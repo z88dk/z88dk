@@ -20,7 +20,7 @@ investigation.
 
 ## The Display Background
 
-The principle is masked sprites is one all Spectrum programmers should be
+The principle of masked sprites is one all Spectrum programmers should be
 familiar with. The basic idea is succinctly described
 [here](http://www.breakintoprogram.co.uk/software_development/masking-sprites). Before
 we look at a sprite, however, we need to take a brief look at the *background*.
@@ -37,12 +37,14 @@ We're going to postpone discussion of how to get proper control over the
 background until a later article, but in order to demonstrate how masked sprites
 work we need to at least fill a pattern into the display background so we can
 see the effects of the masking. We can create such a pattern by using a default
-*tile* pattern when we first initialise the screen.
+*tile* when we first initialise the screen.
 
 ---
 
 **_This section introduces the SP1 concept of 'tiles'. If you've already read
-the BiFrost part of this guide you'll know that BiFrost also has the concept of
+the
+[BiFrost](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_07_BiFrost.md)
+part of this guide you'll know that BiFrost also has the concept of
 'tiles'. It's somewhat unfortunate and confusing that the two graphics libraries
 use the same term for different things. As we're about to see, SP1 uses the term
 'tile' for an 8x8 pixel character cell, a grid of which makes up the background
@@ -91,7 +93,7 @@ does fill the screen with a repeating pattern which is what we need here.
 Recall from the first article in this series that we used a simple 8x8 [circle
 graphic](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_01_GettingStarted.md#program-1---sp1-circle-sprite)
 as our sprite, and that the data for it was defined in assembly language
-as opposed to 'C' in order to make the graphical data little easier to look
+as opposed to 'C' in order to make the graphical data a little easier to look
 at. We're going to continue with that approach. For our masked sprite we'll use
 the same circle sprite and a mask for it, as seen here, circle to the left, mask
 to the right:
@@ -112,7 +114,7 @@ SP1 masks have a bit set where the background is to be allowed to be seen. This
 mask just opens up the corners of the sprite; we could allow the centre of the
 circle to show the background if we so chose.
 
-As we've seen, in SP1, sprites are built up in columns, and our simple 8x8 pixel
+As we've [seen](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_01_GettingStarted.md#a-closer-look-at-the-sprites-code), in SP1 sprites are built up in columns, and our simple 8x8 pixel
 sprite is one column of data. With masked sprites, the data is arranged in
 memory as one mask byte, followed by one data byte, incrementing upwards in
 memory. That gives this assembly listing:
@@ -206,8 +208,8 @@ zcc +zx -vn -m -startup=31 -clib=sdcc_iy circle_masked.c circle_sprite_masked.as
 ```
 
 Running the program sees the screen fill with 'X's and our little circle sprite
-glides across the screen, left to right, floating above the background, and
-neatly blended into it, thanks to the mask.
+glides across the screen, left to right, floating above the background, neatly
+blended into it via the mask.
 
 Apart from the tweak to *sp1_Initialize()* which populates the background tiles,
 there are only two other significant differences between this code and the
@@ -215,32 +217,33 @@ version of it introduced in the first article in this series. Firstly, the
 *sp1_CreateSpr()* and *sp1_AddColSpr()* calls specify draw functions called
 *SP1_DRAW_MASK2LB* and *SP1_DRAW_MASK2RB* respectively, and have a sprite type
 of *SP1_TYPE_2BYTE*. This is because we're drawing a masked sprite, with 2 bytes
-per scan line. Secondly, we're moving the sprite with a call to
-*sp1_MoveSprPix()* instead of *sp1_MoveSprAbs()*. The *pix* version of the move
+per scan line (one mask, one data). Secondly, we're moving the sprite with a call to
+*sp1_MoveSprPix()* instead of *sp1_MoveSprAbs()*. The *Pix* version of the move
 function takes pixel coordinates, which are frequently easier to work with than
-the cell/rotation arguments the *abs* sprite move function takes. Both sprite
+the cell/rotation arguments the *Abs* sprite move function takes. Both sprite
 moving functions do the same thing in the end, so use whichever one works best
 with the positioning data your program has to hand.
 
 You'll have noticed that this code uses the Spectrum's hardware interrupt: it
 called *intrinsic_ei()* to enable the interrupt (Z88DK programs start with
 interrupts disabled), and uses *intrinsic_halt()* to pause and wait for the
-interrupt between each screen update. As has been discussed, you don't need to
-*HALT* the Z80 in SP1 programs in order to avoid flickering, so you might wonder
-what's going on here. If you take out the *intrinsic_halt()* call you'll see:
-the sprite zips across the screen too quickly to observe. Waiting on the
-interrupt locks the update to moving the sprite one pixel every interrupt. Since
-the Spectrum generates 50 interrupts a second, the *intrinsic_halt()* makes the
-updates slow down moving 50 pixels a second. The Spectrum's screen is 256 pixels
-wide, so at 50 frames per second (fps) it takes the sprite about 5 seconds to
-cross the screen.
+interrupt between each screen update. As has been
+[discussed](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_01_GettingStarted.md#runtime),
+you don't need to *HALT* the Z80 in SP1 programs in order to avoid flickering,
+so you might wonder what's going on here. If you take out the *intrinsic_halt()*
+call you'll see: the sprite zips across the screen too quickly to
+observe. Waiting on the interrupt locks the update to moving the sprite one
+pixel every interrupt. Since the Spectrum generates 50 interrupts a second, the
+*intrinsic_halt()* makes the updates slow down and the sprite moves at 50 pixels
+a second. The Spectrum's screen is 256 pixels wide, so at 50 frames per second
+(fps) it takes the sprite about 5 seconds to cross the screen.
 
 ## Multiple sprites
 
-Since we've introduced the concept of timings, let's have a look at how SP1
+Since we've now introduced the concept of timings, let's have a look at how SP1
 copes with multiple sprites.
 
-Save this code to a file called 'circle_masked.c':
+Save this code to a file called 'circle_masked_multi.c':
 
 ```
 #pragma output REGISTER_SP = 0xD000
@@ -313,29 +316,39 @@ int main()
 }
 ```
 
+Since we're discussing timings and performance, we'll turn on the SDCC
+compiler's options for full optimisation for this compile:
+
+```
+zcc +zx -vn -m -startup=31 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 circle_masked_multi.c circle_sprite_masked.asm -o circle_masked_multi -create-app
+```
+
 There are two significant developments in this example. The first is that we
-replace the default interrupt service routine (in the Spectrum's ROM) with an
-empty one called *isr()*. We do this so we can still *HALT* the Z80 in order to
-lock the code to 50fps, but without consuming CPU time with the services the
-Spectrum's ROM code adds to the interrupt call. This is a fairly common approach
-with SP1 programs. While there's no need to synchronise with the raster, it's
-common to use the ISR to to other background tasks likes maintain timers or play
-music. The default SP1 installation creates the interrupt vector table at
-0xD000, and makes room for the jump vector at 0xD1D1. All the details on how to
-control the interrupt are in
+replace the default interrupt service routine (the one in the Spectrum's ROM)
+with an empty one called *isr()*. We do this so we can still *HALT* the Z80 in
+order to lock the code to 50fps using the interrupt, but without consuming CPU
+time with the services the Spectrum's ROM code adds to the interrupt call. This
+is a fairly common approach with SP1 programs. While there's no need to
+synchronise with the raster, it's common to use the ISR to do other background
+tasks likes maintain timers or play music. The default SP1 installation creates
+the interrupt vector table at 0xD000, and makes room for the jump vector at
+0xD1D1. All these details are covered in the
 [interrupts](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_08_Interrupts.md)
 document of this getting started guide.
 
 The second development we have in this example is the use of multiple
 sprites. Instead of a single *sp1_ss* pointer, we define a structure to hold the
-necessary details of a sprite, then create an array of those structures. For now
-the created sprites all use the same sprite data (the masked circle sprite);
-they're intialised to different screen x,y locations though. Each time round the
-same loop all the sprites are moved one pixel, left to right, as before.
+necessary details of a sprite (*sp1_ss and screen location), then create an
+array of those structures. For now the created sprites all use the same sprite
+data (the masked circle sprite); they're intialised to different screen x,y
+locations. Each time round the game loop all the sprites are moved one
+pixel, left to right, as before.
 
 ## Exercises for the reader!
 
 There's enough here to play with, so we leave some exercises for the reader:
+
+* Modify the sprite mask to open up the centre of the circle sprite.
 
 * How many 8x8 pixel, masked sprites can SP1 draw in 1/50th of a second
 (i.e. between the *HALT*s)?
@@ -343,12 +356,12 @@ There's enough here to play with, so we leave some exercises for the reader:
 * What happens if too many sprites are used, such that SP1 can't redraw them all
 in 1/50th second?
 
-* Take out the *intrinsic_halt()* and *intrinsic_ei()* calls and rerun the
-tests. Now what happens? Increase the number of sprites to see how many SP1
-could realistically manipulate in a game.
+* Take out the *intrinsic_halt()* call and rerun the tests. Now what happens?
+Increase the number of sprites to see how many SP1 could realistically
+manipulate in a game.
 
 * Replace the masked sprite data and code with the simple LOADed sprite and code
-from the first example. The simpler drawing algorithm is faster, so how many
+from the [first example](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_01_GettingStarted.md#program-1---sp1-circle-sprite). The simpler drawing algorithm is faster, so how many
 more sprites can it handle each frame? But what happens on screen?
 
 * Try changing the *circle_sprites[i].x_pos++* code which moves each sprite 1
@@ -369,5 +382,10 @@ the expense of jerky movement. SP1 puts all of these options in the hands of the
 programmer.
 
 ### Where To Go From Here
+
+More of the [example
+links](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_01_GettingStarted.md#where-to-go-from-here)
+given in the first article in this series will make sense, since most of them
+use masked sprites.
 
 The next article in this series will start to explore sprite animation.
