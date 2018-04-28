@@ -7,23 +7,17 @@
     </Filter>
     <Filter Include="Header Files">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\regex">
-      <UniqueIdentifier>{4cc7238f-2da3-4a31-b367-7acac0b0a9c3}</UniqueIdentifier>
+    <Filter Include="Header Files\ext">
+      <UniqueIdentifier>{b419f951-4b8d-4d82-8957-78e2189524d9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\regex">
-      <UniqueIdentifier>{ac85d6b9-2161-419b-aba0-082f47044237}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Unity">
-      <UniqueIdentifier>{16573ad6-03df-4260-8f51-bd9af1c8fba6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Unity">
-      <UniqueIdentifier>{3f1b05cf-01df-47a7-81d6-c05cc340433d}</UniqueIdentifier>
+    <Filter Include="Source Files\ext">
+      <UniqueIdentifier>{16879cff-0970-4165-b538-03b9084baacc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -45,20 +39,20 @@
     <ClCompile Include="..\..\src\common\t\test.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\ext\Unity\src\unity.c">
+      <Filter>Source Files\ext</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\ext\regex\regcomp.c">
-      <Filter>Source Files\regex</Filter>
+      <Filter>Source Files\ext</Filter>
     </ClCompile>
     <ClCompile Include="..\..\ext\regex\regerror.c">
-      <Filter>Source Files\regex</Filter>
+      <Filter>Source Files\ext</Filter>
     </ClCompile>
     <ClCompile Include="..\..\ext\regex\regexec.c">
-      <Filter>Source Files\regex</Filter>
+      <Filter>Source Files\ext</Filter>
     </ClCompile>
     <ClCompile Include="..\..\ext\regex\regfree.c">
-      <Filter>Source Files\regex</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\ext\Unity\src\unity.c">
-      <Filter>Source Files\Unity</Filter>
+      <Filter>Source Files\ext</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -71,26 +65,17 @@
     <ClInclude Include="..\..\src\common\strutil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\ext\regex\cclass.h">
-      <Filter>Header Files\regex</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ext\regex\cname.h">
-      <Filter>Header Files\regex</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ext\regex\regex.h">
-      <Filter>Header Files\regex</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ext\regex\regex2.h">
-      <Filter>Header Files\regex</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ext\regex\utils.h">
-      <Filter>Header Files\regex</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\ext\Unity\src\unity.h">
-      <Filter>Header Files\Unity</Filter>
+      <Filter>Header Files\ext</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ext\Unity\src\unity_internals.h">
-      <Filter>Header Files\Unity</Filter>
+      <Filter>Header Files\ext</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ext\optparse\optparse.h">
+      <Filter>Header Files\ext</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ext\regex\regex.h">
+      <Filter>Header Files\ext</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
