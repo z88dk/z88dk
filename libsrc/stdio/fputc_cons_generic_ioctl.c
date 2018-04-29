@@ -6,7 +6,7 @@ int fputc_cons_generic_ioctl(uint16_t cmd, void *arg) __naked
 {
 #asm
 	EXTERN		generic_console_ioctl
-	EXTERN		generic_console_w
+	EXTERN		__console_w
 	EXTERN		generic_console_flags
 
 ; fputc_cons_generic_ioctl(uint16_t request, void *arg) __smallc;
@@ -42,7 +42,7 @@ set_raw:
 	jr	success
 
 get_console_size:
-	ld	hl,(generic_console_w)
+	ld	hl,(__console_w)
 	ex	de,hl		;hl = arg
 	ld	(hl),e
 	inc	hl

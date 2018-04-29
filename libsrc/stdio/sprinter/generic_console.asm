@@ -6,6 +6,8 @@
 		PUBLIC		generic_console_scrollup
 		PUBLIC		generic_console_printc
 		PUBLIC		generic_console_ioctl
+                PUBLIC          generic_console_set_ink
+                PUBLIC          generic_console_set_paper
 
 		EXTERN		__console_w
 		EXTERN		CONSOLE_COLUMNS
@@ -13,6 +15,30 @@
 
 generic_console_ioctl:
 	scf
+	ret
+
+generic_console_set_ink:
+	ld	hl,text_colour
+	and	15
+	ld	b,a
+	ld	a,(hl)
+	and	@11110000
+	or	b
+	ld	(hl),a
+	ret
+
+generic_console_set_paper:
+	ld	hl,text_colour
+	rlca
+	rlca
+	rlca	
+	rlca
+	and	@11110000
+	ld	b,a
+	ld	a,(hl)
+	and	15
+	or	b
+	ld	(hl),a
 	ret
 
 generic_console_cls:
@@ -61,3 +87,4 @@ generic_console_printc_1:
 		SECTION		data_clib
 
 text_colour:	defb	@00001111	;bright white on black
+

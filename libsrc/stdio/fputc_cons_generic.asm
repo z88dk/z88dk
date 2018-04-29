@@ -1,17 +1,40 @@
+; Generic console driver - VT52 + ZX Codes
 ;
-; Generic console writer
+; Supported VT52 codes:
 ;
-; Supports:
+;  [ESC] A - Move the cursor to beginning of line above.
+;  [ESC] B - Move the cursor to beginning of line below.
+;  [ESC] C - Move the cursor right by one.
+;  [ESC] D - Move the cursor left by one 
+;  [ESC] E - Clear the screen and place the cursor in the upper left corner.
+;  [ESC] H - Move the cursor to the upper left corner.
+;  [ESC] I - Move the cursor to beginning of line above.
+;  [ESC] J - Erase all lines after our current line
+;  [ESC] K - Clear the current line from the current cursor position.
+;  [ESC] Y - row col 'Goto' Coordinate mode - first will change line number, then cursor position (both ASCII - 32)
+;  [ESC] b - Byte after 'b' sets new foreground color (ASCII - 32)
+;  [ESC] c - Byte after 'c' sets new background color (ASCII -32)
+;  [ESC] s - Enable/disable vertical scrolling
+;   8      - move cursor left
+;  10      - linefeed
 ;
-;  8 = backspace (+erase)
-;  9 = right
-; 11 = up
-; 13 = down
+; Supported ZX Codes:
+;
 ;  4,[0|1] = enable/disable vertical scroll
+;  8 = backspace 
+;  9 = right
 ; 10 = line feed
+; 11 = up
 ; 12 = cls
-; 22,y,x = Move to position
-;
+; 13 = down
+; 16, 32 +n = set ink
+; 17, 32 +n = set paper
+; 22,y+32,x+32 = Move to position
+
+		defc		SUPPORT_vt52=1
+		; Extra VT52 codes - clear to end of line + clear to end of screen
+		defc		SUPPORT_vt52x=0
+		defc		SUPPORT_zxcodes=1
 
 
 		SECTION		code_clib
@@ -21,11 +44,11 @@
 		; Variables that can be adjusted by platform specific code
 		PUBLIC		generic_console_flags
 
-		EXTERN		CONSOLE_ROWS
-		EXTERN		CONSOLE_COLUMNS
 		EXTERN		generic_console_scrollup
 		EXTERN		generic_console_printc
 		EXTERN		generic_console_cls
+		EXTERN		generic_console_set_ink
+		EXTERN		generic_console_set_paper
 		EXTERN		__console_x
 		EXTERN		__console_y
 		EXTERN		__console_w
@@ -40,32 +63,53 @@ _fputc_cons_generic:
 	ld	a,(hl)
 	ld	bc,(__console_x)		;coordinates
 	ld	hl,generic_console_flags
+IF SUPPORT_vt52
 	bit	0,(hl)
-	jr	nz,set_y
+	jp	nz,set_escape
+ENDIF
 	bit	1,(hl)
-	jr	nz,set_x
+	jp	nz,set_y
 	bit	2,(hl)
-	jr	nz,set_vscroll
+	jp	nz,set_x
+	bit	3,(hl)
+	jp	nz,set_vscroll
+	bit	4,(hl)
+	jp	nz,set_ink
+	bit	5,(hl)
+	jp	nz,set_paper
+        bit     6,(hl)          ;raw mode
+        ld      e,1             ;set raw mode
+        jr      nz,handle_character
+        cp      8
+        jp      z,left
+        cp      10
+        jp      z,handle_cr
+IF SUPPORT_zxcodes
+        cp      9
+        jp      z,right
+        cp      11
+        jp      z,up
+        cp      12
+        jp      z,cls
+        cp      13
+        jp      z,down
+        cp      22
+        jp      z,start_xypos
+        cp      4
+        jp      z,start_vscroll
+	cp	16
+	jp	z,start_ink
+	cp	17
+	jp	z,start_paper
+ENDIF
+IF SUPPORT_vt52
+	cp	27
+	jp	z,start_escape
+ENDIF
+	dec	e		;e =0, translate mode
 	bit	6,(hl)		;raw mode
 	ld	e,1		;set raw mode
 	jr	nz,handle_character
-	cp	8
-	jr	z,left
-	cp	9
-	jp	z,right
-	cp	10
-	jp	z,handle_cr
-	cp	11
-	jr	z,up
-	cp	12
-	jp	z,cls
-	cp	13
-	jr	z,down
-	cp	22
-	jp	z,start_xypos
-	cp	4
-	jp	z,start_vscroll
-	ld	e,0		;translate mode
 handle_character:
 	; At this point:
 	;hl = generic_console_flags
@@ -99,7 +143,7 @@ handle_character_no_scroll:
 
 
 set_x:
-	res	1,(hl)
+	res	2,(hl)
 	sub	32
 	ld	b,a
 	ld	a,(__console_w)
@@ -110,7 +154,7 @@ set_x:
 	ld	(__console_x),a
 	ret
 set_y:
-	res	0,(hl)
+	res	1,(hl)
 	sub	32
 	ld	b,a
 	ld	a,(__console_h)
@@ -122,12 +166,48 @@ set_y:
 	ret
 
 set_vscroll:
-	res	2,(hl)
+	res	3,(hl)
 	res	7,(hl)
 	rrca
 	ret	c
 	set	7,(hl)
 	ret
+
+
+IF SUPPORT_vt52
+set_escape:
+	res	0,(hl)
+	cp	'A'
+	jr	z,up
+	cp	'B'
+	jr	z,down
+	cp	'C'
+	jr	z,right
+	cp	'D'
+	jr	z,left
+	cp	'E'
+	jr	z,cls
+	cp	'H'		;home
+	jr	z,move_home
+	cp	'Y'
+	jr	z,start_xypos
+IF SUPPORT_vt52x
+	cp	'K'
+	jr	z,clear_eol
+	cp	'J'
+	jr	z,clear_eos
+ENDIF
+	cp	'b'
+	jr	z,start_ink
+	cp	'c'
+	jr	z,start_paper
+	cp	's'
+	jr	z,start_vscroll
+	; We just swallow the remainder
+	ret
+ENDIF
+
+	
 
 ; Move print position left
 left:	ld	a,c
@@ -165,19 +245,70 @@ right:	ld	a,(__console_w)
 
 
 cls:	call	generic_console_cls
+move_home:
 	ld	bc,0
 	jr	store_coords
 
 start_xypos:
-	ld	a,(hl)
-	or	3
-	ld	(hl),a
+	set	2,(hl)
+	set	1,(hl)
 	ret
 
 start_vscroll:
-	set	2,(hl)
+	set	3,(hl)
 	ret
-	
+
+IF SUPPORT_vt52
+start_escape:
+	set	0,(hl)
+	ret
+ENDIF
+
+start_ink:
+	set	4,(hl)
+	ret
+
+start_paper:
+	set	5,(hl)
+	ret
+
+
+set_ink:
+	res	4,(hl)
+	jp	generic_console_set_ink
+
+set_paper:
+	res	5,(hl)
+	jp	generic_console_set_paper
+
+IF SUPPORT_vt52x
+; bc = coordinates
+clear_eol:
+	ld	a,b
+clear_eol_loop:
+	ld	hl,generic_console_flags
+	push	af		;save row
+	ld	e,0		;not raw
+	ld	a,' '
+	call	handle_character	;exits with bc=coordinates
+	pop	af
+	cp	b
+	jr	nz,clear_eol_loop
+	ret
+
+; bc = coordinates
+clear_eos:
+	call	clear_eol		;exit, bc = coordinates
+	ld	a,(__console_h)
+	sub	b
+clear_eos_loop:
+	push	af
+	call	clear_eol
+	pop	af
+	dec	a
+	jr	nz,clear_eos_loop
+	ret
+ENDIF
 
 
 handle_cr:
@@ -206,9 +337,12 @@ handle_cr_no_need_to_scroll:
 
 		SECTION		bss_clib
 
-generic_console_flags:		defb	0		; bit 0 = set x
-					; bit 1 = set y
-					; bit 2 = set vertical scroll
-					; bit 6 = raw mode
-					; bit 7 = vertical scroll disabled
+generic_console_flags:		defb	0		; bit 0 = expect escape
+							; bit 1 = set row
+							; bit 2 = set column
+							; bit 3 = set vscroll
+							; bit 4 = set ink
+							; bit 5 = set paper
+							; bit 6 = raw mode
+							; bit 7 = vscroll disabled
 

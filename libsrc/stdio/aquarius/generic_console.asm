@@ -6,6 +6,8 @@
 		PUBLIC		generic_console_scrollup
 		PUBLIC		generic_console_printc
 		PUBLIC		generic_console_ioctl
+                PUBLIC          generic_console_set_ink
+                PUBLIC          generic_console_set_paper
 
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
@@ -14,6 +16,8 @@
 
 generic_console_ioctl:
 	scf
+generic_console_set_ink:
+generic_console_set_paper:
 	ret
 
 generic_console_cls:

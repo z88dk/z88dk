@@ -6,6 +6,8 @@
 		PUBLIC		generic_console_scrollup
 		PUBLIC		generic_console_printc
 		PUBLIC		generic_console_ioctl
+                PUBLIC          generic_console_set_ink
+                PUBLIC          generic_console_set_paper
 		PUBLIC		msx_attr
 
 		EXTERN		generic_console_w
@@ -25,6 +27,8 @@ ENDIF
 
 generic_console_ioctl:
 	scf
+generic_console_set_ink:
+generic_console_set_paper:
 	ret
 
 generic_console_cls:
