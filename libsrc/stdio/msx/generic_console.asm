@@ -28,10 +28,39 @@ ENDIF
 
 generic_console_ioctl:
 	scf
-generic_console_set_ink:
-generic_console_set_paper:
 generic_console_set_inverse:
 	ret
+
+generic_console_set_ink:
+	call	map_colour
+	rla
+	rla
+	rla
+	rla
+	ld	b,0x0f
+set_attr:
+	ld	c,a
+	ld	hl,msx_attr
+	ld	a,(hl)
+	and	b
+	or	c
+	ld	(hl),a
+	ret
+
+generic_console_set_paper:
+	call	map_colour
+	ld	b,0xf0
+	jr	set_attr
+	
+
+map_colour:
+	and	7
+	inc	a	;(1,3,5,7: black, green, blue, cyan)
+	bit	0,a
+	ret	nz
+	add	7	; (2,4,6,8 -> 9,11,13,15; red, yellow, magenta, white)
+	ret
+
 
 generic_console_cls:
 	call	ansi_cls
