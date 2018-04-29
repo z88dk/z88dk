@@ -517,3 +517,5 @@ and
 [Blackstar](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/EXAMPLES/zx/demo_sp1/BlackStar)
 in particular is a complete game written with SP1, and is an excellent
 source of ideas and revelations.
+
+The second article in this SP1 series covers masked sprites, and is [here](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_02_SimpleMaskedSprite.md).

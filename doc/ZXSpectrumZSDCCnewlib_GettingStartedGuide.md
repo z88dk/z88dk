@@ -26,8 +26,9 @@ an excellent basis for Spectrum games written with Z88DK:
 | Article         | Covers        |
 | --------------- | ------------- |
 | [SP1, Getting Started](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_01_GettingStarted.md) | Getting started with SP1 |
+| [SP1, Masked Sprites](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_02_SimpleMaskedSprite.md) | Masked sprites |
 
 These documents are a work in progress. Comments and suggestions are welcome in
 the [Z88DK Sinclair ZX forum](https://www.z88dk.org/forum/viewforum.php?id=2).
 
-[Derek Fountain](http://www.derekfountain.org/), March, 2018
+[Derek Fountain](http://www.derekfountain.org/), April, 2018
