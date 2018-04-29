@@ -14,39 +14,31 @@
 	EXTERN	__console_w
 	EXTERN	generic_console_flags2
 
-
+; Entry:
+;  a = charcter
+; hl = expect_flags
 handle_controls:
 	; Extra codes
-	ld	hl,expect_flags
 	cp	18
-	jr	z,start_flash
+	ld	d,1
+	jr	z,start_code
+	ld	d,2
 	cp	19
-	jr	z,start_bright
+	jr	z,start_code
+	ld	d,16
 	cp	1
-	jr	z,start_switch
+	jr	z,start_code
 	cp	2
-	jr	z,start_font_set
-	ret
-
-start_font_set:
-	set	2,(hl)
-	set	3,(hl)
-	ret
-
-start_switch:
-	set	4,(hl)
-	ret
-
-start_bright:
-	set	1,(hl)
-	ret
-
-start_flash:
-	set	0,(hl)
+	ret	nz
+	ld	d,12
+start_code:
+	ld	a,(hl)
+	or	d	
+	ld	(hl),a
 	ret
 
 set_flash:
-	res	1,(hl)
+	res	0,(hl)
 	ld	hl,__zx_console_attr
 	res	7,(hl)
 	rrca

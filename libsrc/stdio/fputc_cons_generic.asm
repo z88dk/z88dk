@@ -140,21 +140,27 @@ IF SUPPORT_zxcodes
         cp      13
         jp      z,down
         cp      22
-        jp      z,start_xypos
+	ld	d,6
+        jr      z,start_code
         cp      4
-        jp      z,start_vscroll
+	ld	d,8
+        jr      z,start_code
 	cp	16
-	jp	z,start_ink
+	ld	d,16
+	jr	z,start_code
 	cp	17
-	jp	z,start_paper
+	ld	d,32
+	jr	z,start_code
+	ld	d,64
 	cp	20
-	jp	z,start_inverse
+	jr	z,start_code
 ENDIF
 IF SUPPORT_vt52
+	ld	d,1
 	cp	27
-	jp	z,start_escape
+	jr	z,start_code
 ENDIF
-	ld	e,0		;set raw mode
+	dec	e		;e = 0, not raw mode
 handle_character:
 	; At this point:
 	;hl = generic_console_flags
@@ -187,6 +193,11 @@ handle_character_no_scroll:
 	jr	store_coords
 
 
+start_code:
+	ld	a,(hl)
+	or	d
+	ld	(hl),a
+	ret
 
 cls:	call	generic_console_cls
 move_home:
@@ -209,7 +220,8 @@ set_escape:
 	cp	'H'		;home
 	jr	z,move_home
 	cp	'Y'
-	jr	z,start_xypos
+	ld	d,6
+	jr	z,start_code
 IF SUPPORT_vt52x
 	cp	'K'
 	jr	z,clear_eol
@@ -221,11 +233,14 @@ ENDIF
 	cp	'q'
 	jr	z,set_inverse_ansi
 	cp	'b'
-	jr	z,start_ink
+	ld	d,16
+	jr	z,start_code
 	cp	'c'
-	jr	z,start_paper
+	ld	d,32
+	jr	z,start_code
 	cp	's'
-	jr	z,start_vscroll
+	ld	d,8
+	jr	z,start_code
 	; We just swallow the remainder
 	ret
 ENDIF
@@ -235,10 +250,9 @@ set_inverse_ansi:
 set_inverse:			;Entry hl = flags
 	res	6,(hl)
 	inc	hl		;hl = flags2
-	res	7,(hl)
-	and	1
-	jr	z,set_inverse_call_generic
-	set	7,(hl)
+	rl	(hl)		;drop bit 7
+	rra
+	rr	(hl)		;get it back again
 set_inverse_call_generic:
 	jp	generic_console_set_inverse
 
@@ -278,33 +292,6 @@ right:	ld	a,(__console_w)
 	jr	store_coords
 
 
-
-start_xypos:
-	set	2,(hl)
-	set	1,(hl)
-	ret
-
-start_vscroll:
-	set	3,(hl)
-	ret
-
-IF SUPPORT_vt52
-start_escape:
-	set	0,(hl)
-	ret
-ENDIF
-
-start_ink:
-	set	4,(hl)
-	ret
-
-start_paper:
-	set	5,(hl)
-	ret
-
-start_inverse:
-	set	6,(hl)
-	ret
 
 
 IF SUPPORT_vt52x
