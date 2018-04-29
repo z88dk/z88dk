@@ -8,6 +8,7 @@
 		PUBLIC		generic_console_ioctl
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
+                PUBLIC          generic_console_set_inverse
 		PUBLIC		msx_attr
 
 		EXTERN		generic_console_w
@@ -29,6 +30,7 @@ generic_console_ioctl:
 	scf
 generic_console_set_ink:
 generic_console_set_paper:
+generic_console_set_inverse:
 	ret
 
 generic_console_cls:

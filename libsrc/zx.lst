@@ -8,6 +8,12 @@ stdio/spectrum/getk
 stdio/spectrum/CRT_FONT
 stdio/spectrum/CRT_FONT_64
 stdio/spectrum/CRT_FONT_FZX
+stdio/spectrum/generic_console_scrollup
+stdio/spectrum/generic_console_cls
+stdio/spectrum/generic_console_attrs
+stdio/spectrum/generic_console_printc
+stdio/spectrum/generic_console_ioctl
+stdio/spectrum/console_vars
 @stdio/stdio.lst
 @stdio/ansicore.lst
 stdio/ansi/spectrum/f_ansi_attr
