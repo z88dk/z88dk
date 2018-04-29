@@ -18,6 +18,14 @@ in this series. The other modes are simple enough for the reader to
 explore on their own, but how SP1 deals with masked sprites is worthy of
 investigation.
 
+## Assumptions
+
+The reader is expected to be following on from the first SP1 document, and to
+have read the other documents in the Getting Started series. In particular, this
+document makes use of the Spectrum's interrupt, and the reader is assumed to
+understand how Z88DK can set up the interrupt for custom use. This is covered in
+depth in the [interrupts article](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_08_Interrupts.md).
+
 ## The Display Background
 
 The principle of masked sprites is one all Spectrum programmers should be
@@ -171,6 +179,18 @@ Here's the code to draw the sprite. Save it to a file called 'circle_masked.c':
 #include <arch/zx.h>
 #include <arch/zx/sp1.h>
 #include <intrinsic.h>
+#include <z80.h>
+#include <im2.h>
+#include <string.h>
+
+IM2_DEFINE_ISR(isr) {}
+#define TABLE_HIGH_BYTE        ((unsigned int)0xD0)
+#define JUMP_POINT_HIGH_BYTE   ((unsigned int)0xD1)
+
+#define UI_256                 ((unsigned int)256)
+#define TABLE_ADDR             ((void*)(TABLE_HIGH_BYTE*UI_256))
+#define JUMP_POINT             ((unsigned char*)( (unsigned int)(JUMP_POINT_HIGH_BYTE*UI_256) + JUMP_POINT_HIGH_BYTE ))
+
 
 extern unsigned char circle_masked[];
 
@@ -179,6 +199,12 @@ int main()
   struct sp1_Rect full_screen = {0, 0, 32, 24};
   struct sp1_ss  *circle_sprite;
   unsigned char x;
+
+  memset( TABLE_ADDR, JUMP_POINT_HIGH_BYTE, 257 );
+  z80_bpoke( JUMP_POINT,   195 );
+  z80_wpoke( JUMP_POINT+1, (unsigned int)isr );
+  im2_init( TABLE_ADDR );
+  intrinsic_ei();
 
   zx_border(INK_BLACK);
 
@@ -211,23 +237,12 @@ Running the program sees the screen fill with 'X's and our little circle sprite
 glides across the screen, left to right, floating above the background, neatly
 blended into it via the mask.
 
-Apart from the tweak to *sp1_Initialize()* which populates the background tiles,
-there are only two other significant differences between this code and the
-version of it introduced in the first article in this series. Firstly, the
-*sp1_CreateSpr()* and *sp1_AddColSpr()* calls specify draw functions called
-*SP1_DRAW_MASK2LB* and *SP1_DRAW_MASK2RB* respectively, and have a sprite type
-of *SP1_TYPE_2BYTE*. This is because we're drawing a masked sprite, with 2 bytes
-per scan line (one mask, one data). Secondly, we're moving the sprite with a call to
-*sp1_MoveSprPix()* instead of *sp1_MoveSprAbs()*. The *Pix* version of the move
-function takes pixel coordinates, which are frequently easier to work with than
-the cell/rotation arguments the *Abs* sprite move function takes. Both sprite
-moving functions do the same thing in the end, so use whichever one works best
-with the positioning data your program has to hand.
+### SP1 and the interrupt
 
-You'll have noticed that this code uses the Spectrum's hardware interrupt: it
-called *intrinsic_ei()* to enable the interrupt (Z88DK programs start with
-interrupts disabled), and uses *intrinsic_halt()* to pause and wait for the
-interrupt between each screen update. As has been
+This code uses the Spectrum's hardware interrupt: it calls *intrinsic_ei()* to
+enable the interrupt (Z88DK programs start with interrupts disabled), and uses
+*intrinsic_halt()* to pause and wait for the interrupt between each screen
+update. As has been
 [discussed](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_01_GettingStarted.md#runtime),
 you don't need to *HALT* the Z80 in SP1 programs in order to avoid flickering,
 so you might wonder what's going on here. If you take out the *intrinsic_halt()*
@@ -237,6 +252,35 @@ pixel every interrupt. Since the Spectrum generates 50 interrupts a second, the
 *intrinsic_halt()* makes the updates slow down and the sprite moves at 50 pixels
 a second. The Spectrum's screen is 256 pixels wide, so at 50 frames per second
 (fps) it takes the sprite about 5 seconds to cross the screen.
+
+In order to use the 50Hz interrupt with SP1 we need to stop it calling the
+Spectrum ROM's default interrupt routine, which is incompatible with SP1. (The
+ROM routine assumes exclusive use of some registers which the SP1 library uses.)
+Disabling interrupts is one simple answer to the problem, but since it's fairly
+typical for SP1 programs to use the ISR to do other background tasks like maintain
+timers or play music, installing a custom ISR is a more common practice. In this
+simple example our interrupt service routine, *isr()*, is empty. It still gets
+called, and we can still *HALT* the Z80, the ISR just doesn't do anything.
+
+The default SP1 installation leaves room for the interrupt vector table at
+0xD000, and the jump vector at 0xD1D1. All these details are covered in the
+[interrupts](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_08_Interrupts.md)
+document of this getting started guide.
+
+### Masked sprite modifications
+
+Other than the interrupt and the tweak to *sp1_Initialize()* which populates
+the background tiles, there are only two other significant differences between
+this code and the version of it introduced in the first article in this
+series. Firstly, the *sp1_CreateSpr()* and *sp1_AddColSpr()* calls specify draw
+functions called *SP1_DRAW_MASK2LB* and *SP1_DRAW_MASK2RB* respectively, and
+have a sprite type of *SP1_TYPE_2BYTE*. This is because we're drawing a masked
+sprite, with 2 bytes per scan line (one mask, one data). Secondly, we're moving
+the sprite with a call to *sp1_MoveSprPix()* instead of *sp1_MoveSprAbs()*. The
+*Pix* version of the move function takes pixel coordinates, which are frequently
+easier to work with than the cell/rotation arguments the *Abs* sprite move
+function takes. Both sprite moving functions do the same thing in the end, so
+use whichever one works best with the positioning data your program has to hand.
 
 ## Multiple sprites
 
@@ -323,28 +367,14 @@ compiler's options for full optimisation for this compile:
 zcc +zx -vn -m -startup=31 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 circle_masked_multi.c circle_sprite_masked.asm -o circle_masked_multi -create-app
 ```
 
-There are two significant developments in this example. The first is that we
-replace the default interrupt service routine (the one in the Spectrum's ROM)
-with an empty one called *isr()*. We do this so we can still *HALT* the Z80 in
-order to lock the code to 50fps using the interrupt, but without consuming CPU
-time with the services the Spectrum's ROM code adds to the interrupt call. This
-is a fairly common approach with SP1 programs. While there's no need to
-synchronise with the raster, it's common to use the ISR to do other background
-tasks like maintain timers or play music. The default SP1 installation leaves
-room for the interrupt vector table at 0xD000, and the jump vector at
-0xD1D1. All these details are covered in the
-[interrupts](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_08_Interrupts.md)
-document of this getting started guide.
+This example uses multiple sprites. Instead of a single *sp1_ss* pointer, we
+define a structure to hold the necessary details of a sprite (*sp1_ss and screen
+location), then create an array of those structures. For now the created sprites
+all use the same sprite data (the masked circle sprite); they're intialised to
+different screen x,y locations. Each time round the game loop all the sprites
+are moved one pixel, left to right, as before.
 
-The second development we have in this example is the use of multiple
-sprites. Instead of a single *sp1_ss* pointer, we define a structure to hold the
-necessary details of a sprite (*sp1_ss and screen location), then create an
-array of those structures. For now the created sprites all use the same sprite
-data (the masked circle sprite); they're intialised to different screen x,y
-locations. Each time round the game loop all the sprites are moved one
-pixel, left to right, as before.
-
-## Exercises for the reader!
+## Exercises for the reader
 
 There's enough here to play with, so we leave some exercises for the reader:
 
@@ -356,9 +386,9 @@ There's enough here to play with, so we leave some exercises for the reader:
 * What happens if too many sprites are used, such that SP1 can't redraw them all
 in 1/50th second?
 
-* Take out the *intrinsic_halt()* call and rerun the tests. Now what happens?
-Increase the number of sprites to see how many SP1 could realistically
-manipulate in a game.
+* Take out the *intrinsic_halt()* call from the second example and rerun the
+tests. Now what happens? Increase the number of sprites to see how many SP1
+could realistically manipulate in a game.
 
 * Replace the masked sprite data and code with the simple LOADed sprite and code
 from the [first example](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_01_GettingStarted.md#program-1---sp1-circle-sprite). The simpler drawing algorithm is faster, so how many
