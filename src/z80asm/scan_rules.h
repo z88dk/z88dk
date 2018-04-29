@@ -3718,10 +3718,10 @@ static const int lexer_error = 0;
 static const int lexer_en_main = 38;
 static void set_scan_buf( char *text, Bool _at_bol )
 {
- str_set( input_buf, text );
- p = str_data(input_buf);
+ Str_set( input_buf, text );
+ p = Str_data(input_buf);
  at_bol = _at_bol;
- pe = str_data(input_buf) + str_len(input_buf);
+ pe = Str_data(input_buf) + Str_len(input_buf);
  eof = pe;
 	{
 	cs = lexer_start;
@@ -5104,10 +5104,10 @@ _eof_trans:
   if ( get_sym_string() )
   {
    STR_DEFINE(string, STR_SIZE);
-   str_set_bytes(string, ts, te-ts);
-   str_compress_escapes(string);
-   if (str_len(string) == 1)
-    sym.number = str_data(string)[0];
+   Str_set_bytes(string, ts, te-ts);
+   Str_compress_escapes(string);
+   if (Str_len(string) == 1)
+    sym.number = Str_data(string)[0];
    else
     error_invalid_squoted_string();
    STR_DELETE(string);

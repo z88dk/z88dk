@@ -371,7 +371,7 @@ void Expr_init (Expr *self)
     self->rpn_ops = OBJ_NEW( ExprOpArray );
 	OBJ_AUTODELETE( self->rpn_ops ) = FALSE;
 
-    self->text = str_new(STR_SIZE);
+    self->text = Str_new(STR_SIZE);
 
 	self->type	= TYPE_UNKNOWN;
 	
@@ -390,14 +390,14 @@ void Expr_init (Expr *self)
 void Expr_copy (Expr *self, Expr *other)
 {
 	self->rpn_ops	= ExprOpArray_clone( other->rpn_ops );
-	self->text = str_new(STR_SIZE); 
-	str_set(self->text, str_data(other->text));
+	self->text = Str_new(STR_SIZE); 
+	Str_set(self->text, Str_data(other->text));
 }
 
 void Expr_fini (Expr *self)
 { 
 	OBJ_DELETE( self->rpn_ops );
-	str_delete(self->text);
+	Str_delete(self->text);
 }
 
 /*-----------------------------------------------------------------------------
@@ -416,7 +416,7 @@ static Bool Expr_parse_ternary_cond( Expr *expr );
 		while ( condition )									\
 		{													\
 			op = sym.tok;									\
-			str_append_n(self->text, sym.tstart, sym.tlen);	\
+			Str_append_n(self->text, sym.tstart, sym.tlen);	\
 			GetSym();										\
 			if ( ! prev_name(self) )						\
 				return FALSE;								\
@@ -440,7 +440,7 @@ static Bool Expr_parse_factor( Expr *self )
 		ExprOp_init_asmpc( ExprOpArray_push( self->rpn_ops ) );
 		self->type = MAX( self->type, TYPE_ADDRESS );
 
-		str_append_n(self->text, sym.tstart, sym.tlen);
+		Str_append_n(self->text, sym.tstart, sym.tlen);
 		
 		GetSym();
 		break;
@@ -460,13 +460,13 @@ static Bool Expr_parse_factor( Expr *self )
         }
 #endif
 
-        str_append_n(self->text, sym.tstart, sym.tlen);		/* add identifier to infix expr */
+        Str_append_n(self->text, sym.tstart, sym.tlen);		/* add identifier to infix expr */
 
         GetSym();
         break;
 
 	case TK_NUMBER:
-		str_append_sprintf(self->text, "%ld", sym.number);
+		Str_append_sprintf(self->text, "%ld", sym.number);
 		ExprOp_init_number( ExprOpArray_push( self->rpn_ops ),
 							sym.number );
 		self->type = MAX( self->type, TYPE_CONSTANT );
@@ -488,7 +488,7 @@ static Bool Expr_parse_unary( Expr *self )
 	switch (sym.tok) 
 	{
     case TK_MINUS:
-		str_append_n(self->text, sym.tstart, sym.tlen);
+		Str_append_n(self->text, sym.tstart, sym.tlen);
         GetSym();
 		if ( ! Expr_parse_unary( self ) )		/* right-associative, recurse */
 			return FALSE;
@@ -502,7 +502,7 @@ static Bool Expr_parse_unary( Expr *self )
         return Expr_parse_unary( self );
 
     case TK_BIN_NOT:
-		str_append_n(self->text, sym.tstart, sym.tlen);
+		Str_append_n(self->text, sym.tstart, sym.tlen);
         GetSym();
 		if ( ! Expr_parse_unary( self ) )		/* right-associative, recurse */
 			return FALSE;
@@ -512,7 +512,7 @@ static Bool Expr_parse_unary( Expr *self )
 		return TRUE;
 
     case TK_LOG_NOT:
-		str_append_n(self->text, sym.tstart, sym.tlen);
+		Str_append_n(self->text, sym.tstart, sym.tlen);
         GetSym();
 
         if ( ! Expr_parse_unary( self ) )		/* right-associative, recurse */
@@ -524,7 +524,7 @@ static Bool Expr_parse_unary( Expr *self )
 
     case TK_LPAREN:
     case TK_LSQUARE:
-		str_append_n(self->text, sym.tstart, sym.tlen);
+		Str_append_n(self->text, sym.tstart, sym.tlen);
         open_paren = sym.tok;
         GetSym();
 
@@ -536,7 +536,7 @@ static Bool Expr_parse_unary( Expr *self )
              ( open_paren == TK_LSQUARE && sym.tok != TK_RSQUARE ) )
 			return FALSE;
 
-		str_append_n(self->text, sym.tstart, sym.tlen);
+		Str_append_n(self->text, sym.tstart, sym.tlen);
         GetSym();
 		return TRUE;
 
@@ -553,7 +553,7 @@ static Bool Expr_parse_power( Expr *self )
 
     while ( sym.tok == TK_POWER )
     {
-		str_append_n(self->text, sym.tstart, sym.tlen);
+		Str_append_n(self->text, sym.tstart, sym.tlen);
         GetSym();
 		if ( ! Expr_parse_power( self ) )		/* right-associative, recurse */
 			return FALSE;
@@ -609,7 +609,7 @@ static Bool Expr_parse_ternary_cond( Expr *self )
 		return TRUE;
 
 	/* ternary construct found */
-    str_append_char(self->text, '?');
+    Str_append_char(self->text, '?');
 	GetSym();						/* consume '?' */
 		
 	if ( ! Expr_parse_ternary_cond(self) )	/* get true */
@@ -617,7 +617,7 @@ static Bool Expr_parse_ternary_cond( Expr *self )
 
 	if ( sym.tok != TK_COLON )
 		return FALSE;
-    str_append_char(self->text, ':');
+    Str_append_char(self->text, ':');
 	GetSym();						/* consume ':' */
 
 	if ( ! Expr_parse_ternary_cond(self) )	/* get false */
@@ -637,7 +637,7 @@ Expr *expr_parse( void )
 
     if ( sym.tok == TK_CONST_EXPR )		/* leading '#' : ignore relocatable address expression */
     {
-		str_append_n(self->text, sym.tstart, sym.tlen);
+		Str_append_n(self->text, sym.tstart, sym.tlen);
 
 		GetSym();               
         is_const_expr = TRUE;

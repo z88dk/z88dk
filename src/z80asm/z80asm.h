@@ -9,7 +9,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 
 #pragma once
 
-#include "types.h"
+#include "ztypes.h"
 #include "sym.h"
 #include "expr.h"
 #include <stdio.h>

@@ -12,7 +12,7 @@ One symbol from the assembly code - label or constant.
 #pragma once
 
 #include "class.h"
-#include "types.h"
+#include "ztypes.h"
 
 struct Module;
 struct Section;

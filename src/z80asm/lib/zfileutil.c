@@ -12,6 +12,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include "alloc.h"
 #include "class.h"
 #include "fileutil.h"
+#include "zfileutil.h"
 #include "init.h"
 #include "strpool.h"
 #include "str.h"
@@ -69,9 +70,9 @@ char *temp_filename( char *filename )
 	static int count;
 	char *ret;
 
-	str_sprintf( temp, "%s/~$%d$%s", 
+	Str_sprintf( temp, "%s/~$%d$%s", 
 				 path_dirname(filename), ++count, path_basename(filename) );
-	ret = add_temp_file(str_data(temp));
+	ret = add_temp_file(Str_data(temp));
 
 	STR_DELETE(temp);
 	return ret;
@@ -87,7 +88,7 @@ CLASS( OpenFile )
 	Bool	 is_open;				/* TRUE if fopen succeeded */
 	Bool	 is_writing;			/* TRUE if writing, FALSE if reading */
 	Bool	 is_atomic;				/* TRUE if writing a temp file to be
-									   renamed to filename at myfclose() */
+									   renamed to filename at fclose() */
 END_CLASS;
 
 typedef struct OpenFileElem
@@ -174,103 +175,9 @@ void OpenFile_copy( OpenFile *self, OpenFile *other )
 void OpenFile_fini( OpenFile *self )
 {
 	if ( self->file != NULL && self->is_open )
-		fclose( self->file );		/* no myfclose for atomic to work */
+		fclose( self->file );		/* no xfclose for atomic to work */
 		
 	remove_open_file( self->file );
-}
-
-/* open a file, add to hash table */
-static FILE *OpenFile_open( char *filename, char *mode, Bool is_atomic )
-{
-	OpenFile   *self;
-	char 	   *temp_name;
-
-	init_module();
-
-	/* init temp_files before OpenFile, to assure temp files are removed last */
-	strpool_init();
-	temp_name = is_atomic ? temp_filename( filename ) : NULL;
-
-	/* init object */
-	self = OBJ_NEW( OpenFile );
-	self->filename   = strpool_add( filename );
-	self->is_writing = strchr( mode, 'r' ) ? FALSE : TRUE;
-	
-	/* handle atomic writes */
-	if ( self->is_writing && is_atomic )
-	{
-		self->is_atomic			= TRUE;
-		self->file 				= fopen( temp_name, mode );
-		self->atomic_tempname 	= temp_name;
-	}
-	else 
-	{
-		self->is_atomic			= FALSE;
-		self->file 				= fopen( filename, mode );
-		self->atomic_tempname 	= NULL;
-	}
-
-	if ( self->file == NULL )
-	{
-		/* error, remove object */
-		Bool is_writing = self->is_writing;
-		file_error_filename( filename, is_writing );
-
-		return NULL;
-	}
-	else 
-	{
-		/* add object to open_files map */
-		self->is_open = TRUE;
-		add_open_file( self->file, self );
-
-		return self->file;
-	}
-}
-
-/* close a file, rename temp name if atomic, remove from hash table */
-static void OpenFile_close( FILE *file )
-{
-    OpenFile *self;
-	char     *filename;
-	Bool	  is_writing;
-	int 	  fclose_ret 	= 0;
-	int 	  rename_ret 	= 0;
-
-	/* try to get open_file, may fail if file was already closed */
-	self = get_open_file( file );
-	if ( self == NULL )
-	{
-		fclose( file );
-	}
-	else 
-	{												/* managed file */
-		filename   	= self->filename;
-		is_writing 	= self->is_writing;
-		
-		/* close file */
-		if ( self->is_open )
-			fclose_ret = fclose( file );
-		self->is_open = FALSE;			/* so that OBJ_DELETE() skips fclose() */
-		
-		/* handle atomic writes, if fclose OK */
-		if ( self->is_atomic )
-		{
-			if ( fclose_ret >= 0 )
-			{
-				/* remove target file, if it exists; needed for rename 
-				   ignore errors from remove */
-				remove( self->filename );
-				rename_ret = rename( self->atomic_tempname, self->filename );
-			}
-		}
-
-		OBJ_DELETE( self );			/* object no longer needed */
-		
-		/* error if fclose or rename failed */
-		if ( fclose_ret < 0 || rename_ret < 0 )
-			file_error_filename( filename, is_writing );
-	}
 }
 
 /*-----------------------------------------------------------------------------
@@ -311,101 +218,33 @@ static void fatal_ferr_write( FILE *file )
 /*-----------------------------------------------------------------------------
 *   File open and close
 *----------------------------------------------------------------------------*/
-FILE *myfopen( char *filename, char *mode )
-{
-	return OpenFile_open( filename, mode, FALSE );
-}
-
-FILE *myfopen_atomic( char *filename, char *mode )
-{
-	return OpenFile_open( filename, mode, TRUE );
-}
-
-void myfclose( FILE *file )
-{
-    OpenFile_close( file );
-}
-
-void myfclose_remove( FILE *file )
-{
-    OpenFile *self;
-	char     *filename;
-
-	/* try to get open_file, may fail if file was already closed */
-	self = get_open_file( file );
-	filename = self ? self->filename : NULL;	/* filename in strpool */
-	
-	/* close the file */
-    myfclose( file );
-	
-	/* delete file, if one was found */
-	if ( filename != NULL )
-		remove( filename );
-}
-
-void myfclose_remove_if_empty(FILE *file)
-{
-    fseek(file, 0, SEEK_END);
-	if (ftell(file) == 0)
-		myfclose_remove(file);
-	else
-		myfclose(file);
-}
-
-/*-----------------------------------------------------------------------------
-*   Buffers
-*----------------------------------------------------------------------------*/
-void xfwrite( void *buffer, size_t size, size_t count, FILE *file )
-{
-    if ( fwrite( buffer, size, count, file ) != count )
-        fatal_ferr_write( file );
-}
-
-void xfread( void *buffer, size_t size, size_t count, FILE *file )
-{
-    if ( fread( buffer, size, count, file ) != count )
-        fatal_ferr_read( file );
-}
-
-/*-----------------------------------------------------------------------------
-*   read/write strings of characters
-*----------------------------------------------------------------------------*/
-void xfput_chars( FILE *file, char *buffer, size_t len )
-{
-    xfwrite( buffer, sizeof(char), len, file );
-}
-
-void xfget_chars( FILE *file, char *buffer, size_t len )
-{
-    xfread( buffer, sizeof(char), len, file );
-}
 
 /*-----------------------------------------------------------------------------
 *   read/write Str
 *----------------------------------------------------------------------------*/
 void xfput_strz( FILE *file, char *str )
 {
-    xfput_chars( file, str, strlen(str) );
+	xfwrite_bytes(str, strlen(str), file);
 }
 
 void xfput_Str( FILE *file, Str *str )
 {
-    xfput_chars( file, str_data(str), str_len(str) );
+	xfwrite_bytes(Str_data(str), Str_len(str), file);
 }
 
 void xfget_Str( FILE *file, Str *str, size_t len )
 {
 	/* reserve space */
-	str_clear( str );
-	str_reserve( str, len );
+	Str_clear( str );
+	Str_reserve( str, len );
 
 	/* may fail if static string */
     if ( (int)len + 1 > str->size )
         fatal_ferr_read( file ); 			/* too long */
 
-    xfget_chars( file, str_data(str), len );		/* characters */
-    str_data(str)[len] = '\0';					/* terminate string */
-	str_len(str) = len;							/* set lenght; str_sync_len() only for
+	xfread_bytes(Str_data(str), len, file);		/* characters */
+    Str_data(str)[len] = '\0';					/* terminate string */
+	Str_len(str) = len;							/* set lenght; Str_sync_len() only for
 											   strings not including nulls */
 }
 
@@ -418,7 +257,7 @@ static void _xfput_count_byte_str( FILE *file, char *str, size_t len )
         fatal_ferr_write( file );			/* too long */
 
     xfput_uint8( file, len & 0xFF );		/* byte count */
-	xfput_chars( file, str, len );			/* characters */
+	xfwrite_bytes(str, len, file);			/* characters */
 }
 
 void xfput_count_byte_strz( FILE *file, char *str )
@@ -428,7 +267,7 @@ void xfput_count_byte_strz( FILE *file, char *str )
 
 void xfput_count_byte_Str( FILE *file, Str *str )
 {
-	_xfput_count_byte_str( file, str_data(str), str_len(str) );
+	_xfput_count_byte_str( file, Str_data(str), Str_len(str) );
 }
 
 void xfget_count_byte_Str( FILE *file, Str *str )
@@ -448,7 +287,7 @@ static void _xfput_count_word_str( FILE *file, char *str, size_t len )
         fatal_ferr_write( file );			/* too long */
 
     xfput_uint16( file, len );				/* word count */
-	xfput_chars(  file, str, len );			/* characters */
+	xfwrite_bytes(str, len, file);			/* characters */
 }
 
 void xfput_count_word_strz( FILE *file, char *str )
@@ -458,7 +297,7 @@ void xfput_count_word_strz( FILE *file, char *str )
 
 void xfput_count_word_Str( FILE *file, Str *str )
 {
-	_xfput_count_word_str( file, str_data(str), str_len(str) );
+	_xfput_count_word_str( file, Str_data(str), Str_len(str) );
 }
 
 void xfget_count_word_Str( FILE *file, Str *str )
@@ -513,7 +352,7 @@ void xfput_uint16( FILE *file, int value )
 
 	buffer[0] = value & 0xFF; value >>= 8;
 	buffer[1] = value & 0xFF; value >>= 8;
-    xfput_chars( file, (char *) buffer, sizeof(buffer) );
+	xfwrite_bytes((char *)buffer, sizeof(buffer), file);
 }
 
 int xfget_int16( FILE *file )
@@ -528,7 +367,7 @@ int xfget_uint16( FILE *file )
 {
     Byte buffer[2];
 
-    xfget_chars( file, (char *) buffer, sizeof(buffer) );
+	xfread_bytes(buffer, sizeof(buffer), file);
 	return
         ( ( buffer[0] << 0 ) & 0x00FF ) |
         ( ( buffer[1] << 8 ) & 0xFF00 );
@@ -550,7 +389,7 @@ void xfput_uint32(FILE *file, unsigned int value)
 	buffer[1] = value & 0xFF; value >>= 8;
 	buffer[2] = value & 0xFF; value >>= 8;
 	buffer[3] = value & 0xFF; value >>= 8;
-    xfput_chars( file, (char *) buffer, sizeof(buffer) );
+	xfwrite_bytes((char *)buffer, sizeof(buffer), file);
 }
 
 int xfget_int32( FILE *file )
@@ -565,7 +404,7 @@ unsigned int xfget_uint32( FILE *file )
 {
     Byte buffer[4];
 
-    xfget_chars( file, (char *) buffer, sizeof(buffer) );
+	xfread_bytes(buffer, sizeof(buffer), file);
 	return
         ( ( buffer[0] << 0 ) & 0x000000FF ) |
         ( ( buffer[1] << 8 ) & 0x0000FF00 ) |
@@ -587,22 +426,22 @@ static void _path_remove_ext( Str *dest, char *filename )
 {
     char *dot_pos, *dir_pos_1, *dir_pos_2;
 	
-    str_set( dest, filename );		/* make a copy */
+    Str_set( dest, filename );		/* make a copy */
 
     /* BUG_0014 : need to ignore dot if before a directory separator */
-    dot_pos   = strrchr( str_data(dest), '.' );
-    dir_pos_1 = strrchr( str_data(dest), '/' );
+    dot_pos   = strrchr( Str_data(dest), '.' );
+    dir_pos_1 = strrchr( Str_data(dest), '/' );
 
-    if ( dir_pos_1 == NULL ) dir_pos_1 = str_data(dest);
+    if ( dir_pos_1 == NULL ) dir_pos_1 = Str_data(dest);
 
-    dir_pos_2 = strrchr( str_data(dest), '\\' );
+    dir_pos_2 = strrchr( Str_data(dest), '\\' );
 
-    if ( dir_pos_2 == NULL ) dir_pos_2 = str_data(dest);
+    if ( dir_pos_2 == NULL ) dir_pos_2 = Str_data(dest);
 
     if ( dot_pos != NULL && dot_pos > dir_pos_1 && dot_pos > dir_pos_2 )
     {
         *dot_pos = '\0';                /* terminate the string */
-        str_sync_len( dest );
+        Str_sync_len( dest );
     }
 }
 
@@ -612,7 +451,7 @@ char *path_remove_ext( char *filename )
 	char *ret;
 
 	_path_remove_ext( dest, filename );
-	ret = strpool_add(str_data(dest));
+	ret = strpool_add(Str_data(dest));
 
 	STR_DELETE(dest);
 	return ret;
@@ -627,8 +466,8 @@ char *path_replace_ext( char *filename, char *new_ext )
     _path_remove_ext( dest, filename );
 
     if ( new_ext != NULL )
-        str_append( dest, new_ext );
-	ret = strpool_add(str_data(dest));
+        Str_append( dest, new_ext );
+	ret = strpool_add(Str_data(dest));
 
 	STR_DELETE(dest);
 	return ret;
@@ -687,7 +526,7 @@ static void path_search_1(Str *dest, char *filename, UT_array *dir_list, Str *pa
 {
 	char **pdir;
 	
-    str_set( dest, filename );		/* default return: input file name */
+    Str_set( dest, filename );		/* default return: input file name */
 
     /* if no dir_list, return file */
     if ( dir_list == NULL )
@@ -700,10 +539,10 @@ static void path_search_1(Str *dest, char *filename, UT_array *dir_list, Str *pa
     /* search in dir_list */
 	for (pdir = NULL; (pdir = (char **)utarray_next(dir_list, pdir)) != NULL; )
     {
-		str_sprintf(pathname, "%s/%s", *pdir, filename);
+		Str_sprintf(pathname, "%s/%s", *pdir, filename);
 
-		if (file_exists(str_data(pathname))) {
-            str_set( dest, str_data(pathname) );
+		if (file_exists(Str_data(pathname))) {
+            Str_set( dest, Str_data(pathname) );
             return;
         }
     }
@@ -725,7 +564,7 @@ char *search_file( char *filename, UT_array *dir_list )
 	char *ret;
 
     path_search( dest, filename, dir_list );
-	ret = strpool_add(str_data(dest));
+	ret = strpool_add(Str_data(dest));
 
 	STR_DELETE(dest);
 	return ret;

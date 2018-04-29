@@ -15,7 +15,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #pragma once
 
 #include "queue.h"
-#include "types.h"
+#include "ztypes.h"
 #include "class.h"
 #include "strhash.h"
 

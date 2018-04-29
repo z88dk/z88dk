@@ -13,6 +13,7 @@ Parse command line options
 
 #include "errors.h"
 #include "fileutil.h"
+#include "zfileutil.h"
 #include "hist.h"
 #include "init.h"
 #include "model.h"
@@ -351,14 +352,14 @@ static void expand_star_star(char *filename, UT_array **plist)
 			for (int i = 0; i < glob_dirs.gl_pathc; i++) {
 				char *found = glob_dirs.gl_pathv[i];
 				if (dir_exists(found)) {
-					str_sprintf(path, "%s/%s", 
+					Str_sprintf(path, "%s/%s", 
 						found, tail[2] == '/' ? tail + 3 : tail + 2);	// collect directory with pattern
-					char *pattern = str_data(path);
+					char *pattern = Str_data(path);
 					utarray_push_back(*plist, &pattern);
 
-					str_sprintf(path, "%s/%s",
+					Str_sprintf(path, "%s/%s",
 						found, tail[0] == '/' ? tail + 1 : tail);	// reuse **/... from tail to recurse
-					expand_star_star(str_data(path), plist);		// recurse
+					expand_star_star(Str_data(path), plist);		// recurse
 				}
 			}
 		}
@@ -568,14 +569,14 @@ static void show_option( enum OptType type, Bool *pflag,
 	STR_DEFINE(msg, STR_SIZE);
     int count_opts = 0;
 
-    str_set( msg, "  " );
+    Str_set( msg, "  " );
 
     if ( *short_opt )
     {
         /* dont show short_opt if short_opt is same as long_opt, except for extra '-' */
         if ( !( *long_opt && strcmp( short_opt, long_opt + 1 ) == 0 ) )
         {
-            str_append_sprintf( msg, "%s", short_opt );
+            Str_append_sprintf( msg, "%s", short_opt );
             count_opts++;
         }
     }
@@ -583,21 +584,21 @@ static void show_option( enum OptType type, Bool *pflag,
     if ( *long_opt )
     {
         if ( count_opts )
-            str_append( msg, ", " );
+            Str_append( msg, ", " );
 
-        str_append_sprintf( msg, "%s", long_opt );
+        Str_append_sprintf( msg, "%s", long_opt );
         count_opts++;
     }
 
     if ( *help_arg )
     {
-        str_append_sprintf( msg, "=%s", help_arg );
+        Str_append_sprintf( msg, "=%s", help_arg );
     }
 
-    if ( str_len(msg) > ALIGN_HELP )
-        printf( "%s\n%-*s %s\n", str_data(msg), ALIGN_HELP, "",       help_text );
+    if ( Str_len(msg) > ALIGN_HELP )
+        printf( "%s\n%-*s %s\n", Str_data(msg), ALIGN_HELP, "",       help_text );
     else
-        printf( "%-*s %s\n",                    ALIGN_HELP, str_data(msg), help_text );
+        printf( "%-*s %s\n",                    ALIGN_HELP, Str_data(msg), help_text );
 
 	STR_DELETE(msg);
 }
@@ -908,18 +909,18 @@ void checkrun_appmake(void)
 			char *bin_filename = get_bin_filename(get_first_module(NULL)->filename);
 			char *out_filename = path_replace_ext(bin_filename, opts.appmake_ext);
 
-			str_sprintf(cmd, "appmake %s -b \"%s\" -o \"%s\" --org %d",
+			Str_sprintf(cmd, "appmake %s -b \"%s\" -o \"%s\" --org %d",
 				opts.appmake_opts,
 				bin_filename,
 				out_filename,
 				origin);
 
 			if (opts.verbose)
-				puts(str_data(cmd));
+				puts(Str_data(cmd));
 
-			int rv = system(str_data(cmd));
+			int rv = system(Str_data(cmd));
 			if (rv != 0)
-				error_cmd_failed(str_data(cmd));
+				error_cmd_failed(Str_data(cmd));
 		}
 	}
 }
@@ -957,16 +958,16 @@ static char *search_z80asm_lib()
 	char *ret;
 
 	/* Build libary file name */
-	str_sprintf(lib_name_str, Z80ASM_LIB, opts.cpu_name, SWAP_IX_IY_NAME);
-	lib_name = strpool_add(str_data(lib_name_str));
+	Str_sprintf(lib_name_str, Z80ASM_LIB, opts.cpu_name, SWAP_IX_IY_NAME);
+	lib_name = strpool_add(Str_data(lib_name_str));
 
 	/* try to read from current directory */
 	if (check_library(lib_name))
 		return lib_name;
 
 	/* try to read from PREFIX/lib */
-	str_sprintf(f, "%s/lib/%s", PREFIX, lib_name);
-	ret = strpool_add(str_data(f));
+	Str_sprintf(f, "%s/lib/%s", PREFIX, lib_name);
+	ret = strpool_add(Str_data(f));
 	if (check_library(ret))
 		return ret;
 
@@ -978,8 +979,8 @@ static char *search_z80asm_lib()
 	}
 
 	/* try to read from ZCCCFG/.. */
-	str_sprintf(f, "${ZCCCFG}/../%s", lib_name);
-	ret = expand_environment_variables(str_data(f));
+	Str_sprintf(f, "${ZCCCFG}/../%s", lib_name);
+	ret = expand_environment_variables(Str_data(f));
 	if (check_library(ret))
 		return ret;
 

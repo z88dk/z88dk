@@ -173,6 +173,7 @@
     <ClCompile Include="..\..\ext\regex\regexec.c" />
     <ClCompile Include="..\..\ext\regex\regfree.c" />
     <ClCompile Include="..\..\src\common\die.c" />
+    <ClCompile Include="..\..\src\common\fileutil.c" />
     <ClCompile Include="..\..\src\common\objfile.c" />
     <ClCompile Include="..\..\src\common\strutil.c" />
     <ClCompile Include="..\..\src\z80nm\ar.c" />
@@ -189,8 +190,10 @@
     <ClInclude Include="..\..\ext\regex\regex2.h" />
     <ClInclude Include="..\..\ext\regex\utils.h" />
     <ClInclude Include="..\..\src\common\die.h" />
+    <ClInclude Include="..\..\src\common\fileutil.h" />
     <ClInclude Include="..\..\src\common\objfile.h" />
     <ClInclude Include="..\..\src\common\strutil.h" />
+    <ClInclude Include="..\..\src\common\types.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

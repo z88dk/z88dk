@@ -12,6 +12,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include "errors.h"
 #include "expr.h"
 #include "fileutil.h"
+#include "zfileutil.h"
 #include "listfile.h"
 #include "modlink.h"
 #include "options.h"
@@ -73,7 +74,7 @@ static void ReadNames_1(char *filename, FILE *file, Str *section_name, Str *name
 		xfget_count_byte_Str(file, def_filename);
 		line_nr = xfget_int32(file);
 
-		new_section( str_data(section_name) );		/* define CURRENTSECTION */
+		new_section( Str_data(section_name) );		/* define CURRENTSECTION */
 
         switch ( symbol_char )
         {
@@ -86,15 +87,15 @@ static void ReadNames_1(char *filename, FILE *file, Str *section_name, Str *name
 
         switch ( scope )
         {
-		case 'L': sym = define_local_sym(str_data(name), value, type); break;
-		case 'G': sym = define_global_sym(str_data(name), value, type); break;
+		case 'L': sym = define_local_sym(Str_data(name), value, type); break;
+		case 'G': sym = define_global_sym(Str_data(name), value, type); break;
         default:
             error_not_obj_file( filename );
         }
 
 		// set symbol definition
 		if (sym) {
-			sym->filename = strpool_add(str_data(def_filename));
+			sym->filename = strpool_add(Str_data(def_filename));
 			sym->line_nr = line_nr;
 		}
     }
@@ -168,10 +169,10 @@ static void read_cur_module_exprs_1(ExprList *exprs, FILE *file, char *filename,
 
 		/* source file and line number */
 		xfget_count_word_Str( file, source_filename );
-		if ( str_len(source_filename) == 0 )
-			str_set( source_filename, str_data(last_filename) );
+		if ( Str_len(source_filename) == 0 )
+			Str_set( source_filename, Str_data(last_filename) );
 		else
-			str_set( last_filename, str_data(source_filename) );
+			Str_set( last_filename, Str_data(source_filename) );
 
 		line_nr = xfget_int32( file );
 
@@ -185,8 +186,8 @@ static void read_cur_module_exprs_1(ExprList *exprs, FILE *file, char *filename,
 		xfget_count_word_Str( file, expr_text );	/* get expression */
 
 		/* read expression followed by newline */
-		str_append_char( expr_text, '\n');
-		SetTemporaryLine( str_data(expr_text) );			/* read expression */
+		Str_append_char( expr_text, '\n');
+		SetTemporaryLine( Str_data(expr_text) );			/* read expression */
 
         EOL = FALSE;                /* reset end of line parsing flag - a line is to be parsed... */
 
@@ -194,8 +195,8 @@ static void read_cur_module_exprs_1(ExprList *exprs, FILE *file, char *filename,
         GetSym();
 
 		/* parse and store expression in the list */
-		set_asmpc_env( CURRENTMODULE, str_data(section_name), 
-					   str_data(source_filename), line_nr, 
+		set_asmpc_env( CURRENTMODULE, Str_data(section_name), 
+					   Str_data(source_filename), line_nr, 
 					   asmpc,
 					   FALSE );
         if ( ( expr = expr_parse() ) != NULL )
@@ -209,8 +210,8 @@ static void read_cur_module_exprs_1(ExprList *exprs, FILE *file, char *filename,
 			case 'B': expr->range = RANGE_WORD_BE;		break;
 			case 'L': expr->range = RANGE_DWORD;		break;
 			case '=': expr->range = RANGE_WORD;
-					  assert( str_len(target_name) > 0 );
-					  expr->target_name = strpool_add( str_data(target_name) );	/* define expression as EQU */
+					  assert( Str_len(target_name) > 0 );
+					  expr->target_name = strpool_add( Str_data(target_name) );	/* define expression as EQU */
 					  break;
 			default:
 				error_not_obj_file( filename );
@@ -220,7 +221,7 @@ static void read_cur_module_exprs_1(ExprList *exprs, FILE *file, char *filename,
 			expr->section	= CURRENTSECTION;
 			expr->asmpc		= asmpc;
 			expr->code_pos	= code_pos;
-			expr->filename	= strpool_add( str_data(source_filename) );
+			expr->filename	= strpool_add( Str_data(source_filename) );
 			expr->line_nr	= line_nr;
 			expr->listpos	= -1;
 
@@ -267,9 +268,11 @@ static void read_module_exprs( ExprList *exprs )
         set_error_null();
 
         /* open relocatable file for reading */
-        file = myfopen( curlink->objfilename, "rb" );	
-		if (file)
-		{
+        file = fopen( curlink->objfilename, "rb" );	
+		if (!file) {
+			error_read_file(curlink->objfilename);
+		}
+		else {
 			fseek(file, fptr_base + 8, SEEK_SET);			/* point at module name  pointer   */
 			/*fptr_modname*/  xfget_int32(file);			/* get file pointer to module name */
 			fptr_exprdecl = xfget_int32(file);			/* get file pointer to expression declarations */
@@ -285,7 +288,7 @@ static void read_module_exprs( ExprList *exprs )
 					read_cur_module_exprs(CURRENTMODULE->exprs, file, curlink->objfilename);
 			}
 
-			myfclose(file);
+			xfclose(file);
 		}
 
         curlink = curlink->nextlink;
@@ -542,14 +545,14 @@ static void define_location_symbols( void )
 		printf("Code size: %d bytes ($%04X to $%04X)\n",
 			(int)(get_sections_size()), (int)start_addr, (int)end_addr - 1);
 
-	str_sprintf( name, ASMHEAD_KW, "", "" ); 
-	define_global_def_sym( str_data(name), start_addr );
+	Str_sprintf( name, ASMHEAD_KW, "", "" ); 
+	define_global_def_sym( Str_data(name), start_addr );
 	
-	str_sprintf( name, ASMTAIL_KW, "", "" ); 
-	define_global_def_sym( str_data(name), end_addr );
+	Str_sprintf( name, ASMTAIL_KW, "", "" ); 
+	define_global_def_sym( Str_data(name), end_addr );
 	
-	str_sprintf( name, ASMSIZE_KW, "", "" ); 
-	define_global_def_sym( str_data(name), end_addr - start_addr );
+	Str_sprintf( name, ASMSIZE_KW, "", "" ); 
+	define_global_def_sym( Str_data(name), end_addr - start_addr );
 
 	/* size of each named section - skip "" section */
 	for ( section = get_first_section( &iter ) ; section != NULL ; 
@@ -565,14 +568,14 @@ static void define_location_symbols( void )
 					section->name, (int)(end_addr - start_addr),
 					(unsigned int)start_addr, (unsigned int)end_addr - 1);
 
-			str_sprintf(name, ASMHEAD_KW, section->name, "_");
-			define_global_def_sym(str_data(name), start_addr);
+			Str_sprintf(name, ASMHEAD_KW, section->name, "_");
+			define_global_def_sym(Str_data(name), start_addr);
 
-			str_sprintf(name, ASMTAIL_KW, section->name, "_");
-			define_global_def_sym(str_data(name), end_addr);
+			Str_sprintf(name, ASMTAIL_KW, section->name, "_");
+			define_global_def_sym(Str_data(name), end_addr);
 
-			str_sprintf(name, ASMSIZE_KW, section->name, "_");
-			define_global_def_sym(str_data(name), end_addr - start_addr);
+			Str_sprintf(name, ASMSIZE_KW, section->name, "_");
+			define_global_def_sym(Str_data(name), end_addr - start_addr);
 		}
 	}
 
@@ -642,13 +645,13 @@ static Bool linked_module(struct libfile *lib, FILE *file, long obj_fpos, StrHas
 			xfget_count_byte_Str(file, def_filename);
 			xfget_int32(file);			/* line_nr */
 
-			if (scope == 'G' && StrHash_exists(extern_syms, str_data(symbol_name)))
+			if (scope == 'G' && StrHash_exists(extern_syms, Str_data(symbol_name)))
 				found_symbol = TRUE;
 		}
 
 		/* link module if found one needed symbol */
 		if (found_symbol) {
-			LinkLibModule(lib, obj_fpos, str_data(module_name), extern_syms);
+			LinkLibModule(lib, obj_fpos, Str_data(module_name), extern_syms);
 			linked = TRUE;
 		}
 	}
@@ -672,24 +675,26 @@ static Bool linked_libraries(StrHash *extern_syms)
 	/* search library chain */
 	for (lib = libraryhdr->firstlib; !linked && lib != NULL; lib = lib->nextlib) {
 		
-		file = myfopen(lib->libfilename, "rb");
-		if (!file)
-			continue;									/* error issued by myfopen */
-
-		/* search object module chain */
-		for (obj_fpos = 8; !linked && obj_fpos != -1; obj_fpos = obj_next_fpos) {
-			fseek(file, obj_fpos, SEEK_SET);			/* point at beginning of a module */
-			obj_next_fpos = xfget_int32(file);			/* get file pointer to next module in library */
-			module_size = xfget_int32(file);			/* get size of current module */
-
-			if (module_size == 0)
-				continue;								/* deleted module */
-
-			if (linked_module(lib, file, obj_fpos + 4 + 4, extern_syms))
-				linked = TRUE;
+		file = fopen(lib->libfilename, "rb");
+		if (!file) {
+			error_read_file(lib->libfilename);
 		}
+		else {
+			/* search object module chain */
+			for (obj_fpos = 8; !linked && obj_fpos != -1; obj_fpos = obj_next_fpos) {
+				fseek(file, obj_fpos, SEEK_SET);			/* point at beginning of a module */
+				obj_next_fpos = xfget_int32(file);			/* get file pointer to next module in library */
+				module_size = xfget_int32(file);			/* get size of current module */
 
-		myfclose(file);
+				if (module_size == 0)
+					continue;								/* deleted module */
+
+				if (linked_module(lib, file, obj_fpos + 4 + 4, extern_syms))
+					linked = TRUE;
+			}
+
+			xfclose(file);
+		}
 	}
 
 	return linked;
@@ -827,9 +832,11 @@ static int LinkModule_1(char *filename, long fptr_base, Str *section_name, StrHa
 	Section *section;
 
     /* open object file for reading */
-    file = myfopen( filename, "rb" );           
-	if (file)
-	{
+    file = fopen( filename, "rb" );           
+	if (!file) {
+		error_read_file(filename);
+	}
+	else {
 		fseek(file, fptr_base + 8, SEEK_SET);
 
 		fptr_modname = xfget_int32(file);	/* get file pointer to module name */
@@ -851,13 +858,13 @@ static int LinkModule_1(char *filename, long fptr_base, Str *section_name, StrHa
 				/* load bytes to section */
 				/* BUG_0015: was reading at current position in code area, swaping order of modules */
 				xfget_count_byte_Str(file, section_name);
-				section = new_section(str_data(section_name));
+				section = new_section(Str_data(section_name));
 				read_origin(file, section);
 				section->align = xfget_int32(file);
 
 				/* if creating relocatable code, ignore origin */
 				if (opts.relocatable && section->origin >= 0) {
-					warn_org_ignored(filename, str_data(section_name));
+					warn_org_ignored(filename, Str_data(section_name));
 					section->origin = -1;
 					section->section_split = FALSE;
 				}
@@ -883,14 +890,14 @@ static int LinkModule_1(char *filename, long fptr_base, Str *section_name, StrHa
 			for (p = fptr_libnmdecl; p < fptr_modname;) {
 				fseek(file, fptr_base + p, SEEK_SET);			/* set file pointer to point at external name declaration */
 				xfget_count_byte_Str(file, name);				/* read library reference name */
-				p += 1 + str_len(name);							/* point to next name */
-				name_p = strpool_add(str_data(name));
+				p += 1 + Str_len(name);							/* point to next name */
+				name_p = strpool_add(Str_data(name));
 				StrHash_set(&extern_syms, name_p, name_p);		/* remember all extern references */
 			}
 			STR_DELETE(name);
 		}
 
-		myfclose(file);
+		xfclose(file);
 	}
 
     return LinkTracedModule( filename, fptr_base );       /* Remember module for pass2 */
@@ -941,10 +948,10 @@ CreateBinFile( void )
         filename = get_bin_filename( get_first_module(NULL)->filename );		/* add '.bin' extension */
 
     /* binary output to filename.bin */
-    binaryfile = myfopen( filename, "wb" );
+    binaryfile = xfopen( filename, "wb" );
 	inital_binaryfile = binaryfile;
 
-	relocfile = opts.relocatable ? NULL : opts.reloc_info ? myfopen(get_reloc_filename(filename), "wb") : NULL;
+	relocfile = opts.relocatable ? NULL : opts.reloc_info ? xfopen(get_reloc_filename(filename), "wb") : NULL;
 	initial_relocfile = relocfile;
 
 	if (binaryfile)
@@ -952,7 +959,7 @@ CreateBinFile( void )
 		if (is_relocatable)
 		{
 			/* relocate routine */
-			xfput_chars(binaryfile, (char *)reloc_routine, sizeof_relocroutine);
+			xfwrite_bytes((char *)reloc_routine, sizeof_relocroutine, binaryfile);
 
 			*(reloctable + 0) = (Byte)totaladdr % 256U;
 			*(reloctable + 1) = (Byte)totaladdr / 256U;  /* total of relocation elements */
@@ -960,7 +967,7 @@ CreateBinFile( void )
 			*(reloctable + 3) = (Byte)sizeof_reloctable / 256U; /* total size of relocation table elements */
 
 			/* write relocation table, inclusive 4 byte header */
-			xfput_chars(binaryfile, reloctable, sizeof_reloctable + 4);
+			xfwrite_bytes(reloctable, sizeof_reloctable + 4, binaryfile);
 
 			printf("Relocation header is %d bytes.\n", (int)(sizeof_relocroutine + sizeof_reloctable + 4));
 		}
@@ -969,15 +976,15 @@ CreateBinFile( void )
 
 		/* delete output file if empty, except main output file */
 		if (binaryfile == inital_binaryfile)
-			myfclose(binaryfile);
+			xfclose(binaryfile);
 		else
-			myfclose_remove_if_empty(binaryfile);
+			xfclose_remove_empty(binaryfile);
 
 		if (relocfile != NULL) {
 			if (relocfile == initial_relocfile)
-				myfclose(relocfile);
+				xfclose(relocfile);
 			else
-				myfclose_remove_if_empty(relocfile);
+				xfclose_remove_empty(relocfile);
 		}
 	}
 }
@@ -1057,7 +1064,7 @@ static void replace_names(Str *result, char *input, StrHash *map)
 	STR_DEFINE(key, STR_SIZE);
 	char *elem;
 	char *p0, *p1;
-	str_clear(result);
+	Str_clear(result);
 
 	p0 = input;
 	while (*p0) {
@@ -1065,19 +1072,19 @@ static void replace_names(Str *result, char *input, StrHash *map)
 			p1 = p0 + 1;
 			while (*p1 && sym_next(*p1))
 				p1++;
-			str_set_n(key, p0, p1 - p0);
-			elem = StrHash_get(map, str_data(key));
+			Str_set_n(key, p0, p1 - p0);
+			elem = StrHash_get(map, Str_data(key));
 			if (elem)
-				str_append(result, (char *)elem);
+				Str_append(result, (char *)elem);
 			else
-				str_append(result, str_data(key));
+				Str_append(result, Str_data(key));
 			p0 = p1;
 		}
 		else {				/* /\W+/ */
 			p1 = p0 + 1;
 			while (*p1 && !sym_first(*p1))
 				p1++;
-			str_append_n(result, p0, p1 - p0);
+			Str_append_n(result, p0, p1 - p0);
 			p0 = p1;
 		}
 	}
@@ -1100,8 +1107,8 @@ static void rename_module_local_symbols(Module *module)
 		sym = (Symbol *)sym_it->value;
 
 		old_name = strpool_add(sym->name);
-		str_sprintf(new_name, "%s_%s", module->modname, old_name);
-		StrHash_set(&old_syms, old_name, strpool_add(str_data(new_name)));
+		Str_sprintf(new_name, "%s_%s", module->modname, old_name);
+		StrHash_set(&old_syms, old_name, strpool_add(Str_data(new_name)));
 	}
 
 	/* change symbol names */
@@ -1118,12 +1125,12 @@ static void rename_module_local_symbols(Module *module)
 		expr = expr_it->obj;
 
 		/* rpn_ops already point to symbol table, no rename needed - change only text and target_name */
-		replace_names(new_text, str_data(expr->text), old_syms);
-		str_set(expr->text, str_data(new_text));
+		replace_names(new_text, Str_data(expr->text), old_syms);
+		Str_set(expr->text, Str_data(new_text));
 
 		if (expr->target_name) {
 			replace_names(new_text, expr->target_name, old_syms);
-			expr->target_name = strpool_add(str_data(new_text));
+			expr->target_name = strpool_add(Str_data(new_text));
 		}
 	}
 

@@ -17,7 +17,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include "class.h"
 #include "init.h"
 #include "strpool.h"
-#include "types.h"
+#include "ztypes.h"
 
 /*-----------------------------------------------------------------------------
 *   Object register - just the pointers defined by CLASS()

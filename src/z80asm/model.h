@@ -13,7 +13,7 @@ Global data model.
 
 #include "list.h"
 #include "module.h"
-#include "types.h"
+#include "ztypes.h"
 #include "utarray.h"
 
 

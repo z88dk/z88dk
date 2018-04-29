@@ -13,7 +13,7 @@ Handle assembly listing and symbol table listing.
 
 #include "class.h"
 #include "str.h"
-#include "types.h"
+#include "ztypes.h"
 
 /* Page metrics for list file (CH_0017) */
 #define COLUMN_WIDTH	32

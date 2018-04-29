@@ -12,7 +12,7 @@ Scanner. Scanning engine is built by ragel from scan_rules.rl.
 #pragma once
 
 #include "tokens.h"
-#include "types.h"
+#include "ztypes.h"
 #include "opcodes.h"
 
 /*-----------------------------------------------------------------------------

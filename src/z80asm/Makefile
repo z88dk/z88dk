@@ -20,7 +20,7 @@ CROSS		?= 0
 #------------------------------------------------------------------------------
 # Object files
 #------------------------------------------------------------------------------
-SRCS		:= $(filter-out test.c,$(wildcard *.c lib/*.c))
+SRCS		:= $(filter-out test.c,$(wildcard *.c lib/*.c ../common/*.c ../../ext/regex/reg*.c))
 OBJS 		:= $(SRCS:.c=.o)
 DEPENDS		:= $(SRCS:.c=.d)
 TEST_SRC_MAIN:= $(wildcard t/test_*.c)

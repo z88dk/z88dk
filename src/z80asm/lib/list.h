@@ -13,7 +13,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #pragma once
 
 #include "class.h"
-#include "types.h"
+#include "ztypes.h"
 #include "queue.h"
 
 /*-----------------------------------------------------------------------------

@@ -150,11 +150,15 @@
     <ClCompile Include="..\..\ext\regex\regfree.c" />
     <ClCompile Include="..\..\ext\Unity\src\unity.c" />
     <ClCompile Include="..\..\src\common\die.c" />
+    <ClCompile Include="..\..\src\common\fileutil.c" />
     <ClCompile Include="..\..\src\common\objfile.c" />
     <ClCompile Include="..\..\src\common\optparse.c" />
     <ClCompile Include="..\..\src\common\strutil.c" />
     <ClCompile Include="..\..\src\common\t\test.c" />
+    <ClCompile Include="..\..\src\common\t\t_die.c" />
+    <ClCompile Include="..\..\src\common\t\t_fileutil.c" />
     <ClCompile Include="..\..\src\common\t\t_strutil.c" />
+    <ClCompile Include="..\..\src\common\t\t_types.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ext\optparse\optparse.h" />
@@ -162,8 +166,12 @@
     <ClInclude Include="..\..\ext\Unity\src\unity.h" />
     <ClInclude Include="..\..\ext\Unity\src\unity_internals.h" />
     <ClInclude Include="..\..\src\common\die.h" />
+    <ClInclude Include="..\..\src\common\fileutil.h" />
     <ClInclude Include="..\..\src\common\objfile.h" />
     <ClInclude Include="..\..\src\common\strutil.h" />
+    <ClInclude Include="..\..\src\common\types.h" />
+    <ClInclude Include="..\..\src\common\t\test1.hh" />
+    <ClInclude Include="..\..\src\common\t\test2.hh" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

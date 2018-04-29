@@ -11,12 +11,13 @@ Handle assembly listing and symbol table listing.
 
 #include "listfile.h"
 #include "fileutil.h"
+#include "zfileutil.h"
 #include "options.h"
 #include "z80asm.h"
 #include "errors.h"
 #include "hist.h"
 #include "strpool.h"
-#include "types.h"
+#include "ztypes.h"
 #include "codearea.h"
 
 #include <stdio.h>
@@ -42,8 +43,8 @@ DEF_CLASS( ListFile );
 *----------------------------------------------------------------------------*/
 void ListFile_init( ListFile *self )
 {
-	self->bytes = str_new(STR_SIZE);
-	self->line = str_new(STR_SIZE);
+	self->bytes = Str_new(STR_SIZE);
+	self->line = Str_new(STR_SIZE);
 }
 
 void ListFile_copy( ListFile *self, ListFile *other )
@@ -61,8 +62,8 @@ void ListFile_fini( ListFile *self )
     /* delete file if object is garbage-collected - unexpected exit */
     ListFile_close( self, FALSE );
 
-	str_delete(self->bytes);
-	str_delete(self->line);
+	Str_delete(self->bytes);
+	Str_delete(self->line);
 }
 
 /*-----------------------------------------------------------------------------
@@ -76,10 +77,10 @@ static void ListFile_fprintf( ListFile *self, char *msg, ... )
     if ( self->file != NULL )
     {
 	    va_start( argptr, msg );				/* BUG_0046 */
-        str_vsprintf( str, msg, argptr );		/* ignore ret, as we dont retry */
+        Str_vsprintf( str, msg, argptr );		/* ignore ret, as we dont retry */
 		va_end( argptr );
 
-		fputs(str_data(str), self->file);
+		fputs(Str_data(str), self->file);
     }
 
 	STR_DELETE(str);
@@ -95,7 +96,7 @@ void ListFile_open( ListFile *self, char *list_file )
 
     /* open the file */
     self->filename	= strpool_add( list_file );
-    self->file		= myfopen( list_file, "w+" );
+    self->file		= xfopen( list_file, "w" );
     self->source_list_ended = FALSE;
 
     /* init '\n' size */
@@ -126,7 +127,7 @@ void ListFile_close( ListFile *self, Bool keep_file )
         /* close any pending line started */
         ListFile_end( self );
 
-        myfclose( self->file );
+        xfclose( self->file );
 
         if ( ! keep_file )
             remove( self->filename );
@@ -161,15 +162,15 @@ void ListFile_start_line( ListFile *self, int address,
 
         /* init all line-related variables */
         self->address = address;
-        str_clear( self->bytes );
+        Str_clear( self->bytes );
 
         self->source_file = strpool_add( source_file );
         self->source_line_nr = source_line_nr;
 
         /* normalize the line end (BUG_0031) */
-        str_set( self->line, line );
-        str_chomp( self->line );
-        str_append_char( self->line, '\n' );
+        Str_set( self->line, line );
+        Str_chomp( self->line );
+        Str_append_char( self->line, '\n' );
     }
 }
 
@@ -195,7 +196,7 @@ void ListFile_append( ListFile *self, long value, int num_bytes )
         while ( num_bytes-- > 0 )
         {
             byte1 = value & 0xFF;
-            str_append_char( self->bytes, byte1 );
+            Str_append_char( self->bytes, byte1 );
             value >>= 8;
         }
     }
@@ -289,8 +290,8 @@ void ListFile_end_line( ListFile *self )
     if ( self->file != NULL && self->line_started && ! self->source_list_ended )
     {
         /* get length of hex dump and pointer to data bytes (BUG_0015) */
-        len     = str_len(self->bytes);
-        byteptr = (Byte *) str_data(self->bytes);
+        len     = Str_len(self->bytes);
+        byteptr = (Byte *) Str_data(self->bytes);
 
         /* output line number and address */
         ListFile_fprintf( self, "%-5d %04X  ", self->source_line_nr, self->address );
@@ -317,7 +318,7 @@ void ListFile_end_line( ListFile *self )
             ListFile_fprintf( self, "\n%*s", 5 + 1 + 4 + 2 + ( 4 * 3 ), "" );
         }
 
-        ListFile_fprintf( self, "%s", str_data(self->line) );
+        ListFile_fprintf( self, "%s", Str_data(self->line) );
 
         self->line_started = FALSE;				/* no longer in line */
     }

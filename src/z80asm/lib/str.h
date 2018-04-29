@@ -13,6 +13,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 
 #include "alloc.h"
 #include "dbg.h"
+#include "types.h"
 #include <stdio.h>
 #include <stdarg.h>
 
@@ -76,7 +77,7 @@ typedef struct _Str {
 									}; \
 									Str *name = & _##name##_data.str
 
-#define STR_DELETE( name )			str_delete( name )
+#define STR_DELETE( name )			Str_delete( name )
 
 #ifndef STR_SIZE
 #define STR_SIZE					MAX(256, FILENAME_MAX)	/* default string size */
@@ -85,72 +86,72 @@ typedef struct _Str {
 /*-----------------------------------------------------------------------------
 *   Accessors
 *----------------------------------------------------------------------------*/
-#define str_data( str )				( (str)->data )
-#define str_len( str )				( (str)->len )
-#define str_size( str )				( (str)->size )
+#define Str_data( str )				( (str)->data )
+#define Str_len( str )				( (str)->len )
+#define Str_size( str )				( (str)->size )
 
 /*-----------------------------------------------------------------------------
 *   initialize and delete
 *----------------------------------------------------------------------------*/
 
 /* allocate a Str on the heap and return pointer; die on error */
-extern Str *str_new_(int size);
-#define     str_new( size )			(check_ptr_die(str_new_(size), != NULL, "str_new failed" ))
+extern Str *Str_new_(int size);
+#define     Str_new( size )			(check_ptr_die(Str_new_(size), != NULL, "Str_new failed" ))
 
 /* free a string */
-extern void str_delete_(Str *str);
-#define     str_delete( str )		(str_delete_(str), (str) = NULL)
+extern void Str_delete_(Str *str);
+#define     Str_delete( str )		(Str_delete_(str), (str) = NULL)
 
 /* reserve space for at least more size chars plus '\0'
    does nothing if buffer is already large enough */
-extern void str_reserve(Str *str, int size);
+extern void Str_reserve(Str *str, int size);
 
 /*-----------------------------------------------------------------------------
 *   Set strings
 *----------------------------------------------------------------------------*/
 
 /* clear the string, keep allocated space */
-extern void str_clear(Str *str);
+extern void Str_clear(Str *str);
 
 /* sync length in case string was modified in place */
-extern void str_sync_len(Str *str);
+extern void Str_sync_len(Str *str);
 
 /* set / append string */
-extern void str_set(Str *str, char *source);
-extern void str_append(Str *str, char *source);
+extern void Str_set(Str *str, char *source);
+extern void Str_append(Str *str, char *source);
 
 /* set / append substring */
-extern void str_set_n(Str *str, char *source, int count);
-extern void str_append_n(Str *str, char *source, int count);
+extern void Str_set_n(Str *str, char *source, int count);
+extern void Str_append_n(Str *str, char *source, int count);
 
 /* set / append bytes */
-extern void str_set_bytes(Str *str, char *source, int size);
-extern void str_append_bytes(Str *str, char *source, int size);
+extern void Str_set_bytes(Str *str, char *source, int size);
+extern void Str_append_bytes(Str *str, char *source, int size);
 
 /* set / append char */
-extern void str_set_char(Str *str, char ch);
-extern void str_append_char(Str *str, char ch);
+extern void Str_set_char(Str *str, char ch);
+extern void Str_append_char(Str *str, char ch);
 
 /* set / append with printf-like parameters */
-extern void str_sprintf(Str *str, char *format, ...);
-extern void str_append_sprintf(Str *str, char *format, ...);
+extern void Str_sprintf(Str *str, char *format, ...);
+extern void Str_append_sprintf(Str *str, char *format, ...);
 
 /* set / append with va_list argument */
-extern void str_vsprintf(Str *str, char *format, va_list argptr);
-extern void str_append_vsprintf(Str *str, char *format, va_list argptr);
+extern void Str_vsprintf(Str *str, char *format, va_list argptr);
+extern void Str_append_vsprintf(Str *str, char *format, va_list argptr);
 
 /*-----------------------------------------------------------------------------
 *   Modify strings
 *----------------------------------------------------------------------------*/
 
 /* tolower, toupper, chomp, strip, compress_escapes */
-extern void str_toupper(Str *str);
-extern void str_tolower(Str *str);
-extern void str_chomp(Str *str);
-extern void str_strip(Str *str);
-extern void str_compress_escapes(Str *str);
+extern void Str_toupper(Str *str);
+extern void Str_tolower(Str *str);
+extern void Str_chomp(Str *str);
+extern void Str_strip(Str *str);
+extern void Str_compress_escapes(Str *str);
 
 /* get one line from input, convert end-of-line sequences,
 *  return string including one LF character
 *  return FALSE on end of input */
-extern Bool str_getline(Str *str, FILE *fp);
+extern Bool Str_getline(Str *str, FILE *fp);

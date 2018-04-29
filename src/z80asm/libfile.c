@@ -11,8 +11,9 @@ Handle library file contruction, reading and writing
 
 #include "errors.h"
 #include "fileutil.h"
+#include "zfileutil.h"
 #include "libfile.h"
-#include "objfile.h"
+#include "zobjfile.h"
 #include "options.h"
 
 char Z80libhdr[] = "Z80LMF" OBJ_VERSION;
@@ -50,7 +51,7 @@ void make_library(char *lib_filename, UT_array *src_files)
         printf("Creating library '%s'\n", lib_filename );
 
 	/* write library header */
-	lib_file = myfopen_atomic( lib_filename, "w+b" );	
+	lib_file = xfopen( lib_filename, "wb" );	
 	xfput_strz( lib_file, Z80libhdr );
 
 	/* write each object file */
@@ -63,7 +64,8 @@ void make_library(char *lib_filename, UT_array *src_files)
 		obj_file_data = read_obj_file_data( obj_filename );
 		if ( obj_file_data == NULL )
 		{
-			myfclose_remove( lib_file );			/* error */
+			xfclose(lib_file);			/* error */
+			remove(lib_filename);
 			return;
 		}
 
@@ -78,11 +80,11 @@ void make_library(char *lib_filename, UT_array *src_files)
         xfput_uint32( lib_file, obj_size );
 
 		/* write module */
-        xfput_chars( lib_file, (char *) ByteArray_item( obj_file_data, 0 ), obj_size ); 
+		xfwrite_bytes((char *)ByteArray_item(obj_file_data, 0), obj_size, lib_file);
 	}
 
 	/* close and write lib file */
-	myfclose( lib_file );
+	xfclose( lib_file );
 }
 
 Bool check_library_file(char *src_filename)

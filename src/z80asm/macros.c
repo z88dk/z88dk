@@ -16,7 +16,7 @@ Assembly macros.
 #include "utarray.h"
 #include "uthash.h"
 #include "utstring.h"
-#include "types.h"
+#include "ztypes.h"
 #include <assert.h>
 #include <ctype.h>
 

@@ -89,7 +89,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\src\common;..\..\src\z80asm\lib;..\..\ext\UNIXem\include;..\..\ext\uthash\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\src\common;..\..\src\z80asm\lib;..\..\ext\UNIXem\include;..\..\ext\uthash\src;..\..\ext\regex</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -129,7 +129,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\src\common;..\..\src\z80asm\lib;..\..\ext\UNIXem\include;..\..\ext\uthash\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\src\common;..\..\src\z80asm\lib;..\..\ext\UNIXem\include;..\..\ext\uthash\src;..\..\ext\regex</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -183,6 +183,14 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\ext\regex\regcomp.c" />
+    <ClCompile Include="..\..\ext\regex\regerror.c" />
+    <ClCompile Include="..\..\ext\regex\regexec.c" />
+    <ClCompile Include="..\..\ext\regex\regfree.c" />
+    <ClCompile Include="..\..\src\common\die.c" />
+    <ClCompile Include="..\..\src\common\fileutil.c" />
+    <ClCompile Include="..\..\src\common\objfile.c" />
+    <ClCompile Include="..\..\src\common\strutil.c" />
     <ClCompile Include="..\..\src\z80asm\codearea.c" />
     <ClCompile Include="..\..\src\z80asm\directives.c" />
     <ClCompile Include="..\..\src\z80asm\errors.c" />
@@ -194,7 +202,7 @@
     <ClCompile Include="..\..\src\z80asm\lib\array.c" />
     <ClCompile Include="..\..\src\z80asm\lib\class.c" />
     <ClCompile Include="..\..\src\z80asm\lib\dbg.c" />
-    <ClCompile Include="..\..\src\z80asm\lib\fileutil.c" />
+    <ClCompile Include="..\..\src\z80asm\lib\zfileutil.c" />
     <ClCompile Include="..\..\src\z80asm\lib\list.c" />
     <ClCompile Include="..\..\src\z80asm\lib\minunit.c" />
     <ClCompile Include="..\..\src\z80asm\lib\srcfile.c" />
@@ -207,7 +215,7 @@
     <ClCompile Include="..\..\src\z80asm\model.c" />
     <ClCompile Include="..\..\src\z80asm\modlink.c" />
     <ClCompile Include="..\..\src\z80asm\module.c" />
-    <ClCompile Include="..\..\src\z80asm\objfile.c" />
+    <ClCompile Include="..\..\src\z80asm\zobjfile.c" />
     <ClCompile Include="..\..\src\z80asm\opcodes.c" />
     <ClCompile Include="..\..\src\z80asm\options.c" />
     <ClCompile Include="..\..\src\z80asm\parse.c" />
@@ -218,6 +226,12 @@
     <ClCompile Include="..\..\src\z80asm\z80pass.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\ext\regex\regex.h" />
+    <ClInclude Include="..\..\src\common\die.h" />
+    <ClInclude Include="..\..\src\common\fileutil.h" />
+    <ClInclude Include="..\..\src\common\objfile.h" />
+    <ClInclude Include="..\..\src\common\strutil.h" />
+    <ClInclude Include="..\..\src\common\types.h" />
     <ClInclude Include="..\..\src\config.h" />
     <ClInclude Include="..\..\src\portability.h" />
     <ClInclude Include="..\..\src\z80asm\codearea.h" />
@@ -234,7 +248,7 @@
     <ClInclude Include="..\..\src\z80asm\lib\classhash.h" />
     <ClInclude Include="..\..\src\z80asm\lib\classlist.h" />
     <ClInclude Include="..\..\src\z80asm\lib\dbg.h" />
-    <ClInclude Include="..\..\src\z80asm\lib\fileutil.h" />
+    <ClInclude Include="..\..\src\z80asm\lib\zfileutil.h" />
     <ClInclude Include="..\..\src\z80asm\lib\init.h" />
     <ClInclude Include="..\..\src\z80asm\lib\list.h" />
     <ClInclude Include="..\..\src\z80asm\lib\minunit.h" />
@@ -243,13 +257,13 @@
     <ClInclude Include="..\..\src\z80asm\lib\str.h" />
     <ClInclude Include="..\..\src\z80asm\lib\strhash.h" />
     <ClInclude Include="..\..\src\z80asm\lib\strpool.h" />
-    <ClInclude Include="..\..\src\z80asm\lib\types.h" />
+    <ClInclude Include="..\..\src\z80asm\lib\ztypes.h" />
     <ClInclude Include="..\..\src\z80asm\listfile.h" />
     <ClInclude Include="..\..\src\z80asm\macros.h" />
     <ClInclude Include="..\..\src\z80asm\model.h" />
     <ClInclude Include="..\..\src\z80asm\modlink.h" />
     <ClInclude Include="..\..\src\z80asm\module.h" />
-    <ClInclude Include="..\..\src\z80asm\objfile.h" />
+    <ClInclude Include="..\..\src\z80asm\zobjfile.h" />
     <ClInclude Include="..\..\src\z80asm\opcodes.h" />
     <ClInclude Include="..\..\src\z80asm\options.h" />
     <ClInclude Include="..\..\src\z80asm\options_def.h" />

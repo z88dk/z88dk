@@ -17,7 +17,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include "class.h"
 #include "list.h"
 #include "str.h"
-#include "types.h"
+#include "ztypes.h"
 #include "utarray.h"
 #include <stdio.h>
 

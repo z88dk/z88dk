@@ -4,6 +4,11 @@
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 #include "unity.h"
+#include "die.h"
+
+#include <assert.h>
+#include <stdlib.h>
+#include <string.h>
 
 void setUp() {}
 void tearDown() {}
@@ -14,20 +19,13 @@ void tearDown() {}
 
 int main(int argc, char *argv[])
 {
-	UNITY_BEGIN();
-	
-	T(t_str_new);
-	T(t_str_new_copy);
-	T(t_str_clear);
-	T(t_str_reserve);
-	T(t_str_set);
-	T(t_str_set_f);
-	T(t_str_set_bin);
-	T(t_str_set_str);
-	T(t_str_append);
-	T(t_str_append_f);
-	T(t_str_append_bin);
-	T(t_str_append_str);
-	
-	return UNITY_END();
+	if (argc == 2) {
+#include "test1.hh"
+		assert(0);
+	}
+	else {
+		UNITY_BEGIN();
+#include "test2.hh"
+		return UNITY_END();
+	}
 }

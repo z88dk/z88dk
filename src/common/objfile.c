@@ -4,6 +4,7 @@
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 #include "objfile.h"
+#include "fileutil.h"
 #include "strutil.h"
 #include "utlist.h"
 
@@ -73,7 +74,7 @@ static void write_signature(FILE *fp, file_type_e type)
 		type == is_object ? SIGNATURE_OBJ : SIGNATURE_LIB,
 		CUR_VERSION);
 
-	xfwrite(str_data(signature), sizeof(char), SIGNATURE_SIZE, fp);
+	xfwrite_bytes(str_data(signature), SIGNATURE_SIZE, fp);
 
 	str_free(signature);
 }
@@ -277,7 +278,7 @@ objfile_t *objfile_new()
 	
 	utarray_new(self->externs, &ut_str_icd);
 	
-	section_t *section= section_new();			// section "" must exist
+	section_t *section = section_new();			// section "" must exist
 	self->sections = NULL;
 	DL_APPEND(self->sections, section);
 
@@ -735,7 +736,7 @@ static long objfile_write_sections(objfile_t *obj, FILE *fp)
 		xfwrite_bcount_str(section->name, fp);
 		xfwrite_dword(section->org, fp);
 		xfwrite_dword(section->align, fp);
-		xfwrite(utarray_front(section->data), sizeof(byte_t), utarray_len(section->data), fp);
+		xfwrite_bytes(utarray_front(section->data), utarray_len(section->data), fp);
 	}
 
 	xfwrite_dword(-1, fp);					// end marker

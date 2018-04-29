@@ -14,7 +14,7 @@ Handle object file contruction, reading and writing
 #include "array.h"
 #include "class.h"
 #include "module.h"
-#include "types.h"
+#include "ztypes.h"
 #include <stdio.h>
 #include <stdlib.h>
 

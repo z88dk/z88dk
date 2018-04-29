@@ -11,7 +11,9 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 
 #pragma once
 
-#include "types.h"
+#include "die.h"
+
+#include "ztypes.h"
 #include "str.h"
 #include "utarray.h"
 #include <stdio.h>
@@ -26,24 +28,6 @@ typedef void (*ferr_callback_t)(char *filename, Bool writing);
 
 /* set call-back for input/output error; return old call-back */
 extern ferr_callback_t set_ferr_callback( ferr_callback_t func );
-
-/* OS interface */
-extern FILE *myfopen( char *filename, char *mode );
-extern void  myfclose( FILE *file );
-
-/* open temp file for writing, rename to final name on myfclose()
-   delete temp file by myfclose_remove() or atexit if xflcose() not called  */
-extern FILE *myfopen_atomic( char *filename, char *mode );
-extern void  myfclose_remove( FILE *file );
-extern void  myfclose_remove_if_empty(FILE *file);
-
-/* read/write buffers */
-extern void xfwrite( void *buffer, size_t size, size_t count, FILE *file );
-extern void xfread(  void *buffer, size_t size, size_t count, FILE *file );
-
-/* read/write strings of characters */
-extern void xfput_chars( FILE *file, char *buffer, size_t len );
-extern void xfget_chars( FILE *file, char *buffer, size_t len );
 
 /* read/write Str */
 extern void xfput_strz( FILE *file, char *str );

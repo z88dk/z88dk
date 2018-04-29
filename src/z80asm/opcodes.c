@@ -183,7 +183,7 @@ void add_copper_unit_wait(Expr *ver, Expr *hor)
 	else {
 		char expr_text[MAXLINE];
 		snprintf(expr_text, sizeof(expr_text),
-			"0x8000 + (((%s) & 0x3F) << 9) + ((%s) & 0x1FF)", str_data(hor->text), str_data(ver->text));
+			"0x8000 + (((%s) & 0x3F) << 9) + ((%s) & 0x1FF)", Str_data(hor->text), Str_data(ver->text));
 		Expr *expr = parse_expr(expr_text);
 
 		Pass2infoExpr(RANGE_WORD_BE, expr);
@@ -201,7 +201,7 @@ void add_copper_unit_move(Expr *reg, Expr *val)
 	else {
 		char expr_text[MAXLINE];
 		snprintf(expr_text, sizeof(expr_text),
-			"(((%s) & 0x7F) << 8) + ((%s) & 0xFF)", str_data(reg->text), str_data(val->text));
+			"(((%s) & 0x7F) << 8) + ((%s) & 0xFF)", Str_data(reg->text), Str_data(val->text));
 		Expr *expr = parse_expr(expr_text);
 
 		Pass2infoExpr(RANGE_WORD_BE, expr);

@@ -12,7 +12,7 @@ Define ragel-based parser.
 #pragma once
 
 #include "scan.h"
-#include "types.h"
+#include "ztypes.h"
 #include "utarray.h"
 
 struct Expr;

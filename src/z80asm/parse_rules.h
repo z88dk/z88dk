@@ -39551,13 +39551,13 @@ _match:
 		switch ( *_acts++ )
 		{
 	case 0:
-	{ str_set_n(stmt_label, ctx->p->tstart, ctx->p->tlen); }
+	{ Str_set_n(stmt_label, ctx->p->tstart, ctx->p->tlen); }
 	break;
 	case 1:
-	{ str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
+	{ Str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
 	break;
 	case 2:
-	{ str_set_bytes(name, ctx->p->tstart, ctx->p->tlen); }
+	{ Str_set_bytes(name, ctx->p->tstart, ctx->p->tlen); }
 	break;
 	case 3:
 	{ expr_open_parens++; }
@@ -39583,10 +39583,10 @@ _match:
 	{ asm_IF(ctx, pop_expr(ctx) ); }
 	break;
 	case 9:
-	{ asm_IFDEF(ctx, str_data(name) ); }
+	{ asm_IFDEF(ctx, Str_data(name) ); }
 	break;
 	case 10:
-	{ asm_IFNDEF(ctx, str_data(name) ); }
+	{ asm_IFNDEF(ctx, Str_data(name) ); }
 	break;
 	case 11:
 	{ asm_ELSE(ctx); }
@@ -39599,12 +39599,12 @@ _match:
     error_expected_const_expr();
    else {
     asm_DEFGROUP_start(expr_value);
-    asm_DEFGROUP_define_const(str_data(name));
+    asm_DEFGROUP_define_const(Str_data(name));
    }
     }
 	break;
 	case 14:
-	{ asm_DEFGROUP_define_const(str_data(name)); }
+	{ asm_DEFGROUP_define_const(Str_data(name)); }
 	break;
 	case 15:
 	{ asm_DEFGROUP_start(0);
@@ -39650,17 +39650,17 @@ _match:
 	{ ctx->current_sm = SM_MAIN; }
 	break;
 	case 28:
-	{ asm_DEFVARS_define_const( str_data(name), 0, 0 ); }
+	{ asm_DEFVARS_define_const( Str_data(name), 0, 0 ); }
 	break;
 	case 29:
-	{ asm_DEFVARS_define_const( str_data(name), 0, 0 );
+	{ asm_DEFVARS_define_const( Str_data(name), 0, 0 );
             ctx->current_sm = SM_MAIN; }
 	break;
 	case 30:
 	{ if (expr_error)
              error_expected_const_expr();
             else
-             asm_DEFVARS_define_const( str_data(name),
+             asm_DEFVARS_define_const( Str_data(name),
                      DEFVARS_SIZE_B,
                      expr_value );
            }
@@ -39669,7 +39669,7 @@ _match:
 	{ if (expr_error)
              error_expected_const_expr();
             else
-             asm_DEFVARS_define_const( str_data(name),
+             asm_DEFVARS_define_const( Str_data(name),
                      DEFVARS_SIZE_W,
                      expr_value );
            }
@@ -39678,7 +39678,7 @@ _match:
 	{ if (expr_error)
              error_expected_const_expr();
             else
-             asm_DEFVARS_define_const( str_data(name),
+             asm_DEFVARS_define_const( Str_data(name),
                      DEFVARS_SIZE_P,
                      expr_value );
            }
@@ -39687,7 +39687,7 @@ _match:
 	{ if (expr_error)
              error_expected_const_expr();
             else
-             asm_DEFVARS_define_const( str_data(name),
+             asm_DEFVARS_define_const( Str_data(name),
                      DEFVARS_SIZE_Q,
                      expr_value );
            }
@@ -39696,7 +39696,7 @@ _match:
 	{ if (expr_error)
              error_expected_const_expr();
             else
-             asm_DEFVARS_define_const( str_data(name),
+             asm_DEFVARS_define_const( Str_data(name),
                      DEFVARS_SIZE_B,
                      expr_value );
             ctx->current_sm = SM_MAIN;
@@ -39706,7 +39706,7 @@ _match:
 	{ if (expr_error)
              error_expected_const_expr();
             else
-             asm_DEFVARS_define_const( str_data(name),
+             asm_DEFVARS_define_const( Str_data(name),
                      DEFVARS_SIZE_W,
                      expr_value );
             ctx->current_sm = SM_MAIN;
@@ -39716,7 +39716,7 @@ _match:
 	{ if (expr_error)
              error_expected_const_expr();
             else
-             asm_DEFVARS_define_const( str_data(name),
+             asm_DEFVARS_define_const( Str_data(name),
                      DEFVARS_SIZE_P,
                      expr_value );
             ctx->current_sm = SM_MAIN;
@@ -39726,7 +39726,7 @@ _match:
 	{ if (expr_error)
              error_expected_const_expr();
             else
-             asm_DEFVARS_define_const( str_data(name),
+             asm_DEFVARS_define_const( Str_data(name),
                      DEFVARS_SIZE_Q,
                      expr_value );
             ctx->current_sm = SM_MAIN;
@@ -39794,8 +39794,8 @@ _match:
 	break;
 	case 49:
 	{ asm_cond_LABEL(stmt_label);
-     str_compress_escapes(name);
-     asm_DEFB_str(str_data(name), str_len(name));
+     Str_compress_escapes(name);
+     asm_DEFB_str(Str_data(name), Str_len(name));
      if ( ctx->p->tok == TK_COMMA )
       {( ctx->cs) = 13;goto _again;}
     }
@@ -39828,7 +39828,7 @@ _match:
 	{ asm_LSTOFF(); }
 	break;
 	case 55:
-	{ asm_MODULE(str_data(name)); }
+	{ asm_MODULE(Str_data(name)); }
 	break;
 	case 56:
 	{ asm_MODULE(sym_text(&ctx->p[-1])); }
@@ -39942,7 +39942,7 @@ _match:
 	{ asm_MODULE(sym_text(&ctx->p[-1])); }
 	break;
 	case 93:
-	{ asm_SECTION(str_data(name)); }
+	{ asm_SECTION(Str_data(name)); }
 	break;
 	case 94:
 	{ asm_SECTION(sym_text(&ctx->p[-1])); }
@@ -40056,34 +40056,34 @@ _match:
 	{ asm_SECTION(sym_text(&ctx->p[-1])); }
 	break;
 	case 131:
-	{ asm_GLOBAL(str_data(name)); }
+	{ asm_GLOBAL(Str_data(name)); }
 	break;
 	case 132:
-	{ asm_PUBLIC(str_data(name)); }
+	{ asm_PUBLIC(Str_data(name)); }
 	break;
 	case 133:
-	{ asm_EXTERN(str_data(name)); }
+	{ asm_EXTERN(Str_data(name)); }
 	break;
 	case 134:
-	{ asm_DEFINE(str_data(name)); }
+	{ asm_DEFINE(Str_data(name)); }
 	break;
 	case 135:
-	{ asm_UNDEFINE(str_data(name)); }
+	{ asm_UNDEFINE(Str_data(name)); }
 	break;
 	case 136:
-	{ asm_XDEF(str_data(name)); }
+	{ asm_XDEF(Str_data(name)); }
 	break;
 	case 137:
-	{ asm_XLIB(str_data(name)); }
+	{ asm_XLIB(Str_data(name)); }
 	break;
 	case 138:
-	{ asm_XREF(str_data(name)); }
+	{ asm_XREF(Str_data(name)); }
 	break;
 	case 139:
-	{ asm_LIB(str_data(name)); }
+	{ asm_LIB(Str_data(name)); }
 	break;
 	case 140:
-	{ asm_DEFC(str_data(name), pop_expr(ctx));
+	{ asm_DEFC(Str_data(name), pop_expr(ctx));
      if ( ctx->p->tok == TK_COMMA )
       {( ctx->cs) = 10872;goto _again;}
     }
@@ -40220,7 +40220,7 @@ _match:
    if (expr_error)
     error_expected_const_expr();
    else
-    asm_LINE(expr_value, str_data(name));
+    asm_LINE(expr_value, Str_data(name));
   }
 	break;
 	case 168:
@@ -40236,19 +40236,19 @@ _match:
    if (expr_error)
     error_expected_const_expr();
    else
-    asm_C_LINE(expr_value, str_data(name));
+    asm_C_LINE(expr_value, Str_data(name));
   }
 	break;
 	case 170:
 	{
    asm_cond_LABEL(stmt_label);
-   asm_INCLUDE(str_data(name));
+   asm_INCLUDE(Str_data(name));
   }
 	break;
 	case 171:
 	{
    asm_cond_LABEL(stmt_label);
-   asm_BINARY(str_data(name));
+   asm_BINARY(Str_data(name));
   }
 	break;
 	case 172:

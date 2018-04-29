@@ -72,15 +72,15 @@ char *Symbol_fullname( Symbol *sym )
 	STR_DEFINE(name, STR_SIZE);
 	char *ret;
 
-    str_set( name, sym->name );
+    Str_set( name, sym->name );
 
     if ( sym->module && sym->module->modname )
     {
-        str_append_char( name, '@' );
-        str_append( name, sym->module->modname );
+        Str_append_char( name, '@' );
+        Str_append( name, sym->module->modname );
     }
 
-    ret = strpool_add( str_data(name) );
+    ret = strpool_add( Str_data(name) );
 
 	STR_DELETE(name);
 

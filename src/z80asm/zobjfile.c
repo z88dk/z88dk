@@ -11,12 +11,13 @@ Handle object file contruction, reading and writing
 
 #include "class.h"
 #include "codearea.h"
-#include "errors.h"
 #include "fileutil.h"
+#include "zfileutil.h"
+#include "errors.h"
 #include "libfile.h"
 #include "options.h"
 #include "model.h"
-#include "objfile.h"
+#include "zobjfile.h"
 #include "strpool.h"
 #include "str.h"
 
@@ -73,10 +74,10 @@ static long write_expr( FILE *fp )
 
 		/* store file name if different from last, folowed by source line number */
 		if ( expr->filename != NULL &&
-			 strcmp( str_data(last_sourcefile), expr->filename ) != 0 )
+			 strcmp( Str_data(last_sourcefile), expr->filename ) != 0 )
 		{
 			xfput_count_word_strz( fp, expr->filename );
-			str_set( last_sourcefile, expr->filename );
+			Str_set( last_sourcefile, expr->filename );
 		}
 		else
 			xfput_count_word_strz( fp, "" );
@@ -88,7 +89,7 @@ static long write_expr( FILE *fp )
 		xfput_uint16( fp, expr->asmpc );				/* ASMPC */
 		xfput_uint16( fp, expr->code_pos );				/* patchptr */
 		xfput_count_byte_strz( fp, target_name );		/* target symbol for expression */
-		xfput_count_word_strz( fp, str_data(expr->text) );	/* expression */
+		xfput_count_word_strz( fp, Str_data(expr->text) );	/* expression */
 	}
 
 	xfput_uint8( fp, 0 );								/* terminator */
@@ -222,7 +223,7 @@ void write_obj_file( char *source_filename )
 
 	/* open file */
 	obj_filename = get_obj_filename( source_filename );
-	fp = myfopen_atomic( obj_filename, "w+b" );
+	fp = xfopen( obj_filename, "wb" );
 
 	/* write header */
     xfput_strz( fp, Z80objhdr );
@@ -248,7 +249,7 @@ void write_obj_file( char *source_filename )
     xfput_uint32( fp, code_ptr );
 
 	/* close temp file and rename to object file */
-	myfclose( fp );
+	xfclose( fp );
 }
 
 
@@ -290,7 +291,7 @@ void OFile_fini( OFile *self )
     if ( self->file		 != NULL && 
 		 self->start_ptr == 0
 	   )
-        myfclose( self->file );
+        xfclose( self->file );
 
 	/* if writing but not closed, delete partialy created file */
     if ( self->writing && 
@@ -333,7 +334,7 @@ OFile *OFile_read_header( FILE *file, size_t start_ptr )
     /* read module name */
     fseek( file, start_ptr + self->modname_ptr, SEEK_SET );
     xfget_count_byte_Str( file, buffer );
-    self->modname		= strpool_add( str_data(buffer) );
+    self->modname		= strpool_add( Str_data(buffer) );
 
 	STR_DELETE(buffer);
 
@@ -352,17 +353,18 @@ static OFile *_OFile_open_read( char *filename, Bool test_mode )
 	FILE *file;
 
 	/* file exists? */
-	file = test_mode ? 
-			fopen(  filename, "rb" ) :	/* no exceptions if testing */
-			myfopen( filename, "rb" );
-	if ( file == NULL )
+	file = fopen(filename, "rb");
+	if (!file) {
+		if (!test_mode)
+			error_read_file(filename);
 		return NULL;
+	}
 
 	/* read header */
 	self = OFile_read_header( file, 0 );
 	if ( self == NULL )
 	{
-		myfclose( file );
+		xfclose( file );
 		
 		if ( ! test_mode )
 			error_not_obj_file( filename );
@@ -387,7 +389,7 @@ void OFile_close( OFile *self )
 {
 	if ( self != NULL && self->file != NULL )
 	{
-		myfclose( self->file );
+		xfclose( self->file );
 		self->file = NULL;
 	}
 }
@@ -427,7 +429,7 @@ ByteArray *read_obj_file_data( char *filename )
 
 	/* set array size, read file */
 	ByteArray_set_size( buffer, size );
-	xfget_chars( ofile->file, (char *) ByteArray_item( buffer, 0 ), size );
+	xfread_bytes(ByteArray_item(buffer, 0), size, ofile->file);
     
 	OBJ_DELETE( ofile );
 
@@ -462,7 +464,7 @@ static Bool objmodule_loaded_1( char *obj_filename, Str *section_name )
 
 				/* reserve space in section */
 				xfget_count_byte_Str(ofile->file, section_name);
-				section = new_section(str_data(section_name));
+				section = new_section(Str_data(section_name));
 				read_origin(ofile->file, section);
 				section->align = xfget_int32(ofile->file);
 

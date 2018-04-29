@@ -11,12 +11,13 @@ Error handling.
 
 #include "errors.h"
 #include "fileutil.h"
+#include "zfileutil.h"
 #include "options.h"
 #include "srcfile.h"
 #include "strpool.h"
 #include "str.h"
 #include "strhash.h"
-#include "types.h"
+#include "ztypes.h"
 #include "init.h"
 #include <stdio.h>
 
@@ -141,7 +142,7 @@ void open_error_file( char *src_filename )
     close_error_file();
 
     error_file.filename = strpool_add( filename );
-	error_file.file = myfopen(error_file.filename, "a");
+	error_file.file = xfopen(error_file.filename, "a");		// TODO: remove error file at start of assembly
 }
 
 void close_error_file( void )
@@ -151,7 +152,7 @@ void close_error_file( void )
     /* close current file if any */
 	if (error_file.file != NULL)
 	{
-		myfclose(error_file.file);
+		xfclose(error_file.file);
 
 		/* delete file if no errors found */
 		if (error_file.filename != NULL && file_size(error_file.filename) == 0)
@@ -182,49 +183,49 @@ void do_error( enum ErrType err_type, char *message )
     init_module();
 
     /* init empty message */
-    str_clear( msg );
+    Str_clear( msg );
 
     /* Information messages have no prefix */
     if ( err_type != ErrInfo )
     {
-        str_append( msg, err_type == ErrWarn ? "Warning" : "Error" );
+        Str_append( msg, err_type == ErrWarn ? "Warning" : "Error" );
 
         /* prepare to remove " at" if no prefix */
-        len_at = str_len(msg);
-        str_append( msg, " at" );
-        len_prefix = str_len(msg);
+        len_at = Str_len(msg);
+        Str_append( msg, " at" );
+        len_prefix = Str_len(msg);
 
         /* output filename */
         if ( errors.filename && *errors.filename )
-            str_append_sprintf( msg, " file '%s'", errors.filename );
+            Str_append_sprintf( msg, " file '%s'", errors.filename );
 
         /* output module */
         if ( errors.module != NULL && *errors.module )
-            str_append_sprintf( msg, " module '%s'", errors.module );
+            Str_append_sprintf( msg, " module '%s'", errors.module );
 
         /* output line number */
         if ( errors.line > 0 )
-            str_append_sprintf( msg, " line %d", errors.line );
+            Str_append_sprintf( msg, " line %d", errors.line );
 
         /* remove at if no prefix */
-        if ( len_prefix == str_len(msg) )	/* no prefix loaded to string */
+        if ( len_prefix == Str_len(msg) )	/* no prefix loaded to string */
         {
-            str_data(msg)[ len_at ] = '\0';	/* go back 3 chars to before at */
-            str_sync_len( msg );
+            Str_data(msg)[ len_at ] = '\0';	/* go back 3 chars to before at */
+            Str_sync_len( msg );
         }
 
-        str_append( msg, ": " );
+        Str_append( msg, ": " );
     }
 
     /* output error message */
-    str_append( msg, message );
-    str_append_char( msg, '\n' );
+    Str_append( msg, message );
+    Str_append_char( msg, '\n' );
 
     /* CH_0001 : Assembly error messages should appear on stderr */
-    fputs( str_data(msg), stderr );
+    fputs( Str_data(msg), stderr );
 
     /* send to error file */
-    puts_error_file( str_data(msg) );
+    puts_error_file( Str_data(msg) );
 
     if ( err_type == ErrError )
         errors.count++;		/* count number of errors */

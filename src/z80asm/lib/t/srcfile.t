@@ -17,7 +17,7 @@ use Capture::Tiny 'capture';
 use Test::Differences; 
 
 my $compile = "gcc -Wall -I../../../ext/uthash/src -Ilib -otest test.c srcfile.c ".
-			  "class.c alloc.c strpool.c str.c fileutil.c list.c dbg.c";
+			  "class.c alloc.c strpool.c str.c zfileutil.c list.c dbg.c";
 
 #------------------------------------------------------------------------------
 # create directories and files

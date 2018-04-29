@@ -87,8 +87,8 @@ static void init_sym(void)
 *----------------------------------------------------------------------------*/
 DEFINE_init_module()
 {
-	input_buf = str_new(STR_SIZE);
-	p = str_data(input_buf);
+	input_buf = Str_new(STR_SIZE);
+	p = Str_data(input_buf);
 
 	input_stack	 = OBJ_NEW(List);
 	input_stack->free_data = m_free_compat;
@@ -99,7 +99,7 @@ DEFINE_init_module()
 
 DEFINE_dtor_module()
 {
-	str_delete(input_buf);
+	Str_delete(input_buf);
 	OBJ_DELETE(input_stack);
 	utarray_free(scan_state);
 }
@@ -114,16 +114,16 @@ void save_scan_state(void)
 	init_module();
 
 	save.sym = sym;
-	save.input_buf = m_strdup(str_data(input_buf));
+	save.input_buf = m_strdup(Str_data(input_buf));
 	save.at_bol = at_bol;
 	save.EOL = EOL;
 	save.cs = cs;
 	save.act = act;
-	save.p   = p   ? p   - str_data(input_buf) : -1;
-	save.pe  = pe  ? pe  - str_data(input_buf) : -1;
-	save.eof = eof ? eof - str_data(input_buf) : -1;
-	save.ts  = ts  ? ts  - str_data(input_buf) : -1;
-	save.te  = te  ? te  - str_data(input_buf) : -1;
+	save.p   = p   ? p   - Str_data(input_buf) : -1;
+	save.pe  = pe  ? pe  - Str_data(input_buf) : -1;
+	save.eof = eof ? eof - Str_data(input_buf) : -1;
+	save.ts  = ts  ? ts  - Str_data(input_buf) : -1;
+	save.te  = te  ? te  - Str_data(input_buf) : -1;
 //	save.sym_string = m_strdup(sym_string->str);
 	save.expect_opcode = expect_opcode;
 
@@ -138,17 +138,17 @@ void restore_scan_state(void)
 
 	save = (ScanState *)utarray_back(scan_state);
 	sym = save->sym;
-	str_set(input_buf, save->input_buf);
+	Str_set(input_buf, save->input_buf);
 	at_bol = save->at_bol;
 	EOL = save->EOL;
 	cs = save->cs;
 	act = save->act;
-	p   = save->p   >= 0 ? str_data(input_buf) + save->p   : NULL;
-	pe  = save->pe  >= 0 ? str_data(input_buf) + save->pe  : NULL;
-	eof = save->eof >= 0 ? str_data(input_buf) + save->eof : NULL;
-	ts  = save->ts  >= 0 ? str_data(input_buf) + save->ts  : NULL;
-	te  = save->te  >= 0 ? str_data(input_buf) + save->te  : NULL;
-//	str_set(sym_string, save->sym_string);
+	p   = save->p   >= 0 ? Str_data(input_buf) + save->p   : NULL;
+	pe  = save->pe  >= 0 ? Str_data(input_buf) + save->pe  : NULL;
+	eof = save->eof >= 0 ? Str_data(input_buf) + save->eof : NULL;
+	ts  = save->ts  >= 0 ? Str_data(input_buf) + save->ts  : NULL;
+	te  = save->te  >= 0 ? Str_data(input_buf) + save->te  : NULL;
+//	Str_set(sym_string, save->sym_string);
 	expect_opcode = save->expect_opcode;
 
 	utarray_pop_back(scan_state);
@@ -425,6 +425,6 @@ char *sym_text(Sym *sym)
 {
 	static STR_DEFINE(text, STR_SIZE);
 
-	str_set_bytes(text, sym->tstart, sym->tlen);
-	return str_data(text);
+	Str_set_bytes(text, sym->tstart, sym->tlen);
+	return Str_data(text);
 }

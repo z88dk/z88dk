@@ -12,7 +12,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include "alloc.h"
 #include "init.h"
 #include "strpool.h"
-#include "types.h"
+#include "ztypes.h"
 #include "uthash.h"
 #include <stdio.h>
 

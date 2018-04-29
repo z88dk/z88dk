@@ -178,7 +178,7 @@ static void str_remove_data(Str *str)
 	str->flag.data_alloc = FALSE;
 }
 
-Str *str_new_(int size)
+Str *Str_new_(int size)
 {
 	Str *str;
 
@@ -194,14 +194,14 @@ Str *str_new_(int size)
 	str->flag.data_alloc = TRUE;
 	str->flag.header_alloc = TRUE;
 
-	str_clear(str);
+	Str_clear(str);
 
 	return str;
 error:
 	return NULL;
 }
 
-void str_delete_(Str *str)
+void Str_delete_(Str *str)
 {
 	if (str) {
 		str_remove_data(str);
@@ -211,7 +211,7 @@ void str_delete_(Str *str)
 }
 
 /* expand string buffer if needed */
-void str_reserve(Str *str, int size)
+void Str_reserve(Str *str, int size)
 {
 	char *new_data;
 	int   new_size;
@@ -243,29 +243,29 @@ error:;
 *----------------------------------------------------------------------------*/
 
 /* clear the string, keep allocated space */
-void str_clear(Str *str)
+void Str_clear(Str *str)
 {
 	str->len = 0;
 	str->data[0] = '\0';
 }
 
 /* sync length in case string was modified in place */
-void str_sync_len(Str *str)
+void Str_sync_len(Str *str)
 {
 	str->len = strlen(str->data);
 }
 
 /* set / append bytes */
-void str_set_bytes(Str *str, char *source, int size)
+void Str_set_bytes(Str *str, char *source, int size)
 {
-	str_clear(str);
-	str_append_bytes(str, source, size);
+	Str_clear(str);
+	Str_append_bytes(str, source, size);
 }
 
-void str_append_bytes(Str *str, char *source, int size)
+void Str_append_bytes(Str *str, char *source, int size)
 {
 	/* expand string if needed */
-	str_reserve(str, size);
+	Str_reserve(str, size);
 
 	/* copy buffer and add null terminator */
 	memcpy(str->data + str->len, source, size);
@@ -274,41 +274,42 @@ void str_append_bytes(Str *str, char *source, int size)
 }
 
 /* set / append string */
-void str_set(Str *str, char *source)
+void Str_set(Str *str, char *source)
 {
-	str_clear(str);
-	str_append(str, source);
+	Str_clear(str);
+	Str_append(str, source);
 }
 
-void str_append(Str *str, char *source)
+void Str_append(Str *str, char *source)
 {
-	str_append_bytes(str, source, strlen(source));
+	Str_append_bytes(str, source, strlen(source));
 }
 
 /* set / append substring */
-void str_set_n(Str *str, char *source, int count)
+void Str_set_n(Str *str, char *source, int count)
 {
-	str_clear(str);
-	str_append_n(str, source, count);
+	Str_clear(str);
+	Str_append_n(str, source, count);
 }
 
-void str_append_n(Str *str, char *source, int count)
+void Str_append_n(Str *str, char *source, int count)
 {
 	int num_copy = strlen(source);
-	str_append_bytes(str, source, MIN(count, num_copy));
+
+	Str_append_bytes(str, source, MIN(count, num_copy));
 }
 
 /* set / append char */
-void str_set_char(Str *str, char ch)
+void Str_set_char(Str *str, char ch)
 {
-	str_clear(str);
-	str_append_char(str, ch);
+	Str_clear(str);
+	Str_append_char(str, ch);
 }
 
-void str_append_char(Str *str, char ch)
+void Str_append_char(Str *str, char ch)
 {
 	/* expand string if needed */
-	str_reserve(str, 1);
+	Str_reserve(str, 1);
 
 	/* add bytes */
 	str->data[str->len++] = ch;
@@ -316,13 +317,13 @@ void str_append_char(Str *str, char ch)
 }
 
 /* set / append with va_list argument */
-void str_vsprintf(Str *str, char *format, va_list argptr)
+void Str_vsprintf(Str *str, char *format, va_list argptr)
 {
-	str_clear(str);
-	str_append_vsprintf(str, format, argptr);
+	Str_clear(str);
+	Str_append_vsprintf(str, format, argptr);
 }
 
-void str_append_vsprintf(Str *str, char *format, va_list argptr)
+void Str_append_vsprintf(Str *str, char *format, va_list argptr)
 {
 	int free_space;      /* may be negative */
 	int need_space;
@@ -351,28 +352,28 @@ void str_append_vsprintf(Str *str, char *format, va_list argptr)
 		else
 		{
 			/* increase the size by STR_SIZE and retry */
-			str_reserve(str, str->size - str->len);
+			Str_reserve(str, str->size - str->len);
 			va_copy(argptr, savearg);
 		}
 	} while (!ok);
 }
 
 /* set / append with printf-like parameters */
-void str_sprintf(Str *str, char *format, ...)
+void Str_sprintf(Str *str, char *format, ...)
 {
 	va_list argptr;
 
 	va_start(argptr, format);
-	str_vsprintf(str, format, argptr);
+	Str_vsprintf(str, format, argptr);
 	va_end(argptr);
 }
 
-void str_append_sprintf(Str *str, char *format, ...)
+void Str_append_sprintf(Str *str, char *format, ...)
 {
 	va_list argptr;
 
 	va_start(argptr, format);
-	str_append_vsprintf(str, format, argptr);
+	Str_append_vsprintf(str, format, argptr);
 	va_end(argptr);
 }
 
@@ -381,54 +382,54 @@ void str_append_sprintf(Str *str, char *format, ...)
 *----------------------------------------------------------------------------*/
 
 /* tolower, toupper, chomp, strip, compress_escapes */
-void str_toupper(Str *str)
+void Str_toupper(Str *str)
 {
 	stoupper(str->data);
 }
 
-void str_tolower(Str *str)
+void Str_tolower(Str *str)
 {
 	stolower(str->data);
 }
 
-void str_chomp(Str *str)
+void Str_chomp(Str *str)
 {
 	chomp(str->data);
-	str_sync_len(str);
+	Str_sync_len(str);
 }
 
-void str_strip(Str *str)
+void Str_strip(Str *str)
 {
 	strip(str->data);
-	str_sync_len(str);
+	Str_sync_len(str);
 }
 
-void str_compress_escapes(Str *str)
+void Str_compress_escapes(Str *str)
 {
-	/* no str_sync_len() as string may have '\0' */
+	/* no Str_sync_len() as string may have '\0' */
 	str->len = compress_escapes(str->data);
 }
 
 /* get one line from input, convert end-of-line sequences,
 *  return string including one LF character
 *  return FALSE on end of input */
-Bool str_getline(Str *str, FILE *fp)
+Bool Str_getline(Str *str, FILE *fp)
 {
 	int c1, c2;
 
-	str_clear(str);
+	Str_clear(str);
 
 	while ((c1 = getc(fp)) != EOF && c1 != '\n' && c1 != '\r')
-		str_append_char(str, c1);
+		Str_append_char(str, c1);
 
 	if (c1 == EOF)
 	{
 		if (str->len > 0)				/* read some chars */
-			str_append_char(str, '\n');		/* missing newline at end of line */
+			Str_append_char(str, '\n');		/* missing newline at end of line */
 	}
 	else
 	{
-		str_append_char(str, '\n');			/* end of line */
+		Str_append_char(str, '\n');			/* end of line */
 
 		if ((c2 = getc(fp)) != EOF &&
 			!((c1 == '\n' && c2 == '\r') ||

@@ -16,7 +16,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #pragma once
 
 #include "dbg.h"
-#include "types.h"
+#include "ztypes.h"
 #include <stdlib.h>
 
 /*-----------------------------------------------------------------------------

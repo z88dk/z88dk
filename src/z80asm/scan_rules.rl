@@ -198,10 +198,10 @@ main := |*
 		{
 			STR_DEFINE(string, STR_SIZE);
 			
-			str_set_bytes(string, ts, te-ts);
-			str_compress_escapes(string);		/* process escape sequeneces */
-			if (str_len(string) == 1)
-				sym.number = str_data(string)[0];
+			Str_set_bytes(string, ts, te-ts);
+			Str_compress_escapes(string);		/* process escape sequeneces */
+			if (Str_len(string) == 1)
+				sym.number = Str_data(string)[0];
 			else
 				error_invalid_squoted_string(); 
 				
@@ -240,12 +240,12 @@ main := |*
 
 static void set_scan_buf( char *text, Bool _at_bol )
 {
-	str_set( input_buf, text );		
-	p = str_data(input_buf);
+	Str_set( input_buf, text );		
+	p = Str_data(input_buf);
 	
 	/* init state */
 	at_bol  = _at_bol;
-	pe		= str_data(input_buf) + str_len(input_buf);
+	pe		= Str_data(input_buf) + Str_len(input_buf);
 	eof		= pe;	/* tokens are not split acros input lines */
 	
 	%%write init;

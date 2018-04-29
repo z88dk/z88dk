@@ -16,6 +16,7 @@ b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM 
 #include "errors.h"
 #include "listfile.h"
 #include "fileutil.h"
+#include "zfileutil.h"
 #include "model.h"
 #include "options.h"
 #include "symbol.h"
@@ -585,39 +586,37 @@ static void _write_symbol_file(char *filename, Module *module, Bool(*cond)(Symbo
 	else
 		reloc_offset = 0;
 
-	file = myfopen(filename, "w");
-	if (file)
+	file = xfopen(filename, "w");
+
+	symbols = select_module_symbols(module, cond);
+
+	// show symbols in the order they appear in the source
+	for (iter = SymbolHash_first(symbols); iter; iter = SymbolHash_next(iter))
 	{
-		symbols = select_module_symbols(module, cond);
+		sym = (Symbol *)iter->value;
 
-		// show symbols in the order they appear in the source
-		for (iter = SymbolHash_first(symbols); iter; iter = SymbolHash_next(iter))
-		{
-			sym = (Symbol *)iter->value;
+		Str_set(line, prefix);
+		Str_append_sprintf(line, "%-*s", COLUMN_WIDTH - 1, sym->name);
+		Str_append_sprintf(line, " = $%04lX ", sym->value + reloc_offset);
 
-			str_set(line, prefix);
-			str_append_sprintf(line, "%-*s", COLUMN_WIDTH - 1, sym->name);
-			str_append_sprintf(line, " = $%04lX ", sym->value + reloc_offset);
-
-			if (type_flag) {
-				str_append_sprintf(line, "; %s", sym_type_str[sym->type]);
-				str_append_sprintf(line, ", %s", sym_scope_str[sym->scope]);
-				str_append_sprintf(line, ", %s", sym->is_global_def ? "def" : "");
-				str_append_sprintf(line, ", %s", (module == NULL && sym->module != NULL) ? sym->module->modname : "");
-				str_append_sprintf(line, ", %s", sym->section->name);
-				str_append_sprintf(line, ", ");
-				if (sym->filename && sym->filename[0]) {
-					str_append_sprintf(line, "%s:%d", sym->filename, sym->line_nr);
-				}
+		if (type_flag) {
+			Str_append_sprintf(line, "; %s", sym_type_str[sym->type]);
+			Str_append_sprintf(line, ", %s", sym_scope_str[sym->scope]);
+			Str_append_sprintf(line, ", %s", sym->is_global_def ? "def" : "");
+			Str_append_sprintf(line, ", %s", (module == NULL && sym->module != NULL) ? sym->module->modname : "");
+			Str_append_sprintf(line, ", %s", sym->section->name);
+			Str_append_sprintf(line, ", ");
+			if (sym->filename && sym->filename[0]) {
+				Str_append_sprintf(line, "%s:%d", sym->filename, sym->line_nr);
 			}
-			str_strip(line);
-			fprintf(file, "%s\n", str_data(line));
 		}
-
-		OBJ_DELETE(symbols);
-
-		myfclose(file);
+		Str_strip(line);
+		fprintf(file, "%s\n", Str_data(line));
 	}
+
+	OBJ_DELETE(symbols);
+
+	xfclose(file);
 }
 
 /*-----------------------------------------------------------------------------

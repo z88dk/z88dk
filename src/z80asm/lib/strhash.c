@@ -75,9 +75,9 @@ static char *StrHash_norm_key( StrHash *self, char *key )
 	
 	if ( self->ignore_case )
 	{
-		str_set(KEY, key);
-		str_toupper(KEY);
-		return str_data(KEY);
+		Str_set(KEY, key);
+		Str_toupper(KEY);
+		return Str_data(KEY);
 	}
 	else
 		return key;

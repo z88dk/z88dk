@@ -33,8 +33,19 @@ all: t/test$(EXE)
 t/test$(EXE): $(OBJS)
 	$(CC) $(CFLAGS) -o t/test$(EXE) $(OBJS) $(LDFLAGS)
 
+t/test.o: t/test.c t/test1.hh t/test2.hh
+
+t/test1.hh: $(wildcard t/*.c) Makefile
+	@grep -h -i '^void run_[a-z0-9_]*(void)' t/*.c | sed -e 's/void run_\([a-z0-9_]*\).*/if (strcmp(argv[1],"\1") == 0) { extern void run_\1(void); run_\1(); exit(0); } else/' > t/test1.hh
+	@echo Built t/test1.hh
+
+t/test2.hh: $(wildcard t/*.c) Makefile
+	@grep -h -i '^void t_[a-z0-9_]*(void)' t/*.c | sed -e 's/void \(t_[a-z0-9_]*\).*/extern void \1(void); RUN_TEST(\1);/' > t/test2.hh
+	@echo Built t/test2.hh
+
 test: t/test$(EXE)
 	t/test$(EXE)
+	t/run_tests.sh
 
 clean:
 	$(RM) t/test$(EXE) $(OBJS) $(DEPENDS)

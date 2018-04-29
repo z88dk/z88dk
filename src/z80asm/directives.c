@@ -13,11 +13,12 @@ Assembly directives.
 #include "directives.h"
 #include "errors.h"
 #include "fileutil.h"
+#include "zfileutil.h"
 #include "model.h"
 #include "module.h"
 #include "parse.h"
 #include "strpool.h"
-#include "types.h"
+#include "ztypes.h"
 #include "symtab.h"
 #include "z80asm.h"
 #include <assert.h>
@@ -46,17 +47,17 @@ void asm_LABEL(char *name)
 
 void asm_cond_LABEL(Str *label)
 {
-	if (str_len(label)) {
-		asm_LABEL(str_data(label));
-		str_len(label) = 0;
+	if (Str_len(label)) {
+		asm_LABEL(Str_data(label));
+		Str_len(label) = 0;
 	}
 
 	if (opts.debug_info && !scr_is_c_source()) {
 		STR_DEFINE(name, STR_SIZE);
 
-		str_sprintf(name, "__ASM_LINE_%ld", get_error_line());
-		if (!find_local_symbol(str_data(name)))
-			asm_LABEL(str_data(name));
+		Str_sprintf(name, "__ASM_LINE_%ld", get_error_line());
+		if (!find_local_symbol(Str_data(name)))
+			asm_LABEL(Str_data(name));
 
 		STR_DELETE(name);
 	}
@@ -176,9 +177,9 @@ void asm_C_LINE(int line_nr, char *filename)
 	if (opts.debug_info) {
 		STR_DEFINE(name, STR_SIZE);
 
-		str_sprintf(name, "__C_LINE_%ld", line_nr);
-		if (!find_local_symbol(str_data(name)))
-			asm_LABEL(str_data(name));
+		Str_sprintf(name, "__C_LINE_%ld", line_nr);
+		if (!find_local_symbol(Str_data(name)))
+			asm_LABEL(Str_data(name));
 
 		STR_DELETE(name);
 	}
@@ -210,15 +211,14 @@ void asm_INCLUDE(char *filename)
 
 void asm_BINARY(char *filename)
 {
-	FILE *binfile;
-
 	filename = search_file(filename, opts.inc_path);
-
-	binfile = myfopen(filename, "rb");		
-	if (binfile)
-	{
+	FILE *binfile = fopen(filename, "rb");
+	if (!binfile) {
+		error_read_file(filename);
+	}
+	else {
 		append_file_contents(binfile, -1);		/* read binary code */
-		myfclose(binfile);
+		xfclose(binfile);
 	}
 }
 

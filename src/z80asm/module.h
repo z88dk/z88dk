@@ -17,7 +17,9 @@ Assembled module, i.e. result of assembling a .asm file
 #include "codearea.h"
 #include "expr.h"
 #include "symtab.h"
-#include "types.h"
+#include "ztypes.h"
+
+#include "objfile.h"
 
 /*-----------------------------------------------------------------------------
 *   Assembly module
@@ -28,6 +30,8 @@ CLASS( Module )
 	int			 module_id;			/* sequence number of linked modules in sections */
     ExprList	*exprs;				/* list of expressions */
 	SymbolHash	*local_symtab;		/* module local symbols */
+
+	objfile_t	*objfile;
 END_CLASS;
 
 CLASS_LIST( Module );

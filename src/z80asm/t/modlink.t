@@ -582,7 +582,7 @@ write_file("test.asm", <<'END');
 			sd_write_sector:
 				jp sd_write_block_2gb + ASMDISP_SD_WRITE_BLOCK_2GB_CALLEE ;; error: symbol 'sd_write_block_2gb' not defined
 END
-my($stdout, $stderr, $return) = capture { system "z80asm test.asm"; };
+my($stdout, $stderr, $return, @dummy) = capture { system "z80asm test.asm"; };
 is $stdout, "";
 is $stderr, <<'END';
 Error at file 'test.asm' line 5: symbol 'sd_write_block_2gb' not defined
@@ -711,7 +711,7 @@ write_file("test2.asm", <<'...');
 ...
 my $cmd = "./z80asm -b test.asm test1.asm test2.asm";
 ok 1, $cmd;
-($stdout, $stderr, $return) = capture { system $cmd; };
+($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
 eq_or_diff_text $stdout, "", "stdout";
 eq_or_diff_text $stderr, "", "stderr";
 ok !!$return == !!0, "retval";
@@ -865,7 +865,7 @@ my $bincode = sub {
 
 $cmd = "./z80asm -s -otest.o test1.asm test2.asm test3.asm test4.asm";
 ok 1, $cmd;
-($stdout, $stderr, $return) = capture { system $cmd; };
+($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
 eq_or_diff_text $stdout, "", "stdout";
 eq_or_diff_text $stderr, "", "stderr";
 ok !!$return == !!0, "retval";
@@ -932,7 +932,7 @@ unlink "test.asm", "test.bin";
 
 $cmd = "./z80asm -b -m test.o test_lib.asm";
 ok 1, $cmd;
-($stdout, $stderr, $return) = capture { system $cmd; };
+($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
 eq_or_diff_text $stdout, "", "stdout";
 eq_or_diff_text $stderr, "", "stderr";
 ok !!$return == !!0, "retval";
@@ -970,7 +970,7 @@ unlink "test.asm", "test.bin";
 
 $cmd = "./z80asm -b -m -r0x1234 test.o test_lib.asm";
 ok 1, $cmd;
-($stdout, $stderr, $return) = capture { system $cmd; };
+($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
 eq_or_diff_text $stdout, "", "stdout";
 eq_or_diff_text $stderr, "", "stderr";
 ok !!$return == !!0, "retval";
@@ -1020,7 +1020,7 @@ write_file("test_plat1.asm", <<'...');
 
 $cmd = "./z80asm -xtest_plat1.lib test_plat1 test_gen";
 ok 1, $cmd;
-($stdout, $stderr, $return) = capture { system $cmd; };
+($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
 eq_or_diff_text $stdout, "", "stdout";
 eq_or_diff_text $stderr, "", "stderr";
 ok !!$return == !!0, "retval";
@@ -1037,7 +1037,7 @@ write_file("test_plat2.asm", <<'...');
 
 $cmd = "./z80asm -xtest_plat2.lib test_plat2 test_gen";
 ok 1, $cmd;
-($stdout, $stderr, $return) = capture { system $cmd; };
+($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
 eq_or_diff_text $stdout, "", "stdout";
 eq_or_diff_text $stderr, "", "stderr";
 ok !!$return == !!0, "retval";
@@ -1053,7 +1053,7 @@ write_file("test.asm", <<'...');
 # link on platform 1
 $cmd = "./z80asm -itest_plat1.lib -b test";
 ok 1, $cmd;
-($stdout, $stderr, $return) = capture { system $cmd; };
+($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
 eq_or_diff_text $stdout, "", "stdout";
 eq_or_diff_text $stderr, "", "stderr";
 ok !!$return == !!0, "retval";
@@ -1063,7 +1063,7 @@ test_binfile("test.bin", pack("C*", 0xC3, 3, 0, 0x3E, 1, 0xC9));
 # link on platform 2
 $cmd = "./z80asm -itest_plat2.lib -b test";
 ok 1, $cmd;
-($stdout, $stderr, $return) = capture { system $cmd; };
+($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
 eq_or_diff_text $stdout, "", "stdout";
 eq_or_diff_text $stderr, "", "stderr";
 ok !!$return == !!0, "retval";
@@ -1116,14 +1116,14 @@ write_file("test1.asm", <<'...');
 
 $cmd = "./z80asm test1.asm";
 ok 1, $cmd;
-($stdout, $stderr, $return) = capture { system $cmd; };
+($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
 eq_or_diff_text $stdout, "", "stdout";
 eq_or_diff_text $stderr, "", "stderr";
 ok !!$return == !!0, "retval";
 
 $cmd = "../../src/z80nm/z80nm test1.o";
 ok 1, $cmd;
-($stdout, $stderr, $return) = capture { system $cmd; };
+($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
 $stdout = join("\n", grep {/__/} split(/\n/, $stdout))."\n";
 eq_or_diff_text $stdout, <<'END', "stdout";
     U         __LOADER_head
@@ -1135,14 +1135,14 @@ ok !!$return == !!0, "retval";
 
 $cmd = "./z80asm --output=test1.o test1.asm";
 ok 1, $cmd;
-($stdout, $stderr, $return) = capture { system $cmd; };
+($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
 eq_or_diff_text $stdout, "", "stdout";
 eq_or_diff_text $stderr, "", "stderr";
 ok !!$return == !!0, "retval";
 
 $cmd = "../../src/z80nm/z80nm test1.o";
 ok 1, $cmd;
-($stdout, $stderr, $return) = capture { system $cmd; };
+($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
 $stdout = join("\n", grep {/__/} split(/\n/, $stdout))."\n";
 eq_or_diff_text $stdout, <<'END', "stdout";
     U         __LOADER_head

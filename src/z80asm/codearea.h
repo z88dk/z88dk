@@ -11,7 +11,7 @@ Manage the code area in memory
 #pragma once
 
 #include "array.h"
-#include "types.h"
+#include "ztypes.h"
 #include "class.h"
 #include "classhash.h"
 

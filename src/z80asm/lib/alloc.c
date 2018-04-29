@@ -12,6 +12,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include "alloc.h"
 #include "dbg.h"
 #include "init.h"
+#include "ztypes.h"
 #include "types.h"
 #include "utlist.h"
 #include <stddef.h>

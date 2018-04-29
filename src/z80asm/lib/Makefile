@@ -72,21 +72,21 @@ depend:
 
 # DO NOT DELETE
 
-alloc.o: alloc.h dbg.h types.h init.h 
-array.o: array.h class.h alloc.h dbg.h types.h queue.h
-class.o: alloc.h dbg.h types.h class.h queue.h init.h strpool.h
+alloc.o: alloc.h dbg.h ztypes.h init.h 
+array.o: array.h class.h alloc.h dbg.h ztypes.h queue.h
+class.o: alloc.h dbg.h ztypes.h class.h queue.h init.h strpool.h
 dbg.o: dbg.h
-fileutil.o: alloc.h dbg.h types.h fileutil.h list.h class.h queue.h 
-fileutil.o: strpool.h 
-list.o: alloc.h dbg.h types.h list.h class.h queue.h
+zfileutil.o: alloc.h dbg.h ztypes.h zfileutil.h list.h class.h queue.h 
+zfileutil.o: strpool.h 
+list.o: alloc.h dbg.h ztypes.h list.h class.h queue.h
 minunit.o: minunit.h dbg.h
-srcfile.o: alloc.h dbg.h types.h srcfile.h class.h queue.h list.h 
-srcfile.o: fileutil.h strpool.h
-str.o: str.h alloc.h dbg.h types.h
-strpool.o: alloc.h dbg.h types.h init.h strpool.h 
-t/test_alloc.o: minunit.h dbg.h alloc.h types.h
+srcfile.o: alloc.h dbg.h ztypes.h srcfile.h class.h queue.h list.h 
+srcfile.o: zfileutil.h strpool.h
+str.o: str.h alloc.h dbg.h ztypes.h
+strpool.o: alloc.h dbg.h ztypes.h init.h strpool.h 
+t/test_alloc.o: minunit.h dbg.h alloc.h ztypes.h
 t/test_dbg.o: minunit.h dbg.h
-t/test_init.o: minunit.h dbg.h init.h types.h
-t/test_str.o: minunit.h dbg.h str.h alloc.h types.h
+t/test_init.o: minunit.h dbg.h init.h ztypes.h
+t/test_str.o: minunit.h dbg.h str.h alloc.h ztypes.h
 t/test_strpool.o: minunit.h dbg.h strpool.h
-t/test_types.o: minunit.h dbg.h types.h
+t/test_types.o: minunit.h dbg.h ztypes.h

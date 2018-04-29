@@ -9,14 +9,15 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 
 #include "directives.h"
 #include "fileutil.h"
+#include "zfileutil.h"
 #include "libfile.h"
 #include "listfile.h"
 #include "macros.h"
 #include "modlink.h"
 #include "module.h"
-#include "objfile.h"
+#include "zobjfile.h"
 #include "parse.h"
-#include "types.h"
+#include "ztypes.h"
 #include "strpool.h"
 #include "symbol.h"
 #include <sys/stat.h>

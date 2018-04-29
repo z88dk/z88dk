@@ -13,8 +13,10 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 */
 
 #include "alloc.h"
+#include "../errors.h"
 #include "srcfile.h"
 #include "fileutil.h"
+#include "zfileutil.h"
 #include "strpool.h"
 #include <assert.h>
 
@@ -36,7 +38,7 @@ static void free_file_stack_elem( void *_elem )
 	FileStackElem *elem = _elem;
 	
 	if ( elem->file != NULL )
-		myfclose( elem->file );
+		xfclose( elem->file );
 	m_free( elem );
 }
 
@@ -86,7 +88,7 @@ void SrcFile_init( SrcFile *self )
 	self->filename = NULL;
 	self->line_filename = NULL;
 
-	self->line = str_new(STR_SIZE);
+	self->line = Str_new(STR_SIZE);
 
     self->line_stack = OBJ_NEW( List );
     OBJ_AUTODELETE( self->line_stack ) = FALSE;
@@ -105,9 +107,9 @@ void SrcFile_copy( SrcFile *self, SrcFile *other )
 void SrcFile_fini( SrcFile *self )
 {
     if ( self->file != NULL )
-        myfclose( self->file );
+        xfclose( self->file );
 
-	str_delete(self->line);
+	Str_delete(self->line);
     OBJ_DELETE( self->line_stack );
     OBJ_DELETE( self->file_stack );
 }
@@ -149,7 +151,7 @@ Bool SrcFile_open( SrcFile *self, char *filename, UT_array *dir_list )
 	/* close last file */
 	if (self->file != NULL)
 	{
-		myfclose(self->file);
+		xfclose(self->file);
 		self->file = NULL;
 	}
 
@@ -164,10 +166,12 @@ Bool SrcFile_open( SrcFile *self, char *filename, UT_array *dir_list )
 	self->line_filename = filename_path;
 
     /* open new file in binary mode, for cross-platform newline processing */
-    self->file = myfopen( self->filename, "rb" );
+    self->file = fopen( self->filename, "rb" );
+	if (!self->file)
+		error_read_file(self->filename);
 
 	/* init current line */
-    str_clear( self->line );
+    Str_clear( self->line );
     self->line_nr = 0;
 	self->line_inc = 1;
 	self->is_c_source = FALSE;
@@ -190,7 +194,7 @@ char *SrcFile_getline( SrcFile *self )
     char *line;
 
     /* clear result string */
-    str_clear( self->line );
+    Str_clear( self->line );
 
     /* check for line stack */
     if ( ! List_empty( self->line_stack ) )
@@ -198,11 +202,11 @@ char *SrcFile_getline( SrcFile *self )
         line = List_pop( self->line_stack );
 
         /* we own the string now and need to release memory */
-		str_set( self->line, line );
+		Str_set( self->line, line );
         m_free( line );
 
         /* dont increment line number as we are still on same file input line */
-        return str_data(self->line);
+        return Str_data(self->line);
     }
 
     /* check for EOF condition */
@@ -237,28 +241,28 @@ char *SrcFile_getline( SrcFile *self )
             c = '\n';
 
         default:
-            str_append_char( self->line, c );
+            Str_append_char( self->line, c );
         }
     }
 
     /* terminate string if needed */
-    if ( str_len(self->line) > 0 && ! found_newline )
-        str_append_char( self->line, '\n' );
+    if ( Str_len(self->line) > 0 && ! found_newline )
+        Str_append_char( self->line, '\n' );
 
 	/* signal new line, even empty one, to show end line in list */
     self->line_nr += self->line_inc;
-	call_new_line_cb( self->line_filename, self->line_nr, str_data(self->line) );
+	call_new_line_cb( self->line_filename, self->line_nr, Str_data(self->line) );
 
 	/* check for end of file
 	   even if EOF found, we need to return any chars in line first */
-    if ( str_len(self->line) > 0 )		
+    if ( Str_len(self->line) > 0 )		
     {
-        return str_data(self->line);
+        return Str_data(self->line);
     }
     else
     {
         /* EOF - close file */
-        myfclose( self->file );				/* close input */
+        xfclose( self->file );				/* close input */
         self->file = NULL;
 
 //		call_new_line_cb( NULL, 0, NULL );
@@ -368,7 +372,7 @@ Bool SrcFile_pop( SrcFile *self )
 		return FALSE;
 		
 	if ( self->file != NULL )
-		myfclose( self->file );
+		xfclose( self->file );
 		
 	elem = List_pop( self->file_stack );
 	self->file		= elem->file;

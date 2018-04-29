@@ -6,6 +6,7 @@
 #pragma once
 
 #include "die.h"
+#include "types.h"
 #include "utarray.h"
 #include "strutil.h"
 #include <stdbool.h>

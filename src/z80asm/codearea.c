@@ -9,8 +9,9 @@ Manage the code area in memory
 */
 
 #include "codearea.h"
-#include "errors.h"
 #include "fileutil.h"
+#include "zfileutil.h"
+#include "errors.h"
 #include "init.h"
 #include "listfile.h"
 #include "options.h"
@@ -513,7 +514,7 @@ void patch_file_contents( FILE *file, int addr, long num_bytes )
 	if ( num_bytes > 0 )
 	{
 		buffer = alloc_space( addr, num_bytes );
-		xfget_chars( file, (char *) buffer, num_bytes );
+		xfread_bytes(buffer, num_bytes, file);
 	}
 }
 
@@ -553,7 +554,7 @@ Bool fwrite_module_code(FILE *file, int* p_code_size)
 			xfput_int32(file, section->align);
 
 			if (size > 0)		/* ByteArray_item(bytes,0) creates item[0]!! */
-				xfput_chars(file, (char *)ByteArray_item(section->bytes, addr), size);
+				xfwrite_bytes((char *)ByteArray_item(section->bytes, addr), size, file);
 
 			code_size += size;
 			wrote_data = TRUE;
@@ -607,18 +608,16 @@ void fwrite_codearea(char *filename, FILE **pbinfile, FILE **prelocfile)
 					if (opts.appmake)
 						warn_org_ignored(get_obj_filename(filename), section->name);
 					else {
-						str_set(new_name, path_remove_ext(filename));	/* "test" */
-						str_append_char(new_name, '_');
-						str_append(new_name, section->name);
+						Str_set(new_name, path_remove_ext(filename));	/* "test" */
+						Str_append_char(new_name, '_');
+						Str_append(new_name, section->name);
 
-                        myfclose_remove_if_empty(*pbinfile);
-						*pbinfile = myfopen(get_bin_filename(str_data(new_name)), "wb");
-						if (!*pbinfile)
-							break;
+                        xfclose_remove_empty(*pbinfile);
+						*pbinfile = xfopen(get_bin_filename(Str_data(new_name)), "wb");
 
 						if (*prelocfile) {
-                            myfclose_remove_if_empty(*prelocfile);
-							*prelocfile = myfopen(get_reloc_filename(str_data(new_name)), "wb");
+                            xfclose_remove_empty(*prelocfile);
+							*prelocfile = xfopen(get_reloc_filename(Str_data(new_name)), "wb");
 							cur_section_block_size = 0;
 						}
 
@@ -627,7 +626,7 @@ void fwrite_codearea(char *filename, FILE **pbinfile, FILE **prelocfile)
 				}
 			}
 
-			xfput_chars(*pbinfile, (char *)ByteArray_item(section->bytes, 0), section_size);
+			xfwrite_bytes((char *)ByteArray_item(section->bytes, 0), section_size, *pbinfile);
 
 			if (*prelocfile) {
 				unsigned i;

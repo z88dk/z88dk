@@ -110,18 +110,18 @@ static void push_expr(ParseCtx *ctx)
 	Bool  last_was_prefix;
 
 	/* build expression text - split constant prefixes from numbers and names */
-	str_clear(expr_text);
+	Str_clear(expr_text);
 	last_was_prefix = FALSE;
 	for (expr_p = ctx->expr_start; expr_p < ctx->p; expr_p++)
 	{
 		if (last_was_prefix && expr_p->tlen > 0 &&
 			(isalnum(*expr_p->tstart) || *expr_p->tstart == '"'))
 		{
-			str_append_char(expr_text, ' ');
+			Str_append_char(expr_text, ' ');
 			last_was_prefix = FALSE;
 		}
 
-		str_append_n(expr_text, expr_p->tstart, expr_p->tlen);
+		Str_append_n(expr_text, expr_p->tstart, expr_p->tlen);
 
 		if (expr_p->tlen > 0)
 		{
@@ -140,7 +140,7 @@ static void push_expr(ParseCtx *ctx)
 	}
 	
 	/* parse expression */
-	expr = parse_expr(str_data(expr_text));
+	expr = parse_expr(Str_data(expr_text));
 
 	/* push the new expression, or NULL on error */
 	utarray_push_back(ctx->exprs, &expr);
@@ -195,8 +195,8 @@ char *autolabel(void)
 	static int n;
 	char *ret;
 
-	str_sprintf(label, "__autolabel_%04d", ++n);
-	ret = strpool_add(str_data(label));
+	Str_sprintf(label, "__autolabel_%04d", ++n);
+	ret = strpool_add(Str_data(label));
 
 	STR_DELETE(label);
 	return ret;
@@ -234,9 +234,9 @@ static void read_token(ParseCtx *ctx)
 	switch (sym_copy.tok)
 	{
 	case TK_NUMBER:
-		str_sprintf(buffer, "%d", sym_copy.number);
-		sym_copy.tstart = token_strings_add(ctx, str_data(buffer));
-		sym_copy.tlen = str_len(buffer);
+		Str_sprintf(buffer, "%d", sym_copy.number);
+		sym_copy.tstart = token_strings_add(ctx, Str_data(buffer));
+		sym_copy.tlen = Str_len(buffer);
 		break;
 
 	case TK_NAME:
