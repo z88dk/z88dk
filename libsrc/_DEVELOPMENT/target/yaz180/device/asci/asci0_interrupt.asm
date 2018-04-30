@@ -1,7 +1,8 @@
 
     INCLUDE "config_private.inc"
 
-    SECTION rocode_common1_driver
+    SECTION code_driver
+    SECTION code_driver_character_input
 
     PUBLIC _asci0_interrupt
     

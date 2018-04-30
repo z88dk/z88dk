@@ -35,12 +35,12 @@ define(`__COMMON_AREA_1_PHASE_DRIVER', 0x`'eval(__COMMON_AREA_1_BASE+__COMMON_AR
 # Z180 ASCI0 driver
 
 define(`__ASCI0_RX_SIZE', 0x100)  # Size of the Rx Buffer
-define(`__ASCI0_TX_SIZE', 0x080)  # Size of the Tx Buffer
+define(`__ASCI0_TX_SIZE', 0x100)  # Size of the Tx Buffer
 
 # Z180 ASCI1 driver
 
 define(`__ASCI1_RX_SIZE', 0x100)  # Size of the Rx Buffer
-define(`__ASCI1_TX_SIZE', 0x080)  # Size of the Tx Buffer
+define(`__ASCI1_TX_SIZE', 0x100)  # Size of the Tx Buffer
 
 # BREAK for Single Step Mode
 
@@ -58,6 +58,7 @@ define(`__IO_PCA9665_2_PORT_BASE', 0x8000)  # Base Address for PCA9665 2 I/O
 # Am9511A-1 APU Definitions
 
 define(`__APU_CMD_SIZE', 0x100)   # Size of the CMD Buffer, 256 CMDs
+define(`__APU_PTR_SIZE', 0x100)   # Size of the Data PTR Buffer
 define(`__APU_DATA_SIZE', 0x100)  # Size of the DATA Buffer
 
 define(`__IO_APU_PORT_BASE', 0xC000)        # Base Address for Am9511A
@@ -101,6 +102,7 @@ PUBLIC `__IO_PCA9665_1_PORT_BASE'
 PUBLIC `__IO_PCA9665_2_PORT_BASE'
 
 PUBLIC `__APU_CMD_SIZE'
+PUBLIC `__APU_PTR_SIZE'
 PUBLIC `__APU_DATA_SIZE'
 
 PUBLIC `__IO_APU_PORT_BASE'
@@ -139,6 +141,7 @@ defc `__IO_PCA9665_1_PORT_BASE' = __IO_PCA9665_1_PORT_BASE
 defc `__IO_PCA9665_2_PORT_BASE' = __IO_PCA9665_2_PORT_BASE
 
 defc `__APU_CMD_SIZE' = __APU_CMD_SIZE
+defc `__APU_PTR_SIZE' = __APU_PTR_SIZE
 defc `__APU_DATA_SIZE' = __APU_DATA_SIZE
 
 defc `__IO_APU_PORT_BASE' = __IO_APU_PORT_BASE
@@ -178,6 +181,7 @@ ifdef(`CFG_C_DEF',
 `#define' `__IO_PCA9665_2_PORT_BASE'  __IO_PCA9665_2_PORT_BASE
 
 `#define' `__APU_CMD_SIZE'  __APU_CMD_SIZE
+`#define' `__APU_PTR_SIZE'  __APU_PTR_SIZE
 `#define' `__APU_DATA_SIZE'  __APU_DATA_SIZE
 
 `#define' `__IO_APU_PORT_BASE'  __IO_APU_PORT_BASE

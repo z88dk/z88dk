@@ -206,9 +206,9 @@ SECTION code_crt_return
 
    ; terminate
    
-      include "../crt_exit_eidi.inc"
-      include "../crt_restore_sp.inc"
-      include "../crt_program_exit.inc"      
+   include "../crt_exit_eidi.inc"
+   include "../crt_restore_sp.inc"
+   include "../crt_program_exit.inc"      
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -1,13 +1,13 @@
 include(`z88dk.m4')
 
 dnl############################################################
-dnl##         YAZ180_CRT_0.ASM.M4 - YABIOS TARGET            ##
+dnl##          YAZ180_CRT_0.ASM.M4 - ROM TARGET              ##
 dnl############################################################
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                  yaz180 YABIOS target                     ;;
+;;                   yaz180 ROM target                       ;;
 ;; generated from target/yaz180/startup/yaz180_crt_0.asm.m4  ;;
 ;;                                                           ;;
-;;                banked 64k address spaces                  ;;
+;;                  flat 64k address space                   ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -117,7 +117,7 @@ ENDIF
 
 IF (ASMPC = 0) && (__crt_org_code = 0)
 
-   include "crt_page_zero_yabios.inc"
+   include "../crt_page_zero_z180.inc"
 
 ENDIF
 

@@ -1,7 +1,7 @@
 
 INCLUDE "config_private.inc"
     
-SECTION rodata_common1_data
+SECTION data_align_256
 
 PUBLIC asci1RxBuffer
 
@@ -9,11 +9,9 @@ asci1RxBuffer:   defs __ASCI1_RX_SIZE   ; Space for the Rx Buffer
 
 ; pad to next 256 byte boundary
 
-IF (ASMPC & 0xff)
-   defs 256 - (ASMPC & 0xff)
-ENDIF
+ALIGN 256
 
-SECTION rodata_common1_data
+SECTION data_driver
 
 PUBLIC asci1RxCount, asci1RxIn, asci1RxOut, asci1RxLock
  

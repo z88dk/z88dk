@@ -21,7 +21,6 @@ include "config_yaz180_public.inc"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../crt_defaults.inc"
-include "crt_yabios_def.inc"
 include "crt_config.inc"
 include(`../crt_rules.inc')
 include(`yaz180_rules.inc')
