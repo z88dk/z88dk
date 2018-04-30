@@ -96,6 +96,11 @@ void xfwrite(const void *ptr, size_t size, size_t count, FILE *stream)
 		die("failed to write %u bytes to file '%s'\n", size*count, get_filename(stream));
 }
 
+void xfwrite_cstr(const char *str, FILE *stream)
+{
+	xfwrite_bytes(str, strlen(str), stream);
+}
+
 void xfwrite_str(str_t *str, FILE *stream)
 {
 	xfwrite_bytes(str_data(str), str_len(str), stream);
@@ -110,7 +115,7 @@ void xfwrite_bcount_str(str_t *str, FILE *stream)
 {
 	size_t len = str_len(str);
 	if (len > 255)
-		die("string '%s' too long for byte counted string\n", str_data(str));
+		die("string '%.40s...' too long for byte counted string\n", str_data(str));
 	xfwrite_byte(len & 0xFF, stream);
 	xfwrite_str(str, stream);
 }
@@ -119,7 +124,7 @@ void xfwrite_wcount_str(str_t * str, FILE * stream)
 {
 	size_t len = str_len(str);
 	if (len > 0xFFFF)
-		die("string '%s' too long for word counted string", str);
+		die("string '%.40s...' too long for word counted string\n", str_data(str));
 	xfwrite_word(len, stream);
 	xfwrite_str(str, stream);
 }

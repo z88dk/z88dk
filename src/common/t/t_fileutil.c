@@ -80,6 +80,26 @@ void t_fileutil_xfwrite_bytes(void)
 	remove("test.out");
 }
 
+void t_fileutil_xfwrite_cstr(void)
+{
+	FILE *fp = xfopen("test.out", "wb");
+	TEST_ASSERT_NOT_NULL(fp);
+
+	xfwrite_cstr("hello", fp);
+	xfclose(fp);
+
+	fp = xfopen("test.out", "rb");
+	TEST_ASSERT_NOT_NULL(fp);
+
+	str_t *s = str_new();
+	xfread_str(5, s, fp);
+	TEST_ASSERT_EQUAL_STRING("hello", str_data(s));
+
+	xfclose(fp);
+	remove("test.out");
+	str_free(s);
+}
+
 void t_fileutil_xfwrite_str(void)
 {
 	str_t *s = str_new();
@@ -204,7 +224,55 @@ void run_fileutil_xfwrite_bcount_str(void)
 	assert(0);
 }
 
-void t_fileutil_xfwrite_wcount_str(void)
+void run_fileutil_xfwrite_wcount_str(void)
+{
+	size_t sz = 0x10000;
+	str_t *s = str_new();
+	str_reserve(s, sz);
+	memset(str_data(s), 'x', sz);
+	str_data(s)[str_len(s) = sz] = '\0';
+
+	FILE *fp = xfopen("test.out", "wb");
+	TEST_ASSERT_NOT_NULL(fp);
+
+	xfwrite_wcount_str(s, fp);		// dies
+	assert(0);
+}
+
+void t_fileutil_xfwrite_wcount_str_1(void)
+{
+	size_t sz = 0xFFFF;
+	str_t *s = str_new();
+	str_reserve(s, sz);
+	memset(str_data(s), 'x', sz);
+	str_data(s)[str_len(s) = sz] = '\0';
+
+	FILE *fp = xfopen("test.out", "wb");
+	TEST_ASSERT_NOT_NULL(fp);
+
+	xfwrite_wcount_str(s, fp);
+	xfclose(fp);
+
+	str_clear(s);
+	TEST_ASSERT_EQUAL_STRING("", str_data(s));
+
+	fp = xfopen("test.out", "rb");
+	TEST_ASSERT_NOT_NULL(fp);
+
+	xfread_wcount_str(s, fp);
+
+	TEST_ASSERT_EQUAL(EOF, fgetc(fp));
+
+	TEST_ASSERT_EQUAL(sz, str_len(s));
+	for (size_t i = 0; i < sz; i++)
+		TEST_ASSERT_EQUAL('x', str_data(s)[i]);
+
+	xfclose(fp);
+	remove("test.out");
+	str_free(s);
+}
+
+void t_fileutil_xfwrite_wcount_str_2(void)
 {
 	str_t *s = str_new();
 	FILE *fp = xfopen("test.out", "wb");

@@ -18,6 +18,7 @@ extern void xfclose_remove_empty(FILE *stream);
 
 // dies if error writing all elements
 extern void xfwrite(const void *ptr, size_t size, size_t count, FILE *stream);
+extern void xfwrite_cstr(const char *str, FILE *stream);
 extern void xfwrite_str(str_t *str, FILE *stream);
 extern void xfwrite_bytes(const void *ptr, size_t count, FILE *stream);
 
