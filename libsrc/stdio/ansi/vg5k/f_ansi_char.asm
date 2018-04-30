@@ -24,8 +24,6 @@
 
 
 .ansi_CHAR
-	ld	ix,$47FA
-
 	ld    d,a
 	
 	ld    a,(vg5k_attr)
