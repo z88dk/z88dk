@@ -74,14 +74,14 @@ Line 4: Unit test for dbg.h
 Line 5: 
 Line 6: Based on Learn C the Hard Way book, by Zed. A. Shaw (http://c.learncodethehardway.org/book/)
 Line 7: 
+t/test_dbg.c.not.found: No such file or directory
 
 ---------- Test: test_xfopen_die ----------
 Read t/test_dbg.c.not.found
-[ERROR] (t/test_dbg.c:280 errno: No such file or directory) file open t/test_dbg.c.not.found: failed
 
 ---------- Test: test_xfclose_die ----------
 Open t/test_dbg.c and close twice
-[ERROR] (t/test_dbg.c:293) file close failed
+file 't/test_dbg.c' close failed
 
 ---------- Test: test_xfputs ----------
 

@@ -15,7 +15,7 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "gcc -Wall -I../../../ext/uthash/src -otest test.c list.c class.c strpool.c alloc.c dbg.c";
+my $compile = "gcc -Wall -I../../../ext/uthash/src -I../../common -otest test.c list.c class.c strpool.c alloc.c dbg.c ../../common/die.o ../../common/fileutil.o ../../common/strutil.o ";
 
 write_file("test.c", <<'END');
 #include "list.h"

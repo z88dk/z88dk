@@ -11,13 +11,13 @@
 TARGET	= libclibrary.a
 
 CC		= gcc
-CFLAGS	+= -g -Wall -Wextra -I. -I../../../ext/uthash/src $(OPTFLAGS)
+CFLAGS	+= -g -Wall -Wextra -I. -I../../common -I../../../ext/uthash/src $(OPTFLAGS)
 LDLIBS	+= $(OPTLIBS) $(TARGET)
 PREFIX  ?= /usr/local
 
 INSTALL ?= install
 
-SOURCES	= $(wildcard *.c)
+SOURCES	= $(wildcard *.c) ../../common/die.o ../../common/fileutil.o ../../common/strutil.o 
 OBJECTS	= $(patsubst %.c,%.o,$(SOURCES))
 
 TEST_SRC= $(wildcard t/test_*.c) $(wildcard t/uthash/test*.c)

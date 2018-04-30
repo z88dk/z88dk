@@ -11,6 +11,8 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 
 #pragma once
 
+#include "types.h"
+
 #include <stdint.h>
 #include <stdio.h>			/* FILENAME_MAX */
 
