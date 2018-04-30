@@ -1,0 +1,4 @@
+stdout:
+stderr:
+failed to read 65535 bytes from file 'test.out'
+exit: 1
