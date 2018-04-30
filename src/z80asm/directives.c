@@ -18,7 +18,7 @@ Assembly directives.
 #include "module.h"
 #include "parse.h"
 #include "strpool.h"
-#include "ztypes.h"
+#include "types.h"
 #include "symtab.h"
 #include "z80asm.h"
 #include <assert.h>
@@ -37,7 +37,7 @@ void asm_LABEL_offset(char *name, int offset)
 	else
 		sym = define_symbol(name, get_PC() + offset, TYPE_ADDRESS);
 
-	sym->is_touched = TRUE;
+	sym->is_touched = true;
 }
 
 void asm_LABEL(char *name)
@@ -141,13 +141,13 @@ void asm_DEFVARS_define_const(char *name, int elem_size, int count)
 void asm_LSTON(void)
 {
 	if (opts.list)
-		opts.cur_list = TRUE;
+		opts.cur_list = true;
 }
 
 void asm_LSTOFF(void)
 {
 	if (opts.list)
-		opts.cur_list = FALSE;
+		opts.cur_list = false;
 }
 
 /*-----------------------------------------------------------------------------
@@ -296,7 +296,7 @@ void asm_DEFC(char *name, Expr *expr)
 {
 	int value; 
 
-	value = Expr_eval(expr, FALSE);		/* DEFC constant expression */
+	value = Expr_eval(expr, false);		/* DEFC constant expression */
 	if ((expr->result.not_evaluable) || (expr->type >= TYPE_ADDRESS))
 	{
 		/* store in object file to be computed at link time */
@@ -368,7 +368,7 @@ void asm_ALIGN(int align, int filler)
 			}
 			else {
 				CURRENTSECTION->align = align;
-				CURRENTSECTION->align_found = TRUE;
+				CURRENTSECTION->align_found = true;
 				check_org_align();
 			}
 		}
@@ -404,27 +404,27 @@ static Expr *asm_DMA_shift_exprs(UT_array *exprs)
 	return expr;
 }
 
-static Bool asm_DMA_shift_byte(UT_array *exprs, int *out_value)
+static bool asm_DMA_shift_byte(UT_array *exprs, int *out_value)
 {
 	*out_value = 0;
 
 	Expr *expr = asm_DMA_shift_exprs(exprs);
-	*out_value = Expr_eval(expr, TRUE);
-	Bool not_evaluable = expr->result.not_evaluable;
+	*out_value = Expr_eval(expr, true);
+	bool not_evaluable = expr->result.not_evaluable;
 	OBJ_DELETE(expr);
 
 	if (not_evaluable) {
 		error_expected_const_expr();
 		*out_value = 0;
-		return FALSE;
+		return false;
 	}
 	else if (*out_value < 0 || *out_value > 255) {
 		error_int_range(*out_value);
 		*out_value = 0;
-		return FALSE;
+		return false;
 	}
 	else
-		return TRUE;
+		return true;
 }
 
 static void asm_DMA_command_1(int cmd, UT_array *exprs)

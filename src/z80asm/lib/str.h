@@ -21,6 +21,10 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #define va_copy(dst, src)  ((void)((dst) = (src)))
 #endif
 
+/* maximum length of strings, must be at least FILENAME_MAX */
+#include <stdio.h>			/* FILENAME_MAX */
+#define MAXLINE			MAX( 1024, FILENAME_MAX )
+
 /*-----------------------------------------------------------------------------
 *   Utilities working on char *
 *----------------------------------------------------------------------------*/
@@ -53,8 +57,8 @@ typedef struct _Str {
 	int 	len;				/* length of string */
 	int		size;				/* size of allocated buffer > len to allow for '\0' */
 	struct {
-		Bool	header_alloc : 1;	/* true if header is allocated in the heap */
-		Bool	data_alloc   : 1;	/* true if data is allocated in the heap
+		bool	header_alloc : 1;	/* true if header is allocated in the heap */
+		bool	data_alloc   : 1;	/* true if data is allocated in the heap
 									   and can be reallocated and freed */
 	} flag;
 } Str;
@@ -73,7 +77,7 @@ typedef struct _Str {
 									} _##name##_data = { \
 										"", \
 										{ _##name##_data.data, 0, (size), \
-										  { FALSE, FALSE } } \
+										  { false, false } } \
 									}; \
 									Str *name = & _##name##_data.str
 
@@ -153,5 +157,5 @@ extern void Str_compress_escapes(Str *str);
 
 /* get one line from input, convert end-of-line sequences,
 *  return string including one LF character
-*  return FALSE on end of input */
-extern Bool Str_getline(Str *str, FILE *fp);
+*  return false on end of input */
+extern bool Str_getline(Str *str, FILE *fp);

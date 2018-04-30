@@ -25,7 +25,7 @@ Scanner. Scanning engine is built by ragel from scan_rules.rl.
 * 	Globals
 *----------------------------------------------------------------------------*/
 Sym  sym;
-Bool EOL;
+bool EOL;
 
 /*-----------------------------------------------------------------------------
 * 	Static - current scan context
@@ -33,14 +33,14 @@ Bool EOL;
 static Str	*input_buf;					/* current input buffer */
 static List *input_stack;				/* stack of previous contexts */
 
-static Bool	 at_bol;					/* true if at beginning of line */
+static bool	 at_bol;					/* true if at beginning of line */
 
 static int	 cs, act;					/* Ragel state variables */
 static char	*p, *pe, *eof, *ts, *te;	/* Ragel state variables */
 
 /* static DEFINE_STR(sym_string, STR_SIZE); */
 
-static Bool	expect_opcode;				/* true to return opcodes as tokens, 
+static bool	expect_opcode;				/* true to return opcodes as tokens, 
 										*  false to return as names */
 
 /* save scan status */
@@ -48,12 +48,12 @@ typedef struct scan_state_t
 {
 	Sym		 sym;
 	char	*input_buf;
-	Bool	 at_bol;
-	Bool	 EOL;
+	bool	 at_bol;
+	bool	 EOL;
 	int		 cs, act;
 	int		 p, pe, eof, ts, te;
 //	char	*sym_string;
-	Bool	 expect_opcode;
+	bool	 expect_opcode;
 } ScanState;
 
 static void ut_scan_state_dtor(void *elt) 
@@ -165,7 +165,7 @@ void scan_expect_opcode(void)
 {
 	init_module();
 
-	expect_opcode = TRUE;
+	expect_opcode = true;
 
 	/* convert current symbol */
 	if (sym.tok_opcode)
@@ -176,7 +176,7 @@ void scan_expect_operands(void)
 {
 	init_module();
 
-	expect_opcode = FALSE;
+	expect_opcode = false;
 
 	/* convert current symbol */
 	if (sym.tok_opcode)
@@ -193,10 +193,10 @@ static long scan_num ( char *text, int length, int base )
 	int digit = 0;
 	char c;
 	int i;
-	Bool range_err;
+	bool range_err;
 	
 	value = 0;
-	range_err = FALSE;
+	range_err = false;
 	for ( i = 0 ; i < length ; i++ ) 
 	{
 		c = *text++;					/* read each digit */
@@ -226,7 +226,7 @@ static long scan_num ( char *text, int length, int base )
 
 		if ( ! range_err && value < 0 )	/* overflow to sign bit */
 		{
-			range_err = TRUE;		
+			range_err = true;		
 		}
 	}
 	
@@ -245,7 +245,7 @@ static long scan_num ( char *text, int length, int base )
 *	end with p pointing at the end quote, copy characters to tok_string
 *	handling C escape sequences. Return false if string not terminated.
 *----------------------------------------------------------------------------*/
-static Bool get_sym_string( void )
+static bool get_sym_string( void )
 {
 	char quote;
 
@@ -255,20 +255,20 @@ static Bool get_sym_string( void )
 	ts = p;
 
 	/* search for end quote or end of string */
-	while (TRUE)
+	while (true)
 	{
 		if (*p == '\\' && p[1] != '\0')
 			p++;						/* skip char after backslash, may be a quote */
 		else if (*p == quote)
 		{
 			te = p;
-			return TRUE;
+			return true;
 		}
 		else if (*p == '\n' || *p == '\0')
 		{
 			te = ts;
 			p--;						/* point to before separator */
-			return FALSE;
+			return false;
 		}
 		
 		/* advance to next */
@@ -301,7 +301,7 @@ void Skipline( void )
 		else 
 			p = newline + 1;
 		
-		EOL = TRUE;
+		EOL = true;
 	}
 }
 
@@ -312,9 +312,9 @@ void Skipline( void )
 #include "scan_rules.h"
 
 /*-----------------------------------------------------------------------------
-*   Fill scan buffer if needed, return FALSE on end of file
+*   Fill scan buffer if needed, return false on end of file
 *----------------------------------------------------------------------------*/
-static Bool fill_buffer( void )
+static bool fill_buffer( void )
 {
 	char *line;
 
@@ -324,7 +324,7 @@ static Bool fill_buffer( void )
 		line = List_pop( input_stack );
 		if ( line != NULL )
 		{
-			set_scan_buf( line, FALSE );	/* read from stack - assume not at BOL */
+			set_scan_buf( line, false );	/* read from stack - assume not at BOL */
 			m_free( line );
 		}
 		else 
@@ -332,14 +332,14 @@ static Bool fill_buffer( void )
 			/* get next line from input source file */
 			line = src_getline();
 			if ( line == NULL )
-				return FALSE;
+				return false;
 
 			/* got new line */
-			set_scan_buf( line, TRUE );		/* read from file - at BOL */
+			set_scan_buf( line, true );		/* read from file - at BOL */
 		}
 	}
 
-	return TRUE;
+	return true;
 }
 
 /*-----------------------------------------------------------------------------
@@ -355,7 +355,7 @@ tokid_t GetSym( void )
 	*  NOTE: HACK for inconsistent parser in handling newlines, should be removed */
 	if ( EOL )
 	{
-		at_bol = TRUE;
+		at_bol = true;
 		sym.tstart = "\n"; sym.tlen = 1;
 		return (sym.tok = TK_NEWLINE);			/* assign and return */
 	}
@@ -378,7 +378,7 @@ tokid_t GetSym( void )
 
 	sym.tstart = ts; sym.tlen = te - ts;			/* remember token position */
 
-	at_bol = EOL = (sym.tok == TK_NEWLINE) ? TRUE : FALSE;
+	at_bol = EOL = (sym.tok == TK_NEWLINE) ? true : false;
 	return sym.tok;
 }
 
@@ -414,7 +414,7 @@ void SetTemporaryLine( char *line )
 	if (*p != '\0')
 		List_push(&input_stack, m_strdup(p));		/* save current input */
 #endif
-	set_scan_buf( line, FALSE );					/* assume not at BOL */
+	set_scan_buf( line, false );					/* assume not at BOL */
 }
 
 /*-----------------------------------------------------------------------------

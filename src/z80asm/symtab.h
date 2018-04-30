@@ -55,10 +55,10 @@ extern Symbol *define_local_def_sym( char *name, long value );
 extern Symbol *define_local_sym(char *name, long value, sym_type_t type);
 extern Symbol *define_global_sym(char *name, long value, sym_type_t type);
 
-/* get the symbols for which the passed function returns TRUE,
+/* get the symbols for which the passed function returns true,
    mapped NAME@MODULE -> Symbol, needs to be deleted by OBJ_DELETE() */
-extern SymbolHash *select_symbols( Bool (*cond)(Symbol *sym) );
-extern SymbolHash *select_module_symbols( struct Module *module, Bool (*cond)(Symbol *sym) );
+extern SymbolHash *select_symbols( bool (*cond)(Symbol *sym) );
+extern SymbolHash *select_module_symbols( struct Module *module, bool (*cond)(Symbol *sym) );
 
 /* copy the static symbols to CURRENTMODULE->local_symtab */
 extern void copy_static_syms( void );

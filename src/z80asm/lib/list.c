@@ -200,7 +200,7 @@ void List_remove_all( List *self )
 }
 
 /* check if list is empty */
-Bool List_empty( List *self )
+bool List_empty( List *self )
 {
-    return List_first( self ) == NULL ? TRUE : FALSE;
+    return List_first( self ) == NULL ? true : false;
 }

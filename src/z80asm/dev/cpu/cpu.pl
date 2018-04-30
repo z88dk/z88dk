@@ -1034,7 +1034,7 @@ sub merge_parens {
 		die;
 	}
 	elsif (!$t->{expr_no_parens} && $t->{expr_in_parens}) {
-		return "if (!expr_in_parens) return FALSE;\n".
+		return "if (!expr_in_parens) return false;\n".
 				merge_ixiy($cpu, $t->{expr_in_parens});			
 	}
 	elsif ($t->{expr_no_parens} && !$t->{expr_in_parens}) {

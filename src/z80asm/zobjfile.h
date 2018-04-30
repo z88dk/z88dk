@@ -14,7 +14,7 @@ Handle object file contruction, reading and writing
 #include "array.h"
 #include "class.h"
 #include "module.h"
-#include "ztypes.h"
+#include "types.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -33,8 +33,8 @@ CLASS( OFile )
 	size_t	 start_ptr;			/* offset in file to start of object file
 								   used when object module is part of a library */
 
-	Bool	 writing;			/* TRUE if writing a new object file,
-								   FALSE if reading */
+	bool	 writing;			/* true if writing a new object file,
+								   false if reading */
 
 	char	*filename;			/* object file name, in strpool */
 	char	*modname;			/* module name, in strpool */
@@ -80,13 +80,13 @@ extern ByteArray *read_obj_file_data( char *filename );
 
 /* Updates current module name and size, if object file of given source is valid
    load module name and size, when assembling with -d and up-to-date */
-extern Bool objmodule_loaded( char *obj_filename);
+extern bool objmodule_loaded( char *obj_filename);
 
 // check if the given filename exists and is an object file of the correct version
-extern Bool check_object_file(char *obj_filename);
+extern bool check_object_file(char *obj_filename);
 
 // worker
-extern Bool check_obj_lib_file(char *filename,
+extern bool check_obj_lib_file(char *filename,
 	char *signature,
 	void(*error_file)(char*), 
 	void(*error_version)(char*,int,int));	

@@ -13,7 +13,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 
 #include "die.h"
 
-#include "ztypes.h"
+#include "types.h"
 #include "str.h"
 #include "utarray.h"
 #include <stdio.h>
@@ -24,7 +24,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 *	Fatal error if number of chars read/writen not same as requested
 *   Use fwrite/fread instead for checking.
 *----------------------------------------------------------------------------*/
-typedef void (*ferr_callback_t)(char *filename, Bool writing);
+typedef void (*ferr_callback_t)(char *filename, bool writing);
 
 /* set call-back for input/output error; return old call-back */
 extern ferr_callback_t set_ferr_callback( ferr_callback_t func );
@@ -45,9 +45,9 @@ extern void xfget_count_word_Str(  FILE *file, Str  *str );
 
 /* read/write numbers */
 extern void    xfput_int8(  FILE *file, int  value );
-extern void    xfput_uint8( FILE *file, Byte value );
+extern void    xfput_uint8( FILE *file, byte_t value );
 extern int  xfget_int8(  FILE *file );
-extern Byte xfget_uint8( FILE *file );
+extern byte_t xfget_uint8( FILE *file );
 
 extern void     xfput_int16(  FILE *file, int  value );
 extern void     xfput_uint16( FILE *file, int value );
@@ -83,8 +83,8 @@ extern char *search_file(char *filename, UT_array *dir_list);	/* returned string
 extern char *temp_filename( char *filename );
 
 /* check if file/directory exists */
-extern Bool file_exists(char *filename);
-extern Bool dir_exists(char *dirname);
+extern bool file_exists(char *filename);
+extern bool dir_exists(char *dirname);
 extern int file_size(char *filename);	// file size, -1 if not regular file
 
 /* create a directory and all parents above it */

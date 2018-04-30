@@ -13,7 +13,7 @@ Handle assembly listing and symbol table listing.
 
 #include "class.h"
 #include "str.h"
-#include "ztypes.h"
+#include "types.h"
 
 /* Page metrics for list file (CH_0017) */
 #define COLUMN_WIDTH	32
@@ -27,10 +27,10 @@ CLASS( ListFile )
 	char		*filename;				/* list file name, held in strpool */
 	FILE		*file;					/* open file */
 
-	Bool		 source_list_ended;		/* end of source listing, from now on no source lines */
+	bool		 source_list_ended;		/* end of source listing, from now on no source lines */
 
 	/* current line being output */
-	Bool		 line_started;			/* true if a line was started but not ended */
+	bool		 line_started;			/* true if a line was started but not ended */
 	long		 start_line_pos;		/* ftell() position at start of next list line */
 	int	 address;				/* address of start of line */
 	Str			*bytes;					/* list of bytes output for this line */
@@ -48,8 +48,8 @@ END_CLASS;
 /* open the list file for writing, given the list file name */
 extern void ListFile_open( ListFile *self, char *list_file );
 
-/* close the list file, and remove the file if the passed flag is FALSE */
-extern void ListFile_close( ListFile *self, Bool keep_file );
+/* close the list file, and remove the file if the passed flag is false */
+extern void ListFile_close( ListFile *self, bool keep_file );
 
 /* output a list line in three steps:
    1. start a new list, provide address, file name, line number and input assembly line
@@ -59,7 +59,7 @@ extern void ListFile_close( ListFile *self, Bool keep_file );
 extern void ListFile_start_line( ListFile *self, int address,
                                  char *source_file, int source_line_nr, char *line );
 extern void ListFile_append( ListFile *self, long value, int num_bytes );
-extern void ListFile_append_byte( ListFile *self, Byte byte1 );
+extern void ListFile_append_byte( ListFile *self, byte_t byte1 );
 extern void ListFile_append_word( ListFile *self, int word );
 extern void ListFile_append_long( ListFile *self, long dword );
 extern long ListFile_patch_pos( ListFile *self, int byte_offset );
@@ -76,11 +76,11 @@ extern void ListFile_patch_data( ListFile *self, long patch_pos, long value, int
 *	See description for corresponding method above
 *----------------------------------------------------------------------------*/
 extern void list_open( char *list_file );
-extern void list_close( Bool keep_file );
+extern void list_close( bool keep_file );
 extern void list_start_line( int address,
                              char *source_file, int source_line_nr, char *line );
 extern void list_append( long value, int num_bytes );
-extern void list_append_byte( Byte byte1 );
+extern void list_append_byte( byte_t byte1 );
 extern void list_append_word( int word );
 extern void list_append_long( long dword );
 extern long list_patch_pos( int byte_offset );

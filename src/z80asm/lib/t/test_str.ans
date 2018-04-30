@@ -136,7 +136,7 @@ Str (len=21 size=260 data_alloc) = "hello{20}1234hello{20}12345"
 --------  Str_clear(s7)
 Str (len=0 size=260 data_alloc) = ""
 
-[WARN ] (alloc.c:123) memory leak (16 bytes) allocated at str.c:187
+[WARN ] (alloc.c:122) memory leak (16 bytes) allocated at str.c:191
 
 ---------- Test: test_getline ----------
 --------  s1

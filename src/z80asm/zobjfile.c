@@ -200,7 +200,7 @@ static long write_code( FILE *fp )
 {
 	long code_ptr;
 	int code_size = 0;
-	Bool wrote_data = FALSE;
+	bool wrote_data = false;
 	
 	code_ptr  = ftell( fp );
 	wrote_data = fwrite_module_code(fp, &code_size);
@@ -257,16 +257,16 @@ void write_obj_file( char *source_filename )
 /*-----------------------------------------------------------------------------
 *   Check the object file header
 *----------------------------------------------------------------------------*/
-static Bool test_header( FILE *file )
+static bool test_header( FILE *file )
 {
     char buffer[Z80objhdr_size];
 
     if ( fread(  buffer, sizeof(char), Z80objhdr_size, file ) == Z80objhdr_size &&
          memcmp( buffer, Z80objhdr,    Z80objhdr_size ) == 0
        )
-        return TRUE;
+        return true;
     else
-        return FALSE;
+        return false;
 }
 
 /*-----------------------------------------------------------------------------
@@ -323,7 +323,7 @@ OFile *OFile_read_header( FILE *file, size_t start_ptr )
 
 	self->file			= file;
 	self->start_ptr		= start_ptr;
-	self->writing		= FALSE;
+	self->writing		= false;
 
     self->modname_ptr	= xfget_int32( file );
     self->expr_ptr		= xfget_int32( file );
@@ -347,7 +347,7 @@ OFile *OFile_read_header( FILE *file, size_t start_ptr )
 *   Object needs to be deleted by caller by OBJ_DELETE()
 *   Keeps the object file open
 *----------------------------------------------------------------------------*/
-static OFile *_OFile_open_read( char *filename, Bool test_mode )
+static OFile *_OFile_open_read( char *filename, bool test_mode )
 {
 	OFile *self;
 	FILE *file;
@@ -379,7 +379,7 @@ static OFile *_OFile_open_read( char *filename, Bool test_mode )
 
 OFile *OFile_open_read( char *filename )
 {
-	return _OFile_open_read( filename, FALSE );
+	return _OFile_open_read( filename, false );
 }
 
 /*-----------------------------------------------------------------------------
@@ -401,7 +401,7 @@ void OFile_close( OFile *self )
 *----------------------------------------------------------------------------*/
 OFile *OFile_test_file( char *filename )
 {
-	return _OFile_open_read( filename, TRUE );
+	return _OFile_open_read( filename, true );
 }
 
 /*-----------------------------------------------------------------------------
@@ -440,7 +440,7 @@ ByteArray *read_obj_file_data( char *filename )
 *	Updates current module name and size, if given object file is valid
 *	Load module name and size, when assembling with -d and up-to-date
 *----------------------------------------------------------------------------*/
-static Bool objmodule_loaded_1( char *obj_filename, Str *section_name )
+static bool objmodule_loaded_1( char *obj_filename, Str *section_name )
 {
 	int code_size;
 	OFile *ofile;
@@ -456,7 +456,7 @@ static Bool objmodule_loaded_1( char *obj_filename, Str *section_name )
 		{
 			fseek( ofile->file, ofile->start_ptr + ofile->code_ptr, SEEK_SET );
 
-			while (TRUE)	/* read sections until end marker */
+			while (true)	/* read sections until end marker */
 			{
 				code_size = xfget_int32( ofile->file );
 				if ( code_size < 0 )
@@ -477,21 +477,21 @@ static Bool objmodule_loaded_1( char *obj_filename, Str *section_name )
 
 		OBJ_DELETE( ofile );					/* BUG_0049 */
 
-        return TRUE;
+        return true;
     }
     else
-        return FALSE;
+        return false;
 }
 
-Bool objmodule_loaded(char *obj_filename)
+bool objmodule_loaded(char *obj_filename)
 {
 	STR_DEFINE(section_name, STR_SIZE);
-	Bool ret = objmodule_loaded_1(obj_filename, section_name);
+	bool ret = objmodule_loaded_1(obj_filename, section_name);
 	STR_DELETE(section_name);
 	return ret;
 }
 
-Bool check_object_file(char *obj_filename)
+bool check_object_file(char *obj_filename)
 {
 	return check_obj_lib_file(
 		obj_filename, 
@@ -500,7 +500,7 @@ Bool check_object_file(char *obj_filename)
 		error_obj_file_version);
 }
 
-Bool check_obj_lib_file(char *filename,
+bool check_obj_lib_file(char *filename,
 	char *signature,
 	void(*error_file)(char*),
 	void(*error_version)(char*, int, int))
@@ -542,10 +542,10 @@ Bool check_obj_lib_file(char *filename,
 
 	// ok
 	fclose(fp);
-	return TRUE;
+	return true;
 
 error:
 	if (fp)
 		fclose(fp);
-	return FALSE;
+	return false;
 }

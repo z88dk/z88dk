@@ -23,11 +23,11 @@ Z80pass2( void )
 	ExprListElem *iter;
     Expr *expr, *expr2;
     long value;
-	Bool do_patch, do_store;
+	bool do_patch, do_store;
 	long asmpc;		// should be an int!
 
 	/* compute all dependent expressions */
-	compute_equ_exprs( CURRENTMODULE->exprs, FALSE, TRUE );
+	compute_equ_exprs( CURRENTMODULE->exprs, false, true );
 
 	iter = ExprList_first( CURRENTMODULE->exprs );
 	while ( iter != NULL )
@@ -44,34 +44,34 @@ Z80pass2( void )
 		set_PC( expr->asmpc );		
 
 		/* try to evaluate expression to detect missing symbols */
-		value = Expr_eval(expr, TRUE);
+		value = Expr_eval(expr, true);
 
 		/* check if expression is stored in object file or computed and patched */
-		do_patch = TRUE;
-		do_store = FALSE;
+		do_patch = true;
+		do_store = false;
 
 		if ( expr->result.undefined_symbol ) 
 		{
-			do_patch = FALSE;
+			do_patch = false;
 		}
 		else if ( expr->range == RANGE_JR_OFFSET )
 		{
 			if (expr->result.extern_symbol || expr->result.cross_section_addr)
 			{
 				error_jr_not_local();	/* JR must be local */
-				do_patch = FALSE;
+				do_patch = false;
 			}
 		}
 		else if ( expr->type >= TYPE_ADDRESS || 
 				  expr->result.extern_symbol ||
 			      expr->target_name )
 		{
-			do_patch = FALSE;
-			do_store = TRUE;            /* store expression in relocatable file */
+			do_patch = false;
+			do_store = true;            /* store expression in relocatable file */
 		}
 		else if ( expr->result.not_evaluable )
 		{
-			do_patch = FALSE;
+			do_patch = false;
 		}
 
         if ( do_patch )
@@ -84,7 +84,7 @@ Z80pass2( void )
 
                 if ( value >= -128 && value <= 127 )
                 {
-					patch_byte(expr->code_pos, (Byte)value);
+					patch_byte(expr->code_pos, (byte_t)value);
                     /* opcode is stored, now store relative jump */
                 }
                 else
@@ -97,14 +97,14 @@ Z80pass2( void )
                 if ( value < -128 || value > 255 )
                     warn_int_range( value );
 
-				patch_byte(expr->code_pos, (Byte)value);
+				patch_byte(expr->code_pos, (byte_t)value);
                 break;
 
             case RANGE_BYTE_SIGNED:
                 if ( value < -128 || value > 127 )
                     warn_int_range( value );
 
-				patch_byte(expr->code_pos, (Byte)value);
+				patch_byte(expr->code_pos, (byte_t)value);
                 break;
 
 			case RANGE_WORD:
@@ -173,7 +173,7 @@ Z80pass2( void )
 }
 
 
-Bool Pass2infoExpr(range_t range, Expr *expr)
+bool Pass2infoExpr(range_t range, Expr *expr)
 {
 	int list_offset;
 
@@ -194,10 +194,10 @@ Bool Pass2infoExpr(range_t range, Expr *expr)
 	/* reserve space */
 	append_defs(range_size(range), 0);
 
-	return expr == NULL ? FALSE : TRUE;
+	return expr == NULL ? false : true;
 }
 
-Bool Pass2info(range_t range)
+bool Pass2info(range_t range)
 {
 	Expr *expr;
 	
@@ -208,7 +208,7 @@ Bool Pass2info(range_t range)
 		{
 		case TK_RPAREN:
 			append_byte(0);		/* offset zero */
-			return TRUE;		/* OK, zero already stored */
+			return true;		/* OK, zero already stored */
 
 		case TK_PLUS:
 		case TK_MINUS:          /* + or - expected */
@@ -216,7 +216,7 @@ Bool Pass2info(range_t range)
 
 		default:                /* Syntax error, e.g. (ix 4) */
 			error_syntax();
-			return FALSE;		/* FAIL */
+			return false;		/* FAIL */
 		}
 
 	}
@@ -226,7 +226,7 @@ Bool Pass2info(range_t range)
 	if (range == RANGE_BYTE_SIGNED && sym.tok != TK_RPAREN)
 	{
 		error_syntax();
-		return FALSE;		/* FAIL */
+		return false;		/* FAIL */
 	}
 
 	return Pass2infoExpr(range, expr);

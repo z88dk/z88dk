@@ -13,7 +13,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #pragma once
 
 #include "class.h"
-#include "ztypes.h"
+#include "types.h"
 #include "queue.h"
 
 /*-----------------------------------------------------------------------------
@@ -67,4 +67,4 @@ extern void *List_remove( List *self, ListElem **piter );
 extern void List_remove_all( List *self );
 
 /* check if list is empty */
-extern Bool List_empty( List *self );
+extern bool List_empty( List *self );

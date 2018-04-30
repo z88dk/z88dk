@@ -10,7 +10,7 @@ Parse command line options
 
 #pragma once
 
-#include "ztypes.h"
+#include "types.h"
 #include "utarray.h"
 
 /*-----------------------------------------------------------------------------

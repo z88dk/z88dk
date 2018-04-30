@@ -39,8 +39,8 @@ typedef struct OpenStruct
 	tokid_t	open_tok;			/* open token - TK_IF, TK_ELSE, ... */
 	char   *filename;			/* file and line where token found */
 	int		line_nr;
-	Bool	active : 1;			/* in TRUE branch of conditional compilation */
-	Bool	parent_active : 1;	/* in TRUE branch of parent's conditional compilation */
+	bool	active : 1;			/* in true branch of conditional compilation */
+	bool	parent_active : 1;	/* in true branch of parent's conditional compilation */
 } OpenStruct;
 
 static UT_icd ut_OpenStruct_icd = { sizeof(OpenStruct), NULL, NULL, NULL };
@@ -87,7 +87,7 @@ struct Expr *parse_expr(char *expr_text)
 		{
 			SetTemporaryLine(expr_text);
 			num_errors = get_num_errors();
-			EOL = FALSE;
+			EOL = false;
 			scan_expect_operands();
 			GetSym();
 			expr = expr_parse();		/* may output error */
@@ -107,18 +107,18 @@ static void push_expr(ParseCtx *ctx)
 	STR_DEFINE(expr_text, STR_SIZE);
 	Expr *expr;
 	Sym  *expr_p;
-	Bool  last_was_prefix;
+	bool  last_was_prefix;
 
 	/* build expression text - split constant prefixes from numbers and names */
 	Str_clear(expr_text);
-	last_was_prefix = FALSE;
+	last_was_prefix = false;
 	for (expr_p = ctx->expr_start; expr_p < ctx->p; expr_p++)
 	{
 		if (last_was_prefix && expr_p->tlen > 0 &&
 			(isalnum(*expr_p->tstart) || *expr_p->tstart == '"'))
 		{
 			Str_append_char(expr_text, ' ');
-			last_was_prefix = FALSE;
+			last_was_prefix = false;
 		}
 
 		Str_append_n(expr_text, expr_p->tstart, expr_p->tlen);
@@ -130,11 +130,11 @@ static void push_expr(ParseCtx *ctx)
 			case '@':
 			case '%':
 			case '$':
-				last_was_prefix = TRUE;
+				last_was_prefix = true;
 				break;
 
 			default:
-				last_was_prefix = FALSE;
+				last_was_prefix = false;
 			}
 		}
 	}
@@ -166,22 +166,22 @@ static Expr *pop_expr(ParseCtx *ctx)
 /*-----------------------------------------------------------------------------
 *   Pop and compute expression, issue error on failure
 *----------------------------------------------------------------------------*/
-static void pop_eval_expr(ParseCtx *ctx, int *pvalue, Bool *perror)
+static void pop_eval_expr(ParseCtx *ctx, int *pvalue, bool *perror)
 {
 	Expr *expr;
 
 	*pvalue = 0;
-	*perror = FALSE;
+	*perror = false;
 
 	expr = pop_expr(ctx);
 	if (expr == NULL)
 	{
-		*perror = TRUE;				/* error output by push_expr() */
+		*perror = true;				/* error output by push_expr() */
 		return;
 	}
 
 	/* eval and discard expression */
-	*pvalue = Expr_eval(expr, TRUE);
+	*pvalue = Expr_eval(expr, true);
 	*perror = (expr->result.not_evaluable);
 	OBJ_DELETE(expr);
 }
@@ -287,7 +287,7 @@ static void free_tokens(ParseCtx *ctx)
 /*-----------------------------------------------------------------------------
 *   IF, IFDEF, IFNDEF, ELSE, ENDIF
 *----------------------------------------------------------------------------*/
-static void start_struct(ParseCtx *ctx, tokid_t open_tok, Bool condition)
+static void start_struct(ParseCtx *ctx, tokid_t open_tok, bool condition)
 {
 	OpenStruct *parent_os, os;
 
@@ -300,37 +300,37 @@ static void start_struct(ParseCtx *ctx, tokid_t open_tok, Bool condition)
 	if (parent_os)
 		os.parent_active = parent_os->active && parent_os->parent_active;
 	else
-		os.parent_active = TRUE;
+		os.parent_active = true;
 
 	utarray_push_back(ctx->open_structs, &os);
 }
 
-static Bool check_ifdef_condition(char *name)
+static bool check_ifdef_condition(char *name)
 {
 	Symbol *symbol;
 
 	symbol = find_symbol(name, CURRENTMODULE->local_symtab);
 	if (symbol != NULL && (symbol->is_defined || (symbol->scope == SCOPE_EXTERN || symbol->scope == SCOPE_GLOBAL)))
-		return TRUE;
+		return true;
 
 	symbol = find_symbol(name, global_symtab);
 	if (symbol != NULL && (symbol->is_defined || (symbol->scope == SCOPE_EXTERN || symbol->scope == SCOPE_GLOBAL)))
-		return TRUE;
+		return true;
 
-	return FALSE;
+	return false;
 }
 
 static void asm_IF(ParseCtx *ctx, Expr *expr)
 {
 	int value;
-	Bool condition;
+	bool condition;
 
 	/* eval and discard expression, ignore errors */
-	value = Expr_eval(expr, FALSE);
+	value = Expr_eval(expr, false);
 	if (value == 0)				/* ignore expr->result.not_evaluable, as undefined values result in 0 */
-		condition = FALSE;
+		condition = false;
 	else
-		condition = TRUE;
+		condition = true;
 
 	OBJ_DELETE(expr);
 
@@ -339,7 +339,7 @@ static void asm_IF(ParseCtx *ctx, Expr *expr)
 
 static void asm_IFDEF(ParseCtx *ctx, char *name)
 {
-	Bool condition;
+	bool condition;
 
 	condition = check_ifdef_condition(name);
 	start_struct(ctx, TK_IFDEF, condition);
@@ -347,7 +347,7 @@ static void asm_IFDEF(ParseCtx *ctx, char *name)
 
 static void asm_IFNDEF(ParseCtx *ctx, char *name)
 {
-	Bool condition;
+	bool condition;
 
 	condition = ! check_ifdef_condition(name);
 	start_struct(ctx, TK_IFNDEF, condition);
@@ -407,14 +407,14 @@ static void asm_ENDIF(ParseCtx *ctx)
 #include "parse_rules.h"
 
 /*-----------------------------------------------------------------------------
-*   parse the given assembly file, return FALSE if failed
+*   parse the given assembly file, return false if failed
 *----------------------------------------------------------------------------*/
 static void parseline(ParseCtx *ctx)
 {
 	int start_num_errors;
 
 	next_PC();				/* update assembler program counter */
-	EOL = FALSE;			/* reset END OF LINE flag */
+	EOL = false;			/* reset END OF LINE flag */
 
 	start_num_errors = get_num_errors();
 
@@ -433,7 +433,7 @@ static void parseline(ParseCtx *ctx)
 	list_end_line();				/* Write current source line to list file */
 }
 
-Bool parse_file(char *filename)
+bool parse_file(char *filename)
 {
 	ParseCtx *ctx;
 	OpenStruct *open_struct;
@@ -467,9 +467,9 @@ Bool parse_file(char *filename)
 /*-----------------------------------------------------------------------------
 *   Parse one statement, if possible
 *----------------------------------------------------------------------------*/
-Bool parse_statement(ParseCtx *ctx)
+bool parse_statement(ParseCtx *ctx)
 {
-	Bool parse_ok;
+	bool parse_ok;
 
 	save_scan_state();
 	{

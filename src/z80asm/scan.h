@@ -12,7 +12,7 @@ Scanner. Scanning engine is built by ragel from scan_rules.rl.
 #pragma once
 
 #include "tokens.h"
-#include "ztypes.h"
+#include "types.h"
 #include "opcodes.h"
 
 /*-----------------------------------------------------------------------------
@@ -39,7 +39,7 @@ typedef struct sym_t
 * 	Globals
 *----------------------------------------------------------------------------*/
 extern Sym  sym;			/* last token retrieved */
-extern Bool EOL;			/* scanner EOL state */
+extern bool EOL;			/* scanner EOL state */
 
 /*-----------------------------------------------------------------------------
 *	Scan API
@@ -64,7 +64,7 @@ extern void SetTemporaryLine( char *line );
 
 /* skip line past the newline, set EOL */
 extern void  Skipline( void );
-extern Bool EOL;
+extern bool EOL;
 
 /* return static string with current token text
 *  non-reentrant, string needs to be saved by caller */

@@ -11,14 +11,15 @@
 TARGET	= libclibrary.a
 
 CC		= gcc
-CFLAGS	+= -g -Wall -Wextra -I. -I../../common -I../../../ext/uthash/src $(OPTFLAGS)
+CFLAGS	+= -g -Wall -Wextra -MMD -I. -I../../common -I../../../ext/uthash/src $(OPTFLAGS)
 LDLIBS	+= $(OPTLIBS) $(TARGET)
 PREFIX  ?= /usr/local
 
 INSTALL ?= install
 
-SOURCES	= $(wildcard *.c) ../../common/die.o ../../common/fileutil.o ../../common/strutil.o 
+SOURCES	= $(wildcard *.c) ../../common/die.c ../../common/fileutil.c ../../common/strutil.c
 OBJECTS	= $(patsubst %.c,%.o,$(SOURCES))
+DEPENDS = $(patsubst %.c,%.d,$(SOURCES))
 
 TEST_SRC= $(wildcard t/test_*.c) $(wildcard t/uthash/test*.c)
 TESTS	= $(patsubst %.c,%,$(TEST_SRC))
@@ -55,6 +56,7 @@ clean:
 		-rm -f t/tests.log
 		-rm -f *.bak
 		-rm -rf win32/Debug win32/Release win32/ipch
+		-rm -f $(DEPENDS)
 
 # The Install
 install: all
@@ -67,26 +69,4 @@ check:
 		@echo Files with potentially dangerous functions.
 		@egrep $(BADFUNCS) $(SOURCES) || true
 
-depend:
-		makedepend -Y -I. $(SOURCES) $(TEST_SRC)
-
-# DO NOT DELETE
-
-alloc.o: alloc.h dbg.h ztypes.h init.h 
-array.o: array.h class.h alloc.h dbg.h ztypes.h queue.h
-class.o: alloc.h dbg.h ztypes.h class.h queue.h init.h strpool.h
-dbg.o: dbg.h
-zfileutil.o: alloc.h dbg.h ztypes.h zfileutil.h list.h class.h queue.h 
-zfileutil.o: strpool.h 
-list.o: alloc.h dbg.h ztypes.h list.h class.h queue.h
-minunit.o: minunit.h dbg.h
-srcfile.o: alloc.h dbg.h ztypes.h srcfile.h class.h queue.h list.h 
-srcfile.o: zfileutil.h strpool.h
-str.o: str.h alloc.h dbg.h ztypes.h
-strpool.o: alloc.h dbg.h ztypes.h init.h strpool.h 
-t/test_alloc.o: minunit.h dbg.h alloc.h ztypes.h
-t/test_dbg.o: minunit.h dbg.h
-t/test_init.o: minunit.h dbg.h init.h ztypes.h
-t/test_str.o: minunit.h dbg.h str.h alloc.h ztypes.h
-t/test_strpool.o: minunit.h dbg.h strpool.h
-t/test_types.o: minunit.h dbg.h ztypes.h
+-include $(DEPENDS)

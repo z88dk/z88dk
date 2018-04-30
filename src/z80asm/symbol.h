@@ -13,7 +13,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include "model.h"
 #include "zobjfile.h"
 #include "symtab.h"
-#include "ztypes.h"
+#include "types.h"
 #include "scan.h"
 #include <stdlib.h>
 

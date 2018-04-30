@@ -14,7 +14,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 
 #include "alloc.h"
 #include "class.h"
-#include "ztypes.h"
+#include "types.h"
 #include "str.h"
 #include <assert.h>
 #include <stdlib.h>
@@ -51,7 +51,9 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 
 
 /* default types */
+typedef byte_t Byte;
 ARRAY(Byte);
+typedef word_t Word;
 ARRAY(Word);
 ARRAY(int);
 ARRAY(long);

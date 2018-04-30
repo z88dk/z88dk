@@ -15,10 +15,11 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "gcc -Wall -I../../../ext/uthash/src -I../../common -otest test.c strhash.c class.c alloc.c strpool.c str.c dbg.c ../../common/die.o ";
+my $compile = "gcc -I../../../ext/uthash/src -I../../common -otest test.c strhash.c class.c alloc.c strpool.c str.c dbg.c ../../common/die.o ";
 
 write_file("test.c", <<'END');
 #include "strhash.h"
+#include "str.h"
 #include <assert.h>
 
 #define ERROR die("Test failed at line %d\n", __LINE__)
@@ -107,13 +108,13 @@ void _check_list (StrHash *hash, char *expected, char *file, int lineno)
 		/* check positive and negative StrHash_exists() */
 		if ( ! StrHash_exists(hash, iter->key) )
 		{
-			die("%s %d : exists(%s) = FALSE, expected TRUE\n", 
+			die("%s %d : exists(%s) = false, expected true\n", 
 			    file, lineno, iter->key);
 		}
 
 		if ( StrHash_exists(hash, wrong_key) )
 		{
-			die("%s %d : exists(%s) = TRUE, expected FALSE\n", 
+			die("%s %d : exists(%s) = true, expected false\n", 
 			    file, lineno, wrong_key);
 		}
 		
@@ -324,7 +325,7 @@ int main()
 
 	/* case-insensitive */
 	hash1 = OBJ_NEW(StrHash);
-	hash1->ignore_case = TRUE;
+	hash1->ignore_case = true;
 	if (StrHash_first(hash1) != NULL)			ERROR;
 	check_list(hash1, "");
 	

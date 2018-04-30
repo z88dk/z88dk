@@ -25,7 +25,11 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include <direct.h>
 #endif
 
-static void file_error_filename( char *filename, Bool is_writing );
+#ifdef _MSC_VER
+#define snprintf _snprintf
+#endif
+
+static void file_error_filename( char *filename, bool is_writing );
 
 /*-----------------------------------------------------------------------------
 *	List to keep temporary file names that need to be deleted atexit
@@ -85,9 +89,9 @@ CLASS( OpenFile )
     FILE    *file; 					/* file pointer returned by fopen */
     char    *filename;				/* file name kept in strpool.h */
 	char 	*atomic_tempname;		/* tempname used in atomic mode */
-	Bool	 is_open;				/* TRUE if fopen succeeded */
-	Bool	 is_writing;			/* TRUE if writing, FALSE if reading */
-	Bool	 is_atomic;				/* TRUE if writing a temp file to be
+	bool	 is_open;				/* true if fopen succeeded */
+	bool	 is_writing;			/* true if writing, false if reading */
+	bool	 is_atomic;				/* true if writing a temp file to be
 									   renamed to filename at fclose() */
 END_CLASS;
 
@@ -194,7 +198,7 @@ ferr_callback_t set_ferr_callback( ferr_callback_t func )
 }
 
 /* show error for a file */
-static void file_error_filename( char *filename, Bool is_writing )
+static void file_error_filename( char *filename, bool is_writing )
 {
 	/* call call-back, if any */
 	if (ferr_callback != NULL)
@@ -206,13 +210,13 @@ static void file_error_filename( char *filename, Bool is_writing )
 static void fatal_ferr_read( FILE *file )
 {
     OpenFile *open_file = get_open_file( file );
-	file_error_filename( open_file ? open_file->filename : "???", FALSE );
+	file_error_filename( open_file ? open_file->filename : "???", false );
 }
 
 static void fatal_ferr_write( FILE *file )
 {
     OpenFile *open_file = get_open_file( file );
-	file_error_filename( open_file ? open_file->filename : "???", TRUE );
+	file_error_filename( open_file ? open_file->filename : "???", true );
 }
 
 /*-----------------------------------------------------------------------------
@@ -313,10 +317,10 @@ void xfget_count_word_Str( FILE *file, Str *str )
 *----------------------------------------------------------------------------*/
 void xfput_int8( FILE *file, int value )
 {
-	xfput_uint8( file, (Byte) value );
+	xfput_uint8( file, (byte_t) value );
 }
 
-void xfput_uint8( FILE *file, Byte value )
+void xfput_uint8( FILE *file, byte_t value )
 {
     if ( fputc( value, file ) < 0 )
         fatal_ferr_write( file );
@@ -330,12 +334,12 @@ int xfget_int8(  FILE *file )
 	return value;
 }
 
-Byte xfget_uint8( FILE *file )
+byte_t xfget_uint8( FILE *file )
 {
 	int value;
 	if ( (value = getc( file )) < 0 )
         fatal_ferr_read( file );
-	return (Byte) value;
+	return (byte_t) value;
 }
 
 /*-----------------------------------------------------------------------------
@@ -348,7 +352,7 @@ void xfput_int16( FILE *file, int value )
 
 void xfput_uint16( FILE *file, int value )
 {
-    Byte buffer[2];
+    byte_t buffer[2];
 
 	buffer[0] = value & 0xFF; value >>= 8;
 	buffer[1] = value & 0xFF; value >>= 8;
@@ -365,7 +369,7 @@ int xfget_int16( FILE *file )
 
 int xfget_uint16( FILE *file )
 {
-    Byte buffer[2];
+    byte_t buffer[2];
 
 	xfread_bytes(buffer, sizeof(buffer), file);
 	return
@@ -383,7 +387,7 @@ void xfput_int32( FILE *file, int value )
 
 void xfput_uint32(FILE *file, unsigned int value)
 {
-    Byte buffer[4];
+    byte_t buffer[4];
 
 	buffer[0] = value & 0xFF; value >>= 8;
 	buffer[1] = value & 0xFF; value >>= 8;
@@ -402,7 +406,7 @@ int xfget_int32( FILE *file )
 
 unsigned int xfget_uint32( FILE *file )
 {
-    Byte buffer[4];
+    byte_t buffer[4];
 
 	xfread_bytes(buffer, sizeof(buffer), file);
 	return
@@ -570,22 +574,22 @@ char *search_file( char *filename, UT_array *dir_list )
 	return ret;
 }
 
-Bool file_exists(char *filename)
+bool file_exists(char *filename)
 {
 	struct stat  sb;
 	if ((stat(filename, &sb) == 0)  && (sb.st_mode & S_IFREG))
-		return TRUE;
+		return true;
 	else
-		return FALSE;
+		return false;
 }
 
-Bool dir_exists(char *dirname)
+bool dir_exists(char *dirname)
 {
 	struct stat  sb;
 	if ((stat(dirname, &sb) == 0) && (sb.st_mode & S_IFDIR))
-		return TRUE;
+		return true;
 	else
-		return FALSE;
+		return false;
 }
 
 int file_size(char *filename)	// file size, -1 if not regular file

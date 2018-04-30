@@ -13,7 +13,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 
 #include "alloc.h"
 #include "queue.h"
-#include "ztypes.h"
+#include "types.h"
 #include "class.h"
 
 /*-----------------------------------------------------------------------------
@@ -78,7 +78,7 @@ DEF_CLASS_LIST(T);
 	extern void T##List_remove_all( T##List *self );						\
 																			\
 	/* check if list is empty */											\
-	extern Bool T##List_empty( T##List *self );								\
+	extern bool T##List_empty( T##List *self );								\
  
 /*-----------------------------------------------------------------------------
 *   Class definition
@@ -121,7 +121,7 @@ DEF_CLASS_LIST(T);
 																			\
 		elem = m_new(T##ListElem);											\
 		elem->obj = obj;													\
-		OBJ_AUTODELETE(obj) = FALSE;		/* deleted by list */			\
+		OBJ_AUTODELETE(obj) = false;		/* deleted by list */			\
 																			\
 		(*pself)->count++;													\
 		return elem;														\
@@ -136,7 +136,7 @@ DEF_CLASS_LIST(T);
 			return NULL;													\
 																			\
 		obj = elem->obj;													\
-		OBJ_AUTODELETE(obj) = TRUE;		/* deleted by caller */				\
+		OBJ_AUTODELETE(obj) = true;		/* deleted by caller */				\
 																			\
 		TAILQ_REMOVE( &self->head, elem, entries);							\
 		m_free( elem );														\
@@ -256,7 +256,7 @@ DEF_CLASS_LIST(T);
 	}																		\
 																			\
 	/* check if list is empty */											\
-	Bool T##List_empty( T##List *self )										\
+	bool T##List_empty( T##List *self )										\
 	{																		\
-		return T##List_first(self) == NULL ? TRUE : FALSE;					\
+		return T##List_first(self) == NULL ? true : false;					\
 	}

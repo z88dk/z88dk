@@ -17,24 +17,28 @@ Define CPU opcodes
 #include "parse.h"
 #include "z80asm.h"
 
+#ifdef _MSC_VER
+#define snprintf _snprintf
+#endif
+
 /* add 1 to 4 bytes opcode opcode to object code 
 *  bytes in big-endian format, e.g. 0xCB00 */
 void add_opcode(int opcode)
 {
-	Bool out = FALSE;
+	bool out = false;
 	
 	if (opcode & 0xFF000000) {
-		out = TRUE;
+		out = true;
 		append_byte( (opcode >> 24) & 0xFF );
 	}
 
 	if (out || (opcode & 0xFF0000)) {
-		out = TRUE;
+		out = true;
 		append_byte( (opcode >> 16) & 0xFF );
 	}
 
 	if (out || (opcode & 0xFF00)) {
-		out = TRUE;
+		out = true;
 		append_byte((opcode >> 8) & 0xFF);
 	}
 

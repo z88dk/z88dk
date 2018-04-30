@@ -87,7 +87,7 @@ void make_library(char *lib_filename, UT_array *src_files)
 	xfclose( lib_file );
 }
 
-Bool check_library_file(char *src_filename)
+bool check_library_file(char *src_filename)
 {
 	return check_obj_lib_file(
 		get_lib_filename(src_filename),

@@ -61,7 +61,7 @@ char *GetLibfile( char *filename ) {return NULL;}
 	T_GET( TK_NEWLINE, "\n" ); assert( EOL ); \
 	T_GET( TK_NEWLINE, "\n" ); assert( EOL ); \
 	T_GET( TK_NEWLINE, "\n" ); assert( EOL ); \
-	EOL = FALSE;
+	EOL = false;
 
 #define T_NIL()				T_GET( TK_NIL,			"" );
 #define T_EXCLAM()			T_GET( TK_LOG_NOT,		"!" );
@@ -170,7 +170,7 @@ t_compile_module($init, <<'END', $objs);
 	T_END();
 	
 	
-	/* at_bol = TRUE */
+	/* at_bol = true */
 	SetTemporaryLine("\n \t start \t : \t . start : \n");
 	T_NEWLINE();
 	T_LABEL("start");
@@ -210,7 +210,7 @@ t_compile_module($init, <<'END', $objs);
 	T_END();
 	
 	
-	/* at_bol = FALSE */
+	/* at_bol = false */
 	SetTemporaryLine(" \t start \t : \t . start : \n");
 	T_NAME("start");
 	T_COLON();

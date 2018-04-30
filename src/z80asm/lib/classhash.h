@@ -15,7 +15,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #pragma once
 
 #include "queue.h"
-#include "ztypes.h"
+#include "types.h"
 #include "class.h"
 #include "strhash.h"
 
@@ -26,7 +26,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 CLASS_HASH(T);			// T is declared by CLASS(T); defines THash
 
 // define the hash class
-DEF_CLASS_HASH(T, Bool ignore_case);	// ignore_case = TRUE for case-insensitive
+DEF_CLASS_HASH(T, bool ignore_case);	// ignore_case = true for case-insensitive
 										// keys
 
 *----------------------------------------------------------------------------*/
@@ -55,7 +55,7 @@ DEF_CLASS_HASH(T, Bool ignore_case);	// ignore_case = TRUE for case-insensitive
 	extern T *T##Hash_get( T##Hash *self, char *key );						\
 																			\
 	/* Check if a key exists in the hash */									\
-	extern Bool T##Hash_exists( T##Hash *self, char *key );					\
+	extern bool T##Hash_exists( T##Hash *self, char *key );					\
 																			\
 	/* Remove element from hash if found */									\
 	extern void T##Hash_remove( T##Hash *self, char *key );					\
@@ -82,7 +82,7 @@ DEF_CLASS_HASH(T, Bool ignore_case);	// ignore_case = TRUE for case-insensitive
 	extern T##HashElem *T##Hash_next( T##HashElem *iter );					\
 																			\
 	/* check if hash is empty */											\
-	extern Bool T##Hash_empty( T##Hash *self );								\
+	extern bool T##Hash_empty( T##Hash *self );								\
 																			\
 	/* sort the items in the hash */										\
 	extern void T##Hash_sort( T##Hash *self, T##Hash_compare_func compare );\
@@ -192,7 +192,7 @@ DEF_CLASS_HASH(T, Bool ignore_case);	// ignore_case = TRUE for case-insensitive
 																			\
 		/* set new value */													\
 		StrHash_set( & ((*pself)->hash), key, (void *) obj );				\
-		OBJ_AUTODELETE(obj) = FALSE;		/* deleted by hash */			\
+		OBJ_AUTODELETE(obj) = false;		/* deleted by hash */			\
 		(*pself)->count = (*pself)->hash->count;							\
 	}																		\
 																			\
@@ -203,9 +203,9 @@ DEF_CLASS_HASH(T, Bool ignore_case);	// ignore_case = TRUE for case-insensitive
 	}																		\
 																			\
 	/* check if element exists */											\
-	Bool T##Hash_exists( T##Hash *self, char *key )							\
+	bool T##Hash_exists( T##Hash *self, char *key )							\
 	{																		\
-		return self == NULL ? FALSE : StrHash_exists( self->hash, key );	\
+		return self == NULL ? false : StrHash_exists( self->hash, key );	\
 	}																		\
 																			\
 	/* remove element if it exists */										\
@@ -239,9 +239,9 @@ DEF_CLASS_HASH(T, Bool ignore_case);	// ignore_case = TRUE for case-insensitive
 	}																		\
 																			\
 	/* check if hash is empty */											\
-	Bool T##Hash_empty( T##Hash *self )										\
+	bool T##Hash_empty( T##Hash *self )										\
 	{																		\
-		return T##Hash_first(self) == NULL ? TRUE : FALSE;					\
+		return T##Hash_first(self) == NULL ? true : false;					\
 	}																		\
 																			\
 	/* sort the items in the hash */										\

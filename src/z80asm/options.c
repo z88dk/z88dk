@@ -31,6 +31,10 @@ Parse command line options
 #include <limits.h>
 #include <string.h>
 
+#ifdef _MSC_VER
+#define snprintf _snprintf
+#endif
+
 /* default file name extensions */
 #define FILEEXT_ASM     ".asm"    
 #define FILEEXT_LIST    ".lis"    
@@ -192,7 +196,7 @@ static void process_opt( int *parg, int argc, char *argv[] )
                 if ( *opt_arg_ptr )
                     error_illegal_option( argv[II] );
                 else
-                    *( ( Bool * )( opts_lu[j].arg ) ) = TRUE;
+                    *( ( bool * )( opts_lu[j].arg ) ) = true;
 
                 break;
 
@@ -374,7 +378,7 @@ static void expand_star_star(char *filename, UT_array **plist)
 	}
 }
 
-static void expand_glob(char *filename, UT_array **pfiles, Bool do_search_path)
+static void expand_glob(char *filename, UT_array **pfiles, bool do_search_path)
 {
 	int initial_len = utarray_len(*pfiles);
 	int ret;
@@ -429,7 +433,7 @@ static void expand_glob(char *filename, UT_array **pfiles, Bool do_search_path)
 
 void expand_source_glob(char *filename)
 {
-	expand_glob(filename, &opts.files, TRUE);
+	expand_glob(filename, &opts.files, true);
 }
 
 void expand_list_glob(char *filename)
@@ -437,7 +441,7 @@ void expand_list_glob(char *filename)
 	UT_array *files;
 	utarray_new(files, &ut_str_icd);
 
-	expand_glob(filename, &files, FALSE);
+	expand_glob(filename, &files, false);
 	char **p = NULL;
 	while ((p = (char**)utarray_next(files, p))) {
 		char *filename = *p;
@@ -558,12 +562,12 @@ static void process_files( int arg, int argc, char *argv[] )
 *----------------------------------------------------------------------------*/
 #define OPT_TITLE(text)		puts(""); puts(text);
 #define OPT(type, arg, short_opt, long_opt, help_text, help_arg) \
-							show_option(type, (Bool *)arg, \
+							show_option(type, (bool *)arg, \
 										short_opt, long_opt, help_text, help_arg);
 
 #define ALIGN_HELP	24
 
-static void show_option( enum OptType type, Bool *pflag,
+static void show_option( enum OptType type, bool *pflag,
                          char *short_opt, char *long_opt, char *help_text, char *help_arg )
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -694,8 +698,8 @@ static void option_filler( char *filler_arg )
 
 static void option_debug_info()
 {
-	opts.debug_info = TRUE;
-	opts.map = TRUE;
+	opts.debug_info = true;
+	opts.map = true;
 }
 
 static void option_define( char *symbol )
@@ -881,7 +885,7 @@ static void option_appmake_zx(void)
 	opts.appmake_origin_min = ZX_ORIGIN_MIN;
 	opts.appmake_origin_max = ZX_ORIGIN_MAX;
 	set_origin_option(ZX_ORIGIN);
-	opts.make_bin = TRUE;
+	opts.make_bin = true;
 }
 
 static void option_appmake_zx81(void)
@@ -892,7 +896,7 @@ static void option_appmake_zx81(void)
 	opts.appmake_origin_min = ZX81_ORIGIN_MIN;
 	opts.appmake_origin_max = ZX81_ORIGIN_MAX;
 	set_origin_option(ZX81_ORIGIN);
-	opts.make_bin = TRUE;
+	opts.make_bin = true;
 }
 
 void checkrun_appmake(void)

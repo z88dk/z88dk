@@ -14,7 +14,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 
 #pragma once
 
-#include "ztypes.h"
+#include "types.h"
 #include "class.h"
 #include "queue.h"
 #include "uthash.h"
@@ -33,7 +33,7 @@ typedef struct StrHashElem
 
 CLASS( StrHash )
 	size_t 	count;					/* number of objects */
-	Bool 	ignore_case;			/* TRUE to ignore case of keys */
+	bool 	ignore_case;			/* true to ignore case of keys */
 	void  (*free_data)(void *);		/* function to free an element
 									   called by StrHash_remove_all() */
 	StrHashElem		*hash;			/* hash table of all keys */
@@ -50,7 +50,7 @@ extern void StrHash_set( StrHash **pself, char *key, void *value );
 extern void *StrHash_get( StrHash *self, char *key );
 
 /* Check if a key exists in the hash */
-extern Bool StrHash_exists( StrHash *self, char *key );
+extern bool StrHash_exists( StrHash *self, char *key );
 
 /* Remove element from hash if found */
 extern void StrHash_remove( StrHash *self, char *key );
@@ -71,7 +71,7 @@ extern StrHashElem *StrHash_first( StrHash *self );
 extern StrHashElem *StrHash_next( StrHashElem *iter );
 
 /* check if hash is empty */
-extern Bool StrHash_empty( StrHash *self );
+extern bool StrHash_empty( StrHash *self );
 
 /* sort the items in the hash */
 extern void StrHash_sort( StrHash *self, StrHash_compare_func compare );

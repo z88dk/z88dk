@@ -16,7 +16,7 @@ use File::Path qw(make_path remove_tree);
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "gcc -Wall -I../../../ext/uthash/src -I../../common -Wno-overflow -otest test.c zfileutil.c str.c alloc.c class.c list.c strpool.c dbg.c ../../common/die.o ../../common/fileutil.o ../../common/strutil.o";
+my $compile = "gcc -I../../../ext/uthash/src -I../../common -Wno-overflow -otest test.c zfileutil.c str.c alloc.c class.c list.c strpool.c dbg.c ../../common/die.o ../../common/fileutil.o ../../common/strutil.o";
 
 #------------------------------------------------------------------------------
 # create directories and files
@@ -144,12 +144,12 @@ write_file("test.c", <<'END');
 
 #define ERROR die("Test failed at line %d\n", __LINE__)
 
-void error(char *filename, Bool writing)
+void error(char *filename, bool writing)
 {
 	die("captured error %s %d\n", filename, writing );
 }
 
-void null_error(char *filename, Bool writing)
+void null_error(char *filename, bool writing)
 {
 	warn("captured error %s %d\n", filename, writing );
 }

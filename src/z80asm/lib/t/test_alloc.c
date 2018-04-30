@@ -250,7 +250,7 @@ error: ;
 
 static Person *Person_new( char *name, int age )
 {
-	static Bool toggle = FALSE;
+	static bool toggle = false;
 
 	char   *name_copy;
 	Person *self;

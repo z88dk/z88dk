@@ -47,7 +47,7 @@ DEFINE_dtor_module()
 *   Named Section of code, introduced by "SECTION" keyword
 *----------------------------------------------------------------------------*/
 DEF_CLASS( Section );
-DEF_CLASS_HASH( Section, FALSE );
+DEF_CLASS_HASH( Section, false );
 
 void Section_init (Section *self)   
 {
@@ -55,21 +55,21 @@ void Section_init (Section *self)
 	self->addr	= 0;
 	self->origin = -1;
 	self->align = 1;
-	self->origin_found = FALSE;
-	self->origin_opts = FALSE;
-	self->section_split = FALSE;
+	self->origin_found = false;
+	self->origin_opts = false;
+	self->section_split = false;
 	self->asmpc = 0;
 	self->asmpc_phase = -1;
 	self->opcode_size = 0;
 	
 	self->bytes = OBJ_NEW(ByteArray);
-	OBJ_AUTODELETE(self->bytes) = FALSE;
+	OBJ_AUTODELETE(self->bytes) = false;
 
 	self->reloc = OBJ_NEW(intArray);
-	OBJ_AUTODELETE(self->reloc) = FALSE;
+	OBJ_AUTODELETE(self->reloc) = false;
 
 	self->module_start = OBJ_NEW(intArray);
-	OBJ_AUTODELETE( self->module_start ) = FALSE;
+	OBJ_AUTODELETE( self->module_start ) = false;
 }
 
 void Section_copy (Section *self, Section *other)	
@@ -395,17 +395,17 @@ static void check_space( int addr, int num_bytes )
 	if (addr + num_bytes > MAXCODESIZE && !g_cur_section->max_codesize_issued)
 	{
 		error_max_codesize((long)MAXCODESIZE);
-		g_cur_section->max_codesize_issued = TRUE;
+		g_cur_section->max_codesize_issued = true;
 	}
 }
 
 /* reserve space in bytes, increment PC if buffer expanded
    assert only the last module can be expanded */
-static Byte *alloc_space( int addr, int num_bytes )
+static byte_t *alloc_space( int addr, int num_bytes )
 {
 	int base_addr;
 	int old_size, new_size;
-	Byte *buffer;
+	byte_t *buffer;
 
     init_module();
 	base_addr = get_cur_module_start();
@@ -441,7 +441,7 @@ static Byte *alloc_space( int addr, int num_bytes )
 *----------------------------------------------------------------------------*/
 void patch_value( int addr, int value, int num_bytes )
 {
-	Byte *buffer;
+	byte_t *buffer;
 
     init_module();
 	buffer = alloc_space( addr, num_bytes );
@@ -461,32 +461,32 @@ void append_value( int value, int num_bytes )
 		list_append( value, num_bytes );
 }
 
-void patch_byte( int addr, Byte byte1 ) { patch_value( addr, byte1, 1 ); }
+void patch_byte( int addr, byte_t byte1 ) { patch_value( addr, byte1, 1 ); }
 void patch_word( int addr, int  word  ) { patch_value( addr, word,  2 ); }
 void patch_long( int addr, long dword ) { patch_value( addr, dword, 4 ); }
 
 void patch_word_be(int addr, int  word) { patch_value(addr, ((word & 0xFF00) >> 8) | ((word & 0x00FF) << 8), 2); }
 
-void append_byte( Byte byte1 ) { append_value( byte1, 1 ); }
+void append_byte( byte_t byte1 ) { append_value( byte1, 1 ); }
 void append_word( int  word )  { append_value( word,  2 ); }
 void append_long( long dword ) { append_value( dword, 4 ); }
 
 void append_word_be(int  word) { append_value(((word & 0xFF00) >> 8) | ((word & 0x00FF) << 8), 2); }
 
-void append_2bytes( Byte byte1, Byte byte2 ) 
+void append_2bytes( byte_t byte1, byte_t byte2 ) 
 {
 	append_value( byte1, 1 );
 	append_value( byte2, 1 );
 }
 
-void append_defs(int num_bytes, Byte fill)
+void append_defs(int num_bytes, byte_t fill)
 {
 	while (num_bytes-- > 0)
 		append_byte(fill);
 }
 
 /* advance code pointer reserving space, return address of start of buffer */
-Byte *append_reserve( int num_bytes )
+byte_t *append_reserve( int num_bytes )
 {
     init_module();
 	return alloc_space( get_cur_module_size(), num_bytes );
@@ -496,7 +496,7 @@ Byte *append_reserve( int num_bytes )
 void patch_file_contents( FILE *file, int addr, long num_bytes )
 {
 	long start_ptr;
-	Byte *buffer;
+	byte_t *buffer;
 
 	init_module();
 
@@ -527,11 +527,11 @@ void append_file_contents(FILE *file, long num_bytes)
 /*-----------------------------------------------------------------------------
 *   read/write current module to an open file
 *----------------------------------------------------------------------------*/
-Bool fwrite_module_code(FILE *file, int* p_code_size)
+bool fwrite_module_code(FILE *file, int* p_code_size)
 {
 	Section *section;
 	SectionHashElem *iter;
-	Bool wrote_data = FALSE;
+	bool wrote_data = false;
 	int code_size = 0;
 	int addr, size;
 
@@ -557,7 +557,7 @@ Bool fwrite_module_code(FILE *file, int* p_code_size)
 				xfwrite_bytes((char *)ByteArray_item(section->bytes, addr), size, file);
 
 			code_size += size;
-			wrote_data = TRUE;
+			wrote_data = true;
 		}
 	}
 
@@ -656,9 +656,9 @@ void set_origin_directive(int origin)
 		error_org_redefined();
 	else
 	{
-		CURRENTSECTION->origin_found = TRUE;
+		CURRENTSECTION->origin_found = true;
 		if (origin == -1)					/* signal split section binary file */
-			CURRENTSECTION->section_split = TRUE;
+			CURRENTSECTION->section_split = true;
 		else if (origin >= 0 && origin <= 0xFFFF)
 		{
 			if (CURRENTSECTION->origin_opts && CURRENTSECTION->origin >= 0)
@@ -682,7 +682,7 @@ void set_origin_option(int origin)
 	{
 		default_section = get_first_section(NULL);
 		default_section->origin = origin;
-		default_section->origin_opts = TRUE;
+		default_section->origin_opts = true;
 	}
 }
 
@@ -691,10 +691,10 @@ void read_origin(FILE* file, Section *section) {
 	int origin = xfget_int32(file);
 	if (origin >= 0) {
 		section->origin = origin;
-		section->section_split = FALSE;
+		section->section_split = false;
 	}
 	else if (origin == -2) {
-		section->section_split = TRUE;
+		section->section_split = true;
 	}
 	else {
 		// ignore all other values

@@ -15,7 +15,7 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "gcc -Wall -I../../../ext/uthash/src -Ilib -I../../common -otest test.c array.c str.c strpool.c class.c alloc.c dbg.c ../../common/die.o ../../common/fileutil.o ../../common/strutil.o ";
+my $compile = "gcc -I../../../ext/uthash/src -Ilib -I../../common -otest test.c array.c str.c strpool.c class.c alloc.c dbg.c ../../common/die.o ../../common/fileutil.o ../../common/strutil.o ";
 
 write_file("test.c", <<'END');
 #include "alloc.h"
@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 	Point *p;
 	long *lp;
 	int *ip;
-	Byte *bp;
+	byte_t *bp;
 	long l;
 	int i;
 	
@@ -181,12 +181,12 @@ int main(int argc, char *argv[])
 	for ( i = 10; i >= 0; i-- ) 
 	{
 		bp = ByteArray_item(bytes, i);
-		*bp = (Byte) i;
+		*bp = (byte_t) i;
 	}
 	for ( i = 0; i <= 10; i++ )
 	{
 		bp = ByteArray_item(bytes, i);
-		assert( *bp == (Byte) i );
+		assert( *bp == (byte_t) i );
 	}
 	
 	/* int array */

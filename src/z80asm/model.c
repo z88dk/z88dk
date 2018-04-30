@@ -66,7 +66,7 @@ void model_init(void)
 /*-----------------------------------------------------------------------------
 *   interface to SrcFile singleton
 *----------------------------------------------------------------------------*/
-Bool src_open(char *filename, UT_array *dir_list)
+bool src_open(char *filename, UT_array *dir_list)
 {
 	init_module();
 	return SrcFile_open( g_src_input, filename, dir_list );
@@ -101,7 +101,7 @@ int src_line_nr( void )
 	return SrcFile_line_nr( g_src_input );
 }
 
-Bool scr_is_c_source(void)
+bool scr_is_c_source(void)
 {
 	init_module();
 	return ScrFile_is_c_source(g_src_input);
@@ -131,7 +131,7 @@ void src_push( void )
 	SrcFile_push( g_src_input );
 }
 
-Bool src_pop( void )
+bool src_pop( void )
 {
 	init_module();
 	return SrcFile_pop( g_src_input );

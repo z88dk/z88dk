@@ -16,7 +16,7 @@ Assembly macros.
 #include "utarray.h"
 #include "uthash.h"
 #include "utstring.h"
-#include "ztypes.h"
+#include "types.h"
 #include <assert.h>
 #include <ctype.h>
 
@@ -39,7 +39,7 @@ static DefMacro *def_macros = NULL;		// global list of #define macros
 static UT_array *in_lines = NULL;		// line stream from input
 static UT_array *out_lines = NULL;		// line stream to ouput
 static UT_string *current_line = NULL;	// current returned line
-static Bool in_defgroup;				// no EQU transformation in defgroup
+static bool in_defgroup;				// no EQU transformation in defgroup
 
 static DefMacro *DefMacro_add(char *name)
 {
@@ -84,7 +84,7 @@ static DefMacro *DefMacro_lookup(char *name)
 void init_macros()
 {
 	def_macros = NULL;
-	in_defgroup = FALSE;
+	in_defgroup = false;
 	utarray_new(in_lines, &ut_str_icd);
 	utarray_new(out_lines, &ut_str_icd);
 	utstring_new(current_line);
@@ -97,7 +97,7 @@ void clear_macros()
 		DefMacro_delete_elem(elem);
 	}
 	def_macros = NULL;
-	in_defgroup = FALSE;
+	in_defgroup = false;
 
 	utarray_clear(in_lines);
 	utarray_clear(out_lines);
@@ -124,7 +124,7 @@ static void fill_input(getline_t getline_func)
 }
 
 // extract first line from input_stream to current_line
-static Bool shift_lines(UT_array *lines)
+static bool shift_lines(UT_array *lines)
 {
 	utstring_clear(current_line);
 	if (utarray_len(lines) > 0) {
@@ -132,14 +132,14 @@ static Bool shift_lines(UT_array *lines)
 		char *line = *((char **)utarray_front(lines));
 		utstring_printf(current_line, "%s", line);
 		utarray_erase(lines, 0, 1);
-		return TRUE;
+		return true;
 	}
 	else
-		return FALSE;
+		return false;
 }
 
 // collect a macro or argument name [\.\#]?[a-z_][a-z_0-9]*
-static Bool collect_name(char **in, UT_string *out)
+static bool collect_name(char **in, UT_string *out)
 {
 	char *p = *in;
 
@@ -150,43 +150,43 @@ static Bool collect_name(char **in, UT_string *out)
 		utstring_bincpy(out, p, 2); p += 2;
 		while (Is_ident_cont(*p)) { utstring_bincpy(out, p, 1); p++; }
 		*in = p;
-		return TRUE;
+		return true;
 	}
 	else if (Is_ident_start(p[0])) {
 		while (Is_ident_cont(*p)) { utstring_bincpy(out, p, 1); p++; }
 		*in = p;
-		return TRUE;
+		return true;
 	}
 	else {
-		return FALSE;
+		return false;
 	}
 }
 
 // collect formal parameters
-static Bool collect_params(char **p, DefMacro *macro, UT_string *param)
+static bool collect_params(char **p, DefMacro *macro, UT_string *param)
 {
 #define P (*p)
 
-	if (*P == '(') P++; else return TRUE;
+	if (*P == '(') P++; else return true;
 	while (isspace(*P)) P++;
-	if (*P == ')') { P++; return TRUE; }
+	if (*P == ')') { P++; return true; }
 
 	for (;;) {
-		if (!collect_name(p, param)) return FALSE;
+		if (!collect_name(p, param)) return false;
 		char *param_body = utstring_body(param);
 		utarray_push_back(macro->params, &param_body);
 
 		while (isspace(*P)) P++;
-		if (*P == ')') { P++; return TRUE; }
+		if (*P == ')') { P++; return true; }
 		else if (*P == ',') P++;
-		else return FALSE;
+		else return false;
 	}
 
 #undef P
 }
 
 // collect macro text
-static Bool collect_text(char **p, DefMacro *macro, UT_string *text)
+static bool collect_text(char **p, DefMacro *macro, UT_string *text)
 {
 #define P (*p)
 
@@ -225,40 +225,40 @@ static Bool collect_text(char **p, DefMacro *macro, UT_string *text)
 
 	utstring_printf(macro->text, "%s", utstring_body(text));
 
-	return TRUE;
+	return true;
 
 #undef P
 }
 
 // collect white space up to end of line or comment
-static Bool collect_eol(char **p)
+static bool collect_eol(char **p)
 {
 #define P (*p)
 
 	while (isspace(*P)) P++; // consumes also \n and \r
 	if (*P == ';' || *P == '\0')
-		return TRUE;
+		return true;
 	else
-		return FALSE;
+		return false;
 
 #undef P
 }
 
 // is this an identifier?
-static Bool collect_ident(char **in, char *ident)
+static bool collect_ident(char **in, char *ident)
 {
 	char *p = *in;
 
 	size_t idlen = strlen(ident);
 	if (strnicompare(p, ident, idlen) == 0 && !Is_ident_cont(p[idlen])) {
 		*in = p + idlen;
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 // is this a "NAME EQU xxx" or "NAME = xxx"?
-static Bool collect_equ(char **in, UT_string *name)
+static bool collect_equ(char **in, UT_string *name)
 {
 	char *p = *in;
 
@@ -267,37 +267,37 @@ static Bool collect_equ(char **in, UT_string *name)
 	if (in_defgroup) {
 		while (*p != '\0' && *p != ';') {
 			if (*p == '}') {
-				in_defgroup = FALSE;
-				return FALSE;
+				in_defgroup = false;
+				return false;
 			}
 			p++;
 		}
 	}
 	else if (collect_name(&p, name)) {
 		if (stricompare(utstring_body(name), "defgroup") == 0) {
-			in_defgroup = TRUE;
+			in_defgroup = true;
 			while (*p != '\0' && *p != ';') {
 				if (*p == '}') {
-					in_defgroup = FALSE;
-					return FALSE;
+					in_defgroup = false;
+					return false;
 				}
 				p++;
 			}
-			return FALSE;
+			return false;
 		}
 
 		while (isspace(*p)) p++;
 
 		if (*p == '=') {
 			*in = p + 1;
-			return TRUE;
+			return true;
 		}
 		else if (Is_ident_start(*p) && collect_ident(&p, "equ")) {
 			*in = p;
-			return TRUE;
+			return true;
 		}
 	}
-	return FALSE;
+	return false;
 }
 
 // collect arguments and expand macro

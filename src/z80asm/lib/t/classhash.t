@@ -15,10 +15,11 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "gcc -Wall -I../../../ext/uthash/src -I../../common -otest test.c strhash.c strpool.c str.c class.c alloc.c dbg.c ../../common/die.o ../../common/fileutil.o ../../common/strutil.o ";
+my $compile = "gcc -I../../../ext/uthash/src -I../../common -otest test.c strhash.c strpool.c str.c class.c alloc.c dbg.c ../../common/die.o ../../common/fileutil.o ../../common/strutil.o ";
 
 write_file("test.c", <<'END');
 #include "classhash.h"
+#include "str.h"
 
 #define ERROR die("Test failed at line %d\n", __LINE__)
 
@@ -41,7 +42,7 @@ Obj *new_obj(char *text)
 }
 
 CLASS_HASH(Obj);
-DEF_CLASS_HASH(Obj, TRUE);
+DEF_CLASS_HASH(Obj, true);
 
 int _count;
 #define T_START(hash)							\

@@ -109,7 +109,7 @@ Define rules for a ragel-based parser.
 	action expr_start_action {
 		ctx->expr_start = ctx->p;
 		expr_in_parens = 
-			(ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+			(ctx->expr_start->tok == TK_LPAREN) ? true : false;
 		expr_open_parens = 0;
 	} 
 	
@@ -282,7 +282,7 @@ Define rules for a ragel-based parser.
 				@{ if (expr_error)
 					  error_expected_const_expr();
 			       value1 = expr_error ? 0 : expr_value;
-				   expr_error = FALSE;
+				   expr_error = false;
 				}
 				const_expr _TK_NEWLINE
 		  @{ DO_STMT_LABEL(); 
@@ -460,7 +460,7 @@ Define rules for a ragel-based parser.
 				@{ if (expr_error)
 					   error_expected_const_expr();
 				   value1 = expr_error ? 0 : expr_value; 
-				   expr_error = FALSE;
+				   expr_error = false;
 				}
 				const_expr _TK_NEWLINE @{ 
 			DO_STMT_LABEL(); 
@@ -606,13 +606,13 @@ static int get_start_state(ParseCtx *ctx)
 	return 0;	/* not reached */
 }
 
-static Bool _parse_statement_1(ParseCtx *ctx, Str *name, Str *stmt_label)
+static bool _parse_statement_1(ParseCtx *ctx, Str *name, Str *stmt_label)
 {
 	int  value1 = 0;
 	int  start_num_errors = get_num_errors();
 	int  expr_value = 0;			/* last computed expression value */
-	Bool expr_error = FALSE;		/* last computed expression error */
-	Bool expr_in_parens = FALSE;	/* true if expression has enclosing parens */
+	bool expr_error = false;		/* last computed expression error */
+	bool expr_in_parens = false;	/* true if expression has enclosing parens */
 	int  expr_open_parens = 0;		/* number of open parens */
 
 	%%write init nocs;
@@ -628,25 +628,25 @@ static Bool _parse_statement_1(ParseCtx *ctx, Str *name, Str *stmt_label)
 
 		/* Did parsing succeed? */
 		if ( ctx->cs == %%{ write error; }%% )
-			return FALSE;
+			return false;
 		
 		if ( ctx->cs >= %%{ write first_final; }%% )
-			return TRUE;
+			return true;
 			
 		/* assembly error? must test after check for end of parse */
 		if (get_num_errors() != start_num_errors) 
 			break;
 	}
 	
-	return FALSE;
+	return false;
 }
 
-static Bool _parse_statement(ParseCtx *ctx)
+static bool _parse_statement(ParseCtx *ctx)
 {
 	STR_DEFINE(name, STR_SIZE);			/* identifier name */
 	STR_DEFINE(stmt_label, STR_SIZE);	/* statement label, NULL if none */
 	
-	Bool ret = _parse_statement_1(ctx, name, stmt_label);
+	bool ret = _parse_statement_1(ctx, name, stmt_label);
 
 	STR_DELETE(name);
 	STR_DELETE(stmt_label);

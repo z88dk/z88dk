@@ -17,11 +17,11 @@ Error handling.
 #include "strpool.h"
 #include "str.h"
 #include "strhash.h"
-#include "ztypes.h"
+#include "types.h"
 #include "init.h"
 #include <stdio.h>
 
-static void file_error( char *filename, Bool writing );
+static void file_error( char *filename, bool writing );
 
 /*-----------------------------------------------------------------------------
 *   Singleton data
@@ -236,7 +236,7 @@ void do_error( enum ErrType err_type, char *message )
 /*-----------------------------------------------------------------------------
 *   file error handling
 *----------------------------------------------------------------------------*/
-static void file_error( char *filename, Bool writing )
+static void file_error( char *filename, bool writing )
 {
 	init_module();
 	

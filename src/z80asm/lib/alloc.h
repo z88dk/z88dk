@@ -16,7 +16,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #pragma once
 
 #include "dbg.h"
-#include "ztypes.h"
+#include "types.h"
 #include <stdlib.h>
 
 /*-----------------------------------------------------------------------------
@@ -94,11 +94,11 @@ extern void *m_set_destructor_( void *memptr, destructor_t destructor, char *fil
    This flag avoids a list element to be destroyed without removing from the
    list, leaving dangling pointers in the parent.
    Returns pointer to be able to be chained. */
-extern void *m_set_in_collection_( void *memptr, Bool in_collection, char *file, int lineno );
+extern void *m_set_in_collection_( void *memptr, bool in_collection, char *file, int lineno );
 #define      m_set_in_collection( memptr )	\
-						m_set_in_collection_((memptr), TRUE,  __FILE__, __LINE__)
+						m_set_in_collection_((memptr), true,  __FILE__, __LINE__)
 #define      m_clear_in_collection( memptr )	\
-						m_set_in_collection_((memptr), FALSE, __FILE__, __LINE__)
+						m_set_in_collection_((memptr), false, __FILE__, __LINE__)
 
 /* declare a memory block as to be destroyed by the garbage collector atexit,
    so that no memory leak warning is given
@@ -108,4 +108,4 @@ extern void *m_destroy_atexit_( void *memptr, char *file, int lineno );
 						m_destroy_atexit_((memptr), __FILE__, __LINE__)
 
 /* check if memptr points to a block allocated by m_... */
-extern Bool m_is_managed( void *memptr );
+extern bool m_is_managed( void *memptr );

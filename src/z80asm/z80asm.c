@@ -17,7 +17,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include "module.h"
 #include "zobjfile.h"
 #include "parse.h"
-#include "ztypes.h"
+#include "types.h"
 #include "strpool.h"
 #include "symbol.h"
 #include <sys/stat.h>
@@ -33,7 +33,7 @@ struct libfile *NewLibrary( void );
 
 extern char Z80objhdr[];
 
-Byte reloc_routine[] =
+byte_t reloc_routine[] =
     "\x08\xD9\xFD\xE5\xE1\x01\x49\x00\x09\x5E\x23\x56\xD5\x23\x4E\x23"
     "\x46\x23\xE5\x09\x44\x4D\xE3\x7E\x23\xB7\x20\x06\x5E\x23\x56\x23"
     "\x18\x03\x16\x00\x5F\xE3\x19\x5E\x23\x56\xEB\x09\xEB\x72\x2B\x73"
@@ -61,7 +61,7 @@ static void do_assemble( char *src_filename );
 void assemble_file( char *filename )
 {
     char *src_filename, *obj_filename, *src_dirname;
-	Bool load_obj_only;
+	bool load_obj_only;
 	Module *module;
 
 	/* create output directory*/
@@ -72,11 +72,11 @@ void assemble_file( char *filename )
 	if (strcmp(filename, obj_filename) == 0 &&			/* input is object file */
 		file_exists(filename)							/* .o file exists */
 		) {
-		load_obj_only = TRUE;
+		load_obj_only = true;
 		src_filename = filename;
 	}
 	else {
-		load_obj_only = FALSE;
+		load_obj_only = false;
 
 		/* use input file if it exists */
 		if (file_exists(filename)) {
@@ -88,7 +88,7 @@ void assemble_file( char *filename )
 				src_filename = asm_filename;
 			}
 			else if (file_exists(obj_filename)) {
-				load_obj_only = TRUE;
+				load_obj_only = true;
 				src_filename = obj_filename;
 			}
 			else {				
@@ -130,7 +130,7 @@ void assemble_file( char *filename )
 		query_assemble(src_filename);			/* try to assemble, check -d */
 
     set_error_null();							/* no more module in error messages */
-	opts.cur_list = FALSE;
+	opts.cur_list = false;
 
 	/* finished assembly, remove dirname from include path */
 	utarray_pop_back(opts.inc_path);
@@ -154,7 +154,7 @@ static void query_assemble( char *src_filename )
             obj_stat_result >= 0 &&							/* object file exists */
             ( src_stat_result >= 0 ?						/* if source file exists, ... */
               src_stat.st_mtime <= obj_stat.st_mtime		/* ... source older than object */
-              : TRUE										/* ... else source does not exist, but object exists
+              : true										/* ... else source does not exist, but object exists
 															   --> consider up-to-date (e.g. test.c -> test.o) */
             ) &&
             objmodule_loaded(obj_filename)					/* object file valid and size loaded */
@@ -252,7 +252,7 @@ char *GetLibfile( char *filename )
 	if (!check_library_file(found_libfilename))					/* not a library or wrong version */
 		return NULL;
 
-	opts.library = TRUE;
+	opts.library = true;
 
 	if (opts.verbose)
 		printf("Reading library '%s'\n", found_libfilename);

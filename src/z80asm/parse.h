@@ -12,7 +12,7 @@ Define ragel-based parser.
 #pragma once
 
 #include "scan.h"
-#include "ztypes.h"
+#include "types.h"
 #include "utarray.h"
 
 struct Expr;
@@ -24,7 +24,7 @@ typedef struct ParseCtx
 {
 	enum {
 		SM_MAIN,
-		SM_SKIP,					/* in FALSE branch of an IF, skip */
+		SM_SKIP,					/* in false branch of an IF, skip */
 		SM_DEFVARS_OPEN, SM_DEFVARS_LINE,
 		SM_DEFGROUP_OPEN, SM_DEFGROUP_LINE,
 		SM_DMA_PARAMS
@@ -47,11 +47,11 @@ extern ParseCtx *ParseCtx_new(void);
 /* detele the parse context */
 extern void ParseCtx_delete(ParseCtx *ctx);
 
-/* parse the given assembly file, return FALSE if failed */
-extern Bool parse_file(char *filename);
+/* parse the given assembly file, return false if failed */
+extern bool parse_file(char *filename);
 
-/* try to parse the current statement, return FALSE if failed */
-extern Bool parse_statement(ParseCtx *ctx);
+/* try to parse the current statement, return false if failed */
+extern bool parse_statement(ParseCtx *ctx);
 
 /* save the current scanner context and parse the given expression */
 extern struct Expr *parse_expr(char *expr_text);

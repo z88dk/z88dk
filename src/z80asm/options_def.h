@@ -16,21 +16,21 @@ Define command line options
 #define OPT_VAR(type, name, default)
 #endif
 
-OPT_VAR( Bool,		verbose,	FALSE	)
-OPT_VAR( Bool,		symtable,	FALSE	)
-OPT_VAR( Bool,		list,		FALSE	)	/* -l flag */
-OPT_VAR( Bool,		cur_list,	FALSE	)	/* current LSTON/LSTOFF status */
-OPT_VAR( Bool,		map,		FALSE	)
-OPT_VAR( Bool,		ti83plus,	FALSE	)
-OPT_VAR( Bool,		swap_ix_iy,	FALSE	)
-OPT_VAR( Bool,      debug_info, FALSE   )	/* add debug info to map file */
-OPT_VAR( Bool,		globaldef,	FALSE	)
-OPT_VAR( Bool,		make_bin,	FALSE	)
-OPT_VAR( Bool,		split_bin,	FALSE   )	/* true to split binary file per section */
-OPT_VAR( Bool,		date_stamp,	FALSE	)
-OPT_VAR( Bool,		relocatable, FALSE	)
-OPT_VAR( Bool,      reloc_info, FALSE   )	/* generate .reloc file */
-OPT_VAR( Bool,		library,	FALSE	)	/* true if linking with libs */
+OPT_VAR( bool,		verbose,	false	)
+OPT_VAR( bool,		symtable,	false	)
+OPT_VAR( bool,		list,		false	)	/* -l flag */
+OPT_VAR( bool,		cur_list,	false	)	/* current LSTON/LSTOFF status */
+OPT_VAR( bool,		map,		false	)
+OPT_VAR( bool,		ti83plus,	false	)
+OPT_VAR( bool,		swap_ix_iy,	false	)
+OPT_VAR( bool,      debug_info, false   )	/* add debug info to map file */
+OPT_VAR( bool,		globaldef,	false	)
+OPT_VAR( bool,		make_bin,	false	)
+OPT_VAR( bool,		split_bin,	false   )	/* true to split binary file per section */
+OPT_VAR( bool,		date_stamp,	false	)
+OPT_VAR( bool,		relocatable, false	)
+OPT_VAR( bool,      reloc_info, false   )	/* generate .reloc file */
+OPT_VAR( bool,		library,	false	)	/* true if linking with libs */
 
 OPT_VAR(appmake_t, appmake, APPMAKE_NONE)
 OPT_VAR(char *, appmake_opts, "")

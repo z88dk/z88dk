@@ -26,7 +26,7 @@ void StrHash_init( StrHash *self )
 {
     self->hash = NULL;
     self->count = 0;
-    self->ignore_case = FALSE;
+    self->ignore_case = false;
 }
 
 void StrHash_copy( StrHash *self, StrHash *other )
@@ -172,15 +172,15 @@ void *StrHash_get( StrHash *self, char *key )
 /*-----------------------------------------------------------------------------
 *	Check if a key exists in the hash
 *----------------------------------------------------------------------------*/
-Bool StrHash_exists( StrHash *self, char *key )
+bool StrHash_exists( StrHash *self, char *key )
 {
     StrHashElem *elem;
 
     elem = StrHash_find( self, key );
     if ( elem != NULL )
-        return TRUE;
+        return true;
     else
-        return FALSE;
+        return false;
 }
 
 /*-----------------------------------------------------------------------------
@@ -213,9 +213,9 @@ StrHashElem *StrHash_next( StrHashElem *iter )
 /*-----------------------------------------------------------------------------
 *	check if hash is empty
 *----------------------------------------------------------------------------*/
-Bool StrHash_empty( StrHash *self )
+bool StrHash_empty( StrHash *self )
 {
-    return StrHash_first( self ) == NULL ? TRUE : FALSE;
+    return StrHash_first( self ) == NULL ? true : false;
 }
 
 /*-----------------------------------------------------------------------------

@@ -13,6 +13,10 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include <ctype.h>
 #include <string.h>
 
+#ifdef _MSC_VER
+#define vsnprintf _vsnprintf
+#endif
+
 /*-----------------------------------------------------------------------------
 *   Utilities working on char *
 *----------------------------------------------------------------------------*/
@@ -175,7 +179,7 @@ static void str_remove_data(Str *str)
 	if (str && str->flag.data_alloc)
 		m_free(str->data);
 	str->data = NULL;
-	str->flag.data_alloc = FALSE;
+	str->flag.data_alloc = false;
 }
 
 Str *Str_new_(int size)
@@ -191,8 +195,8 @@ Str *Str_new_(int size)
 	m_set_in_collection(str->data);
 	str->size = size;
 
-	str->flag.data_alloc = TRUE;
-	str->flag.header_alloc = TRUE;
+	str->flag.data_alloc = true;
+	str->flag.header_alloc = true;
 
 	Str_clear(str);
 
@@ -231,7 +235,7 @@ void Str_reserve(Str *str, int size)
 			memcpy(new_data, str->data, str->size);
 			str->data = new_data;
 
-			str->flag.data_alloc = TRUE;
+			str->flag.data_alloc = true;
 		}
 		str->size = new_size;
 	}
@@ -328,7 +332,7 @@ void Str_append_vsprintf(Str *str, char *format, va_list argptr)
 	int free_space;      /* may be negative */
 	int need_space;
 	va_list savearg;	/* save argptr before new invocations of vsnprintf */
-	Bool ok;
+	bool ok;
 
 	va_copy(savearg, argptr);
 	do
@@ -412,8 +416,8 @@ void Str_compress_escapes(Str *str)
 
 /* get one line from input, convert end-of-line sequences,
 *  return string including one LF character
-*  return FALSE on end of input */
-Bool Str_getline(Str *str, FILE *fp)
+*  return false on end of input */
+bool Str_getline(Str *str, FILE *fp)
 {
 	int c1, c2;
 
@@ -439,5 +443,5 @@ Bool Str_getline(Str *str, FILE *fp)
 		}
 	}
 
-	return str->len > 0 ? TRUE : FALSE;
+	return str->len > 0 ? true : false;
 }

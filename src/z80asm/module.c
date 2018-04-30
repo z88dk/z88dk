@@ -45,10 +45,10 @@ void Module_init (Module *self)
 	self->module_id	= new_module_id();
 
 	self->local_symtab	= OBJ_NEW( SymbolHash );
-	OBJ_AUTODELETE( self->local_symtab ) = FALSE;
+	OBJ_AUTODELETE( self->local_symtab ) = false;
 
 	self->exprs			= OBJ_NEW( ExprList );
-	OBJ_AUTODELETE( self->exprs ) = FALSE;
+	OBJ_AUTODELETE( self->exprs ) = false;
 
 	self->objfile = objfile_new();
 }

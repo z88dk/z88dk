@@ -29,7 +29,7 @@ ragel, to expand token definition from token_def.h.
 		<TAB>		if (expect_opcode) {				<NL> \
 		<TAB><TAB>		sym.tok        = TK_##opcode;	<NL> \
 		<TAB><TAB>		sym.tok_opcode = TK_##opcode;	<NL> \
-		<TAB><TAB>		expect_opcode  = FALSE;			<NL> \
+		<TAB><TAB>		expect_opcode  = false;			<NL> \
 		<TAB>		}									<NL> \
 		<TAB>		else {								<NL> \
 		<TAB><TAB>		sym.tok        = TK_NAME;		<NL> \
@@ -238,7 +238,7 @@ main := |*
 
 %%write data nofinal;
 
-static void set_scan_buf( char *text, Bool _at_bol )
+static void set_scan_buf( char *text, bool _at_bol )
 {
 	Str_set( input_buf, text );		
 	p = Str_data(input_buf);

@@ -12,7 +12,6 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include "alloc.h"
 #include "dbg.h"
 #include "init.h"
-#include "ztypes.h"
 #include "types.h"
 #include "utlist.h"
 #include <stddef.h>
@@ -32,8 +31,8 @@ typedef struct MemBlock {
 	destructor_t destructor;		/* desctructor function called by m_free_() to 
 									   destroy children */
 	struct {
-		Bool in_collection   :1;	/* TRUE if part of collection, deleted last */
-		Bool destroy_atextit :1;	/* TRUE to shut up memory leak warning */
+		bool in_collection   :1;	/* true if part of collection, deleted last */
+		bool destroy_atextit :1;	/* true to shut up memory leak warning */
 	} flags;
 
     size_t		client_size;		/* size requested by client */
@@ -156,8 +155,8 @@ static MemBlock *new_block( size_t client_size, char *file, int lineno )
     /* init block */
     block->signature   = MEMBLOCK_SIGN;
 	block->destructor  = NULL;
-	block->flags.in_collection	 = FALSE;
-	block->flags.destroy_atextit = FALSE;
+	block->flags.in_collection	 = false;
+	block->flags.destroy_atextit = false;
     block->client_size = client_size;
     block->file        = file;
     block->lineno      = lineno;
@@ -197,15 +196,15 @@ error:
 	return NULL;
 }
 
-Bool m_is_managed( void *memptr )
+bool m_is_managed( void *memptr )
 {
-	return find_block_no_warn( memptr ) ? TRUE : FALSE;
+	return find_block_no_warn( memptr ) ? true : false;
 }
 
 /*-----------------------------------------------------------------------------
-*   Check block fence, return FALSE on error
+*   Check block fence, return false on error
 *----------------------------------------------------------------------------*/
-static Bool check_fences( MemBlock *block )
+static bool check_fences( MemBlock *block )
 {
     /* check fences */
 	check( memcmp( g_fence, START_FENCE_PTR( block ), FENCE_SIZE ) == 0,
@@ -213,10 +212,10 @@ static Bool check_fences( MemBlock *block )
 
 	check( memcmp( g_fence, END_FENCE_PTR( block ), FENCE_SIZE ) == 0,
 		   "buffer overflow, memory allocated at %s:%d", block->file, block->lineno );
-	return TRUE;
+	return true;
 	
 error:
-	return FALSE;
+	return false;
 }
 
 /*-----------------------------------------------------------------------------
@@ -285,7 +284,7 @@ char *m_strdup_( char *source, char *file, int lineno )
 void *m_realloc_( void *memptr, size_t size, char *file, int lineno )
 {
     MemBlock *block, *next_block;
-	Bool 	  result;
+	bool 	  result;
 
     init_module();
 
@@ -340,7 +339,7 @@ void *m_realloc_compat( void *memptr, size_t size )
 void m_free_( void *memptr, char *file, int lineno )
 {
     MemBlock *block = NULL;
-	Bool result;
+	bool result;
 	
     init_module();
 
@@ -389,7 +388,7 @@ error:
 	return memptr;
 }
 
-void *m_set_in_collection_( void *memptr, Bool in_collection, char *file, int lineno )
+void *m_set_in_collection_( void *memptr, bool in_collection, char *file, int lineno )
 {
     MemBlock *block;
 
@@ -409,7 +408,7 @@ void *m_destroy_atexit_( void *memptr, char *file, int lineno )
     block = find_block( memptr, file, lineno );
 	check( block, "m_destroy_atexit at %s:%d failed", file, lineno );
 
-	block->flags.destroy_atextit = TRUE;
+	block->flags.destroy_atextit = true;
 
 error: 
 	return memptr;

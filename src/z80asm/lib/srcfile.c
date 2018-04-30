@@ -30,7 +30,7 @@ typedef struct FileStackElem
 	char	*line_filename;			/* source file name of LINE statement, held in strpool */
 	int		 line_nr;				/* current line number, i.e. last returned */
 	int		 line_inc;				/* increment on each line read */
-	Bool	 is_c_source;			/* true if C_LINE was called */
+	bool	 is_c_source;			/* true if C_LINE was called */
 } FileStackElem;
 
 static void free_file_stack_elem( void *_elem )
@@ -91,11 +91,11 @@ void SrcFile_init( SrcFile *self )
 	self->line = Str_new(STR_SIZE);
 
     self->line_stack = OBJ_NEW( List );
-    OBJ_AUTODELETE( self->line_stack ) = FALSE;
+    OBJ_AUTODELETE( self->line_stack ) = false;
 	self->line_stack->free_data = m_free_compat;
 
     self->file_stack = OBJ_NEW( List );
-    OBJ_AUTODELETE( self->file_stack ) = FALSE;
+    OBJ_AUTODELETE( self->file_stack ) = false;
 	self->file_stack->free_data = free_file_stack_elem;
 }
 
@@ -118,9 +118,9 @@ void SrcFile_fini( SrcFile *self )
 *	SrcFile API
 *----------------------------------------------------------------------------*/
 
-/* check for recursive includes, call error callback and return FALSE abort if found
-   returns TRUE if callback not defined */
-static Bool check_recursive_include( SrcFile *self, char *filename )
+/* check for recursive includes, call error callback and return false abort if found
+   returns true if callback not defined */
+static bool check_recursive_include( SrcFile *self, char *filename )
 {
 	ListElem *iter;
     FileStackElem *elem;
@@ -135,16 +135,16 @@ static Bool check_recursive_include( SrcFile *self, char *filename )
 				 strcmp( filename, elem->filename ) == 0 )
 			{
 				incl_recursion_err_cb( filename );
-				return FALSE;
+				return false;
 			}
 		}
 	}
-	return TRUE;
+	return true;
 }
 
 /* Open the source file for reading, closing any previously open file.
    If dir_list is not NULL, calls search_file() to search the file in dir_list */
-Bool SrcFile_open( SrcFile *self, char *filename, UT_array *dir_list )
+bool SrcFile_open( SrcFile *self, char *filename, UT_array *dir_list )
 {
     char *filename_path;
 	
@@ -160,7 +160,7 @@ Bool SrcFile_open( SrcFile *self, char *filename, UT_array *dir_list )
 
 	/* check for recursive includes, return if found */
 	if (!check_recursive_include(self, filename_path))
-		return FALSE;
+		return false;
 	
 	self->filename = filename_path;
 	self->line_filename = filename_path;
@@ -174,12 +174,12 @@ Bool SrcFile_open( SrcFile *self, char *filename, UT_array *dir_list )
     Str_clear( self->line );
     self->line_nr = 0;
 	self->line_inc = 1;
-	self->is_c_source = FALSE;
+	self->is_c_source = false;
 
 	if (self->file)
-		return TRUE;
+		return true;
 	else
-		return FALSE;		/* error opening file */
+		return false;		/* error opening file */
 }
 
 /* get the next line of input, normalize end of line termination (i.e. convert
@@ -190,7 +190,7 @@ Bool SrcFile_open( SrcFile *self, char *filename, UT_array *dir_list )
 char *SrcFile_getline( SrcFile *self )
 {
     int c, c1;
-    Bool found_newline;
+    bool found_newline;
     char *line;
 
     /* clear result string */
@@ -214,7 +214,7 @@ char *SrcFile_getline( SrcFile *self )
         return NULL;
 
     /* read characters */
-    found_newline = FALSE;
+    found_newline = false;
     while ( ! found_newline && ( c = getc( self->file ) ) != EOF )
     {
         switch ( c )
@@ -237,7 +237,7 @@ char *SrcFile_getline( SrcFile *self )
             }
 
             /* normalize newline and fall through to default */
-            found_newline = TRUE;
+            found_newline = true;
             c = '\n';
 
         default:
@@ -318,7 +318,7 @@ void SrcFile_ungetline( SrcFile *self, char *lines )
 char *SrcFile_filename( SrcFile *self ) { return self->line_filename; }
 int   SrcFile_line_nr(  SrcFile *self ) { return self->line_nr; }
 
-Bool ScrFile_is_c_source(SrcFile * self)
+bool ScrFile_is_c_source(SrcFile * self)
 {
 	return self->is_c_source;
 }
@@ -336,12 +336,12 @@ void SrcFile_set_line_nr(SrcFile * self, int line_nr, int line_inc)
 
 void SrcFile_set_c_source(SrcFile * self)
 {
-	self->is_c_source = TRUE;
+	self->is_c_source = true;
 }
 
 /* stack of input files manipulation:
    push saves current file on the stack and prepares for a new open
-   pop returns FALSE if the stack is empty; else retrieves last file from stack
+   pop returns false if the stack is empty; else retrieves last file from stack
    and updates current input */
 void SrcFile_push( SrcFile *self )
 {
@@ -364,12 +364,12 @@ void SrcFile_push( SrcFile *self )
 	*/
 }
 
-Bool SrcFile_pop( SrcFile *self )
+bool SrcFile_pop( SrcFile *self )
 {
 	FileStackElem *elem;
 	
 	if ( List_empty( self->file_stack ) )
-		return FALSE;
+		return false;
 		
 	if ( self->file != NULL )
 		xfclose( self->file );
@@ -383,5 +383,5 @@ Bool SrcFile_pop( SrcFile *self )
 	self->is_c_source = elem->is_c_source;
 
 	m_free( elem );
-	return TRUE;
+	return true;
 }

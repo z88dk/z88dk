@@ -271,7 +271,7 @@ void ExprOp_init_operator( ExprOp *self, tokid_t tok, op_type_t op_type )
 }
 
 /* compute ExprOp using Calc_xxx functions */
-void ExprOp_compute(ExprOp *self, Expr *expr, Bool not_defined_error)
+void ExprOp_compute(ExprOp *self, Expr *expr, bool not_defined_error)
 {
 	switch (self->op_type)
 	{
@@ -279,17 +279,17 @@ void ExprOp_compute(ExprOp *self, Expr *expr, Bool not_defined_error)
 		/* symbol was not defined */
         if ( ! self->d.symbol->is_defined )
         {
-			expr->result.not_evaluable = TRUE;
+			expr->result.not_evaluable = true;
 
 			/* copy scope */
 			if (self->d.symbol->scope == SCOPE_EXTERN ||
 				(self->d.symbol->scope == SCOPE_GLOBAL && !self->d.symbol->is_defined))
 			{
-				expr->result.extern_symbol = TRUE;
+				expr->result.extern_symbol = true;
 			}
 			else if (self->d.symbol->type == TYPE_UNKNOWN)
 			{
-				expr->result.undefined_symbol = TRUE;
+				expr->result.undefined_symbol = true;
 				if (not_defined_error)
 					error_not_defined(self->d.symbol->name);
 			}
@@ -302,14 +302,14 @@ void ExprOp_compute(ExprOp *self, Expr *expr, Bool not_defined_error)
 
 			/* check cross-section addresses to invalidade relative jumps */
 			if (self->d.symbol->section != CURRENTSECTION)
-				expr->result.cross_section_addr = TRUE;
+				expr->result.cross_section_addr = true;
 		}
 
 		expr->type = MAX( expr->type, self->d.symbol->type );
 
 		/* check if symbol is computable and was computed */
 		if (self->d.symbol->type == TYPE_COMPUTED && !self->d.symbol->is_computed)
-			expr->is_computed = FALSE;
+			expr->is_computed = false;
 
 		break;
 		
@@ -369,7 +369,7 @@ DEF_CLASS_LIST( Expr );
 void Expr_init (Expr *self) 
 { 
     self->rpn_ops = OBJ_NEW( ExprOpArray );
-	OBJ_AUTODELETE( self->rpn_ops ) = FALSE;
+	OBJ_AUTODELETE( self->rpn_ops ) = false;
 
     self->text = Str_new(STR_SIZE);
 
@@ -403,15 +403,15 @@ void Expr_fini (Expr *self)
 /*-----------------------------------------------------------------------------
 *	Expression parser
 *----------------------------------------------------------------------------*/
-static Bool Expr_parse_ternary_cond( Expr *expr );
+static bool Expr_parse_ternary_cond( Expr *expr );
 
 #define DEFINE_PARSER( name, prev_name, condition )			\
-	static Bool name( Expr *self )							\
+	static bool name( Expr *self )							\
 	{														\
 		tokid_t op = TK_NIL;								\
 															\
 		if ( ! prev_name(self) )							\
-			return FALSE;									\
+			return false;									\
 															\
 		while ( condition )									\
 		{													\
@@ -419,18 +419,18 @@ static Bool Expr_parse_ternary_cond( Expr *expr );
 			Str_append_n(self->text, sym.tstart, sym.tlen);	\
 			GetSym();										\
 			if ( ! prev_name(self) )						\
-				return FALSE;								\
+				return false;								\
 															\
 			ExprOp_init_operator(							\
 				ExprOpArray_push( self->rpn_ops ),			\
 				op, BINARY_OP );							\
 		}													\
 															\
-		return TRUE;										\
+		return true;										\
 	}
 
 /* parse value */
-static Bool Expr_parse_factor( Expr *self )
+static bool Expr_parse_factor( Expr *self )
 {
     Symbol  *symptr;
 
@@ -456,7 +456,7 @@ static Bool Expr_parse_factor( Expr *self )
 #if 0
         if ( ! symptr->is_defined )
         {
-			self->result.not_evaluable		= TRUE;
+			self->result.not_evaluable		= true;
         }
 #endif
 
@@ -481,7 +481,7 @@ static Bool Expr_parse_factor( Expr *self )
 }
 
 /* parse unary operators */
-static Bool Expr_parse_unary( Expr *self )
+static bool Expr_parse_unary( Expr *self )
 {
     tokid_t open_paren;
 
@@ -491,11 +491,11 @@ static Bool Expr_parse_unary( Expr *self )
 		Str_append_n(self->text, sym.tstart, sym.tlen);
         GetSym();
 		if ( ! Expr_parse_unary( self ) )		/* right-associative, recurse */
-			return FALSE;
+			return false;
 
 		ExprOp_init_operator( ExprOpArray_push( self->rpn_ops ),
 							  TK_MINUS, UNARY_OP );
-		return TRUE;
+		return true;
 
     case TK_PLUS:
         GetSym();
@@ -505,22 +505,22 @@ static Bool Expr_parse_unary( Expr *self )
 		Str_append_n(self->text, sym.tstart, sym.tlen);
         GetSym();
 		if ( ! Expr_parse_unary( self ) )		/* right-associative, recurse */
-			return FALSE;
+			return false;
 
 		ExprOp_init_operator( ExprOpArray_push( self->rpn_ops ),
 							  TK_BIN_NOT, UNARY_OP );
-		return TRUE;
+		return true;
 
     case TK_LOG_NOT:
 		Str_append_n(self->text, sym.tstart, sym.tlen);
         GetSym();
 
         if ( ! Expr_parse_unary( self ) )		/* right-associative, recurse */
-			return FALSE;
+			return false;
 
 		ExprOp_init_operator( ExprOpArray_push( self->rpn_ops ),
 							  TK_LOG_NOT, UNARY_OP );
-		return TRUE;
+		return true;
 
     case TK_LPAREN:
     case TK_LSQUARE:
@@ -529,16 +529,16 @@ static Bool Expr_parse_unary( Expr *self )
         GetSym();
 
         if ( ! Expr_parse_ternary_cond( self ) )
-			return FALSE;
+			return false;
 
 		/* chack parentheses balance */
         if ( ( open_paren == TK_LPAREN  && sym.tok != TK_RPAREN ) ||
              ( open_paren == TK_LSQUARE && sym.tok != TK_RSQUARE ) )
-			return FALSE;
+			return false;
 
 		Str_append_n(self->text, sym.tstart, sym.tlen);
         GetSym();
-		return TRUE;
+		return true;
 
 	default:
 		return Expr_parse_factor( self );
@@ -546,23 +546,23 @@ static Bool Expr_parse_unary( Expr *self )
 }
 
 /* parse A ** B */
-static Bool Expr_parse_power( Expr *self )
+static bool Expr_parse_power( Expr *self )
 {
     if ( ! Expr_parse_unary( self ) )
-        return FALSE;
+        return false;
 
     while ( sym.tok == TK_POWER )
     {
 		Str_append_n(self->text, sym.tstart, sym.tlen);
         GetSym();
 		if ( ! Expr_parse_power( self ) )		/* right-associative, recurse */
-			return FALSE;
+			return false;
 
 		ExprOp_init_operator( ExprOpArray_push( self->rpn_ops ),
 							  TK_POWER, BINARY_OP );
     }
 
-    return TRUE;
+    return true;
 }
 
 /* parse A * B, A / B, A % B */
@@ -600,32 +600,32 @@ DEFINE_PARSER( Expr_parse_logical_or, Expr_parse_logical_and,
 			   sym.tok == TK_LOG_OR )
 
 /* parse cond ? true : false */
-static Bool Expr_parse_ternary_cond( Expr *self )
+static bool Expr_parse_ternary_cond( Expr *self )
 {
 	if ( ! Expr_parse_logical_or(self) )		/* get cond or expression */
-		return FALSE;
+		return false;
 
 	if ( sym.tok != TK_QUESTION )
-		return TRUE;
+		return true;
 
 	/* ternary construct found */
     Str_append_char(self->text, '?');
 	GetSym();						/* consume '?' */
 		
 	if ( ! Expr_parse_ternary_cond(self) )	/* get true */
-		return FALSE;
+		return false;
 
 	if ( sym.tok != TK_COLON )
-		return FALSE;
+		return false;
     Str_append_char(self->text, ':');
 	GetSym();						/* consume ':' */
 
 	if ( ! Expr_parse_ternary_cond(self) )	/* get false */
-		return FALSE;
+		return false;
 
 	ExprOp_init_operator( ExprOpArray_push( self->rpn_ops ),
 						  TK_TERN_COND, TERNARY_OP );
-	return TRUE;
+	return true;
 }
 
 /* parse expression at current input, return new Expr object;
@@ -633,14 +633,14 @@ static Bool Expr_parse_ternary_cond( Expr *self )
 Expr *expr_parse( void )
 {
 	Expr *self = OBJ_NEW( Expr );
-    Bool is_const_expr = FALSE;
+    bool is_const_expr = false;
 
     if ( sym.tok == TK_CONST_EXPR )		/* leading '#' : ignore relocatable address expression */
     {
 		Str_append_n(self->text, sym.tstart, sym.tlen);
 
 		GetSym();               
-        is_const_expr = TRUE;
+        is_const_expr = true;
     }
 
     if ( Expr_parse_ternary_cond( self ) )
@@ -665,16 +665,16 @@ Expr *expr_parse( void )
 *	evaluate expression if possible, set result.not_evaluable if failed
 *   e.g. symbol not defined
 *----------------------------------------------------------------------------*/
-long Expr_eval(Expr *self, Bool not_defined_error)
+long Expr_eval(Expr *self, bool not_defined_error)
 {
 	size_t i;
 
-	self->result.not_evaluable		= FALSE;
-	self->result.undefined_symbol	= FALSE;
-	self->result.extern_symbol		= FALSE;
-	self->result.cross_section_addr = FALSE;
+	self->result.not_evaluable		= false;
+	self->result.undefined_symbol	= false;
+	self->result.extern_symbol		= false;
+	self->result.cross_section_addr = false;
 
-	self->is_computed = TRUE;
+	self->is_computed = true;
 
 	for ( i = 0; i < ExprOpArray_size( self->rpn_ops ); i++ )
 	{
@@ -708,18 +708,18 @@ long Expr_eval(Expr *self, Bool not_defined_error)
 }
 
 /*-----------------------------------------------------------------------------
-*	parse and eval an expression, return FALSE on result.not_evaluable
+*	parse and eval an expression, return false on result.not_evaluable
 *----------------------------------------------------------------------------*/
-static Bool _expr_parse_eval( long *presult, Bool not_defined_error )
+static bool _expr_parse_eval( long *presult, bool not_defined_error )
 {
 	Expr *expr;
-	Bool  failed;
+	bool  failed;
 
 	*presult = 0;
 
 	expr = expr_parse();
 	if ( expr == NULL )
-		return FALSE;				/* error output by expr_parse() */
+		return false;				/* error output by expr_parse() */
 
 	/* eval and discard expression */
 	*presult = Expr_eval(expr, not_defined_error);
@@ -728,27 +728,27 @@ static Bool _expr_parse_eval( long *presult, Bool not_defined_error )
 
 	/* check errors */
 	if (failed)
-		return FALSE;
+		return false;
 	else
-		return TRUE;
+		return true;
 }
 
-Bool expr_parse_eval( long *presult )
+bool expr_parse_eval( long *presult )
 {
-	return _expr_parse_eval( presult, TRUE );
+	return _expr_parse_eval( presult, true );
 }
 
 long expr_parse_eval_if( void )
 {
 	long result = 0;
-	_expr_parse_eval( &result, FALSE );
+	_expr_parse_eval( &result, false );
 	return result;
 }
 
 /* check if all variables used in an expression are local to the same module
 and section; if yes, the expression can be computed in phase 2 of the compile,
 if not the expression must be passed to the link phase */
-Bool Expr_is_local_in_section(Expr *self, struct Module *module, struct Section *section)
+bool Expr_is_local_in_section(Expr *self, struct Module *module, struct Section *section)
 {
 	size_t i;
 
@@ -760,7 +760,7 @@ Bool Expr_is_local_in_section(Expr *self, struct Module *module, struct Section 
 		{
 		case SYMBOL_OP:
 			if (expr_op->d.symbol->module != module || expr_op->d.symbol->section != section)
-				return FALSE;
+				return false;
 			break;
 
 		case CONST_EXPR_OP:
@@ -775,10 +775,10 @@ Bool Expr_is_local_in_section(Expr *self, struct Module *module, struct Section 
 			assert(0);
 		}
 	}
-	return TRUE;
+	return true;
 }
 
-Bool Expr_without_addresses(Expr *self)
+bool Expr_without_addresses(Expr *self)
 {
 	size_t i;
 	int num_addresses = 0;
@@ -811,7 +811,7 @@ Bool Expr_without_addresses(Expr *self)
 	}
 
 	if (num_addresses > 1)
-		return FALSE;
+		return false;
 	else
-		return TRUE;
+		return true;
 }

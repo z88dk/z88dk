@@ -3716,7 +3716,7 @@ static const short _lexer_eof_trans[] = {
 static const int lexer_start = 38;
 static const int lexer_error = 0;
 static const int lexer_en_main = 38;
-static void set_scan_buf( char *text, Bool _at_bol )
+static void set_scan_buf( char *text, bool _at_bol )
 {
  Str_set( input_buf, text );
  p = Str_data(input_buf);
@@ -4823,7 +4823,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_CCF1;
 		sym.tok_opcode = TK_CCF1;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -4837,7 +4837,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_RLA1;
 		sym.tok_opcode = TK_RLA1;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -4851,7 +4851,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_RLCA1;
 		sym.tok_opcode = TK_RLCA1;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -4865,7 +4865,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_RRA1;
 		sym.tok_opcode = TK_RRA1;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -4879,7 +4879,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_RRCA1;
 		sym.tok_opcode = TK_RRCA1;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -4893,7 +4893,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_SCF1;
 		sym.tok_opcode = TK_SCF1;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -4907,7 +4907,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_CU_WAIT;
 		sym.tok_opcode = TK_CU_WAIT;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -4921,7 +4921,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_CU_MOVE;
 		sym.tok_opcode = TK_CU_MOVE;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -4935,7 +4935,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_CU_STOP;
 		sym.tok_opcode = TK_CU_STOP;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -4949,7 +4949,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_CU_NOP;
 		sym.tok_opcode = TK_CU_NOP;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -4963,7 +4963,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_DMA_WR0;
 		sym.tok_opcode = TK_DMA_WR0;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -4977,7 +4977,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_DMA_WR1;
 		sym.tok_opcode = TK_DMA_WR1;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -4991,7 +4991,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_DMA_WR2;
 		sym.tok_opcode = TK_DMA_WR2;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5005,7 +5005,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_DMA_WR3;
 		sym.tok_opcode = TK_DMA_WR3;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5019,7 +5019,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_DMA_WR4;
 		sym.tok_opcode = TK_DMA_WR4;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5033,7 +5033,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_DMA_WR5;
 		sym.tok_opcode = TK_DMA_WR5;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5047,7 +5047,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_DMA_WR6;
 		sym.tok_opcode = TK_DMA_WR6;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5061,7 +5061,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_DMA_CMD;
 		sym.tok_opcode = TK_DMA_CMD;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5362,7 +5362,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_IF;
 		sym.tok_opcode = TK_IF;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5376,7 +5376,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_CALL;
 		sym.tok_opcode = TK_CALL;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5390,7 +5390,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_CCF;
 		sym.tok_opcode = TK_CCF;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5404,7 +5404,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_CP;
 		sym.tok_opcode = TK_CP;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5418,7 +5418,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_CPD;
 		sym.tok_opcode = TK_CPD;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5432,7 +5432,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_CPI;
 		sym.tok_opcode = TK_CPI;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5446,7 +5446,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_EI;
 		sym.tok_opcode = TK_EI;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5460,7 +5460,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_EX;
 		sym.tok_opcode = TK_EX;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5474,7 +5474,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_IN;
 		sym.tok_opcode = TK_IN;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5488,7 +5488,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_INC;
 		sym.tok_opcode = TK_INC;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5502,7 +5502,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_IND;
 		sym.tok_opcode = TK_IND;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5516,7 +5516,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_INI;
 		sym.tok_opcode = TK_INI;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5530,7 +5530,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_LD;
 		sym.tok_opcode = TK_LD;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5544,7 +5544,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_LDD;
 		sym.tok_opcode = TK_LDD;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5558,7 +5558,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_LDDR;
 		sym.tok_opcode = TK_LDDR;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5572,7 +5572,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_LDI;
 		sym.tok_opcode = TK_LDI;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5586,7 +5586,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_LDIR;
 		sym.tok_opcode = TK_LDIR;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5600,7 +5600,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_OR;
 		sym.tok_opcode = TK_OR;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5614,7 +5614,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_OUT;
 		sym.tok_opcode = TK_OUT;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5628,7 +5628,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_OUTI;
 		sym.tok_opcode = TK_OUTI;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5642,7 +5642,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_RET;
 		sym.tok_opcode = TK_RET;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5656,7 +5656,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_RL;
 		sym.tok_opcode = TK_RL;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5670,7 +5670,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_RLA;
 		sym.tok_opcode = TK_RLA;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5684,7 +5684,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_RLC;
 		sym.tok_opcode = TK_RLC;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5698,7 +5698,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_RLCA;
 		sym.tok_opcode = TK_RLCA;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5712,7 +5712,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_RR;
 		sym.tok_opcode = TK_RR;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5726,7 +5726,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_RRA;
 		sym.tok_opcode = TK_RRA;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5740,7 +5740,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_RRC;
 		sym.tok_opcode = TK_RRC;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5754,7 +5754,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_RRCA;
 		sym.tok_opcode = TK_RRCA;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5768,7 +5768,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_SCF;
 		sym.tok_opcode = TK_SCF;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5782,7 +5782,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_SET;
 		sym.tok_opcode = TK_SET;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5796,7 +5796,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_SWAP;
 		sym.tok_opcode = TK_SWAP;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5810,7 +5810,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_FILL;
 		sym.tok_opcode = TK_FILL;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5824,7 +5824,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_MMU;
 		sym.tok_opcode = TK_MMU;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5838,7 +5838,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_OTDM;
 		sym.tok_opcode = TK_OTDM;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5852,7 +5852,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_OTIM;
 		sym.tok_opcode = TK_OTIM;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5866,7 +5866,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_TST;
 		sym.tok_opcode = TK_TST;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -5880,7 +5880,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_LDP;
 		sym.tok_opcode = TK_LDP;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6279,7 +6279,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_ALIGN;
 		sym.tok_opcode = TK_ALIGN;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6293,7 +6293,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_BINARY;
 		sym.tok_opcode = TK_BINARY;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6307,7 +6307,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_C_LINE;
 		sym.tok_opcode = TK_C_LINE;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6321,7 +6321,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_DEFB;
 		sym.tok_opcode = TK_DEFB;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6335,7 +6335,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_DEFC;
 		sym.tok_opcode = TK_DEFC;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6349,7 +6349,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_DEFGROUP;
 		sym.tok_opcode = TK_DEFGROUP;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6363,7 +6363,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_DEFINE;
 		sym.tok_opcode = TK_DEFINE;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6377,7 +6377,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_DEFM;
 		sym.tok_opcode = TK_DEFM;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6391,7 +6391,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_DEFQ;
 		sym.tok_opcode = TK_DEFQ;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6405,7 +6405,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_DEFS;
 		sym.tok_opcode = TK_DEFS;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6419,7 +6419,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_DEFVARS;
 		sym.tok_opcode = TK_DEFVARS;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6433,7 +6433,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_DEFW;
 		sym.tok_opcode = TK_DEFW;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6447,7 +6447,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_DEPHASE;
 		sym.tok_opcode = TK_DEPHASE;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6461,7 +6461,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_ELSE;
 		sym.tok_opcode = TK_ELSE;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6475,7 +6475,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_ENDIF;
 		sym.tok_opcode = TK_ENDIF;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6489,7 +6489,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_EXTERN;
 		sym.tok_opcode = TK_EXTERN;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6503,7 +6503,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_GLOBAL;
 		sym.tok_opcode = TK_GLOBAL;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6517,7 +6517,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_IF;
 		sym.tok_opcode = TK_IF;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6531,7 +6531,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_IFDEF;
 		sym.tok_opcode = TK_IFDEF;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6545,7 +6545,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_IFNDEF;
 		sym.tok_opcode = TK_IFNDEF;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6559,7 +6559,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_INCLUDE;
 		sym.tok_opcode = TK_INCLUDE;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6573,7 +6573,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_LIB;
 		sym.tok_opcode = TK_LIB;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6587,7 +6587,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_LINE;
 		sym.tok_opcode = TK_LINE;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6601,7 +6601,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_LSTOFF;
 		sym.tok_opcode = TK_LSTOFF;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6615,7 +6615,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_LSTON;
 		sym.tok_opcode = TK_LSTON;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6629,7 +6629,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_MODULE;
 		sym.tok_opcode = TK_MODULE;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6643,7 +6643,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_ORG;
 		sym.tok_opcode = TK_ORG;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6657,7 +6657,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_PHASE;
 		sym.tok_opcode = TK_PHASE;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6671,7 +6671,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_PUBLIC;
 		sym.tok_opcode = TK_PUBLIC;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6685,7 +6685,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_SECTION;
 		sym.tok_opcode = TK_SECTION;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6699,7 +6699,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_UNDEFINE;
 		sym.tok_opcode = TK_UNDEFINE;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6713,7 +6713,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_XDEF;
 		sym.tok_opcode = TK_XDEF;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6727,7 +6727,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_XLIB;
 		sym.tok_opcode = TK_XLIB;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6741,7 +6741,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_XREF;
 		sym.tok_opcode = TK_XREF;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6755,7 +6755,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_ADC;
 		sym.tok_opcode = TK_ADC;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6769,7 +6769,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_ADD;
 		sym.tok_opcode = TK_ADD;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6783,7 +6783,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_AND;
 		sym.tok_opcode = TK_AND;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6797,7 +6797,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_BIT;
 		sym.tok_opcode = TK_BIT;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6811,7 +6811,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_CALL;
 		sym.tok_opcode = TK_CALL;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6825,7 +6825,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_CCF;
 		sym.tok_opcode = TK_CCF;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6839,7 +6839,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_CP;
 		sym.tok_opcode = TK_CP;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6853,7 +6853,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_CPD;
 		sym.tok_opcode = TK_CPD;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6867,7 +6867,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_CPDR;
 		sym.tok_opcode = TK_CPDR;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6881,7 +6881,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_CPI;
 		sym.tok_opcode = TK_CPI;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6895,7 +6895,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_CPIR;
 		sym.tok_opcode = TK_CPIR;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6909,7 +6909,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_CPL;
 		sym.tok_opcode = TK_CPL;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6923,7 +6923,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_DAA;
 		sym.tok_opcode = TK_DAA;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6937,7 +6937,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_DEC;
 		sym.tok_opcode = TK_DEC;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6951,7 +6951,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_DI;
 		sym.tok_opcode = TK_DI;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6965,7 +6965,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_DJNZ;
 		sym.tok_opcode = TK_DJNZ;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6979,7 +6979,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_EI;
 		sym.tok_opcode = TK_EI;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -6993,7 +6993,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_EX;
 		sym.tok_opcode = TK_EX;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7007,7 +7007,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_EXX;
 		sym.tok_opcode = TK_EXX;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7021,7 +7021,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_HALT;
 		sym.tok_opcode = TK_HALT;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7035,7 +7035,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_IM;
 		sym.tok_opcode = TK_IM;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7049,7 +7049,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_IN;
 		sym.tok_opcode = TK_IN;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7063,7 +7063,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_INC;
 		sym.tok_opcode = TK_INC;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7077,7 +7077,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_IND;
 		sym.tok_opcode = TK_IND;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7091,7 +7091,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_INDR;
 		sym.tok_opcode = TK_INDR;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7105,7 +7105,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_INI;
 		sym.tok_opcode = TK_INI;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7119,7 +7119,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_INIR;
 		sym.tok_opcode = TK_INIR;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7133,7 +7133,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_JP;
 		sym.tok_opcode = TK_JP;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7147,7 +7147,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_JR;
 		sym.tok_opcode = TK_JR;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7161,7 +7161,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_LD;
 		sym.tok_opcode = TK_LD;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7175,7 +7175,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_LDD;
 		sym.tok_opcode = TK_LDD;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7189,7 +7189,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_LDDR;
 		sym.tok_opcode = TK_LDDR;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7203,7 +7203,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_LDI;
 		sym.tok_opcode = TK_LDI;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7217,7 +7217,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_LDIR;
 		sym.tok_opcode = TK_LDIR;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7231,7 +7231,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_NEG;
 		sym.tok_opcode = TK_NEG;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7245,7 +7245,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_NOP;
 		sym.tok_opcode = TK_NOP;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7259,7 +7259,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_OR;
 		sym.tok_opcode = TK_OR;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7273,7 +7273,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_OTDR;
 		sym.tok_opcode = TK_OTDR;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7287,7 +7287,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_OTIR;
 		sym.tok_opcode = TK_OTIR;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7301,7 +7301,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_OUT;
 		sym.tok_opcode = TK_OUT;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7315,7 +7315,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_OUTD;
 		sym.tok_opcode = TK_OUTD;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7329,7 +7329,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_OUTI;
 		sym.tok_opcode = TK_OUTI;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7343,7 +7343,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_POP;
 		sym.tok_opcode = TK_POP;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7357,7 +7357,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_PUSH;
 		sym.tok_opcode = TK_PUSH;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7371,7 +7371,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_RES;
 		sym.tok_opcode = TK_RES;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7385,7 +7385,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_RET;
 		sym.tok_opcode = TK_RET;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7399,7 +7399,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_RETI;
 		sym.tok_opcode = TK_RETI;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7413,7 +7413,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_RETN;
 		sym.tok_opcode = TK_RETN;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7427,7 +7427,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_RL;
 		sym.tok_opcode = TK_RL;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7441,7 +7441,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_RLA;
 		sym.tok_opcode = TK_RLA;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7455,7 +7455,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_RLC;
 		sym.tok_opcode = TK_RLC;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7469,7 +7469,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_RLCA;
 		sym.tok_opcode = TK_RLCA;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7483,7 +7483,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_RLD;
 		sym.tok_opcode = TK_RLD;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7497,7 +7497,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_RR;
 		sym.tok_opcode = TK_RR;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7511,7 +7511,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_RRA;
 		sym.tok_opcode = TK_RRA;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7525,7 +7525,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_RRC;
 		sym.tok_opcode = TK_RRC;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7539,7 +7539,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_RRCA;
 		sym.tok_opcode = TK_RRCA;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7553,7 +7553,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_RRD;
 		sym.tok_opcode = TK_RRD;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7567,7 +7567,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_RST;
 		sym.tok_opcode = TK_RST;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7581,7 +7581,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_SBC;
 		sym.tok_opcode = TK_SBC;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7595,7 +7595,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_SCF;
 		sym.tok_opcode = TK_SCF;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7609,7 +7609,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_SET;
 		sym.tok_opcode = TK_SET;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7623,7 +7623,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_SLA;
 		sym.tok_opcode = TK_SLA;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7637,7 +7637,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_SLL;
 		sym.tok_opcode = TK_SLL;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7651,7 +7651,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_SLI;
 		sym.tok_opcode = TK_SLI;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7665,7 +7665,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_SRA;
 		sym.tok_opcode = TK_SRA;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7679,7 +7679,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_SRL;
 		sym.tok_opcode = TK_SRL;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7693,7 +7693,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_SUB;
 		sym.tok_opcode = TK_SUB;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7707,7 +7707,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_XOR;
 		sym.tok_opcode = TK_XOR;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7721,7 +7721,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_SWAPNIB;
 		sym.tok_opcode = TK_SWAPNIB;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7735,7 +7735,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_SWAP;
 		sym.tok_opcode = TK_SWAP;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7749,7 +7749,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_OUTINB;
 		sym.tok_opcode = TK_OUTINB;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7763,7 +7763,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_LDIX;
 		sym.tok_opcode = TK_LDIX;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7777,7 +7777,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_LDIRX;
 		sym.tok_opcode = TK_LDIRX;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7791,7 +7791,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_LDDX;
 		sym.tok_opcode = TK_LDDX;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7805,7 +7805,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_LDDRX;
 		sym.tok_opcode = TK_LDDRX;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7819,7 +7819,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_LDIRSCALE;
 		sym.tok_opcode = TK_LDIRSCALE;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7833,7 +7833,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_LDPIRX;
 		sym.tok_opcode = TK_LDPIRX;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7847,7 +7847,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_FILL;
 		sym.tok_opcode = TK_FILL;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7861,7 +7861,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_FILLDE;
 		sym.tok_opcode = TK_FILLDE;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7875,7 +7875,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_MIRROR;
 		sym.tok_opcode = TK_MIRROR;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7889,7 +7889,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_NEXTREG;
 		sym.tok_opcode = TK_NEXTREG;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7903,7 +7903,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_PIXELDN;
 		sym.tok_opcode = TK_PIXELDN;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7917,7 +7917,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_PIXELAD;
 		sym.tok_opcode = TK_PIXELAD;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7931,7 +7931,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_SETAE;
 		sym.tok_opcode = TK_SETAE;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7945,7 +7945,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_TEST;
 		sym.tok_opcode = TK_TEST;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7959,7 +7959,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_MMU;
 		sym.tok_opcode = TK_MMU;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7973,7 +7973,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_MMU0;
 		sym.tok_opcode = TK_MMU0;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -7987,7 +7987,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_MMU1;
 		sym.tok_opcode = TK_MMU1;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8001,7 +8001,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_MMU2;
 		sym.tok_opcode = TK_MMU2;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8015,7 +8015,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_MMU3;
 		sym.tok_opcode = TK_MMU3;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8029,7 +8029,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_MMU4;
 		sym.tok_opcode = TK_MMU4;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8043,7 +8043,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_MMU5;
 		sym.tok_opcode = TK_MMU5;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8057,7 +8057,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_MMU6;
 		sym.tok_opcode = TK_MMU6;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8071,7 +8071,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_MMU7;
 		sym.tok_opcode = TK_MMU7;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8085,7 +8085,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_IN0;
 		sym.tok_opcode = TK_IN0;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8099,7 +8099,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_MLT;
 		sym.tok_opcode = TK_MLT;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8113,7 +8113,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_OTDM;
 		sym.tok_opcode = TK_OTDM;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8127,7 +8127,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_OTDMR;
 		sym.tok_opcode = TK_OTDMR;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8141,7 +8141,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_OTIM;
 		sym.tok_opcode = TK_OTIM;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8155,7 +8155,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_OTIMR;
 		sym.tok_opcode = TK_OTIMR;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8169,7 +8169,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_OUT0;
 		sym.tok_opcode = TK_OUT0;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8183,7 +8183,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_SLP;
 		sym.tok_opcode = TK_SLP;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8197,7 +8197,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_TST;
 		sym.tok_opcode = TK_TST;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8211,7 +8211,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_TSTIO;
 		sym.tok_opcode = TK_TSTIO;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8225,7 +8225,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_ALTD;
 		sym.tok_opcode = TK_ALTD;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8239,7 +8239,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_BOOL;
 		sym.tok_opcode = TK_BOOL;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8253,7 +8253,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_IDET;
 		sym.tok_opcode = TK_IDET;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8267,7 +8267,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_IOE;
 		sym.tok_opcode = TK_IOE;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8281,7 +8281,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_IOI;
 		sym.tok_opcode = TK_IOI;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8295,7 +8295,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_IPRES;
 		sym.tok_opcode = TK_IPRES;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8309,7 +8309,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_IPSET;
 		sym.tok_opcode = TK_IPSET;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8323,7 +8323,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_LDDSR;
 		sym.tok_opcode = TK_LDDSR;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8337,7 +8337,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_LDISR;
 		sym.tok_opcode = TK_LDISR;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8351,7 +8351,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_LDP;
 		sym.tok_opcode = TK_LDP;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8365,7 +8365,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_LSDR;
 		sym.tok_opcode = TK_LSDR;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8379,7 +8379,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_LSIR;
 		sym.tok_opcode = TK_LSIR;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8393,7 +8393,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_LSDDR;
 		sym.tok_opcode = TK_LSDDR;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8407,7 +8407,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_LSIDR;
 		sym.tok_opcode = TK_LSIDR;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8421,7 +8421,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_MUL;
 		sym.tok_opcode = TK_MUL;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8435,7 +8435,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_RDMODE;
 		sym.tok_opcode = TK_RDMODE;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8449,7 +8449,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_SETUSR;
 		sym.tok_opcode = TK_SETUSR;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8463,7 +8463,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_SURES;
 		sym.tok_opcode = TK_SURES;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8477,7 +8477,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_SYSCALL;
 		sym.tok_opcode = TK_SYSCALL;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8491,7 +8491,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_UMA;
 		sym.tok_opcode = TK_UMA;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8505,7 +8505,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_UMS;
 		sym.tok_opcode = TK_UMS;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8519,7 +8519,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_CALL_OZ;
 		sym.tok_opcode = TK_CALL_OZ;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8533,7 +8533,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_CALL_PKG;
 		sym.tok_opcode = TK_CALL_PKG;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8547,7 +8547,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_FPP;
 		sym.tok_opcode = TK_FPP;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;
@@ -8561,7 +8561,7 @@ _eof_trans:
 	if (expect_opcode) {
 		sym.tok = TK_INVOKE;
 		sym.tok_opcode = TK_INVOKE;
-		expect_opcode = FALSE;
+		expect_opcode = false;
 	}
 	else {
 		sym.tok = TK_NAME;

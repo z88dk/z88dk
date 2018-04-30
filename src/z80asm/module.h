@@ -17,7 +17,7 @@ Assembled module, i.e. result of assembling a .asm file
 #include "codearea.h"
 #include "expr.h"
 #include "symtab.h"
-#include "ztypes.h"
+#include "types.h"
 
 #include "objfile.h"
 
