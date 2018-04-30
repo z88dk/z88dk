@@ -4,7 +4,6 @@
 **/*.exe
 **/*.lib
 **/*.o
-**/*.out
 **/*.vcxproj.user
 **/lib*.a
 **/zcc_opt.def
@@ -54,3 +53,4 @@ win32/Release/
 win32/ipch/
 win32/z88dk.VC.VC.opendb
 win32/z88dk.VC.db
+
