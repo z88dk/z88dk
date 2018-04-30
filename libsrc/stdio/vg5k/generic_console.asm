@@ -70,6 +70,7 @@ cls1:	ld	(hl),32
 ; a = character to print
 ; e = raw
 generic_console_printc:
+	push	de
 	ld	hl,DISPLAY - 80
 	ld	de,80
 	inc	b
@@ -85,9 +86,13 @@ generic_console_printc_3:
 	inc	hl
 	add	hl,bc			;hl now points to address in display
 	add	hl,bc			;hl now points to address in display
-	ld	(hl),e
+	ld	(hl),e			;place character
 	inc	hl
+	pop	de			;get raw mode back into e
+	rr	e
+	jr	c,is_gfx
 	and	7
+is_gfx:
 	ld	(hl),a
 	set	0,(iy+1)		;iy -> ix, trigger interrupt to redraw screen
 	ret
