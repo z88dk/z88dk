@@ -191,12 +191,12 @@ IM2_DEFINE_ISR(isr) {}
 #define TABLE_ADDR             ((void*)(TABLE_HIGH_BYTE*UI_256))
 #define JUMP_POINT             ((unsigned char*)( (unsigned int)(JUMP_POINT_HIGH_BYTE*UI_256) + JUMP_POINT_HIGH_BYTE ))
 
-
 extern unsigned char circle_masked[];
+
+struct sp1_Rect full_screen = {0, 0, 32, 24};
 
 int main()
 {
-  struct sp1_Rect full_screen = {0, 0, 32, 24};
   struct sp1_ss  *circle_sprite;
   unsigned char x;
 
@@ -217,7 +217,6 @@ int main()
 
   sp1_AddColSpr(circle_sprite, SP1_DRAW_MASK2RB, SP1_TYPE_2BYTE, (int)circle_masked, 0);
 
-  intrinsic_ei();
   x=0;
   while(1) {
     sp1_MoveSprPix(circle_sprite, &full_screen, 0, x++, 4);
@@ -310,6 +309,8 @@ IM2_DEFINE_ISR(isr) {}
 
 extern unsigned char circle_masked[];
 
+struct sp1_Rect full_screen = {0, 0, 32, 24};
+
 typedef struct
 {
   struct sp1_ss  *sprite;
@@ -323,7 +324,6 @@ CIRCLE_SPRITE circle_sprites[NUM_SPRITES];
 
 int main()
 {
-  struct sp1_Rect full_screen = {0, 0, 32, 24};
   unsigned char i;
 
   memset( TABLE_ADDR, JUMP_POINT_HIGH_BYTE, 257 );
@@ -392,11 +392,23 @@ could realistically manipulate in a game.
 
 * Replace the masked sprite data and code with the simple LOADed sprite and code
 from the [first example](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_01_GettingStarted.md#program-1---sp1-circle-sprite). The simpler drawing algorithm is faster, so how many
-more sprites can it handle each frame? But what happens on screen?
+more sprites can it handle each frame? But what happens on screen?  
+(Note: Perhaps a simpler way to change to LOAD sprites is to use the SP1_DRAW_LOAD2LB 
+and SP1_DRAW_LOAD2RB draw functions in place of the MASK ones used.  These are still 
+2-byte draw functions that simply ignore the mask byte when the sprite is drawn; the 
+extra mask byte is wasted on this draw function but it does allow sprite graphics 
+defined with masks to be used).
 
 * Try changing the *circle_sprites[i].x_pos++* code which moves each sprite 1
 pixel to *circle_sprites[i].x_pos+=2*, to move them 2 pixels. How does that
 look? What about 3 pixels at a time?
+
+
+* Can you mix different sprite types on screen?  Try creating some sprites as MASK, 
+some as LOAD and some as OR.  Use the 2-byte draw functions for the LOAD and 
+[OR sprites](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/arch/zx/sp1.h#L177) 
+so that all the sprites can share the MASK sprite graphics.
+
 
 ## Conclusion
 
