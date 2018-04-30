@@ -17,14 +17,15 @@
         or a                        ; see if there are zero bytes available
         ret z                       ; if the count is zero, then return
 
+        ld hl, asci1RxCount
+        di
+        dec (hl)                    ; atomically decrement Rx count
         ld hl, (asci1RxOut)         ; get the pointer to place where we pop the Rx byte
+        ei
         ld a, (hl)                  ; get the Rx byte
 
         inc l                       ; move the Rx pointer low byte along, 0xFF rollover
         ld (asci1RxOut), hl         ; write where the next byte should be popped
-
-        ld hl, asci1RxCount
-        dec (hl)                    ; atomically decrement Rx count
 
         ld l, a                     ; put the byte in hl
         scf                         ; indicate char received
