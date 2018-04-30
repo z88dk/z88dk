@@ -7,7 +7,7 @@
 
 #include "die.h"
 #include "utarray.h"
-#include "utstring.h"
+#include "strutil.h"
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -42,15 +42,15 @@ typedef enum file_type
 //-----------------------------------------------------------------------------
 typedef struct symbol_s
 {
-	UT_string	*name;
-	char		 scope;
-	char		 type;
-	int			 value;
+	str_t	*name;
+	char	 scope;
+	char	 type;
+	int		 value;
 
 	struct section_s *section;		// weak
 
-	UT_string	*filename;
-	int			 line_nr;
+	str_t	*filename;
+	int		 line_nr;
 
 	struct symbol_s *next, *prev;
 } symbol_t;
@@ -63,17 +63,17 @@ extern void symbol_free(symbol_t *self);
 //-----------------------------------------------------------------------------
 typedef struct expr_s
 {
-	UT_string	*text;
-	char		 type;
-	int			 asmpc;
-	int			 patch_ptr;
+	str_t	*text;
+	char	 type;
+	int		 asmpc;
+	int		 patch_ptr;
 
 	struct section_s *section;		// weak
 
-	UT_string	*target_name;
+	str_t	*target_name;
 
-	UT_string	*filename;
-	int			 line_nr;
+	str_t	*filename;
+	int		 line_nr;
 
 	struct expr_s *next, *prev;
 } expr_t;
@@ -86,7 +86,7 @@ extern void expr_free(expr_t *self);
 //-----------------------------------------------------------------------------
 typedef struct section_s
 {
-	UT_string	*name;
+	str_t		*name;
 	UT_array	*data;
 	int			 org;
 	int			 align;
@@ -106,9 +106,9 @@ extern void section_free(section_t *self);
 //-----------------------------------------------------------------------------
 typedef struct objfile_s
 {
-	UT_string	*filename;
-	UT_string	*signature;
-	UT_string	*modname;
+	str_t		*filename;
+	str_t		*signature;
+	str_t		*modname;
 	int			 version;
 	int			 global_org;
 	UT_array	*externs;
@@ -127,9 +127,9 @@ extern void objfile_write(objfile_t *obj, FILE *fp);
 //-----------------------------------------------------------------------------
 typedef struct file_s
 {
-	UT_string	*filename;
-	UT_string	*signature;
-	file_type_e type;
+	str_t		*filename;
+	str_t		*signature;
+	file_type_e  type;
 	int			 version;
 
 	objfile_t	*objs;					// either one or multiple object files

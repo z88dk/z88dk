@@ -31,14 +31,13 @@ END
 
 check_bin_file("test.bin", pack("C*", 0, 1));
 z80nm("test.o", <<'END');
-
-File test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF11
   Name: test
-  Names:
-    L A $0000 lbl1 test.asm:1
-    L A $0001 lbl2 test.asm:2
-  Code: 2 bytes
+  Section "": 2 bytes
     C $0000: 00 01
+  Symbols:
+    L A $0000 lbl1 (section "") (file test.asm:1)
+    L A $0001 lbl2 (section "") (file test.asm:2)
 END
 
 unlink_testfiles();

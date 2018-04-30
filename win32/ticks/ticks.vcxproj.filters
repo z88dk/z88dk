@@ -33,9 +33,6 @@
     <ClCompile Include="..\..\src\ticks\debugger.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\ticks\disassembler.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\ticks\linenoise.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -46,6 +43,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\ticks\disassembler_alg.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ticks\memory.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

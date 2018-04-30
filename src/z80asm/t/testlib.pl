@@ -82,7 +82,7 @@ sub run {
 	$err //= '';
 	
 	$cmd .= " >test.stdout 2>test.stderr";
-	$cmd =~ s!/!\\!g if $IS_WIN32;
+#	$cmd =~ s!/!\\!g if $IS_WIN32;
 	
 	ok 1, $cmd;
 	ok !!$return == !!system($cmd), "exit value";

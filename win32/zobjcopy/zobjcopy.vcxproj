@@ -148,6 +148,7 @@
     <ClCompile Include="..\..\src\common\die.c" />
     <ClCompile Include="..\..\src\common\optparse.c" />
     <ClCompile Include="..\..\src\common\objfile.c" />
+    <ClCompile Include="..\..\src\common\strutil.c" />
     <ClCompile Include="..\..\src\zobjcopy\zobjcopy.c" />
   </ItemGroup>
   <ItemGroup>
@@ -159,6 +160,7 @@
     <ClInclude Include="..\..\ext\regex\utils.h" />
     <ClInclude Include="..\..\src\common\die.h" />
     <ClInclude Include="..\..\src\common\objfile.h" />
+    <ClInclude Include="..\..\src\common\strutil.h" />
     <ClInclude Include="..\..\src\zobjcopy\zobjcopy.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

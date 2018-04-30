@@ -10,3 +10,6 @@
 [submodule "ext/uthash"]
 	path = ext/uthash
 	url = https://github.com/troydhanson/uthash.git
+[submodule "ext/Unity"]
+	path = ext/Unity
+	url = https://github.com/ThrowTheSwitch/Unity.git

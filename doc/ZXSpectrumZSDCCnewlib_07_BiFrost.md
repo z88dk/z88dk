@@ -39,6 +39,21 @@ you require.
 
 ## Understanding BiFrost's Capabilities
 
+---
+
+**_This section introduces the BiFrost concept of 'tiles'. If you've already
+read the [SP1](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_02_SimpleMaskedSprite.md)
+part of this guide you'll know that SP1 also has the concept
+of 'tiles'. It's somewhat unfortunate and confusing that the two graphics
+libraries use the same term for different things. As we're about to see,
+BiFrost uses the term 'tile' for a 16x16 pixel graphical object which it can
+place on the screen. SP1 uses the term 'tile' for an 8x8 pixel character
+cell, a grid of which makes up the background image SP1 draws onto. If
+you're already familiar with SP1, make sure you keep the concepts of 'tiles'
+separate in your head. They're different entities in these two libraries._**
+
+---
+
 BiFrost places coloured _tiles_ within its display area. Although tiles can be
 animated and moved around to some extent, they're not the _sprite_ type of
 graphics which you might think of as floating freely around the screen. BiFrost

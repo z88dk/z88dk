@@ -594,7 +594,7 @@ static void print_hotspots()
     FILE  *fp;
 
     if ( hotspot == 0 ) return;
-    reset_zxnext_mmu();
+    memory_reset_paging();
     if ( (fp = fopen("hotspots", "w")) != NULL ) {
         for ( i = 0; i < max_hotspot_addr; i++) {
             if ( hotspots[i] != 0 ) {

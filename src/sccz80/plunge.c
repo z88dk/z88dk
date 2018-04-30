@@ -429,7 +429,6 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
     setstage(&before, &start);
     if (lval->is_const) {
         int doconst_oper = 0;
-
         /* constant on left not yet loaded */
         if (plnge1(heir, lval2))
             rvalue(lval2);
@@ -452,7 +451,10 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             }
             doconst_oper = 0; // No const operator for double
             dpush();
-            load_double_into_fa(lval);
+            load_double_into_fa(lval); // LHS 
+            if ( oper == zsub ) {
+                callrts("dswap");
+            }
         } else if ( lval2->val_type == KIND_DOUBLE && lval2->is_const == 0 ) { 
             doconst_oper = 0; // No const operator for double
             /* FA holds the right hand side */

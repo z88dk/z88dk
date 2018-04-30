@@ -22,4 +22,4 @@ test_rcm.bin: $(SOURCES)
 
 
 clean:
-	rm -f test*.bin $(OBJECTS) zcc_opt.def *~
+	rm -f test*.bin *.map $(OBJECTS) zcc_opt.def *~

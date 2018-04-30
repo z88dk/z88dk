@@ -150,15 +150,19 @@ clean: clean-bins
 
 clean-bins:
 	$(MAKE) -C src/appmake clean
+	$(MAKE) -C src/common clean
 	$(MAKE) -C src/copt clean
-	$(MAKE) -C src/ucpp clean
 	$(MAKE) -C src/cpp clean
+	$(MAKE) -C src/lstmanip clean
 	$(MAKE) -C src/sccz80 clean
+	$(MAKE) -C src/ticks clean
+	$(MAKE) -C src/ucpp clean
 	$(MAKE) -C src/z80asm clean
 	$(MAKE) -C src/z80nm clean
+	$(MAKE) -C src/z88dk-lib clean
 	$(MAKE) -C src/zcc clean
+	$(MAKE) -C src/zobjcopy clean
 	$(MAKE) -C src/zpragma clean
-	$(MAKE) -C src/ticks clean
 	$(MAKE) -C src/zx7 clean
 	$(MAKE) -C test clean
 	$(MAKE) -C testsuite clean
