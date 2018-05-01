@@ -6,7 +6,7 @@
 	url = https://github.com/skeeto/optparse.git
 [submodule "ext/regex"]
 	path = ext/regex
-	url = https://github.com/geoffmcl/regex.git
+	url = https://github.com/z88dk/regex.git
 [submodule "ext/uthash"]
 	path = ext/uthash
 	url = https://github.com/troydhanson/uthash.git
