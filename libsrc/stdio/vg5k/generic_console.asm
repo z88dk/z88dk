@@ -63,6 +63,8 @@ cls1:	ld	(hl),32
 	djnz	cls1
 	dec	c
 	jr	nz,cls0
+	set	0,(iy+1)		;iy -> ix, trigger interrupt to redraw screen
+	ld	(iy+0),1		;force an immediate redraw
 	ret
 
 ; c = x
@@ -106,7 +108,7 @@ generic_console_scrollup:
 	ld	bc, 80 * (CONSOLE_ROWS-1)
 	ldir
 	ex	de,hl
-	ld	(hl),0x80
+	ld	(hl),0x00
 	inc	hl
 	ld	a,(vg5k_attr)
 	ld	(hl),a
@@ -119,6 +121,8 @@ generic_console_scrollup_3:
 	ld	(hl),a
 	inc	hl
 	djnz	generic_console_scrollup_3
+	set	0,(iy+1)		;iy -> ix, trigger interrupt to redraw screen
+	ld	(iy+0),1		;force an immediate redraw
 	pop	bc
 	pop	de
 	ret

@@ -47,14 +47,13 @@ start:
 	xor	a
 	ld	(18434), a ;default character will be normal and black
 
-	ex		de,hl ; preserve HL
+	push    hl ; save HL
         ld      (start1+1),sp	;Save entry stack
         INCLUDE "crt/classic/crt_init_sp.asm"
         INCLUDE "crt/classic/crt_init_atexit.asm"
         call    crt0_init_bss
         ld      (exitsp),sp
 		
-	push    de ; save HL
 
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
@@ -64,7 +63,9 @@ IF DEFINED_USING_amalloc
 ENDIF
 
 
+	;di
         call    _main
+	;ei
 cleanup:
 ;
 ;       Deallocate memory which has been allocated here!
@@ -74,10 +75,10 @@ IF CRT_ENABLE_STDIO = 1
 	EXTERN	closeall
 	call	closeall
 ENDIF
-	pop     hl		; ..let's restore them !
-	ld	ix,$47FA
 start1:
         ld      sp,0
+	pop     hl		; ..let's restore them !
+	ld	iy,$47FA
         ret
 
 
