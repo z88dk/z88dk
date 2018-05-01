@@ -21,6 +21,7 @@ generic_console_set_inverse:
 	ret
 
 generic_console_set_paper:
+	jp	generic_console_set_ink
 	and	7
 	rlca
 	rlca
@@ -48,13 +49,9 @@ generic_console_set_ink:
 generic_console_cls:
 	ld	c,CONSOLE_ROWS
 	ld	hl, DISPLAY
-cls0:
-	ld	(hl),0x00
-	inc	hl
 	ld	a,(vg5k_attr)
-	ld	(hl),a
-	inc	hl
 	and	7
+cls0:
 	ld	b,CONSOLE_COLUMNS 
 cls1:	ld	(hl),32
 	inc	hl
@@ -72,6 +69,7 @@ cls1:	ld	(hl),32
 ; a = character to print
 ; e = raw
 generic_console_printc:
+	push	bc	;save coordinates
 	push	de
 	ld	hl,DISPLAY - 80
 	ld	de,80
@@ -80,23 +78,27 @@ generic_console_printc_1:
 	add	hl,de
 	djnz	generic_console_printc_1
 generic_console_printc_3:
-;	ld	(hl),0x00
-	inc	hl			;Skip first two bytes - define background colour
-	ld	e,a			;Save character
+	ld	d,a			;Save character
 	ld	a,(vg5k_attr)
-;	ld	(hl),a			;Set colour
-	inc	hl
+	add	hl,bc		
 	add	hl,bc			;hl now points to address in display
-	add	hl,bc			;hl now points to address in display
-	ld	(hl),e			;place character
+	ld	(hl),d			;place character
 	inc	hl
-	pop	de			;get raw mode back into e
-	rr	e
-	jr	c,is_gfx
-	and	7
+	pop	bc			;get raw mode back into e
+	rr	c
+	jr	nc,is_gfx
+	or	128
 is_gfx:
 	ld	(hl),a
-	set	0,(iy+1)		;iy -> ix, trigger interrupt to redraw screen
+	pop	hl			;get coordinates back
+	ld	e,a			;attribute
+	ld	a,h
+	and	a
+	jr	z,zrow
+	add	7
+	ld	h,a
+zrow:
+	call	0x0092			;call the rom to do the hardwork
 	ret
 
 
@@ -108,12 +110,8 @@ generic_console_scrollup:
 	ld	bc, 80 * (CONSOLE_ROWS-1)
 	ldir
 	ex	de,hl
-	ld	(hl),0x00
-	inc	hl
 	ld	a,(vg5k_attr)
-	ld	(hl),a
 	and	7
-	inc	hl
 	ld	b,CONSOLE_COLUMNS
 generic_console_scrollup_3:
 	ld	(hl),32
@@ -130,4 +128,4 @@ generic_console_scrollup_3:
 
 	SECTION		data_clib
 
-vg5k_attr:		defb	128+7	;White on black
+vg5k_attr:	defb	7	;White on black

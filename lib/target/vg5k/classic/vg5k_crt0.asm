@@ -32,7 +32,7 @@
                 defc    CRT_ORG_CODE  = 18953
         ENDIF   
 
-        defc    CONSOLE_COLUMNS = 39
+        defc    CONSOLE_COLUMNS = 40
         defc    CONSOLE_ROWS = 25
 
         defc    TAR__clib_exit_stack_size = 32
