@@ -553,5 +553,5 @@ void run_fileutil_xfread_wcount_str(void)
 
 void run_fileutil_xfseek(void)
 {
-	xfseek(stdin, 0, SEEK_END);	// dies
+	xfseek(NULL, 0, SEEK_END);	// dies
 }

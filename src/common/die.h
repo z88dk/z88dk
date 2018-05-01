@@ -6,6 +6,7 @@
 #pragma once
 
 #include <stdlib.h>
+#include <string.h>
 
 // error message and exit program
 extern void die(char *msg, ...);

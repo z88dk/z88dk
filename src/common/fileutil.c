@@ -48,8 +48,7 @@ static void add_open_file(FILE *stream, const char *filename)
 static char *get_filename(FILE *fp)
 {
 	init();
-	assert(fp);
-	size_t fno = fileno(fp);
+	size_t fno = fp ? fileno(fp) : -1;
 	if (fno >= utarray_len(open_files))
 		return "?";
 	else
