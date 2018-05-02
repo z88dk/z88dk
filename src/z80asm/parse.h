@@ -48,13 +48,13 @@ extern ParseCtx *ParseCtx_new(void);
 extern void ParseCtx_delete(ParseCtx *ctx);
 
 /* parse the given assembly file, return false if failed */
-extern bool parse_file(char *filename);
+extern bool parse_file(const char *filename);
 
 /* try to parse the current statement, return false if failed */
 extern bool parse_statement(ParseCtx *ctx);
 
 /* save the current scanner context and parse the given expression */
-extern struct Expr *parse_expr(char *expr_text);
+extern struct Expr *parse_expr(const char *expr_text);
 
 /* return new auto-label in strpool */
-extern char *autolabel(void);
+extern const char *autolabel(void);

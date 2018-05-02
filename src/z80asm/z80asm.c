@@ -18,7 +18,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include "zobjfile.h"
 #include "parse.h"
 #include "types.h"
-#include "strpool.h"
+#include "strutil.h"
 #include "symbol.h"
 #include <sys/stat.h>
 
@@ -48,8 +48,8 @@ char *reloctable = NULL, *relocptr = NULL;
 struct liblist *libraryhdr;
 
 /* local functions */
-static void query_assemble( char *src_filename );
-static void do_assemble( char *src_filename );
+static void query_assemble(const char *src_filename );
+static void do_assemble(const char *src_filename );
 
 /*-----------------------------------------------------------------------------
 *   Assemble one source file
@@ -60,7 +60,9 @@ static void do_assemble( char *src_filename );
 *----------------------------------------------------------------------------*/
 void assemble_file( char *filename )
 {
-    char *src_filename, *obj_filename, *src_dirname;
+	const char *src_filename;
+	const char *obj_filename;
+	const char *src_dirname;
 	bool load_obj_only;
 	Module *module;
 
@@ -83,7 +85,7 @@ void assemble_file( char *filename )
 			src_filename = filename;						/* use whatever extension was given */
 		}
 		else {
-			char *asm_filename = get_asm_filename(filename);
+			const char *asm_filename = get_asm_filename(filename);
 			if (file_exists(asm_filename)) {				/* file with .asm extension exists */
 				src_filename = asm_filename;
 			}
@@ -114,7 +116,7 @@ void assemble_file( char *filename )
 
     /* Create module data structures for new file */
 	module = set_cur_module( new_module() );
-	module->filename = strpool_add( src_filename );
+	module->filename = spool_add( src_filename );
 
 	/* Create error file */
 	remove(get_err_filename(src_filename));
@@ -140,11 +142,11 @@ void assemble_file( char *filename )
 *	Assemble file or load object module size if datestamp option was given
 *	and object file is up-to-date
 *----------------------------------------------------------------------------*/
-static void query_assemble( char *src_filename )
+static void query_assemble(const char *src_filename )
 {
     struct stat src_stat, obj_stat;
     int src_stat_result, obj_stat_result;
-	char *obj_filename = get_obj_filename( src_filename );
+	const char *obj_filename = get_obj_filename( src_filename );
 
     /* get time stamp of files, error if source not found */
     src_stat_result = stat( src_filename, &src_stat );		/* BUG_0033 */
@@ -172,10 +174,10 @@ static void query_assemble( char *src_filename )
 /*-----------------------------------------------------------------------------
 *	Assemble one file
 *----------------------------------------------------------------------------*/
-static void do_assemble( char *src_filename )
+static void do_assemble(const char *src_filename )
 {
     int start_errors = get_num_errors();     /* count errors in this source file */
-	char *obj_filename = get_obj_filename(src_filename);
+	const char *obj_filename = get_obj_filename(src_filename);
 
 	clear_macros();
 
@@ -229,10 +231,10 @@ static void do_assemble( char *src_filename )
 
 
 /* search library file name, return found name in strpool */
-char *GetLibfile( char *filename )
+const char *GetLibfile( const char *filename )
 {
     struct libfile *newlib;
-    char           *found_libfilename;
+	const char     *found_libfilename;
     int len;
 
     newlib = NewLibrary();

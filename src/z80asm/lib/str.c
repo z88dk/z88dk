@@ -41,7 +41,7 @@ char *stolower(char *str)
 	return str;
 }
 
-int stricompare(char *s1, char *s2)
+int stricompare(const char *s1, const char *s2)
 {
 	if (s1 == s2)   return 0;
 	if (s1 == NULL) return -1;
@@ -52,7 +52,7 @@ int stricompare(char *s1, char *s2)
 	return (int)(tolower(*s1) - tolower(*s2));
 }
 
-int strnicompare(char *s1, char *s2, size_t n)
+int strnicompare(const char *s1, const char *s2, size_t n)
 {
 	char c1, c2;
 
@@ -260,13 +260,13 @@ void Str_sync_len(Str *str)
 }
 
 /* set / append bytes */
-void Str_set_bytes(Str *str, char *source, int size)
+void Str_set_bytes(Str *str, const char *source, int size)
 {
 	Str_clear(str);
 	Str_append_bytes(str, source, size);
 }
 
-void Str_append_bytes(Str *str, char *source, int size)
+void Str_append_bytes(Str *str, const char *source, int size)
 {
 	/* expand string if needed */
 	Str_reserve(str, size);
@@ -278,25 +278,25 @@ void Str_append_bytes(Str *str, char *source, int size)
 }
 
 /* set / append string */
-void Str_set(Str *str, char *source)
+void Str_set(Str *str, const char *source)
 {
 	Str_clear(str);
 	Str_append(str, source);
 }
 
-void Str_append(Str *str, char *source)
+void Str_append(Str *str, const char *source)
 {
 	Str_append_bytes(str, source, strlen(source));
 }
 
 /* set / append substring */
-void Str_set_n(Str *str, char *source, int count)
+void Str_set_n(Str *str, const char *source, int count)
 {
 	Str_clear(str);
 	Str_append_n(str, source, count);
 }
 
-void Str_append_n(Str *str, char *source, int count)
+void Str_append_n(Str *str, const char *source, int count)
 {
 	int num_copy = strlen(source);
 
@@ -321,13 +321,13 @@ void Str_append_char(Str *str, char ch)
 }
 
 /* set / append with va_list argument */
-void Str_vsprintf(Str *str, char *format, va_list argptr)
+void Str_vsprintf(Str *str, const char *format, va_list argptr)
 {
 	Str_clear(str);
 	Str_append_vsprintf(str, format, argptr);
 }
 
-void Str_append_vsprintf(Str *str, char *format, va_list argptr)
+void Str_append_vsprintf(Str *str, const char *format, va_list argptr)
 {
 	int free_space;      /* may be negative */
 	int need_space;
@@ -363,7 +363,7 @@ void Str_append_vsprintf(Str *str, char *format, va_list argptr)
 }
 
 /* set / append with printf-like parameters */
-void Str_sprintf(Str *str, char *format, ...)
+void Str_sprintf(Str *str, const char *format, ...)
 {
 	va_list argptr;
 
@@ -372,7 +372,7 @@ void Str_sprintf(Str *str, char *format, ...)
 	va_end(argptr);
 }
 
-void Str_append_sprintf(Str *str, char *format, ...)
+void Str_append_sprintf(Str *str, const char *format, ...)
 {
 	va_list argptr;
 

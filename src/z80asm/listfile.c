@@ -16,7 +16,7 @@ Handle assembly listing and symbol table listing.
 #include "z80asm.h"
 #include "errors.h"
 #include "hist.h"
-#include "strpool.h"
+#include "strutil.h"
 #include "types.h"
 #include "codearea.h"
 
@@ -89,13 +89,13 @@ static void ListFile_fprintf( ListFile *self, char *msg, ... )
 /*-----------------------------------------------------------------------------
 *	open the list file
 *----------------------------------------------------------------------------*/
-void ListFile_open( ListFile *self, char *list_file )
+void ListFile_open( ListFile *self, const char *list_file )
 {
     /* close and discard any open list file */
     ListFile_close( self, false );
 
     /* open the file */
-    self->filename	= strpool_add( list_file );
+    self->filename	= spool_add( list_file );
     self->file		= xfopen( list_file, "w" );
     self->source_list_ended = false;
 
@@ -107,7 +107,7 @@ void ListFile_open( ListFile *self, char *list_file )
 	self->start_line_pos = 0;
 }
 
-void list_open( char *list_file )
+void list_open(const char *list_file )
 {
     if ( the_list == NULL )
     {
@@ -148,7 +148,7 @@ void list_close( bool keep_file )
 *	start output of list line
 *----------------------------------------------------------------------------*/
 void ListFile_start_line( ListFile *self, int address,
-                          char *source_file, int source_line_nr, char *line )
+	const char *source_file, int source_line_nr, const char *line )
 {
     if ( self->file != NULL && ! self->source_list_ended )
     {
@@ -164,7 +164,7 @@ void ListFile_start_line( ListFile *self, int address,
         self->address = address;
         Str_clear( self->bytes );
 
-        self->source_file = strpool_add( source_file );
+        self->source_file = spool_add( source_file );
         self->source_line_nr = source_line_nr;
 
         /* normalize the line end (BUG_0031) */
@@ -175,7 +175,7 @@ void ListFile_start_line( ListFile *self, int address,
 }
 
 void list_start_line( int address,
-                      char *source_file, int source_line_nr, char *line )
+	const char *source_file, int source_line_nr, const char *line )
 {
     if ( the_list != NULL )
     {

@@ -36,7 +36,7 @@ typedef struct MemBlock {
 	} flags;
 
     size_t		client_size;		/* size requested by client */
-    char	   *file;				/* source where allocated */
+	const char *file;				/* source where allocated */
     int			lineno;				/* line number where allocated */
 
     char		fence[FENCE_SIZE];	/* fence to detect underflow */
@@ -140,7 +140,7 @@ void m_alloc_init( void )
 /*-----------------------------------------------------------------------------
 *   Create a new MemBlock, return NULL on out of memory
 *----------------------------------------------------------------------------*/
-static MemBlock *new_block( size_t client_size, char *file, int lineno )
+static MemBlock *new_block( size_t client_size, const char *file, int lineno )
 {
     MemBlock *block;
     size_t    block_size;
@@ -221,7 +221,7 @@ error:
 /*-----------------------------------------------------------------------------
 *   malloc, calloc, strdup
 *----------------------------------------------------------------------------*/
-static void *m_alloc( size_t size, int fill, char *source, char *file, int lineno )
+static void *m_alloc( size_t size, int fill, const char *source, const char *file, int lineno )
 {
     MemBlock *block;
     void     *memptr;
@@ -253,7 +253,7 @@ void *m_malloc_compat( size_t size )
 	return m_malloc_(size, __FILE__, __LINE__); 
 }
 
-void *m_malloc_( size_t size, char *file, int lineno )
+void *m_malloc_( size_t size, const char *file, int lineno )
 {
 	return m_alloc( size, -1, NULL, file, lineno );
 }
@@ -263,17 +263,17 @@ void *m_calloc_compat( size_t num, size_t size )
 	return m_calloc_( num, size, __FILE__, __LINE__ );
 }
 
-void *m_calloc_( size_t num, size_t size, char *file, int lineno )
+void *m_calloc_( size_t num, size_t size, const char *file, int lineno )
 {
 	return m_alloc( num * size, 0, NULL, file, lineno );
 }
 
-char *m_strdup_compat( char *source )
+char *m_strdup_compat(const char *source )
 {
 	return m_strdup_( source, __FILE__, __LINE__ );
 }
 
-char *m_strdup_( char *source, char *file, int lineno )
+char *m_strdup_(const char *source, const char *file, int lineno )
 {
 	return (char *)m_alloc( strlen(source) + 1, -1, source, file, lineno );
 }

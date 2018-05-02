@@ -17,8 +17,8 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include "modlink.h"
 #include "options.h"
 #include "scan.h"
-#include "strpool.h"
 #include "str.h"
+#include "strutil.h"
 #include "sym.h"
 #include "symbol.h"
 #include "z80asm.h"
@@ -32,11 +32,11 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 struct libfile *NewLibrary( void );
 
 /* local functions */
-int LinkModule(char *filename, long fptr_base, StrHash *extern_syms);
-int LinkTracedModule( char *filename, long baseptr );
-int LinkLibModule(struct libfile *library, long curmodule, char *modname, StrHash *extern_syms);
+int LinkModule(const char *filename, long fptr_base, StrHash *extern_syms);
+int LinkTracedModule(const char *filename, long baseptr );
+int LinkLibModule(struct libfile *library, long curmodule, const char *modname, StrHash *extern_syms);
 void CreateBinFile(void);
-void ReadNames(char *filename, FILE *file);
+void ReadNames(const char *filename, FILE *file);
 void ReleaseLinkInfo( void );
 static void merge_modules(StrHash *extern_syms);
 
@@ -49,7 +49,7 @@ extern char *reloctable, *relocptr;
 struct linklist *linkhdr;
 int totaladdr, curroffset;
 
-static void ReadNames_1(char *filename, FILE *file, 
+static void ReadNames_1(const char *filename, FILE *file,
 						str_t *section_name, str_t *name, str_t *def_filename)
 {
     int scope, symbol_char;
@@ -96,13 +96,13 @@ static void ReadNames_1(char *filename, FILE *file,
 
 		// set symbol definition
 		if (sym) {
-			sym->filename = strpool_add(str_data(def_filename));
+			sym->filename = spool_add(str_data(def_filename));
 			sym->line_nr = line_nr;
 		}
     }
 }
 
-void ReadNames(char *filename, FILE *file)
+void ReadNames(const char *filename, FILE *file)
 {
 	str_t *section_name = str_new();
 	str_t *name = str_new();
@@ -118,10 +118,10 @@ void ReadNames(char *filename, FILE *file)
 
 
 /* set environment to compute expression */
-static void set_asmpc_env( Module *module, char *section_name,
-						   char *filename, int line_nr,
-						   int asmpc, 
-						   bool module_relative_addr )
+static void set_asmpc_env(Module *module, const char *section_name,
+	const char *filename, int line_nr,
+	int asmpc,
+	bool module_relative_addr)
 {
 	int base_addr, offset;
 
@@ -214,7 +214,7 @@ static void read_cur_module_exprs_1(ExprList *exprs, FILE *file, char *filename,
 			case 'L': expr->range = RANGE_DWORD;		break;
 			case '=': expr->range = RANGE_WORD;
 					  assert( str_len(target_name) > 0 );
-					  expr->target_name = strpool_add( str_data(target_name) );	/* define expression as EQU */
+					  expr->target_name = spool_add( str_data(target_name) );	/* define expression as EQU */
 					  break;
 			default:
 				error_not_obj_file( filename );
@@ -224,7 +224,7 @@ static void read_cur_module_exprs_1(ExprList *exprs, FILE *file, char *filename,
 			expr->section	= CURRENTSECTION;
 			expr->asmpc		= asmpc;
 			expr->code_pos	= code_pos;
-			expr->filename	= strpool_add( str_data(source_filename) );
+			expr->filename	= spool_add( str_data(source_filename) );
 			expr->line_nr	= line_nr;
 			expr->listpos	= -1;
 
@@ -720,7 +720,6 @@ void link_modules( void )
 {
     Module *module, *first_obj_module;
 	ModuleListElem *iter;
-    char *obj_filename;
 	ExprList *exprs = NULL;
 	StrHash *extern_syms = OBJ_NEW(StrHash);
 
@@ -757,7 +756,7 @@ void link_modules( void )
 		set_error_module(CURRENTMODULE->modname);
 
 		/* overwrite '.asm' extension with * '.o' */
-		obj_filename = get_obj_filename(CURRENTMODULE->filename);
+		const char *obj_filename = get_obj_filename(CURRENTMODULE->filename);
 
 		/* open relocatable file for reading */
 		if (!check_object_file(obj_filename))
@@ -828,7 +827,7 @@ void link_modules( void )
 
 
 
-static int LinkModule_1(char *filename, long fptr_base, str_t *section_name, StrHash *extern_syms)
+static int LinkModule_1(const char *filename, long fptr_base, str_t *section_name, StrHash *extern_syms)
 {
     long fptr_namedecl, fptr_modname, fptr_modcode, fptr_libnmdecl;
     int code_size;
@@ -888,15 +887,15 @@ static int LinkModule_1(char *filename, long fptr_base, str_t *section_name, Str
 		if (fptr_libnmdecl != -1)
 		{
 			str_t *name = str_new();
-			char *name_p;
+			const char *name_p;
 			long p;
 
 			for (p = fptr_libnmdecl; p < fptr_modname;) {
 				fseek(file, fptr_base + p, SEEK_SET);			/* set file pointer to point at external name declaration */
 				xfread_bcount_str(name, file);					/* read library reference name */
 				p += 1 + str_len(name);							/* point to next name */
-				name_p = strpool_add(str_data(name));
-				StrHash_set(&extern_syms, name_p, name_p);		/* remember all extern references */
+				name_p = spool_add(str_data(name));
+				StrHash_set(&extern_syms, name_p, (void*)name_p);		/* remember all extern references */
 			}
 			str_free(name);
 		}
@@ -907,7 +906,7 @@ static int LinkModule_1(char *filename, long fptr_base, str_t *section_name, Str
     return LinkTracedModule( filename, fptr_base );       /* Remember module for pass2 */
 }
 
-int LinkModule(char *filename, long fptr_base, StrHash *extern_syms)
+int LinkModule(const char *filename, long fptr_base, StrHash *extern_syms)
 {
 	str_t *section_name = str_new();
 	int ret = LinkModule_1(filename, fptr_base, section_name, extern_syms);
@@ -917,7 +916,7 @@ int LinkModule(char *filename, long fptr_base, StrHash *extern_syms)
 
 
 int
-LinkLibModule(struct libfile *library, long curmodule, char *modname, StrHash *extern_syms)
+LinkLibModule(struct libfile *library, long curmodule, const char *modname, StrHash *extern_syms)
 {
     Module *tmpmodule, *lib_module;
     int flag;
@@ -926,7 +925,7 @@ LinkLibModule(struct libfile *library, long curmodule, char *modname, StrHash *e
 
 	/* create new module to link library */
 	lib_module = set_cur_module( new_module() );
-	lib_module->modname = strpool_add( modname );
+	lib_module->modname = spool_add( modname );
 
     if ( opts.verbose )
         printf( "Linking library module '%s'\n", modname );
@@ -943,7 +942,7 @@ CreateBinFile( void )
 {
 	FILE *binaryfile, *inital_binaryfile;
 	FILE *relocfile, *initial_relocfile;
-	char *filename;
+	const char *filename;
 	bool is_relocatable = ( opts.relocatable && totaladdr != 0 );
 
     if ( opts.bin_file )        /* use predined output filename from command line */
@@ -995,7 +994,7 @@ CreateBinFile( void )
 
 
 int
-LinkTracedModule( char *filename, long baseptr )
+LinkTracedModule(const char *filename, long baseptr )
 {
     struct linkedmod *newm;
     char *fname;
@@ -1063,11 +1062,12 @@ ReleaseLinkInfo( void )
 static inline int sym_first(int c) { return c == '_' || isalpha(c); }
 static inline int sym_next(int c)  { return c == '_' || isalnum(c); }
 
-static void replace_names(Str *result, char *input, StrHash *map)
+static void replace_names(Str *result, const char *input, StrHash *map)
 {
 	STR_DEFINE(key, STR_SIZE);
-	char *elem;
-	char *p0, *p1;
+	const char *elem;
+	const char *p0;
+	const char *p1;
 	Str_clear(result);
 
 	p0 = input;
@@ -1077,7 +1077,7 @@ static void replace_names(Str *result, char *input, StrHash *map)
 			while (*p1 && sym_next(*p1))
 				p1++;
 			Str_set_n(key, p0, p1 - p0);
-			elem = StrHash_get(map, Str_data(key));
+			elem = (const char*)StrHash_get(map, Str_data(key));
 			if (elem)
 				Str_append(result, (char *)elem);
 			else
@@ -1102,7 +1102,8 @@ static void rename_module_local_symbols(Module *module)
 	StrHashElem *name_it;
 	Expr *expr;
 	ExprListElem *expr_it;
-	char *old_name, *value;
+	const char *old_name;
+	const char *value;
 	STR_DEFINE(new_name, STR_SIZE);
 	STR_DEFINE(new_text, STR_SIZE);
 
@@ -1110,14 +1111,14 @@ static void rename_module_local_symbols(Module *module)
 	for (sym_it = SymbolHash_first(module->local_symtab); sym_it != NULL; sym_it = SymbolHash_next(sym_it)) {
 		sym = (Symbol *)sym_it->value;
 
-		old_name = strpool_add(sym->name);
+		old_name = spool_add(sym->name);
 		Str_sprintf(new_name, "%s_%s", module->modname, old_name);
-		StrHash_set(&old_syms, old_name, strpool_add(Str_data(new_name)));
+		StrHash_set(&old_syms, old_name, (void*)spool_add(Str_data(new_name)));
 	}
 
 	/* change symbol names */
 	for (name_it = StrHash_first(old_syms); name_it != NULL; name_it = StrHash_next(name_it)) {
-		value = strpool_add((char *)name_it->value);
+		value = spool_add(name_it->value);
 
 		sym = SymbolHash_extract(module->local_symtab, name_it->key);
 		sym->name = value;
@@ -1134,7 +1135,7 @@ static void rename_module_local_symbols(Module *module)
 
 		if (expr->target_name) {
 			replace_names(new_text, expr->target_name, old_syms);
-			expr->target_name = strpool_add(Str_data(new_text));
+			expr->target_name = spool_add(Str_data(new_text));
 		}
 	}
 
@@ -1238,10 +1239,9 @@ static void touch_symbols()
 static void create_extern_symbols(StrHash *extern_syms)
 {
 	StrHashElem *elem;
-	char *name;
 
 	for (elem = StrHash_first(extern_syms); elem != NULL; elem = StrHash_next(elem)) {
-		name = elem->key;
+		const char *name = elem->key;
 		if (!find_local_symbol(name) && !find_global_symbol(name))
 			declare_extern_symbol(name);
 	}

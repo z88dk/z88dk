@@ -34,7 +34,7 @@ Manage the code area in memory
 *   Named Section of code, introduced by "SECTION" keyword
 *----------------------------------------------------------------------------*/
 CLASS( Section )
-	char		*name;				// name of section, kept in strpool
+	const char	*name;				// name of section, kept in strpool
 	int			 addr;				// start address of this section,
 									// computed by sections_alloc_addr()
     int			 origin;			// ORG address of section, -1 if not defined
@@ -76,7 +76,7 @@ extern int get_section_size( Section *section );
 extern int get_sections_size( void );
 
 /* get section by name, creates a new section if new name; make it the current section */
-extern Section *new_section( char *name );
+extern Section *new_section(const char *name );
 
 /* get/set current section */
 extern Section *get_cur_section( void );
@@ -162,7 +162,7 @@ extern bool fwrite_module_code(FILE *file, int* p_code_size);
 /*-----------------------------------------------------------------------------
 *   write whole code area to an open file
 *----------------------------------------------------------------------------*/
-extern void fwrite_codearea( char *filename, FILE **pbinfile, FILE **prelocfile );
+extern void fwrite_codearea(const char *filename, FILE **pbinfile, FILE **prelocfile );
 
 /*-----------------------------------------------------------------------------
 *   Assembly directives

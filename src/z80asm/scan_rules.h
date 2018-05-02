@@ -3716,7 +3716,7 @@ static const short _lexer_eof_trans[] = {
 static const int lexer_start = 38;
 static const int lexer_error = 0;
 static const int lexer_en_main = 38;
-static void set_scan_buf( char *text, bool _at_bol )
+static void set_scan_buf( const char *text, bool _at_bol )
 {
  Str_set( input_buf, text );
  p = Str_data(input_buf);

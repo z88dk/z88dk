@@ -23,7 +23,7 @@ Handle object file contruction, reading and writing
 /*-----------------------------------------------------------------------------
 *   Write current module to object file - object file name is computed
 *----------------------------------------------------------------------------*/
-extern void write_obj_file( char *src_filename );
+extern void write_obj_file(const char *src_filename );
 
 /*-----------------------------------------------------------------------------
 *   Object file class
@@ -36,8 +36,8 @@ CLASS( OFile )
 	bool	 writing;			/* true if writing a new object file,
 								   false if reading */
 
-	char	*filename;			/* object file name, in strpool */
-	char	*modname;			/* module name, in strpool */
+	const char *filename;		/* object file name, in strpool */
+	const char *modname;		/* module name, in strpool */
 
 	/* all file pointers are -1 if not defined */
 	long	 modname_ptr;		/* offset in file to Module Name */
@@ -54,7 +54,7 @@ END_CLASS;
 /* test if a object file exists and is the correct version, return object if yes
    return NULL if not. 
    Object needs to be deleted by caller by OBJ_DELETE() */
-extern OFile *OFile_test_file( char *filename );
+extern OFile *OFile_test_file(const char *filename );
 
 /* read object file header from within an open library file.
    Return NULL if invalid object file or not the correct version.
@@ -66,13 +66,13 @@ extern OFile *OFile_read_header( FILE *file, size_t start_ptr );
    Return NULL if invalid object file or not the correct version.
    Object needs to be deleted by caller by OBJ_DELETE()
    Keeps the object file open */
-extern OFile *OFile_open_read( char *filename );
+extern OFile *OFile_open_read(const char *filename );
 extern void   OFile_close( OFile *self );
 
 /* return static ByteArray with binary contents of the given object file,
    return NULL if input file is not an object, wrong version, or does not exist
    NOTE: not reentrant, reuses array on each call */
-extern ByteArray *read_obj_file_data( char *filename );
+extern ByteArray *read_obj_file_data(const char *filename );
 
 /*-----------------------------------------------------------------------------
 *   Module interface to object files
@@ -80,13 +80,13 @@ extern ByteArray *read_obj_file_data( char *filename );
 
 /* Updates current module name and size, if object file of given source is valid
    load module name and size, when assembling with -d and up-to-date */
-extern bool objmodule_loaded( char *obj_filename);
+extern bool objmodule_loaded(const char *obj_filename);
 
 // check if the given filename exists and is an object file of the correct version
-extern bool check_object_file(char *obj_filename);
+extern bool check_object_file(const char *obj_filename);
 
 // worker
-extern bool check_obj_lib_file(char *filename,
+extern bool check_obj_lib_file(const char *filename,
 	char *signature,
-	void(*error_file)(char*), 
-	void(*error_version)(char*,int,int));	
+	void(*error_file)(const char*),
+	void(*error_version)(const char*,int,int));

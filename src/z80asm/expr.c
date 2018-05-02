@@ -17,7 +17,7 @@ see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 #include "init.h"
 #include "model.h"
 #include "strhash.h"
-#include "strpool.h"
+#include "strutil.h"
 #include "sym.h"
 #include "symtab.h"
 #include <assert.h>
@@ -127,7 +127,7 @@ static long _calc_power(long base, long exp)
 static StrHash *operator_hash;
 
 /* compute hash key */
-static char *operator_hash_key( tokid_t tok, op_type_t op_type )
+static const char *operator_hash_key( tokid_t tok, op_type_t op_type )
 {
 	char key[3];		/* byte 1 = tok; byte 2 = op_type; byte 3 = '\0' */
 
@@ -136,13 +136,13 @@ static char *operator_hash_key( tokid_t tok, op_type_t op_type )
 	assert( op_type > 0 && op_type < 256 );
 	key[0] = (char) tok; key[1] = (char) op_type; key[2] = '\0';
 
-	return strpool_add(key);
+	return spool_add(key);
 }
 
 /* init operator_hash - create one Operator for each, add to hash table */
 static void init_operator_hash(void)
 {
-	char *key;
+	const char *key;
 
 #define OPERATOR(_operation, _tok, _type, _prec, _assoc, _args, _calc)		\
 	{																		\
@@ -172,7 +172,7 @@ static void fini_operator_hash(void)
 /* get the operator descriptor for the given (tok, op_type) */
 Operator *Operator_get( tokid_t tok, op_type_t op_type )
 {
-	char *key;
+	const char *key;
 
 	init_module();
 	key = operator_hash_key( tok, op_type );

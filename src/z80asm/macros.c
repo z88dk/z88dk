@@ -12,7 +12,7 @@ Assembly macros.
 #include "alloc.h"
 #include "errors.h"
 #include "str.h"
-#include "strpool.h"
+#include "strutil.h"
 #include "utarray.h"
 #include "uthash.h"
 #include "utstring.h"
@@ -29,7 +29,7 @@ Assembly macros.
 //-----------------------------------------------------------------------------
 typedef struct DefMacro
 {
-	char		*name;					// string kept in strpool.h
+	const char	*name;					// string kept in strpool.h
 	UT_array	*params;				// list of formal parameters
 	UT_string	*text;					// replacement text
 	UT_hash_handle hh;      			// hash table
@@ -49,7 +49,7 @@ static DefMacro *DefMacro_add(char *name)
 		return NULL;		// duplicate
 
 	elem = m_new(DefMacro);
-	elem->name = strpool_add(name);
+	elem->name = spool_add(name);
 	utarray_new(elem->params, &ut_str_icd);
 	utstring_new(elem->text);
 	HASH_ADD_KEYPTR(hh, def_macros, elem->name, strlen(name), elem);

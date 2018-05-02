@@ -18,8 +18,8 @@ Handle object file contruction, reading and writing
 #include "options.h"
 #include "model.h"
 #include "zobjfile.h"
-#include "strpool.h"
 #include "str.h"
+#include "strutil.h"
 
 #include <assert.h>
 
@@ -39,7 +39,8 @@ static long write_expr( FILE *fp )
 	STR_DEFINE(last_sourcefile, STR_SIZE);		/* keep last source file referred to in object */
 	ExprListElem *iter;
     Expr *expr;
-	char range, *target_name;
+	char range;
+	const char *target_name;
 	long expr_ptr;
 
 	if ( ExprList_empty( CURRENTMODULE->exprs ) )	/* no expressions */
@@ -214,9 +215,9 @@ static long write_code( FILE *fp )
 		return -1;
 }
 
-void write_obj_file( char *source_filename )
+void write_obj_file(const char *source_filename )
 {
-	char *obj_filename;
+	const char *obj_filename;
 	FILE *fp;
 	long header_ptr, modname_ptr, expr_ptr, symbols_ptr, externsym_ptr, code_ptr;
 	int i;
@@ -334,7 +335,7 @@ OFile *OFile_read_header( FILE *file, size_t start_ptr )
     /* read module name */
     fseek( file, start_ptr + self->modname_ptr, SEEK_SET );
     xfread_bcount_str(modname, file);
-    self->modname		= strpool_add(str_data(modname));
+    self->modname		= spool_add(str_data(modname));
 
 	str_free(modname);
 
@@ -347,7 +348,7 @@ OFile *OFile_read_header( FILE *file, size_t start_ptr )
 *   Object needs to be deleted by caller by OBJ_DELETE()
 *   Keeps the object file open
 *----------------------------------------------------------------------------*/
-static OFile *_OFile_open_read( char *filename, bool test_mode )
+static OFile *_OFile_open_read(const char *filename, bool test_mode )
 {
 	OFile *self;
 	FILE *file;
@@ -371,13 +372,13 @@ static OFile *_OFile_open_read( char *filename, bool test_mode )
 
 		return NULL;
 	}
-	self->filename = strpool_add( filename );
+	self->filename = spool_add( filename );
 
 	/* return object */
 	return self;
 }
 
-OFile *OFile_open_read( char *filename )
+OFile *OFile_open_read(const char *filename )
 {
 	return _OFile_open_read( filename, false );
 }
@@ -399,7 +400,7 @@ void OFile_close( OFile *self )
 *   return NULL if not. 
 *   Object needs to be deleted by caller by OBJ_DELETE()
 *----------------------------------------------------------------------------*/
-OFile *OFile_test_file( char *filename )
+OFile *OFile_test_file(const char *filename )
 {
 	return _OFile_open_read( filename, true );
 }
@@ -409,7 +410,7 @@ OFile *OFile_test_file( char *filename )
 *	return NULL if input file is not an object, or does not exist
 *	NOTE: not reentrant, reuses array on each call
 *----------------------------------------------------------------------------*/
-ByteArray *read_obj_file_data( char *filename )
+ByteArray *read_obj_file_data(const char *filename )
 {
 	static ByteArray *buffer = NULL;
 	size_t	 size;
@@ -440,7 +441,7 @@ ByteArray *read_obj_file_data( char *filename )
 *	Updates current module name and size, if given object file is valid
 *	Load module name and size, when assembling with -d and up-to-date
 *----------------------------------------------------------------------------*/
-static bool objmodule_loaded_1( char *obj_filename, str_t *section_name )
+static bool objmodule_loaded_1(const char *obj_filename, str_t *section_name )
 {
 	int code_size;
 	OFile *ofile;
@@ -483,7 +484,7 @@ static bool objmodule_loaded_1( char *obj_filename, str_t *section_name )
         return false;
 }
 
-bool objmodule_loaded(char *obj_filename)
+bool objmodule_loaded(const char *obj_filename)
 {
 	str_t *section_name = str_new();
 	bool ret = objmodule_loaded_1(obj_filename, section_name);
@@ -491,7 +492,7 @@ bool objmodule_loaded(char *obj_filename)
 	return ret;
 }
 
-bool check_object_file(char *obj_filename)
+bool check_object_file(const char *obj_filename)
 {
 	return check_obj_lib_file(
 		obj_filename, 
@@ -500,10 +501,10 @@ bool check_object_file(char *obj_filename)
 		error_obj_file_version);
 }
 
-bool check_obj_lib_file(char *filename,
+bool check_obj_lib_file(const char *filename,
 	char *signature,
-	void(*error_file)(char*),
-	void(*error_version)(char*, int, int))
+	void(*error_file)(const char*),
+	void(*error_version)(const char*, int, int))
 {
 	FILE *fp = NULL;
 

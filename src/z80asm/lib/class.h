@@ -77,8 +77,8 @@ struct Object;
         /* header, equal in all classes */                                  \
         struct {                            /* private attributes */        \
             void (*delete_ptr)(struct Object *);                       		\
-            /* destructor function */       \
-            char *name;                     /* class name */                \
+            /* destructor function */										\
+            const char *name;               /* class name */                \
             bool autodelete;                /* false to skip cleanup */     \
             LIST_ENTRY(T) entries;          /* D-Linked list of objs */     \
         } _class;                                                           \
@@ -148,8 +148,8 @@ struct Object;
 /*-----------------------------------------------------------------------------
 *   Private interface
 *----------------------------------------------------------------------------*/
-extern void _register_obj( struct Object *obj,
-                           void ( *delete_ptr )( struct Object * ),
-                           char *name );
+extern void _register_obj(struct Object *obj,
+	void(*delete_ptr)(struct Object *),
+	const char *name);
 extern void _update_register_obj( struct Object *obj );
 extern void _deregister_obj( struct Object *obj );

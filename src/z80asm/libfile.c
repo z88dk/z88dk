@@ -21,7 +21,7 @@ char Z80libhdr[] = "Z80LMF" OBJ_VERSION;
 /*-----------------------------------------------------------------------------
 *	define a library file name from the command line
 *----------------------------------------------------------------------------*/
-static char *search_libfile( char *filename )
+static const char *search_libfile(const char *filename )
 {
 	if ( filename != NULL && *filename != '\0' )	/* not empty */
 		return get_lib_filename( filename );		/* add '.lib' extension */
@@ -35,13 +35,13 @@ static char *search_libfile( char *filename )
 /*-----------------------------------------------------------------------------
 *	make library from list of files; convert each source to object file name 
 *----------------------------------------------------------------------------*/
-void make_library(char *lib_filename, UT_array *src_files)
+void make_library(const char *lib_filename, UT_array *src_files)
 {
 	ByteArray *obj_file_data;
 	FILE	*lib_file;
-	char	*obj_filename;
+	const char *obj_filename;
 	size_t	 fptr, obj_size;
-	char **pfile;
+	const char **pfile;
 
 	lib_filename = search_libfile(lib_filename);
 	if ( lib_filename == NULL )
@@ -87,7 +87,7 @@ void make_library(char *lib_filename, UT_array *src_files)
 	xfclose( lib_file );
 }
 
-bool check_library_file(char *src_filename)
+bool check_library_file(const char *src_filename)
 {
 	return check_obj_lib_file(
 		get_lib_filename(src_filename),

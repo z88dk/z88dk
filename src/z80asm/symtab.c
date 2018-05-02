@@ -58,7 +58,7 @@ void SymbolHash_cat( SymbolHash **ptarget, SymbolHash *source )
 *   return pointer to found symbol in a symbol tree, otherwise NULL if not found
 *	marks looked-up symbol as is_touched
 *----------------------------------------------------------------------------*/
-Symbol *find_symbol( char *name, SymbolHash *symtab )
+Symbol *find_symbol(const char *name, SymbolHash *symtab )
 {
     Symbol *sym;
 
@@ -73,12 +73,12 @@ Symbol *find_symbol( char *name, SymbolHash *symtab )
     return sym;
 }
 
-Symbol *find_local_symbol( char *name )
+Symbol *find_local_symbol(const char *name )
 {
     return find_symbol( name, CURRENTMODULE->local_symtab );
 }
 
-Symbol *find_global_symbol( char *name )
+Symbol *find_global_symbol(const char *name )
 {
     return find_symbol( name, global_symtab );
 }
@@ -86,7 +86,7 @@ Symbol *find_global_symbol( char *name )
 /*-----------------------------------------------------------------------------
 *   create a symbol in the given table, error if already defined
 *----------------------------------------------------------------------------*/
-Symbol *_define_sym(char *name, long value, sym_type_t type, sym_scope_t scope,
+Symbol *_define_sym(const char *name, long value, sym_type_t type, sym_scope_t scope,
                      Module *module, Section *section,
 					 SymbolHash **psymtab )
 {
@@ -127,7 +127,7 @@ Symbol *_define_sym(char *name, long value, sym_type_t type, sym_scope_t scope,
 *   search for symbol in either local tree or global table,
 *   create undefined symbol if not found, return symbol
 *----------------------------------------------------------------------------*/
-Symbol *get_used_symbol( char *name )
+Symbol *get_used_symbol(const char *name )
 {
     Symbol     *sym;
 
@@ -152,7 +152,7 @@ Symbol *get_used_symbol( char *name )
 /*-----------------------------------------------------------------------------
 *   define a static symbol (from -D command line)
 *----------------------------------------------------------------------------*/
-Symbol *define_static_def_sym( char *name, long value )
+Symbol *define_static_def_sym(const char *name, long value )
 {
     Symbol *sym = _define_sym( name, value, TYPE_CONSTANT, SCOPE_LOCAL, 
 						NULL, get_first_section(NULL), 
@@ -165,7 +165,7 @@ Symbol *define_static_def_sym( char *name, long value )
 /*-----------------------------------------------------------------------------
 *   define a global static symbol (e.g. ASMSIZE, ASMTAIL)
 *----------------------------------------------------------------------------*/
-Symbol *define_global_def_sym( char *name, long value )
+Symbol *define_global_def_sym(const char *name, long value )
 {
 	Symbol* sym = _define_sym(name, value, TYPE_CONSTANT, SCOPE_PUBLIC,
 						NULL, get_first_section(NULL), 
@@ -177,7 +177,7 @@ Symbol *define_global_def_sym( char *name, long value )
 /*-----------------------------------------------------------------------------
 *   define a local DEF symbol (e.g. DEFINE)
 *----------------------------------------------------------------------------*/
-Symbol *define_local_def_sym( char *name, long value )
+Symbol *define_local_def_sym(const char *name, long value )
 {
 	return _define_sym(name, value, TYPE_CONSTANT, SCOPE_LOCAL,
 						CURRENTMODULE, CURRENTSECTION, 
@@ -187,14 +187,14 @@ Symbol *define_local_def_sym( char *name, long value )
 /*-----------------------------------------------------------------------------
 *   define a new symbol in the local or global tabs
 *----------------------------------------------------------------------------*/
-Symbol *define_local_sym(char *name, long value, sym_type_t type)
+Symbol *define_local_sym(const char *name, long value, sym_type_t type)
 {
 	return _define_sym(name, value, type, SCOPE_LOCAL,
 						CURRENTMODULE, CURRENTSECTION, 
 						& CURRENTMODULE->local_symtab );
 }
 
-Symbol *define_global_sym(char *name, long value, sym_type_t type)
+Symbol *define_global_sym(const char *name, long value, sym_type_t type)
 {
 	return _define_sym(name, value, type, SCOPE_PUBLIC,
 						CURRENTMODULE, CURRENTSECTION, 
@@ -289,7 +289,7 @@ void remove_all_global_syms( void )
 *   b) if in the local table but not yet defined, create now (was a reference)
 *   c) else error REDEFINED
 *----------------------------------------------------------------------------*/
-static Symbol *define_local_symbol(char *name, long value, sym_type_t type)
+static Symbol *define_local_symbol(const char *name, long value, sym_type_t type)
 {
     Symbol *sym;
 
@@ -328,7 +328,7 @@ static Symbol *define_local_symbol(char *name, long value, sym_type_t type)
 *   c) if declared global/extern and defined -> error REDEFINED
 *   d) if in global table and not global/extern -> define a new local symbol
 *----------------------------------------------------------------------------*/
-Symbol *define_symbol(char *name, long value, sym_type_t type)
+Symbol *define_symbol(const char *name, long value, sym_type_t type)
 {
     Symbol     *sym;
 
@@ -360,7 +360,7 @@ Symbol *define_symbol(char *name, long value, sym_type_t type)
 /*-----------------------------------------------------------------------------
 *   update a symbol value, used to compute EQU symbols
 *----------------------------------------------------------------------------*/
-void update_symbol( char *name, long value, sym_type_t type )
+void update_symbol(const char *name, long value, sym_type_t type )
 {
     Symbol *sym;
 
@@ -382,7 +382,7 @@ void update_symbol( char *name, long value, sym_type_t type )
 /*-----------------------------------------------------------------------------
 *   declare a GLOBAL symbol
 *----------------------------------------------------------------------------*/
-void declare_global_symbol(char *name)
+void declare_global_symbol(const char *name)
 {
 	Symbol     *sym, *global_sym;
 
@@ -441,7 +441,7 @@ void declare_global_symbol(char *name)
 /*-----------------------------------------------------------------------------
 *   declare a PUBLIC symbol
 *----------------------------------------------------------------------------*/
-void declare_public_symbol(char *name)
+void declare_public_symbol(const char *name)
 {
 	Symbol     *sym, *global_sym;
 
@@ -505,7 +505,7 @@ void declare_public_symbol(char *name)
 /*-----------------------------------------------------------------------------
 *   declare an EXTERN symbol
 *----------------------------------------------------------------------------*/
-void declare_extern_symbol(char *name)
+void declare_extern_symbol(const char *name)
 {
 	Symbol     *sym, *ext_sym;
 
@@ -571,7 +571,7 @@ void declare_extern_symbol(char *name)
 /*-----------------------------------------------------------------------------
 *   generate output files with lists of symbols
 *----------------------------------------------------------------------------*/
-static void _write_symbol_file(char *filename, Module *module, bool(*cond)(Symbol *sym),
+static void _write_symbol_file(const char *filename, Module *module, bool(*cond)(Symbol *sym),
 							   char *prefix, bool type_flag) 
 {
 	FILE *file;

@@ -49,25 +49,25 @@ DEF_CLASS_HASH(T, bool ignore_case);	// ignore_case = true for case-insensitive
 																			\
 	/* add new key/value to the list, create new entry if new key, */		\
 	/* overwrite if key exists */											\
-	extern void T##Hash_set( T##Hash **pself, char *key, T *obj );			\
+	extern void T##Hash_set( T##Hash **pself, const char *key, T *obj );	\
 																			\
 	/* retrive value for a given key, return NULL if not found */			\
-	extern T *T##Hash_get( T##Hash *self, char *key );						\
+	extern T *T##Hash_get( T##Hash *self, const char *key );				\
 																			\
 	/* Check if a key exists in the hash */									\
-	extern bool T##Hash_exists( T##Hash *self, char *key );					\
+	extern bool T##Hash_exists( T##Hash *self, const char *key );			\
 																			\
 	/* Remove element from hash if found */									\
-	extern void T##Hash_remove( T##Hash *self, char *key );					\
+	extern void T##Hash_remove( T##Hash *self, const char *key );			\
 																			\
 	/* Extract element from hash if found, return element, undefine key in hash */	\
-	extern T *T##Hash_extract( T##Hash *self, char *key );					\
+	extern T *T##Hash_extract( T##Hash *self, const char *key );			\
 																			\
 	/* Remove all entries */												\
 	extern void T##Hash_remove_all( T##Hash *self );						\
 																			\
 	/* Find a hash entry */													\
-	extern T##HashElem *T##Hash_find( T##Hash *self, char *key );			\
+	extern T##HashElem *T##Hash_find( T##Hash *self, const char *key );		\
 																			\
 	/* Delete a hash entry if not NULL */									\
 	extern void T##Hash_remove_elem( T##Hash *self, T##HashElem *elem );	\
@@ -137,7 +137,7 @@ DEF_CLASS_HASH(T, bool ignore_case);	// ignore_case = true for case-insensitive
 	}																		\
 																			\
 	/* find a hash entry */													\
-	T##HashElem *T##Hash_find( T##Hash *self, char *key )					\
+	T##HashElem *T##Hash_find( T##Hash *self, const char *key )				\
 	{																		\
 		if ( self == NULL || key == NULL )									\
 			return NULL;													\
@@ -177,7 +177,7 @@ DEF_CLASS_HASH(T, bool ignore_case);	// ignore_case = true for case-insensitive
 	}																		\
 																			\
 	/* set key/value, delete old value if any */							\
-	void T##Hash_set( T##Hash **pself, char *key, T *obj )					\
+	void T##Hash_set( T##Hash **pself, const char *key, T *obj )			\
 	{																		\
 		T *old;																\
 																			\
@@ -197,19 +197,19 @@ DEF_CLASS_HASH(T, bool ignore_case);	// ignore_case = true for case-insensitive
 	}																		\
 																			\
 	/* get value, NULL if not defined */									\
-	T *T##Hash_get( T##Hash *self, char *key )								\
+	T *T##Hash_get( T##Hash *self, const char *key )						\
 	{																		\
 		return self == NULL ? NULL : (T *) StrHash_get( self->hash, key );	\
 	}																		\
 																			\
 	/* check if element exists */											\
-	bool T##Hash_exists( T##Hash *self, char *key )							\
+	bool T##Hash_exists( T##Hash *self, const char *key )					\
 	{																		\
 		return self == NULL ? false : StrHash_exists( self->hash, key );	\
 	}																		\
 																			\
 	/* remove element if it exists */										\
-	void T##Hash_remove( T##Hash *self, char *key )							\
+	void T##Hash_remove( T##Hash *self, const char *key )					\
 	{																		\
 		T##HashElem *elem;													\
 																			\
@@ -218,7 +218,7 @@ DEF_CLASS_HASH(T, bool ignore_case);	// ignore_case = true for case-insensitive
 	}																		\
 																			\
 	/* Extract element from hash if found, return element, undefine key in hash */	\
-	T *T##Hash_extract( T##Hash *self, char *key )							\
+	T *T##Hash_extract( T##Hash *self, const char *key )					\
 	{																		\
 		T##HashElem *elem;													\
 																			\

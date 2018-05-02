@@ -23,7 +23,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 
 extern size_t sizeof_relocroutine, sizeof_reloctable;
 
-extern char *GetLibfile( char *filename );
+extern const char *GetLibfile(const char *filename );
 
 extern void assemble_file( char *filename );
 extern bool Pass2info(range_t range);

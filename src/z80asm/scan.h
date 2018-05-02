@@ -60,7 +60,7 @@ extern void CurSymExpect(tokid_t expected_tok);
 extern void GetSymExpect(tokid_t expected_tok);
 
 /* insert the given text at the current scan position */
-extern void SetTemporaryLine( char *line );
+extern void SetTemporaryLine(const char *line );
 
 /* skip line past the newline, set EOL */
 extern void  Skipline( void );

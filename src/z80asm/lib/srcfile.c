@@ -15,9 +15,9 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include "alloc.h"
 #include "../errors.h"
 #include "srcfile.h"
+#include "strutil.h"
 #include "fileutil.h"
 #include "zfileutil.h"
-#include "strpool.h"
 #include <assert.h>
 
 /*-----------------------------------------------------------------------------
@@ -26,8 +26,8 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 typedef struct FileStackElem
 {
 	FILE	*file;					/* open file */
-	char	*filename;				/* source file name, held in strpool */
-	char	*line_filename;			/* source file name of LINE statement, held in strpool */
+	const char *filename;				/* source file name, held in strpool */
+	const char *line_filename;			/* source file name of LINE statement, held in strpool */
 	int		 line_nr;				/* current line number, i.e. last returned */
 	int		 line_inc;				/* increment on each line read */
 	bool	 is_c_source;			/* true if C_LINE was called */
@@ -57,7 +57,7 @@ new_line_cb_t set_new_line_cb( new_line_cb_t func )
 }
 
 /* call callback */
-static void call_new_line_cb( char *filename, int line_nr, char *text )
+static void call_new_line_cb(const char *filename, int line_nr, const char *text )
 {
 	if ( new_line_cb != NULL )
 		new_line_cb( filename, line_nr, text );
@@ -83,8 +83,6 @@ DEF_CLASS( SrcFile );
 
 void SrcFile_init( SrcFile *self )
 {
-	strpool_init();
-	
 	self->filename = NULL;
 	self->line_filename = NULL;
 
@@ -120,7 +118,7 @@ void SrcFile_fini( SrcFile *self )
 
 /* check for recursive includes, call error callback and return false abort if found
    returns true if callback not defined */
-static bool check_recursive_include( SrcFile *self, char *filename )
+static bool check_recursive_include( SrcFile *self, const char *filename )
 {
 	ListElem *iter;
     FileStackElem *elem;
@@ -144,10 +142,8 @@ static bool check_recursive_include( SrcFile *self, char *filename )
 
 /* Open the source file for reading, closing any previously open file.
    If dir_list is not NULL, calls search_file() to search the file in dir_list */
-bool SrcFile_open( SrcFile *self, char *filename, UT_array *dir_list )
+bool SrcFile_open( SrcFile *self, const char *filename, UT_array *dir_list )
 {
-    char *filename_path;
-	
 	/* close last file */
 	if (self->file != NULL)
 	{
@@ -156,7 +152,7 @@ bool SrcFile_open( SrcFile *self, char *filename, UT_array *dir_list )
 	}
 
 	/* search path, add to strpool */
-	filename_path = search_file(filename, dir_list);
+	const char *filename_path = search_file(filename, dir_list);
 
 	/* check for recursive includes, return if found */
 	if (!check_recursive_include(self, filename_path))
@@ -272,7 +268,7 @@ char *SrcFile_getline( SrcFile *self )
 
 /* Search for the start of the next line in string, i.e. char after '\n' except last
    Return NULL if only one line */
-static char *search_next_line( char *lines )
+static const char *search_next_line(const char *lines )
 {
     char *nl_ptr;
 
@@ -288,13 +284,13 @@ static char *search_next_line( char *lines )
    in reverse order, i.e. last pushed is next to be retrieved
    line may contain multiple lines separated by '\n', they are split and
    pushed back-to-forth so that first text is first to retrieve from getline() */
-void SrcFile_ungetline( SrcFile *self, char *lines )
+void SrcFile_ungetline( SrcFile *self, const char *lines )
 {
-	char *next_line, *line;
+	char *line;
 	size_t len;
 
 	/* search next line after first '\n' */
-	next_line = search_next_line( lines );
+	const char *next_line = search_next_line( lines );
 
 	/* recurse to push this line at the end */
 	if ( next_line )
@@ -315,17 +311,17 @@ void SrcFile_ungetline( SrcFile *self, char *lines )
 }
 
 /* return the current file name and line number */
-char *SrcFile_filename( SrcFile *self ) { return self->line_filename; }
-int   SrcFile_line_nr(  SrcFile *self ) { return self->line_nr; }
+const char *SrcFile_filename( SrcFile *self ) { return self->line_filename; }
+int         SrcFile_line_nr(  SrcFile *self ) { return self->line_nr; }
 
 bool ScrFile_is_c_source(SrcFile * self)
 {
 	return self->is_c_source;
 }
 
-void SrcFile_set_filename(SrcFile * self, char * filename)
+void SrcFile_set_filename(SrcFile * self, const char * filename)
 {
-	self->line_filename = strpool_add(filename);
+	self->line_filename = spool_add(filename);
 }
 
 void SrcFile_set_line_nr(SrcFile * self, int line_nr, int line_inc)

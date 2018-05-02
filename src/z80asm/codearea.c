@@ -15,7 +15,7 @@ Manage the code area in memory
 #include "init.h"
 #include "listfile.h"
 #include "options.h"
-#include "strpool.h"
+#include "strutil.h"
 #include "z80asm.h"
 #include <assert.h>
 #include <memory.h>
@@ -132,7 +132,7 @@ int get_sections_size( void )
 *   get section by name, creates a new section if new name; 
 *	make it the current section
 *----------------------------------------------------------------------------*/
-Section *new_section( char *name )
+Section *new_section( const char *name )
 {
 	int last_id;
 
@@ -141,7 +141,7 @@ Section *new_section( char *name )
 	if ( g_cur_section == NULL )
 	{
 		g_cur_section = OBJ_NEW( Section );
-		g_cur_section->name = strpool_add( name );
+		g_cur_section->name = spool_add( name );
 		SectionHash_set( & g_sections, name, g_cur_section );
 		
 		/* set first and last sections */
@@ -573,7 +573,7 @@ bool fwrite_module_code(FILE *file, int* p_code_size)
 /*-----------------------------------------------------------------------------
 *   read/write whole code area to an open file
 *----------------------------------------------------------------------------*/
-void fwrite_codearea(char *filename, FILE **pbinfile, FILE **prelocfile)
+void fwrite_codearea(const char *filename, FILE **pbinfile, FILE **prelocfile)
 {
 	STR_DEFINE(new_name, FILENAME_MAX);
 	Section *section;

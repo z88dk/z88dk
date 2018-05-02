@@ -26,7 +26,7 @@ static SrcFile			*g_src_input;			/* input handle for reading source lines */
 /*-----------------------------------------------------------------------------
 *   Call-back called when reading each new line from source
 *----------------------------------------------------------------------------*/
-static void new_line_cb( char *filename, int line_nr, char *text )
+static void new_line_cb(const char *filename, int line_nr, const char *text )
 {
     set_error_file( filename );		/* error file */
 
@@ -66,7 +66,7 @@ void model_init(void)
 /*-----------------------------------------------------------------------------
 *   interface to SrcFile singleton
 *----------------------------------------------------------------------------*/
-bool src_open(char *filename, UT_array *dir_list)
+bool src_open(const char *filename, UT_array *dir_list)
 {
 	init_module();
 	return SrcFile_open( g_src_input, filename, dir_list );
@@ -83,13 +83,13 @@ char *src_getline()
 	return macros_getline(src_getline1);
 }
 
-void src_ungetline( char *lines )
+void src_ungetline(const char *lines )
 {
 	init_module();
 	SrcFile_ungetline( g_src_input, lines );
 }
 
-char *src_filename( void )
+const char *src_filename( void )
 {
 	init_module();
 	return SrcFile_filename( g_src_input );
@@ -107,7 +107,7 @@ bool scr_is_c_source(void)
 	return ScrFile_is_c_source(g_src_input);
 }
 
-void src_set_filename(char * filename)
+void src_set_filename(const char * filename)
 {
 	init_module();
 	SrcFile_set_filename(g_src_input, filename);

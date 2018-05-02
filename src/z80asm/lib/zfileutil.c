@@ -13,8 +13,8 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include "class.h"
 #include "fileutil.h"
 #include "zfileutil.h"
-#include "strpool.h"
 #include "str.h"
+#include "strutil.h"
 #include "uthash.h"
 
 #include <assert.h>
@@ -38,7 +38,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 *----------------------------------------------------------------------------*/
 
 /* remove the extension of the filename, returns in passed Str */
-static void _path_remove_ext( Str *dest, char *filename )
+static void _path_remove_ext( Str *dest, const char *filename )
 {
     char *dot_pos, *dir_pos_1, *dir_pos_2;
 	
@@ -61,38 +61,39 @@ static void _path_remove_ext( Str *dest, char *filename )
     }
 }
 
-char *path_remove_ext( char *filename )
+const char *path_remove_ext(const char *filename )
 {
 	STR_DEFINE(dest, FILENAME_MAX);
-	char *ret;
+	const char *ret;
 
 	_path_remove_ext( dest, filename );
-	ret = strpool_add(Str_data(dest));
+	ret = spool_add(Str_data(dest));
 
 	STR_DELETE(dest);
 	return ret;
 }
 
 /* make a copy of the file name in strpool, replacing the extension */
-char *path_replace_ext( char *filename, char *new_ext )
+const char *path_replace_ext(const char *filename, const char *new_ext )
 {
 	STR_DEFINE(dest, FILENAME_MAX);
-	char *ret;
+	const char *ret;
 
     _path_remove_ext( dest, filename );
 
     if ( new_ext != NULL )
         Str_append( dest, new_ext );
-	ret = strpool_add(Str_data(dest));
+	ret = spool_add(Str_data(dest));
 
 	STR_DELETE(dest);
 	return ret;
 }
 
 /* return address of start of file basename after final slash, or start of string in none */
-static char *_start_basename( char *filename )
+static const char *_start_basename(const char *filename )
 {
-    char *dir_pos_1, *dir_pos_2;
+	const char *dir_pos_1;
+	const char *dir_pos_2;
 	
     dir_pos_1 = strrchr( filename, '/' );
     if ( dir_pos_1 == NULL ) dir_pos_1 = filename - 1;
@@ -104,13 +105,13 @@ static char *_start_basename( char *filename )
 }
 
 /* make a copy of the file basename, skipping the directory part */
-char *path_basename( char *filename )
+const char *path_basename(const char *filename )
 {
-    return strpool_add( _start_basename(filename) );
+    return spool_add( _start_basename(filename) );
 }
 
 /* make a copy of the file dirname */
-char *path_dirname( char *filename )
+const char *path_dirname(const char *filename )
 {
 	char path[FILENAME_MAX];
 	snprintf(path, sizeof(path), "%s", filename);
@@ -124,21 +125,21 @@ char *path_dirname( char *filename )
 	if (*path == '\0')		/* dir is now empty */
 		snprintf(path, sizeof(path), ".");
 
-	return strpool_add(path);
+	return spool_add(path);
 }
 
-char *path_remove_slashes(char *filename)
+const char *path_remove_slashes(const char *filename)
 {
 	char path[FILENAME_MAX];
 	snprintf(path, sizeof(path), "%s", filename);
 	char *p = path + strlen(path);
 	while (p > path && (p[-1] == '/' || p[-1] == '\\')) p--;
 	*p = '\0';
-	return strpool_add(path);
+	return spool_add(path);
 }
 
 /* search for a file on the given directory list, return full path name */
-static void path_search_1(Str *dest, char *filename, UT_array *dir_list, Str *pathname)
+static void path_search_1(Str *dest, const char *filename, UT_array *dir_list, Str *pathname)
 {
 	char **pdir;
 	
@@ -167,26 +168,26 @@ static void path_search_1(Str *dest, char *filename, UT_array *dir_list, Str *pa
     return;
 }
 
-void path_search(Str *dest, char *filename, UT_array *dir_list)
+void path_search(Str *dest, const char *filename, UT_array *dir_list)
 {
 	STR_DEFINE(pathname, FILENAME_MAX);
 	path_search_1(dest, filename, dir_list, pathname);
 	STR_DELETE(pathname);
 }
 
-char *search_file( char *filename, UT_array *dir_list )
+const char *search_file(const char *filename, UT_array *dir_list )
 {
 	STR_DEFINE(dest, FILENAME_MAX);
-	char *ret;
+	const char *ret;
 
     path_search( dest, filename, dir_list );
-	ret = strpool_add(Str_data(dest));
+	ret = spool_add(Str_data(dest));
 
 	STR_DELETE(dest);
 	return ret;
 }
 
-bool file_exists(char *filename)
+bool file_exists(const char *filename)
 {
 	struct stat  sb;
 	if ((stat(filename, &sb) == 0)  && (sb.st_mode & S_IFREG))
@@ -195,7 +196,7 @@ bool file_exists(char *filename)
 		return false;
 }
 
-bool dir_exists(char *dirname)
+bool dir_exists(const char *dirname)
 {
 	struct stat  sb;
 	if ((stat(dirname, &sb) == 0) && (sb.st_mode & S_IFDIR))
@@ -204,7 +205,7 @@ bool dir_exists(char *dirname)
 		return false;
 }
 
-int file_size(char *filename)	// file size, -1 if not regular file
+int file_size(const char *filename)	// file size, -1 if not regular file
 {
 	struct stat  sb;
 	if ((stat(filename, &sb) == 0) && (sb.st_mode & S_IFREG))
@@ -213,11 +214,11 @@ int file_size(char *filename)	// file size, -1 if not regular file
 		return -1;
 }
 
-void mkdir_p(char *path)
+void mkdir_p(const char *path)
 {
 	path = path_remove_slashes(path);
 	if (!dir_exists(path)) {
-		char *parent = path_dirname(path);
+		const char *parent = path_dirname(path);
 		mkdir_p(parent);
 
 #ifdef _WIN32

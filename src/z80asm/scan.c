@@ -406,7 +406,7 @@ void CurSymExpect(tokid_t expected_tok)
 /*-----------------------------------------------------------------------------
 *   Insert the given text at the current scan position
 *----------------------------------------------------------------------------*/
-void SetTemporaryLine( char *line )
+void SetTemporaryLine(const char *line )
 {
 	init_module();
 

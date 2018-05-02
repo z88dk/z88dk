@@ -12,7 +12,6 @@ Assembled module, i.e. result of assembling a .asm file
 #include "codearea.h"
 #include "init.h"
 #include "module.h"
-#include "strpool.h"
 
 /*-----------------------------------------------------------------------------
 *   Global data

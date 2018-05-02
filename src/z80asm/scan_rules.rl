@@ -238,7 +238,7 @@ main := |*
 
 %%write data nofinal;
 
-static void set_scan_buf( char *text, bool _at_bol )
+static void set_scan_buf( const char *text, bool _at_bol )
 {
 	Str_set( input_buf, text );		
 	p = Str_data(input_buf);

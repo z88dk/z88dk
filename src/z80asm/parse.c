@@ -19,7 +19,7 @@ Define ragel-based parser.
 #include "parse.h"
 #include "scan.h"
 #include "str.h"
-#include "strpool.h"
+#include "strutil.h"
 #include "sym.h"
 #include "symtab.h"
 #include "utarray.h"
@@ -37,7 +37,7 @@ static UT_icd ut_Sym_icd = { sizeof(Sym), NULL, NULL, NULL };
 typedef struct OpenStruct
 {
 	tokid_t	open_tok;			/* open token - TK_IF, TK_ELSE, ... */
-	char   *filename;			/* file and line where token found */
+	const char *filename;			/* file and line where token found */
 	int		line_nr;
 	bool	active : 1;			/* in true branch of conditional compilation */
 	bool	parent_active : 1;	/* in true branch of parent's conditional compilation */
@@ -76,7 +76,7 @@ void ParseCtx_delete(ParseCtx *ctx)
 *----------------------------------------------------------------------------*/
 
 /* save the current scanner context and parse the given expression */
-struct Expr *parse_expr(char *expr_text)
+struct Expr *parse_expr(const char *expr_text)
 {
 	Expr *expr;
 	int num_errors;
@@ -189,14 +189,14 @@ static void pop_eval_expr(ParseCtx *ctx, int *pvalue, bool *perror)
 /*-----------------------------------------------------------------------------
 *   return new auto-label in strpool
 *----------------------------------------------------------------------------*/
-char *autolabel(void)
+const char *autolabel(void)
 {
 	STR_DEFINE(label, STR_SIZE);
 	static int n;
-	char *ret;
+	const char *ret;
 
 	Str_sprintf(label, "__autolabel_%04d", ++n);
-	ret = strpool_add(Str_data(label));
+	ret = spool_add(Str_data(label));
 
 	STR_DELETE(label);
 	return ret;
@@ -433,7 +433,7 @@ static void parseline(ParseCtx *ctx)
 	list_end_line();				/* Write current source line to list file */
 }
 
-bool parse_file(char *filename)
+bool parse_file(const char *filename)
 {
 	ParseCtx *ctx;
 	OpenStruct *open_struct;

@@ -913,7 +913,7 @@ sub parse_code {
 		push @code,
 			"DO_STMT_LABEL();",
 			"Expr *target_expr = pop_expr(ctx);",
-			"char *end_label = autolabel();",
+			"const char *end_label = autolabel();",
 			"Expr *end_label_expr = parse_expr(end_label);",
 			"add_opcode_nn(0x".fmthex($bin[0]).", end_label_expr);",	# jump over
 			"add_opcode_nn(0x".fmthex($bin[3]).", target_expr);",		# call

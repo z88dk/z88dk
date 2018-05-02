@@ -67,16 +67,16 @@ extern void parse_argv( int argc, char *argv[] );
 *	strpool
 *	Extensions may be changed by options.
 *----------------------------------------------------------------------------*/
-extern char *get_asm_filename( char *filename );
-extern char *get_list_filename( char *filename );
-extern char *get_obj_filename( char *filename );
-extern char *get_def_filename( char *filename );
-extern char *get_err_filename( char *filename );
-extern char *get_bin_filename( char *filename );
-extern char *get_lib_filename( char *filename );
-extern char *get_sym_filename( char *filename );
-extern char *get_map_filename(char *filename);
-extern char *get_reloc_filename(char *filename);
+extern const char *get_asm_filename(const char *filename );
+extern const char *get_list_filename(const char *filename );
+extern const char *get_obj_filename(const char *filename );
+extern const char *get_def_filename(const char *filename );
+extern const char *get_err_filename(const char *filename );
+extern const char *get_bin_filename(const char *filename );
+extern const char *get_lib_filename(const char *filename );
+extern const char *get_sym_filename(const char *filename );
+extern const char *get_map_filename(const char *filename);
+extern const char *get_reloc_filename(const char *filename);
 
 /*-----------------------------------------------------------------------------
 *   Call appmake if requested in options

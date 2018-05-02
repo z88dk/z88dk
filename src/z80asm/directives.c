@@ -17,7 +17,7 @@ Assembly directives.
 #include "model.h"
 #include "module.h"
 #include "parse.h"
-#include "strpool.h"
+#include "strutil.h"
 #include "types.h"
 #include "symtab.h"
 #include "z80asm.h"
@@ -28,7 +28,7 @@ static void check_org_align();
 /*-----------------------------------------------------------------------------
 *   LABEL: define a label at the current location
 *----------------------------------------------------------------------------*/
-void asm_LABEL_offset(char *name, int offset)
+void asm_LABEL_offset(const char *name, int offset)
 {
 	Symbol *sym;
 	
@@ -40,7 +40,7 @@ void asm_LABEL_offset(char *name, int offset)
 	sym->is_touched = true;
 }
 
-void asm_LABEL(char *name)
+void asm_LABEL(const char *name)
 {
 	asm_LABEL_offset(name, 0);
 }
@@ -76,7 +76,7 @@ void asm_DEFGROUP_start(int next_value)
 }
 
 /* define one constant with the next value, increment the value */
-void asm_DEFGROUP_define_const(char *name)
+void asm_DEFGROUP_define_const(const char *name)
 {
 	assert(name != NULL);
 	
@@ -117,7 +117,7 @@ void asm_DEFVARS_start(int start_addr)
 }
 
 /* define one constant in the current context */
-void asm_DEFVARS_define_const(char *name, int elem_size, int count)
+void asm_DEFVARS_define_const(const char *name, int elem_size, int count)
 {
 	int var_size = elem_size * count;
 	int next_pc = *DEFVARS_PC + var_size;
@@ -153,7 +153,7 @@ void asm_LSTOFF(void)
 /*-----------------------------------------------------------------------------
 *   directives with number argument
 *----------------------------------------------------------------------------*/
-void asm_LINE(int line_nr, char *filename)
+void asm_LINE(int line_nr, const char *filename)
 {
 	STR_DEFINE(name, STR_SIZE);
 
@@ -165,7 +165,7 @@ void asm_LINE(int line_nr, char *filename)
 	STR_DELETE(name);
 }
 
-void asm_C_LINE(int line_nr, char *filename)
+void asm_C_LINE(int line_nr, const char *filename)
 {
 	src_set_filename(filename);
 	src_set_line_nr(line_nr, 0);		// do not increment line numbers
@@ -204,12 +204,12 @@ void asm_DEPHASE()
 /*-----------------------------------------------------------------------------
 *   directives with string argument 
 *----------------------------------------------------------------------------*/
-void asm_INCLUDE(char *filename)
+void asm_INCLUDE(const char *filename)
 {
 	parse_file(filename);
 }
 
-void asm_BINARY(char *filename)
+void asm_BINARY(const char *filename)
 {
 	filename = search_file(filename, opts.inc_path);
 	FILE *binfile = fopen(filename, "rb");
@@ -225,9 +225,9 @@ void asm_BINARY(char *filename)
 /*-----------------------------------------------------------------------------
 *   directives with name argument
 *----------------------------------------------------------------------------*/
-void asm_MODULE(char *name)
+void asm_MODULE(const char *name)
 {
-	CURRENTMODULE->modname = strpool_add(name);		/* replace previous module name */
+	CURRENTMODULE->modname = spool_add(name);		/* replace previous module name */
 }
 
 void asm_MODULE_default(void)
@@ -236,7 +236,7 @@ void asm_MODULE_default(void)
 		CURRENTMODULE->modname = path_remove_ext(path_basename(CURRENTMODULE->filename));
 }
 
-void asm_SECTION(char *name)
+void asm_SECTION(const char *name)
 {
 	new_section(name);
 }
@@ -244,47 +244,47 @@ void asm_SECTION(char *name)
 /*-----------------------------------------------------------------------------
 *   directives with list of names argument, function called for each argument
 *----------------------------------------------------------------------------*/
-void asm_GLOBAL(char *name)
+void asm_GLOBAL(const char *name)
 {
 	declare_global_symbol(name);
 }
 
-void asm_EXTERN(char *name)
+void asm_EXTERN(const char *name)
 {
 	declare_extern_symbol(name);
 }
 
-void asm_XREF(char *name)
+void asm_XREF(const char *name)
 {
 	declare_extern_symbol(name);
 }
 
-void asm_LIB(char *name)
+void asm_LIB(const char *name)
 {
 	declare_extern_symbol(name);
 }
 
-void asm_PUBLIC(char *name)
+void asm_PUBLIC(const char *name)
 {
 	declare_public_symbol(name);
 }
 
-void asm_XDEF(char *name)
+void asm_XDEF(const char *name)
 {
 	declare_public_symbol(name);
 }
 
-void asm_XLIB(char *name)
+void asm_XLIB(const char *name)
 {
 	declare_public_symbol(name);
 }
 
-void asm_DEFINE(char *name)
+void asm_DEFINE(const char *name)
 {
 	define_local_def_sym(name, 1);
 }
 
-void asm_UNDEFINE(char *name)
+void asm_UNDEFINE(const char *name)
 {
 	SymbolHash_remove(CURRENTMODULE->local_symtab, name);
 }
@@ -292,7 +292,7 @@ void asm_UNDEFINE(char *name)
 /*-----------------------------------------------------------------------------
 *   define a constant or expression 
 *----------------------------------------------------------------------------*/
-void asm_DEFC(char *name, Expr *expr)
+void asm_DEFC(const char *name, Expr *expr)
 {
 	int value; 
 
@@ -301,7 +301,7 @@ void asm_DEFC(char *name, Expr *expr)
 	{
 		/* store in object file to be computed at link time */
 		expr->range = RANGE_WORD;
-		expr->target_name = strpool_add(name);
+		expr->target_name = spool_add(name);
 
 		ExprList_push(&CURRENTMODULE->exprs, expr);
 
@@ -331,7 +331,7 @@ void asm_DEFS(int count, int fill)
 /*-----------------------------------------------------------------------------
 *   DEFB - add an expression or a string
 *----------------------------------------------------------------------------*/
-void asm_DEFB_str(char *str, int length)
+void asm_DEFB_str(const char *str, int length)
 {
 	while (length-- > 0)
 		add_opcode((*str++) & 0xFF);

@@ -12,8 +12,8 @@ One symbol from the assembly code - label or constant.
 #include "errors.h"
 #include "listfile.h"
 #include "options.h"
-#include "strpool.h"
 #include "str.h"
+#include "strutil.h"
 #include "sym.h"
 #include "symbol.h"
 
@@ -47,12 +47,12 @@ void Symbol_fini( Symbol *self ) {}
 *   create a new symbol, needs to be deleted by OBJ_DELETE()
 *	adds a reference to the page were referred to
 *----------------------------------------------------------------------------*/
-Symbol *Symbol_create(char *name, long value, sym_type_t type, sym_scope_t scope,
+Symbol *Symbol_create(const char *name, long value, sym_type_t type, sym_scope_t scope,
 					   Module *module, Section *section )
 {
     Symbol *self 	= OBJ_NEW( Symbol );
 
-	self->name = strpool_add(name);			/* name in strpool, not freed */
+	self->name = spool_add(name);			/* name in strpool, not freed */
 	self->value = value;
 	self->type = type;
 	self->scope = scope;
@@ -67,10 +67,10 @@ Symbol *Symbol_create(char *name, long value, sym_type_t type, sym_scope_t scope
 /*-----------------------------------------------------------------------------
 *   return full symbol name NAME@MODULE stored in strpool
 *----------------------------------------------------------------------------*/
-char *Symbol_fullname( Symbol *sym )
+const char *Symbol_fullname( Symbol *sym )
 {
 	STR_DEFINE(name, STR_SIZE);
-	char *ret;
+	const char *ret;
 
     Str_set( name, sym->name );
 
@@ -80,7 +80,7 @@ char *Symbol_fullname( Symbol *sym )
         Str_append( name, sym->module->modname );
     }
 
-    ret = strpool_add( Str_data(name) );
+    ret = spool_add( Str_data(name) );
 
 	STR_DELETE(name);
 

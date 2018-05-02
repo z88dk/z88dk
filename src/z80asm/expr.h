@@ -118,7 +118,7 @@ CLASS( Expr )
 	sym_type_t	 type;				/* highest type of symbols used in expression */
 	bool		 is_computed : 1;	/* true if all values in expression have been computed */
 
-	char		*target_name;		/* name of the symbol, stored in strpool, 
+	const char	*target_name;		/* name of the symbol, stored in strpool,
 								    * to receive the result value of the expression 
 								    * computation, NULL if not an EQU expression */
 
@@ -127,7 +127,7 @@ CLASS( Expr )
 	int		 asmpc;				/* ASMPC value during linking */
     int		 code_pos;			/* Address to patch expression value */
 
-	char		*filename;			/* file and line where expression defined, string in strpool */
+	const char	*filename;			/* file and line where expression defined, string in strpool */
     int			 line_nr;			/* source line */
     long		 listpos;			/* position in listing file to patch (in pass 2), -1 if not listing */
 END_CLASS;

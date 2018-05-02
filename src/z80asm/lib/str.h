@@ -35,8 +35,8 @@ extern char *stoupper(char *str);
 extern char *stolower(char *str);
 
 /* case insensitive compare */
-extern int stricompare(char *s1, char *s2);
-extern int strnicompare(char *s1, char *s2, size_t n);
+extern int stricompare(const char *s1, const char *s2);
+extern int strnicompare(const char *s1, const char *s2, size_t n);
 
 /* remove end newline and whitespace - modify in place, return address of string */
 extern char *chomp(char *str);
@@ -121,28 +121,28 @@ extern void Str_clear(Str *str);
 extern void Str_sync_len(Str *str);
 
 /* set / append string */
-extern void Str_set(Str *str, char *source);
-extern void Str_append(Str *str, char *source);
+extern void Str_set(Str *str, const char *source);
+extern void Str_append(Str *str, const char *source);
 
 /* set / append substring */
-extern void Str_set_n(Str *str, char *source, int count);
-extern void Str_append_n(Str *str, char *source, int count);
+extern void Str_set_n(Str *str, const char *source, int count);
+extern void Str_append_n(Str *str, const char *source, int count);
 
 /* set / append bytes */
-extern void Str_set_bytes(Str *str, char *source, int size);
-extern void Str_append_bytes(Str *str, char *source, int size);
+extern void Str_set_bytes(Str *str, const char *source, int size);
+extern void Str_append_bytes(Str *str, const char *source, int size);
 
 /* set / append char */
 extern void Str_set_char(Str *str, char ch);
 extern void Str_append_char(Str *str, char ch);
 
 /* set / append with printf-like parameters */
-extern void Str_sprintf(Str *str, char *format, ...);
-extern void Str_append_sprintf(Str *str, char *format, ...);
+extern void Str_sprintf(Str *str, const char *format, ...);
+extern void Str_append_sprintf(Str *str, const char *format, ...);
 
 /* set / append with va_list argument */
-extern void Str_vsprintf(Str *str, char *format, va_list argptr);
-extern void Str_append_vsprintf(Str *str, char *format, va_list argptr);
+extern void Str_vsprintf(Str *str, const char *format, va_list argptr);
+extern void Str_append_vsprintf(Str *str, const char *format, va_list argptr);
 
 /*-----------------------------------------------------------------------------
 *   Modify strings

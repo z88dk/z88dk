@@ -34,17 +34,17 @@ extern void m_alloc_init( void );
 *----------------------------------------------------------------------------*/
 
 extern void *m_malloc_compat( size_t size );
-extern void *m_malloc_( size_t size, char *file, int lineno );
+extern void *m_malloc_( size_t size, const char *file, int lineno );
 #define      m_malloc( size )	\
 						check_mem_die( m_malloc_((size), __FILE__, __LINE__) )
 
 extern void *m_calloc_compat( size_t num, size_t size );
-extern void *m_calloc_( size_t num, size_t size, char *file, int lineno );
+extern void *m_calloc_( size_t num, size_t size, const char *file, int lineno );
 #define      m_calloc( num, size )	\
 						check_mem_die( m_calloc_((num), (size), __FILE__, __LINE__) )
 
-extern char *m_strdup_compat( char *source );
-extern char *m_strdup_( char *source, char *file, int lineno );
+extern char *m_strdup_compat(const char *source );
+extern char *m_strdup_(const char *source, const char *file, int lineno );
 #define      m_strdup( source )	\
 						((char *) check_mem_die( m_strdup_((source), __FILE__, __LINE__) ) )
 

@@ -25,7 +25,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 *   Call-back interace to declare a new line has been read, telling the
 * 	file name and line number
 *----------------------------------------------------------------------------*/
-typedef void (*new_line_cb_t)( char *filename, int line_nr, char *text );
+typedef void (*new_line_cb_t)(const char *filename, int line_nr, const char *text );
 
 /* set call-back when reading a new line; return old call-back */
 extern new_line_cb_t set_new_line_cb( new_line_cb_t func );
@@ -33,7 +33,7 @@ extern new_line_cb_t set_new_line_cb( new_line_cb_t func );
 /*-----------------------------------------------------------------------------
 *   Call-back interace to exit with error on recursive include files
 *----------------------------------------------------------------------------*/
-typedef void (*incl_recursion_err_cb_t)( char *filename );
+typedef void (*incl_recursion_err_cb_t)(const char *filename );
 
 /* set call-back when reading a new line; return old call-back */
 extern incl_recursion_err_cb_t set_incl_recursion_err_cb( incl_recursion_err_cb_t func );
@@ -43,8 +43,8 @@ extern incl_recursion_err_cb_t set_incl_recursion_err_cb( incl_recursion_err_cb_
 *----------------------------------------------------------------------------*/
 CLASS( SrcFile )
 	FILE	*file;					/* open file */
-	char	*filename;				/* source file name, held in strpool */
-	char	*line_filename;			/* source file name of LINE statement, held in strpool */
+	const char *filename;			/* source file name, held in strpool */
+	const char *line_filename;		/* source file name of LINE statement, held in strpool */
 	int		 line_nr;				/* current line number, i.e. last returned */
 	int		 line_inc;				/* increment on each line read */
 	Str		*line;					/* current input line, i.e. last returned */
@@ -66,7 +66,7 @@ END_CLASS;
 /* Open the source file for reading, closing any previously open file.
    If dir_list is not NULL, calls search_file() to search the file in dir_list
    calls incl_recursion_err_cb pointed fucntion in case of recursive include */
-extern bool SrcFile_open( SrcFile *self, char *filename, UT_array *dir_list );
+extern bool SrcFile_open( SrcFile *self, const char *filename, UT_array *dir_list );
 
 /* get the next line of input, normalize end of line termination (i.e. convert
    "\r", "\r\n" and "\n\r" to "\n"
@@ -79,15 +79,15 @@ extern char *SrcFile_getline( SrcFile *self );
    in reverse order, i.e. last pushed is next to be retrieved
    line may contain multiple lines separated by '\n', they are split and
    pushed back-to-forth so that first text is first to retrieve from getline() */
-extern void SrcFile_ungetline( SrcFile *self, char *lines );
+extern void SrcFile_ungetline( SrcFile *self, const char *lines );
 
 /* return the current file name and line number */
-extern char *SrcFile_filename( SrcFile *self );		/* string in strpool */
-extern int   SrcFile_line_nr(SrcFile *self);
-extern bool  ScrFile_is_c_source(SrcFile *self);
+extern const char *SrcFile_filename( SrcFile *self );		/* string in strpool */
+extern int         SrcFile_line_nr(SrcFile *self);
+extern bool        ScrFile_is_c_source(SrcFile *self);
 
 
-extern void SrcFile_set_filename(SrcFile *self, char *filename);
+extern void SrcFile_set_filename(SrcFile *self, const char *filename);
 extern void SrcFile_set_line_nr(SrcFile *self, int line_nr, int line_inc);
 extern void SrcFile_set_c_source(SrcFile *self);
 

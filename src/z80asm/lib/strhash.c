@@ -14,8 +14,8 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 
 #include "alloc.h"
 #include "strhash.h"
-#include "strpool.h"
 #include "str.h"
+#include "strutil.h"
 
 /*-----------------------------------------------------------------------------
 *   Define the class
@@ -69,7 +69,7 @@ void StrHash_remove_all( StrHash *self )
 *	keeps input unmodified.
 *	NOTE: not reentrant
 *----------------------------------------------------------------------------*/
-static char *StrHash_norm_key( StrHash *self, char *key )
+static const char *StrHash_norm_key( StrHash *self, const char *key )
 {
 	static STR_DEFINE(KEY, STR_SIZE);		/* static object to keep upper case key */
 	
@@ -86,7 +86,7 @@ static char *StrHash_norm_key( StrHash *self, char *key )
 /*-----------------------------------------------------------------------------
 *	Find a hash entry
 *----------------------------------------------------------------------------*/
-StrHashElem *StrHash_find( StrHash *self, char *key )
+StrHashElem *StrHash_find( StrHash *self, const char *key )
 {
     StrHashElem *elem;
     size_t  	 num_chars;
@@ -121,7 +121,7 @@ void StrHash_remove_elem( StrHash *self, StrHashElem *elem )
 /*-----------------------------------------------------------------------------
 *	Create the element if the key is not found, update the value if found
 *----------------------------------------------------------------------------*/
-void StrHash_set( StrHash **pself, char *key, void *value )
+void StrHash_set( StrHash **pself, const char *key, void *value )
 {
     StrHashElem *elem;
     size_t num_chars;
@@ -136,7 +136,7 @@ void StrHash_set( StrHash **pself, char *key, void *value )
 		key = StrHash_norm_key( *pself, key );
         
 		elem = m_new( StrHashElem );
-        elem->key = strpool_add( key );
+        elem->key = spool_add( key );
 
         /* add to hash, need to store elem->key instead of key, as it is invariant */
         num_chars = strlen( key );
@@ -157,7 +157,7 @@ void StrHash_set( StrHash **pself, char *key, void *value )
 /*-----------------------------------------------------------------------------
 *	Retrive value for a given key, return NULL if not found
 *----------------------------------------------------------------------------*/
-void *StrHash_get( StrHash *self, char *key )
+void *StrHash_get( StrHash *self, const char *key )
 {
     StrHashElem *elem;
 
@@ -172,7 +172,7 @@ void *StrHash_get( StrHash *self, char *key )
 /*-----------------------------------------------------------------------------
 *	Check if a key exists in the hash
 *----------------------------------------------------------------------------*/
-bool StrHash_exists( StrHash *self, char *key )
+bool StrHash_exists( StrHash *self, const char *key )
 {
     StrHashElem *elem;
 
@@ -186,7 +186,7 @@ bool StrHash_exists( StrHash *self, char *key )
 /*-----------------------------------------------------------------------------
 *	Remove element from hash if found
 *----------------------------------------------------------------------------*/
-void StrHash_remove( StrHash *self, char *key )
+void StrHash_remove( StrHash *self, const char *key )
 {
     StrHashElem *elem;
 

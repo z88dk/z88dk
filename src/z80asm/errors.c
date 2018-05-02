@@ -14,8 +14,8 @@ Error handling.
 #include "zfileutil.h"
 #include "options.h"
 #include "srcfile.h"
-#include "strpool.h"
 #include "str.h"
+#include "strutil.h"
 #include "strhash.h"
 #include "types.h"
 #include "init.h"
@@ -27,8 +27,8 @@ Error handling.
 typedef struct Errors
 {
     int			 count;				/* total errors */
-    char		*filename;			/* location of error: name of source file */
-    char		*module;			/* location of error: name of module */
+	const char	*filename;			/* location of error: name of source file */
+	const char	*module;			/* location of error: name of module */
     int			 line;				/* location of error: line number */
 } Errors;
 
@@ -38,7 +38,7 @@ static Errors errors;				/* count errors and locations */
 typedef struct ErrorFile
 {
     FILE		*file;				/* currently open error file */
-    char		*filename;			/* name of error file */
+	const char	*filename;			/* name of error file */
 } ErrorFile;
 
 static ErrorFile error_file;		/* currently open error file */
@@ -48,8 +48,6 @@ static ErrorFile error_file;		/* currently open error file */
 *----------------------------------------------------------------------------*/
 DEFINE_init_module()
 {
-	strpool_init();					/* make sure strpool is removed last */
-
     /* init Errors */
     reset_error_count();			/* clear error count */
     set_error_null();               /* clear location of error messages */
@@ -80,16 +78,16 @@ void set_error_null( void )
     errors.line = 0;
 }
 
-void set_error_file( char *filename )
+void set_error_file(const char *filename )
 {
     init_module();
-    errors.filename = strpool_add( filename );	/* may be NULL */
+    errors.filename = spool_add( filename );	/* may be NULL */
 }
 
-void set_error_module( char *modulename )
+void set_error_module(const char *modulename )
 {
     init_module();
-    errors.module = strpool_add( modulename );	/* may be NULL */
+    errors.module = spool_add( modulename );	/* may be NULL */
 }
 
 void set_error_line( int lineno )
@@ -98,7 +96,7 @@ void set_error_line( int lineno )
     errors.line = lineno;
 }
 
-char *get_error_file(void)
+const char *get_error_file(void)
 {
 	init_module();
 	return errors.filename;
@@ -129,16 +127,16 @@ int get_num_errors( void )
 *	Open file to receive all errors / warnings from now on
 *	File is appended, to allow assemble	and link errors to be joined in the same file.
 *----------------------------------------------------------------------------*/
-void open_error_file( char *src_filename )
+void open_error_file(const char *src_filename )
 {
-	char *filename = get_err_filename( src_filename );
+	const char *filename = get_err_filename( src_filename );
 
     init_module();
 
     /* close current file if any */
     close_error_file();
 
-    error_file.filename = strpool_add( filename );
+    error_file.filename = spool_add( filename );
 	error_file.file = xfopen(error_file.filename, "a");		// TODO: remove error file at start of assembly
 }
 

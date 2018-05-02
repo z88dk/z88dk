@@ -25,8 +25,8 @@ Assembled module, i.e. result of assembling a .asm file
 *   Assembly module
 *----------------------------------------------------------------------------*/
 CLASS( Module )
-	char		*modname;			/* module name, kept in strpool */
-	char		*filename;			/* source file name, kept in strpool */
+	const char	*modname;			/* module name, kept in strpool */
+	const char	*filename;			/* source file name, kept in strpool */
 	int			 module_id;			/* sequence number of linked modules in sections */
     ExprList	*exprs;				/* list of expressions */
 	SymbolHash	*local_symtab;		/* module local symbols */
