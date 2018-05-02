@@ -11,11 +11,15 @@
 SECTION code_clib
 PUBLIC vz_plot_callee
 PUBLIC _vz_plot_callee
+PUBLIC cplot_callee
+PUBLIC _cplot_callee
 PUBLIC ASMDISP_VZ_PLOT_CALLEE
 EXTERN base_graphics
 
 .vz_plot_callee
 ._vz_plot_callee
+.cplot_callee
+._cplot_callee
 
    pop af
    pop bc
