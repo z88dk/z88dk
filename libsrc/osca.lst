@@ -29,6 +29,7 @@ graphics/draw_profile
 graphics/w_pointxy
 graphics/osca/cclg
 graphics/osca/cplot
+graphics/osca/cplot_callee
 graphics/osca/cplotpixel
 games/osca/joystick
 @games/games.lst
