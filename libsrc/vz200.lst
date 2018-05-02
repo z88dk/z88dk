@@ -13,6 +13,7 @@ stdio/ansi/vz200/f_ansi_scrollup
 @gfxbase.lst
 graphics/dcircle
 graphics/clg
+graphics/cclg
 graphics/vz200/clsgraph
 graphics/clrarea
 graphics/lftscrol
