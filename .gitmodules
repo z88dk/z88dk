@@ -10,3 +10,6 @@
 [submodule "ext/Unity"]
 	path = ext/Unity
 	url = https://github.com/ThrowTheSwitch/Unity.git
+[submodule "ext/regex"]
+	path = ext/regex
+	url = https://github.com/geoffmcl/regex.git
