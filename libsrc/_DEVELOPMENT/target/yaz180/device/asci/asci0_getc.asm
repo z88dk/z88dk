@@ -7,27 +7,26 @@
     EXTERN asci0RxCount, asci0RxOut
 
     _asci0_getc:
-
         ; exit     : l = char received
         ;            carry reset if Rx buffer is empty
         ;
         ; modifies : af, hl
         
-        ld a, (asci0RxCount)        ; get the number of bytes in the Rx buffer
+        ld a,(asci0RxCount)         ; get the number of bytes in the Rx buffer
         or a                        ; see if there are zero bytes available
-        ret z                       ; if the count is zero, then return
+        ret Z                       ; if the count is zero, then return
 
-        ld hl, asci0RxCount
+        ld hl,asci0RxCount
         di
         dec (hl)                    ; atomically decrement Rx count
-        ld hl, (asci0RxOut)         ; get the pointer to place where we pop the Rx byte
+        ld hl,(asci0RxOut)          ; get the pointer to place where we pop the Rx byte
         ei
-        ld a, (hl)                  ; get the Rx byte
+        ld a,(hl)                   ; get the Rx byte
 
         inc l                       ; move the Rx pointer low byte along, 0xFF rollover
-        ld (asci0RxOut), hl         ; write where the next byte should be popped
+        ld (asci0RxOut),hl          ; write where the next byte should be popped
 
-        ld l, a                     ; put the byte in hl
+        ld l,a                      ; put the byte in hl
         scf                         ; indicate char received
         ret
 
