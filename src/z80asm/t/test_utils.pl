@@ -487,7 +487,7 @@ sub t_compile_module {
 	my($init_code, $main_code, $compile_args) = @_;
 
 	# modules to include always
-	$compile_args .= " -DMEMALLOC_DEBUG lib/alloc.c lib/strpool.o";
+	$compile_args .= " -DMEMALLOC_DEBUG lib/alloc.c";
 	
 	# wait for previous run to finish
 	while (-f 'test.exe' && ! unlink('test.exe')) {

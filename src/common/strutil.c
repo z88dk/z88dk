@@ -4,9 +4,15 @@
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 #include "strutil.h"
+#include "die.h"
+#include "uthash.h"
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stdlib.h>
 
+//-----------------------------------------------------------------------------
+// string str_t
+//-----------------------------------------------------------------------------
 str_t *str_new()
 {
 	str_t *str;
@@ -85,3 +91,52 @@ void str_append_str(str_t *str, str_t *src)
 {
 	utstring_concat(str, src);
 }
+
+//-----------------------------------------------------------------------------
+// string pool
+//-----------------------------------------------------------------------------
+typedef struct spool_s {
+	char *str;
+	UT_hash_handle hh;
+} spool_t;
+
+static spool_t *spool = NULL;
+
+static void spool_deinit(void);
+
+static void spool_init()
+{
+	static bool inited = false;
+	if (!inited) {
+		inited = true;
+		atexit(spool_deinit);
+	}
+}
+
+static void spool_deinit(void)
+{
+	spool_t *elem, *tmp;
+	HASH_ITER(hh, spool, elem, tmp) {
+		HASH_DEL(spool, elem);
+		xfree(elem);
+	}
+}
+
+const char *spool_add(const char *str)
+{
+	spool_init();
+
+	if (str == NULL) return NULL;		// special case
+
+	spool_t *found;
+	HASH_FIND_STR(spool, str, found);
+	if (found) return found->str;		// found
+
+	found = xnew(spool_t);
+	found->str = xstrdup(str);
+
+	HASH_ADD_STR(spool, str, found);
+
+	return found->str;
+}
+

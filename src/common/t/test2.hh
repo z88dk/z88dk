@@ -26,6 +26,7 @@ extern void t_str_append(void); RUN_TEST(t_str_append);
 extern void t_str_append_f(void); RUN_TEST(t_str_append_f);
 extern void t_str_append_bin(void); RUN_TEST(t_str_append_bin);
 extern void t_str_append_str(void); RUN_TEST(t_str_append_str);
+extern void t_str_spool_add(void); RUN_TEST(t_str_spool_add);
 extern void t_types_bool(void); RUN_TEST(t_types_bool);
 extern void t_types_byte(void); RUN_TEST(t_types_byte);
 extern void t_types_word(void); RUN_TEST(t_types_word);
