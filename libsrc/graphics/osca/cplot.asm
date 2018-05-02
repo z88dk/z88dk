@@ -7,13 +7,14 @@
 ;
 ;       Color HRG version by Stefano Bodrato
 ;
-;	$Id: cplot.asm,v 1.4 2017-01-02 22:57:58 aralbrec Exp $
+;	$Id: cplot.asm $
 ;
 
 ;Usage: cplot(int x, int y, int color)
 
 
                 SECTION   code_clib
+				
                 PUBLIC    cplot
                 PUBLIC    _cplot
                 EXTERN     swapgfxbk
