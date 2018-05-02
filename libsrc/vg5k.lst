@@ -1,4 +1,4 @@
-@stdio/stdio.lst
+@stdio/stdio_ixiy.lst
 stdio/vg5k/fgetc_cons
 stdio/vg5k/getk
 @stdio/ansicore.lst
@@ -8,6 +8,7 @@ stdio/ansi/vg5k/f_ansi_char
 stdio/ansi/generic/f_ansi_cls
 stdio/ansi/generic/f_ansi_dline
 stdio/ansi/vg5k/f_ansi_scrollup
+stdio/vg5k/generic_console
 @gfxbase.lst
 graphics/dcircle
 graphics/clg

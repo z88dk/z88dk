@@ -24,17 +24,13 @@
 
 
 .ansi_CHAR
-	ld	ix,$47FA
-
-	ld    d,a
+	ld    d,a		; character
 	
 	ld    a,(vg5k_attr)
-	ld    e,a		; white on black
+	ld    e,a		; attribute
 	
-	ld    a,(__console_x)
-	ld    l,a
-	ld    a,(__console_y)	
-	ld    h,a
+	ld    hl,(__console_x)	; l = x, h = y
+	ld    a,h
 	push  hl
 	and   a
 	jr    z,zrow
@@ -50,11 +46,9 @@
 	call  $a7		; video buffer access (keep a copy to scroll)
 	pop   de
 	
-	ld   a,d
-	ld   (hl),a
+	ld   (hl),d
 	inc  hl
-	ld   a,e
-	ld   (hl),a
+	ld   (hl),e
 	
 	ld hl,_ef9345
 	jp $AD			; hide cursor
