@@ -3,6 +3,7 @@
 		SECTION		code_clib
 
 		PUBLIC		generic_console_cls
+		PUBLIC		generic_console_vpeek
 		PUBLIC		generic_console_scrollup
 		PUBLIC		generic_console_printc
 		PUBLIC		generic_console_ioctl
@@ -71,17 +72,9 @@ cls1:	ld	(hl),32
 generic_console_printc:
 	push	bc	;save coordinates
 	push	de
-	ld	hl,DISPLAY - 80
-	ld	de,80
-	inc	b
-generic_console_printc_1:
-	add	hl,de
-	djnz	generic_console_printc_1
-generic_console_printc_3:
+	call	xypos
 	ld	d,a			;Save character
 	ld	a,(vg5k_attr)
-	add	hl,bc		
-	add	hl,bc			;hl now points to address in display
 	ld	(hl),d			;place character
 	inc	hl
 	pop	bc			;get raw mode back into e
@@ -99,6 +92,29 @@ is_gfx:
 	ld	h,a
 zrow:
 	call	0x0092			;call the rom to do the hardwork
+	ret
+
+xypos:
+	ld	hl,DISPLAY - 80
+	ld	de,80
+	inc	b
+generic_console_printc_1:
+	add	hl,de
+	djnz	generic_console_printc_1
+	add	hl,bc		
+	add	hl,bc			;hl now points to address in display
+	ret
+
+;Entry: c = x,
+;       b = y
+;       e = rawmode
+;Exit:  nc = success
+;        a = character,
+;        c = failure
+generic_console_vpeek:
+        call    xypos
+	ld	a,(hl)
+	and	a
 	ret
 
 

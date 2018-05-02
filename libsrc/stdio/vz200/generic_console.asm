@@ -3,6 +3,7 @@
 		SECTION		code_clib
 
 		PUBLIC		generic_console_cls
+		PUBLIC		generic_console_vpeek
 		PUBLIC		generic_console_printc
 		PUBLIC		generic_console_scrollup
 		PUBLIC		generic_console_ioctl
@@ -35,6 +36,26 @@ generic_console_cls:
 ; a = character to print
 ; e = raw
 generic_console_printc:
+	call	xypos
+	rr	e
+	call	nc,convert_character
+	ld	(hl),a
+	ret
+
+;Entry: c = x,
+;       b = y
+;       e = rawmode
+;Exit:  nc = success
+;        a = character,
+;        c = failure
+generic_console_vpeek:
+        call    xypos
+	ld	a,(hl)
+	and	a
+	ret
+
+
+xypos:
 	ld	hl,DISPLAY - CONSOLE_COLUMNS
 	ld	de,CONSOLE_COLUMNS
 	inc	b
@@ -43,9 +64,6 @@ generic_console_printc_1:
 	djnz	generic_console_printc_1
 generic_console_printc_3:
 	add	hl,bc			;hl now points to address in display
-	rr	e
-	call	nc,convert_character
-	ld	(hl),a
 	ret
 
 convert_character:
