@@ -58,20 +58,18 @@ void main()
                 if ((n + o) < e)
                     goto l110;
 
-                cplot(x, y, k & 7);
-                cplot(x, ymax - y, k & 7);
+                cplot(x, y, k);
+                cplot(x, ymax - y, k);
             }
         }
     }
 
         // color cycling - standard mode
-/*
         for (k = 100; k >= 0; k--) {
             for (y = ymax; y >= 0; y--) {
                 for (x = xmax; x >= 0; x--)
                     cplot(x, y, cpoint(x, y) + 1);
             }
         }
-*/
 
 }
