@@ -23,11 +23,16 @@ extern void xfwrite_str(str_t *str, FILE *stream);
 extern void xfwrite_bytes(const void *ptr, size_t count, FILE *stream);
 
 // byte/word length followed by string
+extern void xfwrite_bcount_bytes(const void *str, size_t count, FILE *stream);
+extern void xfwrite_bcount_cstr(const char *str, FILE *stream);
 extern void xfwrite_bcount_str(str_t *str, FILE *stream);
+
+extern void xfwrite_wcount_bytes(const void *str, size_t count, FILE *stream);
+extern void xfwrite_wcount_cstr(const char *str, FILE *stream);
 extern void xfwrite_wcount_str(str_t *str, FILE *stream);
 
 extern void xfwrite_byte(byte_t value, FILE *stream);
-extern void xfwrite_word(int value, FILE *stream);
+extern void xfwrite_word(word_t value, FILE *stream);
 extern void xfwrite_dword(int value, FILE *stream);
 
 // dies if cannot read all expected elements; use fread() if this is expected

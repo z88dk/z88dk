@@ -33,6 +33,7 @@ write_file('test.x3/test.f3', "");
 #------------------------------------------------------------------------------
 write_file("test.c", <<'END');
 #include "zfileutil.h"
+#include "fileutil.h"
 #include "strpool.h"
 
 #define ERROR die("Test failed at line %d\n", __LINE__)
@@ -138,59 +139,10 @@ system($compile) and die "compile failed: $compile\n";
 t_capture("./test", "", "", 0);
 
 #------------------------------------------------------------------------------
-# error callback
-write_file("test.c", <<'END');
-#include "zfileutil.h"
-
-#define ERROR die("Test failed at line %d\n", __LINE__)
-
-void error(char *filename, bool writing)
-{
-	die("captured error %s %d\n", filename, writing );
-}
-
-void null_error(char *filename, bool writing)
-{
-	warn("captured error %s %d\n", filename, writing );
-}
-
-int main(int argc, char *argv[])
-{
-	ferr_callback_t old;
-	
-	old = set_ferr_callback( error );
-	if (old != NULL) ERROR;
-	
-	old = set_ferr_callback( error );
-	if (old != error) ERROR;
-
-	switch (*argv[1]) 
-	{
-		case '0':	xfopen("test.1xxxx.bin", 		"rb"); break;
-		case '1':	xfopen("x/x/x/x/test.1.bin", 	"wb"); break;
-		case '2': 	set_ferr_callback( null_error );
-					xfopen("test.1xxxx.bin",		"rb");
-					break;
-		case '3': 	set_ferr_callback( null_error );
-					xfopen("x/x/x/x/test.1.bin", "wb"); 
-					break;
-	}
-							
-	return 0;
-}
-END
-
-system($compile) and die "compile failed: $compile\n";
-t_capture("./test 0", "", "test.1xxxx.bin: No such file or directory\n", 1);
-t_capture("./test 1", "", "x/x/x/x/test.1.bin: No such file or directory\n", 1);
-t_capture("./test 2", "", "test.1xxxx.bin: No such file or directory\n", 1);
-t_capture("./test 3", "", "x/x/x/x/test.1.bin: No such file or directory\n", 1);
-
-
-#------------------------------------------------------------------------------
 # file io
 write_file("test.c", <<'END');
 #include "zfileutil.h"
+#include "fileutil.h"
 
 #define ERROR die("Test failed at line %d\n", __LINE__)
 
@@ -272,256 +224,6 @@ int main(int argc, char *argv[])
 					xfread_bytes( buffer, Str_len(small)+1, file );
 					break;
 					
-		case '9':	Str_set( small, SMALL_STR );
-					file = xfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
-					xfput_Str(  file, small );
-					xfput_strz( file, "abc" );
-					xfclose(file);
-		
-					memset( Str_data(large), 0, large->size );
-					file = xfopen("test.1.bin", "rb"); if ( ! file ) ERROR;
-					xfget_Str( file, large, 7 );
-					xfclose(file);
-					if (Str_len(large) != 7) ERROR;
-					if (memcmp( Str_data(large), "1234abc", 7)) ERROR;
-					break;
-					
-		case 'A':	Str_set( small, SMALL_STR );
-					file = xfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
-					xfput_Str( file, small );
-					xfclose(file);
-		
-					file = xfopen("test.1.bin", "rb"); if ( ! file ) ERROR;
-					xfget_Str( file, large, Str_len(small)+1 );
-					break;
-					
-		case 'B':	Str_set_bytes( small, "\0\1\2\3", 4 );
-					file = xfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
-					xfput_Str( file, small );
-					xfclose(file);
-		
-					memset( Str_data(large), 0, large->size );
-					file = xfopen("test.1.bin", "rb"); if ( ! file ) ERROR;
-					xfget_Str( file, large, Str_len(small) );
-					xfclose(file);
-					if (Str_len(large) != 4) ERROR;
-					if (memcmp( Str_data(large), "\0\1\2\3", 4)) ERROR;
-					break;
-					
-		case 'C':	file = xfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
-		
-					Str_clear( small );			xfput_count_byte_Str( file, small );
-					Str_set( small, SMALL_STR);	xfput_count_byte_Str( file, small );
-												xfput_count_byte_strz( file, "hello world" );
-					Str_clear( large );			xfput_count_word_Str( file, large );
-					Str_set( large, BIG_STR );	xfput_count_word_Str( file, large );
-												xfput_count_word_strz( file, "hello world" );
-					xfclose(file);
-		
-					file = xfopen("test.1.bin", "rb"); if ( ! file ) ERROR;
-					
-					memset( Str_data(large), 0, large->size );
-					xfget_count_byte_Str( file, large );
-					if (Str_len(large) != 0) ERROR;
-					if (memcmp( Str_data(large), "", 0)) ERROR;
-					
-					memset( Str_data(large), 0, large->size );
-					xfget_count_byte_Str( file, large );
-					if (Str_len(large) != 4) ERROR;
-					if (memcmp( Str_data(large), "1234", 4)) ERROR;
-					
-					memset( Str_data(large), 0, large->size );
-					xfget_count_byte_Str( file, large );
-					if (Str_len(large) != 11) ERROR;
-					if (memcmp( Str_data(large), "hello world", 11)) ERROR;
-					
-					memset( Str_data(large), 0, large->size );
-					xfget_count_word_Str( file, large );
-					if (Str_len(large) != 0) ERROR;
-					if (memcmp( Str_data(large), "", 0)) ERROR;
-					
-					memset( Str_data(large), 0, large->size );
-					xfget_count_word_Str( file, large );
-					if (Str_len(large) != 256) ERROR;
-					if (memcmp( Str_data(large), BIG_STR, 256)) ERROR;
-					
-					memset( Str_data(large), 0, large->size );
-					xfget_count_word_Str( file, large );
-					if (Str_len(large) != 11) ERROR;
-					if (memcmp( Str_data(large), "hello world", 11)) ERROR;
-					
-					xfclose(file);
-					break;
-
-		case 'D':	Str_set( large, BIG_STR );
-					file = xfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
-					xfput_count_byte_Str( file, large );
-					break;
-								
-		case 'E':	huge = Str_new(0x10000);
-					huge->len = 0x10000;
-					
-					file = xfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
-					xfput_count_word_Str( file, huge );
-
-					Str_delete(huge);
-					break;
-
-		case 'F':	file = xfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
-					xfput_int8(   file,        -128 );
-					xfput_uint8(  file,        -128 );
-					xfput_int8(   file,        -127 );
-					xfput_uint8(  file,        -127 );
-					xfput_int8(   file,           0 );
-					xfput_uint8(  file,           0 );
-					xfput_int8(   file,         127 );
-					xfput_uint8(  file,         127 );
-					xfput_int8(   file,         128 );
-					xfput_uint8(  file,         128 );
-					xfput_int8(   file,         255 );
-					xfput_uint8(  file,         255 );
-					xfput_int8(   file,         256 );
-					xfput_uint8(  file,         256 );
-					xfput_int16(  file,      -32768 );
-					xfput_uint16( file,      -32768 );
-					xfput_int16(  file,      -32767 );
-					xfput_uint16( file,      -32767 );
-					xfput_int16(  file,           0 );
-					xfput_uint16( file,           0 );
-					xfput_int16(  file,       32767 );
-					xfput_uint16( file,       32767 );
-					xfput_int16(  file,       32768 );
-					xfput_uint16( file,       32768 );
-					xfput_int16(  file,       65535 );
-					xfput_uint16( file,       65535 );
-					xfput_int16(  file,       65536 );
-					xfput_uint16( file,       65536 );
-					xfput_int32(  file,  0x80000000 ); /* -2,147,483,648 */
-					xfput_uint32( file,  0x80000000 ); /*  2,147,483,648 */
-					xfput_int32(  file,  0x80000001 ); /* -2,147,483,647 */
-					xfput_uint32( file,  0x80000001 ); /*  2,147,483,649 */
-					xfput_int32(  file,           0 );
-					xfput_uint32( file,           0 );
-					xfput_int32(  file,           1 );
-					xfput_uint32( file,           1 );
-					xfput_int32(  file,         256 );
-					xfput_uint32( file,         256 );
-					xfput_int32(  file,       65536 );
-					xfput_uint32( file,       65536 );
-					xfput_int32(  file,    16777216 );
-					xfput_uint32( file,    16777216 );
-					xfput_int32(  file,  0x7FFFFFFF ); /*  2,147,483,647 */
-					xfput_uint32( file,  0x7FFFFFFF ); /*  2,147,483,647 */
-					xfput_int32(  file,  0x80000000 ); /* -2,147,483,648 */
-					xfput_uint32( file,  0x80000000 ); /*  2,147,483,648 */
-					xfput_int32(  file,          -1 ); /*  4,294,967,295 */
-					xfput_uint32( file,  0xFFFFFFFF ); /*  4,294,967,295 */
-					xfclose(file);
-
-					file = xfopen("test.1.bin", "rb"); if ( ! file ) ERROR;
-					ivalue = xfget_int8(   file ); if ( ivalue !=        -128 ) ERROR;
-					uvalue = xfget_uint8(  file ); if ( uvalue !=         128 ) ERROR;
-					ivalue = xfget_int8(   file ); if ( ivalue !=        -127 ) ERROR;
-					uvalue = xfget_uint8(  file ); if ( uvalue !=         129 ) ERROR;
-					ivalue = xfget_int8(   file ); if ( ivalue !=           0 ) ERROR;
-					uvalue = xfget_uint8(  file ); if ( uvalue !=           0 ) ERROR;
-					ivalue = xfget_int8(   file ); if ( ivalue !=         127 ) ERROR;
-					uvalue = xfget_uint8(  file ); if ( uvalue !=         127 ) ERROR;
-					ivalue = xfget_int8(   file ); if ( ivalue !=        -128 ) ERROR;
-					uvalue = xfget_uint8(  file ); if ( uvalue !=         128 ) ERROR;
-					ivalue = xfget_int8(   file ); if ( ivalue !=          -1 ) ERROR;
-					uvalue = xfget_uint8(  file ); if ( uvalue !=         255 ) ERROR;
-					ivalue = xfget_int8(   file ); if ( ivalue !=           0 ) ERROR;
-					uvalue = xfget_uint8(  file ); if ( uvalue !=           0 ) ERROR;
-					ivalue = xfget_int16(  file ); if ( ivalue !=      -32768 ) ERROR;
-					uvalue = xfget_uint16( file ); if ( uvalue !=       32768 ) ERROR;
-					ivalue = xfget_int16(  file ); if ( ivalue !=      -32767 ) ERROR;
-					uvalue = xfget_uint16( file ); if ( uvalue !=       32769 ) ERROR;
-					ivalue = xfget_int16(  file ); if ( ivalue !=           0 ) ERROR;
-					uvalue = xfget_uint16( file ); if ( uvalue !=           0 ) ERROR;
-					ivalue = xfget_int16(  file ); if ( ivalue !=       32767 ) ERROR;
-					uvalue = xfget_uint16( file ); if ( uvalue !=       32767 ) ERROR;
-					ivalue = xfget_int16(  file ); if ( ivalue !=      -32768 ) ERROR;
-					uvalue = xfget_uint16( file ); if ( uvalue !=       32768 ) ERROR;
-					ivalue = xfget_int16(  file ); if ( ivalue !=          -1 ) ERROR;
-					uvalue = xfget_uint16( file ); if ( uvalue !=       65535 ) ERROR;
-					ivalue = xfget_int16(  file ); if ( ivalue !=           0 ) ERROR;
-					uvalue = xfget_uint16( file ); if ( uvalue !=           0 ) ERROR;
-					ilvalue = xfget_int32( file ); if ((ilvalue &  0xFFFFFFFF)
-															   !=  0x80000000 
-													   || ilvalue >= 0        ) ERROR;
-					ulvalue = xfget_uint32(file ); if (ulvalue !=  0x80000000 ) ERROR;
-					ilvalue = xfget_int32( file ); if ((ilvalue &  0xFFFFFFFF)
-															   !=  0x80000001 
-													   || ilvalue >= 0        ) ERROR;
-					ulvalue = xfget_uint32(file ); if (ulvalue !=  0x80000001 ) ERROR;
-					ilvalue = xfget_int32( file ); if (ilvalue !=           0 ) ERROR;
-					ulvalue = xfget_uint32(file ); if (ulvalue !=           0 ) ERROR;
-					ilvalue = xfget_int32( file ); if (ilvalue !=           1 ) ERROR;
-					ulvalue = xfget_uint32(file ); if (ulvalue !=           1 ) ERROR;
-					ilvalue = xfget_int32( file ); if (ilvalue !=         256 ) ERROR;
-					ulvalue = xfget_uint32(file ); if (ulvalue !=         256 ) ERROR;
-					ilvalue = xfget_int32( file ); if (ilvalue !=       65536 ) ERROR;
-					ulvalue = xfget_uint32(file ); if (ulvalue !=       65536 ) ERROR;
-					ilvalue = xfget_int32( file ); if (ilvalue !=    16777216 ) ERROR;
-					ulvalue = xfget_uint32(file ); if (ulvalue !=    16777216 ) ERROR;
-					ilvalue = xfget_int32( file ); if (ilvalue !=  2147483647 ) ERROR;
-					ulvalue = xfget_uint32(file ); if (ulvalue !=  2147483647 ) ERROR;
-					ilvalue = xfget_int32( file ); if ((ilvalue &  0xFFFFFFFF)
-															   !=  0x80000000 
-													   || ilvalue >= 0        ) ERROR;
-					ulvalue = xfget_uint32(file ); if (ulvalue !=  0x80000000 ) ERROR;
-					ilvalue = xfget_int32( file ); if (ilvalue !=          -1 ) ERROR;
-					ulvalue = xfget_uint32(file ); if (ulvalue !=  0xFFFFFFFF ) ERROR;
-					xfclose(file);
-					break;
-
-#define T_TEMP_FILENAME(name,temp) \
-					if (strcmp(temp, temp_filename(name))) ERROR;	\
-					file = xfopen(temp, "w"); if ( ! file ) ERROR;	\
-					fputs("hello", file);	\
-					xfclose(file);
-					
-		case 'G':	T_TEMP_FILENAME("test.1.c",		"./~$1$test.1.c");
-					T_TEMP_FILENAME("test.1.c",		"./~$2$test.1.c");
-					T_TEMP_FILENAME("test.2.c",		"./~$3$test.2.c");
-					T_TEMP_FILENAME("test.x1\\x.c",	"test.x1/~$4$x.c");
-					break;
-
-		case 'H':	/* without existing target file */
-					remove("test.1.bin");
-					file = xfopen("test.1.bin", "wb"); 
-					if ( ! file ) ERROR;
-					xfput_strz( file, "123" );
-					xfclose(file);
-
-					/* with existing target file */
-					file = xfopen("test.1.bin", "wb"); 
-					if ( ! file ) ERROR;
-					xfput_strz( file, "123" );
-					xfclose(file);
-
-					memset(buffer, 0, sizeof(buffer));
-					file = xfopen("test.1.bin", "rb"); 
-					if ( ! file ) ERROR;
-					xfread_bytes( buffer, 3, file );
-					xfclose(file);
-					if (memcmp(buffer, "123", 3)) ERROR;
-					break;
-					
-		case 'I':	remove("test.1.bin");
-					file = xfopen("test.1.bin", "wb"); 
-					if ( ! file ) ERROR;
-					xfput_strz( file, "123" );
-					break;
-					
-		case 'J':	remove("test.1.bin");
-					file = xfopen("test.1.bin", "wb"); 
-					if ( ! file ) ERROR;
-					xfput_strz( file, "123" );
-					xfclose( file );
-					break;
-					
 	}
 
 	return 0;
@@ -538,53 +240,12 @@ t_capture("./test 5", "", "failed to write 4 bytes to file 'test.1.bin'\n", 1);
 t_capture("./test 6", "", "failed to read 4 bytes from file 'test.1.bin'\n", 1);
 t_capture("./test 7", "", "", 0); is read_binfile("test.1.bin"), "1234123";
 t_capture("./test 8", "", "failed to read 5 bytes from file 'test.1.bin'\n", 1);
-t_capture("./test 9", "", "", 0); is read_binfile("test.1.bin"), "1234abc";
-t_capture("./test A", "", "failed to read 5 bytes from file 'test.1.bin'\n", 1);
-t_capture("./test B", "", "", 0); is read_binfile("test.1.bin"), "\0\1\2\3";
-t_capture("./test C", "", "", 0); is read_binfile("test.1.bin"), 
-									pack("C",   0)."".
-									pack("C",   4)."1234".
-									pack("C",  11)."hello world".
-									pack("v",   0)."".
-									pack("v", 256).("1234567890" x 25)."123456".
-									pack("v",  11)."hello world";
-#t_capture("./test D", "", "Error: cannot write file 'test.1.bin'\n", 0);
-#t_capture("./test E", "", "Error: cannot write file 'test.1.bin'\n", 0);
-t_capture("./test F", "", "", 0); is read_binfile("test.1.bin"), 
-									pack("C*", 
-										 128, 128, 129, 129, 0, 0, 127, 127, 
-										 128, 128, 255, 255, 0, 0).
-									pack("v*",
-										 32768, 32768, 32769, 32769, 0, 0,
-										 32767, 32767, 32768, 32768, 
-										 65535, 65535, 0, 0).
-									pack("V*",
-									     2147483648, 2147483648, 
-										 2147483649, 2147483649, 0, 0, 1, 1,
-										 256, 256, 65536, 65536,
-										 16777216, 16777216, 
-										 2147483647, 2147483647,
-										 2147483648, 2147483648,
-										 4294967295, 4294967295);
-t_capture("./test G", "", "", 0); 
-	ok ! -f '~$1$test.1.c';
-	ok ! -f '~$2$test.1.c';
-	ok ! -f '~$3$test.2.c';
-	ok ! -f 'test.x1\\~$4$x.c';
-t_capture("./test H", "", "", 0); is read_binfile("test.1.bin"), "123";
-t_capture("./test I", "", "", 0); 
-	ok ! -f 'test.bin';
-	ok ! -f '~$1$test.bin';
-	ok ! -f '~$2$test.bin';
-t_capture("./test J", "", "", 0); 
-	ok ! -f 'test.bin';
-	ok ! -f '~$1$test.bin';
-	ok ! -f '~$2$test.bin';
 
 #------------------------------------------------------------------------------
 # order of execution of fini() actions
 write_file("test.c", <<'END');
 #include "zfileutil.h"
+#include "fileutil.h"
 #include "init.h"
 #include <assert.h>
 
@@ -605,7 +266,7 @@ int main()
 	init_module();	
 	file = xfopen("test.1.bin", "wb"); assert(file);
 	
-	xfput_strz( file, "123" );
+	xfwrite_cstr( "123", file );
 	
 	return 0;
 }

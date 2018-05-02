@@ -14,14 +14,14 @@
 static UT_array *open_files = NULL;		// array indexed by fileno(fp)
 
 static void add_open_file(FILE *stream, const char *filename);
-static void deinit(void);
+static void file_deinit(void);
 
-static void init()
+static void file_init()
 {
 	static bool inited = false;
 	if (!inited) {
 		inited = true;
-		atexit(deinit);
+		atexit(file_deinit);
 		utarray_new(open_files, &ut_str_icd);
 		add_open_file(stdin, "<stdin>");
 		add_open_file(stdout, "<stdout>");
@@ -29,14 +29,14 @@ static void init()
 	}
 }
 
-static void deinit(void)
+static void file_deinit(void)
 {
 	utarray_free(open_files);
 }
 
 static void add_open_file(FILE *stream, const char *filename)
 {
-	init();
+	file_init();
 	assert(stream);
 	size_t fno = fileno(stream);
 	if (fno >= utarray_len(open_files))
@@ -47,7 +47,7 @@ static void add_open_file(FILE *stream, const char *filename)
 
 static char *get_filename(FILE *fp)
 {
-	init();
+	file_init();
 	size_t fno = fp ? fileno(fp) : -1;
 	if (fno >= utarray_len(open_files))
 		return "?";
@@ -110,22 +110,40 @@ void xfwrite_bytes(const void *ptr, size_t count, FILE *stream)
 	xfwrite(ptr, sizeof(byte_t), count, stream);
 }
 
-void xfwrite_bcount_str(str_t *str, FILE *stream)
+void xfwrite_bcount_bytes(const void *str, size_t count, FILE *stream)
 {
-	size_t len = str_len(str);
-	if (len > 255)
-		die("string '%.40s...' too long for byte counted string\n", str_data(str));
-	xfwrite_byte(len & 0xFF, stream);
-	xfwrite_str(str, stream);
+	if (count > 255)
+		die("string '%.40s...' too long for byte counted string\n", str);
+	xfwrite_byte(count & 0xFF, stream);
+	xfwrite_bytes(str, count, stream);
 }
 
-void xfwrite_wcount_str(str_t * str, FILE * stream)
+void xfwrite_bcount_cstr(const char *str, FILE *stream)
 {
-	size_t len = str_len(str);
-	if (len > 0xFFFF)
-		die("string '%.40s...' too long for word counted string\n", str_data(str));
-	xfwrite_word(len, stream);
-	xfwrite_str(str, stream);
+	xfwrite_bcount_bytes(str, strlen(str), stream);
+}
+
+void xfwrite_bcount_str(str_t *str, FILE *stream)
+{
+	xfwrite_bcount_bytes(str_data(str), str_len(str), stream);
+}
+
+void xfwrite_wcount_bytes(const void *str, size_t count, FILE * stream)
+{
+	if (count > 0xFFFF)
+		die("string '%.40s...' too long for word counted string\n", str);
+	xfwrite_word((word_t)count, stream);
+	xfwrite_bytes(str, count, stream);
+}
+
+void xfwrite_wcount_cstr(const char *str, FILE *stream)
+{
+	xfwrite_wcount_bytes(str, strlen(str), stream);
+}
+
+void xfwrite_wcount_str(str_t *str, FILE *stream)
+{
+	xfwrite_wcount_bytes(str_data(str), str_len(str), stream);
 }
 
 void xfwrite_byte(byte_t value, FILE *stream)
@@ -133,7 +151,7 @@ void xfwrite_byte(byte_t value, FILE *stream)
 	xfwrite_bytes(&value, 1, stream);
 }
 
-void xfwrite_word(int value, FILE *stream)
+void xfwrite_word(word_t value, FILE *stream)
 {
 	byte_t word[2];
 	word[0] = value & 0xFF; value >>= 8;

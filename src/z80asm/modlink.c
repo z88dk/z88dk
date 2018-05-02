@@ -49,7 +49,8 @@ extern char *reloctable, *relocptr;
 struct linklist *linkhdr;
 int totaladdr, curroffset;
 
-static void ReadNames_1(char *filename, FILE *file, Str *section_name, Str *name, Str *def_filename)
+static void ReadNames_1(char *filename, FILE *file, 
+						str_t *section_name, str_t *name, str_t *def_filename)
 {
     int scope, symbol_char;
 	sym_type_t type = TYPE_UNKNOWN;
@@ -59,22 +60,22 @@ static void ReadNames_1(char *filename, FILE *file, Str *section_name, Str *name
 
     while (true)
     {
-        scope = xfget_int8(  file );
+        scope = xfread_byte(file);
 		if ( scope == 0 )
 			break;								/* terminator */
 
-        symbol_char	= xfget_int8(  file );		/* type of name   */
+        symbol_char	= xfread_byte(file);		/* type of name   */
 
-		xfget_count_byte_Str( file, section_name );	/* read section name */
+		xfread_bcount_str(section_name, file);	/* read section name */
 
-		value		= xfget_int32( file );		/* read symbol (long) integer */
-		xfget_count_byte_Str( file, name );		/* read symbol name */
+		value		= xfread_dword(file);		/* read symbol (long) integer */
+		xfread_bcount_str(name, file);			/* read symbol name */
 
 		// read symbol definition location
-		xfget_count_byte_Str(file, def_filename);
-		line_nr = xfget_int32(file);
+		xfread_bcount_str(def_filename, file);
+		line_nr = xfread_dword(file);
 
-		new_section( Str_data(section_name) );		/* define CURRENTSECTION */
+		new_section( str_data(section_name) );		/* define CURRENTSECTION */
 
         switch ( symbol_char )
         {
@@ -87,15 +88,15 @@ static void ReadNames_1(char *filename, FILE *file, Str *section_name, Str *name
 
         switch ( scope )
         {
-		case 'L': sym = define_local_sym(Str_data(name), value, type); break;
-		case 'G': sym = define_global_sym(Str_data(name), value, type); break;
+		case 'L': sym = define_local_sym(str_data(name), value, type); break;
+		case 'G': sym = define_global_sym(str_data(name), value, type); break;
         default:
             error_not_obj_file( filename );
         }
 
 		// set symbol definition
 		if (sym) {
-			sym->filename = strpool_add(Str_data(def_filename));
+			sym->filename = strpool_add(str_data(def_filename));
 			sym->line_nr = line_nr;
 		}
     }
@@ -103,15 +104,16 @@ static void ReadNames_1(char *filename, FILE *file, Str *section_name, Str *name
 
 void ReadNames(char *filename, FILE *file)
 {
-	STR_DEFINE(section_name, STR_SIZE);
-	STR_DEFINE(name, STR_SIZE);
-	STR_DEFINE(def_filename, STR_SIZE);
+	str_t *section_name = str_new();
+	str_t *name = str_new();
+	str_t *def_filename = str_new();
 
-	ReadNames_1(filename, file, section_name, name, def_filename);
+	ReadNames_1(filename, file, 
+				section_name, name, def_filename);
 
-	STR_DELETE(section_name);
-	STR_DELETE(name);
-	STR_DELETE(def_filename);
+	str_free(section_name);
+	str_free(name);
+	str_free(def_filename);
 }
 
 
@@ -154,7 +156,8 @@ static void set_expr_env( Expr *expr, bool module_relative_addr )
 
 /* read the current modules' expressions to the given list */
 static void read_cur_module_exprs_1(ExprList *exprs, FILE *file, char *filename,
-	Str *expr_text, Str *last_filename, Str *source_filename, Str *section_name, Str *target_name)
+	str_t *expr_text, str_t *last_filename, str_t *source_filename, 
+	str_t *section_name, str_t *target_name)
 {
 	int line_nr;
 	int type;
@@ -163,31 +166,31 @@ static void read_cur_module_exprs_1(ExprList *exprs, FILE *file, char *filename,
 
 	while (1) 
 	{
-        type = xfget_int8( file );
+        type = xfread_byte(file);
 		if ( type == 0 )
 			break;			/* end marker */
 
 		/* source file and line number */
-		xfget_count_word_Str( file, source_filename );
-		if ( Str_len(source_filename) == 0 )
-			Str_set( source_filename, Str_data(last_filename) );
+		xfread_wcount_str(source_filename, file);
+		if ( str_len(source_filename) == 0 )
+			str_set( source_filename, str_data(last_filename) );
 		else
-			Str_set( last_filename, Str_data(source_filename) );
+			str_set( last_filename, str_data(source_filename) );
 
-		line_nr = xfget_int32( file );
+		line_nr = xfread_dword(file);
 
 		/* patch location */
-		xfget_count_byte_Str( file, section_name );
+		xfread_bcount_str(section_name, file);
 
-		asmpc		= xfget_uint16( file );
-        code_pos	= xfget_uint16( file );
+		asmpc		= xfread_word(file);
+        code_pos	= xfread_word(file);
 
-		xfget_count_byte_Str( file, target_name );	/* get expression EQU target, if not empty */
-		xfget_count_word_Str( file, expr_text );	/* get expression */
+		xfread_bcount_str(target_name, file);	/* get expression EQU target, if not empty */
+		xfread_wcount_str(expr_text, file);		/* get expression */
 
 		/* read expression followed by newline */
-		Str_append_char( expr_text, '\n');
-		SetTemporaryLine( Str_data(expr_text) );			/* read expression */
+		str_append(expr_text, "\n");
+		SetTemporaryLine( str_data(expr_text) );			/* read expression */
 
         EOL = false;                /* reset end of line parsing flag - a line is to be parsed... */
 
@@ -195,8 +198,8 @@ static void read_cur_module_exprs_1(ExprList *exprs, FILE *file, char *filename,
         GetSym();
 
 		/* parse and store expression in the list */
-		set_asmpc_env( CURRENTMODULE, Str_data(section_name), 
-					   Str_data(source_filename), line_nr, 
+		set_asmpc_env( CURRENTMODULE, str_data(section_name), 
+					   str_data(source_filename), line_nr, 
 					   asmpc,
 					   false );
         if ( ( expr = expr_parse() ) != NULL )
@@ -210,8 +213,8 @@ static void read_cur_module_exprs_1(ExprList *exprs, FILE *file, char *filename,
 			case 'B': expr->range = RANGE_WORD_BE;		break;
 			case 'L': expr->range = RANGE_DWORD;		break;
 			case '=': expr->range = RANGE_WORD;
-					  assert( Str_len(target_name) > 0 );
-					  expr->target_name = strpool_add( Str_data(target_name) );	/* define expression as EQU */
+					  assert( str_len(target_name) > 0 );
+					  expr->target_name = strpool_add( str_data(target_name) );	/* define expression as EQU */
 					  break;
 			default:
 				error_not_obj_file( filename );
@@ -221,7 +224,7 @@ static void read_cur_module_exprs_1(ExprList *exprs, FILE *file, char *filename,
 			expr->section	= CURRENTSECTION;
 			expr->asmpc		= asmpc;
 			expr->code_pos	= code_pos;
-			expr->filename	= strpool_add( Str_data(source_filename) );
+			expr->filename	= strpool_add( str_data(source_filename) );
 			expr->line_nr	= line_nr;
 			expr->listpos	= -1;
 
@@ -232,20 +235,20 @@ static void read_cur_module_exprs_1(ExprList *exprs, FILE *file, char *filename,
 
 static void read_cur_module_exprs(ExprList *exprs, FILE *file, char *filename)
 {
-	STR_DEFINE(expr_text, STR_SIZE);
-	STR_DEFINE(last_filename, STR_SIZE);
-	STR_DEFINE(source_filename, STR_SIZE);
-	STR_DEFINE(section_name, STR_SIZE);
-	STR_DEFINE(target_name, STR_SIZE);
+	str_t *expr_text = str_new();
+	str_t *last_filename = str_new();
+	str_t *source_filename = str_new();
+	str_t *section_name = str_new();
+	str_t *target_name = str_new();
 
 	read_cur_module_exprs_1(exprs, file, filename, 
 		expr_text, last_filename, source_filename, section_name, target_name);
 
-	STR_DELETE(expr_text);
-	STR_DELETE(last_filename);
-	STR_DELETE(source_filename);
-	STR_DELETE(section_name);
-	STR_DELETE(target_name);
+	str_free(expr_text);
+	str_free(last_filename);
+	str_free(source_filename);
+	str_free(section_name);
+	str_free(target_name);
 
 }
 
@@ -274,10 +277,10 @@ static void read_module_exprs( ExprList *exprs )
 		}
 		else {
 			fseek(file, fptr_base + 8, SEEK_SET);			/* point at module name  pointer   */
-			/*fptr_modname*/  xfget_int32(file);			/* get file pointer to module name */
-			fptr_exprdecl = xfget_int32(file);			/* get file pointer to expression declarations */
-			/*fptr_namedecl*/ xfget_int32(file);			/* get file pointer to name declarations */
-			/*fptr_libnmdecl*/xfget_int32(file);			/* get file pointer to library name declarations */
+			/*fptr_modname*/  xfread_dword(file);			/* get file pointer to module name */
+			fptr_exprdecl = xfread_dword(file);			/* get file pointer to expression declarations */
+			/*fptr_namedecl*/ xfread_dword(file);			/* get file pointer to name declarations */
+			/*fptr_libnmdecl*/xfread_dword(file);			/* get file pointer to library name declarations */
 
 			if (fptr_exprdecl != -1)
 			{
@@ -612,20 +615,21 @@ static bool linked_module(struct libfile *lib, FILE *file, long obj_fpos, StrHas
 	long names_fpos, modname_fpos;
 	bool linked = false;
 	bool found_symbol;
-	STR_DEFINE(module_name, STR_SIZE);
-	STR_DEFINE(def_filename, STR_SIZE);
-	STR_DEFINE(symbol_name, STR_SIZE);
-	STR_DEFINE(section_name, STR_SIZE);
+	
+	str_t *module_name = str_new();
+	str_t *def_filename = str_new();
+	str_t *symbol_name = str_new();
+	str_t *section_name = str_new();
 
 	/* read module name */
 	fseek(file, obj_fpos + 8, SEEK_SET);
-	modname_fpos = xfget_int32(file);
+	modname_fpos = xfread_dword(file);
 	fseek(file, obj_fpos + modname_fpos, SEEK_SET);
-	xfget_count_byte_Str(file, module_name);
+	xfread_bcount_str(module_name, file);
 
 	/* names section */
 	fseek(file, obj_fpos + 8 + 4 + 4, SEEK_SET);
-	names_fpos = xfget_int32(file);
+	names_fpos = xfread_dword(file);
 
 	if (names_fpos != -1) {
 		fseek(file, obj_fpos + names_fpos, SEEK_SET);
@@ -634,32 +638,32 @@ static bool linked_module(struct libfile *lib, FILE *file, long obj_fpos, StrHas
 		for (found_symbol = false; !found_symbol;) {
 			int scope;
 
-			scope = xfget_int8(file);
+			scope = xfread_byte(file);
 			if (scope == 0)
 				break;
 
-			xfget_int8(file);			/* type */
-			xfget_count_byte_Str(file, section_name);
-			xfget_int32(file);			/* value */
-			xfget_count_byte_Str(file, symbol_name);
-			xfget_count_byte_Str(file, def_filename);
-			xfget_int32(file);			/* line_nr */
+			xfread_byte(file);			/* type */
+			xfread_bcount_str(section_name, file);
+			xfread_dword(file);			/* value */
+			xfread_bcount_str(symbol_name, file);
+			xfread_bcount_str(def_filename, file);
+			xfread_dword(file);			/* line_nr */
 
-			if (scope == 'G' && StrHash_exists(extern_syms, Str_data(symbol_name)))
+			if (scope == 'G' && StrHash_exists(extern_syms, str_data(symbol_name)))
 				found_symbol = true;
 		}
 
 		/* link module if found one needed symbol */
 		if (found_symbol) {
-			LinkLibModule(lib, obj_fpos, Str_data(module_name), extern_syms);
+			LinkLibModule(lib, obj_fpos, str_data(module_name), extern_syms);
 			linked = true;
 		}
 	}
 
-	STR_DELETE(module_name);
-	STR_DELETE(def_filename);
-	STR_DELETE(symbol_name);
-	STR_DELETE(section_name);
+	str_free(module_name);
+	str_free(def_filename);
+	str_free(symbol_name);
+	str_free(section_name);
 
 	return linked;
 }
@@ -683,8 +687,8 @@ static bool linked_libraries(StrHash *extern_syms)
 			/* search object module chain */
 			for (obj_fpos = 8; !linked && obj_fpos != -1; obj_fpos = obj_next_fpos) {
 				fseek(file, obj_fpos, SEEK_SET);			/* point at beginning of a module */
-				obj_next_fpos = xfget_int32(file);			/* get file pointer to next module in library */
-				module_size = xfget_int32(file);			/* get size of current module */
+				obj_next_fpos = xfread_dword(file);			/* get file pointer to next module in library */
+				module_size = xfread_dword(file);			/* get size of current module */
 
 				if (module_size == 0)
 					continue;								/* deleted module */
@@ -824,7 +828,7 @@ void link_modules( void )
 
 
 
-static int LinkModule_1(char *filename, long fptr_base, Str *section_name, StrHash *extern_syms)
+static int LinkModule_1(char *filename, long fptr_base, str_t *section_name, StrHash *extern_syms)
 {
     long fptr_namedecl, fptr_modname, fptr_modcode, fptr_libnmdecl;
     int code_size;
@@ -839,11 +843,11 @@ static int LinkModule_1(char *filename, long fptr_base, Str *section_name, StrHa
 	else {
 		fseek(file, fptr_base + 8, SEEK_SET);
 
-		fptr_modname = xfget_int32(file);	/* get file pointer to module name */
-		xfget_int32(file);	/* get file pointer to expression declarations */
-		fptr_namedecl = xfget_int32(file);	/* get file pointer to name declarations */
-		fptr_libnmdecl = xfget_int32(file);	/* get file pointer to library name declarations */
-		fptr_modcode = xfget_int32(file);	/* get file pointer to module code */
+		fptr_modname = xfread_dword(file);	/* get file pointer to module name */
+		xfread_dword(file);	/* get file pointer to expression declarations */
+		fptr_namedecl = xfread_dword(file);	/* get file pointer to name declarations */
+		fptr_libnmdecl = xfread_dword(file);	/* get file pointer to library name declarations */
+		fptr_modcode = xfread_dword(file);	/* get file pointer to module code */
 
 		if (fptr_modcode != -1)
 		{
@@ -851,20 +855,20 @@ static int LinkModule_1(char *filename, long fptr_base, Str *section_name, StrHa
 
 			while (true)	/* read sections until end marker */
 			{
-				code_size = xfget_int32(file);
+				code_size = xfread_dword(file);
 				if (code_size < 0)
 					break;
 
 				/* load bytes to section */
 				/* BUG_0015: was reading at current position in code area, swaping order of modules */
-				xfget_count_byte_Str(file, section_name);
-				section = new_section(Str_data(section_name));
+				xfread_bcount_str(section_name, file);
+				section = new_section(str_data(section_name));
 				read_origin(file, section);
-				section->align = xfget_int32(file);
+				section->align = xfread_dword(file);
 
 				/* if creating relocatable code, ignore origin */
 				if (opts.relocatable && section->origin >= 0) {
-					warn_org_ignored(filename, Str_data(section_name));
+					warn_org_ignored(filename, str_data(section_name));
 					section->origin = -1;
 					section->section_split = false;
 				}
@@ -883,18 +887,18 @@ static int LinkModule_1(char *filename, long fptr_base, Str *section_name, StrHa
 		// collect list of external symbols
 		if (fptr_libnmdecl != -1)
 		{
-			STR_DEFINE(name, STR_SIZE);
+			str_t *name = str_new();
 			char *name_p;
 			long p;
 
 			for (p = fptr_libnmdecl; p < fptr_modname;) {
 				fseek(file, fptr_base + p, SEEK_SET);			/* set file pointer to point at external name declaration */
-				xfget_count_byte_Str(file, name);				/* read library reference name */
-				p += 1 + Str_len(name);							/* point to next name */
-				name_p = strpool_add(Str_data(name));
+				xfread_bcount_str(name, file);					/* read library reference name */
+				p += 1 + str_len(name);							/* point to next name */
+				name_p = strpool_add(str_data(name));
 				StrHash_set(&extern_syms, name_p, name_p);		/* remember all extern references */
 			}
-			STR_DELETE(name);
+			str_free(name);
 		}
 
 		xfclose(file);
@@ -905,9 +909,9 @@ static int LinkModule_1(char *filename, long fptr_base, Str *section_name, StrHa
 
 int LinkModule(char *filename, long fptr_base, StrHash *extern_syms)
 {
-	STR_DEFINE(section_name, STR_SIZE);
+	str_t *section_name = str_new();
 	int ret = LinkModule_1(filename, fptr_base, section_name, extern_syms);
-	STR_DELETE(section_name);
+	str_free(section_name);
 	return ret;
 }
 

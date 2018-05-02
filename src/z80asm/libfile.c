@@ -52,7 +52,7 @@ void make_library(char *lib_filename, UT_array *src_files)
 
 	/* write library header */
 	lib_file = xfopen( lib_filename, "wb" );	
-	xfput_strz( lib_file, Z80libhdr );
+	xfwrite_cstr(Z80libhdr, lib_file);
 
 	/* write each object file */
 	for (pfile = NULL; (pfile = (char **)utarray_next(src_files, pfile)) != NULL; )
@@ -72,12 +72,12 @@ void make_library(char *lib_filename, UT_array *src_files)
 		/* write file pointer of next file, or -1 if last */
 		obj_size = ByteArray_size( obj_file_data );
 		if (pfile == (char **)utarray_back(src_files))
-			xfput_uint32(lib_file, -1);
+			xfwrite_dword(-1, lib_file);
         else
-            xfput_uint32( lib_file, fptr + 4 + 4 + obj_size ); 
+            xfwrite_dword(fptr + 4 + 4 + obj_size,  lib_file); 
 
 		/* write module size */
-        xfput_uint32( lib_file, obj_size );
+        xfwrite_dword(obj_size, lib_file);
 
 		/* write module */
 		xfwrite_bytes((char *)ByteArray_item(obj_file_data, 0), obj_size, lib_file);

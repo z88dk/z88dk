@@ -113,7 +113,7 @@ static int char_digit(char c)
    code borrowed from GLib */
 int compress_escapes(char *str)
 {
-	char *p, *q, *num;
+	char *p = NULL, *q = NULL, *num = NULL;
 	int base = 0, max_digits, digit;
 
 	for (p = q = str; *p; p++)

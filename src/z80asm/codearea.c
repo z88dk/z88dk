@@ -548,10 +548,10 @@ bool fwrite_module_code(FILE *file, int* p_code_size)
 		if (size > 0 || section != get_first_section(NULL) || 
 		    section->origin >= 0 || section->align > 1)
 		{
-			xfput_int32(file, size);
-			xfput_count_byte_strz(file, section->name);
+			xfwrite_dword(size, file);
+			xfwrite_bcount_cstr(section->name, file);
 			write_origin(file, section);
-			xfput_int32(file, section->align);
+			xfwrite_dword(section->align, file);
 
 			if (size > 0)		/* ByteArray_item(bytes,0) creates item[0]!! */
 				xfwrite_bytes((char *)ByteArray_item(section->bytes, addr), size, file);
@@ -562,7 +562,7 @@ bool fwrite_module_code(FILE *file, int* p_code_size)
 	}
 
 	if (wrote_data)
-		xfput_int32(file, -1);		/* end marker */
+		xfwrite_dword(-1, file);		/* end marker */
 
 	if (p_code_size)
 		*p_code_size = code_size;
@@ -631,7 +631,7 @@ void fwrite_codearea(char *filename, FILE **pbinfile, FILE **prelocfile)
 			if (*prelocfile) {
 				unsigned i;
 				for (i = 0; i < intArray_size(section->reloc); i++) {
-					xfput_uint16(*prelocfile, *(intArray_item(section->reloc, i)) + cur_section_block_size);
+					xfwrite_word(*(intArray_item(section->reloc, i)) + cur_section_block_size, *prelocfile);
 				}
 			}
 
@@ -688,7 +688,7 @@ void set_origin_option(int origin)
 
 
 void read_origin(FILE* file, Section *section) {
-	int origin = xfget_int32(file);
+	int origin = xfread_dword(file);
 	if (origin >= 0) {
 		section->origin = origin;
 		section->section_split = false;
@@ -710,7 +710,7 @@ void write_origin(FILE* file, Section *section) {
 			origin = -1;			/* write -1 for not defined */
 	}
 
-	xfput_int32(file, origin);
+	xfwrite_dword(origin, file);
 }
 
 void set_phase_directive(int address)

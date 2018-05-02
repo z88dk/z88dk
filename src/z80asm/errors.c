@@ -21,8 +21,6 @@ Error handling.
 #include "init.h"
 #include <stdio.h>
 
-static void file_error( char *filename, bool writing );
-
 /*-----------------------------------------------------------------------------
 *   Singleton data
 *----------------------------------------------------------------------------*/
@@ -57,7 +55,6 @@ DEFINE_init_module()
     set_error_null();               /* clear location of error messages */
 
 	/* init file error handling */
-	set_ferr_callback( file_error );
 	set_incl_recursion_err_cb( error_include_recursion );
 }
 
@@ -231,17 +228,4 @@ void do_error( enum ErrType err_type, char *message )
         errors.count++;		/* count number of errors */
 
 	STR_DELETE(msg);
-}
-
-/*-----------------------------------------------------------------------------
-*   file error handling
-*----------------------------------------------------------------------------*/
-static void file_error( char *filename, bool writing )
-{
-	init_module();
-	
-	if ( writing )
-		error_write_file( filename );
-	else
-		error_read_file( filename );
 }

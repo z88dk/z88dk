@@ -151,13 +151,18 @@ void t_fileutil_xfwrite_bcount_str_1(void)
 
 	str_clear(s);
 	xfwrite_bcount_str(s, fp);
-
 	fputc(0xFF, fp);
 
 	str_set(s, "h");
 	xfwrite_bcount_str(s, fp);
-
 	fputc(0xFF, fp);
+
+	xfwrite_bcount_bytes("hel", 3, fp);
+	fputc(0xFF, fp);
+
+	xfwrite_bcount_cstr("hel", fp);
+	fputc(0xFF, fp);
+
 	xfclose(fp);
 
 	fp = xfopen("test.out", "rb");
@@ -168,6 +173,16 @@ void t_fileutil_xfwrite_bcount_str_1(void)
 	TEST_ASSERT_EQUAL(0xFF, fgetc(fp));
 	TEST_ASSERT_EQUAL(1, fgetc(fp));
 	TEST_ASSERT_EQUAL('h', fgetc(fp));
+	TEST_ASSERT_EQUAL(0xFF, fgetc(fp));
+	TEST_ASSERT_EQUAL(3, fgetc(fp));
+	TEST_ASSERT_EQUAL('h', fgetc(fp));
+	TEST_ASSERT_EQUAL('e', fgetc(fp));
+	TEST_ASSERT_EQUAL('l', fgetc(fp));
+	TEST_ASSERT_EQUAL(0xFF, fgetc(fp));
+	TEST_ASSERT_EQUAL(3, fgetc(fp));
+	TEST_ASSERT_EQUAL('h', fgetc(fp));
+	TEST_ASSERT_EQUAL('e', fgetc(fp));
+	TEST_ASSERT_EQUAL('l', fgetc(fp));
 	TEST_ASSERT_EQUAL(0xFF, fgetc(fp));
 	TEST_ASSERT_EQUAL(EOF, fgetc(fp));
 
@@ -221,21 +236,6 @@ void run_fileutil_xfwrite_bcount_str(void)
 	TEST_ASSERT_NOT_NULL(fp);
 
 	xfwrite_bcount_str(s, fp);		// dies
-	assert(0);
-}
-
-void run_fileutil_xfwrite_wcount_str(void)
-{
-	size_t sz = 0x10000;
-	str_t *s = str_new();
-	str_reserve(s, sz);
-	memset(str_data(s), 'x', sz);
-	str_data(s)[str_len(s) = sz] = '\0';
-
-	FILE *fp = xfopen("test.out", "wb");
-	TEST_ASSERT_NOT_NULL(fp);
-
-	xfwrite_wcount_str(s, fp);		// dies
 	assert(0);
 }
 
@@ -295,7 +295,12 @@ void t_fileutil_xfwrite_wcount_str_2(void)
 	str_data(s)[str_len(s) = 256] = '\0';
 
 	xfwrite_wcount_str(s, fp);
+	fputc(0xFF, fp);
 
+	xfwrite_wcount_bytes("hel", 3, fp);
+	fputc(0xFF, fp);
+
+	xfwrite_wcount_cstr("hel", fp);
 	fputc(0xFF, fp);
 
 	xfclose(fp);
@@ -316,11 +321,38 @@ void t_fileutil_xfwrite_wcount_str_2(void)
 	for (int i = 0; i < 256; i++)
 		TEST_ASSERT_EQUAL(' ', fgetc(fp));
 	TEST_ASSERT_EQUAL(0xFF, fgetc(fp));
+	TEST_ASSERT_EQUAL(3, fgetc(fp));
+	TEST_ASSERT_EQUAL(0, fgetc(fp));
+	TEST_ASSERT_EQUAL('h', fgetc(fp));
+	TEST_ASSERT_EQUAL('e', fgetc(fp));
+	TEST_ASSERT_EQUAL('l', fgetc(fp));
+	TEST_ASSERT_EQUAL(0xFF, fgetc(fp));
+	TEST_ASSERT_EQUAL(3, fgetc(fp));
+	TEST_ASSERT_EQUAL(0, fgetc(fp));
+	TEST_ASSERT_EQUAL('h', fgetc(fp));
+	TEST_ASSERT_EQUAL('e', fgetc(fp));
+	TEST_ASSERT_EQUAL('l', fgetc(fp));
+	TEST_ASSERT_EQUAL(0xFF, fgetc(fp));
 	TEST_ASSERT_EQUAL(EOF, fgetc(fp));
 
 	xfclose(fp);
 	remove("test.out");
 	str_free(s);
+}
+
+void run_fileutil_xfwrite_wcount_str(void)
+{
+	size_t sz = 0x10000;
+	str_t *s = str_new();
+	str_reserve(s, sz);
+	memset(str_data(s), 'x', sz);
+	str_data(s)[str_len(s) = sz] = '\0';
+
+	FILE *fp = xfopen("test.out", "wb");
+	TEST_ASSERT_NOT_NULL(fp);
+
+	xfwrite_wcount_str(s, fp);		// dies
+	assert(0);
 }
 
 void t_fileutile_xfwrite_byte(void)
@@ -333,6 +365,8 @@ void t_fileutile_xfwrite_byte(void)
 	fputc(0xFF, fp);
 	xfwrite_byte(255, fp);
 	fputc(0xFF, fp);
+	xfwrite_byte(-128, fp);
+	fputc(0xFF, fp);
 
 	xfclose(fp);
 
@@ -344,6 +378,8 @@ void t_fileutile_xfwrite_byte(void)
 	TEST_ASSERT_EQUAL(0xFF, fgetc(fp));
 	TEST_ASSERT_EQUAL(255, fgetc(fp));
 	TEST_ASSERT_EQUAL(0xFF, fgetc(fp));
+	TEST_ASSERT_EQUAL(128, fgetc(fp));
+	TEST_ASSERT_EQUAL(0xFF, fgetc(fp));
 	TEST_ASSERT_EQUAL(EOF, fgetc(fp));
 
 	xfseek(fp, 0, SEEK_SET);
@@ -351,6 +387,8 @@ void t_fileutile_xfwrite_byte(void)
 	TEST_ASSERT_EQUAL(0, xfread_byte(fp));
 	TEST_ASSERT_EQUAL(0xFF, fgetc(fp));
 	TEST_ASSERT_EQUAL(255, xfread_byte(fp));
+	TEST_ASSERT_EQUAL(0xFF, fgetc(fp));
+	TEST_ASSERT_EQUAL(128, xfread_byte(fp));
 	TEST_ASSERT_EQUAL(0xFF, fgetc(fp));
 	TEST_ASSERT_EQUAL(EOF, fgetc(fp));
 
@@ -372,7 +410,8 @@ void t_fileutile_xfwrite_word(void)
 	fputc(0xFF, fp);
 	xfwrite_word(65535, fp);
 	fputc(0xFF, fp);
-
+	xfwrite_word(-32768, fp);
+	fputc(0xFF, fp);
 	xfclose(fp);
 
 	fp = xfopen("test.out", "rb");
@@ -391,6 +430,9 @@ void t_fileutile_xfwrite_word(void)
 	TEST_ASSERT_EQUAL(255, fgetc(fp));
 	TEST_ASSERT_EQUAL(255, fgetc(fp));
 	TEST_ASSERT_EQUAL(0xFF, fgetc(fp));
+	TEST_ASSERT_EQUAL(0, fgetc(fp));
+	TEST_ASSERT_EQUAL(128, fgetc(fp));
+	TEST_ASSERT_EQUAL(0xFF, fgetc(fp));
 	TEST_ASSERT_EQUAL(EOF, fgetc(fp));
 
 	xfseek(fp, 0, SEEK_SET);
@@ -402,6 +444,8 @@ void t_fileutile_xfwrite_word(void)
 	TEST_ASSERT_EQUAL(256, xfread_word(fp));
 	TEST_ASSERT_EQUAL(0xFF, fgetc(fp));
 	TEST_ASSERT_EQUAL(65535, xfread_word(fp));
+	TEST_ASSERT_EQUAL(0xFF, fgetc(fp));
+	TEST_ASSERT_EQUAL(32768, xfread_word(fp));
 	TEST_ASSERT_EQUAL(0xFF, fgetc(fp));
 	TEST_ASSERT_EQUAL(EOF, fgetc(fp));
 

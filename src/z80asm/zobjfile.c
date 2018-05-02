@@ -70,29 +70,29 @@ static long write_expr( FILE *fp )
 			default:					assert(0);
 			}
 		}
-		xfput_uint8( fp, range );				/* range of expression */
+		xfwrite_byte(range, fp);				/* range of expression */
 
 		/* store file name if different from last, folowed by source line number */
 		if ( expr->filename != NULL &&
 			 strcmp( Str_data(last_sourcefile), expr->filename ) != 0 )
 		{
-			xfput_count_word_strz( fp, expr->filename );
+			xfwrite_wcount_cstr(expr->filename, fp);
 			Str_set( last_sourcefile, expr->filename );
 		}
 		else
-			xfput_count_word_strz( fp, "" );
+			xfwrite_wcount_cstr("", fp);
 
-		xfput_int32(  fp, expr->line_nr );				/* source line number */
+		xfwrite_dword(expr->line_nr, fp);				/* source line number */
 
-		xfput_count_byte_strz( fp, expr->section->name );	/* section name */
+		xfwrite_bcount_cstr(expr->section->name, fp);	/* section name */
 
-		xfput_uint16( fp, expr->asmpc );				/* ASMPC */
-		xfput_uint16( fp, expr->code_pos );				/* patchptr */
-		xfput_count_byte_strz( fp, target_name );		/* target symbol for expression */
-		xfput_count_word_strz( fp, Str_data(expr->text) );	/* expression */
+		xfwrite_word(expr->asmpc, fp);					/* ASMPC */
+		xfwrite_word(expr->code_pos, fp);				/* patchptr */
+		xfwrite_bcount_cstr(target_name, fp);			/* target symbol for expression */
+		xfwrite_wcount_cstr(Str_data(expr->text), fp);	/* expression */
 	}
 
-	xfput_uint8( fp, 0 );								/* terminator */
+	xfwrite_byte(0, fp);								/* terminator */
 
 	STR_DELETE(last_sourcefile);
 
@@ -126,16 +126,16 @@ static int write_symbols_symtab( FILE *fp, SymbolHash *symtab )
 			default: assert(0);
 			}
 
-			xfput_uint8(fp, scope);
-			xfput_uint8(fp, type);
+			xfwrite_byte(scope, fp);
+			xfwrite_byte(type, fp);
 
-			xfput_count_byte_strz(fp, sym->section->name);
-			xfput_uint32(fp, sym->value);
-			xfput_count_byte_strz(fp, sym->name);
+			xfwrite_bcount_cstr(sym->section->name, fp);
+			xfwrite_dword(sym->value, fp);
+			xfwrite_bcount_cstr(sym->name, fp);
 
 			// write symbol definition location
-			xfput_count_byte_strz(fp, sym->filename ? sym->filename : "");
-			xfput_uint32(fp, sym->line_nr);
+			xfwrite_bcount_cstr(sym->filename ? sym->filename : "", fp);
+			xfwrite_dword(sym->line_nr, fp);
 
 			written++;
 		}
@@ -155,7 +155,7 @@ static long write_symbols( FILE *fp )
 
 	if ( written )
 	{
-		xfput_uint8( fp, 0 );								/* terminator */
+		xfwrite_byte(0, fp);								/* terminator */
 		return symbols_ptr;
 	}
 	else
@@ -178,7 +178,7 @@ static long write_externsym( FILE *fp )
 		if (sym->is_touched &&
 			(sym->scope == SCOPE_EXTERN || (!sym->is_defined && sym->scope == SCOPE_GLOBAL)))
 		{
-			xfput_count_byte_strz( fp, sym->name );
+			xfwrite_bcount_cstr(sym->name, fp);
 			written++;
 		}
     }
@@ -192,7 +192,7 @@ static long write_externsym( FILE *fp )
 static long write_modname( FILE *fp )
 {
 	long modname_ptr = ftell( fp );
-	xfput_count_byte_strz( fp, CURRENTMODULE->modname );		/* write module name */
+	xfwrite_bcount_cstr(CURRENTMODULE->modname, fp);		/* write module name */
 	return modname_ptr;
 }
 
@@ -226,12 +226,12 @@ void write_obj_file( char *source_filename )
 	fp = xfopen( obj_filename, "wb" );
 
 	/* write header */
-    xfput_strz( fp, Z80objhdr );
+	xfwrite_cstr(Z80objhdr, fp);
 
 	/* write placeholders for 5 pointers */
 	header_ptr = ftell( fp );
 	for ( i = 0; i < 5; i++ )
-	    xfput_uint32( fp, -1 );
+	    xfwrite_dword(-1, fp);
 
 	/* write sections, return pointers */
 	expr_ptr		= write_expr( fp );
@@ -242,11 +242,11 @@ void write_obj_file( char *source_filename )
 
 	/* write pointers to areas */
 	fseek( fp, header_ptr, SEEK_SET );
-    xfput_uint32( fp, modname_ptr );
-    xfput_uint32( fp, expr_ptr );
-    xfput_uint32( fp, symbols_ptr );
-    xfput_uint32( fp, externsym_ptr );
-    xfput_uint32( fp, code_ptr );
+    xfwrite_dword(modname_ptr, fp);
+    xfwrite_dword(expr_ptr, fp);
+    xfwrite_dword(symbols_ptr, fp);
+    xfwrite_dword(externsym_ptr, fp);
+    xfwrite_dword(code_ptr, fp);
 
 	/* close temp file and rename to object file */
 	xfclose( fp );
@@ -310,7 +310,7 @@ void OFile_fini( OFile *self )
 *----------------------------------------------------------------------------*/
 OFile *OFile_read_header( FILE *file, size_t start_ptr )
 {
-	STR_DEFINE(buffer, STR_SIZE);
+	str_t *modname = str_new();
 	OFile *self;
 
 	/* check file version */
@@ -325,18 +325,18 @@ OFile *OFile_read_header( FILE *file, size_t start_ptr )
 	self->start_ptr		= start_ptr;
 	self->writing		= false;
 
-    self->modname_ptr	= xfget_int32( file );
-    self->expr_ptr		= xfget_int32( file );
-    self->symbols_ptr	= xfget_int32( file );
-    self->externsym_ptr	= xfget_int32( file );
-    self->code_ptr		= xfget_int32( file );
+    self->modname_ptr	= xfread_dword(file);
+    self->expr_ptr		= xfread_dword(file);
+    self->symbols_ptr	= xfread_dword(file);
+    self->externsym_ptr	= xfread_dword(file);
+    self->code_ptr		= xfread_dword(file);
 
     /* read module name */
     fseek( file, start_ptr + self->modname_ptr, SEEK_SET );
-    xfget_count_byte_Str( file, buffer );
-    self->modname		= strpool_add( Str_data(buffer) );
+    xfread_bcount_str(modname, file);
+    self->modname		= strpool_add(str_data(modname));
 
-	STR_DELETE(buffer);
+	str_free(modname);
 
 	return self;
 }
@@ -440,7 +440,7 @@ ByteArray *read_obj_file_data( char *filename )
 *	Updates current module name and size, if given object file is valid
 *	Load module name and size, when assembling with -d and up-to-date
 *----------------------------------------------------------------------------*/
-static bool objmodule_loaded_1( char *obj_filename, Str *section_name )
+static bool objmodule_loaded_1( char *obj_filename, str_t *section_name )
 {
 	int code_size;
 	OFile *ofile;
@@ -458,15 +458,15 @@ static bool objmodule_loaded_1( char *obj_filename, Str *section_name )
 
 			while (true)	/* read sections until end marker */
 			{
-				code_size = xfget_int32( ofile->file );
+				code_size = xfread_dword(ofile->file);
 				if ( code_size < 0 )
 					break;
 
 				/* reserve space in section */
-				xfget_count_byte_Str(ofile->file, section_name);
-				section = new_section(Str_data(section_name));
+				xfread_bcount_str(section_name, ofile->file);
+				section = new_section(str_data(section_name));
 				read_origin(ofile->file, section);
-				section->align = xfget_int32(ofile->file);
+				section->align = xfread_dword(ofile->file);
 
 				append_reserve( code_size );
 
@@ -485,9 +485,9 @@ static bool objmodule_loaded_1( char *obj_filename, Str *section_name )
 
 bool objmodule_loaded(char *obj_filename)
 {
-	STR_DEFINE(section_name, STR_SIZE);
+	str_t *section_name = str_new();
 	bool ret = objmodule_loaded_1(obj_filename, section_name);
-	STR_DELETE(section_name);
+	str_free(section_name);
 	return ret;
 }
 
