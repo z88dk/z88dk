@@ -34,6 +34,10 @@ EXTERN base_graphics
 
 .asmentry
 
+   ld	a,c
+   and 3
+   ld	c,a
+
    ld a,h
    cp 64
    ret nc
