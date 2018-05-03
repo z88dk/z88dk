@@ -26,13 +26,6 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 *	Dirname is the path up to and including the final slash.
 *	Extension is the final "." followed by sequence of letters or digits
 *----------------------------------------------------------------------------*/
-extern const char *path_remove_ext(const char *filename );
-extern const char *path_replace_ext(const char *filename, const char *new_ext );
-extern const char *path_basename(const  char *filename );
-extern const char *path_dirname(const  char *filename );
-
-extern const char *path_remove_slashes(const char *filename);
-
 /* search for a file on the given directory list, return full path name */
 extern void path_search( Str *dest, const char *filename, UT_array *dir_list );
 extern const char *search_file(const char *filename, UT_array *dir_list);	/* returned string in strpool */

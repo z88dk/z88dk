@@ -37,22 +37,6 @@ write_file("test.c", <<'END');
 
 #define ERROR die("Test failed at line %d\n", __LINE__)
 
-#define T_REMOVE_EXT(init, result) \
-		p = path_remove_ext( init ); \
-		if ( strcmp( p, result ) ) ERROR;
-
-#define T_REPLACE_EXT(init, ext, result) \
-		p = path_replace_ext( init, ext ); \
-		if ( strcmp( p, result ) ) ERROR;
-
-#define T_BASENAME(init, result) \
-		p = path_basename( init ); \
-		if ( strcmp( p, result ) ) ERROR;
-
-#define T_DIRNAME(init, result) \
-		p = path_dirname( init ); \
-		if ( strcmp( p, result ) ) ERROR;
-
 #define T_SEARCH(file, path, result) \
 		path_search( s, file, path ); \
 		if ( strcmp( Str_data(s), result ) ) ERROR; \
@@ -64,52 +48,7 @@ int main()
 	STR_DEFINE(s, FILENAME_MAX);
 	const char *p;
 	UT_array *path = NULL;
-	
-	/* path_remove_ext */
-	T_REMOVE_EXT("abc", 			"abc");
-	T_REMOVE_EXT("abc.", 			"abc");
-	T_REMOVE_EXT("abc.xpt", 		"abc");
-	T_REMOVE_EXT("abc.xpt.obj", 	"abc.xpt");
-	T_REMOVE_EXT("./abc", 			"./abc");
-	T_REMOVE_EXT(".\\abc",			".\\abc");
-	T_REMOVE_EXT("./abc.", 			"./abc");
-	T_REMOVE_EXT(".\\abc.",			".\\abc");
-	T_REMOVE_EXT("./abc.xpt", 		"./abc");
-	T_REMOVE_EXT(".\\abc.xpt",		".\\abc");
-	T_REMOVE_EXT("./abc.xpt.obj", 	"./abc.xpt");
-	T_REMOVE_EXT(".\\abc.xpt.obj",	".\\abc.xpt");
 
-	/* path_replace_ext */
-	T_REPLACE_EXT("abc", 		NULL,	"abc");
-	T_REPLACE_EXT("abc.", 		NULL,	"abc");
-	T_REPLACE_EXT("abc", 		"",		"abc");
-	T_REPLACE_EXT("abc.", 		"",		"abc");
-	T_REPLACE_EXT("abc", 		".obj",	"abc.obj");
-	T_REPLACE_EXT("abc.", 		".obj",	"abc.obj");
-	T_REPLACE_EXT("abc.xpt.zz",	".obj",	"abc.xpt.obj");
-	T_REPLACE_EXT("./abc", 		".obj",	"./abc.obj");
-	T_REPLACE_EXT(".\\abc", 	".obj",	".\\abc.obj");
-	T_REPLACE_EXT("./abc.", 	".obj",	"./abc.obj");
-	T_REPLACE_EXT(".\\abc.", 	".obj",	".\\abc.obj");
-	T_REPLACE_EXT("./abc.xpt", 	".obj",	"./abc.obj");
-	T_REPLACE_EXT(".\\abc.xpt", ".obj",	".\\abc.obj");
-
-	/* path_basename */
-	T_BASENAME("abc",			"abc");
-	T_BASENAME("abc.zz",		"abc.zz");
-	T_BASENAME("./abc",			"abc");
-	T_BASENAME(".\\abc",		"abc");
-	T_BASENAME("/a/b/c/abc",	"abc");
-	T_BASENAME("\\a\\b\\c\\abc","abc");
-	
-	/* path_dirname */
-	T_DIRNAME("abc",			".");
-	T_DIRNAME("abc.zz",			".");
-	T_DIRNAME("./abc",			".");
-	T_DIRNAME(".\\abc",			".");
-	T_DIRNAME("/a/b/c/abc",		"/a/b/c");
-	T_DIRNAME("\\a\\b\\c\\abc",	"\\a\\b\\c");
-	
 	/* path_search */
 	utarray_new(path,&ut_str_icd);
 	p = "test.x1"; utarray_push_back(path, &p);

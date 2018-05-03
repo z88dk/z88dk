@@ -41,7 +41,6 @@ void make_library(const char *lib_filename, UT_array *src_files)
 	FILE	*lib_file;
 	const char *obj_filename;
 	size_t	 fptr, obj_size;
-	const char **pfile;
 
 	lib_filename = search_libfile(lib_filename);
 	if ( lib_filename == NULL )
@@ -55,6 +54,7 @@ void make_library(const char *lib_filename, UT_array *src_files)
 	xfwrite_cstr(Z80libhdr, lib_file);
 
 	/* write each object file */
+	char * const *pfile;
 	for (pfile = NULL; (pfile = (char **)utarray_next(src_files, pfile)) != NULL; )
 	{
 		fptr = ftell( lib_file );

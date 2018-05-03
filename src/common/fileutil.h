@@ -10,6 +10,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// pathname manipulation - strings are allocated in spool, no need to free
+
+// change to forward slashes, remove extra slashes and dots
+extern const char *path_canon(const char *path);
+
+// same as path_canon but with back-slashes on windows and forward slashes everywhere else
+extern const char *path_os(const char *path);
+
+// combine two paths "a","b" -> "a/b"
+extern const char *path_combine(const char *path1, const char *path2);
+
+// remove file extension
+extern const char *path_remove_ext(const char *path);
+
+// replace file extension
+extern const char *path_replace_ext(const char *path, const char *new_ext);
+
+// extract directory
+extern const char *path_dirname(const char *path);
+
+// extract file name
+extern const char *path_filename(const char *path);
+
 // file IO, die if error
 // maps internally FILE* -> fileno -> filename for error messages
 extern FILE *xfopen(const char *filename, const char *mode);

@@ -997,7 +997,7 @@ static const char *search_z80asm_lib()
 static void make_output_dir()
 {
 	if (opts.output_directory) {
-		opts.output_directory = path_remove_slashes(opts.output_directory);
+		opts.output_directory = path_canon(opts.output_directory);
 		mkdir_p(opts.output_directory);
 	}
 }

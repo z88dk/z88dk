@@ -9,6 +9,138 @@
 #include <limits.h>
 #include <stdio.h>
 
+void t_fileutil_path_canon(void)
+{
+	// files
+	TEST_ASSERT_EQUAL_STRING(".", path_canon(""));
+	TEST_ASSERT_EQUAL_STRING(".", path_canon("."));
+	TEST_ASSERT_EQUAL_STRING("..", path_canon(".."));
+	TEST_ASSERT_EQUAL_STRING("abc", path_canon("abc"));
+
+	// multiple slashes are colapsed
+	TEST_ASSERT_EQUAL_STRING("abc/def", path_canon("abc//\\//def"));
+	TEST_ASSERT_EQUAL_STRING("abc/def", path_canon("abc//\\//def//\\//"));
+	TEST_ASSERT_EQUAL_STRING("c:abc/def", path_canon("c:abc//\\//def//\\//"));
+	TEST_ASSERT_EQUAL_STRING("c:/abc/def", path_canon("c://\\//abc//\\//def//\\//"));
+
+	// handle multiple trainling slashes
+	TEST_ASSERT_EQUAL_STRING("abc", path_canon("abc//"));
+	TEST_ASSERT_EQUAL_STRING("/", path_canon("//"));
+	TEST_ASSERT_EQUAL_STRING("c:/", path_canon("c://"));
+
+	// handle dir/..
+	TEST_ASSERT_EQUAL_STRING(".", path_canon("abc/.."));
+	TEST_ASSERT_EQUAL_STRING(".", path_canon("abc/../"));
+	TEST_ASSERT_EQUAL_STRING("def", path_canon("abc/../def"));
+	TEST_ASSERT_EQUAL_STRING("../def", path_canon("abc/../../def"));
+
+	TEST_ASSERT_EQUAL_STRING("c:", path_canon("c:abc/.."));
+	TEST_ASSERT_EQUAL_STRING("c:", path_canon("c:abc/../"));
+	TEST_ASSERT_EQUAL_STRING("c:def", path_canon("c:abc/../def"));
+	TEST_ASSERT_EQUAL_STRING("c:../def", path_canon("c:abc/../../def"));
+
+	TEST_ASSERT_EQUAL_STRING("c:/", path_canon("c:/abc/.."));
+	TEST_ASSERT_EQUAL_STRING("c:/", path_canon("c:/abc/../"));
+	TEST_ASSERT_EQUAL_STRING("c:/def", path_canon("c:/abc/../def"));
+	TEST_ASSERT_EQUAL_STRING("c:/../def", path_canon("c:/abc/../../def"));
+
+	// handle ./
+	TEST_ASSERT_EQUAL_STRING("abc", path_canon("./abc"));
+	TEST_ASSERT_EQUAL_STRING("abc", path_canon("./abc/."));
+	TEST_ASSERT_EQUAL_STRING("c:abc", path_canon("c:./abc/."));
+	TEST_ASSERT_EQUAL_STRING("c:/abc", path_canon("c:/././abc/."));
+}
+
+void t_fileutil_path_os(void)
+{
+#ifdef _WIN32
+	TEST_ASSERT_EQUAL_STRING("c:\\abc\\def", path_os("c://\\//abc//\\//def//\\//"));
+#else
+	TEST_ASSERT_EQUAL_STRING("c:/abc/def", path_os("c://\\//abc//\\//def//\\//"));
+#endif
+}
+
+void t_fileutil_path_combine(void)
+{
+	TEST_ASSERT_EQUAL_STRING("a/b", path_combine("a", "b"));
+	TEST_ASSERT_EQUAL_STRING("a/b", path_combine("a/", "b"));
+	TEST_ASSERT_EQUAL_STRING("a/b", path_combine("a", "/b"));
+	TEST_ASSERT_EQUAL_STRING("a/b", path_combine("a/", "/b"));
+	TEST_ASSERT_EQUAL_STRING("a/c/b", path_combine("a/", "c:/b"));
+}
+
+void t_fileutil_path_remove_ext(void)
+{
+	TEST_ASSERT_EQUAL_STRING("abc", path_remove_ext("abc"));
+	TEST_ASSERT_EQUAL_STRING("abc", path_remove_ext("abc."));
+	TEST_ASSERT_EQUAL_STRING("abc", path_remove_ext("abc.xpt"));
+	TEST_ASSERT_EQUAL_STRING("abc.xpt", path_remove_ext("abc.xpt."));
+	TEST_ASSERT_EQUAL_STRING("abc.xpt", path_remove_ext("abc.xpt.obj"));
+
+	TEST_ASSERT_EQUAL_STRING(".x/abc", path_remove_ext(".x/abc"));
+	TEST_ASSERT_EQUAL_STRING(".x/abc", path_remove_ext(".x\\abc"));
+	TEST_ASSERT_EQUAL_STRING(".x/abc", path_remove_ext(".x/abc."));
+	TEST_ASSERT_EQUAL_STRING(".x/abc", path_remove_ext(".x\\abc."));
+	TEST_ASSERT_EQUAL_STRING(".x/abc", path_remove_ext(".x/abc.xpt"));
+	TEST_ASSERT_EQUAL_STRING(".x/abc.xpt", path_remove_ext(".x/abc.xpt."));
+	TEST_ASSERT_EQUAL_STRING(".x/abc.xpt", path_remove_ext(".x/abc.xpt.obj"));
+
+	TEST_ASSERT_EQUAL_STRING(".rc", path_remove_ext(".rc"));
+	TEST_ASSERT_EQUAL_STRING("/.rc", path_remove_ext("/.rc"));
+	TEST_ASSERT_EQUAL_STRING(".x/.rc", path_remove_ext(".x/.rc"));
+}
+
+void t_fileutil_path_replace_ext(void)
+{
+	TEST_ASSERT_EQUAL_STRING("abc", path_replace_ext("abc", ""));
+	TEST_ASSERT_EQUAL_STRING("abc", path_replace_ext("abc.", ""));
+
+	TEST_ASSERT_EQUAL_STRING("abc.obj", path_replace_ext("abc", "obj"));
+	TEST_ASSERT_EQUAL_STRING("abc.obj", path_replace_ext("abc.", "obj"));
+	TEST_ASSERT_EQUAL_STRING("abc.obj", path_replace_ext("abc", ".obj"));
+	TEST_ASSERT_EQUAL_STRING("abc.obj", path_replace_ext("abc.", ".obj"));
+
+	TEST_ASSERT_EQUAL_STRING("abc.obj", path_replace_ext("abc", "obj"));
+	TEST_ASSERT_EQUAL_STRING("abc.obj", path_replace_ext("abc.", "obj"));
+	TEST_ASSERT_EQUAL_STRING("abc.obj", path_replace_ext("abc", ".obj"));
+	TEST_ASSERT_EQUAL_STRING("abc.obj", path_replace_ext("abc.", ".obj"));
+
+	TEST_ASSERT_EQUAL_STRING("x./abc.obj", path_replace_ext("x./abc", "obj"));
+	TEST_ASSERT_EQUAL_STRING("x./abc.obj", path_replace_ext("x./abc.", "obj"));
+	TEST_ASSERT_EQUAL_STRING("x./abc.obj", path_replace_ext("x./abc", ".obj"));
+	TEST_ASSERT_EQUAL_STRING("x./abc.obj", path_replace_ext("x./abc.", ".obj"));
+}
+
+void t_fileutil_path_dirname(void)
+{
+	TEST_ASSERT_EQUAL_STRING(".", path_dirname("abc"));
+	TEST_ASSERT_EQUAL_STRING(".", path_dirname("abc.xx"));
+	TEST_ASSERT_EQUAL_STRING(".", path_dirname("./abc"));
+
+	TEST_ASSERT_EQUAL_STRING("/a/b/c", path_dirname("/a/b/c/abc"));
+	TEST_ASSERT_EQUAL_STRING("a/b/c", path_dirname("a/b/c/abc"));
+	TEST_ASSERT_EQUAL_STRING("c:/a/b/c", path_dirname("c:/a/b/c/abc"));
+	TEST_ASSERT_EQUAL_STRING("c:a/b/c", path_dirname("c:a/b/c/abc"));
+
+	TEST_ASSERT_EQUAL_STRING("c:", path_dirname("c:abc"));
+	TEST_ASSERT_EQUAL_STRING("c:/", path_dirname("c:/abc"));
+}
+
+void t_fileutil_path_filename(void)
+{
+	TEST_ASSERT_EQUAL_STRING("abc", path_filename("abc"));
+	TEST_ASSERT_EQUAL_STRING("abc.xx", path_filename("abc.xx"));
+	TEST_ASSERT_EQUAL_STRING("abc", path_filename(".x/abc"));
+
+	TEST_ASSERT_EQUAL_STRING("abc", path_filename("/a/b/c/abc"));
+	TEST_ASSERT_EQUAL_STRING("abc", path_filename("a/b/c/abc"));
+	TEST_ASSERT_EQUAL_STRING("abc", path_filename("c:/a/b/c/abc"));
+	TEST_ASSERT_EQUAL_STRING("abc", path_filename("c:a/b/c/abc"));
+
+	TEST_ASSERT_EQUAL_STRING("abc", path_filename("c:abc"));
+	TEST_ASSERT_EQUAL_STRING("abc", path_filename("c:/abc"));
+}
+
 void t_fileutil_xfopen(void)
 {
 	char buffer[6];

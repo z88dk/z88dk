@@ -57,7 +57,7 @@ void str_set_f(str_t *str, const char *fmt, ...)
 	va_end(ap);
 }
 
-void str_set_bin(str_t *str, const char *data, size_t len)
+void str_set_n(str_t *str, const char *data, size_t len)
 {
 	utstring_clear(str);
 	utstring_bincpy(str, data, len);
@@ -82,7 +82,7 @@ void str_append_f(str_t *str, const char *fmt, ...)
 	va_end(ap);
 }
 
-void str_append_bin(str_t *str, const char *data, size_t len)
+void str_append_n(str_t *str, const char *data, size_t len)
 {
 	utstring_bincpy(str, data, len);
 }

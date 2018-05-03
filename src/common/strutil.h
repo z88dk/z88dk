@@ -28,12 +28,12 @@ extern void str_reserve(str_t *str, size_t amt);
 
 extern void str_set(str_t *str, const char *src);
 extern void str_set_f(str_t *str, const char *fmt, ...);
-extern void str_set_bin(str_t *str, const char *data, size_t len);
+extern void str_set_n(str_t *str, const char *data, size_t len);
 extern void str_set_str(str_t *str, str_t *src);
 
 extern void str_append(str_t *str, const char *src);
 extern void str_append_f(str_t *str, const char *fmt, ...);
-extern void str_append_bin(str_t *str, const char *data, size_t len);
+extern void str_append_n(str_t *str, const char *data, size_t len);
 extern void str_append_str(str_t *str, str_t *src);
 
 // string pool

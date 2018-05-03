@@ -1059,8 +1059,8 @@ ReleaseLinkInfo( void )
 }
 
 /* Consolidate object file */
-static inline int sym_first(int c) { return c == '_' || isalpha(c); }
-static inline int sym_next(int c)  { return c == '_' || isalnum(c); }
+static int sym_first(int c) { return c == '_' || isalpha(c); }
+static int sym_next(int c)  { return c == '_' || isalnum(c); }
 
 static void replace_names(Str *result, const char *input, StrHash *map)
 {

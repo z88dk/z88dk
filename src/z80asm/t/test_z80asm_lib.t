@@ -53,7 +53,7 @@ move('z80asm-z80-.lib', $ENV{ZCCCFG}.'/../z80asm-z80-.lib');
 run("./z80asm -b -v test.asm", 0, <<'END', "");
 Library 'z80asm-z80-.lib' not found
 Library '/usr/local/share/z88dk/lib/z80asm-z80-.lib' not found
-Reading library 'testdir/root/lib/config/../z80asm-z80-.lib'
+Reading library 'testdir/root/lib/z80asm-z80-.lib'
 Predefined constant: __CPU_Z80__ = $0001
 Assembling 'test.asm' to 'test.o'
 Reading 'test.asm'

@@ -46,7 +46,7 @@ static file_type_e read_signature(FILE *fp, const char *filename,
 	else
 		die("error: file '%s' not object nor library\n", filename);
 
-	str_set_bin(signature, file_signature, SIGNATURE_SIZE);
+	str_set_n(signature, file_signature, SIGNATURE_SIZE);
 
 	// read version
 	if (sscanf(file_signature + 6, "%d", version) < 1)

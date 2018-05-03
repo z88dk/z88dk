@@ -37,107 +37,6 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 *	Extension is the final "." followed by sequence of letters or digits
 *----------------------------------------------------------------------------*/
 
-/* remove the extension of the filename, returns in passed Str */
-static void _path_remove_ext( Str *dest, const char *filename )
-{
-    char *dot_pos, *dir_pos_1, *dir_pos_2;
-	
-    Str_set( dest, filename );		/* make a copy */
-
-    /* BUG_0014 : need to ignore dot if before a directory separator */
-    dot_pos   = strrchr( Str_data(dest), '.' );
-    dir_pos_1 = strrchr( Str_data(dest), '/' );
-
-    if ( dir_pos_1 == NULL ) dir_pos_1 = Str_data(dest);
-
-    dir_pos_2 = strrchr( Str_data(dest), '\\' );
-
-    if ( dir_pos_2 == NULL ) dir_pos_2 = Str_data(dest);
-
-    if ( dot_pos != NULL && dot_pos > dir_pos_1 && dot_pos > dir_pos_2 )
-    {
-        *dot_pos = '\0';                /* terminate the string */
-        Str_sync_len( dest );
-    }
-}
-
-const char *path_remove_ext(const char *filename )
-{
-	STR_DEFINE(dest, FILENAME_MAX);
-	const char *ret;
-
-	_path_remove_ext( dest, filename );
-	ret = spool_add(Str_data(dest));
-
-	STR_DELETE(dest);
-	return ret;
-}
-
-/* make a copy of the file name in strpool, replacing the extension */
-const char *path_replace_ext(const char *filename, const char *new_ext )
-{
-	STR_DEFINE(dest, FILENAME_MAX);
-	const char *ret;
-
-    _path_remove_ext( dest, filename );
-
-    if ( new_ext != NULL )
-        Str_append( dest, new_ext );
-	ret = spool_add(Str_data(dest));
-
-	STR_DELETE(dest);
-	return ret;
-}
-
-/* return address of start of file basename after final slash, or start of string in none */
-static const char *_start_basename(const char *filename )
-{
-	const char *dir_pos_1;
-	const char *dir_pos_2;
-	
-    dir_pos_1 = strrchr( filename, '/' );
-    if ( dir_pos_1 == NULL ) dir_pos_1 = filename - 1;
-
-    dir_pos_2 = strrchr( filename, '\\' );
-    if ( dir_pos_2 == NULL ) dir_pos_2 = filename - 1;
-
-	return MAX( dir_pos_1, dir_pos_2 ) + 1;
-}
-
-/* make a copy of the file basename, skipping the directory part */
-const char *path_basename(const char *filename )
-{
-    return spool_add( _start_basename(filename) );
-}
-
-/* make a copy of the file dirname */
-const char *path_dirname(const char *filename )
-{
-	char path[FILENAME_MAX];
-	snprintf(path, sizeof(path), "%s", filename);
-
-	// remove last file component
-	char *p = path + strlen(path);
-	while (p > path && !(p[-1] == '/' || p[-1] == '\\')) p--;
-	while (p > path && (p[-1] == '/' || p[-1] == '\\')) p--;
-	*p = '\0';
-
-	if (*path == '\0')		/* dir is now empty */
-		snprintf(path, sizeof(path), ".");
-
-	return spool_add(path);
-}
-
-const char *path_remove_slashes(const char *filename)
-{
-	char path[FILENAME_MAX];
-	snprintf(path, sizeof(path), "%s", filename);
-	char *p = path + strlen(path);
-	while (p > path && (p[-1] == '/' || p[-1] == '\\')) p--;
-	*p = '\0';
-	return spool_add(path);
-}
-
 /* search for a file on the given directory list, return full path name */
 static void path_search_1(Str *dest, const char *filename, UT_array *dir_list, Str *pathname)
 {
@@ -216,7 +115,7 @@ int file_size(const char *filename)	// file size, -1 if not regular file
 
 void mkdir_p(const char *path)
 {
-	path = path_remove_slashes(path);
+	path = path_os(path);
 	if (!dir_exists(path)) {
 		const char *parent = path_dirname(path);
 		mkdir_p(parent);

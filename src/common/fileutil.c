@@ -7,6 +7,197 @@
 #include "die.h"
 #include "utarray.h"
 #include <assert.h>
+#include <ctype.h>
+#include <string.h>
+
+//-----------------------------------------------------------------------------
+// pathname manipulation 
+//-----------------------------------------------------------------------------
+#define isslash(x)	((x) == '/' || (x) == '\\')
+
+static void str_path_canon(str_t *path)
+{
+	// remove double slashes and normalize forward slashes
+	char *s = str_data(path);
+	char *d = str_data(path);
+	while (*s) {
+		if (isslash(*s)) {
+			*d++ = '/';
+			while (*s && isslash(*s))
+				s++;
+		}
+		else {
+			while (*s && !isslash(*s))
+				*d++ = *s++;
+		}
+	}
+	*d = '\0';
+
+	// remove "./" and "xxx/.."
+	char *p = str_data(path);
+	if (isalpha(p[0]) && p[1] == ':') 
+		p += 2;											// win32 volume
+	if (*p == '/')
+		p++;											// root dir
+	char *root = p;
+	while (*p) {
+		if (*p == '/') {
+			p++;
+		}
+		else if (strncmp(p, "./", 2) == 0) {			// remove ./
+			memmove(p, p + 2, strlen(p + 2) + 1);		// copy also null
+		}
+		else if (strcmp(p, ".") == 0) {					// remove final .
+			*p = '\0';
+		}
+		else {
+			char *p1 = p;
+			while (*p && *p != '/') 
+				p++;
+			if (strncmp(p, "/../", 4) == 0) {
+				memmove(p1, p + 4, strlen(p + 4) + 1);	// copy also null
+				p = p1;
+			}
+			else if (strcmp(p, "/..") == 0) {
+				p = p1;
+				*p = '\0';
+			}
+			else {
+				;	// p points to the '/' or '\0'
+			}
+		}
+	}
+
+	// remove trailing slashes
+	while (p - 1 > root && p[-1] == '/') {
+		p--; 
+		*p = '\0';
+	}
+	str_len(path) = p - str_data(path);
+
+	if (str_len(path) == 0)			// dir is now empty
+		str_set(path, ".");
+}
+
+static const char *path_canon_sep(const char *path, char win32_sep)
+{
+	str_t *canon = str_new_copy(path);
+	str_path_canon(canon);
+
+#ifdef _WIN32
+	for (char *p = str_data(canon); *p; p++)
+		if (*p == '/')
+			*p = win32_sep;
+#endif
+
+	const char *ret = spool_add(str_data(canon));
+	str_free(canon);
+	return ret;
+}
+
+const char *path_canon(const char *path)
+{
+	return path_canon_sep(path, '/');
+}
+
+const char *path_os(const char *path)
+{
+	return path_canon_sep(path, '\\');
+}
+
+const char *path_combine(const char *path1, const char *path2)
+{
+	str_t *path = str_new_copy(path1);
+
+	str_append(path, "/");
+
+	if (isalpha(path2[0]) && path2[1] == ':') {	// remove ':'
+		str_append_n(path, path2, 1);			// drive letter
+		str_append(path, "/");					// slash
+		str_append(path, path2 + 2);				// rest of path
+	}
+	else {
+		str_append(path, path2);
+	}
+
+	str_path_canon(path);
+
+	const char *ret = spool_add(str_data(path));
+	str_free(path);
+	return ret;
+}
+
+const char *path_remove_ext(const char *path1)
+{
+	return path_replace_ext(path1, "");
+}
+
+const char *path_replace_ext(const char *path1, const char *new_ext)
+{
+	str_t *path = str_new_copy(path1);
+	str_path_canon(path);
+
+	char *p = str_data(path) + str_len(path) - 1;
+	while (p > str_data(path) && *p != '.' && p[-1] != '/')
+		p--;
+	if (*p == '.' && p > str_data(path) && p[-1] != '/') {
+		*p = '\0';
+		str_len(path) = p - str_data(path);
+	}
+	if (*new_ext && *new_ext!='.')
+		str_append(path, ".");
+	str_append(path, new_ext);
+
+	const char *ret = spool_add(str_data(path));
+	str_free(path);
+	return ret;
+}
+
+static char *path_dir_slash(str_t *path)
+{
+	str_path_canon(path);
+
+	char *p = str_data(path);
+	if (isalpha(p[0]) && p[1] == ':')
+		p += 2;											// win32 volume
+	if (*p == '/')
+		p++;											// root dir
+	char *root = p;
+
+	p = str_data(path) + str_len(path) - 1;
+	while (p > root && *p != '/')
+		p--;
+
+	return p;
+}
+
+const char *path_dirname(const char *path1)
+{
+	str_t *path = str_new_copy(path1);
+	char *p = path_dir_slash(path);
+
+	*p = '\0';
+	str_len(path) = p - str_data(path);
+
+	if (str_len(path) == 0)			// dir is now empty
+		str_set(path, ".");
+	
+	const char *ret = spool_add(str_data(path));
+	str_free(path);
+	return ret;
+}
+
+const char *path_filename(const char *path1)
+{
+	str_t *path = str_new_copy(path1);
+	char *p = path_dir_slash(path);
+	if (*p == '/')
+		p++;
+
+	const char *ret = spool_add(p);
+	str_free(path);
+	return ret;
+}
 
 //-----------------------------------------------------------------------------
 // map fileno(FLIE*) to filename in this session

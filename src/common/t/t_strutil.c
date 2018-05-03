@@ -90,11 +90,11 @@ void t_str_set_bin(void)
 	str_t *s = str_new();
 	TEST_ASSERT_EQUAL_STRING("", str_data(s));
 
-	str_set_bin(s, "\0\1\2\3", 4);
+	str_set_n(s, "\0\1\2\3", 4);
 	TEST_ASSERT_EQUAL(4, str_len(s));
 	TEST_ASSERT_EQUAL(0, memcmp(str_data(s), "\0\1\2\3\0", 5));
 
-	str_set_bin(s, "\3\2\1\0", 4);
+	str_set_n(s, "\3\2\1\0", 4);
 	TEST_ASSERT_EQUAL(4, str_len(s));
 	TEST_ASSERT_EQUAL(0, memcmp(str_data(s), "\3\2\1\0\0", 5));
 
@@ -152,11 +152,11 @@ void t_str_append_bin(void)
 	str_t *s = str_new();
 	TEST_ASSERT_EQUAL_STRING("", str_data(s));
 
-	str_append_bin(s, "\0\1\2\3", 4);
+	str_append_n(s, "\0\1\2\3", 4);
 	TEST_ASSERT_EQUAL(4, str_len(s));
 	TEST_ASSERT_EQUAL(0, memcmp(str_data(s), "\0\1\2\3\0", 5));
 
-	str_append_bin(s, "\3\2\1\0", 4);
+	str_append_n(s, "\3\2\1\0", 4);
 	TEST_ASSERT_EQUAL(8, str_len(s));
 	TEST_ASSERT_EQUAL(0, memcmp(str_data(s), "\0\1\2\3\3\2\1\0\0", 9));
 

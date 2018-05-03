@@ -365,7 +365,7 @@ int z80asm_main( int argc, char *argv[] )
 			set_cur_module(get_first_module(NULL));
 			
 			CURRENTMODULE->filename = get_asm_filename(opts.consol_obj_file);
-			CURRENTMODULE->modname = path_remove_ext(path_basename(CURRENTMODULE->filename));
+			CURRENTMODULE->modname = path_remove_ext(path_filename(CURRENTMODULE->filename));
 
 			if (!get_num_errors())
 				write_obj_file(opts.consol_obj_file);
