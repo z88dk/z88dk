@@ -36,6 +36,7 @@ _cvpeek:
 	ret	c
 	ld	c,e
 	; b = y, c = x
+	ld	e,0		;not in raw mode
 	call	generic_console_vpeek
 	ld	hl,-1
 	ret	c
