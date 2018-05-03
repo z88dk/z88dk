@@ -1,8 +1,6 @@
 ;------------------------------------------------------------------------------  
 ;       Initialises the APU buffers
 ;
-;       HL = address of the jump table nmi address
-
     INCLUDE "config_private.inc"
 
     SECTION code_driver
@@ -21,51 +19,45 @@
         push de
         push hl
 
-        LD  HL, APUCMDBuf       ; Initialise COMMAND Buffer
-        LD (APUCMDInPtr), HL
-        LD (APUCMDOutPtr), HL
+        ld  hl,APUCMDBuf        ; Initialise COMMAND Buffer
+        ld (APUCMDInPtr),hl
+        ld (APUCMDOutPtr),hl
 
-        LD HL, APUPTRBuf        ; Initialise OPERAND POINTER Buffer
-        LD (APUPTRInPtr), HL
-        LD (APUPTROutPtr), HL
+        ld hl,APUPTRBuf         ; Initialise OPERAND POINTER Buffer
+        ld (APUPTRInPtr),hl
+        ld (APUPTROutPtr),hl
 
-        XOR A                   ; clear A register to 0
+        xor a                   ; clear A register to 0
 
-        LD (APUCMDBufUsed), A   ; 0 both Buffer counts
-        LD (APUPTRBufUsed), A
+        ld (APUCMDBufUsed),a    ; 0 both Buffer counts
+        ld (APUPTRBufUsed),a
 
-        LD (APUCMDBuf), A       ; clear COMMAND Buffer
-        LD HL, APUCMDBuf
-        LD D, H
-        LD E, L
-        INC DE
-        LD BC, __APU_CMD_SIZE-1
-        LDIR
+        ld (APUCMDBuf),a        ; clear COMMAND Buffer
+        ld hl,APUCMDBuf
+        ld d,h
+        ld e,l
+        inc de
+        ld bc,__APU_CMD_SIZE-1
+        ldir
 
-        LD (APUPTRBuf), A       ; clear OPERAND POINTER Buffer
-        LD HL, APUPTRBuf
-        LD D, H
-        LD E, L
-        INC DE
-        LD BC, __APU_PTR_SIZE-1
-        LDIR
+        ld (APUPTRBuf),a        ; clear OPERAND POINTER Buffer
+        ld hl,APUPTRBuf
+        ld d,h
+        ld e,l
+        inc de
+        ld bc,__APU_PTR_SIZE-1
+        ldir
 
-        ld (APUStatus), a       ; set APU status to idle (NOP)
-        ld (APUError), a        ; clear APU errors
+        ld (APUStatus),a        ; set APU status to idle (NOP)
+        ld (APUError),a         ; clear APU errors
 
-        pop hl                  ; load the jump table nmi address
-        ld de, asm_am9511a_isr  ; load our interrupt origin
-                                ; initially there is a RETN there
-        ld (hl), e              ; load the address of the APU NMI jump
-        inc hl
-        ld (hl), d
+;   am9511a_reset_loop:
+;       ld bc,__IO_APU_STATUS  ; the address of the APU status port in bc
+;       in a,(c)               ; read the APU
+;       and __IO_APU_STATUS_BUSY    ; busy?
+;       jr NZ,am9511a_reset_loop
 
-    am9511a_reset_loop:
-        ld bc, __IO_APU_STATUS  ; the address of the APU status port in bc
-        in a, (c)               ; read the APU
-        and __IO_APU_STATUS_BUSY    ; busy?
-        jr nz, am9511a_reset_loop
-
+        pop hl
         pop de
         pop bc
         pop af
