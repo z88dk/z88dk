@@ -202,9 +202,9 @@ go back to using SP1's LOAD draw routines which we used in [article
 1](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_01_GettingStarted.md#a-closer-look-at-the-sprites-code).
 
 What we have here is an 8 frame sprite. That is, 8 separate 8x8 pixel graphics,
-which run together create the animation. Frame 8 is designed to loop back to
-frame 1, and each frame is designed to move the character one pixel left to
-right to produce a walking effect.
+which drawn in sequence create the animation. Frame 8 is designed to loop back
+to frame 1, and each frame is designed to move the character one pixel left to
+right to produce a walking effect one pixel at a time.
 
 The individual frames are labelled in the listing, but only for information
 purposes. These labels are not exported since the C code doesn't need them for
@@ -214,12 +214,11 @@ Notice how each frame is separated from the next with 8 zero bytes. As discussed
 in the [first
 article](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_01_GettingStarted.md#pixel-positioning)
 in this series, each sprite needs to have 7 zero bytes *before* it in memory,
-and 8 zero bytes *after* it, in order to facilitate precise pixel
+and also 8 zero bytes *after* it, in order to facilitate precise pixel
 positioning. This requirement persists for individual sprite animation frames,
 and when sprite frames are positioned sequentially in memory, as they are here,
 it's convenient to use the same 8 zero bytes as the *after* bytes for one frame
-and the *before* bytes for the following frame. This technique saves 8 bytes per
-frame.
+and the *before* bytes for the following frame. This technique saves some memory.
 
 Finally, take note that given this layout each frame is located 16 bytes higher
 in memory than the previous one. For example, label *runner_f2* will assemble to
