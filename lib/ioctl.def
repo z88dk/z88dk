@@ -1,0 +1,8 @@
+
+; IOCTLs defined for the generic console driver
+
+defc IOCTL_GENCON_RAW_MODE     = 1  ; Set raw terminal mode (int *) 
+defc IOCTL_GENCON_CONSOLE_SIZE = 2  ; Get console size (int *) = (d<<8|w) 
+defc IOCTL_GENCON_SET_FONT32   = 3  ; Set the 32 column font (int *)  
+defc IOCTL_GENCON_SET_FONT64   = 4  ; Set the 64 column font (int *)  
+defc IOCTL_GENCON_SET_UDGS     = 5  ; Set the 32 columns udgs (int *) 

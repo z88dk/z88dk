@@ -56,8 +56,12 @@
             ENDIF
         ENDIF
 
-        defc    CONSOLE_COLUMNS = 32
+	; We default to the 64 column terminal driver
+        defc    CONSOLE_COLUMNS = 64
         defc    CONSOLE_ROWS = 24
+
+	; We use the generic driver by default
+        defc    TAR__fputc_cons_generic = 1
 
 	defc	DEF__register_sp = -1
         defc    TAR__clib_exit_stack_size = 32
