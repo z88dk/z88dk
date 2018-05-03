@@ -50,6 +50,7 @@ generic_console_printc:
 generic_console_vpeek:
         call    xypos
 	ld	a,(hl)
+	and	a
 	ret
 
 xypos:
