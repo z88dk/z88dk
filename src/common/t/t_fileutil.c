@@ -597,5 +597,8 @@ void run_fileutil_xfread_wcount_str(void)
 
 void run_fileutil_xfseek(void)
 {
+#ifdef _WIN32
+	// issues segmentation fault on Linux, fails silently on Win32
 	xfseek(NULL, 0, SEEK_END);	// dies
+#endif
 }
