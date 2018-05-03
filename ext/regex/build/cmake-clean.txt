@@ -1,3 +1,0 @@
-libregex.a
-re-test
-
