@@ -12,6 +12,7 @@
 		SECTION		code_clib
 
 		PUBLIC		generic_console_cls
+		PUBLIC		generic_console_vpeek
 		PUBLIC		generic_console_printc
 		PUBLIC		generic_console_scrollup
 		PUBLIC		generic_console_ioctl
@@ -45,6 +46,22 @@ generic_console_cls:
 ; a = d character to print
 ; e = raw
 generic_console_printc:
+	call	xypos
+	ld	(hl),a
+	ret
+
+;Entry: c = x,
+;	b = y
+;Exit:	nc = success
+;	 a = character,
+;	 c = failure
+generic_console_vpeek:
+	call	xypos
+	ld	a,(hl)
+	and	a
+	ret
+
+xypos:
 	ld	hl,TOPROW
 	ld	a,b
 	and	a

@@ -10,6 +10,7 @@
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
 		PUBLIC		msx_attr
+		PUBLIC		__msx_font32
 
 		EXTERN		generic_console_w
 		EXTERN		CONSOLE_COLUMNS
@@ -91,7 +92,7 @@ generic_console_printc_1:
 	add	hl,hl
 	add	hl,hl
 	add	hl,hl
-	ld	de,(fontaddr)
+	ld	de,(__msx_font32)
 	add	hl,de
 	ld	a,c
 	add	a
@@ -115,5 +116,5 @@ generic_console_printc_1:
 
 
 		SECTION	data_clib
-.fontaddr       defw    CRT_FONT
+.__msx_font32       defw    CRT_FONT
 .msx_attr	defb $F1	; White on Black

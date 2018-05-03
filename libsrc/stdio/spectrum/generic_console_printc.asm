@@ -6,6 +6,7 @@
 	
 	SECTION code_clib
 	PUBLIC	generic_console_printc
+	PUBLIC	generic_console_calc_screen_addr
 		
 	EXTERN	__zx_console_attr
 	EXTERN	__zx_32col_udgs
@@ -105,7 +106,7 @@ skip_control_codes:
 
 
 print32:
-	call	calc_screen_address	; hl = screen address, d preserved
+	call	generic_console_calc_screen_addr	; hl = screen address, d preserved
 	ex	de,hl
 	ld	bc,(__zx_32col_font)
 	dec	b
@@ -154,7 +155,7 @@ ENDIF
 print64:
 	srl	c	; divide by 2
 	ex	af,af	; save the lowest bit
-	call	calc_screen_address
+	call	generic_console_calc_screen_addr
 	ex	de,hl	; de = screen address
 	ex	af,af
 	ld	a,0x0f
@@ -201,7 +202,7 @@ print64_noinverse:
 ; Entry: c = x (0...31) or (0...63 for ts2068/hrgmode)
 ;        b = y
 ; Exit: hl = screen address
-calc_screen_address:
+generic_console_calc_screen_addr:
 IF FORts2068
         bit     0,c             ;if set then we need to use alt screen
         push    af

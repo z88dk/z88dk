@@ -5,3 +5,5 @@ stdio/conio/gotoxy_callee
 stdio/conio/screensize
 stdio/conio/screensize_callee
 stdio/conio/console_coords
+stdio/conio/screendollar
+stdio/conio/cvpeek
