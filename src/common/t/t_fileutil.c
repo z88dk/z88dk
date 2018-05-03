@@ -601,7 +601,7 @@ void run_fileutil_xfseek(void)
 	// issues segmentation fault on Linux, fails silently on Win32
 	xfseek(NULL, 0, SEEK_END);	// dies
 #else
-	printf("failed to seek to 0 in file '?'\n");
+	fprintf(stderr, "failed to seek to 0 in file '?'\n");
 	exit(1);
 #endif
 }
