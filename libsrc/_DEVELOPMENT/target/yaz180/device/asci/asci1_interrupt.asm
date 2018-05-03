@@ -6,8 +6,8 @@
 
     PUBLIC _asci1_interrupt
     
-    EXTERN asci1RxCount, asci1RxIn
-    EXTERN asci1TxCount, asci1TxOut
+    EXTERN asci1RxBuffer, asci1RxCount, asci1RxIn
+    EXTERN asci1TxBuffer, asci1TxCount, asci1TxOut
 
     _asci1_interrupt:
         push af
@@ -34,7 +34,13 @@ ASCI1_RX_GET:
         ld hl,(asci1RxIn)           ; get the pointer to where we poke
         ld (hl),a                   ; write the Rx byte to the asci1RxIn target
 
-        inc l                       ; move the Rx pointer low byte along, 0xFF rollover
+        inc l                       ; move the Rx pointer low byte along
+IF __ASCI1_RX_SIZE != 0x100
+        ld a,__ASCI1_RX_SIZE-1      ; load the buffer size, (n^2)-1
+        and l                       ; range check
+        or asci1RxBuffer&0xFF       ; locate base
+        ld l,a                      ; return the low byte to l
+ENDIF
         ld (asci1RxIn),hl           ; write where the next byte should be poked
 
         jr ASCI1_RX_CHECK           ; check for additional bytes
@@ -63,7 +69,13 @@ ASCI1_TX_CHECK:                     ; now start doing the Tx stuff
         ld a,(hl)                   ; get the Tx byte
         out0 (TDR1),a               ; output the Tx byte to the ASCI1
 
-        inc l                       ; move the Tx pointer low byte along, 0xFF rollover
+        inc l                       ; move the Tx pointer low byte along
+IF __ASCI1_TX_SIZE != 0x100
+        ld a,__ASCI1_TX_SIZE-1      ; load the buffer size, (n^2)-1
+        and l                       ; range check
+        or asci1TxBuffer&0xFF       ; locate base
+        ld l,a                      ; return the low byte to l
+ENDIF
         ld (asci1TxOut),hl          ; write where the next byte should be popped
 
         jr NZ,ASCI1_TX_END          ; if we've more Tx bytes to send, we're done for now

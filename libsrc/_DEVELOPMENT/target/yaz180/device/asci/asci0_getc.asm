@@ -1,10 +1,12 @@
 
+    INCLUDE "config_private.inc"
+
     SECTION code_driver
     SECTION code_driver_character_input
 
     PUBLIC _asci0_getc
 
-    EXTERN asci0RxCount, asci0RxOut
+    EXTERN asci0RxBuffer, asci0RxCount, asci0RxOut
 
     _asci0_getc:
         ; exit     : l = char received
@@ -13,6 +15,7 @@
         ; modifies : af, hl
         
         ld a,(asci0RxCount)         ; get the number of bytes in the Rx buffer
+        ld l,a                      ; and put it in hl
         or a                        ; see if there are zero bytes available
         ret Z                       ; if the count is zero, then return
 
@@ -23,7 +26,15 @@
         ei
         ld a,(hl)                   ; get the Rx byte
 
-        inc l                       ; move the Rx pointer low byte along, 0xFF rollover
+        inc l                       ; move the Rx pointer low byte along
+IF __ASCI0_RX_SIZE != 0x100
+        push af
+        ld a,__ASCI0_RX_SIZE-1      ; load the buffer size, (n^2)-1
+        and l                       ; range check
+        or asci0RxBuffer&0xFF       ; locate base
+        ld l,a                      ; return the low byte to l
+        pop af
+ENDIF
         ld (asci0RxOut),hl          ; write where the next byte should be popped
 
         ld l,a                      ; put the byte in hl

@@ -1,14 +1,12 @@
+
+    INCLUDE "config_private.inc"
+
     SECTION code_driver
     SECTION code_driver_character_output
 
     PUBLIC _asci0_putc
-    
-    EXTERN STAT0, TDR0
-    EXTERN STAT0_TDRE, STAT0_TIE
-    
-    EXTERN __ASCI0_TX_SIZE
 
-    EXTERN asci0TxCount, asci0TxIn
+    EXTERN asci0TxBuffer, asci0TxCount, asci0TxIn
 
     _asci0_putc:
         ; enter    : l = char to output
@@ -43,7 +41,13 @@
         ei
         ld (hl),a                   ; write the Tx byte to the asci0TxIn
 
-        inc l                       ; move the Tx pointer low byte along, 0xFF rollover
+        inc l                       ; move the Tx pointer low byte along
+IF __ASCI0_TX_SIZE != 0x100
+        ld a,__ASCI0_TX_SIZE-1      ; load the buffer size, (n^2)-1
+        and l                       ; range check
+        or asci0TxBuffer&0xFF       ; locate base
+        ld l,a                      ; return the low byte to l
+ENDIF
         ld (asci0TxIn),hl           ; write where the next byte should be poked
 
         ld l,0                      ; indicate Tx buffer was not full
