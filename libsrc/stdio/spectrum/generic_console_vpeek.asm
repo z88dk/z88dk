@@ -14,23 +14,22 @@
 
 
 generic_console_vpeek:
-	push	bc
-	call	generic_console_calc_screen_addr
-	pop	bc
-	ex	de,hl
 	ld	hl,-8
 	add	hl,sp		;de = screen, hl = buffer, bc = coords
+	ld	sp,hl
 	ld	a,(__console_w)
 	cp	32
 	jr	nz,handle_64col
-	; Make some space
 	push	hl		;Save buffer
+	ex	de,hl		;get it into de
+	call	generic_console_calc_screen_addr
+	; Make some space
 	ld	b,8
 vpeek_1:
-	ld	a,(de)
-	ld	(hl),a
-	inc	d
-	inc	hl
+	ld	a,(hl)
+	ld	(de),a
+	inc	h
+	inc	de
 	djnz 	vpeek_1
 	pop	de		;the buffer on the stack
 	ld	hl,(__zx_32col_font)
@@ -39,15 +38,21 @@ do_screendollar:
 	ex	af,af		; Save those flags
 	ld	hl,8		; Dump our temporary buffer
 	add	hl,sp
+	ld	sp,hl
 	ex	af,af		; Flags and parameter back
 	ret
 
 handle_64col:
 	; hl = buffer
-	; de = screen
 	; bc = coordinates
 	push	hl		;save buffer
-	rr	c
+	ex	de,hl
+	srl	c
+	ex	af,af		;save flags
+	call	generic_console_calc_screen_addr
+	;hl = screen
+	ex	de,hl		;de = screen, hl=buffer
+	ex	af,af
 	ld	c,0xf0
 	jr	nc,even_column
 	ld	c,0x0f

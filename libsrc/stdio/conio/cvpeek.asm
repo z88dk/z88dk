@@ -29,11 +29,11 @@ _cvpeek:
 	ld	hl,-1		;invalid charactet
 	ld	a,(__console_h)
 	cp	c
-	ret	nc
-	ld	b,a
+	ret	c
+	ld	b,c
 	ld	a,(__console_w)
 	cp	e
-	ret	nc
+	ret	c
 	ld	c,e
 	; b = y, c = x
 	call	generic_console_vpeek
