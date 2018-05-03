@@ -4,6 +4,11 @@ graphics/eg2000/clg
 graphics/eg2000/clsgraph
 graphics/clrarea
 graphics/lftscrol
+graphics/cclg
+graphics/eg2000/cplot
+graphics/eg2000/cplot_callee
+graphics/eg2000/cpoint
+graphics/eg2000/cpoint_callee
 graphics/eg2000/pixladdr
 graphics/plotpixl
 graphics/respixl
