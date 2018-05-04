@@ -92,9 +92,9 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 
 	SECTION code_crt_init
 IF (startup=2)
-	ld	hl,$4800   ; Address of the Graphics map   COLOUR GENIE
+	ld	hl,$4400   ; Address of the TEXT map for COLOUR GENIE
 ELSE
-	ld	hl,$3c00   ; Address of the Graphics map
+	ld	hl,$3c00   ; Address of the TEXT (Semi-Graphics) map for TRS-80
 ENDIF
 	ld	(base_graphics),hl
 
