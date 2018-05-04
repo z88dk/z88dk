@@ -112,7 +112,7 @@ typedef struct objfile_s
 	str_t		*modname;
 	int			 version;
 	int			 global_org;
-	UT_array	*externs;
+	argv_t		*externs;
 	section_t	*sections;
 
 	struct objfile_s *next, *prev;

@@ -6,7 +6,7 @@
 #include "strutil.h"
 #include "unity.h"
 
-void t_str_new(void)
+void t_strutil_str_new(void)
 {
 	str_t *s = str_new();
 	
@@ -19,7 +19,7 @@ void t_str_new(void)
 	str_free(s);
 }
 
-void t_str_new_copy(void)
+void t_strutil_str_new_copy(void)
 {
 	str_t *s = str_new_copy("hello");
 	
@@ -31,7 +31,7 @@ void t_str_new_copy(void)
 	str_free(s);
 }
 
-void t_str_clear(void)
+void t_strutil_str_clear(void)
 {
 	str_t *s = str_new_copy("hello");
 	
@@ -43,7 +43,7 @@ void t_str_clear(void)
 	str_free(s);
 }
 
-void t_str_reserve(void)
+void t_strutil_str_reserve(void)
 {
 	const char *init = "1234567890123456789012345678901234567890"
 					   "1234567890123456789012345678901234567890";
@@ -57,7 +57,7 @@ void t_str_reserve(void)
 	str_free(s);
 }
 
-void t_str_set(void)
+void t_strutil_str_set(void)
 {
 	str_t *s = str_new();
 	TEST_ASSERT_EQUAL_STRING("", str_data(s));
@@ -71,7 +71,7 @@ void t_str_set(void)
 	str_free(s);
 }
 
-void t_str_set_f(void)
+void t_strutil_str_set_f(void)
 {
 	str_t *s = str_new();
 	TEST_ASSERT_EQUAL_STRING("", str_data(s));
@@ -85,7 +85,7 @@ void t_str_set_f(void)
 	str_free(s);
 }
 
-void t_str_set_bin(void)
+void t_strutil_str_set_n(void)
 {
 	str_t *s = str_new();
 	TEST_ASSERT_EQUAL_STRING("", str_data(s));
@@ -101,7 +101,7 @@ void t_str_set_bin(void)
 	str_free(s);
 }
 
-void t_str_set_str(void)
+void t_strutil_str_set_str(void)
 {
 	str_t *s = str_new();
 	TEST_ASSERT_EQUAL_STRING("", str_data(s));
@@ -119,7 +119,7 @@ void t_str_set_str(void)
 	str_free(s2);
 }
 
-void t_str_append(void)
+void t_strutil_str_append(void)
 {
 	str_t *s = str_new();
 	TEST_ASSERT_EQUAL_STRING("", str_data(s));
@@ -133,7 +133,7 @@ void t_str_append(void)
 	str_free(s);
 }
 
-void t_str_append_f(void)
+void t_strutil_str_append_f(void)
 {
 	str_t *s = str_new();
 	TEST_ASSERT_EQUAL_STRING("", str_data(s));
@@ -147,7 +147,7 @@ void t_str_append_f(void)
 	str_free(s);
 }
 
-void t_str_append_bin(void)
+void t_strutil_str_append_n(void)
 {
 	str_t *s = str_new();
 	TEST_ASSERT_EQUAL_STRING("", str_data(s));
@@ -163,7 +163,7 @@ void t_str_append_bin(void)
 	str_free(s);
 }
 
-void t_str_append_str(void)
+void t_strutil_str_append_str(void)
 {
 	str_t *s = str_new();
 	TEST_ASSERT_EQUAL_STRING("", str_data(s));
@@ -181,7 +181,205 @@ void t_str_append_str(void)
 	str_free(s2);
 }
 
-void t_str_spool_add(void) 
+void t_strutil_argv_new(void)
+{
+	argv_t *argv = argv_new();
+	TEST_ASSERT_EQUAL(0, argv_len(argv));
+	TEST_ASSERT_NULL(*argv_front(argv));
+	TEST_ASSERT_NULL(*argv_back(argv));
+	TEST_ASSERT(argv_front(argv) == argv_back(argv));
+
+	argv_push(argv, "1");
+	argv_push(argv, "2");
+	argv_push(argv, "3");
+	TEST_ASSERT_EQUAL(3, argv_len(argv));
+	TEST_ASSERT_EQUAL_STRING("1", (argv_front(argv))[0]);
+	TEST_ASSERT_EQUAL_STRING("2", (argv_front(argv))[1]);
+	TEST_ASSERT_EQUAL_STRING("3", (argv_front(argv))[2]);
+	TEST_ASSERT_NULL((argv_front(argv))[3]);
+	TEST_ASSERT(argv_front(argv) + 3 == argv_back(argv));
+
+	argv_unshift(argv, "0");
+	argv_unshift(argv, "-1");
+	argv_unshift(argv, "-2");
+	TEST_ASSERT_EQUAL(6, argv_len(argv));
+	TEST_ASSERT_EQUAL_STRING("-2", (argv_front(argv))[0]);
+	TEST_ASSERT_EQUAL_STRING("-1", (argv_front(argv))[1]);
+	TEST_ASSERT_EQUAL_STRING("0", (argv_front(argv))[2]);
+	TEST_ASSERT_EQUAL_STRING("1", (argv_front(argv))[3]);
+	TEST_ASSERT_EQUAL_STRING("2", (argv_front(argv))[4]);
+	TEST_ASSERT_EQUAL_STRING("3", (argv_front(argv))[5]);
+	TEST_ASSERT_NULL((argv_front(argv))[6]);
+	TEST_ASSERT(argv_front(argv) + 6 == argv_back(argv));
+
+	argv_insert(argv, 3, "0.5");
+	TEST_ASSERT_EQUAL(7, argv_len(argv));
+	TEST_ASSERT_EQUAL_STRING("-2", (argv_front(argv))[0]);
+	TEST_ASSERT_EQUAL_STRING("-1", (argv_front(argv))[1]);
+	TEST_ASSERT_EQUAL_STRING("0", (argv_front(argv))[2]);
+	TEST_ASSERT_EQUAL_STRING("0.5", (argv_front(argv))[3]);
+	TEST_ASSERT_EQUAL_STRING("1", (argv_front(argv))[4]);
+	TEST_ASSERT_EQUAL_STRING("2", (argv_front(argv))[5]);
+	TEST_ASSERT_EQUAL_STRING("3", (argv_front(argv))[6]);
+	TEST_ASSERT_NULL((argv_front(argv))[7]);
+	TEST_ASSERT(argv_front(argv) + 7 == argv_back(argv));
+
+	argv_insert(argv, 6, "2.5");
+	TEST_ASSERT_EQUAL(8, argv_len(argv));
+	TEST_ASSERT_EQUAL_STRING("-2", (argv_front(argv))[0]);
+	TEST_ASSERT_EQUAL_STRING("-1", (argv_front(argv))[1]);
+	TEST_ASSERT_EQUAL_STRING("0", (argv_front(argv))[2]);
+	TEST_ASSERT_EQUAL_STRING("0.5", (argv_front(argv))[3]);
+	TEST_ASSERT_EQUAL_STRING("1", (argv_front(argv))[4]);
+	TEST_ASSERT_EQUAL_STRING("2", (argv_front(argv))[5]);
+	TEST_ASSERT_EQUAL_STRING("2.5", (argv_front(argv))[6]);
+	TEST_ASSERT_EQUAL_STRING("3", (argv_front(argv))[7]);
+	TEST_ASSERT_NULL((argv_front(argv))[8]);
+	TEST_ASSERT(argv_front(argv) + 8 == argv_back(argv));
+
+	argv_insert(argv, 8, "3.5");
+	TEST_ASSERT_EQUAL(9, argv_len(argv));
+	TEST_ASSERT_EQUAL_STRING("-2", (argv_front(argv))[0]);
+	TEST_ASSERT_EQUAL_STRING("-1", (argv_front(argv))[1]);
+	TEST_ASSERT_EQUAL_STRING("0", (argv_front(argv))[2]);
+	TEST_ASSERT_EQUAL_STRING("0.5", (argv_front(argv))[3]);
+	TEST_ASSERT_EQUAL_STRING("1", (argv_front(argv))[4]);
+	TEST_ASSERT_EQUAL_STRING("2", (argv_front(argv))[5]);
+	TEST_ASSERT_EQUAL_STRING("2.5", (argv_front(argv))[6]);
+	TEST_ASSERT_EQUAL_STRING("3", (argv_front(argv))[7]);
+	TEST_ASSERT_EQUAL_STRING("3.5", (argv_front(argv))[8]);
+	TEST_ASSERT_NULL((argv_front(argv))[9]);
+	TEST_ASSERT(argv_front(argv) + 9 == argv_back(argv));
+
+	argv_insert(argv, 10, "4");
+	TEST_ASSERT_EQUAL(11, argv_len(argv));
+	TEST_ASSERT_EQUAL_STRING("-2", (argv_front(argv))[0]);
+	TEST_ASSERT_EQUAL_STRING("-1", (argv_front(argv))[1]);
+	TEST_ASSERT_EQUAL_STRING("0", (argv_front(argv))[2]);
+	TEST_ASSERT_EQUAL_STRING("0.5", (argv_front(argv))[3]);
+	TEST_ASSERT_EQUAL_STRING("1", (argv_front(argv))[4]);
+	TEST_ASSERT_EQUAL_STRING("2", (argv_front(argv))[5]);
+	TEST_ASSERT_EQUAL_STRING("2.5", (argv_front(argv))[6]);
+	TEST_ASSERT_EQUAL_STRING("3", (argv_front(argv))[7]);
+	TEST_ASSERT_EQUAL_STRING("3.5", (argv_front(argv))[8]);
+	TEST_ASSERT_NULL((argv_front(argv))[9]);
+	TEST_ASSERT_EQUAL_STRING("4", (argv_front(argv))[10]);
+	TEST_ASSERT_NULL((argv_front(argv))[11]);
+	TEST_ASSERT(argv_front(argv) + 11 == argv_back(argv));
+
+	argv_erase(argv, 9, 10);
+	TEST_ASSERT_EQUAL(9, argv_len(argv));
+	TEST_ASSERT_EQUAL_STRING("-2", (argv_front(argv))[0]);
+	TEST_ASSERT_EQUAL_STRING("-1", (argv_front(argv))[1]);
+	TEST_ASSERT_EQUAL_STRING("0", (argv_front(argv))[2]);
+	TEST_ASSERT_EQUAL_STRING("0.5", (argv_front(argv))[3]);
+	TEST_ASSERT_EQUAL_STRING("1", (argv_front(argv))[4]);
+	TEST_ASSERT_EQUAL_STRING("2", (argv_front(argv))[5]);
+	TEST_ASSERT_EQUAL_STRING("2.5", (argv_front(argv))[6]);
+	TEST_ASSERT_EQUAL_STRING("3", (argv_front(argv))[7]);
+	TEST_ASSERT_EQUAL_STRING("3.5", (argv_front(argv))[8]);
+	TEST_ASSERT_NULL((argv_front(argv))[9]);
+	TEST_ASSERT(argv_front(argv) + 9 == argv_back(argv));
+
+	argv_erase(argv, 0, 2);
+	TEST_ASSERT_EQUAL(7, argv_len(argv));
+	TEST_ASSERT_EQUAL_STRING("0", (argv_front(argv))[0]);
+	TEST_ASSERT_EQUAL_STRING("0.5", (argv_front(argv))[1]);
+	TEST_ASSERT_EQUAL_STRING("1", (argv_front(argv))[2]);
+	TEST_ASSERT_EQUAL_STRING("2", (argv_front(argv))[3]);
+	TEST_ASSERT_EQUAL_STRING("2.5", (argv_front(argv))[4]);
+	TEST_ASSERT_EQUAL_STRING("3", (argv_front(argv))[5]);
+	TEST_ASSERT_EQUAL_STRING("3.5", (argv_front(argv))[6]);
+	TEST_ASSERT_NULL((argv_front(argv))[7]);
+	TEST_ASSERT(argv_front(argv) + 7 == argv_back(argv));
+
+	argv_set(argv, 1, "0,5");
+	TEST_ASSERT_EQUAL(7, argv_len(argv));
+	TEST_ASSERT_EQUAL_STRING("0", (argv_front(argv))[0]);
+	TEST_ASSERT_EQUAL_STRING("0,5", (argv_front(argv))[1]);
+	TEST_ASSERT_EQUAL_STRING("1", (argv_front(argv))[2]);
+	TEST_ASSERT_EQUAL_STRING("2", (argv_front(argv))[3]);
+	TEST_ASSERT_EQUAL_STRING("2.5", (argv_front(argv))[4]);
+	TEST_ASSERT_EQUAL_STRING("3", (argv_front(argv))[5]);
+	TEST_ASSERT_EQUAL_STRING("3.5", (argv_front(argv))[6]);
+	TEST_ASSERT_NULL((argv_front(argv))[7]);
+	TEST_ASSERT(argv_front(argv) + 7 == argv_back(argv));
+
+	char **p = argv_front(argv);
+	TEST_ASSERT_EQUAL_STRING("0", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("0,5", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("1", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("2", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("2.5", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("3", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("3.5", *p); p++;
+	TEST_ASSERT_NULL(*p);
+
+	TEST_ASSERT_EQUAL(7, argv_len(argv));
+	TEST_ASSERT_EQUAL_STRING("0", argv_get(argv, 0));
+	TEST_ASSERT_EQUAL_STRING("0,5", argv_get(argv, 1));
+	TEST_ASSERT_EQUAL_STRING("1", argv_get(argv, 2));
+	TEST_ASSERT_EQUAL_STRING("2", argv_get(argv, 3));
+	TEST_ASSERT_EQUAL_STRING("2.5", argv_get(argv, 4));
+	TEST_ASSERT_EQUAL_STRING("3", argv_get(argv, 5));
+	TEST_ASSERT_EQUAL_STRING("3.5", argv_get(argv, 6));
+	TEST_ASSERT_NULL(argv_get(argv, 7));
+
+	argv_pop(argv);
+	TEST_ASSERT_EQUAL(6, argv_len(argv));
+	TEST_ASSERT_EQUAL_STRING("0", argv_get(argv, 0));
+	TEST_ASSERT_EQUAL_STRING("0,5", argv_get(argv, 1));
+	TEST_ASSERT_EQUAL_STRING("1", argv_get(argv, 2));
+	TEST_ASSERT_EQUAL_STRING("2", argv_get(argv, 3));
+	TEST_ASSERT_EQUAL_STRING("2.5", argv_get(argv, 4));
+	TEST_ASSERT_EQUAL_STRING("3", argv_get(argv, 5));
+	TEST_ASSERT_NULL(argv_get(argv, 6));
+
+	argv_shift(argv);
+	TEST_ASSERT_EQUAL(5, argv_len(argv));
+	TEST_ASSERT_EQUAL_STRING("0,5", argv_get(argv, 0));
+	TEST_ASSERT_EQUAL_STRING("1", argv_get(argv, 1));
+	TEST_ASSERT_EQUAL_STRING("2", argv_get(argv, 2));
+	TEST_ASSERT_EQUAL_STRING("2.5", argv_get(argv, 3));
+	TEST_ASSERT_EQUAL_STRING("3", argv_get(argv, 4));
+	TEST_ASSERT_NULL(argv_get(argv, 5));
+
+	argv_pop(argv); 
+	argv_pop(argv);
+	argv_pop(argv);
+	argv_pop(argv);
+	TEST_ASSERT_EQUAL(1, argv_len(argv));
+	TEST_ASSERT_EQUAL_STRING("0,5", argv_get(argv, 0));
+	TEST_ASSERT_NULL(argv_get(argv, 1));
+
+	argv_pop(argv);
+	TEST_ASSERT_EQUAL(0, argv_len(argv));
+	TEST_ASSERT_NULL(argv_get(argv, 0));
+
+	argv_pop(argv);
+	TEST_ASSERT_EQUAL(0, argv_len(argv));
+	TEST_ASSERT_NULL(argv_get(argv, 0));
+
+	argv_push(argv, "1");
+	TEST_ASSERT_EQUAL(1, argv_len(argv));
+	TEST_ASSERT_EQUAL_STRING("1", argv_get(argv, 0));
+	TEST_ASSERT_NULL(argv_get(argv, 1));
+
+	argv_shift(argv);
+	TEST_ASSERT_EQUAL(0, argv_len(argv));
+	TEST_ASSERT_NULL(argv_get(argv, 0));
+
+	argv_shift(argv);
+	TEST_ASSERT_EQUAL(0, argv_len(argv));
+	TEST_ASSERT_NULL(argv_get(argv, 0));
+
+	argv_clear(argv);
+	TEST_ASSERT_EQUAL(0, argv_len(argv));
+	
+	argv_free(argv);
+}
+
+void t_strutil_spool_add(void)
 {
 #define NUM_STRINGS 10
 #define STRING_SIZE	5
@@ -218,3 +416,4 @@ void t_str_spool_add(void)
 	pool = spool_add(NULL);
 	TEST_ASSERT_NULL(pool);
 }
+

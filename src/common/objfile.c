@@ -275,8 +275,7 @@ objfile_t *objfile_new()
 	self->modname = str_new();
 
 	self->version = self->global_org = -1;
-	
-	utarray_new(self->externs, &ut_str_icd);
+	self->externs = argv_new();
 	
 	section_t *section = section_new();			// section "" must exist
 	self->sections = NULL;
@@ -292,7 +291,7 @@ void objfile_free(objfile_t *self)
 	str_free(self->filename);
 	str_free(self->signature);
 	str_free(self->modname);
-	utarray_free(self->externs);
+	argv_free(self->externs);
 
 	section_t *section, *tmp;
 	DL_FOREACH_SAFE(self->sections, section, tmp) {
@@ -454,7 +453,7 @@ static void objfile_read_externs(objfile_t *obj, FILE *fp, long fpos_start, long
 	xfseek(fp, fpos_start, SEEK_SET);
 	while (ftell(fp) < fpos_end) {
 		xfread_bcount_str(name, fp);
-		utarray_push_back(obj->externs, &str_data(name));
+		argv_push(obj->externs, str_data(name));
 
 		if (opt_obj_list)
 			printf("    U         %s\n", str_data(name));
@@ -694,12 +693,11 @@ static long objfile_write_symbols(objfile_t *obj, FILE *fp)
 
 static long objfile_write_externs1(objfile_t *obj, FILE *fp, str_t *name)
 {
-	if (utarray_len(obj->externs) == 0) return -1;	// no external symbols
+	if (argv_len(obj->externs) == 0) return -1;		// no external symbols
 
 	long fpos0 = ftell(fp);							// start of externals area
 
-	char **pname = NULL;
-	while ((pname = (char**)utarray_next(obj->externs, pname)) != NULL) {
+	for (char **pname = argv_front(obj->externs); *pname; pname++) {
 		str_set_f(name, "%s", *pname);
 		xfwrite_bcount_str(name, fp);
 	}
@@ -1170,8 +1168,7 @@ void file_rename_symbol(file_t *file, const char *old_name, const char *new_name
 		if (opt_obj_verbose)
 			printf("Block '%s'\n", str_data(obj->signature));
 
-		char **ext = NULL;
-		while ((ext = (char**)utarray_next(obj->externs, ext)) != NULL) {
+		for (char **ext = argv_front(obj->externs); *ext; ext++) {
 			if (strcmp(*ext, old_name) == 0) {	// match
 				if (opt_obj_verbose)
 					printf("  rename symbol %s -> %s\n", old_name, new_name);

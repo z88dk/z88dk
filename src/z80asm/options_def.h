@@ -46,10 +46,10 @@ OPT_VAR(const char *,	lib_file,	NULL	)	/* set by -x */
 OPT_VAR(const char *,    consol_obj_file, NULL)	/* set by -o and no -b */
 OPT_VAR(const char *,    output_directory, NULL)	/* set by -O */
 
-OPT_VAR(UT_array *,	inc_path,	NULL )		/* path for include files */
-OPT_VAR(UT_array *,	lib_path,	NULL )		/* path for library files */
+OPT_VAR(argv_t *,	inc_path, NULL)			/* path for include files */
+OPT_VAR(argv_t *,	lib_path, NULL)			/* path for library files */
 
-OPT_VAR(UT_array  *, files, 	NULL)		/* list of input files */
+OPT_VAR(argv_t *,	files,	  NULL)			/* list of input files */
 
 OPT_VAR(int,		filler,		0)			/* filler byte for defs */
 

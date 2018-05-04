@@ -38,10 +38,8 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 *----------------------------------------------------------------------------*/
 
 /* search for a file on the given directory list, return full path name */
-static void path_search_1(Str *dest, const char *filename, UT_array *dir_list, Str *pathname)
+static void path_search_1(Str *dest, const char *filename, argv_t *dir_list, Str *pathname)
 {
-	char **pdir;
-	
     Str_set( dest, filename );		/* default return: input file name */
 
     /* if no dir_list, return file */
@@ -53,7 +51,7 @@ static void path_search_1(Str *dest, const char *filename, UT_array *dir_list, S
 		return;
 
     /* search in dir_list */
-	for (pdir = NULL; (pdir = (char **)utarray_next(dir_list, pdir)) != NULL; )
+	for (char **pdir = argv_front(dir_list); *pdir; pdir++)
     {
 		Str_sprintf(pathname, "%s/%s", *pdir, filename);
 
@@ -67,14 +65,14 @@ static void path_search_1(Str *dest, const char *filename, UT_array *dir_list, S
     return;
 }
 
-void path_search(Str *dest, const char *filename, UT_array *dir_list)
+void path_search(Str *dest, const char *filename, argv_t *dir_list)
 {
 	STR_DEFINE(pathname, FILENAME_MAX);
 	path_search_1(dest, filename, dir_list, pathname);
 	STR_DELETE(pathname);
 }
 
-const char *search_file(const char *filename, UT_array *dir_list )
+const char *search_file(const char *filename, argv_t *dir_list )
 {
 	STR_DEFINE(dest, FILENAME_MAX);
 	const char *ret;

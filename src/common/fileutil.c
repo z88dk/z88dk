@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 #include "fileutil.h"
 #include "die.h"
-#include "utarray.h"
+#include "strutil.h"
 #include <assert.h>
 #include <ctype.h>
 #include <string.h>
@@ -202,7 +202,7 @@ const char *path_filename(const char *path1)
 //-----------------------------------------------------------------------------
 // map fileno(FLIE*) to filename in this session
 //-----------------------------------------------------------------------------
-static UT_array *open_files = NULL;		// array indexed by fileno(fp)
+static argv_t *open_files;		// array indexed by fileno(fp)
 
 static void add_open_file(FILE *stream, const char *filename);
 static void file_deinit(void);
@@ -213,7 +213,7 @@ static void file_init()
 	if (!inited) {
 		inited = true;
 		atexit(file_deinit);
-		utarray_new(open_files, &ut_str_icd);
+		open_files = argv_new();
 		add_open_file(stdin, "<stdin>");
 		add_open_file(stdout, "<stdout>");
 		add_open_file(stderr, "<stderr>");
@@ -222,28 +222,25 @@ static void file_init()
 
 static void file_deinit(void)
 {
-	utarray_free(open_files);
+	argv_free(open_files);
 }
 
 static void add_open_file(FILE *stream, const char *filename)
 {
 	file_init();
 	assert(stream);
-	size_t fno = fileno(stream);
-	if (fno >= utarray_len(open_files))
-		utarray_resize(open_files, fno + 1);
-	free(*(char**)utarray_eltptr(open_files, fno));
-	*(char**)utarray_eltptr(open_files, fno) = xstrdup(filename);
+	argv_set(open_files, fileno(stream), filename);
 }
 
 static char *get_filename(FILE *fp)
 {
 	file_init();
-	size_t fno = fp ? fileno(fp) : -1;
-	if (fno >= utarray_len(open_files))
+	if (!fp)
 		return "?";
-	else
-		return *(char**)utarray_eltptr(open_files, fno);
+	else {
+		char *filename = argv_get(open_files, fileno(fp));
+		return filename ? filename : "?";
+	}
 }
 
 //-----------------------------------------------------------------------------

@@ -118,16 +118,16 @@ static OptsLU opts_lu[] =
 *----------------------------------------------------------------------------*/
 DEFINE_init_module()
 {
-	utarray_new(opts.inc_path, &ut_str_icd);
-	utarray_new(opts.lib_path, &ut_str_icd);
-	utarray_new(opts.files, &ut_str_icd);
+	opts.inc_path = argv_new();
+	opts.lib_path = argv_new();
+	opts.files = argv_new();
 }
 
 DEFINE_dtor_module()
 {
-	utarray_free(opts.inc_path);
-	utarray_free(opts.lib_path);
-	utarray_free(opts.files);
+	argv_free(opts.inc_path);
+	argv_free(opts.lib_path);
+	argv_free(opts.files);
 }
 
 /*-----------------------------------------------------------------------------
@@ -334,13 +334,13 @@ static void process_file(char *filename )
 //	expand .../**/... into a list of all directories replacing **
 //	return just the input pattern if no ** is present
 //-----------------------------------------------------------------------------
-static void expand_star_star(const char *filename, UT_array **plist)
+static void expand_star_star(const char *filename, argv_t *list)
 {
 	STR_DEFINE(path, STR_SIZE);
 	char *tail;
 
 	if ((tail = strstr(filename, "**")) == NULL) {
-		utarray_push_back(*plist, &filename);
+		argv_push(list, filename);
 	}
 	else {
 		// expand first ** into list of all sub-directories
@@ -359,11 +359,11 @@ static void expand_star_star(const char *filename, UT_array **plist)
 					Str_sprintf(path, "%s/%s", 
 						found, tail[2] == '/' ? tail + 3 : tail + 2);	// collect directory with pattern
 					char *pattern = Str_data(path);
-					utarray_push_back(*plist, &pattern);
+					argv_push(list, pattern);
 
 					Str_sprintf(path, "%s/%s",
 						found, tail[0] == '/' ? tail + 1 : tail);	// reuse **/... from tail to recurse
-					expand_star_star(Str_data(path), plist);		// recurse
+					expand_star_star(Str_data(path), list);		// recurse
 				}
 			}
 		}
@@ -378,25 +378,22 @@ static void expand_star_star(const char *filename, UT_array **plist)
 	}
 }
 
-static void expand_glob(const char *filename, UT_array **pfiles, bool do_search_path)
+static void expand_glob(const char *filename, argv_t *files, bool do_search_path)
 {
-	int initial_len = utarray_len(*pfiles);
+	int initial_len = argv_len(files);
 	int ret;
 
 	// expand ** into list of all possible paths
-	UT_array *patterns;
-	utarray_new(patterns, &ut_str_icd);
+	argv_t *patterns = argv_new();
+	expand_star_star(filename, patterns);		// expand **
 
-	expand_star_star(filename, &patterns);		// expand **
-
-	char **p = NULL;
-	while ((p = (char**)utarray_next(patterns, p))) {
+	for (char **p = argv_front(patterns); *p; p++) {
 		char *pattern = *p;
 
 		if (strchr(pattern, '*') == NULL && strchr(pattern, '?') == NULL) {
 			// optimize if no pattern chars
 			const char *found = search_source(pattern);
-			utarray_push_back(*pfiles, &found);
+			argv_push(files, found);
 		}
 		else {
 			glob_t glob_files;
@@ -408,7 +405,7 @@ static void expand_glob(const char *filename, UT_array **pfiles, bool do_search_
 				for (int i = 0; i < glob_files.gl_pathc; i++) {
 					char *found = glob_files.gl_pathv[i];
 					if (file_exists(found))
-						utarray_push_back(*pfiles, &found);
+						argv_push(files, found);
 				}
 			}
 			else {
@@ -424,34 +421,31 @@ static void expand_glob(const char *filename, UT_array **pfiles, bool do_search_
 
 	// error if pattern matched no file
 	if (strchr(filename, '*') || strchr(filename, '?')) {
-		if (initial_len == utarray_len(*pfiles))
+		if (initial_len == argv_len(files))
 			error_glob_no_files(filename);
 	}
 
-	utarray_free(patterns);
+	argv_free(patterns);
 }
 
 void expand_source_glob(const char *filename)
 {
-	expand_glob(filename, &opts.files, true);
+	expand_glob(filename, opts.files, true);
 }
 
 void expand_list_glob(const char *filename)
 {
-	UT_array *files;
-	utarray_new(files, &ut_str_icd);
+	argv_t *files = argv_new();
 
-	expand_glob(filename, &files, false);
-	char **p = NULL;
-	while ((p = (char**)utarray_next(files, p))) {
+	expand_glob(filename, files, false);
+	for (char **p = argv_front(files); *p; p++) {
 		char *filename = *p;
 		src_push();
 		{
 			char *line;
 
 			// append the directoy of the list file to the include path	and remove it at the end
-			const char *lst_dirname = path_dirname(filename);
-			utarray_push_back(opts.inc_path, &lst_dirname);
+			argv_push(opts.inc_path, path_dirname(filename));
 
 			if (src_open(filename, NULL)) {
 				while ((line = src_getline()) != NULL)
@@ -459,11 +453,11 @@ void expand_list_glob(const char *filename)
 			}
 
 			// finished assembly, remove dirname from include path
-			utarray_pop_back(opts.inc_path);
+			argv_pop(opts.inc_path);
 		}
 		src_pop();
 	}
-	utarray_free(files);
+	argv_free(files);
 }
 
 /*-----------------------------------------------------------------------------

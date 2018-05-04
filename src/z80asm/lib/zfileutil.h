@@ -15,7 +15,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 
 #include "types.h"
 #include "str.h"
-#include "utarray.h"
+#include "strutil.h"
 #include <stdio.h>
 
 /*-----------------------------------------------------------------------------
@@ -27,8 +27,8 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 *	Extension is the final "." followed by sequence of letters or digits
 *----------------------------------------------------------------------------*/
 /* search for a file on the given directory list, return full path name */
-extern void path_search( Str *dest, const char *filename, UT_array *dir_list );
-extern const char *search_file(const char *filename, UT_array *dir_list);	/* returned string in strpool */
+extern void path_search( Str *dest, const char *filename, argv_t *dir_list );
+extern const char *search_file(const char *filename, argv_t *dir_list);	/* returned string in strpool */
 
 /* check if file/directory exists */
 extern bool file_exists(const char *filename);

@@ -62,7 +62,6 @@ void assemble_file( char *filename )
 {
 	const char *src_filename;
 	const char *obj_filename;
-	const char *src_dirname;
 	bool load_obj_only;
 	Module *module;
 
@@ -102,8 +101,7 @@ void assemble_file( char *filename )
 	
 	/* append the directoy of the file being assembled to the include path 
 	   and remove it at function end */
-	src_dirname  = path_dirname(src_filename);
-	utarray_push_back(opts.inc_path, &src_dirname);
+	argv_push(opts.inc_path, path_dirname(src_filename));
 
     /* normal case - assemble a asm source file */
     opts.cur_list = opts.list;		/* initial LSTON status */
@@ -135,7 +133,7 @@ void assemble_file( char *filename )
 	opts.cur_list = false;
 
 	/* finished assembly, remove dirname from include path */
-	utarray_pop_back(opts.inc_path);
+	argv_pop(opts.inc_path);
 }
 
 /*-----------------------------------------------------------------------------
@@ -325,8 +323,6 @@ ReleaseLibraries( void )
  ***************************************************************************************************/
 int z80asm_main( int argc, char *argv[] )
 {
-	char **pfile;
-
 	model_init();						/* init global data */
 	libraryhdr = NULL;					/* initialise to no library files */
 	init_macros();
@@ -336,7 +332,7 @@ int z80asm_main( int argc, char *argv[] )
 	*	and assembles each one in turn */
 	parse_argv(argc, argv);
 	if (!get_num_errors()) {
-		for (pfile = NULL; (pfile = (char**)utarray_next(opts.files, pfile)) != NULL; )
+		for (char **pfile = argv_front(opts.files); *pfile; pfile++)
 			assemble_file(*pfile);
 	}
 

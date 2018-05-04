@@ -12,6 +12,7 @@ Parse command line options
 
 #include "types.h"
 #include "utarray.h"
+#include "strutil.h"
 
 /*-----------------------------------------------------------------------------
 *   CPU type
