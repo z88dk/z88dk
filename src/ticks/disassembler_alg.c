@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include "ticks.h"
 
+#if defined(_WIN32) || defined(WIN32)
+#define snprintf _snprintf
+#endif
 
 
 
