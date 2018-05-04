@@ -12,7 +12,6 @@ SECTION code_clib
 PUBLIC cplot_callee
 PUBLIC _cplot_callee
 PUBLIC ASMDISP_CPLOT_CALLEE
-EXTERN base_graphics
 
 .cplot_callee
 ._cplot_callee
@@ -51,7 +50,7 @@ EXTERN base_graphics
 
 		ld	b,l
 
-		ld	hl,(base_graphics)	; pointer to base of graphics area
+		ld	hl,$4800	; pointer to base of graphics area
 		ld	l,a
 
 		xor a
