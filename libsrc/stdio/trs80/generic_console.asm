@@ -13,8 +13,8 @@
 
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
-
-		defc		DISPLAY = 15360
+		
+		EXTERN		base_graphics
 
 generic_console_ioctl:
 	scf
@@ -24,8 +24,10 @@ generic_console_set_inverse:
 	ret
 
 generic_console_cls:
-	ld	hl, DISPLAY
-	ld	de, DISPLAY +1
+	ld	hl, (base_graphics)
+	ld	d,l
+	ld	e,l
+	inc de
 	ld	bc,1023
 	ld	(hl),32
 	ldir
@@ -54,9 +56,10 @@ generic_console_vpeek:
 	ret
 
 xypos:
-	ld	hl,DISPLAY - CONSOLE_COLUMNS
+	ld	hl, (base_graphics)
 	ld	de,CONSOLE_COLUMNS
 	inc	b
+	sbc hl,de
 generic_console_printc_1:
 	add	hl,de
 	djnz	generic_console_printc_1
@@ -68,8 +71,9 @@ generic_console_printc_3:
 generic_console_scrollup:
 	push	de
 	push	bc
-	ld	hl, DISPLAY + CONSOLE_COLUMNS
-	ld	de, DISPLAY
+	ld	hl, CONSOLE_COLUMNS
+	ld	de, (base_graphics)
+	add	hl,de
 	ld	bc,+ ((CONSOLE_COLUMNS) * (CONSOLE_ROWS-1))
 	ldir
 	ex	de,hl
