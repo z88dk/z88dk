@@ -37,8 +37,13 @@ IF      !DEFINED_CRT_ORG_CODE
 	ENDIF
 ENDIF
 
+IF (startup=2)
+        defc    CONSOLE_ROWS = 24
+        defc    CONSOLE_COLUMNS = 40
+ELSE
         defc    CONSOLE_ROWS = 16
         defc    CONSOLE_COLUMNS = 64
+ENDIF
 
 
         defc    TAR__fputc_cons_generic = 1
@@ -92,6 +97,7 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 
 	SECTION code_crt_init
 IF (startup=2)
+	call	$1c9		;CLS
 	ld	hl,$4400   ; Address of the TEXT map for COLOUR GENIE
 ELSE
 	ld	hl,$3c00   ; Address of the TEXT (Semi-Graphics) map for TRS-80
