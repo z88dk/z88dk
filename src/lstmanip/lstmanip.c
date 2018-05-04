@@ -15,7 +15,9 @@
 
 #if defined(_WIN32) || defined(WIN32)
 #define strcasecmp(a,b) stricmp(a,b)
+#define snprintf _snprintf
 #endif
+
 
 static void read_list_file(char *filename);
 static void usage(void);
