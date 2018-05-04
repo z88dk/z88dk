@@ -12,7 +12,6 @@ SECTION code_clib
 PUBLIC cpoint_callee
 PUBLIC _cpoint_callee
 PUBLIC ASMDISP_CPOINT_CALLEE
-EXTERN base_graphics
 
 .cpoint_callee
 ._cpoint_callee
@@ -47,7 +46,7 @@ EXTERN base_graphics
 
 		ld	b,l
 
-		ld	hl,(base_graphics)	; pointer to base of graphics area
+		ld	hl,$4800	; pointer to base of graphics area
 		ld	l,a
 
 		xor a
