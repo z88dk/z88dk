@@ -5,7 +5,9 @@
 	PUBLIC	generic_console_vpeek
 
 	EXTERN	__msx_font32
+	EXTERN	__msx_udg32
 	EXTERN	screendollar
+	EXTERN	screendollar_with_count
 	EXTERN	msxbios
 
 IF FORmsx
@@ -43,6 +45,13 @@ generic_console_vpeek:
 	pop	de		;buffer
 	ld	hl,(__msx_font32)
 	call	screendollar
+	jr	nc,gotit
+	ld	hl,(__msx_udg32)
+	ld	b,128
+	call	screendollar_with_count
+	jr	c,gotit
+	add	128
+gotit:
 	ex	af,af
 	ld	hl,8
 	add	hl,sp

@@ -7,7 +7,9 @@
 
 	EXTERN	generic_console_calc_screen_addr
 	EXTERN  screendollar
+	EXTERN  screendollar_with_count
 	EXTERN	__console_w
+	EXTERN	__zx_32col_udgs
 	EXTERN	__zx_32col_font
 	EXTERN	__zx_64col_font
 
@@ -35,6 +37,13 @@ vpeek_1:
 	ld	hl,(__zx_32col_font)
 do_screendollar:
 	call	screendollar
+	jr	nc,gotit
+	ld	hl,(__zx_32col_udgs)
+	ld	b,128
+	call	screendollar_with_count
+	jr	c,gotit
+	add	128
+gotit:
 	ex	af,af		; Save those flags
 	ld	hl,8		; Dump our temporary buffer
 	add	hl,sp

@@ -5,12 +5,14 @@
 
 	SECTION	code_clib
 	PUBLIC	screendollar
+	PUBLIC	screendollar_with_count
 
 ;
 ; Entry:	de = character to match
 ;		hl = start of font
 screendollar:
 	ld	b,96		; number of characters in font
+screendollar_with_count:
 screendollar_1:
 	push	bc
 	push	de
