@@ -45,6 +45,7 @@
         defc    CONSOLE_ROWS = 24
         defc    CONSOLE_COLUMNS = 32
 
+        defc    TAR__fputc_cons_generic = 1
 	defc	TAR__clib_exit_stack_size = 32
 	defc	TAR__register_sp = -1
 	defc __CPU_CLOCK = 3250000
@@ -77,6 +78,16 @@ ENDIF
 	call	crt0_init_bss
         ld      (exitsp),sp
 
+IF DEFINED_CRT_FONT
+        defc    CHAR_TABLE = 0x2C00
+        EXTERN	ace_set_font
+        ld	hl,CRT_FONT
+        ld      de,CHAR_TABLE + 256
+        ld      bc,768
+        ldir
+ENDIF
+	
+	
 
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
