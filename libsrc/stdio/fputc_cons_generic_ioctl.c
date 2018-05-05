@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <sys/ioctl.h>
 
-int fputc_cons_generic_ioctl(uint16_t cmd, void *arg) __naked 
+int console_ioctl(uint16_t cmd, void *arg) __naked 
 {
 #asm
 	EXTERN		generic_console_ioctl
