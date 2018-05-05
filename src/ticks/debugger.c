@@ -4,10 +4,6 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-#if defined(_WIN32) || defined(WIN32)
-#define snprintf _snprintf
-#endif
-
 #include "utlist.h"
 
 #include "ticks.h"

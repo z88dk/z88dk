@@ -19,10 +19,6 @@
 #include <dirent.h>
 #endif
 
-#if defined(_WIN32) || defined(WIN32)
-#define snprintf _snprintf
-#endif
-
 #define PATHSIZE 1024
 
 // Version Information

@@ -4,10 +4,6 @@
 #include <ctype.h>
 #include "ticks.h"
 
-#if defined(_WIN32) || defined(WIN32)
-#define snprintf _snprintf
-#endif
-
 static symbol  *symbols[65536] = {0};
 static symbol  *symbols_byname = NULL;
 

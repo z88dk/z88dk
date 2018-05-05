@@ -132,10 +132,6 @@
 #include <stdlib.h>
 #include <sys/types.h>
 
-#if defined(_WIN32) || defined(WIN32)
-#define snprintf _snprintf
-#endif
-
 #include "linenoise.h"
 #include "utf8.h"
 

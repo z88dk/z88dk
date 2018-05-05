@@ -29,9 +29,6 @@
 #define FILENAME_LEN FILENAME_MAX
 #endif
 
-#if defined(_WIN32) || defined(WIN32)
-#define snprintf _snprintf
-#endif
 
 /*
  *      Now some system files for good luck
