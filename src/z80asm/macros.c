@@ -305,7 +305,7 @@ static void macro_expand(DefMacro *macro, char **p, str_t *out)
 		assert(0);
 	}
 
-	str_set_str(out, macro->text);
+	str_append(out, str_data(macro->text));
 }
 
 // parse #define, #undef and expand macros
