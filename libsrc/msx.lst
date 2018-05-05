@@ -4,6 +4,7 @@ stdio/msx/getk
 stdio/msx/fputc_cons
 stdio/msx/generic_console
 stdio/msx/generic_console_vpeek
+stdio/msx/generic_console_ioctl
 stdio/msx/CRT_FONT
 @font/font_8x8/font_8x8.lst
 @stdio/ansicore.lst
