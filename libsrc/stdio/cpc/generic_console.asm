@@ -25,17 +25,26 @@ generic_console_set_inverse:
 	ret
 
 generic_console_set_ink:
+	ld	d,a
 	and	15		;Maximum
-	ld	(__cpc_ink),a
 	call	convert_to_mode0
 	ld	(__cpc_ink0),a
+	ld	a,d
+	and	3
+	call	convert_to_mode1
+	ld	(__cpc_ink1),a
+        ret
 	ret
 
 generic_console_set_paper:
+	ld	d,a
 	and	15		;Maximum
-	ld	(__cpc_paper),a
 	call	convert_to_mode0
 	ld	(__cpc_paper0),a
+	ld	a,d
+	and	3
+	call	convert_to_mode1
+	ld	(__cpc_paper1),a
         ret
 
 
@@ -85,32 +94,43 @@ handle_mode1:
 	; p0-1 p1-1 p2-1 p3-1 p0-0 p1-0 p2-0 p3-0
 	ld	b,8
 handle_mode1_0:
+	push	bc
 	ld	a,(de)
-	rrca
-	rrca
-	rrca
-	rrca
-	and	15
-	ld	c,a	
-	ld	a,(de)
-	and	@11110000
+	push	de
+
+	ld	b,2
+handle_mode1_1:
+	ld	de,(__cpc_ink1)
+	push	bc
+	push	hl
+	ld	l,a	
+	ld	b,4
+	ld	c,0	;final attribute
+handle_mode1_2:
+	rl	l
+	ld	a,d	;paper
+	jr	nc,is_paper_m1
+	ld	a,e	;ink
+is_paper_m1:
 	or	c
-	ld	(hl),a
+	ld	c,a
+	srl	d
+	srl	e
+	djnz	handle_mode1_2
+	ld	a,l		;font back into a
+	pop	hl
+	ld	(hl),c
 	inc	hl
-	ld	a,(de)
-	and	15
-	ld	c,a	
-	rlca
-	rlca
-	rlca
-	rlca
-	or	c
-	ld	(hl),a
+	pop	bc
+	djnz	handle_mode1_1
 	dec	hl
+	dec	hl
+	pop	de
+	inc	de
 	ld	a,h
 	add	8
 	ld	h,a
-	inc	de
+	pop	bc
 	djnz	handle_mode1_0
 	ret
 
@@ -220,13 +240,23 @@ calc_address:
 ; Entry: a = colour
 ; Exit:  a = colour bits
 convert_to_mode0:
+	ld	hl,mode0_table
+	jr	convert
+convert_to_mode1:
+	ld	hl,mode1_table
+convert:
 	ld	c,a
 	ld	b,0
-	ld	hl,mode0_table
 	add	hl,bc
 	ld	a,(hl)
 	ret
 
+; p0-1 p1-1 p2-1 p3-1 p0-0 p1-0 p2-0 p3-0
+mode1_table:
+	defb	@00000000
+	defb	@00001000
+	defb	@10000000
+	defb	@10001000
 
 ; p0-b0 * p1-b2 * p0-b1 * p0-b3 *
 ; Must be a better way to do this...
@@ -251,10 +281,11 @@ mode0_table:
 	
 	SECTION	data_clib
 
-.__cpc_mode	defb	0
+.__cpc_mode	defb	1
 .__cpc_font	defw	CRT_FONT
-.__cpc_ink	defb	3
-.__cpc_paper	defb	0
 ; Mode 0 equivalents of ink/paper
 .__cpc_ink0	defb	@10001000
 .__cpc_paper0	defb	@00000000
+; And equivalents for mode 1
+.__cpc_ink1	defb	@10001000
+.__cpc_paper1	defb	@00000000
