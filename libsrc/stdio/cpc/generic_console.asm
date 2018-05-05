@@ -21,10 +21,23 @@
 
 generic_console_ioctl:
         scf
-generic_console_set_ink:
-generic_console_set_paper:
 generic_console_set_inverse:
+	ret
+
+generic_console_set_ink:
+	and	15		;Maximum
+	ld	(__cpc_ink),a
+	call	convert_to_mode0
+	ld	(__cpc_ink0),a
+	ret
+
+generic_console_set_paper:
+	and	15		;Maximum
+	ld	(__cpc_paper),a
+	call	convert_to_mode0
+	ld	(__cpc_paper0),a
         ret
+
 
 generic_console_vpeek:
 	scf
@@ -118,69 +131,33 @@ handle_mode0:
 	; b7    b6    b5    b4    b3    b2    b1    b0
 	; p0-b0 p1-b0 p1-b2 p1-b2 p0-b1 p1-b1 p0-b3 p1-b3
 handle_mode0_0:
+	ld	c,4
 	ld	a,(de)
-	and	@11000000
-	ld	c,a
-	rrca
-	rrca
-	or	c
-	ld	c,a
-	rrca
-	rrca
-	or	c
-	ld	c,a
-	rrca
-	rrca
+	push	de
+	ld	de,(__cpc_ink0)	;e = ink, d = paper
+handle_mode0_1:
+	push	bc
+	rlca
+	ld	c,d		;paper
+	jr	nc,is_paper
+	ld	c,e		;ink
+is_paper:
+	rlca			;shift again
+	ld	b,a		;save it
+	ld	a,d		;paper
+	jr	nc,is_paper_2
+	ld	a,e		;ink
+is_paper_2:
+	srl	a
 	or	c
 	ld	(hl),a
 	inc	hl
-	ld	a,(de)
-	and	@00110000
-	ld	c,a
-	rrca
-	rrca
-	or	c
-	ld	c,a
-	rrca
-	rrca
-	or	c
-	ld	c,a
-	rrca
-	rrca
-	or	c
-	ld	(hl),a
-	inc	hl
-	ld	a,(de)
-	and	@00001100
-	ld	c,a
-	rrca
-	rrca
-	or	c
-	ld	c,a
-	rrca
-	rrca
-	or	c
-	ld	c,a
-	rrca
-	rrca
-	or	c
-	ld	(hl),a
-	inc	hl
-	ld	a,(de)
-	and	@00000011
-	ld	c,a
-	rrca
-	rrca
-	or	c
-	ld	c,a
-	rrca
-	rrca
-	or	c
-	ld	c,a
-	rrca
-	rrca
-	or	c
-	ld	(hl),a
+	ld	a,b
+	pop	bc
+	dec	c
+	jr	nz,handle_mode0_1
+	pop	de
+	dec	hl
 	dec	hl
 	dec	hl
 	dec	hl
@@ -239,8 +216,45 @@ calc_address:
 	add	hl,de
 	ret
 
+; Map to handle the mode0 pixel order
+; Entry: a = colour
+; Exit:  a = colour bits
+convert_to_mode0:
+	ld	c,a
+	ld	b,0
+	ld	hl,mode0_table
+	add	hl,bc
+	ld	a,(hl)
+	ret
+
+
+; p0-b0 * p1-b2 * p0-b1 * p0-b3 *
+; Must be a better way to do this...
+mode0_table:
+	defb	@00000000		; 0	
+	defb	@10000000		; 1	
+	defb	@00001000		; 2
+	defb	@10001000		; 3
+	defb	@00100000		; 4
+	defb	@10100000		; 5
+	defb	@00101000		; 6
+	defb	@10101000		; 7
+	defb	@00000010		; 8
+	defb	@10000010		; 9
+	defb	@00001010		; 10
+	defb	@10001010		; 11
+	defb	@00100010		; 12
+	defb	@10100010		; 13
+	defb	@00101010		; 14
+	defb	@10101010		; 14
+	
 	
 	SECTION	data_clib
 
 .__cpc_mode	defb	0
 .__cpc_font	defw	CRT_FONT
+.__cpc_ink	defb	3
+.__cpc_paper	defb	0
+; Mode 0 equivalents of ink/paper
+.__cpc_ink0	defb	@10001000
+.__cpc_paper0	defb	@00000000
