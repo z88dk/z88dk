@@ -2,36 +2,34 @@
 	MODULE	generic_console_ioctl
 	PUBLIC	generic_console_ioctl
 
+	defc	CHAR_TABLE = 0x2C00
+
 	SECTION	code_clib
 	INCLUDE	"ioctl.def"
-
-	EXTERN	__zx_32col_font
-	EXTERN	__zx_64col_font
-	EXTERN	__zx_32col_udgs
 
 
 ; a = ioctl
 ; de = arg
 generic_console_ioctl:
 	ex	de,hl
-	ld	c,(hl)	;bc = where we point to
+	ld	c,(hl)	;hl = source
 	inc	hl
-	ld	b,(hl)
+	ld	h,(hl)
+	ld	l,c
 	cp	IOCTL_GENCON_SET_FONT32
-	jr	nz,check_set_font64
-	ld	(__zx_32col_font),bc
+	jr	nz,check_set_udg
+	ld	de,CHAR_TABLE + 256
+	ld	bc,768
+	ldir
 success:
 	and	a
 	ret
-check_set_font64:
-	cp	IOCTL_GENCON_SET_FONT64
-	jr	nz,check_set_udg
-	ld	(__zx_64col_font),bc
-	jr	success
 check_set_udg:
 	cp	IOCTL_GENCON_SET_UDGS
 	jr	nz,failure
-	ld	(__zx_32col_udgs),bc
+	ld	de,CHAR_TABLE
+	ld	bc,32 * 8
+	ldir
 	jr	success
 failure:
 	scf

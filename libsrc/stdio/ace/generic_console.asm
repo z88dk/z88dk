@@ -6,7 +6,6 @@
 		PUBLIC		generic_console_vpeek
 		PUBLIC		generic_console_printc
 		PUBLIC		generic_console_scrollup
-		PUBLIC		generic_console_ioctl
 		PUBLIC		generic_console_set_ink
 		PUBLIC		generic_console_set_paper
 		PUBLIC		generic_console_set_inverse
@@ -25,8 +24,6 @@ generic_console_cls:
 	ldir
 	ret
 
-generic_console_ioctl:
-	scf
 generic_console_set_ink:
 generic_console_set_paper:
 generic_console_set_inverse:
@@ -37,7 +34,14 @@ generic_console_set_inverse:
 ; a = character to print
 ; e = raw
 generic_console_printc:
+	push	de
 	call	xypos
+	pop	de
+	rl	e
+	jr	c,is_raw
+	; In non-raw mode characters > 128 are udgs
+	res	7,a
+is_raw:
 	ld	(hl),a
 	ret
 
