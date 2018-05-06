@@ -45,15 +45,32 @@ void t_strutil_str_clear(void)
 
 void t_strutil_str_reserve(void)
 {
-	const char *init = "1234567890123456789012345678901234567890"
-					   "1234567890123456789012345678901234567890";
-	size_t init_len = strlen(init);
+	str_t *s = str_new();
+	TEST_ASSERT_EQUAL(0, s->i);
+	TEST_ASSERT_EQUAL(100, s->n);
+	TEST_ASSERT_EQUAL(0, s->d[0]);
 
-	str_t *s = str_new_copy(init);
+	str_reserve(s, 99);
+	TEST_ASSERT_EQUAL(0, s->i);
+	TEST_ASSERT_EQUAL(100, s->n);
+	TEST_ASSERT_EQUAL(0, s->d[99]);
+
 	str_reserve(s, 100);
+	TEST_ASSERT_EQUAL(0, s->i);
+	TEST_ASSERT_EQUAL(101, s->n);
+	TEST_ASSERT_EQUAL(0, s->d[100]);
+	str_free(s);
 
-	TEST_ASSERT_GREATER_OR_EQUAL(init_len + 100, s->n);
+	s = str_new_copy("1234567890");
+	str_reserve(s, 89);
+	TEST_ASSERT_EQUAL(10, s->i);
+	TEST_ASSERT_EQUAL(100, s->n);
+	TEST_ASSERT_EQUAL(0, s->d[99]);
 
+	str_reserve(s, 90);
+	TEST_ASSERT_EQUAL(10, s->i);
+	TEST_ASSERT_EQUAL(101, s->n);
+	TEST_ASSERT_EQUAL(0, s->d[100]);
 	str_free(s);
 }
 

@@ -38,9 +38,15 @@ void str_clear(str_t *str)
 	utstring_clear(str);
 }
 
+// utstring_reserve(x) allocates 100+x; rewrite
 void str_reserve(str_t *str, size_t amt)
 {
-	utstring_reserve(str, amt);
+	size_t new_size = str->i + amt + 1;
+	if (new_size > str->n) {
+		str->d = xrealloc(str->d, new_size);
+		str->n = new_size;
+	}
+	str->d[str->n - 1] = '\0';
 }
 
 void str_set(str_t *str, const char *src)
