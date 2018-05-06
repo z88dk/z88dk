@@ -5,13 +5,12 @@
 	SECTION	code_clib
 
         PUBLIC  generic_console_cls
-        PUBLIC  generic_console_vpeek
         PUBLIC  generic_console_printc
         PUBLIC  generic_console_scrollup
-        PUBLIC  generic_console_ioctl
         PUBLIC  generic_console_set_ink
         PUBLIC  generic_console_set_paper
         PUBLIC  generic_console_set_inverse
+	PUBLIC	generic_console_calc_screen_address
 
 	PUBLIC	__cpc_mode
 	PUBLIC	__cpc_font
@@ -21,8 +20,6 @@
 
 	defc	SCREEN = 0xc000
 
-generic_console_ioctl:
-        scf
 generic_console_set_inverse:
 	ret
 
@@ -50,16 +47,25 @@ generic_console_set_paper:
         ret
 
 
-generic_console_vpeek:
-	scf
-	ret
-
 
 generic_console_cls:
+	ld	a,(__cpc_mode)
+	and	a
+	jr	nz,cls_mode1
+	ld	a,(__cpc_paper0)
+	jr	docls
+cls_mode1:
+	cp	1
+	jr	nz,cls_mode2
+	ld	a,(__cpc_paper1)
+	jr	doclas
+cls_mode2:
+	xor	a
+docls:
 	ld	hl,SCREEN
 	ld	de,SCREEN+1
 	ld	bc,16383
-	ld	(hl),0		;TODO
+	ld	(hl),a
 	ldir
 	ret
 
@@ -86,7 +92,7 @@ not_udg:
 	ld	de,(__cpc_font)
 	add	hl,de
 	push	hl		;Save font
-	call	calc_screen_position
+	call	generic_console_calc_screen_address
 	pop	de
 	; hl = screen address to place
 	; de = font
@@ -203,7 +209,7 @@ is_paper_2:
 ; For a line:
 ;
 ; Address = 0xC000 + ((Line / 8) * 80) + ((Line % 8) * 2048)
-calc_screen_position:
+generic_console_calc_screen_address:
 	; Convert column into byte
 	; Mode 2 = no shifting (80max)
 	; Mode 1 = 4 pixels per byte = *2 (40 max)
