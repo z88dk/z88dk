@@ -11,5 +11,6 @@ extern int __LIB__ console_ioctl(uint16_t cmd, void *arg) __smallc;
 #define IOCTL_GENCON_SET_FONT32   3  /* Set the address for the 32 column font (int *) */
 #define IOCTL_GENCON_SET_FONT64   4  /* Set the address for the 64 column font (int *) */
 #define IOCTL_GENCON_SET_UDGS     5  /* Set the address for the 64 column udgs (int *) */
+#define IOCTL_GENCON_SET_MODE     6  /* Set the display mode (int *) */
 
 #endif

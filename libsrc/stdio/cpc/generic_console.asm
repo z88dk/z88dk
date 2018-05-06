@@ -14,6 +14,8 @@
         PUBLIC  generic_console_set_inverse
 
 	PUBLIC	__cpc_mode
+	PUBLIC	__cpc_font
+	PUBLIC	__cpc_udg
 
 	EXTERN	CRT_FONT
 
@@ -69,6 +71,12 @@ generic_console_scrollup:
 ; a = d character to print
 ; e = raw
 generic_console_printc:
+	ld	de,(__cpc_font)
+	bit	7,a
+	jr	z,not_udg
+	sub	128 - 32
+	ld	de,(__cpc_udg)
+not_udg:
 	sub	32
 	ld	l,a
 	ld	h,0
@@ -283,6 +291,7 @@ mode0_table:
 
 .__cpc_mode	defb	1
 .__cpc_font	defw	CRT_FONT
+.__cpc_udg	defw	0
 ; Mode 0 equivalents of ink/paper
 .__cpc_ink0	defb	@10001000
 .__cpc_paper0	defb	@00000000

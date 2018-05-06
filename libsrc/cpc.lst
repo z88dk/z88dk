@@ -3,6 +3,7 @@ stdio/cpc/fgetc_cons
 stdio/cpc/fputc_cons
 stdio/cpc/getk
 stdio/cpc/generic_console
+stdio/cpc/generic_console_ioctl
 stdio/cpc/CRT_FONT
 @font/font_8x8/font_8x8.lst
 @stdio/ansicore.lst
