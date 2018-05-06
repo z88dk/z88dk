@@ -23,7 +23,7 @@
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
-        defc    CONSOLE_COLUMNS = 80
+        defc    CONSOLE_COLUMNS = 40
         defc    CONSOLE_ROWS = 25
 
         PUBLIC    cpc_enable_fw_exx_set       ;needed by firmware interposer
@@ -65,7 +65,6 @@ start:
 	; install interrupt interposer
 	call    cpc_enable_process_exx_set
 	ei
-
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
 ; the compiled program and the stack pointer
