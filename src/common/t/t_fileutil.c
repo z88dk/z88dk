@@ -69,6 +69,52 @@ void t_fileutil_path_combine(void)
 	TEST_ASSERT_EQUAL_STRING("a/c/b", path_combine("a/", "c:/b"));
 }
 
+void t_fileutil_path_dir(void)
+{
+	TEST_ASSERT_EQUAL_STRING(".", path_dir("abc"));
+	TEST_ASSERT_EQUAL_STRING(".", path_dir("abc.xx"));
+	TEST_ASSERT_EQUAL_STRING(".", path_dir("./abc"));
+
+	TEST_ASSERT_EQUAL_STRING("/a/b/c", path_dir("/a/b/c/abc"));
+	TEST_ASSERT_EQUAL_STRING("a/b/c", path_dir("a/b/c/abc"));
+	TEST_ASSERT_EQUAL_STRING("c:/a/b/c", path_dir("c:/a/b/c/abc"));
+	TEST_ASSERT_EQUAL_STRING("c:a/b/c", path_dir("c:a/b/c/abc"));
+
+	TEST_ASSERT_EQUAL_STRING("c:", path_dir("c:abc"));
+	TEST_ASSERT_EQUAL_STRING("c:/", path_dir("c:/abc"));
+}
+
+void t_fileutil_path_file(void)
+{
+	TEST_ASSERT_EQUAL_STRING("abc", path_file("abc"));
+	TEST_ASSERT_EQUAL_STRING("abc.xx", path_file("abc.xx"));
+	TEST_ASSERT_EQUAL_STRING("abc", path_file(".x/abc"));
+
+	TEST_ASSERT_EQUAL_STRING("abc", path_file("/a/b/c/abc"));
+	TEST_ASSERT_EQUAL_STRING("abc", path_file("a/b/c/abc"));
+	TEST_ASSERT_EQUAL_STRING("abc", path_file("c:/a/b/c/abc"));
+	TEST_ASSERT_EQUAL_STRING("abc", path_file("c:a/b/c/abc"));
+
+	TEST_ASSERT_EQUAL_STRING("abc", path_file("c:abc"));
+	TEST_ASSERT_EQUAL_STRING("abc", path_file("c:/abc"));
+}
+
+void t_fileutil_path_ext(void)
+{
+	TEST_ASSERT_EQUAL_STRING("", path_ext("abc"));
+	TEST_ASSERT_EQUAL_STRING(".xx", path_ext("abc.xx"));
+	TEST_ASSERT_EQUAL_STRING("", path_ext(".x/abc"));
+
+	TEST_ASSERT_EQUAL_STRING("", path_ext("c:abc"));
+	TEST_ASSERT_EQUAL_STRING("", path_ext("c:/abc"));
+
+	TEST_ASSERT_EQUAL_STRING(".c", path_ext("c:abc.c"));
+	TEST_ASSERT_EQUAL_STRING(".c", path_ext("c:/abc.c"));
+
+	TEST_ASSERT_EQUAL_STRING("", path_ext("c:.c"));
+	TEST_ASSERT_EQUAL_STRING("", path_ext("c:/.c"));
+}
+
 void t_fileutil_path_remove_ext(void)
 {
 	TEST_ASSERT_EQUAL_STRING("abc", path_remove_ext("abc"));
@@ -111,36 +157,6 @@ void t_fileutil_path_replace_ext(void)
 	TEST_ASSERT_EQUAL_STRING("x./abc.obj", path_replace_ext("x./abc.", ".obj"));
 }
 
-void t_fileutil_path_dirname(void)
-{
-	TEST_ASSERT_EQUAL_STRING(".", path_dirname("abc"));
-	TEST_ASSERT_EQUAL_STRING(".", path_dirname("abc.xx"));
-	TEST_ASSERT_EQUAL_STRING(".", path_dirname("./abc"));
-
-	TEST_ASSERT_EQUAL_STRING("/a/b/c", path_dirname("/a/b/c/abc"));
-	TEST_ASSERT_EQUAL_STRING("a/b/c", path_dirname("a/b/c/abc"));
-	TEST_ASSERT_EQUAL_STRING("c:/a/b/c", path_dirname("c:/a/b/c/abc"));
-	TEST_ASSERT_EQUAL_STRING("c:a/b/c", path_dirname("c:a/b/c/abc"));
-
-	TEST_ASSERT_EQUAL_STRING("c:", path_dirname("c:abc"));
-	TEST_ASSERT_EQUAL_STRING("c:/", path_dirname("c:/abc"));
-}
-
-void t_fileutil_path_filename(void)
-{
-	TEST_ASSERT_EQUAL_STRING("abc", path_filename("abc"));
-	TEST_ASSERT_EQUAL_STRING("abc.xx", path_filename("abc.xx"));
-	TEST_ASSERT_EQUAL_STRING("abc", path_filename(".x/abc"));
-
-	TEST_ASSERT_EQUAL_STRING("abc", path_filename("/a/b/c/abc"));
-	TEST_ASSERT_EQUAL_STRING("abc", path_filename("a/b/c/abc"));
-	TEST_ASSERT_EQUAL_STRING("abc", path_filename("c:/a/b/c/abc"));
-	TEST_ASSERT_EQUAL_STRING("abc", path_filename("c:a/b/c/abc"));
-
-	TEST_ASSERT_EQUAL_STRING("abc", path_filename("c:abc"));
-	TEST_ASSERT_EQUAL_STRING("abc", path_filename("c:/abc"));
-}
-
 void t_fileutil_xfopen(void)
 {
 	char buffer[6];
@@ -160,6 +176,13 @@ void t_fileutil_xfopen(void)
 
 	xfclose(fp);
 	remove("test.out");
+}
+
+void run_fileutil_xfopen(void)
+{
+	FILE *fp = xfopen("/x/x/x/x/x/x/x/x/x", "rb");
+	assert(0);
+	xfclose(fp); // not reached, silence warning on unused fp
 }
 
 void t_fileutil_xfclose_remove_empty(void)
@@ -182,13 +205,6 @@ void t_fileutil_xfclose_remove_empty(void)
 
 	fp = fopen("test.out", "rb");
 	TEST_ASSERT_NULL(fp);
-}
-
-void run_fileutil_xfopen(void)
-{
-	FILE *fp = xfopen("/x/x/x/x/x/x/x/x/x", "rb");
-	assert(0);
-	xfclose(fp); // not reached, silence warning on unused fp
 }
 
 void t_fileutil_xfwrite_bytes(void)
@@ -736,4 +752,181 @@ void run_fileutil_xfseek(void)
 	fprintf(stderr, "failed to seek to 0 in file '?'\n");
 	exit(1);
 #endif
+}
+
+void t_fileutil_file_spew_slurp(void)
+{
+	unlink("test.txt");
+	TEST_ASSERT(!file_exists("test.txt"));
+	TEST_ASSERT_EQUAL(-1, file_size("test.txt"));
+
+	const char *text =
+		"In the beginning God created the heaven and the earth. \n"
+		"\n"
+		"And the earth was without form, and void; and darkness was upon the face \n"
+		"of the deep. And the Spirit of God moved upon the face of the waters. \n"
+		"\n"
+		"And God said, Let there be light: and there was light. \n"
+		"\n"
+		"And God saw the light, that it was good: and God divided the light from \n"
+		"the darkness. \n"
+		"\n"
+		"And God called the light Day, and the darkness he called Night. And the \n"
+		"evening and the morning were the first day. \n"
+		"\n"
+		"And God said, Let there be a firmament in the midst of the waters, and \n"
+		"let it divide the waters from the waters. \n"
+		"\n"
+		"And God made the firmament, and divided the waters which were under the \n"
+		"firmament from the waters which were above the firmament: and it was so. \n"
+		"\n"
+		"And God called the firmament Heaven. And the evening and the morning \n"
+		"were the second day. \n"
+		"\n"
+		"And God said, Let the waters under the heaven be gathered together unto \n"
+		"one place, and let the dry land appear: and it was so. \n"
+		"\n"
+		"And God called the dry land Earth; and the gathering together of the \n"
+		"waters called he Seas: and God saw that it was good. \n"
+		"\n"
+		"And God said, Let the earth bring forth grass, the herb yielding seed, \n"
+		"and the fruit tree yielding fruit after his kind, whose seed is in \n"
+		"itself, upon the earth: and it was so. \n"
+		"\n"
+		"And the earth brought forth grass, and herb yielding seed after his \n"
+		"kind, and the tree yielding fruit, whose seed was in itself, after his \n"
+		"kind: and God saw that it was good. \n"
+		"\n"
+		"And the evening and the morning were the third day. \n"
+		"\n"
+		"And God said, Let there be lights in the firmament of the heaven to \n"
+		"divide the day from the night; and let them be for signs, and for \n"
+		"seasons, and for days, and years: \n"
+		"\n"
+		"And let them be for lights in the firmament of the heaven to give light \n"
+		"upon the earth: and it was so. \n"
+		"\n"
+		"And God made two great lights; the greater light to rule the day, and \n"
+		"the lesser light to rule the night: he made the stars also. \n"
+		"\n"
+		"And God set them in the firmament of the heaven to give light upon the \n"
+		"earth, \n"
+		"\n"
+		"And to rule over the day and over the night, and to divide the light \n"
+		"from the darkness: and God saw that it was good. \n"
+		"\n"
+		"And the evening and the morning were the fourth day. \n"
+		"\n"
+		"And God said, Let the waters bring forth abundantly the moving creature \n"
+		"that hath life, and fowl that may fly above the earth in the open \n"
+		"firmament of heaven. \n"
+		"\n"
+		"And God created great whales, and every living creature that moveth, \n"
+		"which the waters brought forth abundantly, after their kind, and every \n"
+		"winged fowl after his kind: and God saw that it was good. \n"
+		"\n"
+		"And God blessed them, saying, Be fruitful, and multiply, and fill the \n"
+		"waters in the seas, and let fowl multiply in the earth. \n"
+		"\n"
+		"And the evening and the morning were the fifth day. \n"
+		"\n"
+		"And God said, Let the earth bring forth the living creature after his \n"
+		"kind, cattle, and creeping thing, and beast of the earth after his kind: \n"
+		"and it was so. \n"
+		"\n"
+		"And God made the beast of the earth after his kind, and cattle after \n"
+		"their kind, and every thing that creepeth upon the earth after his kind: \n"
+		"and God saw that it was good. \n"
+		"\n"
+		"And God said, Let us make man in our image, after our likeness: and let \n"
+		"them have dominion over the fish of the sea, and over the fowl of the \n"
+		"air, and over the cattle, and over all the earth, and over every \n"
+		"creeping thing that creepeth upon the earth. \n"
+		"\n"
+		"So God created man in his own image, in the image of God created he him; \n"
+		"male and female created he them. \n"
+		"\n"
+		"And God blessed them, and God said unto them, Be fruitful, and multiply, \n"
+		"and replenish the earth, and subdue it: and have dominion over the fish \n"
+		"of the sea, and over the fowl of the air, and over every living thing \n"
+		"that moveth upon the earth. \n"
+		"\n"
+		"And God said, Behold, I have given you every herb bearing seed, which is \n"
+		"upon the face of all the earth, and every tree, in the which is the \n"
+		"fruit of a tree yielding seed; to you it shall be for meat. \n"
+		"\n"
+		"And to every beast of the earth, and to every fowl of the air, and to \n"
+		"every thing that creepeth upon the earth, wherein there is life, I have \n"
+		"given every green herb for meat: and it was so. \n"
+		"\n"
+		"And God saw every thing that he had made, and, behold, it was very good. \n"
+		"And the evening and the morning were the sixth day. \n";
+
+	size_t len = strlen(text);
+	str_t *s;
+
+	// file_spew
+	file_spew("test.txt", text);
+	TEST_ASSERT(file_exists("test.txt"));
+	TEST_ASSERT_EQUAL(len, file_size("test.txt"));
+
+	s = file_slurp("test.txt");
+	TEST_ASSERT_EQUAL(len, str_len(s));
+	TEST_ASSERT_EQUAL_STRING(text, str_data(s));
+	str_free(s);
+
+	// file_spew_n
+	file_spew_n("test.txt", text, strlen(text));
+	TEST_ASSERT(file_exists("test.txt"));
+	TEST_ASSERT_EQUAL(len, file_size("test.txt"));
+
+	s = file_slurp("test.txt");
+	TEST_ASSERT_EQUAL(len, str_len(s));
+	TEST_ASSERT_EQUAL_STRING(text, str_data(s));
+	str_free(s);
+
+	// file_spew_str
+	s = str_new_copy(text);
+	file_spew_str("test.txt", s);
+	str_free(s);
+	TEST_ASSERT(file_exists("test.txt"));
+	TEST_ASSERT_EQUAL(len, file_size("test.txt"));
+
+	s = file_slurp("test.txt");
+	TEST_ASSERT_EQUAL(len, str_len(s));
+	TEST_ASSERT_EQUAL_STRING(text, str_data(s));
+	str_free(s);
+
+	unlink("test.txt");
+	TEST_ASSERT(!file_exists("test.txt"));
+	TEST_ASSERT_EQUAL(-1, file_size("test.txt"));
+}
+
+void t_fileutil_path_mkdir(void)
+{
+#ifdef _WIN32
+	system("rmdir /s/q test_dir 2>nul");
+#else
+	system("rm -rf test_dir");
+#endif
+
+	TEST_ASSERT(!dir_exists("test_dir"));
+	path_mkdir("test_dir/a/b");
+
+	TEST_ASSERT(dir_exists("test_dir"));
+	TEST_ASSERT(dir_exists("test_dir/a"));
+	TEST_ASSERT(dir_exists("test_dir/a/b"));
+
+	TEST_ASSERT(!file_exists("test_dir"));
+
+	file_spew("test_dir/a/b/test.txt", "hello");
+	TEST_ASSERT(file_exists("test_dir/a/b/test.txt"));
+
+#ifdef _WIN32
+	system("rmdir /s/q test_dir");
+#else
+	system("rm -rf test_dir");
+#endif
+
+	TEST_ASSERT(!dir_exists("test_dir"));
 }

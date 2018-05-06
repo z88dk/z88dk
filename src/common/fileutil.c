@@ -9,6 +9,10 @@
 #include <assert.h>
 #include <ctype.h>
 #include <string.h>
+#include <sys/stat.h>
+#ifdef _WIN32
+#include <direct.h>
+#endif
 
 //-----------------------------------------------------------------------------
 // pathname manipulation 
@@ -35,10 +39,8 @@ static void str_path_canon(str_t *path)
 
 	// remove "./" and "xxx/.."
 	char *p = str_data(path);
-	if (isalpha(p[0]) && p[1] == ':') 
-		p += 2;											// win32 volume
-	if (*p == '/')
-		p++;											// root dir
+	if (isalpha(p[0]) && p[1] == ':') p += 2;			// win32 volume
+	if (*p == '/') p++;									// root dir
 	char *root = p;
 	while (*p) {
 		if (*p == '/') {
@@ -137,14 +139,13 @@ const char *path_replace_ext(const char *path1, const char *new_ext)
 	str_t *path = str_new_copy(path1);
 	str_path_canon(path);
 
-	char *p = str_data(path) + str_len(path) - 1;
-	while (p > str_data(path) && *p != '.' && p[-1] != '/')
-		p--;
-	if (*p == '.' && p > str_data(path) && p[-1] != '/') {
-		*p = '\0';
-		str_len(path) = p - str_data(path);
-	}
-	if (*new_ext && *new_ext!='.')
+	// remove extension
+	const char *old_ext = path_ext(path1);
+	str_len(path) -= strlen(old_ext);
+	str_data(path)[str_len(path)] = '\0';
+
+	// append new extension
+	if (*new_ext && *new_ext != '.')
 		str_append(path, ".");
 	str_append(path, new_ext);
 
@@ -171,7 +172,7 @@ static char *path_dir_slash(str_t *path)
 	return p;
 }
 
-const char *path_dirname(const char *path1)
+const char *path_dir(const char *path1)
 {
 	str_t *path = str_new_copy(path1);
 	char *p = path_dir_slash(path);
@@ -187,7 +188,7 @@ const char *path_dirname(const char *path1)
 	return ret;
 }
 
-const char *path_filename(const char *path1)
+const char *path_file(const char *path1)
 {
 	str_t *path = str_new_copy(path1);
 	char *p = path_dir_slash(path);
@@ -199,8 +200,22 @@ const char *path_filename(const char *path1)
 	return ret;
 }
 
+const char *path_ext(const char *path)
+{
+	if (isalpha(path[0]) && path[1] == ':') path += 2;	// win32 volume
+	if (isslash(*path)) path++;							// root dir
+
+	const char *p = path + strlen(path) - 1;
+	while (p > path && *p != '.' && !isslash(p[-1]))
+		p--;
+	if (*p == '.' && p > path && !isslash(p[-1]))
+		return spool_add(p);
+	else
+		return spool_add("");
+}
+
 //-----------------------------------------------------------------------------
-// map fileno(FLIE*) to filename in this session
+// map fileno(FILE*) to filename in this session
 //-----------------------------------------------------------------------------
 static argv_t *open_files;		// array indexed by fileno(fp)
 
@@ -429,3 +444,87 @@ void xfseek(FILE *stream, long offset, int origin)
 	if (fseek(stream, offset, origin) != 0)
 		die("failed to seek to %ld in file '%s'\n", offset, get_filename(stream));
 }
+
+//-----------------------------------------------------------------------------
+// file system interface
+//-----------------------------------------------------------------------------
+void file_spew(const char *filename, const char *text)
+{
+	file_spew_n(filename, text, strlen(text));
+}
+
+void file_spew_n(const char *filename, const char *text, size_t size)
+{
+	FILE *fp = xfopen(filename, "wb");
+	xfwrite(text, sizeof(char), size, fp);
+	xfclose(fp);
+}
+
+void file_spew_str(const char *filename, str_t *str)
+{
+	file_spew_n(filename, str_data(str), str_len(str));
+}
+
+str_t *file_slurp(const char *filename)
+{
+	FILE *fp = xfopen(filename, "rb");
+
+	xfseek(fp, 0, SEEK_END);
+	long size = ftell(fp);
+	assert(size >= 0);
+	xfseek(fp, 0, SEEK_SET);
+
+	str_t *text = str_new();
+	xfread_str((size_t)size, text, fp);
+
+	xfclose(fp);
+
+	return text;		// user must free
+}
+
+void path_mkdir(const char *path)
+{
+	path = path_canon(path);
+	if (!dir_exists(path)) {
+		const char *parent = path_dir(path);
+		path_mkdir(parent);
+
+#ifdef _WIN32
+		int rv = _mkdir(path_os(path));
+#else
+		int rv = mkdir(path_os(path), 0777);
+#endif
+		if (rv != 0) {
+			perror(path);
+			exit(1);
+		}
+	}
+}
+
+bool file_exists(const char *filename)
+{
+	struct stat sb;
+	if ((stat(filename, &sb) == 0) && (sb.st_mode & S_IFREG))
+		return true;
+	else
+		return false;
+}
+
+bool dir_exists(const char *dirname)
+{
+	struct stat sb;
+	if ((stat(dirname, &sb) == 0) && (sb.st_mode & S_IFDIR))
+		return true;
+	else
+		return false;
+}
+
+long file_size(const char *filename)
+{
+	struct stat sb;
+	if ((stat(filename, &sb) == 0) && (sb.st_mode & S_IFREG))
+		return sb.st_size;
+	else
+		return -1;
+}
+

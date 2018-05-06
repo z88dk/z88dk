@@ -67,7 +67,7 @@ void assemble_file( char *filename )
 
 	/* create output directory*/
 	obj_filename = get_obj_filename(filename);
-	mkdir_p(path_dirname(obj_filename));
+	path_mkdir(path_dir(obj_filename));
 
 	/* try to load object file */
 	if (strcmp(filename, obj_filename) == 0 &&			/* input is object file */
@@ -101,7 +101,7 @@ void assemble_file( char *filename )
 	
 	/* append the directoy of the file being assembled to the include path 
 	   and remove it at function end */
-	argv_push(opts.inc_path, path_dirname(src_filename));
+	argv_push(opts.inc_path, path_dir(src_filename));
 
     /* normal case - assemble a asm source file */
     opts.cur_list = opts.list;		/* initial LSTON status */
@@ -361,7 +361,7 @@ int z80asm_main( int argc, char *argv[] )
 			set_cur_module(get_first_module(NULL));
 			
 			CURRENTMODULE->filename = get_asm_filename(opts.consol_obj_file);
-			CURRENTMODULE->modname = path_remove_ext(path_filename(CURRENTMODULE->filename));
+			CURRENTMODULE->modname = path_remove_ext(path_file(CURRENTMODULE->filename));
 
 			if (!get_num_errors())
 				write_obj_file(opts.consol_obj_file);

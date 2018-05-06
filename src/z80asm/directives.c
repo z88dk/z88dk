@@ -233,7 +233,7 @@ void asm_MODULE(const char *name)
 void asm_MODULE_default(void)
 {
 	if (!CURRENTMODULE->modname)     /* Module name must be defined */
-		CURRENTMODULE->modname = path_remove_ext(path_filename(CURRENTMODULE->filename));
+		CURRENTMODULE->modname = path_remove_ext(path_file(CURRENTMODULE->filename));
 }
 
 void asm_SECTION(const char *name)

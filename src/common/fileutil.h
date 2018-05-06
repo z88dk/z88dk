@@ -21,17 +21,14 @@ extern const char *path_os(const char *path);
 // combine two paths "a","b" -> "a/b"
 extern const char *path_combine(const char *path1, const char *path2);
 
-// remove file extension
+// extract path components
+extern const char *path_dir(const char *path);
+extern const char *path_file(const char *path);
+extern const char *path_ext(const char *path);
+
+// manipulate extension
 extern const char *path_remove_ext(const char *path);
-
-// replace file extension
 extern const char *path_replace_ext(const char *path, const char *new_ext);
-
-// extract directory
-extern const char *path_dirname(const char *path);
-
-// extract file name
-extern const char *path_filename(const char *path);
 
 // file IO, die if error
 // maps internally FILE* -> fileno -> filename for error messages
@@ -73,3 +70,19 @@ extern int xfread_dword(FILE *stream);
 
 // dies if fseek() fails
 extern void xfseek(FILE *stream, long offset, int origin);
+
+// write and read files in one go; die on error
+extern void file_spew(const char *filename, const char *text);
+extern void file_spew_n(const char *filename, const char *text, size_t size);
+extern void file_spew_str(const char *filename, str_t *str);
+
+extern str_t *file_slurp(const char *filename);		// user must free str_t
+
+// create a directory and all parents above it
+extern void path_mkdir(const char *path);
+
+// check if file/directory exist
+extern bool file_exists(const char *filename);
+extern bool dir_exists(const char *dirname);
+extern long file_size(const char *filename);		// -1 if not regular file
+

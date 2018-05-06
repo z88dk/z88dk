@@ -29,11 +29,3 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 /* search for a file on the given directory list, return full path name */
 extern void path_search( Str *dest, const char *filename, argv_t *dir_list );
 extern const char *search_file(const char *filename, argv_t *dir_list);	/* returned string in strpool */
-
-/* check if file/directory exists */
-extern bool file_exists(const char *filename);
-extern bool dir_exists(const char *dirname);
-extern int file_size(const char *filename);	// file size, -1 if not regular file
-
-/* create a directory and all parents above it */
-extern void mkdir_p(const char *path);

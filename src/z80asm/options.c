@@ -445,7 +445,7 @@ void expand_list_glob(const char *filename)
 			char *line;
 
 			// append the directoy of the list file to the include path	and remove it at the end
-			argv_push(opts.inc_path, path_dirname(filename));
+			argv_push(opts.inc_path, path_dir(filename));
 
 			if (src_open(filename, NULL)) {
 				while ((line = src_getline()) != NULL)
@@ -992,6 +992,6 @@ static void make_output_dir()
 {
 	if (opts.output_directory) {
 		opts.output_directory = path_canon(opts.output_directory);
-		mkdir_p(opts.output_directory);
+		path_mkdir(opts.output_directory);
 	}
 }
