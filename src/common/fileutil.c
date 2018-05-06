@@ -37,11 +37,17 @@ static void str_path_canon(str_t *path)
 	}
 	*d = '\0';
 
-	// remove "./" and "xxx/.."
+	// skip initial volume, root dir, or parent dir
 	char *p = str_data(path);
 	if (isalpha(p[0]) && p[1] == ':') p += 2;			// win32 volume
-	if (*p == '/') p++;									// root dir
+	if (*p == '/')
+		p++;											// root dir
+	else
+		while (strncmp(p, "../", 3) == 0)				// ../ at start cannot be removed
+			p += 3;
 	char *root = p;
+
+	// remove "./" and "xxx/.."
 	while (*p) {
 		if (*p == '/') {
 			p++;

@@ -49,6 +49,11 @@ void t_fileutil_path_canon(void)
 	TEST_ASSERT_EQUAL_STRING("abc", path_canon("./abc/."));
 	TEST_ASSERT_EQUAL_STRING("c:abc", path_canon("c:./abc/."));
 	TEST_ASSERT_EQUAL_STRING("c:/abc", path_canon("c:/././abc/."));
+
+	// handle initial ../
+	TEST_ASSERT_EQUAL_STRING("../abc", path_canon("../abc"));
+	TEST_ASSERT_EQUAL_STRING("../../abc", path_canon("../../abc"));
+	TEST_ASSERT_EQUAL_STRING("../../../abc", path_canon("../../../abc"));
 }
 
 void t_fileutil_path_os(void)
