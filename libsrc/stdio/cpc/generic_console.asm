@@ -58,7 +58,7 @@ cls_mode1:
 	cp	1
 	jr	nz,cls_mode2
 	ld	a,(__cpc_paper1)
-	jr	doclas
+	jr	docls
 cls_mode2:
 	xor	a
 docls:
@@ -70,6 +70,41 @@ docls:
 	ret
 
 generic_console_scrollup:
+	ld	b,8
+	ld	hl,SCREEN + 80
+	ld	de,SCREEN
+scrollup_1:
+	push	bc
+	push	de
+	push	hl
+	ld	bc,24 * 80
+	ldir
+	pop	hl
+	pop	de
+	pop	bc
+	ld	a,d
+	add	8
+	ld	d,a
+	ld	a,h
+	add	8
+	ld	h,a
+	djnz	scrollup_1
+	ld	hl,SCREEN + 24 * 80
+	ld	c,8
+scrollup_2:
+	push	hl
+	ld	b,80
+	xor	a
+scrollup_3:
+	ld	(hl),a
+	inc	hl
+	djnz	scrollup_3
+	pop	hl
+	ld	a,h
+	add	8
+	ld	h,a
+	dec	c
+	jr	nz,scrollup_2
 	ret
 
 ; c = x
