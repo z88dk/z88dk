@@ -12,7 +12,6 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include "errors.h"
 #include "expr.h"
 #include "fileutil.h"
-#include "zfileutil.h"
 #include "listfile.h"
 #include "modlink.h"
 #include "options.h"

@@ -528,3 +528,19 @@ long file_size(const char *filename)
 		return -1;
 }
 
+const char *path_search(const char *filename, argv_t *dir_list)
+{
+	// if no directory list or file exists, return filename
+	if (!dir_list || argv_len(dir_list) == 0 || file_exists(filename))
+		return path_canon(filename);
+
+	// search in dir list
+	for (char **p = argv_front(dir_list); *p; p++) {
+		const char *f = path_combine(*p, filename);
+		if (file_exists(f))
+			return f;
+	}
+
+	// not found, return original file name
+	return path_canon(filename);
+}

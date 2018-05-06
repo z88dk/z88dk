@@ -24,6 +24,7 @@ extern void t_fileutile_xfwrite_word(void); RUN_TEST(t_fileutile_xfwrite_word);
 extern void t_fileutile_xfwrite_dword(void); RUN_TEST(t_fileutile_xfwrite_dword);
 extern void t_fileutil_file_spew_slurp(void); RUN_TEST(t_fileutil_file_spew_slurp);
 extern void t_fileutil_path_mkdir(void); RUN_TEST(t_fileutil_path_mkdir);
+extern void t_fileutil_path_search(void); RUN_TEST(t_fileutil_path_search);
 extern void t_strutil_str_new(void); RUN_TEST(t_strutil_str_new);
 extern void t_strutil_str_new_copy(void); RUN_TEST(t_strutil_str_new_copy);
 extern void t_strutil_str_clear(void); RUN_TEST(t_strutil_str_clear);

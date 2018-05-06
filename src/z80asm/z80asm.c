@@ -9,7 +9,6 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 
 #include "directives.h"
 #include "fileutil.h"
-#include "zfileutil.h"
 #include "libfile.h"
 #include "listfile.h"
 #include "macros.h"
@@ -245,7 +244,7 @@ const char *GetLibfile( const char *filename )
 		return NULL;
 	}
 	
-	found_libfilename = search_file( get_lib_filename( filename ), opts.lib_path );
+	found_libfilename = path_search( get_lib_filename( filename ), opts.lib_path );
 
     newlib->libfilename = m_strdup( found_libfilename );		/* freed when newlib is freed */
 

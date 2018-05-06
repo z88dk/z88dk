@@ -12,7 +12,6 @@ Handle object file contruction, reading and writing
 #include "class.h"
 #include "codearea.h"
 #include "fileutil.h"
-#include "zfileutil.h"
 #include "errors.h"
 #include "libfile.h"
 #include "options.h"

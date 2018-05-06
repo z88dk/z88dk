@@ -11,7 +11,6 @@ Error handling.
 
 #include "errors.h"
 #include "fileutil.h"
-#include "zfileutil.h"
 #include "options.h"
 #include "srcfile.h"
 #include "str.h"

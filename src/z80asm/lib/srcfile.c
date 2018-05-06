@@ -17,7 +17,6 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include "srcfile.h"
 #include "strutil.h"
 #include "fileutil.h"
-#include "zfileutil.h"
 #include <assert.h>
 
 /*-----------------------------------------------------------------------------
@@ -141,7 +140,7 @@ static bool check_recursive_include( SrcFile *self, const char *filename )
 }
 
 /* Open the source file for reading, closing any previously open file.
-   If dir_list is not NULL, calls search_file() to search the file in dir_list */
+   If dir_list is not NULL, calls path_search() to search the file in dir_list */
 bool SrcFile_open( SrcFile *self, const char *filename, UT_array *dir_list )
 {
 	/* close last file */
@@ -152,7 +151,7 @@ bool SrcFile_open( SrcFile *self, const char *filename, UT_array *dir_list )
 	}
 
 	/* search path, add to strpool */
-	const char *filename_path = search_file(filename, dir_list);
+	const char *filename_path = path_search(filename, dir_list);
 
 	/* check for recursive includes, return if found */
 	if (!check_recursive_include(self, filename_path))

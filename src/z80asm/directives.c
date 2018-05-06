@@ -13,7 +13,6 @@ Assembly directives.
 #include "directives.h"
 #include "errors.h"
 #include "fileutil.h"
-#include "zfileutil.h"
 #include "model.h"
 #include "module.h"
 #include "parse.h"
@@ -211,7 +210,7 @@ void asm_INCLUDE(const char *filename)
 
 void asm_BINARY(const char *filename)
 {
-	filename = search_file(filename, opts.inc_path);
+	filename = path_search(filename, opts.inc_path);
 	FILE *binfile = fopen(filename, "rb");
 	if (!binfile) {
 		error_read_file(filename);

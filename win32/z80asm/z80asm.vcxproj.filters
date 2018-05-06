@@ -135,9 +135,6 @@
     <ClCompile Include="..\..\ext\regex\regfree.c">
       <Filter>Source Files\ext</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\lib\zfileutil.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\common\fileutil.c">
       <Filter>Source Files\ext</Filter>
     </ClCompile>
@@ -280,9 +277,6 @@
     </ClInclude>
     <ClInclude Include="..\..\ext\regex\regex.h">
       <Filter>Header Files\ext</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\lib\zfileutil.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\common\fileutil.h">
       <Filter>Header Files\ext</Filter>

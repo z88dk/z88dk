@@ -10,7 +10,6 @@ Manage the code area in memory
 
 #include "codearea.h"
 #include "fileutil.h"
-#include "zfileutil.h"
 #include "errors.h"
 #include "init.h"
 #include "listfile.h"

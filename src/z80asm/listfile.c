@@ -11,7 +11,6 @@ Handle assembly listing and symbol table listing.
 
 #include "listfile.h"
 #include "fileutil.h"
-#include "zfileutil.h"
 #include "options.h"
 #include "z80asm.h"
 #include "errors.h"

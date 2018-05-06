@@ -11,7 +11,6 @@ Handle library file contruction, reading and writing
 
 #include "errors.h"
 #include "fileutil.h"
-#include "zfileutil.h"
 #include "libfile.h"
 #include "zobjfile.h"
 #include "options.h"

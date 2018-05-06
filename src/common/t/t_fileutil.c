@@ -930,3 +930,68 @@ void t_fileutil_path_mkdir(void)
 
 	TEST_ASSERT(!dir_exists("test_dir"));
 }
+
+void t_fileutil_path_search(void)
+{
+#ifdef _WIN32
+	system("rmdir /s/q test_dir.x1 test_dir.x2 test_dir.x3 2>nul");
+#else
+	system("rm -rf test_dir.x1 test_dir.x2 test_dir.x3 ");
+#endif
+
+	TEST_ASSERT(!dir_exists("test_dir.x1"));
+	TEST_ASSERT(!dir_exists("test_dir.x2"));
+	TEST_ASSERT(!dir_exists("test_dir.x3"));
+
+	path_mkdir("test_dir.x1");
+	path_mkdir("test_dir.x2");
+	path_mkdir("test_dir.x3");
+
+	TEST_ASSERT(dir_exists("test_dir.x1"));
+	TEST_ASSERT(dir_exists("test_dir.x2"));
+	TEST_ASSERT(dir_exists("test_dir.x3"));
+		
+	file_spew("test.f0", "");
+	file_spew("test_dir.x1/test.f0", "");
+	file_spew("test_dir.x1/test.f1", "");
+	file_spew("test_dir.x2/test.f1", "");
+	file_spew("test_dir.x2/test.f2", "");
+	file_spew("test_dir.x3/test.f2", "");
+	file_spew("test_dir.x3/test.f3", "");
+
+	// NULL dir_list
+	TEST_ASSERT_EQUAL_STRING("test.f0", path_search("test.f0", NULL));
+	TEST_ASSERT_EQUAL_STRING("test.f1", path_search("test.f1", NULL));
+	TEST_ASSERT_EQUAL_STRING("test.f2", path_search("test.f2", NULL));
+	TEST_ASSERT_EQUAL_STRING("test.f3", path_search("test.f3", NULL));
+	TEST_ASSERT_EQUAL_STRING("test.f4", path_search("test.f4", NULL));
+
+	// empty dir_list
+	argv_t *dirs = argv_new();
+	TEST_ASSERT_EQUAL_STRING("test.f0", path_search("test.f0", dirs));
+	TEST_ASSERT_EQUAL_STRING("test.f1", path_search("test.f1", dirs));
+	TEST_ASSERT_EQUAL_STRING("test.f2", path_search("test.f2", dirs));
+	TEST_ASSERT_EQUAL_STRING("test.f3", path_search("test.f3", dirs));
+	TEST_ASSERT_EQUAL_STRING("test.f4", path_search("test.f4", dirs));
+
+	// search path
+	argv_push(dirs, "test_dir.x1");
+	argv_push(dirs, "test_dir.x2");
+	argv_push(dirs, "test_dir.x3");
+
+	TEST_ASSERT_EQUAL_STRING("test.f0", path_search("test.f0", dirs));
+	TEST_ASSERT_EQUAL_STRING("test_dir.x1/test.f1", path_search("test.f1", dirs));
+	TEST_ASSERT_EQUAL_STRING("test_dir.x2/test.f2", path_search("test.f2", dirs));
+	TEST_ASSERT_EQUAL_STRING("test_dir.x3/test.f3", path_search("test.f3", dirs));
+	TEST_ASSERT_EQUAL_STRING("test.f4", path_search("test.f4", dirs));
+
+#ifdef _WIN32
+	system("rmdir /s/q test_dir.x1 test_dir.x2 test_dir.x3 2>nul");
+#else
+	system("rm -rf test_dir.x1 test_dir.x2 test_dir.x3 ");
+#endif
+
+	TEST_ASSERT(!dir_exists("test_dir.x1"));
+	TEST_ASSERT(!dir_exists("test_dir.x2"));
+	TEST_ASSERT(!dir_exists("test_dir.x3"));
+}

@@ -13,7 +13,6 @@ Parse command line options
 
 #include "errors.h"
 #include "fileutil.h"
-#include "zfileutil.h"
 #include "hist.h"
 #include "init.h"
 #include "model.h"
@@ -278,7 +277,7 @@ static const char *search_source(char *filename)
 	if (file_exists(filename))
 		return filename;
 
-	f = search_file(filename, opts.inc_path);
+	f = path_search(filename, opts.inc_path);
 	if (file_exists(f))
 		return f;
 
@@ -286,7 +285,7 @@ static const char *search_source(char *filename)
 	if (file_exists(f))
 		return f;
 
-	f = search_file(f, opts.inc_path);
+	f = path_search(f, opts.inc_path);
 	if (file_exists(f))
 		return f;
 
@@ -294,7 +293,7 @@ static const char *search_source(char *filename)
 	if (file_exists(f))
 		return f;
 
-	f = search_file(f, opts.inc_path);
+	f = path_search(f, opts.inc_path);
 	if (file_exists(f))
 		return f;
 
@@ -970,7 +969,7 @@ static const char *search_z80asm_lib()
 		return ret;
 
 	/* try to read form -L path */
-	ret = search_file(get_lib_filename(lib_name), opts.lib_path);
+	ret = path_search(get_lib_filename(lib_name), opts.lib_path);
 	if (strcmp(ret, lib_name) != 0) {		// found one in path
 		if (check_library(ret))
 			return ret;
