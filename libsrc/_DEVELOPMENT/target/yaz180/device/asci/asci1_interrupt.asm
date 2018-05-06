@@ -28,9 +28,6 @@ ASCI1_RX_GET:
         jr NC,ASCI1_RX_CHECK        ; buffer full, check whether we need to drain H/W FIFO
 
         ld a,l                      ; get Rx byte from l
-
-        ld hl,asci1RxCount
-        inc (hl)                    ; atomically increment Rx buffer count
         ld hl,(asci1RxIn)           ; get the pointer to where we poke
         ld (hl),a                   ; write the Rx byte to the asci1RxIn target
 
@@ -43,6 +40,8 @@ IF __ASCI1_RX_SIZE != 0x100
 ENDIF
         ld (asci1RxIn),hl           ; write where the next byte should be poked
 
+        ld hl, asci1RxCount
+        inc (hl)                    ; atomically increment Rx buffer count
         jr ASCI1_RX_CHECK           ; check for additional bytes
 
 ASCI1_RX_ERROR:
@@ -63,8 +62,6 @@ ASCI1_TX_CHECK:                     ; now start doing the Tx stuff
         or a                        ; check whether it is zero
         jr Z,ASCI1_TX_TIE1_CLEAR    ; if the count is zero, then disable the Tx Interrupt
 
-        ld hl,asci1TxCount
-        dec (hl)                    ; atomically decrement current Tx count
         ld hl,(asci1TxOut)          ; get the pointer to place where we pop the Tx byte
         ld a,(hl)                   ; get the Tx byte
         out0 (TDR1),a               ; output the Tx byte to the ASCI1
@@ -78,6 +75,8 @@ IF __ASCI1_TX_SIZE != 0x100
 ENDIF
         ld (asci1TxOut),hl          ; write where the next byte should be popped
 
+        ld hl,asci1TxCount
+        dec (hl)                    ; atomically decrement current Tx count
         jr NZ,ASCI1_TX_END          ; if we've more Tx bytes to send, we're done for now
 
 ASCI1_TX_TIE1_CLEAR:

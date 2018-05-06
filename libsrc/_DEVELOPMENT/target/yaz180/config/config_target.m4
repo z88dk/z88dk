@@ -35,12 +35,12 @@ define(`__COMMON_AREA_1_PHASE_DRIVER', 0x`'eval(__COMMON_AREA_1_BASE+__COMMON_AR
 # Z180 ASCI0 driver
 
 define(`__ASCI0_RX_SIZE', 0x100)  # Size of the Rx Buffer, must be 2^n >= 8
-define(`__ASCI0_TX_SIZE', 0x100)  # Size of the Tx Buffer, must be 2^n >= 8
+define(`__ASCI0_TX_SIZE', 0x080)  # Size of the Tx Buffer, must be 2^n >= 8
 
 # Z180 ASCI1 driver
 
 define(`__ASCI1_RX_SIZE', 0x100)  # Size of the Rx Buffer, must be 2^n >= 8
-define(`__ASCI1_TX_SIZE', 0x100)  # Size of the Tx Buffer, must be 2^n >= 8
+define(`__ASCI1_TX_SIZE', 0x080)  # Size of the Tx Buffer, must be 2^n >= 8
 
 # BREAK for Single Step Mode
 

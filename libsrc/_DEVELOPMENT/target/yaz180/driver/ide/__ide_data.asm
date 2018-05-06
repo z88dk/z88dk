@@ -1,5 +1,7 @@
 SECTION data_driver
 
+PUBLIC ideStatus, ideLock
+
 ; IDE Status byte
 ; set bit 0 : User selects master (0) or slave (1) drive
 ; bit 1 : Flag 0 = master not previously accessed 

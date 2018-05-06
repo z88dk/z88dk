@@ -17,16 +17,18 @@
         or a                        ; check whether the buffer is empty
         jr NZ,put_buffer_tx         ; buffer not empty, so abandon immediate Tx
 
+        di
         in0 a,(STAT0)               ; get the ASCI0 status register
         and STAT0_TDRE              ; test whether we can transmit on ASCI0
         jr Z,put_buffer_tx          ; if not, so abandon immediate Tx
-
+        ei
         out0 (TDR0),l               ; output the Tx byte to the ASCI0
 
         ld l,0                      ; indicate Tx buffer was not full
         ret                         ; and just complete
 
     put_buffer_tx:
+        ei
         ld a,(asci0TxCount)         ; Get the number of bytes in the Tx buffer
         cp __ASCI0_TX_SIZE - 1      ; check whether there is space in the buffer
         ld a,l                      ; Tx byte

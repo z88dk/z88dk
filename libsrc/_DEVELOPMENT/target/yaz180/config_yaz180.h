@@ -51,10 +51,10 @@
 #define __COMMON_AREA_1_PHASE_DRIVER  0xf600
 
 #define __ASCI0_RX_SIZE  0x100
-#define __ASCI0_TX_SIZE  0x100
+#define __ASCI0_TX_SIZE  0x080
 
 #define __ASCI1_RX_SIZE  0x100
-#define __ASCI1_TX_SIZE  0x100
+#define __ASCI1_TX_SIZE  0x080
 
 #define __IO_BREAK  0x2000
 
