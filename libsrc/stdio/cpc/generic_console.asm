@@ -16,6 +16,7 @@
 	PUBLIC	__cpc_font
 	PUBLIC	__cpc_udg
 
+	EXTERN	generic_console_flags2
 	EXTERN	CRT_FONT
 
 	defc	SCREEN = 0xc000
@@ -144,9 +145,13 @@ handle_mode1:
 	ld	b,8
 handle_mode1_0:
 	push	bc
+	ld      a,(generic_console_flags2)
+	rlca		;get bit 7 out
+	sbc	a
+        ld      c,a	; c = 0/ c = 255
 	ld	a,(de)
+	xor	c
 	push	de
-
 	ld	b,2
 handle_mode1_1:
 	ld	de,(__cpc_ink1)
@@ -185,8 +190,14 @@ is_paper_m1:
 
 handle_mode2:
 	ld	b,8
+        ld      a,(generic_console_flags2)
+        ld      c,a
 handle_mode2_1:
 	ld	a,(de)
+	bit	7,c
+	jr	z,handle_mode2_noinverse
+	cpl
+handle_mode2_noinverse:
 	ld	(hl),a
 	ld	a,h
 	add	8		;2048
@@ -200,8 +211,13 @@ handle_mode0:
 	; b7    b6    b5    b4    b3    b2    b1    b0
 	; p0-b0 p1-b0 p1-b2 p1-b2 p0-b1 p1-b1 p0-b3 p1-b3
 handle_mode0_0:
-	ld	c,4
+	ld      a,(generic_console_flags2)
+	rlca		;get bit 7 out
+	sbc	a
+        ld      c,a	; c = 0/ c = 255
 	ld	a,(de)
+	xor	c
+	ld	c,4
 	push	de
 	ld	de,(__cpc_ink0)	;e = ink, d = paper
 handle_mode0_1:
