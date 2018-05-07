@@ -115,9 +115,9 @@ ENDIF
 ;; PAGE ZERO ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF (ASMPC = 0) && (__crt_org_code = 0)
+IF (ASMPC = 0) && (__crt_org_code = 0) && (__page_zero_present != 1)
 
-   include "../crt_page_zero_z180.inc"
+    include "../crt_page_zero_z180.inc"
 
 ENDIF
 
