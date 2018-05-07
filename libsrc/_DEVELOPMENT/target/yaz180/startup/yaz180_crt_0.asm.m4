@@ -107,7 +107,6 @@ EXTERN _main
 IF __crt_include_preamble
 
    include "crt_preamble.asm"
-   SECTION CODE
 
 ENDIF
 
@@ -148,6 +147,12 @@ __Restart_2:
 
       push hl                  ; argv
       push bc                  ; argc
+
+   ENDIF
+
+   IF __crt_include_preamble
+
+      include "crt_preamble.asm"
 
    ENDIF
 
