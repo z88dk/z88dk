@@ -51,7 +51,14 @@
         ret
 
     system_tick_update:
-        ld hl, __system_time        ; inc hl would also work, provided the storage is contiguous
+;       push bc
+;       ld bc, __IO_PIO_PORT_B      ; see the low byte of __system_time
+;       ld hl, __system_time
+;       ld l, (hl)
+;       out (c), l
+;       pop bc
+
+        ld hl, __system_time        ; increment through the __system_time bytes
         inc (hl)
         jr NZ, system_tick_exit
         inc hl
@@ -63,13 +70,4 @@
         inc hl
         inc (hl)
         jr system_tick_exit
-
-;   system_tick_view:
-;       push bc
-;       ld bc, __IO_PIO_PORT_B      ; see the low byte of __system_time
-;       ld hl, __system_time
-;       ld l, (hl)
-;       out (c), l
-;       pop bc
-;       jr system_tick_exit
 

@@ -1,14 +1,12 @@
 target/yaz180/driver/ide/__ide_data
 
-# moved to target/yaz180/driver/yabios/asm_common1_driver
-# target/yaz180/driver/ide/ide_wait_ready
-# target/yaz180/driver/ide/ide_wait_drq
-# target/yaz180/driver/ide/ide_test_error
-# target/yaz180/driver/ide/ide_setup_lba
-# target/yaz180/driver/ide/ide_read_sector
-# target/yaz180/driver/ide/ide_write_sector
+target/yaz180/driver/ide/ide_wait_ready
+target/yaz180/driver/ide/ide_wait_drq
+target/yaz180/driver/ide/ide_test_error
+target/yaz180/driver/ide/ide_setup_lba
+target/yaz180/driver/ide/ide_read_sector
+target/yaz180/driver/ide/ide_write_sector
 
-# remain in common1 area, as they are not time critical
 target/yaz180/driver/ide/ide_hard_reset
 target/yaz180/driver/ide/ide_soft_reset
 target/yaz180/driver/ide/ide_init

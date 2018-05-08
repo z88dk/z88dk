@@ -16,7 +16,7 @@ ENDIF
 IF __CRTCFG = 0
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ;; yabios model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; rom model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    defc TAR__crt_org_code              = 0
@@ -25,7 +25,7 @@ IF __CRTCFG = 0
 
    defc TAR__crt_model                 = 2
 
-   defc TAR__register_sp               = __BIOS_SP
+   defc TAR__register_sp               = 0xFFE0
    defc TAR__crt_stack_size            = 256
 
    defc TAR__crt_initialize_bss        = 1
@@ -34,7 +34,7 @@ IF __CRTCFG = 0
 
    defc TAR__crt_org_vector_table      = 0xFFE0
    defc TAR__crt_io_vector_base        = 0x00
-   
+
    defc TAR__crt_interrupt_mode        = 1
    defc TAR__crt_interrupt_mode_exit   = -1
 
@@ -45,16 +45,16 @@ IF __CRTCFG = 0
    defc TAR__crt_enable_eidi           = 0x13
    defc TAR__crt_on_exit               = 0x10001
 
-   defc TAR__crt_enable_rst            = 0x00FE
+   defc TAR__crt_enable_rst            = 0x80
    defc TAR__crt_enable_nmi            = 0
-   defc TAR__crt_enable_trap           = 1
+   defc TAR__crt_enable_trap           = 0
 
    ; clib defaults
 
    defc TAR__clib_exit_stack_size      = 0
    defc TAR__clib_quickexit_stack_size = 0
 
-   defc TAR__clib_malloc_heap_size     = 4096
+   defc TAR__clib_malloc_heap_size     = -1
    defc TAR__clib_stdio_heap_size      = 128
 
    defc TAR__clib_balloc_table_size    = 0

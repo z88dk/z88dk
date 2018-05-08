@@ -116,7 +116,7 @@ ENDIF
 ;; PAGE ZERO ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF (ASMPC = 0) && (__crt_org_code = 0)
+IF (ASMPC = 0) && (__crt_org_code = 0) && !(__page_zero_present)
 
    include "../crt_page_zero_z180.inc"
 
@@ -206,9 +206,9 @@ SECTION code_crt_return
 
    ; terminate
    
-      include "../crt_exit_eidi.inc"
-      include "../crt_restore_sp.inc"
-      include "../crt_program_exit.inc"      
+   include "../crt_exit_eidi.inc"
+   include "../crt_restore_sp.inc"
+   include "../crt_program_exit.inc"      
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -86,9 +86,6 @@
 extern void __LIB__ apu_reset(void) __smallc;
 
 
-extern void __LIB__ apu_init(void) __smallc;
-
-
 extern uint8_t __LIB__ apu_chk_idle(void) __smallc __z88dk_fastcall;
 
 

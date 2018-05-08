@@ -85,8 +85,6 @@
 
 extern void apu_reset(void) __preserves_regs(a,b,c,d,e,iyh,iyl);
 
-extern void apu_init(void) __preserves_regs(a,b,c,d,e,iyh,iyl);
-
 extern uint8_t apu_chk_idle(void) __preserves_regs(b,c,d,e,iyh,iyl);
 extern uint8_t apu_chk_idle_fastcall(void) __preserves_regs(b,c,d,e,iyh,iyl) __z88dk_fastcall;
 #define apu_chk_idle(a) apu_chk_idle_fastcall(a)

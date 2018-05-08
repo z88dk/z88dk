@@ -86,9 +86,6 @@
 extern void apu_reset(void);
 
 
-extern void apu_init(void);
-
-
 extern uint8_t apu_chk_idle(void);
 
 
