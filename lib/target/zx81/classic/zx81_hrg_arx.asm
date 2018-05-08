@@ -9,13 +9,19 @@
 ; - - - - - - -
 
 PUBLIC	hrg_on
+PUBLIC	_hrg_on
 PUBLIC	hrg_off
+PUBLIC	_hrg_off
 PUBLIC	HRG_LineStart
 PUBLIC	HRG_handler
 PUBLIC	zx_blank
+PUBLIC	_zx_blank
 PUBLIC	zx_noblank
+PUBLIC	_zx_noblank
 PUBLIC	zx_fast
+PUBLIC	_zx_fast
 PUBLIC	zx_slow
+PUBLIC	_zx_slow
 
 
 IF ((startup=13)|(startup=15))
@@ -46,6 +52,7 @@ DEFC    RAMTOP  = 16388 ;word   Address of first byte above BASIC system area.
 ;
 ;----------------------------------------------------------------
 zx_fast:
+_zx_fast:
 	call restore81
 	jp	$F23		; FAST !
 
@@ -56,7 +63,9 @@ zx_fast:
 ;
 ;----------------------------------------------------------------
 zx_slow:
+_zx_slow:
 hrg_on:
+_hrg_on:
 		call   restore81
 		call   $F2B	; SLOW
 IF !DEFINED_hrgpage
@@ -79,6 +88,7 @@ ENDIF
 
 ;----------------------------------------------------------------
 zx_noblank:
+_zx_noblank:
         ld      hl,HRG_handler  ; starts the hires mode when JP (IX) is made
         call	HRG_Sync
 IF (startup<15)
@@ -89,6 +99,7 @@ ENDIF
 
 ;----------------------------------------------------------------
 zx_blank:
+_zx_blank:
         ld      hl,HRG_BlankHandler
         call	HRG_Sync
 IF (startup<15)
@@ -103,6 +114,7 @@ ENDIF
 ;
 ;----------------------------------------------------------------
 hrg_off:
+_hrg_off:
 IF DEFINED_noslowfix
 		jp		zx_fast
 ELSE
