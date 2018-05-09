@@ -3,6 +3,7 @@
 		SECTION		code_clib
 
 		PUBLIC		generic_console_cls
+		PUBLIC		generic_console_vpeek
 		PUBLIC		generic_console_scrollup
 		PUBLIC		generic_console_printc
 		PUBLIC		generic_console_ioctl
@@ -84,6 +85,20 @@ generic_console_printc_1:
 	ex	af,af
 	ld	c,0x58		;WRCHAR
 	rst	$10
+	ret
+
+;Entry: c = x,
+;       b = y
+;       e = rawmode
+;Exit:  nc = success
+;        a = character,
+;        c = failure
+generic_console_vpeek:
+	ld	d,b
+	ld	e,c
+	ld	c,0x57		;RDCHAR
+	rst	$10
+	and	a
 	ret
 
 		SECTION		data_clib

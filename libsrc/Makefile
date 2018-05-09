@@ -1090,7 +1090,7 @@ vg5k_clib.lib:
 	$(MAKE) gfxdeps
 	$(call buildgeneric,vg5k)
 	$(MAKE) -C games TARGET=vg5k
-	TARGET=vg5k TYPE=z80 $(LIBLINKER) -DFORvg5k -x$(OUTPUT_DIRECTORY)/vg5k_clib @$(LISTFILE_DIRECTORY)/vg5k.lst
+	TARGET=vg5k TYPE=ixiy $(LIBLINKER) --IXIY -DFORvg5k -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/vg5k_clib @$(LISTFILE_DIRECTORY)/vg5k.lst
 
 # S-OS (The Sentinel) - Stefano
 sos_clib.lib:

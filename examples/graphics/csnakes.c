@@ -1,22 +1,22 @@
 /*
 
 	Z88DK base graphics libraries examples
+	Colour version
 	
 	A classic 2 players game, the opponents must trap each other.
 	
 	Build options:
-	-DJOYSTICK_DIALOG -DDEFINE_JOYSTICK_TYPE	- let the players choose their controllers
+	-DJOYSTICK_DIALOG	- let the players choose their controllers
 	-DPSG -lm			- PSG sound support (e.g. ZON-X on the ZX81, maths library is required)
 	
 	
-	SPEED must be adjusted according to the CPU speed (e.g. must be around 500 on a ZX81):
+	SPEED must be adjusted according to the CPU speed (e.g. must be around 500 on a ZX81)
 	
-	zcc +vz -startup=2 -oa.vz -DJOYSTICK_DIALOG -DDEFINE_JOYSTICK_TYPE snakes.c	
+	zcc +trs80 -subtype=eg2000disk -lgfxeg2000 -create-app -DSPEED=1500 -DJOYSTICK_DIALOG -DDEFINE_JOYSTICK_TYPE csnakes.c	
 	
 */
 
 #include <games.h>
-#include <vz.h>
 #include <graphics.h>
 
 #ifdef JOYSTICK_DIALOG
@@ -26,8 +26,6 @@
 #ifdef PSG
 #include <psg.h>
 #endif
-
-#define SPEED 1000
 
 struct snake {
     int joystick;
@@ -48,10 +46,10 @@ void crash(int a, int b)
 {
     for (y = 0; y < 30; y++) {
 		
-        vz_plot(a + 1, b + 1, y & 3);
-        vz_plot(a - 1, b - 1, y & 3);
-        vz_plot(a - 1, b + 1, y & 3);
-        vz_plot(a + 1, b - 1, y & 3);
+        cplot(a + 1, b + 1, y & 3);
+        cplot(a - 1, b - 1, y & 3);
+        cplot(a - 1, b + 1, y & 3);
+        cplot(a + 1, b - 1, y & 3);
 		
         for (x = 0; x < SPEED * 2; x++) {
         }
@@ -81,9 +79,9 @@ int move_snake(struct snake* p)
     p->x += p->x_incr;
     p->y += p->y_incr;
 
-    if (vz_point(p->x, p->y)!=0)
+    if (cpoint(p->x, p->y)!=0)
         return (0);
-    vz_plot(p->x, p->y, p->c);
+    cplot(p->x, p->y, p->c);
 
     p->direction = joystick(p->joystick);
 
@@ -156,7 +154,7 @@ main()
 #endif
 
     while (1) {
-        clg();
+        cclg();
 		
 
 #ifdef PSG
@@ -166,12 +164,12 @@ main()
 #endif
 
         for (x = 0; x <= 127; x++) {
-            vz_plot(x, 0, 2);
-            vz_plot(x, 63, 2);
+            cplot(x, 0, 2);
+            cplot(x, 63, 2);
         }
         for (y = 0; y <= 63; y++) {
-            vz_plot(0, y, 2);
-            vz_plot(127, y, 2);
+            cplot(0, y, 2);
+            cplot(127, y, 2);
         }
 
         p1.x = 127 / 5;

@@ -51,7 +51,7 @@
  *     zcc +zx81 -subtype=wrx -clib=wrx -create-app -Dspritesize=8 -DBANNERS -O3 wall.c
  *
  *  ZX81 CHROMA-81 (the newest zx81 expansion, color attribute mode)
- *     zcc +zx81 -subtype=chroma -clib=chroma -create-app -Dspritesize=8 -DBANNERS -DSPECTRUM -O3 wall.c
+ *     zcc +zx81 -subtype=chroma -clib=wrx -create-app -Dspritesize=8 -DBANNERS -DSPECTRUM -O3 wall.c
  *
  *  ZX81 ARX (Andy Rea's High Resolution trick based on extra RAM over ROM addresses, could work with few programmable characters boards)
  *     zcc +zx81 -subtype=arx -clib=arx -create-app -Dspritesize=8 -DBANNERS -O3 wall.c

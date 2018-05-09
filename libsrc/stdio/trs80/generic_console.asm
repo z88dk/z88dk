@@ -3,6 +3,7 @@
 		SECTION		code_clib
 
 		PUBLIC		generic_console_cls
+		PUBLIC		generic_console_vpeek
 		PUBLIC		generic_console_printc
 		PUBLIC		generic_console_scrollup
 		PUBLIC		generic_console_ioctl
@@ -12,8 +13,8 @@
 
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
-
-		defc		DISPLAY = 15360
+		
+		EXTERN		base_graphics
 
 generic_console_ioctl:
 	scf
@@ -23,8 +24,10 @@ generic_console_set_inverse:
 	ret
 
 generic_console_cls:
-	ld	hl, DISPLAY
-	ld	de, DISPLAY +1
+	ld	hl, (base_graphics)
+	ld	d,l
+	ld	e,l
+	inc de
 	ld	bc,1023
 	ld	(hl),32
 	ldir
@@ -36,23 +39,41 @@ generic_console_cls:
 ; a = character to print
 ; e = raw
 generic_console_printc:
-	ld	hl,DISPLAY - CONSOLE_COLUMNS
+	call	xypos
+	ld	(hl),a
+	ret
+
+;Entry: c = x,
+;       b = y
+;       e = rawmode
+;Exit:  nc = success
+;        a = character,
+;        c = failure
+generic_console_vpeek:
+        call    xypos
+	ld	a,(hl)
+	and	a
+	ret
+
+xypos:
+	ld	hl, (base_graphics)
 	ld	de,CONSOLE_COLUMNS
 	inc	b
+	sbc hl,de
 generic_console_printc_1:
 	add	hl,de
 	djnz	generic_console_printc_1
 generic_console_printc_3:
 	add	hl,bc			;hl now points to address in display
-	ld	(hl),a
 	ret
 
 
 generic_console_scrollup:
 	push	de
 	push	bc
-	ld	hl, DISPLAY + CONSOLE_COLUMNS
-	ld	de, DISPLAY
+	ld	hl, CONSOLE_COLUMNS
+	ld	de, (base_graphics)
+	add	hl,de
 	ld	bc,+ ((CONSOLE_COLUMNS) * (CONSOLE_ROWS-1))
 	ldir
 	ex	de,hl

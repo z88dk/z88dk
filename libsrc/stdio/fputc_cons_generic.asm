@@ -160,6 +160,7 @@ IF SUPPORT_vt52
 	cp	27
 	jr	z,start_code
 ENDIF
+print_character:
 	dec	e		;e = 0, not raw mode
 handle_character:
 	; At this point:
@@ -241,8 +242,8 @@ ENDIF
 	cp	's'
 	ld	d,8
 	jr	z,start_code
-	; We just swallow the remainder
-	ret
+	; Anything else we just print
+	jr	print_character
 ENDIF
 
 set_inverse_ansi:

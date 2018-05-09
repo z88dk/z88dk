@@ -26,5 +26,4 @@ ENDIF
 
 	ld	l,a
 	ld	h,0
-
 	ret

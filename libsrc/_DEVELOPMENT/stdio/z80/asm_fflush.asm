@@ -48,9 +48,22 @@ asm_fflush:
    ;
    ; uses  : all except ix
 
+IF __CPU_Z180__ || __CPU_R2K__ || __CPU_R3K__
+
+   push ix
+   pop hl
+
+   ld a,l
+   or h
+   jp z, asm__fflushall
+
+ELSE
+
    ld a,ixl
    or ixh
    jp z, asm__fflushall
+
+ENDIF
 
 asm0_fflush:
 

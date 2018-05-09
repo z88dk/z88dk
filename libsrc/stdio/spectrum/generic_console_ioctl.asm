@@ -18,7 +18,7 @@ generic_console_ioctl:
 	inc	hl
 	ld	b,(hl)
 	cp	IOCTL_GENCON_SET_FONT32
-	jr	z,check_set_font64
+	jr	nz,check_set_font64
 	ld	(__zx_32col_font),bc
 success:
 	and	a

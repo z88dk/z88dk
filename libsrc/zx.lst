@@ -13,6 +13,7 @@ stdio/spectrum/generic_console_cls
 stdio/spectrum/generic_console_attrs
 stdio/spectrum/generic_console_printc
 stdio/spectrum/generic_console_ioctl
+stdio/spectrum/generic_console_vpeek
 stdio/spectrum/console_vars
 @stdio/stdio.lst
 @stdio/ansicore.lst

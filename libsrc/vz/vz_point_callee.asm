@@ -11,11 +11,15 @@
 SECTION code_clib
 PUBLIC vz_point_callee
 PUBLIC _vz_point_callee
+PUBLIC cpoint_callee
+PUBLIC _cpoint_callee
 PUBLIC ASMDISP_VZ_POINT_CALLEE
 EXTERN base_graphics
 
 .vz_point_callee
 ._vz_point_callee
+.cpoint_callee
+._cpoint_callee
 
    pop af
    pop de

@@ -5,11 +5,12 @@
 		PUBLIC		generic_console_cls
 		PUBLIC		generic_console_scrollup
 		PUBLIC		generic_console_printc
-		PUBLIC		generic_console_ioctl
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
 		PUBLIC		msx_attr
+		PUBLIC		__msx_font32
+		PUBLIC		__msx_udg32
 
 		EXTERN		generic_console_w
 		EXTERN		CONSOLE_COLUMNS
@@ -26,8 +27,6 @@ ELSE
 ENDIF
 
 
-generic_console_ioctl:
-	scf
 generic_console_set_inverse:
 	ret
 
@@ -85,13 +84,16 @@ generic_console_printc:
 	; Here we can interpret any extra codes (eg for setting colours)
 
 generic_console_printc_1:
+	bit	7,a
+	jr	nz,generic_console_printc_handle_udgs
 	sub	32
+	ld	de,(__msx_font32)
+generic_console_printc_rejoin:
 	ld	l,a
 	ld	h,0
 	add	hl,hl
 	add	hl,hl
 	add	hl,hl
-	ld	de,(fontaddr)
 	add	hl,de
 	ld	a,c
 	add	a
@@ -113,7 +115,13 @@ generic_console_printc_1:
 	pop	ix
 	ret
 
+generic_console_printc_handle_udgs:
+	sub	128
+	ld	de,(__msx_udg32)
+	jr	generic_console_printc_rejoin
+
 
 		SECTION	data_clib
-.fontaddr       defw    CRT_FONT
+.__msx_font32	defw    CRT_FONT
+.__msx_udg32	defw    0
 .msx_attr	defb $F1	; White on Black

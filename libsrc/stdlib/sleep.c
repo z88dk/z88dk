@@ -30,6 +30,7 @@ int sleep(int secs)
 static void __private_wrapper() __naked
 {
 #asm
+	PUBLIC	_sleep
 _sleep:
 sleep:
 	ld	a,h
