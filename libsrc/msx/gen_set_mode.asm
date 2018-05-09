@@ -44,6 +44,11 @@ ELSE
 
 ; Switch 2 Video Mode n. 0
 initxt:
+
+IF FORm5
+	jp INITXT
+ELSE
+
 ; MSX:  $00,$F0,$00,$00,$01,$00,$00,$F4
 ; SVI:  $00,$F0,$00,$FF,$01,$36,$07,$F4
 ; SC3:  $00,$F0,$0F,$FF,$03,$76,$03,$13
@@ -73,22 +78,19 @@ initxt:
     
 		; reg0  - TEXT MODE
     ld    c,$00
-IF FORm5
-    ld    a,$01		; bit 1 (external video flag) must be set on Sord M5
-ELSE
     xor a		; .. and reset on the other targets
-ENDIF
     call    VDPreg_Write
 
 	; reg1
     ld    a,$D0   ; ($C0 for MTX ?)  ; reg1 - TEXT MODE
     call    VDPreg_Write
     ret
-	
+ENDIF
 
 ; Switch 2 Video Mode n. 1
 
 init32:
+
 ; MSX:  $00,$E0,$06,$80,        $00,$36,$07,$04
 ; SVI?: $00,$E0,$06,$7F(00<>ff),$00,$36,$07,$04
 ; MTX?: $00,$D0,$04,$80,        $00,$7E,$07
@@ -112,18 +114,23 @@ init32:
     ld    a,$07
     call    VDPreg_Write    ; reg6  -  SPRITE PATTERN GEN. TAB.
     
-    ld    a,$f5 ; (00 ?)
+;    ld    a,$f5 ; (00 ?)
+IF FORm5
+	ld	a,1		; avoid transparent color (to be confirmed)
+ELSE
+    xor   a
+ENDIF    
     call    VDPreg_Write    ; reg7  -  INK & PAPER-/BACKDROPCOL.
-    
     
 		; reg0  - TEXT MODE
     ld    c,$00
 IF FORm5
-    ld    a,$01		; bit 1 (external video flag) must be set on Sord M5
+	ld	a,1		; external video flag bit must be set on M5
 ELSE
     xor a		; .. and reset on the other targets
 ENDIF
     call    VDPreg_Write
+	ret
 	
 ;
 ; -- Thanks to Saverio Russo his initial hints --
@@ -145,7 +152,8 @@ inigrp:
 ; M5:   $02,$E2,$06,$FF,$03,$36,$07,$61
 ; M5:   $03,$A2,$0E,$FF,$03,$76,$03,$11 ; name table at 3800 in place of 1800
 
-; Compare example from MSX emulator for M5:
+; Compare example from MSX emulator for M5,
+; on reg#0 of the SORD M5, external video flag bit must be set
 ; msx:  02 62 11 23 21 33 11 E0
 ; M5:   03 E2 11 23 21 33 11 E1
 
@@ -224,6 +232,18 @@ pattern:
 	jr nz,pattern
 	dec e
 	jr nz,pattern
+	
+	ld bc,6144	; set VRAM attribute area
+	ld a,$F1	; white on black
+	ld hl,8192
+;	push bc
+	call FILVRM
+;	pop bc		; clear VRAM picture area
+;	xor a
+;	ld	h,a
+;	ld	l,a
+;	jp	FILVRM
+
 ENDIF
 
 
