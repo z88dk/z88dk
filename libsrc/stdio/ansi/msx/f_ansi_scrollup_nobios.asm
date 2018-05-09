@@ -14,10 +14,14 @@
 	PUBLIC	ansi_SCROLLUP
 	EXTERN	msx_attr
 	
+IF FORm5
+	INCLUDE "target/m5/def/m5bios.def"
+ELSE
 	EXTERN	LDIRVM
 	EXTERN	LDIRMV
 	EXTERN	FILVRM
-
+ENDIF
+	
 .ansi_SCROLLUP
 	push ix
 	
