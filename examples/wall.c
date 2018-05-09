@@ -76,6 +76,10 @@
  *     zcc +abc80 -create-app -owall -Dspritesize=2 -Dspritesizeh=3 wall.c
  *     LOAD WALL
  *
+ *  SORD M5
+ *     zcc +m5 -create-app -Cz--audio -Dspritesize=8 -DBANNERS -O3 -lndos wall.c
+ *     TAPE
+ *
  *  MSX, Spectravideo SVI
  *     zcc +[msx/svi] -create-app -DJOYSTICK -Dspritesize=8 -DSOUND -DBANNERS  -lndos wall.c
  *     BLOAD “CAS:”,R
@@ -118,7 +122,7 @@
 
 #ifdef SPECTRUM
 #ifdef ZX81
-#pragma output hrgpage = 36096
+//#pragma output hrgpage = 36096
 #endif
 #endif
 
@@ -141,7 +145,7 @@
 #endif
 #endif
 
-#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN)
+#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN) || defined(M5)
 #include <msx.h>
 #include <msx/gfx.h>
 #endif
@@ -174,7 +178,7 @@ int temp;
 #endif
 #endif
 
-#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN)
+#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN) || defined(M5)
 void set_attr (int x, int y, int attr) {
 		for (k=0; k<8; k++)
 			vpoke(MODE2_ATTR + (256*x) + (8*y) + k, attr);
@@ -237,7 +241,7 @@ void destroy_brick() {
 		*zx_cyx2aaddr(m,n) = 112;
 	#endif
 	
-	#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN)
+	#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN) || defined(M5)
 	#if (spritesize == 8)
 		set_attr (m,n,0x1f);
 	#endif
@@ -260,7 +264,7 @@ void destroy_brick() {
 		*zx_cyx2aaddr(m,n-1) = 112;
 	#endif
 	
-	#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN)
+	#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN) || defined(M5)
 	#if (spritesize == 8)
 		set_attr (m,n-1,0x1F);
 	#endif
@@ -283,7 +287,7 @@ void destroy_brick() {
 		*zx_cyx2aaddr(m,n+1) = 112;
 	#endif
 	
-	#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN)
+	#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN) || defined(M5)
 	#if (spritesize == 8)
 		set_attr (m,n+1,0x1F);
 	#endif
@@ -550,8 +554,9 @@ restart:
 #endif
 #else
 #ifdef C128
-#else
 	speed=300;
+#else
+	speed=1000;
 #endif
 #endif
 
@@ -601,7 +606,7 @@ start_level:
 		*zx_cyx2aaddr(m+4,n+1) = (m+1)<<4;
 	#endif
 	
-	#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN)
+	#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN) || defined(M5)
 	#if (spritesize == 8)
 		set_attr(m+3,n,((m+1)<<1)|0x10);
 		set_attr(m+3,n+1,((m+1)<<1)|0x10);
@@ -630,7 +635,7 @@ start_level:
 		*zx_cyx2aaddr(m+3,n+1) = 6<<4;
 	#endif
 	
-	#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN)
+	#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN) || defined(M5)
 	#if (spritesize == 8)
 		set_attr(m+3,n,INK_LIGHT_YELLOW|0x10);
 		set_attr(m+3,n+1,INK_LIGHT_YELLOW|0x10);
