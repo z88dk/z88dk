@@ -1,5 +1,5 @@
 
-IF (__crt_org_code = 0)
+IF (__page_zero_present)
 
 SECTION code_crt_init
 
@@ -51,8 +51,5 @@ SECTION code_crt_init
 
     EXTERN  _asci1_init
     call    _asci1_init     ; and the asci1 interfaces
-
-    EXTERN  _apu_reset
-    call    _apu_reset      ; and the APU
 
 ENDIF
