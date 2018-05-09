@@ -11,6 +11,7 @@
 
         SECTION code_clib
 	PUBLIC  getk
+	PUBLIC  _getk
 
 .getk
 ._getk
