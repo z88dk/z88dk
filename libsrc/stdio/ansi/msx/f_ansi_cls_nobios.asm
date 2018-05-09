@@ -22,7 +22,12 @@ ENDIF
 
         EXTERN	msx_color
         EXTERN	msx_attr
+
+IF FORm5
+	INCLUDE "target/m5/def/m5bios.def"
+ELSE
         EXTERN	FILVRM
+ENDIF
 
         INCLUDE	"graphics/grafix.inc"
 
