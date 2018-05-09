@@ -1,5 +1,5 @@
 
-IF (__page_zero_present)
+IF !(__page_zero_present)
 
 SECTION code_crt_init
 

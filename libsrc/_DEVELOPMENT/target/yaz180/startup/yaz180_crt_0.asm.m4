@@ -114,15 +114,17 @@ ENDIF
 ;; PAGE ZERO ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF (ASMPC = 0) && (__crt_org_code = 0) && !(__page_zero_present)
+IF (__crt_org_code = 0) && !(__page_zero_present)
 
-    include "../crt_page_zero_z180.inc"
+   include "../crt_page_zero_z180.inc"
 
 ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CRT INIT ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+SECTION code_crt_start         ; system initialization
 
 __Start:
 
