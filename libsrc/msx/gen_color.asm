@@ -12,7 +12,12 @@
 	PUBLIC	msx_color
 	PUBLIC	_msx_color
 
+IF FORm5
+	INCLUDE "target/m5/def/m5bios.def"
+ELSE
 	EXTERN	SETWRT
+ENDIF
+	
 	EXTERN	set_vdp_reg
 	
 	;EXTERN	SCRMOD
