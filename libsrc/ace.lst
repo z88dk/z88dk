@@ -4,6 +4,7 @@ stdio/ace/fgetc_cons
 stdio/ace/getk
 stdio/ace/generic_console
 stdio/ace/generic_console_ioctl
+stdio/ace/CRT_FONT
 @stdio/ansicore.lst
 stdio/ansi/f_ansi_dsr6
 stdio/ansi/ace/f_ansi_attr
