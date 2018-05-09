@@ -21,7 +21,7 @@ IF FORm5
 	ld hl,0
 	and $40	; mask the SPACE key
 	ret z
-	inc hl
+	dec hl
 	ret
 ELSE
 	ld	hl,0
