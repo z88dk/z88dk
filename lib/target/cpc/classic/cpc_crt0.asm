@@ -31,6 +31,7 @@
 		
 	GLOBAL    __interposer_isr__
 
+	defc	TAR__no_ansifont = 1
 	defc	TAR__register_sp = -1
         defc	TAR__clib_exit_stack_size = 8
 	defc	CRT_KEY_DEL = 12

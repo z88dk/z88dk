@@ -334,10 +334,15 @@ IF NEED_ansiterminal
 	defc fputc_cons = fputc_cons_ansi
 	defc _fputc_cons = fputc_cons_ansi
 
-        PUBLIC ansicolumns
-        PUBLIC ansicharacter_pixelwidth
-        PUBLIC ansifont
-        PUBLIC ansifont_is_packed
+       	PUBLIC ansicolumns
+
+	IF !TAR__no_ansifont
+        	PUBLIC ansicharacter_pixelwidth
+		PUBLIC ansifont
+        	PUBLIC ansifont_is_packed
+        ELSE
+                defc DEFINED_ansifont = 1
+	ENDIF
 
 	IF !ansipixels
 		defc ansipixels = 256
