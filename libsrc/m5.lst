@@ -32,6 +32,7 @@ graphics/msx/surface/surface_draw
 graphics/msx/surface/surface_pixladdr
 graphics/msx/surface/surface_plotpixl
 graphics/msx/surface/surface_stencil_render
+games/m5/joystick
 @msx/genmsx.lst
 msx/gen_set_vdp_reg
 msx/gen_get_vdp_reg
