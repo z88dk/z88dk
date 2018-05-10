@@ -19,12 +19,6 @@
 	
 	EXTERN	msxbios
 
-IF FORmsx
-        INCLUDE "target/msx/def/msxbios.def"
-ELSE
-        INCLUDE "target/svi/def/svibios.def"
-ENDIF
-
 st_dir:
 _st_dir:
 	defw @0000 ; 0
@@ -37,6 +31,25 @@ _st_dir:
 	defw @1000 ; 7
 	defw @1001 ; 8
 
+IF FORm5
+
+	INCLUDE "target/m5/def/m5bios.def"
+
+msx_get_stick:
+_msx_get_stick:
+
+	call	JOYSP
+	ld	h,0
+	ld	l,a
+	ret
+
+ELSE
+IF FORmsx
+        INCLUDE "target/msx/def/msxbios.def"
+ELSE
+        INCLUDE "target/svi/def/svibios.def"
+ENDIF
+
 
 msx_get_stick:
 _msx_get_stick:
@@ -48,6 +61,7 @@ _msx_get_stick:
 	call	msxbios
 
 	ld	h,0	
-	ld	l, a
+	ld	l,a
 	pop	ix
 	ret
+ENDIF
