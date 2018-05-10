@@ -89,6 +89,13 @@ extern unsigned char *joystick_type[];
 	#define GAME_DEVICES 1
 #endif
 
+#ifdef __M5__
+#ifdef DEFINE_JOYSTICK_TYPE
+	unsigned char *joystick_type[] = { "Cursor keys + Space"};
+#endif
+	#define GAME_DEVICES 1
+#endif
+
 #ifdef __MSX__
 #ifdef DEFINE_JOYSTICK_TYPE
 	unsigned char *joystick_type[] = { "Cursor", "Joystick 1", "Joystick 2"};
