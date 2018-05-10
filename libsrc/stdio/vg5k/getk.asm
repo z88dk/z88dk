@@ -15,7 +15,10 @@
 
 .getk
 ._getk
+	push	iy
+	ld	iy,$47FA		;iy -> ix
 	call $aa
+	pop	iy
 
 
 IF STANDARDESCAPECHARS

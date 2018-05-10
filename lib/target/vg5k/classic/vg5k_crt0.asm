@@ -64,9 +64,10 @@ IF DEFINED_USING_amalloc
 ENDIF
 
 
-	;di
+	di
         call    _main
-	;ei
+	ld	iy,$47FA
+	ei
 cleanup:
 ;
 ;       Deallocate memory which has been allocated here!

@@ -61,8 +61,7 @@ cls1:	ld	(hl),32
 	djnz	cls1
 	dec	c
 	jr	nz,cls0
-	set	0,(iy+1)		;iy -> ix, trigger interrupt to redraw screen
-	ld	(iy+0),1		;force an immediate redraw
+	call	refresh_screen
 	ret
 
 ; c = x
@@ -135,12 +134,51 @@ generic_console_scrollup_3:
 	ld	(hl),a
 	inc	hl
 	djnz	generic_console_scrollup_3
-	set	0,(iy+1)		;iy -> ix, trigger interrupt to redraw screen
-	ld	(iy+0),1		;force an immediate redraw
+	call	refresh_screen
 	pop	bc
 	pop	de
 	ret
 
+; Refresh the whole VG5k screen - we can't rely on the interrupt
+refresh_screen:
+	ld	bc,CONSOLE_ROWS * CONSOLE_COLUMNS
+	ld	hl,0		
+	ld	de,DISPLAY
+refresh_screen1:
+	push	bc
+	push	hl
+	ld	a,(de)
+	inc	de
+	ex	af,af
+	ld	a,(de)		;attribute
+	inc	de
+	push	de
+	ld	e,a		;attribute
+	ex	af,af
+	ld	d,a		;character
+	call	$0092
+	push	de
+	pop	hl
+	inc	l
+	ld	a,l
+	cp	40
+	jr	nz,same_line
+	ld	l,0
+	ld	a,h
+	and	a
+	jr	nz,increment_row
+	ld	a,7
+increment_row:
+	inc	h
+same_line:
+	pop	bc
+	dec	bc
+	ld	a,b
+	or	c
+	jr	nz,refresh_screen1
+	ret
+
+	
 
 	SECTION		data_clib
 
