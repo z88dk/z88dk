@@ -32,8 +32,6 @@
 
         ld      a,STAT0_RIE         ; receive interrupt enabled
         out0    (STAT0),a           ; output to the ASCI0 status reg
-        
-        call _asci0_reset           ; reset empties and initialises the Tx & Rx buffers
 
         jp asm_z180_pop_ei_jp       ; ei
 
