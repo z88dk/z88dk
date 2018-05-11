@@ -25,6 +25,16 @@ $(wildcard ../common/*.c) \
 $(wildcard ../../ext/regex/reg*.c)
 
 OBJS_ALL	:= $(SRCS:.c=.o)
+
+# Use these flags both in Windows_NT and in a MinGW build in Unix
+ifeq ($(EXE),.exe)
+CFLAGS	+= \
+-I../../ext/UNIXem/include
+OBJS_ALL	+= \
+../../ext/UNIXem/src/glob.o \
+../../ext/UNIXem/src/dirent.o
+endif
+
 OBJS		:= $(OBJS_ALL:$(PROJ).o=)
 
 DEPENDS		:= $(SRCS:.c=.d) $(T_SRCS:.c=.d)

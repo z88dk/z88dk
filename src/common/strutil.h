@@ -57,6 +57,8 @@ extern void argv_unshift(argv_t *argv, const char *str);
 extern void argv_insert(argv_t *argv, size_t idx, const char *str);
 extern void argv_erase(argv_t *argv, size_t pos, size_t len);
 
+extern void argv_sort(argv_t *argv);
+
 // get element by index, NULL if outside range
 extern char *argv_get(argv_t *argv, size_t idx);
 

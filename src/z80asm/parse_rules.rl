@@ -67,7 +67,7 @@ Define rules for a ragel-based parser.
 	variable cs  ctx->cs;
 	variable p   ctx->p;
 	variable pe  ctx->pe;
-	variable eof ctx->eof;
+	variable eof ctx->eof_;
 
 	/* label, name */
 	label  = _TK_LABEL  @{ Str_set_n(stmt_label, ctx->p->tstart, ctx->p->tlen); };
@@ -618,9 +618,9 @@ static bool _parse_statement_1(ParseCtx *ctx, Str *name, Str *stmt_label)
 	%%write init nocs;
 
 	ctx->cs = get_start_state(ctx);
-	ctx->p = ctx->pe = ctx->eof = ctx->expr_start = NULL;
+	ctx->p = ctx->pe = ctx->eof_ = ctx->expr_start = NULL;
 	
-	while ( ctx->eof == NULL || ctx->eof != ctx->pe )
+	while ( ctx->eof_ == NULL || ctx->eof_ != ctx->pe )
 	{
 		read_token(ctx);
 		

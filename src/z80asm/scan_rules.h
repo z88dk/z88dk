@@ -3722,7 +3722,7 @@ static void set_scan_buf( const char *text, bool _at_bol )
  p = Str_data(input_buf);
  at_bol = _at_bol;
  pe = Str_data(input_buf) + Str_len(input_buf);
- eof = pe;
+ eof_ = pe;
 	{
 	cs = lexer_start;
 	ts = 0;
@@ -8636,7 +8636,7 @@ _again:
 	if ( ++p != pe )
 		goto _resume;
 	_test_eof: {}
-	if ( p == eof )
+	if ( p == ( eof_) )
 	{
 	if ( _lexer_eof_trans[cs] > 0 ) {
 		_trans = _lexer_eof_trans[cs] - 1;

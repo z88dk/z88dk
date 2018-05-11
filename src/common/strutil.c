@@ -173,6 +173,18 @@ void argv_erase(argv_t * argv, size_t pos, size_t len)
 	argv_add_end_marker(argv);
 }
 
+static int argv_cmp(const void *a, const void *b)
+{
+	const char *_a = *(const char**)a;
+	const char *_b = *(const char**)b;
+	return strcmp(_a, _b);
+}
+
+void argv_sort(argv_t *argv)
+{
+	utarray_sort(argv, argv_cmp);
+}
+
 char *argv_get(argv_t *argv, size_t idx)
 {
 	char **elt = argv_eltptr(argv, idx);

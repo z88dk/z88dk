@@ -260,9 +260,9 @@ static void read_token(ParseCtx *ctx)
 	ctx->pe = (Sym *)utarray_back(ctx->tokens) + 1;
 
 	if (sym.tok == TK_END)
-		ctx->eof = ctx->pe;
+		ctx->eof_ = ctx->pe;
 	else
-		ctx->eof = NULL;
+		ctx->eof_ = NULL;
 
 	ctx->expr_start = expr_start_index >= 0 ? ((Sym *)utarray_front(ctx->tokens)) + expr_start_index : NULL;
 

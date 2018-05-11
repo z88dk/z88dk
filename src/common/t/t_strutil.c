@@ -396,6 +396,26 @@ void t_strutil_argv_new(void)
 	argv_free(argv);
 }
 
+void t_strutil_argv_sort(void)
+{
+	argv_t *argv = argv_new();
+	argv_push(argv, "22");
+	argv_push(argv, "2");
+	argv_push(argv, "25");
+	argv_push(argv, "11");
+	argv_push(argv, "1");
+
+	argv_sort(argv);
+	char **p = argv_front(argv);
+	TEST_ASSERT_EQUAL_STRING("1", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("11", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("2", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("22", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("25", *p); p++;
+	TEST_ASSERT_NULL(*p);
+	argv_free(argv);
+}
+
 void t_strutil_spool_add(void)
 {
 #define NUM_STRINGS 10

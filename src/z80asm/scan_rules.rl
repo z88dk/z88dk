@@ -74,6 +74,8 @@ ragel, to expand token definition from token_def.h.
 %%{
 machine lexer;
 
+variable eof eof_;
+
 /* check predicates - beginning of line */
 action at_bol 		{ at_bol }	
 
@@ -246,7 +248,7 @@ static void set_scan_buf( const char *text, bool _at_bol )
 	/* init state */
 	at_bol  = _at_bol;
 	pe		= Str_data(input_buf) + Str_len(input_buf);
-	eof		= pe;	/* tokens are not split acros input lines */
+	eof_	= pe;	/* tokens are not split acros input lines */
 	
 	%%write init;
 }

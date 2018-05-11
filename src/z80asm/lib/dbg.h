@@ -97,10 +97,6 @@ Based on Learn C the Hard Way book, by Zed. A. Shaw (http://c.learncodethehardwa
 #define xfputs(str,stream)	\
 		check_int_die(fputs((str), (stream)), == 0, "fputs failed")
 
-#define xremove(filename)	\
-		check_int_die(remove(filename), == 0, \
-					"remove %s failed", filename)
-
 #define xsystem(command)	\
 		check_int_die(system(command), == 0, \
 					"command %s failed", command)

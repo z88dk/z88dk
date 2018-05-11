@@ -76,10 +76,15 @@ extern void file_spew(const char *filename, const char *text);
 extern void file_spew_n(const char *filename, const char *text, size_t size);
 extern void file_spew_str(const char *filename, str_t *str);
 
-extern str_t *file_slurp(const char *filename);		// user must free str_t
+extern str_t *file_slurp(const char *filename);			// user must free str_t
 
-// create a directory and all parents above it
+// read directory (files and directories), user must free argv_t
+extern argv_t *path_find_all(const char *dirname, bool recursive);
+extern argv_t *path_find_glob(const char *pattern);
+
+// create/remve a directory and all parents above/children below it
 extern void path_mkdir(const char *path);
+extern void path_rmdir(const char *path);
 
 // check if file/directory exist
 extern bool file_exists(const char *filename);

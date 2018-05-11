@@ -16,7 +16,7 @@ use File::Path qw(make_path remove_tree);
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "gcc -I../../../ext/uthash/src -Ilib -I../../common -otest test.c srcfile.c class.c alloc.c str.c list.c dbg.c  ../../common/die.o ../../common/fileutil.o ../../common/strutil.o ../errors.o ../error_func.o ../options.o ../model.o ../hist.o ../codearea.o ../module.o strhash.o array.o ../sym.o ../symtab.o ../expr.o ../../common/objfile.o ../z80asm.o ../zobjfile.o ../macros.o ../listfile.o ../libfile.o ../../../ext/regex/regcomp.o ../../../ext/regex/regerror.o ../../../ext/regex/regexec.o ../../../ext/regex/regfree.o ../modlink.o ../z80pass.o ../scan.o ../../../ext/UNIXem/src/glob.o ../parse.o ../directives.o ../opcodes.o ";
+my $compile = "gcc -I../../../ext/uthash/src -Ilib -I../../common -otest test.c srcfile.c class.c alloc.c str.c list.c dbg.c  ../../common/die.o ../../common/fileutil.o ../../common/strutil.o ../errors.o ../error_func.o ../options.o ../model.o ../hist.o ../codearea.o ../module.o strhash.o array.o ../sym.o ../symtab.o ../expr.o ../../common/objfile.o ../z80asm.o ../zobjfile.o ../macros.o ../listfile.o ../libfile.o ../../../ext/regex/regcomp.o ../../../ext/regex/regerror.o ../../../ext/regex/regexec.o ../../../ext/regex/regfree.o ../modlink.o ../z80pass.o ../scan.o ../../../ext/UNIXem/src/glob.o ../../../ext/UNIXem/src/dirent.o ../parse.o ../directives.o ../opcodes.o ";
 
 #------------------------------------------------------------------------------
 # create directories and files

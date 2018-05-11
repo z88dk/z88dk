@@ -19,7 +19,7 @@ my $objs = "scan.o errors.o error_func.o model.o module.o codearea.o listfile.o 
 		   "options.o hist.o sym.o symtab.o expr.o ".
 		   "lib/str.o lib/strhash.o  ../common/fileutil.o ../common/strutil.o ../common/die.o ../common/objfile.o ../../ext/regex/regcomp.o ../../ext/regex/regerror.o ../../ext/regex/regexec.o ../../ext/regex/regfree.o ".
 		   "lib/srcfile.o macros.o lib/class.o ".
-		   "lib/list.o lib/array.o lib/dbg.o ../../ext/UNIXem/src/glob.o";
+		   "lib/list.o lib/array.o lib/dbg.o ../../ext/UNIXem/src/glob.o ../../ext/UNIXem/src/dirent.o";
 		   
 my $init = <<'END';
 #include "scan.h"

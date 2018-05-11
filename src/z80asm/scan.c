@@ -36,7 +36,7 @@ static List *input_stack;				/* stack of previous contexts */
 static bool	 at_bol;					/* true if at beginning of line */
 
 static int	 cs, act;					/* Ragel state variables */
-static char	*p, *pe, *eof, *ts, *te;	/* Ragel state variables */
+static char	*p, *pe, *eof_, *ts, *te;	/* Ragel state variables */
 
 /* static DEFINE_STR(sym_string, STR_SIZE); */
 
@@ -51,7 +51,7 @@ typedef struct scan_state_t
 	bool	 at_bol;
 	bool	 EOL;
 	int		 cs, act;
-	int		 p, pe, eof, ts, te;
+	int		 p, pe, eof_, ts, te;
 //	char	*sym_string;
 	bool	 expect_opcode;
 } ScanState;
@@ -121,7 +121,7 @@ void save_scan_state(void)
 	save.act = act;
 	save.p   = p   ? p   - Str_data(input_buf) : -1;
 	save.pe  = pe  ? pe  - Str_data(input_buf) : -1;
-	save.eof = eof ? eof - Str_data(input_buf) : -1;
+	save.eof_ = eof_ ? eof_ - Str_data(input_buf) : -1;
 	save.ts  = ts  ? ts  - Str_data(input_buf) : -1;
 	save.te  = te  ? te  - Str_data(input_buf) : -1;
 //	save.sym_string = m_strdup(sym_string->str);
@@ -145,7 +145,7 @@ void restore_scan_state(void)
 	act = save->act;
 	p   = save->p   >= 0 ? Str_data(input_buf) + save->p   : NULL;
 	pe  = save->pe  >= 0 ? Str_data(input_buf) + save->pe  : NULL;
-	eof = save->eof >= 0 ? Str_data(input_buf) + save->eof : NULL;
+	eof_ = save->eof_ >= 0 ? Str_data(input_buf) + save->eof_ : NULL;
 	ts  = save->ts  >= 0 ? Str_data(input_buf) + save->ts  : NULL;
 	te  = save->te  >= 0 ? Str_data(input_buf) + save->te  : NULL;
 //	Str_set(sym_string, save->sym_string);

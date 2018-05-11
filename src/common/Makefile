@@ -13,7 +13,7 @@ CC			?= gcc
 CFLAGS		+= -Wall -std=gnu11 -MMD \
 -I../../ext/uthash/src \
 -I../../ext/regex \
--I../../ext/optparse
+-I../../ext/optparse 
 
 SRCS 		:= \
 $(wildcard *.c) \
@@ -25,6 +25,14 @@ OBJS		:= $(SRCS:.c=.o)
 
 # -DUNITY_EXCLUDE_SETJMP_H for compilation in Linux
 CFLAGS		+= -DUNITY_EXCLUDE_SETJMP_H -I. -I../../ext/Unity/src
+
+# Use these flags both in Windows_NT and in a MinGW build in Unix
+ifeq ($(EXE),.exe)
+CFLAGS	+= -I../../ext/UNIXem/include
+OBJS	+= \
+../../ext/UNIXem/src/glob.o \
+../../ext/UNIXem/src/dirent.o
+endif
 
 DEPENDS		:= $(SRCS:.c=.d)
 

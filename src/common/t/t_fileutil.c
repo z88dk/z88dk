@@ -909,15 +909,10 @@ void t_fileutil_file_spew_slurp(void)
 
 void t_fileutil_path_mkdir(void)
 {
-#ifdef _WIN32
-	system("rmdir /s/q test_dir 2>nul");
-#else
-	system("rm -rf test_dir");
-#endif
-
+	path_rmdir("test_dir");
 	TEST_ASSERT(!dir_exists("test_dir"));
-	path_mkdir("test_dir/a/b");
 
+	path_mkdir("test_dir/a/b");
 	TEST_ASSERT(dir_exists("test_dir"));
 	TEST_ASSERT(dir_exists("test_dir/a"));
 	TEST_ASSERT(dir_exists("test_dir/a/b"));
@@ -927,22 +922,15 @@ void t_fileutil_path_mkdir(void)
 	file_spew("test_dir/a/b/test.txt", "hello");
 	TEST_ASSERT(file_exists("test_dir/a/b/test.txt"));
 
-#ifdef _WIN32
-	system("rmdir /s/q test_dir");
-#else
-	system("rm -rf test_dir");
-#endif
-
+	path_rmdir("test_dir");
 	TEST_ASSERT(!dir_exists("test_dir"));
 }
 
 void t_fileutil_path_search(void)
 {
-#ifdef _WIN32
-	system("rmdir /s/q test_dir.x1 test_dir.x2 test_dir.x3 2>nul");
-#else
-	system("rm -rf test_dir.x1 test_dir.x2 test_dir.x3 ");
-#endif
+	path_rmdir("test_dir.x1");
+	path_rmdir("test_dir.x2");
+	path_rmdir("test_dir.x3");
 
 	TEST_ASSERT(!dir_exists("test_dir.x1"));
 	TEST_ASSERT(!dir_exists("test_dir.x2"));
@@ -990,13 +978,174 @@ void t_fileutil_path_search(void)
 	TEST_ASSERT_EQUAL_STRING("test_dir.x3/test.f3", path_search("test.f3", dirs));
 	TEST_ASSERT_EQUAL_STRING("test.f4", path_search("test.f4", dirs));
 
-#ifdef _WIN32
-	system("rmdir /s/q test_dir.x1 test_dir.x2 test_dir.x3 2>nul");
-#else
-	system("rm -rf test_dir.x1 test_dir.x2 test_dir.x3 ");
-#endif
+	path_rmdir("test_dir.x1");
+	path_rmdir("test_dir.x2");
+	path_rmdir("test_dir.x3");
 
 	TEST_ASSERT(!dir_exists("test_dir.x1"));
 	TEST_ASSERT(!dir_exists("test_dir.x2"));
 	TEST_ASSERT(!dir_exists("test_dir.x3"));
+}
+
+void t_fileutil_path_find_all(void)
+{
+	path_rmdir("test_dir");
+	TEST_ASSERT(!dir_exists("test_dir"));
+
+	path_mkdir("test_dir/x1");
+	path_mkdir("test_dir/x2");
+	path_mkdir("test_dir/x3");
+	file_spew("test_dir/test.f0", "");
+	file_spew("test_dir/x1/test.f0", "");
+	file_spew("test_dir/x1/test.f1", "");
+	file_spew("test_dir/x2/test.f1", "");
+	file_spew("test_dir/x2/test.f2", "");
+	file_spew("test_dir/x3/test.f2", "");
+	file_spew("test_dir/x3/test.f3", "");
+	TEST_ASSERT(dir_exists("test_dir"));
+
+	argv_t *f = path_find_all("test_dir", false);
+	argv_sort(f);
+	char **p = argv_front(f);
+	TEST_ASSERT_EQUAL_STRING("test_dir/test.f0", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/x1", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/x2", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/x3", *p); p++;
+	TEST_ASSERT_NULL(*p);
+	argv_free(f);
+
+	f = path_find_all("test_dir", true);
+	argv_sort(f);
+	p = argv_front(f);
+	TEST_ASSERT_EQUAL_STRING("test_dir/test.f0", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/x1", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/x1/test.f0", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/x1/test.f1", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/x2", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/x2/test.f1", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/x2/test.f2", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/x3", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/x3/test.f2", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/x3/test.f3", *p); p++;
+	TEST_ASSERT_NULL(*p);
+	argv_free(f);
+
+	path_rmdir("test_dir");
+	TEST_ASSERT(!dir_exists("test_dir"));
+}
+
+void t_fileutil_path_find_glob(void)
+{
+	path_rmdir("test_dir");
+	TEST_ASSERT(!dir_exists("test_dir"));
+
+	int file = 0;
+	str_t *pad = str_new();
+	for (int d1 = 'a'; d1 <= 'b'; d1++) {
+		for (int d2 = '1'; d2 <= '2'; d2++) {
+			str_set_f(pad, "test_dir/%c/%c", d1, d2); path_mkdir(str_data(pad));
+			str_set_f(pad, "test_dir/%c/%c/d", d1, d2); path_mkdir(str_data(pad));
+
+			str_set_f(pad, "test_dir/%c/%c/f%d.c", d1, d2, ++file); file_spew(str_data(pad), "");
+			str_set_f(pad, "test_dir/%c/%c/f%d.c", d1, d2, ++file); file_spew(str_data(pad), "");
+			str_set_f(pad, "test_dir/%c/%c/f%d.c", d1, d2, ++file); file_spew(str_data(pad), "");
+		}
+	}
+	str_free(pad);
+
+	// no wild card - file exists
+	argv_t *f = path_find_glob("test_dir/a/1/f1.c");
+	argv_sort(f);
+	char **p = argv_front(f);
+	TEST_ASSERT_EQUAL_STRING("test_dir/a/1/f1.c", *p); p++;
+	TEST_ASSERT_NULL(*p);
+	argv_free(f);
+
+	// no wild card - file does not exist
+	f = path_find_glob("test_dir/a/1/g1.c");
+	argv_sort(f);
+	p = argv_front(f);
+	TEST_ASSERT_NULL(*p);
+	argv_free(f);
+
+	// wildcard in file component
+	f = path_find_glob("test_dir/a/1/f?.c");
+	argv_sort(f);
+	p = argv_front(f);
+	TEST_ASSERT_EQUAL_STRING("test_dir/a/1/f1.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/a/1/f2.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/a/1/f3.c", *p); p++;
+	TEST_ASSERT_NULL(*p);
+	argv_free(f);
+
+	f = path_find_glob("test_dir/a/1/*.c");
+	argv_sort(f);
+	p = argv_front(f);
+	TEST_ASSERT_EQUAL_STRING("test_dir/a/1/f1.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/a/1/f2.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/a/1/f3.c", *p); p++;
+	TEST_ASSERT_NULL(*p);
+	argv_free(f);
+
+	f = path_find_glob("test_dir/a/1/**");
+	argv_sort(f);
+	p = argv_front(f);
+	TEST_ASSERT_EQUAL_STRING("test_dir/a/1/f1.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/a/1/f2.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/a/1/f3.c", *p); p++;
+	TEST_ASSERT_NULL(*p);
+	argv_free(f);
+
+	// wildcard in path
+	f = path_find_glob("test_dir/*/*/f?.c");
+	argv_sort(f);
+	p = argv_front(f);
+	TEST_ASSERT_EQUAL_STRING("test_dir/a/1/f1.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/a/1/f2.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/a/1/f3.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/a/2/f4.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/a/2/f5.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/a/2/f6.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/b/1/f7.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/b/1/f8.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/b/1/f9.c", *p); p++;
+	TEST_ASSERT_NULL(*p);
+	argv_free(f);
+	
+	// recursive glob
+	f = path_find_glob("test_dir/**/f?.c");
+	argv_sort(f);
+	p = argv_front(f);
+	TEST_ASSERT_EQUAL_STRING("test_dir/a/1/f1.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/a/1/f2.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/a/1/f3.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/a/2/f4.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/a/2/f5.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/a/2/f6.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/b/1/f7.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/b/1/f8.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/b/1/f9.c", *p); p++;
+	TEST_ASSERT_NULL(*p);
+	argv_free(f);
+
+	f = path_find_glob("test_dir/**");
+	argv_sort(f);
+	p = argv_front(f);
+	TEST_ASSERT_EQUAL_STRING("test_dir/a/1/f1.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/a/1/f2.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/a/1/f3.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/a/2/f4.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/a/2/f5.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/a/2/f6.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/b/1/f7.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/b/1/f8.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/b/1/f9.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/b/2/f10.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/b/2/f11.c", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/b/2/f12.c", *p); p++;
+	TEST_ASSERT_NULL(*p);
+	argv_free(f);
+
+	path_rmdir("test_dir");
+	TEST_ASSERT(!dir_exists("test_dir"));
 }

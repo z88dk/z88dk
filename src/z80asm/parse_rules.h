@@ -39451,8 +39451,8 @@ static bool _parse_statement_1(ParseCtx *ctx, Str *name, Str *stmt_label)
 	{
 	}
  ctx->cs = get_start_state(ctx);
- ctx->p = ctx->pe = ctx->eof = ctx->expr_start = NULL;
- while ( ctx->eof == NULL || ctx->eof != ctx->pe )
+ ctx->p = ctx->pe = ctx->eof_ = ctx->expr_start = NULL;
+ while ( ctx->eof_ == NULL || ctx->eof_ != ctx->pe )
  {
   read_token(ctx);
 	{

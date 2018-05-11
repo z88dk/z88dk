@@ -6,13 +6,11 @@
 #include "fileutil.h"
 #include "die.h"
 #include "strutil.h"
+
 #include <assert.h>
 #include <ctype.h>
 #include <string.h>
-#include <sys/stat.h>
-#ifdef _WIN32
-#include <direct.h>
-#endif
+#include <dirent.h>
 
 //-----------------------------------------------------------------------------
 // pathname manipulation 
@@ -452,7 +450,7 @@ void xfseek(FILE *stream, long offset, int origin)
 }
 
 //-----------------------------------------------------------------------------
-// file system interface
+// file read/write
 //-----------------------------------------------------------------------------
 void file_spew(const char *filename, const char *text)
 {
@@ -488,25 +486,167 @@ str_t *file_slurp(const char *filename)
 	return text;		// user must free
 }
 
+//-----------------------------------------------------------------------------
+// directories
+//-----------------------------------------------------------------------------
+static void find_files_1(argv_t *dirs, const char *dirname, bool recursive)
+{
+	DIR *dir = opendir(dirname);
+	if (!dir) {
+		perror(dirname);
+		exit(EXIT_FAILURE);
+	}
+
+	struct dirent *entry;
+	while ((entry = readdir(dir)) != NULL) {
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+			continue;
+
+		const char *name = path_combine(dirname, entry->d_name);
+		if (dir_exists(name)) {
+			argv_push(dirs, name);
+			if (recursive)
+				find_files_1(dirs, name, recursive);
+		}
+		else if (file_exists(name)) {
+			argv_push(dirs, name);
+		}
+	}
+
+	if (closedir(dir)) {
+		perror(dirname);
+		exit(EXIT_FAILURE);
+	}
+}
+
+argv_t *path_find_all(const char *dirname, bool recursive)
+{
+	argv_t *dirs = argv_new();
+	find_files_1(dirs, dirname, recursive);
+	return dirs;
+}
+
+static void path_find_glob_1(argv_t *files, const char *pattern)
+{
+	str_t *pad = str_new();
+
+	pattern = path_canon(pattern);
+	const char *wc = strpbrk(pattern, "*?");
+	if (!wc) {
+		if (file_exists(pattern))
+			argv_push(files, pattern);		// no wildcard
+	}
+	else if (strncmp(wc, "**", 2) == 0) {	// star-star - recursively find all subdirs
+		char *child = strchr(wc, '/');		// point to slash after star-star
+
+		if (child) {
+			str_set_n(pad, pattern, wc - pattern);		// try without star-star
+			str_append(pad, child);
+			path_find_glob_1(files, str_data(pad));		// recurse
+		}
+
+		str_set_n(pad, pattern, wc - pattern + 1);			// copy up to first star
+		if (child)
+			str_append_n(pad, wc + 2, child - (wc + 2));	// and up to child
+		else
+			str_append(pad, wc + 2);
+		
+		glob_t glob_files;
+		int ret = xglob(str_data(pad), GLOB_NOESCAPE, NULL, &glob_files);
+		if (ret == GLOB_NOMATCH) {				// no match - ignore
+			;
+		}
+		else if (ret == 0) {
+			for (int i = 0; i < glob_files.gl_pathc; i++) {
+				char *found = glob_files.gl_pathv[i];
+				if (dir_exists(found)) {
+					str_set_f(pad, "%s/**", found);
+					if (child)
+						str_append(pad, child);
+					path_find_glob_1(files, str_data(pad));		// recurse
+				}
+				else {
+					str_set(pad, found);
+					if (child)
+						str_append(pad, child);
+					path_find_glob_1(files, str_data(pad));		// recurse
+				}
+			}
+		}
+		else {
+			assert(0);
+		}
+		globfree(&glob_files);
+
+	}
+	else {									// find one level of subdirs
+		char *child = strchr(wc, '/');		// point to slash wild card
+		if (child)
+			str_set_n(pad, pattern, child - pattern);
+		else
+			str_set(pad, pattern);
+
+		glob_t glob_files;
+		int ret = xglob(str_data(pad), GLOB_NOESCAPE, NULL, &glob_files);
+		if (ret == GLOB_NOMATCH) {				// no match - ignore
+			;
+		}
+		else if (ret == 0) {
+			for (int i = 0; i < glob_files.gl_pathc; i++) {
+				char *found = glob_files.gl_pathv[i];
+				str_set(pad, found);
+				if (child)
+					str_append(pad, child);
+				path_find_glob_1(files, str_data(pad));		// recurse
+			}
+		}
+		else {
+			assert(0);
+		}
+		globfree(&glob_files);
+	}
+
+	str_free(pad);
+}
+
+argv_t *path_find_glob(const char *pattern)
+{
+	argv_t *files = argv_new();
+	path_find_glob_1(files, pattern);
+	return files;
+}
+
 void path_mkdir(const char *path)
 {
 	path = path_canon(path);
 	if (!dir_exists(path)) {
 		const char *parent = path_dir(path);
 		path_mkdir(parent);
-
-#ifdef _WIN32
-		int rv = _mkdir(path_os(path));
-#else
-		int rv = mkdir(path_os(path), 0777);
-#endif
-		if (rv != 0) {
-			perror(path);
-			exit(1);
-		}
+		xmkdir(path);
 	}
 }
 
+void path_rmdir(const char *path)
+{
+	path = path_canon(path);
+	if (dir_exists(path)) {
+		// delete all children
+		argv_t *files = path_find_all(path, false);
+		for (char **p = argv_front(files); *p; p++) {
+			if (file_exists(*p))
+				xremove(*p);
+			else if (dir_exists(*p))
+				path_rmdir(*p);
+		}
+		argv_free(files);
+
+		xrmdir(path);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// file checks
+//-----------------------------------------------------------------------------
 bool file_exists(const char *filename)
 {
 	struct stat sb;
@@ -534,6 +674,9 @@ long file_size(const char *filename)
 		return -1;
 }
 
+//-----------------------------------------------------------------------------
+// file search
+//-----------------------------------------------------------------------------
 const char *path_search(const char *filename, argv_t *dir_list)
 {
 	// if no directory list or file exists, return filename

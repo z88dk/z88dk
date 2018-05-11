@@ -30,3 +30,25 @@ void *check_alloc(void *p, const char *file, int line_nr)
 		die("memory allocation error at %s:%d\n", file, line_nr);
 	return p;
 }
+
+int check_retval(int retval, const char *file, const char *source_file, int line_nr)
+{
+	if (retval) {
+		perror(file);
+		exit(EXIT_FAILURE);
+	}
+	return retval;
+}
+
+int xglob(const char * pattern, int flags, 
+	int(*errfunc)(const char *epath, int eerrno), glob_t * pglob)
+{
+	int ret = glob(pattern, flags, errfunc, pglob);
+	if (ret != GLOB_NOMATCH && ret != 0)
+		die("glob pattern '%s': %s\n",
+			pattern,
+			(ret == GLOB_ABORTED ? "filesystem problem" :
+				ret == GLOB_NOSPACE ? "no dynamic memory" :
+				"unknown problem"));
+	return ret;
+}

@@ -391,7 +391,7 @@ static void expand_glob(const char *filename, argv_t *files, bool do_search_path
 
 		if (strchr(pattern, '*') == NULL && strchr(pattern, '?') == NULL) {
 			// optimize if no pattern chars
-			const char *found = search_source(pattern);
+			const char *found = do_search_path ? search_source(pattern) : pattern;
 			argv_push(files, found);
 		}
 		else {
