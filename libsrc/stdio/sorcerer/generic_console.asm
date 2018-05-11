@@ -41,7 +41,7 @@ generic_console_printc:
 	push	de
 	call	xypos
 	pop	de
-	rl	e
+	rr	e
 	jr	c,is_raw	;Just pass it through
 	ld	d,a		;save character
 	ld	a,(__exidy_custom_font)

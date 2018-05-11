@@ -51,7 +51,7 @@ generic_console_printc:
 	push	de		;save raw
 	call	xypos
 	pop	de
-	rl	e
+	rr	e
 	call	nc,asctozx81_entry_reg
 	ld	(hl),a
 	ret

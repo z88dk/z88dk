@@ -24,6 +24,7 @@
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
+	PUBLIC	EG2000_ENABLED
 
 ;--------
 ; Set an origin for the application (-zorg=) default to $5200
@@ -31,8 +32,10 @@
 
 IF      !DEFINED_CRT_ORG_CODE
 	IF (startup=2)
+		defc	EG2000_ENABLED = 1
                 defc    CRT_ORG_CODE  = 22500
 	ELSE
+		defc	EG2000_ENABLED = 0
                 defc    CRT_ORG_CODE  = $5200
 	ENDIF
 ENDIF
@@ -40,16 +43,17 @@ ENDIF
 IF (startup=2)
         defc    CONSOLE_ROWS = 24
         defc    CONSOLE_COLUMNS = 40
+	defc	__CPU_CLOCK = 2216750
 ELSE
         defc    CONSOLE_ROWS = 16
         defc    CONSOLE_COLUMNS = 64
+	defc	__CPU_CLOCK = 1774000
 ENDIF
 
 
         defc    TAR__fputc_cons_generic = 1
 	defc	TAR__register_sp = -1
         defc    TAR__clib_exit_stack_size = 32
-	defc	__CPU_CLOCK = 1774000
 	INCLUDE	"crt/classic/crt_rules.inc"
 
 	org     CRT_ORG_CODE

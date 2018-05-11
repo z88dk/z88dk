@@ -39,7 +39,7 @@ generic_console_printc:
 	push	de
 	call	xypos
 	pop	de
-	rl	e
+	rr	e
 	jr	c,is_raw
 	; In non-raw mode characters > 128 are udgs
 	res	7,a
