@@ -10,6 +10,7 @@
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
 		PUBLIC		__eg2000_custom_font
+		PUBLIC		__eg2000_mode
 
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
@@ -60,19 +61,25 @@ generic_console_printc:
 	push	de
 	call	xypos
 	pop	de
-	rr	e
-	jr	c,is_raw
 	ld	d,a
-	ld	a,(__eg2000_custom_font)
-	and	EG2000_ENABLED
-	ld	a,d
-	jr	z,is_raw
-	set	7,a	;custom font define, use chars 160-255 for font, 128-159=udgs
-is_raw:
-	ld	(hl),a
 	ld	a,EG2000_ENABLED
 	and	a
-	ret	z
+	jr	nz,eg2000_printc
+	ld	(hl),d
+	ret
+
+eg2000_printc:
+	ld	a,24		;Use rom generator for everything
+	rr	e
+	jr	c,is_raw
+        ld      a,(__eg2000_custom_font)
+        and     EG2000_ENABLED
+	ld	a,(__eg2000_mode)
+	jr	z,is_raw
+	set	7,d	;custom font define, use chars 160-255 for font, 128-159=udgs
+is_raw:
+	out	(0xff),a
+	ld	(hl),d
 	ld	a,h
 	add	EG2000_COLOUR_OFFSET
 	ld	h,a
@@ -147,20 +154,20 @@ scrollup_return:
 	pop	de
 	ret
 
+	SECTION		bss_clib
 
-	SECTION		data_clib
-
+__eg2000_mode:	defb	0
 __eg2000_attr:	defb	0
 __eg2000_custom_font:	defb	0
 
 	SECTION		code_crt_init
 
+	ld	a,EG2000_ENABLED
+	and	a
+	jr	z,no_set_font
 	ld	hl,CRT_FONT
 	ld	a,h
 	or	l
-	jr	z,no_set_font
-	ld	a,EG2000_ENABLED
-	and	a
 	jr	z,no_set_font
 	ld	(__eg2000_custom_font),a
 	ld	de,CHAR_TABLE+256
