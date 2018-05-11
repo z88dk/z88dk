@@ -14,7 +14,7 @@ BEGIN {
 	use lib '.'; 
 	use t::TestZ80asm;
 };
-use Capture::Tiny 'capture';
+use Capture::Tiny::Extended 'capture';
 
 #------------------------------------------------------------------------------
 # Test expressions across modules
