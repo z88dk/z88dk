@@ -107,14 +107,16 @@ generic_console_printc:
 	bit	7,d
 	jr	z, place_it
 	res	7,d
-	set	7,e
+	set	7,c
 	jr	place_it
 
 not_raw:
 	; If d > 128 then we need graphics + extended
 	bit	7,d
 	jr	z,not_udg
-	res	7,d
+	ld	a,d
+	add	32
+	ld	d,a
 	set	7,c
 	jr	place_it
 not_udg:
@@ -156,11 +158,16 @@ generic_console_printc_1:
 ;        c = failure
 generic_console_vpeek:
         call    xypos
-	ld	a,(hl)
+	ld	d,(hl)
+	ld	a,d
 	res	7,a		;never high
 	inc	hl
-	bit	7,(hl)
-	jr	z,vpeek_done
+	bit	7,(hl)	
+	jr	z,vpeek_done	;not graphics
+	bit	7,d		;is it a udg
+	jr	z,not_vpeek_udg
+	sub	32		;UDG offset
+not_vpeek_udg:
 	set	7,a
 vpeek_done:
 	and	a

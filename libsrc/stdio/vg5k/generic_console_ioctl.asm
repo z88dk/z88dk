@@ -36,8 +36,8 @@ success:
 check_set_udg:
 	cp	IOCTL_GENCON_SET_UDGS
 	jr	nz,failure
-	ld	b,128
-	ld	c,128
+	ld	b,128 - 32
+	ld	c,128 + 32
 	jr	set_font
 failure:
 	scf
