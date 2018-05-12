@@ -35,9 +35,9 @@ generic_console_set_inverse:
 
 generic_console_cls:
 	ld	hl, (base_graphics)
-	ld	d,l
+	ld	d,h
 	ld	e,l
-	inc de
+	inc 	de
 	ld	bc,1023
 	ld	(hl),32
 	ldir
