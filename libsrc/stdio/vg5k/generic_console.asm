@@ -6,7 +6,6 @@
 		PUBLIC		generic_console_vpeek
 		PUBLIC		generic_console_scrollup
 		PUBLIC		generic_console_printc
-		PUBLIC		generic_console_ioctl
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
@@ -16,8 +15,6 @@
 
 		defc		DISPLAY = 0x4000
 
-generic_console_ioctl:
-	scf
 generic_console_set_inverse:
 	ret
 
@@ -64,26 +61,73 @@ cls1:	ld	(hl),32
 	call	refresh_screen
 	ret
 
+
+;
+;First byte of the pair has this layout:
+;
+;+---------+-------------+---------------------------+
+;| Bit     | 7           | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
+;+---------+-------------+---------------------------+
+;| Content | N (0)/E (1) |     character number      |
+;+---------+-------------+---------------------------+
+;
+;The second byte of the pair has this layout:
+;
+;+---------+--------+---------+----------+-----------+-------+-----+------+-----+
+;| Bit     | 7      |    6    |     5    |     4     |   3   |  2  |   1  |  0  |
+;+---------+--------+---------+----------+-----------+-------+-----+------+-----+
+;| Content | TX (0) | Reverse | Width x2 | Height x2 | Blink |       Color      |
+;+---------+--------+---------+----------+-----------+-------+------------------+
+;| Content | GR (1) |         Background Color       | Blink | Foreground Color |
+;+---------+--------+--------------------------------+-------+------------------+
+;
+;With N/E (Normal/Extended) and TX/GR, the selection of the character set is made.
+;This corresponds to the various graphic selections in BASIC.
+;Normal TX is TX, Extended TX is ET, Normal GR is GR, Extended GR is EG.
+;Extended mode allows character redefinition.
+;Normal text is ASCII, normal graphics is the Semi-Graphic character set.
+
+; Entry:
 ; c = x
 ; b = y
 ; a = character to print
 ; e = raw
 generic_console_printc:
+	ld	d,a	
 	push	bc	;save coordinates
 	push	de
 	call	xypos
-	ld	d,a			;Save character
-	ld	a,(vg5k_attr)
+	pop	de
+	ld	a,(vg5k_attr)	; d = character, c = attribute
+	ld	c,a
+	bit	0,e
+	jr	z,not_raw
+
+; Raw mode, if > 128 then graphics
+	bit	7,d
+	jr	z, place_it
+	res	7,d
+	set	7,e
+	jr	place_it
+
+not_raw:
+	; If d > 128 then we need graphics + extended
+	bit	7,d
+	jr	z,not_udg
+	res	7,d
+	set	7,c
+	jr	place_it
+not_udg:
+	ld	a,(__vg5k_custom_font)
+	and	a
+	jr	z,place_it
+	set	7,d		;extended character set
+place_it:
 	ld	(hl),d			;place character
 	inc	hl
-	pop	bc			;get raw mode back into e
-	rr	c
-	jr	nc,is_gfx
-	or	128
-is_gfx:
-	ld	(hl),a
+	ld	(hl),c
+	ld	e,c
 	pop	hl			;get coordinates back
-	ld	e,a			;attribute
 	ld	a,h
 	and	a
 	jr	z,zrow
@@ -157,7 +201,7 @@ refresh_screen1:
 	ex	af,af
 	ld	d,a		;character
 	call	$0092
-	push	de
+	pop	de
 	pop	hl
 	inc	l
 	ld	a,l
@@ -167,7 +211,7 @@ refresh_screen1:
 	ld	a,h
 	and	a
 	jr	nz,increment_row
-	ld	a,7
+	ld	h,7
 increment_row:
 	inc	h
 same_line:
@@ -178,8 +222,34 @@ same_line:
 	jr	nz,refresh_screen1
 	ret
 
-	
+	SECTION		bss_clib
+
+__vg5k_custom_font:	defb	0
 
 	SECTION		data_clib
 
 vg5k_attr:	defb	7	;White on black
+
+	SECTION		code_crt_init
+	EXTERN	set_character8
+	EXTERN	CRT_FONT
+
+	ld	hl,CRT_FONT
+	ld	a,h
+	or	l
+	jr	z,no_set_font
+	ld	a,1
+	ld	(__vg5k_custom_font),a
+        ld      b,96
+        ld      c,32
+set_font:
+        push    bc
+        push    hl
+        call    set_character8
+        pop     hl
+	ld	bc,8
+	add	hl,bc
+        pop     bc
+        inc     c
+        djnz    set_font
+no_set_font:
