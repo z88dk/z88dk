@@ -157,6 +157,12 @@ generic_console_printc_1:
 generic_console_vpeek:
         call    xypos
 	ld	a,(hl)
+	res	7,a		;never high
+	inc	hl
+	bit	7,(hl)
+	jr	z,vpeek_done
+	set	7,a
+vpeek_done:
 	and	a
 	ret
 
