@@ -121,7 +121,7 @@ nextflag0:
 	cp	'*'
 	jr	nz,width
 	set	3,(ix-3)
-	inc	de
+	inc	hl
 	jr	flagloop
 width:
 	ld	a,(hl)
