@@ -2413,10 +2413,14 @@ static void configure_compiler()
 		c_compiler = c_sdcc_exe;
 		c_cpp_exe = c_sdcc_preproc_exe;
 		compiler_style = filter_outspecified_flag;
+                BuildOptions(&asmargs, "-D__SDCC");
+                BuildOptions(&linkargs, "-D__SDCC");
 	}
 	else {
 		preprocarg = " -DSCCZ80 -DSMALL_C -D__SCCZ80";
 		BuildOptions(&cpparg, preprocarg);
+                BuildOptions(&asmargs, "-D__SCCZ80");
+                BuildOptions(&linkargs, "-D__SCCZ80");
 		/* Indicate to sccz80 what assembler we want */
 		snprintf(buf, sizeof(buf), "-ext=opt %s", select_cpu(CPU_MAP_TOOL_SCCZ80));
 
