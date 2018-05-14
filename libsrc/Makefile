@@ -588,8 +588,9 @@ mz_clib.lib:
 	@echo '--- Building Sharp MZ Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
+	$(MAKE) -C psg deps
 	$(call buildgeneric,mz)
-	TARGET=mz TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/mz_clib @$(LISTFILE_DIRECTORY)/mz.lst
+	TARGET=mz TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmz -x$(OUTPUT_DIRECTORY)/mz_clib @$(LISTFILE_DIRECTORY)/mz.lst
 
 # ABC80 Library - Stefano
 abc80_clib.lib:
@@ -742,6 +743,7 @@ mtx_clib.lib:
 	@echo '--- Building Memotech MTX Library ---'
 	@echo ''
 	$(MAKE) msxdeps
+	$(MAKE) -C psg deps
 	$(call buildgeneric,mtx)
 	$(MAKE) -C games TARGET=mtx
 	$(MAKE) -C msx TARGET=test
@@ -793,6 +795,7 @@ m5_clib.lib:
 	@echo '--- Building SORD M5 Library ---'
 	@echo ''
 	$(MAKE) msxdeps
+	$(MAKE) -C psg deps
 	$(call buildgeneric,m5)
 	$(MAKE) -C msx TARGET=test
 	TARGET=m5 TYPE=z80 $(LIBLINKER) -DFORm5 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/m5_clib @$(LISTFILE_DIRECTORY)/m5.lst
@@ -1018,6 +1021,7 @@ sms_clib.lib:
 	@echo '--- Building Sega Master System Library ---'
 	@echo ''
 	$(MAKE) msxdeps
+	$(MAKE) -C psg deps
 	$(call buildgeneric,sms)
 	$(MAKE) -C msx TARGET=test
 	TARGET=sms TYPE=z80 $(LIBLINKER) -DFORsms -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sms_clib @$(LISTFILE_DIRECTORY)/sms.lst
@@ -1028,6 +1032,7 @@ sc3000_clib.lib:
 	@echo '--- Building SC-3000 System Library ---'
 	@echo ''
 	$(MAKE) msxdeps
+	$(MAKE) -C psg deps
 	$(call buildgeneric,sc3000)
 	$(MAKE) -C msx TARGET=test
 	TARGET=sc3000 TYPE=z80 $(LIBLINKER) -DFORsc3000 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sc3000_clib @$(LISTFILE_DIRECTORY)/sc3000.lst

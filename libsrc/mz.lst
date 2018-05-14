@@ -26,4 +26,9 @@ graphics/liner
 graphics/stencil_render2
 graphics/swapgfxbk_foo
 games/joystick
+psg/sn76489/psg_tone
+psg/sn76489/psg_volume
+psg/sn76489/psg_init.asm
+psg/sn76489/set_psg.asm
+psg/sn76489/set_psg_callee.asm
 @z80.lst

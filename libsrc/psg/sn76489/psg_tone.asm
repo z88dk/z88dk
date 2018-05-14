@@ -1,16 +1,25 @@
-	SECTION code_clib	
+	SECTION code_clib
+	
 	PUBLIC	set_sound_freq
 	PUBLIC	_set_sound_freq
+	PUBLIC	psg_tone
+	PUBLIC	_psg_tone
 	
-	INCLUDE "sms/sms.hdr"
+;	$Id: psg_tone.asm $
 
 ;==============================================================
 ; void set_sound_freq(int channel, int freq)
 ;==============================================================
 ; Sets the sound frequency for a given channel
 ;==============================================================
+
+	INCLUDE	"psg/sn76489.inc"
+
 .set_sound_freq
 ._set_sound_freq
+.psg_tone
+._psg_tone
+
 	ld	hl, 2
 	add	hl, sp
 	ld	e, (hl)		; DE = Frequency
@@ -31,7 +40,7 @@
 	
 	or	a, $80
 	or	a, b		; Prepares the first byte of the command
-	out	($7F), a	; Sends it
+	out	(psgport), a	; Sends it
 	
 	ld	a, e
 	srl	a
@@ -49,6 +58,6 @@
 	and	a, $30		; Bits 8, 9 of the frequency go to bytes 4,5 of the register
 	
 	or	a, b		; Puts them together
-	out	($7F), a	; Sends the second byte of the command
+	out	(psgport), a	; Sends the second byte of the command
 
 	ret
