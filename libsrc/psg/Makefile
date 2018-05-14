@@ -35,9 +35,6 @@ all:    dirs $(addprefix obj/z80/, $(AOBJECTS)) $(addprefix obj/ixiy/, $(AOBJECT
 obj/c128/%.o: c128/%.c
 	$(ZCC) +c128 -mz80 $(CFLAGS) -o $@  $^
 
-deps:
-	$(RM) -f sn76498/*.o
-
 dirs:
 	@mkdir -p obj/z80 obj/ixiy obj/c128
 
