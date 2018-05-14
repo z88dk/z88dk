@@ -25,6 +25,7 @@ my $init = <<'END';
 #include "scan.h"
 #include "symbol.h"
 #include "macros.h"
+#include "strutil.h"
 #include <assert.h>
 
 char *GetLibfile( char *filename ) {return NULL;}
@@ -143,11 +144,11 @@ char *GetLibfile( char *filename ) {return NULL;}
 
 #define T_OPCODE(opcode, _cpu)	\
 		strcpy(opcode_lcase, #opcode); \
-		stolower(opcode_lcase); \
+		cstr_tolower(opcode_lcase); \
 		strcpy(string, #opcode " " #opcode); \
-		stolower(string); \
+		cstr_tolower(string); \
 		T_OPCODE2(opcode, opcode_lcase, _cpu); \
-		stoupper(string); \
+		cstr_toupper(string); \
 		T_OPCODE2(opcode, #opcode, _cpu);
 
 END

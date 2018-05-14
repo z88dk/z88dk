@@ -303,7 +303,7 @@ static const char *search_source(char *filename)
 
 static void process_file(char *filename )
 {
-	strip(filename);
+	cstr_strip(filename);
 	switch (filename[0])
 	{
 	case '-':		/* Illegal source file name */
@@ -316,7 +316,7 @@ static void process_file(char *filename )
 
 	case '@':		/* file list */
 		filename++;						/* point to after '@' */
-		strip(filename);
+		cstr_strip(filename);
 		filename = (char *)expand_environment_variables(filename);
 		expand_list_glob(filename);
 		break;

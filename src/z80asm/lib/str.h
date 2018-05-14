@@ -26,30 +26,6 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #define MAXLINE			MAX( 1024, FILENAME_MAX )
 
 /*-----------------------------------------------------------------------------
-*   Utilities working on char *
-*----------------------------------------------------------------------------*/
-
-/* convert string to upper/lower case - modify in place,
-   return address of string */
-extern char *stoupper(char *str);
-extern char *stolower(char *str);
-
-/* case insensitive compare */
-extern int stricompare(const char *s1, const char *s2);
-extern int strnicompare(const char *s1, const char *s2, size_t n);
-
-/* remove end newline and whitespace - modify in place, return address of string */
-extern char *chomp(char *str);
-
-/* remove begin and end whitespace - modify in place, return address of string */
-extern char *strip(char *str);
-
-/* convert C-escape sequences - modify in place, return final length
-   to allow strings with '\0' characters
-   Accepts \b, \f, \n, \r, \t, \v, \xhh, \? \ooo */
-extern int compress_escapes(char *str);
-
-/*-----------------------------------------------------------------------------
 *   Str structure
 *----------------------------------------------------------------------------*/
 typedef struct _Str {
@@ -147,13 +123,6 @@ extern void Str_append_vsprintf(Str *str, const char *format, va_list argptr);
 /*-----------------------------------------------------------------------------
 *   Modify strings
 *----------------------------------------------------------------------------*/
-
-/* tolower, toupper, chomp, strip, compress_escapes */
-extern void Str_toupper(Str *str);
-extern void Str_tolower(Str *str);
-extern void Str_chomp(Str *str);
-extern void Str_strip(Str *str);
-extern void Str_compress_escapes(Str *str);
 
 /* get one line from input, convert end-of-line sequences,
 *  return string including one LF character

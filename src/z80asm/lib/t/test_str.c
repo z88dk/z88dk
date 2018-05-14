@@ -43,117 +43,6 @@ void dump_str ( Str *str, char *name )
 	warn("\"\n\n");
 }
 
-#define T_CONVERT_STR(func, str_func, in, out) \
-			strcpy(s, in); \
-			p = func(s); \
-			mu_assert( p == s, #func " output != input" ); \
-			mu_assert_str( s, ==, out ); \
-			Str_set(str, in); \
-			str_func(str); \
-			mu_assert_str( Str_data(str), ==, out )
-
-int test_convert_str(void)
-{
-	STR_DEFINE(str, STR_SIZE);
-	char s[STR_SIZE], *p;
-
-	/* toupper */
-	T_CONVERT_STR(stoupper, Str_toupper, "abc1", "ABC1");
-	T_CONVERT_STR(stoupper, Str_toupper, "Abc1", "ABC1");
-	T_CONVERT_STR(stoupper, Str_toupper, "ABC1", "ABC1");
-	
-	/* stolower */
-	T_CONVERT_STR(stolower, Str_tolower, "abc1", "abc1");
-	T_CONVERT_STR(stolower, Str_tolower, "Abc1", "abc1");
-	T_CONVERT_STR(stolower, Str_tolower, "ABC1", "abc1");
-	
-	/* chomp */
-	T_CONVERT_STR(chomp, Str_chomp, "", "");
-	T_CONVERT_STR(chomp, Str_chomp, "\r\n \t\f \r\n \t\f\v", "");
-	T_CONVERT_STR(chomp, Str_chomp, "\r\n \t\fxxxxxxxx\r\n \t\f\v", "\r\n \t\fxxxxxxxx");
-
-	/* strip */
-	T_CONVERT_STR(strip, Str_strip, "", "");
-	T_CONVERT_STR(strip, Str_strip, "\r\n \t\f \r\n \t\f\v", "");
-	T_CONVERT_STR(strip, Str_strip, "\r\n \t\fxxxxxxxx\r\n \t\f\v", "xxxxxxxx");
-
-	/* stricompare */
-	mu_assert_int( stricompare( "",  ""   ), ==, 0);
-	mu_assert_int( stricompare( "a", ""   ), > , 0);
-	mu_assert_int( stricompare( "",  "a"  ), < , 0);
-	mu_assert_int( stricompare( "a", "a"  ), ==, 0);
-	mu_assert_int( stricompare( "a", "A"  ), ==, 0);
-	mu_assert_int( stricompare( "A", "a"  ), ==, 0);
-	mu_assert_int( stricompare( "ab","a"  ), > , 0);
-	mu_assert_int( stricompare( "a", "ab" ), < , 0);
-	mu_assert_int( stricompare( "ab","ab" ), ==, 0);
-	
-	return MU_PASS;
-}
-
-#define T_COMPRESS( in, out_len, out_str ) \
-			strcpy(s, in); \
-			len = compress_escapes(s); \
-			mu_assert( len == out_len, "len=%d, out_len=%d", len, out_len ); \
-			mu_assert( memcmp(s, out_str, out_len) == 0, "compress_escapes failed" ); \
-			Str_set(str, in); \
-			Str_compress_escapes(str); \
-			mu_assert(Str_len(str) == out_len, "Str_len=%d, out_len=%d", len, out_len); \
-			mu_assert( memcmp(Str_data(str), out_str, out_len) == 0, "Str_compress_escapes failed" )
-
-int test_compress_escapes(void)
-{
-	STR_DEFINE(str, STR_SIZE);
-	char s[STR_SIZE];
-	int  len, i;
-
-	/* trailing backslash ignored */
-	T_COMPRESS( "\\", 0, "" );
-		
-	/* escape any */
-	T_COMPRESS( "\\" "?" "\\" "\"" "\\" "'",
-				3, "?\"'" );
-		
-	/* escape chars */
-	T_COMPRESS( "0" "\\a" 
-				"1" "\\b" 
-				"2" "\\e" 
-				"3" "\\f" 
-				"4" "\\n" 
-				"5" "\\r" 
-				"6" "\\t" 
-				"7" "\\v" 
-				"8",
-				17,
-				"0" "\a" 
-				"1" "\b" 
-				"2" "\x1B" 
-				"3" "\f" 
-				"4" "\n" 
-				"5" "\r" 
-				"6" "\t" 
-				"7" "\v" 
-				"8" );
-		
-	/* octal and hexadecimal, including '\0' */
-	for ( i = 0; i < 256; i++ )
-	{
-		sprintf(s, "\\%o \\x%x", i, i );
-		len = compress_escapes(s);		
-		mu_assert( len  == 3,		"len=%d", len );
-		mu_assert( s[0] == (char)i,	"s[0]=%d", s[0] );
-		mu_assert( s[1] == ' ',		"s[1]=%d", s[1] );
-		mu_assert( s[2] == (char)i,	"s[2]=%d", s[2] );
-		mu_assert( s[3] == '\0',	"s[3]=%d", s[3] );
-	}
-		
-	/* octal and hexadecimal with longer digit string */
-	T_COMPRESS( "\\3770\\xff0", 
-				4,
-				"\xFF" "0" "\xFF" "0");
-
-	return MU_PASS;
-}
 
 STR_DECLARE( s1 );
 STR_DEFINE( s1, STR_SIZE );
@@ -340,7 +229,6 @@ int test_getline(void)
 int main(int argc, char *argv[])
 {
 	mu_init(argc, argv);
-    mu_run_test(MU_PASS, test_convert_str);
     mu_run_test(MU_PASS, test_compress_escapes);
 	mu_run_test(MU_PASS, test_str);
 	mu_run_test(MU_PASS, test_getline);

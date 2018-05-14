@@ -247,7 +247,7 @@ static bool collect_ident(char **in, char *ident)
 	char *p = *in;
 
 	size_t idlen = strlen(ident);
-	if (strnicompare(p, ident, idlen) == 0 && !Is_ident_cont(p[idlen])) {
+	if (cstr_case_ncmp(p, ident, idlen) == 0 && !Is_ident_cont(p[idlen])) {
 		*in = p + idlen;
 		return true;
 	}
@@ -271,7 +271,7 @@ static bool collect_equ(char **in, UT_string *name)
 		}
 	}
 	else if (collect_name(&p, name)) {
-		if (stricompare(str_data(name), "defgroup") == 0) {
+		if (cstr_case_cmp(str_data(name), "defgroup") == 0) {
 			in_defgroup = true;
 			while (*p != '\0' && *p != ';') {
 				if (*p == '}') {

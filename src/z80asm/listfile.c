@@ -168,8 +168,9 @@ void ListFile_start_line( ListFile *self, int address,
 
         /* normalize the line end (BUG_0031) */
         Str_set( self->line, line );
-        Str_chomp( self->line );
-        Str_append_char( self->line, '\n' );
+		cstr_chomp(Str_data(self->line));
+		Str_sync_len(self->line);
+		Str_append_char(self->line, '\n');
     }
 }
 

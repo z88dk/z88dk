@@ -609,7 +609,8 @@ static void _write_symbol_file(const char *filename, Module *module, bool(*cond)
 				Str_append_sprintf(line, "%s:%d", sym->filename, sym->line_nr);
 			}
 		}
-		Str_strip(line);
+		cstr_strip(Str_data(line));
+		Str_sync_len(line);
 		fprintf(file, "%s\n", Str_data(line));
 	}
 
