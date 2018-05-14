@@ -26,11 +26,22 @@ void test_scanf_d()
     }
 }
 
+void test_scanf_ws() 
+{
+	int      i, j, r;
+
+        r = sscanf("12 \t\n32","%d %d",&i,&j);
+        Assert(r == 2, "Expected to parse two values");
+        Assert(i == 12, "Failed ot parse value 1");
+        Assert(j == 32, "Failed ot parse value 2");
+}
+
 int test_scanf()
 {
     suite_setup("Scanf Tests");
 
     suite_add_test(test_scanf_d);
+    suite_add_test(test_scanf_ws);
 
     return suite_run();
 }

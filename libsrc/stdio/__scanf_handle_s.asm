@@ -28,7 +28,7 @@ scanf_fmt_s_loop:
         call    __scanf_getchar
         jr      c,scanf_fmt_s_done
         call    asm_isspace
-        jr      z,scanf_fmt_s_success
+        jr      nc,scanf_fmt_s_success
 scanf_fmt_s_join:
         bit     3,(ix-3)        ;we're not setting
         jr      nz,scanf_fmt_s_suppress
