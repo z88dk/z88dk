@@ -7,11 +7,7 @@
 #------------------------------------------------------------------------------
 PROJ		:= z80asm
 
-ifeq ($(OS),Windows_NT)
-  EXE 		:= .exe
-else
-  EXE 		:= $(EXESUFFIX)
-endif
+include ../Make.common
 
 CC 			?= gcc
 INSTALL 	?= install
@@ -21,7 +17,8 @@ CROSS		?= 0
 # Object files
 #------------------------------------------------------------------------------
 SRCS		:= $(filter-out test.c,$(wildcard *.c lib/*.c ../common/*.c ../../ext/regex/reg*.c))
-OBJS 		:= $(SRCS:.c=.o)
+OBJS 		:= $(SRCS:.c=.o) \
+			$(UNIXem_OBJS)
 DEPENDS		:= $(SRCS:.c=.d)
 TEST_SRC_MAIN:= $(wildcard t/test_*.c)
 TEST_SRC_LIB:=t/testlib.c
@@ -37,18 +34,11 @@ OPT = -O3
 STD = -std=gnu11
 LOCAL_LIB :=	lib
 LOCAL_CFLAGS +=	-MMD -I. -I$(LOCAL_LIB) -It -g -Wall -ftabstop=4 $(STD) $(OPT) \
--I../common \
--I../../ext/optparse \
--I../../ext/regex \
--I../../ext/uthash/src
-
-# Use these flags both in Windows_NT and in a MinGW build in Unix
-ifeq ($(EXE),.exe)
-LOCAL_CFLAGS	+= -I../../ext/UNIXem/include
-OBJS	+= \
-../../ext/UNIXem/src/glob.o \
-../../ext/UNIXem/src/dirent.o
-endif
+			-I../common \
+			-I../../ext/optparse \
+			-I../../ext/regex \
+			-I../../ext/uthash/src \
+			$(UNIXem_CFLAGS)
 
 #------------------------------------------------------------------------------
 # main

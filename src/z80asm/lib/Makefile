@@ -10,6 +10,12 @@
 
 TARGET	= libclibrary.a
 
+ifeq ($(OS),Windows_NT)
+  EXE 		:= .exe
+else
+  EXE 		:= $(EXESUFFIX)
+endif
+
 CC		= gcc
 CFLAGS	+= -g -Wall -Wextra -MMD -I. -I../../common -I../../../ext/uthash/src $(OPTFLAGS)
 LDLIBS	+= $(OPTLIBS) $(TARGET)
@@ -23,6 +29,14 @@ DEPENDS = $(patsubst %.c,%.d,$(SOURCES))
 
 TEST_SRC= $(wildcard t/test_*.c) $(wildcard t/uthash/test*.c)
 TESTS	= $(patsubst %.c,%,$(TEST_SRC))
+
+# Use these flags both in Windows_NT and in a MinGW build in Unix
+# ifeq ($(EXE),.exe)
+# CFLAGS	+= -I../../../ext/UNIXem/include
+# OBJECTS	+= \
+# ../../../ext/UNIXem/src/glob.o \
+# ../../../ext/UNIXem/src/dirent.o
+# endif
 
 # The Target Build
 all: $(TARGET)

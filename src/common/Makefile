@@ -3,11 +3,7 @@
 # Copyright (C) Paulo Custodio, 2011-2018
 # License: http://www.perlfoundation.org/artistic_license_2_0
 #-----------------------------------------------------------------------------
-ifeq ($(OS),Windows_NT)
-  EXE	:= .exe
-else
-  EXE 	:= $(EXESUFFIX)
-endif
+include ../Make.common
 
 CC			?= gcc
 CFLAGS		+= -Wall -std=gnu11 -MMD \
@@ -21,18 +17,12 @@ $(wildcard t/*.c) \
 $(wildcard ../../ext/regex/reg*.c) \
 $(wildcard ../../ext/Unity/src/*.c)
 
-OBJS		:= $(SRCS:.c=.o)
+OBJS		:= $(SRCS:.c=.o) \
+				$(UNIXem_OBJS)
 
 # -DUNITY_EXCLUDE_SETJMP_H for compilation in Linux
-CFLAGS		+= -DUNITY_EXCLUDE_SETJMP_H -I. -I../../ext/Unity/src
-
-# Use these flags both in Windows_NT and in a MinGW build in Unix
-ifeq ($(EXE),.exe)
-CFLAGS	+= -I../../ext/UNIXem/include
-OBJS	+= \
-../../ext/UNIXem/src/glob.o \
-../../ext/UNIXem/src/dirent.o
-endif
+CFLAGS		+= -DUNITY_EXCLUDE_SETJMP_H -I. -I../../ext/Unity/src \
+				$(UNIXem_CFLAGS)
 
 DEPENDS		:= $(SRCS:.c=.d)
 

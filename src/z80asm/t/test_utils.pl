@@ -683,28 +683,36 @@ sub get_gcc_options {
 	our %FLAGS;
 	
 	# hack
-	$ENV{LOCAL_LIB} = "lib";
-	$ENV{OPT} ||= "";
+#	$ENV{LOCAL_LIB} = "lib";
+#	$ENV{OPT} ||= "";
 	
 	if ( ! %FLAGS ) {
+		my %vars;
 		open(my $pipe, "make -p|") or die;
 		while (<$pipe>) {
-			if (/^\w*(CFLAGS|LDFLAGS)\s*=\s*(.*)/) {
+			if (/^(\w+)\s*[:+]?=\s*(.*)/) {
 				my($flag, $text) = ($1, $2);
-				
-				$text =~ s/\$\((\w+)\)/ $ENV{$1} || "" /ge;
-				defined $ENV{$1} or warn "Environment variable $1 not found";
-				
-				$text =~ s/\$\(shell (.*?)\)/ `$1` /ge;
-				$text =~ s/\s+/ /g;
-				
-				$FLAGS{$flag} = $text;
-				last if scalar keys %FLAGS == 2;
+				$vars{$flag} = $text;
 			}
 		}
 		close($pipe) or die;
-		$FLAGS{CFLAGS}  ||= '';
-		$FLAGS{LDFLAGS} ||= '';
+		
+		$FLAGS{CFLAGS}   ||= '';
+		$FLAGS{CPPFLAGS} ||= '';
+		$FLAGS{LDFLAGS}  ||= '';
+
+		while (my($flag, $text) = each %vars) {
+			if ($flag =~ /^\w*(CFLAGS|CPPFLAGS|LDFLAGS)$/) {
+				$flag = $1;
+				
+				$text =~ s/\$\((\w+)\)/ $vars{$1} || "" /ge;
+				
+				$text =~ s/\$\(shell (.*?)\)/ `$1` /ge;
+				$text =~ s/\s+/ /g;
+			
+				$FLAGS{$flag} = join(" ", $FLAGS{$flag}, $text);
+			}
+		}
 	}
 	
 	return @FLAGS{qw( CFLAGS LDFLAGS )};
