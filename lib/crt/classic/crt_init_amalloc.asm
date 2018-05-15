@@ -18,6 +18,12 @@
 
 ; $Id: amalloc.def,v 1.4 2016-07-14 17:44:17 pauloscustodio Exp $
 
+IF CRT_MAX_HEAP_ADDRESS
+	ld	hl,CRT_MAX_HEAP_ADDRESS
+ELSE
+	ld	hl,0
+	add	hl,sp
+ENDIF
 	; HL must hold SP or the end of free memory
 	push hl
 

@@ -70,6 +70,7 @@ start:
 ; it assumes we have free space between the end of 
 ; the compiled program and the stack pointer
 IF DEFINED_USING_amalloc
+	defc	CRT_MAX_HEAP_ADDRESS = 0xa600
 	INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
 
