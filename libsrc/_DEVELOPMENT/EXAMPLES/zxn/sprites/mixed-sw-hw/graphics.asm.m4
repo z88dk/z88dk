@@ -41,13 +41,13 @@ PUBLIC _gfx_splat
 _gfx_splat:
 
    defb @10101010
-	defb @01010101
+   defb @01010101
    defb @10101010
-	defb @01010101
+   defb @01010101
    defb @10101010
-	defb @01010101
+   defb @01010101
    defb @10101010
-	defb @01010101
+   defb @01010101
 
 ;; ZX Next Hardware Sprite
 ;; Sword $E3 is transparent
@@ -75,29 +75,32 @@ _gfx_sword:
 
 ;; Layer 2 Tile 16x16
 
-define(`BB', __ZXN_RGB332_ARCADE29_LGRAY)
-define(`FF', __ZXN_RGB332_ARCADE29_BLUEGRAY)
-
 PUBLIC _gfx_tile
 
 EXTERN __ZXN_RGB332_ARCADE29_LGRAY
 EXTERN __ZXN_RGB332_ARCADE29_BLUEGRAY
 
+pushdef(`O', __ZXN_RGB332_ARCADE29_LGRAY)
+pushdef(`W', __ZXN_RGB332_ARCADE29_BLUEGRAY)
+
 _gfx_tile:
    
-   defb BB, BB, BB, BB, FF, FF, BB, BB, BB, BB, BB, BB, BB, BB, BB, BB
-   defb BB, BB, BB, FF, BB, BB, FF, BB, BB, BB, BB, BB, BB, BB, BB, BB
-   defb BB, BB, FF, BB, BB, BB, BB, FF, BB, BB, BB, BB, BB, BB, BB, BB
-   defb BB, FF, BB, BB, BB, BB, BB, BB, FF, BB, BB, BB, BB, BB, BB, BB
-   defb FF, BB, BB, BB, BB, BB, BB, BB, BB, FF, BB, BB, BB, BB, BB, BB
-   defb BB, BB, BB, BB, BB, BB, BB, BB, BB, BB, FF, BB, BB, BB, BB, FF
-   defb BB, BB, BB, BB, BB, BB, BB, BB, BB, BB, BB, FF, BB, BB, FF, BB
-   defb BB, BB, BB, BB, BB, BB, BB, BB, BB, BB, BB, BB, FF, FF, BB, BB
-   defb BB, BB, BB, BB, BB, BB, BB, BB, BB, BB, BB, BB, FF, FF, BB, BB
-   defb BB, BB, BB, BB, BB, BB, BB, BB, BB, BB, BB, FF, BB, BB, FF, BB
-   defb BB, BB, BB, BB, BB, BB, BB, BB, BB, BB, FF, BB, BB, BB, BB, FF
-   defb FF, BB, BB, BB, BB, BB, BB, BB, BB, FF, BB, BB, BB, BB, BB, BB
-   defb BB, FF, BB, BB, BB, BB, BB, BB, FF, BB, BB, BB, BB, BB, BB, BB
-   defb BB, BB, FF, BB, BB, BB, BB, FF, BB, BB, BB, BB, BB, BB, BB, BB
-   defb BB, BB, BB, FF, BB, BB, FF, BB, BB, BB, BB, BB, BB, BB, BB, BB
-   defb BB, BB, BB, BB, FF, FF, BB, BB, BB, BB, BB, BB, BB, BB, BB, BB
+   defb O,O,O,O,W,W,O,O,O,O,O,O,O,O,O,O
+   defb O,O,O,W,O,O,W,O,O,O,O,O,O,O,O,O
+   defb O,O,W,O,O,O,O,W,O,O,O,O,O,O,O,O
+   defb O,W,O,O,O,O,O,O,W,O,O,O,O,O,O,O
+   defb W,O,O,O,O,O,O,O,O,W,O,O,O,O,O,O
+   defb O,O,O,O,O,O,O,O,O,O,W,O,O,O,O,W
+   defb O,O,O,O,O,O,O,O,O,O,O,W,O,O,W,O
+   defb O,O,O,O,O,O,O,O,O,O,O,O,W,W,O,O
+   defb O,O,O,O,O,O,O,O,O,O,O,O,W,W,O,O
+   defb O,O,O,O,O,O,O,O,O,O,O,W,O,O,W,O
+   defb O,O,O,O,O,O,O,O,O,O,W,O,O,O,O,W
+   defb W,O,O,O,O,O,O,O,O,W,O,O,O,O,O,O
+   defb O,W,O,O,O,O,O,O,W,O,O,O,O,O,O,O
+   defb O,O,W,O,O,O,O,W,O,O,O,O,O,O,O,O
+   defb O,O,O,W,O,O,W,O,O,O,O,O,O,O,O,O
+   defb O,O,O,O,W,W,O,O,O,O,O,O,O,O,O,O
+
+popdef(`O')
+popdef(`W')
