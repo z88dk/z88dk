@@ -40,8 +40,11 @@ graphics/msx/surface/surface_pixladdr
 graphics/msx/surface/surface_plotpixl
 graphics/msx/surface/surface_stencil_render
 games/mtx/joystick
+psg/sn76489/bit_open
+@games/games.lst
 psg/sn76489/psg_tone
 psg/sn76489/psg_volume
+psg/sn76489/psg_envelope
 psg/sn76489/psg_init.asm
 psg/sn76489/set_psg.asm
 psg/sn76489/set_psg_callee.asm
