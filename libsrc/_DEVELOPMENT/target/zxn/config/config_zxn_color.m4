@@ -16,7 +16,7 @@ divert(-1)
 
 # Define Colour Macros
 
-include(`target/zxn/macro/zxn-color.m4')
+include(`target/zxn/include/zxn-macro-color.m4')
 
 # Some colours here may need manual tweaking
 
@@ -1111,7 +1111,7 @@ define(`__ZXN_RGB333_HTML_YellowGreen', RGB333_FROM_RGB888(0x9ACD32))
 
 # Undefine Colour Macros
 
-include(`target/zxn/macro/zxn-color-undef.m4')
+include(`target/zxn/include/zxn-macro-color-undef.m4')
 
 #
 # END OF USER CONFIGURATION
