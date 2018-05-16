@@ -27,13 +27,10 @@ asm_sms_copy_mem_to_vram_unsafe:
    ;
    ; uses  : af, bc, de, hl
 
-   ld a,b
-   inc a
-   ld b,c
-   
+   dec bc
    inc b
-   djnz no_adjust
-   dec a
+   inc c
+   ld a,c
    
 no_adjust:
    
