@@ -5,19 +5,25 @@ divert(-1)
 # rebuild the library if changes are made
 #
 
-# NEXTOS API 1.94B
+# NEXTOS API 1.97F
 # https://github.com/z88dk/techdocs/blob/master/targets/zx-next/nextos/
+# https://github.com/z88dk/techdocs/blob/master/targets/zx-next/nextos/nextos_api.pdf
 
 # NOTE:
 #
 # For most NextOS functions, the memory map must be set up
-# as ROM2 in the bottom 16k, BANK 7 in the top 16k and page 10 in
+# as ROM2 in the bottom 16k, BANK 7 in the top 16k and PAGE 10 in
 # mmu2.  This latter setting puts the system variables from BANK 5
-# into the 16k-24k area.  System variables BANKM an BANK678 must
+# into the 16k-24k area.  System variables BANKM and BANK678 must
 # accurately reflect the current banking arrangement.
 #
 # In addition, layer 2 write-only into
 # the lower 16k must be disabled (port 0x123b, IO_LAYER_2_CONFIG)
+
+# NextOS DOTN Commands
+# stack location in divmmc ram
+
+define(`__NEXTOS_DOTN_SP_DIVMMC', 0x4000)
 
 # Filesystem Related
 
@@ -98,10 +104,11 @@ define(`__nextos_rc_bank_reserve', 2)
 define(`__nextos_rc_bank_free', 3)
 
 define(`__NEXTOS_IDE_BASIC', 0x01c0)
-define(`__NEXTOS_IDE_STREAM_LINEIN', 0x01c3)
+define(`__NEXTOS_IDE_WINDOW_LINEIN', 0x01c3)
 define(`__NEXTOS_IDE_WINDOW_STRING', 0x01c6)
 define(`__NEXTOS_IDE_INTEGER_VAR', 0x01c9)
 define(`__NEXTOS_IDE_RTC', 0x01cc)
+define(`__NEXTOS_IDE_DRIVER', 0x01cf)
 
 # Legacy - Floppy Drive
 
@@ -148,66 +155,6 @@ define(`__NEXTOS_IDE_PARTITION_OPEN', 0x00cd)
 define(`__NEXTOS_IDE_PARTITION_CLOSE', 0x00d0)
 define(`__NEXTOS_IDE_PARTITIONS', 0x01a5)
 
-# NextOS DOTN Commands
-# stack location in divmmc ram
-
-define(`__NEXTOS_DOTN_SP_DIVMMC', 0x4000)
-
-# NextOS ESXDOS API
-
-define(`__ESX_DISK_FILEMAP', 0x85)
-define(`__ESX_DISK_STRMSTART', 0x86)
-define(`__ESX_DISK_STRMEND', 0x87)
-
-define(`__ESX_M_DOSVERSION', 0x88)
-define(`__ESX_M_GETSETDRV', 0x89)
-define(`__ESX_M_TAPEIN', 0x8b)
-define(`__ESX_M_TAPEOUT', 0x8c)
-define(`__ESX_M_GETHANDLE', 0x8d)
-define(`__ESX_M_GETDATE', 0x8e)
-define(`__ESX_M_EXECCMD', 0x8f)
-define(`__ESX_M_GETERR', 0x93)
-define(`__ESX_M_P3DOS', 0x94)
-define(`__ESX_M_ERRH', 0x95)
-
-define(`__ESX_F_OPEN', 0x9a)
-define(`__ESX_F_CLOSE', 0x9b)
-define(`__ESX_F_SYNC', 0x9c)
-define(`__ESX_F_READ', 0x9d)
-define(`__ESX_F_WRITE', 0x9e)
-define(`__ESX_F_SEEK', 0x9f)
-define(`__ESX_F_FGETPOS', 0xa0)
-define(`__ESX_F_FSTAT', 0xa1)
-define(`__ESX_F_FTRUNCATE', 0xa2)
-define(`__ESX_F_OPENDIR', 0xa3)
-define(`__ESX_F_READDIR', 0xa4)
-define(`__ESX_F_TELLDIR', 0xa5)
-define(`__ESX_F_SEEKDIR', 0xa6)
-define(`__ESX_F_REWINDDIR', 0xa7)
-define(`__ESX_F_GETCWD', 0xa8)
-define(`__ESX_F_CHDIR', 0xa9)
-define(`__ESX_F_MKDIR', 0xaa)
-define(`__ESX_F_RMDIR', 0xab)
-define(`__ESX_F_STAT', 0xac)
-define(`__ESX_F_UNLINK', 0xad)
-define(`__ESX_F_TRUNCATE', 0xae)
-define(`__ESX_F_CHMOD', 0xaf)
-define(`__ESX_F_RENAME', 0xb0)
-define(`__ESX_F_GETFREE', 0xb1)
-
-# Error Codes - Recoverable Disk Errors
-
-define(`__NEXTOS_RC_READY', 0)
-define(`__NEXTOS_RC_WP', 1)
-define(`__NEXTOS_RC_SEEK', 2)
-define(`__NEXTOS_RC_CRC', 3)
-define(`__NEXTOS_RC_NODATA', 4)
-define(`__NEXTOS_RC_MARK', 5)
-define(`__NEXTOS_RC_UNRECOG', 6)
-define(`__NEXTOS_RC_UNKNOWN', 7)
-define(`__NEXTOS_RC_DISKCHG', 8)
-define(`__NEXTOS_RC_UNSUIT', 9)
-
 # Error Codes - Non-Recoverable Disk Errors
 
 define(`__NEXTOS_RC_BADNAME', 20)
@@ -241,6 +188,49 @@ define(`__NEXTOS_RC_INVDEVICE', 65)
 define(`__NEXTOS_RC_CMDPHASE', 67)
 define(`__NEXTOS_RC_DATAPHASE', 68)
 define(`__NEXTOS_RC_NOTDIR', 69)
+
+# NextOS ESXDOS API
+
+define(`__ESX_DISK_FILEMAP', 0x85)
+define(`__ESX_DISK_STRMSTART', 0x86)
+define(`__ESX_DISK_STRMEND', 0x87)
+
+define(`__ESX_M_DOSVERSION', 0x88)
+define(`__ESX_M_GETSETDRV', 0x89)
+define(`__ESX_M_TAPEIN', 0x8b)
+define(`__ESX_M_TAPEOUT', 0x8c)
+define(`__ESX_M_GETHANDLE', 0x8d)
+define(`__ESX_M_GETDATE', 0x8e)
+define(`__ESX_M_EXECCMD', 0x8f)
+define(`__ESX_M_DRVAPI', 0x92)
+define(`__ESX_M_GETERR', 0x93)
+define(`__ESX_M_P3DOS', 0x94)
+define(`__ESX_M_ERRH', 0x95)
+
+define(`__ESX_F_OPEN', 0x9a)
+define(`__ESX_F_CLOSE', 0x9b)
+define(`__ESX_F_SYNC', 0x9c)
+define(`__ESX_F_READ', 0x9d)
+define(`__ESX_F_WRITE', 0x9e)
+define(`__ESX_F_SEEK', 0x9f)
+define(`__ESX_F_FGETPOS', 0xa0)
+define(`__ESX_F_FSTAT', 0xa1)
+define(`__ESX_F_FTRUNCATE', 0xa2)
+define(`__ESX_F_OPENDIR', 0xa3)
+define(`__ESX_F_READDIR', 0xa4)
+define(`__ESX_F_TELLDIR', 0xa5)
+define(`__ESX_F_SEEKDIR', 0xa6)
+define(`__ESX_F_REWINDDIR', 0xa7)
+define(`__ESX_F_GETCWD', 0xa8)
+define(`__ESX_F_CHDIR', 0xa9)
+define(`__ESX_F_MKDIR', 0xaa)
+define(`__ESX_F_RMDIR', 0xab)
+define(`__ESX_F_STAT', 0xac)
+define(`__ESX_F_UNLINK', 0xad)
+define(`__ESX_F_TRUNCATE', 0xae)
+define(`__ESX_F_CHMOD', 0xaf)
+define(`__ESX_F_RENAME', 0xb0)
+define(`__ESX_F_GETFREE', 0xb1)
 
 #
 # END OF USER CONFIGURATION
@@ -329,10 +319,11 @@ PUBLIC `__nextos_rc_bank_reserve'
 PUBLIC `__nextos_rc_bank_free'
 
 PUBLIC `__NEXTOS_IDE_BASIC'
-PUBLIC `__NEXTOS_IDE_STREAM_LINEIN'
+PUBLIC `__NEXTOS_IDE_WINDOW_LINEIN'
 PUBLIC `__NEXTOS_IDE_WINDOW_STRING'
 PUBLIC `__NEXTOS_IDE_INTEGER_VAR'
 PUBLIC `__NEXTOS_IDE_RTC'
+PUBLIC `__NEXTOS_IDE_DRIVER'
 
 PUBLIC `__NEXTOS_DOS_REF_XDPB'
 PUBLIC `__NEXTOS_DOS_MAP_B'
@@ -388,6 +379,7 @@ PUBLIC `__ESX_M_TAPEOUT'
 PUBLIC `__ESX_M_GETHANDLE'
 PUBLIC `__ESX_M_GETDATE'
 PUBLIC `__ESX_M_EXECCMD'
+PUBLIC `__ESX_M_DRVAPI'
 PUBLIC `__ESX_M_GETERR'
 PUBLIC `__ESX_M_P3DOS'
 PUBLIC `__ESX_M_ERRH'
@@ -542,10 +534,11 @@ defc `__nextos_rc_bank_reserve' = __nextos_rc_bank_reserve
 defc `__nextos_rc_bank_free' = __nextos_rc_bank_free
 
 defc `__NEXTOS_IDE_BASIC' = __NEXTOS_IDE_BASIC
-defc `__NEXTOS_IDE_STREAM_LINEIN' = __NEXTOS_IDE_STREAM_LINEIN
+defc `__NEXTOS_IDE_WINDOW_LINEIN' = __NEXTOS_IDE_WINDOW_LINEIN
 defc `__NEXTOS_IDE_WINDOW_STRING' = __NEXTOS_IDE_WINDOW_STRING
 defc `__NEXTOS_IDE_INTEGER_VAR' = __NEXTOS_IDE_INTEGER_VAR
 defc `__NEXTOS_IDE_RTC' = __NEXTOS_IDE_RTC
+defc `__NEXTOS_IDE_DRIVER' = __NEXTOS_IDE_DRIVER
 
 defc `__NEXTOS_DOS_REF_XDPB' = __NEXTOS_DOS_REF_XDPB
 defc `__NEXTOS_DOS_MAP_B' = __NEXTOS_DOS_MAP_B
@@ -601,6 +594,7 @@ defc `__ESX_M_TAPEOUT' = __ESX_M_TAPEOUT
 defc `__ESX_M_GETHANDLE' = __ESX_M_GETHANDLE
 defc `__ESX_M_GETDATE' = __ESX_M_GETDATE
 defc `__ESX_M_EXECCMD' = __ESX_M_EXECCMD
+defc `__ESX_M_DRVAPI' = __ESX_M_DRVAPI
 defc `__ESX_M_GETERR' = __ESX_M_GETERR
 defc `__ESX_M_P3DOS' = __ESX_M_P3DOS
 defc `__ESX_M_ERRH' = __ESX_M_ERRH
@@ -755,10 +749,11 @@ ifdef(`CFG_C_DEF',
 `#define' `__nextos_rc_bank_free'  __nextos_rc_bank_free
 
 `#define' `__NEXTOS_IDE_BASIC'  __NEXTOS_IDE_BASIC
-`#define' `__NEXTOS_IDE_STREAM_LINEIN'  __NEXTOS_IDE_STREAM_LINEIN
+`#define' `__NEXTOS_IDE_WINDOW_LINEIN'  __NEXTOS_IDE_WINDOW_LINEIN
 `#define' `__NEXTOS_IDE_WINDOW_STRING'  __NEXTOS_IDE_WINDOW_STRING
 `#define' `__NEXTOS_IDE_INTEGER_VAR'  __NEXTOS_IDE_INTEGER_VAR
 `#define' `__NEXTOS_IDE_RTC'  __NEXTOS_IDE_RTC
+`#define' `__NEXTOS_IDE_DRIVER'  __NEXTOS_IDE_DRIVER
 
 `#define' `__NEXTOS_DOS_REF_XDPB'  __NEXTOS_DOS_REF_XDPB
 `#define' `__NEXTOS_DOS_MAP_B'  __NEXTOS_DOS_MAP_B
@@ -814,6 +809,7 @@ ifdef(`CFG_C_DEF',
 `#define' `__ESX_M_GETHANDLE'  __ESX_M_GETHANDLE
 `#define' `__ESX_M_GETDATE'  __ESX_M_GETDATE
 `#define' `__ESX_M_EXECCMD'  __ESX_M_EXECCMD
+`#define' `__ESX_M_DRVAPI'  __ESX_M_DRVAPI
 `#define' `__ESX_M_GETERR'  __ESX_M_GETERR
 `#define' `__ESX_M_P3DOS'  __ESX_M_P3DOS
 `#define' `__ESX_M_ERRH'  __ESX_M_ERRH
