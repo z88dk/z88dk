@@ -175,12 +175,6 @@ IF FOReinstein
         defc sndbit_mask   = 0
 ENDIF
 
-IF FORmtx
-        defc sndbit_port   = 0
-        defc sndbit_bit    = 0
-        defc sndbit_mask   = 0
-ENDIF
-
 IF FORoz
         defc sndbit_port   = 0
         defc sndbit_bit    = 0
@@ -205,4 +199,65 @@ IF FORosca
         defc sndbit_mask   = 0
 ENDIF
 
+; ********************************************************
+;  SN76489 PSG chip definitions
+; ********************************************************
+
+IF FORmz
+	defc sndbit_port	= $F2
+    defc sndbit_bit    = 3
+    defc sndbit_mask   = $0F			; $0F for full volume output
+ENDIF
+
+IF FORsc3000
+	defc sndbit_port	= $7F		; also valid for SG-1000
+    defc sndbit_bit    = 3
+    defc sndbit_mask   = $0F			; $0F for full volume output
+ENDIF
+
+IF FORm5
+	defc sndbit_port	= $20
+    defc sndbit_bit    = 3
+    defc sndbit_mask   = $0F			; $0F for full volume output
+ENDIF
+
+IF FORmtx
+	defc sndbit_port	= $06
+    defc sndbit_bit    = 3
+    defc sndbit_mask   = $0F			; $0F for full volume output
+ENDIF
+
+IF FORsms
+	defc sndbit_port	= $40
+    defc sndbit_bit    = 3
+    defc sndbit_mask   = $0F			; $0F for full volume output
+ENDIF
+
+; ********************************************************
+;   This last part refers to NOT YET supported hardware
+; ********************************************************
+
+IF FORcoleco
+	defc sndbit_port	= $E0		; also valid for Coleco Adam and Pencil II
+    defc sndbit_bit    = 3
+    defc sndbit_mask   = $0F			; $0F for full volume output
+ENDIF
+
+IF FORpasopia
+	defc sndbit_port	= $3A		; Pasopia has also a second PSG on port $3B
+    defc sndbit_bit    = 3
+    defc sndbit_mask   = $0F			; $0F for full volume output
+ENDIF
+
+IF FORrx78
+	defc sndbit_port	= $FF
+    defc sndbit_bit    = 3
+    defc sndbit_mask   = $0F			; $0F for full volume output
+ENDIF
+
+IF FORsmc777
+	defc sndbit_port	= $53		; possibly valid also for Sony SMC 70
+    defc sndbit_bit    = 3
+    defc sndbit_mask   = $0F			; $0F for full volume output
+ENDIF
 
