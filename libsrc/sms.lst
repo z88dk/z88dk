@@ -19,8 +19,11 @@ sms/gotoxy
 sms/aplib_depack
 sms/add_raster_int
 sms/add_pause_int
+psg/sn76489/bit_open
+@games/games.lst
 psg/sn76489/psg_tone
 psg/sn76489/psg_volume
+psg/sn76489/psg_envelope
 psg/sn76489/psg_init.asm
 psg/sn76489/set_psg.asm
 psg/sn76489/set_psg_callee.asm
