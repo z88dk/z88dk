@@ -9,6 +9,7 @@ stdio/ansi/sharp-mz/f_ansi_char
 stdio/ansi/sharp-mz/f_ansi_cls
 stdio/ansi/generic/f_ansi_dline
 stdio/ansi/sharp-mz/f_ansi_scrollup
+psg/sn76489/bit_open
 @gfxbase.lst
 graphics/dcircle
 graphics/clg
@@ -25,9 +26,10 @@ graphics/putsprite2
 graphics/liner
 graphics/stencil_render2
 graphics/swapgfxbk_foo
-games/joystick
+@games/games.lst
 psg/sn76489/psg_tone
 psg/sn76489/psg_volume
+psg/sn76489/psg_envelope
 psg/sn76489/psg_init.asm
 psg/sn76489/set_psg.asm
 psg/sn76489/set_psg_callee.asm
