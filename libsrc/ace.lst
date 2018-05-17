@@ -17,4 +17,5 @@ time/ace/clock
 @font/font_8x8/font_8x8.lst
 @games/games.lst
 @ace/ace.lst
+@input/ace.lst
 @z80.lst
