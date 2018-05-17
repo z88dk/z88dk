@@ -299,14 +299,20 @@ void asm_DEFC(char *name, Expr *expr)
 	value = Expr_eval(expr, FALSE);		/* DEFC constant expression */
 	if ((expr->result.not_evaluable) || (expr->type >= TYPE_ADDRESS))
 	{
-		/* store in object file to be computed at link time */
-		expr->range = RANGE_WORD;
-		expr->target_name = strpool_add(name);
+		/* check if expression depends on itself */
+		if (Expr_is_recusive(expr, name)) {
+			error_expression_recursion(name);
+		}
+		else {
+			/* store in object file to be computed at link time */
+			expr->range = RANGE_WORD;
+			expr->target_name = strpool_add(name);
 
-		ExprList_push(&CURRENTMODULE->exprs, expr);
+			ExprList_push(&CURRENTMODULE->exprs, expr);
 
-		/* create symbol */
-		define_symbol(expr->target_name, 0, TYPE_COMPUTED);
+			/* create symbol */
+			define_symbol(expr->target_name, 0, TYPE_COMPUTED);
+		}
 	}
 	else
 	{
