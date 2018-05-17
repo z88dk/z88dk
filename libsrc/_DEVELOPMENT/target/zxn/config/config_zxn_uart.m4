@@ -9,7 +9,7 @@ divert(-1)
 # with the onboard ESP-8266 wifi module.  All the pins of the
 # esp module are connected to the fpga, meaning you could use
 # the next itself to program new firmware for it, but those
-# connections to the fpga are not part of the current config.
+# connections to the fpga are not part of the current fpga config.
 # It should be mentioned that the UART can also be disconnected
 # from the esp module and, if used in combination with a level
 # shifter, it could be used to connect to any serial device.
@@ -39,8 +39,25 @@ divert(-1)
 # is the baud rate (115200, eg).  A status bit can also be
 # polled to find out when it's safe to send another byte.
 
+# The UART baud rate is derived from a nominal 28MHz clock.
+# However this clock varies depending on the video timing the
+# user has selected for his tv.  The actual clock used by the
+# UART baud generator can be found by reading nextreg 17 to
+# determine the current video timing 0-7 and then using that
+# to look up the actual UART clock:
+
+define(`__CLK_28_0', 28000000)
+define(`__CLK_28_1', 28571429)
+define(`__CLK_28_2', 29464286)
+define(`__CLK_28_3', 30000000)
+define(`__CLK_28_4', 31000000)
+define(`__CLK_28_5', 32000000)
+define(`__CLK_28_6', 33000000)
+define(`__CLK_28_7', 27000000)
+
 # The UART baud rate is set by writing a 14-bit period measured
-# in 28MHz cycles.  Periods for common baud rates are shown below:
+# in nominal 28MHz cycles.  Periods for common baud rates are
+# shown below:
 #
 # 28000000 / 2400    = 11666  = 2400 bps
 # 28000000 / 4800    = 5833   = 4800 bps
@@ -51,8 +68,14 @@ divert(-1)
 # 28000000 / 57600   = 486    = 57600 bps
 # 28000000 / 115200  = 243    = 115200 bps
 #
-# These 14-bit baud rates are written to the baud rate register
-# 7-bits at a time.  In the 8-bit byte written, the top bit
+# The nominal 28MHz clock is fine for calculating periods for
+# lower baud rates but as baud rates increase, timing errors
+# can cause communication errors.  For faster speeds it is
+# best to calculate the baud rate period using the actual
+# UART clock as described above.
+
+# These 14-bit baud rate periods are written to the baud rate
+# register 7-bits at a time.  In the 8-bit byte written, the top bit
 # is set to indicate that the upper 7-bits are being written and
 # it is reset to indicate that the lower 7-bits are being written.
 #
@@ -131,6 +154,15 @@ dnl#
 
 ifdef(`CFG_ASM_PUB',
 `
+PUBLIC `__CLK_28_0'
+PUBLIC `__CLK_28_1'
+PUBLIC `__CLK_28_2'
+PUBLIC `__CLK_28_3'
+PUBLIC `__CLK_28_4'
+PUBLIC `__CLK_28_5'
+PUBLIC `__CLK_28_6'
+PUBLIC `__CLK_28_7'
+
 PUBLIC `__IO_UART_RX'
 
 PUBLIC `__IO_UART_BAUD_RATE'
@@ -188,6 +220,20 @@ dnl#
 
 ifdef(`CFG_ASM_DEF',
 `
+IFNDEF __ZXN_MAC_UART
+DEFINE __ZXN_MAC_UART
+
+defc `__CLK_28_0' = __CLK_28_0
+defc `__CLK_28_1' = __CLK_28_1
+defc `__CLK_28_2' = __CLK_28_2
+defc `__CLK_28_3' = __CLK_28_3
+defc `__CLK_28_4' = __CLK_28_4
+defc `__CLK_28_5' = __CLK_28_5
+defc `__CLK_28_6' = __CLK_28_6
+defc `__CLK_28_7' = __CLK_28_7
+
+ENDIF
+
 defc `__IO_UART_RX' = __IO_UART_RX
 
 defc `__IO_UART_BAUD_RATE' = __IO_UART_BAUD_RATE
@@ -245,6 +291,15 @@ dnl#
 
 ifdef(`CFG_C_DEF',
 `
+`#define' `__CLK_28_0'  __CLK_28_0
+`#define' `__CLK_28_1'  __CLK_28_1
+`#define' `__CLK_28_2'  __CLK_28_2
+`#define' `__CLK_28_3'  __CLK_28_3
+`#define' `__CLK_28_4'  __CLK_28_4
+`#define' `__CLK_28_5'  __CLK_28_5
+`#define' `__CLK_28_6'  __CLK_28_6
+`#define' `__CLK_28_7'  __CLK_28_7
+
 `#define' `__IO_UART_RX'  __IO_UART_RX
 
 `#define' `__IO_UART_BAUD_RATE'  __IO_UART_BAUD_RATE

@@ -2056,10 +2056,11 @@ defc __nextos_rc_bank_reserve = 2
 defc __nextos_rc_bank_free = 3
 
 defc __NEXTOS_IDE_BASIC = 0x01c0
-defc __NEXTOS_IDE_STREAM_LINEIN = 0x01c3
+defc __NEXTOS_IDE_WINDOW_LINEIN = 0x01c3
 defc __NEXTOS_IDE_WINDOW_STRING = 0x01c6
 defc __NEXTOS_IDE_INTEGER_VAR = 0x01c9
 defc __NEXTOS_IDE_RTC = 0x01cc
+defc __NEXTOS_IDE_DRIVER = 0x01cf
 
 defc __NEXTOS_DOS_REF_XDPB = 0x0151
 defc __NEXTOS_DOS_MAP_B = 0x0154
@@ -2115,6 +2116,7 @@ defc __ESX_M_TAPEOUT = 0x8c
 defc __ESX_M_GETHANDLE = 0x8d
 defc __ESX_M_GETDATE = 0x8e
 defc __ESX_M_EXECCMD = 0x8f
+defc __ESX_M_DRVAPI = 0x92
 defc __ESX_M_GETERR = 0x93
 defc __ESX_M_P3DOS = 0x94
 defc __ESX_M_ERRH = 0x95
@@ -2413,6 +2415,20 @@ defc __REG_DEBUG = 0xff
 
 
 
+defc __IO_I2C_SCL = 0x103b
+defc __IO_I2C_SDA = 0x113b
+
+
+
+
+
+
+
+
+
+
+
+
 defc __IO_SPRITE_SLOT = 0x303b
 
 defc __IO_SPRITE_FLAGS = 0x303b
@@ -2605,6 +2621,20 @@ defc __ERRB_R_TAPE_LOADING_ERROR = 27
 
 
 
+
+IFNDEF __ZXN_MAC_UART
+DEFINE __ZXN_MAC_UART
+
+defc __CLK_28_0 = 28000000
+defc __CLK_28_1 = 28571429
+defc __CLK_28_2 = 29464286
+defc __CLK_28_3 = 30000000
+defc __CLK_28_4 = 31000000
+defc __CLK_28_5 = 32000000
+defc __CLK_28_6 = 33000000
+defc __CLK_28_7 = 27000000
+
+ENDIF
 
 defc __IO_UART_RX = 0x143b
 

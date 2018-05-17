@@ -15,6 +15,7 @@ stdio/ansi/generic/f_ansi_dline
 stdio/ansi/ace/f_ansi_scrollup
 time/ace/clock
 @font/font_8x8/font_8x8.lst
+games/ace/joystick
 @games/games.lst
 @ace/ace.lst
 @input/ace.lst
