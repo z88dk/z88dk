@@ -19,8 +19,8 @@ asm_esxdos_m_gethandle:
    ;
    ; exit  : success
    ;
-   ;             l = file handle
-   ;             carry reset
+   ;            hl = file handle
+   ;            carry reset
    ;
    ;         error
    ;

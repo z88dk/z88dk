@@ -1,14 +1,13 @@
-ESXDOS functions can be called from within esxdos, which applies
-to dot commands, or from elsewhere which applies to the usual
-programs running from ram.
+Information about programming esxdos is scarce.
 
-If esxdos is called from within, then parameters can be passed
-in via HL.  Otherwise that same parameter is passed in IX instead.
+The information here comes from various sources but principally
+from a conversation with Miguel some time ago.
 
-For this reason, the C interface has two entry points defined - one
-for dot commands and one for ram.  All functions carry "dot" or
-"ram" in their names to distinguish them.  You can choose to call
-the specific function by these names as needed or you can call the
-equivalent function without "dot" or "ram" in their names.  The
-esxdos header will define these functions appropriately depending
-on whether the toolchain is compiling a dot command or not.
+In that conversation he asked that I do not release this information
+publicly because it was subject to change.  He didn't want people
+making widespread use of it, which would mean his design would be
+locked in for the sake of backwards compatibility.
+
+Obviously this is somewhat public and you've found this information.
+Please continue to honour his request and write your software so that
+it is prepared for potentially incompatible changes to come.
