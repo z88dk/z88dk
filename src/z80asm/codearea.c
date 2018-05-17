@@ -16,7 +16,7 @@ Manage the code area in memory
 #include "options.h"
 #include "strutil.h"
 #include "z80asm.h"
-#include <assert.h>
+#include "die.h"
 #include <memory.h>
 
 /*-----------------------------------------------------------------------------
@@ -221,8 +221,8 @@ int get_cur_module_id( void )
 void set_cur_module_id( int module_id )
 {
 	init_module();
-	assert( module_id >= 0 );
-	assert( module_id <= get_last_module_id() );
+	xassert( module_id >= 0 );
+	xassert( module_id <= get_last_module_id() );
 	g_cur_module = module_id;
 }
 
@@ -254,7 +254,7 @@ static int section_module_start( Section *section, int module_id )
 
 		/* update address with current code index */
 		item = intArray_item( section->module_start, module_id );
-		assert( get_section_size( section ) >= addr );
+		xassert( get_section_size( section ) >= addr );
 
 		addr = *item = get_section_size( section );
 	}
@@ -412,7 +412,7 @@ static byte_t *alloc_space( int addr, int num_bytes )
 
 	/* cannot expand unless last module */
 	if ( get_cur_module_id() != get_last_module_id() )
-		assert( addr + num_bytes <= old_size );
+		xassert( addr + num_bytes <= old_size );
 
 	check_space( base_addr + addr, num_bytes );
 

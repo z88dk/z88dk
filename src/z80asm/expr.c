@@ -20,7 +20,7 @@ see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 #include "strutil.h"
 #include "sym.h"
 #include "symtab.h"
-#include <assert.h>
+#include "die.h"
 
 /*-----------------------------------------------------------------------------
 *	UT_array of Expr*
@@ -132,8 +132,8 @@ static const char *operator_hash_key( tokid_t tok, op_type_t op_type )
 	char key[3];		/* byte 1 = tok; byte 2 = op_type; byte 3 = '\0' */
 
 	/* assert we can map symbol and type in a string */
-	assert( tok     > 0 && tok     < 256 );
-	assert( op_type > 0 && op_type < 256 );
+	xassert( tok     > 0 && tok     < 256 );
+	xassert( op_type > 0 && op_type < 256 );
 	key[0] = (char) tok; key[1] = (char) op_type; key[2] = '\0';
 
 	return spool_add(key);
@@ -201,7 +201,7 @@ long Calc_pop( void )
 	INIT_OBJ(longArray, &calc_stack);		/* freed by class */
 
 	top = longArray_top(calc_stack);
-	assert( top != NULL );
+	xassert( top != NULL );
 	value = *top;
 
 	longArray_pop(calc_stack);
@@ -264,7 +264,7 @@ void ExprOp_init_operator( ExprOp *self, tokid_t tok, op_type_t op_type )
 {
 	Operator *op;
 
-	op = Operator_get( tok, op_type ); assert( op != NULL );
+	op = Operator_get( tok, op_type ); xassert( op != NULL );
 
 	self->op_type	= op_type;
 	self->d.op		= op;
@@ -334,7 +334,7 @@ void ExprOp_compute(ExprOp *self, Expr *expr, bool not_defined_error)
 	case TERNARY_OP:Calc_compute_ternary( self->d.op->calc.ternary ); break;
 	
 	default:
-		assert(0);
+		xassert(0);
 	}
 }
 
@@ -353,10 +353,10 @@ int range_size( range_t range )
 	case RANGE_WORD:			return 2;
 	case RANGE_WORD_BE:			return 2;
 	case RANGE_DWORD:			return 4;
-	default: assert(0);
+	default: xassert(0);
 	}
 
-	assert(0);
+	xassert(0);
 	return -1;	/* not reached */
 }
 
@@ -700,7 +700,7 @@ long Expr_eval(Expr *self, bool not_defined_error)
 			default:			; /* no change */
 			}
 		}
-		assert( type != TYPE_COMPUTED );
+		xassert( type != TYPE_COMPUTED );
 		self->type = type;
 	}
 
@@ -772,7 +772,7 @@ bool Expr_is_local_in_section(Expr *self, struct Module *module, struct Section 
 			break;
 
 		default:
-			assert(0);
+			xassert(0);
 		}
 	}
 	return true;
@@ -806,7 +806,7 @@ bool Expr_without_addresses(Expr *self)
 			break;
 
 		default:
-			assert(0);
+			xassert(0);
 		}
 	}
 

@@ -13,6 +13,12 @@ void run_die_die(void)
 	die("hello %s %d!\n", "world", 42);
 }
 
+void run_die_xassert(void)
+{
+	xassert(1);
+	xassert(0);
+}
+
 void run_die_check_alloc(void)
 {
 	Check_alloc(void*, run_die_check_alloc);

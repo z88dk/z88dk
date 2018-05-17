@@ -23,8 +23,8 @@ Parse command line options
 #include "symtab.h"
 #include "utarray.h"
 #include "z80asm.h"
+#include "die.h"
 
-#include <assert.h>
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
@@ -240,7 +240,7 @@ static void process_opt( int *parg, int argc, char *argv[] )
                 break;
 
             default:
-                assert(0);
+                xassert(0);
             }
 
             return;
@@ -777,7 +777,7 @@ static void define_assembly_defines()
 	    define_static_def_sym("__CPU_R3K__", 1);
 		break;
 	default:
-		assert(0);
+		xassert(0);
 	}
 
 	if (opts.swap_ix_iy) {

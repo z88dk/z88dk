@@ -23,7 +23,7 @@ Define ragel-based parser.
 #include "sym.h"
 #include "symtab.h"
 #include "utarray.h"
-#include <assert.h>
+#include "die.h"
 #include <ctype.h>
 
 /*-----------------------------------------------------------------------------
@@ -251,7 +251,7 @@ static void read_token(ParseCtx *ctx)
 
 	default:;
 //		if (!*(sym_copy.text))
-//			assert(*(sym_copy.text));
+//			xassert(*(sym_copy.text));
 	}
 //	sym_copy.string = token_strings_add(sym.string);
 	utarray_push_back(ctx->tokens, &sym_copy);

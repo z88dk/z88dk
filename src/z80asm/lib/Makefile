@@ -17,7 +17,7 @@ else
 endif
 
 CC		= gcc
-CFLAGS	+= -g -Wall -Wextra -MMD -I. -I../../common -I../../../ext/uthash/src $(OPTFLAGS)
+CFLAGS	+= -g -Wall -Wextra -MMD -I. -I../../common -I../../../ext/uthash/src -I../../../ext/UNIXem/include $(OPTFLAGS)
 LDLIBS	+= $(OPTLIBS) $(TARGET)
 PREFIX  ?= /usr/local
 

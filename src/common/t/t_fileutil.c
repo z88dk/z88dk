@@ -4,8 +4,8 @@
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 #include "unity.h"
+#include "die.h"
 #include "fileutil.h"
-#include <assert.h>
 #include <limits.h>
 #include <stdio.h>
 
@@ -186,7 +186,7 @@ void t_fileutil_xfopen(void)
 void run_fileutil_xfopen(void)
 {
 	FILE *fp = xfopen("/x/x/x/x/x/x/x/x/x", "rb");
-	assert(0);
+	xassert(0);
 	xfclose(fp); // not reached, silence warning on unused fp
 }
 
@@ -291,7 +291,7 @@ void run_fileutil_xfwrite_str(void)
 	TEST_ASSERT_NOT_NULL(fp);
 
 	xfwrite_str(s, fp);				// dies
-	assert(0);
+	xassert(0);
 }
 
 void t_fileutil_xfwrite_bcount_str_1(void)
@@ -389,7 +389,7 @@ void run_fileutil_xfwrite_bcount_str(void)
 	TEST_ASSERT_NOT_NULL(fp);
 
 	xfwrite_bcount_str(s, fp);		// dies
-	assert(0);
+	xassert(0);
 }
 
 void t_fileutil_xfwrite_wcount_str_1(void)
@@ -505,7 +505,7 @@ void run_fileutil_xfwrite_wcount_str(void)
 	TEST_ASSERT_NOT_NULL(fp);
 
 	xfwrite_wcount_str(s, fp);		// dies
-	assert(0);
+	xassert(0);
 }
 
 void t_fileutile_xfwrite_byte(void)
@@ -696,7 +696,7 @@ void run_fileutil_xfread(void)
 
 	char buffer[2];
 	xfread(buffer, sizeof(char), NUM_ELEMS(buffer), fp); // dies
-	assert(0);
+	xassert(0);
 }
 
 void run_fileutil_xfread_str(void)
@@ -712,7 +712,7 @@ void run_fileutil_xfread_str(void)
 
 	str_t *s = str_new();
 	xfread_str(2, s, fp);	// dies
-	assert(0);
+	xassert(0);
 }
 
 void run_fileutil_xfread_bcount_str(void)
@@ -728,7 +728,7 @@ void run_fileutil_xfread_bcount_str(void)
 
 	str_t *s = str_new();
 	xfread_bcount_str(s, fp);	// dies
-	assert(0);
+	xassert(0);
 }
 
 void run_fileutil_xfread_wcount_str(void)
@@ -745,7 +745,7 @@ void run_fileutil_xfread_wcount_str(void)
 
 	str_t *s = str_new();
 	xfread_wcount_str(s, fp);	// dies
-	assert(0);
+	xassert(0);
 }
 
 void run_fileutil_xfseek(void)

@@ -212,7 +212,7 @@ static void read_cur_module_exprs_1(ExprList *exprs, FILE *file, char *filename,
 			case 'B': expr->range = RANGE_WORD_BE;		break;
 			case 'L': expr->range = RANGE_DWORD;		break;
 			case '=': expr->range = RANGE_WORD;
-					  assert( str_len(target_name) > 0 );
+					  xassert( str_len(target_name) > 0 );
 					  expr->target_name = spool_add( str_data(target_name) );	/* define expression as EQU */
 					  break;
 			default:
@@ -356,7 +356,7 @@ static int compute_equ_exprs_once( ExprList *exprs, bool show_error, bool module
 		{
 			/* remove current expression, advance iterator */
 			expr2 = ExprList_remove( exprs, &iter );
-			assert( expr == expr2 );
+			xassert( expr == expr2 );
 
 			OBJ_DELETE( expr );	
 		}
@@ -398,7 +398,7 @@ static void patch_exprs( ExprList *exprs )
 	while ( iter != NULL )
 	{
 		expr = iter->obj;
-		assert( expr->target_name == NULL );		/* EQU expressions are already computed */
+		xassert( expr->target_name == NULL );		/* EQU expressions are already computed */
 
 		set_expr_env( expr, false );
 		value = Expr_eval(expr, true);
@@ -472,14 +472,14 @@ static void patch_exprs( ExprList *exprs )
 				patch_long(expr->code_pos, value);
                 break;
 
-			default: assert(0);
+			default: xassert(0);
             }
 
 		}
 
 		/* remove current expression, advance iterator */
 		expr2 = ExprList_remove( exprs, &iter );
-		assert( expr == expr2 );
+		xassert( expr == expr2 );
 
 		OBJ_DELETE( expr );	
 	}
@@ -500,7 +500,7 @@ static void relocate_symbols_symtab( SymbolHash *symtab )
         sym = (Symbol *) iter->value;
 		if ( sym->type == TYPE_ADDRESS ) 
 		{
-			assert( sym->module );				/* owner should exist except for -D defines */
+			xassert( sym->module );				/* owner should exist except for -D defines */
 			
 			/* set base address for symbol */
 			set_cur_module(  sym->module );
@@ -1152,7 +1152,7 @@ static void merge_local_symbols(StrHash *extern_syms)
 	StrHashElem *elem, *next;
 	int start;
 
-	first_module = get_first_module(NULL); assert(first_module != NULL);
+	first_module = get_first_module(NULL); xassert(first_module != NULL);
 
 	for (module = get_first_module(&it); module != NULL; module = get_next_module(&it)) {
 		/* remove local symbols that are not defined */
@@ -1249,7 +1249,7 @@ static void create_extern_symbols(StrHash *extern_syms)
 static void merge_modules(StrHash *extern_syms)
 {
 	Module *first_module;
-	first_module = get_first_module(NULL); assert(first_module != NULL);
+	first_module = get_first_module(NULL); xassert(first_module != NULL);
 
 	/* read each module's expression list */
 	set_cur_module(first_module);

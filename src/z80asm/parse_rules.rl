@@ -600,7 +600,7 @@ static int get_start_state(ParseCtx *ctx)
 		return parser_en_dma_params;
 
 	default:
-		assert(0);
+		xassert(0);
 	}
 
 	return 0;	/* not reached */

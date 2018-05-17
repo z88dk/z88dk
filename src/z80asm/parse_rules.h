@@ -39436,7 +39436,7 @@ static int get_start_state(ParseCtx *ctx)
   scan_expect_operands();
   return parser_en_dma_params;
  default:
-  assert(0);
+  xassert(0);
  }
  return 0;
 }

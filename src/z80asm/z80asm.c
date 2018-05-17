@@ -19,6 +19,8 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include "types.h"
 #include "strutil.h"
 #include "symbol.h"
+#include "die.h"
+
 #include <sys/stat.h>
 
 /* external functions */
@@ -341,7 +343,7 @@ int z80asm_main( int argc, char *argv[] )
 			make_library(opts.lib_file, opts.files);
 		}
 		else if (opts.make_bin) {
-			assert(opts.consol_obj_file == NULL);
+			xassert(opts.consol_obj_file == NULL);
 			link_modules();			
 
 			if (!get_num_errors())
@@ -354,7 +356,7 @@ int z80asm_main( int argc, char *argv[] )
 			opts.consol_obj_file = get_obj_filename(opts.bin_file);
 			opts.bin_file = NULL;
 
-			assert(opts.consol_obj_file != NULL);
+			xassert(opts.consol_obj_file != NULL);
 			link_modules();
 
 			set_cur_module(get_first_module(NULL));

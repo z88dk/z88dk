@@ -7,7 +7,6 @@
 #include "die.h"
 #include "strutil.h"
 
-#include <assert.h>
 #include <ctype.h>
 #include <string.h>
 #include <dirent.h>
@@ -247,7 +246,7 @@ static void file_deinit(void)
 static void add_open_file(FILE *stream, const char *filename)
 {
 	file_init();
-	assert(stream);
+	xassert(stream);
 	argv_set(open_files, fileno(stream), filename);
 }
 
@@ -475,7 +474,7 @@ str_t *file_slurp(const char *filename)
 
 	xfseek(fp, 0, SEEK_END);
 	long size = ftell(fp);
-	assert(size >= 0);
+	xassert(size >= 0);
 	xfseek(fp, 0, SEEK_SET);
 
 	str_t *text = str_new();
@@ -574,7 +573,7 @@ static void path_find_glob_1(argv_t *files, const char *pattern)
 			}
 		}
 		else {
-			assert(0);
+			xassert(0);
 		}
 		globfree(&glob_files);
 
@@ -601,7 +600,7 @@ static void path_find_glob_1(argv_t *files, const char *pattern)
 			}
 		}
 		else {
-			assert(0);
+			xassert(0);
 		}
 		globfree(&glob_files);
 	}

@@ -15,7 +15,7 @@ Assembly macros.
 #include "strutil.h"
 #include "uthash.h"
 #include "types.h"
-#include <assert.h>
+#include "die.h"
 #include <ctype.h>
 
 #define Is_ident_prefix(x)	((x)=='.' || (x)=='#' || (x)=='$' || (x)=='%' || (x)=='@')
@@ -302,7 +302,7 @@ static void macro_expand(DefMacro *macro, char **p, str_t *out)
 {
 	if (utarray_len(macro->params) > 0) {
 		// collect arguments
-		assert(0);
+		xassert(0);
 	}
 
 	str_append(out, str_data(macro->text));

@@ -20,7 +20,7 @@ Assembly directives.
 #include "types.h"
 #include "symtab.h"
 #include "z80asm.h"
-#include <assert.h>
+#include "die.h"
 
 static void check_org_align();
 
@@ -77,7 +77,7 @@ void asm_DEFGROUP_start(int next_value)
 /* define one constant with the next value, increment the value */
 void asm_DEFGROUP_define_const(const char *name)
 {
-	assert(name != NULL);
+	xassert(name != NULL);
 	
 	if (DEFGROUP_PC > 0xFFFF || DEFGROUP_PC < -0x8000)
 		error_int_range(DEFGROUP_PC);
@@ -121,7 +121,7 @@ void asm_DEFVARS_define_const(const char *name, int elem_size, int count)
 	int var_size = elem_size * count;
 	int next_pc = *DEFVARS_PC + var_size;
 
-	assert(name != NULL);
+	xassert(name != NULL);
 
 	if (var_size > 0xFFFF)
 		error_int_range(var_size);
@@ -394,7 +394,7 @@ static void check_org_align()
 *----------------------------------------------------------------------------*/
 static Expr *asm_DMA_shift_exprs(UT_array *exprs)
 {
-	assert(utarray_len(exprs) > 0);
+	xassert(utarray_len(exprs) > 0);
 
 	Expr *expr = *((Expr **)utarray_front(exprs));	// copy first element
 	*((Expr **)utarray_front(exprs)) = NULL;		// do not destroy
@@ -465,7 +465,7 @@ static void asm_DMA_command_1(int cmd, UT_array *exprs)
 		case 0x08: asm_DEFB_expr(asm_DMA_shift_exprs(exprs)); break;		// bit 3
 		case 0x10: asm_DEFB_expr(asm_DMA_shift_exprs(exprs)); break; 		// bit 4
 		case 0x18: asm_DEFW(asm_DMA_shift_exprs(exprs)); break; 			// bits 3,4
-		default: assert(0);
+		default: xassert(0);
 		}
 
 		// parse wr0 parameters: check bits 5,6
@@ -478,7 +478,7 @@ static void asm_DMA_command_1(int cmd, UT_array *exprs)
 		case 0x20: asm_DEFB_expr(asm_DMA_shift_exprs(exprs)); break;		// bit 5
 		case 0x40: asm_DEFB_expr(asm_DMA_shift_exprs(exprs)); break;		// bit 6
 		case 0x60: asm_DEFW(asm_DMA_shift_exprs(exprs)); break;				// bits 5,6
-		default: assert(0);
+		default: xassert(0);
 		}
 
 		break;
@@ -742,7 +742,7 @@ static void asm_DMA_command_1(int cmd, UT_array *exprs)
 		break;
 
 	default:
-		assert(0);
+		xassert(0);
 	}
 
 	// check for extra arguments
@@ -757,7 +757,7 @@ void asm_DMA_command(int cmd, UT_array *exprs)
 		return;
 	}
 
-	assert(utarray_len(exprs) > 0);
+	xassert(utarray_len(exprs) > 0);
 	asm_DMA_command_1(cmd, exprs);
 	utarray_clear(exprs);			// clear any expr left over in case of error
 }

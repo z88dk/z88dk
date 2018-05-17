@@ -321,8 +321,8 @@ static void objfile_read_sections(objfile_t *obj, FILE *fp, long fpos_start)
 			section_t *section;
 			if (str_len(name) == 0) {
 				section = obj->sections;			// empty section is the first
-				assert(str_len(section->name) == 0);
-				assert(utarray_len(section->data) == 0);
+				xassert(str_len(section->name) == 0);
+				xassert(utarray_len(section->data) == 0);
 			}
 			else {
 				section = section_new();			// create a new section
@@ -877,7 +877,7 @@ void file_read(file_t *file, const char *filename)
 	switch (file->type) {
 	case is_object:  file_read_object(file, fp, signature, file->version);  break;
 	case is_library: file_read_library(file, fp, signature, file->version); break;
-	default: assert(0);
+	default: xassert(0);
 	}
 
 	xfclose(fp);
@@ -929,7 +929,7 @@ void file_write(file_t *file, const char *filename)
 	switch (file->type) {
 	case is_object:  file_write_object(file, fp);  break;
 	case is_library: file_write_library(file, fp); break;
-	default: assert(0);
+	default: xassert(0);
 	}
 
 	xfclose(fp);

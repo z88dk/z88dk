@@ -17,7 +17,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include "srcfile.h"
 #include "strutil.h"
 #include "fileutil.h"
-#include <assert.h>
+#include "die.h"
 
 /*-----------------------------------------------------------------------------
 *   Type stored in file_stack
@@ -98,7 +98,7 @@ void SrcFile_init( SrcFile *self )
 
 void SrcFile_copy( SrcFile *self, SrcFile *other )
 {
-    assert(0);
+    xassert(0);
 }
 
 void SrcFile_fini( SrcFile *self )

@@ -18,7 +18,7 @@ Scanner. Scanning engine is built by ragel from scan_rules.rl.
 #include "scan.h"
 #include "str.h"
 #include "utarray.h"
-#include <assert.h>
+#include "die.h"
 #include <ctype.h>
 
 /*-----------------------------------------------------------------------------
@@ -214,12 +214,12 @@ static long scan_num ( char *text, int length, int base )
 		}
 		else 
 		{
-			assert(0); /* invalid digit - should not be reached */
+			xassert(0); /* invalid digit - should not be reached */
 		}
 
 		if (digit >= base) 
 		{
-			assert(0); /* digit out of range - should not be reached */
+			xassert(0); /* digit out of range - should not be reached */
 		}
 		
 		value = value * base + digit;
@@ -251,7 +251,7 @@ static bool get_sym_string( void )
 
 	/* mark token start */
 	quote = *p++;
-	assert( quote == '"' || quote == '\'' );
+	xassert( quote == '"' || quote == '\'' );
 	ts = p;
 
 	/* search for end quote or end of string */

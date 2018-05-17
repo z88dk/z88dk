@@ -19,8 +19,7 @@ Handle object file contruction, reading and writing
 #include "zobjfile.h"
 #include "str.h"
 #include "strutil.h"
-
-#include <assert.h>
+#include "die.h"
 
 /*-----------------------------------------------------------------------------
 *   Object header
@@ -66,8 +65,8 @@ static long write_expr( FILE *fp )
 			case RANGE_WORD_BE:			range = 'B'; break;
 			case RANGE_BYTE_UNSIGNED:	range = 'U'; break;
 			case RANGE_BYTE_SIGNED:		range = 'S'; break;
-			case RANGE_JR_OFFSET:		assert(0);
-			default:					assert(0);
+			case RANGE_JR_OFFSET:		xassert(0);
+			default:					xassert(0);
 			}
 		}
 		xfwrite_byte(range, fp);				/* range of expression */
@@ -123,7 +122,7 @@ static int write_symbols_symtab( FILE *fp, SymbolHash *symtab )
 			case TYPE_CONSTANT:	type = 'C'; break;
 			case TYPE_ADDRESS:	type = 'A'; break;
 			case TYPE_COMPUTED:	type = '='; break;
-			default: assert(0);
+			default: xassert(0);
 			}
 
 			xfwrite_byte(scope, fp);
@@ -283,7 +282,7 @@ void OFile_init( OFile *self )
 	self->code_ptr = -1;
 }
 
-void OFile_copy( OFile *self, OFile *other ) { assert(0); }
+void OFile_copy( OFile *self, OFile *other ) { xassert(0); }
 
 void OFile_fini( OFile *self )
 {

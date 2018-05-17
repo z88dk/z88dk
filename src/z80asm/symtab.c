@@ -22,8 +22,7 @@ b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM 
 #include "symtab.h"
 #include "str.h"
 #include "z80asm.h"
-
-#include <assert.h>
+#include "die.h"
 
 /*-----------------------------------------------------------------------------
 *   Global Symbol Tables
@@ -424,7 +423,7 @@ void declare_global_symbol(const char *name)
 			sym->scope = SCOPE_GLOBAL;
 
 			global_sym = SymbolHash_extract(CURRENTMODULE->local_symtab, name);
-			assert(global_sym == sym);
+			xassert(global_sym == sym);
 
 			SymbolHash_set(&global_symtab, name, sym);
 		}
@@ -432,7 +431,7 @@ void declare_global_symbol(const char *name)
 		{
 			/* local, global - no possible path, as if local & not global,
 			symbol is moved local -> global */
-			assert(0);
+			xassert(0);
 		}
 	}
 }
@@ -488,7 +487,7 @@ void declare_public_symbol(const char *name)
 			sym->scope = SCOPE_PUBLIC;
 
 			global_sym = SymbolHash_extract(CURRENTMODULE->local_symtab, name);
-			assert(global_sym == sym);
+			xassert(global_sym == sym);
 
 			SymbolHash_set(&global_symtab, name, sym);
 		}
@@ -496,7 +495,7 @@ void declare_public_symbol(const char *name)
 		{
 			/* local, global - no possible path, as if local & not global,
 			   symbol is moved local -> global */
-			assert(0);
+			xassert(0);
 		}
 	}
 }
@@ -549,7 +548,7 @@ void declare_extern_symbol(const char *name)
 				sym->scope = SCOPE_EXTERN;
 				
 				ext_sym = SymbolHash_extract( CURRENTMODULE->local_symtab, name );
-				assert(ext_sym == sym);
+				xassert(ext_sym == sym);
 
                 SymbolHash_set( &global_symtab, name, sym );
             }

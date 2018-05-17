@@ -16,7 +16,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include "class.h"
 #include "types.h"
 #include "str.h"
-#include <assert.h>
+#include "die.h"
 #include <stdlib.h>
 
 /*-----------------------------------------------------------------------------
@@ -144,6 +144,6 @@ ARRAY(long);
 	void T##Array_pop(T##Array *self)										\
 	{																		\
 		size_t size = T##Array_size(self);									\
-		assert( size > 0 );													\
+		xassert( size > 0 );												\
 		T##Array_set_size(self, size - 1);									\
 	}

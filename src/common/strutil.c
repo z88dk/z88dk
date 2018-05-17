@@ -6,7 +6,6 @@
 #include "strutil.h"
 #include "die.h"
 #include "uthash.h"
-#include <assert.h>
 #include <ctype.h>
 #include <stdarg.h>
 #include <stdbool.h>
@@ -344,7 +343,7 @@ void argv_set(argv_t *argv, size_t idx, const char *str)
 
 	// free old element and set new one
 	char **elt = argv_eltptr(argv, idx);
-	assert(elt);
+	xassert(elt);
 	xfree(*elt);
 	*elt = xstrdup(str);
 	argv_add_end_marker(argv);

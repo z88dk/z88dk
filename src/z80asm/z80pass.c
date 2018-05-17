@@ -11,6 +11,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include "listfile.h"
 #include "modlink.h"
 #include "symbol.h"
+#include "die.h"
 
 /* external functions */
 
@@ -129,7 +130,7 @@ Z80pass2( void )
                 break;
 
 			default:
-				assert(0);
+				xassert(0);
             }
         }
 
@@ -150,7 +151,7 @@ Z80pass2( void )
 		{
 			/* remove current expression, advance iterator */
 			expr2 = ExprList_remove( CURRENTMODULE->exprs, &iter );
-			assert( expr == expr2 );
+			xassert( expr == expr2 );
 
 			OBJ_DELETE( expr );	
 		}

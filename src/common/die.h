@@ -24,6 +24,12 @@
 // error message and exit program
 extern void die(char *msg, ...);
 
+// assertion that is not removed in a release compile
+#define xassert(f)			do { \
+								if (!(f)) \
+									die("assertion failed in %s:%d\n", __FILE__, __LINE__); \
+							} while(0)
+
 // check alloc result, die if error
 extern void *check_alloc(void *p, const char *file, int line_nr);
 #define Check_alloc(type, p)	((type)(check_alloc((p), __FILE__, __LINE__)))
