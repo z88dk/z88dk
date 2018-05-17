@@ -155,6 +155,19 @@ define(`__NEXTOS_IDE_PARTITION_OPEN', 0x00cd)
 define(`__NEXTOS_IDE_PARTITION_CLOSE', 0x00d0)
 define(`__NEXTOS_IDE_PARTITIONS', 0x01a5)
 
+# Error Codes - Recoverable Disk Errors
+
+define(`__NEXTOS_RC_READY', 0)
+define(`__NEXTOS_RC_WP', 1)
+define(`__NEXTOS_RC_SEEK', 2)
+define(`__NEXTOS_RC_CRC', 3)
+define(`__NEXTOS_RC_NODATA', 4)
+define(`__NEXTOS_RC_MARK', 5)
+define(`__NEXTOS_RC_UNRECOG', 6)
+define(`__NEXTOS_RC_UNKNOWN', 7)
+define(`__NEXTOS_RC_DISKCHG', 8)
+define(`__NEXTOS_RC_UNSUIT', 9)
+
 # Error Codes - Non-Recoverable Disk Errors
 
 define(`__NEXTOS_RC_BADNAME', 20)

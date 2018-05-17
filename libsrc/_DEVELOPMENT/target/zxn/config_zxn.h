@@ -2045,10 +2045,11 @@
 #define __nextos_rc_bank_free  3
 
 #define __NEXTOS_IDE_BASIC  0x01c0
-#define __NEXTOS_IDE_STREAM_LINEIN  0x01c3
+#define __NEXTOS_IDE_WINDOW_LINEIN  0x01c3
 #define __NEXTOS_IDE_WINDOW_STRING  0x01c6
 #define __NEXTOS_IDE_INTEGER_VAR  0x01c9
 #define __NEXTOS_IDE_RTC  0x01cc
+#define __NEXTOS_IDE_DRIVER  0x01cf
 
 #define __NEXTOS_DOS_REF_XDPB  0x0151
 #define __NEXTOS_DOS_MAP_B  0x0154
@@ -2104,6 +2105,7 @@
 #define __ESX_M_GETHANDLE  0x8d
 #define __ESX_M_GETDATE  0x8e
 #define __ESX_M_EXECCMD  0x8f
+#define __ESX_M_DRVAPI  0x92
 #define __ESX_M_GETERR  0x93
 #define __ESX_M_P3DOS  0x94
 #define __ESX_M_ERRH  0x95
@@ -2402,6 +2404,20 @@
 
 
 
+#define __IO_I2C_SCL  0x103b
+#define __IO_I2C_SDA  0x113b
+
+
+
+
+
+
+
+
+
+
+
+
 #define __IO_SPRITE_SLOT  0x303b
 
 #define __IO_SPRITE_FLAGS  0x303b
@@ -2594,6 +2610,15 @@
 
 
 
+
+#define __CLK_28_0  28000000
+#define __CLK_28_1  28571429
+#define __CLK_28_2  29464286
+#define __CLK_28_3  30000000
+#define __CLK_28_4  31000000
+#define __CLK_28_5  32000000
+#define __CLK_28_6  33000000
+#define __CLK_28_7  27000000
 
 #define __IO_UART_RX  0x143b
 
