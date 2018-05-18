@@ -17,7 +17,8 @@
 ;	$Id: f_ansi_char.asm,v 1.5 2016-07-14 17:44:18 pauloscustodio Exp $
 ;
 
-        SECTION code_clib
+        SECTION code_driver
+	
 	PUBLIC	ansi_CHAR
 
 	;EXTERN	base_graphics
