@@ -280,8 +280,8 @@ void error_expression_recursion(char *name)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
-	str_append_sprintf( msg, "expression for '%s' depends on itself", name );
-	do_error( ErrError, str_data(msg) );
+	Str_append_sprintf( msg, "expression for '%s' depends on itself", name );
+	do_error( ErrError, Str_data(msg) );
 	
 	STR_DELETE(msg);
 }
