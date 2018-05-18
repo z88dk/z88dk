@@ -164,7 +164,7 @@ extern bool Expr_is_local_in_section(Expr *self, struct Module *module, struct S
 extern bool Expr_without_addresses(Expr *self);
 
 /* check if expression depends on itself */
-extern Bool Expr_is_recusive(Expr *self, const char *name);
+extern bool Expr_is_recusive(Expr *self, const char *name);
 
 /*-----------------------------------------------------------------------------
 *	Stack for calculator

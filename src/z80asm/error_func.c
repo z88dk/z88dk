@@ -276,7 +276,7 @@ void error_symbol_redecl(const char *symbol)
 	
 	STR_DELETE(msg);
 }
-void error_expression_recursion(char *name)
+void error_expression_recursion(const char *name)
 {
 	STR_DEFINE(msg, STR_SIZE);
 

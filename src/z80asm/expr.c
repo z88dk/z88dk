@@ -817,7 +817,7 @@ bool Expr_without_addresses(Expr *self)
 }
 
 /* check if expression depends on itself */
-Bool Expr_is_recusive(Expr *self, const char *name)
+bool Expr_is_recusive(Expr *self, const char *name)
 {
 	size_t i;
 
@@ -829,7 +829,7 @@ Bool Expr_is_recusive(Expr *self, const char *name)
 		{
 		case SYMBOL_OP:
 			if (strcmp(expr_op->d.symbol->name, name) == 0)
-				return TRUE;
+				return true;
 			break;
 
 		case CONST_EXPR_OP:
@@ -841,9 +841,9 @@ Bool Expr_is_recusive(Expr *self, const char *name)
 			break;
 
 		default:
-			assert(0);
+			xassert(0);
 		}
 	}
-	return FALSE;
+	return false;
 }
 

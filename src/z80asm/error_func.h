@@ -32,7 +32,7 @@ extern void error_symbol_redefined(const char *symbol);
 extern void error_symbol_redefined_module(const char *symbol, const char *module);
 extern void error_symbol_decl_local(const char *symbol);
 extern void error_symbol_redecl(const char *symbol);
-extern void error_expression_recursion(char *name);
+extern void error_expression_recursion(const char *name);
 extern void error_max_codesize(long size);
 extern void error_org_redefined(void);
 extern void error_align_redefined(void);

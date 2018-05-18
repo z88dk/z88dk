@@ -168,7 +168,7 @@ errors:
 	
   - type	: ErrError
     func	: error_expression_recursion
-    args	: char *name
+    args	: const char *name
     message	: "\"expression for '%s' depends on itself\", name"
 	
   # Link errors

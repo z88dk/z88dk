@@ -305,7 +305,7 @@ void asm_DEFC(const char *name, Expr *expr)
 		else {
 			/* store in object file to be computed at link time */
 			expr->range = RANGE_WORD;
-			expr->target_name = strpool_add(name);
+			expr->target_name = spool_add(name);
 
 			ExprList_push(&CURRENTMODULE->exprs, expr);
 
