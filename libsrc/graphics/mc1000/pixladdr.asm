@@ -6,7 +6,7 @@
 
 ;-----------  GFX paging  -------------
 
-	SECTION	  code_clib
+	SECTION	  code_driver 
 
 	PUBLIC	pixeladdress
 
@@ -82,7 +82,7 @@
 	
 ;-------
 
-	SECTION bss_clib
+;;;	SECTION bss_clib -  (to be kept in the code_driver section)
 	PUBLIC	pixelbyte
 
 .pixelbyte
