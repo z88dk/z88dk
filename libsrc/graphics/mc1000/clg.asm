@@ -6,7 +6,7 @@
 
 ;-----------  GFX init  -------------
 
-	SECTION	  code_clib
+	SECTION	  code_driver 
 
 	PUBLIC	clg
 	PUBLIC	_clg
