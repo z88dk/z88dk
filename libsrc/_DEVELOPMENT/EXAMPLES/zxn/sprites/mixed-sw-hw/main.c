@@ -18,8 +18,6 @@ unsigned char num_sw_sprites = 0;
 unsigned char num_hw_sprites = 0;
 unsigned char num_splats     = 0;
 
-#define TRANSPARENT 0xe3
-
 // hardware sprites
 
 extern unsigned char gfx_sword[];
@@ -247,7 +245,7 @@ void main(void)
    // global transparency
    
    ZXN_NEXTREG(REG_FALLBACK_COLOR, ZXN_RGB332_FACEBOOK_1);    // ignored by cspect
-   ZXN_NEXTREG(REG_GLOBAL_TRANSPARENCY_COLOR, TRANSPARENT);
+   ZXN_NEXTREG(REG_GLOBAL_TRANSPARENCY_COLOR, ZXN_RGB332_NEXTOS_BRIGHT_MAGENTA);
    
    // apply pattern to layer 2
 
