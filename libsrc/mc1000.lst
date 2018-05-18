@@ -5,11 +5,13 @@ stdio/mc1000/fputc_cons
 stdio/mc1000/generic_console
 stdio/mc1000/generic_console_ioctl
 stdio/mc1000/CRT_FONT
-@stdio/ansicore.lst
 stdio/ansi/mc1000/f_ansi_attr
+stdio/ansi/mc1000/f_ansi_scrollup
 stdio/ansi/mc1000/f_ansi_bel
 stdio/ansi/mc1000/f_ansi_char
-@gfxbase.lst
+@stdio/ansicore.lst
+graphics/mc1000/clg
+graphics/mc1000/pixladdr
 graphics/dcircle2
 graphics/clrarea
 graphics/lftscrol
@@ -25,6 +27,7 @@ graphics/mc1000/bksave
 graphics/mc1000/bkrestore
 graphics/mc1000/swapgfxbk
 graphics/mc1000/stencil_render
+@gfxbase.lst
 time/mc1000/clock
 games/mc1000/joystick
 games/mc1000/bit_open
