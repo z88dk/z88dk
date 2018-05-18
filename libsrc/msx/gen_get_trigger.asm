@@ -13,9 +13,17 @@
 	PUBLIC	msx_get_trigger
 	PUBLIC	_msx_get_trigger
 
-
 msx_get_trigger:
 _msx_get_trigger:
 
+IF FORm5
+	in a,($30)	; keyboard row scan
+	ld hl,0
+	and $40	; mask the SPACE key
+	ret z
+	dec hl
+	ret
+ELSE
 	ld	hl,0
 	ret
+ENDIF

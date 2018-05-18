@@ -1,5 +1,5 @@
-# moved to target/yaz180/driver/yabios/asm_common1_driver
-# target/yaz180/device/8255/8255_read_block
-# target/yaz180/device/8255/8255_write_block
-# target/yaz180/device/8255/8255_read_byte
-# target/yaz180/device/8255/8255_write_byte
+
+target/yaz180/device/8255/8255_read_block
+target/yaz180/device/8255/8255_write_block
+target/yaz180/device/8255/8255_read_byte
+target/yaz180/device/8255/8255_write_byte

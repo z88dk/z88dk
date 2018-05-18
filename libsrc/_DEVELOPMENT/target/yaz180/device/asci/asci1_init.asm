@@ -5,6 +5,7 @@
 
     PUBLIC _asci1_init
 
+    EXTERN _asci1_reset
     EXTERN asm_z180_push_di, asm_z180_pop_ei_jp
 
     _asci1_init:

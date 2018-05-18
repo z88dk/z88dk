@@ -215,7 +215,7 @@ int main()
  
   circle_sprite = sp1_CreateSpr(SP1_DRAW_MASK2LB, SP1_TYPE_2BYTE, 2, (int)circle_masked, 0);
 
-  sp1_AddColSpr(circle_sprite, SP1_DRAW_MASK2RB, SP1_TYPE_2BYTE, (int)circle_masked, 0);
+  sp1_AddColSpr(circle_sprite, SP1_DRAW_MASK2RB, SP1_TYPE_2BYTE, 0, 0);
 
   x=0;
   while(1) {
@@ -342,7 +342,7 @@ int main()
   for( i=0; i<NUM_SPRITES; i++ )
   {
     circle_sprites[i].sprite = sp1_CreateSpr(SP1_DRAW_MASK2LB, SP1_TYPE_2BYTE, 2, (int)circle_masked, 0);
-    sp1_AddColSpr(circle_sprites[i].sprite, SP1_DRAW_MASK2RB, SP1_TYPE_2BYTE, (int)circle_masked, 0);
+    sp1_AddColSpr(circle_sprites[i].sprite, SP1_DRAW_MASK2RB, SP1_TYPE_2BYTE, 0, 0);
 
     circle_sprites[i].x_pos = i*10;
     circle_sprites[i].y_pos = i*10;

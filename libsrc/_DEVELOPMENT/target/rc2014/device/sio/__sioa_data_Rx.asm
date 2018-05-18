@@ -4,12 +4,12 @@ INCLUDE "config_private.inc"
 SECTION data_driver
 
 PUBLIC sioaRxCount, sioaRxIn, sioaRxOut, sioaRxLock
- 
+
 sioaRxCount:    defb 0                  ; Space for Rx Buffer Management 
 sioaRxIn:       defw sioaRxBuffer       ; non-zero item in data since it's initialized anyway
 sioaRxOut:      defw sioaRxBuffer       ; non-zero item in data since it's initialized anyway
 sioaRxLock:     defb 0                  ; lock flag for Rx exclusion
-    
+
 IF  __IO_SIO_RX_SIZE = 256
     SECTION data_align_256
 ENDIF
@@ -56,5 +56,4 @@ ENDIF
 IF  __IO_SIO_RX_SIZE = 8
     ALIGN   8
 ENDIF
-
 

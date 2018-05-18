@@ -3,6 +3,7 @@
 		SECTION		code_clib
 
 		PUBLIC		generic_console_cls
+		PUBLIC		generic_console_vpeek
 		PUBLIC		generic_console_printc
 		PUBLIC		generic_console_scrollup
 		PUBLIC		generic_console_ioctl
@@ -13,6 +14,7 @@
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
 		EXTERN		asctozx81_entry_reg
+		EXTERN		zx81toasc
 
 		defc		D_FILE = 16396
 
@@ -47,6 +49,30 @@ generic_console_cls_2:
 ; e = raw
 generic_console_printc:
 	push	de		;save raw
+	call	xypos
+	pop	de
+	rr	e
+	call	nc,asctozx81_entry_reg
+	ld	(hl),a
+	ret
+
+;Entry: c = x,
+;       b = y
+;       e = rawmode
+;Exit:  nc = success
+;        a = character,
+;        c = failure
+generic_console_vpeek:
+	push	de
+        call    xypos
+	pop	de
+        ld      a,(hl)
+	rl	e
+	call	nc,zx81toasc	;reloads from (hl) but nevermind
+        and     a
+        ret
+
+xypos:
 	ld	hl,(D_FILE)
 	inc	hl
 	ld	de,CONSOLE_COLUMNS+1
@@ -58,10 +84,6 @@ generic_console_printc_1:
 	djnz	generic_console_printc_1
 generic_console_printc_3:
 	add	hl,bc			;hl now points to address in display
-	pop	de
-	rl	e
-	call	nc,asctozx81_entry_reg
-	ld	(hl),a
 	ret
 
 

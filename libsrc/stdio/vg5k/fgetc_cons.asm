@@ -15,14 +15,18 @@
 
 .fgetc_cons
 ._fgetc_cons
+        push    iy
+        ld      iy,$47FA                ;iy -> ix
+.fgetc_cons_loop
 	call $aa
 	and a
-	jr nz,fgetc_cons
+	jr nz,fgetc_cons_loop
 
 .wait_for_a_press
 	call $aa
 	and	a
 	jr	z, wait_for_a_press	
+	pop	iy
 
 IF STANDARDESCAPECHARS
 	cp	13
@@ -32,5 +36,4 @@ IF STANDARDESCAPECHARS
 ENDIF
 	ld	l,a
 	ld	h,0
-
 	ret

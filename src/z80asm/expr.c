@@ -815,3 +815,35 @@ bool Expr_without_addresses(Expr *self)
 	else
 		return true;
 }
+
+/* check if expression depends on itself */
+Bool Expr_is_recusive(Expr *self, const char *name)
+{
+	size_t i;
+
+	for (i = 0; i < ExprOpArray_size(self->rpn_ops); i++)
+	{
+		ExprOp *expr_op = ExprOpArray_item(self->rpn_ops, i);
+
+		switch (expr_op->op_type)
+		{
+		case SYMBOL_OP:
+			if (strcmp(expr_op->d.symbol->name, name) == 0)
+				return TRUE;
+			break;
+
+		case CONST_EXPR_OP:
+		case ASMPC_OP:
+		case NUMBER_OP:
+		case UNARY_OP:
+		case BINARY_OP:
+		case TERNARY_OP:
+			break;
+
+		default:
+			assert(0);
+		}
+	}
+	return FALSE;
+}
+

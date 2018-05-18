@@ -82,7 +82,6 @@ include(__link__.m4)
 // Functions
 
 __OPROTO(`a,b,c,d,e,iyh,iyl',`a,b,c,d,e,iyh,iyl',void,,apu_reset,void)
-__OPROTO(`a,b,c,d,e,iyh,iyl',`a,b,c,d,e,iyh,iyl',void,,apu_init,void)
 __DPROTO(`b,c,d,e,iyh,iyl',`b,c,d,e,iyh,iyl',uint8_t,,apu_chk_idle,void)
 __DPROTO(`iyh,iyl',`iyh,iyl',void,,apu_cmd_ld,uint32_t operand,uint8_t command)
 __DPROTO(`iyh,iyl',`iyh,iyl',uint8_t,,apu_op_rem,void * operand)

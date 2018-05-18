@@ -53,4 +53,7 @@ win32/Release/
 win32/ipch/
 win32/z88dk.VC.VC.opendb
 win32/z88dk.VC.db
-
+include/_DEVELOPMENT/proto/lib/
+include/_DEVELOPMENT/clang/lib/
+include/_DEVELOPMENT/sccz80/lib/
+include/_DEVELOPMENT/sdcc/lib/

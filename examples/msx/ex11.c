@@ -33,7 +33,7 @@ Contact the author:
 	HEAPSIZE(HPSIZE)
 
 
-	u_char* sbuffer[MODE2_MAX];
+	u_char sbuffer[MODE2_MAX];
 	unsigned char stencil[MODE2_HEIGHT*2];
 
 

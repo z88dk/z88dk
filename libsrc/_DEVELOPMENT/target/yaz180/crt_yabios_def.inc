@@ -130,56 +130,56 @@ PUBLIC _asci0_peekc
 DEFC _asci0_peekc                    = $FBA4
 
 PUBLIC _asci0_pollc
-DEFC _asci0_pollc                    = $FBB2
+DEFC _asci0_pollc                    = $FBB0
 
 PUBLIC _asci0_putc
-DEFC _asci0_putc                     = $FBBA
+DEFC _asci0_putc                     = $FBB8
 
 PUBLIC _asci1_init
-DEFC _asci1_init                     = $FC56
+DEFC _asci1_init                     = $FC57
 
 PUBLIC _asci1_flush_Rx_di
-DEFC _asci1_flush_Rx_di              = $FC6F
+DEFC _asci1_flush_Rx_di              = $FC70
 
 PUBLIC _asci1_flush_Tx_di
-DEFC _asci1_flush_Tx_di              = $FC87
+DEFC _asci1_flush_Tx_di              = $FC88
 
 PUBLIC _asci1_reset
-DEFC _asci1_reset                    = $FC9F
+DEFC _asci1_reset                    = $FCA0
 
 PUBLIC _asci1_getc
-DEFC _asci1_getc                     = $FCA9
+DEFC _asci1_getc                     = $FCAA
 
 PUBLIC _asci1_peekc
-DEFC _asci1_peekc                    = $FCBF
+DEFC _asci1_peekc                    = $FCC0
 
 PUBLIC _asci1_pollc
-DEFC _asci1_pollc                    = $FCCD
+DEFC _asci1_pollc                    = $FCCC
 
 PUBLIC _asci1_putc
-DEFC _asci1_putc                     = $FCD5
+DEFC _asci1_putc                     = $FCD4
 
 PUBLIC ide_read_sector
-DEFC ide_read_sector                 = $FE21
+DEFC ide_read_sector                 = $FE1A
 
 PUBLIC ide_write_sector
-DEFC ide_write_sector                = $FE51
+DEFC ide_write_sector                = $FE4A
 
 PUBLIC rhex
-DEFC rhex                            = $FEB8
+DEFC rhex                            = $FEB1
 
 PUBLIC phexwd
-DEFC phexwd                          = $FE91
+DEFC phexwd                          = $FE8A
 
 PUBLIC phex
-DEFC phex                            = $FE9B
+DEFC phex                            = $FE94
 
 PUBLIC pstring
-DEFC pstring                         = $FE7E
+DEFC pstring                         = $FE77
 
 PUBLIC pnewline
-DEFC pnewline                        = $FE88
+DEFC pnewline                        = $FE81
 
 PUBLIC _common1_phase_end
-DEFC _common1_phase_end              = $FEDE
+DEFC _common1_phase_end              = $FED7
 

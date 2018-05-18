@@ -13,6 +13,53 @@
 
 // convert a given frequency into a suitable period for PSG
 
+
+// **************
+//      C128
+// **************
+
+// 1 Mhz clock but the SID is different  
+#ifdef __C128__
+#include <c128/sid.h>
+#define psgT(hz)		((int) (hz/0.0596))
+#endif
+
+
+// **************
+//     SN PSG
+// **************
+
+// depending on the chip variant clock is divided by 16 or by 32
+
+#ifdef __M5__
+// Clock: 3579545
+#define psgT(hz)		((int)(111860.8 / (hz)))
+#endif
+
+#ifdef __MTX__
+// Clock: 4000000
+#define psgT(hz)		((int)(250000.0 / (hz)))
+#endif
+
+#ifdef __SC3000__
+#define psgT(hz)		((int)(167791.2 / (hz)))
+#endif
+
+#ifdef __SMS__
+// Masterclock PALN/3 = 3582056
+#define psgT(hz)		((int)(223878.5 / (hz)))
+#endif
+
+#ifdef __SHARPMZ__
+// Clock: 3546894 ..sharpmz.org suggests: "11094/(FR/10)"
+#define psgT(hz)		((int)(110840.4 / (hz)))
+#endif
+
+
+// **************
+//     YM PSG
+// **************
+
 #ifdef __X1__
 // Z80 is clocked at 4mhz
 #define psgT(hz)		((int)(125000.0 / (hz)))
@@ -25,12 +72,6 @@
 
 #ifdef __AQUARIUS__
 #define psgT(hz)		((int)(111861.0 / (hz)))
-#endif
-
-// 1 Mhz clock but the SID is different  
-#ifdef __C128__
-#include <c128/sid.h>
-#define psgT(hz)		((int) (hz/0.0596))
 #endif
 
 #ifdef __EINSTEIN__

@@ -121,7 +121,7 @@ nextflag0:
 	cp	'*'
 	jr	nz,width
 	set	3,(ix-3)
-	inc	de
+	inc	hl
 	jr	flagloop
 width:
 	ld	a,(hl)
@@ -138,10 +138,12 @@ formatchar:
 	ld	c,a
 	cp	'%'			; %% should match a single %
 	jr	z,scanf_ordinary_char
-
+	cp	'h'			; short specifier
+	jr	z,get_next_char
 	cp	'l'
 	jr	nz, not_long_specifier
 	set	1,(ix-3)
+get_next_char:
 	ld	c,(hl)
 	inc	hl
 not_long_specifier:
@@ -223,7 +225,7 @@ ENDIF
 __scanf_getchar_return:
 	ld	a,h	
 	or	l
-	inc	a	; if eof then 0
+	;inc	a	; if eof then 0
 	ld	a,l	; set the return value
 	scf
 	jr	z,__scanf_getchar_return1

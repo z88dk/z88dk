@@ -166,6 +166,11 @@ errors:
     args	: const char *symbol
     message	: "\"re-declaration of '%s' not allowed\", symbol"
 	
+  - type	: ErrError
+    func	: error_expression_recursion
+    args	: char *name
+    message	: "\"expression for '%s' depends on itself\", name"
+	
   # Link errors
   - type	: ErrError
     func	: error_max_codesize

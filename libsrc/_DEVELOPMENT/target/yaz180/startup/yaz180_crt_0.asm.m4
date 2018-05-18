@@ -1,13 +1,13 @@
 include(`z88dk.m4')
 
 dnl############################################################
-dnl##         YAZ180_CRT_0.ASM.M4 - YABIOS TARGET            ##
+dnl##          YAZ180_CRT_0.ASM.M4 - ROM TARGET              ##
 dnl############################################################
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                  yaz180 YABIOS target                     ;;
+;;                   yaz180 ROM target                       ;;
 ;; generated from target/yaz180/startup/yaz180_crt_0.asm.m4  ;;
 ;;                                                           ;;
-;;                banked 64k address spaces                  ;;
+;;                  flat 64k address space                   ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -107,7 +107,6 @@ EXTERN _main
 IF __crt_include_preamble
 
    include "crt_preamble.asm"
-   SECTION CODE
 
 ENDIF
 
@@ -115,15 +114,17 @@ ENDIF
 ;; PAGE ZERO ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF (ASMPC = 0) && (__crt_org_code = 0)
+IF (__crt_org_code = 0) && !(__page_zero_present)
 
-   include "crt_page_zero_yabios.inc"
+   include "../crt_page_zero_z180.inc"
 
 ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CRT INIT ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+SECTION code_crt_start         ; system initialization
 
 __Start:
 
@@ -148,6 +149,12 @@ __Restart_2:
 
       push hl                  ; argv
       push bc                  ; argc
+
+   ENDIF
+
+   IF __crt_include_preamble
+
+      include "crt_preamble.asm"
 
    ENDIF
 

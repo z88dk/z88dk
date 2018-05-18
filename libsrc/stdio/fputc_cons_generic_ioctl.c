@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <sys/ioctl.h>
 
-int fputc_cons_generic_ioctl(uint16_t cmd, void *arg) __naked 
+int console_ioctl(uint16_t cmd, void *arg) __naked 
 {
 #asm
 	EXTERN		generic_console_ioctl
@@ -22,7 +22,7 @@ int fputc_cons_generic_ioctl(uint16_t cmd, void *arg) __naked
 	cp	IOCTL_GENCON_RAW_MODE
 	jr	z,set_raw
         cp      IOCTL_GENCON_CONSOLE_SIZE
-        jr      nz,get_console_size
+        jr      z,get_console_size
 	call	generic_console_ioctl
 	jr	nc,success
 failure:

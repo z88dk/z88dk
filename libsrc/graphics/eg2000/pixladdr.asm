@@ -2,11 +2,9 @@
 	SECTION  code_clib
 	PUBLIC	pixeladdress
 
-	EXTERN	base_graphics
-
 
 ;
-;	$Id: pixladdr.asm,v 1.2 2016-06-20 21:47:41 dom Exp $
+;	$Id: pixladdr.asm $
 ;
 
 ; ******************************************************************
@@ -33,7 +31,7 @@
 
 				ld	b,l
 
-				ld	hl,(base_graphics)	; pointer to base of graphics area
+				ld	hl,$4800	; pointer to base of graphics area
 				ld	l,a
 
 				xor a

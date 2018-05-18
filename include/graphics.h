@@ -1,16 +1,9 @@
 /*
  *      Graphics Routines
  *
- *      Since no one actually used these routines I've taken it upon
- *      myself to rewrite the entry conditions so that they are actually
- *      useful and easy to use (hurrah!)
+ *      This file holds the declarations for the generic (multi target) graphics routines.
  *
- *      djm 12/4/2000
- *
- *      Stefano has converted many of these routines to the new ports
- *      Some will work, some will not. djm 6/6/2000
- *
- *	$Id: graphics.h,v 1.20 2016-11-10 07:34:54 stefano Exp $
+ *	$Id: graphics.h $
  */
 
 #ifndef __GFX_H__
@@ -18,10 +11,6 @@
 
 #include <sys/compiler.h>
 #include <stdint.h>
-
-#ifdef __TIKI100__
-#include <tiki100.h>
-#endif
 
 #pragma output graphics
 
@@ -144,14 +133,16 @@ extern void __LIB__ closegfx(struct window *) __smallc;
 /* ZX Spectrum has its own implementation aside */
 /* Init GFX mode and clear map */
 extern void __LIB__ cclg(void) __smallc;
+
 /* Plot a pixel to screen */
-extern void __LIB__ cplot(int x, int y, int color) __smallc;
-/* Draw a line */
-extern void __LIB__ cdraw(int x1, int y1, int x2, int y2, int color) __smallc;
-/* Draw a circle */
-extern void __LIB__ ccircle(int x, int y, int radius, int skip, int color) __smallc;
-/* Relative draw */
-extern void __LIB__ cdrawr(int px, int py, int color) __smallc;
+extern void __LIB__           cplot(int x, int y, int c) __smallc;
+extern void __LIB__    cplot_callee(int x, int y, int c) __smallc __z88dk_callee;
+#define cplot(a,b,c)           cplot_callee(a,b,c)
+
+/* Get a pixel from screen */
+extern char __LIB__           cpoint(int x, int y) __smallc;
+extern char __LIB__    cpoint_callee(int x, int y) __smallc __z88dk_callee;
+#define cpoint(a,b)            cpoint_callee(a,b)
 
 
 #endif

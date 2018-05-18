@@ -13,8 +13,6 @@
 			PUBLIC    clg
          PUBLIC    _clg
 
-	EXTERN	base_graphics
-	
 			INCLUDE	"graphics/grafix.inc"
 
 

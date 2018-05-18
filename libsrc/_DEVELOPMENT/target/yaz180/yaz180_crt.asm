@@ -12,6 +12,38 @@ IF !DEFINED_startup
 ENDIF
 
 
+IF !DEFINED_REGISTER_SP 
+	defc	DEFINED_REGISTER_SP  = 1
+	defc REGISTER_SP  = 0xffde
+	IFNDEF REGISTER_SP 
+	ENDIF
+ENDIF
+
+
+IF !DEFINED_CRT_ENABLE_RST 
+	defc	DEFINED_CRT_ENABLE_RST  = 1
+	defc CRT_ENABLE_RST  = 0xfe
+	IFNDEF CRT_ENABLE_RST 
+	ENDIF
+ENDIF
+
+
+IF !DEFINED_CRT_ENABLE_TRAP 
+	defc	DEFINED_CRT_ENABLE_TRAP  = 1
+	defc CRT_ENABLE_TRAP  = 0x1
+	IFNDEF CRT_ENABLE_TRAP 
+	ENDIF
+ENDIF
+
+
+IF !DEFINED_CLIB_MALLOC_HEAP_SIZE 
+	defc	DEFINED_CLIB_MALLOC_HEAP_SIZE  = 1
+	defc CLIB_MALLOC_HEAP_SIZE  = 0x1000
+	IFNDEF CLIB_MALLOC_HEAP_SIZE 
+	ENDIF
+ENDIF
+
+
 
 
 
@@ -56,10 +88,10 @@ ENDIF
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                  yaz180 YABIOS target                     ;;
+;;                   yaz180 ROM target                       ;;
 ;; generated from target/yaz180/startup/yaz180_crt_0.asm.m4  ;;
 ;;                                                           ;;
-;;                banked 64k address spaces                  ;;
+;;                  flat 64k address space                   ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -680,7 +712,7 @@ ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    ; make the default SP location public
-   
+
    PUBLIC __register_sp
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1705,7 +1737,7 @@ ENDIF
 
 SECTION CODE
 
-PUBLIC __Start, __Restart, __Exit
+PUBLIC __Start, __Exit
 
 EXTERN _main
 
@@ -1716,7 +1748,6 @@ EXTERN _main
 IF __crt_include_preamble
 
    include "crt_preamble.asm"
-   SECTION CODE
 
 ENDIF
 
@@ -1724,15 +1755,17 @@ ENDIF
 ;; PAGE ZERO ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF (ASMPC = 0) && (__crt_org_code = 0)
+IF (__crt_org_code = 0) && !(__page_zero_present)
 
-   include "crt_page_zero_yabios.inc"
+   include "../crt_page_zero_z180.inc"
 
 ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CRT INIT ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+SECTION code_crt_start         ; system initialization
 
 __Start:
 
@@ -1757,6 +1790,12 @@ __Restart_2:
 
       push hl                  ; argv
       push bc                  ; argc
+
+   ENDIF
+
+   IF __crt_include_preamble
+
+      include "crt_preamble.asm"
 
    ENDIF
 

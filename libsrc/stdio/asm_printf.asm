@@ -92,9 +92,12 @@ handle_percent:
 	jr	z,print_format_character
 	call	__printf_get_flags		;level2
 	res	6,(ix-4)
+	cp	'h'
+	jr	z,get_next_char
 	cp	'l'
 	jr	nz,no_long_qualifier
 	set	6,(ix-4)
+get_next_char:
 	ld	a,(hl)
 	inc	hl
 no_long_qualifier:

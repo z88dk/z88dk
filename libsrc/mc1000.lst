@@ -2,6 +2,9 @@
 stdio/mc1000/fgetc_cons
 stdio/mc1000/getk
 stdio/mc1000/fputc_cons
+stdio/mc1000/generic_console
+stdio/mc1000/generic_console_ioctl
+stdio/mc1000/CRT_FONT
 @stdio/ansicore.lst
 stdio/ansi/mc1000/f_ansi_attr
 stdio/ansi/mc1000/f_ansi_bel

@@ -50,7 +50,7 @@ defc ADJSTL  = $0016	;
 defc ADJSTU  = $001E	; 
 defc ADJSTR  = $0023	; 
 defc KEYSP   = $0511	; 
-defc JOYSP   = $05A5	; 
+defc JOYSP   = $05A5	; = GTSTCK when used with cursor keys
 defc GTCAPC  = $0085	; 
 defc CHGCP   = $0707	; 
 defc PTKDT   = $0869	; 
@@ -268,7 +268,7 @@ defc V0FAC  = $1A31	; Switch off all the three SGC channels
 
 ; MSX equivalences
 
-; Accessing to the VDP (T19918)
+; Accessing to the VDP (TMS9918)
 
 defc RDVRM  = $0018 ; GBVRID - Reads the VRAM address by [HL].
 defc WRTVRM = $0010 ; PBVRID - Write to the VRAM address by [HL].

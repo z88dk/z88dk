@@ -64,6 +64,7 @@
 #define __IO_PCA9665_2_PORT_BASE  0x8000
 
 #define __APU_CMD_SIZE  0x100
+#define __APU_PTR_SIZE  0x100
 #define __APU_DATA_SIZE  0x100
 
 #define __IO_APU_PORT_BASE  0xC000

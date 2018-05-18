@@ -20,9 +20,13 @@
 ;--------------------------------------------------------------
 
 PUBLIC	altint_on
+PUBLIC	_altint_on
 PUBLIC	altint_off
+PUBLIC	_altint_off
 PUBLIC	zx_fast
+PUBLIC	_zx_fast
 PUBLIC	zx_slow
+PUBLIC	_zx_slow
 
 ;----------------------------------------------------------------
 ;
@@ -30,6 +34,7 @@ PUBLIC	zx_slow
 ;
 ;----------------------------------------------------------------
 zx_fast:
+_zx_fast:
 	call restore81
 	jp	$F23		; FAST !
 
@@ -39,7 +44,9 @@ zx_fast:
 ;========
 
 zx_slow:
+_zx_slow:
 altint_on:
+_altint_on:
 		call    restore81
 		call    $F2B	; SLOW
         ld      hl,L0281
@@ -60,6 +67,7 @@ nosync:
 ;--------------------------------------------------------------
 
 altint_off:
+_altint_off:
 		call	altint_on     ; restore registers and make sure we are in SLOW mode
         ld      hl,$281
         jr      HRG_Sync

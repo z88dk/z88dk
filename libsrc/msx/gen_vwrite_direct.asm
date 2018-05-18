@@ -11,7 +11,12 @@
         SECTION code_clib
 	PUBLIC	msx_vwrite_direct
 	PUBLIC	_msx_vwrite_direct
+	
+IF FORm5
+	INCLUDE "target/m5/def/m5bios.def"
+ELSE
 	EXTERN     SETWRT
+ENDIF
 	
 	INCLUDE	"msx/vdp.inc"
 

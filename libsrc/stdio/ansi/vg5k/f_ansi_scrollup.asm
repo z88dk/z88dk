@@ -26,7 +26,6 @@
         SECTION code_clib
 	
 .ansi_SCROLLUP
-	ld	ix,$47FA
 ;	ld hl,(ROW)
 ;	push hl
 	ld  hl,0

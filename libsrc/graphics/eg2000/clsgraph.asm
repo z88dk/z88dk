@@ -13,8 +13,6 @@
 			PUBLIC    clsgraph
          PUBLIC    _clsgraph
 
-	EXTERN	base_graphics
-
 			INCLUDE	"graphics/grafix.inc"
 
 

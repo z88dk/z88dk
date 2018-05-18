@@ -23,7 +23,7 @@
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
-        defc    CONSOLE_COLUMNS = 80
+        defc    CONSOLE_COLUMNS = 40
         defc    CONSOLE_ROWS = 25
 
         PUBLIC    cpc_enable_fw_exx_set       ;needed by firmware interposer
@@ -31,6 +31,7 @@
 		
 	GLOBAL    __interposer_isr__
 
+	defc	TAR__no_ansifont = 1
 	defc	TAR__register_sp = -1
         defc	TAR__clib_exit_stack_size = 8
 	defc	CRT_KEY_DEL = 12
@@ -65,11 +66,11 @@ start:
 	; install interrupt interposer
 	call    cpc_enable_process_exx_set
 	ei
-
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
 ; the compiled program and the stack pointer
 IF DEFINED_USING_amalloc
+	defc	CRT_MAX_HEAP_ADDRESS = 0xa600
 	INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
 

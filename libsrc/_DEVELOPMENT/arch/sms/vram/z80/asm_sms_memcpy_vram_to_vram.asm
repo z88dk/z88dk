@@ -31,12 +31,10 @@ asm_sms_memcpy_vram_to_vram:
 
    set 6,d
    
-   ld a,c
+   dec bc
    inc b
-   
-   or a
-   jr nz, no_adjust
-   dec b
+   inc c
+   ld a,c
 
 no_adjust:
    
