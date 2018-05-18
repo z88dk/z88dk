@@ -21,9 +21,6 @@
 	PUBLIC	ansi_CHAR
 
 	;EXTERN	base_graphics
-	EXTERN	pix_rl
-	EXTERN	pix_pre
-	EXTERN	pix_post
 	EXTERN	pix_return
 
 	EXTERN	__console_y
@@ -212,3 +209,50 @@
   inc c
 ; end of underlined text handling
   ret
+
+
+;------- ANSI VT support (chunk 1)
+.pix_pre
+	ld	a,$9e
+	out	($80),a
+
+	rl (ix+1)
+	rl (ix+0)
+	inc b
+	dec b
+	jr z,DTS
+.L1
+	rl (ix+1)
+	rl (ix+0)
+	djnz L1
+.DTS
+	;ex	af,af	;
+	ld	a,$9f
+	out	($80),a
+	;ex	af,af	;
+	ret
+
+;------- ANSI VT support (chunk 2)
+.pix_rl
+	ex	af,af	;
+	ld	a,$9e
+	out	($80),a
+	ex	af,af	;
+.L2
+	rla
+	rl (ix+1)
+	rl (ix+0)
+	djnz L2
+.pix_post
+	ld b,6
+	inc b
+	dec b
+	jr z,NEXT
+.L3
+	rl (ix+1)
+	rl (ix+0)
+	djnz L3
+.NEXT
+	ld	a,$9f
+	out	($80),a	
+	ret
