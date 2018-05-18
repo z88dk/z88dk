@@ -2,6 +2,8 @@
 stdio/mz/fgetc_cons
 stdio/mz/fputc_cons
 stdio/mz/getk
+stdio/mz/generic_console
+stdio/mz/sharpmz_conversion
 @stdio/ansicore.lst
 stdio/ansi/sharp-mz/f_ansi_attr
 stdio/ansi/sharp-mz/f_ansi_bel
