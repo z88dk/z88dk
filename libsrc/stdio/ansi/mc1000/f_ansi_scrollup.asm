@@ -6,7 +6,7 @@
 ;	$Id: f_ansi_scrollup.asm $
 ;
 
-	SECTION  code_clib
+	SECTION  code_driver
 	
 	PUBLIC	ansi_del_line
 	PUBLIC	ansi_SCROLLUP
