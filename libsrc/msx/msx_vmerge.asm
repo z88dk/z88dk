@@ -30,6 +30,11 @@ _msx_vmerge:
 	push	de	; value
 	push	bc	; RET address
 
+IF VDP_CMD > 255
+	; TODO: Memory mapped VDP
+	
+
+ELSE
 	ld	c,VDP_CMD
 	ld	b,c
 
@@ -53,8 +58,8 @@ _msx_vmerge:
 	or	@01000000
 	ei
 	out	(c),a
-
 	ld	a,e
-	out	(VDP_DATA), a
+	out	(VDP_DATA),a
+ENDIF
 
 	ret

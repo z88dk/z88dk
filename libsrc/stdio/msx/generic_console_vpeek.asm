@@ -22,6 +22,9 @@ ENDIF
 IF FORmtx
 	EXTERN	LDIRMV
 ENDIF
+IF FORpv2000
+	EXTERN	LDIRMV
+ENDIF
 
 
 generic_console_vpeek:

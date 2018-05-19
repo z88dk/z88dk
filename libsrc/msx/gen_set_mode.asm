@@ -288,11 +288,19 @@ VDPreg_Write:
 	pop hl
 
 	ld	a,b
-	out     (VDP_CMD),a
+IF VDP_CMD > 255
+	ld	(VDP_CMD),a
+ELSE
+	out	(VDP_CMD),a
+ENDIF
 	ld      a,c
 	and     $07
 	or      $80		; enable bit for "set register" command
-	out     (VDP_CMD),a
+IF VDP_CMD > 255
+	ld	(VDP_CMD),a
+ELSE
+	out	(VDP_CMD),a
+ENDIF
 	inc     c
 	
 	push hl

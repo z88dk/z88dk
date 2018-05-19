@@ -18,7 +18,11 @@ FILVRM:
 	call	SETWRT
 
 loop: 	pop	af
+IF VDP_DATA > 255
+	ld	(VDP_DATA),a
+ELSE
 	out	(VDP_DATA),a
+ENDIF
 	push	af
 	dec	bc
 	ld	a,b

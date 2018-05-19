@@ -145,23 +145,41 @@ ENDIF
 
 
 ;**************
+IF VDP_CMD > 255
+	ld	a,l
+	ld	(VDP_CMD),a
+	ld	a,h
+	and	@00111111
+	ld	(VDP_CMD),a
+	ld	a,(VDP_DATAIN)
+ELSE
 	ld	a,l		; LSB of video memory ptr
 	out	(VDP_CMD), a
 	ld	a,h		; MSB of video mem ptr
 	and	@00111111	; masked with "read command" bits
 	out	(VDP_CMD), a
 	in	a, (VDP_DATAIN)
+ENDIF
 	ld (chline_buffer),a
 
 	ld	de,8	; next row
 	add	hl,de
-	
+
+IF VDP_CMD > 255
+	ld	a,l
+	ld	(VDP_CMD),a
+	ld	a,h
+	and	@00111111
+	ld	(VDP_CMD),a
+	ld	a,(VDP_DATAIN)
+ELSE	
 	ld	a,l		; LSB of video memory ptr
 	out	(VDP_CMD), a
 	ld	a,h		; MSB of video mem ptr
 	and	@00111111	; masked with "read command" bits
 	out	(VDP_CMD), a
 	in	a, (VDP_DATAIN)
+ENDIF
 	ld (chline_buffer+1),a
 ;**************
 	
@@ -254,6 +272,16 @@ ENDIF
 	ld hl,(RIGA+1)
 	push hl
 ;**************
+IF VDP_CMD > 255
+	ld	a,l
+	ld	(VDP_CMD),a
+	ld	a,h
+	and	@00111111
+	or	@01000000
+	ld	(VDP_CMD),a
+	ld	a,(chline_buffer)
+	ld	(VDP_DATA),a
+ELSE
          ld       a,l		; LSB of video memory ptr
          out      (VDP_CMD),a
          ld       a,h		; MSB of video mem ptr
@@ -262,9 +290,21 @@ ENDIF
          out      (VDP_CMD), a
          ld       a,(chline_buffer)
          out      (VDP_DATA), a
+ENDIF
 
 	ld de,8	; next row
 	add hl,de
+
+IF VDP_CMD > 255
+	ld	a,l	
+	ld	(VDP_CMD),a
+	ld	a,h
+	and	@00111111
+	or	@01000000
+	ld	(VDP_CMD),a
+	ld	a,(chline_buffer+1)
+	ld	(VDP_DATA),a
+ELSE
 		 
          ld       a,l		; LSB of video memory ptr
          out      (VDP_CMD),a
@@ -274,6 +314,7 @@ ENDIF
          out      (VDP_CMD), a
          ld       a,(chline_buffer+1)
          out      (VDP_DATA), a
+ENDIF
 		 
 ;	ld de,8192-8	; attribute
 ;	add hl,de
@@ -294,23 +335,41 @@ ENDIF
 	ld (RIGA+1),hl
 
 ;**************
+IF VDP_CMD > 255
+	ld	a,l
+	ld	(VDP_CMD),a
+	ld	a,h
+	and	@00111111
+	ld	(VDP_CMD),a
+	ld	a,(VDP_DATAIN)
+ELSE
 	ld	a,l		; LSB of video memory ptr
 	out	(VDP_CMD), a
 	ld	a,h		; MSB of video mem ptr
 	and	@00111111	; masked with "read command" bits
 	out	(VDP_CMD), a
 	in	a, (VDP_DATAIN)
+ENDIF
 	ld (chline_buffer),a
 
 	ld de,8	; next row
 	add hl,de
-	
+
+IF VDP_CMD > 255
+	ld	a,l
+	ld	(VDP_CMD),a
+	ld	a,h
+	and	@00111111
+	ld	(VDP_CMD),a
+	ld	a,(VDP_DATAIN)
+ELSE	
 	ld	a,l		; LSB of video memory ptr
 	out	(VDP_CMD), a
 	ld	a,h		; MSB of video mem ptr
 	and	@00111111	; masked with "read command" bits
 	out	(VDP_CMD), a
 	in	a, (VDP_DATAIN)
+ENDIF
 	ld (chline_buffer+1),a
 ;**************
 

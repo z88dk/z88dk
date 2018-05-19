@@ -46,7 +46,11 @@ _msx_vwrite_direct:
 
 wrtloop:
 	ld	a,(de)
+IF VDP_DATA > 255
+	ld	(VDP_DATA),a
+ELSE
 	out	(VDP_DATA),a
+ENDIF
 	inc	de
 	dec	bc
 	ld	a,c

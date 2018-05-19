@@ -59,3 +59,11 @@ IF FOReinstein
 	defc VDP_STATUS  = 9
 	defc VRAM_SIZE   = 16
 ENDIF
+
+IF FORpv2000
+	defc VDP_DATA    = 0x4000
+	defc VDP_DATAIN  = 0x4000
+	defc VDP_CMD     = 0x4001
+	defc VDP_STATUS  = 0x4001
+	defc VRAM_SIZE   = 16
+ENDIF
