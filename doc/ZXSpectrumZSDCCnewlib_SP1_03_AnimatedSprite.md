@@ -21,7 +21,8 @@ World of Spectrum. Here it is as an animated GIF file:
 
 ![alt text](images/runner32.gif "Runner sprite")
 
-As in previous examples, we code this graphics data as an assembly listing:
+The sprite has 8 "frames" of animation. As in previous examples, we
+code this graphics data as an assembly listing:
 
 ```
 SECTION rodata_user
@@ -200,14 +201,15 @@ author didn't want to have to type those data lines in as well. We're going to
 go back to using SP1's LOAD draw routines which we used in [article
 1](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_01_GettingStarted.md#a-closer-look-at-the-sprites-code).
 
-What we have here is an 8 frame sprite. That is, 8 separate 8x8 pixel graphics,
-which drawn in sequence create the animation. Frame 8 is designed to loop back
-to frame 1, and each frame is designed to move the character one pixel left to
-right to produce a walking effect one pixel at a time.
+What we have here is the data for an 8 frame sprite. That is, 8
+separate 8x8 pixel graphics, which drawn in sequence create the
+animation. Frame 8 is designed to loop back to frame 1, and each frame
+is designed to move the character one pixel left to right to produce a
+walking effect one pixel at a time.
 
 The individual frames are labelled in the listing, but only for information
 purposes. These labels are not exported since the C code doesn't need them for
-this example.
+this example. We only export the first frame address.
 
 Notice how each frame is separated from the next with 8 zero bytes. As discussed
 in the [first
@@ -359,6 +361,172 @@ frame. We increment the offset each time around the loop, resetting after the
 8th frame of our animation so we go back to the beginning. Rather than using the
 interrupt to *HALT* the Z80 in order to slow the animation, this example (which
 doesn't enable interrupts) adds a pause to slow things down.
+
+### State based animation
+
+Sequential animation works well for sprites like the runner character
+where the frames follow on from each other in a loop, but many sprites
+don't work like that. It's common for a video character to be in one
+of many states, and to transition between those states based on
+external stimuli. For example, a character might transition from left,
+to right, to climbing, to crouching, to dead, all on user key presses
+and other game events. This sort of thing is typically done with a
+state machine, and each state transition needs an update to the sprite
+graphic.
+
+The sequential graphical frame approach we've seen, where we calculate
+offsets to the appropriate frame data, doesn't really work for this
+sort of animation. It's simpler to just store the absolute address of
+the graphical data for each state, and switch to using that data when
+the sprite moves to the state. This is the nature of the second
+approach the SP1 library uses for sprite animation.
+
+Let's look at a trivial example to see how the code changes. Save this
+code to a file called *arrow_sprite.asm*:
+
+```
+SECTION rodata_user
+
+PUBLIC _arrow_left
+PUBLIC _arrow_right
+
+	defb @00000000
+	defb @00000000
+	defb @00000000
+	defb @00000000
+	defb @00000000
+	defb @00000000
+	defb @00000000
+
+._arrow_left
+	defb @00010000
+	defb @00100000
+	defb @01011111
+	defb @10000001
+	defb @10000001
+	defb @01011111
+	defb @00100000
+	defb @00010000
+
+	defb @00000000
+	defb @00000000
+	defb @00000000
+	defb @00000000
+	defb @00000000
+	defb @00000000
+	defb @00000000
+	defb @00000000
+	
+._arrow_right
+	defb @00001000
+	defb @00000100
+	defb @11111010
+	defb @10000001
+	defb @10000001
+	defb @11111010
+	defb @00000100
+	defb @00001000
+
+	defb @00000000
+	defb @00000000
+	defb @00000000
+	defb @00000000
+	defb @00000000
+	defb @00000000
+	defb @00000000
+	defb @00000000	
+```
+
+This is a simple 2-state sprite representing an arrow. One state has
+it facing left, the other has it facing right. The addresses of both
+frames are exported to the C.
+
+Here's the C code, which you should save to a file called
+*arrow_sprite.c*:
+
+```
+#pragma output REGISTER_SP = 0xD000
+
+#include <arch/zx.h>
+#include <z80.h>
+#include <arch/zx/sp1.h>
+#include <input.h>
+
+extern unsigned char arrow_left[];
+extern unsigned char arrow_right[];
+
+struct sp1_Rect full_screen = {0, 0, 32, 24};
+
+struct
+{
+  unsigned int   scan_code;
+  unsigned char *graphic;
+  signed   char  x_delta;
+}
+arrow_state[] = { {IN_KEY_SCANCODE_o, arrow_left,  -1},
+                  {IN_KEY_SCANCODE_p, arrow_right, +1} };
+
+int main()
+{
+  struct sp1_ss  *arrow_sprite;
+
+  unsigned char   x     = 128;
+  unsigned char   state = 0;
+
+  zx_border(INK_BLACK);
+
+  sp1_Initialize( SP1_IFLAG_MAKE_ROTTBL | SP1_IFLAG_OVERWRITE_TILES | SP1_IFLAG_OVERWRITE_DFILE,
+                  INK_BLACK | PAPER_WHITE,
+                  ' ' );
+ 
+  arrow_sprite = sp1_CreateSpr(SP1_DRAW_LOAD1LB, SP1_TYPE_1BYTE, 2, 0, 0);
+  sp1_AddColSpr(arrow_sprite, SP1_DRAW_LOAD1RB, SP1_TYPE_1BYTE, 0, 0);
+  sp1_MoveSprPix(arrow_sprite, &full_screen, arrow_state[state].graphic, x, 80);
+  sp1_Invalidate(&full_screen);
+
+  while( 1 ) {
+    unsigned char i;
+
+    for( i=0; i<2; i++ )
+    {
+      if( in_key_pressed( arrow_state[i].scan_code ) == 0xFFFF ) {
+        state = i;
+        break;
+      }
+    }
+
+    x += arrow_state[state].x_delta;
+
+    sp1_MoveSprPix(arrow_sprite, &full_screen, arrow_state[state].graphic, x, 80);
+    z80_delay_ms(10);
+
+    sp1_UpdateNow();    
+  }
+}
+```
+
+The main difference to the sprite handling introduced here is that
+the sprite creation function, *sp1_CreateSpr()*, has a null value in
+its penultimate argument. We're not giving the graphical data address
+here. Instead we provide the graphic data address to the
+*sp1_MoveSprPix()* function in the third argument. We're effectively
+saying "move the sprite to this screen location, and show it using
+this graphical data."
+
+The rest of the code should be simple to understand. We create a
+structure which holds a key scancode which will allow us to move the
+sprite into the state, the graphical data to use when in the state,
+and a value to adjust the sprite's screen position each time round the
+game loop while in the state. In this simple example we only have two
+such states for the sprite, moving left and moving right, so we have
+an array of 2 of these structures.
+
+The "game loop" therefore loops over the array testing for the key
+scancode for each state. If the relevant key is pressed we adopt that
+state. From there we update the sprite's screen coordinates according
+to the delta in the state information, and move and display the sprite
+accordingly.
+
 
 ## Conclusion
 
