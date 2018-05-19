@@ -35,7 +35,7 @@ generic_console_set_paper:
 generic_console_cls:
 	ld	hl, DISPLAY
 	ld	de, DISPLAY +1
-	ld	bc, +(CONSOLE_COLUMNS * CONSOLE_ROWS) - 1
+	ld	bc, +(32 * CONSOLE_ROWS) - 1
 	ld	(hl),32
 	ldir
 	ret
@@ -63,8 +63,8 @@ generic_console_vpeek:
 
 
 xypos:
-	ld	hl,DISPLAY - CONSOLE_COLUMNS
-	ld	de,CONSOLE_COLUMNS
+	ld	hl,DISPLAY - 30		; We lose left most two columns
+	ld	de,32
 	inc	b
 generic_console_printc_1:
 	add	hl,de
@@ -77,12 +77,12 @@ generic_console_printc_3:
 generic_console_scrollup:
 	push	de
 	push	bc
-	ld	hl, DISPLAY + CONSOLE_COLUMNS
+	ld	hl, DISPLAY + 32
 	ld	de, DISPLAY
-	ld	bc,+ ((CONSOLE_COLUMNS) * (CONSOLE_ROWS-1))
+	ld	bc,+ ((32) * (CONSOLE_ROWS-1))
 	ldir
 	ex	de,hl
-	ld	b,CONSOLE_COLUMNS
+	ld	b,32
 generic_console_scrollup_3:
 	ld	(hl),32
 	inc	hl

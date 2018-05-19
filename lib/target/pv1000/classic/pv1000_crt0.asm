@@ -28,7 +28,8 @@
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
-	defc	CONSOLE_COLUMNS = 32
+	; 2 columns on left and 2 column on right are lost
+	defc	CONSOLE_COLUMNS = 28
 	defc	CONSOLE_ROWS = 24
 
 	; 256 bytes at bb00
@@ -131,7 +132,9 @@ IF DEFINED_USING_amalloc
 ENDIF
 	call	_main
 cleanup:
-	jp	0
+	di
+	halt
+	jp	cleanup
 
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
