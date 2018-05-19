@@ -150,7 +150,11 @@ endif
 	INCLUDE	"target/pv1000/classic/lores.asm"
 
 	; Character map - TODO, redefining it
+IF PV1000_CUSTOM_TILESET
+	INCLUDE	"tileset.asm"
+ELSE
 	INCLUDE	"target/pv1000/classic/font.asm"
+ENDIF
 
 
 
