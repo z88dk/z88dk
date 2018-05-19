@@ -44,7 +44,7 @@ _joystick:
 	in	a,(0xfd)
 	rrca
 	rrca
-	bit	1,l		;J2?
+	bit	0,l		;J2?
 	jr	z,not_j2_1
 	rrca
 	rrca
@@ -55,7 +55,7 @@ not_j2_1:
 	ld	a,2		;Bit 1  = Down, right
 	out	(0xfd),a
 	in	a,(0xfd)
-	bit	1,l		;J2?
+	bit	0,l		;J2?
 	jr	z,not_j2_2
 	rrca
 	rrca
@@ -72,7 +72,7 @@ not_right:
 	ld	a,4		;Bit 2 = Up, left
 	out	(0xfd),a
 	in	a,(0xfd)
-	bit	1,l		;J2?
+	bit	0,l		;J2?
 	jr	z,not_j2_3
 	rrca
 	rrca
@@ -88,7 +88,7 @@ not_up:
 	ld	a,8		;Bit 3 = Trig 2, Trig 1
 	out	(0xfd),a
 	in	a,(0xfd)
-	bit	1,l
+	bit	0,l
 	jr	z,not_j2_4
 	rrca
 	rrca

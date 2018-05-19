@@ -141,12 +141,15 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 
 ; Font location - this is far to generous - we should add in extra
 ; symbols
-	defs	$0400-ASMPC
-if (ASMPC<>$0400)
+	defs	10 * 32-ASMPC
+if (ASMPC<>(10 * 32))
         defs    CODE_ALIGNMENT_ERROR
 endif
 
-; Character map - TODO, redefining it
+	; Lores graphics
+	INCLUDE	"target/pv1000/classic/lores.asm"
+
+	; Character map - TODO, redefining it
 	INCLUDE	"target/pv1000/classic/font.asm"
 
 
