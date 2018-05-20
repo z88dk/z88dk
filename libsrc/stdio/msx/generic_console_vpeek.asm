@@ -1,7 +1,7 @@
 
 
 	MODULE	generic_console_vpeek
-	SECTION	code_lib
+	SECTION	code_clib
 	PUBLIC	generic_console_vpeek
 
 	EXTERN	__msx_font32

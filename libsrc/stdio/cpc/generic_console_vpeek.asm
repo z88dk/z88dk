@@ -1,7 +1,7 @@
 
 
 	MODULE	generic_console_vpeek
-	SECTION	code_lib
+	SECTION	code_clib
 	EXTERN	generic_console_calc_screen_address
 	PUBLIC	generic_console_vpeek
 

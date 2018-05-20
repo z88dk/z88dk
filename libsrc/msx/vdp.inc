@@ -67,3 +67,11 @@ IF FORpv2000
 	defc VDP_STATUS  = 0x4001
 	defc VRAM_SIZE   = 16
 ENDIF
+
+IF FORsg1000
+	defc VDP_DATA    = 0xbe
+	defc VDP_DATAIN  = 0xbe
+	defc VDP_CMD     = 0xbf
+	defc VDP_STATUS  = 0xbf
+	defc VRAM_SIZE   = 16
+ENDIF
