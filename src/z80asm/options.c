@@ -1,12 +1,9 @@
-/*
-Z88DK Z80 Module Assembler
-
-Copyright (C) Paulo Custodio, 2011-2017
-License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-Repository: https://github.com/pauloscustodio/z88dk-z80asm
-
-Parse command line options
-*/
+//-----------------------------------------------------------------------------
+// Z88DK Z80 Module Assembler
+// Parse command line options
+// Copyright (C) Paulo Custodio, 2011-2018
+// License: http://www.perlfoundation.org/artistic_license_2_0
+//-----------------------------------------------------------------------------
 
 #include "../config.h"
 #include "../portability.h"
@@ -77,7 +74,7 @@ static void make_output_dir();
 
 static void process_options( int *parg, int argc, char *argv[] );
 static void process_files( int arg, int argc, char *argv[] );
-static void expand_source_glob(const char *filename);
+static void expand_source_glob(const char *pattern);
 static void expand_list_glob(const char *filename);
 
 static const char *expand_environment_variables(const char *arg);
@@ -329,114 +326,25 @@ static void process_file(char *filename )
 	}
 }
 
-//-----------------------------------------------------------------------------
-//	expand .../**/... into a list of all directories replacing **
-//	return just the input pattern if no ** is present
-//-----------------------------------------------------------------------------
-static void expand_star_star(const char *filename, argv_t *list)
+void expand_source_glob(const char *pattern)
 {
-	STR_DEFINE(path, STR_SIZE);
-	char *tail;
-
-	if ((tail = strstr(filename, "**")) == NULL) {
-		argv_push(list, filename);
-	}
-	else {
-		// expand first ** into list of all sub-directories
-		char *head = strdup(filename);			// alloc a copy to be modified
-		head[tail - filename + 1] = '\0';		// cut from second '*' of "**" onwards and expand one '*'
-
-		glob_t glob_dirs;						// find all directories that match head
-		int ret = glob(head, GLOB_NOESCAPE | GLOB_ONLYDIR, NULL, &glob_dirs);
-		if (ret == GLOB_NOMATCH) {
-			;									// no-match is OK - this directory is skipped
-		}
-		else if (ret == 0) {					// read list
-			for (int i = 0; i < glob_dirs.gl_pathc; i++) {
-				char *found = glob_dirs.gl_pathv[i];
-				if (dir_exists(found)) {
-					Str_sprintf(path, "%s/%s", 
-						found, tail[2] == '/' ? tail + 3 : tail + 2);	// collect directory with pattern
-					char *pattern = Str_data(path);
-					argv_push(list, pattern);
-
-					Str_sprintf(path, "%s/%s",
-						found, tail[0] == '/' ? tail + 1 : tail);	// reuse **/... from tail to recurse
-					expand_star_star(Str_data(path), list);		// recurse
-				}
-			}
-		}
-		else {									// error
-			error_glob(filename,
-				(ret == GLOB_ABORTED ? "filesystem problem" :
-					ret == GLOB_NOMATCH ? "no match of pattern" :
-					ret == GLOB_NOSPACE ? "no dynamic memory" :
-					"unknown problem"));
-		}
-		free(head);
-	}
-}
-
-static void expand_glob(const char *filename, argv_t *files, bool do_search_path)
-{
-	int initial_len = argv_len(files);
-	int ret;
-
-	// expand ** into list of all possible paths
-	argv_t *patterns = argv_new();
-	expand_star_star(filename, patterns);		// expand **
-
-	for (char **p = argv_front(patterns); *p; p++) {
-		char *pattern = *p;
-
-		if (strchr(pattern, '*') == NULL && strchr(pattern, '?') == NULL) {
-			// optimize if no pattern chars
-			const char *found = do_search_path ? search_source(pattern) : pattern;
-			argv_push(files, found);
-		}
-		else {
-			glob_t glob_files;
-			ret = glob(pattern, GLOB_NOESCAPE, NULL, &glob_files);
-			if (ret == GLOB_NOMATCH) {				// no match - ignore
-				;
-			}
-			else if (ret == 0) {
-				for (int i = 0; i < glob_files.gl_pathc; i++) {
-					char *found = glob_files.gl_pathv[i];
-					if (file_exists(found))
-						argv_push(files, found);
-				}
-			}
-			else {
-				error_glob(filename,
-					(ret == GLOB_ABORTED ? "filesystem problem" :
-						ret == GLOB_NOMATCH ? "no match of pattern" :
-						ret == GLOB_NOSPACE ? "no dynamic memory" :
-						"unknown problem"));
-			}
-			globfree(&glob_files);
-		}
-	}
-
+	argv_t *files = path_find_glob(pattern);
+	
 	// error if pattern matched no file
-	if (strchr(filename, '*') || strchr(filename, '?')) {
-		if (initial_len == argv_len(files))
-			error_glob_no_files(filename);
+	if (strpbrk(pattern, "*?") != NULL) {
+		if (argv_len(files) == 0)
+			error_glob_no_files(pattern);
 	}
 
-	argv_free(patterns);
-}
-
-void expand_source_glob(const char *filename)
-{
-	expand_glob(filename, opts.files, true);
+	for (char **p = argv_front(files); *p; p++) {
+		argv_push(opts.files, search_source(*p));
+	}
+	argv_free(files);
 }
 
 void expand_list_glob(const char *filename)
 {
-	argv_t *files = argv_new();
-
-	expand_glob(filename, files, false);
+	argv_t *files = path_find_glob(filename);
 	for (char **p = argv_front(files); *p; p++) {
 		char *filename = *p;
 		src_push();

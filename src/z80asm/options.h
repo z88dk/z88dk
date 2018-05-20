@@ -1,13 +1,9 @@
-/*
-Z88DK Z80 Module Assembler
-
-Copyright (C) Paulo Custodio, 2011-2017
-License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-Repository: https://github.com/pauloscustodio/z88dk-z80asm
-
-Parse command line options
-*/
-
+//-----------------------------------------------------------------------------
+// Z88DK Z80 Module Assembler
+// Parse command line options
+// Copyright (C) Paulo Custodio, 2011-2018
+// License: http://www.perlfoundation.org/artistic_license_2_0
+//-----------------------------------------------------------------------------
 #pragma once
 
 #include "types.h"

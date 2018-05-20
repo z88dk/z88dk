@@ -90,9 +90,9 @@ static const char *path_canon_sep(const char *path, char win32_sep)
 	str_path_canon(canon);
 
 #ifdef _WIN32
-	for (char *p = str_data(canon); *p; p++)
-		if (*p == '/')
-			*p = win32_sep;
+	char *p = str_data(canon);
+	while ((p = strchr(p, '/')) != NULL)
+		*p++ = win32_sep;
 #endif
 
 	const char *ret = spool_add(str_data(canon));
@@ -525,6 +525,7 @@ argv_t *path_find_all(const char *dirname, bool recursive)
 	return dirs;
 }
 
+// may be used to expand wildcards for files that dont exist, e.g. basenames of files e.g. dir/*/base
 static void path_find_glob_1(argv_t *files, const char *pattern)
 {
 	str_t *pad = str_new();
@@ -532,8 +533,7 @@ static void path_find_glob_1(argv_t *files, const char *pattern)
 	pattern = path_canon(pattern);
 	const char *wc = strpbrk(pattern, "*?");
 	if (!wc) {
-		if (file_exists(pattern))
-			argv_push(files, pattern);		// no wildcard
+		argv_push(files, pattern);			// no wildcard
 	}
 	else if (strncmp(wc, "**", 2) == 0) {	// star-star - recursively find all subdirs
 		char *child = strchr(wc, '/');		// point to slash after star-star

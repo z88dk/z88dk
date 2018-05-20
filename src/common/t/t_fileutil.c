@@ -1065,6 +1065,7 @@ void t_fileutil_path_find_glob(void)
 	f = path_find_glob("test_dir/a/1/g1.c");
 	argv_sort(f);
 	p = argv_front(f);
+	TEST_ASSERT_EQUAL_STRING("test_dir/a/1/g1.c", *p); p++;
 	TEST_ASSERT_NULL(*p);
 	argv_free(f);
 

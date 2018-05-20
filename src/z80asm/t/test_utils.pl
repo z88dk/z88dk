@@ -1,13 +1,13 @@
 #!/usr/bin/perl
 
+#-----------------------------------------------------------------------------
 # Z88DK Z80 Macro Assembler
 #
-# Copyright (C) Gunther Strube, InterLogic 1993-99
-# Copyright (C) Paulo Custodio, 2011-2017
-# License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-# Repository: https://github.com/pauloscustodio/z88dk-z80asm
+# Copyright (C) Paulo Custodio, 2011-2018
+# License: http://www.perlfoundation.org/artistic_license_2_0
 #
 # Common utils for tests
+#-----------------------------------------------------------------------------
 
 use Modern::Perl;
 use Path::Tiny;
@@ -576,7 +576,7 @@ int main (int argc, char **argv)
 	write_file("test.c", $main_code);
 
 	# build
-	my $cc = "gcc $CFLAGS -o test.exe test.c $compile_args $LDFLAGS";
+	my $cc = "gcc $CFLAGS -O0 -o test.exe test.c $compile_args $LDFLAGS";
 	note "line ", (caller)[2], ": $cc";
 	
 	my $ok = (0 == system($cc));
