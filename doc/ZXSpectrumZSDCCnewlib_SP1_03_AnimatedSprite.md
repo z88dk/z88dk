@@ -445,6 +445,7 @@ Here's the C code, which you should save to a file called
 *arrow_sprite.c*:
 
 ```
+
 #pragma output REGISTER_SP = 0xD000
 
 #include <arch/zx.h>
@@ -478,11 +479,10 @@ int main()
   sp1_Initialize( SP1_IFLAG_MAKE_ROTTBL | SP1_IFLAG_OVERWRITE_TILES | SP1_IFLAG_OVERWRITE_DFILE,
                   INK_BLACK | PAPER_WHITE,
                   ' ' );
+  sp1_Invalidate(&full_screen);
  
   arrow_sprite = sp1_CreateSpr(SP1_DRAW_LOAD1LB, SP1_TYPE_1BYTE, 2, 0, 0);
   sp1_AddColSpr(arrow_sprite, SP1_DRAW_LOAD1RB, SP1_TYPE_1BYTE, 0, 0);
-  sp1_MoveSprPix(arrow_sprite, &full_screen, arrow_state[state].graphic, x, 80);
-  sp1_Invalidate(&full_screen);
 
   while( 1 ) {
     unsigned char i;
@@ -505,13 +505,19 @@ int main()
 }
 ```
 
-The main difference to the sprite handling introduced here is that
-the sprite creation function, *sp1_CreateSpr()*, has a null value in
-its penultimate argument. We're not giving the graphical data address
+Compile this example with:
+
+```
+zcc +zx -vn -m -startup=1 -clib=sdcc_iy arrow_sprite.c arrow_sprite.asm -o arrow_sprite -create-app
+```
+
+The main difference to the sprite handling introduced here is that the
+sprite creation function, *sp1_CreateSpr()*, has a null value in its
+penultimate argument. We're not giving the graphical data address
 here. Instead we provide the graphic data address to the
-*sp1_MoveSprPix()* function in the third argument. We're effectively
-saying "move the sprite to this screen location, and show it using
-this graphical data."
+*sp1_MoveSprPix()* function in the third argument - it's not an offset
+here, we're effectively saying "move the sprite to this screen
+location, and show it using this graphical data."
 
 The rest of the code should be simple to understand. We create a
 structure which holds a key scancode which will allow us to move the
@@ -521,15 +527,32 @@ game loop while in the state. In this simple example we only have two
 such states for the sprite, moving left and moving right, so we have
 an array of 2 of these structures.
 
-The "game loop" therefore loops over the array testing for the key
+The "game loop" therefore iteratess over the array testing for the key
 scancode for each state. If the relevant key is pressed we adopt that
 state. From there we update the sprite's screen coordinates according
 to the delta in the state information, and move and display the sprite
-accordingly.
+with the appropriate graphical data.
 
+Of course, this is a trivial example. A real game, where the
+characters walk, run, jump, climb, shoot and die might need dozens of
+sprite frames, all linked via state machines which smoothly transition
+from one state to the next.
+
+## Exercises for the reader
+
+* Add more states and graphics to the arrow sprite example. Change it
+so you can guide the arrow using Q, A, O and P.
+
+* Add an explosion state, which the arrow takes if you let it hit the
+side of the screen.
 
 ## Conclusion
 
-
-### Where To Go From Here
+We've now looked at both approaches to drawing sprites with SP1, in
+particular in the context of animation. One uses a data address
+together with a varying offset to locate a specific frame, and the
+other uses absolute frame addresses each time the sprite needs to be
+moved. While both approaches have their merits and use cases, it's
+the second approach which is generally more popular. Certainly, most
+of the SP1 example code in Z88DK uses it.
 
