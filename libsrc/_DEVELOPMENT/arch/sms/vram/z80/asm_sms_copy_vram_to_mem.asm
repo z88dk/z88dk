@@ -27,13 +27,10 @@ asm_sms_copy_vram_to_mem:
    ;
    ; uses  : af, bc, de, hl
 
-   ld a,b
-   inc a
-   ld b,c
-   
+   dec bc
    inc b
-   djnz no_adjust
-   dec a
+   inc c
+   ld a,c
    
 no_adjust:
    

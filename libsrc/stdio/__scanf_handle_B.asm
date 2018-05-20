@@ -20,6 +20,6 @@ __scanf_b_fmt_entry_from_i:
         jp      c,scanf_exit
 handle_b_fmt_nobase:
         call    asm_isbdigit
-        jp      c,scanf_exit
+        jp      nz,scanf_exit
         ld      b,2
         jp      __scanf_parse_number

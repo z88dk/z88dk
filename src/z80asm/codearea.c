@@ -302,7 +302,8 @@ void sections_alloc_addr(void)
 
 		// check ALIGN of next section, extend this section if needed
 		next_section = get_next_section(&iter);
-		if (next_section != NULL && !(next_section->origin >= 0) && next_section->align > 1) {
+		if (next_section != NULL && !(next_section->origin >= 0) && next_section->align > 1
+			&& get_section_size(next_section) > 0) {
 			int above = addr % next_section->align;
 			if (above > 0) {
 				for (int i = next_section->align - above; i > 0; i--) {

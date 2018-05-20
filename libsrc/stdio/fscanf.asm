@@ -18,6 +18,7 @@ fscanf:
 	ld	h,0
         add     hl,hl
 	add	hl,sp		;&buf
+	push	ix		;save caller
 	ld	c,(hl)		;fp
 	inc	hl
 	ld	b,(hl)
@@ -34,8 +35,6 @@ fscanf:
 	dec	hl
 	push	hl		;&ap
 	call	asm_scanf
-	pop	bc
-	pop	bc
 	pop	bc
 	pop	bc
 	pop	bc

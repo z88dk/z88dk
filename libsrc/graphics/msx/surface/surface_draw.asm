@@ -31,11 +31,13 @@
                 EXTERN     Line
                 EXTERN     surface_plotpixel
 
+; #define surface_line(s,x1,y1,x2,y2) surface_draw(s,x1,y1,x2,y2)
+; void surface_draw(surface_t *s, int x1, int y1, int x2, int y2);
 
 .surface_draw
 ._surface_draw
 		push	ix	;save callers
-		ld	ix,2
+		ld	ix,0
 		add	ix,sp
 
 		ld	l,(ix+12)	; surface struct

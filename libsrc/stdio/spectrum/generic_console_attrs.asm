@@ -1,5 +1,5 @@
 
-		SECTION	generic_console_attrs
+		MODULE generic_console_attrs
 
 		SECTION	code_clib
 		PUBLIC	generic_console_set_ink

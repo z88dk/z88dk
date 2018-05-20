@@ -9,6 +9,10 @@ stdio/ansi/generic/f_ansi_cls
 stdio/ansi/generic/f_ansi_dline
 stdio/ansi/vg5k/f_ansi_scrollup
 stdio/vg5k/generic_console
+stdio/vg5k/generic_console_ioctl
+stdio/vg5k/CRT_FONT
+stdio/vg5k/set_character
+@font/font_8x8/font_8x8.lst
 @gfxbase.lst
 graphics/dcircle
 graphics/clg

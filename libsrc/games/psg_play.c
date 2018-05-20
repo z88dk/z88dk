@@ -8,14 +8,14 @@
 ;
 ; Syntax: "TONE(#/b)(+/-)(duration)"
 ; Sample:
-;		bit_play("C8DEb4DC8");
-;		bit_play("C8DEb4DC8");
-;		bit_play("Eb8FGG");
-;		bit_play("Eb8FGG");
-;		bit_play("G8Ab4G8FEb4DC");
-;		bit_play("G8Ab4G8FEb4DC");
-;		bit_play("C8G-C");
-;		bit_play("C8G-C");
+;		psg_play("C8DEb4DC8");
+;		psg_play("C8DEb4DC8");
+;		psg_play("Eb8FGG");
+;		psg_play("Eb8FGG");
+;		psg_play("G8Ab4G8FEb4DC");
+;		psg_play("G8Ab4G8FEb4DC");
+;		psg_play("C8G-C");
+;		psg_play("C8G-C");
 */
 
 #include <psg.h>

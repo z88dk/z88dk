@@ -26,6 +26,7 @@ all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	svi_clib.lib sam_clib.lib  sorcerer_clib.lib  sos_clib.lib tiki100.lib \
 	trs80_clib.lib vg5k_clib.lib vz_clib.lib  x07_clib.lib \
 	embedded_clib.lib test_clib.lib testrcm_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
+	pv1000_clib.lib \
 	preempt.lib x1ansi_clib.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib gendos.lib ndos.lib  \
@@ -107,6 +108,7 @@ msxdeps:
 	@$(RM) -f graphics/msx/*.o
 	@$(RM) -f graphics/msx/surface/*.o
 	@$(RM) -f psg/msx/*.o
+	@$(RM) -f psg/sn76489/*.o
 	@$(RM) -f time/msx/*.o
 	@$(RM) -f msx/*.o
 
@@ -588,8 +590,10 @@ mz_clib.lib:
 	@echo '--- Building Sharp MZ Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
+	$(MAKE) msxdeps
+	$(MAKE) -C games TARGET=mz
 	$(call buildgeneric,mz)
-	TARGET=mz TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/mz_clib @$(LISTFILE_DIRECTORY)/mz.lst
+	TARGET=mz TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmz -x$(OUTPUT_DIRECTORY)/mz_clib @$(LISTFILE_DIRECTORY)/mz.lst
 
 # ABC80 Library - Stefano
 abc80_clib.lib:
@@ -742,6 +746,7 @@ mtx_clib.lib:
 	@echo '--- Building Memotech MTX Library ---'
 	@echo ''
 	$(MAKE) msxdeps
+	$(MAKE) -C games TARGET=mtx
 	$(call buildgeneric,mtx)
 	$(MAKE) -C games TARGET=mtx
 	$(MAKE) -C msx TARGET=test
@@ -793,6 +798,7 @@ m5_clib.lib:
 	@echo '--- Building SORD M5 Library ---'
 	@echo ''
 	$(MAKE) msxdeps
+	$(MAKE) -C games TARGET=m5
 	$(call buildgeneric,m5)
 	$(MAKE) -C msx TARGET=test
 	TARGET=m5 TYPE=z80 $(LIBLINKER) -DFORm5 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/m5_clib @$(LISTFILE_DIRECTORY)/m5.lst
@@ -853,6 +859,15 @@ kc_clib.lib:
 	$(MAKE) gfxdeps
 	$(call buildgeneric,kc)
 	TARGET=kc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORkc -x$(OUTPUT_DIRECTORY)/kc_clib @$(LISTFILE_DIRECTORY)/kc.lst
+
+# Casio PV1000 (dom)
+pv1000_clib.lib:
+	@echo ''
+	@echo '--- Building Casio PV-1000 Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(call buildgeneric,pv1000)
+	TARGET=pv1000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORpv1000 -x$(OUTPUT_DIRECTORY)/pv1000_clib @$(LISTFILE_DIRECTORY)/pv1000.lst
 
 # Untested C lib for NC100 machines - dom
 nc_clib.lib:
@@ -1018,6 +1033,7 @@ sms_clib.lib:
 	@echo '--- Building Sega Master System Library ---'
 	@echo ''
 	$(MAKE) msxdeps
+	$(MAKE) -C games TARGET=sms
 	$(call buildgeneric,sms)
 	$(MAKE) -C msx TARGET=test
 	TARGET=sms TYPE=z80 $(LIBLINKER) -DFORsms -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sms_clib @$(LISTFILE_DIRECTORY)/sms.lst
@@ -1028,6 +1044,7 @@ sc3000_clib.lib:
 	@echo '--- Building SC-3000 System Library ---'
 	@echo ''
 	$(MAKE) msxdeps
+	$(MAKE) -C games TARGET=sc3000
 	$(call buildgeneric,sc3000)
 	$(MAKE) -C msx TARGET=test
 	TARGET=sc3000 TYPE=z80 $(LIBLINKER) -DFORsc3000 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sc3000_clib @$(LISTFILE_DIRECTORY)/sc3000.lst

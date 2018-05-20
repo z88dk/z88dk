@@ -2,6 +2,7 @@
 stdio/abc80/fgetc_cons
 stdio/abc80/fputc_cons
 stdio/abc80/getk
+stdio/abc80/generic_console
 @stdio/ansicore.lst
 stdio/ansi/abc80/f_ansi_attr
 stdio/ansi/abc80/f_ansi_bel

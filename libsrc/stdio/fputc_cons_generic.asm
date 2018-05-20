@@ -17,6 +17,7 @@
 ;  [ESC] p - start inverse video
 ;  [ESC] q - stop inverse video
 ;  [ESC] s - Enable/disable vertical scrolling
+;  [ESC] r [char] - Print character (raw)
 ;   8      - move cursor left
 ;  10      - linefeed
 ;
@@ -83,10 +84,11 @@ set_y:
 
 set_vscroll:
 	res	3,(hl)
-	res	7,(hl)
+	inc	hl		;Now on flags2
+	res	6,(hl)
 	rrca
 	ret	c
-	set	7,(hl)
+	set	6,(hl)
 	ret
 
 set_ink:
@@ -121,10 +123,13 @@ ENDIF
 	jr	nz,set_paper
 	bit	6,(hl)
 	jp	nz,set_inverse
+	bit	7,(hl)
+	res	7,(hl)
+        ld      e,1             ;set raw mode
+	jr	nz,handle_character
 	inc	hl		;flags2
         bit     0,(hl)          ;raw mode
 	dec	hl
-        ld      e,1             ;set raw mode
         jr      nz,handle_character
         cp      8
         jp      z,left
@@ -160,7 +165,6 @@ IF SUPPORT_vt52
 	cp	27
 	jr	z,start_code
 ENDIF
-print_character:
 	dec	e		;e = 0, not raw mode
 handle_character:
 	; At this point:
@@ -173,7 +177,8 @@ handle_character:
 	ld	a,(__console_h)
 	cp	b
 	jr	nc,handle_character_no_scroll
-	bit	7,(hl)
+	inc	hl
+	bit	6,(hl)
 	call	z,generic_console_scrollup
 	ld	a,(__console_h)
 	dec	a
@@ -208,6 +213,7 @@ move_home:
 IF SUPPORT_vt52
 set_escape:
 	res	0,(hl)
+	jr	z,start_code
 	cp	'A'
 	jr	z,up
 	cp	'B'
@@ -242,8 +248,12 @@ ENDIF
 	cp	's'
 	ld	d,8
 	jr	z,start_code
+	cp	'r'
+	ld	d,128
+	jr	z,start_code
 	; Anything else we just print
-	jr	print_character
+	ld	e,1			;Print in raw mode
+	jr	handle_character
 ENDIF
 
 set_inverse_ansi:
@@ -356,7 +366,8 @@ generic_console_flags:		defb	0		; bit 0 = expect escape
 							; bit 4 = expect ink
 							; bit 5 = expect paper
 							; bit 6 = expect inverse
-							; bit 7 = vscroll disabled
+							; bit 7 = expect raw character
 generic_console_flags2:		defb	0		; bit 0 = raw mode enabled
+							; bit 6 = vscroll disabled
 							; bit 7 = inverse on
 

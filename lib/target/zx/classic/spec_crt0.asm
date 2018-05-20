@@ -36,6 +36,9 @@
         PUBLIC    _FRAMES
         defc      _FRAMES = 23672 ; Timer
 
+	PUBLIC	  __PORT254COPY
+	defc	  __PORT254COPY = 23624
+
 
         IF DEFINED_ZXVGS
             IF !DEFINED_CRT_ORG_CODE
@@ -120,25 +123,8 @@ ELSE
 ; Optional definition for auto MALLOC init; it takes
 ; all the space between the end of the program and UDG
 IF DEFINED_USING_amalloc
-        ld  hl,_heap
-        ld  c,(hl)
-        inc hl
-        ld  b,(hl)
-        inc bc
-        ; compact way to do "mallinit()"
-        xor a
-        ld  (hl),a
-        dec hl
-        ld  (hl),a
-
-        ;  Stack is somewhere else, no need to reduce the size for malloc
-        ld  hl,65535-168 ; Preserve UDG
-        sbc hl,bc   ; hl = total free memory
-
-        push bc ; main address for malloc area
-        push hl ; area size
-        EXTERN sbrk_callee
-        call    sbrk_callee
+	defc	CRT_MAX_HEAP_ADDRESS = 65535 - 169
+	INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
 
   IF DEFINED_ZXVGS

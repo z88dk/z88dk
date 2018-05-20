@@ -11,6 +11,7 @@
     PUBLIC     _bit_open_di
     EXTERN     __snd_tick
     EXTERN     __bit_irqstatus
+    EXTERN     __PORT254COPY
 
     INCLUDE  "games/games.inc"
     
@@ -25,7 +26,7 @@
         ld (__bit_irqstatus),hl
         pop hl
         
-        ld a,(23624)
+        ld a,(__PORT254COPY)
         rra
         rra
         rra

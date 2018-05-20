@@ -114,6 +114,9 @@ extern unsigned char IO_SD_STATUS;
 extern unsigned char IO_EB;
 extern unsigned char IO_SD_DATA
 extern unsigned char IO_103B;
+extern unsigned char IO_I2C_SCL;
+extern unsigned char IO_113B;
+extern unsigned char IO_I2C_SDA;
 extern unsigned char IO_LED_L;
 
 #else
@@ -199,9 +202,19 @@ __sfr __at __IO_SD_STATUS IO_SD_STATUS;
 __sfr __at 0xeb IO_EB;
 __sfr __at __IO_SD_DATA IO_SD_DATA;
 
-// io ports - LED
+// io ports - i2c (real-time clock)
 
 __sfr __banked __at 0x103b IO_103B;
+__sfr __banked __at __IO_I2C_SCL IO_I2C_SCL;  // bit 0 w only
+
+__sfr __banked __at 0x113b IO_113B;
+__sfr __banked __at __IO_I2C_SDA IO_I2C_SDA;  // bit 0 r/w
+
+// io ports - LED
+
+// not implemented on zx next, needed by boot code for other hw
+// mapped to same port as IO_I2C_SCL
+
 __sfr __banked __at __IO_LED_L IO_LED_L;
 
 #endif
@@ -310,6 +323,19 @@ __sfr __banked __at __IO_LED_L IO_LED_L;
 #define IO_303B_COLLISION  __IO_303B_COLLISION
 
 // 0x143b, IO_UART_BAUD_RATE
+
+// actual uart clock as a function of video timing 0-7
+
+#define CLK_28_0  __CLK_28_0
+#define CLK_28_1  __CLK_28_1
+#define CLK_28_2  __CLK_28_2
+#define CLK_28_3  __CLK_28_3
+#define CLK_28_4  __CLK_28_4
+#define CLK_28_5  __CLK_28_5
+#define CLK_28_6  __CLK_28_6
+#define CLK_28_7  __CLK_28_7
+
+// these are calculated using a nominal 28MHz clock
 
 #define IUBR_115200_L  __IUBR_115200_L
 #define IUBR_115200_H  __IUBR_115200_H
@@ -743,7 +769,7 @@ __DPROTO(`b,c,d,e,h,l,iyl,iyh',`b,c,d,e,h,l,iyl,iyh',void,,ZXN_WRITE_MMU7,unsign
 
 __DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned int,,zxn_addr_from_mmu,unsigned char mmu)
 __DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned char,,zxn_mmu_from_addr,unsigned int addr)
-__DPROTO(`b,c,d,e,iyl,iyh',`b,c,d,e,iyl,iyh',unsigned int,,zxn_addr_in_mmu,unsigned char mmu, unsigned int addr)
+__DPROTO(`b,c,d,iyl,iyh',`b,c,d,iyl,iyh',unsigned int,,zxn_addr_in_mmu,unsigned char mmu, unsigned int addr)
 
 __DPROTO(`b,c,iyl,iyh',`b,c,iyl,iyh',unsigned long,,zxn_addr_from_page,unsigned char page)
 __DPROTO(`b,c,d,e,iyl,iyh',`b,c,iyl,iyh',unsigned char,,zxn_page_from_addr,unsigned long addr)

@@ -65,7 +65,7 @@ xypos:
 	ld	hl,TOPROW
 	ld	a,b
 	and	a
-	ld	a,d
+	ld	a,d		
 	jr	z,generic_console_printc_3
 	ld	hl, DISPLAY - 64 + 10
 	ld	de,64
@@ -74,7 +74,6 @@ generic_console_printc_1:
 	djnz	generic_console_printc_1
 generic_console_printc_3:
 	add	hl,bc			;hl now points to address in display
-	ld	(hl),a
 	ret
 
 generic_console_scrollup:

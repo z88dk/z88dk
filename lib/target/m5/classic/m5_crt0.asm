@@ -43,6 +43,8 @@ IF      !DEFINED_CRT_ORG_CODE
 	defc    CRT_ORG_CODE  = $7300
 ENDIF
 
+	defc	CONSOLE_COLUMNS = 32
+	defc    CONSOLE_ROWS = 24
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = -1
 	defc	__CPU_CLOCK = 3580000

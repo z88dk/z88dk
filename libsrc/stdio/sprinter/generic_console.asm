@@ -72,11 +72,6 @@ generic_console_scrollup:
 ; a = d = character to print
 ; e = raw
 generic_console_printc:
-	rl	e
-	jr	c,generic_console_printc_1
-	; Here we can interpret any extra codes (eg for setting colours)
-
-generic_console_printc_1:
 	ld	d,b
 	ld	e,c
 	ex	af,af

@@ -37,7 +37,7 @@
         ENDIF
 
 
-
+	defc	TAR__no_ansifont = 1
 	defc	TAR__clib_exit_stack_size = 32
 	defc	TAR__register_sp = -1
 	defc __CPU_CLOCK = 2000000

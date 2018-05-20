@@ -7,6 +7,8 @@ SECTION code_clib
 PUBLIC zx_border
 PUBLIC _zx_border
 
+EXTERN __PORT254COPY
+
 zx_border:
 _zx_border:
 
@@ -23,9 +25,9 @@ _zx_border:
    rla
    rla
    ld	e,a
-   ld	a,(23624)
+   ld	a,(__PORT254COPY)
    and	$c7
    or	e
-   ld  (23624),a
+   ld  (__PORT254COPY),a
    
    ret

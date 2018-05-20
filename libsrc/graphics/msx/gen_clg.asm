@@ -15,7 +15,11 @@ IF FORsc3000
 ELSE
         EXTERN	msx_set_mode
         EXTERN	msx_color
-        EXTERN	FILVRM
+	IF FORm5
+		INCLUDE "target/m5/def/m5bios.def"
+	ELSE
+			EXTERN	FILVRM
+	ENDIF
 ENDIF
 
 .clg

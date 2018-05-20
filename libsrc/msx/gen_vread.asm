@@ -11,7 +11,12 @@
         SECTION code_clib
 	PUBLIC	msx_vread
 	PUBLIC	_msx_vread
+
+IF FORm5
+	INCLUDE "target/m5/def/m5bios.def"
+ELSE
 	EXTERN     SETRD
+ENDIF
 	
 	INCLUDE	"msx/vdp.inc"
 

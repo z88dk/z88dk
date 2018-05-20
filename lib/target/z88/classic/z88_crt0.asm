@@ -48,7 +48,7 @@
 
         defc    CONSOLE_COLUMNS = 80
         defc    CONSOLE_ROWS = 8
-
+	defc	TAR__no_ansifont = 1
 
 	defc	__CPU_CLOCK = 3276800
 

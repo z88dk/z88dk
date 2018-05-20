@@ -26,6 +26,7 @@ define(`__IO_SD_DATA', 0xeb)
 #
 
 # PORT 0x103B: LED active low
+# Not present on the zx next but used in boot programs
 
 define(`__IO_LED_L', 0x103b)
 

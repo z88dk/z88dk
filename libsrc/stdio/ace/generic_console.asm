@@ -12,8 +12,10 @@
 
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
+		EXTERN		CRT_FONT
 
-		defc		DISPLAY = 0x2400
+		defc            DISPLAY = 0x2400
+	        defc		CHAR_TABLE = 0x2C00
 
 
 generic_console_cls:
@@ -37,7 +39,7 @@ generic_console_printc:
 	push	de
 	call	xypos
 	pop	de
-	rl	e
+	rr	e
 	jr	c,is_raw
 	; In non-raw mode characters > 128 are udgs
 	res	7,a
@@ -85,3 +87,16 @@ generic_console_scrollup_3:
 	pop	bc
 	pop	de
 	ret
+
+
+; If compiled with a font option then set it up
+        SECTION code_crt_init
+
+        ld      hl,CRT_FONT
+        ld      a,h
+        or      l
+        jr      z,no_set_font
+        ld      de,CHAR_TABLE + 256
+        ld      bc,768
+        ldir
+no_set_font:

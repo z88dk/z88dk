@@ -11,10 +11,14 @@
 
         SECTION code_clib
 	PUBLIC  getk
+	PUBLIC  _getk
 
 .getk
 ._getk
+	push	iy
+	ld	iy,$47FA		;iy -> ix
 	call $aa
+	pop	iy
 
 
 IF STANDARDESCAPECHARS

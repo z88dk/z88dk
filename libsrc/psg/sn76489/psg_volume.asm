@@ -1,16 +1,25 @@
-	SECTION code_clib	
+	SECTION code_clib
+	
 	PUBLIC	set_sound_volume
 	PUBLIC	_set_sound_volume
+	PUBLIC	psg_volume
+	PUBLIC	_psg_volume
 	
-	INCLUDE "sms/sms.hdr"
+;	$Id: psg_volume.asm $
 
 ;==============================================================
 ; void set_sound_volume(int channel, int volume)
 ;==============================================================
 ; Sets the sound volume for a given channel
 ;==============================================================
+
+	INCLUDE	"psg/sn76489.inc"
+
 .set_sound_volume
 ._set_sound_volume
+.psg_volume
+._psg_volume
+
 	ld	hl, 2
 	add	hl, sp
 	ld	e, (hl)		; E = Volume
@@ -31,6 +40,6 @@
 	
 	or	a, $90
 	or	a, b		; Prepares the first byte of the command
-	out	($7F), a	; Sends it
+	out	(psgport), a	; Sends it
 
 	ret

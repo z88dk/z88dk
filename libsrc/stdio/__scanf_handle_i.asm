@@ -6,7 +6,6 @@
         EXTERN  __scanf_common_start
 	EXTERN  __scanf_getchar
         EXTERN  scanf_exit
-	EXTERN	asm_isodigit
 	EXTERN	__scanf_parse_number
 
 	EXTERN	__scanf_b_fmt_entry_from_i

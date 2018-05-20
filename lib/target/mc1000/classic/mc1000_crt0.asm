@@ -10,7 +10,6 @@
 ;	this file:
 ;
 ;	#pragma output nostreams      - No stdio disc files
-;	#pragma output nogfx          - Saves memory in TEXT only programs
 
 
 
@@ -33,19 +32,6 @@
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
-
-        PUBLIC	pixeladdress
-        PUBLIC	clg
-        PUBLIC	pix_return
-        PUBLIC	pix_rl
-        PUBLIC	pix_pre
-        PUBLIC	pix_post
-        
-        PUBLIC	gfxbyte_get
-        
-        PUBLIC	ansi_cls
-        PUBLIC	ansi_del_line
-        PUBLIC	ansi_SCROLLUP
 
         defc    CONSOLE_COLUMNS = 32
         defc    CONSOLE_ROWS = 24
@@ -353,181 +339,6 @@ irq_hndl:
 		ret
 
 
-IF !DEFINED_nogfx
-
-
-;-----------  GFX init  -------------
-.ansi_cls
-.clg
-	ld	b,255
-	ld	a,$9e
-	out	($80),a
-
-	ld	hl,$8000
-.clg1
-	ld	(hl),b
-	inc	hl
-	ld	a,h
-	cp	$98
-	jp	nz,clg1
-
-	ld	a,$9f
-	out	($80),a
-	ld	($f5),a		; Instruct the BASIC about the current screen mode
-					; so the ROM won't mess with the video page when called
-	ld	hl,clgret
-	ld	($f7),hl	; cursor flashing and positioning routine
-
-.clgret
-	ret
-
-;-----------  GFX support for ANSI VT emulation  -------------
-.ansi_SCROLLUP
-	ld	a,$9e
-	out	($80),a
-
-	ld	de,$8000
-	ld	hl,$8000+256
-	ld	bc,6144-256
-	ldir
-	
-	ld	a,23
-
-.ansi_del_line
-	ex	af,af
-	ld	a,$9e
-	out	($80),a
-	ex	af,af
-
-	ld	hl,$8000
-	ld	d,a		; de = line*256
-	ld	e,l
-	add	hl,de	;Line address in HL	
-	
-	ld	bc,255
-	ld	(hl),c
-	ld	d,h
-	ld	e,l
-	inc	de
-	ldir
-
-	ld	a,$9f
-	out	($80),a
-	ret
-
-;-----------  GFX paging  -------------
-.pixeladdress
-
-	; add y-times the nuber of bytes per line (32)
-	; or just multiply y by 32 and the add
-	ld	e,l
-	ld	a,h
-	ld	b,a
-
-	ld	h,0
-
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-
-	ld	de,$8000
-	add	hl,de
-
-	; add x divided by 8
-	
-	;or	a
-	rra
-	srl a
-	srl a
-	ld	e,a
-	ld	d,0
-	add	hl,de	
-	
-;-------
-.gfxbyte_get
-	ld	a,$9e
-	out	($80),a
-
-	ld	a,(hl)
-	ld	d,h
-	ld	e,l
-	ld	hl,pixelbyte
-	cpl
-	ld	(hl),a
-
-	ld	a,$9f
-	out	($80),a
-
-	ld	a,b
-	or	0f8h	;set all unused bits 1
-	cpl			;they now become 0	
-	ret
-
-
-;-------
-.pix_return
-	ex	af,af	; dcircle uses the flags in af'.. watch out !
-	ld	a,$9e
-	out	($80),a
-
-	ex	af,af	; dcircle uses the flags in af'.. watch out !
-	cpl
-	ld	(de),a	; pixel address
-
-	ld	a,$9f
-	out	($80),a
-	ret
-
-;------- ANSI VT support (chunk 1)
-.pix_pre
-	ld	a,$9e
-	out	($80),a
-
-	rl (ix+1)
-	rl (ix+0)
-	inc b
-	dec b
-	jr z,DTS
-.L1
-	rl (ix+1)
-	rl (ix+0)
-	djnz L1
-.DTS
-	;ex	af,af	;
-	ld	a,$9f
-	out	($80),a
-	;ex	af,af	;
-	ret
-
-;------- ANSI VT support (chunk 2)
-.pix_rl
-	ex	af,af	;
-	ld	a,$9e
-	out	($80),a
-	ex	af,af	;
-.L2
-	rla
-	rl (ix+1)
-	rl (ix+0)
-	djnz L2
-.pix_post
-	ld b,6
-	inc b
-	dec b
-	jr z,NEXT
-.L3
-	rl (ix+1)
-	rl (ix+0)
-	djnz L3
-.NEXT
-	ld	a,$9f
-	out	($80),a	
-	ret
-
-ENDIF
-
         defm  "Small C+ MC1000"
         defb   0
 
@@ -544,12 +355,9 @@ ENDIF
 	
 	SECTION	bss_crt
 	
-        PUBLIC	pixelbyte	; Temp store for non-buffered mode
         PUBLIC	FRAMES
-		
-pixelbyte:
-		defw    0       
 
+		
 FRAMES:
 		defw	0
 		defw	0
