@@ -78,8 +78,9 @@ extern void file_spew_str(const char *filename, str_t *str);
 
 extern str_t *file_slurp(const char *filename);			// user must free str_t
 
-// read directory (files and directories), user must free argv_t
+// list files in directories, user must free argv_t
 extern argv_t *path_find_all(const char *dirname, bool recursive);
+extern argv_t *path_find_files(const char *dirname, bool recursive);
 extern argv_t *path_find_glob(const char *pattern);
 
 // create/remve a directory and all parents above/children below it

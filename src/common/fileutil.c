@@ -488,7 +488,7 @@ str_t *file_slurp(const char *filename)
 //-----------------------------------------------------------------------------
 // directories
 //-----------------------------------------------------------------------------
-static void find_files_1(argv_t *dirs, const char *dirname, bool recursive)
+static void find_files_1(argv_t *dirs, const char *dirname, bool recursive, bool find_dirs)
 {
 	DIR *dir = opendir(dirname);
 	if (!dir) {
@@ -503,9 +503,10 @@ static void find_files_1(argv_t *dirs, const char *dirname, bool recursive)
 
 		const char *name = path_combine(dirname, entry->d_name);
 		if (dir_exists(name)) {
-			argv_push(dirs, name);
+			if (find_dirs)
+				argv_push(dirs, name);
 			if (recursive)
-				find_files_1(dirs, name, recursive);
+				find_files_1(dirs, name, recursive, find_dirs);
 		}
 		else if (file_exists(name)) {
 			argv_push(dirs, name);
@@ -521,11 +522,17 @@ static void find_files_1(argv_t *dirs, const char *dirname, bool recursive)
 argv_t *path_find_all(const char *dirname, bool recursive)
 {
 	argv_t *dirs = argv_new();
-	find_files_1(dirs, dirname, recursive);
+	find_files_1(dirs, dirname, recursive, true);
 	return dirs;
 }
 
-// may be used to expand wildcards for files that dont exist, e.g. basenames of files e.g. dir/*/base
+argv_t *path_find_files(const char *dirname, bool recursive)
+{
+	argv_t *dirs = argv_new();
+	find_files_1(dirs, dirname, recursive, false);
+	return dirs;
+}
+
 static void path_find_glob_1(argv_t *files, const char *pattern)
 {
 	str_t *pad = str_new();
@@ -533,7 +540,8 @@ static void path_find_glob_1(argv_t *files, const char *pattern)
 	pattern = path_canon(pattern);
 	const char *wc = strpbrk(pattern, "*?");
 	if (!wc) {
-		argv_push(files, pattern);			// no wildcard
+		if (file_exists(pattern))
+			argv_push(files, pattern);		// no wildcard
 	}
 	else if (strncmp(wc, "**", 2) == 0) {	// star-star - recursively find all subdirs
 		char *child = strchr(wc, '/');		// point to slash after star-star
@@ -576,7 +584,6 @@ static void path_find_glob_1(argv_t *files, const char *pattern)
 			xassert(0);
 		}
 		globfree(&glob_files);
-
 	}
 	else {									// find one level of subdirs
 		char *child = strchr(wc, '/');		// point to slash wild card

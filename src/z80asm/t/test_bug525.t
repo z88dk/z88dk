@@ -18,6 +18,7 @@ use Path::Tiny;
 require './t/testlib.pl';
 
 unlink_testfiles();
+-d "test_dir" && path("test_dir")->remove_tree;
 
 path("test_dir/a/1")->mkpath;
 path("test_dir/a/2")->mkpath;
@@ -28,6 +29,10 @@ path("test_dir/a/1/a.asm")->spew("defb 1");
 path("test_dir/a/2/a.asm")->spew("defb 2");
 path("test_dir/b/1/a.asm")->spew("defb 3");
 path("test_dir/b/2/a.asm")->spew("defb 4");
+
+unlink "test.bin";
+run("z80asm -b -otest.bin \"test_dir/**/*\"", 0, "", "");
+check_bin_file("test.bin", pack("C*", 1..4));
 
 unlink "test.bin";
 run("z80asm -b -otest.bin \"test_dir/*/*/*.asm\"", 0, "", "");

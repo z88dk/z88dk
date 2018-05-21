@@ -267,7 +267,7 @@ static void process_options( int *parg, int argc, char *argv[] )
 /* search for the first file in path, with the given extension,
 * with .asm extension and with .o extension
 * if not found, return original file */
-static const char *search_source(char *filename)
+static const char *search_source(const char *filename)
 {
 	const char *f;
 
@@ -328,18 +328,21 @@ static void process_file(char *filename )
 
 void expand_source_glob(const char *pattern)
 {
-	argv_t *files = path_find_glob(pattern);
-	
-	// error if pattern matched no file
-	if (strpbrk(pattern, "*?") != NULL) {
-		if (argv_len(files) == 0)
-			error_glob_no_files(pattern);
-	}
+	if (strpbrk(pattern, "*?") != NULL) {		// is a pattern
+		argv_t *files = path_find_glob(pattern);
 
-	for (char **p = argv_front(files); *p; p++) {
-		argv_push(opts.files, search_source(*p));
+		if (argv_len(files) == 0)
+			error_glob_no_files(pattern);		// error if pattern matched no file
+
+		for (char **p = argv_front(files); *p; p++) {
+			argv_push(opts.files, search_source(*p));
+		}
+
+		argv_free(files);
 	}
-	argv_free(files);
+	else {
+		argv_push(opts.files, search_source(pattern));
+	}
 }
 
 void expand_list_glob(const char *filename)

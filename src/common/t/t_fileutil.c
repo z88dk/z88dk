@@ -1014,6 +1014,13 @@ void t_fileutil_path_find_all(void)
 	TEST_ASSERT_NULL(*p);
 	argv_free(f);
 
+	f = path_find_files("test_dir", false);
+	argv_sort(f);
+	p = argv_front(f);
+	TEST_ASSERT_EQUAL_STRING("test_dir/test.f0", *p); p++;
+	TEST_ASSERT_NULL(*p);
+	argv_free(f);
+
 	f = path_find_all("test_dir", true);
 	argv_sort(f);
 	p = argv_front(f);
@@ -1025,6 +1032,19 @@ void t_fileutil_path_find_all(void)
 	TEST_ASSERT_EQUAL_STRING("test_dir/x2/test.f1", *p); p++;
 	TEST_ASSERT_EQUAL_STRING("test_dir/x2/test.f2", *p); p++;
 	TEST_ASSERT_EQUAL_STRING("test_dir/x3", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/x3/test.f2", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/x3/test.f3", *p); p++;
+	TEST_ASSERT_NULL(*p);
+	argv_free(f);
+
+	f = path_find_files("test_dir", true);
+	argv_sort(f);
+	p = argv_front(f);
+	TEST_ASSERT_EQUAL_STRING("test_dir/test.f0", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/x1/test.f0", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/x1/test.f1", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/x2/test.f1", *p); p++;
+	TEST_ASSERT_EQUAL_STRING("test_dir/x2/test.f2", *p); p++;
 	TEST_ASSERT_EQUAL_STRING("test_dir/x3/test.f2", *p); p++;
 	TEST_ASSERT_EQUAL_STRING("test_dir/x3/test.f3", *p); p++;
 	TEST_ASSERT_NULL(*p);
@@ -1065,7 +1085,6 @@ void t_fileutil_path_find_glob(void)
 	f = path_find_glob("test_dir/a/1/g1.c");
 	argv_sort(f);
 	p = argv_front(f);
-	TEST_ASSERT_EQUAL_STRING("test_dir/a/1/g1.c", *p); p++;
 	TEST_ASSERT_NULL(*p);
 	argv_free(f);
 
