@@ -33,7 +33,7 @@ EXECFILES = $(CFILES:.c=.cas)
 
 ifeq ($(COMPILER),sdcc)
    CFLAGS += -compiler=sdcc  -SO3 --max-allocs-per-node200000 --fsigned-char 
-all: ex1.cas ex1b.cas ex2.cas ex3.cas ex6.cas ex10.cas ex10b.cas vpoke.cas
+all: ex1.cas ex1b.cas ex2.cas ex3.cas ex6.cas ex10.cas ex10b.cas vpoke.cas vtstone.cas
 else
 all: $(EXECFILES) EX8.COM ADVA.COM dstar.cas microman.cas othello.cas wall.cas globe.cas snakes.cas vtstone.cas
 endif
