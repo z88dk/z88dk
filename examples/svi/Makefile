@@ -9,7 +9,7 @@
 CC = zcc
 
 COMPILER ?= sccz80
-CFLAGS = +msx -vn -llib3d  -lm -lndos -create-app
+CFLAGS = +svi -vn -llib3d  -lm -lndos -create-app
 
 
 CFILES = \
