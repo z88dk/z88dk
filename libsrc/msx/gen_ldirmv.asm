@@ -21,7 +21,11 @@ _LDIRMV:
 	ex	(sp),hl
 
 loop:
+IF VDP_DATAIN > 255
+	ld	a,(VDP_DATAIN)
+ELSE
 	in	a,(VDP_DATAIN)
+ENDIF
 	ld	(de),a
 	inc	de
 	dec	bc

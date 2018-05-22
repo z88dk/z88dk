@@ -165,6 +165,16 @@
 		
 		 push     af
 		 ld       a,l		; LSB of video memory ptr
+IF VDP_CMD > 255
+		ld	(VDP_CMD),a
+		ld	a,h
+		and	@00111111
+		or	@01000000
+		ld	(VDP_CMD),a
+		pop	af
+		ld	(VDP_DATA),a
+
+ELSE
 		 out      (VDP_CMD),a
 		 ld       a,h		; MSB of video mem ptr
 		 and      @00111111	; masked with "write command" bits
@@ -174,5 +184,6 @@
 		 pop      af
 		 ;;;ld       a,(pattern2+1) ; pattern
 		 out      (VDP_DATA), a
+ENDIF
 		 ret
 ;--- --- --- --- --- --- --- --- --- --- --- --- 

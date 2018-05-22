@@ -167,6 +167,16 @@
 ._edge
          push     af
 ;**************
+IF VDP_DATA > 255
+	ld	a,l
+	ld	(VDP_CMD),a
+	ld	a,h
+	and	@00111111
+	or	@01000000
+	ld	(VDP_CMD),a
+	ld	a,(pixelbyte)
+	ld	(VDP_DATA),a
+ELSE
          ld       a,l		; LSB of video memory ptr
          out      (VDP_CMD),a
          ld       a,h		; MSB of video mem ptr
@@ -175,6 +185,7 @@
          out      (VDP_CMD), a
          ld       a,(pixelbyte)
          out      (VDP_DATA), a
+ENDIF
 ;**************
          ld       a,8
          add      l
@@ -184,12 +195,21 @@
 ;.nozh
          ;inc      hl                ;Go to next byte
 ;**************
+IF VDP_DATA > 255
+	ld	a,l
+	ld	(VDP_CMD),a
+	ld	a,h
+	and	@00111111
+	ld	(VDP_CMD),a
+	ld	a,(VDP_DATAIN)
+ELSE
          ld       a,l		; LSB of video memory ptr
          out      (VDP_CMD), a
          ld       a,h		; MSB of video mem ptr
          and      @00111111	; masked with "read command" bits
          out      (VDP_CMD), a
          in       a, (VDP_DATAIN)
+ENDIF
          ld       (pixelbyte),a
 ;**************
          pop      af
@@ -198,6 +218,16 @@
 ._row
 	push	af
 ;**************
+IF VDP_DATA > 255
+	ld	a,l
+	ld	(VDP_CMD),a
+	ld	a,h
+	and	@00111111
+	or	@01000000
+	ld	(VDP_CMD),a
+	ld	a,(pixelbyte)
+	ld	(VDP_DATA),a
+ELSE
          ld       a,l		; LSB of video memory ptr
          out      (VDP_CMD),a
          ld       a,h		; MSB of video mem ptr
@@ -206,6 +236,7 @@
          out      (VDP_CMD), a
          ld       a,(pixelbyte)
          out      (VDP_DATA), a
+ENDIF
 ;**************
 	push	de
         ld	hl,(actcoord)

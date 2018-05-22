@@ -19,9 +19,17 @@
 ._SETRD
 	di
 	ld      a,l
-	out     (VDP_CMD),a
+IF VDP_CMD > 255
+	ld	(VDP_CMD),a
+ELSE
+	out	(VDP_CMD),a
+ENDIF
 	ld      a,h
 	and     $3F
-	out     (VDP_CMD),a
+IF VDP_CMD > 255
+	ld	(VDP_CMD),a
+ELSE
+	out	(VDP_CMD),a
+ENDIF
 	ei
 	ret

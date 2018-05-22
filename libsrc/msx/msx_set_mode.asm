@@ -64,7 +64,11 @@ IF FORsvi
 	ld    (RG0SAV),a
 ENDIF
 	di
-	out   (VDP_CMD),a
+IF VDP_CMD > 255
+	ld	(VDP_CMD),a
+ELSE
+	out	(VDP_CMD),a
+ENDIF
 IF FORsc3000
 	ld	a,1		; change reg#1 on SC3000
 ELSE
@@ -73,36 +77,64 @@ ELSE
 ENDIF
 	or    $80
 	ei
-	out   (VDP_CMD),a
+IF VDP_CMD > 255
+	ld	(VDP_CMD),a
+ELSE
+	out	(VDP_CMD),a
+ENDIF
 
 IF FORsc3000
 	; Bend register #2
 	ld	a,$06
 	di
-	out   (VDP_CMD),a
+IF VDP_CMD > 255
+	ld	(VDP_CMD),a
+ELSE
+	out	(VDP_CMD),a
+ENDIF
 	ld    a,2  ; reg2
 	or    $80
 	ei
-	out   (VDP_CMD),a
+IF VDP_CMD > 255
+	ld	(VDP_CMD),a
+ELSE
+	out	(VDP_CMD),a
+ENDIF
 ENDIF
 
 	; Bend register #3
 	ld	a,$80
 	di
-	out   (VDP_CMD),a
+IF VDP_CMD > 255
+	ld	(VDP_CMD),a
+ELSE
+	out	(VDP_CMD),a
+ENDIF
 	ld    a,3  ; reg3
 	or    $80
 	ei
-	out   (VDP_CMD),a
+IF VDP_CMD > 255
+	ld	(VDP_CMD),a
+ELSE
+	out	(VDP_CMD),a
+ENDIF
 	
 	; Bend register #4
 	xor	  a
 	di
-	out   (VDP_CMD),a
+IF VDP_CMD > 255
+	ld	(VDP_CMD),a
+ELSE
+	out	(VDP_CMD),a
+ENDIF
 	ld    a,4  ; reg4  -  PT./TXT/MCOL-GEN.TAB.
 	or    $80
 	ei
-	out   (VDP_CMD),a
+IF VDP_CMD > 255
+	ld	(VDP_CMD),a
+ELSE
+	out	(VDP_CMD),a
+ENDIF
 	
 	
 	ld	hl,$1800		; SCREEN 1 name table

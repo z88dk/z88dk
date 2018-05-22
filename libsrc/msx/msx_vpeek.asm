@@ -28,14 +28,26 @@ _msx_vpeek:
 	; enter vdp address pointer
 	ld	a,l
 	di
-	out	(VDP_CMD), a
+IF VDP_CMD > 255
+	ld	(VDP_CMD),a
+ELSE
+	out	(VDP_CMD),a
+ENDIF
 	ld	a,h
 	and	@00111111
 	ei
-	out	(VDP_CMD), a
+IF VDP_CMD > 255
+	ld	(VDP_CMD),a
+ELSE
+	out	(VDP_CMD),a
+ENDIF
 
 	; read data
+IF VDP_DATAIN > 255
+	ld	a,(VDP_DATAIN)
+ELSE
 	in	a,(VDP_DATAIN)
+ENDIF
 	
 	ld	h,0
 	ld	l,a

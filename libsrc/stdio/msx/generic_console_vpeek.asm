@@ -1,7 +1,7 @@
 
 
 	MODULE	generic_console_vpeek
-	SECTION	code_lib
+	SECTION	code_clib
 	PUBLIC	generic_console_vpeek
 
 	EXTERN	__msx_font32
@@ -20,6 +20,9 @@ IF FORm5
         INCLUDE "target/m5/def/m5bios.def"
 ENDIF
 IF FORmtx
+	EXTERN	LDIRMV
+ENDIF
+IF FORpv2000
 	EXTERN	LDIRMV
 ENDIF
 

@@ -67,7 +67,11 @@ _msx_color:
 ;	call    SETWRT
 ;cclr_lp:
 ;	pop     af
-;	out     (VDP_DATA),a
+IF VDP_DATA > 255
+	ld	(VDP_DATA),a
+ELSE
+	out	(VDP_DATA),a
+ENDIF
 ;	push    af
 ;	dec     bc
 ;	ld      a,b

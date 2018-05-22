@@ -53,12 +53,21 @@
 	;;ld	de,(base_graphics)
 	;;add	hl,de
 ;-------
+IF VDP_CMD > 255
+	ld	a,l
+	ld	(VDP_CMD),a
+	ld	a,h
+	and	@00111111
+	ld	(VDP_CMD),a
+	ld	a,(VDP_DATAIN)
+ELSE
 	ld	a,l		; LSB of video memory ptr
 	out	(VDP_CMD), a
 	ld	a,h		; MSB of video mem ptr
 	and	@00111111	; masked with "read command" bits
 	out	(VDP_CMD), a
 	in	a, (VDP_DATAIN)
+ENDIF
 
 	ld	d,h
 	ld	e,l
@@ -76,6 +85,16 @@
 
 .pix_return
          ld       (hl),a	; hl points to "pixelbyte"
+IF VDP_CMD > 255
+	ld	a,e
+	ld	(VDP_CMD),a
+	ld	a,d
+	and	@00111111
+	or	@01000000
+	ld	(VDP_CMD),a
+	ld	a,(pixelbyte)
+	ld	(VDP_DATA),a
+ELSE
          ld       a,e		; LSB of video memory ptr
          out      (VDP_CMD),a
          ld       a,d		; MSB of video mem ptr
@@ -84,6 +103,7 @@
          out      (VDP_CMD), a
          ld       a,(pixelbyte) ; Can it be optimized ? what about VDP timing ?
          out      (VDP_DATA), a
+ENDIF
          pop      bc
          ret
 

@@ -22,6 +22,11 @@ IF FORm5
 	INCLUDE "target/m5/def/m5bios.def"
 ENDIF
 
+IF FORpv2000
+	EXTERN	SETWRT
+	EXTERN	FILVRM
+ENDIF
+
 msx_set_mode:
 _msx_set_mode:
 
@@ -151,11 +156,14 @@ inigrp:
 ; MTXd: $02,$C2,$06,$FF,$03,$38,$07,$01	; kilopede
 ; M5:   $02,$E2,$06,$FF,$03,$36,$07,$61
 ; M5:   $03,$A2,$0E,$FF,$03,$76,$03,$11 ; name table at 3800 in place of 1800
+; PV2:  $02,$82,$07,$ff,$03,$3e,$03,$f0 ; and then r1 = e2
 
 ; Compare example from MSX emulator for M5,
 ; on reg#0 of the SORD M5, external video flag bit must be set
 ; msx:  02 62 11 23 21 33 11 E0
 ; M5:   03 E2 11 23 21 33 11 E1
+
+; Final state: 02 e0 06 ff 03 76 03 00
 
 
     ; reg1  - GRAPH MODE, first reset bit #6 to blank the screen
@@ -215,9 +223,8 @@ ENDIF
 	ld    a,$E0   ; MTX, M5
     call    VDPreg_Write
 	
-
 	
-IF FORm5
+IF FORm5 | FORpv2000
 	; Pattern table should probably be initialized on other targets as well,
 	; Memotech MTX does not seem to require the initialization (discovered experimentally)
 	; SETWRT on the M5 sets C correctly on exit, it may be differente elsewhere
@@ -227,7 +234,11 @@ IF FORm5
 	xor a
 	ld e,3
 pattern:
+IF VDP_DATA > 255
+	ld (VDP_DATA),a
+ELSE
 	out (c),a
+ENDIF
 	inc a
 	jr nz,pattern
 	dec e
@@ -288,11 +299,19 @@ VDPreg_Write:
 	pop hl
 
 	ld	a,b
-	out     (VDP_CMD),a
+IF VDP_CMD > 255
+	ld	(VDP_CMD),a
+ELSE
+	out	(VDP_CMD),a
+ENDIF
 	ld      a,c
 	and     $07
 	or      $80		; enable bit for "set register" command
-	out     (VDP_CMD),a
+IF VDP_CMD > 255
+	ld	(VDP_CMD),a
+ELSE
+	out	(VDP_CMD),a
+ENDIF
 	inc     c
 	
 	push hl
