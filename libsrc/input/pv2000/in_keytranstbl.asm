@@ -37,6 +37,16 @@ PUBLIC in_keytranstbl
 	defb	255, 255, 255, 255, ';', '}', '*', 'L'		; J2-right, J2-left, J1-right, j1-left
 	defb	255, 255, 255, 255, '<', '?', '>', 'M'		;J2-up, J2-down, j1-up, j1-down
 	defb	255, 255, 255, 255, 255, 127, 255,  13		; J2-but1, J2-but0, J1-but1, J1-but0, -, inst/del, mode, return
+	defb    255, 255, 255, 255, 255, 255, 255, 255  	; STOP/CONT, -, -, -, -, -, -, -, -
 
 ;Func modifier (control)
-	defs	8 * 9, 255
+	defb 	 27,  28,  29,  30,  31, 135, '`',  134
+        defb     17,  23,   5,  18,  20,  25,  21,   9
+        defb      1,  19,   4,   6,   7,   8,  10,  11
+        defb    255,  26,  24,   3,  22,   2,  14,  ' '
+        defb    255, 255, 255, '\', 255, 255, 255, 255
+	defb	255, 255, 255, 255,  16, '[', '@',  15
+	defb	255, 255, 255, 255, 255, ']', 255,  12		; J2-right, J2-left, J1-right, j1-left
+	defb	255, 255, 255, 255, ',', '/', '.',  13		;J2-up, J2-down, j1-up, j1-down
+	defb	255, 255, 255, 255, 255, 127, 255,  13		; J2-but1, J2-but0, J1-but1, J1-but0, -, inst/del, mode, return
+	defb    255, 255, 255, 255, 255, 255, 255, 255  	; STOP/CONT, -, -, -, -, -, -, -, -

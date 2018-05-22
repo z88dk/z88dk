@@ -73,6 +73,8 @@ done:
    add hl,bc
    add hl,de
    ld  a,(hl)
+   cp  255
+   jr  z,nokey
    ld  l,a
    ld  h,0
    and a
