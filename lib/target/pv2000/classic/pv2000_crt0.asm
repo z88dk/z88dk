@@ -34,7 +34,7 @@
 	defc	CRT_ORG_BSS = 0x7565
 
 	defc	CONSOLE_ROWS = 24
-	defc	CONSOLE_COLUMNS = 80
+	defc	CONSOLE_COLUMNS = 32
 
         defc    TAR__fputc_cons_generic = 1
         defc    TAR__clib_exit_stack_size = 0

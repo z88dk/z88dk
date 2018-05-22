@@ -1,5 +1,7 @@
 @stdio/stdio.lst
 @stdio/ansicore.lst
+stdio/pv2000/fgetc_cons
+stdio/pv2000/getk
 stdio/ansi/msx/f_ansi_attr
 stdio/ansi/msx/f_ansi_bel
 stdio/ansi/msx/f_ansi_char
@@ -11,7 +13,7 @@ stdio/msx/generic_console_vpeek
 stdio/msx/generic_console_ioctl
 stdio/msx/CRT_FONT
 @font/font_8x8/font_8x8.lst
-@gfxbase.lst
+@input/pv2000.lst
 graphics/dcircle
 graphics/msx/gen_clg
 graphics/clrarea
@@ -43,7 +45,7 @@ psg/sn76489/psg_envelope
 psg/sn76489/psg_init.asm
 psg/sn76489/set_psg.asm
 psg/sn76489/set_psg_callee.asm
-@msx/genmsx.lst
+@gfxbase.lst
 msx/gen_filvrm
 msx/gen_ldirmv
 msx/gen_ldirvm
@@ -66,4 +68,5 @@ msx/gen_vram
 msx/gen_vread
 msx/gen_vwrite
 msx/gen_vwrite_direct
+@msx/genmsx.lst
 @z80.lst
