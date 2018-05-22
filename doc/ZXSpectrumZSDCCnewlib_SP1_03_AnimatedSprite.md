@@ -10,6 +10,15 @@ started guide](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnew
 
 ## Purpose
 
+So far in this SP1 series we've looked at displaying simple and masked
+sprites on the SP1-controlled display. When working through both of
+those examples we've only looked at single frame, non-animated
+sprites. In this document we look at multiple frame sprites and their
+animation.
+
+There are two approaches to using the SP1 library to display a sprite
+and so far we've only looked at one of them. Here, we introduce the
+second approach.
 
 ### The Sprite Data
 
@@ -192,7 +201,7 @@ PUBLIC _runner_f1
 
 The first thing to note about this data is that it was typed in by your author,
 by hand. The animated GIF was loaded into a graphics editor where the frames
-where examined and the binary data carefully copied, bit by bit, into the
+were examined and the binary data carefully copied, bit by bit, into the
 listing above. As of this writing there doesn't appear to be any magic tool to
 create SP1 sprite data assembly listings from an animated GIF.
 
@@ -366,7 +375,7 @@ doesn't enable interrupts) adds a pause to slow things down.
 
 Sequential animation works well for sprites like the runner character
 where the frames follow on from each other in a loop, but many sprites
-don't work like that. It's common for a video character to be in one
+don't work like that. It's common for a video game character to be in one
 of many states, and to transition between those states based on
 external stimuli. For example, a character might transition from left,
 to right, to climbing, to crouching, to dead, all on user key presses
@@ -520,12 +529,12 @@ here, we're effectively saying "move the sprite to this screen
 location, and show it using this graphical data."
 
 The rest of the code should be simple to understand. We create a
-structure which holds a key scancode which will allow us to move the
-sprite into the state, the graphical data to use when in the state,
-and a value to adjust the sprite's screen position each time round the
-game loop while in the state. In this simple example we only have two
-such states for the sprite, moving left and moving right, so we have
-an array of 2 of these structures.
+structure which holds a key scancode which will allow us to detech
+user input and hence change state on cue, the graphical data to use
+when in the state, and a value to adjust the sprite's screen position
+by each time round the game loop while in the state. In this simple
+example we only have two such states for the sprite, moving left and
+moving right, so we have an array of 2 of these structures.
 
 The "game loop" therefore iteratess over the array testing for the key
 scancode for each state. If the relevant key is pressed we adopt that
@@ -539,6 +548,9 @@ sprite frames, all linked via state machines which smoothly transition
 from one state to the next.
 
 ## Exercises for the reader
+
+* Add [mask data](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_02_SimpleMaskedSprite.md#the-sprite-data)
+to the runner sprite and have him run through a screen with a background.
 
 * Add more states and graphics to the arrow sprite example. Change it
 so you can guide the arrow using Q, A, O and P.
