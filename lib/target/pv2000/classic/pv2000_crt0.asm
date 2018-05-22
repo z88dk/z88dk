@@ -25,6 +25,8 @@
 	; VDP specific
 	PUBLIC	msxbios
 
+	EXTERN	msx_set_mode
+
 
 ;--------
 ; Set an origin for the application (-zorg=) default to 32768
@@ -55,6 +57,8 @@ start:
         ld      (start1+1),sp   ; Save entry stack
 	call	crt0_init_bss
         ld      (exitsp),sp
+	ld	hl,2
+	call	msx_set_mode
 
 
 ; Optional definition for auto MALLOC init
