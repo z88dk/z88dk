@@ -20,9 +20,7 @@ ENDIF
 
 IF FORm5
 	INCLUDE "target/m5/def/m5bios.def"
-ENDIF
-
-IF FORpv2000
+ELSE
 	EXTERN	SETWRT
 	EXTERN	FILVRM
 ENDIF
@@ -224,7 +222,7 @@ ENDIF
     call    VDPreg_Write
 	
 	
-IF FORm5 | FORpv2000
+IF FORm5 | FORpv2000  | FORsc3000
 	; Pattern table should probably be initialized on other targets as well,
 	; Memotech MTX does not seem to require the initialization (discovered experimentally)
 	; SETWRT on the M5 sets C correctly on exit, it may be differente elsewhere
@@ -237,7 +235,7 @@ pattern:
 IF VDP_DATA > 255
 	ld (VDP_DATA),a
 ELSE
-	out (c),a
+	out (VDP_DATA),a
 ENDIF
 	inc a
 	jr nz,pattern

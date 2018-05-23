@@ -9,6 +9,11 @@ stdio/ansi/msx/f_ansi_char
 stdio/ansi/msx/f_ansi_cls_nobios
 stdio/ansi/generic/f_ansi_dline
 stdio/ansi/msx/f_ansi_scrollup_nobios
+stdio/msx/generic_console
+stdio/msx/generic_console_vpeek
+stdio/msx/generic_console_ioctl
+stdio/msx/CRT_FONT
+@font/font_8x8/font_8x8.lst
 time/sc3000/clock
 @gfxbase.lst
 graphics/dcircle
@@ -53,7 +58,7 @@ msx/gen_get_trigger
 msx/msx_map_m2_block
 msx/msx_map_m2_pixel
 msx/msx_map_m2_subpixel
-msx/msx_set_mode
+msx/gen_set_mode
 msx/gen_vfill
 msx/msx_vmerge
 msx/msx_vpeek
