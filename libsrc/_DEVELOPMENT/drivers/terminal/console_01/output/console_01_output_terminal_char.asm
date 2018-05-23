@@ -114,6 +114,24 @@
 ;     The output terminal generates this message to
 ;     indicate the output window is full and is being paused.
 ;
+;   * ITERM_MSG_READLINE_SCROLL_LIMIT (optional)
+;
+;     enter  :  c = default
+;     exit   :  c = number of rows to scroll before pause
+;     can use:  af, bc, de, hl
+;
+;     Return number of scrolls allowed before pause after
+;     a readline operation ends.  Default is current y + 1.
+;
+;   * OTERM_MSG_SCROLL_LIMIT (optional)
+;
+;     enter  :  c = default
+;     exit   :  c = maximum scroll amount
+;     can use:  af, bc, de, hl
+;
+;     Scroll has just paused.  Return number of scrolls until
+;     next pause.  Default is window height.
+;
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; IOCTLs UNDERSTOOD BY THIS DRIVER
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -165,6 +183,8 @@
 ;
 ;   * IOCTL_OTERM_SCROLL
 ;
+;   * IOCTL_OTERM_SCROLL_LIMIT
+;
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; BYTES RESERVED IN FDSTRUCT
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -190,10 +210,10 @@ EXTERN console_01_output_char_oterm_msg_putc, console_01_output_char_stdio_msg_i
 EXTERN console_01_output_char_iterm_msg_putc, console_01_output_char_iterm_msg_bs
 EXTERN console_01_output_char_iterm_msg_readline_begin, console_01_output_char_iterm_msg_readline_end
 
-EXTERN OTERM_MSG_TTY, OTERM_MSG_BELL, ITERM_MSG_BELL
+EXTERN OTERM_MSG_TTY, OTERM_MSG_BELL, ITERM_MSG_BELL, OTERM_MSG_SCROLL_LIMIT
 EXTERN OTERM_MSG_PUTC, STDIO_MSG_ICTL, ITERM_MSG_PUTC, ITERM_MSG_BS, ITERM_MSG_READLINE_BEGIN
 EXTERN ITERM_MSG_BS_PWD, ITERM_MSG_PRINT_CURSOR, ITERM_MSG_ERASE_CURSOR, ITERM_MSG_READLINE_END
-EXTERN ITERM_MSG_ERASE_CURSOR_PWD
+EXTERN ITERM_MSG_ERASE_CURSOR_PWD, ITERM_MSG_READLINE_SCROLL_LIMIT
 
 console_01_output_terminal_char:
 
@@ -245,6 +265,12 @@ jp z, error_zc     ;; placed further up to speed up putchar
    jp z, error_zc
    
    cp ITERM_MSG_BELL
+   jp z, error_zc
+   
+   cp ITERM_MSG_READLINE_SCROLL_LIMIT
+   jp z, error_zc
+
+   cp OTERM_MSG_SCROLL_LIMIT
    jp z, error_zc
    
    jp console_01_output_terminal       ; forward to library
