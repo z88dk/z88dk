@@ -430,4 +430,5 @@ links](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_
 given in the first article in this series will now make sense, since most of them
 use masked sprites.
 
-The next article in this series will start to explore sprite animation.
+The [next article](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_03_AnimatedSprite.md)
+in this series explores sprite animation.

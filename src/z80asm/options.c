@@ -229,7 +229,7 @@ static void process_opt( int *parg, int argc, char *argv[] )
 				{
 					UT_array **p_path = (UT_array **)opts_lu[j].arg;
 					opt_arg_ptr = expand_environment_variables(opt_arg_ptr);
-					utarray_push_back(*p_path, &opt_arg_ptr);
+					argv_push(*p_path, opt_arg_ptr);
 				}
                 else
                     error_illegal_option( argv[II] );
