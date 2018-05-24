@@ -138,6 +138,8 @@
 ;
 ;   * IOCTL_OTERM_SCROLL
 ;
+;   * IOCTL_OTERM_SCROLL_LIMIT
+;
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; BYTES RESERVED IN FDSTRUCT
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;

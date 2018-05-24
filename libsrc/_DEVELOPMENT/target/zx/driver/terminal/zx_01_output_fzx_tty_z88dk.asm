@@ -72,6 +72,28 @@
 ;
 ;   * OTERM_MSG_SCROLL
 ;
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; MESSAGES GENERATED FOR DERIVED DRIVERS
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+;   * ITERM_MSG_READLINE_SCROLL_LIMIT (optional)
+;
+;     enter  :  c = default
+;     exit   :  c = number of rows to scroll before pause
+;     can use:  af, bc, de, hl
+;
+;     Return number of scrolls allowed before pause after
+;     a readline operation ends.  Default is current y + 1.
+;
+;   * OTERM_MSG_SCROLL_LIMIT (optional)
+;
+;     enter  :  c = default
+;     exit   :  c = maximum scroll amount
+;     can use:  af, bc, de, hl
+;
+;     Scroll has just paused.  Return number of scrolls until
+;     next pause.  Default is window height.
+;
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; IOCTLs UNDERSTOOD BY THIS DRIVER
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -124,6 +146,8 @@
 ;   * IOCTL_OTERM_GET_OTERM
 ;
 ;   * IOCTL_OTERM_SCROLL
+;
+;   * IOCTL_OTERM_SCROLL_LIMIT
 ;
 ;   * IOCTL_OTERM_FONT
 ;

@@ -26,6 +26,7 @@ console_01_output_char_stdio_msg_ictl:
    ; defc IOCTL_OTERM_SET_CURSOR_COORD = $0502
    ; defc IOCTL_OTERM_GET_OTERM        = $0602
    ; defc IOCTL_OTERM_SCROLL           = $0702
+   ; defc IOCTL_OTERM_SCROLL_LIMIT     = $0902
    ;
    ; in addition to flags managed by stdio.
    ;
@@ -76,7 +77,26 @@ console_01_output_char_stdio_msg_ictl_0:
    jr z, _ioctl_get_oterm
    
    dec a
+   jr z, _ioctl_scroll
+   
+   dec a
+   dec a
    jp nz, error_einval_zc
+
+_ioctl_scroll_limit:
+
+   ; bc = first parameter (scroll limit)
+   
+   ld l,(ix+20)
+   ld h,0                      ; return old scroll limit
+   
+   inc b
+   dec b
+   
+   ret nz                      ; no change if scroll limit > 255
+   
+   ld (ix+20),c
+   ret
 
 _ioctl_scroll:
 
