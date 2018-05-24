@@ -253,7 +253,7 @@ stationary, but it doesn't really work for our *runner* character. Another
 approach is to react to the user's input, which might be made to work with our
 *runner* as long as the user only ever presses the *right* key. :)
 
-For demonstration, we'll keep it simple and anmiate our sprite walking left to
+For demonstration, we'll keep it simple and animate our sprite walking left to
 right across the screen.
 
 The SP1 library provides two ways to draw sprites on the screen using
@@ -530,14 +530,16 @@ here, we're effectively saying "move the sprite to this screen
 location, and show it using this graphical data."
 
 The rest of the code should be simple to understand. We create a
-structure which holds a key scancode which will allow us to detech
+structure which holds a [key
+scancode](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_04_InputDevices.md#scancodes)
+which will allow us to detect
 user input and hence change state on cue, the graphical data to use
 when in the state, and a value to adjust the sprite's screen position
 by each time round the game loop while in the state. In this simple
 example we only have two such states for the sprite, moving left and
 moving right, so we have an array of 2 of these structures.
 
-The "game loop" therefore iteratess over the array testing for the key
+The "game loop" therefore iterates over the array testing for the key
 scancode for each state. If the relevant key is pressed we adopt that
 state. From there we update the sprite's screen coordinates according
 to the delta in the state information, and move and display the sprite
