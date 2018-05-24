@@ -363,7 +363,7 @@ int main()
 The compile line is:
 
 ```
-zcc +zx -vn -m -startup=31 -clib=sdcc_iy runner_simple.c runner_sprite.asm -o runner_simple -create-app
+zcc +zx -vn -m -startup=31 -clib=sdcc_iy runner.c runner_sprite.asm -o runner_simple -create-app
 ```
 
 The main loop starts with an animation offset of 0, so we start with the first
