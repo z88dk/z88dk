@@ -1,7 +1,6 @@
 @stdio/stdio.lst
-stdio/sc3000/fputc_cons
-stdio/sc3000/fgetc_cons
-stdio/sc3000/getk
+stdio/sc3000/fgetc_cons_inkey
+stdio/sc3000/getk_inkey
 @stdio/ansicore.lst
 stdio/ansi/msx/f_ansi_attr
 stdio/ansi/msx/f_ansi_bel
@@ -15,6 +14,7 @@ stdio/msx/generic_console_ioctl
 stdio/msx/CRT_FONT
 @font/font_8x8/font_8x8.lst
 time/sc3000/clock
+@input/sc3000.lst
 @gfxbase.lst
 graphics/dcircle
 graphics/msx/gen_clg
