@@ -13,6 +13,8 @@
 
         PUBLIC  msxbios
 
+	; Always use the generic console unless overridden
+        defc    TAR__fputc_cons_generic = 1
         defc    CONSOLE_COLUMNS = 32
         defc    CONSOLE_ROWS = 24
 
