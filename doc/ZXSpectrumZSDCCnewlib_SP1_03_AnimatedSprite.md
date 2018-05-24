@@ -256,9 +256,9 @@ approach is to react to the user's input, which might be made to work with our
 For demonstration, we'll keep it simple and anmiate our sprite walking left to
 right across the screen.
 
-As hinted at [previously](), there are two ways to draw sprites on the screen
-using SP1, and now, as we're discussing animation, is the time to introduce the
-two different approaches.
+The SP1 library provides two ways to draw sprites on the screen using
+SP1, and now, as we're discussing animation, is the time to introduce
+the two different approaches.
 
 ### Sequential animation
 
@@ -307,8 +307,9 @@ sp1_MoveSprPix(sprite, &full_screen, 0, x, y);
 which does exactly what the SP1 interface was supposed to do, only avoiding the
 quirk. (This is one of those moments where it's better for an SP1 beginner to
 not worry about the detail too much and just do as advised. The underlying issue
-is discussed in [this forum thread]() if you're interested, and you can always
-come back to it when you understand more.)
+is discussed in [this forum
+thread](https://www.z88dk.org/forum/viewtopic.php?id=10277)
+if you're interested, and you can always come back to it when you understand more.)
 
 With this animation code in place, here's the program to walk our character
 across the screen. Save it to a file called 'runner.c':
