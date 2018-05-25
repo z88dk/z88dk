@@ -1003,6 +1003,10 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
     int bsnum_bank;
     int return_to_basic = 0;
 
+    // force 128k snapshot
+
+    is_128 = zxs->force_128 != 0;
+
     // find bankspace BANK
 
     bsnum_bank = mb_find_bankspace(memory, "BANK");
