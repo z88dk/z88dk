@@ -84,7 +84,9 @@ static struct zx_tape zxt = {
 static struct zx_sna zxs = {
     -1,         // stackloc
     -1,         // intstate
-     0          // force_128
+     0,         // force_128
+     0,         // xsna
+     0          // fsna
 };
 
 static struct zx_bin zxb = {
@@ -414,8 +416,15 @@ int zx_exec(char *target)
 
     if (sna)
     {
-        if ((ret = zx_sna(&zxc, &zxs, &memory, 0)) != 0)
-            return ret;
+        ret = zx_sna(&zxc, &zxs, &memory, 0);
+
+        if (zxs.fsna != 0)
+        {
+            fclose(zxs.fsna);
+            zxs.fsna = 0;
+        }
+
+        if (ret != 0) return ret;
 
         // sna snapshot is out but we need to process the rest of the binaries too
         // so remove mainbank and banks 0-7 from memory model so as not to treat those again
