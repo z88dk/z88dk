@@ -518,7 +518,7 @@ int main()
 Compile this example with:
 
 ```
-zcc +zx -vn -m -startup=1 -clib=sdcc_iy arrow_sprite.c arrow_sprite.asm -o arrow_sprite -create-app
+zcc +zx -vn -m -startup=31 -clib=sdcc_iy arrow_sprite.c arrow_sprite.asm -o arrow_sprite -create-app
 ```
 
 The main difference to the sprite handling introduced here is that the
