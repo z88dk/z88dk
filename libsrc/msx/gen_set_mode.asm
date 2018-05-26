@@ -281,12 +281,6 @@ inimlt:
 VDPreg_Write:  
 ;»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»
 
-;IF FORsc3000
-;	call $2BBF
-;	inc c
-;	ret
-;ELSE
-
 	ld	b,a
 	
 	ld a,i		; get the current status of the irq line

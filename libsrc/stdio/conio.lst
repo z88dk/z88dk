@@ -10,3 +10,4 @@ stdio/conio/cvpeek
 stdio/conio/textbackground
 stdio/conio/textcolour
 stdio/conio/conio_map_colour_noop
+stdio/conio/bordercolour
