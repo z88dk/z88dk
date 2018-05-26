@@ -1,4 +1,3 @@
-@stdio/stdio.lst
 stdio/p2000/fgetc_cons
 stdio/p2000/getk
 stdio/p2000/fputc_cons
@@ -9,6 +8,7 @@ stdio/ansi/p2000/f_ansi_char
 stdio/ansi/p2000/f_ansi_cls
 stdio/ansi/p2000/f_ansi_dline
 stdio/ansi/p2000/f_ansi_scrollup
+@stdio/stdio.lst
 time/p2000/clock
 @gfxbase.lst
 graphics/dcircle

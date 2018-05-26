@@ -1,4 +1,3 @@
-@stdio/stdio.lst
 stdio/pc6001/fgetc_cons
 stdio/pc6001/getk
 stdio/pc6001/fputc_cons
@@ -9,6 +8,7 @@ stdio/ansi/pc6001/f_ansi_char
 stdio/ansi/pc6001/f_ansi_cls
 stdio/ansi/pc6001/f_ansi_dline
 stdio/ansi/pc6001/f_ansi_scrollup
+@stdio/stdio.lst
 @gfxbase.lst
 games/pc6001/joystick
 graphics/dcircle

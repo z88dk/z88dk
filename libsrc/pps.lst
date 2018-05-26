@@ -1,4 +1,3 @@
-@stdio/stdio.lst
 stdio/sprinter/fgetc_cons
 stdio/sprinter/fputc_cons
 stdio/sprinter/getk
@@ -10,6 +9,7 @@ stdio/ansi/sprinter/f_ansi_char
 stdio/ansi/sprinter/f_ansi_cls
 stdio/ansi/sprinter/f_ansi_dline
 stdio/ansi/sprinter/f_ansi_scrollup
+@stdio/stdio.lst
 time/mktime
 time/sprinter/clock
 time/sprinter/time

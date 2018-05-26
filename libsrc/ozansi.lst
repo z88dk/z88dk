@@ -1,4 +1,3 @@
-@stdio/stdio.lst
 stdio/oz/fgetc_cons
 stdio/oz/getk
 @stdio/ansicore.lst
@@ -8,6 +7,7 @@ stdio/ansi/oz/f_ansi_char
 stdio/ansi/oz/f_ansi_cls
 stdio/ansi/generic/f_ansi_dline
 stdio/ansi/oz/f_ansi_scrollup
+@stdio/stdio.lst
 @gfxbase.lst
 graphics/dcircle
 graphics/oz/clg

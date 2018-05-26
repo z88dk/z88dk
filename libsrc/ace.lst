@@ -1,4 +1,3 @@
-@stdio/stdio.lst
 stdio/ace/fputc_cons
 stdio/ace/fgetc_cons
 stdio/ace/getk
@@ -13,6 +12,7 @@ stdio/ansi/ace/f_ansi_char
 stdio/ansi/ace/f_ansi_cls
 stdio/ansi/generic/f_ansi_dline
 stdio/ansi/ace/f_ansi_scrollup
+@stdio/stdio.lst
 time/ace/clock
 @font/font_8x8/font_8x8.lst
 games/ace/joystick

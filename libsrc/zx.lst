@@ -15,7 +15,6 @@ stdio/spectrum/generic_console_printc
 stdio/spectrum/generic_console_ioctl
 stdio/spectrum/generic_console_vpeek
 stdio/spectrum/console_vars
-@stdio/stdio.lst
 @stdio/ansicore.lst
 stdio/ansi/spectrum/f_ansi_attr
 stdio/ansi/spectrum/f_ansi_bel
@@ -23,6 +22,7 @@ stdio/ansi/spectrum/f_ansi_char
 stdio/ansi/spectrum/f_ansi_cls
 stdio/ansi/spectrum/f_ansi_dline
 stdio/ansi/spectrum/f_ansi_scrollup
+@stdio/stdio.lst
 time/spectrum/clock
 @gfxspectrum.lst
 @font/fzx/fzx.lst

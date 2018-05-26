@@ -1,11 +1,7 @@
-@stdio/stdio.lst
 stdio/msx/fgetc_cons
 stdio/msx/getk
 stdio/msx/fputc_cons
-stdio/msx/generic_console
-stdio/msx/generic_console_vpeek
-stdio/msx/generic_console_ioctl
-stdio/msx/CRT_FONT
+@stdio/tms9918/tms9918.lst
 @font/font_8x8/font_8x8.lst
 @stdio/ansicore.lst
 stdio/ansi/msx/f_ansi_attr
@@ -14,6 +10,7 @@ stdio/ansi/msx/f_ansi_char
 stdio/ansi/msx/f_ansi_cls
 stdio/ansi/generic/f_ansi_dline
 stdio/ansi/msx/f_ansi_scrollup
+@stdio/stdio.lst
 time/msx/clock
 @gfxbase.lst
 graphics/dcircle

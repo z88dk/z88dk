@@ -1,5 +1,4 @@
 @input/zx81.lst
-@stdio/stdio.lst
 stdio/zx80/fgetc_cons
 stdio/zx80/getk
 stdio/zx80/zx80_decode_keys
@@ -12,6 +11,7 @@ stdio/ansi/zx81/text/f_ansi_char
 stdio/ansi/zx81/text/f_ansi_cls
 stdio/ansi/zx81/text/f_ansi_dline
 stdio/ansi/zx81/text/f_ansi_scrollup
+@stdio/stdio.lst
 time/zx81/clock
 @gfxbase.lst
 graphics/dcircle

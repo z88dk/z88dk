@@ -1,4 +1,3 @@
-@stdio/stdio.lst
 stdio/m5/fgetc_cons
 stdio/m5/getk
 stdio/m5/fputc_cons
@@ -9,6 +8,8 @@ stdio/ansi/msx/f_ansi_char
 stdio/ansi/msx/f_ansi_cls_nobios
 stdio/ansi/generic/f_ansi_dline
 stdio/ansi/msx/f_ansi_scrollup_nobios
+@stdio/tms9918/tms9918.lst
+@stdio/stdio.lst
 @gfxbase.lst
 @msx/genmsx.lst
 graphics/dcircle

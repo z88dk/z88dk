@@ -1,4 +1,3 @@
-@stdio/stdio.lst
 stdio/aquarius/fgetc_cons
 stdio/aquarius/getk
 stdio/aquarius/fputc_cons
@@ -10,6 +9,7 @@ stdio/ansi/aquarius/f_ansi_char
 stdio/ansi/aquarius/f_ansi_cls
 stdio/ansi/aquarius/f_ansi_dline
 stdio/ansi/aquarius/f_ansi_scrollup
+@stdio/stdio.lst
 @gfxbasetxt6.lst
 graphics/aquarius/textpixl6
 games/aquarius/joystick

@@ -1,5 +1,4 @@
 @input/spectrum.lst
-@stdio/stdio.lst
 stdio/spectrum/fgetc_cons
 stdio/spectrum/fgetc_cons_inkey
 stdio/spectrum/fputc_cons_rom_rst
@@ -14,6 +13,7 @@ stdio/ansi/ts2068/f_ansi_char
 stdio/ansi/ts2068/f_ansi_cls
 stdio/ansi/ts2068/f_ansi_dline
 stdio/ansi/ts2068/f_ansi_scrollup
+@stdio/stdio.lst
 time/spectrum/clock
 games/spectrum/joystick
 @games/games.lst
