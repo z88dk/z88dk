@@ -1,4 +1,4 @@
-; unsigned char extended_sna_load(unsigned char *sna_file)
+; unsigned char extended_sna_load(unsigned char handle)
 
 SECTION code_esxdos
 

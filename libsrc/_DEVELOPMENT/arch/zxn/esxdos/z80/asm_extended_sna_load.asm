@@ -1,4 +1,4 @@
-; unsigned char extended_sna_load(char *sna_name)
+; unsigned char extended_sna_load(unsigned char handle)
 
 INCLUDE "config_private.inc"
 
@@ -14,7 +14,7 @@ asm_extended_sna_load:
    ; load pages stored in an extended sna into memory
    ; uses mmu2 to load pages
    ;
-   ; enter : hl = char *sna_name
+   ; enter : l = handle
    ;
    ; exit  : success
    ;
@@ -27,29 +27,15 @@ asm_extended_sna_load:
    ;            carry set, errno set
    ;
    ; uses  : all except iy
-   
-   ld a,'*'
-   ld b,__ESXDOS_MODE_READ | __ESXDOS_MODE_OPEN_EXIST
 
-IF __SDCC_IY
+   ; seek past end of standard sna
+   
    push hl
-   pop iy
-ELSE
-   push hl
-   pop ix
-ENDIF
    
-   rst  __ESXDOS_SYSCALL
-   defb __ESXDOS_SYS_F_OPEN
-   
-   jp c, __esxdos_error_mc
-   
-   ; a = file handle
-   
-   push af
+   ld a,l
    
    ld bc,0x2
-   ld de,0x001f                ; seek past end of actual 128k sna
+   ld de,0x001f
    
    ld l,__ESXDOS_SEEK_SET
 
@@ -64,15 +50,14 @@ ENDIF
    rst  __ESXDOS_SYSCALL
    defb __ESXDOS_SYS_F_SEEK
    
-   jr c, close_error
+   pop hl
+   jp c, __esxdos_error_mc
 
 load_page_loop:
 
-   ; stack = file handle
+   push hl
    
-   pop af                      ; a = file handle
-   push af
-   
+   ld a,l                      ; a = handle
    ld hl,destination_page
 
 IF __SDCC_IY
@@ -88,22 +73,39 @@ ENDIF
    rst  __ESXDOS_SYSCALL
    defb __ESXDOS_SYS_F_READ
    
-   jr c, close_error
+   pop de
+   jp c, __esxdos_error_mc
    
    ld a,b
    or c
 
-   jr z, close_success         ; nothing read indicates eof
+   jp z, error_znc             ; nothing read indicates eof
+   
+   ld a,(destination_page)
+   inc a
+   
+   jp z, error_znc             ; if stop marker met
    
    ; load into page
    
-   ld a,(destination_page)
+   dec a
    mmu2 a
    
-   pop af                      ; a = file handle
-   push af
+   ; verify the page is valid
    
    ld hl,0x4000                ; destination is mmu2
+   
+   ld a,(hl)
+   cpl
+   ld (hl),a
+   cp (hl)
+   
+   ld a,__ESXDOS_EVERIFY
+   jp nz, __esxdos_error_mc
+   
+   push de
+   
+   ld a,e                      ; a = handle
 
 IF __SDCC_IY
    push hl
@@ -120,36 +122,17 @@ ENDIF
    
    mmu2 10                     ; restore page 10
    
-   jr c, close_error
+   pop de
+   jp c, __esxdos_error_mc
    
    ld hl,0x2000
    sbc hl,bc
    
+   ex de,hl
    jr z, load_page_loop        ; if page loaded successfully
    
    ld a,__ESXDOS_EIO           ; indicate io error if entire 8k not read
-
-close_error:
-
-   pop hl                      ; h = file handle
-   push af                     ; save error code
-   
-   ld a,h
-   
-   rst  __ESXDOS_SYSCALL
-   defb __ESXDOS_SYS_F_CLOSE
-   
-   pop af                      ; a = error code
    jp __esxdos_error_mc
-   
-close_success:
-
-   pop af                      ; a = file handle
-   
-   rst  __ESXDOS_SYSCALL
-   defb __ESXDOS_SYS_F_CLOSE
-   
-   jp error_znc
 
 
 SECTION bss_arch

@@ -4,8 +4,8 @@
 
 #ifndef __ESXDOS_H__
 
-extern unsigned char extended_sna_load(unsigned char *sna_file);
-extern unsigned char extended_sna_load_fastcall(unsigned char *sna_file) __z88dk_fastcall;
+extern unsigned char extended_sna_load(unsigned char handle);
+extern unsigned char extended_sna_load_fastcall(unsigned char handle) __z88dk_fastcall;
 #define extended_sna_load(a) extended_sna_load_fastcall(a)
 
 

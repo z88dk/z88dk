@@ -4,7 +4,7 @@
 
 #ifndef __ESXDOS_H__
 
-extern unsigned char extended_sna_load(unsigned char *sna_file);
+extern unsigned char extended_sna_load(unsigned char handle);
 
 
 

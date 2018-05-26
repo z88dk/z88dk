@@ -661,14 +661,22 @@ int zxn_exec(char *target)
                 {
                     FILE *fin;
                     unsigned char mem[8192];
+                    int first, last, gap;
 
                     memset(mem, zxb.romfill, sizeof(mem));
 
                     // PAGE_i
 
+                    gap = 0;
+
                     for (j = 0; j < mb->num; ++j)
                     {
                         struct section_bin *sb = &mb->secbin[j];
+
+                        if (j == 0)
+                            first = sb->org & 0x1fff;
+                        else
+                            gap += (sb->org & 0x1fff) - last;
 
                         if (((sb->org & 0x1fff) + sb->size) > 0x2000)
                             exit_log(1, "Error: Section %s exceeds 8k page [%d,%d)\n", sb->section_name, sb->org & 0x1fff, (sb->org & 0x1fff) + sb->size);
@@ -683,12 +691,22 @@ int zxn_exec(char *target)
                             exit_log(1, "Error: Can't read [%d,%d) from \"%s\"\n", sb->offset, sb->offset + sb->size);
 
                         fclose(fin);
+
+                        last = (sb->org & 0x1fff) + sb->size;
                     }
 
                     // append to output sna
 
                     fputc(i, zxs.fsna);
                     fwrite(mem, sizeof(mem), 1, zxs.fsna);
+
+                    // information
+
+                    printf("Adding Page %d", i);
+                    if (first) printf(", %d head bytes free", first);
+                    if (gap) printf(", %d gap bytes free", gap);
+                    if (last - 0x2000 < 0) printf(", %d tail bytes free", 0x2000 - last);
+                    printf("\n");
 
                     // remove this PAGE from memory model
 
