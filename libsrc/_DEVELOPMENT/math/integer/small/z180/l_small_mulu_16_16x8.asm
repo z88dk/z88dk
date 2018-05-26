@@ -1,21 +1,21 @@
 SECTION code_clib
 SECTION code_math
 
-PUBLIC l_small_mul_16_16x8
+PUBLIC l_small_mulu_16_16x8
 
-   ex de,hl
+;  ex de,hl
 
-l_small_mul_16_16x8:
+l_small_mulu_16_16x8:
 
    ; multiplication of a 16-bit number by an 8-bit number into 16-bit product
    ;
-   ; enter :  l = 8-bit multiplicand
+   ; enter :  l =  8-bit multiplier
    ;         de = 16-bit multiplicand
    ;
    ; exit  : hl = 16-bit product
    ;         carry reset
    ;
-   ; uses  : af, bc, hl
+   ; uses  : af, bc, de, hl
 
    ld c,l
    ld b,d
