@@ -26,12 +26,12 @@ extern void errors_init( void );
 *	error_xxx(), warn_xxx()
 *----------------------------------------------------------------------------*/
 extern void set_error_null( void );             /* clear all locations */
-extern void set_error_file( char *filename );
-extern void set_error_module( char *modulename );
+extern void set_error_file(const char *filename );
+extern void set_error_module(const char *modulename );
 extern void set_error_line( int lineno );
 
-extern char *get_error_file(void);
-extern int   get_error_line(void);
+extern const char *get_error_file(void);
+extern int         get_error_line(void);
 
 /*-----------------------------------------------------------------------------
 *	reset count of errors and return current count
@@ -44,7 +44,7 @@ extern int  get_num_errors( void );
 *	File is created on first call and appended on second, to allow assemble
 *	and link errors to be joined in the same file.
 *----------------------------------------------------------------------------*/
-extern void open_error_file( char *src_filename );
+extern void open_error_file(const char *src_filename );
 extern void close_error_file( void );   /* deletes the file if no errors */
 
 /*-----------------------------------------------------------------------------

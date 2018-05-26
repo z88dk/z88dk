@@ -36,14 +36,14 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 
 /* DEFINE_init_module() */
 #define DEFINE_init_module()									\
-		static Bool __init_called = FALSE;				\
+		static bool __init_called = false;				\
 		static void __fini(void);						\
 		static void __user_init(void);					\
 		static void __init(void)						\
 		{												\
 			if ( ! __init_called )						\
 			{											\
-				__init_called = TRUE;					\
+				__init_called = true;					\
 				__user_init();							\
 				xatexit( __fini );						\
 			}											\

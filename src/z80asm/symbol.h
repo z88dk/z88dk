@@ -11,7 +11,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 
 #include "expr.h"
 #include "model.h"
-#include "objfile.h"
+#include "zobjfile.h"
 #include "symtab.h"
 #include "types.h"
 #include "scan.h"

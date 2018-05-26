@@ -24,7 +24,7 @@ typedef struct ParseCtx
 {
 	enum {
 		SM_MAIN,
-		SM_SKIP,					/* in FALSE branch of an IF, skip */
+		SM_SKIP,					/* in false branch of an IF, skip */
 		SM_DEFVARS_OPEN, SM_DEFVARS_LINE,
 		SM_DEFGROUP_OPEN, SM_DEFGROUP_LINE,
 		SM_DMA_PARAMS
@@ -33,7 +33,7 @@ typedef struct ParseCtx
 	int cs;							/* current state */
 
 	UT_array *tokens;				/* array of tokens in the current statement */
-	Sym *p, *pe, *eof, *expr_start;	/* point into array */
+	Sym *p, *pe, *eof_, *expr_start;	/* point into array */
 
 	UT_array *token_strings;		/* strings saved from the current statement */
 	UT_array *exprs;				/* array of expressions computed during parse */
@@ -47,14 +47,14 @@ extern ParseCtx *ParseCtx_new(void);
 /* detele the parse context */
 extern void ParseCtx_delete(ParseCtx *ctx);
 
-/* parse the given assembly file, return FALSE if failed */
-extern Bool parse_file(char *filename);
+/* parse the given assembly file, return false if failed */
+extern bool parse_file(const char *filename);
 
-/* try to parse the current statement, return FALSE if failed */
-extern Bool parse_statement(ParseCtx *ctx);
+/* try to parse the current statement, return false if failed */
+extern bool parse_statement(ParseCtx *ctx);
 
 /* save the current scanner context and parse the given expression */
-extern struct Expr *parse_expr(char *expr_text);
+extern struct Expr *parse_expr(const char *expr_text);
 
 /* return new auto-label in strpool */
-extern char *autolabel(void);
+extern const char *autolabel(void);

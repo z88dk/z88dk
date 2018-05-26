@@ -34,17 +34,17 @@ extern void m_alloc_init( void );
 *----------------------------------------------------------------------------*/
 
 extern void *m_malloc_compat( size_t size );
-extern void *m_malloc_( size_t size, char *file, int lineno );
+extern void *m_malloc_( size_t size, const char *file, int lineno );
 #define      m_malloc( size )	\
 						check_mem_die( m_malloc_((size), __FILE__, __LINE__) )
 
 extern void *m_calloc_compat( size_t num, size_t size );
-extern void *m_calloc_( size_t num, size_t size, char *file, int lineno );
+extern void *m_calloc_( size_t num, size_t size, const char *file, int lineno );
 #define      m_calloc( num, size )	\
 						check_mem_die( m_calloc_((num), (size), __FILE__, __LINE__) )
 
-extern char *m_strdup_compat( char *source );
-extern char *m_strdup_( char *source, char *file, int lineno );
+extern char *m_strdup_compat(const char *source );
+extern char *m_strdup_(const char *source, const char *file, int lineno );
 #define      m_strdup( source )	\
 						((char *) check_mem_die( m_strdup_((source), __FILE__, __LINE__) ) )
 
@@ -94,11 +94,11 @@ extern void *m_set_destructor_( void *memptr, destructor_t destructor, char *fil
    This flag avoids a list element to be destroyed without removing from the
    list, leaving dangling pointers in the parent.
    Returns pointer to be able to be chained. */
-extern void *m_set_in_collection_( void *memptr, Bool in_collection, char *file, int lineno );
+extern void *m_set_in_collection_( void *memptr, bool in_collection, char *file, int lineno );
 #define      m_set_in_collection( memptr )	\
-						m_set_in_collection_((memptr), TRUE,  __FILE__, __LINE__)
+						m_set_in_collection_((memptr), true,  __FILE__, __LINE__)
 #define      m_clear_in_collection( memptr )	\
-						m_set_in_collection_((memptr), FALSE, __FILE__, __LINE__)
+						m_set_in_collection_((memptr), false, __FILE__, __LINE__)
 
 /* declare a memory block as to be destroyed by the garbage collector atexit,
    so that no memory leak warning is given
@@ -108,4 +108,4 @@ extern void *m_destroy_atexit_( void *memptr, char *file, int lineno );
 						m_destroy_atexit_((memptr), __FILE__, __LINE__)
 
 /* check if memptr points to a block allocated by m_... */
-extern Bool m_is_managed( void *memptr );
+extern bool m_is_managed( void *memptr );

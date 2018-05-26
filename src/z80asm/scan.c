@@ -18,14 +18,14 @@ Scanner. Scanning engine is built by ragel from scan_rules.rl.
 #include "scan.h"
 #include "str.h"
 #include "utarray.h"
-#include <assert.h>
+#include "die.h"
 #include <ctype.h>
 
 /*-----------------------------------------------------------------------------
 * 	Globals
 *----------------------------------------------------------------------------*/
 Sym  sym;
-Bool EOL;
+bool EOL;
 
 /*-----------------------------------------------------------------------------
 * 	Static - current scan context
@@ -33,14 +33,14 @@ Bool EOL;
 static Str	*input_buf;					/* current input buffer */
 static List *input_stack;				/* stack of previous contexts */
 
-static Bool	 at_bol;					/* true if at beginning of line */
+static bool	 at_bol;					/* true if at beginning of line */
 
 static int	 cs, act;					/* Ragel state variables */
-static char	*p, *pe, *eof, *ts, *te;	/* Ragel state variables */
+static char	*p, *pe, *eof_, *ts, *te;	/* Ragel state variables */
 
 /* static DEFINE_STR(sym_string, STR_SIZE); */
 
-static Bool	expect_opcode;				/* true to return opcodes as tokens, 
+static bool	expect_opcode;				/* true to return opcodes as tokens, 
 										*  false to return as names */
 
 /* save scan status */
@@ -48,12 +48,12 @@ typedef struct scan_state_t
 {
 	Sym		 sym;
 	char	*input_buf;
-	Bool	 at_bol;
-	Bool	 EOL;
+	bool	 at_bol;
+	bool	 EOL;
 	int		 cs, act;
-	int		 p, pe, eof, ts, te;
+	int		 p, pe, eof_, ts, te;
 //	char	*sym_string;
-	Bool	 expect_opcode;
+	bool	 expect_opcode;
 } ScanState;
 
 static void ut_scan_state_dtor(void *elt) 
@@ -87,8 +87,8 @@ static void init_sym(void)
 *----------------------------------------------------------------------------*/
 DEFINE_init_module()
 {
-	input_buf = str_new(STR_SIZE);
-	p = str_data(input_buf);
+	input_buf = Str_new(STR_SIZE);
+	p = Str_data(input_buf);
 
 	input_stack	 = OBJ_NEW(List);
 	input_stack->free_data = m_free_compat;
@@ -99,7 +99,7 @@ DEFINE_init_module()
 
 DEFINE_dtor_module()
 {
-	str_delete(input_buf);
+	Str_delete(input_buf);
 	OBJ_DELETE(input_stack);
 	utarray_free(scan_state);
 }
@@ -114,16 +114,16 @@ void save_scan_state(void)
 	init_module();
 
 	save.sym = sym;
-	save.input_buf = m_strdup(str_data(input_buf));
+	save.input_buf = m_strdup(Str_data(input_buf));
 	save.at_bol = at_bol;
 	save.EOL = EOL;
 	save.cs = cs;
 	save.act = act;
-	save.p   = p   ? p   - str_data(input_buf) : -1;
-	save.pe  = pe  ? pe  - str_data(input_buf) : -1;
-	save.eof = eof ? eof - str_data(input_buf) : -1;
-	save.ts  = ts  ? ts  - str_data(input_buf) : -1;
-	save.te  = te  ? te  - str_data(input_buf) : -1;
+	save.p   = p   ? p   - Str_data(input_buf) : -1;
+	save.pe  = pe  ? pe  - Str_data(input_buf) : -1;
+	save.eof_ = eof_ ? eof_ - Str_data(input_buf) : -1;
+	save.ts  = ts  ? ts  - Str_data(input_buf) : -1;
+	save.te  = te  ? te  - Str_data(input_buf) : -1;
 //	save.sym_string = m_strdup(sym_string->str);
 	save.expect_opcode = expect_opcode;
 
@@ -138,17 +138,17 @@ void restore_scan_state(void)
 
 	save = (ScanState *)utarray_back(scan_state);
 	sym = save->sym;
-	str_set(input_buf, save->input_buf);
+	Str_set(input_buf, save->input_buf);
 	at_bol = save->at_bol;
 	EOL = save->EOL;
 	cs = save->cs;
 	act = save->act;
-	p   = save->p   >= 0 ? str_data(input_buf) + save->p   : NULL;
-	pe  = save->pe  >= 0 ? str_data(input_buf) + save->pe  : NULL;
-	eof = save->eof >= 0 ? str_data(input_buf) + save->eof : NULL;
-	ts  = save->ts  >= 0 ? str_data(input_buf) + save->ts  : NULL;
-	te  = save->te  >= 0 ? str_data(input_buf) + save->te  : NULL;
-//	str_set(sym_string, save->sym_string);
+	p   = save->p   >= 0 ? Str_data(input_buf) + save->p   : NULL;
+	pe  = save->pe  >= 0 ? Str_data(input_buf) + save->pe  : NULL;
+	eof_ = save->eof_ >= 0 ? Str_data(input_buf) + save->eof_ : NULL;
+	ts  = save->ts  >= 0 ? Str_data(input_buf) + save->ts  : NULL;
+	te  = save->te  >= 0 ? Str_data(input_buf) + save->te  : NULL;
+//	Str_set(sym_string, save->sym_string);
 	expect_opcode = save->expect_opcode;
 
 	utarray_pop_back(scan_state);
@@ -165,7 +165,7 @@ void scan_expect_opcode(void)
 {
 	init_module();
 
-	expect_opcode = TRUE;
+	expect_opcode = true;
 
 	/* convert current symbol */
 	if (sym.tok_opcode)
@@ -176,7 +176,7 @@ void scan_expect_operands(void)
 {
 	init_module();
 
-	expect_opcode = FALSE;
+	expect_opcode = false;
 
 	/* convert current symbol */
 	if (sym.tok_opcode)
@@ -193,10 +193,10 @@ static long scan_num ( char *text, int length, int base )
 	int digit = 0;
 	char c;
 	int i;
-	Bool range_err;
+	bool range_err;
 	
 	value = 0;
-	range_err = FALSE;
+	range_err = false;
 	for ( i = 0 ; i < length ; i++ ) 
 	{
 		c = *text++;					/* read each digit */
@@ -214,19 +214,19 @@ static long scan_num ( char *text, int length, int base )
 		}
 		else 
 		{
-			assert(0); /* invalid digit - should not be reached */
+			xassert(0); /* invalid digit - should not be reached */
 		}
 
 		if (digit >= base) 
 		{
-			assert(0); /* digit out of range - should not be reached */
+			xassert(0); /* digit out of range - should not be reached */
 		}
 		
 		value = value * base + digit;
 
 		if ( ! range_err && value < 0 )	/* overflow to sign bit */
 		{
-			range_err = TRUE;		
+			range_err = true;		
 		}
 	}
 	
@@ -245,30 +245,30 @@ static long scan_num ( char *text, int length, int base )
 *	end with p pointing at the end quote, copy characters to tok_string
 *	handling C escape sequences. Return false if string not terminated.
 *----------------------------------------------------------------------------*/
-static Bool get_sym_string( void )
+static bool get_sym_string( void )
 {
 	char quote;
 
 	/* mark token start */
 	quote = *p++;
-	assert( quote == '"' || quote == '\'' );
+	xassert( quote == '"' || quote == '\'' );
 	ts = p;
 
 	/* search for end quote or end of string */
-	while (TRUE)
+	while (true)
 	{
 		if (*p == '\\' && p[1] != '\0')
 			p++;						/* skip char after backslash, may be a quote */
 		else if (*p == quote)
 		{
 			te = p;
-			return TRUE;
+			return true;
 		}
 		else if (*p == '\n' || *p == '\0')
 		{
 			te = ts;
 			p--;						/* point to before separator */
-			return FALSE;
+			return false;
 		}
 		
 		/* advance to next */
@@ -301,7 +301,7 @@ void Skipline( void )
 		else 
 			p = newline + 1;
 		
-		EOL = TRUE;
+		EOL = true;
 	}
 }
 
@@ -312,9 +312,9 @@ void Skipline( void )
 #include "scan_rules.h"
 
 /*-----------------------------------------------------------------------------
-*   Fill scan buffer if needed, return FALSE on end of file
+*   Fill scan buffer if needed, return false on end of file
 *----------------------------------------------------------------------------*/
-static Bool fill_buffer( void )
+static bool fill_buffer( void )
 {
 	char *line;
 
@@ -324,7 +324,7 @@ static Bool fill_buffer( void )
 		line = List_pop( input_stack );
 		if ( line != NULL )
 		{
-			set_scan_buf( line, FALSE );	/* read from stack - assume not at BOL */
+			set_scan_buf( line, false );	/* read from stack - assume not at BOL */
 			m_free( line );
 		}
 		else 
@@ -332,14 +332,14 @@ static Bool fill_buffer( void )
 			/* get next line from input source file */
 			line = src_getline();
 			if ( line == NULL )
-				return FALSE;
+				return false;
 
 			/* got new line */
-			set_scan_buf( line, TRUE );		/* read from file - at BOL */
+			set_scan_buf( line, true );		/* read from file - at BOL */
 		}
 	}
 
-	return TRUE;
+	return true;
 }
 
 /*-----------------------------------------------------------------------------
@@ -355,7 +355,7 @@ tokid_t GetSym( void )
 	*  NOTE: HACK for inconsistent parser in handling newlines, should be removed */
 	if ( EOL )
 	{
-		at_bol = TRUE;
+		at_bol = true;
 		sym.tstart = "\n"; sym.tlen = 1;
 		return (sym.tok = TK_NEWLINE);			/* assign and return */
 	}
@@ -378,7 +378,7 @@ tokid_t GetSym( void )
 
 	sym.tstart = ts; sym.tlen = te - ts;			/* remember token position */
 
-	at_bol = EOL = (sym.tok == TK_NEWLINE) ? TRUE : FALSE;
+	at_bol = EOL = (sym.tok == TK_NEWLINE) ? true : false;
 	return sym.tok;
 }
 
@@ -406,7 +406,7 @@ void CurSymExpect(tokid_t expected_tok)
 /*-----------------------------------------------------------------------------
 *   Insert the given text at the current scan position
 *----------------------------------------------------------------------------*/
-void SetTemporaryLine( char *line )
+void SetTemporaryLine(const char *line )
 {
 	init_module();
 
@@ -414,7 +414,7 @@ void SetTemporaryLine( char *line )
 	if (*p != '\0')
 		List_push(&input_stack, m_strdup(p));		/* save current input */
 #endif
-	set_scan_buf( line, FALSE );					/* assume not at BOL */
+	set_scan_buf( line, false );					/* assume not at BOL */
 }
 
 /*-----------------------------------------------------------------------------
@@ -425,6 +425,6 @@ char *sym_text(Sym *sym)
 {
 	static STR_DEFINE(text, STR_SIZE);
 
-	str_set_bytes(text, sym->tstart, sym->tlen);
-	return str_data(text);
+	Str_set_bytes(text, sym->tstart, sym->tlen);
+	return Str_data(text);
 }

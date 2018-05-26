@@ -24,6 +24,7 @@ Contact the author:
 
 // shapes and attributes
 
+/*
 extern u_char grass1[8];
 extern u_char grass1_attr[8];
 extern u_char grass2[8];
@@ -34,7 +35,156 @@ extern u_char water3[8];
 
 extern u_char spaceship[32];
 extern u_char fire[32];
+*/
 
+
+// binary data (shapes, attributes, whatever...)
+/*
+#asm
+
+._grass1
+	defb	@00000000
+	defb	@00111000
+	defb	@00000000
+	defb	@10000011
+	defb	@00000000
+	defb	@00110000
+	defb	@00000100
+	defb	@00011010
+
+._grass1_attr
+	defb	032h ;00000000
+	defb	032h ;00111000
+	defb	032h ;00000000
+	defb	0B2h ;10000011
+	defb	032h ;00000000
+	defb	032h ;00110000
+	defb	0B2h ;00000100
+	defb	0A2h ;00011010
+*/
+
+u_char grass1[] = {0, 0x38, 0, 0x83 , 0, 0x30, 4, 0x1a};
+u_char grass1_attr[] = {0x32, 0x32, 0x32, 0xB2, 0x32, 0x32, 0xB2, 0xA2};
+
+/*
+._grass2
+	defb	@01011000
+	defb	@00000000
+	defb	@00000000
+	defb	@11100000
+	defb	@00000000
+	defb	@00000111
+	defb	@00000000
+	defb	@00100000
+
+._grass2_attr
+	defb	0A2h 
+	defb	032h 
+	defb	032h 
+	defb	0B2h 
+	defb	032h 
+	defb	032h 
+	defb	032h 
+	defb	0B2h 
+*/
+u_char grass2[] = {0x58, 0, 0, 0xE0, 0, 7, 0, 0x20};
+u_char grass2_attr[] = {0xA2, 0x32, 0x32, 0xB2, 0x32, 0x32, 0x32, 0xB2};
+
+/*
+._water1
+	defb	@00000000
+	defb	@11111000
+	defb	@00000000
+	defb	@00000000
+	defb	@00111111
+	defb	@00000000
+	defb	@00000000
+	defb	@00000000
+
+._water2
+	defb	@00000000
+	defb	@00000000
+	defb	@00000000
+	defb	@00000000
+	defb	@11111111
+	defb	@00000000
+	defb	@00000111
+	defb	@00000000
+
+._water3
+	defb	0,0,0,0,0,0,0,0
+*/
+
+u_char water1[] = {0, 0, 0, 0, 0xFF, 0, 7, 0};
+u_char water2[] = {0, 0xF8, 0, 0, 0x3F, 0, 0, 0};
+u_char water3[] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+/*
+._spaceship
+	defb	@00000011
+	defb	@00000011
+	defb	@00000011
+	defb	@00000111
+	defb	@00000111
+	defb	@11000111
+	defb	@11000111
+	defb	@11100111
+	defb	@11101110
+	defb	@11101110
+	defb	@11111110
+	defb	@11111111
+	defb	@11100111
+	defb	@11000011
+	defb	@11110000
+	defb	@10010000
+	
+	defb	@11000000
+	defb	@11000000
+	defb	@11000000
+	defb	@11100000
+	defb	@11100000
+	defb	@11100011
+	defb	@11100011
+	defb	@11100111
+	defb	@01110111
+	defb	@01110111
+	defb	@01111111
+	defb	@11111111
+	defb	@11100111
+	defb	@11000011
+	defb	@00001111
+	defb	@00001001
+*/
+
+u_char spaceship[] = {3, 3, 3, 7, 7, 0xc7, 0xc7, 0xe7, 0xee, 0xee, 0xfe, 0xff, 0xe7, 0xc3, 0xf0, 0x90,
+					0xc0, 0xc0, 0xc0, 0xe0, 0xe0, 0xe3, 0xe3, 0xe7, 0x77, 0x77, 0x7f, 0xff, 0xe7, 0xc3, 0x0f, 9 };
+
+/*
+._fire
+	defb	@00011000
+	defb	@00111100
+	defb	@00111100
+	defb	@01111110
+	defb	@01111110
+	defb	@01111110
+	defb	@01110110
+	defb	@01010100
+	defb	@00010000
+	defb	@00010000
+	defb	@00010000
+	defb	@00000000
+	defb	@00000000
+	defb	@00000000
+	defb	@00000000
+	defb	@00000000
+	defb	0,0,0,0,0,0,0,0
+	defb	0,0,0,0,0,0,0,0
+
+#endasm
+*/
+
+u_char fire[] = {0x18, 0x3C, 0x3C, 0x7E, 0x7E, 0x7E, 0x76, 0x54, 0x10, 0x10, 0x10, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 // terrain definitions
 
@@ -253,129 +403,5 @@ void main() {
 		show_map(map, c);
 	}
 }
-
-// binary data (shapes, attributes, whatever...)
-
-#asm
-
-._grass1
-	defb	@00000000
-	defb	@00111000
-	defb	@00000000
-	defb	@10000011
-	defb	@00000000
-	defb	@00110000
-	defb	@00000100
-	defb	@00011010
-
-._grass1_attr
-	defb	032h ;00000000
-	defb	032h ;00111000
-	defb	032h ;00000000
-	defb	0B2h ;10000011
-	defb	032h ;00000000
-	defb	032h ;00110000
-	defb	0B2h ;00000100
-	defb	0A2h ;00011010
-
-._grass2
-	defb	@01011000
-	defb	@00000000
-	defb	@00000000
-	defb	@11100000
-	defb	@00000000
-	defb	@00000111
-	defb	@00000000
-	defb	@00100000
-
-._grass2_attr
-	defb	0A2h 
-	defb	032h 
-	defb	032h 
-	defb	0B2h 
-	defb	032h 
-	defb	032h 
-	defb	032h 
-	defb	0B2h 
-
-._water1
-	defb	@00000000
-	defb	@11111000
-	defb	@00000000
-	defb	@00000000
-	defb	@00111111
-	defb	@00000000
-	defb	@00000000
-	defb	@00000000
-
-._water2
-	defb	@00000000
-	defb	@00000000
-	defb	@00000000
-	defb	@00000000
-	defb	@11111111
-	defb	@00000000
-	defb	@00000111
-	defb	@00000000
-
-._water3
-	defb	0,0,0,0,0,0,0,0
-
-._spaceship
-	defb	@00000011
-	defb	@00000011
-	defb	@00000011
-	defb	@00000111
-	defb	@00000111
-	defb	@11000111
-	defb	@11000111
-	defb	@11100111
-	defb	@11101110
-	defb	@11101110
-	defb	@11111110
-	defb	@11111111
-	defb	@11100111
-	defb	@11000011
-	defb	@11110000
-	defb	@10010000
-
-	defb	@11000000
-	defb	@11000000
-	defb	@11000000
-	defb	@11100000
-	defb	@11100000
-	defb	@11100011
-	defb	@11100011
-	defb	@11100111
-	defb	@01110111
-	defb	@01110111
-	defb	@01111111
-	defb	@11111111
-	defb	@11100111
-	defb	@11000011
-	defb	@00001111
-	defb	@00001001
-
-._fire
-	defb	@00011000
-	defb	@00111100
-	defb	@00111100
-	defb	@01111110
-	defb	@01111110
-	defb	@01111110
-	defb	@01110110
-	defb	@01010100
-	defb	@00010000
-	defb	@00010000
-	defb	@00010000
-	defb	@00000000
-	defb	@00000000
-	defb	@00000000
-	defb	@00000000
-	defb	@00000000
-	defb	0,0,0,0,0,0,0,0
-	defb	0,0,0,0,0,0,0,0
-
-#endasm
 
 

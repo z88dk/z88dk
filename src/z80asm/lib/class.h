@@ -45,7 +45,7 @@ T * obj2 = T_clone(obj1);
 OBJ_DELETE(obj1);       // same as T_delete(obj1); obj1 = NULL;
 OBJ_DELETE(obj2);       // same as T_delete(obj2); obj2 = NULL;
 
-OBJ_AUTODELETE(obj1) = FALSE;   // if object is destroyed by another
+OBJ_AUTODELETE(obj1) = false;   // if object is destroyed by another
                                 // object that owns it
 
 // usage for static objects
@@ -77,9 +77,9 @@ struct Object;
         /* header, equal in all classes */                                  \
         struct {                            /* private attributes */        \
             void (*delete_ptr)(struct Object *);                       		\
-            /* destructor function */       \
-            char *name;                     /* class name */                \
-            Bool autodelete;                /* false to skip cleanup */     \
+            /* destructor function */										\
+            const char *name;               /* class name */                \
+            bool autodelete;                /* false to skip cleanup */     \
             LIST_ENTRY(T) entries;          /* D-Linked list of objs */     \
         } _class;                                                           \
         /* next come the user supplied fields */
@@ -103,7 +103,7 @@ struct Object;
     T * T##_new (void)                                                      \
     {                                                                       \
         T * self = m_new(T);		            /* allocate object */           \
-        OBJ_AUTODELETE(self) = TRUE;        /* auto delete by default */    \
+        OBJ_AUTODELETE(self) = true;        /* auto delete by default */    \
         T##_init(self);                     /* call user initialization */  \
         _register_obj((struct Object *) self,                          		\
                       (void (*)(struct Object *)) T##_delete, ""#T );		\
@@ -148,8 +148,8 @@ struct Object;
 /*-----------------------------------------------------------------------------
 *   Private interface
 *----------------------------------------------------------------------------*/
-extern void _register_obj( struct Object *obj,
-                           void ( *delete_ptr )( struct Object * ),
-                           char *name );
+extern void _register_obj(struct Object *obj,
+	void(*delete_ptr)(struct Object *),
+	const char *name);
 extern void _update_register_obj( struct Object *obj );
 extern void _deregister_obj( struct Object *obj );

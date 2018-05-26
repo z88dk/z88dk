@@ -184,13 +184,28 @@ ELSE
 ENDIF
 
 section data_align_256
+align 256
+
 section data_align_128
+align 128
+
 section data_align_64
+align 64
+
 section data_align_32
+align 32
+
 section data_align_16
+align 16
+
 section data_align_8
+align 8
+
 section data_align_4
+align 4
+
 section data_align_2
+align 2
 
 section smc_jump_vectors
 section smc_driver
@@ -234,13 +249,28 @@ ELSE
 ENDIF
 
 section bss_align_256
+align 256
+
 section bss_align_128
+align 128
+
 section bss_align_64
+align 64
+
 section bss_align_32
+align 32
+
 section bss_align_16
+align 16
+
 section bss_align_8
+align 8
+
 section bss_align_4
+align 4
+
 section bss_align_2
+align 2
 
 section bss_driver
 section bss_font

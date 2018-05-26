@@ -19,9 +19,17 @@
 ._SETWRT
 	di
 	ld    a,l
-	out   (VDP_CMD),a
+IF VDP_CMD > 255
+	ld	(VDP_CMD),a
+ELSE
+	out	(VDP_CMD),a
+ENDIF
 	ld    a,h
 	or    $40
-	out   (VDP_CMD),a
+IF VDP_CMD > 255
+	ld	(VDP_CMD),a
+ELSE
+	out	(VDP_CMD),a
+ENDIF
 	ei
 	ret

@@ -14,11 +14,7 @@
         PUBLIC    ansi_cls
         PUBLIC    _ansi_cls
 		
-IF FORsc3000
-	;
-ELSE
         EXTERN	msx_set_mode
-ENDIF
 
         EXTERN	msx_color
         EXTERN	msx_attr
@@ -35,12 +31,8 @@ ENDIF
 .ansi_cls
 ._ansi_cls
 
-IF FORsc3000
-	call $39E2
-ELSE
 	ld    hl,2		; set graphics mode
 	call  msx_set_mode
-ENDIF
 
 	ld a,(msx_attr)
 	and $0F

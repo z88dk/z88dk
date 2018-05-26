@@ -12,7 +12,6 @@ Assembled module, i.e. result of assembling a .asm file
 #include "codearea.h"
 #include "init.h"
 #include "module.h"
-#include "strpool.h"
 
 /*-----------------------------------------------------------------------------
 *   Global data
@@ -45,10 +44,12 @@ void Module_init (Module *self)
 	self->module_id	= new_module_id();
 
 	self->local_symtab	= OBJ_NEW( SymbolHash );
-	OBJ_AUTODELETE( self->local_symtab ) = FALSE;
+	OBJ_AUTODELETE( self->local_symtab ) = false;
 
 	self->exprs			= OBJ_NEW( ExprList );
-	OBJ_AUTODELETE( self->exprs ) = FALSE;
+	OBJ_AUTODELETE( self->exprs ) = false;
+
+	self->objfile = objfile_new();
 }
 
 void Module_copy (Module *self, Module *other)	
@@ -61,6 +62,8 @@ void Module_fini (Module *self)
 { 
 	OBJ_DELETE( self->exprs);
 	OBJ_DELETE( self->local_symtab );
+
+	objfile_free(self->objfile);
 }
 
 /*-----------------------------------------------------------------------------
@@ -73,6 +76,7 @@ Module *new_module( void )
 	init_module();
 	module = OBJ_NEW( Module );
 	ModuleList_push( &g_module_list, module );
+
 	return module;
 }
 

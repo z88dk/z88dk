@@ -421,6 +421,12 @@ IF FORpacman
 	defc blankch	= 30
 ENDIF
 
+IF FORpv1000
+	DEFINE gotgfx
+	defc maxx	= 56
+	defc maxy	= 48
+ENDIF
+
 ; =============================================
 
 

@@ -22,13 +22,13 @@ void dump_str ( Str *str, char *name )
 
 	warn("--------  "
 		 "%s\nStr (len=%d size=%d%s%s) = \"",
-		 name, str_len( str ), str_size( str ), 
+		 name, Str_len( str ), Str_size( str ), 
 		 str->flag.header_alloc ? " header_alloc" : "",
 		 str->flag.data_alloc   ?   " data_alloc" : "" );
-	assert( str_data( str )[ str_len( str ) ] == 0 );
+	assert( Str_data( str )[ Str_len( str ) ] == 0 );
 
 	for (i = 0; i < str->len; i++) {
-		char c = str_data(str)[i];
+		char c = Str_data(str)[i];
 
 		if (isgraph(c))
 			warn("%c", c);
@@ -43,117 +43,6 @@ void dump_str ( Str *str, char *name )
 	warn("\"\n\n");
 }
 
-#define T_CONVERT_STR(func, str_func, in, out) \
-			strcpy(s, in); \
-			p = func(s); \
-			mu_assert( p == s, #func " output != input" ); \
-			mu_assert_str( s, ==, out ); \
-			str_set(str, in); \
-			str_func(str); \
-			mu_assert_str( str_data(str), ==, out )
-
-int test_convert_str(void)
-{
-	STR_DEFINE(str, STR_SIZE);
-	char s[STR_SIZE], *p;
-
-	/* toupper */
-	T_CONVERT_STR(stoupper, str_toupper, "abc1", "ABC1");
-	T_CONVERT_STR(stoupper, str_toupper, "Abc1", "ABC1");
-	T_CONVERT_STR(stoupper, str_toupper, "ABC1", "ABC1");
-	
-	/* stolower */
-	T_CONVERT_STR(stolower, str_tolower, "abc1", "abc1");
-	T_CONVERT_STR(stolower, str_tolower, "Abc1", "abc1");
-	T_CONVERT_STR(stolower, str_tolower, "ABC1", "abc1");
-	
-	/* chomp */
-	T_CONVERT_STR(chomp, str_chomp, "", "");
-	T_CONVERT_STR(chomp, str_chomp, "\r\n \t\f \r\n \t\f\v", "");
-	T_CONVERT_STR(chomp, str_chomp, "\r\n \t\fxxxxxxxx\r\n \t\f\v", "\r\n \t\fxxxxxxxx");
-
-	/* strip */
-	T_CONVERT_STR(strip, str_strip, "", "");
-	T_CONVERT_STR(strip, str_strip, "\r\n \t\f \r\n \t\f\v", "");
-	T_CONVERT_STR(strip, str_strip, "\r\n \t\fxxxxxxxx\r\n \t\f\v", "xxxxxxxx");
-
-	/* stricompare */
-	mu_assert_int( stricompare( "",  ""   ), ==, 0);
-	mu_assert_int( stricompare( "a", ""   ), > , 0);
-	mu_assert_int( stricompare( "",  "a"  ), < , 0);
-	mu_assert_int( stricompare( "a", "a"  ), ==, 0);
-	mu_assert_int( stricompare( "a", "A"  ), ==, 0);
-	mu_assert_int( stricompare( "A", "a"  ), ==, 0);
-	mu_assert_int( stricompare( "ab","a"  ), > , 0);
-	mu_assert_int( stricompare( "a", "ab" ), < , 0);
-	mu_assert_int( stricompare( "ab","ab" ), ==, 0);
-	
-	return MU_PASS;
-}
-
-#define T_COMPRESS( in, out_len, out_str ) \
-			strcpy(s, in); \
-			len = compress_escapes(s); \
-			mu_assert( len == out_len, "len=%d, out_len=%d", len, out_len ); \
-			mu_assert( memcmp(s, out_str, out_len) == 0, "compress_escapes failed" ); \
-			str_set(str, in); \
-			str_compress_escapes(str); \
-			mu_assert(str_len(str) == out_len, "str_len=%d, out_len=%d", len, out_len); \
-			mu_assert( memcmp(str_data(str), out_str, out_len) == 0, "str_compress_escapes failed" )
-
-int test_compress_escapes(void)
-{
-	STR_DEFINE(str, STR_SIZE);
-	char s[STR_SIZE];
-	int  len, i;
-
-	/* trailing backslash ignored */
-	T_COMPRESS( "\\", 0, "" );
-		
-	/* escape any */
-	T_COMPRESS( "\\" "?" "\\" "\"" "\\" "'",
-				3, "?\"'" );
-		
-	/* escape chars */
-	T_COMPRESS( "0" "\\a" 
-				"1" "\\b" 
-				"2" "\\e" 
-				"3" "\\f" 
-				"4" "\\n" 
-				"5" "\\r" 
-				"6" "\\t" 
-				"7" "\\v" 
-				"8",
-				17,
-				"0" "\a" 
-				"1" "\b" 
-				"2" "\x1B" 
-				"3" "\f" 
-				"4" "\n" 
-				"5" "\r" 
-				"6" "\t" 
-				"7" "\v" 
-				"8" );
-		
-	/* octal and hexadecimal, including '\0' */
-	for ( i = 0; i < 256; i++ )
-	{
-		sprintf(s, "\\%o \\x%x", i, i );
-		len = compress_escapes(s);		
-		mu_assert( len  == 3,		"len=%d", len );
-		mu_assert( s[0] == (char)i,	"s[0]=%d", s[0] );
-		mu_assert( s[1] == ' ',		"s[1]=%d", s[1] );
-		mu_assert( s[2] == (char)i,	"s[2]=%d", s[2] );
-		mu_assert( s[3] == '\0',	"s[3]=%d", s[3] );
-	}
-		
-	/* octal and hexadecimal with longer digit string */
-	T_COMPRESS( "\\3770\\xff0", 
-				4,
-				"\xFF" "0" "\xFF" "0");
-
-	return MU_PASS;
-}
 
 STR_DECLARE( s1 );
 STR_DEFINE( s1, STR_SIZE );
@@ -167,9 +56,9 @@ char *static_str( int init )
 	static STR_DEFINE( str, STR_SIZE );
 
 	if ( init >= 0 )
-		sprintf( str_data( str ), "%d", init );
+		sprintf( Str_data( str ), "%d", init );
 
-	return str_data( str );
+	return Str_data( str );
 }
 
 void call_vsprintf(Str *str, char *format, ...)
@@ -177,7 +66,7 @@ void call_vsprintf(Str *str, char *format, ...)
 	va_list argptr;
 
 	va_start(argptr, format);
-	str_vsprintf(str, format, argptr);
+	Str_vsprintf(str, format, argptr);
 	va_end(argptr);
 }
 
@@ -186,7 +75,7 @@ void call_append_vsprintf(Str *str, char *format, ...)
 	va_list argptr;
 
 	va_start(argptr, format);
-	str_append_vsprintf(str, format, argptr);
+	Str_append_vsprintf(str, format, argptr);
 	va_end(argptr);
 }
 
@@ -212,64 +101,64 @@ int test_str(void)
 	mu_assert_str( static_str(-1), ==, "7" );
 	mu_assert_str( static_str(-1), ==, "7" );
 
-	T_STR(s4, s4 = str_new(6));		/* alloc, keep memory leak */
+	T_STR(s4, s4 = Str_new(6));		/* alloc, keep memory leak */
 
-	T_STR(s5, s5 = str_new(6));
+	T_STR(s5, s5 = Str_new(6));
 	
 	/* expand */
-	T_STR(s3, str_clear(s3));
-	T_STR(s3, str_reserve(s3, 9));
-	T_STR(s3, str_reserve(s3, 10));
-	T_STR(s3, str_reserve(s3, 11));
-	T_STR(s3, str_clear(s3));
+	T_STR(s3, Str_clear(s3));
+	T_STR(s3, Str_reserve(s3, 9));
+	T_STR(s3, Str_reserve(s3, 10));
+	T_STR(s3, Str_reserve(s3, 11));
+	T_STR(s3, Str_clear(s3));
 
 	/* char */
-	T_STR(s4, str_set(s4, "xxxx"));
-	T_STR(s4, str_set_char(s4, 0));
-	T_STR(s4, str_append_char(s4, 1));
-	T_STR(s4, str_append_char(s4, 2));
-	T_STR(s4, str_append_char(s4, 3));
-	T_STR(s4, str_append_char(s4, 4));
-	T_STR(s4, str_append_char(s4, 5));
-	T_STR(s4, str_append_char(s4, 6));
-	T_STR(s4, str_append_char(s4, 7));
-	T_STR(s4, str_append_char(s4, 8));
-	T_STR(s4, str_append_char(s4, 9));
-	T_STR(s4, str_append_char(s4, 10));
-	T_STR(s4, str_clear(s4));
+	T_STR(s4, Str_set(s4, "xxxx"));
+	T_STR(s4, Str_set_char(s4, 0));
+	T_STR(s4, Str_append_char(s4, 1));
+	T_STR(s4, Str_append_char(s4, 2));
+	T_STR(s4, Str_append_char(s4, 3));
+	T_STR(s4, Str_append_char(s4, 4));
+	T_STR(s4, Str_append_char(s4, 5));
+	T_STR(s4, Str_append_char(s4, 6));
+	T_STR(s4, Str_append_char(s4, 7));
+	T_STR(s4, Str_append_char(s4, 8));
+	T_STR(s4, Str_append_char(s4, 9));
+	T_STR(s4, Str_append_char(s4, 10));
+	T_STR(s4, Str_clear(s4));
 
 	/* string */
-	T_STR(s5, str_set(s5, "1234"));
-	T_STR(s5, str_append(s5, "56789"));
-	T_STR(s5, str_append(s5, "0"));
-	T_STR(s5, str_clear(s5));
+	T_STR(s5, Str_set(s5, "1234"));
+	T_STR(s5, Str_append(s5, "56789"));
+	T_STR(s5, Str_append(s5, "0"));
+	T_STR(s5, Str_clear(s5));
 
 	/* substring */
-	T_STR(s5, str_set_n(s5, "1234xx", 4));
-	T_STR(s5, str_append_n(s5, "56789xx", 5));
-	T_STR(s5, str_append_n(s5, "01234567890xx", 11));
-	T_STR(s5, str_clear(s5));
+	T_STR(s5, Str_set_n(s5, "1234xx", 4));
+	T_STR(s5, Str_append_n(s5, "56789xx", 5));
+	T_STR(s5, Str_append_n(s5, "01234567890xx", 11));
+	T_STR(s5, Str_clear(s5));
 
 	/* bytes */
-	T_STR(s5, str_set_bytes(s5, "\0\1\2\3x", 3));
-	T_STR(s5, str_append_bytes(s5, "\4\5\6x", 3));
-	T_STR(s5, str_clear(s5));
+	T_STR(s5, Str_set_bytes(s5, "\0\1\2\3x", 3));
+	T_STR(s5, Str_append_bytes(s5, "\4\5\6x", 3));
+	T_STR(s5, Str_clear(s5));
 
 	/* sprintf - test repeated call to vsprintf when buffer grows, needs va_copy in MacOS */
-	T_STR(s6, str_set(s6, "xxxx"));
-	T_STR(s6, str_sprintf(s6, "%s %d", "hello", 123));
-	T_STR(s6, str_sprintf(s6, "%s %d", "hello", 1234));
-	T_STR(s6, str_append_sprintf(s6, "%s %d", "hello", 12345));
-	T_STR(s6, str_clear(s6));
+	T_STR(s6, Str_set(s6, "xxxx"));
+	T_STR(s6, Str_sprintf(s6, "%s %d", "hello", 123));
+	T_STR(s6, Str_sprintf(s6, "%s %d", "hello", 1234));
+	T_STR(s6, Str_append_sprintf(s6, "%s %d", "hello", 12345));
+	T_STR(s6, Str_clear(s6));
 
 	/* vsprintf - test repeated call to vsprintf when buffer grows, needs va_copy in MacOS */
-	T_STR(s7, str_set(s7, "xxxx"));
+	T_STR(s7, Str_set(s7, "xxxx"));
 	T_STR(s7, call_vsprintf(s7, "%s %d", "hello", 123));
 	T_STR(s7, call_vsprintf(s7, "%s %d", "hello", 1234));
 	T_STR(s7, call_append_vsprintf(s7, "%s %d", "hello", 12345));
-	T_STR(s7, str_clear(s7));
+	T_STR(s7, Str_clear(s7));
 
-	str_delete(s5);
+	Str_delete(s5);
 	mu_assert_ptr_null(s5);
 
 	STR_DELETE(s3);
@@ -285,11 +174,11 @@ int test_str(void)
 }
 
 #define T_GETLINE(_s) \
-				str_set(s1, _s); \
+				Str_set(s1, _s); \
 				dump_str(s1, "input"); \
 				fp = fopen(TEST_FILE, "wb"); \
 				mu_assert_ptr(fp); \
-				ret = fputs(str_data(s1), fp); \
+				ret = fputs(Str_data(s1), fp); \
 				mu_assert(ret >= 0, "fputs=%d", ret); \
 				ret = fclose(fp); \
 				mu_assert(ret == 0, "fclose=%d", ret); \
@@ -297,8 +186,8 @@ int test_str(void)
 				mu_assert_ptr(fp); \
 				warn("read lines\n"); \
 				line_nr = 0; \
-				str_set(s2, "xxxx"); \
-				while (str_getline(s2, fp)) { \
+				Str_set(s2, "xxxx"); \
+				while (Str_getline(s2, fp)) { \
 					warn("line %d\n", ++line_nr); \
 					dump_str(s2, "read line"); \
 				} \
@@ -340,7 +229,6 @@ int test_getline(void)
 int main(int argc, char *argv[])
 {
 	mu_init(argc, argv);
-    mu_run_test(MU_PASS, test_convert_str);
     mu_run_test(MU_PASS, test_compress_escapes);
 	mu_run_test(MU_PASS, test_str);
 	mu_run_test(MU_PASS, test_getline);

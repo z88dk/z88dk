@@ -24,6 +24,10 @@ IF FORsms
 	defc psgport	= $40
 ENDIF
 
+IF FORpv2000
+	defc psgport	= $40
+ENDIF
+
 ; ********************************************************
 ;   This last part refers to NOT YET supported hardware
 ; ********************************************************

@@ -1,20 +1,31 @@
+#------------------------------------------------------------------------------
+# z88dk z80nm Makefile
+#------------------------------------------------------------------------------
+include ../Make.common
+
 SRCS 		:= $(wildcard *.c) \
 ../common/die.c \
 ../common/objfile.c \
+../common/fileutil.c \
 ../common/strutil.c \
 $(wildcard ../../ext/regex/reg*.c)
 
-OBJS	:= $(SRCS:.c=.o)
+OBJS	:= $(SRCS:.c=.o) \
+			$(UNIXem_OBJS)
 
 DEPENDS	:= $(SRCS:.c=.d)
 
-CFLAGS += -Wall -std=gnu11 -MMD -std=gnu11 -I../common -I../../ext/uthash/src -I../../ext/regex
+CFLAGS += -Wall -std=gnu11 -MMD -std=gnu11 -I../common -I../../ext/uthash/src -I../../ext/regex \
+			$(UNIXem_CFLAGS)
 
 INSTALL ?= install
 
-ifeq ($(EXEPREFIX),.exe)
-OBJS += ../../ext/getopt/getopt.o
-CFLAGS += -I../../ext/getopt 
+# Use these flags both in Windows_NT and in a MinGW build in Unix
+ifeq ($(EXE),.exe)
+CFLAGS	+= \
+-I../../ext/getopt 
+OBJS	+= \
+../../ext/getopt/getopt.o
 endif
 
 all: z80nm$(EXESUFFIX)

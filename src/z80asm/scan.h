@@ -39,7 +39,7 @@ typedef struct sym_t
 * 	Globals
 *----------------------------------------------------------------------------*/
 extern Sym  sym;			/* last token retrieved */
-extern Bool EOL;			/* scanner EOL state */
+extern bool EOL;			/* scanner EOL state */
 
 /*-----------------------------------------------------------------------------
 *	Scan API
@@ -60,11 +60,11 @@ extern void CurSymExpect(tokid_t expected_tok);
 extern void GetSymExpect(tokid_t expected_tok);
 
 /* insert the given text at the current scan position */
-extern void SetTemporaryLine( char *line );
+extern void SetTemporaryLine(const char *line );
 
 /* skip line past the newline, set EOL */
 extern void  Skipline( void );
-extern Bool EOL;
+extern bool EOL;
 
 /* return static string with current token text
 *  non-reentrant, string needs to be saved by caller */

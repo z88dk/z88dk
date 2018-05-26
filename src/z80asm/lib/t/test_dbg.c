@@ -12,6 +12,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 */
 
 #include "minunit.h"
+#include "fileutil.h"
 #include <assert.h>
 
 int test_warn_die(void)

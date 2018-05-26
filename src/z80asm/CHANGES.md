@@ -993,7 +993,7 @@ Define keywords for special symbols ASMSIZE, ASMTAIL
 		- Removed global variable smallc_source, no longer used
 		- ENDIAN not used and logic to define it was causing Deprecated warnings - removed
 		- Add utility functions to convert end-of-line sequences CR, CRLF, LFCR, LF all to LF
-		- Add utility functions to get N characters from input, return FALSE on EOF
+		- Add utility functions to get N characters from input, return false on EOF
 		- New module for object file handling
 		- New MAXIDENT for maximum identifier length - set at 255 because of
 		  object file format with one byte string length
@@ -1049,7 +1049,7 @@ Define keywords for special symbols ASMSIZE, ASMTAIL
 		Change page metrics variables into constants.
 
     - Internal clean-up:
-		- Unified usage of integer types: int, char, Byte
+		- Unified usage of integer types: int, char, byte_t
 		- New CLASS_LIST() to create lists of objects defined by CLASS()
 		- New CLASS_HASH() to create hash tables of objects defined by CLASS()
 
@@ -1860,7 +1860,7 @@ Did'nt set the EOL flag if end of line encoun- tered during reading of file name
 Expression evaluation altered: Expression are now evaluated completely, even though a single identifier is not known
 (making the expression NOT EVALUABLE). The result of the evaluation is returned (but probably incorrect). This
 allows specification of several -D symbols in an conditional assembly line, e.g.  "if MSDOS | UNIX", to be
-evaluated to TRUE if just one symbol is defined (the expression is however detected as UNEVALUABLE).
+evaluated to true if just one symbol is defined (the expression is however detected as UNEVALUABLE).
 -D symbols now saved separately in new STATIC tree structure, and copied into local symbols during assembly of each
 module. This fixes the problem of -D used on multi-module-assembly (otherwise the -D symbol is removed after the
 assembly of the first module). STATICs are first removed after the linking process.
@@ -1920,7 +1920,7 @@ Expression evaluation improved with logical NOT (using '!' in expressions) Some 
 algorithms rewritten.
 
 - 1993-12-06, V0.24:  
-All expressions may now be specified as logical expressions returning 1 for TRUE and 0 for FALSE.
+All expressions may now be specified as logical expressions returning 1 for true and 0 for false.
 logical operators are: =, <>, <, >, <= and >= .  
 Conditional assembly implemented with #if, #else and #endif. Unlimited nesting of #if expressions allowed.  
 pass1 algorithm optimized and rewritten to facilitate conditional assembly.

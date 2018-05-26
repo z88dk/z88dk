@@ -13,10 +13,11 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 */
 
 #include "alloc.h"
+#include "../errors.h"
 #include "srcfile.h"
+#include "strutil.h"
 #include "fileutil.h"
-#include "strpool.h"
-#include <assert.h>
+#include "die.h"
 
 /*-----------------------------------------------------------------------------
 *   Type stored in file_stack
@@ -24,11 +25,11 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 typedef struct FileStackElem
 {
 	FILE	*file;					/* open file */
-	char	*filename;				/* source file name, held in strpool */
-	char	*line_filename;			/* source file name of LINE statement, held in strpool */
+	const char *filename;				/* source file name, held in strpool */
+	const char *line_filename;			/* source file name of LINE statement, held in strpool */
 	int		 line_nr;				/* current line number, i.e. last returned */
 	int		 line_inc;				/* increment on each line read */
-	Bool	 is_c_source;			/* true if C_LINE was called */
+	bool	 is_c_source;			/* true if C_LINE was called */
 } FileStackElem;
 
 static void free_file_stack_elem( void *_elem )
@@ -36,7 +37,7 @@ static void free_file_stack_elem( void *_elem )
 	FileStackElem *elem = _elem;
 	
 	if ( elem->file != NULL )
-		myfclose( elem->file );
+		xfclose( elem->file );
 	m_free( elem );
 }
 
@@ -55,7 +56,7 @@ new_line_cb_t set_new_line_cb( new_line_cb_t func )
 }
 
 /* call callback */
-static void call_new_line_cb( char *filename, int line_nr, char *text )
+static void call_new_line_cb(const char *filename, int line_nr, const char *text )
 {
 	if ( new_line_cb != NULL )
 		new_line_cb( filename, line_nr, text );
@@ -81,33 +82,31 @@ DEF_CLASS( SrcFile );
 
 void SrcFile_init( SrcFile *self )
 {
-	strpool_init();
-	
 	self->filename = NULL;
 	self->line_filename = NULL;
 
-	self->line = str_new(STR_SIZE);
+	self->line = Str_new(STR_SIZE);
 
     self->line_stack = OBJ_NEW( List );
-    OBJ_AUTODELETE( self->line_stack ) = FALSE;
+    OBJ_AUTODELETE( self->line_stack ) = false;
 	self->line_stack->free_data = m_free_compat;
 
     self->file_stack = OBJ_NEW( List );
-    OBJ_AUTODELETE( self->file_stack ) = FALSE;
+    OBJ_AUTODELETE( self->file_stack ) = false;
 	self->file_stack->free_data = free_file_stack_elem;
 }
 
 void SrcFile_copy( SrcFile *self, SrcFile *other )
 {
-    assert(0);
+    xassert(0);
 }
 
 void SrcFile_fini( SrcFile *self )
 {
     if ( self->file != NULL )
-        myfclose( self->file );
+        xfclose( self->file );
 
-	str_delete(self->line);
+	Str_delete(self->line);
     OBJ_DELETE( self->line_stack );
     OBJ_DELETE( self->file_stack );
 }
@@ -116,9 +115,9 @@ void SrcFile_fini( SrcFile *self )
 *	SrcFile API
 *----------------------------------------------------------------------------*/
 
-/* check for recursive includes, call error callback and return FALSE abort if found
-   returns TRUE if callback not defined */
-static Bool check_recursive_include( SrcFile *self, char *filename )
+/* check for recursive includes, call error callback and return false abort if found
+   returns true if callback not defined */
+static bool check_recursive_include( SrcFile *self, const char *filename )
 {
 	ListElem *iter;
     FileStackElem *elem;
@@ -133,49 +132,49 @@ static Bool check_recursive_include( SrcFile *self, char *filename )
 				 strcmp( filename, elem->filename ) == 0 )
 			{
 				incl_recursion_err_cb( filename );
-				return FALSE;
+				return false;
 			}
 		}
 	}
-	return TRUE;
+	return true;
 }
 
 /* Open the source file for reading, closing any previously open file.
-   If dir_list is not NULL, calls search_file() to search the file in dir_list */
-Bool SrcFile_open( SrcFile *self, char *filename, UT_array *dir_list )
+   If dir_list is not NULL, calls path_search() to search the file in dir_list */
+bool SrcFile_open( SrcFile *self, const char *filename, UT_array *dir_list )
 {
-    char *filename_path;
-	
 	/* close last file */
 	if (self->file != NULL)
 	{
-		myfclose(self->file);
+		xfclose(self->file);
 		self->file = NULL;
 	}
 
 	/* search path, add to strpool */
-	filename_path = search_file(filename, dir_list);
+	const char *filename_path = path_search(filename, dir_list);
 
 	/* check for recursive includes, return if found */
 	if (!check_recursive_include(self, filename_path))
-		return FALSE;
+		return false;
 	
 	self->filename = filename_path;
 	self->line_filename = filename_path;
 
     /* open new file in binary mode, for cross-platform newline processing */
-    self->file = myfopen( self->filename, "rb" );
+    self->file = fopen( self->filename, "rb" );
+	if (!self->file)
+		error_read_file(self->filename);
 
 	/* init current line */
-    str_clear( self->line );
+    Str_clear( self->line );
     self->line_nr = 0;
 	self->line_inc = 1;
-	self->is_c_source = FALSE;
+	self->is_c_source = false;
 
 	if (self->file)
-		return TRUE;
+		return true;
 	else
-		return FALSE;		/* error opening file */
+		return false;		/* error opening file */
 }
 
 /* get the next line of input, normalize end of line termination (i.e. convert
@@ -186,11 +185,11 @@ Bool SrcFile_open( SrcFile *self, char *filename, UT_array *dir_list )
 char *SrcFile_getline( SrcFile *self )
 {
     int c, c1;
-    Bool found_newline;
+    bool found_newline;
     char *line;
 
     /* clear result string */
-    str_clear( self->line );
+    Str_clear( self->line );
 
     /* check for line stack */
     if ( ! List_empty( self->line_stack ) )
@@ -198,11 +197,11 @@ char *SrcFile_getline( SrcFile *self )
         line = List_pop( self->line_stack );
 
         /* we own the string now and need to release memory */
-		str_set( self->line, line );
+		Str_set( self->line, line );
         m_free( line );
 
         /* dont increment line number as we are still on same file input line */
-        return str_data(self->line);
+        return Str_data(self->line);
     }
 
     /* check for EOF condition */
@@ -210,7 +209,7 @@ char *SrcFile_getline( SrcFile *self )
         return NULL;
 
     /* read characters */
-    found_newline = FALSE;
+    found_newline = false;
     while ( ! found_newline && ( c = getc( self->file ) ) != EOF )
     {
         switch ( c )
@@ -233,32 +232,32 @@ char *SrcFile_getline( SrcFile *self )
             }
 
             /* normalize newline and fall through to default */
-            found_newline = TRUE;
+            found_newline = true;
             c = '\n';
 
         default:
-            str_append_char( self->line, c );
+            Str_append_char( self->line, c );
         }
     }
 
     /* terminate string if needed */
-    if ( str_len(self->line) > 0 && ! found_newline )
-        str_append_char( self->line, '\n' );
+    if ( Str_len(self->line) > 0 && ! found_newline )
+        Str_append_char( self->line, '\n' );
 
 	/* signal new line, even empty one, to show end line in list */
     self->line_nr += self->line_inc;
-	call_new_line_cb( self->line_filename, self->line_nr, str_data(self->line) );
+	call_new_line_cb( self->line_filename, self->line_nr, Str_data(self->line) );
 
 	/* check for end of file
 	   even if EOF found, we need to return any chars in line first */
-    if ( str_len(self->line) > 0 )		
+    if ( Str_len(self->line) > 0 )		
     {
-        return str_data(self->line);
+        return Str_data(self->line);
     }
     else
     {
         /* EOF - close file */
-        myfclose( self->file );				/* close input */
+        xfclose( self->file );				/* close input */
         self->file = NULL;
 
 //		call_new_line_cb( NULL, 0, NULL );
@@ -268,7 +267,7 @@ char *SrcFile_getline( SrcFile *self )
 
 /* Search for the start of the next line in string, i.e. char after '\n' except last
    Return NULL if only one line */
-static char *search_next_line( char *lines )
+static const char *search_next_line(const char *lines )
 {
     char *nl_ptr;
 
@@ -284,13 +283,13 @@ static char *search_next_line( char *lines )
    in reverse order, i.e. last pushed is next to be retrieved
    line may contain multiple lines separated by '\n', they are split and
    pushed back-to-forth so that first text is first to retrieve from getline() */
-void SrcFile_ungetline( SrcFile *self, char *lines )
+void SrcFile_ungetline( SrcFile *self, const char *lines )
 {
-	char *next_line, *line;
+	char *line;
 	size_t len;
 
 	/* search next line after first '\n' */
-	next_line = search_next_line( lines );
+	const char *next_line = search_next_line( lines );
 
 	/* recurse to push this line at the end */
 	if ( next_line )
@@ -311,17 +310,17 @@ void SrcFile_ungetline( SrcFile *self, char *lines )
 }
 
 /* return the current file name and line number */
-char *SrcFile_filename( SrcFile *self ) { return self->line_filename; }
-int   SrcFile_line_nr(  SrcFile *self ) { return self->line_nr; }
+const char *SrcFile_filename( SrcFile *self ) { return self->line_filename; }
+int         SrcFile_line_nr(  SrcFile *self ) { return self->line_nr; }
 
-Bool ScrFile_is_c_source(SrcFile * self)
+bool ScrFile_is_c_source(SrcFile * self)
 {
 	return self->is_c_source;
 }
 
-void SrcFile_set_filename(SrcFile * self, char * filename)
+void SrcFile_set_filename(SrcFile * self, const char * filename)
 {
-	self->line_filename = strpool_add(filename);
+	self->line_filename = spool_add(filename);
 }
 
 void SrcFile_set_line_nr(SrcFile * self, int line_nr, int line_inc)
@@ -332,12 +331,12 @@ void SrcFile_set_line_nr(SrcFile * self, int line_nr, int line_inc)
 
 void SrcFile_set_c_source(SrcFile * self)
 {
-	self->is_c_source = TRUE;
+	self->is_c_source = true;
 }
 
 /* stack of input files manipulation:
    push saves current file on the stack and prepares for a new open
-   pop returns FALSE if the stack is empty; else retrieves last file from stack
+   pop returns false if the stack is empty; else retrieves last file from stack
    and updates current input */
 void SrcFile_push( SrcFile *self )
 {
@@ -360,15 +359,15 @@ void SrcFile_push( SrcFile *self )
 	*/
 }
 
-Bool SrcFile_pop( SrcFile *self )
+bool SrcFile_pop( SrcFile *self )
 {
 	FileStackElem *elem;
 	
 	if ( List_empty( self->file_stack ) )
-		return FALSE;
+		return false;
 		
 	if ( self->file != NULL )
-		myfclose( self->file );
+		xfclose( self->file );
 		
 	elem = List_pop( self->file_stack );
 	self->file		= elem->file;
@@ -379,5 +378,5 @@ Bool SrcFile_pop( SrcFile *self )
 	self->is_c_source = elem->is_c_source;
 
 	m_free( elem );
-	return TRUE;
+	return true;
 }

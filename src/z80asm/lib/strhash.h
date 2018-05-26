@@ -24,8 +24,8 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 *----------------------------------------------------------------------------*/
 typedef struct StrHashElem
 {
-    char    *key; 					/* string kept in strpool.h */
-    void	*value;					/* value managed by caller */
+	const char	*key;				/* string kept in strpool.h */
+    void		*value;				/* value managed by caller */
 
     UT_hash_handle hh;      		/* hash table */
 
@@ -33,7 +33,7 @@ typedef struct StrHashElem
 
 CLASS( StrHash )
 	size_t 	count;					/* number of objects */
-	Bool 	ignore_case;			/* TRUE to ignore case of keys */
+	bool 	ignore_case;			/* true to ignore case of keys */
 	void  (*free_data)(void *);		/* function to free an element
 									   called by StrHash_remove_all() */
 	StrHashElem		*hash;			/* hash table of all keys */
@@ -44,22 +44,22 @@ typedef int ( *StrHash_compare_func )( StrHashElem *a, StrHashElem *b );
 
 /* add new key/value to the list, create new entry if new key,
    overwrite if key exists */
-extern void StrHash_set( StrHash **pself, char *key, void *value );
+extern void StrHash_set( StrHash **pself, const char *key, void *value );
 
 /* retrive value for a given key, return NULL if not found */
-extern void *StrHash_get( StrHash *self, char *key );
+extern void *StrHash_get( StrHash *self, const char *key );
 
 /* Check if a key exists in the hash */
-extern Bool StrHash_exists( StrHash *self, char *key );
+extern bool StrHash_exists( StrHash *self, const char *key );
 
 /* Remove element from hash if found */
-extern void StrHash_remove( StrHash *self, char *key );
+extern void StrHash_remove( StrHash *self, const char *key );
 
 /* Remove all entries */
 extern void StrHash_remove_all( StrHash *self );
 
 /* Find a hash entry */
-extern StrHashElem *StrHash_find( StrHash *self, char *key );
+extern StrHashElem *StrHash_find( StrHash *self, const char *key );
 
 /* Delete a hash entry if not NULL */
 extern void StrHash_remove_elem( StrHash *self, StrHashElem *elem );
@@ -71,7 +71,7 @@ extern StrHashElem *StrHash_first( StrHash *self );
 extern StrHashElem *StrHash_next( StrHashElem *iter );
 
 /* check if hash is empty */
-extern Bool StrHash_empty( StrHash *self );
+extern bool StrHash_empty( StrHash *self );
 
 /* sort the items in the hash */
 extern void StrHash_sort( StrHash *self, StrHash_compare_func compare );

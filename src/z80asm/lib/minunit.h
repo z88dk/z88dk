@@ -17,7 +17,7 @@ Based on Learn C the Hard Way book, by Zed. A. Shaw (http://c.learncodethehardwa
 #include <string.h>
 
 /*-----------------------------------------------------------------------------
-*   Constants for test results, 0 is TRUE to match process exit codes
+*   Constants for test results, 0 is true to match process exit codes
 *----------------------------------------------------------------------------*/
 #define MU_PASS		0
 #define MU_FAIL		1

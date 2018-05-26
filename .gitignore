@@ -4,7 +4,6 @@
 **/*.exe
 **/*.lib
 **/*.o
-**/*.out
 **/*.vcxproj.user
 **/lib*.a
 **/zcc_opt.def

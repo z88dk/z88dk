@@ -22,8 +22,7 @@ b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM 
 #include "symtab.h"
 #include "str.h"
 #include "z80asm.h"
-
-#include <assert.h>
+#include "die.h"
 
 /*-----------------------------------------------------------------------------
 *   Global Symbol Tables
@@ -34,7 +33,7 @@ SymbolHash *static_symtab = NULL;
 /*-----------------------------------------------------------------------------
 *   Symbol Table
 *----------------------------------------------------------------------------*/
-DEF_CLASS_HASH( Symbol, FALSE );			/* defines SymbolHash */
+DEF_CLASS_HASH( Symbol, false );			/* defines SymbolHash */
 
 /*-----------------------------------------------------------------------------
 *   join two symbol tables, adding all symbols from source to the target
@@ -57,14 +56,14 @@ void SymbolHash_cat( SymbolHash **ptarget, SymbolHash *source )
 *   return pointer to found symbol in a symbol tree, otherwise NULL if not found
 *	marks looked-up symbol as is_touched
 *----------------------------------------------------------------------------*/
-Symbol *find_symbol( char *name, SymbolHash *symtab )
+Symbol *find_symbol(const char *name, SymbolHash *symtab )
 {
     Symbol *sym;
 
     sym = SymbolHash_get( symtab, name );
 	if ( sym != NULL )
 	{
-		sym->is_touched = TRUE;
+		sym->is_touched = true;
 		if ( strcmp( sym->name, name ) != 0 )
 			warn_symbol_different( sym->name, name );
 	}
@@ -72,12 +71,12 @@ Symbol *find_symbol( char *name, SymbolHash *symtab )
     return sym;
 }
 
-Symbol *find_local_symbol( char *name )
+Symbol *find_local_symbol(const char *name )
 {
     return find_symbol( name, CURRENTMODULE->local_symtab );
 }
 
-Symbol *find_global_symbol( char *name )
+Symbol *find_global_symbol(const char *name )
 {
     return find_symbol( name, global_symtab );
 }
@@ -85,7 +84,7 @@ Symbol *find_global_symbol( char *name )
 /*-----------------------------------------------------------------------------
 *   create a symbol in the given table, error if already defined
 *----------------------------------------------------------------------------*/
-Symbol *_define_sym(char *name, long value, sym_type_t type, sym_scope_t scope,
+Symbol *_define_sym(const char *name, long value, sym_type_t type, sym_scope_t scope,
                      Module *module, Section *section,
 					 SymbolHash **psymtab )
 {
@@ -96,7 +95,7 @@ Symbol *_define_sym(char *name, long value, sym_type_t type, sym_scope_t scope,
     if ( sym == NULL )								/* new symbol */
     {
 		sym = Symbol_create(name, value, type, scope, module, section);
-		sym->is_defined = TRUE;
+		sym->is_defined = true;
         SymbolHash_set( psymtab, name, sym );
     }
     else if ( ! sym->is_defined )	/* already declared but not defined */
@@ -104,7 +103,7 @@ Symbol *_define_sym(char *name, long value, sym_type_t type, sym_scope_t scope,
         sym->value = value;
 		sym->type = MAX( sym->type, type );
         sym->scope = scope;
-		sym->is_defined = TRUE;
+		sym->is_defined = true;
         sym->module = module;
 		sym->section = section;
 		sym->filename = get_error_file();
@@ -126,7 +125,7 @@ Symbol *_define_sym(char *name, long value, sym_type_t type, sym_scope_t scope,
 *   search for symbol in either local tree or global table,
 *   create undefined symbol if not found, return symbol
 *----------------------------------------------------------------------------*/
-Symbol *get_used_symbol( char *name )
+Symbol *get_used_symbol(const char *name )
 {
     Symbol     *sym;
 
@@ -151,7 +150,7 @@ Symbol *get_used_symbol( char *name )
 /*-----------------------------------------------------------------------------
 *   define a static symbol (from -D command line)
 *----------------------------------------------------------------------------*/
-Symbol *define_static_def_sym( char *name, long value )
+Symbol *define_static_def_sym(const char *name, long value )
 {
     Symbol *sym = _define_sym( name, value, TYPE_CONSTANT, SCOPE_LOCAL, 
 						NULL, get_first_section(NULL), 
@@ -164,19 +163,19 @@ Symbol *define_static_def_sym( char *name, long value )
 /*-----------------------------------------------------------------------------
 *   define a global static symbol (e.g. ASMSIZE, ASMTAIL)
 *----------------------------------------------------------------------------*/
-Symbol *define_global_def_sym( char *name, long value )
+Symbol *define_global_def_sym(const char *name, long value )
 {
 	Symbol* sym = _define_sym(name, value, TYPE_CONSTANT, SCOPE_PUBLIC,
 						NULL, get_first_section(NULL), 
 						& global_symtab );
-	sym->is_global_def = TRUE;
+	sym->is_global_def = true;
 	return sym;
 }
 
 /*-----------------------------------------------------------------------------
 *   define a local DEF symbol (e.g. DEFINE)
 *----------------------------------------------------------------------------*/
-Symbol *define_local_def_sym( char *name, long value )
+Symbol *define_local_def_sym(const char *name, long value )
 {
 	return _define_sym(name, value, TYPE_CONSTANT, SCOPE_LOCAL,
 						CURRENTMODULE, CURRENTSECTION, 
@@ -186,14 +185,14 @@ Symbol *define_local_def_sym( char *name, long value )
 /*-----------------------------------------------------------------------------
 *   define a new symbol in the local or global tabs
 *----------------------------------------------------------------------------*/
-Symbol *define_local_sym(char *name, long value, sym_type_t type)
+Symbol *define_local_sym(const char *name, long value, sym_type_t type)
 {
 	return _define_sym(name, value, type, SCOPE_LOCAL,
 						CURRENTMODULE, CURRENTSECTION, 
 						& CURRENTMODULE->local_symtab );
 }
 
-Symbol *define_global_sym(char *name, long value, sym_type_t type)
+Symbol *define_global_sym(const char *name, long value, sym_type_t type)
 {
 	return _define_sym(name, value, type, SCOPE_PUBLIC,
 						CURRENTMODULE, CURRENTSECTION, 
@@ -204,7 +203,7 @@ Symbol *define_global_sym(char *name, long value, sym_type_t type)
 *   copy all SYM_ADDR symbols to target, replacing NAME by NAME@MODULE
 *----------------------------------------------------------------------------*/
 static void copy_full_sym_names( SymbolHash **ptarget, SymbolHash *source, 
-								 Bool (*cond)(Symbol *sym) )
+								 bool (*cond)(Symbol *sym) )
 {
     SymbolHashElem *iter;
     Symbol         *sym;
@@ -219,10 +218,10 @@ static void copy_full_sym_names( SymbolHash **ptarget, SymbolHash *source,
 }
 
 /*-----------------------------------------------------------------------------
-*   get the symbols for which the passed function returns TRUE,
+*   get the symbols for which the passed function returns true,
 *   mapped NAME@MODULE -> Symbol, needs to be deleted by OBJ_DELETE()
 *----------------------------------------------------------------------------*/
-static SymbolHash *_select_module_symbols(Module *module, Bool(*cond)(Symbol *sym))
+static SymbolHash *_select_module_symbols(Module *module, bool(*cond)(Symbol *sym))
 {
 	ModuleListElem *iter;
 	SymbolHash *all_syms = OBJ_NEW(SymbolHash);
@@ -239,12 +238,12 @@ static SymbolHash *_select_module_symbols(Module *module, Bool(*cond)(Symbol *sy
 	return all_syms;
 }
 
-SymbolHash *select_symbols( Bool (*cond)(Symbol *sym) )
+SymbolHash *select_symbols( bool (*cond)(Symbol *sym) )
 {
 	return _select_module_symbols(NULL, cond);
 }
 
-SymbolHash *select_module_symbols(Module *module, Bool(*cond)(Symbol *sym))
+SymbolHash *select_module_symbols(Module *module, bool(*cond)(Symbol *sym))
 {
 	return _select_module_symbols(module, cond);
 }
@@ -288,7 +287,7 @@ void remove_all_global_syms( void )
 *   b) if in the local table but not yet defined, create now (was a reference)
 *   c) else error REDEFINED
 *----------------------------------------------------------------------------*/
-static Symbol *define_local_symbol(char *name, long value, sym_type_t type)
+static Symbol *define_local_symbol(const char *name, long value, sym_type_t type)
 {
     Symbol *sym;
 
@@ -298,7 +297,7 @@ static Symbol *define_local_symbol(char *name, long value, sym_type_t type)
     {
         /* create symbol */
 		sym = Symbol_create(name, value, type, SCOPE_LOCAL, CURRENTMODULE, CURRENTSECTION);
-		sym->is_defined = TRUE;
+		sym->is_defined = true;
 		SymbolHash_set(&CURRENTMODULE->local_symtab, name, sym);
     }
     else if ( sym->is_defined )			/* local symbol already defined */
@@ -310,7 +309,7 @@ static Symbol *define_local_symbol(char *name, long value, sym_type_t type)
         sym->value = value;
 		sym->type = MAX( sym->type, type );
 		sym->scope = SCOPE_LOCAL;
-		sym->is_defined = TRUE;
+		sym->is_defined = true;
         sym->module  = CURRENTMODULE;						/* owner of symbol is always creator */
 		sym->section = CURRENTSECTION;
 		sym->filename = get_error_file();
@@ -327,7 +326,7 @@ static Symbol *define_local_symbol(char *name, long value, sym_type_t type)
 *   c) if declared global/extern and defined -> error REDEFINED
 *   d) if in global table and not global/extern -> define a new local symbol
 *----------------------------------------------------------------------------*/
-Symbol *define_symbol(char *name, long value, sym_type_t type)
+Symbol *define_symbol(const char *name, long value, sym_type_t type)
 {
     Symbol     *sym;
 
@@ -346,7 +345,7 @@ Symbol *define_symbol(char *name, long value, sym_type_t type)
 		sym->value = value;
 		sym->type = MAX(sym->type, type);
 		sym->scope = SCOPE_PUBLIC;			/* already in global, must be public */
-		sym->is_defined = TRUE;
+		sym->is_defined = true;
 		sym->module = CURRENTMODULE;		/* owner of symbol is always creator */
 		sym->section = CURRENTSECTION;
 		sym->filename = get_error_file();
@@ -359,7 +358,7 @@ Symbol *define_symbol(char *name, long value, sym_type_t type)
 /*-----------------------------------------------------------------------------
 *   update a symbol value, used to compute EQU symbols
 *----------------------------------------------------------------------------*/
-void update_symbol( char *name, long value, sym_type_t type )
+void update_symbol(const char *name, long value, sym_type_t type )
 {
     Symbol *sym;
 
@@ -374,14 +373,14 @@ void update_symbol( char *name, long value, sym_type_t type )
 	{
 		sym->value = value;
 		sym->type = type;
-		sym->is_computed = TRUE;
+		sym->is_computed = true;
 	}
 }
 
 /*-----------------------------------------------------------------------------
 *   declare a GLOBAL symbol
 *----------------------------------------------------------------------------*/
-void declare_global_symbol(char *name)
+void declare_global_symbol(const char *name)
 {
 	Symbol     *sym, *global_sym;
 
@@ -424,7 +423,7 @@ void declare_global_symbol(char *name)
 			sym->scope = SCOPE_GLOBAL;
 
 			global_sym = SymbolHash_extract(CURRENTMODULE->local_symtab, name);
-			assert(global_sym == sym);
+			xassert(global_sym == sym);
 
 			SymbolHash_set(&global_symtab, name, sym);
 		}
@@ -432,7 +431,7 @@ void declare_global_symbol(char *name)
 		{
 			/* local, global - no possible path, as if local & not global,
 			symbol is moved local -> global */
-			assert(0);
+			xassert(0);
 		}
 	}
 }
@@ -440,7 +439,7 @@ void declare_global_symbol(char *name)
 /*-----------------------------------------------------------------------------
 *   declare a PUBLIC symbol
 *----------------------------------------------------------------------------*/
-void declare_public_symbol(char *name)
+void declare_public_symbol(const char *name)
 {
 	Symbol     *sym, *global_sym;
 
@@ -488,7 +487,7 @@ void declare_public_symbol(char *name)
 			sym->scope = SCOPE_PUBLIC;
 
 			global_sym = SymbolHash_extract(CURRENTMODULE->local_symtab, name);
-			assert(global_sym == sym);
+			xassert(global_sym == sym);
 
 			SymbolHash_set(&global_symtab, name, sym);
 		}
@@ -496,7 +495,7 @@ void declare_public_symbol(char *name)
 		{
 			/* local, global - no possible path, as if local & not global,
 			   symbol is moved local -> global */
-			assert(0);
+			xassert(0);
 		}
 	}
 }
@@ -504,7 +503,7 @@ void declare_public_symbol(char *name)
 /*-----------------------------------------------------------------------------
 *   declare an EXTERN symbol
 *----------------------------------------------------------------------------*/
-void declare_extern_symbol(char *name)
+void declare_extern_symbol(const char *name)
 {
 	Symbol     *sym, *ext_sym;
 
@@ -549,7 +548,7 @@ void declare_extern_symbol(char *name)
 				sym->scope = SCOPE_EXTERN;
 				
 				ext_sym = SymbolHash_extract( CURRENTMODULE->local_symtab, name );
-				assert(ext_sym == sym);
+				xassert(ext_sym == sym);
 
                 SymbolHash_set( &global_symtab, name, sym );
             }
@@ -570,8 +569,8 @@ void declare_extern_symbol(char *name)
 /*-----------------------------------------------------------------------------
 *   generate output files with lists of symbols
 *----------------------------------------------------------------------------*/
-static void _write_symbol_file(char *filename, Module *module, Bool(*cond)(Symbol *sym),
-							   char *prefix, Bool type_flag) 
+static void _write_symbol_file(const char *filename, Module *module, bool(*cond)(Symbol *sym),
+							   char *prefix, bool type_flag) 
 {
 	FILE *file;
 	SymbolHash *symbols;
@@ -585,54 +584,53 @@ static void _write_symbol_file(char *filename, Module *module, Bool(*cond)(Symbo
 	else
 		reloc_offset = 0;
 
-	file = myfopen(filename, "w");
-	if (file)
+	file = xfopen(filename, "w");
+
+	symbols = select_module_symbols(module, cond);
+
+	// show symbols in the order they appear in the source
+	for (iter = SymbolHash_first(symbols); iter; iter = SymbolHash_next(iter))
 	{
-		symbols = select_module_symbols(module, cond);
+		sym = (Symbol *)iter->value;
 
-		// show symbols in the order they appear in the source
-		for (iter = SymbolHash_first(symbols); iter; iter = SymbolHash_next(iter))
-		{
-			sym = (Symbol *)iter->value;
+		Str_set(line, prefix);
+		Str_append_sprintf(line, "%-*s", COLUMN_WIDTH - 1, sym->name);
+		Str_append_sprintf(line, " = $%04lX ", sym->value + reloc_offset);
 
-			str_set(line, prefix);
-			str_append_sprintf(line, "%-*s", COLUMN_WIDTH - 1, sym->name);
-			str_append_sprintf(line, " = $%04lX ", sym->value + reloc_offset);
-
-			if (type_flag) {
-				str_append_sprintf(line, "; %s", sym_type_str[sym->type]);
-				str_append_sprintf(line, ", %s", sym_scope_str[sym->scope]);
-				str_append_sprintf(line, ", %s", sym->is_global_def ? "def" : "");
-				str_append_sprintf(line, ", %s", (module == NULL && sym->module != NULL) ? sym->module->modname : "");
-				str_append_sprintf(line, ", %s", sym->section->name);
-				str_append_sprintf(line, ", ");
-				if (sym->filename && sym->filename[0]) {
-					str_append_sprintf(line, "%s:%d", sym->filename, sym->line_nr);
-				}
+		if (type_flag) {
+			Str_append_sprintf(line, "; %s", sym_type_str[sym->type]);
+			Str_append_sprintf(line, ", %s", sym_scope_str[sym->scope]);
+			Str_append_sprintf(line, ", %s", sym->is_global_def ? "def" : "");
+			Str_append_sprintf(line, ", %s", (module == NULL && sym->module != NULL) ? sym->module->modname : "");
+			Str_append_sprintf(line, ", %s", sym->section->name);
+			Str_append_sprintf(line, ", ");
+			if (sym->filename && sym->filename[0]) {
+				Str_append_sprintf(line, "%s:%d", sym->filename, sym->line_nr);
 			}
-			str_strip(line);
-			fprintf(file, "%s\n", str_data(line));
 		}
-
-		OBJ_DELETE(symbols);
-
-		myfclose(file);
+		cstr_strip(Str_data(line));
+		Str_sync_len(line);
+		fprintf(file, "%s\n", Str_data(line));
 	}
+
+	OBJ_DELETE(symbols);
+
+	xfclose(file);
 }
 
 /*-----------------------------------------------------------------------------
 *   Write symbols to files
 *----------------------------------------------------------------------------*/
-static Bool cond_all_symbols(Symbol *sym) { return TRUE; }
+static bool cond_all_symbols(Symbol *sym) { return true; }
 
 void write_map_file(void)
 {
 	_write_symbol_file(
 		get_map_filename(get_first_module(NULL)->filename),
-		NULL, cond_all_symbols, "", TRUE);
+		NULL, cond_all_symbols, "", true);
 }
 
-static Bool cond_global_symbols(Symbol *sym)
+static bool cond_global_symbols(Symbol *sym)
 {
 	return !(sym->is_global_def) && (sym->scope == SCOPE_PUBLIC || sym->scope == SCOPE_GLOBAL);
 }
@@ -641,24 +639,24 @@ void write_def_file(void)
 {
 	_write_symbol_file(
 		get_def_filename(get_first_module(NULL)->filename),
-		NULL, cond_global_symbols, "DEFC ", FALSE);
+		NULL, cond_global_symbols, "DEFC ", false);
 }
 
-static Bool cond_module_symbols(Symbol *sym) 
+static bool cond_module_symbols(Symbol *sym) 
 {
 	if (sym->is_touched 
 		&& (sym->scope == SCOPE_LOCAL || sym->scope == SCOPE_PUBLIC 
 			|| (sym->scope == SCOPE_GLOBAL && sym->is_defined)))
-		return TRUE;
+		return true;
 	else
-		return FALSE;
+		return false;
 }
 
 void write_sym_file(Module *module)
 {
 	_write_symbol_file(
 		get_sym_filename(module->filename),
-		module, cond_module_symbols, "", TRUE);
+		module, cond_module_symbols, "", true);
 }
 
 void check_undefined_symbols(SymbolHash *symtab)

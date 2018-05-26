@@ -233,6 +233,12 @@ IF FORsms
     defc sndbit_mask   = $0F			; $0F for full volume output
 ENDIF
 
+IF FORpv2000
+    defc sndbit_port	= $40		
+    defc sndbit_bit    = 3
+    defc sndbit_mask   = $0F			; $0F for full volume output
+ENDIF
+
 ; ********************************************************
 ;   This last part refers to NOT YET supported hardware
 ; ********************************************************

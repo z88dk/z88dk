@@ -13,14 +13,12 @@ Error handling.
 #include "fileutil.h"
 #include "options.h"
 #include "srcfile.h"
-#include "strpool.h"
 #include "str.h"
+#include "strutil.h"
 #include "strhash.h"
 #include "types.h"
 #include "init.h"
 #include <stdio.h>
-
-static void file_error( char *filename, Bool writing );
 
 /*-----------------------------------------------------------------------------
 *   Singleton data
@@ -28,8 +26,8 @@ static void file_error( char *filename, Bool writing );
 typedef struct Errors
 {
     int			 count;				/* total errors */
-    char		*filename;			/* location of error: name of source file */
-    char		*module;			/* location of error: name of module */
+	const char	*filename;			/* location of error: name of source file */
+	const char	*module;			/* location of error: name of module */
     int			 line;				/* location of error: line number */
 } Errors;
 
@@ -39,7 +37,7 @@ static Errors errors;				/* count errors and locations */
 typedef struct ErrorFile
 {
     FILE		*file;				/* currently open error file */
-    char		*filename;			/* name of error file */
+	const char	*filename;			/* name of error file */
 } ErrorFile;
 
 static ErrorFile error_file;		/* currently open error file */
@@ -49,14 +47,11 @@ static ErrorFile error_file;		/* currently open error file */
 *----------------------------------------------------------------------------*/
 DEFINE_init_module()
 {
-	strpool_init();					/* make sure strpool is removed last */
-
     /* init Errors */
     reset_error_count();			/* clear error count */
     set_error_null();               /* clear location of error messages */
 
 	/* init file error handling */
-	set_ferr_callback( file_error );
 	set_incl_recursion_err_cb( error_include_recursion );
 }
 
@@ -82,16 +77,16 @@ void set_error_null( void )
     errors.line = 0;
 }
 
-void set_error_file( char *filename )
+void set_error_file(const char *filename )
 {
     init_module();
-    errors.filename = strpool_add( filename );	/* may be NULL */
+    errors.filename = spool_add( filename );	/* may be NULL */
 }
 
-void set_error_module( char *modulename )
+void set_error_module(const char *modulename )
 {
     init_module();
-    errors.module = strpool_add( modulename );	/* may be NULL */
+    errors.module = spool_add( modulename );	/* may be NULL */
 }
 
 void set_error_line( int lineno )
@@ -100,7 +95,7 @@ void set_error_line( int lineno )
     errors.line = lineno;
 }
 
-char *get_error_file(void)
+const char *get_error_file(void)
 {
 	init_module();
 	return errors.filename;
@@ -131,17 +126,17 @@ int get_num_errors( void )
 *	Open file to receive all errors / warnings from now on
 *	File is appended, to allow assemble	and link errors to be joined in the same file.
 *----------------------------------------------------------------------------*/
-void open_error_file( char *src_filename )
+void open_error_file(const char *src_filename )
 {
-	char *filename = get_err_filename( src_filename );
+	const char *filename = get_err_filename( src_filename );
 
     init_module();
 
     /* close current file if any */
     close_error_file();
 
-    error_file.filename = strpool_add( filename );
-	error_file.file = myfopen(error_file.filename, "a");
+    error_file.filename = spool_add( filename );
+	error_file.file = xfopen(error_file.filename, "a");		// TODO: remove error file at start of assembly
 }
 
 void close_error_file( void )
@@ -151,7 +146,7 @@ void close_error_file( void )
     /* close current file if any */
 	if (error_file.file != NULL)
 	{
-		myfclose(error_file.file);
+		xfclose(error_file.file);
 
 		/* delete file if no errors found */
 		if (error_file.filename != NULL && file_size(error_file.filename) == 0)
@@ -182,65 +177,52 @@ void do_error( enum ErrType err_type, char *message )
     init_module();
 
     /* init empty message */
-    str_clear( msg );
+    Str_clear( msg );
 
     /* Information messages have no prefix */
     if ( err_type != ErrInfo )
     {
-        str_append( msg, err_type == ErrWarn ? "Warning" : "Error" );
+        Str_append( msg, err_type == ErrWarn ? "Warning" : "Error" );
 
         /* prepare to remove " at" if no prefix */
-        len_at = str_len(msg);
-        str_append( msg, " at" );
-        len_prefix = str_len(msg);
+        len_at = Str_len(msg);
+        Str_append( msg, " at" );
+        len_prefix = Str_len(msg);
 
         /* output filename */
         if ( errors.filename && *errors.filename )
-            str_append_sprintf( msg, " file '%s'", errors.filename );
+            Str_append_sprintf( msg, " file '%s'", errors.filename );
 
         /* output module */
         if ( errors.module != NULL && *errors.module )
-            str_append_sprintf( msg, " module '%s'", errors.module );
+            Str_append_sprintf( msg, " module '%s'", errors.module );
 
         /* output line number */
         if ( errors.line > 0 )
-            str_append_sprintf( msg, " line %d", errors.line );
+            Str_append_sprintf( msg, " line %d", errors.line );
 
         /* remove at if no prefix */
-        if ( len_prefix == str_len(msg) )	/* no prefix loaded to string */
+        if ( len_prefix == Str_len(msg) )	/* no prefix loaded to string */
         {
-            str_data(msg)[ len_at ] = '\0';	/* go back 3 chars to before at */
-            str_sync_len( msg );
+            Str_data(msg)[ len_at ] = '\0';	/* go back 3 chars to before at */
+            Str_sync_len( msg );
         }
 
-        str_append( msg, ": " );
+        Str_append( msg, ": " );
     }
 
     /* output error message */
-    str_append( msg, message );
-    str_append_char( msg, '\n' );
+    Str_append( msg, message );
+    Str_append_char( msg, '\n' );
 
     /* CH_0001 : Assembly error messages should appear on stderr */
-    fputs( str_data(msg), stderr );
+    fputs( Str_data(msg), stderr );
 
     /* send to error file */
-    puts_error_file( str_data(msg) );
+    puts_error_file( Str_data(msg) );
 
     if ( err_type == ErrError )
         errors.count++;		/* count number of errors */
 
 	STR_DELETE(msg);
-}
-
-/*-----------------------------------------------------------------------------
-*   file error handling
-*----------------------------------------------------------------------------*/
-static void file_error( char *filename, Bool writing )
-{
-	init_module();
-	
-	if ( writing )
-		error_write_file( filename );
-	else
-		error_read_file( filename );
 }

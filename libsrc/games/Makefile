@@ -36,4 +36,5 @@ dirs:
 
 clean:
 	$(RM) -fr obj
+	$(RM) -f *.o
 	$(RM) -f */*.o

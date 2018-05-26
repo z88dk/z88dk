@@ -1,0 +1,4 @@
+stdout:
+stderr:
+string 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...' too long for word counted string
+exit: 1

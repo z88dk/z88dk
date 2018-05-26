@@ -1,0 +1,4 @@
+stdout:
+stderr:
+failed to seek to 0 in file '?'
+exit: 1

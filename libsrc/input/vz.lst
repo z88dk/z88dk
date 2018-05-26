@@ -1,0 +1,9 @@
+input/vz/in_WaitForKey
+input/vz/in_Inkey
+input/vz/in_GetKey
+input/vz/in_keytranstbl
+input/vz/in_KeyPressed
+input/vz/in_WaitForNoKey
+input/vz/in_LookupKey
+input/vz/in_GetKeyReset
+input/vz/in_GetKeyVariables

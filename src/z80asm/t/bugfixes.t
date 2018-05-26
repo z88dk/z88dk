@@ -1,13 +1,13 @@
 #!/usr/bin/perl
 
+#-----------------------------------------------------------------------------
 # Z88DK Z80 Macro Assembler
 #
-# Copyright (C) Gunther Strube, InterLogic 1993-99
-# Copyright (C) Paulo Custodio, 2011-2017
-# License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-# Repository: https://github.com/pauloscustodio/z88dk-z80asm
+# Copyright (C) Paulo Custodio, 2011-2018
+# License: http://www.perlfoundation.org/artistic_license_2_0
 #
 # Test bugfixes
+#-----------------------------------------------------------------------------
 
 use Modern::Perl;
 use File::Path qw(make_path remove_tree);;
@@ -427,80 +427,6 @@ ASM
 );
 
 #------------------------------------------------------------------------------
-# BUG_0049: Making a library with -d and 512 (win32) object files fails - Too many open files
-# limits very per OS:
-# 509 files - when compiled with Visual Studio on Win32
-# 3197 files - when compiled with gcc on Cygwin on Win32
-# 2045 files - when compiled with gcc on Linux Subsystem for Windows
-# 1021 files - when compiled with gcc on Ubuntu
-note "BUG_0049";
-{
-	# build asm files
-	my @list;
-	my $bin = "";
-	for my $n (1..4096) {
-		my $id = sprintf("%04d", $n);
-		unlink("test$id.o", "test$id.bin", "test$id.err");
-		path("test$id.asm")->spew(<<END);
-			public lbl$id
-			defw $n
-			defc lbl$id = $n
-END
-		push @list, "test$id";
-		
-		$bin .= pack("v", $n);
-	}
-	
-	# assemble
-	unlink 'test0001.bin';
-	write_file("test.lst", join("\n", @list), "\n");
-	my $cmd = './z80asm -b @test.lst';
-	ok 1, $cmd;
-	my($out, $err, $ret) = capture { system $cmd; };
-	is $out, "";
-	is $err, "";
-	is $ret, 0;
-	test_binfile('test0001.bin', $bin);
-
-	# link only
-	unlink 'test0001.bin';
-	for (@list) { unlink "$_.asm"; }
-	ok 1, $cmd;
-	($out, $err, $ret) = capture { system $cmd; };
-	is $out, "";
-	is $err, "";
-	is $ret, 0;
-	test_binfile('test0001.bin', $bin);
-	
-	# make library
-	unlink 'test.lib';
-	$cmd = './z80asm -b -xtest "@test.lst"';
-	ok 1, $cmd;
-	($out, $err, $ret) = capture { system $cmd; };
-	is $out, "";
-	is $err, "";
-	is $ret, 0;
-	ok -f 'test.lib';
-	
-	# use library
-	unlink 'test.bin';
-	path('test.asm')->spew(<<'END');
-	extern lbl1234;
-	defw lbl1234;
-END
-	$cmd = './z80asm -b -itest test.asm';
-	ok 1, $cmd;
-	($out, $err, $ret) = capture { system $cmd; };
-	is $out, "";
-	is $err, "";
-	is $ret, 0;
-	test_binfile('test.bin', pack("v*", 1234, 1234));
-
-	# delete test files
-	for ('test', @list) { unlink "$_.asm", "$_.o", "$_.bin", "$_.err", "$_.lib"; }
-}
-
-#------------------------------------------------------------------------------
 # BUG_0050: Making a library with more than 64K and -d option fails - max. code size reached
 note "BUG_0050";
 z80asm(
@@ -568,7 +494,7 @@ for my $op ("jr", "djnz", "jr nc,") {
 	pietro_loader:
 		ret
 ...
-	my $cmd = "./z80asm -b test.asm";
+	my $cmd = "z80asm -b test.asm";
 	ok 1, $cmd;
 	my($stdout, $stderr, $return) = capture { system $cmd; };
 	eq_or_diff_text $stdout, "", "stdout";

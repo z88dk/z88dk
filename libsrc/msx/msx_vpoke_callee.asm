@@ -42,16 +42,28 @@ msx_vpoke_direct:
 	push	af
 	ld	a,l
 	di
-	out	(VDP_CMD), a
+IF VDP_CMD > 255
+	ld	(VDP_CMD),a
+ELSE
+	out	(VDP_CMD),a
+ENDIF
 	ld	a,h
 	and	@00111111
 	or 	@01000000
 	ei
-	out	(VDP_CMD), a
+IF VDP_CMD > 255
+	ld	(VDP_CMD),a
+ELSE
+	out	(VDP_CMD),a
+ENDIF
 
 	; enter data
 	pop 	af			; "ld a,e" could be too fast, better to keep the POP instruction
-	out	(VDP_DATA), a
+IF VDP_DATA > 255
+	ld	(VDP_DATA),a
+ELSE
+	out	(VDP_DATA),a
+ENDIF
 
 	ret
 	

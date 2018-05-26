@@ -16,40 +16,40 @@ Define command line options
 #define OPT_VAR(type, name, default)
 #endif
 
-OPT_VAR( Bool,		verbose,	FALSE	)
-OPT_VAR( Bool,		symtable,	FALSE	)
-OPT_VAR( Bool,		list,		FALSE	)	/* -l flag */
-OPT_VAR( Bool,		cur_list,	FALSE	)	/* current LSTON/LSTOFF status */
-OPT_VAR( Bool,		map,		FALSE	)
-OPT_VAR( Bool,		ti83plus,	FALSE	)
-OPT_VAR( Bool,		swap_ix_iy,	FALSE	)
-OPT_VAR( Bool,      debug_info, FALSE   )	/* add debug info to map file */
-OPT_VAR( Bool,		globaldef,	FALSE	)
-OPT_VAR( Bool,		make_bin,	FALSE	)
-OPT_VAR( Bool,		split_bin,	FALSE   )	/* true to split binary file per section */
-OPT_VAR( Bool,		date_stamp,	FALSE	)
-OPT_VAR( Bool,		relocatable, FALSE	)
-OPT_VAR( Bool,      reloc_info, FALSE   )	/* generate .reloc file */
-OPT_VAR( Bool,		library,	FALSE	)	/* true if linking with libs */
+OPT_VAR( bool,		verbose,	false	)
+OPT_VAR( bool,		symtable,	false	)
+OPT_VAR( bool,		list,		false	)	/* -l flag */
+OPT_VAR( bool,		cur_list,	false	)	/* current LSTON/LSTOFF status */
+OPT_VAR( bool,		map,		false	)
+OPT_VAR( bool,		ti83plus,	false	)
+OPT_VAR( bool,		swap_ix_iy,	false	)
+OPT_VAR( bool,      debug_info, false   )	/* add debug info to map file */
+OPT_VAR( bool,		globaldef,	false	)
+OPT_VAR( bool,		make_bin,	false	)
+OPT_VAR( bool,		split_bin,	false   )	/* true to split binary file per section */
+OPT_VAR( bool,		date_stamp,	false	)
+OPT_VAR( bool,		relocatable, false	)
+OPT_VAR( bool,      reloc_info, false   )	/* generate .reloc file */
+OPT_VAR( bool,		library,	false	)	/* true if linking with libs */
 
 OPT_VAR(appmake_t, appmake, APPMAKE_NONE)
-OPT_VAR(char *, appmake_opts, "")
-OPT_VAR(char *, appmake_ext, "")
+OPT_VAR(const char *, appmake_opts, "")
+OPT_VAR(const char *, appmake_ext, "")
 OPT_VAR(int, appmake_origin_min, -1)
 OPT_VAR(int, appmake_origin_max, -1)
 
 OPT_VAR(int, cpu, CPU_Z80)
-OPT_VAR(char *, cpu_name, CPU_Z80_NAME)
+OPT_VAR(const char *, cpu_name, CPU_Z80_NAME)
 
-OPT_VAR( char *,	bin_file,	NULL	)	/* set by -o */
-OPT_VAR( char *,	lib_file,	NULL	)	/* set by -x */
-OPT_VAR( char *,    consol_obj_file, NULL)	/* set by -o and no -b */
-OPT_VAR( char *,    output_directory, NULL)	/* set by -O */
+OPT_VAR(const char *,	bin_file,	NULL	)	/* set by -o */
+OPT_VAR(const char *,	lib_file,	NULL	)	/* set by -x */
+OPT_VAR(const char *,    consol_obj_file, NULL)	/* set by -o and no -b */
+OPT_VAR(const char *,    output_directory, NULL)	/* set by -O */
 
-OPT_VAR(UT_array *,	inc_path,	NULL )		/* path for include files */
-OPT_VAR(UT_array *,	lib_path,	NULL )		/* path for library files */
+OPT_VAR(argv_t *,	inc_path, NULL)			/* path for include files */
+OPT_VAR(argv_t *,	lib_path, NULL)			/* path for library files */
 
-OPT_VAR(UT_array  *, files, 	NULL)		/* list of input files */
+OPT_VAR(argv_t *,	files,	  NULL)			/* list of input files */
 
 OPT_VAR(int,		filler,		0)			/* filler byte for defs */
 
@@ -88,8 +88,8 @@ OPT(OptCallArg, option_make_lib, "-x", "--make-lib", "Create a library file" FIL
 OPT(OptCallArg, option_use_lib, "-i", "--use-lib", "Link library file" FILEEXT_LIB, "FILE")
 
 OPT_TITLE("Binary Output:")
-OPT(OptString, &opts.output_directory, "-O", "", "Output directory", "DIR")
-OPT(OptString, &opts.bin_file, "-o", "--output", "Output binary file", "FILE")
+OPT(OptString, (void*)&opts.output_directory, "-O", "", "Output directory", "DIR")
+OPT(OptString, (void*)&opts.bin_file, "-o", "--output", "Output binary file", "FILE")
 OPT(OptSet, &opts.make_bin, "-b", "--make-bin", "Assemble and link/relocate to file" FILEEXT_BIN, "")
 OPT(OptSet, &opts.split_bin, "", "--split-bin", "Create one binary file per section", "")
 OPT(OptSet, &opts.date_stamp, "-d", "--date-stamp", "Assemble only updated files", "")

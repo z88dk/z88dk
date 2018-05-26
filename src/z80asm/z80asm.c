@@ -14,11 +14,13 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include "macros.h"
 #include "modlink.h"
 #include "module.h"
-#include "objfile.h"
+#include "zobjfile.h"
 #include "parse.h"
 #include "types.h"
-#include "strpool.h"
+#include "strutil.h"
 #include "symbol.h"
+#include "die.h"
+
 #include <sys/stat.h>
 
 /* external functions */
@@ -32,7 +34,7 @@ struct libfile *NewLibrary( void );
 
 extern char Z80objhdr[];
 
-Byte reloc_routine[] =
+byte_t reloc_routine[] =
     "\x08\xD9\xFD\xE5\xE1\x01\x49\x00\x09\x5E\x23\x56\xD5\x23\x4E\x23"
     "\x46\x23\xE5\x09\x44\x4D\xE3\x7E\x23\xB7\x20\x06\x5E\x23\x56\x23"
     "\x18\x03\x16\x00\x5F\xE3\x19\x5E\x23\x56\xEB\x09\xEB\x72\x2B\x73"
@@ -47,8 +49,8 @@ char *reloctable = NULL, *relocptr = NULL;
 struct liblist *libraryhdr;
 
 /* local functions */
-static void query_assemble( char *src_filename );
-static void do_assemble( char *src_filename );
+static void query_assemble(const char *src_filename );
+static void do_assemble(const char *src_filename );
 
 /*-----------------------------------------------------------------------------
 *   Assemble one source file
@@ -59,35 +61,36 @@ static void do_assemble( char *src_filename );
 *----------------------------------------------------------------------------*/
 void assemble_file( char *filename )
 {
-    char *src_filename, *obj_filename, *src_dirname;
-	Bool load_obj_only;
+	const char *src_filename;
+	const char *obj_filename;
+	bool load_obj_only;
 	Module *module;
 
 	/* create output directory*/
 	obj_filename = get_obj_filename(filename);
-	mkdir_p(path_dirname(obj_filename));
+	path_mkdir(path_dir(obj_filename));
 
 	/* try to load object file */
 	if (strcmp(filename, obj_filename) == 0 &&			/* input is object file */
 		file_exists(filename)							/* .o file exists */
 		) {
-		load_obj_only = TRUE;
+		load_obj_only = true;
 		src_filename = filename;
 	}
 	else {
-		load_obj_only = FALSE;
+		load_obj_only = false;
 
 		/* use input file if it exists */
 		if (file_exists(filename)) {
 			src_filename = filename;						/* use whatever extension was given */
 		}
 		else {
-			char *asm_filename = get_asm_filename(filename);
+			const char *asm_filename = get_asm_filename(filename);
 			if (file_exists(asm_filename)) {				/* file with .asm extension exists */
 				src_filename = asm_filename;
 			}
 			else if (file_exists(obj_filename)) {
-				load_obj_only = TRUE;
+				load_obj_only = true;
 				src_filename = obj_filename;
 			}
 			else {				
@@ -99,8 +102,7 @@ void assemble_file( char *filename )
 	
 	/* append the directoy of the file being assembled to the include path 
 	   and remove it at function end */
-	src_dirname  = path_dirname(src_filename);
-	utarray_push_back(opts.inc_path, &src_dirname);
+	argv_push(opts.inc_path, path_dir(src_filename));
 
     /* normal case - assemble a asm source file */
     opts.cur_list = opts.list;		/* initial LSTON status */
@@ -113,7 +115,7 @@ void assemble_file( char *filename )
 
     /* Create module data structures for new file */
 	module = set_cur_module( new_module() );
-	module->filename = strpool_add( src_filename );
+	module->filename = spool_add( src_filename );
 
 	/* Create error file */
 	remove(get_err_filename(src_filename));
@@ -129,21 +131,21 @@ void assemble_file( char *filename )
 		query_assemble(src_filename);			/* try to assemble, check -d */
 
     set_error_null();							/* no more module in error messages */
-	opts.cur_list = FALSE;
+	opts.cur_list = false;
 
 	/* finished assembly, remove dirname from include path */
-	utarray_pop_back(opts.inc_path);
+	argv_pop(opts.inc_path);
 }
 
 /*-----------------------------------------------------------------------------
 *	Assemble file or load object module size if datestamp option was given
 *	and object file is up-to-date
 *----------------------------------------------------------------------------*/
-static void query_assemble( char *src_filename )
+static void query_assemble(const char *src_filename )
 {
     struct stat src_stat, obj_stat;
     int src_stat_result, obj_stat_result;
-	char *obj_filename = get_obj_filename( src_filename );
+	const char *obj_filename = get_obj_filename( src_filename );
 
     /* get time stamp of files, error if source not found */
     src_stat_result = stat( src_filename, &src_stat );		/* BUG_0033 */
@@ -153,7 +155,7 @@ static void query_assemble( char *src_filename )
             obj_stat_result >= 0 &&							/* object file exists */
             ( src_stat_result >= 0 ?						/* if source file exists, ... */
               src_stat.st_mtime <= obj_stat.st_mtime		/* ... source older than object */
-              : TRUE										/* ... else source does not exist, but object exists
+              : true										/* ... else source does not exist, but object exists
 															   --> consider up-to-date (e.g. test.c -> test.o) */
             ) &&
             objmodule_loaded(obj_filename)					/* object file valid and size loaded */
@@ -171,10 +173,10 @@ static void query_assemble( char *src_filename )
 /*-----------------------------------------------------------------------------
 *	Assemble one file
 *----------------------------------------------------------------------------*/
-static void do_assemble( char *src_filename )
+static void do_assemble(const char *src_filename )
 {
     int start_errors = get_num_errors();     /* count errors in this source file */
-	char *obj_filename = get_obj_filename(src_filename);
+	const char *obj_filename = get_obj_filename(src_filename);
 
 	clear_macros();
 
@@ -228,10 +230,10 @@ static void do_assemble( char *src_filename )
 
 
 /* search library file name, return found name in strpool */
-char *GetLibfile( char *filename )
+const char *GetLibfile( const char *filename )
 {
     struct libfile *newlib;
-    char           *found_libfilename;
+	const char     *found_libfilename;
     int len;
 
     newlib = NewLibrary();
@@ -244,14 +246,14 @@ char *GetLibfile( char *filename )
 		return NULL;
 	}
 	
-	found_libfilename = search_file( get_lib_filename( filename ), opts.lib_path );
+	found_libfilename = path_search( get_lib_filename( filename ), opts.lib_path );
 
     newlib->libfilename = m_strdup( found_libfilename );		/* freed when newlib is freed */
 
 	if (!check_library_file(found_libfilename))					/* not a library or wrong version */
 		return NULL;
 
-	opts.library = TRUE;
+	opts.library = true;
 
 	if (opts.verbose)
 		printf("Reading library '%s'\n", found_libfilename);
@@ -322,8 +324,6 @@ ReleaseLibraries( void )
  ***************************************************************************************************/
 int z80asm_main( int argc, char *argv[] )
 {
-	char **pfile;
-
 	model_init();						/* init global data */
 	libraryhdr = NULL;					/* initialise to no library files */
 	init_macros();
@@ -333,7 +333,7 @@ int z80asm_main( int argc, char *argv[] )
 	*	and assembles each one in turn */
 	parse_argv(argc, argv);
 	if (!get_num_errors()) {
-		for (pfile = NULL; (pfile = (char**)utarray_next(opts.files, pfile)) != NULL; )
+		for (char **pfile = argv_front(opts.files); *pfile; pfile++)
 			assemble_file(*pfile);
 	}
 
@@ -343,7 +343,7 @@ int z80asm_main( int argc, char *argv[] )
 			make_library(opts.lib_file, opts.files);
 		}
 		else if (opts.make_bin) {
-			assert(opts.consol_obj_file == NULL);
+			xassert(opts.consol_obj_file == NULL);
 			link_modules();			
 
 			if (!get_num_errors())
@@ -356,13 +356,13 @@ int z80asm_main( int argc, char *argv[] )
 			opts.consol_obj_file = get_obj_filename(opts.bin_file);
 			opts.bin_file = NULL;
 
-			assert(opts.consol_obj_file != NULL);
+			xassert(opts.consol_obj_file != NULL);
 			link_modules();
 
 			set_cur_module(get_first_module(NULL));
 			
 			CURRENTMODULE->filename = get_asm_filename(opts.consol_obj_file);
-			CURRENTMODULE->modname = path_remove_ext(path_basename(CURRENTMODULE->filename));
+			CURRENTMODULE->modname = path_remove_ext(path_file(CURRENTMODULE->filename));
 
 			if (!get_num_errors())
 				write_obj_file(opts.consol_obj_file);

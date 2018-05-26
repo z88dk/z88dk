@@ -83,7 +83,10 @@ static struct zx_tape zxt = {
 
 static struct zx_sna zxs = {
     -1,         // stackloc
-    -1          // intstate
+    -1,         // intstate
+     0,         // force_128
+     0,         // xsna
+     0          // fsna
 };
 
 static struct zx_bin zxb = {
@@ -120,6 +123,7 @@ option_t zx_options[] = {
     { 0,  "clean",    "Remove consumed source binaries\n", OPT_BOOL, &zxc.clean },
 
     { 0,  "sna",      "Make .sna instead of .tap",  OPT_BOOL,  &sna },
+    { 0,  "128",      "Force generation of 128k sna", OPT_BOOL, &zxs.force_128 },
     { 0,  "org",      "Start address of .sna",      OPT_INT,   &zxc.origin },
     { 0,  "sna-sp",   "Stack location in .sna",     OPT_INT,   &zxs.stackloc },
     { 0,  "sna-di",   "Di on start if non-zero (default = 0)", OPT_INT, &zxs.intstate },
@@ -412,8 +416,15 @@ int zx_exec(char *target)
 
     if (sna)
     {
-        if ((ret = zx_sna(&zxc, &zxs, &memory, 0)) != 0)
-            return ret;
+        ret = zx_sna(&zxc, &zxs, &memory, 0);
+
+        if (zxs.fsna != 0)
+        {
+            fclose(zxs.fsna);
+            zxs.fsna = 0;
+        }
+
+        if (ret != 0) return ret;
 
         // sna snapshot is out but we need to process the rest of the binaries too
         // so remove mainbank and banks 0-7 from memory model so as not to treat those again

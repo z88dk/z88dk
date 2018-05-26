@@ -8,15 +8,14 @@ Based on Learn C the Hard Way book, by Zed. A. Shaw (http://c.learncodethehardwa
 
 #pragma once
 
+#include "die.h"
+
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
 
 /* show warning on stderr */
 #define warn(message,...)	fprintf(stderr, message, ##__VA_ARGS__)
-
-/* show error on stderr, exit 1 */
-#define die( message,...)	( fprintf(stderr, message, ##__VA_ARGS__), exit(1) )
 
 /* debug message for unit tests */
 #ifdef NDEBUG
@@ -95,18 +94,8 @@ Based on Learn C the Hard Way book, by Zed. A. Shaw (http://c.learncodethehardwa
 #define xatexit(func)	\
 		check_int_die(atexit(func), == 0, "atexit failed")
 
-#define xfopen(filename, mode)	\
-		check_ptr_die(fopen((filename), (mode)), != NULL, "file open %s: failed", (filename))
-
-#define xfclose(file)	\
-		check_int_die(fclose(file), == 0, "file close failed")
-
 #define xfputs(str,stream)	\
 		check_int_die(fputs((str), (stream)), == 0, "fputs failed")
-
-#define xremove(filename)	\
-		check_int_die(remove(filename), == 0, \
-					"remove %s failed", filename)
 
 #define xsystem(command)	\
 		check_int_die(system(command), == 0, \

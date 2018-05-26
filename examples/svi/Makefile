@@ -7,6 +7,8 @@
 #include ../../libsrc/Make.config
 
 CC = zcc
+
+COMPILER ?= sccz80
 CFLAGS = +svi -vn -llib3d  -lm -lndos -create-app
 
 
@@ -29,7 +31,13 @@ CFILES = \
 
 EXECFILES = $(CFILES:.c=.cas)
 
+ifeq ($(COMPILER),sdcc)
+   CFLAGS += -compiler=sdcc  -SO3 --max-allocs-per-node200000 --fsigned-char 
+all: ex1.cas ex1b.cas ex2.cas ex3.cas ex6.cas ex7.cas ex10.cas ex10b.cas vpoke.cas vtstone.cas
+else
 all: $(EXECFILES) dstar.cas microman.cas othello.cas wall.cas globe.cas snakes.cas vtstone.cas
+endif
+
 
 #ex8.com: ex8.c
 #	$(CC) +cpm -create-app -lsvicpm -oex8 ex8.c

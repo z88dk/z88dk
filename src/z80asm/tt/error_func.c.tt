@@ -13,8 +13,8 @@ void [% func %]([% args %])
 {
 	STR_DEFINE(msg, STR_SIZE);
 
-	str_append_sprintf( msg, [% message %] );
-	do_error( [% type %], str_data(msg) );
+	Str_append_sprintf( msg, [% message %] );
+	do_error( [% type %], Str_data(msg) );
 	
 	STR_DELETE(msg);
 }

@@ -16,8 +16,7 @@ use File::Path qw(make_path remove_tree);
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "gcc -Wall -I../../../ext/uthash/src -Ilib -otest test.c srcfile.c ".
-			  "class.c alloc.c strpool.c str.c fileutil.c list.c dbg.c";
+my $compile = "gcc -I../../../ext/uthash/src -Ilib -I../../common -otest test.c srcfile.c class.c alloc.c str.c list.c dbg.c  ../../common/die.o ../../common/fileutil.o ../../common/strutil.o ../errors.o ../error_func.o ../options.o ../model.o ../hist.o ../codearea.o ../module.o strhash.o array.o ../sym.o ../symtab.o ../expr.o ../../common/objfile.o ../z80asm.o ../zobjfile.o ../macros.o ../listfile.o ../libfile.o ../../../ext/regex/regcomp.o ../../../ext/regex/regerror.o ../../../ext/regex/regexec.o ../../../ext/regex/regfree.o ../modlink.o ../z80pass.o ../scan.o ../../../ext/UNIXem/src/glob.o ../../../ext/UNIXem/src/dirent.o ../parse.o ../directives.o ../opcodes.o ";
 
 #------------------------------------------------------------------------------
 # create directories and files
@@ -43,13 +42,13 @@ write_file("test.c", <<'END');
 			assert( file->line_nr == _line_nr ); \
 			assert( SrcFile_line_nr(file) == _line_nr ); \
 			assert( strcmp( str, _expected ) == 0 ); \
-			assert( strcmp( str_data(file->line), _expected ) == 0 );
+			assert( strcmp( Str_data(file->line), _expected ) == 0 );
 			
 #define T_GETLINE_END()	\
 			assert( SrcFile_getline( file ) == NULL ); \
 			warn("(eof)\n");
 			
-static void new_line_cb( char *filename, int line_nr, char *text )
+static void new_line_cb( const char *filename, int line_nr, const char *text )
 {
 	warn("File %s line %d text %s\n", 
 		 filename ? filename : "NULL", 
@@ -59,7 +58,7 @@ static void new_line_cb( char *filename, int line_nr, char *text )
 
 UT_array *dirs = NULL;
 
-static void incl_recursion_err_cb( char *filename )
+static void incl_recursion_err_cb( const char *filename )
 {
 	if (dirs)
 		utarray_free(dirs);

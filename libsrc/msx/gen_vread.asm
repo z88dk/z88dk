@@ -44,7 +44,11 @@ _msx_vread:
 	ex	(sp),hl		; VDP Timing
 
 rdloop:
+IF VDP_DATAIN > 255
+	ld	a,(VDP_DATAIN)
+ELSE
 	in	a,(VDP_DATAIN)
+ENDIF
 	ld	(de),a
 	inc	de
 	dec	bc

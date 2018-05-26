@@ -1,12 +1,9 @@
-/*
-Z88DK Z80 Module Assembler
-
-Copyright (C) Paulo Custodio, 2011-2017
-License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-Repository: https://github.com/pauloscustodio/z88dk-z80asm
-
-Parse command line options
-*/
+//-----------------------------------------------------------------------------
+// Z88DK Z80 Module Assembler
+// Parse command line options
+// Copyright (C) Paulo Custodio, 2011-2018
+// License: http://www.perlfoundation.org/artistic_license_2_0
+//-----------------------------------------------------------------------------
 
 #include "../config.h"
 #include "../portability.h"
@@ -18,17 +15,21 @@ Parse command line options
 #include "model.h"
 #include "options.h"
 #include "srcfile.h"
-#include "strpool.h"
 #include "str.h"
+#include "strutil.h"
 #include "symtab.h"
 #include "utarray.h"
 #include "z80asm.h"
+#include "die.h"
 
-#include <assert.h>
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
 #include <string.h>
+
+#ifdef _MSC_VER
+#define snprintf _snprintf
+#endif
 
 /* default file name extensions */
 #define FILEEXT_ASM     ".asm"    
@@ -53,10 +54,10 @@ enum OptType
 /* declare functions */
 static void exit_help( void );
 static void exit_copyright( void );
-static void option_origin( char *origin );
-static void option_define( char *symbol );
-static void option_make_lib( char *library );
-static void option_use_lib( char *library );
+static void option_origin(const char *origin );
+static void option_define(const char *symbol );
+static void option_make_lib(const char *library );
+static void option_use_lib(const char *library );
 static void option_cpu_z80(void);
 static void option_cpu_z80_zxn(void);
 static void option_cpu_z180(void);
@@ -64,19 +65,19 @@ static void option_cpu_r2k(void);
 static void option_cpu_r3k(void);
 static void option_appmake_zx(void);
 static void option_appmake_zx81(void);
-static void option_filler( char *filler_arg );
+static void option_filler(const char *filler_arg );
 static void option_debug_info();
 static void define_assembly_defines();
 static void include_z80asm_lib();
-static char *search_z80asm_lib();
+static const char *search_z80asm_lib();
 static void make_output_dir();
 
 static void process_options( int *parg, int argc, char *argv[] );
 static void process_files( int arg, int argc, char *argv[] );
-static void expand_source_glob(char *filename);
-static void expand_list_glob(char *filename);
+static void expand_source_glob(const char *pattern);
+static void expand_list_glob(const char *filename);
 
-static char *expand_environment_variables(char *arg);
+static const char *expand_environment_variables(const char *arg);
 static char *replace_str(const char *str, const char *old, const char *new);
 
 /*-----------------------------------------------------------------------------
@@ -113,16 +114,16 @@ static OptsLU opts_lu[] =
 *----------------------------------------------------------------------------*/
 DEFINE_init_module()
 {
-	utarray_new(opts.inc_path, &ut_str_icd);
-	utarray_new(opts.lib_path, &ut_str_icd);
-	utarray_new(opts.files, &ut_str_icd);
+	opts.inc_path = argv_new();
+	opts.lib_path = argv_new();
+	opts.files = argv_new();
 }
 
 DEFINE_dtor_module()
 {
-	utarray_free(opts.inc_path);
-	utarray_free(opts.lib_path);
-	utarray_free(opts.files);
+	argv_free(opts.inc_path);
+	argv_free(opts.lib_path);
+	argv_free(opts.files);
 }
 
 /*-----------------------------------------------------------------------------
@@ -176,7 +177,7 @@ static void process_opt( int *parg, int argc, char *argv[] )
 {
 #define II (*parg)
     int		 j;
-    char	*opt_arg_ptr;
+	const char *opt_arg_ptr;
 
     /* search opts_lu[] */
     for ( j = 0; j < NUM_ELEMS( opts_lu ); j++ )
@@ -191,7 +192,7 @@ static void process_opt( int *parg, int argc, char *argv[] )
                 if ( *opt_arg_ptr )
                     error_illegal_option( argv[II] );
                 else
-                    *( ( Bool * )( opts_lu[j].arg ) ) = TRUE;
+                    *( ( bool * )( opts_lu[j].arg ) ) = true;
 
                 break;
 
@@ -206,7 +207,7 @@ static void process_opt( int *parg, int argc, char *argv[] )
             case OptCallArg:
 				if (*opt_arg_ptr) {
 					opt_arg_ptr = expand_environment_variables(opt_arg_ptr);
-					((void(*)(char *))(opts_lu[j].arg))(opt_arg_ptr);
+					((void(*)(const char *))(opts_lu[j].arg))(opt_arg_ptr);
 				}
                 else
                     error_illegal_option( argv[II] );
@@ -216,7 +217,7 @@ static void process_opt( int *parg, int argc, char *argv[] )
             case OptString:
 				if (*opt_arg_ptr) {
 					opt_arg_ptr = expand_environment_variables(opt_arg_ptr);
-                    *( ( char ** )( opts_lu[j].arg ) ) = opt_arg_ptr;
+                    *( ( const char ** )( opts_lu[j].arg ) ) = opt_arg_ptr;
 				}
                 else
                     error_illegal_option( argv[II] );
@@ -228,7 +229,7 @@ static void process_opt( int *parg, int argc, char *argv[] )
 				{
 					UT_array **p_path = (UT_array **)opts_lu[j].arg;
 					opt_arg_ptr = expand_environment_variables(opt_arg_ptr);
-					utarray_push_back(*p_path, &opt_arg_ptr);
+					argv_push(*p_path, opt_arg_ptr);
 				}
                 else
                     error_illegal_option( argv[II] );
@@ -236,7 +237,7 @@ static void process_opt( int *parg, int argc, char *argv[] )
                 break;
 
             default:
-                assert(0);
+                xassert(0);
             }
 
             return;
@@ -266,14 +267,14 @@ static void process_options( int *parg, int argc, char *argv[] )
 /* search for the first file in path, with the given extension,
 * with .asm extension and with .o extension
 * if not found, return original file */
-static char *search_source(char *filename)
+static const char *search_source(const char *filename)
 {
-	char *f;
+	const char *f;
 
 	if (file_exists(filename))
 		return filename;
 
-	f = search_file(filename, opts.inc_path);
+	f = path_search(filename, opts.inc_path);
 	if (file_exists(f))
 		return f;
 
@@ -281,7 +282,7 @@ static char *search_source(char *filename)
 	if (file_exists(f))
 		return f;
 
-	f = search_file(f, opts.inc_path);
+	f = path_search(f, opts.inc_path);
 	if (file_exists(f))
 		return f;
 
@@ -289,7 +290,7 @@ static char *search_source(char *filename)
 	if (file_exists(f))
 		return f;
 
-	f = search_file(f, opts.inc_path);
+	f = path_search(f, opts.inc_path);
 	if (file_exists(f))
 		return f;
 
@@ -297,9 +298,9 @@ static char *search_source(char *filename)
 	return filename;
 }
 
-static void process_file( char *filename )
+static void process_file(char *filename )
 {
-	strip(filename);
+	cstr_strip(filename);
 	switch (filename[0])
 	{
 	case '-':		/* Illegal source file name */
@@ -312,141 +313,49 @@ static void process_file( char *filename )
 
 	case '@':		/* file list */
 		filename++;						/* point to after '@' */
-		strip(filename);
-		filename = expand_environment_variables(filename);
+		cstr_strip(filename);
+		filename = (char *)expand_environment_variables(filename);
 		expand_list_glob(filename);
 		break;
 	case ';':     /* comment */
 	case '#':
 		break;
 	default:
-		filename = expand_environment_variables(filename);
+		filename = (char *)expand_environment_variables(filename);
 		expand_source_glob(filename);
 	}
 }
 
-//-----------------------------------------------------------------------------
-//	expand .../**/... into a list of all directories replacing **
-//	return just the input pattern if no ** is present
-//-----------------------------------------------------------------------------
-static void expand_star_star(char *filename, UT_array **plist)
+void expand_source_glob(const char *pattern)
 {
-	STR_DEFINE(path, STR_SIZE);
-	char *tail;
+	if (strpbrk(pattern, "*?") != NULL) {		// is a pattern
+		argv_t *files = path_find_glob(pattern);
 
-	if ((tail = strstr(filename, "**")) == NULL) {
-		utarray_push_back(*plist, &filename);
+		if (argv_len(files) == 0)
+			error_glob_no_files(pattern);		// error if pattern matched no file
+
+		for (char **p = argv_front(files); *p; p++) {
+			argv_push(opts.files, search_source(*p));
+		}
+
+		argv_free(files);
 	}
 	else {
-		// expand first ** into list of all sub-directories
-		char *head = strdup(filename);			// alloc a copy to be modified
-		head[tail - filename + 1] = '\0';		// cut from second '*' of "**" onwards and expand one '*'
-
-		glob_t glob_dirs;						// find all directories that match head
-		int ret = glob(head, GLOB_NOESCAPE | GLOB_ONLYDIR, NULL, &glob_dirs);
-		if (ret == GLOB_NOMATCH) {
-			;									// no-match is OK - this directory is skipped
-		}
-		else if (ret == 0) {					// read list
-			for (int i = 0; i < glob_dirs.gl_pathc; i++) {
-				char *found = glob_dirs.gl_pathv[i];
-				if (dir_exists(found)) {
-					str_sprintf(path, "%s/%s", 
-						found, tail[2] == '/' ? tail + 3 : tail + 2);	// collect directory with pattern
-					char *pattern = str_data(path);
-					utarray_push_back(*plist, &pattern);
-
-					str_sprintf(path, "%s/%s",
-						found, tail[0] == '/' ? tail + 1 : tail);	// reuse **/... from tail to recurse
-					expand_star_star(str_data(path), plist);		// recurse
-				}
-			}
-		}
-		else {									// error
-			error_glob(filename,
-				(ret == GLOB_ABORTED ? "filesystem problem" :
-					ret == GLOB_NOMATCH ? "no match of pattern" :
-					ret == GLOB_NOSPACE ? "no dynamic memory" :
-					"unknown problem"));
-		}
-		free(head);
+		argv_push(opts.files, search_source(pattern));
 	}
 }
 
-static void expand_glob(char *filename, UT_array **pfiles, Bool do_search_path)
+void expand_list_glob(const char *filename)
 {
-	int initial_len = utarray_len(*pfiles);
-	int ret;
-
-	// expand ** into list of all possible paths
-	UT_array *patterns;
-	utarray_new(patterns, &ut_str_icd);
-
-	expand_star_star(filename, &patterns);		// expand **
-
-	char **p = NULL;
-	while ((p = (char**)utarray_next(patterns, p))) {
-		char *pattern = *p;
-
-		if (strchr(pattern, '*') == NULL && strchr(pattern, '?') == NULL) {
-			// optimize if no pattern chars
-			char *found = search_source(pattern);
-			utarray_push_back(*pfiles, &found);
-		}
-		else {
-			glob_t glob_files;
-			ret = glob(pattern, GLOB_NOESCAPE, NULL, &glob_files);
-			if (ret == GLOB_NOMATCH) {				// no match - ignore
-				;
-			}
-			else if (ret == 0) {
-				for (int i = 0; i < glob_files.gl_pathc; i++) {
-					char *found = glob_files.gl_pathv[i];
-					if (file_exists(found))
-						utarray_push_back(*pfiles, &found);
-				}
-			}
-			else {
-				error_glob(filename,
-					(ret == GLOB_ABORTED ? "filesystem problem" :
-						ret == GLOB_NOMATCH ? "no match of pattern" :
-						ret == GLOB_NOSPACE ? "no dynamic memory" :
-						"unknown problem"));
-			}
-			globfree(&glob_files);
-		}
-	}
-
-	// error if pattern matched no file
-	if (strchr(filename, '*') || strchr(filename, '?')) {
-		if (initial_len == utarray_len(*pfiles))
-			error_glob_no_files(filename);
-	}
-
-	utarray_free(patterns);
-}
-
-void expand_source_glob(char *filename)
-{
-	expand_glob(filename, &opts.files, TRUE);
-}
-
-void expand_list_glob(char *filename)
-{
-	UT_array *files;
-	utarray_new(files, &ut_str_icd);
-
-	expand_glob(filename, &files, FALSE);
-	char **p = NULL;
-	while ((p = (char**)utarray_next(files, p))) {
+	argv_t *files = path_find_glob(filename);
+	for (char **p = argv_front(files); *p; p++) {
 		char *filename = *p;
 		src_push();
 		{
 			char *line;
 
 			// append the directoy of the list file to the include path	and remove it at the end
-			char *lst_dirname = path_dirname(filename);
-			utarray_push_back(opts.inc_path, &lst_dirname);
+			argv_push(opts.inc_path, path_dir(filename));
 
 			if (src_open(filename, NULL)) {
 				while ((line = src_getline()) != NULL)
@@ -454,24 +363,24 @@ void expand_list_glob(char *filename)
 			}
 
 			// finished assembly, remove dirname from include path
-			utarray_pop_back(opts.inc_path);
+			argv_pop(opts.inc_path);
 		}
 		src_pop();
 	}
-	utarray_free(files);
+	argv_free(files);
 }
 
 /*-----------------------------------------------------------------------------
 *   replace environment variables in filenames
 *----------------------------------------------------------------------------*/
 
-static char *expand_environment_variables(char *arg)
+static const char *expand_environment_variables(const char *arg)
 {
 	char  *ptr, *nval = NULL;
 	char  *rep, *start;
 	char  *value = strdup(arg);
 	char   varname[300];
-	char  *ret;
+	const char  *ret;
 
 	start = value;
 	while ((ptr = strchr(start, '$')) != NULL) 
@@ -501,7 +410,7 @@ static char *expand_environment_variables(char *arg)
 		}
 	}
 
-	ret = strpool_add(value);		// free memory, return pooled string
+	ret = spool_add(value);		// free memory, return pooled string
 	free(value);
 	return ret;
 }
@@ -557,25 +466,25 @@ static void process_files( int arg, int argc, char *argv[] )
 *----------------------------------------------------------------------------*/
 #define OPT_TITLE(text)		puts(""); puts(text);
 #define OPT(type, arg, short_opt, long_opt, help_text, help_arg) \
-							show_option(type, (Bool *)arg, \
+							show_option(type, (bool *)arg, \
 										short_opt, long_opt, help_text, help_arg);
 
 #define ALIGN_HELP	24
 
-static void show_option( enum OptType type, Bool *pflag,
+static void show_option( enum OptType type, bool *pflag,
                          char *short_opt, char *long_opt, char *help_text, char *help_arg )
 {
 	STR_DEFINE(msg, STR_SIZE);
     int count_opts = 0;
 
-    str_set( msg, "  " );
+    Str_set( msg, "  " );
 
     if ( *short_opt )
     {
         /* dont show short_opt if short_opt is same as long_opt, except for extra '-' */
         if ( !( *long_opt && strcmp( short_opt, long_opt + 1 ) == 0 ) )
         {
-            str_append_sprintf( msg, "%s", short_opt );
+            Str_append_sprintf( msg, "%s", short_opt );
             count_opts++;
         }
     }
@@ -583,21 +492,21 @@ static void show_option( enum OptType type, Bool *pflag,
     if ( *long_opt )
     {
         if ( count_opts )
-            str_append( msg, ", " );
+            Str_append( msg, ", " );
 
-        str_append_sprintf( msg, "%s", long_opt );
+        Str_append_sprintf( msg, "%s", long_opt );
         count_opts++;
     }
 
     if ( *help_arg )
     {
-        str_append_sprintf( msg, "=%s", help_arg );
+        Str_append_sprintf( msg, "=%s", help_arg );
     }
 
-    if ( str_len(msg) > ALIGN_HELP )
-        printf( "%s\n%-*s %s\n", str_data(msg), ALIGN_HELP, "",       help_text );
+    if ( Str_len(msg) > ALIGN_HELP )
+        printf( "%s\n%-*s %s\n", Str_data(msg), ALIGN_HELP, "",       help_text );
     else
-        printf( "%-*s %s\n",                    ALIGN_HELP, str_data(msg), help_text );
+        printf( "%-*s %s\n",                    ALIGN_HELP, Str_data(msg), help_text );
 
 	STR_DELETE(msg);
 }
@@ -642,10 +551,10 @@ static void exit_copyright( void )
 /*-----------------------------------------------------------------------------
 *   Option functions called from Opts table
 *----------------------------------------------------------------------------*/
-int number_arg(char *arg)
+int number_arg(const char *arg)
 {
 	char *end;
-	char *p = arg;
+	const char *p = arg;
 	long lval;
 	int radix;
 	char suffix = '\0';
@@ -673,7 +582,7 @@ int number_arg(char *arg)
 		return (int)lval;
 }
 
-static void option_origin( char *origin )
+static void option_origin(const char *origin )
 {
 	int value = number_arg(origin);
 	if (value < 0 || value > 0xFFFF)
@@ -682,7 +591,7 @@ static void option_origin( char *origin )
 		set_origin_option(value);
 }
 
-static void option_filler( char *filler_arg )
+static void option_filler(const char *filler_arg )
 {
 	int value = number_arg(filler_arg);
 	if (value < 0 || value > 0xFF)
@@ -693,11 +602,11 @@ static void option_filler( char *filler_arg )
 
 static void option_debug_info()
 {
-	opts.debug_info = TRUE;
-	opts.map = TRUE;
+	opts.debug_info = true;
+	opts.map = true;
 }
 
-static void option_define( char *symbol )
+static void option_define(const char *symbol )
 {
     int i;
 
@@ -720,12 +629,12 @@ static void option_define( char *symbol )
     define_static_def_sym( symbol, 1 );
 }
 
-static void option_make_lib( char *library )
+static void option_make_lib(const char *library )
 {
     opts.lib_file = library;		/* may be empty string */
 }
 
-static void option_use_lib( char *library )
+static void option_use_lib(const char *library )
 {
     GetLibfile( library );
 }
@@ -779,7 +688,7 @@ static void define_assembly_defines()
 	    define_static_def_sym("__CPU_R3K__", 1);
 		break;
 	default:
-		assert(0);
+		xassert(0);
 	}
 
 	if (opts.swap_ix_iy) {
@@ -792,7 +701,7 @@ static void define_assembly_defines()
 *	strpool
 *	Extensions may be changed by options.
 *----------------------------------------------------------------------------*/
-static char *path_prepend_output_dir(char *filename)
+static const char *path_prepend_output_dir(const char *filename)
 {
 	char path[FILENAME_MAX];
 	if (opts.output_directory) {
@@ -802,67 +711,67 @@ static char *path_prepend_output_dir(char *filename)
 		else
 			snprintf(path, sizeof(path), "%s/%s", 
 				opts.output_directory, filename);
-		return strpool_add(path);
+		return spool_add(path);
 	}
 	else {
 		return filename;
 	}
 }
 
-char *get_list_filename( char *filename )
+const char *get_list_filename(const char *filename )
 {
     init_module();
 	return path_prepend_output_dir(path_replace_ext(filename, FILEEXT_LIST));
 }
 
-char *get_def_filename( char *filename )
+const char *get_def_filename(const char *filename )
 {
     init_module();
 	return path_prepend_output_dir(path_replace_ext(filename, FILEEXT_DEF));
 }
 
-char *get_err_filename( char *filename )
+const char *get_err_filename(const char *filename )
 {
     init_module();
 	return path_prepend_output_dir(path_replace_ext(filename, FILEEXT_ERR));
 }
 
-char *get_bin_filename( char *filename )
+const char *get_bin_filename(const char *filename )
 {
     init_module();
 	return path_prepend_output_dir(path_replace_ext(filename, FILEEXT_BIN));
 }
 
-char *get_lib_filename( char *filename )
+const char *get_lib_filename(const char *filename )
 {
     init_module();
 	return path_replace_ext(filename, FILEEXT_LIB);
 }
 
-char *get_sym_filename( char *filename )
+const char *get_sym_filename(const char *filename )
 {
     init_module();
 	return path_prepend_output_dir(path_replace_ext(filename, FILEEXT_SYM));
 }
 
-char *get_map_filename(char *filename)
+const char *get_map_filename(const char *filename)
 {
 	init_module();
 	return path_prepend_output_dir(path_replace_ext(filename, FILEEXT_MAP));
 }
 
-char *get_reloc_filename(char *filename)
+const char *get_reloc_filename(const char *filename)
 {
 	init_module();
 	return path_prepend_output_dir(path_replace_ext(filename, FILEEXT_RELOC));
 }
 
-char *get_asm_filename(char *filename)
+const char *get_asm_filename(const char *filename)
 {
 	return path_replace_ext(filename, FILEEXT_ASM);
 }
 
-char *get_obj_filename( char *filename )
+const char *get_obj_filename(const char *filename )
 {
 	return path_prepend_output_dir(path_replace_ext(filename, FILEEXT_OBJ));
 }
@@ -880,7 +789,7 @@ static void option_appmake_zx(void)
 	opts.appmake_origin_min = ZX_ORIGIN_MIN;
 	opts.appmake_origin_max = ZX_ORIGIN_MAX;
 	set_origin_option(ZX_ORIGIN);
-	opts.make_bin = TRUE;
+	opts.make_bin = true;
 }
 
 static void option_appmake_zx81(void)
@@ -891,7 +800,7 @@ static void option_appmake_zx81(void)
 	opts.appmake_origin_min = ZX81_ORIGIN_MIN;
 	opts.appmake_origin_max = ZX81_ORIGIN_MAX;
 	set_origin_option(ZX81_ORIGIN);
-	opts.make_bin = TRUE;
+	opts.make_bin = true;
 }
 
 void checkrun_appmake(void)
@@ -905,21 +814,21 @@ void checkrun_appmake(void)
 			error_invalid_org(origin);
 		}
 		else {
-			char *bin_filename = get_bin_filename(get_first_module(NULL)->filename);
-			char *out_filename = path_replace_ext(bin_filename, opts.appmake_ext);
+			const char *bin_filename = get_bin_filename(get_first_module(NULL)->filename);
+			const char *out_filename = path_replace_ext(bin_filename, opts.appmake_ext);
 
-			str_sprintf(cmd, "appmake %s -b \"%s\" -o \"%s\" --org %d",
+			Str_sprintf(cmd, "appmake %s -b \"%s\" -o \"%s\" --org %d",
 				opts.appmake_opts,
 				bin_filename,
 				out_filename,
 				origin);
 
 			if (opts.verbose)
-				puts(str_data(cmd));
+				puts(Str_data(cmd));
 
-			int rv = system(str_data(cmd));
+			int rv = system(Str_data(cmd));
 			if (rv != 0)
-				error_cmd_failed(str_data(cmd));
+				error_cmd_failed(Str_data(cmd));
 		}
 	}
 }
@@ -932,13 +841,13 @@ void checkrun_appmake(void)
 *----------------------------------------------------------------------------*/
 static void include_z80asm_lib()
 {
-	char *library = search_z80asm_lib();
+	const char *library = search_z80asm_lib();
 
 	if (library != NULL)
 		option_use_lib(library);
 }
 
-static char *check_library(char *lib_name)
+static const char *check_library(const char *lib_name)
 {
 	if (file_exists(lib_name))
 		return lib_name;
@@ -949,37 +858,37 @@ static char *check_library(char *lib_name)
 	return NULL;
 }
 
-static char *search_z80asm_lib()
+static const char *search_z80asm_lib()
 {
 	STR_DEFINE(lib_name_str, STR_SIZE);
-	char *lib_name;
+	const char *lib_name;
 	STR_DEFINE(f, STR_SIZE);
-	char *ret;
+	const char *ret;
 
 	/* Build libary file name */
-	str_sprintf(lib_name_str, Z80ASM_LIB, opts.cpu_name, SWAP_IX_IY_NAME);
-	lib_name = strpool_add(str_data(lib_name_str));
+	Str_sprintf(lib_name_str, Z80ASM_LIB, opts.cpu_name, SWAP_IX_IY_NAME);
+	lib_name = spool_add(Str_data(lib_name_str));
 
 	/* try to read from current directory */
 	if (check_library(lib_name))
 		return lib_name;
 
 	/* try to read from PREFIX/lib */
-	str_sprintf(f, "%s/lib/%s", PREFIX, lib_name);
-	ret = strpool_add(str_data(f));
+	Str_sprintf(f, "%s/lib/%s", PREFIX, lib_name);
+	ret = spool_add(Str_data(f));
 	if (check_library(ret))
 		return ret;
 
 	/* try to read form -L path */
-	ret = search_file(get_lib_filename(lib_name), opts.lib_path);
+	ret = path_search(get_lib_filename(lib_name), opts.lib_path);
 	if (strcmp(ret, lib_name) != 0) {		// found one in path
 		if (check_library(ret))
 			return ret;
 	}
 
 	/* try to read from ZCCCFG/.. */
-	str_sprintf(f, "${ZCCCFG}/../%s", lib_name);
-	ret = expand_environment_variables(str_data(f));
+	Str_sprintf(f, "${ZCCCFG}/../%s", lib_name);
+	ret = expand_environment_variables(Str_data(f));
 	if (check_library(ret))
 		return ret;
 
@@ -992,7 +901,7 @@ static char *search_z80asm_lib()
 static void make_output_dir()
 {
 	if (opts.output_directory) {
-		opts.output_directory = path_remove_slashes(opts.output_directory);
-		mkdir_p(opts.output_directory);
+		opts.output_directory = path_canon(opts.output_directory);
+		path_mkdir(opts.output_directory);
 	}
 }

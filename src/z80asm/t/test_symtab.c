@@ -24,7 +24,7 @@ int sizeof_relocroutine = 0;
 int sizeof_reloctable = 0;
 
 char *GetLibfile( char *filename ) { return ""; }
-extern Symbol *_define_sym( char *name, long value, sym_type_t sym_type, Byte type_mask,
+extern Symbol *_define_sym( char *name, long value, sym_type_t sym_type, byte_t type_mask,
                      Module *module, Section *section,
 					 SymbolHash **psymtab );
 
@@ -100,8 +100,8 @@ static void test_symtab( void )
 	SymbolHash *symtab, *symtab2;
 	
 	list_open("test.lis");
-	opts.symtable = TRUE;
-	opts.list     = TRUE;
+	opts.symtable = true;
+	opts.list     = true;
 	
 	warn("Create current module\n");	
 	set_cur_module( new_module() );
@@ -183,7 +183,7 @@ static void test_symtab( void )
 	assert( ! sym->is_defined );
 	find_symbol( S("PC"), global_symtab )->value += 3;
 	sym = define_symbol(S("NN"), find_symbol( "PC", global_symtab )->value, TYPE_ADDRESS); 
-	sym->is_touched = TRUE;
+	sym->is_touched = true;
 	sym = get_used_symbol(S("NN"));
 	assert( sym != NULL );
 	dump_Symbol(sym);
@@ -203,7 +203,7 @@ static void test_symtab( void )
 	remove_all_global_syms();
 	dump_symtab();
 	
-	list_close(FALSE);
+	list_close(false);
 
 	warn("End\n");	
 

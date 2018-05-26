@@ -17,10 +17,10 @@ see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 #include "init.h"
 #include "model.h"
 #include "strhash.h"
-#include "strpool.h"
+#include "strutil.h"
 #include "sym.h"
 #include "symtab.h"
-#include <assert.h>
+#include "die.h"
 
 /*-----------------------------------------------------------------------------
 *	UT_array of Expr*
@@ -127,22 +127,22 @@ static long _calc_power(long base, long exp)
 static StrHash *operator_hash;
 
 /* compute hash key */
-static char *operator_hash_key( tokid_t tok, op_type_t op_type )
+static const char *operator_hash_key( tokid_t tok, op_type_t op_type )
 {
 	char key[3];		/* byte 1 = tok; byte 2 = op_type; byte 3 = '\0' */
 
 	/* assert we can map symbol and type in a string */
-	assert( tok     > 0 && tok     < 256 );
-	assert( op_type > 0 && op_type < 256 );
+	xassert( tok     > 0 && tok     < 256 );
+	xassert( op_type > 0 && op_type < 256 );
 	key[0] = (char) tok; key[1] = (char) op_type; key[2] = '\0';
 
-	return strpool_add(key);
+	return spool_add(key);
 }
 
 /* init operator_hash - create one Operator for each, add to hash table */
 static void init_operator_hash(void)
 {
-	char *key;
+	const char *key;
 
 #define OPERATOR(_operation, _tok, _type, _prec, _assoc, _args, _calc)		\
 	{																		\
@@ -172,7 +172,7 @@ static void fini_operator_hash(void)
 /* get the operator descriptor for the given (tok, op_type) */
 Operator *Operator_get( tokid_t tok, op_type_t op_type )
 {
-	char *key;
+	const char *key;
 
 	init_module();
 	key = operator_hash_key( tok, op_type );
@@ -201,7 +201,7 @@ long Calc_pop( void )
 	INIT_OBJ(longArray, &calc_stack);		/* freed by class */
 
 	top = longArray_top(calc_stack);
-	assert( top != NULL );
+	xassert( top != NULL );
 	value = *top;
 
 	longArray_pop(calc_stack);
@@ -264,14 +264,14 @@ void ExprOp_init_operator( ExprOp *self, tokid_t tok, op_type_t op_type )
 {
 	Operator *op;
 
-	op = Operator_get( tok, op_type ); assert( op != NULL );
+	op = Operator_get( tok, op_type ); xassert( op != NULL );
 
 	self->op_type	= op_type;
 	self->d.op		= op;
 }
 
 /* compute ExprOp using Calc_xxx functions */
-void ExprOp_compute(ExprOp *self, Expr *expr, Bool not_defined_error)
+void ExprOp_compute(ExprOp *self, Expr *expr, bool not_defined_error)
 {
 	switch (self->op_type)
 	{
@@ -279,17 +279,17 @@ void ExprOp_compute(ExprOp *self, Expr *expr, Bool not_defined_error)
 		/* symbol was not defined */
         if ( ! self->d.symbol->is_defined )
         {
-			expr->result.not_evaluable = TRUE;
+			expr->result.not_evaluable = true;
 
 			/* copy scope */
 			if (self->d.symbol->scope == SCOPE_EXTERN ||
 				(self->d.symbol->scope == SCOPE_GLOBAL && !self->d.symbol->is_defined))
 			{
-				expr->result.extern_symbol = TRUE;
+				expr->result.extern_symbol = true;
 			}
 			else if (self->d.symbol->type == TYPE_UNKNOWN)
 			{
-				expr->result.undefined_symbol = TRUE;
+				expr->result.undefined_symbol = true;
 				if (not_defined_error)
 					error_not_defined(self->d.symbol->name);
 			}
@@ -302,14 +302,14 @@ void ExprOp_compute(ExprOp *self, Expr *expr, Bool not_defined_error)
 
 			/* check cross-section addresses to invalidade relative jumps */
 			if (self->d.symbol->section != CURRENTSECTION)
-				expr->result.cross_section_addr = TRUE;
+				expr->result.cross_section_addr = true;
 		}
 
 		expr->type = MAX( expr->type, self->d.symbol->type );
 
 		/* check if symbol is computable and was computed */
 		if (self->d.symbol->type == TYPE_COMPUTED && !self->d.symbol->is_computed)
-			expr->is_computed = FALSE;
+			expr->is_computed = false;
 
 		break;
 		
@@ -334,7 +334,7 @@ void ExprOp_compute(ExprOp *self, Expr *expr, Bool not_defined_error)
 	case TERNARY_OP:Calc_compute_ternary( self->d.op->calc.ternary ); break;
 	
 	default:
-		assert(0);
+		xassert(0);
 	}
 }
 
@@ -353,10 +353,10 @@ int range_size( range_t range )
 	case RANGE_WORD:			return 2;
 	case RANGE_WORD_BE:			return 2;
 	case RANGE_DWORD:			return 4;
-	default: assert(0);
+	default: xassert(0);
 	}
 
-	assert(0);
+	xassert(0);
 	return -1;	/* not reached */
 }
 
@@ -369,9 +369,9 @@ DEF_CLASS_LIST( Expr );
 void Expr_init (Expr *self) 
 { 
     self->rpn_ops = OBJ_NEW( ExprOpArray );
-	OBJ_AUTODELETE( self->rpn_ops ) = FALSE;
+	OBJ_AUTODELETE( self->rpn_ops ) = false;
 
-    self->text = str_new(STR_SIZE);
+    self->text = Str_new(STR_SIZE);
 
 	self->type	= TYPE_UNKNOWN;
 	
@@ -390,47 +390,47 @@ void Expr_init (Expr *self)
 void Expr_copy (Expr *self, Expr *other)
 {
 	self->rpn_ops	= ExprOpArray_clone( other->rpn_ops );
-	self->text = str_new(STR_SIZE); 
-	str_set(self->text, str_data(other->text));
+	self->text = Str_new(STR_SIZE); 
+	Str_set(self->text, Str_data(other->text));
 }
 
 void Expr_fini (Expr *self)
 { 
 	OBJ_DELETE( self->rpn_ops );
-	str_delete(self->text);
+	Str_delete(self->text);
 }
 
 /*-----------------------------------------------------------------------------
 *	Expression parser
 *----------------------------------------------------------------------------*/
-static Bool Expr_parse_ternary_cond( Expr *expr );
+static bool Expr_parse_ternary_cond( Expr *expr );
 
 #define DEFINE_PARSER( name, prev_name, condition )			\
-	static Bool name( Expr *self )							\
+	static bool name( Expr *self )							\
 	{														\
 		tokid_t op = TK_NIL;								\
 															\
 		if ( ! prev_name(self) )							\
-			return FALSE;									\
+			return false;									\
 															\
 		while ( condition )									\
 		{													\
 			op = sym.tok;									\
-			str_append_n(self->text, sym.tstart, sym.tlen);	\
+			Str_append_n(self->text, sym.tstart, sym.tlen);	\
 			GetSym();										\
 			if ( ! prev_name(self) )						\
-				return FALSE;								\
+				return false;								\
 															\
 			ExprOp_init_operator(							\
 				ExprOpArray_push( self->rpn_ops ),			\
 				op, BINARY_OP );							\
 		}													\
 															\
-		return TRUE;										\
+		return true;										\
 	}
 
 /* parse value */
-static Bool Expr_parse_factor( Expr *self )
+static bool Expr_parse_factor( Expr *self )
 {
     Symbol  *symptr;
 
@@ -440,7 +440,7 @@ static Bool Expr_parse_factor( Expr *self )
 		ExprOp_init_asmpc( ExprOpArray_push( self->rpn_ops ) );
 		self->type = MAX( self->type, TYPE_ADDRESS );
 
-		str_append_n(self->text, sym.tstart, sym.tlen);
+		Str_append_n(self->text, sym.tstart, sym.tlen);
 		
 		GetSym();
 		break;
@@ -456,17 +456,17 @@ static Bool Expr_parse_factor( Expr *self )
 #if 0
         if ( ! symptr->is_defined )
         {
-			self->result.not_evaluable		= TRUE;
+			self->result.not_evaluable		= true;
         }
 #endif
 
-        str_append_n(self->text, sym.tstart, sym.tlen);		/* add identifier to infix expr */
+        Str_append_n(self->text, sym.tstart, sym.tlen);		/* add identifier to infix expr */
 
         GetSym();
         break;
 
 	case TK_NUMBER:
-		str_append_sprintf(self->text, "%ld", sym.number);
+		Str_append_sprintf(self->text, "%ld", sym.number);
 		ExprOp_init_number( ExprOpArray_push( self->rpn_ops ),
 							sym.number );
 		self->type = MAX( self->type, TYPE_CONSTANT );
@@ -481,64 +481,64 @@ static Bool Expr_parse_factor( Expr *self )
 }
 
 /* parse unary operators */
-static Bool Expr_parse_unary( Expr *self )
+static bool Expr_parse_unary( Expr *self )
 {
     tokid_t open_paren;
 
 	switch (sym.tok) 
 	{
     case TK_MINUS:
-		str_append_n(self->text, sym.tstart, sym.tlen);
+		Str_append_n(self->text, sym.tstart, sym.tlen);
         GetSym();
 		if ( ! Expr_parse_unary( self ) )		/* right-associative, recurse */
-			return FALSE;
+			return false;
 
 		ExprOp_init_operator( ExprOpArray_push( self->rpn_ops ),
 							  TK_MINUS, UNARY_OP );
-		return TRUE;
+		return true;
 
     case TK_PLUS:
         GetSym();
         return Expr_parse_unary( self );
 
     case TK_BIN_NOT:
-		str_append_n(self->text, sym.tstart, sym.tlen);
+		Str_append_n(self->text, sym.tstart, sym.tlen);
         GetSym();
 		if ( ! Expr_parse_unary( self ) )		/* right-associative, recurse */
-			return FALSE;
+			return false;
 
 		ExprOp_init_operator( ExprOpArray_push( self->rpn_ops ),
 							  TK_BIN_NOT, UNARY_OP );
-		return TRUE;
+		return true;
 
     case TK_LOG_NOT:
-		str_append_n(self->text, sym.tstart, sym.tlen);
+		Str_append_n(self->text, sym.tstart, sym.tlen);
         GetSym();
 
         if ( ! Expr_parse_unary( self ) )		/* right-associative, recurse */
-			return FALSE;
+			return false;
 
 		ExprOp_init_operator( ExprOpArray_push( self->rpn_ops ),
 							  TK_LOG_NOT, UNARY_OP );
-		return TRUE;
+		return true;
 
     case TK_LPAREN:
     case TK_LSQUARE:
-		str_append_n(self->text, sym.tstart, sym.tlen);
+		Str_append_n(self->text, sym.tstart, sym.tlen);
         open_paren = sym.tok;
         GetSym();
 
         if ( ! Expr_parse_ternary_cond( self ) )
-			return FALSE;
+			return false;
 
 		/* chack parentheses balance */
         if ( ( open_paren == TK_LPAREN  && sym.tok != TK_RPAREN ) ||
              ( open_paren == TK_LSQUARE && sym.tok != TK_RSQUARE ) )
-			return FALSE;
+			return false;
 
-		str_append_n(self->text, sym.tstart, sym.tlen);
+		Str_append_n(self->text, sym.tstart, sym.tlen);
         GetSym();
-		return TRUE;
+		return true;
 
 	default:
 		return Expr_parse_factor( self );
@@ -546,23 +546,23 @@ static Bool Expr_parse_unary( Expr *self )
 }
 
 /* parse A ** B */
-static Bool Expr_parse_power( Expr *self )
+static bool Expr_parse_power( Expr *self )
 {
     if ( ! Expr_parse_unary( self ) )
-        return FALSE;
+        return false;
 
     while ( sym.tok == TK_POWER )
     {
-		str_append_n(self->text, sym.tstart, sym.tlen);
+		Str_append_n(self->text, sym.tstart, sym.tlen);
         GetSym();
 		if ( ! Expr_parse_power( self ) )		/* right-associative, recurse */
-			return FALSE;
+			return false;
 
 		ExprOp_init_operator( ExprOpArray_push( self->rpn_ops ),
 							  TK_POWER, BINARY_OP );
     }
 
-    return TRUE;
+    return true;
 }
 
 /* parse A * B, A / B, A % B */
@@ -600,32 +600,32 @@ DEFINE_PARSER( Expr_parse_logical_or, Expr_parse_logical_and,
 			   sym.tok == TK_LOG_OR )
 
 /* parse cond ? true : false */
-static Bool Expr_parse_ternary_cond( Expr *self )
+static bool Expr_parse_ternary_cond( Expr *self )
 {
 	if ( ! Expr_parse_logical_or(self) )		/* get cond or expression */
-		return FALSE;
+		return false;
 
 	if ( sym.tok != TK_QUESTION )
-		return TRUE;
+		return true;
 
 	/* ternary construct found */
-    str_append_char(self->text, '?');
+    Str_append_char(self->text, '?');
 	GetSym();						/* consume '?' */
 		
 	if ( ! Expr_parse_ternary_cond(self) )	/* get true */
-		return FALSE;
+		return false;
 
 	if ( sym.tok != TK_COLON )
-		return FALSE;
-    str_append_char(self->text, ':');
+		return false;
+    Str_append_char(self->text, ':');
 	GetSym();						/* consume ':' */
 
 	if ( ! Expr_parse_ternary_cond(self) )	/* get false */
-		return FALSE;
+		return false;
 
 	ExprOp_init_operator( ExprOpArray_push( self->rpn_ops ),
 						  TK_TERN_COND, TERNARY_OP );
-	return TRUE;
+	return true;
 }
 
 /* parse expression at current input, return new Expr object;
@@ -633,14 +633,14 @@ static Bool Expr_parse_ternary_cond( Expr *self )
 Expr *expr_parse( void )
 {
 	Expr *self = OBJ_NEW( Expr );
-    Bool is_const_expr = FALSE;
+    bool is_const_expr = false;
 
     if ( sym.tok == TK_CONST_EXPR )		/* leading '#' : ignore relocatable address expression */
     {
-		str_append_n(self->text, sym.tstart, sym.tlen);
+		Str_append_n(self->text, sym.tstart, sym.tlen);
 
 		GetSym();               
-        is_const_expr = TRUE;
+        is_const_expr = true;
     }
 
     if ( Expr_parse_ternary_cond( self ) )
@@ -665,16 +665,16 @@ Expr *expr_parse( void )
 *	evaluate expression if possible, set result.not_evaluable if failed
 *   e.g. symbol not defined
 *----------------------------------------------------------------------------*/
-long Expr_eval(Expr *self, Bool not_defined_error)
+long Expr_eval(Expr *self, bool not_defined_error)
 {
 	size_t i;
 
-	self->result.not_evaluable		= FALSE;
-	self->result.undefined_symbol	= FALSE;
-	self->result.extern_symbol		= FALSE;
-	self->result.cross_section_addr = FALSE;
+	self->result.not_evaluable		= false;
+	self->result.undefined_symbol	= false;
+	self->result.extern_symbol		= false;
+	self->result.cross_section_addr = false;
 
-	self->is_computed = TRUE;
+	self->is_computed = true;
 
 	for ( i = 0; i < ExprOpArray_size( self->rpn_ops ); i++ )
 	{
@@ -700,7 +700,7 @@ long Expr_eval(Expr *self, Bool not_defined_error)
 			default:			; /* no change */
 			}
 		}
-		assert( type != TYPE_COMPUTED );
+		xassert( type != TYPE_COMPUTED );
 		self->type = type;
 	}
 
@@ -708,18 +708,18 @@ long Expr_eval(Expr *self, Bool not_defined_error)
 }
 
 /*-----------------------------------------------------------------------------
-*	parse and eval an expression, return FALSE on result.not_evaluable
+*	parse and eval an expression, return false on result.not_evaluable
 *----------------------------------------------------------------------------*/
-static Bool _expr_parse_eval( long *presult, Bool not_defined_error )
+static bool _expr_parse_eval( long *presult, bool not_defined_error )
 {
 	Expr *expr;
-	Bool  failed;
+	bool  failed;
 
 	*presult = 0;
 
 	expr = expr_parse();
 	if ( expr == NULL )
-		return FALSE;				/* error output by expr_parse() */
+		return false;				/* error output by expr_parse() */
 
 	/* eval and discard expression */
 	*presult = Expr_eval(expr, not_defined_error);
@@ -728,27 +728,27 @@ static Bool _expr_parse_eval( long *presult, Bool not_defined_error )
 
 	/* check errors */
 	if (failed)
-		return FALSE;
+		return false;
 	else
-		return TRUE;
+		return true;
 }
 
-Bool expr_parse_eval( long *presult )
+bool expr_parse_eval( long *presult )
 {
-	return _expr_parse_eval( presult, TRUE );
+	return _expr_parse_eval( presult, true );
 }
 
 long expr_parse_eval_if( void )
 {
 	long result = 0;
-	_expr_parse_eval( &result, FALSE );
+	_expr_parse_eval( &result, false );
 	return result;
 }
 
 /* check if all variables used in an expression are local to the same module
 and section; if yes, the expression can be computed in phase 2 of the compile,
 if not the expression must be passed to the link phase */
-Bool Expr_is_local_in_section(Expr *self, struct Module *module, struct Section *section)
+bool Expr_is_local_in_section(Expr *self, struct Module *module, struct Section *section)
 {
 	size_t i;
 
@@ -760,7 +760,7 @@ Bool Expr_is_local_in_section(Expr *self, struct Module *module, struct Section 
 		{
 		case SYMBOL_OP:
 			if (expr_op->d.symbol->module != module || expr_op->d.symbol->section != section)
-				return FALSE;
+				return false;
 			break;
 
 		case CONST_EXPR_OP:
@@ -772,13 +772,13 @@ Bool Expr_is_local_in_section(Expr *self, struct Module *module, struct Section 
 			break;
 
 		default:
-			assert(0);
+			xassert(0);
 		}
 	}
-	return TRUE;
+	return true;
 }
 
-Bool Expr_without_addresses(Expr *self)
+bool Expr_without_addresses(Expr *self)
 {
 	size_t i;
 	int num_addresses = 0;
@@ -806,18 +806,18 @@ Bool Expr_without_addresses(Expr *self)
 			break;
 
 		default:
-			assert(0);
+			xassert(0);
 		}
 	}
 
 	if (num_addresses > 1)
-		return FALSE;
+		return false;
 	else
-		return TRUE;
+		return true;
 }
 
 /* check if expression depends on itself */
-Bool Expr_is_recusive(Expr *self, const char *name)
+bool Expr_is_recusive(Expr *self, const char *name)
 {
 	size_t i;
 
@@ -829,7 +829,7 @@ Bool Expr_is_recusive(Expr *self, const char *name)
 		{
 		case SYMBOL_OP:
 			if (strcmp(expr_op->d.symbol->name, name) == 0)
-				return TRUE;
+				return true;
 			break;
 
 		case CONST_EXPR_OP:
@@ -841,9 +841,9 @@ Bool Expr_is_recusive(Expr *self, const char *name)
 			break;
 
 		default:
-			assert(0);
+			xassert(0);
 		}
 	}
-	return FALSE;
+	return false;
 }
 

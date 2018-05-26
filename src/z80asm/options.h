@@ -1,17 +1,14 @@
-/*
-Z88DK Z80 Module Assembler
-
-Copyright (C) Paulo Custodio, 2011-2017
-License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-Repository: https://github.com/pauloscustodio/z88dk-z80asm
-
-Parse command line options
-*/
-
+//-----------------------------------------------------------------------------
+// Z88DK Z80 Module Assembler
+// Parse command line options
+// Copyright (C) Paulo Custodio, 2011-2018
+// License: http://www.perlfoundation.org/artistic_license_2_0
+//-----------------------------------------------------------------------------
 #pragma once
 
 #include "types.h"
 #include "utarray.h"
+#include "strutil.h"
 
 /*-----------------------------------------------------------------------------
 *   CPU type
@@ -67,16 +64,16 @@ extern void parse_argv( int argc, char *argv[] );
 *	strpool
 *	Extensions may be changed by options.
 *----------------------------------------------------------------------------*/
-extern char *get_asm_filename( char *filename );
-extern char *get_list_filename( char *filename );
-extern char *get_obj_filename( char *filename );
-extern char *get_def_filename( char *filename );
-extern char *get_err_filename( char *filename );
-extern char *get_bin_filename( char *filename );
-extern char *get_lib_filename( char *filename );
-extern char *get_sym_filename( char *filename );
-extern char *get_map_filename(char *filename);
-extern char *get_reloc_filename(char *filename);
+extern const char *get_asm_filename(const char *filename );
+extern const char *get_list_filename(const char *filename );
+extern const char *get_obj_filename(const char *filename );
+extern const char *get_def_filename(const char *filename );
+extern const char *get_err_filename(const char *filename );
+extern const char *get_bin_filename(const char *filename );
+extern const char *get_lib_filename(const char *filename );
+extern const char *get_sym_filename(const char *filename );
+extern const char *get_map_filename(const char *filename);
+extern const char *get_reloc_filename(const char *filename);
 
 /*-----------------------------------------------------------------------------
 *   Call appmake if requested in options
