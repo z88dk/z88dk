@@ -571,3 +571,5 @@ moved. While both approaches have their merits and use cases, it's
 the second approach which is generally more popular. Certainly, most
 of the SP1 example code in Z88DK uses it.
 
+The [next article](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_04_BiggerSprites.md)
+in this series looks at creating bigger and more colourful sprites.
