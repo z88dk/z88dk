@@ -6,6 +6,7 @@
 		PUBLIC		bordercolor
 		PUBLIC		_bordercolor
 
+		EXTERN		conio_map_colour
 		EXTERN		zx_border
 
 bordercolor:
