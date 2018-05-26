@@ -6,6 +6,7 @@
 		PUBLIC		bordercolor
 		PUBLIC		_bordercolor
 
+		EXTERN		conio_map_colour
 		EXTERN		cpc_SetBorder
 
 bordercolor:
