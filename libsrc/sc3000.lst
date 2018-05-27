@@ -52,6 +52,7 @@ msx/gen_setwrt
 msx/gen_set_vdp_reg
 msx/gen_get_vdp_reg
 msx/gen_color
+msx/gen_set_border
 msx/gen_get_trigger
 msx/msx_map_m2_block
 msx/msx_map_m2_pixel

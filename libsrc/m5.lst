@@ -10,6 +10,7 @@ stdio/ansi/generic/f_ansi_dline
 stdio/ansi/msx/f_ansi_scrollup_nobios
 @stdio/tms9918/tms9918.lst
 @stdio/stdio.lst
+@font/font_8x8/font_8x8.lst
 @gfxbase.lst
 @msx/genmsx.lst
 graphics/dcircle
@@ -46,6 +47,7 @@ psg/sn76489/set_psg_callee.asm
 msx/gen_set_vdp_reg
 msx/gen_get_vdp_reg
 msx/gen_color
+msx/gen_set_border
 msx/msx_get_stick
 msx/gen_get_trigger
 msx/msx_map_m2_block
@@ -61,4 +63,9 @@ msx/gen_vram
 msx/gen_vread
 msx/gen_vwrite
 msx/gen_vwrite_direct
+msx/gen_setwrt
+msx/gen_setrd
+msx/gen_filvrm
+msx/gen_ldirvm
+msx/gen_ldirmv
 @z80.lst

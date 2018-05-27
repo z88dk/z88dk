@@ -54,6 +54,7 @@ msx/svi_blank_noblank.asm
 msx/msx_break
 msx/msx_clearkey
 msx/msx_color
+msx/gen_set_border
 msx/msx_get_stick
 msx/msx_get_trigger
 msx/msx_locate

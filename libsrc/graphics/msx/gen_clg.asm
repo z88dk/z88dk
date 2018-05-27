@@ -11,11 +11,7 @@
         
         EXTERN	msx_set_mode
         EXTERN	msx_color
-	IF FORm5
-		INCLUDE "target/m5/def/m5bios.def"
-	ELSE
-			EXTERN	FILVRM
-	ENDIF
+	EXTERN	FILVRM
 
 .clg
 ._clg

@@ -12,11 +12,7 @@
 	PUBLIC	msx_vwrite
 	PUBLIC	_msx_vwrite
 	
-IF FORm5
-	INCLUDE "target/m5/def/m5bios.def"
-ELSE
 	EXTERN     LDIRVM
-ENDIF
 	
 	INCLUDE	"msx/vdp.inc"
 
