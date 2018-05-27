@@ -1225,7 +1225,7 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
     if (zxc->outfile == NULL)
     {
         strcpy(filename, zxc->binname);
-        suffix_change(filename, ".sna");
+        suffix_change(filename, (zxs->snx == 0) ? ".sna" : ".snx");
     }
     else
         strcpy(filename, zxc->outfile);
