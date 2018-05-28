@@ -11,6 +11,7 @@
 
 		EXTERN	msleep
                 EXTERN in_GetKey
+		EXTERN	__CLIB_FGETC_CONS_DELAY
 
 getk_inkey:
 _getk_inkey:
@@ -19,7 +20,7 @@ _getk_inkey:
 
 .fgetc_cons_inkey
 ._fgetc_cons_inkey
-	ld	hl,50
+	ld	hl,__CLIB_FGETC_CONS_DELAY
 	call	msleep
 loop:
 	call	in_GetKey

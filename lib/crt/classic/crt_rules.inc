@@ -57,3 +57,12 @@
    ELSE
      defc __CLIB_CONIO_NATIVE_COLOUR = 0
    ENDIF
+
+   ; Delay when entering fgetc_cons()
+   ; 50ms stops rogue repeats nicely, but may need tuning
+   PUBLIC __CLIB_FGETC_CONS_DELAY
+   IFDEF CLIB_FGETC_CONS_DELAY
+     defc __CLIB_FGETC_CONS_DELAY = CLIB_FGETC_CONS_DELAY
+   ELSE
+     defc __CLIB_FGETC_CONS_DELAY = 50
+   ENDIF
