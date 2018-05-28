@@ -176,7 +176,7 @@ handle_character:
 	ld	d,a
 	ld	a,(__console_h)
 	cp	b
-	jr	nc,handle_character_no_scroll
+	jr	nz,handle_character_no_scroll
 	inc	hl
 	bit	6,(hl)
 	call	z,generic_console_scrollup
