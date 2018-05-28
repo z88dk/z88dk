@@ -1,8 +1,0 @@
-input/m5/in_WaitForKey
-input/m5/in_Inkey
-input/m5/in_GetKey
-input/m5/in_keytranstbl
-input/m5/in_WaitForNoKey
-input/m5/in_LookupKey
-input/m5/in_GetKeyReset
-input/m5/in_GetKeyVariables

@@ -1,5 +1,5 @@
-stdio/sc3000/fgetc_cons_inkey
-stdio/sc3000/getk_inkey
+stdio/inkey/fgetc_cons
+stdio/inkey/getk
 @stdio/ansicore.lst
 stdio/ansi/msx/f_ansi_attr
 stdio/ansi/msx/f_ansi_bel
@@ -11,7 +11,7 @@ stdio/ansi/msx/f_ansi_scrollup_nobios
 @font/font_8x8/font_8x8.lst
 @stdio/stdio.lst
 time/sc3000/clock
-@input/sc3000.lst
+@input/input_keyboard.lst
 @gfxbase.lst
 graphics/dcircle
 graphics/msx/gen_clg

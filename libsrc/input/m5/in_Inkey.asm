@@ -46,6 +46,10 @@ EXTERN in_keytranstbl
 	in	a,($36)
 	and	a
 	jr	nz, gotkey
+	ld	e,56
+	in	a,($50)
+	and	128
+	jr	nz,gotkey
 nokey:
 	ld	hl,0	
 	scf
@@ -64,11 +68,11 @@ hitkey_loop:
 doneinc:
 
 	; Check for shift and control
-	ld	bc, 56 * 2
+	ld	bc, 64 * 2
 	in	a,($30)
 	bit	0,a		;Control
 	jr	nz, got_modifier
-	ld	bc, 56
+	ld	bc, 64
 	and	@00001100	;Both shift keys
 	jr	nz,got_modifier
 	ld	bc,0

@@ -8,7 +8,7 @@ PUBLIC in_keytranstbl
 
 .in_keytranstbl
 
-; Each table 56 bytes
+; Each table 64  bytes
 
 ;Unshifted
 	defb	255, 255, 255, 255, 255, 255, ' ',  13	; Ctrl, Func, Lshift, Rshift, -, -, SPC, Return
@@ -18,6 +18,7 @@ PUBLIC in_keytranstbl
 	defb	'z', 'x', 'c', 'v', 'b', 'n', 'm', ','	; z, x, c, v, b, n, m, ','
 	defb	'9', '0', '-', '^', '.', '/', '~', '\\'	; 9, 0, '-', ^, '.', /, ~, \
 	defb	'o', 'p', '@', '[', 'l', ';', ':', ']'	; o, p, @, [, l, ;. :, ]
+	defb	255, 255, 255, 255, 255, 255, 255,  12	; -, -, -, -, -, -, -, RESET
 
 ;Shifted
 	defb	255, 255, 255, 255, 255, 255, ' ',  13	; Ctrl, Func, Lshift, Rshift, -, -, SPC, Return
@@ -27,6 +28,7 @@ PUBLIC in_keytranstbl
 	defb	'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<'	; z, x, c, v, b, n, m, ','
 	defb	')', '0', '=', '~', '>', '?', '_',  '|'	; 9, 0, '-', ^, '.', /, ~, \
 	defb	'O', 'P', '`', '{', 'L', '+', '*', '}'	; o, p, @, [, l, ;. :, ]
+	defb	255, 255, 255, 255, 255, 255, 255, 127	; -, -, -, -, -, -, -, RESET
 
 ;Control
 	defb	255, 255, 255, 255, 255, 255, ' ',  13	; Ctrl, Func, Lshift, Rshift, -, -, SPC, Return
@@ -36,4 +38,5 @@ PUBLIC in_keytranstbl
 	defb	 26,  23,   3,  22,   2,  14,  13, '<'	; z, x, c, v, b, n, m, ','
 	defb	')', '0', '=', '~', '>', '?', '_',  '|'	; 9, 0, '-', ^, '.', /, ~, \
 	defb	 15,  16, '`', '{',  12, '+', '*', '}'	; o, p, @, [, l, ;. :, ]
+	defb	255, 255, 255, 255, 255, 255, 255,  12	; -, -, -, -, -, -, -, RESET
 

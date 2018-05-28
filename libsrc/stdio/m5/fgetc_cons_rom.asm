@@ -10,14 +10,14 @@
 ;
 
         SECTION code_clib
-	PUBLIC	fgetc_cons
-	PUBLIC	_fgetc_cons
+	PUBLIC	fgetc_cons_rom
+	PUBLIC	_fgetc_cons_rom
 	EXTERN	msxbios
 
 	INCLUDE "target/m5/def/m5bios.def"
 
-.fgetc_cons
-._fgetc_cons
+.fgetc_cons_rom
+._fgetc_cons_rom
 	call	WTKDTC
 
 IF STANDARDESCAPECHARS

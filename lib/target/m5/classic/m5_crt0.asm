@@ -18,6 +18,7 @@
         defc    CONSOLE_COLUMNS = 32
         defc    CONSOLE_ROWS = 24
         defc    __CPU_CLOCK = 3580000
+	defc	CRT_KEY_DEL = 12
 
 IF startup = 2
 	INCLUDE	"target/m5/classic/rom.asm"

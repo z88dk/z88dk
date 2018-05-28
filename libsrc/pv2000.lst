@@ -1,6 +1,6 @@
 @stdio/ansicore.lst
-stdio/pv2000/fgetc_cons
-stdio/pv2000/getk
+stdio/inkey/fgetc_cons
+stdio/inkey/getk
 stdio/ansi/msx/f_ansi_attr
 stdio/ansi/msx/f_ansi_bel
 stdio/ansi/msx/f_ansi_char
@@ -10,7 +10,7 @@ stdio/ansi/msx/f_ansi_scrollup_nobios
 @stdio/tms9918/tms9918.lst
 @stdio/stdio.lst
 @font/font_8x8/font_8x8.lst
-@input/pv2000.lst
+@input/input_keyboard.lst
 graphics/dcircle
 graphics/msx/gen_clg
 graphics/clrarea

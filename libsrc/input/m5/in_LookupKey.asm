@@ -28,23 +28,23 @@ EXTERN in_keytranstbl
 ._in_LookupKey
 	ld	a,l
 	ld	hl,in_keytranstbl
-	ld	bc,56 * 3
+	ld	bc,64 * 3
 	cpir
 	jr	nz,notfound
 
-	ld	a,+(56 * 3) - 1
+	ld	a,+(64 * 3) - 1
 	sub	c		;A = position in table
 	ld	hl,0
-	cp	56 * 2
+	cp	64 * 2
 	jr	c,not_control
 	set	6,l
-	sub	56 * 2
+	sub	64 * 2
 	jr	gotit
 not_control:
-	cp	56
+	cp	64
 	jr	c, gotit
 	set	7,l
-	sub	56
+	sub	64
 	jr	gotit
 
 notfound:
@@ -75,6 +75,10 @@ got_mask:
 	; c = line number
 	; l = flags
 	ld	a,c
+	cp	8
+	jr	c, not_line_50
+	add	$12
+not_line_50:
 	add	$30
 	or	l		;add in flags
 	ld	l,a

@@ -1,6 +1,5 @@
 @input/spectrum.lst
 stdio/spectrum/fgetc_cons
-stdio/spectrum/fgetc_cons_inkey
 stdio/spectrum/fputc_cons_rom_rst
 stdio/ts2068/fputc_cons
 stdio/spectrum/getk

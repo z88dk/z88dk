@@ -1,6 +1,8 @@
-stdio/m5/fgetc_cons
-stdio/m5/getk
-stdio/m5/fputc_cons
+stdio/inkey/fgetc_cons
+stdio/inkey/getk
+stdio/m5/fgetc_cons_rom
+stdio/m5/getk_rom
+stdio/m5/fputc_cons_rom
 @stdio/ansicore.lst
 stdio/ansi/msx/f_ansi_attr
 stdio/ansi/msx/f_ansi_bel
@@ -11,7 +13,7 @@ stdio/ansi/msx/f_ansi_scrollup_nobios
 @stdio/tms9918/tms9918.lst
 @stdio/stdio.lst
 @font/font_8x8/font_8x8.lst
-@input/m5.lst
+@input/input_keyboard.lst
 @gfxbase.lst
 graphics/dcircle
 graphics/msx/gen_clg
