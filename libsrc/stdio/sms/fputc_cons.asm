@@ -4,6 +4,7 @@
 	INCLUDE "sms/sms.hdr"
 
 	EXTERN	VRAMToHL
+	PUBLIC	fputc_vdp_offs
 	
 .fputc_cons_native
 	ld	a, (fputc_vdp_offs)
