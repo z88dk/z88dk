@@ -3,11 +3,14 @@
 tms9118_interrupt:
 	push	af
 	push	hl
-IF VDP_STATUS >= 256
+	ld	a, +(VDP_STATUS / 256)
+	and	a
+	jr	z,read_port
 	ld	a,(VDP_STATUS)
-ELSE
-	in	a,(VDP_STATUS)
-ENDIF
+	jr	done_read
+read_port:
+	in	a,(VDP_STATUS % 256)
+done_read:
 	or	a
 	jp	p,int_not_VBL
 	jr	int_VBL
