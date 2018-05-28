@@ -1,12 +1,12 @@
-
+	EXTERN	VDP_STATUS
 
 tms9118_interrupt:
 	push	af
 	push	hl
-IF VDP_PORT >= 256
-	ld	a,(VDP_PORT)
+IF VDP_STATUS >= 256
+	ld	a,(VDP_STATUS)
 ELSE
-	in	a,(VDP_PORT)
+	in	a,(VDP_STATUS)
 ENDIF
 	or	a
 	jp	p,int_not_VBL

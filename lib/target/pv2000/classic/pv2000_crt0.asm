@@ -97,7 +97,6 @@ start1: ld      sp,0            ;Restore stack to entry value
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
 
-	defc	VDP_PORT = 0x4001
 	INCLUDE	"crt/classic/tms9118/interrupt.asm"
 	INCLUDE	"crt/classic/tms9118/interrupt_handler.asm"
 

@@ -13,7 +13,6 @@ stdio/ansi/msx/f_ansi_scrollup_nobios
 @font/font_8x8/font_8x8.lst
 @input/m5.lst
 @gfxbase.lst
-@msx/genmsx.lst
 graphics/dcircle
 graphics/msx/gen_clg
 graphics/clrarea

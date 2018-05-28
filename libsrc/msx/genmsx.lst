@@ -13,3 +13,4 @@ msx/obj/test/msx_set_sprite_16
 msx/obj/test/msx_set_sprite_8
 msx/obj/test/msx_set_sprite_mode
 msx/obj/test/msx_vfill_v
+msx/vdpport

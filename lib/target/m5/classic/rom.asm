@@ -68,7 +68,6 @@ cleanup_exit:
         pop     bc				; return code (still not sure it is teh right one !)
         ret
 
-	defc	VDP_PORT = 0x11
 
 	INCLUDE	"crt/classic/tms9118/interrupt.asm"
 	INCLUDE	"crt/classic/tms9118/interrupt_handler.asm"
