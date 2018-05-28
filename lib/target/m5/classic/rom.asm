@@ -26,6 +26,10 @@ l_ret:	ret
 
 
 start:
+	di
+	; Overwrite the system vbl interrupt handler with ours
+	ld	hl,tms9118_interrupt
+	ld	($7006),hl
 
 
         INCLUDE "crt/classic/crt_init_sp.asm"
@@ -35,6 +39,7 @@ start:
         ld      (exitsp),sp
 	ld	hl,2
 	call	msx_set_mode
+	ei
 
 
 ; Optional definition for auto MALLOC init
@@ -63,6 +68,10 @@ cleanup_exit:
         pop     bc				; return code (still not sure it is teh right one !)
         ret
 
+	defc	VDP_PORT = 0x11
+
+	INCLUDE	"crt/classic/tms9118/interrupt.asm"
+	INCLUDE	"crt/classic/tms9118/interrupt_handler.asm"
 
         defc    __crt_org_bss = CRT_ORG_BSS
         ; If we were given a model then use it

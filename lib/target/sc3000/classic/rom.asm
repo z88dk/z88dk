@@ -67,33 +67,7 @@ endif
 if (ASMPC<>$0038)
         defs    CODE_ALIGNMENT_ERROR
 endif
-; IM1 interrupt routine
-int_RASTER:
-	push	hl
-	
-;	ld	a, ($BF)
-;	or	a
-;	jp	p, int_not_VBL	; Bit 7 not set
-;	jr	int_VBL
-
-int_not_VBL:
-	pop	hl
-	reti
-	
-int_VBL:
-	ld	hl, timer
-	ld	a, (hl)
-	inc	a
-	ld	(hl), a
-	inc	hl
-	ld	a, (hl)
-	adc	a, 1
-	ld	(hl), a		;Increments the timer
-	
-	ld	hl, raster_procs
-	call	int_handler
-	pop	hl
-	reti
+	INCLUDE	"crt/classic/tms/interrupt.asm"
 
         defs    $0066 - ASMPC
 if (ASMPC<>$0066)
@@ -113,33 +87,7 @@ int_PAUSE:
 	pop	hl
 	retn
 
-int_handler:
-	push	af
-	push	bc
-	push	de
-int_loop:
-	ld	a, (hl)
-	inc	hl
-	or	(hl)
-	jr	z, int_done
-	push	hl
-	ld	a, (hl)
-	dec	hl
-	ld	l, (hl)
-	ld	h, a
-	call	call_int_handler
-	pop	hl
-	inc	hl
-	jr	int_loop
-int_done:
-	pop	de
-	pop	bc
-	pop	af
-	ret
-
-call_int_handler:
-	jp	(hl)
-
+	INCLUDE	"crt/classic/tms/interrupt_handler.asm"
 
 restart10:
 restart08:
