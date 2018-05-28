@@ -3,7 +3,11 @@
 tms9118_interrupt:
 	push	af
 	push	hl
+IF VDP_PORT >= 256
+	ld	a,(VDP_PORT)
+ELSE
 	in	a,(VDP_PORT)
+ENDIF
 	or	a
 	jp	p,int_not_VBL
 	jr	int_VBL

@@ -3,11 +3,6 @@
 	PUBLIC	aplib_depack
 	PUBLIC	_aplib_depack
 
-	EXTERN	aPLibMemory_bits
-	EXTERN	aPLibMemory_byte
-	EXTERN	aPLibMemory_LWM
-	EXTERN	aPLibMemory_R0
-
 ;==============================================================
 ; aplib_depack(unsigned char *src, unsigned char *dest)	
 ;==============================================================
@@ -235,3 +230,9 @@
 		ldir
 	pop hl
 	jr aploop
+
+	SECTION		bss_crt
+aPLibMemory_bits:       defb    0       ;apLib support variable
+aPLibMemory_byte:       defb    0       ;apLib support variable
+aPLibMemory_LWM:        defb    0       ;apLib support variable
+aPLibMemory_R0:         defw    0       ;apLib support variable
