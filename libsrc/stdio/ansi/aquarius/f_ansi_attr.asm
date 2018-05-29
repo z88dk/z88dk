@@ -19,6 +19,7 @@
 
         SECTION data_clib
 	EXTERN	__aquarius_attr
+	EXTERN	__aquarius_inverse
 
         SECTION code_clib
 
