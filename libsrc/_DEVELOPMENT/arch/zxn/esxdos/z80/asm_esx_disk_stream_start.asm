@@ -55,16 +55,16 @@ ELSE
 ENDIF
 
    ld (__esx_stream_protocol_address),de
-	ld (__esx_stream_protocol_address + 2),hl
-	
-	ld (__esx_stream_protocol_sectors),bc
+   ld (__esx_stream_protocol_address + 2),hl
+   
+   ld (__esx_stream_protocol_sectors),bc
 
    ; ixde = card address
    ;   bc = sectors
    
    ld a,(__esx_stream_card_flags)
    
-   rst __ESXDOS_SYSCALL
+   rst __ESX_RST_SYS
    defb __ESX_DISK_STRMSTART
 
    jp c, __esxdos_error_zc

@@ -1,4 +1,4 @@
-; unsigned char esx_f_chmod(unsigned char *filename, uint8_t attr_change, uint8_t attr)
+; unsigned char esx_f_chmod(unsigned char *filename, uint8_t attr_mask, uint8_t attr)
 
 INCLUDE "config_private.inc"
 
@@ -26,7 +26,9 @@ asm_esx_f_chmod:
    ;            carry set, errno set
    ;
    ; uses  : af, bc, de, hl, ix
-   
+
+   ld a,'*'
+
 IF __SDCC_IY
    push hl
    pop iy
@@ -35,7 +37,7 @@ ELSE
    pop ix
 ENDIF
 
-   rst __ESXDOS_SYSCALL
+   rst __ESX_RST_SYS
    defb __ESX_F_CHMOD
 
    jp nc, error_znc

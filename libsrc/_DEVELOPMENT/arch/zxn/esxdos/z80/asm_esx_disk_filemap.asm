@@ -16,7 +16,7 @@ asm_esx_disk_filemap:
    ;
    ; exit  : success
    ;
-   ;            hl = fmap->mapsz = number of entries filled in
+   ;            hl = fmap->mapsz (modified) = number of entries filled in
    ;            carry reset
    ;
    ;         fail
@@ -48,7 +48,7 @@ ELSE
    pop ix
 ENDIF
 
-   rst __ESXDOS_SYSCALL
+   rst __ESX_RST_SYS
    defb __ESX_DISK_FILEMAP
    
    pop hl

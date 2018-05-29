@@ -26,7 +26,7 @@ asm_esx_f_ftrunc:
    ;
    ; uses  : af, bc, de, hl
 
-   rst __ESXDOS_SYSCALL
+   rst __ESX_RST_SYS
    defb __ESX_F_FTRUNCATE
 
    jp nc, error_znc

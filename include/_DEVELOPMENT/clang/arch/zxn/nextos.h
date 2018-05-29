@@ -91,6 +91,8 @@ extern unsigned char GLOBAL_ZXN_PORT_DFFD;
 // 3. esx_disk_stream_sectors : load whole sectors from the span
 // 4. esx_disk_stream_bytes   : load bytes from the span (only use for last access to span)
 // 5. esx_disk_stream_end     : terminate streaming from span
+//
+// No other esxdos calls allowed between steps 2-5
 
 struct esx_filemap_entry
 {
@@ -259,6 +261,10 @@ extern uint32_t esx_f_getfree(void);
 
 // OPERATIONS ON DIRECTORIES
 
+#define ESX_PATHNAME_MAX __ESX_PATHNAME_MAX     // max pathname length in bytes including terminating 0, ~256 bytes
+#define ESX_FILENAME_MAX __ESX_FILENAME_MAX     // max filename length in bytes not including terminating 0, ~12 bytes
+#define ESX_FILENAME_LFN_MAX __ESX_FILENAME_LFN_MAX   // max lfn filename length in bytes not including terminating 0, ~260 bytes
+
 struct esx_p3_hdr
 {
    uint8_t  type;    // 0 = program, 1 = numeric array, 2 = char array, 3 = code
@@ -268,30 +274,32 @@ struct esx_p3_hdr
 };
 
 struct esx_dirent
-{                                         // <byte>   attributes
-   uint8_t attr;                          // <asciiz> name
-   uint8_t dir[__ESX_NAME_MAX+1+8];       // <dword>  date-time
-};                                        // <dword>  size
+{                                           // <byte>   attributes
+   uint8_t attr;                            // <asciiz> name
+   uint8_t dir[ESX_FILENAME_MAX+1+8];       // <dword>  date-time
+};                                          // <dword>  size
 
 struct esx_dirent_p3
 {
    uint8_t attr;
-   uint8_t dir[__ESX_NAME_MAX+1+8];
+   uint8_t dir[ESX_FILENAME_MAX+1+8];
 	struct esx_p3_hdr p3;
 };
 
 struct esx_dirent_lfn
-{                                         // <byte>   attributes
-   uint8_t attr;                          // <asciiz> name
-   uint8_t dir[__ESX_LFN_NAME_MAX+1+8];   // <dword>  date-time
-};                                        // <dword>  size
+{                                           // <byte>   attributes
+   uint8_t attr;                            // <asciiz> name
+   uint8_t dir[ESX_FILENAME_LFN_MAX+1+8];   // <dword>  date-time
+};                                          // <dword>  size
 
 struct esx_dirent_lfn_p3
 {
    uint8_t attr;
-   uint8_t dir[__ESX_LFN_NAME_MAX+1+8];
+   uint8_t dir[ESX_FILENAME_LFN_MAX+1+8];
 	struct esx_p3_hdr p3;
 };
+
+// slice dirent to access members following filename
 
 struct esx_dirent_slice
 {
@@ -306,8 +314,10 @@ struct esx_dirent_slice_p3
 	struct esx_p3_hdr p3;
 };
 
-#define ESX_OPENDIR_MODE_LFN  
-#define ESX_OPENDIR_MODE_P3
+// opendir_ex modes
+
+#define ESX_DIR_USE_LFN     __esx_dir_use_lfn
+#define ESX_DIR_USE_HEADER  __esx_dir_use_header
 
 extern unsigned char esx_f_opendir(unsigned char *dirname);
 
@@ -318,6 +328,17 @@ extern unsigned char esx_f_opendir_ex(unsigned char *dirname,uint8_t mode);
 extern unsigned char esx_f_closedir(unsigned char handle);
 
 
+
+// file attributes
+
+#define ESX_A_RDO   __esx_a_rdo     // read only
+#define ESX_A_HID   __esx_a_hid     // hide in normal dir listings
+#define ESX_A_SYS   __esx_a_sys     // system file (must not be physically moved)
+#define ESX_A_VOL   __esx_a_vol     // filename is a volume label
+#define ESX_A_DIR   __esx_a_dir     // directory
+#define ESX_A_ARCH  __esx_a_arch    // file has been modified since last backup
+#define ESX_A_DEV   __esx_a_dev     // device
+#define ESX_A_RES   __esx_a_res     // reserved
 
 extern unsigned char esx_f_readdir(unsigned char handle,void *esx_dirent);
 
@@ -336,7 +357,7 @@ extern unsigned char esx_f_rewinddir(unsigned char handle);
 
 
 
-extern unsigned char esx_f_getcwd(unsigned char *buf);
+extern unsigned char esx_f_getcwd(unsigned char *pathname);
 
 
 extern unsigned char esx_f_chdir(unsigned char *pathname);
@@ -360,6 +381,22 @@ struct esx_stat
    struct dos_tm time;   // time.h contains functions dealing with dos time
    uint32_t      size;
 };
+
+// file open mode
+
+// at least one of:
+
+#define ESX_MODE_READ  __esx_mode_read
+#define ESX_MODE_WRITE  __esx_mode_write
+
+// one of:
+
+#define ESX_MODE_OPEN_EXIST  __esx_mode_open_exist
+#define ESX_MODE_OPEN_CREAT  __esx_mode_open_creat
+#define ESX_MODE_OPEN_CREAT_NOEXIST  __esx_mode_creat_noexist
+#define ESX_MODE_OPEN_CREAT_TRUNC  __esx_mode_creat_trunc
+
+#define ESX_MODE_USE_HEADER  __esx_mode_use_header
 
 extern unsigned char esx_f_open(unsigned char *filename,unsigned char mode);
 
@@ -397,14 +434,7 @@ extern unsigned char esx_f_ftrunc(unsigned char handle,uint32_t size);
 
 // DIRECT OPERATIONS ON FILES
 
-#define ESX_ATTR_WRITE
-#define ESX_ATTR_READ
-#define ESX_ATTR_RDWR
-#define ESX_ATTR_HIDDEN
-#define ESX_ATTR_SYSTEM
-#define ESX_ATTR_ARCH
-
-extern unsigned char esx_f_chmod(unsigned char *filename,uint8_t attr_change,uint8_t attr);
+extern unsigned char esx_f_chmod(unsigned char *filename,uint8_t attr_mask,uint8_t attr);
 
 
 extern unsigned char esx_f_rename(unsigned char *old,unsigned char *new);
@@ -420,4 +450,41 @@ extern unsigned char esx_f_unlink(unsigned char *filename);
 
 
 
-#endif
+// ESX ERROR CODES
+
+#define ESX_OK  __ESX_OK                       // 0 OK 0:1
+#define ESX_EOK  __ESX_EOK                     // O.K. ESXDOS, 0:1
+#define ESX_ENONSENSE  __ESX_ENONSENSE         // Nonsense in ESXDOS, 0:1
+#define ESX_ESTEND  __ESX_ESTEND               // Statement END error, 0:1
+#define ESX_EWRTYPE  __ESX_EWRTYPE             // Wrong file TYPE, 0:1
+#define ESX_ENOENT  __ESX_ENOENT               // No such FILE or DIR, 0:1
+#define ESX_EIO  __ESX_EIO                     // I/O ERROR, 0:1
+#define ESX_EINVAL  __ESX_EINVAL               // Invalid FILENAME, 0:1
+#define ESX_EACCES  __ESX_EACCES               // Access DENIED, 0:1
+#define ESX_ENOSPC  __ESX_ENOSPC               // Drive FULL, 0:1
+#define ESX_ENXIO  __ESX_ENXIO                 // Invalid I/O REQUEST, 0:1
+#define ESX_ENODRV  __ESX_ENODRV               // No such DRIVE, 0:1
+#define ESX_ENFILE  __ESX_ENFILE               // Too many OPEN FILES, 0:1
+#define ESX_EBADF  __ESX_EBADF                 // Bad file DESCRIPTOR, 0:1
+#define ESX_ENODEV  __ESX_ENODEV               // No such DEVICE, 0:1
+#define ESX_EOVERFLOW  __ESX_EOVERFLOW         // File pointer OVERFLOW, 0:1
+#define ESX_EISDIR  __ESX_EISDIR               // Is a DIRECTORY, 0:1
+#define ESX_ENOTDIR  __ESX_ENOTDIR             // Not a DIRECTORY, 0:1
+#define ESX_EEXIST  __ESX_EEXIST               // File already EXISTS, 0:1
+#define ESX_EPATH  __ESX_EPATH                 // Invalid PATH, 0:1
+#define ESX_ENOSYS  __ESX_ENOSYS               // No SYS, 0:1
+#define ESX_ENAMETOOLONG  __ESX_ENAMETOOLONG   // Path too LONG, 0:1
+#define ESX_ENOCMD  __ESX_ENOCMD               // No such COMMAND, 0:1
+#define ESX_EINUSE  __ESX_EINUSE               // File in USE, 0:1
+#define ESX_ERDONLY  __ESX_ERDONLY             // File is READ ONLY, 0:1
+#define ESX_EVERIFY  __ESX_EVERIFY             // Verify FAILED, 0:1
+#define ESX_ELOADINGKO  __ESX_ELOADINGKO       // Loading .KO FAILED, 0:1
+#define ESX_EDIRINUSE  __ESX_EDIRINUSE         // Directory NOT EMPTY, 0:1
+#define ESX_EMAPRAMACTIVE  __ESX_EMAPRAMACTIVE // MAPRAM is ACTIVE, 0:1
+#define ESX_EDRIVEBUSY  __ESX_EDRIVEBUSY       // Drive is BUSY, 0:1
+#define ESX_EFSUNKNOWN  __ESX_EFSUNKNOWN       // Unknown FILESYSTEM, 0:1
+#define ESX_EDEVICEBUSY  __ESX_EDEVICEBUSY     // Device is BUSY, 0:1
+
+#define ESX_EMAXCODE  __ESX_EMAXCODE           // Largest valid error code
+
+//endif

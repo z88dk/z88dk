@@ -29,7 +29,7 @@ asm_esx_disk_stream_end:
    
    ld a,(__esx_stream_card_flags)
    
-   rst __ESXDOS_SYSCALL
+   rst __ESX_RST_SYS
    defb __ESX_DISK_STRMEND
    
    jp nc, error_mnc

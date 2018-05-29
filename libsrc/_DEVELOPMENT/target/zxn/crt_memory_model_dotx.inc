@@ -60,6 +60,7 @@ section code_dot
 section rodata_dot
 section smc_dot
 section data_dot
+section bss_esxdos
 section bss_dot
 section bss_dot_uninitialized
 

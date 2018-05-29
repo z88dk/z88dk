@@ -26,7 +26,7 @@ asm_esx_f_open:
    ;
    ; uses  : af, bc, de, hl, ix
 
-   and ~__ESX_MODE_USE_HEADER  ; make sure +3 header is disabled
+   and ~__esx_mode_use_header  ; make sure +3 header is disabled
    ld b,a
    
    ld a,'*'
@@ -39,7 +39,7 @@ ELSE
    pop ix
 ENDIF
 
-   rst __ESXDOS_SYSCALL
+   rst __ESX_RST_SYS
    defb __ESX_F_OPEN
 
    ld l,a

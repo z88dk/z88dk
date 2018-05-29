@@ -142,12 +142,13 @@ ide_read_sector:
 
 error_sd:
 
-   dec d                       ; d = number of sectors remaining
-
    ld a,e
    sub d
    ld e,a                      ; e = number of sectors read
    ld d,0
+   
+   dec h
+   dec h                       ; hl -= 512 (failed sector)
    
    call update_filemap
 

@@ -12,8 +12,8 @@ EXTERN __esxdos_error_mc
 asm_esx_f_getcwd:
 
    ; enter : hl = buf
-	;
-	; exit  : success
+   ;
+   ; exit  : success
    ;
    ;            hl = 0
    ;            carry reset
@@ -22,11 +22,11 @@ asm_esx_f_getcwd:
    ;
    ;            hl = -1
    ;            carry set, errno set
-	;
-	; uses  : af, bc, de, hl, ix
-	
+   ;
+   ; uses  : af, bc, de, hl, ix
+   
    ld a,'*'
-	
+   
 IF __SDCC_IY
    push hl
    pop iy
@@ -35,11 +35,11 @@ ELSE
    pop ix
 ENDIF
 
-   rst __ESXDOS_SYSCALL
+   rst __ESX_RST_SYS
    defb __ESX_F_GETCWD
-	
-	jp nc, error_znc
-	jp __esxdos_error_mc
+   
+   jp nc, error_znc
+   jp __esxdos_error_mc
 
 
 ; ***************************************************************************

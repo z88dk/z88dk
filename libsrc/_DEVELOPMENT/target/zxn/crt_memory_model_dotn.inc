@@ -80,6 +80,7 @@ section bss_arch
 section bss_clib
 section bss_compress_aplib
 section bss_error
+section bss_esxdos
 section bss_fcntl
 section bss_input
 section bss_stdio

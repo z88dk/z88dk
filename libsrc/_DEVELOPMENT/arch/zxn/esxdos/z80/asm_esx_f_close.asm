@@ -27,7 +27,7 @@ asm_esx_f_close:
    
    ld a,l
    
-   rst __ESXDOS_SYSCALL
+   rst __ESX_RST_SYS
    defb __ESX_F_CLOSE
 
    jp nc, error_znc

@@ -2115,47 +2115,6 @@
 
 #define __NEXTOS_DOTN_SP_DIVMMC  0x4000
 
-#define __ESX_DISK_FILEMAP  0x85
-#define __ESX_DISK_STRMSTART  0x86
-#define __ESX_DISK_STRMEND  0x87
-
-#define __ESX_M_DOSVERSION  0x88
-#define __ESX_M_GETSETDRV  0x89
-#define __ESX_M_TAPEIN  0x8b
-#define __ESX_M_TAPEOUT  0x8c
-#define __ESX_M_GETHANDLE  0x8d
-#define __ESX_M_GETDATE  0x8e
-#define __ESX_M_EXECCMD  0x8f
-#define __ESX_M_DRVAPI  0x92
-#define __ESX_M_GETERR  0x93
-#define __ESX_M_P3DOS  0x94
-#define __ESX_M_ERRH  0x95
-
-#define __ESX_F_OPEN  0x9a
-#define __ESX_F_CLOSE  0x9b
-#define __ESX_F_SYNC  0x9c
-#define __ESX_F_READ  0x9d
-#define __ESX_F_WRITE  0x9e
-#define __ESX_F_SEEK  0x9f
-#define __ESX_F_FGETPOS  0xa0
-#define __ESX_F_FSTAT  0xa1
-#define __ESX_F_FTRUNCATE  0xa2
-#define __ESX_F_OPENDIR  0xa3
-#define __ESX_F_READDIR  0xa4
-#define __ESX_F_TELLDIR  0xa5
-#define __ESX_F_SEEKDIR  0xa6
-#define __ESX_F_REWINDDIR  0xa7
-#define __ESX_F_GETCWD  0xa8
-#define __ESX_F_CHDIR  0xa9
-#define __ESX_F_MKDIR  0xaa
-#define __ESX_F_RMDIR  0xab
-#define __ESX_F_STAT  0xac
-#define __ESX_F_UNLINK  0xad
-#define __ESX_F_TRUNCATE  0xae
-#define __ESX_F_CHMOD  0xaf
-#define __ESX_F_RENAME  0xb0
-#define __ESX_F_GETFREE  0xb1
-
 #define __NEXTOS_RC_READY  0
 #define __NEXTOS_RC_WP  1
 #define __NEXTOS_RC_SEEK  2
@@ -2198,6 +2157,137 @@
 #define __NEXTOS_RC_CMDPHASE  67
 #define __NEXTOS_RC_DATAPHASE  68
 #define __NEXTOS_RC_NOTDIR  69
+
+#define __ESX_RST_SYS  0x08
+#define __ESX_RST_ROM  0x18
+#define __ESX_RST_EXITDOT  0x20
+
+#define __ESX_PATHNAME_MAX  256
+#define __ESX_FILENAME_MAX  12
+#define __ESX_FILENAME_LFN_MAX  260
+
+#define __ESX_DISK_FILEMAP  0x85
+#define __ESX_DISK_STRMSTART  0x86
+#define __ESX_DISK_STRMEND  0x87
+
+#define __ESX_M_DOSVERSION  0x88
+#define __ESX_M_GETSETDRV  0x89
+
+#define __ESX_M_TAPEIN  0x8b
+#define __esx_tapein_open  0
+#define __esx_tapein_close  1
+#define __esx_tapein_info  2
+#define __esx_tapein_setpos  3
+#define __esx_tapein_getpos  4
+#define __esx_tapein_pause  5
+#define __esx_tapein_flags  6
+
+#define __ESX_M_TAPEOUT  0x8c
+#define __esx_tapeout_open  0
+#define __esx_tapeout_close  1
+#define __esx_tapeout_info  2
+#define __esx_tapeout_trunc  3
+
+#define __ESX_M_GETHANDLE  0x8d
+#define __ESX_M_GETDATE  0x8e
+#define __ESX_M_EXECCMD  0x8f
+#define __ESX_M_DRVAPI  0x92
+#define __ESX_M_GETERR  0x93
+#define __ESX_M_P3DOS  0x94
+#define __ESX_M_ERRH  0x95
+
+#define __ESX_F_OPEN  0x9a
+#define __esx_mode_read  0x01
+#define __esx_mode_write  0x02
+#define __esx_mode_use_header  0x40
+#define __esx_mode_open_exist  0x00
+#define __esx_mode_open_creat  0x08
+#define __esx_mode_create_noexist  0x04
+#define __esx_mode_create_trunc  0x0c
+
+#define __ESX_F_CLOSE  0x9b
+#define __ESX_F_SYNC  0x9c
+#define __ESX_F_READ  0x9d
+#define __ESX_F_WRITE  0x9e
+
+#define __ESX_F_SEEK  0x9f
+#define __esx_seek_set  0x00
+#define __esx_seek_fwd  0x01
+#define __esx_seek_bwd  0x02
+
+#define __ESX_F_FGETPOS  0xa0
+#define __ESX_F_FSTAT  0xa1
+#define __ESX_F_FTRUNCATE  0xa2
+
+#define __ESX_F_OPENDIR  0xa3
+#define __esx_dir_use_lfn  0x10
+#define __esx_dir_use_header  0x40
+
+#define __ESX_F_READDIR  0xa4
+#define __esx_a_hid  0x02
+#define __esx_a_sys  0x04
+#define __esx_a_vol  0x08
+#define __esx_a_dir  0x10
+#define __esx_a_arch  0x20
+#define __esx_a_dev  0x40
+#define __esx_a_res  0x80
+
+#define __ESX_F_TELLDIR  0xa5
+#define __ESX_F_SEEKDIR  0xa6
+#define __ESX_F_REWINDDIR  0xa7
+#define __ESX_F_GETCWD  0xa8
+#define __ESX_F_CHDIR  0xa9
+#define __ESX_F_MKDIR  0xaa
+#define __ESX_F_RMDIR  0xab
+#define __ESX_F_STAT  0xac
+#define __ESX_F_UNLINK  0xad
+#define __ESX_F_TRUNCATE  0xae
+
+#define __ESX_F_CHMOD  0xaf
+#define __esx_a_write  __esx_a_write
+#define __esx_a_read  __esx_a_read
+#define __esx_a_rdwr  __esx_a_rdwr
+#define __esx_a_hidden  __esx_a_hidden
+#define __esx_a_system  __esx_a_system
+#define __esx_a_arch  0x20
+
+#define __ESX_F_RENAME  0xb0
+#define __ESX_F_GETFREE  0xb1
+
+#define __ESX_OK  0
+#define __ESX_EOK  1
+#define __ESX_ENONSENSE  2
+#define __ESX_ESTEND  3
+#define __ESX_EWRTYPE  4
+#define __ESX_ENOENT  5
+#define __ESX_EIO  6
+#define __ESX_EINVAL  7
+#define __ESX_EACCES  8
+#define __ESX_ENOSPC  9
+#define __ESX_ENXIO  10
+#define __ESX_ENODRV  11
+#define __ESX_ENFILE  12
+#define __ESX_EBADF  13
+#define __ESX_ENODEV  14
+#define __ESX_EOVERFLOW  15
+#define __ESX_EISDIR  16
+#define __ESX_ENOTDIR  17
+#define __ESX_EEXIST  18
+#define __ESX_EPATH  19
+#define __ESX_ENOSYS  20
+#define __ESX_ENAMETOOLONG  21
+#define __ESX_ENOCMD  22
+#define __ESX_EINUSE  23
+#define __ESX_ERDONLY  24
+#define __ESX_EVERIFY  25
+#define __ESX_ELOADINGKO  26
+#define __ESX_EDIRINUSE  27
+#define __ESX_EMAPRAMACTIVE  28
+#define __ESX_EDRIVEBUSY  29
+#define __ESX_EFSUNKNOWN  30
+#define __ESX_EDEVICEBUSY  31
+
+#define __ESX_EMAXCODE  31
 
 
 
