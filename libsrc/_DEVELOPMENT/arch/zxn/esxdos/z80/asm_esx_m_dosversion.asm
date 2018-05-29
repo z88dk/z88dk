@@ -31,7 +31,7 @@ asm_esx_m_dosversion:
    ;
    ; uses  : af, bc, de, hl
 
-   rst __ESXDOS_SYSCALL
+   rst __ESX_RST_SYS
    defb __ESX_M_DOSVERSION
 
    jp c, error_mc              ; esxdos <= 0.8.6

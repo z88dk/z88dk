@@ -3927,8 +3927,8 @@ PUBLIC __esx_mode_write
 PUBLIC __esx_mode_use_header
 PUBLIC __esx_mode_open_exist
 PUBLIC __esx_mode_open_creat
-PUBLIC __esx_mode_create_noexist
-PUBLIC __esx_mode_create_trunc
+PUBLIC __esx_mode_creat_noexist
+PUBLIC __esx_mode_creat_trunc
 
 PUBLIC __ESX_F_CLOSE
 PUBLIC __ESX_F_SYNC
@@ -3949,14 +3949,14 @@ PUBLIC __esx_dir_use_lfn
 PUBLIC __esx_dir_use_header
 
 PUBLIC __ESX_F_READDIR
-PUBLIC __esx_a_rdo
-PUBLIC __esx_a_hid
-PUBLIC __esx_a_sys
-PUBLIC __esx_a_vol
-PUBLIC __esx_a_dir
-PUBLIC __esx_a_arch
-PUBLIC __esx_a_dev
-PUBLIC __esx_a_res
+PUBLIC __esx_dir_a_rdo
+PUBLIC __esx_dir_a_hid
+PUBLIC __esx_dir_a_sys
+PUBLIC __esx_dir_a_vol
+PUBLIC __esx_dir_a_dir
+PUBLIC __esx_dir_a_arch
+PUBLIC __esx_dir_a_dev
+PUBLIC __esx_dir_a_res
 
 PUBLIC __ESX_F_TELLDIR
 PUBLIC __ESX_F_SEEKDIR
@@ -3968,7 +3968,17 @@ PUBLIC __ESX_F_RMDIR
 PUBLIC __ESX_F_STAT
 PUBLIC __ESX_F_UNLINK
 PUBLIC __ESX_F_TRUNCATE
+
 PUBLIC __ESX_F_CHMOD
+PUBLIC __esx_a_write
+PUBLIC __esx_a_read
+PUBLIC __esx_a_rdwr
+PUBLIC __esx_a_hidden
+PUBLIC __esx_a_system
+PUBLIC __esx_a_arch
+PUBLIC __esx_a_exec
+PUBLIC __esx_a_all
+
 PUBLIC __ESX_F_RENAME
 PUBLIC __ESX_F_GETFREE
 
@@ -4221,8 +4231,8 @@ defc __esx_mode_write = 0x02
 defc __esx_mode_use_header = 0x40
 defc __esx_mode_open_exist = 0x00
 defc __esx_mode_open_creat = 0x08
-defc __esx_mode_create_noexist = 0x04
-defc __esx_mode_create_trunc = 0x0c
+defc __esx_mode_creat_noexist = 0x04
+defc __esx_mode_creat_trunc = 0x0c
 
 defc __ESX_F_CLOSE = 0x9b
 defc __ESX_F_SYNC = 0x9c
@@ -4243,13 +4253,13 @@ defc __esx_dir_use_lfn = 0x10
 defc __esx_dir_use_header = 0x40
 
 defc __ESX_F_READDIR = 0xa4
-defc __esx_a_hid = 0x02
-defc __esx_a_sys = 0x04
-defc __esx_a_vol = 0x08
-defc __esx_a_dir = 0x10
-defc __esx_a_arch = 0x20
-defc __esx_a_dev = 0x40
-defc __esx_a_res = 0x80
+defc __esx_dir_a_hid = 0x02
+defc __esx_dir_a_sys = 0x04
+defc __esx_dir_a_vol = 0x08
+defc __esx_dir_a_dir = 0x10
+defc __esx_dir_a_arch = 0x20
+defc __esx_dir_a_dev = 0x40
+defc __esx_dir_a_res = 0x80
 
 defc __ESX_F_TELLDIR = 0xa5
 defc __ESX_F_SEEKDIR = 0xa6
@@ -4261,7 +4271,17 @@ defc __ESX_F_RMDIR = 0xab
 defc __ESX_F_STAT = 0xac
 defc __ESX_F_UNLINK = 0xad
 defc __ESX_F_TRUNCATE = 0xae
+
 defc __ESX_F_CHMOD = 0xaf
+defc __esx_a_write = 0x01
+defc __esx_a_read = 0x80
+defc __esx_a_rdwr = 0x81
+defc __esx_a_hidden = 0x02
+defc __esx_a_system = 0x04
+defc __esx_a_arch = 0x20
+defc __esx_a_exec = 0x40
+defc __esx_a_all = 0xe7
+
 defc __ESX_F_RENAME = 0xb0
 defc __ESX_F_GETFREE = 0xb1
 

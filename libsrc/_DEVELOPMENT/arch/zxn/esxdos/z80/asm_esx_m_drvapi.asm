@@ -39,7 +39,7 @@ asm_esx_m_drvapi:
    ld h,(hl)
    ld l,a
    
-   rst __ESXDOS_SYSCALL
+   rst __ESX_RST_SYS
    defb __ESX_M_DRVAPI
    
    jr c, error

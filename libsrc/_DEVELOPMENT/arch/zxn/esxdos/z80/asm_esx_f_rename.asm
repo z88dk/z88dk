@@ -36,7 +36,7 @@ ELSE
    pop ix
 ENDIF
 
-   rst __ESXDOS_SYSCALL
+   rst __ESX_RST_SYS
    defb __ESX_F_RENAME
 
    jp nc, error_znc

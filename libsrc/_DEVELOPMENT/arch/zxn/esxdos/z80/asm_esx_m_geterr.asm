@@ -43,7 +43,7 @@ have_error_code:
    
    ld b,1
    
-   rst __ESXDOS_SYSCALL
+   rst __ESX_RST_SYS
    defb __ESX_M_GETERR
    
    pop hl

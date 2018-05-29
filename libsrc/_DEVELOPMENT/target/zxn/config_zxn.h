@@ -2202,8 +2202,8 @@
 #define __esx_mode_use_header  0x40
 #define __esx_mode_open_exist  0x00
 #define __esx_mode_open_creat  0x08
-#define __esx_mode_create_noexist  0x04
-#define __esx_mode_create_trunc  0x0c
+#define __esx_mode_creat_noexist  0x04
+#define __esx_mode_creat_trunc  0x0c
 
 #define __ESX_F_CLOSE  0x9b
 #define __ESX_F_SYNC  0x9c
@@ -2224,13 +2224,13 @@
 #define __esx_dir_use_header  0x40
 
 #define __ESX_F_READDIR  0xa4
-#define __esx_a_hid  0x02
-#define __esx_a_sys  0x04
-#define __esx_a_vol  0x08
-#define __esx_a_dir  0x10
-#define __esx_a_arch  0x20
-#define __esx_a_dev  0x40
-#define __esx_a_res  0x80
+#define __esx_dir_a_hid  0x02
+#define __esx_dir_a_sys  0x04
+#define __esx_dir_a_vol  0x08
+#define __esx_dir_a_dir  0x10
+#define __esx_dir_a_arch  0x20
+#define __esx_dir_a_dev  0x40
+#define __esx_dir_a_res  0x80
 
 #define __ESX_F_TELLDIR  0xa5
 #define __ESX_F_SEEKDIR  0xa6
@@ -2244,12 +2244,14 @@
 #define __ESX_F_TRUNCATE  0xae
 
 #define __ESX_F_CHMOD  0xaf
-#define __esx_a_write  __esx_a_write
-#define __esx_a_read  __esx_a_read
-#define __esx_a_rdwr  __esx_a_rdwr
-#define __esx_a_hidden  __esx_a_hidden
-#define __esx_a_system  __esx_a_system
+#define __esx_a_write  0x01
+#define __esx_a_read  0x80
+#define __esx_a_rdwr  0x81
+#define __esx_a_hidden  0x02
+#define __esx_a_system  0x04
 #define __esx_a_arch  0x20
+#define __esx_a_exec  0x40
+#define __esx_a_all  0xe7
 
 #define __ESX_F_RENAME  0xb0
 #define __ESX_F_GETFREE  0xb1

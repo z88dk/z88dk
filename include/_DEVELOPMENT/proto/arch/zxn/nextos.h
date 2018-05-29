@@ -146,7 +146,7 @@ __OPROTO(,,unsigned char,,esx_m_tapeout_close,void)
 
 // DOT COMMANDS
 
-// call from within a dot command
+// must call from within a dot command
 
 typedef void (*esx_handler_t)(uint8_t error);
 
@@ -157,7 +157,7 @@ extern esx_handler_t esx_errh;
 __OPROTO(,,unsigned char,,esx_m_gethandle,void)
 __DPROTO(,,esx_handler_t,,esx_m_errh,esx_handler_t error)
 
-// do not call from within a dot command
+// must not call from within a dot command
 
 // execute dot command, return value is error if not zero
 // geterr with non-zero error code, write as zero-terminated string in 33-byte buffer msg
@@ -184,7 +184,7 @@ struct esx_drvapi
    uint16_t hl;
 };
 
-__DPROTO(,,unsigned char,,esx_m_drvapi,struct esx_drvapi *)   // return -1 if no error, 0 if driver not found, else canned esxdos error code
+__DPROTO(,,unsigned char,,esx_m_drvapi,struct esx_drvapi *)
 
 // MISCELLANEOUS
 
@@ -266,22 +266,22 @@ struct esx_dirent_slice_p3
 #define ESX_DIR_USE_HEADER  __esx_dir_use_header
 
 __DPROTO(,,unsigned char,,esx_f_opendir,unsigned char *dirname)
-__DPROTO(,,unsigned char,,esx_f_opendir_ex,unsigned char *dirname,uint8_t mode)
+__DPROTO(,,unsigned char,,esx_f_opendir_ex,unsigned char *dirname,uint8_t diruse)
 __DPROTO(,,unsigned char,,esx_f_closedir,unsigned char handle)
 
 // file attributes
 
-#define ESX_A_RDO   __esx_a_rdo     // read only
-#define ESX_A_HID   __esx_a_hid     // hide in normal dir listings
-#define ESX_A_SYS   __esx_a_sys     // system file (must not be physically moved)
-#define ESX_A_VOL   __esx_a_vol     // filename is a volume label
-#define ESX_A_DIR   __esx_a_dir     // directory
-#define ESX_A_ARCH  __esx_a_arch    // file has been modified since last backup
-#define ESX_A_DEV   __esx_a_dev     // device
-#define ESX_A_RES   __esx_a_res     // reserved
+#define ESX_DIR_A_RDO   __esx_dir_a_rdo     // read only
+#define ESX_DIR_A_HID   __esx_dir_a_hid     // hide in normal dir listings
+#define ESX_DIR_A_SYS   __esx_dir_a_sys     // system file (must not be physically moved)
+#define ESX_DIR_A_VOL   __esx_dir_a_vol     // filename is a volume label
+#define ESX_DIR_A_DIR   __esx_dir_a_dir     // directory
+#define ESX_DIR_A_ARCH  __esx_dir_a_arch    // file has been modified since last backup
+#define ESX_DIR_A_DEV   __esx_dir_a_dev     // device
+#define ESX_DIR_A_RES   __esx_dir_a_res     // reserved
 
 __DPROTO(,,unsigned char,,esx_f_readdir,unsigned char handle,void *esx_dirent)
-__DPROTO(,,void,*,esx_slice_dirent,void *esx_dirent)
+__DPROTO(`d,e,iyl,iyh',`d,e,iyl,iyh',void,*,esx_slice_dirent,void *esx_dirent)
 
 __DPROTO(,,uint32_t,,esx_f_telldir,unsigned char handle)
 __DPROTO(,,unsigned char,,esx_f_seekdir,unsigned char handle,uint32_t pos)
@@ -328,13 +328,28 @@ __DPROTO(,,unsigned char,,esx_f_sync,unsigned char handle)
 __DPROTO(,,unsigned char,,esx_f_fstat,unsigned char handle,struct esx_stat *es)
 __DPROTO(,,uint32_t,,esx_f_fgetpos,unsigned char handle)
 
+#define ESX_SEEK_SET  __esx_seek_set
+#define ESX_SEEK_FWD  __esx_seek_fwd
+#define ESX_SEEK_BWD  __esx_seek_bwd
+
 __DPROTO(,,uint32_t,,esx_f_seek,unsigned char handle,uint32_t distance,unsigned char whence)
 __DPROTO(,,uint16_t,,esx_f_read,unsigned char handle,void *dst,size_t nbytes)
 __DPROTO(,,uint16_t,,esx_f_write,unsigned char handle,void *src,size_t nbytes)
 
 __DPROTO(,,unsigned char,,esx_f_ftrunc,unsigned char handle,uint32_t size)
 
-// DIRECT OPERATIONS ON FILES
+// DIRECT OPERATIONS ON FILES BY FILENAME
+
+// chmod attr
+
+#define ESX_A_WRITE  __esx_a_write
+#define ESX_A_READ  __esx_a_read
+#define ESX_A_RDWR  __esx_a_rdwr
+#define ESX_A_HIDDEN  __esx_a_hidden
+#define ESX_A_SYSTEM  __esx_a_system
+#define ESX_A_ARCH  __esx_a_arch
+#define ESX_A_EXEC  __esx_a_exec
+#define ESX_A_ALL  __esx_a_all
 
 __DPROTO(,,unsigned char,,esx_f_chmod,unsigned char *filename,uint8_t attr_mask,uint8_t attr)
 __DPROTO(,,unsigned char,,esx_f_rename,unsigned char *old,unsigned char *new)

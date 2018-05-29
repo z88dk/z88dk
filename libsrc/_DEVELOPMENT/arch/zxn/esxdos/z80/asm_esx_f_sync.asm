@@ -27,7 +27,7 @@ asm_esx_f_sync:
    
    ld a,l
    
-   rst __ESXDOS_SYSCALL
+   rst __ESX_RST_SYS
    defb __ESX_F_SYNC
 
    jp nc, error_znc

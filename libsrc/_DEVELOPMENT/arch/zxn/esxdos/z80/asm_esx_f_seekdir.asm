@@ -1,4 +1,4 @@
-; unsigned char esx_f_seekdir(uint32_t pos)
+; unsigned char esx_f_seekdir(unsigned char handle,uint32_t pos)
 
 INCLUDE "config_private.inc"
 
@@ -12,9 +12,9 @@ EXTERN __esxdos_error_mc
 asm_esx_f_seekdir:
 
    ; enter :    a = handle
-	;         dehl = directory position
-	;
-	; exit  : success
+   ;         bcde = directory position
+   ;
+   ; exit  : success
    ;
    ;            hl = 0
    ;            carry reset
@@ -23,19 +23,14 @@ asm_esx_f_seekdir:
    ;
    ;            hl = -1
    ;            carry set, errno set
-	;
-	; uses  : af, bc, de, hl
-	
-	ex de,hl
-	
-	ld c,l
-	ld b,h
+   ;
+   ; uses  : af, bc, de, hl
 
-   rst __ESXDOS_SYSCALL
+   rst __ESX_RST_SYS
    defb __ESX_F_SEEKDIR
 
-	jp nc, error_znc
-	jp __esxdos_error_mc
+   jp nc, error_znc
+   jp __esxdos_error_mc
 
 
 ; ***************************************************************************
@@ -50,4 +45,4 @@ asm_esx_f_seekdir:
 ; Exit (failure):
 ; Fc=1
 ; A=error code
-	
+   

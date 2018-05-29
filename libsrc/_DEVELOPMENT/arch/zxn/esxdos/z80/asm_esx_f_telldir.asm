@@ -26,7 +26,7 @@ asm_esx_f_telldir:
    
    ld a,l
    
-   rst __ESXDOS_SYSCALL
+   rst __ESX_RST_SYS
    defb __ESX_F_TELLDIR
    
    ld l,c

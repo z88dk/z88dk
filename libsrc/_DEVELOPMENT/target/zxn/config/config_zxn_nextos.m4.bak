@@ -279,14 +279,14 @@ define(`__esx_dir_use_lfn', 0x10)
 define(`__esx_dir_use_header', 0x40)
 
 define(`__ESX_F_READDIR', 0xa4)
-define(`__esx_a_rdo', 0x01)           # read only
-define(`__esx_a_hid', 0x02)           # hide in normal dir listings
-define(`__esx_a_sys', 0x04)           # file must not be physically moved
-define(`__esx_a_vol', 0x08)           # filename is a volume label
-define(`__esx_a_dir', 0x10)           # directory
-define(`__esx_a_arch', 0x20)          # file has been modified since last backup
-define(`__esx_a_dev', 0x40)           # device
-define(`__esx_a_res', 0x80)           # reserved
+define(`__esx_dir_a_rdo', 0x01)           # read only
+define(`__esx_dir_a_hid', 0x02)           # hide in normal dir listings
+define(`__esx_dir_a_sys', 0x04)           # file must not be physically moved
+define(`__esx_dir_a_vol', 0x08)           # filename is a volume label
+define(`__esx_dir_a_dir', 0x10)           # directory
+define(`__esx_dir_a_arch', 0x20)          # file has been modified since last backup
+define(`__esx_dir_a_dev', 0x40)           # device
+define(`__esx_dir_a_res', 0x80)           # reserved
 
 define(`__ESX_F_TELLDIR', 0xa5)
 define(`__ESX_F_SEEKDIR', 0xa6)
@@ -298,7 +298,17 @@ define(`__ESX_F_RMDIR', 0xab)
 define(`__ESX_F_STAT', 0xac)
 define(`__ESX_F_UNLINK', 0xad)
 define(`__ESX_F_TRUNCATE', 0xae)
+
 define(`__ESX_F_CHMOD', 0xaf)
+define(`__esx_a_write', 0x01)
+define(`__esx_a_read', 0x80)
+define(`__esx_a_rdwr', 0x81)
+define(`__esx_a_hidden', 0x02)
+define(`__esx_a_system', 0x04)
+define(`__esx_a_arch', 0x20)
+define(`__esx_a_exec', 0x40)
+define(`__esx_a_all', 0xe7)
+
 define(`__ESX_F_RENAME', 0xb0)
 define(`__ESX_F_GETFREE', 0xb1)
 
@@ -584,14 +594,14 @@ PUBLIC `__esx_dir_use_lfn'
 PUBLIC `__esx_dir_use_header'
 
 PUBLIC `__ESX_F_READDIR'
-PUBLIC `__esx_a_rdo'
-PUBLIC `__esx_a_hid'
-PUBLIC `__esx_a_sys'
-PUBLIC `__esx_a_vol'
-PUBLIC `__esx_a_dir'
-PUBLIC `__esx_a_arch'
-PUBLIC `__esx_a_dev'
-PUBLIC `__esx_a_res'
+PUBLIC `__esx_dir_a_rdo'
+PUBLIC `__esx_dir_a_hid'
+PUBLIC `__esx_dir_a_sys'
+PUBLIC `__esx_dir_a_vol'
+PUBLIC `__esx_dir_a_dir'
+PUBLIC `__esx_dir_a_arch'
+PUBLIC `__esx_dir_a_dev'
+PUBLIC `__esx_dir_a_res'
 
 PUBLIC `__ESX_F_TELLDIR'
 PUBLIC `__ESX_F_SEEKDIR'
@@ -603,7 +613,17 @@ PUBLIC `__ESX_F_RMDIR'
 PUBLIC `__ESX_F_STAT'
 PUBLIC `__ESX_F_UNLINK'
 PUBLIC `__ESX_F_TRUNCATE'
+
 PUBLIC `__ESX_F_CHMOD'
+PUBLIC `__esx_a_write'
+PUBLIC `__esx_a_read'
+PUBLIC `__esx_a_rdwr'
+PUBLIC `__esx_a_hidden'
+PUBLIC `__esx_a_system'
+PUBLIC `__esx_a_arch'
+PUBLIC `__esx_a_exec'
+PUBLIC `__esx_a_all'
+
 PUBLIC `__ESX_F_RENAME'
 PUBLIC `__ESX_F_GETFREE'
 
@@ -882,13 +902,13 @@ defc `__esx_dir_use_lfn' = __esx_dir_use_lfn
 defc `__esx_dir_use_header' = __esx_dir_use_header
 
 defc `__ESX_F_READDIR' = __ESX_F_READDIR
-defc `__esx_a_hid' = __esx_a_hid
-defc `__esx_a_sys' = __esx_a_sys
-defc `__esx_a_vol' = __esx_a_vol
-defc `__esx_a_dir' = __esx_a_dir
-defc `__esx_a_arch' = __esx_a_arch
-defc `__esx_a_dev' = __esx_a_dev
-defc `__esx_a_res' = __esx_a_res
+defc `__esx_dir_a_hid' = __esx_dir_a_hid
+defc `__esx_dir_a_sys' = __esx_dir_a_sys
+defc `__esx_dir_a_vol' = __esx_dir_a_vol
+defc `__esx_dir_a_dir' = __esx_dir_a_dir
+defc `__esx_dir_a_arch' = __esx_dir_a_arch
+defc `__esx_dir_a_dev' = __esx_dir_a_dev
+defc `__esx_dir_a_res' = __esx_dir_a_res
 
 defc `__ESX_F_TELLDIR' = __ESX_F_TELLDIR
 defc `__ESX_F_SEEKDIR' = __ESX_F_SEEKDIR
@@ -900,7 +920,17 @@ defc `__ESX_F_RMDIR' = __ESX_F_RMDIR
 defc `__ESX_F_STAT' = __ESX_F_STAT
 defc `__ESX_F_UNLINK' = __ESX_F_UNLINK
 defc `__ESX_F_TRUNCATE' = __ESX_F_TRUNCATE
+
 defc `__ESX_F_CHMOD' = __ESX_F_CHMOD
+defc `__esx_a_write' = __esx_a_write
+defc `__esx_a_read' = __esx_a_read
+defc `__esx_a_rdwr' = __esx_a_rdwr
+defc `__esx_a_hidden' = __esx_a_hidden
+defc `__esx_a_system' = __esx_a_system
+defc `__esx_a_arch' = __esx_a_arch
+defc `__esx_a_exec' = __esx_a_exec
+defc `__esx_a_all' = __esx_a_all
+
 defc `__ESX_F_RENAME' = __ESX_F_RENAME
 defc `__ESX_F_GETFREE' = __ESX_F_GETFREE
 
@@ -1179,13 +1209,13 @@ ifdef(`CFG_C_DEF',
 `#define' `__esx_dir_use_header'  __esx_dir_use_header
 
 `#define' `__ESX_F_READDIR'  __ESX_F_READDIR
-`#define' `__esx_a_hid'  __esx_a_hid
-`#define' `__esx_a_sys'  __esx_a_sys
-`#define' `__esx_a_vol'  __esx_a_vol
-`#define' `__esx_a_dir'  __esx_a_dir
-`#define' `__esx_a_arch'  __esx_a_arch
-`#define' `__esx_a_dev'  __esx_a_dev
-`#define' `__esx_a_res'  __esx_a_res
+`#define' `__esx_dir_a_hid'  __esx_dir_a_hid
+`#define' `__esx_dir_a_sys'  __esx_dir_a_sys
+`#define' `__esx_dir_a_vol'  __esx_dir_a_vol
+`#define' `__esx_dir_a_dir'  __esx_dir_a_dir
+`#define' `__esx_dir_a_arch'  __esx_dir_a_arch
+`#define' `__esx_dir_a_dev'  __esx_dir_a_dev
+`#define' `__esx_dir_a_res'  __esx_dir_a_res
 
 `#define' `__ESX_F_TELLDIR'  __ESX_F_TELLDIR
 `#define' `__ESX_F_SEEKDIR'  __ESX_F_SEEKDIR
@@ -1205,6 +1235,8 @@ ifdef(`CFG_C_DEF',
 `#define' `__esx_a_hidden'  __esx_a_hidden
 `#define' `__esx_a_system'  __esx_a_system
 `#define' `__esx_a_arch'  __esx_a_arch
+`#define' `__esx_a_exec'  __esx_a_exec
+`#define' `__esx_a_all'  __esx_a_all
 
 `#define' `__ESX_F_RENAME'  __ESX_F_RENAME
 `#define' `__ESX_F_GETFREE'  __ESX_F_GETFREE

@@ -22,7 +22,7 @@ asm_esx_m_setdrv:
    
    ld a,l
    
-   rst  __ESXDOS_SYSCALL
+   rst  __ESX_RST_SYS
    defb __ESX_M_GETSETDRV
    
    ld l,a

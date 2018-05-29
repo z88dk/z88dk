@@ -38,11 +38,11 @@ ELSE
    pop ix
 ENDIF
 
-   rst __ESXDOS_SYSCALL
+   rst __ESX_RST_SYS
    defb __ESX_M_TAPEOUT
    
    pop hl
-   
+
    jp c, __esxdos_error_mc
    
    ld e,a

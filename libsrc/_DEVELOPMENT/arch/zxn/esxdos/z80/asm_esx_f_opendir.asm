@@ -34,6 +34,8 @@ asm_esx_f_opendir_ex:
    ;
    ; uses  : af, bc, de, hl, ix
    
+   ld a,'*'
+   
 IF __SDCC_IY
    push hl
    pop iy
@@ -42,9 +44,7 @@ ELSE
    pop ix
 ENDIF
 
-   ld a,'*'
-   
-   rst __ESXDOS_SYSCALL
+   rst __ESX_RST_SYS
    defb __ESX_F_OPENDIR
    
    ld l,a

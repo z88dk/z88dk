@@ -34,6 +34,9 @@ ELSE
    pop ix
 ENDIF
 
+   rst __ESX_RST_SYS
+   defb __ESX_F_SEEK
+
    ld l,c
    ld h,b
    

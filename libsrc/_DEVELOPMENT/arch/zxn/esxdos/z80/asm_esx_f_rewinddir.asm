@@ -27,7 +27,7 @@ asm_esx_f_rewinddir:
    
    ld a,l
    
-   rst __ESXDOS_SYSCALL
+   rst __ESX_RST_SYS
    defb __ESX_F_REWINDDIR
    
    jp nc, error_znc

@@ -41,7 +41,7 @@ __esx_m_tapein_call_default_drive:
 
 __esx_m_tapein_call:
 
-   rst __ESXDOS_SYSCALL
+   rst __ESX_RST_SYS
    defb __ESX_M_TAPEIN
 
 	jp nc, error_znc

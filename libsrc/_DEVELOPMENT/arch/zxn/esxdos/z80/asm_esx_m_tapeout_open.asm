@@ -44,7 +44,7 @@ __esx_m_tapeout_call_default_drive:
 
 __esx_m_tapeout_call:
 
-   rst __ESXDOS_SYSCALL
+   rst __ESX_RST_SYS
    defb __ESX_M_TAPEOUT
 
 	jp nc, error_znc

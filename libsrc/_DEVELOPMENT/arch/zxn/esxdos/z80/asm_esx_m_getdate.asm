@@ -11,8 +11,8 @@ EXTERN error_mc, error_znc
 asm_esx_m_getdate:
 
    ; enter : hl = struct dos_tm *
-	;
-	; exit  : success
+   ;
+   ; exit  : success
    ;
    ;            hl = 0
    ;            carry reset
@@ -21,26 +21,26 @@ asm_esx_m_getdate:
    ;
    ;            hl = -1
    ;            carry set
-	;
-	; uses  : af, bc, de, hl
-	
-	push hl
-	
-	rst __ESXDOS_SYSCALL
+   ;
+   ; uses  : af, bc, de, hl
+   
+   push hl
+   
+   rst __ESX_RST_SYS
    defb __ESX_M_GETDATE
 
-	pop hl
+   pop hl
    jp c, error_mc
-	
-	ld (hl),e
-	inc hl
-	ld (hl),d
-	inc hl
-	ld (hl),c
-	inc hl
-	ld (hl),b
-	
-	jp error_znc
+   
+   ld (hl),e
+   inc hl
+   ld (hl),d
+   inc hl
+   ld (hl),c
+   inc hl
+   ld (hl),b
+   
+   jp error_znc
 
 
 ; ***************************************************************************

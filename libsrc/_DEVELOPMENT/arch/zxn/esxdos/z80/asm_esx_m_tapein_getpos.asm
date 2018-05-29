@@ -24,7 +24,7 @@ asm_esx_m_tapein_getpos:
 
    ld b,4
 
-   rst __ESXDOS_SYSCALL
+   rst __ESX_RST_SYS
    defb __ESX_M_TAPEIN
 
    ret nc
