@@ -30,7 +30,6 @@ enum colors { BLACK, BLUE, GREEN, CYAN, RED, MAGENTA, BROWN, LIGHTGRAY, DARKGRAY
 
 
 
-
 #ifdef __CONIO_VT100
 // Much faster shortcut passing the colors in vt-ansi mode (equivalent to a "set text rendition" ESC sequence)
 extern void   __LIB__      vtrendition(unsigned int attribute) __z88dk_fastcall;
@@ -62,6 +61,7 @@ static int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 
 extern void __LIB__        textcolor(int c) __z88dk_fastcall;
 extern void __LIB__        textbackground(int c) __z88dk_fastcall;
+#define clrscr()           fputc_cons(12)
 #endif
 
 
