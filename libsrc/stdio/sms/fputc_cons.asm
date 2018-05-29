@@ -3,9 +3,8 @@
 	
 	INCLUDE "sms/sms.hdr"
 
-	EXTERN	fputc_vdp_offs
-	
 	EXTERN	VRAMToHL
+	PUBLIC	fputc_vdp_offs
 	
 .fputc_cons_native
 	ld	a, (fputc_vdp_offs)
@@ -65,3 +64,7 @@ ENDIF
 	ld	(fputc_vdp_offs+1), a	; Saves char offset
 
 	ret
+
+	SECTION	bss_clib
+
+fputc_vdp_offs:         defw    0       ;Current character pointer

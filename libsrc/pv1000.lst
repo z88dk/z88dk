@@ -1,5 +1,5 @@
-@stdio/stdio.lst
 stdio/pv1000/generic_console
+@stdio/stdio.lst
 games/pv1000/joystick
 @gfxbase.lst
 graphics/dcircle

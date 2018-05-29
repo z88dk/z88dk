@@ -49,7 +49,12 @@
 	jp	start
 
 start:
-
+	di
+	; Hook the interrupt
+	ld	a,0xc3
+	ld	($749b),a	;jp
+	ld	hl,tms9118_interrupt
+	ld	($749c),hl
 
         INCLUDE "crt/classic/crt_init_sp.asm"
         INCLUDE "crt/classic/crt_init_atexit.asm"
@@ -59,7 +64,7 @@ start:
         ld      (exitsp),sp
 	ld	hl,2
 	call	msx_set_mode
-
+	ei
 
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
@@ -92,7 +97,8 @@ start1: ld      sp,0            ;Restore stack to entry value
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
 
-
+	INCLUDE	"crt/classic/tms9118/interrupt.asm"
+	INCLUDE	"crt/classic/tms9118/interrupt_handler.asm"
 
 ; ---------------
 ; MSX specific stuff
@@ -118,12 +124,7 @@ msxbios:
 
 	SECTION	bss_crt
 
-	PUBLIC	fputc_vdp_offs	;Current character pointer
 			
-	PUBLIC	aPLibMemory_bits;apLib support variable
-	PUBLIC	aPLibMemory_byte;apLib support variable
-	PUBLIC	aPLibMemory_LWM	;apLib support variable
-	PUBLIC	aPLibMemory_R0	;apLib support variable
 
 	PUBLIC	raster_procs	;Raster interrupt handlers
 	PUBLIC	pause_procs	;Pause interrupt handlers
@@ -139,12 +140,7 @@ msxbios:
 	PUBLIC	RG5SAV
 	PUBLIC	RG6SAV
 	PUBLIC	RG7SAV       
-; imported form the pre-existing Sega Master System libs
-fputc_vdp_offs:		defw	0	;Current character pointer
-aPLibMemory_bits:	defb	0	;apLib support variable
-aPLibMemory_byte:	defb	0	;apLib support variable
-aPLibMemory_LWM:	defb	0	;apLib support variable
-aPLibMemory_R0:		defw	0	;apLib support variable
+
 raster_procs:		defw	0	;Raster interrupt handlers
 pause_procs:		defs	8	;Pause interrupt handlers
 timer:				defw	0	;This is incremented every time a VBL/HBL interrupt happens

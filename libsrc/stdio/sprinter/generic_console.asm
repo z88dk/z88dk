@@ -14,6 +14,7 @@
 		EXTERN		__console_w
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
+		EXTERN		__sprinter_attr
 
 generic_console_ioctl:
 	scf
@@ -21,7 +22,7 @@ generic_console_set_inverse:
 	ret
 
 generic_console_set_ink:
-	ld	hl,text_colour
+	ld	hl,__sprinter_attr
 	and	15
 	ld	b,a
 	ld	a,(hl)
@@ -31,7 +32,7 @@ generic_console_set_ink:
 	ret
 
 generic_console_set_paper:
-	ld	hl,text_colour
+	ld	hl,__sprinter_attr
 	rlca
 	rlca
 	rlca	
@@ -47,7 +48,7 @@ generic_console_set_paper:
 generic_console_cls:
 	ld	de,0
 	ld	hl,(__console_w)	; +(CONSOLE_ROWS * 256 ) + CONSOLE_COLUMNS
-	ld	a,(text_colour)
+	ld	a,(__sprinter_attr)
 	ld	b,a
 	ld	a,' '
 	ld	c,0x56		;CLEAR
@@ -75,7 +76,7 @@ generic_console_printc:
 	ld	d,b
 	ld	e,c
 	ex	af,af
-	ld	a,(text_colour)
+	ld	a,(__sprinter_attr)
 	ld	b,a
 	ex	af,af
 	ld	c,0x58		;WRCHAR
@@ -96,7 +97,4 @@ generic_console_vpeek:
 	and	a
 	ret
 
-		SECTION		data_clib
-
-text_colour:	defb	@00001111	;bright white on black
 

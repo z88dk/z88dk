@@ -1,6 +1,4 @@
 stdio/z88/fgets_cons
-@stdio/stdio.lst
-@stdio/stdio_net.lst
 @stdio/ansicore.lst
 stdio/ansi/z88/f_ansi_attr
 stdio/ansi/z88/f_ansi_bel
@@ -13,6 +11,8 @@ stdio/z88/fputc_cons
 stdio/z88/getcmd
 stdio/z88/getk
 stdio/z88/gets
+@stdio/stdio.lst
+@stdio/stdio_net.lst
 fcntl/z88/fdgetpos
 fcntl/z88/fdtell
 fcntl/z88/rename

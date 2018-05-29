@@ -1,4 +1,3 @@
-@stdio/stdio.lst
 stdio/cpmbios/fgetc_cons
 stdio/cpmbios/getk
 stdio/cpmbios/fputc_cons
@@ -9,6 +8,7 @@ stdio/ansi/z9001/f_ansi_char
 stdio/ansi/z9001/f_ansi_cls
 stdio/ansi/generic/f_ansi_dline
 stdio/ansi/z9001/f_ansi_scrollup
+@stdio/stdio.lst
 games/z9001/joystick
 @games/games.lst
 @z80.lst

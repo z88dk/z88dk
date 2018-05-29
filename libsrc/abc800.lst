@@ -1,7 +1,7 @@
-@stdio/stdio.lst
 stdio/abc800/fgetc_cons
 stdio/abc800/fputc_cons
 stdio/abc800/getk
+@stdio/stdio.lst
 graphics/clg
 graphics/clrarea
 graphics/abc80/clsgraph

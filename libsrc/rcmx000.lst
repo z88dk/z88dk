@@ -1,3 +1,7 @@
+stdio/rcmx000/fgetc_cons
+stdio/rcmx000/cnvtab
+stdio/rcmx000/getk
+stdio/rcmx000/fputc_cons
 @stdio/stdio_r2k.lst
 @adt/adt.lst
 @adt-newlib/adt.lst
@@ -5,10 +9,6 @@
 @alloc/alloc.lst
 @ctype/ctype.lst
 @debug/debug.lst
-stdio/rcmx000/fgetc_cons
-stdio/rcmx000/cnvtab
-stdio/rcmx000/getk
-stdio/rcmx000/fputc_cons
 @stdlib/stdlib.lst
 @strings/string.lst
 setjmp/l_longjmp

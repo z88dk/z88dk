@@ -13,11 +13,7 @@
 	PUBLIC	msx_vfill
 	PUBLIC	_msx_vfill
 	
-IF FORm5
-	INCLUDE "target/m5/def/m5bios.def"
-ELSE
 	EXTERN     FILVRM
-ENDIF
 
 	
 	INCLUDE	"msx/vdp.inc"

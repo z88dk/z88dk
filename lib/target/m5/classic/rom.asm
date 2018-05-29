@@ -1,0 +1,81 @@
+;      Sord M5 ROM crt0 
+;
+;      Sord memory starts from 0x7000 and is 4k long
+;      im2 interrupt vectors from 0x7000
+
+
+
+	defc	CRT_ORG_CODE = 0x2000
+	defc	CRT_ORG_BSS = 0x7100
+
+        defc    TAR__clib_exit_stack_size = 0
+        defc    TAR__register_sp = 0x7fff
+        INCLUDE "crt/classic/crt_rules.inc"
+
+
+	EXTERN	msx_set_mode
+
+        org     CRT_ORG_CODE
+
+	defb	$00		;$2000 Needs to be non zero
+	defw	l_ret		;$2001 pre hook
+	defw	start		;$2003 main routine
+
+
+l_ret:	ret
+
+
+start:
+	di
+	; Overwrite the system vbl interrupt handler with ours
+	ld	hl,tms9118_interrupt
+	ld	($7006),hl
+
+
+        INCLUDE "crt/classic/crt_init_sp.asm"
+        INCLUDE "crt/classic/crt_init_atexit.asm"
+
+	call	crt0_init_bss
+        ld      (exitsp),sp
+	ld	hl,2
+	call	msx_set_mode
+	ei
+
+
+; Optional definition for auto MALLOC init
+; it assumes we have free space between the end of 
+; the compiled program and the stack pointer
+	IF DEFINED_USING_amalloc
+		INCLUDE "crt/classic/crt_init_amalloc.asm"
+	ENDIF
+
+
+        call    _main           ; Call user program
+cleanup:
+;
+;       Deallocate memory which has been allocated here!
+;
+        push    hl				; return code
+
+IF CRT_ENABLE_STDIO = 1
+        EXTERN     closeall
+        call    closeall
+ENDIF
+
+
+cleanup_exit:
+
+        pop     bc				; return code (still not sure it is teh right one !)
+        ret
+
+
+	INCLUDE	"crt/classic/tms9118/interrupt.asm"
+	INCLUDE	"crt/classic/tms9118/interrupt_handler.asm"
+
+        defc    __crt_org_bss = CRT_ORG_BSS
+        ; If we were given a model then use it
+        IF DEFINED_CRT_MODEL
+            defc __crt_model = CRT_MODEL
+        ELSE
+            defc __crt_model = 1
+        ENDIF

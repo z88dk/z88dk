@@ -1,4 +1,3 @@
-@stdio/stdio.lst
 stdio/bee/fgetc_cons
 stdio/bee/getk
 stdio/bee/fputc_cons
@@ -9,6 +8,7 @@ stdio/ansi/bee/f_ansi_char
 stdio/ansi/bee/f_ansi_cls
 stdio/ansi/bee/f_ansi_dline
 stdio/ansi/bee/f_ansi_scrollup
+@stdio/stdio.lst
 games/bee/joystick
 @games/games.lst
 @z80.lst

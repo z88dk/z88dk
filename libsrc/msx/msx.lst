@@ -13,3 +13,4 @@ msx/obj/${TARGET}/msx_set_sprite_16
 msx/obj/${TARGET}/msx_set_sprite_8
 msx/obj/${TARGET}/msx_set_sprite_mode
 msx/obj/${TARGET}/msx_vfill_v
+msx/vdpport

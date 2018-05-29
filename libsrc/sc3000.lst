@@ -1,6 +1,5 @@
-@stdio/stdio.lst
-stdio/sc3000/fgetc_cons_inkey
-stdio/sc3000/getk_inkey
+stdio/inkey/fgetc_cons
+stdio/inkey/getk
 @stdio/ansicore.lst
 stdio/ansi/msx/f_ansi_attr
 stdio/ansi/msx/f_ansi_bel
@@ -8,13 +7,11 @@ stdio/ansi/msx/f_ansi_char
 stdio/ansi/msx/f_ansi_cls_nobios
 stdio/ansi/generic/f_ansi_dline
 stdio/ansi/msx/f_ansi_scrollup_nobios
-stdio/msx/generic_console
-stdio/msx/generic_console_vpeek
-stdio/msx/generic_console_ioctl
-stdio/msx/CRT_FONT
+@stdio/tms9918/tms9918.lst
 @font/font_8x8/font_8x8.lst
+@stdio/stdio.lst
 time/sc3000/clock
-@input/sc3000.lst
+@input/input_keyboard.lst
 @gfxbase.lst
 graphics/dcircle
 graphics/msx/gen_clg
@@ -55,6 +52,7 @@ msx/gen_setwrt
 msx/gen_set_vdp_reg
 msx/gen_get_vdp_reg
 msx/gen_color
+msx/gen_set_border
 msx/gen_get_trigger
 msx/msx_map_m2_block
 msx/msx_map_m2_pixel

@@ -105,11 +105,8 @@ nmi:
 	; Should jump to pause
 	retn
 
-restart10:
-	; a = command to execute
-	defb	$ED, $FE	;trap
-	ret
 ; Restart routines, nothing sorted yet
+restart10:
 restart08:
 restart18:
 restart20:

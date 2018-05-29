@@ -10,14 +10,14 @@
 ;
 
         SECTION code_clib
-	PUBLIC	getk
-	PUBLIC	_getk
+	PUBLIC	getk_rom
+	PUBLIC	_getk_rom
 	EXTERN	msxbios
 
 	INCLUDE "target/m5/def/m5bios.def"
 
-.getk
-._getk
+.getk_rom
+._getk_rom
 ;        ld      ix,ACECH0
 ;       call    msxbios
 	call	$966

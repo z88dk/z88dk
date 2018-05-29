@@ -18,6 +18,7 @@
 	SECTION code_clib
 	PUBLIC	ansi_attr
 	EXTERN	INVRS
+	EXTERN	__zx_console_attr
 
 
 .ansi_attr
@@ -28,7 +29,7 @@
 .noreset
         cp      1
         jr      nz,nobold
-        ld      a,(23693)
+        ld      a,(__zx_console_attr)
         or      @01000000
         jr		setbk
 .nobold
@@ -37,7 +38,7 @@
         cp      8
         jr      nz,nodim
 .dim
-        ld      a,(23693)
+        ld      a,(__zx_console_attr)
         and     @10111111
         jr		setbk
 .nodim
@@ -55,13 +56,13 @@
 .noCunderline
         cp      5
         jr      nz,noblink
-        ld      a,(23693)
+        ld      a,(__zx_console_attr)
         or      @10000000
         jr		setbk
 .noblink
         cp      25
         jr      nz,nocblink
-        ld      a,(23693)
+        ld      a,(__zx_console_attr)
         and     @01111111
         jr		setbk
 .nocblink
@@ -79,7 +80,7 @@
 .noCreverse
         cp      8
         jr      nz,noinvis
-        ld      a,(23693)
+        ld      a,(__zx_console_attr)
         ld      (oldattr),a
         and     @00111000
         ld      e,a
@@ -89,10 +90,8 @@
         or      e
 .setbk
         ;ld      (23624),a
-		ld      (23693),a
+		ld      (__zx_console_attr),a
         ret
-.oldattr
-        defb     0
 .noinvis
         cp      28
         jr      nz,nocinvis
@@ -113,7 +112,7 @@
 .ZFR
 ;''''''''''''''''''''''
         ld      e,a
-        ld      a,(23693)
+        ld      a,(__zx_console_attr)
         and     @11111000
         or      e
         jr		setbk
@@ -135,9 +134,13 @@
         rla
         rla
         ld      e,a
-        ld      a,(23693)
+        ld      a,(__zx_console_attr)
         and     @11000111
         or      e
         jr		setbk
 .noback
         ret
+
+	SECTION		bss_clib
+.oldattr
+        defb     0
