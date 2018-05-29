@@ -19,9 +19,6 @@
 
         SECTION data_clib
 	EXTERN	__aquarius_attr
-	PUBLIC	aquarius_inverse
-	
-.aquarius_inverse	defb 0
 
         SECTION code_clib
 
@@ -79,11 +76,11 @@
 .nocblink
         cp      7
         jr      nz,noreverse
-        ld	a,(aquarius_inverse)
+        ld	a,(__aquarius_inverse)
         and	a
         ret	nz
         ld      a,1
-        ld      (aquarius_inverse),a     ; inverse 1
+        ld      (__aquarius_inverse),a     ; inverse 1
 .attrswap
         ld      a,(__aquarius_attr)
 	rla
@@ -104,11 +101,11 @@
 .noreverse
         cp      27
         jr      nz,noCreverse
-        ld	a,(aquarius_inverse)
+        ld	a,(__aquarius_inverse)
         and	a
         ret	z
         xor	a
-        ld      (aquarius_inverse),a     ; inverse 1
+        ld      (__aquarius_inverse),a     ; inverse 1
         jr	attrswap
 .noCreverse
         cp      8
@@ -124,8 +121,6 @@
         or      e
         ld      (__aquarius_attr),a
         ret
-.oldattr
-        defb     0
 .noinvis
         cp      28
         jr      nz,nocinvis
@@ -171,3 +166,6 @@
 
 .noback
         ret
+
+	SECTION	bss_clib
+oldattr:	defb	0

@@ -130,10 +130,7 @@
 	ld	a,e
 	and	@10001000
 	or	d
-	ld	(inverse_attr),a
+	ld	(__sprinter_attr + 1),a
 	ret
 
 
-	SECTION	data_clib
-
-.inverse_attr	defb	@01111000       ;grey on white

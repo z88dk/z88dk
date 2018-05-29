@@ -24,36 +24,19 @@
 #include <X11/Xz88dk.h>
 
 
-/*
-// Old crap gotoxy() stuff
-
-#if defined __SVI__ || defined __MSX__
-#define gotoxy(a,b)     printf("\033Y%c%c",b+31,a+31)
-#define delline()	printf("\033M")
-#define clrscr() printf("\033E")
-#define clreol() printf("\033K")
-#endif
-
-
-#if __M5__
-extern unsigned char *sc_cursor_pos;
-#define gotoxy(a,b)     sc_cursor_pos[1]=a-1; sc_cursor_pos[0]=b-1
-#define clrscr() printf("\014")
-#endif
-*/
-
-/* Fallback to ANSI VT escape sequences */
-#ifndef gotoxy
-
 #define MAXCOLORS       15
 enum colors { BLACK, BLUE, GREEN, CYAN, RED, MAGENTA, BROWN, LIGHTGRAY, DARKGRAY,
               LIGHTBLUE, LIGHTGREEN, LIGHTCYAN, LIGHTRED, LIGHTMAGENTA, YELLOW, WHITE };
 
-// Color translation table
-static int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 
+
+
+#ifdef __CONIO_VT100
 // Much faster shortcut passing the colors in vt-ansi mode (equivalent to a "set text rendition" ESC sequence)
 extern void   __LIB__      vtrendition(unsigned int attribute) __z88dk_fastcall;
+
+// Color translation table
+static int PCDOS_COLORS[]={0,4,2,6,1,5,1,7,4,6,2,6,1,5,3,7};
 
 // QUICK C syntax
 #define settextcolor(a)    vtrendition(PCDOS_COLORS[a]+30)
@@ -67,12 +50,21 @@ extern void   __LIB__      vtrendition(unsigned int attribute) __z88dk_fastcall;
 #define highvideo()        vtrendition(1)
 #define lowvideo()         vtrendition(2)
 #define normvideo()        vtrendition(0)
+#define clreol()           printf("\033[K")
 
 // Useless, DL is not fully implemented in the VT-ansi engine
 //#define delline()	       printf("\033[M")
 
 #define clrscr()           fputc_cons(12)
-#define clreol()           printf("\033[K")
+#else
+// Definitions for VT52/generic console, these set common variables for both VT100 and
+// VT52, but may drag in more code than intended.
+
+extern void __LIB__        textcolor(int c) __z88dk_fastcall;
+extern void __LIB__        textbackground(int c) __z88dk_fastcall;
+#endif
+
+
 
 extern int     __LIB__     wherex (void);
 extern int     __LIB__     wherey (void);
@@ -85,8 +77,6 @@ extern void    __LIB__     screensize_callee(unsigned char *x, unsigned char *y)
 #define gotoxy(a,b) gotoxy_callee(a,b)
 #define screensize(a,b) screensize_callee(a,b)
 
-
-#endif
 
 /* The leading underscores are for compatibility with the 
  * Digital Mars library */
@@ -120,6 +110,7 @@ extern int __LIB__ getch(void);
 // Get the character that is on screen at the specified location
 extern int __LIB__ cvpeek(int x, int y) __smallc;
 
+// Set the border colour, may not be implemented on all ports
 extern int __LIB__ bordercolor(int c) __z88dk_fastcall;
 
 // Missing functions, not implemented

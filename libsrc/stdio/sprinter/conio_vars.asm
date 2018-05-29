@@ -8,3 +8,4 @@
 		PUBLIC		__sprinter_attr
 
 .__sprinter_attr       defb    @00001111       ;bright white on black
+.inverse_attr   defb    @01111000       ;grey on white
