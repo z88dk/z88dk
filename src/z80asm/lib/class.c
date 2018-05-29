@@ -16,7 +16,6 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include "alloc.h"
 #include "class.h"
 #include "init.h"
-#include "strpool.h"
 #include "types.h"
 
 /*-----------------------------------------------------------------------------
@@ -50,9 +49,8 @@ static Object *next_autodelete( ObjectList *headp )
 *----------------------------------------------------------------------------*/
 DEFINE_init_module()
 {
-	/* make sure m_malloc and strpool are removed last */
+	/* make sure m_malloc is removed last */
     m_alloc_init();
-	strpool_init();
 
 #ifdef CLASS_DEBUG
     warn( "class: init\n" );
@@ -85,9 +83,9 @@ DEFINE_dtor_module()
 /*-----------------------------------------------------------------------------
 *   Register an object
 *----------------------------------------------------------------------------*/
-void _register_obj( Object *obj,
-                    void ( *delete_ptr )( Object * ),
-                    char *name )
+void _register_obj(Object *obj,
+	void(*delete_ptr)(Object *),
+	const char *name)
 {
     init_module();
 

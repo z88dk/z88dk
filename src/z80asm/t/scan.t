@@ -17,14 +17,15 @@ require './t/test_utils.pl';
 
 my $objs = "scan.o errors.o error_func.o model.o module.o codearea.o listfile.o ".
 		   "options.o hist.o sym.o symtab.o expr.o ".
-		   "lib/str.o lib/strhash.o lib/fileutil.o ".
+		   "lib/str.o lib/strhash.o  ../common/fileutil.o ../common/strutil.o ../common/die.o ../common/objfile.o ../../ext/regex/regcomp.o ../../ext/regex/regerror.o ../../ext/regex/regexec.o ../../ext/regex/regfree.o ".
 		   "lib/srcfile.o macros.o lib/class.o ".
-		   "lib/list.o lib/array.o lib/dbg.o";
+		   "lib/list.o lib/array.o lib/dbg.o ../../ext/UNIXem/src/glob.o ../../ext/UNIXem/src/dirent.o";
 		   
 my $init = <<'END';
 #include "scan.h"
 #include "symbol.h"
 #include "macros.h"
+#include "strutil.h"
 #include <assert.h>
 
 char *GetLibfile( char *filename ) {return NULL;}
@@ -61,7 +62,7 @@ char *GetLibfile( char *filename ) {return NULL;}
 	T_GET( TK_NEWLINE, "\n" ); assert( EOL ); \
 	T_GET( TK_NEWLINE, "\n" ); assert( EOL ); \
 	T_GET( TK_NEWLINE, "\n" ); assert( EOL ); \
-	EOL = FALSE;
+	EOL = false;
 
 #define T_NIL()				T_GET( TK_NIL,			"" );
 #define T_EXCLAM()			T_GET( TK_LOG_NOT,		"!" );
@@ -143,11 +144,11 @@ char *GetLibfile( char *filename ) {return NULL;}
 
 #define T_OPCODE(opcode, _cpu)	\
 		strcpy(opcode_lcase, #opcode); \
-		stolower(opcode_lcase); \
+		cstr_tolower(opcode_lcase); \
 		strcpy(string, #opcode " " #opcode); \
-		stolower(string); \
+		cstr_tolower(string); \
 		T_OPCODE2(opcode, opcode_lcase, _cpu); \
-		stoupper(string); \
+		cstr_toupper(string); \
 		T_OPCODE2(opcode, #opcode, _cpu);
 
 END
@@ -170,7 +171,7 @@ t_compile_module($init, <<'END', $objs);
 	T_END();
 	
 	
-	/* at_bol = TRUE */
+	/* at_bol = true */
 	SetTemporaryLine("\n \t start \t : \t . start : \n");
 	T_NEWLINE();
 	T_LABEL("start");
@@ -210,7 +211,7 @@ t_compile_module($init, <<'END', $objs);
 	T_END();
 	
 	
-	/* at_bol = FALSE */
+	/* at_bol = false */
 	SetTemporaryLine(" \t start \t : \t . start : \n");
 	T_NAME("start");
 	T_COLON();

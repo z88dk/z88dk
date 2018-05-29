@@ -14,7 +14,6 @@
 #include <sys/types.h>	// needed before regex.h
 #include "regex.h"
 
-#include <assert.h>
 #include <ctype.h>
 #include <stdbool.h>
 #include <stdio.h>

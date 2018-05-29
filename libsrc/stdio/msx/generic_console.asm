@@ -73,6 +73,9 @@ generic_console_scrollup:
 	pop	de
 	ret
 
+;  V-RAM memory map TMS9918 so address can be changed but it is the address when initializing with BASIC system Graphic mode 2 (SCREEN 2 in MSX) is used 00000 H - 007 FFH: Pattern generator top 00800 H -00FFFH: pattern generator middle 01000H - 017FFH: pattern generator low 01800H - 01BFFH: sprite pattern generator 01C00H - 01F7FH: pattern name table 01F00H - 01FFFH: sprite attribute 02000H - 03FFFH: color table　
+
+
 ; c = x
 ; b = y
 ; a = d = character to print

@@ -179,7 +179,7 @@ int main(int argc, char *argv[])
 			break;
 		case '?':
 			die("error: %s\n", options.errmsg);
-		default: assert(0);
+		default: xassert(0);
 		}
 	}
 
@@ -259,13 +259,13 @@ int main(int argc, char *argv[])
 			utarray_erase(commands, 0, 3);
 			break;
 		default:
-			assert(0);
+			xassert(0);
 		}
 	}
 
 	// write changed file
 	if (!opt_obj_list) {
-		assert(outfile);
+		xassert(outfile);
 		file_write(file, outfile);
 	}
 

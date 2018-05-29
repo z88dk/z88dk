@@ -16,7 +16,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include "class.h"
 #include "types.h"
 #include "str.h"
-#include <assert.h>
+#include "die.h"
 #include <stdlib.h>
 
 /*-----------------------------------------------------------------------------
@@ -51,7 +51,9 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 
 
 /* default types */
+typedef byte_t Byte;
 ARRAY(Byte);
+typedef word_t Word;
 ARRAY(Word);
 ARRAY(int);
 ARRAY(long);
@@ -62,24 +64,24 @@ ARRAY(long);
 																			\
 	void T##Array_init (T##Array *self)										\
 	{ 																		\
-		self->items = str_new(STR_SIZE);									\
+		self->items = Str_new(STR_SIZE);									\
 	}																		\
 																			\
 	void T##Array_copy (T##Array *self, T##Array *other) 					\
 	{ 																		\
-		self->items = str_new(str_size(other->items));						\
-		str_set_bytes(self->items, str_data(other->items), str_len(other->items)); \
+		self->items = Str_new(Str_size(other->items));						\
+		Str_set_bytes(self->items, Str_data(other->items), Str_len(other->items)); \
 	}																		\
 																			\
 	void T##Array_fini (T##Array *self) 									\
 	{ 																		\
 		T##Array_remove_all(self);											\
-		str_delete(self->items);											\
+		Str_delete(self->items);											\
 	}																		\
 																			\
 	size_t T##Array_size(T##Array *self)									\
 	{																		\
-		return str_len(self->items) / sizeof(T);								\
+		return Str_len(self->items) / sizeof(T);							\
 	}																		\
 																			\
 	void T##Array_set_size(T##Array *self, size_t n)						\
@@ -98,8 +100,8 @@ ARRAY(long);
 		if ( n > 0 )														\
 			T##Array_item(self, n-1);										\
 		else 																\
-			str_clear(self->items);											\
-		str_len(self->items) = n * sizeof(T);									\
+			Str_clear(self->items);											\
+		Str_len(self->items) = n * sizeof(T);									\
 	}																		\
 																			\
 	T *T##Array_item(T##Array *self, size_t n)								\
@@ -113,13 +115,13 @@ ARRAY(long);
 		if ( new_size > old_size )											\
 		{																	\
 			new_bytes = (new_size - old_size) * sizeof(T);					\
-			str_reserve(self->items, new_bytes );							\
-			str_len(self->items) += new_bytes;									\
-			memset( (T *)str_data(self->items) + old_size, 0, new_bytes );		\
+			Str_reserve(self->items, new_bytes );							\
+			Str_len(self->items) += new_bytes;									\
+			memset( (T *)Str_data(self->items) + old_size, 0, new_bytes );		\
 		}																	\
 																			\
 		/* return address of n-item */										\
-		return (T *)str_data(self->items) + n;									\
+		return (T *)Str_data(self->items) + n;									\
 	}																		\
 																			\
 	void T##Array_remove_all(T##Array *self)								\
@@ -142,6 +144,6 @@ ARRAY(long);
 	void T##Array_pop(T##Array *self)										\
 	{																		\
 		size_t size = T##Array_size(self);									\
-		assert( size > 0 );													\
+		xassert( size > 0 );												\
 		T##Array_set_size(self, size - 1);									\
 	}

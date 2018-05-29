@@ -1,0 +1,9 @@
+input/sc3000/in_WaitForKey
+input/sc3000/in_Inkey
+input/sc3000/in_GetKey
+input/sc3000/in_keytranstbl
+input/sc3000/in_KeyPressed
+input/sc3000/in_WaitForNoKey
+input/sc3000/in_LookupKey
+input/sc3000/in_GetKeyReset
+input/sc3000/in_GetKeyVariables

@@ -34,19 +34,19 @@ Manage the code area in memory
 *   Named Section of code, introduced by "SECTION" keyword
 *----------------------------------------------------------------------------*/
 CLASS( Section )
-	char		*name;				// name of section, kept in strpool
+	const char	*name;				// name of section, kept in strpool
 	int			 addr;				// start address of this section,
 									// computed by sections_alloc_addr()
     int			 origin;			// ORG address of section, -1 if not defined
 	int			 align;				// if align>1, section is aligned at align-boundaries
-	Bool		 origin_found : 1;	// ORG already found in code
-	Bool		 origin_opts : 1;	// ORG was defined from command line options,
+	bool		 origin_found : 1;	// ORG already found in code
+	bool		 origin_opts : 1;	// ORG was defined from command line options,
 									// override asm code
-	Bool		 section_split : 1;	// ORG -1 was given, signal that this section
+	bool		 section_split : 1;	// ORG -1 was given, signal that this section
 									// should be output to a new binary file
-	Bool		 max_codesize_issued : 1;
+	bool		 max_codesize_issued : 1;
 									// error_max_codesize issued, ignore next calls
-	Bool		 align_found : 1;	// ALIGN already found in this section
+	bool		 align_found : 1;	// ALIGN already found in this section
 	int			 asmpc;				// address of current opcode relative to start
 									// of the current module, reset to 0 at start
 									// of each module
@@ -76,7 +76,7 @@ extern int get_section_size( Section *section );
 extern int get_sections_size( void );
 
 /* get section by name, creates a new section if new name; make it the current section */
-extern Section *new_section( char *name );
+extern Section *new_section(const char *name );
 
 /* get/set current section */
 extern Section *get_cur_section( void );
@@ -130,9 +130,9 @@ extern int get_phased_PC(void);
 extern void  patch_value( int addr, int value, int num_bytes );
 extern void append_value(            int value, int num_bytes );
 
-extern void  patch_byte( int addr, Byte byte1 );		/* one byte */
-extern void append_byte( Byte byte1 );
-extern void append_2bytes( Byte byte1, Byte byte2 );
+extern void  patch_byte( int addr, byte_t byte1 );		/* one byte */
+extern void append_byte( byte_t byte1 );
+extern void append_2bytes( byte_t byte1, byte_t byte2 );
 
 extern void  patch_word(int addr, int word);			/* 2-byte word */
 extern void append_word(int word);
@@ -143,10 +143,10 @@ extern void append_word_be(int word);
 extern void  patch_long( int addr, long dword );		/* 4-byte long */
 extern void append_long( long dword );
 
-extern void append_defs(int num_bytes, Byte fill);
+extern void append_defs(int num_bytes, byte_t fill);
 
 /* advance code pointer reserving space, return address of start of buffer */
-extern Byte *append_reserve( int num_bytes );	
+extern byte_t *append_reserve( int num_bytes );	
 
 /* patch/append binary contents of file, whole file if num_bytes < 0 */
 extern void  patch_file_contents( FILE *file, int addr, long num_bytes );	
@@ -156,13 +156,13 @@ extern void append_file_contents( FILE *file,            long num_bytes );
 *   read/write current module to an open file
 *----------------------------------------------------------------------------*/
 
-/* write object code of the current module, return TRUE if wrote any data */
-extern Bool fwrite_module_code(FILE *file, int* p_code_size);
+/* write object code of the current module, return true if wrote any data */
+extern bool fwrite_module_code(FILE *file, int* p_code_size);
 
 /*-----------------------------------------------------------------------------
 *   write whole code area to an open file
 *----------------------------------------------------------------------------*/
-extern void fwrite_codearea( char *filename, FILE **pbinfile, FILE **prelocfile );
+extern void fwrite_codearea(const char *filename, FILE **pbinfile, FILE **prelocfile );
 
 /*-----------------------------------------------------------------------------
 *   Assembly directives

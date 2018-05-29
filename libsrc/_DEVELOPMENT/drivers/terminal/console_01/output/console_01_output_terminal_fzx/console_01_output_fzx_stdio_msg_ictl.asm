@@ -28,6 +28,7 @@ console_01_output_fzx_stdio_msg_ictl:
    ; defc IOCTL_OTERM_GET_OTERM        = $0602
    ; defc IOCTL_OTERM_SCROLL           = $0702
    ; defc IOCTL_OTERM_FONT             = $0802
+   ; defc IOCTL_OTERM_SCROLL_LIMIT     = $0902
    ;
    ; defc IOCTL_OTERM_FZX_GET_PAPER_COORD = $0a82
    ; defc IOCTL_OTERM_FZX_SET_PAPER_COORD = $0a02

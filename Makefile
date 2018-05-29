@@ -23,7 +23,7 @@ CROSS ?= 0
 
 export CC INSTALL CFLAGS EXEC_PREFIX CROSS 
 
-all: setup appmake copt zcpp ucpp sccz80 z80asm zcc zpragma zx7 z80nm zobjcopy lstmanip ticks z80svg testsuite z88dk-lib
+all: setup appmake copt zcpp ucpp sccz80 z80asm zcc zpragma zx7 z80nm zobjcopy lstmanip ticks z80svg font2pv1000 testsuite z88dk-lib
 
 setup:
 	$(shell if [ "${git_count}" != "" ]; then \
@@ -92,6 +92,10 @@ lstmanip:
 z80svg:
 	$(MAKE) -C support/graphics
 	$(MAKE) -C support/graphics PREFIX=`pwd` install
+
+font2pv1000:
+	$(MAKE) -C support/pv1000
+	$(MAKE) -C support/pv1000 PREFIX=`pwd` install
 
 ticks:
 	$(MAKE) -C src/ticks
@@ -164,6 +168,7 @@ clean-bins:
 	$(MAKE) -C src/zobjcopy clean
 	$(MAKE) -C src/zpragma clean
 	$(MAKE) -C src/zx7 clean
+	$(MAKE) -C support clean
 	$(MAKE) -C test clean
 	$(MAKE) -C testsuite clean
 	$(MAKE) -C src/z88dk-lib clean

@@ -107,18 +107,18 @@ CLASS( Expr )
 	
 	/* flags set during eval */
 	struct {
-		Bool not_evaluable:1;		/* TRUE if expression did not retunr a value */
-		Bool undefined_symbol:1;	/* TRUE if expression contains one undefined symbol */
-		Bool extern_symbol:1;		/* TRUE if expression contains one EXTERN symbol */
-		Bool cross_section_addr:1;	/* TRUE if expression referred to symbol on another section */	
+		bool not_evaluable:1;		/* true if expression did not retunr a value */
+		bool undefined_symbol:1;	/* true if expression contains one undefined symbol */
+		bool extern_symbol:1;		/* true if expression contains one EXTERN symbol */
+		bool cross_section_addr:1;	/* true if expression referred to symbol on another section */	
 	} result;
 
 	range_t		 range;			/* range of expression result */
 
 	sym_type_t	 type;				/* highest type of symbols used in expression */
-	Bool		 is_computed : 1;	/* TRUE if all values in expression have been computed */
+	bool		 is_computed : 1;	/* true if all values in expression have been computed */
 
-	char		*target_name;		/* name of the symbol, stored in strpool, 
+	const char	*target_name;		/* name of the symbol, stored in strpool,
 								    * to receive the result value of the expression 
 								    * computation, NULL if not an EQU expression */
 
@@ -127,7 +127,7 @@ CLASS( Expr )
 	int		 asmpc;				/* ASMPC value during linking */
     int		 code_pos;			/* Address to patch expression value */
 
-	char		*filename;			/* file and line where expression defined, string in strpool */
+	const char	*filename;			/* file and line where expression defined, string in strpool */
     int			 line_nr;			/* source line */
     long		 listpos;			/* position in listing file to patch (in pass 2), -1 if not listing */
 END_CLASS;
@@ -135,16 +135,16 @@ END_CLASS;
 CLASS_LIST( Expr );					/* list of expressions */
 
 /* compute ExprOp using Calc_xxx functions */
-extern void ExprOp_compute(ExprOp *self, Expr *expr, Bool not_defined_error);
+extern void ExprOp_compute(ExprOp *self, Expr *expr, bool not_defined_error);
 
 /* parse expression at current input, return new Expr object;
    return NULL and issue syntax error on error */
 extern Expr *expr_parse( void );
 
 /* parse and eval an expression, 
-   return FALSE and issue syntax error on parse error
-   return FALSE and issue symbol not defined error on result.not_evaluable */
-extern Bool expr_parse_eval( long *presult );
+   return false and issue syntax error on parse error
+   return false and issue symbol not defined error on result.not_evaluable */
+extern bool expr_parse_eval( long *presult );
 
 /* parse and eval an expression as argument to IF, 
    return expression value, ignoring symbol-not-defined errors  */
@@ -152,16 +152,19 @@ extern long expr_parse_eval_if( void );
 
 /* evaluate expression if possible, set result.not_evaluable if failed
    e.g. symbol not defined; show error messages if not_defined_error */
-extern long Expr_eval(Expr *self, Bool not_defined_error);
+extern long Expr_eval(Expr *self, bool not_defined_error);
 
 /* check if all variables used in an expression are local to the same module
    and section; if yes, the expression can be computed in phase 2 of the compile,
    if not the expression must be passed to the link phase */
-extern Bool Expr_is_local_in_section(Expr *self, struct Module *module, struct Section *section);
+extern bool Expr_is_local_in_section(Expr *self, struct Module *module, struct Section *section);
 
 /* check if the expression refers to more than one address expression; if yes, 
    it needs to be computed at link time */
-extern Bool Expr_without_addresses(Expr *self);
+extern bool Expr_without_addresses(Expr *self);
+
+/* check if expression depends on itself */
+extern bool Expr_is_recusive(Expr *self, const char *name);
 
 /*-----------------------------------------------------------------------------
 *	Stack for calculator

@@ -141,7 +141,7 @@ static void test_sections( void )
 	int module_id;
 	FILE *file;
 	FILE *reloc = NULL;
-	Byte *p;
+	byte_t *p;
 	int code_size;
 
 	T( reset_codearea() );

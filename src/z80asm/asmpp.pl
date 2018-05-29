@@ -45,7 +45,7 @@ our %DEFINE;		# list of -D defines from command line, or DEFL vars
 our %MACRO;			# macros { args, local, lines }
 our %DEFL;			# variable-value macros
 our $DEFL_RE;		# match any DEFL name
-our $UCASE;			# if TRUE all text is capitalized on reading from file
+our $UCASE;			# if true all text is capitalized on reading from file
 
 our $NAME_RE = 
 	qr/ [_a-z]  \w* /ix;

@@ -45,7 +45,11 @@ static struct zx_tape zxt = {
 
 static struct zx_sna zxs = {
     -1,         // stackloc
-    -1          // intstate
+    -1,         // intstate
+     0,         // force_128
+     0,         // snx
+     0,         // xsna
+     0          // fsna
 };
 
 static struct zx_bin zxb = {
@@ -59,7 +63,7 @@ static struct zx_bin zxb = {
 static char tap = 0;            // .tap tape
 static char sna = 0;            // .sna 48k/128k snapshot
 static char dot = 0;            //  esxdos dot command
-static char universal_dot = 0;  // nextos universal dot command
+static char universal_dot = 0;  //  nextos universal dot command
 static char zxn = 0;            // .zxn full size memory executable
 static char bin = 0;            // .bin output binaries with banks correctly merged
 
@@ -85,6 +89,9 @@ option_t zxn_options[] = {
     {  0,  "clean",    "Remove consumed source binaries\n", OPT_BOOL, &zxc.clean },
 
     {  0,  "sna",      "Make .sna instead of .tap",  OPT_BOOL,  &sna },
+    {  0,  "128",      "Force generation of 128k sna", OPT_BOOL, &zxs.force_128 },
+    {  0,  "ext",      "Generate extended sna",      OPT_BOOL, &zxs.xsna },
+    {  0,  "snx",      "Generate extended nextos snx", OPT_BOOL, &zxs.snx },
     {  0,  "org",      "Start address of .sna",      OPT_INT,   &zxc.origin },
     {  0,  "sna-sp",   "Stack location in .sna",     OPT_INT,   &zxs.stackloc },
     {  0,  "sna-di",   "Di on start if non-zero (default = 0)", OPT_INT, &zxs.intstate },
@@ -154,6 +161,12 @@ int zxn_exec(char *target)
     }
 
     // generate output
+
+    if (zxs.snx)
+    {
+        sna = 1;
+        zxs.xsna = 1;
+    }
 
     tap = !dot && !sna && !zxn && !bin;
 
@@ -371,7 +384,6 @@ int zxn_exec(char *target)
                 while (size > 0)
                 {
                     struct section_bin newsec;
-                    char *buffer;
                     int len;
                     struct memory_bank *dst;
 
@@ -493,8 +505,26 @@ int zxn_exec(char *target)
 
     if (sna)
     {
-        if ((ret = zx_sna(&zxc, &zxs, &memory, 1)) != 0)
-            return ret;
+        if (zxs.xsna)
+        {
+            // generating an extended sna for nextos so tick off the implied options
+
+            zxs.force_128 = 1;
+            zxc.pages = 1;
+        }
+
+        ret = zx_sna(&zxc, &zxs, &memory, 1);
+
+        if ((ret != 0) || (zxs.xsna == 0))
+        {
+            if (zxs.fsna)
+            {
+                fclose(zxs.fsna);
+                zxs.fsna = 0;
+            }
+        }
+
+        if (ret != 0) return ret;
 
         // sna snapshot is out but we need to process the rest of the binaries too
         // so remove mainbank and banks 0-7 from memory model so as not to treat those again
@@ -623,8 +653,89 @@ int zxn_exec(char *target)
         }
     }
 
-    // output remaining memory bank contents as raw binaries
+    // extended nextos sna
 
+    if (sna && zxs.xsna && zxs.fsna)
+    {
+        // append PAGE bankspace to sna
+
+        if ((bsnum_page = mb_find_bankspace(&memory, "PAGE")) >= 0)
+        {
+            for (i = 0; i < MAXBANKS; ++i)
+            {
+                struct memory_bank *mb = &memory.bankspace[bsnum_page].membank[i];
+
+                if (mb->num > 0)
+                {
+                    FILE *fin;
+                    unsigned char mem[8192];
+                    int first, last, gap;
+
+                    memset(mem, zxb.romfill, sizeof(mem));
+
+                    // PAGE_i
+
+                    gap = 0;
+
+                    for (j = 0; j < mb->num; ++j)
+                    {
+                        struct section_bin *sb = &mb->secbin[j];
+
+                        if (j == 0)
+                            first = sb->org & 0x1fff;
+                        else
+                            gap += (sb->org & 0x1fff) - last;
+
+                        if (((sb->org & 0x1fff) + sb->size) > 0x2000)
+                            exit_log(1, "Error: Section %s exceeds 8k page [%d,%d)\n", sb->section_name, sb->org & 0x1fff, (sb->org & 0x1fff) + sb->size);
+
+                        if ((fin = fopen(sb->filename, "rb")) == NULL)
+                            exit_log(1, "Error: Can't open \"%s\"\n", sb->filename);
+
+                        if (fseek(fin, sb->offset, SEEK_SET) != 0)
+                            exit_log(1, "Error: Can't seek \"%s\" to %d\n", sb->filename, sb->offset);
+
+                        if (fread(&mem[sb->org & 0x1fff], sb->size, 1, fin) != 1)
+                            exit_log(1, "Error: Can't read [%d,%d) from \"%s\"\n", sb->offset, sb->offset + sb->size);
+
+                        fclose(fin);
+
+                        last = (sb->org & 0x1fff) + sb->size;
+                    }
+
+                    // append to output sna
+
+                    fputc(i, zxs.fsna);
+                    fwrite(mem, sizeof(mem), 1, zxs.fsna);
+
+                    // information
+
+                    printf("Adding Page %d", i);
+                    if (first) printf(", %d head bytes free", first);
+                    if (gap) printf(", %d gap bytes free", gap);
+                    if (last - 0x2000 < 0) printf(", %d tail bytes free", 0x2000 - last);
+                    printf("\n");
+
+                    // remove this PAGE from memory model
+
+                    mb_remove_bank(&memory.bankspace[bsnum_page], i, zxc.clean);
+                }
+            }
+
+            // remove PAGE bankspace from memory model
+
+            mb_remove_bankspace(&memory, "PAGE");
+        }
+    }
+
+    if (zxs.fsna)
+    {
+        fclose(zxs.fsna);
+        zxs.fsna = 0;
+    }
+    
+    // output remaining memory bank contents as raw binaries
+    
     if (bin || sna || dot || tap)
     {
         mb_generate_output_binary_complete(zxc.binname, zxb.ihex, zxb.romfill, zxb.ipad, zxb.recsize, &memory);

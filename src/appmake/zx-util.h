@@ -39,6 +39,10 @@ struct zx_sna
 {
     int            stackloc;
     int            intstate;
+    char           force_128;
+    char           snx;
+    char           xsna;
+    FILE          *fsna;
 };
 
 struct zx_bin

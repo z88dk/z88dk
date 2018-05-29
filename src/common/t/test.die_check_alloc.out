@@ -1,0 +1,4 @@
+stdout:
+stderr:
+memory allocation error at t/t_die.c:25
+exit: 1

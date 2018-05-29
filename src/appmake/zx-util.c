@@ -1002,6 +1002,11 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
     int is_128 = 0;
     int bsnum_bank;
     int return_to_basic = 0;
+    int z_sna_filename;
+
+    // force 128k snapshot
+
+    is_128 = zxs->force_128 != 0;
 
     // find bankspace BANK
 
@@ -1220,13 +1225,20 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
     if (zxc->outfile == NULL)
     {
         strcpy(filename, zxc->binname);
-        suffix_change(filename, ".sna");
+        suffix_change(filename, (zxs->snx == 0) ? ".sna" : ".snx");
     }
     else
         strcpy(filename, zxc->outfile);
 
     if (strcmp(zxc->binname, filename) == 0)
         exit_log(1, "Error: Input and output filenames must be different\n");
+
+    // write sna filename into memory image
+
+    z_sna_filename = parameter_search(zxc->crtfile, ".map", "__z_sna_filename");
+
+    if (z_sna_filename >= 0x4000)
+        sprintf(&mem128[z_sna_filename - 0x4000], "%.12s", filename);
 
     // create sna file
 
@@ -1249,7 +1261,9 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
         }
     }
 
-    fclose(fout);
+    // output file is kept open
+
+    zxs->fsna = fout;
 
     return 0;
 }

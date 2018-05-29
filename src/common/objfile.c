@@ -4,6 +4,7 @@
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 #include "objfile.h"
+#include "fileutil.h"
 #include "strutil.h"
 #include "utlist.h"
 
@@ -45,7 +46,7 @@ static file_type_e read_signature(FILE *fp, const char *filename,
 	else
 		die("error: file '%s' not object nor library\n", filename);
 
-	str_set_bin(signature, file_signature, SIGNATURE_SIZE);
+	str_set_n(signature, file_signature, SIGNATURE_SIZE);
 
 	// read version
 	if (sscanf(file_signature + 6, "%d", version) < 1)
@@ -73,7 +74,7 @@ static void write_signature(FILE *fp, file_type_e type)
 		type == is_object ? SIGNATURE_OBJ : SIGNATURE_LIB,
 		CUR_VERSION);
 
-	xfwrite(str_data(signature), sizeof(char), SIGNATURE_SIZE, fp);
+	xfwrite_bytes(str_data(signature), SIGNATURE_SIZE, fp);
 
 	str_free(signature);
 }
@@ -274,10 +275,9 @@ objfile_t *objfile_new()
 	self->modname = str_new();
 
 	self->version = self->global_org = -1;
+	self->externs = argv_new();
 	
-	utarray_new(self->externs, &ut_str_icd);
-	
-	section_t *section= section_new();			// section "" must exist
+	section_t *section = section_new();			// section "" must exist
 	self->sections = NULL;
 	DL_APPEND(self->sections, section);
 
@@ -291,7 +291,7 @@ void objfile_free(objfile_t *self)
 	str_free(self->filename);
 	str_free(self->signature);
 	str_free(self->modname);
-	utarray_free(self->externs);
+	argv_free(self->externs);
 
 	section_t *section, *tmp;
 	DL_FOREACH_SAFE(self->sections, section, tmp) {
@@ -321,8 +321,8 @@ static void objfile_read_sections(objfile_t *obj, FILE *fp, long fpos_start)
 			section_t *section;
 			if (str_len(name) == 0) {
 				section = obj->sections;			// empty section is the first
-				assert(str_len(section->name) == 0);
-				assert(utarray_len(section->data) == 0);
+				xassert(str_len(section->name) == 0);
+				xassert(utarray_len(section->data) == 0);
 			}
 			else {
 				section = section_new();			// create a new section
@@ -453,7 +453,7 @@ static void objfile_read_externs(objfile_t *obj, FILE *fp, long fpos_start, long
 	xfseek(fp, fpos_start, SEEK_SET);
 	while (ftell(fp) < fpos_end) {
 		xfread_bcount_str(name, fp);
-		utarray_push_back(obj->externs, &str_data(name));
+		argv_push(obj->externs, str_data(name));
 
 		if (opt_obj_list)
 			printf("    U         %s\n", str_data(name));
@@ -693,12 +693,11 @@ static long objfile_write_symbols(objfile_t *obj, FILE *fp)
 
 static long objfile_write_externs1(objfile_t *obj, FILE *fp, str_t *name)
 {
-	if (utarray_len(obj->externs) == 0) return -1;	// no external symbols
+	if (argv_len(obj->externs) == 0) return -1;		// no external symbols
 
 	long fpos0 = ftell(fp);							// start of externals area
 
-	char **pname = NULL;
-	while ((pname = (char**)utarray_next(obj->externs, pname)) != NULL) {
+	for (char **pname = argv_front(obj->externs); *pname; pname++) {
 		str_set_f(name, "%s", *pname);
 		xfwrite_bcount_str(name, fp);
 	}
@@ -735,7 +734,7 @@ static long objfile_write_sections(objfile_t *obj, FILE *fp)
 		xfwrite_bcount_str(section->name, fp);
 		xfwrite_dword(section->org, fp);
 		xfwrite_dword(section->align, fp);
-		xfwrite(utarray_front(section->data), sizeof(byte_t), utarray_len(section->data), fp);
+		xfwrite_bytes(utarray_front(section->data), utarray_len(section->data), fp);
 	}
 
 	xfwrite_dword(-1, fp);					// end marker
@@ -878,7 +877,7 @@ void file_read(file_t *file, const char *filename)
 	switch (file->type) {
 	case is_object:  file_read_object(file, fp, signature, file->version);  break;
 	case is_library: file_read_library(file, fp, signature, file->version); break;
-	default: assert(0);
+	default: xassert(0);
 	}
 
 	xfclose(fp);
@@ -930,7 +929,7 @@ void file_write(file_t *file, const char *filename)
 	switch (file->type) {
 	case is_object:  file_write_object(file, fp);  break;
 	case is_library: file_write_library(file, fp); break;
-	default: assert(0);
+	default: xassert(0);
 	}
 
 	xfclose(fp);
@@ -1169,8 +1168,7 @@ void file_rename_symbol(file_t *file, const char *old_name, const char *new_name
 		if (opt_obj_verbose)
 			printf("Block '%s'\n", str_data(obj->signature));
 
-		char **ext = NULL;
-		while ((ext = (char**)utarray_next(obj->externs, ext)) != NULL) {
+		for (char **ext = argv_front(obj->externs); *ext; ext++) {
 			if (strcmp(*ext, old_name) == 0) {	// match
 				if (opt_obj_verbose)
 					printf("  rename symbol %s -> %s\n", old_name, new_name);

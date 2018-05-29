@@ -89,6 +89,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\src\common;..\..\ext\UNIXem\include;..\..\ext\uthash\src;..\..\ext\Unity\src;..\..\ext\regex;..\..\ext\optparse;</AdditionalIncludeDirectories>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -118,6 +119,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\src\common;..\..\ext\UNIXem\include;..\..\ext\uthash\src;..\..\ext\Unity\src;..\..\ext\regex;..\..\ext\optparse;</AdditionalIncludeDirectories>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -150,11 +152,15 @@
     <ClCompile Include="..\..\ext\regex\regfree.c" />
     <ClCompile Include="..\..\ext\Unity\src\unity.c" />
     <ClCompile Include="..\..\src\common\die.c" />
+    <ClCompile Include="..\..\src\common\fileutil.c" />
     <ClCompile Include="..\..\src\common\objfile.c" />
     <ClCompile Include="..\..\src\common\optparse.c" />
     <ClCompile Include="..\..\src\common\strutil.c" />
     <ClCompile Include="..\..\src\common\t\test.c" />
+    <ClCompile Include="..\..\src\common\t\t_die.c" />
+    <ClCompile Include="..\..\src\common\t\t_fileutil.c" />
     <ClCompile Include="..\..\src\common\t\t_strutil.c" />
+    <ClCompile Include="..\..\src\common\t\t_types.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ext\optparse\optparse.h" />
@@ -162,8 +168,17 @@
     <ClInclude Include="..\..\ext\Unity\src\unity.h" />
     <ClInclude Include="..\..\ext\Unity\src\unity_internals.h" />
     <ClInclude Include="..\..\src\common\die.h" />
+    <ClInclude Include="..\..\src\common\fileutil.h" />
     <ClInclude Include="..\..\src\common\objfile.h" />
     <ClInclude Include="..\..\src\common\strutil.h" />
+    <ClInclude Include="..\..\src\common\types.h" />
+    <ClInclude Include="..\..\src\common\t\test1.hh" />
+    <ClInclude Include="..\..\src\common\t\test2.hh" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\UNIXem\UNIXem.vcxproj">
+      <Project>{7d0213a3-87fa-4f56-a5d6-cc23682acad8}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

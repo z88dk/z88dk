@@ -28,10 +28,18 @@
 	inc	hl
 	inc	hl
 	di
+IF VDP_CMD > 255
+	ld	(VDP_CMD),a
+ELSE
 	out	(VDP_CMD),a
+ENDIF
 	
 	ld	a, (hl)		; Register #
+IF VDP_CMD > 255
+	ld	(VDP_CMD),a
+ELSE
 	out	(VDP_CMD),a
+ENDIF
 	ei
 
 	ld	a,c

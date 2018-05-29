@@ -1,0 +1,4 @@
+stdout:
+stderr:
+string '0123456789abcdef0123456789abcdef01234567...' too long for byte counted string
+exit: 1

@@ -29,7 +29,7 @@ ragel, to expand token definition from token_def.h.
 		<TAB>		if (expect_opcode) {				<NL> \
 		<TAB><TAB>		sym.tok        = TK_##opcode;	<NL> \
 		<TAB><TAB>		sym.tok_opcode = TK_##opcode;	<NL> \
-		<TAB><TAB>		expect_opcode  = FALSE;			<NL> \
+		<TAB><TAB>		expect_opcode  = false;			<NL> \
 		<TAB>		}									<NL> \
 		<TAB>		else {								<NL> \
 		<TAB><TAB>		sym.tok        = TK_NAME;		<NL> \
@@ -73,6 +73,8 @@ ragel, to expand token definition from token_def.h.
 
 %%{
 machine lexer;
+
+variable eof eof_;
 
 /* check predicates - beginning of line */
 action at_bol 		{ at_bol }	
@@ -198,10 +200,10 @@ main := |*
 		{
 			STR_DEFINE(string, STR_SIZE);
 			
-			str_set_bytes(string, ts, te-ts);
-			str_compress_escapes(string);		/* process escape sequeneces */
-			if (str_len(string) == 1)
-				sym.number = str_data(string)[0];
+			Str_set_bytes(string, ts, te-ts);
+			Str_len(string) = cstr_compress_escapes(Str_data(string));		/* process escape sequeneces */
+			if (Str_len(string) == 1)
+				sym.number = Str_data(string)[0];
 			else
 				error_invalid_squoted_string(); 
 				
@@ -238,15 +240,15 @@ main := |*
 
 %%write data nofinal;
 
-static void set_scan_buf( char *text, Bool _at_bol )
+static void set_scan_buf( const char *text, bool _at_bol )
 {
-	str_set( input_buf, text );		
-	p = str_data(input_buf);
+	Str_set( input_buf, text );		
+	p = Str_data(input_buf);
 	
 	/* init state */
 	at_bol  = _at_bol;
-	pe		= str_data(input_buf) + str_len(input_buf);
-	eof		= pe;	/* tokens are not split acros input lines */
+	pe		= Str_data(input_buf) + Str_len(input_buf);
+	eof_	= pe;	/* tokens are not split acros input lines */
 	
 	%%write init;
 }

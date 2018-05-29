@@ -5,18 +5,15 @@
 #-----------------------------------------------------------------------------
 PROJ		:= zobjcopy
 
-ifeq ($(OS),Windows_NT)
-  EXE	:= .exe
-else
-  EXE 	:= $(EXESUFFIX)
-endif
+include ../Make.common
 
 CC			?= gcc
 CFLAGS		+= -Wall -std=gnu11 -MMD \
--I../common \
--I../../ext/uthash/src \
--I../../ext/optparse \
--I../../ext/regex
+			-I../common \
+			-I../../ext/uthash/src \
+			-I../../ext/optparse \
+			-I../../ext/regex  \
+			$(UNIXem_CFLAGS)
 
 INSTALL 	?= install
 
@@ -24,7 +21,9 @@ SRCS 		:= $(wildcard *.c) \
 $(wildcard ../common/*.c) \
 $(wildcard ../../ext/regex/reg*.c)
 
-OBJS_ALL	:= $(SRCS:.c=.o)
+OBJS_ALL	:= $(SRCS:.c=.o) \
+			$(UNIXem_OBJS)
+
 OBJS		:= $(OBJS_ALL:$(PROJ).o=)
 
 DEPENDS		:= $(SRCS:.c=.d) $(T_SRCS:.c=.d)

@@ -1145,7 +1145,7 @@ void FindActions(struct lemon *lemp)
 /* Resolve a conflict between the two given actions.  If the
 ** conflict can't be resolved, return non-zero.
 **
-** NO LONGER TRUE:
+** NO LONGER true:
 **   To resolve a conflict, first look to see if either action
 **   is on an error rule.  In that case, take the action which
 **   is not associated with the error rule.  If neither or both
@@ -2993,7 +2993,7 @@ char *tag;
 }
 #endif
 
-/* Print an action to the given file descriptor.  Return FALSE if
+/* Print an action to the given file descriptor.  Return false if
 ** nothing was actually printed.
 */
 int PrintAction(struct action *ap, FILE *fp, int indent){
@@ -3335,7 +3335,7 @@ void emit_destructor_code(
 }
 
 /*
-** Return TRUE (non-zero) if the given symbol has a destructor.
+** Return true (non-zero) if the given symbol has a destructor.
 */
 int has_destructor(struct symbol *sp, struct lemon *lemp)
 {
@@ -4346,8 +4346,8 @@ void SetFree(char *s)
   free(s);
 }
 
-/* Add a new element to the set.  Return TRUE if the element was added
-** and FALSE if it was already there. */
+/* Add a new element to the set.  Return true if the element was added
+** and false if it was already there. */
 int SetAdd(char *s, int e)
 {
   int rv;
@@ -4357,7 +4357,7 @@ int SetAdd(char *s, int e)
   return !rv;
 }
 
-/* Add every element of s2 to s1.  Return TRUE if s1 changes. */
+/* Add every element of s2 to s1.  Return true if s1 changes. */
 int SetUnion(char *s1, char *s2)
 {
   int i, progress;
@@ -4453,7 +4453,7 @@ void Strsafe_init(){
     }
   }
 }
-/* Insert a new record into the array.  Return TRUE if successful.
+/* Insert a new record into the array.  Return true if successful.
 ** Prior data with the same key is NOT overwritten */
 int Strsafe_insert(const char *data)
 {
@@ -4620,7 +4620,7 @@ void Symbol_init(){
     }
   }
 }
-/* Insert a new record into the array.  Return TRUE if successful.
+/* Insert a new record into the array.  Return true if successful.
 ** Prior data with the same key is NOT overwritten */
 int Symbol_insert(struct symbol *data, const char *key)
 {
@@ -4817,7 +4817,7 @@ void State_init(){
     }
   }
 }
-/* Insert a new record into the array.  Return TRUE if successful.
+/* Insert a new record into the array.  Return true if successful.
 ** Prior data with the same key is NOT overwritten */
 int State_insert(struct state *data, struct config *key)
 {
@@ -4957,7 +4957,7 @@ void Configtable_init(){
     }
   }
 }
-/* Insert a new record into the array.  Return TRUE if successful.
+/* Insert a new record into the array.  Return true if successful.
 ** Prior data with the same key is NOT overwritten */
 int Configtable_insert(struct config *data)
 {

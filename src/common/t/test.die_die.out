@@ -1,0 +1,4 @@
+stdout:
+stderr:
+hello world 42!
+exit: 1

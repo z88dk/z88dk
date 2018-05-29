@@ -5,55 +5,56 @@
 //-----------------------------------------------------------------------------
 #pragma once
 
-#include "strutil.h"
+#include "fileutil.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
 
-typedef unsigned char byte_t;
+#ifdef _WIN32
+#include <direct.h>
+#endif
+
+#ifdef _WIN32
+#include <unixem/glob.h>
+#endif
+#include <glob.h>
+#include <dirent.h>
 
 // error message and exit program
 extern void die(char *msg, ...);
 
-// check alloc result, die if error
-extern void *check_alloc(void *p);
-#define Check_alloc(type, p)	((type)(p))
+// assertion that is not removed in a release compile
+#define xassert(f)			do { \
+								if (!(f)) \
+									die("assertion failed in %s:%d\n", __FILE__, __LINE__); \
+							} while(0)
 
-#define xmalloc(size)		check_alloc(malloc(size))
-#define xcalloc(count,size)	check_alloc(calloc((cout), (size)))
-#define xrealloc(p,size)	check_alloc(realloc((p), (size)))
+// check alloc result, die if error
+extern void *check_alloc(void *p, const char *file, int line_nr);
+#define Check_alloc(type, p)	((type)(check_alloc((p), __FILE__, __LINE__)))
+
+#define xmalloc(size)		Check_alloc(void*, malloc(size))
+#define xcalloc(count,size)	Check_alloc(void*, calloc((count), (size)))
+#define xrealloc(p,size)	Check_alloc(void*, realloc((p), (size)))
 #define xfree(p)			(free(p), (p) = NULL)
 #define xstrdup(s)			Check_alloc(char*, strdup(s))
 
 #define xnew(type)			Check_alloc(type*, calloc(1, sizeof(type)))
 
-// file IO, die if error
-// maps internally FILE* -> fileno -> filename for error messages
-extern FILE *xfopen(const char *filename, const char *mode);
-extern void xfclose(FILE *stream);
+// check OS retval
+extern int check_retval(int retval, const char *file, const char *source_file, int line_nr);
+#define Check_retval(rv, file)	check_retval((rv), (file), __FILE__, __LINE__)
 
-// dies if error writing all elements
-extern void xfwrite(const void *ptr, size_t size, size_t count, FILE *stream);
-extern void xfwrite_str(str_t *str, FILE *stream);
+#define xremove(file)		Check_retval(remove(file), (file))
 
-// byte/word length followed by string
-extern void xfwrite_bcount_str(str_t *str, FILE *stream);
-extern void xfwrite_wcount_str(str_t *str, FILE *stream);
+#ifdef _WIN32
+#define xmkdir(dir)			Check_retval(_mkdir(path_os(dir)), (dir))
+#define xrmdir(dir)			Check_retval(_rmdir(path_os(dir)), (dir))
+#else
+#define xmkdir(dir)			Check_retval(mkdir(path_os(dir), 0777), (dir))
+#define xrmdir(dir)			Check_retval(rmdir(path_os(dir)), (dir))
+#endif
 
-extern void xfwrite_byte(byte_t value, FILE *stream);
-extern void xfwrite_word(int value, FILE *stream);
-extern void xfwrite_dword(int value, FILE *stream);
-
-// dies if cannot read all expected elements; use fread() if this is expected
-extern void xfread(void *ptr, size_t size, size_t count, FILE *stream);
-extern void xfread_str(size_t size, str_t *str, FILE *stream);
-
-// byte/word length followed by string
-extern void xfread_bcount_str(str_t *str, FILE *stream);
-extern void xfread_wcount_str(str_t *str, FILE *stream);
-
-extern byte_t xfread_byte(FILE *stream);
-extern int xfread_word(FILE *stream);
-extern int xfread_dword(FILE *stream);
-
-// dies if fseek() fails
-extern void xfseek(FILE *stream, long offset, int origin);
+int xglob(const char *pattern, int flags, const int(*errfunc) (const char *epath, int eerrno),
+	glob_t *pglob);

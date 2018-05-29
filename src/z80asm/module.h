@@ -19,15 +19,19 @@ Assembled module, i.e. result of assembling a .asm file
 #include "symtab.h"
 #include "types.h"
 
+#include "objfile.h"
+
 /*-----------------------------------------------------------------------------
 *   Assembly module
 *----------------------------------------------------------------------------*/
 CLASS( Module )
-	char		*modname;			/* module name, kept in strpool */
-	char		*filename;			/* source file name, kept in strpool */
+	const char	*modname;			/* module name, kept in strpool */
+	const char	*filename;			/* source file name, kept in strpool */
 	int			 module_id;			/* sequence number of linked modules in sections */
     ExprList	*exprs;				/* list of expressions */
 	SymbolHash	*local_symtab;		/* module local symbols */
+
+	objfile_t	*objfile;
 END_CLASS;
 
 CLASS_LIST( Module );

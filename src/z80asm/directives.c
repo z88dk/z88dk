@@ -16,18 +16,18 @@ Assembly directives.
 #include "model.h"
 #include "module.h"
 #include "parse.h"
-#include "strpool.h"
+#include "strutil.h"
 #include "types.h"
 #include "symtab.h"
 #include "z80asm.h"
-#include <assert.h>
+#include "die.h"
 
 static void check_org_align();
 
 /*-----------------------------------------------------------------------------
 *   LABEL: define a label at the current location
 *----------------------------------------------------------------------------*/
-void asm_LABEL_offset(char *name, int offset)
+void asm_LABEL_offset(const char *name, int offset)
 {
 	Symbol *sym;
 	
@@ -36,27 +36,27 @@ void asm_LABEL_offset(char *name, int offset)
 	else
 		sym = define_symbol(name, get_PC() + offset, TYPE_ADDRESS);
 
-	sym->is_touched = TRUE;
+	sym->is_touched = true;
 }
 
-void asm_LABEL(char *name)
+void asm_LABEL(const char *name)
 {
 	asm_LABEL_offset(name, 0);
 }
 
 void asm_cond_LABEL(Str *label)
 {
-	if (str_len(label)) {
-		asm_LABEL(str_data(label));
-		str_len(label) = 0;
+	if (Str_len(label)) {
+		asm_LABEL(Str_data(label));
+		Str_len(label) = 0;
 	}
 
 	if (opts.debug_info && !scr_is_c_source()) {
 		STR_DEFINE(name, STR_SIZE);
 
-		str_sprintf(name, "__ASM_LINE_%ld", get_error_line());
-		if (!find_local_symbol(str_data(name)))
-			asm_LABEL(str_data(name));
+		Str_sprintf(name, "__ASM_LINE_%ld", get_error_line());
+		if (!find_local_symbol(Str_data(name)))
+			asm_LABEL(Str_data(name));
 
 		STR_DELETE(name);
 	}
@@ -75,9 +75,9 @@ void asm_DEFGROUP_start(int next_value)
 }
 
 /* define one constant with the next value, increment the value */
-void asm_DEFGROUP_define_const(char *name)
+void asm_DEFGROUP_define_const(const char *name)
 {
-	assert(name != NULL);
+	xassert(name != NULL);
 	
 	if (DEFGROUP_PC > 0xFFFF || DEFGROUP_PC < -0x8000)
 		error_int_range(DEFGROUP_PC);
@@ -116,12 +116,12 @@ void asm_DEFVARS_start(int start_addr)
 }
 
 /* define one constant in the current context */
-void asm_DEFVARS_define_const(char *name, int elem_size, int count)
+void asm_DEFVARS_define_const(const char *name, int elem_size, int count)
 {
 	int var_size = elem_size * count;
 	int next_pc = *DEFVARS_PC + var_size;
 
-	assert(name != NULL);
+	xassert(name != NULL);
 
 	if (var_size > 0xFFFF)
 		error_int_range(var_size);
@@ -140,19 +140,19 @@ void asm_DEFVARS_define_const(char *name, int elem_size, int count)
 void asm_LSTON(void)
 {
 	if (opts.list)
-		opts.cur_list = TRUE;
+		opts.cur_list = true;
 }
 
 void asm_LSTOFF(void)
 {
 	if (opts.list)
-		opts.cur_list = FALSE;
+		opts.cur_list = false;
 }
 
 /*-----------------------------------------------------------------------------
 *   directives with number argument
 *----------------------------------------------------------------------------*/
-void asm_LINE(int line_nr, char *filename)
+void asm_LINE(int line_nr, const char *filename)
 {
 	STR_DEFINE(name, STR_SIZE);
 
@@ -164,7 +164,7 @@ void asm_LINE(int line_nr, char *filename)
 	STR_DELETE(name);
 }
 
-void asm_C_LINE(int line_nr, char *filename)
+void asm_C_LINE(int line_nr, const char *filename)
 {
 	src_set_filename(filename);
 	src_set_line_nr(line_nr, 0);		// do not increment line numbers
@@ -176,9 +176,9 @@ void asm_C_LINE(int line_nr, char *filename)
 	if (opts.debug_info) {
 		STR_DEFINE(name, STR_SIZE);
 
-		str_sprintf(name, "__C_LINE_%ld", line_nr);
-		if (!find_local_symbol(str_data(name)))
-			asm_LABEL(str_data(name));
+		Str_sprintf(name, "__C_LINE_%ld", line_nr);
+		if (!find_local_symbol(Str_data(name)))
+			asm_LABEL(Str_data(name));
 
 		STR_DELETE(name);
 	}
@@ -203,40 +203,39 @@ void asm_DEPHASE()
 /*-----------------------------------------------------------------------------
 *   directives with string argument 
 *----------------------------------------------------------------------------*/
-void asm_INCLUDE(char *filename)
+void asm_INCLUDE(const char *filename)
 {
 	parse_file(filename);
 }
 
-void asm_BINARY(char *filename)
+void asm_BINARY(const char *filename)
 {
-	FILE *binfile;
-
-	filename = search_file(filename, opts.inc_path);
-
-	binfile = myfopen(filename, "rb");		
-	if (binfile)
-	{
+	filename = path_search(filename, opts.inc_path);
+	FILE *binfile = fopen(filename, "rb");
+	if (!binfile) {
+		error_read_file(filename);
+	}
+	else {
 		append_file_contents(binfile, -1);		/* read binary code */
-		myfclose(binfile);
+		xfclose(binfile);
 	}
 }
 
 /*-----------------------------------------------------------------------------
 *   directives with name argument
 *----------------------------------------------------------------------------*/
-void asm_MODULE(char *name)
+void asm_MODULE(const char *name)
 {
-	CURRENTMODULE->modname = strpool_add(name);		/* replace previous module name */
+	CURRENTMODULE->modname = spool_add(name);		/* replace previous module name */
 }
 
 void asm_MODULE_default(void)
 {
 	if (!CURRENTMODULE->modname)     /* Module name must be defined */
-		CURRENTMODULE->modname = path_remove_ext(path_basename(CURRENTMODULE->filename));
+		CURRENTMODULE->modname = path_remove_ext(path_file(CURRENTMODULE->filename));
 }
 
-void asm_SECTION(char *name)
+void asm_SECTION(const char *name)
 {
 	new_section(name);
 }
@@ -244,47 +243,47 @@ void asm_SECTION(char *name)
 /*-----------------------------------------------------------------------------
 *   directives with list of names argument, function called for each argument
 *----------------------------------------------------------------------------*/
-void asm_GLOBAL(char *name)
+void asm_GLOBAL(const char *name)
 {
 	declare_global_symbol(name);
 }
 
-void asm_EXTERN(char *name)
+void asm_EXTERN(const char *name)
 {
 	declare_extern_symbol(name);
 }
 
-void asm_XREF(char *name)
+void asm_XREF(const char *name)
 {
 	declare_extern_symbol(name);
 }
 
-void asm_LIB(char *name)
+void asm_LIB(const char *name)
 {
 	declare_extern_symbol(name);
 }
 
-void asm_PUBLIC(char *name)
+void asm_PUBLIC(const char *name)
 {
 	declare_public_symbol(name);
 }
 
-void asm_XDEF(char *name)
+void asm_XDEF(const char *name)
 {
 	declare_public_symbol(name);
 }
 
-void asm_XLIB(char *name)
+void asm_XLIB(const char *name)
 {
 	declare_public_symbol(name);
 }
 
-void asm_DEFINE(char *name)
+void asm_DEFINE(const char *name)
 {
 	define_local_def_sym(name, 1);
 }
 
-void asm_UNDEFINE(char *name)
+void asm_UNDEFINE(const char *name)
 {
 	SymbolHash_remove(CURRENTMODULE->local_symtab, name);
 }
@@ -292,21 +291,27 @@ void asm_UNDEFINE(char *name)
 /*-----------------------------------------------------------------------------
 *   define a constant or expression 
 *----------------------------------------------------------------------------*/
-void asm_DEFC(char *name, Expr *expr)
+void asm_DEFC(const char *name, Expr *expr)
 {
 	int value; 
 
-	value = Expr_eval(expr, FALSE);		/* DEFC constant expression */
+	value = Expr_eval(expr, false);		/* DEFC constant expression */
 	if ((expr->result.not_evaluable) || (expr->type >= TYPE_ADDRESS))
 	{
-		/* store in object file to be computed at link time */
-		expr->range = RANGE_WORD;
-		expr->target_name = strpool_add(name);
+		/* check if expression depends on itself */
+		if (Expr_is_recusive(expr, name)) {
+			error_expression_recursion(name);
+		}
+		else {
+			/* store in object file to be computed at link time */
+			expr->range = RANGE_WORD;
+			expr->target_name = spool_add(name);
 
-		ExprList_push(&CURRENTMODULE->exprs, expr);
+			ExprList_push(&CURRENTMODULE->exprs, expr);
 
-		/* create symbol */
-		define_symbol(expr->target_name, 0, TYPE_COMPUTED);
+			/* create symbol */
+			define_symbol(expr->target_name, 0, TYPE_COMPUTED);
+		}
 	}
 	else
 	{
@@ -331,7 +336,7 @@ void asm_DEFS(int count, int fill)
 /*-----------------------------------------------------------------------------
 *   DEFB - add an expression or a string
 *----------------------------------------------------------------------------*/
-void asm_DEFB_str(char *str, int length)
+void asm_DEFB_str(const char *str, int length)
 {
 	while (length-- > 0)
 		add_opcode((*str++) & 0xFF);
@@ -368,7 +373,7 @@ void asm_ALIGN(int align, int filler)
 			}
 			else {
 				CURRENTSECTION->align = align;
-				CURRENTSECTION->align_found = TRUE;
+				CURRENTSECTION->align_found = true;
 				check_org_align();
 			}
 		}
@@ -395,7 +400,7 @@ static void check_org_align()
 *----------------------------------------------------------------------------*/
 static Expr *asm_DMA_shift_exprs(UT_array *exprs)
 {
-	assert(utarray_len(exprs) > 0);
+	xassert(utarray_len(exprs) > 0);
 
 	Expr *expr = *((Expr **)utarray_front(exprs));	// copy first element
 	*((Expr **)utarray_front(exprs)) = NULL;		// do not destroy
@@ -404,27 +409,27 @@ static Expr *asm_DMA_shift_exprs(UT_array *exprs)
 	return expr;
 }
 
-static Bool asm_DMA_shift_byte(UT_array *exprs, int *out_value)
+static bool asm_DMA_shift_byte(UT_array *exprs, int *out_value)
 {
 	*out_value = 0;
 
 	Expr *expr = asm_DMA_shift_exprs(exprs);
-	*out_value = Expr_eval(expr, TRUE);
-	Bool not_evaluable = expr->result.not_evaluable;
+	*out_value = Expr_eval(expr, true);
+	bool not_evaluable = expr->result.not_evaluable;
 	OBJ_DELETE(expr);
 
 	if (not_evaluable) {
 		error_expected_const_expr();
 		*out_value = 0;
-		return FALSE;
+		return false;
 	}
 	else if (*out_value < 0 || *out_value > 255) {
 		error_int_range(*out_value);
 		*out_value = 0;
-		return FALSE;
+		return false;
 	}
 	else
-		return TRUE;
+		return true;
 }
 
 static void asm_DMA_command_1(int cmd, UT_array *exprs)
@@ -466,7 +471,7 @@ static void asm_DMA_command_1(int cmd, UT_array *exprs)
 		case 0x08: asm_DEFB_expr(asm_DMA_shift_exprs(exprs)); break;		// bit 3
 		case 0x10: asm_DEFB_expr(asm_DMA_shift_exprs(exprs)); break; 		// bit 4
 		case 0x18: asm_DEFW(asm_DMA_shift_exprs(exprs)); break; 			// bits 3,4
-		default: assert(0);
+		default: xassert(0);
 		}
 
 		// parse wr0 parameters: check bits 5,6
@@ -479,7 +484,7 @@ static void asm_DMA_command_1(int cmd, UT_array *exprs)
 		case 0x20: asm_DEFB_expr(asm_DMA_shift_exprs(exprs)); break;		// bit 5
 		case 0x40: asm_DEFB_expr(asm_DMA_shift_exprs(exprs)); break;		// bit 6
 		case 0x60: asm_DEFW(asm_DMA_shift_exprs(exprs)); break;				// bits 5,6
-		default: assert(0);
+		default: xassert(0);
 		}
 
 		break;
@@ -743,7 +748,7 @@ static void asm_DMA_command_1(int cmd, UT_array *exprs)
 		break;
 
 	default:
-		assert(0);
+		xassert(0);
 	}
 
 	// check for extra arguments
@@ -758,7 +763,7 @@ void asm_DMA_command(int cmd, UT_array *exprs)
 		return;
 	}
 
-	assert(utarray_len(exprs) > 0);
+	xassert(utarray_len(exprs) > 0);
 	asm_DMA_command_1(cmd, exprs);
 	utarray_clear(exprs);			// clear any expr left over in case of error
 }

@@ -4463,7 +4463,7 @@ t_binary(read_binfile(bin_file()), "\xC3\x00\x00");
 #------------------------------------------------------------------------------
 unlink_testfiles();
 
-my $objs = "objfile.o lib/class.o lib/array.o errors.o error_func.o lib/str.o lib/strhash.o lib/list.o lib/fileutil.o scan.o options.o model.o module.o sym.o symtab.o lib/srcfile.o macros.o hist.o expr.o listfile.o codearea.o lib/dbg.o";
+my $objs = "zobjfile.o lib/class.o lib/array.o errors.o error_func.o lib/str.o lib/strhash.o lib/list.o  ../common/fileutil.o ../common/strutil.o ../common/die.o ../common/objfile.o ../../ext/regex/regcomp.o ../../ext/regex/regerror.o ../../ext/regex/regexec.o ../../ext/regex/regfree.o scan.o options.o model.o module.o sym.o symtab.o lib/srcfile.o macros.o hist.o expr.o listfile.o codearea.o lib/dbg.o ../../ext/UNIXem/src/glob.o ../../ext/UNIXem/src/dirent.o";
 
 # get init code except init() and main()
 my $init = <<'END';
@@ -4500,28 +4500,28 @@ t_compile_module($init, <<'END', $objs);
 	ASSERT( obj == NULL );
 
 	TITLE("Invalid short file, test mode");	
-	file = myfopen("test.o", "wb");
-	myfclose(file);
+	file = xfopen("test.o", "wb");
+	xfclose(file);
 	obj = OFile_test_file("test.o");
 	ASSERT( obj == NULL );
 	
 	TITLE("Invalid short file, read mode");	
-	file = myfopen("test.o", "wb");
-	myfclose(file);
+	file = xfopen("test.o", "wb");
+	xfclose(file);
 	obj = OFile_open_read("test.o");
 	ASSERT( obj == NULL );
 	
 	TITLE("Invalid long file, test mode");	
-	file = myfopen("test.o", "wb");
+	file = xfopen("test.o", "wb");
 	fprintf( file, "%100s", "" );		/* 100 spaces */
-	myfclose(file);
+	xfclose(file);
 	obj = OFile_test_file("test.o");
 	ASSERT( obj == NULL );
 	
 	TITLE("Invalid long file, read mode");	
-	file = myfopen("test.o", "wb");
+	file = xfopen("test.o", "wb");
 	fprintf( file, "%100s", "" );		/* 100 spaces */
-	myfclose(file);
+	xfclose(file);
 	obj = OFile_open_read("test.o");
 	ASSERT( obj == NULL );
 	
@@ -4532,7 +4532,7 @@ t_compile_module($init, <<'END', $objs);
 	ASSERT( obj->start_ptr == 0 );
 	ASSERT( strcmp(obj->filename, "test1.o") == 0 );
 	ASSERT( strcmp(obj->modname,  "test1") == 0 );
-	ASSERT( obj->writing == FALSE );
+	ASSERT( obj->writing == false );
 	ASSERT( obj->modname_ptr != -1 );
 	ASSERT( obj->expr_ptr == -1 );
 	ASSERT( obj->symbols_ptr == -1 );
@@ -4548,7 +4548,7 @@ t_compile_module($init, <<'END', $objs);
 	ASSERT( obj->start_ptr == 0 );
 	ASSERT( strcmp(obj->filename, "test1.o") == 0 );
 	ASSERT( strcmp(obj->modname,  "test1") == 0 );
-	ASSERT( obj->writing == FALSE );
+	ASSERT( obj->writing == false );
 	ASSERT( obj->modname_ptr != -1 );
 	ASSERT( obj->expr_ptr == -1 );
 	ASSERT( obj->symbols_ptr == -1 );
@@ -4558,7 +4558,7 @@ t_compile_module($init, <<'END', $objs);
 	ASSERT( obj == NULL );
 	
 	TITLE("test1 Library file");
-	file = myfopen("test1.lib", "rb");
+	file = xfopen("test1.lib", "rb");
 	ASSERT( file != NULL );
 	obj = OFile_read_header(file, 16);	
 	ASSERT( obj != NULL );
@@ -4566,7 +4566,7 @@ t_compile_module($init, <<'END', $objs);
 	ASSERT( obj->start_ptr == 16 );
 	ASSERT( obj->filename == NULL );
 	ASSERT( strcmp(obj->modname,  "test1") == 0 );
-	ASSERT( obj->writing == FALSE );
+	ASSERT( obj->writing == false );
 	ASSERT( obj->modname_ptr != -1 );
 	ASSERT( obj->expr_ptr == -1 );
 	ASSERT( obj->symbols_ptr == -1 );

@@ -13,78 +13,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\regex">
-      <UniqueIdentifier>{f7ea5ebd-3be7-4ae2-afa4-d9194f7617b4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\regex">
-      <UniqueIdentifier>{ded62bbb-3b39-43c7-9603-c11fbb66f6f1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\common">
-      <UniqueIdentifier>{68f82956-71c2-436b-b15b-bce8053ce250}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\common">
-      <UniqueIdentifier>{ffa0744a-cf3e-446f-a54a-08c7721c63cd}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\zobjcopy\zobjcopy.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\ext\regex\regcomp.c">
-      <Filter>Source Files\regex</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\ext\regex\regerror.c">
-      <Filter>Source Files\regex</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\ext\regex\regexec.c">
-      <Filter>Source Files\regex</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\ext\regex\regfree.c">
-      <Filter>Source Files\regex</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\common\die.c">
-      <Filter>Source Files\common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\common\optparse.c">
-      <Filter>Source Files\common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\common\objfile.c">
-      <Filter>Source Files\common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\common\strutil.c">
-      <Filter>Source Files\common</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\zobjcopy\zobjcopy.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ext\regex\cclass.h">
-      <Filter>Header Files\regex</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ext\regex\cname.h">
-      <Filter>Header Files\regex</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ext\regex\regex.h">
-      <Filter>Header Files\regex</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ext\regex\regex2.h">
-      <Filter>Header Files\regex</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ext\regex\utils.h">
-      <Filter>Header Files\regex</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\common\die.h">
-      <Filter>Header Files\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ext\optparse\optparse.h">
-      <Filter>Header Files\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\common\objfile.h">
-      <Filter>Header Files\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\common\strutil.h">
-      <Filter>Header Files\common</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

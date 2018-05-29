@@ -18,4 +18,5 @@ time/ace/clock
 games/ace/joystick
 @games/games.lst
 @ace/ace.lst
+@input/ace.lst
 @z80.lst

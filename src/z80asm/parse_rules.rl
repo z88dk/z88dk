@@ -67,12 +67,12 @@ Define rules for a ragel-based parser.
 	variable cs  ctx->cs;
 	variable p   ctx->p;
 	variable pe  ctx->pe;
-	variable eof ctx->eof;
+	variable eof ctx->eof_;
 
 	/* label, name */
-	label  = _TK_LABEL  @{ str_set_n(stmt_label, ctx->p->tstart, ctx->p->tlen); };
-	name   = _TK_NAME   @{ str_set_n(name, ctx->p->tstart, ctx->p->tlen); };
-	string = _TK_STRING @{ str_set_bytes(name, ctx->p->tstart, ctx->p->tlen); };
+	label  = _TK_LABEL  @{ Str_set_n(stmt_label, ctx->p->tstart, ctx->p->tlen); };
+	name   = _TK_NAME   @{ Str_set_n(name, ctx->p->tstart, ctx->p->tlen); };
+	string = _TK_STRING @{ Str_set_bytes(name, ctx->p->tstart, ctx->p->tlen); };
 	
 	/*---------------------------------------------------------------------
 	*   Expression 
@@ -109,7 +109,7 @@ Define rules for a ragel-based parser.
 	action expr_start_action {
 		ctx->expr_start = ctx->p;
 		expr_in_parens = 
-			(ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+			(ctx->expr_start->tok == TK_LPAREN) ? true : false;
 		expr_open_parens = 0;
 	} 
 	
@@ -125,8 +125,8 @@ Define rules for a ragel-based parser.
 	*   IF, IFDEF, IFNDEF, ELSE, ENDIF
 	*--------------------------------------------------------------------*/
 	asm_IF = 	 _TK_IF     expr _TK_NEWLINE @{ asm_IF(ctx, pop_expr(ctx) ); };
-	asm_IFDEF =  _TK_IFDEF  name _TK_NEWLINE @{ asm_IFDEF(ctx, str_data(name) ); };
-	asm_IFNDEF = _TK_IFNDEF name _TK_NEWLINE @{ asm_IFNDEF(ctx, str_data(name) ); };
+	asm_IFDEF =  _TK_IFDEF  name _TK_NEWLINE @{ asm_IFDEF(ctx, Str_data(name) ); };
+	asm_IFNDEF = _TK_IFNDEF name _TK_NEWLINE @{ asm_IFNDEF(ctx, Str_data(name) ); };
 	asm_ELSE =	 _TK_ELSE        _TK_NEWLINE @{ asm_ELSE(ctx); };
 	asm_ENDIF =	 _TK_ENDIF       _TK_NEWLINE @{ asm_ENDIF(ctx); };
 	
@@ -148,13 +148,13 @@ Define rules for a ragel-based parser.
 				error_expected_const_expr();
 			else {
 				asm_DEFGROUP_start(expr_value);
-				asm_DEFGROUP_define_const(str_data(name));
+				asm_DEFGROUP_define_const(Str_data(name));
 			}
 		  };
 	
 	defgroup_var_next =
 		  name
-		  %{ asm_DEFGROUP_define_const(str_data(name)); }
+		  %{ asm_DEFGROUP_define_const(Str_data(name)); }
 		;
 
 	defgroup_var = defgroup_var_value | defgroup_var_next ;
@@ -201,15 +201,15 @@ Define rules for a ragel-based parser.
 	*   DEFVARS
 	*--------------------------------------------------------------------*/
 	defvars_define = 
-			name _TK_NEWLINE				@{ 	asm_DEFVARS_define_const( str_data(name), 0, 0 ); }
-		|	name _TK_RCURLY _TK_NEWLINE		@{ 	asm_DEFVARS_define_const( str_data(name), 0, 0 ); 
+			name _TK_NEWLINE				@{ 	asm_DEFVARS_define_const( Str_data(name), 0, 0 ); }
+		|	name _TK_RCURLY _TK_NEWLINE		@{ 	asm_DEFVARS_define_const( Str_data(name), 0, 0 ); 
 												ctx->current_sm = SM_MAIN; }
 #foreach <S> in B, W, P, Q
 		|	name _TK_DS_<S> const_expr _TK_NEWLINE
 											@{ 	if (expr_error)
 													error_expected_const_expr();
 												else
-													asm_DEFVARS_define_const( str_data(name), 
+													asm_DEFVARS_define_const( Str_data(name), 
 																			  DEFVARS_SIZE_<S>, 
 																			  expr_value ); 
 											}
@@ -219,7 +219,7 @@ Define rules for a ragel-based parser.
 											@{ 	if (expr_error)
 													error_expected_const_expr();
 												else
-													asm_DEFVARS_define_const( str_data(name), 
+													asm_DEFVARS_define_const( Str_data(name), 
 																			  DEFVARS_SIZE_<S>, 
 																			  expr_value ); 
 												ctx->current_sm = SM_MAIN;
@@ -282,7 +282,7 @@ Define rules for a ragel-based parser.
 				@{ if (expr_error)
 					  error_expected_const_expr();
 			       value1 = expr_error ? 0 : expr_value;
-				   expr_error = FALSE;
+				   expr_error = false;
 				}
 				const_expr _TK_NEWLINE
 		  @{ DO_STMT_LABEL(); 
@@ -300,8 +300,8 @@ Define rules for a ragel-based parser.
 			(
 				string (_TK_COMMA | _TK_NEWLINE)
 				@{	DO_STMT_LABEL();
-					str_compress_escapes(name);
-					asm_DEFB_str(str_data(name), str_len(name));
+					Str_len(name) = cstr_compress_escapes(Str_data(name));
+					asm_DEFB_str(Str_data(name), Str_len(name));
 					if ( ctx->p->tok == TK_COMMA )
 						fgoto asm_DEFB_next;
 				}
@@ -347,7 +347,7 @@ Define rules for a ragel-based parser.
 	*--------------------------------------------------------------------*/
 #foreach <OP> in MODULE, SECTION
 	asm_<OP> = _TK_<OP> name _TK_NEWLINE
-			   @{ asm_<OP>(str_data(name)); }
+			   @{ asm_<OP>(Str_data(name)); }
 #foreach <KW> in A,A32,AF,B,BC,C,D,DE,DEHL,E,EIR,F,H,HL,I,IIR,IP,IX,IXH,IXL,IY,IYH,IYL,L,M,NC,NV,NZ,P,PE,PO,R,SP,SU,V,XPC,Z
 			 | _TK_<OP> _TK_<KW> _TK_NEWLINE
 			   @{ asm_<OP>(sym_text(&ctx->p[-1])); }
@@ -361,7 +361,7 @@ Define rules for a ragel-based parser.
 	*	argument
 	*--------------------------------------------------------------------*/
 #foreach <OP> in GLOBAL, PUBLIC, EXTERN, DEFINE, UNDEFINE, XDEF, XLIB, XREF, LIB
-	action <OP>_action { asm_<OP>(str_data(name)); }
+	action <OP>_action { asm_<OP>(Str_data(name)); }
 	
 	asm_<OP> = _TK_<OP> name @<OP>_action
 		    ( _TK_COMMA name @<OP>_action )*
@@ -378,7 +378,7 @@ Define rules for a ragel-based parser.
 	asm_<OP>_iter =
 			asm_<OP>_next: 
 				name _TK_EQUAL expr (_TK_COMMA | _TK_NEWLINE)
-				@{	asm_<OP>(str_data(name), pop_expr(ctx));
+				@{	asm_<OP>(Str_data(name), pop_expr(ctx));
 					if ( ctx->p->tok == TK_COMMA )
 						fgoto asm_<OP>_next;
 				};
@@ -460,7 +460,7 @@ Define rules for a ragel-based parser.
 				@{ if (expr_error)
 					   error_expected_const_expr();
 				   value1 = expr_error ? 0 : expr_value; 
-				   expr_error = FALSE;
+				   expr_error = false;
 				}
 				const_expr _TK_NEWLINE @{ 
 			DO_STMT_LABEL(); 
@@ -488,7 +488,7 @@ Define rules for a ragel-based parser.
 			if (expr_error)
 				error_expected_const_expr();
 			else
-				asm_LINE(expr_value, str_data(name)); 
+				asm_LINE(expr_value, Str_data(name)); 
 		}
 		
 		| _TK_C_LINE const_expr _TK_NEWLINE @{ 
@@ -502,17 +502,17 @@ Define rules for a ragel-based parser.
 			if (expr_error)
 				error_expected_const_expr();
 			else
-				asm_C_LINE(expr_value, str_data(name)); 
+				asm_C_LINE(expr_value, Str_data(name)); 
 		}
 		
 		| label? _TK_INCLUDE string _TK_NEWLINE @{ 
 			DO_STMT_LABEL(); 
-			asm_INCLUDE(str_data(name)); 
+			asm_INCLUDE(Str_data(name)); 
 		}
 		
 		| label? _TK_BINARY string _TK_NEWLINE @{ 
 			DO_STMT_LABEL(); 
-			asm_BINARY(str_data(name)); 
+			asm_BINARY(Str_data(name)); 
 		}
 		
 		| _TK_PHASE const_expr _TK_NEWLINE @{ 
@@ -600,27 +600,27 @@ static int get_start_state(ParseCtx *ctx)
 		return parser_en_dma_params;
 
 	default:
-		assert(0);
+		xassert(0);
 	}
 
 	return 0;	/* not reached */
 }
 
-static Bool _parse_statement_1(ParseCtx *ctx, Str *name, Str *stmt_label)
+static bool _parse_statement_1(ParseCtx *ctx, Str *name, Str *stmt_label)
 {
 	int  value1 = 0;
 	int  start_num_errors = get_num_errors();
 	int  expr_value = 0;			/* last computed expression value */
-	Bool expr_error = FALSE;		/* last computed expression error */
-	Bool expr_in_parens = FALSE;	/* true if expression has enclosing parens */
+	bool expr_error = false;		/* last computed expression error */
+	bool expr_in_parens = false;	/* true if expression has enclosing parens */
 	int  expr_open_parens = 0;		/* number of open parens */
 
 	%%write init nocs;
 
 	ctx->cs = get_start_state(ctx);
-	ctx->p = ctx->pe = ctx->eof = ctx->expr_start = NULL;
+	ctx->p = ctx->pe = ctx->eof_ = ctx->expr_start = NULL;
 	
-	while ( ctx->eof == NULL || ctx->eof != ctx->pe )
+	while ( ctx->eof_ == NULL || ctx->eof_ != ctx->pe )
 	{
 		read_token(ctx);
 		
@@ -628,25 +628,25 @@ static Bool _parse_statement_1(ParseCtx *ctx, Str *name, Str *stmt_label)
 
 		/* Did parsing succeed? */
 		if ( ctx->cs == %%{ write error; }%% )
-			return FALSE;
+			return false;
 		
 		if ( ctx->cs >= %%{ write first_final; }%% )
-			return TRUE;
+			return true;
 			
 		/* assembly error? must test after check for end of parse */
 		if (get_num_errors() != start_num_errors) 
 			break;
 	}
 	
-	return FALSE;
+	return false;
 }
 
-static Bool _parse_statement(ParseCtx *ctx)
+static bool _parse_statement(ParseCtx *ctx)
 {
 	STR_DEFINE(name, STR_SIZE);			/* identifier name */
 	STR_DEFINE(stmt_label, STR_SIZE);	/* statement label, NULL if none */
 	
-	Bool ret = _parse_statement_1(ctx, name, stmt_label);
+	bool ret = _parse_statement_1(ctx, name, stmt_label);
 
 	STR_DELETE(name);
 	STR_DELETE(stmt_label);

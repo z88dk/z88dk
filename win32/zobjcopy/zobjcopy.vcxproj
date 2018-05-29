@@ -77,7 +77,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\src\common;..\..\ext\uthash\src;..\..\ext\optparse;..\..\ext\regex</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\src\common;..\..\ext\uthash\src;..\..\ext\optparse;..\..\ext\regex;..\..\ext\UNIXem\include</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -99,7 +99,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\src\common;..\..\ext\uthash\src;..\..\ext\optparse;..\..\ext\regex</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\src\common;..\..\ext\uthash\src;..\..\ext\optparse;..\..\ext\regex;..\..\ext\UNIXem\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -141,27 +141,18 @@
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\ext\regex\regcomp.c" />
-    <ClCompile Include="..\..\ext\regex\regerror.c" />
-    <ClCompile Include="..\..\ext\regex\regexec.c" />
-    <ClCompile Include="..\..\ext\regex\regfree.c" />
-    <ClCompile Include="..\..\src\common\die.c" />
-    <ClCompile Include="..\..\src\common\optparse.c" />
-    <ClCompile Include="..\..\src\common\objfile.c" />
-    <ClCompile Include="..\..\src\common\strutil.c" />
     <ClCompile Include="..\..\src\zobjcopy\zobjcopy.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\ext\optparse\optparse.h" />
-    <ClInclude Include="..\..\ext\regex\cclass.h" />
-    <ClInclude Include="..\..\ext\regex\cname.h" />
-    <ClInclude Include="..\..\ext\regex\regex.h" />
-    <ClInclude Include="..\..\ext\regex\regex2.h" />
-    <ClInclude Include="..\..\ext\regex\utils.h" />
-    <ClInclude Include="..\..\src\common\die.h" />
-    <ClInclude Include="..\..\src\common\objfile.h" />
-    <ClInclude Include="..\..\src\common\strutil.h" />
     <ClInclude Include="..\..\src\zobjcopy\zobjcopy.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\UNIXem\UNIXem.vcxproj">
+      <Project>{7d0213a3-87fa-4f56-a5d6-cc23682acad8}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\z80asm-common\z80asm-common.vcxproj">
+      <Project>{00bce225-fe40-4c33-b15e-c8fb6ada74eb}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
