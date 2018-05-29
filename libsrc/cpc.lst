@@ -5,6 +5,7 @@ stdio/cpc/generic_console
 stdio/cpc/generic_console_ioctl
 stdio/cpc/generic_console_vpeek
 stdio/cpc/bordercolour
+stdio/cpc/conio_map_colour
 stdio/cpc/CRT_FONT
 @font/font_8x8/font_8x8.lst
 @stdio/ansicore.lst

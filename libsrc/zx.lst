@@ -14,6 +14,7 @@ stdio/spectrum/generic_console_printc
 stdio/spectrum/generic_console_ioctl
 stdio/spectrum/generic_console_vpeek
 stdio/spectrum/console_vars
+stdio/spectrum/conio_vars
 stdio/spectrum/bordercolour
 @stdio/ansicore.lst
 stdio/ansi/spectrum/f_ansi_attr

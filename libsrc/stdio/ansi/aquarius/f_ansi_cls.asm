@@ -12,7 +12,7 @@
 
         SECTION  code_clib
 	PUBLIC	ansi_cls
-	EXTERN	aquarius_attr
+	EXTERN	__aquarius_attr
 
 .ansi_cls
 	ld	hl,$3000
@@ -24,8 +24,7 @@
 	ldir
 	
 	ld	hl,$3400
-	;ld	a,(aquarius_attr)
-	ld	a,$70
+	ld	a,(__aquarius_attr)
 	ld	(hl),a
 	ld	d,h
 	ld	e,l

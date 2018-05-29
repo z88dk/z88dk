@@ -12,7 +12,7 @@
 	EXTERN	__console_y
 	EXTERN	__console_x
 
-	EXTERN	text_attr
+	EXTERN	__sprinter_attr
 	
 
 
@@ -23,7 +23,7 @@
 	ld	d,a
 	ld	a,(__console_x)
 	ld	e,a	
-	ld	a,(text_attr)
+	ld	a,(__sprinter_attr)
 	ld	b,a
 	ex	af,af
 	ld	c,$58		;PUTCHAR

@@ -18,11 +18,10 @@
 
 
         SECTION data_clib
-	PUBLIC	aquarius_attr
+	EXTERN	__aquarius_attr
 	PUBLIC	aquarius_inverse
 	
 .aquarius_inverse	defb 0
-.aquarius_attr		defb $70	; White on Black
 
         SECTION code_clib
 
@@ -30,14 +29,14 @@
         and     a
         jr      nz,noreset
         ld      a,$70
-        ld      (aquarius_attr),a
+        ld      (__aquarius_attr),a
         ret
 .noreset
         cp      1
         jr      nz,nobold
-        ld      a,(aquarius_attr)
+        ld      a,(__aquarius_attr)
         or      @00001000
-        ld      (aquarius_attr),a
+        ld      (__aquarius_attr),a
         ret
 .nobold
         cp      2
@@ -45,37 +44,37 @@
         cp      8
         jr      nz,nodim
 .dim
-        ld      a,(aquarius_attr)
+        ld      a,(__aquarius_attr)
         and     @11110111
-        ld      (aquarius_attr),a
+        ld      (__aquarius_attr),a
         ret
 .nodim
         cp      4
         jr	nz,nounderline
-        ld      a,(aquarius_attr)	; Underline
+        ld      a,(__aquarius_attr)	; Underline
         or      @00001000
-        ld      (aquarius_attr),a
+        ld      (__aquarius_attr),a
         ret
 .nounderline
         cp      24
         jr	nz,noCunderline
-        ld      a,(aquarius_attr)	; Cancel Underline
+        ld      a,(__aquarius_attr)	; Cancel Underline
         and     @11110111
-        ld      (aquarius_attr),a
+        ld      (__aquarius_attr),a
         ret
 .noCunderline
         cp      5
         jr      nz,noblink
-        ld      a,(aquarius_attr)
+        ld      a,(__aquarius_attr)
         or      @10000000
-        ld      (aquarius_attr),a
+        ld      (__aquarius_attr),a
         ret
 .noblink
         cp      25
         jr      nz,nocblink
-        ld      a,(aquarius_attr)
+        ld      a,(__aquarius_attr)
         and     @01111111
-        ld      (aquarius_attr),a
+        ld      (__aquarius_attr),a
         ret
 .nocblink
         cp      7
@@ -86,21 +85,21 @@
         ld      a,1
         ld      (aquarius_inverse),a     ; inverse 1
 .attrswap
-        ld      a,(aquarius_attr)
+        ld      a,(__aquarius_attr)
 	rla
 	rla
 	rla
 	rla
 	and	@11110000
 	ld	e,a
-	ld      a,(aquarius_attr)
+	ld      a,(__aquarius_attr)
 	rra
 	rra
 	rra
 	rra
 	and	@1111
         or	e
-        ld	(aquarius_attr),a
+        ld	(__aquarius_attr),a
         ret
 .noreverse
         cp      27
@@ -114,7 +113,7 @@
 .noCreverse
         cp      8
         jr      nz,noinvis
-        ld      a,(aquarius_attr)
+        ld      a,(__aquarius_attr)
         ld      (oldattr),a
         and     @1111
         ld      e,a
@@ -123,7 +122,7 @@
         rla
         rla
         or      e
-        ld      (aquarius_attr),a
+        ld      (__aquarius_attr),a
         ret
 .oldattr
         defb     0
@@ -131,7 +130,7 @@
         cp      28
         jr      nz,nocinvis
         ld      a,(oldattr)
-        ld      (aquarius_attr),a
+        ld      (__aquarius_attr),a
         ret
 .nocinvis
         cp      30
@@ -148,10 +147,10 @@
         rla
         rla
         ld      e,a
-        ld      a,(aquarius_attr)
+        ld      a,(__aquarius_attr)
         and     @10001111
         or      e
-        ld      (aquarius_attr),a 
+        ld      (__aquarius_attr),a 
 
 .nofore
         cp      40
@@ -164,10 +163,10 @@
         and     7
 ;''''''''''''''''''''''
         ld      e,a
-        ld      a,(aquarius_attr)
+        ld      a,(__aquarius_attr)
         and     @11111000
         or      e
-        ld      (aquarius_attr),a
+        ld      (__aquarius_attr),a
         ret
 
 .noback

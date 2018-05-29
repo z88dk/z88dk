@@ -2,6 +2,7 @@ stdio/sprinter/fgetc_cons
 stdio/sprinter/fputc_cons
 stdio/sprinter/getk
 stdio/sprinter/generic_console
+stdio/sprinter/conio_vars
 @stdio/ansicore.lst
 stdio/ansi/sprinter/f_ansi_attr
 stdio/ansi/sprinter/f_ansi_bel

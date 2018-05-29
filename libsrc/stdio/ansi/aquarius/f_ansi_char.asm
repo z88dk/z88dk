@@ -18,7 +18,7 @@
 	EXTERN	__console_y
 	EXTERN	__console_x
 	
-	EXTERN	aquarius_attr
+	EXTERN	__aquarius_attr
 
 .ansi_CHAR
 
@@ -40,7 +40,7 @@
 	
 	ld	de,1000+24
 	add	hl,de
-	ld	a,(aquarius_attr)
+	ld	a,(__aquarius_attr)
 	ld	(hl),a
 
 	ret

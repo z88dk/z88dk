@@ -16,7 +16,7 @@
 
         SECTION  code_clib
 	PUBLIC	ansi_del_line
-	EXTERN	aquarius_attr
+	EXTERN	__aquarius_attr
 
 .ansi_del_line
 	ld	hl,$3000
@@ -39,8 +39,7 @@
 	ld	de,$400
 	add	hl,de
 
-	;ld	a,(aquarius_attr)
-	ld	a,$70
+	ld	a,(__aquarius_attr)
 	ld	(hl),a
 	ld	d,h
 	ld	e,l
