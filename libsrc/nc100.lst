@@ -1,7 +1,7 @@
-@stdio/stdio.lst
 stdio/nc100/fgetc_cons
 stdio/nc100/fputc_cons
 stdio/nc100/getk
+@stdio/stdio.lst
 games/joystick
 fcntl/nc100/open
 fcntl/nc100/opendir

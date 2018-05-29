@@ -1,11 +1,7 @@
-@stdio/stdio_binary.lst
 stdio/msx/fgetc_cons
 stdio/msx/getk
 stdio/msx/fputc_cons
-stdio/msx/generic_console
-stdio/msx/generic_console_vpeek
-stdio/msx/generic_console_ioctl
-stdio/msx/CRT_FONT
+@stdio/tms9918/tms9918.lst
 @font/font_8x8/font_8x8.lst
 @stdio/ansicore.lst
 stdio/ansi/msx/f_ansi_attr
@@ -14,6 +10,7 @@ stdio/ansi/msx/f_ansi_char
 stdio/ansi/msx/f_ansi_cls
 stdio/ansi/generic/f_ansi_dline
 stdio/ansi/msx/f_ansi_scrollup
+@stdio/stdio_binary.lst
 time/msx/clock
 @fcntl/cpm/fcntl.lst
 @gfxbase.lst
@@ -49,14 +46,15 @@ games/msx/bit_close_ei
 msx/msxbasic
 msx/msxextrom
 msx/msxrompage
-msx/set_vdp_reg
-msx/get_vdp_reg
+msx/gen_set_vdp_reg
+msx/gen_get_vdp_reg
 msx/msx_blank
 msx/msx_break
 msx/msx_breakoff
 msx/msx_breakon
 msx/msx_clearkey
 msx/msx_color
+msx/gen_set_border
 msx/msx_get_stick
 msx/msx_get_trigger
 msx/msx_locate
@@ -67,7 +65,7 @@ msx/msx_map_m2_subpixel
 msx/msx_noblank
 msx/msx_screen
 msx/msx_screenmode
-msx/msx_set_mode
+msx/gen_set_mode
 msx/msx_text
 msx/msx_type
 msx/msx_vfill
@@ -79,6 +77,8 @@ msx/msx_vram
 msx/msx_vread
 msx/msx_vwrite
 msx/msx_vwrite_direct
+msx/gen_setwrt
+msx/gen_filvrm
 psg/msx/psg_init
 psg/msx/get_psg
 psg/msx/set_psg

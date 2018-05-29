@@ -1,5 +1,4 @@
 @input/zx81.lst
-@stdio/stdio_ixiy.lst
 stdio/zx81/fgetc_cons
 stdio/zx81/getk
 stdio/zx81/fputc_cons
@@ -7,6 +6,7 @@ stdio/zx81/generic_console
 @stdio/ansicore.lst
 stdio/ansi/zx81/f_ansi_attr
 stdio/ansi/zx81/f_ansi_bel
+@stdio/stdio_ixiy.lst
 @stdlib/stdlib.lst
 time/zx81/clock
 games/zx81snd/joystick

@@ -1,4 +1,3 @@
-@stdio/stdio.lst
 stdio/vz200/fgetc_cons
 stdio/vz200/fputc_cons
 stdio/vz200/getk
@@ -10,6 +9,7 @@ stdio/ansi/vz200/f_ansi_char
 stdio/ansi/vz200/f_ansi_cls
 stdio/ansi/vz200/f_ansi_dline
 stdio/ansi/vz200/f_ansi_scrollup
+@stdio/stdio.lst
 @gfxbase.lst
 graphics/dcircle
 graphics/clg
@@ -37,7 +37,7 @@ games/vz/bit_close
 games/vz/bit_close_ei
 games/vz/joystick
 @games/games_mwr.lst
-@input/vz.lst
+@input/input_keyboard.lst
 vz/vz_bgrd
 vz/vz_brick
 vz/vz_brick_callee

@@ -1,5 +1,3 @@
-@stdio/stdio.lst
-@input/spectrum.lst
 stdio/sam/fgetc_cons
 stdio/sam/fputc_cons
 stdio/sam/getk
@@ -12,7 +10,9 @@ stdio/ansi/sam/f_ansi_default
 stdio/ansi/sam/f_ansi_dline
 stdio/ansi/sam/f_ansi_restore
 stdio/ansi/sam/f_ansi_scrollup
+@stdio/stdio.lst
 time/spectrum/clock
+@input/spectrum.lst
 @gfxbase.lst
 graphics/dcircle
 graphics/spectrum/clg

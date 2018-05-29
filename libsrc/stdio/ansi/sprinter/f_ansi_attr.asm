@@ -18,6 +18,8 @@
         SECTION code_clib
 	PUBLIC	ansi_attr
 
+	EXTERN	__sprinter_attr
+
 
 ; 0 = reset all attributes
 ; 1 = bold on
@@ -37,7 +39,7 @@
 	and	a
 	jr	nz,noreset
 	ld	a,15
-	ld	(text_attr),a
+	ld	(__sprinter_attr),a
 	ret
 .noreset
 	cp	2
@@ -45,14 +47,14 @@
 	cp	8
 	jr	nz,nodim
 .dim
-	ld	a,(text_attr)
+	ld	a,(__sprinter_attr)
 	and	@01110111
-	ld	(text_attr),a
+	ld	(__sprinter_attr),a
 	ret
 .nodim
 	cp	5
 	jr	nz,noblinkon
-	ld	hl,text_attr
+	ld	hl,__sprinter_attr
 	set	7,(hl)
 	inc	hl
 	set	7,(hl)
@@ -60,7 +62,7 @@
 .noblinkon
 	cp	25
 	jr	nz,noblinkoff
-	ld	hl,text_attr
+	ld	hl,__sprinter_attr
 	res	7,(hl)
 	inc	hl
 	res	7,(hl)
@@ -71,7 +73,7 @@
 	cp	27
 	jr	nz,noreverse
 .switchreverse
-	ld	hl,text_attr
+	ld	hl,__sprinter_attr
 	ld	e,(hl)
 	inc	hl
 	ld	d,(hl)
@@ -87,10 +89,10 @@
 	jp	p,background
 	sub	30
 	ld	e,a
-	ld	a,(text_attr)
+	ld	a,(__sprinter_attr)
 	and	@11111000
 	or	e
-	ld	(text_attr),a
+	ld	(__sprinter_attr),a
 	jr	calcinverse
 .background
 	cp	40
@@ -105,10 +107,10 @@
 	rlca
 	and	@01110000
 	ld	e,a
-	ld	a,(text_attr)
+	ld	a,(__sprinter_attr)
 	and	@10001111
 	or	e
-	ld	(text_attr),a
+	ld	(__sprinter_attr),a
 .calcinverse
 	ld	e,a
 	rlca
@@ -128,12 +130,7 @@
 	ld	a,e
 	and	@10001000
 	or	d
-	ld	(inverse_attr),a
+	ld	(__sprinter_attr + 1),a
 	ret
 
 
-	SECTION	data_clib
-
-	PUBLIC	text_attr
-.text_attr	defb	@00001111       ;bright white on black
-.inverse_attr	defb	@01111000       ;grey on white

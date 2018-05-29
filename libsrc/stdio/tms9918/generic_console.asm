@@ -8,7 +8,7 @@
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
-		PUBLIC		msx_attr
+		EXTERN		msx_attr
 		PUBLIC		__msx_font32
 		PUBLIC		__msx_udg32
 
@@ -18,6 +18,7 @@
         	EXTERN		msxbios
 		EXTERN		ansi_SCROLLUP
 		EXTERN		ansi_cls
+		EXTERN		conio_map_colour
 		EXTERN		CRT_FONT
 
 IF FORmsx
@@ -31,7 +32,7 @@ generic_console_set_inverse:
 	ret
 
 generic_console_set_ink:
-	call	map_colour
+	call	conio_map_colour
 	rla
 	rla
 	rla
@@ -47,19 +48,10 @@ set_attr:
 	ret
 
 generic_console_set_paper:
-	call	map_colour
+	call	conio_map_colour
 	ld	b,0xf0
 	jr	set_attr
 	
-
-map_colour:
-	and	7
-	inc	a	;(1,3,5,7: black, green, blue, cyan)
-	bit	0,a
-	ret	nz
-	add	7	; (2,4,6,8 -> 9,11,13,15; red, yellow, magenta, white)
-	ret
-
 
 generic_console_cls:
 	call	ansi_cls
@@ -127,4 +119,3 @@ generic_console_printc_handle_udgs:
 		SECTION	data_clib
 .__msx_font32	defw    CRT_FONT
 .__msx_udg32	defw    0
-.msx_attr	defb $F1	; White on Black

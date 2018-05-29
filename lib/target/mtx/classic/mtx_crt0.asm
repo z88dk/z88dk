@@ -112,12 +112,7 @@ msxbios:
 
 	SECTION	bss_crt
 
-	PUBLIC	fputc_vdp_offs	;Current character pointer
 			
-	PUBLIC	aPLibMemory_bits;apLib support variable
-	PUBLIC	aPLibMemory_byte;apLib support variable
-	PUBLIC	aPLibMemory_LWM	;apLib support variable
-	PUBLIC	aPLibMemory_R0	;apLib support variable
 
 	PUBLIC	raster_procs	;Raster interrupt handlers
 	PUBLIC	pause_procs	;Pause interrupt handlers
@@ -133,12 +128,7 @@ msxbios:
 	PUBLIC	RG5SAV
 	PUBLIC	RG6SAV
 	PUBLIC	RG7SAV       
-; imported form the pre-existing Sega Master System libs
-fputc_vdp_offs:		defw	0	;Current character pointer
-aPLibMemory_bits:	defb	0	;apLib support variable
-aPLibMemory_byte:	defb	0	;apLib support variable
-aPLibMemory_LWM:	defb	0	;apLib support variable
-aPLibMemory_R0:		defw	0	;apLib support variable
+
 raster_procs:		defw	0	;Raster interrupt handlers
 pause_procs:		defs	8	;Pause interrupt handlers
 timer:				defw	0	;This is incremented every time a VBL/HBL interrupt happens

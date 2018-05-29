@@ -21,14 +21,8 @@
 IF FORmsx
         INCLUDE "target/msx/def/msxbios.def"
 ELSE
-	IF FORm5
-		INCLUDE "target/m5/def/m5bios.def"
-	ELSE
-		; target/svi/def/svibios.def includes the following declarations, valid also elsewhere:
-		;	EXTERN	FILVRM
-		;	EXTERN	LDIRVM
-		INCLUDE "target/svi/def/svibios.def"
-	ENDIF
+	EXTERN	FILVRM
+	EXTERN	LDIRVM
 ENDIF
 
 

@@ -1,9 +1,0 @@
-input/pv2000/in_GetKey
-input/pv2000/in_GetKeyReset
-input/pv2000/in_GetKeyVariables
-input/pv2000/in_Inkey
-input/pv2000/in_KeyPressed
-input/pv2000/in_LookupKey
-input/pv2000/in_WaitForKey
-input/pv2000/in_WaitForNoKey
-input/pv2000/in_keytranstbl

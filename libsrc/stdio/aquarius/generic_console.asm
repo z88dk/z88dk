@@ -32,6 +32,7 @@
 
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
+		EXTERN		__aquarius_attr
 
 		defc		DISPLAY = 12328
 		defc		COLOUR_MAP = DISPLAY + 1024
@@ -146,7 +147,3 @@ generic_console_scrollup_4:
 	pop	de
 	ret
 
-
-	SECTION	data_clib
-
-.__aquarius_attr	defb $70        ; White on Black

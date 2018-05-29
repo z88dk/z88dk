@@ -1,10 +1,10 @@
-@stdio/stdio.lst
 stdio/sorcerer/fgetc_cons
 stdio/sorcerer/fputc_cons
 stdio/sorcerer/getk
 stdio/sorcerer/CRT_FONT
 stdio/sorcerer/generic_console
 stdio/sorcerer/generic_console_ioctl
+@stdio/stdio.lst
 @font/font_8x8/font_8x8.lst
 @gfxbase.lst
 graphics/dcircle

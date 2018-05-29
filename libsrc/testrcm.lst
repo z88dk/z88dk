@@ -1,6 +1,6 @@
-@stdio/stdio_r2k.lst
 stdio/test/fgetc_cons.asm
 stdio/test/fputc_cons.asm
+@stdio/stdio_r2k.lst
 time/test/time
 @time/time.lst
 @z80.lst

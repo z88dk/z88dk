@@ -22,11 +22,11 @@
 ._set_vdp_reg
 	ld	hl, 2
 	add	hl, sp
-	
-	ld	a, (hl)		; Value
+	ex	de,hl
+	ld	a, (de)		; Value
 	ld	c,a
-	inc	hl
-	inc	hl
+	inc	de
+	inc	de
 	di
 IF VDP_CMD > 255
 	ld	(VDP_CMD),a
@@ -34,7 +34,7 @@ ELSE
 	out	(VDP_CMD),a
 ENDIF
 	
-	ld	a, (hl)		; Register #
+	ld	a, (de)		; Register #
 IF VDP_CMD > 255
 	ld	(VDP_CMD),a
 ELSE

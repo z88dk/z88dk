@@ -1,10 +1,11 @@
-@stdio/stdio.lst
 stdio/cpc/fgetc_cons
 stdio/cpc/fputc_cons
 stdio/cpc/getk
 stdio/cpc/generic_console
 stdio/cpc/generic_console_ioctl
 stdio/cpc/generic_console_vpeek
+stdio/cpc/bordercolour
+stdio/cpc/conio_map_colour
 stdio/cpc/CRT_FONT
 @font/font_8x8/font_8x8.lst
 @stdio/ansicore.lst
@@ -14,6 +15,7 @@ stdio/ansi/cpc/f_ansi_char
 stdio/ansi/cpc/f_ansi_cls
 stdio/ansi/cpc/f_ansi_dline
 stdio/ansi/cpc/f_ansi_scrollup
+@stdio/stdio.lst
 graphics/w_drawb
 graphics/w_undrawb
 graphics/w_xorborder

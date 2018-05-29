@@ -32,7 +32,7 @@
 ; Dirty thing for self modifying code
 	PUBLIC	INVRS	
 
-
+	EXTERN	__zx_console_attr
 	EXTERN	ansicharacter_pixelwidth
 	EXTERN	ansifont_is_packed
 	EXTERN	ansifont
@@ -100,7 +100,7 @@ no_underline:
 	and	3
 	or	0x58
 	ld	d,a
-  	ld	a,(23693)  ;Current color attributes
+  	ld	a,(__zx_console_attr)  ;Current color attributes
 	ld	(de),a
 	ret
 ; End of fast path for 32 columns
@@ -151,7 +151,7 @@ no_underline:
   add hl,de
   dec a
   jr nz,CLP
-  ld a,(23693)  ;Current color attributes
+  ld a,(__zx_console_attr)  ;Current color attributes
   ld (hl),a
   pop af
   pop hl
