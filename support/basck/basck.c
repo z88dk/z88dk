@@ -70,6 +70,30 @@ int ldir_skel[]={11, 33, CATCH, CATCH, 17, SKIP, SKIP, 1, SKIP, SKIP, 0xED, 0xB0
 int ldir_skel2[]={11, 17, CATCH, CATCH, 33, SKIP, SKIP, 1, SKIP, SKIP, 0xED, 0xB0};
 
 
+
+/* Hudson Software HuBASIC detection */
+int hubas_skel[]={13, 0x3E, CATCH, 0x21, 0x3E, SKIP, 0x21, 0x3E, SKIP, 0x21, 0x3E, SKIP, 0x21, 0x3E}; 
+int huproduct_skel[]={8, ADDR, 'H', 'u', 'B', 'A', 'S', 'I', 'C'};
+int hudson_skel[]={8, ADDR, 'H', 'u', 'd', 's', 'o', 'n'};
+
+int tkhudson_skel[]={11, 0x01, CATCH, CATCH, 0xFE, 0x20, 0xDA, SKIP, SKIP, 0xFE, 0x22, 0x28};
+int hugoto_skel[]={9, ADDR, 'O', 'T', 'O'+128, 'G', 'O', 'S', 'U', 'B'+128, };
+
+int hu_curyst[]={12, 0xCD, SKIP, SKIP, 0x7E, 0xB7, 0xC8, 0x2B, 0x1D, 0x3A, CATCH, CATCH, 0xBB};
+int hu_curyed[]={12, 0xCD, SKIP, SKIP, 0x1C, 0x23, 0x7E, 0xB7, 0xC8, 0x3A, CATCH, CATCH, 0xBB};
+int hu_txtcoord[]={14, 0xE5, 0x2A, CATCH, CATCH, 0xE5, 0xD5, 0xCD, SKIP, SKIP, 0xD1, 0x36, 0, 0xE1, 0xCD};
+int hu_input[]={14, ADDR, 0x2A, SKIP, SKIP, 0xE5, 0xD5, 0xCD, SKIP, SKIP, 0xD1, 0x36, 0, 0xE1, 0xCD};
+int hu_inputl[]={12, 0xE5, 0xD5, 0xCD, SKIP, SKIP, 0xD1, 0x36, 0, 0xE1, 0xCD, CATCH, CATCH};
+int hu_curxst[]={12, 0xD1, 0x36, 0, 0xE1, 0xCD, SKIP, SKIP, 0x38, SKIP, 0x3A, CATCH, CATCH};
+
+int hu_filad[]={15, 0xCD, SKIP, SKIP, 0xF1, 0xE1, 0x30, 3, 0x2A, CATCH, CATCH, 0xED, 0x4B, SKIP, SKIP, 0xCD};
+int hu_filsz[]={15, 0xCD, SKIP, SKIP, 0xF1, 0xE1, 0x30, 3, 0x2A, SKIP, SKIP, 0xED, 0x4B, CATCH, CATCH, 0xCD};
+int hu_filblock[]={14, 0xF1, 0xE1, 0x30, 3, 0x2A, SKIP, SKIP, 0xED, 0x4B, SKIP, SKIP, 0xCD, CATCH, CATCH};
+
+int hu_mon_cmd[]={10, 0x13, 0xD9, 0x21, CATCH, CATCH, 0x06, 0x0A, 0xBE, 0x23, 0x28};
+int hu_putc[]={13, 0x3E, 0x2A, 0xCD, CATCH, CATCH, 0xCD, SKIP, SKIP, 0x30, SKIP, 0x1A, 0xFE, 0x2A};
+int hu_mon_getl[]={13, 0x3E, 0x2A, 0xCD, SKIP, SKIP, 0xCD, CATCH, CATCH, 0x30, SKIP, 0x1A, 0xFE, 0x2A};
+
 /* Sinclair BASIC detection */
 int makeroom_skel[]={7, 0x2A, CATCH, CATCH, 0xEB,0xEd, 0xB8, 0xC9};
 int sinclair_skel[]={8, CATCH, 'i', 'n', 'c', 'l', 'a', 'i', 'r'};
@@ -382,6 +406,10 @@ int for_skel[]={10, ADDR, 62, 0x64, 0x32, SKIP, SKIP, SKIP_CALL, 0xE3, SKIP_CALL
 int for_skel2[]={10, ADDR, 62, 0x64, 0x32, SKIP, SKIP, SKIP_CALL, 0xE3, 0xD1, 0xC2};
 int for_skel3[]={12, ADDR, SKIP_CALL, SKIP_CALL, SKIP_CALL, 0xED, 0x53, SKIP, SKIP, 0xE3, SKIP_CALL, 0xD1, 0x20};
 int for_skel4[]={10, ADDR, 62, 0x64, 0x32, SKIP, SKIP, SKIP_CALL, 0xC1, 0xE5, SKIP_CALL};
+
+// NOTE: fdtlp_skel2 and data_skel2 skeleton is present also in HuBasic.  It can be a coincidence,
+//       but the technique used for the error handling is close to the Microsoft one, I believe that
+//       MS BASIC was used as a reference while developing HuBASIC.
 
 int fdtlp_skel[]={10, ADDR, SKIP_CALL, 0xB7, 0xC2, SKIP, SKIP, 0x23, 0x7E, 0x23, 0xB6, 0x5E};
 int fdtlp_skel2[]={9, ADDR, SKIP_CALL, 0xB7, 0x20, SKIP, 0x23, 0x7E, 0x23, 0xB6, 0x5E};
@@ -2594,14 +2622,14 @@ int main(int argc, char *argv[])
 	res=find_skel(makeroom_skel);
 	
 	if (res>0) {
-		printf("\nSinclair BASIC found\n");
+		printf("\n# Sinclair BASIC found\n");
 		brand=find_skel(sinclair_skel);
 		if (brand>0)
-			printf("  Sinclair signature found\n");
+			printf("#  Sinclair signature found\n");
 		else {
 			brand=find_skel(amstrad_skel);
 			if (brand>0)
-				printf("  Amstrad signature found\n");
+				printf("#  Amstrad signature found\n");
 		}
 		
 		brand=0;
@@ -2863,7 +2891,7 @@ int main(int argc, char *argv[])
 
 	}
 
-	
+
 	res=find_skel(zxshadow_end);
 	
 	if (res>0) {
@@ -2871,6 +2899,106 @@ int main(int argc, char *argv[])
 		
 		printf("\n\tZX_SHADOW_END  =  $%04X    ; Return to the BASIC interpreter\n",res);
 		
+	}
+
+
+   	/**************************/
+	/* Hudson HuBASIC section */
+	/**************************/
+	
+	res=find_skel(hubas_skel);
+	
+	if (res>0) {
+		printf("\n# Hudson Software HuBASIC found\n");
+		res2=find_skel(huproduct_skel);
+		if (res2>0)
+			printf("#  HuBASIC name found\n\n");
+		brand=find_skel(hudson_skel);
+		if (brand>0)
+			printf("#  Hudson signature found\n\n");
+		else
+			if (res2<=0)
+			printf("#  Hudson signature not found\n\n");
+
+
+		res=find_skel(tkhudson_skel);
+			if (res>0)	dlbl("CMDTABLE", res, "HuBASIC command list");
+			
+		// Catch possible offset shiftings
+		// (determine real locations, e.g. in case we are analyzing a file into a disk image)
+		pos=find_skel(hugoto_skel);
+		
+		if (pos >0) {
+			pos=pos-res;
+			if (pos >0)
+				printf("\n#    ORG shift detected, %d bytes",pos);
+		}	else pos=0;
+		
+		
+		res=find_skel(hu_txtcoord);
+			if (res>0)	dlbl("XYTEXT", res, "X and Y text coordinates");
+			
+		res=find_skel(hu_curxst);
+			if (res>0)	dlbl("CURXST", res, "X cursor position on screen");
+			
+		res=find_skel(hu_curyst);
+			if (res>0)	dlbl("CURYST", res, "Y cursor position on screen");
+			
+		res=find_skel(hu_curyed);
+			if (res>0)	dlbl("CURYED", res, "Y cursor position on screen (editing)");
+
+		res=find_skel(hu_input);
+			if (res>0)	dlbl("INPUT", res-pos, "Console input, DE=address");
+
+		res=find_skel(hu_inputl);
+			if (res>0)	dlbl("INPUTL", res, "LINE INPUT (DE=addr, CY if BREAK)");
+		
+		res=find_skel(hu_filad);
+			if (res>0)	dlbl("FILAD", res, "FILE data block address");
+		
+		res=find_skel(hu_filsz);
+			if (res>0)	dlbl("FILSZ", res, "FILE data block size");
+		
+		res=find_skel(hu_filblock);
+			if (res>0)	dlbl("FILBLK", res, "File data block transfer, HL=addr, BC=size");
+		
+		res=find_skel(hu_putc);
+			if (res>0)	dlbl("PUTC", res, "Output character in A");
+		
+		res=find_skel(hu_mon_getl);
+			if (res>0)	dlbl("MON_GETL", res, "Line input for Monitor, DE=addr");
+		
+		
+		
+		res=find_skel(hu_mon_cmd);
+			if (res>0)	{
+				dlbl("MONCMD", res, "MONitor jump table");
+					for (i=res+pos; ((img[i]>'C') && (img[i]<'Z')); i+=3) {
+						clear_token();
+						append_c('M');
+						append_c('O');
+						append_c('N');
+						append_c('_');
+						append_c(img[i]);
+						dlbl(token, img[i+1]+256*img[i+2], "Monitor command");
+					}
+			}
+				
+		
+		
+		res=find_skel(tkhudson_skel);
+		if (res>0) {
+			printf("\n# TOKEN table position = $%04X\n",res);
+			printf("\n\t0 ");
+			chr=1;
+			for (i=res; img[i+pos]!=255; i++) {
+				c=img[i+pos];
+				if (c>=128) { c-=128; printf("%c \n\t%d ",c, chr++); }
+				else printf("%c",c);
+			}
+		}
+		
+
 	}
 
 	printf("\n\n");
