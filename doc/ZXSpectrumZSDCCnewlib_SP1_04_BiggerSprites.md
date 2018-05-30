@@ -15,6 +15,14 @@ monochrome sprites. While simple to explore and understand, 8x8 pixel sprites
 are of limited use for games. We need to look at how SP1 handles bigger sprites,
 and sprites with colour.
 
+## 16x16 Sprite
+
+For this example we'll be using this sprite and mask:
+
+![alt text](images/sprite_mask_example.png "Sprite mask example")
+
+kindly provided by Dean Belfield at [Break into Program](http://www.breakintoprogram.co.uk/).
+
 
 ## Adding Colour
 
