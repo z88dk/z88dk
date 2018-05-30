@@ -24,4 +24,5 @@
 @target/yaz180/device/device.lst
 @target/yaz180/driver/driver_sdcc_iy.lst
 @threads/threads_sdcc_iy.lst
+@time/time_sdcc.lst
 @z180/z180_sdcc.lst

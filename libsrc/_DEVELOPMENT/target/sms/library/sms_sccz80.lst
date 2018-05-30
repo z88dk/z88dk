@@ -24,4 +24,5 @@
 @string/string_sccz80.lst
 @target/sms/driver/driver.lst
 @threads/threads_sccz80.lst
+@time/time_sccz80.lst
 @z80/z80_sccz80.lst

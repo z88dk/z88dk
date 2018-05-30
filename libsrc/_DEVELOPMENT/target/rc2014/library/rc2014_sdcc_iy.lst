@@ -24,4 +24,5 @@
 @target/rc2014/device/device.lst
 @target/rc2014/driver/driver_sdcc_iy.lst
 @threads/threads_sdcc_iy.lst
+@time/time_sdcc.lst
 @z80/z80_sdcc.lst
