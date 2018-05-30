@@ -15,13 +15,114 @@ monochrome sprites. While simple to explore and understand, 8x8 pixel sprites
 are of limited use for games. We need to look at how SP1 handles bigger sprites,
 and sprites with colour.
 
-## 16x16 Sprite
+This is pretty straightforward stuff and we don't need to linger on it. A couple
+of quick examples will suffice. While we're here, we'll have a look at applying
+colour to SP1 sprites as well.
+
+## 16x16 Pixel Sprite
+
+The 16x16 pixel sprite is the mainstay of Spectrum graphics. It's big enough to
+be nicely visible, but still small enough that the hardware can handle it.
+
+As far as SP1 is concerned a 16x16 pixel sprite is made up of 2 columns, each 8
+pixels wide and 16 pixels high. If aligned on 8 pixel boundaries the sprite will
+occupy 4 character cells. If it's shifted horizontally by between 1 and 7 pixels
+it'll occupy 2 more character cells in the horizontal plane, making a total of
+6. If it's shifted vertically by between 1 and 7 pixels it'll occupy 9 character
+cells.
+
+image
+
+All of this details is handled by SP1. All we have to do is create the sprite
+much like we have been doing, and add the extra column.
 
 For this example we'll be using this sprite and mask:
 
 ![alt text](images/sprite_mask_example.png "Sprite mask example")
 
-kindly provided by Dean Belfield at [Break into Program](http://www.breakintoprogram.co.uk/).
+kindly provided by Dean Belfield at [Break Into Program](http://www.breakintoprogram.co.uk/). 
+
+Here's the sprite data in assembly language, which you should save to a file
+called *bubble_masked_sprite.asm*:
+
+```
+SECTION rodata_user
+
+PUBLIC _bubble_col1
+PUBLIC _bubble_col2
+	
+	defb @11111111, @00000000
+	defb @11111111, @00000000
+	defb @11111111, @00000000
+	defb @11111111, @00000000
+	defb @11111111, @00000000
+	defb @11111111, @00000000
+	defb @11111111, @00000000
+
+._bubble_col1
+	defb @11111100, @00000000
+	defb @11110000, @00000011
+	defb @11100000, @00001100
+	defb @11000000, @00010000
+	defb @10000000, @00100110
+	defb @10000000, @00101000
+	defb @00000000, @01001000
+	defb @00000000, @01000000
+	defb @00000000, @01000000
+	defb @00000000, @01000000
+	defb @10000000, @00100000
+	defb @10000000, @00100000
+	defb @11000000, @00010000
+	defb @11100000, @00001100
+	defb @11110000, @00000011
+	defb @11111100, @00000000
+
+	defb @11111111, @00000000
+	defb @11111111, @00000000
+	defb @11111111, @00000000
+	defb @11111111, @00000000
+	defb @11111111, @00000000
+	defb @11111111, @00000000
+	defb @11111111, @00000000
+
+._bubble_col2
+	defb @00111111, @00000000
+	defb @00001111, @11000000
+	defb @00000111, @00110000
+	defb @00000011, @00001000
+	defb @00000001, @00000100
+	defb @00000001, @00000100
+	defb @00000000, @00000010
+	defb @00000000, @00000010
+	defb @00000000, @00000010
+	defb @00000000, @00000010
+	defb @00000001, @00000100
+	defb @00000001, @00000100
+	defb @00000011, @00001000
+	defb @00000111, @00110000
+	defb @00001111, @11000000
+	defb @00111111, @00000000
+		
+	defb @11111111, @00000000
+	defb @11111111, @00000000
+	defb @11111111, @00000000
+	defb @11111111, @00000000
+	defb @11111111, @00000000
+	defb @11111111, @00000000
+	defb @11111111, @00000000
+```
+
+Consider this carefully in relation to the graphic above: we have 2 columns of
+8-pixel-wide data, labelled *bubble_col1* and *bubble_col2*. Each has 16 rows,
+and each row consists of a mask byte followed by a data byte. This data layout
+is the same as we saw in the earlier [masked sprite example](), only with twice
+the vertical data (16 rows instead of 8). The first column is the left side of
+the sprite (with mask), and the second column is the right side (with mask).
+
+As usual with SP1, in order to allow vertical pixel positioning we add 7 empty
+rows (with mask) before each column, and 7 empty rows (with mask) after each
+column. Note how the middle block of empty rows serves as both the *after* rows
+for the first column and the *before* rows for the second column.
 
 
 ## Adding Colour
