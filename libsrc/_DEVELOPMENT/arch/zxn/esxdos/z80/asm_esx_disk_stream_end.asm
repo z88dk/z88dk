@@ -6,7 +6,7 @@ SECTION code_esxdos
 
 PUBLIC asm_esx_disk_stream_end
 
-EXTERN __esx_stream_protocol_address
+EXTERN __esx_stream_card_flags
 
 EXTERN error_mnc
 EXTERN __esxdos_error_zc

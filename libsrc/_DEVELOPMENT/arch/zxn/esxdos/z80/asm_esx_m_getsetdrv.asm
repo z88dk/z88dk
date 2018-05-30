@@ -8,6 +8,8 @@ SECTION code_esxdos
 PUBLIC asm_esx_m_getdrv
 PUBLIC asm_esx_m_setdrv
 
+EXTERN __esxdos_error_mc
+
 asm_esx_m_getdrv:
 
    ld l,0

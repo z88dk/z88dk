@@ -6,6 +6,8 @@ SECTION code_esxdos
 
 PUBLIC asm_esx_m_tapein_getpos
 
+EXTERN __esxdos_error_mc
+
 asm_esx_m_tapein_getpos:
 
    ; enter : none

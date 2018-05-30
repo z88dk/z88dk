@@ -4,10 +4,495 @@
 
 #ifndef __ESXDOS_H__
 
+#include <arch.h>
+#include <stdint.h>
+#include <time.h>
+
+// extended sna load
+
 extern unsigned char __LIB__ extended_sna_load(unsigned char handle) __smallc __z88dk_fastcall;
 
 
 
+/*
+   NextOS ESX API
+
+   The interface to NextOS's implementation of the esxdos api
+   is kept separate from esxdos.h even though many functions
+   are aliases of each other.
+
+   This is because the NextOS api adds several functions to the
+   original esxdos api and some functions in the esxdos api are
+   not documented so NextOS's implementation may not be the same.
+
+   If you're using a NextOS machine, use these functions for the
+   esxdos api.  If you want to ensure things run on esxdos, use
+   the esxdos api version in esxdos.h.
+   
+   NOTE:  To use the esxdos api, ROM3 must be present in the bottom
+   16k and layer 2 write-only mode in the bottom 16k must be disabled.
+*/
+
+// FAST STREAMING DISK IO
+
+// 1. esx_disk_filemap        : find out how the file is distributed on disk
+// 2. esx_stream_start        : prepare to load from one span on disk
+// 3. esx_disk_stream_sectors : load whole sectors from the span
+// 4. esx_disk_stream_bytes   : load bytes from the span (only use for last access to span)
+// 5. esx_disk_stream_end     : terminate streaming from span
+//
+// No other esxdos calls allowed between steps 2-5
+
+struct esx_filemap_entry
+{
+   // describes one span on disk
+
+   uint32_t address;
+   uint16_t sectors;
+};
+
+struct esx_filemap
+{
+   uint8_t mapsz;
+   struct esx_filemap_entry *map;
+};
+
+// the following four variables are filled in after a call to esx_disk_stream_start()
+
+extern unsigned char esx_stream_io_port;       // 1
+extern unsigned char esx_stream_protocol;      // 2
+
+// the following two variables are updated by esx_disk_stream_sectors()
+// and esx_disk_stream_bytes() but only for whole numbers of sectors read
+
+extern uint32_t esx_stream_card_address;       // 3
+extern uint16_t esx_stream_sectors_remaining;  // 4
+
+extern unsigned char __LIB__ esx_disk_filemap(uint8_t handle,struct esx_filemap *fmap) __smallc;
+extern unsigned char __LIB__ esx_disk_filemap_callee(uint8_t handle,struct esx_filemap *fmap) __smallc __z88dk_callee;
+#define esx_disk_filemap(a,b) esx_disk_filemap_callee(a,b)
+
+
+extern unsigned char __LIB__ esx_disk_stream_start(struct esx_filemap_entry *entry) __smallc __z88dk_fastcall;
+
+
+extern void __LIB__ *esx_disk_stream_sectors(void *dst,uint8_t sectors) __smallc;
+extern void __LIB__ *esx_disk_stream_sectors_callee(void *dst,uint8_t sectors) __smallc __z88dk_callee;
+#define esx_disk_stream_sectors(a,b) esx_disk_stream_sectors_callee(a,b)
+
+
+extern void __LIB__ *esx_disk_stream_bytes(void *dst,uint16_t len) __smallc;
+extern void __LIB__ *esx_disk_stream_bytes_callee(void *dst,uint16_t len) __smallc __z88dk_callee;
+#define esx_disk_stream_bytes(a,b) esx_disk_stream_bytes_callee(a,b)
+
+
+extern unsigned char __LIB__ esx_disk_stream_end(void) __smallc;
+
+
+
+// TAP FILE EMULATION
+
+extern unsigned char __LIB__ esx_m_tapein_open(unsigned char *filename) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ esx_m_tapein_close(void) __smallc;
+
+
+extern unsigned char __LIB__ esx_m_tapein_info(uint8_t *drive,unsigned char *filename) __smallc;
+extern unsigned char __LIB__ esx_m_tapein_info_callee(uint8_t *drive,unsigned char *filename) __smallc __z88dk_callee;
+#define esx_m_tapein_info(a,b) esx_m_tapein_info_callee(a,b)
+
+
+extern unsigned char __LIB__ esx_m_tapein_setpos(uint16_t block) __smallc __z88dk_fastcall;
+
+
+extern uint16_t __LIB__ esx_m_tapein_getpos(void) __smallc;
+
+
+extern unsigned char __LIB__ esx_m_tapein_toggle_pause(void) __smallc;
+
+
+
+#define ESX_TAPEIN_FLAGS_PAUSE  1   // pause after loading blocks of size 6912 bytes (eg screen$)
+#define ESX_TAPEIN_FLAGS_RETRO  2   // tape loading simulated as if from tape recorder
+
+extern unsigned char __LIB__ esx_m_tapein_flags(uint8_t flags) __smallc __z88dk_fastcall;
+
+
+
+// open appends to file, trunc replaces or creates
+
+extern unsigned char __LIB__ esx_m_tapeout_open(unsigned char *appendname) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ esx_m_tapeout_trunc(unsigned char *filename) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ esx_m_tapeout_info(uint8_t *drive,unsigned char *filename) __smallc;
+extern unsigned char __LIB__ esx_m_tapeout_info_callee(uint8_t *drive,unsigned char *filename) __smallc __z88dk_callee;
+#define esx_m_tapeout_info(a,b) esx_m_tapeout_info_callee(a,b)
+
+
+extern unsigned char __LIB__ esx_m_tapeout_close(void) __smallc;
+
+
+
+// DOT COMMANDS
+
+// must call from within a dot command
+
+typedef void (*esx_handler_t)(uint8_t error);
+
+// currently registered error handler (0 = none)
+
+extern esx_handler_t esx_errh;
+
+extern unsigned char __LIB__ esx_m_gethandle(void) __smallc;
+
+
+extern esx_handler_t __LIB__ esx_m_errh(esx_handler_t error) __smallc __z88dk_fastcall;
+
+
+
+// must not call from within a dot command
+
+// execute dot command, return value is error if not zero
+// geterr with non-zero error code, write as zero-terminated string in 33-byte buffer msg
+
+extern uint16_t __LIB__ esx_m_execcmd(unsigned char *cmdline) __smallc __z88dk_fastcall;
+
+
+extern void __LIB__ esx_m_geterr(uint16_t error,unsigned char *msg) __smallc;
+extern void __LIB__ esx_m_geterr_callee(uint16_t error,unsigned char *msg) __smallc __z88dk_callee;
+#define esx_m_geterr(a,b) esx_m_geterr_callee(a,b)
+
+
+
+// DRIVER API
+
+struct esx_drvapi
+{
+   union
+   {
+      uint16_t bc;
+      struct
+      {
+         uint8_t driver;
+         uint8_t function;
+      }
+      call;
+   };
+   
+   uint16_t de;
+   uint16_t hl;
+};
+
+extern unsigned char __LIB__ esx_m_drvapi(struct esx_drvapi *) __smallc __z88dk_fastcall;
+
+
+
+// MISCELLANEOUS
+
+#define ESX_DOSVERSION_ESXDOS     -1
+#define ESX_DOSVERSION_NEXTOS_48K  0
+
+#define ESX_DOSVERSION_NEXTOS_MAJOR(v)  (((v)&0xff00)>>8)
+#define ESX_DOSVERSION_NEXTOS_MINOR(v)  ((v)&0xff)
+
+extern uint16_t __LIB__ esx_m_dosversion(void) __smallc;
+
+
+
+extern unsigned char __LIB__ esx_m_getdrv(void) __smallc;
+
+
+extern unsigned char __LIB__ esx_m_setdrv(unsigned char drive) __smallc __z88dk_fastcall;
+
+
+
+// time.h contains functions dealing with dos time
+
+extern unsigned char __LIB__ esx_m_getdate(struct dos_tm *) __smallc __z88dk_fastcall;
+
+
+
+extern uint32_t __LIB__ esx_f_getfree(void) __smallc;
+
+
+
+// OPERATIONS ON DIRECTORIES
+
+#define ESX_PATHNAME_MAX __ESX_PATHNAME_MAX     // max pathname length in bytes including terminating 0, ~256 bytes
+#define ESX_FILENAME_MAX __ESX_FILENAME_MAX     // max filename length in bytes not including terminating 0, ~12 bytes
+#define ESX_FILENAME_LFN_MAX __ESX_FILENAME_LFN_MAX   // max lfn filename length in bytes not including terminating 0, ~260 bytes
+
+struct esx_p3_hdr
+{
+   uint8_t  type;    // 0 = program, 1 = numeric array, 2 = char array, 3 = code
+   uint16_t length;
+   uint8_t  data[4];
+   uint8_t  unused;
+};
+
+struct esx_dirent
+{                                           // <byte>   attributes
+   uint8_t attr;                            // <asciiz> name
+   uint8_t dir[ESX_FILENAME_MAX+1+8];       // <dword>  date-time
+};                                          // <dword>  size
+
+struct esx_dirent_p3
+{
+   uint8_t attr;
+   uint8_t dir[ESX_FILENAME_MAX+1+8];
+	struct esx_p3_hdr p3;
+};
+
+struct esx_dirent_lfn
+{                                           // <byte>   attributes
+   uint8_t attr;                            // <asciiz> name
+   uint8_t dir[ESX_FILENAME_LFN_MAX+1+8];   // <dword>  date-time
+};                                          // <dword>  size
+
+struct esx_dirent_lfn_p3
+{
+   uint8_t attr;
+   uint8_t dir[ESX_FILENAME_LFN_MAX+1+8];
+	struct esx_p3_hdr p3;
+};
+
+// slice dirent to access members following filename
+
+struct esx_dirent_slice
+{
+   struct dos_tm time;   // time.h contains functions dealing with dos time
+   uint32_t      size;
+};
+
+struct esx_dirent_slice_p3
+{
+   struct dos_tm time;
+   uint32_t      size;
+	struct esx_p3_hdr p3;
+};
+
+// opendir_ex modes
+
+#define ESX_DIR_USE_LFN     __esx_dir_use_lfn
+#define ESX_DIR_USE_HEADER  __esx_dir_use_header
+
+extern unsigned char __LIB__ esx_f_opendir(unsigned char *dirname) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ esx_f_opendir_ex(unsigned char *dirname,uint8_t diruse) __smallc;
+extern unsigned char __LIB__ esx_f_opendir_ex_callee(unsigned char *dirname,uint8_t diruse) __smallc __z88dk_callee;
+#define esx_f_opendir_ex(a,b) esx_f_opendir_ex_callee(a,b)
+
+
+extern unsigned char __LIB__ esx_f_closedir(unsigned char handle) __smallc __z88dk_fastcall;
+
+
+
+// file attributes
+
+#define ESX_DIR_A_RDO   __esx_dir_a_rdo     // read only
+#define ESX_DIR_A_HID   __esx_dir_a_hid     // hide in normal dir listings
+#define ESX_DIR_A_SYS   __esx_dir_a_sys     // system file (must not be physically moved)
+#define ESX_DIR_A_VOL   __esx_dir_a_vol     // filename is a volume label
+#define ESX_DIR_A_DIR   __esx_dir_a_dir     // directory
+#define ESX_DIR_A_ARCH  __esx_dir_a_arch    // file has been modified since last backup
+#define ESX_DIR_A_DEV   __esx_dir_a_dev     // device
+#define ESX_DIR_A_RES   __esx_dir_a_res     // reserved
+
+extern unsigned char __LIB__ esx_f_readdir(unsigned char handle,void *esx_dirent) __smallc;
+extern unsigned char __LIB__ esx_f_readdir_callee(unsigned char handle,void *esx_dirent) __smallc __z88dk_callee;
+#define esx_f_readdir(a,b) esx_f_readdir_callee(a,b)
+
+
+extern void __LIB__ *esx_slice_dirent(void *esx_dirent) __smallc __z88dk_fastcall;
+
+
+
+extern uint32_t __LIB__ esx_f_telldir(unsigned char handle) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ esx_f_seekdir(unsigned char handle,uint32_t pos) __smallc;
+extern unsigned char __LIB__ esx_f_seekdir_callee(unsigned char handle,uint32_t pos) __smallc __z88dk_callee;
+#define esx_f_seekdir(a,b) esx_f_seekdir_callee(a,b)
+
+
+extern unsigned char __LIB__ esx_f_rewinddir(unsigned char handle) __smallc;
+
+
+
+extern unsigned char __LIB__ esx_f_getcwd(unsigned char *pathname) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ esx_f_chdir(unsigned char *pathname) __smallc __z88dk_fastcall;
+
+
+
+extern unsigned char __LIB__ esx_f_mkdir(unsigned char *pathname) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ esx_f_rmdir(unsigned char *pathname) __smallc __z88dk_fastcall;
+
+
+
+// OPERATIONS ON FILES
+
+struct esx_stat
+{
+   uint8_t       drive;
+   uint8_t       device;
+   uint8_t       attr;
+   struct dos_tm time;   // time.h contains functions dealing with dos time
+   uint32_t      size;
+};
+
+// file open mode
+
+// at least one of:
+
+#define ESX_MODE_READ  __esx_mode_read
+#define ESX_MODE_WRITE  __esx_mode_write
+
+// one of:
+
+#define ESX_MODE_OPEN_EXIST  __esx_mode_open_exist
+#define ESX_MODE_OPEN_CREAT  __esx_mode_open_creat
+#define ESX_MODE_OPEN_CREAT_NOEXIST  __esx_mode_creat_noexist
+#define ESX_MODE_OPEN_CREAT_TRUNC  __esx_mode_creat_trunc
+
+#define ESX_MODE_USE_HEADER  __esx_mode_use_header
+
+extern unsigned char __LIB__ esx_f_open(unsigned char *filename,unsigned char mode) __smallc;
+extern unsigned char __LIB__ esx_f_open_callee(unsigned char *filename,unsigned char mode) __smallc __z88dk_callee;
+#define esx_f_open(a,b) esx_f_open_callee(a,b)
+
+
+extern unsigned char __LIB__ esx_f_open_p3(unsigned char *filename,unsigned char mode,struct esx_p3_hdr *h) __smallc;
+extern unsigned char __LIB__ esx_f_open_p3_callee(unsigned char *filename,unsigned char mode,struct esx_p3_hdr *h) __smallc __z88dk_callee;
+#define esx_f_open_p3(a,b,c) esx_f_open_p3_callee(a,b,c)
+
+
+extern unsigned char __LIB__ esx_f_close(unsigned char handle) __smallc __z88dk_fastcall;
+
+
+
+extern unsigned char __LIB__ esx_f_sync(unsigned char handle) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ esx_f_fstat(unsigned char handle,struct esx_stat *es) __smallc;
+extern unsigned char __LIB__ esx_f_fstat_callee(unsigned char handle,struct esx_stat *es) __smallc __z88dk_callee;
+#define esx_f_fstat(a,b) esx_f_fstat_callee(a,b)
+
+
+extern uint32_t __LIB__ esx_f_fgetpos(unsigned char handle) __smallc __z88dk_fastcall;
+
+
+
+#define ESX_SEEK_SET  __esx_seek_set
+#define ESX_SEEK_FWD  __esx_seek_fwd
+#define ESX_SEEK_BWD  __esx_seek_bwd
+
+extern uint32_t __LIB__ esx_f_seek(unsigned char handle,uint32_t distance,unsigned char whence) __smallc;
+extern uint32_t __LIB__ esx_f_seek_callee(unsigned char handle,uint32_t distance,unsigned char whence) __smallc __z88dk_callee;
+#define esx_f_seek(a,b,c) esx_f_seek_callee(a,b,c)
+
+
+extern uint16_t __LIB__ esx_f_read(unsigned char handle,void *dst,size_t nbytes) __smallc;
+extern uint16_t __LIB__ esx_f_read_callee(unsigned char handle,void *dst,size_t nbytes) __smallc __z88dk_callee;
+#define esx_f_read(a,b,c) esx_f_read_callee(a,b,c)
+
+
+extern uint16_t __LIB__ esx_f_write(unsigned char handle,void *src,size_t nbytes) __smallc;
+extern uint16_t __LIB__ esx_f_write_callee(unsigned char handle,void *src,size_t nbytes) __smallc __z88dk_callee;
+#define esx_f_write(a,b,c) esx_f_write_callee(a,b,c)
+
+
+
+extern unsigned char __LIB__ esx_f_ftrunc(unsigned char handle,uint32_t size) __smallc;
+extern unsigned char __LIB__ esx_f_ftrunc_callee(unsigned char handle,uint32_t size) __smallc __z88dk_callee;
+#define esx_f_ftrunc(a,b) esx_f_ftrunc_callee(a,b)
+
+
+
+// DIRECT OPERATIONS ON FILES BY FILENAME
+
+// chmod attr
+
+#define ESX_A_WRITE  __esx_a_write
+#define ESX_A_READ  __esx_a_read
+#define ESX_A_RDWR  __esx_a_rdwr
+#define ESX_A_HIDDEN  __esx_a_hidden
+#define ESX_A_SYSTEM  __esx_a_system
+#define ESX_A_ARCH  __esx_a_arch
+#define ESX_A_EXEC  __esx_a_exec
+#define ESX_A_ALL  __esx_a_all
+
+extern unsigned char __LIB__ esx_f_chmod(unsigned char *filename,uint8_t attr_mask,uint8_t attr) __smallc;
+extern unsigned char __LIB__ esx_f_chmod_callee(unsigned char *filename,uint8_t attr_mask,uint8_t attr) __smallc __z88dk_callee;
+#define esx_f_chmod(a,b,c) esx_f_chmod_callee(a,b,c)
+
+
+extern unsigned char __LIB__ esx_f_rename(unsigned char *old,unsigned char *new) __smallc;
+extern unsigned char __LIB__ esx_f_rename_callee(unsigned char *old,unsigned char *new) __smallc __z88dk_callee;
+#define esx_f_rename(a,b) esx_f_rename_callee(a,b)
+
+
+extern unsigned char __LIB__ esx_f_stat(unsigned char *filename,struct esx_stat *es) __smallc;
+extern unsigned char __LIB__ esx_f_stat_callee(unsigned char *filename,struct esx_stat *es) __smallc __z88dk_callee;
+#define esx_f_stat(a,b) esx_f_stat_callee(a,b)
+
+
+extern unsigned char __LIB__ esx_f_trunc(unsigned char *filename,uint32_t size) __smallc;
+extern unsigned char __LIB__ esx_f_trunc_callee(unsigned char *filename,uint32_t size) __smallc __z88dk_callee;
+#define esx_f_trunc(a,b) esx_f_trunc_callee(a,b)
+
+
+extern unsigned char __LIB__ esx_f_unlink(unsigned char *filename) __smallc __z88dk_fastcall;
+
+
+
+// ESX ERROR CODES
+
+#define ESX_OK  __ESX_OK                       // 0 OK 0:1
+#define ESX_EOK  __ESX_EOK                     // O.K. ESXDOS, 0:1
+#define ESX_ENONSENSE  __ESX_ENONSENSE         // Nonsense in ESXDOS, 0:1
+#define ESX_ESTEND  __ESX_ESTEND               // Statement END error, 0:1
+#define ESX_EWRTYPE  __ESX_EWRTYPE             // Wrong file TYPE, 0:1
+#define ESX_ENOENT  __ESX_ENOENT               // No such FILE or DIR, 0:1
+#define ESX_EIO  __ESX_EIO                     // I/O ERROR, 0:1
+#define ESX_EINVAL  __ESX_EINVAL               // Invalid FILENAME, 0:1
+#define ESX_EACCES  __ESX_EACCES               // Access DENIED, 0:1
+#define ESX_ENOSPC  __ESX_ENOSPC               // Drive FULL, 0:1
+#define ESX_ENXIO  __ESX_ENXIO                 // Invalid I/O REQUEST, 0:1
+#define ESX_ENODRV  __ESX_ENODRV               // No such DRIVE, 0:1
+#define ESX_ENFILE  __ESX_ENFILE               // Too many OPEN FILES, 0:1
+#define ESX_EBADF  __ESX_EBADF                 // Bad file DESCRIPTOR, 0:1
+#define ESX_ENODEV  __ESX_ENODEV               // No such DEVICE, 0:1
+#define ESX_EOVERFLOW  __ESX_EOVERFLOW         // File pointer OVERFLOW, 0:1
+#define ESX_EISDIR  __ESX_EISDIR               // Is a DIRECTORY, 0:1
+#define ESX_ENOTDIR  __ESX_ENOTDIR             // Not a DIRECTORY, 0:1
+#define ESX_EEXIST  __ESX_EEXIST               // File already EXISTS, 0:1
+#define ESX_EPATH  __ESX_EPATH                 // Invalid PATH, 0:1
+#define ESX_ENOSYS  __ESX_ENOSYS               // No SYS, 0:1
+#define ESX_ENAMETOOLONG  __ESX_ENAMETOOLONG   // Path too LONG, 0:1
+#define ESX_ENOCMD  __ESX_ENOCMD               // No such COMMAND, 0:1
+#define ESX_EINUSE  __ESX_EINUSE               // File in USE, 0:1
+#define ESX_ERDONLY  __ESX_ERDONLY             // File is READ ONLY, 0:1
+#define ESX_EVERIFY  __ESX_EVERIFY             // Verify FAILED, 0:1
+#define ESX_ELOADINGKO  __ESX_ELOADINGKO       // Loading .KO FAILED, 0:1
+#define ESX_EDIRINUSE  __ESX_EDIRINUSE         // Directory NOT EMPTY, 0:1
+#define ESX_EMAPRAMACTIVE  __ESX_EMAPRAMACTIVE // MAPRAM is ACTIVE, 0:1
+#define ESX_EDRIVEBUSY  __ESX_EDRIVEBUSY       // Drive is BUSY, 0:1
+#define ESX_EFSUNKNOWN  __ESX_EFSUNKNOWN       // Unknown FILESYSTEM, 0:1
+#define ESX_EDEVICEBUSY  __ESX_EDEVICEBUSY     // Device is BUSY, 0:1
+
+#define ESX_EMAXCODE  __ESX_EMAXCODE           // Largest valid error code
+
 #endif
+
+// original esxdos api
 
 #include <arch/zx/esxdos.h>

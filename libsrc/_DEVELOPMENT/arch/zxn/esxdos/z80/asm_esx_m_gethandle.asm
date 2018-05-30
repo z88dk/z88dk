@@ -1,5 +1,7 @@
 ; unsigned char esx_m_gethandle(void)
 
+INCLUDE "config_private.inc"
+
 SECTION code_esxdos
 
 PUBLIC asm_esx_m_gethandle
@@ -15,7 +17,7 @@ asm_esx_m_gethandle:
    ; uses  : af, bc, de, hl
    
    rst  __ESX_RST_SYS
-   defb __ESX_SYS_M_GETHANDLE
+   defb __ESX_M_GETHANDLE
    
    ld l,a
    ld h,0

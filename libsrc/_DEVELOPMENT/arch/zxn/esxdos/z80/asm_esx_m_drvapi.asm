@@ -6,6 +6,9 @@ SECTION code_esxdos
 
 PUBLIC asm_esx_m_drvapi
 
+EXTERN error_znc
+EXTERN __esxdos_error_mc
+
 asm_esx_m_drvapi:
 
    ; enter : hl = struct esx_drvapi *

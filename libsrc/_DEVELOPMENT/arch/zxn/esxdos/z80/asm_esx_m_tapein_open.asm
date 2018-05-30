@@ -9,6 +9,9 @@ PUBLIC asm_esx_m_tapein_open
 PUBLIC __esx_m_tapein_call
 PUBLIC __esx_m_tapein_call_default_drive
 
+EXTERN error_znc
+EXTERN __esxdos_error_mc
+
 asm_esx_m_tapein_open:
 
    ; enter : hl = char *filename
