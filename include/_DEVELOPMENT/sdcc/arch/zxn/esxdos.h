@@ -259,7 +259,7 @@ struct esx_dirent_p3
 {
    uint8_t attr;
    uint8_t dir[ESX_FILENAME_MAX+1+8];
-	struct esx_p3_hdr p3;
+   struct esx_p3_hdr p3;
 };
 
 struct esx_dirent_lfn
@@ -272,7 +272,7 @@ struct esx_dirent_lfn_p3
 {
    uint8_t attr;
    uint8_t dir[ESX_FILENAME_LFN_MAX+1+8];
-	struct esx_p3_hdr p3;
+   struct esx_p3_hdr p3;
 };
 
 // slice dirent to access members following filename
@@ -287,7 +287,7 @@ struct esx_dirent_slice_p3
 {
    struct dos_tm time;
    uint32_t      size;
-	struct esx_p3_hdr p3;
+   struct esx_p3_hdr p3;
 };
 
 // opendir_ex modes
