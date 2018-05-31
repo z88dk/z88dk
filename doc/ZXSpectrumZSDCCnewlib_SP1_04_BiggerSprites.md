@@ -12,12 +12,10 @@ which looked at anmiation.
 
 So far in this SP1 series we've only looked at small, single character cell,
 monochrome sprites. While simple to explore and understand, 8x8 pixel sprites
-are of limited use for games. We need to look at how SP1 handles bigger sprites,
-and sprites with colour.
-
+are of limited use for games. We need to look at how SP1 handles bigger sprites.
 This is pretty straightforward stuff and we don't need to linger on it. A couple
-of quick examples will suffice. While we're here, we'll have a look at applying
-colour to SP1 sprites as well.
+of quick examples will suffice. While we're wrapping up our initial look at SP1
+sprites we'll also have a look at applying some colour to them as well.
 
 ## 16x16 Pixel Sprite
 
@@ -28,13 +26,14 @@ As far as SP1 is concerned a 16x16 pixel sprite is made up of 2 columns, each 8
 pixels wide and 16 pixels high. If aligned on 8 pixel boundaries the sprite will
 occupy 4 character cells. If it's shifted horizontally by between 1 and 7 pixels
 it'll occupy 2 more character cells in the horizontal plane, making a total of
-6. If it's shifted vertically by between 1 and 7 pixels it'll occupy 9 character
-cells.
+6. If it's also shifted vertically by between 1 and 7 pixels it'll occupy 9
+character cells, as shown in this image:
 
-image
+![alt text](images/16x16_numbered.png "16x16 sprite in 9 char cells")
 
-All of this details is handled by SP1. All we have to do is create the sprite
-much like we have been doing, and add the extra column.
+All of this detail is handled by SP1. All we have to do is create the sprite
+much like we have been doing, and add the extra column being sure to tell SP1
+the maximum height of the sprite in character cells.
 
 For this example we'll be using this sprite and mask:
 
