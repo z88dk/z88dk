@@ -2,11 +2,11 @@
 
 SECTION code_esxdos
 
-PUBLIC _esx_dirent_slice
+PUBLIC _esx_slice_dirent
 
 EXTERN asm_esx_slice_dirent
 
-_esx_dirent_slice:
+_esx_slice_dirent:
 
    pop af
    pop hl

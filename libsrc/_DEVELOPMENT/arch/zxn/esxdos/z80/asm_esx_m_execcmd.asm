@@ -22,7 +22,10 @@ asm_esx_m_execcmd:
    ;            hl = error for "asm_esx_m_geterr"
    ;            carry set
    ;
-   ; uses   : af, bc, de, hl, ix
+   ; uses   : af, bc, de, hl
+   
+   push ix
+   push iy
    
 IF __SDCC_IY
    push hl
@@ -34,6 +37,9 @@ ENDIF
 
    rst __ESX_RST_SYS
    defb __ESX_M_EXECCMD
+   
+   pop iy
+   pop ix
    
    jp nc, error_znc
    

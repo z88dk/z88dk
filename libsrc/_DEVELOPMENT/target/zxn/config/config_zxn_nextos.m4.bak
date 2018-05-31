@@ -902,6 +902,7 @@ defc `__esx_dir_use_lfn' = __esx_dir_use_lfn
 defc `__esx_dir_use_header' = __esx_dir_use_header
 
 defc `__ESX_F_READDIR' = __ESX_F_READDIR
+defc `__esx_dir_a_rdo' = __esx_dir_a_rdo
 defc `__esx_dir_a_hid' = __esx_dir_a_hid
 defc `__esx_dir_a_sys' = __esx_dir_a_sys
 defc `__esx_dir_a_vol' = __esx_dir_a_vol
@@ -1209,6 +1210,7 @@ ifdef(`CFG_C_DEF',
 `#define' `__esx_dir_use_header'  __esx_dir_use_header
 
 `#define' `__ESX_F_READDIR'  __ESX_F_READDIR
+`#define' `__esx_dir_a_rdo'  __esx_dir_a_rdo
 `#define' `__esx_dir_a_hid'  __esx_dir_a_hid
 `#define' `__esx_dir_a_sys'  __esx_dir_a_sys
 `#define' `__esx_dir_a_vol'  __esx_dir_a_vol

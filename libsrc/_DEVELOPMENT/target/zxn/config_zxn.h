@@ -2224,6 +2224,7 @@
 #define __esx_dir_use_header  0x40
 
 #define __ESX_F_READDIR  0xa4
+#define __esx_dir_a_rdo  0x01
 #define __esx_dir_a_hid  0x02
 #define __esx_dir_a_sys  0x04
 #define __esx_dir_a_vol  0x08

@@ -25,10 +25,10 @@ asm_esx_m_drvapi:
    ;            hl = -1
    ;            carry set, errno set
    ;
-   ; uses  : all
+   ; uses  : all except ix,iy
    
    push hl                     ; save esx_drvapi *
-   
+
    ld c,(hl)
    inc hl
    ld b,(hl)
@@ -42,8 +42,14 @@ asm_esx_m_drvapi:
    ld h,(hl)
    ld l,a
    
+   push ix
+   push iy
+   
    rst __ESX_RST_SYS
    defb __ESX_M_DRVAPI
+   
+   pop iy
+   pop ix
    
    jr c, error
 

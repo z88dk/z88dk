@@ -8,9 +8,8 @@ EXTERN asm_esx_m_geterr
 
 _esx_m_geterr_callee:
 
-   pop af
-   pop de
    pop hl
-   push af
-   
+   pop de
+   ex (sp),hl
+
    jp asm_esx_m_geterr
