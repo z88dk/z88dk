@@ -127,9 +127,9 @@ instead see it ouput as a separate binary.  Existing as a separate binary (with 
 means it is not in the sna/snx and the program is responsible for loading it into memory somehow.
 In this example, the divmmc page is only there to verify the sna generation is working.
 
-Note that the examples are using the nextos-api with functions prefixed with "esx_*" instead of
-"esxdos_*".  The "esx_*" functions use the esxdos api as documented by NextOS whereas the "esxdos_*"
-functions use the original esxdos api.  At the moment the code is separate but as each function
+Note that the examples are using the nextos-api with functions prefixed with `esx_*` instead of
+`esxdos_*`.  The `esx_*` functions use the [esxdos api as documented by NextOS](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/arch/zxn/esxdos.h#L19) whereas the `esxdos_*`
+functions use the [original esxdos api](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/arch/zx/esxdos.h).  At the moment the code is separate but as each function
 is verified to be identical between the two, they will point at the same code.  If you want to
-guarantee your programs work with original esxdos, use the "esxdos_*" api.  NextOS expands the
-esxdos api so some functions can only be found with "esx_*" prefix.
+guarantee your programs work with original esxdos, use the `esxdos_*` api.  NextOS expands the
+esxdos api so some functions can only be found with `esx_*` prefix.
