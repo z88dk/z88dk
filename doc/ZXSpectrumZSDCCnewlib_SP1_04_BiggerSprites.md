@@ -33,15 +33,17 @@ character cells, as shown in this image:
 
 All of this detail is handled by SP1. All we have to do is create the sprite
 much like we have been doing, and add the extra column being sure to tell SP1
-the maximum height of the sprite in character cells.
+the correct maximum height of the sprite in character cells.
 
-For this example we'll be using this sprite and mask:
+### 16x16 Example
+
+We're going to work through an example with a 16x16 pixel masked sprite kindly
+provided by Dean Belfield at [Break Into Program](http://www.breakintoprogram.co.uk/):
 
 ![alt text](images/sprite_mask_example.png "Sprite mask example")
 
-kindly provided by Dean Belfield at [Break Into Program](http://www.breakintoprogram.co.uk/). 
-
-Here's the sprite data in assembly language, which you should save to a file
+We need to convert this graphical data and the mask into an SP1 sprite data
+structure. Here it is in assembly language, which you should save to a file
 called *bubble_masked_sprite.asm*:
 
 ```
