@@ -79,12 +79,26 @@ int hudson_skel[]={8, ADDR, 'H', 'u', 'd', 's', 'o', 'n'};
 int tkhudson_skel[]={11, 0x01, CATCH, CATCH, 0xFE, 0x20, 0xDA, SKIP, SKIP, 0xFE, 0x22, 0x28};
 int hugoto_skel[]={9, ADDR, 'O', 'T', 'O'+128, 'G', 'O', 'S', 'U', 'B'+128, };
 
+int hu_jptab2[]={14, 0xd6, 0x80, 0x6F, 0x26, 0, 0x01, CATCH, CATCH, 0x29, 0x09, 0x7E, 0x23, 0x66, 0x6F};
+
+int hu_jptab[]={13, 0x11, CATCH, CATCH, 0xD6, 0x80, 0xE5, 0xEB, 0x5F, 0x16, 0, 0x19, 0x19, 0x7E};
+
+
+
 int hu_curyst[]={12, 0xCD, SKIP, SKIP, 0x7E, 0xB7, 0xC8, 0x2B, 0x1D, 0x3A, CATCH, CATCH, 0xBB};
 int hu_curyed[]={12, 0xCD, SKIP, SKIP, 0x1C, 0x23, 0x7E, 0xB7, 0xC8, 0x3A, CATCH, CATCH, 0xBB};
 int hu_txtcoord[]={14, 0xE5, 0x2A, CATCH, CATCH, 0xE5, 0xD5, 0xCD, SKIP, SKIP, 0xD1, 0x36, 0, 0xE1, 0xCD};
 int hu_input[]={14, ADDR, 0x2A, SKIP, SKIP, 0xE5, 0xD5, 0xCD, SKIP, SKIP, 0xD1, 0x36, 0, 0xE1, 0xCD};
 int hu_inputl[]={12, 0xE5, 0xD5, 0xCD, SKIP, SKIP, 0xD1, 0x36, 0, 0xE1, 0xCD, CATCH, CATCH};
 int hu_curxst[]={12, 0xD1, 0x36, 0, 0xE1, 0xCD, SKIP, SKIP, 0x38, SKIP, 0x3A, CATCH, CATCH};
+
+//0000058A:	INC L
+//0000058B:	LD A,(005Ch)	CURXED
+//0000058E:	CP L
+//0000058F:	JP NC,07D2h		JR
+//00000592:	LD A,(005Bh)
+//00000595:	LD L,A
+//00000596:	INC H
 
 int hu_filad[]={15, 0xCD, SKIP, SKIP, 0xF1, 0xE1, 0x30, 3, 0x2A, CATCH, CATCH, 0xED, 0x4B, SKIP, SKIP, 0xCD};
 int hu_filsz[]={15, 0xCD, SKIP, SKIP, 0xF1, 0xE1, 0x30, 3, 0x2A, SKIP, SKIP, 0xED, 0x4B, CATCH, CATCH, 0xCD};
@@ -2935,6 +2949,9 @@ int main(int argc, char *argv[])
 		}	else pos=0;
 		
 		
+		res=find_skel(hu_putc);
+			if (res>0)	dlbl("PUTC", res, "Output character in A");
+
 		res=find_skel(hu_txtcoord);
 			if (res>0)	dlbl("XYTEXT", res, "X and Y text coordinates");
 			
@@ -2962,14 +2979,11 @@ int main(int argc, char *argv[])
 		res=find_skel(hu_filblock);
 			if (res>0)	dlbl("FILBLK", res, "File data block transfer, HL=addr, BC=size");
 		
-		res=find_skel(hu_putc);
-			if (res>0)	dlbl("PUTC", res, "Output character in A");
-		
+		printf("\n");
+			
 		res=find_skel(hu_mon_getl);
 			if (res>0)	dlbl("MON_GETL", res, "Line input for Monitor, DE=addr");
-		
-		
-		
+				
 		res=find_skel(hu_mon_cmd);
 			if (res>0)	{
 				dlbl("MONCMD", res, "MONitor jump table");
@@ -2984,17 +2998,28 @@ int main(int argc, char *argv[])
 					}
 			}
 				
+		printf("\n");
 		
-		
+		res=find_skel(hu_jptab2);
+			if (res>0)	dlbl("JPTAB2", res, "Jump table #2");
+			
+		res2=find_skel(hu_jptab);
+			if (res2>0)	dlbl("JPTAB", res2, "Jump table");
+
 		res=find_skel(tkhudson_skel);
 		if (res>0) {
 			printf("\n# TOKEN table position = $%04X\n",res);
-			printf("\n\t0 ");
-			chr=1;
+			printf("\n\t[128] ");
+			chr=129;
 			for (i=res; img[i+pos]!=255; i++) {
 				c=img[i+pos];
-				if (c>=128) { c-=128; printf("%c \n\t%d ",c, chr++); }
-				else printf("%c",c);
+				if (c>=128) {
+					c-=128;
+					//if (c>' ') {
+						printf("%c \t{%4X} \n\t[%d] ",c, img[res2+pos]+256*img[res2+pos+1], chr++);
+					//}
+					res2+=2;
+				} else printf("%c",c);
 			}
 		}
 		
