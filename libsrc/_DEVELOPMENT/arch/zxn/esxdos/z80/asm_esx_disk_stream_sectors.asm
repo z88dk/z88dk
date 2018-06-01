@@ -51,9 +51,18 @@ asm_esx_disk_stream_sectors:
    jr nz, ide_read_sector
 
 sd_read_sector:
-   
+
+IF __NEXTOS_CONFIG_STREAM_UNROLL
+
+   EXTERN l_ini_512
+   call   l_ini_512
+
+ELSE
+
    inir
    inir
+
+ENDIF
 
    ; skip crc
    
@@ -132,8 +141,17 @@ exit:
 
 ide_read_sector:
 
+IF __NEXTOS_CONFIG_STREAM_UNROLL
+
+   EXTERN l_ini_512
+   call   l_ini_512
+
+ELSE
+
    inir
    inir
+
+ENDIF
    
    dec d
    jr nz, ide_read_sector
