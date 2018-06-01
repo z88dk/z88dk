@@ -32,7 +32,12 @@
 	EXTERN     l_outi
 	EXTERN     l_outi_128
 	EXTERN     l_outi_256
-        
+	
+	EXTERN     l_ini
+	EXTERN     l_ini_128
+	EXTERN     l_ini_256
+	EXTERN     l_ini_512
+
 
 ;------------------------------------
 ; Scopes for integer library routines

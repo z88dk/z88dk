@@ -156,6 +156,35 @@
 =
 
 
+	call	_intrinsic_ini_num_128
+=
+	call	l_ini_128
+
+	call	_intrinsic_ini_num_256
+=
+	call	l_ini_256
+
+	call	_intrinsic_ini_num_512
+=
+	call	l_ini_512
+
+	call	_intrinsic_ini_num_%1
+=
+	call	l_ini-(%1*2)
+
+	call	l_ini%1
+	ret
+=
+	jp	l_ini%1
+
+	call	_intrinsic_ini_port_%1
+=
+	ld	c,%1
+
+	call	_intrinsic_ini
+=
+
+
 	call	intrinsic_reti
 =
 	reti
