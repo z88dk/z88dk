@@ -26,6 +26,10 @@ extern void intrinsic_outi(void*) __z88dk_fastcall;
 #define intrinsic_outi_helper(src,port,num)  { intrinsic_outi(src); intrinsic_outi_port_##port(); intrinsic_outi_num_##num(); }
 #define intrinsic_outi(src,port,num)  intrinsic_outi_helper(src,port,num)
 
+extern void intrinsic_ini(void*) __z88dk_fastcall;
+#define intrinsic_ini_helper(dst,port,num)  { intrinsic_ini(dst); intrinsic_ini_port_##port(); intrinsic_ini_num_##num(); }
+#define intrinsic_ini(dst,port,num)  intrinsic_ini_helper(dst,port,num)
+
 extern void intrinsic_stub(void) __preserves_regs(a,b,c,d,e,h,l);
 
 extern void intrinsic_di(void) __preserves_regs(a,b,c,d,e,h,l);
@@ -77,6 +81,10 @@ extern void intrinsic_ldi(void*,void*) __z88dk_callee;
 extern void intrinsic_outi(void*) __z88dk_fastcall;
 #define intrinsic_outi_helper(src,port,num)  { intrinsic_outi(src); intrinsic_outi_port_##port(); intrinsic_outi_num_##num(); }
 #define intrinsic_outi(src,port,num)  intrinsic_outi_helper(src,port,num)
+
+extern void intrinsic_ini(void*) __z88dk_fastcall;
+#define intrinsic_ini_helper(dst,port,num)  { intrinsic_ini(dst); intrinsic_ini_port_##port(); intrinsic_ini_num_##num(); }
+#define intrinsic_ini(dst,port,num)  intrinsic_ini_helper(dst,port,num)
 
 extern void __LIB__ intrinsic_stub(void) __smallc;
 
