@@ -15,6 +15,8 @@
 	SECTION	code_clib
 	PUBLIC	ansi_cls
 
+	EXTERN	__zx_console_attr
+
 .ansi_cls
         ld      hl,16384
         ld      de,16385
@@ -22,7 +24,7 @@
         ld      bc,6143
         ldir
         ; clear attributes
-        ld      a,(23693)
+        ld      a,(__zx_console_attr)
         ld      hl,22528
         ld      (hl),a
         ld      de,22529

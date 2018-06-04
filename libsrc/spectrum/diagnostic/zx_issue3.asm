@@ -14,11 +14,11 @@
 	SECTION code_clib
 	PUBLIC	zx_issue3
 	PUBLIC	_zx_issue3
-	EXTERN  __PORT254COPY
+	EXTERN  __SYSVAR_BORDCR
 	
 zx_issue3:
 _zx_issue3:
-	ld	a,(__PORT254COPY)  
+	ld	a,(__SYSVAR_BORDCR)  
 	rrca
 	rrca
 	rrca

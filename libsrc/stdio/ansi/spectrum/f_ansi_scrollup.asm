@@ -18,8 +18,6 @@
 
 
 .ansi_SCROLLUP
-	 ;ld     a,(23693)
-	 ;ld     (23624),a
 	 ld		a,($dff)
 	 cp		$17
 	 jr		nz,ts2068_rom
@@ -28,6 +26,6 @@
 	 ret
 .ts2068_rom
 	 call    call_rom3
-     defw	$939	; TS2068 scrollup
+     	defw	$939	; TS2068 scrollup
 	 ret
  

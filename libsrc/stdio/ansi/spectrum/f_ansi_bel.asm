@@ -15,12 +15,12 @@
 	SECTION code_clib
 	PUBLIC	ansi_BEL
 
-	EXTERN	__PORT254COPY
+	EXTERN	__SYSVAR_BORDCR
 
 ; A fine double frequency beep for BEL
 
 .ansi_BEL
-        ld      a,(__PORT254COPY)
+        ld      a,(__SYSVAR_BORDCR)
         rra
         rra
         rra

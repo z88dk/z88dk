@@ -15,6 +15,7 @@
 
 	SECTION	code_clib
 	PUBLIC	ansi_del_line
+	EXTERN	__zx_console_attr
 
 
 .ansi_del_line
@@ -61,7 +62,7 @@
   ld d,h
   ld e,l
   inc de
-  ld a,(23693) ; Use the default attributes
+  ld a,(__zx_console_attr) ; Use the default attributes
   ld (hl),a
   ld bc,31
   ldir

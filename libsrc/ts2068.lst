@@ -5,6 +5,8 @@ stdio/ts2068/fputc_cons
 stdio/spectrum/getk
 stdio/spectrum/CRT_FONT
 stdio/spectrum/CRT_FONT_64
+stdio/spectrum/conio_vars
+stdio/spectrum/bordercolour
 @stdio/ansicore.lst
 stdio/ansi/ts2068/f_ansi_attr
 stdio/ansi/spectrum/f_ansi_bel

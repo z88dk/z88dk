@@ -172,6 +172,10 @@ int symbol_resolve(char *name)
 const char *find_symbol(int addr, symboltype preferred_type)
 {
     symbol *sym;
+
+    if ( addr < 0 ) {
+        return NULL;
+    }
     
     sym = symbols[addr % 65536];
 

@@ -13,11 +13,11 @@
     PUBLIC     bit_open
     PUBLIC     _bit_open
     EXTERN     __snd_tick
-    EXTERN     __PORT254COPY
+    EXTERN     __SYSVAR_BORDCR
 
 .bit_open
 ._bit_open
-        ld a,(__PORT254COPY)
+        ld a,(__SYSVAR_BORDCR)
         rra
         rra
         rra

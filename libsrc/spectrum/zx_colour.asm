@@ -5,6 +5,7 @@
 SECTION code_clib
 PUBLIC zx_colour
 PUBLIC _zx_colour
+EXTERN	__zx_console_attr
 
 .zx_colour
 ._zx_colour
@@ -14,7 +15,7 @@ PUBLIC _zx_colour
 
 		ld 	a,l
         ;ld  (23624),a
-		ld  (23693),a
+		ld  (__zx_console_attr),a
 
 		ld	d,l
 		ld	e,l

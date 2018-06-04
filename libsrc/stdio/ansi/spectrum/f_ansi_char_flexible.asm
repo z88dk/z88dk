@@ -27,6 +27,7 @@
 	
 	EXTERN	__console_y
 	EXTERN	__console_x
+	EXTERN	__zx_console_attr
 
 	PUBLIC	__console_w
 	PUBLIC	__console_h
@@ -105,7 +106,7 @@ no_underline:
 	and	3
 	or	0x58
 	ld	d,a
-  	ld	a,(23693)  ;Current color attributes
+  	ld	a,(__zx_console_attr)  ;Current color attributes
 	ld	(de),a
 	ret
 ; End of fast path for 32 columns
@@ -156,7 +157,7 @@ no_underline:
   add hl,de
   dec a
   jr nz,CLP
-  ld a,(23693)  ;Current color attributes
+  ld a,(__zx_console_attr)  ;Current color attributes
   ld (hl),a
   pop af
   pop hl
