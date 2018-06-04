@@ -146,5 +146,5 @@
 .noback
         ret
 
-	SECTION  bss_clib
+	SECTION  data_clib
 .z9001_attr	defb 7*16
