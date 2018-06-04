@@ -1,4 +1,5 @@
 stdio/pv1000/generic_console
+stdio/pv1000/fgetc_cons
 @stdio/stdio.lst
 games/pv1000/joystick
 @gfxbase.lst
