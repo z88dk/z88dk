@@ -62,7 +62,7 @@ IF FORsc3000
 	ld		a,64	; change reg#1 on SC3000, keep bit 6 enabled to avoid screen blanking
 ELSE
 	ld    hl,INIGRP		; (Graphics 2)
-	call  setmode
+	call  set_mode
 	xor   a			; change reg#0 on SVI
 ENDIF
 	; Now bend the configuration to Graphics mode 1
