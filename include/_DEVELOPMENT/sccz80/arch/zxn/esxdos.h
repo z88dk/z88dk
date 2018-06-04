@@ -9,6 +9,7 @@
 #include <time.h>
 
 // extended sna load
+// call first thing after sna loads, org >= 24576
 
 extern unsigned char __LIB__ extended_sna_load(unsigned char handle) __smallc __z88dk_fastcall;
 

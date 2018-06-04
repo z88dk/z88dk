@@ -5,6 +5,10 @@ divert(-1)
 # rebuild the library if changes are made
 #
 
+# User Configuration
+
+define(`__NEXTOS_CONFIG_STREAM_UNROLL', 0)   # non-zero to unroll inir to ini
+
 # NEXTOS API 1.97F
 # https://github.com/z88dk/techdocs/blob/master/targets/zx-next/nextos/
 # https://github.com/z88dk/techdocs/blob/master/targets/zx-next/nextos/nextos_api.pdf
@@ -361,6 +365,8 @@ dnl#
 
 ifdef(`CFG_ASM_PUB',
 `
+PUBLIC `__NEXTOS_CONFIG_STREAM_UNROLL'
+
 PUBLIC `__NEXTOS_DOS_VERSION'
 PUBLIC `__NEXTOS_DOS_OPEN'
 PUBLIC `__NEXTOS_DOS_CLOSE'
@@ -669,6 +675,8 @@ dnl#
 
 ifdef(`CFG_ASM_DEF',
 `
+defc `__NEXTOS_CONFIG_STREAM_UNROLL' = __NEXTOS_CONFIG_STREAM_UNROLL
+
 defc `__NEXTOS_DOS_VERSION' = __NEXTOS_DOS_VERSION
 defc `__NEXTOS_DOS_OPEN' = __NEXTOS_DOS_OPEN
 defc `__NEXTOS_DOS_CLOSE' = __NEXTOS_DOS_CLOSE
@@ -977,6 +985,8 @@ dnl#
 
 ifdef(`CFG_C_DEF',
 `
+`#define' `__NEXTOS_CONFIG_STREAM_UNROLL'  __NEXTOS_CONFIG_STREAM_UNROLL
+
 `#define' `__NEXTOS_DOS_VERSION'  __NEXTOS_DOS_VERSION
 `#define' `__NEXTOS_DOS_OPEN'  __NEXTOS_DOS_OPEN
 `#define' `__NEXTOS_DOS_CLOSE'  __NEXTOS_DOS_CLOSE

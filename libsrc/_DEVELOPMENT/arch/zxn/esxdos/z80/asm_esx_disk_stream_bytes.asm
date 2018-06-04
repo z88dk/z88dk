@@ -72,8 +72,17 @@ read_256:
    dec d
    jr nz, read_bytes
 
+IF __NEXTOS_CONFIG_STREAM_UNROLL
+
+   EXTERN l_ini_256
+   call   l_ini_256
+
+ELSE
+
    ld b,d
    inir
+
+ENDIF
 
 read_bytes:
 

@@ -2002,6 +2002,8 @@ defc __IO_LED_L = 0x103b
 
 
 
+defc __NEXTOS_CONFIG_STREAM_UNROLL = 0
+
 defc __NEXTOS_DOS_VERSION = 0x0103
 defc __NEXTOS_DOS_OPEN = 0x0106
 defc __NEXTOS_DOS_CLOSE = 0x0109
@@ -2235,6 +2237,7 @@ defc __esx_dir_use_lfn = 0x10
 defc __esx_dir_use_header = 0x40
 
 defc __ESX_F_READDIR = 0xa4
+defc __esx_dir_a_rdo = 0x01
 defc __esx_dir_a_hid = 0x02
 defc __esx_dir_a_sys = 0x04
 defc __esx_dir_a_vol = 0x08
