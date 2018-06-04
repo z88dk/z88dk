@@ -31,8 +31,8 @@
         PUBLIC    _FRAMES
         defc    _FRAMES = 23672	; Timer
 
-        PUBLIC    __PORT254COPY
-        defc      __PORT254COPY = 23624
+        PUBLIC    __SYSVAR_BORDCR
+        defc      __SYSVAR_BORDCR = 23624
 
 ;--------
 ; Set an origin for the application (-zorg=) default to 32768

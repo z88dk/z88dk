@@ -23,6 +23,7 @@
 	EXTERN  call_rom3
 	EXTERN	CRT_FONT
 	EXTERN	CRT_FONT_64
+	EXTERN	__zx_console_attr
 
 ;
 ; Entry:	a= char to print
@@ -144,7 +145,7 @@ ENDIF
 	djnz	print64_loop
 	dec	h
 IF FORts2068
-	; No attribute setting for hires mode
+	; No __zx_console_attribute setting for hires mode
 	ld	a,(hrgmode)
 	and	a
 	jr	nz,cbak
@@ -156,7 +157,7 @@ ENDIF
 	and	3  
 	or	88  
 	ld	h,a  
-	ld	a,(attr)
+	ld	a,(__zx_console_attr)
 	ld	(hl),a
 
 .cbak	ld	hl,(chrloc)  
@@ -224,7 +225,7 @@ ENDIF
 	and	3  
 	or	88
 	ld	d,a
-	ld	a,(attr)
+	ld	a,(__zx_console_attr)
 	ld	(de),a
 .increment
 	inc	l
@@ -489,7 +490,7 @@ IF FORts2068
 	and	a
 	jr	nz,cls_hrg
 ENDIF
-	ld	a,(attr)
+	ld	a,(__zx_console_attr)
 	ld	(hl),a
 	ld	bc,767
 	ldir
@@ -520,7 +521,7 @@ ENDIF
 	ld      (chrloc),hl
 	ret
 
-; Set attributes etc
+; Set __zx_console_attributes etc
 .doinverse
 	ld	hl,control_flags
 	set	0,(hl)
@@ -541,7 +542,7 @@ ENDIF
 
 
 .dobright
-	ld	hl,attr
+	ld	hl,__zx_console_attr
 	set	6,(hl)
 	ld	a,(params)
 	rrca
@@ -551,7 +552,7 @@ ENDIF
 
 
 .doflash
-	ld	hl,attr
+	ld	hl,__zx_console_attr
 	set	7,(hl)
 	ld	a,(params)
 	rrca
@@ -560,7 +561,7 @@ ENDIF
 	ret
 
 .dopaper
-	ld	hl,attr
+	ld	hl,__zx_console_attr
 	ld	a,(hl)	
 	and	@11000111
 	ld	c,a
@@ -574,7 +575,7 @@ ENDIF
 	ret
 	
 .doink
-	ld	hl,attr
+	ld	hl,__zx_console_attr
 	ld	a,(hl)
 	and	@11111000
 	ld	c,a
@@ -724,7 +725,6 @@ ENDIF
 .fontaddr	defw	CRT_FONT
 .font64addr	defw	CRT_FONT_64
 .udgaddr	defw	65368
-.attr		defb	56
 .print_routine	defw	print64
 .deltax		defb	1		;how much to move in x 
 
