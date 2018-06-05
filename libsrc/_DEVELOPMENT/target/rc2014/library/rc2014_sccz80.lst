@@ -24,4 +24,5 @@
 @target/rc2014/device/device.lst
 @target/rc2014/driver/driver_sccz80.lst
 @threads/threads_sccz80.lst
+@time/time_sccz80.lst
 @z80/z80_sccz80.lst

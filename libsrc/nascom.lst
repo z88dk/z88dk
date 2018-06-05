@@ -1,4 +1,3 @@
-@stdio/stdio.lst
 stdio/nascom/fgetc_cons
 stdio/nascom/getk
 stdio/nascom/fputc_cons
@@ -10,6 +9,7 @@ stdio/ansi/nascom/f_ansi_char
 stdio/ansi/nascom/f_ansi_cls
 stdio/ansi/generic/f_ansi_dline
 stdio/ansi/nascom/f_ansi_scrollup
+@stdio/stdio.lst
 @gfxbase.lst
 graphics/dcircle
 graphics/clg

@@ -3716,6 +3716,8 @@ defc __IO_LED_L = 0x103b
 
 
 
+PUBLIC __NEXTOS_CONFIG_STREAM_UNROLL
+
 PUBLIC __NEXTOS_DOS_VERSION
 PUBLIC __NEXTOS_DOS_OPEN
 PUBLIC __NEXTOS_DOS_CLOSE
@@ -3840,47 +3842,6 @@ PUBLIC __NEXTOS_IDE_PARTITIONS
 
 PUBLIC __NEXTOS_DOTN_SP_DIVMMC
 
-PUBLIC __ESX_DISK_FILEMAP
-PUBLIC __ESX_DISK_STRMSTART
-PUBLIC __ESX_DISK_STRMEND
-
-PUBLIC __ESX_M_DOSVERSION
-PUBLIC __ESX_M_GETSETDRV
-PUBLIC __ESX_M_TAPEIN
-PUBLIC __ESX_M_TAPEOUT
-PUBLIC __ESX_M_GETHANDLE
-PUBLIC __ESX_M_GETDATE
-PUBLIC __ESX_M_EXECCMD
-PUBLIC __ESX_M_DRVAPI
-PUBLIC __ESX_M_GETERR
-PUBLIC __ESX_M_P3DOS
-PUBLIC __ESX_M_ERRH
-
-PUBLIC __ESX_F_OPEN
-PUBLIC __ESX_F_CLOSE
-PUBLIC __ESX_F_SYNC
-PUBLIC __ESX_F_READ
-PUBLIC __ESX_F_WRITE
-PUBLIC __ESX_F_SEEK
-PUBLIC __ESX_F_FGETPOS
-PUBLIC __ESX_F_FSTAT
-PUBLIC __ESX_F_FTRUNCATE
-PUBLIC __ESX_F_OPENDIR
-PUBLIC __ESX_F_READDIR
-PUBLIC __ESX_F_TELLDIR
-PUBLIC __ESX_F_SEEKDIR
-PUBLIC __ESX_F_REWINDDIR
-PUBLIC __ESX_F_GETCWD
-PUBLIC __ESX_F_CHDIR
-PUBLIC __ESX_F_MKDIR
-PUBLIC __ESX_F_RMDIR
-PUBLIC __ESX_F_STAT
-PUBLIC __ESX_F_UNLINK
-PUBLIC __ESX_F_TRUNCATE
-PUBLIC __ESX_F_CHMOD
-PUBLIC __ESX_F_RENAME
-PUBLIC __ESX_F_GETFREE
-
 PUBLIC __NEXTOS_RC_READY
 PUBLIC __NEXTOS_RC_WP
 PUBLIC __NEXTOS_RC_SEEK
@@ -3924,8 +3885,144 @@ PUBLIC __NEXTOS_RC_CMDPHASE
 PUBLIC __NEXTOS_RC_DATAPHASE
 PUBLIC __NEXTOS_RC_NOTDIR
 
+PUBLIC __ESX_RST_SYS
+PUBLIC __ESX_RST_ROM
+PUBLIC __ESX_RST_EXITDOT
+
+PUBLIC __ESX_PATHNAME_MAX
+PUBLIC __ESX_FILENAME_MAX
+PUBLIC __ESX_FILENAME_LFN_MAX
+
+PUBLIC __ESX_DISK_FILEMAP
+PUBLIC __ESX_DISK_STRMSTART
+PUBLIC __ESX_DISK_STRMEND
+
+PUBLIC __ESX_M_DOSVERSION
+PUBLIC __ESX_M_GETSETDRV
+
+PUBLIC __ESX_M_TAPEIN
+PUBLIC __esx_tapein_open
+PUBLIC __esx_tapein_close
+PUBLIC __esx_tapein_info
+PUBLIC __esx_tapein_setpos
+PUBLIC __esx_tapein_getpos
+PUBLIC __esx_tapein_pause
+PUBLIC __esx_tapein_flags
+
+PUBLIC __ESX_M_TAPEOUT
+PUBLIC __esx_tapeout_open
+PUBLIC __esx_tapeout_close
+PUBLIC __esx_tapeout_info
+PUBLIC __esx_tapeout_trunc
+
+PUBLIC __ESX_M_GETHANDLE
+PUBLIC __ESX_M_GETDATE
+PUBLIC __ESX_M_EXECCMD
+PUBLIC __ESX_M_DRVAPI
+PUBLIC __ESX_M_GETERR
+PUBLIC __ESX_M_P3DOS
+PUBLIC __ESX_M_ERRH
+
+PUBLIC __ESX_F_OPEN
+PUBLIC __esx_mode_read
+PUBLIC __esx_mode_write
+PUBLIC __esx_mode_use_header
+PUBLIC __esx_mode_open_exist
+PUBLIC __esx_mode_open_creat
+PUBLIC __esx_mode_creat_noexist
+PUBLIC __esx_mode_creat_trunc
+
+PUBLIC __ESX_F_CLOSE
+PUBLIC __ESX_F_SYNC
+PUBLIC __ESX_F_READ
+PUBLIC __ESX_F_WRITE
+
+PUBLIC __ESX_F_SEEK
+PUBLIC __esx_seek_set
+PUBLIC __esx_seek_fwd
+PUBLIC __esx_seek_bwd
+
+PUBLIC __ESX_F_FGETPOS
+PUBLIC __ESX_F_FSTAT
+PUBLIC __ESX_F_FTRUNCATE
+
+PUBLIC __ESX_F_OPENDIR
+PUBLIC __esx_dir_use_lfn
+PUBLIC __esx_dir_use_header
+
+PUBLIC __ESX_F_READDIR
+PUBLIC __esx_dir_a_rdo
+PUBLIC __esx_dir_a_hid
+PUBLIC __esx_dir_a_sys
+PUBLIC __esx_dir_a_vol
+PUBLIC __esx_dir_a_dir
+PUBLIC __esx_dir_a_arch
+PUBLIC __esx_dir_a_dev
+PUBLIC __esx_dir_a_res
+
+PUBLIC __ESX_F_TELLDIR
+PUBLIC __ESX_F_SEEKDIR
+PUBLIC __ESX_F_REWINDDIR
+PUBLIC __ESX_F_GETCWD
+PUBLIC __ESX_F_CHDIR
+PUBLIC __ESX_F_MKDIR
+PUBLIC __ESX_F_RMDIR
+PUBLIC __ESX_F_STAT
+PUBLIC __ESX_F_UNLINK
+PUBLIC __ESX_F_TRUNCATE
+
+PUBLIC __ESX_F_CHMOD
+PUBLIC __esx_a_write
+PUBLIC __esx_a_read
+PUBLIC __esx_a_rdwr
+PUBLIC __esx_a_hidden
+PUBLIC __esx_a_system
+PUBLIC __esx_a_arch
+PUBLIC __esx_a_exec
+PUBLIC __esx_a_all
+
+PUBLIC __ESX_F_RENAME
+PUBLIC __ESX_F_GETFREE
+
+PUBLIC __ESX_OK
+PUBLIC __ESX_EOK
+PUBLIC __ESX_ENONSENSE
+PUBLIC __ESX_ESTEND
+PUBLIC __ESX_EWRTYPE
+PUBLIC __ESX_ENOENT
+PUBLIC __ESX_EIO
+PUBLIC __ESX_EINVAL
+PUBLIC __ESX_EACCES
+PUBLIC __ESX_ENOSPC
+PUBLIC __ESX_ENXIO
+PUBLIC __ESX_ENODRV
+PUBLIC __ESX_ENFILE
+PUBLIC __ESX_EBADF
+PUBLIC __ESX_ENODEV
+PUBLIC __ESX_EOVERFLOW
+PUBLIC __ESX_EISDIR
+PUBLIC __ESX_ENOTDIR
+PUBLIC __ESX_EEXIST
+PUBLIC __ESX_EPATH
+PUBLIC __ESX_ENOSYS
+PUBLIC __ESX_ENAMETOOLONG
+PUBLIC __ESX_ENOCMD
+PUBLIC __ESX_EINUSE
+PUBLIC __ESX_ERDONLY
+PUBLIC __ESX_EVERIFY
+PUBLIC __ESX_ELOADINGKO
+PUBLIC __ESX_EDIRINUSE
+PUBLIC __ESX_EMAPRAMACTIVE
+PUBLIC __ESX_EDRIVEBUSY
+PUBLIC __ESX_EFSUNKNOWN
+PUBLIC __ESX_EDEVICEBUSY
+
+PUBLIC __ESX_EMAXCODE
 
 
+
+
+defc __NEXTOS_CONFIG_STREAM_UNROLL = 0
 
 defc __NEXTOS_DOS_VERSION = 0x0103
 defc __NEXTOS_DOS_OPEN = 0x0106
@@ -4051,47 +4148,6 @@ defc __NEXTOS_IDE_PARTITIONS = 0x01a5
 
 defc __NEXTOS_DOTN_SP_DIVMMC = 0x4000
 
-defc __ESX_DISK_FILEMAP = 0x85
-defc __ESX_DISK_STRMSTART = 0x86
-defc __ESX_DISK_STRMEND = 0x87
-
-defc __ESX_M_DOSVERSION = 0x88
-defc __ESX_M_GETSETDRV = 0x89
-defc __ESX_M_TAPEIN = 0x8b
-defc __ESX_M_TAPEOUT = 0x8c
-defc __ESX_M_GETHANDLE = 0x8d
-defc __ESX_M_GETDATE = 0x8e
-defc __ESX_M_EXECCMD = 0x8f
-defc __ESX_M_DRVAPI = 0x92
-defc __ESX_M_GETERR = 0x93
-defc __ESX_M_P3DOS = 0x94
-defc __ESX_M_ERRH = 0x95
-
-defc __ESX_F_OPEN = 0x9a
-defc __ESX_F_CLOSE = 0x9b
-defc __ESX_F_SYNC = 0x9c
-defc __ESX_F_READ = 0x9d
-defc __ESX_F_WRITE = 0x9e
-defc __ESX_F_SEEK = 0x9f
-defc __ESX_F_FGETPOS = 0xa0
-defc __ESX_F_FSTAT = 0xa1
-defc __ESX_F_FTRUNCATE = 0xa2
-defc __ESX_F_OPENDIR = 0xa3
-defc __ESX_F_READDIR = 0xa4
-defc __ESX_F_TELLDIR = 0xa5
-defc __ESX_F_SEEKDIR = 0xa6
-defc __ESX_F_REWINDDIR = 0xa7
-defc __ESX_F_GETCWD = 0xa8
-defc __ESX_F_CHDIR = 0xa9
-defc __ESX_F_MKDIR = 0xaa
-defc __ESX_F_RMDIR = 0xab
-defc __ESX_F_STAT = 0xac
-defc __ESX_F_UNLINK = 0xad
-defc __ESX_F_TRUNCATE = 0xae
-defc __ESX_F_CHMOD = 0xaf
-defc __ESX_F_RENAME = 0xb0
-defc __ESX_F_GETFREE = 0xb1
-
 defc __NEXTOS_RC_READY = 0
 defc __NEXTOS_RC_WP = 1
 defc __NEXTOS_RC_SEEK = 2
@@ -4134,6 +4190,140 @@ defc __NEXTOS_RC_INVDEVICE = 65
 defc __NEXTOS_RC_CMDPHASE = 67
 defc __NEXTOS_RC_DATAPHASE = 68
 defc __NEXTOS_RC_NOTDIR = 69
+
+defc __ESX_RST_SYS = 0x08
+defc __ESX_RST_ROM = 0x18
+defc __ESX_RST_EXITDOT = 0x20
+
+defc __ESX_PATHNAME_MAX = 256
+defc __ESX_FILENAME_MAX = 12
+defc __ESX_FILENAME_LFN_MAX = 260
+
+defc __ESX_DISK_FILEMAP = 0x85
+defc __ESX_DISK_STRMSTART = 0x86
+defc __ESX_DISK_STRMEND = 0x87
+
+defc __ESX_M_DOSVERSION = 0x88
+defc __ESX_M_GETSETDRV = 0x89
+
+defc __ESX_M_TAPEIN = 0x8b
+defc __esx_tapein_open = 0
+defc __esx_tapein_close = 1
+defc __esx_tapein_info = 2
+defc __esx_tapein_setpos = 3
+defc __esx_tapein_getpos = 4
+defc __esx_tapein_pause = 5
+defc __esx_tapein_flags = 6
+
+defc __ESX_M_TAPEOUT = 0x8c
+defc __esx_tapeout_open = 0
+defc __esx_tapeout_close = 1
+defc __esx_tapeout_info = 2
+defc __esx_tapeout_trunc = 3
+
+defc __ESX_M_GETHANDLE = 0x8d
+defc __ESX_M_GETDATE = 0x8e
+defc __ESX_M_EXECCMD = 0x8f
+defc __ESX_M_DRVAPI = 0x92
+defc __ESX_M_GETERR = 0x93
+defc __ESX_M_P3DOS = 0x94
+defc __ESX_M_ERRH = 0x95
+
+defc __ESX_F_OPEN = 0x9a
+defc __esx_mode_read = 0x01
+defc __esx_mode_write = 0x02
+defc __esx_mode_use_header = 0x40
+defc __esx_mode_open_exist = 0x00
+defc __esx_mode_open_creat = 0x08
+defc __esx_mode_creat_noexist = 0x04
+defc __esx_mode_creat_trunc = 0x0c
+
+defc __ESX_F_CLOSE = 0x9b
+defc __ESX_F_SYNC = 0x9c
+defc __ESX_F_READ = 0x9d
+defc __ESX_F_WRITE = 0x9e
+
+defc __ESX_F_SEEK = 0x9f
+defc __esx_seek_set = 0x00
+defc __esx_seek_fwd = 0x01
+defc __esx_seek_bwd = 0x02
+
+defc __ESX_F_FGETPOS = 0xa0
+defc __ESX_F_FSTAT = 0xa1
+defc __ESX_F_FTRUNCATE = 0xa2
+
+defc __ESX_F_OPENDIR = 0xa3
+defc __esx_dir_use_lfn = 0x10
+defc __esx_dir_use_header = 0x40
+
+defc __ESX_F_READDIR = 0xa4
+defc __esx_dir_a_rdo = 0x01
+defc __esx_dir_a_hid = 0x02
+defc __esx_dir_a_sys = 0x04
+defc __esx_dir_a_vol = 0x08
+defc __esx_dir_a_dir = 0x10
+defc __esx_dir_a_arch = 0x20
+defc __esx_dir_a_dev = 0x40
+defc __esx_dir_a_res = 0x80
+
+defc __ESX_F_TELLDIR = 0xa5
+defc __ESX_F_SEEKDIR = 0xa6
+defc __ESX_F_REWINDDIR = 0xa7
+defc __ESX_F_GETCWD = 0xa8
+defc __ESX_F_CHDIR = 0xa9
+defc __ESX_F_MKDIR = 0xaa
+defc __ESX_F_RMDIR = 0xab
+defc __ESX_F_STAT = 0xac
+defc __ESX_F_UNLINK = 0xad
+defc __ESX_F_TRUNCATE = 0xae
+
+defc __ESX_F_CHMOD = 0xaf
+defc __esx_a_write = 0x01
+defc __esx_a_read = 0x80
+defc __esx_a_rdwr = 0x81
+defc __esx_a_hidden = 0x02
+defc __esx_a_system = 0x04
+defc __esx_a_arch = 0x20
+defc __esx_a_exec = 0x40
+defc __esx_a_all = 0xe7
+
+defc __ESX_F_RENAME = 0xb0
+defc __ESX_F_GETFREE = 0xb1
+
+defc __ESX_OK = 0
+defc __ESX_EOK = 1
+defc __ESX_ENONSENSE = 2
+defc __ESX_ESTEND = 3
+defc __ESX_EWRTYPE = 4
+defc __ESX_ENOENT = 5
+defc __ESX_EIO = 6
+defc __ESX_EINVAL = 7
+defc __ESX_EACCES = 8
+defc __ESX_ENOSPC = 9
+defc __ESX_ENXIO = 10
+defc __ESX_ENODRV = 11
+defc __ESX_ENFILE = 12
+defc __ESX_EBADF = 13
+defc __ESX_ENODEV = 14
+defc __ESX_EOVERFLOW = 15
+defc __ESX_EISDIR = 16
+defc __ESX_ENOTDIR = 17
+defc __ESX_EEXIST = 18
+defc __ESX_EPATH = 19
+defc __ESX_ENOSYS = 20
+defc __ESX_ENAMETOOLONG = 21
+defc __ESX_ENOCMD = 22
+defc __ESX_EINUSE = 23
+defc __ESX_ERDONLY = 24
+defc __ESX_EVERIFY = 25
+defc __ESX_ELOADINGKO = 26
+defc __ESX_EDIRINUSE = 27
+defc __ESX_EMAPRAMACTIVE = 28
+defc __ESX_EDRIVEBUSY = 29
+defc __ESX_EFSUNKNOWN = 30
+defc __ESX_EDEVICEBUSY = 31
+
+defc __ESX_EMAXCODE = 31
 
 
 

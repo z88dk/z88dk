@@ -13,7 +13,7 @@ static char *assorted_mainpage_opcodes[] = { "rlca", "rrca", "rla", "rra", "daa"
 
 typedef struct {
     int       index;
-    int       pc;
+    unsigned short     pc;
     int       len;
     int       skip;
     uint8_t   prefix;
@@ -61,7 +61,7 @@ static char *handle_rel8(dcontext *state, char *buf, size_t buflen)
     if ( (label = find_symbol(state->pc + displacement, SYM_ADDRESS)) != NULL ) {
         BUF_PRINTF("%s",label);
     } else {
-        BUF_PRINTF("$%04x", state->pc + displacement);
+        BUF_PRINTF("$%04x", (unsigned short)(state->pc + displacement));
     }
     
     

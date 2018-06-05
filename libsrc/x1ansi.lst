@@ -1,5 +1,4 @@
 @input/x1.lst
-@stdio/stdio.lst
 stdio/x1/fgetc_cons
 stdio/x1/getk
 @stdio/ansicore.lst
@@ -9,6 +8,7 @@ stdio/ansi/x1/f_ansi_char
 stdio/ansi/x1/f_ansi_cls
 stdio/ansi/x1/f_ansi_dline
 stdio/ansi/x1/f_ansi_scrollup
+@stdio/stdio.lst
 @time/time.lst
 time/x1/clock
 time/x1/time

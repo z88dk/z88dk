@@ -22,4 +22,5 @@
 @string/string_sdcc_ix.lst
 @target/vgl/driver/driver.lst
 @threads/threads_sdcc_ix.lst
+@time/time_sdcc.lst
 @z80/z80_sdcc.lst

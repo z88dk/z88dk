@@ -46,6 +46,7 @@ section code_stdlib
 section code_string
 section code_threads
 section code_threads_mutex
+section code_time
 section code_z180
 section code_z80
 
@@ -80,6 +81,7 @@ section bss_arch
 section bss_clib
 section bss_compress_aplib
 section bss_error
+section bss_esxdos
 section bss_fcntl
 section bss_input
 section bss_stdio

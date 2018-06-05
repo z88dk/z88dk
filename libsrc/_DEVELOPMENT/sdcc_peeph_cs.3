@@ -3710,6 +3710,79 @@ replace restart {
 barrier
 
 replace restart {
+	call	_intrinsic_ini_num_512
+} by {
+	call	____sdcc_ini_512
+	; peephole z88dk-intrinsic-ini-num-512
+}
+
+replace restart {
+	jp	_intrinsic_ini_num_512
+} by {
+	jp	____sdcc_ini_512
+	; peephole z88dk-intrinsic-ini-num-512
+}
+
+replace restart {
+	call	_intrinsic_ini_num_256
+} by {
+	call	____sdcc_ini_256
+	; peephole z88dk-intrinsic-ini-num-256
+}
+
+replace restart {
+	jp	_intrinsic_ini_num_256
+} by {
+	jp	____sdcc_ini_256
+	; peephole z88dk-intrinsic-ini-num-256
+}
+
+replace restart {
+	call	_intrinsic_ini_num_128
+} by {
+	call	____sdcc_ini_128
+	; peephole z88dk-intrinsic-ini-num-128
+}
+
+replace restart {
+	jp	_intrinsic_ini_num_128
+} by {
+	jp	____sdcc_ini_128
+	; peephole z88dk-intrinsic-ini-num-128
+}
+
+barrier
+
+replace restart {
+	call	_intrinsic_ini_num_%1
+} by {
+	call	____sdcc_ini-(%1*2)
+	; peephole z88dk-intrinsic-ini-num-%1
+}
+
+replace restart {
+	jp	_intrinsic_ini_num_%1
+} by {
+	jp	____sdcc_ini-(%1*2)
+	; peephole z88dk-intrinsic-ini-num-%1
+}
+
+replace restart {
+	call	_intrinsic_ini_port_%1
+} by {
+	ld	c,#%1
+	; peephole z88dk-intrinsic-ini-port-%1
+}
+
+replace restart {
+	call	_intrinsic_ini
+} by {
+	; peephole z88dk-intrinsic-ini
+}
+
+barrier
+
+replace restart {
 	call	_intrinsic_ldi_num_256
 } by {
 	call	____sdcc_ldi_256

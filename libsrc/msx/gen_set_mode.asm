@@ -18,12 +18,8 @@ ENDIF
 	
 	INCLUDE	"msx/vdp.inc"
 
-IF FORm5
-	INCLUDE "target/m5/def/m5bios.def"
-ELSE
 	EXTERN	SETWRT
 	EXTERN	FILVRM
-ENDIF
 
 msx_set_mode:
 _msx_set_mode:
@@ -48,9 +44,6 @@ ELSE
 ; Switch 2 Video Mode n. 0
 initxt:
 
-IF FORm5
-	jp INITXT
-ELSE
 
 ; MSX:  $00,$F0,$00,$00,$01,$00,$00,$F4
 ; SVI:  $00,$F0,$00,$FF,$01,$36,$07,$F4
@@ -88,7 +81,6 @@ ELSE
     ld    a,$D0   ; ($C0 for MTX ?)  ; reg1 - TEXT MODE
     call    VDPreg_Write
     ret
-ENDIF
 
 ; Switch 2 Video Mode n. 1
 
@@ -118,7 +110,7 @@ init32:
     call    VDPreg_Write    ; reg6  -  SPRITE PATTERN GEN. TAB.
     
 ;    ld    a,$f5 ; (00 ?)
-IF FORm5
+IF FORm5___2
 	ld	a,1		; avoid transparent color (to be confirmed)
 ELSE
     xor   a
@@ -127,7 +119,7 @@ ENDIF
     
 		; reg0  - TEXT MODE
     ld    c,$00
-IF FORm5
+IF FORm5___2
 	ld	a,1		; external video flag bit must be set on M5
 ELSE
     xor a		; .. and reset on the other targets
@@ -191,7 +183,7 @@ ENDIF
     call    VDPreg_Write
     
     ; reg6  -  SPRITE PATTERN GEN. TAB.
-IF FORm5
+IF FORm5___2
     ld    a,$07		; M5 = MSX = SVI
 ELSE
     ld    a,$03
@@ -209,7 +201,7 @@ ENDIF
 	; reg0  - GRAPH MODE
     ld    c,$00
 IF FORm5
-    ld    a,$03		; set bit 0 on m5 (to be confirmed)
+    ld    a,$03		; set bit 0 on m5___2 (to be confirmed)
 ELSE
     ld    a,$02		; .. and reset on the other targets
 ENDIF
@@ -222,7 +214,6 @@ ENDIF
     call    VDPreg_Write
 	
 	
-IF FORm5 | FORpv2000  | FORsc3000
 	; Pattern table should probably be initialized on other targets as well,
 	; Memotech MTX does not seem to require the initialization (discovered experimentally)
 	; SETWRT on the M5 sets C correctly on exit, it may be differente elsewhere
@@ -253,7 +244,6 @@ ENDIF
 ;	ld	l,a
 ;	jp	FILVRM
 
-ENDIF
 
 
     ret
@@ -280,12 +270,6 @@ inimlt:
 ;»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»
 VDPreg_Write:  
 ;»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»
-
-;IF FORsc3000
-;	call $2BBF
-;	inc c
-;	ret
-;ELSE
 
 	ld	b,a
 	

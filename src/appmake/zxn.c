@@ -47,6 +47,7 @@ static struct zx_sna zxs = {
     -1,         // stackloc
     -1,         // intstate
      0,         // force_128
+     0,         // snx
      0,         // xsna
      0          // fsna
 };
@@ -62,7 +63,7 @@ static struct zx_bin zxb = {
 static char tap = 0;            // .tap tape
 static char sna = 0;            // .sna 48k/128k snapshot
 static char dot = 0;            //  esxdos dot command
-static char universal_dot = 0;  // nextos universal dot command
+static char universal_dot = 0;  //  nextos universal dot command
 static char zxn = 0;            // .zxn full size memory executable
 static char bin = 0;            // .bin output binaries with banks correctly merged
 
@@ -89,7 +90,8 @@ option_t zxn_options[] = {
 
     {  0,  "sna",      "Make .sna instead of .tap",  OPT_BOOL,  &sna },
     {  0,  "128",      "Force generation of 128k sna", OPT_BOOL, &zxs.force_128 },
-    {  0,  "ext",      "Generate extended nextos sna", OPT_BOOL, &zxs.xsna },
+    {  0,  "ext",      "Generate extended sna",      OPT_BOOL, &zxs.xsna },
+    {  0,  "snx",      "Generate extended nextos snx", OPT_BOOL, &zxs.snx },
     {  0,  "org",      "Start address of .sna",      OPT_INT,   &zxc.origin },
     {  0,  "sna-sp",   "Stack location in .sna",     OPT_INT,   &zxs.stackloc },
     {  0,  "sna-di",   "Di on start if non-zero (default = 0)", OPT_INT, &zxs.intstate },
@@ -159,6 +161,12 @@ int zxn_exec(char *target)
     }
 
     // generate output
+
+    if (zxs.snx)
+    {
+        sna = 1;
+        zxs.xsna = 1;
+    }
 
     tap = !dot && !sna && !zxn && !bin;
 
@@ -505,7 +513,7 @@ int zxn_exec(char *target)
             zxc.pages = 1;
         }
 
-        ret = zx_sna(&zxc, &zxs, &memory, 0);
+        ret = zx_sna(&zxc, &zxs, &memory, 1);
 
         if ((ret != 0) || (zxs.xsna == 0))
         {

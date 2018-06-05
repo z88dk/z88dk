@@ -1,4 +1,3 @@
-@stdio/stdio.lst
 stdio/abc80/fgetc_cons
 stdio/abc80/fputc_cons
 stdio/abc80/getk
@@ -10,6 +9,7 @@ stdio/ansi/abc80/f_ansi_char
 stdio/ansi/abc80/f_ansi_cls
 stdio/ansi/abc80/f_ansi_dline
 stdio/ansi/abc80/f_ansi_scrollup
+@stdio/stdio.lst
 time/abc80/clock
 graphics/clg
 graphics/clrarea

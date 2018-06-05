@@ -1,12 +1,12 @@
 @input/spectrum.lst
-@stdio/stdio.lst
 stdio/spectrum/fgetc_cons
-stdio/spectrum/fgetc_cons_inkey
 stdio/spectrum/fputc_cons_rom_rst
 stdio/ts2068/fputc_cons
 stdio/spectrum/getk
 stdio/spectrum/CRT_FONT
 stdio/spectrum/CRT_FONT_64
+stdio/spectrum/conio_vars
+stdio/spectrum/bordercolour
 @stdio/ansicore.lst
 stdio/ansi/ts2068/f_ansi_attr
 stdio/ansi/spectrum/f_ansi_bel
@@ -14,6 +14,7 @@ stdio/ansi/ts2068/f_ansi_char
 stdio/ansi/ts2068/f_ansi_cls
 stdio/ansi/ts2068/f_ansi_dline
 stdio/ansi/ts2068/f_ansi_scrollup
+@stdio/stdio.lst
 time/spectrum/clock
 games/spectrum/joystick
 @games/games.lst

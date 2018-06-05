@@ -85,6 +85,7 @@ static struct zx_sna zxs = {
     -1,         // stackloc
     -1,         // intstate
      0,         // force_128
+     0,         // snx
      0,         // xsna
      0          // fsna
 };

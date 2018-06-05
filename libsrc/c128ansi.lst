@@ -1,4 +1,3 @@
-@stdio/stdio.lst
 stdio/c128/fgetc_cons
 stdio/c128/getk
 @stdio/ansicore.lst
@@ -8,5 +7,6 @@ stdio/ansi/c128/f_ansi_char
 stdio/ansi/c128/f_ansi_cls
 stdio/ansi/c128/f_ansi_dline
 stdio/ansi/c128/f_ansi_scrollup
+@stdio/stdio.lst
 @c128cpm.lst
 @z80.lst

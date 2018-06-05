@@ -89,6 +89,7 @@ got_mask:
 	; l = flags
 	ld	a,l
 	or	c
+	ld	l,a
 	ret
 
 

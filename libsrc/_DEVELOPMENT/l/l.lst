@@ -14,6 +14,8 @@ l/z80/l_ex_bc_de
 l/z80/l_ex_bc_hl
 l/z80/l_inc_hl
 l/z80/l_inc_sp
+l/z80/l_ini
+l/z80/l_ini_loop
 l/z80/l_jphl
 l/z80/l_jpix
 l/z80/l_jpix_00

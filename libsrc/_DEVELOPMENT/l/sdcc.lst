@@ -10,6 +10,10 @@ l/sdcc/____sdcc_4_push_mhl
 l/sdcc/____sdcc_cpu_pop_ei
 l/sdcc/____sdcc_cpu_pop_ei_jp
 l/sdcc/____sdcc_cpu_push_di
+l/sdcc/____sdcc_ini
+l/sdcc/____sdcc_ini_128
+l/sdcc/____sdcc_ini_256
+l/sdcc/____sdcc_ini_512
 l/sdcc/____sdcc_ldi
 l/sdcc/____sdcc_ldi_128
 l/sdcc/____sdcc_ldi_256

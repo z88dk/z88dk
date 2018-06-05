@@ -44,6 +44,7 @@ section code_sound_bit
 section code_stdio
 section code_stdlib
 section code_string
+section code_time
 section code_z180
 section code_z80
 
@@ -60,6 +61,7 @@ section code_dot
 section rodata_dot
 section smc_dot
 section data_dot
+section bss_esxdos
 section bss_dot
 section bss_dot_uninitialized
 

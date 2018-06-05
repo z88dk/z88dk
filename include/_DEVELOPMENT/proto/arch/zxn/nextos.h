@@ -5,188 +5,14 @@ include(__link__.m4)
 
 #include <arch.h>
 
-// Global Variables - same port numbers are aliases
-
-extern unsigned char GLOBAL_ZX_PORT_1FFD;
-extern unsigned char GLOBAL_ZX_PORT_7FFD;
+// Global Variables
 
 extern unsigned char GLOBAL_ZXN_PORT_1FFD;
 extern unsigned char GLOBAL_ZXN_PORT_7FFD;
 extern unsigned char GLOBAL_ZXN_PORT_DFFD;
 
-// NEXTOS API 1.94B
+// NEXTOS API 1.98
 // https://github.com/z88dk/techdocs/blob/master/targets/zx-next/nextos/
-
-// Filesystem Related
-
-#define NEXTOS_DOS_VERSION  __NEXTOS_DOS_VERSION
-#define NEXTOS_DOS_OPEN  __NEXTOS_DOS_OPEN
-#define NEXTOS_DOS_CLOSE  __NEXTOS_DOS_CLOSE
-#define NEXTOS_DOS_ABANDON  __NEXTOS_DOS_ABANDON
-#define NEXTOS_DOS_REF_HEAD  __NEXTOS_DOS_REF_HEAD
-#define NEXTOS_DOS_READ  __NEXTOS_DOS_READ
-#define NEXTOS_DOS_WRITE  __NEXTOS_DOS_WRITE
-#define NEXTOS_DOS_BYTE_READ  __NEXTOS_DOS_BYTE_READ
-#define NEXTOS_DOS_BYTE_WRITE  __NEXTOS_DOS_BYTE_WRITE
-#define NEXTOS_DOS_CATALOG  __NEXTOS_DOS_CATALOG
-#define NEXTOS_DOS_FREE_SPACE  __NEXTOS_DOS_FREE_SPACE
-#define NEXTOS_DOS_DELETE  __NEXTOS_DOS_DELETE
-#define NEXTOS_DOS_RENAME  __NEXTOS_DOS_RENAME
-#define NEXTOS_DOS_BOOT  __NEXTOS_DOS_BOOT
-#define NEXTOS_DOS_SET_DRIVE  __NEXTOS_DOS_SET_DRIVE
-#define NEXTOS_DOS_SET_USER  __NEXTOS_DOS_SET_USER
-#define NEXTOS_DOS_GET_POSITION  __NEXTOS_DOS_GET_POSITION
-#define NEXTOS_DOS_SET_POSITION  __NEXTOS_DOS_SET_POSITION
-#define NEXTOS_DOS_GET_EOF  __NEXTOS_DOS_GET_EOF
-#define NEXTOS_DOS_GET_1346  __NEXTOS_DOS_GET_1346
-#define NEXTOS_DOS_SET_1346  __NEXTOS_DOS_SET_1346
-#define NEXTOS_DOS_FLUSH  __NEXTOS_DOS_FLUSH
-#define NEXTOS_DOS_SET_ACCESS  __NEXTOS_DOS_SET_ACCESS
-#define NEXTOS_DOS_SET_ATTRIBUTES  __NEXTOS_DOS_SET_ATTRIBUTES
-#define NEXTOS_DOS_SET_MESSAGE  __NEXTOS_DOS_SET_MESSAGE
-
-#define NEXTOS_IDE_VERSION  __NEXTOS_IDE_VERSION
-#define NEXTOS_IDE_SWAP_OPEN  __NEXTOS_IDE_SWAP_OPEN
-#define NEXTOS_IDE_SWAP_CLOSE  __NEXTOS_IDE_SWAP_CLOSE
-#define NEXTOS_IDE_SWAP_OUT  __NEXTOS_IDE_SWAP_OUT
-#define NEXTOS_IDE_SWAP_IN  __NEXTOS_IDE_SWAP_IN
-#define NEXTOS_IDE_SWAP_EX  __NEXTOS_IDE_SWAP_EX
-#define NEXTOS_IDE_SWAP_POS  __NEXTOS_IDE_SWAP_POS
-#define NEXTOS_IDE_SWAP_MOVE  __NEXTOS_IDE_SWAP_MOVE
-#define NEXTOS_IDE_SWAP_RESIZE  __NEXTOS_IDE_SWAP_RESIZE
-#define NEXTOS_IDE_PARTITION_FIND  __NEXTOS_IDE_PARTITION_FIND
-#define NEXTOS_IDE_DOS_MAP  __NEXTOS_IDE_DOS_MAP
-#define NEXTOS_IDE_DOS_UNMAP  __NEXTOS_IDE_DOS_UNMAP
-#define NEXTOS_IDE_DOS_MAPPING  __NEXTOS_IDE_DOS_MAPPING
-#define NEXTOS_IDE_SNAPLOAD  __NEXTOS_IDE_SNAPLOAD
-
-#define NEXTOS_IDE_PATH  __NEXTOS_IDE_PATH
-#define nextos_rc_path_change  __nextos_rc_path_change
-#define nextos_rc_path_get  __nextos_rc_path_get
-#define nextos_rc_path_make  __nextos_rc_path_make
-#define nextos_rc_path_delete  __nextos_rc_path_delete
-
-#define NEXTOS_IDE_CAPACITY  __NEXTOS_IDE_CAPACITY
-#define NEXTOS_IDE_GET_LFN  __NEXTOS_IDE_GET_LFN
-
-#define NEXTOS_IDE_BROWSER  __NEXTOS_IDE_BROWSER
-#define nextos_browsercaps_none  __nextos_browsercaps_none
-#define nextos_browsercaps_copy  __nextos_browsercaps_copy
-#define nextos_browsercaps_rename  __nextos_browsercaps_rename
-#define nextos_browsercaps_mkdir  __nextos_browsercaps_mkdir
-#define nextos_browsercaps_erase  __nextos_browsercaps_erase
-#define nextos_browsercaps_remount  __nextos_browsercaps_remount
-#define nextos_browsercaps_syscfg  __nextos_browsercaps_syscfg
-#define nextos_browsercaps_all  __nextos_browsercaps_all
-
-// Not Filesystem Related
-
-#define NEXTOS_IDE_STREAM_OPEN  __NEXTOS_IDE_STREAM_OPEN
-#define NEXTOS_IDE_STREAM_CLOSE  __NEXTOS_IDE_STREAM_CLOSE
-#define NEXTOS_IDE_STREAM_IN  __NEXTOS_IDE_STREAM_IN
-#define NEXTOS_IDE_STREAM_OUT  __NEXTOS_IDE_STREAM_OUT
-#define NEXTOS_IDE_STREAM_PTR  __NEXTOS_IDE_STREAM_PTR
-
-#define NEXTOS_IDE_BANK  __NEXTOS_IDE_BANK
-#define nextos_rc_banktype_zx  __nextos_rc_banktype_zx
-#define nextos_rc_banktype_mmc  __nextos_rc_banktype_mmc
-#define nextos_rc_bank_total  __nextos_rc_bank_total
-#define nextos_rc_bank_alloc  __nextos_rc_bank_alloc
-#define nextos_rc_bank_reserve  __nextos_rc_bank_reserve
-#define nextos_rc_bank_free  __nextos_rc_bank_free
-
-#define NEXTOS_IDE_BASIC  __NEXTOS_IDE_BASIC
-#define NEXTOS_IDE_STREAM_LINEIN  __NEXTOS_IDE_STREAM_LINEIN
-#define NEXTOS_IDE_WINDOW_STRING  __NEXTOS_IDE_WINDOW_STRING
-#define NEXTOS_IDE_INTEGER_VAR  __NEXTOS_IDE_INTEGER_VAR
-#define NEXTOS_IDE_RTC  __NEXTOS_IDE_RTC
-
-// Legacy - Floppy Drive
-
-#define NEXTOS_DOS_REF_XDPB  __NEXTOS_DOS_REF_XDPB
-#define NEXTOS_DOS_MAP_B  __NEXTOS_DOS_MAP_B
-#define NEXTOS_DD_INTERFACE  __NEXTOS_DD_INTERFACE
-#define NEXTOS_DD_INIT  __NEXTOS_DD_INIT
-#define NEXTOS_DD_SETUP  __NEXTOS_DD_SETUP
-#define NEXTOS_DD_SET_RETRY  __NEXTOS_DD_SET_RETRY
-#define NEXTOS_DD_READ_SECTOR  __NEXTOS_DD_READ_SECTOR
-#define NEXTOS_DD_WRITE_SECTOR  __NEXTOS_DD_WRITE_SECTOR
-#define NEXTOS_DD_CHECK_SECTOR  __NEXTOS_DD_CHECK_SECTOR
-#define NEXTOS_DD_FORMAT  __NEXTOS_DD_FORMAT
-#define NEXTOS_DD_READ_ID  __NEXTOS_DD_READ_ID
-#define NEXTOS_DD_TEST_UNSUITABLE  __NEXTOS_DD_TEST_UNSUITABLE
-#define NEXTOS_DD_LOGIN  __NEXTOS_DD_LOGIN
-#define NEXTOS_DD_SEL_FORMAT  __NEXTOS_DD_SEL_FORMAT
-#define NEXTOS_DD_ASK_1  __NEXTOS_DD_ASK_1
-#define NEXTOS_DD_DRIVE_STATUS  __NEXTOS_DD_DRIVE_STATUS
-#define NEXTOS_DD_EQUIPMENT  __NEXTOS_DD_EQUIPMENT
-#define NEXTOS_DD_ENCODE  __NEXTOS_DD_ENCODE
-#define NEXTOS_DD_L_XDPB  __NEXTOS_DD_L_XDPB
-#define NEXTOS_DD_L_DPB  __NEXTOS_DD_L_DPB
-#define NEXTOS_DD_L_SEEK  __NEXTOS_DD_L_SEEK
-#define NEXTOS_DD_L_READ  __NEXTOS_DD_L_READ
-#define NEXTOS_DD_L_WRITE  __NEXTOS_DD_L_WRITE
-#define NEXTOS_DD_L_ON_MOTOR  __NEXTOS_DD_L_ON_MOTOR
-#define NEXTOS_DD_T_OFF_MOTOR  __NEXTOS_DD_T_OFF_MOTOR
-#define NEXTOS_DD_L_OFF_MOTOR  __NEXTOS_DD_L_OFF_MOTOR
-
-// System Use
-
-#define NEXTOS_DOS_INITIALISE  __NEXTOS_DOS_INITIALISE
-#define NEXTOS_DOS_INITIALIZE  __NEXTOS_DOS_INITIALIZE
-#define NEXTOS_IDE_INTERFACE  __NEXTOS_IDE_INTERFACE
-#define NEXTOS_IDE_INIT  __NEXTOS_IDE_INIT
-#define NEXTOS_IDE_DRIVE  __NEXTOS_IDE_DRIVE
-#define NEXTOS_IDE_SECTOR_READ  __NEXTOS_IDE_SECTOR_READ
-#define NEXTOS_IDE_SECTOR_WRITE  __NEXTOS_IDE_SECTOR_WRITE
-#define NEXTOS_IDE_PARTITION_NEW  __NEXTOS_IDE_PARTITION_NEW
-#define NEXTOS_IDE_PARTITION_INIT  __NEXTOS_IDE_PARTITION_INIT
-#define NEXTOS_IDE_PARTITION_READ  __NEXTOS_IDE_PARTITION_READ
-#define NEXTOS_IDE_PARTITION_OPEN  __NEXTOS_IDE_PARTITION_OPEN
-#define NEXTOS_IDE_PARTITION_CLOSE  __NEXTOS_IDE_PARTITION_CLOSE
-#define NEXTOS_IDE_PARTITIONS  __NEXTOS_IDE_PARTITIONS
-
-// NextOS ESXDOS API
-
-#define ESX_DISK_FILEMAP  __ESX_DISK_FILEMAP
-#define ESX_DISK_STRMSTART  __ESX_DISK_STRMSTART
-#define ESX_DISK_STRMEND  __ESX_DISK_STRMEND
-
-#define ESX_M_DOSVERSION  __ESX_M_DOSVERSION
-#define ESX_M_GETSETDRV  __ESX_M_GETSETDRV
-#define ESX_M_TAPEIN  __ESX_M_TAPEIN
-#define ESX_M_TAPEOUT  __ESX_M_TAPEOUT
-#define ESX_M_GETHANDLE  __ESX_M_GETHANDLE
-#define ESX_M_GETDATE  __ESX_M_GETDATE
-#define ESX_M_EXECCMD  __ESX_M_EXECCMD
-#define ESX_M_GETERR  __ESX_M_GETERR
-#define ESX_M_P3DOS  __ESX_M_P3DOS
-#define ESX_M_ERRH  __ESX_M_ERRH
-
-#define ESX_F_OPEN  __ESX_F_OPEN
-#define ESX_F_CLOSE  __ESX_F_CLOSE
-#define ESX_F_SYNC  __ESX_F_SYNC
-#define ESX_F_READ  __ESX_F_READ
-#define ESX_F_WRITE  __ESX_F_WRITE
-#define ESX_F_SEEK  __ESX_F_SEEK
-#define ESX_F_FGETPOS  __ESX_F_FGETPOS
-#define ESX_F_FSTAT  __ESX_F_FSTAT
-#define ESX_F_FTRUNCATE  __ESX_F_FTRUNCATE
-#define ESX_F_OPENDIR  __ESX_F_OPENDIR
-#define ESX_F_READDIR  __ESX_F_READDIR
-#define ESX_F_TELLDIR  __ESX_F_TELLDIR
-#define ESX_F_SEEKDIR  __ESX_F_SEEKDIR
-#define ESX_F_REWINDDIR  __ESX_F_REWINDDIR
-#define ESX_F_GETCWD  __ESX_F_GETCWD
-#define ESX_F_CHDIR  __ESX_F_CHDIR
-#define ESX_F_MKDIR  __ESX_F_MKDIR
-#define ESX_F_RMDIR  __ESX_F_RMDIR
-#define ESX_F_STAT  __ESX_F_STAT
-#define ESX_F_UNLINK  __ESX_F_UNLINK
-#define ESX_F_TRUNCATE  __ESX_F_TRUNCATE
-#define ESX_F_CHMOD  __ESX_F_CHMOD
-#define ESX_F_RENAME  __ESX_F_RENAME
-#define ESX_F_GETFREE  __ESX_F_GETFREE
 
 // Error Codes - Recoverable Disk Errors
 
@@ -234,5 +60,7 @@ extern unsigned char GLOBAL_ZXN_PORT_DFFD;
 #define NEXTOS_RC_CMDPHASE  __NEXTOS_RC_CMDPHASE
 #define NEXTOS_RC_DATAPHASE  __NEXTOS_RC_DATAPHASE
 #define NEXTOS_RC_NOTDIR  __NEXTOS_RC_NOTDIR
+
+// NextOS ESX API found in esxdos.h
 
 #endif

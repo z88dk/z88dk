@@ -31,7 +31,7 @@ extern void __LIB__  msx_set_mode(int mode) __z88dk_fastcall;
 
 // Video modes for set_mode
 
-#ifdef __MSX__
+#ifdef __MSX__UNUSED
 #define vmode_defined 1
 enum video_mode {
 	mode_0 = 0x6C,	// INITXT
@@ -41,7 +41,7 @@ enum video_mode {
 };
 #endif
 
-#ifdef __SC3000__
+#ifdef __SC3000__UNUSED
 #define vmode_defined 1
 enum video_mode {
 	mode_0 = 0x39E5,    // INITXT

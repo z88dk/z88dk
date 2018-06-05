@@ -1,4 +1,3 @@
-@stdio/stdio.lst
 stdio/g800/fgetc_cons_850
 stdio/g800/getk_850
 @stdio/ansicore.lst
@@ -8,4 +7,5 @@ stdio/ansi/g800/f_ansi_char_850
 stdio/ansi/g800/f_ansi_cls_850
 stdio/ansi/generic/f_ansi_dline
 stdio/ansi/g800/f_ansi_scrollup_850
+@stdio/stdio.lst
 @z80.lst

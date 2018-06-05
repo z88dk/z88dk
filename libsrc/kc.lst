@@ -1,7 +1,7 @@
-@stdio/stdio.lst
 stdio/kc/fgetc_cons
 stdio/kc/getk
 stdio/kc/fputc_cons
+@stdio/stdio.lst
 games/joystick
 @gfxbasew.lst
 graphics/kc/clg

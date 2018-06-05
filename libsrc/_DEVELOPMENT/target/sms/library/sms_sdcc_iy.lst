@@ -24,4 +24,5 @@
 @string/string_sdcc_iy.lst
 @target/sms/driver/driver.lst
 @threads/threads_sdcc_iy.lst
+@time/time_sdcc.lst
 @z80/z80_sdcc.lst

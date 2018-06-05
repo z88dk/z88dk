@@ -135,7 +135,7 @@ ENDIF
    jp __esxdos_error_mc
 
 
-SECTION bss_arch
+SECTION bss_esxdos
 
 destination_page:
    defb 0

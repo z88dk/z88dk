@@ -6,7 +6,7 @@
 ;
 ;	extern bool __FASTCALL__ msx_set_mode(unsigned char id);
 ;
-;	set screen mode
+;	set screen mode - used for MSX and SVI only
 ;
 ;	$Id: msx_set_mode.asm $
 ;
@@ -17,29 +17,37 @@
 	
 	EXTERN	msxbios
 
+IF FORmsx
+	INCLUDE	"target/msx/def/msxbios.def"
+ENDIF
+
 IF FORsvi
     INCLUDE	"msx/vdp.inc"
     INCLUDE "target/svi/def/svibios.def"
     INCLUDE "target/svi/def/svibasic.def"
 ENDIF
 
-IF FORsc3000
-    INCLUDE	"msx/vdp.inc"
-	EXTERN     LDIRVM
-	EXTERN     FILVRM
-ENDIF
-
 msx_set_mode:
 _msx_set_mode:
 
+	ex	de,hl
+	ld	a,e
+	ld	hl,INITXT
+	and	a
+	jr	z,set_mode
 IF FORmsx
-	; MSX supports G1 natively
+	ld	hl,INIT32
+	dec	a
+	jr	z,set_mode
 ELSE
-	ld	a,h
-	or	l
+	dec	a
 	jr	z,txt32
-setmode:
 ENDIF
+	ld	hl,INIGRP
+	dec	a
+	jr	z,set_mode
+	ld	hl,INIMLT
+set_mode:
 	push	ix
 	push	hl
 	pop	ix
@@ -47,16 +55,14 @@ ENDIF
 	pop	ix
 	ret
 
-IF FORmsx
-	; MSX supports G1 natively
-ELSE
+IF FORsvi
 txt32:
 IF FORsc3000
 	call  $39E2
 	ld		a,64	; change reg#1 on SC3000, keep bit 6 enabled to avoid screen blanking
 ELSE
 	ld    hl,INIGRP		; (Graphics 2)
-	call  setmode
+	call  set_mode
 	xor   a			; change reg#0 on SVI
 ENDIF
 	; Now bend the configuration to Graphics mode 1

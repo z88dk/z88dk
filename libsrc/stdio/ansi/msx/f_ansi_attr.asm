@@ -15,6 +15,7 @@
 
         SECTION code_clib
 	PUBLIC	ansi_attr
+	EXTERN	msx_attr
 	EXTERN	INVRS
 	EXTERN	BOLD
 
@@ -156,7 +157,3 @@
 .noback
         ret
 
-        SECTION data_clib	
-	PUBLIC	msx_attr
-	
-.msx_attr			defb $F1	; White on Black
