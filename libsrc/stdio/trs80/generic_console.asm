@@ -10,7 +10,6 @@
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
 		PUBLIC		__eg2000_custom_font
-		PUBLIC		__eg2000_mode
 
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
@@ -74,12 +73,13 @@ eg2000_printc:
 	jr	c,is_raw
         ld      a,(__eg2000_custom_font)
         and     EG2000_ENABLED
-	ld	a,(__eg2000_mode)
 	jr	z,is_raw
 	set	7,d	;custom font define, use chars 160-255 for font, 128-159=udgs
 is_raw:
-	out	(0xff),a
 	ld	(hl),d
+	ld	a,EG2000_ENABLED
+	and	a
+	ret	z	;Don't set colour in EG2000 mode
 	ld	a,h
 	add	EG2000_COLOUR_OFFSET
 	ld	h,a
@@ -156,7 +156,6 @@ scrollup_return:
 
 	SECTION		bss_clib
 
-__eg2000_mode:	defb	0
 __eg2000_attr:	defb	0
 __eg2000_custom_font:	defb	0
 
