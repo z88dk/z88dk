@@ -84,7 +84,7 @@ include(__link__.m4)
 __OPROTO(`a,b,c,d,e,iyh,iyl',`a,b,c,d,e,iyh,iyl',void,,apu_init,void)
 __OPROTO(`a,b,c,d,e,iyh,iyl',`a,b,c,d,e,iyh,iyl',void,,apu_reset,void)
 __OPROTO(`b,c,d,e,iyh,iyl',`b,c,d,e,iyh,iyl',uint8_t,,apu_chk_idle,void)
-__DPROTO(`iyh,iyl',`iyh,iyl',void,,apu_cmd,uint8_t command)
+__DPROTO(`b,d,e,iyh,iyl',`iyh,iyl',void,,apu_cmd,uint8_t command)
 __DPROTO(`iyh,iyl',`iyh,iyl',void,,apu_opp,uint8_t command,int8_t bank,void * operand)
 
 #endif

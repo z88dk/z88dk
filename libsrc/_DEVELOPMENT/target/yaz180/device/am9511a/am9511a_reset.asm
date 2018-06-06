@@ -7,8 +7,6 @@
 
     PUBLIC asm_am9511a_reset
 
-    EXTERN asm_am9511a_isr
-
     EXTERN APUCMDBuf, APUPTRBuf
     EXTERN APUCMDInPtr, APUCMDOutPtr, APUPTRInPtr, APUPTROutPtr
     EXTERN APUCMDBufUsed, APUPTRBufUsed, APUStatus, APUError
@@ -51,11 +49,11 @@
         ld (APUStatus),a        ; set APU status to idle (NOP)
         ld (APUError),a         ; clear APU errors
 
-;   am9511a_reset_loop:
-;       ld bc,__IO_APU_STATUS  ; the address of the APU status port in bc
-;       in a,(c)               ; read the APU
-;       and __IO_APU_STATUS_BUSY    ; busy?
-;       jr NZ,am9511a_reset_loop
+    am9511a_reset_loop:
+        ld bc,__IO_APU_STATUS  ; the address of the APU status port in bc
+        in a,(c)               ; read the APU
+        and __IO_APU_STATUS_BUSY    ; busy?
+        jr NZ,am9511a_reset_loop
 
         pop hl
         pop de

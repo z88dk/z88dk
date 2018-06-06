@@ -10,7 +10,7 @@
 ;
 ;       APUError is zeroed on return
 ;
-;       uint8_t apu_chk_idle( void );
+;       uint8_t apu_chk_idle( void ) __smallc __z88dk_callee;
 
     SECTION code_driver
 

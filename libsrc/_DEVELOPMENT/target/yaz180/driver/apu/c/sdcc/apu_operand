@@ -1,0 +1,39 @@
+;------------------------------------------------------------------------------
+;       APU_OPP
+;
+;       OPERAND BANK in B
+;       POINTER to OPERAND in DE
+;       APU COMMAND in C
+
+SECTION code_driver
+
+PUBLIC _apu_opp
+
+EXTERN asm_am9511a_opp
+
+;       cmd - This is the APU command to load either 16 bit or 32 bit operand. uint8 (C)
+;       bank- This is the operand bank, relative to the current bank. int8 (B)
+;       addr- This is a pointer to operand, type-cast to a pointer of type void* (DE)
+;
+;       This function returns a void.
+;
+;       void apu_opp( uint8_t cmd, int8_t bank, void * addr );
+;
+;       stack:
+;
+;           addr high
+;           addr low
+;           bank int8
+;           cmd uint8
+;           ret high
+;           ret low
+
+_apu_opp:
+    pop af                  ; collect ret address
+    pop bc                  ; bank+cmd in BC
+    pop de                  ; addr in DE
+    push de
+    push bc
+    push af                 ; put ret address back
+
+    jp asm_am9511a_opp
