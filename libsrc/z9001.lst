@@ -1,6 +1,8 @@
 stdio/cpmbios/fgetc_cons
 stdio/cpmbios/getk
 stdio/cpmbios/fputc_cons
+stdio/z9001/generic_console
+stdio/z9001/conio_vars
 @stdio/ansicore.lst
 stdio/ansi/z9001/f_ansi_attr
 stdio/ansi/z9001/f_ansi_bel
