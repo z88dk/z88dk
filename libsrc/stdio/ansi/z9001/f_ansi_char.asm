@@ -17,7 +17,7 @@
 	EXTERN	__console_y
 	EXTERN	__console_x
 	
-	EXTERN	z9001_attr
+	EXTERN	__z9001_attr
 
 
 
@@ -43,7 +43,7 @@
 	ld	(hl),a
 	ld  de,-1024	; Colour attribute map
 	add hl,de
-	ld a,(z9001_attr)
+	ld a,(__z9001_attr)
 	ld (hl),a
 	
 	ret

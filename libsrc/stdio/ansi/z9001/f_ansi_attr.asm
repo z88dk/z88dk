@@ -18,7 +18,7 @@
         SECTION  code_clib
 	PUBLIC	ansi_attr
 
-	PUBLIC	z9001_attr
+	EXTERN	__z9001_attr
 	
 
 .ansi_attr
@@ -29,7 +29,7 @@
 .noreset
         cp      1
         jr      nz,nobold
-        ld      a,(z9001_attr)	; blink 1
+        ld      a,(__z9001_attr)	; blink 1
         or      @10000000
         jr		setbk
 .nobold
@@ -38,31 +38,31 @@
         cp      8
         jr      nz,nodim
 .dim
-        ld      a,(z9001_attr)	; blink 0
+        ld      a,(__z9001_attr)	; blink 0
         and     @01111111
         jr		setbk
 .nodim
         cp      4
         jr      nz,nounderline
-        ld      a,(z9001_attr)	; blink 1
+        ld      a,(__z9001_attr)	; blink 1
         or      @10000000
         jr		setbk
 .nounderline
         cp      24
         jr      nz,noCunderline
-        ld      a,(z9001_attr)	; blink 0
+        ld      a,(__z9001_attr)	; blink 0
         and     @01111111
         jr		setbk
 .noCunderline
         cp      5
         jr      nz,noblink
-        ld      a,(z9001_attr)
+        ld      a,(__z9001_attr)
         or      @10000000
         jr		setbk
 .noblink
         cp      25
         jr      nz,nocblink
-        ld      a,(z9001_attr)
+        ld      a,(__z9001_attr)
         and     @01111111
         jr		setbk
 .nocblink
@@ -74,26 +74,26 @@
         cp      27
         jr      nz,noCreverse
 .swapattr
-        ld      a,(z9001_attr)
+        ld      a,(__z9001_attr)
 		rla
 		rla
 		rla
 		rla
         and     @11110000
 		ld		e,a
-        ld      a,(z9001_attr)
+        ld      a,(__z9001_attr)
 		rra
 		rra
 		rra
 		rra
         and     @00001111
 		or		e
-		ld		(z9001_attr),a
+		ld		(__z9001_attr),a
         ret
 .noCreverse
         cp      8
         jr      nz,noinvis
-        ld      a,(z9001_attr)
+        ld      a,(__z9001_attr)
         ld      (oldattr),a
         and     @00111000
         ld      e,a
@@ -102,7 +102,7 @@
         rra
         or      e
 .setbk
-		ld      (z9001_attr),a
+		ld      (__z9001_attr),a
         ret
 .oldattr
         defb     0
@@ -121,7 +121,7 @@
 .ZBK
 ;''''''''''''''''''''''
         ld      e,a
-        ld      a,(z9001_attr)
+        ld      a,(__z9001_attr)
         and     @11110000
         or      e
         jr		setbk
@@ -139,12 +139,10 @@
         rla
 		rla
         ld      e,a
-        ld      a,(z9001_attr)
+        ld      a,(__z9001_attr)
         and     @00001111
         or      e
         jr		setbk
 .noback
         ret
 
-	SECTION  data_clib
-.z9001_attr	defb 7*16

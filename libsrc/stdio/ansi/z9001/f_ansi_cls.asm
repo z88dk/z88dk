@@ -14,7 +14,7 @@
         SECTION  code_clib
 	PUBLIC	ansi_cls
 
-	EXTERN	z9001_attr
+	EXTERN	__z9001_attr
 
 .ansi_cls
 	ld	hl,$EC00
@@ -25,7 +25,7 @@
 	ld	bc,40*24 - 1
 	ldir
 	ld	hl,$EC00 - 1024
-	ld	a,(z9001_attr)
+	ld	a,(__z9001_attr)
 	ld	(hl),a
 	ld	d,h
 	ld	e,l

@@ -12,30 +12,34 @@
         SECTION  code_clib
 	PUBLIC	ansi_SCROLLUP
 
+	EXTERN	__z9001_attr
+
 
 .ansi_SCROLLUP
+	push	de
+	push	bc
 	ld	hl,$EC00+40
 	ld	de,$EC00
 	ld	bc,40*23
 	ldir
-	ld	hl,$EC00+40*23
-	ld	(hl),32 ;' '
-	ld	d,h
-	ld	e,l
-	inc	de
-	ld	bc,23
-	ldir
+	ex	de,hl
+	ld	b,40
+scrollup_1:
+	ld	(hl),32
+	inc	hl
+	djnz	scrollup_1
 
 	ld	hl,$E800+40
 	ld	de,$E800
 	ld	bc,40*23
 	ldir
-	ld	hl,$E800+40*23
-	ld	(hl),7*16	; reset bottom line attributes
-	ld	d,h
-	ld	e,l
-	inc	de
-	ld	bc,23
-	ldir
-
+	ex	de,hl
+	ld	a,(__z9001_attr)
+	ld	b,40
+scrollup_2:
+	ld	(hl),a
+	inc	hl
+	djnz	scrollup_2
+	pop	bc
+	pop	de
 	ret
