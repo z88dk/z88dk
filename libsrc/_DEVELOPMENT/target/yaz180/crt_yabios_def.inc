@@ -174,6 +174,9 @@ DEFC phexwd                          = $FE03
 PUBLIC phex
 DEFC phex                            = $FE0D
 
+PUBLIC pchar
+DEFC pchar                           = $FE20
+
 PUBLIC pstring
 DEFC pstring                         = $FDF0
 
