@@ -2104,7 +2104,8 @@ void gather_from_list_file(char *filename)
 		return;
 
 	// open list file for reading
-	if ((in = fopen(filename, "r")) == NULL) {
+	if ((in = fopen(filename, "r")) == NULL)
+    {
 		fprintf(stderr, "Unable to open list file \"%s\"\n", filename);
 		exit(1);
 	}
@@ -2117,20 +2118,28 @@ void gather_from_list_file(char *filename)
 
 	// read filenames from list file
 	line = NULL;
-	while (zcc_getdelim(&line, &len, '\n', in) > 0) {
-		if (((p = strtok(line, " \r\n\t")) != NULL) && *p) {
+	while (zcc_getdelim(&line, &len, '\n', in) > 0)
+    {
+		if (((p = strtok(line, " \r\n\t")) != NULL) && *p)
+        {
+            // check for comment line
+            if ((*p == ';') || (*p == '#'))
+                continue;
+
 			// clear output filename
 			*outname = '\0';
 
 			// prepend list file indicator if the filename is a list file
-			if (*p == '@') {
+			if (*p == '@')
+            {
 				strcpy(outname, "@");
 				if (((p = strtok(p + 1, " \r\n\t")) == NULL) || !(*p))
 					continue;
 			}
 
 			// sanity check
-			if (strlen(p) > FILENAME_MAX) {
+			if (strlen(p) > FILENAME_MAX)
+            {
 				fprintf(stderr, "Filename is too long \"%s\"\n", p);
 				exit(1);
 			}
@@ -2144,7 +2153,8 @@ void gather_from_list_file(char *filename)
 
 			// add file to process
 
-			if (strlen(outname) >= FILENAME_MAX) {
+			if (strlen(outname) >= FILENAME_MAX)
+            {
 				fprintf(stderr, "Filename is too long \"%s\"\n", outname);
 				exit(1);
 			}
@@ -2153,7 +2163,8 @@ void gather_from_list_file(char *filename)
 		}
 	}
 
-	if (!feof(in)) {
+	if (!feof(in))
+    {
 		fprintf(stderr, "Malformed line in list file \"%s\"\n", filename);
 		exit(1);
 	}
@@ -2175,7 +2186,7 @@ void add_file_to_process(char *filename)
 
         if (*p == '@')
             gather_from_list_file(p + 1);
-        else if (*p != ';')  /* ignore filename leading with semicolon; these indicate a comment in lst files */
+        else if ((*p != ';') && (*p != '#')) /* ignore filename leading with semicolon or hash */
         {
 			/* Expand memory for filenames */
 			if ((original_filenames = realloc(original_filenames, (nfiles + 1) * sizeof(char *))) == NULL) {
