@@ -31,13 +31,12 @@ EXTERN asm_am9511a_opp
 ;           ret low
 
 _apu_opp_callee:
-    pop af                  ; collect ret address
+    pop hl                  ; collect ret address
     pop de                  ; addr in DE
     pop bc                  ; bank in BC
-    pop hl                  ; cmd in HL
-    push af                 ; put ret address back
+    ex (sp),hl              ; cmd in HL, put ret address back
 
     ld b,c                  ; move bank to B
-    ld c,l                  ; cmd to B
+    ld c,l                  ; cmd to C
 
     jp asm_am9511a_opp

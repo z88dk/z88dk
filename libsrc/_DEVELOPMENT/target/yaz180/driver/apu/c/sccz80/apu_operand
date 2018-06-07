@@ -41,6 +41,6 @@ _apu_opp:
     push af                 ; put ret address back
 
     ld b,c                  ; move bank to B
-    ld c,l                  ; cmd to B
+    ld c,l                  ; cmd to C
 
     jp asm_am9511a_opp

@@ -18,5 +18,5 @@ EXTERN asm_am9511a_cmd
 ;
 
 _apu_cmd_fastcall:
-    ld c,l
+    ld c,l                  ; cmd to C
     jp asm_am9511a_cmd

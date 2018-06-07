@@ -90,7 +90,7 @@ extern void apu_reset(void) __preserves_regs(a,b,c,d,e,iyh,iyl);
 extern uint8_t apu_chk_idle(void) __preserves_regs(b,c,d,e,iyh,iyl);
 
 extern void apu_cmd(uint8_t command) __preserves_regs(iyh,iyl);
-extern void apu_cmd_fastcall(uint8_t command) __preserves_regs(b,d,e,iyh,iyl) __z88dk_fastcall;
+extern void apu_cmd_fastcall(uint8_t command) __preserves_regs(d,e,iyh,iyl) __z88dk_fastcall;
 #define apu_cmd(a) apu_cmd_fastcall(a)
 
 
