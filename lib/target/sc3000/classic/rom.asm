@@ -67,7 +67,7 @@ endif
 if (ASMPC<>$0038)
         defs    CODE_ALIGNMENT_ERROR
 endif
-	INCLUDE	"crt/classic/tms/interrupt.asm"
+	INCLUDE	"crt/classic/tms9118/interrupt.asm"
 
         defs    $0066 - ASMPC
 if (ASMPC<>$0066)
@@ -87,7 +87,7 @@ int_PAUSE:
 	pop	hl
 	retn
 
-	INCLUDE	"crt/classic/tms/interrupt_handler.asm"
+	INCLUDE	"crt/classic/tms9118/interrupt_handler.asm"
 
 restart10:
 restart08:
