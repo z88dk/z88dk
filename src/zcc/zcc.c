@@ -1577,7 +1577,11 @@ void zsdcc_asm_filter_comments(int filenumber, char *ext)
                 switch (line[i])
                 {
                 case '\'':
+#ifdef WIN32
                     if ((i >= 2) && (strnicmp(&line[i - 2], "af'", 3) == 0))
+#else
+                    if ((i >= 2) && (strncasecmp(&line[i - 2], "af'", 3) == 0))
+#endif
                         break;
                     if (quote_count && ((quote_type & 0x1) == 0))
                     {
