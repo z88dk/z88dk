@@ -17,6 +17,7 @@
         defc    TAR__fputc_cons_generic = 1
         defc    CONSOLE_COLUMNS = 32
         defc    CONSOLE_ROWS = 24
+        defc    CRT_KEY_DEL = 12
 
 IF startup = 2
 	INCLUDE	"target/sc3000/classic/rom.asm"
