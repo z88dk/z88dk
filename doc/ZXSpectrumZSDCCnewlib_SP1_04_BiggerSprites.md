@@ -587,11 +587,12 @@ struct*s. You can see the definition of this structure in the [SP1 header
 file](), although for the purposes of this discussion you can treat it as
 opaque. An 8x8 pixel sprite will require 4 of these, since it can occupy a
 maximum of 4 character cells on screen . For a 16x16 pixel sprite, 9 such char
-structs will be pre-prepared. And so on - since SP1 can support sprites of
-arbitrary size, the number of char structs required is also arbitrary. These
-char structs describe, amongst other things, the colour attributes the
-background tiles need to take when the sprite occupies them, and hence it's a
-sprite's char structs which must be modified to add colour to a sprite.
+structs will be pre-prepared (see the numbered bubble graphic at the top of this
+article). And so on - since SP1 can support sprites of arbitrary size, the
+number of char structs required is also arbitrary. These char structs describe,
+amongst other things, the colour attributes the background tiles need to take
+when the sprite occupies them, and hence it's a sprite's char structs which must
+be modified to add colour to a sprite.
 
 Because a sprite can be of arbitrary size, and can hence have an arbitrary
 number of char structs controlling it, SP1 needs a way to allow these char
@@ -605,18 +606,241 @@ the sprite's char structs will be passed as a parameter, so it's in this
 function that the user's code can update the sprite's colour attributes for one
 part of the sprite.
 
+Here's a modified version of the bubble program which colours the sprite:
 
+```
+#pragma output REGISTER_SP = 0xD000
 
+#include <z80.h>
+#include <arch/zx.h>
+#include <arch/zx/sp1.h>
 
-It's important to remember that the
-number of attribute cells a sprite can effect can change each time the sprite
-the moved. If an 8x8 pixel sprite is positioned on an 8 pixel boundary in both
-the horizonal and vertical directions it'll occupy a single attribute cell. It
-if moves a single pixel down it'll suddenly occupy 2 attribute cells, and if it
-then goes across a pixel it'll be occupying 4 attribute cells.
+extern unsigned char bubble_col1[];
+extern unsigned char bubble_col2[];
 
-## Exercises for the reader
+struct sp1_Rect full_screen = {0, 0, 32, 24};
 
+void initialiseColour(unsigned int count, struct sp1_cs *c)
+{
+  (void)count;    /* Suppress compiler warning about unused parameter */
+
+  c->attr_mask = SP1_AMASK_INK;
+  c->attr      = INK_BLUE;
+}
+
+int main()
+{
+  struct sp1_ss  *bubble_sprite;
+  unsigned char x;
+
+  zx_border(INK_BLACK);
+
+  sp1_Initialize( SP1_IFLAG_MAKE_ROTTBL | SP1_IFLAG_OVERWRITE_TILES | SP1_IFLAG_OVERWRITE_DFILE,
+                  INK_BLACK | PAPER_WHITE,
+                  ' ' );
+  sp1_Invalidate(&full_screen);
+ 
+  bubble_sprite = sp1_CreateSpr(SP1_DRAW_MASK2LB, SP1_TYPE_2BYTE, 3, 0, 0);
+  sp1_AddColSpr(bubble_sprite, SP1_DRAW_MASK2,    SP1_TYPE_2BYTE, bubble_col2-bubble_col1, 0);
+  sp1_AddColSpr(bubble_sprite, SP1_DRAW_MASK2RB,  SP1_TYPE_2BYTE, 0, 0);
+
+  sp1_IterateSprChar(bubble_sprite, initialiseColour);  
+
+  x=0;
+  while(1)
+  {
+    sp1_MoveSprPix(bubble_sprite, &full_screen, bubble_col1, x++, 80);
+
+    z80_delay_ms(25);
+    sp1_UpdateNow();    
+  }
+}
+```
+
+Save this to a file called *bubble_col.c*. The compile line is:
+
+```
+zcc +zx -vn -m -startup=31 -clib=sdcc_iy bubble_col.c bubble_masked_sprite.asm -o bubble_col -create-app
+```
+
+In this example we colour the sprite at the point it's created. The iterator
+calls its function 9 times, each time setting the character cell attribute
+values such that only the on screen ink colour will be changed (the mask says to
+change the INK, whatever PAPER, INVERSE and FLASH attributes are already shown
+in that cell will be untouched), and the ink colour for the cells are all blue.
+
+We'll look at one more example before we finish: let's make the mothership land,
+with its antennae changing colour as it does so. Save this listing to
+*mothership_landing.c*:
+
+```
+#pragma output REGISTER_SP = 0xD000
+
+#include <z80.h>
+#include <intrinsic.h>
+#include <arch/zx.h>
+#include <arch/zx/sp1.h>
+
+extern unsigned char mothership_col1[];
+extern unsigned char mothership_col2[];
+extern unsigned char mothership_col3[];
+extern unsigned char mothership_col4[];
+extern unsigned char mothership_col5[];
+extern unsigned char mothership_col6[];
+
+struct sp1_Rect full_screen = {0, 0, 32, 24};
+
+void initialiseColour(unsigned int count, struct sp1_cs *c)
+{
+
+  if( count == 2 || count == 3 || count == 4 )
+  {
+    c->attr_mask = SP1_AMASK_INK;
+    c->attr      = INK_BLUE;
+  }
+}
+
+void changeAntennacolour(unsigned int count, struct sp1_cs *c)
+{
+  if( count == 2 || count == 3 || count == 4 )
+  {
+    if( ++c->attr == INK_WHITE )
+      c->attr = INK_BLUE;
+  }
+}
+
+void invalidateAntenna(unsigned int count, struct sp1_update *u)
+{
+  if( count == 2 || count == 3 || count == 4 )
+  {
+    sp1_InvUpdateStruct(u);
+  }
+}
+
+struct sp1_ss  *mothership_sprite;
+
+int main()
+{
+  unsigned char y;
+
+  zx_border(INK_BLACK);
+
+  sp1_Initialize( SP1_IFLAG_MAKE_ROTTBL | SP1_IFLAG_OVERWRITE_TILES | SP1_IFLAG_OVERWRITE_DFILE,
+                  INK_BLACK | PAPER_WHITE,
+                  ' ' );
+ 
+  mothership_sprite = sp1_CreateSpr(SP1_DRAW_LOAD2LB, SP1_TYPE_2BYTE, 4, 0, 0);
+  sp1_AddColSpr(mothership_sprite, SP1_DRAW_LOAD2,    SP1_TYPE_2BYTE, (int)mothership_col2-mothership_col1, 0);
+  sp1_AddColSpr(mothership_sprite, SP1_DRAW_LOAD2,    SP1_TYPE_2BYTE, (int)mothership_col3-mothership_col1, 0);
+  sp1_AddColSpr(mothership_sprite, SP1_DRAW_LOAD2,    SP1_TYPE_2BYTE, (int)mothership_col4-mothership_col1, 0);
+  sp1_AddColSpr(mothership_sprite, SP1_DRAW_LOAD2,    SP1_TYPE_2BYTE, (int)mothership_col5-mothership_col1, 0);
+  sp1_AddColSpr(mothership_sprite, SP1_DRAW_LOAD2,    SP1_TYPE_2BYTE, (int)mothership_col6-mothership_col1, 0);
+  sp1_AddColSpr(mothership_sprite, SP1_DRAW_LOAD2RB,  SP1_TYPE_2BYTE, 0, 0);
+
+  sp1_IterateSprChar(mothership_sprite, initialiseColour);
+  sp1_Invalidate(&full_screen);
+
+  y=0;
+  while(1)
+  {
+    sp1_IterateSprChar(mothership_sprite, changeAntennacolour);
+
+    if( y <= 192-24+2 )
+    {
+      sp1_MoveSprPix(mothership_sprite, &full_screen, mothership_col1, 104, y++);
+    }
+    else
+    {
+      sp1_IterateUpdateSpr(mothership_sprite,invalidateAntenna);
+    }
+
+    z80_delay_ms(20);
+    sp1_UpdateNow();    
+  }
+}
+```
+
+The compile line is:
+
+```
+zcc +zx -vn -m -startup=31 -clib=sdcc_iy mothership_landing.c mothership_sprite.asm -o mothership_landing -create-app
+```
+
+For demonstration purposes this code uses the alternative sprite creation and
+positioning technique, with the column graphic address calculations in the code
+which adds the columns.
+
+More interesting is the use of three iterator functions. The first, which uses
+*sp1_IterateSprChar()* to initialise the colour, sets the attribute mask and ink
+colour of the character cells as before. Only this time it only does it for
+cells 2, 3 and 4. If you look carefully at the mothership graphic you can see
+the antennae parts of it are in cells 2 and 3 (top left is indexed at 0), which
+means they can be rotated into cell 4 when the sprite is positioned on a pixel
+boundary which isn't divisible by 8. So we initialise cells 2, 3 and 4 to blue.
+
+At the top of the main loop there's another call to *sp1_IterateSprChar()*, this
+time to change the antennae colour. Again, this restricts itself to only
+changing the character cells which cover the antennae parts of the graphic, and
+it cycles the cell's attribute value. This produces the colour effect as the
+sprite moves down the screen.
+
+There's another iterator in there too - this call:
+
+```
+sp1_IterateUpdateSpr(mothership_sprite,invalidateAntenna);
+```
+
+This is a different library call. It's not actually to do with the SP1 sprite
+data, it's to do with the SP1 updater, which is the part of SP1 which works out
+which parts of the screen need to be updated. This call iterates over the screen
+update structures which the sprite occupies, and as before it only changes those
+which the antennae are in. Those 3 cells are all specifically invalidated with a
+call to *sp1_InvUpdateStruct()* meaning they will, without question, be redrawn
+at the next call to *sp1_UpdateNow()*. Why is this necessary?
+
+The answer is that one the ship has 'landed' the sprite stops moving, and it's
+the sprite moving code which we normally depend on to tell the SP1 updater that
+the sprite's area of the screen needs redrawing. Since the sprite is no longer
+moving it's area of the screen is no longer marked as needing to be
+redrawn. Since SP1 skips redrawing it, even though we're still calling the
+iterator which cycles the colours (via *changeAntennacolour()*) the colours of
+the antennae stop changing on screen once the ship has landed. In order to
+maintain the colour changing effect we specifically call into the SP1 library to
+tell it these 3 character cells need updating.
+
+One more detail worth mentioning: there's an optimisation we can make to obviate
+that call to *sp1_IterateUpdateSpr()* once the ship is landed. The iterated
+function which changes the antennae colour, *changeAntennacolour()*, receives as
+its second parameter an *struct sp1_cs* structure which, rather conveniently,
+contains a pointer to the update structure which needs to be updated to
+invalidate the screen character cell being updated. So we can specifically
+invalidate the antennae character cells in the *changeAntennacolour()*
+function. The comment in the SP1 header file tells us that the pointer is big
+endian (the Z80 is little endian so we need to swap the bytes) and only valid if
+the most significant byte of it isn't 0. With all this in mind, the
+*changeAntennacolour()* function can be updated to this:
+
+```
+void changeAntennacolour(unsigned int count, struct sp1_cs *c)
+{
+  if( count == 2 || count == 3 || count == 4 )
+  {
+    unsigned char *p;
+
+    if( ++c->attr == INK_WHITE )
+      c->attr = INK_BLUE;
+
+    if (*(p = (unsigned char *)c->update))
+    {
+      sp1_InvUpdateStruct((void*)intrinsic_swap_endian_16((unsigned int)p));
+    }
+  }
+}
+```
+
+It might not be the most readable bit of code, but its inclusion means we can
+remove the call to *sp1_IterateUpdateSpr()* from the main game loop and still
+have the antennae flashing while the ship is landed.
 
 ## Conclusion
 
