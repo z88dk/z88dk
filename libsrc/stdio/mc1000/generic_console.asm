@@ -3,7 +3,7 @@
 		SECTION		code_driver
 
 		PUBLIC		generic_console_cls
-		PUBLIC		generic_console_vpeek
+		PUBLIC		generic_console_calc_xypos
 		PUBLIC		generic_console_printc
 		PUBLIC		generic_console_scrollup
                 PUBLIC          generic_console_set_ink
@@ -31,7 +31,7 @@ generic_console_set_inverse:
 generic_console_cls:
 	ld	a,(__mc1000_mode)
 	cp	0x9e
-	jp	z,ansi_cls
+	jr	z,hires_cls
 	out	($80),a
 	ld	hl, DISPLAY
 	ld	de, DISPLAY +1
@@ -41,6 +41,18 @@ generic_console_cls:
 	set	0,a
 	out	($80),a
 	ret
+
+hires_cls:
+	ld	hl,DISPLAY
+	ld	de,DISPLAY + 1
+	ld	bc, 32 * 192 - 1
+	out	($80),a
+	ld	(hl),0
+	ldir
+	set	0,a
+	out	($80),a
+	ret
+
 
 ; c = x
 ; b = y
@@ -52,13 +64,15 @@ generic_console_printc:
 	jr	z,hires_printc
 ; Text mode
 	out	($80),a
-	push	af		;Give CPU stack is safe
+	ex	af,af
 	ld	a,d
-	call	xypos
+	push	de
+	call	generic_console_calc_xypos
+	pop	de
 	rr	e
 	call	nc,convert_character
 	ld	(hl),a
-	pop	af
+	ex	af,af
 	set	0,a
 	out	($80),a		;
 	ret
@@ -84,10 +98,10 @@ not_udg:
 	add	hl,hl
 	add	hl,hl
 	add	hl,de
-	dec	d		; -32 characters
+	dec	h		; -32 characters
 	ex	de,hl		; de = font
 	ld	h,b		; 32 * 8
-	ld	l,0
+	ld	l,c
 	ld	bc,DISPLAY
 	add	hl,bc		;hl = screen
 
@@ -113,34 +127,14 @@ no_overflow:
 	ret
 
 
-;Entry: c = x,
-;       b = y
-;       e = rawmode
-;Exit:  nc = success
-;        a = character,
-;        c = failure
-generic_console_vpeek:
-	ld	a,(__mc1000_mode)
-	cp	0x9e
-	jr	z,vpeek_hires
-        call    xypos
-	ld	a,(hl)
-	and	a
-	ret
 
-vpeek_hires:
-	scf
-	ret
-
-
-xypos:
+generic_console_calc_xypos:
 	ld	hl,DISPLAY - CONSOLE_COLUMNS
 	ld	de,CONSOLE_COLUMNS
 	inc	b
 generic_console_printc_1:
 	add	hl,de
 	djnz	generic_console_printc_1
-generic_console_printc_3:
 	add	hl,bc			;hl now points to address in display
 	ret
 
@@ -184,6 +178,6 @@ generic_console_scrollup_3:
 
 	SECTION	data_clib
 
-__mc1000_mode:	defb	0x9e		;hires mode
+__mc1000_mode:	defb	0x00		; lores mode 0x9e		;hires mode
 __mc1000_font:	defw	CRT_FONT
 __mc1000_udg:	defw	0

@@ -34,13 +34,15 @@ check_mode:
 	cp	IOCTL_GENCON_SET_MODE
 	jr	nz,failure
 	ld	a,c
-	and	a		;mode 0 = text
-	ld	h,16
-	ld	l,0
-	jr	z,set_mode
-	cp	1
 	ld	l,0x9e
 	ld	h,24
+	cp	1
+	jr	z,set_mode
+	ld	h,16
+	ld	l,a
+	and	a
+	jr	z,set_mode
+	cp	2
 	jr	nz,failure
 set_mode:
 	ld	a,h
