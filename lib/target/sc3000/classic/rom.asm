@@ -75,6 +75,7 @@ if (ASMPC<>$0066)
 endif
 nmi:
 int_PAUSE:
+	push	af
 	push	hl
 	
 	ld	hl, _pause_flag
@@ -85,6 +86,7 @@ int_PAUSE:
 	ld	hl, pause_procs
 	call	int_handler
 	pop	hl
+	pop	af
 	retn
 
 	INCLUDE	"crt/classic/tms9118/interrupt_handler.asm"
