@@ -115,9 +115,11 @@ PUBLIC _bubble_col2
 Consider this carefully in relation to the graphic above: we have 2 columns of
 8-pixel-wide data, labelled *bubble_col1* and *bubble_col2*. Each has 16 rows,
 and each row consists of a mask byte followed by a data byte. This data layout
-is the same as we saw in the earlier [masked sprite example](), only with twice
-the vertical data (16 rows instead of 8). The first column is the left side of
-the sprite (with mask), and the second column is the right side (with mask).
+is the same as we saw in the earlier [masked sprite
+example](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_02_SimpleMaskedSprite.md#the-sprite-data),
+only with twice the vertical data (16 rows instead of 8). The first column is
+the left side of the sprite (with mask), and the second column is the right side
+(with mask).
 
 As usual with SP1, in order to allow vertical pixel positioning we add 7 empty
 rows (with mask) before each column, and 7 empty rows (with mask) after each
@@ -189,7 +191,9 @@ zcc +zx -vn -m -startup=31 -clib=sdcc_iy bubble_masked.c bubble_masked_sprite.as
 ```
 
 If you prefer the alternative method of specifying sprite data, as we saw in the
-[previous article](), you can specify the the sprite initialisation like this:
+[previous
+article](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_03_AnimatedSprite.md#state-based-animation),
+you can specify the the sprite initialisation like this:
 
 ```
 bubble_sprite = sp1_CreateSpr(SP1_DRAW_MASK2LB, SP1_TYPE_2BYTE, 3, 0, 0);
@@ -213,7 +217,7 @@ the listing above, just achieved slightly differently.
 ### A Bigger Example
 
 Here's an example of a bigger *mothership* type of sprite, seen in [ZX
-Paintbrush]() as graphic and mask:
+Paintbrush](http://www.zx-modules.de/zxpaintbrush/zxpaintbrush.html) as graphic and mask:
 
 ![alt text](images/mothership.png "mothership sprite")
 
@@ -564,15 +568,16 @@ one or more of these character cells.
 In order to place a sprite in pixel-perfect position, SP1 pre-prepares (at
 sprite creation time) a number of *character cell structures*, known as *char
 struct*s. You can see the definition of this structure in the [SP1 header
-file](), although for the purposes of this discussion you can treat it as
-opaque. An 8x8 pixel sprite will require 4 of these, since it can occupy a
-maximum of 4 character cells on screen . For a 16x16 pixel sprite, 9 such char
-structs will be pre-prepared (see the numbered bubble graphic at the top of this
-article). And so on - since SP1 can support sprites of arbitrary size the
-number of char structs required is also arbitrary. These char structs describe,
-amongst other things, the colour attributes the character cells need to take
-when the sprite occupies them, and hence it's a sprite's char structs which must
-be modified to add colour to a sprite.
+file](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/arch/zx/sp1.h#L83),
+although for the purposes of this discussion you can treat it as opaque. An 8x8
+pixel sprite will require 4 of these, since it can occupy a maximum of 4
+character cells on screen . For a 16x16 pixel sprite, 9 such char structs will
+be pre-prepared (see the numbered bubble graphic at the top of this
+article). And so on - since SP1 can support sprites of arbitrary size the number
+of char structs required is also arbitrary. These char structs describe, amongst
+other things, the colour attributes the character cells need to take when the
+sprite occupies them, and hence it's a sprite's char structs which must be
+modified to add colour to a sprite.
 
 Because a sprite can be of arbitrary size, and can therefore have an arbitrary
 number of char structs controlling it, SP1 needs a way to allow these char
@@ -754,7 +759,8 @@ zcc +zx -vn -m -startup=31 -clib=sdcc_iy mothership_landing.c mothership_sprite.
 
 For demonstration purposes this code uses the alternative sprite creation and
 positioning technique, with the column graphic address calculations in the code
-which adds the columns. This detail isn't really relevant to the example.
+which adds the columns. We also leave the screen clear and switch to the faster
+LOAD type of draw function. This detail isn't really relevant to the example.
 
 More interesting is the use of three iterator functions. The first, which uses
 *sp1_IterateSprChar()* to initialise the colour, sets the attribute mask and ink
@@ -848,4 +854,4 @@ SP1. The reader should now be able to display, colour and animate any sprite of
 any size using any of the SP1 draw functions. There's a lot of ground still to
 cover and we've still not even considered important issues such as colision
 detection, but for now it's time to move on and look at some of the other
-features this library brings.
+features the SP1 library brings.
