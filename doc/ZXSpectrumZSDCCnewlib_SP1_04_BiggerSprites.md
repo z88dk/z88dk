@@ -659,7 +659,7 @@ zcc +zx -vn -m -startup=31 -clib=sdcc_iy bubble_col.c bubble_masked_sprite.asm -
 
 In this example we colour the sprite at the point it's created. The iterator
 calls its function 9 times, each time passing the count of the cell (0-8 in this
-example) and the appropriate sprite's character cell SP1 structure. The code
+example) and the appropriate sprite's character cell structure. The code
 sets the character cell attribute values such that only the on screen ink colour
 will be changed (the mask says to change the INK - whatever PAPER, INVERSE and
 FLASH attributes are already shown in that cell will be untouched), and the ink
