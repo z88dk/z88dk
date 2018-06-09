@@ -2,10 +2,10 @@
 
 This document, the 4th in the SP1 part of the [ZX Spectrum Z88DK/C developer's
 getting started guide](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_GettingStartedGuide.md),
-builds on the previous 3 installments, showing how to create bigger and more
+builds on the previous 3 instalments, showing how to create bigger and more
 colourful sprites. It follows on from the [third
 document](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_03_AnimatedSprite.md)
-which looked at anmiation.
+which looked at animation.
 
 ## Purpose
 
@@ -84,6 +84,7 @@ PUBLIC _bubble_col2
 	defb @11111111, @00000000
 	defb @11111111, @00000000
 	defb @11111111, @00000000
+	defb @11111111, @00000000
 
 ._bubble_col2
 	defb @00111111, @00000000
@@ -122,7 +123,7 @@ the left side of the sprite (with mask), and the second column is the right side
 (with mask).
 
 As usual with SP1, in order to allow vertical pixel positioning we add 7 empty
-rows (with mask) before each column, and 7 empty rows (with mask) after each
+rows (with mask) before each column, and 8 empty rows (with mask) after each
 column. Note how the middle block of empty rows serves as both the *after* rows
 for the first column and the *before* rows for the second column.
 
@@ -308,6 +309,7 @@ PUBLIC _mothership_col1
  defb @11111111, @00000000
  defb @11111111, @00000000
  defb @11111111, @00000000
+ defb @11111111, @00000000
 
 PUBLIC _mothership_col2
 ._mothership_col2
@@ -337,6 +339,7 @@ PUBLIC _mothership_col2
  defb @11111111, @00000000 
  defb @11111111, @00000000 
 
+ defb @11111111, @00000000
  defb @11111111, @00000000
  defb @11111111, @00000000
  defb @11111111, @00000000
@@ -380,6 +383,7 @@ PUBLIC _mothership_col3
  defb @11111111, @00000000
  defb @11111111, @00000000
  defb @11111111, @00000000
+ defb @11111111, @00000000
 
 PUBLIC _mothership_col4
 ._mothership_col4
@@ -409,6 +413,7 @@ PUBLIC _mothership_col4
  defb @11111111, @00000000 
  defb @11111111, @00000000 
 
+ defb @11111111, @00000000
  defb @11111111, @00000000
  defb @11111111, @00000000
  defb @11111111, @00000000
@@ -452,6 +457,7 @@ PUBLIC _mothership_col5
  defb @11111111, @00000000
  defb @11111111, @00000000
  defb @11111111, @00000000
+ defb @11111111, @00000000
 
 PUBLIC _mothership_col6
 ._mothership_col6
@@ -488,11 +494,12 @@ PUBLIC _mothership_col6
  defb @11111111, @00000000
  defb @11111111, @00000000
  defb @11111111, @00000000
+ defb @11111111, @00000000
 ```
 
 This should appear familiar by now: we have 6 columns (i.e. 6*8=48 pixels) of 24
 rows, each row consisting of 2 bytes: mask and graphic. Each column is separated
-by 7 rows of null data to allow precise positioning.
+by 8 rows of null data to allow precise positioning.
 
 Here's the *mothership_masked.c* listing which shows the sprite:
 
@@ -795,7 +802,7 @@ at the next call to *sp1_UpdateNow()*. Why is this necessary?
 The answer is that once the ship has 'landed' the sprite stops moving, and it's
 the sprite moving code (the call to *sp1_MoveSprPix()*) which we normally depend
 on to tell the SP1 updater that the sprite's area of the screen needs
-redrawing. Since the sprite is no longer moving it's area of the screen is no
+redrawing. Since the sprite is no longer moving its area of the screen is no
 longer marked as needing to be redrawn. Since SP1 skips redrawing where it
 doesn't need to, even though we're still calling the iterator which cycles the
 colours (via *changeAntennacolour()*) the colours of the antennae stop changing
@@ -852,6 +859,6 @@ have the antennae flashing while the ship is landed.
 This article wraps up our introductory look at working with sprites in C and
 SP1. The reader should now be able to display, colour and animate any sprite of
 any size using any of the SP1 draw functions. There's a lot of ground still to
-cover and we've still not even considered important issues such as colision
+cover and we've still not even considered important issues such as collision
 detection, but for now it's time to move on and look at some of the other
 features the SP1 library brings.
