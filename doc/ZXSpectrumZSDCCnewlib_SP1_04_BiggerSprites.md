@@ -576,9 +576,8 @@ one or more of these character cells.
 In order to place a sprite in pixel-perfect position, SP1 pre-prepares (at
 sprite creation time) a number of *character cell structures*, known as *char
 struct*s. You can see the definition of this structure in the [SP1 header
-file](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/arch/zx/sp1.h#L83),
-although for the purposes of this discussion you can treat it as opaque. An 8x8
-pixel sprite will require 4 of these, since it can occupy a maximum of 4
+file](https://github.com/z88dk/z88dk/blob/master/include/_DEVELOPMENT/sdcc/arch/zx/sp1.h#L83). An
+8x8 pixel sprite will require 4 of these, since it can occupy a maximum of 4
 character cells on screen . For a 16x16 pixel sprite, 9 such char structs will
 be pre-prepared (see the numbered bubble graphic at the top of this
 article). And so on - since SP1 can support sprites of arbitrary size the number
