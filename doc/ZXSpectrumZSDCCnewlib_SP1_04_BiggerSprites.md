@@ -111,6 +111,7 @@ PUBLIC _bubble_col2
 	defb @11111111, @00000000
 	defb @11111111, @00000000
 	defb @11111111, @00000000
+	defb @11111111, @00000000
 ```
 
 Consider this carefully in relation to the graphic above: we have 2 columns of
