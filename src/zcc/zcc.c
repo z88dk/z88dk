@@ -86,6 +86,7 @@ static void           *mustmalloc(size_t);
 static char           *muststrdup(const char *s);
 static char           *zcc_strstrip(char *s);
 static char           *zcc_strrstrip(char *s);
+static char           *zcc_ascii_only(char *s);
 static int             hassuffix(char *file, char *suffix_to_check);
 static char           *stripsuffix(char *, char *);
 static char           *changesuffix(char *, char *);
@@ -110,7 +111,7 @@ static void            configure_compiler();
 static void            configure_misc_options();
 static void            configure_maths_library(char **libstring);
 
-static void            apply_copt_rules(int filenumber, int num, char **rules, char *ext);
+static void            apply_copt_rules(int filenumber, int num, char **rules, char *ext1, char *ext2, char *ext);
 static void            zsdcc_asm_filter_comments(int filenumber, char *ext);
 static void            remove_temporary_files(void);
 static void            remove_file_with_extension(char *file, char *suffix);
@@ -571,6 +572,16 @@ static char *zcc_strrstrip(char *s)
 
     for (p = s + strlen(s); p != s; *p = 0)
         if (!isspace(*--p)) break;
+
+    return s;
+}
+
+static char *zcc_ascii_only(char *s)
+{
+    char *p;
+
+    for (p = s; *p; ++p)
+        *p &= 0x7f;
 
     return s;
 }
@@ -1191,6 +1202,9 @@ int main(int argc, char **argv)
 				char  *rules[MAX_COPT_RULE_FILES];
 				int    num_rules = 0;
 
+                // filter comments out of asz80 asm file see issue #801 on github
+                if (peepholeopt) zsdcc_asm_filter_comments(i, ".op1");
+
 				/* sdcc_opt.9 bugfixes critical sections and implements RST substitution */
 				// rules[num_rules++] = c_sdccopt9;
 
@@ -1209,6 +1223,7 @@ int main(int argc, char **argv)
 					rules[num_rules++] = c_sdccopt2;
 					break;
 				}
+
 				if ( c_coptrules_target ) {
 					rules[num_rules++] = c_coptrules_target;
 				}
@@ -1218,9 +1233,11 @@ int main(int argc, char **argv)
 				if ( c_coptrules_user ) {
 					rules[num_rules++] = c_coptrules_user;
 				}
-				apply_copt_rules(i, num_rules, rules, (peepholeopt == 0) ? ".s" : ".op2");
-                // filter comments out of asz80 asm file see issue #801 on github
-                if (peepholeopt) zsdcc_asm_filter_comments(i, ".asm");
+
+                if (peepholeopt == 0)
+                    apply_copt_rules(i, num_rules, rules, ".opt", ".op1", ".s");
+                else
+                    apply_copt_rules(i, num_rules, rules, ".op1", ".opt", ".asm");
 			} else {
 				char  *rules[MAX_COPT_RULE_FILES];
 				int    num_rules = 0;
@@ -1244,6 +1261,7 @@ int main(int argc, char **argv)
 						rules[num_rules++] = c_coptrules3;
 						break;
 				}
+
 				if ( c_coptrules_target ) {
 					rules[num_rules++] = c_coptrules_target;
 				}
@@ -1256,7 +1274,8 @@ int main(int argc, char **argv)
 				if ( c_coptrules_user ) {
 					rules[num_rules++] = c_coptrules_user;
 				}
-				apply_copt_rules(i, num_rules, rules, ".asm");
+
+				apply_copt_rules(i, num_rules, rules, ".opt", ".op1", ".asm");
 			}
 			// continue processing if this is not a .s file
 			if ((compiler_type != CC_SDCC) || (peepholeopt != 0))
@@ -1504,25 +1523,32 @@ int main(int argc, char **argv)
 }
 
 
-static void apply_copt_rules(int filenumber, int num, char **rules, char *ext)
+static void apply_copt_rules(int filenumber, int num, char **rules, char *ext1, char *ext2, char *ext)
 {
-	char  *input_ext = ".opt";
-	char  *output_ext = ".op1";
-	int    i;
+    int    i;
+	char  *input_ext;
+	char  *output_ext;
 
-	for ( i = 0; i < num ; i++ ) {
-		if ( i == (num-1) ) {
+	for ( i = 0; i < num ; i++ )
+    {
+        if (i % 2 == 0)
+        {
+            input_ext = ext1;
+            output_ext = ext2;
+        }
+        else
+        {
+            input_ext = ext2;
+            output_ext = ext1;
+        }
+
+		if ( i == (num-1) )
+        {
 			output_ext = ext;
 		}
+
 		if (process(input_ext, output_ext, c_copt_exe, rules[i], filter, filenumber, YES, NO))
 			exit(1);
-		if ( i % 2 == 0 ) {
-			input_ext = ".op1";
-			output_ext = ".opt";
-		} else {
-			input_ext = ".opt";
-			output_ext = ".op1";
-		}
 	}
 }
 
@@ -1628,10 +1654,8 @@ void zsdcc_asm_filter_comments(int filenumber, char *ext)
             }
         }
 
-        if (seen_semicolon)
-            fprintf(fout, "%.*s\n", i - 1, line);
-        else
-            fprintf(fout, "%s\n", zcc_strrstrip(line));
+        if (seen_semicolon) line[i-1] = '\0';                         // terminate at semicolon
+        fprintf(fout, "%s\n", zcc_ascii_only(zcc_strrstrip(line)));   // remove trailing whitespace (copt asz80 translator) and ascii-ify source (copt)
     }
 
     free(line);
