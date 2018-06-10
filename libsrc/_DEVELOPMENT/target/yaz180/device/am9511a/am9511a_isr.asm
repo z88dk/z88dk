@@ -21,141 +21,156 @@
     EXTERN APUCMDOutPtr, APUPTROutPtr
     EXTERN APUCMDBufUsed, APUPTRBufUsed, APUStatus, APUError
 
-    asm_am9511a_isr:
-        push af                 ; store AF, etc, so we don't clobber them
-        push bc
-        push de
-        push hl
+asm_am9511a_isr:
+    push af                 ; store AF, etc, so we don't clobber them
+    push bc
+    push de
+    push hl
 
-        xor a                   ; set internal clock = crystal x 1 = 18.432MHz
-                                ; that makes the PHI 9.216MHz
-        out0 (CMR),a            ; CPU Clock Multiplier Reg (CMR)
-                                ; Am9511A-1 needs TWCS 30ns. This provides 41.7ns.
+    xor a                   ; set internal clock = crystal x 1 = 18.432MHz
+                            ; that makes the PHI 9.216MHz
+    out0 (CMR),a            ; CPU Clock Multiplier Reg (CMR)
+                            ; Am9511A-1 needs TWCS 30ns. This provides 41.7ns.
 
-    am9511a_isr_entry:
-        ld a,(APUCMDBufUsed)    ; check whether we have a command to do
-        or a                    ; zero?
-        jr Z,am9511a_isr_end    ; if so then clean up and END
+am9511a_isr_entry:
+    ld a,(APUCMDBufUsed)    ; check whether we have a command to do
+    or a                    ; zero?
+    jr Z,am9511a_isr_end    ; if so then clean up and END
 
-        ld hl,APUStatus         ; set APUStatus to busy
-        ld (hl),__IO_APU_STATUS_BUSY
+    ld bc,__IO_APU_STATUS   ; the address of the APU status port in BC
+    in a,(c)                ; read the APU
+    and __IO_APU_STATUS_ERROR   ; any errors?
+    call NZ,am9511a_isr_error   ; then capture the error in APUError
 
-        ld bc,__IO_APU_STATUS   ; the address of the APU status port in BC
-        in a,(c)                ; read the APU
-        and __IO_APU_STATUS_ERROR   ; any errors?
-        call NZ,am9511a_isr_error   ; then capture error in APUError
+    ld hl,(APUCMDOutPtr)    ; get the pointer to place where we pop the COMMAND
+    ld a,(hl)               ; get the COMMAND byte
+    ld (APUStatus),a        ; save the COMMAND (in APUStatus byte)
 
-        ld hl,APUCMDBufUsed
-        dec (hl)                ; atomically decrement COMMAND count remaining
-        ld hl,(APUCMDOutPtr)    ; get the pointer to place where we pop the COMMAND
-        ld a,(hl)               ; get the COMMAND byte
-        push af                 ; save the COMMAND 
+    inc l                   ; move the COMMAND pointer low byte along, 0xFF rollover
+    ld (APUCMDOutPtr),hl    ; write where the next byte should be popped
 
-        inc l                   ; move the COMMAND pointer low byte along, 0xFF rollover
-        ld (APUCMDOutPtr),hl    ; write where the next byte should be popped
+    ld hl,APUCMDBufUsed
+    dec (hl)                ; atomically decrement COMMAND count remaining
 
-        and $F0                 ; mask only most significant nibble of COMMAND
-        cp __IO_APU_OP_ENT      ; check whether it is OPERAND entry COMMAND
-        jr Z,am9511a_isr_op_ent    ; load an OPERAND
+    and $F0                 ; mask only most significant nibble of COMMAND
+    cp __IO_APU_OP_ENT      ; check whether it is OPERAND entry COMMAND
+    jr Z,am9511a_isr_op_ent ; load an OPERAND
 
-        cp __IO_APU_OP_REM      ; check whether it is OPERAND removal COMMAND
-        jr Z,am9511a_isr_op_rem    ; remove an OPERAND
+    cp __IO_APU_OP_REM      ; check whether it is OPERAND removal COMMAND
+    jr Z,am9511a_isr_op_rem ; remove an OPERAND
 
-        pop af                  ; recover the COMMAND 
-        ld bc,__IO_APU_CONTROL    ; the address of the APU control port in BC
-        out (c),a              ; load the COMMAND, and do it
+    ld a,(APUStatus)        ; recover the COMMAND from status byte
+    ld bc,__IO_APU_CONTROL  ; the address of the APU control port in BC
+    out (c),a               ; load the COMMAND, and do it
 
-    am9511a_isr_exit:
-        ld a,CMR_X2            ; set internal clock = crystal x 2 = 36.864MHz
-        out0 (CMR),a           ; CPU Clock Multiplier Reg (CMR)
+    ld hl,APUStatus         ; set APUStatus to busy
+    ld (hl),__IO_APU_STATUS_BUSY
 
-        pop hl                  ; recover HL, etc
-        pop de
-        pop bc
-        pop af
-        ei
-        reti
+am9511a_isr_exit:
+    ld a,CMR_X2             ; set internal clock = crystal x 2 = 36.864MHz
+    out0 (CMR),a            ; CPU Clock Multiplier Reg (CMR)
 
-    am9511a_isr_end:            ; we've finished a COMMAND sentence
-        ld bc,__IO_APU_STATUS   ; the address of the APU status port in BC
-        in a,(c)                ; read the APU
-        tst __IO_APU_STATUS_BUSY    ; test the STATUS byte is valid (i.e. we're not busy)
-        jr NZ,am9511a_isr_end
-        ld (APUStatus),a        ; update status byte
-        jr am9511a_isr_exit     ; we're done here
+    pop hl                  ; recover HL, etc
+    pop de
+    pop bc
+    pop af
+    ei                      ; interrupts were enabled, or we wouldn't have been here
+    ret                     ; no Z80 interrupt chaining
 
-    am9511a_isr_op_ent:
-        ld hl,APUPTRBufUsed     ; decrement of POINTER count remaining
-        dec (hl)
-        dec (hl)
+am9511a_isr_end:            ; we've finished a COMMAND sentence
+    ld bc,__IO_APU_STATUS   ; the address of the APU status port in BC
+    in a,(c)                ; read the APU
+    tst __IO_APU_STATUS_BUSY; test the STATUS byte is valid (i.e. we're not busy)
+    jr NZ,am9511a_isr_end
+    ld (APUStatus),a        ; update status byte
+    jr am9511a_isr_exit     ; we're done here
 
-        ld hl,(APUPTROutPtr)    ; get the pointer to where we pop OPERAND PTR
-        ld e,(hl)               ; read the OPERAND PTR low byte from the APUPTROutPtr
-        inc l                   ; move the POINTER low byte along, 0xFF rollover
-        ld d,(hl)               ; read the OPERAND PTR high byte from the APUPTROutPtr
-        inc l
-        ld (APUPTROutPtr),hl    ; write where the next POINTER should be read
+am9511a_isr_op_ent:
+    ld hl,(APUPTROutPtr)    ; get the pointer to where we pop OPERAND PTR
+    ld e,(hl)               ; read the OPERAND PTR low byte from the APUPTROutPtr
+    inc l                   ; move the POINTER low byte along, 0xFF rollover
+    ld d,(hl)               ; read the OPERAND PTR high byte from the APUPTROutPtr
+    inc l
+    ld b,(hl)               ; read the BBR of OPERAND PTR to the APUPTRInPtr
+    inc l
+    ld (APUPTROutPtr),hl    ; write where the next POINTER should be read
 
-        ld bc,__IO_APU_DATA+$0300   ; the address of the APU data port (+3) in BC
-        ex de,hl                ; move the base address of the OPERAND to HL
+    ld hl,APUPTRBufUsed     ; decrement of POINTER count remaining
+    dec (hl)
+    dec (hl)
+    dec (hl)
+    
+    ex de,hl                ; move the base address of the OPERAND to HL
 
-        outi                    ; output 16 bit OPERAND
+    in0 e,(BBR)             ; keep current BBR in E
+    out0 (BBR),b            ; make the bank swap to B
 
-        ex (sp),hl              ; delay for 38 cycles (5us) TWI @1.152MHz 3.472us
-        ex (sp),hl
-        outi
+    ld bc,__IO_APU_DATA+$0300 ; the address of the APU data port in BC
+    outi                    ; output 16 bit OPERAND to APU
 
-        pop af                  ; recover the COMMAND 
-        cp __IO_APU_OP_ENT16    ; is it a 2 byte OPERAND
-        jp Z,am9511a_isr_entry  ; yes? then go back to get another COMMAND
+    ex (sp),hl              ; delay for 38 cycles (5us) TWI 1.280us
+    ex (sp),hl
+    outi                    ; output 16 bit OPERAND to APU
 
-        ex (sp),hl              ; delay for 38 cycles (5us) TWI 1.280us
-        ex (sp),hl
-        outi                    ; output last two bytes of 32 bit OPERAND
+    ld a,(APUStatus)        ; recover the COMMAND (stored in APUStatus byte)
+    cp __IO_APU_OP_ENT16    ; is it a 2 byte OPERAND
+    jp Z,am9511a_isr_entry  ; yes? then go back to get another COMMAND
 
-        ex (sp),hl              ; delay for 38 cycles (5us) TWI @1.152MHz 3.472us
-        ex (sp),hl
-        outi
+    ex (sp),hl              ; delay for 38 cycles (5us) TWI 1.280us
+    ex (sp),hl
+    outi                    ; output last two bytes of 32 bit OPERAND
 
-        jp am9511a_isr_entry    ; go back to get another COMMAND
+    ex (sp),hl              ; delay for 38 cycles (5us) TWI 1.280us
+    ex (sp),hl
+    outi
 
-    am9511a_isr_op_rem:
-        ld hl,APUPTRBufUsed     ; decrement of OPERAND POINTER count remaining
-        dec (hl)
-        dec (hl)
+    out0 (BBR),e            ; make the bank swap back
+    jp am9511a_isr_entry    ; go back to get another COMMAND
 
-        ld hl,(APUPTROutPtr)    ; get the pointer to where we pop OPERAND PTR
-        ld e,(hl)               ; read the OPERAND PTR low byte from the APUPTROutPtr
-        inc l                   ; move the POINTER low byte along, 0xFF rollover
-        ld d,(hl)               ; read the OPERAND PTR high byte from the APUPTROutPtr
-        inc l
-        ld (APUPTROutPtr),hl    ; write where the next POINTER should be read
+am9511a_isr_op_rem:         ; REMINDER operands removed BIG ENDIAN !!!
+    ld hl,(APUPTROutPtr)    ; get the pointer to where we pop OPERAND PTR
+    ld e,(hl)               ; read the OPERAND PTR low byte from the APUPTROutPtr
+    inc l                   ; move the POINTER low byte along, 0xFF rollover
+    ld d,(hl)               ; read the OPERAND PTR high byte from the APUPTROutPtr
+    inc l
+    ld b,(hl)               ; read the BBR of OPERAND PTR to the APUPTRInPtr
+    inc l
+    ld (APUPTROutPtr),hl    ; write where the next POINTER should be read
 
-        ld bc,__IO_APU_DATA+$0300 ; the address of the APU data port (+3) in BC
-        ex de,hl                ; move the base address of the OPERAND to HL
+    ld hl,APUPTRBufUsed    ; decrement of OPERAND POINTER count remaining
+    dec (hl)
+    dec (hl)
+    dec (hl)
 
-        inc hl                  ; reverse the OPERAND bytes to load
+    ex de,hl                ; move the base address of the OPERAND to HL
 
-        pop af                  ; recover the COMMAND 
-        cp __IO_APU_OP_REM16    ; is it a 2 byte OPERAND
-        jr Z,am9511a_isr_op_rem16  ; yes then skip over 32bit stuff
+    in0 e,(BBR)             ; keep current BBR in E
+    out0 (BBR),b            ; make the bank swap to B
 
-        inc hl                  ; increment two more bytes for 32bit OPERAND
-        inc hl
+    ld bc,__IO_APU_DATA+$0300 ; the address of the APU data port in BC
 
-        ind                     ; get the higher two bytes of 32bit OPERAND
-        ind
+    inc hl                  ; reverse the OPERAND bytes to load
 
-    am9511a_isr_op_rem16:
-        ind                     ; get 16 bit OPERAND
-        ind
+    ld a,(APUStatus)        ; recover the COMMAND (stored in APUStatus byte)
+    cp __IO_APU_OP_REM16    ; is it a 2 byte OPERAND
+    jr Z,am9511a_isr_op_rem16   ; yes then skip over 32bit stuff
 
-        jp am9511a_isr_entry    ; go back to get another COMMAND
+    inc hl                  ; increment two more bytes for 32bit OPERAND
+    inc hl
 
-    am9511a_isr_error:          ; we've an error to notify in A
-        ld hl,APUError          ; collect any previous errors
-        or (hl)                 ; and we add any new error types
-        ld (hl),a               ; set the APUError status
-        ei
-        reti                    ; we're done here
+    ind                     ; get the higher two bytes of 32bit OPERAND
+    ind
+
+am9511a_isr_op_rem16:
+    ind                     ; get 16 bit OPERAND
+    ind
+
+    out0 (BBR),e            ; make the bank swap back
+    jp am9511a_isr_entry    ; go back to get another COMMAND
+
+am9511a_isr_error:          ; we've an error to notify in A
+    ld hl,APUError          ; collect any previous errors
+    or (hl)                 ; and we add any new error types
+    ld (hl),a               ; set the APUError status
+    ret
 

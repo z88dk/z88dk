@@ -34,11 +34,11 @@ The Am9511 is a binary arithmetic processor and requires that floating point dat
 
 The Am9511A works similarly to a HP Reverse Polish Notation (RPN) calculator, with a 16 or 32 bit wide operand stack. Operands must be pushed onto the stack before a command can then act upon the (or these) operands. The depth of the stack depends on whether 16 bit fixed or 32 bit fixed (or floating) numbers are being used.
 
-The driver implements two FIFO buffers, which are managed by an interrupt attached (on the yaz180) to the NMI.
+The driver implements two FIFO buffers, which are managed by an interrupt attached (on the yaz180) to the INT0.
 
 The command buffer is 255 commands deep, which allows for complex calculations to be programmed, and then the result will be calculated with no further action from the controlling program. Operand loading (pushing) or unloading (popping) commands are included in the command buffer sequence, allowing operands to be loaded at the correct time within a calculation.
 
-The operand pointer buffer is 127 operands deep. As an operand can be either 16 bits or 32 bits (fixed or floating) in width. Using a pointer buffer allows for the operand buffer managment to be simplified (accelerated).
+The operand pointer buffer is 85 operand pointers deep. As an operand can be either 16 bits or 32 bits (fixed or floating) in width. Using a pointer buffer allows for the operand buffer managment to be simplified (accelerated). The pointer buffer consists of one byte for the required BBR, combined with two bytes for the operand address.
 
 Four special commands (non-Am9511A intrinsic) are provided to permit operands to be loaded (or pushed) onto the Am9511A internal stack and, at the end of the calculation sequence, also to allow results to be unloaded (or popped) from the Am9511A stack to a location provided in the operand pointer buffer.
 
@@ -57,63 +57,64 @@ for the hypotenuse of Pythagoras Triangle.
                             ;OP2   = LSB OF OPERAND 2
                             ;RSULT = LSB OF RESULT
 
-    ld hl, INT_NMI_ADDR     ;GET Z80 INTERRUPT NMI VECTOR ADDRESS
     CALL asm_am9511a_reset  ;INITIALISE (RESET) THE APU
-                            ;ONLY IF NOT USING A CRT
-                            ;OR IF DESIRED TO FLUSH BUFFERS
+                            ;ONLY IF DESIRED TO FLUSH BUFFERS
 
                             ;EXAMPLE CODE - TWO OPERAND INPUT LOADING 
 
     LD D, SCRPG             ;SET D REGISTER TO RAM SCRATCH PAGE
     LD E, OP1               ;POINTER TO OPERAND 1
-    LD a, __IO_APU_OP_ENT32 ;ENTER 32 BIT DOUBLE WORD
-    CALL asm_am9511a_cmd_ld ;POINTER TO OPERAND IN OPERAND BUFFER
+    LD B, 0                 ;USE CURRENT BANK
+    LD C, __IO_APU_OP_ENT32 ;LOAD A 32 BIT DOUBLE WORD
+    CALL asm_am9511a_opp    ;POINTER TO SOURCE IN OPERAND BUFFER
 
     LD D, SCRPG             ;SET D REGISTER TO RAM SCRATCH PAGE
     LD E, OP2               ;POINTER TO OPERAND 2
-    LD A, __IO_APU_OP_ENT32 ;ENTER 32 BIT DOUBLE WORD
-    CALL asm_am9511a_cmd_ld ;POINTER TO OPERAND IN OPERAND BUFFER
+    LD B, 0                 ;USE CURRENT BANK
+    LD C, __IO_APU_OP_ENT32 ;LOAD A 32 BIT DOUBLE WORD
+    CALL asm_am9511a_opp    ;POINTER TO SOURCE IN OPERAND BUFFER
 
                             ;EXAMPLE CODE - COMMAND LOADING
                             
-    LD A, __IO_APU_OP_FLTD  ;COMMAND for FLTD (float double)
-    CALL asm_am9511a_cmd_ld ;ENTER a COMMAND
+    LD C, __IO_APU_OP_FLTD  ;COMMAND for FLTD (float double)
+    CALL asm_am9511a_cmd    ;ENTER a COMMAND
 
-    LD A, __IO_APU_OP_PTOF  ;COMMAND for PTOF (push float)
-    CALL asm_am9511a_cmd_ld ;ENTER a COMMAND
+    LD C, __IO_APU_OP_PTOF  ;COMMAND for PTOF (push float)
+    CALL asm_am9511a_cmd    ;ENTER a COMMAND
 
-    LD A, __IO_APU_OP_FMUL  ;COMMAND for FMUL (floating multiply)
-    CALL asm_am9511a_cmd_ld ;ENTER a COMMAND
+    LD C, __IO_APU_OP_FMUL  ;COMMAND for FMUL (floating multiply)
+    CALL asm_am9511a_cmd    ;ENTER a COMMAND
 
-    LD A, __IO_APU_OP_XCHF  ;COMMAND for XCHF (swap float)
-    CALL asm_am9511a_cmd_ld ;ENTER a COMMAND
+    LD C, __IO_APU_OP_XCHF  ;COMMAND for XCHF (swap float)
+    CALL asm_am9511a_cmd    ;ENTER a COMMAND
 
-    LD A, __IO_APU_OP_FLTD  ;COMMAND for FLTD (float double)
-    CALL asm_am9511a_cmd_ld ;ENTER a COMMAND
+    LD C, __IO_APU_OP_FLTD  ;COMMAND for FLTD (float double)
+    CALL asm_am9511a_cmd    ;ENTER a COMMAND
 
-    LD A, __IO_APU_OP_PTOF  ;COMMAND for PTOF (push floating)
-    CALL asm_am9511a_cmd_ld ;ENTER a COMMAND
+    LD C, __IO_APU_OP_PTOF  ;COMMAND for PTOF (push floating)
+    CALL asm_am9511a_cmd    ;ENTER a COMMAND
 
-    LD A, __IO_APU_OP_FMUL  ;COMMAND for FMUL (floating multiply)
-    CALL asm_am9511a_cmd_ld ;ENTER a COMMAND
+    LD C, __IO_APU_OP_FMUL  ;COMMAND for FMUL (floating multiply)
+    CALL asm_am9511a_cmd    ;ENTER a COMMAND
 
-    LD A, __IO_APU_OP_FADD  ;COMMAND for FADD (floating add)
-    CALL asm_am9511a_cmd_ld ;ENTER a COMMAND
+    LD C, __IO_APU_OP_FADD  ;COMMAND for FADD (floating add)
+    CALL asm_am9511a_cmd    ;ENTER a COMMAND
 
-    LD A, __IO_APU_OP_SQRT  ;COMMAND for SQRT (floating square root)
-    CALL asm_am9511a_cmd_ld ;ENTER a COMMAND
+    LD C, __IO_APU_OP_SQRT  ;COMMAND for SQRT (floating square root)
+    CALL asm_am9511a_cmd    ;ENTER a COMMAND
 
-    LD A, __IO_APU_OP_FIXD  ;COMMAND for FIXD (fix double)
-    CALL asm_am9511a_cmd_ld ;ENTER a COMMAND
+    LD C, __IO_APU_OP_FIXD  ;COMMAND for FIXD (fix double)
+    CALL asm_am9511a_cmd    ;ENTER a COMMAND
 
     LD D, SCRPG             ;SET D REGISTER TO RAM SCRATCH PAGE
     LD E, RSULT             ;(D)E POINTER NOW RSULT
-    LD A, __IO_APU_OP_REM32 ;REMOVE 32 bit OPERAND
-    CALL asm_am9511a_cmd_ld
+    LD B, 0                 ;USE CURRENT BANK
+    LD C, __IO_APU_OP_REM32 ;UNLOAD A 32 BIT OPERAND
+    CALL asm_am9511a_opp    ;POINTER TO DESTINATION IN OPERAND BUFFER
 
                             ;EXAMPLE CODE - PROCESSING
                             
-    CALL asm_am9511a_isr    ;KICK OFF APU PROCESS, WHICH THEN INTERRUPTS
+    CALL asm_am9511a_isr    ;KICK OFF APU PROCESS, WHICH THEN INTERRUPTS AS IT NEEDS
 
     CALL asm_am9511a_chk_idle  ;CHECK, because it could be doing a last command
     

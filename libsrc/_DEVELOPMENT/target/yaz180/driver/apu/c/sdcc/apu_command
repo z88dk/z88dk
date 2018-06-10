@@ -1,0 +1,31 @@
+;------------------------------------------------------------------------------
+;       APU_CMD
+;
+;       APU COMMAND in C
+;
+
+SECTION code_driver
+
+PUBLIC _apu_cmd
+
+EXTERN asm_am9511a_cmd
+    
+;       cmd - This is the APU command. uint8 (C)
+;
+;       This function returns a void.
+;
+;       void apu_cmd( uint8_t command );
+;
+;       stack:
+;
+;           cmd uint8
+;           ret high
+;           ret low
+
+_apu_cmd:
+    pop hl                      ; collect ret address
+    pop bc                      ; command in C
+    push bc
+    push hl                     ; put ret address back
+
+    jp asm_am9511a_cmd

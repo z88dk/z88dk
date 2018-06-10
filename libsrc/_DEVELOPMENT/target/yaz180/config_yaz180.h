@@ -65,7 +65,6 @@
 
 #define __APU_CMD_SIZE  0x100
 #define __APU_PTR_SIZE  0x100
-#define __APU_DATA_SIZE  0x100
 
 #define __IO_APU_PORT_BASE  0xC000
 

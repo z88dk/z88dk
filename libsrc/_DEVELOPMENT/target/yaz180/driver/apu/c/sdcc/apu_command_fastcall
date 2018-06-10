@@ -1,0 +1,22 @@
+;------------------------------------------------------------------------------
+;       APU_CMD
+;
+;       APU COMMAND in C
+;
+
+SECTION code_driver
+
+PUBLIC _apu_cmd_fastcall
+
+EXTERN asm_am9511a_cmd
+    
+;       cmd - This is the APU command. uint8 (C)
+;
+;       This function returns a void.
+;
+;       void apu_cmd( uint8_t command )  __z88dk_fastcall;
+;
+
+_apu_cmd_fastcall:
+    ld c,l                      ; command in C   
+    jp asm_am9511a_cmd
