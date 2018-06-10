@@ -64,14 +64,17 @@ PUBLIC __USE_ZXN_OPCODES_OTHER
 
 defc __ZXNEXT = 1
 
-; define(`__ENV_FILENAME', "/sys/env")
+; define(`__ENV_FILENAME', /sys/env)
 
 defc __ENV_GETENV_BUFSZ = 64
 
-; define(`__ENV_TMPDIR', "/tmp/")
+; define(`__ENV_TMPDIR', /tmp/)
 
-defc __ENV_LTMPNAM = 12
+defc __ENV_LTMPNAM = 13
 defc __ENV_TMPMAX = 0xffff
+
+; define(`__ENV_BINDIR', /bin/)
+; define(`__ENV_SYSDIR', /sys/)
 
 defc __SPECTRUM = 16
 

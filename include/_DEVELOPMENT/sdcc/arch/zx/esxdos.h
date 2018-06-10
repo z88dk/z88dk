@@ -276,4 +276,9 @@ extern int esxdos_f_write_callee(unsigned char handle,void *src,size_t nbytes) _
 
 
 
+// Temporary inclusion of NextOS-esxdos api
+// The includes are circular but ifguards should solve that
+
+#include <arch/zxn/esxdos.h>
+
 #endif

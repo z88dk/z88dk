@@ -9,6 +9,8 @@ PUBLIC asm_extended_sna_load
 EXTERN error_znc
 EXTERN __esxdos_error_mc
 
+IF __ZXNEXT
+
 asm_extended_sna_load:
 
    ; load pages stored in an extended sna into memory
@@ -139,3 +141,9 @@ SECTION bss_esxdos
 
 destination_page:
    defb 0
+
+ELSE
+
+defc asm_extended_sna_load = __esxdos_error_mc
+
+ENDIF

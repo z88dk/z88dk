@@ -1,6 +1,7 @@
 include(__link__.m4)
 
-#ifndef __ESXDOS_H__
+#ifndef __NEXTOS_ESXDOS_H__
+#define __NEXTOS_ESXDOS_H__
 
 #include <arch.h>
 #include <stdint.h>
@@ -342,8 +343,8 @@ __DPROTO(,,unsigned char,,esx_f_unlink,unsigned char *filename)
 
 #define ESX_EMAXCODE  __ESX_EMAXCODE           // Largest valid error code
 
-#endif
-
 // original esxdos api
 
 #include <arch/zx/esxdos.h>
+
+#endif
