@@ -7,7 +7,7 @@
 // without any changes.
 
 // zsdcc compile
-// zcc +zxn -vn -startup=0 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 sna.c sna.asm -o sna -subtype=sna -Cz"--ext --fullsize --clean" -create-app
+// zcc +zxn -vn -startup=0 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 sna.c mem.asm -o sna -subtype=sna -Cz"--ext --fullsize --clean" -create-app
 
 // sccz80 compile
 // zcc +zxn -vn -startup=0 -clib=new sna.c mem.asm -o sna -subtype=sna -Cz"--ext --fullsize --clean" -create-app
@@ -40,7 +40,7 @@ int main(void)
    
    printf("Filename: %s\n\n", _z_sna_filename);
    
-   fin = esx_f_open(_z_sna_filename, ESXDOS_MODE_R | ESXDOS_MODE_OPEN_EXIST);
+   fin = esx_f_open(_z_sna_filename, ESX_MODE_R | ESX_MODE_OPEN_EXIST);
    
    if (errno == 0)
    {
