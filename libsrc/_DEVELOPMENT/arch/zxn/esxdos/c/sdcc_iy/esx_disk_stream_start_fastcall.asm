@@ -6,4 +6,11 @@ PUBLIC _esx_disk_stream_start_fastcall
 
 EXTERN asm_esx_disk_stream_start
 
-defc _esx_disk_stream_start_fastcall = asm_esx_disk_stream_start
+_esx_disk_stream_start_fastcall:
+
+   push iy
+
+   call asm_esx_disk_stream_start
+
+   pop iy
+   ret

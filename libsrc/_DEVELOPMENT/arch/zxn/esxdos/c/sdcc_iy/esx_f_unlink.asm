@@ -4,7 +4,7 @@ SECTION code_esxdos
 
 PUBLIC _esx_f_unlink
 
-EXTERN asm_esx_f_unlink
+EXTERN _esx_f_unlink_fastcall
 
 _esx_f_unlink:
 
@@ -14,4 +14,4 @@ _esx_f_unlink:
    push hl
    push af
 
-   jp asm_esx_f_unlink
+   jp _esx_f_unlink_fastcall

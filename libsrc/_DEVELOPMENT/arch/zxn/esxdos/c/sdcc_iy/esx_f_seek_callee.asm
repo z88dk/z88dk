@@ -3,6 +3,7 @@
 SECTION code_esxdos
 
 PUBLIC _esx_f_seek_callee
+PUBLIC l0_esx_f_seek_callee
 
 EXTERN asm_esx_f_seek
 
@@ -15,6 +16,14 @@ _esx_f_seek_callee:
    pop bc
    dec sp
    ex (sp),hl
-   
+
+l0_esx_f_seek_callee:
+
    ld l,h
-   jp asm_esx_f_seek
+   
+   push iy
+
+   call asm_esx_f_seek
+
+   pop iy
+   ret

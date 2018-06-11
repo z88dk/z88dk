@@ -67,16 +67,16 @@ extern uint32_t esx_stream_card_address;       // 3
 extern uint16_t esx_stream_sectors_remaining;  // 4
 
 __DPROTO(,,unsigned char,,esx_disk_filemap,uint8_t handle,struct esx_filemap *fmap)
-__DPROTO(,,unsigned char,,esx_disk_stream_start,struct esx_filemap_entry *entry)
+__DPROTO(,,unsigned char,,esx_disk_stream_start,const struct esx_filemap_entry *entry)
 __DPROTO(,,void,*,esx_disk_stream_sectors,void *dst,uint8_t sectors)
 __DPROTO(,,void,*,esx_disk_stream_bytes,void *dst,uint16_t len)
 __OPROTO(,,unsigned char,,esx_disk_stream_end,void)
 
 // TAP FILE EMULATION
 
-__DPROTO(,,unsigned char,,esx_m_tapein_open,unsigned char *filename)
+__DPROTO(,,unsigned char,,esx_m_tapein_open,const char *filename)
 __OPROTO(,,unsigned char,,esx_m_tapein_close,void)
-__DPROTO(,,unsigned char,,esx_m_tapein_info,uint8_t *drive,unsigned char *filename)
+__DPROTO(,,unsigned char,,esx_m_tapein_info,uint8_t *drive,const char *filename)
 __DPROTO(,,unsigned char,,esx_m_tapein_setpos,uint16_t block)
 __OPROTO(,,uint16_t,,esx_m_tapein_getpos,void)
 __OPROTO(,,unsigned char,,esx_m_tapein_toggle_pause,void)
@@ -88,9 +88,9 @@ __DPROTO(,,unsigned char,,esx_m_tapein_flags,uint8_t flags)
 
 // open appends to file, trunc replaces or creates
 
-__DPROTO(,,unsigned char,,esx_m_tapeout_open,unsigned char *appendname)
-__DPROTO(,,unsigned char,,esx_m_tapeout_trunc,unsigned char *filename)
-__DPROTO(,,unsigned char,,esx_m_tapeout_info,uint8_t *drive,unsigned char *filename)
+__DPROTO(,,unsigned char,,esx_m_tapeout_open,const char *appendname)
+__DPROTO(,,unsigned char,,esx_m_tapeout_trunc,const char *filename)
+__DPROTO(,,unsigned char,,esx_m_tapeout_info,uint8_t *drive,const char *filename)
 __OPROTO(,,unsigned char,,esx_m_tapeout_close,void)
 
 // DOT COMMANDS
@@ -111,8 +111,8 @@ __DPROTO(,,esx_handler_t,,esx_m_errh,esx_handler_t error)
 // execute dot command, return value is error if not zero
 // geterr with non-zero error code, write as zero-terminated string in 33-byte buffer msg
 
-__DPROTO(,,uint16_t,,esx_m_execcmd,unsigned char *cmdline)
-__DPROTO(,,void,,esx_m_geterr,uint16_t error,unsigned char *msg)
+__DPROTO(,,uint16_t,,esx_m_execcmd,char *cmdline)
+__DPROTO(,,void,,esx_m_geterr,uint16_t error,char *msg)
 
 // DRIVER API
 
@@ -171,27 +171,27 @@ struct esx_p3_hdr
 struct esx_dirent
 {                                           // <byte>   attributes
    uint8_t attr;                            // <asciiz> name
-   uint8_t dir[ESX_FILENAME_MAX+1+8];       // <dword>  date-time
+   uint8_t name[ESX_FILENAME_MAX+1+8];      // <dword>  date-time
 };                                          // <dword>  size
 
 struct esx_dirent_p3
 {
    uint8_t attr;
-   uint8_t dir[ESX_FILENAME_MAX+1+8];
-   struct esx_p3_hdr p3;
+   uint8_t name[ESX_FILENAME_MAX+1+8];
+   struct  esx_p3_hdr p3;
 };
 
 struct esx_dirent_lfn
 {                                           // <byte>   attributes
    uint8_t attr;                            // <asciiz> name
-   uint8_t dir[ESX_FILENAME_LFN_MAX+1+8];   // <dword>  date-time
+   uint8_t name[ESX_FILENAME_LFN_MAX+1+8];  // <dword>  date-time
 };                                          // <dword>  size
 
 struct esx_dirent_lfn_p3
 {
    uint8_t attr;
-   uint8_t dir[ESX_FILENAME_LFN_MAX+1+8];
-   struct esx_p3_hdr p3;
+   uint8_t name[ESX_FILENAME_LFN_MAX+1+8];
+   struct  esx_p3_hdr p3;
 };
 
 // slice dirent to access members following filename
@@ -214,8 +214,8 @@ struct esx_dirent_slice_p3
 #define ESX_DIR_USE_LFN     __esx_dir_use_lfn
 #define ESX_DIR_USE_HEADER  __esx_dir_use_header
 
-__DPROTO(,,unsigned char,,esx_f_opendir,unsigned char *dirname)
-__DPROTO(,,unsigned char,,esx_f_opendir_ex,unsigned char *dirname,uint8_t diruse)
+__DPROTO(,,unsigned char,,esx_f_opendir,const char *dirname)
+__DPROTO(,,unsigned char,,esx_f_opendir_ex,const char *dirname,uint8_t diruse)
 __DPROTO(,,unsigned char,,esx_f_closedir,unsigned char handle)
 
 // file attributes
@@ -236,11 +236,11 @@ __DPROTO(,,uint32_t,,esx_f_telldir,unsigned char handle)
 __DPROTO(,,unsigned char,,esx_f_seekdir,unsigned char handle,uint32_t pos)
 __OPROTO(,,unsigned char,,esx_f_rewinddir,unsigned char handle)
 
-__DPROTO(,,unsigned char,,esx_f_getcwd,unsigned char *pathname)
-__DPROTO(,,unsigned char,,esx_f_chdir,unsigned char *pathname)
+__DPROTO(,,unsigned char,,esx_f_getcwd,char *pathname)
+__DPROTO(,,unsigned char,,esx_f_chdir,const char *pathname)
 
-__DPROTO(,,unsigned char,,esx_f_mkdir,unsigned char *pathname)
-__DPROTO(,,unsigned char,,esx_f_rmdir,unsigned char *pathname)
+__DPROTO(,,unsigned char,,esx_f_mkdir,const char *pathname)
+__DPROTO(,,unsigned char,,esx_f_rmdir,const char *pathname)
 
 // OPERATIONS ON FILES
 
@@ -269,8 +269,8 @@ struct esx_stat
 
 #define ESX_MODE_USE_HEADER  __esx_mode_use_header
 
-__DPROTO(,,unsigned char,,esx_f_open,unsigned char *filename,unsigned char mode)
-__DPROTO(,,unsigned char,,esx_f_open_p3,unsigned char *filename,unsigned char mode,struct esx_p3_hdr *h)
+__DPROTO(,,unsigned char,,esx_f_open,const char *filename,unsigned char mode)
+__DPROTO(,,unsigned char,,esx_f_open_p3,const char *filename,unsigned char mode,struct esx_p3_hdr *h)
 __DPROTO(,,unsigned char,,esx_f_close,unsigned char handle)
 
 __DPROTO(,,unsigned char,,esx_f_sync,unsigned char handle)
@@ -300,11 +300,11 @@ __DPROTO(,,unsigned char,,esx_f_ftrunc,unsigned char handle,uint32_t size)
 #define ESX_A_EXEC  __esx_a_exec
 #define ESX_A_ALL  __esx_a_all
 
-__DPROTO(,,unsigned char,,esx_f_chmod,unsigned char *filename,uint8_t attr_mask,uint8_t attr)
-__DPROTO(,,unsigned char,,esx_f_rename,unsigned char *old,unsigned char *new)
-__DPROTO(,,unsigned char,,esx_f_stat,unsigned char *filename,struct esx_stat *es)
-__DPROTO(,,unsigned char,,esx_f_trunc,unsigned char *filename,uint32_t size)
-__DPROTO(,,unsigned char,,esx_f_unlink,unsigned char *filename)
+__DPROTO(,,unsigned char,,esx_f_chmod,const char *filename,uint8_t attr_mask,uint8_t attr)
+__DPROTO(,,unsigned char,,esx_f_rename,const char *old,const char *new)
+__DPROTO(,,unsigned char,,esx_f_stat,const char *filename,struct esx_stat *es)
+__DPROTO(,,unsigned char,,esx_f_trunc,const char *filename,uint32_t size)
+__DPROTO(,,unsigned char,,esx_f_unlink,const char *filename)
 
 // ESX ERROR CODES
 

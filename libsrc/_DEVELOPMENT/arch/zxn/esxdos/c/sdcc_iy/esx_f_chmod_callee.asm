@@ -3,6 +3,7 @@
 SECTION code_esxdos
 
 PUBLIC _esx_f_chmod_callee
+PUBLIC l0_esx_f_chmod_callee
 
 EXTERN asm_esx_f_chmod
 
@@ -12,5 +13,12 @@ _esx_f_chmod_callee:
    pop hl
    pop bc
    push af
+
+l0_esx_f_chmod_callee:
+
+   push iy
    
-   jp asm_esx_f_chmod
+   call asm_esx_f_chmod
+
+   pop iy
+   ret

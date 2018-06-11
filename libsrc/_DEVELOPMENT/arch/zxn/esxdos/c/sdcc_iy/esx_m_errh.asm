@@ -4,7 +4,7 @@ SECTION code_esxdos
 
 PUBLIC _esx_m_errh
 
-EXTERN asm_esx_m_errh
+EXTERN _esx_m_errh_fastcall
 
 _esx_m_errh:
 
@@ -14,4 +14,4 @@ _esx_m_errh:
    push hl
    push af
 
-   jp asm_esx_m_errh
+   jp _esx_m_errh_fastcall

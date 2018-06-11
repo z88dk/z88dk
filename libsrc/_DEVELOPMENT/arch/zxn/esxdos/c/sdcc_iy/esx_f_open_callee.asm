@@ -3,6 +3,7 @@
 SECTION code_esxdos
 
 PUBLIC _esx_f_open_callee
+PUBLIC l0_esx_f_open_callee
 
 EXTERN asm_esx_f_open
 
@@ -13,5 +14,12 @@ _esx_f_open_callee:
    dec sp
    pop af
    push de
+
+l0_esx_f_open_callee:
+
+   push iy
    
-   jp asm_esx_f_open
+   call asm_esx_f_open
+
+   pop iy
+   ret

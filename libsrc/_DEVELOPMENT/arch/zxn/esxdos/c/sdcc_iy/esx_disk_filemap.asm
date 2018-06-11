@@ -4,7 +4,7 @@ SECTION code_esxdos
 
 PUBLIC _esx_disk_filemap
 
-EXTERN asm_esx_disk_filemap
+EXTERN l0_esx_disk_filemap_callee
 
 _esx_disk_filemap:
 
@@ -18,4 +18,4 @@ _esx_disk_filemap:
    inc sp
    push de
 
-   jp asm_esx_disk_filemap
+   jp l0_esx_disk_filemap_callee

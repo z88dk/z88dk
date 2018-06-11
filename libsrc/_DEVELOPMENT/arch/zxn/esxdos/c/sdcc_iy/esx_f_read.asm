@@ -4,7 +4,7 @@ SECTION code_esxdos
 
 PUBLIC _esx_f_read
 
-EXTERN asm_esx_f_read
+EXTERN l0_esx_f_read_callee
 
 _esx_f_read:
 
@@ -20,4 +20,4 @@ _esx_f_read:
    inc sp
    push de
    
-   jp asm_esx_f_read
+   jp l0_esx_f_read_callee

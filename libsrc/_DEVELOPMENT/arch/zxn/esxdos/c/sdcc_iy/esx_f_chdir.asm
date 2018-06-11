@@ -4,7 +4,7 @@ SECTION code_esxdos
 
 PUBLIC _esx_f_chdir
 
-EXTERN asm_esx_f_chdir
+EXTERN _esx_f_chdir_fastcall
 
 _esx_f_chdir:
 
@@ -14,4 +14,4 @@ _esx_f_chdir:
    push hl
    push af
    
-   jp asm_esx_f_chdir
+   jp _esx_f_chdir_fastcall

@@ -4,7 +4,7 @@ SECTION code_esxdos
 
 PUBLIC _esx_f_seek
 
-EXTERN asm_esx_f_seek
+EXTERN l0_esx_f_seek_callee
 
 _esx_f_seek:
 
@@ -24,5 +24,4 @@ _esx_f_seek:
    push af
    ex af,af'
 
-   ld l,h
-   jp asm_esx_f_seek
+   jp l0_esx_f_seek_callee

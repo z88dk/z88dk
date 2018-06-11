@@ -6,4 +6,11 @@ PUBLIC _esx_f_mkdir_fastcall
 
 EXTERN asm_esx_f_mkdir
 
-defc _esx_f_mkdir_fastcall = asm_esx_f_mkdir
+_esx_f_mkdir_fastcall:
+
+   push iy
+   
+   call asm_esx_f_mkdir
+
+   pop iy
+   ret

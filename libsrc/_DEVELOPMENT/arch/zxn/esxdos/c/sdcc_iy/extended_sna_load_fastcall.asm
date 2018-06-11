@@ -6,4 +6,11 @@ PUBLIC _extended_sna_load_fastcall
 
 EXTERN asm_extended_sna_load
 
-defc _extended_sna_load_fastcall = asm_extended_sna_load
+_extended_sna_load_fastcall:
+
+   push iy
+   
+   call asm_extended_sna_load
+
+   pop iy
+   ret

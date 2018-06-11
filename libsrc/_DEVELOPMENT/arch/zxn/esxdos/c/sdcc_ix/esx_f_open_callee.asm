@@ -20,6 +20,6 @@ l0_esx_f_open_callee:
    push ix
    
    call asm_esx_f_open
-   
+
    pop ix
    ret

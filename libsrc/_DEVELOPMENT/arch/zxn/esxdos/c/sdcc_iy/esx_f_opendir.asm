@@ -4,7 +4,7 @@ SECTION code_esxdos
 
 PUBLIC _esx_f_opendir
 
-EXTERN asm_esx_f_opendir
+EXTERN _esx_f_opendir_fastcall
 
 _esx_f_opendir:
 
@@ -14,4 +14,4 @@ _esx_f_opendir:
    push hl
    push af
    
-   jp asm_esx_f_opendir
+   jp _esx_f_opendir_fastcall

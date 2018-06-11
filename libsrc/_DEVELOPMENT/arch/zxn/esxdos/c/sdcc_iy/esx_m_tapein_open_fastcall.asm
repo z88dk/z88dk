@@ -6,4 +6,11 @@ PUBLIC _esx_m_tapein_open_fastcall
 
 EXTERN asm_esx_m_tapein_open
 
-defc _esx_m_tapein_open_fastcall = asm_esx_m_tapein_open
+_esx_m_tapein_open_fastcall:
+
+   push iy
+   
+   call asm_esx_m_tapein_open
+
+   pop iy
+   ret

@@ -3,6 +3,7 @@
 SECTION code_esxdos
 
 PUBLIC _esx_f_rename_callee
+PUBLIC l0_esx_f_rename_callee
 
 EXTERN asm_esx_f_rename
 
@@ -12,5 +13,12 @@ _esx_f_rename_callee:
    pop hl
    pop de
    push af
+
+l0_esx_f_rename_callee:
+
+   push iy
    
-   jp asm_esx_f_rename
+   call asm_esx_f_rename
+
+   pop iy
+   ret

@@ -3,6 +3,7 @@
 SECTION code_esxdos
 
 PUBLIC _esx_f_fstat_callee
+PUBLIC l0_esx_f_fstat_callee
 
 EXTERN asm_esx_f_fstat
 
@@ -12,5 +13,12 @@ _esx_f_fstat_callee:
    dec sp
    pop af
    ex (sp),hl
+
+l0_esx_f_fstat_callee:
+
+   push iy
    
-   jp asm_esx_f_fstat
+   call asm_esx_f_fstat
+
+   pop iy
+   ret

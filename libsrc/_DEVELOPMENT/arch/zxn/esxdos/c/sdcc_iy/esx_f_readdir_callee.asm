@@ -3,6 +3,7 @@
 SECTION code_esxdos
 
 PUBLIC _esx_f_readdir_callee
+PUBLIC l0_esx_f_readdir_callee
 
 EXTERN asm_esx_f_readdir
 
@@ -12,5 +13,12 @@ _esx_f_readdir_callee:
    dec sp
    pop af
    ex (sp),hl
-   
-   jp asm_esx_f_readdir
+
+l0_esx_f_readdir_callee:
+
+   push iy
+
+   call asm_esx_f_readdir
+
+   pop iy
+   ret

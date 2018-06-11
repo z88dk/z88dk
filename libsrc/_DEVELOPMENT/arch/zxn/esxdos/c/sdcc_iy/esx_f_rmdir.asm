@@ -4,7 +4,7 @@ SECTION code_esxdos
 
 PUBLIC _esx_f_rmdir
 
-EXTERN asm_esx_f_rmdir
+EXTERN _esx_f_rmdir_fastcall
 
 _esx_f_rmdir:
 
@@ -14,4 +14,4 @@ _esx_f_rmdir:
    push hl
    push af
 
-   jp asm_esx_f_rmdir
+   jp _esx_f_rmdir_fastcall

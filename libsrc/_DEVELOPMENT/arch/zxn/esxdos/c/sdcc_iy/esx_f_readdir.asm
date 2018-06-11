@@ -4,7 +4,7 @@ SECTION code_esxdos
 
 PUBLIC _esx_f_readdir
 
-EXTERN asm_esx_f_readdir
+EXTERN l0_esx_f_readdir_callee
 
 _esx_f_readdir:
 
@@ -18,4 +18,4 @@ _esx_f_readdir:
    inc sp
    push de
 
-   jp asm_esx_f_readdir
+   jp l0_esx_f_readdir_callee

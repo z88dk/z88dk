@@ -4,7 +4,7 @@ SECTION code_esxdos
 
 PUBLIC _esx_f_chmod
 
-EXTERN asm_esx_f_chmod
+EXTERN l0_esx_f_chmod_callee
 
 _esx_f_chmod:
 
@@ -16,4 +16,4 @@ _esx_f_chmod:
    push hl
    push af
    
-   jp asm_esx_f_chmod
+   jp l0_esx_f_chmod_callee

@@ -19,7 +19,7 @@ _esx_f_write_callee:
 l0_esx_f_write_callee:
 
    push ix
-
+   
    call asm_esx_f_write
 
    pop ix

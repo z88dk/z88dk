@@ -18,7 +18,7 @@ _esx_f_opendir_ex_callee:
 l0_esx_f_opendir_ex_callee:
 
    push ix
-
+   
    call asm_esx_f_opendir_ex
 
    pop ix
