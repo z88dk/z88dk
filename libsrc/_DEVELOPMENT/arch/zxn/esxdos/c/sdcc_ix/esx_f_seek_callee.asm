@@ -22,7 +22,7 @@ l0_esx_f_seek_callee:
    ld l,h
    
    push ix
-   
+
    call asm_esx_f_seek
 
    pop ix

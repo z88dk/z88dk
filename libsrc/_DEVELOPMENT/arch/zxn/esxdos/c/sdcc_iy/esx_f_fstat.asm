@@ -4,7 +4,7 @@ SECTION code_esxdos
 
 PUBLIC _esx_f_fstat
 
-EXTERN asm_esx_f_fstat
+EXTERN l0_esx_f_fstat_callee
 
 _esx_f_fstat:
 
@@ -18,4 +18,4 @@ _esx_f_fstat:
    inc sp
    push de
    
-   jp asm_esx_f_fstat
+   jp l0_esx_f_fstat_callee

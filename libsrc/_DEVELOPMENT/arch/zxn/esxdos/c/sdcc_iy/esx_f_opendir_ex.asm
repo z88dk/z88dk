@@ -4,7 +4,7 @@ SECTION code_esxdos
 
 PUBLIC _esx_f_opendir_ex
 
-EXTERN asm_esx_f_opendir_ex
+EXTERN l0_esx_f_opendir_ex_callee
 
 _esx_f_opendir_ex:
 
@@ -18,4 +18,4 @@ _esx_f_opendir_ex:
    push hl
    push af
    
-   jp asm_esx_f_opendir_ex
+   jp l0_esx_f_opendir_ex_callee

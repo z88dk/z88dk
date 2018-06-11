@@ -3,6 +3,7 @@
 SECTION code_esxdos
 
 PUBLIC _esx_f_opendir_ex_callee
+PUBLIC l0_esx_f_opendir_ex_callee
 
 EXTERN asm_esx_f_opendir_ex
 
@@ -13,5 +14,12 @@ _esx_f_opendir_ex_callee:
    dec sp
    pop bc
    push af
+
+l0_esx_f_opendir_ex_callee:
+
+   push iy
    
-   jp asm_esx_f_opendir_ex
+   call asm_esx_f_opendir_ex
+
+   pop iy
+   ret

@@ -3,11 +3,13 @@ stdio/mc1000/getk
 stdio/mc1000/fputc_cons
 stdio/mc1000/generic_console
 stdio/mc1000/generic_console_ioctl
+stdio/mc1000/generic_console_vpeek
 stdio/mc1000/CRT_FONT
 stdio/ansi/mc1000/f_ansi_attr
 stdio/ansi/mc1000/f_ansi_scrollup
 stdio/ansi/mc1000/f_ansi_bel
 stdio/ansi/mc1000/f_ansi_char
+@font/font_8x8/font_8x8.lst
 @stdio/ansicore.lst
 @stdio/stdio.lst
 graphics/mc1000/clg

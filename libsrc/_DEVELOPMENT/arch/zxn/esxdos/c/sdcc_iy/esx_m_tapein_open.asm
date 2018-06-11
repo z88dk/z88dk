@@ -4,7 +4,7 @@ SECTION code_esxdos
 
 PUBLIC _esx_m_tapein_open
 
-EXTERN asm_esx_m_tapein_open
+EXTERN _esx_m_tapein_open_fastcall
 
 _esx_m_tapein_open:
 
@@ -14,4 +14,4 @@ _esx_m_tapein_open:
    push hl
    push af
 
-   jp asm_esx_m_tapein_open
+   jp _esx_m_tapein_open_fastcall

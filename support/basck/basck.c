@@ -77,13 +77,15 @@ int huproduct_skel[]={8, ADDR, 'H', 'u', 'B', 'A', 'S', 'I', 'C'};
 int hudson_skel[]={8, ADDR, 'H', 'u', 'd', 's', 'o', 'n'};
 
 int tkhudson_skel[]={11, 0x01, CATCH, CATCH, 0xFE, 0x20, 0xDA, SKIP, SKIP, 0xFE, 0x22, 0x28};
+int tkhudson_skel2[]={15, 0xFE, 0xFE, 0x38, SKIP, 0x3C, 0x01, CATCH, CATCH, 0x28, SKIP, 0x01, SKIP, SKIP, 0x7E, 0x23};
+int tkhudson_skel3[]={15, 0xFE, 0xFE, 0x38, SKIP, 0x3C, 0x01, SKIP, SKIP, 0x28, SKIP, 0x01, CATCH, CATCH, 0x7E, 0x23};
+
+
 int hugoto_skel[]={9, ADDR, 'O', 'T', 'O'+128, 'G', 'O', 'S', 'U', 'B'+128, };
 
-int hu_jptab2[]={14, 0xd6, 0x80, 0x6F, 0x26, 0, 0x01, CATCH, CATCH, 0x29, 0x09, 0x7E, 0x23, 0x66, 0x6F};
-
 int hu_jptab[]={13, 0x11, CATCH, CATCH, 0xD6, 0x80, 0xE5, 0xEB, 0x5F, 0x16, 0, 0x19, 0x19, 0x7E};
-
-
+int hu_jptab2[]={14, 0xd6, 0x80, 0x6F, 0x26, 0, 0x01, CATCH, CATCH, 0x29, 0x09, 0x7E, 0x23, 0x66, 0x6F};
+int hu_jptab3[]={12, 0x23, 0xFE, 0xFF, 0xCA, SKIP, SKIP, 0x11, CATCH, CATCH, 0xFE, 0xFE, 0x20};
 
 int hu_curyst[]={12, 0xCD, SKIP, SKIP, 0x7E, 0xB7, 0xC8, 0x2B, 0x1D, 0x3A, CATCH, CATCH, 0xBB};
 int hu_curyed[]={12, 0xCD, SKIP, SKIP, 0x1C, 0x23, 0x7E, 0xB7, 0xC8, 0x3A, CATCH, CATCH, 0xBB};
@@ -2934,6 +2936,11 @@ int main(int argc, char *argv[])
 			if (res2<=0)
 			printf("#  Hudson signature not found\n\n");
 
+		res=find_skel(tkhudson_skel2);
+			if (res>0)	dlbl("CMDTABLE_FF", res, "HuBASIC command list (prefix $FF)");
+
+		res=find_skel(tkhudson_skel3);
+			if (res>0)	dlbl("CMDTABLE_FE", res, "HuBASIC command list (prefix $FE)");
 
 		res=find_skel(tkhudson_skel);
 			if (res>0)	dlbl("CMDTABLE", res, "HuBASIC command list");
@@ -3000,8 +3007,6 @@ int main(int argc, char *argv[])
 				
 		printf("\n");
 		
-		res=find_skel(hu_jptab2);
-			if (res>0)	dlbl("JPTAB2", res, "Jump table #2");
 			
 		res2=find_skel(hu_jptab);
 			if (res2>0)	dlbl("JPTAB", res2, "Jump table");
@@ -3014,16 +3019,53 @@ int main(int argc, char *argv[])
 			for (i=res; img[i+pos]!=255; i++) {
 				c=img[i+pos];
 				if (c>=128) {
-					c-=128;
-					//if (c>' ') {
+					c-=128;  if (c==0) c=' ';
 						printf("%c \t{%4X} \n\t[%d] ",c, img[res2+pos]+256*img[res2+pos+1], chr++);
-					//}
 					res2+=2;
 				} else printf("%c",c);
 			}
 		}
 		
+		printf("\n");
+		
+		res2=find_skel(hu_jptab2);
+			if (res2>0)	dlbl("JPTAB2", res2, "Jump table #2");
 
+		res=find_skel(tkhudson_skel2);
+		if (res>0) {
+			printf("\n# TOKEN table position for prefix $FF = $%04X\n",res);
+			printf("\n\t[128] ");
+			chr=129;
+			for (i=res; img[i+pos]!=255; i++) {
+				c=img[i+pos];
+				if (c>=128) {
+					c-=128;  if (c==0) c=' ';
+						printf("%c \t{%4X} \n\t[%d] ",c, img[res2+pos]+256*img[res2+pos+1], chr++);
+					res2+=2;
+				} else printf("%c",c);
+			}
+		}
+		
+		printf("\n");
+		
+		res2=find_skel(hu_jptab3);
+			if (res2>0)	dlbl("JPTAB3", res2, "Jump table #3");
+			
+		res=find_skel(tkhudson_skel3);
+		if (res>0) {
+			printf("\n# TOKEN table position for prefix $FE = $%04X\n",res);
+			printf("\n\t[128] ");
+			chr=129;
+			for (i=res; img[i+pos]!=255; i++) {
+				c=img[i+pos];
+				if (c>=128) {
+					c-=128;  if (c==0) c=' ';
+						printf("%c \t{%4X} \n\t[%d] ",c, img[res2+pos]+256*img[res2+pos+1], chr++);
+					res2+=2;
+				} else printf("%c",c);
+			}
+		}
+	
 	}
 
 	printf("\n\n");

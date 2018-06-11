@@ -3,6 +3,7 @@
 SECTION code_esxdos
 
 PUBLIC _esx_f_read_callee
+PUBLIC l0_esx_f_read_callee
 
 EXTERN asm_esx_f_read
 
@@ -14,5 +15,12 @@ _esx_f_read_callee:
    pop hl
    pop bc
    push de
+
+l0_esx_f_read_callee:
+
+   push iy
    
-   jp asm_esx_f_read
+   call asm_esx_f_read
+
+   pop iy
+   ret

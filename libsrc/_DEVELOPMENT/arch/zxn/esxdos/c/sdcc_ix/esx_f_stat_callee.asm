@@ -17,7 +17,7 @@ _esx_f_stat_callee:
 l0_esx_f_stat_callee:
 
    push ix
-
+   
    call asm_esx_f_stat
 
    pop ix

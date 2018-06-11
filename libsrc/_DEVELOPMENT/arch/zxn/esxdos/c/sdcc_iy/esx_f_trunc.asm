@@ -4,7 +4,7 @@ SECTION code_esxdos
 
 PUBLIC _esx_f_trunc
 
-EXTERN asm_esx_f_trunc
+EXTERN l0_esx_f_trunc_callee
 
 _esx_f_trunc:
 
@@ -18,4 +18,4 @@ _esx_f_trunc:
    push hl
    push af
    
-   jp asm_esx_f_trunc
+   jp l0_esx_f_trunc_callee

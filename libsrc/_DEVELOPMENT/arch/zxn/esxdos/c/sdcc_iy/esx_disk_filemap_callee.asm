@@ -3,6 +3,7 @@
 SECTION code_esxdos
 
 PUBLIC _esx_disk_filemap_callee
+PUBLIC l0_esx_disk_filemap_callee
 
 EXTERN asm_esx_disk_filemap
 
@@ -12,5 +13,12 @@ _esx_disk_filemap_callee:
    dec sp
    pop af
    ex (sp),hl
-   
-   jp asm_esx_disk_filemap
+
+l0_esx_disk_filemap_callee:
+
+   push iy
+
+   call asm_esx_disk_filemap
+
+   pop iy
+   ret

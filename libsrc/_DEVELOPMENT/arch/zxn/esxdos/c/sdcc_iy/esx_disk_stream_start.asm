@@ -4,7 +4,7 @@ SECTION code_esxdos
 
 PUBLIC _esx_disk_stream_start
 
-EXTERN asm_esx_disk_stream_start
+EXTERN _esx_disk_stream_start_fastcall
 
 _esx_disk_stream_start:
 
@@ -14,4 +14,4 @@ _esx_disk_stream_start:
    push hl
    push af
    
-   jp asm_esx_disk_stream_start
+   jp _esx_disk_stream_start_fastcall

@@ -17,7 +17,7 @@ _esx_disk_filemap_callee:
 l0_esx_disk_filemap_callee:
 
    push ix
-   
+
    call asm_esx_disk_filemap
 
    pop ix

@@ -4,7 +4,7 @@ SECTION code_esxdos
 
 PUBLIC _esx_m_tapeout_trunc
 
-EXTERN asm_esx_m_tapeout_trunc
+EXTERN _esx_m_tapeout_trunc_fastcall
 
 _esx_m_tapeout_trunc:
 
@@ -14,4 +14,4 @@ _esx_m_tapeout_trunc:
    push hl
    push af
 
-   jp asm_esx_m_tapeout_trunc
+   jp _esx_m_tapeout_trunc_fastcall

@@ -6,4 +6,11 @@ PUBLIC _esx_m_tapeout_trunc_fastcall
 
 EXTERN asm_esx_m_tapeout_trunc
 
-defc _esx_m_tapeout_trunc_fastcall = asm_esx_m_tapeout_trunc
+_esx_m_tapeout_trunc_fastcall:
+
+   push iy
+   
+   call asm_esx_m_tapeout_trunc
+
+   pop iy
+   ret

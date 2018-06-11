@@ -6,4 +6,11 @@ PUBLIC _esx_f_unlink_fastcall
 
 EXTERN asm_esx_f_unlink
 
-defc _esx_f_unlink_fastcall = asm_esx_f_unlink
+_esx_f_unlink_fastcall:
+
+   push iy
+   
+   call asm_esx_f_unlink
+
+   pop iy
+   ret

@@ -4,7 +4,7 @@ SECTION code_esxdos
 
 PUBLIC _esx_m_geterr
 
-EXTERN asm_esx_m_geterr
+EXTERN l0_esx_m_geterr_callee
 
 _esx_m_geterr:
 
@@ -16,4 +16,4 @@ _esx_m_geterr:
    push de
    push af
    
-   jp asm_esx_m_geterr
+   jp l0_esx_m_geterr_callee

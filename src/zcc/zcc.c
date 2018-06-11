@@ -84,7 +84,9 @@ static void            write_zcc_defined(char *name, int value, int export);
 
 static void           *mustmalloc(size_t);
 static char           *muststrdup(const char *s);
-static char           *strstrip(char *s);
+static char           *zcc_strstrip(char *s);
+static char           *zcc_strrstrip(char *s);
+static char           *zcc_ascii_only(char *s);
 static int             hassuffix(char *file, char *suffix_to_check);
 static char           *stripsuffix(char *, char *);
 static char           *changesuffix(char *, char *);
@@ -109,7 +111,8 @@ static void            configure_compiler();
 static void            configure_misc_options();
 static void            configure_maths_library(char **libstring);
 
-static void            apply_copt_rules(int filenumber, int num, char **rules);
+static void            apply_copt_rules(int filenumber, int num, char **rules, char *ext1, char *ext2, char *ext);
+static void            zsdcc_asm_filter_comments(int filenumber, char *ext);
 static void            remove_temporary_files(void);
 static void            remove_file_with_extension(char *file, char *suffix);
 static void            ShowErrors(char *, char *);
@@ -557,17 +560,32 @@ static char *muststrdup(const char *s)
 	return r;
 }
 
-static char *strstrip(char *s)
+static char *zcc_strstrip(char *s)
+{
+    while (isspace(*s)) ++s;
+    return zcc_strrstrip(s);
+}
+
+static char *zcc_strrstrip(char *s)
 {
     char *p;
-
-    while (isspace(*s)) ++s;
 
     for (p = s + strlen(s); p != s; *p = 0)
         if (!isspace(*--p)) break;
 
     return s;
 }
+
+static char *zcc_ascii_only(char *s)
+{
+    char *p;
+
+    for (p = s; *p; ++p)
+        *p &= 0x7f;
+
+    return s;
+}
+
 static int hassuffix(char *name, char *suffix)
 {
 	int             nlen, slen;
@@ -1184,6 +1202,9 @@ int main(int argc, char **argv)
 				char  *rules[MAX_COPT_RULE_FILES];
 				int    num_rules = 0;
 
+                // filter comments out of asz80 asm file see issue #801 on github
+                if (peepholeopt) zsdcc_asm_filter_comments(i, ".op1");
+
 				/* sdcc_opt.9 bugfixes critical sections and implements RST substitution */
 				// rules[num_rules++] = c_sdccopt9;
 
@@ -1202,6 +1223,7 @@ int main(int argc, char **argv)
 					rules[num_rules++] = c_sdccopt2;
 					break;
 				}
+
 				if ( c_coptrules_target ) {
 					rules[num_rules++] = c_coptrules_target;
 				}
@@ -1211,7 +1233,11 @@ int main(int argc, char **argv)
 				if ( c_coptrules_user ) {
 					rules[num_rules++] = c_coptrules_user;
 				}
-				apply_copt_rules(i, num_rules, rules);
+
+                if (peepholeopt == 0)
+                    apply_copt_rules(i, num_rules, rules, ".opt", ".op1", ".s");
+                else
+                    apply_copt_rules(i, num_rules, rules, ".op1", ".opt", ".asm");
 			} else {
 				char  *rules[MAX_COPT_RULE_FILES];
 				int    num_rules = 0;
@@ -1235,6 +1261,7 @@ int main(int argc, char **argv)
 						rules[num_rules++] = c_coptrules3;
 						break;
 				}
+
 				if ( c_coptrules_target ) {
 					rules[num_rules++] = c_coptrules_target;
 				}
@@ -1247,7 +1274,8 @@ int main(int argc, char **argv)
 				if ( c_coptrules_user ) {
 					rules[num_rules++] = c_coptrules_user;
 				}
-				apply_copt_rules(i, num_rules, rules);
+
+				apply_copt_rules(i, num_rules, rules, ".opt", ".op1", ".asm");
 			}
 			// continue processing if this is not a .s file
 			if ((compiler_type != CC_SDCC) || (peepholeopt != 0))
@@ -1256,7 +1284,9 @@ int main(int argc, char **argv)
 			if (assembleonly) continue;
 		case SFILE:
 			if (m4only || clangonly || llvmonly || preprocessonly) continue;
-			if (process(".s", ".asm", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
+            // filter comments out of asz80 asm file see issue #801 on github
+            zsdcc_asm_filter_comments(i, ".s2");
+            if (process(".s2", ".asm", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
 				exit(1);
 		CASE_ASMFILE:
 		case ASMFILE:
@@ -1493,26 +1523,148 @@ int main(int argc, char **argv)
 }
 
 
-static void apply_copt_rules(int filenumber, int num, char **rules)
+static void apply_copt_rules(int filenumber, int num, char **rules, char *ext1, char *ext2, char *ext)
 {
-	char  *input_ext = ".opt";
-	char  *output_ext = ".op1";
-	int    i;
+    int    i;
+	char  *input_ext;
+	char  *output_ext;
 
-	for ( i = 0; i < num ; i++ ) {
-		if ( i == (num-1) ) {
-			output_ext = ".asm";
+	for ( i = 0; i < num ; i++ )
+    {
+        if (i % 2 == 0)
+        {
+            input_ext = ext1;
+            output_ext = ext2;
+        }
+        else
+        {
+            input_ext = ext2;
+            output_ext = ext1;
+        }
+
+		if ( i == (num-1) )
+        {
+			output_ext = ext;
 		}
+
 		if (process(input_ext, output_ext, c_copt_exe, rules[i], filter, filenumber, YES, NO))
 			exit(1);
-		if ( i % 2 == 0 ) {
-			input_ext = ".op1";
-			output_ext = ".opt";
-		} else {
-			input_ext = ".opt";
-			output_ext = ".op1";
-		}
 	}
+}
+
+
+// filter comments out of asz80 asm file see issue #801 on github
+void zsdcc_asm_filter_comments(int filenumber, char *ext)
+{
+    FILE *fin;
+    FILE *fout;
+    char *outname;
+
+    char *line = NULL;
+    unsigned int len = 0;
+
+    outname = changesuffix(temporary_filenames[filenumber], ext);
+
+    if ((fin = fopen(filelist[filenumber], "r")) == NULL)
+    {
+        fprintf(stderr, "Error: Cannot read %s\n", filelist[filenumber]);
+        exit(1);
+    }
+
+    if ((fout = fopen(outname, "w")) == NULL)
+    {
+        fprintf(stderr, "Error: Cannot write %s\n", outname);
+        fclose(fin);
+        exit(1);
+    }
+
+    // read lines from asm file
+
+    while (zcc_getdelim(&line, &len, '\n', fin) > 0)
+    {
+        unsigned int i;
+
+        int seen_semicolon = 0;
+        int seen_nonws = 0;
+        int accept_line = 0;
+
+        unsigned int quote_type = 0;
+        unsigned int quote_count = 0;
+
+        for (i = 0; i <= strlen(line); ++i)
+        {
+            if (accept_line == 0)
+            {
+                if (seen_semicolon && (line[i] != '@'))
+                    break;
+
+                seen_semicolon = 0;
+
+                switch (line[i])
+                {
+                case '\'':
+#ifdef WIN32
+                    if ((i >= 2) && (strnicmp(&line[i - 2], "af'", 3) == 0))
+#else
+                    if ((i >= 2) && (strncasecmp(&line[i - 2], "af'", 3) == 0))
+#endif
+                        break;
+                    if (quote_count && ((quote_type & 0x1) == 0))
+                    {
+                        quote_count--;
+                        quote_type >>= 1;
+                    }
+                    else
+                    {
+                        quote_count++;
+                        quote_type <<= 1;
+                    }
+                    break;
+
+                case '"':
+                    if (quote_count && ((quote_type & 0x1) == 1))
+                    {
+                        quote_count--;
+                        quote_type >>= 1;
+                    }
+                    else
+                    {
+                        quote_count++;
+                        quote_type = (quote_type << 1) + 1;
+                    }
+                    break;
+
+                case ';':
+                    if (quote_count)
+                        break;
+                    if (seen_nonws == 0)
+                    {
+                        accept_line = 1;
+                        break;
+                    }
+                    seen_semicolon = 1;
+                    break;
+
+                default:
+                    break;
+                }
+
+                if (!isspace(line[i]))
+                    seen_nonws = 1;
+            }
+        }
+
+        if (seen_semicolon) line[i-1] = '\0';                         // terminate at semicolon
+        fprintf(fout, "%s\n", zcc_ascii_only(zcc_strrstrip(line)));   // remove trailing whitespace (copt asz80 translator) and ascii-ify source (copt)
+    }
+
+    free(line);
+
+    fclose(fin);
+    fclose(fout);
+
+    free(filelist[filenumber]);
+    filelist[filenumber] = outname;
 }
 
 
@@ -1568,7 +1720,7 @@ int copy_defc_file(char *name1, char *ext1, char *name2, char *ext2)
         line = NULL;
         for (lineno = 1; zcc_getdelim(&line, &len, '\n', rules) > 0; ++lineno)
         {
-            ptr = strstrip(line);
+            ptr = zcc_strstrip(line);
             if ((*ptr == 0) || (*ptr == ';')) continue;
             if ((filter = realloc(filter, (nfilter + 1) * sizeof(*filter))) == NULL)
             {
@@ -2104,7 +2256,8 @@ void gather_from_list_file(char *filename)
 		return;
 
 	// open list file for reading
-	if ((in = fopen(filename, "r")) == NULL) {
+	if ((in = fopen(filename, "r")) == NULL)
+    {
 		fprintf(stderr, "Unable to open list file \"%s\"\n", filename);
 		exit(1);
 	}
@@ -2117,20 +2270,28 @@ void gather_from_list_file(char *filename)
 
 	// read filenames from list file
 	line = NULL;
-	while (zcc_getdelim(&line, &len, '\n', in) > 0) {
-		if (((p = strtok(line, " \r\n\t")) != NULL) && *p) {
+	while (zcc_getdelim(&line, &len, '\n', in) > 0)
+    {
+		if (((p = strtok(line, " \r\n\t")) != NULL) && *p)
+        {
+            // check for comment line
+            if ((*p == ';') || (*p == '#'))
+                continue;
+
 			// clear output filename
 			*outname = '\0';
 
 			// prepend list file indicator if the filename is a list file
-			if (*p == '@') {
+			if (*p == '@')
+            {
 				strcpy(outname, "@");
 				if (((p = strtok(p + 1, " \r\n\t")) == NULL) || !(*p))
 					continue;
 			}
 
 			// sanity check
-			if (strlen(p) > FILENAME_MAX) {
+			if (strlen(p) > FILENAME_MAX)
+            {
 				fprintf(stderr, "Filename is too long \"%s\"\n", p);
 				exit(1);
 			}
@@ -2144,7 +2305,8 @@ void gather_from_list_file(char *filename)
 
 			// add file to process
 
-			if (strlen(outname) >= FILENAME_MAX) {
+			if (strlen(outname) >= FILENAME_MAX)
+            {
 				fprintf(stderr, "Filename is too long \"%s\"\n", outname);
 				exit(1);
 			}
@@ -2153,7 +2315,8 @@ void gather_from_list_file(char *filename)
 		}
 	}
 
-	if (!feof(in)) {
+	if (!feof(in))
+    {
 		fprintf(stderr, "Malformed line in list file \"%s\"\n", filename);
 		exit(1);
 	}
@@ -2175,7 +2338,7 @@ void add_file_to_process(char *filename)
 
         if (*p == '@')
             gather_from_list_file(p + 1);
-        else if (*p != ';')  /* ignore filename leading with semicolon; these indicate a comment in lst files */
+        else if ((*p != ';') && (*p != '#')) /* ignore filename leading with semicolon or hash */
         {
 			/* Expand memory for filenames */
 			if ((original_filenames = realloc(original_filenames, (nfiles + 1) * sizeof(char *))) == NULL) {
@@ -2628,7 +2791,9 @@ void remove_temporary_files(void)
 			remove_file_with_extension(temporary_filenames[j], ".i");
 			remove_file_with_extension(temporary_filenames[j], ".i2");
 			remove_file_with_extension(temporary_filenames[j], ".asm");
+            remove_file_with_extension(temporary_filenames[j], ".s2");
 			remove_file_with_extension(temporary_filenames[j], ".err");
+            remove_file_with_extension(temporary_filenames[j], ".op2");
 			remove_file_with_extension(temporary_filenames[j], ".op1");
 			remove_file_with_extension(temporary_filenames[j], ".opt");
 			remove_file_with_extension(temporary_filenames[j], ".o");

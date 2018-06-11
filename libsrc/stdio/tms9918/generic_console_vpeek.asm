@@ -16,7 +16,7 @@ ENDIF
 IF FORsvi
         INCLUDE "target/svi/def/svibios.def"
 ENDIF
-IF FORmtx | FORpv2000 | FORsc3000 | FORm5
+IF FORmtx | FORpv2000 | FORsc3000 | FORm5 | FOReinstein
 	EXTERN	LDIRMV
 ENDIF
 

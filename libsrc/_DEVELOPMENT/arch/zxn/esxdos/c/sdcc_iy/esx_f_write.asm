@@ -4,7 +4,7 @@ SECTION code_esxdos
 
 PUBLIC _esx_f_write
 
-EXTERN asm_esx_f_write
+EXTERN l0_esx_f_write_callee
 
 _esx_f_write:
 
@@ -20,4 +20,4 @@ _esx_f_write:
    inc sp
    push de
    
-   jp asm_esx_f_write
+   jp l0_esx_f_write_callee

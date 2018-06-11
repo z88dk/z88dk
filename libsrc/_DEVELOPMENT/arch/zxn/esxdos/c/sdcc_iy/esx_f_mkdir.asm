@@ -4,7 +4,7 @@ SECTION code_esxdos
 
 PUBLIC _esx_f_mkdir
 
-EXTERN asm_esx_f_mkdir
+EXTERN _esx_f_mkdir_fastcall
 
 _esx_f_mkdir:
 
@@ -14,4 +14,4 @@ _esx_f_mkdir:
    push hl
    push af
    
-   jp asm_esx_f_mkdir
+   jp _esx_f_mkdir_fastcall

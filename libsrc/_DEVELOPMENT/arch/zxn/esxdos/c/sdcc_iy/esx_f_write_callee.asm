@@ -3,6 +3,7 @@
 SECTION code_esxdos
 
 PUBLIC _esx_f_write_callee
+PUBLIC l0_esx_f_write_callee
 
 EXTERN asm_esx_f_write
 
@@ -14,5 +15,12 @@ _esx_f_write_callee:
    pop hl
    pop bc
    push de
+
+l0_esx_f_write_callee:
+
+   push iy
    
-   jp asm_esx_f_write
+   call asm_esx_f_write
+
+   pop iy
+   ret

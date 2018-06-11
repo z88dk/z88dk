@@ -4,7 +4,7 @@ SECTION code_esxdos
 
 PUBLIC _esx_m_tapein_info
 
-EXTERN asm_esx_m_tapein_info
+EXTERN l0_esx_m_tapein_info_callee
 
 _esx_m_tapein_info:
 
@@ -16,4 +16,4 @@ _esx_m_tapein_info:
    push de
    push af
 
-   jp asm_esx_m_tapein_info
+   jp l0_esx_m_tapein_info_callee

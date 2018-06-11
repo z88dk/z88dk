@@ -36,7 +36,7 @@
 	add	hl,de	;Line address in HL	
 	
 	ld	bc,255
-	ld	(hl),c
+	ld	(hl),0
 	ld	d,h
 	ld	e,l
 	inc	de

@@ -4,7 +4,7 @@ SECTION code_esxdos
 
 PUBLIC _esx_f_open_p3
 
-EXTERN asm_esx_f_open_p3
+EXTERN l0_esx_f_open_p3_callee
 
 _esx_f_open_p3:
 
@@ -20,4 +20,4 @@ _esx_f_open_p3:
    push hl
    push bc
    
-   jp asm_esx_f_open_p3
+   jp l0_esx_f_open_p3_callee

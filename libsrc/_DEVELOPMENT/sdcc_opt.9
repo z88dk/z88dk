@@ -1,10 +1,10 @@
 ;;
-;; Embedded EXTERN
+;; Embedded Directive in Comment
 ;;
 
-%"[ \t]*"0nop	; EXTERN %1
+%"[ \t]*"0nop%"[ \t]*"1;@%"[ \t]*"2%3
 =
-%0EXTERN	%1
+%0%3
 
 ;;
 ;; RST substitution

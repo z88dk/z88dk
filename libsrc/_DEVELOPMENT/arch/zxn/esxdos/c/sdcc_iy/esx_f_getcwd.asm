@@ -4,7 +4,7 @@ SECTION code_esxdos
 
 PUBLIC _esx_f_getcwd
 
-EXTERN asm_esx_f_getcwd
+EXTERN _esx_f_getcwd_fastcall
 
 _esx_f_getcwd:
 
@@ -14,4 +14,4 @@ _esx_f_getcwd:
    push hl
    push af
    
-   jp asm_esx_f_getcwd
+   jp _esx_f_getcwd_fastcall

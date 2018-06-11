@@ -14,12 +14,15 @@ define(`__ZXNEXT_2MB', 2)
 
 # Static Environment
 
-define(`__ENV_FILENAME', `"/sys/env"')
+define(`__ENV_FILENAME', `/sys/env')                # file containing environment variables
 define(`__ENV_GETENV_BUFSZ', 64)
 
-define(`__ENV_TMPDIR', `"/tmp/"')  # trailing dir separator required
-define(`__ENV_LTMPNAM', 12)        # TMPDIR/tmpXXXX
+define(`__ENV_TMPDIR', `/tmp/')                       # trailing dir separator required
+define(`__ENV_LTMPNAM', eval(len(__ENV_TMPDIR)+7+1))  # TMPDIR/tmpXXXX includes terminating 0
 define(`__ENV_TMPMAX', 0xffff)
+
+define(`__ENV_BINDIR', `/bin/')                     # location of dot commands
+define(`__ENV_SYSDIR', `/sys/')                     # location of system files
 
 # Compatible Spectrum model
 
@@ -38,7 +41,7 @@ define(`__SPECTRUM_PENTAGON', 32)
 define(`__USE_SPECTRUM_128_SECOND_DFILE', 0)
 
 # Use System Variables
-# Some globals like GLOBAL_ZX_PORT_7FFD will map to existing system variable address
+# Some globals like GLOBAL_ZX_PORT_7FFD will map to existing system variable addresses
 
 define(`__USE_SYSVAR', 0)
 
@@ -111,6 +114,9 @@ defc `__ENV_GETENV_BUFSZ' = __ENV_GETENV_BUFSZ
 defc `__ENV_LTMPNAM' = __ENV_LTMPNAM
 defc `__ENV_TMPMAX' = __ENV_TMPMAX
 
+; `define(`__ENV_BINDIR',' __ENV_BINDIR)
+; `define(`__ENV_SYSDIR',' __ENV_SYSDIR)
+
 defc `__SPECTRUM' = __SPECTRUM
 
 defc `__SPECTRUM_48' = __SPECTRUM_48
@@ -142,10 +148,15 @@ ifdef(`CFG_C_DEF',
 `#undef'  `__ZXNEXT'
 `#define' `__ZXNEXT'    __ZXNEXT
 
+`#define' `__ENV_FILENAME'  "__ENV_FILENAME"
 `#define' `__ENV_GETENV_BUFSZ'  __ENV_GETENV_BUFSZ
 
+`#define' `__ENV_TMPDIR'  "__ENV_TMPDIR"
 `#define' `__ENV_LTMPNAM'  __ENV_LTMPNAM
 `#define' `__ENV_TMPMAX'  __ENV_TMPMAX
+
+`#define' `__ENV_BINDIR'  "__ENV_BINDIR"
+`#define' `__ENV_SYSDIR'  "__ENV_SYSDIR"
 
 `#undef'  `__SPECTRUM'
 `#define' `__SPECTRUM'  __SPECTRUM

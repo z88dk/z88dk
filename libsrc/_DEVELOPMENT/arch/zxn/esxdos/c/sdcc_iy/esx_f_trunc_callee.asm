@@ -3,6 +3,7 @@
 SECTION code_esxdos
 
 PUBLIC _esx_f_trunc_callee
+PUBLIC l0_esx_f_trunc_callee
 
 EXTERN asm_esx_f_trunc
 
@@ -13,5 +14,12 @@ _esx_f_trunc_callee:
    pop de
    pop bc
    push af
+
+l0_esx_f_trunc_callee:
+
+   push iy
    
-   jp asm_esx_f_trunc
+   call asm_esx_f_trunc
+
+   pop iy
+   ret

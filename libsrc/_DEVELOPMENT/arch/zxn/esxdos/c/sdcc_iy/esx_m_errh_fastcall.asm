@@ -6,4 +6,11 @@ PUBLIC _esx_m_errh_fastcall
 
 EXTERN asm_esx_m_errh
 
-defc _esx_m_errh_fastcall = asm_esx_m_errh
+_esx_m_errh_fastcall:
+
+   push iy
+   
+   call asm_esx_m_errh
+
+   pop iy
+   ret

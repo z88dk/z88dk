@@ -191,4 +191,9 @@ __DPROTO(,,uint32_t,,esxdos_f_seek,unsigned char handle,uint32_t distance,unsign
 __DPROTO(,,int,,esxdos_f_read,unsigned char handle,void *dst,size_t nbytes)
 __DPROTO(,,int,,esxdos_f_write,unsigned char handle,void *src,size_t nbytes)
 
+// Temporary inclusion of NextOS-esxdos api
+// The includes are circular but ifguards should solve that
+
+#include <arch/zxn/esxdos.h>
+
 #endif

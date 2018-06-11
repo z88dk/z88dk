@@ -34,7 +34,11 @@
 
 
         defc    CONSOLE_COLUMNS = 32
-        defc    CONSOLE_ROWS = 24
+IF NEED_ansiterminal
+	defc	CONSOLE_ROWS = 24
+ELSE
+        defc    CONSOLE_ROWS = 16
+ENDIF
 
         IF      !DEFINED_CRT_ORG_CODE
 	   IF (startup=2)
@@ -289,7 +293,6 @@ IF DEFINED_USING_amalloc
 	INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
 		
-
         call    _main
 cleanup:
 ;

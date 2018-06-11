@@ -3,6 +3,7 @@
 SECTION code_esxdos
 
 PUBLIC _esx_m_geterr_callee
+PUBLIC l0_esx_m_geterr_callee
 
 EXTERN asm_esx_m_geterr
 
@@ -12,4 +13,11 @@ _esx_m_geterr_callee:
    pop de
    ex (sp),hl
 
-   jp asm_esx_m_geterr
+l0_esx_m_geterr_callee:
+
+   push iy
+   
+   call asm_esx_m_geterr
+
+   pop iy
+   ret

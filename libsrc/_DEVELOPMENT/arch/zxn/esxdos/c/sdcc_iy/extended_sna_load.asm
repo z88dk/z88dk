@@ -4,7 +4,7 @@ SECTION code_esxdos
 
 PUBLIC _extended_sna_load
 
-EXTERN asm_extended_sna_load
+EXTERN _extended_sna_load_fastcall
 
 _extended_sna_load:
 
@@ -14,4 +14,4 @@ _extended_sna_load:
    push hl
    push af
    
-   jp asm_extended_sna_load
+   jp _extended_sna_load_fastcall

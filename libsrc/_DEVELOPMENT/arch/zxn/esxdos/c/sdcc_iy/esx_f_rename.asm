@@ -4,7 +4,7 @@ SECTION code_esxdos
 
 PUBLIC _esx_f_rename
 
-EXTERN asm_esx_f_rename
+EXTERN l0_esx_f_rename_callee
 
 _esx_f_rename:
 
@@ -16,4 +16,4 @@ _esx_f_rename:
    push hl
    push af
    
-   jp asm_esx_f_rename
+   jp l0_esx_f_rename_callee

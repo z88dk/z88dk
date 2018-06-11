@@ -24842,6 +24842,25 @@ replace restart {
 	; peephole z88dk-493a7
 }
 
+replace restart {
+	ld	hl,#%1
+	ld	l,(hl)
+	ld	h,#%2
+} by {
+	ld	hl,(#%1)
+	ld	h,#%2
+	; peephole z88dk-494a1
+}
+
+replace restart {
+	ld	hl,#%1 + %3
+	ld	l,(hl)
+	ld	h,#%2
+} by {
+	ld	hl,(#%1 + %3)
+	ld	h,#%2
+	; peephole z88dk-494a2
+}
 
 
 

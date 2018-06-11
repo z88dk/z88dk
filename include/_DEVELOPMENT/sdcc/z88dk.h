@@ -9,6 +9,10 @@
 
 // z88dk version
 
+// 1990 = 1.99A
+// 1991 = 1.99B
+// 1992 = 1.99C
+
 #define Z88DK_VERSION  __Z88DK
 
 // section information
