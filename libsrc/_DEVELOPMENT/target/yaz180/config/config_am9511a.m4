@@ -70,7 +70,8 @@ define(`__IO_APU_OP_FLTS',  0x1D)
 define(`__IO_APU_OP_FLTD',  0x1C)
 define(`__IO_APU_OP_CHSS',  0x74)
 define(`__IO_APU_OP_CHSD',  0x34)
-define(`__IO_APU_OP_PTOS',  0x15)
+define(`__IO_APU_OP_CHSF',  0x15)
+define(`__IO_APU_OP_PTOS',  0x77)
 define(`__IO_APU_OP_PTOD',  0x37)
 define(`__IO_APU_OP_PTOF',  0x17)
 define(`__IO_APU_OP_POPS',  0x78)
@@ -153,6 +154,7 @@ PUBLIC `__IO_APU_OP_FLTS'
 PUBLIC `__IO_APU_OP_FLTD'
 PUBLIC `__IO_APU_OP_CHSS'
 PUBLIC `__IO_APU_OP_CHSD'
+PUBLIC `__IO_APU_OP_CHSF'
 PUBLIC `__IO_APU_OP_PTOS'
 PUBLIC `__IO_APU_OP_PTOD'
 PUBLIC `__IO_APU_OP_PTOF'
@@ -231,6 +233,7 @@ defc `__IO_APU_OP_FLTS' = __IO_APU_OP_FLTS
 defc `__IO_APU_OP_FLTD' = __IO_APU_OP_FLTD
 defc `__IO_APU_OP_CHSS' = __IO_APU_OP_CHSS
 defc `__IO_APU_OP_CHSD' = __IO_APU_OP_CHSD
+defc `__IO_APU_OP_CHSF' = __IO_APU_OP_CHSF
 defc `__IO_APU_OP_PTOS' = __IO_APU_OP_PTOS
 defc `__IO_APU_OP_PTOD' = __IO_APU_OP_PTOD
 defc `__IO_APU_OP_PTOF' = __IO_APU_OP_PTOF
@@ -309,6 +312,7 @@ ifdef(`CFG_C_DEF',
 `#define' `__IO_APU_OP_FLTD'  __IO_APU_OP_FLTD
 `#define' `__IO_APU_OP_CHSS'  __IO_APU_OP_CHSS
 `#define' `__IO_APU_OP_CHSD'  __IO_APU_OP_CHSD
+`#define' `__IO_APU_OP_CHSF'  __IO_APU_OP_CHSF
 `#define' `__IO_APU_OP_PTOS'  __IO_APU_OP_PTOS
 `#define' `__IO_APU_OP_PTOD'  __IO_APU_OP_PTOD
 `#define' `__IO_APU_OP_PTOF'  __IO_APU_OP_PTOF
