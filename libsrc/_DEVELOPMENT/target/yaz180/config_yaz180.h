@@ -810,7 +810,8 @@
 #define __IO_APU_OP_FLTD  0x1C
 #define __IO_APU_OP_CHSS  0x74
 #define __IO_APU_OP_CHSD  0x34
-#define __IO_APU_OP_PTOS  0x15
+#define __IO_APU_OP_CHSF  0x15
+#define __IO_APU_OP_PTOS  0x77
 #define __IO_APU_OP_PTOD  0x37
 #define __IO_APU_OP_PTOF  0x17
 #define __IO_APU_OP_POPS  0x78

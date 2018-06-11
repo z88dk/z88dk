@@ -65,6 +65,7 @@ include(__link__.m4)
 #define APU_OP_FLTD  __IO_APU_OP_FLTD
 #define APU_OP_CHSS  __IO_APU_OP_CHSS
 #define APU_OP_CHSD  __IO_APU_OP_CHSD
+#define APU_OP_CHSF  __IO_APU_OP_CHSF
 #define APU_OP_PTOS  __IO_APU_OP_PTOS
 #define APU_OP_PTOD  __IO_APU_OP_PTOD
 #define APU_OP_PTOF  __IO_APU_OP_PTOF
