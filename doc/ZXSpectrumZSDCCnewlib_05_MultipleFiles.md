@@ -256,9 +256,9 @@ ASFLAGS=$(TARGET) $(VERBOSITY) -c
 ```
 
 To keep all pieces of a split build consistent we specifically state the
-compiler we want to use (SDCC) together with the C library. The C library option
-needs to be given to both the compiler and linker. The optimisation flags are
-separate so they can be switched off easily.
+compiler we want to use (SDCC) together with the C library (sdcc_iy). The C
+library option needs to be given to both the compiler and linker. The
+optimisation flags are separate so they can be switched off easily.
 
 ```
 %.o: %.c $(PRAGMA_FILE)
@@ -275,9 +275,9 @@ changes.
 ```
 
 This is an additional rule which defines how to create an object file from an
-assembly language file. We just call the assembler with the correct flags. GNU
-make's implicit rule works if you don't mind your assembly language files having
-.s extensions.
+assembly language file. We just call the assembler with the correct
+flags. (Actually, GNU make's implicit rule works fine if you don't mind your
+assembly language files having .s extensions.)
 
 ```
 $(EXEC) : $(OBJECTS)
@@ -296,7 +296,7 @@ zcc +zx -vn -c -o text_via_makefile.o text_via_makefile.asm
 zcc +zx -vn -clib=sdcc_iy -pragma-include:zpragma.inc -startup=4 text_main.o text_via_makefile.o -o text -create-app
 ```
 
-The first line compiles text_main.c, the second assembles text_via_makefile.asm,
+The first line compiles *text_main.c*, the second assembles *text_via_makefile.asm*,
 and the third links the objects and creates the Spectrum TAP file.
 
 ## Where To Go From Here
