@@ -143,7 +143,7 @@ The *zcc* tool recognises the ASM file and knows it has to be passed to the
 assembler, as opposed to the C compiler. Once assembled, *zcc* links the assembly
 language into the application and makes its contents available to the C code.
 
-### Makefiles
+## Makefiles
 
 Once a project gets to a reasonable size it makes sense to start using
 makefiles.  The SDCC compiler can be very slow when optimising so deploying a
@@ -299,7 +299,7 @@ zcc +zx -vn -clib=sdcc_iy -pragma-include:zpragma.inc -startup=4 text_main.o tex
 The first line compiles text_main.c, the second assembles text_via_makefile.asm,
 and the third links the objects and creates the Spectrum TAP file.
 
-### Where To Go From Here
+## Where To Go From Here
 
 This has been a brief introduction to the ability of zcc to handle multiple
 files and file types all in one build. We've scratched the surface and
