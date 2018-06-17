@@ -18,6 +18,9 @@ together within the context of a C program.
 The reader is also assumed to be familiar with the concept and basic content of
 a Z80 assembly language file.
 
+The makefile section assumes the reader understands GNU make, or their preferred
+make utility.
+
 ## Multiple C Source Files
 
 So far in this series of articles we've only ever had examples consisting of a
@@ -30,7 +33,7 @@ with Z88DK, and the nuances and caveats that there are won't be discussed
 here. We simply introduce the concept so the reader can see how to keep their
 build clear and understandable as it gets bigger.
 
-As always, we start simple. Here's a source file containing a main() function:
+As always, we start simple. Here's a source file containing a *main()* function:
 
 ```
 /* C source start */
@@ -49,8 +52,8 @@ int main()
 /* C source end */
 ```
 
-Save that into a file called text_main.c, then save this into a file called
-text_data.c:
+Save that into a file called *text_main.c*, then save this into a file called
+*text_data.c*:
 
 ```
 /* C source start */
@@ -75,7 +78,7 @@ Two filenames on the command line isn't a problem, but as a project gets bigger
 and the list of its files gets longer it becomes more convenient to put those
 filenames into a single list file and use that on the command line instead.
 
-Create a file called text.lst containing these lines:
+Create a file called *text.lst* containing these lines:
 
 ```
 text_main.c
@@ -99,8 +102,8 @@ game_code.c
 @data/data.lst
 ```
 
-That's one C file and a second list file in the data/ subdirectory. The
-data/data.lst file might contain:
+That's one C file and a second list file in the *data/* subdirectory. The
+*data/data.lst* file might contain:
 
 ```
 graphics_data.c
@@ -108,17 +111,17 @@ music_data.c
 text_data.c
 ```
 
-All the data files listed in data/data.lst would be compiled and linked with
-game_code.c as you'd expect.
+All the data files listed in *data/data.lst* would be compiled and linked with
+*game_code.c* as you'd expect.
 
 ## Adding Z80 Assembly Language
 
 This guide isn't the place to introduce Z80 assembly language or how it can be
 used with Z88DK, but we can demonstrate how to bring a Z80 assembly language
-file into our build. In fact, since the zcc front end tool knows how to deal
+file into our build. In fact, since the *zcc* front end tool knows how to deal
 with assembly language files it's quite trivial.
 
-Copy this assembly language into a file called text_data.asm:
+Copy this assembly language into a file called *text_data.asm*:
 
 ```
 SECTION rodata_user
@@ -136,15 +139,15 @@ Build the application with:
 zcc +zx -vn -startup=0 -clib=sdcc_iy text_main.c text_data.asm -o text -create-app
 ```
 
-The zcc tool recognises the ASM file and knows it has to be passed to the
-assembler, as opposed to the C compiler. Once assembled, zcc links the assembly
+The *zcc* tool recognises the ASM file and knows it has to be passed to the
+assembler, as opposed to the C compiler. Once assembled, *zcc* links the assembly
 language into the application and makes its contents available to the C code.
 
 ### Makefiles
 
-Once a project gets to a reasonable size it makes sense to start using makefiles.
-The SDCC compiler can be very slow, particularly when optimising, so deploying
-a makefile can speed up builds quite considerably. For this worked example we use
+Once a project gets to a reasonable size it makes sense to start using
+makefiles.  The SDCC compiler can be very slow when optimising so deploying a
+makefile can speed up builds quite considerably. For this worked example we use
 the GNU *make* utility on Linux, although any variant can be used with a little
 tweaking.
 
@@ -158,7 +161,7 @@ PUBLIC _message
 
 _message:
 
-defb "This version is built from a makefile", 0x00
+defm "This version is built from a makefile", 0x00
 ```
 
 Here's a sample makefile which will build the program, resulting in a TAP file:
@@ -209,7 +212,7 @@ bit differently we'll just review the salient points.
 
 What we're putting together here is called a *split build*, which is where the
 various parts of a software package are (at least potentially) built separately
-from each other. The challenge with split builds is to ensure all components of
+from each other. The key with split builds is to ensure all components of
 the software use the same tools, flags, options, and so on.
 
 ```
@@ -223,7 +226,7 @@ CRT=4
 Firstly, we use the Z88DK front end utility *zcc* as both the C compiler (which
 it fronts for *sdcc*) and the assembler (which it fronts for *z80asm*). Using
 the underlying tools is perfectly possible, but *zcc* makes life a lot easier,
-at least at first. We also define our [target platform]() and [CRT]() up front
+at least at first. We also define our [target platform](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_01_GettingStarted.md#build-a-compile-command) and [CRT](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_02_HelloWorld.md#crts-for-reference) up front
 to make them easier to change should we want to.
 
 ```
