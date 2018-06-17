@@ -67,9 +67,7 @@ give both file names on the compile line:
 zcc +zx -vn -startup=0 -clib=sdcc_iy text_main.c text_data.c -o text -create-app
 ```
 
-Both files will be compiled each time the application is built. We're not going
-to look at Makefiles here, although zsdcc can be slow so you should plan to use
-one for any sizeable project.
+Both files will be compiled each time the application is built.
 
 ### Project Lists
 
@@ -141,6 +139,162 @@ zcc +zx -vn -startup=0 -clib=sdcc_iy text_main.c text_data.asm -o text -create-a
 The zcc tool recognises the ASM file and knows it has to be passed to the
 assembler, as opposed to the C compiler. Once assembled, zcc links the assembly
 language into the application and makes its contents available to the C code.
+
+### Makefiles
+
+Once a project gets to a reasonable size it makes sense to start using makefiles.
+The SDCC compiler can be very slow, particularly when optimising, so deploying
+a makefile can speed up builds quite considerably. For this worked example we use
+the GNU *make* utility on Linux, although any variant can be used with a little
+tweaking.
+
+We need another assembly language file to play with, so save this text to a file
+called *text_via_makefile.asm*:
+
+```
+SECTION rodata_user
+
+PUBLIC _message
+
+_message:
+
+defb "This version is built from a makefile", 0x00
+```
+
+Here's a sample makefile which will build the program, resulting in a TAP file:
+
+```
+CC=zcc
+AS=zcc
+TARGET=+zx
+VERBOSITY=-vn
+CRT=4
+
+PRAGMA_FILE=zpragma.inc
+
+C_OPT_FLAGS=-SO3 --max-allocs-per-node200000
+
+CFLAGS=$(TARGET) $(VERBOSITY) -c $(C_OPT_FLAGS) -compiler sdcc -clib=sdcc_iy -pragma-include:$(PRAGMA_FILE)
+LDFLAGS=$(TARGET) $(VERBOSITY) -clib=sdcc_iy -pragma-include:$(PRAGMA_FILE)
+ASFLAGS=$(TARGET) $(VERBOSITY) -c
+
+
+EXEC=text.tap
+EXEC_OUTPUT=text
+
+OBJECTS = text_main.o \
+          text_via_makefile.o
+
+%.o: %.c $(PRAGMA_FILE)
+	$(CC) $(CFLAGS) -o $@ $<
+
+%.o: %.asm
+	$(AS) $(ASFLAGS) -o $@ $<
+
+all : $(EXEC)
+
+$(EXEC) : $(OBJECTS)
+	 $(CC) $(LDFLAGS) -startup=$(CRT) $(OBJECTS) -o $(EXEC_OUTPUT) -create-app
+
+.PHONY: clean
+clean:
+	rm -f *.o *.bin *.tap *.map zcc_opt.def *~ /tmp/tmpXX*
+```
+
+**If you copy and paste the makefile example above, ensure you end up with tab
+characters in the rule lines, not spaces.**
+
+This isn't the place to learn about makefiles, and since everyone does it a
+bit differently we'll just review the salient points.
+
+What we're putting together here is called a *split build*, which is where the
+various parts of a software package are (at least potentially) built separately
+from each other. The challenge with split builds is to ensure all components of
+the software use the same tools, flags, options, and so on.
+
+```
+CC=zcc
+AS=zcc
+TARGET=+zx
+VERBOSITY=-vn
+CRT=4
+```
+
+Firstly, we use the Z88DK front end utility *zcc* as both the C compiler (which
+it fronts for *sdcc*) and the assembler (which it fronts for *z80asm*). Using
+the underlying tools is perfectly possible, but *zcc* makes life a lot easier,
+at least at first. We also define our [target platform]() and [CRT]() up front
+to make them easier to change should we want to.
+
+```
+PRAGMA_FILE=zpragma.inc
+```
+
+We define a separate file for our *pragma* declarations. We haven't seen pragmas
+yet. They will be introduced in the [next
+article](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_06_SomeDetails.md#changing-the-memory-layout)
+where they are embedded into the C source. When using split builds it's easier
+to put them all into a separate file used by all the tools. This ensures they're
+used consistently. Don't worry about this detail until you need pragmas. For now
+just create an empty file to allow the build to progress:
+
+```
+> touch zpragma.inc
+```
+
+Next we set up the flags for the compile, link and assembler tools:
+
+```
+C_OPT_FLAGS=-SO3 --max-allocs-per-node200000
+
+CFLAGS=$(TARGET) $(VERBOSITY) -c $(C_OPT_FLAGS) -compiler sdcc -clib=sdcc_iy -pragma-include:$(PRAGMA_FILE)
+LDFLAGS=$(TARGET) $(VERBOSITY) -clib=sdcc_iy -pragma-include:$(PRAGMA_FILE)
+ASFLAGS=$(TARGET) $(VERBOSITY) -c
+```
+
+To keep all pieces of a split build consistent we specifically state the
+compiler we want to use (SDCC) together with the C library. The C library option
+needs to be given to both the compiler and linker. The optimisation flags are
+separate so they can be switched off easily.
+
+```
+%.o: %.c $(PRAGMA_FILE)
+	$(CC) $(CFLAGS) -o $@ $<
+```
+
+This is the standard *C-file-to-Object-file* implicit compilation rule. We've
+added the pragma file to it so all C files will be recompiled if the pragma file
+changes.
+
+```
+%.o: %.asm
+	$(AS) $(ASFLAGS) -o $@ $<
+```
+
+This is an additional rule which defines how to create an object file from an
+assembly language file. We just call the assembler with the correct flags. GNU
+make's implicit rule works if you don't mind your assembly language files having
+.s extensions.
+
+```
+$(EXEC) : $(OBJECTS)
+	 $(CC) $(LDFLAGS) -startup=$(CRT) $(OBJECTS) -o $(EXEC_OUTPUT) -create-app
+```
+
+Finally this is the build line which uses *zcc* to bring together the built
+object files and create a Spectrum application from them.
+
+The output from this makefile is:
+
+```
+>make all
+zcc +zx -vn -c -SO3 --max-allocs-per-node200000 -compiler sdcc -clib=sdcc_iy -pragma-include:zpragma.inc -o text_main.o text_main.c
+zcc +zx -vn -c -o text_via_makefile.o text_via_makefile.asm
+zcc +zx -vn -clib=sdcc_iy -pragma-include:zpragma.inc -startup=4 text_main.o text_via_makefile.o -o text -create-app
+```
+
+The first line compiles text_main.c, the second assembles text_via_makefile.asm,
+and the third links the objects and creates the Spectrum TAP file.
 
 ### Where To Go From Here
 
