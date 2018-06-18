@@ -10,6 +10,8 @@ define(`__ZXNEXT', 1)
 define(`__ZXNEXT_1MB', 1)
 define(`__ZXNEXT_2MB', 2)
 
+define(`__ZXNEXT_LAST_PAGE', 223)
+
 # ZX Next Runtime Configuration
 
 # Static Environment
@@ -70,6 +72,11 @@ ifdef(`CFG_ASM_PUB',
 `
 PUBLIC `__ZXNEXT'
 
+PUBLIC `__ZXNEXT_1MB'
+PUBLIC `__ZXNEXT_2MB'
+
+PUBLIC `__ZXNEXT_LAST_PAGE'
+
 PUBLIC `__ENV_GETENV_BUFSZ'
 
 PUBLIC `__ENV_LTMPNAM'
@@ -104,6 +111,11 @@ dnl#
 ifdef(`CFG_ASM_DEF',
 `
 defc `__ZXNEXT' = __ZXNEXT
+
+defc `__ZXNEXT_1MB' = __ZXNEXT_1MB
+defc `__ZXNEXT_2MB' = __ZXNEXT_2MB
+
+defc `__ZXNEXT_LAST_PAGE' = __ZXNEXT_LAST_PAGE
 
 ; `define(`__ENV_FILENAME',' __ENV_FILENAME)
 
@@ -146,7 +158,12 @@ dnl#
 ifdef(`CFG_C_DEF',
 `
 `#undef'  `__ZXNEXT'
-`#define' `__ZXNEXT'    __ZXNEXT
+`#define' `__ZXNEXT'  __ZXNEXT
+
+`#define' `__ZXNEXT_1MB'  __ZXNEXT_1MB
+`#define' `__ZXNEXT_2MB'  __ZXNEXT_2MB
+
+`#define' `__ZXNEXT_LAST_PAGE'  __ZXNEXT_LAST_PAGE
 
 `#define' `__ENV_FILENAME'  "__ENV_FILENAME"
 `#define' `__ENV_GETENV_BUFSZ'  __ENV_GETENV_BUFSZ

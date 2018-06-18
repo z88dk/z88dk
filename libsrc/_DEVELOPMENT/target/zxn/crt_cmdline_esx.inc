@@ -1,4 +1,4 @@
-      ; command line parsing for esxdos dot commands
+      ; command line parsing for nextos-esx dot commands
 
       ; hl = pointer to args or 0 if no args
 
@@ -20,21 +20,13 @@
       EXTERN l_command_line_parse
       call   l_command_line_parse
       
-      ; esxdos does not supply program name in command line
-      ; so place empty string in argv[0] instead
+      ; nextos-esx supplies program name in argv[0]
       
       ; bc = int argc
       ; hl = char *argv[]
       ; de = & empty string
       ; bc'= num chars in redirector
       ; hl'= char *redirector
-      
-      push de                  ; empty string added to front of argv[]
-      
-      dec hl
-      dec hl                   ; char *argv[] adjusted to include empty string at index 0
-      
-      inc c                    ; argc++
 
    cmdline_end:
 

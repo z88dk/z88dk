@@ -180,7 +180,17 @@ SECTION code_crt_main
    include "../crt_start_ei.inc"
 
    ; call user program
+
+IF __crt_enable_commandline = 2
+
+   pop bc
+   pop hl
    
+   push hl
+   push bc
+
+ENDIF
+
    call _main                  ; hl = return status
 
    ; run exit stack
