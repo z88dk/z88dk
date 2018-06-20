@@ -60,7 +60,8 @@ static struct zx_common zxc = {
     NULL,       // excluded_sections
     0,          // clean
     -1,         // main_fence applies to banked model compiles only
-    0           // pages - zx next only
+    0,          // pages - zx next only
+    NULL        // file
 };
 
 static struct zx_tape zxt = {
@@ -350,6 +351,57 @@ int zx_exec(char *target)
 
     if (mb_sort_banks(&memory))
         exit_log(1, "Aborting... one or more binaries overlap\n");
+
+    // if using 5,2,0 main bank executable model, merge these banks into the main bank
+
+    if (sna)
+    {
+        if (bsnum_bank >= 0)
+        {
+            for (i = 0; i < 8; ++i)
+            {
+                struct memory_bank *mb = &memory.bankspace[bsnum_bank].membank[i];
+
+                if (mb->num > 0)
+                {
+                    // merge banks 5,2,0 into main bank
+
+                    if ((i == 0) || (i == 2) || (i == 5))
+                    {
+                        // adjust org appropriately
+
+                        for (j = 0; j < mb->num; ++j)
+                        {
+                            if (i == 0)
+                                mb->secbin[j].org += 0xc000 - 0xc000;
+                            else if (i == 2)
+                                mb->secbin[j].org += 0x8000 - 0xc000;
+                            else
+                                mb->secbin[j].org += 0x4000 - 0xc000;
+                        }
+
+                        // move sections to main bank
+
+                        memory.mainbank.secbin = must_realloc(memory.mainbank.secbin, (memory.mainbank.num + mb->num) * sizeof(*memory.mainbank.secbin));
+                        memcpy(&memory.mainbank.secbin[memory.mainbank.num], mb->secbin, mb->num * sizeof(*memory.mainbank.secbin));
+                        memory.mainbank.num += mb->num;
+
+                        free(mb->secbin);
+
+                        mb->num = 0;
+                        mb->secbin = NULL;
+
+                        printf("Notice: Merged BANK_%d into the main memory bank\n", i);
+                    }
+                }
+            }
+
+            // sort the memory banks and look for section overlaps
+
+            if (mb_sort_banks(&memory))
+                exit_log(1, "Aborting... one or more binaries overlap\n");
+        }
+    }
 
     // check if main binary extends past fence
 
