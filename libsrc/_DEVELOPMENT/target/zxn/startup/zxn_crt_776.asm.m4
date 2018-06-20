@@ -1,7 +1,7 @@
 include(`z88dk.m4')
 
 dnl############################################################
-dnl##       ZXN_CRT_799.M4 - RAM MODEL DOTN COMMAND          ##
+dnl##       ZXN_CRT_776.M4 - RAM MODEL DOTN COMMAND          ##
 dnl############################################################
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;          zx spectrum nextos extended dot command          ;;
@@ -99,8 +99,6 @@ __Start:
    rst __ESX_RST_SYS
    defb __ESX_M_DOSVERSION
 
-   di
-
    ; return status statically initialized to this
    ;
    ; ld hl,error_msg_nextos
@@ -116,7 +114,9 @@ __Start:
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    ld hl,__z_saved_mmu_state
-   call asm_zxn_read_mmu_state
+   
+   EXTERN asm_zxn_read_mmu_state
+   call   asm_zxn_read_mmu_state
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; save basic bank state
@@ -284,15 +284,17 @@ merge_cancel:
    ;; restore mmu state after allocation
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ld sp,DOT_REGISTER_SP       ; move stack to divmmc memory
-
    ld hl,__z_saved_mmu_state
-   call asm_zxn_write_mmu_state
+   
+   EXTERN asm_zxn_write_mmu_state
+   call   asm_zxn_write_mmu_state
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; parse command line to divmmc memory
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   
+
+   ld sp,DOTN_REGISTER_SP       ; move stack to divmmc memory
+
    IF __crt_enable_commandline = 1
    
       include "../crt_cmdline_empty.inc"
@@ -327,7 +329,7 @@ merge_cancel:
       
       inc bc                   ; include terminator in length
       
-      ld hl,256
+      ld hl,128
       
       EXTERN l_minu_bc_hl
       call   l_minu_bc_hl      ; place a cap on the length of the command line
@@ -335,7 +337,7 @@ merge_cancel:
       ld c,l
       ld b,h
       
-      ld hl,DOT_REGISTER_SP
+      ld hl,DOTN_REGISTER_SP
       
       xor a
       sbc hl,bc
@@ -446,14 +448,16 @@ merge_cancel:
 
    include "../clib_init_bss.inc"
 
+   ; not normal to disable interrupts
+   
+   include "../crt_start_di.inc"
+
    ; interrupt mode
    
    include "../crt_set_interrupt_mode.inc"
 
 SECTION code_crt_init          ; user and library initialization
 SECTION code_crt_main
-
-   include "../crt_start_ei.inc"
 
    ; call user program
    
@@ -478,7 +482,9 @@ SECTION code_crt_main
       ENDIF
 
    ENDIF
-   
+
+   include "../crt_start_ei.inc"
+
    call _main                  ; hl = return status
 
 error_basic:
@@ -511,10 +517,9 @@ SECTION code_crt_return
 
 terminate:
 
-   di
    ld (__return_status),hl
    
-   ld sp,DOT_REGISTER_SP       ; stack to divmmc memory
+   ld sp,DOTN_REGISTER_SP       ; stack to divmmc memory
    
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; restore banked state
@@ -597,15 +602,9 @@ error_nextos:
    pop iy
    
    ld hl,(__return_status)
-   
-   IF (__crt_interrupt_mode_exit >= 0) && (__crt_interrupt_mode_exit <= 2)
 
-      im __crt_interrupt_mode_exit
+   include "../crt_exit_eidi.inc"
 
-   ENDIF
-
-   ei
-   
    ; If you exit with carry set and A<>0, the corresponding error code will be printed in BASIC.
    ; If carry set and A=0, HL should be pointing to a custom error message (with last char +$80 as END marker).
    ; If carry reset, exit cleanly to BASIC
@@ -628,8 +627,6 @@ error_nextos:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; BASIC ERROR ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-PUBLIC __dotn_basic_error_intercept
 
 __dotn_basic_error_intercept:
 
@@ -684,6 +681,11 @@ PUBLIC __z_saved_mmu_state
 __z_saved_bank_state:  defw 0
 __z_saved_mmu_state:   defs 8
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; contiguous section filled in by appmake
+
+__appmake_handle:
+
 PUBLIC __z_page_table_sz
 PUBLIC __z_page_extra_sz
 
@@ -699,6 +701,8 @@ PUBLIC __z_page_extra
 
 __z_page_table:      defs DOTN_LAST_PAGE + 1  ; must be in this order
 __z_page_extra:      defs DOTN_EXTRA_PAGES    ; must be in this order
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../clib_variables.inc"
 

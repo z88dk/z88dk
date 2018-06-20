@@ -34,6 +34,11 @@ defc __Z88DK = 1992
 
 defc __ZXNEXT = 1
 
+defc __ZXNEXT_1MB = 1
+defc __ZXNEXT_2MB = 2
+
+defc __ZXNEXT_LAST_PAGE = 223
+
 ; define(`__ENV_FILENAME', /sys/env)
 
 defc __ENV_GETENV_BUFSZ = 64
@@ -2128,8 +2133,6 @@ defc __NEXTOS_IDE_PARTITION_READ = 0x00c4
 defc __NEXTOS_IDE_PARTITION_OPEN = 0x00cd
 defc __NEXTOS_IDE_PARTITION_CLOSE = 0x00d0
 defc __NEXTOS_IDE_PARTITIONS = 0x01a5
-
-defc __NEXTOS_DOTN_SP_DIVMMC = 0x4000
 
 defc __NEXTOS_RC_READY = 0
 defc __NEXTOS_RC_WP = 1

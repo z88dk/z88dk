@@ -48,16 +48,31 @@ Z88DK_FOR(`LOOP', `0', `15',
    ; NextOS dotn commands
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   IFNDEF CRT_ORG_DTN
-      defc CRT_ORG_DTN  = 0x8000
+   PUBLIC DOTN_MAIN_OVERLAY_MASK
+   PUBLIC DOTN_MAIN_ABSOLUTE_MASK
+
+   IFNDEF CRT_ORG_MAIN
+      defc CRT_ORG_MAIN = 0x8000
    ENDIF
 
    IFNDEF DOTN_REGISTER_SP
-      defc DOTN_REGISTER_SP = __NEXTOS_DOTN_SP_DIVMMC
+      defc DOTN_REGISTER_SP = 0x4000
    ENDIF
    
+   IFNDEF DOTN_LAST_PAGE
+      defc DOTN_LAST_PAGE = __ZXNEXT_LAST_PAGE
+   ENDIF
+
    IFNDEF DOTN_EXTRA_PAGES
       defc DOTN_EXTRA_PAGES = 0
+   ENDIF
+   
+   IFNDEF DOTN_MAIN_OVERLAY_MASK
+      defc DOTN_MAIN_OVERLAY_MASK = 0
+   ENDIF
+   
+   IFNDEF DOTN_MAIN_ABSOLUTE_MASK
+      defc DOTN_MAIN_ABSOLUTE_MASK = 0
    ENDIF
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

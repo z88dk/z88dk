@@ -1,7 +1,7 @@
 include(`z88dk.m4')
 
 dnl############################################################
-dnl##       ZXN_CRT_799.M4 - RAM MODEL DOTN COMMAND          ##
+dnl##       ZXN_CRT_772.M4 - RAM MODEL DOTN COMMAND          ##
 dnl############################################################
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;          zx spectrum nextos extended dot command          ;;
@@ -33,9 +33,27 @@ include(`crt_memory_map.inc')
 ;; INSTANTIATE DRIVERS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+ifndef CRT_OTERM_FONT_4X8
+
+   PUBLIC CRT_OTERM_FONT_4X8
+   EXTERN _font_4x8_default
+   defc CRT_OTERM_FONT_4X8 = _font_4x8_default
+
+endif
+
 include(`../clib_instantiate_begin.m4')
 
-ifelse(eval(M4__CRT_INCLUDE_DRIVER_INSTANTIATION == 0), 1,,
+ifelse(eval(M4__CRT_INCLUDE_DRIVER_INSTANTIATION == 0), 1,
+`
+   include(`driver/terminal/zx_01_input_kbd_inkey.m4')dnl
+   m4_zx_01_input_kbd_inkey(_stdin, __i_fcntl_fdstruct_1, CRT_ITERM_TERMINAL_FLAGS, M4__CRT_ITERM_EDIT_BUFFER_SIZE, CRT_ITERM_INKEY_DEBOUNCE, CRT_ITERM_INKEY_REPEAT_START, CRT_ITERM_INKEY_REPEAT_RATE)dnl
+
+   include(`driver/terminal/zx_01_output_char_64.m4')dnl
+   m4_zx_01_output_char_64(_stdout, CRT_OTERM_TERMINAL_FLAGS, 0, 0, CRT_OTERM_WINDOW_X*2, CRT_OTERM_WINDOW_WIDTH*2, CRT_OTERM_WINDOW_Y, CRT_OTERM_WINDOW_HEIGHT, 0, CRT_OTERM_FONT_4X8, CRT_OTERM_TEXT_COLOR, CRT_OTERM_TEXT_COLOR_MASK, CRT_OTERM_BACKGROUND_COLOR)dnl
+
+   include(`../m4_file_dup.m4')dnl
+   m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)dnl
+',
 `
    include(`crt_driver_instantiation.asm.m4')
 ')

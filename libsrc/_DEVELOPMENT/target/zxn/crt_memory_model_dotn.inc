@@ -50,6 +50,8 @@ section code_time
 section code_z180
 section code_z80
 
+section code_dot
+
 section rodata_arch
 section rodata_clib
 section rodata_driver
@@ -62,9 +64,13 @@ section rodata_sound_bit
 section rodata_stdio
 section rodata_stdlib
 
+section rodata_dot
+
 section smc_clib
 section smc_fcntl
 section smc_l
+
+section smc_dot
 
 section data_arch
 section data_clib
@@ -77,6 +83,8 @@ section data_stdio
 section data_stdlib
 section data_threads
 
+section data_dot
+
 section bss_arch
 section bss_clib
 section bss_compress_aplib
@@ -88,20 +96,14 @@ section bss_stdio
 section bss_stdlib
 section bss_string
 
-section code_dot
-section rodata_dot
-section smc_dot
-section data_dot
 section bss_dot
-section bss_dot_uninitialized
-section dtn_allocated_pages
 
 SECTION CODE_END
 
-;; Dot Extension Code ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Main Bank ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-SECTION DTN
-org CRT_ORG_DTN
+SECTION MAIN
+org CRT_ORG_MAIN
 
 section code_adt_b_array
 section code_adt_b_vector
@@ -153,6 +155,8 @@ section code_lib
 section code_compiler
 section code_user
 
+section code_main
+
 section rodata_font
 section rodata_font_4x8
 section rodata_font_8x8
@@ -163,11 +167,7 @@ section rodata_lib
 section rodata_compiler
 section rodata_user
 
-section code_dtn
-section rodata_dtn
-section smc_dtn
-section data_dtn
-section bss_dtn
+section rodata_main
 
 SECTION DATA
 
@@ -219,6 +219,8 @@ section smc_lib
 section smc_compiler
 section smc_user
 
+section smc_main
+
 section data_driver
 section data_font
 
@@ -231,6 +233,8 @@ section data_sound_bit
 section data_lib
 section data_compiler
 section data_user
+
+section data_main
 
 SECTION DATA_END
 
@@ -287,12 +291,12 @@ section bss_lib
 section bss_compiler
 section bss_user
 
+section bss_main
+
 section BSS_UNINITIALIZED
-SECTION BSS_STACK_BOT
-   defs __crt_stack_size
-SECTION BSS_STACK_TOP
 SECTION BSS_END
-SECTION DTN_END
+
+SECTION MAIN_END
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

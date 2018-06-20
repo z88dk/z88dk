@@ -13,7 +13,7 @@
 
    cmdline_present:
 
-      include "../crt_cmdline_esxdos_len.inc"
+      include "crt_cmdline_esxdos_len.inc"
       
       ; copy command line words from basic program to stack
 

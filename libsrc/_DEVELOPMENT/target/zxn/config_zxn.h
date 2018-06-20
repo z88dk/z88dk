@@ -37,7 +37,12 @@
 
 
 #undef  __ZXNEXT
-#define __ZXNEXT    1
+#define __ZXNEXT  1
+
+#define __ZXNEXT_1MB  1
+#define __ZXNEXT_2MB  2
+
+#define __ZXNEXT_LAST_PAGE  223
 
 #define __ENV_FILENAME  "/sys/env"
 #define __ENV_GETENV_BUFSZ  64
@@ -2119,8 +2124,6 @@
 #define __NEXTOS_IDE_PARTITION_OPEN  0x00cd
 #define __NEXTOS_IDE_PARTITION_CLOSE  0x00d0
 #define __NEXTOS_IDE_PARTITIONS  0x01a5
-
-#define __NEXTOS_DOTN_SP_DIVMMC  0x4000
 
 #define __NEXTOS_RC_READY  0
 #define __NEXTOS_RC_WP  1
