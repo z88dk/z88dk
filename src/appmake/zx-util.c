@@ -22,6 +22,72 @@
 
 #define ZXN_UNIVERSAL_DOT_BINARY  "libsrc/_DEVELOPMENT/target/zxn/zxn_universal_dot.bin"
 
+/*
+    z88dk_ffs
+    missing from vs2015
+*/
+
+int z88dk_ffs(int n)
+{
+    int res;
+
+    if (n == 0) return 0;
+
+    for (res = 1; (n & 0x1) == 0; ++res)
+        n >>= 1;
+
+    return res;
+}
+
+/*
+    ZX Next Utility
+    Construct Contents of 8k Page
+*/
+
+void zxn_construct_page_contents(unsigned char *mem, struct memory_bank *mb, int fillbyte)
+{
+    FILE *fin;
+    int   j;
+    int   first, last, gap;
+
+    memset(mem, fillbyte, 8192);
+
+    gap = 0;
+
+    for (j = 0; j < mb->num; ++j)
+    {
+        struct section_bin *sb = &mb->secbin[j];
+
+        if (j == 0)
+            first = sb->org & 0x1fff;
+        else
+            gap += (sb->org & 0x1fff) - last;
+
+        if (((sb->org & 0x1fff) + sb->size) > 0x2000)
+            exit_log(1, "Error: Section %s exceeds 8k page [%d,%d)\n", sb->section_name, sb->org & 0x1fff, (sb->org & 0x1fff) + sb->size);
+
+        if ((fin = fopen(sb->filename, "rb")) == NULL)
+            exit_log(1, "Error: Can't open \"%s\"\n", sb->filename);
+
+        if (fseek(fin, sb->offset, SEEK_SET) != 0)
+            exit_log(1, "Error: Can't seek \"%s\" to %d\n", sb->filename, sb->offset);
+
+        if (fread(&mem[sb->org & 0x1fff], sb->size, 1, fin) != 1)
+            exit_log(1, "Error: Can't read [%d,%d) from \"%s\"\n", sb->offset, sb->offset + sb->size);
+
+        fclose(fin);
+
+        last = (sb->org & 0x1fff) + sb->size;
+    }
+
+    // information
+
+    if (first) printf(", %d head bytes free", first);
+    if (gap) printf(", %d gap bytes free", gap);
+    if (last - 0x2000 < 0) printf(", %d tail bytes free", 0x2000 - last);
+    printf("\n");
+}
+
 
 /*
    TAPE
@@ -704,7 +770,6 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt)
 
    * dot  : standard dot command resident in divmmc page at 0x2000 limited to ~7k+
    * dotx : extended dot command with first part at 0x2000 and limited to 7k+ and a second part in main ram
-   * dotn : zx next only same as dotx except ram pages are allocated from NextOS so as not to overwrite main ram
 
    July/Nov 2017 aralbrec
 */
@@ -865,6 +930,345 @@ int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory)
     }
 
     fclose(fout);
+    return 0;
+}
+
+/*
+NextOS Dotn Command
+zx next only ram pages are allocated from NextOS so as not to overwrite main ram
+
+June 2018 aralbrec
+*/
+
+#define ZXN_MAX_PAGE 223
+
+#define ZXN_ALLOCATE_LOAD 0xfd
+#define ZXN_ABSOLUTE_LOAD 0xfe
+#define ZXN_PHYSICAL_PAGE 0xff
+
+int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fillbyte)
+{
+    int  i;
+    int  bsnum_page;
+
+    char outname[9];
+
+    int main_org, main_end;
+    int overlay_alloc_mask, overlay_load_mask;
+
+    int appmake_handle;
+    int dotn_last_page, actual_last_page;
+    int dotn_extra_pages;
+    int dotn_main_overlay_mask;
+    int dotn_main_absolute_mask;
+
+    unsigned char mem[64 * 1024];
+
+    unsigned char z_alloc_table[MAXBANKS];
+    unsigned char z_page_table[MAXBANKS];
+
+    int main_bin_start;
+    int main_bin_end;
+    int dot_bin_end;
+
+    FILE *fout;
+
+    // find PAGE space
+
+    if ((bsnum_page = mb_find_bankspace(memory, "PAGE")) < 0)
+        exit_log(1, "Error: Can't find PAGE space\n");
+
+    // determine output filename
+
+    if (zxc->outfile == NULL)
+        snprintf(outname, sizeof(outname), "%.8s", zxc->binname);
+    else
+        snprintf(outname, sizeof(outname), "%.8s", zxc->outfile);
+
+    suffix_change(outname, "");
+
+    // capitalize output filename
+
+    for (i = 0; outname[i]; ++i)
+        outname[i] = toupper(outname[i]);
+
+    // collect parameters
+
+    if ((appmake_handle = parameter_search(zxc->crtfile, ".map", "__appmake_handle")) < 0)
+        exit_log(1, "Error: Can't find page area in dotn\n");
+
+    if ((dotn_last_page = parameter_search(zxc->crtfile, ".map", "DOTN_LAST_PAGE")) < 0)
+        exit_log(1, "Error: DOTN_LAST_PAGE not defined\n");
+
+    if ((dotn_last_page < 11) || (dotn_last_page > ZXN_MAX_PAGE))
+        exit_log(1, "Error: DOTN_LAST_PAGE %d must line in range [11,%d]\n", dotn_last_page, ZXN_MAX_PAGE);
+
+    if ((dotn_extra_pages = parameter_search(zxc->crtfile, ".map", "DOTN_EXTRA_PAGES")) < 0)
+        exit_log(1, "Error: DOTN_EXTRA_PAGES not defined\n");
+
+    if ((dotn_main_overlay_mask = parameter_search(zxc->crtfile, ".map", "DOTN_MAIN_OVERLAY_MASK")) < 0)
+        exit_log(1, "Error: DOTN_MAIN_OVERLAY_MASK not defined\n");
+
+    if ((dotn_main_absolute_mask = parameter_search(zxc->crtfile, ".map", "DOTN_MAIN_ABSOLUTE_MASK")) < 0)
+        exit_log(1, "Error: DOTN_MAIN_ABSOLUTE_MASK not defined\n");
+
+    main_bin_start = parameter_search(zxc->crtfile, ".map", "__MAIN_head");
+    main_bin_end = parameter_search(zxc->crtfile, ".map", "__MAIN_END_tail");
+
+    if ((main_bin_start >= 0) && (main_bin_end > main_bin_start))
+        printf("Notice: Main binary occupies [%d,%d]\n", main_bin_start, main_bin_end);
+
+    // initialize memory contents
+
+    memset(mem, fillbyte, sizeof(mem));
+
+    // write main bank into memory image
+
+    main_org = 0x10000;
+    main_end = 0;
+
+    dot_bin_end = 0;
+
+    for (i = 0; i < memory->mainbank.num; ++i)
+    {
+        FILE *fin;
+        struct section_bin *sb = &memory->mainbank.secbin[i];
+
+        if (sb->org < 0x2000)
+            exit_log(1, "Error: Section %s has org too low 0x%04x\n", sb->section_name, sb->org);
+
+        if ((sb->org < 0x4000) && (sb->org + sb->size >= 0x4000))
+            exit_log(1, "Error: Section %s extends past end of dot [0x%04x,0x%04x)\n", sb->section_name, sb->org, sb->org + sb->size);
+
+        if ((sb->org < 0x4000) && (sb->org + sb->size >= (0x4000 - 300)))
+            printf("Warning: Section %s may overlap stack area in divmmc memory [0x%04x,0x%04x)\n", sb->section_name, sb->org, sb->org + sb->size);
+
+        if ((sb->org >= 0x4000) && (sb->org + sb->size >= 0x10000))
+            exit_log(1, "Error: Section %s extends past end of main bank [0x%04x,0x%04x)\n", sb->section_name, sb->org, sb->org + sb->size);
+
+        if (sb->org < 0x4000)
+        {
+            if (dot_bin_end < (sb->org + sb->size))
+                dot_bin_end = sb->org + sb->size;
+        }
+
+        if (sb->org >= 0x4000)
+        {
+            if (sb->org < main_org)
+                main_org = sb->org;
+
+            if ((sb->org + sb->size - 1) > main_end)
+                main_end = sb->org + sb->size - 1;
+        }
+
+        if ((fin = fopen(sb->filename, "rb")) == NULL)
+            exit_log(1, "Error: Can't open file %s for reading\n", sb->filename);
+
+        if (fseek(fin, sb->offset, SEEK_SET) != 0)
+            exit_log(1, "Error: Can't seek to %" PRIu32 " in file %s\n", sb->offset, sb->filename);
+
+        if (fread(&mem[sb->org], sb->size, 1, fin) < 1)
+        {
+            fclose(fin);
+            exit_log(1, "Error: Expected %d bytes from file %s\n", sb->size, sb->filename);
+        }
+
+        fclose(fin);
+    }
+
+    printf("Notice: Space to end of dot is %d bytes\n", 0x4000 - dot_bin_end);
+
+    // round main_org down to nearest start of 8k page
+    // round main_end down to nearest start of 8k page
+
+    main_org &= 0x1e000;
+    main_end &= 0xe000;
+
+    // determine main bank overlay mask
+
+    if (main_org < 0x10000)
+    {
+        overlay_alloc_mask = (0xff << (main_org / 0x2000)) & 0xff;
+        overlay_load_mask = (0xff >> (7 - main_end / 0x2000)) & overlay_alloc_mask;
+    }
+    else
+    {
+        overlay_alloc_mask = 0;
+        overlay_load_mask = 0;
+    }
+
+    overlay_alloc_mask |= dotn_main_overlay_mask;
+    overlay_alloc_mask &= ~dotn_main_absolute_mask;
+
+    printf("Notice: Main bank allocation mask is 0x%02x\n", overlay_alloc_mask);
+    printf("Notice: Main bank load mask is 0x%02x\n", overlay_load_mask);
+
+    // overlay_load_mask: bits indicate which main bank pages should be loaded
+    // overlay_alloc_mask: bits indicate which main bank pages should be allocated
+
+    // create output file
+
+    if ((fout = fopen(outname, "wb")) == NULL)
+        exit_log(1, "Error: Couldn't create output file %s\n", outname);
+
+    // write dot portion to file
+
+    fwrite(&mem[0x2000], 8192, 1, fout);
+
+    // create page table contents
+    // write pages to file
+
+    actual_last_page = -1;
+
+    for (i = 0; i <= ZXN_MAX_PAGE; ++i)
+    {
+        int main_mask;
+        struct memory_bank *mb = &memory->bankspace[bsnum_page].membank[i];
+
+        // logical to physical mapping is 1:1 until modified at load time
+
+        z_page_table[i] = i;
+
+        // check for main bank page
+
+        switch (i)
+        {
+        // BANK 0
+
+        case 0:
+            main_mask = 0x40;   // mmu6
+            break;
+
+        case 1:
+            main_mask = 0x80;   // mmu7
+            break;
+
+        // BANK 2
+
+        case 4:
+            main_mask = 0x10;   // mmu4
+            break;
+
+        case 5:
+            main_mask = 0x20;   // mmu5
+            break;
+
+        // BANK 5
+
+        case 10:
+            main_mask = 0x04;   // mmu2
+            break;
+
+        case 11:
+            main_mask = 0x08;   // mmu3
+            break;
+
+        // not main bank
+
+        default:
+            main_mask = 0;
+            break;
+        }
+
+        // create allocation entry
+
+        z_alloc_table[i] = ZXN_PHYSICAL_PAGE;          // page is physical
+
+        if (main_mask)
+        {
+            // page is in main bank
+
+            if (overlay_alloc_mask & main_mask)
+                z_alloc_table[i] = ZXN_ALLOCATE_LOAD;  // indicate allocate and load
+            else if (overlay_load_mask & main_mask)
+                z_alloc_table[i] = ZXN_ABSOLUTE_LOAD;  // indicate load into absolute page
+
+            if (z_alloc_table[i] != ZXN_PHYSICAL_PAGE)
+            {
+                printf("Page %d, main bank %s\n", i, (z_alloc_table[i] == ZXN_ALLOCATE_LOAD) ? "allocated" : "physical");
+
+                actual_last_page = i;
+                fwrite(&mem[(z88dk_ffs(main_mask) - 1) * 0x2000], 8192, 1, fout);
+            }
+        }
+        else
+        {
+            // page not in main bank, check if part of the program
+
+            if (mb->num > 0)
+            {
+                unsigned char page[8192];
+
+                // indicate allocate and load
+
+                z_alloc_table[i] = ZXN_ALLOCATE_LOAD;
+
+                printf("Page %d", i);
+                zxn_construct_page_contents(page, mb, fillbyte);
+
+                // append to dotn
+
+                actual_last_page = i;
+                fwrite(page, sizeof(page), 1, fout);
+
+                // remove this PAGE from memory model
+
+                mb_remove_bank(&memory->bankspace[bsnum_page], i, zxc->clean);
+            }
+        }
+    }
+
+    // append extra pages to alloc table
+
+    memset(&z_alloc_table[dotn_last_page + 1], ZXN_ALLOCATE_LOAD, dotn_extra_pages);
+
+    // write page table data into dotn command
+
+    if ((actual_last_page >= 0) && (dotn_last_page < actual_last_page))
+    {
+        fclose(fout);
+        remove(outname);
+        exit_log(1, "Error: Insufficient space for allocation table\n       Increase DOTN_LAST_PAGE to %d\n", actual_last_page);
+    }
+
+    fseek(fout, appmake_handle - 0x2000, SEEK_SET);
+
+/*
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;; contiguous section filled in by appmake
+
+        __appmake_handle :
+
+        PUBLIC __z_page_table_sz
+        PUBLIC __z_page_extra_sz
+
+        __z_page_table_sz : defb DOTN_LAST_PAGE + 1; must be in this order
+        __z_page_extra_sz : defb DOTN_EXTRA_PAGES; must be in this order
+
+        PUBLIC __z_alloc_table
+
+        __z_alloc_table : defs DOTN_LAST_PAGE + DOTN_EXTRA_PAGES + 1, 0xff
+
+        PUBLIC __z_page_table
+        PUBLIC __z_page_extra
+
+        __z_page_table : defs DOTN_LAST_PAGE + 1; must be in this order
+        __z_page_extra : defs DOTN_EXTRA_PAGES; must be in this order
+
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+*/
+
+    writebyte(dotn_last_page + 1, fout);
+    writebyte(dotn_extra_pages, fout);
+
+    fwrite(z_alloc_table, dotn_last_page + dotn_extra_pages + 1, 1, fout);
+    fwrite(z_page_table, dotn_last_page + 1, 1, fout);
+
+    for (i = 0; i < dotn_extra_pages; ++i)
+        writebyte(0xff, fout);
+
+    fclose(fout);
+
     return 0;
 }
 
@@ -1040,7 +1444,7 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
     return_to_basic = parameter_search(zxc->crtfile, ".map", "__crt_on_exit");
     return_to_basic = (return_to_basic != -1) && ((return_to_basic & 0x30000) == 0x30000) && ((return_to_basic & 0xa) == 0x2);
 
-    // merge banks 5,2,0 into the main binary
+    // check if 128k snapshot is needed
 
     if (bsnum_bank >= 0)
     {
@@ -1050,37 +1454,13 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
 
             if (mb->num > 0)
             {
-                // merge banks 5,2,0 into main bank
+                // banks 5,2,0 should be empty as they've been merged already
 
                 if ((i == 0) || (i == 2) || (i == 5))
-                {
-                    // adjust org appropriately
-
-                    for (j = 0; j < mb->num; ++j)
-                    {
-                        if (i == 0)
-                            mb->secbin[j].org += 0xc000 - 0xc000;
-                        else if (i == 2)
-                            mb->secbin[j].org += 0x8000 - 0xc000;
-                        else
-                            mb->secbin[j].org += 0x4000 - 0xc000;
-                    }
-
-                    // move sections to main bank
-
-                    memory->mainbank.secbin = must_realloc(memory->mainbank.secbin, (memory->mainbank.num + mb->num) * sizeof(*memory->mainbank.secbin));
-                    memcpy(&memory->mainbank.secbin[memory->mainbank.num], mb->secbin, mb->num * sizeof(*memory->mainbank.secbin));
-                    memory->mainbank.num += mb->num;
-
-                    free(mb->secbin);
-
-                    mb->num = 0;
-                    mb->secbin = NULL;
-
-                    printf("Notice: Merged BANK_%d into the main memory bank\n", i);
-                }
-                else
-                    is_128++;
+                    exit_log(1, "Error: Bank %d should have been merged into the main bank\n", i);
+                
+                is_128++;
+                break;
             }
         }
     }

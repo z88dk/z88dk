@@ -66,6 +66,9 @@ find_end:
 
    ld a,(hl)
    
+   cp '|'
+   jr z, redirector
+   
    cp '>'
    jr z, redirector
    

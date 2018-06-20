@@ -358,6 +358,10 @@ struct esx_stat
 #define ESX_MODE_READ  __esx_mode_read
 #define ESX_MODE_WRITE  __esx_mode_write
 
+#define ESX_MODE_R  __esx_mode_read
+#define ESX_MODE_W  __esx_mode_write
+#define ESX_MODE_RW  (__esx_mode_read | __esx_mode_write)
+
 // one of:
 
 #define ESX_MODE_OPEN_EXIST  __esx_mode_open_exist

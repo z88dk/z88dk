@@ -15,7 +15,7 @@ ENDIF
    
    EXTERN __DTX_head
    
-   ld hl,(23730)               ; hl = RAMTOP
+   ld hl,(__SYSVAR_RAMTOP)
    ld de,__DTX_head
    
    xor a
@@ -37,13 +37,13 @@ ENDIF
    
    EXTERN l_utoa
    
-   ex de,hl                    ; hl = __DTX_head
-   ld de,error_ramtop+18       ; de = & "00000"
-   
-   call l_utoa                 ; to ascii without leading zeroes
-   
-   ld a,')'+0x80
-   ld (de),a                   ; terminate the string
+   ex de,hl
+   dec hl                      ; hl = __DTX_head - 1
+
+   ld de,error_ramtop_address  ; de = & "00000"
+
+   scf
+   call l_utoa                 ; to ascii with leading zeroes
    
    xor a
    scf
@@ -53,11 +53,20 @@ ENDIF
 
 error_ramtop:
 
-   defm "M RAMTOP no good (00000)"
+   defm "M RAMTOP no good ("
 
-__esxdos_dtx_fname:
+error_ramtop_address:
 
-   defs 18                     ; filled in by appmake
+   defm "00000"
+   defb ')'+0x80
+
+esxdos_dtx_filename:
+
+   defm "__ENV_BINDIR"         ; from config_target.m4
+
+__z_dtx_filename:
+
+   defs 13                     ; filled in by appmake
 
 ramtop_good:
 
@@ -66,7 +75,7 @@ ramtop_good:
    ;;
 
    ld a,'$'
-   ld hl,__esxdos_dtx_fname
+   ld hl,esxdos_dtx_filename
    ld b,__ESXDOS_MODE_OPEN_EXIST | __ESXDOS_MODE_READ
    
    rst  __ESXDOS_SYSCALL
@@ -87,13 +96,9 @@ ENDIF
 
    EXTERN __DTX_END_tail
 
-esxdos_dotx_len:
-
    ld bc,__DTX_END_tail - __DTX_head
    ld hl,__DTX_head
 
-defc __esxdos_dotx_len = esxdos_dotx_len + 1
-   
    rst  __ESXDOS_SYSCALL
    defb __ESXDOS_SYS_F_READ
 

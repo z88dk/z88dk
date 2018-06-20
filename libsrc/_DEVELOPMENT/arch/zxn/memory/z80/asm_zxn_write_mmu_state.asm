@@ -32,19 +32,17 @@ loop:
    ld a,(hl)
    inc hl
 
-   inc a
-   jr nz, write
+   cp __ZXNEXT_LAST_PAGE + 1
+   jr c, write
    
    ld a,e
    
    cp __REG_MMU2
    jr nc, skip
    
-   xor a
+   ld a,0xff
 
 write:
-
-   dec a
    
    out (c),e
    inc b

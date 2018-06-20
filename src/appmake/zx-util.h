@@ -14,6 +14,7 @@ struct zx_common
     char           clean;
     int            main_fence;
     char           pages;
+    FILE          *file;
 };
 
 struct zx_tape
@@ -54,10 +55,13 @@ struct zx_bin
     int            recsize;
 };
 
+extern int  z88dk_ffs(int n);
+extern void zxn_construct_page_contents(unsigned char *mem, struct memory_bank *mb, int fillbyte);
+
 extern int zx_tape(struct zx_common *zxc, struct zx_tape *zxt);
 extern int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory);
+extern int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fillbyte);
 extern int zxn_universal_dot(struct zx_common *zxc);
 extern int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memory, int is_zxn);
-
 
 #endif

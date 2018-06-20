@@ -22,7 +22,8 @@ static struct zx_common zxc = {
     NULL,       // excluded_sections
     0,          // clean
     -1,         // main_fence applies to banked model compiles only
-    0           // pages
+    0,          // pages
+    NULL        // file
 };
 
 static struct zx_tape zxt = {
@@ -63,6 +64,7 @@ static struct zx_bin zxb = {
 static char tap = 0;            // .tap tape
 static char sna = 0;            // .sna 48k/128k snapshot
 static char dot = 0;            //  esxdos dot command
+static char dotn = 0;           //  nextos dot command
 static char universal_dot = 0;  //  nextos universal dot command
 static char zxn = 0;            // .zxn full size memory executable
 static char bin = 0;            // .bin output binaries with banks correctly merged
@@ -102,6 +104,7 @@ option_t zxn_options[] = {
     {  0,  "clean",    "Remove consumed source binaries\n", OPT_BOOL, &zxc.clean },
 
     {  0,  "dot",      "Make esxdos dot command instead of .tap", OPT_BOOL, &dot },
+    {  0,  "dotn",     "Make nextos dot command instead of .tap", OPT_BOOL, &dotn },
     {  0,  "universal-dot", "Make universal dot command instead of .tap\n", OPT_BOOL, &universal_dot },
 
     {  0,  "audio",     "Create also a WAV file",    OPT_BOOL,  &zxt.audio },
@@ -121,8 +124,9 @@ option_t zxn_options[] = {
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
+
 /*
-* Execution starts here
+ * Execution starts here
 */
 
 #define LINELEN  1024
@@ -168,7 +172,7 @@ int zxn_exec(char *target)
         zxs.xsna = 1;
     }
 
-    tap = !dot && !sna && !zxn && !bin;
+    tap = !dot && !dotn && !sna && !zxn && !bin;
 
     if (tap && (zxc.main_fence > 0))
         fprintf(stderr, "Warning: Main-fence is ignored for tap compiles\n");
@@ -439,6 +443,57 @@ int zxn_exec(char *target)
     if (mb_sort_banks(&memory))
         exit_log(1, "Aborting... one or more binaries overlap\n");
 
+    // if using 5,2,0 main bank executable model, merge these banks into the main bank
+
+    if (sna || dotn)
+    {
+        if (bsnum_bank >= 0)
+        {
+            for (i = 0; i < 8; ++i)
+            {
+                struct memory_bank *mb = &memory.bankspace[bsnum_bank].membank[i];
+
+                if (mb->num > 0)
+                {
+                    // merge banks 5,2,0 into main bank
+
+                    if ((i == 0) || (i == 2) || (i == 5))
+                    {
+                        // adjust org appropriately
+
+                        for (j = 0; j < mb->num; ++j)
+                        {
+                            if (i == 0)
+                                mb->secbin[j].org += 0xc000 - 0xc000;
+                            else if (i == 2)
+                                mb->secbin[j].org += 0x8000 - 0xc000;
+                            else
+                                mb->secbin[j].org += 0x4000 - 0xc000;
+                        }
+
+                        // move sections to main bank
+
+                        memory.mainbank.secbin = must_realloc(memory.mainbank.secbin, (memory.mainbank.num + mb->num) * sizeof(*memory.mainbank.secbin));
+                        memcpy(&memory.mainbank.secbin[memory.mainbank.num], mb->secbin, mb->num * sizeof(*memory.mainbank.secbin));
+                        memory.mainbank.num += mb->num;
+
+                        free(mb->secbin);
+
+                        mb->num = 0;
+                        mb->secbin = NULL;
+
+                        printf("Notice: Merged BANK_%d into the main memory bank\n", i);
+                    }
+                }
+            }
+
+            // sort the memory banks and look for section overlaps
+
+            if (mb_sort_banks(&memory))
+                exit_log(1, "Aborting... one or more binaries overlap\n");
+        }
+    }
+
     // check if main binary extends past fence
 
     if (zxc.main_fence > 0)
@@ -502,6 +557,13 @@ int zxn_exec(char *target)
 
         mb_remove_mainbank(&memory.mainbank, zxc.clean);
     }
+
+    if (dotn)
+    {
+        zxc.pages = 1;
+    }
+
+    // sna snapshot
 
     if (sna)
     {
@@ -667,54 +729,15 @@ int zxn_exec(char *target)
 
                 if (mb->num > 0)
                 {
-                    FILE *fin;
                     unsigned char mem[8192];
-                    int first, last, gap;
 
-                    memset(mem, zxb.romfill, sizeof(mem));
+                    printf("Page %d", i);
+                    zxn_construct_page_contents(mem, mb, zxb.romfill);
 
-                    // PAGE_i
-
-                    gap = 0;
-
-                    for (j = 0; j < mb->num; ++j)
-                    {
-                        struct section_bin *sb = &mb->secbin[j];
-
-                        if (j == 0)
-                            first = sb->org & 0x1fff;
-                        else
-                            gap += (sb->org & 0x1fff) - last;
-
-                        if (((sb->org & 0x1fff) + sb->size) > 0x2000)
-                            exit_log(1, "Error: Section %s exceeds 8k page [%d,%d)\n", sb->section_name, sb->org & 0x1fff, (sb->org & 0x1fff) + sb->size);
-
-                        if ((fin = fopen(sb->filename, "rb")) == NULL)
-                            exit_log(1, "Error: Can't open \"%s\"\n", sb->filename);
-
-                        if (fseek(fin, sb->offset, SEEK_SET) != 0)
-                            exit_log(1, "Error: Can't seek \"%s\" to %d\n", sb->filename, sb->offset);
-
-                        if (fread(&mem[sb->org & 0x1fff], sb->size, 1, fin) != 1)
-                            exit_log(1, "Error: Can't read [%d,%d) from \"%s\"\n", sb->offset, sb->offset + sb->size);
-
-                        fclose(fin);
-
-                        last = (sb->org & 0x1fff) + sb->size;
-                    }
-
-                    // append to output sna
+                    // append to sna
 
                     fputc(i, zxs.fsna);
                     fwrite(mem, sizeof(mem), 1, zxs.fsna);
-
-                    // information
-
-                    printf("Adding Page %d", i);
-                    if (first) printf(", %d head bytes free", first);
-                    if (gap) printf(", %d gap bytes free", gap);
-                    if (last - 0x2000 < 0) printf(", %d tail bytes free", 0x2000 - last);
-                    printf("\n");
 
                     // remove this PAGE from memory model
 
@@ -734,9 +757,23 @@ int zxn_exec(char *target)
         zxs.fsna = 0;
     }
     
+    // nextos dotn command
+
+    if (dotn)
+    {
+        if ((ret = zxn_dotn_command(&zxc, &memory, zxb.romfill)) != 0)
+            return ret;
+
+        // dotn is out but we need to process the rest of the binaries too
+        // so remove mainbank and PAGE space since they've already been consumed
+
+        mb_remove_mainbank(&memory.mainbank, zxc.clean);
+        // mb_remove_bankspace(&memory, "PAGE");
+    }
+
     // output remaining memory bank contents as raw binaries
     
-    if (bin || sna || dot || tap)
+    if (bin || sna || dot || dotn || tap)
     {
         mb_generate_output_binary_complete(zxc.binname, zxb.ihex, zxb.romfill, zxb.ipad, zxb.recsize, &memory);
         ret = 0;
