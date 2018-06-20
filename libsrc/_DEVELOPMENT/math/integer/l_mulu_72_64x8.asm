@@ -3,6 +3,7 @@ INCLUDE "config_private.inc"
 
 SECTION code_clib
 SECTION code_math
+
 PUBLIC l_mulu_72_64x8
 
    ; multiplication of a 64-bit number and an 8-bit number into 72-bit result
@@ -15,11 +16,10 @@ PUBLIC l_mulu_72_64x8
    ;
    ; uses  : af, bc, de, hl, bc', de', hl'
 
-   
 IF __CLIB_OPT_IMATH <= 50
 
    EXTERN l_small_mul_72_64x8
-   
+
    defc l_mulu_72_64x8 = l_small_mul_72_64x8
 
 ENDIF
