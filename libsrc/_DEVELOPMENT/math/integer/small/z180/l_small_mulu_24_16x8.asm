@@ -26,7 +26,6 @@ l_small_mulu_24_16x8:
    ld  h,a
 
    ld  a,d
-   ret NC                      ; return if no carry
-   inc a
+   adc a,0
    ret
 
