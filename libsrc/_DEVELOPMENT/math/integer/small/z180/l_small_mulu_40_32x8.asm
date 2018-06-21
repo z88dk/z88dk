@@ -45,6 +45,8 @@ l_small_mulu_40_32x8:
    pop bc
    adc a,c
    ld d,a
-
+   
+   ld a,b
+   adc a,0
    ret
 
