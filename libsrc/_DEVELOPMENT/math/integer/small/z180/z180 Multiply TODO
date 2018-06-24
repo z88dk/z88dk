@@ -45,7 +45,7 @@ PUBLIC l_mulu_32_16x16
         ; exit  : dehl = 32-bit product
         ;         carry reset
 
-	; math/integer/l_mulu_32_32x32  TODO
+	; math/integer/l_mulu_32_32x32
 PUBLIC l_mulu_32_32x32
     ; compute:  dehl = dehl * dehl'
     EXTERN l_small_mul_32_32x32
@@ -53,6 +53,12 @@ PUBLIC l_mulu_32_32x32
         ;         dehl'= 32-bit multiplicand (more leading zeroes = better performance)
         ; exit  : dehl = 32-bit product
         ;         carry reset
+        EXTERN l0_small_mul_32_32x32
+            ; enter : dede' = 32-bit multiplier   = x
+            ;         bcbc' = 32-bit multiplicand = y
+            ;         hlhl' = 0
+            ; exit  : dehl = 32-bit product
+            ;         carry reset
 
 	; math/integer/l_mulu_40_32x8
 PUBLIC l_mulu_40_32x8
@@ -74,6 +80,12 @@ PUBLIC l_mulu_64_32x32
         ;         dehl'= 32-bit multiplicand
         ; exit  : dehl dehl' = 64-bit product
         ;         carry reset
+        EXTERN l0_small_mul_64_32x32
+            ; enter : bc'bc = 32-bit multiplier    = x
+            ;         de'de = 32-bit multiplicand  = y
+            ;         hl'hl = 0
+            ; exit  : dehl dehl' = 64-bit product
+            ;         carry reset
 
 	; math/integer/l_mulu_64_64x64  TODO
 PUBLIC l_mulu_64_64x64
@@ -105,10 +117,19 @@ PUBLIC l_mulu_64_64x64
         ;         dehl' dehl = 64-bit product
         ;         carry reset
         EXTERN l0_small_mul_64_32x32
+            ; enter : bc'bc = 32-bit multiplier    = x
+            ;         de'de = 32-bit multiplicand  = y
+            ;         hl'hl = 0
+            ; exit  : dehl dehl' = 64-bit product
+            ;         carry reset
         EXTERN l0_small_mul_32_32x32
+            ; enter : dede' = 32-bit multiplier   = x
+            ;         bcbc' = 32-bit multiplicand = y
+            ;         hlhl' = 0
+            ; exit  : dehl = 32-bit product
+            ;         carry reset
 
-
-	; math/integer/l_mulu_72_64x8   TODO
+	; math/integer/l_mulu_72_64x8
 PUBLIC l_mulu_72_64x8
     ; enter :   dehl'dehl = 64-bit multiplicand
     ;                   a = 8-bit multiplicand
