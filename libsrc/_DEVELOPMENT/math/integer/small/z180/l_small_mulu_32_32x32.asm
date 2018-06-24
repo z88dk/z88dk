@@ -1,5 +1,7 @@
 ;   @feilipu 2018
 
+INCLUDE "config_private.inc"
+
 IF __Z180
 
 SECTION code_clib
@@ -113,15 +115,15 @@ l0_small_z180_mulu_32_32x32:
 
     pop bc                      ; y1 y0
     pop de                      ; x3 x2
-    ld a,b
+    ld h,b
     ld b,d
-    ld d,a
+    ld d,h
     mlt bc                      ; x3 * y0
     mlt de                      ; y1 * x2
 
-    add a,c
+    add a,c                     ; add low bytes of products
     add a,e
-    ld h,a                      ; put p3 back in H
+    ld h,a                      ; put final p3 back in H
 
     push hl
 

@@ -1,3 +1,6 @@
+; @feilipu 2018
+
+INCLUDE "config_private.inc"
 
 IF __Z180
 

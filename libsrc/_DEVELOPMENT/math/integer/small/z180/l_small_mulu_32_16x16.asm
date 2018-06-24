@@ -1,4 +1,6 @@
 
+INCLUDE "config_private.inc"
+
 IF __Z180
 
 SECTION code_clib
