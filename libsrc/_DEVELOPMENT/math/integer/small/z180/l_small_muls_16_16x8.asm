@@ -1,3 +1,6 @@
+
+IF __Z180
+
 SECTION code_clib
 SECTION code_math
 
@@ -42,4 +45,6 @@ l_neg_l:
     ld l,a
     inc l
     ret
+
+ENDIF
 

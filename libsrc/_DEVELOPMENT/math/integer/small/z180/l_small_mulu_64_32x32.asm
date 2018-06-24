@@ -1,3 +1,6 @@
+
+IF __Z180
+
 SECTION code_clib
 SECTION code_math
 
@@ -22,4 +25,6 @@ l0_small_z180_mulu_64_32x32:
     ; result = hl' hl bc' ac
 
     ret
+
+ENDIF
 

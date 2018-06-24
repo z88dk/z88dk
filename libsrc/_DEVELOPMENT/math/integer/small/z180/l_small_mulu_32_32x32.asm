@@ -1,5 +1,7 @@
 ;   @feilipu 2018
 
+IF __Z180
+
 SECTION code_clib
 SECTION code_math
 
@@ -127,4 +129,6 @@ l0_small_z180_mulu_32_32x32:
     pop de
     xor a                       ; carry reset
     ret                         ; exit  : DEHL = 32-bit product
+
+ENDIF
 

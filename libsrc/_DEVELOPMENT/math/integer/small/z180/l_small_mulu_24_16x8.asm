@@ -1,3 +1,6 @@
+
+IF __Z180
+
 SECTION code_clib
 SECTION code_math
 
@@ -28,4 +31,6 @@ l_small_z180_mulu_24_16x8:
     ld  a,d
     adc a,0
     ret
+
+ENDIF
 

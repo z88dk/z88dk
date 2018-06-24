@@ -1,3 +1,6 @@
+
+IF __Z180
+
 SECTION code_clib
 SECTION code_math
 
@@ -27,4 +30,6 @@ l_small_z180_mulu_16_16x8:
 
     xor a
     ret
+
+ENDIF
 

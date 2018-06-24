@@ -1,3 +1,6 @@
+
+IF __Z180
+
 SECTION code_clib
 SECTION code_math
 
@@ -35,4 +38,6 @@ l_small_z180_muls_32_16x16:
     xor c
     jp M,l_neg_dehl             ; negate product if needed, and return
     ret
+
+ENDIF
 

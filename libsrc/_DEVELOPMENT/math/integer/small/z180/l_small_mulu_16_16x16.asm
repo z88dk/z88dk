@@ -1,6 +1,8 @@
 ; 2017 dom / feilipu
 ; 2017 aralbrec - slightly faster
 
+IF __Z180
+
 SECTION code_clib
 SECTION code_math
 
@@ -34,4 +36,6 @@ l_small_z180_mulu_16_16x16:
 
     or a
     ret
+
+ENDIF
 
