@@ -22,7 +22,7 @@ l0_small_z180_mulu_32_32x32:
     ;
     ; uses  : af, bc, de, hl, bc', de', hl'
 
-    ; save material for the highest order byte p3 = x3*y0 + x2*y1 + x1*y2 + x0*y3 ++
+    ; save material for the highest order byte p3 = x3*y0 + x2*y1 + x1*y2 + x0*y3 + carry
     push de                     ; x3 x2
     exx
     push bc                     ; y1 y0
@@ -64,9 +64,9 @@ l0_small_z180_mulu_32_32x32:
     mlt bc                      ; x0 * y1
     mlt hl                      ; x1 * y0
 
+    xor a                       ; zero A
     add hl,bc                   ; sum cross products p2 p1
-    sbc a,a                     ; capture carry p3
-    and $01                     ; isolate carry p3
+    adc a,a                     ; capture carry p3
     ld b,a
     ld c,h                      ; LSB of MSW from cross products
 
@@ -83,10 +83,10 @@ l0_small_z180_mulu_32_32x32:
     push hl                     ; stack interim p3 p2
     ex de,hl                    ; DEHL = end of 32_16x16
 
-    ; start doing the p2 byte, using the existing HL
+    ; start doing the p2 byte
 
     exx                         ; now we're working in the high order bytes
-                                ; DE'HL' = end of 32_16x16
+                                ; DEHL' = end of 32_16x16
     pop hl                      ; stack interim p3 p2
 
     pop bc                      ; x0 y0
@@ -99,7 +99,7 @@ l0_small_z180_mulu_32_32x32:
     add hl,bc
     add hl,de
 
-    ; start doing the p3 byte, using the existing H
+    ; start doing the p3 byte
 
     pop bc                      ; y3 y2
     pop de                      ; x1 x0

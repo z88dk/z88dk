@@ -36,9 +36,9 @@ l_small_z180_mulu_32_16x16:
     mlt bc                      ; xl * yh
     mlt hl                      ; xh * yl
 
+    xor a                       ; zero A
     add hl,bc                   ; sum cross products
-    sbc a,a                     ; capture carry
-    and $01                     ; isolate carry
+    adc a,a                     ; capture carry
     ld b,a                      ; carry from cross products
     ld c,h                      ; LSB of MSW from cross products
 
