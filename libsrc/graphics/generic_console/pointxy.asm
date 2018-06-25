@@ -33,7 +33,7 @@
 			push	hl		; save coordinates
 	
 			ld	c,l
-			ld	h,b
+			ld	b,h
 			srl	c
 			srl	b
 			call	generic_console_vpeek
