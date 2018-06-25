@@ -72,9 +72,13 @@ int ldir_skel2[]={11, 17, CATCH, CATCH, 33, SKIP, SKIP, 1, SKIP, SKIP, 0xED, 0xB
 
 
 /* Hudson Software HuBASIC detection */
-int hubas_skel[]={13, 0x3E, CATCH, 0x21, 0x3E, SKIP, 0x21, 0x3E, SKIP, 0x21, 0x3E, SKIP, 0x21, 0x3E}; 
-int huproduct_skel[]={8, ADDR, 'H', 'u', 'B', 'A', 'S', 'I', 'C'};
-int hudson_skel[]={8, ADDR, 'H', 'u', 'd', 's', 'o', 'n'};
+int hubas_skel[]={15, 0x7F,0x4C,0xCC,0xCC,0xCC,0xCC,0xCC,0xCD,0x81,0x55,0x55,0x55,0x55,0x55,CATCH}; 
+int hubas_ext_skel[]={13, 0x3E, CATCH, 0x21, 0x3E, SKIP, 0x21, 0x3E, SKIP, 0x21, 0x3E, SKIP, 0x21, 0x3E}; 
+int huproduct_skel[]={8, CATCH, 'H', 'u', 'B', 'A', 'S', 'I', 'C'};
+int hudson_skel[]={7, CATCH, 'H', 'u', 'd', 's', 'o', 'n'};
+int hudson_skel2[]={7, CATCH, 'H', 'U', 'D', 'S', 'O', 'N'};
+
+int sharp_skel[]={6, CATCH, 'S', 'H', 'A', 'R', 'P'};
 
 int tkhudson_skel[]={11, 0x01, CATCH, CATCH, 0xFE, 0x20, 0xDA, SKIP, SKIP, 0xFE, 0x22, 0x28};
 int tkhudson_skel2[]={15, 0xFE, 0xFE, 0x38, SKIP, 0x3C, 0x01, CATCH, CATCH, 0x28, SKIP, 0x01, SKIP, SKIP, 0x7E, 0x23};
@@ -94,13 +98,6 @@ int hu_input[]={14, ADDR, 0x2A, SKIP, SKIP, 0xE5, 0xD5, 0xCD, SKIP, SKIP, 0xD1, 
 int hu_inputl[]={12, 0xE5, 0xD5, 0xCD, SKIP, SKIP, 0xD1, 0x36, 0, 0xE1, 0xCD, CATCH, CATCH};
 int hu_curxst[]={12, 0xD1, 0x36, 0, 0xE1, 0xCD, SKIP, SKIP, 0x38, SKIP, 0x3A, CATCH, CATCH};
 
-//0000058A:	INC L
-//0000058B:	LD A,(005Ch)	CURXED
-//0000058E:	CP L
-//0000058F:	JP NC,07D2h		JR
-//00000592:	LD A,(005Bh)
-//00000595:	LD L,A
-//00000596:	INC H
 
 int hu_filad[]={15, 0xCD, SKIP, SKIP, 0xF1, 0xE1, 0x30, 3, 0x2A, CATCH, CATCH, 0xED, 0x4B, SKIP, SKIP, 0xCD};
 int hu_filsz[]={15, 0xCD, SKIP, SKIP, 0xF1, 0xE1, 0x30, 3, 0x2A, SKIP, SKIP, 0xED, 0x4B, CATCH, CATCH, 0xCD};
@@ -109,6 +106,43 @@ int hu_filblock[]={14, 0xF1, 0xE1, 0x30, 3, 0x2A, SKIP, SKIP, 0xED, 0x4B, SKIP, 
 int hu_mon_cmd[]={10, 0x13, 0xD9, 0x21, CATCH, CATCH, 0x06, 0x0A, 0xBE, 0x23, 0x28};
 int hu_putc[]={13, 0x3E, 0x2A, 0xCD, CATCH, CATCH, 0xCD, SKIP, SKIP, 0x30, SKIP, 0x1A, 0xFE, 0x2A};
 int hu_mon_getl[]={13, 0x3E, 0x2A, 0xCD, SKIP, SKIP, 0xCD, CATCH, CATCH, 0x30, SKIP, 0x1A, 0xFE, 0x2A};
+
+/* HuBASIC FP math internal functions */
+
+int hufp_mul[]={36, 0xEB, 0xE1, 0xCD, CATCH, CATCH, 0x11, SKIP, SKIP, 0xCD, SKIP, SKIP, 0xCD, SKIP, SKIP, 0xCD, SKIP, SKIP, 0xEB, 0x2A, SKIP, SKIP, 0xCD, SKIP, SKIP, 0x11, SKIP, SKIP, 0xCD, SKIP, SKIP, 0xD1, 0xCD, SKIP, SKIP, 0xC1, 0xC9};
+int hufp_multwo[]={36, 0xEB, 0xE1, 0xCD, SKIP, SKIP, 0x11, SKIP, SKIP, 0xCD, CATCH, CATCH, 0xCD, SKIP, SKIP, 0xCD, SKIP, SKIP, 0xEB, 0x2A, SKIP, SKIP, 0xCD, SKIP, SKIP, 0x11, SKIP, SKIP, 0xCD, SKIP, SKIP, 0xD1, 0xCD, SKIP, SKIP, 0xC1, 0xC9};
+int hufp_add[]={36, 0xEB, 0xE1, 0xCD, SKIP, SKIP, 0x11, SKIP, SKIP, 0xCD, SKIP, SKIP, 0xCD, CATCH, CATCH, 0xCD, SKIP, SKIP, 0xEB, 0x2A, SKIP, SKIP, 0xCD, SKIP, SKIP, 0x11, SKIP, SKIP, 0xCD, SKIP, SKIP, 0xD1, 0xCD, SKIP, SKIP, 0xC1, 0xC9};
+int hufp_divtwo[]={36, 0xEB, 0xE1, 0xCD, SKIP, SKIP, 0x11, SKIP, SKIP, 0xCD, SKIP, SKIP, 0xCD, SKIP, SKIP, 0xCD, CATCH, CATCH, 0xEB, 0x2A, SKIP, SKIP, 0xCD, SKIP, SKIP, 0x11, SKIP, SKIP, 0xCD, SKIP, SKIP, 0xD1, 0xCD, SKIP, SKIP, 0xC1, 0xC9};
+int hufp_snfac0[]={36, 0xEB, 0xE1, 0xCD, SKIP, SKIP, 0x11, SKIP, SKIP, 0xCD, SKIP, SKIP, 0xCD, SKIP, SKIP, 0xCD, SKIP, SKIP, 0xEB, 0x2A, CATCH, CATCH, 0xCD, SKIP, SKIP, 0x11, SKIP, SKIP, 0xCD, SKIP, SKIP, 0xD1, 0xCD, SKIP, SKIP, 0xC1, 0xC9};
+
+int hufp_mul2[]={32, 0xEB, 0xE1, 0xCD, CATCH, CATCH, 0x11, SKIP, SKIP, 0x34, 0xCD, SKIP, SKIP, 0x35, 0xEB, 0x2A, SKIP, SKIP, 0xCD, SKIP, SKIP, 0x11, SKIP, SKIP, 0xCD, SKIP, SKIP, 0xD1, 0xCD, SKIP, SKIP, 0xC1, 0xC9};
+int hufp_add2[]={32, 0xEB, 0xE1, 0xCD, SKIP, SKIP, 0x11, SKIP, SKIP, 0x34, 0xCD, CATCH, CATCH, 0x35, 0xEB, 0x2A, SKIP, SKIP, 0xCD, SKIP, SKIP, 0x11, SKIP, SKIP, 0xCD, SKIP, SKIP, 0xD1, 0xCD, SKIP, SKIP, 0xC1, 0xC9};
+int hufp_snfac0_2[]={32, 0xEB, 0xE1, 0xCD, SKIP, SKIP, 0x11, SKIP, SKIP, 0x34, 0xCD, SKIP, SKIP, 0x35, 0xEB, 0x2A, CATCH, CATCH, 0xCD, SKIP, SKIP, 0x11, SKIP, SKIP, 0xCD, SKIP, SKIP, 0xD1, 0xCD, SKIP, SKIP, 0xC1, 0xC9};
+
+int hufp_snfac1_2[]={21, 0x22, CATCH, CATCH, 0x5F, 0x16, 0x00, 0xCD, SKIP, SKIP, 0x3A, SKIP, SKIP, 0xE6, 0x80, 0x23, 0xB6, 0x77, 0x2B, 0xEB, 0xE1, 0xCD};
+int hufp_flthex[]={21, 0x22, SKIP, SKIP, 0x5F, 0x16, 0x00, 0xCD, CATCH, CATCH, 0x3A, SKIP, SKIP, 0xE6, 0x80, 0x23, 0xB6, 0x77, 0x2B, 0xEB, 0xE1, 0xCD};
+int hufp_logexp[]={21, 0x22, SKIP, SKIP, 0x5F, 0x16, 0x00, 0xCD, SKIP, SKIP, 0x3A, CATCH, CATCH, 0xE6, 0x80, 0x23, 0xB6, 0x77, 0x2B, 0xEB, 0xE1, 0xCD};
+
+
+int hufp_power2[]={25, 0xCD, CATCH, CATCH, 0xD5, 0xE5, 0x11, SKIP, SKIP, 0xCD, SKIP, SKIP, 0x21, SKIP, SKIP, 0xD1, 0xCD, SKIP, SKIP, 0xD5, 0xCD, SKIP, SKIP, 0xE1, 0xD1, 0xC9};
+int hufp_zfac1[]={25, 0xCD, CATCH, CATCH, 0xD5, 0xE5, 0x11, SKIP, SKIP, 0xCD, SKIP, SKIP, 0x21, SKIP, SKIP, 0xD1, 0xCD, SKIP, SKIP, 0xD5, 0xCD, SKIP, SKIP, 0xE1, 0xD1, 0xC9};
+int hufp_ldir1[]={25, 0xCD, CATCH, CATCH, 0xD5, 0xE5, 0x11, SKIP, SKIP, 0xCD, SKIP, SKIP, 0x21, SKIP, SKIP, 0xD1, 0xCD, SKIP, SKIP, 0xD5, 0xCD, SKIP, SKIP, 0xE1, 0xD1, 0xC9};
+
+
+int hufp_oneadd[]={21, 0xE1, 0xCD, CATCH, CATCH, 0xE3, 0xCD, SKIP, SKIP, 0xD1, 0xCD, SKIP, SKIP, 0xD5, 0xCD, SKIP, SKIP, 0xE1, 0xD5, 0x5D, 0x54, 0xCD};
+int hufp_sub[]={21, 0xE1, 0xCD, SKIP, SKIP, 0xE3, 0xCD, CATCH, CATCH, 0xD1, 0xCD, SKIP, SKIP, 0xD5, 0xCD, SKIP, SKIP, 0xE1, 0xD5, 0x5D, 0x54, 0xCD};
+int hufp_div[]={21, 0xE1, 0xCD, SKIP, SKIP, 0xE3, 0xCD, SKIP, SKIP, 0xD1, 0xCD, CATCH, CATCH, 0xD5, 0xCD, SKIP, SKIP, 0xE1, 0xD5, 0x5D, 0x54, 0xCD};
+
+int hufp_ldir5[]={18, 0xE5, 0xD5, 0xCD, SKIP, SKIP, 0xE1, 0x11, CATCH, CATCH, 0xCD, SKIP, SKIP, 0xEB, 0xE1, 0xCD, SKIP, SKIP, 0x11};
+
+int hufp_memmax[]={13, 0xE5, 0x11, SKIP, 0, 0x19, 0xEB, 0x2A, CATCH, CATCH, 0x2B, 0xED, 0x52, 0xDA};
+int hufp_addhl5[]={14, ADDR, 0xE5, 0x11, SKIP, 0, 0x19, 0xEB, 0x2A, SKIP, SKIP, 0x2B, 0xED, 0x52, 0xDA};
+
+int hufp_logexp2[]={18, 0xD6, 0x81, 0x32, CATCH, CATCH, 0x36, 0x81, 0xAF, 0x06, 0x08, 0x11, SKIP, SKIP, 0xC5, 0xF5, 0xCD, SKIP, SKIP};
+int hufp_exdtbl[]={18, 0xD6, 0x81, 0x32, SKIP, SKIP, 0x36, 0x81, 0xAF, 0x06, 0x08, 0x11, CATCH, CATCH, 0xC5, 0xF5, 0xCD, SKIP, SKIP};
+int hufp_cmp[]={18, 0xD6, 0x81, 0x32, SKIP, SKIP, 0x36, 0x81, 0xAF, 0x06, 0x08, 0x11, SKIP, SKIP, 0xC5, 0xF5, 0xCD, CATCH, CATCH};
+
+
 
 /* Sinclair BASIC detection */
 int makeroom_skel[]={7, 0x2A, CATCH, CATCH, 0xEB,0xEd, 0xB8, 0xC9};
@@ -2922,19 +2956,32 @@ int main(int argc, char *argv[])
 	/* Hudson HuBASIC section */
 	/**************************/
 	
-	res=find_skel(hubas_skel);
+	res=find_skel(hubas_ext_skel);
+	if (res<0)
+		res=find_skel(hubas_skel);
 	
 	if (res>0) {
 		printf("\n# Hudson Software HuBASIC found\n");
 		res2=find_skel(huproduct_skel);
 		if (res2>0)
 			printf("#  HuBASIC name found\n\n");
+		
 		brand=find_skel(hudson_skel);
+		if (brand<0)
+			brand=find_skel(hudson_skel2);
 		if (brand>0)
 			printf("#  Hudson signature found\n\n");
 		else
 			if (res2<=0)
 			printf("#  Hudson signature not found\n\n");
+		
+		brand=find_skel(sharp_skel);
+		if (brand>0)
+			printf("#  'SHARP' signature found\n\n");		
+
+		brand=find_skel(hubas_ext_skel);
+		if (brand>0)
+			printf("#  Extended HuBASIC version detected\n\n");
 
 		res=find_skel(tkhudson_skel2);
 			if (res>0)	dlbl("CMDTABLE_FF", res, "HuBASIC command list (prefix $FF)");
@@ -2944,16 +2991,18 @@ int main(int argc, char *argv[])
 
 		res=find_skel(tkhudson_skel);
 			if (res>0)	dlbl("CMDTABLE", res, "HuBASIC command list");
+
+		if (res>0) {
+			// Catch possible offset shiftings
+			// (determine real locations, e.g. in case we are analyzing a file into a disk image)
+			pos=find_skel(hugoto_skel);
 			
-		// Catch possible offset shiftings
-		// (determine real locations, e.g. in case we are analyzing a file into a disk image)
-		pos=find_skel(hugoto_skel);
-		
-		if (pos >0) {
-			pos=pos-res;
-			if (pos >0)
-				printf("\n#    ORG shift detected, %d bytes",pos);
-		}	else pos=0;
+			if (pos >0) {
+				pos=pos-res;
+				if (pos >0)
+					printf("\n#    ORG shift detected, %d bytes",pos);
+			}	else pos=0;
+		}
 		
 		
 		res=find_skel(hu_putc);
@@ -2972,7 +3021,7 @@ int main(int argc, char *argv[])
 			if (res>0)	dlbl("CURYED", res, "Y cursor position on screen (editing)");
 
 		res=find_skel(hu_input);
-			if (res>0)	dlbl("INPUT", res-pos, "Console input, DE=address");
+			if (res>0)	dlbl("INPUT", res+pos, "Console input, DE=address");
 
 		res=find_skel(hu_inputl);
 			if (res>0)	dlbl("INPUTL", res, "LINE INPUT (DE=addr, CY if BREAK)");
@@ -2985,7 +3034,118 @@ int main(int argc, char *argv[])
 		
 		res=find_skel(hu_filblock);
 			if (res>0)	dlbl("FILBLK", res, "File data block transfer, HL=addr, BC=size");
+	
+		printf("\n");
 		
+		res=find_skel(hufp_memmax);
+			if (res>0)	dlbl("FP_MEMMAX", res, "Top position for FP calculator memory");
+		
+		res=find_skel(hufp_addhl5);
+			if (res>0)	dlbl("FP_ADDHL5", res, "Add space for a new element (5 or 8 bytes) in the number queue (HL ptr)");
+
+		res=find_skel(hufp_power2);
+		if (res>0) {
+			clbl("FP_POWER2", res, "FP power fn");
+		}
+
+		res=find_skel(hufp_ldir1);
+		if (res>0) {
+			clbl("FP_LDIR1", res, "FP init to '1': (DE) = (FLONE), 8 or 5 bytes");
+		}
+
+		res=find_skel(hufp_ldir5);
+		if (res>0) {
+			clbl("FP_LDIR5", res+pos+1, "FP move (DE)=(HL), 8 or 5 bytes depending on the BASIC FP precision");
+		}
+
+		res=find_skel(hufp_flthex);
+		if (res>0) {
+			clbl("FP_FLTHEX", res, "FP, (HL)=DE");
+		}
+
+		res=find_skel(hufp_logexp);
+		if (res<0)
+		res=find_skel(hufp_logexp2);
+		if (res>0) {
+			clbl("FP_LOGEXP", res, "FP, used by LOG");
+		}
+
+		res=find_skel(hufp_exdtbl);
+		if (res>0) {
+			clbl("FP_EXDTBL", res, "FP, numeric table used by LOG");
+		}
+
+		res=find_skel(hufp_cmp);
+		if (res>0) {
+			clbl("FP_CMP", res, "FP compare");
+		}
+		
+		res=find_skel(hufp_add2);
+		if (res<0)
+		res=find_skel(hufp_add);
+		if (res>0) {
+			clbl("FP_ADD", res, "FP addition");
+		}
+		
+		res=find_skel(hufp_sub);
+		if (res>0) {
+			clbl("FP_SUB", res, "FP subtraction");
+		}
+		
+		res=find_skel(hufp_mul2);
+		if (res<0)
+		res=find_skel(hufp_mul);
+		if (res>0) {
+			clbl("FP_MUL", res, "FP multiplication");
+		}
+
+		res=find_skel(hufp_div);
+		if (res>0) {
+			clbl("FP_DIV", res, "FP diviion");
+		}
+
+		res=find_skel(hufp_multwo);
+		if (res>0) {
+			clbl("FP_MULTWO", res, "FP duplicate");
+		}
+
+		res=find_skel(hufp_divtwo);
+		if (res>0) {
+			clbl("FP_DIVTWO", res, "FP halve");
+		}
+		
+		res=find_skel(hufp_oneadd);
+		if (res>0) {
+			clbl("FP_ONEADD", res, "FP Increment");
+		}
+		
+		res=find_skel(hufp_zfac1);
+		if (res>0) {
+			clbl("FP_ZFAC1", res+8, "FP accumulator");
+		}
+
+		res=find_skel(hufp_snfac0);
+		if (res>0) {
+			clbl("FP_SNFAC0", res, "PTR to first element in the number queue");
+			clbl("FP_SNFAC1", res+2, "PTR to second element in the number queue");
+			clbl("FP_SNFAC2", res+4, "PTR to third element in the number queue");
+			clbl("FP_SNFAC3", res+8, "PTR to fourth element in the number queue");
+		} else {
+		res=find_skel(hufp_snfac0_2);
+			if (res>0) {
+				clbl("FP_SNFAC0", res, "FP, first numeric factor (self modifying code)");
+			}
+		res=find_skel(hufp_snfac1_2);
+			if (res>0) {
+				clbl("FP_SNFAC1", res, "FP, second numeric factor (self modifying code)");
+			}
+		}
+		
+		res=find_skel(hufp_zfac1);
+		if (res>0) {
+			clbl("ZFAC1", res, "FP accumulator");
+		}
+
 		printf("\n");
 			
 		res=find_skel(hu_mon_getl);
@@ -3020,7 +3180,10 @@ int main(int argc, char *argv[])
 				c=img[i+pos];
 				if (c>=128) {
 					c-=128;  if (c==0) c=' ';
-						printf("%c \t{%4X} \n\t[%d] ",c, img[res2+pos]+256*img[res2+pos+1], chr++);
+						if (chr>224)
+							printf("%c \t{} \n\t[%d] ",c, chr++);
+						else
+							printf("%c \t{%4X} \n\t[%d] ",c, img[res2+pos]+256*img[res2+pos+1], chr++);
 					res2+=2;
 				} else printf("%c",c);
 			}
