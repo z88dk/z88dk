@@ -3,6 +3,7 @@ stdio/pv1000/fgetc_cons
 stdio/pv1000/getk
 @stdio/stdio.lst
 games/pv1000/joystick
+games/obj/pv1000/joystick_type
 @gfxbase.lst
 graphics/dcircle
 graphics/clg

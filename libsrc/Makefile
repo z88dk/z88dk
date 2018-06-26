@@ -867,6 +867,7 @@ pv1000_clib.lib:
 	@echo '--- Building Casio PV-1000 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
+	$(MAKE) -C games TARGET=pv1000
 	$(call buildgeneric,pv1000)
 	TARGET=pv1000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORpv1000 -x$(OUTPUT_DIRECTORY)/pv1000_clib @$(LISTFILE_DIRECTORY)/pv1000.lst
 
