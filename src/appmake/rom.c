@@ -61,7 +61,7 @@ int rom_exec(char *target)
 
     if ((binorg == -1) && ((crtfile == NULL) || ((binorg = get_org_addr(crtfile)) == -1)))
     {
-        fprintf(stderr,"Warning: could not get the 'myzorg' value, binary ORG defaults to rombase = %d\n", rombase);
+        fprintf(stderr,"Warning: could not get the code ORG, binary ORG defaults to rombase = %d\n", rombase);
         binorg = rombase;
     }
 
