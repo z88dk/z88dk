@@ -1,4 +1,4 @@
-;   @feilipu 2018
+; 2018 June feilipu
 
 INCLUDE "config_private.inc"
 
@@ -60,9 +60,9 @@ l0_small_z180_mulu_32_32x32:
     ; hl = x1 y0
     ; stack = x1 y1
 
-    mlt de                      ; x0 * y0
-    mlt bc                      ; x0 * y1
-    mlt hl                      ; x1 * y0
+    mlt de                      ; x0*y0
+    mlt bc                      ; x0*y1
+    mlt hl                      ; x1*y0
 
     xor a                       ; zero A
     add hl,bc                   ; sum cross products p2 p1
@@ -75,7 +75,7 @@ l0_small_z180_mulu_32_32x32:
     ld d,a                      ; LSW in DE p1 p0
 
     pop hl
-    mlt hl                      ; x1 * y1
+    mlt hl                      ; x1*y1
 
     adc hl,bc                   ; HL = interim MSW p3 p2
                                 ; 32_16x16 = HLDE
@@ -83,7 +83,7 @@ l0_small_z180_mulu_32_32x32:
     push hl                     ; stack interim p3 p2
     ex de,hl                    ; DEHL = end of 32_16x16
 
-    ; start doing the p2 byte
+    ; continue doing the p2 byte
 
     exx                         ; now we're working in the high order bytes
                                 ; DEHL' = end of 32_16x16
@@ -94,8 +94,8 @@ l0_small_z180_mulu_32_32x32:
     ld a,b
     ld b,d
     ld d,a
-    mlt bc                      ; x2 * y0
-    mlt de                      ; x0 * y2
+    mlt bc                      ; x2*y0
+    mlt de                      ; x0*y2
     add hl,bc
     add hl,de
 
@@ -106,8 +106,8 @@ l0_small_z180_mulu_32_32x32:
     ld a,b
     ld b,d
     ld d,a
-    mlt bc                      ; x1 * y2
-    mlt de                      ; y3 * x0
+    mlt bc                      ; x1*y2
+    mlt de                      ; y3*x0
 
     ld a,h                      ; work with existing p3 from H
     add a,c                     ; add low bytes of products
@@ -118,8 +118,8 @@ l0_small_z180_mulu_32_32x32:
     ld h,b
     ld b,d
     ld d,h
-    mlt bc                      ; x3 * y0
-    mlt de                      ; y1 * x2
+    mlt bc                      ; x3*y0
+    mlt de                      ; y1*x2
 
     add a,c                     ; add low bytes of products
     add a,e

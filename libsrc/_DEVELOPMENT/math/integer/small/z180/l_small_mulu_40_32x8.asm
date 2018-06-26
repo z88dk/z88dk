@@ -1,4 +1,4 @@
-; @feilipu 2018
+; 2018 June feilipu
 
 INCLUDE "config_private.inc"
 
@@ -25,8 +25,8 @@ l_small_z180_mulu_40_32x8:
     ld d,a
     ld b,a
 
-    mlt bc                      ; yl * x3
-    mlt de                      ; yl * x2
+    mlt bc                      ; yl*x3
+    mlt de                      ; yl*x2
 
     push bc
     push de
@@ -35,8 +35,8 @@ l_small_z180_mulu_40_32x8:
     ld h,a
     ld b,a
 
-    mlt bc                      ; yl * x1
-    mlt hl                      ; yl * x0
+    mlt bc                      ; yl*x1
+    mlt hl                      ; yl*x0
 
     ld a,h
     add a,c

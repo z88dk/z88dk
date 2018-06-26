@@ -32,9 +32,9 @@ l_small_z180_mulu_32_16x16:
     ; hl = xh yl
     ; stack = xh yh
 
-    mlt de                      ; xl * yl
-    mlt bc                      ; xl * yh
-    mlt hl                      ; xh * yl
+    mlt de                      ; xl*yl
+    mlt bc                      ; xl*yh
+    mlt hl                      ; xh*yl
 
     xor a                       ; zero A
     add hl,bc                   ; sum cross products
@@ -47,7 +47,7 @@ l_small_z180_mulu_32_16x16:
     ld d,a                      ; de = final LSW
 
     pop hl
-    mlt hl                      ; xh * yh
+    mlt hl                      ; xh*yh
 
     adc hl,bc                   ; hl = final MSW
     ex de,hl

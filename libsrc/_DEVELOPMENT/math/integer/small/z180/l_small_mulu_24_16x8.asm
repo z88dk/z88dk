@@ -24,8 +24,8 @@ l_small_z180_mulu_24_16x8:
     ld d,h                      ; xh
     ld h,e                      ; yl
 
-    mlt hl                      ; yl * xl
-    mlt de                      ; xh * yl
+    mlt hl                      ; yl*xl
+    mlt de                      ; xh*yl
 
     ld  a,h                     ; sum products
     add a,e

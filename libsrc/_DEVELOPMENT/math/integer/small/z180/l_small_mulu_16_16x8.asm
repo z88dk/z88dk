@@ -23,8 +23,8 @@ l_small_z180_mulu_16_16x8:
     ld h,e                      ; yl
     ld e,l                      ; xl
 
-    mlt hl                      ; yl * xl
-    mlt de                      ; yh * xl
+    mlt hl                      ; yl*xl
+    mlt de                      ; yh*xl
 
     ld a,h                      ; sum products
     add a,e                     ; add to msb final

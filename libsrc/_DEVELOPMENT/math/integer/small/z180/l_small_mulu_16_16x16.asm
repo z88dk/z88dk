@@ -27,10 +27,10 @@ l_small_z180_mulu_16_16x16:
     ld h,a                      ; h = xh
     ld c,e                      ; c = xl
     ld b,l                      ; b = yl
-    mlt de                      ; yh * xl
-    mlt hl                      ; xh * yl
+    mlt de                      ; yh*xl
+    mlt hl                      ; xh*yl
     add hl,de                   ; add cross products
-    mlt bc                      ; yl * xl
+    mlt bc                      ; yl*xl
     ld a,l                      ; cross products lsb
     add a,b                     ; add to msb final
     ld h,a
