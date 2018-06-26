@@ -58,11 +58,11 @@ shift:
 	; calculate the mask now
 	ld	a,h
 	and	7
-	ld	h,1
+	ld	h,128
 shift_loop:
 	and	a
 	ret	z		; nc
-	rl	h
+	rr	h
 	dec	a
 	jr	shift_loop
 

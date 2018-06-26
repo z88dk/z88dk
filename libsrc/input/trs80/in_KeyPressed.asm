@@ -45,7 +45,7 @@ done:
 	ld	e,a
 	ld	a,(de)
 	and	h		;Check with mask
-	jr	nz,fail
+	jr	z,fail
 	ld	hl,1
 	scf
 	ret
