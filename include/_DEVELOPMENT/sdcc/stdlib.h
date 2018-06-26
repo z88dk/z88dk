@@ -478,4 +478,25 @@ extern char *ulltoa_callee(unsigned long long num,char *buf,int radix) __z88dk_c
 
 #endif
 
+#ifdef __ZXNEXT
+
+extern unsigned char mkstemp_ex(char *template);
+extern unsigned char mkstemp_ex_fastcall(char *template) __z88dk_fastcall;
+#define mkstemp_ex(a) mkstemp_ex_fastcall(a)
+
+
+
+extern char *getenv(const char *name);
+extern char *getenv_fastcall(const char *name) __z88dk_fastcall;
+#define getenv(a) getenv_fastcall(a)
+
+
+extern char *getenv_ex(const char *filename,const char *name);
+extern char *getenv_ex_callee(const char *filename,const char *name) __z88dk_callee;
+#define getenv_ex(a,b) getenv_ex_callee(a,b)
+
+
+
+#endif
+
 #endif

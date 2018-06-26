@@ -348,4 +348,15 @@ extern int vscanf_unlocked(char *format,void *arg);
 
 
 
+#ifdef __ZXNEXT
+
+extern char *tmpnam(char *s);
+
+
+extern char *env_tmpnam(char *template);
+
+
+
+#endif
+
 #endif

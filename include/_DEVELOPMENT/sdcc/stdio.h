@@ -494,4 +494,19 @@ extern int vscanf_unlocked_callee(char *format,void *arg) __z88dk_callee;
 
 
 
+#ifdef __ZXNEXT
+
+extern char *tmpnam(char *s);
+extern char *tmpnam_fastcall(char *s) __z88dk_fastcall;
+#define tmpnam(a) tmpnam_fastcall(a)
+
+
+extern char *env_tmpnam(char *template);
+extern char *env_tmpnam_fastcall(char *template) __z88dk_fastcall;
+#define env_tmpnam(a) env_tmpnam_fastcall(a)
+
+
+
+#endif
+
 #endif

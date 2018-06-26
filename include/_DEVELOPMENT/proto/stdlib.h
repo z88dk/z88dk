@@ -246,4 +246,13 @@ __DPROTO(,,char,*,ulltoa,unsigned long long num,char *buf,int radix)
 
 #endif
 
+#ifdef __ZXNEXT
+
+__DPROTO(,,unsigned char,,mkstemp_ex,char *template)
+
+__DPROTO(,,char,*,getenv,const char *name)
+__DPROTO(,,char,*,getenv_ex,const char *filename,const char *name)
+
+#endif
+
 #endif

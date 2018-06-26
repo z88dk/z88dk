@@ -44,15 +44,18 @@
 
 #define __ZXNEXT_LAST_PAGE  223
 
-#define __ENV_FILENAME  "/sys/env"
-#define __ENV_GETENV_BUFSZ  64
+#define __ENV_FILENAME  "/sys/env.txt"
 
-#define __ENV_TMPDIR  "/tmp/"
+#define __ENV_BUFSZ  128
+#define __ENV_GETENV_VALSZ  64
+
+#define __ENV_TMPDIR  "/tmp"
 #define __ENV_LTMPNAM  13
 #define __ENV_TMPMAX  0xffff
+#define __ENV_TMPMAX_TRY  16
 
-#define __ENV_BINDIR  "/bin/"
-#define __ENV_SYSDIR  "/sys/"
+#define __ENV_BINDIR  "/bin"
+#define __ENV_SYSDIR  "/sys"
 
 #undef  __SPECTRUM
 #define __SPECTRUM  16

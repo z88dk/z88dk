@@ -39,17 +39,19 @@ defc __ZXNEXT_2MB = 2
 
 defc __ZXNEXT_LAST_PAGE = 223
 
-; define(`__ENV_FILENAME', /sys/env)
+; define(`__ENV_FILENAME', /sys/env.txt)
 
-defc __ENV_GETENV_BUFSZ = 64
+defc __ENV_BUFSZ = 128
+defc __ENV_GETENV_VALSZ = 64
 
-; define(`__ENV_TMPDIR', /tmp/)
+; define(`__ENV_TMPDIR', /tmp)
 
 defc __ENV_LTMPNAM = 13
 defc __ENV_TMPMAX = 0xffff
+defc __ENV_TMPMAX_TRY = 16
 
-; define(`__ENV_BINDIR', /bin/)
-; define(`__ENV_SYSDIR', /sys/)
+; define(`__ENV_BINDIR', /bin)
+; define(`__ENV_SYSDIR', /sys)
 
 defc __SPECTRUM = 16
 

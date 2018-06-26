@@ -168,4 +168,11 @@ __DPROTO(,,int,,vfscanf_unlocked,FILE *stream,char *format,void *arg)
 __DPROTO(,,int,,vprintf_unlocked,char *format,void *arg)
 __DPROTO(,,int,,vscanf_unlocked,char *format,void *arg)
 
+#ifdef __ZXNEXT
+
+__DPROTO(,,char,*,tmpnam,char *s)
+__DPROTO(,,char,*,env_tmpnam,char *template)
+
+#endif
+
 #endif

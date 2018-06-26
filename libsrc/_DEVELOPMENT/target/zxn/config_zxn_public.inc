@@ -38,10 +38,12 @@ PUBLIC __ZXNEXT_2MB
 
 PUBLIC __ZXNEXT_LAST_PAGE
 
-PUBLIC __ENV_GETENV_BUFSZ
+PUBLIC __ENV_BUFSZ
+PUBLIC __ENV_GETENV_VALSZ
 
 PUBLIC __ENV_LTMPNAM
 PUBLIC __ENV_TMPMAX
+PUBLIC __ENV_TMPMAX_TRY
 
 PUBLIC __SPECTRUM
 
@@ -74,17 +76,19 @@ defc __ZXNEXT_2MB = 2
 
 defc __ZXNEXT_LAST_PAGE = 223
 
-; define(`__ENV_FILENAME', /sys/env)
+; define(`__ENV_FILENAME', /sys/env.txt)
 
-defc __ENV_GETENV_BUFSZ = 64
+defc __ENV_BUFSZ = 128
+defc __ENV_GETENV_VALSZ = 64
 
-; define(`__ENV_TMPDIR', /tmp/)
+; define(`__ENV_TMPDIR', /tmp)
 
 defc __ENV_LTMPNAM = 13
 defc __ENV_TMPMAX = 0xffff
+defc __ENV_TMPMAX_TRY = 16
 
-; define(`__ENV_BINDIR', /bin/)
-; define(`__ENV_SYSDIR', /sys/)
+; define(`__ENV_BINDIR', /bin)
+; define(`__ENV_SYSDIR', /sys)
 
 defc __SPECTRUM = 16
 
