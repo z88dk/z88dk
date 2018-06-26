@@ -16,3 +16,4 @@ input/spectrum/in_Wait
 input/spectrum/in_WaitForKey
 input/spectrum/in_WaitForNoKey
 input/zx81/INMouseSim
+input/fgetc_cons_inkey

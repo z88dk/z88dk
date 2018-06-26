@@ -36,3 +36,4 @@ input/spectrum/in_WaitForNoKey
 input/spectrum/INMouseAMX
 input/spectrum/INMouseKemp
 input/spectrum/INMouseSim
+input/fgetc_cons_inkey

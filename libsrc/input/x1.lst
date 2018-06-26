@@ -6,3 +6,4 @@ input/x1/in_Pause
 input/x1/in_Wait
 input/x1/in_WaitForKey
 input/x1/in_WaitForNoKey
+input/fgetc_cons_inkey
