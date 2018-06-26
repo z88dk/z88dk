@@ -40,7 +40,7 @@ check_set_udg:
 	ld	bc,128 * 8		;All of them
 	and	a
 	jr	z,full_udg_bank
-	ld	bc,32 * 8		;Otherwise, just 32
+	ld	bc,16 * 8		;Otherwise, just 16
 full_udg_bank:
 	ld	de,CHAR_TABLE 
 	ldir
