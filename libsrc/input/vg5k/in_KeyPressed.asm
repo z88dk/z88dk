@@ -26,7 +26,7 @@ PUBLIC _in_KeyPressed
 	jr	z,nofunc
 	in	a,($80)
 	and	$40
-	jr	z,fail
+	jr	nz,fail
 
 .nofunc
 	ld	a,l
