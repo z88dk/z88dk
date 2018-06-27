@@ -32,8 +32,8 @@
 			push	de
 			push	hl		; save coordinates
 	
-			ld	c,l
-			ld	b,h
+			ld	c,h
+			ld	b,l
 			srl	c
 			srl	b
 			call	generic_console_vpeek

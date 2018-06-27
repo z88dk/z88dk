@@ -11,6 +11,7 @@ stdio/ansi/aquarius/f_ansi_cls
 stdio/ansi/aquarius/f_ansi_dline
 stdio/ansi/aquarius/f_ansi_scrollup
 @stdio/stdio.lst
+@input/input_keyboard.lst
 @gfxbasetxt6.lst
 graphics/aquarius/textpixl6
 games/aquarius/joystick
