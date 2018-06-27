@@ -1,6 +1,6 @@
 @stdio/ansicore.lst
-stdio/inkey/fgetc_cons
-stdio/inkey/getk
+stdio/coleco/fgetc_cons
+stdio/coleco/getk
 stdio/ansi/msx/f_ansi_attr
 stdio/ansi/msx/f_ansi_bel
 stdio/ansi/msx/f_ansi_char
