@@ -14,3 +14,4 @@ env/esxdos/z80/asm_getenv
 env/esxdos/z80/asm_getenv_ex
 env/esxdos/z80/asm_mkstemp_ex
 env/esxdos/z80/asm_tmpnam
+env/esxdos/z80/asm_tmpnam_ex

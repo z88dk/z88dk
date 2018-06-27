@@ -501,9 +501,9 @@ extern char *tmpnam_fastcall(char *s) __z88dk_fastcall;
 #define tmpnam(a) tmpnam_fastcall(a)
 
 
-extern char *env_tmpnam(char *template);
-extern char *env_tmpnam_fastcall(char *template) __z88dk_fastcall;
-#define env_tmpnam(a) env_tmpnam_fastcall(a)
+extern char *tmpnam_ex(char *template);
+extern char *tmpnam_ex_fastcall(char *template) __z88dk_fastcall;
+#define tmpnam_ex(a) tmpnam_ex_fastcall(a)
 
 
 

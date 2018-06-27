@@ -171,7 +171,7 @@ __DPROTO(,,int,,vscanf_unlocked,char *format,void *arg)
 #ifdef __ZXNEXT
 
 __DPROTO(,,char,*,tmpnam,char *s)
-__DPROTO(,,char,*,env_tmpnam,char *template)
+__DPROTO(,,char,*,tmpnam_ex,char *template)
 
 #endif
 

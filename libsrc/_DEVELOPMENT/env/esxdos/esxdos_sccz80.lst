@@ -1,8 +1,7 @@
 @env/esxdos/esxdos_asm.lst
-env/esxdos/c/sccz80/env_mkstemp
-env/esxdos/c/sccz80/env_tmpnam
 env/esxdos/c/sccz80/getenv
 env/esxdos/c/sccz80/getenv_ex
 env/esxdos/c/sccz80/getenv_ex_callee
 env/esxdos/c/sccz80/mkstemp_ex
 env/esxdos/c/sccz80/tmpnam
+env/esxdos/c/sccz80/tmpnam_ex

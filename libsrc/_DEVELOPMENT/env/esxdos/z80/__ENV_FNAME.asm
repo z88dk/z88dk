@@ -6,4 +6,4 @@ PUBLIC __ENV_FNAME
 
 __ENV_FNAME:
 
-   defm "/sys/env.txt", 0
+   defm "/sys/env.cfg", 0

@@ -1,4 +1,4 @@
-; char *tmpnam(char *s)
+; char *tmpnam(char *template)
 
 INCLUDE "config_private.inc"
 

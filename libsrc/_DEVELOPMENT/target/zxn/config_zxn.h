@@ -44,7 +44,7 @@
 
 #define __ZXNEXT_LAST_PAGE  223
 
-#define __ENV_FILENAME  "/sys/env.txt"
+#define __ENV_FILENAME  "/sys/env.cfg"
 
 #define __ENV_BUFSZ  128
 #define __ENV_GETENV_VALSZ  64

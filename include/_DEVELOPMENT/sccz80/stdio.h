@@ -441,7 +441,7 @@ extern int __LIB__ vscanf_unlocked_callee(char *format,void *arg) __smallc __z88
 extern char __LIB__ *tmpnam(char *s) __smallc __z88dk_fastcall;
 
 
-extern char __LIB__ *env_tmpnam(char *template) __smallc __z88dk_fastcall;
+extern char __LIB__ *tmpnam_ex(char *template) __smallc __z88dk_fastcall;
 
 
 

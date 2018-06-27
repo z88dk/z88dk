@@ -353,7 +353,7 @@ extern int vscanf_unlocked(char *format,void *arg);
 extern char *tmpnam(char *s);
 
 
-extern char *env_tmpnam(char *template);
+extern char *tmpnam_ex(char *template);
 
 
 

@@ -76,7 +76,7 @@ defc __ZXNEXT_2MB = 2
 
 defc __ZXNEXT_LAST_PAGE = 223
 
-; define(`__ENV_FILENAME', /sys/env.txt)
+; define(`__ENV_FILENAME', /sys/env.cfg)
 
 defc __ENV_BUFSZ = 128
 defc __ENV_GETENV_VALSZ = 64
