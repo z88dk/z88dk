@@ -7,9 +7,9 @@ IF __Z180
 SECTION code_clib
 SECTION code_math
 
-PUBLIC l0_small_z180_mulu_32_32x32
+PUBLIC l0_z180_mulu_32_32x32
 
-l0_small_z180_mulu_32_32x32:
+l0_z180_mulu_32_32x32:
 
     ; multiplication of two 32-bit numbers into a 32-bit product
     ;

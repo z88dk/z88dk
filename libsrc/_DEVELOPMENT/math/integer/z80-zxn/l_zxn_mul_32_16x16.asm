@@ -1,9 +1,14 @@
+
+INCLUDE "config_private.inc"
+
+IF __ZXN
+
 SECTION code_clib
 SECTION code_math
 
-PUBLIC l_small_mul_32_16x16
+PUBLIC l_zxn_mul_32_16x16
 
-l_small_mul_32_16x16:
+l_zxn_mul_32_16x16:
 
    ; multiplication of two 16-bit numbers into a 32-bit product
    ;
@@ -58,3 +63,5 @@ l_small_mul_32_16x16:
    ; 154 cycles, 32 bytes
 
    ret
+
+ENDIF

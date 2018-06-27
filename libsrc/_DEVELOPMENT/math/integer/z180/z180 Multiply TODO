@@ -69,7 +69,7 @@ PUBLIC l_mulu_40_32x8
         ; exit  : adehl = 40-bit product
         ;         carry reset
 
-	; math/integer/l_mulu_64_32x32  TODO
+	; math/integer/l_mulu_64_32x32
 PUBLIC l_mulu_64_32x32
     ; enter : dehl = 32-bit multiplicand (more zeros = better performance)
     ;         dehl'= 32-bit multiplicand
@@ -87,7 +87,7 @@ PUBLIC l_mulu_64_32x32
             ; exit  : dehl dehl' = 64-bit product
             ;         carry reset
 
-	; math/integer/l_mulu_64_64x64  TODO
+	; math/integer/l_mulu_64_64x64
 PUBLIC l_mulu_64_64x64
     ; enter :      +-------------------------------
     ;              | +15 

@@ -8,9 +8,9 @@ IF __Z180
 SECTION code_clib
 SECTION code_math
 
-PUBLIC l_small_z180_mulu_16_16x16
+PUBLIC l_z180_mulu_16_16x16
 
-l_small_z180_mulu_16_16x16:
+l_z180_mulu_16_16x16:
 
     ; multiplication of two 16-bit numbers into a 16-bit product
     ;

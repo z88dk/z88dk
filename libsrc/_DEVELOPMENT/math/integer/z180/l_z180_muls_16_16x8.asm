@@ -6,12 +6,12 @@ IF __Z180
 SECTION code_clib
 SECTION code_math
 
-EXTERN l_small_z180_mulu_16_16x8
+EXTERN l_z180_mulu_16_16x8
 EXTERN l_neg_hl, l_neg_de
 
-PUBLIC l_small_z180_muls_16_16x8
+PUBLIC l_z180_muls_16_16x8
 
-l_small_z180_muls_16_16x8:
+l_z180_muls_16_16x8:
 
     ; multiplication of a 16-bit signed number by an 8-bit signed number into 16-bit product
     ;
@@ -33,7 +33,7 @@ l_small_z180_muls_16_16x8:
     bit 7,l
     call NZ,l_neg_l              ; take absolute value of multiplier
 
-    call l_small_z180_mulu_16_16x8    ; do unsigned multiplication
+    call l_z180_mulu_16_16x8     ; do unsigned multiplication
 
     pop bc                       ; recover sign info from multiplicand and multiplier
     ld a,b
