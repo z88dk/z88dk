@@ -35,7 +35,7 @@
         defc    TAR__clib_exit_stack_size = 0
         defc    TAR__register_sp = 0x7400
 	defc	CRT_KEY_DEL = 127
-	defc	__CPU_CLOCK = 3579000
+	defc	__CPU_CLOCK = 3579545
         INCLUDE "crt/classic/crt_rules.inc"
 
 	org	  CRT_ORG_CODE
