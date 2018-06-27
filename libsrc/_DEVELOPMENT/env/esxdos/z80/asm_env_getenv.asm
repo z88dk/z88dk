@@ -245,18 +245,24 @@ ENDIF
    ; stack = val, valsz, handle, bufsz
    
    jp c, error_zc - 4          ; if read error
-   
+
+   push hl
+
    ld a,b
    or c
-   
-   jp z, error_zc - 4          ; if eof reached
-   
-   push hl
+
+   jr z, value_found_exx       ; if eof reached
 
    ld a,(hl)                   ; a = current char
    jr value_loop
 
+value_found_exx:
+
+   exx
+
 value_found:
+
+   ; carry reset
 
    sbc hl,de
 
