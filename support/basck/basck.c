@@ -64,6 +64,10 @@ int SKOOLMODE = -1;
 #define SPECTRUM 4
 #define TS2068   5
 
+#define HUBASIC_OLD   1
+#define HUBASIC_NEW   2
+#define HUBASIC_EXT   3
+
 
 /* CPU detection */
 int ldir_skel[]={11, 33, CATCH, CATCH, 17, SKIP, SKIP, 1, SKIP, SKIP, 0xED, 0xB0};
@@ -87,12 +91,19 @@ int tkhudson_skel[]={11, 0x01, CATCH, CATCH, 0xFE, 0x20, 0xDA, SKIP, SKIP, 0xFE,
 int tkhudson_skel2[]={15, 0xFE, 0xFE, 0x38, SKIP, 0x3C, 0x01, CATCH, CATCH, 0x28, SKIP, 0x01, SKIP, SKIP, 0x7E, 0x23};
 int tkhudson_skel3[]={15, 0xFE, 0xFE, 0x38, SKIP, 0x3C, 0x01, SKIP, SKIP, 0x28, SKIP, 0x01, CATCH, CATCH, 0x7E, 0x23};
 
+int tkhudson_skel_old[]={20, 0x01, CATCH, CATCH, 0xCD, SKIP, SKIP, 0x30, SKIP, 0x01, SKIP, SKIP, 0xCD, SKIP, SKIP, 0x38, SKIP, 0x2B, 0x7E, 0x36, 0xFF};
+//int tkhudson_detoken[]={20, 0x01, SKIP, SKIP, 0xCD, CATCH, CATCH, 0x30, SKIP, 0x01, SKIP, SKIP, 0xCD, SKIP, SKIP, 0x38, SKIP, 0x2B, 0x7E, 0x36, 0xFF};
+int tkhudson_skel_fn_old[]={20, 0x01, SKIP, SKIP, 0xCD, SKIP, SKIP, 0x30, SKIP, 0x01, CATCH, CATCH, 0xCD, SKIP, SKIP, 0x38, SKIP, 0x2B, 0x7E, 0x36, 0xFF};
+ 
 
 int hugoto_skel[]={9, ADDR, 'O', 'T', 'O'+128, 'G', 'O', 'S', 'U', 'B'+128, };
 
 int hu_jptab[]={13, 0x11, CATCH, CATCH, 0xD6, 0x80, 0xE5, 0xEB, 0x5F, 0x16, 0, 0x19, 0x19, 0x7E};
 int hu_jptab2[]={14, 0xd6, 0x80, 0x6F, 0x26, 0, 0x01, CATCH, CATCH, 0x29, 0x09, 0x7E, 0x23, 0x66, 0x6F};
 int hu_jptab3[]={12, 0x23, 0xFE, 0xFF, 0xCA, SKIP, SKIP, 0x11, CATCH, CATCH, 0xFE, 0xFE, 0x20};
+
+int hu_jptab_old[]={18, 0xFE, 0xFF, SKIP, 0x1B, 0xFE, SKIP, 0xD2, SKIP, SKIP, 0xE5, 0x21, CATCH, CATCH, 0xCD, SKIP, SKIP, 0xE3, 0xC9};
+int hu_jptab_fn_old[]={11, 0x21, CATCH, CATCH, 0xD6, 0x81, 0x87, 0x5F, 0x16, 0x00, 0x19, 0xC3};
 
 
 /* HuBASIC editor and interpreter stuff */
@@ -109,7 +120,9 @@ int hu_input[]={14, ADDR, 0x2A, SKIP, SKIP, 0xE5, 0xD5, 0xCD, SKIP, SKIP, 0xD1, 
 int hu_inputl[]={12, 0xE5, 0xD5, 0xCD, SKIP, SKIP, 0xD1, 0x36, 0, 0xE1, 0xCD, CATCH, CATCH};
 int hu_curxst[]={12, 0xD1, 0x36, 0, 0xE1, 0xCD, SKIP, SKIP, 0x38, SKIP, 0x3A, CATCH, CATCH};
 
-
+int hu_edline[]={12, 0xFE, 0x2E, 0x20, 0x06, 0xED, 0x5B, 0x2A, CATCH, CATCH, 0x09, 0xFE, 0x0B};
+int hu_gtsted[]={11, ADDR, 0x37, 0x18, 0xF1, 0x11, 0x00, 0x00, 0x01, 0xFF, 0xFF, 0xCD};
+ 
 int hu_filad[]={15, 0xCD, SKIP, SKIP, 0xF1, 0xE1, 0x30, 3, 0x2A, CATCH, CATCH, 0xED, 0x4B, SKIP, SKIP, 0xCD};
 int hu_filsz[]={15, 0xCD, SKIP, SKIP, 0xF1, 0xE1, 0x30, 3, 0x2A, SKIP, SKIP, 0xED, 0x4B, CATCH, CATCH, 0xCD};
 int hu_filblock[]={14, 0xF1, 0xE1, 0x30, 3, 0x2A, SKIP, SKIP, 0xED, 0x4B, SKIP, SKIP, 0xCD, CATCH, CATCH};
@@ -117,7 +130,9 @@ int hu_filblock[]={14, 0xF1, 0xE1, 0x30, 3, 0x2A, SKIP, SKIP, 0xED, 0x4B, SKIP, 
 /* HuBASIC embedded monitor */
 
 int hu_mon_cmd[]={10, 0x13, 0xD9, 0x21, CATCH, CATCH, 0x06, 0x0A, 0xBE, 0x23, 0x28};
-int hu_putc[]={13, 0x3E, 0x2A, 0xCD, CATCH, CATCH, 0xCD, SKIP, SKIP, 0x30, SKIP, 0x1A, 0xFE, 0x2A};
+int hu_outc[]={13, 0x3E, 0x2A, 0xCD, CATCH, CATCH, 0xCD, SKIP, SKIP, 0x30, SKIP, 0x1A, 0xFE, 0x2A};
+int hu_outc2[]={13, 0xCD, SKIP, SKIP, 0x3E, 0x2A, 0xCD, CATCH, CATCH, 0xCD, SKIP, SKIP, 0x30, 0xFB};
+
 int hu_mon_getl[]={13, 0x3E, 0x2A, 0xCD, SKIP, SKIP, 0xCD, CATCH, CATCH, 0x30, SKIP, 0x1A, 0xFE, 0x2A};
 
 
@@ -3027,17 +3042,29 @@ int main(int argc, char *argv[])
 			printf("#  'SHARP' signature found\n\n");		
 
 		brand=find_skel(hubas_ext_skel);
-		if (brand>0)
+		if (brand>0) {
 			printf("#  Extended HuBASIC version detected\n\n");
+			brand = HUBASIC_EXT;
+		} else 
+			brand = HUBASIC_NEW;
+
+		res=find_skel(tkhudson_skel_old);
+		if (res>0) 
+			brand = HUBASIC_OLD;
 
 		res=find_skel(tkhudson_skel2);
-			if (res>0)	dlbl("CMDTABLE_FF", res, "HuBASIC command list (prefix $FF)");
+		if (res>0)	dlbl("CMDTABLE_FF", res, "HuBASIC command list (prefix $FF)");
 
 		res=find_skel(tkhudson_skel3);
-			if (res>0)	dlbl("CMDTABLE_FE", res, "HuBASIC command list (prefix $FE)");
+		if (res>0)	dlbl("CMDTABLE_FE", res, "HuBASIC command list (prefix $FE)");
 
+		res=find_skel(tkhudson_skel_fn_old);
+		if (res>0)	dlbl("FNTABLE", res, "HuBASIC function list");
+			
 		res=find_skel(tkhudson_skel);
-			if (res>0)	dlbl("CMDTABLE", res, "HuBASIC command list");
+		if (res<0)
+			res=find_skel(tkhudson_skel_old);
+		if (res>0)	dlbl("CMDTABLE", res, "HuBASIC command list");
 
 		if (res>0) {
 			// Catch possible offset shiftings
@@ -3052,56 +3079,64 @@ int main(int argc, char *argv[])
 		}
 		
 		res=find_skel(hu_ideexp);
-			if (res>0)	{
-				clbl("IDEEXP", res+pos+1, "DE=(HL), A=next character to be parsed");
-				clbl("STDEFC", res+pos+4, "DE=CINT(HL), A=next character to be parsed");
-			}
+		if (res>0)	{
+			clbl("IDEEXP", res+pos+1, "DE=(HL), A=next character to be parsed");
+			clbl("STDEFC", res+pos+4, "DE=CINT(HL), A=next character to be parsed");
+		}
 		
 		res=find_skel(hu_expr);
-			if (res>0)	clbl("IDEEXP", res, "Evaluate expression");
+		if (res>0)	clbl("IDEEXP", res, "Evaluate expression");
 			
 		res=find_skel(hu_cint);
-			if (res>0)	clbl("CINT", res, "Convert to integer");
+		if (res>0)	clbl("CINT", res, "Convert to integer");
 			
-		res=find_skel(hu_putc);
-			if (res>0)	clbl("PUTC", res, "Output character in A");
+		res=find_skel(hu_outc);
+		if (res<0)
+		res=find_skel(hu_outc2);
+		if (res>0)	clbl("OUTC", res, "Output character in A");
 
 		res=find_skel(hu_input);
-			if (res>0)	clbl("INPUT", res+pos, "Console input, DE=address");
+		if (res>0)	clbl("INPUT", res+pos, "Console input, DE=address");
 
 		res=find_skel(hu_inputl);
-			if (res>0)	clbl("INPUTL", res, "LINE INPUT (DE=addr, CY if BREAK)");
+		if (res>0)	clbl("INPUTL", res, "LINE INPUT (DE=addr, CY if BREAK)");
 		
 		res=find_skel(hu_filblock);
-			if (res>0)	clbl("FILBLK", res, "File data block transfer, HL=addr, BC=size");
+		if (res>0)	clbl("FILBLK", res, "File data block transfer, HL=addr, BC=size");
 
 		printf("\n");
 			
 		res=find_skel(hu_filad);
-			if (res>0)	dlbl("FILAD", res, "FILE data block address");
+		if (res>0)	dlbl("FILAD", res, "FILE data block address");
 		
 		res=find_skel(hu_filsz);
-			if (res>0)	dlbl("FILSZ", res, "FILE data block size");
+		if (res>0)	dlbl("FILSZ", res, "FILE data block size");
 			
 		res=find_skel(hu_txtcoord);
-			if (res>0)	dlbl("XYTEXT", res, "X and Y text coordinates");
+		if (res>0)	dlbl("XYTEXT", res, "X and Y text coordinates");
 			
 		res=find_skel(hu_curxst);
-			if (res>0)	dlbl("CURXST", res, "X cursor position on screen");
+		if (res>0)	dlbl("CURXST", res, "X cursor position on screen");
 			
 		res=find_skel(hu_curyst);
-			if (res>0)	dlbl("CURYST", res, "Y cursor position on screen");
-			
+		if (res>0)	dlbl("CURYST", res, "Y cursor position on screen");
+		
 		res=find_skel(hu_curyed);
-			if (res>0)	dlbl("CURYED", res, "Y cursor position on screen (editing)");
+		if (res>0)	dlbl("CURYED", res, "Y cursor position on screen (editing)");
 
+		res=find_skel(hu_edline);
+		if (res>0)	dlbl("EDLINE", res, "BASIC program line to be edited");
+
+		res=find_skel(hu_gtsted);
+		if (res>0)	dlbl("GTSTED", res+pos+4, "Get arguments for line number range (xxx-yyy), DE to BC.");
+		
 		printf("\n");
 	
 		res=find_skel(hufp_seed);
-			if (res>0)	dlbl("SEED", res, "SEED for RND function");
+		if (res>0)	dlbl("SEED", res, "SEED for RND function");
 		
 		res=find_skel(hufp_logexp);
-			if (res>0) 	dlbl("FP_LOGEXP", res, "FP, used by LOG");
+		if (res>0) 	dlbl("FP_LOGEXP", res, "FP, used by LOG");
 
 		res=find_skel(hufp_exdtbl);
 		if (res>0)  dlbl("FP_EXDTBL", res, "FP, numeric table used by LOG");
@@ -3295,18 +3330,27 @@ int main(int argc, char *argv[])
 		
 			
 		res2=find_skel(hu_jptab);
-			if (res2>0)	dlbl("JPTAB", res2, "Jump table");
+		if (res2<0)
+			res2=find_skel(hu_jptab_old);
+		if (res2>0)	dlbl("JPTAB", res2, "Jump table");
 
 		res=find_skel(tkhudson_skel);
+		if (res<0)
+			res=find_skel(tkhudson_skel_old);
 		if (res>0) {
 			printf("\n# TOKEN table position = $%04X\n",res);
-			printf("\n\t[128] ");
-			chr=129;
+			if (brand == HUBASIC_OLD) {
+				printf("\n\t[129] ");
+				chr=130;
+			} else{
+				printf("\n\t[128] ");
+				chr=129;
+			}
 			for (i=res; img[i+pos]!=255; i++) {
 				c=img[i+pos];
 				if (c>=128) {
 					c-=128;  if (c==0) c=' ';
-						if (chr>224)
+						if ((brand != HUBASIC_OLD) && (chr>224))
 							printf("%c \t{} \n\t[%d] ",c, chr++);
 						else
 							printf("%c \t{%4X} \n\t[%d] ",c, img[res2+pos]+256*img[res2+pos+1], chr++);
@@ -3354,6 +3398,35 @@ int main(int argc, char *argv[])
 				} else printf("%c",c);
 			}
 		}
+
+		printf("\n");
+		
+		res2=find_skel(hu_jptab_fn_old);
+		if (res2>0)	dlbl("JPTAB_FN", res2, "Jump table for functions");
+
+		res=find_skel(tkhudson_skel_fn_old);
+		if (res>0) {
+			printf("\n# TOKEN table position for functions = $%04X\n",res);
+			//if (brand == HUBASIC_OLD) {
+				printf("\n\t[129] ");
+				chr=130;
+			//} else{
+			//	printf("\n\t[128] ");
+			//	chr=129;
+			//}
+			for (i=res; img[i+pos]!=255; i++) {
+				c=img[i+pos];
+				if (c>=128) {
+					c-=128;  if (c==0) c=' ';
+//						if ((brand != HUBASIC_OLD) && (chr>224))
+//							printf("%c \t{} \n\t[%d] ",c, chr++);
+//						else
+							printf("%c \t{%4X} \n\t[%d] ",c, img[res2+pos]+256*img[res2+pos+1], chr++);
+					res2+=2;
+				} else printf("%c",c);
+			}
+		}
+
 	
 	}
 
