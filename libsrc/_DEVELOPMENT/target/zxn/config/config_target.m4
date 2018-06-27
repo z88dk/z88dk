@@ -16,7 +16,7 @@ define(`__ZXNEXT_LAST_PAGE', 223)
 
 # Static Environment
 
-define(`__ENV_FILENAME', `/sys/env.txt')            # file containing environment variables
+define(`__ENV_FILENAME', `/sys/env.cfg')            # file containing environment variables
 
 define(`__ENV_BUFSZ', 128)                          # size of static file buffer
 define(`__ENV_GETENV_VALSZ', 64)                    # size of static value buffer for getenv
