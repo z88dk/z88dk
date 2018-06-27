@@ -2396,6 +2396,7 @@
 #define __RP3_ENABLE_COVOX  0x08
 #define __RP3_ENABLE_TIMEX  0x04
 #define __RP3_ENABLE_TURBOSOUND  0x02
+#define __RP3_DISABLE_CONTENTION  0x40
 #define __RP3_UNLOCK_7FFD  0x80
 
 #define __REG_SUB_VERSION  14
@@ -2499,6 +2500,8 @@
 
 #define __REG_FALLBACK_COLOR  74
 
+#define __REG_SPRITE_TRANSPARENCY_INDEX  75
+
 #define __REG_MMU0  80
 #define __REG_MMU1  81
 #define __REG_MMU2  82
@@ -2554,8 +2557,6 @@
 
 #define __IO_303B_MAX_SPRITES_PER_LINE  0x02
 #define __IO_303B_COLLISION  0x01
-
-#define __IO_SPRITE_PALETTE  0x53
 
 #define __IO_SPRITE_ATTRIBUTE  0x57
 
