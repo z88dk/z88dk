@@ -219,34 +219,24 @@ ENDIF
 	; SETWRT on the M5 sets C correctly on exit, it may be differente elsewhere
 
 	ld	hl,$1800
-	call SETWRT
-	xor a
-	ld e,3
+	call	SETWRT
+	xor	a
+	ld	e,3
 pattern:
 IF VDP_DATA > 255
-	ld (VDP_DATA),a
+	ld	(VDP_DATA),a
 ELSE
-	out (VDP_DATA),a
+	out	(VDP_DATA),a
 ENDIF
-	inc a
-	jr nz,pattern
-	dec e
-	jr nz,pattern
-	
-	ld bc,6144	; set VRAM attribute area
-	ld a,$F1	; white on black
-	ld hl,8192
-;	push bc
-	call FILVRM
-;	pop bc		; clear VRAM picture area
-;	xor a
-;	ld	h,a
-;	ld	l,a
-;	jp	FILVRM
-
-
-
-    ret
+	inc	a
+	jr	nz,pattern
+	dec	e
+	jr	nz,pattern
+	ld	bc,6144	; set VRAM attribute area
+	ld	a,$F1	; white on black
+	ld	hl,8192
+	call	FILVRM
+	ret
 
 	
 ; Switch 2 Video Mode n. 3
