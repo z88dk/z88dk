@@ -20,22 +20,22 @@ l0_z180_mulu_64_32x32:
     ; exit  : dehl dehl' = 64-bit product
     ;         carry reset
     ;
-    ; uses  : af, bc, de, hl, bc', de', hl'
+    ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-    ; save material for the byte p6 = x3*y3 + carry
+    ; save material for the byte p7 p6 = x3*y3 + p5 carry
     exx                         ;'
     ld h,d
     ld l,b
     push hl                     ;'x3 y3
 
-    ; save material for the byte p5 = x3*y2 + x2*y3 + carry
+    ; save material for the byte p5 = x3*y2 + x2*y3 + p4 carry
     ld l,c
     push hl                     ;'x3 y2
     ld h,b
     ld l,e
     push hl                     ;'y3 x2
 
-    ; save material for the byte p4 = x3*y1 + x2*y2 + x1*y3 + carry
+    ; save material for the byte p4 = x3*y1 + x2*y2 + x1*y3 + p3 carry
     ld h,e
     ld l,c
     push hl                     ;'x2 y2
@@ -47,7 +47,7 @@ l0_z180_mulu_64_32x32:
     ld h,d
     push hl                     ; x1 y1
 
-    ; save material for the byte p3 = x3*y0 + x2*y1 + x1*y2 + x0*y3 + carry
+    ; save material for the byte p3 = x3*y0 + x2*y1 + x1*y2 + x0*y3 + p2 carry
     push bc                     ; y1 y0
     exx                         ;'
     push de                     ;'x3 x2
@@ -55,7 +55,7 @@ l0_z180_mulu_64_32x32:
     exx                         ;
     push de                     ; x1 x0
 
-    ; save material for the byte p2 = x2*y0 + x0*y2 + x1*y1 + carry
+    ; save material for the byte p2 = x2*y0 + x0*y2 + x1*y1 + p1 carry
     ; start of 32_32x32
     exx                         ;'
     ld h,e
@@ -67,7 +67,8 @@ l0_z180_mulu_64_32x32:
     ld l,c
     push hl                     ; x0 y0
 
-    ; start of 32_16x16
+    ; start of 32_16x16          p1 = x1*y0 + x0*y1 + p0 carry
+    ;                            p0 = x0*y0
 
     ld h,d
     ld l,b

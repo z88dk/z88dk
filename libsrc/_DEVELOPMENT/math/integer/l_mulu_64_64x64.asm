@@ -23,19 +23,26 @@ PUBLIC l_mulu_64_64x64
    ;         carry set if overflow
    ;
    ; uses  : af, bc, de, hl, af', bc', de', hl'
-   
-IF __CLIB_OPT_IMATH <= 50
+
+IF __Z180
 
    EXTERN l_small_mul_64_64x64
-   
    defc l_mulu_64_64x64 = l_small_mul_64_64x64
 
-ENDIF
+ELSE
 
-IF __CLIB_OPT_IMATH > 50
+    IF __CLIB_OPT_IMATH <= 50
 
-   EXTERN l_fast_mulu_64_64x64
-   
-   defc l_mulu_64_64x64 = l_fast_mulu_64_64x64
+       EXTERN l_small_mul_64_64x64
+       defc l_mulu_64_64x64 = l_small_mul_64_64x64
+
+    ENDIF
+
+    IF __CLIB_OPT_IMATH > 50
+
+       EXTERN l_fast_mulu_64_64x64
+       defc l_mulu_64_64x64 = l_fast_mulu_64_64x64
+
+    ENDIF
 
 ENDIF

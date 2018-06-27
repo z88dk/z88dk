@@ -16,18 +16,25 @@ PUBLIC l_mulu_72_64x8
    ;
    ; uses  : af, bc, de, hl, bc', de', hl'
 
-IF __CLIB_OPT_IMATH <= 50
+IF __Z180
 
-   EXTERN l_small_mul_72_64x8
+   EXTERN l_z180_mulu_72_64x8
+   defc l_mulu_72_64x8 = l_z180_mulu_72_64x8
 
-   defc l_mulu_72_64x8 = l_small_mul_72_64x8
+ELSE
 
-ENDIF
+    IF __CLIB_OPT_IMATH <= 50
 
-IF __CLIB_OPT_IMATH > 50
+       EXTERN l_small_mul_72_64x8
+       defc l_mulu_72_64x8 = l_small_mul_72_64x8
 
-   EXTERN l_fast_mulu_72_64x8
-   
-   defc l_mulu_72_64x8 = l_fast_mulu_72_64x8
+    ENDIF
+
+    IF __CLIB_OPT_IMATH > 50
+
+       EXTERN l_fast_mulu_72_64x8
+       defc l_mulu_72_64x8 = l_fast_mulu_72_64x8
+
+    ENDIF
 
 ENDIF

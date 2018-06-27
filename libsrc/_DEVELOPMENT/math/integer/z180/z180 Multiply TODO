@@ -136,11 +136,9 @@ PUBLIC l_mulu_72_64x8
     ; exit  : a dehl'dehl = 72-bit product
     ;         carry reset
     EXTERN l_small_mul_72_64x8
-        ; enter :   dehl'dehl = 64-bit multiplicand
-        ;                   a = 8-bit multiplicand
-        ; exit  : a dehl'dehl = 72-bit product
-        ;         carry reset
-        EXTERN l_small_mul_40_32x8
-
+           ; enter :   dehl'dehl = 64-bit multiplicand
+           ;                   a = 8-bit multiplicand
+           ; exit  : a dehl'dehl = 72-bit product
+           ;         carry reset
 
 

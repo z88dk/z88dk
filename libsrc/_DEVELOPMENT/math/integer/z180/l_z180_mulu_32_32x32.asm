@@ -22,7 +22,7 @@ l0_z180_mulu_32_32x32:
     ;
     ; uses  : af, bc, de, hl, bc', de', hl'
 
-    ; save material for the highest order byte p3 = x3*y0 + x2*y1 + x1*y2 + x0*y3 + carry
+    ; save material for the byte p3 = x3*y0 + x2*y1 + x1*y2 + x0*y3 + p2 carry
     push de                     ; x3 x2
     exx
     push bc                     ; y1 y0
@@ -30,7 +30,7 @@ l0_z180_mulu_32_32x32:
     exx
     push bc                     ; y3 y2
 
-    ; save material for the higher order byte p2 = x2*y0 + x0*y2 + x1*y1 + carry
+    ; save material for the byte p2 = x2*y0 + x0*y2 + x1*y1 + p1 carry
     ; start of 32_32x32
 
     ld h,e
@@ -42,8 +42,8 @@ l0_z180_mulu_32_32x32:
     ld l,c
     push hl                     ; x0 y0
 
-    ; save material for the higher order byte p1 = x1*y1 + carry
-    ; start of 32_16x16
+    ; start of 32_16x16          p1 = x1*y0 + x0*y1 + p0 carry
+    ;                            p0 = x0*y0
 
     ld h,d
     ld l,b
