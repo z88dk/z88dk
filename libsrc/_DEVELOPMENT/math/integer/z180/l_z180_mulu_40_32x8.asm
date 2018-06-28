@@ -2,7 +2,7 @@
 
 INCLUDE "config_private.inc"
 
-IF __Z180
+IF __CPU_Z180__
 
 SECTION code_clib
 SECTION code_math
@@ -19,11 +19,11 @@ l_z180_mulu_40_32x8:
     ; exit  : adehl = 40-bit product
     ;         carry reset
     ;
-    ; uses  : af, bc, de, hl
+    ; uses  : af, bc, de, hl, af'
 
-   ex af,af                     ; 
-   push af                      ;'preserve af'
-   ex af,af                     ; y
+;  ex af,af                     ; 
+;  push af                      ;'preserve af'
+;  ex af,af                     ; y
 
    ld c,l                       ; x0
    ld b,a
@@ -64,9 +64,9 @@ l_z180_mulu_40_32x8:
    ld a,b                       ;'p4 carry
    adc a,0                      ;'final carry
 
-   ex af,af
-   pop af                       ;'restore af'
-   ex af,af
+;  ex af,af
+;  pop af                       ;'restore af'
+;  ex af,af
    ret
 
 ENDIF

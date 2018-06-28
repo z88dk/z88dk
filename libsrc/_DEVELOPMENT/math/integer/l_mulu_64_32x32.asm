@@ -16,7 +16,7 @@ PUBLIC l_mulu_64_32x32
    ;
    ; uses  : af, bc, de, hl, bc', de', hl'
 
-IF __Z180
+IF __CPU_Z180__
 
    EXTERN l_small_mul_64_32x32
    defc l_mulu_64_32x32 = l_small_mul_64_32x32

@@ -2,7 +2,7 @@
 
 INCLUDE "config_private.inc"
 
-IF __Z180
+IF __CPU_Z180__
 
 SECTION code_clib
 SECTION code_math

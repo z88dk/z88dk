@@ -36,7 +36,7 @@ l_small_mul_64_32x32:
    exx
    pop de
 
-IF __Z180
+IF __CPU_Z180__
 
    EXTERN l0_z180_mulu_64_32x32
    defc l0_small_mul_64_32x32 = l0_z180_mulu_64_32x32

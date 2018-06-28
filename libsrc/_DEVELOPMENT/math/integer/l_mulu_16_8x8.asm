@@ -9,7 +9,7 @@ PUBLIC l_mulu_16_8x8
    ; compute:  hl = l * e
    ; alters :  af, bc, de, hl
 
-IF __Z180
+IF __CPU_Z180__
 
 l_mulu_16_8x8:
 

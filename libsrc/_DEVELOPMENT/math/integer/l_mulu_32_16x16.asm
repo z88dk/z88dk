@@ -9,7 +9,7 @@ PUBLIC l_mulu_32_16x16
    ; compute:  dehl = hl * de
    ; alters :  af, bc, de, hl
 
-IF __Z180
+IF __CPU_Z180__
 
    EXTERN l_z180_mulu_32_16x16
    defc l_mulu_32_16x16 = l_z180_mulu_32_16x16
