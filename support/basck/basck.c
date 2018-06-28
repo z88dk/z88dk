@@ -958,7 +958,7 @@ int main(int argc, char *argv[])
 {
 	FILE	*fpin;
 	int	c, chr;
-	int	i;
+	int	i, flg;
 	long res, res2, res3;
 	int token_range;
 	int brand;
@@ -3322,13 +3322,20 @@ int main(int argc, char *argv[])
 						append_c('N');
 						append_c('_');
 						append_c(img[i]);
-						clbl(token, img[i+1]+256*img[i+2], "Monitor command");
+						clbl(token, img[i+pos+1]+256*img[i+pos+2], "Monitor command");
 					}
 			}
 				
 		printf("\n");
 		
-			
+		
+		res3=0; flg=0;
+		if (brand == HUBASIC_OLD) {
+			res2=find_skel(hu_jptab_fn_old);
+			if (res2>0)
+				res3 = img[res2+pos]+256*img[res2+pos+1];
+		}
+		
 		res2=find_skel(hu_jptab);
 		if (res2<0)
 			res2=find_skel(hu_jptab_old);
@@ -3350,25 +3357,36 @@ int main(int argc, char *argv[])
 				c=img[i+pos];
 				if (c>=128) {
 					c-=128;  if (c==0) c=' ';
-						if ((brand != HUBASIC_OLD) && (chr>224))
+						if (((brand != HUBASIC_OLD) && (chr>224)) || flg)
 							printf("%c \t{} \n\t[%d] ",c, chr++);
 						else
 							printf("%c \t{%4X} \n\t[%d] ",c, img[res2+pos]+256*img[res2+pos+1], chr++);
 					res2+=2;
+					if (img[res2+pos]+256*img[res2+pos+1] == res3) flg=1;
 				} else printf("%c",c);
 			}
 		}
 		
 		printf("\n");
 		
-		res2=find_skel(hu_jptab2);
-			if (res2>0)	dlbl("JPTAB2", res2, "Jump table #2");
+		res2=find_skel(hu_jptab_fn_old);
+		if (res2<0)
+			res2=find_skel(hu_jptab2);
+		if (res2>0)
+			dlbl("JPTAB2", res2, "Jump table #2");
 
 		res=find_skel(tkhudson_skel2);
+		if (res<0)
+			res=find_skel(tkhudson_skel_fn_old);	// HUBASIC_OLD only
 		if (res>0) {
 			printf("\n# TOKEN table position for prefix $FF = $%04X\n",res);
+			if (brand == HUBASIC_OLD) {
+				printf("\n\t[129] ");
+				chr=130;
+			} else{
 			printf("\n\t[128] ");
-			chr=129;
+				chr=129;
+			}
 			for (i=res; img[i+pos]!=255; i++) {
 				c=img[i+pos];
 				if (c>=128) {
@@ -3398,35 +3416,6 @@ int main(int argc, char *argv[])
 				} else printf("%c",c);
 			}
 		}
-
-		printf("\n");
-		
-		res2=find_skel(hu_jptab_fn_old);
-		if (res2>0)	dlbl("JPTAB_FN", res2, "Jump table for functions");
-
-		res=find_skel(tkhudson_skel_fn_old);
-		if (res>0) {
-			printf("\n# TOKEN table position for functions = $%04X\n",res);
-			//if (brand == HUBASIC_OLD) {
-				printf("\n\t[129] ");
-				chr=130;
-			//} else{
-			//	printf("\n\t[128] ");
-			//	chr=129;
-			//}
-			for (i=res; img[i+pos]!=255; i++) {
-				c=img[i+pos];
-				if (c>=128) {
-					c-=128;  if (c==0) c=' ';
-//						if ((brand != HUBASIC_OLD) && (chr>224))
-//							printf("%c \t{} \n\t[%d] ",c, chr++);
-//						else
-							printf("%c \t{%4X} \n\t[%d] ",c, img[res2+pos]+256*img[res2+pos+1], chr++);
-					res2+=2;
-				} else printf("%c",c);
-			}
-		}
-
 	
 	}
 
