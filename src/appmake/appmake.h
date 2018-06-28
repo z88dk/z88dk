@@ -99,6 +99,9 @@ extern option_t  msx_options;
 extern int       mtx_exec(char *target);
 extern option_t  mtx_options;
 
+extern int       multi8_exec(char *target);
+extern option_t  multi8_options;
+
 extern int       mz_exec(char *target);
 extern option_t  mz_options;
 
@@ -275,6 +278,10 @@ struct {
       "Memotech MTX file format packaging, optional WAV format",
       NULL,
       mtx_exec,     &mtx_options },
+    { "bin2m8",   "multi8",   "(C) 2018 Dominic Morris",
+      "Generates a tape file for the Mitsubishi Multi8 computers",
+      NULL,
+      multi8_exec,      &multi8_options },
     { "bin2m12",  "mz",       "(C) 2000,2003 S. Bodrato, J.F.J. Laros, M. Nemecek",
       "Generates a tape file for the Sharp MZ computers",
       NULL,
