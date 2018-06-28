@@ -75,3 +75,12 @@ IF FORsg1000
 	defc VDP_STATUS  = 0xbf
 	defc VRAM_SIZE   = 16
 ENDIF
+
+IF FORcoleco
+	defc VDP_DATA    = 0xbe
+	defc VDP_DATAIN  = 0xbe
+	defc VDP_CMD     = 0xbf
+	defc VDP_STATUS  = 0xbf
+	defc VRAM_SIZE   = 16
+
+ENDIF
