@@ -115,6 +115,8 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 	defc	__crt_org_bss = CRT_ORG_BSS
         IF DEFINED_CRT_MODEL
             defc __crt_model = CRT_MODEL
+        ELSE
+            defc __crt_model = 1
         ENDIF
 	INCLUDE	"crt/classic/crt_section.asm"
 
