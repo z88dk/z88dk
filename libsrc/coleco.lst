@@ -1,12 +1,13 @@
 @stdio/ansicore.lst
-stdio/coleco/fgetc_cons
-stdio/coleco/getk
 stdio/ansi/msx/f_ansi_attr
 stdio/ansi/msx/f_ansi_bel
 stdio/ansi/msx/f_ansi_char
 stdio/ansi/msx/f_ansi_cls_nobios
 stdio/ansi/generic/f_ansi_dline
 stdio/ansi/msx/f_ansi_scrollup_nobios
+stdio/coleco/CRT_FONT
+stdio/coleco/fgetc_cons
+stdio/coleco/getk
 @stdio/tms9918/tms9918.lst
 @stdio/stdio.lst
 @font/font_8x8/font_8x8.lst
