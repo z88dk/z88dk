@@ -34,6 +34,7 @@ int multi8_exec(char *target)
     int     c;
     int     i;
     int     len, blocklen;
+    int     cksum;
 
     if ( help )
         return -1;
@@ -86,20 +87,32 @@ int multi8_exec(char *target)
 
     for (i=0; i<(len / 255) * 255;i++) {
       if (((i%255)==0)&&(i!=len)) {
+         if ( i != 0 ) {
+             writebyte(-cksum,fpout);
+         }
          writebyte(0x3a,fpout);
          writebyte(0xff,fpout);
+	 cksum = 255;
       }
       c=getc(fpin);
+      cksum += c;
       writebyte(c,fpout);
+    }
+
+    if ( i ) {
+        writebyte(-cksum,fpout);
     }
 
     if ( len != i ) {
         writebyte(0x3a,fpout);
         writebyte(len - i,fpout);
+        cksum = len - i;
         for ( ; i < len ; i++ ) {
             c=getc(fpin);
             writebyte(c,fpout);
+            cksum += c;
         }
+        writebyte(-cksum,fpout);
     }
     writebyte(0x3a,fpout);
     writebyte(0x00,fpout);
