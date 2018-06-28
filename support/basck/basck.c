@@ -4,10 +4,10 @@
  *   This tool looks for known 'fingerprints' in the code and tries to identify
  *   function entry points and to provide a cross-reference for further ROM analysis.
  *
- *   It works with either Sinclair or Microsoft ROMs, giving hints to set-up a brand new
- *   target port or to just extend it with an alternative shortcuts (i.e. in the FP package).
+ *   It works with Sinclair, Microsoft or Hu-BASIC ROMs or raw datafiles (tape images, etc..), giving hints to 
+ *   set-up a brand new target port or to just extend it with an alternative shortcuts (i.e. in the FP package).
  *
- *   $Id: basck.c,v 1.19 2017-01-09 09:35:42 stefano Exp $
+ *   $Id: basck.c - updated in 2018 $
  */
 
 unsigned char  *img;
@@ -803,8 +803,10 @@ long signed_byte(long byt)
 /* DATA label declaration */
 int dlbl(char *label, long position, char *comment) {
 if (SKOOLMODE) {
-	printf("@ $%04x label=%s\n", position, label);
-	printf("D $%04x %s\n", position, comment);
+	if (strlen(label) >2) {
+		printf("@ $%04x label=%s\n", position, label);
+		printf("D $%04x %s\n", position, comment);
+	}
 } else
 	printf("%s \t= $%04X   ; %s\n", label, position, comment);
 }
@@ -813,8 +815,10 @@ if (SKOOLMODE) {
 /* CODE label declaration */
 int clbl(char *label, long position, char *comment) {
 if (SKOOLMODE) {
-	printf("@ $%04x label=%s\n", position, label);
-	printf("c $%04x %s\n", position, comment);
+	if (strlen(label) >2) {
+		printf("@ $%04x label=%s\n", position, label);
+		printf("c $%04x %s\n", position, comment);
+	}
 } else
 	printf("%s \t= $%04X   ; %s\n", label, position, comment);
 }
@@ -834,13 +838,11 @@ void append_c(char c) {
 			token[sl] = '_';
 			token[sl+1] = '\0';
 			break;
-		/*
 		case '$':
 			token[sl] = '_';
 			token[sl+1] = 'S';
 			token[sl+2] = '\0';
 			break;
-			*/
 		default:
 			token[sl] = c;
 			token[sl+1] = '\0';
@@ -2302,9 +2304,15 @@ int main(int argc, char *argv[])
 			
 		}
 
+		
 		res=find_skel(tkmsbasic_ex_skel);
 		
 		if (res>0) {
+		
+		/*********************************/
+		/* Microsoft Extended Basic mode */
+		/*********************************/
+		
 			res+=1;
 			
 			printf("\n# TOKEN table position = $%04X, word list in 'extended BASIC' mode.\n",res);
@@ -2571,9 +2579,10 @@ int main(int argc, char *argv[])
 
 			
 		} else {
-			
-			
-		/* Classic MS BASIC MODE */
+		
+		/******************************************/
+		/* Classic (Non-Extended) Microsoft BASIC */
+		/******************************************/
 		
 			res=find_skel(tkmsbasic_skel)-1;
 			if (res<0)
@@ -3326,7 +3335,7 @@ int main(int argc, char *argv[])
 					}
 			}
 				
-		printf("\n");
+		printf("\n\n");
 		
 		
 		res3=0; flg=0;
@@ -3347,27 +3356,49 @@ int main(int argc, char *argv[])
 		if (res>0) {
 			printf("\n# TOKEN table position = $%04X\n",res);
 			if (brand == HUBASIC_OLD) {
-				printf("\n\t[129] ");
+				if (!SKOOLMODE)
+					printf("\n\t[129] ");
 				chr=130;
-			} else{
-				printf("\n\t[128] ");
+			} else {
+				if (!SKOOLMODE)
+					printf("\n\t[128] ");
 				chr=129;
 			}
+			clear_token();
+			append_c('_');
 			for (i=res; img[i+pos]!=255; i++) {
 				c=img[i+pos];
+
 				if (c>=128) {
-					c-=128;  if (c==0) c=' ';
+					c-=128;  
+					if (c==0) c=' ';
+					append_c(c);
 						if (((brand != HUBASIC_OLD) && (chr>224)) || flg)
-							printf("%c \t{} \n\t[%d] ",c, chr++);
+							if (SKOOLMODE)
+								chr++;
+							else
+								printf("%c \t{} \n\t[%d] ",c, chr++);
 						else
-							printf("%c \t{%4X} \n\t[%d] ",c, img[res2+pos]+256*img[res2+pos+1], chr++);
+							if (SKOOLMODE)
+								clbl(token, img[res2+pos]+256*img[res2+pos+1], "BASIC command entry");
+							else
+								if (SKOOLMODE)
+									chr++;
+								else
+									printf("%c \t{%4X} \n\t[%d] ",c, img[res2+pos]+256*img[res2+pos+1], chr++);
+					clear_token();
+					append_c('_');
 					res2+=2;
 					if (img[res2+pos]+256*img[res2+pos+1] == res3) flg=1;
-				} else printf("%c",c);
+				} else { 
+					append_c(c);
+					if (!SKOOLMODE)
+						printf("%c",c);
+				}
 			}
 		}
 		
-		printf("\n");
+		printf("\n\n");
 		
 		res2=find_skel(hu_jptab_fn_old);
 		if (res2<0)
@@ -3379,25 +3410,40 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(tkhudson_skel_fn_old);	// HUBASIC_OLD only
 		if (res>0) {
-			printf("\n# TOKEN table position for prefix $FF = $%04X\n",res);
+			printf("\n# TOKEN table position for prefix $FF = $%04X\n",res);		
+			clear_token();			
 			if (brand == HUBASIC_OLD) {
-				printf("\n\t[129] ");
+				if (!SKOOLMODE)
+					printf("\n\t[129] ");
 				chr=130;
-			} else{
-			printf("\n\t[128] ");
+			} else {
+				if (!SKOOLMODE)
+					printf("\n\t[128] ");
 				chr=129;
 			}
 			for (i=res; img[i+pos]!=255; i++) {
 				c=img[i+pos];
 				if (c>=128) {
-					c-=128;  if (c==0) c=' ';
-						printf("%c \t{%4X} \n\t[%d] ",c, img[res2+pos]+256*img[res2+pos+1], chr++);
+					c-=128;
+					if (c==0) c=' ';
+					append_c(c);
+						if (SKOOLMODE) {
+							chr++;
+							clbl(token, img[res2+pos]+256*img[res2+pos+1], "BASIC command entry (prefix $FF)");
+						} else
+							printf("%c \t{%4X} \n\t[%d] ",c, img[res2+pos]+256*img[res2+pos+1], chr++);
+					clear_token();
+					append_c('_');
 					res2+=2;
-				} else printf("%c",c);
+				} else { 
+					append_c(c);
+					if (!SKOOLMODE)
+						printf("%c",c);
+				}
 			}
 		}
 		
-		printf("\n");
+		printf("\n\n");
 		
 		res2=find_skel(hu_jptab3);
 			if (res2>0)	dlbl("JPTAB3", res2, "Jump table #3");
@@ -3405,15 +3451,29 @@ int main(int argc, char *argv[])
 		res=find_skel(tkhudson_skel3);
 		if (res>0) {
 			printf("\n# TOKEN table position for prefix $FE = $%04X\n",res);
-			printf("\n\t[128] ");
+			clear_token();
+			if (!SKOOLMODE)
+				printf("\n\t[128] ");
 			chr=129;
 			for (i=res; img[i+pos]!=255; i++) {
 				c=img[i+pos];
 				if (c>=128) {
-					c-=128;  if (c==0) c=' ';
-						printf("%c \t{%4X} \n\t[%d] ",c, img[res2+pos]+256*img[res2+pos+1], chr++);
+					c-=128;
+					if (c==0) c=' ';
+					append_c(c);
+					if (SKOOLMODE) {
+							chr++;
+							clbl(token, img[res2+pos]+256*img[res2+pos+1], "BASIC command entry (prefix $FE)");
+						} else
+							printf("%c \t{%4X} \n\t[%d] ",c, img[res2+pos]+256*img[res2+pos+1], chr++);
+					clear_token();
+					append_c('_');
 					res2+=2;
-				} else printf("%c",c);
+				} else { 
+					append_c(c);
+					if (!SKOOLMODE)
+						printf("%c",c);
+				}
 			}
 		}
 	
