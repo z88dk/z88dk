@@ -64,6 +64,10 @@ define(`__esx_tapeout_trunc', 3)
 define(`__ESX_M_GETHANDLE', 0x8d)
 define(`__ESX_M_GETDATE', 0x8e)
 define(`__ESX_M_EXECCMD', 0x8f)
+
+define(`__ESX_M_SETCAPS', 0x91)
+define(`__esx_caps_fast_trunc', 0x80)
+
 define(`__ESX_M_DRVAPI', 0x92)
 define(`__ESX_M_GETERR', 0x93)
 define(`__ESX_M_P3DOS', 0x94)
@@ -212,6 +216,10 @@ PUBLIC `__esx_tapeout_trunc'
 PUBLIC `__ESX_M_GETHANDLE'
 PUBLIC `__ESX_M_GETDATE'
 PUBLIC `__ESX_M_EXECCMD'
+
+PUBLIC `__ESX_M_SETCAPS'
+PUBLIC `__esx_caps_fast_trunc'
+
 PUBLIC `__ESX_M_DRVAPI'
 PUBLIC `__ESX_M_GETERR'
 PUBLIC `__ESX_M_P3DOS'
@@ -353,6 +361,10 @@ defc `__esx_tapeout_trunc' = __esx_tapeout_trunc
 defc `__ESX_M_GETHANDLE' = __ESX_M_GETHANDLE
 defc `__ESX_M_GETDATE' = __ESX_M_GETDATE
 defc `__ESX_M_EXECCMD' = __ESX_M_EXECCMD
+
+defc `__ESX_M_SETCAPS' = __ESX_M_SETCAPS
+defc `__esx_caps_fast_trunc' = __esx_caps_fast_trunc
+
 defc `__ESX_M_DRVAPI' = __ESX_M_DRVAPI
 defc `__ESX_M_GETERR' = __ESX_M_GETERR
 defc `__ESX_M_P3DOS' = __ESX_M_P3DOS
@@ -494,6 +506,10 @@ ifdef(`CFG_C_DEF',
 `#define' `__ESX_M_GETHANDLE'  __ESX_M_GETHANDLE
 `#define' `__ESX_M_GETDATE'  __ESX_M_GETDATE
 `#define' `__ESX_M_EXECCMD'  __ESX_M_EXECCMD
+
+`#define' `__ESX_M_SETCAPS'  __ESX_M_SETCAPS
+`#define' `__esx_caps_fast_trunc'  __esx_caps_fast_trunc
+
 `#define' `__ESX_M_DRVAPI'  __ESX_M_DRVAPI
 `#define' `__ESX_M_GETERR'  __ESX_M_GETERR
 `#define' `__ESX_M_P3DOS'  __ESX_M_P3DOS

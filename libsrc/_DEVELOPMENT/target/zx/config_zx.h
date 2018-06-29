@@ -1063,6 +1063,10 @@
 #define __ESX_M_GETHANDLE  0x8d
 #define __ESX_M_GETDATE  0x8e
 #define __ESX_M_EXECCMD  0x8f
+
+#define __ESX_M_SETCAPS  0x91
+#define __esx_caps_fast_trunc  0x80
+
 #define __ESX_M_DRVAPI  0x92
 #define __ESX_M_GETERR  0x93
 #define __ESX_M_P3DOS  0x94

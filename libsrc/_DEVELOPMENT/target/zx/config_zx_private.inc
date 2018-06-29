@@ -1066,6 +1066,10 @@ defc __esx_tapeout_trunc = 3
 defc __ESX_M_GETHANDLE = 0x8d
 defc __ESX_M_GETDATE = 0x8e
 defc __ESX_M_EXECCMD = 0x8f
+
+defc __ESX_M_SETCAPS = 0x91
+defc __esx_caps_fast_trunc = 0x80
+
 defc __ESX_M_DRVAPI = 0x92
 defc __ESX_M_GETERR = 0x93
 defc __ESX_M_P3DOS = 0x94
