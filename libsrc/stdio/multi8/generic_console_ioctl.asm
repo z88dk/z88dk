@@ -49,7 +49,7 @@ set_mode_2:		;Graphics
 	or	@00011000		;Page in all graphics pages
 	ld	l,a
 	ld	a,(__port29_copy)
-	ld	h,40
+	ld	h,80
 	and	@10111111		;Bit 6 = 0 = 40 column
 set_mode:
 	ld	(__port29_copy),a
