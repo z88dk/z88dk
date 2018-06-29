@@ -75,6 +75,8 @@ arch/zxn/esxdos/c/sdcc_iy/esx_m_getdrv
 arch/zxn/esxdos/c/sdcc_iy/esx_m_geterr
 arch/zxn/esxdos/c/sdcc_iy/esx_m_geterr_callee
 arch/zxn/esxdos/c/sdcc_iy/esx_m_gethandle
+arch/zxn/esxdos/c/sdcc_iy/esx_m_setcaps
+arch/zxn/esxdos/c/sdcc_iy/esx_m_setcaps_fastcall
 arch/zxn/esxdos/c/sdcc_iy/esx_m_setdrv
 arch/zxn/esxdos/c/sdcc_iy/esx_m_setdrv_fastcall
 arch/zxn/esxdos/c/sdcc_iy/esx_m_tapein_close

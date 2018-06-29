@@ -148,6 +148,10 @@ __OPROTO(,,uint16_t,,esx_m_dosversion,void)
 __OPROTO(,,unsigned char,,esx_m_getdrv,void)
 __DPROTO(,,unsigned char,,esx_m_setdrv,unsigned char drive)
 
+#define ESX_CAPS_FAST_TRUNC  __esx_caps_fast_trunc
+
+__DPROTO(,,unsigned char,,esx_m_setcaps,unsigned char caps)
+
 // time.h contains functions dealing with dos time
 
 __DPROTO(,,unsigned char,,esx_m_getdate,struct dos_tm *)

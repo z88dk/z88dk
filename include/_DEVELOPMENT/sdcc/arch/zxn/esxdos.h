@@ -226,6 +226,14 @@ extern unsigned char esx_m_setdrv_fastcall(unsigned char drive) __z88dk_fastcall
 
 
 
+#define ESX_CAPS_FAST_TRUNC  __esx_caps_fast_trunc
+
+extern unsigned char esx_m_setcaps(unsigned char caps);
+extern unsigned char esx_m_setcaps_fastcall(unsigned char caps) __z88dk_fastcall;
+#define esx_m_setcaps(a) esx_m_setcaps_fastcall(a)
+
+
+
 // time.h contains functions dealing with dos time
 
 extern unsigned char esx_m_getdate(struct dos_tm *);

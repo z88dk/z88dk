@@ -58,6 +58,7 @@ arch/zxn/esxdos/c/sccz80/esx_m_getdrv
 arch/zxn/esxdos/c/sccz80/esx_m_geterr
 arch/zxn/esxdos/c/sccz80/esx_m_geterr_callee
 arch/zxn/esxdos/c/sccz80/esx_m_gethandle
+arch/zxn/esxdos/c/sccz80/esx_m_setcaps
 arch/zxn/esxdos/c/sccz80/esx_m_setdrv
 arch/zxn/esxdos/c/sccz80/esx_m_tapein_close
 arch/zxn/esxdos/c/sccz80/esx_m_tapein_flags
