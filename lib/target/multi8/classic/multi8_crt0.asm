@@ -22,8 +22,9 @@
 
 
 
-        defc    CONSOLE_ROWS = 24
-        defc    CONSOLE_COLUMNS = 32
+        defc    CONSOLE_ROWS = 20
+        defc    CONSOLE_COLUMNS = 40
+	defc	CRT_KEY_DEL = 8
 
 	IF      !DEFINED_CRT_ORG_CODE
 		defc    CRT_ORG_CODE  = 0xC000
