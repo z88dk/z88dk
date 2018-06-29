@@ -92,7 +92,7 @@ int tkhudson_skel2[]={15, 0xFE, 0xFE, 0x38, SKIP, 0x3C, 0x01, CATCH, CATCH, 0x28
 int tkhudson_skel3[]={15, 0xFE, 0xFE, 0x38, SKIP, 0x3C, 0x01, SKIP, SKIP, 0x28, SKIP, 0x01, CATCH, CATCH, 0x7E, 0x23};
 
 int tkhudson_skel_old[]={20, 0x01, CATCH, CATCH, 0xCD, SKIP, SKIP, 0x30, SKIP, 0x01, SKIP, SKIP, 0xCD, SKIP, SKIP, 0x38, SKIP, 0x2B, 0x7E, 0x36, 0xFF};
-//int tkhudson_detoken[]={20, 0x01, SKIP, SKIP, 0xCD, CATCH, CATCH, 0x30, SKIP, 0x01, SKIP, SKIP, 0xCD, SKIP, SKIP, 0x38, SKIP, 0x2B, 0x7E, 0x36, 0xFF};
+int tkhudson_imser[]={20, 0x01, SKIP, SKIP, 0xCD, CATCH, CATCH, 0x30, SKIP, 0x01, SKIP, SKIP, 0xCD, SKIP, SKIP, 0x38, SKIP, 0x2B, 0x7E, 0x36, 0xFF};
 int tkhudson_skel_fn_old[]={20, 0x01, SKIP, SKIP, 0xCD, SKIP, SKIP, 0x30, SKIP, 0x01, CATCH, CATCH, 0xCD, SKIP, SKIP, 0x38, SKIP, 0x2B, 0x7E, 0x36, 0xFF};
  
 
@@ -2752,9 +2752,15 @@ int main(int argc, char *argv[])
 			if (brand>0)
 				printf("#  Amstrad signature found\n");
 		}
+
+		printf("\n");
 		
+		if (SKOOLMODE)
+			dlbl("STKEND", res, "STKEND system variable");
+
 		brand=0;
-		printf("\n\tSTKEND system variable = %d  ; ",res);
+		
+		printf("\n#\t STKEND system variable = %d  ; ",res);
 			switch (res) {
 				case 16400:
 					printf ("ZX80 System Variables mode\n");
@@ -2778,11 +2784,14 @@ int main(int argc, char *argv[])
 					printf ("Unknown System Variables mode\n");
 					break;
 			}
+			
+		printf("\n");
+		
 		res=find_skel(prog_skel);
 		if (res<0)
 			res=find_skel(prog_skel2);
 		if (res>0)
-			printf("\n\tPROG    = $%04X  ; BASIC program start",res);
+			printf("\n#\tPROG    = $%04X  ; BASIC program start",res);
 			switch (res) {
 				case 0x4396:
 					printf (" - LAMBDA style addressing");
@@ -2800,21 +2809,28 @@ int main(int argc, char *argv[])
 					break;
 			}
 
+		printf("\n");
+			
+		if (SKOOLMODE)
+			dlbl("PROG", res, "BASIC program start");
+
 		res=find_skel(vars_skel);
 		if (res<0)
 			res=find_skel(vars_skel2);
 		if (res>0)
-			printf("\n\tVARS    = $%04X  ; BASIC variables ptr",res);
+			dlbl("VARS", res, "BASIC variables ptr");
+		
 
 		res=find_skel(eline_skel);
 		if (res<0)
 			res=find_skel(eline_skel2);
 		if (res>0)
-			printf("\n\tE-LINE  = $%04X  ; Ptr to line being edited",res);
+			dlbl("E-LINE", res, "Ptr to line being edited");
+
 
 		res=find_skel(seed_skel);
 		if (res>0)
-			printf("\n\tSEED    = $%04X  ; 'SEED' for RND function",res);
+			dlbl("SEED", res, "'SEED' for RND function");
 		
 		printf("\n");
 
@@ -2822,62 +2838,59 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(next_one_skel2);
 		if (res>0)
-			printf("\n\tNEXT-ONE  = $%04X  ; Find next variable or program line",res);
+			clbl("NEXT-ONE", res, "Find next variable or program line");
 		
 		res=find_skel(restack_skel);
 		if (res>0)
-			printf("\n\tZXFP_DO_RESTACK   = $%04X  ; Not on ZX81",res+1);
+			clbl("ZXFP_DO_RESTACK", res, "Not on ZX81, refresh FP value on stack");
 	
-		printf("\n");
-
 		res=find_skel(stk_pntr_skel);
 		if (res>0)
-			printf("\n\tZXFP_STK_PTR   = $%04X\n",res);
+			dlbl("ZXFP_STK_PTR", res, "FP calc stack pointer");
 
 		res=find_skel(stk_st_skel);
 		if (res>0)
-			printf("\n\tZXFP_STK_STORE = $%04X",res);
+			clbl("ZXFP_STK_STORE", res, "Put FP number on calculator stack (5 registers)");
 
 		res=find_skel(test5fp_skel);
 		if (res<0) 
 			res=find_skel(test5fp_skel2);
 		if (res>0)
-			printf("\n\tZXFP_TEST_5_FP = $%04X",res);
-		
+			clbl("ZXFP_TEST_5_FP", res, "Test five-spaces");
+
 		res=find_skel(stkstr_skel);
 		if (res>0)
-			printf("\n\tZXFP_STK_STR   = $%04X",res);
+			clbl("ZXFP_STK_STR", res, "Put string on calculator stack (5 registers)");
 		
 		res=find_skel(stkftch_skel);
 		if (res<0)
 				res=find_skel(stkftch_skel2);
 		if (res>0)
-			printf("\n\tZXFP_STK_FETCH = $%04X",res);
+			clbl("ZXFP_STK_FETCH", res, "Get FP number from calculator stack (5 registers)");
 
 		res=find_skel(stka_skel);
 		if (res>0)
-			printf("\n\tZXFP_STACK_A   = $%04X",res);
+			clbl("ZXFP_STACK_A", res, "Put FP number in A reg on calculator stack");
 		
 		res=find_skel(stkbc_skel);
 		if (res>0)
-			printf("\n\tZXFP_STACK_BC  = $%04X",res);
+			clbl("ZXFP_STACK_BC", res, "Put FP number in BC reg on calculator stack");
 
 		res=find_skel(fpbc_skel);
 		if (res<0)
 			res=find_skel(fpbc_skel2);
 		if (res>0)
-			printf("\n\tZXFP_FP_TO_BC  = $%04X",res);
+			clbl("ZXFP_FP_TO_BC", res, "Convert FP number to integer value in BC");
 
 		res=find_skel(intfp_skel);
 		if (res<0)
 			res=find_skel(intfp_skel2);
 		if (res>0)
-			printf("\n\tZXFP_INT_TO_FP = $%04X",res);
+			clbl("ZXFP_INT_TO_FP", res, "Integer to floating point");
 
 		res=find_skel(decfp_skel);
 		if (res>0)
-			printf("\n\tZXFP_DEC_TO_FP = $%04X",res);
-
+			clbl("ZXFP_DEC_TO_FP", res, "Decimal floating point");
 
 		printf("\n");
 		
@@ -2886,32 +2899,32 @@ int main(int argc, char *argv[])
 			res=find_skel(zxfpmod_skel2);
 		if (res>0) {
 			if (img[res-1] & 0xC7 == 0xC7)
-				printf("\n\tZXFP_BEGIN_CALC  = $%02X\n",img[res-1] & 0x38);
+				printf("\n#\tZXFP_BEGIN_CALC  = $%02X\n",img[res-1] & 0x38);
 			if (img[res+12]==img[res+33]) {
-				printf("\n\tZXFP_END_CALC   = $%02X",img[res+12]);
-				printf("\n\tZXFP_DELETE     = $%02X",img[res+1]);
-				printf("\n\tZXFP_DUPLICATE  = $%02X",img[res+2]);
-				printf("\n\tZXFP_SUBTRACT   = $%02X",img[res+11]);
-				printf("\n\tZXFP_DIVISION   = $%02X",img[res+4]);
-				printf("\n\tZXFP_MULTIPLY   = $%02X",img[res+9]);
-				printf("\n\tZXFP_EXCHANGE   = $%02X",img[res+7]);
-				printf("\n\tZXFP_INT        = $%02X",img[res+5]);
-				printf("\n\tZXFP_ST_MEM_0   = $%02X",img[res]);
-				printf("\n\tZXFP_GET_MEM_0  = $%02X",img[res+3]);
-				printf("\n\tZXFP_LESS_0     = $%02X",img[res+16]);
-				printf("\n\tZXFP_JUMP_TRUE  = $%02X",img[res+17]);
-				printf("\n\tZXFP_TRUNCATE   = $%02X",img[res+19]);
-				printf("\n\tZXFP_NOT        = $%02X",img[res+28]);
-				printf("\n\tZXFP_STK_ONE    = $%02X",img[res+31]);
+				printf("\n#\tZXFP_END_CALC   = $%02X",img[res+12]);
+				printf("\n#\tZXFP_DELETE     = $%02X",img[res+1]);
+				printf("\n#\tZXFP_DUPLICATE  = $%02X",img[res+2]);
+				printf("\n#\tZXFP_SUBTRACT   = $%02X",img[res+11]);
+				printf("\n#\tZXFP_DIVISION   = $%02X",img[res+4]);
+				printf("\n#\tZXFP_MULTIPLY   = $%02X",img[res+9]);
+				printf("\n#\tZXFP_EXCHANGE   = $%02X",img[res+7]);
+				printf("\n#\tZXFP_INT        = $%02X",img[res+5]);
+				printf("\n#\tZXFP_ST_MEM_0   = $%02X",img[res]);
+				printf("\n#\tZXFP_GET_MEM_0  = $%02X",img[res+3]);
+				printf("\n#\tZXFP_LESS_0     = $%02X",img[res+16]);
+				printf("\n#\tZXFP_JUMP_TRUE  = $%02X",img[res+17]);
+				printf("\n#\tZXFP_TRUNCATE   = $%02X",img[res+19]);
+				printf("\n#\tZXFP_NOT        = $%02X",img[res+28]);
+				printf("\n#\tZXFP_STK_ONE    = $%02X",img[res+31]);
 			}
 			if (img[res+12]==img[res+87]) {
-				printf("\n\tZXFP_ADDITION   = $%02X",img[res+49]);
-				printf("\n\tZXFP_STK_DATA   = $%02X",img[res+36]);
-				printf("\n\tZXFP_ST_MEM_3   = $%02X",img[res+46]);
-				printf("\n\tZXFP_GET_MEM_3  = $%02X",img[res+86]);
-				printf("\n\tZXFP_SERIES_08  = $%02X",img[res+52]);
+				printf("\n#\tZXFP_ADDITION   = $%02X",img[res+49]);
+				printf("\n#\tZXFP_STK_DATA   = $%02X",img[res+36]);
+				printf("\n#\tZXFP_ST_MEM_3   = $%02X",img[res+46]);
+				printf("\n#\tZXFP_GET_MEM_3  = $%02X",img[res+86]);
+				printf("\n#\tZXFP_SERIES_08  = $%02X",img[res+52]);
 				printf("\n");				
-				printf("\n\tZXFP_FP_TO_A  = $%04X",img[res+89]+256*img[res+90]);
+				printf("\n#\tZXFP_FP_TO_A  = $%04X",img[res+89]+256*img[res+90]);
 			}
 
 		}
@@ -2919,13 +2932,15 @@ int main(int argc, char *argv[])
 		res=find_skel(rnd_skel);
 		if (res>0) {
 			printf("\n");
-			printf("\n\tZXFP_STK_ONE    = $%02X",img[res+1]);
-			printf("\n\tZXFP_STK_DATA   = $%02X",img[res+3]);
-			printf("\n\tZXFP_N_MOD_M    = $%02X",img[res+13]);
+			printf("\n#\tZXFP_STK_ONE    = $%02X",img[res+1]);
+			printf("\n#\tZXFP_STK_DATA   = $%02X",img[res+3]);
+			printf("\n#\tZXFP_N_MOD_M    = $%02X",img[res+13]);
 			if (img[res+18]==img[res+42]) {
-				printf("\n\tZXFP_STK_PI_D_2 = $%02X",img[res+13]);
+				printf("\n#\tZXFP_STK_PI_D_2 = $%02X",img[res+13]);
 			}
 		}
+
+		printf("\n\n\n");
 
 		/* Sinclair BASIC Commands */
 	
@@ -2934,13 +2949,14 @@ int main(int argc, char *argv[])
 			case LAMBDA:
 				res=find_skel(tklambda_skel);
 				if (res>0) {
-					printf("\n\n\nTOKEN table position = $%04X\n",res);
-					printf("\n\t--- ");
+					if (SKOOLMODE)	dlbl("TKN_TABLE", res, "TOKEN table position");
+						printf("\n\n\n#TOKEN table position = $%04X\n",res);
+						printf("\n#\t--- ");						
 					chr=192;
 					for (i=res; (img[i]!=0xCD)!=0; i++) {
 						c=img[i] & 0xBF;
 						if (chr==256)  chr=64;
-						if (c>=128) { c-=128; printf("%c \n\t%d ",zx81char(c), chr++); }
+						if (c>=128) { c-=128; printf("%c \n#\t%d ",zx81char(c), chr++); }
 						else printf("%c",zx81char(c));
 					}
 				}
@@ -2949,13 +2965,14 @@ int main(int argc, char *argv[])
 			case ZX81:
 				res=find_skel(tkzx81_skel);
 				if (res>0) {
-					printf("\n\n\nTOKEN table position = $%04X\n",res);
-					printf("\n\t--- ");
+					if (SKOOLMODE)	dlbl("TKN_TABLE", res, "TOKEN table position");
+					printf("\n\n\n#TOKEN table position = $%04X\n",res);
+					printf("\n#\t--- ");
 					chr=192;
 					for (i=res; (img[i]!=0x23)!=0; i++) {
 						c=img[i] & 0xBF;
 						if (chr==256) chr=64;
-						if (c>=128) { c-=128; printf("%c \n\t%d ",zx81char(c), chr++); }
+						if (c>=128) { c-=128; printf("%c \n#\t%d ",zx81char(c), chr++); }
 						else printf("%c",zx81char(c));
 					}
 				}
@@ -2964,17 +2981,18 @@ int main(int argc, char *argv[])
 			case TS2068:
 				res=find_skel(tk2068_skel);
 				if (res>0) {
-					printf("\n\n\nTOKEN table position = $%04X\n",res);
-					printf("\n\t--- ");
+					if (SKOOLMODE)	dlbl("TKN_TABLE", res, "TOKEN table position");
+					printf("\n\n\n#TOKEN table position = $%04X\n",res);
+					printf("\n#\t--- ");
 					chr=165;
 					for (i=res; (chr<263)!=0; i++) {
 						c=img[i];
 						if (c>=128) {
 							c-=128;
 							if (chr<=255)
-								printf("%c \n\t%d ",c, chr++);
+								printf("%c \n#\t%d ",c, chr++);
 							else {
-								printf("%c \n\t    ",c);
+								printf("%c \n#\t    ",c);
 								chr++;
 							}
 						}
@@ -2985,14 +3003,15 @@ int main(int argc, char *argv[])
 			default:
 				res=find_skel(tkspectrum_skel);
 				if (res>0) {
-					printf("\n\n\nTOKEN table position = $%04X\n",res);
-					printf("\n\t--- ");
+					if (SKOOLMODE)	dlbl("TKN_TABLE", res, "TOKEN table position");
+					printf("\n\n\n#TOKEN table position = $%04X\n",res);
+					printf("\n#\t--- ");
 					chr=165;
 					if (len>16384) res+=16384;
 					if (len>32768) res+=32768;
 					for (i=res; (chr<=256)!=0; i++) {
 						c=img[i];
-						if (c>=128) { c-=128; printf("%c \n\t%d ",c, chr++); }
+						if (c>=128) { c-=128; printf("%c \n#\t%d ",c, chr++); }
 						else printf("%c",c);
 					}
 					res=find_skel(tkzx128_skel);
@@ -3002,7 +3021,7 @@ int main(int argc, char *argv[])
 					if (res>0) {
 						for (i=res; (img[i]>2); i++) {
 							c=img[i];
-							if (c>=128) { c-=128; printf("%c\n\t    ",c); }
+							if (c>=128) { c-=128; printf("%c\n#\t    ",c); }
 							else printf("%c",c);
 						}
 					}
@@ -3012,14 +3031,12 @@ int main(int argc, char *argv[])
 
 	}
 
-
+	
 	res=find_skel(zxshadow_end);
 	
 	if (res>0) {
-		printf("\nShadow memory for ZX Spectrum ROM found\n");
-		
-		printf("\n\tZX_SHADOW_END  =  $%04X    ; Return to the BASIC interpreter\n",res);
-		
+		printf("\n#Shadow memory for ZX Spectrum ROM found\n");
+		dlbl("ZX_SHADOW_END", res, "Return to the BASIC interpreter");
 	}
 
 
@@ -3091,10 +3108,13 @@ int main(int argc, char *argv[])
 		if (res>0)	{
 			clbl("IDEEXP", res+pos+1, "DE=(HL), A=next character to be parsed");
 			clbl("STDEFC", res+pos+4, "DE=CINT(HL), A=next character to be parsed");
+		} else {
+			res=find_skel(hu_expr);
+			if (res>0)	clbl("IDEEXP", res, "Evaluate expression");
 		}
 		
-		res=find_skel(hu_expr);
-		if (res>0)	clbl("IDEEXP", res, "Evaluate expression");
+		res=find_skel(tkhudson_imser);
+		if (res>0)	clbl("IMSER", res, "search in Token Table");
 			
 		res=find_skel(hu_cint);
 		if (res>0)	clbl("CINT", res, "Convert to integer");
