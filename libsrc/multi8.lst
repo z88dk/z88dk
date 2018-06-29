@@ -10,4 +10,9 @@ multi8/tape_load
 multi8/asm_tape_load
 multi8/load_palette
 @stdio/stdio.lst
+psg/multi8/set_psg
+psg/multi8/set_psg_callee
+psg/multi8/get_psg
+psg/multi8/psg_init
+@psg/psg.lst
 @z80.lst
