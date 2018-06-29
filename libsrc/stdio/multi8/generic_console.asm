@@ -8,7 +8,9 @@
 ; Text mode = two bytes get written 2k apart
 ;
 
-		SECTION		code_clib
+		; In code_driver so we are low down in memory and hopefully
+		; never paged out
+		SECTION		code_driver
 
 		PUBLIC		generic_console_cls
 		PUBLIC		generic_console_vpeek
@@ -24,6 +26,8 @@
 
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
+		EXTERN		__vram_in
+		EXTERN		__vram_out
 
 		defc		DISPLAY = 0x8000
 
@@ -53,7 +57,7 @@ store:
 
 generic_console_cls:
 	call	l_push_di
-	ld	a,0x17		
+	ld	a,(__vram_in)
 	out	($2a),a
 	ld	hl, DISPLAY
 	ld	de, DISPLAY +1
@@ -66,7 +70,7 @@ generic_console_cls:
 	ld	a,(__multi8_attr)
 	ld	(hl),a
 	ldir
-	ld	a,0xf
+	ld	a,(__vram_out)
 	out	($2a),a
 	call	l_pop_ei
 	ret
@@ -80,14 +84,14 @@ generic_console_printc:
 	call	xypos
 	ld	e,a
         call    l_push_di
-        ld      a,0x17       
+	ld	a,(__vram_in)
         out     ($2a),a
 	ld	(hl),e
 	ld	bc,0x800
 	add	hl,bc
 	ld	a,(__multi8_attr)
 	ld	(hl),a
-	ld	a,0xf
+	ld	a,(__vram_out)
 	out	($2a),a
 	call	l_pop_ei
 	ret
@@ -101,10 +105,10 @@ generic_console_vpeek:
 	sla	c		;40 column to 80 columns translation
 	call	xypos
 	call	l_push_di
-	ld	a,0x17
+	ld	a,(__vram_in)
 	out	($2a),a
 	ld	b,(hl)
-	ld	a,0xf
+	ld	a,(__vram_out)
 	out	($2a),a
 	call	l_pop_ei
 	ld	a,b
@@ -125,7 +129,7 @@ generic_console_scrollup:
 	push	de
 	push	bc
 	call	l_push_di
-	ld	a,0x17
+	ld	a,(__vram_in)
 	out	($2a),a
 	ld	hl, DISPLAY + 80
 	ld	de, DISPLAY
@@ -149,7 +153,7 @@ generic_console_scrollup_4:
 	ld	(hl),a
 	inc	hl
 	djnz	generic_console_scrollup_4
-	ld	a,0xf
+	ld	a,(__vram_out)
 	out	($2a),a
 	call	l_pop_ei
 	pop	bc
