@@ -84,6 +84,9 @@ program:
 	call	crt0_init_bss
 	ld      (exitsp),sp
 
+	ld	a,(SYSVAR_PORT29_COPY)
+	ld	(__port29_copy),a
+
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
 ; the compiled program and the stack pointer

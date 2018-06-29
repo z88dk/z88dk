@@ -21,6 +21,7 @@
 	PUBLIC    l_dcal          ;jp(hl)
 
 
+	defc	SYSVAR_PORT29_COPY = 0xf0bb
 
         defc    TAR__fputc_cons_generic = 1
         defc    CONSOLE_ROWS = 20
@@ -49,4 +50,7 @@ l_dcal:	jp	(hl)		;Used for function pointer calls
 	PUBLIC	__vram_out
 __vram_in:	defb	VRAM_IN
 __vram_out:	defb	VRAM_OUT
+	SECTION	bss_crt
+	PUBLIC	__port29_copy
+__port29_copy:	defb	0
 

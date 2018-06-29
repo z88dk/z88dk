@@ -28,6 +28,7 @@
 		EXTERN		CONSOLE_ROWS
 		EXTERN		__vram_in
 		EXTERN		__vram_out
+		EXTERN		__port29_copy
 
 		defc		DISPLAY = 0x8000
 
@@ -168,9 +169,9 @@ __multi8_attr:	defb	0x07		;white ink
 	SECTION		code_crt_init
 
 	; Enable colour text mode
-	ld	a,($f0bb)
+	ld	a,(__port29_copy)
 	and	127
-	ld	($f0bb),a
+	ld	(__port29_copy),a
 	out	($29),a
 
 IF write_palette
