@@ -2,7 +2,7 @@
 *        ZX NEXT Application Generator
 *        See also zx.c
 *
-*        Alvin Albrecht  - 09/2017 through 03/2018
+*        Alvin Albrecht  - 09/2017 through 06/2018
 */
 
 #include "appmake.h"
@@ -61,6 +61,11 @@ static struct zx_bin zxb = {
     16          // recsize
 };
 
+static struct zxn_nex zxnex = {
+    0,          // screen
+    7           // border
+};
+
 static char tap = 0;            // .tap tape
 static char sna = 0;            // .sna 48k/128k snapshot
 static char dot = 0;            //  esxdos dot command
@@ -68,6 +73,7 @@ static char dotn = 0;           //  nextos dot command
 static char universal_dot = 0;  //  nextos universal dot command
 static char zxn = 0;            // .zxn full size memory executable
 static char bin = 0;            // .bin output binaries with banks correctly merged
+static char nex = 0;            // .nex format
 
 /* Options that are available for this module */
 option_t zxn_options[] = {
@@ -102,6 +108,10 @@ option_t zxn_options[] = {
     {  0,  "exclude-banks",    "Exclude memory banks from output", OPT_STR, &zxc.excluded_banks },
     {  0,  "exclude-sections", "Exclude sections from output", OPT_STR, &zxc.excluded_sections },
     {  0,  "clean",    "Remove consumed source binaries\n", OPT_BOOL, &zxc.clean },
+
+    {  0,  "nex",      "Make .nex instead of .tap", OPT_BOOL,   &nex },
+    {  0,  "nex-screen", "File containing loading screen", OPT_STR, &zxnex.screen },
+    {  0,  "nex-border", "Initial border colour\n", OPT_INT, &zxnex.border },
 
     {  0,  "dot",      "Make esxdos dot command instead of .tap", OPT_BOOL, &dot },
     {  0,  "dotn",     "Make nextos dot command instead of .tap", OPT_BOOL, &dotn },
@@ -172,7 +182,7 @@ int zxn_exec(char *target)
         zxs.xsna = 1;
     }
 
-    tap = !dot && !dotn && !sna && !zxn && !bin;
+    tap = !dot && !dotn && !sna && !zxn && !bin && !nex;
 
     if (tap && (zxc.main_fence > 0))
         fprintf(stderr, "Warning: Main-fence is ignored for tap compiles\n");
@@ -445,7 +455,7 @@ int zxn_exec(char *target)
 
     // if using 5,2,0 main bank executable model, merge these banks into the main bank
 
-    if (sna || dotn)
+    if (sna || dotn || nex)
     {
         if (bsnum_bank >= 0)
         {
@@ -600,6 +610,20 @@ int zxn_exec(char *target)
         }
     }
 
+    // nex format
+
+    if (nex)
+    {
+        if ((ret = zxn_nex(&zxc, &zxnex, &memory, zxb.romfill)) != 0)
+            return ret;
+
+        // nex is out but we need to process any remaining binaries
+        // remove the mainbank; BANK space should have been emptied
+
+        mb_remove_mainbank(&memory.mainbank, zxc.clean);
+        // mb_remove_bankspace(&memory, "BANK");
+    }
+
     // if user wants memory represented in 8k segments must switch from current 16k segments
 
     if (zxc.pages)
@@ -732,7 +756,7 @@ int zxn_exec(char *target)
                     unsigned char mem[8192];
 
                     printf("Page %d", i);
-                    zxn_construct_page_contents(mem, mb, zxb.romfill);
+                    zxn_construct_page_contents(mem, mb, sizeof(mem), zxb.romfill);
 
                     // append to sna
 
@@ -756,7 +780,7 @@ int zxn_exec(char *target)
         fclose(zxs.fsna);
         zxs.fsna = 0;
     }
-    
+
     // nextos dotn command
 
     if (dotn)
@@ -773,7 +797,7 @@ int zxn_exec(char *target)
 
     // output remaining memory bank contents as raw binaries
     
-    if (bin || sna || dot || dotn || tap)
+    if (bin || sna || nex || dot || dotn || tap)
     {
         mb_generate_output_binary_complete(zxc.binname, zxb.ihex, zxb.romfill, zxb.ipad, zxb.recsize, &memory);
         ret = 0;
