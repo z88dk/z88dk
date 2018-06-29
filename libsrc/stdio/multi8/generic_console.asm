@@ -27,11 +27,28 @@
 
 		defc		DISPLAY = 0x8000
 
+generic_console_set_ink:
+	and	7
+	ld	b,a
+	ld	a,(__multi8_attr)
+	and	248
+	or	b
+	ld	(__multi8_attr),a
+	ret
+
+	
 generic_console_ioctl:
 	scf
-generic_console_set_ink:
 generic_console_set_paper:
+
 generic_console_set_inverse:
+	ld	a,(__multi8_attr)
+	and	0xdf
+	bit	7,(hl)
+	jr	z,store
+	or	0x20
+store:
+	ld	(__multi8_attr),a
 	ret
 
 generic_console_cls:
@@ -42,6 +59,12 @@ generic_console_cls:
 	ld	de, DISPLAY +1
 	ld	bc, 80 * 25 - 1
 	ld	(hl),32
+	ldir
+	ld	hl, DISPLAY + 0x800
+	ld	de, DISPLAY + 0x800 + 1
+	ld	bc, 80 * 25 - 1
+	ld	a,(__multi8_attr)
+	ld	(hl),a
 	ldir
 	ld	a,0xf
 	out	($2a),a
@@ -106,15 +129,26 @@ generic_console_scrollup:
 	out	($2a),a
 	ld	hl, DISPLAY + 80
 	ld	de, DISPLAY
-	ld	bc, 80 * 25
+	ld	bc, 80 * 24
 	ldir
-	; And blank out row 15
 	ex	de,hl
 	ld	b,80
 generic_console_scrollup_3:
 	ld	(hl),32
 	inc	hl
 	djnz	generic_console_scrollup_3
+	ld	hl, DISPLAY + 0x800 + 80
+	ld	de, DISPLAY + 0x800
+	ld	bc,80 * 24
+	ldir
+	; blank out last row
+	ex	de,hl
+	ld	b,80
+	ld	a,(__multi8_attr)
+generic_console_scrollup_4:
+	ld	(hl),a
+	inc	hl
+	djnz	generic_console_scrollup_4
 	ld	a,0xf
 	out	($2a),a
 	call	l_pop_ei
@@ -123,6 +157,33 @@ generic_console_scrollup_3:
 	ret
 
 
-	SECTION		bss_clib
+	SECTION		data_clib
 
-__multi8_attr:	defb	0
+__multi8_attr:	defb	0x07		;white ink
+
+	SECTION		code_crt_init
+
+	; Enable colour text mode
+	ld	a,($f0bb)
+	and	127
+	ld	($f0bb),a
+	out	($29),a
+
+IF write_palette
+	xor	a
+	out	($30),a
+	inc	a
+	out	($31),a
+	inc	a
+	out	($32),a
+	inc	a
+	out	($33),a
+	inc	a
+	out	($34),a
+	inc	a
+	out	($35),a
+	inc	a
+	out	($36),a
+	inc	a
+	out	($37),a
+ENDIF
