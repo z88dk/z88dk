@@ -11,7 +11,10 @@ AFILES = \
 	subcpu_command.c \
 	subcpu_reset.c \
 	subcpu_set.c \
-	subcpu_get.c
+	subcpu_get.c \
+	tape.c \
+	tape_status.c
+
 
 AOBJECTS = $(AFILES:.c=.o)
 
