@@ -16,19 +16,23 @@
 		PUBLIC		generic_console_vpeek
 		PUBLIC		generic_console_printc
 		PUBLIC		generic_console_scrollup
-		PUBLIC		generic_console_ioctl
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
 
+		PUBLIC		__multi8_font32
+		PUBLIC		__multi8_udg32
+
 		EXTERN		l_push_di
 		EXTERN		l_pop_ei
 
+		EXTERN		CRT_FONT
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
 		EXTERN		__vram_in
 		EXTERN		__vram_out
 		EXTERN		__port29_copy
+		EXTERN		__multi8_mode
 
 		defc		DISPLAY = 0x8000
 
@@ -42,9 +46,8 @@ generic_console_set_ink:
 	ret
 
 	
-generic_console_ioctl:
-	scf
 generic_console_set_paper:
+	ret
 
 generic_console_set_inverse:
 	ld	a,(__multi8_attr)
@@ -76,12 +79,24 @@ generic_console_cls:
 	call	l_pop_ei
 	ret
 
+
+scale_column:
+	ex	af,af
+	ld	a,(__multi8_mode)
+	cp	1
+	jr	z,no_scale
+	srl	c		;40 -> 80 column
+no_scale:
+	ex	af,af
+	ret
+	
+
 ; c = x
 ; b = y
 ; a = d character to print
 ; e = raw
 generic_console_printc:
-	sla	c		;40 column to 80 columns translation
+	call	scale_column
 	call	xypos
 	ld	e,a
         call    l_push_di
@@ -103,7 +118,7 @@ generic_console_printc:
 ;	 a = character,
 ;	 c = failure
 generic_console_vpeek:
-	sla	c		;40 column to 80 columns translation
+	call	scale_column
 	call	xypos
 	call	l_push_di
 	ld	a,(__vram_in)
@@ -164,7 +179,10 @@ generic_console_scrollup_4:
 
 	SECTION		data_clib
 
-__multi8_attr:	defb	0x07		;white ink
+__multi8_attr:	  defb	0x07		;white ink
+__multi8_font32:  defw    CRT_FONT
+__multi8_udg32:   defw    0
+
 
 	SECTION		code_crt_init
 
@@ -174,21 +192,3 @@ __multi8_attr:	defb	0x07		;white ink
 	ld	(__port29_copy),a
 	out	($29),a
 
-IF write_palette
-	xor	a
-	out	($30),a
-	inc	a
-	out	($31),a
-	inc	a
-	out	($32),a
-	inc	a
-	out	($33),a
-	inc	a
-	out	($34),a
-	inc	a
-	out	($35),a
-	inc	a
-	out	($36),a
-	inc	a
-	out	($37),a
-ENDIF
