@@ -12,6 +12,7 @@
 	EXTERN	__console_h
 	EXTERN	__console_w
 	EXTERN	__port29_copy
+	EXTERN	__vram_in
 
 
 ; a = ioctl
@@ -43,6 +44,10 @@ check_mode:
 	cp	2
 	jr	nz,failure
 set_mode_2:		;Graphics
+	in	a,($2a)
+	and	@00100000		;Keep lower RAM page
+	or	@00011000		;Page in all graphics pages
+	ld	l,a
 	ld	a,(__port29_copy)
 	ld	h,40
 	and	@10111111		;Bit 6 = 0 = 40 column
@@ -53,15 +58,25 @@ set_mode:
 	ld	(__multi8_mode),a
 	ld	a,h
 	ld	(__console_w),a
+	ld	a,l
+	ld	(__vram_in),a
 	call	generic_console_cls
 	jr	success
 set_mode_1:		; 80 col text
+	in	a,($2a)
+	and	@00100111		;Keep lower RAM page
+	or	@00010111		;Page in text page
+	ld	l,a
 	ld	a,(__port29_copy)
 	and	@00111111		;Bit 6 = 1 = 80 column
 	or	@01000000		
 	ld	h,80
 	jr	set_mode
 set_mode_0:		; 40 col text
+	in	a,($2a)
+	and	@00100111		;Keep lower RAM page
+	or	@00010111		;Page in all text page 
+	ld	l,a
 	ld	a,(__port29_copy)
 	and	@00111111		;Bit 6 = 0 = 40 column
 	ld	h,40

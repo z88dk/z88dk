@@ -61,7 +61,16 @@ store:
 
 generic_console_cls:
 	call	l_push_di
-	ld	a,(__vram_in)
+	ld	a,(__vram_in)	;Clear hires screens
+	and	@1111000
+	or	@0000100
+	ld	hl,DISPLAY
+	ld	de,DISPLAY + 1
+	ld	bc, 16383
+	ld	(hl),0
+	ldir
+	and	@11110000	;And clear text screen
+	or	@00000111
 	out	($2a),a
 	ld	hl, DISPLAY
 	ld	de, DISPLAY +1
@@ -96,6 +105,10 @@ no_scale:
 ; a = d character to print
 ; e = raw
 generic_console_printc:
+	ld	a,(__multi8_mode)
+	cp	2
+	jr	z, printc_graphics
+	ld	a,d
 	call	scale_column
 	call	xypos
 	ld	e,a
@@ -107,10 +120,84 @@ generic_console_printc:
 	add	hl,bc
 	ld	a,(__multi8_attr)
 	ld	(hl),a
+printc_exit:
 	ld	a,(__vram_out)
 	out	($2a),a
 	call	l_pop_ei
 	ret
+
+printc_graphics:
+	ld	a,d
+	call	xypos_graphics
+	ex	de,hl		;de = destination
+	ld	bc,(__multi8_font32)
+	ld	l,a
+	ld	h,0
+	bit	7,l
+	jr	z,not_udg
+	res	7,l
+	ld	bc,(__multi8_udg32)
+	inc	b
+not_udg:
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,bc
+	dec	h		;-32 characters
+	ex	de,hl		;hl = screen, de = font
+	call	l_push_di
+	ld	a,(__multi8_attr)
+	and	@00000111
+	ld	c,a
+	ld	a,7
+	sub	c
+	ld	c,a
+	ld	a,(__vram_in)
+	and	@11111000
+	or	c
+	ld	b,a		;b = vram bits set
+	ld	a,c
+	cpl
+	and	@00000111
+	ld	c,a
+	ld	a,(__vram_in)
+	and	@11111000
+	or	c
+	ld	c,a		;c = vram bits not set
+
+	ld	a,8
+loop:	push	af
+
+	ld	a,(de)		;Pick up font from main memory
+	ex	af,af
+
+	; Page in the "set pages"
+	ld	a,b
+	out	($2a),a
+	ex	af,af
+	ld	(hl),a
+
+	; And do the "unset" pages
+	ld	a,c
+	out	($2a),a
+	ld	(hl),0
+
+	; Page the screen out
+	ld	a,(__vram_out)
+	out	($2a),a
+
+	inc	de	;Step in font
+
+	push	bc	;And to the next row of the character
+	ld	bc,80
+	add	hl,bc
+	pop	bc
+
+	pop	af
+	dec	a
+	jr	nz,loop
+
+	jr	printc_exit
 
 ;Entry: c = x,
 ;	b = y
@@ -118,18 +205,26 @@ generic_console_printc:
 ;	 a = character,
 ;	 c = failure
 generic_console_vpeek:
+	ld	a,(__multi8_mode)
+	cp	2
+	jr	z,vpeek_graphics
 	call	scale_column
 	call	xypos
 	call	l_push_di
 	ld	a,(__vram_in)
 	out	($2a),a
 	ld	b,(hl)
+vpeek_exit:
 	ld	a,(__vram_out)
 	out	($2a),a
 	call	l_pop_ei
 	ld	a,b
 	and	a
 	ret
+
+vpeek_graphics:
+	call	l_push_di
+	jr	vpeek_exit
 
 xypos:
 	ld	hl, DISPLAY - 80
@@ -141,11 +236,25 @@ generic_console_printc_3:
 	add	hl,bc			;hl now points to address in display
 	ret
 
+; Calculate the address for the graphics mode
+xypos_graphics:
+	ld	hl, DISPLAY - 80 * 8
+	ld	de, 80 * 8
+xypos_graphics_1:
+	add	hl,de
+	djnz	xypos_graphics_1
+	add	hl,bc
+	ret
+
+
 generic_console_scrollup:
 	push	de
 	push	bc
 	call	l_push_di
+	ld	a,(__multi8_mode)
+	cp	2
 	ld	a,(__vram_in)
+	jr	z,scrollup_graphics
 	out	($2a),a
 	ld	hl, DISPLAY + 80
 	ld	de, DISPLAY
@@ -169,12 +278,39 @@ generic_console_scrollup_4:
 	ld	(hl),a
 	inc	hl
 	djnz	generic_console_scrollup_4
+scrollup_exit:
 	ld	a,(__vram_out)
 	out	($2a),a
 	call	l_pop_ei
 	pop	bc
 	pop	de
 	ret
+
+scrollup_graphics:
+	or	@00000110
+	call	scroll_gfx
+	ld	a,(__vram_in)
+	or	@00000101
+	call	scroll_gfx
+	ld	a,(__vram_in)
+	or	@00000011
+	call	scroll_gfx
+	jr	scrollup_exit
+scroll_gfx:
+	out	($2a),a
+	ld	hl, DISPLAY + 80 * 8
+	ld	de, DISPLAY
+	ld	bc, 80 * 192
+	ldir
+	ex	de,hl
+	ld	d,h
+	ld	e,l
+	inc	de
+	ld	(hl),0
+	ld	bc, 80 * 8
+	ldir
+	ret
+
 
 
 	SECTION		data_clib
