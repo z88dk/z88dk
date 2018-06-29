@@ -24,7 +24,7 @@
 	defc	SYSVAR_PORT29_COPY = 0xf0bb
 
         defc    TAR__fputc_cons_generic = 1
-        defc    CONSOLE_ROWS = 20
+        defc    CONSOLE_ROWS = 25
         defc    CONSOLE_COLUMNS = 40
 	defc	CRT_KEY_DEL = 8
 

@@ -81,13 +81,13 @@ generic_console_cls:
 
 
 scale_column:
-	ex	af,af
+	push	af
 	ld	a,(__multi8_mode)
 	cp	1
 	jr	z,no_scale
-	srl	c		;40 -> 80 column
+	sla	c		;40 -> 80 column
 no_scale:
-	ex	af,af
+	pop	af
 	ret
 	
 
@@ -191,4 +191,16 @@ __multi8_udg32:   defw    0
 	and	127
 	ld	(__port29_copy),a
 	out	($29),a
+	; Make the display 25 lines in height
+	; Write 25 to register 6 of CTC
+	; Write 7 to register 9 of CTC to set font height
+	ld	a,6
+	out	($1c),a
+	ld	a,25
+	out	($1d),a
+	ld	a,9
+	out	($1c),a
+	ld	a,7
+	out	($1d),a
+
 

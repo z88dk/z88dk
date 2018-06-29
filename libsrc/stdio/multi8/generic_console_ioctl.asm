@@ -57,12 +57,13 @@ set_mode:
 	jr	success
 set_mode_1:		; 80 col text
 	ld	a,(__port29_copy)
-	or	@11000000		;Bit 6 = 1 = 80 column
+	and	@00111111		;Bit 6 = 1 = 80 column
+	or	@01000000		
 	ld	h,80
 	jr	set_mode
 set_mode_0:		; 40 col text
 	ld	a,(__port29_copy)
-	and	@10111111		;Bit 6 = 0 = 40 column
+	and	@00111111		;Bit 6 = 0 = 40 column
 	ld	h,40
 	jr	set_mode
 failure:
