@@ -13,12 +13,15 @@
 		SECTION		code_driver
 
 		PUBLIC		generic_console_cls
-		PUBLIC		generic_console_vpeek
 		PUBLIC		generic_console_printc
 		PUBLIC		generic_console_scrollup
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
+
+		PUBLIC		generic_console_xypos_graphics
+		PUBLIC		generic_console_xypos
+		PUBLIC		generic_console_scale
 
 		PUBLIC		__multi8_font32
 		PUBLIC		__multi8_udg32
@@ -62,8 +65,8 @@ store:
 generic_console_cls:
 	call	l_push_di
 	ld	a,(__vram_in)	;Clear hires screens
-	and	@1111000
-	or	@0000100
+	and	@11110000
+	or	@00001000
 	ld	hl,DISPLAY
 	ld	de,DISPLAY + 1
 	ld	bc, 16383
@@ -89,7 +92,7 @@ generic_console_cls:
 	ret
 
 
-scale_column:
+generic_console_scale:
 	push	af
 	ld	a,(__multi8_mode)
 	cp	1
@@ -109,8 +112,8 @@ generic_console_printc:
 	cp	2
 	jr	z, printc_graphics
 	ld	a,d
-	call	scale_column
-	call	xypos
+	call	generic_console_scale
+	call	generic_console_xypos
 	ld	e,a
         call    l_push_di
 	ld	a,(__vram_in)
@@ -128,7 +131,7 @@ printc_exit:
 
 printc_graphics:
 	ld	a,d
-	call	xypos_graphics
+	call	generic_console_xypos_graphics
 	ex	de,hl		;de = destination
 	ld	bc,(__multi8_font32)
 	ld	l,a
@@ -196,39 +199,12 @@ loop:	push	af
 	pop	af
 	dec	a
 	jr	nz,loop
-
 	jr	printc_exit
 
-;Entry: c = x,
-;	b = y
-;Exit:	nc = success
-;	 a = character,
-;	 c = failure
-generic_console_vpeek:
-	ld	a,(__multi8_mode)
-	cp	2
-	jr	z,vpeek_graphics
-	call	scale_column
-	call	xypos
-	call	l_push_di
-	ld	a,(__vram_in)
-	out	($2a),a
-	ld	b,(hl)
-vpeek_exit:
-	ld	a,(__vram_out)
-	out	($2a),a
-	call	l_pop_ei
-	ld	a,b
-	and	a
-	ret
-
-vpeek_graphics:
-	call	l_push_di
-	jr	vpeek_exit
-
-xypos:
+generic_console_xypos:
 	ld	hl, DISPLAY - 80
 	ld	de,80
+	inc	b
 generic_console_printc_1:
 	add	hl,de
 	djnz	generic_console_printc_1
@@ -237,12 +213,13 @@ generic_console_printc_3:
 	ret
 
 ; Calculate the address for the graphics mode
-xypos_graphics:
+generic_console_xypos_graphics:
 	ld	hl, DISPLAY - 80 * 8
 	ld	de, 80 * 8
-xypos_graphics_1:
+	inc	b
+generic_console_xypos_graphics_1:
 	add	hl,de
-	djnz	xypos_graphics_1
+	djnz	generic_console_xypos_graphics_1
 	add	hl,bc
 	ret
 

@@ -3,6 +3,7 @@ stdio/multi8/fgetc_cons
 stdio/multi8/getk
 stdio/multi8/generic_console
 stdio/multi8/generic_console_ioctl
+stdio/multi8/generic_console_vpeek
 stdio/multi8/conio_vars
 stdio/multi8/CRT_FONT
 @font/font_8x8/font_8x8.lst
