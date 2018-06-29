@@ -103,6 +103,13 @@
 #endif
 #endif
 
+#ifdef __MULTI8__
+// Clock is 3579545
+#ifndef psgT
+#define psgT(hz)		((int)(118750.0 / (hz)))
+#endif
+#endif
+
 #ifdef __SPRINTER__
 // The PPS Sprinter PSG lib is totally untested, let's assume it is connected
 // and clocked as for a Spectrum, but probably we're wrong

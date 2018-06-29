@@ -8,6 +8,7 @@
 
 	defc	VRAM_IN = 0x17
 	defc	VRAM_OUT = 0x0f
+	defc	__PORT29_COPY = 0xf0bb
 
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = -1
@@ -22,6 +23,8 @@ start:
 	call	crt0_init_bss
 	ld      (exitsp),sp
 
+	ld	a,(SYSVAR_PORT29_COPY)
+	ld	(__port29_copy),a
 
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
