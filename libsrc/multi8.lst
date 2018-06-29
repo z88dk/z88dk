@@ -1,0 +1,8 @@
+stdio/multi8/fputc_cons_native
+stdio/multi8/fgetc_cons
+stdio/multi8/getk
+stdio/multi8/generic_console
+multi8/tape_load
+multi8/asm_tape_load
+@stdio/stdio.lst
+@z80.lst
