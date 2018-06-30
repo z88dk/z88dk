@@ -37,21 +37,21 @@ no_inverse:
 
 generic_console_set_paper:
 	and	7
-	rlca
-	rlca
-	rlca
 	ld	b,a
 	ld	a,(__alphatro_attr)
-	and	@11000111
+	and	@11111000
 	or	b
 	ld	(__alphatro_attr),a
 	ret
 	
 generic_console_set_ink:
 	and	7
+	rlca
+	rlca
+	rlca
 	ld	b,a
 	ld	a,(__alphatro_attr)
-	and	@11111000
+	and	@11000111
 	or	b
 	ld	(__alphatro_attr),a
 	ret
