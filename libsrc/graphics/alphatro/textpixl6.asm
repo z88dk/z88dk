@@ -10,13 +10,13 @@
 ;       16 32
 ; If pixel > 32 then  191 - value
 
+textpixl:
 ;
 ;
 ;       .. X. .X XX
 ;       .. .. .. ..
 ;       .. .. .. ..
 
-textpixl:
 
 	defb	0,   1,   2,  3
 
@@ -93,7 +93,7 @@ textpixl:
 	defb	143, 142, 141, 140
 
 ;	.. X. .X XX
-;       X. X. X. .
+;       X. X. X. X.
 ; 	XX XX XX XX
 	defb	139, 138, 137, 136
 

@@ -83,6 +83,7 @@ gfxdeps:
 	@$(RM) -f graphics/gray/ticalc/*.o
 	@$(RM) -f graphics/spectrum/*.o
 	@$(RM) -f graphics/z88/*.o
+	@$(RM) -f graphics/generic_console/*.o
 	@$(RM) -f graphics/text/*.o
 	@@$(RM) -f graphics/text6/*.o
 	@$(RM) -f graphics/x11/*.o
@@ -874,6 +875,7 @@ alphatro_clib.lib:
 	@echo ''
 	@echo '--- Building Triump Adler Alphatronic PC Library ---'
 	@echo ''
+	$(MAKE) gfxdeps
 	$(call buildgeneric,alphatro)
 	TARGET=alphatro TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORalphatro -x$(OUTPUT_DIRECTORY)/alphatro_clib @$(LISTFILE_DIRECTORY)/alphatro.lst
 

@@ -29,7 +29,7 @@
 	defc	CRT_ORG_CODE = 0xa000
 	defc	CRT_ORG_BSS = 0x6000
 
-	defc	CONSOLE_ROWS = 25
+	defc	CONSOLE_ROWS = 24
 	defc	CONSOLE_COLUMNS = 40
 
 	defc	CRT_KEY_DEL = 12
