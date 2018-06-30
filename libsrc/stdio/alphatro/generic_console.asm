@@ -1,22 +1,5 @@
 ;
 ;
-; Aquarius colours
-; 0  = black
-; 1  = red
-; 2  = green
-; 3  = yellow
-; 4  = blue
-; 5  = violet
-; 6  = cyan
-; 7  = white
-; 8  = light grey
-; 9  = blue green
-; 10 = magenta
-; 11 = dark blue
-; 12 = light yellow
-; 13 = light green
-; 14 = orange
-; 15 = dark gray
 
 
 		SECTION		code_clib
@@ -33,21 +16,56 @@
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
 		EXTERN		__alphatro_attr
+		EXTERN		__console_w
 
 		defc		DISPLAY = 0xf000
 		defc		COLOUR_MAP = 0xf800
 
 generic_console_ioctl:
 	scf
+
 generic_console_set_inverse:
+	ld	a,(__alphatro_attr)
+	res	7,a
+	bit	7,(hl)	
+	jr	z,no_inverse
+	set	7,a
+no_inverse:
+	ld	(__alphatro_attr),a
 	ret
 
-generic_console_set_ink:
+map_colour:
+	and	3
+	ld	c,a
+	ld	b,0
+	ld	hl,table
+	add	hl,bc
+	ld	a,(hl)
 	ret
 
-	
+table:	defb	0, 1, 2, 4
+
 generic_console_set_paper:
+	call	map_colour
+	rlca
+	rlca
+	rlca
+	ld	b,a
+	ld	a,(__alphatro_attr)
+	and	@11000111
+	or	b
+	ld	(__alphatro_attr),a
 	ret
+	
+generic_console_set_ink:
+	call	map_colour
+	ld	b,a
+	ld	a,(__alphatro_attr)
+	and	@11111000
+	or	b
+	ld	(__alphatro_attr),a
+	ret
+	
 
 generic_console_cls:
 	ld	hl, DISPLAY
@@ -92,8 +110,11 @@ generic_console_vpeek:
 
 
 xypos:
-	ld	hl,DISPLAY - 80
-	ld	de,80
+	ld	hl,DISPLAY
+	ld	de,(__console_w)
+	ld	d,0
+	and	a
+	sbc	hl,de
 	inc	b
 generic_console_printc_1:
 	add	hl,de
