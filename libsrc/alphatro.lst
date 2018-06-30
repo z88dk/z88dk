@@ -1,5 +1,6 @@
 stdio/alphatro/fputc_cons_native
 stdio/alphatro/generic_console
+stdio/alphatro/generic_console_ioctl
 stdio/alphatro/conio_vars
 stdio/alphatro/getk
 stdio/alphatro/fgetc_cons
