@@ -427,6 +427,13 @@ IF FORpv1000
 	defc maxy	= 48
 ENDIF
 
+IF FORalphatro
+	DEFINE gotgfx
+	defc maxx	= 80
+	defc maxy	= 75
+	defc blankch	= 32
+ENDIF
+
 ; =============================================
 
 

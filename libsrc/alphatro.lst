@@ -6,4 +6,9 @@ stdio/alphatro/generic_console_ioctl
 stdio/alphatro/conio_vars
 @stdio/stdio.lst
 @input/input_keyboard.lst
+graphics/dcircle2
+graphics/__gfx_coords
+graphics/alphatro/textpixl6
+graphics/alphatro/cleargraphics
+@gfxbasetxt6.lst
 @z80.lst
