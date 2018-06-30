@@ -1,0 +1,7 @@
+stdio/alphatro/fputc_cons_native
+stdio/alphatro/generic_console
+stdio/alphatro/conio_vars
+stdio/alphatro/getk
+stdio/alphatro/fgetc_cons
+@stdio/stdio.lst
+@z80.lst

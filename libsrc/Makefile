@@ -869,6 +869,15 @@ multi8_clib.lib:
 	$(call buildgeneric,multi8)
 	TARGET=multi8 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmulti8 -x$(OUTPUT_DIRECTORY)/multi8_clib @$(LISTFILE_DIRECTORY)/multi8.lst
 
+# Triumph Adler Alphatronic PC - dom
+alphatro_clib.lib:
+	@echo ''
+	@echo '--- Building Triump Adler Alphatronic PC Library ---'
+	@echo ''
+	$(call buildgeneric,alphatro)
+	TARGET=alphatro TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORalphatro -x$(OUTPUT_DIRECTORY)/alphatro_clib @$(LISTFILE_DIRECTORY)/alphatro.lst
+
+
 # Casio PV1000 - dom
 pv1000_clib.lib:
 	@echo ''
