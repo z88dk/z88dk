@@ -34,19 +34,9 @@ no_inverse:
 	ld	(__alphatro_attr),a
 	ret
 
-map_colour:
-	and	3
-	ld	c,a
-	ld	b,0
-	ld	hl,table
-	add	hl,bc
-	ld	a,(hl)
-	ret
-
-table:	defb	0, 1, 2, 4
 
 generic_console_set_paper:
-	call	map_colour
+	and	7
 	rlca
 	rlca
 	rlca
@@ -58,7 +48,7 @@ generic_console_set_paper:
 	ret
 	
 generic_console_set_ink:
-	call	map_colour
+	and	7
 	ld	b,a
 	ld	a,(__alphatro_attr)
 	and	@11111000

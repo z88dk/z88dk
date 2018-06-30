@@ -7,4 +7,4 @@
 
 		PUBLIC		__alphatro_attr
 
-.__alphatro_attr  	defb	$4		;Forground green
+.__alphatro_attr  	defb	56
