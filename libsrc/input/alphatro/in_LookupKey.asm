@@ -53,8 +53,9 @@ EXTERN in_keytranstbl
 	and	a
 	sbc	hl,de
 got_table:
-	add	hl,bc
-	ld	a,h
+	add	hl,bc		;Add the 96 back on
+	ld	a,l
+	ld	h,a
 	srl	a		;divide by 8
 	srl	a
 	srl	a
