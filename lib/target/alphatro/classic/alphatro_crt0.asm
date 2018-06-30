@@ -29,8 +29,10 @@
 	defc	CRT_ORG_CODE = 0xa000
 	defc	CRT_ORG_BSS = 0x6000
 
-	defc	CONSOLE_ROWS = 20
+	defc	CONSOLE_ROWS = 25
 	defc	CONSOLE_COLUMNS = 40
+
+	defc	CRT_KEY_DEL = 12
 
         defc    TAR__fputc_cons_generic = 1
         defc    TAR__clib_exit_stack_size = 0

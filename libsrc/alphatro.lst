@@ -1,8 +1,9 @@
+stdio/inkey/fgetc_cons
+stdio/inkey/getk
 stdio/alphatro/fputc_cons_native
 stdio/alphatro/generic_console
 stdio/alphatro/generic_console_ioctl
 stdio/alphatro/conio_vars
-stdio/alphatro/getk
-stdio/alphatro/fgetc_cons
 @stdio/stdio.lst
+@input/input_keyboard.lst
 @z80.lst
