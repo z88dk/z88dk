@@ -21,10 +21,6 @@ l_z180_mulu_72_64x8:
    ;
    ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-;  ex af,af                     ; 
-;  push af                      ;'preserve af'
-;  ex af,af                     ; y
-
    ld c,l                       ; x0
    ld b,a
    mlt bc                       ; y*x0
@@ -106,9 +102,6 @@ l_z180_mulu_72_64x8:
    ld a,b                       ;'p8 carry
    adc a,0                      ;'final carry
 
-;  ex af,af
-;  pop af                       ;'restore af'
-;  ex af,af
    exx
    ret
 

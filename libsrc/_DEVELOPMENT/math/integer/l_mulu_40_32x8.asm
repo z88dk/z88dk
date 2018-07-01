@@ -8,6 +8,7 @@ PUBLIC l_mulu_40_32x8
 
    ; compute:  adehl = dehl * a
    ; alters :  af, bc, de, hl, ixh
+   ; z180 alters:   af, bc, de, hl, af'
 
 IF __CPU_Z180__
 

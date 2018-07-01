@@ -14,7 +14,7 @@ PUBLIC l_mulu_72_64x8
    ; exit  : a dehl'dehl = 72-bit product
    ;         carry reset
    ;
-   ; uses  : af, bc, de, hl, bc', de', hl'
+   ; uses  : af, bc, de, hl, af', bc', de', hl'
 
 IF __CPU_Z180__
 
