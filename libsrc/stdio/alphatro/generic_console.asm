@@ -139,3 +139,9 @@ generic_console_scrollup_4:
 	pop	de
 	ret
 
+	SECTION		code_crt_init
+
+	EXTERN		asm_set_cursor_state
+	ld	l,0x20		;disable cursor
+	call	asm_set_cursor_state
+

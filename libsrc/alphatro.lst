@@ -16,4 +16,5 @@ graphics/__gfx_coords
 graphics/alphatro/textpixl6
 graphics/alphatro/cleargraphics
 @gfxbasetxt6.lst
+@video/mc6845/mc6845.lst
 @z80.lst
