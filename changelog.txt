@@ -37,10 +37,13 @@ z88dk vX.XX  - XX.XX.XXXX
 - [classiclib] Marked adt and balloc classic apis as deprecated
 - [classiclib] +cpc cpcrslib has been imported
 - [classiclib] CPC, MSX, SVI, ZX81, Galaksija, Sam, X1, Z1013 port improvements
-- [classiclib] New ports for Casio PV-1000, PV-2000, Colecovision
+- [classiclib] New ports for Casio PV-1000, PV-2000, Colecovision, Mitsubishi Multi8
+  Alphatronic PC
 - [classiclib] +m5 ROM cartridge support
 - [classiclib] SC-3000 target now runs on SG-1000 console
-- [classiclib] inkey() implementations for Jupiter Ace, Sord M5, PV-2000, SC-3000, VZ-200
+- [classiclib] +aquarius 8k ROM cartridges can now be created
+- [classiclib] inkey() implementations for Jupiter Ace, Sord M5, PV-2000, SC-3000,
+  VZ-200, TRS80, Exidy Sorcerer
 - [classiclib] SMS stability improvements
 - [classiclib] [all] New kbhit() implementation
 - [classiclib] Now shares ctype, string and most of stdlib with newlib
