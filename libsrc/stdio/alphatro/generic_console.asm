@@ -57,12 +57,12 @@ generic_console_set_ink:
 generic_console_cls:
 	ld	hl, DISPLAY
 	ld	de, DISPLAY +1
-	ld	bc, 80 * 25 - 1
+	ld	bc, 80 * 24 - 1
 	ld	(hl),32
 	ldir
 	ld	hl, COLOUR_MAP
 	ld	de, COLOUR_MAP+1
-	ld	bc, 80 * 25 - 1
+	ld	bc, 80 * 24 - 1
 	ld	(hl),32
 	ld	a,(__alphatro_attr)
 	ld	(hl),a
@@ -114,22 +114,36 @@ generic_console_printc_3:
 generic_console_scrollup:
 	push	de
 	push	bc
-	ld	hl, DISPLAY + 80
+	ld	hl, DISPLAY + 40
 	ld	de, DISPLAY
-	ld	bc,+ (80 * 24)
+	ld	bc,+ (40 * 23)
+	ld	a,(__console_w)
+	cp	40
+	jr	z,got_size
+	ld	hl, DISPLAY + 80
+	ld	bc, + (80 * 23)
+got_size:
 	ldir
 	ex	de,hl
-	ld	b,80
+	ld	a,(__console_w)
+	ld	b,a
 generic_console_scrollup_3:
 	ld	(hl),32
 	inc	hl
 	djnz	generic_console_scrollup_3
-	ld	hl, COLOUR_MAP + 80
+	ld	hl, COLOUR_MAP + 40
 	ld	de, COLOUR_MAP
-	ld	bc,+ (80 * 24)
+	ld	bc,+ (40 * 23)
+	ld	a,(__console_w)
+	cp	40
+	jr	z,got_size_2
+	ld	hl, COLOUR_MAP + 80
+	ld	bc, + (80 * 23)
+got_size_2:
 	ldir
 	ex	de,hl
-	ld	b,80
+	ld	a,(__console_w)
+	ld	b,a
 	ld	a,(__alphatro_attr)
 generic_console_scrollup_4:
 	ld	(hl),a
