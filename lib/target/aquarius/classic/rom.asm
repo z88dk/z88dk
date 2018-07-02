@@ -4,9 +4,9 @@
 	; Constants for ROM mode (-startup=2)
 	
 	defc    CRT_ORG_CODE  = 0xe000
-        defc    TAR__register_sp = 0x7f00
+        defc    TAR__register_sp = 0x3fff
         defc    TAR__clib_exit_stack_size = 0
-	defc	RAM_Start = 0x3800
+	defc	RAM_Start = 0x3900
 	INCLUDE	"crt/classic/crt_rules.inc"
 
 
@@ -16,6 +16,7 @@
 	defb    $53,$43,$30,$38,$4B,$9C,$B5,$B0,$A8,$6C,$AC,$64,$CC,$A8,$06,$70
 
 program:
+
 ; Make room for the atexit() stack
 	INCLUDE	"crt/classic/crt_init_sp.asm"
 	INCLUDE	"crt/classic/crt_init_atexit.asm"
