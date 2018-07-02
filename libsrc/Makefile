@@ -879,6 +879,13 @@ alphatro_clib.lib:
 	$(call buildgeneric,alphatro)
 	TARGET=alphatro TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORalphatro -x$(OUTPUT_DIRECTORY)/alphatro_clib @$(LISTFILE_DIRECTORY)/alphatro.lst
 
+# SPC-1000 - dom
+spc1000_clib.lib:
+	@echo ''
+	@echo '--- Building Samsung SPC-1000 Library ---'
+	@echo ''
+	$(call buildgeneric,spc1000)
+	TARGET=spc1000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORspc1000 -x$(OUTPUT_DIRECTORY)/spc1000_clib @$(LISTFILE_DIRECTORY)/spc1000.lst
 
 # Casio PV1000 - dom
 pv1000_clib.lib:
