@@ -5,18 +5,20 @@
 		SECTION		code_clib
 
 		PUBLIC		generic_console_cls
-		PUBLIC		generic_console_vpeek
 		PUBLIC		generic_console_scrollup
 		PUBLIC		generic_console_printc
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
+		PUBLIC		generic_console_calc_xypos
 
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
 		EXTERN		CRT_FONT
 		EXTERN		__spc1000_attr
 		EXTERN		__spc1000_mode
+		EXTERN		__spc1000_font
+		EXTERN		__spc1000_udg
 		EXTERN		__console_w
 
 		defc		DISPLAY = 0x0000
@@ -74,7 +76,7 @@ generic_console_printc:
 	cp	1
 	jr	z,printc_hires
 	ld	a,d
-	call	xypos
+	call	generic_console_calc_xypos
 	ld	c,l
 	ld	b,h
 	cp	$60
@@ -132,21 +134,8 @@ no_overflow:
 
 
 
-;Entry: c = x,
-;       b = y
-;Exit:  nc = success
-;        a = character,
-;        c = failure
-generic_console_vpeek:
-        call    xypos
-	ld	c,l
-	ld	b,h
-        in	a,(c)
-        and     a
-        ret
 
-
-xypos:
+generic_console_calc_xypos:
 	ld	hl,DISPLAY
 	ld	de,(__console_w)
 	ld	d,0
