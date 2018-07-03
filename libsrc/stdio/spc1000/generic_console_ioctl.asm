@@ -8,6 +8,7 @@
 	EXTERN	generic_console_cls
 	EXTERN	__console_h
 	EXTERN	__console_w
+	EXTERN	__spc1000_mode
 
 
 ; a = ioctl
@@ -18,27 +19,26 @@ generic_console_ioctl:
 	inc	hl
 	ld	b,(hl)
 check_mode:
-IF WRONGplatform
 	cp	IOCTL_GENCON_SET_MODE
 	jr	nz,failure
 	ld	a,c		; The mode
-	ld	l,40		; columns
-	ld	h,@01000000	; Flags for port 10 - TODO, rompack
+	ld	h,@00000000
+	ld	l,16
 	and	a
 	jr	z,set_mode
-	ld	l,80
-	ld	h,@01000001	; Flags for port 10 - TODO, rompack
+	ld	h,0x8e
+	ld	l,24
 	cp	1
 	jr	nz,failure
 set_mode:
+	ld	(__spc1000_mode),a
+	ld	bc,$2000
+	out	(c),h
 	ld	a,l
-	ld	(__console_w),a
-	ld	a,h
-	;out	($10),a
+	ld	(__console_h),a
 	call	generic_console_cls
 	and	a
 	ret
 failure:
-ENDIF
 	scf
 	ret

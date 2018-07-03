@@ -3,6 +3,8 @@ stdio/inkey/getk
 stdio/spc1000/fputc_cons_native
 stdio/spc1000/generic_console
 stdio/spc1000/generic_console_ioctl
+stdio/spc1000/CRT_FONT
+@font/font_8x8/font_8x8.lst
 @stdio/stdio.lst
 @input/input_keyboard.lst
 @z80.lst
