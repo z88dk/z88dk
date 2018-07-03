@@ -5,8 +5,8 @@
 		PUBLIC		generic_console_vpeek
 
 		EXTERN		__spc1000_mode
-		EXTERN		__spc1000_font
-		EXTERN		__spc1000_udg
+		EXTERN		generic_console_font32
+		EXTERN		generic_console_udg32
 		EXTERN		screendollar	
 		EXTERN		screendollar_with_count
 		EXTERN		generic_console_calc_xypos
@@ -29,9 +29,26 @@ generic_console_vpeek:
         call    generic_console_calc_xypos
 	ld	c,l
 	ld	b,h
-	in	a,(c)	;TODO, lower case
+	in	a,(c)
+	set	3,b
+	in	l,(c)
+	bit	3,l
+	jr	nz,lower_case
+	bit	2,l
+	jr	nz,high_chars
+done:
 	and	a
 	ret
+lower_case:
+	cp	$60
+	jr	nc,done
+	or	128
+	jr	done
+high_chars:
+	and	$0f
+	or	$e0
+	jr	done
+
 
 vpeek_hires:
         ld      hl,-8
@@ -54,11 +71,11 @@ no_overflow:
 	dec	a
 	jr	nz,vpeek_1
         pop     de              ;the buffer on the stack
-        ld      hl,(__spc1000_font)
+        ld      hl,(generic_console_font32)
 do_screendollar:
         call    screendollar
         jr      nc,gotit
-        ld      hl,(__spc1000_udg)
+        ld      hl,(generic_console_udg32)
         ld      b,128
         call    screendollar_with_count
         jr      c,gotit

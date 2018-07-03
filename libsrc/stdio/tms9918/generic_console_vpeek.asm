@@ -4,8 +4,8 @@
 	SECTION	code_clib
 	PUBLIC	__tms9918_console_vpeek
 
-	EXTERN	__tms9918_font32
-	EXTERN	__tms9918_udg32
+	EXTERN	generic_console_font32
+	EXTERN	generic_console_udg32
 	EXTERN	screendollar
 	EXTERN	screendollar_with_count
 	EXTERN	msxbios
@@ -44,10 +44,10 @@ __tms9918_console_vpeek:
 	ld	bc,8
 	call	msxbios
 	pop	de		;buffer
-	ld	hl,(__tms9918_font32)
+	ld	hl,(generic_console_font32)
 	call	screendollar
 	jr	nc,gotit
-	ld	hl,(__tms9918_udg32)
+	ld	hl,(generic_console_udg32)
 	ld	b,128
 	call	screendollar_with_count
 	jr	c,gotit

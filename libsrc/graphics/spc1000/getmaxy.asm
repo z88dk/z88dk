@@ -10,7 +10,7 @@
 ._getmaxy
         ld      a,(__spc1000_mode)
         and     a
-        ld      hl, 32
+        ld      hl, 32 - 1
         ret     z
         ld      hl,maxy - 1
         ret

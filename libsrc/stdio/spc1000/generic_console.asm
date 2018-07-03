@@ -124,6 +124,7 @@ high_chars:
 	and	$f
 	ld	d,a
 	ld	a,(__spc1000_attr)
+	dec	a
 	and	7
 	rlca
 	rlca
@@ -133,9 +134,7 @@ high_chars:
 	out	(c),a
 	ld	a,(__spc1000_attr)
 	or	4
-	set	3,b
-	out	(c),a
-	ret
+	jr	write_attr
 
 hardware_chars:
 	out	(c),a
