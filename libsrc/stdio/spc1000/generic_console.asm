@@ -103,6 +103,47 @@ generic_console_printc_3:
 generic_console_scrollup:
 	push	de
 	push	bc
+	ld	bc, CONSOLE_COLUMNS	;source
+	ld	hl, +((CONSOLE_ROWS -1)* CONSOLE_COLUMNS)
+scroll_loop:
+	push	hl
+	in	e,(c)
+	set	3,b
+	in	d,(c)
+	res	3,b
+	ld	hl,-CONSOLE_COLUMNS
+	add	hl,bc
+	ld	c,l
+	ld	b,h
+	out	(c),e
+	set	3,b
+	out	(c),d
+	res	3,b
+	ld	hl,CONSOLE_COLUMNS + 1
+	add	hl,bc
+	ld	c,l
+	ld	b,h
+	pop	hl
+	dec	hl
+	ld	a,h
+	or	l
+	jr	nz,scroll_loop
+
+	ld	hl,-CONSOLE_COLUMNS
+	add	hl,bc
+	ld	c,l
+	ld	b,h
+	ld	e,32
+	ld	d,' '
+	ld	a,(__spc1000_attr)
+scroll_loop_2:
+	out	(c),d
+	set	3,b
+	out	(c),a
+	res	3,b
+	inc	bc
+	dec	e
+	jr	nz,scroll_loop_2
 	pop	bc
 	pop	de
 	ret
