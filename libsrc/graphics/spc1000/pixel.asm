@@ -1,4 +1,3 @@
-        INCLUDE "graphics/grafix.inc"
 
 	EXTERN pixeladdress
 

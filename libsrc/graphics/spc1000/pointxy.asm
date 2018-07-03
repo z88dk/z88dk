@@ -7,9 +7,19 @@
 
         SECTION code_clib
 	PUBLIC	pointxy
+        EXTERN  __spc1000_mode
+        defc    NEEDpoint= 1
+
+dotext:
+	ld	a,l
+	cp	32
+	ret	nc
+        INCLUDE "graphics/generic_console/pixel.asm"
 
 
 .pointxy			
-	defc	NEEDpoint = 1
+        ld      a,(__spc1000_mode)
+        and     a
+        jr      z,dotext
 	INCLUDE "pixel.asm"
 

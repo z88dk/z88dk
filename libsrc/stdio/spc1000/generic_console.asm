@@ -107,8 +107,10 @@ generic_console_printc:
 	ld	c,l
 	ld	b,h
 	cp	$60
-	jr	c,not_lower
+	jr	c,hardware_chars
 	; We do something with characters > 0xe0 here
+	cp	$e0
+	jr	nc,high_chars
 	and	$7f
 	out	(c),a
 	ld	a,(__spc1000_attr)
@@ -118,7 +120,24 @@ write_attr:
 	set	3,b
 	out	(c),a
 	ret
-not_lower:
+high_chars:
+	and	$f
+	ld	d,a
+	ld	a,(__spc1000_attr)
+	and	7
+	rlca
+	rlca
+	rlca
+	rlca
+	or	d
+	out	(c),a
+	ld	a,(__spc1000_attr)
+	or	4
+	set	3,b
+	out	(c),a
+	ret
+
+hardware_chars:
 	out	(c),a
 	ld	a,(__spc1000_attr)
 	jr	write_attr
