@@ -33,6 +33,8 @@ check_mode:
 	cp	10		;Switch to VDP
 	jr	nz,failure
 	ld	(__spc1000_mode),a
+	ld	a,24
+	ld	(__console_h),a
 	call	generic_console_cls
 	and	a
 	ret

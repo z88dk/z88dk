@@ -85,8 +85,8 @@ generic_console_printc:
 	cp	1
 	jr	z,printc_hires
 	cp	10
-	jp	z,tms9918_printc
 	ld	a,d
+	jp	z,tms9918_printc
 	call	generic_console_calc_xypos
 	ld	c,l
 	ld	b,h

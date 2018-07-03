@@ -85,10 +85,10 @@ IF FORcoleco
 ENDIF
 
 IF FORspc1000
-	defc VDP_DATA    = 0x7000
-	defc VDP_DATAIN  = 0x7000
-	defc VDP_CMD     = 0x7001
-	defc VDP_STATUS  = 0x7001
+	defc VDP_DATA    = 0xc800
+	defc VDP_DATAIN  = 0xc800
+	defc VDP_CMD     = 0xc801
+	defc VDP_STATUS  = 0xc801
 	defc VRAM_SIZE   = 16
 
 ENDIF
