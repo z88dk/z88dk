@@ -32,7 +32,7 @@
 
 	defc	CRT_KEY_DEL = 12
 
-;        defc    TAR__fputc_cons_generic = 1
+        defc    TAR__fputc_cons_generic = 1
         defc    TAR__clib_exit_stack_size = 0
         defc    TAR__register_sp = -1
 	defc	__CPU_CLOCK = 4000000 
