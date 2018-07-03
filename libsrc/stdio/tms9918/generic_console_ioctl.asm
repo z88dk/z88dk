@@ -5,8 +5,8 @@
 	SECTION	code_clib
 	INCLUDE	"ioctl.def"
 
-	EXTERN	__tms9918_font32
-	EXTERN	__tms9918_udg32
+	EXTERN	generic_console_font32
+	EXTERN	generic_console_udg32
 
 IF !FORspc1000
 	PUBLIC		generic_console_ioctl
@@ -24,14 +24,14 @@ __tms9918_console_ioctl:
 	ld	b,(hl)
 	cp	IOCTL_GENCON_SET_FONT32
 	jr	nz,check_set_udg
-	ld	(__tms9918_font32),bc
+	ld	(generic_console_font32),bc
 success:
 	and	a
 	ret
 check_set_udg:
 	cp	IOCTL_GENCON_SET_UDGS
 	jr	nz,failure
-	ld	(__tms9918_udg32),bc
+	ld	(generic_console_udg32),bc
 	jr	success
 failure:
 	scf

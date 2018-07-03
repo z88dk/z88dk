@@ -18,14 +18,13 @@
                 EXTERN          tms9918_set_ink
                 EXTERN          tms9918_set_paper
                 EXTERN          tms9918_set_inverse
+		EXTERN		generic_console_font32
+		EXTERN		generic_console_udg32
 
 
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
-		EXTERN		CRT_FONT
 		EXTERN		__spc1000_mode
-		PUBLIC		__spc1000_font
-		PUBLIC		__spc1000_udg
 		EXTERN		__console_w
 
 		defc		DISPLAY = 0x0000
@@ -127,11 +126,11 @@ not_lower:
 printc_hires:
 	ld	l,d
 	ld	h,0
-	ld	de,(__spc1000_font)
+	ld	de,(generic_console_font32)
 	bit	7,l
 	jr	z,not_udg
 	res	7,l
-	ld	de,(__spc1000_udg)
+	ld	de,(generic_console_udg32)
 	inc	d	
 not_udg:
 	add	hl,hl
@@ -253,5 +252,3 @@ scroll_hires_1:
 	SECTION	data_clib
 
 __spc1000_attr:	defb	1
-__spc1000_font:  defw    CRT_FONT
-__spc1000_udg:   defw    0

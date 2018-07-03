@@ -23,8 +23,8 @@
 		PUBLIC		generic_console_xypos
 		PUBLIC		generic_console_scale
 
-		PUBLIC		__multi8_font32
-		PUBLIC		__multi8_udg32
+		EXTERN		generic_console_font32
+		EXTERN		generic_console_udg32
 
 		EXTERN		l_push_di
 		EXTERN		l_pop_ei
@@ -133,13 +133,13 @@ printc_graphics:
 	ld	a,d
 	call	generic_console_xypos_graphics
 	ex	de,hl		;de = destination
-	ld	bc,(__multi8_font32)
+	ld	bc,(generic_console_font32)
 	ld	l,a
 	ld	h,0
 	bit	7,l
 	jr	z,not_udg
 	res	7,l
-	ld	bc,(__multi8_udg32)
+	ld	bc,(generic_console_udg32)
 	inc	b
 not_udg:
 	add	hl,hl
@@ -293,8 +293,6 @@ scroll_gfx:
 	SECTION		data_clib
 
 __multi8_attr:	  defb	0x07		;white ink
-__multi8_font32:  defw    CRT_FONT
-__multi8_udg32:   defw    0
 
 
 	SECTION		code_crt_init

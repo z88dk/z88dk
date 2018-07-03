@@ -10,8 +10,8 @@
                 PUBLIC          __tms9918_set_inverse
 		EXTERN		msx_attr
 
-		EXTERN		__tms9918_font32
-		EXTERN		__tms9918_udg32
+		EXTERN		generic_console_font32
+		EXTERN		generic_console_udg32
 
 		EXTERN		tms9918_w
 		EXTERN		CONSOLE_COLUMNS
@@ -107,7 +107,7 @@ tms9918_printc_1:
 	bit	7,a
 	jr	nz,tms9918_printc_handle_udgs
 	sub	32
-	ld	de,(__tms9918_font32)
+	ld	de,(generic_console_font32)
 tms9918_printc_rejoin:
 	ld	l,a
 	ld	h,0
@@ -137,11 +137,6 @@ tms9918_printc_rejoin:
 
 tms9918_printc_handle_udgs:
 	sub	128
-	ld	de,(__tms9918_udg32)
+	ld	de,(generic_console_udg32)
 	jr	tms9918_printc_rejoin
 
-
-	SECTION	data_clib
-
-.__tms9918_font32       defw    CRT_FONT
-.__tms9918_udg32    defw    0
