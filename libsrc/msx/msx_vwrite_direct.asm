@@ -44,17 +44,24 @@ _msx_vwrite_direct:
 	ld	ix,SETWRT
 	call	msxbios
 
+	ld l, (ix+0)	; count
+	ld h, (ix+1)
+
+IF VDP_DATA >= 0
+	ld	bc,VDP_DATA
+ENDIF
+
 wrtloop:
 	ld	a,(de)
-IF VDP_DATA > 255
-	ld	(VDP_DATA),a
+IF VDP_DATA < 0
+	ld	(-VDP_DATA),a
 ELSE
-	out	(VDP_DATA),a
+	out	(c),a
 ENDIF
 	inc	de
-	dec	bc
-	ld	a,c
-	or	b
+	dec	hl
+	ld	a,h
+	or	l
 	jr	nz,wrtloop
 	pop	ix
 	ret

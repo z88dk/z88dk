@@ -14,22 +14,25 @@
 ; VRAM to HL
 ;==============================================================
 ; Sets VRAM read address to hl
+;
+; CORRUPTS bc
 ;==============================================================
 .SETRD
 ._SETRD
 	di
 	ld      a,l
-IF VDP_CMD > 255
-	ld	(VDP_CMD),a
+IF VDP_CMD < 0
+	ld	(-VDP_CMD),a
 ELSE
-	out	(VDP_CMD),a
+	ld	bc,VDP_CMD
+	out	(c),a
 ENDIF
 	ld      a,h
 	and     $3F
-IF VDP_CMD > 255
-	ld	(VDP_CMD),a
+IF VDP_CMD < 0
+	ld	(-VDP_CMD),a
 ELSE
-	out	(VDP_CMD),a
+	out	(c),a
 ENDIF
 	ei
 	ret

@@ -12,13 +12,20 @@
                 PUBLIC          generic_console_set_inverse
 		PUBLIC		generic_console_calc_xypos
 
+		EXTERN		tms9918_cls
+		EXTERN		tms9918_scrollup
+		EXTERN		tms9918_printc
+                EXTERN          tms9918_set_ink
+                EXTERN          tms9918_set_paper
+                EXTERN          tms9918_set_inverse
+
+
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
 		EXTERN		CRT_FONT
-		EXTERN		__spc1000_attr
 		EXTERN		__spc1000_mode
-		EXTERN		__spc1000_font
-		EXTERN		__spc1000_udg
+		PUBLIC		__spc1000_font
+		PUBLIC		__spc1000_udg
 		EXTERN		__console_w
 
 		defc		DISPLAY = 0x0000
@@ -38,6 +45,8 @@ generic_console_cls:
 	ld	a,(__spc1000_mode)
 	cp	1
 	jr	z,cls_hires
+	cp	10
+	jp	z,tms9918_cls
 	ld	bc,0
 	ld	hl, CONSOLE_ROWS * CONSOLE_COLUMNS
 cls_1:
@@ -75,6 +84,8 @@ generic_console_printc:
 	ld	a,(__spc1000_mode)
 	cp	1
 	jr	z,printc_hires
+	cp	10
+	jp	z,tms9918_printc
 	ld	a,d
 	call	generic_console_calc_xypos
 	ld	c,l
@@ -151,9 +162,11 @@ generic_console_printc_3:
 
 
 generic_console_scrollup:
+	ld	a,(__spc1000_mode)
+	cp	10
+	jp	z,tms9918_scrollup
 	push	de
 	push	bc
-	ld	a,(__spc1000_mode)
 	cp	1
 	jr	z,scrollup_hires
 	ld	bc, CONSOLE_COLUMNS	;source
@@ -201,6 +214,7 @@ scroll_loop_2:
 	pop	de
 	ret
 
+
 scrollup_hires:
 	ld	bc, 32 * 8
 	ld	hl, +(32 * 23 * 8)
@@ -222,8 +236,5 @@ scroll_hires_1:
 	SECTION	data_clib
 
 __spc1000_attr:	defb	1
-__spc1000_mode:	defb	0		;Mode 0 = text
-					;Mode 1 = hires 
-
 __spc1000_font:  defw    CRT_FONT
 __spc1000_udg:   defw    0

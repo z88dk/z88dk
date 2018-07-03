@@ -8,6 +8,9 @@
 	PUBLIC	SETWRT
 	PUBLIC	_SETWRT
 
+	EXTERN	l_push_di
+	EXTERN	l_pop_ei
+
 	INCLUDE	"msx/vdp.inc"
 
 ;==============================================================
@@ -17,19 +20,20 @@
 ;==============================================================
 .SETWRT
 ._SETWRT
-	di
+	call	l_push_di
 	ld    a,l
-IF VDP_CMD > 255
-	ld	(VDP_CMD),a
+IF VDP_CMD < 0
+	ld	(-VDP_CMD),a
 ELSE
-	out	(VDP_CMD),a
+	ld	bc,VDP_CMD
+	out	(c),a
 ENDIF
 	ld    a,h
 	or    $40
-IF VDP_CMD > 255
-	ld	(VDP_CMD),a
+IF VDP_CMD < 0
+	ld	(-VDP_CMD),a
 ELSE
-	out	(VDP_CMD),a
+	out	(c),a
 ENDIF
-	ei
+	call	l_pop_ei
 	ret

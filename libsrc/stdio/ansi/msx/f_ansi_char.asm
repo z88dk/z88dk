@@ -139,13 +139,13 @@ ENDIF
 
 
 ;**************
-IF VDP_CMD > 255
+IF VDP_CMD < 0
 	ld	a,l
-	ld	(VDP_CMD),a
+	ld	(-VDP_CMD),a
 	ld	a,h
 	and	@00111111
-	ld	(VDP_CMD),a
-	ld	a,(VDP_DATAIN)
+	ld	(-VDP_CMD),a
+	ld	a,(-VDP_DATAIN)
 ELSE
 	ld	a,l		; LSB of video memory ptr
 	out	(VDP_CMD), a
@@ -159,13 +159,13 @@ ENDIF
 	ld	de,8	; next row
 	add	hl,de
 
-IF VDP_CMD > 255
+IF VDP_CMD < 0
 	ld	a,l
-	ld	(VDP_CMD),a
+	ld	(-VDP_CMD),a
 	ld	a,h
 	and	@00111111
-	ld	(VDP_CMD),a
-	ld	a,(VDP_DATAIN)
+	ld	(-VDP_CMD),a
+	ld	a,(-VDP_DATAIN)
 ELSE	
 	ld	a,l		; LSB of video memory ptr
 	out	(VDP_CMD), a
@@ -266,15 +266,15 @@ ENDIF
 	ld hl,(RIGA+1)
 	push hl
 ;**************
-IF VDP_CMD > 255
+IF VDP_CMD < 0
 	ld	a,l
-	ld	(VDP_CMD),a
+	ld	(-VDP_CMD),a
 	ld	a,h
 	and	@00111111
 	or	@01000000
-	ld	(VDP_CMD),a
+	ld	(-VDP_CMD),a
 	ld	a,(chline_buffer)
-	ld	(VDP_DATA),a
+	ld	(-VDP_DATA),a
 ELSE
          ld       a,l		; LSB of video memory ptr
          out      (VDP_CMD),a
@@ -289,15 +289,15 @@ ENDIF
 	ld de,8	; next row
 	add hl,de
 
-IF VDP_CMD > 255
+IF VDP_CMD < 0
 	ld	a,l	
-	ld	(VDP_CMD),a
+	ld	(-VDP_CMD),a
 	ld	a,h
 	and	@00111111
 	or	@01000000
-	ld	(VDP_CMD),a
+	ld	(-VDP_CMD),a
 	ld	a,(chline_buffer+1)
-	ld	(VDP_DATA),a
+	ld	(-VDP_DATA),a
 ELSE
 		 
          ld       a,l		; LSB of video memory ptr
@@ -329,13 +329,13 @@ ENDIF
 	ld (RIGA+1),hl
 
 ;**************
-IF VDP_CMD > 255
+IF VDP_CMD < 0
 	ld	a,l
-	ld	(VDP_CMD),a
+	ld	(-VDP_CMD),a
 	ld	a,h
 	and	@00111111
-	ld	(VDP_CMD),a
-	ld	a,(VDP_DATAIN)
+	ld	(-VDP_CMD),a
+	ld	a,(-VDP_DATAIN)
 ELSE
 	ld	a,l		; LSB of video memory ptr
 	out	(VDP_CMD), a
@@ -349,13 +349,13 @@ ENDIF
 	ld de,8	; next row
 	add hl,de
 
-IF VDP_CMD > 255
+IF VDP_CMD < 0
 	ld	a,l
-	ld	(VDP_CMD),a
+	ld	(-VDP_CMD),a
 	ld	a,h
 	and	@00111111
-	ld	(VDP_CMD),a
-	ld	a,(VDP_DATAIN)
+	ld	(-VDP_CMD),a
+	ld	a,(-VDP_DATAIN)
 ELSE	
 	ld	a,l		; LSB of video memory ptr
 	out	(VDP_CMD), a

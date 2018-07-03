@@ -29,7 +29,14 @@ check_mode:
 	ld	h,0x8e
 	ld	l,24
 	cp	1
+	jr	z,set_mode
+	cp	10		;Switch to VDP
 	jr	nz,failure
+	ld	(__spc1000_mode),a
+	call	generic_console_cls
+	and	a
+	ret
+
 set_mode:
 	ld	(__spc1000_mode),a
 	ld	bc,$2000

@@ -7,7 +7,7 @@
 ;	$Id: gen_ldirmv.asm$
 ;
 
-        SECTION code_clib
+	SECTION code_clib
 	PUBLIC	LDIRMV
 	PUBLIC	_LDIRMV
 	EXTERN		SETRD
@@ -16,15 +16,20 @@
 	
 LDIRMV:
 _LDIRMV:
+	push	bc
 	call	SETRD
-	ex	(sp),hl
+	pop		bc	
+	ex	(sp),hl		;Timing
 	ex	(sp),hl
 
 loop:
-IF VDP_DATAIN > 255
-	ld	a,(VDP_DATAIN)
+IF VDP_DATAIN < 0
+	ld	a,(-VDP_DATAIN)
 ELSE
-	in	a,(VDP_DATAIN)
+	IF VDP_DATAIN > 255
+		ld	a,(VDP_DATAIN / 256)
+	ENDIF
+	in	a,(VDP_DATAIN % 256)
 ENDIF
 	ld	(de),a
 	inc	de

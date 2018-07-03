@@ -70,6 +70,14 @@ IF CRT_ENABLE_STDIO = 1
         call    closeall
 ENDIF
 
+IF CRT_ENABLE_VDP
+	EXTERN	tms9918_spc1000_impl
+	defc	__unused_vdp_import = tms9918_spc1000_impl
+ELSE
+	EXTERN	tms9918_spc1000_stub
+	defc	__unused_vdp_import = tms9918_spc1000_stub
+ENDIF
+
 
 cleanup_exit:
 

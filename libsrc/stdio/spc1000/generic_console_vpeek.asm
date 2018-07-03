@@ -10,6 +10,7 @@
 		EXTERN		screendollar	
 		EXTERN		screendollar_with_count
 		EXTERN		generic_console_calc_xypos
+		EXTERN		tms9918_console_vpeek
 
 
 
@@ -23,6 +24,8 @@ generic_console_vpeek:
 	ld	a,(__spc1000_mode)
 	cp	1
 	jr	z,vpeek_hires
+	cp	10
+	jp	z,tms9918_console_vpeek
         call    generic_console_calc_xypos
 	ld	c,l
 	ld	b,h
