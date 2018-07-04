@@ -3,14 +3,12 @@
 
 INCLUDE "config_private.inc"
 
-IF __ZXN
-
 SECTION code_clib
 SECTION code_math
 
-PUBLIC l_zxn_mul_16_16x16
+PUBLIC l_z80_zxn_mulu_16_16x16
 
-l_zxn_mul_16_16x16:
+l_z80_zxn_mulu_16_16x16:
 
    ; multiplication of two 16-bit numbers into a 16-bit product
    ;
@@ -27,13 +25,13 @@ l_zxn_mul_16_16x16:
    ld h,a                      ; h = xh
    ld c,e                      ; c = xl
    ld b,l                      ; b = yl
-   mul d,e                     ; yh * yl
+   mlt de                      ; yh * yl
    ex de,hl
-   mul d,e                     ; xh * yl
+   mlt de                      ; xh * yl
    add hl,de                   ; add cross products
    ld e,c
    ld d,b
-   mul d,e                     ; yl * xl
+   mlt de                      ; yl * xl
    ld a,l                      ; cross products lsb
    add a,d                     ; add to msb final
    ld h,a
@@ -43,5 +41,3 @@ l_zxn_mul_16_16x16:
 
    or a
    ret
-
-ENDIF

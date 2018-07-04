@@ -1,14 +1,12 @@
 
 INCLUDE "config_private.inc"
 
-IF __ZXN
-
 SECTION code_clib
 SECTION code_math
 
-PUBLIC l_zxn_mul_32_16x16
+PUBLIC l_z80_zxn_mulu_32_16x16
 
-l_zxn_mul_32_16x16:
+l_z80_zxn_mulu_32_16x16:
 
    ; multiplication of two 16-bit numbers into a 32-bit product
    ;
@@ -32,9 +30,9 @@ l_zxn_mul_32_16x16:
    ; hl = xh yl
    ; stack = xh yh
 
-   mul d,e                     ; xl * yh
+   mlt de                      ; xl * yh
    ex de,hl
-   mul d,e                     ; xh * yl
+   mlt de                      ; xh * yl
 
    add hl,de                   ; sum cross products
 
@@ -43,7 +41,7 @@ l_zxn_mul_32_16x16:
 
    ld e,c                      ; xl
    ld d,b                      ; yl
-   mul d,e                     ; xl * yl
+   mlt de                      ; xl * yl
 
    ld b,a                      ; carry from cross products
    ld c,h                      ; LSB of MSW from cross products
@@ -54,7 +52,7 @@ l_zxn_mul_32_16x16:
    ld l,e                      ; hl = final LSW
 
    pop de
-   mul d,e                     ; xh * yh
+   mlt de                      ; xh * yh
 
    ex de,hl
    adc hl,bc
@@ -63,5 +61,3 @@ l_zxn_mul_32_16x16:
    ; 154 cycles, 32 bytes
 
    ret
-
-ENDIF

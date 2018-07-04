@@ -5,9 +5,9 @@ INCLUDE "config_private.inc"
 SECTION code_clib
 SECTION code_math
 
-PUBLIC l_z180_mulu_24_16x8
+PUBLIC l_z80_zxn_mulu_24_16x8
 
-l_z180_mulu_24_16x8:
+l_z80_zxn_mulu_24_16x8:
 
     ; multiplication of 16-bit number and 8-bit number into a 24-bit product
     ;
