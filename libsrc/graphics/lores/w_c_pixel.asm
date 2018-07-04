@@ -1,3 +1,4 @@
+	INCLUDE	"graphics/grafix.inc"
 
 	EXTERN	w_plotpixel
 	EXTERN	w_respixel
@@ -26,7 +27,7 @@
 	ld	l,h
 	ld	h,0
 	add	hl,hl
-	addh	hl,hl		;x * 4
+	add 	hl,hl		;x * 4
 
 
 	; hl = x
@@ -35,7 +36,6 @@
 	ld	c,4
 row_loop:
 	push	hl
-	push	de
 	ld	b,4
 col_loop:
 	push	bc
@@ -45,7 +45,7 @@ IF NEEDplot
 	call	w_plotpixel
 ENDIF
 IF NEEDunplot
-	call	w_rexpixel
+	call	w_respixel
 ENDIF
 IF NEEDxor
 	call	w_xorpixel
@@ -54,13 +54,12 @@ IF NEEDpoint
 	call	w_pointxy
 	jr	z,failed
 ENDIF
-	pop	hl
 	pop	de
+	pop	hl
 	inc	hl
 	pop	bc
 	djnz	col_loop
 	pop	hl
-	pop	de
 	inc	de
 	dec	c
 	jr	nz,row_loop
@@ -72,7 +71,6 @@ ENDIF
 IF NEEDpoint
 ; Fz is set
 failed:
-	pop	bc
 	pop	bc
         pop     bc
         pop     bc
