@@ -434,6 +434,12 @@ IF FORalphatro
 	defc blankch	= 32
 ENDIF
 
+IF FORmulti8
+	DEFINE gotgfx
+	defc maxx	= 640
+	defc maxy	= 200
+ENDIF
+
 ; =============================================
 
 
