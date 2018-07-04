@@ -1,11 +1,16 @@
+
+INCLUDE "config_private.inc"
+
+IF __ZXN
+
 SECTION code_clib
 SECTION code_math
 
-PUBLIC l_small_mul_16_16x8
+PUBLIC l_zxn_mul_16_16x8
 
    ex de,hl
 
-l_small_mul_16_16x8:
+l_zxn_mul_16_16x8:
 
    ; multiplication of a 16-bit number by an 8-bit number into 16-bit product
    ;
@@ -39,3 +44,5 @@ l_small_mul_16_16x8:
 
    or a
    ret
+
+ENDIF

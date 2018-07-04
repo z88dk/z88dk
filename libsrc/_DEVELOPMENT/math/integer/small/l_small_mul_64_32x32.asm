@@ -3,6 +3,8 @@
 ; zx spectrum rom @ address $30f0
 ; http://www.wearmouth.demon.co.uk/zx82.htm
 
+INCLUDE "config_private.inc"
+
 SECTION code_clib
 SECTION code_math
 
@@ -33,6 +35,15 @@ l_small_mul_64_32x32:
    ld h,a
    exx
    pop de
+
+IF __CPU_Z180__
+
+   EXTERN l0_z180_mulu_64_32x32
+   defc l0_small_mul_64_32x32 = l0_z180_mulu_64_32x32
+   
+   jp l0_z180_mulu_64_32x32
+
+ELSE
 
 l0_small_mul_64_32x32:
 
@@ -86,3 +97,5 @@ start:
    pop de
    
    ret
+
+ENDIF

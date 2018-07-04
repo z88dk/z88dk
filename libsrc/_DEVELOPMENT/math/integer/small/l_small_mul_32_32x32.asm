@@ -2,6 +2,8 @@
 ; 2000 djm
 ; 2007 aralbrec - use bcbc' rather than bytes indexed by ix per djm suggestion
 
+INCLUDE "config_private.inc"
+
 SECTION code_clib
 SECTION code_math
 
@@ -33,6 +35,15 @@ l_small_mul_32_32x32:
    pop bc
    ld l,a
    ld h,a
+
+IF __CPU_Z180__
+
+   EXTERN l0_z180_mulu_32_32x32
+   defc l0_small_mul_32_32x32 = l0_z180_mulu_32_32x32
+   
+   jp l0_z180_mulu_32_32x32
+
+ELSE
 
 l0_small_mul_32_32x32:
 
@@ -73,3 +84,5 @@ loop_1:
    
    or a
    ret
+
+ENDIF
