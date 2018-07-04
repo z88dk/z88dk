@@ -18,27 +18,21 @@ l_z80_zxn_mulu_16_16x8:
    ; exit  : hl = 16-bit product
    ;         carry reset
    ;
-   ; uses  : af, bc, hl
-
-   ld c,e
-   ld b,d
-
-   ;
+   ; uses  : af, de, hl
 
    ld h,e                      ; h = yl
    ld e,l                      ; e = x
-   mlt de                     ; x * yh
+
+   mlt de                      ; x * yh
    ex de,hl
-   mlt de                     ; x * yl
+   mlt de                      ; x * yl
+
    ld a,l                      ; cross product lsb
    add a,d                     ; add to msb final
    ld h,a
    ld l,e                      ; hl = final
 
    ; 44 cycles, 11 bytes
-
-   ld e,c
-   ld d,b
 
    xor a
    ret

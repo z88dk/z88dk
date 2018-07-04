@@ -39,5 +39,5 @@ l_z80_zxn_mulu_16_16x16:
 
    ; 83 cycles, 19 bytes
 
-   or a
+   xor a
    ret

@@ -1,4 +1,4 @@
-    ; math/integer/l_mulu_16_8x8 TODO
+    ; math/integer/l_mulu_16_8x8
 PUBLIC l_mulu_16_8x8
     ; compute:  hl = l * e
     EXTERN l_small_mul_16_16x8
