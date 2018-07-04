@@ -1,0 +1,82 @@
+
+	EXTERN	w_plotpixel
+	EXTERN	w_respixel
+	EXTERN	w_xorpixel
+	EXTERN	w_pointxy
+
+; ******************************************************************
+;
+; Plot etc pixel at (x,y) coordinate (chunky for wide screens)
+; Entry h = x
+;       l = y
+;
+	ld	a,h
+	cp	maxx / 4
+	ret	nc
+	ld	a,l
+	cp	maxy / 4
+	ret	nc
+
+	ex	de,hl
+	ld	l,e
+	ld	h,0
+	add	hl,hl
+	add	hl,hl		;y * 4
+	ex	de,hl
+	ld	l,h
+	ld	h,0
+	add	hl,hl
+	addh	hl,hl		;x * 4
+
+
+	; hl = x
+	; de = y
+
+	ld	c,4
+row_loop:
+	push	hl
+	push	de
+	ld	b,4
+col_loop:
+	push	bc
+	push	hl
+	push	de
+IF NEEDplot
+	call	w_plotpixel
+ENDIF
+IF NEEDunplot
+	call	w_rexpixel
+ENDIF
+IF NEEDxor
+	call	w_xorpixel
+ENDIF
+IF NEEDpoint
+	call	w_pointxy
+	jr	z,failed
+ENDIF
+	pop	hl
+	pop	de
+	inc	hl
+	pop	bc
+	djnz	col_loop
+	pop	hl
+	pop	de
+	inc	de
+	dec	c
+	jr	nz,row_loop
+IF NEEDpoint
+	inc	c
+ENDIF
+	ret
+
+IF NEEDpoint
+; Fz is set
+failed:
+	pop	bc
+	pop	bc
+        pop     bc
+        pop     bc
+        pop     bc
+        ret
+ENDIF
+
