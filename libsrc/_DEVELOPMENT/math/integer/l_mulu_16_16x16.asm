@@ -9,11 +9,10 @@ PUBLIC l_mulu_16_16x16
    ; compute:  hl = hl * de
    ; alters :  af, bc, de, hl
 
-IF __CPU_Z180__
+IF __CPU_Z180__ && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
 
    EXTERN l_z180_mulu_16_16x16
    defc l_mulu_16_16x16 = l_z180_mulu_16_16x16
-
 
 ELSE
 

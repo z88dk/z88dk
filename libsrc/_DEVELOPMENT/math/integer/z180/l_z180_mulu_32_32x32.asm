@@ -2,12 +2,37 @@
 
 INCLUDE "config_private.inc"
 
-IF __CPU_Z180__
-
 SECTION code_clib
 SECTION code_math
 
-PUBLIC l0_z180_mulu_32_32x32
+PUBLIC l_z180_mulu_32_32x32, l0_z180_mulu_32_32x32
+
+l_z180_mulu_32_32x32:
+
+   ; multiplication of two 32-bit numbers into a 32-bit product
+   ;
+   ; enter : dehl = 32-bit multiplicand
+   ;         dehl'= 32-bit multiplicand (more leading zeroes = better performance)
+   ;
+   ; exit  : dehl = 32-bit product
+   ;         carry reset
+   ;
+   ; uses  : af, bc, de, hl, bc', de', hl'
+
+   xor a
+   push hl
+   exx
+   ld c,l
+   ld b,h
+   pop hl
+   push de
+   ex de,hl
+   ld l,a
+   ld h,a
+   exx
+   pop bc
+   ld l,a
+   ld h,a
 
 l0_z180_mulu_32_32x32:
 
@@ -131,6 +156,4 @@ l0_z180_mulu_32_32x32:
     pop de
     xor a                       ; carry reset
     ret                         ; exit  : DEHL = 32-bit product
-
-ENDIF
 

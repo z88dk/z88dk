@@ -2,8 +2,6 @@
 
 INCLUDE "config_private.inc"
 
-IF __CPU_Z180__
-
 SECTION code_clib
 SECTION code_math
 
@@ -61,6 +59,3 @@ l_z180_mulu_40_32x8:
    adc a,0                      ;'final carry
 
    ret
-
-ENDIF
-

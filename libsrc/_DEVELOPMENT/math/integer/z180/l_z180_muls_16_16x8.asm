@@ -1,8 +1,6 @@
 
 INCLUDE "config_private.inc"
 
-IF __CPU_Z180__
-
 SECTION code_clib
 SECTION code_math
 
@@ -47,6 +45,3 @@ l_neg_l:
     ld l,a
     inc l
     ret
-
-ENDIF
-

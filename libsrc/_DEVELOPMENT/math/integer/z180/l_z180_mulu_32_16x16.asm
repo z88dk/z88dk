@@ -1,8 +1,6 @@
 
 INCLUDE "config_private.inc"
 
-IF __CPU_Z180__
-
 SECTION code_clib
 SECTION code_math
 
@@ -53,6 +51,3 @@ l_z180_mulu_32_16x16:
     ex de,hl
 
     ret
-
-ENDIF
-

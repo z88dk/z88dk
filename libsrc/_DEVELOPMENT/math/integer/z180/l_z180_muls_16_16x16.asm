@@ -1,8 +1,6 @@
 
 INCLUDE "config_private.inc"
 
-IF __CPU_Z180__
-
 SECTION code_clib
 SECTION code_math
 
@@ -40,6 +38,3 @@ l_z180_muls_16_16x16:
     xor c
     jp M,l_neg_hl               ; negate product if needed, and return
     ret
-
-ENDIF
-
