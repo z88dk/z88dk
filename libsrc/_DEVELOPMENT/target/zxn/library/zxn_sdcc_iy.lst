@@ -4,7 +4,7 @@
 @compress/compress_sdcc_iy.lst
 @ctype/ctype_sdcc_iy.lst
 @drivers/drivers.lst
-@env/file/esxdos_sdcc_iy.lst
+@env/esxdos/esxdos_sdcc_iy.lst
 @error/error.lst
 @fcntl/fcntl_sdcc_iy.lst
 @font/font_4x8/fonts.lst
@@ -16,6 +16,7 @@
 @inttypes/inttypes_sdcc_iy.lst
 @l/l.lst
 @l/sdcc.lst
+@libgen/libgen_sdcc.lst
 @locale/locale.lst
 @math/math_integer.lst
 @math/math_float_sdcc_iy.lst

@@ -36,15 +36,6 @@ l_small_mul_32_32x32:
    ld l,a
    ld h,a
 
-IF __CPU_Z180__
-
-   EXTERN l0_z180_mulu_32_32x32
-   defc l0_small_mul_32_32x32 = l0_z180_mulu_32_32x32
-   
-   jp l0_z180_mulu_32_32x32
-
-ELSE
-
 l0_small_mul_32_32x32:
 
    ; dede' = 32-bit multiplicand
@@ -84,5 +75,3 @@ loop_1:
    
    or a
    ret
-
-ENDIF

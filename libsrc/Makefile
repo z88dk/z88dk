@@ -26,7 +26,7 @@ all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	svi_clib.lib sam_clib.lib  sorcerer_clib.lib  sos_clib.lib tiki100.lib \
 	trs80_clib.lib vg5k_clib.lib vz_clib.lib  x07_clib.lib \
 	embedded_clib.lib test_clib.lib testrcm_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
-	pv1000_clib.lib pv2000_clib.lib \
+	pv1000_clib.lib pv2000_clib.lib coleco_clib.lib multi8_clib.lib alphatro_clib.lib  \
 	preempt.lib x1ansi_clib.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib gendos.lib ndos.lib  \
@@ -83,6 +83,7 @@ gfxdeps:
 	@$(RM) -f graphics/gray/ticalc/*.o
 	@$(RM) -f graphics/spectrum/*.o
 	@$(RM) -f graphics/z88/*.o
+	@$(RM) -f graphics/generic_console/*.o
 	@$(RM) -f graphics/text/*.o
 	@@$(RM) -f graphics/text6/*.o
 	@$(RM) -f graphics/x11/*.o
@@ -861,12 +862,31 @@ kc_clib.lib:
 	$(call buildgeneric,kc)
 	TARGET=kc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORkc -x$(OUTPUT_DIRECTORY)/kc_clib @$(LISTFILE_DIRECTORY)/kc.lst
 
+# Mitsubishi Multi8 - dom
+multi8_clib.lib:
+	@echo ''
+	@echo '--- Building Mitsubishi Multi8 Library ---'
+	@echo ''
+	$(call buildgeneric,multi8)
+	TARGET=multi8 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmulti8 -x$(OUTPUT_DIRECTORY)/multi8_clib @$(LISTFILE_DIRECTORY)/multi8.lst
+
+# Triumph Adler Alphatronic PC - dom
+alphatro_clib.lib:
+	@echo ''
+	@echo '--- Building Triump Adler Alphatronic PC Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(call buildgeneric,alphatro)
+	TARGET=alphatro TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORalphatro -x$(OUTPUT_DIRECTORY)/alphatro_clib @$(LISTFILE_DIRECTORY)/alphatro.lst
+
+
 # Casio PV1000 - dom
 pv1000_clib.lib:
 	@echo ''
 	@echo '--- Building Casio PV-1000 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
+	$(MAKE) -C games TARGET=pv1000
 	$(call buildgeneric,pv1000)
 	TARGET=pv1000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORpv1000 -x$(OUTPUT_DIRECTORY)/pv1000_clib @$(LISTFILE_DIRECTORY)/pv1000.lst
 
@@ -881,6 +901,19 @@ pv2000_clib.lib:
 	$(MAKE) -C games TARGET=pv2000
 	$(MAKE) -C msx TARGET=pv2000
 	TARGET=pv2000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORpv2000 -x$(OUTPUT_DIRECTORY)/pv2000_clib @$(LISTFILE_DIRECTORY)/pv2000.lst
+
+# Colecovision - dom/stefano
+coleco_clib.lib:
+	@echo ''
+	@echo '--- Building Colecovision Library ---'
+	@echo ''
+	$(MAKE) msxdeps
+	$(MAKE) -C games TARGET=coleco
+	$(call buildgeneric,coleco)
+	$(MAKE) -C games TARGET=coleco
+	$(MAKE) -C msx 
+	$(MAKE) -C msx TARGET=coleco
+	TARGET=coleco TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcoleco -x$(OUTPUT_DIRECTORY)/coleco_clib @$(LISTFILE_DIRECTORY)/coleco.lst
 
 # Untested C lib for NC100 machines - dom
 nc_clib.lib:

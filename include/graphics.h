@@ -129,6 +129,15 @@ extern void __LIB__ rscroll(int x, int y, int width, int height, int pixels) __s
 extern void __LIB__ closegfx(struct window *) __smallc;
 #endif
 
+/* Chunk 4x4 pixel */
+extern void __LIB__ c_plot(int x, int y) __smallc;
+/* Unplot a pixel */
+extern void __LIB__ c_unplot(int x, int y) __smallc;
+/* XORs a pixel on screen */
+extern void __LIB__ c_xorplot(int x, int y) __smallc;
+/* Get pixel status */
+extern int __LIB__ c_point(int x, int y) __smallc;
+
 /* Colour graphics, only few targets are supported */
 /* ZX Spectrum has its own implementation aside */
 /* Init GFX mode and clear map */

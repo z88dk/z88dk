@@ -6,7 +6,9 @@ PUBLIC l_ret
 
    ; function present in some rom crts
    ; if number of pops changes, check crts
-   
+
+   pop hl
+   pop hl
    pop hl
    
 l_ret:

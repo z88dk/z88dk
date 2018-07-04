@@ -1,0 +1,5 @@
+@libgen/libgen_asm.lst
+libgen/c/sdcc/basename
+libgen/c/sdcc/basename_fastcall
+libgen/c/sdcc/dirname
+libgen/c/sdcc/dirname_fastcall

@@ -1,0 +1,3 @@
+@libgen/libgen_asm.lst
+libgen/c/sccz80/basename
+libgen/c/sccz80/dirname

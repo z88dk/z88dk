@@ -32,6 +32,7 @@ section code_clib
 section code_compress_aplib
 section code_compress_zx7
 section code_ctype
+section code_env
 section code_error
 section code_esxdos
 section code_fcntl
@@ -55,6 +56,7 @@ section code_dot
 section rodata_arch
 section rodata_clib
 section rodata_driver
+section rodata_env
 section rodata_error_strings
 section rodata_error_string_end
 defb 0
@@ -88,6 +90,7 @@ section data_dot
 section bss_arch
 section bss_clib
 section bss_compress_aplib
+section bss_env
 section bss_error
 section bss_esxdos
 section bss_fcntl

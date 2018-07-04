@@ -146,6 +146,8 @@ extern void wait_sub_cpu();
 #define TV_CHANNEL_12   0x1b
 
 // Cassette Recorder
+extern int __FASTCALL__ tape(int command);
+extern void tape_status(int command);
 #define SUBCPU_TAPE_CONTROL   0xe9
 #define SUBCPU_TAPE_STATUS    0xea
 #define TAPE_EJECT     0x00
@@ -161,6 +163,7 @@ extern void wait_sub_cpu();
 #define TAPE_END   1    // set if Tape end
 #define TAPE_SET   2	// set if cassette is present
 #define TAPE_WP    3    // set if Write Protected 
+
 
 // Time / Date
 #define SUBCPU_SET_CALENDAR   0xec

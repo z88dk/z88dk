@@ -1,6 +1,6 @@
-input/spectrum/in_GetKey
-input/spectrum/in_GetKeyReset
-input/spectrum/in_GetKeyVariables
+input/generic/in_GetKey
+input/generic/in_GetKeyReset
+input/generic/in_GetKeyVariables
 input/spectrum/in_Inkey
 input/spectrum/in_JoyFuller
 input/spectrum/in_JoyKempston
@@ -36,3 +36,4 @@ input/spectrum/in_WaitForNoKey
 input/spectrum/INMouseAMX
 input/spectrum/INMouseKemp
 input/spectrum/INMouseSim
+input/fgetc_cons_inkey

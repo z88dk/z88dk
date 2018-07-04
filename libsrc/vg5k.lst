@@ -13,6 +13,7 @@ stdio/vg5k/CRT_FONT
 stdio/vg5k/set_character
 @stdio/stdio_ixiy.lst
 @font/font_8x8/font_8x8.lst
+@input/input_keyboard.lst
 @gfxbase.lst
 graphics/dcircle
 graphics/clg

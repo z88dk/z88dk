@@ -190,7 +190,7 @@ BYTE* pActionCurrent;
 // ======================================================================
 */
 
-char *strInstructions =
+const char *strInstructions =
     "Welcome to Adventure 'A' - The Planet of Death.\n"
 	"In this adventure you find yourself stranded on an alien planet. "
 	"Your aim is to escape from this planet by finding your, now captured and disabled, space ship."
@@ -204,7 +204,7 @@ char *strInstructions =
 // ======================================================================
 */
 
-char* straMsg[] =
+const char* straMsg[] =
 {
 	"It shows a man climbing down a pit using a rope\n",
 	"How? I can't reach\n",
@@ -254,7 +254,7 @@ char* straMsg[] =
 // ======================================================================
 */
 
-char* straRoom[] =
+const char* straRoom[] =
 {
     "I am on a mountain plateau\nTo the north there is a steep cliff.\nObvious exits are down, east and west.\n",
 
@@ -308,7 +308,7 @@ char* straRoom[] =
 
 #define MAX_ITEM 28
 
-char* straItem[MAX_ITEM] =
+const char* straItem[MAX_ITEM] =
 {
 	"a pair of boots",
 	"a starter motor",
@@ -348,7 +348,7 @@ char* straItem[MAX_ITEM] =
 // ======================================================================
 */
 
-int naItemStart[MAX_ITEM] =
+const int naItemStart[MAX_ITEM] =
 {
 	0x05, 0x11, 0x0e, 0x06, 0x11, NOTX, NOTX, 0x0c,
 	NOTX, 0x0d, NOTX, 0x05, NOTX, NOTX, 0x0b, NOTX,
@@ -454,7 +454,7 @@ typedef struct
 
 #define MAX_TOK 111
 
-TOKEN taToken[MAX_TOK] =
+const TOKEN taToken[MAX_TOK] =
 {
 	{ "DOWN", TOK_DOWN },
 	{ "D   ", TOK_DOWN },
@@ -587,46 +587,46 @@ TOKEN taToken[MAX_TOK] =
 // each list is terminated with $ff
 */
 
-BYTE DIR_00[] = 
+const BYTE DIR_00[] = 
 {
 	TOK_DOWN,0x03,
 	TOK_EAST,0x02,
 	TOK_WEST,0x01,
 	0xff
 };
-BYTE DIR_01[] =
+const BYTE DIR_01[] =
 {
 	TOK_EAST,0x00,
 	0xff
 };
-BYTE DIR_02[] =
+const BYTE DIR_02[] =
 {
 	TOK_NORT,0x07,
 	TOK_WEST,0x00,
 	0xff
 };
-BYTE DIR_03[] =
+const BYTE DIR_03[] =
 {
 	TOK_SOUT,0x04,
 	TOK_WEST,0x00,
 	0xff
 };
-BYTE DIR_04[] =
+const BYTE DIR_04[] =
 {
 	TOK_NORT,0x03,
 	TOK_EAST,0x05,
 	0xff
 };
-BYTE DIR_05[] =
+const BYTE DIR_05[] =
 {
 	TOK_NORT,0x04,
 	0xff
 };
-BYTE DIR_06[] =
+const BYTE DIR_06[] =
 {
 	0xff
 };
-BYTE DIR_07[] =
+const BYTE DIR_07[] =
 {
 	TOK_DOWN,0x07,
 	TOK_NORT,0x08,
@@ -635,7 +635,7 @@ BYTE DIR_07[] =
 	TOK_WEST,0x07,
 	0xff
 };
-BYTE DIR_08[] =
+const BYTE DIR_08[] =
 {
 	TOK_DOWN,0x07,
 	TOK_NORT,0x07,
@@ -644,7 +644,7 @@ BYTE DIR_08[] =
 	TOK_WEST,0x07,
 	0xff
 };
-BYTE DIR_09[] =
+const BYTE DIR_09[] =
 {
 	TOK_DOWN,0x07,
 	TOK_NORT,0x07,
@@ -653,7 +653,7 @@ BYTE DIR_09[] =
 	TOK_WEST,0x07,
 	0xff
 };
-BYTE DIR_0A[] =
+const BYTE DIR_0A[] =
 {
 	TOK_DOWN,0x07,
 	TOK_NORT,0x02,
@@ -662,51 +662,51 @@ BYTE DIR_0A[] =
 	TOK_WEST,0x0b,
 	0xff
 };
-BYTE DIR_0B[] =
+const BYTE DIR_0B[] =
 {
 	TOK_EAST,0x07,
 	0xff
 };
-BYTE DIR_0C[] =
+const BYTE DIR_0C[] =
 {
 	TOK_SOUT,0x0f,
 	TOK_EAST,0x0d,
 	TOK_WEST,0x13,
 	0xff
 };
-BYTE DIR_0D[] =
+const BYTE DIR_0D[] =
 {
 	0xff
 };
-BYTE DIR_0E[] =
+const BYTE DIR_0E[] =
 {
 	TOK_WEST,0x0d,
 	0xff
 };
-BYTE DIR_0F[] =
+const BYTE DIR_0F[] =
 {
 	TOK_EAST,0x13,
 	TOK_WEST,0x13,
 	0xff
 };
-BYTE DIR_10[] =
+const BYTE DIR_10[] =
 {
 	TOK_NORT,0x0f,
 	TOK_SOUT,0x13,
 	TOK_EAST,0x11,
 	0xff
 };
-BYTE DIR_11[] =
+const BYTE DIR_11[] =
 {
 	TOK_WEST,0x10,
 	0xff
 };
-BYTE DIR_12[] =
+const BYTE DIR_12[] =
 {
 	TOK_EAST,0x10,
 	0xff
 };
-BYTE DIR_13[] =
+const BYTE DIR_13[] =
 {
 	0xff
 };
@@ -714,7 +714,7 @@ BYTE DIR_13[] =
 
 /* this vector array contains an address for every room */
 
-BYTE* DIR_V[] =
+const BYTE* DIR_V[] =
 {
 	DIR_00,
 	DIR_01,
@@ -772,7 +772,7 @@ BOOL CHKHELD();
 #ifdef SCCZ80
 int *PRED_V[] = 
 #else
-BOOL (*PRED_V[])(void) =
+const BOOL (*PRED_V[])(void) =
 #endif
 {
 	 CHKROOM,					/* $00 */
@@ -794,218 +794,218 @@ BOOL (*PRED_V[])(void) =
 */
 
 
-BYTE A_GD_BOOT[] =
+const BYTE A_GD_BOOT[] =
 {
 	COM_CHKHERE,0x00,
 	0xff
 };
-BYTE A_GD_STAR[] =
+const BYTE A_GD_STAR[] =
 {
 	COM_CHKHERE,0x01,
 	0xff
 };
-BYTE A_GD_KEY[] =
+const BYTE A_GD_KEY[] =
 {
 	COM_CHKHERE,0x02,
 	0xff
 };
-BYTE A_GD_GUN[] =
+const BYTE A_GD_GUN[] =
 {
 	COM_CHKHERE,0x03,
 	0xff
 };
-BYTE A_GD_BAR[] =
+const BYTE A_GD_BAR[] =
 {
 	COM_CHKHERE,0x05,
 	0xff
 };
-BYTE A_GD_COIN[] =
+const BYTE A_GD_COIN[] =
 {
 	COM_CHKHERE,0x06,
 	0xff
 };
-BYTE A_G_MIRR_1[] =
+const BYTE A_G_MIRR_1[] =
 {
 	COM_CHKHERE,0x07,
 	COM_CHKAWAY,0x10,
 	0xff
 };
-BYTE A_GD_MIRR_2[] =
+const BYTE A_GD_MIRR_2[] =
 {
 	COM_CHKHERE,0x08,
 	0xff
 };
-BYTE A_GD_GLOV[] =
+const BYTE A_GD_GLOV[] =
 {
 	COM_CHKHERE,0x09,
 	0xff
 };
-BYTE A_GD_ROPE[] =
+const BYTE A_GD_ROPE[] =
 {
 	COM_CHKHERE,0x0a,
 	0xff
 };
-BYTE A_GD_BOAR_1[] =
+const BYTE A_GD_BOAR_1[] =
 {
 	COM_CHKHERE,0x0b,
 	0xff
 };
-BYTE A_GD_BOAR_2[] =
+const BYTE A_GD_BOAR_2[] =
 {
 	COM_CHKHERE,0x0c,
 	0xff
 };
-BYTE A_GD_STAL[] =
+const BYTE A_GD_STAL[] =
 {
 	COM_CHKHERE,0x0d,
 	0xff
 };
-BYTE A_GD_ICE[] =
+const BYTE A_GD_ICE[] =
 {
 	COM_CHKHERE,0x0e,
 	0xff
 };
-BYTE A_GD_FLIN[] =
+const BYTE A_GD_FLIN[] =
 {
 	COM_CHKHERE,0x18,
 	0xff
 };
-BYTE A_GD_STON[] =
+const BYTE A_GD_STON[] =
 {
 	COM_CHKHERE,0x19,
 	0xff
 };
-BYTE A_D_MIRR[] =
+const BYTE A_D_MIRR[] =
 {
 	COM_CHKHERE,0x07,
 	0xff
 };
-BYTE A_DRAW_STAL[] =
+const BYTE A_DRAW_STAL[] =
 {
 	COM_CHKROOM,0x02,
 	0xff
 };
-BYTE A_U_ICE_1[] =
+const BYTE A_U_ICE_1[] =
 {
 	COM_CHKROOM,0x02,
 	COM_CHKHERE,0x0e,
 	0xff
 };
-BYTE A_CUT_ROPE[] =
+const BYTE A_CUT_ROPE[] =
 {
 	COM_CHKROOM,0x03,
 	0xff
 };
-BYTE A_USE_FLIN[] =
+const BYTE A_USE_FLIN[] =
 {
 	COM_CHKROOM,0x03,
 	COM_CHKHERE,0x18,
 	0xff
 };
-BYTE A_C_RAVI_1[] =
+const BYTE A_C_RAVI_1[] =
 {
 	COM_CHKROOM,0x04,
 	0xff
 };
-BYTE A_C_RAVI_2[] =
+const BYTE A_C_RAVI_2[] =
 {
 	COM_CHKROOM,0x06,
 	0xff
 };
-BYTE A_C_RAVI_3[] =
+const BYTE A_C_RAVI_3[] =
 {
 	COM_CHKROOM,0x04,
 	COM_CHKHERE,0x0b,
 	0xff
 };
-BYTE A_USE_BOAR[] =
+const BYTE A_USE_BOAR[] =
 {
 	COM_CHKROOM,0x06,
 	COM_CHKHERE,0x0b,
 	0xff
 };
-BYTE A_DOWN[] =
+const BYTE A_DOWN[] =
 {
 	COM_CHKROOM,0x0b,
 	0xff
 };
-BYTE A_U_ICE_2[] =
+const BYTE A_U_ICE_2[] =
 {
 	COM_CHKROOM,0x0b,
 	COM_CHKHELD,0x0e,
 	0xff
 };
-BYTE A_G_MAN_1[] =
+const BYTE A_G_MAN_1[] =
 {
 	COM_CHKHERE,0x10,
 	COM_CHKHERE,0x09,
 	COM_CHKWORN,0x09,
 	0xff
 };
-BYTE A_G_MAN_2[] =
+const BYTE A_G_MAN_2[] =
 {
 	COM_CHKHERE,0x10,
 	COM_CHKHERE,0x09,
 	0xff
 };
-BYTE A_G_MAN_3[] =
+const BYTE A_G_MAN_3[] =
 {
 	COM_CHKHERE,0x10,
 	0xff
 };
-BYTE A_KD_MAN_1[] =
+const BYTE A_KD_MAN_1[] =
 {
 	COM_CHKHERE,0x11,
 	0xff
 };
-BYTE A_G_MIRR_3[] =
+const BYTE A_G_MIRR_3[] =
 {
 	COM_CHKHERE,0x07,
 	COM_CHKAWAY,0x10,
 	0xff
 };
-BYTE A_K_MAN_2[] =
+const BYTE A_K_MAN_2[] =
 {
 	COM_CHKHERE,0x10,
 	0xff
 };
-BYTE A_U_GUN_1[] =
+const BYTE A_U_GUN_1[] =
 {
 	COM_CHKHERE,0x10,
 	COM_CHKHERE,0x03,
 	0xff
 };
-BYTE A_U_GUN_2[] =
+const BYTE A_U_GUN_2[] =
 {
 	COM_CHKHERE,0x11,
 	COM_CHKHERE,0x03,
 	COM_CHKHELD,0x11,
 	0xff
 };
-BYTE A_U_GUN_3[] =
+const BYTE A_U_GUN_3[] =
 {
 	COM_CHKHERE,0x11,
 	COM_CHKHERE,0x03,
 	0xff
 };
-BYTE A_TYPE_HELP[] =
+const BYTE A_TYPE_HELP[] =
 {
 	COM_CHKROOM,0x0e,
 	0xff
 };
-BYTE A_FIRE_GUN[] =
+const BYTE A_FIRE_GUN[] =
 {
 	COM_CHKROOM,0x0f,
 	0xff
 };
-BYTE A_FIEL_1[] =
+const BYTE A_FIEL_1[] =
 {
 	COM_CHKROOM,0x0f,
 	COM_CHKCLRF,GVAR_07,
 	COM_CHKHERE,0x03,
 	0xff
 };
-BYTE A_FIEL_2[] =
+const BYTE A_FIEL_2[] =
 {
 	COM_CHKSETF,GVAR_07,
 	COM_CHKCLRF,GVAR_08,
@@ -1013,78 +1013,78 @@ BYTE A_FIEL_2[] =
 	COM_CHKHERE,0x03,
 	0xff
 };
-BYTE A_FIEL_3[] =
+const BYTE A_FIEL_3[] =
 {
 	COM_CHKSETF,GVAR_08,
 	COM_CHKROOM,0x0f,
 	COM_CHKHERE,0x03,
 	0xff
 };
-BYTE A_DANC_1[] =
+const BYTE A_DANC_1[] =
 {
 	COM_CHKROOM,0x0f,
 	COM_CHKHELD,0x07,
 	COM_CHKSETF,GVAR_08,
 	0xff
 };
-BYTE A_DANC_2[] =
+const BYTE A_DANC_2[] =
 {
 	COM_CHKROOM,0x0f,
 	0xff
 };
-BYTE A_O_DOOR_1[] =
+const BYTE A_O_DOOR_1[] =
 {
 	COM_CHKROOM,0x10,
 	0xff
 };
-BYTE A_USE_KEY[] =
+const BYTE A_USE_KEY[] =
 {
 	COM_CHKROOM,0x10,
 	COM_CHKHERE,0x02,
 	0xff
 };
-BYTE A_K_SECU[] =
+const BYTE A_K_SECU[] =
 {
 	COM_CHKROOM,0x10,
 	COM_CHKHERE,0x03,
 	0xff
 };
-BYTE A_LUP_BREA[] =
+const BYTE A_LUP_BREA[] =
 {
 	COM_CHKROOM,0x13,
 	0xff
 };
-BYTE A_UP[] =
+const BYTE A_UP[] =
 {
 	COM_CHKROOM,0x13,
 	COM_CHKHERE,0x15,
 	0xff
 };
-BYTE A_BRSEC[] =
+const BYTE A_BRSEC[] =
 {
 	COM_CHKROOM,0x13,
 	0xff
 };
-BYTE A_U_COIN[] =
+const BYTE A_U_COIN[] =
 {
 	COM_CHKROOM,0x13,
 	COM_CHKHERE,0x06,
 	0xff
 };
-BYTE A_B_DOOR[] =
+const BYTE A_B_DOOR[] =
 {
 	COM_CHKROOM,0x13,
 	COM_CHKHERE,0x13,
 	0xff
 };
-BYTE A_G_COIN[] =
+const BYTE A_G_COIN[] =
 {
 	COM_CHKROOM,0x04,
 	COM_CHKAWAY,0x06,
 	0xff
 };
 #define A_L_WATE A_G_COIN
-BYTE A_WATE_1[] =
+const BYTE A_WATE_1[] =
 {
 	COM_CHKROOM,0x04,
 	COM_CHKAWAY,0x06,
@@ -1092,157 +1092,157 @@ BYTE A_WATE_1[] =
 	COM_CHKHERE,0x00,
 	0xff
 };
-BYTE A_WATE_2[] =
+const BYTE A_WATE_2[] =
 {
 	COM_CHKROOM,0x04,
 	COM_CHKAWAY,0x06,
 	COM_CHKHERE,0x00,
 	0xff
 };
-BYTE A_O_DOOR_2[] =
+const BYTE A_O_DOOR_2[] =
 {
 	COM_CHKROOM,0x0d,
 	0xff
 };
-BYTE A_PUSH_THRE[] =
+const BYTE A_PUSH_THRE[] =
 {
 	COM_CHKROOM,0x12,
 	COM_CHKCLRF,GVAR_09,
 	COM_CHKCLRF,GVAR_0a,
 	0xff
 };
-BYTE A_PUSH_DIG[] =
+const BYTE A_PUSH_DIG[] =
 {
 	COM_CHKROOM,0x12,
 	COM_CHKCLRF,GVAR_0a,
 	0xff
 };
-BYTE A_PUSH_TWO[] =
+const BYTE A_PUSH_TWO[] =
 {
 	COM_CHKROOM,0x12,
 	COM_TSTGVAR,GVAR_09,0x01,
 	COM_CHKCLRF,GVAR_0a,
 	0xff
 };
-BYTE A_PUSH_ONE[] =
+const BYTE A_PUSH_ONE[] =
 {
 	COM_CHKROOM,0x12,
 	COM_TSTGVAR,GVAR_09,0x02,
 	COM_CHKCLRF,GVAR_0a,
 	0xff
 };
-BYTE A_MEND_FUSE[] =
+const BYTE A_MEND_FUSE[] =
 {
 	COM_CHKROOM,0x12,
 	COM_CHKSETF,GVAR_0a,
 	0xff
 };
-BYTE A_USE_BAR[] =
+const BYTE A_USE_BAR[] =
 {
 	COM_CHKROOM,0x12,
 	COM_CHKHERE,0x05,
 	COM_CHKSETF,GVAR_0a,
 	0xff
 };
-BYTE A_LOOK[] =
+const BYTE A_LOOK[] =
 {
 	COM_CHKROOM,0x0b,
 	0xff
 };
-BYTE A_HELP_1[] =
+const BYTE A_HELP_1[] =
 {
 	COM_CHKROOM,0x11,
 	0xff
 };
-BYTE A_HELP_2[] =
+const BYTE A_HELP_2[] =
 {
 	COM_CHKROOM,0x0f,
 	0xff
 };
-BYTE A_HELP_3[] =
+const BYTE A_HELP_3[] =
 {
 	COM_CHKROOM,0x0e,
 	0xff
 };
-BYTE A_HELP_4[] =
+const BYTE A_HELP_4[] =
 {
 	COM_CHKROOM,0x07,
 	0xff
 };
-BYTE A_HELP_5[] =
+const BYTE A_HELP_5[] =
 {
 	COM_CHKROOM,0x08,
 	0xff
 };
-BYTE A_HELP_6[] =
+const BYTE A_HELP_6[] =
 {
 	COM_CHKROOM,0x09,
 	0xff
 };
-BYTE A_HELP_7[] =
+const BYTE A_HELP_7[] =
 {
 	COM_CHKROOM,0x0a,
 	0xff
 };
-BYTE A_HELP_8[] =
+const BYTE A_HELP_8[] =
 {
 	COM_CHKROOM,0x14,
 	COM_CHKSETF,GVAR_0c,
 	0xff
 };
-BYTE A_LUP[] =
+const BYTE A_LUP[] =
 {
 	COM_CHKSETF,GVAR_0b,
 	COM_CHKROOM,0x0c,
 	0xff
 };
-BYTE A_WEST[] =
+const BYTE A_WEST[] =
 {
 	COM_CHKROOM,0x0d,
 	0xff
 };
-BYTE A_JUMP[] =
+const BYTE A_JUMP[] =
 {
 	COM_CHKROOM,0x01,
 	0xff
 };
-BYTE A_USEROP[] =
+const BYTE A_USEROP[] =
 {
 	COM_CHKROOM,0x01,
 	COM_CHKHELD,0x0a,
 	0xff
 };
-BYTE A_UPROPE[] =
+const BYTE A_UPROPE[] =
 {
 	COM_CHKROOM,0x0c,
 	COM_CHKSETF,GVAR_0b,
 	0xff
 };
-BYTE A_SHIP[] =
+const BYTE A_SHIP[] =
 {
 	COM_CHKHERE,0x16,
 	0xff
 };
-BYTE A_P_MAUX[] =
+const BYTE A_P_MAUX[] =
 {
 	COM_CHKROOM,0x14,
 	COM_CHKHERE,0x01,
 	0xff
 };
-BYTE A_P_32[] =
+const BYTE A_P_32[] =
 {
 	COM_CHKROOM,0x14,
 	COM_CHKSETF,GVAR_0c,
 	0xff
 };
-BYTE A_P_41[] =
+const BYTE A_P_41[] =
 {
 	COM_CHKROOM,0x14,
 	COM_CHKSETF,GVAR_0c,
 	COM_TSTGVAR,GVAR_09,0x03,
 	0xff
 };
-BYTE A_PSH_ONE_2[] =
+const BYTE A_PSH_ONE_2[] =
 {
 	COM_CHKROOM,0x14,
 	COM_CHKSETF,GVAR_0c,
@@ -1260,7 +1260,7 @@ BYTE A_PSH_ONE_2[] =
 // subsequent bytes of entry are terminated with a $ff
 // check if we have turned green and died
 */
-BYTE A_CHGRN[] =
+const BYTE A_CHGRN[] =
 {
 	COM_TSTGVAR,GVAR_05,0x01,		/* if game variable 0x05 = 1     */
 	COM_CHKSETF,GVAR_06,			/* and game variable 0x06 is set */
@@ -1268,7 +1268,7 @@ BYTE A_CHGRN[] =
 };
 
 /* check if the small green man is to throttle us (version 1) */
-BYTE A_CHTHR[] =
+const BYTE A_CHTHR[] =
 {
 	COM_TSTGVAR,GVAR_02,0x01,		/* if game variable 0x02 = 1 */
 	COM_CHKHERE,0x10,			/* and is-present the small green man sleeping on the mirror */
@@ -1276,7 +1276,7 @@ BYTE A_CHTHR[] =
 };
 
 /* check if the small green man is to throttle us (version 2) */
-BYTE A_C2THR[] =
+const BYTE A_C2THR[] =
 {
 	COM_TSTGVAR,GVAR_02,0x01,		/* if game variable 0x02 = 1 */
 	COM_CHKHERE,0x11,				/* and is-present the sleeping green man (moved off mirror) */
@@ -1284,7 +1284,7 @@ BYTE A_C2THR[] =
 };
 
 /* check if we're to be shot by the security guard */
-BYTE A_SHOT[] =
+const BYTE A_SHOT[] =
 {
 	COM_TSTGVAR,GVAR_02,0x01,		/* if game variable 0x02 = 1 */
 	COM_CHKHERE,0x17,			/* and is-present the sleeping security man */
@@ -1292,7 +1292,7 @@ BYTE A_SHOT[] =
 };
 
 /* check if ice has melted */
-BYTE A_MELTD[] =
+const BYTE A_MELTD[] =
 {
 	COM_TSTGVAR,GVAR_02,0x01,		/* if game variable 0x02 = 1 */
 	COM_CHKHERE,0x0e,			/* and is-present the block of ice */
@@ -1300,9 +1300,9 @@ BYTE A_MELTD[] =
 };
 
 /* an empty action entry */
-BYTE A_NULL[] = { 0Xff };
+const BYTE A_NULL[] = { 0Xff };
 
-BYTE A_MISC[] = { 0xff };		/* used for auto commands - no predicates required */
+const BYTE A_MISC[] = { 0xff };		/* used for auto commands - no predicates required */
 
 
 
@@ -1337,112 +1337,112 @@ BYTE A_MISC[] = { 0xff };		/* used for auto commands - no predicates required */
 
 /* bytecodes for the various commands a user can enter */
 
-BYTE SGET_00[] = { I_SH_GET,0x00,I_SH_OK };
-BYTE SGET_01[] = { I_SH_GET,0x01,I_SH_OK };
-BYTE SGET_02[] = { I_SH_GET,0x02,I_SH_OK };
-BYTE SGET_03[] = { I_SH_GET,0x03,I_SH_OK };
-BYTE SGET_05[] = { I_SH_GET,0x05,I_SH_OK };
-BYTE SGET_06[] = { I_SH_GET,0x06,I_SH_OK };
-BYTE SGET_07[] = { I_SH_GET,0x07,I_SH_OK };
-BYTE SGET_08[] = { I_SH_GET,0x08,I_SH_OK };
-BYTE SGET_09[] = { I_SH_GET,0x09,I_SH_OK };
-BYTE SGET_0A[] = { I_SH_GET,0x0a,I_SH_OK };
-BYTE SGET_0B[] = { I_SH_GET,0x0b,I_SH_OK };
-BYTE SGET_0C[] = { I_SH_GET,0x0c,I_SH_OK };
-BYTE SGET_0D[] = { I_SH_GET,0x0d,I_SH_OK };
-BYTE SGET_0E[] = { I_SH_GET,0x0e,I_SH_SETV,GVAR_02,0x09,I_SH_OK };
-BYTE SGET_18[] = { I_SH_GET,0x18,I_SH_OK };
-BYTE SGET_19[] = { I_SH_GET,0x19,I_SH_OK };
-BYTE SINVENT[] = { I_SH_INVE,0x07			 };		/* the 0x07 is ignored */
-BYTE SQUIT[] = { I_SH_QUIT };
-BYTE SPUT_00[] = { I_SH_DROP,0x00,I_SH_OK };
-BYTE SPUT_01[] = { I_SH_DROP,0x01,I_SH_OK };
-BYTE SPUT_02[] = { I_SH_DROP,0x02,I_SH_OK };
-BYTE SPUT_03[] = { I_SH_DROP,0x03,I_SH_OK };
-BYTE SPUT_05[] = { I_SH_DROP,0x05,I_SH_OK };
-BYTE SPUT_06[] = { I_SH_DROP,0x06,I_SH_OK };
-BYTE SPUT_07[] = { I_SH_DROP,0x07,I_SH_OK };
-BYTE SPUT_08[] = { I_SH_DROP,0x08,I_SH_OK };
-BYTE SPUT_09[] = { I_SH_DROP,0x09,I_SH_OK };
-BYTE SPUT_0A[] = { I_SH_DROP,0x0a,I_SH_OK };
-BYTE SPUT_0B[] = { I_SH_DROP,0x0b,I_SH_OK };
-BYTE SPUT_0C[] = { I_SH_DROP,0x0c,I_SH_OK };
-BYTE SPUT_0D[] = { I_SH_DROP,0x0d,I_SH_OK };
-BYTE SPUT_0E[] = { I_SH_DROP,0x0e,I_SH_OK };
-BYTE SPUT_18[] = { I_SH_DROP,0x18,I_SH_OK };
-BYTE SPUT_19[] = { I_SH_DROP,0x19,I_SH_OK };
-BYTE SLK_DRW[] = { I_SH_MSG,0x00,I_SH_AUTO };
-BYTE SBRK_ST[] = { I_SH_MSG,0x01,I_SH_AUTO };
-BYTE SUSE_IC[] = { I_SH_CREA,0x0d,I_SH_MSG,0x02,I_SH_AUTO };
-BYTE SCUT_RP[] = { I_SH_MSG,0x03,I_SH_AUTO };
-BYTE SUSE_FL[] = { I_SH_CREA,0x0a,I_SH_MSG,0x02,I_SH_AUTO };
-BYTE SWR_00[] = { I_SH_WEAR,0x00,I_SH_OK };
-BYTE SRM_00[] = { I_SH_REMO,0x00,I_SH_OK };
-BYTE SCR_RV[] = { I_SH_MSG,0x03,I_SH_AUTO };
-BYTE SUSE_BO[] = { I_SH_GOTO,0x06,I_SH_REDE };
-BYTE SUS2_BO[] = { I_SH_GOTO,0x04,I_SH_DEST,0x0b,I_SH_CREA,0x0c,I_SH_REDE };
-BYTE SJMP_RV[] = { I_SH_MSG,0x04,I_SH_DEAD };
-BYTE SUSE_I2[] = { I_SH_GOTO,0x0c,I_SH_DROP,0x0e,I_SH_SWAP,0x0e,I_SH_SETV,GVAR_02,0x07,I_SH_REDE };
-BYTE SGET_MN[] = { I_SH_GET,0x10,I_SH_SWAP,0x10,I_SH_MSG,0x05,I_SH_SETV,GVAR_05,0x0a,I_SH_CLRF,GVAR_06,I_SH_AUTO };
-BYTE SGET_M2[] = { I_SH_GET,0x10,I_SH_SWAP,0x10,I_SH_OK };
-BYTE SPUT_11[] = { I_SH_DROP,0x11,I_SH_OK };
-BYTE SGE2_07[] = { I_SH_GET,0x07,I_SH_OK };
-BYTE SGE2_08[] = { I_SH_GET,0x08,I_SH_OK };
-BYTE SPU2_07[] = { I_SH_DROP,0x07,I_SH_OK };
-BYTE SPU2_08[] = { I_SH_DROP,0x08,I_SH_OK };
-BYTE SDO_HOW[] = { I_SH_MSG,0x03,I_SH_AUTO };
-BYTE SUSE_GN[] = { I_SH_DEST,0x10,I_SH_SWAP,0x07,I_SH_MSG,0x06,I_SH_MSG,0x07,I_SH_AUTO };
-BYTE SFIR_GN[] = { I_SH_MSG,0x26,I_SH_AUTO };
-BYTE SUS2_GN[] = { I_SH_DEST,0x11,I_SH_MSG,0x06,I_SH_AUTO };
-BYTE SHLP_CM[] = { I_SH_MSG,0x08,I_SH_AUTO };
-BYTE SFLD_1[] = { I_SH_SETF,GVAR_07,I_SH_MSG,0x09,I_SH_AUTO };
-BYTE SFLD_2[] = { I_SH_SETF,GVAR_08,I_SH_MSG,0x09,I_SH_AUTO };
-BYTE SFLD_3[] = { I_SH_MSG,0x0a,I_SH_AUTO };
-BYTE SDANCE[] = { I_SH_GOTO,0x10,I_SH_SETV,GVAR_02,0x09,I_SH_REDE };
-BYTE SDANCE2[] = { I_SH_MSG,0x0b,I_SH_GOTO,0x13,I_SH_REDE };
-BYTE SUSE_KY[] = { I_SH_GOTO,0x12,I_SH_REDE };
-BYTE SKIL_SG[] = { I_SH_DEST,0x17,I_SH_OK };
-BYTE SLK_UP[] = { I_SH_MSG,0x0c,I_SH_AUTO };
-BYTE SBRK_BA[] = { I_SH_SWAP,0x14,I_SH_CREA,0x05,I_SH_REDE };
-BYTE SGO_UP[] = { I_SH_GOTO,0x0c,I_SH_SWAP,0x14,I_SH_REDE };
-BYTE SBRBSEC[] = { I_SH_MSG,0x0d,I_SH_AUTO };
-BYTE SUSE_CN[] = { I_SH_SWAP,0x12,I_SH_DEST,0x06,I_SH_REDE };
-BYTE SBDOOR[] = { I_SH_GOTO,0x0c,I_SH_SWAP,0x12,I_SH_REDE };
-BYTE SLK_WAT[] = { I_SH_MSG,0x0e,I_SH_AUTO };
-BYTE SGET_CN[] = { I_SH_MSG,0x01,I_SH_AUTO };
-BYTE SWATER2[] = { I_SH_MSG,0x0f,I_SH_AUTO };
-BYTE SWATER1[] = { I_SH_CREA,0x06,I_SH_GET,0x06,I_SH_OK };
-BYTE SL2_WAT[] = { I_SH_MSG,0x0f,I_SH_AUTO };
-BYTE SODOOR2[] = { I_SH_GOTO,0x0e,I_SH_REDE };
-BYTE SPSH3A[] = { I_SH_SETV,GVAR_09,0x01,I_SH_OK };
-BYTE SPSHDG[] = { I_SH_MSG,0x10,I_SH_CLRF,GVAR_09,I_SH_SETF,GVAR_0a,I_SH_AUTO };
-BYTE SPSH2A[] = { I_SH_SETV,GVAR_09,0x02,I_SH_OK };
-BYTE SPSH1A[] = { I_SH_MSG,0x11,I_SH_SETV,GVAR_09,0x03,I_SH_AUTO };
-BYTE SMNDFUS[] = { I_SH_MSG,0x0d,I_SH_AUTO };
-BYTE SUSE_BA[] = { I_SH_CLRF,GVAR_0a,I_SH_DEST,0x05,I_SH_OK };
-BYTE SLOOK1[] = { I_SH_MSG,0x18,I_SH_AUTO };
-BYTE SHELP1[] = { I_SH_MSG,0x13,I_SH_AUTO };
-BYTE SHELP2[] = { I_SH_MSG,0x14,I_SH_AUTO };
-BYTE SHELP3[] = { I_SH_MSG,0x15,I_SH_AUTO };
-BYTE SHELP4[] = { I_SH_MSG,0x16,I_SH_AUTO };
-BYTE SLK_UP2[] = { I_SH_MSG,0x1a,I_SH_AUTO };
-BYTE SQUIET[] = { I_SH_GOTO,0x0c,I_SH_SETV,GVAR_02,0x07,I_SH_REDE };
-BYTE SWR_09[] = { I_SH_WEAR,0x09,I_SH_OK };
-BYTE SRM_09[] = { I_SH_REMO,0x09,I_SH_OK };
-BYTE SREDE[] = { I_SH_REDE };
-BYTE SJUMP_D[] = { I_SH_MSG,0x03,I_SH_AUTO };
-BYTE SUSE_RP[] = { I_SH_SETF,GVAR_0b,I_SH_DROP,0x0a,I_SH_GOTO,0x0c,I_SH_REDE };
-BYTE SJUMP[] = { I_SH_MSG,0x1b,I_SH_AUTO };
-BYTE SUP_ROP[] = { I_SH_GOTO,0x01,I_SH_REDE };
-BYTE SSHIP[] = { I_SH_GOTO,0x14,I_SH_REDE };
-BYTE SPSH_MN[] = { I_SH_MSG,0x1c,I_SH_DEAD };
-BYTE SPSH_AU[] = { I_SH_SETF,GVAR_0c,I_SH_MSG,0x1d,I_SH_AUTO };
-BYTE SPSH_32[] = { I_SH_MSG,0x19,I_SH_DEAD };
-BYTE SPSH_4[] = { I_SH_MSG,0x1e,I_SH_QUIT };
-BYTE SPSH_1B[] = { I_SH_MSG,0x1f,I_SH_MSG,0x20,I_SH_DEAD };
-BYTE SPSH_1C[] = { I_SH_MSG,0x1f,I_SH_MSG,0x21,I_SH_MSG,0x1e,I_SH_QUIT };
-BYTE SHELP5[] = { I_SH_MSG,0x17,I_SH_AUTO };
-BYTE SLOOK2[] = { I_SH_MSG,0x12,I_SH_AUTO };
+const BYTE SGET_00[] = { I_SH_GET,0x00,I_SH_OK };
+const BYTE SGET_01[] = { I_SH_GET,0x01,I_SH_OK };
+const BYTE SGET_02[] = { I_SH_GET,0x02,I_SH_OK };
+const BYTE SGET_03[] = { I_SH_GET,0x03,I_SH_OK };
+const BYTE SGET_05[] = { I_SH_GET,0x05,I_SH_OK };
+const BYTE SGET_06[] = { I_SH_GET,0x06,I_SH_OK };
+const BYTE SGET_07[] = { I_SH_GET,0x07,I_SH_OK };
+const BYTE SGET_08[] = { I_SH_GET,0x08,I_SH_OK };
+const BYTE SGET_09[] = { I_SH_GET,0x09,I_SH_OK };
+const BYTE SGET_0A[] = { I_SH_GET,0x0a,I_SH_OK };
+const BYTE SGET_0B[] = { I_SH_GET,0x0b,I_SH_OK };
+const BYTE SGET_0C[] = { I_SH_GET,0x0c,I_SH_OK };
+const BYTE SGET_0D[] = { I_SH_GET,0x0d,I_SH_OK };
+const BYTE SGET_0E[] = { I_SH_GET,0x0e,I_SH_SETV,GVAR_02,0x09,I_SH_OK };
+const BYTE SGET_18[] = { I_SH_GET,0x18,I_SH_OK };
+const BYTE SGET_19[] = { I_SH_GET,0x19,I_SH_OK };
+const BYTE SINVENT[] = { I_SH_INVE,0x07			 };		/* the 0x07 is ignored */
+const BYTE SQUIT[] = { I_SH_QUIT };
+const BYTE SPUT_00[] = { I_SH_DROP,0x00,I_SH_OK };
+const BYTE SPUT_01[] = { I_SH_DROP,0x01,I_SH_OK };
+const BYTE SPUT_02[] = { I_SH_DROP,0x02,I_SH_OK };
+const BYTE SPUT_03[] = { I_SH_DROP,0x03,I_SH_OK };
+const BYTE SPUT_05[] = { I_SH_DROP,0x05,I_SH_OK };
+const BYTE SPUT_06[] = { I_SH_DROP,0x06,I_SH_OK };
+const BYTE SPUT_07[] = { I_SH_DROP,0x07,I_SH_OK };
+const BYTE SPUT_08[] = { I_SH_DROP,0x08,I_SH_OK };
+const BYTE SPUT_09[] = { I_SH_DROP,0x09,I_SH_OK };
+const BYTE SPUT_0A[] = { I_SH_DROP,0x0a,I_SH_OK };
+const BYTE SPUT_0B[] = { I_SH_DROP,0x0b,I_SH_OK };
+const BYTE SPUT_0C[] = { I_SH_DROP,0x0c,I_SH_OK };
+const BYTE SPUT_0D[] = { I_SH_DROP,0x0d,I_SH_OK };
+const BYTE SPUT_0E[] = { I_SH_DROP,0x0e,I_SH_OK };
+const BYTE SPUT_18[] = { I_SH_DROP,0x18,I_SH_OK };
+const BYTE SPUT_19[] = { I_SH_DROP,0x19,I_SH_OK };
+const BYTE SLK_DRW[] = { I_SH_MSG,0x00,I_SH_AUTO };
+const BYTE SBRK_ST[] = { I_SH_MSG,0x01,I_SH_AUTO };
+const BYTE SUSE_IC[] = { I_SH_CREA,0x0d,I_SH_MSG,0x02,I_SH_AUTO };
+const BYTE SCUT_RP[] = { I_SH_MSG,0x03,I_SH_AUTO };
+const BYTE SUSE_FL[] = { I_SH_CREA,0x0a,I_SH_MSG,0x02,I_SH_AUTO };
+const BYTE SWR_00[] = { I_SH_WEAR,0x00,I_SH_OK };
+const BYTE SRM_00[] = { I_SH_REMO,0x00,I_SH_OK };
+const BYTE SCR_RV[] = { I_SH_MSG,0x03,I_SH_AUTO };
+const BYTE SUSE_BO[] = { I_SH_GOTO,0x06,I_SH_REDE };
+const BYTE SUS2_BO[] = { I_SH_GOTO,0x04,I_SH_DEST,0x0b,I_SH_CREA,0x0c,I_SH_REDE };
+const BYTE SJMP_RV[] = { I_SH_MSG,0x04,I_SH_DEAD };
+const BYTE SUSE_I2[] = { I_SH_GOTO,0x0c,I_SH_DROP,0x0e,I_SH_SWAP,0x0e,I_SH_SETV,GVAR_02,0x07,I_SH_REDE };
+const BYTE SGET_MN[] = { I_SH_GET,0x10,I_SH_SWAP,0x10,I_SH_MSG,0x05,I_SH_SETV,GVAR_05,0x0a,I_SH_CLRF,GVAR_06,I_SH_AUTO };
+const BYTE SGET_M2[] = { I_SH_GET,0x10,I_SH_SWAP,0x10,I_SH_OK };
+const BYTE SPUT_11[] = { I_SH_DROP,0x11,I_SH_OK };
+const BYTE SGE2_07[] = { I_SH_GET,0x07,I_SH_OK };
+const BYTE SGE2_08[] = { I_SH_GET,0x08,I_SH_OK };
+const BYTE SPU2_07[] = { I_SH_DROP,0x07,I_SH_OK };
+const BYTE SPU2_08[] = { I_SH_DROP,0x08,I_SH_OK };
+const BYTE SDO_HOW[] = { I_SH_MSG,0x03,I_SH_AUTO };
+const BYTE SUSE_GN[] = { I_SH_DEST,0x10,I_SH_SWAP,0x07,I_SH_MSG,0x06,I_SH_MSG,0x07,I_SH_AUTO };
+const BYTE SFIR_GN[] = { I_SH_MSG,0x26,I_SH_AUTO };
+const BYTE SUS2_GN[] = { I_SH_DEST,0x11,I_SH_MSG,0x06,I_SH_AUTO };
+const BYTE SHLP_CM[] = { I_SH_MSG,0x08,I_SH_AUTO };
+const BYTE SFLD_1[] = { I_SH_SETF,GVAR_07,I_SH_MSG,0x09,I_SH_AUTO };
+const BYTE SFLD_2[] = { I_SH_SETF,GVAR_08,I_SH_MSG,0x09,I_SH_AUTO };
+const BYTE SFLD_3[] = { I_SH_MSG,0x0a,I_SH_AUTO };
+const BYTE SDANCE[] = { I_SH_GOTO,0x10,I_SH_SETV,GVAR_02,0x09,I_SH_REDE };
+const BYTE SDANCE2[] = { I_SH_MSG,0x0b,I_SH_GOTO,0x13,I_SH_REDE };
+const BYTE SUSE_KY[] = { I_SH_GOTO,0x12,I_SH_REDE };
+const BYTE SKIL_SG[] = { I_SH_DEST,0x17,I_SH_OK };
+const BYTE SLK_UP[] = { I_SH_MSG,0x0c,I_SH_AUTO };
+const BYTE SBRK_BA[] = { I_SH_SWAP,0x14,I_SH_CREA,0x05,I_SH_REDE };
+const BYTE SGO_UP[] = { I_SH_GOTO,0x0c,I_SH_SWAP,0x14,I_SH_REDE };
+const BYTE SBRBSEC[] = { I_SH_MSG,0x0d,I_SH_AUTO };
+const BYTE SUSE_CN[] = { I_SH_SWAP,0x12,I_SH_DEST,0x06,I_SH_REDE };
+const BYTE SBDOOR[] = { I_SH_GOTO,0x0c,I_SH_SWAP,0x12,I_SH_REDE };
+const BYTE SLK_WAT[] = { I_SH_MSG,0x0e,I_SH_AUTO };
+const BYTE SGET_CN[] = { I_SH_MSG,0x01,I_SH_AUTO };
+const BYTE SWATER2[] = { I_SH_MSG,0x0f,I_SH_AUTO };
+const BYTE SWATER1[] = { I_SH_CREA,0x06,I_SH_GET,0x06,I_SH_OK };
+const BYTE SL2_WAT[] = { I_SH_MSG,0x0f,I_SH_AUTO };
+const BYTE SODOOR2[] = { I_SH_GOTO,0x0e,I_SH_REDE };
+const BYTE SPSH3A[] = { I_SH_SETV,GVAR_09,0x01,I_SH_OK };
+const BYTE SPSHDG[] = { I_SH_MSG,0x10,I_SH_CLRF,GVAR_09,I_SH_SETF,GVAR_0a,I_SH_AUTO };
+const BYTE SPSH2A[] = { I_SH_SETV,GVAR_09,0x02,I_SH_OK };
+const BYTE SPSH1A[] = { I_SH_MSG,0x11,I_SH_SETV,GVAR_09,0x03,I_SH_AUTO };
+const BYTE SMNDFUS[] = { I_SH_MSG,0x0d,I_SH_AUTO };
+const BYTE SUSE_BA[] = { I_SH_CLRF,GVAR_0a,I_SH_DEST,0x05,I_SH_OK };
+const BYTE SLOOK1[] = { I_SH_MSG,0x18,I_SH_AUTO };
+const BYTE SHELP1[] = { I_SH_MSG,0x13,I_SH_AUTO };
+const BYTE SHELP2[] = { I_SH_MSG,0x14,I_SH_AUTO };
+const BYTE SHELP3[] = { I_SH_MSG,0x15,I_SH_AUTO };
+const BYTE SHELP4[] = { I_SH_MSG,0x16,I_SH_AUTO };
+const BYTE SLK_UP2[] = { I_SH_MSG,0x1a,I_SH_AUTO };
+const BYTE SQUIET[] = { I_SH_GOTO,0x0c,I_SH_SETV,GVAR_02,0x07,I_SH_REDE };
+const BYTE SWR_09[] = { I_SH_WEAR,0x09,I_SH_OK };
+const BYTE SRM_09[] = { I_SH_REMO,0x09,I_SH_OK };
+const BYTE SREDE[] = { I_SH_REDE };
+const BYTE SJUMP_D[] = { I_SH_MSG,0x03,I_SH_AUTO };
+const BYTE SUSE_RP[] = { I_SH_SETF,GVAR_0b,I_SH_DROP,0x0a,I_SH_GOTO,0x0c,I_SH_REDE };
+const BYTE SJUMP[] = { I_SH_MSG,0x1b,I_SH_AUTO };
+const BYTE SUP_ROP[] = { I_SH_GOTO,0x01,I_SH_REDE };
+const BYTE SSHIP[] = { I_SH_GOTO,0x14,I_SH_REDE };
+const BYTE SPSH_MN[] = { I_SH_MSG,0x1c,I_SH_DEAD };
+const BYTE SPSH_AU[] = { I_SH_SETF,GVAR_0c,I_SH_MSG,0x1d,I_SH_AUTO };
+const BYTE SPSH_32[] = { I_SH_MSG,0x19,I_SH_DEAD };
+const BYTE SPSH_4[] = { I_SH_MSG,0x1e,I_SH_QUIT };
+const BYTE SPSH_1B[] = { I_SH_MSG,0x1f,I_SH_MSG,0x20,I_SH_DEAD };
+const BYTE SPSH_1C[] = { I_SH_MSG,0x1f,I_SH_MSG,0x21,I_SH_MSG,0x1e,I_SH_QUIT };
+const BYTE SHELP5[] = { I_SH_MSG,0x17,I_SH_AUTO };
+const BYTE SLOOK2[] = { I_SH_MSG,0x12,I_SH_AUTO };
 
 
 
@@ -1461,7 +1461,7 @@ BYTE SLOOK2[] = { I_SH_MSG,0x12,I_SH_AUTO };
 // 4th = address of system command list entry
 */
 
-VNDef vndDefinitions[] =
+const VNDef vndDefinitions[] =
 {
 	{ TOK_GET,	TOK_BOOT,	 A_GD_BOOT,		 SGET_00 },
 	{ TOK_GET,	TOK_STAR,	 A_GD_STAR,		 SGET_01 },
@@ -1597,11 +1597,11 @@ VNDef vndDefinitions[] =
 
 
 /* bytecodes for the auto commands */
-BYTE STURNGR[] = { I_SH_MSG,0x23,I_SH_DEAD };
-BYTE STHROTL[] = { I_SH_MSG,0x24,I_SH_DEAD };
-BYTE SSHOT[] = { I_SH_MSG,0x25,I_SH_DEAD };
-BYTE SMELT_I[] = { I_SH_SWAP,0x0e,I_SH_TELL };
-BYTE STELLME[] = { I_SH_TELL };
+const BYTE STURNGR[] = { I_SH_MSG,0x23,I_SH_DEAD };
+const BYTE STHROTL[] = { I_SH_MSG,0x24,I_SH_DEAD };
+const BYTE SSHOT[] = { I_SH_MSG,0x25,I_SH_DEAD };
+const BYTE SMELT_I[] = { I_SH_SWAP,0x0e,I_SH_TELL };
+const BYTE STELLME[] = { I_SH_TELL };
 
 
 
@@ -1617,7 +1617,7 @@ BYTE STELLME[] = { I_SH_TELL };
 // 4th = unknown address
 */
 
-VNDef AUT_LST[] = 
+const VNDef AUT_LST[] = 
 {
 	{ 0xff, 0xff,  A_CHGRN,  STURNGR },
 	{ 0xff, 0xff,  A_CHTHR,  STHROTL },
@@ -2717,7 +2717,7 @@ void SH_SCOR()
 
 /* addresses of various system function handlers */
 
-void* SYS_V[] =
+const void* SYS_V[] =
 {
 	SH_INVE,
 	SH_REMO,
@@ -2931,6 +2931,7 @@ int main()
 {
 	int n;
 
+	printf("%cE",27);
 	for (;;)		/* restart game loop */
 	{
 		/* initialize the game variables */

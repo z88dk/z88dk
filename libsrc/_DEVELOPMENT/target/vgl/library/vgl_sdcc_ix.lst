@@ -11,6 +11,7 @@
 @inttypes/inttypes_sdcc_ix.lst
 @l/l.lst
 @l/sdcc.lst
+@libgen/libgen_sdcc.lst
 @locale/locale.lst
 @math/math_integer.lst
 @math/math_float_sdcc_ix.lst

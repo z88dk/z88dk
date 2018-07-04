@@ -1,0 +1,13 @@
+@env/esxdos/esxdos_asm.lst
+env/esxdos/c/sdcc_iy/env_getenv
+env/esxdos/c/sdcc_iy/env_getenv_callee
+env/esxdos/c/sdcc_iy/getenv
+env/esxdos/c/sdcc_iy/getenv_fastcall
+env/esxdos/c/sdcc_iy/getenv_ex
+env/esxdos/c/sdcc_iy/getenv_ex_callee
+env/esxdos/c/sdcc_iy/mkstemp_ex
+env/esxdos/c/sdcc_iy/mkstemp_ex_fastcall
+env/esxdos/c/sdcc_iy/tmpnam
+env/esxdos/c/sdcc_iy/tmpnam_fastcall
+env/esxdos/c/sdcc_iy/tmpnam_ex
+env/esxdos/c/sdcc_iy/tmpnam_ex_fastcall

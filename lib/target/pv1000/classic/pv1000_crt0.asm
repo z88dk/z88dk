@@ -9,8 +9,6 @@
 
 	module	pv1000_crt0 
 
-	defc	myzorg = 0
-	org	  0x0000
 
 ;--------
 ; Include zcc_opt.def to find out some info
@@ -35,6 +33,7 @@
 	; 256 bytes at bb00
 	; 1024 bytes at bc00 - shared with RAM character generator
 	defc	CRT_ORG_BSS = 0xbb00	
+	defc	CRT_ORG_CODE = 0x0000
 
         defc    TAR__fputc_cons_generic = 1
         defc    TAR__no_ansifont = 1
@@ -44,6 +43,7 @@
 	defc	__CPU_CLOCK = 3579000
         INCLUDE "crt/classic/crt_rules.inc"
 
+	org	  CRT_ORG_CODE
 
 if (ASMPC<>$0000)
         defs    CODE_ALIGNMENT_ERROR

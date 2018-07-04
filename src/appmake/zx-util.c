@@ -23,7 +23,7 @@
 #define ZXN_UNIVERSAL_DOT_BINARY  "libsrc/_DEVELOPMENT/target/zxn/zxn_universal_dot.bin"
 
 /*
-    z88dk_ffs
+    ffs
     missing from vs2015
 */
 
@@ -41,16 +41,19 @@ int z88dk_ffs(int n)
 
 /*
     ZX Next Utility
-    Construct Contents of 8k Page
+    Construct Contents of 8k Page or 16k Bank
 */
 
-void zxn_construct_page_contents(unsigned char *mem, struct memory_bank *mb, int fillbyte)
+void zxn_construct_page_contents(unsigned char *mem, struct memory_bank *mb, int mbsz, int fillbyte)
 {
     FILE *fin;
     int   j;
     int   first, last, gap;
 
-    memset(mem, fillbyte, 8192);
+    if ((mbsz != 0x2000) && (mbsz != 0x4000))
+        exit_log(1, "Error: Page construction for a size that is not 8k or 16k: %u\n", mbsz);
+
+    memset(mem, fillbyte, mbsz);
 
     gap = 0;
 
@@ -59,12 +62,12 @@ void zxn_construct_page_contents(unsigned char *mem, struct memory_bank *mb, int
         struct section_bin *sb = &mb->secbin[j];
 
         if (j == 0)
-            first = sb->org & 0x1fff;
+            first = sb->org & (mbsz - 1);
         else
-            gap += (sb->org & 0x1fff) - last;
+            gap += (sb->org & (mbsz - 1)) - last;
 
-        if (((sb->org & 0x1fff) + sb->size) > 0x2000)
-            exit_log(1, "Error: Section %s exceeds 8k page [%d,%d)\n", sb->section_name, sb->org & 0x1fff, (sb->org & 0x1fff) + sb->size);
+        if (((sb->org & (mbsz - 1)) + sb->size) > mbsz)
+            exit_log(1, "Error: Section %s exceeds %s [%d,%d)\n", sb->section_name, (mbsz == 0x2000) ? "8k page" : "16k bank", sb->org & (mbsz - 1), (sb->org & (mbsz - 1)) + sb->size);
 
         if ((fin = fopen(sb->filename, "rb")) == NULL)
             exit_log(1, "Error: Can't open \"%s\"\n", sb->filename);
@@ -72,19 +75,19 @@ void zxn_construct_page_contents(unsigned char *mem, struct memory_bank *mb, int
         if (fseek(fin, sb->offset, SEEK_SET) != 0)
             exit_log(1, "Error: Can't seek \"%s\" to %d\n", sb->filename, sb->offset);
 
-        if (fread(&mem[sb->org & 0x1fff], sb->size, 1, fin) != 1)
+        if (fread(&mem[sb->org & (mbsz - 1)], sb->size, 1, fin) != 1)
             exit_log(1, "Error: Can't read [%d,%d) from \"%s\"\n", sb->offset, sb->offset + sb->size);
 
         fclose(fin);
 
-        last = (sb->org & 0x1fff) + sb->size;
+        last = (sb->org & (mbsz - 1)) + sb->size;
     }
 
     // information
 
     if (first) printf(", %d head bytes free", first);
     if (gap) printf(", %d gap bytes free", gap);
-    if (last - 0x2000 < 0) printf(", %d tail bytes free", 0x2000 - last);
+    if (last - mbsz < 0) printf(", %d tail bytes free", mbsz - last);
     printf("\n");
 }
 
@@ -941,6 +944,7 @@ June 2018 aralbrec
 */
 
 #define ZXN_MAX_PAGE 223
+#define ZXN_MAX_BANK 111
 
 #define ZXN_ALLOCATE_LOAD 0xfd
 #define ZXN_ABSOLUTE_LOAD 0xfe
@@ -1204,7 +1208,7 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
                 z_alloc_table[i] = ZXN_ALLOCATE_LOAD;
 
                 printf("Page %d", i);
-                zxn_construct_page_contents(page, mb, fillbyte);
+                zxn_construct_page_contents(page, mb, sizeof(page), fillbyte);
 
                 // append to dotn
 
@@ -1644,6 +1648,211 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
     // output file is kept open
 
     zxs->fsna = fout;
+
+    return 0;
+}
+
+
+/*
+   ZX NEXT NEX FORMAT
+   June 2018 aralbrec
+
+   .NEX file format (V1.0)
+   =======================
+   unsigned char Next[4];			//"Next"
+   unsigned char VersionNumber[4];	//"V1.0"
+   unsigned char RAM_Required;		//0=768K, 1=1792K
+   unsigned char NumBanksToLoad;	//0-112 x 16K banks
+   unsigned char LoadingScreen;	//1=YES load palette also and layer2 at 16K page 9.
+   unsigned char BorderColour;		//0-7 ld a,BorderColour:out(254),a
+   unsigned short SP;				//Stack Pointer
+   unsigned short PC;				//Code Entry Point : $0000 = Don't run just load.
+   unsigned short NumExtraFiles;	//NumExtraFiles
+   unsigned char Banks[64+48];		//Which 16K Banks load.	: Bank 5 = $0000-$3fff, Bank 2 = $4000-$7fff, Bank 0 = $c000-$ffff
+   unsigned char RestOf512Bytes[512-(4+4 +1+1+1+1 +2+2+2 +64+48 )];
+   if LoadingScreen!=0 {
+   unsigned short	palette[256];
+   unsigned char	Layer2LoadingScreen[49152];
+   }
+   Banks[...]
+*/
+
+struct nex_hdr
+{
+    uint8_t Next[4];
+    uint8_t VersionNumber[4];
+    uint8_t RAM_Required;
+    uint8_t NumBanksToLoad;
+    uint8_t LoadingScreen;
+    uint8_t BorderColour;
+    uint8_t SP[2];
+    uint8_t PC[2];
+    uint8_t NumExtraFiles[2];
+    uint8_t Banks[48 + 64];
+    uint8_t Padding[512 - (4 + 4 + 1 + 1 + 1 + 1 + 2 + 2 + 2 + 64 + 48)];
+};
+
+struct nex_hdr nh;
+
+#define NEX_SCREEN_SIZE (512+49152)
+
+int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *memory, int fillbyte)
+{
+    int  i;
+    int  bsnum_bank;
+    char outname[FILENAME_MAX];
+
+    int register_sp;
+    int crt_org_code;
+
+    FILE *fin;
+    FILE *fout;
+
+    // find BANK space
+
+    if ((bsnum_bank = mb_find_bankspace(memory, "BANK")) < 0)
+        exit_log(1, "Error: Can't find BANK space\n");
+
+    // determine output filename
+
+    if (zxc->outfile == NULL)
+        snprintf(outname, sizeof(outname), "%s", zxc->binname);
+    else
+        snprintf(outname, sizeof(outname), "%s", zxc->outfile);
+
+    suffix_change(outname, ".nex");
+
+    // collect parameters
+
+    register_sp = parameter_search(zxc->crtfile, ".map", "__register_sp");
+
+    if ((crt_org_code = parameter_search(zxc->crtfile, ".map", "__crt_org_code")) < 0)
+        exit_log(1, "Error: Unable to find org address\n");
+
+    // open output file
+
+    if ((fout = fopen(outname, "wb")) == NULL)
+        exit_log(1, "Error: Couldn't create output file %s\n", outname);
+
+    // write incomplete nex header
+
+    memset(&nh, 0, sizeof(nh));
+    fwrite(&nh, sizeof(nh), 1, fout);
+
+    // write loading screen if present
+
+    if (zxnex->screen)
+    {
+        unsigned char scr[NEX_SCREEN_SIZE];
+
+        memset(scr, 0, sizeof(scr));
+
+        if ((fin = fopen(zxnex->screen, "rb")) == NULL)
+            fprintf(stderr, "Warning: NEX loading screen not added; can't open %s\n", zxnex->screen);
+        else
+        {
+            nh.LoadingScreen = 1;
+            
+            fread(scr, NEX_SCREEN_SIZE, 1, fin);
+            fclose(fin);
+
+            fwrite(scr, sizeof(scr), 1, fout);
+        }
+    }
+
+    // write main memory bank: 16k banks 5,2,0
+
+    {
+        unsigned char mem[48*1024];
+
+        memset(mem, fillbyte, sizeof(mem));
+
+        for (i = 0; i < memory->mainbank.num; ++i)
+        {
+            struct section_bin *sb = &memory->mainbank.secbin[i];
+
+            if (sb->org < 0x4000)
+                exit_log(1, "Error: Section %s has org in rom 0x%04x\n", sb->section_name, sb->org);
+
+            if ((fin = fopen(sb->filename, "rb")) == NULL)
+                exit_log(1, "Error: Can't open file %s for reading\n", sb->filename);
+
+            if (fseek(fin, sb->offset, SEEK_SET) != 0)
+                exit_log(1, "Error: Can't seek to %" PRIu32 " in file %s\n", sb->offset, sb->filename);
+
+            if (fread(&mem[sb->org - 0x4000], sb->size, 1, fin) < 1)
+            {
+                fclose(fin);
+                exit_log(1, "Error: Expected %d bytes from file %s\n", sb->size, sb->filename);
+            }
+
+            fclose(fin);
+        }
+
+        fwrite(mem, sizeof(mem), 1, fout);
+    }
+
+    // write all occupied 16k banks but skip 5,2,0
+
+    for (i = 0; i <= ZXN_MAX_BANK; ++i)
+    {
+        struct memory_bank *mb = &memory->bankspace[bsnum_bank].membank[i];
+
+        if ((i == 5) || (i == 2) || (i == 0))
+        {
+            // these were in the main memory bank but need to mark as present in header
+
+            nh.Banks[i] = 1;
+        }
+        else
+        {
+            if (mb->num > 0)
+            {
+                unsigned char bank[0x4000];
+
+                // indicate bank is present
+
+                nh.Banks[i] = 1;                     // bank is present
+                if (i >= 48) nh.RAM_Required = 1;    // if need memory expansion
+                nh.NumBanksToLoad++;                 // increase bank count
+
+                // construct bank contents
+
+                printf("Bank %d", i);
+                zxn_construct_page_contents(bank, mb, sizeof(bank), fillbyte);
+
+                // append to output
+
+                fwrite(bank, sizeof(bank), 1, fout);
+
+                // remove this BANK from memory model
+
+                mb_remove_bank(&memory->bankspace[bsnum_bank], i, zxc->clean);
+            }
+        }
+    }
+
+    // complete the header
+
+    memcpy(&nh.Next, "Next", 4);
+    memcpy(&nh.VersionNumber, "V1.0", 4);
+    nh.BorderColour = zxnex->border & 0x7;
+
+    if (register_sp > 0)
+    {
+        nh.SP[0] = register_sp & 0xff;
+        nh.SP[1] = (register_sp >> 8) & 0xff;
+    }
+
+    nh.PC[0] = crt_org_code & 0xff;
+    nh.PC[1] = (crt_org_code >> 8) & 0xff;
+
+    // write the completed header to output
+
+    rewind(fout);
+    fwrite(&nh, sizeof(nh), 1, fout);
+
+    fclose(fout);
 
     return 0;
 }

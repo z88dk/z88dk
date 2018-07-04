@@ -43,3 +43,11 @@ graphics/pen_down
 graphics/putc4x6
 graphics/xorborder
 graphics/xorplot
+graphics/c_plotpixel
+graphics/c_respixel
+graphics/c_xorpixel
+graphics/c_plot
+graphics/c_unplot
+graphics/c_xorplot
+graphics/c_pointxy
+graphics/c_point

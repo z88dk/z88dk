@@ -366,4 +366,22 @@ extern char *ulltoa(unsigned long long num,char *buf,int radix);
 
 #endif
 
+#ifdef __ZXNEXT
+
+extern unsigned char mkstemp_ex(char *template);
+
+
+
+extern char *getenv(const char *name);
+
+
+extern char *getenv_ex(const char *filename,const char *name);
+
+
+extern char *env_getenv(unsigned char handle,const char *name,char *val,unsigned int valsz,void *buf,unsigned int bufsz);
+
+
+
+#endif
+
 #endif

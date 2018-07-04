@@ -39,17 +39,19 @@ defc __ZXNEXT_2MB = 2
 
 defc __ZXNEXT_LAST_PAGE = 223
 
-; define(`__ENV_FILENAME', /sys/env)
+; define(`__ENV_FILENAME', /sys/env.cfg)
 
-defc __ENV_GETENV_BUFSZ = 64
+defc __ENV_BUFSZ = 128
+defc __ENV_GETENV_VALSZ = 64
 
-; define(`__ENV_TMPDIR', /tmp/)
+; define(`__ENV_TMPDIR', /tmp)
 
 defc __ENV_LTMPNAM = 13
 defc __ENV_TMPMAX = 0xffff
+defc __ENV_TMPMAX_TRY = 16
 
-; define(`__ENV_BINDIR', /bin/)
-; define(`__ENV_SYSDIR', /sys/)
+; define(`__ENV_BINDIR', /bin)
+; define(`__ENV_SYSDIR', /sys)
 
 defc __SPECTRUM = 16
 
@@ -2210,6 +2212,10 @@ defc __esx_tapeout_trunc = 3
 defc __ESX_M_GETHANDLE = 0x8d
 defc __ESX_M_GETDATE = 0x8e
 defc __ESX_M_EXECCMD = 0x8f
+
+defc __ESX_M_SETCAPS = 0x91
+defc __esx_caps_fast_trunc = 0x80
+
 defc __ESX_M_DRVAPI = 0x92
 defc __ESX_M_GETERR = 0x93
 defc __ESX_M_P3DOS = 0x94
@@ -2402,6 +2408,7 @@ defc __RP3_ENABLE_SPECDRUM = 0x08
 defc __RP3_ENABLE_COVOX = 0x08
 defc __RP3_ENABLE_TIMEX = 0x04
 defc __RP3_ENABLE_TURBOSOUND = 0x02
+defc __RP3_DISABLE_CONTENTION = 0x40
 defc __RP3_UNLOCK_7FFD = 0x80
 
 defc __REG_SUB_VERSION = 14
@@ -2505,6 +2512,8 @@ defc __REG_PALETTE_VALUE_16 = 68
 
 defc __REG_FALLBACK_COLOR = 74
 
+defc __REG_SPRITE_TRANSPARENCY_INDEX = 75
+
 defc __REG_MMU0 = 80
 defc __REG_MMU1 = 81
 defc __REG_MMU2 = 82
@@ -2560,8 +2569,6 @@ defc __ISF_COLLISION = 0x01
 
 defc __IO_303B_MAX_SPRITES_PER_LINE = 0x02
 defc __IO_303B_COLLISION = 0x01
-
-defc __IO_SPRITE_PALETTE = 0x53
 
 defc __IO_SPRITE_ATTRIBUTE = 0x57
 

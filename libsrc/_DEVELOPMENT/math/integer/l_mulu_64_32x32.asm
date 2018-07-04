@@ -16,10 +16,10 @@ PUBLIC l_mulu_64_32x32
    ;
    ; uses  : af, bc, de, hl, bc', de', hl'
 
-IF __CPU_Z180__
+IF __CPU_Z180__ && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
 
-   EXTERN l_small_mul_64_32x32
-   defc l_mulu_64_32x32 = l_small_mul_64_32x32
+   EXTERN l_z180_mulu_64_32x32
+   defc l_mulu_64_32x32 = l_z180_mulu_64_32x32
 
 ELSE
 

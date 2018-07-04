@@ -6,6 +6,7 @@ stdio/trs80/generic_console_ioctl
 stdio/trs80/CRT_FONT
 @stdio/stdio.lst
 @font/font_8x8/font_8x8.lst
+@input/input_keyboard.lst
 psg/trs80/set_psg
 psg/trs80/set_psg_callee
 psg/trs80/get_psg

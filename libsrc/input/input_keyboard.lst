@@ -1,10 +1,10 @@
-input/${TARGET}/in_WaitForKey
+input/generic/in_WaitForKey
 input/${TARGET}/in_Inkey
-input/${TARGET}/in_GetKey
+input/generic/in_GetKey
 input/${TARGET}/in_keytranstbl
 input/${TARGET}/in_KeyPressed
-input/${TARGET}/in_WaitForNoKey
+input/generic/in_WaitForNoKey
 input/${TARGET}/in_LookupKey
-input/${TARGET}/in_GetKeyReset
-input/${TARGET}/in_GetKeyVariables
+input/generic/in_GetKeyReset
+input/generic/in_GetKeyVariables
 input/fgetc_cons_inkey

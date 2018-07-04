@@ -44,15 +44,18 @@
 
 #define __ZXNEXT_LAST_PAGE  223
 
-#define __ENV_FILENAME  "/sys/env"
-#define __ENV_GETENV_BUFSZ  64
+#define __ENV_FILENAME  "/sys/env.cfg"
 
-#define __ENV_TMPDIR  "/tmp/"
+#define __ENV_BUFSZ  128
+#define __ENV_GETENV_VALSZ  64
+
+#define __ENV_TMPDIR  "/tmp"
 #define __ENV_LTMPNAM  13
 #define __ENV_TMPMAX  0xffff
+#define __ENV_TMPMAX_TRY  16
 
-#define __ENV_BINDIR  "/bin/"
-#define __ENV_SYSDIR  "/sys/"
+#define __ENV_BINDIR  "/bin"
+#define __ENV_SYSDIR  "/sys"
 
 #undef  __SPECTRUM
 #define __SPECTRUM  16
@@ -2201,6 +2204,10 @@
 #define __ESX_M_GETHANDLE  0x8d
 #define __ESX_M_GETDATE  0x8e
 #define __ESX_M_EXECCMD  0x8f
+
+#define __ESX_M_SETCAPS  0x91
+#define __esx_caps_fast_trunc  0x80
+
 #define __ESX_M_DRVAPI  0x92
 #define __ESX_M_GETERR  0x93
 #define __ESX_M_P3DOS  0x94
@@ -2393,6 +2400,7 @@
 #define __RP3_ENABLE_COVOX  0x08
 #define __RP3_ENABLE_TIMEX  0x04
 #define __RP3_ENABLE_TURBOSOUND  0x02
+#define __RP3_DISABLE_CONTENTION  0x40
 #define __RP3_UNLOCK_7FFD  0x80
 
 #define __REG_SUB_VERSION  14
@@ -2496,6 +2504,8 @@
 
 #define __REG_FALLBACK_COLOR  74
 
+#define __REG_SPRITE_TRANSPARENCY_INDEX  75
+
 #define __REG_MMU0  80
 #define __REG_MMU1  81
 #define __REG_MMU2  82
@@ -2551,8 +2561,6 @@
 
 #define __IO_303B_MAX_SPRITES_PER_LINE  0x02
 #define __IO_303B_COLLISION  0x01
-
-#define __IO_SPRITE_PALETTE  0x53
 
 #define __IO_SPRITE_ATTRIBUTE  0x57
 

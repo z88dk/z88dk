@@ -234,7 +234,7 @@ int nec_exec(char *target)
 		
 		if (origin == -1) {
 			if ( (origin = get_org_addr(crtfile)) == -1 ) {
-				fprintf(stderr,"Warning: could not get the 'myzorg' value, ORG defaults to MODE1 ($C437)\n");
+				fprintf(stderr,"Warning: could not get the code ORG, ORG defaults to MODE1 ($C437)\n");
 				origin = 0xC437;
 			}
 		}

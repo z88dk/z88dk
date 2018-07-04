@@ -143,7 +143,7 @@ define(`__RTM_28MHZ', 0x03)
 #          Unlike the paging lock in port 0x7ffd, 
 #          this may be enabled or disabled at any time.
 #          Use "1" to disable the locked paging.
-#  bit 6 = Reserved, must be 0
+#  bit 6 = "1" to disable RAM contention. (0 after a reset) 
 #  bit 5 = Stereo mode (0 = ABC, 1 = ACB)(Reset to 0 after a PoR or Hard-reset)
 #  bit 4 = Enable internal speaker (1 = enabled)(Reset to 1 afeter a PoR or Hard-reset)
 #  bit 3 = Enable Specdrum/Covox (1 = enabled)(Reset to 0 after a PoR or Hard-reset)
@@ -159,6 +159,7 @@ define(`__RP3_ENABLE_SPECDRUM', 0x08)
 define(`__RP3_ENABLE_COVOX', 0x08)
 define(`__RP3_ENABLE_TIMEX', 0x04)
 define(`__RP3_ENABLE_TURBOSOUND', 0x02)
+define(`__RP3_DISABLE_CONTENTION', 0x40)
 define(`__RP3_UNLOCK_7FFD', 0x80)
 
 # (R) 0x0E (14) => Core Version (sub minor number) 
@@ -441,6 +442,12 @@ define(`__REG_PALETTE_VALUE_16', 68)
 
 define(`__REG_FALLBACK_COLOR', 74)
 
+# (R/W) 0x4B (75) => Transparency index for Sprites
+#  bits 7-0 = Set the index value.
+#  (0XE3 after a reset)
+
+define(`__REG_SPRITE_TRANSPARENCY_INDEX', 75)
+
 # (R/W) 0x50 (80) => MMU slot 0
 #  bits 7-0 = Set a Spectrum RAM page at position 0x0000 to 0x1fff
 #  (Reset to 255 after a reset)
@@ -618,6 +625,7 @@ PUBLIC `__RP3_ENABLE_SPECDRUM'
 PUBLIC `__RP3_ENABLE_COVOX'
 PUBLIC `__RP3_ENABLE_TIMEX'
 PUBLIC `__RP3_ENABLE_TURBOSOUND'
+PUBLIC `__RP3_DISABLE_CONTENTION'
 PUBLIC `__RP3_UNLOCK_7FFD'
 
 PUBLIC `__REG_SUB_VERSION'
@@ -720,6 +728,8 @@ PUBLIC `__RPC_ENABLE_ULANEXT'
 PUBLIC `__REG_PALETTE_VALUE_16'
 
 PUBLIC `__REG_FALLBACK_COLOR'
+
+PUBLIC `__REG_SPRITE_TRANSPARENCY_INDEX'
 
 PUBLIC `__REG_MMU0'
 PUBLIC `__REG_MMU1'
@@ -829,6 +839,7 @@ defc `__RP3_ENABLE_SPECDRUM' = __RP3_ENABLE_SPECDRUM
 defc `__RP3_ENABLE_COVOX' = __RP3_ENABLE_COVOX
 defc `__RP3_ENABLE_TIMEX' = __RP3_ENABLE_TIMEX
 defc `__RP3_ENABLE_TURBOSOUND' = __RP3_ENABLE_TURBOSOUND
+defc `__RP3_DISABLE_CONTENTION' = __RP3_DISABLE_CONTENTION
 defc `__RP3_UNLOCK_7FFD' = __RP3_UNLOCK_7FFD
 
 defc `__REG_SUB_VERSION' = __REG_SUB_VERSION
@@ -931,6 +942,8 @@ defc `__RPC_ENABLE_ULANEXT' = __RPC_ENABLE_ULANEXT
 defc `__REG_PALETTE_VALUE_16' = __REG_PALETTE_VALUE_16
 
 defc `__REG_FALLBACK_COLOR' = __REG_FALLBACK_COLOR
+
+defc `__REG_SPRITE_TRANSPARENCY_INDEX' = __REG_SPRITE_TRANSPARENCY_INDEX
 
 defc `__REG_MMU0' = __REG_MMU0
 defc `__REG_MMU1' = __REG_MMU1
@@ -1040,6 +1053,7 @@ ifdef(`CFG_C_DEF',
 `#define' `__RP3_ENABLE_COVOX'  __RP3_ENABLE_COVOX
 `#define' `__RP3_ENABLE_TIMEX'  __RP3_ENABLE_TIMEX
 `#define' `__RP3_ENABLE_TURBOSOUND'  __RP3_ENABLE_TURBOSOUND
+`#define' `__RP3_DISABLE_CONTENTION'  __RP3_DISABLE_CONTENTION
 `#define' `__RP3_UNLOCK_7FFD'  __RP3_UNLOCK_7FFD
 
 `#define' `__REG_SUB_VERSION'  __REG_SUB_VERSION
@@ -1142,6 +1156,8 @@ ifdef(`CFG_C_DEF',
 `#define' `__REG_PALETTE_VALUE_16'  __REG_PALETTE_VALUE_16
 
 `#define' `__REG_FALLBACK_COLOR'  __REG_FALLBACK_COLOR
+
+`#define' `__REG_SPRITE_TRANSPARENCY_INDEX'  __REG_SPRITE_TRANSPARENCY_INDEX
 
 `#define' `__REG_MMU0'  __REG_MMU0
 `#define' `__REG_MMU1'  __REG_MMU1

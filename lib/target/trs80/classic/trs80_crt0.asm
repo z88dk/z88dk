@@ -25,6 +25,7 @@
         PUBLIC    l_dcal          ;jp(hl)
 
 	PUBLIC	EG2000_ENABLED
+	PUBLIC	CLIB_KEYBOARD_ADDRESS
 
 ;--------
 ; Set an origin for the application (-zorg=) default to $5200
@@ -34,9 +35,11 @@ IF      !DEFINED_CRT_ORG_CODE
 	IF (startup=2)
 		defc	EG2000_ENABLED = 1
                 defc    CRT_ORG_CODE  = 22500
+		defc	CLIB_KEYBOARD_ADDRESS = 0xf800
 	ELSE
 		defc	EG2000_ENABLED = 0
                 defc    CRT_ORG_CODE  = $5200
+		defc	CLIB_KEYBOARD_ADDRESS = 0x3800
 	ENDIF
 ENDIF
 

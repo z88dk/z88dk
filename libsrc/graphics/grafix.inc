@@ -410,8 +410,8 @@ ENDIF
 IF FORsorcerer
 	DEFINE gotgfx
 	defc maxx	= 128
-	defc maxy	= 90
-	defc blankch	= 192
+	defc maxy	= 60
+	defc blankch	= 32
 ENDIF
 
 IF FORpacman
@@ -425,6 +425,13 @@ IF FORpv1000
 	DEFINE gotgfx
 	defc maxx	= 56
 	defc maxy	= 48
+ENDIF
+
+IF FORalphatro
+	DEFINE gotgfx
+	defc maxx	= 80
+	defc maxy	= 72
+	defc blankch	= 32
 ENDIF
 
 ; =============================================

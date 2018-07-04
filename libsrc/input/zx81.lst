@@ -1,5 +1,6 @@
-input/spectrum/in_GetKey
-input/spectrum/in_GetKeyReset
+input/generic/in_GetKey
+input/generic/in_GetKeyReset
+input/generic/in_GetKeyVariables
 input/zx81/in_Inkey
 input/spectrum/in_JoyKeyboard
 input/zx81/in_KeyPressed
@@ -16,3 +17,4 @@ input/spectrum/in_Wait
 input/spectrum/in_WaitForKey
 input/spectrum/in_WaitForNoKey
 input/zx81/INMouseSim
+input/fgetc_cons_inkey

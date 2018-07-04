@@ -444,4 +444,26 @@ extern char __LIB__ *ulltoa_callee(unsigned long long num,char *buf,int radix) _
 
 #endif
 
+#ifdef __ZXNEXT
+
+extern unsigned char __LIB__ mkstemp_ex(char *template) __smallc __z88dk_fastcall;
+
+
+
+extern char __LIB__ *getenv(const char *name) __smallc __z88dk_fastcall;
+
+
+extern char __LIB__ *getenv_ex(const char *filename,const char *name) __smallc;
+extern char __LIB__ *getenv_ex_callee(const char *filename,const char *name) __smallc __z88dk_callee;
+#define getenv_ex(a,b) getenv_ex_callee(a,b)
+
+
+extern char __LIB__ *env_getenv(unsigned char handle,const char *name,char *val,unsigned int valsz,void *buf,unsigned int bufsz) __smallc;
+extern char __LIB__ *env_getenv_callee(unsigned char handle,const char *name,char *val,unsigned int valsz,void *buf,unsigned int bufsz) __smallc __z88dk_callee;
+#define env_getenv(a,b,c,d,e,f) env_getenv_callee(a,b,c,d,e,f)
+
+
+
+#endif
+
 #endif

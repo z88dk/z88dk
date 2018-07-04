@@ -1,0 +1,17 @@
+env/esxdos/z80/__ENV_BUF
+env/esxdos/z80/__ENV_FNAME
+env/esxdos/z80/__ENV_GETENV_VALUE
+env/esxdos/z80/__ENV_MKSNAM
+env/esxdos/z80/__env_name_sm
+env/esxdos/z80/__env_qualify_name
+env/esxdos/z80/__ENV_TMPNAM
+env/esxdos/z80/__ENV_TMPNAM_TEMPLATE
+env/esxdos/z80/__env_value_sm
+env/esxdos/z80/asm_env_getenv
+env/esxdos/z80/asm_env_mkstemp
+env/esxdos/z80/asm_env_tmpnam
+env/esxdos/z80/asm_getenv
+env/esxdos/z80/asm_getenv_ex
+env/esxdos/z80/asm_mkstemp_ex
+env/esxdos/z80/asm_tmpnam
+env/esxdos/z80/asm_tmpnam_ex

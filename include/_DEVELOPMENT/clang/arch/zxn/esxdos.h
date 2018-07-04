@@ -200,6 +200,12 @@ extern unsigned char esx_m_setdrv(unsigned char drive);
 
 
 
+#define ESX_CAPS_FAST_TRUNC  __esx_caps_fast_trunc
+
+extern unsigned char esx_m_setcaps(unsigned char caps);
+
+
+
 // time.h contains functions dealing with dos time
 
 extern unsigned char esx_m_getdate(struct dos_tm *);
