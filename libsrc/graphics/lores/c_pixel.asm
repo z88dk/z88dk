@@ -1,4 +1,4 @@
-
+	INCLUDE	"graphics/grafix.inc"
 	EXTERN	plotpixel
 	EXTERN	respixel
 	EXTERN	xorpixel
@@ -32,7 +32,7 @@ IF NEEDplot
 	call	plotpixel
 ENDIF
 IF NEEDunplot
-	call	rexpixel
+	call	respixel
 ENDIF
 IF NEEDxor
 	call	xorpixel
