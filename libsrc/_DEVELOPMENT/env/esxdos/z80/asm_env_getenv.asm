@@ -1,3 +1,5 @@
+; char *env_getenv(unsigned char handle,const char *name,char *val,unsigned int valsz,void *buf,unsigned int bufsz)
+
 INCLUDE "config_private.inc"
 
 SECTION code_env

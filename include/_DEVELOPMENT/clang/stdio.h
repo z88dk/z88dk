@@ -34,9 +34,6 @@ extern unsigned char    _MAX_FOPEN[];
 
 #define FILENAME_MAX    128
 
-#define L_tmpnam        8
-#define TMP_MAX         16
-
 #ifndef SEEK_SET
 #define SEEK_SET        0
 #endif
@@ -349,6 +346,11 @@ extern int vscanf_unlocked(char *format,void *arg);
 
 
 #ifdef __ZXNEXT
+
+#include <arch.h>
+
+#define L_tmpnam  __ENV_LTMPNAM
+#define TMP_MAX   0xffff
 
 extern char *tmpnam(char *s);
 
