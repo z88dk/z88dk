@@ -771,12 +771,16 @@ int ex_end1_skel[]={14, ADDR, 0x22, SKIP, SKIP, 33, SKIP, SKIP, 0x22, SKIP, SKIP
 int tkmsbasic_code_skel[]={12, 0xD5, 17, SKIP, SKIP, 0xC5, 1, SKIP, SKIP, 0xC5, 0x06, CATCH, 0x7E};
 int jptab_msbasic_skel[]={10, 0x07, 0x4F, 6, 0, 0xEB, 33, CATCH, CATCH, 9, 0x4E};
 
-int jptab2_msbasic_skel[]={10, 0x07, 0x4F, 6, 0, 0xEB, 0x2A, CATCH, CATCH, 9, 0x4E};
+int jptabptr_msbasic_skel[]={10, 0x07, 0x4F, 6, 0, 0xEB, 0x2A, CATCH, CATCH, 9, 0x4E};
+
+int relocsrc_msbasic_skel[]={15, 0x11, SKIP, SKIP, 0x21, CATCH, CATCH, 0x01, SKIP, 0x01, 0xED, 0xB0, 0x21, SKIP, SKIP, 0x22};
+int relocdst_msbasic_skel[]={15, 0x11, CATCH, CATCH, 0x21, SKIP, SKIP, 0x01, SKIP, 0x01, 0xED, 0xB0, 0x21, SKIP, SKIP, 0x22};
+
+
 									   
 //int jptab_msbasic_skel[]={13, 0x07, 0x4F, 6, 0, 0xEB, 33, CATCH, CATCH, 0x09, 0x4E, 0x23, 0x46, 0xC5};
 int jptab_msbasic_skel3[]={11, 17, CATCH, CATCH, 0xD4, SKIP,SKIP, 7, 0x4f, 6, 0, 0xEB};
 int jptab_msbasic_skel2[]={12, 17, CATCH, CATCH, 0x07, 0x4F, 6, 0, 0xEB, 0x09, 0x4E, 0x23, 0x46};
-int jptab_msbasic_skel4[]={13, 0x7E, 0x32, SKIP,SKIP, 0xC9, 0xC3, SKIP, SKIP, 0xC3, SKIP, SKIP, 0, ADDR};
 
 int else_token_skel[]={13, 0x32, SKIP, SKIP,0xF1, 0xC1, 0xD1, 0xFE, CATCH, 0xF5, 0xCC, SKIP, SKIP, 0xF1};
 
@@ -2289,18 +2293,29 @@ int main(int argc, char *argv[])
 		printf("\n\n");
 
 		/* MS BASIC commands */
-		jptab=find_skel(jptab2_msbasic_skel);
-		if (jptab>0)  printf("\n# JP table relocated in ram, ptr in $%04X\n",jptab);
+		jptab=find_skel(jptabptr_msbasic_skel);
+		if (jptab>0)  {
+			printf("\n# JP table relocated in ram, ptr in $%04X\n",jptab);
+			res=find_skel(relocdst_msbasic_skel);
+			if (res>0) {
+				printf("\n# First byte of moved block: $%04X\n",res);
+				res=jptab-res;
+				jptab=find_skel(relocsrc_msbasic_skel);
+				if (jptab>0) {
+					  res+=jptab;
+					  jptab = img[res+pos]+256*img[res+pos+1];
+					  printf("\n# Original JP table ptr in ROM to be copied: $%04X, getting JP table address\n",res);
+				}
+			} else jptab=0;
+				
+		}
 			
+		if (jptab <=0)
 		jptab=find_skel(jptab_msbasic_skel);
 		if (jptab<0)
 			jptab=find_skel(jptab_msbasic_skel2);
 		if (jptab<0)
 			jptab=find_skel(jptab_msbasic_skel3);
-		if (jptab<0) {
-			jptab=find_skel(jptab_msbasic_skel4);
-			if (jptab>0) jptab += pos;
-		}
 		if (jptab>0) {
 			printf("\n# JP table for statements = $%04X\n",jptab);
 			if (SKOOLMODE) {
