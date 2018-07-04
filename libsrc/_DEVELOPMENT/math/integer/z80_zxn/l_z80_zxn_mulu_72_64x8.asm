@@ -1,4 +1,4 @@
-; 2018 June feilipu
+; 2018 July feilipu
 
 INCLUDE "config_private.inc"
 
@@ -19,86 +19,98 @@ l_z80_zxn_mulu_72_64x8:
    ;
    ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-   ld c,l                       ; x0
-   ld b,a
-   mlt bc                       ; y*x0
-   ld l,c                       ; p0
+   ld b,d                       ; relocate DE
+   ld c,e
+
+   ld e,l                       ; x0
+   ld d,a
+   mlt de                       ; y*x0
 
    ex af,af                     ;'accumulator
-   ld a,b                       ;'p1 carry
+   ld l,e                       ;'p0
+   ld a,d                       ;'p1 carry
    ex af,af
    
-   ld c,h                       ; x1
-   ld b,a
-   mlt bc                       ; y*x1
+   ld e,h                       ; x1
+   ld d,a
+   mlt de                       ; y*x1
    
    ex af,af
-   add a,c
+   add a,e
    ld h,a                       ;'p1
-   ld a,b                       ;'p2 carry
+   ld a,d                       ;'p2 carry
    ex af,af
    
-   ld c,e
-   ld b,a
-   mlt bc                       ; y*x2
+   ld e,c
+   ld d,a
+   mlt de                       ; y*x2
    
    ex af,af
-   adc a,c
-   ld e,a                       ;'p2
-   ld a,b                       ;'p3 carry
+   adc a,e
+   ld c,a                       ;'p2
+   ld a,d                       ;'p3 carry
    ex af,af
    
-   ld c,d
-   ld b,a
-   mlt bc                       ; y*x3
+   ld e,b
+   ld d,a
+   mlt de                       ; y*x3
    
    ex af,af
-   adc a,c
-   ld d,a                       ;'p3
-   ld a,b                       ;'p4 carry
+   adc a,e
+   ld b,a                       ;'p3
+   ld a,d                       ;'p4 carry
    ex af,af
+
+   ld d,b                       ; return DE
+   ld e,c
 
    exx
 
-   ld c,l
-   ld b,a
-   mlt bc                       ; y*x4
-
-   ex af,af
-   adc a,c
-   ld l,a                       ;'p4
-   ld a,b                       ;'p5 carry
-   ex af,af
-
-   ld c,h
-   ld b,a
-   mlt bc                       ; y*x5
-
-   ex af,af
-   adc a,c
-   ld h,a                       ;'p5
-   ld a,b                       ;'p6 carry
-   ex af,af
-
+   ld b,d                       ; relocate DE
    ld c,e
-   ld b,a
-   mlt bc                       ; y*x6
+
+   ld e,l
+   ld d,a
+   mlt de                       ; y*x4
 
    ex af,af
-   adc a,c
-   ld e,a                       ;'p6
-   ld a,b                       ;'p7 carry
+   adc a,e
+   ld l,a                       ;'p4
+   ld a,d                       ;'p5 carry
    ex af,af
 
-   ld c,d
-   ld b,a
-   mlt bc                       ; y*x6
+   ld e,h
+   ld d,a
+   mlt de                       ; y*x5
 
    ex af,af
-   adc a,c
-   ld d,a                       ;'p7
-   ld a,b                       ;'p8 carry
+   adc a,e
+   ld h,a                       ;'p5
+   ld a,d                       ;'p6 carry
+   ex af,af
+
+   ld e,c
+   ld d,a
+   mlt de                       ; y*x6
+
+   ex af,af
+   adc a,e
+   ld c,a                       ;'p6
+   ld a,d                       ;'p7 carry
+   ex af,af
+
+   ld e,b
+   ld d,a
+   mlt de                       ; y*x6
+
+   ex af,af
+   adc a,e
+   ld b,a                       ;'p7
+   ld a,d                       ;'p8 carry
    adc a,0                      ;'final carry
 
+   ld d,b                       ; return DE
+   ld e,c
+   
    exx
    ret

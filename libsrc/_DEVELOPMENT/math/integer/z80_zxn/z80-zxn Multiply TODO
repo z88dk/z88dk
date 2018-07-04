@@ -25,7 +25,7 @@ PUBLIC l_mulu_16_16x16
         ; exit  : hl = 16-bit product
         ;         carry reset
 
-	; math/integer/l_mulu_24_16x8 TODO
+	; math/integer/l_mulu_24_16x8
 PUBLIC l_mulu_24_16x8
     ; compute:  ahl = hl * e
     EXTERN l0_small_mul_32_32x32
@@ -60,7 +60,7 @@ PUBLIC l_mulu_32_32x32
             ; exit  : dehl = 32-bit product
             ;         carry reset
 
-	; math/integer/l_mulu_40_32x8 TODO
+	; math/integer/l_mulu_40_32x8
 PUBLIC l_mulu_40_32x8
     ; compute:  adehl = dehl * a
     EXTERN l_small_mul_40_32x8
@@ -129,7 +129,7 @@ PUBLIC l_mulu_64_64x64
             ; exit  : dehl = 32-bit product
             ;         carry reset
 
-	; math/integer/l_mulu_72_64x8 TODO
+	; math/integer/l_mulu_72_64x8
 PUBLIC l_mulu_72_64x8
     ; enter :   dehl'dehl = 64-bit multiplicand
     ;                   a = 8-bit multiplicand

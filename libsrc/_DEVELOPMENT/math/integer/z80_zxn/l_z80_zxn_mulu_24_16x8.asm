@@ -1,4 +1,4 @@
-; 2018 June feilipu
+; 2018 July feilipu
 
 INCLUDE "config_private.inc"
 
@@ -22,12 +22,14 @@ l_z80_zxn_mulu_24_16x8:
     ld d,h                      ; xh
     ld h,e                      ; yl
 
-    mlt hl                      ; yl*xl
     mlt de                      ; xh*yl
+    ex de,hl
+    mlt de                      ; yl*xl, hl = xh*yl
 
-    ld  a,h                     ; sum products
-    add a,e
-    ld  h,a
+    ld  a,d                     ; sum products
+    add a,l
+    ld  d,a
+    ex de,hl
 
     ld  a,d
     adc a,0

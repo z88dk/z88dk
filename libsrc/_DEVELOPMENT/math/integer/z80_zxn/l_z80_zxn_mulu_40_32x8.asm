@@ -1,4 +1,4 @@
-; 2018 June feilipu
+; 2018 July feilipu
 
 INCLUDE "config_private.inc"
 
@@ -19,43 +19,49 @@ l_z80_zxn_mulu_40_32x8:
     ;
     ; uses  : af, bc, de, hl, af'
 
-   ld c,l                       ; x0
-   ld b,a
-   mlt bc                       ; y*x0
-   ld l,c                       ; p0
+   ld b,d                       ; relocate DE
+   ld c,e
+   
+   ld e,l                       ; x0
+   ld d,a
+   mlt de                       ; y*x0
 
    ex af,af                     ;'accumulator
-   ld a,b                       ;'p1 carry
+   ld l,e                       ;'p0
+   ld a,d                       ;'p1 carry
    ex af,af
    
-   ld c,h                       ; x1
-   ld b,a
-   mlt bc                       ; y*x1
+   ld e,h                       ; x1
+   ld d,a
+   mlt de                       ; y*x1
    
    ex af,af
-   add a,c
+   add a,e
    ld h,a                       ;'p1
-   ld a,b                       ;'p2 carry
+   ld a,d                       ;'p2 carry
    ex af,af
    
-   ld c,e
-   ld b,a
-   mlt bc                       ; y*x2
+   ld e,c
+   ld d,a
+   mlt de                       ; y*x2
    
    ex af,af
-   adc a,c
-   ld e,a                       ;'p2
-   ld a,b                       ;'p3 carry
+   adc a,e
+   ld c,a                       ;'p2
+   ld a,d                       ;'p3 carry
    ex af,af
    
-   ld c,d
-   ld b,a
-   mlt bc                       ; y*x3
+   ld e,b
+   ld d,a
+   mlt de                       ; y*x3
    
    ex af,af
-   adc a,c
-   ld d,a                       ;'p3
-   ld a,b                       ;'p4 carry
+   adc a,e
+   ld b,a                       ;'p3
+   ld a,d                       ;'p4 carry
    adc a,0                      ;'final carry
+   
+   ld d,b                       ; return DE
+   ld e,c
 
    ret
