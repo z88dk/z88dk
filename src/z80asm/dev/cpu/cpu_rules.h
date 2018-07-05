@@ -26113,6 +26113,14 @@ break;
 default: error_illegal_ident(); }
 }
 
+| label? _TK_LDWS _TK_NEWLINE @{
+switch (opts.cpu) {
+case CPU_Z80_ZXN: 
+DO_stmt(0xEDA5);
+break;
+default: error_illegal_ident(); }
+}
+
 | label? _TK_LSDDR _TK_NEWLINE @{
 switch (opts.cpu) {
 case CPU_R3K: 
@@ -26149,14 +26157,6 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_Z80_ZXN: 
 DO_stmt(0xED24);
-break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_MIRROR _TK_DE _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_Z80_ZXN: 
-DO_stmt(0xED26);
 break;
 default: error_illegal_ident(); }
 }
@@ -27039,14 +27039,6 @@ if (!opts.swap_ix_iy) { DO_stmt(0xFDE1); } else { DO_stmt(0xDDE1); }
 switch (opts.cpu) {
 case CPU_R3K: 
 DO_stmt(0xED6E);
-break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_POP _TK_X _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_Z80_ZXN: 
-DO_stmt(0xED8B);
 break;
 default: error_illegal_ident(); }
 }

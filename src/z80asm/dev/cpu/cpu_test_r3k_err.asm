@@ -673,8 +673,8 @@
  ldirx                          ; Error
  ldix                           ; Error
  ldpirx                         ; Error
+ ldws                           ; Error
  mirror a                       ; Error
- mirror de                      ; Error
  mlt bc                         ; Error
  mlt de                         ; Error
  mlt hl                         ; Error
@@ -821,7 +821,6 @@
  outinb                         ; Error
  pixelad                        ; Error
  pixeldn                        ; Error
- pop x                          ; Error
  push -32768                    ; Error
  push 32767                     ; Error
  push 65535                     ; Error
