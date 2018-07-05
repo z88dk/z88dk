@@ -53,13 +53,13 @@
 	;;ld	de,(base_graphics)
 	;;add	hl,de
 ;-------
-IF VDP_CMD > 255
+IF VDP_CMD < 0
 	ld	a,l
-	ld	(VDP_CMD),a
+	ld	(-VDP_CMD),a
 	ld	a,h
 	and	@00111111
-	ld	(VDP_CMD),a
-	ld	a,(VDP_DATAIN)
+	ld	(-VDP_CMD),a
+	ld	a,(-VDP_DATAIN)
 ELSE
 	ld	a,l		; LSB of video memory ptr
 	out	(VDP_CMD), a
@@ -85,15 +85,15 @@ ENDIF
 
 .pix_return
          ld       (hl),a	; hl points to "pixelbyte"
-IF VDP_CMD > 255
+IF VDP_CMD < 0
 	ld	a,e
-	ld	(VDP_CMD),a
+	ld	(-VDP_CMD),a
 	ld	a,d
 	and	@00111111
 	or	@01000000
-	ld	(VDP_CMD),a
+	ld	(-VDP_CMD),a
 	ld	a,(pixelbyte)
-	ld	(VDP_DATA),a
+	ld	(-VDP_DATA),a
 ELSE
          ld       a,e		; LSB of video memory ptr
          out      (VDP_CMD),a

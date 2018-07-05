@@ -38,11 +38,15 @@ _msx_color:
 	and     $F0
 	ld      l,a
 	ld      a,(ix+2)	;border
-	or      l
+	or      l		;value
 
-	ld      b,a
-	ld      c,7
-	call    set_vdp_reg
+	ld	bc,7		;register
+	push	bc
+	ld	c,a		;value
+	push	bc
+	call    set_vdp_reg		;; This is wrong
+	pop	af		;dump parameters
+	pop	af
 	pop     af
 	pop	ix		;restore callers
 	;ret     nz
@@ -63,11 +67,11 @@ _msx_color:
 ;	call    SETWRT
 ;cclr_lp:
 ;	pop     af
-IF VDP_DATA > 255
-	ld	(VDP_DATA),a
-ELSE
-	out	(VDP_DATA),a
-ENDIF
+;IF VDP_DATA < 0
+;	ld	(VDP_DATA),a
+;ELSE
+;	out	(VDP_DATA),a
+;ENDIF
 ;	push    af
 ;	dec     bc
 ;	ld      a,b

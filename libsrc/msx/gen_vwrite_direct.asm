@@ -27,28 +27,32 @@ _msx_vwrite_direct:
 	ld      ix,4
 	add     ix,sp
 
-	ld c, (ix+0)	; count
-	ld b, (ix+1)
-
 	ld l, (ix+2)	; dest
 	ld h, (ix+3)
+
+	call	SETWRT
+
+	ld l, (ix+0)	; count
+	ld h, (ix+1)
 
 	ld e, (ix+4)	; source
 	ld d, (ix+5)
 
-	call	SETWRT
+IF VDP_DATA >= 0
+	ld	bc,VDP_DATA
+ENDIF
 
 wrtloop:
 	ld	a,(de)
-IF VDP_DATA > 255
-	ld	(VDP_DATA),a
+IF VDP_DATA < 0
+	ld	(-VDP_DATA),a
 ELSE
-	out	(VDP_DATA),a
+	out	(c),a
 ENDIF
 	inc	de
-	dec	bc
-	ld	a,c
-	or	b
+	dec	hl
+	ld	a,h
+	or	l
 	jr	nz,wrtloop
 	pop	ix		;restore callers
 	ret

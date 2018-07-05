@@ -21,7 +21,7 @@ _LDIRVM:
 	call	$373C	;SETWRT
 
 loop: 	ld	a,(de)
-IF VDP_DATA > 255
+IF VDP_DATA < 0
 	ld	(VDP_DATA),a
 ELSE
 	out	(VDP_DATA),a

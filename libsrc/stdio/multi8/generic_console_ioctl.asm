@@ -6,8 +6,8 @@
 	INCLUDE	"ioctl.def"
 
 	EXTERN	generic_console_cls
-	EXTERN	__multi8_font32
-	EXTERN	__multi8_udg32
+	EXTERN	generic_console_font32
+	EXTERN	generic_console_udg32
 	EXTERN	__multi8_mode
 	EXTERN	__console_h
 	EXTERN	__console_w
@@ -24,14 +24,14 @@ generic_console_ioctl:
 	ld	b,(hl)
 	cp	IOCTL_GENCON_SET_FONT32
 	jr	nz,check_set_udg
-	ld	(__multi8_font32),bc
+	ld	(generic_console_font32),bc
 success:
 	and	a
 	ret
 check_set_udg:
 	cp	IOCTL_GENCON_SET_UDGS
 	jr	nz,check_mode
-	ld	(__multi8_udg32),bc
+	ld	(generic_console_udg32),bc
 	jr	success
 check_mode:
 	cp	IOCTL_GENCON_SET_MODE

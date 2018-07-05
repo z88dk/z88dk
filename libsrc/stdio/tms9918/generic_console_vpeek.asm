@@ -1,11 +1,11 @@
 
 
-	MODULE	generic_console_vpeek
+	MODULE	tms9918_console_vpeek
 	SECTION	code_clib
-	PUBLIC	generic_console_vpeek
+	PUBLIC	__tms9918_console_vpeek
 
-	EXTERN	__msx_font32
-	EXTERN	__msx_udg32
+	EXTERN	generic_console_font32
+	EXTERN	generic_console_udg32
 	EXTERN	screendollar
 	EXTERN	screendollar_with_count
 	EXTERN	msxbios
@@ -16,12 +16,16 @@ ENDIF
 IF FORsvi
         INCLUDE "target/svi/def/svibios.def"
 ENDIF
-IF FORmtx | FORpv2000 | FORsc3000 | FORm5 | FOReinstein | FORcoleco
+IF FORmtx | FORpv2000 | FORsc3000 | FORm5 | FOReinstein | FORcoleco | FORspc1000
 	EXTERN	LDIRMV
 ENDIF
 
+IF !FORspc1000
+	PUBLIC	generic_console_vpeek
+	defc	generic_console_vpeek = __tms9918_console_vpeek
+ENDIF
 
-generic_console_vpeek:
+__tms9918_console_vpeek:
 	push	ix
         ld      a,c
         add     a
@@ -40,10 +44,10 @@ generic_console_vpeek:
 	ld	bc,8
 	call	msxbios
 	pop	de		;buffer
-	ld	hl,(__msx_font32)
+	ld	hl,(generic_console_font32)
 	call	screendollar
 	jr	nc,gotit
-	ld	hl,(__msx_udg32)
+	ld	hl,(generic_console_udg32)
 	ld	b,128
 	call	screendollar_with_count
 	jr	c,gotit

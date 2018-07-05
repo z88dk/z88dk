@@ -22,7 +22,7 @@ _LDIRMV:
 	ex	(sp),hl
 
 loop:
-IF VDP_DATAIN > 255
+IF VDP_DATAIN < 0
 	ld	a,(VDP_DATAIN)
 ELSE
 	in	a,(VDP_DATAIN)

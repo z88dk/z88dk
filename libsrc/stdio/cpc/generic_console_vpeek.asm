@@ -5,8 +5,8 @@
 	EXTERN	generic_console_calc_screen_address
 	PUBLIC	generic_console_vpeek
 
-	EXTERN	__cpc_font
-	EXTERN	__cpc_udg
+	EXTERN	generic_console_font32
+	EXTERN	generic_console_udg32
 	EXTERN	__cpc_mode
 	EXTERN	screendollar
 	EXTERN	screendollar_with_count
@@ -125,10 +125,10 @@ handle_mode_2_1:
 	djnz	handle_mode_2_1
 do_screendollar:
         pop     de              ;buffer
-        ld      hl,(__cpc_font)
+        ld      hl,(generic_console_font32)
         call    screendollar	;exits with de = buffer
         jr      nc,gotit
-        ld      hl,(__cpc_udg)
+        ld      hl,(generic_console_udg32)
         ld      b,128
         call    screendollar_with_count
         jr      c,gotit
