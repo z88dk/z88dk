@@ -316,6 +316,7 @@ for my $cpu (@CPUS) {
 	}
 	elsif ($z80_zxn) {
 		add_opc($cpu, "mul d, e", 0xED, 0x30);
+		add_opc($cpu, "mul de",   0xED, 0x30);
 	}
 	elsif ($rabbit) {
 		add_opc($cpu, "mul", 0xF7);

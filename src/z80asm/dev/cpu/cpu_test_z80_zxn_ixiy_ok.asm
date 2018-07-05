@@ -897,6 +897,7 @@
  mmu7 255                       ; ED 91 57 FF
  mmu7 a                         ; ED 92 57
  mul d, e                       ; ED 30
+ mul de                         ; ED 30
  neg                            ; ED 44
  neg a                          ; ED 44
  nextreg -128, -128             ; ED 91 80 80

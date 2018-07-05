@@ -29,6 +29,7 @@ add("swapnib",			0xED, 0x23);
 
 # 4T     mul d,e           ED 30           multiply DE = D*E (no flags set)
 add("mul d,e",			0xED, 0x30);
+add("mul de",			0xED, 0x30);
 
 # 4T     add  hl,a         ED 31           Add A to HL (no flags set) not sign extended
 add("add hl,a",			0xED, 0x31);

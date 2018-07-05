@@ -4326,6 +4326,7 @@
  mmu7 a                         ; Error
  mul                            ; Error
  mul d, e                       ; Error
+ mul de                         ; Error
  neg a'                         ; Error
  nextreg -128, -128             ; Error
  nextreg -128, a                ; Error

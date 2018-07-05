@@ -26361,6 +26361,14 @@ break;
 default: error_illegal_ident(); }
 }
 
+| label? _TK_MUL _TK_DE _TK_NEWLINE @{
+switch (opts.cpu) {
+case CPU_Z80_ZXN: 
+DO_stmt(0xED30);
+break;
+default: error_illegal_ident(); }
+}
+
 | label? _TK_MUL _TK_NEWLINE @{
 switch (opts.cpu) {
 case CPU_R2K: case CPU_R3K: 

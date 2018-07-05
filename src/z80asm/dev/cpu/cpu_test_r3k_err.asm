@@ -760,6 +760,7 @@
  mmu7 255                       ; Error
  mmu7 a                         ; Error
  mul d, e                       ; Error
+ mul de                         ; Error
  nextreg -128, -128             ; Error
  nextreg -128, a                ; Error
  nextreg 127, 127               ; Error
