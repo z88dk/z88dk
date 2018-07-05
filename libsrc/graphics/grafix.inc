@@ -440,6 +440,12 @@ IF FORspc1000
 	defc maxy	= 192
 ENDIF
 
+IF FORmulti8
+	DEFINE gotgfx
+	defc maxx	= 640
+	defc maxy	= 200
+ENDIF
+
 ; =============================================
 
 

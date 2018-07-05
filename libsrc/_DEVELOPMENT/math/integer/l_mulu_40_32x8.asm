@@ -8,6 +8,14 @@ PUBLIC l_mulu_40_32x8
 
    ; compute:  adehl = dehl * a
    ; alters :  af, bc, de, hl, ixh
+   ; z180 alters:   af, bc, de, hl, af'
+
+IF __CPU_Z180__ && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
+
+   EXTERN l_z180_mulu_40_32x8
+   defc l_mulu_40_32x8 = l_z180_mulu_40_32x8
+
+ELSE
 
 IF __CLIB_OPT_IMATH <= 50
 
@@ -40,5 +48,7 @@ IF __CLIB_OPT_IMATH > 50
 
    EXTERN l_fast_mulu_40_32x8
    defc l_mulu_40_32x8 = l_fast_mulu_40_32x8
+
+ENDIF
 
 ENDIF

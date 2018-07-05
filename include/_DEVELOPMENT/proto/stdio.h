@@ -32,9 +32,6 @@ extern unsigned char    _MAX_FOPEN[];
 
 #define FILENAME_MAX    128
 
-#define L_tmpnam        8
-#define TMP_MAX         16
-
 #ifndef SEEK_SET
 #define SEEK_SET        0
 #endif
@@ -169,6 +166,11 @@ __DPROTO(,,int,,vprintf_unlocked,char *format,void *arg)
 __DPROTO(,,int,,vscanf_unlocked,char *format,void *arg)
 
 #ifdef __ZXNEXT
+
+#include <arch.h>
+
+#define L_tmpnam  __ENV_LTMPNAM
+#define TMP_MAX   0xffff
 
 __DPROTO(,,char,*,tmpnam,char *s)
 __DPROTO(,,char,*,tmpnam_ex,char *template)

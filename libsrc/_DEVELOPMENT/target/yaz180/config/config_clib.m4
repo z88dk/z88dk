@@ -58,6 +58,8 @@ define(`__CLIB_OPT_MULTITHREAD_LOCK_FDSTR', 0x10)
 
 define(`__CLIB_OPT_IMATH', 0)
 
+;    0 = use z180 mlt with small division
+;  100 = use z180 mlt with fast division
 ; < 50 = select small integer math library
 ; > 50 = select fast integer math library
 

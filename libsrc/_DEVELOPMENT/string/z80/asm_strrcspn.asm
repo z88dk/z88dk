@@ -58,13 +58,11 @@ asm_strrcspn:
 
 loop:
 
-   dec bc                      ; position of next char in str
-   
-   ld a,b
-   or c
-   jr z, none_in_cset
+   cpd                         ; hl--, bc--
+   jp po, none_in_cset
 
-   dec hl                      ; & next char in str to check
+   ; hl = & current char in str to check
+   ; bc = position of current char in str
 
    push bc
    push hl

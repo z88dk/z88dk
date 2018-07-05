@@ -12,8 +12,10 @@
 @inttypes/inttypes_sdcc_iy.lst
 @l/l.lst
 @l/sdcc.lst
+@libgen/libgen_sdcc.lst
 @locale/locale.lst
 @math/math_integer.lst
+@math/math_integer_z180.lst
 @math/math_float_sdcc_iy.lst
 @network/network_sdcc_iy.lst
 @setjmp/setjmp_sdcc_iy.lst

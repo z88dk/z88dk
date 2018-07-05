@@ -76,17 +76,7 @@ endef
 #  short script to sort out gfx dependencies
 gfxdeps:
 	@$(RM) -f graphics/*.o
-	@$(RM) -f graphics/nc/*.o
-	@$(RM) -f graphics/c128/*.o
-	@$(RM) -f graphics/ticalc/*.o
-	@$(RM) -f graphics/gray/*.o
-	@$(RM) -f graphics/gray/ticalc/*.o
-	@$(RM) -f graphics/spectrum/*.o
-	@$(RM) -f graphics/z88/*.o
-	@$(RM) -f graphics/generic_console/*.o
-	@$(RM) -f graphics/text/*.o
-	@@$(RM) -f graphics/text6/*.o
-	@$(RM) -f graphics/x11/*.o
+	@$(RM) -f graphics/*/*.o
 
 #  short script to sort out ticalc dependencies
 tideps:
@@ -867,6 +857,7 @@ multi8_clib.lib:
 	@echo ''
 	@echo '--- Building Mitsubishi Multi8 Library ---'
 	@echo ''
+	$(MAKE) gfxdeps
 	$(call buildgeneric,multi8)
 	TARGET=multi8 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmulti8 -x$(OUTPUT_DIRECTORY)/multi8_clib @$(LISTFILE_DIRECTORY)/multi8.lst
 

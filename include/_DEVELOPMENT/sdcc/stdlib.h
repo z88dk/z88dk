@@ -496,6 +496,11 @@ extern char *getenv_ex_callee(const char *filename,const char *name) __z88dk_cal
 #define getenv_ex(a,b) getenv_ex_callee(a,b)
 
 
+extern char *env_getenv(unsigned char handle,const char *name,char *val,unsigned int valsz,void *buf,unsigned int bufsz);
+extern char *env_getenv_callee(unsigned char handle,const char *name,char *val,unsigned int valsz,void *buf,unsigned int bufsz) __z88dk_callee;
+#define env_getenv(a,b,c,d,e,f) env_getenv_callee(a,b,c,d,e,f)
+
+
 
 #endif
 

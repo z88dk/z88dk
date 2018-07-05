@@ -2,6 +2,8 @@
 ; 2000 djm
 ; 2007 aralbrec - use bcbc' rather than bytes indexed by ix per djm suggestion
 
+INCLUDE "config_private.inc"
+
 SECTION code_clib
 SECTION code_math
 

@@ -6,6 +6,7 @@ spectrum/zx_break
 spectrum/zx_colour
 spectrum/zx_screenstr
 spectrum/zx_screenstr_callee
+spectrum/zx_lprintc
 spectrum/basic/zx_basemem
 spectrum/basic/zx_basic_length
 spectrum/basic/zx_extsys

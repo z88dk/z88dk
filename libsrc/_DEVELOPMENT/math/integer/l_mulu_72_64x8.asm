@@ -14,20 +14,27 @@ PUBLIC l_mulu_72_64x8
    ; exit  : a dehl'dehl = 72-bit product
    ;         carry reset
    ;
-   ; uses  : af, bc, de, hl, bc', de', hl'
-   
-IF __CLIB_OPT_IMATH <= 50
+   ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-   EXTERN l_small_mul_72_64x8
-   
-   defc l_mulu_72_64x8 = l_small_mul_72_64x8
+IF __CPU_Z180__ && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
 
-ENDIF
+   EXTERN l_z180_mulu_72_64x8
+   defc l_mulu_72_64x8 = l_z180_mulu_72_64x8
 
-IF __CLIB_OPT_IMATH > 50
+ELSE
 
-   EXTERN l_fast_mulu_72_64x8
-   
-   defc l_mulu_72_64x8 = l_fast_mulu_72_64x8
+    IF __CLIB_OPT_IMATH <= 50
+
+       EXTERN l_small_mul_72_64x8
+       defc l_mulu_72_64x8 = l_small_mul_72_64x8
+
+    ENDIF
+
+    IF __CLIB_OPT_IMATH > 50
+
+       EXTERN l_fast_mulu_72_64x8
+       defc l_mulu_72_64x8 = l_fast_mulu_72_64x8
+
+    ENDIF
 
 ENDIF

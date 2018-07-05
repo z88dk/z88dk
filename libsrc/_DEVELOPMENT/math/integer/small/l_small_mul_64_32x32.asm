@@ -3,6 +3,8 @@
 ; zx spectrum rom @ address $30f0
 ; http://www.wearmouth.demon.co.uk/zx82.htm
 
+INCLUDE "config_private.inc"
+
 SECTION code_clib
 SECTION code_math
 

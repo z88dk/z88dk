@@ -252,6 +252,7 @@ __DPROTO(,,unsigned char,,mkstemp_ex,char *template)
 
 __DPROTO(,,char,*,getenv,const char *name)
 __DPROTO(,,char,*,getenv_ex,const char *filename,const char *name)
+__DPROTO(,,char,*,env_getenv,unsigned char handle,const char *name,char *val,unsigned int valsz,void *buf,unsigned int bufsz)
 
 #endif
 

@@ -207,6 +207,13 @@ extern void __LIB__    zx_setfloat_callee(char *variable, double_t value) __smal
 #define zx_setfloat(a,b)         zx_setfloat_callee(a,b)
 
 
+//////////////
+// ZX PRINTER
+//////////////
+
+extern void __LIB__  zx_lprintc(int chr);
+
+
 ////////////
 // TAPE I/O
 ////////////
