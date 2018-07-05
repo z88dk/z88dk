@@ -4,8 +4,8 @@
 
 		PUBLIC		generic_console_vpeek
 
-		EXTERN		__multi8_font32
-		EXTERN		__multi8_udg32
+		EXTERN		generic_console_font32
+		EXTERN		generic_console_udg32
 
 		EXTERN		l_push_di
 		EXTERN		l_pop_ei
@@ -88,10 +88,10 @@ loop:
 	call	l_pop_ei
 
 	pop	de		;de = buffer of stack
-	ld	hl,(__multi8_font32)
+	ld	hl,(generic_console_font32)
 	call	screendollar
 	jr	nc,gotit
-	ld	hl,(__multi8_udg32)
+	ld	hl,(generic_console_udg32)
 	ld	b,128
 	call	screendollar_with_count
 	jr	c,gotit

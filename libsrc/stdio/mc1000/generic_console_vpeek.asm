@@ -5,8 +5,8 @@
 		PUBLIC		generic_console_vpeek
 
 		EXTERN		__mc1000_mode
-		EXTERN		__mc1000_font
-		EXTERN		__mc1000_udg
+		EXTERN		generic_console_font32
+		EXTERN		__generic_console_udg32
 		EXTERN		screendollar	
 		EXTERN		screendollar_with_count
 		EXTERN		generic_console_calc_xypos
@@ -65,11 +65,11 @@ no_overflow:
         inc     de
         djnz    vpeek_1
         pop     de              ;the buffer on the stack
-        ld      hl,(__mc1000_font)
+        ld      hl,(generic_console_font32)
 do_screendollar:
         call    screendollar
         jr      nc,gotit
-        ld      hl,(__mc1000_udg)
+        ld      hl,(__generic_console_udg32)
         ld      b,128
         call    screendollar_with_count
         jr      c,gotit
