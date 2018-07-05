@@ -18,30 +18,29 @@ l_z80_zxn_mulu_32_16x16:
    ;
    ; uses  : af, bc, de, hl
 
-   ld b,l                      ; xl
-   ld c,e                      ; yl
-   ld e,l                      ; xl
+   ld b,l                      ; x0
+   ld c,e                      ; y0
+   ld e,l                      ; x0
    ld l,d
-   push hl                     ; xh yh
-   ld l,c                      ; yl
+   push hl                     ; x1 y1
+   ld l,c                      ; y0
 
-   ; bc = xl yl
-   ; de = yh xl
-   ; hl = xh yl
-   ; stack = xh yh
+   ; bc = x0 y0
+   ; de = y1 x0
+   ; hl = x1 y0
+   ; stack = x1 y1
 
-   mlt de                      ; xl * yh
+   mlt de                      ; y1*x0
    ex de,hl
-   mlt de                      ; xh * yl
+   mlt de                      ; x1*y0
 
-   add hl,de                   ; sum cross products
+   xor a                       ; zero A
+   add hl,de                   ; sum cross products p2 p1
+   adc a,a                     ; capture carry p3
 
-   sbc a,a
-   and $01                     ; carry from cross products
-
-   ld e,c                      ; xl
-   ld d,b                      ; yl
-   mlt de                      ; xl * yl
+   ld e,c                      ; x0
+   ld d,b                      ; y0
+   mlt de                      ; y0*x0
 
    ld b,a                      ; carry from cross products
    ld c,h                      ; LSB of MSW from cross products
@@ -49,15 +48,13 @@ l_z80_zxn_mulu_32_16x16:
    ld a,d
    add a,l
    ld h,a
-   ld l,e                      ; hl = final LSW
+   ld l,e                      ; LSW in HL p1 p0
 
    pop de
-   mlt de                      ; xh * yh
+   mlt de                      ; x1*y1
 
    ex de,hl
    adc hl,bc
    ex de,hl                    ; de = final MSW
-
-   ; 154 cycles, 32 bytes
 
    ret
