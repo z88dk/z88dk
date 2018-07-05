@@ -22,9 +22,9 @@ l_z80_zxn_mulu_24_16x8:
     ld d,h                      ; xh
     ld h,e                      ; yl
 
-    mlt de                      ; xh*yl
+    mul d,e                     ; xh*yl
     ex de,hl
-    mlt de                      ; yl*xl, hl = xh*yl
+    mul d,e                     ; yl*xl, hl = xh*yl
 
     ld  a,d                     ; sum products
     add a,l

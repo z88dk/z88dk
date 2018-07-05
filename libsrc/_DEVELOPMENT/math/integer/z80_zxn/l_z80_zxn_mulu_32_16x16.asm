@@ -30,9 +30,9 @@ l_z80_zxn_mulu_32_16x16:
    ; hl = x1 y0
    ; stack = x1 y1
 
-   mlt de                      ; y1*x0
+   mul d,e                     ; y1*x0
    ex de,hl
-   mlt de                      ; x1*y0
+   mul d,e                     ; x1*y0
 
    xor a                       ; zero A
    add hl,de                   ; sum cross products p2 p1
@@ -40,7 +40,7 @@ l_z80_zxn_mulu_32_16x16:
 
    ld e,c                      ; x0
    ld d,b                      ; y0
-   mlt de                      ; y0*x0
+   mul d,e                     ; y0*x0
 
    ld b,a                      ; carry from cross products
    ld c,h                      ; LSB of MSW from cross products
@@ -51,7 +51,7 @@ l_z80_zxn_mulu_32_16x16:
    ld l,e                      ; LSW in HL p1 p0
 
    pop de
-   mlt de                      ; x1*y1
+   mul d,e                     ; x1*y1
 
    ex de,hl
    adc hl,bc

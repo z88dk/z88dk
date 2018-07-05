@@ -23,9 +23,9 @@ l_z80_zxn_mulu_16_16x8:
    ld h,e                      ; h = yl
    ld e,l                      ; e = x
 
-   mlt de                      ; x * yh
+   mul d,e                     ; x * yh
    ex de,hl
-   mlt de                      ; x * yl
+   mul d,e                     ; x * yl
 
    ld a,l                      ; cross product lsb
    add a,d                     ; add to msb final
