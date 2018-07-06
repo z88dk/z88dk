@@ -16,6 +16,13 @@ IF __CPU_Z180__ && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
 
 ELSE
 
+IF __CPU_Z80_ZXN__ && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
+
+   EXTERN l_z80_zxn_mulu_24_16x8
+   defc l_mulu_24_16x8 = l_z80_zxn_mulu_24_16x8
+
+ELSE
+
 IF __CLIB_OPT_IMATH <= 50
 
    EXTERN l0_small_mul_32_32x32
@@ -62,6 +69,8 @@ IF __CLIB_OPT_IMATH > 50
 
    EXTERN l_fast_mulu_24_16x8
    defc l_mulu_24_16x8 = l_fast_mulu_24_16x8
+
+ENDIF
 
 ENDIF
 
