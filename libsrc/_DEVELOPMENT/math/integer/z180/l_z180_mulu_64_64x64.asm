@@ -28,16 +28,12 @@ l_z180_mulu_64_64x64:
    ;
    ; uses  : af, bc, de, hl, af', bc', de', hl'
    
-   xor a
    
    ld b,(ix+11)
    ld c,(ix+10)
    
    ld d,(ix+3)
    ld e,(ix+2)
-   
-   ld l,a
-   ld h,a
    
    exx
    
@@ -46,9 +42,6 @@ l_z180_mulu_64_64x64:
    
    ld d,(ix+1)
    ld e,(ix+0)
-   
-   ld l,a
-   ld h,a
    
    call l0_z180_mulu_64_32x32  ; dehl dehl' = B*D
    
@@ -88,23 +81,16 @@ l_z180_mulu_64_64x64:
    ld d,(ix+3)
    ld e,(ix+2)
    
-   ld hl,0
-   
    call l0_z180_mulu_32_32x32  ; dehl = LS32(A*D)
    
    push de
    push hl                     ; save LS32(A*D)
-   
-   xor a
    
    ld b,(ix+9)
    ld c,(ix+8)
    
    ld d,(ix+5)
    ld e,(ix+4)
-   
-   ld l,a
-   ld h,a
    
    exx
    
@@ -113,9 +99,6 @@ l_z180_mulu_64_64x64:
    
    ld d,(ix+7)
    ld e,(ix+6)
-   
-   ld l,a
-   ld h,a
    
    call l0_z180_mulu_32_32x32  ; dehl = LS32(B*C)
    
