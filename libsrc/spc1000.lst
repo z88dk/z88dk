@@ -25,6 +25,7 @@ graphics/spc1000/respixl
 graphics/spc1000/xorpixl
 graphics/spc1000/pointxy
 graphics/spc1000/swapgfxbk
+graphics/putsprite3
 graphics/dcircle2
 graphics/clrarea
 graphics/lftscrol
