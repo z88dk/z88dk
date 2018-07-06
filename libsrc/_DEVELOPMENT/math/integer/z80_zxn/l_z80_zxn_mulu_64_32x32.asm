@@ -108,9 +108,9 @@ l0_z80_zxn_mulu_64_32x32:
    ; hl = x1 y0
    ; stack = x1 y1
 
-    mul d,e                     ; y1*x0
+    mul de                      ; y1*x0
     ex de,hl
-    mul d,e                     ; x1*y0
+    mul de                      ; x1*y0
 
     xor a                       ; zero A
     add hl,de                   ; sum cross products p2 p1
@@ -118,7 +118,7 @@ l0_z80_zxn_mulu_64_32x32:
 
     ld e,c                      ; x0
     ld d,b                      ; y0
-    mul d,e                     ; y0*x0
+    mul de                      ; y0*x0
 
     ld b,a                      ; carry from cross products
     ld c,h                      ; LSB of MSW from cross products
@@ -129,7 +129,7 @@ l0_z80_zxn_mulu_64_32x32:
     ld l,e                      ; LSW in HL p1 p0
 
     pop de
-    mul d,e                     ; x1*y1
+    mul de                      ; x1*y1
 
     ex de,hl
     adc hl,bc                   ; HL = interim MSW p3 p2
@@ -148,9 +148,9 @@ l0_z80_zxn_mulu_64_32x32:
     ld a,h
     ld h,d
     ld d,a
-    mul d,e                     ;'x0*y2
+    mul de                      ;'x0*y2
     ex de,hl
-    mul d,e                     ;'x2*y0
+    mul de                      ;'x2*y0
 
     xor a
     add hl,bc
@@ -173,9 +173,9 @@ l0_z80_zxn_mulu_64_32x32:
     ld a,h
     ld h,d
     ld d,a
-    mul d,e                     ;'y3*x0
+    mul de                      ;'y3*x0
     ex de,hl
-    mul d,e                     ;'x1*y2
+    mul de                      ;'x1*y2
 
     xor a                       ;'zero A
     add hl,de                   ;'p4 p3
@@ -191,9 +191,9 @@ l0_z80_zxn_mulu_64_32x32:
     ld a,h
     ld h,d
     ld d,a
-    mul d,e                     ;'x3*y0
+    mul de                      ;'x3*y0
     ex de,hl
-    mul d,e                     ;'y1*x2
+    mul de                      ;'y1*x2
 
     ex af,af
     add hl,de                   ;'p4 p3
@@ -217,9 +217,9 @@ l0_z80_zxn_mulu_64_32x32:
     ld a,h
     ld h,d
     ld d,a
-    mul d,e                     ;'x1*y3
+    mul de                      ;'x1*y3
     ex de,hl
-    mul d,e                     ;'x3*y1
+    mul de                      ;'x3*y1
 
 
     xor a                       ;'zero A
@@ -229,7 +229,7 @@ l0_z80_zxn_mulu_64_32x32:
     adc a,0                     ;'p6
 
     pop de                      ;'x2 y2
-    mul d,e                     ;'x2*y2
+    mul de                      ;'x2*y2
 
     add hl,de                   ;'p5 p4
     adc a,0                     ;'p6
@@ -241,14 +241,14 @@ l0_z80_zxn_mulu_64_32x32:
     ; start doing the p5 byte
 
     pop de                      ;'y3 x2
-    mul d,e                     ;'y3*x2
+    mul de                      ;'y3*x2
 
     xor a                       ;'zero A
     add hl,de                   ;'p6 p5
     adc a,a                     ;'p7
 
     pop de                      ;'x3 y2
-    mul d,e                     ;'x3*y2
+    mul de                      ;'x3*y2
 
     add hl,de                   ;'p6 p5
     adc a,0                     ;'p7
@@ -259,7 +259,7 @@ l0_z80_zxn_mulu_64_32x32:
 
     ; start doing the p6 p7 bytes
     pop de                      ;'y3 x3
-    mul d,e                     ;'y3*x3
+    mul de                      ;'y3*x3
 
     add hl,de                   ;'p7 p6
     ex de,hl                    ;'p7 p6

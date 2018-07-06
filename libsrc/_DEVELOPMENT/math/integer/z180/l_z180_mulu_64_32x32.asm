@@ -100,7 +100,6 @@ l0_z180_mulu_64_32x32:
 
     ld h,d                      ; x1
     ld l,c                      ; y0
-
     ld d,c                      ; y0 e = x0
     ld c,e                      ; x0 b = y1
 

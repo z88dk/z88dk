@@ -84,9 +84,9 @@ l0_z80_zxn_mulu_32_32x32:
    ; hl = x1 y0
    ; stack = x1 y1
 
-    mul d,e                     ; y1*x0
+    mul de                      ; y1*x0
     ex de,hl
-    mul d,e                     ; x1*y0
+    mul de                      ; x1*y0
 
     xor a                       ; zero A
     add hl,de                   ; sum cross products p2 p1
@@ -94,7 +94,7 @@ l0_z80_zxn_mulu_32_32x32:
 
     ld e,c                      ; x0
     ld d,b                      ; y0
-    mul d,e                     ; y0*x0
+    mul de                      ; y0*x0
 
     ld b,a                      ; carry from cross products
     ld c,h                      ; LSB of MSW from cross products
@@ -105,7 +105,7 @@ l0_z80_zxn_mulu_32_32x32:
     ld l,e                      ; LSW in HL p1 p0
 
     pop de
-    mul d,e                     ; x1*y1
+    mul de                      ; x1*y1
 
     ex de,hl
     adc hl,bc                   ; HL = interim MSW p3 p2
@@ -125,9 +125,9 @@ l0_z80_zxn_mulu_32_32x32:
     ld a,h
     ld h,d
     ld d,a
-    mul d,e                     ; x0*y2
+    mul de                      ; x0*y2
     ex de,hl
-    mul d,e                     ; x2*y0
+    mul de                      ; x2*y0
 
     add hl,bc
     add hl,de
@@ -141,9 +141,9 @@ l0_z80_zxn_mulu_32_32x32:
     ld a,h
     ld h,d
     ld d,a
-    mul d,e                     ; y3*x0
+    mul de                      ; y3*x0
     ex de,hl
-    mul d,e                     ; x1*y2
+    mul de                      ; x1*y2
 
     ld a,b                      ; work with existing p3 from B
     add a,e                     ; add low bytes of products
@@ -154,9 +154,9 @@ l0_z80_zxn_mulu_32_32x32:
     ld b,h
     ld h,d
     ld d,b
-    mul d,e                     ; y1*x2
+    mul de                      ; y1*x2
     ex de,hl
-    mul d,e                     ; x3*y0
+    mul de                      ; x3*y0
 
 
     add a,l                     ; add low bytes of products

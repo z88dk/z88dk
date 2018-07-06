@@ -24,7 +24,7 @@ l_z80_zxn_mulu_72_64x8:
 
    ld e,l                       ; x0
    ld d,a
-   mul d,e                      ; y*x0
+   mul de                       ; y*x0
 
    ex af,af                     ;'accumulator
    ld l,e                       ;'p0
@@ -33,7 +33,7 @@ l_z80_zxn_mulu_72_64x8:
    
    ld e,h                       ; x1
    ld d,a
-   mul d,e                      ; y*x1
+   mul de                       ; y*x1
    
    ex af,af
    add a,e
@@ -43,7 +43,7 @@ l_z80_zxn_mulu_72_64x8:
    
    ld e,c
    ld d,a
-   mul d,e                      ; y*x2
+   mul de                       ; y*x2
    
    ex af,af
    adc a,e
@@ -53,7 +53,7 @@ l_z80_zxn_mulu_72_64x8:
    
    ld e,b
    ld d,a
-   mul d,e                      ; y*x3
+   mul de                       ; y*x3
    
    ex af,af
    adc a,e
@@ -71,7 +71,7 @@ l_z80_zxn_mulu_72_64x8:
 
    ld e,l
    ld d,a
-   mul d,e                      ; y*x4
+   mul de                       ; y*x4
 
    ex af,af
    adc a,e
@@ -81,7 +81,7 @@ l_z80_zxn_mulu_72_64x8:
 
    ld e,h
    ld d,a
-   mul d,e                      ; y*x5
+   mul de                       ; y*x5
 
    ex af,af
    adc a,e
@@ -91,7 +91,7 @@ l_z80_zxn_mulu_72_64x8:
 
    ld e,c
    ld d,a
-   mul d,e                      ; y*x6
+   mul de                       ; y*x6
 
    ex af,af
    adc a,e
@@ -101,7 +101,7 @@ l_z80_zxn_mulu_72_64x8:
 
    ld e,b
    ld d,a
-   mul d,e                      ; y*x6
+   mul de                       ; y*x6
 
    ex af,af
    adc a,e
