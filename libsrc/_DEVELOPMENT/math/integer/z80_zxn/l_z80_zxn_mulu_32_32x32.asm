@@ -9,30 +9,25 @@ PUBLIC l_z80_zxn_mulu_32_32x32, l0_z80_zxn_mulu_32_32x32
 
 l_z80_zxn_mulu_32_32x32:
 
-   ; multiplication of two 32-bit numbers into a 32-bit product
-   ;
-   ; enter : dehl = 32-bit multiplicand
-   ;         dehl'= 32-bit multiplicand
-   ;
-   ; exit  : dehl = 32-bit product
-   ;         carry reset
-   ;
-   ; uses  : af, bc, de, hl, bc', de', hl'
+    ; multiplication of two 32-bit numbers into a 32-bit product
+    ;
+    ; enter : dehl = 32-bit multiplicand
+    ;         dehl'= 32-bit multiplicand
+    ;
+    ; exit  : dehl = 32-bit product
+    ;         carry reset
+    ;
+    ; uses  : af, bc, de, hl, bc', de', hl'
 
-   xor a
-   push hl
-   exx
-   ld c,l
-   ld b,h
-   pop hl
-   push de
-   ex de,hl
-   ld l,a
-   ld h,a
-   exx
-   pop bc
-   ld l,a
-   ld h,a
+    push hl
+    exx
+    ld c,l
+    ld b,h
+    pop hl
+    push de
+    ex de,hl
+    exx
+    pop bc
 
 l0_z80_zxn_mulu_32_32x32:
 
@@ -40,7 +35,6 @@ l0_z80_zxn_mulu_32_32x32:
     ;
     ; enter : dede' = 32-bit multiplier   = x
     ;         bcbc' = 32-bit multiplicand = y
-    ;         hlhl' = 0
     ;
     ; exit  : dehl  = 32-bit product
     ;         carry reset

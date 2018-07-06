@@ -19,17 +19,12 @@ l_z180_mulu_64_32x32:
    ;
    ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-   xor a
    ld c,l
    ld b,h
-   ld l,a
-   ld h,a
    push de
    exx
    pop bc
    push hl
-   ld l,a
-   ld h,a
    exx
    pop de
 
@@ -39,7 +34,6 @@ l0_z180_mulu_64_32x32:
     ;
     ; enter : de'de = 32-bit multiplier    = x
     ;         bc'bc = 32-bit multiplicand  = y
-    ;         hl'hl = 0
     ;
     ; exit  : dehl dehl' = 64-bit product
     ;         carry reset
