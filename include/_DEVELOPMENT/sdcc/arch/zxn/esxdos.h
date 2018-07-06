@@ -7,6 +7,7 @@
 
 #include <arch.h>
 #include <stdint.h>
+#include <stddef.h>
 #include <time.h>
 
 // extended sna load

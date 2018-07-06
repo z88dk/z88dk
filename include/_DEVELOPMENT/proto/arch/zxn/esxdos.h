@@ -5,6 +5,7 @@ include(__link__.m4)
 
 #include <arch.h>
 #include <stdint.h>
+#include <stddef.h>
 #include <time.h>
 
 // extended sna load
