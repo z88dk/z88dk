@@ -3,3 +3,4 @@ libgen/z80/__lg_return_dot
 libgen/z80/__lg_return_slash
 libgen/z80/asm_basename
 libgen/z80/asm_dirname
+libgen/z80/asm_pathnice

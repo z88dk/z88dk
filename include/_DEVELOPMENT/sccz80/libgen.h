@@ -11,5 +11,8 @@ extern char __LIB__ *basename(char *path) __smallc __z88dk_fastcall;
 extern char __LIB__ *dirname(char *path) __smallc __z88dk_fastcall;
 
 
+extern char __LIB__ *pathnice(char *path) __smallc __z88dk_fastcall;
+
+
 
 #endif
