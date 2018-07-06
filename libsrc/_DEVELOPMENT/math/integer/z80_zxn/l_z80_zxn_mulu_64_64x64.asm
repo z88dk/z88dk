@@ -55,8 +55,6 @@ l_z80_zxn_mulu_64_64x64:
    ld d,(ix+1)
    ld e,(ix+0)
    
-   ld hl,0
-   
    ld a,b
    or c
    
