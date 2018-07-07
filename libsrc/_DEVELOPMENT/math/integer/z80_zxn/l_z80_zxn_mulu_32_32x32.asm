@@ -1,13 +1,13 @@
-; 2018 June feilipu
+; 2018 July feilipu
 
 INCLUDE "config_private.inc"
 
 SECTION code_clib
 SECTION code_math
 
-PUBLIC l_z180_mulu_32_32x32, l0_z180_mulu_32_32x32
+PUBLIC l_z80_zxn_mulu_32_32x32, l0_z80_zxn_mulu_32_32x32
 
-l_z180_mulu_32_32x32:
+l_z80_zxn_mulu_32_32x32:
 
     ; multiplication of two 32-bit numbers into a 32-bit product
     ;
@@ -29,7 +29,7 @@ l_z180_mulu_32_32x32:
     exx
     pop bc
 
-l0_z180_mulu_32_32x32:
+l0_z80_zxn_mulu_32_32x32:
 
     ; multiplication of two 32-bit numbers into a 32-bit product
     ;
@@ -69,82 +69,95 @@ l0_z180_mulu_32_32x32:
     push hl                     ; x1 y1
 
     ld h,d                      ; x1
+    ld d,b                      ; y1
     ld l,c                      ; y0
+    ld b,e                      ; x0 
 
-    ld d,c                      ; y0 e = x0
-    ld c,e                      ; x0 b = y1
+   ; bc = x0 y0
+   ; de = y1 x0
+   ; hl = x1 y0
+   ; stack = x1 y1
 
-    ; bc = x0 y1
-    ; de = x0 y0
-    ; hl = x1 y0
-    ; stack = x1 y1
-
-    mlt de                      ; x0*y0
-    mlt bc                      ; x0*y1
-    mlt hl                      ; x1*y0
+    mul de                      ; y1*x0
+    ex de,hl
+    mul de                      ; x1*y0
 
     xor a                       ; zero A
-    add hl,bc                   ; sum cross products p2 p1
+    add hl,de                   ; sum cross products p2 p1
     adc a,a                     ; capture carry p3
-    ld b,a
+
+    ld e,c                      ; x0
+    ld d,b                      ; y0
+    mul de                      ; y0*x0
+
+    ld b,a                      ; carry from cross products
     ld c,h                      ; LSB of MSW from cross products
 
     ld a,d
     add a,l
-    ld d,a                      ; LSW in DE p1 p0
+    ld h,a
+    ld l,e                      ; LSW in HL p1 p0
 
-    pop hl
-    mlt hl                      ; x1*y1
+    pop de
+    mul de                      ; x1*y1
 
+    ex de,hl
     adc hl,bc                   ; HL = interim MSW p3 p2
                                 ; 32_16x16 = HLDE
 
     push hl                     ; stack interim p3 p2
-    ex de,hl                    ; DEHL = end of 32_16x16
+    ex de,hl                    ; p1 p0 in HL
 
     ; continue doing the p2 byte
 
     exx                         ; now we're working in the high order bytes
                                 ; DEHL' = end of 32_16x16
-    pop hl                      ; stack interim p3 p2
+    pop bc                      ; stack interim p3 p2
 
-    pop bc                      ; x0 y0
+    pop hl                      ; x0 y0
     pop de                      ; x2 y2
-    ld a,b
-    ld b,d
+    ld a,h
+    ld h,d
     ld d,a
-    mlt bc                      ; x2*y0
-    mlt de                      ; x0*y2
+    mul de                      ; x0*y2
+    ex de,hl
+    mul de                      ; x2*y0
+
     add hl,bc
     add hl,de
+    ld b,h
+    ld c,l
 
     ; start doing the p3 byte
 
-    pop bc                      ; y3 y2
+    pop hl                      ; y3 y2
     pop de                      ; x1 x0
-    ld a,b
-    ld b,d
+    ld a,h
+    ld h,d
     ld d,a
-    mlt bc                      ; x1*y2
-    mlt de                      ; y3*x0
+    mul de                      ; y3*x0
+    ex de,hl
+    mul de                      ; x1*y2
 
-    ld a,h                      ; work with existing p3 from H
-    add a,c                     ; add low bytes of products
-    add a,e
+    ld a,b                      ; work with existing p3 from B
+    add a,e                     ; add low bytes of products
+    add a,l
 
-    pop bc                      ; y1 y0
+    pop hl                      ; y1 y0
     pop de                      ; x3 x2
-    ld h,b
-    ld b,d
-    ld d,h
-    mlt bc                      ; x3*y0
-    mlt de                      ; y1*x2
+    ld b,h
+    ld h,d
+    ld d,b
+    mul de                      ; y1*x2
+    ex de,hl
+    mul de                      ; x3*y0
 
-    add a,c                     ; add low bytes of products
+
+    add a,l                     ; add low bytes of products
     add a,e
-    ld h,a                      ; put final p3 back in H
+    ld b,a                      ; put final p3 back in B
 
-    push hl
+    push bc
 
     exx                         ; now we're working in the low order bytes, again
     pop de

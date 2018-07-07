@@ -3,12 +3,12 @@
 SECTION code_clib
 SECTION code_math
 
-PUBLIC l_z180_mulu_64_64x64
+PUBLIC l_z80_zxn_mulu_64_64x64
 
-EXTERN l0_z180_mulu_64_32x32
-EXTERN l0_z180_mulu_32_32x32
+EXTERN l0_z80_zxn_mulu_64_32x32
+EXTERN l0_z80_zxn_mulu_32_32x32
 
-l_z180_mulu_64_64x64:
+l_z80_zxn_mulu_64_64x64:
 
    ; 64-bit multiplication
 
@@ -28,13 +28,12 @@ l_z180_mulu_64_64x64:
    ;
    ; uses  : af, bc, de, hl, af', bc', de', hl'
    
-   
    ld b,(ix+11)
    ld c,(ix+10)
    
    ld d,(ix+3)
    ld e,(ix+2)
-   
+
    exx
    
    ld b,(ix+9)
@@ -43,7 +42,7 @@ l_z180_mulu_64_64x64:
    ld d,(ix+1)
    ld e,(ix+0)
    
-   call l0_z180_mulu_64_32x32  ; dehl dehl' = B*D
+   call l0_z80_zxn_mulu_64_32x32  ; dehl dehl' = B*D
    
    exx
    
@@ -79,7 +78,7 @@ l_z180_mulu_64_64x64:
    ld d,(ix+3)
    ld e,(ix+2)
    
-   call l0_z180_mulu_32_32x32  ; dehl = LS32(A*D)
+   call l0_z80_zxn_mulu_32_32x32  ; dehl = LS32(A*D)
    
    push de
    push hl                     ; save LS32(A*D)
@@ -98,7 +97,7 @@ l_z180_mulu_64_64x64:
    ld d,(ix+7)
    ld e,(ix+6)
    
-   call l0_z180_mulu_32_32x32  ; dehl = LS32(B*C)
+   call l0_z80_zxn_mulu_32_32x32  ; dehl = LS32(B*C)
    
    pop bc
    add hl,bc

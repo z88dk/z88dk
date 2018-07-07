@@ -19,6 +19,7 @@
 @libgen/libgen_sdcc.lst
 @locale/locale.lst
 @math/math_integer.lst
+@math/math_integer_z80_zxn.lst
 @math/math_float_sdcc_ix.lst
 @network/network_sdcc_ix.lst
 @setjmp/setjmp_sdcc_ix.lst

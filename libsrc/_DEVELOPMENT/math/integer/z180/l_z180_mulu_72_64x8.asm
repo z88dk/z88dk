@@ -22,9 +22,9 @@ l_z180_mulu_72_64x8:
    ld c,l                       ; x0
    ld b,a
    mlt bc                       ; y*x0
-   ld l,c                       ; p0
 
    ex af,af                     ;'accumulator
+   ld l,c                       ;'p0
    ld a,b                       ;'p1 carry
    ex af,af
    

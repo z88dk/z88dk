@@ -34,5 +34,5 @@ l_z180_mulu_16_16x16:
     ld h,a
     ld l,c                      ; hl = final
 
-    or a
+    xor a
     ret

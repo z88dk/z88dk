@@ -1,16 +1,14 @@
 
 INCLUDE "config_private.inc"
 
-IF __ZXN
-
 SECTION code_clib
 SECTION code_math
 
-PUBLIC l_zxn_mul_16_16x8
+PUBLIC l_z80_zxn_mulu_16_16x8
 
    ex de,hl
 
-l_zxn_mul_16_16x8:
+l_z80_zxn_mulu_16_16x8:
 
    ; multiplication of a 16-bit number by an 8-bit number into 16-bit product
    ;
@@ -20,18 +18,15 @@ l_zxn_mul_16_16x8:
    ; exit  : hl = 16-bit product
    ;         carry reset
    ;
-   ; uses  : af, bc, hl
-
-   ld c,e
-   ld b,d
-
-   ;
+   ; uses  : af, de, hl
 
    ld h,e                      ; h = yl
    ld e,l                      ; e = x
-   mul d,e                     ; x * yh
+
+   mul de                      ; x * yh
    ex de,hl
-   mul d,e                     ; x * yl
+   mul de                      ; x * yl
+
    ld a,l                      ; cross product lsb
    add a,d                     ; add to msb final
    ld h,a
@@ -39,10 +34,5 @@ l_zxn_mul_16_16x8:
 
    ; 44 cycles, 11 bytes
 
-   ld e,c
-   ld d,b
-
-   or a
+   xor a
    ret
-
-ENDIF
