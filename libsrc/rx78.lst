@@ -1,3 +1,7 @@
+stdio/rx78/generic_console
+stdio/rx78/generic_console_ioctl
+stdio/rx78/generic_console_vpeek
+stdio/rx78/CRT_FONT
 stdio/rx78/fputc_cons_native
 @stdio/stdio.lst
 @font/font_8x8/font_8x8.lst
