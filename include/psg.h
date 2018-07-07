@@ -55,6 +55,11 @@
 #define psgT(hz)		((int)(110840.4 / (hz)))
 #endif
 
+#ifdef __RX78__
+// 3579545
+#define psgT(hz)		((int)(223722 / (hz)))
+#endif
+
 
 // **************
 //     YM PSG
@@ -107,6 +112,13 @@
 // Clock is 3579545
 #ifndef psgT
 #define psgT(hz)		((int)(118750.0 / (hz)))
+#endif
+#endif
+
+#ifdef __SPC1000__
+// Clock is 4000000
+#ifndef psgT
+#define psgT(hz)		((int)(125000.0/ (hz)))
 #endif
 #endif
 

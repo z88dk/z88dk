@@ -27,6 +27,7 @@ all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	trs80_clib.lib vg5k_clib.lib vz_clib.lib  x07_clib.lib \
 	embedded_clib.lib test_clib.lib testrcm_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
 	pv1000_clib.lib pv2000_clib.lib coleco_clib.lib multi8_clib.lib alphatro_clib.lib  spc1000_clib.lib \
+	rx78_clib.lib \
 	preempt.lib x1ansi_clib.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib gendos.lib ndos.lib  \
@@ -851,6 +852,16 @@ kc_clib.lib:
 	$(MAKE) gfxdeps
 	$(call buildgeneric,kc)
 	TARGET=kc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORkc -x$(OUTPUT_DIRECTORY)/kc_clib @$(LISTFILE_DIRECTORY)/kc.lst
+
+# Bandai RX78 - dom
+rx78_clib.lib:
+	@echo ''
+	@echo '--- Building Bandai RX78 Library ---'
+	@echo ''
+	$(call buildgeneric,rx78)
+	TARGET=rx78 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORrx78 -x$(OUTPUT_DIRECTORY)/rx78_clib @$(LISTFILE_DIRECTORY)/rx78.lst
+
+# Triumph Adler Alphatronic PC - dom
 
 # Mitsubishi Multi8 - dom
 multi8_clib.lib:
