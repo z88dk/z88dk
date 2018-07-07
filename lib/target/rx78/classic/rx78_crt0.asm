@@ -49,7 +49,8 @@ start:
 	di
         INCLUDE "crt/classic/crt_init_sp.asm"
         INCLUDE "crt/classic/crt_init_atexit.asm"
-
+	ld	hl,interrupt
+	ld	(0xe788),hl		;RAM interrupt vector
 	call	crt0_init_bss
 	ei
 
@@ -80,6 +81,9 @@ cleanup_exit:
 
 end:	jp	0
 
+interrupt:
+	ei	
+	ret
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
 
