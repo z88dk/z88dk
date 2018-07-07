@@ -20,6 +20,8 @@ void option_print_path(void)
       printf("%s %s\n", esx_f_chdir(p) ? "X" : "O", p);
    }
    
+   path_close();
+
    printf("\nDone\n");
 }
 
@@ -44,5 +46,7 @@ void option_print_find_dirs(void)
       }
    }
    
+   path_close();
+
    printf("\nDone\n");
 }

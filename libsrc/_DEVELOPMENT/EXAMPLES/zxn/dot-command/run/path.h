@@ -3,5 +3,6 @@
 
 extern char *path_open(void);
 extern char *path_next(void);
+extern void path_close(void);
 
 #endif

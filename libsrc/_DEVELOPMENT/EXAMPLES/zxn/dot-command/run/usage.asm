@@ -4,5 +4,4 @@ PUBLIC _usage
 
 _usage:
 
-   BINARY "usage.txt"
-	defb 0
+   BINARY "usage.txt.zx7"

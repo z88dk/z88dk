@@ -5,7 +5,9 @@
 
 extern unsigned char cwd[ESX_PATHNAME_MAX];
 
-extern unsigned char fin; 
+extern unsigned char fin;
+extern unsigned char fdir;
+
 extern unsigned char program_name[ESX_PATHNAME_MAX];
 extern unsigned char *command_line;
 

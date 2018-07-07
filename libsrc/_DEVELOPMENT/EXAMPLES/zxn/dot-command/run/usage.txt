@@ -1,9 +1,7 @@
 .run [opts] filename [cmdline]
 
 supported extensions:
-
-.exe, .nex, .o, .p, .sna, .snx
-.tap, .z80
+exe nex o p sna snx tap z80
 
 options:
 

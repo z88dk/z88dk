@@ -13,7 +13,7 @@ void load_tap(void)
    if (esx_m_tapein_open(basename(program_name)))
       return;
 
-   printf("\nto start - LOAD \"t:\": LOAD \"\"n");
+   printf("\nto start - LOAD \"t:\": LOAD \"\"\n");
    exit(0);
 }
 

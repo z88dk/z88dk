@@ -13,6 +13,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include <arch/zxn/esxdos.h>
+#include <compress/zx7.h>
 
 #include "globals.h"
 #include "load.h"
@@ -191,7 +192,7 @@ unsigned char *parse_filename(unsigned char *cl)
             
       // part of filename
       
-      if (isspace(*p))
+      if ((quote == 0) && isspace(*p))
          break;
       
       *q++ = *p;
@@ -208,6 +209,8 @@ unsigned char *parse_filename(unsigned char *cl)
 void cleanup(void)
 {
    if (fin != 0xff) esx_f_close(fin);
+   if (fdir != 0xff) esx_f_close(fdir);
+
    if ((opt_flag & (OPT_FLAG_R | OPT_FLAG_C)) == OPT_FLAG_R) esx_f_chdir(cwd);
 
    // must make the decision here if it
@@ -242,30 +245,15 @@ int main(unsigned int no, unsigned char *cl)
    
    p = parse_filename(p);
    command_line = cl + (p - PATH);
-   
-   // check extension of filename
-   
-   program_type = 0;
-   qsort(types, sizeof(types)/sizeof(*types), sizeof(*types), sort_type);
-   
-   if (program_name[0])
-   {
-      while ((p = strrchr(program_name, '.')) == 0)
-         strcat(program_name, ".exe");
-
-      program_type = bsearch(p, types, sizeof(types)/sizeof(*types), sizeof(*types), find_type);
-   }
 
    // what are we doing ?
 
    // print usage if no options and no filename given
    
-   if ((opt_flag == 0) && (program_type == 0))
+   if ((opt_flag == 0) && (program_name[0] == 0))
    {
-      // compression only saves about 70 bytes
-      // which is about the size of the decompressor
-
-      printf("\n%s", usage);
+      *dzx7_standard(usage, PATH) = 0;   // PATH is 512 bytes so ok to decompress there
+      printf("\n%s", PATH);
       exit(0);
    }
    
@@ -297,7 +285,7 @@ int main(unsigned int no, unsigned char *cl)
 
    // program is required
    
-   if (program_type == 0)
+   if (program_name[0] == 0)
       exit(error("F Missing file name"));
    
    // -?
@@ -344,9 +332,11 @@ int main(unsigned int no, unsigned char *cl)
          }
       }
    }
-      
+
+   path_close();
+
    if (fin == 0xff)
-      exit(error("R Program not found"));
+      exit(error("F File not found"));
    
    printf("\nFound:\n%s\n", PATH);
 
@@ -357,7 +347,20 @@ int main(unsigned int no, unsigned char *cl)
       printf("\nChanging directory\n");
       exit(0);
    }
+
+   // check extension of filename
    
+   program_type = 0;
+   qsort(types, sizeof(types)/sizeof(*types), sizeof(*types), sort_type);
+   
+   while ((p = strrchr(program_name, '.')) == 0)
+      strcat(program_name, ".exe");
+
+   program_type = bsearch(p, types, sizeof(types)/sizeof(*types), sizeof(*types), find_type);
+
+   if (program_type == 0)
+      exit(error("F Unknown file type"));
+
    // load program
 
    if (stricmp(program_type->ext, ".exe") != 0)
@@ -368,5 +371,5 @@ int main(unsigned int no, unsigned char *cl)
 
    (program_type->load)();
    
-   exit(error("R Loading error"));
+   return error("R Loading error");
 }

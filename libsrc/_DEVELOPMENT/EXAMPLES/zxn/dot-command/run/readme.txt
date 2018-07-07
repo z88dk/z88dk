@@ -1,21 +1,27 @@
+PATH = /demos/*;/games;/games/*;/games/zx81/*
+
 Create a file holding environment variables in:
 
 /sys/env.cfg
 
-Each line can contain a "name = value" pair.  The code that
-reads this file is robust so there can be errors and strange
-formatting.   The file should use unix line endings (\n); 
+Each line in this file can contain a "name = value" pair.
+The code that reads this file is robust so there can be errors
+and strange formatting.   The file should use unix line endings (\n); 
 I think it will be ok with windows \r\n but that is untested.
 
 The important variable is PATH.  Create a path variable inside
 env.cfg that holds all the directories you want searched.  It
 must be in one line no matter how long it gets.  Each directory
 in the path is separated by : or ; .  Backward slashes are ok 
-(forward is preferred), leading and trailing spaces are ok.
+and will be changed to forward, leading and trailing spaces are ok.
 Spaces inside a directory name are ok.
 
-PATH = /games;/demos
+PATH = /demos/*;/games;/games/*;/games/zx81/*
 
+A trailing "/*" means the directories contained in that directory
+will be searched.  So "/games/*" means all directories in "/games"
+will be searched; note it does not mean "/games" itself will be
+searched.
 
 .run will automatically locate and run programs with .tap,
 sna, .snx, .z80, .o, .p, .nex, .exe (not done) extensions.

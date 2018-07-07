@@ -5,9 +5,13 @@
 
 unsigned char cwd[ESX_PATHNAME_MAX];
 
+// file handles
+
+unsigned char fin = 0xff;                       // handle for located program
+unsigned char fdir = 0xff;                      // handle for readdir
+
 // details on program being loaded
 
-unsigned char fin = 0xff;                       // open file handle
 unsigned char program_name[ESX_PATHNAME_MAX];   // full path to program
 unsigned char *command_line;                    // command line to be passed to program
 

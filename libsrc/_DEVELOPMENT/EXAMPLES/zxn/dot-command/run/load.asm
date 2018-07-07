@@ -5,7 +5,7 @@ SECTION code_user
 PUBLIC _load_snap
 PUBLIC _load_nex
 
-defc MAX_NAME_LEN = 64
+defc MAX_NAME_LEN = 48
 
 ;;;;;;;;;;;;;;;;;;;;;;
 ; void load_snap(void)
@@ -274,4 +274,4 @@ reclaim_stub:
    rst 8
    defb __ERRB_Q_PARAMETER_ERROR - 1
 
-reclaim_end:
+reclaim_stub_end:
