@@ -43,6 +43,7 @@
 #define __ZXNEXT_2MB  2
 
 #define __ZXNEXT_LAST_PAGE  223
+#define __ZXNEXT_LAST_DIVMMC  15
 
 #define __ENV_FILENAME  "/sys/env.cfg"
 
@@ -2526,6 +2527,20 @@
 #define __RCCH_COPPER_RUN_VBI  0xc0
 
 #define __REG_DEBUG  0xff
+
+
+
+
+
+
+
+
+
+
+
+
+#define __ROM3_MAKE_ROOM  0x1655
+#define __ROM3_RECLAIM_2  0x19e8
 
 
 

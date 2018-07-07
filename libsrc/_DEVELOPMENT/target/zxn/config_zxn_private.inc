@@ -38,6 +38,7 @@ defc __ZXNEXT_1MB = 1
 defc __ZXNEXT_2MB = 2
 
 defc __ZXNEXT_LAST_PAGE = 223
+defc __ZXNEXT_LAST_DIVMMC = 15
 
 ; define(`__ENV_FILENAME', /sys/env.cfg)
 
@@ -2534,6 +2535,20 @@ defc __RCCH_COPPER_RUN_LOOP = 0x80
 defc __RCCH_COPPER_RUN_VBI = 0xc0
 
 defc __REG_DEBUG = 0xff
+
+
+
+
+
+
+
+
+
+
+
+
+defc __ROM3_MAKE_ROOM = 0x1655
+defc __ROM3_RECLAIM_2 = 0x19e8
 
 
 
