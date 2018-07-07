@@ -182,6 +182,7 @@
     <ClCompile Include="..\..\src\appmake\mc.c" />
     <ClCompile Include="..\..\src\appmake\msx.c" />
     <ClCompile Include="..\..\src\appmake\mtx.c" />
+    <ClCompile Include="..\..\src\appmake\multi8.c" />
     <ClCompile Include="..\..\src\appmake\mz.c" />
     <ClCompile Include="..\..\src\appmake\nascom.c" />
     <ClCompile Include="..\..\src\appmake\nec.c" />
@@ -196,6 +197,7 @@
     <ClCompile Include="..\..\src\appmake\sms.c" />
     <ClCompile Include="..\..\src\appmake\sorcerer.c" />
     <ClCompile Include="..\..\src\appmake\sos.c" />
+    <ClCompile Include="..\..\src\appmake\spc1000.c" />
     <ClCompile Include="..\..\src\appmake\svi.c" />
     <ClCompile Include="..\..\src\appmake\tixx.c" />
     <ClCompile Include="..\..\src\appmake\trs80.c" />
