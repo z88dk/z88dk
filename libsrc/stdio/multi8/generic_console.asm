@@ -67,6 +67,7 @@ generic_console_cls:
 	ld	a,(__vram_in)	;Clear hires screens
 	and	@11110000
 	or	@00001000
+	out	($2a),a
 	ld	hl,DISPLAY
 	ld	de,DISPLAY + 1
 	ld	bc, 16383
