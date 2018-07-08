@@ -1,8 +1,15 @@
 ;
+; Display has 2 screens - VRAM planes 0,1,2 and 3,4,5 
+;
+; Screen 0 takes palette 0-7, screen 1 palette 8-15
+;
+; If both screens are not set, then background colour palette[16] is taken
+;
+; We'll use through z88dk. screen 0 for ink, screen 1 for paper
+;
+;
 
-		; In code_driver so we are low down in memory and hopefully
-		; never paged out
-		SECTION		code_driver
+		SECTION		code_clib
 
 		PUBLIC		generic_console_cls
 		PUBLIC		generic_console_printc
@@ -31,7 +38,10 @@ generic_console_set_ink:
 
 	
 generic_console_set_paper:
-	and	7
+	rlca
+	rlca
+	rlca
+	and	@00111000
 	ld	(__rx78_paper),a
 	ret
 
@@ -41,6 +51,8 @@ generic_console_set_inverse:
 generic_console_cls:
 	ld	a,@00111111
 	out	($f2),a
+	ld	a,1		;We'll just read from plane 0
+	out	($f1),a
 	ld	hl, DISPLAY
 	ld	de, DISPLAY+1
 	ld	bc, +(CONSOLE_ROWS * CONSOLE_COLUMNS * 8) -1
@@ -72,17 +84,23 @@ not_udg:
 	add	hl,bc
 	dec	h		;-32 characters
 	ex	de,hl		;hl = screen, de = font
+	exx
 	ld	bc,(__rx78_ink)
 	ld	a,c
 	cpl
 	and	@00000111
-	ld	b,a
+	ld	b,a		;Reset ink
+	ld	de,(__rx78_paper)
+	ld	a,e
+	cpl
+	and	@00111000
+	ld	d,a
+	exx
 	ld	a,8
 loop:	push	af
 	ld	a,(de)
 	bit	5,d
 	jr	z,rom_font
-	push	bc
 	ld	c,a		;Mirror the font
 	rlca
 	rlca
@@ -97,24 +115,41 @@ loop:	push	af
 	xor	c
 	and	0x66
 	xor	c
-	pop	bc		;Pages back now
 rom_font:
+	exx			;Switch to planes
 	ex	af,af		;Save byte for a bit
 	ld	a,c		;ink set
 	out	($f2),a
-	ex	af,af
+	ex	af,af		;Back to byte
+	exx			;Mem pointers
 	ld	(hl),a
+	ex	af,af		;Save byte
+	exx			;Planes
 	ld	a,b		;Unset pages
 	out	($f2),a
-	ex	af,af
-;	ld	(hl),0
+	exx			;Mem pointers
+	ld	(hl),0
 
-	ld	a,l
-	add	24
-	ld	l,a
-	jr	nc,noinc
-	inc	h
-noinc:
+	; Now we need to consider paper side
+	ex	af,af
+	cpl			;We need the inverse
+	exx			;Planes
+	ex	af,af
+	ld	a,e
+	out	($f2),a
+	ex	af,af		;Byte
+	exx			;Mem
+	ld	(hl),a
+	exx			;Planes
+	ld	a,d		;Unset
+	out	($f2),a
+	exx			;Mem
+	ld	(hl),0
+	
+
+
+	ld	bc,24
+	add	hl,bc
 	inc	de
 	pop	af
 	dec	a
@@ -137,13 +172,13 @@ generic_console_xypos_graphics_1:
 generic_console_scrollup:
 	push	de
 	push	bc
-	ld	b,3
+	ld	b,6
 	ld	c,@00000001
 scroll_loop:
 	push	bc
 	ld	a,c
 	out	($f2),a		;Page to write
-	ld	a,4
+	ld	a,7
 	sub	b
 	out	($f1),a		;Page to read
 	ld	hl, DISPLAY + 24 * 8
@@ -168,14 +203,14 @@ scroll_loop_2:
 	SECTION		data_clib
 
 __rx78_ink:	  defb	0x07
-__rx78_paper:	  defb	0x01
+__rx78_paper:	  defb	0x00
 
 
 
 	SECTION		code_crt_init
 
 	ld	hl, initial_palette
-	ld	b, 7
+	ld	b, 8
 pal_loop:
 	ld	a,(hl)
 	inc	hl
@@ -193,3 +228,5 @@ initial_palette:
 	defb	0x22, 0xf9
 	defb	0x44, 0xfa
 	defb	0xff, 0xfb
+	defb	0x00, 0xfc
+	defb	@00111111, 0xfe
