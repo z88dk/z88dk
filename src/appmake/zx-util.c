@@ -1724,7 +1724,8 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
 
     // collect parameters
 
-    register_sp = parameter_search(zxc->crtfile, ".map", "__register_sp");
+    if ((register_sp = parameter_search(zxc->crtfile, ".map", "__register_sp")) < 0)
+        exit_log(1, "Error: Stack location must be set (%d)\n", register_sp);
 
     if ((crt_org_code = parameter_search(zxc->crtfile, ".map", "__crt_org_code")) < 0)
         exit_log(1, "Error: Unable to find org address\n");
@@ -1838,11 +1839,8 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
     memcpy(&nh.VersionNumber, "V1.0", 4);
     nh.BorderColour = zxnex->border & 0x7;
 
-    if (register_sp > 0)
-    {
-        nh.SP[0] = register_sp & 0xff;
-        nh.SP[1] = (register_sp >> 8) & 0xff;
-    }
+    nh.SP[0] = register_sp & 0xff;
+    nh.SP[1] = (register_sp >> 8) & 0xff;
 
     nh.PC[0] = crt_org_code & 0xff;
     nh.PC[1] = (crt_org_code >> 8) & 0xff;
