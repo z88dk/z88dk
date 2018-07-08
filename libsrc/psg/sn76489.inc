@@ -28,23 +28,26 @@ IF FORpv2000
 	defc psgport	= $40
 ENDIF
 
-; ********************************************************
-;   This last part refers to NOT YET supported hardware
-; ********************************************************
+IF FORrx78
+	defc psgport = 0xff
+ENDIF
 
 IF FORcoleco
 	defc psgport	= $E0		; also valid for Coleco Adam and Pencil II
 ENDIF
 
+; ********************************************************
+;   This last part refers to NOT YET supported hardware
+; ********************************************************
+
+
 IF FORpasopia
 	defc psgport	= $3A		; Pasopia has also a second PSG on port $3B
 ENDIF
 
-IF FORrx78
-	defc psgport	= $FF
-ENDIF
 
 IF FORsmc777
 	defc psgport	= $53		; possibly valid also for Sony SMC 70
 ENDIF
+
 
