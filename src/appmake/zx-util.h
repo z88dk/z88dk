@@ -59,6 +59,9 @@ struct zxn_nex
 {
     char          *screen;
     int            border;
+    int            loadbar;
+    int            loaddelay;
+    int            startdelay;
 };
 
 extern int  z88dk_ffs(int n);

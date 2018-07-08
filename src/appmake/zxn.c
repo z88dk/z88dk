@@ -63,7 +63,10 @@ static struct zx_bin zxb = {
 
 static struct zxn_nex zxnex = {
     0,          // screen
-    7           // border
+    7,          // border
+   -1,          // loadbar
+    0,          // loaddelay
+    0           // startdelay
 };
 
 static char tap = 0;            // .tap tape
@@ -109,9 +112,12 @@ option_t zxn_options[] = {
     {  0,  "exclude-sections", "Exclude sections from output", OPT_STR, &zxc.excluded_sections },
     {  0,  "clean",    "Remove consumed source binaries\n", OPT_BOOL, &zxc.clean },
 
-    {  0,  "nex",      "Make .nex instead of .tap", OPT_BOOL,   &nex },
-    {  0,  "nex-screen", "File containing loading screen", OPT_STR, &zxnex.screen },
-    {  0,  "nex-border", "Initial border colour\n", OPT_INT, &zxnex.border },
+    {  0,  "nex",          "Make .nex instead of .tap", OPT_BOOL,   &nex },
+    {  0,  "nex-screen",   "File containing loading screen", OPT_STR, &zxnex.screen },
+    {  0,  "nex-border",   "Initial border colour", OPT_INT, &zxnex.border },
+    {  0,  "nex-loadbar",  "Load bar colour", OPT_INT, &zxnex.loadbar },
+    {  0,  "nex-loaddel",  "Delay loading a bank", OPT_INT, &zxnex.loaddelay },
+    {  0,  "nex-startdel", "Delay before starting\n", OPT_INT, &zxnex.startdelay },
 
     {  0,  "dot",      "Make esxdos dot command instead of .tap", OPT_BOOL, &dot },
     {  0,  "dotn",     "Make nextos dot command instead of .tap", OPT_BOOL, &dotn },
