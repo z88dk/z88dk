@@ -25,15 +25,13 @@
 
 generic_console_set_ink:
 	and	7
-	ld	b,a
-	ld	a,(__rx78_attr)
-	and	248
-	or	b
-	ld	(__rx78_attr),a
+	ld	(__rx78_ink),a
 	ret
 
 	
 generic_console_set_paper:
+	and	7
+	ld	(__rx78_paper),a
 	ret
 
 generic_console_set_inverse:
@@ -73,13 +71,16 @@ not_udg:
 	add	hl,bc
 	dec	h		;-32 characters
 	ex	de,hl		;hl = screen, de = font
-	ld	a,@00000111
-	out	($f2),a
+	ld	bc,(__rx78_ink)
+	ld	a,c
+	cpl
+	and	@00000111
+	ld	b,a
 	ld	a,8
 loop:	push	af
+	push	bc
 	ld	a,(de)
-; Let's mirror - painful
-	ld	c,a
+	ld	c,a		;Mirror the font
 	rlca
 	rlca
 	xor	c
@@ -94,12 +95,25 @@ loop:	push	af
 	and	0x66
 	xor	c
 
+	pop	bc		;Pages back now
+
+	ex	af,af		;Save byte for a bit
+	ld	a,c		;ink set
+	out	($f2),a
+	ex	af,af
 	ld	(hl),a
+	ld	a,b		;Unset pages
+	out	($f2),a
+	ex	af,af
+;	ld	(hl),0
+
+	ld	a,l
+	add	24
+	ld	l,a
+	jr	nc,noinc
+	inc	h
+noinc:
 	inc	de
-
-	ld	bc,24
-	add	hl,bc
-
 	pop	af
 	dec	a
 	jr	nz,loop
@@ -125,6 +139,29 @@ generic_console_scrollup:
 
 	SECTION		data_clib
 
-__rx78_attr:	  defb	0x07		;white ink
+__rx78_ink:	  defb	0x07
+__rx78_paper:	  defb	0x01
 
 
+
+	SECTION		code_crt_init
+
+	ld	hl, initial_palette
+	ld	b, 7
+pal_loop:
+	ld	a,(hl)
+	inc	hl
+	ld	c,(hl)
+	inc	hl
+	out	(c),a
+	djnz	pal_loop
+
+	SECTION		rodata_clib
+initial_palette:
+	defb	0x11, 0xf5
+	defb	0x22, 0xf6
+	defb	0x44, 0xf7
+	defb	0x11, 0xf8
+	defb	0x22, 0xf9
+	defb	0x44, 0xfa
+	defb	0xff, 0xfb
