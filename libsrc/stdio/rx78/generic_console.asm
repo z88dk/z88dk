@@ -78,8 +78,10 @@ not_udg:
 	ld	b,a
 	ld	a,8
 loop:	push	af
-	push	bc
 	ld	a,(de)
+	bit	5,d
+	jr	z,rom_font
+	push	bc
 	ld	c,a		;Mirror the font
 	rlca
 	rlca
@@ -94,9 +96,8 @@ loop:	push	af
 	xor	c
 	and	0x66
 	xor	c
-
 	pop	bc		;Pages back now
-
+rom_font:
 	ex	af,af		;Save byte for a bit
 	ld	a,c		;ink set
 	out	($f2),a
