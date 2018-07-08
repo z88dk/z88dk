@@ -859,6 +859,7 @@ rx78_clib.lib:
 	@echo '--- Building Bandai RX78 Library ---'
 	@echo ''
 	@$(RM) -f psg/sn76489/*.o
+	$(MAKE) gfxdeps
 	$(call buildgeneric,rx78)
 	TARGET=rx78 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORrx78 -x$(OUTPUT_DIRECTORY)/rx78_clib @$(LISTFILE_DIRECTORY)/rx78.lst
 
