@@ -28,7 +28,7 @@ char *path_walk(char *p)
          fdir = esx_f_opendir_ex(p, ESX_DIR_USE_LFN);
       }
       else
-         return p;
+         return pathnice(p);
    }
 
    if (fdir != 0xff)
@@ -42,8 +42,7 @@ char *path_walk(char *p)
          }
       }
    
-      esx_f_close(fdir);
-      fdir = 0xff;
+      path_close();
    }
    
    return 0;
