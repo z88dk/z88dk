@@ -16,6 +16,7 @@
 		EXTERN		generic_console_font32
 		EXTERN		generic_console_udg32
 
+
 		EXTERN		CRT_FONT
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
@@ -134,6 +135,32 @@ generic_console_xypos_graphics_1:
 
 
 generic_console_scrollup:
+	push	de
+	push	bc
+	ld	b,3
+	ld	c,@00000001
+scroll_loop:
+	push	bc
+	ld	a,c
+	out	($f2),a		;Page to write
+	ld	a,4
+	sub	b
+	out	($f1),a		;Page to read
+	ld	hl, DISPLAY + 24 * 8
+	ld	de, DISPLAY
+	ld	bc, 24 * 22 * 8
+	ldir
+	ex	de,hl
+	ld	b, 24 * 8
+scroll_loop_2:
+	ld	(hl),0
+	inc	hl
+	djnz	scroll_loop_2
+	pop	bc
+	sla	c
+	djnz	scroll_loop
+	pop	bc
+	pop	de
 	ret
 
 
