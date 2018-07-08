@@ -31,4 +31,6 @@ graphics/lftscrol
 graphics/fill
 graphics/getsprite
 @gfxbase.lst
+games/rx78/joystick
+@games/games.lst
 @z80.lst

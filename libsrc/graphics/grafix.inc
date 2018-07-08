@@ -446,6 +446,12 @@ IF FORmulti8
 	defc maxy	= 200
 ENDIF
 
+IF FORrx78
+	DEFINE gotgfx
+	defc maxx	= 192
+	defc maxy	= 184
+ENDIF
+
 ; =============================================
 
 
