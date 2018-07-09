@@ -98,6 +98,7 @@ msxdeps:
 	@$(RM) -f games/*.o
 	@$(RM) -f games/msx/*.o
 	@$(RM) -f graphics/*.o
+	@$(RM) -f graphics/*/*.o
 	@$(RM) -f graphics/msx/*.o
 	@$(RM) -f graphics/msx/surface/*.o
 	@$(RM) -f psg/msx/*.o
