@@ -21,6 +21,7 @@ graphics/clrarea
 graphics/draw_profile
 graphics/lftscrol
 graphics/swapgfxbk_foo
+graphics/w_putsprite2
 @gfxbasew.lst
 psg/multi8/set_psg
 psg/multi8/set_psg_callee
