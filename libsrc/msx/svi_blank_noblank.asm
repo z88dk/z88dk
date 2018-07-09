@@ -34,13 +34,13 @@ do_blank:
 	
 	; Register #1, bit #6 is used to blank screen.
 	di
-IF VDP_CMD > 255
+IF VDP_CMD < 0
 	ld	(VDP_CMD),a
 ELSE
 	out	(VDP_CMD),a
 ENDIF
 	ld	a,1
-IF VDP_CMD > 255
+IF VDP_CMD < 0
 	ld	(VDP_CMD),a
 ELSE
 	out	(VDP_CMD),a

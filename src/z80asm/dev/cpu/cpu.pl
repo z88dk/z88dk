@@ -316,6 +316,7 @@ for my $cpu (@CPUS) {
 	}
 	elsif ($z80_zxn) {
 		add_opc($cpu, "mul d, e", 0xED, 0x30);
+		add_opc($cpu, "mul de",   0xED, 0x30);
 	}
 	elsif ($rabbit) {
 		add_opc($cpu, "mul", 0xF7);
@@ -548,7 +549,7 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "swapnib", 		0xED, 0x23);
 		add_opc($cpu, "mirror a", 		0xED, 0x24);
 		
-		add_opc($cpu, "mirror de", 		0xED, 0x26);
+#		add_opc($cpu, "mirror de", 		0xED, 0x26);
 		
 		add_opc($cpu, "add hl, a",		0xED, 0x31);
 		add_opc($cpu, "add de, a",		0xED, 0x32);
@@ -569,7 +570,7 @@ for my $cpu (@CPUS) {
 		}
 
 		add_opc($cpu, "push %M",	 	0xED, 0x8A, '%M', '%M');
-		add_opc($cpu, "pop x",		 	0xED, 0x8B);
+#		add_opc($cpu, "pop x",		 	0xED, 0x8B);
 
 		add_opc($cpu, "outinb",			0xED, 0x90);
 		
@@ -581,6 +582,7 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "setae",			0xED, 0x95);
 		
 		add_opc($cpu, "ldix",			0xED, 0xA4);
+		add_opc($cpu, "ldws",			0xED, 0xA5);
 		add_opc($cpu, "lddx",			0xED, 0xAC);
 		add_opc($cpu, "ldirx",			0xED, 0xB4);
 		add_opc($cpu, "lddrx",			0xED, 0xBC);

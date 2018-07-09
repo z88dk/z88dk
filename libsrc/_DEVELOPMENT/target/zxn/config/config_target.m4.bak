@@ -11,6 +11,7 @@ define(`__ZXNEXT_1MB', 1)
 define(`__ZXNEXT_2MB', 2)
 
 define(`__ZXNEXT_LAST_PAGE', 223)
+define(`__ZXNEXT_LAST_DIVMMC', 15)
 
 # ZX Next Runtime Configuration
 
@@ -79,6 +80,7 @@ PUBLIC `__ZXNEXT_1MB'
 PUBLIC `__ZXNEXT_2MB'
 
 PUBLIC `__ZXNEXT_LAST_PAGE'
+PUBLIC `__ZXNEXT_LAST_DIVMMC'
 
 PUBLIC `__ENV_BUFSZ'
 PUBLIC `__ENV_GETENV_VALSZ'
@@ -121,6 +123,7 @@ defc `__ZXNEXT_1MB' = __ZXNEXT_1MB
 defc `__ZXNEXT_2MB' = __ZXNEXT_2MB
 
 defc `__ZXNEXT_LAST_PAGE' = __ZXNEXT_LAST_PAGE
+defc `__ZXNEXT_LAST_DIVMMC' = __ZXNEXT_LAST_DIVMMC
 
 ; `define(`__ENV_FILENAME',' __ENV_FILENAME)
 
@@ -171,6 +174,7 @@ ifdef(`CFG_C_DEF',
 `#define' `__ZXNEXT_2MB'  __ZXNEXT_2MB
 
 `#define' `__ZXNEXT_LAST_PAGE'  __ZXNEXT_LAST_PAGE
+`#define' `__ZXNEXT_LAST_DIVMMC'  __ZXNEXT_LAST_DIVMMC
 
 `#define' `__ENV_FILENAME'  "__ENV_FILENAME"
 

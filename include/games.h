@@ -145,6 +145,13 @@ extern unsigned char *joystick_type[];
 	#define GAME_DEVICES 2
 #endif
 
+#ifdef __RX78__
+#ifdef DEFINE_JOYSTICK_TYPE
+	unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2"};
+#endif
+	#define GAME_DEVICES 2
+#endif
+
 #ifdef __SVI__
 #ifdef DEFINE_JOYSTICK_TYPE
 	unsigned char *joystick_type[] = { "Cursor", "Joystick 1", "Joystick 2"};

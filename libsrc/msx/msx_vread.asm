@@ -34,8 +34,7 @@ _msx_vread:
         ld      ix,4
         add     ix,sp
 
-	ld c, (ix+0)	; count
-	ld b, (ix+1)
+
 
 	ld e, (ix+2)	; dest
 	ld d, (ix+3)
@@ -51,11 +50,17 @@ _msx_vread:
 	ex	(sp),hl		; VDP Timing
 	ex	(sp),hl		; VDP Timing
 
+	ld c, (ix+0)	; count
+	ld b, (ix+1)
+
 rdloop:
-IF VDP_DATAIN > 255
-	ld	a,(VDP_DATAIN)
+IF VDP_DATAIN < 0
+	ld	a,(-VDP_DATAIN)
 ELSE
-	in	a,(VDP_DATAIN)
+	IF VDP_DATAIN > 255
+		ld	a,+(VDP_DATAIN / 256)
+	ENDIF
+	in	a,(VDP_DATAIN % 256)
 ENDIF
 	ld	(de),a
 	inc	de

@@ -15,5 +15,10 @@ extern char *dirname_fastcall(char *path) __z88dk_fastcall;
 #define dirname(a) dirname_fastcall(a)
 
 
+extern char *pathnice(char *path);
+extern char *pathnice_fastcall(char *path) __z88dk_fastcall;
+#define pathnice(a) pathnice_fastcall(a)
+
+
 
 #endif

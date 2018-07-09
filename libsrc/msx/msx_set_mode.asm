@@ -70,8 +70,8 @@ IF FORsvi
 	ld    (RG0SAV),a
 ENDIF
 	di
-IF VDP_CMD > 255
-	ld	(VDP_CMD),a
+IF VDP_CMD < 0
+	ld	(-VDP_CMD),a
 ELSE
 	out	(VDP_CMD),a
 ENDIF
@@ -83,8 +83,8 @@ ELSE
 ENDIF
 	or    $80
 	ei
-IF VDP_CMD > 255
-	ld	(VDP_CMD),a
+IF VDP_CMD < 0
+	ld	(-VDP_CMD),a
 ELSE
 	out	(VDP_CMD),a
 ENDIF
@@ -93,16 +93,16 @@ IF FORsc3000
 	; Bend register #2
 	ld	a,$06
 	di
-IF VDP_CMD > 255
-	ld	(VDP_CMD),a
+IF VDP_CMD < 0
+	ld	(-VDP_CMD),a
 ELSE
 	out	(VDP_CMD),a
 ENDIF
 	ld    a,2  ; reg2
 	or    $80
 	ei
-IF VDP_CMD > 255
-	ld	(VDP_CMD),a
+IF VDP_CMD < 0
+	ld	(-VDP_CMD),a
 ELSE
 	out	(VDP_CMD),a
 ENDIF
@@ -111,16 +111,16 @@ ENDIF
 	; Bend register #3
 	ld	a,$80
 	di
-IF VDP_CMD > 255
-	ld	(VDP_CMD),a
+IF VDP_CMD < 0
+	ld	(-VDP_CMD),a
 ELSE
 	out	(VDP_CMD),a
 ENDIF
 	ld    a,3  ; reg3
 	or    $80
 	ei
-IF VDP_CMD > 255
-	ld	(VDP_CMD),a
+IF VDP_CMD < 0
+	ld	(-VDP_CMD),a
 ELSE
 	out	(VDP_CMD),a
 ENDIF
@@ -128,15 +128,15 @@ ENDIF
 	; Bend register #4
 	xor	  a
 	di
-IF VDP_CMD > 255
-	ld	(VDP_CMD),a
+IF VDP_CMD < 0
+	ld	(-VDP_CMD),a
 ELSE
 	out	(VDP_CMD),a
 ENDIF
 	ld    a,4  ; reg4  -  PT./TXT/MCOL-GEN.TAB.
 	or    $80
 	ei
-IF VDP_CMD > 255
+IF VDP_CMD < 0
 	ld	(VDP_CMD),a
 ELSE
 	out	(VDP_CMD),a

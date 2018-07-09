@@ -51,6 +51,8 @@
     <ClCompile Include="..\..\src\appmake\zx-util.c" />
     <ClCompile Include="..\..\src\appmake\x1.c" />
     <ClCompile Include="..\..\src\appmake\cpm.c" />
+    <ClCompile Include="..\..\src\appmake\spc1000.c" />
+    <ClCompile Include="..\..\src\appmake\multi8.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\appmake\appmake.h" />

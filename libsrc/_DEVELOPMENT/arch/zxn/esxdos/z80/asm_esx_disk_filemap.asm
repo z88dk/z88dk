@@ -39,6 +39,7 @@ asm_esx_disk_filemap:
    ld l,d                      ; hl = buffer
    
    ld d,0                      ; de = max entries
+   push de                     ; save max entries
    
 IF __SDCC_IY
    push hl
@@ -50,12 +51,18 @@ ENDIF
 
    rst __ESX_RST_SYS
    defb __ESX_DISK_FILEMAP
-   
+
+   pop bc
    pop hl
    jp c, __esxdos_error_zc
 
-   ld (hl),e                   ; store number of entries returned
    ld (__esx_stream_card_flags),a
+
+   ld a,c
+   sub e
+   ld e,a
+
+   ld (hl),e                   ; store number of entries returned
    
    ex de,hl
    ret

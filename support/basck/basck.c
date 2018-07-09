@@ -266,6 +266,7 @@ int bastxt_skel[]={8, 0x2A, CATCH, CATCH, 0x44, 0x4D, 0x7E, 0x23, 0xB6, 0x2B, 0x
 int bastxt_skel2[]={11, SKIP_JP_RET, 0xC0, 0x2A, CATCH, CATCH, 0xAF, 0x77, 0x23, 0x77, 0x23, 0x22 };
 
 int microsoft_extended_skel[]={11, ADDR, 0xFE, '%', 0xC8, 0x14, 0xFE, '$', 0xC8, 0x14, 0xFE, '!'};
+
 int microsoft_defdbl_skel[]={7, ADDR, 'D', 'E', 'F', 'D', 'B', 'L'};
 int microsoft_defdbl_skel2[]={7, ADDR, 'D'+0x80, 'E', 'F', 'D', 'B', 'L'};
 int microsoft_defdbl_skel3[]={6, ADDR, 'E', 'F', 'D', 'B', 'L'+0x80};
@@ -755,6 +756,7 @@ int tkmsbasic_old_skel[]={8, ADDR, 'E', 'N', 0xC4, 'F', 'O', 0xd2, 'N'};
 
 /* Odd extended BASIC (i.e. MSX) tokens*/
 int tkmsbasic_ex_skel[]={11, 33, CATCH, CATCH, 0x47, 0x0e, 0x40, 0x0C, 0x23, 0x54, 0x5D, 0x7E};
+int tkmsbasic_ex_skel2[]={14, 33, CATCH, CATCH, 0xCD, SKIP, SKIP, 0x47, 0x0e, 0x40, 0x0C, 0x23, 0x54, 0x5D, 0x7E};
 int tkrange_ex_skel[]={14, 0xD6, 129, 0xDA, SKIP, SKIP, 0xFE, CATCH, 0xD2, SKIP, SKIP, 7, 0x4F, 6, 0};
 int tok_ex_skel[]={12, 0x3C, 0xCA, SKIP, SKIP, 0x3D, 0xFE, ADDR, 0x28, SKIP, 0xFE, SKIP, 0xCA};
 int lnum_tokens_skel[]={11, 17, CATCH, CATCH, 0x4F, 0x1A, 0xB7, 0x28, SKIP, 0x13, 0xB9, 0x20};
@@ -768,6 +770,14 @@ int ex_end1_skel[]={14, ADDR, 0x22, SKIP, SKIP, 33, SKIP, SKIP, 0x22, SKIP, SKIP
 
 int tkmsbasic_code_skel[]={12, 0xD5, 17, SKIP, SKIP, 0xC5, 1, SKIP, SKIP, 0xC5, 0x06, CATCH, 0x7E};
 int jptab_msbasic_skel[]={10, 0x07, 0x4F, 6, 0, 0xEB, 33, CATCH, CATCH, 9, 0x4E};
+
+int jptabptr_msbasic_skel[]={10, 0x07, 0x4F, 6, 0, 0xEB, 0x2A, CATCH, CATCH, 9, 0x4E};
+
+int relocsrc_msbasic_skel[]={15, 0x11, SKIP, SKIP, 0x21, CATCH, CATCH, 0x01, SKIP, 0x01, 0xED, 0xB0, 0x21, SKIP, SKIP, 0x22};
+int relocdst_msbasic_skel[]={15, 0x11, CATCH, CATCH, 0x21, SKIP, SKIP, 0x01, SKIP, 0x01, 0xED, 0xB0, 0x21, SKIP, SKIP, 0x22};
+
+
+									   
 //int jptab_msbasic_skel[]={13, 0x07, 0x4F, 6, 0, 0xEB, 33, CATCH, CATCH, 0x09, 0x4E, 0x23, 0x46, 0xC5};
 int jptab_msbasic_skel3[]={11, 17, CATCH, CATCH, 0xD4, SKIP,SKIP, 7, 0x4f, 6, 0, 0xEB};
 int jptab_msbasic_skel2[]={12, 17, CATCH, CATCH, 0x07, 0x4F, 6, 0, 0xEB, 0x09, 0x4E, 0x23, 0x46};
@@ -1042,13 +1052,15 @@ int main(int argc, char *argv[])
 		
 		brand=find_skel(tkmsbasic_ex_skel);
 		if (brand<0)
+		brand=find_skel(tkmsbasic_ex_skel2);
+		if (brand>0)
 			printf("#  Extended BASIC detected\n");
-			else {
-				brand=find_skel(microsoft_extended_skel);
-				if (brand>0)
-					printf("#  Extended syntax detected (classic version)\n");
-					else printf("#  Earlier version\n");
-			}
+		else {
+			brand=find_skel(microsoft_extended_skel);
+			if (brand>0)
+				printf("#  Extended syntax detected (classic version)\n");
+				else printf("#  Earlier version\n");
+		}
 
 		brand=find_skel(microsoft_defdbl_skel);
 		if (brand<0)
@@ -2281,6 +2293,24 @@ int main(int argc, char *argv[])
 		printf("\n\n");
 
 		/* MS BASIC commands */
+		jptab=find_skel(jptabptr_msbasic_skel);
+		if (jptab>0)  {
+			printf("\n# JP table relocated in ram, ptr in $%04X\n",jptab);
+			res=find_skel(relocdst_msbasic_skel);
+			if (res>0) {
+				printf("\n# First byte of moved block: $%04X\n",res);
+				res=jptab-res;
+				jptab=find_skel(relocsrc_msbasic_skel);
+				if (jptab>0) {
+					  res+=jptab;
+					  jptab = img[res+pos]+256*img[res+pos+1];
+					  printf("\n# Original JP table ptr in ROM to be copied: $%04X, getting JP table address\n",res);
+				}
+			} else jptab=0;
+				
+		}
+			
+		if (jptab <=0)
 		jptab=find_skel(jptab_msbasic_skel);
 		if (jptab<0)
 			jptab=find_skel(jptab_msbasic_skel2);
@@ -2306,7 +2336,8 @@ int main(int argc, char *argv[])
 
 		
 		res=find_skel(tkmsbasic_ex_skel);
-		
+		if (res<0)
+		res=find_skel(tkmsbasic_ex_skel2);
 		if (res>0) {
 		
 		/*********************************/

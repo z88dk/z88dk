@@ -165,14 +165,14 @@
 		
 		 push     af
 		 ld       a,l		; LSB of video memory ptr
-IF VDP_CMD > 255
-		ld	(VDP_CMD),a
+IF VDP_CMD < 0
+		ld	(-VDP_CMD),a
 		ld	a,h
 		and	@00111111
 		or	@01000000
-		ld	(VDP_CMD),a
+		ld	(-VDP_CMD),a
 		pop	af
-		ld	(VDP_DATA),a
+		ld	(-VDP_DATA),a
 
 ELSE
 		 out      (VDP_CMD),a

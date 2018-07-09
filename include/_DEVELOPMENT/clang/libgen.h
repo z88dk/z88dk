@@ -11,5 +11,8 @@ extern char *basename(char *path);
 extern char *dirname(char *path);
 
 
+extern char *pathnice(char *path);
+
+
 
 #endif

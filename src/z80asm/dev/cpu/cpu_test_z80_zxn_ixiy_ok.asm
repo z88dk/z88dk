@@ -830,8 +830,8 @@
  ldirx                          ; ED B4
  ldix                           ; ED A4
  ldpirx                         ; ED B7
+ ldws                           ; ED A5
  mirror a                       ; ED 24
- mirror de                      ; ED 26
  mmu 0, -128                    ; ED 91 50 80
  mmu 0, 127                     ; ED 91 50 7F
  mmu 0, 255                     ; ED 91 50 FF
@@ -897,6 +897,7 @@
  mmu7 255                       ; ED 91 57 FF
  mmu7 a                         ; ED 92 57
  mul d, e                       ; ED 30
+ mul de                         ; ED 30
  neg                            ; ED 44
  neg a                          ; ED 44
  nextreg -128, -128             ; ED 91 80 80
@@ -972,7 +973,6 @@
  pop hl                         ; E1
  pop ix                         ; FD E1
  pop iy                         ; DD E1
- pop x                          ; ED 8B
  push -32768                    ; ED 8A 80 00
  push 32767                     ; ED 8A 7F FF
  push 65535                     ; ED 8A FF FF

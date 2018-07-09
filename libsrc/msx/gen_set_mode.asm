@@ -8,28 +8,20 @@
 ;	$Id: gen_set_mode.asm $
 ;
 
-        SECTION code_clib
+    SECTION code_clib
 	PUBLIC	msx_set_mode
 	PUBLIC	_msx_set_mode
-	EXTERN  VDPreg_Write
-IF !FOReinstein
-	PUBLIC  VDPreg_Write
-ENDIF
 	
 	INCLUDE	"msx/vdp.inc"
 
 	EXTERN	SETWRT
 	EXTERN	FILVRM
+	EXTERN	l_push_di
+	EXTERN	l_pop_ei
 
 msx_set_mode:
 _msx_set_mode:
 
-IF FOReinstein
-; The Tatung Einstein should be already in graphics mode, correct memory settings ;)
-; "The Brain", January-February 1986 describes the VDP registers in detail 
-; and in the future we can use it to implement all the "set mode" stuff.
-
-ELSE
 	ld	a,l
 	and	a
 	jr	z,initxt
@@ -50,7 +42,7 @@ initxt:
 ; SC3:  $00,$F0,$0F,$FF,$03,$76,$03,$13
 ; MTX:  $00,$D0,$07,$00,$03,$7E,$07
 
-    ld    c,$01
+    ld    e,$01
     ld    a,$D0
     call    VDPreg_Write    ; reg1  - text MODE
     
@@ -73,7 +65,7 @@ initxt:
     call    VDPreg_Write    ; reg7  -  INK & PAPER-/BACKDROPCOL.
     
 		; reg0  - TEXT MODE
-    ld    c,$00
+    ld    e,$00
     xor a		; .. and reset on the other targets
     call    VDPreg_Write
 
@@ -90,7 +82,7 @@ init32:
 ; SVI?: $00,$E0,$06,$7F(00<>ff),$00,$36,$07,$04
 ; MTX?: $00,$D0,$04,$80,        $00,$7E,$07
 
-    ld    c,$01
+    ld    e,$01
     ld    a,$D0
     call    VDPreg_Write    ; reg1  - text MODE
     
@@ -118,7 +110,7 @@ ENDIF
     call    VDPreg_Write    ; reg7  -  INK & PAPER-/BACKDROPCOL.
     
 		; reg0  - TEXT MODE
-    ld    c,$00
+    ld    e,$00
 IF FORm5___2
 	ld	a,1		; external video flag bit must be set on M5
 ELSE
@@ -157,7 +149,7 @@ inigrp:
 
 
     ; reg1  - GRAPH MODE, first reset bit #6 to blank the screen
-    ld    c,$01
+    ld    e,$01
 	xor a		; bit 7 must be reset on sc3000
     call    VDPreg_Write
 	
@@ -199,7 +191,7 @@ ENDIF
     call    VDPreg_Write
 
 	; reg0  - GRAPH MODE
-    ld    c,$00
+    ld    e,$00
 IF FORm5
     ld    a,$03		; set bit 0 on m5___2 (to be confirmed)
 ELSE
@@ -220,13 +212,16 @@ ENDIF
 
 	ld	hl,$1800
 	call	SETWRT
+IF VDP_DATA >= 0
+	ld	bc,VDP_DATA
+ENDIF
 	xor	a
 	ld	e,3
 pattern:
-IF VDP_DATA > 255
-	ld	(VDP_DATA),a
+IF VDP_DATA < 0
+	ld	(-VDP_DATA),a
 ELSE
-	out	(VDP_DATA),a
+	out	(c),a
 ENDIF
 	inc	a
 	jr	nz,pattern
@@ -256,49 +251,29 @@ inimlt:
 
 ; *** WRTVDP ***
 ; Copy a value into VDP reg
-; IN: C = reg, A = val
+; IN: E = reg, A = val
 ;»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»
 VDPreg_Write:  
 ;»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»
 
-	ld	b,a
-	
-	ld a,i		; get the current status of the irq line
-	di
-	push af        
-	ex (sp),hl
-	ld (bit_irqstatus),hl
-	pop hl
-
-	ld	a,b
-IF VDP_CMD > 255
-	ld	(VDP_CMD),a
+	ld		d,a
+	call	l_push_di
+	ld		a,d
+IF VDP_CMD < 0
+	ld	(-VDP_CMD),a
 ELSE
-	out	(VDP_CMD),a
+	ld	bc,VDP_CMD
+	out	(c),a
 ENDIF
-	ld      a,c
+	ld      a,e
 	and     $07
 	or      $80		; enable bit for "set register" command
-IF VDP_CMD > 255
-	ld	(VDP_CMD),a
+IF VDP_CMD < 0
+	ld	(-VDP_CMD),a
 ELSE
-	out	(VDP_CMD),a
+	out	(c),a
 ENDIF
-	inc     c
-	
-	push hl
-	ld	hl,(bit_irqstatus)
-	ex	(sp),hl
-	pop af
-	ret po
-	ei
-	
+	inc     e
+	call	l_pop_ei
 	ret
-	
-;ENDIF
 
-
-	SECTION		bss_clib
-	
-bit_irqstatus:		defb 0
-ENDIF

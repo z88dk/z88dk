@@ -5,8 +5,8 @@
 	SECTION	code_clib
 	INCLUDE	"ioctl.def"
 
-	EXTERN	__cpc_font
-	EXTERN	__cpc_udg
+	EXTERN	generic_console_font32
+	EXTERN	generic_console_udg32
 	EXTERN	__cpc_mode
 	EXTERN	__console_w
 	EXTERN	cpc_setmode
@@ -21,14 +21,14 @@ generic_console_ioctl:
 	ld	b,(hl)
 	cp	IOCTL_GENCON_SET_FONT32
 	jr	nz,check_set_udg
-	ld	(__cpc_font),bc
+	ld	(generic_console_font32),bc
 success:
 	and	a
 	ret
 check_set_udg:
 	cp	IOCTL_GENCON_SET_UDGS
 	jr	nz,check_mode
-	ld	(__cpc_udg),bc
+	ld	(generic_console_udg32),bc
 	jr	success
 check_mode:
 	cp	IOCTL_GENCON_SET_MODE

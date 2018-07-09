@@ -41,3 +41,11 @@ graphics/pen_up
 graphics/pen_down
 graphics/w_putc4x6
 graphics/w_xorplot
+graphics/lores/w_c_plotpixel
+graphics/lores/w_c_respixel
+graphics/lores/w_c_xorpixel
+graphics/lores/c_plot
+graphics/lores/c_unplot
+graphics/lores/c_xorplot
+graphics/lores/w_c_pointxy
+graphics/lores/c_point

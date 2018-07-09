@@ -688,12 +688,12 @@
  ldisr                          ; Error
  ldix                           ; Error
  ldpirx                         ; Error
+ ldws                           ; Error
  lsddr                          ; Error
  lsdr                           ; Error
  lsidr                          ; Error
  lsir                           ; Error
  mirror a                       ; Error
- mirror de                      ; Error
  mlt bc                         ; Error
  mlt de                         ; Error
  mlt hl                         ; Error
@@ -779,6 +779,7 @@
  mmu7 255                       ; Error
  mmu7 a                         ; Error
  mul d, e                       ; Error
+ mul de                         ; Error
  nextreg -128, -128             ; Error
  nextreg -128, a                ; Error
  nextreg 127, 127               ; Error
@@ -841,7 +842,6 @@
  pixelad                        ; Error
  pixeldn                        ; Error
  pop su                         ; Error
- pop x                          ; Error
  push -32768                    ; Error
  push 32767                     ; Error
  push 65535                     ; Error

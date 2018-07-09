@@ -2,17 +2,18 @@
 
 		SECTION		code_clib
 
-		PUBLIC		generic_console_cls
-		PUBLIC		generic_console_scrollup
-		PUBLIC		generic_console_printc
-                PUBLIC          generic_console_set_ink
-                PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_inverse
+		PUBLIC		__tms9918_cls
+		PUBLIC		__tms9918_scrollup
+		PUBLIC		__tms9918_printc
+                PUBLIC          __tms9918_set_ink
+                PUBLIC          __tms9918_set_paper
+                PUBLIC          __tms9918_set_inverse
 		EXTERN		msx_attr
-		PUBLIC		__msx_font32
-		PUBLIC		__msx_udg32
 
-		EXTERN		generic_console_w
+		EXTERN		generic_console_font32
+		EXTERN		generic_console_udg32
+
+		EXTERN		tms9918_w
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
         	EXTERN		msxbios
@@ -28,10 +29,34 @@ ELSE
 ENDIF
 
 
-generic_console_set_inverse:
+;
+; The SPC-1000 has both a MC6847 and optionally a TMS9228A
+;
+; To support both we want the MC6847 to be the primary, and
+; the VDP as the slave, so don't export the tms symbols as
+; generic_console_*
+;
+IF !FORspc1000
+                PUBLIC          generic_console_cls
+                PUBLIC          generic_console_scrollup
+                PUBLIC          generic_console_printc
+                PUBLIC          generic_console_set_ink
+                PUBLIC          generic_console_set_paper
+                PUBLIC          generic_console_set_inverse
+
+		defc	generic_console_cls = __tms9918_cls
+		defc	generic_console_scrollup = __tms9918_scrollup
+		defc	generic_console_printc = __tms9918_printc
+		defc	generic_console_set_ink = __tms9918_set_ink
+		defc	generic_console_set_paper = __tms9918_set_paper
+		defc	generic_console_set_inverse = __tms9918_set_inverse
+ENDIF
+
+
+__tms9918_set_inverse:
 	ret
 
-generic_console_set_ink:
+__tms9918_set_ink:
 	call	conio_map_colour
 	rla
 	rla
@@ -47,17 +72,17 @@ set_attr:
 	ld	(hl),a
 	ret
 
-generic_console_set_paper:
+__tms9918_set_paper:
 	call	conio_map_colour
 	ld	b,0xf0
 	jr	set_attr
 	
 
-generic_console_cls:
+__tms9918_cls:
 	call	ansi_cls
 	ret
 
-generic_console_scrollup:
+__tms9918_scrollup:
 	push	de
 	push	bc
 	call	ansi_SCROLLUP
@@ -72,18 +97,18 @@ generic_console_scrollup:
 ; b = y
 ; a = d = character to print
 ; e = raw
-generic_console_printc:
+__tms9918_printc:
 	push	ix
 	rl	e
-	jr	c,generic_console_printc_1
+	jr	c,tms9918_printc_1
 	; Here we can interpret any extra codes (eg for setting colours)
 
-generic_console_printc_1:
+tms9918_printc_1:
 	bit	7,a
-	jr	nz,generic_console_printc_handle_udgs
+	jr	nz,tms9918_printc_handle_udgs
 	sub	32
-	ld	de,(__msx_font32)
-generic_console_printc_rejoin:
+	ld	de,(generic_console_font32)
+tms9918_printc_rejoin:
 	ld	l,a
 	ld	h,0
 	add	hl,hl
@@ -110,12 +135,8 @@ generic_console_printc_rejoin:
 	pop	ix
 	ret
 
-generic_console_printc_handle_udgs:
+tms9918_printc_handle_udgs:
 	sub	128
-	ld	de,(__msx_udg32)
-	jr	generic_console_printc_rejoin
+	ld	de,(generic_console_udg32)
+	jr	tms9918_printc_rejoin
 
-
-		SECTION	data_clib
-.__msx_font32	defw    CRT_FONT
-.__msx_udg32	defw    0

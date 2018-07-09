@@ -26,7 +26,8 @@ all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	svi_clib.lib sam_clib.lib  sorcerer_clib.lib  sos_clib.lib tiki100.lib \
 	trs80_clib.lib vg5k_clib.lib vz_clib.lib  x07_clib.lib \
 	embedded_clib.lib test_clib.lib testrcm_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
-	pv1000_clib.lib pv2000_clib.lib coleco_clib.lib multi8_clib.lib alphatro_clib.lib  \
+	pv1000_clib.lib pv2000_clib.lib coleco_clib.lib multi8_clib.lib alphatro_clib.lib  spc1000_clib.lib \
+	rx78_clib.lib \
 	preempt.lib x1ansi_clib.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib gendos.lib ndos.lib  \
@@ -76,17 +77,7 @@ endef
 #  short script to sort out gfx dependencies
 gfxdeps:
 	@$(RM) -f graphics/*.o
-	@$(RM) -f graphics/nc/*.o
-	@$(RM) -f graphics/c128/*.o
-	@$(RM) -f graphics/ticalc/*.o
-	@$(RM) -f graphics/gray/*.o
-	@$(RM) -f graphics/gray/ticalc/*.o
-	@$(RM) -f graphics/spectrum/*.o
-	@$(RM) -f graphics/z88/*.o
-	@$(RM) -f graphics/generic_console/*.o
-	@$(RM) -f graphics/text/*.o
-	@@$(RM) -f graphics/text6/*.o
-	@$(RM) -f graphics/x11/*.o
+	@$(RM) -f graphics/*/*.o
 
 #  short script to sort out ticalc dependencies
 tideps:
@@ -862,11 +853,26 @@ kc_clib.lib:
 	$(call buildgeneric,kc)
 	TARGET=kc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORkc -x$(OUTPUT_DIRECTORY)/kc_clib @$(LISTFILE_DIRECTORY)/kc.lst
 
+# Bandai RX78 - dom
+rx78_clib.lib:
+	@echo ''
+	@echo '--- Building Bandai RX78 Library ---'
+	@echo ''
+	@$(RM) -f psg/sn76489/*.o
+	@$(RM) -f games/*.o
+	$(MAKE) gfxdeps
+	$(call buildgeneric,rx78)
+	$(MAKE) -C games TARGET=rx78
+	TARGET=rx78 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORrx78 -x$(OUTPUT_DIRECTORY)/rx78_clib @$(LISTFILE_DIRECTORY)/rx78.lst
+
+# Triumph Adler Alphatronic PC - dom
+
 # Mitsubishi Multi8 - dom
 multi8_clib.lib:
 	@echo ''
 	@echo '--- Building Mitsubishi Multi8 Library ---'
 	@echo ''
+	$(MAKE) gfxdeps
 	$(call buildgeneric,multi8)
 	TARGET=multi8 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmulti8 -x$(OUTPUT_DIRECTORY)/multi8_clib @$(LISTFILE_DIRECTORY)/multi8.lst
 
@@ -879,6 +885,16 @@ alphatro_clib.lib:
 	$(call buildgeneric,alphatro)
 	TARGET=alphatro TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORalphatro -x$(OUTPUT_DIRECTORY)/alphatro_clib @$(LISTFILE_DIRECTORY)/alphatro.lst
 
+# SPC-1000 - dom
+spc1000_clib.lib:
+	@echo ''
+	@echo '--- Building Samsung SPC-1000 Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(MAKE) msxdeps
+	$(call buildgeneric,spc1000)
+	$(MAKE) -C msx TARGET=spc1000
+	TARGET=spc1000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORspc1000 -x$(OUTPUT_DIRECTORY)/spc1000_clib @$(LISTFILE_DIRECTORY)/spc1000.lst
 
 # Casio PV1000 - dom
 pv1000_clib.lib:

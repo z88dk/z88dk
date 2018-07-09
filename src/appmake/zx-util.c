@@ -1669,7 +1669,11 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
    unsigned short PC;				//Code Entry Point : $0000 = Don't run just load.
    unsigned short NumExtraFiles;	//NumExtraFiles
    unsigned char Banks[64+48];		//Which 16K Banks load.	: Bank 5 = $0000-$3fff, Bank 2 = $4000-$7fff, Bank 0 = $c000-$ffff
-   unsigned char RestOf512Bytes[512-(4+4 +1+1+1+1 +2+2+2 +64+48 )];
+   unsigned char LoadBar;           //Enable the layer 2 load bar
+   unsigned char LoadColour;        //Colour of the load bar
+   unsigned char LoadDelay;         //Delay in interrupts after each 16k loaded
+   unsinged char StartDelay;        //Delay in interrupts before starting the program
+   unsigned char RestOf512Bytes[512-(4+4 +1+1+1+1 +2+2+2 +64+48 +1+1+1+1)];
    if LoadingScreen!=0 {
    unsigned short	palette[256];
    unsigned char	Layer2LoadingScreen[49152];
@@ -1689,7 +1693,11 @@ struct nex_hdr
     uint8_t PC[2];
     uint8_t NumExtraFiles[2];
     uint8_t Banks[48 + 64];
-    uint8_t Padding[512 - (4 + 4 + 1 + 1 + 1 + 1 + 2 + 2 + 2 + 64 + 48)];
+    uint8_t LoadBar;
+    uint8_t LoadColour;
+    uint8_t LoadDelay;
+    uint8_t StartDelay;
+    uint8_t Padding[512 - (4 + 4 + 1 + 1 + 1 + 1 + 2 + 2 + 2 + 64 + 48 + 4)];
 };
 
 struct nex_hdr nh;
@@ -1724,7 +1732,8 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
 
     // collect parameters
 
-    register_sp = parameter_search(zxc->crtfile, ".map", "__register_sp");
+    if ((register_sp = parameter_search(zxc->crtfile, ".map", "__register_sp")) < 0)
+        exit_log(1, "Error: Stack location must be set (%d)\n", register_sp);
 
     if ((crt_org_code = parameter_search(zxc->crtfile, ".map", "__crt_org_code")) < 0)
         exit_log(1, "Error: Unable to find org address\n");
@@ -1836,13 +1845,20 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
 
     memcpy(&nh.Next, "Next", 4);
     memcpy(&nh.VersionNumber, "V1.0", 4);
+
     nh.BorderColour = zxnex->border & 0x7;
 
-    if (register_sp > 0)
+    if (zxnex->loadbar >= 0)
     {
-        nh.SP[0] = register_sp & 0xff;
-        nh.SP[1] = (register_sp >> 8) & 0xff;
+        nh.LoadBar = 1;
+        nh.LoadColour = zxnex->loadbar;
     }
+
+    nh.LoadDelay = zxnex->loaddelay;
+    nh.StartDelay = zxnex->startdelay;
+
+    nh.SP[0] = register_sp & 0xff;
+    nh.SP[1] = (register_sp >> 8) & 0xff;
 
     nh.PC[0] = crt_org_code & 0xff;
     nh.PC[1] = (crt_org_code >> 8) & 0xff;

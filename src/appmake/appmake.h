@@ -147,6 +147,9 @@ extern option_t  sc3000_options;
 extern int       sms_exec(char *target);
 extern option_t  sms_options;
 
+extern int       spc1000_exec(char *target);
+extern option_t  spc1000_options;
+
 extern int       svi_exec(char *target);
 extern option_t  svi_options;
 
@@ -318,6 +321,10 @@ struct {
       "Glue several output binaries into a single binary representing memory",
        NULL,
        glue_exec, &glue_options },
+    { "bin2spc",   "spc1000",   "(C) 2018 Dominic Morris",
+      "Create a .SPC file suitable for emulators",
+      NULL,
+      spc1000_exec,    &spc1000_options },
     { "dgos",   "srr",       "(C) 2011, 2017 Stefano Bodrato",
       "DGOS, KCS variant for Sorcerer Exidy and Microbee, also WAV format",
       NULL,

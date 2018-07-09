@@ -23,16 +23,17 @@ _msx_set_border:
 	call	l_push_di
 	ld	a,e
 	ld	(RG0SAV+7),a
-IF VDP_CMD > 255
-        ld      (VDP_CMD),a
+IF VDP_CMD < 0
+        ld      (-VDP_CMD),a
 ELSE
-        out     (VDP_CMD),a
+	ld	bc,VDP_CMD
+	out	(c),a
 ENDIF
 	ld	a,$87
-IF VDP_CMD > 255
-        ld      (VDP_CMD),a
+IF VDP_CMD < 0
+        ld      (-VDP_CMD),a
 ELSE
-        out     (VDP_CMD),a
+        out     (c),a
 ENDIF
 	call	l_pop_ei
 	ret

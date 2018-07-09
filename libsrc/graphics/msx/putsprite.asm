@@ -167,15 +167,15 @@
 ._edge
          push     af
 ;**************
-IF VDP_DATA > 255
+IF VDP_DATA < 0
 	ld	a,l
-	ld	(VDP_CMD),a
+	ld	(-VDP_CMD),a
 	ld	a,h
 	and	@00111111
 	or	@01000000
-	ld	(VDP_CMD),a
+	ld	(-VDP_CMD),a
 	ld	a,(pixelbyte)
-	ld	(VDP_DATA),a
+	ld	(-VDP_DATA),a
 ELSE
          ld       a,l		; LSB of video memory ptr
          out      (VDP_CMD),a
@@ -195,13 +195,13 @@ ENDIF
 ;.nozh
          ;inc      hl                ;Go to next byte
 ;**************
-IF VDP_DATA > 255
+IF VDP_DATA < 0
 	ld	a,l
-	ld	(VDP_CMD),a
+	ld	(-VDP_CMD),a
 	ld	a,h
 	and	@00111111
-	ld	(VDP_CMD),a
-	ld	a,(VDP_DATAIN)
+	ld	(-VDP_CMD),a
+	ld	a,(-VDP_DATAIN)
 ELSE
          ld       a,l		; LSB of video memory ptr
          out      (VDP_CMD), a
@@ -218,15 +218,15 @@ ENDIF
 ._row
 	push	af
 ;**************
-IF VDP_DATA > 255
+IF VDP_DATA < 0
 	ld	a,l
-	ld	(VDP_CMD),a
+	ld	(-VDP_CMD),a
 	ld	a,h
 	and	@00111111
 	or	@01000000
-	ld	(VDP_CMD),a
+	ld	(-VDP_CMD),a
 	ld	a,(pixelbyte)
-	ld	(VDP_DATA),a
+	ld	(-VDP_DATA),a
 ELSE
          ld       a,l		; LSB of video memory ptr
          out      (VDP_CMD),a

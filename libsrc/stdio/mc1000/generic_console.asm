@@ -11,12 +11,12 @@
                 PUBLIC          generic_console_set_inverse
 
 		PUBLIC		__mc1000_mode
-		PUBLIC		__mc1000_font
-		PUBLIC		__mc1000_udg
 
 		EXTERN		ansi_cls
 		EXTERN		ansi_SCROLLUP
 
+		EXTERN		generic_console_font32
+		EXTERN		generic_console_udg32
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
 		EXTERN		CRT_FONT
@@ -87,11 +87,11 @@ hires_printc:
 	ex	af,af		;save port
 	ld	l,d
 	ld	h,0
-	ld	de,(__mc1000_font)
+	ld	de,(generic_console_font32)
 	bit	7,l
 	jr	z,not_udg
 	res	7,l		;take off 128
-	ld	de,(__mc1000_udg)
+	ld	de,(generic_console_udg32)
 	inc	d		;We decrement later
 not_udg:
 	add	hl,hl
@@ -179,5 +179,3 @@ generic_console_scrollup_3:
 	SECTION	data_clib
 
 __mc1000_mode:	defb	0x00		; lores mode 0x9e		;hires mode
-__mc1000_font:	defw	CRT_FONT
-__mc1000_udg:	defw	0

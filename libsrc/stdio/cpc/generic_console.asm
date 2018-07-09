@@ -13,8 +13,8 @@
 	PUBLIC	generic_console_calc_screen_address
 
 	PUBLIC	__cpc_mode
-	PUBLIC	__cpc_font
-	PUBLIC	__cpc_udg
+	EXTERN	generic_console_font32
+	EXTERN	generic_console_udg32
 
 	EXTERN	generic_console_flags2
 	EXTERN	CRT_FONT
@@ -116,11 +116,11 @@ scrollup_3:
 ; a = d character to print
 ; e = raw
 generic_console_printc:
-	ld	de,(__cpc_font)
+	ld	de,(generic_console_font32)
 	bit	7,a
 	jr	z,not_udg
 	sub	128 - 32
-	ld	de,(__cpc_udg)
+	ld	de,(generic_console_udg32)
 not_udg:
 	sub	32
 	ld	l,a
@@ -128,7 +128,7 @@ not_udg:
 	add	hl,hl
 	add	hl,hl
 	add	hl,hl
-	ld	de,(__cpc_font)
+	ld	de,(generic_console_font32)
 	add	hl,de
 	push	hl		;Save font
 	call	generic_console_calc_screen_address
@@ -350,8 +350,6 @@ mode0_table:
 	SECTION	data_clib
 
 .__cpc_mode	defb	1
-.__cpc_font	defw	CRT_FONT
-.__cpc_udg	defw	0
 ; Mode 0 equivalents of ink/paper
 .__cpc_ink0	defb	@10001000
 .__cpc_paper0	defb	@00000000
