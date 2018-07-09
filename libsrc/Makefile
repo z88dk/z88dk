@@ -86,6 +86,7 @@ tideps:
 	@$(RM) -f games/*.o
 	@$(RM) -f games/ticalc/*.o
 	@$(RM) -f graphics/*.o
+	@$(RM) -f graphics/*/*.o
 	@$(RM) -f graphics/ticalc/*.o
 	@$(RM) -f graphics/gray/*.o
 	@$(RM) -f graphics/gray/ticalc/*.o
@@ -114,6 +115,7 @@ zx81deps:
 	@$(RM) -f input/zx81/*.o
 	@$(RM) -f games/zx81/*.o
 	@$(RM) -f graphics/*.o
+	@$(RM) -f graphics/*/*.o
 	@$(RM) -f graphics/zx81/*.o
 	@$(RM) -f graphics/zx81/hr/*.o
 	@$(RM) -f graphics/zx81/udg/*.o
