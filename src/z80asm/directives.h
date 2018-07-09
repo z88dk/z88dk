@@ -82,8 +82,9 @@ extern void asm_DEFS(int count, int fill);
 extern void asm_DEFB_str(const char *str, int length);
 extern void asm_DEFB_expr(struct Expr *expr);
 
-/* DEFW, DEFQ - add 2-byte and 4-byte expressions */
+/* DEFW, DEFQ, DEFDB - add 2-byte and 4-byte expressions */
 extern void asm_DEFW(struct Expr *expr);
+extern void asm_DEFDB(struct Expr *expr); // big-endian word
 extern void asm_DEFQ(struct Expr *expr);
 
 /* align directive */

@@ -348,11 +348,16 @@ void asm_DEFB_expr(Expr *expr)
 }
 
 /*-----------------------------------------------------------------------------
-*   DEFW, DEFQ - add 2-byte and 4-byte expressions
+*   DEFW, DEFQ, DEFDB - add 2-byte and 4-byte expressions
 *----------------------------------------------------------------------------*/
 void asm_DEFW(Expr *expr)
 {
 	Pass2infoExpr(RANGE_WORD, expr);
+}
+
+void asm_DEFDB(Expr *expr)
+{
+	Pass2infoExpr(RANGE_WORD_BE, expr);
 }
 
 void asm_DEFQ(Expr *expr)
