@@ -27,31 +27,31 @@ l_z180_mulu_40_32x8:
    ld l,c                       ;'p0
    ld a,b                       ;'p1 carry
    ex af,af
-   
+
    ld c,h                       ; x1
    ld b,a
    mlt bc                       ; y*x1
-   
+
    ex af,af
    add a,c
    ld h,a                       ;'p1
    ld a,b                       ;'p2 carry
    ex af,af
-   
+
    ld c,e
    ld b,a
    mlt bc                       ; y*x2
-   
+
    ex af,af
    adc a,c
    ld e,a                       ;'p2
    ld a,b                       ;'p3 carry
    ex af,af
-   
+
    ld c,d
    ld b,a
    mlt bc                       ; y*x3
-   
+
    ex af,af
    adc a,c
    ld d,a                       ;'p3

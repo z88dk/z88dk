@@ -98,7 +98,7 @@ define(`__IO_I2C_IMODE_STD',  0x00)             # Standard mode
 define(`__IO_I2C_IMODE_FAST',  0x01)            # Fast mode
 define(`__IO_I2C_IMODE_FASTP',  0x02)           # Fast Plus mode
 define(`__IO_I2C_IMODE_TURBO',  0x03)           # Turbo mode
-define(`__IO_I2C_IMODE_CR',  0x07)              # Clock Rate (MASK)
+define(`__IO_I2C_IMODE_MASK',  0x03)            # Clock Rate (MASK)
 
 #
 # END OF CONFIGURATION
@@ -182,7 +182,7 @@ PUBLIC `__IO_I2C_IMODE_STD'
 PUBLIC `__IO_I2C_IMODE_FAST'
 PUBLIC `__IO_I2C_IMODE_FASTP'
 PUBLIC `__IO_I2C_IMODE_TURBO'
-PUBLIC `__IO_I2C_IMODE_CR'
+PUBLIC `__IO_I2C_IMODE_MASK'
 ')
 
 dnl#
@@ -261,7 +261,7 @@ defc `__IO_I2C_IMODE_STD' = __IO_I2C_IMODE_STD
 defc `__IO_I2C_IMODE_FAST' = __IO_I2C_IMODE_FAST
 defc `__IO_I2C_IMODE_FASTP' = __IO_I2C_IMODE_FASTP
 defc `__IO_I2C_IMODE_TURBO' = __IO_I2C_IMODE_TURBO
-defc `__IO_I2C_IMODE_CR' = __IO_I2C_IMODE_CR
+defc `__IO_I2C_IMODE_MASK' = __IO_I2C_IMODE_MASK
 ')
 
 dnl#
@@ -343,5 +343,5 @@ ifdef(`CFG_C_DEF',
 `#define' `__IO_I2C_IMODE_FAST'  __IO_I2C_IMODE_FAST
 `#define' `__IO_I2C_IMODE_FASTP'  __IO_I2C_IMODE_FASTP
 `#define' `__IO_I2C_IMODE_TURBO'  __IO_I2C_IMODE_TURBO
-`#define' `__IO_I2C_IMODE_CR'  __IO_I2C_IMODE_CR
+`#define' `__IO_I2C_IMODE_MASK'  __IO_I2C_IMODE_MASK
 ')

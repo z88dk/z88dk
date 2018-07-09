@@ -30,31 +30,31 @@ l_z80_zxn_mulu_72_64x8:
    ld l,e                       ;'p0
    ld a,d                       ;'p1 carry
    ex af,af
-   
+
    ld e,h                       ; x1
    ld d,a
    mul de                       ; y*x1
-   
+
    ex af,af
    add a,e
    ld h,a                       ;'p1
    ld a,d                       ;'p2 carry
    ex af,af
-   
+
    ld e,c
    ld d,a
    mul de                       ; y*x2
-   
+
    ex af,af
    adc a,e
    ld c,a                       ;'p2
    ld a,d                       ;'p3 carry
    ex af,af
-   
+
    ld e,b
    ld d,a
    mul de                       ; y*x3
-   
+
    ex af,af
    adc a,e
    ld b,a                       ;'p3
@@ -111,6 +111,6 @@ l_z80_zxn_mulu_72_64x8:
 
    ld d,b                       ; return DE
    ld e,c
-   
+
    exx
    ret
