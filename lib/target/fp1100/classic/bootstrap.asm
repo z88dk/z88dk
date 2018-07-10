@@ -33,7 +33,7 @@ load_loop:
 	jr	z,load_complete
 	ex	af,af
 	ld	a,b
-	cp	$10		;End of track
+	cp	$20		;End of track (2 heads)
 	jr	z,increment_track
 	ex	af,af
 	jr	load_loop
@@ -56,5 +56,6 @@ print_banner:
 
 banner:
 	defb	"z88dk FP-1100 Bootstrap - Loading"
+	defb	13
 	defb	0
 
