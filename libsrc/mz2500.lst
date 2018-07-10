@@ -1,0 +1,5 @@
+stdio/mz2500/fgetc_cons
+stdio/mz2500/fputc_cons
+stdio/mz2500/getk
+@stdio/stdio.lst
+@z80.lst
