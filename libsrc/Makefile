@@ -18,17 +18,16 @@ all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	aussie.lib bee_clib.lib microbee.lib c7420_clib.lib \
 	cpm_clib.lib einstein.lib gal_clib.lib \
 	g800_clib.lib m5_clib.lib mc1000_clib.lib \
-	msx_clib.lib mtx_clib.lib mz_clib.lib  \
+	msx_clib.lib mtx_clib.lib mz_clib.lib mz2500_clib.lib x1ansi_clib.lib \
 	nascom_clib.lib  newbrain_clib.lib \
 	osca_clib.lib ozansi_clib.lib pacman_clib.lib p2000_clib.lib  \
 	pc6001_clib.lib pps_clib.lib px4.lib px8.lib \
-	rex_clib.lib sc3000_clib.lib sms_clib.lib lynx_clib.lib \
+	rex_clib.lib rx78_clib.lib sc3000_clib.lib sms_clib.lib lynx_clib.lib \
 	svi_clib.lib sam_clib.lib  sorcerer_clib.lib  sos_clib.lib tiki100.lib \
 	trs80_clib.lib vg5k_clib.lib vz_clib.lib  x07_clib.lib \
 	embedded_clib.lib test_clib.lib testrcm_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
 	pv1000_clib.lib pv2000_clib.lib coleco_clib.lib multi8_clib.lib alphatro_clib.lib  spc1000_clib.lib \
-	rx78_clib.lib \
-	preempt.lib x1ansi_clib.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib
+	preempt.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib gendos.lib ndos.lib  \
 	 im2.lib lib3d.lib x11.lib fastmath.lib
@@ -590,6 +589,14 @@ mz_clib.lib:
 	$(MAKE) -C games TARGET=mz
 	$(call buildgeneric,mz)
 	TARGET=mz TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmz -x$(OUTPUT_DIRECTORY)/mz_clib @$(LISTFILE_DIRECTORY)/mz.lst
+
+# Sharp MZ2500 lib - Stefano
+mz2500_clib.lib:
+	@echo ''
+	@echo '--- Building Sharp MZ-2500 Library ---'
+	@echo ''
+	$(call buildgeneric,mz2500)
+	TARGET=mz2500 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmz2500 -x$(OUTPUT_DIRECTORY)/mz2500_clib @$(LISTFILE_DIRECTORY)/mz2500.lst
 
 # ABC80 Library - Stefano
 abc80_clib.lib:
