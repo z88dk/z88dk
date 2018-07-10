@@ -87,9 +87,10 @@ IF CRT_ENABLE_STDIO = 1
         call    closeall
 ENDIF
 
-	push    hl				; return code
-
-	rst	0
+	;push    hl				; return code
+	
+	di
+	halt
 
 cleanup_exit:
 	ret
