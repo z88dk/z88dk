@@ -14,10 +14,12 @@
 #include "appmake.h"
 #include <stdlib.h>
 #include <stdint.h>
-#include <inttypes.h>
 #include <time.h>
 #include "../config.h"
 
+#ifndef _MSC_VER
+#include <inttypes.h>
+#endif
 
 #if (__GNUC__ || _BSD_SOURCE || _SVID_SOURCE || _XOPEN_SOURCE >= 500)
 #include <unistd.h>
