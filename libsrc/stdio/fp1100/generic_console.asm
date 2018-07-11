@@ -68,8 +68,18 @@ generic_console_scrollup:
 ; e = raw
 generic_console_printc:
 	push	af
+	ld	hl,__lastxy
+	ld	a,(hl)
+	cp	c
+	jr	nz,set_position
+	inc	hl
+	cp	b
+	jr	z,skip_position
+set_position:
+	ld	(__lastxy),bc
 	ld	a,SUB_SETXY
 	call	TRNC3
+skip_position:
 	pop	af
 	ld	b,a
 	ld	a,SUB_PRINTCHAR
@@ -92,4 +102,5 @@ generic_console_vpeek:
 __attr:		defb	0x07
 		defb	0x00
 
-
+	SECTION		bss_clib
+__lastxy:	defw	-1
