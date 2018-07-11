@@ -32,6 +32,8 @@
 
 	defc	PRCRT = 0x74F		;Print a to console
 
+	defc	DEFCHR = 0x77e		;Define a UDG, hl = address, which char??
+
 	; Communicate with SubCPU, a = cmd
 	defc	TRNC1 = 0x0afb		; No parameters
 	defc	TRNC2 = 0x0b00		; 1 Paramter in b
