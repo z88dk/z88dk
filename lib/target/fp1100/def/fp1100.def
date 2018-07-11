@@ -24,3 +24,8 @@
 	defc		SUB_SETXY = 18		; b = x, c = y
 	defc		SUB_COLOUR = 19		; ??
 
+
+	defc		TRNC1 = 0x0afb		; No parameters
+	defc		TRNC2 = 0x0b00		; 1 Paramter in b
+	defc		TRNC3 = 0x0b09		; Parameter in bc
+	defc		TRNCx = 0x0b16		; b = num params, hl=address

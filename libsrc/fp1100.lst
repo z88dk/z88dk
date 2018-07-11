@@ -1,3 +1,4 @@
+stdio/fp1100/generic_console
 stdio/fp1100/fputc_cons_native
 @stdio/stdio.lst
 @z80.lst

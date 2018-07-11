@@ -27,8 +27,8 @@
 
 	defc	CRT_ORG_CODE = 0x0cc00
 
-	defc	CONSOLE_ROWS = 40
-	defc	CONSOLE_COLUMNS = 24
+	defc	CONSOLE_ROWS = 24
+	defc	CONSOLE_COLUMNS = 40
 
 	defc	CRT_KEY_DEL = 12
 
