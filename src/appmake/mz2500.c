@@ -1,5 +1,5 @@
 /*
- *      Create a 640KB (655.360 bytes) boot disk image compatible to the Sharp MZ2500 computer family
+ *      Create a 320KB boot disk image compatible to the Sharp MZ2500 computer family
  *
  *      $Id: mz2500.c $
  */
@@ -61,13 +61,12 @@ void writeword_xor(unsigned int i, FILE *fp)
 int mz2500_exec(char *target)
 {
     char    filename[FILENAME_MAX+1];
-	char    name[14];
+    char    name[14];
     FILE   *fpin;
     FILE   *fpout;
     int     len,namelen;
-	int i,c;
-    int        pos;
-	long l;
+    int     i,j,c;
+    int     pos;
 
     if ( help )
         return -1;
@@ -93,7 +92,7 @@ int mz2500_exec(char *target)
     //for (p = filename; *p !='\0'; ++p)
     //   *p = toupper(*p);
 
-    suffix_change(filename,".RAW");
+    suffix_change(filename,".2D");
 
     namelen=strlen(filename)-1;
 
@@ -141,16 +140,15 @@ int mz2500_exec(char *target)
 	writebyte_xor(1,fpout);						/* OBJ (machine language program) */
 	writestring_xor("IPLPRO",fpout);			/* Boot file marker */
 
-	if (strlen(blockname) >= 9 )			/* startup label (JIS X 0201 encoding) */
+	if (strlen(blockname) >= 10 )			/* startup label (JIS X 0201 encoding) */
 	{
-		strncpy(name,blockname,9);
+		strncpy(name,blockname,10);
 	} else {
 		strcpy(name,blockname);
-		strncat(name,"         ",9-strlen(blockname));
+		strncat(name,"          ",10-strlen(blockname));
 	}
 	writestring_xor(name,fpout);
 	writebyte_xor(0x0d,fpout);						/* File name termination */
-	writebyte_xor(0,fpout);						/* filename termination ? */
 
 	writebyte_xor(0,fpout);						/* "normal file" attribute (no protection) */
 	writebyte_xor(0,fpout);						/* unused */
@@ -163,25 +161,28 @@ int mz2500_exec(char *target)
 	writebyte_xor(0,fpout);						/* year */
 	writebyte_xor(0,fpout);						/* month/day */
 	writebyte_xor(0,fpout);						/* day/time */
-	writebyte_xor(0xff,fpout);					/* time/minute */
+	writebyte_xor(0,fpout);						/* time/minute */
 	
-	writeword_xor(0x30,fpout);					/* start sector */
+	writeword_xor(0x30,fpout);					/* start sector ? */
 
 	
-	/* empty directory entry */
+	writebyte_xor(12,fpout);					/* Memory bank: 11..13 for $6000, $8000 or $A000 */
 	
-	writebyte_xor(0x0c,fpout);
 	writebyte_xor(0xff,fpout);
 	for	(i=1;i<=14;i++)
 		writebyte_xor(0,fpout);
-	writebyte_xor(0x08,fpout);
-	writebyte_xor(0x09,fpout);
-	writebyte_xor(0x0a,fpout);
-	writebyte_xor(0x0b,fpout);
-	writebyte_xor(0x0c,fpout);
-	writebyte_xor(0x0d,fpout);
-	writebyte_xor(0x0e,fpout);
-	writebyte_xor(0xff,fpout);
+	
+	/* memory bank organization at boot */
+	writebyte_xor(8,fpout);
+	writebyte_xor(9,fpout);
+	writebyte_xor(10,fpout);
+	writebyte_xor(11,fpout);
+	writebyte_xor(12,fpout);
+	writebyte_xor(13,fpout);
+	writebyte_xor(14,fpout);
+	writebyte_xor(15,fpout);
+	
+	
 	for	(i=1;i<=200;i++)
 		writebyte_xor(0,fpout);
 
@@ -197,7 +198,7 @@ int mz2500_exec(char *target)
 	}
 
 	/* filler */
-	for	(i=1;i<=(0xA0000-len-0x2000);i++)
+	for	(i=1;i<=(0x50000-len-0x2000);i++)
 		writebyte_xor(0,fpout);
 
 
