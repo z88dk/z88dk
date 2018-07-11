@@ -19,8 +19,26 @@
 
 generic_console_ioctl:
 	scf
-generic_console_set_inverse:
 	ret
+
+generic_console_set_inverse:
+	ld	a,(__inverse)
+	ld	b,a
+	ld	a,0
+	bit	7,(hl)
+	jr	z,inverse_off
+	inc	a
+inverse_off:
+	cp	b
+	ret	z		;No change to inverse
+	ld	(__inverse),a
+	ld	a,(__attr)
+	rrca
+	rrca
+	rrca
+	rrca
+	ld	(__attr),a
+	jr	set_colour
 
 generic_console_set_ink:
 	and	7
@@ -104,3 +122,4 @@ __attr:		defb	0x07
 
 	SECTION		bss_clib
 __lastxy:	defw	-1
+__inverse:	defb	0
