@@ -137,7 +137,8 @@ int mz2500_exec(char *target)
 
 	/* Disk block #2 (directory) */
 
-	writebyte_xor(1,fpout);						/* OBJ (machine language program) */
+	writebyte_xor(1,fpout);						/* OBJ (machine language program), 
+													or boot sector for disk model '1': MZ-80B/2000/2200/2500  */
 	writestring_xor("IPLPRO",fpout);			/* Boot file marker */
 
 	if (strlen(blockname) >= 10 )			/* startup label (JIS X 0201 encoding) */
@@ -153,8 +154,9 @@ int mz2500_exec(char *target)
 	writebyte_xor(0,fpout);						/* "normal file" attribute (no protection) */
 	writebyte_xor(0,fpout);						/* unused */
 	
-	writeword_xor(len,fpout);					/* file size */
-	writeword_xor(pos,fpout);					/* load address */
+	writeword_xor(len,fpout);					/* file size? ..no effect if changed !! */	
+	writeword_xor(pos,fpout);					/* load address? ..no effect if changed !! */
+	
 	writeword_xor(pos,fpout);					/* exec address */
 	
 	
@@ -163,24 +165,26 @@ int mz2500_exec(char *target)
 	writebyte_xor(0,fpout);						/* day/time */
 	writebyte_xor(0,fpout);						/* time/minute */
 	
-	writeword_xor(0x30,fpout);					/* start sector ? */
-
+	writeword_xor(0x30,fpout);					/* "start sector"?, seems rather to be a relative offset to the "memory bank organization" below */
 	
-	writebyte_xor(12,fpout);					/* Memory bank: 11..13 for $6000, $8000 or $A000 */
+	writebyte_xor(12,fpout);					/* Memory bank: 9..15 for $2000..$E000 */
+	//writebyte_xor(13,fpout);					/* next Memory bank ? */
 	
-	writebyte_xor(0xff,fpout);
+	
+	writebyte_xor(0xff,fpout);					/* load sequence termination ? */
+	
 	for	(i=1;i<=14;i++)
 		writebyte_xor(0,fpout);
-	
-	/* memory bank organization at boot */
-	writebyte_xor(8,fpout);
-	writebyte_xor(9,fpout);
-	writebyte_xor(10,fpout);
-	writebyte_xor(11,fpout);
-	writebyte_xor(12,fpout);
-	writebyte_xor(13,fpout);
-	writebyte_xor(14,fpout);
-	writebyte_xor(15,fpout);
+
+	/* memory bank organization at boot (Mapping at start of execution ) */
+	writebyte_xor(8,fpout);		/* bank for $0000 */
+	writebyte_xor(9,fpout);		/* bank for $2000 */
+	writebyte_xor(10,fpout);	/* bank for $4000 */
+	writebyte_xor(11,fpout);	/* bank for $6000 */
+	writebyte_xor(12,fpout);	/* bank for $8000 */
+	writebyte_xor(13,fpout);	/* bank for $A000 */
+	writebyte_xor(14,fpout);	/* bank for $C000 */
+	writebyte_xor(15,fpout);	/* bank for $E000 */
 	
 	
 	for	(i=1;i<=200;i++)
