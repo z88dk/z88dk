@@ -1,31 +1,39 @@
-
+;
+; ROM + SubCPU communication for Casio FP-1100
+;
 
 
 	; No parameters
-	defc		SUB_SCROLLUP = 6	; 
-	defc		SUB_SCROLLDOWN = 7	;
+	defc	SUB_SCROLLUP = 6	; 
+	defc	SUB_SCROLLDOWN = 7	;
 
-	defc		SUB_CLS = 13
-	defc		SUB_LF = 14
-	defc		SUB_BS = 15
+	defc	SUB_CLS = 13
+	defc	SUB_LF = 14
+	defc	SUB_BS = 15
 
-	defc		SUB_BLINKON = 26
-	defc		SUB_BLINKOFF = 27
-	defc		SUB_BEEP = 28
-	defc		SUB_BEEPON = 0x1d
-	defc		SUB_BEEPOFF = 0x1d
+	defc	SUB_BLINKON = 26
+	defc	SUB_BLINKOFF = 27
+	defc	SUB_BEEP = 28
+	defc	SUB_BEEPON = 0x1d
+	defc	SUB_BEEPOFF = 0x1d
 
 	; 1 Parameter
-	defc		SUB_PRINTCHAR = 4		; b = character to print
-	defc		SUB_LPRINTCHAR = 31		; b = character to lprint
-	defc		SUB_SCREENSIZE = 33		; b = 1 = 80, 2 = 40 col
+	defc	SUB_PRINTCHAR = 4		; b = character to print
+	defc	SUB_LPRINTCHAR = 31		; b = character to lprint
+	defc	SUB_SCREENSIZE = 33		; b = 1 = 80, 2 = 40 col
 
 	; 2 parameters
-	defc		SUB_SETXY = 18		; b = x, c = y
-	defc		SUB_COLOUR = 19		; ??
+	defc	SUB_SETXY = 18		; b = x, c = y
+	defc	SUB_COLOUR = 19		; ??
 
 
-	defc		TRNC1 = 0x0afb		; No parameters
-	defc		TRNC2 = 0x0b00		; 1 Paramter in b
-	defc		TRNC3 = 0x0b09		; Parameter in bc
-	defc		TRNCx = 0x0b16		; b = num params, hl=address
+	; ROM routines
+	defc	SECRD = 0x356		;Read sector, hl= address, b=sector, c=track, e=0, d=drive
+
+	defc	PRCRT = 0x74F		;Print a to console
+
+	; Communicate with SubCPU, a = cmd
+	defc	TRNC1 = 0x0afb		; No parameters
+	defc	TRNC2 = 0x0b00		; 1 Paramter in b
+	defc	TRNC3 = 0x0b09		; Parameter in bc
+	defc	TRNCx = 0x0b16		; b = num params, hl=address

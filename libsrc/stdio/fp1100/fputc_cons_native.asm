@@ -1,7 +1,8 @@
 
 	MODULE	fputc_cons_native
 	SECTION	code_clib
-	
+
+        INCLUDE         "target/fp1100/def/fp1100.def"	
 	PUBLIC	fputc_cons_native
 	PUBLIC	_fputc_cons_native
 
@@ -15,6 +16,6 @@ _fputc_cons_native:
 	jr	nz,not_lf
 	ld	a,13
 not_lf:
-	call	$074f
+	call	PRCRT
 	ret
 
