@@ -25,6 +25,7 @@
 	ld	bc,$0100	;sector 1, track 0
 load_loop:
 	push	af
+	call	print_dot
 	call	$0356
 	inc	h
 	inc	b
@@ -45,6 +46,18 @@ increment_track:
 load_complete:
 	; The load is complete here, lets jump
 	jp	CRT_ORG_CODE
+
+print_dot:
+	push	de
+	push	bc
+	push	hl
+	ld	a,'.'
+	call	$074f
+	pop	hl
+	pop	bc
+	pop	de
+	ret
+
 
 print_banner:
 	ld	a,(hl)
