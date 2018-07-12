@@ -33,13 +33,13 @@ load_loop:
 	jr	z,load_complete
 	ex	af,af
 	ld	a,b
-	cp	$20		;End of track (2 heads)
+	cp	$10		;End of track (head 0)
 	jr	z,increment_track
 	ex	af,af
 	jr	load_loop
 increment_track:
 	ld	b,0
-	inc	c
+	inc	c		;Now, bump the track
 	ex	af,af
 	jr	load_loop
 load_complete:

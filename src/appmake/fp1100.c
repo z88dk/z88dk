@@ -99,10 +99,12 @@ int fp1100_exec(char *target)
         sector.r++;
         if ( sector.r == 0x11 ) {
             sector.r = 1;
-            sector.c++;
+            if ( sector.h == 1 ) {
+                sector.c++;
+            }
             sector.h ^= 1;
         }
-        if ( !feof(binary_fp) ) {
+        if ( sector.h == 0 && !feof(binary_fp) ) {
             fread(buf, 1, 256, binary_fp);
         } else {
             memset(buf, 0xe5, sizeof(buf));

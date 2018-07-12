@@ -1,4 +1,8 @@
-
+;
+; We keep a mirrored screen at 0x9000 - 80x24
+;
+;
+;
 
 		SECTION		code_clib
 
@@ -14,6 +18,8 @@
 		EXTERN		__console_w
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
+
+		defc		DISPLAY = 0x9000
 
 		INCLUDE		"target/fp1100/def/fp1100.def"
 
@@ -69,6 +75,11 @@ generic_console_set_paper:
 generic_console_cls:
 	ld	a,SUB_CLS
 	call	TRNC1
+	ld	hl,DISPLAY
+	ld	de,DISPLAY + 1
+	ld	bc, 80 * 24 - 1
+	ld	(hl),0
+	ldir
 	ret
 
 generic_console_scrollup:
@@ -76,6 +87,16 @@ generic_console_scrollup:
 	push	bc
 	ld	a,SUB_SCROLLUP
 	call	TRNC1
+        ld      hl, DISPLAY + 80
+        ld      de, DISPLAY
+        ld      bc, 80 * 23
+        ldir
+        ex      de,hl
+        ld      b,80
+generic_console_scrollup_3:
+        ld      (hl),32
+        inc     hl
+        djnz    generic_console_scrollup_3
 	pop	bc
 	pop	de
 	ret
@@ -85,12 +106,18 @@ generic_console_scrollup:
 ; a = d = character to print
 ; e = raw
 generic_console_printc:
+	push	bc
+	call	generic_console_xypos
+	ld	(hl),a
+	pop	bc
 	push	af
 	ld	hl,__lastxy
 	ld	a,(hl)
+	inc	a
 	cp	c
 	jr	nz,set_position
 	inc	hl
+	ld	a,(hl)
 	cp	b
 	jr	z,skip_position
 set_position:
@@ -111,8 +138,21 @@ skip_position:
 ;        a = character,
 ;        c = failure
 generic_console_vpeek:
-	scf
+	call	generic_console_xypos
+	ld	a,(hl)
+	and	a
 	ret
+
+generic_console_xypos:
+        ld      hl, DISPLAY - 80
+        ld      de,80
+        inc     b
+generic_console_printc_1:
+        add     hl,de
+        djnz    generic_console_printc_1
+generic_console_printc_3:
+        add     hl,bc                   ;hl now points to address in display
+        ret
 
 
 	SECTION		data_clib
