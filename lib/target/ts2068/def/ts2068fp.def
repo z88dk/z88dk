@@ -29,7 +29,6 @@ lstoff
 		DEFC	ZXFP_DELETE	= $02
 
 		DEFC	ZXFP_SUBTRACT	= $03		;; basck finds $E0 ???
-		DEFC	ZXFP_SUBTRACT	= $E0
 		DEFC	ZXFP_MULTIPLY	= $04
 		DEFC	ZXFP_DIVISION	= $05
 		DEFC	ZXFP_TO_POWER	= $06
@@ -130,4 +129,6 @@ lstoff
 		DEFC	ZXFP_CH_ADD	= $5C5D
 
 lston
+
+
 
