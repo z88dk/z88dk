@@ -9,6 +9,9 @@
 
 ;double atof(char *)     - convert string to number, leave in fa
 
+IF FORts2068
+		INCLUDE  "target/ts2068/def/ts2068fp.def"
+ENDIF
 IF FORzx
 		INCLUDE  "target/zx/def/zxfp.def"
 ENDIF
@@ -48,7 +51,7 @@ ENDIF
 		ld	a,(de)
 .noneg
 
-IF FORzx
+IF (FORzx | FORts2068)
 ELSE
 		ld	hl,txtbuffer
 		push	hl
