@@ -25,7 +25,7 @@
 ; Set an origin for the application (-zorg=) default to 32768
 ;--------
 
-	defc	CRT_ORG_CODE = 0xcc00
+	defc	CRT_ORG_CODE = 0xb000
 
 	defc	CONSOLE_ROWS = 24
 	defc	CONSOLE_COLUMNS = 40
