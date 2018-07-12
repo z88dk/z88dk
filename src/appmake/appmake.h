@@ -242,7 +242,7 @@ struct {
       "CPM disk image creation",
       cpm_longhelp,
       cpm_exec,     &cpm_options },
-    { "fp1100d88",  "fp1100",      "(C) 2018 Dominic Morris",
+    { "fp1kd88",  "fp1100",      "(C) 2018 Dominic Morris",
       "Creates a .d88 for the Casio FP-1100",
       NULL,
       fp1100_exec,   &fp1100_options },

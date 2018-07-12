@@ -317,9 +317,9 @@ Define rules for a ragel-based parser.
 				asm_DEFB_iter;
 
 	/*---------------------------------------------------------------------
-	*   DEFW / DEFQ
+	*   DEFW / DEFQ / DEFDB
 	*--------------------------------------------------------------------*/
-#foreach <OP> in DEFW, DEFQ
+#foreach <OP> in DEFW, DEFQ, DEFDB
 	asm_<OP>_iter =
 			asm_<OP>_next:
 				expr (_TK_COMMA | _TK_NEWLINE)
@@ -332,7 +332,7 @@ Define rules for a ragel-based parser.
 	asm_<OP> = 	label? _TK_<OP>	asm_<OP>_iter;
 #endfor  <OP>
 
-	directives_DEFx = asm_DEFS | asm_DEFB | asm_DEFW | asm_DEFQ;
+	directives_DEFx = asm_DEFS | asm_DEFB | asm_DEFW | asm_DEFQ | asm_DEFDB;
 	
 	/*---------------------------------------------------------------------
 	*   directives without arguments

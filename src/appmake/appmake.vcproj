@@ -263,7 +263,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\multi8.c"
+				>
+			</File>
+			<File
 				RelativePath=".\mz.c"
+				>
+			</File>
+			<File
+				RelativePath=".\mz2500.c"
 				>
 			</File>
 			<File
@@ -316,6 +324,10 @@
 			</File>
 			<File
 				RelativePath=".\sorcerer.c"
+				>
+			</File>
+			<File
+				RelativePath=".\spc1000.c"
 				>
 			</File>
 			<File

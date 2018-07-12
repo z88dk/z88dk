@@ -906,7 +906,7 @@
 #define __IO_I2C_IMODE_FAST  0x01
 #define __IO_I2C_IMODE_FASTP  0x02
 #define __IO_I2C_IMODE_TURBO  0x03
-#define __IO_I2C_IMODE_CR  0x07
+#define __IO_I2C_IMODE_MASK  0x03
 
 
 
