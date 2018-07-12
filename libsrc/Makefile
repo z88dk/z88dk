@@ -44,7 +44,7 @@ z88libs: z88_math.lib  z88_clib.lib net.lib
 
 tilibs: ti82_clib.lib ti83_clib.lib ti83p_clib.lib ti85_clib.lib ti86_clib.lib
 
-zxlibs: ts2068_clib.lib gfx2068hr.lib gfxspectrum.lib zx_clib.lib zxvgs.lib mzx.lib mzx_tiny.lib zxrom.lib zxfcntl
+zxlibs: ts2068_clib.lib gfx2068hr.lib gfxspectrum.lib zx_clib.lib zxvgs.lib mzx.lib mzx_tiny.lib m2068.lib zxrom.lib zxfcntl
 
 zx81libs: zx81_clib.lib gfx81.lib gfxlambda.lib gfx81udg.lib gfx81hr64.lib gfx81hr192.lib m81.lib m81_tiny.lib mlambda.lib mlambda_tiny.lib lambda_clib.lib
 
@@ -293,6 +293,13 @@ mzx_tiny.lib:
 	@echo '--- Building ZX Spectrum Tiny Maths Library ---'
 	@echo ''
 	$(MAKE) -C math/zxmath mzx_tiny
+
+# TS2068 maths library - Stefano
+m2068.lib:
+	@echo ''
+	@echo '--- Building Timex TS2068 Maths Library ---'
+	@echo ''
+	$(MAKE) -C math/zxmath m2068
 
 # PacMan lib - Stefano
 pacman_clib.lib:
