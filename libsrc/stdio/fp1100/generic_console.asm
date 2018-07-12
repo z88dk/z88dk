@@ -22,9 +22,34 @@
 		defc		DISPLAY = 0x9000
 
 		INCLUDE		"target/fp1100/def/fp1100.def"
+		INCLUDE		"ioctl.def"
 
 generic_console_ioctl:
+        ex      de,hl
+        ld      c,(hl)  ;bc = where we point to
+        inc     hl
+        ld      b,(hl)
+	cp      IOCTL_GENCON_SET_MODE
+        jr      nz,failure
+	ld	a,c
+	ld	b,2
+	ld	c,40
+	and	a
+	jr	z,setmode
+	ld	b,1
+	ld	c,80
+	dec	a
+	jr	z,setmode
+failure:
 	scf
+	ret
+
+setmode:
+	ld	a,c
+	ld	(__console_w),a
+	ld	a,SUB_SCREENSIZE
+	call	TRNC2
+	and	a
 	ret
 
 generic_console_set_inverse:
