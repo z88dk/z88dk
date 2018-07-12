@@ -10,6 +10,9 @@
 
 ; Support for boolean - save some byte
 
+IF FORts2068
+		INCLUDE  "target/ts2068/def/ts2068fp.def"
+ENDIF
 IF FORzx
 		INCLUDE  "target/zx/def/zxfp.def"
 ENDIF
@@ -27,7 +30,7 @@ ENDIF
 .f_yesno
 	call	ZXFP_FP_TO_BC
 
-IF FORzx
+IF (FORzx | FORts2068)
         ld	h,b
         ld	l,c
 ELSE
