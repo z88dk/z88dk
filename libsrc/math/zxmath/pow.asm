@@ -12,6 +12,9 @@
 ;
 
 
+IF FORts2068
+		INCLUDE  "target/ts2068/def/ts2068fp.def"
+ENDIF
 IF FORzx
 		INCLUDE  "target/zx/def/zxfp.def"
 ENDIF
