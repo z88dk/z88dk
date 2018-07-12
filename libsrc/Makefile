@@ -16,7 +16,7 @@ include Make.config
 all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	abc80_clib.lib abc800_clib.lib ace_clib.lib aquarius_clib.lib \
 	aussie.lib bee_clib.lib microbee.lib c7420_clib.lib \
-	cpm_clib.lib einstein.lib gal_clib.lib \
+	cpm_clib.lib einstein.lib fp1100_clib.lib gal_clib.lib \
 	g800_clib.lib m5_clib.lib mc1000_clib.lib \
 	msx_clib.lib mtx_clib.lib mz_clib.lib mz2500_clib.lib x1ansi_clib.lib \
 	nascom_clib.lib  newbrain_clib.lib \
@@ -882,7 +882,15 @@ rx78_clib.lib:
 	$(MAKE) -C games TARGET=rx78
 	TARGET=rx78 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORrx78 -x$(OUTPUT_DIRECTORY)/rx78_clib @$(LISTFILE_DIRECTORY)/rx78.lst
 
-# Triumph Adler Alphatronic PC - dom
+# Mitsubishi Multi8 - dom
+fp1100_clib.lib:
+	@echo ''
+	@echo '--- Building Casio FP-1100 Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(call buildgeneric,fp1100)
+	TARGET=fp1100 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORfp1100 -x$(OUTPUT_DIRECTORY)/fp1100_clib @$(LISTFILE_DIRECTORY)/fp1100.lst
+
 
 # Mitsubishi Multi8 - dom
 multi8_clib.lib:
