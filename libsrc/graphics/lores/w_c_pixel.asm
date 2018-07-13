@@ -11,13 +11,17 @@
 ; Entry h = x
 ;       l = y
 ;
+
+IF maxx / 4 <> 256
 	ld	a,h
 	cp	maxx / 4
 	ret	nc
+ENDIF
+IF maxx / 4 <> 256
 	ld	a,l
 	cp	maxy / 4
 	ret	nc
-
+ENDIF
 	ex	de,hl
 	ld	l,e
 	ld	h,0
