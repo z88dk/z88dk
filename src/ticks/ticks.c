@@ -1376,13 +1376,17 @@ int main (int argc, char **argv){
           sp += (get_memory(pc++)^128)-128; // TODO: Carry
         } else {
           st+= 4;
-          if ( isz180() )
-            t = 0;
-          else
-            t= (fr^fa^fb^fb>>8) & 16;  // H flag
+          t= (fr^fa^fb^fb>>8) & 16;  // H flag
           u= 0;		// incr
-          (a |ff&256)>0x99 && (u= 0x160); // Carry flag - ignore it on a z180()
-          (a&15 | t)>9 && (u+= 6);
+          if ( isz180() ) {
+            if ( t || (!(fb&512) && (a&0x0f) > 0x9) )
+               u |= 6;
+            if ( (ff & 256) || (!(fb&512) && a > 0x99) )
+               u |= 0x160;
+          } else {
+            (a |ff&256)>0x99 && (u= 0x160); 
+            (a&15 | t)>9 && (u+= 6);
+          }
           fa= a|256;
           if( fb&512) // N (subtract) flag set
             a-= u,
