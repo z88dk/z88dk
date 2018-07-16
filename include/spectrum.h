@@ -193,6 +193,9 @@ extern int  __LIB__  zx_syntax(char *statement) __z88dk_fastcall;
 // calling C program when STOP or end of program will happen
 extern int  __LIB__  zx_goto(int line) __z88dk_fastcall;
 
+// executes a single BASIC line (also TS2068 but does not work in 128k mode)
+extern int  __LIB__  zx_line(int line) __z88dk_fastcall;
+
 // set/get string variable values, e.g. for A$: zx_setstr('a',"hello");
 extern int  __LIB__              zx_getstr(char variable, char *value) __smallc;
 extern void __LIB__              zx_setstr(char variable, char *value) __smallc;
