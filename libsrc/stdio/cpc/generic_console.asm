@@ -16,7 +16,7 @@
 	EXTERN	generic_console_font32
 	EXTERN	generic_console_udg32
 
-	EXTERN	generic_console_flags2
+	EXTERN	generic_console_flags
 	EXTERN	CRT_FONT
 	EXTERN	conio_map_colour
 
@@ -148,7 +148,7 @@ handle_mode1:
 	ld	b,8
 handle_mode1_0:
 	push	bc
-	ld      a,(generic_console_flags2)
+	ld      a,(generic_console_flags)
 	rlca		;get bit 7 out
 	sbc	a
         ld      c,a	; c = 0/ c = 255
@@ -193,7 +193,7 @@ is_paper_m1:
 
 handle_mode2:
 	ld	b,8
-        ld      a,(generic_console_flags2)
+        ld      a,(generic_console_flags)
         ld      c,a
 handle_mode2_1:
 	ld	a,(de)
@@ -214,7 +214,7 @@ handle_mode0:
 	; b7    b6    b5    b4    b3    b2    b1    b0
 	; p0-b0 p1-b0 p1-b2 p1-b2 p0-b1 p1-b1 p0-b3 p1-b3
 handle_mode0_0:
-	ld      a,(generic_console_flags2)
+	ld      a,(generic_console_flags)
 	rlca		;get bit 7 out
 	sbc	a
         ld      c,a	; c = 0/ c = 255
