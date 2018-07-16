@@ -40,7 +40,13 @@ _zx_goto:
 	xor	a
 	ld	($5c44),a	; Position within line
 	call	call_rom3
+IF FORts2068
+	defw	$1AEC		; LINE-NEW: enter BASIC
+ELSE
 	defw	$1b9e		; Enter BASIC
+ENDIF
+	
+	
 	pop	bc
 	ld	hl,0
 	jr	exitgoto
