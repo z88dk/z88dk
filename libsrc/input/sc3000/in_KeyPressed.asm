@@ -15,6 +15,7 @@ PUBLIC _in_KeyPressed
 
 .in_KeyPressed
 ._in_KeyPressed
+	ld	c,@00001100
         in      a,($de)
         and     248
         or      6
@@ -24,12 +25,18 @@ PUBLIC _in_KeyPressed
 	jr	z,no_shift
 	bit	3,a
 	jr	nz,fail
+	res	3,c
 no_shift:
 	bit	6,l
 	jr	z,no_control
 	bit	2,a
 	jr	nz,fail
+	res	2,c
 no_control:
+	; Check that we don't have any unwanted modifiers
+	cpl
+	and	c
+	jr	nz,fail
 	; We've passed all requirements for modifiers, now find out what port
 	ld	a,l	; Select the key row
 	and	7

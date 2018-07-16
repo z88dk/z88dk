@@ -50,10 +50,11 @@ notfound:
 
 not_function_table:
 	cp	84
-	jr	c,shift
+	jr	c,not_shift
 	sub	84
 	set	7,l
 
+not_shift:
 ; Now we must divide by 12 to find out the row number
 	ld	c,0	;row number
 shift:

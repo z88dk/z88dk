@@ -16,11 +16,13 @@ EXTERN CLIB_KEYBOARD_ADDRESS
 
 .in_KeyPressed
 ._in_KeyPressed
+	ld	c,@00010111
 	bit	7,l
 	jr	z,noshift
 	ld	a,(CLIB_KEYBOARD_ADDRESS + 0x80)
 	and	@00000011
 	jr	z,fail		;shift not pressed
+	ld	c,@00010100
   
 .noshift
 	bit	6,l
@@ -28,8 +30,14 @@ EXTERN CLIB_KEYBOARD_ADDRESS
 	ld	a,(CLIB_KEYBOARD_ADDRESS + 0x80)
 	and	@00010100
 	jr	z,fail
+	res	2,c
+	res	4,c
 
 .noctrl
+	; Check that we've got the right number of modifier keys pressed
+	ld	a,(CLIB_KEYBOARD_ADDRESS + 0x80)
+	and	c
+	jr	nz,fail
 	ld	a,l
 	ld	b,1
 map_loop:
