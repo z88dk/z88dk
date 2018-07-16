@@ -188,11 +188,20 @@ extern int  __LIB__  ulaplus_get(unsigned char attribute) __z88dk_fastcall;
 ///////////////////////////////
 
 extern int  __LIB__  zx_syntax(char *statement) __z88dk_fastcall;
+
+// enter BASIC at a given program line, execution will stop gettin back to the
+// calling C program when STOP or end of program will happen
 extern int  __LIB__  zx_goto(int line) __z88dk_fastcall;
+
+// set/get string variable values, e.g. for A$: zx_setstr('a',"hello");
 extern int  __LIB__              zx_getstr(char variable, char *value) __smallc;
 extern void __LIB__              zx_setstr(char variable, char *value) __smallc;
+
+// set/get positive integer values in numeric variables
 extern int  __LIB__  zx_getint(char *variable) __z88dk_fastcall;
 extern void __LIB__              zx_setint(char *variable, int value) __smallc;
+
+// set/get FP values in numeric variables, e.g.  double a = zx_getfloat("number");
 extern double_t __LIB__  zx_getfloat(char *variable) __z88dk_fastcall;
 extern void __LIB__              zx_setfloat(char *variable, double_t value) __smallc;
 
