@@ -18,16 +18,22 @@ PUBLIC _in_KeyPressed
 	ld	a,0
 	out	(254),a
 	in	a,(254)
+	ld	c,@00010100
 	bit	6,l
 	jr	z,no_control
 	bit	2,a
 	jr	nz,fail
+	res	2,c
 no_control:
 	bit	7,l
 	jr	z,no_shift
 	bit	4,a
 	jr	nz, fail
+	res	4,c
 no_shift:
+	cpl		; Any erroneous modifiers pressed?
+	and	c
+	jr	nz,fail
 	ld	a,l
 	and	@00011111
 	out	(254),a
