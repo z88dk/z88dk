@@ -9,7 +9,7 @@
 ;
 ;	Debugged version by Antonio Schifano, 29/12/2008
 ;
-;	$Id: zx_getstr_callee.asm,v 1.6 2016-06-10 20:02:04 dom Exp $ 
+;	$Id: zx_getstr_callee.asm $ 
 ;
 
 SECTION code_clib
@@ -48,7 +48,11 @@ loop:	ld	a,(hl)
 
 	push	de
 	call	call_rom3
-	defw	$19b8			;get next variable start
+IF FORts2068
+	defw	$1720		; NEXT-ONE (find next variable)
+ELSE
+	defw	$19b8		; find next variable
+ENDIF
 	ex	de,hl
 	pop	de
 	jr	loop
