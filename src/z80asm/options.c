@@ -347,9 +347,30 @@ void expand_source_glob(const char *pattern)
 
 void expand_list_glob(const char *filename)
 {
-	argv_t *files = path_find_glob(filename);
-	for (char **p = argv_front(files); *p; p++) {
-		char *filename = *p;
+	if (strpbrk(filename, "*?") != NULL) {		// is a pattern
+		argv_t *files = path_find_glob(filename);
+		for (char **p = argv_front(files); *p; p++) {
+			char *filename = *p;
+			src_push();
+			{
+				char *line;
+
+				// append the directoy of the list file to the include path	and remove it at the end
+				argv_push(opts.inc_path, path_dir(filename));
+
+				if (src_open(filename, NULL)) {
+					while ((line = src_getline()) != NULL)
+						process_file(line);
+				}
+
+				// finished assembly, remove dirname from include path
+				argv_pop(opts.inc_path);
+			}
+			src_pop();
+		}
+		argv_free(files);
+	}
+	else {
 		src_push();
 		{
 			char *line;
@@ -367,7 +388,6 @@ void expand_list_glob(const char *filename)
 		}
 		src_pop();
 	}
-	argv_free(files);
 }
 
 /*-----------------------------------------------------------------------------
