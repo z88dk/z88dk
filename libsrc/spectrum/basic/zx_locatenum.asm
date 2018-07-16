@@ -9,7 +9,7 @@
 ;	Carry flag is set on error
 ;
 ;
-;	$Id: zx_locatenum.asm,v 1.7 2016-06-10 20:02:04 dom Exp $
+;	$Id: zx_locatenum.asm $
 ;
 ;	vars format:
 ;
@@ -72,7 +72,12 @@ vp:	ld	a,(hl)
 	
 v1:	push	bc
 	call    call_rom3
+IF FORts2068
+	defw	$1720		; NEXT-ONE (find next variable)
+ELSE
 	defw	$19b8		; find next variable
+ENDIF
+	
 	pop	bc
 	ex	de,hl
 	jr	vp

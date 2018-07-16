@@ -7,6 +7,7 @@ include ../Make.config
 
 
 all:
+	$(RM) -f basic/*.o*
 	$(MAKE) -C fzx
 	$(MAKE) -C tape clean
 	$(MAKE) -C tape 
