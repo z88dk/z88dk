@@ -15,16 +15,26 @@ PUBLIC _in_KeyPressed
 
 .in_KeyPressed
 ._in_KeyPressed
-	bit	7,l
-	jr	z,nocaps
 	in	a,($2a)
+	bit	7,l
+	jr	nz,check_shift
+	bit	2,a
+	jr	nz,fail
+	jr	consider_ctrl
+
+check_shift:
 	bit	2,a
 	jr	z,fail		;Shift not pressed
-  
-.nocaps
-	bit	6,l
-	jr	z,nofunc
+ 
+.consider_ctrl
 	in	a,($29)
+	bit	6,l
+	jr	nz,check_ctrl
+	bit	5,a
+	jr	nz,fail
+	jr	nofunc
+.check_ctrl
+	jr	z,nofunc
 	bit	5,a		;CTRL
 	jr	z,fail
 
