@@ -20,6 +20,7 @@
                 EXTERN          tms9918_set_inverse
 		EXTERN		generic_console_font32
 		EXTERN		generic_console_udg32
+		EXTERN		generic_console_flags
 
 
 		EXTERN		CONSOLE_COLUMNS
@@ -159,9 +160,16 @@ not_udg:
 	ex	de,hl		;de = font
 	; bc is already set 
 
+	; Set up the inverse state
+	ld	a,(generic_console_flags)
+	rlca
+	sbc	a,a		; So 0 / 255
+	ld	h,a
+
 	ld	l,8
 hires_printc_1:
 	ld	a,(de)
+	xor	h
 	out	(c),a
 	ld	a,c
 	add	32
