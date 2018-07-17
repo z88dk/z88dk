@@ -45,10 +45,10 @@ ENDIF
 		ld	bc,cmdlen
 		push	bc
 		push	de
-		call	call_rom3
 IF FORts2068
-		defw	$12BB		; MAKE-ROOM
+		call	$12BB		; MAKE-ROOM
 ELSE
+		call	call_rom3
 		defw	$1655		; MAKE-ROOM
 ENDIF
 		pop	hl
