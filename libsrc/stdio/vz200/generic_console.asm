@@ -18,10 +18,21 @@
 
 generic_console_ioctl:
 	scf
-generic_console_set_ink:
 generic_console_set_paper:
 generic_console_set_inverse:
 	ret
+
+generic_console_set_ink:
+	and	7
+	rlca
+	rlca
+	rlca
+	rlca
+	or	128
+	ld	(colour_mask),a
+	ret
+
+	
 
 generic_console_cls:
 	ld	hl, DISPLAY
@@ -36,7 +47,9 @@ generic_console_cls:
 ; a = character to print
 ; e = raw
 generic_console_printc:
+	push	de
 	call	xypos
+	pop	de
 	rr	e
 	call	nc,convert_character
 	ld	(hl),a
@@ -91,3 +104,7 @@ generic_console_scrollup_3:
 	pop	bc
 	pop	de
 	ret
+
+	SECTION	bss_clib
+
+colour_mask:	defb	0
