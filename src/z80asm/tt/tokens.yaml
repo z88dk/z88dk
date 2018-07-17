@@ -265,6 +265,9 @@ tokens:
   - name    : DEFVARS
   - name    : DEFW
   - name    : DEPHASE
+  - name    : ELIF
+  - name    : ELIFDEF
+  - name    : ELIFNDEF
   - name    : ELSE
   - name    : ENDIF
   - name    : EXTERN

@@ -36,11 +36,12 @@ static UT_icd ut_Sym_icd = { sizeof(Sym), NULL, NULL, NULL };
 *----------------------------------------------------------------------------*/
 typedef struct OpenStruct
 {
-	tokid_t	open_tok;			/* open token - TK_IF, TK_ELSE, ... */
-	const char *filename;			/* file and line where token found */
+	tokid_t	open_tok;			// open token - TK_IF, TK_ELSE, ...
+	const char *filename;		// file and line where token found
 	int		line_nr;
-	bool	active : 1;			/* in true branch of conditional compilation */
-	bool	parent_active : 1;	/* in true branch of parent's conditional compilation */
+	bool	active : 1;			// in true branch of conditional compilation
+	bool	parent_active : 1;	// in true branch of parent's conditional compilation
+	bool	elif_was_true : 1;	// true if any of the IF/ELIF branches returned true
 } OpenStruct;
 
 static UT_icd ut_OpenStruct_icd = { sizeof(OpenStruct), NULL, NULL, NULL };
@@ -285,16 +286,21 @@ static void free_tokens(ParseCtx *ctx)
 }
 
 /*-----------------------------------------------------------------------------
-*   IF, IFDEF, IFNDEF, ELSE, ENDIF
+*   IF, IFDEF, IFNDEF, ELSE, ELIF, ELIFDEF, ELIFNDEF, ENDIF
 *----------------------------------------------------------------------------*/
 static void start_struct(ParseCtx *ctx, tokid_t open_tok, bool condition)
 {
 	OpenStruct *parent_os, os;
 
+	// init to zeros
+	memset(&os, 0, sizeof(OpenStruct));
+
 	os.open_tok = open_tok;
 	os.filename = get_error_file();
 	os.line_nr = get_error_line();
 	os.active = condition;
+	if (os.active)
+		os.elif_was_true = true;
 
 	parent_os = (OpenStruct *)utarray_back(ctx->open_structs);
 	if (parent_os)
@@ -303,6 +309,36 @@ static void start_struct(ParseCtx *ctx, tokid_t open_tok, bool condition)
 		os.parent_active = true;
 
 	utarray_push_back(ctx->open_structs, &os);
+}
+
+static void continue_struct(ParseCtx *ctx, tokid_t open_tok, bool condition)
+{
+	OpenStruct *os = (OpenStruct *)utarray_back(ctx->open_structs);
+	if (!os)
+		error_unbalanced_struct();
+	else {
+		os->open_tok = open_tok;
+		os->active = condition && !os->elif_was_true;
+		if (os->active)
+			os->elif_was_true = true;
+	}
+}
+
+static bool check_if_condition(Expr *expr)
+{
+	int value;
+	bool condition;
+
+	// eval and discard expression, ignore errors
+	value = Expr_eval(expr, false);
+	if (value == 0)				// ignore expr->result.not_evaluable, as undefined values result in 0
+		condition = false;
+	else
+		condition = true;
+
+	OBJ_DELETE(expr);
+
+	return condition;
 }
 
 static bool check_ifdef_condition(char *name)
@@ -322,18 +358,7 @@ static bool check_ifdef_condition(char *name)
 
 static void asm_IF(ParseCtx *ctx, Expr *expr)
 {
-	int value;
-	bool condition;
-
-	/* eval and discard expression, ignore errors */
-	value = Expr_eval(expr, false);
-	if (value == 0)				/* ignore expr->result.not_evaluable, as undefined values result in 0 */
-		condition = false;
-	else
-		condition = true;
-
-	OBJ_DELETE(expr);
-
+	bool condition = check_if_condition(expr);
 	start_struct(ctx, TK_IF, condition);
 }
 
@@ -355,38 +380,59 @@ static void asm_IFNDEF(ParseCtx *ctx, char *name)
 
 static void asm_ELSE(ParseCtx *ctx)
 {
-	OpenStruct *open_struct;
+	OpenStruct *os;
 
-	open_struct = (OpenStruct *)utarray_back(ctx->open_structs);
-	if (open_struct == NULL)
+	os = (OpenStruct *)utarray_back(ctx->open_structs);
+	if (!os)
 		error_unbalanced_struct();
 	else
 	{
-		switch (open_struct->open_tok)
+		switch (os->open_tok)
 		{
 		case TK_IF:
 		case TK_IFDEF:
 		case TK_IFNDEF:
-			open_struct->active = !open_struct->active;
-			open_struct->open_tok = TK_ELSE;
+			os->active = !os->active && !os->elif_was_true;
+			os->open_tok = TK_ELSE;
 			break;
 
 		default:
-			error_unbalanced_struct_at(open_struct->filename, open_struct->line_nr);
+			error_unbalanced_struct_at(os->filename, os->line_nr);
 		}
 	}
 }
 
+static void asm_ELIF(ParseCtx *ctx, Expr *expr)
+{
+	asm_ELSE(ctx);
+	bool condition = check_if_condition(expr);
+	continue_struct(ctx, _TK_IF, condition);
+}
+
+static void asm_ELIFDEF(ParseCtx *ctx, char *name)
+{
+	asm_ELSE(ctx);
+	bool condition = check_ifdef_condition(name);
+	continue_struct(ctx, _TK_IFDEF, condition);
+}
+
+static void asm_ELIFNDEF(ParseCtx *ctx, char *name)
+{
+	asm_ELSE(ctx);
+	bool condition = !check_ifdef_condition(name);
+	continue_struct(ctx, _TK_IFDEF, condition);
+}
+
 static void asm_ENDIF(ParseCtx *ctx)
 {
-	OpenStruct *open_struct;
+	OpenStruct *os;
 
-	open_struct = (OpenStruct *)utarray_back(ctx->open_structs);
-	if (open_struct == NULL)
+	os = (OpenStruct *)utarray_back(ctx->open_structs);
+	if (!os)
 		error_unbalanced_struct();
 	else
 	{
-		switch (open_struct->open_tok)
+		switch (os->open_tok)
 		{
 		case TK_IF:
 		case TK_IFDEF:
@@ -396,7 +442,7 @@ static void asm_ENDIF(ParseCtx *ctx)
 			break;
 
 		default:
-			error_unbalanced_struct_at(open_struct->filename, open_struct->line_nr);
+			error_unbalanced_struct_at(os->filename, os->line_nr);
 		}
 	}
 }
@@ -436,7 +482,7 @@ static void parseline(ParseCtx *ctx)
 bool parse_file(const char *filename)
 {
 	ParseCtx *ctx;
-	OpenStruct *open_struct;
+	OpenStruct *os;
 	int num_errors = get_num_errors();
 
 	ctx = ParseCtx_new();
@@ -451,9 +497,9 @@ bool parse_file(const char *filename)
 			while (sym.tok != TK_END)
 				parseline(ctx);				/* before parsing it */
 
-			open_struct = (OpenStruct *)utarray_back(ctx->open_structs);
-			if (open_struct != NULL)
-				error_unbalanced_struct_at(open_struct->filename, open_struct->line_nr);
+			os = (OpenStruct *)utarray_back(ctx->open_structs);
+			if (os != NULL)
+				error_unbalanced_struct_at(os->filename, os->line_nr);
 		}
 	}
 	src_pop();
