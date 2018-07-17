@@ -64,8 +64,13 @@ vlcount:
 	ld	b,0
 	ld	hl,($5c59)      ; E_LINE
 	dec	hl		; now HL points to end of VARS
+IF FORts2068
+	call	$12BB		; MAKE-ROOM
+ELSE
 	call	call_rom3
 	defw	$1655		; MAKE-ROOM
+ENDIF
+
 	inc	hl
 	
 	pop	de		; point to VAR name
