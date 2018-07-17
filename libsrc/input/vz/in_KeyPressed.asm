@@ -17,17 +17,26 @@ PUBLIC _in_KeyPressed
 
 .in_KeyPressed
 ._in_KeyPressed
-	bit	7,l
-	jr	z,no_shift
 	ld	a,($68fb)
+	bit	7,l
+	jr	nz,check_shift
 	bit	2,a
 	jr	z,fail
-no_shift:
-	bit	6,l
-	jr	z,no_control
+	jr	start_control
+check_shift:
+	bit	2,a
+	jr	nz,fail
+
+start_control:
 	ld	a,($68fd)
+	bit	6,l
+	jr	nz,check_control
 	bit	2,a
 	jr	z,fail
+	jr	no_control
+check_control:
+	bit	2,a
+	jr	nz,fail
 no_control:
 	; We've passed all requirements for modifiers, now find out what port
 	ld	a,l

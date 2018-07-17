@@ -71,10 +71,16 @@ found_mask:
 	ld	a,e
 	or	b
 	ld	e,a		; e = mask + modifier flags
-	ld	b,0
-	ld	hl,port_table
-	add	hl,bc
-	ld	d,(hl)		; port to use
+
+	ld	d,@11111110
+	ld	a,c
+find_port_loop:
+	and	a
+	jr	z,got_port
+	rlc	d
+	dec	a
+	jr	find_port_loop
+got_port:
 	ex	de,hl		; and into correct return values
 	and	a
 	ret
@@ -83,7 +89,3 @@ notfound:
 	scf
 	ret
 
-	SECTION	rodata_clib
-
-port_table:
-	defb	0xfe, 0xfd, 0xfb, 0xf7, 0xef, 0xdf, 0xbf, 0x7f
