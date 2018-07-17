@@ -69,10 +69,10 @@ IF FORts2068
 ELSE
 	defw	$19b8		; find next variable
 ENDIF
-	call    call_rom3
 IF FORts2068
-	defw	$1750		; RECLAIM-2: reclaim space (delete)
+	call	$1750		; RECLAIM-2: reclaim space (delete)
 ELSE
+	call    call_rom3
 	defw	$19e8			; reclaim space (delete)
 ENDIF
 
@@ -102,10 +102,10 @@ store:
 	inc	bc
 	inc	bc
 	inc	bc
-	call    call_rom3
 IF FORts2068
-	defw	$12BB		; MAKE-ROOM
+	call	$12BB		; MAKE-ROOM
 ELSE
+	call    call_rom3
 	defw	$1655		; MAKE-ROOM
 ENDIF
 	pop	bc
