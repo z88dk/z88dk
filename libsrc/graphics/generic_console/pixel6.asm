@@ -93,7 +93,7 @@ ELSE
 			ld	a,(hl)
 			ld	c,(ix+2)
 			ld	b,(ix+3)
-			ld	e,0		;raw mode
+			ld	e,1		;raw mode
 			call	generic_console_printc
 ENDIF
 			pop	bc		;dump buffer

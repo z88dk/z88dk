@@ -52,6 +52,13 @@ generic_console_printc:
 	pop	de
 	rr	e
 	call	nc,convert_character
+	cp	128
+	jr	c,place_character
+	and	@10001111
+	ld	c,a
+	ld	a,(colour_mask)
+	or	c
+place_character:
 	ld	(hl),a
 	ret
 

@@ -57,8 +57,13 @@ ENDIF
 
 IF FORvz
 	DEFINE gotgfx
-	defc maxx	= 128
-	defc maxy	= 64
+	IF BLOCKgfx
+	    defc maxx	= 64
+      	    defc maxy	= 32
+	ELSE
+	    defc maxx	= 128
+      	    defc maxy	= 64
+	ENDIF
 ENDIF
 
 IF FORabc80

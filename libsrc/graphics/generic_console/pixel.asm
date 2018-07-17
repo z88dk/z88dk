@@ -71,7 +71,7 @@ ELSE
 		add	hl,de
 		ld	a,(hl)
 		pop	bc		;reduced coordinates
-		ld	e,0		;raw mode
+		ld	e,1		;raw mode
 		call	generic_console_printc
 ENDIF
 		pop	bc
