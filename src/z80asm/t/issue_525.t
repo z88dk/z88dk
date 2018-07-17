@@ -42,6 +42,6 @@ unlink "test.bin";
 run("z80asm -b -otest.bin \"test_dir/**/*.asm\"", 0, "", "");
 check_bin_file("test.bin", pack("C*", 1..4));
 
-#path("test_dir")->remove_tree;
-#unlink_testfiles();
+path("test_dir")->remove_tree;
+unlink_testfiles();
 done_testing();
