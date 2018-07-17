@@ -17,7 +17,11 @@ EXTERN	zx_locatenum
 EXTERN	fa
 EXTERN	call_rom3
 
-INCLUDE  "target/zx/def/zxfp.def"
+IF FORts2068
+		INCLUDE  "target/ts2068/def/ts2068fp.def"
+ELSE
+		INCLUDE  "target/zx/def/zxfp.def"
+ENDIF
 
 ; hl = char *variable
 
@@ -38,8 +42,12 @@ _zx_getfloat:
 	inc	hl
 	ld	b,(hl)
 
+IF FORts2068
+	call	ZXFP_STK_STORE
+ELSE
 	call	call_rom3
 	defw	ZXFP_STK_STORE
+ENDIF
 
 	rst	ZXFP_BEGIN_CALC
 	defb	ZXFP_RE_STACK
