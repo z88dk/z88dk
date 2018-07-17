@@ -41,8 +41,13 @@ _zx_getint:
 	inc	hl
 	ld	b,(hl)
 	
+IF FORts2068
+	call	ZXFP_STK_STORE
+ELSE
 	call	call_rom3
 	defw	ZXFP_STK_STORE
+ENDIF
+
 	call    call_rom3
 	defw	ZXFP_FP_TO_BC
 
