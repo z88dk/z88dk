@@ -25,11 +25,14 @@ IF FORlambda
 ELSE
         call    $09D8           ; routine LINE-ADDR (ZX81)
 ENDIF
-
-	cp	118
-	jr	nz,havelines
-	ld	hl,-1		; no program lines to point to !
+	jr z,havelines				; exit if not exact line
+	ld	hl,-1
 	ret
+
+;	cp	118
+;	jr	nz,havelines
+;	ld	hl,-1		; no program lines to point to !
+;	ret
 
 havelines:
         inc	hl
