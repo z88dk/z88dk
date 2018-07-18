@@ -2,7 +2,7 @@
 graphics/dcircle2
 graphics/zx81/hr/clg
 graphics/zx81/hr/mt_clg_hr
-graphics/zx81/hr/mt_hardcopy
+graphics/zx81/mt_hardcopy
 graphics/clrarea2
 graphics/lftscrol
 graphics/liner2
