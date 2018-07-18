@@ -28,11 +28,14 @@ IF FORts2068
 ELSE
 	call	$196E		; routine LINE-ADDR 
 ENDIF
-
-	cp	13
-	jr	nz,havelines
-	ld	hl,-1		; no program lines to point to !
+	jr z,havelines				; exit if not exact line
+	ld	hl,-1
 	ret
+
+;	cp	13
+;	jr	nz,havelines
+;	ld	hl,-1		; no program lines to point to !
+;	ret
 
 havelines:
         inc	hl
