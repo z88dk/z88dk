@@ -10,6 +10,7 @@
 		PUBLIC    zx_hardcopy
 		PUBLIC    _zx_hardcopy
 		
+		EXTERN call_rom3
 
 .zx_hardcopy
 ._zx_hardcopy
@@ -19,4 +20,7 @@
 		jr	nz,no_ts2068
 		jp	(hl)
 .no_ts2068
-		jp	$0EAC
+		call call_rom3
+		defw $0EAC
+		ret
+
