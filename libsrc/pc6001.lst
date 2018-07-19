@@ -1,6 +1,11 @@
 stdio/pc6001/fgetc_cons
 stdio/pc6001/getk
 stdio/pc6001/fputc_cons
+stdio/pc6001/generic_console
+;stdio/pc6001/generic_console_ioctl
+;stdio/pc6001/generic_console_vpeek
+stdio/pc6001/conio_vars
+stdio/pc6001/CRT_FONT
 @stdio/ansicore.lst
 stdio/ansi/pc6001/f_ansi_attr
 stdio/ansi/pc6001/f_ansi_bel
@@ -9,6 +14,7 @@ stdio/ansi/pc6001/f_ansi_cls
 stdio/ansi/pc6001/f_ansi_dline
 stdio/ansi/pc6001/f_ansi_scrollup
 @stdio/stdio.lst
+@font/font_8x8/font_8x8.lst
 @gfxbase.lst
 games/pc6001/joystick
 graphics/dcircle

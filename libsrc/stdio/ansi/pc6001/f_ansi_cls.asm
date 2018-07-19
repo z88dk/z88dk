@@ -12,32 +12,7 @@
 
         SECTION code_clib
 	PUBLIC	ansi_cls
+	EXTERN  generic_console_cls
 
-.ansi_cls
-	LD HL,0101h
-	CALL 11CDh      ; L2A - convert location to screen address
-	push hl
-	ld	d,h
-	ld	e,l
-	inc	de
-	
-	ld	(hl),32
+	defc	ansi_cls = generic_console_cls
 
-	ld	bc,511
-	ldir
-
-	pop hl
-	ld	a,$f0
-	and	h
-	ld	h,a
-	
-	ld	d,h
-	ld	e,l
-	inc	de
-
-	ld	(hl),0
-
-	ld	bc,511
-	ldir
-
-	ret

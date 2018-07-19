@@ -18,32 +18,22 @@
         SECTION code_clib
 	PUBLIC	ansi_del_line
 
-	;EXTERN	vram_addr
+	EXTERN	generic_console_printc
 
 
 .ansi_del_line
-	ld	l,1
-	inc a
-	ld	h,a
-	CALL 11CDh      ; L2A - convert location to screen address
-	push hl
-
-	ld	(hl),32 ;' '
-	ld	d,h
-	ld	e,l
-	inc	de
-	ld	bc,31
-	ldir
-	pop hl
-
-	ld	a,$E0
-	and	h
-	ld	h,a
-	ld	(hl),0
-	ld	d,h
-	ld	e,l
-	inc	de
-	ld	bc,31
-	ldir
-
+	ld	b,a
+	ld	c,0
+	ld	a,32
+loop:
+	push	af
+	push	bc
+	ld	a,' '
+	ld	e,0
+	call	generic_console_printc
+	pop	bc
+	inc	c
+	pop	af
+	dec	a
+	jr	nz,loop
 	ret

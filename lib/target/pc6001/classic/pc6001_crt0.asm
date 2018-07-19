@@ -61,6 +61,9 @@ ENDIF
         defc    CONSOLE_COLUMNS = 32
         defc    CONSOLE_ROWS = 16
 
+        defc DEFINED_ansicolumns = 1
+        defc ansicolumns = 32
+
 	defc	TAR__no_ansifont = 1
         defc    TAR__clib_exit_stack_size = 32
 	defc	DEF__register_sp = -1
