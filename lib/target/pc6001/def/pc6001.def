@@ -4,6 +4,7 @@
 ; System Variables
 
 		defc	SYSVAR_screen = $fd91	; High byte of where screen is located
+		defc	SYSVAR_mode   = $fd92	; Screen mode -1
 
 
 ; Firmware functions
