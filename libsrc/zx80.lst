@@ -18,6 +18,7 @@ graphics/dcircle
 graphics/clg
 graphics/clrarea
 graphics/zx81/clsgraph
+graphics/zx80/zx_hardcopy
 graphics/lftscrol
 graphics/zx80/textpixl
 graphics/zx80/plotpixl
