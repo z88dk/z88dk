@@ -31,18 +31,16 @@
 				rra
 				and	@00111111
 
-				ld	b,l
-
-				ld	hl,(base_graphics)	; pointer to base of graphics area
-				ld	l,a
-
-				ld	de,32
-.adder				add	hl,de
-				djnz	adder
-
-
-				ld	d,h
-				ld	e,l
+				ld	de,(base_graphics)	; pointer to base of graphics area
+				ld	e,a
+				ld	h,0
+				add	hl,hl
+				add	hl,hl
+				add	hl,hl
+				add	hl,hl
+				add	hl,hl
+				add	hl,de
+				ex	de,hl
 				pop	af
 				pop	hl
 				
