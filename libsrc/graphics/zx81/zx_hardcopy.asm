@@ -17,4 +17,8 @@
 ._zx_hardcopy
 
 		call	restore81
+IF FORlambda
+		jp	$1CC3
+ELSE
 		jp	$0869
+ENDIF
