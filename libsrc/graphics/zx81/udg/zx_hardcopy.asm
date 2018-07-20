@@ -53,20 +53,12 @@ L087D:  OUT     ($FB),A         ; bit 2 reset starts the printer motor
                                 ; on inner loop.
 
 ;; COPY-BRK
-L0880:  CALL    $0F46           ; routine BREAK-1
-        JR      C,L088A         ; forward with no keypress to COPY-CONT
+L0880:
+        IN      A,($FE)         ;
+        RRA                     ;
 
-; else A will hold 11111111 0
+        jr nc,stop_exit
 
-        ;RRA                     ; 0111 1111
-        ;OUT     ($FB),A         ; stop ZX printer motor, de-activate sylus.
-		jr stop_exit
-
-;; REPORT-D2
-;L0888:  RST     08H             ; ERROR-1
-;        DEFB    $0C             ; Error Report: BREAK - CONT repeats
-
-; ---
 
 ;; COPY-CONT
 L088A:  IN      A,($FB)         ; read from printer port.
@@ -175,8 +167,5 @@ stop_exit:
 L08DE:  ;CALL    $0207           ; routine SLOW/FAST
 		call zx_slow
         POP     BC              ; *** restore preserved BC.
+		RET
 
-;--------------------------------------
-; THE 'CLEAR PRINTER BUFFER' SUBROUTINE
-;--------------------------------------
-		JP $08E2
