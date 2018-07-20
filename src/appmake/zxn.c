@@ -496,7 +496,9 @@ int zxn_exec(char *target)
 
                             if (mb->secbin[j].size > 0)
                             {
-                                for (int k = (mb->secbin[j].org >> 13) & 0x7; k <= (((mb->secbin[j].org + mb->secbin[j].size - 1) >> 13) & 0x7); ++k)
+                                int k;
+
+                                for (k = (mb->secbin[j].org >> 13) & 0x7; k <= (((mb->secbin[j].org + mb->secbin[j].size - 1) >> 13) & 0x7); ++k)
                                     mainbank_occupied |= 1 << k;
                             }
                         }
