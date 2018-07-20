@@ -36,22 +36,18 @@ generic_console_set_inverse:
 	ret
 
 generic_console_set_ink:
-	and	2
-	ld	e,a
-	ld	a,(__pc6001_attr)
-	and	@11111101
-	or	e
-	ld	(__pc6001_attr),a
+	rrca
+	rrca
+	and	@11000000
+	ld	(attr_mode2),a
 	ret
 
 	
 generic_console_set_paper:
-	and	15
-	ld	e,a
-	ld	a,(__pc6001_attr)
-	and	@11110000
-	or	e
-	;ld	(__pc6001_attr),a
+	rrca
+	rrca
+	and	@11000000
+	ld	(attr_mode2+1),a
 	ret
 
 generic_console_cls:
@@ -101,9 +97,7 @@ generic_console_printc:
 	ld	a,(__pc6001_mode)
 	and	a
 	jr	z,printc_text
-	cp	MODE_1
-	jr	z,printc_hires
-	ret
+	jr	printc_hires
 
 printc_text:
 	ex	af,af
@@ -131,13 +125,75 @@ not_udg:
 	add	hl,de
 	dec	h
 	ex	de,hl		;de = font
+	cp	MODE_1
+	jr	z,print_hires
+	cp	MODE_2
+	ret	nz
+
+; Printing in mode 2 - semi hires mode
+;
+; p0-b0 p0-b1 p1-b0 p1-b1 p2-b0 p2-b1 p3-b0 p3-b1
+	ld	h,b		;32 * 8
+	ld	l,c
+	ld	bc,(SYSVAR_screen - 1)
+	ld	c,l
+	add	hl,bc
+	inc	h
+	inc	h		;hl = screen address
+        ld      a,(generic_console_flags)
+        rlca
+        sbc     a,a
+        ld      c,a             ;x = 0 / 255
+        ld      b,8
+semihires_1:
+	push	bc
+	ld	a,(de)
+	xor	c
+	push	de
+	ld	b,2
+semihires_2:
+	ld	de,(attr_mode2)
+	push	bc
+	push	hl
+	ld	l,a
+	ld	b,4
+	ld	c,0	;final attribute
+semihires_3:
+	rl	l
+	ld	a,d
+	jr	nc,is_paper
+	ld	a,e
+is_paper:
+	or	c
+	ld	c,a
+	srl	d
+	srl	d
+	srl	e
+	srl	e
+	djnz	semihires_3
+	ld	a,l		;save what's left of character
+	pop	hl
+	ld	(hl),c
+	inc	hl
+	pop	bc
+	djnz	semihires_2
+	ld	de,30
+	add	hl,de
+	pop	de
+	inc	de
+	pop	bc
+	djnz	semihires_1
+	ret
+
+
+print_hires:
 	ld	h,b		;32 * 8
 	ld	l,c
 	ld	bc,(SYSVAR_screen - 1)
 	ld	c,0
 	add	hl,bc
 	inc	h
-	inc	h
+	inc	h		;hl = screen address
         ld      a,(generic_console_flags)
         rlca
         sbc     a,a
@@ -186,6 +242,8 @@ generic_console_scrollup:
 	jr	z,scrollup_text
 	cp	MODE_1
 	jr	z,scrollup_hires
+	cp	MODE_2
+	jr	z,scrollup_hires	;possibly wrong
 	pop	bc
 	pop	de
 	ret
@@ -227,10 +285,11 @@ generic_console_scrollup_4:
 
 scrollup_hires:
 	ld	hl,(SYSVAR_screen - 1)
+	inc	h
+	inc	h
 	ld	l,0
 	ld	d,h
 	ld	e,l
-	inc	h
 	inc	h
 	ld	bc,32 * 184
 	ldir
@@ -249,3 +308,4 @@ scrollup_hires_1:
 	SECTION data_clib
 
 __pc6001_attr:	defb	32		;We use the external character generator
+attr_mode2:	defb	@11000000,@00000000
