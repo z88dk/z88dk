@@ -2,8 +2,8 @@ stdio/pc6001/fgetc_cons
 stdio/pc6001/getk
 stdio/pc6001/fputc_cons
 stdio/pc6001/generic_console
-;stdio/pc6001/generic_console_ioctl
-;stdio/pc6001/generic_console_vpeek
+stdio/pc6001/generic_console_ioctl
+stdio/pc6001/generic_console_vpeek
 stdio/pc6001/conio_vars
 stdio/pc6001/CRT_FONT
 @stdio/ansicore.lst

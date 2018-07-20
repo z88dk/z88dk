@@ -21,3 +21,9 @@
 						; Exit: a = ascii code
 						;      nz = key pressed
 
+
+; Values uses by library
+
+		defc	MODE_0 = 0
+		defc	MODE_1 = $9e		;@10011100
+		defc	MODE_2 = @10001100
