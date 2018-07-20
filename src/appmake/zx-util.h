@@ -62,6 +62,7 @@ struct zxn_nex
     int            loadbar;
     int            loaddelay;
     int            startdelay;
+    char           norun;
 };
 
 extern int  z88dk_ffs(int n);
@@ -72,6 +73,6 @@ extern int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory);
 extern int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fillbyte);
 extern int zxn_universal_dot(struct zx_common *zxc);
 extern int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memory, int is_zxn);
-extern int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *memory, int fillbyte);
+extern int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *memory, int fillbyte, int mainbank_occupied);
 
 #endif
