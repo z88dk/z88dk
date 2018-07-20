@@ -44,6 +44,8 @@ IF (startup=4)
 	defc DEFINED_CRT_ORG_BSS = 1
     ENDIF
 	defc	__crt_org_bss = CRT_ORG_BSS
+
+        defc    TAR__fputc_cons_generic = 1
 	; In ROM mode we MUST setup the stack
 	defc	TAR__register_sp = 0xffff
 	; If we were given a model then use it

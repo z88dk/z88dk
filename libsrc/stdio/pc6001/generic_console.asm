@@ -15,8 +15,10 @@
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
 
-		defc		DISPLAY = $8200
-		defc		COLOUR = $8000
+		; PC6001 - DISPLAY = $8200, COLOUR = $8000
+		; PC6001mk2 - DISPLAY = $c200, COLOUR = $c000
+
+		INCLUDE		"target/pc6001/def/pc6001.def"
 
 generic_console_ioctl:
 	scf
@@ -53,13 +55,21 @@ generic_console_set_paper:
 	ret
 
 generic_console_cls:
-	ld	hl, DISPLAY
-	ld	de, DISPLAY +1
+	ld	hl,(SYSVAR_screen - 1)
+	inc	h
+	inc	h
+	ld	l,0
+	ld	d,h
+	ld	e,1
+	push	hl
 	ld	bc, +(CONSOLE_COLUMNS * CONSOLE_ROWS) - 1
 	ld	(hl),32
 	ldir
-	ld	hl, COLOUR
-	ld	de, COLOUR +1
+	pop	hl
+	dec	h
+	dec	h
+	ld	d,h
+	ld	e,1
 	ld	bc, +(CONSOLE_COLUMNS * CONSOLE_ROWS) - 1
 	ld	a,(__pc6001_attr)
 	ld	(hl),a
@@ -93,6 +103,7 @@ generic_console_vpeek:
 
 
 xypos:
+	push	af
 	ld	l,b
 	ld	h,0
 	add	hl,hl
@@ -100,16 +111,25 @@ xypos:
 	add	hl,hl
 	add	hl,hl
 	add	hl,hl
-	ld	b,$82
+	ld	a,(SYSVAR_screen)
+	inc	a
+	inc	a
+	ld	b,a
 	add	hl,bc
+	pop	af
 	ret
 
 
 generic_console_scrollup:
 	push	de
 	push	bc
-	ld	hl, DISPLAY + CONSOLE_COLUMNS
-	ld	de, DISPLAY
+	ld	hl,(SYSVAR_screen - 1)
+	inc	h
+	inc	h
+	ld	l, CONSOLE_COLUMNS
+	ld	d,h
+	ld	e,0
+	push	hl	; Save start of screen
 	ld	bc,+ ((CONSOLE_COLUMNS) * (CONSOLE_ROWS-1))
 	ldir
 	ex	de,hl
@@ -118,8 +138,11 @@ generic_console_scrollup_3:
 	ld	(hl),32
 	inc	hl
 	djnz	generic_console_scrollup_3
-	ld	hl, COLOUR + CONSOLE_COLUMNS
-	ld	de, COLOUR
+	pop	hl		;Get screen back
+	dec	h
+	dec	h
+	ld	d,h
+	ld	e,0
 	ld	bc,+ ((CONSOLE_COLUMNS) * (CONSOLE_ROWS-1))
 	ldir
 	ex	de,hl
