@@ -2,7 +2,9 @@
 	INCLUDE	"graphics/grafix.inc"
 
 	EXTERN	generic_console_printc
+	EXTERN	generic_console_plotc
 	EXTERN	generic_console_vpeek
+	EXTERN	generic_console_pointxy
 	EXTERN	textpixl
 
 
@@ -22,7 +24,11 @@ ENDIF
 		srl	c
 		push	bc		;save reduced cooardinates
 		push	hl		;save original coordinates
+IF USEplotc
+		call	generic_console_pointxy
+ELSE
 		call	generic_console_vpeek
+ENDIF
 		ld	e,a
 
 		ld	hl,textpixl
@@ -71,8 +77,13 @@ ELSE
 		add	hl,de
 		ld	a,(hl)
 		pop	bc		;reduced coordinates
+IF USEplotc
+                ld      e,0             ;pixel4 mode
+                call    generic_console_plotc
+ELSE
 		ld	e,1		;raw mode
 		call	generic_console_printc
+ENDIF
 ENDIF
 		pop	bc
 		ret

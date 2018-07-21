@@ -8,6 +8,8 @@
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
 		PUBLIC		generic_console_text_xypos
+		PUBLIC		generic_console_plotc
+		PUBLIC		generic_console_pointxy
 
 		PUBLIC		__pc6001_attr
 
@@ -40,6 +42,8 @@ generic_console_set_inverse:
 	ret
 
 generic_console_set_ink:
+	and	7
+	ld	(__ink_colour),a
 	rrca
 	rrca
 	and	@11000000
@@ -91,6 +95,48 @@ cls_text:
 	ld	(hl),a
 	ldir
 	ret
+
+; Entry point for plotting text graphics
+; c = x
+; b = y
+; a = graphic glyph to print
+; e = 0, 2x2 mode, e = 1, 3x2 mode
+generic_console_plotc:
+	call	generic_console_text_xypos
+	ld	c,a
+	ld	a,(__MODE2_attr)		;It's shifted for us
+	or	c
+	ld	(hl),a
+	dec	h
+	dec	h
+	ld	a,(__ink_colour)
+	rrca
+	and	2				;Set the CSS flag as appropriate
+	or	@01111101			;3x2, CSS not set
+	ld	(hl),a
+	ret
+
+; Entry point for pointing text graphics
+; c = x
+; b = y
+; Exit: a = graphic glyph
+;	nc = found
+;        c = not found
+generic_console_pointxy:
+	call	generic_console_text_xypos
+	ld	c,(hl)		;glyph
+	dec	h
+	dec	h
+	ld	a,(hl)
+	and	@01111101
+	cp	@01111101
+	ld	a,0		;No graphics drawn
+	ret	nz		;Not a graphics character
+	ld	a,c
+	and	@00111111
+	ret	
+
+
 
 ; c = x
 ; b = y
@@ -209,3 +255,4 @@ scrollup_hires_1:
 	SECTION data_clib
 
 __pc6001_attr:	defb	32		;We use the external character generator
+__ink_colour:	defb	7
