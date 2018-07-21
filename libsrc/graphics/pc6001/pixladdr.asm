@@ -6,6 +6,7 @@
 
 	PUBLIC	pixeladdress
 	EXTERN	pixeladdress_MODE1
+	EXTERN	pixeladdress_MODE2
 
 	EXTERN	__pc6001_mode
 
@@ -21,4 +22,6 @@
 	ld	a,(__pc6001_mode)
 	cp	MODE_1
 	jp	z,pixeladdress_MODE1
+	cp	MODE_2
+	jp	z,pixeladdress_MODE2
 	ret

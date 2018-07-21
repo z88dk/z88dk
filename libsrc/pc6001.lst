@@ -30,6 +30,7 @@ graphics/pc6001/xorpixl
 graphics/pc6001/pointxy
 graphics/pc6001/pixladdr
 graphics/pc6001/pixladdr_MODE1
+graphics/pc6001/pixladdr_MODE2
 graphics/pc6001/plot_MODE0
 graphics/pc6001/res_MODE0
 graphics/pc6001/xor_MODE0

@@ -105,6 +105,7 @@ generic_console_plotc:
 	call	generic_console_text_xypos
 	ld	c,a
 	ld	a,(__MODE2_attr)		;It's shifted for us
+	and	@11000000
 	or	c
 	ld	(hl),a
 	dec	h
