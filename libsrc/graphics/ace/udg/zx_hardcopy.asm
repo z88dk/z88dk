@@ -19,9 +19,63 @@
 .zx_hardcopy
 ._zx_hardcopy
 
+	
+	; first part of the character set, "battenberg cake" chars
+;	ld	hl,0
+;	ld	de,acefont
+;fontloop:
+;	LD A,L
+;	AND $BF
+;	RRCA
+;	RRCA
+;	RRCA
+;	JR NC,skip
+;	RRCA
+;	RRCA
+;skip:
+;	RRCA
+;	LD B,A
+;	SBC A
+;	RR B
+;	LD B,A
+;	SBC A
+;	XOR B
+;	AND $F0
+;	XOR B
+;	add hl,de
+;	LD (HL),A
+;	sbc hl,de
+;	INC L
+;	JR NZ,fontloop
+	
+	; needs to be fixed, lowercase chars have some dirt on the top row
+	
+	LD DE,acefont+1024		; de-compress the character set from ROM
+	LD HL,1FFBh
+	LD BC,0008h
+	LDDR
+	EX DE,HL
+	
+	LD A,5Fh
+bitloop:
+	LD C,07h
+	BIT 5,A
+	JR Z,skip2
+	LD (HL),B
+	DEC HL
+	DEC C
+skip2:
+	EX DE,HL
+	LDDR
+	EX DE,HL
+	LD (HL),B
+	DEC HL
+	DEC A
+	JR NZ,bitloop
+
 		ld   c,0	; first UDG chr$ to load
 		ld	 b,64	; number of characters to load
-		ld	hl,acefont+768
+		ld	hl,acefont+768+256
 		call loadudg6
 
 ; The full character-mapped screen is copied to the ZX-Printer.
@@ -29,9 +83,8 @@
 
 ;; COPY
 		DI
-L0869:  LD      D,$16           ; prepare to copy twenty four text lines.
-        LD      HL,$2400      ; set HL to start of display file from D_FILE.
-;        INC     HL              ; 
+L0869:  LD      D,24           ; prepare to copy twenty four text lines.
+        LD      HL,$2400       ; set HL to start of display file from D_FILE.
 
 		; we are always in FAST mode..
 		;call zx_fast
@@ -94,57 +147,31 @@ L088A:  IN      A,($FB)         ; read from printer port.
 ;; COPY-NEXT
 L089C:  LD      C,(HL)          ; load character from screen or buffer.
         INC     HL              ; update pointer for next time.
-		ld	a,31
-		and l                   ; test if we are in a new line
+
         LD      A,C             ; save a copy in C for later inverse test.
-        ;CP      $76             ; is character a NEWLINE ?
-        JR      Z,COPY_NL         ; forward, if so, to COPY-N/L
 
         PUSH    HL              ; * else preserve the character pointer.
 
-		;and 127
+		ld	l,a
+		ld	h,0
+		add	hl,hl
+		add	hl,hl
+		add	hl,hl
 		
-        ;SLA     A               ; (?) multiply by two
-        ;ADD     A,A             ; multiply by four
-        ;ADD     A,A             ; multiply by eight
-
-	ld	l,a
-	ld	h,0
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-		
-;		sub 32
-;		add	a
-;		ld	l,a
-;		ld h,0
-;		add hl,hl
-;		add hl,hl
-		ld	bc,acefont-256
+		ld	bc,acefont
 		add hl,bc
 		
 		ld b,0
 		ld c,e			; current character row
 		add hl,bc
 		
-		
-;
-;		ld l,a
-;		ld	a,$2c				; Character set is at $2C00, it is 768 bytes long
-;		adc	0
-;		ld	h,a
-;		ld	a,l
 
-;        LD      H,$0F           ; load H with half the address of character set.
-;        RL      H               ; now $1E or $1F (with carry)
-;        ADD     A,E             ; add byte offset 0-7
-;        LD      L,A             ; now HL addresses character source byte
-
-;        RL      C               ; test character, setting carry if inverse.
+;        RL      C               ; test character, setting carry if inverse (does bit 7 have such effect on J.ACE?).
 ;        SBC     A,A             ; accumulator now $00 if normal, $FF if inverse.
-		ld a,(hl)
-
 ;        XOR     (HL)            ; combine with bit pattern at end or ROM.
+
+		ld a,(hl)			; With J. ACE we do differently  :)
+
         LD      C,A             ; transfer the byte to C.
         LD      B,$08           ; count eight bits to output.
 
@@ -163,49 +190,17 @@ L08BA:
         LD      A,H             ; control byte to A.
         OUT     ($FB),A         ; and output to printer port.
         DJNZ    L08B5           ; loop for all eight bits to COPY-BITS
-
+		
         POP     HL              ; * restore character pointer.
-        JR      L089C           ; back for adjacent character line to COPY-NEXT
+		ld	a,31
+		and l                   ; test if we are in a new line
+
+        JR      nz,L089C           ; if within 32 columns, back for adjacent character line to COPY-NEXT
 
 ; ---
 
-; A NEWLINE has been encountered either following a text line or as the 
-; first character of the screen or printer line.
-
+; End of line
 ;; COPY-N/L
-COPY_NL:
-
-
-
-; ----   this extra code prints the last column on the right..   in makes EightyOne work correctly ----
-		push hl
-        LD      C,0             ; transfer the dummy blank byte to C.
-        LD      B,8             ; count eight bits to output.
-
-;; COPY-BITS
-M08B5:  LD      A,D             ; fetch speed control mask from D.
-        RLC     C               ; rotate a bit from output byte to carry.
-        RRA                     ; pick up in bit 7, speed bit to bit 1
-        LD      H,A             ; store aligned mask in H register.
-
-;; COPY-WAIT
-M08BA:  
-        IN      A,($FB)         ; read the printer port
-        RRA                     ; test for alignment signal from encoder.
-        JR      NC,M08BA        ; loop if not present to COPY-WAIT
-
-        LD      A,H             ; control byte to A.
-        OUT     ($FB),A         ; and output to printer port.
-        DJNZ    M08B5           ; loop for all eight bits to COPY-BITS
-		pop hl
-
-; ----  end of extra code, cut it away if a real J.ACE does not need it or does not work ----
-
-
-
-
-
-
 
 L08C7:  
         IN      A,($FB)         ; read the printer port
@@ -235,7 +230,7 @@ stop_exit:
         OUT     ($FB),A         ; output to printer port.
 
 ;; COPY-END
-L08DE:  ;CALL    $0207           ; routine SLOW/FAST
+L08DE:  
 		;call zx_slow
         POP     BC              ; *** restore preserved BC.
 		EI
@@ -244,5 +239,7 @@ L08DE:  ;CALL    $0207           ; routine SLOW/FAST
 		
 
 acefont:
-		binary "stdio/ansi/f8.bin"
+		defs	256
+		;binary "stdio/ansi/f8.bin"
+		defs	768
 
