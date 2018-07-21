@@ -6,6 +6,7 @@
 	EXTERN		generic_console_font32
 	EXTERN		generic_console_flags
 	EXTERN		__MODE2_attr
+        EXTERN          __pc6001_attr
 
 
 	INCLUDE		"target/pc6001/def/pc6001.def"
@@ -37,8 +38,8 @@ not_udg:
         add     hl,bc
         inc     h
         inc     h               ;hl = screen address
-        ld      a,(generic_console_flags)
-        rlca
+        ld      a,(__pc6001_attr)
+        rrca
         sbc     a,a
         ld      c,a             ;x = 0 / 255
         ld      b,8
