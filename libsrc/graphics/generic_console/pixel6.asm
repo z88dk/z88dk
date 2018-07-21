@@ -10,6 +10,8 @@
 	EXTERN	div3
 	EXTERN	generic_console_printc
 	EXTERN	generic_console_vpeek
+	EXTERN	generic_console_plotc
+	EXTERN	generic_console_pointxy
 
 
 			ld	a,h
@@ -39,7 +41,11 @@
 			srl	c		; x / 2
 			ld	(ix+2),c
 			ld	(ix+3),b
+IF USEplotc
+			call	generic_console_pointxy
+ELSE
 			call	generic_console_vpeek
+ENDIF
 			ld	hl,textpixl
 			ld	e,0
 			ld	b,64		; whole symbol table size
@@ -93,8 +99,13 @@ ELSE
 			ld	a,(hl)
 			ld	c,(ix+2)
 			ld	b,(ix+3)
+IF USEplotc
+			ld	e,1		;pixel6 mode
+			call	generic_console_plotc
+ELSE
 			ld	e,1		;raw mode
 			call	generic_console_printc
+ENDIF
 ENDIF
 			pop	bc		;dump buffer
 			pop	bc
