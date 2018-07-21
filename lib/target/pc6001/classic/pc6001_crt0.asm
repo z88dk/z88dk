@@ -39,13 +39,12 @@ ENDIF
 
 IF (startup=4)
 	defc    CRT_ORG_CODE  = $4000	 ; ROM
-  IF !DEFINED_CRT_ORG_BSS
-	defc CRT_ORG_BSS =  $c500   ; Static variables are kept in RAM
+    IF !DEFINED_CRT_ORG_BSS
+	defc CRT_ORG_BSS =  $da00   ; Static variables are kept in RAM above max VRAM
 	defc DEFINED_CRT_ORG_BSS = 1
     ENDIF
 	defc	__crt_org_bss = CRT_ORG_BSS
 
-        defc    TAR__fputc_cons_generic = 1
 	; In ROM mode we MUST setup the stack
 	defc	TAR__register_sp = 0xffff
 	; If we were given a model then use it
@@ -56,7 +55,7 @@ IF (startup=4)
 	ENDIF
 ENDIF
 
-IF      !CRT_ORG_CODE
+IF (startup=1)
 	defc    CRT_ORG_CODE  = $c437  ; PC6001 - 16K
 ENDIF
 
@@ -68,6 +67,7 @@ ENDIF
         defc DEFINED_ansicolumns = 1
         defc ansicolumns = 32
 
+        defc    TAR__fputc_cons_generic = 1
 	defc	TAR__no_ansifont = 1
         defc    TAR__clib_exit_stack_size = 32
 	defc	DEF__register_sp = -1
@@ -118,10 +118,12 @@ IF DEFINED_USING_amalloc
 	INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
 
-	ld	a,4
+IF startup != 1
+	ld	a,0
 	out	($B0),a
-	ld	a,$80
+	ld	a,$C0
 	ld	(SYSVAR_screen),a
+ENDIF
 		
         call    _main
 cleanup:
