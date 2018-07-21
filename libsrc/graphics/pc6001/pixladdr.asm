@@ -1,51 +1,24 @@
+;
 
-        SECTION code_clib
+;-----------  GFX paging  -------------
+
+	SECTION	  code_clib
+
 	PUBLIC	pixeladdress
+	EXTERN	pixeladdress_MODE1
 
-	EXTERN	base_graphics
+	EXTERN	__pc6001_mode
+
+	INCLUDE	"target/pc6001/def/pc6001.def"
 
 
-;
-;	$Id: pixladdr.asm,v 1.3 2016-06-23 19:53:27 dom Exp $
-;
-
-; ******************************************************************
-;
-; Get absolute	pixel address in map of virtual (x,y) coordinate.
-;
-; Design & programming by Gunther Strube, Copyright (C) InterLogic 1995
-;
-; ******************************************************************
-;
-; VZ200/300 version By Stefano Bodrato
-;
-; The VZ screen size is 128x64
-; We draw blue dots over green display (UGH!)
-;
-;
+; Entry  h = x
+;        l = y
+; Exit: hl = address	
+;	 a = pixel number
+; Uses: a, bc, de, hl
 .pixeladdress
-				push	hl
-				ld	a,h
-				push	af
-				rra
-				rra
-				and	@00111111
-
-				ld	de,(base_graphics)	; pointer to base of graphics area
-				ld	e,a
-				ld	h,0
-				add	hl,hl
-				add	hl,hl
-				add	hl,hl
-				add	hl,hl
-				add	hl,hl
-				add	hl,de
-				ex	de,hl
-				pop	af
-				pop	hl
-				
-				rla
-				and	@00000110		; a = x mod 8
-				xor	@00000111		; a = 7 - a
-				
-				ret
+	ld	a,(__pc6001_mode)
+	cp	MODE_1
+	jp	z,pixeladdress_MODE1
+	ret
