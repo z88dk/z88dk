@@ -60,6 +60,8 @@ IF      !CRT_ORG_CODE
 	defc    CRT_ORG_CODE  = $c437  ; PC6001 - 16K
 ENDIF
 
+	INCLUDE	"target/pc6001/def/pc6001.def"
+
         defc    CONSOLE_COLUMNS = 32
         defc    CONSOLE_ROWS = 16
 
@@ -115,6 +117,11 @@ start:
 IF DEFINED_USING_amalloc
 	INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
+
+	ld	a,4
+	out	($B0),a
+	ld	a,$80
+	ld	(SYSVAR_screen),a
 		
         call    _main
 cleanup:
@@ -130,6 +137,7 @@ ENDIF
 start1:
         ld      sp,0
         ;ei
+printc_noop:
         ret
 
 l_dcal:
@@ -143,3 +151,19 @@ l_dcal:
         INCLUDE "crt/classic/crt_runtime_selection.asm"
 	INCLUDE	"crt/classic/crt_section.asm"
 
+	EXTERN	vpeek_noop
+	PUBLIC	printc_noop
+
+
+IF CLIB_DISABLE_MODE1 = 1
+	PUBLIC	vpeek_MODE1
+	PUBLIC	printc_MODE1
+	defc	vpeek_MODE1 = vpeek_noop
+	defc	printc_MODE1 = printc_noop
+ENDIF
+IF CLIB_DISABLE_MODE2 = 1
+	PUBLIC	vpeek_MODE2
+	PUBLIC	vpeek_MODE2
+	defc	vpeek_MODE2 = vpeek_noop
+	defc	printc_MODE2 = printc_noop
+ENDIF
