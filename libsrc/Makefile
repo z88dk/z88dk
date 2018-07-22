@@ -27,6 +27,7 @@ all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	trs80_clib.lib vg5k_clib.lib vz_clib.lib  x07_clib.lib \
 	embedded_clib.lib test_clib.lib testrcm_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
 	pv1000_clib.lib pv2000_clib.lib coleco_clib.lib multi8_clib.lib alphatro_clib.lib  spc1000_clib.lib \
+	vz700_clib.lib
 	preempt.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib gendos.lib ndos.lib  \
@@ -885,7 +886,7 @@ rx78_clib.lib:
 	$(MAKE) -C games TARGET=rx78
 	TARGET=rx78 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORrx78 -x$(OUTPUT_DIRECTORY)/rx78_clib @$(LISTFILE_DIRECTORY)/rx78.lst
 
-# Mitsubishi Multi8 - dom
+# Casio FP-1100- dom
 fp1100_clib.lib:
 	@echo ''
 	@echo '--- Building Casio FP-1100 Library ---'
@@ -903,6 +904,15 @@ multi8_clib.lib:
 	$(MAKE) gfxdeps
 	$(call buildgeneric,multi8)
 	TARGET=multi8 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmulti8 -x$(OUTPUT_DIRECTORY)/multi8_clib @$(LISTFILE_DIRECTORY)/multi8.lst
+
+# VTech VZ700- dom
+vz700_clib.lib:
+	@echo ''
+	@echo '--- Building VTech Laser 350/500/700 Library ---'
+	@echo ''
+	$(call buildgeneric,vz700)
+	TARGET=vz700 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORvz700 -x$(OUTPUT_DIRECTORY)/vz700_clib @$(LISTFILE_DIRECTORY)/vz700.lst
+
 
 # Triumph Adler Alphatronic PC - dom
 alphatro_clib.lib:
