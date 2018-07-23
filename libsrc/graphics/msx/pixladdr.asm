@@ -4,6 +4,9 @@
 
 	PUBLIC	pix_return
 
+	EXTERN	l_push_di
+	EXTERN	l_pop_ei
+
 	INCLUDE	"graphics/grafix.inc"
 	INCLUDE	"msx/vdp.inc"
 
@@ -22,8 +25,8 @@
 ;	  fz	= 1 if bit number is 0 of pixel position
 ;
 ; registers changed	after return:
-;  ......hl/ixiy same
-;  afbcde../.... different
+;  ......../ixiy same
+;  afbcdehl/.... different
 ;
 	;;EXTERN	base_graphics
 
@@ -50,16 +53,16 @@
 	ld	d,0
 	add	hl,de		; + Y&7
 	
-	;;ld	de,(base_graphics)
-	;;add	hl,de
 ;-------
+	call	l_push_di
 IF VDP_CMD < 0
 	ld	a,l
 	ld	(-VDP_CMD),a
-	ld	a,h
-	and	@00111111
+	ld	a,h		;4
+	and	@00111111	;7
 	ld	(-VDP_CMD),a
 	ld	a,(-VDP_DATAIN)
+	ld	e,a
 ELSE
 	ld	a,l		; LSB of video memory ptr
 	out	(VDP_CMD), a
@@ -67,11 +70,11 @@ ELSE
 	and	@00111111	; masked with "read command" bits
 	out	(VDP_CMD), a
 	in	a, (VDP_DATAIN)
+	ld	e,a
 ENDIF
-
-	ld	d,h
-	ld	e,l
-	
+	call	l_pop_ei
+	ld	a,e
+	ex	de,hl		;de = VDP address
 	ld	hl,pixelbyte
 	ld	(hl),a
 ;-------
@@ -85,6 +88,7 @@ ENDIF
 
 .pix_return
          ld       (hl),a	; hl points to "pixelbyte"
+	call	l_push_di
 IF VDP_CMD < 0
 	ld	a,e
 	ld	(-VDP_CMD),a
@@ -104,6 +108,7 @@ ELSE
          ld       a,(pixelbyte) ; Can it be optimized ? what about VDP timing ?
          out      (VDP_DATA), a
 ENDIF
+	call	l_pop_ei
          pop      bc
          ret
 

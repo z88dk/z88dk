@@ -52,8 +52,12 @@ start:
 	di
 	; Hook the interrupt
 	ld	a,0xc3
+	ld	($7498),a	;jp
+	ld	hl,nmi_int
+	ld	($7499),hl
+	ld	a,0xc3
 	ld	($749b),a	;jp
-	ld	hl,tms9118_interrupt
+	ld	hl,mask_int
 	ld	($749c),hl
 
         INCLUDE "crt/classic/crt_init_sp.asm"
@@ -97,12 +101,23 @@ start1: ld      sp,0            ;Restore stack to entry value
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
 
-	INCLUDE	"crt/classic/tms9118/interrupt.asm"
-	INCLUDE	"crt/classic/tms9118/interrupt_handler.asm"
+nmi_int:
+        push    af
+        push    hl
+        ; Flow into int_VBL
+        INCLUDE "crt/classic/tms9118/interrupt_handler.asm"
+
+; Not sure when this is called, but don't do anything
+mask_int:
+	ex	(sp),hl
+	pop	hl
+	ei
+	reti
 
 ; ---------------
 ; MSX specific stuff
 ; ---------------
+
 
 ; Safe BIOS call
 msxbios:
