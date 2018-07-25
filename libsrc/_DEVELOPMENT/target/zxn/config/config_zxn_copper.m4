@@ -92,8 +92,10 @@ divert(-1)
 # list is reached, the copper loops back to the beginning.
 #
 # RUN_VBI causes the copper to reset its instruction
-# pointer to 0 and run in VBI mode.  On vsync interrupt,
-# the copper restarts the instruction list from the beginning.
+# pointer to 0 and run in VBI mode.  The name "VBI" is a misnomer;
+# in VBI mode the copper runs its program and automatically restarts
+# it by resetting its instruction pointer to 0 at position 0,0 with
+# no connection to the vbi interrupt.
 
 # Note that modes RUN_LOOP_RESET and RUN_VBI will only reset
 # the instruction pointer to zero if the mode actually changes
