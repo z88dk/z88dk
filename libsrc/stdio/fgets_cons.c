@@ -24,12 +24,15 @@ extern void *_CRT_KEY_CAPS_LOCK;
 
 extern void fgets_cons_erase_character(unsigned char toerase) __z88dk_fastcall;
 
+static void docursor();
+
 char *fgets_cons(char *str, size_t max)
 {   
    int c;
    int ptr;
    ptr=0;
 
+   docursor();
    while (ptr < max - 1) {
       c = fgetc_cons();
 
@@ -41,8 +44,10 @@ char *fgets_cons(char *str, size_t max)
       {
 	if ( ptr > 0 )
 	{
+           fgets_cons_erase_character('_');
            fgets_cons_erase_character(str[--ptr]);
            str[ptr] = 0;
+           docursor();
         }
       }
       else
@@ -52,10 +57,15 @@ char *fgets_cons(char *str, size_t max)
             
          str[ptr++] = c;
          str[ptr] = 0;
+         fgets_cons_erase_character('_');
 	 fputc_cons(c);
          if (c == '\n' || c == '\r') break;
+         docursor();
       }
    }
    return str;
 }
 
+static void docursor() {
+    fputc_cons('_');
+}
