@@ -2051,7 +2051,11 @@ defc __NEXTOS_IDE_SWAP_POS = 0x00e8
 defc __NEXTOS_IDE_SWAP_MOVE = 0x00eb
 defc __NEXTOS_IDE_SWAP_RESIZE = 0x00ee
 defc __NEXTOS_IDE_PARTITION_FIND = 0x00b5
+
 defc __NEXTOS_IDE_DOS_MAP = 0x00f1
+defc __nextos_map_ramdisk = 4
+defc __nextos_map_fsimage = 0xff
+
 defc __NEXTOS_IDE_DOS_UNMAP = 0x00f4
 defc __NEXTOS_IDE_DOS_MAPPING = 0x00f7
 defc __NEXTOS_IDE_SNAPLOAD = 0x00fd
@@ -2072,8 +2076,9 @@ defc __nextos_browsercaps_rename = 0x02
 defc __nextos_browsercaps_mkdir = 0x04
 defc __nextos_browsercaps_erase = 0x08
 defc __nextos_browsercaps_remount = 0x10
+defc __nextos_browsercaps_unmount = 0x20
 defc __nextos_browsercaps_syscfg = 0x80
-defc __nextos_browsercaps_all = 0x1f
+defc __nextos_browsercaps_all = 0x3f
 
 defc __NEXTOS_IDE_STREAM_OPEN = 0x0056
 defc __NEXTOS_IDE_STREAM_CLOSE = 0x0059
@@ -2088,6 +2093,7 @@ defc __nextos_rc_bank_total = 0
 defc __nextos_rc_bank_alloc = 1
 defc __nextos_rc_bank_reserve = 2
 defc __nextos_rc_bank_free = 3
+defc __nextos_rc_bank_available = 4
 
 defc __NEXTOS_IDE_BASIC = 0x01c0
 defc __NEXTOS_IDE_WINDOW_LINEIN = 0x01c3
@@ -2179,6 +2185,7 @@ defc __NEXTOS_RC_INVDEVICE = 65
 defc __NEXTOS_RC_CMDPHASE = 67
 defc __NEXTOS_RC_DATAPHASE = 68
 defc __NEXTOS_RC_NOTDIR = 69
+defc __NEXTOS_RC_FRAGMENTED = 74
 
 defc __ESX_RST_SYS = 0x08
 defc __ESX_RST_ROM = 0x18
@@ -2399,7 +2406,6 @@ defc __REG_TURBO_MODE = 7
 defc __RTM_3MHZ = 0x00
 defc __RTM_7MHZ = 0x01
 defc __RTM_14MHZ = 0x02
-defc __RTM_28MHZ = 0x03
 
 defc __REG_PERIPHERAL_3 = 8
 defc __RP3_STEREO_ABC = 0x00
@@ -2411,6 +2417,12 @@ defc __RP3_ENABLE_TIMEX = 0x04
 defc __RP3_ENABLE_TURBOSOUND = 0x02
 defc __RP3_DISABLE_CONTENTION = 0x40
 defc __RP3_UNLOCK_7FFD = 0x80
+
+defc __REG_PERIPHERAL_4 = 9
+defc __RP4_SCANLINES_OFF = 0x00
+defc __RP4_SCANLINES_25 = 0x03
+defc __RP4_SCANLINES_50 = 0x02
+defc __RP4_SCANLINES_75 = 0x01
 
 defc __REG_SUB_VERSION = 14
 
