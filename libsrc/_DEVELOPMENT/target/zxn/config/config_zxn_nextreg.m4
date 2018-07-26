@@ -129,14 +129,13 @@ define(`__RP2_PSGMODE_YM', 0x02)
 define(`__RP2_PSGMODE_DISABLE', 0x00)
 
 # (R/W) 0x07 (07) => Turbo mode:
-#  bit 1-0 = Turbo (00 = 3.5MHz, 01 = 7MHz, 10 = 14MHz, 11 = 28MHz)
+#  bit 1-0 = Turbo (00 = 3.5MHz, 01 = 7MHz, 10 = 14MHz)
 #  (Reset to 00 after a PoR or Hard-reset)
 
 define(`__REG_TURBO_MODE', 7)
 define(`__RTM_3MHZ', 0x00)
 define(`__RTM_7MHZ', 0x01)
 define(`__RTM_14MHZ', 0x02)
-define(`__RTM_28MHZ', 0x03)
 
 # (R/W) 0x08 (08) => Peripheral 3 setting:
 #  bit 7 = 128K paging enable (inverse of port 0x7ffd, bit 5) 
@@ -162,13 +161,26 @@ define(`__RP3_ENABLE_TURBOSOUND', 0x02)
 define(`__RP3_DISABLE_CONTENTION', 0x40)
 define(`__RP3_UNLOCK_7FFD', 0x80)
 
+# (R/W) 0x09 (09) => Peripheral 4 setting:
+#   bits 7-2 = Reserved, must be 0
+#   bits 1-0 = scanlines (0 after a PoR or Hard-reset)
+#      00 = scanlines off
+#      01 = scanlines 75%
+#      10 = scanlines 50%
+#      11 = scanlines 25%
+
+define(`__REG_PERIPHERAL_4', 9)
+define(`__RP4_SCANLINES_OFF', 0x00)
+define(`__RP4_SCANLINES_25', 0x03)
+define(`__RP4_SCANLINES_50', 0x02)
+define(`__RP4_SCANLINES_75', 0x01)
+
 # (R) 0x0E (14) => Core Version (sub minor number) 
 #  (see register 0x01 for the major and minor version number)
 
 define(`__REG_SUB_VERSION', 14)
 
 # (W) 0x0F (15) => Video Register
-# An ordered list of video parameters are written during boot
 
 define(`__REG_VIDEO_PARAM', 15)
 
@@ -184,13 +196,13 @@ define(`__RAB_BUTTON_DIVMMC', 0x02)
 define(`__RAB_BUTTON_MULTIFACE', 0x01)
 
 # (W) 0x11 (17) => Video Timing
-# A video timing setting is written during boot
+# VGA = 0..6, HDMI = 7
 
 define(`__REG_VIDEO_TIMING', 17)
 
 # (R/W) 0x12 (18) => Layer 2 RAM page
 # bits 7-6 = Reserved, must be 0
-# bits 5-0 = SRAM page (point to page 8 after a Reset)
+# bits 5-0 = SRAM bank 0-13 (point to bank 8 after a Reset)
 
 define(`__REG_LAYER_2_RAM_PAGE', 18)
 define(`__RL2RP_MASK', 0x3f)
@@ -202,7 +214,7 @@ define(`__RL2RB_MASK', __RL2RP_MASK)
 
 # (R/W) 0x13 (19) => Layer 2 RAM shadow page
 # bits 7-6 = Reserved, must be 0
-# bits 5-0 = SRAM page (point to page 11 after a Reset)
+# bits 5-0 = SRAM bank 0-13 (point to bank 11 after a Reset)
 
 define(`__REG_LAYER_2_SHADOW_RAM_PAGE', 19)
 define(`__RL2SRP_MASK', 0x3f)
@@ -615,7 +627,6 @@ PUBLIC `__REG_TURBO_MODE'
 PUBLIC `__RTM_3MHZ'
 PUBLIC `__RTM_7MHZ'
 PUBLIC `__RTM_14MHZ'
-PUBLIC `__RTM_28MHZ'
 
 PUBLIC `__REG_PERIPHERAL_3'
 PUBLIC `__RP3_STEREO_ABC'
@@ -627,6 +638,12 @@ PUBLIC `__RP3_ENABLE_TIMEX'
 PUBLIC `__RP3_ENABLE_TURBOSOUND'
 PUBLIC `__RP3_DISABLE_CONTENTION'
 PUBLIC `__RP3_UNLOCK_7FFD'
+
+PUBLIC `__REG_PERIPHERAL_4'
+PUBLIC `__RP4_SCANLINES_OFF'
+PUBLIC `__RP4_SCANLINES_25'
+PUBLIC `__RP4_SCANLINES_50'
+PUBLIC `__RP4_SCANLINES_75'
 
 PUBLIC `__REG_SUB_VERSION'
 
@@ -829,7 +846,6 @@ defc `__REG_TURBO_MODE' = __REG_TURBO_MODE
 defc `__RTM_3MHZ' = __RTM_3MHZ
 defc `__RTM_7MHZ' = __RTM_7MHZ
 defc `__RTM_14MHZ' = __RTM_14MHZ
-defc `__RTM_28MHZ' = __RTM_28MHZ
 
 defc `__REG_PERIPHERAL_3' = __REG_PERIPHERAL_3
 defc `__RP3_STEREO_ABC' = __RP3_STEREO_ABC
@@ -841,6 +857,12 @@ defc `__RP3_ENABLE_TIMEX' = __RP3_ENABLE_TIMEX
 defc `__RP3_ENABLE_TURBOSOUND' = __RP3_ENABLE_TURBOSOUND
 defc `__RP3_DISABLE_CONTENTION' = __RP3_DISABLE_CONTENTION
 defc `__RP3_UNLOCK_7FFD' = __RP3_UNLOCK_7FFD
+
+defc `__REG_PERIPHERAL_4' = __REG_PERIPHERAL_4
+defc `__RP4_SCANLINES_OFF' = __RP4_SCANLINES_OFF
+defc `__RP4_SCANLINES_25' = __RP4_SCANLINES_25
+defc `__RP4_SCANLINES_50' = __RP4_SCANLINES_50
+defc `__RP4_SCANLINES_75' = __RP4_SCANLINES_75
 
 defc `__REG_SUB_VERSION' = __REG_SUB_VERSION
 
@@ -1043,7 +1065,6 @@ ifdef(`CFG_C_DEF',
 `#define' `__RTM_3MHZ'  __RTM_3MHZ
 `#define' `__RTM_7MHZ'  __RTM_7MHZ
 `#define' `__RTM_14MHZ'  __RTM_14MHZ
-`#define' `__RTM_28MHZ'  __RTM_28MHZ
 
 `#define' `__REG_PERIPHERAL_3'  __REG_PERIPHERAL_3
 `#define' `__RP3_STEREO_ABC'  __RP3_STEREO_ABC
@@ -1055,6 +1076,12 @@ ifdef(`CFG_C_DEF',
 `#define' `__RP3_ENABLE_TURBOSOUND'  __RP3_ENABLE_TURBOSOUND
 `#define' `__RP3_DISABLE_CONTENTION'  __RP3_DISABLE_CONTENTION
 `#define' `__RP3_UNLOCK_7FFD'  __RP3_UNLOCK_7FFD
+
+`#define' `__REG_PERIPHERAL_4'  __REG_PERIPHERAL_4
+`#define' `__RP4_SCANLINES_OFF'  __RP4_SCANLINES_OFF
+`#define' `__RP4_SCANLINES_25'  __RP4_SCANLINES_25
+`#define' `__RP4_SCANLINES_50'  __RP4_SCANLINES_50
+`#define' `__RP4_SCANLINES_75'  __RP4_SCANLINES_75
 
 `#define' `__REG_SUB_VERSION'  __REG_SUB_VERSION
 
