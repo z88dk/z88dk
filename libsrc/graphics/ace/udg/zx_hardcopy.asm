@@ -13,71 +13,28 @@
 		PUBLIC    zx_hardcopy
 		PUBLIC    _zx_hardcopy
 		
-		EXTERN loadudg6
-
+		EXTERN	loadudg6
 
 .zx_hardcopy
 ._zx_hardcopy
 
-	
-	; first part of the character set, "battenberg cake" chars
-;	ld	hl,0
-;	ld	de,acefont
-;fontloop:
-;	LD A,L
-;	AND $BF
-;	RRCA
-;	RRCA
-;	RRCA
-;	JR NC,skip
-;	RRCA
-;	RRCA
-;skip:
-;	RRCA
-;	LD B,A
-;	SBC A
-;	RR B
-;	LD B,A
-;	SBC A
-;	XOR B
-;	AND $F0
-;	XOR B
-;	add hl,de
-;	LD (HL),A
-;	sbc hl,de
-;	INC L
-;	JR NZ,fontloop
-	
-	; needs to be fixed, lowercase chars have some dirt on the top row
-	
-	LD DE,acefont+1024		; de-compress the character set from ROM
-	LD HL,1FFBh
-	LD BC,0008h
-	LDDR
-	EX DE,HL
-	
-	LD A,5Fh
-bitloop:
-	LD C,07h
-	BIT 5,A
-	JR Z,skip2
-	LD (HL),B
-	DEC HL
-	DEC C
-skip2:
-	EX DE,HL
-	LDDR
-	EX DE,HL
-	LD (HL),B
-	DEC HL
-	DEC A
-	JR NZ,bitloop
 
 		ld   c,0	; first UDG chr$ to load
 		ld	 b,64	; number of characters to load
-		ld	hl,acefont+768+256
+		;ld	hl,acefont
+		ld	hl,0
+		add hl,sp
+		ld	(stacksave+1),hl
+		ld	hl,-512
+		add hl,sp
+		ld sp,hl
+		push hl
 		call loadudg6
-
+		pop hl
+		ld de,-1024
+		add hl,de
+		ld	(acefont+1),hl
+	
 ; The full character-mapped screen is copied to the ZX-Printer.
 ; All twenty-four text/graphic lines are printed.
 
@@ -85,13 +42,6 @@ skip2:
 		DI
 L0869:  LD      D,24           ; prepare to copy twenty four text lines.
         LD      HL,$2400       ; set HL to start of display file from D_FILE.
-
-		; we are always in FAST mode..
-		;call zx_fast
-
-        PUSH    BC              ; *** preserve BC throughout.
-                                ; a pending character may be present 
-                                ; in C from LPRINT-CH
 
 ;; COPY-LOOP
 
@@ -145,32 +95,42 @@ L088A:  IN      A,($FB)         ; read from printer port.
         LD      D,A             ; store control mask in D.
 
 ;; COPY-NEXT
-L089C:  LD      C,(HL)          ; load character from screen or buffer.
+L089C:  LD      A,(HL)          ; load character from screen or buffer.
+
+		ld	c,a
+		
         INC     HL              ; update pointer for next time.
-
-        LD      A,C             ; save a copy in C for later inverse test.
-
         PUSH    HL              ; * else preserve the character pointer.
+		ld	h,0
+
+		sub 128
+		ld	a,h			; zero
+		jp	c,blank		; filter out non-udg characters and force them to blank
+		ld  a,c
 
 		ld	l,a
-		ld	h,0
-		add	hl,hl
-		add	hl,hl
-		add	hl,hl
 		
-		ld	bc,acefont
-		add hl,bc
+		ld	c,d		; save D reg
+		ld	d,h		; ..and put zero on it
 		
-		ld b,0
-		ld c,e			; current character row
-		add hl,bc
+		rl l
+		rl h		; *2
+		rl l
+		rl h		; *4
+		rl l
+		rl h		; *8
 		
-
-;        RL      C               ; test character, setting carry if inverse (does bit 7 have such effect on J.ACE?).
-;        SBC     A,A             ; accumulator now $00 if normal, $FF if inverse.
-;        XOR     (HL)            ; combine with bit pattern at end or ROM.
-
-		ld a,(hl)			; With J. ACE we do differently  :)
+		add hl,de			; current character row
+		ld	a,e		; save E reg
+acefont:
+		;ld	de,acefont-1024
+		ld	de,0
+		add hl,de
+		ld	e,a
+		ld	d,c
+				
+		ld		a,(hl)
+blank:
 
         LD      C,A             ; transfer the byte to C.
         LD      B,$08           ; count eight bits to output.
@@ -231,15 +191,16 @@ stop_exit:
 
 ;; COPY-END
 L08DE:  
-		;call zx_slow
-        POP     BC              ; *** restore preserved BC.
+stacksave:
+		ld	hl,0
+		ld	sp,hl
 		EI
 		RET
 
-		
 
-acefont:
-		defs	256
-		;binary "stdio/ansi/f8.bin"
-		defs	768
+;	SECTION	bss_clib
+		
+;acefont:
+;		defs	512
+
 
