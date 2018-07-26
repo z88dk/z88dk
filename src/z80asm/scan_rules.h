@@ -1,44 +1,44 @@
 static const short _lexer_actions[] = {
 	0, 1, 0, 1, 1, 1, 2, 1, 
-	220, 1, 221, 1, 222, 1, 223, 1, 
-	224, 1, 225, 1, 226, 1, 227, 1, 
-	228, 1, 229, 1, 230, 1, 231, 1, 
-	232, 1, 233, 1, 234, 1, 235, 1, 
-	236, 1, 237, 1, 238, 1, 239, 1, 
-	240, 1, 241, 1, 242, 1, 243, 1, 
-	244, 1, 245, 1, 246, 1, 247, 1, 
-	248, 1, 249, 1, 250, 1, 251, 1, 
-	252, 1, 253, 1, 254, 1, 255, 1, 
-	256, 1, 257, 1, 258, 1, 259, 1, 
-	260, 1, 261, 1, 262, 1, 263, 1, 
-	264, 1, 265, 1, 266, 1, 267, 1, 
-	268, 1, 269, 1, 270, 1, 271, 1, 
-	272, 1, 273, 1, 274, 1, 275, 1, 
-	276, 1, 277, 1, 278, 1, 279, 1, 
-	280, 1, 281, 1, 282, 1, 283, 1, 
-	284, 1, 285, 1, 286, 1, 287, 1, 
-	288, 1, 289, 1, 290, 1, 291, 1, 
-	292, 1, 293, 1, 294, 1, 295, 1, 
-	296, 1, 297, 1, 298, 1, 299, 1, 
-	300, 1, 301, 1, 302, 1, 303, 1, 
-	304, 1, 305, 1, 306, 1, 307, 1, 
-	308, 1, 309, 1, 310, 1, 311, 1, 
-	312, 1, 313, 1, 314, 1, 315, 1, 
-	316, 1, 317, 1, 318, 1, 319, 1, 
-	320, 1, 321, 1, 322, 1, 323, 1, 
-	324, 1, 325, 1, 326, 1, 327, 1, 
-	328, 1, 329, 1, 330, 1, 331, 1, 
-	332, 1, 333, 1, 334, 1, 335, 1, 
-	336, 1, 337, 1, 338, 1, 339, 1, 
-	340, 1, 341, 1, 342, 1, 343, 1, 
-	344, 1, 345, 1, 346, 1, 347, 1, 
-	348, 1, 349, 1, 350, 1, 351, 1, 
-	352, 1, 353, 1, 354, 1, 355, 1, 
-	356, 1, 357, 1, 358, 1, 359, 1, 
-	360, 1, 361, 1, 362, 1, 363, 1, 
-	364, 1, 365, 1, 366, 1, 367, 1, 
-	368, 1, 369, 1, 370, 1, 371, 1, 
-	372, 1, 373, 1, 374, 1, 375, 2, 
+	221, 1, 222, 1, 223, 1, 224, 1, 
+	225, 1, 226, 1, 227, 1, 228, 1, 
+	229, 1, 230, 1, 231, 1, 232, 1, 
+	233, 1, 234, 1, 235, 1, 236, 1, 
+	237, 1, 238, 1, 239, 1, 240, 1, 
+	241, 1, 242, 1, 243, 1, 244, 1, 
+	245, 1, 246, 1, 247, 1, 248, 1, 
+	249, 1, 250, 1, 251, 1, 252, 1, 
+	253, 1, 254, 1, 255, 1, 256, 1, 
+	257, 1, 258, 1, 259, 1, 260, 1, 
+	261, 1, 262, 1, 263, 1, 264, 1, 
+	265, 1, 266, 1, 267, 1, 268, 1, 
+	269, 1, 270, 1, 271, 1, 272, 1, 
+	273, 1, 274, 1, 275, 1, 276, 1, 
+	277, 1, 278, 1, 279, 1, 280, 1, 
+	281, 1, 282, 1, 283, 1, 284, 1, 
+	285, 1, 286, 1, 287, 1, 288, 1, 
+	289, 1, 290, 1, 291, 1, 292, 1, 
+	293, 1, 294, 1, 295, 1, 296, 1, 
+	297, 1, 298, 1, 299, 1, 300, 1, 
+	301, 1, 302, 1, 303, 1, 304, 1, 
+	305, 1, 306, 1, 307, 1, 308, 1, 
+	309, 1, 310, 1, 311, 1, 312, 1, 
+	313, 1, 314, 1, 315, 1, 316, 1, 
+	317, 1, 318, 1, 319, 1, 320, 1, 
+	321, 1, 322, 1, 323, 1, 324, 1, 
+	325, 1, 326, 1, 327, 1, 328, 1, 
+	329, 1, 330, 1, 331, 1, 332, 1, 
+	333, 1, 334, 1, 335, 1, 336, 1, 
+	337, 1, 338, 1, 339, 1, 340, 1, 
+	341, 1, 342, 1, 343, 1, 344, 1, 
+	345, 1, 346, 1, 347, 1, 348, 1, 
+	349, 1, 350, 1, 351, 1, 352, 1, 
+	353, 1, 354, 1, 355, 1, 356, 1, 
+	357, 1, 358, 1, 359, 1, 360, 1, 
+	361, 1, 362, 1, 363, 1, 364, 1, 
+	365, 1, 366, 1, 367, 1, 368, 1, 
+	369, 1, 370, 1, 371, 1, 372, 1, 
+	373, 1, 374, 1, 375, 1, 376, 2, 
 	2, 3, 2, 2, 4, 2, 2, 5, 
 	2, 2, 6, 2, 2, 7, 2, 2, 
 	8, 2, 2, 9, 2, 2, 10, 2, 
@@ -120,7 +120,7 @@ static const short _lexer_actions[] = {
 	2, 211, 2, 2, 212, 2, 2, 213, 
 	2, 2, 214, 2, 2, 215, 2, 2, 
 	216, 2, 2, 217, 2, 2, 218, 2, 
-	2, 219
+	2, 219, 2, 2, 220
 };
 static const short _lexer_cond_offsets[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 
@@ -3477,129 +3477,129 @@ static const short _lexer_trans_actions[] = {
 	121, 0, 0, 117, 0, 0, 0, 139, 
 	0, 125, 127, 129, 131, 133, 135, 137, 
 	97, 101, 103, 99, 311, 0, 0, 0, 
-	143, 141, 7, 0, 151, 9, 967, 322, 
+	143, 141, 7, 0, 151, 9, 322, 325, 
 	0, 149, 5, 13, 0, 15, 17, 19, 
-	23, 0, 955, 955, 955, 25, 0, 0, 
-	0, 0, 41, 967, 43, 153, 45, 47, 
+	23, 0, 958, 958, 958, 25, 0, 0, 
+	0, 0, 41, 970, 43, 153, 45, 47, 
 	51, 0, 55, 57, 21, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0, 952, 
+	0, 0, 0, 0, 0, 0, 0, 955, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 358, 0, 328, 5, 388, 361, 334, 
-	364, 367, 391, 952, 370, 394, 952, 952, 
-	379, 346, 952, 952, 343, 400, 952, 952, 
-	952, 358, 406, 328, 155, 33, 958, 0, 
+	0, 361, 0, 331, 5, 391, 364, 337, 
+	367, 370, 394, 955, 373, 397, 955, 955, 
+	382, 349, 955, 955, 346, 403, 955, 955, 
+	955, 361, 409, 331, 155, 33, 961, 0, 
 	0, 307, 157, 11, 159, 161, 49, 301, 
-	961, 0, 961, 305, 964, 303, 295, 165, 
+	964, 0, 964, 305, 967, 303, 295, 165, 
 	27, 29, 31, 167, 35, 169, 39, 37, 
 	171, 53, 191, 71, 0, 0, 0, 0, 
-	0, 0, 297, 439, 559, 562, 211, 81, 
-	0, 0, 0, 445, 877, 565, 0, 0, 
+	0, 0, 297, 442, 562, 565, 211, 81, 
+	0, 0, 0, 448, 880, 568, 0, 0, 
 	319, 181, 59, 0, 0, 0, 201, 75, 
-	0, 568, 0, 0, 448, 0, 880, 173, 
+	0, 571, 0, 0, 451, 0, 883, 173, 
 	61, 0, 0, 0, 5, 0, 0, 0, 
-	221, 0, 0, 0, 940, 0, 943, 0, 
-	223, 105, 225, 0, 0, 592, 227, 583, 
-	229, 589, 0, 0, 0, 0, 451, 183, 
-	63, 0, 0, 601, 0, 0, 5, 595, 
-	203, 77, 598, 0, 0, 0, 454, 457, 
-	0, 0, 0, 469, 472, 475, 0, 481, 
-	460, 0, 0, 0, 463, 0, 466, 0, 
-	0, 478, 442, 0, 0, 0, 484, 0, 
-	604, 5, 0, 0, 185, 65, 0, 0, 
-	0, 0, 231, 403, 0, 0, 0, 217, 
-	0, 0, 0, 493, 0, 0, 496, 487, 
-	0, 0, 499, 233, 0, 613, 0, 0, 
-	502, 193, 73, 0, 0, 0, 0, 283, 
-	0, 799, 946, 0, 0, 0, 0, 505, 
-	187, 67, 0, 0, 0, 616, 205, 79, 
-	195, 0, 0, 0, 619, 0, 0, 0, 
-	0, 0, 0, 883, 219, 0, 0, 0, 
-	511, 0, 0, 514, 397, 235, 847, 0, 
-	0, 0, 0, 237, 0, 0, 0, 517, 
-	239, 631, 241, 637, 0, 0, 949, 886, 
-	889, 213, 0, 0, 0, 892, 0, 895, 
-	207, 373, 382, 209, 376, 385, 640, 643, 
-	189, 69, 0, 0, 352, 0, 349, 243, 
-	0, 0, 0, 0, 245, 0, 0, 781, 
-	247, 784, 898, 249, 0, 0, 775, 251, 
-	0, 778, 0, 0, 0, 787, 901, 293, 
-	0, 0, 790, 793, 520, 0, 523, 0, 
-	0, 0, 0, 907, 913, 0, 910, 916, 
-	0, 0, 529, 526, 179, 0, 0, 0, 
-	0, 0, 0, 0, 0, 802, 850, 0, 
-	285, 823, 826, 829, 832, 835, 838, 841, 
-	844, 0, 0, 0, 532, 919, 331, 0, 
-	0, 355, 325, 661, 0, 0, 0, 0, 
-	805, 664, 0, 0, 0, 253, 535, 0, 
-	0, 0, 670, 287, 856, 0, 673, 289, 
-	862, 0, 255, 865, 679, 0, 257, 0, 
-	772, 177, 340, 0, 0, 0, 0, 0, 
-	0, 538, 0, 0, 0, 0, 0, 811, 
-	808, 175, 685, 0, 0, 0, 0, 541, 
-	688, 197, 0, 0, 0, 0, 0, 0, 
-	0, 0, 922, 691, 0, 259, 697, 700, 
-	261, 0, 0, 715, 263, 107, 265, 0, 
-	267, 109, 269, 0, 0, 730, 271, 111, 
-	273, 0, 275, 113, 733, 0, 0, 0, 
-	0, 427, 0, 0, 0, 0, 736, 0, 
-	277, 115, 0, 0, 0, 0, 0, 544, 
-	279, 0, 0, 814, 0, 925, 745, 751, 
-	748, 868, 754, 757, 215, 760, 0, 0, 
-	928, 0, 0, 281, 0, 0, 766, 0, 
-	0, 0, 0, 931, 0, 0, 0, 817, 
-	0, 291, 0, 874, 0, 0, 934, 937, 
-	0, 0, 0, 0, 0, 547, 199, 0, 
-	0, 0, 0, 0, 0, 550, 0, 553, 
-	763, 436, 0, 556, 163, 299, 952, 952, 
-	424, 952, 952, 952, 439, 559, 562, 952, 
-	952, 952, 445, 877, 565, 952, 952, 319, 
-	409, 952, 952, 952, 568, 952, 952, 448, 
-	952, 880, 952, 952, 577, 952, 952, 952, 
-	571, 952, 952, 952, 940, 952, 943, 574, 
-	580, 586, 592, 583, 589, 952, 952, 952, 
-	451, 952, 412, 601, 952, 952, 952, 595, 
-	598, 952, 952, 952, 454, 457, 952, 952, 
-	952, 469, 472, 475, 952, 481, 460, 952, 
-	952, 952, 463, 952, 466, 952, 952, 478, 
-	442, 952, 952, 952, 484, 952, 604, 952, 
-	607, 952, 952, 610, 403, 952, 952, 490, 
-	952, 952, 952, 493, 952, 952, 496, 487, 
-	952, 952, 499, 952, 613, 952, 952, 502, 
-	952, 952, 952, 796, 952, 799, 946, 952, 
-	952, 952, 952, 505, 952, 415, 952, 616, 
-	952, 508, 952, 619, 622, 952, 430, 418, 
-	421, 952, 883, 952, 952, 952, 511, 952, 
-	952, 514, 397, 847, 625, 628, 634, 952, 
-	952, 952, 952, 517, 631, 637, 952, 952, 
-	949, 886, 889, 952, 952, 952, 892, 952, 
-	895, 373, 382, 376, 385, 640, 643, 646, 
-	952, 352, 952, 349, 649, 655, 904, 952, 
-	652, 952, 781, 784, 898, 658, 952, 775, 
-	952, 778, 952, 952, 952, 787, 901, 952, 
-	952, 790, 793, 520, 952, 523, 952, 952, 
-	952, 952, 907, 913, 952, 910, 916, 952, 
-	952, 529, 526, 952, 952, 952, 952, 952, 
-	952, 952, 952, 802, 850, 820, 823, 826, 
-	829, 832, 835, 838, 841, 844, 952, 952, 
-	952, 532, 919, 331, 952, 952, 355, 325, 
-	661, 952, 952, 952, 952, 805, 664, 667, 
-	952, 952, 535, 952, 952, 853, 670, 856, 
-	859, 673, 862, 676, 865, 679, 682, 952, 
-	772, 340, 952, 952, 337, 952, 952, 952, 
-	538, 952, 952, 952, 952, 952, 811, 808, 
-	685, 952, 952, 952, 952, 541, 688, 952, 
-	952, 703, 718, 952, 952, 952, 952, 922, 
-	691, 694, 697, 700, 706, 709, 715, 712, 
-	721, 724, 730, 727, 733, 952, 952, 952, 
-	952, 427, 952, 433, 952, 952, 736, 739, 
-	952, 742, 952, 952, 952, 544, 952, 952, 
-	814, 952, 925, 745, 751, 748, 868, 754, 
-	757, 760, 952, 952, 928, 952, 769, 952, 
-	952, 766, 952, 952, 952, 952, 931, 952, 
-	952, 952, 817, 871, 952, 874, 952, 952, 
-	934, 937, 952, 952, 952, 952, 952, 547, 
-	952, 952, 952, 952, 952, 952, 550, 952, 
-	553, 763, 436, 952, 556
+	221, 0, 0, 0, 943, 0, 946, 0, 
+	223, 105, 225, 0, 0, 595, 227, 586, 
+	229, 592, 0, 0, 0, 0, 454, 183, 
+	63, 0, 0, 604, 0, 0, 5, 598, 
+	203, 77, 601, 0, 0, 0, 457, 460, 
+	0, 0, 0, 472, 475, 478, 0, 484, 
+	463, 0, 0, 0, 466, 0, 469, 0, 
+	0, 481, 445, 0, 0, 0, 487, 0, 
+	607, 5, 0, 0, 185, 65, 0, 0, 
+	0, 0, 231, 406, 0, 0, 0, 217, 
+	0, 0, 0, 496, 0, 0, 499, 490, 
+	0, 0, 502, 233, 0, 616, 0, 0, 
+	505, 193, 73, 0, 0, 0, 0, 283, 
+	0, 802, 949, 0, 0, 0, 0, 508, 
+	187, 67, 0, 0, 0, 619, 205, 79, 
+	195, 0, 0, 0, 622, 0, 0, 0, 
+	0, 0, 0, 886, 219, 0, 0, 0, 
+	514, 0, 0, 517, 400, 235, 850, 0, 
+	0, 0, 0, 237, 0, 0, 0, 520, 
+	239, 634, 241, 640, 0, 0, 952, 889, 
+	892, 213, 0, 0, 0, 895, 0, 898, 
+	207, 376, 385, 209, 379, 388, 643, 646, 
+	189, 69, 0, 0, 355, 0, 352, 243, 
+	0, 0, 0, 0, 245, 0, 0, 784, 
+	247, 787, 901, 249, 0, 0, 778, 251, 
+	0, 781, 0, 0, 0, 790, 904, 293, 
+	0, 0, 793, 796, 523, 0, 526, 0, 
+	0, 0, 0, 910, 916, 0, 913, 919, 
+	0, 0, 532, 529, 179, 0, 0, 0, 
+	0, 0, 0, 0, 0, 805, 853, 0, 
+	285, 826, 829, 832, 835, 838, 841, 844, 
+	847, 0, 0, 0, 535, 922, 334, 0, 
+	0, 358, 328, 664, 0, 0, 0, 0, 
+	808, 667, 0, 0, 0, 253, 538, 0, 
+	0, 0, 673, 287, 859, 0, 676, 289, 
+	865, 0, 255, 868, 682, 0, 257, 0, 
+	775, 177, 343, 0, 0, 0, 0, 0, 
+	0, 541, 0, 0, 0, 0, 0, 814, 
+	811, 175, 688, 0, 0, 0, 0, 544, 
+	691, 197, 0, 0, 0, 0, 0, 0, 
+	0, 0, 925, 694, 0, 259, 700, 703, 
+	261, 0, 0, 718, 263, 107, 265, 0, 
+	267, 109, 269, 0, 0, 733, 271, 111, 
+	273, 0, 275, 113, 736, 0, 0, 0, 
+	0, 430, 0, 0, 0, 0, 739, 0, 
+	277, 115, 0, 0, 0, 0, 0, 547, 
+	279, 0, 0, 817, 0, 928, 748, 754, 
+	751, 871, 757, 760, 215, 763, 0, 0, 
+	931, 0, 0, 281, 0, 0, 769, 0, 
+	0, 0, 0, 934, 0, 0, 0, 820, 
+	0, 291, 0, 877, 0, 0, 937, 940, 
+	0, 0, 0, 0, 0, 550, 199, 0, 
+	0, 0, 0, 0, 0, 553, 0, 556, 
+	766, 439, 0, 559, 163, 299, 955, 955, 
+	427, 955, 955, 955, 442, 562, 565, 955, 
+	955, 955, 448, 880, 568, 955, 955, 319, 
+	412, 955, 955, 955, 571, 955, 955, 451, 
+	955, 883, 955, 955, 580, 955, 955, 955, 
+	574, 955, 955, 955, 943, 955, 946, 577, 
+	583, 589, 595, 586, 592, 955, 955, 955, 
+	454, 955, 415, 604, 955, 955, 955, 598, 
+	601, 955, 955, 955, 457, 460, 955, 955, 
+	955, 472, 475, 478, 955, 484, 463, 955, 
+	955, 955, 466, 955, 469, 955, 955, 481, 
+	445, 955, 955, 955, 487, 955, 607, 955, 
+	610, 955, 955, 613, 406, 955, 955, 493, 
+	955, 955, 955, 496, 955, 955, 499, 490, 
+	955, 955, 502, 955, 616, 955, 955, 505, 
+	955, 955, 955, 799, 955, 802, 949, 955, 
+	955, 955, 955, 508, 955, 418, 955, 619, 
+	955, 511, 955, 622, 625, 955, 433, 421, 
+	424, 955, 886, 955, 955, 955, 514, 955, 
+	955, 517, 400, 850, 628, 631, 637, 955, 
+	955, 955, 955, 520, 634, 640, 955, 955, 
+	952, 889, 892, 955, 955, 955, 895, 955, 
+	898, 376, 385, 379, 388, 643, 646, 649, 
+	955, 355, 955, 352, 652, 658, 907, 955, 
+	655, 955, 784, 787, 901, 661, 955, 778, 
+	955, 781, 955, 955, 955, 790, 904, 955, 
+	955, 793, 796, 523, 955, 526, 955, 955, 
+	955, 955, 910, 916, 955, 913, 919, 955, 
+	955, 532, 529, 955, 955, 955, 955, 955, 
+	955, 955, 955, 805, 853, 823, 826, 829, 
+	832, 835, 838, 841, 844, 847, 955, 955, 
+	955, 535, 922, 334, 955, 955, 358, 328, 
+	664, 955, 955, 955, 955, 808, 667, 670, 
+	955, 955, 538, 955, 955, 856, 673, 859, 
+	862, 676, 865, 679, 868, 682, 685, 955, 
+	775, 343, 955, 955, 340, 955, 955, 955, 
+	541, 955, 955, 955, 955, 955, 814, 811, 
+	688, 955, 955, 955, 955, 544, 691, 955, 
+	955, 706, 721, 955, 955, 955, 955, 925, 
+	694, 697, 700, 703, 709, 712, 718, 715, 
+	724, 727, 733, 730, 736, 955, 955, 955, 
+	955, 430, 955, 436, 955, 955, 739, 742, 
+	955, 745, 955, 955, 955, 547, 955, 955, 
+	817, 955, 928, 748, 754, 751, 871, 757, 
+	760, 763, 955, 955, 931, 955, 772, 955, 
+	955, 769, 955, 955, 955, 955, 934, 955, 
+	955, 955, 820, 874, 955, 877, 955, 955, 
+	937, 940, 955, 955, 955, 955, 955, 550, 
+	955, 955, 955, 955, 955, 955, 553, 955, 
+	556, 766, 439, 955, 559
 };
 static const short _lexer_to_state_actions[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 
@@ -3959,10 +3959,10 @@ _eof_trans:
 	{act = 1;}
 	break;
 	case 4:
-	{act = 5;}
+	{act = 2;}
 	break;
 	case 5:
-	{act = 37;}
+	{act = 6;}
 	break;
 	case 6:
 	{act = 38;}
@@ -4076,7 +4076,7 @@ _eof_trans:
 	{act = 74;}
 	break;
 	case 43:
-	{act = 94;}
+	{act = 75;}
 	break;
 	case 44:
 	{act = 95;}
@@ -4196,7 +4196,7 @@ _eof_trans:
 	{act = 133;}
 	break;
 	case 83:
-	{act = 138;}
+	{act = 134;}
 	break;
 	case 84:
 	{act = 139;}
@@ -4214,7 +4214,7 @@ _eof_trans:
 	{act = 143;}
 	break;
 	case 89:
-	{act = 145;}
+	{act = 144;}
 	break;
 	case 90:
 	{act = 146;}
@@ -4346,13 +4346,13 @@ _eof_trans:
 	{act = 188;}
 	break;
 	case 133:
-	{act = 190;}
+	{act = 189;}
 	break;
 	case 134:
 	{act = 191;}
 	break;
 	case 135:
-	{act = 193;}
+	{act = 192;}
 	break;
 	case 136:
 	{act = 194;}
@@ -4361,13 +4361,13 @@ _eof_trans:
 	{act = 195;}
 	break;
 	case 138:
-	{act = 197;}
+	{act = 196;}
 	break;
 	case 139:
 	{act = 198;}
 	break;
 	case 140:
-	{act = 200;}
+	{act = 199;}
 	break;
 	case 141:
 	{act = 201;}
@@ -4379,7 +4379,7 @@ _eof_trans:
 	{act = 203;}
 	break;
 	case 144:
-	{act = 205;}
+	{act = 204;}
 	break;
 	case 145:
 	{act = 206;}
@@ -4484,7 +4484,7 @@ _eof_trans:
 	{act = 239;}
 	break;
 	case 179:
-	{act = 252;}
+	{act = 240;}
 	break;
 	case 180:
 	{act = 253;}
@@ -4589,110 +4589,106 @@ _eof_trans:
 	{act = 286;}
 	break;
 	case 214:
-	{act = 289;}
+	{act = 287;}
 	break;
 	case 215:
-	{act = 291;}
+	{act = 290;}
 	break;
 	case 216:
-	{act = 293;}
+	{act = 292;}
 	break;
 	case 217:
-	{act = 295;}
+	{act = 294;}
 	break;
 	case 218:
-	{act = 297;}
+	{act = 296;}
 	break;
 	case 219:
-	{act = 301;}
+	{act = 298;}
 	break;
 	case 220:
+	{act = 302;}
+	break;
+	case 221:
 	{te = p+1;{
 	sym.tok = TK_NEWLINE;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 221:
+	case 222:
 	{te = p+1;{
 	sym.tok = TK_CONST_EXPR;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 222:
+	case 223:
 	{te = p+1;{
 	sym.tok = TK_LOG_AND;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 223:
+	case 224:
 	{te = p+1;{
 	sym.tok = TK_RPAREN;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 224:
+	case 225:
 	{te = p+1;{
 	sym.tok = TK_PLUS;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 225:
+	case 226:
 	{te = p+1;{
 	sym.tok = TK_COMMA;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 226:
+	case 227:
 	{te = p+1;{
 	sym.tok = TK_MINUS;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 227:
+	case 228:
 	{te = p+1;{
 	sym.tok = TK_DOT;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 228:
+	case 229:
 	{te = p+1;{
 	sym.tok = TK_DIVIDE;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 229:
+	case 230:
 	{te = p+1;{
 	sym.tok = TK_COLON;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 230:
+	case 231:
 	{te = p+1;{
 	sym.tok = TK_LEFT_SHIFT;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 231:
-	{te = p+1;{
-	sym.tok = TK_LESS_EQ;
-	;
-	{p++; goto _out; }
-}}
-	break;
 	case 232:
 	{te = p+1;{
-	sym.tok = TK_NOT_EQ;
+	sym.tok = TK_LESS_EQ;
 	;
 	{p++; goto _out; }
 }}
@@ -4706,250 +4702,257 @@ _eof_trans:
 	break;
 	case 234:
 	{te = p+1;{
-	sym.tok = TK_EQUAL;
+	sym.tok = TK_NOT_EQ;
 	;
 	{p++; goto _out; }
 }}
 	break;
 	case 235:
 	{te = p+1;{
-	sym.tok = TK_RIGHT_SHIFT;
+	sym.tok = TK_EQUAL;
 	;
 	{p++; goto _out; }
 }}
 	break;
 	case 236:
 	{te = p+1;{
-	sym.tok = TK_GREATER_EQ;
+	sym.tok = TK_RIGHT_SHIFT;
 	;
 	{p++; goto _out; }
 }}
 	break;
 	case 237:
 	{te = p+1;{
-	sym.tok = TK_QUESTION;
+	sym.tok = TK_GREATER_EQ;
 	;
 	{p++; goto _out; }
 }}
 	break;
 	case 238:
 	{te = p+1;{
-	sym.tok = TK_LSQUARE;
+	sym.tok = TK_QUESTION;
 	;
 	{p++; goto _out; }
 }}
 	break;
 	case 239:
 	{te = p+1;{
-	sym.tok = TK_RSQUARE;
+	sym.tok = TK_LSQUARE;
 	;
 	{p++; goto _out; }
 }}
 	break;
 	case 240:
 	{te = p+1;{
-	sym.tok = TK_BIN_XOR;
+	sym.tok = TK_RSQUARE;
 	;
 	{p++; goto _out; }
 }}
 	break;
 	case 241:
 	{te = p+1;{
-	sym.tok = TK_POWER;
+	sym.tok = TK_BIN_XOR;
 	;
 	{p++; goto _out; }
 }}
 	break;
 	case 242:
 	{te = p+1;{
-	sym.tok = TK_LCURLY;
+	sym.tok = TK_POWER;
 	;
 	{p++; goto _out; }
 }}
 	break;
 	case 243:
 	{te = p+1;{
-	sym.tok = TK_LOG_OR;
+	sym.tok = TK_LCURLY;
 	;
 	{p++; goto _out; }
 }}
 	break;
 	case 244:
 	{te = p+1;{
-	sym.tok = TK_RCURLY;
+	sym.tok = TK_LOG_OR;
 	;
 	{p++; goto _out; }
 }}
 	break;
 	case 245:
 	{te = p+1;{
-	sym.tok = TK_BIN_NOT;
+	sym.tok = TK_RCURLY;
 	;
 	{p++; goto _out; }
 }}
 	break;
 	case 246:
 	{te = p+1;{
-	sym.tok = TK_B1;
+	sym.tok = TK_BIN_NOT;
 	;
 	{p++; goto _out; }
 }}
 	break;
 	case 247:
 	{te = p+1;{
-	sym.tok = TK_C1;
+	sym.tok = TK_B1;
 	;
 	{p++; goto _out; }
 }}
 	break;
 	case 248:
 	{te = p+1;{
-	sym.tok = TK_D1;
+	sym.tok = TK_C1;
 	;
 	{p++; goto _out; }
 }}
 	break;
 	case 249:
 	{te = p+1;{
-	sym.tok = TK_E1;
+	sym.tok = TK_D1;
 	;
 	{p++; goto _out; }
 }}
 	break;
 	case 250:
 	{te = p+1;{
-	sym.tok = TK_H1;
+	sym.tok = TK_E1;
 	;
 	{p++; goto _out; }
 }}
 	break;
 	case 251:
 	{te = p+1;{
-	sym.tok = TK_L1;
+	sym.tok = TK_H1;
 	;
 	{p++; goto _out; }
 }}
 	break;
 	case 252:
 	{te = p+1;{
-	sym.tok = TK_A1;
+	sym.tok = TK_L1;
 	;
 	{p++; goto _out; }
 }}
 	break;
 	case 253:
 	{te = p+1;{
-	sym.tok = TK_F1;
+	sym.tok = TK_A1;
 	;
 	{p++; goto _out; }
 }}
 	break;
 	case 254:
 	{te = p+1;{
-	sym.tok = TK_BC1;
+	sym.tok = TK_F1;
 	;
 	{p++; goto _out; }
 }}
 	break;
 	case 255:
 	{te = p+1;{
-	sym.tok = TK_DE1;
+	sym.tok = TK_BC1;
 	;
 	{p++; goto _out; }
 }}
 	break;
 	case 256:
 	{te = p+1;{
-	sym.tok = TK_HL1;
+	sym.tok = TK_DE1;
 	;
 	{p++; goto _out; }
 }}
 	break;
 	case 257:
 	{te = p+1;{
-	sym.tok = TK_AF1;
+	sym.tok = TK_HL1;
 	;
 	{p++; goto _out; }
 }}
 	break;
 	case 258:
 	{te = p+1;{
-	sym.tok = TK_IND_BC;
-	p--; te--;
+	sym.tok = TK_AF1;
+	;
 	{p++; goto _out; }
 }}
 	break;
 	case 259:
 	{te = p+1;{
-	sym.tok = TK_IND_DE;
+	sym.tok = TK_IND_BC;
 	p--; te--;
 	{p++; goto _out; }
 }}
 	break;
 	case 260:
 	{te = p+1;{
-	sym.tok = TK_IND_IX;
+	sym.tok = TK_IND_DE;
 	p--; te--;
 	{p++; goto _out; }
 }}
 	break;
 	case 261:
 	{te = p+1;{
-	sym.tok = TK_IND_IY;
+	sym.tok = TK_IND_IX;
 	p--; te--;
 	{p++; goto _out; }
 }}
 	break;
 	case 262:
 	{te = p+1;{
-	sym.tok = TK_IND_HL;
+	sym.tok = TK_IND_IY;
 	p--; te--;
 	{p++; goto _out; }
 }}
 	break;
 	case 263:
 	{te = p+1;{
-	sym.tok = TK_IND_SP;
+	sym.tok = TK_IND_HL;
 	p--; te--;
 	{p++; goto _out; }
 }}
 	break;
 	case 264:
 	{te = p+1;{
-	sym.tok = TK_IND_C;
+	sym.tok = TK_IND_SP;
 	p--; te--;
 	{p++; goto _out; }
 }}
 	break;
 	case 265:
 	{te = p+1;{
-	sym.tok = TK_DS_B;
-	;
+	sym.tok = TK_IND_C;
+	p--; te--;
 	{p++; goto _out; }
 }}
 	break;
 	case 266:
 	{te = p+1;{
-	sym.tok = TK_DS_W;
+	sym.tok = TK_DS_B;
 	;
 	{p++; goto _out; }
 }}
 	break;
 	case 267:
 	{te = p+1;{
-	sym.tok = TK_DS_P;
+	sym.tok = TK_DS_W;
 	;
 	{p++; goto _out; }
 }}
 	break;
 	case 268:
 	{te = p+1;{
-	sym.tok = TK_DS_Q;
+	sym.tok = TK_DS_P;
 	;
 	{p++; goto _out; }
 }}
 	break;
 	case 269:
+	{te = p+1;{
+	sym.tok = TK_DS_Q;
+	;
+	{p++; goto _out; }
+}}
+	break;
+	case 270:
 	{te = p+1;{
 	if (expect_opcode) {
 		sym.tok = TK_CCF1;
@@ -4963,7 +4966,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 270:
+	case 271:
 	{te = p+1;{
 	if (expect_opcode) {
 		sym.tok = TK_RLA1;
@@ -4977,7 +4980,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 271:
+	case 272:
 	{te = p+1;{
 	if (expect_opcode) {
 		sym.tok = TK_RLCA1;
@@ -4991,7 +4994,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 272:
+	case 273:
 	{te = p+1;{
 	if (expect_opcode) {
 		sym.tok = TK_RRA1;
@@ -5005,7 +5008,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 273:
+	case 274:
 	{te = p+1;{
 	if (expect_opcode) {
 		sym.tok = TK_RRCA1;
@@ -5019,7 +5022,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 274:
+	case 275:
 	{te = p+1;{
 	if (expect_opcode) {
 		sym.tok = TK_SCF1;
@@ -5033,7 +5036,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 275:
+	case 276:
 	{te = p+1;{
 	if (expect_opcode) {
 		sym.tok = TK_CU_WAIT;
@@ -5047,7 +5050,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 276:
+	case 277:
 	{te = p+1;{
 	if (expect_opcode) {
 		sym.tok = TK_CU_MOVE;
@@ -5061,7 +5064,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 277:
+	case 278:
 	{te = p+1;{
 	if (expect_opcode) {
 		sym.tok = TK_CU_STOP;
@@ -5075,7 +5078,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 278:
+	case 279:
 	{te = p+1;{
 	if (expect_opcode) {
 		sym.tok = TK_CU_NOP;
@@ -5089,7 +5092,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 279:
+	case 280:
 	{te = p+1;{
 	if (expect_opcode) {
 		sym.tok = TK_DMA_WR0;
@@ -5103,7 +5106,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 280:
+	case 281:
 	{te = p+1;{
 	if (expect_opcode) {
 		sym.tok = TK_DMA_WR1;
@@ -5117,7 +5120,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 281:
+	case 282:
 	{te = p+1;{
 	if (expect_opcode) {
 		sym.tok = TK_DMA_WR2;
@@ -5131,7 +5134,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 282:
+	case 283:
 	{te = p+1;{
 	if (expect_opcode) {
 		sym.tok = TK_DMA_WR3;
@@ -5145,7 +5148,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 283:
+	case 284:
 	{te = p+1;{
 	if (expect_opcode) {
 		sym.tok = TK_DMA_WR4;
@@ -5159,7 +5162,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 284:
+	case 285:
 	{te = p+1;{
 	if (expect_opcode) {
 		sym.tok = TK_DMA_WR5;
@@ -5173,7 +5176,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 285:
+	case 286:
 	{te = p+1;{
 	if (expect_opcode) {
 		sym.tok = TK_DMA_WR6;
@@ -5187,7 +5190,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 286:
+	case 287:
 	{te = p+1;{
 	if (expect_opcode) {
 		sym.tok = TK_DMA_CMD;
@@ -5201,10 +5204,10 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 287:
+	case 288:
 	{te = p+1;}
 	break;
-	case 288:
+	case 289:
 	{te = p+1;{
   while ( ts[ 0] == '.' || isspace(ts[ 0]) ) ts++;
   while ( te[-1] == ':' || isspace(te[-1]) ) te--;
@@ -5212,7 +5215,7 @@ _eof_trans:
   {p++; goto _out; }
  }}
 	break;
-	case 289:
+	case 290:
 	{te = p+1;{
   sym.tok = TK_NUMBER;
   sym.number = scan_num( ts, te - ts - 1, 16 );
@@ -5220,7 +5223,7 @@ _eof_trans:
   {p++; goto _out; }
  }}
 	break;
-	case 290:
+	case 291:
 	{te = p+1;{
   sym.tok = TK_NUMBER;
   sym.number = scan_num( ts + 2, te - ts - 3, 2 );
@@ -5228,7 +5231,7 @@ _eof_trans:
   {p++; goto _out; }
  }}
 	break;
-	case 291:
+	case 292:
 	{te = p+1;{
   sym.tok = TK_NUMBER;
   sym.number = 0;
@@ -5251,7 +5254,7 @@ _eof_trans:
   {p++; goto _out; }
  }}
 	break;
-	case 292:
+	case 293:
 	{te = p+1;{
   sym.tok = TK_STRING;
   if ( ! get_sym_string() )
@@ -5259,7 +5262,7 @@ _eof_trans:
   {p++; goto _out; }
  }}
 	break;
-	case 293:
+	case 294:
 	{te = p+1;{
   sym.tok = TK_NIL;
   skip_to_newline();
@@ -5267,161 +5270,161 @@ _eof_trans:
   {p++; goto _out; }
  }}
 	break;
-	case 294:
+	case 295:
 	{te = p;p--;{
 	sym.tok = TK_LOG_NOT;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 295:
+	case 296:
 	{te = p;p--;{
 	sym.tok = TK_BIN_AND;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 296:
+	case 297:
 	{te = p;p--;{
 	sym.tok = TK_LPAREN;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 297:
+	case 298:
 	{te = p;p--;{
 	sym.tok = TK_MULTIPLY;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 298:
+	case 299:
 	{te = p;p--;{
 	sym.tok = TK_DOT;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 299:
+	case 300:
 	{te = p;p--;{
 	sym.tok = TK_LESS;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 300:
+	case 301:
 	{te = p;p--;{
 	sym.tok = TK_EQUAL;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 301:
+	case 302:
 	{te = p;p--;{
 	sym.tok = TK_GREATER;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 302:
+	case 303:
 	{te = p;p--;{
 	sym.tok = TK_BIN_OR;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 303:
+	case 304:
 	{te = p;p--;{
 	sym.tok = TK_C;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 304:
+	case 305:
 	{te = p;p--;{
 	sym.tok = TK_PO;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 305:
+	case 306:
 	{te = p;p--;{
 	sym.tok = TK_P;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 306:
+	case 307:
 	{te = p;p--;{
 	sym.tok = TK_M;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 307:
+	case 308:
 	{te = p;p--;{
 	sym.tok = TK_B;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 308:
+	case 309:
 	{te = p;p--;{
 	sym.tok = TK_D;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 309:
+	case 310:
 	{te = p;p--;{
 	sym.tok = TK_E;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 310:
+	case 311:
 	{te = p;p--;{
 	sym.tok = TK_H;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 311:
+	case 312:
 	{te = p;p--;{
 	sym.tok = TK_L;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 312:
+	case 313:
 	{te = p;p--;{
 	sym.tok = TK_A;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 313:
+	case 314:
 	{te = p;p--;{
 	sym.tok = TK_F;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 314:
+	case 315:
 	{te = p;p--;{
 	sym.tok = TK_I;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 315:
+	case 316:
 	{te = p;p--;{
 	sym.tok = TK_R;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 316:
+	case 317:
 	{te = p;p--;{
 	if (opts.cpu & CPU_Z80_ZXN) {
 		sym.tok = TK_X;
@@ -5432,63 +5435,63 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 317:
+	case 318:
 	{te = p;p--;{
 	sym.tok = TK_BC;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 318:
+	case 319:
 	{te = p;p--;{
 	sym.tok = TK_DE;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 319:
+	case 320:
 	{te = p;p--;{
 	sym.tok = TK_HL;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 320:
+	case 321:
 	{te = p;p--;{
 	sym.tok = TK_IX;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 321:
+	case 322:
 	{te = p;p--;{
 	sym.tok = TK_IY;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 322:
+	case 323:
 	{te = p;p--;{
 	sym.tok = TK_AF;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 323:
+	case 324:
 	{te = p;p--;{
 	sym.tok = TK_IP;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 324:
+	case 325:
 	{te = p;p--;{
 	sym.tok = TK_SU;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 325:
+	case 326:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_ELIF;
@@ -5502,7 +5505,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 326:
+	case 327:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_IF;
@@ -5516,7 +5519,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 327:
+	case 328:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_CALL;
@@ -5530,7 +5533,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 328:
+	case 329:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_CCF;
@@ -5544,7 +5547,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 329:
+	case 330:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_CP;
@@ -5558,7 +5561,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 330:
+	case 331:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_CPD;
@@ -5572,7 +5575,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 331:
+	case 332:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_CPI;
@@ -5586,7 +5589,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 332:
+	case 333:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_EI;
@@ -5600,7 +5603,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 333:
+	case 334:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_EX;
@@ -5614,7 +5617,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 334:
+	case 335:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_IN;
@@ -5628,7 +5631,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 335:
+	case 336:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_INC;
@@ -5642,7 +5645,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 336:
+	case 337:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_IND;
@@ -5656,7 +5659,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 337:
+	case 338:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_INI;
@@ -5670,7 +5673,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 338:
+	case 339:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_LD;
@@ -5684,7 +5687,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 339:
+	case 340:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_LDD;
@@ -5698,7 +5701,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 340:
+	case 341:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_LDDR;
@@ -5712,7 +5715,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 341:
+	case 342:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_LDI;
@@ -5726,7 +5729,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 342:
+	case 343:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_LDIR;
@@ -5740,7 +5743,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 343:
+	case 344:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_OR;
@@ -5754,7 +5757,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 344:
+	case 345:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_OUT;
@@ -5768,7 +5771,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 345:
+	case 346:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_OUTI;
@@ -5782,7 +5785,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 346:
+	case 347:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_RET;
@@ -5796,7 +5799,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 347:
+	case 348:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_RL;
@@ -5810,7 +5813,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 348:
+	case 349:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_RLA;
@@ -5824,7 +5827,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 349:
+	case 350:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_RLC;
@@ -5838,7 +5841,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 350:
+	case 351:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_RLCA;
@@ -5852,7 +5855,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 351:
+	case 352:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_RR;
@@ -5866,7 +5869,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 352:
+	case 353:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_RRA;
@@ -5880,7 +5883,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 353:
+	case 354:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_RRC;
@@ -5894,7 +5897,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 354:
+	case 355:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_RRCA;
@@ -5908,7 +5911,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 355:
+	case 356:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_SCF;
@@ -5922,7 +5925,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 356:
+	case 357:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_SET;
@@ -5936,7 +5939,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 357:
+	case 358:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_SWAP;
@@ -5950,7 +5953,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 358:
+	case 359:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_FILL;
@@ -5964,7 +5967,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 359:
+	case 360:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_MMU;
@@ -5978,7 +5981,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 360:
+	case 361:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_OTDM;
@@ -5992,7 +5995,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 361:
+	case 362:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_OTIM;
@@ -6006,7 +6009,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 362:
+	case 363:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_TST;
@@ -6020,7 +6023,7 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 363:
+	case 364:
 	{te = p;p--;{
 	if (expect_opcode) {
 		sym.tok = TK_LDP;
@@ -6034,16 +6037,16 @@ _eof_trans:
 	{p++; goto _out; }
 }}
 	break;
-	case 364:
+	case 365:
 	{te = p;p--;}
 	break;
-	case 365:
+	case 366:
 	{te = p;p--;{
   sym.tok = TK_NAME;
   {p++; goto _out; }
  }}
 	break;
-	case 366:
+	case 367:
 	{te = p;p--;{
   while ( ts[ 0] == '.' || isspace(ts[ 0]) ) ts++;
   while ( te[-1] == ':' || isspace(te[-1]) ) te--;
@@ -6051,18 +6054,10 @@ _eof_trans:
   {p++; goto _out; }
  }}
 	break;
-	case 367:
-	{te = p;p--;{
-  sym.tok = TK_NUMBER;
-  sym.number = scan_num( ts, te - ts, 10 );
-  ts = te = p;
-  {p++; goto _out; }
- }}
-	break;
 	case 368:
 	{te = p;p--;{
   sym.tok = TK_NUMBER;
-  sym.number = scan_num( ts + 2, te - ts - 2, 16 );
+  sym.number = scan_num( ts, te - ts, 10 );
   ts = te = p;
   {p++; goto _out; }
  }}
@@ -6070,7 +6065,7 @@ _eof_trans:
 	case 369:
 	{te = p;p--;{
   sym.tok = TK_NUMBER;
-  sym.number = scan_num( ts, te - ts - 1, 2 );
+  sym.number = scan_num( ts + 2, te - ts - 2, 16 );
   ts = te = p;
   {p++; goto _out; }
  }}
@@ -6078,32 +6073,40 @@ _eof_trans:
 	case 370:
 	{te = p;p--;{
   sym.tok = TK_NUMBER;
-  sym.number = scan_num( ts + 1, te - ts - 1, 2 );
+  sym.number = scan_num( ts, te - ts - 1, 2 );
   ts = te = p;
   {p++; goto _out; }
  }}
 	break;
 	case 371:
+	{te = p;p--;{
+  sym.tok = TK_NUMBER;
+  sym.number = scan_num( ts + 1, te - ts - 1, 2 );
+  ts = te = p;
+  {p++; goto _out; }
+ }}
+	break;
+	case 372:
 	{{p = ((te))-1;}{
 	sym.tok = TK_LPAREN;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 372:
+	case 373:
 	{{p = ((te))-1;}{
 	sym.tok = TK_DOT;
 	;
 	{p++; goto _out; }
 }}
 	break;
-	case 373:
+	case 374:
 	{{p = ((te))-1;}{
   sym.tok = TK_NAME;
   {p++; goto _out; }
  }}
 	break;
-	case 374:
+	case 375:
 	{{p = ((te))-1;}{
   sym.tok = TK_NUMBER;
   sym.number = scan_num( ts, te - ts, 10 );
@@ -6111,7 +6114,7 @@ _eof_trans:
   {p++; goto _out; }
  }}
 	break;
-	case 375:
+	case 376:
 	{	switch( act ) {
 	case 1:
 	{{p = ((te))-1;}
@@ -6120,70 +6123,77 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 5:
+	case 2:
+	{{p = ((te))-1;}
+	sym.tok = TK_ASMPC;
+	;
+	{p++; goto _out; }
+}
+	break;
+	case 6:
 	{{p = ((te))-1;}
 	sym.tok = TK_MOD;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 37:
+	case 38:
 	{{p = ((te))-1;}
 	sym.tok = TK_NZ;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 38:
+	case 39:
 	{{p = ((te))-1;}
 	sym.tok = TK_Z;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 39:
+	case 40:
 	{{p = ((te))-1;}
 	sym.tok = TK_NC;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 40:
+	case 41:
 	{{p = ((te))-1;}
 	sym.tok = TK_C;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 41:
+	case 42:
 	{{p = ((te))-1;}
 	sym.tok = TK_PO;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 42:
+	case 43:
 	{{p = ((te))-1;}
 	sym.tok = TK_PE;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 43:
+	case 44:
 	{{p = ((te))-1;}
 	sym.tok = TK_P;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 44:
+	case 45:
 	{{p = ((te))-1;}
 	sym.tok = TK_M;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 45:
+	case 46:
 	{{p = ((te))-1;}
 	if ((opts.cpu & CPU_R2K) || (opts.cpu & CPU_R3K)) {
 		sym.tok = TK_LZ;
@@ -6194,7 +6204,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 46:
+	case 47:
 	{{p = ((te))-1;}
 	if ((opts.cpu & CPU_R2K) || (opts.cpu & CPU_R3K)) {
 		sym.tok = TK_LO;
@@ -6205,126 +6215,126 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 47:
+	case 48:
 	{{p = ((te))-1;}
 	sym.tok = TK_NV;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 48:
+	case 49:
 	{{p = ((te))-1;}
 	sym.tok = TK_V;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 49:
+	case 50:
 	{{p = ((te))-1;}
 	sym.tok = TK_B;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 50:
+	case 51:
 	{{p = ((te))-1;}
 	sym.tok = TK_D;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 51:
+	case 52:
 	{{p = ((te))-1;}
 	sym.tok = TK_E;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 52:
+	case 53:
 	{{p = ((te))-1;}
 	sym.tok = TK_H;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 53:
+	case 54:
 	{{p = ((te))-1;}
 	sym.tok = TK_IXH;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 54:
+	case 55:
 	{{p = ((te))-1;}
 	sym.tok = TK_IYH;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 55:
+	case 56:
 	{{p = ((te))-1;}
 	sym.tok = TK_L;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 56:
+	case 57:
 	{{p = ((te))-1;}
 	sym.tok = TK_IXL;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 57:
+	case 58:
 	{{p = ((te))-1;}
 	sym.tok = TK_IYL;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 58:
+	case 59:
 	{{p = ((te))-1;}
 	sym.tok = TK_A;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 59:
+	case 60:
 	{{p = ((te))-1;}
 	sym.tok = TK_F;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 60:
+	case 61:
 	{{p = ((te))-1;}
 	sym.tok = TK_I;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 61:
+	case 62:
 	{{p = ((te))-1;}
 	sym.tok = TK_IIR;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 62:
+	case 63:
 	{{p = ((te))-1;}
 	sym.tok = TK_R;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 63:
+	case 64:
 	{{p = ((te))-1;}
 	sym.tok = TK_EIR;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 64:
+	case 65:
 	{{p = ((te))-1;}
 	if (opts.cpu & CPU_Z80_ZXN) {
 		sym.tok = TK_X;
@@ -6335,91 +6345,91 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 65:
+	case 66:
 	{{p = ((te))-1;}
 	sym.tok = TK_BC;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 66:
+	case 67:
 	{{p = ((te))-1;}
 	sym.tok = TK_DE;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 67:
+	case 68:
 	{{p = ((te))-1;}
 	sym.tok = TK_HL;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 68:
+	case 69:
 	{{p = ((te))-1;}
 	sym.tok = TK_IX;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 69:
+	case 70:
 	{{p = ((te))-1;}
 	sym.tok = TK_IY;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 70:
+	case 71:
 	{{p = ((te))-1;}
 	sym.tok = TK_AF;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 71:
+	case 72:
 	{{p = ((te))-1;}
 	sym.tok = TK_SP;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 72:
+	case 73:
 	{{p = ((te))-1;}
 	sym.tok = TK_IP;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 73:
+	case 74:
 	{{p = ((te))-1;}
 	sym.tok = TK_SU;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 74:
+	case 75:
 	{{p = ((te))-1;}
 	sym.tok = TK_XPC;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 94:
+	case 95:
 	{{p = ((te))-1;}
 	sym.tok = TK_A32;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 95:
+	case 96:
 	{{p = ((te))-1;}
 	sym.tok = TK_DEHL;
 	;
 	{p++; goto _out; }
 }
 	break;
-	case 96:
+	case 97:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_ALIGN;
@@ -6433,7 +6443,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 97:
+	case 98:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_BINARY;
@@ -6447,7 +6457,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 98:
+	case 99:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_C_LINE;
@@ -6461,7 +6471,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 99:
+	case 100:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_DEFB;
@@ -6475,7 +6485,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 100:
+	case 101:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_DEFC;
@@ -6489,7 +6499,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 101:
+	case 102:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_DEFDB;
@@ -6503,7 +6513,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 102:
+	case 103:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_DEFGROUP;
@@ -6517,7 +6527,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 103:
+	case 104:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_DEFINE;
@@ -6531,7 +6541,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 104:
+	case 105:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_DEFM;
@@ -6545,7 +6555,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 105:
+	case 106:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_DEFQ;
@@ -6559,7 +6569,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 106:
+	case 107:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_DEFS;
@@ -6573,7 +6583,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 107:
+	case 108:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_DEFVARS;
@@ -6587,7 +6597,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 108:
+	case 109:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_DEFW;
@@ -6601,7 +6611,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 109:
+	case 110:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_DEPHASE;
@@ -6615,7 +6625,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 110:
+	case 111:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_ELSE;
@@ -6629,7 +6639,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 111:
+	case 112:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_ELIF;
@@ -6643,7 +6653,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 112:
+	case 113:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_ELIFDEF;
@@ -6657,7 +6667,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 113:
+	case 114:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_ELIFNDEF;
@@ -6671,7 +6681,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 114:
+	case 115:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_ENDIF;
@@ -6685,7 +6695,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 115:
+	case 116:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_EXTERN;
@@ -6699,7 +6709,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 116:
+	case 117:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_GLOBAL;
@@ -6713,7 +6723,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 117:
+	case 118:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_IF;
@@ -6727,7 +6737,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 118:
+	case 119:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_IFDEF;
@@ -6741,7 +6751,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 119:
+	case 120:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_IFNDEF;
@@ -6755,7 +6765,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 120:
+	case 121:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_INCLUDE;
@@ -6769,7 +6779,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 121:
+	case 122:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_LIB;
@@ -6783,7 +6793,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 122:
+	case 123:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_LINE;
@@ -6797,7 +6807,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 123:
+	case 124:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_LSTOFF;
@@ -6811,7 +6821,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 124:
+	case 125:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_LSTON;
@@ -6825,7 +6835,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 125:
+	case 126:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_MODULE;
@@ -6839,7 +6849,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 126:
+	case 127:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_ORG;
@@ -6853,7 +6863,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 127:
+	case 128:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_PHASE;
@@ -6867,7 +6877,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 128:
+	case 129:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_PUBLIC;
@@ -6881,7 +6891,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 129:
+	case 130:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_SECTION;
@@ -6895,7 +6905,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 130:
+	case 131:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_UNDEFINE;
@@ -6909,7 +6919,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 131:
+	case 132:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_XDEF;
@@ -6923,7 +6933,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 132:
+	case 133:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_XLIB;
@@ -6937,7 +6947,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 133:
+	case 134:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_XREF;
@@ -6951,7 +6961,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 138:
+	case 139:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_ADC;
@@ -6965,7 +6975,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 139:
+	case 140:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_ADD;
@@ -6979,7 +6989,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 140:
+	case 141:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_AND;
@@ -6993,7 +7003,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 141:
+	case 142:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_BIT;
@@ -7007,7 +7017,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 142:
+	case 143:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_CALL;
@@ -7021,7 +7031,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 143:
+	case 144:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_CCF;
@@ -7035,7 +7045,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 145:
+	case 146:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_CP;
@@ -7049,7 +7059,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 146:
+	case 147:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_CPD;
@@ -7063,7 +7073,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 147:
+	case 148:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_CPDR;
@@ -7077,7 +7087,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 148:
+	case 149:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_CPI;
@@ -7091,7 +7101,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 149:
+	case 150:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_CPIR;
@@ -7105,7 +7115,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 150:
+	case 151:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_CPL;
@@ -7119,7 +7129,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 151:
+	case 152:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_DAA;
@@ -7133,7 +7143,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 152:
+	case 153:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_DEC;
@@ -7147,7 +7157,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 153:
+	case 154:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_DI;
@@ -7161,7 +7171,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 154:
+	case 155:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_DJNZ;
@@ -7175,7 +7185,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 155:
+	case 156:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_EI;
@@ -7189,7 +7199,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 156:
+	case 157:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_EX;
@@ -7203,7 +7213,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 157:
+	case 158:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_EXX;
@@ -7217,7 +7227,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 158:
+	case 159:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_HALT;
@@ -7231,7 +7241,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 159:
+	case 160:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_IM;
@@ -7245,7 +7255,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 160:
+	case 161:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_IN;
@@ -7259,7 +7269,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 161:
+	case 162:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_INC;
@@ -7273,7 +7283,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 162:
+	case 163:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_IND;
@@ -7287,7 +7297,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 163:
+	case 164:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_INDR;
@@ -7301,7 +7311,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 164:
+	case 165:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_INI;
@@ -7315,7 +7325,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 165:
+	case 166:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_INIR;
@@ -7329,7 +7339,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 166:
+	case 167:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_JP;
@@ -7343,7 +7353,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 167:
+	case 168:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_JR;
@@ -7357,7 +7367,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 168:
+	case 169:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_LD;
@@ -7371,7 +7381,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 169:
+	case 170:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_LDD;
@@ -7385,7 +7395,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 170:
+	case 171:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_LDDR;
@@ -7399,7 +7409,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 171:
+	case 172:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_LDI;
@@ -7413,7 +7423,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 172:
+	case 173:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_LDIR;
@@ -7427,7 +7437,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 173:
+	case 174:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_NEG;
@@ -7441,7 +7451,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 174:
+	case 175:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_NOP;
@@ -7455,7 +7465,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 175:
+	case 176:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_OR;
@@ -7469,7 +7479,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 176:
+	case 177:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_OTDR;
@@ -7483,7 +7493,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 177:
+	case 178:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_OTIR;
@@ -7497,7 +7507,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 178:
+	case 179:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_OUT;
@@ -7511,7 +7521,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 179:
+	case 180:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_OUTD;
@@ -7525,7 +7535,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 180:
+	case 181:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_OUTI;
@@ -7539,7 +7549,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 181:
+	case 182:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_POP;
@@ -7553,7 +7563,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 182:
+	case 183:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_PUSH;
@@ -7567,7 +7577,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 183:
+	case 184:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_RES;
@@ -7581,7 +7591,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 184:
+	case 185:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_RET;
@@ -7595,7 +7605,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 185:
+	case 186:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_RETI;
@@ -7609,7 +7619,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 186:
+	case 187:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_RETN;
@@ -7623,7 +7633,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 187:
+	case 188:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_RL;
@@ -7637,7 +7647,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 188:
+	case 189:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_RLA;
@@ -7651,7 +7661,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 190:
+	case 191:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_RLC;
@@ -7665,7 +7675,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 191:
+	case 192:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_RLCA;
@@ -7679,7 +7689,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 193:
+	case 194:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_RLD;
@@ -7693,7 +7703,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 194:
+	case 195:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_RR;
@@ -7707,7 +7717,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 195:
+	case 196:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_RRA;
@@ -7721,7 +7731,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 197:
+	case 198:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_RRC;
@@ -7735,7 +7745,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 198:
+	case 199:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_RRCA;
@@ -7749,7 +7759,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 200:
+	case 201:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_RRD;
@@ -7763,7 +7773,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 201:
+	case 202:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_RST;
@@ -7777,7 +7787,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 202:
+	case 203:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_SBC;
@@ -7791,7 +7801,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 203:
+	case 204:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_SCF;
@@ -7805,7 +7815,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 205:
+	case 206:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_SET;
@@ -7819,7 +7829,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 206:
+	case 207:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_SLA;
@@ -7833,7 +7843,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 207:
+	case 208:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_SLL;
@@ -7847,7 +7857,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 208:
+	case 209:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_SLI;
@@ -7861,7 +7871,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 209:
+	case 210:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_SRA;
@@ -7875,7 +7885,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 210:
+	case 211:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_SRL;
@@ -7889,7 +7899,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 211:
+	case 212:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_SUB;
@@ -7903,7 +7913,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 212:
+	case 213:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_XOR;
@@ -7917,7 +7927,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 213:
+	case 214:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_SWAPNIB;
@@ -7931,7 +7941,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 214:
+	case 215:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_SWAP;
@@ -7945,7 +7955,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 215:
+	case 216:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_OUTINB;
@@ -7959,7 +7969,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 216:
+	case 217:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_LDIX;
@@ -7973,7 +7983,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 217:
+	case 218:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_LDIRX;
@@ -7987,7 +7997,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 218:
+	case 219:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_LDDX;
@@ -8001,7 +8011,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 219:
+	case 220:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_LDDRX;
@@ -8015,7 +8025,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 220:
+	case 221:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_LDIRSCALE;
@@ -8029,7 +8039,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 221:
+	case 222:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_LDPIRX;
@@ -8043,7 +8053,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 222:
+	case 223:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_LDWS;
@@ -8057,7 +8067,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 223:
+	case 224:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_FILL;
@@ -8071,7 +8081,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 224:
+	case 225:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_FILLDE;
@@ -8085,7 +8095,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 225:
+	case 226:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_MIRROR;
@@ -8099,7 +8109,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 226:
+	case 227:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_NEXTREG;
@@ -8113,7 +8123,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 227:
+	case 228:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_PIXELDN;
@@ -8127,7 +8137,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 228:
+	case 229:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_PIXELAD;
@@ -8141,7 +8151,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 229:
+	case 230:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_SETAE;
@@ -8155,7 +8165,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 230:
+	case 231:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_TEST;
@@ -8169,7 +8179,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 231:
+	case 232:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_MMU;
@@ -8183,7 +8193,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 232:
+	case 233:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_MMU0;
@@ -8197,7 +8207,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 233:
+	case 234:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_MMU1;
@@ -8211,7 +8221,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 234:
+	case 235:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_MMU2;
@@ -8225,7 +8235,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 235:
+	case 236:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_MMU3;
@@ -8239,7 +8249,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 236:
+	case 237:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_MMU4;
@@ -8253,7 +8263,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 237:
+	case 238:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_MMU5;
@@ -8267,7 +8277,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 238:
+	case 239:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_MMU6;
@@ -8281,7 +8291,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 239:
+	case 240:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_MMU7;
@@ -8295,7 +8305,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 252:
+	case 253:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_IN0;
@@ -8309,7 +8319,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 253:
+	case 254:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_MLT;
@@ -8323,7 +8333,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 254:
+	case 255:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_OTDM;
@@ -8337,7 +8347,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 255:
+	case 256:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_OTDMR;
@@ -8351,7 +8361,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 256:
+	case 257:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_OTIM;
@@ -8365,7 +8375,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 257:
+	case 258:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_OTIMR;
@@ -8379,7 +8389,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 258:
+	case 259:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_OUT0;
@@ -8393,7 +8403,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 259:
+	case 260:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_SLP;
@@ -8407,7 +8417,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 260:
+	case 261:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_TST;
@@ -8421,7 +8431,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 261:
+	case 262:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_TSTIO;
@@ -8435,7 +8445,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 262:
+	case 263:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_ALTD;
@@ -8449,7 +8459,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 263:
+	case 264:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_BOOL;
@@ -8463,7 +8473,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 264:
+	case 265:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_IDET;
@@ -8477,7 +8487,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 265:
+	case 266:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_IOE;
@@ -8491,7 +8501,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 266:
+	case 267:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_IOI;
@@ -8505,7 +8515,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 267:
+	case 268:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_IPRES;
@@ -8519,7 +8529,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 268:
+	case 269:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_IPSET;
@@ -8533,7 +8543,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 269:
+	case 270:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_LDDSR;
@@ -8547,7 +8557,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 270:
+	case 271:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_LDISR;
@@ -8561,7 +8571,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 271:
+	case 272:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_LDP;
@@ -8575,7 +8585,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 272:
+	case 273:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_LSDR;
@@ -8589,7 +8599,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 273:
+	case 274:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_LSIR;
@@ -8603,7 +8613,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 274:
+	case 275:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_LSDDR;
@@ -8617,7 +8627,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 275:
+	case 276:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_LSIDR;
@@ -8631,7 +8641,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 276:
+	case 277:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_MUL;
@@ -8645,7 +8655,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 277:
+	case 278:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_RDMODE;
@@ -8659,7 +8669,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 278:
+	case 279:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_SETUSR;
@@ -8673,7 +8683,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 279:
+	case 280:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_SURES;
@@ -8687,7 +8697,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 280:
+	case 281:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_SYSCALL;
@@ -8701,7 +8711,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 281:
+	case 282:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_UMA;
@@ -8715,7 +8725,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 282:
+	case 283:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_UMS;
@@ -8729,7 +8739,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 283:
+	case 284:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_CALL_OZ;
@@ -8743,7 +8753,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 284:
+	case 285:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_CALL_PKG;
@@ -8757,7 +8767,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 285:
+	case 286:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_FPP;
@@ -8771,7 +8781,7 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 286:
+	case 287:
 	{{p = ((te))-1;}
 	if (expect_opcode) {
 		sym.tok = TK_INVOKE;
@@ -8785,13 +8795,13 @@ _eof_trans:
 	{p++; goto _out; }
 }
 	break;
-	case 289:
+	case 290:
 	{{p = ((te))-1;}
   sym.tok = TK_NAME;
   {p++; goto _out; }
  }
 	break;
-	case 291:
+	case 292:
 	{{p = ((te))-1;}
   sym.tok = TK_NUMBER;
   sym.number = scan_num( ts, te - ts, 10 );
@@ -8799,7 +8809,7 @@ _eof_trans:
   {p++; goto _out; }
  }
 	break;
-	case 293:
+	case 294:
 	{{p = ((te))-1;}
   sym.tok = TK_NUMBER;
   sym.number = scan_num( ts + 1, te - ts - 1, 16 );
@@ -8807,7 +8817,7 @@ _eof_trans:
   {p++; goto _out; }
  }
 	break;
-	case 295:
+	case 296:
 	{{p = ((te))-1;}
   sym.tok = TK_NUMBER;
   sym.number = scan_num( ts, te - ts - 1, 2 );
@@ -8815,7 +8825,7 @@ _eof_trans:
   {p++; goto _out; }
  }
 	break;
-	case 297:
+	case 298:
 	{{p = ((te))-1;}
   sym.tok = TK_NUMBER;
   sym.number = scan_num( ts + 2, te - ts - 2, 2 );
@@ -8823,7 +8833,7 @@ _eof_trans:
   {p++; goto _out; }
  }
 	break;
-	case 301:
+	case 302:
 	{{p = ((te))-1;}
   sym.tok = TK_NIL;
   skip_to_newline();
