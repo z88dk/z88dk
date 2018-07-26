@@ -223,10 +223,10 @@ t_asmpp_ok(<<'...', "-r0x1234", "\x12\x34\x12\x36");
 t_text(scalar(read_file("test.i")), <<'...');
 ;;test.asm:1
 AUTOLABEL_pc_1:
-		defb (((( AUTOLABEL_pc_1 ) >> 8) & 255)) ,((( AUTOLABEL_pc_1 ) & 255))
+		defb (((( AUTOLABEL_pc_1 ) >> 8) & 255)),((( AUTOLABEL_pc_1 ) & 255))
 ;;test.asm:2
 AUTOLABEL_pc_2:
-		DEFB (((( AUTOLABEL_pc_2 ) >> 8) & 255)) ,((( AUTOLABEL_pc_2 ) & 255))
+		DEFB (((( AUTOLABEL_pc_2 ) >> 8) & 255)),((( AUTOLABEL_pc_2 ) & 255))
 ...
 
 #------------------------------------------------------------------------------
