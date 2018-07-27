@@ -27,7 +27,7 @@
 ; All twenty-four text/graphic lines are printed.
 
 ;; COPY
-L0869:  LD      D,$16           ; prepare to copy twenty four text lines.
+L0869:  LD      D,24           ; prepare to copy twenty four text lines.
         LD      HL,($400C)      ; set HL to start of display file from D_FILE.
         INC     HL              ; 
 
