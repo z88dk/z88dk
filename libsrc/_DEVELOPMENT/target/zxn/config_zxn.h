@@ -45,18 +45,18 @@
 #define __ZXNEXT_LAST_PAGE  223
 #define __ZXNEXT_LAST_DIVMMC  15
 
-#define __ENV_FILENAME  "/sys/env.cfg"
+#define __ENV_FILENAME  "c:/sys/env.cfg"
 
 #define __ENV_BUFSZ  128
 #define __ENV_GETENV_VALSZ  64
 
-#define __ENV_TMPDIR  "/tmp"
-#define __ENV_LTMPNAM  13
+#define __ENV_TMPDIR  "c:/tmp"
+#define __ENV_LTMPNAM  15
 #define __ENV_TMPMAX  0xffff
 #define __ENV_TMPMAX_TRY  16
 
-#define __ENV_BINDIR  "/bin"
-#define __ENV_SYSDIR  "/sys"
+#define __ENV_BINDIR  "c:/bin"
+#define __ENV_SYSDIR  "c:/sys"
 
 #undef  __SPECTRUM
 #define __SPECTRUM  16
@@ -1988,9 +1988,24 @@
 
 
 
-#define __IO_SD_CONTROL  0xe7
-#define __IO_SD_STATUS  0xe7
-#define __IO_SD_DATA  0xeb
+#define __IO_SPI_CONTROL  0xe7
+
+#define __ISC_SPI_CS  0x80
+#define __ISC_FT_CS  0x40
+#define __ISC_RPI_CS1  0x08
+#define __ISC_RPI_CS0  0x04
+#define __ISC_SD_CS1  0x02
+#define __ISC_SD_CS0  0x01
+
+#define __IO_E7_SPI_CS  0x80
+#define __IO_E7_FT_CS  0x40
+#define __IO_E7_RPI_CS1  0x08
+#define __IO_E7_RPI_CS0  0x04
+#define __IO_E7_SD_CS1  0x02
+#define __IO_E7_SD_CS0  0x01
+
+#define __IO_SPI_STATUS  0xe7
+#define __IO_SPI_DATA  0xeb
 
 #define __IO_LED_L  0x103b
 
@@ -2370,15 +2385,26 @@
 #define __RRP_ROM_SPECTRUM  0x00
 
 #define __REG_PERIPHERAL_1  5
-#define __RP1_JOY1_SINCLAIR  0x00
+#define __RP1_JOY1_SINCLAIR  0xc0
+#define __RP1_JOY1_SINCLAIR_1  0xc0
+#define __RP1_JOY1_SINCLAIR_2  0x00
 #define __RP1_JOY1_KEMPSTON  0x40
+#define __RP1_JOY1_KEMPSTON_1  0x40
+#define __RP1_JOY1_KEMPSTON_2  0x08
 #define __RP1_JOY1_CURSOR  0x80
+#define __RP1_JOY1_MD_1  0x48
+#define __RP1_JOY1_MD_2  0x88
 #define __RP1_JOY2_SINCLAIR  0x00
+#define __RP1_JOY2_SINCLAIR_1  0x30
+#define __RP1_JOY2_SINCLAIR_2  0x00
 #define __RP1_JOY2_KEMPSTON  0x10
+#define __RP1_JOY2_KEMPSTON_1  0x10
+#define __RP1_JOY2_KEMPSTON_2  0x02
 #define __RP1_JOY2_CURSOR  0x20
+#define __RP1_JOY2_MD_1  0x12
+#define __RP1_JOY2_MD_2  0x22
 #define __RP1_RATE_50  0x00
 #define __RP1_RATE_60  0x04
-#define __RP1_ENABLE_SCANLINES  0x02
 #define __RP1_ENABLE_SCANDOUBLER  0x01
 
 #define __REG_PERIPHERAL_2  6

@@ -86,24 +86,42 @@ define(`__RRP_ROM_MF', 0x05)        # 0x19
 define(`__RRP_ROM_SPECTRUM', 0x00)  # 0x1c
 
 # (R/W) 0x05 (05) => Peripheral 1 setting:
-#  bits 7-6 = joystick 1 mode 
-#  bits 5-4 = joystick 2 mode
-#  (joystick bits: 00 = Sinclair, 01 = Kempston, 10 = Cursor)(Reset to 0 after a PoR or Hard-reset)
-#  bit 3 = Reserved, must be 0
-#  bit 2 = 50/60 Hz mode (0 = 50Hz, 1 = 60Hz)(Reset to 0 after a PoR or Hard-reset)
-#  bit 1 = Enable Scanlines (1 = enabled)(Reset to 0 after a PoR or Hard-reset)
-#  bit 0 = Enable Scandoubler (1 = enabled)(Reset to 1 after a PoR or Hard-reset)
+#  bits 7-6 = joystick 1 mode (LSB)
+#  bits 5-4 = joystick 2 mode (LSB)
+#  bit 3 = joystick 1 mode (MSB)
+#  bit 2 = 50/60 Hz mode (0 = 50Hz, 1 = 60Hz)(0 after a PoR or Hard-reset)
+#  bit 1 = joystick 2 mode (MSB)
+#  bit 0 = Enable Scandoubler (1 = enabled)(1 after a PoR or Hard-reset)
+#      Joysticks modes:
+#      000 = Sinclair 2 (67890)
+#      001 = Kempston 1 (port 0x1F)
+#      010 = Cursor (56780)
+#      011 = Sinclair 1 (12345)
+#      100 = Kempston 2 (port 0x37)
+#      101 = MD 1 (3 or 6 button joystick port 0x1F)
+#      110 = MD 2 (3 or 6 button joystick port 0x37)
 
 define(`__REG_PERIPHERAL_1', 5)
-define(`__RP1_JOY1_SINCLAIR', 0x00)
+define(`__RP1_JOY1_SINCLAIR', 0xc0)
+define(`__RP1_JOY1_SINCLAIR_1', 0xc0)
+define(`__RP1_JOY1_SINCLAIR_2', 0x00)
 define(`__RP1_JOY1_KEMPSTON', 0x40)
+define(`__RP1_JOY1_KEMPSTON_1', 0x40)
+define(`__RP1_JOY1_KEMPSTON_2', 0x08)
 define(`__RP1_JOY1_CURSOR', 0x80)
+define(`__RP1_JOY1_MD_1', 0x48)
+define(`__RP1_JOY1_MD_2', 0x88)
 define(`__RP1_JOY2_SINCLAIR', 0x00)
+define(`__RP1_JOY2_SINCLAIR_1', 0x30)
+define(`__RP1_JOY2_SINCLAIR_2', 0x00)
 define(`__RP1_JOY2_KEMPSTON', 0x10)
+define(`__RP1_JOY2_KEMPSTON_1', 0x10)
+define(`__RP1_JOY2_KEMPSTON_2', 0x02)
 define(`__RP1_JOY2_CURSOR', 0x20)
+define(`__RP1_JOY2_MD_1', 0x12)
+define(`__RP1_JOY2_MD_2', 0x22)
 define(`__RP1_RATE_50', 0x00)
 define(`__RP1_RATE_60', 0x04)
-define(`__RP1_ENABLE_SCANLINES', 0x02)
 define(`__RP1_ENABLE_SCANDOUBLER', 0x01)
 
 # (R/W) 0x06 (06) => Peripheral 2 setting:
@@ -600,14 +618,25 @@ PUBLIC `__RRP_ROM_SPECTRUM'
 
 PUBLIC `__REG_PERIPHERAL_1'
 PUBLIC `__RP1_JOY1_SINCLAIR'
+PUBLIC `__RP1_JOY1_SINCLAIR_1'
+PUBLIC `__RP1_JOY1_SINCLAIR_2'
 PUBLIC `__RP1_JOY1_KEMPSTON'
+PUBLIC `__RP1_JOY1_KEMPSTON_1'
+PUBLIC `__RP1_JOY1_KEMPSTON_2'
 PUBLIC `__RP1_JOY1_CURSOR'
+PUBLIC `__RP1_JOY1_MD_1'
+PUBLIC `__RP1_JOY1_MD_2'
 PUBLIC `__RP1_JOY2_SINCLAIR'
+PUBLIC `__RP1_JOY2_SINCLAIR_1'
+PUBLIC `__RP1_JOY2_SINCLAIR_2'
 PUBLIC `__RP1_JOY2_KEMPSTON'
+PUBLIC `__RP1_JOY2_KEMPSTON_1'
+PUBLIC `__RP1_JOY2_KEMPSTON_2'
 PUBLIC `__RP1_JOY2_CURSOR'
+PUBLIC `__RP1_JOY2_MD_1'
+PUBLIC `__RP1_JOY2_MD_2'
 PUBLIC `__RP1_RATE_50'
 PUBLIC `__RP1_RATE_60'
-PUBLIC `__RP1_ENABLE_SCANLINES'
 PUBLIC `__RP1_ENABLE_SCANDOUBLER'
 
 PUBLIC `__REG_PERIPHERAL_2'
@@ -819,14 +848,25 @@ defc `__RRP_ROM_SPECTRUM' = __RRP_ROM_SPECTRUM
 
 defc `__REG_PERIPHERAL_1' = __REG_PERIPHERAL_1
 defc `__RP1_JOY1_SINCLAIR' = __RP1_JOY1_SINCLAIR
+defc `__RP1_JOY1_SINCLAIR_1' = __RP1_JOY1_SINCLAIR_1
+defc `__RP1_JOY1_SINCLAIR_2' = __RP1_JOY1_SINCLAIR_2
 defc `__RP1_JOY1_KEMPSTON' = __RP1_JOY1_KEMPSTON
+defc `__RP1_JOY1_KEMPSTON_1' = __RP1_JOY1_KEMPSTON_1
+defc `__RP1_JOY1_KEMPSTON_2' = __RP1_JOY1_KEMPSTON_2
 defc `__RP1_JOY1_CURSOR' = __RP1_JOY1_CURSOR
+defc `__RP1_JOY1_MD_1' = __RP1_JOY1_MD_1
+defc `__RP1_JOY1_MD_2' = __RP1_JOY1_MD_2
 defc `__RP1_JOY2_SINCLAIR' = __RP1_JOY2_SINCLAIR
+defc `__RP1_JOY2_SINCLAIR_1' = __RP1_JOY2_SINCLAIR_1
+defc `__RP1_JOY2_SINCLAIR_2' = __RP1_JOY2_SINCLAIR_2
 defc `__RP1_JOY2_KEMPSTON' = __RP1_JOY2_KEMPSTON
+defc `__RP1_JOY2_KEMPSTON_1' = __RP1_JOY2_KEMPSTON_1
+defc `__RP1_JOY2_KEMPSTON_2' = __RP1_JOY2_KEMPSTON_2
 defc `__RP1_JOY2_CURSOR' = __RP1_JOY2_CURSOR
+defc `__RP1_JOY2_MD_1' = __RP1_JOY2_MD_1
+defc `__RP1_JOY2_MD_2' = __RP1_JOY2_MD_2
 defc `__RP1_RATE_50' = __RP1_RATE_50
 defc `__RP1_RATE_60' = __RP1_RATE_60
-defc `__RP1_ENABLE_SCANLINES' = __RP1_ENABLE_SCANLINES
 defc `__RP1_ENABLE_SCANDOUBLER' = __RP1_ENABLE_SCANDOUBLER
 
 defc `__REG_PERIPHERAL_2' = __REG_PERIPHERAL_2
@@ -1038,14 +1078,25 @@ ifdef(`CFG_C_DEF',
 
 `#define' `__REG_PERIPHERAL_1'  __REG_PERIPHERAL_1
 `#define' `__RP1_JOY1_SINCLAIR'  __RP1_JOY1_SINCLAIR
+`#define' `__RP1_JOY1_SINCLAIR_1'  __RP1_JOY1_SINCLAIR_1
+`#define' `__RP1_JOY1_SINCLAIR_2'  __RP1_JOY1_SINCLAIR_2
 `#define' `__RP1_JOY1_KEMPSTON'  __RP1_JOY1_KEMPSTON
+`#define' `__RP1_JOY1_KEMPSTON_1'  __RP1_JOY1_KEMPSTON_1
+`#define' `__RP1_JOY1_KEMPSTON_2'  __RP1_JOY1_KEMPSTON_2
 `#define' `__RP1_JOY1_CURSOR'  __RP1_JOY1_CURSOR
+`#define' `__RP1_JOY1_MD_1'  __RP1_JOY1_MD_1
+`#define' `__RP1_JOY1_MD_2'  __RP1_JOY1_MD_2
 `#define' `__RP1_JOY2_SINCLAIR'  __RP1_JOY2_SINCLAIR
+`#define' `__RP1_JOY2_SINCLAIR_1'  __RP1_JOY2_SINCLAIR_1
+`#define' `__RP1_JOY2_SINCLAIR_2'  __RP1_JOY2_SINCLAIR_2
 `#define' `__RP1_JOY2_KEMPSTON'  __RP1_JOY2_KEMPSTON
+`#define' `__RP1_JOY2_KEMPSTON_1'  __RP1_JOY2_KEMPSTON_1
+`#define' `__RP1_JOY2_KEMPSTON_2'  __RP1_JOY2_KEMPSTON_2
 `#define' `__RP1_JOY2_CURSOR'  __RP1_JOY2_CURSOR
+`#define' `__RP1_JOY2_MD_1'  __RP1_JOY2_MD_1
+`#define' `__RP1_JOY2_MD_2'  __RP1_JOY2_MD_2
 `#define' `__RP1_RATE_50'  __RP1_RATE_50
 `#define' `__RP1_RATE_60'  __RP1_RATE_60
-`#define' `__RP1_ENABLE_SCANLINES'  __RP1_ENABLE_SCANLINES
 `#define' `__RP1_ENABLE_SCANDOUBLER'  __RP1_ENABLE_SCANDOUBLER
 
 `#define' `__REG_PERIPHERAL_2'  __REG_PERIPHERAL_2
