@@ -1,6 +1,6 @@
 // limit size of printf
 
-#pragma printf = "s u"
+#pragma printf = "s u c"
 
 // space for one function to be registered with atexit()
 
