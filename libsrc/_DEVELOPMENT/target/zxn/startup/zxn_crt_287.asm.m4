@@ -32,42 +32,6 @@ include(`crt_memory_map.inc')
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; INSTANTIATE DRIVERS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-dnl
-dnl############################################################
-dnl## LIST OF AVAILABLE DRIVERS WITH STATIC INSTANTIATORS #####
-dnl############################################################
-dnl
-dnl## input terminals
-dnl
-dnl#include(`driver/terminal/zx_01_input_kbd_inkey.m4')dnl
-dnl#include(`driver/terminal/zx_01_input_kbd_lastk.m4')dnl
-dnl
-dnl## output terminals
-dnl
-dnl#include(`driver/terminal/zx_01_output_char_32.m4')dnl
-dnl#include(`driver/terminal/zx_01_output_char_32_tty_z88dk.m4')dnl
-dnl#include(`driver/terminal/zx_01_output_char_64.m4')dnl
-dnl#include(`driver/terminal/zx_01_output_char_64_tty_z88dk.m4')dnl
-dnl#include(`driver/terminal/zx_01_output_fzx.m4')dnl
-dnl#include(`driver/terminal/zx_01_output_fzx_tty_z88dk.m4')dnl
-dnl
-dnl## file dup
-dnl
-dnl#include(`../m4_file_dup.m4')dnl
-dnl
-dnl## empty fd slot
-dnl
-dnl#include(`../m4_file_absent.m4')dnl
-dnl
-dnl############################################################
-dnl## INSTANTIATE DRIVERS #####################################
-dnl############################################################
-dnl
-dnl#; Some default fonts:
-dnl#;
-dnl#; _font_8x8_zx_system
-dnl#; _font_4x8_default
-dnl#; _ff_ind_Termino
 
 include(`../clib_instantiate_begin.m4')
 
@@ -89,31 +53,45 @@ PUBLIC __Start, __Exit
 EXTERN _main
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; USER PREAMBLE ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-IF __crt_include_preamble
-
-   include "crt_preamble.asm"
-   SECTION CODE
-
-ENDIF
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; PAGE ZERO ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-IF (ASMPC = 0) && (__crt_org_code = 0)
-
-   include "../crt_page_zero_z80.inc"
-
-ENDIF
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CRT INIT ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 __Start:
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; returning to basic
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   push iy
+   exx
+   push hl
+
+   ld (__sp),sp
+
+	include "../crt_init_sp.inc"
+
+   IF __crt_enable_commandlie >= 2
+	
+	   exx
+
+	ENDIF
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; command line
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   IF __crt_enable_command_line & 0x80
+	
+	   ld l,c
+		ld h,b
+	
+	ENDIF
+
+
+
+
+
+
 
    include "../crt_start_di.inc"
 
