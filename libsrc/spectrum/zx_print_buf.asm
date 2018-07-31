@@ -7,8 +7,8 @@
 ;	$Id: zx_print_buf.asm $
 ;
 		SECTION code_clib
-		PUBLIC    zx_printbuf
-		PUBLIC    _zx_printbuf
+		PUBLIC    zx_print_buf
+		PUBLIC    _zx_print_buf
 		PUBLIC    zx_print_row
 		PUBLIC    _zx_print_row
 		
@@ -17,8 +17,8 @@
 		EXTERN  call_rom3
 
 
-.zx_printbuf
-._zx_printbuf
+.zx_print_buf
+._zx_print_buf
 		di
 		ld	b,8
 		jr	eightrows
