@@ -15,6 +15,7 @@ stdio/ansi/msx/f_ansi_cls_nobios
 @stdio/stdio.lst
 @input/input_keyboard.lst
 spc1000/tms9918
+games/spc1000/joystick
 graphics/spc1000/getmaxx
 graphics/spc1000/getmaxy
 graphics/spc1000/textpixl
