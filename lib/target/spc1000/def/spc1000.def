@@ -1,0 +1,8 @@
+
+
+
+; Values uses by library
+
+                defc    MODE_0 = 0
+                defc    MODE_1 = $8e
+                defc    MODE_2 = $8a

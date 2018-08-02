@@ -443,8 +443,9 @@ ENDIF
 
 IF FORspc1000
 	DEFINE gotgfx
-	defc maxx	= 256
-	defc maxy	= 192
+	defc maxx	= 64		;Text graphics settings
+	defc maxy	= 48
+	defc blankch    = 32
 ENDIF
 
 IF FORmulti8

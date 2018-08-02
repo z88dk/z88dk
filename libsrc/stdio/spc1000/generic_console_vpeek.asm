@@ -5,10 +5,8 @@
 		PUBLIC		generic_console_vpeek
 
 		EXTERN		__spc1000_mode
-		EXTERN		generic_console_font32
-		EXTERN		generic_console_udg32
-		EXTERN		screendollar	
-		EXTERN		screendollar_with_count
+		EXTERN		vpeek_MODE1
+		EXTERN		vpeek_MODE2
 		EXTERN		generic_console_calc_xypos
 		EXTERN		tms9918_console_vpeek
 
@@ -23,7 +21,9 @@
 generic_console_vpeek:
 	ld	a,(__spc1000_mode)
 	cp	1
-	jr	z,vpeek_hires
+	jp	z,vpeek_MODE1
+	cp	2
+	jp	z,vpeek_MODE2
 	cp	10
 	jp	z,tms9918_console_vpeek
         call    generic_console_calc_xypos
@@ -49,42 +49,4 @@ high_chars:
 	or	$e0
 	jr	done
 
-
-vpeek_hires:
-        ld      hl,-8
-        add     hl,sp           ;de = screen, hl = buffer, bc = coords
-        ld      sp,hl
-        push    hl              ;Save buffer
-        ld      a,8
-vpeek_1:
-	ex	af,af
-	in	a,(c)
-	ld	(hl),a
-        ld      a,c
-        add     32
-        ld      c,a
-        jr      nc,no_overflow
-        inc     b
-no_overflow:
-        inc     hl
-	ex	af,af
-	dec	a
-	jr	nz,vpeek_1
-        pop     de              ;the buffer on the stack
-        ld      hl,(generic_console_font32)
-do_screendollar:
-        call    screendollar
-        jr      nc,gotit
-        ld      hl,(generic_console_udg32)
-        ld      b,128
-        call    screendollar_with_count
-        jr      c,gotit
-        add     128
-gotit:
-        ex      af,af           ; Save those flags
-        ld      hl,8            ; Dump our temporary buffer
-        add     hl,sp
-        ld      sp,hl
-        ex      af,af           ; Flags and parameter back
-        ret
 

@@ -12,6 +12,8 @@
 	EXTERN	generic_console_font32
 	EXTERN	generic_console_udg32
 
+	INCLUDE	"target/spc1000/def/spc1000.def"
+
 
 ; a = ioctl
 ; de = arg
@@ -37,11 +39,18 @@ check_mode:
 	ld	a,c		; The mode
 	ld	h,@00000000
 	ld	l,16
+	ld	c,32
 	and	a
 	jr	z,set_mode
-	ld	h,0x8e
+	ld	h,MODE_1
 	ld	l,24
+	ld	c,32
 	cp	1		;HIRES
+	jr	z,set_mode
+	ld	h,MODE_2
+	ld	l,24
+	ld	c,16
+	cp	2		;COLOUR
 	jr	z,set_mode
 	cp	10		;Switch to VDP
 	jr	nz,failure
@@ -53,6 +62,8 @@ check_mode:
 
 set_mode:
 	ld	(__spc1000_mode),a
+	ld	a,c
+	ld	(__console_w),a
 	ld	bc,$2000
 	out	(c),h
 	ld	a,l
