@@ -246,6 +246,7 @@ scrollup_hires:
 	xor	a
 scrollup_hires_1:
 	ld	(hl),a
+	inc	hl
 	djnz	scrollup_hires_1
 	pop	bc
 	pop	de

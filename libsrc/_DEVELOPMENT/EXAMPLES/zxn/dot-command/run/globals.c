@@ -22,3 +22,8 @@ unsigned char PATH[512];
 // buffer space
 
 unsigned char buf[64];
+
+// animated cursor
+
+unsigned char cursor[5] = "\|/-";
+unsigned char cpos;

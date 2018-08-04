@@ -1222,6 +1222,9 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
         }
     }
 
+    printf("dotn_last_page = %d\n", dotn_last_page);
+    printf("dotn_extra_pages = %d\n", dotn_extra_pages);
+
     // append extra pages to alloc table
 
     memset(&z_alloc_table[dotn_last_page + 1], ZXN_ALLOCATE_LOAD, dotn_extra_pages);

@@ -322,6 +322,22 @@ ELSE
 ; +++++ non-LAMBDA section end +++++
 ENDIF
 
+;-------------------------------------------------
+; FAST mode workaround for those functions trying
+; to use zx_fast and zx_slow
+;-------------------------------------------------
+IF (!DEFINED_startup | (startup=1))
+	PUBLIC zx_fast
+	PUBLIC zx_slow
+	PUBLIC _zx_fast
+	PUBLIC _zx_slow
+zx_fast:
+zx_slow:
+_zx_fast:
+_zx_slow:
+	ret
+ENDIF
+
 ;-----------
 ; Now some variables
 ;-----------

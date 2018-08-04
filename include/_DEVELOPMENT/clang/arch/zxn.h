@@ -111,10 +111,10 @@ extern unsigned char IO_UART_STATUS;
 extern unsigned char IO_6B;
 extern unsigned char IO_DMA;
 extern unsigned char IO_E7;
-extern unsigned char IO_SD_CONTROL;
-extern unsigned char IO_SD_STATUS;
+extern unsigned char IO_SPI_CONTROL;
+extern unsigned char IO_SPI_STATUS;
 extern unsigned char IO_EB;
-extern unsigned char IO_SD_DATA
+extern unsigned char IO_SPI_DATA
 extern unsigned char IO_103B;
 extern unsigned char IO_I2C_SCL;
 extern unsigned char IO_113B;
@@ -192,14 +192,14 @@ __sfr __banked __at __IO_UART_STATUS IO_UART_STATUS;
 __sfr __at 0x6b IO_6B;
 __sfr __at __IO_DMA IO_DMA;
 
-// io ports - sd card
+// io ports - spi interface (sd card, raspberry pi)
 
 __sfr __at 0xe7 IO_E7;
-__sfr __at __IO_SD_CONTROL IO_SD_CONTROL;
-__sfr __at __IO_SD_STATUS IO_SD_STATUS;
+__sfr __at __IO_SPI_CONTROL IO_SPI_CONTROL;
+__sfr __at __IO_SPI_STATUS IO_SPI_STATUS;
 
 __sfr __at 0xeb IO_EB;
-__sfr __at __IO_SD_DATA IO_SD_DATA;
+__sfr __at __IO_SPI_DATA IO_SPI_DATA;
 
 // io ports - i2c (real-time clock)
 
@@ -504,6 +504,22 @@ __sfr __banked __at __IO_LED_L IO_LED_L;
 #define D_RM_B_ADDR_H  __D_RM_B_ADDR_H
 #define D_RM_B_ADDR  __D_RM_B_ADDR
 
+// 0xe7, IO_SPI_CONTROL
+
+#define ISC_SPI_CS  __ISC_SPI_CS
+#define ISC_FT_CS  __ISC_FT_CS
+#define ISC_RPI_CS1  __ISC_RPI_CS1
+#define ISC_RPI_CS0  __ISC_RPI_CS0
+#define ISC_SD_CS1  __ISC_SD_CS1
+#define ISC_SD_CS0  __ISC_SD_CS0
+
+#define IO_E7_SPI_CS  __IO_E7_SPI_CS
+#define IO_E7_FT_CS  __IO_E7_FT_CS
+#define IO_E7_RPI_CS1  __IO_E7_RPI_CS1
+#define IO_E7_RPI_CS0  __IO_E7_RPI_CS0
+#define IO_E7_SD_CS1  __IO_E7_SD_CS1
+#define IO_E7_SD_CS0  __IO_E7_SD_CS0
+
 ///////////////////////////////////////////////////////////////
 
 // tbblue registry system
@@ -556,14 +572,25 @@ __sfr __banked __at __IO_NEXTREG_DAT IO_NEXTREG_DAT;
 
 #define REG_PERIPHERAL_1  __REG_PERIPHERAL_1
 #define RP1_JOY1_SINCLAIR  __RP1_JOY1_SINCLAIR
+#define RP1_JOY1_SINCLAIR_1  __RP1_JOY1_SINCLAIR_1
+#define RP1_JOY1_SINCLAIR_2  __RP1_JOY1_SINCLAIR_2
 #define RP1_JOY1_KEMPSTON  __RP1_JOY1_KEMPSTON
+#define RP1_JOY1_KEMPSTON_1  __RP1_JOY1_KEMPSTON_1
+#define RP1_JOY1_KEMPSTON_2  __RP1_JOY1_KEMPSTON_2
 #define RP1_JOY1_CURSOR  __RP1_JOY1_CURSOR
+#define RP1_JOY1_MD_1  __RP1_JOY1_MD_1
+#define RP1_JOY1_MD_2  __RP1_JOY1_MD_2
 #define RP1_JOY2_SINCLAIR  __RP1_JOY2_SINCLAIR
+#define RP1_JOY2_SINCLAIR_1  __RP1_JOY2_SINCLAIR_1
+#define RP1_JOY2_SINCLAIR_2  __RP1_JOY2_SINCLAIR_2
 #define RP1_JOY2_KEMPSTON  __RP1_JOY2_KEMPSTON
+#define RP1_JOY2_KEMPSTON_1  __RP1_JOY2_KEMPSTON_1
+#define RP1_JOY2_KEMPSTON_2  __RP1_JOY2_KEMPSTON_2
 #define RP1_JOY2_CURSOR  __RP1_JOY2_CURSOR
+#define RP1_JOY2_MD_1  __RP1_JOY2_MD_1
+#define RP1_JOY2_MD_2  __RP1_JOY2_MD_2
 #define RP1_RATE_50  __RP1_RATE_50
 #define RP1_RATE_60  __RP1_RATE_60
-#define RP1_ENABLE_SCANLINES  __RP1_ENABLE_SCANLINES
 #define RP1_ENABLE_SCANDOUBLER  __RP1_ENABLE_SCANDOUBLER
 
 #define REG_PERIPHERAL_2  __REG_PERIPHERAL_2
@@ -583,7 +610,6 @@ __sfr __banked __at __IO_NEXTREG_DAT IO_NEXTREG_DAT;
 #define RTM_3MHZ  __RTM_3MHZ
 #define RTM_7MHZ  __RTM_7MHZ
 #define RTM_14MHZ  __RTM_14MHZ
-#define RTM_28MHZ  __RTM_28MHZ
 
 #define REG_PERIPHERAL_3  __REG_PERIPHERAL_3
 #define RP3_STEREO_ABC  __RP3_STEREO_ABC
@@ -595,6 +621,12 @@ __sfr __banked __at __IO_NEXTREG_DAT IO_NEXTREG_DAT;
 #define RP3_ENABLE_TURBOSOUND  __RP3_ENABLE_TURBOSOUND
 #define RP3_DISABLE_CONTENTION  __RP3_DISABLE_CONTENTION
 #define RP3_UNLOCK_7FFD  __RP3_UNLOCK_7FFD
+
+#define REG_PERIPHERAL_4  __REG_PERIPHERAL_4
+#define RP4_SCANLINES_OFF  __RP4_SCANLINES_OFF
+#define RP4_SCANLINES_25  __RP4_SCANLINES_25
+#define RP4_SCANLINES_50  __RP4_SCANLINES_50
+#define RP4_SCANLINES_75  __RP4_SCANLINES_75
 
 #define REG_SUB_VERSION  __REG_SUB_VERSION
 

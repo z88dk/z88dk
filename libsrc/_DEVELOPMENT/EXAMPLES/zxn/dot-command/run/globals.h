@@ -15,4 +15,7 @@ extern unsigned char PATH[512];
 
 extern unsigned char buf[64];
 
+extern unsigned char cursor[5];
+extern unsigned char cpos;
+
 #endif

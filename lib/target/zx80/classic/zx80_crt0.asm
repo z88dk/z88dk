@@ -38,6 +38,8 @@
         PUBLIC    restore81       ;Restore ZX81 critical registers
         PUBLIC    zx_fast
         PUBLIC    zx_slow
+        PUBLIC    _zx_fast
+        PUBLIC    _zx_slow
 
         ;; PUBLIC    frames         ;Frame counter for time()
         PUBLIC    _FRAMES
@@ -119,6 +121,8 @@ restore81:
 save81:
 zx_fast:
 zx_slow:
+_zx_fast:
+_zx_slow:
         ret
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
