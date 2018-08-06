@@ -1,6 +1,26 @@
 #include <arch/zxn.h>
 #include "init.h"
 
+// INK 0-7, BRIGHT INK 0-7
+
+const unsigned char ula_ink[] = {
+   0b00000000, 0b00000010, 0b10100000, 0b10100010,
+   0b00010100, 0b00010110, 0b10110100, 0b10110110,
+             
+   0b00000000, 0b00000011, 0b11100000, 0b11100111,
+   0b00011100, 0b00011111, 0b11111100, 0b11111111,
+};
+
+// PAPER 0-7, BRIGHT PAPER 0-7
+
+const unsigned char ula_paper[] = {
+   0b00000000, 0b00000010, 0b10100000, 0b10100010,
+   0b00010100, 0b00010110, 0b10110100, 0b10110110,
+             
+   0b00000000, 0b00000011, 0b11100000, 0b11100111,
+   0b00011100, 0b00011111, 0b11111100, 0b11111111,
+};
+
 void set_ordered_palette(void)
 {
    ZXN_NEXTREG(REG_PALETTE_INDEX, 0);
@@ -19,26 +39,8 @@ void init(void)
    
    IO_NEXTREG_REG = REG_PALETTE_VALUE_8;
    
-   for (unsigned char i = 0; i !=16; ++i)
-   {
-      IO_NEXTREG_DAT = 0b00000000;
-      IO_NEXTREG_DAT = 0b00000010;
-      IO_NEXTREG_DAT = 0b10100000;
-      IO_NEXTREG_DAT = 0b10100010;
-      IO_NEXTREG_DAT = 0b00010100;
-      IO_NEXTREG_DAT = 0b00010110;
-      IO_NEXTREG_DAT = 0b10110100;
-      IO_NEXTREG_DAT = 0b10110110;
-             
-      IO_NEXTREG_DAT = 0b00000000;
-      IO_NEXTREG_DAT = 0b00000011;
-      IO_NEXTREG_DAT = 0b11100000;
-      IO_NEXTREG_DAT = 0b11100111;
-      IO_NEXTREG_DAT = 0b00011100;
-      IO_NEXTREG_DAT = 0b00011111;
-      IO_NEXTREG_DAT = 0b11111100;
-      IO_NEXTREG_DAT = 0b11111111;
-   }
+   for (unsigned char i = 0; i != sizeof(ula_ink); ++i)
+      IO_NEXTREG_DAT = ula_ink[i];
    
    // set default ula paper colours
    
@@ -46,27 +48,9 @@ void init(void)
    
    IO_NEXTREG_REG = REG_PALETTE_VALUE_8;
    
-   for (unsigned char i = 0; i !=16; ++i)
-   {
-      IO_NEXTREG_DAT = 0b00000000;
-      IO_NEXTREG_DAT = 0b00000010;
-      IO_NEXTREG_DAT = 0b10100000;
-      IO_NEXTREG_DAT = 0b10100010;
-      IO_NEXTREG_DAT = 0b00010100;
-      IO_NEXTREG_DAT = 0b00010110;
-      IO_NEXTREG_DAT = 0b10110100;
-      IO_NEXTREG_DAT = 0b10110110;
-             
-      IO_NEXTREG_DAT = 0b00000000;
-      IO_NEXTREG_DAT = 0b00000011;
-      IO_NEXTREG_DAT = 0b11100000;
-      IO_NEXTREG_DAT = 0b11100111;
-      IO_NEXTREG_DAT = 0b00011100;
-      IO_NEXTREG_DAT = 0b00011111;
-      IO_NEXTREG_DAT = 0b11111100;
-      IO_NEXTREG_DAT = 0b11111111;
-   }
-   
+   for (unsigned char i = 0; i != sizeof(ula_paper); ++i)
+      IO_NEXTREG_DAT = ula_paper[i];
+
    // layer 2 palette
    
    ZXN_NEXTREG(REG_PALETTE_CONTROL, RPC_SELECT_LAYER_2_PALETTE_0);
