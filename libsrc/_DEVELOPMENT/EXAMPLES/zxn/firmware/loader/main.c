@@ -225,9 +225,14 @@ void main(void)
    
    DEBUG(10);
    
-   // run the module just loaded
-   
    DisableCard();
+   
+   // return to 3.5MHz
+   
+   if ((machine.id == RMI_ZXNEXT) || (machine.id == RMI_ZXNEXT_AB))
+      ZXN_NEXTREG(REG_TURBO_MODE, RTM_3MHZ);
+   
+   // run the module just loaded
    
    __asm
       jp 0x6000      
