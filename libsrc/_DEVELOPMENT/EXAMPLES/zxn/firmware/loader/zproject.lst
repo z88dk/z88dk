@@ -1,0 +1,5 @@
+fat.o
+init.c
+main.c
+mmc.asm
+vdp.c
