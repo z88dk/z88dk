@@ -219,7 +219,7 @@ unsigned char FindDrive(void)
         fat_size = sector_buffer[0x24] + (((unsigned long)sector_buffer[0x25]) << 8) + (((unsigned long)sector_buffer[0x26]) << 16) + (((unsigned long)sector_buffer[0x27]) << 24);
 #endif
         data_start = fat_start + (fat_number * fat_size);
-#ifdef LITTLE_ENDIAN
+#if LITTLE_ENDIAN
         root_directory_cluster = *(unsigned long *)(&sector_buffer[0x2c]) & 0x0fffffff;
 #else
         root_directory_cluster = sector_buffer[0x2C] + (((unsigned long)sector_buffer[0x2D]) << 8) + (((unsigned long)sector_buffer[0x2E]) << 16) + ((unsigned long)(sector_buffer[0x2F] & 0x0F) << 24);
@@ -229,7 +229,7 @@ unsigned char FindDrive(void)
     else
     {
         // calculate drive's parameters from bootsector, first up is size of directory
-#ifdef LITTLE_ENDIAN
+#if LITTLE_ENDIAN
         dir_entries = *(unsigned int *)(&sector_buffer[17]);
 #else
         dir_entries = sector_buffer[17] + (sector_buffer[18] << 8);
@@ -237,7 +237,7 @@ unsigned char FindDrive(void)
         root_directory_size = ((dir_entries << 5) + 511) >> 9;
 
         // calculate start of FAT,size of FAT and number of FAT's
-#ifdef LITTLE_ENDIAN
+#if LITTLE_ENDIAN
         fat_size = *(unsigned int *)(&sector_buffer[22]);
 #else
         fat_size = sector_buffer[22] + (sector_buffer[23] << 8);
