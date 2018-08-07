@@ -15,6 +15,7 @@
 		EXTERN  asctozx81
 		EXTERN  prbuf_x		; set this one to 0 to wipe the buffer
 
+;		EXTERN restore81
 
 .offsets_table
          defb	128,64,32,16,8,4,2,1
@@ -65,12 +66,11 @@ ENDIF
 	dec a
 	jr	nz,fontptr
 
-	ld	a,c			; font is slightly condensed, here we rebuild the first row
-	sub 9
+	ld	a,9			; font is slightly condensed, here we rebuild the first row
+	sub c
 	sbc a,a
-	jr	nz,empty_row
-	ld a,$AF		; xor a, overrides "ld a,(ix+1)" used on characters 0..8
-.empty_row
+	and $AF		; xor a, overrides "ld a,(ix+1)" used on characters 0..8
+
 	ld (firstbyte),a
 	
 	ld	a,(prbuf_x)
@@ -148,7 +148,8 @@ ENDIF
 	ret
 	
 .newline
-	ld	hl,buf
+;	call restore81
+	ld	hl,buf	
 	call zx_print_buf
 .buf_reset
 	ld	hl,buf
