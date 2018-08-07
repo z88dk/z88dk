@@ -9,10 +9,7 @@
 
 #include <sys/compiler.h>
 
-// bool should really be an unsigned char, but because it was originally 
-// typedef'ed to an unsigned int in z88dk, leaving it as such as to maintain 
-// backwards compatibility.
-typedef unsigned int bool;
+typedef unsigned char bool;
 
 #define true 1
 #define false 0
