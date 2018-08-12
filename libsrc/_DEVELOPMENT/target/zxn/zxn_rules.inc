@@ -37,19 +37,36 @@ Z88DK_FOR(`LOOP', `0', `15',
 ')
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ; CORE VERSION CHECK (0 = no check)
+   ; VERSION CHECKS (0 = no check)
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   ; core version = MMmmSSS (major, minor, sub) in decimal
+   ;    v 1.10.51 = 0110051
 
    IFNDEF CRT_CORE_VERSION
       defc CRT_CORE_VERSION = 0
    ENDIF
    
+   ; nextos version = MMmm (major, minor) in decimal
+   ;         v 1.94 = 0194
+
+   IFNDEF NEXTOS_VERSION
+      defc NEXTOS_VERSION = 0
+   ENDIF
+   
+   ; esxdos version
+   ; currently non-zero checks for presence (use 1)
+
+   IFNDEF ESXDOS_VERSION
+      defc ESXDOS_VERSION = 0
+   ENDIF
+   
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ; ESXDOS dotx commands
+   ; MAIN location for dotx and dotn commands
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   IFNDEF CRT_ORG_DTX
-      defc CRT_ORG_DTX  = 0x8000
+   IFNDEF CRT_ORG_MAIN
+      defc CRT_ORG_MAIN = 0x8000
    ENDIF
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -58,10 +75,6 @@ Z88DK_FOR(`LOOP', `0', `15',
 
    PUBLIC DOTN_MAIN_OVERLAY_MASK
    PUBLIC DOTN_MAIN_ABSOLUTE_MASK
-
-   IFNDEF CRT_ORG_MAIN
-      defc CRT_ORG_MAIN = 0x8000
-   ENDIF
 
    IFNDEF DOTN_REGISTER_SP
       defc DOTN_REGISTER_SP = 0x4000
