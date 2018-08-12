@@ -14,6 +14,6 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #define Z88DK_VERSION "build " __DATE__
 #endif
 
-#define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2017"
+#define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2018"
 
 char copyrightmsg[] = "Z80 Module Assembler " Z88DK_VERSION "\n(c) " COPYRIGHT;

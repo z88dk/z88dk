@@ -294,22 +294,23 @@ extern int __LIB__ getarg(void);
 #endif
 
 
-/*
- * Support routines
- *
- * fchkstd checks for std* varieties
- *
- * f(put|get)c_cons write/read byte to console (to avoid having
- * file open for them) used internally, but you could use them
- * (but may change etc etc)
- */
-
+/* Check whether a file is for the console */
 extern int __LIB__ fchkstd(FILE *);
 
 /* All functions below here are machine specific */
+
+/* Get a key press using the default keyboard driver */
 extern int __LIB__ fgetc_cons();
+
+/* Get a key press using the "inkey" keyboard driver */
+extern int __LIB__ fgetc_cons_inkey();
+
+/* Output a character to the console using the default driver */
 extern int __LIB__ fputc_cons(char c);
+
+/* Read a string using the default keyboard driver */
 extern char __LIB__ *fgets_cons(char *s, size_t n) __smallc;
+
 /* Abandon file - can be the generic version */
 extern void __LIB__ fabandon(FILE *);
 /* Get file position for file handle fd */
@@ -320,20 +321,15 @@ extern int __LIB__ rename(const char *s, const char *d) __smallc;
 /* Remove a file */
 extern int __LIB__ remove(const char *name);
 
-/*
- * Non-standard, but useful for games:
- *
- * getk() returns key currently pressed or 0 if none
- * getkey() waits for a key to be pressed before returning
- * puts_cons() is like puts() but o/p directly to screen
- * printk() is a printf directly to console (bypasses streams)
- * 	    this is not available for the ANSI terminal libraries
- */
-extern int __LIB__ getk();
-#define getkey() fgetc_cons()
-extern void __LIB__ puts_cons(const char *message);
-extern int __LIB__ printk(const char *fmt,...) __vasmallc;
 
+/* Scan for a keypress using the default keyboard driver */
+extern int __LIB__ getk();
+/* Scan for a keypress using the "inkey" keyboard driver */
+extern int __LIB__ getk_inkey();
+#define getkey() fgetc_cons()
+
+/* Print a formatted string directly to the console using the default driver */
+extern int __LIB__ printk(const char *fmt,...) __vasmallc;
 
 
 /*
