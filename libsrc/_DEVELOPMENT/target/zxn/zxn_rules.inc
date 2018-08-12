@@ -43,23 +43,35 @@ Z88DK_FOR(`LOOP', `0', `15',
    ; core version = MMmmSSS (major, minor, sub) in decimal
    ;    v 1.10.51 = 0110051
 
+   PUBLIC __CRT_CORE_VERSION
+
    IFNDEF CRT_CORE_VERSION
       defc CRT_CORE_VERSION = 0
    ENDIF
    
+   defc __CRT_CORE_VERSION = CRT_CORE_VERSION
+   
    ; nextos version = MMmm (major, minor) in decimal
    ;         v 1.94 = 0194
+
+   PUBLIC __NEXTOS_VERSION
 
    IFNDEF NEXTOS_VERSION
       defc NEXTOS_VERSION = 0
    ENDIF
    
+   defc __NEXTOS_VERSION = NEXTOS_VERSION
+   
    ; esxdos version
    ; currently non-zero checks for presence (use 1)
+
+   PUBLIC __ESXDOS_VERSION
 
    IFNDEF ESXDOS_VERSION
       defc ESXDOS_VERSION = 0
    ENDIF
+   
+   defc __ESXDOS_VERSION = ESXDOS_VERSION
    
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; MAIN location for dotx and dotn commands
