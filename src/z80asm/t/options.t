@@ -2,7 +2,7 @@
 
 # Z88DK Z80 Macro Assembler
 #
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2018
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #
@@ -415,9 +415,11 @@ t_z80asm_ok(0, "invoke 0x1234", "\xEF\x34\x12", "--ti83plus");
 #------------------------------------------------------------------------------
 
 t_z80asm_ok(0, "ld ix,0x1234", "\xDD\x21\x34\x12");
+t_z80asm_ok(0, "ld ix,0x1234", "\xFD\x21\x34\x12", "-IXIY");
 t_z80asm_ok(0, "ld ix,0x1234", "\xFD\x21\x34\x12", "--IXIY");
 
 t_z80asm_ok(0, "ld iy,0x1234", "\xFD\x21\x34\x12");
+t_z80asm_ok(0, "ld iy,0x1234", "\xDD\x21\x34\x12", "-IXIY");
 t_z80asm_ok(0, "ld iy,0x1234", "\xDD\x21\x34\x12", "--IXIY");
 
 #------------------------------------------------------------------------------
