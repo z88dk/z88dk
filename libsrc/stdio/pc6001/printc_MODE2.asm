@@ -7,6 +7,8 @@
 	EXTERN		generic_console_flags
 	EXTERN		__MODE2_attr
         EXTERN          __pc6001_attr
+        EXTERN          __pc6001_mode
+	EXTERN		generic_console_text_xypos
 
 
 	INCLUDE		"target/pc6001/def/pc6001.def"
@@ -16,6 +18,7 @@
 ; a' = d = character to print
 ; e = raw
 printc_MODE2:
+	push	bc
         ld      l,d
         ld      h,0
         ld      de,(generic_console_font32)
@@ -81,4 +84,39 @@ is_paper:
         inc     de
         pop     bc
         djnz    semihires_1
-        ret
+	pop	bc		;need to convert to appropriate coordinate
+IF setCSSoneachchar
+	; This isn't working yet, not sure if it ever will - set the
+	; CSS flag for each character, this has slightly odd effects
+	; since we end up mapping a character into 4 blocks
+	sla	c		;column * 2
+	ld	a,b
+	add	a		;row * 8
+	add	a
+	add	a
+	ld	b,0
+div12:	sub	12
+	jr	c,div12_done
+	inc	b
+	jr	div12
+
+div12_done:
+	call	generic_console_text_xypos
+	dec	h
+	dec	h
+	ld	a,(__pc6001_attr)
+	and	@00000010
+	ld	c,a
+	ld	a,(hl)
+	and	@11111101
+	or	c
+	ld	(hl),a
+	inc	hl
+;	ld	(hl),a
+	ld	de,31
+	add	hl,de
+	ld	(hl),a
+	inc	hl
+;	ld	(hl),a
+ENDIF
+	ret

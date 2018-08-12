@@ -61,4 +61,5 @@ psg/pc6001/set_psg_callee
 psg/pc6001/get_psg
 psg/pc6001/psg_init
 @psg/psg.lst
+@video/mc6847/mc6847.lst
 @z80.lst

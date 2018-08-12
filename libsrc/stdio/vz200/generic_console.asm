@@ -10,7 +10,10 @@
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
+		PUBLIC		generic_console_pointxy
+		PUBLIC		generic_console_plotc
 
+		EXTERN		mc6847_map_colour
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
 
@@ -23,12 +26,14 @@ generic_console_set_inverse:
 	ret
 
 generic_console_set_ink:
-	and	7
+	call	mc6847_map_colour
+	ld	a,b
 	rlca
 	rlca
 	rlca
 	rlca
 	or	128
+	and	@11110000
 	ld	(colour_mask),a
 	ret
 
@@ -46,6 +51,8 @@ generic_console_cls:
 ; b = y
 ; a = character to print
 ; e = raw
+generic_console_plotc:
+	inc	e
 generic_console_printc:
 	push	de
 	call	xypos
@@ -60,6 +67,12 @@ generic_console_printc:
 	or	c
 place_character:
 	ld	(hl),a
+	ret
+
+
+generic_console_pointxy:
+	call	generic_console_vpeek
+	and	@10001111
 	ret
 
 ;Entry: c = x,

@@ -37,7 +37,7 @@ check_mode:
 	cp	IOCTL_GENCON_SET_MODE
 	jr	nz,failure
 	ld	a,c		; The mode
-	and	127
+	and	31
 	ld	e,32		;columns
 	ld	h,MODE_0
 	ld	l,16
@@ -52,6 +52,10 @@ check_mode:
 	cp	2		;Half hires
 	jr	nz,failure
 set_mode:
+	bit	5,c
+	jr	z,not_css
+	set	1,h
+not_css:
 	ld	a,e
 	ld	(__console_w),a
 	ld	a,h

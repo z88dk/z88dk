@@ -12,4 +12,5 @@ stdio/conio/textcolour
 stdio/conio/conio_map_colour_noop
 stdio/conio/bordercolour
 stdio/conio/generic_console_fonts
+stdio/conio/generic_console_font64
 stdio/conio/vpeek_noop

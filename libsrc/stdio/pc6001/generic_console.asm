@@ -21,6 +21,7 @@
 		EXTERN		generic_console_font32
 		EXTERN		generic_console_udg32
 		EXTERN		generic_console_flags
+		EXTERN		mc6847_map_colour
 
 		EXTERN		printc_MODE1
 		EXTERN		printc_MODE2
@@ -42,21 +43,35 @@ generic_console_set_inverse:
 	ret
 
 generic_console_set_ink:
+	call	mc6847_map_colour
+	ld	a,b
 	and	7
 	ld	(__ink_colour),a
 	rrca
 	rrca
 	and	@11000000
 	ld	(__MODE2_attr),a
+set_css:
+	ld	a,b
+	rlca
+	rlca
+	and	@00000010
+	ld	c,a
+	ld	a,(__pc6001_attr)
+	and	@11111101
+	or	c
+	ld	(__pc6001_attr),a
 	ret
 
 	
 generic_console_set_paper:
+	call	mc6847_map_colour
+	ld	a,b
 	rrca
 	rrca
 	and	@11000000
 	ld	(__MODE2_attr+1),a
-	ret
+	jr	set_css
 
 generic_console_cls:
 	ld	hl,(SYSVAR_screen - 1)
@@ -146,6 +161,7 @@ generic_console_pointxy:
 generic_console_printc:
 	ex	af,af
 	ld	a,(__pc6001_mode)
+	and	@11111101
 	cp	MODE_1
 	jp	z,printc_MODE1
 	cp	MODE_2
@@ -186,7 +202,7 @@ generic_console_scrollup:
 	push	de
 	push	bc
 	ld	a,(__pc6001_mode)
-	and	a
+	and	@11111101
 	jr	z,scrollup_text
 	cp	MODE_1
 	jr	z,scrollup_hires

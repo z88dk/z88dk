@@ -75,7 +75,7 @@ OPT(OptCall, option_cpu_z180, "", "--cpu=z180", "Assemble for the Z180", "")
 OPT(OptCall, option_cpu_r2k, "", "--cpu=r2k", "Assemble for the Rabbit 2000", "")
 OPT(OptCall, option_cpu_r3k, "", "--cpu=r3k", "Assemble for the Rabbit 3000", "")
 OPT(OptSet, &opts.ti83plus, "", "--ti83plus", "Interpret 'Invoke' as RST 28h", "")
-OPT(OptSet, &opts.swap_ix_iy, "", "--IXIY", "Swap IX and IY registers", "")
+OPT(OptSet, &opts.swap_ix_iy, "-IXIY", "--IXIY", "Swap IX and IY registers", "")
 OPT(OptCall, option_debug_info, "", "--debug", "Add debug info to map file", "")
 
 OPT_TITLE("Environment:")

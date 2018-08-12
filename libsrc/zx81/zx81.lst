@@ -20,6 +20,7 @@ zx81/zx_dfile_addr
 zx81/zx_setcursorpos
 zx81/zx_setcursorpos_callee
 zx81/zx_lprintc
+zx81/zx_lprintc5
 zx81/zx_print_buf
 zx81/basic/zx_basemem
 zx81/basic/zx_basic_length
