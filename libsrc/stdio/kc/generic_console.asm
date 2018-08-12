@@ -78,17 +78,147 @@ generic_console_cls:
 generic_console_scrollup:
 	push	de
 	push	bc
-	in	a,($88)
-	push	af		;Save value
-	set 	2,a		;Page video in
-	out	($88),a
-	ld	hl,($b7a4)	;WEND
-	call	l_jphl
-	pop	af
-	out	($88),a
+	ld	bc, 0
+loop:
+	push	bc
+
+	push	bc
+	call	xypos
+	pop	bc
+	push	hl	;save destination address
+	inc	b	;row 1
+	call	xypos
+	pop	de	;de = destination, hl = source row
+
+	push	hl
+	push	de
+	ld	c,$20
+	call	scroll_half
+	pop	hl	;destination
+	ld	bc,$20
+	add	hl,bc
+	ex	de,hl
+	pop	hl
+	add	hl,bc
+	ld	c,$20
+	call	scroll_half
+
+	; Now do the RHS
+	pop	bc
+	push	bc		
+
+	ld	c,32
+	push	bc
+	call	xypos
+	pop	bc
+	push	hl	;Save destination address
+	inc	b
+	call	xypos
+	pop	de	;Get back destination address
+	
+	push	hl
+	push	de
+	ld	c,$08
+	call	scroll_half
+	pop	hl	;destination
+	ld	bc,$20
+	add	hl,bc
+	ex	de,hl
+	pop	hl
+	add	hl,bc
+	ld	c,$08
+	call	scroll_half
+
+	; Now do the colour attributes
+	pop	bc
+	push	bc
+
+	;LHS
+	push	bc
+	call	cxypos
+	pop	bc
+	push	hl	;Save destination address
+	inc	b
+	call	cxypos
+	pop	de	;Get back destination address
+
+	ld	c,$20
+	call	scroll_colour_half
+
+	; Now do the RHS of the colour
+	pop	bc
+	push	bc
+	ld	c,32
+	push	bc
+	call	cxypos
+	pop	bc
+	push	hl	;Save destination address
+	inc	b
+	call	cxypos
+	pop	de	;Get back destination address
+
+	ld	c,$08
+	call	scroll_colour_half
+
+	pop	bc
+	inc	b
+	ld	a,b
+	cp	31
+	jp	nz,loop
 	pop	bc
 	pop	de
 	ret
+
+; Scroll x number of rows (graphics)
+; Entry: de = destination
+;        hl = source
+;         c = number of columns
+;         b = number of rows
+scroll_half:
+	ld	b,4
+scroll_half_loop:
+	push	bc
+
+	push	hl
+	push	de
+	ld	b,0
+	ldir
+	pop	hl		;dest
+	ld	bc,128
+	add	hl,bc	
+	ex	de,hl
+	pop	hl		;source
+	add	hl,bc
+
+	pop	bc
+	djnz	scroll_half_loop
+	ret
+
+; Scroll x number of rows (colour)
+; Entry: de = destination
+;        hl = source
+;         c = number of columns
+;         b = number of rows
+scroll_colour_half:
+	ld	b,2
+scroll_colour_half_loop:
+	push	bc
+
+	push	hl
+	push	de
+	ld	b,0
+	ldir
+	pop	hl		;dest
+	ld	bc,32
+	add	hl,bc	
+	ex	de,hl
+	pop	hl		;source
+	add	hl,bc
+
+	pop	bc
+	djnz	scroll_colour_half_loop
+	ret
+
 
 ; c = x
 ; b = y
