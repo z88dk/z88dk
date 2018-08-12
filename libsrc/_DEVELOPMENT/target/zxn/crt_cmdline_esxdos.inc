@@ -1,42 +1,126 @@
-      ; command line parsing for esxdos dot commands
+   ; complete esxdos command line implementation
+   ;
+   ;   0 = no command line
+   ;   1 = on stack empty argc,argv
+   ;   2 = unprocessed command line len,cmdline
+   ;   3 = on stack argc,argv
+   ;   4 = on stack unprocessed command line 0-terminated len,cmdline
 
-      ; hl = pointer to args or 0 if no args
+   ; hl' = command line
+   
+   IF __crt_enable_commandline = 1
+   
+      ; empty argc,argv
+      
+      include "../crt_cmdline_empty.inc"
+      
+      push hl   ; argv
+      push bc   ; argc
+   
+   ENDIF
+
+   IF __crt_enable_commandline = 2
+   
+      ; unprocessed esxdos command line
+      
+      exx
+      
+      push hl   ; command line
+      push hl   ; length
+      
+      ld a,h
+      or l
+      
+      jr z, end_command_line
+      
+      pop hl
+      
+      include "crt_cmdline_esxdos_len.inc"
+   
+      push bc   ; length
+
+   end_command_line:
+
+   ENDIF
+
+   IF __crt_enable_commandline = 3
+   
+      ; parse into argc,argv
+      
+      exx
+      
+      IF __NEXTOS_DOT_COMMAND
+
+         include "crt_cmdline_esx_argv.inc"
+      
+      ELSE
+      
+         include "crt_cmdline_esxdos_argv.inc"
+      
+      ENDIF
+      
+      push hl   ; argv
+      push bc   ; argc
+   
+   ENDIF
+
+   IF __crt_enable_commandline >= 4
+   
+      ; copy unprocessed esxdos command line to stack
+      
+      exx
 
       ld a,h
       or l
-      jr nz, cmdline_present
-
-   cmdline_missing:
-
-      include "../crt_cmdline_empty.inc"
-      jr cmdline_end
-
-   cmdline_present:
-
+      
+      jr nz, yes_command_line
+   
+   no_command_line:
+   
+      push hl   ; command line
+      push hl   ; length
+      
+      jr end_command_line
+      
+   yes_command_line:
+   
+      ld e,l
+      ld d,h
+      
       include "crt_cmdline_esxdos_len.inc"
       
-      ; copy command line words from basic program to stack
+      inc bc                   ; include terminator in length
+      
+      ld hl,128
+      
+      EXTERN l_minu_bc_hl
+      call l_minu_bc_hl        ; place a cap on the length of the command line
+      
+      ld c,l
+      ld b,h
 
-      EXTERN l_command_line_parse
-      call   l_command_line_parse
+      ld a,h
+      or l
       
-      ; esxdos does not supply program name in command line
-      ; so place empty string in argv[0] instead
+      jr z, no_command_line
       
-      ; bc = int argc
-      ; hl = char *argv[]
-      ; de = & empty string
-      ; bc'= num chars in redirector
-      ; hl'= char *redirector
+      EXTERN l_neg_hl
+      call l_neg_hl
       
-      push de                  ; empty string added to front of argv[]
+      add hl,sp
+      ld sp,hl
       
-      dec hl
-      dec hl                   ; char *argv[] adjusted to include empty string at index 0
+      push hl   ; command line
+      push bc   ; length
       
-      inc c                    ; argc++
+      ex de,hl
+      ldir
+      
+      dec de
+      
+      xor a
+      ld (de),a                ; replace terminator with 0
 
-   cmdline_end:
+   end_command_line:
 
-      ; hl = char **argv
-      ; bc = int    argc
+   ENDIF
