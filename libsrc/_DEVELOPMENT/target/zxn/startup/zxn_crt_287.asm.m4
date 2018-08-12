@@ -53,10 +53,21 @@ PUBLIC __Start, __Exit
 EXTERN _main
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; CRT INIT ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; CRT ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 __Start:
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; use full command line if nextos
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   IF __NEXTOS_DOT_COMMAND
+   
+      ld l,c
+      ld h,b
+   
+   ENDIF
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; returning to basic
@@ -68,78 +79,138 @@ __Start:
 
    ld (__sp),sp
 
-	include "../crt_init_sp.inc"
+   ; hl' = command line
 
-   IF __crt_enable_commandlie >= 2
-	
-	   exx
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; esxdos compliance
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-	ENDIF
+   IF ESXDOS_VERSION
+
+      ;; check for esxdos
+      
+      rst __ESX_RST_SYS
+      defb __ESX_M_DOSVERSION
+
+      ld hl,error_msg_esxdos
+      jp nc, error_crt         ; if esxdos not present
+
+   ENDIF
+   
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; nextos compliance
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   IF __NEXTOS_DOT_COMMAND || NEXTOS_VERSION
+   
+      ;; check for nextos
+      
+      rst __ESX_RST_SYS
+      defb __ESX_M_DOSVERSION
+
+      ld hl,error_msg_nextos
+      jp c, error_crt          ; if esxdos present
+   
+      or a
+      jp nz, error_crt         ; if nextos is in 48k mode
+      
+      IF NEXTOS_VERSION
+
+         ld hl,+(((NEXTOS_VERSION / 1000) % 10) << 12) + (((NEXTOS_VERSION / 100) % 10) << 8) + (((NEXTOS_VERSION / 10) % 10) << 4) + (NEXTOS_VERSION % 10)
+         
+         ex de,hl
+         sbc hl,de
+
+         ld hl,error_msg_nextos
+         jp c, error_crt       ; if nextos version not met
+
+      ENDIF
+
+      ;; register basic error intercept
+      
+      EXTERN _esx_errh
+      
+      ld hl,__basic_error_intercept
+      ld (_esx_errh),hl
+
+      rst __ESX_RST_SYS
+      defb __ESX_M_ERRH
+   
+   ENDIF
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; core version check
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   IF CRT_CORE_VERSION
+   
+      ; check for emulator
+      
+      ld bc,__IO_NEXTREG_REG
+      
+      ld a,__REG_MACHINE_ID
+      out (c),a
+      
+      inc b
+      in a,(c)
+      
+      cp __RMI_EMULATORS
+      jr z, core_pass
+      
+      ; check core version
+      
+      ld hl,error_msg_core_version
+      dec b
+      
+      ld e,__REG_VERSION
+      out (c),e
+      
+      inc b
+      in e,(c)                 ; e = core version major minor
+      
+      ld a,+(((CRT_CORE_VERSION / 100000) & 0xf) << 4) + (((CRT_CORE_VERSION / 1000) % 100) & 0xf)
+      
+      cp e
+      jr c, core_pass          ; if minimum < core version
+      jp nz, error_crt         ; if minimum > core version
+   
+      ; core version = minimum
+      
+      dec b
+      
+      ld a,__REG_SUB_VERSION
+      out (c),a
+      
+      inc b
+      in a,(c)                 ; a = core sub version
+      
+      cp CRT_CORE_VERSION % 1000
+      jp c, error_crt          ; if core sub version < minimum
+
+   core_pass:
+   
+   ENDIF
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; move stack to final position
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   
+   include "../crt_init_sp.inc"
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; command line
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   IF __crt_enable_command_line & 0x80
-	
-	   ld l,c
-		ld h,b
-	
-	ENDIF
-
-
-
-
-
-
-
-   include "../crt_start_di.inc"
-
-   IF (__crt_on_exit & 0x10000) && (__crt_on_exit & 0x20000) && (!(__crt_on_exit & 0x8)) && (__crt_on_exit & 0x2)
+   ; hl' = command line
    
-      ; returning to basic
-      
-      push iy
-      exx
-      push hl
-      
-      IF __crt_enable_commandline >= 2
-      
-      exx
+   include "crt_cmdline_esxdos.inc"
    
-      ENDIF
-      
-   ENDIF
-
-   include "../crt_save_sp.inc"
-
-__Restart:
-
-   include "../crt_init_sp.inc"
-
-   ; command line
+   ; stack: argv/cmdline, argc/len
    
-   IF __crt_enable_commandline = 1
-   
-      include "../crt_cmdline_empty.inc"
-   
-   ENDIF
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; ram initialization
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   IF __crt_enable_commandline >= 3
-
-      include "crt_cmdline_esxdos.inc"
-
-   ENDIF
-
-__Restart_2:
-
-   IF __crt_enable_commandline >= 1
-
-      push hl                  ; argv
-      push bc                  ; argc
-
-   ENDIF
-   
    ; initialize data section
 
    include "../clib_init_data.inc"
@@ -148,9 +219,19 @@ __Restart_2:
 
    include "../clib_init_bss.inc"
 
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; interrupt mode
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
    ; interrupt mode
    
+   include "../crt_start_di.inc"
+
    include "../crt_set_interrupt_mode.inc"
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; main
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 SECTION code_crt_init          ; user and library initialization
 SECTION code_crt_main
@@ -159,10 +240,10 @@ SECTION code_crt_main
 
    ; call user program
 
-IF __crt_enable_commandline = 2
+IF __crt_enable_commandline >= 1
 
-   pop bc
-   pop hl
+   pop bc                      ; bc = argc / length
+   pop hl                      ; hl = argv / command line
    
    push hl
    push bc
@@ -173,6 +254,8 @@ ENDIF
 
    ; run exit stack
 
+error_basic:
+
    IF __clib_exit_stack_size > 0
    
       EXTERN asm_exit
@@ -182,13 +265,7 @@ ENDIF
 
 __Exit:
 
-   IF !((__crt_on_exit & 0x10000) && (__crt_on_exit & 0x8))
-   
-      ; not restarting
-      
-      push hl                  ; save return status
-   
-   ENDIF
+   push hl                     ; save return status
    
 SECTION code_crt_exit          ; user and library cleanup
 SECTION code_crt_return
@@ -197,62 +274,149 @@ SECTION code_crt_return
    
    include "../clib_close.inc"
 
-   ; terminate
+   ; return to basic
+
+   pop hl
+
+error_crt:
+
+   ld sp,(__sp)
+      
+   exx
+   pop hl
+   exx
+   pop iy
+
+   include "../crt_exit_eidi.inc"
+      
+   ; If you exit with carry set and A<>0, the corresponding error code will be printed in BASIC.
+   ; If carry set and A=0, HL should be pointing to a custom error message (with last char +$80 as END marker).
+   ; If carry reset, exit cleanly to BASIC
+      
+   ld a,h
+   or l
+   ret z                       ; status == 0, no error
+      
+   scf
+   ld a,l
+      
+   inc h
+   dec h
+      
+   ret z                       ; status < 256, basic error code in status&0xff
+      
+   ld a,0                      ; status = & custom error message
+   ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; BASIC ERROR ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+IF __NEXTOS_DOT_COMMAND || NEXTOS_VERSION
+
+   __basic_error_intercept:
+
+      ; basic error has occurred during a rst $10 or rst $18
+      ; must perform clean up
    
-   IF (__crt_on_exit & 0x10000) && (__crt_on_exit & 0x20000) && (!(__crt_on_exit & 0x8)) && (__crt_on_exit & 0x2)
+      ; enter :  a = basic error code - 1
+      ;         de = return address to restart
+      ;         (you can resume the program if you jump to this address)
 
-      ; returning to basic
-      
-      pop hl
-      
-      ld sp,(__sp_or_ret)
-      
-      exx
-      pop hl
-      exx
-      pop iy
+      ld hl,error_msg_d_break
+   
+      cp __ERRB_D_BREAK_CONT_REPEATS - 1
+      jp z, error_basic
+   
+      ld hl,__ESX_ENONSENSE
+      jp error_basic
 
-      include "../crt_exit_eidi.inc"
-      
-      ; If you exit with carry set and A<>0, the corresponding error code will be printed in BASIC.
-      ; If carry set and A=0, HL should be pointing to a custom error message (with last char +$80 as END marker).
-      ; If carry reset, exit cleanly to BASIC
-      
-      ld a,h
-      or l
-      ret z                    ; status == 0, no error
-      
-      scf
-      ld a,l
-      
-      inc h
-      dec h
-      
-      ret z                    ; status < 256, basic error code in status&0xff
-      
-      ld a,0                   ; status = & custom error message
-      ret
+ENDIF
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; error messages
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+IF CRT_CORE_VERSION
+
+   error_msg_core_version:
+   
+      defm "Requires Core v"
+      
+      IF ((CRT_CORE_VERSION / 1000000) % 10)
+         defb (CRT_CORE_VERSION / 1000000) % 10 + '0'
+      ENDIF
+      
+         defb (CRT_CORE_VERSION / 100000) % 10 + '0'
+         defb '.'
+      
+      IF ((CRT_CORE_VERSION / 10000) % 10)
+         defb (CRT_CORE_VERSION / 10000) % 10 + '0'
+      ENDIF
+      
+         defb (CRT_CORE_VERSION / 1000) % 10 + '0'
+         defb '.'
+      
+      IF ((CRT_CORE_VERSION / 100) % 10)
+         defb (CRT_CORE_VERSION / 100) % 10 + '0'
+      ENDIF
+      
+      IF ((CRT_CORE_VERSION / 100) % 10) || ((CRT_CORE_VERSION / 10) % 10)
+         defb (CRT_CORE_VERSION / 10) % 10 + '0'
+      ENDIF
+      
+      defb CRT_CORE_VERSION % 10 + '0' + 0x80
+
+ENDIF
+
+IF __NEXTOS_DOT_COMMAND || NEXTOS_VERSION
+
+   IF NEXTOS_VERSION
+
+      error_msg_nextos:
+      
+         defm "Requires NextZXOS 128k v"
+         
+         IF ((NEXTOS_VERSION >> 12) & 0xf)
+            defb ((NEXTOS_VERSION >> 12) & 0xf) + '0'
+         ENDIF
+         
+            defb ((NEXTOS_VERSION >> 8) & 0xf) + '0'
+            defb '.'
+         
+         IF ((NEXTOS_VERSION >> 4) & 0xf)
+            defb ((NEXTOS_VERSION >> 4) & 0xf) + '0'
+         ENDIF
+         
+         defb (NEXTOS_VERSION & 0xf) + '0' + 0x80
+   
    ELSE
    
-      include "../crt_exit_eidi.inc"
-      include "../crt_restore_sp.inc"
-      include "../crt_program_exit.inc"   
+      error_msg_nextos:
+
+         defm "Requires NextZXOS 128", 'k'+0x80
 
    ENDIF
+   
+   error_msg_d_break:
+
+      defm "D BREAK - no repea", 't'+0x80
+
+ENDIF
+
+IF ESXDOS_VERSION
+
+   error_msg_esxdos:
+   
+      defm "Requires ESXDO", 'S' + 0x80
+
+ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-include "../crt_jump_vectors_z80.inc"
-
-IF (__crt_on_exit & 0x10000) && ((__crt_on_exit & 0x6) || ((__crt_on_exit & 0x8) && (__register_sp = -1)))
-
-   SECTION BSS_UNINITIALIZED
-   __sp_or_ret:  defw 0
-
-ENDIF
+__sp:             defw 0
 
 include "../clib_variables.inc"
 
