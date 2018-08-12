@@ -1,0 +1,7 @@
+@arch/zxn/version/version_asm.lst
+arch/zxn/version/c/sdcc/check_version_core
+arch/zxn/version/c/sdcc/check_version_core_fastcall
+arch/zxn/version/c/sdcc/check_version_esxdos
+arch/zxn/version/c/sdcc/check_version_esxdos_fastcall
+arch/zxn/version/c/sdcc/check_version_nextzxos
+arch/zxn/version/c/sdcc/check_version_nextzxos_fastcall

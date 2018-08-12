@@ -905,6 +905,30 @@ extern unsigned int zxn_mangle_bank_state_fastcall(unsigned int state) __preserv
 
 
 
+// version checks
+
+// note that dot commands will automatically check version with suitable pragma defined
+//
+// core_version: MmSS (major, minor, sub) in hexadecimal; v 1.10.51 would be 0x1a33
+// esxdos_version: esxdos does not return version yet; use 0 or 1 to verify presence
+// nextzxos_version: MMmm (major, minor) in bcd; v 1.94 would be 0x0194
+
+extern unsigned char check_version_core(unsigned int core_version) __preserves_regs(d,iyl,iyh);
+extern unsigned char check_version_core_fastcall(unsigned int core_version) __preserves_regs(d,iyl,iyh) __z88dk_fastcall;
+#define check_version_core(a) check_version_core_fastcall(a)
+
+
+extern unsigned char check_version_esxdos(unsigned int esxdos_version) __preserves_regs(iyl,iyh);
+extern unsigned char check_version_esxdos_fastcall(unsigned int esxdos_version) __preserves_regs(iyl,iyh) __z88dk_fastcall;
+#define check_version_esxdos(a) check_version_esxdos_fastcall(a)
+
+
+extern unsigned char check_version_nextzxos(unsigned int nextzxos_version) __preserves_regs(iyl,iyh);
+extern unsigned char check_version_nextzxos_fastcall(unsigned int nextzxos_version) __preserves_regs(iyl,iyh) __z88dk_fastcall;
+#define check_version_nextzxos(a) check_version_nextzxos_fastcall(a)
+
+
+
 ///////////////////////////////////////////////////////////////
 
 // tape i/o - ROM3 (48k rom) must be enabled

@@ -1,0 +1,3 @@
+arch/zxn/version/z80/check_version_core
+arch/zxn/version/z80/check_version_esxdos
+arch/zxn/version/z80/check_version_nextzxos

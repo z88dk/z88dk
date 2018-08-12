@@ -874,6 +874,24 @@ extern unsigned int zxn_mangle_bank_state(unsigned int state);
 
 
 
+// version checks
+
+// note that dot commands will automatically check version with suitable pragma defined
+//
+// core_version: MmSS (major, minor, sub) in hexadecimal; v 1.10.51 would be 0x1a33
+// esxdos_version: esxdos does not return version yet; use 0 or 1 to verify presence
+// nextzxos_version: MMmm (major, minor) in bcd; v 1.94 would be 0x0194
+
+extern unsigned char check_version_core(unsigned int core_version);
+
+
+extern unsigned char check_version_esxdos(unsigned int esxdos_version);
+
+
+extern unsigned char check_version_nextzxos(unsigned int nextzxos_version);
+
+
+
 ///////////////////////////////////////////////////////////////
 
 // tape i/o - ROM3 (48k rom) must be enabled
