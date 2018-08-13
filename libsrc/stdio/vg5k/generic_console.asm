@@ -26,6 +26,7 @@ generic_console_set_paper:
 	rlca
 	rlca
 	rlca
+	and	@01110000
 	ld	c,a
 	ld	hl,vg5k_attr
 	ld	a,(hl)
@@ -37,6 +38,7 @@ generic_console_set_paper:
 
 generic_console_set_ink:
 	call	conio_map_colour
+	and	7
 	ld	c,a
 	ld	hl,vg5k_attr
 	ld	a,(hl)
@@ -106,7 +108,7 @@ generic_console_printc:
 
 ; Raw mode, if > 128 then graphics
 	bit	7,d
-	jr	z, place_it
+	jr	z, place_text
 	res	7,d
 	set	7,c
 	jr	place_it
@@ -123,8 +125,12 @@ not_raw:
 not_udg:
 	ld	a,(__vg5k_custom_font)
 	and	a
-	jr	z,place_it
+	jr	z,place_text
 	set	7,d		;extended character set
+place_text:
+	ld	a,c		;don't set reverse/double etc
+	and	@10001111
+	ld	c,a
 place_it:
 	ld	(hl),d			;place character
 	inc	hl
