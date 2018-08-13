@@ -10,8 +10,8 @@
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
 		PUBLIC		__vg5k_custom_font
-		PUBLIC		__vg5k_attr
 
+		EXTERN		__vg5k_attr
 		EXTERN		conio_map_colour
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
