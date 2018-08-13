@@ -103,10 +103,10 @@ noneg:
         ld      a,(ix-9)                ;get base
         cp      10
         jr      z,miniprintn_start_process
-        ex      af,af
+        push    af
         ld      a,'0'
         call    __printf_print_to_buf
-        ex      af,af
+        pop     af
         cp      16
         jr      nz,miniprintn_start_process
         ld      a,'x'

@@ -170,8 +170,10 @@
     <ClCompile Include="..\..\src\appmake\c7420.c" />
     <ClCompile Include="..\..\src\appmake\cpc.c" />
     <ClCompile Include="..\..\src\appmake\cpm.c" />
+    <ClCompile Include="..\..\src\appmake\d88.c" />
     <ClCompile Include="..\..\src\appmake\enterprise.c" />
     <ClCompile Include="..\..\src\appmake\extract.c" />
+    <ClCompile Include="..\..\src\appmake\fp1100.c" />
     <ClCompile Include="..\..\src\appmake\galaksija.c" />
     <ClCompile Include="..\..\src\appmake\glue.c" />
     <ClCompile Include="..\..\src\appmake\hex.c" />
@@ -217,6 +219,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\appmake\appmake.h" />
+    <ClInclude Include="..\..\src\appmake\d88.h" />
     <ClInclude Include="..\..\src\appmake\zx-util.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

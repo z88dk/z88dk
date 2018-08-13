@@ -9,7 +9,7 @@
 ;
 ;	CPIR, debugged version by Antonio Schifano, 29/12/2008
 ;
-;	$Id: zx_setstr_callee.asm,v 1.7 2016-06-10 21:30:58 dom Exp $
+;	$Id: zx_setstr_callee.asm $
 ;
 
 SECTION code_clib
@@ -52,18 +52,31 @@ morevar:
 	jr	z,found
 
 	call    call_rom3
-	defw	$19b8			;get next variable start
+IF FORts2068
+	defw	$1720		; NEXT-ONE (find next variable)
+ELSE
+	defw	$19b8		; find next variable
+ENDIF
 	ex	de,hl
 	pop	de
 	push	de
 	jr	loop
 
-found:	
+found:
 	call    call_rom3
-	defw	$19b8			; get next variable start
+IF FORts2068
+	defw	$1720		; NEXT-ONE (find next variable)
+ELSE
+	defw	$19b8		; find next variable
+ENDIF
+IF FORts2068
+	call	$1750		; RECLAIM-2: reclaim space (delete)
+ELSE
 	call    call_rom3
 	defw	$19e8			; reclaim space (delete)
-	
+ENDIF
+
+
 store:
 
 	pop	af			; swap var name and str. ptr into stack
@@ -89,8 +102,12 @@ store:
 	inc	bc
 	inc	bc
 	inc	bc
+IF FORts2068
+	call	$12BB		; MAKE-ROOM
+ELSE
 	call    call_rom3
-	defw	$1655			; MAKE-ROOM
+	defw	$1655		; MAKE-ROOM
+ENDIF
 	pop	bc
 	pop	hl
 	

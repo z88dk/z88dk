@@ -15,20 +15,24 @@ PUBLIC _in_KeyPressed
 
 .in_KeyPressed
 ._in_KeyPressed
+	ld	c,@00000110
+   	in	a,($40)		; read modifiers
 	bit	7,l
 	jr	z,nocaps
-   	in	a,($40)		; check on shift key
-	and	$04
+	bit	2,a
 	jr	z,fail			;CAPS not pressed
-  
+ 	res	2,c 
 .nocaps
 	bit	6,l
 	jr	z,nofunc
-	in	a,($40)
-	and	$02
+	bit	1,a
 	jr	z,fail
+	res	1,c
 
 .nofunc
+	and	c
+	jr	nz,fail		;We had an unexpected modifier key pressed
+
 	ld	a,l
 	and	15
 	out	($20),a

@@ -5,6 +5,7 @@
 #include "globals.h"
 #include "option.h"
 #include "path.h"
+#include "run.h"
 
 void option_print_path(void)
 {
@@ -35,6 +36,13 @@ void option_print_find_dirs(void)
    i = 0;
    for (p = path_open(); p != 0; p = path_next())
    {
+      // progress cursor
+      // allow user to interrupt
+      
+      user_interact();
+         
+      // check this directory
+
       esx_f_chdir("/");
       if ((*p == 0) || esx_f_chdir(p)) continue;
       
@@ -48,5 +56,5 @@ void option_print_find_dirs(void)
    
    path_close();
 
-   printf("\nDone\n");
+   printf(" \nDone\n");
 }

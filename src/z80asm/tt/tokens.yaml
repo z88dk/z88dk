@@ -256,6 +256,7 @@ tokens:
   - name    : C_LINE
   - name    : DEFB
   - name    : DEFC
+  - name    : DEFDB
   - name    : DEFGROUP
   - name    : DEFINE
   - name    : DEFM
@@ -264,6 +265,9 @@ tokens:
   - name    : DEFVARS
   - name    : DEFW
   - name    : DEPHASE
+  - name    : ELIF
+  - name    : ELIFDEF
+  - name    : ELIFNDEF
   - name    : ELSE
   - name    : ENDIF
   - name    : EXTERN

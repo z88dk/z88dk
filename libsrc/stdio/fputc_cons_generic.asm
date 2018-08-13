@@ -8,9 +8,9 @@
 ;  [ESC] D - Move the cursor left by one 
 ;  [ESC] E - Clear the screen and place the cursor in the upper left corner.
 ;  [ESC] H - Move the cursor to the upper left corner.
-;  [ESC] I - Move the cursor to beginning of line above.
-;  [ESC] J - Erase all lines after our current line
-;  [ESC] K - Clear the current line from the current cursor position.
+;  ![ESC] I - Move the cursor to beginning of line above.
+;  *[ESC] J - Erase all lines after our current line
+;  *[ESC] K - Clear the current line from the current cursor position.
 ;  [ESC] Y - row col 'Goto' Coordinate mode - first will change line number, then cursor position (both ASCII - 32)
 ;  [ESC] b - Byte after 'b' sets new foreground color (ASCII - 32)
 ;  [ESC] c - Byte after 'c' sets new background color (ASCII -32)
@@ -20,6 +20,7 @@
 ;  [ESC] r [char] - Print character (raw)
 ;   8      - move cursor left
 ;  10      - linefeed
+;  12 = cls
 ;
 ; Supported ZX Codes:
 ;
@@ -28,7 +29,6 @@
 ;  9 = right
 ; 10 = line feed
 ; 11 = up
-; 12 = cls
 ; 13 = down
 ; 16, 32 +n = set ink
 ; 17, 32 +n = set paper
@@ -46,7 +46,6 @@
 
 		; Variables that can be adjusted by platform specific code
 		PUBLIC		generic_console_flags
-		PUBLIC		generic_console_flags2
 
 		EXTERN		generic_console_scrollup
 		EXTERN		generic_console_printc
@@ -59,125 +58,41 @@
 		EXTERN		__console_w
 		EXTERN		__console_h
 
-set_x:
-	res	2,(hl)
-	sub	32
-	ld	b,a
-	ld	a,(__console_w)
-	dec	a
-	cp	b
-	ret	c		;out of range
-	ld	a,b
-	ld	(__console_x),a
-	ret
-set_y:
-	res	1,(hl)
-	sub	32
-	ld	b,a
-	ld	a,(__console_h)
-	dec	a
-	cp	b
-	ret	c	;out of range
-	ld	a,b
-	ld	(__console_y),a
-	ret
 
-set_vscroll:
-	res	3,(hl)
-	inc	hl		;Now on flags2
-	res	6,(hl)
-	rrca
-	ret	c
-	set	6,(hl)
-	ret
 
-set_ink:
-	res	4,(hl)
-	jp	generic_console_set_ink
-
-set_paper:
-	res	5,(hl)
-	jp	generic_console_set_paper
 
 ; extern int __LIB__ fputc_cons(char c);
 fputc_cons_generic:
 _fputc_cons_generic:
 	ld	hl,2
 	add	hl,sp
-	ld	a,(hl)
+	ld	d,(hl)
 	ld	bc,(__console_x)		;coordinates
-	ld	hl,generic_console_flags
-IF SUPPORT_vt52
-	bit	0,(hl)
-	jp	nz,set_escape
-ENDIF
-	bit	1,(hl)
-	jr	nz,set_y
-	bit	2,(hl)
-	jr	nz,set_x
-	bit	3,(hl)
-	jr	nz,set_vscroll
-	bit	4,(hl)
-	jr	nz,set_ink
-	bit	5,(hl)
-	jr	nz,set_paper
-	bit	6,(hl)
-	jp	nz,set_inverse
-	bit	7,(hl)
-	res	7,(hl)
-        ld      e,1             ;set raw mode
+	ld	hl,params_left
+	ld	a,(hl)
+	and	a
+	jr	nz,handle_parameter
+
+	; Check for raw flag here
+	ld	a,(generic_console_flags)
+	ld	e,1
+	rrca
 	jr	nz,handle_character
-	inc	hl		;flags2
-        bit     0,(hl)          ;raw mode
-	dec	hl
-        jr      nz,handle_character
-        cp      8
-        jp      z,left
-        cp      10
-        jp      z,handle_cr
-        cp      12
-        jr      z,cls
-IF SUPPORT_zxcodes
-        cp      9
-        jp      z,right
-        cp      11
-        jp      z,up
-        cp      13
-        jp      z,down
-        cp      22
-	ld	d,6
-        jr      z,start_code
-        cp      4
-	ld	d,8
-        jr      z,start_code
-	cp	16
-	ld	d,16
-	jr	z,start_code
-	cp	17
-	ld	d,32
-	jr	z,start_code
-	ld	d,64
-	cp	20
-	jr	z,start_code
-ENDIF
-IF SUPPORT_vt52
-	ld	d,1
-	cp	27
-	jr	z,start_code
-ENDIF
-	dec	e		;e = 0, not raw mode
+	
+	dec	e				;-> e = 0 (look at zxcodes)
+	call	check_parameters		;Leaves e untouched
+	ret	c				;Return if we processed the escape/it was a valid escape
 handle_character:
+	ld	hl,generic_console_flags
 	; At this point:
 	;hl = generic_console_flags
 	; c = x position 
 	; b = y position
-	; a = character to print
+	; d = character to print
 	; e = raw character mode
-	ld	d,a
 	ld	a,(__console_h)
 	cp	b
 	jr	nz,handle_character_no_scroll
-	inc	hl
 	bit	6,(hl)
 	call	z,generic_console_scrollup
 	ld	a,(__console_h)
@@ -199,74 +114,97 @@ handle_character_no_scroll:
 	jr	store_coords
 
 
-start_code:
-	ld	a,(hl)
-	or	d
-	ld	(hl),a
-	ret
-
-cls:	call	generic_console_cls
-move_home:
-	ld	bc,0
-	jr	store_coords
-
+; Entry: hl = flags
+;         d = character
 IF SUPPORT_vt52
 set_escape:
-	res	0,(hl)
-	jr	z,start_code
-	cp	'A'
-	jr	z,up
-	cp	'B'
-	jr	z,down
-	cp	'C'
-	jr	z,right
-	cp	'D'
-	jr	z,left
-	cp	'E'
-	jr	z,cls
-	cp	'H'		;home
-	jr	z,move_home
-	cp	'Y'
-	ld	d,6
-	jr	z,start_code
-IF SUPPORT_vt52x
-	cp	'K'
-	jr	z,clear_eol
-	cp	'J'
-	jr	z,clear_eos
-ENDIF
-	cp	'p'
-	jr	z,set_inverse_ansi
-	cp	'q'
-	jr	z,set_inverse_ansi
-	cp	'b'
-	ld	d,16
-	jr	z,start_code
-	cp	'c'
-	ld	d,32
-	jr	z,start_code
-	cp	's'
-	ld	d,8
-	jr	z,start_code
-	cp	'r'
-	ld	d,128
-	jr	z,start_code
-	; Anything else we just print
-	ld	e,1			;Print in raw mode
+	; We need to look at the escape table now
+	ld	e,1			;Consider ANSI side
+	call	check_parameters
+	ret	c		; Processed
+	; Just print it in raw mode then
+print_raw:
+	ld	e,1
 	jr	handle_character
 ENDIF
 
-set_inverse_ansi:
-	dec	a		;p = 70 = on, q = 71 = off
-set_inverse:			;Entry hl = flags
-	res	6,(hl)
-	inc	hl		;hl = flags2
-	rl	(hl)		;drop bit 7
-	rra
-	rr	(hl)		;get it back again
-set_inverse_call_generic:
-	jp	generic_console_set_inverse
+handle_parameter:
+	dec	(hl)
+	jr	z,parameter_dispatch
+	inc	hl	;Now points to parameters
+	ld	(hl),d
+	ret
+parameter_dispatch:
+	ld	hl,(parameter_processor)
+	ld	a,d		;Get parameter into a
+do_dispatch:
+	push	hl
+	ld	hl,generic_console_flags
+	ret
 
+check_parameters:
+	ld	hl,parameter_table
+parameter_loop:
+	ld	a,(hl)
+	inc	hl
+IF SUPPORT_vt52
+	bit	0,e
+	jr	z,not_ansi
+	ld	a,(hl)
+not_ansi:
+ENDIF
+	inc	hl		;points to parameter count now
+	and	a		;nc
+	ret	z
+	cp	255
+	jr	z,try_again
+	cp	d
+	jr	nz, try_again
+	; We matched a command
+	ld	a,(hl)
+	ld	(params_left),a
+	ld	e,a
+	inc	hl
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+	ld	(parameter_processor),hl
+	ld	a,e
+	and	a		;Immediate action?
+	ld	a,d		;The character
+	ccf
+	jr	z,do_dispatch
+	ret
+try_again:
+	inc	hl
+	inc	hl
+	inc	hl
+	jr	parameter_loop
+
+
+
+; hl = flags
+; bc = coordinates
+;  d = x
+; (parameter) = y
+set_xypos:
+	ld	hl,(__console_w)		;l = width, h = height
+	ld	a,d
+	sub	32
+	ld	c,a
+	ld	a,l
+	dec	a
+	cp	c
+	ret	c		;out of range
+	ld	a,(parameters)
+	sub	32
+	ld	b,a
+	ld	a,h
+	dec	a
+	cp	b
+	ret	c	;out of range
+	jr	store_coords
 
 ; Move print position left
 left:	ld	a,c
@@ -279,6 +217,7 @@ left:	ld	a,c
 left_1: dec	c
 store_coords:
 	ld	(__console_x),bc
+	scf
 	ret
 
 ; Move print position up
@@ -302,7 +241,42 @@ right:	ld	a,(__console_w)
 	inc	c
 	jr	store_coords
 
+set_vscroll:
+	res	6,(hl)
+	rrca
+	ret	c
+	set	6,(hl)
+	scf
+	ret
 
+set_ink:
+	call	generic_console_set_ink
+	scf	
+	ret
+
+set_paper:
+	call	generic_console_set_paper
+	scf	
+	ret
+
+
+cls:	call	generic_console_cls
+move_home:
+	ld	bc,0
+	jr	store_coords
+
+IF SUPPORT_vt52
+set_inverse_ansi:
+	dec	a		;p = 70 = on, q = 71 = off
+ENDIF
+set_inverse:			;Entry hl = flags
+	rl	(hl)		;drop bit 7
+	rra
+	rr	(hl)		;get it back again
+set_inverse_call_generic:
+	call	generic_console_set_inverse
+	scf
+	ret
 
 
 IF SUPPORT_vt52x
@@ -310,7 +284,6 @@ IF SUPPORT_vt52x
 clear_eol:
 	ld	a,b
 clear_eol_loop:
-	ld	hl,generic_console_flags
 	push	af		;save row
 	ld	e,0		;not raw
 	ld	a,' '
@@ -318,6 +291,7 @@ clear_eol_loop:
 	pop	af
 	cp	b
 	jr	nz,clear_eol_loop
+	scf
 	ret
 
 ; bc = coordinates
@@ -331,6 +305,7 @@ clear_eos_loop:
 	pop	af
 	dec	a
 	jr	nz,clear_eos_loop
+	scf
 	ret
 ENDIF
 
@@ -341,8 +316,7 @@ handle_cr:
 	cp	b
 	jr	nz,handle_cr_no_need_to_scroll
 	; Check if scroll is enabled
-	ld	a,(generic_console_flags)
-	rlca
+	bit	6,(hl)
 	call	nc,generic_console_scrollup
 
 	ld	a,(__console_h)
@@ -357,17 +331,99 @@ handle_cr_no_need_to_scroll:
 
 
 
+
+	SECTION	rodata_clib
+
+; defb ZXCode, ANSICode
+; defb paramater_count
+; defw process_routine
+;
+; If code is 255 then not valid for this mode, so skip
+parameter_table:
+IF SUPPORT_vt52
+	defb	27,255	;ESC
+	defb	1	;We expect one parameter
+	defw	set_escape
+ENDIF
+	defb	8, 8
+	defb	0
+	defw	left
+	defb	10, 10
+	defb	0
+	defw	handle_cr
+	defb	12, 12
+	defb	0
+	defw	cls
+
+	defb	9, 'D'
+	defb	0
+        defw	right
+        defb	11, 'A'
+	defb	0
+        defw	up
+        defb	13, 'B'
+	defb	0
+        defw	down
+IF SUPPORT_vt52
+        defb	255, 'D'
+	defb	0
+        defw	left
+ENDIF
+        defb	22, 'Y'
+	defb	2
+	defw	set_xypos
+IF SUPPORT_vt52
+	defb	255, 'E'
+	defb	0
+	defw	cls
+	defb	255, 'H'
+	defb	0
+	defw	move_home
+ENDIF
+	defb	4 , 's'
+	defb	1
+	defw	set_vscroll
+	defb	16, 'b'
+	defb	1
+	defw	set_ink
+	defb	17, 'c'
+	defb	1
+	defw	set_paper
+IF SUPPORT_zxcodes
+	defb	20, 255
+	defb	1
+	defw	set_inverse
+ENDIF
+IF SUPPORT_vt52
+	defb	255, 'p'
+	defb	0
+	defw	set_inverse_ansi
+	defb	255, 'q'
+	defb	0
+	defw	set_inverse_ansi
+ENDIF
+IF SUPPORT_vt52x
+	defb	255, 'K'
+	defb	0
+	defw	clear_eol
+	defb	255,'J'
+	defb	0
+	defw	clear_eos
+ENDIF
+IF SUPPORT_vt52
+	defb	255, 'r'
+	defb	1
+	defw	print_raw
+ENDIF
+	defb	0	;endmarker
+
 		SECTION		bss_clib
 
-generic_console_flags:		defb	0		; bit 0 = expect escape
-							; bit 1 = expect row
-							; bit 2 = expect column
-							; bit 3 = expect vscroll
-							; bit 4 = expect ink
-							; bit 5 = expect paper
-							; bit 6 = expect inverse
-							; bit 7 = expect raw character
-generic_console_flags2:		defb	0		; bit 0 = raw mode enabled
+params_left:	defb	0		; Number of parameters left to read
+parameters:	defb	0		; We only have up-to two parameters
+parameter_processor:	defw	0	; Where we go to when we need to process
+
+generic_console_flags:		defb	0		; bit 0 = raw mode enabled
 							; bit 6 = vscroll disabled
 							; bit 7 = inverse on
 

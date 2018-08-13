@@ -196,6 +196,10 @@ alloc_loop:
 
 alloc_load:
 
+;****************
+di
+;****************
+
    ld a,e                      ; basic's stack should be in high memory,
    mmu2 a                      ;   place allocated page in mmu2
    
@@ -210,6 +214,10 @@ alloc_load:
    ld h,0
    
    mmu2 10
+
+;****************
+ei
+;****************
    
    jp c, terminate             ; if read error
    
@@ -507,6 +515,11 @@ SECTION code_crt_return
    ;; terminate
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+
+;;;;;
+;;*****
+;; COPY ERROR STRING TO DIVMMC MEMORY
+
 terminate:
 
    ld (__return_status),hl
@@ -517,7 +530,16 @@ terminate:
    ;; restore banked state
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;****************
+di
+;****************
    mmu2 10
+;****************
+ld iy,__SYS_IY
+im 1
+ei
+;****************
+;*** UNLOCK 7FFD
    
    ld hl,(__z_saved_bank_state)
 

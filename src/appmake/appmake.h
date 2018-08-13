@@ -20,6 +20,8 @@
 #include <unistd.h>
 #endif
 
+#include "d88.h"
+
 extern char c_install_dir[];
 
 /* Conversion routines */
@@ -69,6 +71,9 @@ extern char      cpm_longhelp[];
 
 extern int       enterprise_exec(char *target);
 extern option_t  enterprise_options;
+
+extern int       fp1100_exec(char *target);
+extern option_t  fp1100_options;
 
 extern int       gal_exec(char *target);
 extern option_t  gal_options;
@@ -237,6 +242,10 @@ struct {
       "CPM disk image creation",
       cpm_longhelp,
       cpm_exec,     &cpm_options },
+    { "fp1kd88",  "fp1100",      "(C) 2018 Dominic Morris",
+      "Creates a .d88 for the Casio FP-1100",
+      NULL,
+      fp1100_exec,   &fp1100_options },
     { "bin2gtp",  "gal",      "(C) 2007,2008 Tomaz Solc & Stefano Bodrato",
       "Creates a tape file image for the Galaksija micro",
       NULL,

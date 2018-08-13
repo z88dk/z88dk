@@ -8,7 +8,7 @@
 ;	int __FASTCALL__ zx_getint(char *variable);
 ;
 ;
-;	$Id: zx_getint.asm,v 1.5 2016-06-10 20:02:04 dom Exp $
+;	$Id: zx_getint.asm $
 ;	
 
 SECTION code_clib
@@ -17,7 +17,11 @@ PUBLIC	_zx_getint
 EXTERN	zx_locatenum
 EXTERN	call_rom3
 
-INCLUDE  "target/zx/def/zxfp.def"
+IF FORts2068
+		INCLUDE  "target/ts2068/def/ts2068fp.def"
+ELSE
+		INCLUDE  "target/zx/def/zxfp.def"
+ENDIF
 
 ; hl = char *variable
 
@@ -37,10 +41,16 @@ _zx_getint:
 	inc	hl
 	ld	b,(hl)
 	
-	call    call_rom3
+IF FORts2068
+	call	ZXFP_STK_STORE
+ELSE
+	call	call_rom3
 	defw	ZXFP_STK_STORE
+ENDIF
+
 	call    call_rom3
 	defw	ZXFP_FP_TO_BC
+
 	
 	ld	h,b
 	ld	l,c

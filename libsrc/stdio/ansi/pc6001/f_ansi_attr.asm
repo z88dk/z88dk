@@ -16,60 +16,50 @@
         SECTION code_clib
 	PUBLIC	ansi_attr
 
-
-        SECTION bss_clib
-	PUBLIC	pc6001_attr
-	
-.pc6001_attr	defb 0
+	EXTERN	__pc6001_attr
 
         SECTION code_clib
 
+
+reset_attr:
+	ld	a,32
+set_attr:
+	ld	(__pc6001_attr),a
+	ret
+
 .ansi_attr
         and     a
-        jr      nz,noreset
-        ld      (pc6001_attr),a
-        ret
+	jr	z,reset_attr
 .noreset
         cp      1
         jr      nz,nobold
-        ld      a,2
-        ld      (pc6001_attr),a
-        ret
+        ld      a,32 + 2
+	jr	set_attr
 .nobold
         cp      2
-        jr      z,dim
+        jr      z,reset_attr
         cp      8
-        jr      nz,nodim
-.dim
-        xor     a
-        ld      (pc6001_attr),a
-        ret
+	jr	z,reset_attr
 .nodim
         cp      5
         jr      nz,noblink
-        ld      a,2
-        ld      (pc6001_attr),a
-        ret
+        ld      a,32 + 2
+	jr	set_attr
 .noblink
         cp      25
-        jr      nz,nocblink
-        xor     a
-        ld      (pc6001_attr),a
-        ret
+	jr	z,reset_attr
 .nocblink
         cp      7
         jr      nz,noreverse
-        ld      a,(pc6001_attr)
+        ld      a,(__pc6001_attr)
         or      1
-        ld      (pc6001_attr),a
-        ret
+	jr	set_attr
 .noreverse
         cp      27
         jr      nz,noCreverse
-        ld      a,(pc6001_attr)
+        ld      a,(__pc6001_attr)
         and     254
-        ld      (pc6001_attr),a
-        ret
+	jr	set_attr
 .noCreverse
 
         ret

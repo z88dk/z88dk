@@ -22,8 +22,6 @@ ELSE
 	cp  13
 ENDIF
 	jr  nz,nocr
-	call PV1
-	defb FNCRT
 IF STANDARDESCAPECHARS
 	ld  c,13
 	call PV1

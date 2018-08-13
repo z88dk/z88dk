@@ -19,7 +19,7 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    if ( ( fp = fopen(argv[1],"r") ) == NULL ) {
+    if ( ( fp = fopen(argv[1],"rb") ) == NULL ) {
         perror("Can't open input file");
         exit(1);
     }

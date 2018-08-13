@@ -51,14 +51,22 @@ ENDIF
 
 IF FORpc6001
 	DEFINE gotgfx
-	defc maxx	= 128
-	defc maxy	= 192
+	defc maxx	= 64		;Text graphics settings
+	defc maxy	= 48
+	defc blankch    = 0
+	defc USEplotc   = 1		; We call generic_console_plotc, not _printc for text mode
 ENDIF
 
 IF FORvz
 	DEFINE gotgfx
-	defc maxx	= 128
-	defc maxy	= 64
+	IF BLOCKgfx
+	    defc maxx	= 64
+      	    defc maxy	= 32
+	    defc USEplotc   = 1		; We call generic_console_plotc, not _printc for text mode
+	ELSE
+	    defc maxx	= 128
+      	    defc maxy	= 64
+	ENDIF
 ENDIF
 
 IF FORabc80
@@ -436,8 +444,9 @@ ENDIF
 
 IF FORspc1000
 	DEFINE gotgfx
-	defc maxx	= 256
-	defc maxy	= 192
+	defc maxx	= 64		;Text graphics settings
+	defc maxy	= 48
+	defc blankch    = 32
 ENDIF
 
 IF FORmulti8
@@ -461,6 +470,7 @@ IF !gotgfx
 	defc	maxx = 256
 	defc	maxy = 192
 ENDIF
+
 
 
 ;       Structure for open window       struct *window

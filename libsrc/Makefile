@@ -16,19 +16,18 @@ include Make.config
 all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	abc80_clib.lib abc800_clib.lib ace_clib.lib aquarius_clib.lib \
 	aussie.lib bee_clib.lib microbee.lib c7420_clib.lib \
-	cpm_clib.lib einstein.lib gal_clib.lib \
+	cpm_clib.lib einstein.lib fp1100_clib.lib gal_clib.lib \
 	g800_clib.lib m5_clib.lib mc1000_clib.lib \
-	msx_clib.lib mtx_clib.lib mz_clib.lib  \
+	msx_clib.lib mtx_clib.lib mz_clib.lib mz2500_clib.lib x1ansi_clib.lib \
 	nascom_clib.lib  newbrain_clib.lib \
 	osca_clib.lib ozansi_clib.lib pacman_clib.lib p2000_clib.lib  \
 	pc6001_clib.lib pps_clib.lib px4.lib px8.lib \
-	rex_clib.lib sc3000_clib.lib sms_clib.lib lynx_clib.lib \
+	rex_clib.lib rx78_clib.lib sc3000_clib.lib sms_clib.lib lynx_clib.lib \
 	svi_clib.lib sam_clib.lib  sorcerer_clib.lib  sos_clib.lib tiki100.lib \
 	trs80_clib.lib vg5k_clib.lib vz_clib.lib  x07_clib.lib \
 	embedded_clib.lib test_clib.lib testrcm_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
 	pv1000_clib.lib pv2000_clib.lib coleco_clib.lib multi8_clib.lib alphatro_clib.lib  spc1000_clib.lib \
-	rx78_clib.lib \
-	preempt.lib x1ansi_clib.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib
+	preempt.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib gendos.lib ndos.lib  \
 	 im2.lib lib3d.lib x11.lib fastmath.lib
@@ -45,7 +44,7 @@ z88libs: z88_math.lib  z88_clib.lib net.lib
 
 tilibs: ti82_clib.lib ti83_clib.lib ti83p_clib.lib ti85_clib.lib ti86_clib.lib
 
-zxlibs: ts2068_clib.lib gfx2068hr.lib gfxspectrum.lib zx_clib.lib zxvgs.lib mzx.lib mzx_tiny.lib zxrom.lib zxfcntl
+zxlibs: ts2068_clib.lib gfx2068hr.lib gfxspectrum.lib zx_clib.lib zxvgs.lib mzx.lib mzx_tiny.lib m2068.lib zxrom.lib zxfcntl
 
 zx81libs: zx81_clib.lib gfx81.lib gfxlambda.lib gfx81udg.lib gfx81hr64.lib gfx81hr192.lib m81.lib m81_tiny.lib mlambda.lib mlambda_tiny.lib lambda_clib.lib
 
@@ -86,6 +85,7 @@ tideps:
 	@$(RM) -f games/*.o
 	@$(RM) -f games/ticalc/*.o
 	@$(RM) -f graphics/*.o
+	@$(RM) -f graphics/*/*.o
 	@$(RM) -f graphics/ticalc/*.o
 	@$(RM) -f graphics/gray/*.o
 	@$(RM) -f graphics/gray/ticalc/*.o
@@ -98,6 +98,7 @@ msxdeps:
 	@$(RM) -f games/*.o
 	@$(RM) -f games/msx/*.o
 	@$(RM) -f graphics/*.o
+	@$(RM) -f graphics/*/*.o
 	@$(RM) -f graphics/msx/*.o
 	@$(RM) -f graphics/msx/surface/*.o
 	@$(RM) -f psg/msx/*.o
@@ -113,6 +114,7 @@ zx81deps:
 	@$(RM) -f input/zx81/*.o
 	@$(RM) -f games/zx81/*.o
 	@$(RM) -f graphics/*.o
+	@$(RM) -f graphics/*/*.o
 	@$(RM) -f graphics/zx81/*.o
 	@$(RM) -f graphics/zx81/hr/*.o
 	@$(RM) -f graphics/zx81/udg/*.o
@@ -292,6 +294,13 @@ mzx_tiny.lib:
 	@echo ''
 	$(MAKE) -C math/zxmath mzx_tiny
 
+# TS2068 maths library - Stefano
+m2068.lib:
+	@echo ''
+	@echo '--- Building Timex TS2068 Maths Library ---'
+	@echo ''
+	$(MAKE) -C math/zxmath m2068
+
 # PacMan lib - Stefano
 pacman_clib.lib:
 	@echo ''
@@ -357,6 +366,9 @@ vz_clib.lib:
 	$(call buildgeneric,vz)
 	$(MAKE) -C games TARGET=vz
 	TARGET=vz TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORvz -x$(OUTPUT_DIRECTORY)/vz_clib @$(LISTFILE_DIRECTORY)/vz200.lst
+	$(MAKE) gfxdeps
+	$(LIBLINKER) -DFORvz -DBLOCKgfx -x$(OUTPUT_DIRECTORY)/gfxvzblock @$(LISTFILE_DIRECTORY)/gfxvzblock.lst
+
 
 # ZX80 lib - Stefano
 zx80_clib.lib:
@@ -587,6 +599,14 @@ mz_clib.lib:
 	$(MAKE) -C games TARGET=mz
 	$(call buildgeneric,mz)
 	TARGET=mz TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmz -x$(OUTPUT_DIRECTORY)/mz_clib @$(LISTFILE_DIRECTORY)/mz.lst
+
+# Sharp MZ2500 lib - Stefano
+mz2500_clib.lib:
+	@echo ''
+	@echo '--- Building Sharp MZ-2500 Library ---'
+	@echo ''
+	$(call buildgeneric,mz2500)
+	TARGET=mz2500 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmz2500 -x$(OUTPUT_DIRECTORY)/mz2500_clib @$(LISTFILE_DIRECTORY)/mz2500.lst
 
 # ABC80 Library - Stefano
 abc80_clib.lib:
@@ -865,7 +885,15 @@ rx78_clib.lib:
 	$(MAKE) -C games TARGET=rx78
 	TARGET=rx78 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORrx78 -x$(OUTPUT_DIRECTORY)/rx78_clib @$(LISTFILE_DIRECTORY)/rx78.lst
 
-# Triumph Adler Alphatronic PC - dom
+# Mitsubishi Multi8 - dom
+fp1100_clib.lib:
+	@echo ''
+	@echo '--- Building Casio FP-1100 Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(call buildgeneric,fp1100)
+	TARGET=fp1100 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORfp1100 -x$(OUTPUT_DIRECTORY)/fp1100_clib @$(LISTFILE_DIRECTORY)/fp1100.lst
+
 
 # Mitsubishi Multi8 - dom
 multi8_clib.lib:

@@ -40,19 +40,19 @@ defc __ZXNEXT_2MB = 2
 defc __ZXNEXT_LAST_PAGE = 223
 defc __ZXNEXT_LAST_DIVMMC = 15
 
-; define(`__ENV_FILENAME', /sys/env.cfg)
+; define(`__ENV_FILENAME', c:/sys/env.cfg)
 
 defc __ENV_BUFSZ = 128
 defc __ENV_GETENV_VALSZ = 64
 
-; define(`__ENV_TMPDIR', /tmp)
+; define(`__ENV_TMPDIR', c:/tmp)
 
-defc __ENV_LTMPNAM = 13
+defc __ENV_LTMPNAM = 15
 defc __ENV_TMPMAX = 0xffff
 defc __ENV_TMPMAX_TRY = 16
 
-; define(`__ENV_BINDIR', /bin)
-; define(`__ENV_SYSDIR', /sys)
+; define(`__ENV_BINDIR', c:/bin)
+; define(`__ENV_SYSDIR', c:/sys)
 
 defc __SPECTRUM = 16
 
@@ -1996,9 +1996,24 @@ defc __IO_1FFD_PRINTER_STROBE = 0x10
 
 
 
-defc __IO_SD_CONTROL = 0xe7
-defc __IO_SD_STATUS = 0xe7
-defc __IO_SD_DATA = 0xeb
+defc __IO_SPI_CONTROL = 0xe7
+
+defc __ISC_SPI_CS = 0x80
+defc __ISC_FT_CS = 0x40
+defc __ISC_RPI_CS1 = 0x08
+defc __ISC_RPI_CS0 = 0x04
+defc __ISC_SD_CS1 = 0x02
+defc __ISC_SD_CS0 = 0x01
+
+defc __IO_E7_SPI_CS = 0x80
+defc __IO_E7_FT_CS = 0x40
+defc __IO_E7_RPI_CS1 = 0x08
+defc __IO_E7_RPI_CS0 = 0x04
+defc __IO_E7_SD_CS1 = 0x02
+defc __IO_E7_SD_CS0 = 0x01
+
+defc __IO_SPI_STATUS = 0xe7
+defc __IO_SPI_DATA = 0xeb
 
 defc __IO_LED_L = 0x103b
 
@@ -2051,7 +2066,11 @@ defc __NEXTOS_IDE_SWAP_POS = 0x00e8
 defc __NEXTOS_IDE_SWAP_MOVE = 0x00eb
 defc __NEXTOS_IDE_SWAP_RESIZE = 0x00ee
 defc __NEXTOS_IDE_PARTITION_FIND = 0x00b5
+
 defc __NEXTOS_IDE_DOS_MAP = 0x00f1
+defc __nextos_map_ramdisk = 4
+defc __nextos_map_fsimage = 0xff
+
 defc __NEXTOS_IDE_DOS_UNMAP = 0x00f4
 defc __NEXTOS_IDE_DOS_MAPPING = 0x00f7
 defc __NEXTOS_IDE_SNAPLOAD = 0x00fd
@@ -2072,8 +2091,9 @@ defc __nextos_browsercaps_rename = 0x02
 defc __nextos_browsercaps_mkdir = 0x04
 defc __nextos_browsercaps_erase = 0x08
 defc __nextos_browsercaps_remount = 0x10
+defc __nextos_browsercaps_unmount = 0x20
 defc __nextos_browsercaps_syscfg = 0x80
-defc __nextos_browsercaps_all = 0x1f
+defc __nextos_browsercaps_all = 0x3f
 
 defc __NEXTOS_IDE_STREAM_OPEN = 0x0056
 defc __NEXTOS_IDE_STREAM_CLOSE = 0x0059
@@ -2088,6 +2108,7 @@ defc __nextos_rc_bank_total = 0
 defc __nextos_rc_bank_alloc = 1
 defc __nextos_rc_bank_reserve = 2
 defc __nextos_rc_bank_free = 3
+defc __nextos_rc_bank_available = 4
 
 defc __NEXTOS_IDE_BASIC = 0x01c0
 defc __NEXTOS_IDE_WINDOW_LINEIN = 0x01c3
@@ -2179,6 +2200,7 @@ defc __NEXTOS_RC_INVDEVICE = 65
 defc __NEXTOS_RC_CMDPHASE = 67
 defc __NEXTOS_RC_DATAPHASE = 68
 defc __NEXTOS_RC_NOTDIR = 69
+defc __NEXTOS_RC_FRAGMENTED = 74
 
 defc __ESX_RST_SYS = 0x08
 defc __ESX_RST_ROM = 0x18
@@ -2371,15 +2393,26 @@ defc __RRP_ROM_MF = 0x05
 defc __RRP_ROM_SPECTRUM = 0x00
 
 defc __REG_PERIPHERAL_1 = 5
-defc __RP1_JOY1_SINCLAIR = 0x00
+defc __RP1_JOY1_SINCLAIR = 0xc0
+defc __RP1_JOY1_SINCLAIR_1 = 0xc0
+defc __RP1_JOY1_SINCLAIR_2 = 0x00
 defc __RP1_JOY1_KEMPSTON = 0x40
+defc __RP1_JOY1_KEMPSTON_1 = 0x40
+defc __RP1_JOY1_KEMPSTON_2 = 0x08
 defc __RP1_JOY1_CURSOR = 0x80
+defc __RP1_JOY1_MD_1 = 0x48
+defc __RP1_JOY1_MD_2 = 0x88
 defc __RP1_JOY2_SINCLAIR = 0x00
-defc __RP1_JOY2_KEMPSTON = 0x10
+defc __RP1_JOY2_SINCLAIR_1 = 0x30
+defc __RP1_JOY2_SINCLAIR_2 = 0x00
+defc __RP1_JOY2_KEMPSTON = 0x02
+defc __RP1_JOY2_KEMPSTON_1 = 0x10
+defc __RP1_JOY2_KEMPSTON_2 = 0x02
 defc __RP1_JOY2_CURSOR = 0x20
+defc __RP1_JOY2_MD_1 = 0x12
+defc __RP1_JOY2_MD_2 = 0x22
 defc __RP1_RATE_50 = 0x00
 defc __RP1_RATE_60 = 0x04
-defc __RP1_ENABLE_SCANLINES = 0x02
 defc __RP1_ENABLE_SCANDOUBLER = 0x01
 
 defc __REG_PERIPHERAL_2 = 6
@@ -2399,7 +2432,6 @@ defc __REG_TURBO_MODE = 7
 defc __RTM_3MHZ = 0x00
 defc __RTM_7MHZ = 0x01
 defc __RTM_14MHZ = 0x02
-defc __RTM_28MHZ = 0x03
 
 defc __REG_PERIPHERAL_3 = 8
 defc __RP3_STEREO_ABC = 0x00
@@ -2411,6 +2443,12 @@ defc __RP3_ENABLE_TIMEX = 0x04
 defc __RP3_ENABLE_TURBOSOUND = 0x02
 defc __RP3_DISABLE_CONTENTION = 0x40
 defc __RP3_UNLOCK_7FFD = 0x80
+
+defc __REG_PERIPHERAL_4 = 9
+defc __RP4_SCANLINES_OFF = 0x00
+defc __RP4_SCANLINES_25 = 0x03
+defc __RP4_SCANLINES_50 = 0x02
+defc __RP4_SCANLINES_75 = 0x01
 
 defc __REG_SUB_VERSION = 14
 

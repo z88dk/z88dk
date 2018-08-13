@@ -11,7 +11,7 @@
 
 
 
-// fr = zero, ff = carry, ff&128 = s/p
+// fr = zero, ff&256 = carry, ff&128 = s/p
 
 // TODO: Setting P flag
 #define BOOL(hi, lo, hia, loa, isalt) do {                \
@@ -593,14 +593,14 @@ void out(int port, int value){
 }
 
 int f(void){
-  return  ff & 168
-        | ff >> 8 & 1
-        | !fr << 6
-        | fb >> 8 & 2
-        | (fr ^ fa ^ fb ^ fb >> 8) & 16
+  return  ff & 168  // S, 5, 3: bits 7, 5, 3
+        | ff >> 8 & 1 // C bit 0, so value 256
+        | !fr << 6    // Z, bit 6
+        | fb >> 8 & 2 // N (subtract flag) bit 1, value 512
+        | (fr ^ fa ^ fb ^ fb >> 8) & 16 // H (half carry) bit 4
         | (fa & -256 
             ? 154020 >> ((fr ^ fr >> 4) & 15)
-            : ((fr ^ fa) & (fr ^ fb)) >> 5) & 4;
+            : ((fr ^ fa) & (fr ^ fb)) >> 5) & 4; // P/V bit 2
 }
 
 int f_(void){
@@ -783,7 +783,15 @@ int main (int argc, char **argv){
       if( size>65536 && size!=65574 )
         printf("\nIncorrect length: %d\n", size),
         exit(-1);
-      else if( !strcasecmp(strchr(argv[1], '.'), ".sna" ) && size==49179 ){
+      else if( !strcasecmp(strchr(argv[1], '.'), ".com" ) ){
+        *get_memory_addr(5) = 0xED;
+        *get_memory_addr(6) = 0xFE;
+        *get_memory_addr(7) = 0xC9;
+       pc = 256;
+        // CP/M emulator
+        (void)fread(get_memory_addr(256), 1, size, fh);
+
+      } else if( !strcasecmp(strchr(argv[1], '.'), ".sna" ) && size==49179 ){
         FILE *fk= fopen("48.rom", "rb");
         if( !fk )
           printf("\nZX Spectrum ROM file not found: 48.rom\n"),
@@ -1368,12 +1376,19 @@ int main (int argc, char **argv){
           sp += (get_memory(pc++)^128)-128; // TODO: Carry
         } else {
           st+= 4;
-          t= (fr^fa^fb^fb>>8) & 16;
-          u= 0;
-          (a | ff&256)>153 && (u= 352);
-          (a&15 | t)>9 && (u+= 6);
+          t= (fr^fa^fb^fb>>8) & 16;  // H flag
+          u= 0;		// incr
+          if ( isz180() ) {
+            if ( t || (!(fb&512) && (a&0x0f) > 0x9) )
+               u |= 6;
+            if ( (ff & 256) || (!(fb&512) && a > 0x99) )
+               u |= 0x160;
+          } else {
+            (a |ff&256)>0x99 && (u= 0x160); 
+            (a&15 | t)>9 && (u+= 6);
+          }
           fa= a|256;
-          if( fb&512 )
+          if( fb&512) // N (subtract) flag set
             a-= u,
             fb= ~u;
           else
@@ -2601,7 +2616,7 @@ int main (int argc, char **argv){
             case 0x05:  RLC(l); break;                       // RLC L
             case 0x06:  st+= israbbit() ? 6 : 7;             // RLC (HL)
                         t= l|h<<8;
-                        get_memory(t);
+                        u=get_memory(t);
                         RLC(u);
                         put_memory(t, u); break;                        
             case 0x07:  RLC(a); break;                       // RLC A
@@ -2613,7 +2628,7 @@ int main (int argc, char **argv){
             case 0x0d:  RRC(l); break;                       // RRC L
             case 0x0e:  st+= israbbit() ? 6 : 7;             // RRC (HL)
                         t= l|h<<8;
-                        get_memory(t);
+                        u=get_memory(t);
                         RRC(u);
                         put_memory(t, u); break;                        
             case 0x0f:  RRC(a); break;                       // RRC A
@@ -2625,7 +2640,7 @@ int main (int argc, char **argv){
             case 0x15:  RL(l); break;                        // RL L
             case 0x16:  st+= israbbit() ? 6 : 7;             // RL (HL)
                         t= l|h<<8;
-                        get_memory(t);
+                        u=get_memory(t);
                         RL(u);
                         put_memory(t, u); break;                        
             case 0x17:  RL(a); break;                        // RL A
@@ -2637,7 +2652,8 @@ int main (int argc, char **argv){
             case 0x1d:  RR(l); break;                        // RR L
             case 0x1e:  st+= israbbit() ? 6 : 7;             // RR (HL)
                         t= l|h<<8;
-                        get_memory(t);
+                        u=get_memory(t);
+                        u=get_memory(t);
                         RR(u);
                         put_memory(t, u); break;                        
             case 0x1f:  RR(a); break;                        // RR A
@@ -2649,7 +2665,7 @@ int main (int argc, char **argv){
             case 0x25:  SLA(l); break;                       // SLA L
             case 0x26:  st+= israbbit() ? 6 : 7;             // SLA (HL)
                         t= l|h<<8;
-                        get_memory(t);
+                        u=get_memory(t);
                         SLA(u);
                         put_memory(t, u); break;                        
             case 0x27:  SLA(a); break;                       // SLA A
@@ -2661,7 +2677,7 @@ int main (int argc, char **argv){
             case 0x2d:  SRA(l); break;                       // SRA L
             case 0x2e:  st+= israbbit() ? 6 : 7;             // SRA (HL)
                         t= l|h<<8;
-                        get_memory(t);
+                        u=get_memory(t);
                         SRA(u);
                         put_memory(t, u); break;                        
             case 0x2f:  SRA(a); break;                       // SRA A
@@ -2675,7 +2691,7 @@ int main (int argc, char **argv){
                         if (cansll() ) {
                           st+= 7; 
                           t= l|h<<8;
-                          get_memory(t);
+                          u=get_memory(t);
                           SLL(u);
                           put_memory(t, u); 
                         }
@@ -2689,7 +2705,7 @@ int main (int argc, char **argv){
             case 0x3d:  SRL(l); break;                       // SRL L
             case 0x3e:  st+= israbbit() ? 6 : 7;             // SRL (HL)
                         t= l|h<<8;
-                        get_memory(t);
+                        u=get_memory(t);
                         SRL(u);
                         put_memory(t, u); break;                        
             case 0x3f:  SRL(a); break;                       // SRL A

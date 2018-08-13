@@ -11,7 +11,7 @@ extern unsigned char GLOBAL_ZXN_PORT_1FFD;
 extern unsigned char GLOBAL_ZXN_PORT_7FFD;
 extern unsigned char GLOBAL_ZXN_PORT_DFFD;
 
-// NEXTOS API 1.98
+// NEXTOS API 1.99D
 // https://github.com/z88dk/techdocs/blob/master/targets/zx-next/nextos/
 
 // Error Codes - Recoverable Disk Errors
@@ -60,6 +60,7 @@ extern unsigned char GLOBAL_ZXN_PORT_DFFD;
 #define NEXTOS_RC_CMDPHASE  __NEXTOS_RC_CMDPHASE
 #define NEXTOS_RC_DATAPHASE  __NEXTOS_RC_DATAPHASE
 #define NEXTOS_RC_NOTDIR  __NEXTOS_RC_NOTDIR
+#define NEXTOS_RC_FRAGMENTED  __NEXTOS_RC_FRAGMENTED
 
 // NextOS ESX API found in esxdos.h
 

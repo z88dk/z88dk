@@ -11,7 +11,7 @@
 ;		Terminate the string with carriage return.
 ;
 ;
-;	$Id: zx_syntax.asm,v 1.4 2016-06-10 20:02:04 dom Exp $
+;	$Id: zx_syntax.asm $
 ;
 
 SECTION code_clib
@@ -28,7 +28,11 @@ _zx_syntax:
 		push	hl
 		call	zx_interface1	; force IF1 activation to avoid crashes
 		call	call_rom3
+IF FORts2068
+		defw	$133F		; SET-MIN: clear buffers
+ELSE
 		defw	$16b0		; clear buffers
+ENDIF
 		pop	de
 		
 		ld	hl,($5c5d)	; save CH-ADD
@@ -41,8 +45,12 @@ _zx_syntax:
 		ld	bc,cmdlen
 		push	bc
 		push	de
+IF FORts2068
+		call	$12BB		; MAKE-ROOM
+ELSE
 		call	call_rom3
-		defw	$1655		; MAKE_ROOM
+		defw	$1655		; MAKE-ROOM
+ENDIF
 		pop	hl
 		pop	bc
 		pop	de
@@ -65,7 +73,12 @@ _zx_syntax:
 		ld	($5c3d),sp	; update error handling routine
 		
 		call	call_rom3
+IF FORts2068
+		defw	$1A27		; LINE-SCAN: check syntax
+ELSE
 		defw	$1b17		; check syntax
+ENDIF
+		
 		;ld	(iy+0),255	; set ERR_NR to OK
 		pop	bc
 return:
@@ -99,7 +112,11 @@ nook:
 		;call	$1097		; CLEAR-SP
 		;res     5,(iy+$37)	; unset EDIT mode
 		call	call_rom3
+IF FORts2068
+		defw	$133F		; SET-MIN: clear buffers
+ELSE
 		defw	$16b0		; clear buffers
+ENDIF
 		
 		pop	hl
 		ld	($5c5f),hl	; restore X-PTR

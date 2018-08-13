@@ -64,7 +64,7 @@ gotit:
 	; l = Shift/control flags
 	ld	h,@00000001
 calc_mask:
-	and	a
+	and	7
 	jr	z,got_mask
 	rl	h
 	dec	a

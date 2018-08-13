@@ -16,16 +16,25 @@ PUBLIC _in_KeyPressed
 .in_KeyPressed
 ._in_KeyPressed
 	in	a,($30)
+	ld	b,a
+	ld	c,@00001101
 	bit	6,l
 	jr	z,no_control
 	bit	0,a
 	jr	z,fail
+	res	0,c
 no_control:
 	bit	7,l
 	jr	z,no_shift
 	and	@00001100
 	jr	z, fail
+	res	2,c
+	res	3,c
 no_shift:
+	ld	a,b	; Make sure we don't have unwanted modifiers pressed
+	and	c
+	jr	nz,fail
+
 	ld	a,l
 	and	@00111111
 	ld	c,a

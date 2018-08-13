@@ -89,9 +89,15 @@
  *      MSX:
  *      zcc +msx -Dspritesize=16 -DSOUND -create-app dstar.c
  *
+ *      MULTI 8:
+ *      zcc +multi8 -Dspritesize=21 -create-app dstar.c
+ *
  *      Robotron KC:
  *      zcc +z9001 -Dspritesize=20 -DSOUND -lgfx9001krt -create-app dstar.c
  *      zcc +kc -Dspritesize=20 -create-app dstar.c
+ *
+ *      SPC-1000:
+ *      zcc +spc1000 -Dspritesize=16 -create-app dstar.c
  *
  *      Commodore 128:
  *      zcc +c128 -lgfx128hr -create-app -lm -Dspritesize=21 dstar.c

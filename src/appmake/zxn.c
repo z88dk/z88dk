@@ -66,7 +66,8 @@ static struct zxn_nex zxnex = {
     7,          // border
    -1,          // loadbar
     0,          // loaddelay
-    0           // startdelay
+    0,          // startdelay
+    0           // norun
 };
 
 static char tap = 0;            // .tap tape
@@ -113,10 +114,11 @@ option_t zxn_options[] = {
     {  0,  "clean",    "Remove consumed source binaries\n", OPT_BOOL, &zxc.clean },
 
     {  0,  "nex",          "Make .nex instead of .tap", OPT_BOOL,   &nex },
+    {  0,  "nex-norun",    "Return to basic after loading", OPT_BOOL, &zxnex.norun },
     {  0,  "nex-screen",   "File containing loading screen", OPT_STR, &zxnex.screen },
     {  0,  "nex-border",   "Initial border colour", OPT_INT, &zxnex.border },
     {  0,  "nex-loadbar",  "Load bar colour", OPT_INT, &zxnex.loadbar },
-    {  0,  "nex-loaddel",  "Delay loading a bank", OPT_INT, &zxnex.loaddelay },
+    {  0,  "nex-loaddel",  "Delay after loading a bank", OPT_INT, &zxnex.loaddelay },
     {  0,  "nex-startdel", "Delay before starting\n", OPT_INT, &zxnex.startdelay },
 
     {  0,  "dot",      "Make esxdos dot command instead of .tap", OPT_BOOL, &dot },
@@ -158,8 +160,10 @@ int zxn_exec(char *target)
     int i, j, errors, ret;
     int bsnum_bank, bsnum_div, bsnum_page;
     char k;
+    int mainbank_occupied;
 
     ret = -1;
+    mainbank_occupied = 0xfc;   // mmu2+
 
     if (zxc.help)
         return ret;
@@ -465,6 +469,8 @@ int zxn_exec(char *target)
     {
         if (bsnum_bank >= 0)
         {
+            mainbank_occupied = 0;
+
             for (i = 0; i < 8; ++i)
             {
                 struct memory_bank *mb = &memory.bankspace[bsnum_bank].membank[i];
@@ -485,6 +491,16 @@ int zxn_exec(char *target)
                                 mb->secbin[j].org += 0x8000 - 0xc000;
                             else
                                 mb->secbin[j].org += 0x4000 - 0xc000;
+
+                            // record occupied pages for section
+
+                            if (mb->secbin[j].size > 0)
+                            {
+                                int k;
+
+                                for (k = (mb->secbin[j].org >> 13) & 0x7; k <= (((mb->secbin[j].org + mb->secbin[j].size - 1) >> 13) & 0x7); ++k)
+                                    mainbank_occupied |= 1 << k;
+                            }
                         }
 
                         // move sections to main bank
@@ -620,7 +636,7 @@ int zxn_exec(char *target)
 
     if (nex)
     {
-        if ((ret = zxn_nex(&zxc, &zxnex, &memory, zxb.romfill)) != 0)
+        if ((ret = zxn_nex(&zxc, &zxnex, &memory, zxb.romfill, mainbank_occupied)) != 0)
             return ret;
 
         // nex is out but we need to process any remaining binaries

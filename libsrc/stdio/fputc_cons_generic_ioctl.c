@@ -7,7 +7,7 @@ int console_ioctl(uint16_t cmd, void *arg) __naked
 #asm
 	EXTERN		generic_console_ioctl
 	EXTERN		__console_w
-	EXTERN		generic_console_flags2
+	EXTERN		generic_console_flags
 
 ; fputc_cons_generic_ioctl(uint16_t request, void *arg) __smallc;
 ; Request at the moment is 8 bits
@@ -34,7 +34,7 @@ success:
 
 set_raw:
 	ld	a,(de)
-	ld	hl,generic_console_flags2
+	ld	hl,generic_console_flags
 	res	0,(hl)
 	and	a	
 	jr	z,success

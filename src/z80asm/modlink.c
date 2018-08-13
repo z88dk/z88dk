@@ -686,6 +686,14 @@ static bool linked_libraries(StrHash *extern_syms)
 			/* search object module chain */
 			for (obj_fpos = 8; !linked && obj_fpos != -1; obj_fpos = obj_next_fpos) {
 				fseek(file, obj_fpos, SEEK_SET);			/* point at beginning of a module */
+				
+				// check if library file ended prematurely
+				int c = fgetc(file);
+				if (c == EOF)
+					break;									// end of library file, exit loop
+				else
+					ungetc(c, file);
+
 				obj_next_fpos = xfread_dword(file);			/* get file pointer to next module in library */
 				module_size = xfread_dword(file);			/* get size of current module */
 

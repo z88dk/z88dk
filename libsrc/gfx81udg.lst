@@ -3,6 +3,7 @@ graphics/__graphics_end
 graphics/circle
 graphics/zx81/udg/clg
 graphics/zx81/clsgraph
+graphics/zx81/udg/zx_hardcopy
 graphics/clga
 graphics/clrarea
 graphics/dcircle2

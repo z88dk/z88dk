@@ -14,6 +14,7 @@
 		PUBLIC	cgets
 		PUBLIC	_cgets
 		EXTERN  fgets_cons
+		EXTERN	asm_strlen
 
 		defc	cgets = gets
 		defc	_cgets = gets
@@ -29,7 +30,22 @@
 	ld	bc,65535	
 	push	bc		;length
 	call	fgets_cons
-	pop	bc
-	pop	bc
+	pop	bc		;length
+	pop	hl		;str
+	push	hl
+	call	asm_strlen
+	pop	de		;str
+	jr	z,just_return
+	add	hl,de
+	dec	hl
+	ld	a,(hl)
+	cp	10
+	jr	z,kill_eol
+	cp	13
+	jr	nz,just_return
+kill_eol:
+	ld	(hl),0	
+just_return:
+	ex	de,hl
 	ret
 

@@ -142,6 +142,7 @@
 	GLOBAL	getarg
 	GLOBAL	fchkstd
 	GLOBAL	fgetc_cons
+	GLOBAL	fgetc_cons_inkey
 	GLOBAL	fputc_cons
 	GLOBAL	fgets_cons
 	GLOBAL	fabandon
@@ -150,7 +151,7 @@
 	GLOBAL	rename
 	GLOBAL	remove
 	GLOBAL	getk
-	GLOBAL	puts_cons
+	GLOBAL	getk_inkey
 	GLOBAL	printk
 	GLOBAL	_func
 	GLOBAL	_test

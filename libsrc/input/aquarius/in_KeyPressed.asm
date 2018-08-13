@@ -17,20 +17,23 @@ EXTERN CLIB_KEYBOARD_ADDRESS
 .in_KeyPressed
 ._in_KeyPressed
 	ld	bc,0x7fff
+	in	a,(c)
+	ld	e,@0011000
 	bit	7,l
 	jr	z,noshift
-	in	a,(c)
 	bit	4,a
 	jr	nz,fail		;shift not pressed
-  
+ 	res	4,e 
 .noshift
 	bit	6,l
 	jr	z,noctrl
-	in	a,(c)
 	bit	5,a
 	jr	nz,fail
-
+	res	5,e
 .noctrl
+	cpl		;MAke sure we don't have extra modifiers
+	and	e
+	jr	nz,fail
 	ld	a,l
 	ld	b,0xfe
 map_loop:

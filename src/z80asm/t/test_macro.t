@@ -78,5 +78,5 @@ defb one,two,three,four,five,six
 END
 check_bin_file("test.bin", pack("C*", 1..6));
 
-#unlink_testfiles();
+unlink_testfiles();
 done_testing();

@@ -23,6 +23,10 @@ mzx:
 	$(RM) -f *.o* ../../mzx.lib
 	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/mzx @zxmlist
 
+m2068:
+	$(RM) -f *.o* ../../m2068.lib
+	$(LIBLINKER) -DFORts2068 -x$(OUTPUT_DIRECTORY)/m2068 @zxmlist
+
 m81:
 	$(RM) -f *.o* ../../m81.lib
 	$(LIBLINKER) -DFORzx81 -x$(OUTPUT_DIRECTORY)/m81 @zxmlist

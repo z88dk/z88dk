@@ -124,14 +124,19 @@ Define rules for a ragel-based parser.
 	/*---------------------------------------------------------------------
 	*   IF, IFDEF, IFNDEF, ELSE, ENDIF
 	*--------------------------------------------------------------------*/
-	asm_IF = 	 _TK_IF     expr _TK_NEWLINE @{ asm_IF(ctx, pop_expr(ctx) ); };
-	asm_IFDEF =  _TK_IFDEF  name _TK_NEWLINE @{ asm_IFDEF(ctx, Str_data(name) ); };
-	asm_IFNDEF = _TK_IFNDEF name _TK_NEWLINE @{ asm_IFNDEF(ctx, Str_data(name) ); };
-	asm_ELSE =	 _TK_ELSE        _TK_NEWLINE @{ asm_ELSE(ctx); };
-	asm_ENDIF =	 _TK_ENDIF       _TK_NEWLINE @{ asm_ENDIF(ctx); };
+	asm_IF 		= _TK_IF       expr _TK_NEWLINE @{ asm_IF(ctx, pop_expr(ctx) ); };
+	asm_IFDEF 	= _TK_IFDEF    name _TK_NEWLINE @{ asm_IFDEF(ctx, Str_data(name) ); };
+	asm_IFNDEF 	= _TK_IFNDEF   name _TK_NEWLINE @{ asm_IFNDEF(ctx, Str_data(name) ); };
+	asm_ELSE 	= _TK_ELSE          _TK_NEWLINE @{ asm_ELSE(ctx); };
+	asm_ELIF 	= _TK_ELIF     expr _TK_NEWLINE @{ asm_ELIF(ctx, pop_expr(ctx) ); };
+	asm_ELIFDEF	= _TK_ELIFDEF  name _TK_NEWLINE @{ asm_ELIFDEF(ctx, Str_data(name) ); };
+	asm_ELIFNDEF= _TK_ELIFNDEF name _TK_NEWLINE @{ asm_ELIFNDEF(ctx, Str_data(name) ); };
+	asm_ENDIF 	= _TK_ENDIF         _TK_NEWLINE @{ asm_ENDIF(ctx); };
 	
 	asm_conditional = asm_IF | asm_IFDEF | asm_IFNDEF |
-					  asm_ELSE | asm_ENDIF;
+					  asm_ELSE | 
+					  asm_ELIF | asm_ELIFDEF | asm_ELIFNDEF | 
+					  asm_ENDIF;
 					  
 	skip :=
 		  _TK_END
@@ -317,9 +322,9 @@ Define rules for a ragel-based parser.
 				asm_DEFB_iter;
 
 	/*---------------------------------------------------------------------
-	*   DEFW / DEFQ
+	*   DEFW / DEFQ / DEFDB
 	*--------------------------------------------------------------------*/
-#foreach <OP> in DEFW, DEFQ
+#foreach <OP> in DEFW, DEFQ, DEFDB
 	asm_<OP>_iter =
 			asm_<OP>_next:
 				expr (_TK_COMMA | _TK_NEWLINE)
@@ -332,7 +337,7 @@ Define rules for a ragel-based parser.
 	asm_<OP> = 	label? _TK_<OP>	asm_<OP>_iter;
 #endfor  <OP>
 
-	directives_DEFx = asm_DEFS | asm_DEFB | asm_DEFW | asm_DEFQ;
+	directives_DEFx = asm_DEFS | asm_DEFB | asm_DEFW | asm_DEFQ | asm_DEFDB;
 	
 	/*---------------------------------------------------------------------
 	*   directives without arguments

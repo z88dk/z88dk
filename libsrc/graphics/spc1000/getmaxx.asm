@@ -12,5 +12,8 @@
 	and	a
 	ld	hl, +63
 	ret	z
-	ld	hl,maxx-1
+	ld	hl,255
+	dec	a
+	ret	z
+	ld	hl,127
 	ret

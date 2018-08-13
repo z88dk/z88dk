@@ -13,7 +13,7 @@
 	EXTERN	__zx_32col_font
 	EXTERN	__zx_64col_font
 	EXTERN	__console_w
-	EXTERN	generic_console_flags2
+	EXTERN	generic_console_flags
 
 ; Entry:
 ;  a = charcter
@@ -121,15 +121,14 @@ handle_characters:
 	add	hl,hl
 	add	hl,hl
 	add	hl,bc
-	ld	a,(generic_console_flags2)
+	ld	a,(generic_console_flags)
+	rlca
+	sbc	a,a		; ; c = 0/ c = 255
 	ld	c,a
 	ld	b,8
 print32_loop:
 	ld	a,(hl)
-	bit	7,c
-	jr	z,print32_noinverse
-	cpl
-print32_noinverse:
+	xor	c
 	ld	(de),a
 	inc	d
 	inc	hl
@@ -181,7 +180,7 @@ print64_loop:
 	cpl
 	and	(hl)
 	ld	(hl),a
-	ld	a,(generic_console_flags2)
+	ld	a,(generic_console_flags)
 	rlca
 	ld	a,(de)
 	jr	nc,print64_noinverse

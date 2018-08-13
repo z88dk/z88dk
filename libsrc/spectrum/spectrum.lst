@@ -7,6 +7,7 @@ spectrum/zx_colour
 spectrum/zx_screenstr
 spectrum/zx_screenstr_callee
 spectrum/zx_lprintc
+spectrum/zx_print_buf
 spectrum/basic/zx_basemem
 spectrum/basic/zx_basic_length
 spectrum/basic/zx_extsys
@@ -15,6 +16,7 @@ spectrum/basic/zx_getint
 spectrum/basic/zx_getstr
 spectrum/basic/zx_getstr_callee
 spectrum/basic/zx_goto
+spectrum/basic/zx_line
 spectrum/basic/zx_locatenum
 spectrum/basic/zx_setfloat
 spectrum/basic/zx_setfloat_callee

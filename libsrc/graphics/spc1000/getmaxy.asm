@@ -12,5 +12,5 @@
         and     a
         ld      hl, 32 - 1
         ret     z
-        ld      hl,maxy - 1
+        ld      hl, 191
         ret

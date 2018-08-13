@@ -21,6 +21,7 @@
 		EXTERN		ansi_cls
 		EXTERN		conio_map_colour
 		EXTERN		CRT_FONT
+		EXTERN		generic_console_flags
 
 IF FORmsx
 	        INCLUDE "target/msx/def/msxbios.def"
@@ -128,7 +129,17 @@ tms9918_printc_rejoin:
 	pop	hl
 	ld	de,8192
 	add	hl,de	
+	push	hl
 	ld	a,(msx_attr)
+	ld	hl,generic_console_flags
+	bit	7,(hl)
+	jr	z,not_inverse
+	rlca
+	rlca
+	rlca
+	rlca
+not_inverse:
+	pop	hl
 	ld	bc,8
 	ld	ix,FILVRM
 	call	msxbios

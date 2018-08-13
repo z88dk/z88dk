@@ -15,6 +15,7 @@
 		EXTERN		ansi_cls
 		EXTERN		ansi_SCROLLUP
 
+		EXTERN		generic_console_flags
 		EXTERN		generic_console_font32
 		EXTERN		generic_console_udg32
 		EXTERN		CONSOLE_COLUMNS
@@ -105,9 +106,15 @@ not_udg:
 	ld	bc,DISPLAY
 	add	hl,bc		;hl = screen
 
+	ld	a,(generic_console_flags)
+	rlca
+	sbc	a,a
+	ld	c,a		;x = 0 / 255
 	ld	b,8
 hires_printc_1:
+	push	bc
 	ld	a,(de)
+	xor	c
 	ld	c,a
 	ex	af,af
 	res	0,a
@@ -123,6 +130,7 @@ hires_printc_1:
 	jr	nc,no_overflow
 	inc	h
 no_overflow:
+	pop	bc
 	djnz	hires_printc_1
 	ret
 

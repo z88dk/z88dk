@@ -1222,6 +1222,9 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
         }
     }
 
+    printf("dotn_last_page = %d\n", dotn_last_page);
+    printf("dotn_extra_pages = %d\n", dotn_extra_pages);
+
     // append extra pages to alloc table
 
     memset(&z_alloc_table[dotn_last_page + 1], ZXN_ALLOCATE_LOAD, dotn_extra_pages);
@@ -1668,17 +1671,18 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
    unsigned short SP;				//Stack Pointer
    unsigned short PC;				//Code Entry Point : $0000 = Don't run just load.
    unsigned short NumExtraFiles;	//NumExtraFiles
-   unsigned char Banks[64+48];		//Which 16K Banks load.	: Bank 5 = $0000-$3fff, Bank 2 = $4000-$7fff, Bank 0 = $c000-$ffff
+   unsigned char Banks[64+48];		//Which 16K Banks load
    unsigned char LoadBar;           //Enable the layer 2 load bar
    unsigned char LoadColour;        //Colour of the load bar
    unsigned char LoadDelay;         //Delay in interrupts after each 16k loaded
    unsinged char StartDelay;        //Delay in interrupts before starting the program
    unsigned char RestOf512Bytes[512-(4+4 +1+1+1+1 +2+2+2 +64+48 +1+1+1+1)];
    if LoadingScreen!=0 {
-   unsigned short	palette[256];
-   unsigned char	Layer2LoadingScreen[49152];
+     uint16_t palette[256];  // 8 bits of palette entry followed by 9th bit of palette entry in two bytes
+     uint8_t  Layer2LoadingScreen[49152];
    }
-   Banks[...]
+   Banks 5,2,0 in order if present
+   Banks 1,3,4,6,7,... in order if present (ie not 5,2,0)
 */
 
 struct nex_hdr
@@ -1704,7 +1708,7 @@ struct nex_hdr nh;
 
 #define NEX_SCREEN_SIZE (512+49152)
 
-int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *memory, int fillbyte)
+int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *memory, int fillbyte, int mainbank_occupied)
 {
     int  i;
     int  bsnum_bank;
@@ -1732,11 +1736,19 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
 
     // collect parameters
 
-    if ((register_sp = parameter_search(zxc->crtfile, ".map", "__register_sp")) < 0)
-        exit_log(1, "Error: Stack location must be set (%d)\n", register_sp);
+    if (zxnex->norun)
+    {
+        crt_org_code = 0;
+        register_sp = 0;
+    }
+    else
+    {
+        if ((register_sp = parameter_search(zxc->crtfile, ".map", "__register_sp")) < 0)
+            exit_log(1, "Error: Stack location must be set (%d)\n", register_sp);
 
-    if ((crt_org_code = parameter_search(zxc->crtfile, ".map", "__crt_org_code")) < 0)
-        exit_log(1, "Error: Unable to find org address\n");
+        if ((crt_org_code = parameter_search(zxc->crtfile, ".map", "__crt_org_code")) < 0)
+            exit_log(1, "Error: Unable to find org address\n");
+    }
 
     // open output file
 
@@ -1769,6 +1781,18 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
         }
     }
 
+    // mark all pages occupied above the lowest page
+    // temporary to accommodate z88dk normally placing stack and heap at top of memory
+
+    for (i = 0; i < 8; ++i)
+    {
+        if (mainbank_occupied & (1 << i))
+        {
+            mainbank_occupied = 0xff - (1 << i) + 1;
+            break;
+        }
+    }
+
     // write main memory bank: 16k banks 5,2,0
 
     {
@@ -1798,7 +1822,29 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
             fclose(fin);
         }
 
-        fwrite(mem, sizeof(mem), 1, fout);
+        // bank 5
+
+        if (mainbank_occupied & 0x0c)
+        {
+            nh.Banks[5] = 1;
+            fwrite(mem, 16384, 1, fout);
+        }
+
+        // bank 2
+
+        if (mainbank_occupied & 0x30)
+        {
+            nh.Banks[2] = 1;
+            fwrite(&mem[16384], 16384, 1, fout);
+        }
+
+        // bank 0
+
+        if (mainbank_occupied & 0xc0)
+        {
+            nh.Banks[0] = 1;
+            fwrite(&mem[32768], 16384, 1, fout);
+        }
     }
 
     // write all occupied 16k banks but skip 5,2,0
@@ -1807,13 +1853,9 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
     {
         struct memory_bank *mb = &memory->bankspace[bsnum_bank].membank[i];
 
-        if ((i == 5) || (i == 2) || (i == 0))
-        {
-            // these were in the main memory bank but need to mark as present in header
+        // banks 5, 2, 0 were in the main memory bank
 
-            nh.Banks[i] = 1;
-        }
-        else
+        if ((i != 5) && (i != 2) && (i != 0))
         {
             if (mb->num > 0)
             {

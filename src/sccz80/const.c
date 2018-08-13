@@ -166,6 +166,19 @@ int number(LVALUE *lval)
         lval->const_val = k;
         goto typecheck;
     }
+    if (ch() == '0' && toupper(nch()) == 'B') {
+        int c;
+        gch();
+        gch();
+        if (ch() != '0' && ch() != '1')
+            return (0);
+        while (ch() == '0' || ch() == '1') {
+            c = inbyte();
+            k = (k << 1) + (c - '0');
+        }
+        lval->const_val = k;
+        goto typecheck;
+    }
     if (ch() == '0') {
         gch();
         while (numeric(ch())) {

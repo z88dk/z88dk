@@ -19,6 +19,13 @@
 	PUBLIC	zx_interface1
 	PUBLIC	_zx_interface1
 	EXTERN	if1_installed
+	EXTERN	call_rom3
+
+;IF FORts2068
+;		INCLUDE  "target/ts2068/def/ts2068fp.def"
+;ELSE
+		INCLUDE  "target/zx/def/zxfp.def"
+;ENDIF
 	
 zx_interface1:
 _zx_interface1:
@@ -28,11 +35,18 @@ _zx_interface1:
 	push	bc
 	ld	($5c3d),sp	; update error handling routine
 
-	rst	$28		; load zero to floating point stack
-	defb	$a0		; stk-zero
-	defb	$38		; end-calc
+	; load zero to floating point stack
+	rst	ZXFP_BEGIN_CALC
+	defb	ZXFP_STK_ZERO
+	defb	ZXFP_END_CALC
+		
+	call    call_rom3
+;IF FORts2068
+;	defw	$139F		; CLOSE	#0 (this should force IF1 to activate system variables)
+;ELSE
+	defw	$16e5		; CLOSE	#0 (this will force IF1 to activate system variables)
+;ENDIF
 
-	call	$16e5		; CLOSE	#0 (this will force IF1 to activate system variables)
 
 	pop	bc
 
