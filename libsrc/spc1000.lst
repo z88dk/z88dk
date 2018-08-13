@@ -43,7 +43,8 @@ graphics/spc1000/res_MODE2
 graphics/spc1000/xor_MODE2
 graphics/spc1000/pointxy_MODE2
 graphics/spc1000/swapgfxbk
-graphics/spc1000/textpixl
+graphics/spc1000/textpixl6
+graphics/generic_console/div3
 graphics/putsprite3
 graphics/dcircle2
 graphics/clrarea
@@ -80,4 +81,5 @@ psg/spc1000/set_psg_callee
 psg/spc1000/get_psg
 psg/spc1000/psg_init
 @psg/psg.lst
+@video/mc6847/mc6847.lst
 @z80.lst
