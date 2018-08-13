@@ -26,8 +26,8 @@
                                     ; PHI / PS / SS / DR = BAUD Rate
                                     ; PHI = 18.432MHz
                                     ; BAUD = 115200 = 18432000 / 10 / 1 / 16 
-                                    ; PS 0, SS_DIV_1 0, DR 0           
-        xor     a                   ; BAUD = 115200
+                                    ; PS 0, SS_DIV_1, DR 0
+        ld a,CNTLB0_SS_DIV_1
         out0    (CNTLB0),a          ; output to the ASCI0 control B reg
 
         ld      a,STAT0_RIE         ; receive interrupt enabled
