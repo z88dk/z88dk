@@ -10,6 +10,7 @@
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
 		PUBLIC		__vg5k_custom_font
+		PUBLIC		__vg5k_attr
 
 		EXTERN		conio_map_colour
 		EXTERN		CONSOLE_COLUMNS
@@ -28,7 +29,7 @@ generic_console_set_paper:
 	rlca
 	and	@01110000
 	ld	c,a
-	ld	hl,vg5k_attr
+	ld	hl,__vg5k_attr
 	ld	a,(hl)
 	and	@10001111
 	or	c
@@ -40,7 +41,7 @@ generic_console_set_ink:
 	call	conio_map_colour
 	and	7
 	ld	c,a
-	ld	hl,vg5k_attr
+	ld	hl,__vg5k_attr
 	ld	a,(hl)
 	and	@11111000
 	or	c
@@ -50,7 +51,7 @@ generic_console_set_ink:
 generic_console_cls:
 	ld	c,CONSOLE_ROWS
 	ld	hl, DISPLAY
-	ld	a,(vg5k_attr)
+	ld	a,(__vg5k_attr)
 	and	7
 cls0:
 	ld	b,CONSOLE_COLUMNS 
@@ -101,7 +102,7 @@ generic_console_printc:
 	push	de
 	call	xypos
 	pop	de
-	ld	a,(vg5k_attr)	; d = character, c = attribute
+	ld	a,(__vg5k_attr)	; d = character, c = attribute
 	ld	c,a
 	bit	0,e
 	jr	z,not_raw
@@ -189,7 +190,7 @@ generic_console_scrollup:
 	ld	bc, 80 * (CONSOLE_ROWS-1)
 	ldir
 	ex	de,hl
-	ld	a,(vg5k_attr)
+	ld	a,(__vg5k_attr)
 	and	7
 	ld	b,CONSOLE_COLUMNS
 generic_console_scrollup_3:
@@ -247,9 +248,6 @@ same_line:
 
 __vg5k_custom_font:	defb	0
 
-	SECTION		data_clib
-
-vg5k_attr:	defb	7	;White on black
 
 	SECTION		code_crt_init
 	EXTERN	set_character8
