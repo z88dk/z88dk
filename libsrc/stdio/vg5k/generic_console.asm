@@ -11,6 +11,7 @@
                 PUBLIC          generic_console_set_inverse
 		PUBLIC		__vg5k_custom_font
 
+		EXTERN		conio_map_colour
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
 
@@ -20,8 +21,7 @@ generic_console_set_inverse:
 	ret
 
 generic_console_set_paper:
-	jp	generic_console_set_ink
-	and	7
+	call	conio_map_colour
 	rlca
 	rlca
 	rlca
@@ -36,7 +36,7 @@ generic_console_set_paper:
 
 
 generic_console_set_ink:
-	and	7
+	call	conio_map_colour
 	ld	c,a
 	ld	hl,vg5k_attr
 	ld	a,(hl)
@@ -235,6 +235,7 @@ same_line:
 	or	c
 	jr	nz,refresh_screen1
 	ret
+
 
 	SECTION		bss_clib
 
