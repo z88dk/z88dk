@@ -18,6 +18,12 @@ generic_console_vpeek:
 	ld	sp,hl
 	push	hl		;save buffer
 	ex	de,hl
+
+        in      a,($88)
+        push    af              ;Save value
+        set	2,a             ;Page video in
+        out     ($88),a
+
 	; hl = screen address
 	; de = buffer
 	push	hl
@@ -26,6 +32,10 @@ generic_console_vpeek:
 	ld	bc,$20
 	add	hl,bc
 	call	dohalf
+
+	pop	af
+	out	($88),a		;page video out
+
 	pop	de		;buffer
 	ld	hl,(generic_console_font32)
 	call	screendollar

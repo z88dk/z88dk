@@ -13,9 +13,10 @@
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
-                PUBLIC          generic_console_vpeek
+		PUBLIC		generic_console_xypos
 		PUBLIC		kc_attr
 
+		EXTERN		conio_map_colour
 	        EXTERN          generic_console_udg32
        		EXTERN          generic_console_font32
         	EXTERN          generic_console_flags
@@ -26,12 +27,8 @@
 
 		INCLUDE		"target/kc/def/caos.def"
 
-generic_console_vpeek:
-	scf
-generic_console_set_inverse:
-	ret
-
 generic_console_set_ink:
+	call	conio_map_colour
 	rlca
 	rlca
 	rlca
@@ -44,10 +41,11 @@ set_attr:
 	and	b
 	or	c
 	ld	(hl),a
+generic_console_set_inverse:
 	ret
 
 generic_console_set_paper:
-	and	7
+	call	conio_map_colour
 	ld	b,@11111000
 	jr	set_attr
 	
@@ -58,7 +56,7 @@ generic_console_set_paper:
 generic_console_cls:
 	in	a,($88)
 	push	af		;Save value
-	set 	2,a		;Page video in
+	set	2,a		;Page video in
 	out	($88),a
 	ld	hl,32768
 	ld	de,32769
@@ -78,16 +76,20 @@ generic_console_cls:
 generic_console_scrollup:
 	push	de
 	push	bc
+	in	a,($88)
+	push	af
+	set	2,a
+	out	($88),a
 	ld	bc, 0
 loop:
 	push	bc
 
 	push	bc
-	call	xypos
+	call	generic_console_xypos
 	pop	bc
 	push	hl	;save destination address
 	inc	b	;row 1
-	call	xypos
+	call	generic_console_xypos
 	pop	de	;de = destination, hl = source row
 
 	push	hl
@@ -109,11 +111,11 @@ loop:
 
 	ld	c,32
 	push	bc
-	call	xypos
+	call	generic_console_xypos
 	pop	bc
 	push	hl	;Save destination address
 	inc	b
-	call	xypos
+	call	generic_console_xypos
 	pop	de	;Get back destination address
 	
 	push	hl
@@ -165,6 +167,8 @@ loop:
 	ld	a,b
 	cp	31
 	jp	nz,loop
+	pop	af
+	out	($88),a
 	pop	bc
 	pop	de
 	ret
@@ -226,6 +230,12 @@ scroll_colour_half_loop:
 ; e = raw
 generic_console_printc:
 	; Here we can interpret any extra codes (eg for setting colours)
+	ex	af,af
+	in	a,($88)
+	push	af
+	set	2,a
+	out	($88),a
+	ex	af,af
         ld      l,d
         ld      h,0
         ld      de,(generic_console_font32)
@@ -243,7 +253,7 @@ not_udg:
         ex      de,hl           ;de = font
 	push	bc
 	push	de
-	call	xypos
+	call	generic_console_xypos
 	pop	de
 	push	hl
 	ld	a,(generic_console_flags)
@@ -266,6 +276,8 @@ not_udg:
 	ld	(hl),a
 	add	hl,de
 	ld	(hl),a
+	pop	af
+	out	($88),a
 	ret
 
 print_half:
@@ -284,7 +296,7 @@ no_overflow:
         djnz    hires_printc_1
 	ret
 
-; Colour xypos
+; Colour generic_console_xypos
 ; Columns 0 - 31 = row * $40  $a8 base
 ; Columns 32 - 40 = for every 8 by $80, for each 2 rows increment by $8, if odd add $40 $b000 base
 
@@ -337,7 +349,7 @@ colour_lhs:
 ; Columns 0 - 31 for every 8 by $800 For each 2 rows increment by $200, if the odd row add $40
 ; $a000
 ; Colums 32-40 for every 8 rows $200 for each 2 rows increment by $8, if odd add $40
-xypos:
+generic_console_xypos:
 	ld	a,c
         sub     32
         jr      c,lhs
