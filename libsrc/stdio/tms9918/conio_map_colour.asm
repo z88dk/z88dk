@@ -33,7 +33,7 @@ table:
 	defb	$d	;MAGENTA -> MAGENTA
 	defb	$8	;BROWN -> MEDIUM RED
 	defb	$b	;LIGHTGRAY -> LIGHT YELLOW
-	defb	$b	;DARKGRAY -> GRAY
+	defb	$e	;DARKGRAY -> GRAY
 	defb	$5	;LIGHTBLUE -> LIGHT BLUE
 	defb	$3	;LIGHTGREEN -> LIGHT GREEN
 	defb	$7	;LIGHTCYAN -> CYAN
