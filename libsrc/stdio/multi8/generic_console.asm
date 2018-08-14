@@ -23,6 +23,8 @@
 		PUBLIC		generic_console_xypos
 		PUBLIC		generic_console_scale
 
+
+		EXTERN		conio_map_colour
 		EXTERN		generic_console_font32
 		EXTERN		generic_console_udg32
 
@@ -40,7 +42,7 @@
 		defc		DISPLAY = 0x8000
 
 generic_console_set_ink:
-	and	7
+	call	conio_map_colour
 	ld	b,a
 	ld	a,(__multi8_attr)
 	and	248
