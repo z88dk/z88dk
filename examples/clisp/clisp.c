@@ -23,10 +23,14 @@ OPTIONS:
 
 	-DNOINIT         Remove the stucture initialization, it requires a previous dump of a memory image
 	                 created by running the full clisp version.
+
+	-DINITONLY       Build a limited program intended to initialize the structures in memory and exit.
 					 
 	-DTINYMEM        Shorten the memory structures to a minimal number of objects to save memory 
 
 	-DNOTIMER        To be used when the target platform misses the clock() function to 'randomize'
+	
+	-DZEDIT          (ZX81 ONLY), initial LISP code MUST be present @32768, 16K for text available, 48K RAM NEEDED
 
 
 z88dk build hints:
@@ -36,16 +40,21 @@ Spectrum
 zcc +zx -lndos -O3 -create-app -DLARGEMEM=1200 clisp.c
 zcc +zx -lndos -O3 -create-app -DLARGEMEM=3000 -DGRAPHICS -llib3d -DSHORT -DSPECLISP clisp.c
 
-zx81 32K exp (don't change LARGEMEM, space allocation is hardcoded)
-  zcc +zx81 -O3 -create-app -DLARGEMEM=900 -DZX81_32K clisp.c
+zx81 32K exp (don't change LARGEMEM, space allocation is hardcoded), 2 programs needed
+  zcc +zx81 -O3 -create-app  -DLARGEMEM=900 -DZX81_32K -DINITONLY clisp.c
+  zcc +zx81 -O3 -create-app  -DLARGEMEM=900 -DZX81_32K -DNOINIT clisp.c
+  
 zx81 16K, minimalistic version, graphics support
   zcc +zx81 -O3 -create-app -DTINYMEM -DSHORT -DMINIMALISTIC -DGRAPHICS -lgfx81 -llib3d clisp.c
+zx81 48K, minimalistic version, graphics support, initial code must be provided @32768
+  zcc +zx81 -O3 -create-app -DMINIMALISTIC -DGRAPHICS -lgfx81 -llib3d -DZEDIT -DZX81_32K clisp.c
 
 MicroBee  
   zcc +bee -O3 -create-app -DLARGEMEM=1200 -DGRAPHICS -DNOTIMER -lgfxbee512 -llib3d clisp.c
 
 */
 
+#define HRGPAGE 42000
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -63,9 +72,18 @@ MicroBee
 #include <lib3d.h>
 #endif
 
+#ifdef ZEDIT
+#define shift 16383
+#else
+#define shift 0
+#endif
+
 #ifdef ZX81_32K
+#ifdef ZEDIT
+#pragma output STACKPTR=65535
+#else
 #pragma output STACKPTR=49152
-//#pragma output STACKPTR=65535
+#endif
 unsigned int _sp;
 #endif
 
@@ -123,9 +141,9 @@ int t_cons_free;           /* free list */
 long t_cons_car[NCONS];     /* "car" part of cell */
 long t_cons_cdr[NCONS];     /* "cdr" part of cell */
 #else
-int t_cons_free @32768;
-long t_cons_car[] @32780;  /* 3600 bytes */
-long t_cons_cdr[] @36380;  /* 3600 bytes */
+int t_cons_free @32768+shift;
+long t_cons_car[] @32780+shift;  /* 3600 bytes */
+long t_cons_cdr[] @36380+shift;  /* 3600 bytes */
 #endif
 
 /* Symbols */
@@ -148,11 +166,16 @@ long t_symb_val[NSYMBS];
 long t_symb_fval[NSYMBS];
 int t_symb_ftype[NSYMBS];  /* function type */ 
 #else
-int t_symb_free @32770;
-char *t_symb_pname[] @39980;    /* 360 bytes */
-long t_symb_val[] @40340;    /* 720 bytes */
-long t_symb_fval[] @41060;    /* 720 bytes */
-int t_symb_ftype[] @41780;    /* 360 bytes */
+int t_symb_free @32770+shift;
+char *t_symb_pname[] @39980+shift;    /* 360 bytes */
+long t_symb_val[] @40340+shift;    /* 720 bytes */
+long t_symb_fval[] @41060+shift;    /* 720 bytes */
+int t_symb_ftype[] @41780+shift;    /* 360 bytes */
+#endif
+
+#ifdef ZEDIT
+char* text;
+int c;
 #endif
 
 /* Printable name */
@@ -170,8 +193,8 @@ int t_symb_ftype[] @41780;    /* 360 bytes */
 int t_pnames_free;         /* free pointer */
 char  t_pnames[PNAME_SIZE];  /* names */ 
 #else
-int t_pnames_free @32772;
-char  t_pnames[] @42140; /* 900 bytes */
+int t_pnames_free @32772+shift;
+char  t_pnames[] @42140+shift; /* 900 bytes */
 #endif
 
 /* Stack */
@@ -194,9 +217,9 @@ char  t_pnames[] @42140; /* 900 bytes */
 long t_stack[STACK_SIZE];   /* the stack */
 unsigned int t_stack_ptr;           /* stack pointer */
 #else
-long t_stack[] @43040;    /* up to 100 elements (400 bytes)
+long t_stack[] @43040+shift;    /* up to 100 elements (400 bytes)
                            but only 6112 bytes remaining for both SP and LISP STACK*/
-unsigned int t_stack_ptr @32774;           /* stack pointer */
+unsigned int t_stack_ptr @32774+shift;           /* stack pointer */
 #endif
 
     
@@ -371,6 +394,7 @@ char *errmsg_zero_div   = "DIVISION BY ZERO: ";
 char *errmsg_no_memory  = "\nno memory. abort.\n";
 /* Function types */
 void  init(void);
+#ifndef INITONLY
 void toplevel(void);
 long  l_read(void);
 long l_eval(long s);
@@ -386,14 +410,15 @@ char  err_msg(char *msg, char f, long s);
 long  l_cons(long car, long cdr);
 long  l_car(long s);
 long  l_cdr(long s);
-void  quit(void);
 int  list_len(long s);
 void  rplacd(long s, long cdr);
 void  gcollect(void);
 void  gc_mark(long s);
 char  gc_protect(long s);
 void  gc_unprotect(long s);
+#endif
 long  symb_make(char *p);
+void  quit(void);
 
 long D_GET_TAG(long s) {
         return (s & ~(D_GC_MARK | D_MASK_DATA));
@@ -406,7 +431,7 @@ long D_GET_DATA(long s) {
 #ifdef Z80
 
 #ifdef ZX81_32K
-char buf[] @43440;   /* 43400+(STACK_SIZE*4); */
+char buf[] @43440+shift;   /* 43400+(STACK_SIZE*4); */
 #else
 char buf[180];
 #endif
@@ -415,6 +440,15 @@ int cpt;
 char ug=13;
 
 char gchar() {
+	
+#ifdef ZEDIT
+	if (c!=0 && c!=26)
+		c=text[cpt++];
+		if (c!=0 && c!=26)
+			return (c);
+#endif
+
+	
 #ifdef ZX81_32K
 	zx_slow();
 #endif
@@ -427,6 +461,7 @@ char gchar() {
 #endif
     if ((ug=buf[cpt++]) == 0)  ug=13;
     return (ug);
+
 }
 
 void ugchar(char ch) {
@@ -457,7 +492,12 @@ main(void)
   printf("%cCAMPUS LIsP\nLemon version,\nz88dk variant\n",12);
 #endif
 #endif
+
+#ifdef INITONLY
+  printf("\n...memory structures ready.\n");
+#else
   toplevel();
+#endif
   quit();
 
   /*return 0;*/
@@ -480,7 +520,7 @@ init(void)
   /* stack */
   t_stack_ptr = 0;
 
-#ifdef NOINIT
+#if defined(NOINIT)
   
 #else
   /* cells */
@@ -512,10 +552,16 @@ init(void)
   }
 
 #endif
+
+#ifdef ZEDIT
+text=(char*)32768;
+c=1; cpt=0;
+#endif
   
 }
 
 
+#ifndef INITONLY
 /* Top level */
 void
 toplevel(void)
@@ -1401,14 +1447,6 @@ l_cdr(long s)
   return t_cons_cdr[D_GET_DATA(s)];
 }
 
-/* Quit micro lisp */
-void
-quit(void)
-{
-  printf("\nBYE\n");
-  exit(0);
-}
-
 
 /* Garbage collector */
 void
@@ -1507,6 +1545,7 @@ int_get_c(long s)
   return (long) ((unsigned long)s | ~D_MASK_DATA);
 }
 
+#endif	//INITONLY
 
 /* Make a new symbol */
 long
@@ -1541,6 +1580,14 @@ symb_make(char *p)
   t_pnames[t_pnames_free] = '\0'; t_pnames_free++;
 
   return (TAG_SYMB | s);
+}
+
+/* Quit micro lisp */
+void
+quit(void)
+{
+  printf("\nBYE\n");
+  exit(0);
 }
 
 /* END */

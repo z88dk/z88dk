@@ -27,6 +27,7 @@
                 EXTERN          tms9918_set_paper
                 EXTERN          tms9918_set_inverse
 		EXTERN		generic_console_flags
+		EXTERN		mc6847_map_colour
 
 
 		EXTERN		CONSOLE_COLUMNS
@@ -54,11 +55,16 @@ generic_console_set_inverse:
 	ret
 
 generic_console_set_paper:
-	ld	b,a
+	push	af
+	call	mc6847_map_colour
+	ld	a,b
         rrca
         rrca
         and     @11000000
         ld      (__MODE2_attr+1),a
+	call	set_css
+	pop	af
+	ld	b,a
 	ld	a,(__spc1000_mode)
 	cp	10
 	ld	a,b
@@ -66,18 +72,32 @@ generic_console_set_paper:
 	ret
 
 generic_console_set_ink:
-	ld	b,a
+	push	af
+	call	mc6847_map_colour
+	ld	a,b
         and     7
         ld      (__ink_colour),a
         rrca
         rrca
         and     @11000000
         ld      (__MODE2_attr),a
+	call	set_css
+	pop	af
 	ld	a,(__spc1000_mode)
 	cp	10
 	ld	a,b
 	jp	z,tms9918_set_ink
-	and	3
+	ret
+
+set_css:
+	ld	a,b
+	rlca	
+	rlca
+	and	@00000010	
+	ld	c,a
+	ld	a,(__spc1000_attr)
+	and	@11111101
+	or	c
 	ld	(__spc1000_attr),a
 	ret
 	
