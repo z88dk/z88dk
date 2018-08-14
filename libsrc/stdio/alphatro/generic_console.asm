@@ -12,6 +12,7 @@
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
 
+		EXTERN		conio_map_colour
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
 		EXTERN		__alphatro_attr
@@ -33,7 +34,7 @@ no_inverse:
 
 
 generic_console_set_paper:
-	and	7
+	call	conio_map_colour
 	ld	b,a
 	ld	a,(__alphatro_attr)
 	and	@11111000
@@ -42,7 +43,7 @@ generic_console_set_paper:
 	ret
 	
 generic_console_set_ink:
-	and	7
+	call	conio_map_colour
 	rlca
 	rlca
 	rlca
