@@ -15,7 +15,7 @@ conio_map_colour:
         rr      c
         ret     c
 
-        and     7
+        and     15
 	ld	c,a
 	ld	b,0
 	ld	hl,colour_table
