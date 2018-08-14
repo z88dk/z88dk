@@ -46,6 +46,7 @@ generic_console_set_inverse:
 
 generic_console_set_paper:
 	call	conio_map_colour
+	and	7
 	ld	b,@11111000
 	jr	set_attr
 	

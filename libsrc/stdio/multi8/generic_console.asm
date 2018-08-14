@@ -43,6 +43,7 @@
 
 generic_console_set_ink:
 	call	conio_map_colour
+	and	7
 	ld	b,a
 	ld	a,(__multi8_attr)
 	and	248

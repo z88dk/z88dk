@@ -35,6 +35,7 @@ no_inverse:
 
 generic_console_set_paper:
 	call	conio_map_colour
+	and	7
 	ld	b,a
 	ld	a,(__alphatro_attr)
 	and	@11111000
@@ -47,6 +48,7 @@ generic_console_set_ink:
 	rlca
 	rlca
 	rlca
+	and	@00111000
 	ld	b,a
 	ld	a,(__alphatro_attr)
 	and	@11000111
