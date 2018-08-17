@@ -227,6 +227,12 @@ __Start:
 
    ; hl' = command line
    
+   IF __crt_enable_commandline >= 2
+
+      exx
+
+   ENDIF
+   
    include "crt_cmdline_esxdos.inc"
    
    ; stack: argv/cmdline, argc/len

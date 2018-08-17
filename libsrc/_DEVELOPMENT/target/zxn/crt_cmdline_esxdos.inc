@@ -6,7 +6,7 @@
    ;   3 = on stack argc,argv
    ;   4 = on stack unprocessed command line 0-terminated len,cmdline
 
-   ; hl' = command line
+   ; hl = command line
    
    IF __crt_enable_commandline = 1
    
@@ -22,9 +22,7 @@
    IF __crt_enable_commandline = 2
    
       ; unprocessed esxdos command line
-      
-      exx
-      
+
       push hl   ; command line
       push hl   ; length
       
@@ -47,8 +45,6 @@
    
       ; parse into argc,argv
       
-      exx
-      
       IF __NEXTOS_DOT_COMMAND
 
          include "crt_cmdline_esx_argv.inc"
@@ -67,8 +63,6 @@
    IF __crt_enable_commandline >= 4
    
       ; copy unprocessed esxdos command line to stack
-      
-      exx
 
       ld a,h
       or l
