@@ -28,12 +28,13 @@ asm_zxn_write_bank_state:
    
    ld bc,__IO_1FFD
    out (c),h
-   
+
+   xor a
+   ld b,__IO_DFFD/256          ; must precede 7ffd in case of locking
+   out (c),a
+
    ld b,__IO_7FFD/256
    out (c),l
-   
-   xor a
-   ld b,__IO_DFFD/256
-   out (c),a
-   
+
+   ld b,__IO_DFFD/256          ; preserve output conditions
    ret
