@@ -8,7 +8,7 @@ PUBLIC l_small_mul_32_16x16
 
 l_small_mul_32_16x16:
 
-    ; multiplication of two 16-bit numbers into a 16-bit product
+    ; multiplication of two 16-bit numbers into a 32-bit product
     ;
     ; enter : de = 16-bit multiplicand
     ;         hl = 16-bit multiplicand
