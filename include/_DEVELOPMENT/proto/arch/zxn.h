@@ -108,6 +108,8 @@ extern unsigned char IO_UART_TX;
 extern unsigned char IO_UART_STATUS;
 extern unsigned char IO_6B;
 extern unsigned char IO_DMA;
+extern unsigned char IO_E3;
+extern unsigned char IO_DIVIDE_CONTROL;
 extern unsigned char IO_E7;
 extern unsigned char IO_SPI_CONTROL;
 extern unsigned char IO_SPI_STATUS;
@@ -189,6 +191,11 @@ __sfr __banked __at __IO_UART_STATUS IO_UART_STATUS;
 
 __sfr __at 0x6b IO_6B;
 __sfr __at __IO_DMA IO_DMA;
+
+// io ports - divmmc memory
+
+__sfr __at 0xe3 IO_E3;
+__sfr __at __IO_DIVIDE_CONTROL IO_DIVIDE_CONTROL;
 
 // io ports - spi interface (sd card, raspberry pi)
 
@@ -501,6 +508,11 @@ __sfr __banked __at __IO_LED_L IO_LED_L;
 #define D_RM_B_ADDR_L  __D_RM_B_ADDR_L
 #define D_RM_B_ADDR_H  __D_RM_B_ADDR_H
 #define D_RM_B_ADDR  __D_RM_B_ADDR
+
+// 0xe3, IO_DIVIDE_CONTROL
+
+#define IDC_CONMEM  __IDC_CONMEM
+#define IDC_MAPRAM  __IDC_MAPRAM
 
 // 0xe7, IO_SPI_CONTROL
 
