@@ -269,7 +269,7 @@ alloc_continue:
    
    rst __ESX_RST_SYS
    defb __ESX_M_P3DOS
-   
+
    ld hl,error_msg_out_of_memory
    jp nc, terminate
    
@@ -345,6 +345,134 @@ alloc_not_used:
 alloc_cancel:
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; allocate and load divmmc pages
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   IF __DOTN_LAST_DIVMMC >= 0
+   
+      ld (__sp_divmmc),sp      ; save stack position
+      
+      ld a,c                   ; save file handle
+      
+      ld hl,load_divmmc_begin - load_divmmc_end
+      add hl,sp
+      
+      ld sp,hl                 ; make room on stack for divmmc load function
+      
+      ld (__load_divmmc),hl    ; save location of divmmc loader on stack
+      ex de,hl                 ; de = destination of divmmc load function
+      
+      ld hl,load_divmmc_begin
+      ld bc,load_divmmc_end - load_divmmc_begin
+      
+      ldir                     ; copy divmmc load function to stack
+
+      ld c,a                   ; c = file handle
+      
+      ld a,(__z_div_sz)        ; num divmmc pages
+      
+      or a
+      jr z, div_alloc_cancel
+      
+      ld b,a
+      
+      ld hl,__z_div_alloc_table
+      ld e,0                   ; current physical page
+      
+   div_alloc_loop:
+   
+      ;  b = num pages
+      ;  c = file handle
+      ;  e = current physical page
+      ; hl = div alloc table position
+   
+      ld a,(hl)
+      
+      cp 0xff
+      jr z, div_alloc_not_used ; 0xff indicates page not used
+      
+      cp 0xfc                  ; alloc flag < 0xfc is undefined
+      jr c, alloc_error
+      
+   div_alloc_continue:
+   
+      push de                  ; save current physical page
+      
+      bit 0,a
+      jr nz, div_alloc_load    ; if allocation not requested
+      
+      ;; allocate
+      
+      push bc                  ; save num pages, file handle
+      push hl                  ; save allocation table position
+      
+      ld hl,__nextos_rc_bank_alloc + (__nextos_rc_banktype_mmc * 256)
+      
+      exx
+      
+      ld de,__NEXTOS_IDE_BANK
+      ld c,7
+      
+      rst __ESX_RST_SYS
+      defb __ESX_M_P3DOS
+      
+      ld hl,error_msg_divmmc_out_of_memory
+      jp nc, terminate
+      
+      pop hl                   ; hl = allocation table position
+      pop bc                   ; b = num pages, c = file handle
+      
+      ld a,(hl)                ; a = allocation flag
+      ld (hl),e                ; write allocated bank into allocation table
+      
+   div_alloc_load:
+   
+      ;; load
+      
+      ;  a = alloc flag
+      ;  b = num pages
+      ;  c = file handle
+      ;  e = target physical page
+      ; hl = alloc table position
+      ; stack = current physical page
+      
+      and 0x02
+      jr nc, div_alloc_no_load ; if load not requested
+      
+      push bc                  ; save num pages, file handle
+      push hl                  ; save alloc table
+      
+      ld hl,(__load_divmmc)    ; address of divmmc loader on stack
+
+      call l_jphl
+      jp c, terminate          ; if read error
+
+      pop hl                   ; hl = alloc table
+      pop bc                   ; b = num pages, c = file handle
+      
+   div_alloc_no_load:
+   
+      pop de
+   
+   div_alloc_not_used:
+   
+      ;  b = num pages
+      ;  c = file handle
+      ;  e = current physical page
+      ; hl = alloc table position
+      
+      inc hl
+      inc e
+      
+      djnz div_alloc_loop
+      
+   div_alloc_cancel:
+   
+      ld sp,(__sp_divmmc)
+
+   ENDIF
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; merge allocated table into page table
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -377,6 +505,42 @@ merge_no:
 
 merge_cancel:
 
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; merge allocated table into divmmc table
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   IF __DOTN_LAST_DIVMMC >= 0
+   
+      ld a,(__z_div_sz)
+      
+      or a
+      jr z, div_merge_cancel
+      
+      ld b,a
+      
+      ld hl,__z_div_alloc_table
+      ld de,__z_div_table
+      
+   div_merge_loop:
+   
+      ld a,(hl)
+      
+      cp __ZXNEXT_LAST_DIVMMC + 1
+      jr nc, div_merge_no
+      
+      ld (de),a
+   
+   div_merge_no:
+   
+      inc de
+      inc hl
+      
+      djnz div_merge_loop
+   
+   div_merge_cancel:
+
+   ENDIF
+   
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; parse command line to divmmc memory
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -664,7 +828,7 @@ dealloc_cancel:
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    IF __DOTN_LAST_DIVMMC >= 0
-   
+
       ld a,(__z_div_sz)        ; divmmc pages
       
       or a
@@ -811,46 +975,52 @@ load_restore_mmu7:
    
    ret
 
+;; divmmc loader
 
+IF __DOTN_LAST_DIVMMC >= 0
 
-in a,($e3)
-push af
+load_divmmc_begin:
 
-ld a,e
-or $80
-out ($e3),a
+   in a,(__IO_DIVIDE_CONTROL)
+   push af                     ; save current divmmc control
+   
+   ld a,e
+   or __IDC_CONMEM
+   
+   out (__IO_DIVIDE_CONTROL),a ; map divide page to 0x2000 with esxdos in bottom 8k
+   
+   ld a,c                      ; file handle
+   ld hl,0x2000                ; destination address for load
+   
+   ld c,l
+   ld b,h                      ; length is 8k
+   
+   rst __ESX_RST_SYS
+   defb __ESX_F_READ
+   
+   ld l,a
+   ld h,0
+   
+   pop de
 
+   ld a,d
+   out (__IO_DIVIDE_CONTROL),a ; restore divmmc control
+   
+   ret c                       ; if read error
+   
+   ld hl,0x2000
+   sbc hl,bc
+   
+   ret z                       ; if full 8k loaded
+   
+   ld hl,__ESX_EIO             ; indicate io error
+   
+   scf
+   ret
 
-ld a,c
-ld hl,0x2000
-ld c,l
-ld b,h
+load_divmmc_end:
 
-rst __ESX_RST_SYS
-defb __ESX_F_READ
-
-ld l,a
-ld h,0
-
-pop de
-ld a,d
-out ($e3),a
-
-ret c
-
-ld hl,0x2000
-sbc hl,bc
-
-ret z
-
-ld hl,__ESX_EIO
-scf
-ret
-
-
-
-
-
+ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; error messages
@@ -927,6 +1097,14 @@ error_msg_d_break:
 
    defm "D BREAK - no repea", 't'+0x80
 
+IF __DOTN_LAST_DIVMMC >= 0
+
+   error_msg_divmmc_out_of_memory:
+   
+      defm "4 Out of divmmc memor", 'y' + 0x80
+
+ENDIF
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -934,6 +1112,13 @@ error_msg_d_break:
 __command_line:   defw 0
 
 __sp:             defw 0
+
+IF __DOTN_LAST_DIVMMC >= 0
+
+   __sp_divmmc:   defw 0
+   __load_divmmc: defw 0
+
+ENDIF
 
 __return_status:  defw error_msg_nextos
 

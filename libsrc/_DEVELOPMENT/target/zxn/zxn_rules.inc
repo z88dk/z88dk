@@ -40,8 +40,8 @@ Z88DK_FOR(`LOOP', `0', `15',
    ; VERSION CHECKS (0 = no check)
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ; core version = MMmmSSS (major, minor, sub) in decimal
-   ;    v 1.10.51 = 0110051
+   ;; core version = MMmmSSS (major, minor, sub) in decimal
+   ;;    v 1.10.51 = 0110051
 
    PUBLIC __CRT_CORE_VERSION
 
@@ -51,8 +51,8 @@ Z88DK_FOR(`LOOP', `0', `15',
    
    defc __CRT_CORE_VERSION = CRT_CORE_VERSION
    
-   ; nextos version = MMmm (major, minor) in decimal
-   ;         v 1.94 = 0194
+   ;; nextos version = MMmm (major, minor) in decimal
+   ;;         v 1.94 = 0194
 
    PUBLIC __NEXTOS_VERSION
 
@@ -62,8 +62,8 @@ Z88DK_FOR(`LOOP', `0', `15',
    
    defc __NEXTOS_VERSION = NEXTOS_VERSION
    
-   ; esxdos version
-   ; currently non-zero checks for presence (use 1)
+   ;; esxdos version
+   ;; currently non-zero checks for presence (use 1)
 
    PUBLIC __ESXDOS_VERSION
 
@@ -82,31 +82,142 @@ Z88DK_FOR(`LOOP', `0', `15',
    ENDIF
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ; NextOS dotn commands
+   ; NextOS dotn and exe
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   PUBLIC DOTN_MAIN_OVERLAY_MASK
-   PUBLIC DOTN_MAIN_ABSOLUTE_MASK
-
+   ;; temporary stack location in divmmc
+   
    IFNDEF DOTN_REGISTER_SP
       defc DOTN_REGISTER_SP = 0x4000
    ENDIF
    
+   ;; last ram page in page table
+   
+   PUBLIC __DOTN_LAST_PAGE
+   
    IFNDEF DOTN_LAST_PAGE
       defc DOTN_LAST_PAGE = __ZXNEXT_LAST_PAGE
    ENDIF
-
-   IFNDEF DOTN_EXTRA_PAGES
-      defc DOTN_EXTRA_PAGES = 0
+   
+   IF DOTN_LAST_PAGE < 11
+      defc __DOTN_LAST_PAGE = 11
+   ELSE
+      IF DOTN_LAST_PAGE > __ZXNEXT_LAST_PAGE
+         defc __DOTN_LAST_PAGE = __ZXNEXT_LAST_PAGE
+      ELSE
+         defc __DOTN_LAST_PAGE = DOTN_LAST_PAGE
+      ENDIF
    ENDIF
+
+   ;; last divmmc page in divmmc table
+   
+   PUBLIC __DOTN_LAST_DIVMMC
+   
+   IFNDEF DOTN_LAST_DIVMMC
+      defc DOTN_LAST_DIVMMC = -1
+   ENDIF
+   
+   IF DOTN_LAST_DIVMMC > __ZXNEXT_LAST_DIVMMC
+      defc __DOTN_LAST_DIVMMC = __ZXNEXT_LAST_DIVMMC
+   ELSE
+      defc __DOTN_LAST_DIVMMC = DOTN_LAST_DIVMMC
+   ENDIF
+
+   ;; number of extra ram pages to allocate
+   
+   PUBLIC __DOTN_NUM_EXTRA
+   
+   IFNDEF DOTN_NUM_EXTRA
+      defc DOTN_NUM_EXTRA = 0
+   ENDIF
+   
+   defc __DOTN_NUM_EXTRA = DOTN_NUM_EXTRA
+   
+   ;; set bits indicate mmus that should be allocated in the main bank
+   
+   PUBLIC __DOTN_MAIN_OVERLAY_MASK
    
    IFNDEF DOTN_MAIN_OVERLAY_MASK
       defc DOTN_MAIN_OVERLAY_MASK = 0
    ENDIF
    
+   defc __DOTN_MAIN_OVERLAY_MASK = DOTN_MAIN_OVERLAY_MASK & 0xff
+   
+   ;; set bits indicates mmus that should not be allocated in the main bank
+   
+   PUBLIC __DOTN_MAIN_ABSOLUTE_MASK
+   
    IFNDEF DOTN_MAIN_ABSOLUTE_MASK
       defc DOTN_MAIN_ABSOLUTE_MASK = 0
    ENDIF
+   
+   defc __DOTN_MAIN_ABSOLUTE_MASK = DOTN_MAIN_ABSOLUTE_MASK & 0xff
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ; NextOS EXE
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   ;; last ram page in page table
+   
+   PUBLIC __EXE_LAST_PAGE
+   
+   IFNDEF EXE_LAST_PAGE
+      defc EXE_LAST_PAGE = __ZXNEXT_LAST_PAGE
+   ENDIF
+   
+   IF EXE_LAST_PAGE < 11
+      defc __EXE_LAST_PAGE = 11
+   ELSE
+      IF EXE_LAST_PAGE > __ZXNEXT_LAST_PAGE
+         defc __EXE_LAST_PAGE = __ZXNEXT_LAST_PAGE
+      ELSE
+         defc __EXE_LAST_PAGE = EXE_LAST_PAGE
+      ENDIF
+   ENDIF
+   
+   ;; last divmmc page in divmmc table
+   
+   PUBLIC __EXE_LAST_DIVMMC
+   
+   IFNDEF EXE_LAST_DIVMMC
+      defc EXE_LAST_DIVMMC = -1
+   ENDIF
+   
+   IF EXE_LAST_DIVMMC > __ZXNEXT_LAST_DIVMMC
+      defc __EXE_LAST_DIVMMC = __ZXNEXT_LAST_DIVMMC
+   ELSE
+      defc __EXE_LAST_DIVMMC = EXE_LAST_DIVMMC
+   ENDIF
+
+   ;; number of extra ram pages to allocate
+   
+   PUBLIC __EXE_NUM_EXTRA
+   
+   IFNDEF EXE_NUM_EXTRA
+      defc EXE_NUM_EXTRA = 0
+   ENDIF
+   
+   defc __EXE_NUM_EXTRA = EXE_NUM_EXTRA
+   
+   ;; set bits indicate mmus that should be allocated in the main bank
+   
+   PUBLIC __EXE_MAIN_OVERLAY_MASK
+   
+   IFNDEF EXE_MAIN_OVERLAY_MASK
+      defc EXE_MAIN_OVERLAY_MASK = 0
+   ENDIF
+   
+   defc __EXE_MAIN_OVERLAY_MASK = EXE_MAIN_OVERLAY_MASK & 0xff
+   
+   ;; set bits indicates mmus that should not be allocated in the main bank
+   
+   PUBLIC __EXE_MAIN_ABSOLUTE_MASK
+   
+   IFNDEF EXE_MAIN_ABSOLUTE_MASK
+      defc EXE_MAIN_ABSOLUTE_MASK = 0
+   ENDIF
+   
+   defc __EXE_MAIN_ABSOLUTE_MASK = EXE_MAIN_ABSOLUTE_MASK & 0xff
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; Input Terminal Settings
