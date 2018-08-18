@@ -1988,6 +1988,11 @@
 
 
 
+#define __IO_DIVIDE_CONTROL  0xe3
+
+#define __IDC_CONMEM  0x80
+#define __IDC_MAPRAM  0x40
+
 #define __IO_SPI_CONTROL  0xe7
 
 #define __ISC_SPI_CS  0x80

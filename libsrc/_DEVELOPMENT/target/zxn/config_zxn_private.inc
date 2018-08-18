@@ -1996,6 +1996,11 @@ defc __IO_1FFD_PRINTER_STROBE = 0x10
 
 
 
+defc __IO_DIVIDE_CONTROL = 0xe3
+
+defc __IDC_CONMEM = 0x80
+defc __IDC_MAPRAM = 0x40
+
 defc __IO_SPI_CONTROL = 0xe7
 
 defc __ISC_SPI_CS = 0x80
