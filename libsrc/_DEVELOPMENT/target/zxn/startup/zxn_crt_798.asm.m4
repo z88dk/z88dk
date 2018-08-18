@@ -1203,7 +1203,7 @@ __z_saved_mmu_state:   defs 8
 
 include(`crt_allocation_dotn.m4')
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../clib_variables.inc"
 

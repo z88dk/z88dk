@@ -75,17 +75,17 @@ EXTERN _main
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 __Start:
-   
+
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; returning to basic
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   
+
    IF __crt_enable_commandline >= 2
    
       ld (__command_line),bc
       
    ENDIF
-
+   
    push iy
    exx
    push hl
@@ -95,19 +95,94 @@ __Start:
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; check for nextos
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   
+
    rst __ESX_RST_SYS
    defb __ESX_M_DOSVERSION
 
-   ; return status statically initialized to this
-   ;
-   ; ld hl,error_msg_nextos
-   ; ld (__return_status),hl
-   
-   jp c, error_nextos          ; if esxdos present
+   ;; return status statically initialized to this
+   ;;
+   ;; ld hl,error_msg_nextos
+   ;; ld (__return_status),hl
+
+   jp c, error_crt          ; if esxdos present
    
    or a
-   jp nz, error_nextos         ; if nextos is in 48k mode
+   jp nz, error_crt         ; if nextos is in 48k mode
+      
+   IF NEXTOS_VERSION
+
+      ld hl,+(((NEXTOS_VERSION / 1000) % 10) << 12) + (((NEXTOS_VERSION / 100) % 10) << 8) + (((NEXTOS_VERSION / 10) % 10) << 4) + (NEXTOS_VERSION % 10)
+         
+      ex de,hl
+      sbc hl,de
+
+      jp c, error_crt       ; if nextos version not met
+
+   ENDIF
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; core version check
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   IF CRT_CORE_VERSION
+   
+      ;; set up error
+
+      ld hl,error_msg_core_version
+      ld (__return_status),hl
+
+      ;; check for emulator
+      
+      ld bc,__IO_NEXTREG_REG
+      
+      ld a,__REG_MACHINE_ID
+      out (c),a
+      
+      inc b
+      in a,(c)
+      
+      cp __RMI_EMULATORS
+      jr z, core_pass
+      
+      ;; check core version
+
+      dec b
+      
+      ld e,__REG_VERSION
+      out (c),e
+      
+      inc b
+      in e,(c)                 ; e = core version major minor
+      
+      ld a,+(((CRT_CORE_VERSION / 100000) & 0xf) << 4) + (((CRT_CORE_VERSION / 1000) % 100) & 0xf)
+      
+      cp e
+      jr c, core_pass          ; if minimum < core version
+      jp nz, error_crt         ; if minimum > core version
+   
+      ;; core version = minimum
+      
+      dec b
+      
+      ld a,__REG_SUB_VERSION
+      out (c),a
+      
+      inc b
+      in a,(c)                 ; a = core sub version
+      
+      cp CRT_CORE_VERSION % 1000
+      jp c, error_crt          ; if core sub version < minimum
+
+   core_pass:
+   
+   ENDIF
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; speed up the load process
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   call turbo_save             ; save current z80 speed
+   call turbo_14               ; speed up to 14MHz
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; save current mmu state
@@ -121,9 +196,6 @@ __Start:
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; save basic bank state
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-   ; this is assumed
-   ; mmu2 10
    
    EXTERN asm_zxn_read_sysvar_bank_state
    call   asm_zxn_read_sysvar_bank_state
@@ -137,13 +209,28 @@ __Start:
    rst __ESX_RST_SYS
    defb __ESX_M_GETHANDLE
 
+   ld c,a                      ; c = file handle
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; select mmu for loading
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   ld ix,load_using_mmu7
+   
+   ld a,(__sp + 1)
+   
+   cp 0xe0
+   jr c, end_select
+
+   ld ix,load_using_mmu3
+
+end_select:
+
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; allocate and load pages
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
-   ld c,a                      ; c = file handle
-   
-   ld hl,(__z_page_table_sz)   ; num pages and num extra
+   ld hl,(__z_page_sz)         ; num pages and num extra
    
    ld a,l
    add a,h
@@ -151,32 +238,42 @@ __Start:
    
    jr z, alloc_cancel          ; if no pages are being allocated
 
-   ld hl,__z_alloc_table
+   ld hl,__z_page_alloc_table
    ld e,0                      ; current page
    
 alloc_loop:
 
-   ld a,(hl)
-   
-   inc a
-   jr z, alloc_not_used        ; 0xff indicates page not used
-   
-   push de                     ; save current page
-   push hl                     ; save allocation table position
-   push bc                     ; save num pages, file handle
-   
-   ld l,0xfe
-   push hl                     ; indicate absolute page loaded
-   
-   cp __ZXNEXT_LAST_PAGE + 2
-   
-   ld hl,error_msg_malformed_alloc
-   jp c, terminate             ; if alloc page is a physical page number
-   
-   inc a                       ; 0xfe indicates load into absolute page
-   jr z, alloc_load
+   ;  b = num pages
+   ;  c = file handle
+   ;  e = current physical page
+   ; hl = alloc table position
+   ; ix = mmu function
 
-   pop hl                      ; junk absolute page indicator
+   ld a,(hl)
+
+   cp 0xff
+   jr z, alloc_not_used        ; 0xff indicates page not used
+
+   cp 0xfc                     ; alloc flag < 0xfc is undefined
+   jr nc, alloc_continue
+
+alloc_error:
+
+   ld hl,error_msg_malformed_alloc
+   jp terminate
+
+alloc_continue:
+
+   push de                     ; save current physical page
+
+   bit 0,a
+   jr nz, alloc_load           ; if allocation not requested
+
+   ;; allocate
+
+   push ix                     ; save mmu function
+   push bc                     ; save num pages, file handle
+   push hl                     ; save allocation table position
 
    ld hl,__nextos_rc_bank_alloc + (__nextos_rc_banktype_zx * 256)
 
@@ -187,38 +284,47 @@ alloc_loop:
    
    rst __ESX_RST_SYS
    defb __ESX_M_P3DOS
-   
+
    ld hl,error_msg_out_of_memory
    jp nc, terminate
    
-   ; load 8k of dot command into page
+   pop hl                      ; hl = allocation table position
+   pop bc                      ; b = num pages, c = file handle
+   pop ix                      ; ix = mmu function
    
-   pop bc
-   push bc                     ; b = counter, c = file handle
-   push de                     ; save allocated page
-   
-   ld a,(__z_page_extra_sz)
-   cp b
-   
-   jr nc, alloc_no_load        ; if this is an extra page
+   ld a,(hl)                   ; a = allocation flag
+   ld (hl),e                   ; write allocated bank into allocation table
 
 alloc_load:
 
-   ld a,e                      ; basic's stack should be in high memory,
-   mmu2 a                      ;   place allocated page in mmu2
+   ;; load
+
+   ;  a = alloc flag
+   ;  b = num pages
+   ;  c = file handle
+   ;  e = target physical page
+   ; hl = alloc table position
+   ; ix = mmu function
+   ; stack = current physical page
+
+   and 0x02
+   jr nz, alloc_no_load        ; if load not requested
+
+   push bc                     ; save num pages, file handle
+   push hl                     ; save alloc table
+   push ix                     ; save mmu function
    
-   ld a,c
-   ld hl,0x4000
-   ld bc,0x2000
+   call l_jpix                 ; carry is reset to page in target page
+
+   ld a,c                      ; file handle
+   ld bc,0x2000                ; page size
    
    rst __ESX_RST_SYS
    defb __ESX_F_READ
    
    ld l,a
-   ld h,0
-   
-   mmu2 10
-   
+   ld h,0   
+
    jp c, terminate             ; if read error
    
    ld hl,0x2000
@@ -227,18 +333,24 @@ alloc_load:
    ld hl,__ESX_EIO
    jp nz, terminate            ; if did not read 0x2000 bytes
 
+   pop ix                      ; restore mmu function
+   pop hl                      ; hl = alloc table
+   pop bc                      ; b = num pages, c = handle
+
+   scf
+   call l_jpix                 ; carry is set to restore target page
+
 alloc_no_load:
 
    pop de
-   pop bc
-   pop hl
 
-   ; e = page number
-
-   ld (hl),e
-   pop de                      ; recover current page
-   
 alloc_not_used:
+
+   ;  b = num pages
+   ;  c = file handle
+   ;  e = current physical page
+   ; hl = alloc table position
+   ; ix = mmu function
 
    inc hl
    inc e
@@ -248,10 +360,138 @@ alloc_not_used:
 alloc_cancel:
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; allocate and load divmmc pages
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   IF __DOTN_LAST_DIVMMC >= 0
+   
+      ld (__sp_divmmc),sp      ; save stack position
+      
+      ld a,c                   ; save file handle
+      
+      ld hl,load_divmmc_begin - load_divmmc_end
+      add hl,sp
+      
+      ld sp,hl                 ; make room on stack for divmmc load function
+      
+      ld (__load_divmmc),hl    ; save location of divmmc loader on stack
+      ex de,hl                 ; de = destination of divmmc load function
+      
+      ld hl,load_divmmc_begin
+      ld bc,load_divmmc_end - load_divmmc_begin
+      
+      ldir                     ; copy divmmc load function to stack
+
+      ld c,a                   ; c = file handle
+      
+      ld a,(__z_div_sz)        ; num divmmc pages
+      
+      or a
+      jr z, div_alloc_cancel
+      
+      ld b,a
+      
+      ld hl,__z_div_alloc_table
+      ld e,0                   ; current physical page
+      
+   div_alloc_loop:
+   
+      ;  b = num pages
+      ;  c = file handle
+      ;  e = current physical page
+      ; hl = div alloc table position
+   
+      ld a,(hl)
+      
+      cp 0xff
+      jr z, div_alloc_not_used ; 0xff indicates page not used
+      
+      cp 0xfc                  ; alloc flag < 0xfc is undefined
+      jr c, alloc_error
+      
+   div_alloc_continue:
+   
+      push de                  ; save current physical page
+      
+      bit 0,a
+      jr nz, div_alloc_load    ; if allocation not requested
+      
+      ;; allocate
+      
+      push bc                  ; save num pages, file handle
+      push hl                  ; save allocation table position
+      
+      ld hl,__nextos_rc_bank_alloc + (__nextos_rc_banktype_mmc * 256)
+      
+      exx
+      
+      ld de,__NEXTOS_IDE_BANK
+      ld c,7
+      
+      rst __ESX_RST_SYS
+      defb __ESX_M_P3DOS
+      
+      ld hl,error_msg_divmmc_out_of_memory
+      jp nc, terminate
+      
+      pop hl                   ; hl = allocation table position
+      pop bc                   ; b = num pages, c = file handle
+      
+      ld a,(hl)                ; a = allocation flag
+      ld (hl),e                ; write allocated bank into allocation table
+      
+   div_alloc_load:
+   
+      ;; load
+      
+      ;  a = alloc flag
+      ;  b = num pages
+      ;  c = file handle
+      ;  e = target physical page
+      ; hl = alloc table position
+      ; stack = current physical page
+      
+      and 0x02
+      jr nc, div_alloc_no_load ; if load not requested
+      
+      push bc                  ; save num pages, file handle
+      push hl                  ; save alloc table
+      
+      ld hl,(__load_divmmc)    ; address of divmmc loader on stack
+
+      call l_jphl
+      jp c, terminate          ; if read error
+
+      pop hl                   ; hl = alloc table
+      pop bc                   ; b = num pages, c = file handle
+      
+   div_alloc_no_load:
+   
+      pop de
+   
+   div_alloc_not_used:
+   
+      ;  b = num pages
+      ;  c = file handle
+      ;  e = current physical page
+      ; hl = alloc table position
+      
+      inc hl
+      inc e
+      
+      djnz div_alloc_loop
+      
+   div_alloc_cancel:
+   
+      ld sp,(__sp_divmmc)
+
+   ENDIF
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; merge allocated table into page table
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ld hl,(__z_page_table_sz)
+   ld hl,(__z_page_sz)
    
    ld a,l
    add a,h
@@ -259,7 +499,7 @@ alloc_cancel:
 
    jr z, merge_cancel
    
-   ld hl,__z_alloc_table
+   ld hl,__z_page_alloc_table
    ld de,__z_page_table
 
 merge_loop:
@@ -281,100 +521,59 @@ merge_no:
 merge_cancel:
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ;; restore mmu state after allocation
+   ;; merge allocated table into divmmc table
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ld hl,__z_saved_mmu_state
+   IF __DOTN_LAST_DIVMMC >= 0
    
-   EXTERN asm_zxn_write_mmu_state
-   call   asm_zxn_write_mmu_state
+      ld a,(__z_div_sz)
+      
+      or a
+      jr z, div_merge_cancel
+      
+      ld b,a
+      
+      ld hl,__z_div_alloc_table
+      ld de,__z_div_table
+      
+   div_merge_loop:
+   
+      ld a,(hl)
+      
+      cp __ZXNEXT_LAST_DIVMMC + 1
+      jr nc, div_merge_no
+      
+      ld (de),a
+   
+   div_merge_no:
+   
+      inc de
+      inc hl
+      
+      djnz div_merge_loop
+   
+   div_merge_cancel:
 
+   ENDIF
+   
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; parse command line to divmmc memory
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    ld sp,DOTN_REGISTER_SP       ; move stack to divmmc memory
 
-   IF __crt_enable_commandline = 1
-   
-      include "../crt_cmdline_empty.inc"
-      
-      ex de,hl
-      
-      ; de = argv
-      ; bc = argc
-   
-   ENDIF
-   
-   IF __crt_enable_commandline = 2
+   IF __crt_enable_commandline >= 2
 
       ld hl,(__command_line)
-      
-      ld a,h
-      or l
-      
-      jr nz, copy_continue
 
-      push hl                  ; command line length = 0
-      push hl                  ; unprocessed command line = 0
-      
-      jr copy_cancel
-      
-   copy_continue:
-      
-      include "../crt_cmdline_esxdos_len.inc"
-      
-      ; de = command line
-      ; bc = length (could be zero)
-      
-      inc bc                   ; include terminator in length
-      
-      ld hl,128
-      
-      EXTERN l_minu_bc_hl
-      call   l_minu_bc_hl      ; place a cap on the length of the command line
-      
-      ld c,l
-      ld b,h
-      
-      ld hl,DOTN_REGISTER_SP
-      
-      xor a
-      sbc hl,bc
-      
-      ld sp,hl
-      ex de,hl
+   ENDIF
 
-      push bc                  ; command line length
-      push de                  ; unprocessed command line
-
-      ldir
-      dec de
-
-      ld (de),a                ; replace terminator with 0
-
-   copy_cancel:
+   include "crt_cmdline_esxdos.inc"
    
-      pop bc
-      pop de
-      
-      ; bc = unprocessed command line
-      ; de = command line length including terminator
-      
-   ENDIF
-
-   IF __crt_enable_commandline >= 3
-
-      ld hl,(__command_line)
-      
-      include "crt_cmdline_esx.inc"
-      
-      ex de,hl
-      
-      ; de = argv
-      ; bc = argc
-      
-   ENDIF
+   ; stack: argv/cmdline, argc/len
+   
+   pop bc
+   pop de
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; page main bank into memory
@@ -416,13 +615,15 @@ merge_cancel:
 
    IF __crt_enable_commandline >= 1
 
-      ; de = argv / command line length
-      ; bc = argc / unprocessed zero terminated command line
+      ; de = argv / unprocessed zero terminated command line
+      ; bc = argc / command line length
       
       push de
       push bc
       
    ENDIF
+
+   ; stack: argv/cmdline, argc/len
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; register basic error intercept
@@ -430,14 +631,14 @@ merge_cancel:
    
    EXTERN _esx_errh
    
-   ld hl,__dotn_basic_error_intercept
+   ld hl,__basic_error_intercept
    ld (_esx_errh),hl
 
    rst __ESX_RST_SYS
    defb __ESX_M_ERRH
    
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ;; program launch
+   ;; ram initialization
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    ; initialize data section
@@ -448,42 +649,42 @@ merge_cancel:
 
    include "../clib_init_bss.inc"
 
-   ; not normal to disable interrupts
-   
-   include "../crt_start_di.inc"
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; interrupt mode
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    ; interrupt mode
    
+   include "../crt_start_di.inc"
+
    include "../crt_set_interrupt_mode.inc"
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; restore original cpu speed
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   call turbo_restore
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; main
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 SECTION code_crt_init          ; user and library initialization
 SECTION code_crt_main
 
-   ; call user program
-   
-   IF __crt_enable_commandline = 2
-
-      pop hl                   ; hl = unprocessed zero terminated command line
-      pop bc                   ; bc = command line length including terminator
-      
-      push bc
-      push hl
-   
-   ELSE
-   
-      IF __crt_enable_commandline >= 1
-
-         pop bc                ; bc = argc
-         pop hl                ; hl = argv
-         
-         push hl
-         push bc
-         
-      ENDIF
-
-   ENDIF
-
    include "../crt_start_ei.inc"
+
+   ; call user program
+
+IF __crt_enable_commandline >= 1
+
+   pop bc                      ; bc = argc / length
+   pop hl                      ; hl = argv / command line
+   
+   push hl
+   push bc
+
+ENDIF
 
    call _main                  ; hl = return status
 
@@ -515,18 +716,70 @@ SECTION code_crt_return
    ;; terminate
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+   inc h
+   dec h
+   
+   jr z, terminate             ; if there is no custom error message
+   
+   ;; must copy the error message to divmmc memory
+   
+   ld de,DOTN_REGISTER_SP - 128 - 10
+   ld bc,128
+
+custom_loop:
+   
+   ld a,(hl)
+   and 0x80
+   
+   ldi
+   
+   jr nz, custom_done
+   jp pe, custom_loop
+
+   dec de
+   
+   ex de,hl
+   set 7,(hl)
+
+custom_done:
+
+   ld hl,DOTN_REGISTER_SP - 128 - 10
+
 terminate:
 
+   call turbo_14               ; speed up to 14MHz
+
    ld (__return_status),hl
-   
-   ld sp,DOTN_REGISTER_SP       ; stack to divmmc memory
+   ld sp,DOTN_REGISTER_SP      ; stack to divmmc memory
    
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; restore banked state
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   mmu2 10
+   ;; unlock port 7ffd
    
+   ld bc,__IO_NEXTREG_REG
+   
+   ld a,__REG_PERIPHERAL_3
+   out (c),a
+   
+   inc b
+   
+   in a,(c)
+   or __RP3_UNLOCK_7FFD
+   
+   out (c),a
+   
+   ;; restore sys vars area
+   
+   ld iy,__SYS_IY              ; expected by rom isr  
+   im 1                        ; rom isr will not run until the stack is moved out of divmmc
+   
+   ld a,(__z_saved_mmu_state + 2)
+   mmu2 a
+   
+   ;; restore bank state
+
    ld hl,(__z_saved_bank_state)
 
    EXTERN asm_zxn_write_sysvar_bank_state
@@ -550,7 +803,7 @@ terminate:
    ;; deallocate pages
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
-   ld hl,(__z_page_table_sz)   ; pages and extra
+   ld hl,(__z_page_sz)         ; pages and extra
    
    ld a,l
    add a,h
@@ -558,7 +811,7 @@ terminate:
    
    jr z, dealloc_cancel
 
-   ld hl,__z_alloc_table
+   ld hl,__z_page_alloc_table
    
 dealloc_loop:
 
@@ -592,18 +845,72 @@ dealloc_not_used:
 dealloc_cancel:
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; deallocate divmmc pages
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   IF __DOTN_LAST_DIVMMC >= 0
+
+      ld a,(__z_div_sz)        ; divmmc pages
+      
+      or a
+      jr z, div_dealloc_cancel
+      
+      ld b,a                   ; b = total number of pages
+      
+      ld hl,__z_div_alloc_table
+   
+   div_dealloc_loop:
+   
+      ld a,(hl)
+      
+      cp __ZXNEXT_LAST_DIVMMC + 1
+      jr nc, div_dealloc_not_used
+      
+      push bc
+      push hl
+      
+      ld e,a
+      ld hl,__nextos_rc_bank_free + (__nextos_rc_banktype_mmc * 256)
+   
+      exx
+
+      ld de,__NEXTOS_IDE_BANK
+      ld c,7
+   
+      rst __ESX_RST_SYS
+      defb __ESX_M_P3DOS
+   
+      pop hl
+      pop bc
+   
+   div_dealloc_not_used:
+
+      inc hl
+      djnz div_dealloc_loop
+
+   div_dealloc_cancel:
+
+   ENDIF
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; return to basic
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-error_nextos:
+   include "../crt_exit_eidi.inc"
 
+   call turbo_restore          ; restore original z80 speed
+
+error_crt:
+
+   ; direct jumps here have not saved original z80 speed
+
+   ld sp,(__sp)
+   
    pop hl
    exx
    pop iy
    
    ld hl,(__return_status)
-
-   include "../crt_exit_eidi.inc"
 
    ; If you exit with carry set and A<>0, the corresponding error code will be printed in BASIC.
    ; If carry set and A=0, HL should be pointing to a custom error message (with last char +$80 as END marker).
@@ -628,7 +935,7 @@ error_nextos:
 ;; BASIC ERROR ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-__dotn_basic_error_intercept:
+__basic_error_intercept:
 
    ; basic error has occurred during a rst $10 or rst $18
    ; must free allocated pages and close open files
@@ -645,13 +952,214 @@ __dotn_basic_error_intercept:
    ld hl,__ESX_ENONSENSE
    jp error_basic
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; TURBO MODE ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; speed up the whole load process by going 14MHz
+
+; must restore the speed set by the user before starting the
+; program and before returning
+
+turbo_save:
+
+   ld bc,__IO_NEXTREG_REG
+   
+   ld a,__REG_TURBO_MODE
+   out (c),a
+   
+   inc b
+   
+   in a,(c)
+   ld (__turbo_save),a
+   
+   ret
+
+turbo_restore:
+
+   ld bc,__IO_NEXTREG_REG
+   
+   ld a,__REG_TURBO_MODE
+   out (c),a
+   
+   inc b
+   
+   ld a,(__turbo_save)
+   out (c),a
+   
+   ret
+
+turbo_14:
+
+   ld bc,__IO_NEXTREG_REG
+
+   ld a,__REG_TURBO_MODE
+   out (c),a
+   
+   inc b
+   
+   ld a,__RTM_14MHZ
+   out (c),a
+   
+   ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ALLOCATION UTILITIES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; load using mmu3
+
+load_using_mmu3:
+
+   jr c, load_restore_mmu3     ; carry set indicates restore page
+
+load_set_mmu3:
+
+   ld hl,0x6000                ; start of mmu3
+   
+   ld a,e                      ; physical page
+   mmu3 a
+   
+   ret
+
+load_restore_mmu3:
+
+   ld a,(__z_saved_mmu_state + 3)
+   mmu3 a
+   
+   ret
+
+;; load using mmu7
+
+load_using_mmu7:
+
+   jr c, load_restore_mmu7     ; carry set indicates restore page
+
+load_set_mmu7:
+
+   ld hl,0xe000                ; start of mmu7
+   
+   ld a,e                      ; physical page
+   mmu7 a
+   
+   ret
+
+load_restore_mmu7:
+
+   ld a,(__z_saved_mmu_state + 7)
+   mmu7 a
+   
+   ret
+
+;; divmmc loader
+
+IF __DOTN_LAST_DIVMMC >= 0
+
+load_divmmc_begin:
+
+   in a,(__IO_DIVIDE_CONTROL)
+   push af                     ; save current divmmc control
+   
+   ld a,e
+   or __IDC_CONMEM
+   
+   out (__IO_DIVIDE_CONTROL),a ; map divide page to 0x2000 with esxdos in bottom 8k
+   
+   ld a,c                      ; file handle
+   ld hl,0x2000                ; destination address for load
+   
+   ld c,l
+   ld b,h                      ; length is 8k
+   
+   rst __ESX_RST_SYS
+   defb __ESX_F_READ
+   
+   ld l,a
+   ld h,0
+   
+   pop de
+
+   ld a,d
+   out (__IO_DIVIDE_CONTROL),a ; restore divmmc control
+   
+   ret c                       ; if read error
+   
+   ld hl,0x2000
+   sbc hl,bc
+   
+   ret z                       ; if full 8k loaded
+   
+   ld hl,__ESX_EIO             ; indicate io error
+   
+   scf
+   ret
+
+load_divmmc_end:
+
+ENDIF
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; error messages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-error_msg_nextos:
+IF CRT_CORE_VERSION
 
-   defm "Requires NextOS 128", 'k'+0x80
+   error_msg_core_version:
+   
+      defm "Requires Core v"
+
+      IF ((CRT_CORE_VERSION / 1000000) % 10)
+         defb (CRT_CORE_VERSION / 1000000) % 10 + '0'
+      ENDIF
+      
+         defb (CRT_CORE_VERSION / 100000) % 10 + '0'
+         defb '.'
+      
+      IF ((CRT_CORE_VERSION / 10000) % 10)
+         defb (CRT_CORE_VERSION / 10000) % 10 + '0'
+      ENDIF
+      
+         defb (CRT_CORE_VERSION / 1000) % 10 + '0'
+         defb '.'
+      
+      IF ((CRT_CORE_VERSION / 100) % 10)
+         defb (CRT_CORE_VERSION / 100) % 10 + '0'
+      ENDIF
+      
+      IF ((CRT_CORE_VERSION / 100) % 10) || ((CRT_CORE_VERSION / 10) % 10)
+         defb (CRT_CORE_VERSION / 10) % 10 + '0'
+      ENDIF
+      
+      defb CRT_CORE_VERSION % 10 + '0' + 0x80
+
+ENDIF
+
+IF NEXTOS_VERSION
+
+   error_msg_nextos:
+      
+      defm "Requires NextZXOS 128k v"
+         
+      IF ((NEXTOS_VERSION >> 12) & 0xf)
+         defb ((NEXTOS_VERSION >> 12) & 0xf) + '0'
+      ENDIF
+         
+         defb ((NEXTOS_VERSION >> 8) & 0xf) + '0'
+         defb '.'
+         
+      IF ((NEXTOS_VERSION >> 4) & 0xf)
+         defb ((NEXTOS_VERSION >> 4) & 0xf) + '0'
+      ENDIF
+         
+      defb (NEXTOS_VERSION & 0xf) + '0' + 0x80
+   
+ELSE
+   
+   error_msg_nextos:
+
+      defm "Requires NextZXOS 128", 'k'+0x80
+
+ENDIF
 
 error_msg_out_of_memory:
 
@@ -665,6 +1173,14 @@ error_msg_d_break:
 
    defm "D BREAK - no repea", 't'+0x80
 
+IF __DOTN_LAST_DIVMMC >= 0
+
+   error_msg_divmmc_out_of_memory:
+   
+      defm "4 Out of divmmc memor", 'y' + 0x80
+
+ENDIF
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -672,6 +1188,15 @@ error_msg_d_break:
 __command_line:   defw 0
 
 __sp:             defw 0
+
+__turbo_save:     defb 0
+
+IF __DOTN_LAST_DIVMMC >= 0
+
+   __sp_divmmc:   defw 0
+   __load_divmmc: defw 0
+
+ENDIF
 
 __return_status:  defw error_msg_nextos
 
@@ -681,28 +1206,12 @@ PUBLIC __z_saved_mmu_state
 __z_saved_bank_state:  defw 0
 __z_saved_mmu_state:   defs 8
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; contiguous section filled in by appmake
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; allocation variables filled in by appmake
 
-__appmake_handle:
+include(`crt_allocation_dotn.m4')
 
-PUBLIC __z_page_table_sz
-PUBLIC __z_page_extra_sz
-
-__z_page_table_sz:   defb DOTN_LAST_PAGE + 1  ; must be in this order
-__z_page_extra_sz:   defb DOTN_EXTRA_PAGES    ; must be in this order
-
-PUBLIC __z_alloc_table
-
-__z_alloc_table:     defs DOTN_LAST_PAGE + DOTN_EXTRA_PAGES + 1, 0xff
-
-PUBLIC __z_page_table
-PUBLIC __z_page_extra
-
-__z_page_table:      defs DOTN_LAST_PAGE + 1  ; must be in this order
-__z_page_extra:      defs DOTN_EXTRA_PAGES    ; must be in this order
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../clib_variables.inc"
 
