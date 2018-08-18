@@ -16,15 +16,12 @@
         SECTION code_clib
 	PUBLIC	ansi_attr
 
-	PUBLIC	vg5k_attr
+	EXTERN	__vg5k_attr
 	;PUBLIC	vg5k_inverse
 	
 
         SECTION bss_clib
 .vg5k_inverse	defb 0
-
-	SECTION	data_clib
-.vg5k_attr	defb 7		;White on black
 
 
         SECTION code_clib
@@ -33,14 +30,14 @@
         and     a
         jr      nz,noreset
         ld      a,7
-        ld      (vg5k_attr),a
+        ld      (__vg5k_attr),a
         ret
 .noreset
         cp      1
         jr      nz,nobold
-        ld      a,(vg5k_attr)
+        ld      a,(__vg5k_attr)
         or      @00001000
-        ld      (vg5k_attr),a
+        ld      (__vg5k_attr),a
         ret
 .nobold
         cp      2
@@ -48,37 +45,37 @@
         cp      8
         jr      nz,nodim
 .dim
-        ld      a,(vg5k_attr)
+        ld      a,(__vg5k_attr)
         and     @11110111
-        ld      (vg5k_attr),a
+        ld      (__vg5k_attr),a
         ret
 .nodim
         cp      4
         jr	nz,nounderline
-        ld      a,(vg5k_attr)	; Underline
+        ld      a,(__vg5k_attr)	; Underline
         or      @00001000
-        ld      (vg5k_attr),a
+        ld      (__vg5k_attr),a
         ret
 .nounderline
         cp      24
         jr	nz,noCunderline
-        ld      a,(vg5k_attr)	; Cancel Underline
+        ld      a,(__vg5k_attr)	; Cancel Underline
         and     @11110111
-        ld      (vg5k_attr),a
+        ld      (__vg5k_attr),a
         ret
 .noCunderline
         cp      5
         jr      nz,noblink
-        ld      a,(vg5k_attr)
+        ld      a,(__vg5k_attr)
         or      @00001000
-        ld      (vg5k_attr),a
+        ld      (__vg5k_attr),a
         ret
 .noblink
         cp      25
         jr      nz,nocblink
-        ld      a,(vg5k_attr)
+        ld      a,(__vg5k_attr)
         and     @11110111
-        ld      (vg5k_attr),a
+        ld      (__vg5k_attr),a
         ret
 .nocblink
         cp      7
@@ -89,9 +86,9 @@
         ld      a,1
         ld      (vg5k_inverse),a     ; inverse 1
 .attrswap
-        ld      a,(vg5k_attr)
+        ld      a,(__vg5k_attr)
         xor      @00001000
-        ld      (vg5k_attr),a
+        ld      (__vg5k_attr),a
         ret
 .noreverse
         cp      27
@@ -105,7 +102,7 @@
 .noCreverse
         cp      8
         jr      nz,noinvis
-        ld      a,(vg5k_attr)
+        ld      a,(__vg5k_attr)
         ld      (oldattr),a
         and     @1111
         ld      e,a
@@ -114,7 +111,7 @@
         rla
         rla
         or      e
-        ld      (vg5k_attr),a
+        ld      (__vg5k_attr),a
         ret
 .oldattr
         defb     0
@@ -122,7 +119,7 @@
         cp      28
         jr      nz,nocinvis
         ld      a,(oldattr)
-        ld      (vg5k_attr),a
+        ld      (__vg5k_attr),a
         ret
 .nocinvis
         cp      30
@@ -135,10 +132,10 @@
         and     7
 ;''''''''''''''''''''''
         ld      e,a
-        ld      a,(vg5k_attr)
+        ld      a,(__vg5k_attr)
         and     @11111000
         or      e
-        ld      (vg5k_attr),a
+        ld      (__vg5k_attr),a
 
 .nofore
         cp      40
@@ -151,10 +148,10 @@
         and     7
 ;''''''''''''''''''''''
         ld      e,a
-        ld      a,(vg5k_attr)
+        ld      a,(__vg5k_attr)
         and     @11111000
         or      e
-        ld      (vg5k_attr),a
+        ld      (__vg5k_attr),a
 ;
 ;
 .noback

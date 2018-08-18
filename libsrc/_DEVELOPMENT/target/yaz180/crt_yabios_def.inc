@@ -115,74 +115,74 @@ PUBLIC _asci0_init
 DEFC _asci0_init                     = $FAC2
 
 PUBLIC _asci0_flush_Rx_di
-DEFC _asci0_flush_Rx_di              = $FADB
+DEFC _asci0_flush_Rx_di              = $FADC
 
 PUBLIC _asci0_flush_Tx_di
-DEFC _asci0_flush_Tx_di              = $FAF3
+DEFC _asci0_flush_Tx_di              = $FAF4
 
 PUBLIC _asci0_reset
-DEFC _asci0_reset                    = $FB0B
+DEFC _asci0_reset                    = $FB0C
 
 PUBLIC _asci0_getc
-DEFC _asci0_getc                     = $FB15
+DEFC _asci0_getc                     = $FB16
 
 PUBLIC _asci0_peekc
-DEFC _asci0_peekc                    = $FB2B
+DEFC _asci0_peekc                    = $FB2C
 
 PUBLIC _asci0_pollc
-DEFC _asci0_pollc                    = $FB37
+DEFC _asci0_pollc                    = $FB38
 
 PUBLIC _asci0_putc
-DEFC _asci0_putc                     = $FB3F
+DEFC _asci0_putc                     = $FB40
 
 PUBLIC _asci1_init
-DEFC _asci1_init                     = $FBDE
+DEFC _asci1_init                     = $FBDF
 
 PUBLIC _asci1_flush_Rx_di
-DEFC _asci1_flush_Rx_di              = $FBF7
+DEFC _asci1_flush_Rx_di              = $FBF9
 
 PUBLIC _asci1_flush_Tx_di
-DEFC _asci1_flush_Tx_di              = $FC0F
+DEFC _asci1_flush_Tx_di              = $FC11
 
 PUBLIC _asci1_reset
-DEFC _asci1_reset                    = $FC27
+DEFC _asci1_reset                    = $FC29
 
 PUBLIC _asci1_getc
-DEFC _asci1_getc                     = $FC31
+DEFC _asci1_getc                     = $FC33
 
 PUBLIC _asci1_peekc
-DEFC _asci1_peekc                    = $FC47
+DEFC _asci1_peekc                    = $FC49
 
 PUBLIC _asci1_pollc
-DEFC _asci1_pollc                    = $FC53
+DEFC _asci1_pollc                    = $FC55
 
 PUBLIC _asci1_putc
-DEFC _asci1_putc                     = $FC5B
+DEFC _asci1_putc                     = $FC5D
 
 PUBLIC ide_read_sector
-DEFC ide_read_sector                 = $FDA1
+DEFC ide_read_sector                 = $FDA3
 
 PUBLIC ide_write_sector
-DEFC ide_write_sector                = $FDD1
+DEFC ide_write_sector                = $FDD3
 
 PUBLIC rhex
-DEFC rhex                            = $FE38
+DEFC rhex                            = $FE3A
 
 PUBLIC phexwd
-DEFC phexwd                          = $FE11
+DEFC phexwd                          = $FE13
 
 PUBLIC phex
-DEFC phex                            = $FE1B
+DEFC phex                            = $FE1D
 
 PUBLIC pchar
-DEFC pchar                           = $FE2E
+DEFC pchar                           = $FE30
 
 PUBLIC pstring
-DEFC pstring                         = $FDFE
+DEFC pstring                         = $FE00
 
 PUBLIC pnewline
-DEFC pnewline                        = $FE08
+DEFC pnewline                        = $FE0A
 
 PUBLIC _common1_phase_end
-DEFC _common1_phase_end              = $FE5E
+DEFC _common1_phase_end              = $FE60
 

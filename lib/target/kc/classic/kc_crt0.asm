@@ -36,7 +36,6 @@
 IF      !DEFINED_CRT_ORG_CODE
 	defc    CRT_ORG_CODE  = $1000
 ENDIF
-
         defc    CONSOLE_COLUMNS = 40
         defc    CONSOLE_ROWS = 32
 
