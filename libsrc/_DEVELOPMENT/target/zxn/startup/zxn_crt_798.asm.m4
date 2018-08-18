@@ -170,6 +170,13 @@ __Start:
    ENDIF
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; speed up the load process
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   call turbo_save             ; save current z80 speed
+   call turbo_14               ; speed up to 14MHz
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; save current mmu state
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
@@ -645,6 +652,12 @@ merge_cancel:
    include "../crt_set_interrupt_mode.inc"
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; restore original cpu speed
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   call turbo_restore
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; main
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -666,8 +679,6 @@ IF __crt_enable_commandline >= 1
 ENDIF
 
    call _main                  ; hl = return status
-
-   ; run exit stack
 
 error_basic:
 
@@ -728,8 +739,10 @@ custom_done:
 
 terminate:
 
+   call turbo_14               ; speed up to 14MHz
+
    ld (__return_status),hl
-   ld sp,DOTN_REGISTER_SP       ; stack to divmmc memory
+   ld sp,DOTN_REGISTER_SP      ; stack to divmmc memory
    
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; restore banked state
@@ -877,7 +890,11 @@ dealloc_cancel:
 
    include "../crt_exit_eidi.inc"
 
+   call turbo_restore          ; restore original z80 speed
+
 error_crt:
+
+   ; direct jumps here have not saved original z80 speed
 
    ld sp,(__sp)
    
@@ -926,6 +943,57 @@ __basic_error_intercept:
    
    ld hl,__ESX_ENONSENSE
    jp error_basic
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; TURBO MODE ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; speed up the whole load process by going 14MHz
+
+; must restore the speed set by the user before starting the
+; program and before returning
+
+turbo_save:
+
+   ld bc,__IO_NEXTREG_REG
+   
+   ld a,__REG_TURBO_MODE
+   out (c),a
+   
+   inc b
+   
+   in a,(c)
+   ld (__turbo_save),a
+   
+   ret
+
+turbo_restore:
+
+   ld bc,__IO_NEXTREG_REG
+   
+   ld a,__REG_TURBO_MODE
+   out (c),a
+   
+   inc b
+   
+   ld a,(__turbo_save)
+   out (c),a
+   
+   ret
+
+turbo_14:
+
+   ld bc,__IO_NEXTREG_REG
+
+   ld a,__REG_TURBO_MODE
+   out (c),a
+   
+   inc b
+   
+   ld a,__RTM_14MHZ
+   out (c),a
+   
+   ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ALLOCATION UTILITIES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1113,6 +1181,8 @@ __command_line:   defw 0
 
 __sp:             defw 0
 
+__turbo_save:     defb 0
+
 IF __DOTN_LAST_DIVMMC >= 0
 
    __sp_divmmc:   defw 0
@@ -1128,46 +1198,10 @@ PUBLIC __z_saved_mmu_state
 __z_saved_bank_state:  defw 0
 __z_saved_mmu_state:   defs 8
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; contiguous section filled in by appmake
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; allocation variables filled in by appmake
 
-PUBLIC __appmake_handle
-
-__appmake_handle:
-
-PUBLIC __z_page_sz
-PUBLIC __z_extra_sz
-
-__z_page_sz:             defb __DOTN_LAST_PAGE + 1  ; must be in this order
-__z_extra_sz:            defb __DOTN_NUM_EXTRA      ; must be in this order
-
-PUBLIC __z_page_alloc_table
-PUBLIC __z_extra_alloc_table
-
-__z_page_alloc_table:    defs __DOTN_LAST_PAGE + 1, 0xff  ; must be in this order
-__z_extra_alloc_table:   defs __DOTN_NUM_EXTRA, 0xfe      ; must be in this order
-
-PUBLIC __z_page_table
-PUBLIC __z_extra_table
-
-__z_page_table:          defs __DOTN_LAST_PAGE + 1, 0xff  ; must be in this order
-__z_extra_table:         defs __DOTN_NUM_EXTRA            ; must be in this order
-
-IF __DOTN_LAST_DIVMMC >= 0
-
-   PUBLIC __z_divmmc_sz
-
-   __z_div_sz:           defb __DOTN_LAST_DIVMMC + 1
-
-   PUBLIC __z_div_alloc_table
-
-   __z_div_alloc_table:  defs __DOTN_LAST_DIVMMC + 1, 0xff
-
-   PUBLIC __z_div_table
-
-   __z_div_table:        defs __DOTN_LAST_DIVMMC + 1, 0xff
-
-ENDIF
+include(`crt_allocation_dotn.m4')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
