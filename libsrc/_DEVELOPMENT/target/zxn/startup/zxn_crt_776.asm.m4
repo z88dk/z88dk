@@ -178,6 +178,33 @@ __Start:
    ENDIF
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; reserve space for divmmc loader
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   IF __DOTN_LAST_DIVMMC >= 0
+
+      defc DIVMMC_BUFSZ = 64
+      
+      ld bc,load_divmmc_end - load_divmmc_begin + DIVMMC_BUFSZ
+      
+      rst __ESX_RST_ROM
+      defw __ROM3_BC_SPACES
+
+      ld hl,load_divmmc_begin
+      ld bc,load_divmmc_end - load_divmmc_begin
+
+      ld (__load_divmmc),de    ; address of divmmc load function
+
+      ldir                     ; copy load function to final location
+      
+      ld (__load_buffer),de    ; address of load buffer
+
+      in a,(__IO_DIVIDE_CONTROL)
+      ld (__divide_control),a  ; save esxdos divmmc control
+
+   ENDIF
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; speed up the load process
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -364,26 +391,7 @@ alloc_cancel:
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    IF __DOTN_LAST_DIVMMC >= 0
-   
-      ld (__sp_divmmc),sp      ; save stack position
-      
-      ld a,c                   ; save file handle
-      
-      ld hl,load_divmmc_begin - load_divmmc_end
-      add hl,sp
-      
-      ld sp,hl                 ; make room on stack for divmmc load function
-      
-      ld (__load_divmmc),hl    ; save location of divmmc loader on stack
-      ex de,hl                 ; de = destination of divmmc load function
-      
-      ld hl,load_divmmc_begin
-      ld bc,load_divmmc_end - load_divmmc_begin
-      
-      ldir                     ; copy divmmc load function to stack
 
-      ld c,a                   ; c = file handle
-      
       ld a,(__z_div_sz)        ; num divmmc pages
       
       or a
@@ -482,8 +490,6 @@ alloc_cancel:
       djnz div_alloc_loop
       
    div_alloc_cancel:
-   
-      ld sp,(__sp_divmmc)
 
    ENDIF
 
@@ -1055,43 +1061,74 @@ load_restore_mmu7:
 
 IF __DOTN_LAST_DIVMMC >= 0
 
+   EXTERN l_ret
+
 load_divmmc_begin:
 
-   in a,(__IO_DIVIDE_CONTROL)
-   push af                     ; save current divmmc control
-   
    ld a,e
    or __IDC_CONMEM
    
-   out (__IO_DIVIDE_CONTROL),a ; map divide page to 0x2000 with esxdos in bottom 8k
+   ld b,8192 / DIVMMC_BUFSZ
    
+   ld de,0x2000
+
+__load_divmmc_loop:
+
+   ;  a = target divmmc page
+   ;  b = loop count
+   ;  c = file handle
+   ; de = destination address in divmmc
+   
+   push af
+   push bc
+
+   push af
+   push de
+
+   ;; load fragment into buffer
+
    ld a,c                      ; file handle
-   ld hl,0x2000                ; destination address for load
    
-   ld c,l
-   ld b,h                      ; length is 8k
-   
+   ld hl,__load_buffer
+   ld bc,DIVMMC_BUFSZ
+
    rst __ESX_RST_SYS
    defb __ESX_F_READ
+
+   pop de
    
    ld l,a
    ld h,0
    
-   pop de
+   jp c, l_ret - 3             ; if read error
 
-   ld a,d
-   out (__IO_DIVIDE_CONTROL),a ; restore divmmc control
-   
-   ret c                       ; if read error
-   
-   ld hl,0x2000
+   ld hl,DIVMMC_BUFSZ
    sbc hl,bc
    
-   ret z                       ; if full 8k loaded
-   
-   ld hl,__ESX_EIO             ; indicate io error
-   
+   ld hl,__ESX_EIO
    scf
+   jp nz, l_ret - 3            ; if full amount not read
+
+   pop af
+   
+   ;; copy to destination divmmc page
+
+   out (__IO_DIVIDE_CONTROL),a ; map destination divmmc page
+   
+   ld hl,__load_buffer
+   ld bc,DIVMMC_BUFSZ
+   
+   ldir
+   
+   ld a,(__divide_control)
+   out (__IO_DIVIDE_CONTROL),a ; restore esxdos divmmc page
+   
+   ;; loop until done
+   
+   pop bc
+   pop af
+
+   djnz __load_divmmc_loop
    ret
 
 load_divmmc_end:
@@ -1163,11 +1200,11 @@ ENDIF
 
 error_msg_out_of_memory:
 
-   defm "4 Out of memor", 'y'+0x80
+   defm "4 Out of page memor", 'y'+0x80
 
 error_msg_malformed_alloc:
 
-   defm "Alloc Table Malforme", 'd'+0x80
+   defm "Alloc table malforme", 'd'+0x80
 
 error_msg_d_break:
 
@@ -1193,8 +1230,9 @@ __turbo_save:     defb 0
 
 IF __DOTN_LAST_DIVMMC >= 0
 
-   __sp_divmmc:   defw 0
-   __load_divmmc: defw 0
+   __load_divmmc:     defw 0
+   __load_buffer:     defw 0
+   __divide_control:  defb 0
 
 ENDIF
 
