@@ -55,7 +55,7 @@
 #define __ENV_TMPMAX  0xffff
 #define __ENV_TMPMAX_TRY  16
 
-#define __ENV_BINDIR  "c:/bin"
+#define __ENV_BINDIR  "c:/dot"
 #define __ENV_SYSDIR  "c:/sys"
 
 #undef  __SPECTRUM
@@ -72,7 +72,7 @@
 
 #define __USE_SYSVAR  0
 
-#define __USE_ZXN_OPCODES  0
+#define __USE_ZXN_OPCODES  0xff
 
 #define __USE_ZXN_OPCODES_NEXTREG  1
 #define __USE_ZXN_OPCODES_MLT  2
@@ -2582,6 +2582,7 @@
 
 
 
+#define __ROM3_BC_SPACES  0x0030
 #define __ROM3_MAKE_ROOM  0x1655
 #define __ROM3_RECLAIM_2  0x19e8
 

@@ -51,7 +51,7 @@ defc __ENV_LTMPNAM = 15
 defc __ENV_TMPMAX = 0xffff
 defc __ENV_TMPMAX_TRY = 16
 
-; define(`__ENV_BINDIR', c:/bin)
+; define(`__ENV_BINDIR', c:/dot)
 ; define(`__ENV_SYSDIR', c:/sys)
 
 defc __SPECTRUM = 16
@@ -67,7 +67,7 @@ defc __USE_SPECTRUM_128_SECOND_DFILE = 0
 
 defc __USE_SYSVAR = 0
 
-defc __USE_ZXN_OPCODES = 0
+defc __USE_ZXN_OPCODES = 0xff
 
 defc __USE_ZXN_OPCODES_NEXTREG = 1
 defc __USE_ZXN_OPCODES_MLT = 2
@@ -2590,6 +2590,7 @@ defc __REG_DEBUG = 0xff
 
 
 
+defc __ROM3_BC_SPACES = 0x0030
 defc __ROM3_MAKE_ROOM = 0x1655
 defc __ROM3_RECLAIM_2 = 0x19e8
 
