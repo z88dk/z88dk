@@ -27,7 +27,7 @@ define(`__ENV_LTMPNAM', eval(len(__ENV_TMPDIR)+1+7+1))  # TMPDIR/tmpXXXX include
 define(`__ENV_TMPMAX', 0xffff)                      # max number of unique temp files that can be created
 define(`__ENV_TMPMAX_TRY', 16)                      # max number of attempts to create unique temp file in one call
 
-define(`__ENV_BINDIR', `c:/bin')                    # location of dot commands
+define(`__ENV_BINDIR', `c:/dot')                    # location of dot commands
 define(`__ENV_SYSDIR', `c:/sys')                    # location of system files
 
 # Compatible Spectrum model
@@ -54,7 +54,7 @@ define(`__USE_SYSVAR', 0)
 # Use Extended Opcodes
 # (not applied yet)
 
-define(`__USE_ZXN_OPCODES', 0)
+define(`__USE_ZXN_OPCODES', 0xff)
 
 define(`__USE_ZXN_OPCODES_NEXTREG', 1)
 define(`__USE_ZXN_OPCODES_MLT', 2)

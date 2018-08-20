@@ -67,7 +67,15 @@ error_ramtop:
 
 esxdos_dtx_filename:
 
+IF __NEXTOS_DOT_COMMAND
+
+   defm __ENV_BINDIR, '/extra/'
+
+ELSE
+
    defm "/bin/extra/"
+
+ENDIF
 
 __z_dtx_filename:
 
