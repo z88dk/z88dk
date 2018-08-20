@@ -471,6 +471,23 @@ IF !DEFINED_fputc_cons
         ENDIF
 ENDIF
 
+IF !DEFINED_getk
+   IF !DEFINED_fgetc_cons
+      IF TAR__fgetc_cons_inkey
+          EXTERN fgetc_cons_inkey
+          EXTERN getk_inkey
+          PUBLIC fgetc_cons
+          PUBLIC _fgetc_cons
+          PUBLIC getk
+          PUBLIC _getk
+          defc fgetc_cons = fgetc_cons_inkey
+          defc _fgetc_cons = fgetc_cons_inkey
+          defc getk = getk_inkey
+          defc _getk = getk_inkey
+      ENDIF
+   ENDIF
+ENDIF
+
 
 
 IF CONSOLE_COLUMNS

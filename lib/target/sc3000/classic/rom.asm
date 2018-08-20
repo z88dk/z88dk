@@ -15,6 +15,7 @@
 	defc    CRT_ORG_CODE  = ROM_Start
         defc    TAR__register_sp = Stack_Top
         defc    TAR__clib_exit_stack_size = 0
+        defc    TAR__fgetc_cons_inkey = 1
 	defc	__CPU_CLOCK = 3580000
 	INCLUDE	"crt/classic/crt_rules.inc"
 
