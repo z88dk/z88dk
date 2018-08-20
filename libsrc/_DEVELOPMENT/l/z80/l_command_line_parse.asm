@@ -57,15 +57,35 @@ l_command_line_parse:
    ; ix = return address
 
    ld e,b
+   ld d,b                      ; d = quote indicator
    
-   ld a,c
-   or a
+   inc c
+   dec c
+
    jr z, generate_argv         ; if there is no command line
 
 find_end:
 
    ld a,(hl)
+
+   inc d
+   dec d
    
+   jr z, outside_quote
+
+inside_quote:
+
+   cp d
+   jr nz, find_cont            ; if end quote not seen
+
+   ld d,b                      ; quote ended
+   jr find_cont
+
+outside_quote:
+
+   cp '"'
+   jr z, start_quote
+
    cp '|'
    jr z, redirector
    
@@ -89,6 +109,10 @@ redirector:
    
    jr found_end
 
+start_quote:
+
+   ld d,a
+
 find_cont:
 
    inc e
@@ -103,6 +127,7 @@ found_end:
    
    ; hl = & last char in command line
    ; bc = number of chars in command line <= 128
+   ;  d = quote indicator
    ; hl'= & redirector
    ; bc'= num chars remaining in redirector
    ; ix = return address
@@ -111,9 +136,31 @@ found_end:
 
    ld e,b                      ; e = word_count = 0
 
+   inc d
+   dec d
+
+   jr nz, copy_word            ; if in an unterminated quote
+
 skip_trailing_ws:
 
    ld a,(hl)
+
+   cp '"'
+   jr nz, skip_ws_cont
+
+skip_ws_quote:
+
+   ld d,a
+
+   inc e                       ; word_count++
+
+   push bc
+   inc sp                      ; zero terminate quoted string
+
+   jr copy_word_loop 
+
+skip_ws_cont:
+
    call asm_isspace
    jr c, copy_word             ; not space, end of word found
    
@@ -128,13 +175,12 @@ copy_word:
 
    inc e                       ; word_count++
    
-   ld d,e
-   ld e,a                      ; e = char
-   ld a,d                      ; a = word_count
-   ld d,b                      ; d = '\0'
+   ld a,c
    
-   push de                     ; zero terminate and push last char of word
-   ld e,a                      ; e = word_count
+   ld c,(hl)
+   push bc                     ; zero terminate and push last char of word
+   
+   ld c,a
    
 copy_word_loop:
 
@@ -142,9 +188,32 @@ copy_word_loop:
    jp po, generate_argv        ; if reached beginning of command line
 
    ld a,(hl)
+   
+   inc d
+   dec d
+   
+   jr z, out_quote
+
+in_quote:
+
+   cp d
+   jr nz, put_quote_char
+   
+   ld d,b
+   jr word_loop
+
+out_quote:
+
+   cp '"'
+   jr z, skip_ws_quote
+
+out_quote_cont:
+
    call asm_isspace
    jr nc, word_loop            ; if next char is space, word ends
-   
+
+put_quote_char:
+
    push af
    inc sp                      ; copy char to stack
    
