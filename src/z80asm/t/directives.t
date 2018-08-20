@@ -90,8 +90,9 @@ z80asm(
 z80asm(
 	asm		=> " defb 1 \n defs 3 \n defb 2",
 	bin		=> pack("C*", 1, 253, 253, 253, 2),
-	options	=> '-b --filler=\\$FD'
+	options	=> ($^O eq 'MSWin32') ? "-b --filler=\$FD" : '-b --filler=\\$FD',	# Note: different quoting
 );
+
 z80asm(
 	asm		=> " defb 1 \n defs 3 \n defb 2",
 	bin		=> pack("C*", 1, 252, 252, 252, 2),
