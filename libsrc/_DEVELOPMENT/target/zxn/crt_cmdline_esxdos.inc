@@ -45,7 +45,7 @@
    
       ; parse into argc,argv
       
-      IF __NEXTOS_DOT_COMMAND
+      IF __crt_enable_commandline_ex & 0x80
 
          include "crt_cmdline_esx_argv.inc"
       

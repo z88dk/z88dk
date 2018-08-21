@@ -72,7 +72,7 @@ __Start:
    ;; use full command line if nextos
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   IF __NEXTOS_DOT_COMMAND
+   IF __crt_enable_commandline_ex & 0x80
    
       ld l,c
       ld h,b

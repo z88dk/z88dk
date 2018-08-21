@@ -64,7 +64,15 @@ __Start:
 
    IF __crt_enable_commandline >= 2
    
-      ld (__command_line),bc
+      IF __crt_enable_commandline_ex & 0x80
+
+         ld (__command_line),bc
+      
+      ELSE
+      
+         ld (__command_line),hl
+      
+      ENDIF
       
    ENDIF
    
