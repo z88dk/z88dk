@@ -82,7 +82,7 @@ Z88DK_FOR(`LOOP', `0', `15',
    ENDIF
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ; NextOS dotn and exe
+   ; NextOS dotn
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    ;; temporary stack location in divmmc
