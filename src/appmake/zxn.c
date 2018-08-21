@@ -74,7 +74,6 @@ static char tap = 0;            // .tap tape
 static char sna = 0;            // .sna 48k/128k snapshot
 static char dot = 0;            //  esxdos dot command
 static char dotn = 0;           //  nextos dot command
-static char universal_dot = 0;  //  nextos universal dot command
 static char zxn = 0;            // .zxn full size memory executable
 static char bin = 0;            // .bin output binaries with banks correctly merged
 static char nex = 0;            // .nex format
@@ -123,7 +122,6 @@ option_t zxn_options[] = {
 
     {  0,  "dot",      "Make esxdos dot command instead of .tap", OPT_BOOL, &dot },
     {  0,  "dotn",     "Make nextos dot command instead of .tap", OPT_BOOL, &dotn },
-    {  0,  "universal-dot", "Make universal dot command instead of .tap\n", OPT_BOOL, &universal_dot },
 
     {  0,  "audio",     "Create also a WAV file",    OPT_BOOL,  &zxt.audio },
     {  0,  "ts2068",    "TS2068 BASIC relocation (if possible)",  OPT_BOOL,  &zxt.ts2068 },
@@ -167,11 +165,6 @@ int zxn_exec(char *target)
 
     if (zxc.help)
         return ret;
-
-    // universal dot command
-
-    if (universal_dot)
-        return zxn_universal_dot(&zxc);
 
     // filenames
 
