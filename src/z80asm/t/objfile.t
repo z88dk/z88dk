@@ -12,12 +12,12 @@
 use strict;
 use warnings;
 use Test::More;
-use Test::Differences; 
+use Test::Differences;
 use Capture::Tiny::Extended 'capture';
 require './t/test_utils.pl';
 
 use Config;
-$ENV{PATH} = join($Config{path_sep}, 
+$ENV{PATH} = join($Config{path_sep},
 			".",
 			"../z80nm",
 			"../../bin",
@@ -40,7 +40,7 @@ sub t_z80nm {
 	eq_or_diff_text $stderr, "", "$line stderr";
 	ok !!$return == !!0, "$line retval";
 
-		
+
 	if ($stdout ne $expected_out) {
 		my($file, $line) = (caller)[1,2];
 		my $out = "test.out";
@@ -75,7 +75,7 @@ unlink_testfiles();
 write_file(asm_file(), "nop");
 t_z80asm_capture(asm_file(), "", "", 0);
 $obj = read_binfile(o_file());
-t_binary($obj, objfile(NAME => 'test', 
+t_binary($obj, objfile(NAME => 'test',
 					   CODE => [["", -1, 1, "\x00"]]));
 t_z80nm(o_file(), <<'END');
 Object  file test.o at $0000: Z80RMF11
@@ -89,7 +89,7 @@ unlink_testfiles();
 write_file(asm_file(), "nop\n" x 0x10000);
 t_z80asm_capture(asm_file(), "", "", 0);
 $obj = read_binfile(o_file());
-t_binary($obj, objfile(NAME => 'test', 
+t_binary($obj, objfile(NAME => 'test',
 					   CODE => [["", -1, 1, "\x00" x 0x10000]]));
 t_z80nm(o_file(), <<'END');
 Object  file test.o at $0000: Z80RMF11
@@ -4198,7 +4198,7 @@ unlink_testfiles();
 write_file(asm_file(), "org 0 \n nop");
 t_z80asm_capture(asm_file(), "", "", 0);
 $obj = read_binfile(o_file());
-t_binary($obj, objfile(NAME => 'test', 
+t_binary($obj, objfile(NAME => 'test',
 					   CODE => [["", 0, 1, "\x00"]]));
 t_z80nm(o_file(), <<'END');
 Object  file test.o at $0000: Z80RMF11
@@ -4211,7 +4211,7 @@ unlink_testfiles();
 write_file(asm_file(), "org 0xFFFF \n nop");
 t_z80asm_capture(asm_file(), "", "", 0);
 $obj = read_binfile(o_file());
-t_binary($obj, objfile(NAME => 'test', 
+t_binary($obj, objfile(NAME => 'test',
 					   CODE => [["", 0xFFFF, 1, "\x00"]]));
 t_z80nm(o_file(), <<'END');
 Object  file test.o at $0000: Z80RMF11
@@ -4463,7 +4463,10 @@ t_binary(read_binfile(bin_file()), "\xC3\x00\x00");
 #------------------------------------------------------------------------------
 unlink_testfiles();
 
-my $objs = "zobjfile.o lib/class.o lib/array.o errors.o error_func.o lib/str.o lib/strhash.o lib/list.o  ../common/fileutil.o ../common/strutil.o ../common/die.o ../common/objfile.o ../../ext/regex/regcomp.o ../../ext/regex/regerror.o ../../ext/regex/regexec.o ../../ext/regex/regfree.o scan.o options.o model.o module.o sym.o symtab.o lib/srcfile.o macros.o hist.o expr.o listfile.o codearea.o lib/dbg.o ../../ext/UNIXem/src/glob.o ../../ext/UNIXem/src/dirent.o";
+my $objs = "zobjfile.o lib/class.o lib/array.o errors.o error_func.o lib/str.o lib/strhash.o lib/list.o  ../common/fileutil.o ../common/strutil.o ../common/die.o ../common/objfile.o ../../ext/regex/regcomp.o ../../ext/regex/regerror.o ../../ext/regex/regexec.o ../../ext/regex/regfree.o scan.o options.o model.o module.o sym.o symtab.o lib/srcfile.o macros.o hist.o expr.o listfile.o codearea.o lib/dbg.o ";
+if ($^O eq 'MSWin32') {
+	  $objs .= "../../ext/UNIXem/src/glob.o ../../ext/UNIXem/src/dirent.o ";
+}
 
 # get init code except init() and main()
 my $init = <<'END';
@@ -4484,47 +4487,47 @@ t_compile_module($init, <<'END', $objs);
 	OFile *obj;
 	FILE	*file;
 	int 	code_size;
-	
+
 	errors_init();
 
 	code_size = atoi(argv[1]);
-	
-	TITLE("File not found, test mode");	
+
+	TITLE("File not found, test mode");
 	remove("test.o");
-	obj = OFile_test_file("test.o"); 
+	obj = OFile_test_file("test.o");
 	ASSERT( obj == NULL );
 
-	TITLE("File not found, read mode");	
+	TITLE("File not found, read mode");
 	remove("test.o");
 	obj = OFile_open_read("test.o");
 	ASSERT( obj == NULL );
 
-	TITLE("Invalid short file, test mode");	
+	TITLE("Invalid short file, test mode");
 	file = xfopen("test.o", "wb");
 	xfclose(file);
 	obj = OFile_test_file("test.o");
 	ASSERT( obj == NULL );
-	
-	TITLE("Invalid short file, read mode");	
+
+	TITLE("Invalid short file, read mode");
 	file = xfopen("test.o", "wb");
 	xfclose(file);
 	obj = OFile_open_read("test.o");
 	ASSERT( obj == NULL );
-	
-	TITLE("Invalid long file, test mode");	
+
+	TITLE("Invalid long file, test mode");
 	file = xfopen("test.o", "wb");
 	fprintf( file, "%100s", "" );		/* 100 spaces */
 	xfclose(file);
 	obj = OFile_test_file("test.o");
 	ASSERT( obj == NULL );
-	
-	TITLE("Invalid long file, read mode");	
+
+	TITLE("Invalid long file, read mode");
 	file = xfopen("test.o", "wb");
 	fprintf( file, "%100s", "" );		/* 100 spaces */
 	xfclose(file);
 	obj = OFile_open_read("test.o");
 	ASSERT( obj == NULL );
-	
+
 	TITLE("test1 Object file, read mode");
 	obj = OFile_open_read("test1.o");
 	ASSERT( obj != NULL );
@@ -4540,7 +4543,7 @@ t_compile_module($init, <<'END', $objs);
 	ASSERT( code_size ? (obj->code_ptr != -1) : (obj->code_ptr == -1));
 	OBJ_DELETE(obj);
 	ASSERT( obj == NULL );
-	
+
 	TITLE("test1 Object file, test mode");
 	obj = OFile_test_file("test1.o");
 	ASSERT( obj != NULL );
@@ -4556,11 +4559,11 @@ t_compile_module($init, <<'END', $objs);
 	ASSERT( code_size ? (obj->code_ptr != -1) : (obj->code_ptr == -1));
 	OBJ_DELETE(obj);
 	ASSERT( obj == NULL );
-	
+
 	TITLE("test1 Library file");
 	file = xfopen("test1.lib", "rb");
 	ASSERT( file != NULL );
-	obj = OFile_read_header(file, 16);	
+	obj = OFile_read_header(file, 16);
 	ASSERT( obj != NULL );
 	ASSERT( obj->file == file );
 	ASSERT( obj->start_ptr == 16 );
@@ -4574,15 +4577,15 @@ t_compile_module($init, <<'END', $objs);
 	ASSERT( code_size ? (obj->code_ptr != -1) : (obj->code_ptr == -1));
 	OBJ_DELETE(obj);
 	ASSERT( obj == NULL );
-	
-	TITLE("End");	
+
+	TITLE("End");
 END
 
 # write test object file
 for my $code_size (0, 1, 65536) {
 	my %code = $code_size ? (CODE => [["", -1, 1, "\x00" x $code_size]]) : ();
 	my $obj1 = objfile(NAME => "test1", %code);
-	write_binfile(o1_file(), $obj1); 
+	write_binfile(o1_file(), $obj1);
 	write_binfile(lib1_file(), libfile($obj1));
 
 	t_run_module([$code_size], '', <<'END', 0);

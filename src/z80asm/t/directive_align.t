@@ -108,7 +108,7 @@ unlink_testfiles();
 z80asm(<<'END', "-l -s -b -m", 0, "", "");
 	section code
 	nop
-	
+
 	section data
 	align 	16
 	defb	1, 2, 3, 4
@@ -128,7 +128,7 @@ unlink_testfiles();
 z80asm(<<'END', "-l -s -b -m --filler=0xFF", 0, "", "");
 	section code
 	nop
-	
+
 	section data
 	align 	16
 	defb	1, 2, 3, 4
@@ -141,14 +141,14 @@ z80asm(<<'END', "-l -s -b -m", 0, "", "");
 	section code
 	org 	0
 	nop
-	
+
 	section data
 	align 	16
 	org		0x100
 	defb	1, 2, 3, 4
 END
-check_bin_file("test_CODE.bin", pack("C*", 0));
-check_bin_file("test_DATA.bin", pack("C*", 1,2,3,4));
+check_bin_file("test_code.bin", pack("C*", 0));
+check_bin_file("test_data.bin", pack("C*", 1,2,3,4));
 
 unlink_testfiles();
 done_testing();

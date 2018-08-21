@@ -15,7 +15,7 @@ use File::Copy;
 use Time::HiRes 'sleep';
 use File::Path qw(make_path remove_tree);;
 use Capture::Tiny::Extended 'capture';
-use Test::Differences; 
+use Test::Differences;
 use Path::Tiny;
 require './t/test_utils.pl';
 
@@ -35,22 +35,22 @@ t_z80asm_capture(asm_file(), "",
 unlink_testfiles();
 t_z80asm_error('
 	binary "'.inc_file().'"
-	', 
+	',
 	"Error at file 'test.asm' line 2: cannot read file 'test.inc'",
 	"-l");
 
 unlink_testfiles();
 write_file(asm_file(), "nop");
-t_z80asm_capture("-b -ixxxx ".asm_file(), "", 
+t_z80asm_capture("-b -ixxxx ".asm_file(), "",
 		"Error: cannot read file 'xxxx.lib'\n".
 		"1 errors occurred during assembly\n",
 		1);
-	
+
 #------------------------------------------------------------------------------
-# error_expression 
+# error_expression
 unlink_testfiles();
-write_binfile(o_file(), objfile( NAME => "test", 
-								   CODE => [["", -1, 1, "\0\0"]], 
+write_binfile(o_file(), objfile( NAME => "test",
+								   CODE => [["", -1, 1, "\0\0"]],
 								   EXPR => [ ["C", "test.asm",1, "", 0, 0, "", "*+VAL"] ] ));
 t_z80asm_capture("-b -d ".o_file(),
 				 "",
@@ -69,7 +69,7 @@ write_file(asm_file(), <<'ASM');
 	ld	a, L_129
 	ld	a, G_129
 	ld	a, G0 - 129
-	
+
 ; Byte = -128
 	ld	a, L_128
 	ld	a, G_128
@@ -223,7 +223,7 @@ t_binary(read_binfile(bin_file()), pack("C*",
 for ([jr => chr(0x18)], [djnz => chr(0x10)])
 {
 	my($jump, $opcode) = @$_;
-		
+
 	t_z80asm(
 		asm		=> "$jump ASMPC+2-129",
 		err		=> "Error at file 'test.asm' line 1: integer '-129' out of range",
@@ -258,13 +258,13 @@ for ([jr => chr(0x18)], [djnz => chr(0x10)])
 		);
 
 		t_z80asm(
-			org		=> $org, 
+			org		=> $org,
 			asm		=> "$jump ASMPC+2+127",
 			bin		=> "$opcode\x7F",
 		);
 
 		t_z80asm(
-			org		=> $org, 
+			org		=> $org,
 			asm		=> "$jump label : defc label = ASMPC+127",
 			bin		=> "$opcode\x7F",
 		);
@@ -297,13 +297,13 @@ ok -f $lib;
 write_file(asm_file(), "EXTERN main \n call main");
 t_z80asm_capture("-b -i".$lib." ".asm_file(), "",
 		"Error at file 'test.asm' line 2: symbol 'main' not defined\n".
-		"1 errors occurred during assembly\n", 
+		"1 errors occurred during assembly\n",
 		1);
 
 #------------------------------------------------------------------------------
 # error_no_src_file
 unlink_testfiles();
-t_z80asm_capture("-b", "", 
+t_z80asm_capture("-b", "",
 		"Error: source filename missing\n".
 		"1 errors occurred during assembly\n", 1);
 
@@ -358,7 +358,7 @@ t_binary(read_binfile(bin_file()),
 
 write_file(asm_file(), "defs 65536, 0xAA");
 t_z80asm_capture(asm_file()." ".asm1_file(), "", "", 0);
-t_z80asm_capture("-d -b ".asm_file()." ".asm1_file(), "", 
+t_z80asm_capture("-d -b ".asm_file()." ".asm1_file(), "",
 	"Error: max. code size of 65536 bytes reached\n".
 	"1 errors occurred during assembly\n", 1);
 
@@ -382,7 +382,7 @@ write_file(asm_file(), "nop");
 t_z80asm_capture(asm_file()." -IllegalFilename", "",
 		"Error: illegal source filename '-IllegalFilename'\n".
 		"1 errors occurred during assembly\n", 1);
-		
+
 #------------------------------------------------------------------------------
 # error_org_redefined - tested in directives.t
 
@@ -412,8 +412,8 @@ write_file(o_file(), "not an object");
 sleep 0.500;
 write_file(asm_file(), "nop");
 t_z80asm_capture("-b -d ".asm_file(), "", "", 0);
-t_binary(read_binfile(o_file()), objfile(NAME => "test", 
-										   CODE => [["", -1, 1, "\x00"]], 
+t_binary(read_binfile(o_file()), objfile(NAME => "test",
+										   CODE => [["", -1, 1, "\x00"]],
 										   ));
 t_binary(read_binfile(bin_file()), "\x00");
 
@@ -423,11 +423,11 @@ write_file(o_file(), "not an object");
 sleep 0.500;
 write_file(asm_file(), "nop");
 t_z80asm_capture("-x".lib_file()." -d ".asm_file(), "", "", 0);
-t_binary(read_binfile(lib_file()), libfile(objfile(NAME => "test", 
+t_binary(read_binfile(lib_file()), libfile(objfile(NAME => "test",
 												   CODE => [["", -1, 1, "\x00"]])));
 unlink_testfiles();
-write_binfile(o_file(), objfile( NAME => "test", 
-								   CODE => [["", -1, 1, "\0\0"]], 
+write_binfile(o_file(), objfile( NAME => "test",
+								   CODE => [["", -1, 1, "\0\0"]],
 								   SYMBOLS => [ ["Z", "Z", "", 0, "ABCD", "", 0] ] ));
 t_z80asm_capture("-b -d ".o_file(),
 				 "",
@@ -479,7 +479,10 @@ t_binary(read_binfile("test.bin"), "\xFE\x10");
 #------------------------------------------------------------------------------
 unlink_testfiles();
 
-my $objs = "errors.o error_func.o scan.o lib/array.o lib/class.o lib/str.o lib/strhash.o lib/list.o  ../common/fileutil.o ../common/strutil.o ../common/die.o ../common/objfile.o ../../ext/regex/regcomp.o ../../ext/regex/regerror.o ../../ext/regex/regexec.o ../../ext/regex/regfree.o options.o model.o module.o sym.o symtab.o codearea.o expr.o listfile.o lib/srcfile.o macros.o hist.o lib/dbg.o ../../ext/UNIXem/src/glob.o ../../ext/UNIXem/src/dirent.o";
+my $objs = "errors.o error_func.o scan.o lib/array.o lib/class.o lib/str.o lib/strhash.o lib/list.o  ../common/fileutil.o ../common/strutil.o ../common/die.o ../common/objfile.o ../../ext/regex/regcomp.o ../../ext/regex/regerror.o ../../ext/regex/regexec.o ../../ext/regex/regfree.o options.o model.o module.o sym.o symtab.o codearea.o expr.o listfile.o lib/srcfile.o macros.o hist.o lib/dbg.o ";
+if ($^O eq 'MSWin32') {
+	  $objs .= "../../ext/UNIXem/src/glob.o ../../ext/UNIXem/src/dirent.o ";
+}
 
 # get init code except init() and main()
 my $init = <<'END';
@@ -494,7 +497,7 @@ t_compile_module($init, <<'END', $objs);
 #define check_count(e) if (get_num_errors() != e) ERROR;
 
 	check_count(0);
-	
+
 	warn("Information\n");
 	info_total_errors();
 	check_count(0);
@@ -509,7 +512,7 @@ t_compile_module($init, <<'END', $objs);
 
 	warn("File error not caught\n");
 	error_read_file("file.asm");
-	warn("end\n");	
+	warn("end\n");
 END
 
 t_run_module([], '', <<'ERR', 0);
@@ -535,16 +538,16 @@ t_compile_module($init, <<'END', $objs);
 	set_error_line(line); \
 	error_syntax(); \
 	check_count(_count + 1)
-	
+
 #define DOUBLE(x) #x #x
 	int _count;
 
 	check_count(0);
-	
+
 	warn("File error\n");
 	error_read_file("file.asm");
 	check_count(1);
-	
+
 	SYNTAX(	NULL,		NULL,	0 );
 	SYNTAX(	NULL,		NULL,	1 );
 	SYNTAX(	NULL,		"TEST",	0 );
@@ -558,26 +561,26 @@ t_compile_module($init, <<'END', $objs);
 	check_count(9);
 	error_syntax();
 	check_count(10);
-	
+
 	reset_error_count();
 	check_count(0);
 
 	open_error_file("test1.err");
 	close_error_file();
-	
+
 	error_syntax();
-	
+
 	open_error_file("test2.err");
 	error_syntax();
 	close_error_file();
-	
+
 	open_error_file("test3.err");
 	error_syntax();
-	
+
 	open_error_file("test2.err");
 	error_syntax();
 	close_error_file();
-	
+
 END
 
 t_run_module([], '', <<'ERR', 0);
