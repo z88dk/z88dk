@@ -8,12 +8,16 @@
 ;; to your local directory, modify it there, and name it the same
 ;; in the directory that the compile command is invoked from.  The
 ;; dotn command will preferentially use your file instead of this one.
-;; Be sure to remove the definition of "__appmake_handle" - with this
-;; definition removed, appmake will not alter your tables.
+;; Be sure to replace the definition of "__appmake_handle" with
+;; "__user_handle" - this will ensure appmake does not change the tables.
 
 PUBLIC __appmake_handle
 
 __appmake_handle:
+
+; PUBLIC __user_handle
+;
+; __user_handle:
 
 PUBLIC __z_page_sz
 PUBLIC __z_extra_sz
