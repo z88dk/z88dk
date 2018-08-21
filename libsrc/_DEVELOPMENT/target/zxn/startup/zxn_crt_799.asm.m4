@@ -256,13 +256,13 @@ end_select:
    jr z, alloc_cancel          ; if no pages are being allocated
 
    ld hl,__z_page_alloc_table
-   ld e,0                      ; current page
+   ld de,__z_page_table
    
 alloc_loop:
 
    ;  b = num pages
    ;  c = file handle
-   ;  e = current physical page
+   ; de = logical table position
    ; hl = alloc table position
    ; ix = mmu function
 
@@ -281,7 +281,7 @@ alloc_error:
 
 alloc_continue:
 
-   push de                     ; save current physical page
+   push de                     ; save logical table position
 
    bit 0,a
    jr nz, alloc_load           ; if allocation not requested
@@ -311,6 +311,10 @@ alloc_continue:
    
    ld a,(hl)                   ; a = allocation flag
    ld (hl),e                   ; write allocated bank into allocation table
+   
+   ex (sp),hl
+   ld (hl),e                   ; write allocated bank into logical table
+   ex (sp),hl
 
 alloc_load:
 
@@ -319,18 +323,21 @@ alloc_load:
    ;  a = alloc flag
    ;  b = num pages
    ;  c = file handle
-   ;  e = target physical page
    ; hl = alloc table position
    ; ix = mmu function
-   ; stack = current physical page
+   ; stack = logical table position
 
    and 0x02
    jr nz, alloc_no_load        ; if load not requested
 
+   pop de
+   push de                     ; de = logical table position
+   
    push bc                     ; save num pages, file handle
    push hl                     ; save alloc table
    push ix                     ; save mmu function
-   
+
+   ld a,(de)                   ; a = destination physical page
    call l_jpix                 ; carry is reset to page in target page
 
    ld a,c                      ; file handle
@@ -365,12 +372,12 @@ alloc_not_used:
 
    ;  b = num pages
    ;  c = file handle
-   ;  e = current physical page
+   ; de = logical table position
    ; hl = alloc table position
    ; ix = mmu function
 
    inc hl
-   inc e
+   inc de
 
    djnz alloc_loop
 
@@ -390,13 +397,13 @@ alloc_cancel:
       ld b,a
       
       ld hl,__z_div_alloc_table
-      ld e,0                   ; current physical page
+      ld de,__z_div_table
       
    div_alloc_loop:
    
       ;  b = num pages
       ;  c = file handle
-      ;  e = current physical page
+      ; de = div logical table position
       ; hl = div alloc table position
    
       ld a,(hl)
@@ -409,7 +416,7 @@ alloc_cancel:
       
    div_alloc_continue:
    
-      push de                  ; save current physical page
+      push de                  ; save logical table position
       
       bit 0,a
       jr nz, div_alloc_load    ; if allocation not requested
@@ -438,6 +445,10 @@ alloc_cancel:
       ld a,(hl)                ; a = allocation flag
       ld (hl),e                ; write allocated bank into allocation table
       
+      ex (sp),hl
+      ld (hl),e                ; write allocated bank into logical table
+      ex (sp),hl
+      
    div_alloc_load:
    
       ;; load
@@ -445,16 +456,19 @@ alloc_cancel:
       ;  a = alloc flag
       ;  b = num pages
       ;  c = file handle
-      ;  e = target physical page
       ; hl = alloc table position
-      ; stack = current physical page
+      ; stack = logical table position
       
       and 0x02
       jr nc, div_alloc_no_load ; if load not requested
       
+      pop de
+      push de                  ; de = logical table position
+      
       push bc                  ; save num pages, file handle
       push hl                  ; save alloc table
-      
+
+      ld a,(de)                ; physical divmmc page to load into      
       ld hl,(__load_divmmc)    ; address of divmmc loader on stack
 
       call l_jphl
@@ -471,11 +485,11 @@ alloc_cancel:
    
       ;  b = num pages
       ;  c = file handle
-      ;  e = current physical page
+      ; de = logical table position
       ; hl = alloc table position
       
       inc hl
-      inc e
+      inc de
       
       djnz div_alloc_loop
       
@@ -483,75 +497,6 @@ alloc_cancel:
 
    ENDIF
 
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ;; merge allocated table into page table
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-   ld hl,(__z_page_sz)
-   
-   ld a,l
-   add a,h
-   ld b,a
-
-   jr z, merge_cancel
-   
-   ld hl,__z_page_alloc_table
-   ld de,__z_page_table
-
-merge_loop:
-
-   ld a,(hl)
-   
-   cp __ZXNEXT_LAST_PAGE + 1
-   jr nc, merge_no
-
-   ld (de),a
-
-merge_no:
-
-   inc de
-   inc hl
-   
-   djnz merge_loop
-
-merge_cancel:
-
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ;; merge allocated table into divmmc table
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-   IF __DOTN_LAST_DIVMMC >= 0
-   
-      ld a,(__z_div_sz)
-      
-      or a
-      jr z, div_merge_cancel
-      
-      ld b,a
-      
-      ld hl,__z_div_alloc_table
-      ld de,__z_div_table
-      
-   div_merge_loop:
-   
-      ld a,(hl)
-      
-      cp __ZXNEXT_LAST_DIVMMC + 1
-      jr nc, div_merge_no
-      
-      ld (de),a
-   
-   div_merge_no:
-   
-      inc de
-      inc hl
-      
-      djnz div_merge_loop
-   
-   div_merge_cancel:
-
-   ENDIF
-   
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; parse command line to divmmc memory
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1013,9 +958,7 @@ load_set_mmu3:
 
    ld hl,0x6000                ; start of mmu3
    
-   ld a,e                      ; physical page
    mmu3 a
-   
    ret
 
 load_restore_mmu3:
@@ -1035,9 +978,7 @@ load_set_mmu7:
 
    ld hl,0xe000                ; start of mmu7
    
-   ld a,e                      ; physical page
    mmu7 a
-   
    ret
 
 load_restore_mmu7:
@@ -1055,7 +996,6 @@ IF __DOTN_LAST_DIVMMC >= 0
 
 load_divmmc_begin:
 
-   ld a,e
    or __IDC_CONMEM
    
    ld b,8192 / DIVMMC_BUFSZ
