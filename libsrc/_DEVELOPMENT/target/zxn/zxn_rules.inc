@@ -100,10 +100,10 @@ Z88DK_FOR(`LOOP', `0', `15',
    ENDIF
    
    IF DOTN_LAST_PAGE < 11
-      defc __DOTN_LAST_PAGE = 11
+      error "DOTN_LAST_PAGE must be at least 11"
    ELSE
       IF DOTN_LAST_PAGE > __ZXNEXT_LAST_PAGE
-         defc __DOTN_LAST_PAGE = __ZXNEXT_LAST_PAGE
+         error "DOTN_LAST_PAGE cannot exceed 223"
       ELSE
          defc __DOTN_LAST_PAGE = DOTN_LAST_PAGE
       ENDIF
@@ -118,7 +118,7 @@ Z88DK_FOR(`LOOP', `0', `15',
    ENDIF
    
    IF DOTN_LAST_DIVMMC > __ZXNEXT_LAST_DIVMMC
-      defc __DOTN_LAST_DIVMMC = __ZXNEXT_LAST_DIVMMC
+      error "DOTN_LAST_DIVMMC cannot exceed 15"
    ELSE
       defc __DOTN_LAST_DIVMMC = DOTN_LAST_DIVMMC
    ENDIF
