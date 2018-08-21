@@ -58,24 +58,26 @@ error_esxdos_dtx:
 error_ramtop:
 
    defm "M RAMTOP no good ("
-   defb __MAIN_head / 10000 % 10 + '0'
-   defb __MAIN_head / 1000 % 10 + '0'
-   defb __MAIN_head / 100 % 10 + '0'
-   defb __MAIN_head / 10 % 10 + '0'
-   defb __MAIN_head % 10 + '0'
+   defb (__MAIN_head - 1) / 10000 % 10 + '0'
+   defb (__MAIN_head - 1) / 1000 % 10 + '0'
+   defb (__MAIN_head - 1)/ 100 % 10 + '0'
+   defb (__MAIN_head - 1) / 10 % 10 + '0'
+   defb (__MAIN_head - 1) % 10 + '0'
    defb ')'+0x80
 
 esxdos_dtx_filename:
 
 IF __NEXTOS_DOT_COMMAND
 
-   defm __ENV_BINDIR, '/extra/'
+   defm __ENV_BINDIR, "/extra/"
 
 ELSE
 
    defm "/bin/extra/"
 
 ENDIF
+
+PUBLIC __z_dtx_filename
 
 __z_dtx_filename:
 
