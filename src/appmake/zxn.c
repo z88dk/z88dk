@@ -163,8 +163,7 @@ int zxn_exec(char *target)
     ret = -1;
     mainbank_occupied = 0xfc;   // mmu2+
 
-    if (zxc.help)
-        return ret;
+    if (zxc.help) return ret;
 
     // filenames
 
@@ -206,7 +205,7 @@ int zxn_exec(char *target)
 
     // BANK = ZXN Ram Enumerated as 16K banks compatible with 128k Spectrum banking scheme with org 0xc000
     // PAGE = ZXN Ram Enumerated as 8k pages compatible with ZXN MMU paging
-    // DIV  = DIVMMC Memory organized as 32 8k pages with org 0x2000
+    // DIV  = DIVMMC Memory organized as 16 8k pages with org 0x2000
     // RES  = Separate bankspace to hold resources stored in disk file but not initially loaded at runtime
 
     memset(&memory, 0, sizeof(memory));
@@ -578,9 +577,6 @@ int zxn_exec(char *target)
             return ret;
 
         // dot command is out but we need to process binaries in other memory banks
-        // remove the mainbank so as not to process it again
-
-        mb_remove_mainbank(&memory.mainbank, zxc.clean);
     }
 
     if (dotn)
@@ -804,10 +800,11 @@ int zxn_exec(char *target)
             return ret;
 
         // dotn is out but we need to process the rest of the binaries too
-        // so remove mainbank and PAGE space since they've already been consumed
+        // so remove mainbank, PAGE, and DIV spaces since they've already been consumed
 
         mb_remove_mainbank(&memory.mainbank, zxc.clean);
         // mb_remove_bankspace(&memory, "PAGE");
+        // mb_remove_bankspace(&memory, "DIV");
     }
 
     // output remaining memory bank contents as raw binaries

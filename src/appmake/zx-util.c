@@ -771,10 +771,11 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt)
 /*
    ESXDOS Dot Command
 
-   * dot  : standard dot command resident in divmmc page at 0x2000 limited to ~7k+
-   * dotx : extended dot command with first part at 0x2000 and limited to 7k+ and a second part in main ram
+   * dot  : standard dot command resident at 0x2000 limited to ~7k+
+   * dotx : extended dot command with first part at 0x2000 limited to 7k+ and a second part in main ram
 
    July/Nov 2017 aralbrec
+   August 2018 aralbrec
 */
 
 int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory)
@@ -785,24 +786,18 @@ int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory)
     struct section_bin *sb;
     int section_num;
 
-    char outname[FILENAMELEN];
-    char outnamex[FILENAMELEN];
-
-    int  __esxdos_dtx_fname;
-    int  __esxdos_dotx_len;
-    int  __dotn_num_main_pages;
-    int  DOTN_REGISTER_SP;
-    int  DOTN_EXTRA_PAGES;
+    char outname[9];
+    char outnamex[13];
 
     int c;
-    int dotx, dotn;
+    int z_dtx_filename;
 
     // determine output filename
 
     if (zxc->outfile == NULL)
-        strcpy(outname, zxc->binname);
+        sprintf(outname, "%.8s", zxc->binname);
     else
-        strcpy(outname, zxc->outfile);
+        sprintf(outname, "%.8s", zxc->outfile);
 
     suffix_change(outname, "");
 
@@ -812,18 +807,7 @@ int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory)
     for (c = 0; outname[c]; ++c)
         outname[c] = toupper(outname[c]);
 
-    // collect parameters
-
-    __esxdos_dtx_fname    = parameter_search(zxc->crtfile, ".map", "__esxdos_dtx_fname");
-    __esxdos_dotx_len     = parameter_search(zxc->crtfile, ".map", "__esxdos_dotx_len");
-    __dotn_num_main_pages = parameter_search(zxc->crtfile, ".map", "__dotn_num_main_pages");
-    DOTN_REGISTER_SP      = parameter_search(zxc->crtfile, ".map", "DOTN_REGISTER_SP");
-    DOTN_EXTRA_PAGES = parameter_search(zxc->crtfile, ".map", "DOTN_EXTRA_PAGES");
-
-    dotx = (__esxdos_dtx_fname >= 0) && (__esxdos_dotx_len >= 0) && (__dotn_num_main_pages < 0);
-    dotn = (__esxdos_dtx_fname >= 0) && (__esxdos_dotx_len >= 0) && (__dotn_num_main_pages >= 0);
-
-    // generate the main dot command from section CODE
+    // generate the dot command from section CODE
 
     if (mb_find_section(memory, "CODE", &mb, &section_num) == 0)
         exit_log(1, "Error: Section CODE not found\n");
@@ -840,37 +824,24 @@ int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory)
         exit_log(1, "Error: Couldn't read section binary %s\n", sb->filename);
     }
 
+    mb_remove_section(memory, "CODE", zxc->clean);
+
     fclose(fout);
 
-    if (dotn)
-    {
-        int space = 0x4000 - (sb->org + sb->size);
+    // generate the dotx portion from section MAIN
 
-        if (space < 0)
-        {
-            remove(outname);
-            exit_log(1, "Error: Main dot binary exceeds 0x4000 by %d bytes\n", -space);
-        }
+    if ((z_dtx_filename = parameter_search(zxc->crtfile, ".map", "__z_dtx_filename")) < 0)
+        return 0;
 
-        if (DOTN_REGISTER_SP >= 0)
-            printf("Note: Available space for command line in divmmc memory is %d bytes\n", DOTN_REGISTER_SP - (sb->org + sb->size));
-    }
+    printf("Creating DOTX command\n");
 
-    // stop if plain dot command
-
-    if (!dotx && !dotn) return 0;
-
-    // extended dot command filename
-
-    snprintf(outnamex, sizeof(outnamex), "/BIN/%s.%s", outname, dotx ? "DTX" : "DTN");
-
-    // generate the extended dot command from section DTX or DTN
-
-    if ((dotx && (mb_find_section(memory, "DTX", &mb, &section_num) == 0)) || (dotn && (mb_find_section(memory, "DTN", &mb, &section_num) == 0)))
+    if (mb_find_section(memory, "MAIN", &mb, &section_num) == 0)
     {
         remove(outname);
-        exit_log(1, "Error: Section %s not found\n", dotx ? "DTX" : "DTN");
+        exit_log(1, "Error: Section MAIN not found\n");
     }
+
+    snprintf(outnamex, "%s.X", outname);
 
     sb = &mb->secbin[section_num];
 
@@ -880,7 +851,7 @@ int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory)
         exit_log(1, "Error: Section %s org of %d is less than 0x4000\n", sb->section_name, sb->org);
     }
 
-    if ((fout = fopen(outnamex + 5, "wb")) == NULL)
+    if ((fout = fopen(outnamex, "wb")) == NULL)
     {
         remove(outname);
         exit_log(1, "Error: Couldn't create output file %s\n", outnamex);
@@ -894,6 +865,8 @@ int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory)
         exit_log(1, "Error: Couldn't read section binary %s\n", sb->filename);
     }
 
+    mb_remove_section(memory, "MAIN", zxc->clean);
+
     fclose(fout);
 
     // insert variables into main dot binary
@@ -905,32 +878,8 @@ int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory)
         exit_log(1, "Error: Couldn't write variables into main dot binary\n");
     }
 
-    fseek(fout, __esxdos_dtx_fname - 0x2000, SEEK_SET);
+    fseek(fout, z_dtx_filename - 0x2000, SEEK_SET);
     fprintf(fout, "%s", outnamex);
-
-    fseek(fout, __esxdos_dotx_len - 0x2000, SEEK_SET);
-    writeword(sb->size, fout);
-
-    if (dotn)
-    {
-        int num_pages = (sb->size - 1) / 0x2000 + 1;
-
-        if ((num_pages > 6) || (num_pages < 1))
-        {
-            fclose(fout);
-            remove(outname);
-            remove(outnamex);
-            exit_log(1, "Error: Number of pages required for main (%d) is out of range\n", num_pages);
-        }
-
-        printf("Note: Number of 8k pages required for main is %d\n", num_pages);
-
-        fseek(fout, __dotn_num_main_pages - 0x2000, SEEK_SET);
-        writebyte((unsigned char)num_pages, fout);
-
-        if (DOTN_EXTRA_PAGES > 0)
-            printf("Note: Total number of 8k pages allocated at runtime is %d\n", num_pages + DOTN_EXTRA_PAGES);
-    }
 
     fclose(fout);
     return 0;
@@ -938,22 +887,25 @@ int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory)
 
 /*
 NextOS Dotn Command
-zx next only ram pages are allocated from NextOS so as not to overwrite main ram
+zx next only; ram pages are allocated from NextOS so as not to overwrite main ram
 
-June 2018 aralbrec
+June/August 2018 aralbrec
 */
 
 #define ZXN_MAX_PAGE 223
 #define ZXN_MAX_BANK 111
+#define ZXN_MAX_DIV  15
 
-#define ZXN_ALLOCATE_LOAD 0xfd
-#define ZXN_ABSOLUTE_LOAD 0xfe
-#define ZXN_PHYSICAL_PAGE 0xff
+#define ZXNM_SKIP           0xff
+#define ZXNM_ALLOCATE       0xfe
+#define ZXNM_LOAD           0xfd
+#define ZXNM_ALLOCATE_LOAD  0xfc
 
 int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fillbyte)
 {
     int  i;
     int  bsnum_page;
+    int  bsnum_div;
 
     char outname[9];
 
@@ -961,15 +913,21 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
     int overlay_alloc_mask, overlay_load_mask;
 
     int appmake_handle;
+    int user_handle;
+
     int dotn_last_page, actual_last_page;
-    int dotn_extra_pages;
+    int dotn_last_div, actual_last_div;
+    int dotn_num_extra;
     int dotn_main_overlay_mask;
     int dotn_main_absolute_mask;
 
     unsigned char mem[64 * 1024];
 
-    unsigned char z_alloc_table[MAXBANKS];
+    unsigned char z_page_alloc_table[MAXBANKS];
     unsigned char z_page_table[MAXBANKS];
+
+    unsigned char z_div_alloc_table[ZXN_MAX_DIV + 1];
+    unsigned char z_div_table[ZXN_MAX_DIV + 1];
 
     int main_bin_start;
     int main_bin_end;
@@ -981,6 +939,11 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
 
     if ((bsnum_page = mb_find_bankspace(memory, "PAGE")) < 0)
         exit_log(1, "Error: Can't find PAGE space\n");
+
+    // find DIV space
+
+    if ((bsnum_div = mb_find_bankspace(memory, "DIV")) < 0)
+        exit_log(1, "Error: Can't find DIV space\n");
 
     // determine output filename
 
@@ -998,29 +961,17 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
 
     // collect parameters
 
+    appmake_handle = user_handle = -1;
+
     if ((appmake_handle = parameter_search(zxc->crtfile, ".map", "__appmake_handle")) < 0)
-        exit_log(1, "Error: Can't find page area in dotn\n");
-
-    if ((dotn_last_page = parameter_search(zxc->crtfile, ".map", "DOTN_LAST_PAGE")) < 0)
-        exit_log(1, "Error: DOTN_LAST_PAGE not defined\n");
-
-    if ((dotn_last_page < 11) || (dotn_last_page > ZXN_MAX_PAGE))
-        exit_log(1, "Error: DOTN_LAST_PAGE %d must line in range [11,%d]\n", dotn_last_page, ZXN_MAX_PAGE);
-
-    if ((dotn_extra_pages = parameter_search(zxc->crtfile, ".map", "DOTN_EXTRA_PAGES")) < 0)
-        exit_log(1, "Error: DOTN_EXTRA_PAGES not defined\n");
-
-    if ((dotn_main_overlay_mask = parameter_search(zxc->crtfile, ".map", "DOTN_MAIN_OVERLAY_MASK")) < 0)
-        exit_log(1, "Error: DOTN_MAIN_OVERLAY_MASK not defined\n");
-
-    if ((dotn_main_absolute_mask = parameter_search(zxc->crtfile, ".map", "DOTN_MAIN_ABSOLUTE_MASK")) < 0)
-        exit_log(1, "Error: DOTN_MAIN_ABSOLUTE_MASK not defined\n");
+        if ((user_handle = parameter_search(zxc->crtfile, ".map", "__user_handle")) < 0)
+            exit_log(1, "Error: Cannot locate __appmake_handle or __user_handle\n");
 
     main_bin_start = parameter_search(zxc->crtfile, ".map", "__MAIN_head");
     main_bin_end = parameter_search(zxc->crtfile, ".map", "__MAIN_END_tail");
 
     if ((main_bin_start >= 0) && (main_bin_end > main_bin_start))
-        printf("Notice: Main binary occupies [%d,%d]\n", main_bin_start, main_bin_end);
+        printf("Notice: Main binary occupies [%d,%d]\n", main_bin_start, main_bin_end - 1);
 
     // initialize memory contents
 
@@ -1104,11 +1055,87 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
     overlay_alloc_mask |= dotn_main_overlay_mask;
     overlay_alloc_mask &= ~dotn_main_absolute_mask;
 
-    printf("Notice: Main bank allocation mask is 0x%02x\n", overlay_alloc_mask);
-    printf("Notice: Main bank load mask is 0x%02x\n", overlay_load_mask);
+    if (appmake_handle >= 0)
+    {
+        printf("Notice: Main bank allocation mask is 0x%02x\n", overlay_alloc_mask);
+        printf("Notice: Main bank load mask is 0x%02x\n", overlay_load_mask);
+    }
+    else
+    {
+        printf("Notice: Main bank occupied mask is 0x%02x\n", overlay_load_mask);
+    }
 
     // overlay_load_mask: bits indicate which main bank pages should be loaded
     // overlay_alloc_mask: bits indicate which main bank pages should be allocated
+
+    // collect allocation table parameters
+
+    if ((dotn_last_div = parameter_search(zxc->crtfile, ".map", "__DOTN_LAST_DIVMMC")) > ZXN_MAX_DIV)
+        exit_log(1, "Error: __DOTN_LAST_DIVMMC must lie in range [0,%d]\n", ZXN_MAX_DIV);
+
+    if (appmake_handle >= 0)
+    {
+        if ((dotn_last_page = parameter_search(zxc->crtfile, ".map", "__DOTN_LAST_PAGE")) < 0)
+            exit_log(1, "Error: __DOTN_LAST_PAGE not defined\n");
+
+        if ((dotn_last_page < 11) || (dotn_last_page > ZXN_MAX_PAGE))
+            exit_log(1, "Error: __DOTN_LAST_PAGE %d must lie in range [11,%d]\n", dotn_last_page, ZXN_MAX_PAGE);
+
+        if ((dotn_num_extra = parameter_search(zxc->crtfile, ".map", "__DOTN_NUM_EXTRA")) < 0)
+            exit_log(1, "Error: __DOTN_NUM_EXTRA not defined\n");
+
+        if (dotn_num_extra > ZXN_MAX_PAGE)
+            exit_log(1, "Error: __DOTN_NUM_EXTRA %d must lie in range [0,%d]\n", dotn_num_extra, ZXN_MAX_PAGE);
+
+        if ((dotn_last_page >= 0) && ((dotn_last_page + dotn_num_extra) > ZXN_MAX_PAGE))
+            exit_log(1, "Error: __DOTN_LAST_PAGE and __DOTN_NUM_EXTRA together must not exceed %d\n", ZXN_MAX_PAGE);
+
+        if ((dotn_main_overlay_mask = parameter_search(zxc->crtfile, ".map", "__DOTN_MAIN_OVERLAY_MASK")) < 0)
+            exit_log(1, "Error: __DOTN_MAIN_OVERLAY_MASK not defined\n");
+
+        if ((dotn_main_absolute_mask = parameter_search(zxc->crtfile, ".map", "__DOTN_MAIN_ABSOLUTE_MASK")) < 0)
+            exit_log(1, "Error: __DOTN_MAIN_ABSOLUTE_MASK not defined\n");
+    }
+    else
+    {
+        dotn_last_page = mem[user_handle + 0] - 1;
+        dotn_num_extra = mem[user_handle + 1];
+
+        if ((dotn_last_page < 11) || (dotn_last_page > ZXN_MAX_PAGE))
+            exit_log(1, "Error: Actual __DOTN_LAST_PAGE %d must lie in range [11,%d]\n", dotn_last_page, ZXN_MAX_PAGE);
+
+        if (dotn_num_extra > ZXN_MAX_PAGE)
+            exit_log(1, "Error: Actual __DOTN_NUM_EXTRA %d must lie in range [0,%d]\n", dotn_num_extra, ZXN_MAX_PAGE);
+
+        if ((dotn_last_page >= 0) && ((dotn_last_page + dotn_num_extra) > ZXN_MAX_PAGE))
+            exit_log(1, "Error: Actual __DOTN_LAST_PAGE and __DOTN_NUM_EXTRA together must not exceed %d\n", ZXN_MAX_PAGE);
+
+        memset(z_page_alloc_table, ZXNM_SKIP, sizeof(z_page_alloc_table));
+        memcpy(z_page_alloc_table, &mem[user_handle + 2], dotn_last_page + dotn_num_extra + 1);
+
+        memcpy(z_page_table, &mem[user_handle + 2 + dotn_last_page + dotn_num_extra + 1], dotn_last_page + dotn_num_extra + 1);
+
+        for (i = 0; i < (dotn_last_page + dotn_num_extra + 1); ++i)
+            if (z_page_table[i] > ZXN_MAX_PAGE)
+                exit_log(1, "Error: User z_page_table[%d] has illegal value %d\n", i, z_page_table[i]);
+
+        if (dotn_last_div >= 0)
+        {
+            dotn_last_div = mem[user_handle + 2 + 2 * (dotn_last_page + dotn_num_extra + 1)] - 1;
+
+            if (dotn_last_div > ZXN_MAX_DIV)
+                exit_log(1, "Error: Actual __DOTN_LAST_DIVMMC must lie in range [0,%d]\n", ZXN_MAX_DIV);
+
+            memset(z_div_alloc_table, ZXNM_SKIP, sizeof(z_div_alloc_table));
+            memcpy(z_div_alloc_table, &mem[user_handle + 2 + 2 * (dotn_last_page + dotn_num_extra + 1) + 1], dotn_last_div + 1);
+
+            memcpy(z_div_table, &mem[user_handle + 2 + 2 * (dotn_last_page + dotn_num_extra + 1) + 1 + dotn_last_div + 1], dotn_last_div + 1);
+
+            for (i = 0; i < (dotn_last_div + 1); ++i)
+                if (z_div_table[i] > ZXN_MAX_DIV)
+                    exit_log(1, "Error: User z_div_table[%d] has illegal value %d\n", i, z_div_table[i]);
+        }
+    }
 
     // create output file
 
@@ -1120,7 +1147,6 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
     fwrite(&mem[0x2000], 8192, 1, fout);
 
     // create page table contents
-    // write pages to file
 
     actual_last_page = -1;
 
@@ -1129,15 +1155,11 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
         int main_mask;
         struct memory_bank *mb = &memory->bankspace[bsnum_page].membank[i];
 
-        // logical to physical mapping is 1:1 until modified at load time
-
-        z_page_table[i] = i;
-
         // check for main bank page
 
         switch (i)
         {
-        // BANK 0
+            // BANK 0
 
         case 0:
             main_mask = 0x40;   // mmu6
@@ -1147,7 +1169,7 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
             main_mask = 0x80;   // mmu7
             break;
 
-        // BANK 2
+            // BANK 2
 
         case 4:
             main_mask = 0x10;   // mmu4
@@ -1157,7 +1179,7 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
             main_mask = 0x20;   // mmu5
             break;
 
-        // BANK 5
+            // BANK 5
 
         case 10:
             main_mask = 0x04;   // mmu2
@@ -1167,37 +1189,167 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
             main_mask = 0x08;   // mmu3
             break;
 
-        // not main bank
+            // not main bank
 
         default:
             main_mask = 0;
             break;
         }
 
-        // create allocation entry
+        // create allocation table entry
 
-        z_alloc_table[i] = ZXN_PHYSICAL_PAGE;          // page is physical
-
-        if (main_mask)
+        if (user_handle >= 0)
         {
-            // page is in main bank
+            // allocation table is dictated by user
 
-            if (overlay_alloc_mask & main_mask)
-                z_alloc_table[i] = ZXN_ALLOCATE_LOAD;  // indicate allocate and load
-            else if (overlay_load_mask & main_mask)
-                z_alloc_table[i] = ZXN_ABSOLUTE_LOAD;  // indicate load into absolute page
-
-            if (z_alloc_table[i] != ZXN_PHYSICAL_PAGE)
-            {
-                printf("Page %d, main bank %s\n", i, (z_alloc_table[i] == ZXN_ALLOCATE_LOAD) ? "allocated" : "physical");
-
+            if (z_page_alloc_table[i] != ZXNM_SKIP)
                 actual_last_page = i;
-                fwrite(&mem[(z88dk_ffs(main_mask) - 1) * 0x2000], 8192, 1, fout);
+
+            if ((z_page_alloc_table[i] == ZXNM_ALLOCATE_LOAD) || (z_page_alloc_table[i] == ZXNM_ALLOCATE_LOAD))
+            {
+                if (main_mask)
+                {
+                    printf("Page %d, main bank %s\n", i, (z_page_alloc_table[i] == ZXNM_ALLOCATE_LOAD) ? "allocate and load" : "load");
+                    fwrite(&mem[(z88dk_ffs(main_mask) - 1) * 0x2000], 8192, 1, fout);
+                }
+                else
+                {
+                    unsigned char page[8192];
+
+                    memset(page, fillbyte, sizeof(page));
+
+                    if (mb->num > 0)
+                    {
+                        printf("Page %d %s", i, (z_page_alloc_table[i] == ZXNM_ALLOCATE_LOAD) ? "allocate and load" : "load");
+
+                        zxn_construct_page_contents(page, mb, sizeof(page), fillbyte);
+                        mb_remove_bank(&memory->bankspace[bsnum_page], i, zxc->clean);
+                    }
+                    else
+                        printf("Warning: Empty Page %d loaded\n", i);
+
+                    // append to dotn
+
+                    fwrite(page, sizeof(page), 1, fout);
+                }
             }
+            else if (z_page_alloc_table[i] == ZXNM_ALLOCATE)
+                printf("Page %d allocated\n", i);
         }
         else
         {
-            // page not in main bank, check if part of the program
+            // logical to physical mapping is 1:1 until modified at load time
+
+            z_page_table[i] = i;
+
+            // create allocation entry
+
+            z_page_alloc_table[i] = ZXNM_SKIP;                   // page is physical
+
+            if (main_mask)
+            {
+                // page is in main bank
+
+                if (overlay_alloc_mask & overlay_load_mask & main_mask)
+                    z_page_alloc_table[i] = ZXNM_ALLOCATE_LOAD;  // indicate allocate and load
+                else if (overlay_alloc_mask & main_mask)
+                    z_page_alloc_table[i] = ZXNM_ALLOCATE;       // indicate allocate
+                else if (overlay_load_mask & main_mask)
+                    z_page_alloc_table[i] = ZXNM_LOAD;           // indicate load
+
+                if (z_page_alloc_table[i] != ZXNM_SKIP)
+                {
+                    printf("Page %d, main bank %s\n", i, (z_page_alloc_table[i] == ZXNM_ALLOCATE_LOAD) ? "allocate and load" : ((z_page_alloc_table[i] == ZXNM_ALLOCATE) ? "allocate" : "load"));
+
+                    actual_last_page = i;
+
+                    if ((z_page_alloc_table[i] == ZXNM_ALLOCATE_LOAD) || (z_page_alloc_table[i] == ZXNM_LOAD))
+                        fwrite(&mem[(z88dk_ffs(main_mask) - 1) * 0x2000], 8192, 1, fout);
+                }
+            }
+            else
+            {
+                // page not in main bank, check if part of the program
+
+                if (mb->num > 0)
+                {
+                    unsigned char page[8192];
+
+                    // indicate allocate and load
+
+                    z_page_alloc_table[i] = ZXNM_ALLOCATE_LOAD;
+
+                    printf("Page %d allocate and load", i);
+                    zxn_construct_page_contents(page, mb, sizeof(page), fillbyte);
+
+                    // append to dotn
+
+                    actual_last_page = i;
+                    fwrite(page, sizeof(page), 1, fout);
+
+                    // remove this PAGE from memory model
+
+                    mb_remove_bank(&memory->bankspace[bsnum_page], i, zxc->clean);
+                }
+            }
+        }
+    }
+
+    printf("dotn_last_page = %d\n", dotn_last_page);
+    printf("dotn_num_extra = %d\n", dotn_num_extra);
+
+    // append extra pages to alloc table
+
+    if (appmake_handle >= 0)
+        memset(&z_page_alloc_table[dotn_last_page + 1], ZXNM_ALLOCATE, dotn_num_extra);
+
+    // create divmmc table
+
+    actual_last_div = -1;
+
+    for (i = 0; i <= ZXN_MAX_DIV; ++i)
+    {
+        struct memory_bank *mb = &memory->bankspace[bsnum_div].membank[i];
+
+        if (user_handle >= 0)
+        {
+            // allocation table is dictated by user
+
+            if (z_div_alloc_table[i] != ZXNM_SKIP)
+                actual_last_div = i;
+
+            if ((z_div_alloc_table[i] == ZXNM_ALLOCATE_LOAD) || (z_div_alloc_table[i] == ZXNM_ALLOCATE_LOAD))
+            {
+                unsigned char page[8192];
+
+                memset(page, fillbyte, sizeof(page));
+
+                if (mb->num > 0)
+                {
+                    printf("DIVMMC Page %d %s", i, (z_page_alloc_table[i] == ZXNM_ALLOCATE_LOAD) ? "allocate and load" : "load");
+
+                    zxn_construct_page_contents(page, mb, sizeof(page), fillbyte);
+                    mb_remove_bank(&memory->bankspace[bsnum_page], i, zxc->clean);
+                }
+                else
+                    printf("Warning: Empty DIVMMC Page %d loaded\n", i);
+
+                // append to dotn
+
+                fwrite(page, sizeof(page), 1, fout);
+            }
+            else if (z_div_alloc_table[i] == ZXNM_ALLOCATE)
+                printf("DIVMMC Page %d allocated\n", i);
+        }
+        else
+        {
+            // logical to physical mapping is 1:1 until modified at load time
+
+            z_div_table[i] = i;
+
+            // create allocation entry
+
+            z_div_alloc_table[i] = ZXNM_SKIP;                    // page is physical
 
             if (mb->num > 0)
             {
@@ -1205,29 +1357,22 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
 
                 // indicate allocate and load
 
-                z_alloc_table[i] = ZXN_ALLOCATE_LOAD;
+                z_div_alloc_table[i] = ZXNM_ALLOCATE_LOAD;
 
-                printf("Page %d", i);
+                printf("DIVMMC Page %d allocate and load", i);
                 zxn_construct_page_contents(page, mb, sizeof(page), fillbyte);
 
                 // append to dotn
 
-                actual_last_page = i;
+                actual_last_div = i;
                 fwrite(page, sizeof(page), 1, fout);
 
                 // remove this PAGE from memory model
 
-                mb_remove_bank(&memory->bankspace[bsnum_page], i, zxc->clean);
+                mb_remove_bank(&memory->bankspace[bsnum_div], i, zxc->clean);
             }
         }
     }
-
-    printf("dotn_last_page = %d\n", dotn_last_page);
-    printf("dotn_extra_pages = %d\n", dotn_extra_pages);
-
-    // append extra pages to alloc table
-
-    memset(&z_alloc_table[dotn_last_page + 1], ZXN_ALLOCATE_LOAD, dotn_extra_pages);
 
     // write page table data into dotn command
 
@@ -1238,46 +1383,97 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
         exit_log(1, "Error: Insufficient space for allocation table\n       Increase DOTN_LAST_PAGE to %d\n", actual_last_page);
     }
 
-    fseek(fout, appmake_handle - 0x2000, SEEK_SET);
+    if ((actual_last_div >= 0) && (dotn_last_div < actual_last_div))
+    {
+        fclose(fout);
+        remove(outname);
+        exit_log(1, "Error: Insufficient space for allocation table\n       Increase DOTN_LAST_DIVMMC to %d\n", actual_last_div);
+    }
 
 /*
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ;; contiguous section filled in by appmake
 
-        __appmake_handle :
+    __appmake_handle:
 
-        PUBLIC __z_page_table_sz
-        PUBLIC __z_page_extra_sz
+    PUBLIC __z_page_sz
+    PUBLIC __z_extra_sz
 
-        __z_page_table_sz : defb DOTN_LAST_PAGE + 1; must be in this order
-        __z_page_extra_sz : defb DOTN_EXTRA_PAGES; must be in this order
+    ; z_page_sz must be at least 11
+    ; z_extra_sz can be 0
 
-        PUBLIC __z_alloc_table
+    __z_page_sz:             defb __DOTN_LAST_PAGE + 1  ; must be in this order
+    __z_extra_sz:            defb __DOTN_NUM_EXTRA      ; must be in this order
 
-        __z_alloc_table : defs DOTN_LAST_PAGE + DOTN_EXTRA_PAGES + 1, 0xff
+    PUBLIC __z_page_alloc_table
+    PUBLIC __z_extra_alloc_table
 
-        PUBLIC __z_page_table
-        PUBLIC __z_page_extra
+    ; 0xff = skip
+    ; 0xfe = allocate but do not load
+    ; 0xfd = load but do not allocate
+    ; 0xfc = allocate and load
 
-        __z_page_table : defs DOTN_LAST_PAGE + 1; must be in this order
-        __z_page_extra : defs DOTN_EXTRA_PAGES; must be in this order
+    __z_page_alloc_table:    defs __DOTN_LAST_PAGE + 1, 0xff  ; must be in this order
+    __z_extra_alloc_table:   defs __DOTN_NUM_EXTRA, 0xfe      ; must be in this order
+
+    PUBLIC __z_page_table
+    PUBLIC __z_extra_table
+
+    ; these tables perform logical to physical page mapping and
+    ; are normally filled in with a 1:1 mapping ie numbers 0,1,2,...
+    ; (appmake does this when it builds the dotn command)
+
+    ; entries are overwritten if a particular page is allocated
+
+    __z_page_table:          defs __DOTN_LAST_PAGE + 1, 0xff  ; must be in this order
+    __z_extra_table:         defs __DOTN_NUM_EXTRA            ; must be in this order
+
+    IF __DOTN_LAST_DIVMMC >= 0
+
+    PUBLIC __z_divmmc_sz
+
+    __z_div_sz:           defb __DOTN_LAST_DIVMMC + 1
+
+    PUBLIC __z_div_alloc_table
+
+    __z_div_alloc_table:  defs __DOTN_LAST_DIVMMC + 1, 0xff
+
+    PUBLIC __z_div_table
+
+    __z_div_table:        defs __DOTN_LAST_DIVMMC + 1, 0xff
+
+    ENDIF
 
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 */
 
-    writebyte(dotn_last_page + 1, fout);
-    writebyte(dotn_extra_pages, fout);
+    if (appmake_handle >= 0)
+    {
+        fseek(fout, appmake_handle - 0x2000, SEEK_SET);
 
-    fwrite(z_alloc_table, dotn_last_page + dotn_extra_pages + 1, 1, fout);
-    fwrite(z_page_table, dotn_last_page + 1, 1, fout);
+        writebyte(dotn_last_page + 1, fout);
+        writebyte(dotn_num_extra, fout);
 
-    for (i = 0; i < dotn_extra_pages; ++i)
-        writebyte(0xff, fout);
+        fwrite(z_page_alloc_table, dotn_last_page + dotn_num_extra + 1, 1, fout);
+        fwrite(z_page_table, dotn_last_page + 1, 1, fout);
+
+        for (i = 0; i < dotn_num_extra; ++i)
+            writebyte(0xff, fout);
+
+        if (dotn_last_div >= 0)
+        {
+            writebyte(dotn_last_div + 1, fout);
+
+            fwrite(z_div_alloc_table, dotn_last_div + 1, 1, fout);
+            fwrite(z_div_table, dotn_last_div + 1, 1, fout);
+        }
+    }
 
     fclose(fout);
 
     return 0;
 }
+
 
 /*
 48k/128k SNA SNAPSHOT
@@ -1686,17 +1882,19 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
         }
     }
 
+    // NOT NEEDED FOR NEX FORMAT BECAUSE NEX DOES NOT COOPERATE WITH NEXTZXOS
+    //
     // mark all pages occupied above the lowest page
     // temporary to accommodate z88dk normally placing stack and heap at top of memory
-
-    for (i = 0; i < 8; ++i)
-    {
-        if (mainbank_occupied & (1 << i))
-        {
-            mainbank_occupied = 0xff - (1 << i) + 1;
-            break;
-        }
-    }
+    //
+    // for (i = 0; i < 8; ++i)
+    // {
+    //     if (mainbank_occupied & (1 << i))
+    //     {
+    //         mainbank_occupied = 0xff - (1 << i) + 1;
+    //         break;
+    //     }
+    // }
 
     // write main memory bank: 16k banks 5,2,0
 
