@@ -17,7 +17,7 @@ use Test::Differences;
 use List::AllUtils 'uniq';
 use Data::HexDump;
 
-my $OBJ_FILE_VERSION = "11";
+my $OBJ_FILE_VERSION = "12";
 my $STOP_ON_ERR = grep {/-stop/} @ARGV; 
 my $KEEP_FILES	= grep {/-keep/} @ARGV; 
 my $test	 = "test";

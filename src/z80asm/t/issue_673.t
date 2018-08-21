@@ -27,7 +27,7 @@ z80asm(<<'...');
 ...
 check_bin_file("test.bin", pack("C*", 1..2));
 z80nm("test.o", <<'...');
-Object  file test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF12
   Name: a
   Section a: 1 bytes
     C $0000: 01
