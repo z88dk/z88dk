@@ -340,6 +340,8 @@ alloc_load:
    and 0x02
    jr nz, alloc_no_load        ; if load not requested
 
+   EXTERN l_jpix
+
    pop de
    push de                     ; de = logical table position
    
@@ -472,6 +474,8 @@ alloc_cancel:
       and 0x02
       jr nc, div_alloc_no_load ; if load not requested
       
+      EXTERN l_jphl
+   
       pop de
       push de                  ; de = logical table position
       
@@ -521,10 +525,14 @@ alloc_cancel:
 
    include "crt_cmdline_esxdos.inc"
    
-   ; stack: argv/cmdline, argc/len
+   IF __crt_enable_commandline >= 1
+
+      ; stack: argv/cmdline, argc/len
    
-   pop bc
-   pop de
+      pop bc
+      pop de
+   
+   ENDIF
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; page main bank into memory
@@ -928,30 +936,14 @@ turbo_save:
 
 turbo_restore:
 
-   ld bc,__IO_NEXTREG_REG
-   
-   ld a,__REG_TURBO_MODE
-   out (c),a
-   
-   inc b
-   
    ld a,(__turbo_save)
-   out (c),a
-   
+
+   nextreg __REG_TURBO_MODE,a
    ret
 
 turbo_14:
 
-   ld bc,__IO_NEXTREG_REG
-
-   ld a,__REG_TURBO_MODE
-   out (c),a
-   
-   inc b
-   
-   ld a,__RTM_14MHZ
-   out (c),a
-   
+   nextreg __REG_TURBO_MODE,__RTM_14MHZ
    ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

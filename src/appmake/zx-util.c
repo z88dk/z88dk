@@ -1374,6 +1374,9 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
         }
     }
 
+    if (dotn_last_div >= 0)
+        printf("dotn_last_div = %d\n", dotn_last_div);
+
     // write page table data into dotn command
 
     if ((actual_last_page >= 0) && (dotn_last_page < actual_last_page))

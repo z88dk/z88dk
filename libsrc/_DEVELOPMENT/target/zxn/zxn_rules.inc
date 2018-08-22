@@ -41,7 +41,7 @@ Z88DK_FOR(`LOOP', `0', `15',
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    ;; core version = MMmmSSS (major, minor, sub) in decimal
-   ;;    v 1.10.51 = 0110051
+   ;;    v 1.10.51 =  110051
 
    PUBLIC __CRT_CORE_VERSION
 
@@ -52,7 +52,7 @@ Z88DK_FOR(`LOOP', `0', `15',
    defc __CRT_CORE_VERSION = CRT_CORE_VERSION
    
    ;; nextos version = MMmm (major, minor) in decimal
-   ;;         v 1.94 = 0194
+   ;;         v 1.94 =  194
 
    PUBLIC __NEXTOS_VERSION
 

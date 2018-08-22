@@ -53,7 +53,7 @@ __z_extra_table:         defs __DOTN_NUM_EXTRA            ; must be in this orde
 
 IF __DOTN_LAST_DIVMMC >= 0
 
-   PUBLIC __z_divmmc_sz
+   PUBLIC __z_div_sz
 
    __z_div_sz:           defb __DOTN_LAST_DIVMMC + 1
 

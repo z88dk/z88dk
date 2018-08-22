@@ -266,11 +266,11 @@ ENDIF
    
       IFDEF TAR__crt_enable_commandline_ex
       
-         defc __crt_enable_commandline_ex = TAR__crt_enable_commandline_EX
+         defc __crt_enable_commandline_ex = TAR__crt_enable_commandline_ex
       
       ELSE
       
-         defc __crt_enable_commandline_ex = DEF__crt_enable_commandline_EX
+         defc __crt_enable_commandline_ex = DEF__crt_enable_commandline_ex
       
       ENDIF
    
