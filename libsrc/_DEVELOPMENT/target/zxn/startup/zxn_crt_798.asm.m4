@@ -340,7 +340,7 @@ alloc_load:
    and 0x02
    jr nz, alloc_no_load        ; if load not requested
 
-   EXTERN l_jpix
+   EXTERN l_call_ix
 
    pop de
    push de                     ; de = logical table position
@@ -350,7 +350,7 @@ alloc_load:
    push ix                     ; save mmu function
 
    ld a,(de)                   ; a = destination physical page
-   call l_jpix                 ; carry is reset to page in target page
+   call l_call_ix              ; carry is reset to page in target page
 
    ld a,c                      ; file handle
    ld bc,0x2000                ; page size
@@ -374,7 +374,7 @@ alloc_load:
    pop bc                      ; b = num pages, c = handle
 
    scf
-   call l_jpix                 ; carry is set to restore target page
+   call l_call_ix              ; carry is set to restore target page
 
 alloc_no_load:
 
@@ -1107,20 +1107,16 @@ IF NEXTOS_VERSION
 
    error_msg_nextos:
       
-      defm "Requires NextZXOS 128k v"
-         
-      IF ((NEXTOS_VERSION >> 12) & 0xf)
-         defb ((NEXTOS_VERSION >> 12) & 0xf) + '0'
+      defm "Requires NextZXOS 128 v"
+      
+      IF ((NEXTOS_VERSION / 1000) % 10)
+         defb (NEXTOS_VERSION / 1000) % 10 + '0'
       ENDIF
-         
-         defb ((NEXTOS_VERSION >> 8) & 0xf) + '0'
-         defb '.'
-         
-      IF ((NEXTOS_VERSION >> 4) & 0xf)
-         defb ((NEXTOS_VERSION >> 4) & 0xf) + '0'
-      ENDIF
-         
-      defb (NEXTOS_VERSION & 0xf) + '0' + 0x80
+      
+      defb (NEXTOS_VERSION / 100) % 10 + '0'
+      defb '.'
+      defb (NEXTOS_VERSION / 10) % 10 + '0'
+      defb NEXTOS_VERSION % 10 + '0' + 0x80
    
 ELSE
    
