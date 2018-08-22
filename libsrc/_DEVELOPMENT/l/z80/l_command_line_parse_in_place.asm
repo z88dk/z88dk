@@ -210,6 +210,8 @@ word_in_quote:
 
    cp d
    jr nz, word_begin_loop
+   
+   ld d,b
    jr word_end_quote
 
 word_out_quote:
