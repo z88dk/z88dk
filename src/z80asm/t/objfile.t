@@ -66,7 +66,7 @@ t_z80asm_capture(asm_file(), "", "", 0);
 $obj = read_binfile(o_file());
 t_binary($obj, objfile(NAME => 'test'));
 t_z80nm(o_file(), <<'END');
-Object  file test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF12
   Name: test
 END
 
@@ -78,7 +78,7 @@ $obj = read_binfile(o_file());
 t_binary($obj, objfile(NAME => 'test',
 					   CODE => [["", -1, 1, "\x00"]]));
 t_z80nm(o_file(), <<'END');
-Object  file test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF12
   Name: test
   Section "": 1 bytes
     C $0000: 00
@@ -92,7 +92,7 @@ $obj = read_binfile(o_file());
 t_binary($obj, objfile(NAME => 'test',
 					   CODE => [["", -1, 1, "\x00" x 0x10000]]));
 t_z80nm(o_file(), <<'END');
-Object  file test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF12
   Name: test
   Section "": 65536 bytes
     C $0000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
@@ -4201,7 +4201,7 @@ $obj = read_binfile(o_file());
 t_binary($obj, objfile(NAME => 'test',
 					   CODE => [["", 0, 1, "\x00"]]));
 t_z80nm(o_file(), <<'END');
-Object  file test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF12
   Name: test
   Section "": 1 bytes, ORG $0000
     C $0000: 00
@@ -4214,7 +4214,7 @@ $obj = read_binfile(o_file());
 t_binary($obj, objfile(NAME => 'test',
 					   CODE => [["", 0xFFFF, 1, "\x00"]]));
 t_z80nm(o_file(), <<'END');
-Object  file test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF12
   Name: test
   Section "": 1 bytes, ORG $FFFF
     C $0000: 00
@@ -4237,7 +4237,7 @@ t_binary($obj, objfile(NAME => 'test',
 									"\x11\x0C\x00".
 									"\x0C\x00\x00\x00"]]));
 t_z80nm(o_file(), <<'END');
-Object  file test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF12
   Name: test
   Section "": 12 bytes
     C $0000: 3E 0C DD 46 0C 11 0C 00 0C 00 00 00
@@ -4266,7 +4266,7 @@ t_binary($obj, objfile(NAME => 'test',
 					"\x11\x0C\x00".
 					"\x0C\x00\x00\x00"]]));
 t_z80nm(o_file(), <<'END');
-Object  file test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF12
   Name: test
   Section "": 12 bytes
     C $0000: 3E 0C DD 46 0C 11 0C 00 0C 00 00 00
@@ -4298,7 +4298,7 @@ t_binary($obj, objfile(NAME => 'test',
 					"\x11\x0C\x00".
 					"\x0C\x00\x00\x00"]]));
 t_z80nm(o_file(), <<'END');
-Object  file test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF12
   Name: test
   Section "": 12 bytes
     C $0000: 3E 0C DD 46 0C 11 0C 00 0C 00 00 00
@@ -4341,7 +4341,7 @@ t_binary($obj, objfile(NAME => 'test',
 					"\x01\x00\x00".			# addr  11
 					"\x00\x00\x00\x00"]]));	# addr  14
 t_z80nm(o_file(), <<'END');
-Object  file test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF12
   Name: test
   Section "": 18 bytes, ORG $0003
     C $0000: 3E 00 DD 46 00 01 00 00 11 00 00 01 00 00 00 00
@@ -4384,7 +4384,7 @@ t_binary($obj, objfile(NAME => 'test',
 		                "\xCD\x00\x00".
 		                "\xCD\x00\x00"]]));
 t_z80nm(o_file(), <<'END');
-Object  file test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF12
   Name: test
   Section "": 7 bytes
     C $0000: 00 CD 00 00 CD 00 00
@@ -4415,15 +4415,15 @@ my $obj2 = read_binfile(o2_file());
 my $lib  = read_binfile(lib_file());
 t_binary($lib, libfile( $obj1, $obj2 ));
 t_z80nm(lib_file(), <<'END');
-Library file test.lib at $0000: Z80LMF11
-Object  file test.lib at $0010: Z80RMF11
+Library file test.lib at $0000: Z80LMF12
+Object  file test.lib at $0010: Z80RMF12
   Name: test1
   Section "": 1 bytes
     C $0000: C9
   Symbols:
     G A $0000 mult (section "") (file test1.asm:3)
 
-Object  file test.lib at $0067: Z80RMF11
+Object  file test.lib at $0067: Z80RMF12
   Name: test2
   Section "": 1 bytes
     C $0000: C9

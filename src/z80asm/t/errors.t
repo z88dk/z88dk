@@ -231,7 +231,7 @@ for ([jr => chr(0x18)], [djnz => chr(0x10)])
 
 	t_z80asm(
 		asm		=> "$jump label : defc label = ASMPC-129",
-		err		=> "Error at file 'test.asm' line 1: integer '-129' out of range",
+		linkerr	=> "Error at file 'test.asm' line 1: integer '-129' out of range",
 	);
 
 	t_z80asm(
@@ -241,7 +241,7 @@ for ([jr => chr(0x18)], [djnz => chr(0x10)])
 
 	t_z80asm(
 		asm		=> "$jump label : defc label = ASMPC+128",
-		err		=> "Error at file 'test.asm' line 1: integer '128' out of range",
+		linkerr	=> "Error at file 'test.asm' line 1: integer '128' out of range",
 	);
 
 	for my $org (0, 0x8000, 0xFFFE) {
@@ -389,10 +389,17 @@ t_z80asm_capture(asm_file()." -IllegalFilename", "",
 #------------------------------------------------------------------------------
 # error_jr_not_local
 unlink_testfiles();
-t_z80asm_error("
-	EXTERN loop
-	jr loop
-", "Error at file 'test.asm' line 3: relative jump address must be local");
+
+t_z80asm(
+	asm		=> " extern loop \n jr loop ",
+	asm1	=> " public loop \n loop: ret ",
+	bin		=> pack("C*", 0x18, 0x00, 0xc9),
+);
+
+#t_z80asm_error("
+#	EXTERN loop
+#	jr loop
+#", "Error at file 'test.asm' line 3: relative jump address must be local");
 
 #------------------------------------------------------------------------------
 # error_obj_file_version
@@ -401,7 +408,7 @@ my $obj = objfile(NAME => "test", CODE => [["", -1, 1, "\x00"]] );
 substr($obj,6,2)="99";		# change version
 write_file(o_file(), $obj);
 t_z80asm_capture("-b  ".o_file(), "", <<"END", 1);
-Error: object file 'test.o' version 99, expected version 11
+Error: object file 'test.o' version 99, expected version 12
 1 errors occurred during assembly
 END
 
@@ -454,7 +461,7 @@ substr($lib,6,2)="99";		# change version
 write_file(asm_file(), "nop");
 write_file(lib_file(), $lib);
 t_z80asm_capture("-b -i".lib_file()." ".asm_file(), "", <<"END", 1);
-Error: library file 'test.lib' version 99, expected version 11
+Error: library file 'test.lib' version 99, expected version 12
 1 errors occurred during assembly
 END
 
