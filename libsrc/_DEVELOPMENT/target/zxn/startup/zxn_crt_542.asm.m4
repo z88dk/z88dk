@@ -397,20 +397,16 @@ IF __NEXTOS_DOT_COMMAND || NEXTOS_VERSION
 
       error_msg_nextos:
       
-         defm "Requires NextZXOS 128k v"
-         
-         IF ((NEXTOS_VERSION >> 12) & 0xf)
-            defb ((NEXTOS_VERSION >> 12) & 0xf) + '0'
+         defm "Requires NextZXOS 128 v"
+      
+         IF ((NEXTOS_VERSION / 1000) % 10)
+            defb (NEXTOS_VERSION / 1000) % 10 + '0'
          ENDIF
-         
-            defb ((NEXTOS_VERSION >> 8) & 0xf) + '0'
-            defb '.'
-         
-         IF ((NEXTOS_VERSION >> 4) & 0xf)
-            defb ((NEXTOS_VERSION >> 4) & 0xf) + '0'
-         ENDIF
-         
-         defb (NEXTOS_VERSION & 0xf) + '0' + 0x80
+      
+         defb (NEXTOS_VERSION / 100) % 10 + '0'
+         defb '.'
+         defb (NEXTOS_VERSION / 10) % 10 + '0'
+         defb NEXTOS_VERSION % 10 + '0' + 0x80
    
    ELSE
    
