@@ -1220,7 +1220,7 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
 
                     if (mb->num > 0)
                     {
-                        printf("Page %d %s", i, (z_page_alloc_table[i] == ZXNM_ALLOCATE_LOAD) ? "allocate and load" : "load");
+                        printf("Page %d, %s", i, (z_page_alloc_table[i] == ZXNM_ALLOCATE_LOAD) ? "allocate and load" : "load");
 
                         zxn_construct_page_contents(page, mb, sizeof(page), fillbyte);
                         mb_remove_bank(&memory->bankspace[bsnum_page], i, zxc->clean);
@@ -1234,7 +1234,7 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
                 }
             }
             else if (z_page_alloc_table[i] == ZXNM_ALLOCATE)
-                printf("Page %d allocated\n", i);
+                printf("Page %d, allocated\n", i);
         }
         else
         {
@@ -1279,7 +1279,7 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
 
                     z_page_alloc_table[i] = ZXNM_ALLOCATE_LOAD;
 
-                    printf("Page %d allocate and load", i);
+                    printf("Page %d, allocate and load", i);
                     zxn_construct_page_contents(page, mb, sizeof(page), fillbyte);
 
                     // append to dotn
@@ -1326,7 +1326,7 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
 
                 if (mb->num > 0)
                 {
-                    printf("DIVMMC Page %d %s", i, (z_page_alloc_table[i] == ZXNM_ALLOCATE_LOAD) ? "allocate and load" : "load");
+                    printf("DIVMMC Page %d, %s", i, (z_page_alloc_table[i] == ZXNM_ALLOCATE_LOAD) ? "allocate and load" : "load");
 
                     zxn_construct_page_contents(page, mb, sizeof(page), fillbyte);
                     mb_remove_bank(&memory->bankspace[bsnum_page], i, zxc->clean);
@@ -1339,7 +1339,7 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
                 fwrite(page, sizeof(page), 1, fout);
             }
             else if (z_div_alloc_table[i] == ZXNM_ALLOCATE)
-                printf("DIVMMC Page %d allocated\n", i);
+                printf("DIVMMC Page %d, allocated\n", i);
         }
         else
         {
@@ -1359,7 +1359,7 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
 
                 z_div_alloc_table[i] = ZXNM_ALLOCATE_LOAD;
 
-                printf("DIVMMC Page %d allocate and load", i);
+                printf("DIVMMC Page %d, allocate and load", i);
                 zxn_construct_page_contents(page, mb, sizeof(page), fillbyte);
 
                 // append to dotn
