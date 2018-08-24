@@ -28,8 +28,6 @@
 	%2c	hl
 	ld	a,l
 	ld	(%1),a
-	ld	hl,(%1)
-	ld	h,0
 =
 	ld	hl,%1
 	%2c	(hl)
