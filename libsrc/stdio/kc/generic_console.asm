@@ -386,7 +386,11 @@ not_odd_lhs:
         add     hl,bc
         ret
 
-	
+	SECTION	code_crt_init
+
+	; Remove the cursor
+	ld	hl,0xffff
+	ld	(CURSO_COL),hl
 
 		SECTION	data_clib
 .kc_attr	defb @01111000
