@@ -381,7 +381,7 @@ IF __NEXTOS_DOT_COMMAND || NEXTOS_VERSION
 
       error_msg_nextos:
       
-         defm "Requires NextZXOS 128k v"
+         defm "Requires NextZXOS 128k "
          
          IF ((NEXTOS_VERSION >> 12) & 0xf)
             defb ((NEXTOS_VERSION >> 12) & 0xf) + '0'
