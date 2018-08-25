@@ -10,7 +10,7 @@ AFILES = $(wildcard *.asm)
 
 CLASSIC_OBJECTS = $(addprefix obj/,$(CFILES:.c=.o)) $(addprefix obj/,$(AFILES:.asm=.o))
 
-NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/arch/zx/esxdos/z80/*.asm"
+NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/arch/zx/esxdos/z80/*.asm"  "$(NEWLIB_DIRECTORY)/arch/zx/esxdos/c/sccz80/*.asm"
 NEWLIB_TARGETS := obj/newlib-z80
 
 all: dirs $(OUTPUT_DIRECTORY)/esxdos.lib

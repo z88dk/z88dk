@@ -49,10 +49,11 @@ extern int __LIB__ writebyte(int fd, int c) __smallc;
 /* extern int __LIB__ mkdir(char *, int mode); */
 
 extern char __LIB__ *getcwd(char *buf, size_t maxlen) __smallc;
+extern int __LIB__ chdir(const char *dir) __smallc;
+extern char __LIB__ *getwd(char *buf);
 
 /* Following two only implemented for Sprinter ATM (20.11.2002) */
 extern int  __LIB__ rmdir(const char *);
-extern char __LIB__ *getwd(char *buf);
 
 
 
