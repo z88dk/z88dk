@@ -168,6 +168,22 @@ loop:
 	ld	a,b
 	cp	31
 	jp	nz,loop
+
+	; And now blank out the bottom row - print a space
+	ld	a,40
+blank_row:
+	push	af
+	ld	a,' '
+	ld	d,a
+	ld	e,0
+	push	bc
+	call	generic_console_printc
+	pop	bc
+	inc	c
+	pop	af
+	dec	a
+	jr	nz,blank_row
+
 	pop	af
 	out	($88),a
 	pop	bc
