@@ -20,9 +20,22 @@
       
       ; copy command line words from basic program to stack
 
+      IF __SDCC_IY && (__NEXTOS_DOT_COMMAND = 0) && (NEXTOS_VERSION = 0)
+      
+         di
+      
+      ENDIF
+
       EXTERN l_command_line_parse
       call   l_command_line_parse
+
+      IF __SDCC_IY && (__NEXTOS_DOT_COMMAND = 0) && (NEXTOS_VERSION = 0)
       
+         ld iy,__SYS_IY
+         ei
+      
+      ENDIF
+
       ; esxdos does not supply program name in command line
       ; so place empty string in argv[0] instead
       
