@@ -16,3 +16,10 @@ esxdos_f_readdir_callee:
    
    ld a,e
    jp asm_esxdos_f_readdir
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esxdos_f_readdir_callee
+defc _esxdos_f_readdir_callee = esxdos_f_readdir_callee
+ENDIF
+

@@ -19,3 +19,10 @@ esxdos_disk_info:
    
    ld a,c
    jp asm_esxdos_disk_info
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esxdos_disk_info
+defc _esxdos_disk_info = esxdos_disk_info
+ENDIF
+

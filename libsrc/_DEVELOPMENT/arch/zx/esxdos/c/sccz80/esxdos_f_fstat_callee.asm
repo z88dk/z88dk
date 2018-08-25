@@ -16,3 +16,10 @@ esxdos_f_fstat_callee:
 
    ld a,c
    jp asm_esxdos_f_fstat
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esxdos_f_fstat_callee
+defc _esxdos_f_fstat_callee = esxdos_f_fstat_callee
+ENDIF
+

@@ -18,3 +18,10 @@ esx_disk_filemap:
    
    ld a,e
    jp asm_esx_disk_filemap
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esx_disk_filemap
+defc _esx_disk_filemap = esx_disk_filemap
+ENDIF
+

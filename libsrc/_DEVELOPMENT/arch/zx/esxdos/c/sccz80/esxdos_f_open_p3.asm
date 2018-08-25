@@ -25,3 +25,10 @@ _esxdos_f_open_p3:
 
    ld b,c
    jp asm_esxdos_f_open
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC __esxdos_f_open_p3
+defc __esxdos_f_open_p3 = _esxdos_f_open_p3
+ENDIF
+

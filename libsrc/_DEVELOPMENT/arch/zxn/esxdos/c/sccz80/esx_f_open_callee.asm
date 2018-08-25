@@ -14,3 +14,10 @@ esx_f_open_callee:
    
    ld a,e
    jp asm_esx_f_open
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esx_f_open_callee
+defc _esx_f_open_callee = esx_f_open_callee
+ENDIF
+

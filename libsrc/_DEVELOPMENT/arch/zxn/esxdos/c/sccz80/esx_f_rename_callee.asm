@@ -13,3 +13,10 @@ esx_f_rename_callee:
    ex (sp),hl
 
    jp asm_esx_f_rename
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esx_f_rename_callee
+defc _esx_f_rename_callee = esx_f_rename_callee
+ENDIF
+

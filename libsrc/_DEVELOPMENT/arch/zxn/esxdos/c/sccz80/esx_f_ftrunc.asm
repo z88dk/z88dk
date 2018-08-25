@@ -20,3 +20,10 @@ esx_f_ftrunc:
 
    ld a,l
    jp asm_esx_f_ftrunc
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esx_f_ftrunc
+defc _esx_f_ftrunc = esx_f_ftrunc
+ENDIF
+

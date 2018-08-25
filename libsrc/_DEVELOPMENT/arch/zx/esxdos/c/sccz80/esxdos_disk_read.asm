@@ -26,3 +26,10 @@ esxdos_disk_read:
    pop hl
    
    jp asm_esxdos_disk_read
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esxdos_disk_read
+defc _esxdos_disk_read = esxdos_disk_read
+ENDIF
+

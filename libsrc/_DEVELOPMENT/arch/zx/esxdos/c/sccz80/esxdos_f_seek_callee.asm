@@ -21,3 +21,10 @@ esxdos_f_seek_callee:
    pop hl
 
    jp asm_esxdos_f_seek
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esxdos_f_seek_callee
+defc _esxdos_f_seek_callee = esxdos_f_seek_callee
+ENDIF
+

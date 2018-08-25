@@ -21,3 +21,10 @@ esxdos_f_read:
    
    ld a,e
    jp asm_esxdos_f_read
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esxdos_f_read
+defc _esxdos_f_read = esxdos_f_read
+ENDIF
+
