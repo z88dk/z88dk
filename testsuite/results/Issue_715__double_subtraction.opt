@@ -93,8 +93,9 @@
 	GLOBAL	readbyte
 	GLOBAL	writebyte
 	GLOBAL	getcwd
-	GLOBAL	rmdir
+	GLOBAL	chdir
 	GLOBAL	getwd
+	GLOBAL	rmdir
 	GLOBAL	_RND_BLOCKSIZE
 	GLOBAL	rnd_loadblock
 	GLOBAL	rnd_saveblock
