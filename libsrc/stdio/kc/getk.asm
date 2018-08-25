@@ -17,10 +17,12 @@
 
 .getk
 ._getk
-	ld	ix,$1f0
+	push	iy
+	ld	iy,$1f0
 ;    ld l,0
     call PV1
     defb FNKBDS
+	pop	iy
 ;    jr nc,gkret
 
 IF STANDARDESCAPECHARS

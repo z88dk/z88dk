@@ -9,6 +9,23 @@
 	EXTERN	generic_console_udg32
 	EXTERN	screendollar
 	EXTERN	screendollar_with_count
+	EXTERN	kc_type
+
+vpeek_85_4:
+	ld	a,(iy+1)
+	res	1,a
+	ld	(iy+1),a
+	out	($84),a
+	; hl = screen address
+	; de = buffer
+	ld	b,8
+vpeek_85_4_1:
+	ld	a,(hl)
+	ld	(de),a
+	inc	l
+	inc	de
+	djnz	vpeek_85_4_1
+	jr	vpeek_rejoin
 
 generic_console_vpeek:
 	call	generic_console_xypos
@@ -23,6 +40,9 @@ generic_console_vpeek:
         push    af              ;Save value
         set	2,a             ;Page video in
         out     ($88),a
+	ld	a,(kc_type)
+	and	a
+	jr	nz,vpeek_85_4
 
 	; hl = screen address
 	; de = buffer
@@ -33,6 +53,7 @@ generic_console_vpeek:
 	add	hl,bc
 	call	dohalf
 
+vpeek_rejoin:
 	pop	af
 	out	($88),a		;page video out
 
