@@ -8,35 +8,25 @@
 # Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #------------------------------------------------------------------------------
 
-TARGET	= libclibrary.a
+TARGET		= libclibrary.a
 
-ifeq ($(OS),Windows_NT)
-  EXE 		:= .exe
-else
-  EXE 		:= $(EXESUFFIX)
-endif
+include ../../Make.common
 
 CC		= gcc
-CFLAGS	+= -g -Wall -Wextra -MMD -I. -I../../common -I../../../ext/uthash/src -I../../../ext/UNIXem/include $(OPTFLAGS)
-LDLIBS	+= $(OPTLIBS) $(TARGET)
-PREFIX  ?= /usr/local
+CFLAGS		+= -g -Wall -Wextra -MMD -I. -I../../common -I../../../ext/uthash/src \
+		   $(UNIXem_CFLAGS)\
+		   $(OPTFLAGS)
+LDLIBS		+= $(OPTLIBS) $(TARGET)
+PREFIX  	?= /usr/local
 
-INSTALL ?= install
+INSTALL 	?= install
 
-SOURCES	= $(wildcard *.c) ../../common/die.c ../../common/fileutil.c ../../common/strutil.c
-OBJECTS	= $(patsubst %.c,%.o,$(SOURCES))
-DEPENDS = $(patsubst %.c,%.d,$(SOURCES))
+SOURCES		= $(wildcard *.c) ../../common/die.c ../../common/fileutil.c ../../common/strutil.c
+OBJECTS		= $(patsubst %.c,%.o,$(SOURCES))
+DEPENDS 	= $(patsubst %.c,%.d,$(SOURCES))
 
-TEST_SRC= $(wildcard t/test_*.c) $(wildcard t/uthash/test*.c)
-TESTS	= $(patsubst %.c,%,$(TEST_SRC))
-
-# Use these flags both in Windows_NT and in a MinGW build in Unix
-# ifeq ($(EXE),.exe)
-# CFLAGS	+= -I../../../ext/UNIXem/include
-# OBJECTS	+= \
-# ../../../ext/UNIXem/src/glob.o \
-# ../../../ext/UNIXem/src/dirent.o
-# endif
+TEST_SRC	= $(wildcard t/test_*.c) $(wildcard t/uthash/test*.c)
+TESTS		= $(patsubst %.c,%,$(TEST_SRC))
 
 # The Target Build
 all: $(TARGET)
@@ -50,8 +40,8 @@ release:
 	$(MAKE) OPTFLAGS="-DNDEBUG -O2" all
 
 $(TARGET): $(OBJECTS)
-		ar rcs $@ $(OBJECTS)
-		ranlib $@
+	ar rcs $@ $(OBJECTS)
+	ranlib $@
 
 $(TESTS): $(TARGET)
 
@@ -59,28 +49,22 @@ $(TESTS): $(TARGET)
 .PHONY: tests
 
 tests: $(TESTS)
-		sh ./t/runtests.sh
+	sh ./t/runtests.sh
 
 # The Cleaner
 clean:
-		-rm -f $(OBJECTS) $(TESTS) $(TARGET)
-		-rm -f $(patsubst %,%.exe,$(TESTS))
-		-rm -f $(patsubst %,%.out,$(TESTS))
-		-rm -f $(patsubst %,%.o,$(TESTS))
-		-rm -f t/tests.log
-		-rm -f *.bak
-		-rm -rf win32/Debug win32/Release win32/ipch
-		-rm -f $(DEPENDS)
+	$(RM) $(OBJECTS) $(TESTS) $(TARGET)
+	$(RM) $(patsubst %,%.exe,$(TESTS))
+	$(RM) $(patsubst %,%.out,$(TESTS))
+	$(RM) $(patsubst %,%.o,$(TESTS))
+	$(RM) t/tests.log
+	$(RM) *.bak
+	$(RM) -r win32/Debug win32/Release win32/ipch
+	$(RM) $(DEPENDS)
 
 # The Install
 install: all
-		$(INSTALL)        -d $(DESTDIR)/$(PREFIX)/lib/
-		$(INSTALL) $(TARGET) $(DESTDIR)/$(PREFIX)/lib/
-
-# The Checker
-BADFUNCS='[^_.>a-zA-Z0-9](str(n?cpy|n?cat|xfrm|n?dup|str|pbrk|tok|_)|stpn?cpy|a?sn?printf|byte_)'
-check:
-		@echo Files with potentially dangerous functions.
-		@egrep $(BADFUNCS) $(SOURCES) || true
+	$(INSTALL)        -d $(DESTDIR)/$(PREFIX)/lib/
+	$(INSTALL) $(TARGET) $(DESTDIR)/$(PREFIX)/lib/
 
 -include $(DEPENDS)
