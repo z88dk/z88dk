@@ -26,3 +26,10 @@ esxdos_disk_write:
    pop hl
 
    jp asm_esxdos_disk_write
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esxdos_disk_write
+defc _esxdos_disk_write = esxdos_disk_write
+ENDIF
+

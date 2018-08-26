@@ -873,7 +873,7 @@ kc_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(call buildgeneric,kc)
-	TARGET=kc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORkc -x$(OUTPUT_DIRECTORY)/kc_clib @$(LISTFILE_DIRECTORY)/kc.lst
+	TARGET=kc TYPE=ixiy $(LIBLINKER) --IXIY -DSTANDARDESCAPECHARS -DFORkc -x$(OUTPUT_DIRECTORY)/kc_clib @$(LISTFILE_DIRECTORY)/kc.lst
 
 # Bandai RX78 - dom
 rx78_clib.lib:

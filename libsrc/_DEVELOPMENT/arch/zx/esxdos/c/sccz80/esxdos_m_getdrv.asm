@@ -11,3 +11,10 @@ esxdos_m_getdrv:
 
    ld l,0
    jp asm_esxdos_m_getsetdrv
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esxdos_m_getdrv
+defc _esxdos_m_getdrv = esxdos_m_getdrv
+ENDIF
+

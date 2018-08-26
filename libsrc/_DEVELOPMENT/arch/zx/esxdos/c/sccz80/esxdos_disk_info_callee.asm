@@ -16,3 +16,10 @@ esxdos_disk_info_callee:
    
    ld a,c
    jp asm_esxdos_disk_info
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esxdos_disk_info_callee
+defc _esxdos_disk_info_callee = esxdos_disk_info_callee
+ENDIF
+

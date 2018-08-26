@@ -13,6 +13,8 @@
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
 		EXTERN		__z9001_attr
+		EXTERN		conio_map_colour
+		EXTERN		generic_console_flags
 
 		defc		DISPLAY = 0xEC00
 		defc		COLOUR_MAP = DISPLAY - 1024 
@@ -29,7 +31,8 @@ generic_console_set_inverse:
 	ret
 
 generic_console_set_ink:
-	and	15
+	call	conio_map_colour
+	and	7
 	rla
 	rla
 	rla
@@ -43,7 +46,8 @@ generic_console_set_ink:
 
 	
 generic_console_set_paper:
-	and	15
+	call	conio_map_colour
+	and	7
 	ld	e,a
 	ld	a,(__z9001_attr)
 	and	@11110000
@@ -64,7 +68,15 @@ generic_console_printc:
 	dec	h
 	dec	h
 	dec	h
+	ld	a,(generic_console_flags)
+	rlca
 	ld	a,(__z9001_attr)
+	jr	nc,not_inverse
+	rlca
+	rlca
+	rlca
+	rlca
+not_inverse:
 	ld	(hl),a
 	ret
 

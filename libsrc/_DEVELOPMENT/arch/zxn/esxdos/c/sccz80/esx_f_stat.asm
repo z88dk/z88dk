@@ -17,3 +17,10 @@ esx_f_stat:
    push af
 
    jp asm_esx_f_stat
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esx_f_stat
+defc _esx_f_stat = esx_f_stat
+ENDIF
+

@@ -417,6 +417,9 @@ static bool Expr_parse_ternary_cond( Expr *expr );
 		{													\
 			op = sym.tok;									\
 			Str_append_n(self->text, sym.tstart, sym.tlen);	\
+			/* '%10' is binary constant 2, '% 10' is modulo 10 */	\
+			if (*sym.tstart == '%')							\
+				Str_append(self->text, " ");				\
 			GetSym();										\
 			if ( ! prev_name(self) )						\
 				return false;								\

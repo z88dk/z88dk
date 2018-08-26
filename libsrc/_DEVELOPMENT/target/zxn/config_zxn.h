@@ -55,7 +55,7 @@
 #define __ENV_TMPMAX  0xffff
 #define __ENV_TMPMAX_TRY  16
 
-#define __ENV_BINDIR  "c:/bin"
+#define __ENV_BINDIR  "c:/dot"
 #define __ENV_SYSDIR  "c:/sys"
 
 #undef  __SPECTRUM
@@ -72,7 +72,7 @@
 
 #define __USE_SYSVAR  0
 
-#define __USE_ZXN_OPCODES  0
+#define __USE_ZXN_OPCODES  0xff
 
 #define __USE_ZXN_OPCODES_NEXTREG  1
 #define __USE_ZXN_OPCODES_MLT  2
@@ -1988,6 +1988,11 @@
 
 
 
+#define __IO_DIVIDE_CONTROL  0xe3
+
+#define __IDC_CONMEM  0x80
+#define __IDC_MAPRAM  0x40
+
 #define __IO_SPI_CONTROL  0xe7
 
 #define __ISC_SPI_CS  0x80
@@ -2087,6 +2092,10 @@
 #define __nextos_browsercaps_syscfg  0x80
 #define __nextos_browsercaps_all  0x3f
 
+#define __NEXTOS_IDE_MOUNT  0x01d2
+#define __nextos_unmount  0
+#define __nextos_remount  1
+
 #define __NEXTOS_IDE_STREAM_OPEN  0x0056
 #define __NEXTOS_IDE_STREAM_CLOSE  0x0059
 #define __NEXTOS_IDE_STREAM_IN  0x005c
@@ -2108,6 +2117,15 @@
 #define __NEXTOS_IDE_INTEGER_VAR  0x01c9
 #define __NEXTOS_IDE_RTC  0x01cc
 #define __NEXTOS_IDE_DRIVER  0x01cf
+
+#define __NEXTOS_IDE_MODE  0x01d5
+#define __nextos_mode_query  0
+#define __nextos_mode_set_layer_0  0x0000
+#define __nextos_mode_set_layer_1_lores  0x0100
+#define __nextos_mode_set_layer_1_ula  0x0101
+#define __nextos_mode_set_layer_1_hires  0x0102
+#define __nextos_mode_set_layer_1_hicol  0x0103
+#define __nextos_mode_set_layer_2  0x0200
 
 #define __NEXTOS_DOS_REF_XDPB  0x0151
 #define __NEXTOS_DOS_MAP_B  0x0154
@@ -2577,6 +2595,8 @@
 
 
 
+#define __ROM3_BC_SPACES  0x0030
+#define __ROM3_CLS  0x0d6b
 #define __ROM3_MAKE_ROOM  0x1655
 #define __ROM3_RECLAIM_2  0x19e8
 

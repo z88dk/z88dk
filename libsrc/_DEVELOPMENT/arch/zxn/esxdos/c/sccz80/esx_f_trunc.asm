@@ -19,3 +19,10 @@ esx_f_trunc:
    push af
 
    jp asm_esx_f_trunc
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esx_f_trunc
+defc _esx_f_trunc = esx_f_trunc
+ENDIF
+

@@ -467,6 +467,54 @@ extern unsigned char __LIB__ esx_f_unlink(const char *filename) __smallc __z88dk
 
 
 
+// FUNCTIONS IMPORTED FROM NEXTZXOS
+
+struct esx_mode
+{
+   union
+   {
+      uint16_t mode;
+      struct
+      {
+         uint8_t submode;      // 0=lores,1=ula,2=hires,3=hicol
+         uint8_t layer;        // 0,1,2
+      }
+      mode8;
+   };
+   
+   union
+   {
+      uint8_t attr;            // layer0,ula,hires,hicol
+      uint8_t ink;             // lores,layer2
+   };
+   
+   uint8_t paper;              // lores,layer2
+   
+   uint8_t flags;
+   uint8_t width;              // width of char in pixels 3-8
+   
+   uint8_t cols;               // printable columns
+   uint8_t rows;               // printable rows
+};
+
+#define esx_mode_flag_reduced_height  0x01
+#define esx_mode_flag_double_width  0x10
+#define esx_mode_flag_double_height  0x20
+
+#define esx_mode_set_layer_0  __nextos_mode_set_layer_0
+#define esx_mode_set_layer_1_lores  __nextos_mode_set_layer_1_lores
+#define esx_mode_set_layer_1_ula  __nextos_mode_set_layer_1_ula
+#define esx_mode_set_layer_1_hires  __nextos_mode_set_layer_1_hires
+#define esx_mode_set_layer_1_hicol  __nextos_mode_set_layer_1_hicol
+#define esx_mode_set_layer_2  __nextos_mode_set_layer_2
+
+extern unsigned char __LIB__ esx_ide_mode_get(struct esx_mode *mode) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ esx_ide_mode_set(struct esx_mode *mode) __smallc __z88dk_fastcall;
+
+
+
 // ESX ERROR CODES
 
 #define ESX_OK  __ESX_OK                       // 0 OK 0:1

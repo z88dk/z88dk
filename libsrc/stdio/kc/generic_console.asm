@@ -15,6 +15,7 @@
                 PUBLIC          generic_console_set_inverse
 		PUBLIC		generic_console_xypos
 		PUBLIC		kc_attr
+		PUBLIC		kc_type
 
 		EXTERN		conio_map_colour
 	        EXTERN          generic_console_udg32
@@ -59,20 +60,75 @@ generic_console_cls:
 	push	af		;Save value
 	set	2,a		;Page video in
 	out	($88),a
+	ld	a,(iy+1)	;port 84
+	res	1,a
+	ld	(iy+1),a
+	out	($84),a		;pixels
 	ld	hl,32768
 	ld	de,32769
-	ld	bc,+(CONSOLE_ROWS * CONSOLE_COLUMNS * 8 ) 
+	ld	bc,+(CONSOLE_ROWS * CONSOLE_COLUMNS * 8 ) -1
 	ld	(hl),0
 	ldir
+	ld	a,(kc_type)
+	and	a
+	jr	z,clear_attributes_kc85_2_3
+	ld	a,(iy+1)	;port 84
+	set	1,a
+	ld	(iy+1),a
+	out	($84),a		;pixels
+        ld      hl,32768
+        ld      de,32769
+        ld      bc,+(CONSOLE_ROWS * CONSOLE_COLUMNS * 8 )-1
+	ld	a,(kc_attr)
+        ld      (hl),a
+        ldir
+	jr	cls_rejoin
+clear_attributes_kc85_2_3:
 	; Now we point to start of colour memory
 	; Consider KC85/2 first of all
 	ld	bc,+(CONSOLE_ROWS * CONSOLE_COLUMNS * 2) -1
 	ld	a,(kc_attr)
 	ld	(hl),a
 	ldir
+cls_rejoin:
 	pop	af		;And restore paging
 	out	($88),a
 	ret
+
+scrollup_85_4:
+	ld	b,CONSOLE_COLUMNS
+	ld	hl,$8008
+	ld	de,$8000
+scrollup_85_4_1:
+	push	bc
+	push	hl
+	push	de
+	ld	a,(iy+1)
+	res	1,a
+	ld	(iy+1),a
+	out	($84),a
+	ld	bc,248
+	ldir
+	set	1,a
+	ld	(iy+1),a
+	out	($84),a
+	pop	de
+	pop	hl
+	push	hl
+	push	de
+        ld      bc,248
+	ldir
+	pop	de
+	pop	hl
+	inc	d
+	inc	h
+	pop	bc
+	djnz	scrollup_85_4_1
+	; Now blank some characters
+	ld	bc, + (CONSOLE_ROWS - 1) * 256
+	jp	print_blank_row
+
+
 
 generic_console_scrollup:
 	push	de
@@ -81,6 +137,9 @@ generic_console_scrollup:
 	push	af
 	set	2,a
 	out	($88),a
+	ld	a,(kc_type)
+	and	a
+	jr	nz,scrollup_85_4
 	ld	bc, 0
 loop:
 	push	bc
@@ -168,8 +227,26 @@ loop:
 	ld	a,b
 	cp	31
 	jp	nz,loop
+
+print_blank_row:
+	; And now blank out the bottom row - print a space
+	ld	a,40
+blank_row:
+	push	af
+	ld	a,' '
+	ld	d,a
+	ld	e,0
+	push	bc
+	call	generic_console_printc
+	pop	bc
+	inc	c
+	pop	af
+	dec	a
+	jr	nz,blank_row
+
 	pop	af
 	out	($88),a
+scrollup_done:
 	pop	bc
 	pop	de
 	ret
@@ -252,6 +329,9 @@ not_udg:
         add     hl,de
         dec     h
         ex      de,hl           ;de = font
+	ld	a,(kc_type)
+	and	a
+	jr	nz,printc_kc85_4
 	push	bc
 	push	de
 	call	generic_console_xypos
@@ -296,6 +376,46 @@ hires_printc_1:
 no_overflow:
         djnz    hires_printc_1
 	ret
+
+; Print to a kc85_4 screen
+; de = font
+; bc = xypos
+; On stack, old value for port 88
+printc_kc85_4:
+	ld	a,(iy+1)	;iy = ix, this is port 0x84 copy
+	res	1,a
+	ld	(iy+1),a
+	out	($84),a
+	call	xypos_85_4
+	push	hl		;Save address
+	ld	a,(generic_console_flags)
+	rlca
+	sbc	a,a
+	ld	c,a		;c = 0 /255
+	ld	b,8
+printc_kc85_4_1:
+	ld	a,(de)
+	xor	c
+	ld	(hl),a
+	inc	de
+	inc	l
+	djnz	printc_kc85_4_1
+	; Now, do the attributes
+	pop	hl		;address back
+	ld	a,(iy+1)	;iy = ix, this is port 0x84 copy
+	set	1,a		;select attributes
+	ld	(iy+1),a
+	out	($84),a
+	ld	b,8
+	ld	a,(kc_attr)
+printc_kc85_4_2:
+	ld	(hl),a
+	inc	l	
+	djnz	printc_kc85_4_2
+        pop     af
+        out     ($88),a
+        ret
+
 
 ; Colour generic_console_xypos
 ; Columns 0 - 31 = row * $40  $a8 base
@@ -343,6 +463,19 @@ colour_lhs:
         ret
 	
 
+; Entry: b = row
+;        c = column
+; Exit: hl = address
+xypos_85_4:
+	Ld	a,c
+	add	$80
+	ld	h,a
+	ld	a,b
+	add	a
+	add	a
+	add	a
+	ld	l,a
+	ret
 
 
 
@@ -351,6 +484,9 @@ colour_lhs:
 ; $a000
 ; Colums 32-40 for every 8 rows $200 for each 2 rows increment by $8, if odd add $40
 generic_console_xypos:
+	ld	a,(kc_type)
+	and	a
+	jr	nz,xypos_85_4
 	ld	a,c
         sub     32
         jr      c,lhs
@@ -386,7 +522,34 @@ not_odd_lhs:
         add     hl,bc
         ret
 
-	
+	SECTION	code_crt_init
+
+	; Remove the cursor
+	ld	hl,0xffff
+	ld	(CURSO_COL),hl
+
+	ld	hl,$0001
+	call	PV1
+	defb	FNPADR
+	ld	l,0
+	ld	a,h
+	cp	$81
+	jr	nz,not_kc85_4
+	inc	l
+	ld	a,(iy+1)
+	res	0,a	;display image 0
+	res	2,a	;cpu access 0
+	set	3,a	;disable hicolor
+	ld	(iy+1),a
+	out	($84),a
+not_kc85_4:
+	ld	a,l
+	ld	(kc_type),a
+
+
+		SECTION bss_clib
+
+.kc_type	defb	0		;holds 1 for KC85/4
 
 		SECTION	data_clib
 .kc_attr	defb @01111000

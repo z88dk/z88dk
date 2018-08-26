@@ -15,3 +15,10 @@ esxdos_f_opendir_p3:
    ld b,__ESXDOS_MODE_USE_HEADER
 
    jp asm_esxdos_f_opendir
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esxdos_f_opendir_p3
+defc _esxdos_f_opendir_p3 = esxdos_f_opendir_p3
+ENDIF
+

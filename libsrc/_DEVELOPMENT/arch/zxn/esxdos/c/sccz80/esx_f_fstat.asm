@@ -18,3 +18,10 @@ esx_f_fstat:
    
    ld a,e
    jp asm_esx_f_fstat
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esx_f_fstat
+defc _esx_f_fstat = esx_f_fstat
+ENDIF
+

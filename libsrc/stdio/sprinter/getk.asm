@@ -19,7 +19,7 @@
 	rst	$10
 	pop	ix
 	ld	hl,0
-	ret	nz	;no key pressed
+	ret	z	;no key pressed
 	
 IF STANDARDESCAPECHARS
 	ld	a,13

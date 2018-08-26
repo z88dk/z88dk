@@ -20,3 +20,10 @@ esx_f_read:
    
    ld a,e
    jp asm_esx_f_read
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esx_f_read
+defc _esx_f_read = esx_f_read
+ENDIF
+

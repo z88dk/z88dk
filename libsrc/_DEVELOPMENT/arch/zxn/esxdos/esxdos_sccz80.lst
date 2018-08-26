@@ -49,6 +49,8 @@ arch/zxn/esxdos/c/sccz80/esx_f_trunc_callee
 arch/zxn/esxdos/c/sccz80/esx_f_unlink
 arch/zxn/esxdos/c/sccz80/esx_f_write
 arch/zxn/esxdos/c/sccz80/esx_f_write_callee
+arch/zxn/esxdos/c/sccz80/esx_ide_mode_get
+arch/zxn/esxdos/c/sccz80/esx_ide_mode_set
 arch/zxn/esxdos/c/sccz80/esx_m_dosversion
 arch/zxn/esxdos/c/sccz80/esx_m_drvapi
 arch/zxn/esxdos/c/sccz80/esx_m_errh

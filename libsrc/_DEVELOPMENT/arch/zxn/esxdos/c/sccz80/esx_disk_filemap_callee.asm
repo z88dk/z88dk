@@ -15,3 +15,10 @@ esx_disk_filemap_callee:
    
    ld a,e
    jp asm_esx_disk_filemap
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esx_disk_filemap_callee
+defc _esx_disk_filemap_callee = esx_disk_filemap_callee
+ENDIF
+

@@ -39,6 +39,7 @@ IF __CRTCFG = 0
    defc TAR__crt_interrupt_mode_exit   = -1
 
    defc TAR__crt_enable_commandline    = 0
+   defc TAR__crt_enable_commandline_ex = 0
    defc TAR__crt_enable_restart        = 1
    defc TAR__crt_enable_close          = 1
 
@@ -90,6 +91,7 @@ IF __CRTCFG = 1
    defc TAR__crt_interrupt_mode_exit   = -1
 
    defc TAR__crt_enable_commandline    = 0
+   defc TAR__crt_enable_commandline_ex = 0
    defc TAR__crt_enable_restart        = 0
    defc TAR__crt_enable_close          = 1
 
@@ -141,6 +143,7 @@ IF __CRTCFG = 2
    defc TAR__crt_interrupt_mode_exit   = -1
 
    defc TAR__crt_enable_commandline    = 0
+   defc TAR__crt_enable_commandline_ex = 0
    defc TAR__crt_enable_restart        = 0
    defc TAR__crt_enable_close          = 1
 

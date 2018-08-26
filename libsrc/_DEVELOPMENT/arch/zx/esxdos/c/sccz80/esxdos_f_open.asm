@@ -24,3 +24,10 @@ esxdos_f_open:
 	
    ld b,c
    jp asm_esxdos_f_open
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esxdos_f_open
+defc _esxdos_f_open = esxdos_f_open
+ENDIF
+

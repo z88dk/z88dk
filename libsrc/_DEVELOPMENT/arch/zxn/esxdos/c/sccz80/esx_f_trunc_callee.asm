@@ -14,3 +14,10 @@ esx_f_trunc_callee:
    ex (sp),hl
 
    jp asm_esx_f_trunc
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esx_f_trunc_callee
+defc _esx_f_trunc_callee = esx_f_trunc_callee
+ENDIF
+

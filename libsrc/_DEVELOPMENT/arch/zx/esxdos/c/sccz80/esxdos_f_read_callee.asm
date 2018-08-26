@@ -17,3 +17,10 @@ esxdos_f_read_callee:
    
    ld a,e
    jp asm_esxdos_f_read
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esxdos_f_read_callee
+defc _esxdos_f_read_callee = esxdos_f_read_callee
+ENDIF
+

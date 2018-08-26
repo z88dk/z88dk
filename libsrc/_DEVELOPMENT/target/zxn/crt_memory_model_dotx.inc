@@ -63,17 +63,17 @@ section code_dot
 section rodata_dot
 section smc_dot
 section data_dot
+
 section bss_env
 section bss_esxdos
 section bss_dot
-section bss_dot_uninitialized
 
 SECTION CODE_END
 
-;; Dot Extension Code ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Main Bank ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-SECTION DTX
-org CRT_ORG_DTX
+SECTION MAIN
+org CRT_ORG_MAIN
 
 section code_adt_b_array
 section code_adt_b_vector
@@ -127,6 +127,8 @@ section code_lib
 section code_compiler
 section code_user
 
+section code_main
+
 section rodata_error_strings
 section rodata_error_string_end
 defb 0
@@ -140,11 +142,7 @@ section rodata_lib
 section rodata_compiler
 section rodata_user
 
-section code_dtx
-section rodata_dtx
-section smc_dtx
-section data_dtx
-section bss_dtx
+section rodata_main
 
 SECTION DATA
 
@@ -199,6 +197,8 @@ section smc_lib
 section smc_compiler
 section smc_user
 
+section smc_main
+
 section data_driver
 section data_font
 section data_clib
@@ -221,6 +221,8 @@ section data_threads
 section data_lib
 section data_compiler
 section data_user
+
+section data_main
 
 SECTION DATA_END
 
@@ -286,9 +288,12 @@ section bss_lib
 section bss_compiler
 section bss_user
 
+section bss_main
+
 section BSS_UNINITIALIZED
 SECTION BSS_END
-SECTION DTX_END
+
+SECTION MAIN_END
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

@@ -51,7 +51,7 @@ defc __ENV_LTMPNAM = 15
 defc __ENV_TMPMAX = 0xffff
 defc __ENV_TMPMAX_TRY = 16
 
-; define(`__ENV_BINDIR', c:/bin)
+; define(`__ENV_BINDIR', c:/dot)
 ; define(`__ENV_SYSDIR', c:/sys)
 
 defc __SPECTRUM = 16
@@ -67,7 +67,7 @@ defc __USE_SPECTRUM_128_SECOND_DFILE = 0
 
 defc __USE_SYSVAR = 0
 
-defc __USE_ZXN_OPCODES = 0
+defc __USE_ZXN_OPCODES = 0xff
 
 defc __USE_ZXN_OPCODES_NEXTREG = 1
 defc __USE_ZXN_OPCODES_MLT = 2
@@ -1996,6 +1996,11 @@ defc __IO_1FFD_PRINTER_STROBE = 0x10
 
 
 
+defc __IO_DIVIDE_CONTROL = 0xe3
+
+defc __IDC_CONMEM = 0x80
+defc __IDC_MAPRAM = 0x40
+
 defc __IO_SPI_CONTROL = 0xe7
 
 defc __ISC_SPI_CS = 0x80
@@ -2095,6 +2100,10 @@ defc __nextos_browsercaps_unmount = 0x20
 defc __nextos_browsercaps_syscfg = 0x80
 defc __nextos_browsercaps_all = 0x3f
 
+defc __NEXTOS_IDE_MOUNT = 0x01d2
+defc __nextos_unmount = 0
+defc __nextos_remount = 1
+
 defc __NEXTOS_IDE_STREAM_OPEN = 0x0056
 defc __NEXTOS_IDE_STREAM_CLOSE = 0x0059
 defc __NEXTOS_IDE_STREAM_IN = 0x005c
@@ -2116,6 +2125,15 @@ defc __NEXTOS_IDE_WINDOW_STRING = 0x01c6
 defc __NEXTOS_IDE_INTEGER_VAR = 0x01c9
 defc __NEXTOS_IDE_RTC = 0x01cc
 defc __NEXTOS_IDE_DRIVER = 0x01cf
+
+defc __NEXTOS_IDE_MODE = 0x01d5
+defc __nextos_mode_query = 0
+defc __nextos_mode_set_layer_0 = 0x0000
+defc __nextos_mode_set_layer_1_lores = 0x0100
+defc __nextos_mode_set_layer_1_ula = 0x0101
+defc __nextos_mode_set_layer_1_hires = 0x0102
+defc __nextos_mode_set_layer_1_hicol = 0x0103
+defc __nextos_mode_set_layer_2 = 0x0200
 
 defc __NEXTOS_DOS_REF_XDPB = 0x0151
 defc __NEXTOS_DOS_MAP_B = 0x0154
@@ -2585,6 +2603,8 @@ defc __REG_DEBUG = 0xff
 
 
 
+defc __ROM3_BC_SPACES = 0x0030
+defc __ROM3_CLS = 0x0d6b
 defc __ROM3_MAKE_ROOM = 0x1655
 defc __ROM3_RECLAIM_2 = 0x19e8
 

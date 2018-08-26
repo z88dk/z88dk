@@ -172,8 +172,7 @@ int zx_exec(char *target)
 
     ret = -1;
 
-    if (zxc.help)
-        return ret;
+    if (zxc.help) return ret;
 
     // filenames
 
@@ -462,9 +461,6 @@ int zx_exec(char *target)
             return ret;
 
         // dot command is out but we need to process binaries in other memory banks
-        // remove the mainbank so as not to process it again
-
-        mb_remove_mainbank(&memory.mainbank, zxc.clean);
     }
 
     if (sna)

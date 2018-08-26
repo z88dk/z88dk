@@ -21,3 +21,10 @@ esxdos_f_write:
    
    ld a,e
    jp asm_esxdos_f_write
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esxdos_f_write
+defc _esxdos_f_write = esxdos_f_write
+ENDIF
+

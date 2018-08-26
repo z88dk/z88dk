@@ -14,3 +14,10 @@ esx_f_opendir_ex_callee:
    
    ld b,c
    jp asm_esx_f_opendir_ex
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esx_f_opendir_ex_callee
+defc _esx_f_opendir_ex_callee = esx_f_opendir_ex_callee
+ENDIF
+
