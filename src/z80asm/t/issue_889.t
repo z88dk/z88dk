@@ -36,5 +36,5 @@ END
 run("z80asm -b test.asm test1.asm");
 check_bin_file("test.bin", "7");
 
-#unlink_testfiles();
+unlink_testfiles();
 done_testing();
