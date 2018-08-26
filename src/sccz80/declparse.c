@@ -316,7 +316,7 @@ Type *parse_struct(Type *type, char isstruct)
     } else {
         // Anonymous struct
         str = CALLOC(1,sizeof(*str));
-        snprintf(str->name, sizeof(str->name), "0__anonstruct_%d", num_structs++);
+        snprintf(str->name, sizeof(str->name), "0__anon%s_%d", isstruct ? "struct" : "union", num_structs++);
         str->kind = KIND_STRUCT;
         str->fields = array_init(free_type); 
         str->weak = 1;
