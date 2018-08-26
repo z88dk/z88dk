@@ -158,10 +158,8 @@ int zxn_exec(char *target)
     int i, j, errors, ret;
     int bsnum_bank, bsnum_div, bsnum_page;
     char k;
-    int mainbank_occupied;
 
     ret = -1;
-    mainbank_occupied = 0xfc;   // mmu2+
 
     if (zxc.help) return ret;
 
@@ -461,8 +459,6 @@ int zxn_exec(char *target)
     {
         if (bsnum_bank >= 0)
         {
-            mainbank_occupied = 0;
-
             for (i = 0; i < 8; ++i)
             {
                 struct memory_bank *mb = &memory.bankspace[bsnum_bank].membank[i];
@@ -483,16 +479,6 @@ int zxn_exec(char *target)
                                 mb->secbin[j].org += 0x8000 - 0xc000;
                             else
                                 mb->secbin[j].org += 0x4000 - 0xc000;
-
-                            // record occupied pages for section
-
-                            if (mb->secbin[j].size > 0)
-                            {
-                                int k;
-
-                                for (k = (mb->secbin[j].org >> 13) & 0x7; k <= (((mb->secbin[j].org + mb->secbin[j].size - 1) >> 13) & 0x7); ++k)
-                                    mainbank_occupied |= 1 << k;
-                            }
                         }
 
                         // move sections to main bank
@@ -625,7 +611,7 @@ int zxn_exec(char *target)
 
     if (nex)
     {
-        if ((ret = zxn_nex(&zxc, &zxnex, &memory, zxb.romfill, mainbank_occupied)) != 0)
+        if ((ret = zxn_nex(&zxc, &zxnex, &memory, zxb.romfill)) != 0)
             return ret;
 
         // nex is out but we need to process any remaining binaries
