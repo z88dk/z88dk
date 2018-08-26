@@ -10,20 +10,23 @@ set -e  		# -e: exit on error; -u: exit on undefined variable
 do_clean=0
 do_tests=0
 do_build=1
+do_examples=0
 do_libbuild=1
 for arg in "$@"; do
   case "$arg" in
     -k) set +e					;;	# keep building ignoring errors
     -c) do_clean=1				;;	# clean before building
     -t) do_tests=1				;;	# Run tests as well
+    -e) do_examples=1				;;	# Build examples as well 
     -nb) do_build=0				;;	# Don't build
     -nl) do_libbuild=0				;;	# Don't build libraries
      *) 
-	echo "Usage: $0 [-k][-c][-t][-nb][-nl]"
+	echo "Usage: $0 [-e][-k][-c][-t][-nb][-nl]"
 	echo
 	echo "-k\tKeep building ignoring errors"
 	echo "-c\tClean before building"
 	echo "-t\tRun tests"
+	echo "-e\tBuild examples"
 	echo "-nb\tDon't build binaries"
 	echo "-nl\tDon't build libraries"
 	echo ""
@@ -77,7 +80,7 @@ fi
 
 
 if [ $do_libbuild = 1 ]; then
-    $MAKE -C libsrc 
+    $MAKE -C libsrc clean
     $MAKE -C libsrc install 
     $MAKE -C libsrc/_DEVELOPMENT 
     $MAKE -C include/_DEVELOPMENT 
@@ -85,5 +88,8 @@ fi
 if [ $do_tests = 1 ]; then
     $MAKE -C testsuite 
     $MAKE -C test 
+fi
+if [ $do_examples = 1 ]; then
+    $MAKE -C examples
 fi
 
