@@ -81,6 +81,7 @@ fi
 
 if [ $do_libbuild = 1 ]; then
     $MAKE -C libsrc clean
+    $MAKE -C libsrc 
     $MAKE -C libsrc install 
     $MAKE -C libsrc/_DEVELOPMENT 
     $MAKE -C include/_DEVELOPMENT 
