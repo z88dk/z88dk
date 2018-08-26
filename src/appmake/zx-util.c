@@ -841,7 +841,7 @@ int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory)
         exit_log(1, "Error: Section MAIN not found\n");
     }
 
-    snprintf(outnamex, "%s.X", outname);
+    sprintf(outnamex, "%s.X", outname);
 
     sb = &mb->secbin[section_num];
 
@@ -1812,14 +1812,16 @@ struct nex_hdr nh;
 
 #define NEX_SCREEN_SIZE (512+49152)
 
-int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *memory, int fillbyte, int mainbank_occupied)
+int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *memory, int fillbyte)
 {
-    int  i;
+    int  i, j;
     int  bsnum_bank;
     char outname[FILENAME_MAX];
 
     int register_sp;
     int crt_org_code;
+
+    int mainbank_occupied;
 
     FILE *fin;
     FILE *fout;
@@ -1906,6 +1908,8 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
 
         memset(mem, fillbyte, sizeof(mem));
 
+        mainbank_occupied = 0;
+
         for (i = 0; i < memory->mainbank.num; ++i)
         {
             struct section_bin *sb = &memory->mainbank.secbin[i];
@@ -1926,7 +1930,27 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
             }
 
             fclose(fin);
+
+            if (sb->size > 0)
+            {
+                for (j = (sb->org >> 13) & 0x7; j <= (((sb->org + sb->size - 1) >> 13) & 0x7); ++j)
+                    mainbank_occupied |= 1 << j;
+            }
         }
+
+        // NOT NEEDED FOR NEX FORMAT BECAUSE NEX DOES NOT COOPERATE WITH NEXTZXOS
+        //
+        // mark all pages occupied above the lowest page
+        // temporary to accommodate z88dk normally placing stack and heap at top of memory
+        //
+        // for (i = 0; i < 8; ++i)
+        // {
+        //     if (mainbank_occupied & (1 << i))
+        //     {
+        //         mainbank_occupied = 0xff - (1 << i) + 1;
+        //         break;
+        //     }
+        // }
 
         // bank 5
 
