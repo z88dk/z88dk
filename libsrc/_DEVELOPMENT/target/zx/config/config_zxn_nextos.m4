@@ -20,6 +20,8 @@ divert(-1)
 # compatible with esxdos should work on esxdos too.  The interfaces are kept
 # separate pending confirmation the esxdos portion is the same.
 
+define(`__NEXTOS_IDE_MODE', 0x01d5)
+
 ###################
 # NextOS ESXDOS API
 ###################
@@ -183,6 +185,8 @@ dnl#
 
 ifdef(`CFG_ASM_PUB',
 `
+PUBLIC `__NEXTOS_IDE_MODE'
+
 PUBLIC `__ESX_RST_SYS'
 PUBLIC `__ESX_RST_ROM'
 PUBLIC `__ESX_RST_EXITDOT'
@@ -328,6 +332,8 @@ dnl#
 
 ifdef(`CFG_ASM_DEF',
 `
+defc `__NEXTOS_IDE_MODE' = __NEXTOS_IDE_MODE
+
 defc `__ESX_RST_SYS' = __ESX_RST_SYS
 defc `__ESX_RST_ROM' = __ESX_RST_ROM
 defc `__ESX_RST_EXITDOT' = __ESX_RST_EXITDOT
@@ -473,6 +479,8 @@ dnl#
 
 ifdef(`CFG_C_DEF',
 `
+`#define' `__NEXTOS_IDE_MODE'  __NEXTOS_IDE_MODE
+
 `#define' `__ESX_RST_SYS'  __ESX_RST_SYS
 `#define' `__ESX_RST_ROM'  __ESX_RST_ROM
 `#define' `__ESX_RST_EXITDOT'  __ESX_RST_EXITDOT

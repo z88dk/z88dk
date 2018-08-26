@@ -1033,6 +1033,8 @@ defc __ULAP_COLOR_HTML_White = 255
 
 
 
+defc __NEXTOS_IDE_MODE = 0x01d5
+
 defc __ESX_RST_SYS = 0x08
 defc __ESX_RST_ROM = 0x18
 defc __ESX_RST_EXITDOT = 0x20

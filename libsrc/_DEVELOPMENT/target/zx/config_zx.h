@@ -1030,6 +1030,8 @@
 
 
 
+#define __NEXTOS_IDE_MODE  0x01d5
+
 #define __ESX_RST_SYS  0x08
 #define __ESX_RST_ROM  0x18
 #define __ESX_RST_EXITDOT  0x20
