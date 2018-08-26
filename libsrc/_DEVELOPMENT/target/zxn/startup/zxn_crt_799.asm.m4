@@ -99,9 +99,9 @@ __Start:
    or a
    jp nz, error_crt         ; if nextos is in 48k mode
       
-   IF NEXTOS_VERSION
+   IF __NEXTOS_VERSION > 0
 
-      ld hl,+(((NEXTOS_VERSION / 1000) % 10) << 12) + (((NEXTOS_VERSION / 100) % 10) << 8) + (((NEXTOS_VERSION / 10) % 10) << 4) + (NEXTOS_VERSION % 10)
+      ld hl,+(((__NEXTOS_VERSION / 1000) % 10) << 12) + (((__NEXTOS_VERSION / 100) % 10) << 8) + (((__NEXTOS_VERSION / 10) % 10) << 4) + (__NEXTOS_VERSION % 10)
          
       ex de,hl
       sbc hl,de
@@ -114,7 +114,7 @@ __Start:
    ;; core version check
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   IF CRT_CORE_VERSION
+   IF __CRT_CORE_VERSION
    
       ;; set up error
 
@@ -144,7 +144,7 @@ __Start:
       inc b
       in e,(c)                 ; e = core version major minor
       
-      ld a,+(((CRT_CORE_VERSION / 100000) & 0xf) << 4) + (((CRT_CORE_VERSION / 1000) % 100) & 0xf)
+      ld a,+(((__CRT_CORE_VERSION / 100000) & 0xf) << 4) + (((__CRT_CORE_VERSION / 1000) % 100) & 0xf)
       
       cp e
       jr c, core_pass          ; if minimum < core version
@@ -160,7 +160,7 @@ __Start:
       inc b
       in a,(c)                 ; a = core sub version
       
-      cp CRT_CORE_VERSION % 1000
+      cp __CRT_CORE_VERSION % 1000
       jp c, error_crt          ; if core sub version < minimum
 
    core_pass:
@@ -1061,52 +1061,52 @@ ENDIF
 ;; error messages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF CRT_CORE_VERSION
+IF __CRT_CORE_VERSION
 
    error_msg_core_version:
    
       defm "Requires Core v"
 
-      IF ((CRT_CORE_VERSION / 1000000) % 10)
-         defb (CRT_CORE_VERSION / 1000000) % 10 + '0'
+      IF ((__CRT_CORE_VERSION / 1000000) % 10)
+         defb (__CRT_CORE_VERSION / 1000000) % 10 + '0'
       ENDIF
       
-         defb (CRT_CORE_VERSION / 100000) % 10 + '0'
+         defb (__CRT_CORE_VERSION / 100000) % 10 + '0'
          defb '.'
       
-      IF ((CRT_CORE_VERSION / 10000) % 10)
-         defb (CRT_CORE_VERSION / 10000) % 10 + '0'
+      IF ((__CRT_CORE_VERSION / 10000) % 10)
+         defb (__CRT_CORE_VERSION / 10000) % 10 + '0'
       ENDIF
       
-         defb (CRT_CORE_VERSION / 1000) % 10 + '0'
+         defb (__CRT_CORE_VERSION / 1000) % 10 + '0'
          defb '.'
       
-      IF ((CRT_CORE_VERSION / 100) % 10)
-         defb (CRT_CORE_VERSION / 100) % 10 + '0'
+      IF ((__CRT_CORE_VERSION / 100) % 10)
+         defb (__CRT_CORE_VERSION / 100) % 10 + '0'
       ENDIF
       
-      IF ((CRT_CORE_VERSION / 100) % 10) || ((CRT_CORE_VERSION / 10) % 10)
-         defb (CRT_CORE_VERSION / 10) % 10 + '0'
+      IF ((__CRT_CORE_VERSION / 100) % 10) || ((__CRT_CORE_VERSION / 10) % 10)
+         defb (__CRT_CORE_VERSION / 10) % 10 + '0'
       ENDIF
       
-      defb CRT_CORE_VERSION % 10 + '0' + 0x80
+      defb __CRT_CORE_VERSION % 10 + '0' + 0x80
 
 ENDIF
 
-IF NEXTOS_VERSION
+IF __NEXTOS_VERSION > 0
 
    error_msg_nextos:
       
       defm "Requires NextZXOS 128k "
       
-      IF ((NEXTOS_VERSION / 1000) % 10)
-         defb (NEXTOS_VERSION / 1000) % 10 + '0'
+      IF ((__NEXTOS_VERSION / 1000) % 10)
+         defb (__NEXTOS_VERSION / 1000) % 10 + '0'
       ENDIF
       
-      defb (NEXTOS_VERSION / 100) % 10 + '0'
+      defb (__NEXTOS_VERSION / 100) % 10 + '0'
       defb '.'
-      defb (NEXTOS_VERSION / 10) % 10 + '0'
-      defb NEXTOS_VERSION % 10 + '0' + 0x80
+      defb (__NEXTOS_VERSION / 10) % 10 + '0'
+      defb __NEXTOS_VERSION % 10 + '0' + 0x80
    
 ELSE
    
