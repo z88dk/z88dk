@@ -28,7 +28,7 @@ use Object::Tiny::RW qw(
 use Test::More;
 use Test::Differences; 
 use File::Slurp;
-use List::AllUtils 'uniq';
+use List::Uniq 'uniq';
 BEGIN { 
 	use lib '.'; 
 	use t::TestZ80asm; *z80asm = \&::z80asm; # z80asm already imported in another package

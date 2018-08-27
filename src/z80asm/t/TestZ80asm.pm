@@ -15,7 +15,7 @@ use Test::More;
 use Test::Differences; 
 use Test::HexDifferences;
 use File::Slurp;
-use List::AllUtils 'uniq';
+use List::Uniq 'uniq';
 use Capture::Tiny::Extended 'capture';
 
 our @EXPORT = qw( z80asm z80nm 
