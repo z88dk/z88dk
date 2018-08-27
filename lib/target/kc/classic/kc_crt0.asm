@@ -41,6 +41,7 @@ ENDIF
         defc    CONSOLE_COLUMNS = 40
         defc    CONSOLE_ROWS = 32
 
+        defc    TAR__fputc_cons_generic = 1
 	defc	TAR__register_sp = CRT_ORG_CODE-2
         defc    TAR__clib_exit_stack_size = 32
 	defc	__CPU_CLOCK = 2000000
