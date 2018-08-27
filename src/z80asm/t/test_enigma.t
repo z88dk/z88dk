@@ -15,6 +15,7 @@ use Test::More;
 use Path::Tiny;
 require './t/testlib.pl';
 
+my $NUL 	= ($^O eq 'MSWin32') ? 'nul:' : '/dev/null';
 my $CPM_DIR     = '../../ext/cpm';
 my $CPM         = '../../ext/cpm/cpm';
 my $ENIGMA      = '../../examples/console/enigma.c';
@@ -29,7 +30,7 @@ spew("enigma.in", "HELLO.\r\n");
 spew("enigma.exp", "Enter text to be (de)coded, finish with a .\n".
                    "HREXLSLEOC .");
 
-$cmd = "$CPM enigma < enigma.in > enigma.out";
+$cmd = "$CPM enigma < enigma.in > enigma.out 2> $NUL";
 ok 0==system($cmd), $cmd;
 
 # cleanup output
