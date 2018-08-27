@@ -911,6 +911,7 @@ alphatro_clib.lib:
 	@echo ''
 	@echo '--- Building Triump Adler Alphatronic PC Library ---'
 	@echo ''
+	@$(RM) -f video/mc6845/*.o
 	$(MAKE) gfxdeps
 	$(call buildgeneric,alphatro)
 	TARGET=alphatro TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORalphatro -x$(OUTPUT_DIRECTORY)/alphatro_clib @$(LISTFILE_DIRECTORY)/alphatro.lst
@@ -1162,6 +1163,7 @@ trs80_clib.lib:
 	@echo ''
 	@echo '--- Building TRS 80 Library ---'
 	@echo ''
+	@$(RM) -f video/mc6845/*.o
 	$(call buildgeneric,trs80)
 	$(MAKE) -C games TARGET=trs80
 	TARGET=trs80 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80_clib @$(LISTFILE_DIRECTORY)/trs80.lst

@@ -20,6 +20,15 @@ generic_console_ioctl:
 	inc	hl
 	ld	h,(hl)
 	ld	l,c
+        cp      IOCTL_GENCON_SET_MODE
+        jr      nz,check_font32
+        ld      a,l
+        and     a
+        jr      z,set_mode
+        ld      a,24            ;use ROM character set
+set_mode:
+        ld      (__eg2000_mode),a
+        jr      success
 check_font32:
 	cp	IOCTL_GENCON_SET_FONT32
 	jr	nz,check_set_udg
