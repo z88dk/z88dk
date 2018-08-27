@@ -15,6 +15,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-4.9
+            - dos2unix
       env:
          - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
 
