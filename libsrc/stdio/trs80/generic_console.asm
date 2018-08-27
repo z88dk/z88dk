@@ -16,6 +16,7 @@
 		EXTERN		CONSOLE_ROWS
 		EXTERN		EG2000_ENABLED
 		EXTERN		CRT_FONT
+		EXTERN		conio_map_colour
 		
 		EXTERN		base_graphics
 
@@ -25,6 +26,7 @@
 
 
 generic_console_set_ink:
+	call	conio_map_colour
 	and	15
 	ld	(__eg2000_attr),a
 	ret
