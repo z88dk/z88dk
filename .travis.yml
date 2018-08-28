@@ -17,6 +17,8 @@ matrix:
             - g++-4.9
             - dos2unix
             - libboost-all-dev
+            - texinfo
+            - texi2html
       env:
          - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
 
