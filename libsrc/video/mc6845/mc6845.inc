@@ -8,3 +8,11 @@ IF FORalphatro
 	defc	register_r = 0x51
 	defc	register_w = 0x51
 ENDIF
+
+IF FORtrs80
+	; Really for the Color Genie (eg2000)
+	defc	address_r = 0
+	defc	address_w = 0xfa
+	defc	register_r = 0xfb
+	defc	register_w = 0xfb
+ENDIF

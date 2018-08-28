@@ -12,6 +12,7 @@ games/joystick
 @gfxbasew.lst
 graphics/kc/clg
 graphics/kc/w_pixladdr
+graphics/kc/swapgfxbk
 graphics/w_clga
 graphics/kc/w_stencil_render
 graphics/w_putsprite

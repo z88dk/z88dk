@@ -20,8 +20,10 @@
 
 		PUBLIC		generic_console_xypos_graphics
 
+		EXTERN		generic_console_flags
 		EXTERN		generic_console_font32
 		EXTERN		generic_console_udg32
+		EXTERN		conio_map_colour
 
 
 		EXTERN		CRT_FONT
@@ -32,12 +34,14 @@
 
 
 generic_console_set_ink:
+	call	conio_map_colour
 	and	7
 	ld	(__rx78_ink),a
 	ret
 
 	
 generic_console_set_paper:
+	call	conio_map_colour
 	rlca
 	rlca
 	rlca
@@ -96,12 +100,21 @@ not_udg:
 	and	@00111000
 	ld	d,a
 	exx
+	ld	a,(generic_console_flags)
+	rlca
+	sbc	a
+	ld	c,a		;c = 0/c = 255 = inverse
 	ld	a,8
 loop:	push	af
+	push	bc		;save inverse flag
 	ld	a,(de)
-	bit	5,d
-	jr	z,rom_font
-	ld	c,a		;Mirror the font
+	xor	c
+	ld	c,a		;c = byte to print
+	ld	a,d
+	cp	$20		;If font < 8192, then it's in ROM and mirrored
+	ld	a,c
+	jr	c,rom_font
+	; Mirror for RAM fonts
 	rlca
 	rlca
 	xor	c
@@ -147,10 +160,10 @@ rom_font:
 	ld	(hl),0
 	
 
-
 	ld	bc,24
 	add	hl,bc
 	inc	de
+	pop	bc
 	pop	af
 	dec	a
 	jr	nz,loop

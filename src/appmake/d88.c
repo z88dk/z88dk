@@ -15,7 +15,7 @@ FILE *d88_create_disk(const char *filename, d88_hdr_t *header, int num_tracks, i
     FILE    *fp;
     int      i;
 
-    if ( (fp = fopen(filename, "w") ) == NULL) {
+    if ( (fp = fopen(filename, "wb") ) == NULL) {
         exit_log(1,"Cannot open d88 disc <%s> for writing\n", filename);
     }
     num_tracks *= 2;
@@ -45,7 +45,7 @@ FILE *d88_create_disk(const char *filename, d88_hdr_t *header, int num_tracks, i
 /* Needs to be called in order */
 int   d88_write_sector(FILE *handle, d88_sct_t *sector, void *data, size_t datalen)
 {
-     uint8_t  *buf = malloc(sizeof(sector) + datalen);
+     uint8_t  *buf = malloc(sizeof(*sector) + datalen);
      uint8_t  *ptr = buf;
 
      *ptr++ = sector->c;

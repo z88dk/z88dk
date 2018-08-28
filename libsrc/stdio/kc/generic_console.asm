@@ -66,7 +66,7 @@ generic_console_cls:
 	out	($84),a		;pixels
 	ld	hl,32768
 	ld	de,32769
-	ld	bc,+(CONSOLE_ROWS * CONSOLE_COLUMNS * 8 ) -1
+	ld	bc,+(CONSOLE_ROWS * CONSOLE_COLUMNS * 8 ) 
 	ld	(hl),0
 	ldir
 	ld	a,(kc_type)
@@ -78,7 +78,7 @@ generic_console_cls:
 	out	($84),a		;pixels
         ld      hl,32768
         ld      de,32769
-        ld      bc,+(CONSOLE_ROWS * CONSOLE_COLUMNS * 8 )-1
+        ld      bc,+(CONSOLE_ROWS * CONSOLE_COLUMNS * 8 )
 	ld	a,(kc_attr)
         ld      (hl),a
         ldir
@@ -86,7 +86,7 @@ generic_console_cls:
 clear_attributes_kc85_2_3:
 	; Now we point to start of colour memory
 	; Consider KC85/2 first of all
-	ld	bc,+(CONSOLE_ROWS * CONSOLE_COLUMNS * 2) -1
+	ld	bc,+(CONSOLE_ROWS * CONSOLE_COLUMNS * 2) 
 	ld	a,(kc_attr)
 	ld	(hl),a
 	ldir

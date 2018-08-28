@@ -3,6 +3,7 @@ stdio/trs80/fputc_cons
 stdio/trs80/getk
 stdio/trs80/generic_console
 stdio/trs80/generic_console_ioctl
+stdio/trs80/conio_map_colour
 stdio/trs80/CRT_FONT
 @stdio/stdio.lst
 @font/font_8x8/font_8x8.lst
@@ -17,4 +18,5 @@ games/trs80/bit_open_di
 games/trs80/bit_close
 games/trs80/bit_close_ei
 @games/games.lst
+@video/mc6845/mc6845.lst
 @z80.lst
