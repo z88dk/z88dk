@@ -16,14 +16,18 @@ INSTALL ?= install
 CFLAGS ?= -O2
 CC ?= gcc
 # Prefix for executables (eg z88dk-, hence z88dk-z80asm, z88dk-copt etc)
-EXEC_PREFIX ?= 
+EXEC_PREFIX ?=
 CROSS ?= 0
+
+SDCC_PATH	= /tmp/sdcc
+Z88DK_PATH	= $(shell pwd)
 
 # --> End of Configurable Options
 
-export CC INSTALL CFLAGS EXEC_PREFIX CROSS 
+export CC INSTALL CFLAGS EXEC_PREFIX CROSS
 
-all: setup appmake copt zcpp ucpp sccz80 z80asm zcc zpragma zx7 z80nm zobjcopy lstmanip ticks z80svg font2pv1000 testsuite z88dk-lib
+all: 	setup appmake copt zcpp ucpp sccz80 z80asm zcc zpragma zx7 z80nm zobjcopy \
+	lstmanip ticks z80svg font2pv1000 testsuite z88dk-lib zsdcc
 
 setup:
 	$(shell if [ "${git_count}" != "" ]; then \
@@ -40,6 +44,23 @@ setup:
         fi)
 	@mkdir -p bin
 
+zsdcc: bin/zsdcc
+
+bin/zsdcc:
+	svn checkout -r 9958 svn://svn.code.sf.net/p/sdcc/code/trunk/sdcc $(SDCC_PATH)
+	cd $(SDCC_PATH) && patch -p0 < $(Z88DK_PATH)/src/zsdcc/sdcc-z88dk.patch
+	cd $(SDCC_PATH) && ./configure --disable-mcs51-port --disable-gbz80-port \
+				       --disable-avr-port --disable-ds390-port \
+				       --disable-ds400-port --disable-hc08-port \
+				       --disable-pic-port --disable-pic14-port \
+                       		       --disable-pic16-port --disable-stm8-port \
+				       --disable-tlcs90-port --disable-s08-port \
+                       		       --disable-ucsim --disable-device-lib \
+				       --disable-packihx
+	cd $(SDCC_PATH) && $(MAKE)
+	cd $(SDCC_PATH) && mv ./bin/sdcc  $(Z88DK_PATH)/bin/zsdcc
+	cd $(SDCC_PATH) && mv ./bin/sdcpp $(Z88DK_PATH)/bin/zsdcpp
+	$(RM) -fR $(SDCC_PATH)
 
 appmake:
 	$(MAKE) -C src/appmake
@@ -111,7 +132,7 @@ libs:
 	cd libsrc ; $(MAKE) install
 
 install: install-clean
-	install -d $(DESTDIR)/$(prefix) $(DESTDIR)/$(prefix_share)/lib 
+	install -d $(DESTDIR)/$(prefix) $(DESTDIR)/$(prefix_share)/lib
 	$(MAKE) -C src/appmake PREFIX=$(DESTDIR)/$(prefix) install
 	$(MAKE) -C src/copt PREFIX=$(DESTDIR)/$(prefix) install
 	$(MAKE) -C src/ucpp PREFIX=$(DESTDIR)/$(prefix) install
@@ -139,7 +160,7 @@ install: install-clean
 test:
 	$(MAKE) -C test
 
-testsuite: 
+testsuite:
 	$(MAKE) -C testsuite
 
 install-clean:
