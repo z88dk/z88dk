@@ -16,6 +16,7 @@ matrix:
           packages:
             - g++-4.9
             - dos2unix
+            - libboost-all-dev
       env:
          - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
 
