@@ -9,6 +9,10 @@ arch/zxn/esxdos/c/sdcc_iy/esx_disk_stream_sectors
 arch/zxn/esxdos/c/sdcc_iy/esx_disk_stream_sectors_callee
 arch/zxn/esxdos/c/sdcc_iy/esx_disk_stream_start
 arch/zxn/esxdos/c/sdcc_iy/esx_disk_stream_start_fastcall
+arch/zxn/esxdos/c/sdcc_iy/esx_dos_catalog
+arch/zxn/esxdos/c/sdcc_iy/esx_dos_catalog_fastcall
+arch/zxn/esxdos/c/sdcc_iy/esx_dos_catalog_next
+arch/zxn/esxdos/c/sdcc_iy/esx_dos_catalog_next_fastcall
 arch/zxn/esxdos/c/sdcc_iy/esx_f_chdir
 arch/zxn/esxdos/c/sdcc_iy/esx_f_chdir_fastcall
 arch/zxn/esxdos/c/sdcc_iy/esx_f_chmod

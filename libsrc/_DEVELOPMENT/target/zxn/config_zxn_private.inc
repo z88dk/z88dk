@@ -2044,7 +2044,12 @@ defc __NEXTOS_DOS_READ = 0x0112
 defc __NEXTOS_DOS_WRITE = 0x0115
 defc __NEXTOS_DOS_BYTE_READ = 0x0118
 defc __NEXTOS_DOS_BYTE_WRITE = 0x011b
+
 defc __NEXTOS_DOS_CATALOG = 0x011e
+defc __nextos_cat_filter_system = 0x01
+defc __nextos_cat_filter_lfn = 0x02
+defc __nextos_cat_filter_dir = 0x04
+
 defc __NEXTOS_DOS_FREE_SPACE = 0x0121
 defc __NEXTOS_DOS_DELETE = 0x0124
 defc __NEXTOS_DOS_RENAME = 0x0127
@@ -2134,6 +2139,9 @@ defc __nextos_mode_set_layer_1_ula = 0x0101
 defc __nextos_mode_set_layer_1_hires = 0x0102
 defc __nextos_mode_set_layer_1_hicol = 0x0103
 defc __nextos_mode_set_layer_2 = 0x0200
+defc __nextos_mode_flag_reduced_height = 0x01
+defc __nextos_mode_flag_double_width = 0x10
+defc __nextos_mode_flag_double_height = 0x20
 
 defc __NEXTOS_DOS_REF_XDPB = 0x0151
 defc __NEXTOS_DOS_MAP_B = 0x0154

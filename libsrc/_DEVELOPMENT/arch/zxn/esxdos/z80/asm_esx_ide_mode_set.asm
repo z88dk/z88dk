@@ -20,7 +20,7 @@ asm_esx_ide_mode_set:
    ;         fail
    ;
    ;            hl = -1
-   ;            carry set, errno = __ESX_ENONSENSE
+   ;            carry set, errno = nextzxos error code
    ;
    ; uses  : all except af', iy
    

@@ -5,6 +5,8 @@ arch/zxn/esxdos/z80/asm_esx_disk_stream_bytes
 arch/zxn/esxdos/z80/asm_esx_disk_stream_end
 arch/zxn/esxdos/z80/asm_esx_disk_stream_sectors
 arch/zxn/esxdos/z80/asm_esx_disk_stream_start
+arch/zxn/esxdos/z80/asm_esx_dos_catalog
+arch/zxn/esxdos/z80/asm_esx_dos_catalog_next
 arch/zxn/esxdos/z80/asm_esx_f_chdir
 arch/zxn/esxdos/z80/asm_esx_f_chmod
 arch/zxn/esxdos/z80/asm_esx_f_close
