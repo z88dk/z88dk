@@ -66,6 +66,8 @@ arch/zxn/esxdos/c/sdcc_iy/esx_f_unlink
 arch/zxn/esxdos/c/sdcc_iy/esx_f_unlink_fastcall
 arch/zxn/esxdos/c/sdcc_iy/esx_f_write
 arch/zxn/esxdos/c/sdcc_iy/esx_f_write_callee
+arch/zxn/esxdos/c/sdcc_iy/esx_ide_get_lfn
+arch/zxn/esxdos/c/sdcc_iy/esx_ide_get_lfn_callee
 arch/zxn/esxdos/c/sdcc_iy/esx_ide_mode_get
 arch/zxn/esxdos/c/sdcc_iy/esx_ide_mode_get_fastcall
 arch/zxn/esxdos/c/sdcc_iy/esx_ide_mode_set

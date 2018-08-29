@@ -33,6 +33,7 @@ arch/zxn/esxdos/z80/asm_esx_f_telldir
 arch/zxn/esxdos/z80/asm_esx_f_trunc
 arch/zxn/esxdos/z80/asm_esx_f_unlink
 arch/zxn/esxdos/z80/asm_esx_f_write
+arch/zxn/esxdos/z80/asm_esx_ide_get_lfn
 arch/zxn/esxdos/z80/asm_esx_ide_mode_get
 arch/zxn/esxdos/z80/asm_esx_ide_mode_set
 arch/zxn/esxdos/z80/asm_esx_m_dosversion

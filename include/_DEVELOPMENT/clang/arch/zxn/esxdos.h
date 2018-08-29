@@ -428,7 +428,7 @@ extern unsigned char esx_f_unlink(const char *filename);
 
 
 // FUNCTIONS IMPORTED FROM NEXTZXOS
-// require nextzxos 128k mode
+// require nextzxos 128k mode; items in memory must be in main memory
 
 // ide_mode
 
@@ -491,12 +491,12 @@ struct esx_cat
 {
    uint8_t filter;             // (init) filter applied (set bits enable)
    char *filename;             // (init) catalog match string
-   
-   uint8_t completed_sz;       // (cat) number of matched entries in indices 1+
-   uint16_t dir_handle;        // (cat) for IDE_GET_LFN
-   
+
+   uint16_t dir_handle;        // (dos_catalog) for IDE_GET_LFN
+   uint8_t completed_sz;       // (dos_catalog) number of matched entries in indices 1+
+
    uint8_t cat_sz;             // (init) actual size of cat[] >= 2
-   struct esx_cat_entry cat[0];
+   struct esx_cat_entry cat[2];
 };
 
 // filter bits indicate directory details included in catalog
@@ -509,6 +509,22 @@ extern unsigned char esx_dos_catalog(struct esx_cat *cat);
 
 
 extern unsigned char esx_dos_catalog_next(struct esx_cat *cat);
+
+
+
+// ide_get_lfn (tightly coupled to dos_catalog)
+
+struct esx_lfn
+{
+   struct esx_cat *dir;        // (init) associated dos_catalog structure
+   
+   char filename[ESX_FILENAME_LFN_MAX + 1];  // (get_lfn) long filename
+   
+   struct dos_tm time;         // (get_lfn) time.h contains functions dealing with dos time
+   uint32_t size;              // (get_lfn) file size in bytes
+};
+
+extern unsigned char esx_ide_get_lfn(struct esx_lfn *dir,struct esx_cat_entry *query);
 
 
 

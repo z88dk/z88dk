@@ -39,12 +39,13 @@ l_asm_esx_dos_catalog:
    inc hl
    ld d,(hl)                   ; de = filename
    inc hl
+
+   push hl                     ; save & cat.dir_handle
+   
+   inc hl
+   inc hl
    
    ld a,(hl)                   ; a = completed_sz
-   push hl                     ; save & cat.completed_sz
-   
-   inc hl
-   inc hl
    inc hl
 
    ld b,(hl)                   ; b = n+1 >= 2
@@ -96,17 +97,17 @@ catalog:
    rst __ESX_RST_SYS
    defb __ESX_M_P3DOS
    
-   pop de                      ; de = & cat.completed_sz
+   pop de                      ; de = & cat.dir_handle
    jp nc, __esxdos_error_mc    ; if error
    
    ex de,hl
    
-   ld (hl),b                   ; write completed sz
-   inc hl
-
    ld (hl),e
    inc hl
    ld (hl),d                   ; write directory handle
+   inc hl
+
+   ld (hl),b                   ; write completed sz
    
    xor a
    
