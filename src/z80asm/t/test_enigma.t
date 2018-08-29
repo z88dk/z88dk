@@ -15,7 +15,7 @@ use Test::More;
 use Path::Tiny;
 require './t/testlib.pl';
 
-my $NUL 	= ($^O eq 'MSWin32') ? 'nul:' : '/dev/null';
+my $NUL 	= ($^O eq 'MSWin32') ? 'nul' : '/dev/null';
 my $CPM_DIR     = '../../ext/cpm';
 my $CPM         = '../../ext/cpm/cpm';
 my $ENIGMA      = '../../examples/console/enigma.c';
@@ -30,14 +30,14 @@ spew("enigma.in", "HELLO.\r\n");
 spew("enigma.exp", "Enter text to be (de)coded, finish with a .\n".
                    "HREXLSLEOC .");
 
-$cmd = "$CPM enigma < enigma.in > enigma.out 2> $NUL";
+$cmd = path($CPM)->canonpath." enigma < enigma.in > enigma.out 2> $NUL";
 ok 0==system($cmd), $cmd;
 
 # cleanup output
 my $output = path('enigma.out')->slurp_raw;
 for ($output) {
     1 while s/.\x08//g;
-    s/\r\n|\n\r/\n/g;
+    s/[\r\n]+/\n/g;
     s/^\s+//s;
 }
 spew('enigma.out', $output);
