@@ -6,6 +6,12 @@
 #
 
 # ---> Configurable parameters are below his point
+ifeq ($(OS),Windows_NT)
+  EXE 		:= .exe
+else
+  EXE 		:=
+endif
+
 prefix ?= /usr/local
 prefix_share = $(prefix)/share/z88dk
 git_rev ?= $(shell git rev-parse --short HEAD)
@@ -44,9 +50,9 @@ setup:
         fi)
 	@mkdir -p bin
 
-zsdcc: bin/zsdcc
+zsdcc: bin/zsdcc$(EXE)
 
-bin/zsdcc:
+bin/zsdcc$(EXE):
 	svn checkout -r 9958 svn://svn.code.sf.net/p/sdcc/code/trunk/sdcc $(SDCC_PATH)
 	cd $(SDCC_PATH) && patch -p0 < $(Z88DK_PATH)/src/zsdcc/sdcc-z88dk.patch
 	cd $(SDCC_PATH) && ./configure --disable-mcs51-port --disable-gbz80-port \
