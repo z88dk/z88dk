@@ -9,8 +9,11 @@ EXTERN asm_esx_ide_mode_set
 _esx_ide_mode_set_fastcall:
 
    push ix
+   push iy
    
    call asm_esx_ide_mode_set
    
+   pop iy
    pop ix
+   
    ret

@@ -9,6 +9,10 @@ arch/zxn/esxdos/c/sdcc_ix/esx_disk_stream_sectors
 arch/zxn/esxdos/c/sdcc_ix/esx_disk_stream_sectors_callee
 arch/zxn/esxdos/c/sdcc_ix/esx_disk_stream_start
 arch/zxn/esxdos/c/sdcc_ix/esx_disk_stream_start_fastcall
+arch/zxn/esxdos/c/sdcc_ix/esx_dos_catalog
+arch/zxn/esxdos/c/sdcc_ix/esx_dos_catalog_fastcall
+arch/zxn/esxdos/c/sdcc_ix/esx_dos_catalog_next
+arch/zxn/esxdos/c/sdcc_ix/esx_dos_catalog_next_fastcall
 arch/zxn/esxdos/c/sdcc_ix/esx_f_chdir
 arch/zxn/esxdos/c/sdcc_ix/esx_f_chdir_fastcall
 arch/zxn/esxdos/c/sdcc_ix/esx_f_chmod
@@ -62,6 +66,8 @@ arch/zxn/esxdos/c/sdcc_ix/esx_f_unlink
 arch/zxn/esxdos/c/sdcc_ix/esx_f_unlink_fastcall
 arch/zxn/esxdos/c/sdcc_ix/esx_f_write
 arch/zxn/esxdos/c/sdcc_ix/esx_f_write_callee
+arch/zxn/esxdos/c/sdcc_ix/esx_ide_get_lfn
+arch/zxn/esxdos/c/sdcc_ix/esx_ide_get_lfn_callee
 arch/zxn/esxdos/c/sdcc_ix/esx_ide_mode_get
 arch/zxn/esxdos/c/sdcc_ix/esx_ide_mode_get_fastcall
 arch/zxn/esxdos/c/sdcc_ix/esx_ide_mode_set

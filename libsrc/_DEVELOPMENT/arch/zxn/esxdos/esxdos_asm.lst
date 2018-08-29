@@ -1,3 +1,4 @@
+arch/zxn/esxdos/z80/__nextos_nstr_to_cstr
 arch/zxn/esxdos/z80/__vars_esx_errh
 arch/zxn/esxdos/z80/__vars_esx_stream
 arch/zxn/esxdos/z80/asm_esx_disk_filemap
@@ -5,6 +6,8 @@ arch/zxn/esxdos/z80/asm_esx_disk_stream_bytes
 arch/zxn/esxdos/z80/asm_esx_disk_stream_end
 arch/zxn/esxdos/z80/asm_esx_disk_stream_sectors
 arch/zxn/esxdos/z80/asm_esx_disk_stream_start
+arch/zxn/esxdos/z80/asm_esx_dos_catalog
+arch/zxn/esxdos/z80/asm_esx_dos_catalog_next
 arch/zxn/esxdos/z80/asm_esx_f_chdir
 arch/zxn/esxdos/z80/asm_esx_f_chmod
 arch/zxn/esxdos/z80/asm_esx_f_close
@@ -31,6 +34,7 @@ arch/zxn/esxdos/z80/asm_esx_f_telldir
 arch/zxn/esxdos/z80/asm_esx_f_trunc
 arch/zxn/esxdos/z80/asm_esx_f_unlink
 arch/zxn/esxdos/z80/asm_esx_f_write
+arch/zxn/esxdos/z80/asm_esx_ide_get_lfn
 arch/zxn/esxdos/z80/asm_esx_ide_mode_get
 arch/zxn/esxdos/z80/asm_esx_ide_mode_set
 arch/zxn/esxdos/z80/asm_esx_m_dosversion

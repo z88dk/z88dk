@@ -5,8 +5,11 @@ INCLUDE "config_private.inc"
 SECTION code_esxdos
 
 PUBLIC asm_esx_ide_mode_get
+PUBLIC l_esx_ide_mode_get
 
 EXTERN __esxdos_error_mc, error_znc
+
+IF __ZXNEXT
 
 asm_esx_ide_mode_get:
 
@@ -20,7 +23,7 @@ asm_esx_ide_mode_get:
    ;         fail
    ;
    ;            hl = -1
-   ;            carry set, errno = __ESX_ENONSENSE
+   ;            carry set, errno = nextzxos error code
    ;
    ; uses  : all except af', iy
    
@@ -93,6 +96,14 @@ store_state:
 error_ide_mode:
 
    pop hl
-   
-   ld a,__ESX_ENONSENSE        ; change to esxdos error code
    jp __esxdos_error_mc
+
+ELSE
+
+asm_esx_ide_mode_get:
+l_esx_ide_mode_get:
+
+   ld a,__ESX_ENONSENSE
+   jp __esxdos_error_mc
+
+ENDIF

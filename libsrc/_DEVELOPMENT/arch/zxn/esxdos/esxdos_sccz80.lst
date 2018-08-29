@@ -8,6 +8,8 @@ arch/zxn/esxdos/c/sccz80/esx_disk_stream_end
 arch/zxn/esxdos/c/sccz80/esx_disk_stream_sectors
 arch/zxn/esxdos/c/sccz80/esx_disk_stream_sectors_callee
 arch/zxn/esxdos/c/sccz80/esx_disk_stream_start
+arch/zxn/esxdos/c/sccz80/esx_dos_catalog
+arch/zxn/esxdos/c/sccz80/esx_dos_catalog_next
 arch/zxn/esxdos/c/sccz80/esx_f_chdir
 arch/zxn/esxdos/c/sccz80/esx_f_chmod
 arch/zxn/esxdos/c/sccz80/esx_f_chmod_callee
@@ -49,6 +51,8 @@ arch/zxn/esxdos/c/sccz80/esx_f_trunc_callee
 arch/zxn/esxdos/c/sccz80/esx_f_unlink
 arch/zxn/esxdos/c/sccz80/esx_f_write
 arch/zxn/esxdos/c/sccz80/esx_f_write_callee
+arch/zxn/esxdos/c/sccz80/esx_ide_get_lfn
+arch/zxn/esxdos/c/sccz80/esx_ide_get_lfn_callee
 arch/zxn/esxdos/c/sccz80/esx_ide_mode_get
 arch/zxn/esxdos/c/sccz80/esx_ide_mode_set
 arch/zxn/esxdos/c/sccz80/esx_m_dosversion

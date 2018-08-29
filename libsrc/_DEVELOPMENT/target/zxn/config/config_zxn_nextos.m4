@@ -35,7 +35,12 @@ define(`__NEXTOS_DOS_READ', 0x0112)
 define(`__NEXTOS_DOS_WRITE', 0x0115)
 define(`__NEXTOS_DOS_BYTE_READ', 0x0118)
 define(`__NEXTOS_DOS_BYTE_WRITE', 0x011b)
+
 define(`__NEXTOS_DOS_CATALOG', 0x011e)
+define(`__nextos_cat_filter_system', 0x01)
+define(`__nextos_cat_filter_lfn', 0x02)
+define(`__nextos_cat_filter_dir', 0x04)
+
 define(`__NEXTOS_DOS_FREE_SPACE', 0x0121)
 define(`__NEXTOS_DOS_DELETE', 0x0124)
 define(`__NEXTOS_DOS_RENAME', 0x0127)
@@ -127,6 +132,9 @@ define(`__nextos_mode_set_layer_1_ula', 0x0101)
 define(`__nextos_mode_set_layer_1_hires', 0x0102)
 define(`__nextos_mode_set_layer_1_hicol', 0x0103)
 define(`__nextos_mode_set_layer_2', 0x0200)
+define(`__nextos_mode_flag_reduced_height', 0x01)
+define(`__nextos_mode_flag_double_width', 0x10)
+define(`__nextos_mode_flag_double_height', 0x20)
 
 # Legacy - Floppy Drive
 
@@ -395,7 +403,12 @@ PUBLIC `__NEXTOS_DOS_READ'
 PUBLIC `__NEXTOS_DOS_WRITE'
 PUBLIC `__NEXTOS_DOS_BYTE_READ'
 PUBLIC `__NEXTOS_DOS_BYTE_WRITE'
+
 PUBLIC `__NEXTOS_DOS_CATALOG'
+PUBLIC `__nextos_cat_filter_system'
+PUBLIC `__nextos_cat_filter_lfn'
+PUBLIC `__nextos_cat_filter_dir'
+
 PUBLIC `__NEXTOS_DOS_FREE_SPACE'
 PUBLIC `__NEXTOS_DOS_DELETE'
 PUBLIC `__NEXTOS_DOS_RENAME'
@@ -485,6 +498,9 @@ PUBLIC `__nextos_mode_set_layer_1_ula'
 PUBLIC `__nextos_mode_set_layer_1_hires'
 PUBLIC `__nextos_mode_set_layer_1_hicol'
 PUBLIC `__nextos_mode_set_layer_2'
+PUBLIC `__nextos_mode_flag_reduced_height'
+PUBLIC `__nextos_mode_flag_double_width'
+PUBLIC `__nextos_mode_flag_double_height'
 
 PUBLIC `__NEXTOS_DOS_REF_XDPB'
 PUBLIC `__NEXTOS_DOS_MAP_B'
@@ -727,7 +743,12 @@ defc `__NEXTOS_DOS_READ' = __NEXTOS_DOS_READ
 defc `__NEXTOS_DOS_WRITE' = __NEXTOS_DOS_WRITE
 defc `__NEXTOS_DOS_BYTE_READ' = __NEXTOS_DOS_BYTE_READ
 defc `__NEXTOS_DOS_BYTE_WRITE' = __NEXTOS_DOS_BYTE_WRITE
+
 defc `__NEXTOS_DOS_CATALOG' = __NEXTOS_DOS_CATALOG
+defc `__nextos_cat_filter_system' = __nextos_cat_filter_system
+defc `__nextos_cat_filter_lfn' = __nextos_cat_filter_lfn
+defc `__nextos_cat_filter_dir' = __nextos_cat_filter_dir
+
 defc `__NEXTOS_DOS_FREE_SPACE' = __NEXTOS_DOS_FREE_SPACE
 defc `__NEXTOS_DOS_DELETE' = __NEXTOS_DOS_DELETE
 defc `__NEXTOS_DOS_RENAME' = __NEXTOS_DOS_RENAME
@@ -817,6 +838,9 @@ defc `__nextos_mode_set_layer_1_ula' = __nextos_mode_set_layer_1_ula
 defc `__nextos_mode_set_layer_1_hires' = __nextos_mode_set_layer_1_hires
 defc `__nextos_mode_set_layer_1_hicol' = __nextos_mode_set_layer_1_hicol
 defc `__nextos_mode_set_layer_2' = __nextos_mode_set_layer_2
+defc `__nextos_mode_flag_reduced_height' = __nextos_mode_flag_reduced_height
+defc `__nextos_mode_flag_double_width' = __nextos_mode_flag_double_width
+defc `__nextos_mode_flag_double_height' = __nextos_mode_flag_double_height
 
 defc `__NEXTOS_DOS_REF_XDPB' = __NEXTOS_DOS_REF_XDPB
 defc `__NEXTOS_DOS_MAP_B' = __NEXTOS_DOS_MAP_B
@@ -1059,7 +1083,12 @@ ifdef(`CFG_C_DEF',
 `#define' `__NEXTOS_DOS_WRITE'  __NEXTOS_DOS_WRITE
 `#define' `__NEXTOS_DOS_BYTE_READ'  __NEXTOS_DOS_BYTE_READ
 `#define' `__NEXTOS_DOS_BYTE_WRITE'  __NEXTOS_DOS_BYTE_WRITE
+
 `#define' `__NEXTOS_DOS_CATALOG'  __NEXTOS_DOS_CATALOG
+`#define' `__nextos_cat_filter_system'  __nextos_cat_filter_system
+`#define' `__nextos_cat_filter_lfn'  __nextos_cat_filter_lfn
+`#define' `__nextos_cat_filter_dir'  __nextos_cat_filter_dir
+
 `#define' `__NEXTOS_DOS_FREE_SPACE'  __NEXTOS_DOS_FREE_SPACE
 `#define' `__NEXTOS_DOS_DELETE'  __NEXTOS_DOS_DELETE
 `#define' `__NEXTOS_DOS_RENAME'  __NEXTOS_DOS_RENAME
@@ -1149,6 +1178,9 @@ ifdef(`CFG_C_DEF',
 `#define' `__nextos_mode_set_layer_1_hires'  __nextos_mode_set_layer_1_hires
 `#define' `__nextos_mode_set_layer_1_hicol'  __nextos_mode_set_layer_1_hicol
 `#define' `__nextos_mode_set_layer_2'  __nextos_mode_set_layer_2
+`#define' `__nextos_mode_flag_reduced_height'  __nextos_mode_flag_reduced_height
+`#define' `__nextos_mode_flag_double_width'  __nextos_mode_flag_double_width
+`#define' `__nextos_mode_flag_double_height'  __nextos_mode_flag_double_height
 
 `#define' `__NEXTOS_DOS_REF_XDPB'  __NEXTOS_DOS_REF_XDPB
 `#define' `__NEXTOS_DOS_MAP_B'  __NEXTOS_DOS_MAP_B
