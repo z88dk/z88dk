@@ -38,7 +38,8 @@ done
 
 if [ $do_clean = 1 ]; then
   make clean
-  rm -rf bin/*
+  # dont remove bin, as zsdcc and szdcpp must be built by hand in win32
+  #rm -rf bin/*
 fi
 
 mkdir -p bin
