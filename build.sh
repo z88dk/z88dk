@@ -5,7 +5,7 @@
 #
 
 set -e  		# -e: exit on error; -u: exit on undefined variable
-				# -e can be overidden by -k option
+			# -e can be overidden by -k option
 
 do_clean=0
 do_tests=0
