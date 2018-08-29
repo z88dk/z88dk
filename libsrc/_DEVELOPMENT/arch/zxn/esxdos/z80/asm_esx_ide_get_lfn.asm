@@ -7,6 +7,7 @@ SECTION code_esxdos
 PUBLIC asm_esx_ide_get_lfn
 
 EXTERN __esxdos_error_mc, error_znc
+EXTERN __nextos_nstr_to_cstr
 
 IF __ZXNEXT
 
@@ -37,6 +38,9 @@ asm_esx_ide_get_lfn:
    ld c,l
    ld b,h                      ; bc = &lfn
 
+   ex (sp),hl
+   push hl
+   
    ld hl,__ESX_FILENAME_LFN_MAX + 1
    add hl,bc
    
@@ -47,7 +51,7 @@ asm_esx_ide_get_lfn:
 
    ; bc = &lfn
    ; hl = struct esx_cat *
-   ; stack = &time, query
+   ; stack = &lfn, &time, query
    
    inc hl
    ld e,(hl)
@@ -80,7 +84,7 @@ ENDIF
    ; de = query
    ; hl = filename
    ; ix = dir_handle
-   ; stack = &time
+   ; stack = &lfn, &time
    
    exx
    
@@ -127,11 +131,18 @@ ENDIF
    inc hl
    ld (hl),d                   ; write file size
 
+   ; zero terminate lfn
+   
+   pop hl                      ; hl = &lfn
+
+   call __nextos_nstr_to_cstr
    jp error_znc
 
 error_get_lfn:
 
    pop hl
+   pop hl
+
    jp __esxdos_error_mc
 
 ELSE

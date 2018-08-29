@@ -1,3 +1,4 @@
+arch/zxn/esxdos/z80/__nextos_nstr_to_cstr
 arch/zxn/esxdos/z80/__vars_esx_errh
 arch/zxn/esxdos/z80/__vars_esx_stream
 arch/zxn/esxdos/z80/asm_esx_disk_filemap
