@@ -107,6 +107,7 @@ catalog:
    ld (hl),d                   ; write directory handle
    inc hl
 
+   dec b                       ; change to number of entries written
    ld (hl),b                   ; write completed sz
    
    xor a
