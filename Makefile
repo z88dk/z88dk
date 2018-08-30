@@ -7,9 +7,9 @@
 
 # ---> Configurable parameters are below his point
 ifeq ($(OS),Windows_NT)
-  EXE 		:= .exe
+  EXESUFFIX 		:= .exe
 else
-  EXE 		:=
+  EXESUFFIX 		?=
 endif
 
 prefix ?= /usr/local
@@ -50,7 +50,7 @@ setup:
         fi)
 	@mkdir -p bin
 
-zsdcc: bin/zsdcc$(EXE)
+zsdcc: bin/zsdcc$(EXESUFFIX)
 
 bin/zsdcc$(EXE):
 	svn checkout -r 9958 svn://svn.code.sf.net/p/sdcc/code/trunk/sdcc $(SDCC_PATH)
