@@ -14,7 +14,7 @@ use Path::Tiny;
 use File::Slurp;
 use Capture::Tiny::Extended 'capture';
 use Test::Differences; 
-use List::AllUtils 'uniq';
+use List::Uniq 'uniq';
 use Data::HexDump;
 
 my $OBJ_FILE_VERSION = "12";

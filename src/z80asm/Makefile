@@ -9,7 +9,7 @@ PROJ		:= z80asm
 
 include ../Make.common
 
-CC 			?= gcc
+CC 		?= gcc
 INSTALL 	?= install
 CROSS		?= 0
 
@@ -18,27 +18,27 @@ CROSS		?= 0
 #------------------------------------------------------------------------------
 SRCS		:= $(filter-out test.c,$(wildcard *.c lib/*.c ../common/*.c ../../ext/regex/reg*.c))
 OBJS 		:= $(SRCS:.c=.o) \
-			$(UNIXem_OBJS)
+		   $(UNIXem_OBJS)
 DEPENDS		:= $(SRCS:.c=.d)
-TEST_SRC_MAIN:= $(wildcard t/test_*.c)
-TEST_SRC_LIB:=t/testlib.c
+TEST_SRC_MAIN	:= $(wildcard t/test_*.c)
+TEST_SRC_LIB	:= t/testlib.c
 
 #------------------------------------------------------------------------------
 # variables
 #------------------------------------------------------------------------------
-TARGET =		$(PROJ)$(EXE)
-MSVC_TARGET =	../../win32/Debug/$(TARGET)
+TARGET 		= $(PROJ)$(EXE)
+MSVC_TARGET 	= ../../win32/Debug/$(TARGET)
 
-OPT = -O3
+OPT 		= -O3
 
-STD = -std=gnu11
-LOCAL_LIB :=	lib
-LOCAL_CFLAGS +=	-MMD -I. -I$(LOCAL_LIB) -It -g -Wall -ftabstop=4 $(STD) $(OPT) \
-			-I../common \
-			-I../../ext/optparse \
-			-I../../ext/regex \
-			-I../../ext/uthash/src \
-			$(UNIXem_CFLAGS)
+STD 		= -std=gnu11
+LOCAL_LIB 	:= lib
+LOCAL_CFLAGS 	+= -MMD -I. -I$(LOCAL_LIB) -It -g -Wall -ftabstop=4 $(STD) $(OPT) \
+		   -I../common \
+		   -I../../ext/optparse \
+		   -I../../ext/regex \
+		   -I../../ext/uthash/src \
+		   $(UNIXem_CFLAGS)
 
 #------------------------------------------------------------------------------
 # main
@@ -105,7 +105,7 @@ install:
 #------------------------------------------------------------------------------
 clean::
 	$(RM) *.core $(LOCAL_LIB)/*.core $(LOCAL_LIB)/t/*.core $(LOCAL_LIB)/t/uthash/*.core
-	$(RM) *.o    $(LOCAL_LIB)/*.o    $(LOCAL_LIB)/t/*.o    $(LOCAL_LIB)/t/uthash/*.o 
+	$(RM) *.o    $(LOCAL_LIB)/*.o    $(LOCAL_LIB)/t/*.o    $(LOCAL_LIB)/t/uthash/*.o
 	$(RM) *.out  $(LOCAL_LIB)/*.out  $(LOCAL_LIB)/t/*.out  $(LOCAL_LIB)/t/uthash/*.out
 	$(RM) *.orig $(LOCAL_LIB)/*.orig $(LOCAL_LIB)/t/*.orig $(LOCAL_LIB)/t/uthash/*.orig
 	$(RM) *.exe  $(LOCAL_LIB)/*.exe  $(LOCAL_LIB)/t/*.exe  $(LOCAL_LIB)/t/uthash/*.exe
@@ -126,7 +126,7 @@ t/libtestlib.a : $(OBJS) $(TEST_SRC_LIB:.c=.o)
 $(TEST_SRC_MAIN:.c=.o) : t/libtestlib.a
 
 .o.out :
-	$(CC) -static $(CFLAGS) $< -o $(<:.o=$(EXE)) $(LDFLAGS) -Lt -ltestlib
+	$(CC) $(CFLAGS) $< -o $(<:.o=$(EXE)) $(LDFLAGS) -Lt -ltestlib
 	$(<:.o=$(EXE)) 2> $@~
 	diff -w $(<:.o=.bmk) $@~
 	mv -f $@~ $@
@@ -140,7 +140,6 @@ test: $(TARGET) z80asm_lib
 	#$(MAKE) -C dev\z80asm_lib test
 	$(MAKE) prove_c
 	$(MAKE) prove_perl
-	$(MAKE) test_enigma
 
 testlib:
 	$(MAKE) -C lib test
@@ -153,17 +152,8 @@ prove_perl: $(TARGET)
 testmsvc : $(MSVC_TARGET)
 	make Z80ASM=$(MSVC_TARGET) prove
 
-test_enigma: $(TARGET)
-	zcc +cpm -oenigma.bin t/data/enigma.c
-	echo HELLO. > enigma.in
-	cpm enigma.bin < enigma.in > enigma.out
-	echo 'Enter text to be (de)coded, finish with a .' > enigma.bmk
-	echo 'HREXLSLEOC .' >> enigma.bmk
-	diff -w enigma.bmk enigma.out
-	$(RM) enigma.bin enigma.in enigma.out enigma.bmk
-	
 clean::
-	$(RM) zcc_opt.def zcc_proj.lst enigma.bin enigma.in enigma.out enigma.bmk
+	$(RM) zcc_opt.def zcc_proj.lst
 
 testzcc : $(TARGET)
 	zcc +zx -lndos       -create-app -omicroman.bin ../../examples/microman.c
@@ -177,7 +167,7 @@ clean::
 
 clean::
 	$(RM) $(TARGET) $(LOCAL_LIB)/$(TARGET) test* $(LOCAL_LIB)/test*
-	$(RM) t/*.tmp $(LOCAL_LIB)/t/*.tmp t/dev/*.tmp 
+	$(RM) t/*.tmp $(LOCAL_LIB)/t/*.tmp t/dev/*.tmp
 
 #------------------------------------------------------------------------------
 # build with msvc - need to build manualy, devenv not available in Express
@@ -192,5 +182,5 @@ $(MSVC_TARGET) : $(wildcard *.c) $(wildcard *.h)
 #------------------------------------------------------------------------------
 clean::
 	rm -f $(DEPENDS)
-	
+
 -include $(DEPENDS)

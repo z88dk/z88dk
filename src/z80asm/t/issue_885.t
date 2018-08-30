@@ -20,21 +20,21 @@ my $c_code = <<'END';
 void main(void)
 {
 __asm
-ici: 
+ici:
     DEFC toto = ici %8
 __endasm;
 }
 END
 
 for my $clib ('sdcc_iy',		# zsdcc compile
-			  'new',			# sccz80 compile
+	      'new',			# sccz80 compile
 ) {
-	ok 1, "-clib=$clib";
-	
-	unlink_testfiles();
-	spew("test.c", $c_code);
-	run("zcc +zx -vn -clib=$clib -m --list test.c -o test");
-	test_map("test.map");
+    ok 1, "-clib=$clib";
+
+    unlink_testfiles();
+    spew("test.c", $c_code);
+    run("zcc +zx -vn -clib=$clib -m --list test.c -o test");
+    test_map("test.map");
 }
 
 # core of the problem
@@ -42,31 +42,30 @@ my $org = 100;
 unlink_testfiles();
 spew("test.asm", <<'END');
 ._main
-ici: 
+ici:
     DEFC toto = ici %8
-	defw _main, ici, toto
+    defw _main, ici, toto
 END
 run("z80asm -m -b -r$org test.asm");
 check_bin_file("test.bin", pack("v*", $org, $org, $org % 8));
 test_map("test.map");
 
-#unlink_testfiles();
+unlink_testfiles();
 done_testing();
 
-
 sub read_map {
-	my($map_file) = @_;
-	ok -f $map_file, $map_file;
-	my %map;
-	for (path($map_file)->lines) {
-		/^(\w+)\s*=\s*\$([0-9A-F]{4,})\b/ and $map{$1} = hex($2);
-	}
-	return %map;
+    my($map_file) = @_;
+    ok -f $map_file, $map_file;
+    my %map;
+    for (path($map_file)->lines) {
+	/^(ici|toto|_main)\s*=\s*\$([0-9A-F]{4,})\b/ and $map{$1} = hex($2);
+    }
+    return %map;
 }
 
 sub test_map {
-	my($map_file) = @_;
-	my %map = read_map($map_file);
-	ok $map{ici}==$map{_main}, "$map{ici}==$map{_main}";
-	ok $map{toto}==$map{ici} % 8, "$map{toto}==$map{ici} % 8";
+    my($map_file) = @_;
+    my %map = read_map($map_file);
+    ok $map{ici}==$map{_main}, "$map{ici}==$map{_main}";
+    ok $map{toto}==$map{ici} % 8, "$map{toto}==$map{ici} % 8";
 }

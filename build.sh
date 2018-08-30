@@ -5,7 +5,7 @@
 #
 
 set -e  		# -e: exit on error; -u: exit on undefined variable
-				# -e can be overidden by -k option
+			# -e can be overidden by -k option
 
 do_clean=0
 do_tests=0
@@ -38,7 +38,8 @@ done
 
 if [ $do_clean = 1 ]; then
   make clean
-  rm -rf bin/*
+  # dont remove bin, as zsdcc and szdcpp must be built by hand in win32
+  #rm -rf bin/*
 fi
 
 mkdir -p bin
