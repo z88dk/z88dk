@@ -510,7 +510,19 @@ extern unsigned char esx_f_unlink_fastcall(const char *filename) __z88dk_fastcal
 // FUNCTIONS IMPORTED FROM NEXTZXOS
 // require nextzxos 128k mode; items in memory must be in main memory
 
-// ide_mode
+// IDE_SET_DRIVE
+
+; drive letter is character 'A'..'P'
+
+extern unsigned char esx_dos_get_drive(void);
+
+extern unsigned char esx_dos_set_drive(uint8_t drive);
+extern unsigned char esx_dos_set_drive_fastcall(uint8_t drive) __z88dk_fastcall;
+#define esx_dos_set_drive(a) esx_dos_set_drive_fastcall(a)
+
+
+
+// IDE_MODE
 
 struct esx_mode
 {
@@ -551,6 +563,8 @@ struct esx_mode
 #define ESX_MODE_SET_LAYER_1_HICOL  __nextos_mode_set_layer_1_hicol
 #define ESX_MODE_SET_LAYER_2  __nextos_mode_set_layer_2
 
+// esx_mode structure does not have to be in main memory
+
 extern unsigned char esx_ide_mode_get(struct esx_mode *mode);
 extern unsigned char esx_ide_mode_get_fastcall(struct esx_mode *mode) __z88dk_fastcall;
 #define esx_ide_mode_get(a) esx_ide_mode_get_fastcall(a)
@@ -562,7 +576,7 @@ extern unsigned char esx_ide_mode_set_fastcall(struct esx_mode *mode) __z88dk_fa
 
 
 
-// dos_catalog
+// DOS_CATALOG
 
 struct esx_cat_entry
 {
@@ -574,7 +588,7 @@ struct esx_cat_entry
 struct esx_cat
 {
    uint8_t filter;             // (init) filter applied (set bits enable)
-   char *filename;             // (init) catalog match string
+   char *filename;             // (init) catalog match string 0xff terminated
 
    uint16_t dir_handle;        // (dos_catalog) for IDE_GET_LFN
    uint8_t completed_sz;       // (dos_catalog) number of matched entries in indices 1+
@@ -589,6 +603,8 @@ struct esx_cat
 #define ESX_CAT_FILTER_LFN  __nextos_cat_filter_lfn
 #define ESX_CAT_FILTER_DIR  __nextos_cat_filter_dir
 
+// esx_cat structure must be in main memory
+
 extern unsigned char esx_dos_catalog(struct esx_cat *cat);
 extern unsigned char esx_dos_catalog_fastcall(struct esx_cat *cat) __z88dk_fastcall;
 #define esx_dos_catalog(a) esx_dos_catalog_fastcall(a)
@@ -600,17 +616,19 @@ extern unsigned char esx_dos_catalog_next_fastcall(struct esx_cat *cat) __z88dk_
 
 
 
-// ide_get_lfn (tightly coupled to dos_catalog)
+// IDE_GET_LFN (tightly coupled to dos_catalog)
 
 struct esx_lfn
 {
    struct esx_cat *dir;        // (init) associated dos_catalog structure
    
-   char filename[ESX_FILENAME_LFN_MAX + 1];  // (get_lfn) long filename
+   char filename[ESX_FILENAME_LFN_MAX + 1];  // (get_lfn) long filename zero terminated
    
    struct dos_tm time;         // (get_lfn) time.h contains functions dealing with dos time
    uint32_t size;              // (get_lfn) file size in bytes
 };
+
+// esx_lfn structure must be in main memory
 
 extern unsigned char esx_ide_get_lfn(struct esx_lfn *dir,struct esx_cat_entry *query);
 extern unsigned char esx_ide_get_lfn_callee(struct esx_lfn *dir,struct esx_cat_entry *query) __z88dk_callee;

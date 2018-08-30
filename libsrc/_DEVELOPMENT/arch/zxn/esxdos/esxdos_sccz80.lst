@@ -10,6 +10,8 @@ arch/zxn/esxdos/c/sccz80/esx_disk_stream_sectors_callee
 arch/zxn/esxdos/c/sccz80/esx_disk_stream_start
 arch/zxn/esxdos/c/sccz80/esx_dos_catalog
 arch/zxn/esxdos/c/sccz80/esx_dos_catalog_next
+arch/zxn/esxdos/c/sccz80/esx_dos_get_drive
+arch/zxn/esxdos/c/sccz80/esx_dos_set_drive
 arch/zxn/esxdos/c/sccz80/esx_f_chdir
 arch/zxn/esxdos/c/sccz80/esx_f_chmod
 arch/zxn/esxdos/c/sccz80/esx_f_chmod_callee

@@ -13,6 +13,9 @@ arch/zxn/esxdos/c/sdcc_iy/esx_dos_catalog
 arch/zxn/esxdos/c/sdcc_iy/esx_dos_catalog_fastcall
 arch/zxn/esxdos/c/sdcc_iy/esx_dos_catalog_next
 arch/zxn/esxdos/c/sdcc_iy/esx_dos_catalog_next_fastcall
+arch/zxn/esxdos/c/sdcc_iy/esx_dos_get_drive
+arch/zxn/esxdos/c/sdcc_iy/esx_dos_set_drive
+arch/zxn/esxdos/c/sdcc_iy/esx_dos_set_drive_fastcall
 arch/zxn/esxdos/c/sdcc_iy/esx_f_chdir
 arch/zxn/esxdos/c/sdcc_iy/esx_f_chdir_fastcall
 arch/zxn/esxdos/c/sdcc_iy/esx_f_chmod

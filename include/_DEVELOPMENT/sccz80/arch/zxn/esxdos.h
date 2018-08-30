@@ -470,7 +470,18 @@ extern unsigned char __LIB__ esx_f_unlink(const char *filename) __smallc __z88dk
 // FUNCTIONS IMPORTED FROM NEXTZXOS
 // require nextzxos 128k mode; items in memory must be in main memory
 
-// ide_mode
+// IDE_SET_DRIVE
+
+; drive letter is character 'A'..'P'
+
+extern unsigned char __LIB__ esx_dos_get_drive(void) __smallc;
+
+
+extern unsigned char __LIB__ esx_dos_set_drive(uint8_t drive) __smallc __z88dk_fastcall;
+
+
+
+// IDE_MODE
 
 struct esx_mode
 {
@@ -511,6 +522,8 @@ struct esx_mode
 #define ESX_MODE_SET_LAYER_1_HICOL  __nextos_mode_set_layer_1_hicol
 #define ESX_MODE_SET_LAYER_2  __nextos_mode_set_layer_2
 
+// esx_mode structure does not have to be in main memory
+
 extern unsigned char __LIB__ esx_ide_mode_get(struct esx_mode *mode) __smallc __z88dk_fastcall;
 
 
@@ -518,7 +531,7 @@ extern unsigned char __LIB__ esx_ide_mode_set(struct esx_mode *mode) __smallc __
 
 
 
-// dos_catalog
+// DOS_CATALOG
 
 struct esx_cat_entry
 {
@@ -530,7 +543,7 @@ struct esx_cat_entry
 struct esx_cat
 {
    uint8_t filter;             // (init) filter applied (set bits enable)
-   char *filename;             // (init) catalog match string
+   char *filename;             // (init) catalog match string 0xff terminated
 
    uint16_t dir_handle;        // (dos_catalog) for IDE_GET_LFN
    uint8_t completed_sz;       // (dos_catalog) number of matched entries in indices 1+
@@ -545,6 +558,8 @@ struct esx_cat
 #define ESX_CAT_FILTER_LFN  __nextos_cat_filter_lfn
 #define ESX_CAT_FILTER_DIR  __nextos_cat_filter_dir
 
+// esx_cat structure must be in main memory
+
 extern unsigned char __LIB__ esx_dos_catalog(struct esx_cat *cat) __smallc __z88dk_fastcall;
 
 
@@ -552,17 +567,19 @@ extern unsigned char __LIB__ esx_dos_catalog_next(struct esx_cat *cat) __smallc 
 
 
 
-// ide_get_lfn (tightly coupled to dos_catalog)
+// IDE_GET_LFN (tightly coupled to dos_catalog)
 
 struct esx_lfn
 {
    struct esx_cat *dir;        // (init) associated dos_catalog structure
    
-   char filename[ESX_FILENAME_LFN_MAX + 1];  // (get_lfn) long filename
+   char filename[ESX_FILENAME_LFN_MAX + 1];  // (get_lfn) long filename zero terminated
    
    struct dos_tm time;         // (get_lfn) time.h contains functions dealing with dos time
    uint32_t size;              // (get_lfn) file size in bytes
 };
+
+// esx_lfn structure must be in main memory
 
 extern unsigned char __LIB__ esx_ide_get_lfn(struct esx_lfn *dir,struct esx_cat_entry *query) __smallc;
 extern unsigned char __LIB__ esx_ide_get_lfn_callee(struct esx_lfn *dir,struct esx_cat_entry *query) __smallc __z88dk_callee;
