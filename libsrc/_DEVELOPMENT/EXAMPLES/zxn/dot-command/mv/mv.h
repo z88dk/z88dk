@@ -15,6 +15,7 @@ struct flag
    unsigned char verbose;
    unsigned char help;
    unsigned char version;
+   unsigned char system;
 };
 
 extern struct flag flags;

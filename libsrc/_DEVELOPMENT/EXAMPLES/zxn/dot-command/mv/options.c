@@ -146,3 +146,9 @@ unsigned int option_exec_version(void)
    flags.version = 1;
    return OPT_ACTION_OK;
 }
+
+unsigned int option_exec_system(void)
+{
+   flags.system = 1;
+   return OPT_ACTION_OK;
+}

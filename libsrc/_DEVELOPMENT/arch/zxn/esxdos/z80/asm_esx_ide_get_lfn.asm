@@ -85,9 +85,21 @@ ENDIF
    ; hl = filename
    ; ix = dir_handle
    ; stack = &lfn, &time
-   
+
    exx
-   
+
+IF __SDCC_IY
+
+   push iy
+   pop hl
+
+ELSE
+
+   push ix
+   pop hl
+
+ENDIF
+
    ld de,__NEXTOS_IDE_GET_LFN
    ld c,7
    

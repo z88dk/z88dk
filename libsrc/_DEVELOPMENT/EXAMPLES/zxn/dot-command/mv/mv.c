@@ -10,7 +10,6 @@
 #include <arch/zxn.h>
 #include <arch/zxn/esxdos.h>
 #include <input.h>
-#include <errno.h>
 
 #include "errors.h"
 #include "move.h"
@@ -27,7 +26,8 @@ struct flag flags = {
    0,                    // update def: no time check
    0,                    // verbose def: quiet
    0,                    // help
-   0                     // version
+   0,                    // version
+   0                     // system
 };
 
 // ACCEPTED OPTIONS
@@ -53,7 +53,8 @@ static struct opt options[] = {
    { "--verbose", OPT_TYPE_EXACT, (optfunc)option_exec_v },
    { "-h", OPT_TYPE_EXACT, (optfunc)option_exec_help },
    { "--help", OPT_TYPE_EXACT, (optfunc)option_exec_help },
-   { "--version", OPT_TYPE_EXACT, (optfunc)option_exec_version }
+   { "--version", OPT_TYPE_EXACT, (optfunc)option_exec_version },
+   { "--system", OPT_TYPE_EXACT, (optfunc)option_exec_system }
 };
 
 static int compare_option_sort(struct opt *a, struct opt *b)
@@ -281,31 +282,20 @@ int main(int argc, char **argv)
       dst.type = FILE_TYPE_DIRECTORY;
    }
 
-for (unsigned char k = 0; k < src_sz; ++k)
-	printf("src[%u] = \"%s\" %u\n", k, src[k].name, src[k].type);
-
-printf("dst = \"%s\" %u\n", dst.name, dst.type);
-
-
    // if the destination name contains wildcards it must match something
 
    if ((name_in_main_memory = obstack_copy(ob, dst.name, strlen(dst.name) + 1)) == 0)
       exit((int)err_out_of_memory);
 
-printf("name = \"%s\" at 0x%04x\n", name_in_main_memory, name_in_main_memory);
-
-   catalog.filter = (dst.type == FILE_TYPE_NORMAL) ? (ESX_CAT_FILTER_SYSTEM | ESX_CAT_FILTER_LFN) : (ESX_CAT_FILTER_SYSTEM | ESX_CAT_FILTER_LFN | ESX_CAT_FILTER_DIR);
+   catalog.filter = (flags.system) ? (ESX_CAT_FILTER_SYSTEM | ESX_CAT_FILTER_LFN) : (ESX_CAT_FILTER_LFN);
+   if (dst.type != FILE_TYPE_NORMAL) catalog.filter |= ESX_CAT_FILTER_DIR;
    catalog.filename = p3dos_cstr_to_pstr(name_in_main_memory);
    catalog.cat_sz = 2;   // consistent with mv.asm
-
-printf("name end = %u\n", strchr(name_in_main_memory, 0xff) - name_in_main_memory);
-printf("errno = %u, dos_catalog = %u, errno = %u\n", errno, esx_dos_catalog(&catalog), errno);
-printf("completed_sz = %u\n", catalog.completed_sz);
 
    if (esx_dos_catalog(&catalog) == 1)
    {
       unsigned char type;
-printf("hello\n");
+
       do
       {
          // opportunity for user to break
@@ -325,9 +315,8 @@ printf("hello\n");
       if (dst.type != type) exit(2);
 
       lfn.cat = &catalog;
-      if (esx_ide_get_lfn(&lfn, &catalog.cat[1]) == 0xff)
-			printf("dst lfn error %u\n", errno);
-      
+      esx_ide_get_lfn(&lfn, &catalog.cat[1]);
+
       obstack_free(ob, name_in_main_memory);
 
       if ((dst.name = obstack_copy(ob, &lfn.filename, strlen(lfn.filename) + 1)) == 0)
@@ -349,14 +338,6 @@ printf("hello\n");
    
    // dst.name is in main memory
 
-
-for (unsigned char k = 0; k < src_sz; ++k)
-	printf("src[%u] = \"%s\" %u\n", k, src[k].name, src[k].type);
-
-printf("dst = \"%s\" %u\n", dst.name, dst.type);
-
-
-
    // let the good times roll
 
    for (unsigned char i = 0; i < src_sz; ++i)
@@ -371,23 +352,16 @@ printf("dst = \"%s\" %u\n", dst.name, dst.type);
       if ((name_in_main_memory = obstack_copy(ob, src[i].name, strlen(src[i].name) + 1)) == 0)
          exit((int)err_out_of_memory);
 
-printf("name = \"%s\" at 0x%04x\n", name_in_main_memory, name_in_main_memory);
-
-      catalog.filter = (src[i].type == FILE_TYPE_NORMAL) ? (ESX_CAT_FILTER_SYSTEM | ESX_CAT_FILTER_LFN) : (ESX_CAT_FILTER_SYSTEM | ESX_CAT_FILTER_LFN | ESX_CAT_FILTER_DIR);
+      catalog.filter = (flags.system) ? (ESX_CAT_FILTER_SYSTEM | ESX_CAT_FILTER_LFN) : (ESX_CAT_FILTER_LFN);
+      if (src[i].type != FILE_TYPE_NORMAL) catalog.filter |= ESX_CAT_FILTER_DIR;
       catalog.filename = p3dos_cstr_to_pstr(name_in_main_memory);
       catalog.cat_sz = 2;   // consistent with mv.asm
-
-printf("name end = %u\n", strchr(name_in_main_memory, 0xff) - name_in_main_memory);
 
       // iterate over all source file matches
       // doing one at a time avoids complications with wildcards and new files being created
 
-printf("errno = %u, dos_catalog = %u, errno = %u\n", errno, esx_dos_catalog(&catalog), errno);
-printf("completed_sz = %u\n", catalog.completed_sz);
-
       if (esx_dos_catalog(&catalog) == 1)
       {
-printf("hello\n");
          do
          {
             // opportunity for user to break
@@ -398,8 +372,7 @@ printf("hello\n");
             // lfn details for this file
             
             lfn.cat = &catalog;
-            if (esx_ide_get_lfn(&lfn, &catalog.cat[1]) == 0xff)
-					printf("src lfn error %u\n", errno);
+            esx_ide_get_lfn(&lfn, &catalog.cat[1]);
             
             // action is based on source and destination types
             

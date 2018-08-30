@@ -30,5 +30,6 @@ extern unsigned int option_exec_u(void);
 extern unsigned int option_exec_v(void);
 extern unsigned int option_exec_help(void);
 extern unsigned int option_exec_version(void);
+extern unsigned int option_exec_system(void);
 
 #endif
