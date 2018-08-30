@@ -591,7 +591,7 @@ struct esx_cat
    char *filename;             // (init) catalog match string 0xff terminated
 
    uint16_t dir_handle;        // (dos_catalog) for IDE_GET_LFN
-   uint8_t completed_sz;       // (dos_catalog) number of matched entries in indices 1+
+   uint8_t completed_sz;       // (dos_catalog) number of matched entries written in indices 1+ (0 = none)
 
    uint8_t cat_sz;             // (init) actual size of cat[] >= 2
    struct esx_cat_entry cat[2];
@@ -620,7 +620,7 @@ extern unsigned char esx_dos_catalog_next_fastcall(struct esx_cat *cat) __z88dk_
 
 struct esx_lfn
 {
-   struct esx_cat *dir;        // (init) associated dos_catalog structure
+   struct esx_cat *cat;        // (init) associated dos_catalog structure
    
    char filename[ESX_FILENAME_LFN_MAX + 1];  // (get_lfn) long filename zero terminated
    

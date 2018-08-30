@@ -32,14 +32,14 @@ asm_esx_ide_get_lfn:
    
    ld e,(hl)
    inc hl
-   ld d,(hl)
+   ld d,(hl)                  ; de = struct esx_cat *cat
    inc hl
    
    ld c,l
    ld b,h                      ; bc = &lfn
 
    ex (sp),hl
-   push hl
+   push hl                     ; stack = &lfn, query
    
    ld hl,__ESX_FILENAME_LFN_MAX + 1
    add hl,bc
@@ -47,7 +47,7 @@ asm_esx_ide_get_lfn:
    ex (sp),hl                  ; save &time
    push hl                     ; save query
 
-   ex de,hl                    ; hl = struct esx_cat *dir
+   ex de,hl                    ; hl = struct esx_cat *cat
 
    ; bc = &lfn
    ; hl = struct esx_cat *
@@ -56,14 +56,14 @@ asm_esx_ide_get_lfn:
    inc hl
    ld e,(hl)
    inc hl
-   ld d,(hl)                   ; de = dir.filename
+   ld d,(hl)                   ; de = cat.filename
    
-   push de                     ; save dir.filename
+   push de                     ; save cat.filename
    
    inc hl
    ld e,(hl)
    inc hl
-   ld d,(hl)                   ; de = dir.dir_handle
+   ld d,(hl)                   ; de = cat.dir_handle
    
 IF __SDCC_IY
 
@@ -73,11 +73,11 @@ IF __SDCC_IY
 ELSE
 
    push de
-   pop ix                      ; ix = dir.dir_handle
+   pop ix                      ; ix = cat.dir_handle
 
 ENDIF
 
-   pop hl                      ; hl = dir.filename
+   pop hl                      ; hl = cat.filename
    pop de                      ; de = query
 
    ; bc = &lfn
