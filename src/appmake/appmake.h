@@ -21,6 +21,7 @@
 #endif
 
 #include "d88.h"
+#include "cpmdisk.h"
 
 extern char c_install_dir[];
 
@@ -68,6 +69,9 @@ extern option_t  cpc_options;
 extern int       cpm_exec(char *target);
 extern option_t  cpm_options;
 extern char      cpm_longhelp[];
+
+extern int       einstein_exec(char *target);
+extern option_t  einstein_options;
 
 extern int       enterprise_exec(char *target);
 extern option_t  enterprise_options;
@@ -236,6 +240,10 @@ struct {
       "Creates an AMSDOS file suitable for writing to a .DSK image, opt. WAV",
       NULL,
       cpc_exec,   &cpc_options },
+    { "com2dsk",   "einstein",      "(C) 2018 Dominic Morris",
+      "Create an Einstein disc image",
+      NULL,
+      einstein_exec,   &einstein_options },
     { "bin2ep",   "enterprise",      "(C) 2011 Stefano Bodrato",
       "Adds a type 5 header to make a .app file",
       NULL,
