@@ -512,7 +512,7 @@ extern unsigned char esx_f_unlink_fastcall(const char *filename) __z88dk_fastcal
 
 // IDE_SET_DRIVE
 
-; drive letter is character 'A'..'P'
+// drive letter is character 'A'..'P'
 
 extern unsigned char esx_dos_get_drive(void);
 
@@ -633,6 +633,22 @@ struct esx_lfn
 extern unsigned char esx_ide_get_lfn(struct esx_lfn *dir,struct esx_cat_entry *query);
 extern unsigned char esx_ide_get_lfn_callee(struct esx_lfn *dir,struct esx_cat_entry *query) __z88dk_callee;
 #define esx_ide_get_lfn(a,b) esx_ide_get_lfn_callee(a,b)
+
+
+
+
+// PLUS 3 DOS UTILITIES (MAY BE MOVED LATER)
+
+// change string termination
+
+extern char *p3dos_cstr_to_pstr(char *s) __preserves_regs(d,e,iyl,iyh);
+extern char *p3dos_cstr_to_pstr_fastcall(char *s) __preserves_regs(d,e,h,l,iyl,iyh) __z88dk_fastcall;
+#define p3dos_cstr_to_pstr(a) p3dos_cstr_to_pstr_fastcall(a)
+
+
+extern char *p3dos_pstr_to_cstr(char *s) __preserves_regs(d,e,iyl,iyh);
+extern char *p3dos_pstr_to_cstr_fastcall(char *s) __preserves_regs(d,e,h,l,iyl,iyh) __z88dk_fastcall;
+#define p3dos_pstr_to_cstr(a) p3dos_pstr_to_cstr_fastcall(a)
 
 
 

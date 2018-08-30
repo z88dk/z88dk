@@ -114,3 +114,7 @@ arch/zxn/esxdos/c/sdcc_iy/esx_slice_dirent
 arch/zxn/esxdos/c/sdcc_iy/esx_slice_dirent_fastcall
 arch/zxn/esxdos/c/sdcc_iy/extended_sna_load
 arch/zxn/esxdos/c/sdcc_iy/extended_sna_load_fastcall
+arch/zxn/esxdos/c/sdcc_iy/p3dos_pstr_to_cstr
+arch/zxn/esxdos/c/sdcc_iy/p3dos_pstr_to_cstr_fastcall
+arch/zxn/esxdos/c/sdcc_iy/p3dos_cstr_to_pstr
+arch/zxn/esxdos/c/sdcc_iy/p3dos_cstr_to_pstr_fastcall

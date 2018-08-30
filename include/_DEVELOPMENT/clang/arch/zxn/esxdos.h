@@ -432,7 +432,7 @@ extern unsigned char esx_f_unlink(const char *filename);
 
 // IDE_SET_DRIVE
 
-; drive letter is character 'A'..'P'
+// drive letter is character 'A'..'P'
 
 extern unsigned char esx_dos_get_drive(void);
 
@@ -542,6 +542,18 @@ struct esx_lfn
 // esx_lfn structure must be in main memory
 
 extern unsigned char esx_ide_get_lfn(struct esx_lfn *dir,struct esx_cat_entry *query);
+
+
+
+
+// PLUS 3 DOS UTILITIES (MAY BE MOVED LATER)
+
+// change string termination
+
+extern char *p3dos_cstr_to_pstr(char *s);
+
+
+extern char *p3dos_pstr_to_cstr(char *s);
 
 
 

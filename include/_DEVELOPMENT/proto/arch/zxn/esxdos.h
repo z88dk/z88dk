@@ -320,7 +320,7 @@ __DPROTO(,,unsigned char,,esx_f_unlink,const char *filename)
 
 // IDE_SET_DRIVE
 
-; drive letter is character 'A'..'P'
+// drive letter is character 'A'..'P'
 
 __OPROTO(,,unsigned char,,esx_dos_get_drive,void)
 __DPROTO(,,unsigned char,,esx_dos_set_drive,uint8_t drive)
@@ -418,6 +418,14 @@ struct esx_lfn
 // esx_lfn structure must be in main memory
 
 __DPROTO(,,unsigned char,,esx_ide_get_lfn,struct esx_lfn *dir,struct esx_cat_entry *query)
+
+
+// PLUS 3 DOS UTILITIES (MAY BE MOVED LATER)
+
+// change string termination
+
+__DPROTO(`d,e,h,l,iyl,iyh',`d,e,iyl,iyh',char,*,p3dos_cstr_to_pstr,char *s)
+__DPROTO(`d,e,h,l,iyl,iyh',`d,e,iyl,iyh',char,*,p3dos_pstr_to_cstr,char *s)
 
 
 // ESX ERROR CODES

@@ -1,4 +1,3 @@
-arch/zxn/esxdos/z80/__nextos_nstr_to_cstr
 arch/zxn/esxdos/z80/__vars_esx_errh
 arch/zxn/esxdos/z80/__vars_esx_stream
 arch/zxn/esxdos/z80/asm_esx_disk_filemap
@@ -60,3 +59,5 @@ arch/zxn/esxdos/z80/asm_esx_m_tapeout_open
 arch/zxn/esxdos/z80/asm_esx_m_tapeout_trunc
 arch/zxn/esxdos/z80/asm_esx_slice_dirent
 arch/zxn/esxdos/z80/asm_extended_sna_load
+arch/zxn/esxdos/z80/asm_p3dos_cstr_to_pstr
+arch/zxn/esxdos/z80/asm_p3dos_pstr_to_cstr

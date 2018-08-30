@@ -7,7 +7,7 @@ SECTION code_esxdos
 PUBLIC asm_esx_ide_get_lfn
 
 EXTERN __esxdos_error_mc, error_znc
-EXTERN __nextos_nstr_to_cstr
+EXTERN asm_p3dos_pstr_to_cstr
 
 IF __ZXNEXT
 
@@ -135,7 +135,7 @@ ENDIF
    
    pop hl                      ; hl = &lfn
 
-   call __nextos_nstr_to_cstr
+   call asm_p3dos_pstr_to_cstr
    jp error_znc
 
 error_get_lfn:

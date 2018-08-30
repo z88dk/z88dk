@@ -1,18 +1,22 @@
+; unsigned char *p3dos_pstr_to_cstr(unsigned char *s)
+
 SECTION code_esxdos
 
-PUBLIC __nextos_nstr_to_cstr
+PUBLIC asm_p3dos_pstr_to_cstr
 
-__nextos_nstr_to_cstr:
+asm_p3dos_pstr_to_cstr:
 
    ; change string termination from 0xff to 0x00
    ;
    ; enter : hl = char *s
    ;
-   ; exit  : hl = char *s at terminator
+   ; exit  : hl = char *s
    ;
-   ; uses  : af, bc, hl
+   ; uses  : af, bc
    
    ld a,$ff
+   
+   push hl
    
    ld bc,0
    cpir
@@ -20,4 +24,6 @@ __nextos_nstr_to_cstr:
    dec hl
    ld (hl),0
    
+   pop hl
+
    ret

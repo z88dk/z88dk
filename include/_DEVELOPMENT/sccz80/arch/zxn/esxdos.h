@@ -472,7 +472,7 @@ extern unsigned char __LIB__ esx_f_unlink(const char *filename) __smallc __z88dk
 
 // IDE_SET_DRIVE
 
-; drive letter is character 'A'..'P'
+// drive letter is character 'A'..'P'
 
 extern unsigned char __LIB__ esx_dos_get_drive(void) __smallc;
 
@@ -584,6 +584,18 @@ struct esx_lfn
 extern unsigned char __LIB__ esx_ide_get_lfn(struct esx_lfn *dir,struct esx_cat_entry *query) __smallc;
 extern unsigned char __LIB__ esx_ide_get_lfn_callee(struct esx_lfn *dir,struct esx_cat_entry *query) __smallc __z88dk_callee;
 #define esx_ide_get_lfn(a,b) esx_ide_get_lfn_callee(a,b)
+
+
+
+
+// PLUS 3 DOS UTILITIES (MAY BE MOVED LATER)
+
+// change string termination
+
+extern char __LIB__ *p3dos_cstr_to_pstr(char *s) __smallc __z88dk_fastcall;
+
+
+extern char __LIB__ *p3dos_pstr_to_cstr(char *s) __smallc __z88dk_fastcall;
 
 
 

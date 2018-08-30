@@ -83,3 +83,5 @@ arch/zxn/esxdos/c/sccz80/esx_m_tapeout_open
 arch/zxn/esxdos/c/sccz80/esx_m_tapeout_trunc
 arch/zxn/esxdos/c/sccz80/esx_slice_dirent
 arch/zxn/esxdos/c/sccz80/extended_sna_load
+arch/zxn/esxdos/c/sccz80/p3dos_cstr_to_pstr
+arch/zxn/esxdos/c/sccz80/p3dos_pstr_to_cstr
