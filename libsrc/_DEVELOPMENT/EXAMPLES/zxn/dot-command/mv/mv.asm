@@ -18,8 +18,8 @@ _catalog:
    defw 0      ; filename
    defw 0      ; dir_handle
    defb 0      ; completed_sz
-   defb 11     ; cat_sz (ten dos_catalog entries)
-   defs 11*13  ; cat[]
+   defb 2      ; cat_sz (two dos_catalog entries)
+   defs 2*13   ; cat[]
 
 PUBLIC _lfn
 

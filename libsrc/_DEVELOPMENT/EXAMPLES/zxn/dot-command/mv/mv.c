@@ -1,12 +1,16 @@
+// zcc +zxn -v -startup=30 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 --opt-code-size @zproject.lst -o mvtmp -pragma-include:zpragma.inc -subtype=dotn -Cz"--clean" -create-app --list -m --c-code-in-asm
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <libgen.h>
+#include <time.h>
 #include <alloc/obstack.h>
 #include <arch/zxn.h>
 #include <arch/zxn/esxdos.h>
 #include <input.h>
+#include <errno.h>
 
 #include "errors.h"
 #include "move.h"
@@ -72,11 +76,13 @@ unsigned char src_sz;
 
 struct file dst;               // type is unknown
 
-unsigned char dstat_avail;     // non-zero if dst stat filled in
-struct esx_stat dstat;
+unsigned char dst_resolved;    // non-zero if dst info gathered
+struct dos_tm dst_time;
 
 extern struct esx_cat catalog;
 extern struct esx_lfn lfn;
+
+unsigned char *name_in_main_memory;
 
 // MEMORY MANAGEMENT
 
@@ -90,15 +96,7 @@ unsigned char *advance_past_drive(unsigned char *p)
    return (isalpha(p[0]) && (p[1] == ':')) ? (p + 2) : p;
 }
 
-// MAIN
-
-static unsigned char old_cpu_speed;
-
-static void cleanup(void)
-{
-   printf(" \n");   // erase any cursor left behind
-   ZXN_NEXTREGA(REG_TURBO_MODE, old_cpu_speed);
-}
+// USER INTERACTION
 
 unsigned char user_interaction(void)
 {
@@ -114,7 +112,7 @@ unsigned char user_interaction(void)
 }
 
 static unsigned char cpos;
-static unsigned char cursor[] = "-\|/";
+static unsigned char cursor[] = "-\\|/";
 
 unsigned char user_interaction_spin(void)
 {
@@ -122,6 +120,16 @@ unsigned char user_interaction_spin(void)
    if (++cpos >= (sizeof(cursor) - 1)) cpos = 0;
    
    return user_interaction();
+}
+
+// MAIN
+
+static unsigned char old_cpu_speed;
+
+static void cleanup(void)
+{
+   printf(" \n");   // erase any cursor left behind
+   ZXN_NEXTREGA(REG_TURBO_MODE, old_cpu_speed);
 }
 
 int main(int argc, char **argv)
@@ -158,7 +166,7 @@ int main(int argc, char **argv)
             
             ret = (found->action)(&i, argc, argv);
          }
-         else if (argv[i][1] && (argv[i][1] != '-'))
+         else
          {
             unsigned char *p;
             static unsigned char op[] = "-x";
@@ -166,7 +174,7 @@ int main(int argc, char **argv)
             // check if option is form -abc instead of -a -b -c
             // all must match
             
-            for (p = &argv[i][1]; *p; ++p)
+            for (p = &argv[i][1]; isalnum(*p); ++p)
             {
                op[1] = *p;
                
@@ -193,22 +201,21 @@ int main(int argc, char **argv)
          
          if (found == 0) exit((int)err_invalid_option);
          if (ret != OPT_ACTION_OK) exit(ret);
-         
-         continue;
       }
-
-      // filename
-
+      else
       {
+         // filename
+
          unsigned char c;
          unsigned char *p;
          static struct file tmp;
-         
+
+         tmp.name = argv[i];
          tmp.type = FILE_TYPE_UNKNOWN;
          
          // look for trailing slash before clean up
          
-         p = argv[i];
+         p = tmp.name;
          c = p[strlen(p) - 1];
          
          if ((flags.slashes == 0) && ((c == '/') || (c == '\\')))
@@ -221,22 +228,26 @@ int main(int argc, char **argv)
          if (isspace(*p)) exit(ESX_EINVAL);
          if (*p) strcpy(p, pathnice(p));
          
+         // if there are wildcards then this is not a directory
+         
+         if ((tmp.type == FILE_TYPE_UNKNOWN) && strpbrk(tmp.name, "*?"))
+            tmp.type = FILE_TYPE_NORMAL;
+         
          // add to list of files
-         
-         tmp.name = argv[i];
-         
-         if (*tmp.name == 0) continue;
-         
-         if (obstack_grow(ob, &tmp, sizeof(tmp)) == 0)
-            exit((int)err_out_of_memory);
-         
-         ++src_sz;
+
+         if (*tmp.name)
+         {
+            if (obstack_grow(ob, &tmp, sizeof(tmp)) == 0)
+               exit((int)err_out_of_memory);
+            
+            ++src_sz;
+         }
       }
    }
 
    // help
    
-   if ((src_sz + (dst.name != 0)) < 2)
+   if ((flags.version == 0) && ((src_sz + (dst.name != 0)) < 2))
       flags.help = 1;
    
    if (flags.help)
@@ -262,138 +273,165 @@ int main(int argc, char **argv)
          dst.type = src[src_sz].type;
    }
    
-   if (src_sz > 1)
+   if ((src_sz > 1) || (src[0].type == FILE_TYPE_DIRECTORY))
    {
       if (dst.type == FILE_TYPE_NORMAL)
          exit((int)err_destination_not_directory);
       
       dst.type = FILE_TYPE_DIRECTORY;
    }
-   
+
+for (unsigned char k = 0; k < src_sz; ++k)
+	printf("src[%u] = \"%s\" %u\n", k, src[k].name, src[k].type);
+
+printf("dst = \"%s\" %u\n", dst.name, dst.type);
+
+
    // if the destination name contains wildcards it must match something
-   
-   if (strpbrk(dst.name, "*?"))
+
+   if ((name_in_main_memory = obstack_copy(ob, dst.name, strlen(dst.name) + 1)) == 0)
+      exit((int)err_out_of_memory);
+
+printf("name = \"%s\" at 0x%04x\n", name_in_main_memory, name_in_main_memory);
+
+   catalog.filter = (dst.type == FILE_TYPE_NORMAL) ? (ESX_CAT_FILTER_SYSTEM | ESX_CAT_FILTER_LFN) : (ESX_CAT_FILTER_SYSTEM | ESX_CAT_FILTER_LFN | ESX_CAT_FILTER_DIR);
+   catalog.filename = p3dos_cstr_to_pstr(name_in_main_memory);
+   catalog.cat_sz = 2;   // consistent with mv.asm
+
+printf("name end = %u\n", strchr(name_in_main_memory, 0xff) - name_in_main_memory);
+printf("errno = %u, dos_catalog = %u, errno = %u\n", errno, esx_dos_catalog(&catalog), errno);
+printf("completed_sz = %u\n", catalog.completed_sz);
+
+   if (esx_dos_catalog(&catalog) == 1)
    {
-      unsigned char num;
-      
-      catalog.filter = (dst.type == FILE_TYPE_NORMAL) ? (ESX_CAT_FILTER_SYSTEM | ESX_CAT_FILTER_LFN) : (ESX_CAT_FILTER_SYSTEM | ESX_CAT_FILTER_LFN | ESX_CAT_FILTER_DIR);
-      catalog.filename = dst.name;
-      
-      if ((num = esx_dos_catalog(&catalog)) && (num != 0xff))
+      unsigned char type;
+printf("hello\n");
+      do
       {
-         unsigned char type;
+         // opportunity for user to break
+
+         if (user_interaction_spin())
+            exit((int)err_break_into_program);
          
+         // keep looking until correct destination type found
+
          type = (catalog.cat[1].filename[7] & 0x80) ? FILE_TYPE_DIRECTORY : FILE_TYPE_NORMAL;
-         
+      
          if (dst.type == FILE_TYPE_UNKNOWN)
-         {
             dst.type = type;
-         }
-         else if (dst.type != type)
-         {
-            exit((int)err_destination_type_mismatch);
-         }
-         
-         lfn.dir = &catalog;
-
-         if (esx_ide_get_lfn(&lfn, &catalog.cat[j]))
-            exit((int)err_destination_contains_wildcards);
-
-         if ((dst.name = obstack_copy(ob, &lfn.filename, strlen(lfn.filename) + 1) == 0)
-            exit((int)err_out_of_memory);
       }
-      else
-      {
-         exit((int)err_destination_contains_wildcards);
-      }
+      while ((dst.type != type) && (esx_dos_catalog_next(&catalog) == 1));
+      
+      if (dst.type != type) exit(2);
+
+      lfn.cat = &catalog;
+      if (esx_ide_get_lfn(&lfn, &catalog.cat[1]) == 0xff)
+			printf("dst lfn error %u\n", errno);
+      
+      obstack_free(ob, name_in_main_memory);
+
+      if ((dst.name = obstack_copy(ob, &lfn.filename, strlen(lfn.filename) + 1)) == 0)
+         exit((int)err_out_of_memory);
+      
+      memcpy(&dst_time, &lfn.time, sizeof(dst_time));
+      dst_resolved = 1;
    }
+   else
+   {
+      dst.name = p3dos_pstr_to_cstr(name_in_main_memory);
+
+      if (strpbrk(dst.name, "*?"))
+         exit((int)err_destination_contains_wildcards);
+   }
+
+   if (dst.type == FILE_TYPE_UNKNOWN)
+      dst.type = FILE_TYPE_NORMAL;
    
+   // dst.name is in main memory
+
+
+for (unsigned char k = 0; k < src_sz; ++k)
+	printf("src[%u] = \"%s\" %u\n", k, src[k].name, src[k].type);
+
+printf("dst = \"%s\" %u\n", dst.name, dst.type);
+
+
+
    // let the good times roll
 
    for (unsigned char i = 0; i < src_sz; ++i)
    {
-      unsigned char num;
-
       // opportunity for user to break
 
       if (user_interaction_spin())
          exit((int)err_break_into_program);
 
       // init catalog structure for match on source file
-      // note catalog.cat_sz is initialized in mv.asm
+
+      if ((name_in_main_memory = obstack_copy(ob, src[i].name, strlen(src[i].name) + 1)) == 0)
+         exit((int)err_out_of_memory);
+
+printf("name = \"%s\" at 0x%04x\n", name_in_main_memory, name_in_main_memory);
 
       catalog.filter = (src[i].type == FILE_TYPE_NORMAL) ? (ESX_CAT_FILTER_SYSTEM | ESX_CAT_FILTER_LFN) : (ESX_CAT_FILTER_SYSTEM | ESX_CAT_FILTER_LFN | ESX_CAT_FILTER_DIR);
-      catalog.filename = src[i].name;
-      
-      num = esx_dos_catalog(&catalog);
+      catalog.filename = p3dos_cstr_to_pstr(name_in_main_memory);
+      catalog.cat_sz = 2;   // consistent with mv.asm
 
-      while (num && (num != 0xff))
+printf("name end = %u\n", strchr(name_in_main_memory, 0xff) - name_in_main_memory);
+
+      // iterate over all source file matches
+      // doing one at a time avoids complications with wildcards and new files being created
+
+printf("errno = %u, dos_catalog = %u, errno = %u\n", errno, esx_dos_catalog(&catalog), errno);
+printf("completed_sz = %u\n", catalog.completed_sz);
+
+      if (esx_dos_catalog(&catalog) == 1)
       {
-         // source files found
-
-         if (dst.type == FILE_TYPE_UNKNOWN)
-         {
-            // still don't know if destination is a directory or not, now we can determine that
-
-            dst.type = ((catalog.completed_sz > 1) || (catalog.cat[1].filename[7] & 0x80)) ? FILE_TYPE_DIRECTORY : FILE_TYPE_NORMAL;
-         }
-         
-         // fill destination stat file at first chance
-         
-         if (dstat_avail == 0)
-         {
-            if (esx_f_stat(dst.name, &dstat) == 0)
-               dstat_avail = 1;
-         }
-
-         // iterate over all matches
-
-         for (unsigned char j = 1; j <= num; ++j)
+printf("hello\n");
+         do
          {
             // opportunity for user to break
 
             if (user_interaction_spin())
                exit((int)err_break_into_program);
-
+            
             // lfn details for this file
-
-            lfn.dir = &catalog;
-
-            if (esx_ide_get_lfn(&lfn, &catalog.cat[j]) == 0)
+            
+            lfn.cat = &catalog;
+            if (esx_ide_get_lfn(&lfn, &catalog.cat[1]) == 0xff)
+					printf("src lfn error %u\n", errno);
+            
+            // action is based on source and destination types
+            
+            switch (move_classify(catalog.cat[1].filename[7], dst.type))
             {
-               // action is based on src and dst file types
-
-               switch(move_classify(catalog.cat[j].filename[7], dst.type))
-               {
-                  case MOVE_TYPE_FILE_TO_FILE:
-                     move_file_to_file();
-                     break;
+               case MOVE_TYPE_FILE_TO_FILE:
+                  move_file_to_file();
+                  // do we finish here?  do we allow the destination to be written many times?
+                  exit(0);
+                  break;
                   
-                  case MOVE_TYPE_FILE_TO_DIR:
-                     move_file_to_dir();
-                     break;
+               case MOVE_TYPE_FILE_TO_DIR:
+                  move_file_to_dir();
+                  break;
                   
-                  case MOVE_TYPE_DIR_TO_FILE:
-                     // silently ignore this one
-                     break;
+               case MOVE_TYPE_DIR_TO_FILE:
+                  // silently ignore this one
+                  break;
                   
-                  case MOVE_TYPE_DIR_TO_DIR:
-                     move_dir_to_dir();
-                     break;
+               case MOVE_TYPE_DIR_TO_DIR:
+                  move_dir_to_dir();
+                  break;
                   
-                  default:
-                     printf("debug: classify error\n");
-                     break;
-               }
-            }
-            else
-            {
-               printf("debug: ide_get_lfn failed\n");
+               default:
+                  printf("debug: classify error\n");
+                  break;
             }
          }
-
-         num = esx_dos_catalog_next(&catalog);
+         while (esx_dos_catalog_next(&catalog) == 1);
       }
+      
+      obstack_free(ob, name_in_main_memory);
    }
 
    return 0;
