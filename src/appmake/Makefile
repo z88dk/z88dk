@@ -11,7 +11,7 @@ OBJS = appmake.o z88.o zxvgs.o zx.o z88shell.o abc80.o zx81.o msx.o mtx.o mz.o n
 
 all: appmake$(EXESUFFIX)
 
-CFLAGS += -g -O0
+CFLAGS += -g
 
 %.o: %.c appmake.h zx-util.h d88.h cpmdisk.h
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<

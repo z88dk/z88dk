@@ -38,7 +38,7 @@ void cpm_write_file(cpm_handle *h, char filename[11], void *data, size_t len)
       uint8_t *dir_ptr = h->image + directory_offset;
       uint8_t  direntry[32];
       uint8_t  *ptr;
-      int      i, current_extent;
+      int      i, j, current_extent;
 
       memcpy(h->image + offset, data, len);
 
@@ -63,9 +63,7 @@ void cpm_write_file(cpm_handle *h, char filename[11], void *data, size_t len)
               extents_to_write = (num_extents - ( i * 16));
           }
           ptr = &direntry[16];
-	printf("%p %p\n",direntry,ptr);
-          for ( int j = 0; j < 16; j++ ) {
-		printf("Loop %d\n",j);
+          for ( j = 0; j < 16; j++ ) {
               if ( j < extents_to_write ) {
                  direntry[j * 2 + 16] = (current_extent) % 256;
                  direntry[j * 2 + 16 + 1] = (current_extent) / 256;
@@ -81,6 +79,7 @@ int cpm_write_image(cpm_handle *h, const char *filename)
 {
       uint8_t header[256] = {0};
       FILE  *fp;
+      int    i,j;
 
       if ( ( fp = fopen(filename, "wb")) == NULL ) {
           return -1;
@@ -90,12 +89,12 @@ int cpm_write_image(cpm_handle *h, const char *filename)
       memcpy(header + 0x22, "z88dk", 5);
       header[0x30] = h->spec.tracks;
       header[0x31] = h->spec.sides;
-      for ( int i = 0; i < h->spec.tracks; i++ ) {
+      for ( i = 0; i < h->spec.tracks; i++ ) {
           header[0x34+i] = (h->spec.sector_size * h->spec.sectors_per_track + 256) / 256;
       }
       fwrite(header, 256, 1,  fp);
 
-      for ( int i = 0; i < h->spec.tracks; i++ ) {
+      for ( i = 0; i < h->spec.tracks; i++ ) {
           uint8_t *ptr;
           memset(header, 0, 256);
           memcpy(header, "Track-Info\r\n",12);
@@ -106,7 +105,7 @@ int cpm_write_image(cpm_handle *h, const char *filename)
           header[0x16] = h->spec.gap3_length;
           header[0x17] = h->spec.filler_byte;
           ptr = header + 0x18;
-          for ( int j = 0; j < h->spec.sectors_per_track; j++ ) {
+          for ( j = 0; j < h->spec.sectors_per_track; j++ ) {
              *ptr++ = i;  // Track
              *ptr++ = 0;  // Side
              *ptr++ = j;  // Secotr ID
