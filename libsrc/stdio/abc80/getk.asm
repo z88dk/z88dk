@@ -13,8 +13,9 @@
 	PUBLIC	getk
 
 .getk
-	in	a,(56)
-	and 127
+        ld      a,(65013)
+        and 127
+
 IF STANDARDESCAPECHARS
 	cp	13
 	jr	nz,not_return
@@ -23,4 +24,6 @@ IF STANDARDESCAPECHARS
 ENDIF
 	ld	l,a
 	ld	h,0
+	xor	a
+	ld	(65013),a
 	ret
