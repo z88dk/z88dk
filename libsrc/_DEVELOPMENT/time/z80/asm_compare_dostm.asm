@@ -27,7 +27,13 @@ asm_compare_dostm:
    
    ld d,(hl)
    dec hl
-   ld e,(hl)                   ; de = a->date
+   ld a,(hl)                   ; da = a->date
+   
+   sub $20                     ; make month zero based
+   ld e,a
+   sbc a,a
+   add a,d
+   ld d,a                      ; de = adjusted a->date
    
    push hl                     ; save &a->date
    
@@ -36,7 +42,13 @@ asm_compare_dostm:
    
    ld b,(hl)
    dec hl
-   ld c,(hl)                   ; bc = b->date
+   ld a,(hl)                   ; ba = b->date
+   
+   sub $20                     ; make month zero based
+   ld c,a
+   sbc a,a
+   add a,b
+   ld b,a                      ; bc = adjusted b->date
    
    ex de,hl                    ; de = &b->date
    
