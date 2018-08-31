@@ -12,7 +12,7 @@ define(`__YAZ180', 1)
 
 # Clock frequency in Hz
 
-define(`__CPU_CLOCK', 18432000)
+define(`__CPU_CLOCK', 36864000)
 
 # I/O BASE ADDRESS OF INTERNAL PERIPHERALS
 

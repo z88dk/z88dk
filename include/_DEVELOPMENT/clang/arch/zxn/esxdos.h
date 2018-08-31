@@ -318,6 +318,14 @@ extern unsigned char esx_f_rewinddir(unsigned char handle);
 extern unsigned char esx_f_getcwd(char *pathname);
 
 
+extern unsigned char esx_f_getcwd_drive(unsigned char drive,char *pathname);
+
+
+
+extern unsigned char esx_f_get_canonical_path(char *pathname,char *canonical);
+
+
+
 extern unsigned char esx_f_chdir(const char *pathname);
 
 
@@ -427,8 +435,13 @@ extern unsigned char esx_f_unlink(const char *filename);
 
 
 
+
 // FUNCTIONS IMPORTED FROM NEXTZXOS
-// require nextzxos 128k mode; items in memory must be in main memory
+// require nextzxos 128k mode; this comes with some obligations
+//
+// 1. items in memory must be in main memory 0x4000 - 0xbfe0
+// 2. the stack must be in main memory 0x4000 - 0xbfe0
+// 3. page 10 must be present in mmu2 so that the system vars are present
 
 // IDE_SET_DRIVE
 

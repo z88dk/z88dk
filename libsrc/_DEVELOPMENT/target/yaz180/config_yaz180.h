@@ -39,7 +39,7 @@
 #undef  __YAZ180
 #define __YAZ180  1
 
-#define __CPU_CLOCK  18432000
+#define __CPU_CLOCK  36864000
 
 #define __IO_BASE_ADDRESS 0x0
 
