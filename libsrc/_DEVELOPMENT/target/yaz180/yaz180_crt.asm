@@ -366,6 +366,25 @@ ENDIF
    ENDIF
    
    
+   IFDEF CRT_ENABLE_COMMANDLINE_EX
+   
+      defc __crt_enable_commandline_ex = CRT_ENABLE_COMMANDLINE_EX
+   
+   ELSE
+   
+      IFDEF TAR__crt_enable_commandline_ex
+      
+         defc __crt_enable_commandline_ex = TAR__crt_enable_commandline_ex
+      
+      ELSE
+      
+         defc __crt_enable_commandline_ex = DEF__crt_enable_commandline_ex
+      
+      ENDIF
+   
+   ENDIF
+   
+   
    IFDEF CRT_ENABLE_RESTART
    
       defc __crt_enable_restart = CRT_ENABLE_RESTART
