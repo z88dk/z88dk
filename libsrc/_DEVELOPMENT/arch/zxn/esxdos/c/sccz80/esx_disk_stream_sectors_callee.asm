@@ -13,3 +13,10 @@ esx_disk_stream_sectors_callee:
    ex (sp),hl
    
    jp asm_esx_disk_stream_sectors
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esx_disk_stream_sectors_callee
+defc _esx_disk_stream_sectors_callee = esx_disk_stream_sectors_callee
+ENDIF
+

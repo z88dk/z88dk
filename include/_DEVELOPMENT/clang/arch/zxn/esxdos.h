@@ -318,6 +318,14 @@ extern unsigned char esx_f_rewinddir(unsigned char handle);
 extern unsigned char esx_f_getcwd(char *pathname);
 
 
+extern unsigned char esx_f_getcwd_drive(unsigned char drive,char *pathname);
+
+
+
+extern unsigned char esx_f_get_canonical_path(char *pathname,char *canonical);
+
+
+
 extern unsigned char esx_f_chdir(const char *pathname);
 
 
@@ -424,6 +432,142 @@ extern unsigned char esx_f_trunc(const char *filename,uint32_t size);
 
 
 extern unsigned char esx_f_unlink(const char *filename);
+
+
+
+
+// FUNCTIONS IMPORTED FROM NEXTZXOS
+// require nextzxos 128k mode; this comes with some obligations
+//
+// 1. items in memory must be in main memory 0x4000 - 0xbfe0
+// 2. the stack must be in main memory 0x4000 - 0xbfe0
+// 3. page 10 must be present in mmu2 so that the system vars are present
+
+// IDE_SET_DRIVE
+
+// drive letter is character 'A'..'P'
+
+extern unsigned char esx_dos_get_drive(void);
+
+
+extern unsigned char esx_dos_set_drive(uint8_t drive);
+
+
+
+// IDE_MODE
+
+struct esx_mode
+{
+   union
+   {
+      uint16_t mode;
+      struct
+      {
+         uint8_t submode;      // 0=lores,1=ula,2=hires,3=hicol
+         uint8_t layer;        // 0,1,2
+      }
+      mode8;
+   };
+   
+   union
+   {
+      uint8_t attr;            // layer0,ula,hires,hicol
+      uint8_t ink;             // lores,layer2
+   };
+   
+   uint8_t paper;              // lores,layer2
+   
+   uint8_t flags;
+   uint8_t width;              // width of char in pixels 3-8
+   
+   uint8_t cols;               // printable columns
+   uint8_t rows;               // printable rows
+};
+
+#define ESX_MODE_FLAG_REDUCED_HEIGHT  __nextos_mode_flag_reduced_height
+#define ESX_MODE_FLAG_DOUBLE_WIDTH  __nextos_mode_flag_double_width
+#define ESX_MODE_FLAG_DOUBLE_HEIGHT  __nextos_mode_flag_double_height
+
+#define ESX_MODE_SET_LAYER_0  __nextos_mode_set_layer_0
+#define ESX_MODE_SET_LAYER_1_LORES  __nextos_mode_set_layer_1_lores
+#define ESX_MODE_SET_LAYER_1_ULA  __nextos_mode_set_layer_1_ula
+#define ESX_MODE_SET_LAYER_1_HIRES  __nextos_mode_set_layer_1_hires
+#define ESX_MODE_SET_LAYER_1_HICOL  __nextos_mode_set_layer_1_hicol
+#define ESX_MODE_SET_LAYER_2  __nextos_mode_set_layer_2
+
+// esx_mode structure does not have to be in main memory
+
+extern unsigned char esx_ide_mode_get(struct esx_mode *mode);
+
+
+extern unsigned char esx_ide_mode_set(struct esx_mode *mode);
+
+
+
+// DOS_CATALOG
+
+struct esx_cat_entry
+{
+   char filename[8];           // left justified space filled
+   char extension[3];          // left justified space filled
+   uint16_t size;              // disk space in kB not file size
+};
+
+struct esx_cat
+{
+   uint8_t filter;             // (init) filter applied (set bits enable)
+   char *filename;             // (init) catalog match string 0xff terminated
+
+   uint16_t dir_handle;        // (dos_catalog) for IDE_GET_LFN
+   uint8_t completed_sz;       // (dos_catalog) number of matched entries written in indices 1+ (0 = none)
+
+   uint8_t cat_sz;             // (init) actual size of cat[] >= 2
+   struct esx_cat_entry cat[2];
+};
+
+// filter bits indicate directory details included in catalog
+
+#define ESX_CAT_FILTER_SYSTEM  __nextos_cat_filter_system
+#define ESX_CAT_FILTER_LFN  __nextos_cat_filter_lfn
+#define ESX_CAT_FILTER_DIR  __nextos_cat_filter_dir
+
+// esx_cat structure must be in main memory
+
+extern unsigned char esx_dos_catalog(struct esx_cat *cat);
+
+
+extern unsigned char esx_dos_catalog_next(struct esx_cat *cat);
+
+
+
+// IDE_GET_LFN (tightly coupled to dos_catalog)
+
+struct esx_lfn
+{
+   struct esx_cat *cat;        // (init) associated dos_catalog structure
+   
+   char filename[ESX_FILENAME_LFN_MAX + 1];  // (get_lfn) long filename zero terminated
+   
+   struct dos_tm time;         // (get_lfn) time.h contains functions dealing with dos time
+   uint32_t size;              // (get_lfn) file size in bytes
+};
+
+// esx_lfn structure must be in main memory
+
+extern unsigned char esx_ide_get_lfn(struct esx_lfn *dir,struct esx_cat_entry *query);
+
+
+
+
+// PLUS 3 DOS UTILITIES (MAY BE MOVED LATER)
+
+// change string termination
+
+extern char *p3dos_cstr_to_pstr(char *s);
+
+
+extern char *p3dos_pstr_to_cstr(char *s);
+
 
 
 

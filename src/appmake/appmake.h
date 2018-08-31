@@ -21,6 +21,7 @@
 #endif
 
 #include "d88.h"
+#include "cpmdisk.h"
 
 extern char c_install_dir[];
 
@@ -69,6 +70,9 @@ extern int       cpm_exec(char *target);
 extern option_t  cpm_options;
 extern char      cpm_longhelp[];
 
+extern int       einstein_exec(char *target);
+extern option_t  einstein_options;
+
 extern int       enterprise_exec(char *target);
 extern option_t  enterprise_options;
 
@@ -110,6 +114,8 @@ extern option_t  multi8_options;
 extern int       mz_exec(char *target);
 extern option_t  mz_options;
 
+extern int       mz2500_exec(char *target);
+extern option_t  mz2500_options;
 extern int       nascom_exec(char *target);
 extern option_t  nascom_options;
 
@@ -234,6 +240,10 @@ struct {
       "Creates an AMSDOS file suitable for writing to a .DSK image, opt. WAV",
       NULL,
       cpc_exec,   &cpc_options },
+    { "com2dsk",   "einstein",      "(C) 2018 Dominic Morris",
+      "Create an Einstein disc image",
+      NULL,
+      einstein_exec,   &einstein_options },
     { "bin2ep",   "enterprise",      "(C) 2011 Stefano Bodrato",
       "Adds a type 5 header to make a .app file",
       NULL,
@@ -298,6 +308,10 @@ struct {
       "Generates a tape file for the Sharp MZ computers",
       NULL,
       mz_exec,      &mz_options },
+    { "bin2mz",  "mz2500",    "(C) 2018 S. Bodrato",
+      "Generates a tape file for the Sharp MZ2500 computers",
+      NULL,
+      mz2500_exec,      &mz2500_options },
     { "bin2nas",   "nas",       "(C) 2003 Stefano Bodrato",
       "Generates a .NAS file suitable for use by emulators",
       NULL,

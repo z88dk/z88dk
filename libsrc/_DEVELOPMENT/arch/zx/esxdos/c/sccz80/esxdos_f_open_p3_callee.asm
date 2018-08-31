@@ -20,3 +20,10 @@ esxdos_f_open_p3_callee:
 
    ld b,c
    jp asm_esxdos_f_open
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esxdos_f_open_p3_callee
+defc _esxdos_f_open_p3_callee = esxdos_f_open_p3_callee
+ENDIF
+

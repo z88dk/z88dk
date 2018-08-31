@@ -51,13 +51,16 @@ Z80pass2( void )
 		do_patch = true;
 		do_store = false;
 
-		if ( expr->result.undefined_symbol ) 
+		if ( expr->result.undefined_symbol ||
+ 			 expr->result.not_evaluable ||
+			!expr->is_computed)
 		{
 			do_patch = false;
+			do_store = true;
 		}
 		else if ( expr->range == RANGE_JR_OFFSET )
 		{
-			if (expr->result.extern_symbol || expr->result.cross_section_addr)
+			if (expr->result.extern_symbol || expr->result.cross_section_addr )
 			{
 				error_jr_not_local();	/* JR must be local */
 				do_patch = false;
@@ -70,10 +73,7 @@ Z80pass2( void )
 			do_patch = false;
 			do_store = true;            /* store expression in relocatable file */
 		}
-		else if ( expr->result.not_evaluable )
-		{
-			do_patch = false;
-		}
+
 
         if ( do_patch )
         {

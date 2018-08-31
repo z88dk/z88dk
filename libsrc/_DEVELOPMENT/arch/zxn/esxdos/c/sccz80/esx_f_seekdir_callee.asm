@@ -15,3 +15,10 @@ esx_f_seekdir_callee:
    
    ld a,l
    jp asm_esx_f_seekdir
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esx_f_seekdir_callee
+defc _esx_f_seekdir_callee = esx_f_seekdir_callee
+ENDIF
+

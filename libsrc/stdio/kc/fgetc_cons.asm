@@ -17,11 +17,12 @@
 
 .fgetc_cons
 ._fgetc_cons
-	ld	ix,$1f0
+	push	iy
+	ld	iy,$1f0
 
     call PV1
     defb FNKBD
-
+	pop	iy
 IF STANDARDESCAPECHARS
 	cp	13
 	jr	nz,not_return

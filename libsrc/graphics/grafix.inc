@@ -71,7 +71,7 @@ ENDIF
 
 IF FORabc80
 	DEFINE gotgfx
-	defc maxx	= 70
+	defc maxx	= 78
 	defc maxy	= 72
 ENDIF
 

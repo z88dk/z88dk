@@ -12,17 +12,34 @@ EXTERN __esxdos_error_mc
 
 asm_esx_m_getdrv:
 
+IF __ZXNEXT
+
+   xor a
+   jr join
+
+ELSE
+
    ld l,0
+
+ENDIF
 
 asm_esx_m_setdrv:
 
-   ; enter :  l = drive (0 to get)
+   ; enter :  l = drive
    ;
    ; exit  :  l = default drive
    ;
    ; uses  : af, bc, de, hl
    
    ld a,l
+
+IF __ZXNEXT
+
+   or $01
+
+join:
+
+ENDIF
    
    rst  __ESX_RST_SYS
    defb __ESX_M_GETSETDRV
@@ -42,7 +59,7 @@ asm_esx_m_setdrv:
 ; A=0, get the default drive
 ; A<>0, set the default drive to A
 ; bits 7..3=drive letter (0=A...15=P)
-; bits 2..0=drive number (0)
+; bits 2..0=drive number (0) -- change: set a bit so drive A can be selected
 ; Exit (success):
 ; Fc=0
 ; A=default drive, encoded as:

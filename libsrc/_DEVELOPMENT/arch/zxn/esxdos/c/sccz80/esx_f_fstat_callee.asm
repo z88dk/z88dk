@@ -15,3 +15,10 @@ esx_f_fstat_callee:
    
    ld a,e
    jp asm_esx_f_fstat
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esx_f_fstat_callee
+defc _esx_f_fstat_callee = esx_f_fstat_callee
+ENDIF
+

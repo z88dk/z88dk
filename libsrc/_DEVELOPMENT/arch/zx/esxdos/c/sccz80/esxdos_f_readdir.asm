@@ -19,3 +19,10 @@ esxdos_f_readdir:
    
    ld a,c
    jp asm_esxdos_f_readdir
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esxdos_f_readdir
+defc _esxdos_f_readdir = esxdos_f_readdir
+ENDIF
+

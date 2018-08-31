@@ -1,18 +1,21 @@
 ; unsigned char esx_m_tapein_flags(uint8_t flags)
 
+INCLUDE "config_private.inc"
+
 SECTION code_esxdos
 
 PUBLIC asm_esx_m_tapein_flags
 
-EXTERN __esx_m_tapein_call
+EXTERN __esxdos_error_mc
 
 asm_esx_m_tapein_flags:
+
 
    ; enter :  l = flags (bit 0 = 1 pause on screen$, bit 1 = 1 simulate tape loading)
    ;
    ; exit  : success
    ;
-   ;            hl = 0
+   ;            hl = previous flags (bit 0=pause on screen$, bit 1=simulate)
    ;            carry reset
    ;
    ;         fail
@@ -24,8 +27,15 @@ asm_esx_m_tapein_flags:
 
    ld b,6
    ld a,l
-   
-   jp __esx_m_tapein_call
+
+   rst __ESX_RST_SYS
+   defb __ESX_M_TAPEIN
+
+   ld l,a
+   ld h,0
+
+   ret nc
+   jp __esxdos_error_mc
 
 
 ; ***************************************************************************

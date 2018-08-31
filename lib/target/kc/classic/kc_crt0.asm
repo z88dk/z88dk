@@ -12,6 +12,8 @@
 ;       $Id: kc_crt0.asm,v 1.2 2016-10-10 07:09:14 stefano Exp $
 ;
 ; - - - - - - -
+;
+; NB. Compiled with --IXIY so all iy references are actually iy
 
 
 	MODULE  kc_crt0
@@ -39,6 +41,7 @@ ENDIF
         defc    CONSOLE_COLUMNS = 40
         defc    CONSOLE_ROWS = 32
 
+        defc    TAR__fputc_cons_generic = 1
 	defc	TAR__register_sp = CRT_ORG_CODE-2
         defc    TAR__clib_exit_stack_size = 32
 	defc	__CPU_CLOCK = 2000000
@@ -133,43 +136,43 @@ l_dcal:	jp	(hl)		;Used for function pointer calls
 
 ; CTC channel 3 (keyboard input)
 INT01EE:
-	push ix
-	ld	ix,$01f0
+	push iy
+	ld	iy,$01f0
 	call 0
-	pop ix
+	pop iy
 	ret
 
 ; PIO channel B (keyboard input)
 INT01E6:
-	push ix
-	ld	ix,$01f0
+	push iy
+	ld	iy,$01f0
 	call 0
-	pop ix
+	pop iy
 	ret
 
 IF !DEFINED_nosound
 ; CTC channel 2 (sound duration)
 INT01EC:
-	push ix
-	ld	ix,$01f0
+	push iy
+	ld	iy,$01f0
 	call 0
-	pop ix
+	pop iy
 	ret
 
 ; CTC channel 1 (cassette input)
 INT01E4:
-	push ix
-	ld	ix,$01f0
+	push iy
+	ld	iy,$01f0
 	call 0
-	pop ix
+	pop iy
 	ret
 
 ; CTC channel 1 (cassette output)
 INT01EA:
-	push ix
-	ld	ix,$01f0
+	push iy
+	ld	iy,$01f0
 	call 0
-	pop ix
+	pop iy
 	ret
 ENDIF
 

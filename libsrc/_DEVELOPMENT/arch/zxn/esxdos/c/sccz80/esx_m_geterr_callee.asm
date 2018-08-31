@@ -14,3 +14,10 @@ esx_m_geterr_callee:
    push af
 
    jp asm_esx_m_geterr
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esx_m_geterr_callee
+defc _esx_m_geterr_callee = esx_m_geterr_callee
+ENDIF
+

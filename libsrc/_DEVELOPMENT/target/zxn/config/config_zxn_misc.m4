@@ -6,6 +6,18 @@ divert(-1)
 #
 
 #
+# DIVMMC MEMORY
+# see https://velesoft.speccy.cz/zx/divide/divide-memory.htm
+#
+
+# PORT 0xE3: IO_DIVIDE_CONTROL
+
+define(`__IO_DIVIDE_CONTROL', 0xe3)
+
+define(`__IDC_CONMEM', 0x80)
+define(`__IDC_MAPRAM', 0x40)
+
+#
 # SPI INTERFACE
 # sd card, raspberry pi
 #
@@ -57,6 +69,11 @@ dnl#
 
 ifdef(`CFG_ASM_PUB',
 `
+PUBLIC `__IO_DIVIDE_CONTROL'
+
+PUBLIC `__IDC_CONMEM'
+PUBLIC `__IDC_MAPRAM'
+
 PUBLIC `__IO_SPI_CONTROL'
 
 PUBLIC `__ISC_SPI_CS'
@@ -85,6 +102,11 @@ dnl#
 
 ifdef(`CFG_ASM_DEF',
 `
+defc `__IO_DIVIDE_CONTROL' = __IO_DIVIDE_CONTROL
+
+defc `__IDC_CONMEM' = __IDC_CONMEM
+defc `__IDC_MAPRAM' = __IDC_MAPRAM
+
 defc `__IO_SPI_CONTROL' = __IO_SPI_CONTROL
 
 defc `__ISC_SPI_CS' = __ISC_SPI_CS
@@ -113,6 +135,11 @@ dnl#
 
 ifdef(`CFG_C_DEF',
 `
+`#define' `__IO_DIVIDE_CONTROL'  __IO_DIVIDE_CONTROL
+
+`#define' `__IDC_CONMEM'  __IDC_CONMEM
+`#define' `__IDC_MAPRAM'  __IDC_MAPRAM
+
 `#define' `__IO_SPI_CONTROL'  __IO_SPI_CONTROL
 
 `#define' `__ISC_SPI_CS'  __ISC_SPI_CS

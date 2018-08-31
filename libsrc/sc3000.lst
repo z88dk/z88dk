@@ -1,5 +1,5 @@
-stdio/inkey/fgetc_cons
-stdio/inkey/getk
+stdio/sc3000/fgetc_cons
+stdio/sc3000/getk
 @stdio/ansicore.lst
 stdio/ansi/msx/f_ansi_attr
 stdio/ansi/msx/f_ansi_bel

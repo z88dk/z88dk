@@ -17,3 +17,10 @@ esx_m_tapeout_info:
    push af
    
    jp asm_esx_m_tapeout_info
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esx_m_tapeout_info
+defc _esx_m_tapeout_info = esx_m_tapeout_info
+ENDIF
+

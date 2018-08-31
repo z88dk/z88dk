@@ -11,3 +11,4 @@
 @arch/zx/nirvanap/nirvanap_sccz80.lst
 arch/zxn/sysvar/system_variables
 @arch/zx/tape/tape_sccz80.lst
+@arch/zxn/version/version_sccz80.lst

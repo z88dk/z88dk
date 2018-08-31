@@ -20,3 +20,10 @@ esx_f_write:
    
    ld a,e
    jp asm_esx_f_write
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esx_f_write
+defc _esx_f_write = esx_f_write
+ENDIF
+

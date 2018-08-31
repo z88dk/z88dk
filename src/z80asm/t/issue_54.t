@@ -71,7 +71,7 @@ END
 
 
 z80nm("test.o", <<'END');
-Object  file test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF12
   Name: test
   Section "": 1 bytes, ORG $FDE8
     C $0000: C9

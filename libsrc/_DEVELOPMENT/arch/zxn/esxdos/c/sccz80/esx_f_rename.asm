@@ -17,3 +17,10 @@ esx_f_rename:
    push af
 
    jp asm_esx_f_rename
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esx_f_rename
+defc _esx_f_rename = esx_f_rename
+ENDIF
+

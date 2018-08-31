@@ -13,3 +13,10 @@ esxdos_f_getcwd:
 
    ld a,__ESXDOS_DRIVE_CURRENT
    jp asm_esxdos_f_getcwd
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esxdos_f_getcwd
+defc _esxdos_f_getcwd = esxdos_f_getcwd
+ENDIF
+

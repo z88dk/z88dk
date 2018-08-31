@@ -13,3 +13,10 @@ esxdos_f_unlink:
 
    ld a,__ESXDOS_DRIVE_CURRENT
    jp asm_esxdos_f_unlink
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esxdos_f_unlink
+defc _esxdos_f_unlink = esxdos_f_unlink
+ENDIF
+

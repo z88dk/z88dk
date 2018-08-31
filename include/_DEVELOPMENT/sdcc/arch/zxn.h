@@ -110,6 +110,8 @@ extern unsigned char IO_UART_TX;
 extern unsigned char IO_UART_STATUS;
 extern unsigned char IO_6B;
 extern unsigned char IO_DMA;
+extern unsigned char IO_E3;
+extern unsigned char IO_DIVIDE_CONTROL;
 extern unsigned char IO_E7;
 extern unsigned char IO_SPI_CONTROL;
 extern unsigned char IO_SPI_STATUS;
@@ -191,6 +193,11 @@ __sfr __banked __at __IO_UART_STATUS IO_UART_STATUS;
 
 __sfr __at 0x6b IO_6B;
 __sfr __at __IO_DMA IO_DMA;
+
+// io ports - divmmc memory
+
+__sfr __at 0xe3 IO_E3;
+__sfr __at __IO_DIVIDE_CONTROL IO_DIVIDE_CONTROL;
 
 // io ports - spi interface (sd card, raspberry pi)
 
@@ -503,6 +510,11 @@ __sfr __banked __at __IO_LED_L IO_LED_L;
 #define D_RM_B_ADDR_L  __D_RM_B_ADDR_L
 #define D_RM_B_ADDR_H  __D_RM_B_ADDR_H
 #define D_RM_B_ADDR  __D_RM_B_ADDR
+
+// 0xe3, IO_DIVIDE_CONTROL
+
+#define IDC_CONMEM  __IDC_CONMEM
+#define IDC_MAPRAM  __IDC_MAPRAM
 
 // 0xe7, IO_SPI_CONTROL
 
@@ -902,6 +914,30 @@ extern void zxn_write_sysvar_bank_state_fastcall(unsigned int state) __preserves
 extern unsigned int zxn_mangle_bank_state(unsigned int state) __preserves_regs(b,c,d,e,iyl,iyh);
 extern unsigned int zxn_mangle_bank_state_fastcall(unsigned int state) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
 #define zxn_mangle_bank_state(a) zxn_mangle_bank_state_fastcall(a)
+
+
+
+// version checks
+
+// note that dot commands will automatically check version with suitable pragma defined
+//
+// core_version: MmSS (major, minor, sub) in hexadecimal; v 1.10.51 would be 0x1a33
+// esxdos_version: esxdos does not return version yet; use 0 or 1 to verify presence
+// nextzxos_version: MMmm (major, minor) in bcd; v 1.94 would be 0x0194
+
+extern unsigned char check_version_core(unsigned int core_version) __preserves_regs(d,iyl,iyh);
+extern unsigned char check_version_core_fastcall(unsigned int core_version) __preserves_regs(d,iyl,iyh) __z88dk_fastcall;
+#define check_version_core(a) check_version_core_fastcall(a)
+
+
+extern unsigned char check_version_esxdos(unsigned int esxdos_version) __preserves_regs(iyl,iyh);
+extern unsigned char check_version_esxdos_fastcall(unsigned int esxdos_version) __preserves_regs(iyl,iyh) __z88dk_fastcall;
+#define check_version_esxdos(a) check_version_esxdos_fastcall(a)
+
+
+extern unsigned char check_version_nextzxos(unsigned int nextzxos_version) __preserves_regs(iyl,iyh);
+extern unsigned char check_version_nextzxos_fastcall(unsigned int nextzxos_version) __preserves_regs(iyl,iyh) __z88dk_fastcall;
+#define check_version_nextzxos(a) check_version_nextzxos_fastcall(a)
 
 
 

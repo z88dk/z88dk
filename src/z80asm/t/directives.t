@@ -11,8 +11,8 @@
 use Modern::Perl;
 use File::Slurp;
 use File::Path qw( make_path remove_tree );
-BEGIN { 
-	use lib '.'; 
+BEGIN {
+	use lib '.';
 	use t::TestZ80asm;
 };
 
@@ -90,8 +90,9 @@ z80asm(
 z80asm(
 	asm		=> " defb 1 \n defs 3 \n defb 2",
 	bin		=> pack("C*", 1, 253, 253, 253, 2),
-	options	=> "-b --filler=\$FD"
+	options	=> ($^O eq 'MSWin32') ? "-b --filler=\$FD" : '-b --filler=\\$FD',	# Note: different quoting
 );
+
 z80asm(
 	asm		=> " defb 1 \n defs 3 \n defb 2",
 	bin		=> pack("C*", 1, 252, 252, 252, 2),
@@ -169,7 +170,7 @@ z80asm(
 END
 );
 z80nm("test.o", <<'END');
-Object  file test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF12
   Name: test
   Section "": 1 bytes
     C $0000: C9
@@ -185,7 +186,7 @@ z80asm(
 END
 );
 z80nm("test.o", <<'END');
-Object  file test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF12
   Name: lib
   Section "": 1 bytes
     C $0000: C9
@@ -202,7 +203,7 @@ z80asm(
 END
 );
 z80nm("test.o", <<'END');
-Object  file test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF12
   Name: lib2
   Section "": 1 bytes
     C $0000: C9
@@ -234,7 +235,7 @@ z80asm(
 		global  g1, g2
 		defc g1 = 16, g3 = 48
 		global g3, g4
-		
+
 	p1:	defb ASMPC			;; 00
 	p2:	defb ASMPC			;; 01
 	p3:	defb ASMPC			;; 02
@@ -249,10 +250,10 @@ END
 		global  g1, g2
 		defc g2 = 32, g4 = 64
 		global g3, g4
-		
+
 		defb p1,p2,p3,p4	;; 00 01 02 03
 		defb g1, g2, g3, g4	;; 10 20 30 40
-		
+
 END
 );
 
@@ -297,8 +298,8 @@ z80asm(asm => "ELSE 	;; error: unbalanced control structure");
 z80asm(asm => "ENDIF 	;; error: unbalanced control structure");
 
 z80asm(asm => <<'END',
-	IF 1 
-	ELSE 
+	IF 1
+	ELSE
 	ELSE 	;; error: unbalanced control structure started at file 'test.asm' line 1
 	ENDIF
 END
@@ -312,10 +313,10 @@ z80asm(asm => "IFDEF	;; error: syntax error");
 z80asm(asm => "IFDEF 1	;; error: syntax error");
 z80asm(asm => "IFDEF hello",
 	   error => "Error at file 'test.asm' line 2: unbalanced control structure started at file 'test.asm' line 1");
-	   
+
 z80asm(asm => <<'END',
-	IFDEF hello 
-	ELSE 
+	IFDEF hello
+	ELSE
 	ELSE 	;; error: unbalanced control structure started at file 'test.asm' line 1
 	ENDIF
 END
@@ -329,10 +330,10 @@ z80asm(asm => "IFNDEF	;; error: syntax error");
 z80asm(asm => "IFNDEF 1	;; error: syntax error");
 z80asm(asm => "IFNDEF hello",
 	   error => "Error at file 'test.asm' line 2: unbalanced control structure started at file 'test.asm' line 1");
-	   
+
 z80asm(asm => <<'END',
-	IFNDEF hello 
-	ELSE 
+	IFNDEF hello
+	ELSE
 	ELSE 	;; error: unbalanced control structure started at file 'test.asm' line 1
 	ENDIF
 END
