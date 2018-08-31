@@ -48,8 +48,6 @@
 
 .setout
 
-	ld	(hl),a
-	
 	ld b,h
 	ld c,l
 	out(c),a
