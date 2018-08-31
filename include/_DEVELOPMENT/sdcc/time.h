@@ -53,4 +53,12 @@ extern void tm_from_dostm_callee(struct tm *,struct dos_tm *) __z88dk_callee;
 
 
 
+// dos time comparison
+
+extern int compare_dostm(struct dos_tm *a,struct dos_tm *b);
+extern int compare_dostm_callee(struct dos_tm *a,struct dos_tm *b) __z88dk_callee;
+#define compare_dostm(a,b) compare_dostm_callee(a,b)
+
+
+
 #endif
