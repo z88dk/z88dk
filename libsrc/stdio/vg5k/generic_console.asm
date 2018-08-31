@@ -9,7 +9,10 @@
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
+		PUBLIC		__vg5k_custom_font
 
+		EXTERN		__vg5k_attr
+		EXTERN		conio_map_colour
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
 
@@ -19,14 +22,14 @@ generic_console_set_inverse:
 	ret
 
 generic_console_set_paper:
-	jp	generic_console_set_ink
-	and	7
+	call	conio_map_colour
 	rlca
 	rlca
 	rlca
 	rlca
+	and	@01110000
 	ld	c,a
-	ld	hl,vg5k_attr
+	ld	hl,__vg5k_attr
 	ld	a,(hl)
 	and	@10001111
 	or	c
@@ -35,9 +38,10 @@ generic_console_set_paper:
 
 
 generic_console_set_ink:
+	call	conio_map_colour
 	and	7
 	ld	c,a
-	ld	hl,vg5k_attr
+	ld	hl,__vg5k_attr
 	ld	a,(hl)
 	and	@11111000
 	or	c
@@ -47,7 +51,7 @@ generic_console_set_ink:
 generic_console_cls:
 	ld	c,CONSOLE_ROWS
 	ld	hl, DISPLAY
-	ld	a,(vg5k_attr)
+	ld	a,(__vg5k_attr)
 	and	7
 cls0:
 	ld	b,CONSOLE_COLUMNS 
@@ -98,14 +102,14 @@ generic_console_printc:
 	push	de
 	call	xypos
 	pop	de
-	ld	a,(vg5k_attr)	; d = character, c = attribute
+	ld	a,(__vg5k_attr)	; d = character, c = attribute
 	ld	c,a
 	bit	0,e
 	jr	z,not_raw
 
 ; Raw mode, if > 128 then graphics
 	bit	7,d
-	jr	z, place_it
+	jr	z, place_text
 	res	7,d
 	set	7,c
 	jr	place_it
@@ -122,8 +126,12 @@ not_raw:
 not_udg:
 	ld	a,(__vg5k_custom_font)
 	and	a
-	jr	z,place_it
+	jr	z,place_text
 	set	7,d		;extended character set
+place_text:
+	ld	a,c		;don't set reverse/double etc
+	and	@10001111
+	ld	c,a
 place_it:
 	ld	(hl),d			;place character
 	inc	hl
@@ -182,7 +190,7 @@ generic_console_scrollup:
 	ld	bc, 80 * (CONSOLE_ROWS-1)
 	ldir
 	ex	de,hl
-	ld	a,(vg5k_attr)
+	ld	a,(__vg5k_attr)
 	and	7
 	ld	b,CONSOLE_COLUMNS
 generic_console_scrollup_3:
@@ -235,13 +243,11 @@ same_line:
 	jr	nz,refresh_screen1
 	ret
 
+
 	SECTION		bss_clib
 
 __vg5k_custom_font:	defb	0
 
-	SECTION		data_clib
-
-vg5k_attr:	defb	7	;White on black
 
 	SECTION		code_crt_init
 	EXTERN	set_character8

@@ -18,7 +18,10 @@
 #include "../config.h"
 
 #ifndef _MSC_VER
-#include <inttypes.h>
+   #include <inttypes.h>
+#elif _MSC_VER >= 1900
+   // vs2015 or higher
+   #include <inttypes.h>
 #endif
 
 #if (__GNUC__ || _BSD_SOURCE || _SVID_SOURCE || _XOPEN_SOURCE >= 500)

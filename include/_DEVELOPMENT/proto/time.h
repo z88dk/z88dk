@@ -43,4 +43,8 @@ struct dos_tm
 __DPROTO(,,void,,dostm_from_tm,struct dos_tm *,struct tm *)
 __DPROTO(,,void,,tm_from_dostm,struct tm *,struct dos_tm *)
 
+// dos time comparison
+
+__DPROTO(,,int,,compare_dostm,struct dos_tm *a,struct dos_tm *b)
+
 #endif

@@ -53,4 +53,12 @@ extern void __LIB__ tm_from_dostm_callee(struct tm *,struct dos_tm *) __smallc _
 
 
 
+// dos time comparison
+
+extern int __LIB__ compare_dostm(struct dos_tm *a,struct dos_tm *b) __smallc;
+extern int __LIB__ compare_dostm_callee(struct dos_tm *a,struct dos_tm *b) __smallc __z88dk_callee;
+#define compare_dostm(a,b) compare_dostm_callee(a,b)
+
+
+
 #endif

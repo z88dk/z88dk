@@ -18,6 +18,7 @@
 		EXTERN		__console_w
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
+		EXTERN		conio_map_colour
 
 		defc		DISPLAY = 0x9000
 
@@ -72,6 +73,7 @@ inverse_off:
 	jr	set_colour
 
 generic_console_set_ink:
+	call	conio_map_colour
 	and	7
 	ld	b,a
 	ld	a,(__attr)
@@ -85,6 +87,7 @@ set_colour:
 	ret
 
 generic_console_set_paper:
+	call	conio_map_colour
 	rlca
 	rlca
 	rlca

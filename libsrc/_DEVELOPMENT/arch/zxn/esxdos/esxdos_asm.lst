@@ -5,6 +5,9 @@ arch/zxn/esxdos/z80/asm_esx_disk_stream_bytes
 arch/zxn/esxdos/z80/asm_esx_disk_stream_end
 arch/zxn/esxdos/z80/asm_esx_disk_stream_sectors
 arch/zxn/esxdos/z80/asm_esx_disk_stream_start
+arch/zxn/esxdos/z80/asm_esx_dos_catalog
+arch/zxn/esxdos/z80/asm_esx_dos_catalog_next
+arch/zxn/esxdos/z80/asm_esx_dos_getset_drive
 arch/zxn/esxdos/z80/asm_esx_f_chdir
 arch/zxn/esxdos/z80/asm_esx_f_chmod
 arch/zxn/esxdos/z80/asm_esx_f_close
@@ -12,7 +15,9 @@ arch/zxn/esxdos/z80/asm_esx_f_closedir
 arch/zxn/esxdos/z80/asm_esx_f_fgetpos
 arch/zxn/esxdos/z80/asm_esx_f_fstat
 arch/zxn/esxdos/z80/asm_esx_f_ftrunc
+arch/zxn/esxdos/z80/asm_esx_f_get_canonical_path
 arch/zxn/esxdos/z80/asm_esx_f_getcwd
+arch/zxn/esxdos/z80/asm_esx_f_getcwd_drive
 arch/zxn/esxdos/z80/asm_esx_f_getfree
 arch/zxn/esxdos/z80/asm_esx_f_mkdir
 arch/zxn/esxdos/z80/asm_esx_f_open
@@ -31,6 +36,9 @@ arch/zxn/esxdos/z80/asm_esx_f_telldir
 arch/zxn/esxdos/z80/asm_esx_f_trunc
 arch/zxn/esxdos/z80/asm_esx_f_unlink
 arch/zxn/esxdos/z80/asm_esx_f_write
+arch/zxn/esxdos/z80/asm_esx_ide_get_lfn
+arch/zxn/esxdos/z80/asm_esx_ide_mode_get
+arch/zxn/esxdos/z80/asm_esx_ide_mode_set
 arch/zxn/esxdos/z80/asm_esx_m_dosversion
 arch/zxn/esxdos/z80/asm_esx_m_drvapi
 arch/zxn/esxdos/z80/asm_esx_m_errh
@@ -53,3 +61,5 @@ arch/zxn/esxdos/z80/asm_esx_m_tapeout_open
 arch/zxn/esxdos/z80/asm_esx_m_tapeout_trunc
 arch/zxn/esxdos/z80/asm_esx_slice_dirent
 arch/zxn/esxdos/z80/asm_extended_sna_load
+arch/zxn/esxdos/z80/asm_p3dos_cstr_to_pstr
+arch/zxn/esxdos/z80/asm_p3dos_pstr_to_cstr

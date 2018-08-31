@@ -20,3 +20,10 @@ esx_f_chmod:
 
    ld b,e
    jp asm_esx_f_chmod
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esx_f_chmod
+defc _esx_f_chmod = esx_f_chmod
+ENDIF
+

@@ -8,6 +8,10 @@ arch/zxn/esxdos/c/sccz80/esx_disk_stream_end
 arch/zxn/esxdos/c/sccz80/esx_disk_stream_sectors
 arch/zxn/esxdos/c/sccz80/esx_disk_stream_sectors_callee
 arch/zxn/esxdos/c/sccz80/esx_disk_stream_start
+arch/zxn/esxdos/c/sccz80/esx_dos_catalog
+arch/zxn/esxdos/c/sccz80/esx_dos_catalog_next
+arch/zxn/esxdos/c/sccz80/esx_dos_get_drive
+arch/zxn/esxdos/c/sccz80/esx_dos_set_drive
 arch/zxn/esxdos/c/sccz80/esx_f_chdir
 arch/zxn/esxdos/c/sccz80/esx_f_chmod
 arch/zxn/esxdos/c/sccz80/esx_f_chmod_callee
@@ -17,7 +21,11 @@ arch/zxn/esxdos/c/sccz80/esx_f_fstat
 arch/zxn/esxdos/c/sccz80/esx_f_fstat_callee
 arch/zxn/esxdos/c/sccz80/esx_f_ftrunc
 arch/zxn/esxdos/c/sccz80/esx_f_ftrunc_callee
+arch/zxn/esxdos/c/sccz80/esx_f_get_canonical_path
+arch/zxn/esxdos/c/sccz80/esx_f_get_canonical_path_callee
 arch/zxn/esxdos/c/sccz80/esx_f_getcwd
+arch/zxn/esxdos/c/sccz80/esx_f_getcwd_drive
+arch/zxn/esxdos/c/sccz80/esx_f_getcwd_drive_callee
 arch/zxn/esxdos/c/sccz80/esx_f_getfree
 arch/zxn/esxdos/c/sccz80/esx_f_getpos
 arch/zxn/esxdos/c/sccz80/esx_f_mkdir
@@ -49,6 +57,10 @@ arch/zxn/esxdos/c/sccz80/esx_f_trunc_callee
 arch/zxn/esxdos/c/sccz80/esx_f_unlink
 arch/zxn/esxdos/c/sccz80/esx_f_write
 arch/zxn/esxdos/c/sccz80/esx_f_write_callee
+arch/zxn/esxdos/c/sccz80/esx_ide_get_lfn
+arch/zxn/esxdos/c/sccz80/esx_ide_get_lfn_callee
+arch/zxn/esxdos/c/sccz80/esx_ide_mode_get
+arch/zxn/esxdos/c/sccz80/esx_ide_mode_set
 arch/zxn/esxdos/c/sccz80/esx_m_dosversion
 arch/zxn/esxdos/c/sccz80/esx_m_drvapi
 arch/zxn/esxdos/c/sccz80/esx_m_errh
@@ -75,3 +87,5 @@ arch/zxn/esxdos/c/sccz80/esx_m_tapeout_open
 arch/zxn/esxdos/c/sccz80/esx_m_tapeout_trunc
 arch/zxn/esxdos/c/sccz80/esx_slice_dirent
 arch/zxn/esxdos/c/sccz80/extended_sna_load
+arch/zxn/esxdos/c/sccz80/p3dos_cstr_to_pstr
+arch/zxn/esxdos/c/sccz80/p3dos_pstr_to_cstr

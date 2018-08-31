@@ -17,18 +17,18 @@ define(`__ZXNEXT_LAST_DIVMMC', 15)
 
 # Static Environment
 
-define(`__ENV_FILENAME', `/sys/env.cfg')            # file containing environment variables
+define(`__ENV_FILENAME', `c:/sys/env.cfg')          # file containing environment variables
 
 define(`__ENV_BUFSZ', 128)                          # size of static file buffer
 define(`__ENV_GETENV_VALSZ', 64)                    # size of static value buffer for getenv
 
-define(`__ENV_TMPDIR', `/tmp')                      # location of tmp files
+define(`__ENV_TMPDIR', `c:/tmp')                    # location of tmp files
 define(`__ENV_LTMPNAM', eval(len(__ENV_TMPDIR)+1+7+1))  # TMPDIR/tmpXXXX includes terminating 0
 define(`__ENV_TMPMAX', 0xffff)                      # max number of unique temp files that can be created
 define(`__ENV_TMPMAX_TRY', 16)                      # max number of attempts to create unique temp file in one call
 
-define(`__ENV_BINDIR', `/bin')                      # location of dot commands
-define(`__ENV_SYSDIR', `/sys')                      # location of system files
+define(`__ENV_BINDIR', `c:/dot')                    # location of dot commands
+define(`__ENV_SYSDIR', `c:/sys')                    # location of system files
 
 # Compatible Spectrum model
 
@@ -54,7 +54,7 @@ define(`__USE_SYSVAR', 0)
 # Use Extended Opcodes
 # (not applied yet)
 
-define(`__USE_ZXN_OPCODES', 0)
+define(`__USE_ZXN_OPCODES', 0xff)
 
 define(`__USE_ZXN_OPCODES_NEXTREG', 1)
 define(`__USE_ZXN_OPCODES_MLT', 2)

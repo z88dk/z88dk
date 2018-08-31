@@ -20,3 +20,10 @@ esx_f_open_p3:
    
    ld a,c
    jp asm_esx_f_open_p3
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esx_f_open_p3
+defc _esx_f_open_p3 = esx_f_open_p3
+ENDIF
+

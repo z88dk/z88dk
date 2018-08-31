@@ -9,9 +9,9 @@ divert(-1)
 
 define(`__NEXTOS_CONFIG_STREAM_UNROLL', 0)   # non-zero to unroll inir to ini
 
-# NEXTOS API 1.97F
-# https://github.com/z88dk/techdocs/blob/master/targets/zx-next/nextos/
-# https://github.com/z88dk/techdocs/blob/master/targets/zx-next/nextos/nextos_api.pdf
+# NEXTOS API 1.99D
+# https://github.com/z88dk/techdocs/tree/master/targets/zx-next/nextos
+# https://github.com/z88dk/techdocs/raw/master/targets/zx-next/nextos/nextzxos_api.pdf
 
 # NOTE:
 #
@@ -35,7 +35,12 @@ define(`__NEXTOS_DOS_READ', 0x0112)
 define(`__NEXTOS_DOS_WRITE', 0x0115)
 define(`__NEXTOS_DOS_BYTE_READ', 0x0118)
 define(`__NEXTOS_DOS_BYTE_WRITE', 0x011b)
+
 define(`__NEXTOS_DOS_CATALOG', 0x011e)
+define(`__nextos_cat_filter_system', 0x01)
+define(`__nextos_cat_filter_lfn', 0x02)
+define(`__nextos_cat_filter_dir', 0x04)
+
 define(`__NEXTOS_DOS_FREE_SPACE', 0x0121)
 define(`__NEXTOS_DOS_DELETE', 0x0124)
 define(`__NEXTOS_DOS_RENAME', 0x0127)
@@ -62,7 +67,11 @@ define(`__NEXTOS_IDE_SWAP_POS', 0x00e8)
 define(`__NEXTOS_IDE_SWAP_MOVE', 0x00eb)
 define(`__NEXTOS_IDE_SWAP_RESIZE', 0x00ee)
 define(`__NEXTOS_IDE_PARTITION_FIND', 0x00b5)
+
 define(`__NEXTOS_IDE_DOS_MAP', 0x00f1)
+define(`__nextos_map_ramdisk', 4)
+define(`__nextos_map_fsimage', 0xff)
+
 define(`__NEXTOS_IDE_DOS_UNMAP', 0x00f4)
 define(`__NEXTOS_IDE_DOS_MAPPING', 0x00f7)
 define(`__NEXTOS_IDE_SNAPLOAD', 0x00fd)
@@ -83,8 +92,13 @@ define(`__nextos_browsercaps_rename', 0x02)
 define(`__nextos_browsercaps_mkdir', 0x04)
 define(`__nextos_browsercaps_erase', 0x08)
 define(`__nextos_browsercaps_remount', 0x10)
+define(`__nextos_browsercaps_unmount', 0x20)
 define(`__nextos_browsercaps_syscfg', 0x80)
-define(`__nextos_browsercaps_all', 0x1f)
+define(`__nextos_browsercaps_all', 0x3f)
+
+define(`__NEXTOS_IDE_MOUNT', 0x01d2)
+define(`__nextos_unmount', 0)
+define(`__nextos_remount', 1)
 
 # Not Filesystem Related
 
@@ -101,6 +115,7 @@ define(`__nextos_rc_bank_total', 0)
 define(`__nextos_rc_bank_alloc', 1)
 define(`__nextos_rc_bank_reserve', 2)
 define(`__nextos_rc_bank_free', 3)
+define(`__nextos_rc_bank_available', 4)
 
 define(`__NEXTOS_IDE_BASIC', 0x01c0)
 define(`__NEXTOS_IDE_WINDOW_LINEIN', 0x01c3)
@@ -108,6 +123,18 @@ define(`__NEXTOS_IDE_WINDOW_STRING', 0x01c6)
 define(`__NEXTOS_IDE_INTEGER_VAR', 0x01c9)
 define(`__NEXTOS_IDE_RTC', 0x01cc)
 define(`__NEXTOS_IDE_DRIVER', 0x01cf)
+
+define(`__NEXTOS_IDE_MODE', 0x01d5)
+define(`__nextos_mode_query', 0)
+define(`__nextos_mode_set_layer_0', 0x0000)
+define(`__nextos_mode_set_layer_1_lores', 0x0100)
+define(`__nextos_mode_set_layer_1_ula', 0x0101)
+define(`__nextos_mode_set_layer_1_hires', 0x0102)
+define(`__nextos_mode_set_layer_1_hicol', 0x0103)
+define(`__nextos_mode_set_layer_2', 0x0200)
+define(`__nextos_mode_flag_reduced_height', 0x01)
+define(`__nextos_mode_flag_double_width', 0x10)
+define(`__nextos_mode_flag_double_height', 0x20)
 
 # Legacy - Floppy Drive
 
@@ -200,6 +227,7 @@ define(`__NEXTOS_RC_INVDEVICE', 65)
 define(`__NEXTOS_RC_CMDPHASE', 67)
 define(`__NEXTOS_RC_DATAPHASE', 68)
 define(`__NEXTOS_RC_NOTDIR', 69)
+define(`__NEXTOS_RC_FRAGMENTED', 74)
 
 ###################
 # NextOS ESXDOS API
@@ -375,7 +403,12 @@ PUBLIC `__NEXTOS_DOS_READ'
 PUBLIC `__NEXTOS_DOS_WRITE'
 PUBLIC `__NEXTOS_DOS_BYTE_READ'
 PUBLIC `__NEXTOS_DOS_BYTE_WRITE'
+
 PUBLIC `__NEXTOS_DOS_CATALOG'
+PUBLIC `__nextos_cat_filter_system'
+PUBLIC `__nextos_cat_filter_lfn'
+PUBLIC `__nextos_cat_filter_dir'
+
 PUBLIC `__NEXTOS_DOS_FREE_SPACE'
 PUBLIC `__NEXTOS_DOS_DELETE'
 PUBLIC `__NEXTOS_DOS_RENAME'
@@ -402,7 +435,11 @@ PUBLIC `__NEXTOS_IDE_SWAP_POS'
 PUBLIC `__NEXTOS_IDE_SWAP_MOVE'
 PUBLIC `__NEXTOS_IDE_SWAP_RESIZE'
 PUBLIC `__NEXTOS_IDE_PARTITION_FIND'
+
 PUBLIC `__NEXTOS_IDE_DOS_MAP'
+PUBLIC `__nextos_map_ramdisk'
+PUBLIC `__nextos_map_fsimage'
+
 PUBLIC `__NEXTOS_IDE_DOS_UNMAP'
 PUBLIC `__NEXTOS_IDE_DOS_MAPPING'
 PUBLIC `__NEXTOS_IDE_SNAPLOAD'
@@ -423,8 +460,13 @@ PUBLIC `__nextos_browsercaps_rename'
 PUBLIC `__nextos_browsercaps_mkdir'
 PUBLIC `__nextos_browsercaps_erase'
 PUBLIC `__nextos_browsercaps_remount'
+PUBLIC `__nextos_browsercaps_unmount'
 PUBLIC `__nextos_browsercaps_syscfg'
 PUBLIC `__nextos_browsercaps_all'
+
+PUBLIC `__NEXTOS_IDE_MOUNT'
+PUBLIC `__nextos_unmount'
+PUBLIC `__nextos_remount'
 
 PUBLIC `__NEXTOS_IDE_STREAM_OPEN'
 PUBLIC `__NEXTOS_IDE_STREAM_CLOSE'
@@ -439,6 +481,7 @@ PUBLIC `__nextos_rc_bank_total'
 PUBLIC `__nextos_rc_bank_alloc'
 PUBLIC `__nextos_rc_bank_reserve'
 PUBLIC `__nextos_rc_bank_free'
+PUBLIC `__nextos_rc_bank_available'
 
 PUBLIC `__NEXTOS_IDE_BASIC'
 PUBLIC `__NEXTOS_IDE_WINDOW_LINEIN'
@@ -446,6 +489,18 @@ PUBLIC `__NEXTOS_IDE_WINDOW_STRING'
 PUBLIC `__NEXTOS_IDE_INTEGER_VAR'
 PUBLIC `__NEXTOS_IDE_RTC'
 PUBLIC `__NEXTOS_IDE_DRIVER'
+
+PUBLIC `__NEXTOS_IDE_MODE'
+PUBLIC `__nextos_mode_query'
+PUBLIC `__nextos_mode_set_layer_0'
+PUBLIC `__nextos_mode_set_layer_1_lores'
+PUBLIC `__nextos_mode_set_layer_1_ula'
+PUBLIC `__nextos_mode_set_layer_1_hires'
+PUBLIC `__nextos_mode_set_layer_1_hicol'
+PUBLIC `__nextos_mode_set_layer_2'
+PUBLIC `__nextos_mode_flag_reduced_height'
+PUBLIC `__nextos_mode_flag_double_width'
+PUBLIC `__nextos_mode_flag_double_height'
 
 PUBLIC `__NEXTOS_DOS_REF_XDPB'
 PUBLIC `__NEXTOS_DOS_MAP_B'
@@ -530,6 +585,7 @@ PUBLIC `__NEXTOS_RC_INVDEVICE'
 PUBLIC `__NEXTOS_RC_CMDPHASE'
 PUBLIC `__NEXTOS_RC_DATAPHASE'
 PUBLIC `__NEXTOS_RC_NOTDIR'
+PUBLIC `__NEXTOS_RC_FRAGMENTED'
 
 PUBLIC `__ESX_RST_SYS'
 PUBLIC `__ESX_RST_ROM'
@@ -687,7 +743,12 @@ defc `__NEXTOS_DOS_READ' = __NEXTOS_DOS_READ
 defc `__NEXTOS_DOS_WRITE' = __NEXTOS_DOS_WRITE
 defc `__NEXTOS_DOS_BYTE_READ' = __NEXTOS_DOS_BYTE_READ
 defc `__NEXTOS_DOS_BYTE_WRITE' = __NEXTOS_DOS_BYTE_WRITE
+
 defc `__NEXTOS_DOS_CATALOG' = __NEXTOS_DOS_CATALOG
+defc `__nextos_cat_filter_system' = __nextos_cat_filter_system
+defc `__nextos_cat_filter_lfn' = __nextos_cat_filter_lfn
+defc `__nextos_cat_filter_dir' = __nextos_cat_filter_dir
+
 defc `__NEXTOS_DOS_FREE_SPACE' = __NEXTOS_DOS_FREE_SPACE
 defc `__NEXTOS_DOS_DELETE' = __NEXTOS_DOS_DELETE
 defc `__NEXTOS_DOS_RENAME' = __NEXTOS_DOS_RENAME
@@ -714,7 +775,11 @@ defc `__NEXTOS_IDE_SWAP_POS' = __NEXTOS_IDE_SWAP_POS
 defc `__NEXTOS_IDE_SWAP_MOVE' = __NEXTOS_IDE_SWAP_MOVE
 defc `__NEXTOS_IDE_SWAP_RESIZE' = __NEXTOS_IDE_SWAP_RESIZE
 defc `__NEXTOS_IDE_PARTITION_FIND' = __NEXTOS_IDE_PARTITION_FIND
+
 defc `__NEXTOS_IDE_DOS_MAP' = __NEXTOS_IDE_DOS_MAP
+defc `__nextos_map_ramdisk' = __nextos_map_ramdisk
+defc `__nextos_map_fsimage' = __nextos_map_fsimage
+
 defc `__NEXTOS_IDE_DOS_UNMAP' = __NEXTOS_IDE_DOS_UNMAP
 defc `__NEXTOS_IDE_DOS_MAPPING' = __NEXTOS_IDE_DOS_MAPPING
 defc `__NEXTOS_IDE_SNAPLOAD' = __NEXTOS_IDE_SNAPLOAD
@@ -735,8 +800,13 @@ defc `__nextos_browsercaps_rename' = __nextos_browsercaps_rename
 defc `__nextos_browsercaps_mkdir' = __nextos_browsercaps_mkdir
 defc `__nextos_browsercaps_erase' = __nextos_browsercaps_erase
 defc `__nextos_browsercaps_remount' = __nextos_browsercaps_remount
+defc `__nextos_browsercaps_unmount' = __nextos_browsercaps_unmount
 defc `__nextos_browsercaps_syscfg' = __nextos_browsercaps_syscfg
 defc `__nextos_browsercaps_all' = __nextos_browsercaps_all
+
+defc `__NEXTOS_IDE_MOUNT' = __NEXTOS_IDE_MOUNT
+defc `__nextos_unmount' = __nextos_unmount
+defc `__nextos_remount' = __nextos_remount
 
 defc `__NEXTOS_IDE_STREAM_OPEN' = __NEXTOS_IDE_STREAM_OPEN
 defc `__NEXTOS_IDE_STREAM_CLOSE' = __NEXTOS_IDE_STREAM_CLOSE
@@ -751,6 +821,7 @@ defc `__nextos_rc_bank_total' = __nextos_rc_bank_total
 defc `__nextos_rc_bank_alloc' = __nextos_rc_bank_alloc
 defc `__nextos_rc_bank_reserve' = __nextos_rc_bank_reserve
 defc `__nextos_rc_bank_free' = __nextos_rc_bank_free
+defc `__nextos_rc_bank_available' = __nextos_rc_bank_available
 
 defc `__NEXTOS_IDE_BASIC' = __NEXTOS_IDE_BASIC
 defc `__NEXTOS_IDE_WINDOW_LINEIN' = __NEXTOS_IDE_WINDOW_LINEIN
@@ -758,6 +829,18 @@ defc `__NEXTOS_IDE_WINDOW_STRING' = __NEXTOS_IDE_WINDOW_STRING
 defc `__NEXTOS_IDE_INTEGER_VAR' = __NEXTOS_IDE_INTEGER_VAR
 defc `__NEXTOS_IDE_RTC' = __NEXTOS_IDE_RTC
 defc `__NEXTOS_IDE_DRIVER' = __NEXTOS_IDE_DRIVER
+
+defc `__NEXTOS_IDE_MODE' = __NEXTOS_IDE_MODE
+defc `__nextos_mode_query' = __nextos_mode_query
+defc `__nextos_mode_set_layer_0' = __nextos_mode_set_layer_0
+defc `__nextos_mode_set_layer_1_lores' = __nextos_mode_set_layer_1_lores
+defc `__nextos_mode_set_layer_1_ula' = __nextos_mode_set_layer_1_ula
+defc `__nextos_mode_set_layer_1_hires' = __nextos_mode_set_layer_1_hires
+defc `__nextos_mode_set_layer_1_hicol' = __nextos_mode_set_layer_1_hicol
+defc `__nextos_mode_set_layer_2' = __nextos_mode_set_layer_2
+defc `__nextos_mode_flag_reduced_height' = __nextos_mode_flag_reduced_height
+defc `__nextos_mode_flag_double_width' = __nextos_mode_flag_double_width
+defc `__nextos_mode_flag_double_height' = __nextos_mode_flag_double_height
 
 defc `__NEXTOS_DOS_REF_XDPB' = __NEXTOS_DOS_REF_XDPB
 defc `__NEXTOS_DOS_MAP_B' = __NEXTOS_DOS_MAP_B
@@ -842,6 +925,7 @@ defc `__NEXTOS_RC_INVDEVICE' = __NEXTOS_RC_INVDEVICE
 defc `__NEXTOS_RC_CMDPHASE' = __NEXTOS_RC_CMDPHASE
 defc `__NEXTOS_RC_DATAPHASE' = __NEXTOS_RC_DATAPHASE
 defc `__NEXTOS_RC_NOTDIR' = __NEXTOS_RC_NOTDIR
+defc `__NEXTOS_RC_FRAGMENTED' = __NEXTOS_RC_FRAGMENTED
 
 defc `__ESX_RST_SYS' = __ESX_RST_SYS
 defc `__ESX_RST_ROM' = __ESX_RST_ROM
@@ -999,7 +1083,12 @@ ifdef(`CFG_C_DEF',
 `#define' `__NEXTOS_DOS_WRITE'  __NEXTOS_DOS_WRITE
 `#define' `__NEXTOS_DOS_BYTE_READ'  __NEXTOS_DOS_BYTE_READ
 `#define' `__NEXTOS_DOS_BYTE_WRITE'  __NEXTOS_DOS_BYTE_WRITE
+
 `#define' `__NEXTOS_DOS_CATALOG'  __NEXTOS_DOS_CATALOG
+`#define' `__nextos_cat_filter_system'  __nextos_cat_filter_system
+`#define' `__nextos_cat_filter_lfn'  __nextos_cat_filter_lfn
+`#define' `__nextos_cat_filter_dir'  __nextos_cat_filter_dir
+
 `#define' `__NEXTOS_DOS_FREE_SPACE'  __NEXTOS_DOS_FREE_SPACE
 `#define' `__NEXTOS_DOS_DELETE'  __NEXTOS_DOS_DELETE
 `#define' `__NEXTOS_DOS_RENAME'  __NEXTOS_DOS_RENAME
@@ -1026,7 +1115,11 @@ ifdef(`CFG_C_DEF',
 `#define' `__NEXTOS_IDE_SWAP_MOVE'  __NEXTOS_IDE_SWAP_MOVE
 `#define' `__NEXTOS_IDE_SWAP_RESIZE'  __NEXTOS_IDE_SWAP_RESIZE
 `#define' `__NEXTOS_IDE_PARTITION_FIND'  __NEXTOS_IDE_PARTITION_FIND
+
 `#define' `__NEXTOS_IDE_DOS_MAP'  __NEXTOS_IDE_DOS_MAP
+`#define' `__nextos_map_ramdisk'  __nextos_map_ramdisk
+`#define' `__nextos_map_fsimage'  __nextos_map_fsimage
+
 `#define' `__NEXTOS_IDE_DOS_UNMAP'  __NEXTOS_IDE_DOS_UNMAP
 `#define' `__NEXTOS_IDE_DOS_MAPPING'  __NEXTOS_IDE_DOS_MAPPING
 `#define' `__NEXTOS_IDE_SNAPLOAD'  __NEXTOS_IDE_SNAPLOAD
@@ -1047,8 +1140,13 @@ ifdef(`CFG_C_DEF',
 `#define' `__nextos_browsercaps_mkdir'  __nextos_browsercaps_mkdir
 `#define' `__nextos_browsercaps_erase'  __nextos_browsercaps_erase
 `#define' `__nextos_browsercaps_remount'  __nextos_browsercaps_remount
+`#define' `__nextos_browsercaps_unmount'  __nextos_browsercaps_unmount
 `#define' `__nextos_browsercaps_syscfg'  __nextos_browsercaps_syscfg
 `#define' `__nextos_browsercaps_all'  __nextos_browsercaps_all
+
+`#define' `__NEXTOS_IDE_MOUNT'  __NEXTOS_IDE_MOUNT
+`#define' `__nextos_unmount'  __nextos_unmount
+`#define' `__nextos_remount'  __nextos_remount
 
 `#define' `__NEXTOS_IDE_STREAM_OPEN'  __NEXTOS_IDE_STREAM_OPEN
 `#define' `__NEXTOS_IDE_STREAM_CLOSE'  __NEXTOS_IDE_STREAM_CLOSE
@@ -1063,6 +1161,7 @@ ifdef(`CFG_C_DEF',
 `#define' `__nextos_rc_bank_alloc'  __nextos_rc_bank_alloc
 `#define' `__nextos_rc_bank_reserve'  __nextos_rc_bank_reserve
 `#define' `__nextos_rc_bank_free'  __nextos_rc_bank_free
+`#define' `__nextos_rc_bank_available'  __nextos_rc_bank_available
 
 `#define' `__NEXTOS_IDE_BASIC'  __NEXTOS_IDE_BASIC
 `#define' `__NEXTOS_IDE_WINDOW_LINEIN'  __NEXTOS_IDE_WINDOW_LINEIN
@@ -1070,6 +1169,18 @@ ifdef(`CFG_C_DEF',
 `#define' `__NEXTOS_IDE_INTEGER_VAR'  __NEXTOS_IDE_INTEGER_VAR
 `#define' `__NEXTOS_IDE_RTC'  __NEXTOS_IDE_RTC
 `#define' `__NEXTOS_IDE_DRIVER'  __NEXTOS_IDE_DRIVER
+
+`#define' `__NEXTOS_IDE_MODE'  __NEXTOS_IDE_MODE
+`#define' `__nextos_mode_query'  __nextos_mode_query
+`#define' `__nextos_mode_set_layer_0'  __nextos_mode_set_layer_0
+`#define' `__nextos_mode_set_layer_1_lores'  __nextos_mode_set_layer_1_lores
+`#define' `__nextos_mode_set_layer_1_ula'  __nextos_mode_set_layer_1_ula
+`#define' `__nextos_mode_set_layer_1_hires'  __nextos_mode_set_layer_1_hires
+`#define' `__nextos_mode_set_layer_1_hicol'  __nextos_mode_set_layer_1_hicol
+`#define' `__nextos_mode_set_layer_2'  __nextos_mode_set_layer_2
+`#define' `__nextos_mode_flag_reduced_height'  __nextos_mode_flag_reduced_height
+`#define' `__nextos_mode_flag_double_width'  __nextos_mode_flag_double_width
+`#define' `__nextos_mode_flag_double_height'  __nextos_mode_flag_double_height
 
 `#define' `__NEXTOS_DOS_REF_XDPB'  __NEXTOS_DOS_REF_XDPB
 `#define' `__NEXTOS_DOS_MAP_B'  __NEXTOS_DOS_MAP_B
@@ -1154,6 +1265,7 @@ ifdef(`CFG_C_DEF',
 `#define' `__NEXTOS_RC_CMDPHASE'  __NEXTOS_RC_CMDPHASE
 `#define' `__NEXTOS_RC_DATAPHASE'  __NEXTOS_RC_DATAPHASE
 `#define' `__NEXTOS_RC_NOTDIR'  __NEXTOS_RC_NOTDIR
+`#define' `__NEXTOS_RC_FRAGMENTED'  __NEXTOS_RC_FRAGMENTED
 
 `#define' `__ESX_RST_SYS'  __ESX_RST_SYS
 `#define' `__ESX_RST_ROM'  __ESX_RST_ROM

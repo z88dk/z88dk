@@ -189,7 +189,7 @@ nex_stub:
 
 nex_stub_cmd:
 
-   defm "bigload "
+   defm "nexload "
 
 nex_stub_end:
 

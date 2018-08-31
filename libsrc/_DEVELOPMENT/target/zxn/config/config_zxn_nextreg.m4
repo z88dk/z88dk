@@ -86,24 +86,42 @@ define(`__RRP_ROM_MF', 0x05)        # 0x19
 define(`__RRP_ROM_SPECTRUM', 0x00)  # 0x1c
 
 # (R/W) 0x05 (05) => Peripheral 1 setting:
-#  bits 7-6 = joystick 1 mode 
-#  bits 5-4 = joystick 2 mode
-#  (joystick bits: 00 = Sinclair, 01 = Kempston, 10 = Cursor)(Reset to 0 after a PoR or Hard-reset)
-#  bit 3 = Reserved, must be 0
-#  bit 2 = 50/60 Hz mode (0 = 50Hz, 1 = 60Hz)(Reset to 0 after a PoR or Hard-reset)
-#  bit 1 = Enable Scanlines (1 = enabled)(Reset to 0 after a PoR or Hard-reset)
-#  bit 0 = Enable Scandoubler (1 = enabled)(Reset to 1 after a PoR or Hard-reset)
+#  bits 7-6 = joystick 1 mode (LSB)
+#  bits 5-4 = joystick 2 mode (LSB)
+#  bit 3 = joystick 1 mode (MSB)
+#  bit 2 = 50/60 Hz mode (0 = 50Hz, 1 = 60Hz)(0 after a PoR or Hard-reset)
+#  bit 1 = joystick 2 mode (MSB)
+#  bit 0 = Enable Scandoubler (1 = enabled)(1 after a PoR or Hard-reset)
+#      Joysticks modes:
+#      000 = Sinclair 2 (67890)
+#      001 = Kempston 1 (port 0x1F)
+#      010 = Cursor (56780)
+#      011 = Sinclair 1 (12345)
+#      100 = Kempston 2 (port 0x37)
+#      101 = MD 1 (3 or 6 button joystick port 0x1F)
+#      110 = MD 2 (3 or 6 button joystick port 0x37)
 
 define(`__REG_PERIPHERAL_1', 5)
-define(`__RP1_JOY1_SINCLAIR', 0x00)
+define(`__RP1_JOY1_SINCLAIR', 0xc0)
+define(`__RP1_JOY1_SINCLAIR_1', 0xc0)
+define(`__RP1_JOY1_SINCLAIR_2', 0x00)
 define(`__RP1_JOY1_KEMPSTON', 0x40)
+define(`__RP1_JOY1_KEMPSTON_1', 0x40)
+define(`__RP1_JOY1_KEMPSTON_2', 0x08)
 define(`__RP1_JOY1_CURSOR', 0x80)
+define(`__RP1_JOY1_MD_1', 0x48)
+define(`__RP1_JOY1_MD_2', 0x88)
 define(`__RP1_JOY2_SINCLAIR', 0x00)
-define(`__RP1_JOY2_KEMPSTON', 0x10)
+define(`__RP1_JOY2_SINCLAIR_1', 0x30)
+define(`__RP1_JOY2_SINCLAIR_2', 0x00)
+define(`__RP1_JOY2_KEMPSTON', 0x02)
+define(`__RP1_JOY2_KEMPSTON_1', 0x10)
+define(`__RP1_JOY2_KEMPSTON_2', 0x02)
 define(`__RP1_JOY2_CURSOR', 0x20)
+define(`__RP1_JOY2_MD_1', 0x12)
+define(`__RP1_JOY2_MD_2', 0x22)
 define(`__RP1_RATE_50', 0x00)
 define(`__RP1_RATE_60', 0x04)
-define(`__RP1_ENABLE_SCANLINES', 0x02)
 define(`__RP1_ENABLE_SCANDOUBLER', 0x01)
 
 # (R/W) 0x06 (06) => Peripheral 2 setting:
@@ -129,14 +147,13 @@ define(`__RP2_PSGMODE_YM', 0x02)
 define(`__RP2_PSGMODE_DISABLE', 0x00)
 
 # (R/W) 0x07 (07) => Turbo mode:
-#  bit 1-0 = Turbo (00 = 3.5MHz, 01 = 7MHz, 10 = 14MHz, 11 = 28MHz)
+#  bit 1-0 = Turbo (00 = 3.5MHz, 01 = 7MHz, 10 = 14MHz)
 #  (Reset to 00 after a PoR or Hard-reset)
 
 define(`__REG_TURBO_MODE', 7)
 define(`__RTM_3MHZ', 0x00)
 define(`__RTM_7MHZ', 0x01)
 define(`__RTM_14MHZ', 0x02)
-define(`__RTM_28MHZ', 0x03)
 
 # (R/W) 0x08 (08) => Peripheral 3 setting:
 #  bit 7 = 128K paging enable (inverse of port 0x7ffd, bit 5) 
@@ -162,13 +179,26 @@ define(`__RP3_ENABLE_TURBOSOUND', 0x02)
 define(`__RP3_DISABLE_CONTENTION', 0x40)
 define(`__RP3_UNLOCK_7FFD', 0x80)
 
+# (R/W) 0x09 (09) => Peripheral 4 setting:
+#   bits 7-2 = Reserved, must be 0
+#   bits 1-0 = scanlines (0 after a PoR or Hard-reset)
+#      00 = scanlines off
+#      01 = scanlines 75%
+#      10 = scanlines 50%
+#      11 = scanlines 25%
+
+define(`__REG_PERIPHERAL_4', 9)
+define(`__RP4_SCANLINES_OFF', 0x00)
+define(`__RP4_SCANLINES_25', 0x03)
+define(`__RP4_SCANLINES_50', 0x02)
+define(`__RP4_SCANLINES_75', 0x01)
+
 # (R) 0x0E (14) => Core Version (sub minor number) 
 #  (see register 0x01 for the major and minor version number)
 
 define(`__REG_SUB_VERSION', 14)
 
 # (W) 0x0F (15) => Video Register
-# An ordered list of video parameters are written during boot
 
 define(`__REG_VIDEO_PARAM', 15)
 
@@ -184,13 +214,13 @@ define(`__RAB_BUTTON_DIVMMC', 0x02)
 define(`__RAB_BUTTON_MULTIFACE', 0x01)
 
 # (W) 0x11 (17) => Video Timing
-# A video timing setting is written during boot
+# VGA = 0..6, HDMI = 7
 
 define(`__REG_VIDEO_TIMING', 17)
 
 # (R/W) 0x12 (18) => Layer 2 RAM page
 # bits 7-6 = Reserved, must be 0
-# bits 5-0 = SRAM page (point to page 8 after a Reset)
+# bits 5-0 = SRAM bank 0-13 (point to bank 8 after a Reset)
 
 define(`__REG_LAYER_2_RAM_PAGE', 18)
 define(`__RL2RP_MASK', 0x3f)
@@ -202,7 +232,7 @@ define(`__RL2RB_MASK', __RL2RP_MASK)
 
 # (R/W) 0x13 (19) => Layer 2 RAM shadow page
 # bits 7-6 = Reserved, must be 0
-# bits 5-0 = SRAM page (point to page 11 after a Reset)
+# bits 5-0 = SRAM bank 0-13 (point to bank 11 after a Reset)
 
 define(`__REG_LAYER_2_SHADOW_RAM_PAGE', 19)
 define(`__RL2SRP_MASK', 0x3f)
@@ -588,14 +618,25 @@ PUBLIC `__RRP_ROM_SPECTRUM'
 
 PUBLIC `__REG_PERIPHERAL_1'
 PUBLIC `__RP1_JOY1_SINCLAIR'
+PUBLIC `__RP1_JOY1_SINCLAIR_1'
+PUBLIC `__RP1_JOY1_SINCLAIR_2'
 PUBLIC `__RP1_JOY1_KEMPSTON'
+PUBLIC `__RP1_JOY1_KEMPSTON_1'
+PUBLIC `__RP1_JOY1_KEMPSTON_2'
 PUBLIC `__RP1_JOY1_CURSOR'
+PUBLIC `__RP1_JOY1_MD_1'
+PUBLIC `__RP1_JOY1_MD_2'
 PUBLIC `__RP1_JOY2_SINCLAIR'
+PUBLIC `__RP1_JOY2_SINCLAIR_1'
+PUBLIC `__RP1_JOY2_SINCLAIR_2'
 PUBLIC `__RP1_JOY2_KEMPSTON'
+PUBLIC `__RP1_JOY2_KEMPSTON_1'
+PUBLIC `__RP1_JOY2_KEMPSTON_2'
 PUBLIC `__RP1_JOY2_CURSOR'
+PUBLIC `__RP1_JOY2_MD_1'
+PUBLIC `__RP1_JOY2_MD_2'
 PUBLIC `__RP1_RATE_50'
 PUBLIC `__RP1_RATE_60'
-PUBLIC `__RP1_ENABLE_SCANLINES'
 PUBLIC `__RP1_ENABLE_SCANDOUBLER'
 
 PUBLIC `__REG_PERIPHERAL_2'
@@ -615,7 +656,6 @@ PUBLIC `__REG_TURBO_MODE'
 PUBLIC `__RTM_3MHZ'
 PUBLIC `__RTM_7MHZ'
 PUBLIC `__RTM_14MHZ'
-PUBLIC `__RTM_28MHZ'
 
 PUBLIC `__REG_PERIPHERAL_3'
 PUBLIC `__RP3_STEREO_ABC'
@@ -627,6 +667,12 @@ PUBLIC `__RP3_ENABLE_TIMEX'
 PUBLIC `__RP3_ENABLE_TURBOSOUND'
 PUBLIC `__RP3_DISABLE_CONTENTION'
 PUBLIC `__RP3_UNLOCK_7FFD'
+
+PUBLIC `__REG_PERIPHERAL_4'
+PUBLIC `__RP4_SCANLINES_OFF'
+PUBLIC `__RP4_SCANLINES_25'
+PUBLIC `__RP4_SCANLINES_50'
+PUBLIC `__RP4_SCANLINES_75'
 
 PUBLIC `__REG_SUB_VERSION'
 
@@ -802,14 +848,25 @@ defc `__RRP_ROM_SPECTRUM' = __RRP_ROM_SPECTRUM
 
 defc `__REG_PERIPHERAL_1' = __REG_PERIPHERAL_1
 defc `__RP1_JOY1_SINCLAIR' = __RP1_JOY1_SINCLAIR
+defc `__RP1_JOY1_SINCLAIR_1' = __RP1_JOY1_SINCLAIR_1
+defc `__RP1_JOY1_SINCLAIR_2' = __RP1_JOY1_SINCLAIR_2
 defc `__RP1_JOY1_KEMPSTON' = __RP1_JOY1_KEMPSTON
+defc `__RP1_JOY1_KEMPSTON_1' = __RP1_JOY1_KEMPSTON_1
+defc `__RP1_JOY1_KEMPSTON_2' = __RP1_JOY1_KEMPSTON_2
 defc `__RP1_JOY1_CURSOR' = __RP1_JOY1_CURSOR
+defc `__RP1_JOY1_MD_1' = __RP1_JOY1_MD_1
+defc `__RP1_JOY1_MD_2' = __RP1_JOY1_MD_2
 defc `__RP1_JOY2_SINCLAIR' = __RP1_JOY2_SINCLAIR
+defc `__RP1_JOY2_SINCLAIR_1' = __RP1_JOY2_SINCLAIR_1
+defc `__RP1_JOY2_SINCLAIR_2' = __RP1_JOY2_SINCLAIR_2
 defc `__RP1_JOY2_KEMPSTON' = __RP1_JOY2_KEMPSTON
+defc `__RP1_JOY2_KEMPSTON_1' = __RP1_JOY2_KEMPSTON_1
+defc `__RP1_JOY2_KEMPSTON_2' = __RP1_JOY2_KEMPSTON_2
 defc `__RP1_JOY2_CURSOR' = __RP1_JOY2_CURSOR
+defc `__RP1_JOY2_MD_1' = __RP1_JOY2_MD_1
+defc `__RP1_JOY2_MD_2' = __RP1_JOY2_MD_2
 defc `__RP1_RATE_50' = __RP1_RATE_50
 defc `__RP1_RATE_60' = __RP1_RATE_60
-defc `__RP1_ENABLE_SCANLINES' = __RP1_ENABLE_SCANLINES
 defc `__RP1_ENABLE_SCANDOUBLER' = __RP1_ENABLE_SCANDOUBLER
 
 defc `__REG_PERIPHERAL_2' = __REG_PERIPHERAL_2
@@ -829,7 +886,6 @@ defc `__REG_TURBO_MODE' = __REG_TURBO_MODE
 defc `__RTM_3MHZ' = __RTM_3MHZ
 defc `__RTM_7MHZ' = __RTM_7MHZ
 defc `__RTM_14MHZ' = __RTM_14MHZ
-defc `__RTM_28MHZ' = __RTM_28MHZ
 
 defc `__REG_PERIPHERAL_3' = __REG_PERIPHERAL_3
 defc `__RP3_STEREO_ABC' = __RP3_STEREO_ABC
@@ -841,6 +897,12 @@ defc `__RP3_ENABLE_TIMEX' = __RP3_ENABLE_TIMEX
 defc `__RP3_ENABLE_TURBOSOUND' = __RP3_ENABLE_TURBOSOUND
 defc `__RP3_DISABLE_CONTENTION' = __RP3_DISABLE_CONTENTION
 defc `__RP3_UNLOCK_7FFD' = __RP3_UNLOCK_7FFD
+
+defc `__REG_PERIPHERAL_4' = __REG_PERIPHERAL_4
+defc `__RP4_SCANLINES_OFF' = __RP4_SCANLINES_OFF
+defc `__RP4_SCANLINES_25' = __RP4_SCANLINES_25
+defc `__RP4_SCANLINES_50' = __RP4_SCANLINES_50
+defc `__RP4_SCANLINES_75' = __RP4_SCANLINES_75
 
 defc `__REG_SUB_VERSION' = __REG_SUB_VERSION
 
@@ -1016,14 +1078,25 @@ ifdef(`CFG_C_DEF',
 
 `#define' `__REG_PERIPHERAL_1'  __REG_PERIPHERAL_1
 `#define' `__RP1_JOY1_SINCLAIR'  __RP1_JOY1_SINCLAIR
+`#define' `__RP1_JOY1_SINCLAIR_1'  __RP1_JOY1_SINCLAIR_1
+`#define' `__RP1_JOY1_SINCLAIR_2'  __RP1_JOY1_SINCLAIR_2
 `#define' `__RP1_JOY1_KEMPSTON'  __RP1_JOY1_KEMPSTON
+`#define' `__RP1_JOY1_KEMPSTON_1'  __RP1_JOY1_KEMPSTON_1
+`#define' `__RP1_JOY1_KEMPSTON_2'  __RP1_JOY1_KEMPSTON_2
 `#define' `__RP1_JOY1_CURSOR'  __RP1_JOY1_CURSOR
+`#define' `__RP1_JOY1_MD_1'  __RP1_JOY1_MD_1
+`#define' `__RP1_JOY1_MD_2'  __RP1_JOY1_MD_2
 `#define' `__RP1_JOY2_SINCLAIR'  __RP1_JOY2_SINCLAIR
+`#define' `__RP1_JOY2_SINCLAIR_1'  __RP1_JOY2_SINCLAIR_1
+`#define' `__RP1_JOY2_SINCLAIR_2'  __RP1_JOY2_SINCLAIR_2
 `#define' `__RP1_JOY2_KEMPSTON'  __RP1_JOY2_KEMPSTON
+`#define' `__RP1_JOY2_KEMPSTON_1'  __RP1_JOY2_KEMPSTON_1
+`#define' `__RP1_JOY2_KEMPSTON_2'  __RP1_JOY2_KEMPSTON_2
 `#define' `__RP1_JOY2_CURSOR'  __RP1_JOY2_CURSOR
+`#define' `__RP1_JOY2_MD_1'  __RP1_JOY2_MD_1
+`#define' `__RP1_JOY2_MD_2'  __RP1_JOY2_MD_2
 `#define' `__RP1_RATE_50'  __RP1_RATE_50
 `#define' `__RP1_RATE_60'  __RP1_RATE_60
-`#define' `__RP1_ENABLE_SCANLINES'  __RP1_ENABLE_SCANLINES
 `#define' `__RP1_ENABLE_SCANDOUBLER'  __RP1_ENABLE_SCANDOUBLER
 
 `#define' `__REG_PERIPHERAL_2'  __REG_PERIPHERAL_2
@@ -1043,7 +1116,6 @@ ifdef(`CFG_C_DEF',
 `#define' `__RTM_3MHZ'  __RTM_3MHZ
 `#define' `__RTM_7MHZ'  __RTM_7MHZ
 `#define' `__RTM_14MHZ'  __RTM_14MHZ
-`#define' `__RTM_28MHZ'  __RTM_28MHZ
 
 `#define' `__REG_PERIPHERAL_3'  __REG_PERIPHERAL_3
 `#define' `__RP3_STEREO_ABC'  __RP3_STEREO_ABC
@@ -1055,6 +1127,12 @@ ifdef(`CFG_C_DEF',
 `#define' `__RP3_ENABLE_TURBOSOUND'  __RP3_ENABLE_TURBOSOUND
 `#define' `__RP3_DISABLE_CONTENTION'  __RP3_DISABLE_CONTENTION
 `#define' `__RP3_UNLOCK_7FFD'  __RP3_UNLOCK_7FFD
+
+`#define' `__REG_PERIPHERAL_4'  __REG_PERIPHERAL_4
+`#define' `__RP4_SCANLINES_OFF'  __RP4_SCANLINES_OFF
+`#define' `__RP4_SCANLINES_25'  __RP4_SCANLINES_25
+`#define' `__RP4_SCANLINES_50'  __RP4_SCANLINES_50
+`#define' `__RP4_SCANLINES_75'  __RP4_SCANLINES_75
 
 `#define' `__REG_SUB_VERSION'  __REG_SUB_VERSION
 

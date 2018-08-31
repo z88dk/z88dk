@@ -15,3 +15,10 @@ esxdos_f_opendir:
    ld b,0
 
    jp asm_esxdos_f_opendir
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esxdos_f_opendir
+defc _esxdos_f_opendir = esxdos_f_opendir
+ENDIF
+

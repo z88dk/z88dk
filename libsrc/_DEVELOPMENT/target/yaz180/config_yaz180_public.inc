@@ -67,7 +67,7 @@ PUBLIC __IO_APU_PORT_BASE
 
 defc __YAZ180 = 1
 
-defc __CPU_CLOCK = 18432000
+defc __CPU_CLOCK = 36864000
 
 defc __IO_BASE_ADDRESS = 0x0
 

@@ -25,8 +25,8 @@ Z88DK_FOR(`LOOP', `0', `63',
    ; ESXDOS dotx commands
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   IFNDEF CRT_ORG_DTX
-      defc CRT_ORG_DTX  = 0x8000
+   IFNDEF CRT_ORG_MAIN
+      defc CRT_ORG_MAIN = 0x8000
    ENDIF
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

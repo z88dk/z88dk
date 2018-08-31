@@ -326,13 +326,11 @@ ENDIF
 
 IF NEED_ansiterminal
 	PUBLIC		fputc_cons
-	PUBLIC		_fputc_cons
 	EXTERN		fputc_cons_ansi
 	EXTERN		puts_cons_ansi
 	defc DEFINED_fputc_cons = 1
 	defc DEFINED_puts_cons = 1
 	defc fputc_cons = fputc_cons_ansi
-	defc _fputc_cons = fputc_cons_ansi
 
        	PUBLIC ansicolumns
 
@@ -458,17 +456,37 @@ ENDIF
 ; If it's not been overridden by anybody, lets use the native output
 IF !DEFINED_fputc_cons
 	PUBLIC		fputc_cons
-	PUBLIC		_fputc_cons
 	defc DEFINED_fputc_cons = 1
         IF !TAR__fputc_cons_generic
 	     EXTERN	fputc_cons_native
   	     defc fputc_cons = fputc_cons_native
-	     defc _fputc_cons = fputc_cons_native
         ELSE
 	     EXTERN	fputc_cons_generic
   	     defc fputc_cons = fputc_cons_generic
-	     defc _fputc_cons = fputc_cons_generic
         ENDIF
+ENDIF
+
+IF DEFINED_fputc_cons
+	PUBLIC		_fputc_cons
+	defc		_fputc_cons = fputc_cons
+
+ENDIF
+
+IF !DEFINED_getk
+   IF !DEFINED_fgetc_cons
+      IF TAR__fgetc_cons_inkey
+          EXTERN fgetc_cons_inkey
+          EXTERN getk_inkey
+          PUBLIC fgetc_cons
+          PUBLIC _fgetc_cons
+          PUBLIC getk
+          PUBLIC _getk
+          defc fgetc_cons = fgetc_cons_inkey
+          defc _fgetc_cons = fgetc_cons_inkey
+          defc getk = getk_inkey
+          defc _getk = getk_inkey
+      ENDIF
+   ENDIF
 ENDIF
 
 

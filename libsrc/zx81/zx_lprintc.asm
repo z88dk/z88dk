@@ -26,7 +26,7 @@
 	ld	(charpos+1),hl
 	ld	a,(hl)
 
-.doput
+	call    restore81
 IF STANDARDESCAPECHARS
 	cp  10		; CR?
 	jr  nz,NoLF
@@ -35,6 +35,10 @@ ELSE
 	jr  nz,NoLF
 ENDIF
 	ld	a,$76
+	set 1,(ix+1)	; Set "printer in use" flag
+	rst 16
+	res 1,(ix+1)	; Set "printer in use" flag
+	ret
 .NoLF
 
 	
@@ -42,7 +46,6 @@ IF FORzx80
 ;; LPRINT-CH
 ELSE
 	;ld	ix,16384
-	call    restore81
 	set 1,(ix+1)	; Set "printer in use" flag
 ENDIF
 	
@@ -52,7 +55,7 @@ ENDIF
 	;bit	 6,a		; filter out the dangerous codes
 	;ret	 nz	
 
-	call	16
+	rst	16
 	
 IF FORzx80
 ;; LPRINT-CH

@@ -38,7 +38,7 @@ ENDIF
 
 IF !DEFINED_CLIB_MALLOC_HEAP_SIZE 
 	defc	DEFINED_CLIB_MALLOC_HEAP_SIZE  = 1
-	defc CLIB_MALLOC_HEAP_SIZE  = 0x1000
+	defc CLIB_MALLOC_HEAP_SIZE  = 0x2000
 	IFNDEF CLIB_MALLOC_HEAP_SIZE 
 	ENDIF
 ENDIF
@@ -360,6 +360,25 @@ ENDIF
       ELSE
       
          defc __crt_enable_commandline = DEF__crt_enable_commandline
+      
+      ENDIF
+   
+   ENDIF
+   
+   
+   IFDEF CRT_ENABLE_COMMANDLINE_EX
+   
+      defc __crt_enable_commandline_ex = CRT_ENABLE_COMMANDLINE_EX
+   
+   ELSE
+   
+      IFDEF TAR__crt_enable_commandline_ex
+      
+         defc __crt_enable_commandline_ex = TAR__crt_enable_commandline_ex
+      
+      ELSE
+      
+         defc __crt_enable_commandline_ex = DEF__crt_enable_commandline_ex
       
       ENDIF
    

@@ -1,95 +1,39 @@
    ;;
-   ;; save command line if used
-   ;;
-
-IF __crt_enable_commandline >= 2
-
-   push hl
-
-ENDIF
-
-   ;;
    ;; find out if ram RAMTOP is low enough
    ;; to accommodate the extended binary
    ;;
    
-   EXTERN __DTX_head
+   EXTERN __MAIN_head
    
-   ld hl,(23730)               ; hl = RAMTOP
-   ld de,__DTX_head
+   ld hl,(__SYSVAR_RAMTOP)
+   ld de,__MAIN_head
    
    xor a
    sbc hl,de
    
-   jr c, ramtop_good
-
-ramtop_bad:
-
-IF __crt_enable_commandline >= 2
-
-   pop hl
-
-ENDIF
-
-   ;;
-   ;; print error message
-   ;;
-   
-   EXTERN l_utoa
-   
-   ex de,hl                    ; hl = __DTX_head
-   ld de,error_ramtop+18       ; de = & "00000"
-   
-   call l_utoa                 ; to ascii without leading zeroes
-   
-   ld a,')'+0x80
-   ld (de),a                   ; terminate the string
-   
-   xor a
-   scf
-
    ld hl,error_ramtop
-   ret
-
-error_ramtop:
-
-   defm "M RAMTOP no good (00000)"
-
-__esxdos_dtx_fname:
-
-   defs 18                     ; filled in by appmake
-
-ramtop_good:
+   jp nc, error_crt
 
    ;;
    ;; attempt to load extended binary
    ;;
 
    ld a,'$'
-   ld hl,__esxdos_dtx_fname
+   ld hl,esxdos_dtx_filename
    ld b,__ESXDOS_MODE_OPEN_EXIST | __ESXDOS_MODE_READ
    
    rst  __ESXDOS_SYSCALL
    defb __ESXDOS_SYS_F_OPEN
 
-IF __crt_enable_commandline >= 2
-
-   EXTERN l_ret
-   jp c,  l_ret - 1
-
-ELSE
-   
-   ret c
-   
-ENDIF
+   jr c, error_esxdos_dtx
 
    push af                     ; save file handle
 
-   EXTERN __BSS_END_tail
-   
-   ld bc,__BSS_END_tail - __DTX_head
-   ld hl,__DTX_head
-   
+   EXTERN __MAIN_END_tail
+
+   ld bc,__MAIN_END_tail - __MAIN_head
+   ld hl,__MAIN_head
+
    rst  __ESXDOS_SYSCALL
    defb __ESXDOS_SYS_F_READ
 
@@ -102,11 +46,41 @@ ENDIF
    defb __ESXDOS_SYS_F_CLOSE
    
    pop af
-   
-IF __crt_enable_commandline >= 2
+   jr nc, success_esxdos_dtx
 
-   pop hl
+error_esxdos_dtx:
+
+   ld l,a
+   ld h,0
+   
+   jp error_crt
+
+error_ramtop:
+
+   defm "M RAMTOP no good ("
+   defb (__MAIN_head - 1) / 10000 % 10 + '0'
+   defb (__MAIN_head - 1) / 1000 % 10 + '0'
+   defb (__MAIN_head - 1)/ 100 % 10 + '0'
+   defb (__MAIN_head - 1) / 10 % 10 + '0'
+   defb (__MAIN_head - 1) % 10 + '0'
+   defb ')'+0x80
+
+esxdos_dtx_filename:
+
+IF __NEXTOS_DOT_COMMAND
+
+   defm __ENV_BINDIR, "/extra/"
+
+ELSE
+
+   defm "/bin/extra/"
 
 ENDIF
 
-   ret c
+PUBLIC __z_dtx_filename
+
+__z_dtx_filename:
+
+   defs 13                     ; filled in by appmake
+
+success_esxdos_dtx:

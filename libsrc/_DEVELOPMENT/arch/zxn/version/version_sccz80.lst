@@ -1,0 +1,4 @@
+@arch/zxn/version/version_asm.lst
+arch/zxn/version/c/sccz80/check_version_core
+arch/zxn/version/c/sccz80/check_version_esxdos
+arch/zxn/version/c/sccz80/check_version_nextzxos

@@ -12,15 +12,18 @@
 use Modern::Perl;
 use Test::More;
 use File::Slurp;
-use Test::Differences; 
+use Test::Differences;
 require './t/test_utils.pl';
 
 my $objs = "scan.o errors.o error_func.o model.o module.o codearea.o listfile.o ".
 		   "options.o hist.o sym.o symtab.o expr.o ".
 		   "lib/str.o lib/strhash.o  ../common/fileutil.o ../common/strutil.o ../common/die.o ../common/objfile.o ../../ext/regex/regcomp.o ../../ext/regex/regerror.o ../../ext/regex/regexec.o ../../ext/regex/regfree.o ".
 		   "lib/srcfile.o macros.o lib/class.o ".
-		   "lib/list.o lib/array.o lib/dbg.o ../../ext/UNIXem/src/glob.o ../../ext/UNIXem/src/dirent.o";
-		   
+		   "lib/list.o lib/array.o lib/dbg.o ";
+if ($^O eq 'MSWin32') {
+	  $objs .= "../../ext/UNIXem/src/glob.o ../../ext/UNIXem/src/dirent.o ";
+}
+
 my $init = <<'END';
 #include "scan.h"
 #include "symbol.h"
@@ -42,22 +45,22 @@ char *GetLibfile( char *filename ) {return NULL;}
 
 #define T_NAME_LABEL( exp_token, exp_text ) \
 	T_GET( exp_token, exp_text );
-	
+
 #define T_NAME(  exp_text ) 		T_NAME_LABEL( TK_NAME,  exp_text );
 #define T_LABEL( exp_text ) 		T_NAME_LABEL( TK_LABEL, exp_text );
-	
+
 #define T_NUMBER( exp_value ) \
 	T_GET( TK_NUMBER, "" ); \
 	assert( sym.number == exp_value );
-	
+
 #define T_STRING_N( exp_string, n ) \
 	T_GET_N( TK_STRING, exp_string, n ); \
 	assert( sym.tlen == n); \
 	assert( strncmp( sym.tstart, exp_string, sym.tlen ) == 0 );
-	
+
 #define T_STRING( exp_string ) \
 	T_STRING_N( exp_string, strlen(exp_string) );
-	
+
 #define T_NEWLINE() \
 	T_GET( TK_NEWLINE, "\n" ); assert( EOL ); \
 	T_GET( TK_NEWLINE, "\n" ); assert( EOL ); \
@@ -157,20 +160,20 @@ t_compile_module($init, <<'END', $objs);
 	tokid_t token;
 	char string[MAXLINE];
 	char opcode_lcase[MAXLINE];
-	
+
 	init_macros();
 	SetTemporaryLine("");
 	T_END();
 
-	
+
 	/* invalid chars */
 	SetTemporaryLine(" \\ hello \n . ");
 	T_NIL();
 	T_NEWLINE();
 	T_DOT();
 	T_END();
-	
-	
+
+
 	/* at_bol = true */
 	SetTemporaryLine("\n \t start \t : \t . start : \n");
 	T_NEWLINE();
@@ -180,7 +183,7 @@ t_compile_module($init, <<'END', $objs);
 	T_COLON();
 	T_NEWLINE();
 	T_END();
-	
+
 	SetTemporaryLine("\n \t . \t start \t : \t . start : \n");
 	T_NEWLINE();
 	T_LABEL("start");
@@ -190,7 +193,7 @@ t_compile_module($init, <<'END', $objs);
 	T_COLON();
 	T_NEWLINE();
 	T_END();
-	
+
 	SetTemporaryLine("\n \t . \t start \t . start : \n");
 	T_NEWLINE();
 	T_LABEL("start");
@@ -199,7 +202,7 @@ t_compile_module($init, <<'END', $objs);
 	T_COLON();
 	T_NEWLINE();
 	T_END();
-	
+
 	SetTemporaryLine("\n \t . \t : \t . start : \n");
 	T_NEWLINE();
 	T_DOT();
@@ -209,8 +212,8 @@ t_compile_module($init, <<'END', $objs);
 	T_COLON();
 	T_NEWLINE();
 	T_END();
-	
-	
+
+
 	/* at_bol = false */
 	SetTemporaryLine(" \t start \t : \t . start : \n");
 	T_NAME("start");
@@ -220,7 +223,7 @@ t_compile_module($init, <<'END', $objs);
 	T_COLON();
 	T_NEWLINE();
 	T_END();
-	
+
 	SetTemporaryLine(" \t . \t start \t : \t . start : \n");
 	T_DOT();
 	T_NAME("start");
@@ -230,7 +233,7 @@ t_compile_module($init, <<'END', $objs);
 	T_COLON();
 	T_NEWLINE();
 	T_END();
-	
+
 	SetTemporaryLine(" \t . \t start \t . start : \n");
 	T_DOT();
 	T_NAME("start");
@@ -239,7 +242,7 @@ t_compile_module($init, <<'END', $objs);
 	T_COLON();
 	T_NEWLINE();
 	T_END();
-	
+
 	SetTemporaryLine(" \t . \t : \t . start : \n");
 	T_DOT();
 	T_COLON();
@@ -248,8 +251,8 @@ t_compile_module($init, <<'END', $objs);
 	T_COLON();
 	T_NEWLINE();
 	T_END();
-	
-	
+
+
 	/* symbols */
 	SetTemporaryLine(" \r\f\v\t ; comment \n ! # % & && ( ) * + , - . / : ; comment ");
 	T_NEWLINE();
@@ -268,7 +271,7 @@ t_compile_module($init, <<'END', $objs);
 	T_SLASH();
 	T_COLON();
 	T_END();
-	
+
 	SetTemporaryLine(" < << <= <> != = == > >> >= ; comment ");
 	T_LT();
 	T_LT_LT();
@@ -281,7 +284,7 @@ t_compile_module($init, <<'END', $objs);
 	T_GT_GT();
 	T_GT_EQ();
 	T_END();
-	
+
 	SetTemporaryLine( TEXT_QUESTION() " [ ] ^ ** { | || } ~ ; comment ");
 	T_QUESTION();
 	T_LSQUARE();
@@ -294,16 +297,16 @@ t_compile_module($init, <<'END', $objs);
 	T_RCURLY();
 	T_TILDE();
 	T_END();
-	
+
 	/* names */
 	SetTemporaryLine(" _Abc_123 Abc_123 123_Abc_0 0 ");
-	T_NAME("_Abc_123");	
+	T_NAME("_Abc_123");
 	T_NAME("Abc_123");
 	T_NUMBER(123);
 	T_NAME("_Abc_0");
 	T_NUMBER(0);
 	T_END();
-	
+
 	/* labels */
 	SetTemporaryLine(  "\n . abc   . def ghi : . jkl : "
 					   "\n   abc : . def ghi : . jkl : "
@@ -318,7 +321,7 @@ t_compile_module($init, <<'END', $objs);
 	T_DOT();
 	T_NAME("jkl");
 	T_COLON();
-	
+
 	T_NEWLINE();
 	T_LABEL("abc");
 	T_DOT();
@@ -342,7 +345,7 @@ t_compile_module($init, <<'END', $objs);
 
 	T_NEWLINE();
 	T_END();
-	
+
 	/* numbers - decimal */
 	SetTemporaryLine("2147483647 2147483648 0 1");
 	T_NUMBER(0x7FFFFFFF);
@@ -350,7 +353,7 @@ t_compile_module($init, <<'END', $objs);
 	T_NUMBER(0);
 	T_NUMBER(1);
 	T_END();
-	
+
 	/* numbers - binary */
 	SetTemporaryLine  ("   0000b     0011b      1111111111111111111111111111111b	"
 					   "  @0000     @0011      @1111111111111111111111111111111		"
@@ -421,10 +424,10 @@ t_compile_module($init, <<'END', $objs);
 	T_NUMBER(0x0000000A);
 	T_NUMBER(0x0000000F);
 	T_NUMBER(0x7FFFFFFF);
-	
+
 	T_NUMBER(0);
 	T_END();
-	
+
 	/* very long number > MAXLINE = 1024 --> truncates to 0 */
 	SetTemporaryLine(  "0000000000000000000000000000000000000000"
 					   "0000000000000000000000000000000000000000"
@@ -493,7 +496,7 @@ t_compile_module($init, <<'END', $objs);
 					   "1");
 	T_NUMBER(1);
 	T_END();
-	
+
 	/* strings - single-quote */
 	SetTemporaryLine(  "'\n"
 					   "'a\n"
@@ -505,33 +508,33 @@ t_compile_module($init, <<'END', $objs);
 					   "0");
 	T_NUMBER(0);
 	T_NEWLINE();
-	
+
 	T_NUMBER(0);
 	T_NEWLINE();
-	
+
 	T_NUMBER(0);
 	T_NEWLINE();
-	
+
 	T_NUMBER('a');
 	T_NEWLINE();
-	
+
 	T_NUMBER(0);
 	T_NEWLINE();
-	
-	T_NUMBER(7); 
-	T_NUMBER(8); 
-	T_NUMBER(12); 
-	T_NUMBER(10); 
-	T_NUMBER(13); 
-	T_NUMBER(9); 
-	T_NUMBER(11); 
-	T_NUMBER('\\'); 
-	T_NUMBER('\''); 
-	T_NUMBER(0); 
-	T_NUMBER(-1); 
-	T_NUMBER(-1); 
+
+	T_NUMBER(7);
+	T_NUMBER(8);
+	T_NUMBER(12);
+	T_NUMBER(10);
+	T_NUMBER(13);
+	T_NUMBER(9);
+	T_NUMBER(11);
+	T_NUMBER('\\');
+	T_NUMBER('\'');
+	T_NUMBER(0);
+	T_NUMBER(-1);
+	T_NUMBER(-1);
 	T_NEWLINE();
-	
+
 	T_NUMBER(0);
 	T_END();
 
@@ -545,74 +548,74 @@ t_compile_module($init, <<'END', $objs);
 					   "0");
 	T_STRING("");
 	T_NEWLINE();
-	
+
 	T_STRING("");
 	T_NEWLINE();
-	
+
 	T_STRING("");
 	T_NEWLINE();
-	
+
 	T_STRING("a");
 	T_NEWLINE();
-	
+
 	T_STRING("aa");
 	T_NEWLINE();
-	
+
 	T_STRING("");
 	T_NEWLINE();
-	
+
 	T_NUMBER(0);
 	T_END();
 
 	/* keywords */
 	SetTemporaryLine("nz z nc c po pe p m "
 					 "NZ Z NC C PO PE P M ");
-	T_GET(TK_NZ, "nz"); 
-	T_GET(TK_Z,  "z");  
-	T_GET(TK_NC, "nc"); 
-	T_GET(TK_C,  "c");  
-	T_GET(TK_PO, "po"); 
-	T_GET(TK_PE, "pe"); 
-	T_GET(TK_P,  "p");  
-	T_GET(TK_M,  "m");  
+	T_GET(TK_NZ, "nz");
+	T_GET(TK_Z,  "z");
+	T_GET(TK_NC, "nc");
+	T_GET(TK_C,  "c");
+	T_GET(TK_PO, "po");
+	T_GET(TK_PE, "pe");
+	T_GET(TK_P,  "p");
+	T_GET(TK_M,  "m");
 
-	T_GET(TK_NZ, "NZ"); 
-	T_GET(TK_Z,  "Z");  
-	T_GET(TK_NC, "NC"); 
-	T_GET(TK_C,  "C");  
-	T_GET(TK_PO, "PO"); 
-	T_GET(TK_PE, "PE"); 
-	T_GET(TK_P,  "P");  
-	T_GET(TK_M,  "M");  
+	T_GET(TK_NZ, "NZ");
+	T_GET(TK_Z,  "Z");
+	T_GET(TK_NC, "NC");
+	T_GET(TK_C,  "C");
+	T_GET(TK_PO, "PO");
+	T_GET(TK_PE, "PE");
+	T_GET(TK_P,  "P");
+	T_GET(TK_M,  "M");
 	T_END();
 
 	SetTemporaryLine("b c d e h l a ixh ixl iyh iyl "
 					 "B C D E H L A IXH IXL IYH IYL ");
-	T_GET(TK_B,   "b");   
-	T_GET(TK_C,   "c");   
-	T_GET(TK_D,   "d");   
-	T_GET(TK_E,   "e");   
-	T_GET(TK_H,   "h");   
-	T_GET(TK_L,   "l");   
-	T_GET(TK_A,   "a");   
-	T_GET(TK_IXH, "ixh"); 
-	T_GET(TK_IXL, "ixl"); 
-	T_GET(TK_IYH, "iyh"); 
-	T_GET(TK_IYL, "iyl"); 
-	
-	T_GET(TK_B,   "B");   
-	T_GET(TK_C,   "C");   
-	T_GET(TK_D,   "D");   
-	T_GET(TK_E,   "E");   
-	T_GET(TK_H,   "H");   
-	T_GET(TK_L,   "L");   
-	T_GET(TK_A,   "A");   
-	T_GET(TK_IXH, "IXH"); 
-	T_GET(TK_IXL, "IXL"); 
-	T_GET(TK_IYH, "IYH"); 
-	T_GET(TK_IYL, "IYL"); 
+	T_GET(TK_B,   "b");
+	T_GET(TK_C,   "c");
+	T_GET(TK_D,   "d");
+	T_GET(TK_E,   "e");
+	T_GET(TK_H,   "h");
+	T_GET(TK_L,   "l");
+	T_GET(TK_A,   "a");
+	T_GET(TK_IXH, "ixh");
+	T_GET(TK_IXL, "ixl");
+	T_GET(TK_IYH, "iyh");
+	T_GET(TK_IYL, "iyl");
+
+	T_GET(TK_B,   "B");
+	T_GET(TK_C,   "C");
+	T_GET(TK_D,   "D");
+	T_GET(TK_E,   "E");
+	T_GET(TK_H,   "H");
+	T_GET(TK_L,   "L");
+	T_GET(TK_A,   "A");
+	T_GET(TK_IXH, "IXH");
+	T_GET(TK_IXL, "IXL");
+	T_GET(TK_IYH, "IYH");
+	T_GET(TK_IYL, "IYL");
 	T_END();
-	
+
 	SetTemporaryLine("f (c) (\t c \t) "
 					 "F (C) (\t C \t) "
 					 "(cur)");		// (c is not interpreted as TK_IND_C
@@ -621,7 +624,7 @@ t_compile_module($init, <<'END', $objs);
 	T_RPAREN();
 	T_GET(TK_IND_C, "(\t c \t");
 	T_RPAREN();
-					 
+
 	T_GET(TK_F,     "F");
 	T_GET(TK_IND_C, "(C");
 	T_RPAREN();
@@ -631,34 +634,34 @@ t_compile_module($init, <<'END', $objs);
 	T_NAME("cur");
 	T_RPAREN();
 	T_END();
-					 
+
 	SetTemporaryLine("bc bc' de de' hl hl' af af' sp ix iy "
 					 "BC BC' DE DE' HL HL' AF AF' SP IX IY ");
-	T_GET(TK_BC,  "bc");  
-	T_GET(TK_BC1, "bc'");  
-	T_GET(TK_DE,  "de");  
-	T_GET(TK_DE1, "de'");  
-	T_GET(TK_HL,  "hl");  
-	T_GET(TK_HL1, "hl'");  
-	T_GET(TK_AF,  "af");  
-	T_GET(TK_AF1, "af'"); 
-	T_GET(TK_SP,  "sp");  
-	T_GET(TK_IX,  "ix");  
-	T_GET(TK_IY,  "iy");  
-	
-	T_GET(TK_BC,  "BC");  
-	T_GET(TK_BC1, "BC'");  
-	T_GET(TK_DE,  "DE");  
-	T_GET(TK_DE1, "DE'");  
-	T_GET(TK_HL,  "HL");  
-	T_GET(TK_HL1, "HL'");  
-	T_GET(TK_AF,  "AF");  
-	T_GET(TK_AF1, "AF'"); 
-	T_GET(TK_SP,  "SP");  
-	T_GET(TK_IX,  "IX");  
-	T_GET(TK_IY,  "IY");  
+	T_GET(TK_BC,  "bc");
+	T_GET(TK_BC1, "bc'");
+	T_GET(TK_DE,  "de");
+	T_GET(TK_DE1, "de'");
+	T_GET(TK_HL,  "hl");
+	T_GET(TK_HL1, "hl'");
+	T_GET(TK_AF,  "af");
+	T_GET(TK_AF1, "af'");
+	T_GET(TK_SP,  "sp");
+	T_GET(TK_IX,  "ix");
+	T_GET(TK_IY,  "iy");
+
+	T_GET(TK_BC,  "BC");
+	T_GET(TK_BC1, "BC'");
+	T_GET(TK_DE,  "DE");
+	T_GET(TK_DE1, "DE'");
+	T_GET(TK_HL,  "HL");
+	T_GET(TK_HL1, "HL'");
+	T_GET(TK_AF,  "AF");
+	T_GET(TK_AF1, "AF'");
+	T_GET(TK_SP,  "SP");
+	T_GET(TK_IX,  "IX");
+	T_GET(TK_IY,  "IY");
 	T_END();
-	
+
 	SetTemporaryLine("(bc) (de) (hl) (sp) (\t bc \t) (\t de \t) (\t hl \t) (\t sp \t) "
 					 "(BC) (DE) (HL) (SP) (\t BC \t) (\t DE \t) (\t HL \t) (\t SP \t) ");
 	T_GET(TK_IND_BC, "(bc"); T_RPAREN();
@@ -670,39 +673,39 @@ t_compile_module($init, <<'END', $objs);
 	T_GET(TK_IND_DE, "(\t de \t"); T_RPAREN();
 	T_GET(TK_IND_HL, "(\t hl \t"); T_RPAREN();
 	T_GET(TK_IND_SP, "(\t sp \t"); T_RPAREN();
-	
+
 	T_GET(TK_IND_BC, "(BC"); T_RPAREN();
 	T_GET(TK_IND_DE, "(DE"); T_RPAREN();
 	T_GET(TK_IND_HL, "(HL"); T_RPAREN();
 	T_GET(TK_IND_SP, "(SP"); T_RPAREN();
-	
+
 	T_GET(TK_IND_BC, "(\t BC \t"); T_RPAREN();
 	T_GET(TK_IND_DE, "(\t DE \t"); T_RPAREN();
 	T_GET(TK_IND_HL, "(\t HL \t"); T_RPAREN();
 	T_GET(TK_IND_SP, "(\t SP \t"); T_RPAREN();
 	T_END();
-	
+
 	SetTemporaryLine("(ix) (iy) (\t ix \t) (\t iy \t) "
 					 "(IX) (IY) (\t IX \t) (\t IY \t) ");
-	T_GET(TK_IND_IX, "(ix");  
+	T_GET(TK_IND_IX, "(ix");
 	T_RPAREN();
-	T_GET(TK_IND_IY, "(iy");  
+	T_GET(TK_IND_IY, "(iy");
 	T_RPAREN();
-	T_GET(TK_IND_IX, "(\t ix \t");  
+	T_GET(TK_IND_IX, "(\t ix \t");
 	T_RPAREN();
-	T_GET(TK_IND_IY, "(\t iy \t");  
+	T_GET(TK_IND_IY, "(\t iy \t");
 	T_RPAREN();
-	
-	T_GET(TK_IND_IX, "(IX");  
+
+	T_GET(TK_IND_IX, "(IX");
 	T_RPAREN();
-	T_GET(TK_IND_IY, "(IY");  
+	T_GET(TK_IND_IY, "(IY");
 	T_RPAREN();
-	T_GET(TK_IND_IX, "(\t IX \t");  
+	T_GET(TK_IND_IX, "(\t IX \t");
 	T_RPAREN();
-	T_GET(TK_IND_IY, "(\t IY \t");  
+	T_GET(TK_IND_IY, "(\t IY \t");
 	T_RPAREN();
 	T_END();
-	
+
 	SetTemporaryLine("( \t ix \t ) ( \t ix \t + \t 0 \t ) ( \t ix \t - \t 0 \t ) "
 					 "( \t iy \t ) ( \t iy \t + \t 0 \t ) ( \t iy \t - \t 0 \t ) "
 					 "( \t IX \t ) ( \t IX \t + \t 0 \t ) ( \t IX \t - \t 0 \t ) "
@@ -718,7 +721,7 @@ t_compile_module($init, <<'END', $objs);
 	T_MINUS();
 	T_NUMBER(0);
 	T_RPAREN();
-	
+
 	T_GET(TK_IND_IY, "( \t iy \t ");
 	T_RPAREN();
 	T_GET(TK_IND_IY, "( \t iy \t ");
@@ -729,7 +732,7 @@ t_compile_module($init, <<'END', $objs);
 	T_MINUS();
 	T_NUMBER(0);
 	T_RPAREN();
-	
+
 	T_GET(TK_IND_IX, "( \t IX \t ");
 	T_RPAREN();
 	T_GET(TK_IND_IX, "( \t IX \t ");
@@ -740,7 +743,7 @@ t_compile_module($init, <<'END', $objs);
 	T_MINUS();
 	T_NUMBER(0);
 	T_RPAREN();
-	
+
 	T_GET(TK_IND_IY, "( \t IY \t ");
 	T_RPAREN();
 	T_GET(TK_IND_IY, "( \t IY \t ");
@@ -755,18 +758,18 @@ t_compile_module($init, <<'END', $objs);
 
 	SetTemporaryLine("ds.b ds.w ds.p ds.q "
 					 "DS.B DS.W DS.P DS.Q ");
-	T_GET(TK_DS_B, "ds.b"); 
-	T_GET(TK_DS_W, "ds.w"); 
-	T_GET(TK_DS_P, "ds.p"); 
-	T_GET(TK_DS_Q, "ds.q"); 
+	T_GET(TK_DS_B, "ds.b");
+	T_GET(TK_DS_W, "ds.w");
+	T_GET(TK_DS_P, "ds.p");
+	T_GET(TK_DS_Q, "ds.q");
 
-	T_GET(TK_DS_B, "DS.B"); 
-	T_GET(TK_DS_W, "DS.W"); 
-	T_GET(TK_DS_P, "DS.P"); 
-	T_GET(TK_DS_Q, "DS.Q"); 
+	T_GET(TK_DS_B, "DS.B");
+	T_GET(TK_DS_W, "DS.W");
+	T_GET(TK_DS_P, "DS.P");
+	T_GET(TK_DS_Q, "DS.Q");
 	T_END();
 
-	
+
 	/* assembly operands */
 	SetTemporaryLine("i r I R iir eir IIR EIR xpc XPC");
 	scan_expect_operands();
@@ -782,7 +785,7 @@ t_compile_module($init, <<'END', $objs);
 	T_GET(TK_XPC,   "XPC");
 	T_END();
 
-	
+
 	/* assembly directives */
 	T_OPCODE(BINARY,	T_ALL);
 	T_OPCODE(DEFB,		T_ALL);
@@ -810,7 +813,7 @@ t_compile_module($init, <<'END', $objs);
 	T_OPCODE(PUBLIC,	T_ALL);
 	T_OPCODE(SECTION,	T_ALL);
 	T_OPCODE(UNDEFINE,	T_ALL);
-	
+
 	/* assembly opcodes */
 	T_OPCODE(ADC,	T_ALL);
 	T_OPCODE(ADD,	T_ALL);
@@ -881,13 +884,13 @@ t_compile_module($init, <<'END', $objs);
 	T_OPCODE(SRL,  	T_ALL)
 	T_OPCODE(SUB,	T_ALL);
 	T_OPCODE(XOR,	T_ALL);
-	
+
 	/* Z88DK specific opcodes */
 	T_OPCODE(CALL_OZ,	T_ALL);
 	T_OPCODE(CALL_PKG,	T_ALL);
 	T_OPCODE(FPP,		T_ALL);
 	T_OPCODE(INVOKE,	T_ALL);
-	
+
 	/* check limit cases */
 	SetTemporaryLine("ld(ix_save+2),ix "
 					 "ld ( ix_save + 2 ) , ix ");
@@ -911,9 +914,9 @@ t_compile_module($init, <<'END', $objs);
 	T_END();
 
 	free_macros();
-	
+
 	return 0;
-	
+
 END
 
 t_run_module([], '', <<'ERR', 0);

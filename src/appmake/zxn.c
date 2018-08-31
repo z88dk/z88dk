@@ -66,14 +66,14 @@ static struct zxn_nex zxnex = {
     7,          // border
    -1,          // loadbar
     0,          // loaddelay
-    0           // startdelay
+    0,          // startdelay
+    0           // norun
 };
 
 static char tap = 0;            // .tap tape
 static char sna = 0;            // .sna 48k/128k snapshot
 static char dot = 0;            //  esxdos dot command
 static char dotn = 0;           //  nextos dot command
-static char universal_dot = 0;  //  nextos universal dot command
 static char zxn = 0;            // .zxn full size memory executable
 static char bin = 0;            // .bin output binaries with banks correctly merged
 static char nex = 0;            // .nex format
@@ -113,15 +113,15 @@ option_t zxn_options[] = {
     {  0,  "clean",    "Remove consumed source binaries\n", OPT_BOOL, &zxc.clean },
 
     {  0,  "nex",          "Make .nex instead of .tap", OPT_BOOL,   &nex },
+    {  0,  "nex-norun",    "Return to basic after loading", OPT_BOOL, &zxnex.norun },
     {  0,  "nex-screen",   "File containing loading screen", OPT_STR, &zxnex.screen },
     {  0,  "nex-border",   "Initial border colour", OPT_INT, &zxnex.border },
     {  0,  "nex-loadbar",  "Load bar colour", OPT_INT, &zxnex.loadbar },
-    {  0,  "nex-loaddel",  "Delay loading a bank", OPT_INT, &zxnex.loaddelay },
+    {  0,  "nex-loaddel",  "Delay after loading a bank", OPT_INT, &zxnex.loaddelay },
     {  0,  "nex-startdel", "Delay before starting\n", OPT_INT, &zxnex.startdelay },
 
     {  0,  "dot",      "Make esxdos dot command instead of .tap", OPT_BOOL, &dot },
     {  0,  "dotn",     "Make nextos dot command instead of .tap", OPT_BOOL, &dotn },
-    {  0,  "universal-dot", "Make universal dot command instead of .tap\n", OPT_BOOL, &universal_dot },
 
     {  0,  "audio",     "Create also a WAV file",    OPT_BOOL,  &zxt.audio },
     {  0,  "ts2068",    "TS2068 BASIC relocation (if possible)",  OPT_BOOL,  &zxt.ts2068 },
@@ -161,13 +161,7 @@ int zxn_exec(char *target)
 
     ret = -1;
 
-    if (zxc.help)
-        return ret;
-
-    // universal dot command
-
-    if (universal_dot)
-        return zxn_universal_dot(&zxc);
+    if (zxc.help) return ret;
 
     // filenames
 
@@ -209,7 +203,7 @@ int zxn_exec(char *target)
 
     // BANK = ZXN Ram Enumerated as 16K banks compatible with 128k Spectrum banking scheme with org 0xc000
     // PAGE = ZXN Ram Enumerated as 8k pages compatible with ZXN MMU paging
-    // DIV  = DIVMMC Memory organized as 32 8k pages with org 0x2000
+    // DIV  = DIVMMC Memory organized as 16 8k pages with org 0x2000
     // RES  = Separate bankspace to hold resources stored in disk file but not initially loaded at runtime
 
     memset(&memory, 0, sizeof(memory));
@@ -569,9 +563,6 @@ int zxn_exec(char *target)
             return ret;
 
         // dot command is out but we need to process binaries in other memory banks
-        // remove the mainbank so as not to process it again
-
-        mb_remove_mainbank(&memory.mainbank, zxc.clean);
     }
 
     if (dotn)
@@ -795,10 +786,11 @@ int zxn_exec(char *target)
             return ret;
 
         // dotn is out but we need to process the rest of the binaries too
-        // so remove mainbank and PAGE space since they've already been consumed
+        // so remove mainbank, PAGE, and DIV spaces since they've already been consumed
 
         mb_remove_mainbank(&memory.mainbank, zxc.clean);
         // mb_remove_bankspace(&memory, "PAGE");
+        // mb_remove_bankspace(&memory, "DIV");
     }
 
     // output remaining memory bank contents as raw binaries

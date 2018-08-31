@@ -34,7 +34,7 @@ defc __Z88DK = 1992
 
 defc __YAZ180 = 1
 
-defc __CPU_CLOCK = 18432000
+defc __CPU_CLOCK = 36864000
 
 defc __IO_BASE_ADDRESS = 0x0
 

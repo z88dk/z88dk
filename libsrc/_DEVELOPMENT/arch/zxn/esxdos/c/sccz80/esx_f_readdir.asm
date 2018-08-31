@@ -18,3 +18,10 @@ esx_f_readdir:
    
    ld a,e
    jp asm_esx_f_readdir
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esx_f_readdir
+defc _esx_f_readdir = esx_f_readdir
+ENDIF
+

@@ -3,6 +3,7 @@ stdio/inkey/getk
 stdio/rx78/generic_console
 stdio/rx78/generic_console_ioctl
 stdio/rx78/generic_console_vpeek
+stdio/rx78/conio_map_colour
 stdio/rx78/CRT_FONT
 stdio/rx78/fputc_cons_native
 @stdio/stdio.lst

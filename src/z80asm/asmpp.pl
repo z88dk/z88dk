@@ -2,7 +2,6 @@
 
 # Z88DK Z80 Macro Assembler
 #
-# Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2017
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 #
@@ -22,7 +21,6 @@
 # - DS as synonym to DEFS
 # - *INCLUDE to include files
 # - new expression operators: .AND. .OR. .XOR. .NOT. .SHR. .SHL. .HIGH. .LOW. .EQU. .GT. .LT.
-# - $ as synonym to ASMPC
 # - optional upper case all source before assembly
 
 use strict;
@@ -76,6 +74,7 @@ our $EXPR_RE =
 			(?<TERM>	\s*
 						(?> \d+ 
 						|   \w+ 
+						|   \$
 						|   \( \s* (?&EXPR) \s* \) 
 						) 
 			)
@@ -438,7 +437,6 @@ sub expand_macros_it {
 # - convert strings to lists of character codes
 # - numbers to decimal
 # - Z80MR operators to C-standard operators
-# - $ to ASMPC
 sub convert_expr_it {
 	my($in) = @_;
 	return imap {
@@ -461,7 +459,6 @@ sub convert_expr_it {
 				 | \&b  (    [01]+ ) \b
 				 | 0b   (    [01]+ ) \b
 				 ) / oct("0b".$1) /egxi;
-			s/ \$ / ASMPC /gxi;
 			s/ \. AND \. / & /gxi;
 			s/ \. OR  \. / | /gxi;
 			s/ \. XOR \. / ^ /gxi;

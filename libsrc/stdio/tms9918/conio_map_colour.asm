@@ -2,7 +2,7 @@
 ;
 ; Entry: a = colour
 ; Exit:  a = colour to use on screen
-; Used:  c,f
+; Used:  hl,bc,f
 ;
 
 	MODULE	code_clib
@@ -15,9 +15,30 @@ conio_map_colour:
         rr      c
         ret     c
 
-        and     7
-        inc     a       ;(1,3,5,7: black, green, blue, cyan)
-        bit     0,a
-        ret     nz
-        add     7       ; (2,4,6,8 -> 9,11,13,15; red, yellow, magenta, white)
-        ret
+	and	15
+	ld	c,a
+	ld	b,0
+	ld	hl,table
+	add	hl,bc
+	ld	a,(hl)
+	ret
+
+	SECTION	rodata_clib
+table:
+        defb    $1	;BLACK -> BLACK
+	defb	$4	;BLUE -> DARK BLUE
+	defb	$c	;GREEN -> MEDIUM GREEN
+	defb	$7	;CYAN -> CYAN
+	defb	$6	;RED -> DARK RED
+	defb	$d	;MAGENTA -> MAGENTA
+	defb	$8	;BROWN -> MEDIUM RED
+	defb	$b	;LIGHTGRAY -> LIGHT YELLOW
+	defb	$e	;DARKGRAY -> GRAY
+	defb	$5	;LIGHTBLUE -> LIGHT BLUE
+	defb	$3	;LIGHTGREEN -> LIGHT GREEN
+	defb	$7	;LIGHTCYAN -> CYAN
+	defb	$9	;LIGHTRED -> LIGHT RED
+	defb	$d	;LIGHTMAGENTA -> MAGENTA
+	defb	$a	;YELLOW -> DARK YELLOW
+	defb	$f	;WHITE -> WHITE
+

@@ -2832,10 +2832,15 @@ void zlt_const(LVALUE *lval, int32_t value)
             outfmt("\tsub\t%d\n", (value % 256));
         }
         set_carry(lval);
-    } else if ( lval->val_type == KIND_CHAR ) {
+    } else if ( lval->val_type == KIND_CHAR) {
         // We're signed here
-        ol("ld\ta,l");
-        ol("rla");  
+        if ( value == 0 ) {
+            ol("ld\ta,l");
+            ol("rla");  
+        } else {
+            ol("ld\ta,l");
+            outfmt("\tsub\t%d\n", (value % 256));
+        }
         set_carry(lval);
     } else if ( lval->val_type == KIND_INT || lval->val_type == KIND_PTR ) {
         if ( value == 0 ) {

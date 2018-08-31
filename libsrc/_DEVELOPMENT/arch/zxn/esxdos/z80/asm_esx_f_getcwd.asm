@@ -5,6 +5,7 @@ INCLUDE "config_private.inc"
 SECTION code_esxdos
 
 PUBLIC asm_esx_f_getcwd
+PUBLIC l_asm_esx_f_getcwd
 
 EXTERN error_znc
 EXTERN __esxdos_error_mc
@@ -26,7 +27,9 @@ asm_esx_f_getcwd:
    ; uses  : af, bc, de, hl, ix
    
    ld a,'*'
-   
+
+l_asm_esx_f_getcwd:
+
 IF __SDCC_IY
    push hl
    pop iy

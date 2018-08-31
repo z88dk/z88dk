@@ -97,7 +97,7 @@ int main(int argc, char **argv)
                 break;
             }
         } else {
-            FILE *fp = fopen(argv[1],"r");
+            FILE *fp = fopen(argv[1],"rb");
 
             if ( fp != NULL ) {
                 size_t r = fread(mem + org, sizeof(char), 65536 - start, fp);

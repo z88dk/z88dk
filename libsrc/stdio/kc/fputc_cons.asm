@@ -23,17 +23,9 @@ ELSE
 ENDIF
 	jr  nz,nocr
 	call PV1
-	defb FNCRT
-IF STANDARDESCAPECHARS
-	ld  c,13
-	call PV1
-	defb FNCRT
+	defb FNCRLF
+	ret
 	ld  c,10
-ELSE
-	call PV1
-	defb FNCRT
-	ld  c,10
-ENDIF
 .nocr
 	call PV1
 	defb FNCRT

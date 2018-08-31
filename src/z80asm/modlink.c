@@ -211,6 +211,7 @@ static void read_cur_module_exprs_1(ExprList *exprs, FILE *file, char *filename,
 			case 'C': expr->range = RANGE_WORD;			break;
 			case 'B': expr->range = RANGE_WORD_BE;		break;
 			case 'L': expr->range = RANGE_DWORD;		break;
+			case 'J': expr->range = RANGE_JR_OFFSET;	break;
 			case '=': expr->range = RANGE_WORD;
 					  xassert( str_len(target_name) > 0 );
 					  expr->target_name = spool_add( str_data(target_name) );	/* define expression as EQU */
@@ -329,7 +330,7 @@ static int compute_equ_exprs_once( ExprList *exprs, bool show_error, bool module
 			/* expressions with symbols from other sections need to be passed to the link phase */
 			if (!module_relative_addr || /* link phase */
 				(Expr_is_local_in_section(expr, CURRENTMODULE, CURRENTSECTION) &&	/* or symbols from other sections */
-				 Expr_without_addresses(expr))		/* expression with more than one address - needs to be computed at link time */
+				 Expr_without_addresses(expr))		/* expression addressees - needs to be computed at link time */
 				)
 			{
 				set_expr_env(expr, module_relative_addr);
@@ -392,7 +393,7 @@ static void patch_exprs( ExprList *exprs )
 {
 	ExprListElem *iter;
     Expr *expr, *expr2;
-	long value;
+	long value, asmpc;
 
 	iter = ExprList_first( exprs );
 	while ( iter != NULL )
@@ -471,6 +472,16 @@ static void patch_exprs( ExprList *exprs )
 
 				patch_long(expr->code_pos, value);
                 break;
+
+			case RANGE_JR_OFFSET:
+				asmpc = get_phased_PC() >= 0 ? get_phased_PC() : get_PC();
+				value -= asmpc + 2;		/* get module PC at JR instruction */
+
+				if (value < -128 || value > 127)
+					error_int_range(value);
+
+				patch_byte(expr->code_pos, (byte_t)value);
+				break;
 
 			default: xassert(0);
             }

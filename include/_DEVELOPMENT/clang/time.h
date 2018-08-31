@@ -49,4 +49,10 @@ extern void tm_from_dostm(struct tm *,struct dos_tm *);
 
 
 
+// dos time comparison
+
+extern int compare_dostm(struct dos_tm *a,struct dos_tm *b);
+
+
+
 #endif

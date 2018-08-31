@@ -20,13 +20,13 @@
 	EXTERN	__console_y
 	EXTERN	__console_x
 	
-	EXTERN	vg5k_attr
+	EXTERN	__vg5k_attr
 
 
 .ansi_CHAR
 	ld    d,a		; character
 	
-	ld    a,(vg5k_attr)
+	ld    a,(__vg5k_attr)
 	ld    e,a		; attribute
 	
 	ld    hl,(__console_x)	; l = x, h = y

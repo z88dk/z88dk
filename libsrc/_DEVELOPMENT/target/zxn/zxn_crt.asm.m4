@@ -432,6 +432,75 @@ ifelse(__STARTUP, 265,
    include(`startup/zxn_crt_265.asm.m4')
 ')
 
+ifelse(__STARTUP, 272,
+`
+   ; standard 64 column timex hi-res display
+   ;
+   ; stdin  = zx_01_input_kbd_inkey
+   ; stdout = tshr_01_output_char_64 full screen
+   ; stderr = dup(stdout)
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 2
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 0
+   
+   ENDIF
+
+   include(`startup/zxn_crt_272.asm.m4')
+')
+
+ifelse(__STARTUP, 276,
+`
+   ; standard 128 column timex hi-res display using 4x8 font
+   ;
+   ; stdin  = zx_01_input_kbd_inkey
+   ; stdout = tshr_01_output_char_128 full screen
+   ; stderr = dup(stdout)
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 2
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 0
+   
+   ENDIF
+
+   include(`startup/zxn_crt_276.asm.m4')
+')
+
+ifelse(__STARTUP, 280,
+`
+   ; fzx terminal using ff_ind_Termino font in timex hi-res mode
+   ;
+   ; stdin  = zx_01_input_kbd_inkey
+   ; stdout = tshr_01_output_fzx full screen
+   ; stderr = dup(stdout)
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 2
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 0
+   
+   ENDIF
+
+   include(`startup/zxn_crt_280.asm.m4')
+')
+
 ifelse(__STARTUP, 286,
 `
    ; standard 32 column display using rst 0x10
@@ -616,6 +685,75 @@ ifelse(__STARTUP, 521,
    include(`startup/zxn_crt_521.asm.m4')
 ')
 
+ifelse(__STARTUP, 528,
+`
+   ; standard 64 column timex hi-res display
+   ;
+   ; stdin  = zx_01_input_kbd_inkey
+   ; stdout = tshr_01_output_char_64 full screen
+   ; stderr = dup(stdout)
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 2
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 1
+   
+   ENDIF
+
+   include(`startup/zxn_crt_528.asm.m4')
+')
+
+ifelse(__STARTUP, 532,
+`
+   ; standard 128 column timex hi-res display using 4x8 font
+   ;
+   ; stdin  = zx_01_input_kbd_inkey
+   ; stdout = tshr_01_output_char_128 full screen
+   ; stderr = dup(stdout)
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 2
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 1
+   
+   ENDIF
+
+   include(`startup/zxn_crt_532.asm.m4')
+')
+
+ifelse(__STARTUP, 536,
+`
+   ; fzx terminal using ff_ind_Termino font in timex hi-res mode
+   ;
+   ; stdin  = zx_01_input_kbd_inkey
+   ; stdout = tshr_01_output_fzx full screen
+   ; stderr = dup(stdout)
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 2
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 1
+   
+   ENDIF
+
+   include(`startup/zxn_crt_536.asm.m4')
+')
+
 ifelse(__STARTUP, 542,
 `
    ; standard 32 column display using rst 0x10
@@ -662,6 +800,98 @@ ifelse(__STARTUP, 543,
 ;; nextos extended dot command ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+ifelse(__STARTUP, 768,
+`
+   ; standard 32 column display
+   ;
+   ; stdin  = zx_01_input_kbd_inkey
+   ; stdout = zx_01_output_char_32 full screen
+   ; stderr = dup(stdout)
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 3
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 2
+   
+   ENDIF
+
+   include(`startup/zxn_crt_768.asm.m4')
+')
+
+ifelse(__STARTUP, 769,
+`
+   ; standard 32 column display tty_z88dk terminal
+   ;
+   ; stdin  = zx_01_input_kbd_inkey
+   ; stdout = zx_01_output_char_32_tty_z88dk full screen
+   ; stderr = dup(stdout)
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 3
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 2
+   
+   ENDIF
+
+   include(`startup/zxn_crt_769.asm.m4')
+')
+
+ifelse(__STARTUP, 772,
+`
+   ; 64 column display using fixed width 4x8 font
+   ;
+   ; stdin  = zx_01_input_kbd_inkey
+   ; stdout = zx_01_output_char_64 full screen
+   ; stderr = dup(stdout)
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 3
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 2
+   
+   ENDIF
+
+   include(`startup/zxn_crt_772.asm.m4')
+')
+
+ifelse(__STARTUP, 773,
+`
+   ; 64 column display using fixed width 4x8 font tty_z88dk terminal
+   ;
+   ; stdin  = zx_01_input_kbd_inkey
+   ; stdout = zx_01_output_char_64_tty_z88dk full screen
+   ; stderr = dup(stdout)
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 3
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 2
+   
+   ENDIF
+
+   include(`startup/zxn_crt_773.asm.m4')
+')
+
 ifelse(__STARTUP, 776,
 `
    ; fzx terminal using ff_ind_Termino font
@@ -683,6 +913,98 @@ ifelse(__STARTUP, 776,
    ENDIF
 
    include(`startup/zxn_crt_776.asm.m4')
+')
+
+ifelse(__STARTUP, 777,
+`
+   ; fzx terminal using ff_ind_Termino font tty_z88dk terminal
+   ;
+   ; stdin  = zx_01_input_kbd_inkey
+   ; stdout = zx_01_output_fzx full screen
+   ; stderr = dup(stdout)
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 3
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 2
+   
+   ENDIF
+
+   include(`startup/zxn_crt_777.asm.m4')
+')
+
+ifelse(__STARTUP, 784,
+`
+   ; standard 64 column timex hi-res display
+   ;
+   ; stdin  = zx_01_input_kbd_inkey
+   ; stdout = tshr_01_output_char_64 full screen
+   ; stderr = dup(stdout)
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 3
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 2
+   
+   ENDIF
+
+   include(`startup/zxn_crt_784.asm.m4')
+')
+
+ifelse(__STARTUP, 788,
+`
+   ; standard 128 column timex hi-res display using 4x8 font
+   ;
+   ; stdin  = zx_01_input_kbd_inkey
+   ; stdout = tshr_01_output_char_128 full screen
+   ; stderr = dup(stdout)
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 3
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 2
+   
+   ENDIF
+
+   include(`startup/zxn_crt_788.asm.m4')
+')
+
+ifelse(__STARTUP, 792,
+`
+   ; fzx terminal using ff_ind_Termino font in timex hi-res mode
+   ;
+   ; stdin  = zx_01_input_kbd_inkey
+   ; stdout = tshr_01_output_fzx full screen
+   ; stderr = dup(stdout)
+
+   IFNDEF __CRTCFG
+   
+      defc __CRTCFG = 3
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 2
+   
+   ENDIF
+
+   include(`startup/zxn_crt_792.asm.m4')
 ')
 
 ifelse(__STARTUP, 798,

@@ -14,6 +14,7 @@
 
 #include <sys/compiler.h>
 #include <sys/types.h>
+#include <stdint.h>
 
 #ifdef __X1__
 #define CLOCKS_PER_SEC 1
@@ -128,6 +129,28 @@ extern int FRAMES;
 
 #ifdef __PACMAN__
 #define time(NULL) clock()
+#endif
+
+// MSDOS Time for FAT
+
+struct dos_tm
+{
+   uint16_t time;
+   uint16_t date;
+};
+
+#if 0
+// Not yet ported from newlib to classic
+// dos time affects tm.tm_sec through tm.tm_year
+
+extern void __LIB__ dostm_from_tm(struct dos_tm *,struct tm *) __smallc;
+extern void __LIB__ dostm_from_tm_callee(struct dos_tm *,struct tm *) __smallc __z88dk_callee;
+#define dostm_from_tm(a,b) dostm_from_tm_callee(a,b)
+
+
+extern void __LIB__ tm_from_dostm(struct tm *,struct dos_tm *) __smallc;
+extern void __LIB__ tm_from_dostm_callee(struct tm *,struct dos_tm *) __smallc __z88dk_callee;
+#define tm_from_dostm(a,b) tm_from_dostm_callee(a,b)
 #endif
 
 

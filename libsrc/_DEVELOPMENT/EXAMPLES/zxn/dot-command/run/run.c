@@ -12,13 +12,16 @@
 #include <libgen.h>
 #include <ctype.h>
 #include <errno.h>
+#include <arch/zxn.h>
 #include <arch/zxn/esxdos.h>
 #include <compress/zx7.h>
+#include <input.h>
 
 #include "globals.h"
 #include "load.h"
 #include "option.h"
 #include "path.h"
+#include "run.h"
 
 //////////
 // OPTIONS
@@ -102,6 +105,12 @@ extern unsigned char usage[];
 
 extern unsigned char _ENV_FNAME[];
 
+/////////////////////////
+// RESTORE ORIGINAL STATE
+/////////////////////////
+
+unsigned char old_cpu_speed;
+
 ////////////
 // FUNCTIONS
 ////////////
@@ -112,6 +121,26 @@ int error(char *s)
 
    s[strlen(s)-1] += 0x80;  
    return (int)s;
+}
+
+void user_interact(void)
+{
+   // progress cursor
+         
+   printf("%c" "\x08", cursor[cpos]);
+
+   if (++cpos >= (sizeof(cursor) - 1))
+      cpos = 0;
+         
+   // allow user to interrupt
+      
+   if (in_key_pressed(IN_KEY_SCANCODE_SPACE | 0x8000))
+   {
+      printf("<break>\n");
+
+      in_wait_nokey();
+      exit(error("L Break into Program"));
+   }
 }
 
 unsigned char *parse_options(unsigned char *cl)
@@ -217,7 +246,9 @@ void cleanup(void)
    // is safe to return to basic; if not
    // perform a soft reset
    
-   printf("\n");
+   printf(" \n");
+   
+   ZXN_NEXTREGA(REG_TURBO_MODE, old_cpu_speed);
 }
 
 extern unsigned char *fix_command_line(char *s) __z88dk_fastcall;
@@ -226,19 +257,21 @@ int main(unsigned int no, unsigned char *cl)
 {
    unsigned char *p;
 
-   // record initial state
-   
-   if (esx_f_getcwd(cwd))
-      strcpy(cwd, "/");
-
    // clean up on exit
    
    atexit(cleanup);
 
-   p = fix_command_line(cl);
+   // record initial state
+   
+   old_cpu_speed = ZXN_READ_REG(REG_TURBO_MODE);
+   ZXN_NEXTREG(REG_TURBO_MODE, RTM_14MHZ);
+   
+   if (esx_f_getcwd(cwd))
+      strcpy(cwd, "/");
 
    // parse options from an unprocessed command line
    
+   p = fix_command_line(cl);
    p = parse_options(p);
 
    // filename with weak quoting
@@ -309,9 +342,16 @@ int main(unsigned int no, unsigned char *cl)
    if (fin == 0xff)
    {
       if (opt_n == 0) opt_n = 1;
-      
+
       for (p = path_open(); p != 0; p = path_next())
       {
+         // progress cursor
+         // allow user to interrupt
+      
+         user_interact();
+         
+         // check this directory
+         
          esx_f_chdir("/");
          if ((*p == 0) || esx_f_chdir(p)) continue;
          
@@ -369,6 +409,8 @@ int main(unsigned int no, unsigned char *cl)
       fin = 0xff;
    }
 
+   ZXN_NEXTREGA(REG_TURBO_MODE, old_cpu_speed);
+   
    (program_type->load)();
    
    return error("R Loading error");

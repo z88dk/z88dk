@@ -25,40 +25,9 @@ ELSE
 
 IF __CLIB_OPT_IMATH <= 50
 
-   EXTERN l0_small_mul_32_32x32
+   EXTERN l_small_mul_32_16x16
    
-l_mulu_32_16x16:
-
-   ld c,l
-   ld b,h
-   
-   xor a
-   ld l,a
-   ld h,a
-   
-   exx
-      
-   push bc
-   push de
-   push hl
-   
-   ld l,a
-   ld h,a
-   ld c,a
-   ld b,a
-   ld e,a
-   ld d,a
-   
-   call l0_small_mul_32_32x32
-   
-   exx
-   
-   pop hl
-   pop de
-   pop bc
-   
-   exx
-   ret
+   defc l_mulu_32_16x16 = l_small_mul_32_16x16
 
 ENDIF
 

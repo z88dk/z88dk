@@ -22,3 +22,10 @@ esx_f_seek:
    
    ld a,ixl
    jp asm_esx_f_seek
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esx_f_seek
+defc _esx_f_seek = esx_f_seek
+ENDIF
+

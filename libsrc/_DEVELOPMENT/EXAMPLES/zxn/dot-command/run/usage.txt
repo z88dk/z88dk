@@ -17,4 +17,4 @@ exe options only:
 -i = print text information
 -l = list blocks in file
 
-v0.9 zx-next z88dk.org
+v1.0 zx-next z88dk.org

@@ -45,18 +45,18 @@
 #define __ZXNEXT_LAST_PAGE  223
 #define __ZXNEXT_LAST_DIVMMC  15
 
-#define __ENV_FILENAME  "/sys/env.cfg"
+#define __ENV_FILENAME  "c:/sys/env.cfg"
 
 #define __ENV_BUFSZ  128
 #define __ENV_GETENV_VALSZ  64
 
-#define __ENV_TMPDIR  "/tmp"
-#define __ENV_LTMPNAM  13
+#define __ENV_TMPDIR  "c:/tmp"
+#define __ENV_LTMPNAM  15
 #define __ENV_TMPMAX  0xffff
 #define __ENV_TMPMAX_TRY  16
 
-#define __ENV_BINDIR  "/bin"
-#define __ENV_SYSDIR  "/sys"
+#define __ENV_BINDIR  "c:/dot"
+#define __ENV_SYSDIR  "c:/sys"
 
 #undef  __SPECTRUM
 #define __SPECTRUM  16
@@ -72,7 +72,7 @@
 
 #define __USE_SYSVAR  0
 
-#define __USE_ZXN_OPCODES  0
+#define __USE_ZXN_OPCODES  0xff
 
 #define __USE_ZXN_OPCODES_NEXTREG  1
 #define __USE_ZXN_OPCODES_MLT  2
@@ -1988,9 +1988,29 @@
 
 
 
-#define __IO_SD_CONTROL  0xe7
-#define __IO_SD_STATUS  0xe7
-#define __IO_SD_DATA  0xeb
+#define __IO_DIVIDE_CONTROL  0xe3
+
+#define __IDC_CONMEM  0x80
+#define __IDC_MAPRAM  0x40
+
+#define __IO_SPI_CONTROL  0xe7
+
+#define __ISC_SPI_CS  0x80
+#define __ISC_FT_CS  0x40
+#define __ISC_RPI_CS1  0x08
+#define __ISC_RPI_CS0  0x04
+#define __ISC_SD_CS1  0x02
+#define __ISC_SD_CS0  0x01
+
+#define __IO_E7_SPI_CS  0x80
+#define __IO_E7_FT_CS  0x40
+#define __IO_E7_RPI_CS1  0x08
+#define __IO_E7_RPI_CS0  0x04
+#define __IO_E7_SD_CS1  0x02
+#define __IO_E7_SD_CS0  0x01
+
+#define __IO_SPI_STATUS  0xe7
+#define __IO_SPI_DATA  0xeb
 
 #define __IO_LED_L  0x103b
 
@@ -2016,7 +2036,12 @@
 #define __NEXTOS_DOS_WRITE  0x0115
 #define __NEXTOS_DOS_BYTE_READ  0x0118
 #define __NEXTOS_DOS_BYTE_WRITE  0x011b
+
 #define __NEXTOS_DOS_CATALOG  0x011e
+#define __nextos_cat_filter_system  0x01
+#define __nextos_cat_filter_lfn  0x02
+#define __nextos_cat_filter_dir  0x04
+
 #define __NEXTOS_DOS_FREE_SPACE  0x0121
 #define __NEXTOS_DOS_DELETE  0x0124
 #define __NEXTOS_DOS_RENAME  0x0127
@@ -2043,7 +2068,11 @@
 #define __NEXTOS_IDE_SWAP_MOVE  0x00eb
 #define __NEXTOS_IDE_SWAP_RESIZE  0x00ee
 #define __NEXTOS_IDE_PARTITION_FIND  0x00b5
+
 #define __NEXTOS_IDE_DOS_MAP  0x00f1
+#define __nextos_map_ramdisk  4
+#define __nextos_map_fsimage  0xff
+
 #define __NEXTOS_IDE_DOS_UNMAP  0x00f4
 #define __NEXTOS_IDE_DOS_MAPPING  0x00f7
 #define __NEXTOS_IDE_SNAPLOAD  0x00fd
@@ -2064,8 +2093,13 @@
 #define __nextos_browsercaps_mkdir  0x04
 #define __nextos_browsercaps_erase  0x08
 #define __nextos_browsercaps_remount  0x10
+#define __nextos_browsercaps_unmount  0x20
 #define __nextos_browsercaps_syscfg  0x80
-#define __nextos_browsercaps_all  0x1f
+#define __nextos_browsercaps_all  0x3f
+
+#define __NEXTOS_IDE_MOUNT  0x01d2
+#define __nextos_unmount  0
+#define __nextos_remount  1
 
 #define __NEXTOS_IDE_STREAM_OPEN  0x0056
 #define __NEXTOS_IDE_STREAM_CLOSE  0x0059
@@ -2080,6 +2114,7 @@
 #define __nextos_rc_bank_alloc  1
 #define __nextos_rc_bank_reserve  2
 #define __nextos_rc_bank_free  3
+#define __nextos_rc_bank_available  4
 
 #define __NEXTOS_IDE_BASIC  0x01c0
 #define __NEXTOS_IDE_WINDOW_LINEIN  0x01c3
@@ -2087,6 +2122,18 @@
 #define __NEXTOS_IDE_INTEGER_VAR  0x01c9
 #define __NEXTOS_IDE_RTC  0x01cc
 #define __NEXTOS_IDE_DRIVER  0x01cf
+
+#define __NEXTOS_IDE_MODE  0x01d5
+#define __nextos_mode_query  0
+#define __nextos_mode_set_layer_0  0x0000
+#define __nextos_mode_set_layer_1_lores  0x0100
+#define __nextos_mode_set_layer_1_ula  0x0101
+#define __nextos_mode_set_layer_1_hires  0x0102
+#define __nextos_mode_set_layer_1_hicol  0x0103
+#define __nextos_mode_set_layer_2  0x0200
+#define __nextos_mode_flag_reduced_height  0x01
+#define __nextos_mode_flag_double_width  0x10
+#define __nextos_mode_flag_double_height  0x20
 
 #define __NEXTOS_DOS_REF_XDPB  0x0151
 #define __NEXTOS_DOS_MAP_B  0x0154
@@ -2171,6 +2218,7 @@
 #define __NEXTOS_RC_CMDPHASE  67
 #define __NEXTOS_RC_DATAPHASE  68
 #define __NEXTOS_RC_NOTDIR  69
+#define __NEXTOS_RC_FRAGMENTED  74
 
 #define __ESX_RST_SYS  0x08
 #define __ESX_RST_ROM  0x18
@@ -2363,15 +2411,26 @@
 #define __RRP_ROM_SPECTRUM  0x00
 
 #define __REG_PERIPHERAL_1  5
-#define __RP1_JOY1_SINCLAIR  0x00
+#define __RP1_JOY1_SINCLAIR  0xc0
+#define __RP1_JOY1_SINCLAIR_1  0xc0
+#define __RP1_JOY1_SINCLAIR_2  0x00
 #define __RP1_JOY1_KEMPSTON  0x40
+#define __RP1_JOY1_KEMPSTON_1  0x40
+#define __RP1_JOY1_KEMPSTON_2  0x08
 #define __RP1_JOY1_CURSOR  0x80
+#define __RP1_JOY1_MD_1  0x48
+#define __RP1_JOY1_MD_2  0x88
 #define __RP1_JOY2_SINCLAIR  0x00
-#define __RP1_JOY2_KEMPSTON  0x10
+#define __RP1_JOY2_SINCLAIR_1  0x30
+#define __RP1_JOY2_SINCLAIR_2  0x00
+#define __RP1_JOY2_KEMPSTON  0x02
+#define __RP1_JOY2_KEMPSTON_1  0x10
+#define __RP1_JOY2_KEMPSTON_2  0x02
 #define __RP1_JOY2_CURSOR  0x20
+#define __RP1_JOY2_MD_1  0x12
+#define __RP1_JOY2_MD_2  0x22
 #define __RP1_RATE_50  0x00
 #define __RP1_RATE_60  0x04
-#define __RP1_ENABLE_SCANLINES  0x02
 #define __RP1_ENABLE_SCANDOUBLER  0x01
 
 #define __REG_PERIPHERAL_2  6
@@ -2391,7 +2450,6 @@
 #define __RTM_3MHZ  0x00
 #define __RTM_7MHZ  0x01
 #define __RTM_14MHZ  0x02
-#define __RTM_28MHZ  0x03
 
 #define __REG_PERIPHERAL_3  8
 #define __RP3_STEREO_ABC  0x00
@@ -2403,6 +2461,12 @@
 #define __RP3_ENABLE_TURBOSOUND  0x02
 #define __RP3_DISABLE_CONTENTION  0x40
 #define __RP3_UNLOCK_7FFD  0x80
+
+#define __REG_PERIPHERAL_4  9
+#define __RP4_SCANLINES_OFF  0x00
+#define __RP4_SCANLINES_25  0x03
+#define __RP4_SCANLINES_50  0x02
+#define __RP4_SCANLINES_75  0x01
 
 #define __REG_SUB_VERSION  14
 
@@ -2539,6 +2603,8 @@
 
 
 
+#define __ROM3_BC_SPACES  0x0030
+#define __ROM3_CLS  0x0d6b
 #define __ROM3_MAKE_ROOM  0x1655
 #define __ROM3_RECLAIM_2  0x19e8
 

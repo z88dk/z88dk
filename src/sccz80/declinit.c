@@ -73,15 +73,20 @@ int str_init(Type *tag)
     int sz = 0;
     Type   *ptr;
     int     i;
+    int     num_fields = tag->isstruct ? array_len(tag->fields) : 1;
 
-    for ( i = 0; i < array_len(tag->fields); i++ ) {
+    for ( i = 0; i < num_fields; i++ ) {
         if ( rcmatch('}')) {
             break;
         }
         if ( i != 0 ) needchar(',');
         ptr = array_get_byindex(tag->fields,i);
         sz += ptr->size;
-        if ( ptr->kind == KIND_STRUCT || ( ptr->kind == KIND_ARRAY && ptr->ptr->kind != KIND_CHAR ) ) {
+        if ( ptr->kind == KIND_STRUCT ) {
+            needchar('{');
+            str_init(ptr->tag);
+            needchar('}');
+        } else if ( ( ptr->kind == KIND_ARRAY && ptr->ptr->kind != KIND_CHAR ) ) {
             needchar('{');
             agg_init(ptr);
             needchar('}');

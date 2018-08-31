@@ -3,6 +3,7 @@
 	PUBLIC	generic_console_ioctl
 
 	EXTERN	set_character8
+	EXTERN	__vg5k_custom_font
 
 	SECTION	code_clib
 	INCLUDE	"ioctl.def"
@@ -18,6 +19,8 @@ generic_console_ioctl:
 	ld	l,c
 	cp	IOCTL_GENCON_SET_FONT32
 	jr	nz,check_set_udg
+	ld	a,1
+	ld	(__vg5k_custom_font),a
 	ld	b,96
 	ld	c,32
 set_font:

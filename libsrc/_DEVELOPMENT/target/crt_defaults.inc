@@ -25,6 +25,7 @@
    defc DEF__crt_interrupt_mode_exit   = -1      ;; if 0-2 crt inserts appropriate im x instruction on exit
 
    defc DEF__crt_enable_commandline    = 2       ;; generate argc and argv from command line (targets without command line will get argc=1, argv[0]="", argv[1]=NULL)
+   defc DEF__crt_enable_commandline_ex = 0       ;; target specific bits and bits for io redirection and piping
    defc DEF__crt_enable_restart        = 0       ;; if non-zero, restart the program on exit (correct initialization of static variables with rom models only)
    defc DEF__crt_enable_close          = 1       ;; if non-zero, close files on exit
    

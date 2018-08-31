@@ -44,6 +44,7 @@ TOKEN(	TK_NUMBER,		"", )
 TOKEN(	TK_STRING,		"", )
 TOKEN(	TK_TERN_COND,	"", )	/* cond ? true : false */
 TOKEN(	TK_ASMPC,		"ASMPC", )
+TOKEN2(	TK_ASMPC,		"$", )
 
 /*-----------------------------------------------------------------------------
 *	lexical tokens in ASCII order

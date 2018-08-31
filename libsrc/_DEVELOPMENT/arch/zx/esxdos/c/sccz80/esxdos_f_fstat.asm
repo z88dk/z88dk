@@ -19,3 +19,10 @@ esxdos_f_fstat:
    
    ld a,c
    jp asm_esxdos_f_fstat
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esxdos_f_fstat
+defc _esxdos_f_fstat = esxdos_f_fstat
+ENDIF
+

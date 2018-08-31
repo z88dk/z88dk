@@ -62,10 +62,10 @@ noneg:
         ld      a,(ix-9)                ;get base/radix
         cp      10
         jr      z,number64_start_process
-        ex      af,af
+        push    af
         ld      a,'0'
         call    __printf_print_to_buf
-        ex      af,af
+        pop     af
         cp      16
         jr      nz,number64_start_process
         ld      a,'x'

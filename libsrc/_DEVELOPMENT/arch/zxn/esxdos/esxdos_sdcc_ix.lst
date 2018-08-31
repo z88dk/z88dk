@@ -9,6 +9,13 @@ arch/zxn/esxdos/c/sdcc_ix/esx_disk_stream_sectors
 arch/zxn/esxdos/c/sdcc_ix/esx_disk_stream_sectors_callee
 arch/zxn/esxdos/c/sdcc_ix/esx_disk_stream_start
 arch/zxn/esxdos/c/sdcc_ix/esx_disk_stream_start_fastcall
+arch/zxn/esxdos/c/sdcc_ix/esx_dos_catalog
+arch/zxn/esxdos/c/sdcc_ix/esx_dos_catalog_fastcall
+arch/zxn/esxdos/c/sdcc_ix/esx_dos_catalog_next
+arch/zxn/esxdos/c/sdcc_ix/esx_dos_catalog_next_fastcall
+arch/zxn/esxdos/c/sdcc_ix/esx_dos_get_drive
+arch/zxn/esxdos/c/sdcc_ix/esx_dos_set_drive
+arch/zxn/esxdos/c/sdcc_ix/esx_dos_set_drive_fastcall
 arch/zxn/esxdos/c/sdcc_ix/esx_f_chdir
 arch/zxn/esxdos/c/sdcc_ix/esx_f_chdir_fastcall
 arch/zxn/esxdos/c/sdcc_ix/esx_f_chmod
@@ -21,8 +28,12 @@ arch/zxn/esxdos/c/sdcc_ix/esx_f_fstat
 arch/zxn/esxdos/c/sdcc_ix/esx_f_fstat_callee
 arch/zxn/esxdos/c/sdcc_ix/esx_f_ftrunc
 arch/zxn/esxdos/c/sdcc_ix/esx_f_ftrunc_callee
+arch/zxn/esxdos/c/sdcc_ix/esx_f_get_canonical_path
+arch/zxn/esxdos/c/sdcc_ix/esx_f_get_canonical_path_callee
 arch/zxn/esxdos/c/sdcc_ix/esx_f_getcwd
 arch/zxn/esxdos/c/sdcc_ix/esx_f_getcwd_fastcall
+arch/zxn/esxdos/c/sdcc_ix/esx_f_getcwd_drive
+arch/zxn/esxdos/c/sdcc_ix/esx_f_getcwd_drive_callee
 arch/zxn/esxdos/c/sdcc_ix/esx_f_getfree
 arch/zxn/esxdos/c/sdcc_ix/esx_f_getpos
 arch/zxn/esxdos/c/sdcc_ix/esx_f_getpos_fastcall
@@ -62,6 +73,12 @@ arch/zxn/esxdos/c/sdcc_ix/esx_f_unlink
 arch/zxn/esxdos/c/sdcc_ix/esx_f_unlink_fastcall
 arch/zxn/esxdos/c/sdcc_ix/esx_f_write
 arch/zxn/esxdos/c/sdcc_ix/esx_f_write_callee
+arch/zxn/esxdos/c/sdcc_ix/esx_ide_get_lfn
+arch/zxn/esxdos/c/sdcc_ix/esx_ide_get_lfn_callee
+arch/zxn/esxdos/c/sdcc_ix/esx_ide_mode_get
+arch/zxn/esxdos/c/sdcc_ix/esx_ide_mode_get_fastcall
+arch/zxn/esxdos/c/sdcc_ix/esx_ide_mode_set
+arch/zxn/esxdos/c/sdcc_ix/esx_ide_mode_set_fastcall
 arch/zxn/esxdos/c/sdcc_ix/esx_m_dosversion
 arch/zxn/esxdos/c/sdcc_ix/esx_m_drvapi
 arch/zxn/esxdos/c/sdcc_ix/esx_m_drvapi_fastcall
@@ -101,3 +118,7 @@ arch/zxn/esxdos/c/sdcc_ix/esx_slice_dirent
 arch/zxn/esxdos/c/sdcc_ix/esx_slice_dirent_fastcall
 arch/zxn/esxdos/c/sdcc_ix/extended_sna_load
 arch/zxn/esxdos/c/sdcc_ix/extended_sna_load_fastcall
+arch/zxn/esxdos/c/sdcc_ix/p3dos_cstr_to_pstr
+arch/zxn/esxdos/c/sdcc_ix/p3dos_cstr_to_pstr_fastcall
+arch/zxn/esxdos/c/sdcc_ix/p3dos_pstr_to_cstr
+arch/zxn/esxdos/c/sdcc_ix/p3dos_pstr_to_cstr_fastcall

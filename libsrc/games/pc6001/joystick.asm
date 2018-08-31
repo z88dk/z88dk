@@ -1,52 +1,44 @@
 ;
 ;	Game device library for the PC6001
-;       Stefano Bodrato - 3/12/2007
-;
-;	$Id: joystick.asm,v 1.3 2016-06-16 20:23:52 dom Exp $
 ;
 
 	SECTION code_clib
         PUBLIC    joystick
-        PUBLIC    _joystick
+	PUBLIC	_joystick
+	EXTERN	get_psg
 
 
 .joystick
 ._joystick
 	;__FASTCALL__ : joystick no. in HL
-		
-	ld	a,l
+	ld	a,14
+	dec	l
+	jr	z,got_port
+	inc	a	
+	dec	l
+	jr	z,got_port
+	ld	hl,0	
+	ret
 
-	dec	a
-	ret      nz
-
-	CALL	$1061
+got_port:
 	ld	l,a
-	xor	a
-	rl l	; fire 1 (SPACE)
-	rla
-	rr l
-	
-	rr l	; fire 2 (SHIFT)
-	rla
-
-	rr l
-
-	rr l	; up
-	rla
-	
-	rr l	; down
-	rla
-
-	rr l	; right
-
-	rr l	; left
-	rla
-
-	rl	l	; right
-	rla
-
-	ld	h,0
-	ld	l,a
-	
+	call	get_psg		;Exits with a = value
+	ld	hl,0
+	cpl
+	rra		;UP
+	rl	l
+	rra		;DOWN
+	rl	l	
+	rra		;LEFT
+	rl	l
+	rra		;RIGHT
+	rl	l
+	rra
+	jr	nc,not_fire1
+	set	4,l
+not_fire1:
+	rra
+	ret	nc
+	set	5,l
 	ret
 

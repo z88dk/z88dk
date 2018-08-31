@@ -10,11 +10,13 @@
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
 		PUBLIC		__eg2000_custom_font
+		PUBLIC		__eg2000_mode
 
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
 		EXTERN		EG2000_ENABLED
 		EXTERN		CRT_FONT
+		EXTERN		conio_map_colour
 		
 		EXTERN		base_graphics
 
@@ -24,6 +26,7 @@
 
 
 generic_console_set_ink:
+	call	conio_map_colour
 	and	15
 	ld	(__eg2000_attr),a
 	ret
@@ -63,23 +66,21 @@ generic_console_printc:
 	ld	d,a
 	ld	a,EG2000_ENABLED
 	and	a
+	ld      a,(__eg2000_mode)
 	jr	nz,eg2000_printc
 	ld	(hl),d
 	ret
 
 eg2000_printc:
-	ld	a,24		;Use rom generator for everything
 	rr	e
 	jr	c,is_raw
         ld      a,(__eg2000_custom_font)
-        and     EG2000_ENABLED
+        and     a
 	jr	z,is_raw
 	set	7,d	;custom font define, use chars 160-255 for font, 128-159=udgs
 is_raw:
+	out     (0xff),a
 	ld	(hl),d
-	ld	a,EG2000_ENABLED
-	and	a
-	ret	z	;Don't set colour in EG2000 mode
 	ld	a,h
 	add	EG2000_COLOUR_OFFSET
 	ld	h,a
@@ -96,7 +97,7 @@ is_raw:
 generic_console_vpeek:
         call    xypos
         ld      a,(__eg2000_custom_font)
-        and     EG2000_ENABLED
+        and     a
 	ld	a,(hl)
 	call	nz,has_custom_font
 	and	a
@@ -156,14 +157,19 @@ scrollup_return:
 
 	SECTION		bss_clib
 
+__eg2000_mode:  defb	0
 __eg2000_attr:	defb	0
 __eg2000_custom_font:	defb	0
 
 	SECTION		code_crt_init
 
+	EXTERN		asm_set_cursor_state
+
 	ld	a,EG2000_ENABLED
 	and	a
 	jr	z,no_set_font
+	ld      l,0x20          ;disable cursor
+        call    asm_set_cursor_state
 	ld	hl,CRT_FONT
 	ld	a,h
 	or	l

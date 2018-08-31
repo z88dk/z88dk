@@ -1,0 +1,29 @@
+
+
+
+; System Variables
+
+		defc	SYSVAR_screen = $fd91	; High byte of where screen is located
+		defc	SYSVAR_mode   = $fd92	; Screen mode -1
+
+
+; Firmware functions
+
+		defc	FIRM_XYPOS = $11cd	; l=(y+1), h=(x+1)
+						; Exit: hl = screen address
+
+		defc	FIRM_PRINTC = $26c7	; Print a to screen
+
+		defc	FIRM_CLS = $1dfb	; Clear screen
+
+
+		defc	FIRM_GETK = $0fbc	; Read keyboard (nonblock)
+						; Exit: a = ascii code
+						;      nz = key pressed
+
+
+; Values uses by library
+
+		defc	MODE_0 = 0
+		defc	MODE_1 = $9c
+		defc	MODE_2 = $8c

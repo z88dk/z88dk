@@ -18,3 +18,10 @@ esx_f_open:
    
    ld a,e
    jp asm_esx_f_open
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _esx_f_open
+defc _esx_f_open = esx_f_open
+ENDIF
+

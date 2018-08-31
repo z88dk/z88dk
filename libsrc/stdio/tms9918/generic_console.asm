@@ -63,6 +63,7 @@ __tms9918_set_ink:
 	rla
 	rla
 	rla
+	and	@11110000
 	ld	b,0x0f
 set_attr:
 	ld	c,a
@@ -75,6 +76,7 @@ set_attr:
 
 __tms9918_set_paper:
 	call	conio_map_colour
+	and	15
 	ld	b,0xf0
 	jr	set_attr
 	

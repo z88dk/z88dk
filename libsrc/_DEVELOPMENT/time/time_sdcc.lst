@@ -1,4 +1,6 @@
 @time/time_asm.lst
+time/c/sdcc/compare_dostm
+time/c/sdcc/compare_dostm_callee
 time/c/sdcc/dostm_from_tm
 time/c/sdcc/dostm_from_tm_callee
 time/c/sdcc/tm_from_dostm
