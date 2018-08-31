@@ -28,8 +28,12 @@ arch/zxn/esxdos/c/sdcc_iy/esx_f_fstat
 arch/zxn/esxdos/c/sdcc_iy/esx_f_fstat_callee
 arch/zxn/esxdos/c/sdcc_iy/esx_f_ftrunc
 arch/zxn/esxdos/c/sdcc_iy/esx_f_ftrunc_callee
+arch/zxn/esxdos/c/sdcc_iy/esx_f_get_canonical_path
+arch/zxn/esxdos/c/sdcc_iy/esx_f_get_canonical_path_callee
 arch/zxn/esxdos/c/sdcc_iy/esx_f_getcwd
 arch/zxn/esxdos/c/sdcc_iy/esx_f_getcwd_fastcall
+arch/zxn/esxdos/c/sdcc_iy/esx_f_getcwd_drive
+arch/zxn/esxdos/c/sdcc_iy/esx_f_getcwd_drive_callee
 arch/zxn/esxdos/c/sdcc_iy/esx_f_getfree
 arch/zxn/esxdos/c/sdcc_iy/esx_f_getpos
 arch/zxn/esxdos/c/sdcc_iy/esx_f_getpos_fastcall

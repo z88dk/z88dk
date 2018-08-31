@@ -15,7 +15,9 @@ arch/zxn/esxdos/z80/asm_esx_f_closedir
 arch/zxn/esxdos/z80/asm_esx_f_fgetpos
 arch/zxn/esxdos/z80/asm_esx_f_fstat
 arch/zxn/esxdos/z80/asm_esx_f_ftrunc
+arch/zxn/esxdos/z80/asm_esx_f_get_canonical_path
 arch/zxn/esxdos/z80/asm_esx_f_getcwd
+arch/zxn/esxdos/z80/asm_esx_f_getcwd_drive
 arch/zxn/esxdos/z80/asm_esx_f_getfree
 arch/zxn/esxdos/z80/asm_esx_f_mkdir
 arch/zxn/esxdos/z80/asm_esx_f_open
