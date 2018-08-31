@@ -55,17 +55,18 @@ am9511a_isr_entry:
     cp __IO_APU_OP_ENT      ; check whether it is OPERAND entry COMMAND
     jr Z,am9511a_isr_op_ent ; load an OPERAND
 
-    xor a                   ; set internal clock = crystal x 1 = 18.432MHz
-                            ; that makes the PHI 9.216MHz
+    xor a                   ; set PHI = crystal x 1/2 = 9.216MHz
     out0 (CMR),a            ; CPU Clock Multiplier Reg (CMR)
+    out0 (CCR),a            ; CPU Control Reg (CCR)
                             ; Am9511A-1 needs TWCS 30ns. This provides 41.7ns.
 
     ld a,(APUStatus)        ; recover the COMMAND from status byte
     ld bc,__IO_APU_CONTROL  ; the address of the APU control port in BC
     out (c),a               ; load the COMMAND, and do it
 
-    ld a,CMR_X2             ; set internal clock = crystal x 2 = 36.864MHz
+    ld a,CMR_X2             ; set PHI = crystal x 2 = 36.864MHz
     out0 (CMR),a            ; CPU Clock Multiplier Reg (CMR)
+    out0 (CCR),a            ; CPU Control Reg (CCR) CCR_XTAL_X2 = CMR_X2
 
     ld hl,APUStatus         ; set APUStatus to busy
     ld (hl),__IO_APU_STATUS_BUSY
@@ -106,9 +107,9 @@ am9511a_isr_op_ent:
     in0 e,(BBR)             ; keep current BBR in E
     out0 (BBR),b            ; make the bank swap to B
 
-    xor a                   ; set internal clock = crystal x 1 = 18.432MHz
-                            ; that makes the PHI 9.216MHz
+    xor a                   ; set PHI = crystal x 1/2 = 9.216MHz
     out0 (CMR),a            ; CPU Clock Multiplier Reg (CMR)
+    out0 (CCR),a            ; CPU Control Reg (CCR)
                             ; Am9511A-1 needs TWCS 30ns. This provides 41.7ns.
 
     ld bc,__IO_APU_DATA+$0300 ; the address of the APU data port in BC
@@ -131,8 +132,9 @@ am9511a_isr_op_ent:
     outi
 
 am9511a_isr_op_ent16:
-    ld a,CMR_X2             ; set internal clock = crystal x 2 = 36.864MHz
+    ld a,CMR_X2             ; set PHI = crystal x 2 = 36.864MHz
     out0 (CMR),a            ; CPU Clock Multiplier Reg (CMR)
+    out0 (CCR),a            ; CPU Control Reg (CCR) CCR_XTAL_X2 = CMR_X2
 
     out0 (BBR),e            ; make the bank swap back
     jp am9511a_isr_entry    ; go back to get another COMMAND
