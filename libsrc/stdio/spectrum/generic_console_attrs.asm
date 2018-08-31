@@ -5,11 +5,13 @@
 		PUBLIC	generic_console_set_ink
 		PUBLIC	generic_console_set_paper
 		PUBLIC	generic_console_set_inverse
+		EXTERN	conio_map_colour
 
 		EXTERN	__zx_console_attr
 
 
 generic_console_set_paper:
+	call	conio_map_colour
 	rlca
 	rlca
 	rlca
@@ -24,6 +26,7 @@ generic_console_set_inverse:
 	ret
 
 generic_console_set_ink:
+	call	conio_map_colour
 	and	7
 	ld	c,a
         ld      hl,__zx_console_attr
