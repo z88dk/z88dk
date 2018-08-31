@@ -14,23 +14,23 @@
 	PUBLIC	ansi_attr
 
 	;EXTERN	INVRS
-	EXTERN	ATTR
+	EXTERN	__x1_attr
 
 .ansi_attr
         and     a
         jr      nz,noreset
         ;ld      a,15		;White on black
         ld      a,7		;White on black
-        ld      (ATTR+1),a
+        ld      (__x1_attr),a
 ;	xor	a
 ;	ld	(INVRS+1),a
         ret
 .noreset
         cp      1
         jr      nz,nobold
-        ld		a,(ATTR+1)
+        ld		a,(__x1_attr)
         set		3,a
-        ld      (ATTR+1),a
+        ld      (__x1_attr),a
 ;	ld	a,128
 ;	ld	(INVRS+1),a
         ret
@@ -40,56 +40,56 @@
         cp      8
         jr      nz,nodim
 .dim
-        ld		a,(ATTR+1)
+        ld		a,(__x1_attr)
         res		3,a
-        ld      (ATTR+1),a
+        ld      (__x1_attr),a
         ret
 .nodim
         cp      4
         jr      nz,nounderline
-        ld		a,(ATTR+1)
+        ld		a,(__x1_attr)
         set		4,a
-        ld      (ATTR+1),a
+        ld      (__x1_attr),a
         ret
 .nounderline
         cp      24
         jr      nz,noCunderline
-        ld		a,(ATTR+1)
+        ld		a,(__x1_attr)
         res		4,a
-        ld      (ATTR+1),a
+        ld      (__x1_attr),a
         ret
 .noCunderline
         cp      5
         jr      nz,noblink
-        ld		a,(ATTR+1)
+        ld		a,(__x1_attr)
         set		4,a
-        ld      (ATTR+1),a
+        ld      (__x1_attr),a
         ret
 .noblink
         cp      25
         jr      nz,nocblink
-        ld		a,(ATTR+1)
+        ld		a,(__x1_attr)
         res		4,a
-        ld      (ATTR+1),a
+        ld      (__x1_attr),a
         ret
 .nocblink
         cp      7
         jr      nz,noreverse
-        ld		a,(ATTR+1)
+        ld		a,(__x1_attr)
         set		3,a
-        ld      (ATTR+1),a
+        ld      (__x1_attr),a
         ret
 .noreverse
         cp      27
         jr      nz,noCreverse
-        ld		a,(ATTR+1)
+        ld		a,(__x1_attr)
         res		3,a
-        ld      (ATTR+1),a
+        ld      (__x1_attr),a
         ret
 .noCreverse
         cp      8
         jr      nz,noinvis
-        ld      a,(ATTR+1)
+        ld      a,(__x1_attr)
         ld      (oldattr),a
         and     @11110000
         ld      e,a
@@ -98,7 +98,7 @@
         rra
         rra
         or      e
-        ld      (ATTR+1),a
+        ld      (__x1_attr),a
         ret
 .oldattr
         defb     0
@@ -106,7 +106,7 @@
         cp      28
         jr      nz,nocinvis
         ld      a,(oldattr)
-        ld      (ATTR+1),a
+        ld      (__x1_attr),a
         ret
 .nocinvis
         cp      30
@@ -116,7 +116,7 @@
         sub     30
         call	palette
 ;''''''''''''''''''''''
-        ld      (ATTR+1),a
+        ld      (__x1_attr),a
         ret
 .nofore
         cp      40
@@ -129,7 +129,7 @@
 ;''''''''''''''''''''''
 ;	ld	(53280),a	;border
 ;	ld	(53281),a	;background
-        ld      (ATTR+1),a
+        ld      (__x1_attr),a
 	;ld	a,128
 	;ld	(INVRS+1),a
 .noback

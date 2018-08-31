@@ -18,7 +18,7 @@ all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	aussie.lib bee_clib.lib microbee.lib c7420_clib.lib \
 	cpm_clib.lib einstein.lib fp1100_clib.lib gal_clib.lib \
 	g800_clib.lib m5_clib.lib mc1000_clib.lib \
-	msx_clib.lib mtx_clib.lib mz_clib.lib mz2500_clib.lib x1ansi_clib.lib \
+	msx_clib.lib mtx_clib.lib mz_clib.lib mz2500_clib.lib x1_clib.lib \
 	nascom_clib.lib  newbrain_clib.lib \
 	osca_clib.lib ozansi_clib.lib pacman_clib.lib p2000_clib.lib  \
 	pc6001_clib.lib pps_clib.lib px4.lib px8.lib \
@@ -1185,13 +1185,13 @@ x07_clib.lib:
 	TARGET=x07 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/x07_clib @$(LISTFILE_DIRECTORY)/x07.lst
 
 # Sharp X1 (ANSI VT) - Karl Von Dyson (X1s.org)
-x1ansi_clib.lib:
+x1_clib.lib:
 	@echo ''
-	@echo '--- Building Sharp X1 ANSI Library ---'
+	@echo '--- Building Sharp X1 Library ---'
 	@echo ''
 	$(call buildgeneric,x1)
 	$(MAKE) -C x1 
-	TARGET=x1 TYPE=z80 $(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1ansi_clib @$(LISTFILE_DIRECTORY)/x1ansi.lst
+	TARGET=x1 TYPE=z80 $(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1_clib @$(LISTFILE_DIRECTORY)/x1.lst
 
 # Philips VG5000 lib - Joaopa, Stefano
 vg5k_clib.lib:
