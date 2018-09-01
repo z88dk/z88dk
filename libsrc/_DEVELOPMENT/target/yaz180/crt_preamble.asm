@@ -26,8 +26,8 @@ SECTION code_crt_init
     out0    (CCR),a         ; CPU Control Reg (CCR)
 
                             ; DMA/Wait Control Reg Set I/O Wait States
-    ld      a,DCNTL_MWI0|DCNTL_IWI0
-    out0    (DCNTL),a       ; 1 Memory Wait & 2 I/O Wait
+    ld      a,DCNTL_MWI0|DCNTL_IWI1
+    out0    (DCNTL),a       ; 1 Memory Wait & 3 I/O Wait
 
                             ; Set Logical RAM Addresses
                             ; $F000-$FFFF RAM   CA1  -> $F.
