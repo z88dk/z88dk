@@ -170,7 +170,9 @@
     <ClCompile Include="..\..\src\appmake\c7420.c" />
     <ClCompile Include="..\..\src\appmake\cpc.c" />
     <ClCompile Include="..\..\src\appmake\cpm.c" />
+    <ClCompile Include="..\..\src\appmake\cpmdisk.c" />
     <ClCompile Include="..\..\src\appmake\d88.c" />
+    <ClCompile Include="..\..\src\appmake\einstein.c" />
     <ClCompile Include="..\..\src\appmake\enterprise.c" />
     <ClCompile Include="..\..\src\appmake\extract.c" />
     <ClCompile Include="..\..\src\appmake\fp1100.c" />
@@ -186,6 +188,7 @@
     <ClCompile Include="..\..\src\appmake\mtx.c" />
     <ClCompile Include="..\..\src\appmake\multi8.c" />
     <ClCompile Include="..\..\src\appmake\mz.c" />
+    <ClCompile Include="..\..\src\appmake\mz2500.c" />
     <ClCompile Include="..\..\src\appmake\nascom.c" />
     <ClCompile Include="..\..\src\appmake\nec.c" />
     <ClCompile Include="..\..\src\appmake\newbrain.c" />
@@ -219,6 +222,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\appmake\appmake.h" />
+    <ClInclude Include="..\..\src\appmake\cpmdisk.h" />
     <ClInclude Include="..\..\src\appmake\d88.h" />
     <ClInclude Include="..\..\src\appmake\zx-util.h" />
   </ItemGroup>
