@@ -1039,35 +1039,6 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
     main_org &= 0x1e000;
     main_end &= 0xe000;
 
-    // determine main bank overlay mask
-
-    if (main_org < 0x10000)
-    {
-        overlay_alloc_mask = (0xff << (main_org / 0x2000)) & 0xff;
-        overlay_load_mask = (0xff >> (7 - main_end / 0x2000)) & overlay_alloc_mask;
-    }
-    else
-    {
-        overlay_alloc_mask = 0;
-        overlay_load_mask = 0;
-    }
-
-    overlay_alloc_mask |= dotn_main_overlay_mask;
-    overlay_alloc_mask &= ~dotn_main_absolute_mask;
-
-    if (appmake_handle >= 0)
-    {
-        printf("Notice: Main bank allocation mask is 0x%02x\n", overlay_alloc_mask);
-        printf("Notice: Main bank load mask is 0x%02x\n", overlay_load_mask);
-    }
-    else
-    {
-        printf("Notice: Main bank occupied mask is 0x%02x\n", overlay_load_mask);
-    }
-
-    // overlay_load_mask: bits indicate which main bank pages should be loaded
-    // overlay_alloc_mask: bits indicate which main bank pages should be allocated
-
     // collect allocation table parameters
 
     if ((dotn_last_div = parameter_search(zxc->crtfile, ".map", "__DOTN_LAST_DIVMMC")) > ZXN_MAX_DIV)
@@ -1136,6 +1107,35 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
                     exit_log(1, "Error: User z_div_table[%d] has illegal value %d\n", i, z_div_table[i]);
         }
     }
+
+    // determine main bank overlay mask
+
+    if (main_org < 0x10000)
+    {
+        overlay_alloc_mask = (0xff << (main_org / 0x2000)) & 0xff;
+        overlay_load_mask = (0xff >> (7 - main_end / 0x2000)) & overlay_alloc_mask;
+    }
+    else
+    {
+        overlay_alloc_mask = 0;
+        overlay_load_mask = 0;
+    }
+
+    overlay_alloc_mask |= dotn_main_overlay_mask;
+    overlay_alloc_mask &= ~dotn_main_absolute_mask;
+
+    if (appmake_handle >= 0)
+    {
+        printf("Notice: Main bank allocation mask is 0x%02x\n", overlay_alloc_mask);
+        printf("Notice: Main bank load mask is 0x%02x\n", overlay_load_mask);
+    }
+    else
+    {
+        printf("Notice: Main bank occupied mask is 0x%02x\n", overlay_load_mask);
+    }
+
+    // overlay_load_mask: bits indicate which main bank pages should be loaded
+    // overlay_alloc_mask: bits indicate which main bank pages should be allocated
 
     // create output file
 
@@ -1886,20 +1886,6 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
             fwrite(scr, sizeof(scr), 1, fout);
         }
     }
-
-    // NOT NEEDED FOR NEX FORMAT BECAUSE NEX DOES NOT COOPERATE WITH NEXTZXOS
-    //
-    // mark all pages occupied above the lowest page
-    // temporary to accommodate z88dk normally placing stack and heap at top of memory
-    //
-    // for (i = 0; i < 8; ++i)
-    // {
-    //     if (mainbank_occupied & (1 << i))
-    //     {
-    //         mainbank_occupied = 0xff - (1 << i) + 1;
-    //         break;
-    //     }
-    // }
 
     // write main memory bank: 16k banks 5,2,0
 
