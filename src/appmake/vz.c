@@ -145,8 +145,8 @@ static int create_file(const char* target, int vz700)
         /* Get rid of VZ magic (4 bytes) and filename (17 chars) */
         fseek(fpin, 21L, SEEK_SET);
     } else {
-		fseek(fpin, 0L, SEEK_SET);
-	}
+        fseek(fpin, 0L, SEEK_SET);
+    }
 
     if ((fpout = fopen(filename, "wb")) == NULL) {
         fclose(fpin);
@@ -181,7 +181,7 @@ static int create_file(const char* target, int vz700)
             fputc(0x00, fpout);
             fputc(0x80, fpout);
         }
-        fputc(0x80, fpout);
+        fputc(0xff, fpout);
         startaddr = 0x89a3 - 14;
     } else {
         startaddr = fgetc(fpin) + 256 * fgetc(fpin);
