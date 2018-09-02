@@ -1,5 +1,3 @@
-// zcc +zxn -v -startup=30 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 --opt-code-size @zproject.lst -o mvtmp -pragma-include:zpragma.inc -subtype=dotn -Cz"--clean" -create-app --list -m --c-code-in-asm
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,12 +7,15 @@
 #include <alloc/obstack.h>
 #include <arch/zxn.h>
 #include <arch/zxn/esxdos.h>
-#include <input.h>
+#include <compress/zx7.h>
+#include <errno.h>
 
 #include "errors.h"
 #include "move.h"
 #include "mv.h"
+#include "mv-help.h"
 #include "options.h"
+#include "user_interaction.h"
 
 // SELECTED OPTIONS
 
@@ -72,13 +73,19 @@ static int compare_option_search(unsigned char *name, struct opt *a)
 
 // FILES
 
+// command line names
+
 struct file *src;
 unsigned char src_sz;
 
-struct file dst;               // type is unknown
+struct file dst;               // type is initially unknown
 
-unsigned char dst_resolved;    // non-zero if dst info gathered
-struct dos_tm dst_time;
+// detailed information
+
+struct file_info source;
+struct file_info destination;
+
+// dos_catalog structures
 
 extern struct esx_cat catalog;
 extern struct esx_lfn lfn;
@@ -88,7 +95,7 @@ unsigned char *name_in_main_memory;
 // MEMORY MANAGEMENT
 
 struct obstack *ob;
-unsigned char blob[1024];      // make as large as program allows
+unsigned char blob[2048];      // make as large as program allows (this size is excessive)
 
 // UTILITIES
 
@@ -97,39 +104,38 @@ unsigned char *advance_past_drive(unsigned char *p)
    return (isalpha(p[0]) && (p[1] == ':')) ? (p + 2) : p;
 }
 
-// USER INTERACTION
+static unsigned char current_drive;
 
-unsigned char user_interaction(void)
+unsigned char get_drive(unsigned char *p)
 {
-   if (in_key_pressed(IN_KEY_SCANCODE_SPACE | 0x8000))
-   {
-      printf("<break>\n");
-
-      in_wait_nokey();
-      return 1;
-   }
-   
-   return 0;
-}
-
-static unsigned char cpos;
-static unsigned char cursor[] = "-\\|/";
-
-unsigned char user_interaction_spin(void)
-{
-   printf("%c" "\x08", cursor[cpos]);
-   if (++cpos >= (sizeof(cursor) - 1)) cpos = 0;
-   
-   return user_interaction();
+   return (isalpha(p[0]) && (p[1] == ':')) ? p[0] : current_drive;
 }
 
 // MAIN
 
 static unsigned char old_cpu_speed;
 
+extern unsigned char fin;
+extern unsigned char fout;
+
+void close_open_files(void)
+{
+   if (fin != 0xff) esx_f_close(fin);
+   if (fout != 0xff) esx_f_close(fout);
+   
+   fin = fout = 0xff;
+}
+
+unsigned char *cleanup_remove_name;
+
 static void cleanup(void)
 {
-   printf(" \n");   // erase any cursor left behind
+   close_open_files();
+   
+   if (cleanup_remove_name)
+      esx_f_unlink(cleanup_remove_name);
+   
+   puts(" ");   // erase any cursor left behind
    ZXN_NEXTREGA(REG_TURBO_MODE, old_cpu_speed);
 }
 
@@ -238,9 +244,11 @@ int main(int argc, char **argv)
 
          if (*tmp.name)
          {
+            strlwr(tmp.name);
+
             if (obstack_grow(ob, &tmp, sizeof(tmp)) == 0)
                exit((int)err_out_of_memory);
-            
+
             ++src_sz;
          }
       }
@@ -253,12 +261,16 @@ int main(int argc, char **argv)
    
    if (flags.help)
    {
-      printf("HELP!\n");
+      // this is a dotn dot command so memory is not a problem
+      // but use this as an example of how to decompress help text
+      
+      *dzx7_standard(mv_help, blob) = 0;
+      puts(blob);
    }
    
    if (flags.help || flags.version)
    {
-      printf("VERSION!\n");
+      puts(mv_version);
       exit(0);
    }
    
@@ -281,14 +293,18 @@ int main(int argc, char **argv)
       
       dst.type = FILE_TYPE_DIRECTORY;
    }
+   
+   // find current drive
+   
+   if ((current_drive = tolower(esx_dos_get_drive())) == 0xff)
+      exit(errno);
 
    // if the destination name contains wildcards it must match something
 
    if ((name_in_main_memory = obstack_copy(ob, dst.name, strlen(dst.name) + 1)) == 0)
       exit((int)err_out_of_memory);
 
-   catalog.filter = (flags.system) ? (ESX_CAT_FILTER_SYSTEM | ESX_CAT_FILTER_LFN) : (ESX_CAT_FILTER_LFN);
-   if (dst.type != FILE_TYPE_NORMAL) catalog.filter |= ESX_CAT_FILTER_DIR;
+   catalog.filter = ESX_CAT_FILTER_SYSTEM | ESX_CAT_FILTER_LFN | ESX_CAT_FILTER_DIR;
    catalog.filename = p3dos_cstr_to_pstr(name_in_main_memory);
    catalog.cat_sz = 2;   // consistent with mv.asm
 
@@ -300,8 +316,7 @@ int main(int argc, char **argv)
       {
          // opportunity for user to break
 
-         if (user_interaction_spin())
-            exit((int)err_break_into_program);
+         user_interaction_spin();
          
          // keep looking until correct destination type found
 
@@ -312,18 +327,22 @@ int main(int argc, char **argv)
       }
       while ((dst.type != type) && (esx_dos_catalog_next(&catalog) == 1));
       
-      if (dst.type != type) exit(2);
+      if (dst.type != type)
+         exit((int)err_destination_wrong_type);
 
       lfn.cat = &catalog;
       esx_ide_get_lfn(&lfn, &catalog.cat[1]);
 
       obstack_free(ob, name_in_main_memory);
 
-      if ((dst.name = obstack_copy(ob, &lfn.filename, strlen(lfn.filename) + 1)) == 0)
+      if ((name_in_main_memory = obstack_alloc(ob, basename(dst.name) - dst.name + strlen(lfn.filename) + 1)) == 0)
          exit((int)err_out_of_memory);
       
-      memcpy(&dst_time, &lfn.time, sizeof(dst_time));
-      dst_resolved = 1;
+      sprintf(name_in_main_memory, "%.*s%s", basename(dst.name) - dst.name, dst.name, lfn.filename);
+      dst.name = name_in_main_memory;
+      
+      memcpy(&destination.time, &lfn.time, sizeof(destination.time));
+      destination.exists = 1;
    }
    else
    {
@@ -335,8 +354,28 @@ int main(int argc, char **argv)
 
    if (dst.type == FILE_TYPE_UNKNOWN)
       dst.type = FILE_TYPE_NORMAL;
-   
-   // dst.name is in main memory
+
+   strlwr(dst.name);
+
+   destination.name = dst.name;
+   destination.type = dst.type;
+
+   if (esx_f_get_canonical_path(dst.name, lfn.filename))
+      exit(ESX_EPATH);
+
+   if ((destination.canonical_name = obstack_alloc(ob, strlen(lfn.filename) + strlen(basename(dst.name)) + 1)) == 0)
+      exit((int)err_out_of_memory);
+
+   sprintf(destination.canonical_name, "%s%s", lfn.filename, basename(dst.name));
+   strlwr(destination.canonical_name);
+
+   // destination names are in main memory
+
+   if (flags.verbose)
+   {
+      printf(" \nSRC files = %u\n", src_sz);
+      printf("DST is a %s\n%s\n", (destination.type == FILE_TYPE_NORMAL) ? "file" : "directory", destination.canonical_name);
+   }
 
    // let the good times roll
 
@@ -344,19 +383,22 @@ int main(int argc, char **argv)
    {
       // opportunity for user to break
 
-      if (user_interaction_spin())
-         exit((int)err_break_into_program);
+      user_interaction_spin();
 
       // init catalog structure for match on source file
 
       if ((name_in_main_memory = obstack_copy(ob, src[i].name, strlen(src[i].name) + 1)) == 0)
          exit((int)err_out_of_memory);
 
+      if (flags.verbose)
+         printf(" \nMatching \"%s\"\n", name_in_main_memory);
+
       catalog.filter = (flags.system) ? (ESX_CAT_FILTER_SYSTEM | ESX_CAT_FILTER_LFN) : (ESX_CAT_FILTER_LFN);
       if (src[i].type != FILE_TYPE_NORMAL) catalog.filter |= ESX_CAT_FILTER_DIR;
+
       catalog.filename = p3dos_cstr_to_pstr(name_in_main_memory);
       catalog.cat_sz = 2;   // consistent with mv.asm
-
+      
       // iterate over all source file matches
       // doing one at a time avoids complications with wildcards and new files being created
 
@@ -366,26 +408,53 @@ int main(int argc, char **argv)
          {
             // opportunity for user to break
 
-            if (user_interaction_spin())
-               exit((int)err_break_into_program);
+            user_interaction_spin();
             
             // lfn details for this file
             
             lfn.cat = &catalog;
             esx_ide_get_lfn(&lfn, &catalog.cat[1]);
             
-            // action is based on source and destination types
+            // fill in source file details
             
-            switch (move_classify(catalog.cat[1].filename[7], dst.type))
+            memset(&source, 0, sizeof(source));
+      
+            if ((source.name = obstack_alloc(ob, basename(name_in_main_memory) - name_in_main_memory + strlen(lfn.filename) + 1)) == 0)
+               exit((int)err_out_of_memory);
+            
+            sprintf(source.name, "%.*s%s", basename(name_in_main_memory) - name_in_main_memory, name_in_main_memory, lfn.filename);
+            strlwr(source.name);
+
+            source.type = (catalog.cat[1].filename[7] & 0x80) ? FILE_TYPE_DIRECTORY : FILE_TYPE_NORMAL;
+            
+            memcpy(&source.time, &lfn.time, sizeof(source.time));
+            source.exists = 1;
+            
+            // action is based on source and destination types
+            // source, destination, src, dst all have their own memory so further allocation is safe
+
+            switch (move_classify(source.type, destination.type))
             {
                case MOVE_TYPE_FILE_TO_FILE:
-                  move_file_to_file();
-                  // do we finish here?  do we allow the destination to be written many times?
+               
+                  if (flags.verbose)
+                     printf("Moving file \"%s\" to file \"%s\"\n", source.name, destination.name);
+
+                  move_file_to_file((void*)&source, (void*)&destination);
+                  
                   exit(0);
                   break;
                   
                case MOVE_TYPE_FILE_TO_DIR:
-                  move_file_to_dir();
+               
+                  if (flags.verbose)
+                     printf("Moving file \"%s\" to dir \"%s\"\n", source.name, destination.name);
+                  
+                  if (destination.exists == 0)
+                     printf("Can't move to non-existent dir\n");
+                  else
+                     move_file_to_dir((void*)&source, (void*)&destination);
+                  
                   break;
                   
                case MOVE_TYPE_DIR_TO_FILE:
@@ -393,13 +462,19 @@ int main(int argc, char **argv)
                   break;
                   
                case MOVE_TYPE_DIR_TO_DIR:
-                  move_dir_to_dir();
+               
+                  if (flags.verbose)
+                     printf("Moving dir \"%s\" to dir \"%s\"\n", source.name, destination.name);
+                  
+                  move_dir_to_dir((void*)&source, (void*)&destination);
                   break;
                   
                default:
-                  printf("debug: classify error\n");
+                  // printf("debug: classify error\n");
                   break;
             }
+
+            obstack_free(ob, source.name);   // also frees memory allocated after this
          }
          while (esx_dos_catalog_next(&catalog) == 1);
       }

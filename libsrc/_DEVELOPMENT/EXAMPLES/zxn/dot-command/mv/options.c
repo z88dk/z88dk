@@ -58,14 +58,14 @@ unsigned int option_exec_S_helper(unsigned char *p)
    {
       if (*p == '.') ++p;
    
-      if ((strlen(p) < 4) && (strchr(p, '.') == 0))
+      if (*p && (strlen(p) < 4) && (strpbrk(p, "./\\*?") == 0))
       {
          flags.suffix = p;
          return OPT_ACTION_OK;
       }
    }
    
-   return (unsigned int)err_invalid_argument;
+   return (unsigned int)err_invalid_parameter;
 }
 
 unsigned int option_exec_S(unsigned char *idx, int argc, char **argv)
@@ -101,7 +101,7 @@ unsigned int option_exec_t_helper(unsigned char *p)
       }
    }
    
-   return (unsigned int)err_invalid_argument;
+   return (unsigned int)err_invalid_parameter;
 }
 
 unsigned int option_exec_t(unsigned char *idx, int argc, char **argv)

@@ -1,0 +1,1 @@
+zcc +zxn -v -startup=30 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 --opt-code-size @zproject.lst -o mvtmp -pragma-include:zpragma.inc -subtype=dotn -Cz"--clean" -create-app --list -m --c-code-in-asm
