@@ -1,5 +1,9 @@
 stdio/lynx/fgetc_cons
 stdio/lynx/fputc_cons
 stdio/lynx/getk
+stdio/lynx/generic_console
+stdio/lynx/conio_map_colour
+stdio/lynx/CRT_FONT
+@font/font_8x8/font_8x8.lst
 @stdio/stdio.lst
 @z80.lst

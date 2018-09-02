@@ -1,0 +1,26 @@
+
+; System variables, obtained from: http://www.russelldavis.org/CamputersLynx/files/Newsletters/Lynx%20User/Lynx%20User1.pdf
+
+	defc	SYSVAR_cursorx = $6254
+	defc	SYSVAR_cursory = $6255
+	defc	SYSVAR_inkst = $625b
+	defc	SYSVAR_paperst = $625c
+
+	defc	SYSVAR_blue   = $628e		;Address for blue video page
+	defc	SYSVAR_red    = $6290		;Address for red video page
+	defc	SYSVAR_green  = $6292		;Address for green video page
+
+	defc	SYSVAR_nmiram   = $6294		;Jump on NMI
+	defc	SYSVAR_rstram	= $6296		;Jump on rst $38
+
+	; ROM routines
+	defc	PRCHR		= $0008		;A = character to print
+
+	; Font is 10 characters high, only 7 lines actually filled. 
+	; right aligned, so left shift two pixels and possibly usable as 32 column font
+	defc	FONTADR		= $00ce		;A = character. Exit: hl = char, de = scratch. 
+	defc	GETKEY		= $09bd		;Get key pressed into A
+	defc	INBLUE		= $0069		;Read from red/blue bank
+	defc	INGREEN		= $0070		;Read from red/blue bank
+	defc	CLS		= $08e5		;Clear screen
+	defc	OUTB		= $626c		;($085e) outputs a masked with c to hl offset, uses inkst, paperst
