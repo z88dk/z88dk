@@ -65,7 +65,6 @@ pointer:
 	jr	nz,outloop
 ;------------------------------
 ;	ldir
-	inc	de
 	xor	a
 	ld	(de),a
 	
