@@ -30,19 +30,13 @@
 	defc	CRT_KEY_DEL = 12
 	defc	__CPU_CLOCK = 3694700
 
-IF startup == 2
+IF startup = 2
 	INCLUDE	"target/vz700/classic/rom.asm"
 ELSE
-	INCLUDE	"target/vz700/classic/rom.asm"
+	INCLUDE	"target/vz700/classic/ram.asm"
 ENDIF
 
 
 	INCLUDE "crt/classic/crt_runtime_selection.asm" 
 	
-	defc	__crt_org_bss = CRT_ORG_BSS
-        IF DEFINED_CRT_MODEL
-            defc __crt_model = CRT_MODEL
-        ELSE
-            defc __crt_model = 1
-        ENDIF
 	INCLUDE	"crt/classic/crt_section.asm"
