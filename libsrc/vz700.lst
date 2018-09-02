@@ -1,3 +1,4 @@
 stdio/vz700/generic_console
+stdio/vz700/fputc_cons
 @stdio/stdio.lst
 @z80.lst
