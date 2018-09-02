@@ -177,8 +177,8 @@ static int create_file(const char* target, int vz700)
 
     if (vz700) {
         // Header2
+        fputc(0x00, fpout);
         for (i = 0; i < 10; i++) {
-            fputc(0x00, fpout);
             fputc(0x80, fpout);
         }
         fputc(0xff, fpout);
