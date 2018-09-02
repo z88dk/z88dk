@@ -6,7 +6,6 @@
 	defc	CRT_ORG_BSS = 0xc000
 	defc	CRT_ORG_CODE = 0x0000
 
-        defc    TAR__fputc_cons_generic = 1
         defc    TAR__clib_exit_stack_size = 0
         defc    TAR__register_sp = 0xbfff
 

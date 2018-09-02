@@ -5,6 +5,7 @@
 ;
 
 	  SECTION code_clib
+	  MODULE  fputc_cons_native
           PUBLIC  fputc_cons_native
 
 
