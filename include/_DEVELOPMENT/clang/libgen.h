@@ -8,6 +8,9 @@
 extern char *basename(char *path);
 
 
+extern char *basename_ext(char *path);
+
+
 extern char *dirname(char *path);
 
 
