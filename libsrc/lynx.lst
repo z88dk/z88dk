@@ -7,5 +7,6 @@ stdio/lynx/generic_console_vpeek
 stdio/lynx/conio_map_colour
 stdio/lynx/CRT_FONT
 @font/font_8x8/font_8x8.lst
+@input/input_keyboard.lst
 @stdio/stdio.lst
 @z80.lst
