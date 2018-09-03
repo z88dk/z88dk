@@ -36,7 +36,25 @@ generic_console_set_paper:
 	ret
 
 generic_console_cls:
-	call	$8e5		;Clear screen
+	call	$8e5		;Clear screen (based on colours)
+	; Now clear alt screen
+	exx
+	ld	a,$5
+	ld	bc,$ff7f
+	out	(c),a
+	exx	
+	ld	a,$24
+	out	($80),a
+	ld	hl,$a000
+	ld	de,$a001
+	ld	bc,8191
+	ld	(hl),0
+	ldir
+	xor	a
+	exx
+	out	(c),a
+	exx
+	out	($80),a
 	ret
 
 generic_console_scrollup:
