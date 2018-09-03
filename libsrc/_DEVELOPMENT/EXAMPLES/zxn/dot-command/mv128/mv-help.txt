@@ -7,6 +7,8 @@ mv [OPTION]... -t DIR SRC...
 Rename SRC to DST, or move
 SRC(es) to DIR.
 
+Names can contain wildcards.
+
 Names with trailing slashes
 are directories.
 
@@ -22,7 +24,7 @@ are directories.
 -n, --no-clobber
   do not overwrite
 
-The final -f,-i,-n takes effect
+The last -f,-i,-n takes effect
 
 --strip-trailing-slashes
   remove slashes from names
@@ -31,7 +33,7 @@ The final -f,-i,-n takes effect
   override backup suffix
 
 -t, --target-directory=DIR
-  move all SRC to directory
+  move all SRC to DIR
 
 -T, --no-target-directory
   treat DST as a normal file

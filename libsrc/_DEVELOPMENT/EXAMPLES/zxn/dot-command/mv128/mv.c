@@ -28,7 +28,7 @@ struct flag flags = {
    0,                    // verbose def: quiet
    0,                    // help
    0,                    // version
-   0                     // system
+   0                     // include system files in src matches
 };
 
 // ACCEPTED OPTIONS
@@ -113,8 +113,6 @@ unsigned char get_drive(unsigned char *p)
 
 // MAIN
 
-static unsigned char old_cpu_speed;
-
 extern unsigned char fin;
 extern unsigned char fout;
 
@@ -127,6 +125,7 @@ void close_open_files(void)
 }
 
 unsigned char *cleanup_remove_name;
+static unsigned char old_cpu_speed;
 
 static void cleanup(void)
 {
@@ -451,13 +450,14 @@ int main(int argc, char **argv)
                      printf("Moving file \"%s\" to dir \"%s\"\n", source.name, destination.name);
                   
                   if (destination.exists == 0)
-                     printf("Can't move to non-existent dir\n");
+                     puts("Can't move to non-existent dir");
                   else
                      move_file_to_dir((void*)&source, (void*)&destination);
                   
                   break;
                   
                case MOVE_TYPE_DIR_TO_FILE:
+               
                   // silently ignore this one
                   break;
                   
@@ -470,7 +470,10 @@ int main(int argc, char **argv)
                   break;
                   
                default:
-                  // printf("debug: classify error\n");
+               
+                  if (flags.verbose)
+                     puts("Debug: classify error");
+
                   break;
             }
 

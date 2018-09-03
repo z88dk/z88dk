@@ -20,4 +20,8 @@
 // stack must be kept out of top 16k for NextZXOS
 // place it at top of mmu 5
 
-#pragma output REGISTER_SP = 0xc000
+#pragma output REGISTER_SP = 0xbf00
+
+// load an alternate implementation if NextZXOS is in 48k mode
+
+#pragma output DOTN_ENABLE_ALTERNATE = 1
