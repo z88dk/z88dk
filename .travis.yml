@@ -2,7 +2,7 @@ sudo: false
 
 cache:
   directories:
-  - perl_modules
+  - ~/perl5/lib/perl5/
 
 language: c
 
