@@ -1,5 +1,9 @@
 sudo: false
 
+cache:
+  directories:
+  - perl_modules
+
 language: c
 
 # https://docs.travis-ci.com/user/languages/cpp/ - support C11
