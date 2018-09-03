@@ -17,7 +17,7 @@
                 INCLUDE "zcc_opt.def"
 
 		defc	CONSOLE_COLUMNS = 32
-		defc	CONSOLE_ROWS = 31
+		defc	CONSOLE_ROWS = 32
 
 ; No matter what set up we have, main is always, always external to
 ; this file

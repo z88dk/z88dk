@@ -60,9 +60,139 @@ generic_console_cls:
 generic_console_scrollup:
 	push	de
 	push	bc
-	; Copy into 256 byte buffer and shuffle it up, painfully...
+	ld	hl,$c100
+	ld	b,CONSOLE_ROWS-1
+scrollup_1:
+	push	bc
+	push	hl		;hl = $c000 = red 
+
+	ld	de,scroll_buffer
+	call	copy_from_bluered
+	pop	de	;Source address
+	push	de
+	dec	d	;Up a row
+	call	copy_to_blue
+
+	pop	hl
+	push	hl
+	ld	a,h		;hl = $a000 = blue
+	sub	$20
+	ld	h,a
+	ld	de,scroll_buffer
+	call	copy_from_bluered
+	pop	de		;Source address
+	push	de
+	ld	a,d
+	sub	$21
+	ld	d,a
+	call	copy_to_blue
+
+	pop	hl	
+	push	hl		;hl = $c000 = green
+	ld	de,scroll_buffer
+	call	copy_from_green
+	pop	de	;Source address
+	push	de
+	dec	d	;Up a row
+	call	copy_to_green
+
+	pop	hl
+	push	hl
+	ld	a,h		;hl = $a000 = alt green
+	sub	$20
+	ld	h,a
+	ld	de,scroll_buffer
+	call	copy_from_green
+	pop	de		;Source address
+	push	de
+	ld	a,d
+	sub	$21
+	ld	d,a
+	call	copy_to_green
+
+	pop	hl
+	inc	h		;And down a row
+	pop	bc
+	djnz	scrollup_1
+
+	; TODO: Blanking bottom row - lets print spaces
+	ld	e,CONSOLE_COLUMNS
+	ld	bc,$1f00
+blank_row:
+	push	de
+	push	bc
+	ld	a,' '
+	ld	e,0
+	call	generic_console_printc
+	pop	bc
+	inc	c
+	pop	de
+	dec	e
+	jr	nz,blank_row
 	pop	bc
 	pop	de
+	ret
+
+
+; Copy from the buffer to the screen address
+; Entry: de = destination address
+copy_to_blue:
+	ld	a,$28
+	ex	af,af
+	ld	a,3	;Red/blue bank
+	jr	copy_block
+
+copy_to_green:
+	ld	a,$24	;Port 80 value
+	ex	af,af
+	ld	a,$5	;Green bank
+copy_block:
+	exx
+	ld	bc,$ff7f
+	out	(c),a
+	exx
+	ex	af,af
+	out	($80),a
+	ld	hl,scroll_buffer
+	ld	bc,256
+	ldir
+	xor	a
+	exx	
+	out	(c),a
+	exx
+	out	($80),a
+	ret
+
+; Entry: hl = address to copy from
+;        de = buffer to copy to
+copy_from_green:
+	ld	b,0
+copy_from_green_1:
+	push	bc
+	push	hl
+	call	INGREEN
+	ld	a,l
+	ld	(de),a
+	pop	hl
+	pop	bc
+	inc	hl
+	inc	de
+	djnz	copy_from_green_1
+	ret
+
+copy_from_bluered:
+	ld	b,0
+copy_from_bluered_1:
+	push	bc
+	push	hl
+	call	INBLUE
+	ld	a,l
+	ld	(de),a
+	pop	hl
+	pop	bc
+	inc	hl
+	inc	de
+	djnz	copy_from_bluered_1
 	ret
 
 ; c = x
@@ -142,3 +272,7 @@ generic_console_xypos:
 	ld	b,0
 	add	hl,bc		;Add x
 	ret
+
+	SECTION		bss_clib
+
+scroll_buffer:	defs	256
