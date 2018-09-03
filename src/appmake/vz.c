@@ -159,7 +159,7 @@ static int create_file(const char* target, int vz700)
         fputc(0xFE, fpout); /* leadin */
 
     if (vz700) {
-        fputc(0xf0, fpout); // Basic
+        fputc(0xf1, fpout); // Binary (same as VZ200?)
     } else {
         c = fgetc(fpin); /* File Type */
         fputc(c, fpout);
