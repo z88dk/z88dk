@@ -153,6 +153,16 @@ Z88DK_FOR(`LOOP', `0', `15',
    
    defc __DOTN_MAIN_ABSOLUTE_MASK = DOTN_MAIN_ABSOLUTE_MASK & 0xff
 
+   ;; non-zero to load up alternate implementation in /dot/extra
+   
+   PUBLIC __DOTN_ENABLE_ALTERNATE
+   
+   IFNDEF DOTN_ENABLE_ALTERNATE
+      defc DOTN_ENABLE_ALTERNATE = 0
+   ENDIF
+   
+   defc __DOTN_ENABLE_ALTERNATE = DOTN_ENABLE_ALTERNATE
+
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; NextOS EXE
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
