@@ -1,12 +1,10 @@
 ;
 
-		SECTION		code_clib
+		SECTION		code_driver
 
 		PUBLIC		generic_console_cls
-		PUBLIC		generic_console_vpeek
 		PUBLIC		generic_console_scrollup
 		PUBLIC		generic_console_printc
-		PUBLIC		generic_console_ioctl
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
@@ -21,10 +19,6 @@
 
 		INCLUDE		"target/lynx/def/lynx.def"
 		INCLUDE		"ioctl.def"
-
-generic_console_ioctl:
-	scf
-	ret
 
 generic_console_set_inverse:
 	ret
@@ -48,6 +42,7 @@ generic_console_cls:
 generic_console_scrollup:
 	push	de
 	push	bc
+	; Copy into 256 byte buffer and shuffle it up, painfully...
 	pop	bc
 	pop	de
 	ret
@@ -87,8 +82,33 @@ loop:
 	push	bc
 	push	de
 	push	hl
+	push	af		;Save value
 	ld	c,0
 	call	OUTB
+	pop	af
+	pop	hl
+	push	hl
+
+	; Now write to the alt green page so we know what's on screen (and can use it for
+	; vpeek etc)
+	ld	de,$a000	;Where alt-green is located
+	add	hl,de
+	ld	e,a		;Save e
+	exx
+	ld	a,$5
+	ld	bc,$ff7f
+	out	(c),a
+	exx	
+	ld	a,$24
+	out	($80),a
+	ld	(hl),e
+	xor	a
+	exx
+	out	(c),a
+	exx
+	out	($80),a
+
+
 	pop	hl
 	ld	bc,32
 	add	hl,bc
@@ -96,16 +116,6 @@ loop:
 	pop	bc
 	inc	de
 	djnz	loop
-	ret
-
-;Entry: c = x,
-;       b = y
-;       e = rawmode
-;Exit:  nc = success
-;        a = character,
-;        c = failure
-generic_console_vpeek:
-	scf
 	ret
 
 generic_console_xypos:
