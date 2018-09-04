@@ -270,7 +270,7 @@ unsigned char move_file_to_dir(struct file_info *src, struct file_info *dst)
          printf("DST is \"%s\"\n", new.name);
       
       // we must know if the new file exists
-      
+
       if (esx_f_stat(new.name, &stat) == 0)
       {
          memcpy(&new.time, &stat.time, sizeof(new.time));
@@ -288,6 +288,7 @@ unsigned char move_file_to_dir(struct file_info *src, struct file_info *dst)
       // perform the move
 
       ret = move_file_to_file(src, &new);
+
       obstack_free(ob, new.name);
    }
    else
