@@ -495,9 +495,12 @@ load_alternate:
    add hl,sp
    ld sp,hl
    
-   push hl                     ; save loader start address
+   ex de,hl                    ; de = loader start address
    
-   ex de,hl
+   ld hl,(__sp)
+   push hl                     ; save original stack location
+   
+   push de                     ; loader start on stack
    
    ld hl,load_alternate_begin
    ld bc,load_alternate_end - load_alternate_begin
@@ -526,6 +529,7 @@ load_alternate_begin:
    ;;  a = file handle
    ;; bc = command line
    ;; hl = command line
+   ;; stack = original sp
    
    push bc                     ; save full command line location
    push hl                     ; save esxdos command line location
@@ -542,12 +546,15 @@ load_alternate_begin:
    rst __ESX_RST_SYS
    defb __ESX_F_CLOSE
    
-   pop hl                      ; restore command line pointers
+   pop de                      ; command line pointers
    pop bc
+   
+   pop hl                      ; hl = original sp
    
    di
    
-   ld sp,(__sp)                ; restore stack location
+   ld sp,hl                    ; restore stack location
+   ex de,hl                    ; hl = original command line
    
    exx
    pop hl
