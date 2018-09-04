@@ -1,9 +1,9 @@
 sudo: false
 
 cache:
-  ccache
   directories:
   - ~/perl5/
+  - ~/.ccache
  
 
 language: c
@@ -57,7 +57,7 @@ before_install:
   - eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
 
 before_script:
-  - export PATH=`pwd`/bin:/usr/local/opt/ccache/libexec:$PATH
+  - export PATH=`pwd`/bin:$PATH
   - export ZCCCFG=`pwd`/lib/config
 
 script:
