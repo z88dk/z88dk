@@ -3,6 +3,9 @@ sudo: false
 cache:
   directories:
   - ~/perl5/
+ 
+cache:
+  ccache 
 
 language: c
 
@@ -24,7 +27,7 @@ matrix:
             - texinfo
             - texi2html
       env:
-         - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+         - MATRIX_EVAL="CC=\"ccache gcc-4.9\" && CXX=\"ccache g++-4.9\""
 
 #    - os: linux
 #      addons:
@@ -45,12 +48,13 @@ matrix:
     - os: osx
       osx_image: xcode7.3
       env:
-        - MATRIX_EVAL="CC=clang && CXX=clang++"
+        - MATRIX_EVAL="CC=\"ccache clang\" && CXX=\"ccache clang++\""
 
 before_install:
   - eval "${MATRIX_EVAL}"
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update                  ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install cpanm dos2unix  ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install cpanm dos2unix ccache  ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; export PATH="/usr/local/opt/ccache/libexec:$PATH" ; fi
   - cpanm --local-lib=~/perl5 local::lib App::Prove Modern::Perl Capture::Tiny Capture::Tiny::Extended Path::Tiny File::Path Template Template::Plugin::YAML Test::Differences CPU::Z80::Assembler Test::HexDifferences Data::HexDump Object::Tiny::RW Regexp::Common List::Uniq
   - eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
 
