@@ -479,10 +479,6 @@ IF __NEXTOS_DOT_COMMAND && __DOTN_ENABLE_ALTERNATE
 ;; handle to the dot command file.  So dotn commands cannot
 ;; be used as the alternate.  Which is fine since we're only
 ;; getting an alternate if in 48k mode.
-;;
-;; ROM3_SPACES cannot be used here to make space for the loader
-;; because this would change the address of the command line.
-;; So the loader must be in the stack.
 
    PUBLIC __z_alt_filename
 
