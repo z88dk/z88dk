@@ -6,10 +6,11 @@
 
    defc basicstart_address = 0x8995   
    defc code_address = start - basicstart + basicstart_address   
-	defc CRT_ORG_CODE = code_address
+	defc CRT_ORG_CODE = basicstart_address
 
         INCLUDE "crt/classic/crt_rules.inc"
 
+   org CRT_ORG_CODE
 
 	; BASIC header for the vz
 basicstart:   
