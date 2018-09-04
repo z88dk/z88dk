@@ -32,6 +32,9 @@ The last -f,-i,-n takes effect
 -S, --suffix=SUFFIX
   override backup suffix
 
+--system
+  match system files to SRC
+
 -t, --target-directory=DIR
   move all SRC to DIR
 
