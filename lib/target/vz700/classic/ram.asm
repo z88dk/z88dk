@@ -3,21 +3,24 @@
 
         defc    TAR__clib_exit_stack_size = 0
         defc    TAR__register_sp = -1
-	defc	CRT_ORG_CODE = 0x89a3 - 14
 
+   defc basicstart_address = 0x8995   
+   defc code_address = start - basicstart + basicstart_address   
+	defc CRT_ORG_CODE = code_address
 
         INCLUDE "crt/classic/crt_rules.inc"
 
 
 	; BASIC header for the vz
-	defb	0xA3, 0x89                         ;// pointer to next basic line in memory (&H89A3)
-	defb	0xE2, 0x07                         ;// 2018
-	defb	0x41, 0xF0, 0x0C, 0xA3, 0x89, 0x3A ;// A=&H89A3
-	defb	0xB6                               ;// :
-	defb	0x20, 0x41                         ;// CALL A
-	defb	0x00                               ;// line terminator
-
-
+basicstart:   
+   defb 0xFF, 0xFF                           ; pointer to next basic line in memory
+   defb 0xE2, 0x07                           ; 2018
+   defb 0x41, 0xF0, 0x0C                     ; A=&H   
+   defw code_address                         ; address
+   defb 0x3A                                 ; :
+   defb 0xB6, 0x20, 0x41                     ; CALL A
+   defb 0x00                                 ; basic line terminator    
+   
 start:
 	ld	(start1+1),sp
         INCLUDE "crt/classic/crt_init_sp.asm"
