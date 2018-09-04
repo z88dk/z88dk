@@ -1,11 +1,10 @@
 sudo: false
 
 cache:
+  ccache
   directories:
   - ~/perl5/
  
-cache:
-  ccache 
 
 language: c
 
