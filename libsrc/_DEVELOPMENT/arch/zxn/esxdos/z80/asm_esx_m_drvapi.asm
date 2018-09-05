@@ -44,6 +44,18 @@ asm_esx_m_drvapi:
    
    push ix
    push iy
+
+IF __SDCC_IY
+
+   push hl
+   pop iy
+
+ELSE
+
+   push hl
+   pop ix
+
+ENDIF
    
    rst __ESX_RST_SYS
    defb __ESX_M_DRVAPI

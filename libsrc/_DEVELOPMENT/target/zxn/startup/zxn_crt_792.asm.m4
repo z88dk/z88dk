@@ -12,6 +12,10 @@ dnl############################################################
 ;; GLOBAL SYMBOLS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+divert(-1)
+include(`config_zxn_private.inc')
+divert
+
 include "config_zxn_public.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -80,6 +84,13 @@ __Start:
    ;; returning to basic
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+   IF __DOTN_ENABLE_ALTERNATE
+
+      ld (__command_line_alt_bc),bc
+      ld (__command_line_alt_hl),hl
+
+   ENDIF
+
    IF __crt_enable_commandline >= 2
    
       IF __crt_enable_commandline_ex & 0x80
@@ -115,8 +126,17 @@ __Start:
    jp c, error_crt          ; if esxdos present
    
    or a
+
+IF __DOTN_ENABLE_ALTERNATE
+
+   jp nz, load_alternate    ; if nextos is in 48k mode, try to load an alternate
+
+ELSE
+
    jp nz, error_crt         ; if nextos is in 48k mode
-      
+
+ENDIF
+   
    IF __NEXTOS_VERSION > 0
 
       ld hl,+(((__NEXTOS_VERSION / 1000) % 10) << 12) + (((__NEXTOS_VERSION / 100) % 10) << 8) + (((__NEXTOS_VERSION / 10) % 10) << 4) + (__NEXTOS_VERSION % 10)
@@ -1155,10 +1175,123 @@ IF __DOTN_LAST_DIVMMC >= 0
 ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; LOAD ALTERNATE IMPLEMENTATION ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+IF __NEXTOS_DOT_COMMAND && __DOTN_ENABLE_ALTERNATE
+
+;; Decided not to use M_EXECCMD so that the command line can
+;; be reused without modification.
+;;
+;; Consequence is that M_GETHANDLE cannot be used to get a
+;; handle to the dot command file.  So dotn commands cannot
+;; be used as the alternate.  Which is fine since we're only
+;; getting an alternate if in 48k mode.
+
+   PUBLIC __z_alt_filename
+
+load_alternate:
+
+   ;; copy loader to stack
+   
+   ld hl,load_alternate_begin - load_alternate_end
+   
+   add hl,sp
+   ld sp,hl
+   
+   ex de,hl                    ; de = loader start address
+   
+   ld hl,(__sp)
+   push hl                     ; save original stack location
+   
+   push de                     ; loader start on stack
+   
+   ld hl,load_alternate_begin
+   ld bc,load_alternate_end - load_alternate_begin
+   
+   ldir
+
+   ;; open alternate file
+   
+   ld a,'*'
+   
+   ld b,__esx_mode_open_exist | __esx_mode_read
+   ld hl,alternate_filename
+   
+   rst __ESX_RST_SYS
+   defb __ESX_F_OPEN
+   
+   jp c, error_crt
+   
+   ld bc,(__command_line_alt_bc)
+   ld hl,(__command_line_alt_hl)
+
+   ret                         ; run loader
+
+load_alternate_begin:
+
+   ;;  a = file handle
+   ;; bc = command line
+   ;; hl = command line
+   ;; stack = original sp
+   
+   push bc                     ; save full command line location
+   push hl                     ; save esxdos command line location
+   push af                     ; save handle
+   
+   ld hl,0x2000                ; overlay this dot command
+   ld bc,0x2000                ; at most 8k
+   
+   rst __ESX_RST_SYS
+   defb __ESX_F_READ
+   
+   pop af                      ; a = file handle
+   
+   rst __ESX_RST_SYS
+   defb __ESX_F_CLOSE
+   
+   pop de                      ; command line pointers
+   pop bc
+   
+   pop hl                      ; hl = original sp
+   
+   di
+   
+   ld sp,hl                    ; restore stack location
+   ex de,hl                    ; hl = original command line
+   
+   exx
+   pop hl
+   exx
+   pop iy
+   
+   ei                          ; enabled after jp
+   jp 0x2000
+
+load_alternate_end:
+
+alternate_filename:
+
+   defm "__ENV_BINDIR/extra/"
+
+__z_alt_filename:
+
+   defs 9                      ; filled in by appmake
+
+ENDIF
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 __command_line:   defw 0
+
+IF __DOTN_ENABLE_ALTERNATE
+
+   __command_line_alt_bc:  defw 0
+   __command_line_alt_hl:  defw 0
+
+ENDIF
 
 __sp:             defw 0
 

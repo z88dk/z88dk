@@ -2,4 +2,6 @@ errors.asm
 move.c
 mv.asm
 mv.c
+mv-help.asm
 options.c
+user_interaction.c

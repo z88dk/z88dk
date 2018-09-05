@@ -130,6 +130,7 @@ int lynx_exec(char *target)
 	writeword((checksum%65536),fpout);   /* Program checksum */
 
 	writeword(pos,fpout);                /* Program Location */
+	writeword(0, fpout);
 
 
 	fclose(fpin);

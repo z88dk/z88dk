@@ -17335,8 +17335,24 @@ replace restart {
 	ld	%9,%10
 	ld	%7,%5
 	ld	%8,%6
-	; peephole z88dk-414k
-} if notSame(%9 %5), notSame(%9 %6), notSame(%9 %5%6), notSame(%9 %6%5)
+	; peephole z88dk-414k1
+} if operandsNotRelated(%9 %5), operandsNotRelated(%9 %6)
+
+replace restart {
+	ld	%1 (%2),%5
+	ld	%3 (%4),%6
+	ld	%9,%10
+	ld	%7,%1 (%2)
+	ld	%8,%3 (%4)
+} by {
+	ld	%1 (%2),%5
+	ld	%3 (%4),%6
+	ld	%7,%5
+	ld	%8,%6
+	ld	%9,%10
+	; peephole z88dk-414k2
+} if operandsNotRelated(%9 %7), operandsNotRelated(%9 %8), operandsNotRelated(%10 %7), operandsNotRelated(%10 %8)
+
 
 replace restart {
 	ld	%1 (%2),a
