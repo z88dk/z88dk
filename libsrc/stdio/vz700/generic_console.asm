@@ -13,6 +13,8 @@
 
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
+		EXTERN		conio_map_colour
+		EXTERN		generic_console_flags
 
 		INCLUDE		"target/vz700/def/vz700.def"
 		defc		DISPLAY = 0xf800 - 0x8000
@@ -23,7 +25,8 @@ generic_console_set_inverse:
 	ret
 
 generic_console_set_paper:
-	and	7
+	call	conio_map_colour
+	and	15
 	ld	b,a
 	ld	a,(attr)
 	and	0xf0
@@ -32,7 +35,8 @@ generic_console_set_paper:
 	ret
 
 generic_console_set_ink:
-	and	7
+	call	conio_map_colour
+	and	15
 	rlca
 	rlca
 	rlca
@@ -83,6 +87,10 @@ generic_console_printc:
 	out	($41),a
 	ex	af,af
 	call	xypos
+	ld	d,a		;Save character
+	ld	a,(generic_console_flags)
+	and	128		;bit 7 = inverse
+	or	d
 	ld	(hl),a
 	inc	hl
 	ld	a,(attr)
@@ -106,7 +114,7 @@ generic_console_vpeek:
 	out	($41),a
         call    xypos
 	ld	a,(hl)
-	and	a
+	and	127		;Remove inverse flag
 	ex	af,af
 	pop	af
 	ld	(SYSVAR_bank1),a
