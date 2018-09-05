@@ -3,6 +3,7 @@ stdio/vz700/fputc_cons
 stdio/vz700/getk
 stdio/vz700/fgetc_cons
 stdio/vz700/conio_map_colour
+stdio/vz700/bordercolour
 @stdio/stdio.lst
 @gfxbase.lst
 graphics/dcircle
