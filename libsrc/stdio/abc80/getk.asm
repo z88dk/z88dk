@@ -11,8 +11,10 @@
 
         SECTION code_clib
 	PUBLIC	getk
+	PUBLIC	_getk
 
 .getk
+._getk
         ld      a,(65013)
         and 127
 
