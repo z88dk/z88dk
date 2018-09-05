@@ -151,11 +151,53 @@ generic_console_printc_3:
 
 
 generic_console_scrollup:
+	ld	a,(SYSVAR_bank1)
+	push	af
+	ld	a,7
+	ld	(SYSVAR_bank1),a
+	out	($41),a
+
 	push	de
 	push	bc
-	; Awkward screen layout
+	ld	a,23
+	ld	bc, $0000
+scrollup_1:
+	push	af
+	push	bc
+	call	xypos
+	pop	bc
+	push	bc
+	push	hl		;dest
+	inc	b
+	call	xypos		;hl=source
+	pop	de
+	ld	bc,80
+	ldir
+	pop	bc
+	inc	b
+	pop	af
+	dec	a
+	jr	nz,scrollup_1
+	ld	a,CONSOLE_COLUMNS
+	ld	bc,$1700	;Last row
+scrollup_2:
+	push	af
+	push	bc
+	ld	a,' '
+	ld	e,0
+	call	generic_console_printc
+	pop	bc
+	inc	c
+	pop	af
+	dec	a
+	jr	nz,scrollup_2
+
 	pop	bc
 	pop	de
+
+	pop	af
+	ld	(SYSVAR_bank1),a
+	out	($41),a
 	ret
 
 	SECTION	bss_clib
