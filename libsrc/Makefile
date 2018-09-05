@@ -912,6 +912,7 @@ vz700_clib.lib:
 	@echo ''
 	@echo '--- Building VTech Laser 350/500/700 Library ---'
 	@echo ''
+	$(MAKE) gfxdeps
 	$(call buildgeneric,vz700)
 	TARGET=vz700 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORvz700 -x$(OUTPUT_DIRECTORY)/vz700_clib @$(LISTFILE_DIRECTORY)/vz700.lst
 
