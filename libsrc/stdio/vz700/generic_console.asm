@@ -6,21 +6,20 @@
 		PUBLIC		generic_console_vpeek
 		PUBLIC		generic_console_printc
 		PUBLIC		generic_console_scrollup
-		PUBLIC		generic_console_ioctl
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
+		PUBLIC		__vz700_mode
 
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
+		EXTERN		__console_w
 		EXTERN		conio_map_colour
 		EXTERN		generic_console_flags
 
 		INCLUDE		"target/vz700/def/vz700.def"
 		defc		DISPLAY = 0xf800 - 0x8000
 
-generic_console_ioctl:
-	scf
 generic_console_set_inverse:
 	ret
 
@@ -57,9 +56,13 @@ generic_console_cls:
 	ld	(SYSVAR_bank1),a
 	out	($41),a
 	ld	hl, DISPLAY
-	ld	bc, 2032 / 2
+	ld	bc, +(CONSOLE_ROWS * CONSOLE_COLUMNS)
 	ld	de,(attr)
 	ld	d,32
+	ld	a,(__vz700_mode)
+	and	a
+	jr	z,loop
+	ld	e,d		;80 column, need spaces
 loop:
 	ld	(hl),d
 	inc	hl
@@ -86,15 +89,24 @@ generic_console_printc:
 	ld	(SYSVAR_bank1),a
 	out	($41),a
 	ex	af,af
-	call	xypos
+	call	xypos		
 	ld	d,a		;Save character
 	ld	a,(generic_console_flags)
 	and	128		;bit 7 = inverse
 	or	d
-	ld	(hl),a
+	ld	d,a
+	ld	a,(__vz700_mode)
+	and	a
+	jr	z,text_40col_printc
+	ld	(hl),d		;80 column mode, no attributes
+	jr	printc_return
+text_40col_printc:
+	add	hl,bc		;40 column mode, we have attribtues
+	ld	(hl),d
 	inc	hl
 	ld	a,(attr)
 	ld	(hl),a
+printc_return:
 	pop	af
 	ld	(SYSVAR_bank1),a
 	out	($41),a
@@ -113,6 +125,11 @@ generic_console_vpeek:
 	ld	(SYSVAR_bank1),a
 	out	($41),a
         call    xypos
+	ld	a,(__vz700_mode)
+	and	a
+	jr	nz,skip_40col
+	add	hl,bc
+skip_40col:
 	ld	a,(hl)
 	and	127		;Remove inverse flag
 	ex	af,af
@@ -122,7 +139,9 @@ generic_console_vpeek:
 	ex	af,af
 	ret
 
-
+; Exit:
+;      hl = 80 column position
+;      bc = extra step to get to 40 columns
 xypos:
 	push	af
 	ld	a,b		; Modulus 8 
@@ -141,10 +160,9 @@ generic_console_printc_1:
 	and	a		;We went one row too far
 	sbc	hl,de
 generic_console_printc_3:
-	add	hl,bc	
 	add	hl,bc			;hl now points to address in display
-	ld	bc,DISPLAY
-	add	hl,bc
+	ld	de,DISPLAY
+	add	hl,de
 	pop	af
 	ret
 
@@ -178,7 +196,7 @@ scrollup_1:
 	pop	af
 	dec	a
 	jr	nz,scrollup_1
-	ld	a,CONSOLE_COLUMNS
+	ld	a,(__console_w)
 	ld	bc,$1700	;Last row
 scrollup_2:
 	push	af
@@ -200,6 +218,11 @@ scrollup_2:
 	out	($41),a
 	ret
 
-	SECTION	bss_clib
+	SECTION bss_clib
 
-attr:	defb	0x07
+__vz700_mode:	defb	0
+
+	SECTION data_clib
+
+attr:	defb	0xf0
+

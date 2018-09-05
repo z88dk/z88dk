@@ -1,9 +1,11 @@
 stdio/vz700/generic_console
+stdio/vz700/generic_console_ioctl
 stdio/vz700/fputc_cons
 stdio/vz700/getk
 stdio/vz700/fgetc_cons
 stdio/vz700/conio_map_colour
 stdio/vz700/bordercolour
+stdio/vz700/CRT_FONT
 @stdio/stdio.lst
 @gfxbase.lst
 graphics/dcircle
