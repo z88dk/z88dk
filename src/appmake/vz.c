@@ -34,6 +34,7 @@ option_t vz700_options[] = {
     { 'b', "binfile", "Linked binary file", OPT_STR, &binname },
     { 'c', "crt0file", "crt0 file used in linking", OPT_STR, &crtfile },
     { 'o', "output", "Name of output file", OPT_STR, &outfile },
+    { 0, "fast", "Create a fast loading WAV", OPT_BOOL, &fast },
     { 0, "audio", "Create also a WAV file", OPT_BOOL, &audio },
     { 0, NULL, NULL, OPT_NONE, NULL }
 };
