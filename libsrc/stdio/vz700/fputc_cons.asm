@@ -18,6 +18,7 @@
 IF STANDARDESCAPECHARS
 	cp  10
 	jr  nz,notCR
+	call	$57d9
 	ld	a,13
 	jr setout
 .notCR

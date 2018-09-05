@@ -14,7 +14,8 @@
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
 
-		defc		DISPLAY = 0x7000
+		INCLUDE		"target/vz700/def/vz700.def"
+		defc		DISPLAY = 0xf800 - 0x8000
 
 generic_console_ioctl:
 	scf
@@ -46,6 +47,11 @@ generic_console_set_ink:
 	
 
 generic_console_cls:
+	ld	a,(SYSVAR_bank1)
+	push	af
+	ld	a,7
+	ld	(SYSVAR_bank1),a
+	out	($41),a
 	ld	hl, DISPLAY
 	ld	bc, 2032 / 2
 	ld	de,(attr)
@@ -59,6 +65,9 @@ loop:
 	ld	a,b
 	or	c
 	jr	nz,loop
+	pop	af
+	ld	(SYSVAR_bank1),a
+	out	($41),a
 	ret
 
 ; c = x
@@ -66,11 +75,21 @@ loop:
 ; a = character to print
 ; e = raw
 generic_console_printc:
+	ex	af,af
+	ld	a,(SYSVAR_bank1)
+	push	af
+	ld	a,7
+	ld	(SYSVAR_bank1),a
+	out	($41),a
+	ex	af,af
 	call	xypos
 	ld	(hl),a
 	inc	hl
 	ld	a,(attr)
 	ld	(hl),a
+	pop	af
+	ld	(SYSVAR_bank1),a
+	out	($41),a
 	ret
 
 ;Entry: c = x,
@@ -80,19 +99,30 @@ generic_console_printc:
 ;        a = character,
 ;        c = failure
 generic_console_vpeek:
+	ld	a,(SYSVAR_bank1)
+	push	af
+	ld	a,7
+	ld	(SYSVAR_bank1),a
+	out	($41),a
         call    xypos
 	ld	a,(hl)
 	and	a
+	ex	af,af
+	pop	af
+	ld	(SYSVAR_bank1),a
+	out	($41),a
+	ex	af,af
 	ret
 
 
 xypos:
 	push	af
-	ld	a,b		; Modulus 8 * 256
+	ld	a,b		; Modulus 8 
 	and	7
-	ld	h,a
+	ld	h,a		;*256
+
 	ld	l,0
-	srl	b		;/ 8
+	srl	b		;y/ 8
 	srl	b
 	srl	b
 	ld	de,80
@@ -100,8 +130,10 @@ xypos:
 generic_console_printc_1:
 	add	hl,de
 	djnz	generic_console_printc_1
+	and	a		;We went one row too far
+	sbc	hl,de
 generic_console_printc_3:
-	add	hl,bc			;hl now points to address in display
+	add	hl,bc	
 	add	hl,bc			;hl now points to address in display
 	ld	bc,DISPLAY
 	add	hl,bc
