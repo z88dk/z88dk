@@ -5,4 +5,4 @@
 	defc	SYSVAR_bank1 = $8666
 	defc	SYSVAR_bank2 = $8667
 	defc	SYSVAR_bank3 = $8668
-	defc	SYSVAR_port45 = $8669
+	defc	SYSVAR_port44 = $8669
