@@ -56,8 +56,10 @@ generic_console_cls:
 	ld	(SYSVAR_bank1),a
 	out	($41),a
 	ld	hl, DISPLAY
-	ld	bc, +(CONSOLE_ROWS * CONSOLE_COLUMNS)
+	ld	bc,+( 2032 / 2)
 	ld	de,(attr)
+        ld      a,e
+        out     ($45),a         ;set 80 column colour
 	ld	d,32
 	ld	a,(__vz700_mode)
 	and	a

@@ -112,6 +112,7 @@ start:
 		INCLUDE "crt/classic/crt_init_amalloc.asm"
 	ENDIF
 
+
         call    _main
 cleanup:
 ;
