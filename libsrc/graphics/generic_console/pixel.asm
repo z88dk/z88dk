@@ -6,17 +6,22 @@
 	EXTERN	generic_console_vpeek
 	EXTERN	generic_console_pointxy
 	EXTERN	textpixl
+	EXTERN	__console_w
+	EXTERN	__console_h
 
 
-IF maxx <> 256
-		ld	a,h
-		cp	maxx
-		ret	nc
-ENDIF
-		ld	a,l
-		cp	maxy
-		ret	nc		; y0	out of range
-		
+		ld	a,(__console_w)
+		add	a
+		dec	a
+		cp	h
+		ret	c
+
+		ld	a,(__console_h)
+		add	a
+		dec	a
+		cp	l
+		ret	c
+
 		push	bc		;save entry bc	
 		ld	c,h
 		ld	b,l

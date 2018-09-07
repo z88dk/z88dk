@@ -462,6 +462,13 @@ IF FORrx78
 	defc maxy	= 184
 ENDIF
 
+IF FORvz700
+	DEFINE gotgfx
+	defc maxx = 80
+	defc maxy = 48
+	defc blankch = 32
+ENDIF
+
 ; =============================================
 
 
