@@ -23,7 +23,7 @@ INCLUDE "target/vz700/def/vz700.def"
 	ld	a,2
 	out	($41),a
 
-	ld	hl,$40fe
+	ld	hl,$6bfe
 	ld	e,0
 	ld	a,(hl)
 	cpl
@@ -49,11 +49,12 @@ row_loops:
 	ld	e,a
 	scf
 	rl	l
+	rl	h
 	djnz	row_loops
 
+	ld	hl,$6bff
 	ld	b,4
-	ld	hl,$40ff
-rowad_loop:
+row_loops_2:
 	ld	a,(hl)
 	cpl
 	and	127
@@ -61,8 +62,9 @@ rowad_loop:
 	ld	a,e
 	add	7
 	ld	e,a
-	inc	h
-	djnz	rowad_loop
+	dec	h
+	djnz	row_loops_2
+
 
 	ld	a,(SYSVAR_bank1)
 	out	($41),a
@@ -87,7 +89,7 @@ doneinc:
 
 	; Check for shift and control
 	ld	d, 84 * 2		;CTRL MODIFIER
-	ld	hl,$40fd		;ROW1
+	ld	hl,$6bfd		;ROW1
 	bit	6,(hl)
 	jr	z,got_modifier
 	ld	d,84

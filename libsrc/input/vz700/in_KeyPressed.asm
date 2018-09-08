@@ -15,11 +15,9 @@ EXTERN l_pop_ei
 ;         no carry = key not pressed & HL = 0
 ; used  : AF,BC,HL
 ;
-; Memory mapped io (in bank1, so 0x4000 + )
-; Row0-7 = 1,2,4...
-; RowA-D = 00ff, 01ff, 02ff, 03ff
+; Memory mapped io (in bank1, so 0x6b00 + )
+; Row0-11 = fe, fc... rotate left
 
-	defc	IO_BASE = 0x4000
 
 	INCLUDE	"target/vz700/def/vz700.def"
 
@@ -29,11 +27,7 @@ EXTERN l_pop_ei
 	ld	a,2	
 	out	($41),a
 
-	ld	a,(IO_BASE + 1)		;1st shift
-	and	@01000000
-	jr	z,shift_pressed
-	ld	a,(IO_BASE + 2)		;2nd shift
-shift_pressed:
+	ld	a,($6bfe)
 	bit	7,l
 	jr	nz,check_shift
 	and	@01000000
@@ -45,7 +39,7 @@ check_shift:
 	jr	nz, fail
 
 consider_ctrl:
-	ld	a,(IO_BASE + 128)
+	ld	a,($6bfc)
 	bit	6,l
 	jr	nz,check_ctrl
 	rlca
@@ -78,21 +72,23 @@ fail:
 
 ; Figure out which port we should be reading from
 getport:
-	ld	de,IO_BASE + 0xff
+	ld	de,$6bfe
 	ld	a,l
+	and	15
 	cp	8
-	jr	nc,rows_a_d
-	ld	e,@11111110
+	jr	nc,ports_a_d
 row_0_9_loop:
 	and	a
 	ret	z
 	scf
 	rl	e
+	rl	h
 	dec	a
 	jr	row_0_9_loop
-
-rows_a_d:
-	sub 	8
-	add	d
+ports_a_d:
+	sub	7		;So range 1 - 4
+	neg			;-1 -> -4
+	add	$6b
 	ld	d,a
+	ld	e,$ff
 	ret
