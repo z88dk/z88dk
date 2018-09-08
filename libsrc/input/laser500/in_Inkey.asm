@@ -10,7 +10,7 @@ EXTERN in_keytranstbl
 EXTERN l_push_di
 EXTERN l_pop_ei
 
-INCLUDE "target/vz700/def/vz700.def"
+INCLUDE "target/laser500/def/laser500.def"
 
 ; exit : carry set and HL = 0 for no keys registered
 ;        else HL = ASCII character code
