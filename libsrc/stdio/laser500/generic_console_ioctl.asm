@@ -11,7 +11,7 @@
 	EXTERN	__vz700_mode
 	EXTERN	__console_w
 
-	INCLUDE	"target/vz700/def/vz700.def"
+	INCLUDE	"target/laser500/def/laser500.def"
 
 
 ; a = ioctl
