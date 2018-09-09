@@ -59,19 +59,16 @@ void cpm_write_file(cpm_handle *h, char filename[11], void *data, size_t len)
               direntry[15] = 0x80;
               extents_to_write = 8;
           } else {
-              direntry[15] = (num_extents - ( i * 8)) * 8;   // Record count
+              direntry[15] = (len % 16384 ) / 128; 
               extents_to_write = (num_extents - ( i * 8));
           }
-	printf("Extents to write %d\n",extents_to_write);
           ptr = &direntry[16];
           for ( j = 0; j < 8; j++ ) {
               if ( j < extents_to_write ) {
                  direntry[j * 2 + 16] = (current_extent) % 256;
                  direntry[j * 2 + 16 + 1] = (current_extent) / 256;
                  current_extent++;
-              } else {
-			printf("skipping\n");
-		}
+              } 
           }
           memcpy(h->image + directory_offset, direntry, 32);
           directory_offset += 32;
