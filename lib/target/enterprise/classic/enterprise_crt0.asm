@@ -40,7 +40,6 @@
 
 
 ; Enterprise 64/128 specific stuff
-		PUBLIC    warmreset
 		PUBLIC    set_exos_multi_variables
 		PUBLIC    _DEV_VIDEO
 		PUBLIC    _DEV_KEYBOARD
@@ -182,6 +181,7 @@ ENDIF
 
 IF (!DEFINED_startup | (startup=1))
 warmreset:
+		PUBLIC    warmreset
         ld      sp, 0100h
         ld      a, 0ffh
         out     (0b2h), a
