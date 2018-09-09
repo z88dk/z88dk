@@ -169,11 +169,12 @@ static int create_file(const char* target, int laser500)
     /* Deal with the filename */
     if (strlen(blockname) >= 17) {
         strncpy(name, blockname, 17);
+        name[17] = 0;
     } else {
         strcpy(name, blockname);
         strncat(name, "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 17 - strlen(blockname));
     }
-    for (i = 0; i <= (strlen(name)); i++)
+    for (i = 0; i <= strlen(name); i++)
         writebyte(toupper(name[i]), fpout);
 
     if (laser500) {
