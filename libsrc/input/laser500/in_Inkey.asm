@@ -24,7 +24,7 @@ INCLUDE "target/laser500/def/laser500.def"
 	ld	a,2
 	out	($41),a
 
-	ld	hl,$6bfe
+	ld	hl,$6ffe
 	ld	e,0
 	ld	a,(hl)
 	cpl
