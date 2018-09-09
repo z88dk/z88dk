@@ -36,7 +36,16 @@ ELSE
 	INCLUDE	"target/laser500/classic/ram.asm"
 ENDIF
 
+   ; The extra key rows aren't implemented by Mame, so disable
+   ; scanning of them by default
+   PUBLIC __CLIB_LASER500_SCAN_EXTRA_ROWS
+   IFDEF CLIB_LASER500_SCAN_EXTRA_ROWS
+     defc __CLIB_LASER500_SCAN_EXTRA_ROWS = CLIB_LASER500_SCAN_EXTRA_ROWS
+   ELSE
+     defc __CLIB_LASER500_SCAN_EXTRA_ROWS = 0
+   ENDIF
 
 	INCLUDE "crt/classic/crt_runtime_selection.asm" 
 	
 	INCLUDE	"crt/classic/crt_section.asm"
+

@@ -9,6 +9,7 @@ PUBLIC _in_Inkey
 EXTERN in_keytranstbl
 EXTERN l_push_di
 EXTERN l_pop_ei
+EXTERN __CLIB_LASER500_SCAN_EXTRA_ROWS
 
 INCLUDE "target/laser500/def/laser500.def"
 
@@ -36,6 +37,7 @@ INCLUDE "target/laser500/def/laser500.def"
 	and	63
 	jr	nz,gotkey
 
+
 	ld	l,$fb
 	ld	b,6
 	ld	e,14
@@ -49,8 +51,11 @@ row_loops:
 	ld	e,a
 	scf
 	rl	l
-	rl	h
 	djnz	row_loops
+
+	ld	a,__CLIB_LASER500_SCAN_EXTRA_ROWS
+	and	a
+	jr	z,skip_extra_keys
 
 	ld	hl,$6bff
 	ld	b,4
@@ -65,7 +70,7 @@ row_loops_2:
 	dec	h
 	djnz	row_loops_2
 
-
+skip_extra_keys:
 	ld	a,(SYSVAR_bank1)
 	out	($41),a
 	call	l_pop_ei
