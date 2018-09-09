@@ -27,7 +27,7 @@ EXTERN l_pop_ei
 	ld	a,2	
 	out	($41),a
 
-	ld	a,($6bfe)
+	ld	a,($6ffe)
 	bit	7,l
 	jr	nz,check_shift
 	and	@01000000
@@ -39,7 +39,7 @@ check_shift:
 	jr	nz, fail
 
 consider_ctrl:
-	ld	a,($6bfc)
+	ld	a,($6ffc)
 	bit	6,l
 	jr	nz,check_ctrl
 	rlca
@@ -72,7 +72,7 @@ fail:
 
 ; Figure out which port we should be reading from
 getport:
-	ld	de,$6bfe
+	ld	de,$6ffe
 	ld	a,l
 	and	15
 	cp	8
