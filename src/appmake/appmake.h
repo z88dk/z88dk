@@ -175,8 +175,8 @@ extern option_t  vg5k_options;
 
 extern int       vz_exec(char *target);
 extern option_t  vz_options;
-extern int       vz700_exec(char *target);
-extern option_t  vz700_options;
+extern int       laser500_exec(char *target);
+extern option_t  laser500_options;
 
 extern int       x07_exec(char *target);
 extern option_t  x07_options;
@@ -282,6 +282,10 @@ struct {
       "Prapares a .KCC file for the Robotron KC85/2..KC85/4",
       NULL,
       kc_exec,       &kc_options },
+    { "laser2cas", "laser500",     "(C) 2010-2018 Stefano Bodrato",
+      "Convert the Laser 350/500/700 .vz file to .cas, optionally to WAV",
+      NULL,
+      laser500_exec,    &laser500_options },
     { "lynxtap",  "lynx",      "(C) 2014 Stefano Bodrato",
       "Generates a tape file for the Camputers Lynx, opt. WAV",
       NULL,
@@ -410,10 +414,6 @@ struct {
       "Convert the Laser 200 .vz file to .cas, optionally to WAV",
       NULL,
       vz_exec,    &vz_options },
-    { "vz7002cas", "vz700",     "(C) 2010-2018 Stefano Bodrato",
-      "Convert the Laser 350/500/700 .vz file to .cas, optionally to WAV",
-      NULL,
-      vz700_exec,    &vz700_options },
     { "vg5k2k7",    "vg5k",     "(C) 2014 Stefano Bodrato",
       "Convert to Philips VG-5000 .k7 format, optionally to WAV",
       NULL,

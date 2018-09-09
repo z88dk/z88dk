@@ -15,7 +15,7 @@ static char help = 0;
 static char audio = 0;
 static char fast = 0;
 
-static int create_file(const char* target, int vz700);
+static int create_file(const char* target, int laser500);
 
 /* Options that are available for this module */
 option_t vz_options[] = {
@@ -29,7 +29,7 @@ option_t vz_options[] = {
     { 0, NULL, NULL, OPT_NONE, NULL }
 };
 
-option_t vz700_options[] = {
+option_t laser500_options[] = {
     { 'h', "help", "Display this help", OPT_BOOL, &help },
     { 'b', "binfile", "Linked binary file", OPT_STR, &binname },
     { 'c', "crt0file", "crt0 file used in linking", OPT_STR, &crtfile },
@@ -88,12 +88,12 @@ int vz_exec(char* target)
     return create_file(target, 0);
 }
 
-int vz700_exec(char* target)
+int laser500_exec(char* target)
 {
     return create_file(target, 1);
 }
 
-static int create_file(const char* target, int vz700)
+static int create_file(const char* target, int laser500)
 {
     char filename[FILENAME_MAX + 1];
     char wavfile[FILENAME_MAX + 1];
@@ -140,7 +140,7 @@ static int create_file(const char* target, int vz700)
 
     /*len=ftell(fpin) - sizeof(struct vz);*/
     len = ftell(fpin);
-    if (!vz700) {
+    if (!laser500) {
         len -= 24;
 
         /* Get rid of VZ magic (4 bytes) and filename (17 chars) */
@@ -159,7 +159,7 @@ static int create_file(const char* target, int vz700)
     for (i = 0; i < 5; i++)
         fputc(0xFE, fpout); /* leadin */
 
-    if (vz700) {
+    if (laser500) {
         fputc(0xf1, fpout); // Binary (same as VZ200?)
     } else {
         c = fgetc(fpin); /* File Type */
@@ -176,7 +176,7 @@ static int create_file(const char* target, int vz700)
     for (i = 0; i <= (strlen(name)); i++)
         writebyte(toupper(name[i]), fpout);
 
-    if (vz700) {
+    if (laser500) {
         // Header2
         fputc(0x00, fpout);
         for (i = 0; i < 10; i++) {

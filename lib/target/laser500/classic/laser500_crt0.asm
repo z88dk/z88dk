@@ -31,9 +31,9 @@
 	defc	__CPU_CLOCK = 3694700
 
 IF startup = 2
-	INCLUDE	"target/vz700/classic/rom.asm"
+	INCLUDE	"target/laser500/classic/rom.asm"
 ELSE
-	INCLUDE	"target/vz700/classic/ram.asm"
+	INCLUDE	"target/laser500/classic/ram.asm"
 ENDIF
 
 

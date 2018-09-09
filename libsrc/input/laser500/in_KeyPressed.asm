@@ -19,7 +19,7 @@ EXTERN l_pop_ei
 ; Row0-11 = fe, fc... rotate left
 
 
-	INCLUDE	"target/vz700/def/vz700.def"
+	INCLUDE	"target/laser500/def/laser500.def"
 
 .in_KeyPressed
 ._in_KeyPressed

@@ -17,7 +17,7 @@
 		EXTERN		conio_map_colour
 		EXTERN		generic_console_flags
 
-		INCLUDE		"target/vz700/def/vz700.def"
+		INCLUDE		"target/laser500/def/laser500.def"
 		defc		DISPLAY = 0xf800 - 0x8000
 
 generic_console_set_inverse:

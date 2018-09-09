@@ -8,7 +8,7 @@
 
 		EXTERN		conio_map_colour
 
-		INCLUDE		"target/vz700/def/vz700.def"	
+		INCLUDE		"target/laser500/def/laser500.def"	
 
 bordercolor:
 _bordercolor:
