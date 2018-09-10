@@ -62,4 +62,7 @@ arch/zxn/esxdos/z80/asm_esx_m_tapeout_trunc
 arch/zxn/esxdos/z80/asm_esx_slice_dirent
 arch/zxn/esxdos/z80/asm_extended_sna_load
 arch/zxn/esxdos/z80/asm_p3dos_cstr_to_pstr
+arch/zxn/esxdos/z80/asm_p3dos_dosname_from_catname
+arch/zxn/esxdos/z80/asm_p3dos_edrv_from_pdrv
+arch/zxn/esxdos/z80/asm_p3dos_pdrv_from_edrv
 arch/zxn/esxdos/z80/asm_p3dos_pstr_to_cstr

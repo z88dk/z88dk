@@ -669,6 +669,27 @@ extern char *p3dos_pstr_to_cstr_fastcall(char *s) __preserves_regs(d,e,h,l,iyl,i
 
 
 
+// convert cat name to 8.3 dos name
+
+extern char *p3dos_dosname_from_catname(char *dosname,const char *catname);
+extern char *p3dos_dosname_from_catname_callee(char *dosname,const char *catname) __z88dk_callee;
+#define p3dos_dosname_from_catname(a,b) p3dos_dosname_from_catname_callee(a,b)
+
+
+
+// convert between esx drive numbers and p3dos drive letters
+
+extern unsigned char p3dos_edrv_from_pdrv(unsigned char prdv) __preserves_regs(b,c,d,e);
+extern unsigned char p3dos_edrv_from_pdrv_fastcall(unsigned char prdv) __preserves_regs(b,c,d,e,h) __z88dk_fastcall;
+#define p3dos_edrv_from_pdrv(a) p3dos_edrv_from_pdrv_fastcall(a)
+
+
+extern unsigned char p3dos_pdrv_from_edrv(unsigned char erdv) __preserves_regs(b,c,d,e);
+extern unsigned char p3dos_pdrv_from_edrv_fastcall(unsigned char erdv) __preserves_regs(b,c,d,e,h) __z88dk_fastcall;
+#define p3dos_pdrv_from_edrv(a) p3dos_pdrv_from_edrv_fastcall(a)
+
+
+
 
 // ESX ERROR CODES
 
