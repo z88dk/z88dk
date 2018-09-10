@@ -849,13 +849,13 @@ extern void ZXN_WRITE_MMU7(unsigned char page);
 
 // memory - paging and banking state
 
-extern unsigned int zxn_addr_from_mmu(unsigned char mmu);
+extern void *zxn_addr_from_mmu(unsigned char mmu);
 
 
-extern unsigned char zxn_mmu_from_addr(unsigned int addr);
+extern unsigned char zxn_mmu_from_addr(void *addr);
 
 
-extern unsigned int zxn_addr_in_mmu(unsigned char mmu,unsigned int addr);
+extern void *zxn_addr_in_mmu(unsigned char mmu,void *addr);
 
 
 
