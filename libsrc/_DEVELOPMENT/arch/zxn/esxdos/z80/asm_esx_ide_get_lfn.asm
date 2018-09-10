@@ -108,6 +108,9 @@ ENDIF
    
    jr nc, error_get_lfn
 
+   ; after an M_P3DOS call, return values
+   ; normally in IX are instead in HL'
+
    ex (sp),hl                  ; hl = &time
    
    ld (hl),e
@@ -119,18 +122,11 @@ ENDIF
    inc hl
    ld (hl),b                   ; write dos_date
    inc hl
-   
-IF __SDCC_IY
 
-   push iy
+   exx
+   push hl
+   exx
    pop de
-
-ELSE
-
-   push ix
-   pop de
-
-ENDIF
 
    ld (hl),e
    inc hl
