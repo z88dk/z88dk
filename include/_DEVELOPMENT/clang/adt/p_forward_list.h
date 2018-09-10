@@ -41,10 +41,10 @@ extern void *p_forward_list_pop_front(p_forward_list_t *ls);
 extern void *p_forward_list_prev(p_forward_list_t *ls,void *item);
 
 
-extern void p_forward_list_push_back(p_forward_list_t *ls,void *item);
+extern void *p_forward_list_push_back(p_forward_list_t *ls,void *item);
 
 
-extern void p_forward_list_push_front(p_forward_list_t *ls,void *item);
+extern void *p_forward_list_push_front(p_forward_list_t *ls,void *item);
 
 
 extern void *p_forward_list_remove(p_forward_list_t *ls,void *item);

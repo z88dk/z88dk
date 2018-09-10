@@ -61,13 +61,13 @@ extern void *p_forward_list_prev_callee(p_forward_list_t *ls,void *item) __z88dk
 #define p_forward_list_prev(a,b) p_forward_list_prev_callee(a,b)
 
 
-extern void p_forward_list_push_back(p_forward_list_t *ls,void *item);
-extern void p_forward_list_push_back_callee(p_forward_list_t *ls,void *item) __z88dk_callee;
+extern void *p_forward_list_push_back(p_forward_list_t *ls,void *item);
+extern void *p_forward_list_push_back_callee(p_forward_list_t *ls,void *item) __z88dk_callee;
 #define p_forward_list_push_back(a,b) p_forward_list_push_back_callee(a,b)
 
 
-extern void p_forward_list_push_front(p_forward_list_t *ls,void *item) __preserves_regs(b,c);
-extern void p_forward_list_push_front_callee(p_forward_list_t *ls,void *item) __preserves_regs(b,c) __z88dk_callee;
+extern void *p_forward_list_push_front(p_forward_list_t *ls,void *item) __preserves_regs(b,c);
+extern void *p_forward_list_push_front_callee(p_forward_list_t *ls,void *item) __preserves_regs(b,c) __z88dk_callee;
 #define p_forward_list_push_front(a,b) p_forward_list_push_front_callee(a,b)
 
 
