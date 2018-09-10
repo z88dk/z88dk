@@ -436,6 +436,15 @@ __DPROTO(,,unsigned char,,esx_ide_get_lfn,struct esx_lfn *dir,struct esx_cat_ent
 __DPROTO(`d,e,h,l,iyl,iyh',`d,e,iyl,iyh',char,*,p3dos_cstr_to_pstr,char *s)
 __DPROTO(`d,e,h,l,iyl,iyh',`d,e,iyl,iyh',char,*,p3dos_pstr_to_cstr,char *s)
 
+// convert cat name to 8.3 dos name
+
+__DPROTO(,,char,*,p3dos_dosname_from_catname,char *dosname,const char *catname)
+
+// convert between esx drive numbers and p3dos drive letters
+
+__DPROTO(`b,c,d,e,h',`b,c,d,e',unsigned char,,p3dos_edrv_from_pdrv,unsigned char prdv)
+__DPROTO(`b,c,d,e,h',`b,c,d,e',unsigned char,,p3dos_pdrv_from_edrv,unsigned char erdv)
+
 
 // ESX ERROR CODES
 

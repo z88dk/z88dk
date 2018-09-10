@@ -616,6 +616,23 @@ extern char __LIB__ *p3dos_pstr_to_cstr(char *s) __smallc __z88dk_fastcall;
 
 
 
+// convert cat name to 8.3 dos name
+
+extern char __LIB__ *p3dos_dosname_from_catname(char *dosname,const char *catname) __smallc;
+extern char __LIB__ *p3dos_dosname_from_catname_callee(char *dosname,const char *catname) __smallc __z88dk_callee;
+#define p3dos_dosname_from_catname(a,b) p3dos_dosname_from_catname_callee(a,b)
+
+
+
+// convert between esx drive numbers and p3dos drive letters
+
+extern unsigned char __LIB__ p3dos_edrv_from_pdrv(unsigned char prdv) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ p3dos_pdrv_from_edrv(unsigned char erdv) __smallc __z88dk_fastcall;
+
+
+
 
 // ESX ERROR CODES
 

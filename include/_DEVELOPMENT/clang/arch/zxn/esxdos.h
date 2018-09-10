@@ -570,6 +570,21 @@ extern char *p3dos_pstr_to_cstr(char *s);
 
 
 
+// convert cat name to 8.3 dos name
+
+extern char *p3dos_dosname_from_catname(char *dosname,const char *catname);
+
+
+
+// convert between esx drive numbers and p3dos drive letters
+
+extern unsigned char p3dos_edrv_from_pdrv(unsigned char prdv);
+
+
+extern unsigned char p3dos_pdrv_from_edrv(unsigned char erdv);
+
+
+
 
 // ESX ERROR CODES
 
