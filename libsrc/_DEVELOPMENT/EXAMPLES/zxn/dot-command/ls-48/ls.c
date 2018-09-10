@@ -30,11 +30,11 @@ void print_file_info(void)
    
    if (es.attr & ESX_DIR_A_DIR)
    {
-      printf("%-12s %8s %02u.%02u.%04u\n", name, "<DIR>", tms.tm_mday, tms.tm_mon, tms.tm_year + 1900);
+      printf("%-12s %8s %02u.%02u.%04u\n", name, "<DIR>", tms.tm_mday, tms.tm_mon + 1, tms.tm_year + 1900);
    }
    else
    {
-      printf("%-12s %8lu %02u.%02u.%04u\n", name, es.size, tms.tm_mday, tms.tm_mon, tms.tm_year + 1900);
+      printf("%-12s %8lu %02u.%02u.%04u\n", name, es.size, tms.tm_mday, tms.tm_mon + 1, tms.tm_year + 1900);
    }
 }
 
@@ -44,11 +44,11 @@ void print_dirfile_info(void)
    
    if (ed.attr & ESX_DIR_A_DIR)
    {
-      printf("%-12s %8s %02u.%02u.%04u\n", ed.name, "<DIR>", tms.tm_mday, tms.tm_mon, tms.tm_year + 1900);
+      printf("%-12s %8s %02u.%02u.%04u\n", ed.name, "<DIR>", tms.tm_mday, tms.tm_mon + 1, tms.tm_year + 1900);
    }
    else
    {
-      printf("%-12s %8lu %02u.%02u.%04u\n", ed.name, slice->size, tms.tm_mday, tms.tm_mon, tms.tm_year + 1900);
+      printf("%-12s %8lu %02u.%02u.%04u\n", ed.name, slice->size, tms.tm_mday, tms.tm_mon + 1, tms.tm_year + 1900);
    }
 }
 
