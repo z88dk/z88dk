@@ -129,8 +129,8 @@ int main(int argc, char **argv)
       
       strcpy(cwd, dst);
       strcat(cwd, "/");
-      strcat(cwd, basename(argv[1]));
-      dst = pathnice(cwd);
+      strcat(cwd, basename(src));
+      dst = cwd;
    }
 
    // copy file
