@@ -1,6 +1,7 @@
 stdio/gal/fgetc_cons
 stdio/gal/fputc_cons
 stdio/gal/getk
+stdio/gal/generic_console
 @stdio/stdio.lst
 gal/scrolluptxt
 gal/scrolldowntxt
