@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include <libgen.h>
 #include <input.h>
 #include <errno.h>
@@ -22,6 +23,11 @@ unsigned char *src;
 unsigned char cwd[ESX_PATHNAME_MAX + ESX_FILENAME_MAX + 2];
 
 unsigned char buffer[512];
+
+unsigned char *advance_past_drive(unsigned char *p)
+{
+   return (isalpha(p[0]) && (p[1] == ':')) ? (p + 2) : p;
+}
 
 static unsigned char cpos;
 static unsigned char cursor[] = "-\\|/";
@@ -129,7 +135,7 @@ int main(int argc, char **argv)
       
       strcpy(cwd, dst);
       strcat(cwd, "/");
-      strcat(cwd, basename(src));
+      strcat(cwd, basename(advance_past_drive(src)));
       dst = cwd;
    }
 
