@@ -19,6 +19,8 @@ basicstart:
    defw start			 	     ; address
    defb 0x3A                                 ; :
    defb 0xB6, 0x20, 0x41                     ; CALL A
+   defb 0x3A                                 ; :
+   defb 0x81				     ; END
    defb 0x00                                 ; basic line terminator    
    
 start:
