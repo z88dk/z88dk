@@ -57,6 +57,9 @@ extern option_t  acetap_options;
 extern int       aquarius_exec(char *target);
 extern option_t  aquarius_options;
 
+extern int       attache_exec(char *target);
+extern option_t  attache_options;
+
 extern int       c128_exec(char *target);
 extern option_t  c128_options;
 
@@ -234,6 +237,10 @@ struct {
       "Creates a BASIC loader file and binary stored in variable array format",
       NULL,
       aquarius_exec,   &aquarius_options },
+    { "ot2dsk",    "attache",    "(C) 2018 dom ",
+      "Creates a CP/M .dsk image for the Otrone Attache",
+      NULL,
+      attache_exec,   &attache_options },
     { "bin3000",  "c128",      "(C) 2001 Stefano Bodrato",
       "Adds a c128 style disk file header",
       NULL,

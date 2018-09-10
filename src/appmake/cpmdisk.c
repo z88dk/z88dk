@@ -18,7 +18,7 @@ cpm_handle *cpm_create(cpm_discspec *spec)
      
      h->spec = *spec;
 
-     len = spec->tracks * spec->sectors_per_track * spec->sector_size;
+     len = spec->tracks * spec->sectors_per_track * spec->sector_size * spec->sides;
      h->image = calloc(len, sizeof(char));
      memset(h->image, spec->filler_byte, len);
      return h;
@@ -33,19 +33,20 @@ void cpm_write_boot_track(cpm_handle *h, void *data, size_t len)
 void cpm_write_file(cpm_handle *h, char filename[11], void *data, size_t len)
 {
       size_t num_extents = (len / h->spec.extent_size) + 1;
-      size_t directory_offset = (h->spec.boottracks * h->spec.sectors_per_track * h->spec.sector_size);
+      size_t directory_offset = (h->spec.boottracks * h->spec.sectors_per_track * h->spec.sector_size * 1); // h->spec.sides);
       size_t offset = directory_offset + (h->spec.directory_entries * 32);
       uint8_t *dir_ptr = h->image + directory_offset;
       uint8_t  direntry[32];
       uint8_t  *ptr;
       int      i, j, current_extent;
+      int      extents_per_entry = h->spec.byte_size_extents ? 16 : 8;
 
       memcpy(h->image + offset, data, len);
 
 
       // Now, write the directory entry, we can start from extent 1
-      current_extent = 1;
-      for ( i = 0; i <= (num_extents / 8)  ; i++ ) {
+      current_extent = (h->spec.directory_entries * 32) / h->spec.extent_size;
+      for ( i = 0; i <= (num_extents / extents_per_entry)  ; i++ ) {
           int extents_to_write;
 
           memset(direntry, 0 ,sizeof(direntry));
@@ -55,18 +56,22 @@ void cpm_write_file(cpm_handle *h, char filename[11], void *data, size_t len)
           direntry[12] = i;   // Extent number
           direntry[13] = 0;
           direntry[14] = 0;
-          if ( num_extents - ( i * 8) > 8) {
+          if ( num_extents - ( i * extents_per_entry) > extents_per_entry) {
               direntry[15] = 0x80;
-              extents_to_write = 8;
+              extents_to_write = extents_per_entry;
           } else {
-              direntry[15] = (len % 16384 ) / 128; 
-              extents_to_write = (num_extents - ( i * 8));
+              direntry[15] = ((len % (extents_per_entry * h->spec.extent_size )) / 128) + 1; 
+              extents_to_write = (num_extents - ( i * extents_per_entry));
           }
           ptr = &direntry[16];
-          for ( j = 0; j < 8; j++ ) {
+          for ( j = 0; j < extents_per_entry; j++ ) {
               if ( j < extents_to_write ) {
-                 direntry[j * 2 + 16] = (current_extent) % 256;
-                 direntry[j * 2 + 16 + 1] = (current_extent) / 256;
+                 if ( h->spec.byte_size_extents ) {
+                     direntry[j + 16] = (current_extent) % 256;
+                 } else {
+                     direntry[j * 2 + 16] = (current_extent) % 256;
+                     direntry[j * 2 + 16 + 1] = (current_extent) / 256;
+                 }
                  current_extent++;
               } 
           }
@@ -78,8 +83,10 @@ void cpm_write_file(cpm_handle *h, char filename[11], void *data, size_t len)
 int cpm_write_image(cpm_handle *h, const char *filename)
 {
       uint8_t header[256] = {0};
+      size_t  offs;
       FILE  *fp;
-      int    i,j;
+      int    i,j,s;
+      int    track_length = h->spec.sector_size * h->spec.sectors_per_track;
 
       if ( ( fp = fopen(filename, "wb")) == NULL ) {
           return -1;
@@ -89,17 +96,20 @@ int cpm_write_image(cpm_handle *h, const char *filename)
       memcpy(header + 0x22, "z88dk", 5);
       header[0x30] = h->spec.tracks;
       header[0x31] = h->spec.sides;
-      for ( i = 0; i < h->spec.tracks; i++ ) {
+      for ( i = 0; i < h->spec.tracks * h->spec.sides; i++ ) {
           header[0x34+i] = (h->spec.sector_size * h->spec.sectors_per_track + 256) / 256;
       }
       fwrite(header, 256, 1,  fp);
 
-      for ( i = 0; i < h->spec.tracks; i++ ) {
+      for ( i = 0 ; i < h->spec.tracks; i++ ) {
+        for ( s = 0; s < h->spec.sides; s++ ) {
           uint8_t *ptr;
+
+          offs = track_length * i + (s * track_length * h->spec.tracks);
           memset(header, 0, 256);
           memcpy(header, "Track-Info\r\n",12);
           header[0x10] = i;
-          header[0x11] = 0; // side
+          header[0x11] = s; // side
           header[0x14] = h->spec.sector_size / 256;
           header[0x15] = h->spec.sectors_per_track;
           header[0x16] = h->spec.gap3_length;
@@ -107,8 +117,8 @@ int cpm_write_image(cpm_handle *h, const char *filename)
           ptr = header + 0x18;
           for ( j = 0; j < h->spec.sectors_per_track; j++ ) {
              *ptr++ = i;  // Track
-             *ptr++ = 0;  // Side
-             *ptr++ = j;  // Secotr ID
+             *ptr++ = s;  // Side
+             *ptr++ = j+ h->spec.first_sector_offset;  // Secotr ID
              *ptr++ = h->spec.sector_size / 256;
              *ptr++ = 0; // FDC status register 1
              *ptr++ = 0; // FDC status register 2
@@ -116,7 +126,8 @@ int cpm_write_image(cpm_handle *h, const char *filename)
              *ptr++ = h->spec.sector_size / 256;
           }
           fwrite(header, 256, 1, fp);
-          fwrite(h->image + (i * h->spec.sector_size * h->spec.sectors_per_track), h->spec.sector_size * h->spec.sectors_per_track, 1, fp);
+          fwrite(h->image + offs, track_length, 1, fp);
+        }
       }
       fclose(fp);
       return 0;

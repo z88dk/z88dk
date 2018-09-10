@@ -1,5 +1,4 @@
 
-
 #ifndef CPMDISK_H
 #define CPMDISK_H
 
@@ -11,9 +10,10 @@ typedef struct {
     uint8_t   gap3_length;
     uint8_t   filler_byte;
     uint8_t   boottracks;       /* What track does the directory start */
-
     uint16_t  directory_entries;
     uint16_t  extent_size;
+    uint8_t   byte_size_extents; /* If set, extends in directories are single byte */
+    uint8_t   first_sector_offset; /* If set, first sector in Track-Info is 0, else 1 */
 } cpm_discspec;
 
 typedef struct cpm_handle_s cpm_handle;
