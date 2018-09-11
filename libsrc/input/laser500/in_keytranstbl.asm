@@ -31,7 +31,7 @@ PUBLIC in_keytranstbl
 	defb	 27, '!', '@', '#', '$', '%', '^'	; ESC 1 2 3 4 5 6
 	defb	255, '+', '_', ')', '(', '*', '&'	; UN = - 0 9 8 7
 	defb	127, 255, 255, 'P', 'O', 'I', 'U'	; BS UN UN p o i u
-	defb	 13, 255,'\"', ';', 'l', 'K', 'J'	; RET UN ' : l k j
+	defb	 13, 255,'\"', ';', 'L', 'K', 'J'	; RET UN ' : l k j
 	defb	255, '`', ' ', '?', '>', '<', 'M'	; GRAPH \ SP \ . , m
 	; 6bff, 6aff, 69ff, 68ff5
 	defb	255,'\\', ']', '[', '~', 127, 141	; UN \ [ ] ~ DEL INS
