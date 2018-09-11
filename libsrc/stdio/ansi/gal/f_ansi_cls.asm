@@ -14,5 +14,5 @@
 
 .ansi_cls
 
-	ld	l,0
+	ld	l,32
 	jp	filltxt
