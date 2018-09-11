@@ -1,7 +1,7 @@
 /*
  *	FP1100 disc generator
  *
- *      $Id: einstein.c,v 1.6 2016-06-26 00:46:55 aralbrec Exp $
+ *      $Id: cpm2.c,v 1.6 2016-06-26 00:46:55 aralbrec Exp $
  */
 
 #include "appmake.h"
@@ -9,14 +9,16 @@
 
 static char             *binname      = NULL;
 static char             *crtfile      = NULL;
+static char             *format       = NULL;
 static char             *outfile      = NULL;
 static char             *bootfile     = NULL;
 static char              help         = 0;
 
 
 /* Options that are available for this module */
-option_t einstein_options[] = {
+option_t cpm2_options[] = {
     { 'h', "help",     "Display this help",          OPT_BOOL,  &help},
+    { 'f', "format",   "Disk format",                OPT_STR,   &format},
     { 'b', "binfile",  "Linked binary file",         OPT_STR,   &binname },
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
@@ -25,9 +27,46 @@ option_t einstein_options[] = {
 };
 
 
-int einstein_exec(char *target)
+static cpm_discspec einstein_spec = {
+    .sectors_per_track = 10,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 64,
+    .extent_size = 2048
+};
+
+static cpm_discspec attache_spec = {
+    .sectors_per_track = 10,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+};
+
+
+struct formats {
+     const char    *name;
+     cpm_discspec  *spec;
+} formats[] = {
+    { "einstein",   &einstein_spec },
+    { "attache",    &attache_spec },
+    { NULL, NULL }
+};
+
+int cpm2_exec(char *target)
 {
-    static cpm_discspec spec = {0};
+    cpm_discspec *spec;
+    struct  formats *f = &formats[0];
     char    disc_name[FILENAME_MAX+1];
     char    cpm_filename[12] = "APP     COM";
     void   *filebuf;
@@ -41,6 +80,21 @@ int einstein_exec(char *target)
     if ( binname == NULL ) {
         return -1;
     }
+    if ( format == NULL ) {
+        return -1;
+    }
+
+    while ( f->name != NULL ) {
+       if ( strcasecmp(format, f->name) == 0 ) {
+           spec = f->spec;
+           break;
+       }
+       f++;
+    } 
+
+    if ( spec == NULL ) {
+       return -1;
+    }
 
     if ( outfile == NULL ) {
         strcpy(disc_name,binname);
@@ -48,16 +102,6 @@ int einstein_exec(char *target)
     } else {
         strcpy(disc_name,outfile);
     }
-
-    spec.sectors_per_track = 10;
-    spec.tracks = 40;
-    spec.sides = 1;
-    spec.sector_size = 512;
-    spec.gap3_length = 0x2a;
-    spec.filler_byte = 0xe5;
-    spec.boottracks = 2;
-    spec.directory_entries = 64;
-    spec.extent_size = 2048;
 
     // Open the binary file
     if ( (binary_fp=fopen_bin(binname, crtfile) ) == NULL ) {
@@ -74,7 +118,7 @@ int einstein_exec(char *target)
     fclose(binary_fp);
 
 
-    h = cpm_create(&spec);
+    h = cpm_create(spec);
     if ( bootfile != NULL ) {
         size_t bootlen;
         char   bootbuf[20 * 512];  // Allocate?

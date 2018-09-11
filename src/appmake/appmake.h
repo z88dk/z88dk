@@ -57,9 +57,6 @@ extern option_t  acetap_options;
 extern int       aquarius_exec(char *target);
 extern option_t  aquarius_options;
 
-extern int       attache_exec(char *target);
-extern option_t  attache_options;
-
 extern int       c128_exec(char *target);
 extern option_t  c128_options;
 
@@ -73,8 +70,9 @@ extern int       cpm_exec(char *target);
 extern option_t  cpm_options;
 extern char      cpm_longhelp[];
 
-extern int       einstein_exec(char *target);
-extern option_t  einstein_options;
+extern int       cpm2_exec(char *target);
+extern option_t  cpm2_options;
+
 
 extern int       enterprise_exec(char *target);
 extern option_t  enterprise_options;
@@ -237,10 +235,6 @@ struct {
       "Creates a BASIC loader file and binary stored in variable array format",
       NULL,
       aquarius_exec,   &aquarius_options },
-    { "ot2dsk",    "attache",    "(C) 2018 dom ",
-      "Creates a CP/M .dsk image for the Otrone Attache",
-      NULL,
-      attache_exec,   &attache_options },
     { "bin3000",  "c128",      "(C) 2001 Stefano Bodrato",
       "Adds a c128 style disk file header",
       NULL,
@@ -249,10 +243,6 @@ struct {
       "Creates an AMSDOS file suitable for writing to a .DSK image, opt. WAV",
       NULL,
       cpc_exec,   &cpc_options },
-    { "com2dsk",   "einstein",      "(C) 2018 Dominic Morris",
-      "Create an Einstein disc image",
-      NULL,
-      einstein_exec,   &einstein_options },
     { "bin2ep",   "enterprise",      "(C) 2011 Stefano Bodrato",
       "Adds a type 5 header to make a .app file",
       NULL,
@@ -261,6 +251,10 @@ struct {
       "CPM disk image creation",
       cpm_longhelp,
       cpm_exec,     &cpm_options },
+    { "cpmdisk",  "cpmdisk",   "(C) 2018 dom",
+      "CPM disk image creation",
+      NULL,
+      cpm2_exec,     &cpm2_options },
     { "fp1kd88",  "fp1100",      "(C) 2018 Dominic Morris",
       "Creates a .d88 for the Casio FP-1100",
       NULL,
