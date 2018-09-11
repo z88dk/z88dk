@@ -167,11 +167,11 @@ unsigned char *advance_past_drive(unsigned char *p)
    return (isalpha(p[0]) && (p[1] == ':')) ? (p + 2) : p;
 }
 
-unsigned char current_drive;
+unsigned char current_drive[] = "c:";
 
 unsigned char get_drive(unsigned char *p)
 {
-   return (isalpha(p[0]) && (p[1] == ':')) ? p[0] : current_drive;
+   return (isalpha(p[0]) && (p[1] == ':')) ? p[0] : current_drive[0];
 }
 
 void parse_ls_color(unsigned char *s)
@@ -225,7 +225,7 @@ static void process_directory_cache(void)
          memory_clear_file_records();
          
          catalog_morethanone = 0;
-         catalog_add_file_records(dr->name);   // also restores mmu6,7
+         catalog_add_file_records_from_dir(dr->name);   // also restores mmu6,7
 
          list_generate();
       }
@@ -412,7 +412,7 @@ int main(unsigned int argc, char **argv)
 
    // find current drive
    
-   if ((current_drive = tolower(esx_dos_get_drive())) == 0xff)
+   if ((current_drive[0] = tolower(esx_dos_get_drive())) == 0xff)
       exit(errno);
 
    // create ls groups
@@ -477,7 +477,7 @@ int main(unsigned int argc, char **argv)
    // no src names means the current directory is implied
    
    if (p_forward_list_empty(&src))
-      catalog_add_dir_record("*.*");
+      catalog_add_dir_record(current_drive);
 
    // let's begin
    // iterate over all src files and their peers

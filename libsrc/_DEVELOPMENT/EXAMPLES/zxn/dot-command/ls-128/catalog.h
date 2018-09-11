@@ -11,6 +11,7 @@ extern unsigned char catalog_morethanone;
 
 extern void catalog_add_dir_record(unsigned char *name);
 extern void catalog_add_file_records(unsigned char *name);
+extern void catalog_add_file_records_from_dir(unsigned char *name);
 
 extern struct esx_lfn lfn;
 extern struct esx_cat catalog;

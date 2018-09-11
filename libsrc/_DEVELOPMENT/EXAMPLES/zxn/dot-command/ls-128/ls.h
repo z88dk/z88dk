@@ -92,9 +92,11 @@ extern int16_t current_year;
 extern struct esx_mode screen_mode;
 extern unsigned char canonical_active[ESX_FILENAME_LFN_MAX + 1];
 
-extern unsigned char current_drive;
+extern unsigned char current_drive[];
 
 extern unsigned char *advance_past_drive(unsigned char *p);
 extern unsigned char get_drive(unsigned char *p);
+
+extern unsigned char fin;
 
 #endif

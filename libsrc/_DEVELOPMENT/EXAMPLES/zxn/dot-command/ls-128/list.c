@@ -55,9 +55,9 @@ void list_generate(void)
       // find out what portion of the listing's dir needs to be printed
       // by eliminating the leading part in common with the drive's cwd
       
-      if ((*(p = list_dirname())) || (current_drive != canonical_active[0]))
+      if ((*(p = list_dirname())) || (current_drive[0] != canonical_active[0]))
       {
-         if (current_drive != canonical_active[0])
+         if (current_drive[0] != canonical_active[0])
             printf("%c:", canonical_active[0]);
          
          puts(p);
