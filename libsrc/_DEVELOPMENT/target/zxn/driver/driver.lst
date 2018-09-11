@@ -1,5 +1,5 @@
 target/zx/driver/terminal/_font_8x8_rom
-@target/zx/driver/terminal/zx_00_output_rom_rst.lst
+@target/zxn/driver/terminal/zx_00_output_rom_rst.lst
 @target/zx/driver/terminal/zx_01_input_kbd_inkey.lst
 @target/zx/driver/terminal/zx_01_input_kbd_lastk.lst
 @target/zx/driver/terminal/zx_01_output_char_32.lst
