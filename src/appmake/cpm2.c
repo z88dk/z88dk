@@ -76,7 +76,7 @@ struct formats {
 } formats[] = {
     { "attache",    &attache_spec },
     { "einstein",   &einstein_spec },
-    { "osborne",    &osborne_spec },
+    { "osborne1",   &osborne_spec },
     { NULL, NULL }
 };
 
