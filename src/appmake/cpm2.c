@@ -53,13 +53,30 @@ static cpm_discspec attache_spec = {
     .first_sector_offset = 1,
 };
 
+static cpm_discspec osborne_spec = {
+    .sectors_per_track = 5,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 1024,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+};
+
+
+
 
 struct formats {
      const char    *name;
      cpm_discspec  *spec;
 } formats[] = {
-    { "einstein",   &einstein_spec },
     { "attache",    &attache_spec },
+    { "einstein",   &einstein_spec },
+    { "osborne",    &osborne_spec },
     { NULL, NULL }
 };
 

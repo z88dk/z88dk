@@ -87,6 +87,13 @@ int cpm_write_image(cpm_handle *h, const char *filename)
       FILE  *fp;
       int    i,j,s;
       int    track_length = h->spec.sector_size * h->spec.sectors_per_track;
+      int    sector_size = 0;
+
+      i = h->spec.sector_size;
+      while ( i > 128 ) {
+         sector_size++;
+         i /= 2;
+      }
 
       if ( ( fp = fopen(filename, "wb")) == NULL ) {
           return -1;
@@ -110,7 +117,7 @@ int cpm_write_image(cpm_handle *h, const char *filename)
           memcpy(header, "Track-Info\r\n",12);
           header[0x10] = i;
           header[0x11] = s; // side
-          header[0x14] = h->spec.sector_size / 256;
+          header[0x14] = sector_size;
           header[0x15] = h->spec.sectors_per_track;
           header[0x16] = h->spec.gap3_length;
           header[0x17] = h->spec.filler_byte;
@@ -119,7 +126,7 @@ int cpm_write_image(cpm_handle *h, const char *filename)
              *ptr++ = i;  // Track
              *ptr++ = s;  // Side
              *ptr++ = j+ h->spec.first_sector_offset;  // Secotr ID
-             *ptr++ = h->spec.sector_size / 256;
+             *ptr++ = sector_size;
              *ptr++ = 0; // FDC status register 1
              *ptr++ = 0; // FDC status register 2
              *ptr++ = h->spec.sector_size % 256;
