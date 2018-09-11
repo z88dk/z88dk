@@ -8,8 +8,7 @@
 #include "list.h"
 #include "ls.h"
 #include "memory.h"
-
-#include <stdio.h>
+#include "user_interaction.h"
 
 unsigned char catalog_control;
 unsigned char catalog_morethanone;
@@ -145,8 +144,6 @@ unsigned char catalog_add_file_record(void)
    memcpy(frp.fr, &fr, sizeof(fr));
    memcpy(frp.fr->lfn, lfn.filename, size - sizeof(fr) + 1);
 
-//printf("lfn size = %lu\n", lfn.size);
-//printf("fr size = %lu\n", frp.fr->size);
    // restore memory
    
    memory_restore_mmu7();
@@ -162,7 +159,7 @@ unsigned char catalog_add_file_record(void)
    return 1;
 }
 
-static unsigned char name_in_main_memory[ESX_FILENAME_LFN_MAX + 1];
+static unsigned char name_in_main_memory[ESX_FILENAME_LFN_MAX*2 + 1];
 static unsigned char constructed_name[ESX_FILENAME_LFN_MAX*2 + 1];
 
 void catalog_add_file_records(unsigned char *name)
@@ -176,10 +173,18 @@ void catalog_add_file_records(unsigned char *name)
    
    static unsigned char *constructed_name_base;
 
+   // opportunity for user to break
+   
+   user_interaction_spin();
+
    // name is visible and could be in divmmc or dir bank
    // main bank is restored in mmu6,7 by this function
    
-   strlcpy(name_in_main_memory, name, sizeof(name_in_main_memory));
+   strcpy(name_in_main_memory, name);
+
+   // name_in_main_memory must remain unaltered while matching
+   // so a copy is made where directory names can be constructed
+
    strcpy(constructed_name, name_in_main_memory);
    
    constructed_name_base = advance_past_drive(constructed_name);
@@ -205,6 +210,10 @@ void catalog_add_file_records(unsigned char *name)
 
       do
       {
+         // opportunity for user to break
+         
+         user_interaction_spin();
+
          // lfn details for this file
 
          esx_ide_get_lfn(&lfn, &catalog.cat[1]);

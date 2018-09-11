@@ -22,6 +22,7 @@
 #include "memory.h"
 #include "options.h"
 #include "sort.h"
+#include "user_interaction.h"
 
 
 // SYSTEM INFORMATION
@@ -209,6 +210,12 @@ static void process_directory_cache(void)
 
    for (memory_page_in_dir(BASE_DIR_PAGES); dr = p_queue_pop(&dqueue); memory_page_in_dir(BASE_DIR_PAGES))
    {
+      // opportunity for user to break
+         
+      user_interaction_spin();
+
+      //
+      
       if (esx_f_get_canonical_path(dr->name, canonical_active))
          printf("\nIgnoring invalid path:\n\"%s\"\n\n", dr->name);
       else
@@ -365,8 +372,6 @@ int main(unsigned int argc, char **argv)
 
          if (*tmp.name)
          {
-            void *p;
-            
             strlwr(tmp.name);
 
             if ((p = obstack_copy(fob, &tmp, sizeof(tmp))) == 0)
@@ -421,7 +426,7 @@ int main(unsigned int argc, char **argv)
       for (current = p_forward_list_next(ptr); current; current = p_forward_list_next(ptr))
       {
          struct file *walk;
-      
+
          current->canonical_path = getpath(current->name);
       
          // check if current should be part of a ls group in the src previous to it
@@ -479,6 +484,10 @@ int main(unsigned int argc, char **argv)
    
    for (ptr = p_forward_list_front(&src); ptr; ptr = p_forward_list_next(ptr))
    {
+      // opportunity for user to break
+         
+      user_interaction_spin();
+
       // clear all file records
       // file records are accumulated per src
       
@@ -491,7 +500,7 @@ int main(unsigned int argc, char **argv)
       else
       {
          strlwr(canonical_active);
-         
+
          // point to list of peers
          
          current = p_forward_list_front(&(p_forward_list_t)ptr->peer);

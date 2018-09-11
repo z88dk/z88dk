@@ -9,6 +9,8 @@
 #include "memory.h"
 #include "sort.h"
 
+#include <intrinsic.h>
+
 static struct file_record_ptr frp;
 static unsigned char canonical_cwd[ESX_FILENAME_LFN_MAX + 1];
 
@@ -43,6 +45,8 @@ void list_generate(void)
    {
       unsigned char *p;
       
+      puts(" ");
+
       // first find the cwd for the drive the listing comes from
       
       esx_f_getcwd_drive(p3dos_edrv_from_pdrv(get_drive(canonical_active)), canonical_cwd);
@@ -122,25 +126,23 @@ void list_generate(void)
          memory_page_in_mmu7(frp.page + BASE_LFN_PAGES);
             
          // print one line of listing
-         
+
          name = (flags.name_fmt_mod & FLAG_NAME_FMT_MOD_SFN) ? frp.fr->sfn : frp.fr->lfn;
          ext = basename_ext(name);
 
          if (frp.fr->type == FILE_RECORD_TYPE_FILE)
          {
-            printf("%11s %6lu %.*s%s\n", flags.date_func(&frp.fr->time), frp.fr->size, min(flags.disp_width - 20 - strlen(ext), ext - name), name, ext);
+            printf("%-11s %6lu %.*s%s\n", flags.date_func(&frp.fr->time), frp.fr->size, min(flags.disp_width - 20 - strlen(ext), ext - name), name, ext);
          }
          else
          {
-            printf("%11s %6s %.*s%s\n", flags.date_func(&frp.fr->time), "", min(flags.disp_width - 20 - strlen(ext), ext - name), name, ext);
+            printf("%-11s %6s %.*s%s\n", flags.date_func(&frp.fr->time), "", min(flags.disp_width - 20 - strlen(ext), ext - name), name, ext);
          }
             
          // restore main memory paging state
             
          memory_restore_mmu7();
       }
-      
-      puts(" ");
    }
 
    return;

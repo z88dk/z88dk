@@ -77,11 +77,11 @@ int sort_cmp_file_by_time(struct file_record_ptr *a, struct file_record_ptr *b)
    
    sort_common(a, b);
 
-   // compare
+   // compare newest first (largest time value)
    
    if (res == 0)
    {
-      if ((res = compare_dostm(&fr_a->time, &fr_b->time)) == 0)
+      if ((res = compare_dostm(&fr_b->time, &fr_a->time)) == 0)
          res = stricmp(zxn_addr_in_mmu(6, fr_a->lfn), fr_b->lfn);
       
       if (flags.sort_mod & FLAG_SORT_MOD_REVERSE)
@@ -101,18 +101,18 @@ int sort_cmp_file_by_size(struct file_record_ptr *a, struct file_record_ptr *b)
    
    sort_common(a, b);
 
-   // compare
+   // compare largest first
    
    if (res == 0)
    {
       if (fr_a->size < fr_b->size)
-         res = -1;
+         res = 1;
       else
       {
          if (fr_a->size == fr_b->size)
             res = stricmp(zxn_addr_in_mmu(6, fr_a->lfn), fr_b->lfn);
          else
-            res = 1;
+            res = -1;
       }
 
       if (flags.sort_mod & FLAG_SORT_MOD_REVERSE)
