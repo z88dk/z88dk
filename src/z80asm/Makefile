@@ -71,12 +71,12 @@ all: z80asm_lib
 
 z80asm_lib:
 ifeq ($(CROSS),0)
-	make -C dev/z80asm_lib
+	$(MAKE) -C dev/z80asm_lib
 	cp dev/z80asm_lib/$(PROJ)-*.lib .
 endif
 
 clean::
-	make -C dev/z80asm_lib clean
+	$(MAKE) -C dev/z80asm_lib clean
 	$(RM) $(PROJ)-*.lib
 
 #------------------------------------------------------------------------------
@@ -98,7 +98,7 @@ clean::
 install:
 	$(INSTALL) $(TARGET)     $(PREFIX)/bin/$(EXEC_PREFIX)$(TARGET)
 	$(INSTALL) asmpp.pl      $(PREFIX)/bin/asmpp.pl
-	make -C dev/z80asm_lib install PREFIX=$(PREFIX_SHARE)
+	$(MAKE) -C dev/z80asm_lib install PREFIX=$(PREFIX_SHARE)
 
 #------------------------------------------------------------------------------
 # clean
@@ -150,7 +150,7 @@ prove_perl: $(TARGET)
 	perl -S prove t/*.t
 
 testmsvc : $(MSVC_TARGET)
-	make Z80ASM=$(MSVC_TARGET) prove
+	$(MAKE) Z80ASM=$(MSVC_TARGET) prove
 
 clean::
 	$(RM) zcc_opt.def zcc_proj.lst
