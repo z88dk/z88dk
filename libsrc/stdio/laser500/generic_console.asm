@@ -3,12 +3,12 @@
 		SECTION		code_clib
 
 		PUBLIC		generic_console_cls
-		PUBLIC		generic_console_vpeek
 		PUBLIC		generic_console_printc
 		PUBLIC		generic_console_scrollup
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
+		PUBLIC		generic_console_xypos
 		PUBLIC		__vz700_mode
 
 		EXTERN		CONSOLE_COLUMNS
@@ -16,6 +16,10 @@
 		EXTERN		__console_w
 		EXTERN		conio_map_colour
 		EXTERN		generic_console_flags
+		EXTERN		generic_console_font32
+		EXTERN		generic_console_udg32
+                EXTERN          screendollar
+                EXTERN          screendollar_with_count
 
 		INCLUDE		"target/laser500/def/laser500.def"
 		defc		DISPLAY = 0xf800 - 0x8000
@@ -55,6 +59,9 @@ generic_console_cls:
 	ld	a,7
 	ld	(SYSVAR_bank1),a
 	out	($41),a
+	ld	a,(__vz700_mode)
+	cp	2
+	jr	z,cls_hires
 	ld	hl, DISPLAY
 	ld	bc,+( 2032 / 2)
 	ld	de,(attr)
@@ -74,10 +81,27 @@ loop:
 	ld	a,b
 	or	c
 	jr	nz,loop
+cls_return:
 	pop	af
 	ld	(SYSVAR_bank1),a
 	out	($41),a
 	ret
+
+cls_hires:
+	ld	bc, 8192
+	ld	hl, 16384
+	ld	de,(attr)
+	ld	d,0
+cls_hires_loop:
+	ld	(hl),d
+	inc	hl
+	ld	(hl),e
+	inc	hl
+	dec	bc
+	ld	a,b
+	or	c
+	jr	nz,cls_hires_loop
+	jr	cls_return
 
 ; c = x
 ; b = y
@@ -91,8 +115,11 @@ generic_console_printc:
 	ld	(SYSVAR_bank1),a
 	out	($41),a
 	ex	af,af
-	call	xypos		
+	call	generic_console_xypos		
 	ld	d,a		;Save character
+	ld	a,(__vz700_mode)
+	cp	2
+	jr	z,printc_hires
 	ld	a,(generic_console_flags)
 	and	128		;bit 7 = inverse
 	or	d
@@ -114,42 +141,69 @@ printc_return:
 	out	($41),a
 	ret
 
-;Entry: c = x,
-;       b = y
-;       e = rawmode
-;Exit:  nc = success
-;        a = character,
-;        c = failure
-generic_console_vpeek:
-	ld	a,(SYSVAR_bank1)
-	push	af
-	ld	a,7
-	ld	(SYSVAR_bank1),a
-	out	($41),a
-        call    xypos
-	ld	a,(__vz700_mode)
-	and	a
-	jr	nz,skip_40col
+printc_hires:
+	add	hl,bc		;We need to get 40 column offset
+	ld	a,d
+	ex	de,hl		;de = screen
+	ld	bc,(generic_console_font32)
+	bit	7,a
+	jr	z,not_udg
+	ld	bc,(generic_console_udg32)
+	res	7,a
+	inc	b
+not_udg:
+	ld	l,a
+	ld	h,0
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
 	add	hl,bc
-skip_40col:
-	ld	a,(hl)
-	and	127		;Remove inverse flag
-	ex	af,af
-	pop	af
-	ld	(SYSVAR_bank1),a
-	out	($41),a
-	ex	af,af
-	ret
+	dec	h
+	ex	de,hl		;hl = screen, de = font
+	ld	a,(generic_console_flags)
+	rlca
+	sbc	a
+	ld	c,a		;c = 0 / c = 255
+	ld	b,8
+printc_hires_loop:
+	push	bc
+	ld	a,(de)
+	xor	c
+	; Display is morrored, so mirror the byte
+	ld	c,a
+        rlca
+        rlca
+        xor     c
+        and     0xaa
+        xor     c
+        ld      c,a
+        rlca
+        rlca
+        rlca
+        rrc     c
+        xor     c
+        and     0x66
+        xor     c
+	ld	(hl),a
+	inc	hl
+	ld	a,(attr)
+	ld	(hl),a
+	inc	de
+	ld	bc,$800 - 1
+	add	hl,bc
+	pop	bc
+	djnz	printc_hires_loop
+	jr	printc_return
+
 
 ; Exit:
 ;      hl = 80 column position
 ;      bc = extra step to get to 40 columns
-xypos:
+generic_console_xypos:
 	push	af
 	ld	a,b		; Modulus 8 
 	and	7
 	ld	h,a		;*256
-
 	ld	l,0
 	srl	b		;y/ 8
 	srl	b
@@ -164,6 +218,11 @@ generic_console_printc_1:
 generic_console_printc_3:
 	add	hl,bc			;hl now points to address in display
 	ld	de,DISPLAY
+	ld	a,(__vz700_mode)
+	cp	2
+	jr	nz,not_hires
+	ld	de,$4000
+not_hires:
 	add	hl,de
 	pop	af
 	ret
@@ -176,7 +235,6 @@ generic_console_scrollup:
 	ld	a,7
 	ld	(SYSVAR_bank1),a
 	out	($41),a
-
 	push	de
 	push	bc
 	ld	a,23
@@ -184,15 +242,37 @@ generic_console_scrollup:
 scrollup_1:
 	push	af
 	push	bc
-	call	xypos
+	call	generic_console_xypos
 	pop	bc
 	push	bc
 	push	hl		;dest
 	inc	b
-	call	xypos		;hl=source
+	call	generic_console_xypos		;hl=source
 	pop	de
+
+	; For hires we need to copy 8 rows..
+	ld	b,1
+	ld	a,(__vz700_mode)
+	cp	2
+	jr	nz,mode_0_1
+	ld	b,8
+
+mode_0_1:
+	ld	a,b
+scroll_loop:
+	push	hl
+	push	de
 	ld	bc,80
 	ldir
+	pop	hl
+	ld	bc,$800
+	add	hl,bc
+	ex	de,hl
+	pop	hl
+	add	hl,bc
+	dec	a
+	jr	nz,scroll_loop
+
 	pop	bc
 	inc	b
 	pop	af
@@ -212,13 +292,16 @@ scrollup_2:
 	dec	a
 	jr	nz,scrollup_2
 
+scrollup_return:
 	pop	bc
 	pop	de
-
 	pop	af
 	ld	(SYSVAR_bank1),a
 	out	($41),a
 	ret
+
+scrollup_hires:
+	jr	scrollup_return
 
 	SECTION bss_clib
 

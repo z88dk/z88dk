@@ -2,11 +2,13 @@ stdio/inkey/fgetc_cons
 stdio/inkey/getk
 stdio/laser500/generic_console
 stdio/laser500/generic_console_ioctl
+stdio/laser500/generic_console_vpeek
 stdio/laser500/fputc_cons
 stdio/laser500/conio_map_colour
 stdio/laser500/bordercolour
 stdio/laser500/CRT_FONT
 @stdio/stdio.lst
+@font/font_8x8/font_8x8.lst
 @input/input_keyboard.lst
 graphics/generic_console/getmaxx
 graphics/generic_console/getmaxy

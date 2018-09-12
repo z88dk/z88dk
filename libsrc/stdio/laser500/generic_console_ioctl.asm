@@ -36,23 +36,40 @@ check_mode:
 	cp	IOCTL_GENCON_SET_MODE
 	jr	nz,failure
 	ld	a,c
+	ld	d,0
 	ld	e,80
 	cp	1		;80 column mode
 	jr	z,set_mode
 	ld	e,40
 	and	a		;40 column mode
+	jr	z,set_mode
+	cp	2
 	jr	nz,failure
-	; Graphical modes later
+	ld	d,8
+	; Value of 2 is GR4 - 320x192
 set_mode:
 	ld	(__vz700_mode),a
-	and	1
 	ld	c,a
 	ld	a,(SYSVAR_port44)
+	and	@11111000
 	or	c
 	ld	(SYSVAR_port44),a
 	out	($44),a
 	ld	a,e		;columns
 	ld	(__console_w),a
+	; Toggle graphics mode
+	; We need to enable grpahi
+not_graphics_mode:
+	ld	a,(SYSVAR_bank1)
+	push	af
+	ld	a,2
+	ld	(SYSVAR_bank1),a
+	out	($41),a
+	ld	hl,$4000 + $2800
+	ld	(hl),d		;Enable/disable graphics
+	pop	af
+	ld	(SYSVAR_bank1),a
+	out	($41),a
 	call	generic_console_cls
 	and	a
 	ret
