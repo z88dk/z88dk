@@ -81,7 +81,7 @@ void catalog_add_dir_record(unsigned char *name)
       }
    }
 
-   // silently ignore if no space is available
+   // insert into directory queue
    
    if (spot)
    {
@@ -90,6 +90,8 @@ void catalog_add_dir_record(unsigned char *name)
       
       p_queue_push(&dqueue, spot);
    }
+   else
+      printf(" \nskipped dir %s\n", name);
 
    // restore main bank
    
@@ -101,11 +103,13 @@ void catalog_add_dir_record(unsigned char *name)
 static struct file_record_ptr frp;
 static struct file_record fr;
 
+static unsigned char *cat_lfn_name;
+
 unsigned char catalog_add_file_record(void)
 {
    static unsigned int size;
    
-   size = strlen(lfn.filename) + sizeof(fr);
+   size = strlen(cat_lfn_name) + sizeof(fr);
    
    // locate memory to store file record
    
@@ -144,7 +148,7 @@ unsigned char catalog_add_file_record(void)
    // copy completed file record to obstack
    
    memcpy(frp.fr, &fr, sizeof(fr));
-   memcpy(frp.fr->lfn, lfn.filename, size - sizeof(fr) + 1);
+   memcpy(frp.fr->lfn, cat_lfn_name, size - sizeof(fr) + 1);
 
    // restore memory
    
@@ -203,6 +207,7 @@ void catalog_add_file_records(unsigned char *name)
    catalog.cat_sz = 2;
    
    lfn.cat = &catalog;
+   cat_lfn_name = lfn.filename;
    
    // iterate over all matches
    
@@ -232,10 +237,10 @@ void catalog_add_file_records(unsigned char *name)
 
          // filter listed files
 
-         dots = (strcmp(lfn.filename, ".") == 0) || (strcmp(lfn.filename, "..") == 0);
+         dots = (strcmp(fr.sfn, ".") == 0) || (strcmp(fr.sfn, "..") == 0);
          
          if ((filter = dots && (flags.file_filter & FLAG_FILE_FILTER_ALMOST_ALL)) == 0)
-            filter = (flags.file_filter & FLAG_FILE_FILTER_BACKUP) && (stricmp(basename_ext(lfn.filename), ".bak") == 0);
+            filter = (flags.file_filter & FLAG_FILE_FILTER_BACKUP) && (stricmp(basename_ext(fr.sfn), ".bak") == 0);
          
          if (filter == 0)
          {
@@ -268,7 +273,7 @@ void catalog_add_file_records(unsigned char *name)
             {
                // construct name
 
-               strcat(strcpy(constructed_name_base, lfn.filename), "/");
+               strcat(strcpy(constructed_name_base, fr.sfn), "/");
 
                // add directory to queue
 
@@ -282,13 +287,13 @@ void catalog_add_file_records(unsigned char *name)
    return;
 }
 
-static struct esx_dirent_lfn dirent;
+static struct esx_dirent dirent_sfn;
+static struct esx_dirent_lfn dirent_lfn;
+
 static struct esx_dirent_slice *slice;
 
 void catalog_add_file_records_from_dir(unsigned char *name)
 {
-   static unsigned int index;
-
    static unsigned char dots;
    static unsigned char filter;
    
@@ -302,21 +307,20 @@ void catalog_add_file_records_from_dir(unsigned char *name)
    constructed_name_base = constructed_name + strlen(constructed_name);
    
    // gathering both sfn and lfn names can be done by
-   // walking the directory contents twice (i hope)
-   
-   index = fbase_sz;   // where these new entries will be added
+   // opening the dir twice, once in sfn mod and once in lfn mode
 
-   // first create the file records which must include the lfn name
+   fin = esx_f_opendir_ex(name, ESX_DIR_USE_LFN);
+   gin = esx_f_opendir(name);
    
-   if ((fin = esx_f_opendir_ex(name, ESX_DIR_USE_LFN)) == 0xff)
+   if ((fin == 0xff) || (gin == 0xff))
    {
-      printf(" \nBad dirname %s\n", name);
+      printf(" \nbad dirname %s\n", name);
    }
    else
    {
-      // collect lfn names and create file records
-      
-      while (esx_f_readdir(fin, &dirent) == 1)
+      cat_lfn_name = dirent_lfn.name;
+
+      while ((esx_f_readdir(fin, &dirent_lfn) == 1) && (esx_f_readdir(gin, &dirent_sfn)) == 1)
       {
          // opportunity for user to break
          
@@ -324,37 +328,45 @@ void catalog_add_file_records_from_dir(unsigned char *name)
 
          // filter entry
 
-         dots = (strcmp(dirent.name, ".") == 0) || (strcmp(dirent.name, "..") == 0);
+         dots = (strcmp(dirent_sfn.name, ".") == 0) || (strcmp(dirent_sfn.name, "..") == 0);
          
          if ((filter = dots && (flags.file_filter & FLAG_FILE_FILTER_ALMOST_ALL)) == 0)
-            filter = (flags.file_filter & FLAG_FILE_FILTER_BACKUP) && (stricmp(basename_ext(dirent.name), ".bak") == 0);
+            if ((filter = (flags.sys == 0) && (dirent_sfn.attr & ESX_DIR_A_SYS)) == 0)
+               filter = (flags.file_filter & FLAG_FILE_FILTER_BACKUP) && (stricmp(basename_ext(dirent_sfn.name), ".bak") == 0);
 
+         // create file record
+         
          if (filter == 0)
          {
             // fill in file record
 
-            slice = esx_slice_dirent(&dirent);
+            slice = esx_slice_dirent(&dirent_sfn);
          
-            fr.type = (dirent.attr & ESX_DIR_A_DIR) ? FILE_RECORD_TYPE_DIR : FILE_RECORD_TYPE_FILE;
+            fr.type = (dirent_sfn.attr & ESX_DIR_A_DIR) ? FILE_RECORD_TYPE_DIR : FILE_RECORD_TYPE_FILE;
             memcpy(&fr.time, &slice->time, sizeof(fr.time) + sizeof(fr.size));
-            strcpy(lfn.filename, dirent.name);
-         
-            // provide a temporary sfn in case things go bad unexpectedly
-
-            memcpy(fr.sfn, dirent.name, 12);
-            fr.sfn[12] = 0;
-         
-            // TODO: CHECK IF FULL FOR SUPER LONG DIRECTORIES
-         
-            catalog_add_file_record();
+            strcpy(fr.sfn, dirent_sfn.name);
             
+            // add file record
+
+            if (catalog_add_file_record())
+            {
+               // out of memory for records so must list partially complete directory
+               
+               list_generate();
+               memory_clear_file_records();
+               
+               // now add record
+               
+               catalog_add_file_record();
+            }
+
             // determine if we're adding to the directory queue
             
             if ((fr.type == FILE_RECORD_TYPE_DIR) && (dots == 0) && (flags.dir_type == FLAG_DIR_TYPE_RECURSIVE))
             {
                // construct name
 
-               strcat(strcpy(constructed_name_base, lfn.filename), "/");
+               strcat(strcpy(constructed_name_base, dirent_sfn.name), "/");
 
                // add directory to queue
 
@@ -362,50 +374,8 @@ void catalog_add_file_records_from_dir(unsigned char *name)
             }
          }
       }
-      
-      esx_f_close(fin);
-      fin = 0xff;
-
-      // name may be out of visible memory so use local copy instead
-
-      *constructed_name_base = 0;
-      
-      // copy sfn names into file records
-      
-      if ((fin = esx_f_opendir(constructed_name)) != 0xff)
-      {
-         while ((index < fbase_sz) && (esx_f_readdir(fin, &dirent) == 1))
-         {
-            // opportunity for user to break
-         
-            user_interaction_spin();
-         
-            // filter entry
-
-            dots = (strcmp(dirent.name, ".") == 0) || (strcmp(dirent.name, "..") == 0);
-         
-            if ((filter = dots && (flags.file_filter & FLAG_FILE_FILTER_ALMOST_ALL)) == 0)
-               filter = (flags.file_filter & FLAG_FILE_FILTER_BACKUP) && (stricmp(basename_ext(dirent.name), ".bak") == 0);
-
-            if (filter == 0)
-            {
-               // fill in sfn details of the stored record
-            
-               memcpy(&frp, &fbase[index], sizeof(frp));
-
-               memory_page_in_mmu7(frp.page + BASE_LFN_PAGES);
-            
-               strcpy(frp.fr->sfn, dirent.name);
-               ++index;
-            
-               memory_restore_mmu7();
-            }
-         }
-
-         esx_f_close(fin);
-         fin = 0xff;
-      }
    }
    
+   close_open_files();
    return;
 }

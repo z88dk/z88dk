@@ -98,5 +98,8 @@ extern unsigned char *advance_past_drive(unsigned char *p);
 extern unsigned char get_drive(unsigned char *p);
 
 extern unsigned char fin;
+extern unsigned char gin;
+
+extern void close_open_files(void);
 
 #endif

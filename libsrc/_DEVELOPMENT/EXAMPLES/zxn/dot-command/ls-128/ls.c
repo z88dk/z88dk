@@ -180,11 +180,14 @@ void parse_ls_color(unsigned char *s)
 }
 
 unsigned char fin = 0xff;
+unsigned char gin = 0xff;
 
 void close_open_files(void)
 {
    if (fin != 0xff) esx_f_close(fin);
-   fin = 0xff;
+   if (gin != 0xff) esx_f_close(gin);
+
+   fin = gin = 0xff;
 }
 
 static unsigned char old_cpu_speed;
