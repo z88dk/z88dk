@@ -914,6 +914,7 @@ laser500_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(call buildgeneric,laser500)
+	$(MAKE) -C games TARGET=laser500
 	TARGET=laser500 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORlaser500 -x$(OUTPUT_DIRECTORY)/laser500_clib @$(LISTFILE_DIRECTORY)/laser500.lst
 
 
