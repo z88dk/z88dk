@@ -8,21 +8,62 @@ struct cpm_handle_s {
     cpm_discspec  spec;
 
     uint8_t      *image;
+    uint8_t      *extents;
+    int           num_extents;
 };
 
+static int first_free_extent(cpm_handle *h) 
+{
+     int  i;
+
+     for ( i = 0; i < h->num_extents; i++ ) {
+         if ( h->extents[i] == 0 ) {
+             return i;
+         }
+     }
+     myexit("No free extents on disc\n",1);
+     return -1;
+}
+
+static size_t find_first_free_directory_entry(cpm_handle *h)
+{
+      size_t directory_offset = (h->spec.boottracks * h->spec.sectors_per_track * h->spec.sector_size * 1); 
+      int    i;
+
+      for ( i = 0; i < h->spec.directory_entries; i++ ) {
+         if ( h->image[directory_offset] == h->spec.filler_byte ) {
+             return directory_offset;
+         }
+         directory_offset += 32;
+      }
+      myexit("No free directory entries on disc\n",1);
+      return 0;
+}
 
 cpm_handle *cpm_create(cpm_discspec *spec) 
 {
      cpm_handle *h = calloc(1, sizeof(*h));
      size_t      len;
+     int         directory_extents;
+     int         i;
      
      h->spec = *spec;
 
      len = spec->tracks * spec->sectors_per_track * spec->sector_size * spec->sides;
      h->image = calloc(len, sizeof(char));
      memset(h->image, spec->filler_byte, len);
+
+     directory_extents = (h->spec.directory_entries * 32) / h->spec.extent_size;
+     h->num_extents = ((spec->tracks - h->spec.boottracks) * h->spec.sectors_per_track * h->spec.sector_size) / h->spec.extent_size + 1;
+     h->extents = calloc( h->num_extents, sizeof(uint8_t));
+
+     /* Now reserve the directory extents */
+     for ( i = 0 ; i < directory_extents; i++ ) {
+         h->extents[i] = 1;
+     }
      return h;
 }
+
 
 void cpm_write_boot_track(cpm_handle *h, void *data, size_t len) 
 {
@@ -33,19 +74,23 @@ void cpm_write_boot_track(cpm_handle *h, void *data, size_t len)
 void cpm_write_file(cpm_handle *h, char filename[11], void *data, size_t len)
 {
       size_t num_extents = (len / h->spec.extent_size) + 1;
-      size_t directory_offset = (h->spec.boottracks * h->spec.sectors_per_track * h->spec.sector_size * 1); // h->spec.sides);
-      size_t offset = directory_offset + (h->spec.directory_entries * 32);
-      uint8_t *dir_ptr = h->image + directory_offset;
+      size_t directory_offset;
+      size_t offset;
+      uint8_t *dir_ptr;
       uint8_t  direntry[32];
       uint8_t  *ptr;
       int      i, j, current_extent;
       int      extents_per_entry = h->spec.byte_size_extents ? 16 : 8;
 
+
+      directory_offset = find_first_free_directory_entry(h);
+      dir_ptr = h->image + directory_offset;
+      // Now, write the directory entry, we can start from extent 1
+      current_extent = first_free_extent(h);
+      // We need to turn that extent into an offset into the disc
+      offset = (h->spec.boottracks * h->spec.sectors_per_track * h->spec.sector_size * 1) + ( current_extent * h->spec.extent_size);
       memcpy(h->image + offset, data, len);
 
-
-      // Now, write the directory entry, we can start from extent 1
-      current_extent = (h->spec.directory_entries * 32) / h->spec.extent_size;
       for ( i = 0; i <= (num_extents / extents_per_entry)  ; i++ ) {
           int extents_to_write;
 
@@ -144,5 +189,7 @@ int cpm_write_image(cpm_handle *h, const char *filename)
 void cpm_free(cpm_handle *h)
 {
      free(h->image);
+     free(h->extents);
      free(h);
 }
+
