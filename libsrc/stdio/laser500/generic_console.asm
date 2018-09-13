@@ -8,8 +8,8 @@
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
-		PUBLIC		generic_console_xypos
-		PUBLIC		__vz700_mode
+		PUBLIC		__laser500_mode
+		PUBLIC		__laser500_attr
 
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
@@ -18,6 +18,7 @@
 		EXTERN		generic_console_flags
 		EXTERN		generic_console_font32
 		EXTERN		generic_console_udg32
+		EXTERN		generic_console_xypos
                 EXTERN          screendollar
                 EXTERN          screendollar_with_count
 
@@ -31,10 +32,10 @@ generic_console_set_paper:
 	call	conio_map_colour
 	and	15
 	ld	b,a
-	ld	a,(attr)
+	ld	a,(__laser500_attr)
 	and	0xf0
 	or	b
-	ld	(attr),a
+	ld	(__laser500_attr),a
 	ret
 
 generic_console_set_ink:
@@ -45,10 +46,10 @@ generic_console_set_ink:
 	rlca
 	rlca
 	ld	b,a
-	ld	a,(attr)
+	ld	a,(__laser500_attr)
 	and	0x0f
 	or	b
-	ld	(attr),a
+	ld	(__laser500_attr),a
 	ret
 
 	
@@ -59,16 +60,16 @@ generic_console_cls:
 	ld	a,7
 	ld	(SYSVAR_bank1),a
 	out	($41),a
-	ld	a,(__vz700_mode)
+	ld	a,(__laser500_mode)
 	cp	2
 	jr	z,cls_hires
 	ld	hl, DISPLAY
 	ld	bc,+( 2032 / 2)
-	ld	de,(attr)
+	ld	de,(__laser500_attr)
         ld      a,e
         out     ($45),a         ;set 80 column colour
 	ld	d,32
-	ld	a,(__vz700_mode)
+	ld	a,(__laser500_mode)
 	and	a
 	jr	z,loop
 	ld	e,d		;80 column, need spaces
@@ -90,7 +91,7 @@ cls_return:
 cls_hires:
 	ld	bc, 8192
 	ld	hl, 16384
-	ld	de,(attr)
+	ld	de,(__laser500_attr)
 	ld	d,0
 cls_hires_loop:
 	ld	(hl),d
@@ -117,23 +118,23 @@ generic_console_printc:
 	ex	af,af
 	call	generic_console_xypos		
 	ld	d,a		;Save character
-	ld	a,(__vz700_mode)
+	ld	a,(__laser500_mode)
 	cp	2
 	jr	z,printc_hires
 	ld	a,(generic_console_flags)
 	and	128		;bit 7 = inverse
 	or	d
 	ld	d,a
-	ld	a,(__vz700_mode)
+	ld	a,(__laser500_mode)
 	and	a
 	jr	z,text_40col_printc
-	ld	(hl),d		;80 column mode, no attributes
+	ld	(hl),d		;80 column mode, no __laser500_attributes
 	jr	printc_return
 text_40col_printc:
-	add	hl,bc		;40 column mode, we have attribtues
+	add	hl,bc		;40 column mode, we have __laser500_attribtues
 	ld	(hl),d
 	inc	hl
-	ld	a,(attr)
+	ld	a,(__laser500_attr)
 	ld	(hl),a
 printc_return:
 	pop	af
@@ -186,7 +187,7 @@ printc_hires_loop:
         xor     c
 	ld	(hl),a
 	inc	hl
-	ld	a,(attr)
+	ld	a,(__laser500_attr)
 	ld	(hl),a
 	inc	de
 	ld	bc,$800 - 1
@@ -194,38 +195,6 @@ printc_hires_loop:
 	pop	bc
 	djnz	printc_hires_loop
 	jr	printc_return
-
-
-; Exit:
-;      hl = 80 column position
-;      bc = extra step to get to 40 columns
-generic_console_xypos:
-	push	af
-	ld	a,b		; Modulus 8 
-	and	7
-	ld	h,a		;*256
-	ld	l,0
-	srl	b		;y/ 8
-	srl	b
-	srl	b
-	ld	de,80
-	inc	b
-generic_console_printc_1:
-	add	hl,de
-	djnz	generic_console_printc_1
-	and	a		;We went one row too far
-	sbc	hl,de
-generic_console_printc_3:
-	add	hl,bc			;hl now points to address in display
-	ld	de,DISPLAY
-	ld	a,(__vz700_mode)
-	cp	2
-	jr	nz,not_hires
-	ld	de,$4000
-not_hires:
-	add	hl,de
-	pop	af
-	ret
 
 
 
@@ -252,7 +221,7 @@ scrollup_1:
 
 	; For hires we need to copy 8 rows..
 	ld	b,1
-	ld	a,(__vz700_mode)
+	ld	a,(__laser500_mode)
 	cp	2
 	jr	nz,mode_0_1
 	ld	b,8
@@ -305,9 +274,9 @@ scrollup_hires:
 
 	SECTION bss_clib
 
-__vz700_mode:	defb	0
+__laser500_mode:	defb	0
 
 	SECTION data_clib
 
-attr:	defb	0xf0
+__laser500_attr:	defb	0xf0
 

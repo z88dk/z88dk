@@ -8,7 +8,7 @@
 	EXTERN	generic_console_cls
 	EXTERN	generic_console_font32
 	EXTERN	generic_console_udg32
-	EXTERN	__vz700_mode
+	EXTERN	__laser500_mode
 	EXTERN	__console_w
 
 	INCLUDE	"target/laser500/def/laser500.def"
@@ -48,7 +48,7 @@ check_mode:
 	ld	d,8
 	; Value of 2 is GR4 - 320x192
 set_mode:
-	ld	(__vz700_mode),a
+	ld	(__laser500_mode),a
 	ld	c,a
 	ld	a,(SYSVAR_port44)
 	and	@11111000

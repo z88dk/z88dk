@@ -3,7 +3,7 @@
 		SECTION		code_clib
 
 		PUBLIC		generic_console_vpeek
-		EXTERN		__vz700_mode
+		EXTERN		__laser500_mode
 
 		EXTERN		generic_console_xypos
 		EXTERN		generic_console_font32
@@ -28,7 +28,7 @@ generic_console_vpeek:
 	ld	(SYSVAR_bank1),a
 	out	($41),a
         call    generic_console_xypos
-	ld	a,(__vz700_mode)
+	ld	a,(__laser500_mode)
 	cp	2
 	jr	z,vpeek_hires
 	and	a
