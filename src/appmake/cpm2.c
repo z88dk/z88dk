@@ -1,10 +1,12 @@
 /*
- *	FP1100 disc generator
+ *	CP/M disc generator
  *
  *      $Id: cpm2.c,v 1.6 2016-06-26 00:46:55 aralbrec Exp $
  */
 
 #include "appmake.h"
+
+static void              dump_formats();
 
 
 static char             *binname      = NULL;
@@ -67,18 +69,52 @@ static cpm_discspec osborne_spec = {
     .first_sector_offset = 1,
 };
 
+static cpm_discspec dmv_spec = {
+    .sectors_per_track = 8,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x50,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 256,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+};
+
+
 
 
 
 struct formats {
      const char    *name;
+     const char    *description;
      cpm_discspec  *spec;
+     size_t         bootlen; 
+     void          *bootsector;
 } formats[] = {
-    { "attache",    &attache_spec },
-    { "einstein",   &einstein_spec },
-    { "osborne1",   &osborne_spec },
+    { "attache",   "Otrone Attache",     &attache_spec, 0, NULL },
+    { "dmv",       "NCR Decision Mate",  &dmv_spec, 16, "\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5NCR F3" },
+    { "einstein",  "Tatung Einstein",    &einstein_spec, 0, NULL },
+    { "osborne1",  "Osborne 1",          &osborne_spec, 0, NULL },
     { NULL, NULL }
 };
+
+
+static void dump_formats() 
+{
+    struct formats *f = &formats[0];
+
+    printf("Supported CP/M formats:\n\n");
+
+    while ( f->name ) {
+        printf("%-20s%s\n",f->name, f->description);
+        printf("%d tracks, %d sectors/track, %d bytes/sector, %d entries, %d bytes/extent\n\n",f->spec->tracks, f->spec->sectors_per_track, f->spec->sector_size, f->spec->directory_entries, f->spec->extent_size);
+        f++;
+    }
+    exit(1);
+}
 
 int cpm2_exec(char *target)
 {
@@ -98,6 +134,7 @@ int cpm2_exec(char *target)
         return -1;
     }
     if ( format == NULL ) {
+        dump_formats();
         return -1;
     }
 
@@ -153,6 +190,8 @@ int cpm2_exec(char *target)
             fclose(binary_fp);
             cpm_write_boot_track(h, bootbuf, bootlen);
         }
+    } else if ( f->bootsector ) {
+        cpm_write_boot_track(h,f->bootsector,f->bootlen);
     }
 
 
