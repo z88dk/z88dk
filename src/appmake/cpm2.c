@@ -178,20 +178,23 @@ int cpm2_exec(char *target)
     h = cpm_create(spec);
     if ( bootfile != NULL ) {
         size_t bootlen;
-        char   bootbuf[20 * 512];  // Allocate?
+        size_t max_bootsize = spec->boottracks * spec->sectors_per_track * spec->sector_size;
         if ( (binary_fp=fopen(bootfile, "rb")) != NULL ) {
+           void  *bootbuf;
            if ( fseek(binary_fp,0,SEEK_END) ) {
                fclose(binary_fp);
                exit_log(1,"Couldn't determine size of file\n");
             }
             bootlen = ftell(binary_fp);
             fseek(binary_fp,0L,SEEK_SET);
-            if ( bootlen > 20 * 512 ) {
+            if ( bootlen > max_bootsize ) {
                 exit_log(1,"Boot file is too large\n");
             }
+            bootbuf = malloc(max_bootsize);
             fread(bootbuf, bootlen, 1, binary_fp);
             fclose(binary_fp);
             cpm_write_boot_track(h, bootbuf, bootlen);
+            free(bootbuf);
         }
     } else if ( f->bootsector ) {
         cpm_write_boot_track(h,f->bootsector,f->bootlen);
