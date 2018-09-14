@@ -28,7 +28,7 @@ obj/$(OBJSUBDIR)/%.o: %.c
 	$(ZCC) +$(TARGET) $(CFLAGS) -o $@  $^
 
 obj/$(OBJSUBDIR)/%.o: %.asm
-	$(ZCC) +$(TARGET) $(CFLAGS) -o $@  $^ -Ca-I../ -Ca-DFOR$(TARGET)
+	$(ZCC) +$(TARGET) $(CFLAGS) -o $@  $^ -Ca-I../ -Ca-DFOR$(SUBTYPE)
 
 dirs:
 	@mkdir -p obj/$(OBJSUBDIR)
