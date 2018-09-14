@@ -17,9 +17,8 @@
         defc    TAR__fputc_cons_generic = 1
         defc    CONSOLE_COLUMNS = 32
         defc    CONSOLE_ROWS = 24
-        defc    __CPU_CLOCK = 3580000
+        defc    __CPU_CLOCK = 3579999
 	defc	CRT_KEY_DEL = 12
-	INCLUDE	"crt/classic/crt_rules.inc"
 
 IF startup = 2
 	INCLUDE	"target/m5/classic/rom.asm"
