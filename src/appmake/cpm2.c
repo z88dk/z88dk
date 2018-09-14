@@ -6,7 +6,6 @@
 
 #include "appmake.h"
 
-static void              dump_formats();
 
 
 static char             *binname      = NULL;
@@ -28,6 +27,8 @@ option_t cpm2_options[] = {
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
+static void              dump_formats();
+static void              create_filename(const char *binary_name, char *cpm_filename);
 
 static cpm_discspec einstein_spec = {
     .sectors_per_track = 10,
@@ -157,6 +158,8 @@ int cpm2_exec(char *target)
         strcpy(disc_name,outfile);
     }
 
+    create_filename(binname, cpm_filename);
+
     // Open the binary file
     if ( (binary_fp=fopen_bin(binname, crtfile) ) == NULL ) {
         exit_log(1,"Can't open input file %s\n",binname);
@@ -205,3 +208,23 @@ int cpm2_exec(char *target)
     return 0;
 }
 
+
+static void create_filename(const char *binary, char *cpm_filename)
+{
+     int  count = 0;
+
+     while ( count < 8 && count < strlen(binary) && binary[count] != '.' ) {
+         if ( binary[count] > 127 ) {
+             cpm_filename[count] = '_';
+         } else {
+             cpm_filename[count] = toupper(binary[count]);
+         }
+         count++;
+     }
+     while ( count < 8 ) {
+         cpm_filename[count++] = ' ';
+     }
+     cpm_filename[count++] = 'C';
+     cpm_filename[count++] = 'O';
+     cpm_filename[count++] = 'M';
+}
