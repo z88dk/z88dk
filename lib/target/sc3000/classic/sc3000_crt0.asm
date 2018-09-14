@@ -18,6 +18,7 @@
         defc    CONSOLE_COLUMNS = 32
         defc    CONSOLE_ROWS = 24
         defc    CRT_KEY_DEL = 12
+	INCLUDE	"crt/classic/crt_rules.inc"
 
 IF startup = 2
 	INCLUDE	"target/sc3000/classic/rom.asm"
