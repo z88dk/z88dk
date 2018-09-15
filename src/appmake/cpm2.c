@@ -8,25 +8,26 @@
 
 
 
-static char             *binname      = NULL;
-static char             *crtfile      = NULL;
-static char             *format       = NULL;
-static char             *outfile      = NULL;
-static char             *bootfile     = NULL;
+static char             *c_binary_name      = NULL;
+static char             *c_crt_filename      = NULL;
+static char             *c_disc_format       = NULL;
+static char             *c_output_file      = NULL;
+static char             *c_boot_filename     = NULL;
 static char              help         = 0;
 
 
 /* Options that are available for this module */
 option_t cpm2_options[] = {
     { 'h', "help",     "Display this help",          OPT_BOOL,  &help},
-    { 'f', "format",   "Disk format",                OPT_STR,   &format},
-    { 'b', "binfile",  "Linked binary file",         OPT_STR|OPT_INPUT,   &binname },
-    { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
-    { 'o', "output",   "Name of output file",        OPT_STR|OPT_OUTPUT,   &outfile },
-    { 's', "bootfile", "Name of the boot file",      OPT_STR,   &bootfile },
+    { 'f', "format",   "Disk format",                OPT_STR,   &c_disc_format},
+    { 'b', "binfile",  "Linked binary file",         OPT_STR|OPT_INPUT,   &c_binary_name },
+    { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &c_crt_filename },
+    { 'o', "output",   "Name of output file",        OPT_STR|OPT_OUTPUT,   &c_output_file },
+    { 's', "c_boot_filename", "Name of the boot file",      OPT_STR,   &c_boot_filename },
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
+static struct formats   *get_format(const char *name);
 static void              dump_formats();
 static void              create_filename(const char *binary_name, char *cpm_filename, char force_com_extension);
 
@@ -99,6 +100,20 @@ static cpm_discspec cpcsystem_spec = {
     .first_sector_offset = 0x41,
 };
 
+static cpm_discspec microbee_spec = {
+    .sectors_per_track = 10,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 4096,
+    .byte_size_extents = 1,
+    .first_sector_offset = 0x15,
+};
+
 
 
 struct formats {
@@ -113,6 +128,7 @@ struct formats {
     { "cpcsystem", "CPC System Disc",    &cpcsystem_spec, 0, NULL, 0 },
     { "dmv",       "NCR Decision Mate",  &dmv_spec, 16, "\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5NCR F3", 1 },
     { "einstein",  "Tatung Einstein",    &einstein_spec, 0, NULL, 1 },
+    { "microbee",  "Microbee",           &microbee_spec, 0, NULL, 1 },
     { "osborne1",  "Osborne 1",          &osborne_spec, 0, NULL, 1 },
     { NULL, NULL }
 };
@@ -132,10 +148,40 @@ static void dump_formats()
     exit(1);
 }
 
+cpm_discspec *get_discspec(const char *name)
+{
+    struct formats *f = get_format(name);
+
+    return f == NULL ? NULL : f->spec;
+}
+
+static struct formats *get_format(const char *name)
+{
+    return NULL;
+}
+
+
 int cpm2_exec(char *target)
 {
-    cpm_discspec *spec;
-    struct  formats *f = &formats[0];
+
+    if ( help )
+        return -1;
+    if ( c_binary_name == NULL ) {
+        return -1;
+    }
+    if ( c_disc_format == NULL ) {
+        dump_formats();
+        return -1;
+    }
+    return cpm_write_file_to_image(c_disc_format, c_output_file, c_binary_name,c_crt_filename, c_boot_filename);
+}
+
+
+
+int cpm_write_file_to_image(const char *disc_format, const char *output_file, const char *binary_name, const char *crt_filename, const char *boot_filename)
+{
+    cpm_discspec *spec = NULL;
+    struct formats *f = &formats[0];
     char    disc_name[FILENAME_MAX+1];
     char    cpm_filename[12] = "APP     COM";
     void   *filebuf;
@@ -143,19 +189,9 @@ int cpm2_exec(char *target)
     cpm_handle *h;
     size_t  binlen;
 
-    if ( help )
-        return -1;
-    if ( binname == NULL ) {
-        return -1;
-    }
-    if ( format == NULL ) {
-        dump_formats();
-        return -1;
-    }
-
     while ( f->name != NULL ) {
-       if ( strcasecmp(format, f->name) == 0 ) {
-           spec = f->spec;
+       if ( strcasecmp(disc_format, f->name) == 0 ) {
+	   spec = f->spec;
            break;
        }
        f++;
@@ -165,18 +201,18 @@ int cpm2_exec(char *target)
        return -1;
     }
 
-    if ( outfile == NULL ) {
-        strcpy(disc_name,binname);
+    if ( output_file == NULL ) {
+        strcpy(disc_name,binary_name);
         suffix_change(disc_name,".dsk");
     } else {
-        strcpy(disc_name,outfile);
+        strcpy(disc_name,output_file);
     }
 
-    create_filename(binname, cpm_filename, f->force_com_extension);
+    create_filename(binary_name, cpm_filename, f->force_com_extension);
 
     // Open the binary file
-    if ( (binary_fp=fopen_bin(binname, crtfile) ) == NULL ) {
-        exit_log(1,"Can't open input file %s\n",binname);
+    if ( (binary_fp=fopen_bin(binary_name, crt_filename) ) == NULL ) {
+        exit_log(1,"Can't open input file %s\n",binary_name);
     }
     if ( fseek(binary_fp,0,SEEK_END) ) {
         fclose(binary_fp);
@@ -190,10 +226,10 @@ int cpm2_exec(char *target)
 
 
     h = cpm_create(spec);
-    if ( bootfile != NULL ) {
+    if ( boot_filename != NULL ) {
         size_t bootlen;
         size_t max_bootsize = spec->boottracks * spec->sectors_per_track * spec->sector_size;
-        if ( (binary_fp=fopen(bootfile, "rb")) != NULL ) {
+        if ( (binary_fp=fopen(boot_filename, "rb")) != NULL ) {
            void  *bootbuf;
            if ( fseek(binary_fp,0,SEEK_END) ) {
                fclose(binary_fp);
@@ -220,7 +256,6 @@ int cpm2_exec(char *target)
         exit_log(1,"Can't write disc image");
     }
     cpm_free(h);
-
 
     return 0;
 }

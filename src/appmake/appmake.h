@@ -477,8 +477,8 @@ struct {
 
 #define myexit(buf, code) exit_log(code, buf)
 extern void         exit_log(int code, char *fmt, ...);
-extern long         parameter_search(char *filen, char *ext,char *target);
-extern FILE        *fopen_bin(char *fname, char *crtfile);
+extern long         parameter_search(const char *filen,const  char *ext,const char *target);
+extern FILE        *fopen_bin(const char *fname,const  char *crtfile);
 extern long         get_org_addr(char *crtfile);
 extern void         suffix_change(char *name, char *suffix);
 extern void         any_suffix_change(char *name, char *suffix, char schar);

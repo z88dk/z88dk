@@ -24,6 +24,7 @@ extern void cpm_write_file(cpm_handle *h, char filename[11], void *data, size_t 
 extern int cpm_write_image(cpm_handle *h, const char *filename);
 extern void cpm_free(cpm_handle *h);
 
+int cpm_write_file_to_image(const char *disc_format, const char *output_file, const char *binary_name, const char *crt_filename, const char *boot_filename);
 
 #endif
 

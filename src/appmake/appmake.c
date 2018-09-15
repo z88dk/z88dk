@@ -178,7 +178,7 @@ void exit_log(int code, char *fmt, ...)
 
 
 /* Search through debris from z80asm for some important parameters */
-long parameter_search(char *filen, char *ext,char *target)
+long parameter_search(const char *filen,const  char *ext,const char *target)
 {
     char    name[FILENAME_MAX+1];
     char    buffer[LINEMAX+1];
@@ -226,7 +226,7 @@ long get_org_addr(char *crtfile)
    Otherwise, try to open the "normal" file.
 */
 
-FILE *fopen_bin(char *fname, char *crtfile)
+FILE *fopen_bin(const char *fname,const  char *crtfile)
 {
     FILE   *fcode = NULL, *fdata = NULL, *fin = NULL;
     char    name[FILENAME_MAX+1];
