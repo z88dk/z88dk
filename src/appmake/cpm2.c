@@ -20,9 +20,9 @@ static char              help         = 0;
 option_t cpm2_options[] = {
     { 'h', "help",     "Display this help",          OPT_BOOL,  &help},
     { 'f', "format",   "Disk format",                OPT_STR,   &format},
-    { 'b', "binfile",  "Linked binary file",         OPT_STR,   &binname },
+    { 'b', "binfile",  "Linked binary file",         OPT_STR|OPT_INPUT,   &binname },
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
-    { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
+    { 'o', "output",   "Name of output file",        OPT_STR|OPT_OUTPUT,   &outfile },
     { 's', "bootfile", "Name of the boot file",      OPT_STR,   &bootfile },
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
@@ -85,6 +85,19 @@ static cpm_discspec dmv_spec = {
 };
 
 
+static cpm_discspec cpcsystem_spec = {
+    .sectors_per_track = 9,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 0x41,
+};
 
 
 
@@ -96,6 +109,7 @@ struct formats {
      void          *bootsector;
 } formats[] = {
     { "attache",   "Otrone Attache",     &attache_spec, 0, NULL },
+    { "cpcsystem", "CPC System Disc",    &cpcsystem_spec, 0, NULL },
     { "dmv",       "NCR Decision Mate",  &dmv_spec, 16, "\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5NCR F3" },
     { "einstein",  "Tatung Einstein",    &einstein_spec, 0, NULL },
     { "osborne1",  "Osborne 1",          &osborne_spec, 0, NULL },
@@ -130,7 +144,6 @@ int cpm2_exec(char *target)
 
     if ( help )
         return -1;
-
     if ( binname == NULL ) {
         return -1;
     }
