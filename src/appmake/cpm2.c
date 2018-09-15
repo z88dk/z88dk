@@ -28,7 +28,7 @@ option_t cpm2_options[] = {
 };
 
 static void              dump_formats();
-static void              create_filename(const char *binary_name, char *cpm_filename);
+static void              create_filename(const char *binary_name, char *cpm_filename, char force_com_extension);
 
 static cpm_discspec einstein_spec = {
     .sectors_per_track = 10,
@@ -107,12 +107,13 @@ struct formats {
      cpm_discspec  *spec;
      size_t         bootlen; 
      void          *bootsector;
+     char           force_com_extension;
 } formats[] = {
-    { "attache",   "Otrone Attache",     &attache_spec, 0, NULL },
-    { "cpcsystem", "CPC System Disc",    &cpcsystem_spec, 0, NULL },
-    { "dmv",       "NCR Decision Mate",  &dmv_spec, 16, "\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5NCR F3" },
-    { "einstein",  "Tatung Einstein",    &einstein_spec, 0, NULL },
-    { "osborne1",  "Osborne 1",          &osborne_spec, 0, NULL },
+    { "attache",   "Otrone Attache",     &attache_spec, 0, NULL, 1 },
+    { "cpcsystem", "CPC System Disc",    &cpcsystem_spec, 0, NULL, 0 },
+    { "dmv",       "NCR Decision Mate",  &dmv_spec, 16, "\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5NCR F3", 1 },
+    { "einstein",  "Tatung Einstein",    &einstein_spec, 0, NULL, 1 },
+    { "osborne1",  "Osborne 1",          &osborne_spec, 0, NULL, 1 },
     { NULL, NULL }
 };
 
@@ -171,7 +172,7 @@ int cpm2_exec(char *target)
         strcpy(disc_name,outfile);
     }
 
-    create_filename(binname, cpm_filename);
+    create_filename(binname, cpm_filename, f->force_com_extension);
 
     // Open the binary file
     if ( (binary_fp=fopen_bin(binname, crtfile) ) == NULL ) {
@@ -225,9 +226,10 @@ int cpm2_exec(char *target)
 }
 
 
-static void create_filename(const char *binary, char *cpm_filename)
+static void create_filename(const char *binary, char *cpm_filename, char force_com_extension)
 {
      int  count = 0;
+     int  dest = 0;
 
      while ( count < 8 && count < strlen(binary) && binary[count] != '.' ) {
          if ( binary[count] > 127 ) {
@@ -237,10 +239,35 @@ static void create_filename(const char *binary, char *cpm_filename)
          }
          count++;
      }
-     while ( count < 8 ) {
-         cpm_filename[count++] = ' ';
+     dest = count;
+     while ( dest < 8 ) {
+         cpm_filename[dest++] = ' ';
      }
-     cpm_filename[count++] = 'C';
-     cpm_filename[count++] = 'O';
-     cpm_filename[count++] = 'M';
+     if ( force_com_extension ) {
+         cpm_filename[dest++] = 'C';
+         cpm_filename[dest++] = 'O';
+         cpm_filename[dest++] = 'M';
+     } else {
+         while ( count < strlen(binary) && binary[count] != '.' ) {
+             count++;
+         }
+         if ( count < strlen(binary) ) {
+             while ( dest < 12 && count < strlen(binary) ) {
+                 if ( binary[count] == '.' ) {
+                     count++;
+                     continue;
+                 }
+                 if ( binary[count] > 127 ) {
+                     cpm_filename[dest] = '_';
+                 } else {
+                     cpm_filename[dest] = toupper(binary[count]);
+                 }
+                 dest++;
+                 count++;
+             }
+         }
+         while ( dest < 12 ) {
+             cpm_filename[dest++] = ' ';
+         }
+     }
 }
