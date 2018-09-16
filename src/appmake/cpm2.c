@@ -149,112 +149,107 @@ struct formats {
     { NULL, NULL }
 };
 
-
-static void dump_formats() 
+static void dump_formats()
 {
-    struct formats *f = &formats[0];
+    struct formats* f = &formats[0];
 
     printf("Supported CP/M formats:\n\n");
 
-    while ( f->name ) {
-        printf("%-20s%s\n",f->name, f->description);
-        printf("%d tracks, %d sectors/track, %d bytes/sector, %d entries, %d bytes/extent\n\n",f->spec->tracks, f->spec->sectors_per_track, f->spec->sector_size, f->spec->directory_entries, f->spec->extent_size);
+    while (f->name) {
+        printf("%-20s%s\n", f->name, f->description);
+        printf("%d tracks, %d sectors/track, %d bytes/sector, %d entries, %d bytes/extent\n\n", f->spec->tracks, f->spec->sectors_per_track, f->spec->sector_size, f->spec->directory_entries, f->spec->extent_size);
         f++;
     }
     exit(1);
 }
 
-cpm_discspec *get_discspec(const char *name)
+cpm_discspec* get_discspec(const char* name)
 {
-    struct formats *f = get_format(name);
+    struct formats* f = get_format(name);
 
     return f == NULL ? NULL : f->spec;
 }
 
-static struct formats *get_format(const char *name)
+static struct formats* get_format(const char* name)
 {
     return NULL;
 }
 
-
-int cpm2_exec(char *target)
+int cpm2_exec(char* target)
 {
 
-    if ( help )
+    if (help)
         return -1;
-    if ( c_binary_name == NULL ) {
+    if (c_binary_name == NULL) {
         return -1;
     }
-    if ( c_disc_format == NULL ) {
+    if (c_disc_format == NULL) {
         dump_formats();
         return -1;
     }
-    return cpm_write_file_to_image(c_disc_format, c_output_file, c_binary_name,c_crt_filename, c_boot_filename);
+    return cpm_write_file_to_image(c_disc_format, c_output_file, c_binary_name, c_crt_filename, c_boot_filename);
 }
 
-
-
-int cpm_write_file_to_image(const char *disc_format, const char *output_file, const char *binary_name, const char *crt_filename, const char *boot_filename)
+int cpm_write_file_to_image(const char* disc_format, const char* output_file, const char* binary_name, const char* crt_filename, const char* boot_filename)
 {
-    cpm_discspec *spec = NULL;
-    struct formats *f = &formats[0];
-    char    disc_name[FILENAME_MAX+1];
-    char    cpm_filename[12] = "APP     COM";
-    void   *filebuf;
-    FILE   *binary_fp;
-    cpm_handle *h;
-    size_t  binlen;
+    cpm_discspec* spec = NULL;
+    struct formats* f = &formats[0];
+    char disc_name[FILENAME_MAX + 1];
+    char cpm_filename[12] = "APP     COM";
+    void* filebuf;
+    FILE* binary_fp;
+    cpm_handle* h;
+    size_t binlen;
 
-    while ( f->name != NULL ) {
-       if ( strcasecmp(disc_format, f->name) == 0 ) {
-	   spec = f->spec;
-           break;
-       }
-       f++;
-    } 
-
-    if ( spec == NULL ) {
-       return -1;
+    while (f->name != NULL) {
+        if (strcasecmp(disc_format, f->name) == 0) {
+            spec = f->spec;
+            break;
+        }
+        f++;
     }
 
-    if ( output_file == NULL ) {
-        strcpy(disc_name,binary_name);
-        suffix_change(disc_name,".dsk");
+    if (spec == NULL) {
+        return -1;
+    }
+
+    if (output_file == NULL) {
+        strcpy(disc_name, binary_name);
+        suffix_change(disc_name, ".dsk");
     } else {
-        strcpy(disc_name,output_file);
+        strcpy(disc_name, output_file);
     }
 
     create_filename(binary_name, cpm_filename, f->force_com_extension);
 
     // Open the binary file
-    if ( (binary_fp=fopen_bin(binary_name, crt_filename) ) == NULL ) {
-        exit_log(1,"Can't open input file %s\n",binary_name);
+    if ((binary_fp = fopen_bin(binary_name, crt_filename)) == NULL) {
+        exit_log(1, "Can't open input file %s\n", binary_name);
     }
-    if ( fseek(binary_fp,0,SEEK_END) ) {
+    if (fseek(binary_fp, 0, SEEK_END)) {
         fclose(binary_fp);
-        exit_log(1,"Couldn't determine size of file\n");
+        exit_log(1, "Couldn't determine size of file\n");
     }
     binlen = ftell(binary_fp);
-    fseek(binary_fp,0L,SEEK_SET);
+    fseek(binary_fp, 0L, SEEK_SET);
     filebuf = malloc(binlen);
     fread(filebuf, binlen, 1, binary_fp);
     fclose(binary_fp);
 
-
     h = cpm_create(spec);
-    if ( boot_filename != NULL ) {
+    if (boot_filename != NULL) {
         size_t bootlen;
         size_t max_bootsize = spec->boottracks * spec->sectors_per_track * spec->sector_size;
-        if ( (binary_fp=fopen(boot_filename, "rb")) != NULL ) {
-           void  *bootbuf;
-           if ( fseek(binary_fp,0,SEEK_END) ) {
-               fclose(binary_fp);
-               exit_log(1,"Couldn't determine size of file\n");
+        if ((binary_fp = fopen(boot_filename, "rb")) != NULL) {
+            void* bootbuf;
+            if (fseek(binary_fp, 0, SEEK_END)) {
+                fclose(binary_fp);
+                exit_log(1, "Couldn't determine size of file\n");
             }
             bootlen = ftell(binary_fp);
-            fseek(binary_fp,0L,SEEK_SET);
-            if ( bootlen > max_bootsize ) {
-                exit_log(1,"Boot file is too large\n");
+            fseek(binary_fp, 0L, SEEK_SET);
+            if (bootlen > max_bootsize) {
+                exit_log(1, "Boot file is too large\n");
             }
             bootbuf = malloc(max_bootsize);
             fread(bootbuf, bootlen, 1, binary_fp);
@@ -262,63 +257,61 @@ int cpm_write_file_to_image(const char *disc_format, const char *output_file, co
             cpm_write_boot_track(h, bootbuf, bootlen);
             free(bootbuf);
         }
-    } else if ( f->bootsector ) {
-        cpm_write_boot_track(h,f->bootsector,f->bootlen);
+    } else if (f->bootsector) {
+        cpm_write_boot_track(h, f->bootsector, f->bootlen);
     }
 
-
     cpm_write_file(h, cpm_filename, filebuf, binlen);
-    if ( cpm_write_image(h, disc_name) < 0 ) {
-        exit_log(1,"Can't write disc image");
+    if (cpm_write_image(h, disc_name) < 0) {
+        exit_log(1, "Can't write disc image");
     }
     cpm_free(h);
 
     return 0;
 }
 
-
-static void create_filename(const char *binary, char *cpm_filename, char force_com_extension)
+static void create_filename(const char* binary, char* cpm_filename, char force_com_extension)
 {
-     int  count = 0;
-     int  dest = 0;
+    int count = 0;
+    int dest = 0;
 
-     while ( count < 8 && count < strlen(binary) && binary[count] != '.' ) {
-         if ( binary[count] > 127 ) {
-             cpm_filename[count] = '_';
-         } else {
-             cpm_filename[count] = toupper(binary[count]);
-         }
-         count++;
-     }
-     dest = count;
-     while ( dest < 8 ) {
-         cpm_filename[dest++] = ' ';
-     }
-     if ( force_com_extension ) {
-         cpm_filename[dest++] = 'C';
-         cpm_filename[dest++] = 'O';
-         cpm_filename[dest++] = 'M';
-     } else {
-         while ( count < strlen(binary) && binary[count] != '.' ) {
-             count++;
-         }
-         if ( count < strlen(binary) ) {
-             while ( dest < 12 && count < strlen(binary) ) {
-                 if ( binary[count] == '.' ) {
-                     count++;
-                     continue;
-                 }
-                 if ( binary[count] > 127 ) {
-                     cpm_filename[dest] = '_';
-                 } else {
-                     cpm_filename[dest] = toupper(binary[count]);
-                 }
-                 dest++;
-                 count++;
-             }
-         }
-         while ( dest < 12 ) {
-             cpm_filename[dest++] = ' ';
-         }
-     }
+    while (count < 8 && count < strlen(binary) && binary[count] != '.') {
+        if (binary[count] > 127) {
+            cpm_filename[count] = '_';
+        } else {
+            cpm_filename[count] = toupper(binary[count]);
+        }
+        count++;
+    }
+    dest = count;
+    while (dest < 8) {
+        cpm_filename[dest++] = ' ';
+    }
+    if (force_com_extension) {
+        cpm_filename[dest++] = 'C';
+        cpm_filename[dest++] = 'O';
+        cpm_filename[dest++] = 'M';
+    } else {
+        while (count < strlen(binary) && binary[count] != '.') {
+            count++;
+        }
+        if (count < strlen(binary)) {
+            while (dest < 12 && count < strlen(binary)) {
+                if (binary[count] == '.') {
+                    count++;
+                    continue;
+                }
+                if (binary[count] > 127) {
+                    cpm_filename[dest] = '_';
+                } else {
+                    cpm_filename[dest] = toupper(binary[count]);
+                }
+                dest++;
+                count++;
+            }
+        }
+        while (dest < 12) {
+            cpm_filename[dest++] = ' ';
+        }
+    }
 }
