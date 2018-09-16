@@ -163,18 +163,6 @@ static void dump_formats()
     exit(1);
 }
 
-cpm_discspec* get_discspec(const char* name)
-{
-    struct formats* f = get_format(name);
-
-    return f == NULL ? NULL : f->spec;
-}
-
-static struct formats* get_format(const char* name)
-{
-    return NULL;
-}
-
 int cpm2_exec(char* target)
 {
 
