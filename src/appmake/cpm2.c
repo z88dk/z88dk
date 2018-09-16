@@ -115,6 +115,21 @@ static cpm_discspec microbee_spec = {
 };
 
 
+static cpm_discspec kayproii_spec = {
+    .sectors_per_track = 10,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 1,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 0,
+};
+
+
 
 struct formats {
      const char    *name;
@@ -128,6 +143,7 @@ struct formats {
     { "cpcsystem", "CPC System Disc",    &cpcsystem_spec, 0, NULL, 0 },
     { "dmv",       "NCR Decision Mate",  &dmv_spec, 16, "\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5NCR F3", 1 },
     { "einstein",  "Tatung Einstein",    &einstein_spec, 0, NULL, 1 },
+    { "kayproii",  "Kaypro ii",          &kayproii_spec, 0, NULL, 1 },
     { "microbee",  "Microbee",           &microbee_spec, 0, NULL, 1 },
     { "osborne1",  "Osborne 1",          &osborne_spec, 0, NULL, 1 },
     { NULL, NULL }
