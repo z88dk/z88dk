@@ -6,6 +6,7 @@ stdio/conio/screensize
 stdio/conio/screensize_callee
 stdio/conio/console_coords
 stdio/conio/screendollar
+stdio/conio/screendollar_no_inverse
 stdio/conio/cvpeek
 stdio/conio/textbackground
 stdio/conio/textcolour

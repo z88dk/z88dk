@@ -45,11 +45,10 @@ ENDIF
 		inc	e
 		djnz	ckmap
 		ld	e,0
-.chfound	ld	a,e
+.chfound	ld	b,e
 
 		pop	hl		;original coordinates
 
-		ld	b,a
 		ld	a,1		; the bit we want to draw
 			
 		bit	0,h

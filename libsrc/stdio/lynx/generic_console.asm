@@ -5,6 +5,7 @@
 		PUBLIC		generic_console_cls
 		PUBLIC		generic_console_scrollup
 		PUBLIC		generic_console_printc
+		PUBLIC		generic_console_plotc
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
@@ -15,6 +16,7 @@
 		EXTERN		generic_console_font32
 		EXTERN		generic_console_udg32
 		EXTERN		generic_console_flags
+		EXTERN		lynx_lores_graphics
 
 
 		INCLUDE		"target/lynx/def/lynx.def"
@@ -195,6 +197,17 @@ copy_from_bluered_1:
 	djnz	copy_from_bluered_1
 	ret
 
+; Plot a lores graphics character to the screen
+; c = x
+; b = y
+; a = character to print
+generic_console_plotc:
+	call	generic_console_xypos		;preserves a
+	ex	de,hl		;de = destination
+	ld	bc,(lynx_lores_graphics)
+	inc	b
+	jr	not_udg
+
 ; c = x
 ; b = y
 ; a = d = character to print
@@ -222,7 +235,10 @@ not_udg:
         rlca            ;get bit 7 out
         sbc     a
         ld      c,a     ; c = 0/ c = 255
-
+print_a_character:
+	; hl = screen
+	; de = font
+	;  c = mask
 	ld	b,8
 loop:
 	ld	a,(de)

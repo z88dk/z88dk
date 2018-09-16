@@ -1,11 +1,14 @@
 		SECTION		code_driver
 
 		PUBLIC		generic_console_vpeek
+		PUBLIC		generic_console_pointxy
 
 		EXTERN		generic_console_font32
 		EXTERN		generic_console_udg32
+		EXTERN		lynx_lores_graphics
 
                 EXTERN          screendollar
+                EXTERN          screendollar_no_inverse
                 EXTERN          screendollar_with_count
 
 		INCLUDE		"target/lynx/def/lynx.def"
@@ -17,6 +20,7 @@
 ;	 a = character,
 ;	 c = failure
 generic_console_vpeek:
+generic_console_pointxy:
         ld      hl,-8
         add     hl,sp           ;hl = buffer, bc = coords
         ld      sp,hl
@@ -50,8 +54,16 @@ vpeek_loop:
 	ld	hl,(generic_console_udg32)
 	ld	b,128
 	call	screendollar_with_count
-	jr	c,gotit
+	jr	c,try_lores_graphics
 	add	128
+	jr	gotit
+try_lores_graphics:
+	ld	hl,(lynx_lores_graphics)
+	ld	a,h	
+	or	l
+	scf
+	jr	z,gotit
+	call	screendollar_no_inverse
 gotit:
 	ex	af,af
 	ld	hl,8

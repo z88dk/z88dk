@@ -462,6 +462,15 @@ IF FORrx78
 	defc maxy	= 184
 ENDIF
 
+IF FORlynx
+	DEFINE gotgfx
+	defc maxx	= 64		;Text graphics settings
+	defc maxy	= 64
+	defc blankch    = 0
+	defc USEplotc   = 1		; We call generic_console_plotc, not _printc for text mode
+
+ENDIF
+
 IF FORlaser500
 	DEFINE gotgfx
 	defc maxx = 320
