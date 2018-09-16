@@ -65,8 +65,11 @@ not_graphics_mode:
 	ld	a,2
 	ld	(SYSVAR_bank1),a
 	out	($41),a
-	ld	hl,$4000 + $2800
-	ld	(hl),d		;Enable/disable graphics
+	ld	hl,SYSVAR_mem6800
+	ld	a,(hl)
+	or	d
+	ld	(hl),a	
+	ld	($4000 + $2800),a	;Enable/disable graphics
 	pop	af
 	ld	(SYSVAR_bank1),a
 	out	($41),a
