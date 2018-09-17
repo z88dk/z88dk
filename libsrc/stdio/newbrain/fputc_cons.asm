@@ -31,13 +31,15 @@
 
 IF STANDARDESCAPECHARS
 	cp	10
-ELSE
-	cp	13
-ENDIF
 	jr	nz,nocrlf
-	ld	a,13
 	call doprint
-	ld	a,10
+	ld	a,13
+ELSE
+        cp 13
+	jr      nz,nocrlf
+	call doprint
+	ld      a,10
+ENDIF
 .nocrlf
 
 .doprint
