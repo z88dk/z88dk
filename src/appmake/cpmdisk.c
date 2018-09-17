@@ -154,7 +154,11 @@ int cpm_write_image(cpm_handle* h, const char* filename)
         for (s = 0; s < h->spec.sides; s++) {
             uint8_t* ptr;
 
-            offs = track_length * i + (s * track_length * h->spec.tracks);
+            if ( h->spec.alternate_sides == 0 ) {
+                offs = track_length * i + (s * track_length * h->spec.tracks);
+            } else {
+                offs = track_length * ( 2* i + s);
+            }
             memset(header, 0, 256);
             memcpy(header, "Track-Info\r\n", 12);
             header[0x10] = i;

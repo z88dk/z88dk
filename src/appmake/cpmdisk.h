@@ -14,6 +14,7 @@ typedef struct {
     uint16_t  extent_size;       /* In bytes */
     uint8_t   byte_size_extents; /* If set, extends in directories are single byte */
     uint8_t   first_sector_offset; /* If set, first sector in Track-Info is 1, else 0 */
+    uint8_t   alternate_sides;
 } cpm_discspec;
 
 typedef struct cpm_handle_s cpm_handle;

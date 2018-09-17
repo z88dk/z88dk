@@ -23,7 +23,7 @@ option_t cpm2_options[] = {
     { 'b', "binfile",  "Linked binary file",         OPT_STR|OPT_INPUT,   &c_binary_name },
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &c_crt_filename },
     { 'o', "output",   "Name of output file",        OPT_STR|OPT_OUTPUT,   &c_output_file },
-    { 's', "c_boot_filename", "Name of the boot file",      OPT_STR,   &c_boot_filename },
+    { 's', "bootfile", "Name of the boot file",      OPT_STR,   &c_boot_filename },
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
@@ -129,6 +129,21 @@ static cpm_discspec kayproii_spec = {
     .first_sector_offset = 0,
 };
 
+static cpm_discspec mz2500cpm_spec = {
+    .sectors_per_track = 16,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 0,
+    .first_sector_offset = 1,
+    .alternate_sides = 1
+};
+
 
 
 struct formats {
@@ -145,6 +160,7 @@ struct formats {
     { "einstein",  "Tatung Einstein",    &einstein_spec, 0, NULL, 1 },
     { "kayproii",  "Kaypro ii",          &kayproii_spec, 0, NULL, 1 },
     { "microbee",  "Microbee",           &microbee_spec, 0, NULL, 1 },
+    { "mz2500cpm", "Sharp MZ2500 - CPM", &mz2500cpm_spec, 0, NULL, 1 },
     { "osborne1",  "Osborne 1",          &osborne_spec, 0, NULL, 1 },
     { NULL, NULL }
 };
