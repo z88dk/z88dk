@@ -367,26 +367,22 @@ FILE *fopen_bin(const char *fname,const  char *crtfile)
 /* Generic change suffix routine - make sure name is long enough to hold the suffix */
 void suffix_change(char *name, char *suffix)
 {
-    int j = strlen(name)-1;
+    char *ptr = strrchr(name,'.');
 
-    while ( j && name[j-1] != '.' ) 
-        j--;
-
-    if ( j)
-        name[j-1]='\0';
+    if ( ptr ) {
+        *ptr = 0;
+    }
     strcat(name,suffix);
 }
 
 /* Variant for the generic change suffix routine */
 void any_suffix_change(char *name, char *suffix, char suffix_delimiter)
 {
-    int j = strlen(name)-1;
+    char *ptr = strrchr(name,suffix_delimiter);
 
-    while ( j && name[j-1] != suffix_delimiter ) 
-        j--;
-
-    if ( j)
-        name[j-1]='\0';
+    if ( ptr ) {
+        *ptr = 0;
+    }
     strcat(name,suffix);
 }
 
