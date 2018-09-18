@@ -34,6 +34,7 @@ asm_sms_memcpy_vram_to_vram:
    dec bc
    inc b
    inc c
+
    ld a,c
 
 no_adjust:
