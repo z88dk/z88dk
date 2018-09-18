@@ -199,7 +199,7 @@ long parameter_search(const char *filen,const  char *ext,const char *target)
 
      /* Successfully opened the file so search through it.. */
     while ( fgets(buffer,LINEMAX,fp) != NULL ) {
-        if (strncmp(buffer,target,strlen(target)) == 0 ) {
+        if (strncmp(buffer,target,strlen(target)) == 0 && isspace(buffer[strlen(target)])) {
             sscanf(buffer,"%*s%*s%*[ $]%lx",&val);
             break;
         }
