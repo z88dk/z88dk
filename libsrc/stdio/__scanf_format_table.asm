@@ -1,7 +1,7 @@
 ;
 ; Default format table for scanf family
 	MODULE  __scanf_format_table
-	SECTION	data_clib
+	SECTION	rodata_clib
 	PUBLIC	__scanf_format_table
 
 	EXTERN	__scanf_handle_d
