@@ -164,7 +164,6 @@ int z88_exec(char* target)
             reqpag = ((asmtail - 0x2000) / 256) + 1;
         }
 
-        printf("Application will use %d pages of bad memory\n", reqpag);
     }
 
     pages = ((65536L - (long)(zorg + 1)) / 16384L);
@@ -214,6 +213,12 @@ int z88_exec(char* target)
         exit_log(1, "Binary file too large! Change the org!\n");
     }
     fclose(binfile);
+
+    if ( reqpag && ((memory[in_dor_app_type] & 31) == 1 || (memory[in_dor_app_type]&31) == 8 )) {
+        printf("App needs %d of bad memory, but is %s - app won't start correctly\n",reqpag, (memory[in_dor_app_type]&31) == 1 ? "AT_GOOD" : "AT_POPD");
+    } else {
+        printf("App will use %d pages of bad memory\n", reqpag);
+    }
 
     /*  We've read it in, so now construct the ROM header */
     hdr = (struct romheader*)(memory + MAX_ADDR);
