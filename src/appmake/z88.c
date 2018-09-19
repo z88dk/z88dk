@@ -312,7 +312,7 @@ static void SaveBlock(unsigned offset, size_t length, char* base, char* ext)
     char name[FILENAME_MAX + 1];
     char buffer[LINEMAX + 1];
     FILE* fp;
-	printf("Save block %d %d\n",offset,length);
+
     strcpy(name, base);
     suffix_change(name, ext);
 
