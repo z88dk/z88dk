@@ -47,11 +47,15 @@ generic_console_cls:
 	exx	
 	ld	a,$24
 	out	($80),a
+	ld	bc,8192
 	ld	hl,$a000
-	ld	de,$a001
-	ld	bc,8191
+cls_loop:
 	ld	(hl),0
-	ldir
+	inc	hl
+	dec	bc
+	ld	a,b
+	or	c
+	jr	nz,cls_loop
 	xor	a
 	exx
 	out	(c),a
