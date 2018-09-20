@@ -363,27 +363,45 @@ FILE *fopen_bin(const char *fname,const  char *crtfile)
     return fin;
 }
 
+int zcc_strrcspn(char *s, char *reject)
+{
+    int index, i;
+
+    index = 0;
+
+    for (i = 1; *s; ++i)
+    {
+        if (strchr(reject, *s++))
+            index = i;
+    }
+
+    return index;
+}
 
 /* Generic change suffix routine - make sure name is long enough to hold the suffix */
 void suffix_change(char *name, char *suffix)
 {
-    char *ptr = strrchr(name,'.');
+    int index;
 
-    if ( ptr ) {
-        *ptr = 0;
-    }
-    strcat(name,suffix);
+    if ((index = zcc_strrcspn(name, "./\\")) && (name[index - 1] == '.'))
+        name[index - 1] = 0;
+
+    strcat(name, suffix);
 }
 
 /* Variant for the generic change suffix routine */
 void any_suffix_change(char *name, char *suffix, char suffix_delimiter)
 {
-    char *ptr = strrchr(name,suffix_delimiter);
+    int index;
 
-    if ( ptr ) {
-        *ptr = 0;
-    }
-    strcat(name,suffix);
+    static char delim[] = "./\\";
+
+    delim[0] = suffix_delimiter;
+
+    if ((index = zcc_strrcspn(name, delim)) && (name[index - 1] == delim[0]))
+        name[index - 1] = 0;
+
+    strcat(name, suffix);
 }
 
 void *must_malloc(size_t sz)
