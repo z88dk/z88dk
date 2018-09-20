@@ -44,6 +44,9 @@ typedef struct {
 #ifndef strncasecmp
 #define strncasecmp(a,b,c) strnicmp(a,b,c)
 #endif
+#ifndef strcasecmp
+#define strcasecmp(a,b) stricmp(a,b)
+#endif
 #endif
 
 
