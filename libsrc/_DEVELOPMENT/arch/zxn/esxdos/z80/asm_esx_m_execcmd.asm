@@ -28,12 +28,24 @@ asm_esx_m_execcmd:
    push iy
    
 IF __SDCC_IY
+
    push hl
    pop iy
+   
+   ld ix,__SYS_IY
+
 ELSE
+
    push hl
    pop ix
+   
+   ld iy,__SYS_IY
+
 ENDIF
+
+   exx
+	ld hl,__SYS_HLP
+	exx
 
    rst __ESX_RST_SYS
    defb __ESX_M_EXECCMD
