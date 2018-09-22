@@ -266,7 +266,7 @@ int cpm_write_file_to_image(const char* disc_format, const char* output_file, co
     }
 
     cpm_write_file(h, cpm_filename, filebuf, binlen);
-    if (cpm_write_image(h, disc_name) < 0) {
+    if (cpm_write_edsk(h, disc_name) < 0) {
         exit_log(1, "Can't write disc image");
     }
     cpm_free(h);

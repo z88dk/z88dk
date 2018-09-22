@@ -61,12 +61,42 @@ cpm_handle* cpm_create(cpm_discspec* spec)
     for (i = 0; i < directory_extents; i++) {
         h->extents[i] = 1;
     }
+#if 0
+    // Code that marks each sector so we can see what is actually loaded
+    for ( int t = 0, offs = 0; t < spec->tracks; t++ ) {
+	for ( int head = 0; head < spec->sides; head++ ) {
+	   for ( int s = 0; s < spec->sectors_per_track; s++ ) {
+              for ( int b = 0; b < spec->sector_size / 4 ; b++ ) {
+                 h->image[offs++] = t ^ 255;
+                 h->image[offs++] = head ^ 255;
+                 h->image[offs++] = s ^ 255;
+                 h->image[offs++] = 0 ^ 255;
+              }
+	   }
+	}
+    }
+#endif
     return h;
 }
 
 void cpm_write_boot_track(cpm_handle* h, void* data, size_t len)
 {
     memcpy(h->image, data, len);
+}
+
+void cpm_write_sector(cpm_handle *h, int track, int sector, int head, void *data)
+{
+    size_t offset;
+    size_t track_length = h->spec.sectors_per_track * h->spec.sector_size;
+
+    if ( h->spec.alternate_sides == 0 ) {
+        offset = track_length * track + (head * track_length * h->spec.tracks);
+    } else {
+        offset = track_length * ( 2* track + head);
+    }
+
+    offset += sector * h->spec.sector_size;
+    memcpy(&h->image[offset], data, h->spec.sector_size);
 }
 
 void cpm_write_file(cpm_handle* h, char filename[11], void* data, size_t len)
@@ -122,7 +152,7 @@ void cpm_write_file(cpm_handle* h, char filename[11], void* data, size_t len)
     }
 }
 
-int cpm_write_image(cpm_handle* h, const char* filename)
+int cpm_write_edsk(cpm_handle* h, const char* filename)
 {
     uint8_t header[256] = { 0 };
     size_t offs;
