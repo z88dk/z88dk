@@ -1002,13 +1002,13 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
         if (sb->org < 0x2000)
             exit_log(1, "Error: Section %s has org too low 0x%04x\n", sb->section_name, sb->org);
 
-        if ((sb->org < 0x4000) && (sb->org + sb->size >= 0x4000))
+        if ((sb->org < 0x4000) && (sb->org + sb->size > 0x4000))
             exit_log(1, "Error: Section %s extends past end of dot [0x%04x,0x%04x)\n", sb->section_name, sb->org, sb->org + sb->size);
 
-        if ((sb->org < 0x4000) && (sb->org + sb->size >= (0x4000 - 300)))
+        if ((sb->org < 0x4000) && (sb->org + sb->size > (0x4000 - 256)))
             printf("Warning: Section %s may overlap stack area in divmmc memory [0x%04x,0x%04x)\n", sb->section_name, sb->org, sb->org + sb->size);
 
-        if ((sb->org >= 0x4000) && (sb->org + sb->size >= 0x10000))
+        if ((sb->org >= 0x4000) && (sb->org + sb->size > 0x10000))
             exit_log(1, "Error: Section %s extends past end of main bank [0x%04x,0x%04x)\n", sb->section_name, sb->org, sb->org + sb->size);
 
         if (sb->org < 0x4000)
