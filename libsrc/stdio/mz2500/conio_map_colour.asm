@@ -14,7 +14,7 @@ conio_map_colour:
         ld      c,__CLIB_CONIO_NATIVE_COLOUR
         rr      c
         ret     c
-	ret
+
 	and	15
 	ld	c,a
 	ld	b,0
@@ -27,18 +27,18 @@ conio_map_colour:
 table:
         defb    $0	;BLACK -> BLACK
 	defb	$1	;BLUE -> BLUE
-	defb	$2	;GREEN -> GREEN
-	defb	$3	;CYAN -> CYAN
-	defb	$4	;RED -> RED
-	defb	$5	;MAGENTA -> MAGENTA
-	defb	$e	;BROWN -> BRIGHT YELLOW
-	defb	$7	;LIGHTGRAY -> BRIGHT GREY
-	defb	$8	;DARKGRAY -> DARK GREY
-	defb	$9	;LIGHTBLUE -> BRIGHT BLUE
-	defb	$a 	;LIGHTGREEN -> BRIGHT GREEN
-	defb	$b	;LIGHTCYAN -> BRIGHT CYAN
-	defb	$c	;LIGHTRED -> BRIGHT RED
-	defb	$d	;LIGHTMAGENTA -> BRIGHT MAGENTA
+	defb	$4	;GREEN -> GREEN
+	defb	$5	;CYAN -> CYAN
+	defb	$2	;RED -> RED
+	defb	$3	;MAGENTA -> MAGENTA
+	defb	$2	;BROWN -> RED
+	defb	$7	;LIGHTGRAY -> WHITE
+	defb	$7	;DARKGRAY -> WHITE
+	defb	$1	;LIGHTBLUE -> BLUE
+	defb	$4	;LIGHTGREEN -> GREEN
+	defb	$5	;LIGHTCYAN -> CYAN
+	defb	$2	;LIGHTRED -> RED
+	defb	$3	;LIGHTMAGENTA -> MAGENTA
 	defb	$6	;YELLOW -> YELLOW
-	defb	$f	;WHITE -> WHITE
+	defb	$7	;WHITE -> WHITE
 
