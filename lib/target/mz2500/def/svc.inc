@@ -517,7 +517,7 @@ _LPTRA	EQU	1Dh
 ; OUT: HL = VRAM address (C000h to C7FFh)
 ; DES: all
 ;
-_?PONT	EQU	1Eh
+_PONT	EQU	1Eh
 
 _KCALL	EQU	1Fh
 
@@ -848,7 +848,7 @@ _RWOPN	EQU	33h
 ; OUT:	DE = バッファアドレス
 ; DES:	BC, HL以外
 ; Enter 1 line Enter from the current cursor position
-Others are same as GETL
+;Others are same as GETL
 ; IN: None
 ; OUT: DE = buffer address
 ; DES: other than BC, HL
@@ -1092,7 +1092,7 @@ _LOCK	EQU	3Fh
 ; Equivalent to get # of BASIC
 ; A = 2, except for DE = 0:
 ; Output B type from DE to file
-Equivalent to BASIC's print # ()
+;Equivalent to BASIC's print # ()
 ; A = 2, DE = 0:
 ; Output field-buffer to file
 ; Equivalent to BASIC put #
@@ -2151,7 +2151,7 @@ _SETCG	EQU	74h
 ; = 0: Right of Kanji
 ; DES: all
 ;
-_?TEXT	EQU	75h
+_QTEXT	EQU	75h
 
 ;----------------------------------------------------------------------------
 ; CURBL
