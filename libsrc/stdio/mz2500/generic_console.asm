@@ -57,11 +57,15 @@ generic_console_set_inverse:
 generic_console_set_ink:
 	call	conio_map_colour
 	and	7
+	ld	c,a
+	ld	hl,COLORA
+	ld	a,(hl)
+	and	@11111000
+	or	c
 	ld	(COLORA),a
 	ret
 
 generic_console_set_paper:
-	call	conio_map_colour
 	ret
 
 generic_console_cls:
