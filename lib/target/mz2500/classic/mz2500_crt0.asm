@@ -36,6 +36,7 @@
 
 	defc	TAR__no_ansifont = 1
         defc    TAR__clib_exit_stack_size = 32
+        defc    TAR__fputc_cons_generic = 1
 	defc	__CPU_CLOCK = 6000000
         INCLUDE "crt/classic/crt_rules.inc"
 
