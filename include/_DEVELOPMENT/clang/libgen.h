@@ -14,6 +14,9 @@ extern char *basename_ext(char *path);
 extern char *dirname(char *path);
 
 
+extern unsigned char glob(const char *s,const char *pattern);
+
+
 extern char *pathnice(char *path);
 
 

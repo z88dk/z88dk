@@ -14,6 +14,11 @@ extern char __LIB__ *basename_ext(char *path) __smallc __z88dk_fastcall;
 extern char __LIB__ *dirname(char *path) __smallc __z88dk_fastcall;
 
 
+extern unsigned char __LIB__ glob(const char *s,const char *pattern) __smallc;
+extern unsigned char __LIB__ glob_callee(const char *s,const char *pattern) __smallc __z88dk_callee;
+#define glob(a,b) glob_callee(a,b)
+
+
 extern char __LIB__ *pathnice(char *path) __smallc __z88dk_fastcall;
 
 
