@@ -52,7 +52,6 @@
 	ld	d,h
 	ld	e,l
 	ld	hl,pixelbyte
-	cpl
 	ld	(hl),a
 
 	ld	a,$9f
@@ -72,7 +71,6 @@
 	out	($80),a
 
 	ex	af,af	; dcircle uses the flags in af'.. watch out !
-	cpl
 	ld	(de),a	; pixel address
 
 	ld	a,$9f
