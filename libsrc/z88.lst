@@ -92,7 +92,7 @@ graphics/fill
 graphics/dfill
 graphics/getsprite
 graphics/liner
-graphics/putsprite
+graphics/putsprite2
 graphics/bksave
 graphics/bkrestore
 graphics/z88/pixladdr
