@@ -1,13 +1,15 @@
-; unsigned char glob(const char *s, const char *pattern)
+; unsigned char glob_dos(const char *s, const char *pattern)
 
 SECTION code_string
 
-PUBLIC asm_glob
+PUBLIC asm_glob_fat
 
-asm_glob:
+EXTERN asm_toupper, asm_tolower
 
-   ; match string to glob pattern (unix style)
-   ; case matters
+asm_glob_fat:
+
+   ; match string to glob pattern (fat style)
+   ; matching is case insensitive
    ;
    ; glob pattern can contain:
    ;
@@ -39,7 +41,12 @@ match:
    cp '?'
    jr z, pattern_one
    
-   cp (hl)                     ; match a literal
+   call asm_toupper
+   
+   bit 5,(hl)
+   call nz, asm_tolower
+
+   cp (hl)                     ; match a literal with caseless compare
 
    scf
    ret nz                      ; carry indicates no match
@@ -94,6 +101,6 @@ loop:
    
    scf
    ret z                       ; does not match if end of string reached (aready tried matching zero length)
-
+   
    inc hl
    jr loop

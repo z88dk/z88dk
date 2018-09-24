@@ -7,5 +7,9 @@ libgen/c/sdcc/dirname
 libgen/c/sdcc/dirname_fastcall
 libgen/c/sdcc/glob
 libgen/c/sdcc/glob_callee
+libgen/c/sdcc/glob_dos
+libgen/c/sdcc/glob_dos_callee
+libgen/c/sdcc/glob_fat
+libgen/c/sdcc/glob_fat_callee
 libgen/c/sdcc/pathnice
 libgen/c/sdcc/pathnice_fastcall

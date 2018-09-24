@@ -17,6 +17,12 @@ extern char *dirname(char *path);
 extern unsigned char glob(const char *s,const char *pattern);
 
 
+extern unsigned char glob_dos(const char *s,const char *pattern);
+
+
+extern unsigned char glob_fat(const char *s,const char *pattern);
+
+
 extern char *pathnice(char *path);
 
 

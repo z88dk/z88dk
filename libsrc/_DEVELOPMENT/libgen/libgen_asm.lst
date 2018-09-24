@@ -5,4 +5,6 @@ libgen/z80/asm_basename
 libgen/z80/asm_basename_ext
 libgen/z80/asm_dirname
 libgen/z80/asm_glob
+libgen/z80/asm_glob_dos
+libgen/z80/asm_glob_fat
 libgen/z80/asm_pathnice
