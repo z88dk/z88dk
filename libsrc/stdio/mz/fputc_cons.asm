@@ -10,6 +10,11 @@
 ;
 ;       Stefano Bodrato - 5/5/2000
 ;
+;	UncleBod - 2018-09-25
+;	Added handling of DEL key
+;
+;	TODO
+;	Conversion of mzASCII to real ASCII, especially codes 0-127
 ;
 ;	$Id: fputc_cons.asm,v 1.4 2016-05-15 20:15:45 dom Exp $
 ;
@@ -45,6 +50,11 @@ IF STANDARDESCAPECHARS
 .notCR
 ENDIF
 
+; Handling of DEL-key
+	cp	8
+	jr	nz,notback
+	ld	a,$14 ; move left on MZ700
+.notback
 
 	; Some undercase text?  Transform in UPPER !
 	cp	97

@@ -1,7 +1,9 @@
-;       Stub for the SHARP MZ family
+-;       Stub for the SHARP MZ family
 ;
 ;       Stefano Bodrato - 5/5/2000
 ;
+; 	UncleBod	-  2018-09-25
+;	Changed default org to 1200
 ;       $Id: mz_crt0.asm,v 1.24 2016-07-15 21:03:25 dom Exp $
 ;
 
@@ -28,7 +30,7 @@
 ; Now, getting to the real stuff now!
 
         IF      !DEFINED_CRT_ORG_CODE
-                defc    CRT_ORG_CODE  = $1300
+                defc    CRT_ORG_CODE  = $1200
         ENDIF
 
         defc    CONSOLE_COLUMNS = 40
