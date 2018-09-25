@@ -1,14 +1,14 @@
     SECTION         code_clib
 
-    PUBLIC    draw
-    PUBLIC    _draw
+    PUBLIC    undraw
+    PUBLIC    _undraw
 
-    EXTERN call_plotpixel
+    EXTERN call_unplotpixel
     EXTERN draw_main
     EXTERN last_pos
 
-draw:
-_draw:
+undraw:
+_undraw:
 
     push ix
     ld ix,2
@@ -22,7 +22,7 @@ _draw:
     push hl
 
     push iy
-    ld iy,call_plotpixel
+    ld iy,call_unplotpixel
     call draw_main
     pop iy
 
@@ -32,5 +32,3 @@ _draw:
     pop ix
 
     ret
-
-

@@ -1,6 +1,6 @@
       SECTION code_clib
 
-      PUBLIC  plotpixel
+      PUBLIC  xorpixel
 
       EXTERN sety
       EXTERN setx
@@ -8,7 +8,7 @@
       EXTERN last_pos
 
 ; in: hl=(x,y)
-plotpixel:
+xorpixel:
       push af
       push bc
       push hl
@@ -17,7 +17,7 @@ plotpixel:
       call getpat
       call setx
       in a,(0x41) ;read data
-      or b
+      xor b
       call setx ; to prevent automatic increment of lcd driver
       out (0x41),a ;write data
       pop hl

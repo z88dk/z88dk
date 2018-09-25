@@ -1,14 +1,15 @@
     SECTION         code_clib
 
-    PUBLIC    draw
-    PUBLIC    _draw
+    PUBLIC    xordraw
+    PUBLIC    _xordraw
 
-    EXTERN call_plotpixel
+    EXTERN call_xorplotpixel
     EXTERN draw_main
     EXTERN last_pos
 
-draw:
-_draw:
+xordraw:
+_xordraw:
+
 
     push ix
     ld ix,2
@@ -22,7 +23,7 @@ _draw:
     push hl
 
     push iy
-    ld iy,call_plotpixel
+    ld iy,call_xorplotpixel
     call draw_main
     pop iy
 
@@ -32,5 +33,3 @@ _draw:
     pop ix
 
     ret
-
-
