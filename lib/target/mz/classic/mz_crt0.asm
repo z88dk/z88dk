@@ -1,4 +1,4 @@
--;       Stub for the SHARP MZ family
+;       Stub for the SHARP MZ family
 ;
 ;       Stefano Bodrato - 5/5/2000
 ;
