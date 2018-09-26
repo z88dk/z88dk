@@ -42,4 +42,5 @@ ENDIF
 	ld	(hl),a
 	jp	11
 
+        SECTION bss_clib
 .mychar	defb	0
