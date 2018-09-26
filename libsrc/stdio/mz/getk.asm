@@ -5,6 +5,11 @@
 ;
 ;	Stefano Bodrato - 5/5/2000
 ;
+;	UncleBod - 2018-09-25
+;
+;	TODO
+;	Conversion of mzASCII to real ASCII, especially codes 0-127
+
 ;
 ;	$Id: getk.asm,v 1.4 2016-06-12 17:32:01 dom Exp $
 ;

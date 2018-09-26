@@ -8,6 +8,11 @@
 ;	No auto-repeat for now.
 ;	Maybe someone wants to improve this ?
 ;
+;	UncleBod - 2018-09-25
+;	Added handling of DEL key
+;
+;	TODO
+;	Conversion of mzASCII to real ASCII, especially codes 0-127
 ;
 ;	$Id: fgetc_cons.asm,v 1.5 2016-06-12 17:32:01 dom Exp $
 ;
@@ -38,6 +43,12 @@ ELSE
 		ld	a,13
 ENDIF
 .noenter
+; Handling of DEL key
+		cp	$60	;DEL
+		jr	nz,nodelkey
+		ld	a,8	;DEL_KEY
+.nodelkey		
+
 		ld	l,a
 		ld	h,0
 		ret
