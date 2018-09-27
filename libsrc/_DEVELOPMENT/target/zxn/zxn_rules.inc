@@ -80,6 +80,8 @@ Z88DK_FOR(`LOOP', `0', `15',
    IFNDEF CRT_ORG_MAIN
       defc CRT_ORG_MAIN = 0x8000
    ENDIF
+   
+   ; DOTX_RAMTOP can be set to alter ramtop check
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; NextOS dotn

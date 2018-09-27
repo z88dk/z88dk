@@ -4,9 +4,13 @@
    ;;
    
    EXTERN __MAIN_head
-   
+
+   IFNDEF DOTX_RAMTOP
+      defc DOTX_RAMTOP = __MAIN_head
+   ENDIF
+
    ld hl,(__SYSVAR_RAMTOP)
-   ld de,__MAIN_head
+   ld de,DOTX_RAMTOP
    
    xor a
    sbc hl,de
@@ -58,11 +62,11 @@ error_esxdos_dtx:
 error_ramtop:
 
    defm "M RAMTOP no good ("
-   defb (__MAIN_head - 1) / 10000 % 10 + '0'
-   defb (__MAIN_head - 1) / 1000 % 10 + '0'
-   defb (__MAIN_head - 1)/ 100 % 10 + '0'
-   defb (__MAIN_head - 1) / 10 % 10 + '0'
-   defb (__MAIN_head - 1) % 10 + '0'
+   defb (DOTX_RAMTOP - 1) / 10000 % 10 + '0'
+   defb (DOTX_RAMTOP - 1) / 1000 % 10 + '0'
+   defb (DOTX_RAMTOP - 1)/ 100 % 10 + '0'
+   defb (DOTX_RAMTOP - 1) / 10 % 10 + '0'
+   defb (DOTX_RAMTOP - 1) % 10 + '0'
    defb ')'+0x80
 
 esxdos_dtx_filename:
