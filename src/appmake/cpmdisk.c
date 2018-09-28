@@ -67,15 +67,17 @@ cpm_handle* cpm_create(cpm_discspec* spec)
 	for ( int head = 0; head < spec->sides; head++ ) {
 	   for ( int s = 0; s < spec->sectors_per_track; s++ ) {
               for ( int b = 0; b < spec->sector_size / 4 ; b++ ) {
-                 h->image[offs++] = t ^ 255;
-                 h->image[offs++] = head ^ 255;
-                 h->image[offs++] = s ^ 255;
-                 h->image[offs++] = 0 ^ 255;
+                 h->image[offs++] = t; //^ 255;
+                 h->image[offs++] = head; //^ 255;
+                 h->image[offs++] = s; //^ 255;
+                 h->image[offs++] = 0; //^ 255;
               }
 	   }
 	}
     }
 #endif
+    size_t directory_offset = (h->spec.boottracks * h->spec.sectors_per_track * h->spec.sector_size * 1);
+	memset(h->image +directory_offset, 0xe5, 512);
     return h;
 }
 
@@ -201,7 +203,11 @@ int cpm_write_edsk(cpm_handle* h, const char* filename)
             for (j = 0; j < h->spec.sectors_per_track; j++) {
                 *ptr++ = i; // Track
                 *ptr++ = s; // Side
-                *ptr++ = j + h->spec.first_sector_offset; // Secotr ID
+                if ( h->spec.has_skew && i + (i*h->spec.sides) >= h->spec.skew_track_start ) {
+                    *ptr++ = h->spec.skew_tab[j] + h->spec.first_sector_offset; // Secotr ID
+                } else {
+                    *ptr++ = j + h->spec.first_sector_offset; // Secotr ID
+                }
                 *ptr++ = sector_size;
                 *ptr++ = 0; // FDC status register 1
                 *ptr++ = 0; // FDC status register 2

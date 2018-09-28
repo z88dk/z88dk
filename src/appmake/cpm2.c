@@ -107,11 +107,15 @@ static cpm_discspec microbee_spec = {
     .sector_size = 512,
     .gap3_length = 0x17,
     .filler_byte = 0xe5,
-    .boottracks = 2,
+    .boottracks = 4,
     .directory_entries = 128,
     .extent_size = 4096,
     .byte_size_extents = 1,
     .first_sector_offset = 0x15,
+    .alternate_sides = 1,
+    .has_skew = 1,
+    .skew_track_start = 5,
+    .skew_tab = { 1, 4, 7, 0, 3, 6, 9, 2, 5, 8 }
 };
 
 
@@ -159,7 +163,7 @@ struct formats {
     { "dmv",       "NCR Decision Mate",  &dmv_spec, 16, "\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5NCR F3", 1 },
     { "einstein",  "Tatung Einstein",    &einstein_spec, 0, NULL, 1 },
     { "kayproii",  "Kaypro ii",          &kayproii_spec, 0, NULL, 1 },
-    { "microbee",  "Microbee",           &microbee_spec, 0, NULL, 1 },
+    { "microbee-ds80",  "Microbee DS80", &microbee_spec, 0, NULL, 1 },
     { "mz2500cpm", "Sharp MZ2500 - CPM", &mz2500cpm_spec, 0, NULL, 1 },
     { "osborne1",  "Osborne 1",          &osborne_spec, 0, NULL, 1 },
     { NULL, NULL }
