@@ -3,7 +3,7 @@
     PUBLIC  undrawr
     PUBLIC  _undrawr
 
-    EXTERN call_unplotpixel
+    EXTERN unplotpixel
     EXTERN draw_main
     EXTERN last_pos
 
@@ -27,7 +27,7 @@ _undrawr:
 
     push hl
     push iy
-    ld iy,call_unplotpixel
+    ld iy,unplotpixel
     call draw_main
     pop iy
 

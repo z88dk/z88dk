@@ -33,7 +33,10 @@ graphics/g800/draw_main
 graphics/g800/drawto
 graphics/g800/getmaxx
 graphics/g800/getmaxy
+graphics/g800/last_pos
+graphics/g800/locate
 graphics/g800/plotpixel
+graphics/g800/point
 graphics/g800/pointxy
 graphics/g800/respixel
 graphics/g800/undraw

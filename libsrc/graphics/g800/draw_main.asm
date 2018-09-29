@@ -1,14 +1,14 @@
     SECTION         code_clib
 
     PUBLIC draw_main
-    PUBLIC call_plotpixel
-    PUBLIC call_unplotpixel
-    PUBLIC call_xorplotpixel
-
-    EXTERN plotpixel   ; in:  l=y, h=x
-    EXTERN respixel    ; in:  l=y, h=x
-    EXTERN xorpixel    ; in:  l=y, h=x
     EXTERN last_pos
+
+; draw line routine based on Bresenham's algorithm
+;
+; input:
+;     de: x0/y0
+;     hl: x1/y1
+;     iy: plot routine address
 
 ;----------------------------------------------------------
 draw_main:
@@ -203,22 +203,14 @@ exit_draw:
   ret
 
 myplotpixel:
+  push bc
+  ld bc, exitplotpixel
+  push bc
   jp (iy)
 ;nop
 exitplotpixel:
+  pop bc
   ret
-
-call_plotpixel:
-  call plotpixel
-  jp exitplotpixel
-
-call_unplotpixel:
-  call respixel
-  jp exitplotpixel
-
-call_xorplotpixel:
-  call xorpixel
-  jp exitplotpixel
 
 
 ; convert from 2nd/3rd quadrant to 1st/4th quadrant

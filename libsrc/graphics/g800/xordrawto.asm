@@ -3,7 +3,7 @@
     PUBLIC    xordrawto
     PUBLIC    _xordrawto
 
-    EXTERN call_xorplotpixel
+    EXTERN xorplotpixel
     EXTERN draw_main
     EXTERN last_pos
 
@@ -20,7 +20,7 @@ _xordrawto:
 
     push hl
     push iy
-    ld iy,call_xorplotpixel
+    ld iy,xorplotpixel
     call draw_main
     pop iy
 

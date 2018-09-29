@@ -3,7 +3,7 @@
     PUBLIC  drawr
     PUBLIC  _drawr
 
-    EXTERN call_plotpixel
+    EXTERN plotpixel
     EXTERN draw_main
     EXTERN last_pos
 
@@ -27,7 +27,7 @@ _drawr:
 
     push hl
     push iy
-    ld iy,call_plotpixel
+    ld iy,plotpixel
     call draw_main
     pop iy
 
