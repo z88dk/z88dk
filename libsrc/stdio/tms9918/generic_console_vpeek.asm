@@ -20,7 +20,7 @@ IF FORmtx | FORpv2000 | FORsc3000 | FORm5 | FOReinstein | FORcoleco | FORspc1000
 	EXTERN	LDIRMV
 ENDIF
 
-IF !FORspc1000
+IF !FORspc1000 && !FOReinstein
 	PUBLIC	generic_console_vpeek
 	defc	generic_console_vpeek = __tms9918_console_vpeek
 ENDIF

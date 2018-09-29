@@ -37,7 +37,10 @@ ENDIF
 ; the VDP as the slave, so don't export the tms symbols as
 ; generic_console_*
 ;
-IF !FORspc1000
+; The Tatung Einstein has a TMS9928A as a main display and
+; an 80 column 6845 as a secondary display.
+;
+IF !FORspc1000 && !FOReinstein
                 PUBLIC          generic_console_cls
                 PUBLIC          generic_console_scrollup
                 PUBLIC          generic_console_printc
