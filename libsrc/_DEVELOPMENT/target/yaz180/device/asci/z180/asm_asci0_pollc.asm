@@ -2,11 +2,11 @@
     SECTION code_driver
     SECTION code_driver_character_input
 
-    PUBLIC _asci0_pollc
+    PUBLIC asm_asci0_pollc
 
     EXTERN asci0RxCount
     
-    _asci0_pollc:
+    asm_asci0_pollc:
     
         ; exit     : l = number of characters in Rx buffer
         ;            carry reset if Rx buffer is empty
@@ -22,5 +22,5 @@
         scf                         ; set carry to indicate char received
         ret
 
-    EXTERN _asci0_need
-    defc NEED = _asci0_need
+    EXTERN asm_asci0_need
+    defc NEED = asm_asci0_need

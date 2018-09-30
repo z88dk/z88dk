@@ -7,7 +7,7 @@ PUBLIC rc_01_output_asci1_oterm_msg_putc
 PUBLIC rc_01_output_asci1_oterm_msg_putc_raw
 PUBLIC rc_01_output_asci1_oterm_msg_putc_send
 
-EXTERN l_jpix, _asci1_putc
+EXTERN l_jpix, asm_asci1_putc
 
 rc_01_output_asci1_oterm_msg_putc:
 
@@ -66,7 +66,7 @@ rc_01_output_asci1_oterm_msg_putc_send:
 block_loop:
 
    ld l,c
-   call _asci1_putc
+   call asm_asci1_putc
    
    dec l
    jr z, block_loop            ; if Tx buffer is full
