@@ -18,11 +18,12 @@
 filltxt:
 _filltxt:
 	; __FASTCALL__ mode
-	ld	a,l	
+	ld	e,l
 	ld	hl,$2800        ; DFILE ADDR
 	ld	bc,32*16
 fillp:
-	LD (HL),A            ; POKE DFILE
+	LD (HL),e            ; POKE DFILE
+	inc hl
 	dec bc
 	ld	a,b
 	or c

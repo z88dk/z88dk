@@ -851,14 +851,14 @@ extern void __LIB__ ZXN_WRITE_MMU7(unsigned char page) __smallc __z88dk_fastcall
 
 // memory - paging and banking state
 
-extern unsigned int __LIB__ zxn_addr_from_mmu(unsigned char mmu) __smallc __z88dk_fastcall;
+extern void __LIB__ *zxn_addr_from_mmu(unsigned char mmu) __smallc __z88dk_fastcall;
 
 
-extern unsigned char __LIB__ zxn_mmu_from_addr(unsigned int addr) __smallc __z88dk_fastcall;
+extern unsigned char __LIB__ zxn_mmu_from_addr(void *addr) __smallc __z88dk_fastcall;
 
 
-extern unsigned int __LIB__ zxn_addr_in_mmu(unsigned char mmu,unsigned int addr) __smallc;
-extern unsigned int __LIB__ zxn_addr_in_mmu_callee(unsigned char mmu,unsigned int addr) __smallc __z88dk_callee;
+extern void __LIB__ *zxn_addr_in_mmu(unsigned char mmu,void *addr) __smallc;
+extern void __LIB__ *zxn_addr_in_mmu_callee(unsigned char mmu,void *addr) __smallc __z88dk_callee;
 #define zxn_addr_in_mmu(a,b) zxn_addr_in_mmu_callee(a,b)
 
 

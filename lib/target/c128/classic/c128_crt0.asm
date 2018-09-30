@@ -94,7 +94,8 @@ z80start:
 	ld	a,$87	; Display addres at $2000...
 	out	(c),a	; ...and alternate (upper+lowercase) char set
 
-	ld	a,11		;dark grey
+;	ld	a,11		;dark grey
+	xor	a	; black
 	ld	bc,$d020
 	out	(c),a	;border
 	inc	c

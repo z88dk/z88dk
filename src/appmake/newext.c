@@ -37,69 +37,65 @@ option_t newext_options[] = {
  * Execution starts here
  */
 
-int newext_exec(char *target)
+int newext_exec(char* target)
 {
-    char    filename[FILENAME_MAX+1];
-    FILE   *fpin;
-    FILE   *fpout;
-    int     len;
-    int     c,i;
+    char filename[FILENAME_MAX + 1];
+    FILE* fpin;
+    FILE* fpout;
+    int len;
+    int c, i;
 
-    if ( help )
+    if (help)
         return -1;
 
-    if ( binname == NULL ) {
+    if (binname == NULL) {
         return -1;
     }
 
-    if ( strlen(suffixchar) != 1 ) {
-        fprintf(stderr,"Wrong value for suffix delimiter.\n");
-        myexit(NULL,1);
+    if (strlen(suffixchar) != 1) {
+        fprintf(stderr, "Wrong value for suffix delimiter.\n");
+        myexit(NULL, 1);
     }
 
-    if ( outfile == NULL ) {
-        strcpy(filename,binname);
+    if (outfile == NULL) {
+        strcpy(filename, binname);
         any_suffix_change(filename, extfile, suffixchar[0]);
     } else {
-        strcpy(filename,outfile);
-    }
-	
-	for (i=0;i<=strlen(filename);i++)
-			filename[i]=toupper(filename[i]);
-
-	if ( (fpin=fopen_bin(binname, crtfile) ) == NULL ) {
-        fprintf(stderr,"Can't open input file %s\n",binname);
-        myexit(NULL,1);
+        strcpy(filename, outfile);
     }
 
-    if (fseek(fpin,0,SEEK_END)) {
-        fprintf(stderr,"Couldn't determine size of file\n");
+    for (i = 0; i <= strlen(filename); i++)
+        filename[i] = toupper(filename[i]);
+
+    if ((fpin = fopen_bin(binname, crtfile)) == NULL) {
+        fprintf(stderr, "Can't open input file %s\n", binname);
+        myexit(NULL, 1);
+    }
+
+    if (fseek(fpin, 0, SEEK_END)) {
+        fprintf(stderr, "Couldn't determine size of file\n");
         fclose(fpin);
-        myexit(NULL,1);
+        myexit(NULL, 1);
     }
-	
-	unlink (filename);
 
-    len=ftell(fpin);
+    unlink(filename);
 
-    fseek(fpin,0L,SEEK_SET);
+    len = ftell(fpin);
 
-    if ( (fpout=fopen(filename,"wb") ) == NULL ) {
+    fseek(fpin, 0L, SEEK_SET);
+
+    if ((fpout = fopen(filename, "wb")) == NULL) {
         fclose(fpin);
-        myexit("Can't open output file\n",1);
+        myexit("Can't open output file\n", 1);
     }
 
-    for ( i = 0; i < len; i++) {
+    for (i = 0; i < len; i++) {
         c = getc(fpin);
-        writebyte(c,fpout);
+        writebyte(c, fpout);
     }
-
 
     fclose(fpin);
     fclose(fpout);
 
     return 0;
 }
-
-
-

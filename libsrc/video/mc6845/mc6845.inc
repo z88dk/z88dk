@@ -16,3 +16,12 @@ IF FORtrs80
 	defc	register_r = 0xfb
 	defc	register_w = 0xfb
 ENDIF
+
+IF FORlynx
+	defc	address_r = 0
+	defc	status_r = 0x86
+	defc	address_w = 0x86
+	defc	register_r = 0x87
+	defc	register_w = 0x87
+
+ENDIF

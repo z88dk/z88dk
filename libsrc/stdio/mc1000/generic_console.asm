@@ -2,7 +2,6 @@
 		; code_driver to ensure we don't page ourselves out
 		SECTION		code_driver
 
-		PUBLIC		generic_console_cls
 		PUBLIC		generic_console_calc_xypos
 		PUBLIC		generic_console_printc
 		PUBLIC		generic_console_scrollup
@@ -10,9 +9,8 @@
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
 
-		PUBLIC		__mc1000_mode
+		EXTERN		__mc1000_mode
 
-		EXTERN		ansi_cls
 		EXTERN		ansi_SCROLLUP
 
 		EXTERN		generic_console_flags
@@ -28,32 +26,6 @@ generic_console_set_ink:
 generic_console_set_paper:
 generic_console_set_inverse:
 	ret
-
-generic_console_cls:
-	ld	a,(__mc1000_mode)
-	cp	0x9e
-	jr	z,hires_cls
-	out	($80),a
-	ld	hl, DISPLAY
-	ld	de, DISPLAY +1
-	ld	bc, +(CONSOLE_COLUMNS * CONSOLE_ROWS) - 1
-	ld	(hl),32
-	ldir
-	set	0,a
-	out	($80),a
-	ret
-
-hires_cls:
-	ld	hl,DISPLAY
-	ld	de,DISPLAY + 1
-	ld	bc, 32 * 192 - 1
-	out	($80),a
-	ld	(hl),0
-	ldir
-	set	0,a
-	out	($80),a
-	ret
-
 
 ; c = x
 ; b = y
@@ -183,7 +155,3 @@ generic_console_scrollup_3:
 	pop	bc
 	pop	de
 	ret
-
-	SECTION	data_clib
-
-__mc1000_mode:	defb	0x00		; lores mode 0x9e		;hires mode

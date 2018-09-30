@@ -11,10 +11,13 @@
 
         SECTION code_clib
 	PUBLIC	getk
+	PUBLIC	_getk
 
 .getk
-	in	a,(56)
-	and 127
+._getk
+        ld      a,(65013)
+        and 127
+
 IF STANDARDESCAPECHARS
 	cp	13
 	jr	nz,not_return
@@ -23,4 +26,6 @@ IF STANDARDESCAPECHARS
 ENDIF
 	ld	l,a
 	ld	h,0
+	xor	a
+	ld	(65013),a
 	ret

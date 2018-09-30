@@ -380,6 +380,20 @@ struct esx_mode
 __DPROTO(,,unsigned char,,esx_ide_mode_get,struct esx_mode *mode)
 __DPROTO(,,unsigned char,,esx_ide_mode_set,struct esx_mode *mode)
 
+// IDE_BANK
+// you must ensure allocated pages are returned before program exit
+
+#define ESX_BANKTYPE_RAM     __nextos_rc_banktype_zx
+#define ESX_BANKTYPE_DIVMMC  __nextos_rc_banktype_mmc
+
+__DPROTO(,,unsigned char,,esx_ide_bank_total,unsigned char banktype)
+__DPROTO(,,unsigned char,,esx_ide_bank_avail,unsigned char banktype)
+
+__DPROTO(,,unsigned char,,esx_ide_bank_alloc,unsigned char banktype)
+__DPROTO(,,unsigned char,,esx_ide_bank_reserve,unsigned char banktype, unsigned char page)
+
+__DPROTO(,,unsigned char,,esx_ide_bank_free,unsigned char banktype, unsigned char page)
+
 // DOS_CATALOG
 
 struct esx_cat_entry
@@ -428,6 +442,22 @@ struct esx_lfn
 
 __DPROTO(,,unsigned char,,esx_ide_get_lfn,struct esx_lfn *dir,struct esx_cat_entry *query)
 
+// IDE_BROWSER (system file dialog)
+// Data in memory must lie below 0xc000
+// ESX_BROWSERCAP_SYSCFG is reserved for the system
+
+#define ESX_BROWSERCAP_COPY  __nextos_browsercaps_copy
+#define ESX_BROWSERCAP_RENAME  __nextos_browsercaps_rename
+#define ESX_BROWSERCAP_MKDIR  __nextos_browsercaps_mkdir
+#define ESX_BROWSERCAP_ERASE  __nextos_browsercaps_erase
+#define ESX_BROWSERCAP_REMOUNT  __nextos_browsercaps_remount
+#define ESX_BROWSERCAP_UNMOUNT  __nextos_browsercaps_unmount
+#define ESX_BROWSERCAP_SYSCFG  __nextos_browsercaps_syscfg
+
+#define ESX_BROWSERCAP_NONE  __nextos_browsercaps_none
+#define ESX_BROWSERCAP_ALL  __nextos_browsercaps_all
+
+__DPROTO(,,unsigned char,,esx_ide_browser,uint8_t browsercaps,void *filetypes,char *help,char *dst_sfn,char *dst_lfn)
 
 // PLUS 3 DOS UTILITIES (MAY BE MOVED LATER)
 
@@ -435,6 +465,18 @@ __DPROTO(,,unsigned char,,esx_ide_get_lfn,struct esx_lfn *dir,struct esx_cat_ent
 
 __DPROTO(`d,e,h,l,iyl,iyh',`d,e,iyl,iyh',char,*,p3dos_cstr_to_pstr,char *s)
 __DPROTO(`d,e,h,l,iyl,iyh',`d,e,iyl,iyh',char,*,p3dos_pstr_to_cstr,char *s)
+
+__DPROTO(,,unsigned char,*,p3dos_copy_cstr_to_pstr,char *pdst, const char *csrc)
+__DPROTO(,,unsigned char,*,p3dos_copy_pstr_to_cstr,char *cdst, const char *psrc)
+
+// convert cat name to 8.3 dos name
+
+__DPROTO(,,char,*,p3dos_dosname_from_catname,char *dosname,const char *catname)
+
+// convert between esx drive numbers and p3dos drive letters
+
+__DPROTO(`b,c,d,e,h',`b,c,d,e',unsigned char,,p3dos_edrv_from_pdrv,unsigned char prdv)
+__DPROTO(`b,c,d,e,h',`b,c,d,e',unsigned char,,p3dos_pdrv_from_edrv,unsigned char erdv)
 
 
 // ESX ERROR CODES

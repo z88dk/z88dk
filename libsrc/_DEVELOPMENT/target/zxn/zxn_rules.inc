@@ -80,6 +80,8 @@ Z88DK_FOR(`LOOP', `0', `15',
    IFNDEF CRT_ORG_MAIN
       defc CRT_ORG_MAIN = 0x8000
    ENDIF
+   
+   ; DOTX_RAMTOP can be set to alter ramtop check
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; NextOS dotn
@@ -152,6 +154,16 @@ Z88DK_FOR(`LOOP', `0', `15',
    ENDIF
    
    defc __DOTN_MAIN_ABSOLUTE_MASK = DOTN_MAIN_ABSOLUTE_MASK & 0xff
+
+   ;; non-zero to load up alternate implementation in /dot/extra
+   
+   PUBLIC __DOTN_ENABLE_ALTERNATE
+   
+   IFNDEF DOTN_ENABLE_ALTERNATE
+      defc DOTN_ENABLE_ALTERNATE = 0
+   ENDIF
+   
+   defc __DOTN_ENABLE_ALTERNATE = DOTN_ENABLE_ALTERNATE
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; NextOS EXE

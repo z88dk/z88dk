@@ -14,8 +14,8 @@ LABEL Version="0.8" \
 ENV Z88DK_PATH="/opt/z88dk" \
     SDCC_PATH="/tmp/sdcc"
 
-RUN apk add --no-cache build-base libxml2 \ 
-    && apk add --no-cache -t .build_deps m4 bison flex libxml2-dev git subversion boost-dev texinfo \
+RUN apk add --no-cache build-base libxml2 m4 \ 
+    && apk add --no-cache -t .build_deps bison flex libxml2-dev git subversion boost-dev texinfo \
     && git clone --depth 1 --recursive https://github.com/z88dk/z88dk.git ${Z88DK_PATH}
 
 # Add, edit or uncomment the following lines to customize the z88dk compilation

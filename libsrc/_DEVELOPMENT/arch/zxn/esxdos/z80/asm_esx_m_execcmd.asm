@@ -8,6 +8,8 @@ PUBLIC asm_esx_m_execcmd
 
 EXTERN error_znc
 
+IF __ZXNEXT
+
 asm_esx_m_execcmd:
 
    ; enter : hl = char *cmdline
@@ -28,12 +30,24 @@ asm_esx_m_execcmd:
    push iy
    
 IF __SDCC_IY
+
    push hl
    pop iy
+   
+   ld ix,__SYS_IY
+
 ELSE
+
    push hl
    pop ix
+   
+   ld iy,__SYS_IY
+
 ENDIF
+
+   exx
+   ld hl,__SYS_HLP
+   exx
 
    rst __ESX_RST_SYS
    defb __ESX_M_EXECCMD
@@ -52,6 +66,17 @@ ENDIF
    ld h,0
    
    ret
+
+ELSE
+
+EXTERN __esxdos_error_mc
+
+asm_esx_m_execcmd:
+
+   ld a,__ESX_ENONSENSE
+   jp __esxdos_error_mc
+
+ENDIF
 
 ; ***************************************************************************
 ; * M_EXECCMD ($8f) *

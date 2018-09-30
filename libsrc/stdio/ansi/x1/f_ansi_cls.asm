@@ -10,7 +10,7 @@
 
         SECTION code_clib
 	PUBLIC	ansi_cls
-	EXTERN	ATTR
+	EXTERN	__x1_attr
 	EXTERN	ansicolumns	
 
 ansi_cls:
@@ -25,7 +25,7 @@ clr1:   set 4, b
 		ld	a,32
         out (c), a
         res 4, b
-        ld	a,(ATTR+1)
+        ld	a,(__x1_attr)
         out (c), a
         inc bc
         dec e

@@ -17,8 +17,8 @@
         SECTION code_clib
 	PUBLIC	ansi_CHAR
 	
-	PUBLIC	ATTR
 
+	EXTERN	__x1_attr
 	EXTERN	__console_y
 	EXTERN	__console_x
 	EXTERN	__console_w
@@ -48,16 +48,12 @@
 
 .setout
 
-	ld	(hl),a
-	
 	ld b,h
 	ld c,l
 	out(c),a
 
 	res 4,b
-.ATTR
-	;ld	a,15
-	ld	a,7
+	ld	a,(__x1_attr)
 	out(c),a
 
 	ret

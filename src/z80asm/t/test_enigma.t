@@ -15,17 +15,22 @@ use Test::More;
 use Path::Tiny;
 require './t/testlib.pl';
 
-my $NUL 	= ($^O eq 'MSWin32') ? 'nul' : '/dev/null';
+my $NUL 		= ($^O eq 'MSWin32') ? 'nul' : '/dev/null';
 my $CPM_DIR     = '../../ext/cpm';
 my $CPM         = '../../ext/cpm/cpm';
+my $TICKS_DIR	= '../ticks';
+my $TICKS		= '../ticks/ticks';
 my $ENIGMA      = '../../examples/console/enigma.c';
 
+# build CP/M
 my $cmd = "make -C $CPM_DIR";
-run($cmd, 0, 'IGNORE', '');
+ok 0==system($cmd), $cmd;
 
+# build for CP/M
 $cmd = "zcc +cpm -oenigma.com $ENIGMA";
-run($cmd, 0, 'IGNORE', '');
+ok 0==system($cmd), $cmd;
 
+# run with CP/M
 spew("enigma.in", "HELLO.\r\n");
 spew("enigma.exp", "Enter text to be (de)coded, finish with a .\n".
                    "HREXLSLEOC .");
@@ -46,7 +51,38 @@ ok path('enigma.exp')->slurp_raw eq path('enigma.out')->slurp_raw ,
         "enigma.out and enigma.exp equal";
 
 if (Test::More->builder->is_passing) {
-    unlink qw( enigma.com enigma.in enigma.out enigma.exp );
+    unlink qw( enigma.bin enigma.com enigma.in enigma.out enigma.exp );
+}
+
+# build ticks
+$cmd = "make -C $TICKS_DIR";
+ok 0==system($cmd), $cmd;
+
+# build for ticks
+$cmd = "zcc +test -oenigma.bin $ENIGMA";
+ok 0==system($cmd), $cmd;
+
+# run with ticks
+spew("enigma.in", "HELLO.\n");
+spew("enigma.exp", "Enter text to be (de)coded, finish with a .\n".
+                   "HREXLSLEOC .\n");
+
+$cmd = path($TICKS)->canonpath." enigma.bin < enigma.in > enigma.out 2> $NUL";
+ok 0==system($cmd), $cmd;
+
+# cleanup output
+$output = path('enigma.out')->slurp_raw;
+for ($output) {
+    s/^Ticks:\s*\d+\s*//m;
+	s/\r\n/\n/g;
+}
+spew('enigma.out', $output);
+
+ok path('enigma.exp')->slurp_raw eq path('enigma.out')->slurp_raw ,
+        "enigma.out and enigma.exp equal";
+
+if (Test::More->builder->is_passing) {
+    unlink qw( enigma.bin enigma.com enigma.in enigma.out enigma.exp );
 }
 
 unlink_testfiles();

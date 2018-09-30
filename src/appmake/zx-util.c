@@ -790,7 +790,7 @@ int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory)
     char outnamex[13];
 
     int c;
-    int z_dtx_filename;
+    int z_dtx_filename, z_alt_filename;
 
     // determine output filename
 
@@ -826,60 +826,69 @@ int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory)
 
     mb_remove_section(memory, "CODE", zxc->clean);
 
-    fclose(fout);
-
     // generate the dotx portion from section MAIN
 
-    if ((z_dtx_filename = parameter_search(zxc->crtfile, ".map", "__z_dtx_filename")) < 0)
-        return 0;
-
-    printf("Creating DOTX command\n");
-
-    if (mb_find_section(memory, "MAIN", &mb, &section_num) == 0)
-    {
-        remove(outname);
-        exit_log(1, "Error: Section MAIN not found\n");
-    }
-
-    sprintf(outnamex, "%s.X", outname);
-
-    sb = &mb->secbin[section_num];
-
-    if (sb->org < 0x4000)
-    {
-        remove(outname);
-        exit_log(1, "Error: Section %s org of %d is less than 0x4000\n", sb->section_name, sb->org);
-    }
-
-    if ((fout = fopen(outnamex, "wb")) == NULL)
-    {
-        remove(outname);
-        exit_log(1, "Error: Couldn't create output file %s\n", outnamex);
-    }
-
-    if (mb_output_section_binary(fout, sb) != 0)
+    if ((z_dtx_filename = parameter_search(zxc->crtfile, ".map", "__z_dtx_filename")) >= 0)
     {
         fclose(fout);
-        remove(outnamex);
-        remove(outname);
-        exit_log(1, "Error: Couldn't read section binary %s\n", sb->filename);
+
+        printf("Creating DOTX command\n");
+
+        if (mb_find_section(memory, "MAIN", &mb, &section_num) == 0)
+        {
+            remove(outname);
+            exit_log(1, "Error: Section MAIN not found\n");
+        }
+
+        sprintf(outnamex, "%s.X", outname);
+
+        sb = &mb->secbin[section_num];
+
+        if (sb->org < 0x4000)
+        {
+            remove(outname);
+            exit_log(1, "Error: Section %s org of %d is less than 0x4000\n", sb->section_name, sb->org);
+        }
+
+        if ((fout = fopen(outnamex, "wb")) == NULL)
+        {
+            remove(outname);
+            exit_log(1, "Error: Couldn't create output file %s\n", outnamex);
+        }
+
+        if (mb_output_section_binary(fout, sb) != 0)
+        {
+            fclose(fout);
+            remove(outnamex);
+            remove(outname);
+            exit_log(1, "Error: Couldn't read section binary %s\n", sb->filename);
+        }
+
+        mb_remove_section(memory, "MAIN", zxc->clean);
+
+        fclose(fout);
+
+        // insert variables into main dot binary
+
+        if ((fout = fopen(outname, "rb+")) == NULL)
+        {
+            remove(outname);
+            remove(outnamex);
+            exit_log(1, "Error: Couldn't write variables into main dot binary\n");
+        }
     }
 
-    mb_remove_section(memory, "MAIN", zxc->clean);
-
-    fclose(fout);
-
-    // insert variables into main dot binary
-
-    if ((fout = fopen(outname, "rb+")) == NULL)
+    if (z_dtx_filename >= 0)
     {
-        remove(outname);
-        remove(outnamex);
-        exit_log(1, "Error: Couldn't write variables into main dot binary\n");
+        fseek(fout, z_dtx_filename - 0x2000, SEEK_SET);
+        fprintf(fout, "%s", outnamex);
     }
 
-    fseek(fout, z_dtx_filename - 0x2000, SEEK_SET);
-    fprintf(fout, "%s", outnamex);
+    if ((z_alt_filename = parameter_search(zxc->crtfile, ".map", "__z_alt_filename")) >= 0)
+    {
+        fseek(fout, z_alt_filename - 0x2000, SEEK_SET);
+        fprintf(fout, "%s", outname);
+    }
 
     fclose(fout);
     return 0;
@@ -914,6 +923,7 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
 
     int appmake_handle;
     int user_handle;
+    int z_alt_filename;
 
     int dotn_last_page, actual_last_page;
     int dotn_last_div, actual_last_div;
@@ -992,13 +1002,13 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
         if (sb->org < 0x2000)
             exit_log(1, "Error: Section %s has org too low 0x%04x\n", sb->section_name, sb->org);
 
-        if ((sb->org < 0x4000) && (sb->org + sb->size >= 0x4000))
+        if ((sb->org < 0x4000) && (sb->org + sb->size > 0x4000))
             exit_log(1, "Error: Section %s extends past end of dot [0x%04x,0x%04x)\n", sb->section_name, sb->org, sb->org + sb->size);
 
-        if ((sb->org < 0x4000) && (sb->org + sb->size >= (0x4000 - 300)))
+        if ((sb->org < 0x4000) && (sb->org + sb->size > (0x4000 - 256)))
             printf("Warning: Section %s may overlap stack area in divmmc memory [0x%04x,0x%04x)\n", sb->section_name, sb->org, sb->org + sb->size);
 
-        if ((sb->org >= 0x4000) && (sb->org + sb->size >= 0x10000))
+        if ((sb->org >= 0x4000) && (sb->org + sb->size > 0x10000))
             exit_log(1, "Error: Section %s extends past end of main bank [0x%04x,0x%04x)\n", sb->section_name, sb->org, sb->org + sb->size);
 
         if (sb->org < 0x4000)
@@ -1038,35 +1048,6 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
 
     main_org &= 0x1e000;
     main_end &= 0xe000;
-
-    // determine main bank overlay mask
-
-    if (main_org < 0x10000)
-    {
-        overlay_alloc_mask = (0xff << (main_org / 0x2000)) & 0xff;
-        overlay_load_mask = (0xff >> (7 - main_end / 0x2000)) & overlay_alloc_mask;
-    }
-    else
-    {
-        overlay_alloc_mask = 0;
-        overlay_load_mask = 0;
-    }
-
-    overlay_alloc_mask |= dotn_main_overlay_mask;
-    overlay_alloc_mask &= ~dotn_main_absolute_mask;
-
-    if (appmake_handle >= 0)
-    {
-        printf("Notice: Main bank allocation mask is 0x%02x\n", overlay_alloc_mask);
-        printf("Notice: Main bank load mask is 0x%02x\n", overlay_load_mask);
-    }
-    else
-    {
-        printf("Notice: Main bank occupied mask is 0x%02x\n", overlay_load_mask);
-    }
-
-    // overlay_load_mask: bits indicate which main bank pages should be loaded
-    // overlay_alloc_mask: bits indicate which main bank pages should be allocated
 
     // collect allocation table parameters
 
@@ -1136,6 +1117,35 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
                     exit_log(1, "Error: User z_div_table[%d] has illegal value %d\n", i, z_div_table[i]);
         }
     }
+
+    // determine main bank overlay mask
+
+    if (main_org < 0x10000)
+    {
+        overlay_alloc_mask = (0xff << (main_org / 0x2000)) & 0xff;
+        overlay_load_mask = (0xff >> (7 - main_end / 0x2000)) & overlay_alloc_mask;
+    }
+    else
+    {
+        overlay_alloc_mask = 0;
+        overlay_load_mask = 0;
+    }
+
+    overlay_alloc_mask |= dotn_main_overlay_mask;
+    overlay_alloc_mask &= ~dotn_main_absolute_mask;
+
+    if (appmake_handle >= 0)
+    {
+        printf("Notice: Main bank allocation mask is 0x%02x\n", overlay_alloc_mask);
+        printf("Notice: Main bank load mask is 0x%02x\n", overlay_load_mask);
+    }
+    else
+    {
+        printf("Notice: Main bank occupied mask is 0x%02x\n", overlay_load_mask);
+    }
+
+    // overlay_load_mask: bits indicate which main bank pages should be loaded
+    // overlay_alloc_mask: bits indicate which main bank pages should be allocated
 
     // create output file
 
@@ -1472,6 +1482,12 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
         }
     }
 
+    if ((z_alt_filename = parameter_search(zxc->crtfile, ".map", "__z_alt_filename")) >= 0)
+    {
+        fseek(fout, z_alt_filename - 0x2000, SEEK_SET);
+        fprintf(fout, "%s", outname);
+    }
+
     fclose(fout);
 
     return 0;
@@ -1762,15 +1778,15 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
 
 /*
    ZX NEXT NEX FORMAT
-   June 2018 aralbrec
+   June, Sept 2018 aralbrec
 
    .NEX file format (V1.0)
    =======================
    unsigned char Next[4];			//"Next"
-   unsigned char VersionNumber[4];	//"V1.0"
+   unsigned char VersionNumber[4];	//"V1.1"
    unsigned char RAM_Required;		//0=768K, 1=1792K
    unsigned char NumBanksToLoad;	//0-112 x 16K banks
-   unsigned char LoadingScreen;	//1=YES load palette also and layer2 at 16K page 9.
+   unsigned char LoadingScreen;	    //see implementation
    unsigned char BorderColour;		//0-7 ld a,BorderColour:out(254),a
    unsigned short SP;				//Stack Pointer
    unsigned short PC;				//Code Entry Point : $0000 = Don't run just load.
@@ -1779,11 +1795,17 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
    unsigned char LoadBar;           //Enable the layer 2 load bar
    unsigned char LoadColour;        //Colour of the load bar
    unsigned char LoadDelay;         //Delay in interrupts after each 16k loaded
-   unsinged char StartDelay;        //Delay in interrupts before starting the program
+   unsigned char StartDelay;        //Delay in interrupts before starting the program
+   unsigned char DontSetNextRegs;   //Do not reset nextreg to known state
+   unsigned char CoreMajor;         //Minimum core version
+   unsigned char CoreMinor;
+   unsigned char CoreSubMinor;
+   unsigned char HiResCol;          //Timex hi-res loading screen colour (paper bits)
+
    unsigned char RestOf512Bytes[512-(4+4 +1+1+1+1 +2+2+2 +64+48 +1+1+1+1)];
    if LoadingScreen!=0 {
-     uint16_t palette[256];  // 8 bits of palette entry followed by 9th bit of palette entry in two bytes
-     uint8_t  Layer2LoadingScreen[49152];
+     uint16_t palette[256];  // 8 bits of palette entry followed by 9th bit of palette entry in two bytes (optional)
+     uint8_t  Layer2LoadingScreen[49152];  // can also be other ula mode screens see implementation
    }
    Banks 5,2,0 in order if present
    Banks 1,3,4,6,7,... in order if present (ie not 5,2,0)
@@ -1805,7 +1827,12 @@ struct nex_hdr
     uint8_t LoadColour;
     uint8_t LoadDelay;
     uint8_t StartDelay;
-    uint8_t Padding[512 - (4 + 4 + 1 + 1 + 1 + 1 + 2 + 2 + 2 + 64 + 48 + 4)];
+    uint8_t DontSetNextRegs;
+    uint8_t CoreMajor;
+    uint8_t CoreMinor;
+    uint8_t CoreSubMinor;
+    uint8_t HiResCol;
+    uint8_t Padding[512 - (4 + 4 + 1 + 1 + 1 + 1 + 2 + 2 + 2 + 64 + 48 + 4 + 5)];
 };
 
 struct nex_hdr nh;
@@ -1820,6 +1847,7 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
 
     int register_sp;
     int crt_org_code;
+    int core_version;
 
     int mainbank_occupied;
 
@@ -1856,6 +1884,8 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
             exit_log(1, "Error: Unable to find org address\n");
     }
 
+    core_version = parameter_search(zxc->crtfile, ".map", "__CRT_CORE_VERSION");
+
     // open output file
 
     if ((fout = fopen(outname, "wb")) == NULL)
@@ -1878,28 +1908,45 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
             fprintf(stderr, "Warning: NEX loading screen not added; can't open %s\n", zxnex->screen);
         else
         {
-            nh.LoadingScreen = 1;
+            int size;
+
+            if (zxnex->screen_ula)
+            {
+                size = 6912;
+                nh.LoadingScreen = 0x02;
+            }
+            else if (zxnex->screen_lores)
+            {
+                size = 12288;
+                nh.LoadingScreen = 0x04;
+            }
+            else if (zxnex->screen_hires)
+            {
+                size = 12288;
+                nh.LoadingScreen = 0x08;
+            }
+            else if (zxnex->screen_hicol)
+            {
+                size = 12288;
+                nh.LoadingScreen = 0x10;
+            }
+            else
+            {
+                size = 48 * 1024;
+                nh.LoadingScreen = 0x01;
+            }
+
+            if (zxnex->nopalette)
+                nh.LoadingScreen += 0x80;
+            else
+                size += 512;
             
-            fread(scr, NEX_SCREEN_SIZE, 1, fin);
+            fread(scr, size, 1, fin);
             fclose(fin);
 
-            fwrite(scr, sizeof(scr), 1, fout);
+            fwrite(scr, size, 1, fout);
         }
     }
-
-    // NOT NEEDED FOR NEX FORMAT BECAUSE NEX DOES NOT COOPERATE WITH NEXTZXOS
-    //
-    // mark all pages occupied above the lowest page
-    // temporary to accommodate z88dk normally placing stack and heap at top of memory
-    //
-    // for (i = 0; i < 8; ++i)
-    // {
-    //     if (mainbank_occupied & (1 << i))
-    //     {
-    //         mainbank_occupied = 0xff - (1 << i) + 1;
-    //         break;
-    //     }
-    // }
 
     // write main memory bank: 16k banks 5,2,0
 
@@ -1958,6 +2005,7 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
         {
             nh.Banks[5] = 1;
             fwrite(mem, 16384, 1, fout);
+            nh.NumBanksToLoad++;
         }
 
         // bank 2
@@ -1966,6 +2014,7 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
         {
             nh.Banks[2] = 1;
             fwrite(&mem[16384], 16384, 1, fout);
+            nh.NumBanksToLoad++;
         }
 
         // bank 0
@@ -1974,6 +2023,7 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
         {
             nh.Banks[0] = 1;
             fwrite(&mem[32768], 16384, 1, fout);
+            nh.NumBanksToLoad++;
         }
     }
 
@@ -2016,7 +2066,7 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
     // complete the header
 
     memcpy(&nh.Next, "Next", 4);
-    memcpy(&nh.VersionNumber, "V1.0", 4);
+    memcpy(&nh.VersionNumber, "V1.1", 4);
 
     nh.BorderColour = zxnex->border & 0x7;
 
@@ -2034,6 +2084,15 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
 
     nh.PC[0] = crt_org_code & 0xff;
     nh.PC[1] = (crt_org_code >> 8) & 0xff;
+
+    if (core_version > 0)
+    {
+        nh.CoreMajor = core_version / 100000;
+        nh.CoreMinor = (core_version / 1000) % 100;
+        nh.CoreSubMinor = core_version % 1000;
+    }
+
+    nh.DontSetNextRegs = (zxnex->noreset != 0);
 
     // write the completed header to output
 

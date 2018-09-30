@@ -55,10 +55,14 @@
     <ClCompile Include="..\..\src\appmake\multi8.c" />
     <ClCompile Include="..\..\src\appmake\fp1100.c" />
     <ClCompile Include="..\..\src\appmake\d88.c" />
+    <ClCompile Include="..\..\src\appmake\cpmdisk.c" />
+    <ClCompile Include="..\..\src\appmake\einstein.c" />
+    <ClCompile Include="..\..\src\appmake\mz2500.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\appmake\appmake.h" />
     <ClInclude Include="..\..\src\appmake\zx-util.h" />
     <ClInclude Include="..\..\src\appmake\d88.h" />
+    <ClInclude Include="..\..\src\appmake\cpmdisk.h" />
   </ItemGroup>
 </Project>

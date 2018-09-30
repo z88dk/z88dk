@@ -1,3 +1,4 @@
+arch/zxn/esxdos/z80/__esx_exx_mmu67_bc
 arch/zxn/esxdos/z80/__vars_esx_errh
 arch/zxn/esxdos/z80/__vars_esx_stream
 arch/zxn/esxdos/z80/asm_esx_disk_filemap
@@ -36,6 +37,12 @@ arch/zxn/esxdos/z80/asm_esx_f_telldir
 arch/zxn/esxdos/z80/asm_esx_f_trunc
 arch/zxn/esxdos/z80/asm_esx_f_unlink
 arch/zxn/esxdos/z80/asm_esx_f_write
+arch/zxn/esxdos/z80/asm_esx_ide_bank_alloc
+arch/zxn/esxdos/z80/asm_esx_ide_bank_avail
+arch/zxn/esxdos/z80/asm_esx_ide_bank_free
+arch/zxn/esxdos/z80/asm_esx_ide_bank_reserve
+arch/zxn/esxdos/z80/asm_esx_ide_bank_total
+arch/zxn/esxdos/z80/asm_esx_ide_browser
 arch/zxn/esxdos/z80/asm_esx_ide_get_lfn
 arch/zxn/esxdos/z80/asm_esx_ide_mode_get
 arch/zxn/esxdos/z80/asm_esx_ide_mode_set
@@ -61,5 +68,10 @@ arch/zxn/esxdos/z80/asm_esx_m_tapeout_open
 arch/zxn/esxdos/z80/asm_esx_m_tapeout_trunc
 arch/zxn/esxdos/z80/asm_esx_slice_dirent
 arch/zxn/esxdos/z80/asm_extended_sna_load
+arch/zxn/esxdos/z80/asm_p3dos_copy_cstr_to_pstr
+arch/zxn/esxdos/z80/asm_p3dos_copy_pstr_to_cstr
 arch/zxn/esxdos/z80/asm_p3dos_cstr_to_pstr
+arch/zxn/esxdos/z80/asm_p3dos_dosname_from_catname
+arch/zxn/esxdos/z80/asm_p3dos_edrv_from_pdrv
+arch/zxn/esxdos/z80/asm_p3dos_pdrv_from_edrv
 arch/zxn/esxdos/z80/asm_p3dos_pstr_to_cstr

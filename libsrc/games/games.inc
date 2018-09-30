@@ -124,6 +124,12 @@ IF FORvz
         defc sndbit_mask   = 33         ; bit 0 (Speaker A) and 5 (Speaker B)
 ENDIF
 
+IF FORlaser500
+        defc sndbit_port   = $6800 	; this is a memory address, not a port !
+        defc sndbit_bit    = 0
+        defc sndbit_mask   = 1         ; bit 0 (Speaker A) and 5 (Speaker B)
+ENDIF
+
 IF FORgal
         defc sndbit_port   = 8248       ; this is a memory address, not a port !
         defc sndbit_bit    = 2
@@ -244,6 +250,7 @@ IF FORpv2000
     defc sndbit_bit    = 3
     defc sndbit_mask   = $0F			; $0F for full volume output
 ENDIF
+
 
 ; ********************************************************
 ;   This last part refers to NOT YET supported hardware

@@ -178,7 +178,7 @@ void exit_log(int code, char *fmt, ...)
 
 
 /* Search through debris from z80asm for some important parameters */
-long parameter_search(char *filen, char *ext,char *target)
+long parameter_search(const char *filen,const  char *ext,const char *target)
 {
     char    name[FILENAME_MAX+1];
     char    buffer[LINEMAX+1];
@@ -199,7 +199,7 @@ long parameter_search(char *filen, char *ext,char *target)
 
      /* Successfully opened the file so search through it.. */
     while ( fgets(buffer,LINEMAX,fp) != NULL ) {
-        if (strncmp(buffer,target,strlen(target)) == 0 ) {
+        if (strncmp(buffer,target,strlen(target)) == 0 && isspace(buffer[strlen(target)])) {
             sscanf(buffer,"%*s%*s%*[ $]%lx",&val);
             break;
         }
@@ -226,7 +226,7 @@ long get_org_addr(char *crtfile)
    Otherwise, try to open the "normal" file.
 */
 
-FILE *fopen_bin(char *fname, char *crtfile)
+FILE *fopen_bin(const char *fname,const  char *crtfile)
 {
     FILE   *fcode = NULL, *fdata = NULL, *fin = NULL;
     char    name[FILENAME_MAX+1];
@@ -363,31 +363,45 @@ FILE *fopen_bin(char *fname, char *crtfile)
     return fin;
 }
 
+int zcc_strrcspn(char *s, char *reject)
+{
+    int index, i;
+
+    index = 0;
+
+    for (i = 1; *s; ++i)
+    {
+        if (strchr(reject, *s++))
+            index = i;
+    }
+
+    return index;
+}
 
 /* Generic change suffix routine - make sure name is long enough to hold the suffix */
 void suffix_change(char *name, char *suffix)
 {
-    int j = strlen(name)-1;
+    int index;
 
-    while ( j && name[j-1] != '.' ) 
-        j--;
+    if ((index = zcc_strrcspn(name, "./\\")) && (name[index - 1] == '.'))
+        name[index - 1] = 0;
 
-    if ( j)
-        name[j-1]='\0';
-    strcat(name,suffix);
+    strcat(name, suffix);
 }
 
 /* Variant for the generic change suffix routine */
 void any_suffix_change(char *name, char *suffix, char suffix_delimiter)
 {
-    int j = strlen(name)-1;
+    int index;
 
-    while ( j && name[j-1] != suffix_delimiter ) 
-        j--;
+    static char delim[] = "./\\";
 
-    if ( j)
-        name[j-1]='\0';
-    strcat(name,suffix);
+    delim[0] = suffix_delimiter;
+
+    if ((index = zcc_strrcspn(name, delim)) && (name[index - 1] == delim[0]))
+        name[index - 1] = 0;
+
+    strcat(name, suffix);
 }
 
 void *must_malloc(size_t sz)

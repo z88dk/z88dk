@@ -18,7 +18,7 @@ all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	aussie.lib bee_clib.lib microbee.lib c7420_clib.lib \
 	cpm_clib.lib einstein.lib fp1100_clib.lib gal_clib.lib \
 	g800_clib.lib m5_clib.lib mc1000_clib.lib \
-	msx_clib.lib mtx_clib.lib mz_clib.lib mz2500_clib.lib x1ansi_clib.lib \
+	msx_clib.lib mtx_clib.lib mz_clib.lib mz2500_clib.lib x1_clib.lib \
 	nascom_clib.lib  newbrain_clib.lib \
 	osca_clib.lib ozansi_clib.lib pacman_clib.lib p2000_clib.lib  \
 	pc6001_clib.lib pps_clib.lib px4.lib px8.lib \
@@ -27,6 +27,7 @@ all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	trs80_clib.lib vg5k_clib.lib vz_clib.lib  x07_clib.lib \
 	embedded_clib.lib test_clib.lib testrcm_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
 	pv1000_clib.lib pv2000_clib.lib coleco_clib.lib multi8_clib.lib alphatro_clib.lib  spc1000_clib.lib \
+	laser500_clib.lib \
 	preempt.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib gendos.lib ndos.lib  \
@@ -887,7 +888,7 @@ rx78_clib.lib:
 	$(MAKE) -C games TARGET=rx78
 	TARGET=rx78 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORrx78 -x$(OUTPUT_DIRECTORY)/rx78_clib @$(LISTFILE_DIRECTORY)/rx78.lst
 
-# Mitsubishi Multi8 - dom
+# Casio FP-1100- dom
 fp1100_clib.lib:
 	@echo ''
 	@echo '--- Building Casio FP-1100 Library ---'
@@ -905,6 +906,17 @@ multi8_clib.lib:
 	$(MAKE) gfxdeps
 	$(call buildgeneric,multi8)
 	TARGET=multi8 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmulti8 -x$(OUTPUT_DIRECTORY)/multi8_clib @$(LISTFILE_DIRECTORY)/multi8.lst
+
+# VTech VZ700- dom
+laser500_clib.lib:
+	@echo ''
+	@echo '--- Building VTech Laser 350/500/700 Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(call buildgeneric,laser500)
+	$(MAKE) -C games TARGET=laser500
+	TARGET=laser500 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORlaser500 -x$(OUTPUT_DIRECTORY)/laser500_clib @$(LISTFILE_DIRECTORY)/laser500.lst
+
 
 # Triumph Adler Alphatronic PC - dom
 alphatro_clib.lib:
@@ -1185,13 +1197,13 @@ x07_clib.lib:
 	TARGET=x07 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/x07_clib @$(LISTFILE_DIRECTORY)/x07.lst
 
 # Sharp X1 (ANSI VT) - Karl Von Dyson (X1s.org)
-x1ansi_clib.lib:
+x1_clib.lib:
 	@echo ''
-	@echo '--- Building Sharp X1 ANSI Library ---'
+	@echo '--- Building Sharp X1 Library ---'
 	@echo ''
 	$(call buildgeneric,x1)
 	$(MAKE) -C x1 
-	TARGET=x1 TYPE=z80 $(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1ansi_clib @$(LISTFILE_DIRECTORY)/x1ansi.lst
+	TARGET=x1 TYPE=z80 $(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1_clib @$(LISTFILE_DIRECTORY)/x1.lst
 
 # Philips VG5000 lib - Joaopa, Stefano
 vg5k_clib.lib:

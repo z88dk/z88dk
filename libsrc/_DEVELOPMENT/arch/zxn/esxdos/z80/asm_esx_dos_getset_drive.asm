@@ -27,6 +27,9 @@ asm_esx_dos_set_drive:
    ;
    ;         fail
    ;
+   ;            hl = -1
+   ;            carry set, errno set
+   ;
    ; uses  : all except af', iy
 
    ld a,l

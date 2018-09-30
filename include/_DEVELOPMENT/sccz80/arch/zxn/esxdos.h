@@ -548,6 +548,34 @@ extern unsigned char __LIB__ esx_ide_mode_set(struct esx_mode *mode) __smallc __
 
 
 
+// IDE_BANK
+// you must ensure allocated pages are returned before program exit
+
+#define ESX_BANKTYPE_RAM     __nextos_rc_banktype_zx
+#define ESX_BANKTYPE_DIVMMC  __nextos_rc_banktype_mmc
+
+extern unsigned char __LIB__ esx_ide_bank_total(unsigned char banktype) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ esx_ide_bank_avail(unsigned char banktype) __smallc __z88dk_fastcall;
+
+
+
+extern unsigned char __LIB__ esx_ide_bank_alloc(unsigned char banktype) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ esx_ide_bank_reserve(unsigned char banktype,unsigned char page) __smallc;
+extern unsigned char __LIB__ esx_ide_bank_reserve_callee(unsigned char banktype,unsigned char page) __smallc __z88dk_callee;
+#define esx_ide_bank_reserve(a,b) esx_ide_bank_reserve_callee(a,b)
+
+
+
+extern unsigned char __LIB__ esx_ide_bank_free(unsigned char banktype,unsigned char page) __smallc;
+extern unsigned char __LIB__ esx_ide_bank_free_callee(unsigned char banktype,unsigned char page) __smallc __z88dk_callee;
+#define esx_ide_bank_free(a,b) esx_ide_bank_free_callee(a,b)
+
+
+
 // DOS_CATALOG
 
 struct esx_cat_entry
@@ -604,6 +632,26 @@ extern unsigned char __LIB__ esx_ide_get_lfn_callee(struct esx_lfn *dir,struct e
 
 
 
+// IDE_BROWSER (system file dialog)
+// Data in memory must lie below 0xc000
+// ESX_BROWSERCAP_SYSCFG is reserved for the system
+
+#define ESX_BROWSERCAP_COPY  __nextos_browsercaps_copy
+#define ESX_BROWSERCAP_RENAME  __nextos_browsercaps_rename
+#define ESX_BROWSERCAP_MKDIR  __nextos_browsercaps_mkdir
+#define ESX_BROWSERCAP_ERASE  __nextos_browsercaps_erase
+#define ESX_BROWSERCAP_REMOUNT  __nextos_browsercaps_remount
+#define ESX_BROWSERCAP_UNMOUNT  __nextos_browsercaps_unmount
+#define ESX_BROWSERCAP_SYSCFG  __nextos_browsercaps_syscfg
+
+#define ESX_BROWSERCAP_NONE  __nextos_browsercaps_none
+#define ESX_BROWSERCAP_ALL  __nextos_browsercaps_all
+
+extern unsigned char __LIB__ esx_ide_browser(uint8_t browsercaps,void *filetypes,char *help,char *dst_sfn,char *dst_lfn) __smallc;
+extern unsigned char __LIB__ esx_ide_browser_callee(uint8_t browsercaps,void *filetypes,char *help,char *dst_sfn,char *dst_lfn) __smallc __z88dk_callee;
+#define esx_ide_browser(a,b,c,d,e) esx_ide_browser_callee(a,b,c,d,e)
+
+
 
 // PLUS 3 DOS UTILITIES (MAY BE MOVED LATER)
 
@@ -613,6 +661,34 @@ extern char __LIB__ *p3dos_cstr_to_pstr(char *s) __smallc __z88dk_fastcall;
 
 
 extern char __LIB__ *p3dos_pstr_to_cstr(char *s) __smallc __z88dk_fastcall;
+
+
+
+extern unsigned char __LIB__ *p3dos_copy_cstr_to_pstr(char *pdst,const char *csrc) __smallc;
+extern unsigned char __LIB__ *p3dos_copy_cstr_to_pstr_callee(char *pdst,const char *csrc) __smallc __z88dk_callee;
+#define p3dos_copy_cstr_to_pstr(a,b) p3dos_copy_cstr_to_pstr_callee(a,b)
+
+
+extern unsigned char __LIB__ *p3dos_copy_pstr_to_cstr(char *cdst,const char *psrc) __smallc;
+extern unsigned char __LIB__ *p3dos_copy_pstr_to_cstr_callee(char *cdst,const char *psrc) __smallc __z88dk_callee;
+#define p3dos_copy_pstr_to_cstr(a,b) p3dos_copy_pstr_to_cstr_callee(a,b)
+
+
+
+// convert cat name to 8.3 dos name
+
+extern char __LIB__ *p3dos_dosname_from_catname(char *dosname,const char *catname) __smallc;
+extern char __LIB__ *p3dos_dosname_from_catname_callee(char *dosname,const char *catname) __smallc __z88dk_callee;
+#define p3dos_dosname_from_catname(a,b) p3dos_dosname_from_catname_callee(a,b)
+
+
+
+// convert between esx drive numbers and p3dos drive letters
+
+extern unsigned char __LIB__ p3dos_edrv_from_pdrv(unsigned char prdv) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ p3dos_pdrv_from_edrv(unsigned char erdv) __smallc __z88dk_fastcall;
 
 
 

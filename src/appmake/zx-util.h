@@ -58,11 +58,17 @@ struct zx_bin
 struct zxn_nex
 {
     char          *screen;
+    char           nopalette;
+    char           screen_ula;
+    char           screen_lores;
+    char           screen_hires;
+    char           screen_hicol;
     int            border;
     int            loadbar;
     int            loaddelay;
     int            startdelay;
     char           norun;
+    char           noreset;
 };
 
 extern int  z88dk_ffs(int n);

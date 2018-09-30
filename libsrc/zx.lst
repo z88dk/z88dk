@@ -3,6 +3,7 @@ stdio/spectrum/fputc_cons_fzx
 stdio/spectrum/fputc_cons_rom_rst
 stdio/spectrum/fgetc_cons
 stdio/spectrum/fputc_cons
+stdio/spectrum/conio_map_colour
 stdio/spectrum/getk
 stdio/spectrum/CRT_FONT
 stdio/spectrum/CRT_FONT_64

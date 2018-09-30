@@ -434,7 +434,11 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             rvalue(lval2);
         rhs_val_type = lval2->val_type;
         val = lval->const_val;
-        if (dbltest(lval2, lval)) {
+	if (dbltest(lval,lval2)) {
+	    /* LHS is a constant point, RHS is not a const */
+            /* are adding lval to pointer, adjust size */
+            scale(lval->ptr_type, NULL);
+        } else if (dbltest(lval2, lval) ) {
             int ival = val;
             /* are adding lval to pointer, adjust size */
             cscale(lval2->ltype, &ival);
@@ -558,6 +562,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 if (dbltest(lval, lval2)) {
                     int ival = val;
                     /* are adding lval2 to pointer, adjust size */
+			ol("cscale");
                     cscale(lval->ltype->ptr, &ival);
                     val = ival;
                 }
@@ -575,7 +580,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         } else {
             /* non-constant on both sides  */
             if (dbltest(lval, lval2))
-                scale(lval->ptr_type, lval->ltype->ptr->tag);
+                scale(lval->ptr_type, lval->ptr_type == KIND_STRUCT ? lval->ltype->ptr->tag : NULL);
             if (widen(lval, lval2)) {
                 /* floating point operation */
                 (*oper)(lval);

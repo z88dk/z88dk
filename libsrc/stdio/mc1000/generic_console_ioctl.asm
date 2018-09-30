@@ -50,8 +50,12 @@ set_mode:
 	ld	a,l
 	ld	(__mc1000_mode),a
 	out	($80),a
+	ld      ($f5),a		;Keep basic up-to-date with mode
+        ld      hl,dummy_return
+        ld      ($f7),hl        ; cursor flashing and positioning routine
 	call	generic_console_cls
 	jr	success
 failure:
 	scf
+dummy_return:
 	ret

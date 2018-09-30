@@ -1,4 +1,5 @@
 @stdio/ansicore.lst
+stdio/einstein/generic_console
 stdio/ansi/msx/f_ansi_attr
 stdio/ansi/msx/f_ansi_bel
 stdio/ansi/msx/f_ansi_char

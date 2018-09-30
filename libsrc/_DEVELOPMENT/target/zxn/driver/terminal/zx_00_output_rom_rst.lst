@@ -1,0 +1,3 @@
+target/zxn/driver/terminal/zx_00_output_rom_rst
+target/zxn/driver/terminal/zx_00_output_rom_rst/zx_00_output_rom_rst_init
+target/zxn/driver/terminal/zx_00_output_rom_rst/zx_00_output_rom_rst_ochar_msg_putc_bin

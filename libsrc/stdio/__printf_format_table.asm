@@ -3,7 +3,7 @@
 ; These will be used by default when sdcc pulls in printf
 
 	MODULE	__printf_format_table
-	SECTION data_clib
+	SECTION rodata_clib
 	PUBLIC	__printf_format_table
 	PUBLIC	__printf_get_flags
 

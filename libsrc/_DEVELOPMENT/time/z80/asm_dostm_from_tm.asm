@@ -50,6 +50,7 @@ asm_dostm_from_tm:
    ld (hl),a                   ; dos.day
    
    ld a,(de)                   ; tm_mon
+   inc a
    inc de
    
    rrca

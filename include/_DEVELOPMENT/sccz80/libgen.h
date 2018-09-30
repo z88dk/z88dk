@@ -8,7 +8,25 @@
 extern char __LIB__ *basename(char *path) __smallc __z88dk_fastcall;
 
 
+extern char __LIB__ *basename_ext(char *path) __smallc __z88dk_fastcall;
+
+
 extern char __LIB__ *dirname(char *path) __smallc __z88dk_fastcall;
+
+
+extern unsigned char __LIB__ glob(const char *s,const char *pattern) __smallc;
+extern unsigned char __LIB__ glob_callee(const char *s,const char *pattern) __smallc __z88dk_callee;
+#define glob(a,b) glob_callee(a,b)
+
+
+extern unsigned char __LIB__ glob_dos(const char *s,const char *pattern) __smallc;
+extern unsigned char __LIB__ glob_dos_callee(const char *s,const char *pattern) __smallc __z88dk_callee;
+#define glob_dos(a,b) glob_dos_callee(a,b)
+
+
+extern unsigned char __LIB__ glob_fat(const char *s,const char *pattern) __smallc;
+extern unsigned char __LIB__ glob_fat_callee(const char *s,const char *pattern) __smallc __z88dk_callee;
+#define glob_fat(a,b) glob_fat_callee(a,b)
 
 
 extern char __LIB__ *pathnice(char *path) __smallc __z88dk_fastcall;

@@ -593,6 +593,40 @@ extern unsigned char esx_ide_mode_set_fastcall(struct esx_mode *mode) __z88dk_fa
 
 
 
+// IDE_BANK
+// you must ensure allocated pages are returned before program exit
+
+#define ESX_BANKTYPE_RAM     __nextos_rc_banktype_zx
+#define ESX_BANKTYPE_DIVMMC  __nextos_rc_banktype_mmc
+
+extern unsigned char esx_ide_bank_total(unsigned char banktype);
+extern unsigned char esx_ide_bank_total_fastcall(unsigned char banktype) __z88dk_fastcall;
+#define esx_ide_bank_total(a) esx_ide_bank_total_fastcall(a)
+
+
+extern unsigned char esx_ide_bank_avail(unsigned char banktype);
+extern unsigned char esx_ide_bank_avail_fastcall(unsigned char banktype) __z88dk_fastcall;
+#define esx_ide_bank_avail(a) esx_ide_bank_avail_fastcall(a)
+
+
+
+extern unsigned char esx_ide_bank_alloc(unsigned char banktype);
+extern unsigned char esx_ide_bank_alloc_fastcall(unsigned char banktype) __z88dk_fastcall;
+#define esx_ide_bank_alloc(a) esx_ide_bank_alloc_fastcall(a)
+
+
+extern unsigned char esx_ide_bank_reserve(unsigned char banktype,unsigned char page);
+extern unsigned char esx_ide_bank_reserve_callee(unsigned char banktype,unsigned char page) __z88dk_callee;
+#define esx_ide_bank_reserve(a,b) esx_ide_bank_reserve_callee(a,b)
+
+
+
+extern unsigned char esx_ide_bank_free(unsigned char banktype,unsigned char page);
+extern unsigned char esx_ide_bank_free_callee(unsigned char banktype,unsigned char page) __z88dk_callee;
+#define esx_ide_bank_free(a,b) esx_ide_bank_free_callee(a,b)
+
+
+
 // DOS_CATALOG
 
 struct esx_cat_entry
@@ -653,6 +687,26 @@ extern unsigned char esx_ide_get_lfn_callee(struct esx_lfn *dir,struct esx_cat_e
 
 
 
+// IDE_BROWSER (system file dialog)
+// Data in memory must lie below 0xc000
+// ESX_BROWSERCAP_SYSCFG is reserved for the system
+
+#define ESX_BROWSERCAP_COPY  __nextos_browsercaps_copy
+#define ESX_BROWSERCAP_RENAME  __nextos_browsercaps_rename
+#define ESX_BROWSERCAP_MKDIR  __nextos_browsercaps_mkdir
+#define ESX_BROWSERCAP_ERASE  __nextos_browsercaps_erase
+#define ESX_BROWSERCAP_REMOUNT  __nextos_browsercaps_remount
+#define ESX_BROWSERCAP_UNMOUNT  __nextos_browsercaps_unmount
+#define ESX_BROWSERCAP_SYSCFG  __nextos_browsercaps_syscfg
+
+#define ESX_BROWSERCAP_NONE  __nextos_browsercaps_none
+#define ESX_BROWSERCAP_ALL  __nextos_browsercaps_all
+
+extern unsigned char esx_ide_browser(uint8_t browsercaps,void *filetypes,char *help,char *dst_sfn,char *dst_lfn);
+extern unsigned char esx_ide_browser_callee(uint8_t browsercaps,void *filetypes,char *help,char *dst_sfn,char *dst_lfn) __z88dk_callee;
+#define esx_ide_browser(a,b,c,d,e) esx_ide_browser_callee(a,b,c,d,e)
+
+
 
 // PLUS 3 DOS UTILITIES (MAY BE MOVED LATER)
 
@@ -666,6 +720,38 @@ extern char *p3dos_cstr_to_pstr_fastcall(char *s) __preserves_regs(d,e,h,l,iyl,i
 extern char *p3dos_pstr_to_cstr(char *s) __preserves_regs(d,e,iyl,iyh);
 extern char *p3dos_pstr_to_cstr_fastcall(char *s) __preserves_regs(d,e,h,l,iyl,iyh) __z88dk_fastcall;
 #define p3dos_pstr_to_cstr(a) p3dos_pstr_to_cstr_fastcall(a)
+
+
+
+extern unsigned char *p3dos_copy_cstr_to_pstr(char *pdst,const char *csrc);
+extern unsigned char *p3dos_copy_cstr_to_pstr_callee(char *pdst,const char *csrc) __z88dk_callee;
+#define p3dos_copy_cstr_to_pstr(a,b) p3dos_copy_cstr_to_pstr_callee(a,b)
+
+
+extern unsigned char *p3dos_copy_pstr_to_cstr(char *cdst,const char *psrc);
+extern unsigned char *p3dos_copy_pstr_to_cstr_callee(char *cdst,const char *psrc) __z88dk_callee;
+#define p3dos_copy_pstr_to_cstr(a,b) p3dos_copy_pstr_to_cstr_callee(a,b)
+
+
+
+// convert cat name to 8.3 dos name
+
+extern char *p3dos_dosname_from_catname(char *dosname,const char *catname);
+extern char *p3dos_dosname_from_catname_callee(char *dosname,const char *catname) __z88dk_callee;
+#define p3dos_dosname_from_catname(a,b) p3dos_dosname_from_catname_callee(a,b)
+
+
+
+// convert between esx drive numbers and p3dos drive letters
+
+extern unsigned char p3dos_edrv_from_pdrv(unsigned char prdv) __preserves_regs(b,c,d,e);
+extern unsigned char p3dos_edrv_from_pdrv_fastcall(unsigned char prdv) __preserves_regs(b,c,d,e,h) __z88dk_fastcall;
+#define p3dos_edrv_from_pdrv(a) p3dos_edrv_from_pdrv_fastcall(a)
+
+
+extern unsigned char p3dos_pdrv_from_edrv(unsigned char erdv) __preserves_regs(b,c,d,e);
+extern unsigned char p3dos_pdrv_from_edrv_fastcall(unsigned char erdv) __preserves_regs(b,c,d,e,h) __z88dk_fastcall;
+#define p3dos_pdrv_from_edrv(a) p3dos_pdrv_from_edrv_fastcall(a)
 
 
 

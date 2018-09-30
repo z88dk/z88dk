@@ -48,6 +48,12 @@
                 defc    CRT_ORG_CODE  = 49152
         ENDIF
 
+        IF !DEFINED_CLIB_FOPEN_MAX
+		defc	DEFINED_CLIB_FOPEN_MAX = 1
+                DEFC    CLIB_FOPEN_MAX = 5
+        ENDIF
+
+
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = -1
 	defc	CRT_KEY_DEL = 127

@@ -954,7 +954,7 @@ replace restart {
 	ld	%5, %2
 	; peephole 10 loaded %5 from %2 directly instead of going through %1.
 	ld	%3, %4
-} if canAssign(%5 %2), notVolatile(%1), operandsNotRelated(%1 %4), operandsNotRelated(%1 %3), operandsNotRelated(%4 %5), notUsed(%1), notSame(%3 %4 '(hl)' '(de)' '(bc)'), notVolatile(%5)
+} if notUsed(%1), canAssign(%5 %2), notVolatile(%1), notVolatile(%5), operandsNotRelated(%1 %3), operandsNotRelated(%1 %4), operandsNotRelated(%2 %3), operandsNotRelated(%3 %5), operandsNotRelated(%4 %5), notSame(%3 %4 '(hl)' '(de)' '(bc)')
 // Rule OK unless both %5 and %4 are volatile, but we can't express that directly.
 
 replace restart {

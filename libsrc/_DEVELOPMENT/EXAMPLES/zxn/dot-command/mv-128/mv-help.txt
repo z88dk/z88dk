@@ -1,0 +1,55 @@
+mv - move (rename) files
+
+mv [OPTION]... [-T] SRC DST
+mv [OPTION]... SRC... DIR
+mv [OPTION]... -t DIR SRC...
+
+Rename SRC to DST, or move
+SRC(es) to DIR.
+
+Names can contain wildcards.
+
+Names with trailing slashes
+are directories.
+
+-b
+  make backup of existing DST
+
+-f, --force
+  do not prompt for overwrite
+
+-i, --interactive
+  prompt for overwrite
+
+-n, --no-clobber
+  do not overwrite
+
+The last -f,-i,-n takes effect
+
+--strip-trailing-slashes
+  remove slashes from names
+
+-S, --suffix=SUFFIX
+  override backup suffix
+
+--system
+  match system files to SRC
+
+-t, --target-directory=DIR
+  move all SRC to DIR
+
+-T, --no-target-directory
+  treat DST as a normal file
+
+-u, --update
+  move only when SRC is newer
+  than DST or if DST missing
+
+-v, --verbose
+  explain what is being done
+
+--help
+  display this help and exit
+
+--version
+  print version and exit

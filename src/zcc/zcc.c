@@ -464,7 +464,6 @@ static arg_t     myargs[] = {
 	{ "s", AF_BOOL_TRUE, SetBoolean, &symbolson, NULL, "Generate a symbol map of the final executable" },
 	{ "-list", AF_BOOL_TRUE, SetBoolean, &lston, NULL, "Generate list files" },
 	{ "o", AF_MORE, SetString, &outputfile, NULL, "Set the output files" },
-	{ "nt", 0, AddAppmake, NULL, NULL, "Set notruncate on the appmake options" },
 	{ "set-r2l-by-default", AF_BOOL_TRUE, SetBoolean, &c_sccz80_r2l_calling, NULL, "(sccz80) Use r2l calling convention by default"},
 	{ "+", NO, AddPreProc, NULL, NULL, NULL },    /* Strips // comments in vcpp */
 	{ "-fsigned-char", AF_BOOL_TRUE, SetBoolean, &sdcc_signed_char, NULL, NULL },    /* capture sdcc signed char flag */
