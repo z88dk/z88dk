@@ -56,12 +56,16 @@ generic_console_cls:
 	ld	bc, 80 * 24 - 1
 	ld	(hl),32
 	ldir
+	ld	a,64
+	out	(8),a
 	ld	hl, DISPLAY + $800 
 	ld	de, DISPLAY + $800 + 1
 	ld	bc, 80 * 24 - 1
 	ld	a,(__bee_attr)
 	ld	(hl),a
 	ldir
+	xor	a
+	out	(8),a
 	ret
 
 ; c = x
@@ -120,8 +124,8 @@ vpeek_unmap:
 map_character:
 	ld	a,(__bee_custom_font)
 	and	a
-	jr	z,no_custom_font
 	ld	a,d
+	jr	z,no_custom_font
 	cp	128
 	ret	nc
 	or	128
@@ -130,7 +134,7 @@ map_character:
 no_custom_font:	
 	cp	128
 	ret	c
-	add	16
+	add	16		;UDGs are shifted by 16
 	ret
 
 
@@ -205,3 +209,16 @@ generic_console_printc_1:
 generic_console_printc_3:
         add     hl,bc                   ;hl now points to address in display
         ret
+
+	SECTION		code_crt_init
+
+	EXTERN	copy_font_8x8
+	EXTERN	CRT_FONT
+
+        ld      hl,$f800 + (32 * 16)            ;PCG area
+	ld	c,96
+	ld	de,CRT_FONT
+	ld	a,d
+	or	e
+	ld	(__bee_custom_font),a
+	call	nz,copy_font_8x8

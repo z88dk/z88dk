@@ -5,6 +5,7 @@
 	SECTION	code_clib
 	INCLUDE	"ioctl.def"
 
+	EXTERN	copy_font_8x8
 	EXTERN	generic_console_cls
 	EXTERN	__bee_mode
 	EXTERN	__console_h
@@ -29,7 +30,7 @@ generic_console_ioctl:
 	ld	e,c
 	ld	d,b
 	ld	c,96
-	call	copy_font
+	call	copy_font_8x8
 success:
 	and	a
 	ret
@@ -77,31 +78,6 @@ vduloop:
 failure:
 	scf
 dummy_return:
-	ret
-
-; Copy font in PCG area
-; Entry: c = number of characters
-;       de = address to copy from
-; 	hl = address for PCG
-copy_font:
-copy_1:
-
-	ld	(hl),0
-	inc	hl
-	ld	b,8
-copy_2:
-	ld	a,(de)
-	ld	(hl),a
-	inc	de
-	inc	hl
-	djnz	copy_2
-	ld	b,7
-copy_3:
-	ld	(hl),0
-	inc	hl
-	djnz	copy_3
-	dec	c
-	jr	nz,copy_1
 	ret
 
 
