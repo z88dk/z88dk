@@ -8,6 +8,11 @@ stdio/ansi/bee/f_ansi_char
 stdio/ansi/bee/f_ansi_cls
 stdio/ansi/bee/f_ansi_dline
 stdio/ansi/bee/f_ansi_scrollup
+stdio/bee/generic_console
+stdio/bee/generic_console_ioctl
+stdio/bee/conio_map_colour
+stdio/bee/conio_vars
+@font/font_8x8/font_8x8.lst
 @stdio/stdio.lst
 games/bee/joystick
 @games/games.lst

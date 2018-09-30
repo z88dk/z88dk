@@ -15,37 +15,36 @@
 
         SECTION  code_clib
 	PUBLIC	ansi_del_line
-	EXTERN	bee_attr
-	EXTERN	ansicolumns
+	EXTERN	__bee_attr
+	EXTERN	__console_w
+	EXTERN	generic_console_xypos
 
 .ansi_del_line
-	ld	hl,$F000
-.sum_loop
-	ld	de,ansicolumns
-	add	hl,de
-	dec	a
-	jr	nz,sum_loop
-	push hl
+	ld	b,a
+	ld	c,0
+	call	generic_console_xypos
+	push	hl
 
 	ld	(hl),32 ;' '
 	ld	d,h
 	ld	e,l
 	inc	de
-	ld	bc,ansicolumns
+	ld	bc,(__console_w)
+	ld	b,0
 	dec bc
 	ldir
 	
 	ld	a,64
 	out (8),a
-	ld a,(bee_attr)
+	ld a,(__bee_attr)
 	pop hl
-	ld de,$800
-	add hl,de
+	set	3,h
 	ld	(hl),a
 	ld	d,h
 	ld	e,l
 	inc	de
-	ld	bc,ansicolumns
+	ld	bc,(__console_w)
+	ld	b,0
 	dec bc
 	ldir
 	xor a

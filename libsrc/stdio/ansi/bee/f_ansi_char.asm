@@ -1,8 +1,5 @@
 ;
-; 	ANSI Video handling for the Jupiter ACE
-;
-;	Stefano Bodrato - Feb. 2001
-;
+; 	ANSI Video handling for the Microbee
 ;
 ;	set it up with:
 ;	.__console_w	= max columns
@@ -17,49 +14,15 @@
 
         SECTION  code_clib
 	PUBLIC	ansi_CHAR
-	
-
-	EXTERN	__console_y
+	EXTERN	generic_console_printc
 	EXTERN	__console_x
-	EXTERN	__console_w
-	
-	EXTERN	bee_attr
 	EXTERN	INVRS
 
-
 .ansi_CHAR
-
-.setout
-	ld hl,INVRS
-	or (HL)
-	push	af
-	ld	hl,$F000
-	ld	a,(__console_y)
-	and	a
-	jr	z,r_zero
-	
-	ld	b,a
-	ld	de,(__console_w)
-	ld	d,0
-.r_loop
-	add	hl,de
-	djnz	r_loop
-.r_zero
-	ld	a,(__console_x)
-	ld	d,0
-	ld	e,a
-	add	hl,de
-	pop	af
-	ld	(hl),a
-
-	ld	a,64
-	out (8),a
-	ld de,$800
-	add hl,de
-	ld a,(bee_attr)
-	ld (hl),a
-	xor a
-	out (8),a
-	
+	ld	hl,INVRS		;TODO: really?
+	or	(HL)
+	ld	d,a
+	ld	bc,(__console_x)
+	ld	e,1
+	call	generic_console_printc
 	ret
-
