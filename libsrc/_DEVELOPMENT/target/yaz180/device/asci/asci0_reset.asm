@@ -1,18 +1,18 @@
 
     SECTION code_driver
 
-    PUBLIC _asci0_reset
+    PUBLIC asm_asci0_reset
 
-    EXTERN _asci0_flush_Rx, _asci0_flush_Tx
+    EXTERN asm_asci0_flush_Rx, asm_asci0_flush_Tx
 
-    _asci0_reset:
+    asm_asci0_reset:
 
         ; interrupts should be disabled
         
-        call _asci0_flush_Rx
-        call _asci0_flush_Tx
+        call asm_asci0_flush_Rx
+        call asm_asci0_flush_Tx
 
         ret
 
-    EXTERN _asci0_need
-    defc NEED = _asci0_need
+    EXTERN asm_asci0_need
+    defc NEED = asm_asci0_need

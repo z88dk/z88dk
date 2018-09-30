@@ -4,11 +4,11 @@
     SECTION code_driver
     SECTION code_driver_character_input
 
-    PUBLIC _asci1_getc
+    PUBLIC asm_asci1_getc
 
     EXTERN asci1RxBuffer, asci1RxCount, asci1RxOut
 
-    _asci1_getc:
+    asm_asci1_getc:
         ; exit     : l = char received
         ;            carry reset if Rx buffer is empty
         ;
@@ -41,6 +41,6 @@ ENDIF
         scf                         ; indicate char received
         ret
 
-    EXTERN _asci1_need
-    defc NEED = _asci1_need
+    EXTERN asm_asci1_need
+    defc NEED = asm_asci1_need
 

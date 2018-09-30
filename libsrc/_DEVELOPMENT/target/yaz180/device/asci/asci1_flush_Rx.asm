@@ -2,20 +2,20 @@
     SECTION code_driver
     SECTION code_driver_character_input
 
-    PUBLIC _asci1_flush_Rx_di
-    PUBLIC _asci1_flush_Rx
+    PUBLIC asm_asci1_flush_Rx_di
+    PUBLIC asm_asci1_flush_Rx
 
     EXTERN asm_z180_push_di, asm_z180_pop_ei
     EXTERN asci1RxCount, asci1RxIn, asci1RxOut, asci1RxBuffer
 
-    _asci1_flush_Rx_di:
+    asm_asci1_flush_Rx_di:
 
         push af
         push hl
 
         call asm_z180_push_di       ; di
 
-        call _asci1_flush_Rx
+        call asm_asci1_flush_Rx
 
         call asm_z180_pop_ei        ; ei
 
@@ -24,7 +24,7 @@
 
         ret
 
-    _asci1_flush_Rx:
+    asm_asci1_flush_Rx:
 
         xor a
         ld (asci1RxCount), a        ; reset the Rx counter (set 0)  		
@@ -35,6 +35,6 @@
 
         ret
 
-    EXTERN _asci1_need
-    defc NEED = _asci1_need
+    EXTERN asm_asci1_need
+    defc NEED = asm_asci1_need
     

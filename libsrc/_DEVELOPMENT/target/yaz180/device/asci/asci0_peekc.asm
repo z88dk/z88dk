@@ -2,11 +2,11 @@
     SECTION code_driver
     SECTION code_driver_character_input
 
-    PUBLIC _asci0_peekc
+    PUBLIC asm_asci0_peekc
 
     EXTERN asci0RxCount, asci0RxOut
 
-    _asci0_peekc:
+    asm_asci0_peekc:
 
         ld a,(asci0RxCount)         ; get the number of bytes in the Rx buffer
         ld l,a                      ; and put it in hl
@@ -18,5 +18,5 @@
         ld l,a                      ; and put it in hl
         ret
 
-    EXTERN _asci0_need
-    defc NEED = _asci0_need
+    EXTERN asm_asci0_need
+    defc NEED = asm_asci0_need

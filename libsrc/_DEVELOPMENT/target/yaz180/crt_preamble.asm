@@ -51,10 +51,10 @@ SECTION code_crt_init
     ld      a, TCR_TIE0|TCR_TDE0
     out0    (TCR), a        ; using the driver/z180/system_tick.asm
 
-    EXTERN  _asci0_init
-    call    _asci0_init     ; initialise the asci0
+    EXTERN  asm_asci0_init
+    call    asm_asci0_init  ; initialise the asci0
 
-    EXTERN  _asci1_init
-    call    _asci1_init     ; and the asci1 interfaces
+    EXTERN  asm_asci1_init
+    call    asm_asci1_init  ; and the asci1 interfaces
 
 ENDIF

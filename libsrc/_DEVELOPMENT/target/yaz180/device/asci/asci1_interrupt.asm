@@ -4,12 +4,12 @@
     SECTION code_driver
     SECTION code_driver_character_input
 
-    PUBLIC _asci1_interrupt
+    PUBLIC asm_asci1_interrupt
     
     EXTERN asci1RxBuffer, asci1RxCount, asci1RxIn
     EXTERN asci1TxBuffer, asci1TxCount, asci1TxOut
 
-    _asci1_interrupt:
+    asm_asci1_interrupt:
         push af
         push hl
                                     ; start doing the Rx stuff
@@ -90,5 +90,5 @@ ASCI1_TX_END:
         ei
         ret
 
-    EXTERN _asci1_need
-    defc NEED = _asci1_need
+    EXTERN asm_asci1_need
+    defc NEED = asm_asci1_need

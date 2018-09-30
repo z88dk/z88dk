@@ -4,11 +4,11 @@
     SECTION code_driver
     SECTION code_driver_character_output
 
-    PUBLIC _asci0_putc
+    PUBLIC asm_asci0_putc
 
     EXTERN asci0TxBuffer, asci0TxCount, asci0TxIn
 
-    _asci0_putc:
+    asm_asci0_putc:
         ; enter    : l = char to output
         ; exit     : l = 1 if Tx buffer is full
         ;            carry reset
@@ -67,5 +67,5 @@ ENDIF
         ret
 
 
-    EXTERN _asci0_need
-    defc NEED = _asci0_need
+    EXTERN asm_asci0_need
+    defc NEED = asm_asci0_need

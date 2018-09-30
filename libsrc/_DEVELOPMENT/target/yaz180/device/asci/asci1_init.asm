@@ -3,12 +3,12 @@
     
     SECTION code_driver
 
-    PUBLIC _asci1_init
+    PUBLIC asm_asci1_init
 
-    EXTERN _asci1_reset
+    EXTERN asm_asci1_reset
     EXTERN asm_z180_push_di, asm_z180_pop_ei_jp
 
-    _asci1_init:
+    asm_asci1_init:
     
         call asm_z180_push_di       ; di
 

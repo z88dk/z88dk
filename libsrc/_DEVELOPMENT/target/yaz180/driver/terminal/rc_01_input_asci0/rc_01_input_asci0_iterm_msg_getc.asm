@@ -5,7 +5,7 @@ SECTION code_driver_terminal_input
 
 PUBLIC rc_01_input_asci0_iterm_msg_getc
 
-EXTERN _asci0_pollc, _asci0_getc
+EXTERN asm_asci0_pollc, asm_asci0_getc
 
 rc_01_input_asci0_iterm_msg_getc:
 
@@ -18,10 +18,10 @@ rc_01_input_asci0_iterm_msg_getc:
 
 block_loop:
 
-   call _asci0_pollc            ; check whether any characters are in Rx buffer
+   call asm_asci0_pollc        ; check whether any characters are in Rx buffer
    jr nc, block_loop           ; if Rx buffer is empty
    
-   call _asci0_getc
+   call asm_asci0_getc
    
    ; l = ascii code
    
