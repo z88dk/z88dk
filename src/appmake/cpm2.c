@@ -112,6 +112,7 @@ static cpm_discspec microbee_spec = {
     .extent_size = 4096,
     .byte_size_extents = 1,
     .first_sector_offset = 0x15,
+    .boot_tracks_sector_offset = 1,
     .alternate_sides = 1,
     .has_skew = 1,
     .skew_track_start = 5,

@@ -14,6 +14,7 @@ typedef struct {
     uint16_t  extent_size;       /* In bytes */
     uint8_t   byte_size_extents; /* If set, extends in directories are single byte */
     uint8_t   first_sector_offset; /* If set, first sector in Track-Info is 1, else 0 */
+    uint8_t   boot_tracks_sector_offset;   /* Sector offset for boot tracks (0 = ignore) */
     uint8_t   alternate_sides;
     uint8_t   has_skew;
     uint16_t  skew_track_start;

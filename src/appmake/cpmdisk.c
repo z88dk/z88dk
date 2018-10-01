@@ -203,8 +203,10 @@ int cpm_write_edsk(cpm_handle* h, const char* filename)
             for (j = 0; j < h->spec.sectors_per_track; j++) {
                 *ptr++ = i; // Track
                 *ptr++ = s; // Side
-                if ( h->spec.has_skew && i + (i*h->spec.sides) >= h->spec.skew_track_start ) {
+                if ( 0 && h->spec.has_skew && i + (i*h->spec.sides) >= h->spec.skew_track_start ) {
                     *ptr++ = h->spec.skew_tab[j] + h->spec.first_sector_offset; // Secotr ID
+                } else if (  i + (i*h->spec.sides) <= h->spec.boottracks && h->spec.boot_tracks_sector_offset ) {
+                    *ptr++ = j + h->spec.boot_tracks_sector_offset; // Secotr ID
                 } else {
                     *ptr++ = j + h->spec.first_sector_offset; // Secotr ID
                 }
@@ -215,7 +217,15 @@ int cpm_write_edsk(cpm_handle* h, const char* filename)
                 *ptr++ = h->spec.sector_size / 256;
             }
             fwrite(header, 256, 1, fp);
-            fwrite(h->image + offs, track_length, 1, fp);
+            for (j = 0; j < h->spec.sectors_per_track; j++) {
+                 int sect = j; // TODO: Skew
+                 if ( h->spec.has_skew && i + (i*h->spec.sides) >= h->spec.skew_track_start ) {
+		     for ( sect = 0; sect < h->spec.sectors_per_track; sect++ ) {
+			if ( h->spec.skew_tab[sect] == j ) break;
+		     }
+                 }
+                 fwrite(h->image + offs + (sect * h->spec.sector_size), h->spec.sector_size, 1, fp);
+            }
         }
     }
     fclose(fp);
