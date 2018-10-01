@@ -210,6 +210,45 @@ generic_console_printc_3:
         add     hl,bc                   ;hl now points to address in display
         ret
 
+construct_block_graphics:
+	ld	hl,$f800
+	ld	a,0
+construct_loop_1:
+	ld	b,a
+	push	af
+	call	do_block
+	ld	b,4
+construct_loop_2:
+	ld	(hl),0
+	inc	hl
+	djnz	construct_loop_2
+	pop	af
+	inc	a
+	and	15
+	jr	nz,construct_loop_1
+	ret
+
+
+do_block:
+	call	do_half_block
+do_half_block:
+	rr	b
+	sbc	a
+	and	$0f
+	ld	c,a
+	rr	b
+	sbc	a
+	and	$f0
+	or	c
+	ld	c,6
+do_half_block_1:
+	ld	(hl),a
+	inc	hl
+	dec	c
+	jr	nz,do_half_block_1
+	ret
+
+
 	SECTION		code_crt_init
 
 	EXTERN	copy_font_8x8
@@ -222,3 +261,7 @@ generic_console_printc_3:
 	or	e
 	ld	(__bee_custom_font),a
 	call	nz,copy_font_8x8
+	; Build the block udgs we need
+	call	construct_block_graphics
+
+

@@ -30,18 +30,24 @@ generic_console_ioctl:
 	ld	e,c
 	ld	d,b
 	ld	c,96
+copy_font:
 	call	copy_font_8x8
 success:
 	and	a
 	ret
 check_set_udg:
-IF 0
 	cp	IOCTL_GENCON_SET_UDGS
 	jr	nz,check_mode
-	ld	(generic_console_udg32),bc
-	jr	success
+	ld	hl,$f800 + (16 * 16)		;PCG area
+	ld	e,c
+	ld	d,b
+	ld	c,128 - 16
+	ld	a,(__bee_custom_font)
+	and	a
+	jr	z,copy_font
+	ld	c,16			;If we have a font, then we can have 16 udgs
+	jr	copy_font
 check_mode:
-ENDIF
 	cp	IOCTL_GENCON_SET_MODE
 	jr	nz,failure
 	ld	a,c
