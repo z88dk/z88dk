@@ -16,7 +16,7 @@
         SECTION  code_clib
 	PUBLIC	ansi_attr
 
-	PUBLIC	bee_attr
+	EXTERN  __bee_attr
 	PUBLIC  INVRS
 
 .ansi_attr
@@ -27,7 +27,7 @@
 .noreset
         cp      1
         jr      nz,nobold
-        ld      a,(bee_attr)
+        ld      a,(__bee_attr)
         or      @01000000
         jr		setbk
 .nobold
@@ -36,31 +36,31 @@
         cp      8
         jr      nz,nodim
 .dim
-        ld      a,(bee_attr)
+        ld      a,(__bee_attr)
         and     @10111111
         jr		setbk
 .nodim
         cp      4
         jr      nz,nounderline
-        ld      a,(bee_attr)
+        ld      a,(__bee_attr)
         or      @01001000
         ret
 .nounderline
         cp      24
         jr      nz,noCunderline
-        ld      a,(bee_attr)
+        ld      a,(__bee_attr)
         and     @10110111
         ret
 .noCunderline
         cp      5
         jr      nz,noblink
-        ld      a,(bee_attr)
+        ld      a,(__bee_attr)
         or      @11000000
         jr		setbk
 .noblink
         cp      25
         jr      nz,nocblink
-        ld      a,(bee_attr)
+        ld      a,(__bee_attr)
         and     @00111111
         jr		setbk
 .nocblink
@@ -78,18 +78,18 @@
 .noCreverse
         cp      8
         jr      nz,noinvis
-        ld      a,(bee_attr)
+        ld      a,(__bee_attr)
         ld      (oldattr),a
         and     @00001111
         ld      e,a
         rla
         rla
         rla
-		rla
-		and		@11110000
+	rla
+	and	@11110000
         or      e
 .setbk
-		ld      (bee_attr),a
+	ld      (__bee_attr),a
         ret
 .noinvis
         cp      28
@@ -106,7 +106,7 @@
 .ZFR
 ;''''''''''''''''''''''
         ld      e,a
-        ld      a,(bee_attr)
+        ld      a,(__bee_attr)
         and     @11110000
         or      e
         jr		setbk
@@ -124,7 +124,7 @@
         rla
         rla
         ld      e,a
-        ld      a,(bee_attr)
+        ld      a,(__bee_attr)
         and     @00001111
         or      e
         jr		setbk
@@ -134,8 +134,6 @@
 		
 	SECTION  bss_clib
 	
-.bee_attr
-        defb 15
 	
 .oldattr
         defb     0
