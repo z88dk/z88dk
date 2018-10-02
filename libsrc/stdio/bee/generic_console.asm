@@ -53,14 +53,14 @@ generic_console_set_ink:
 generic_console_cls:
 	ld	hl, DISPLAY
 	ld	de, DISPLAY +1
-	ld	bc, 80 * 24 - 1
+	ld	bc, 80 * 25 - 1
 	ld	(hl),32
 	ldir
 	ld	a,64
 	out	(8),a
 	ld	hl, DISPLAY + $800 
 	ld	de, DISPLAY + $800 + 1
-	ld	bc, 80 * 24 - 1
+	ld	bc, 80 * 25 - 1
 	ld	a,(__bee_attr)
 	ld	(hl),a
 	ldir
@@ -95,21 +95,31 @@ generic_console_printc:
 ;        a = character,
 ;        c = failure
 generic_console_vpeek:
+	ld	a,e
         call    generic_console_xypos
         ld      d,(hl)
-	call	nz,vpeek_unmap
+	rra
+	call	nc,vpeek_unmap
 	ld	a,d
         and     a
         ret
 
+; Unmap characters:
+; Need to handle 
 vpeek_unmap:
+	ld	a,d
+	cp	128 + 16
+	ret	c		; It's a block graphic
+	sub	16
+	ld	d,a
+	cp	128 + 16
+	ret	c		; First 16 UDGs
 	ld	a,(__bee_custom_font)
 	and	a
-	ret	z
+	ret	z		; It's all UDGs
 	ld	a,d
-	cp	160
-	ret	c
-	res	7,d
+	sub	128 - 16
+	ld	d,a
 	ret
 
 

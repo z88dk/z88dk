@@ -110,6 +110,11 @@ extern int __LIB__ getch(void);
 // Get the character that is on screen at the specified location
 extern int __LIB__ cvpeek(int x, int y) __smallc;
 
+
+// Get the character that is on screen at the specified location (no charset
+// translations will be made)
+extern int __LIB__ cvpeekr(int x, int y) __smallc;
+
 // Set the border colour, may not be implemented on all ports
 extern int __LIB__ bordercolor(int c) __z88dk_fastcall;
 

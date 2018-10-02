@@ -44,6 +44,7 @@
 IF USEplotc
 			call	generic_console_pointxy
 ELSE
+			ld	e,1		;raw mode
 			call	generic_console_vpeek
 ENDIF
 			ld	hl,textpixl

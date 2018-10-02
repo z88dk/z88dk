@@ -62,8 +62,8 @@ check_mode:
 	cp	1
 	jr	z,set_mode
 	ld	l,40
-	ld	h,24
-	ld	de,screen_40x24
+	ld	h,25
+	ld	de,screen_40x25
 	cp	2
 	jr	nz,failure
 set_mode:
@@ -90,10 +90,11 @@ dummy_return:
 	SECTION		rodata_clib
 
 screen_80x24:
-	defb    $6b,80,$58,$37,$1b,$05,$18,$1a,$48,$0a,$2a,$0a,$20,0,0,0
+	defb    $6b, 80,$58,$37,$1b,$05,$18,$1a,$48,$0a,$2a,$0a,$20,0,0,0
+;	defb    $6b,$50,$59,$37,$1b,$05,$19,$1b,$48,$0a,$2a,$0a,$20,0,0,0
 
 screen_64x16:
 	defb    107,64,81,55,18,9,16,17,$48,$0F,$2F,$0F,0,0,0,0
 
-screen_40x24:
+screen_40x25:
 	defb    $35,40,$2D,$24,$1b,$05,$19,$1a,$48,$0a,$2a,$0a,$20,0,0,0

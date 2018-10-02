@@ -76,6 +76,7 @@ eg2000_printc:
 	jr	c,is_raw
         ld      a,(__eg2000_custom_font)
         and     a
+	ld      a,(__eg2000_mode)
 	jr	z,is_raw
 	set	7,d	;custom font define, use chars 160-255 for font, 128-159=udgs
 is_raw:
@@ -95,18 +96,24 @@ is_raw:
 ;        a = character,
 ;        c = failure
 generic_console_vpeek:
+	ld	a,e
         call    xypos
-        ld      a,(__eg2000_custom_font)
-        and     a
-	ld	a,(hl)
-	call	nz,has_custom_font
+	ld	e,a
+	ld	d,(hl)
+	rr	e
+	call	nc,vpeek_unmap
+	ld	a,d
 	and	a
 	ret
 
-has_custom_font:
+vpeek_unmap:	
+	ld	a,(__eg2000_custom_font)
+	and	a
+	ret	z
+	ld	a,d
 	cp	160
 	ret	c
-	res	7,a
+	res	7,d
 	ret
 
 xypos:
