@@ -803,6 +803,7 @@ einstein.lib:
 	@echo '--- Building Tatung Einstein Library ---'
 	@echo ''
 	$(MAKE) msxdeps
+	@$(RM) -f video/mc6845/*.o
 	$(MAKE) -C games TARGET=cpm SUBTYPE=einstein
 	$(MAKE) -C msx TARGET=test
 	$(MAKE) -C psg
@@ -1128,6 +1129,7 @@ lynx_clib.lib:
 	@echo '--- Building Camputers Lynx Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
+	@$(RM) -f video/mc6845/*.o
 	$(call buildgeneric,lynx)
 	$(MAKE) -C games TARGET=lynx
 	TARGET=lynx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORlynx -x$(OUTPUT_DIRECTORY)/lynx_clib @$(LISTFILE_DIRECTORY)/lynx.lst

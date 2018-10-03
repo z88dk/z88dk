@@ -16,13 +16,6 @@
 ;
 ; Uses: af, l
 asm_set_cursor_state:
-	ld	a,0x0a		; start_ras
-	out	(address_w),a
-	in	a,(register_r)
-	; Read the register  0x0a
-	and	@00011111
-	or	l
-	ld	l,a
 	ld	a,0x0a
 	out	(address_w),a
 	ld	a,l	

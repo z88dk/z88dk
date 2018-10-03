@@ -25,3 +25,11 @@ IF FORlynx
 	defc	register_w = 0x87
 
 ENDIF
+
+IF FOReinstein
+	defc	address_r = 0
+	defc	status_r = 0 
+	defc	address_w = 0x48
+	defc	register_r = 0
+	defc	register_w = 0x49
+ENDIF

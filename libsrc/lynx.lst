@@ -27,4 +27,5 @@ graphics/liner
 graphics/stencil_render2
 graphics/text/swapgfxbk
 @gfxbase.lst
+@video/mc6845/mc6845.lst
 @z80.lst
