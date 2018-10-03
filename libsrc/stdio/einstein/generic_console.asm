@@ -88,8 +88,6 @@ generic_console_vpeek:
         call    calc_xypos
 	ld	e,a		;Raw mode back
 	in	a,(c)
-	ld	d,'*'
-	out	(c),d
 	rr	e
 	call	nc,vpeek_unmap
 	and	a
