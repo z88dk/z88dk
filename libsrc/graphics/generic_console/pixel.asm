@@ -83,9 +83,11 @@ ELSE
 		ld	a,(hl)
 		pop	bc		;reduced coordinates
 IF USEplotc
+		ld	d,a
                 ld      e,0             ;pixel4 mode
                 call    generic_console_plotc
 ELSE
+		ld	d,a
 		ld	e,1		;raw mode
 		call	generic_console_printc
 ENDIF

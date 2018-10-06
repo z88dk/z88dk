@@ -101,9 +101,11 @@ ELSE
 			ld	c,(ix+2)
 			ld	b,(ix+3)
 IF USEplotc
+			ld	d,a
 			ld	e,1		;pixel6 mode
 			call	generic_console_plotc
 ELSE
+			ld	d,a
 			ld	e,1		;raw mode
 			call	generic_console_printc
 ENDIF
