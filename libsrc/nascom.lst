@@ -15,6 +15,7 @@ graphics/dcircle
 graphics/clg
 graphics/clrarea
 graphics/lftscrol
+graphics/generic_console/clsgraph
 graphics/generic_console/plotpixl6
 graphics/generic_console/respixl6
 graphics/generic_console/xorpixl6
