@@ -24,7 +24,7 @@
 		EXTERN		CONSOLE_ROWS
 
 		defc		DISPLAY = 0x0800
-                defc            TOPROW = DISPLAY + (CONSOLE_ROWS - 1) * 64
+                defc            TOPROW = DISPLAY + (CONSOLE_ROWS - 1) * 64 + 10
 
 generic_console_ioctl:
 	scf
