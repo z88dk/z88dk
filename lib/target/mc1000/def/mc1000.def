@@ -1,0 +1,7 @@
+
+
+	; Values used by the library
+
+        defc    MODE_0 = 0
+        defc    MODE_1 = $9c
+        defc    MODE_2 = $98
