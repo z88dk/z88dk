@@ -7,6 +7,11 @@
 sety:
 ; set y position
 ; in:  l = y position
+      push af
+
+      ld a,0x40; set startline to 0
+      call out40
+
       ld a,l
       sra a
       sra a
@@ -14,6 +19,7 @@ sety:
       and 0x0f
       or 0xb0
       call out40
+      pop af
       ret
 
 ; make pattern
