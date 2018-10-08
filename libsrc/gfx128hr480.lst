@@ -1,3 +1,4 @@
+graphics/w_dcircle_square.asm
 @gfxbasew.lst
 graphics/w_drawb
 graphics/w_undrawb
