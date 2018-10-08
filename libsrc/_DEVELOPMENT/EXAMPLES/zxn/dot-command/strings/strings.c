@@ -3,18 +3,7 @@
  * aralbrec @ z88dk.org
 */
 
-// ZX SPECTRUM
-//
-// zcc +zx -vn -startup=30 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 --opt-code-size strings.c help.asm -o strings -subtype=dot -create-app
-// zcc +zx -vn -startup=30 -clib=new strings.c help.asm -o strings -subtype=dot -create-app
-
-// ZX NEXT
-//
-// zcc +zxn -vn -startup=30 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 --opt-code-size strings.c help.asm -o strings -subtype=dot -create-app
-// zcc +zxn -vn -startup=30 -clib=new strings.c help.asm -o strings -subtype=dot -create-app
-
-#pragma printf = "s u c lu ld lx lX lo"
-#pragma output CLIB_EXIT_STACK_SIZE = 1
+// zcc +zxn -v -startup=30 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 --opt-code-size @zproject.lst -o strings -pragma-include:zpragma.inc -subtype=dot -Cz"--clean" -create-app
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,12 +14,10 @@
 #include <ctype.h>
 #include <errno.h>
 #include <compress/zx7.h>
-
-#if __ZXNEXT
+#include <arch/zxn.h>
 #include <arch/zxn/esxdos.h>
-#else
-#include <arch/zx/esxdos.h>
-#endif
+
+#include "user_interaction.h"
 
 #define max(a,b)  (((a) > (b)) ? (a) : (b))
 
@@ -66,7 +53,7 @@ extern unsigned char help[];
 unsigned char fin  = 0xff;   // file descriptor
 unsigned char fout = 0xff;   // file descriptor
 
-struct esxdos_stat st;       // file info
+struct esx_stat st;          // file info
 
 uint32_t      roffset;       // file offset to start of read buffer
 unsigned char rbuffer[512];  // read buffer
@@ -92,35 +79,25 @@ int error(char *fmt, ...)
    for (p = ebuf; p = strchr(p, '\n'); )
       *p = '\r';
    
-   ebuf[strlen(ebuf)-1] += 0x80;  
+   ebuf[strlen(ebuf) - 1] += 0x80;  
    return (int)ebuf;
 }
 
 // clean up at exit
 
-void cleanup_files(void)
+static unsigned char old_cpu_speed;
+
+void cleanup(void)
 {
-   if (fin != 0xff)
-      esxdos_f_close(fin);
+   if (fin != 0xff) esx_f_close(fin);
+   if (fout != 0xff) esx_f_close(fout);
    
-   if (fout != 0xff)
-      esxdos_f_close(fout);
-   
-   putc('\n', stdout);
+   puts("    ");
+
+   ZXN_NEXTREGA(REG_TURBO_MODE, old_cpu_speed);
 }
 
-// user interrupt
-
-void allow_user_interrupt(void)
-{
-   if (in_key_pressed(IN_KEY_SCANCODE_SPACE | 0x8000))
-   {
-      in_wait_nokey();
-      exit(error("L Break into Program"));
-   }
-}
-
-//
+// program start
 
 int main(int argc, char **argv)
 {
@@ -135,11 +112,18 @@ int main(int argc, char **argv)
    static uint32_t olen;
    static uint32_t moffset;
 
+   // initialization
+   
+   old_cpu_speed = ZXN_READ_REG(REG_TURBO_MODE);
+   ZXN_NEXTREG(REG_TURBO_MODE, RTM_14MHZ);
+   
+   atexit(cleanup);
+
    // parse command line
 
    for (i = 2; i < (unsigned char)argc; ++i)
    {
-      unsigned char *p = argv[i];
+      unsigned char *p  = argv[i];
 
       if (!stricmp(p, "-f"))
          options.force = 1;
@@ -188,9 +172,9 @@ int main(int argc, char **argv)
    {
       // compressed help text saves some memory
       
-      dzx7_standard(help, rbuffer);
-      
-      printf("%s", rbuffer);
+      *dzx7_standard(help, rbuffer) = 0;
+      puts(rbuffer);
+
       return 0;
    }
 
@@ -198,14 +182,10 @@ int main(int argc, char **argv)
    
    if (options.outfile && (!stricmp(options.outfile, options.infile)))
       return error("In and out files are same");
-
-   atexit(cleanup_files);
    
    // open input file
    
-   fin = esxdos_f_open(options.infile, ESXDOS_MODE_OPEN_EXIST | ESXDOS_MODE_R);
-   
-   if (errno)
+   if ((fin = esx_f_open(options.infile, ESX_MODE_OPEN_EXIST | ESX_MODE_R)) == 0xff)
       return error("%u: Can't open %s", errno, options.infile);
 
    // open output file
@@ -213,22 +193,21 @@ int main(int argc, char **argv)
    if (options.outfile != NULL)
    {
       if (options.append)
-         fout = esxdos_f_open(options.outfile, ESXDOS_MODE_OPEN_CREAT | ESXDOS_MODE_R | ESXDOS_MODE_W);
+         fout = esx_f_open(options.outfile, ESX_MODE_OPEN_CREAT | ESX_MODE_RW);
       else
-         fout = esxdos_f_open(options.outfile, (options.force == 0) ? ESXDOS_MODE_CREAT_NOEXIST | ESXDOS_MODE_W : ESXDOS_MODE_CREAT_TRUNC | ESXDOS_MODE_W);
+         fout = esx_f_open(options.outfile, (options.force == 0) ? (ESX_MODE_OPEN_CREAT_NOEXIST | ESX_MODE_W) : (ESX_MODE_OPEN_CREAT_TRUNC | ESX_MODE_W));
       
       if (errno)
          return error("%u: Can't open %s%s", errno, options.outfile, options.force ? "" : " (-f)");
       
       if (options.append)
       {
-         if (esxdos_f_fstat(fout, &st) < 0)
+         if (esx_f_fstat(fout, &st))
             return error("%u: Can't stat %s", errno, options.outfile);
          
          if (st.size > 0)
          {
-            esxdos_f_read(fout, rbuffer, 1);   // reported bug: esxdos cannot seek unless r/w has occurred first
-            esxdos_f_seek(fout, st.size, ESXDOS_SEEK_SET);
+            esx_f_seek(fout, st.size, ESX_SEEK_SET);
             
             if (errno)
                return error("Can't seek to %lu in\n%s", st.size, options.outfile);
@@ -236,12 +215,16 @@ int main(int argc, char **argv)
       }
    }
    
+   // record input file size
+   
+   if (esx_f_fstat(fin, &st))
+      return error("%u: Can't stat %s", errno, options.infile);
+   
    // strings
    // relying on default initialization of some vars here
    
    rptr  = rbuffer;
-   
-   rsize = esxdos_f_read(fin, rbuffer, sizeof(rbuffer));
+   rsize = esx_f_read(fin, rbuffer, sizeof(rbuffer));
    
    if (errno)
       return error("%u: Can't read from %s", errno, options.infile);
@@ -254,7 +237,7 @@ int main(int argc, char **argv)
       {
          for ( ; rptr < (rbuffer + rsize); rptr++)
          {
-            allow_user_interrupt();
+            user_interaction();
             
             if ((*rptr == '\t') || (options.whitespace && (*rptr == '\r' || *rptr == '\n')))
                continue;
@@ -269,15 +252,14 @@ int main(int argc, char **argv)
          roffset += rsize;
          rptr = rbuffer;
       
-         rsize = esxdos_f_read(fin, rbuffer, sizeof(rbuffer));
+         rsize = esx_f_read(fin, rbuffer, sizeof(rbuffer));
          
          if (errno)
             return error("%u: Failed read from %s", errno, options.infile);
          
          // heartbeat
          
-         if (fout != 0xff)
-            putc('.', stdout);
+         printf("%03u%%" "\x08\x08\x08\x08", (unsigned int)(roffset * 100 / st.size));
       }
 
 end_match:
@@ -290,7 +272,7 @@ end_match:
       {
          // rewind input file to start of match
       
-         esxdos_f_seek(fin, moffset, ESXDOS_SEEK_SET);
+         esx_f_seek(fin, moffset, ESX_SEEK_SET);
          
          if (errno)
             return error("%u: Can't seek to match string", errno);
@@ -303,23 +285,23 @@ end_match:
             snprintf(wbuffer + 7, sizeof(wbuffer) - 7, wbuffer, moffset);
          
             if (fout != 0xff)
-               esxdos_f_write(fout, wbuffer + 7, strlen(wbuffer + 7));
+               esx_f_write(fout, wbuffer + 7, strlen(wbuffer + 7));
             else
                printf("%s", wbuffer + 7);
          }
 
          // copy matched string to output
       
-         while (olen && (wsize = esxdos_f_read(fin, wbuffer, (olen > sizeof(wbuffer)) ? sizeof(wbuffer) : olen)))
+         while (olen && (wsize = esx_f_read(fin, wbuffer, (olen > sizeof(wbuffer)) ? sizeof(wbuffer) : olen)))
          {
             olen -= wsize;
             
-            allow_user_interrupt();
+            user_interaction();
          
             // write to output
          
             if (fout != 0xff)
-               esxdos_f_write(fout, wbuffer, wsize);
+               esx_f_write(fout, wbuffer, wsize);
             else
             {
                for (wptr = wbuffer; wsize; --wsize,++wptr)
@@ -337,8 +319,8 @@ end_match:
       
          if (fout != 0xff)
          {
-            snprintf(wbuffer, sizeof(wbuffer), "%s%s\r\n", *options.separator ? "\r\n" : "", options.separator);
-            esxdos_f_write(fout, wbuffer, strlen(wbuffer));
+            snprintf(wbuffer, sizeof(wbuffer), "%s%s\n", *options.separator ? "\n" : "", options.separator);
+            esx_f_write(fout, wbuffer, strlen(wbuffer));
          }
          else
             printf("%s%s\n", *options.separator ? "\n" : "", options.separator);
@@ -350,7 +332,7 @@ end_match:
          
          // repair read file pointer
       
-         esxdos_f_seek(fin, roffset + rsize, ESXDOS_SEEK_SET);
+         esx_f_seek(fin, roffset + rsize, ESX_SEEK_SET);
       }
    
       // resume match phase
