@@ -8,7 +8,7 @@
 ;       Unplot pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: w_respixel.asm $
+;	$Id: w_respixl.asm $
 ;
 
 
