@@ -59,7 +59,11 @@ getparmx:		;cx=vx+percent*pic[x++]/50;  (double width)
 	ld	h,0
 	ld	l,a
 	call l_mult
+IF (maxx > 320) & ((maxx/maxy)>1)
 	ld	de,25	; 50/2
+ELSE
+	ld	de,50
+ENDIF
 	jr  perc_div
 ENDIF
 
