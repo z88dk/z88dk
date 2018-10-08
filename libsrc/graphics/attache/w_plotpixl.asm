@@ -8,7 +8,7 @@
 ;       Plot pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: w_plotpixel.asm $
+;	$Id: w_plotpixl.asm $
 ;
 
 
