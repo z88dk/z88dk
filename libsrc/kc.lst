@@ -9,6 +9,7 @@ stdio/kc/CRT_FONT
 @stdio/stdio_ixiy.lst
 @font/font_8x8/font_8x8.lst
 games/joystick
+graphics/w_dcircle_square.asm
 @gfxbasew.lst
 graphics/kc/clg
 graphics/kc/w_pixladdr
