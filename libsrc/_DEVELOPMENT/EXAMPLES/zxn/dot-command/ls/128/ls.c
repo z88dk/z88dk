@@ -195,7 +195,7 @@ static unsigned char old_cpu_speed;
 static void cleanup(void)
 {
    close_open_files();   
-   puts(" ");                       // erase any cursor left behind
+   printf(" ");                     // erase any cursor left behind
    ZXN_NEXTREGA(REG_TURBO_MODE, old_cpu_speed);
 }
 
@@ -211,6 +211,8 @@ static void process_directory_cache(void)
 
    catalog_control = CATALOG_MODE_DIR;
 
+   memory_clear_file_records();
+
    for (memory_page_in_dir(BASE_DIR_PAGES); dr = p_queue_pop(&dqueue); memory_page_in_dir(BASE_DIR_PAGES))
    {
       // opportunity for user to break
@@ -220,17 +222,16 @@ static void process_directory_cache(void)
       //
       
       if (esx_f_get_canonical_path(dr->name, canonical_active))
-         printf("\nIgnoring invalid path:\n\"%s\"\n\n", dr->name);
+         printf(" \nignoring invalid path:\n%s\n", dr->name);
       else
       {
          strlwr(canonical_active);
-         
-         memory_clear_file_records();
-         
+
          catalog_morethanone = 0;
          catalog_add_file_records_from_dir(dr->name);   // also restores mmu6,7
 
          list_generate();
+         memory_clear_file_records();
       }
    }
 
@@ -499,7 +500,7 @@ int main(unsigned int argc, char **argv)
       // record active canonical path
       
       if (esx_f_get_canonical_path(ptr->name, canonical_active))
-         printf("\nIgnoring invalid path:\n\"%s\"\n\n", ptr->name);
+         printf(" \nignoring invalid path:\n%s\n", ptr->name);
       else
       {
          strlwr(canonical_active);

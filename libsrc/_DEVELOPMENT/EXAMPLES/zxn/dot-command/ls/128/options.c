@@ -308,18 +308,18 @@ unsigned int option_exec_version(void)
 
 unsigned int option_exec_lfn_on(void)
 {
-   flags.name_fmt_mod = (flags.name_fmt_mod & ~(FLAG_NAME_FMT_MOD_SFN | FLAG_NAME_FMT_MOD_LFN)) | FLAG_NAME_FMT_MOD_LFN;
+   flags.name_fmt_mod = (flags.name_fmt_mod & ~(FLAG_NAME_FMT_MOD_SFN | FLAG_NAME_FMT_MOD_LFN | FLAG_NAME_FMT_MOD_AUTO)) | FLAG_NAME_FMT_MOD_LFN;
    return OPT_ACTION_OK;
 }
 
 unsigned int option_exec_lfn_off(void)
 {
-   flags.name_fmt_mod = (flags.name_fmt_mod & ~(FLAG_NAME_FMT_MOD_SFN | FLAG_NAME_FMT_MOD_LFN)) | FLAG_NAME_FMT_MOD_SFN;
+   flags.name_fmt_mod = (flags.name_fmt_mod & ~(FLAG_NAME_FMT_MOD_SFN | FLAG_NAME_FMT_MOD_LFN | FLAG_NAME_FMT_MOD_AUTO)) | FLAG_NAME_FMT_MOD_SFN;
    return OPT_ACTION_OK;
 }
 
 unsigned int option_exec_lfn_both(void)
 {
-   flags.name_fmt_mod = (flags.name_fmt_mod & ~(FLAG_NAME_FMT_MOD_SFN | FLAG_NAME_FMT_MOD_LFN)) | FLAG_NAME_FMT_MOD_SFN | FLAG_NAME_FMT_MOD_LFN;
+   flags.name_fmt_mod = (flags.name_fmt_mod & ~(FLAG_NAME_FMT_MOD_SFN | FLAG_NAME_FMT_MOD_LFN | FLAG_NAME_FMT_MOD_AUTO)) | FLAG_NAME_FMT_MOD_SFN | FLAG_NAME_FMT_MOD_LFN;
    return OPT_ACTION_OK;
 }

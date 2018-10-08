@@ -26,6 +26,7 @@
 #define FLAG_NAME_FMT_MOD_QUOTE      2
 #define FLAG_NAME_FMT_MOD_LFN        4
 #define FLAG_NAME_FMT_MOD_SFN        8
+#define FLAG_NAME_FMT_MOD_AUTO       16
 
 #define FLAG_NAME_FMT_CLASSIFY_NONE  0
 #define FLAG_NAME_FMT_CLASSIFY_DIR   1

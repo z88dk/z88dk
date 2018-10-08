@@ -25,7 +25,7 @@
 
 // By default z88dk will allocate all main bank pages starting
 // from the first occupied at address CRT_ORG_MAIN.  So here
-// z88dk will be allocating pages for mmu3 through mmu7 which
+// z88dk will be allocating pages for mmu4 through mmu7 which
 // is what we want.
 
 // Request additional pages for file records and dir records

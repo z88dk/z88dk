@@ -11,8 +11,6 @@
 #include "memory.h"
 #include "user_interaction.h"
 
-#include <errno.h>
-
 unsigned char catalog_control;
 unsigned char catalog_morethanone;
 
@@ -320,7 +318,7 @@ void catalog_add_file_records_from_dir(unsigned char *name)
    {
       cat_lfn_name = dirent_lfn.name;
 
-      while ((esx_f_readdir(fin, &dirent_lfn) == 1) && (esx_f_readdir(gin, &dirent_sfn)) == 1)
+      while ((esx_f_readdir(fin, &dirent_lfn) == 1) && (esx_f_readdir(gin, &dirent_sfn) == 1))
       {
          // opportunity for user to break
          
