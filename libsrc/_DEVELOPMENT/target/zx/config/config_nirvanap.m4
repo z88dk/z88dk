@@ -10,7 +10,7 @@ define(`__NIRVANAP_OPTIONS', 0)
 define(`__NIRVANAP_OPTIONS_WIDE_DRAW',    0x01)
 define(`__NIRVANAP_OPTIONS_WIDE_SPRITES', 0x02)
 
-define(`__NIRVANAP_TOTAL_ROWS', 18)      # total number of rows drawn by nirvana+ 1-23
+define(`__NIRVANAP_TOTAL_ROWS', 23)      # total number of rows drawn by nirvana+ 1-23
 define(`__NIRVANAP_HOLE', eval(__NIRVANAP_TOTAL_ROWS*328+56718))
 define(`__NIRVANAP_HOLE_SIZE', eval(64262-__NIRVANAP_HOLE))
 
