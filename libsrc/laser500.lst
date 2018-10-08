@@ -27,6 +27,7 @@ graphics/laser500/w_respixl
 graphics/laser500/w_xorpixel
 graphics/laser500/xor_MODE0
 graphics/laser500/xor_MODE2
+graphics/w_dcircle_square.asm
 @gfxbasew.lst
 graphics/text/swapgfxbk
 games/laser500/bit_open
