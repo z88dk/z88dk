@@ -5,7 +5,12 @@ SECTION code_user
 PUBLIC _load_snap
 PUBLIC _load_nex
 
-defc MAX_NAME_LEN = 48
+defc MAX_NAME_LEN = 12         ; 8.3 only
+
+EXTERN _mode48
+EXTERN _dirent_sfn
+
+defc PROGRAM_NAME = _dirent_sfn + 1;
 
 ;;;;;;;;;;;;;;;;;;;;;;
 ; void load_snap(void)
@@ -13,72 +18,55 @@ defc MAX_NAME_LEN = 48
 
 _load_snap:
 
-   ld sp,(__SYSVAR_ERRSP)
-
+   call unlock_7ffd
    call close_dot_handle
 
-   ; place reclaim_stub on stack
-   ; addr of reclaim_stub left on stack
+   ld sp,(__SYSVAR_ERRSP)
+   ld iy,__SYS_IY
    
-   call stack_reclaim_stub
+   ; in 48k mode make sure there is a valid stack for M_P3DOS
    
-   ; make room for snap_stub underneath PROG
+   ld a,(_mode48)
+   
+   or a
+   jr z, skip48
 
-   ld hl,(__SYSVAR_PROG)
+   ld hl,__SYSVAR_TSTACK
+   ld (__SYSVAR_OLDSP),hl
+   
+skip48:
+
+   ; make room for snap stub
+   
    ld bc,snap_stub_end - snap_stub + MAX_NAME_LEN + 1
    
-   push bc
-
    rst __ESX_RST_ROM
-   defw __ROM3_MAKE_ROOM       ; insert space before hl
-
-   inc hl                      ; point at space
-
-   pop bc
-   pop de
+   defw __ROM3_BC_SPACES
    
-   push bc                     ; save space size for reclaim_stub
-   push hl                     ; save space addr for reclaim_stub
+   push de                     ; save start address
    
-   push hl                     ; save exec address
-   push de                     ; save addr of reclaim_stub
-
-   ; copy snap_stub except two bytes for jp destination
-
-   ex de,hl
-
+   ; copy snap_stub
+   
    ld hl,snap_stub
-   ld bc,snap_stub_end - snap_stub - 2
+   ld bc,snap_stub_end - snap_stub
    
    ldir
-
-   ; write address of reclaim_stub into jp
    
-   pop hl                      ; hl = addr of reclaim_stub
-   
-   ex de,hl
-
-   ld (hl),e
-   inc hl
-   ld (hl),d
-   inc hl
-   
-   ex de,hl
+   push de                     ; save filename address
    
    ; copy filename
    
-   push de
-   pop ix                      ; ix = filename
-   
-   call stack_copy_name
+   call copy_filename
    
    ld a,0xff
-   ld (de),a                   ; terminate with 0xff
+   ld (de),a
+   
+   ; start the snap
+   
+   pop ix                      ; ix = filename
 
-   pop hl                      ; hl = exec address
+   pop hl                      ; hl = start address   
    rst __ESX_RST_EXITDOT
-
-   ; must be below PROG not in stack
 
 snap_stub:
 
@@ -89,11 +77,26 @@ snap_stub:
    
    ld de,__NEXTOS_IDE_SNAPLOAD
    ld c,7
-
+   
    rst __ESX_RST_SYS
    defb __ESX_M_P3DOS
+
+   ld bc,__IO_NEXTREG_REG
+   ld a,__REG_PERIPHERAL_3
+   out (c),a
+   inc b
+ 
+snap_p3_smc:
+
+   ld a,0
+   out (c),a
+
+   ld iy,__SYS_IY
+   ld hl,__SYS_HLP
+   exx
    
-   jp 0                        ; jump to reclaim_stub
+   rst 8
+   defb __ERRB_Q_PARAMETER_ERROR - 1
 
 snap_stub_end:
 
@@ -103,95 +106,97 @@ snap_stub_end:
 
 _load_nex:
 
-   ld sp,(__SYSVAR_ERRSP)
-
+   call unlock_7ffd
    call close_dot_handle
 
-   ; place reclaim_stub on stack
-   ; addr of reclaim_stub left on stack
-   
-   call stack_reclaim_stub
-   
-   ; make room for nex_stub underneath PROG
+   ld sp,(__SYSVAR_ERRSP)
+   ld iy,__SYS_IY
 
-   ld hl,(__SYSVAR_PROG)
+   ; make room for nex stub
+
    ld bc,nex_stub_end - nex_stub + MAX_NAME_LEN + 1
    
-   push bc
-
    rst __ESX_RST_ROM
-   defw __ROM3_MAKE_ROOM       ; insert space before hl
-
-   inc hl                      ; point at space
-
-   pop bc
-   pop de
+   defw __ROM3_BC_SPACES
    
-   push bc                     ; save space size for reclaim_stub
-   push hl                     ; save space addr for reclaim_stub
+   push de                     ; save start address
    
-   push hl                     ; save exec address
-   push de                     ; save addr of reclaim_stub
-
-   ; copy nex_stub except two bytes for jp destination
-
-   ex de,hl
-
+   ; copy snap_stub
+   
    ld hl,nex_stub
-   ld bc,nex_stub_cmd - nex_stub - 2
-   
-   ldir
-
-   ; write address of reclaim_stub into jp
-   
-   pop hl                      ; hl = addr of reclaim_stub
-   
-   ex de,hl
-
-   ld (hl),e
-   inc hl
-   ld (hl),d
-   inc hl
-   
-   ex de,hl
-
-   ; copy dot command
-
-   push de
-   pop ix                      ; ix = dot command
-   
-   ld hl,nex_stub_cmd
-   ld bc,nex_stub_end - nex_stub_cmd
+   ld bc,nex_stub_end - nex_stub
    
    ldir
 
    ; copy filename
-
-   call stack_copy_name
+   
+   ld ix,nex_stub_cmd - nex_stub_end
+   add ix,de                   ; ix = address of dot command
+   
+   call copy_filename
    
    xor a
-   ld (de),a                   ; zero terminate
-   
-   pop hl                      ; hl = exec address
-   rst __ESX_RST_EXITDOT
+   ld (de),a
 
-   ; must be below PROG not in stack
+   ; start nex
+   
+   pop hl                      ; hl = start address
+   rst __ESX_RST_EXITDOT
 
 nex_stub:
 
    push ix
    pop hl
-
+   
    rst __ESX_RST_SYS
    defb __ESX_M_EXECCMD
+   
+   ld bc,__IO_NEXTREG_REG
+   ld a,__REG_PERIPHERAL_3
+   out (c),a
+   inc b
+ 
+nex_p3_smc:
 
-   jp 0                        ; jump to reclaim_stub
+   ld a,0
+   out (c),a
+
+   ld iy,__SYS_IY
+   ld hl,__SYS_HLP
+   exx
+
+   rst 8
+   defb __ERRB_Q_PARAMETER_ERROR - 1
 
 nex_stub_cmd:
 
    defm "nexload "
 
 nex_stub_end:
+
+;;;;;;;;;;;;;
+; unlock 7ffd
+;;;;;;;;;;;;;
+
+; in 48k mode we will try to allow loading of 128k programs
+
+unlock_7ffd:
+
+   ld bc,__IO_NEXTREG_REG
+   ld a,__REG_PERIPHERAL_3
+   
+   out (c),a
+   
+   inc b
+   in a,(c)
+   
+   ld (snap_p3_smc + 1),a
+   ld (nex_p3_smc + 1),a
+   
+   or __RP3_UNLOCK_7FFD
+   out (c),a
+   
+   ret
 
 ;;;;;;;;;;;;;;;;;;
 ; close dot handle
@@ -209,24 +214,13 @@ close_dot_handle:
    
    ret
 
-;;;;;;;;;;;;;;;;;;;;;;;
-; stack execution tools
-;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;
+; copy filename
+;;;;;;;;;;;;;;;
 
-EXTERN _program_name
-EXTERN asm_basename
+copy_filename:
 
-; copy program name to max length without terminating zero
-
-stack_copy_name:
-
-   push de                     ; save destination
-   
-   ld hl,_program_name
-   call asm_basename
-   
-   pop de
-   
+   ld hl,PROGRAM_NAME
    ld bc,MAX_NAME_LEN
    
    xor a
@@ -240,38 +234,3 @@ loop_name:
    jp pe, loop_name            ; if max len not exceeded
    
    ret
-
-; copy reclaim_stub code to stack
-; leave address of reclaim_stub on stack
-
-stack_reclaim_stub:
-
-   pop ix
-
-   ld hl,reclaim_stub - reclaim_stub_end
-
-   add hl,sp
-   ld sp,hl
-   
-   push hl                     ; save address of reclaim_stub
-   
-   ex de,hl
-   
-   ld hl,reclaim_stub
-   ld bc,reclaim_stub_end - reclaim_stub
-   
-   ldir
-   
-   jp (ix)
-
-reclaim_stub:
-
-   pop hl                      ; space addr
-   pop bc                      ; space size
-   
-   call __ROM3_RECLAIM_2       ; release reserved memory
-   
-   rst 8
-   defb __ERRB_Q_PARAMETER_ERROR - 1
-
-reclaim_stub_end:
