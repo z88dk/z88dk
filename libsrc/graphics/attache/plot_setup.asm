@@ -32,11 +32,12 @@
 						
 						;LD	A,(GRY)
 						push hl
-						ld a,maxy
-						sub e
+						ld a,e
 						
-						ADD	A,16	;FIND OUT WHICH NIBBLE
-						CPL		
+						
+						
+						;ADD	A,16	;FIND OUT WHICH NIBBLE
+						;CPL		
 						;LD	HL,PIXBIT
 						LD	HL,PIXBIT+1		; wow... here we do SMC on the SMC code !
 						RES	5,(HL)
