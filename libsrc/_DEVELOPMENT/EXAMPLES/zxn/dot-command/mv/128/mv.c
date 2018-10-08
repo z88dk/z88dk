@@ -136,7 +136,7 @@ static void cleanup(void)
    if (cleanup_remove_name)
       esx_f_unlink(cleanup_remove_name);
    
-   puts(" ");   // erase any cursor left behind
+   printf(" ");                // erase any cursor left behind
    ZXN_NEXTREGA(REG_TURBO_MODE, old_cpu_speed);
 }
 
