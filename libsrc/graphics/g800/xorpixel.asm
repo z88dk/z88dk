@@ -16,6 +16,7 @@ xorpixel:
       call sety
       call getpat
       call setx
+      in a,(0x41) ;dummy read
       in a,(0x41) ;read data
       xor b
       call setx ; to prevent automatic increment of lcd driver

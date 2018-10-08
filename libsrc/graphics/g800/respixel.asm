@@ -19,6 +19,7 @@ respixel:
       cpl
       ld b,a
       call setx
+      in a,(0x41) ;dummy read
       in a,(0x41) ;read data
       and b
       call setx ; to prevent automatic increment of lcd driver
