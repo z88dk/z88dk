@@ -1,3 +1,4 @@
+graphics/w_dcircle_square.asm
 @gfxbasew.lst
 graphics/clg
 graphics/attache/clsgraph
@@ -16,6 +17,7 @@ graphics/attache/w_plotpixl
 graphics/attache/w_respixl
 graphics/attache/w_xorpixl
 graphics/attache/w_pointxy
+graphics/w_multipoint
 graphics/lftscrol
 graphics/swapgfxbk_foo
 graphics/draw_profile
