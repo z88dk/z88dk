@@ -8,6 +8,7 @@ stdio/ansi/g800/f_ansi_cls_850
 stdio/ansi/generic/f_ansi_dline
 stdio/ansi/g800/f_ansi_scrollup_850
 @stdio/stdio.lst
+games/joystick
 @z80.lst
 graphics/__graphics_end
 graphics/circle
@@ -46,3 +47,6 @@ graphics/g800/xordraw
 graphics/g800/xordrawr
 graphics/g800/xordrawto
 graphics/g800/xorpixel
+graphics/putsprite3
+graphics/stencil_render2
+@gfxbase.lst
