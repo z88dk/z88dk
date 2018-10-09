@@ -780,6 +780,10 @@
 int main ()
 {
 	clg();
-	draw_profile(-10, 0, 110, marilyn);
-	draw_profile(160, 90, 55, marilyn);
+	if (getmaxx() > 200) {
+		draw_profile(-10, 0, getmaxy()*10/16, marilyn);
+		draw_profile(160, 90, 55, marilyn);
+	} else
+		draw_profile(5, 0, getmaxy()*10/16, marilyn);
 }
+
