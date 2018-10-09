@@ -313,9 +313,6 @@ ENDIF
         ret
         
 
-        defm    "Small C+ ZX"   ;Unnecessary file signature
-        defb    0
-
 
 IF (startup=2) 			;ROM
 

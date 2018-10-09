@@ -81,7 +81,6 @@ l_dcal:	jp	(hl)		;Used for call by function ptr
 
 
 
-	defm  	"Small C+ Sorcerer"
 end:	defb	0		; null file name
 
         INCLUDE "crt/classic/crt_runtime_selection.asm"

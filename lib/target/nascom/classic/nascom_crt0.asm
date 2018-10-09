@@ -99,8 +99,6 @@ montest: ld	a,(1)	; "T" monitor or NAS-SYS?
          ret
 
 
-         defm  "Small C+ NASCOM"	;Unnecessary file signature
-         defb	0
 
         INCLUDE "crt/classic/crt_runtime_selection.asm"
 	INCLUDE "crt/classic/crt_section.asm"

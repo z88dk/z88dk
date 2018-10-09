@@ -76,7 +76,6 @@ start1:	ld  sp,0    ;Pick up entry sp
 l_dcal:	jp  (hl)    ;Used for call by function ptr
 
 
-	defm  	"Small C+ X-07"
 end:	defb	0		; null file name
 
         INCLUDE "crt/classic/crt_runtime_selection.asm"

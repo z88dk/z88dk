@@ -16,6 +16,8 @@
 	defc    crt0 = 1
 	INCLUDE "zcc_opt.def"
 
+	INCLUDE	"target/svi/def/svibios.def"
+
 ;--------
 ; Some scope definitions
 ;--------
@@ -74,6 +76,9 @@ ENDIF
 start1:
         ld      sp,0
 
+	ld	ix,KILBUF	;Clear keyboard buffer
+	call	msxbios
+
 	ld	ix,$3768	; TOTEXT - force text mode on exit
 	call	msxbios
         ret
@@ -89,12 +94,6 @@ l_dcal:
 msxbios:
 	push	ix
 	ret
-
-; Signature in resulting binary
-
-	defm	"Small C+ SVI"
-	defb	0
-
 
         INCLUDE "crt/classic/crt_runtime_selection.asm"
 	INCLUDE	"crt/classic/crt_section.asm"

@@ -69,8 +69,6 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 
 
 
-	defm    "Small C+ Galaksija"        ;Unnecessary file signature
-	defb    0
 
         INCLUDE "crt/classic/crt_runtime_selection.asm"
 

@@ -138,8 +138,6 @@ l_dcal:
 	jp      (hl)
 
 
-   defm    "Small C+ PacMan"   ;Unnecessary file signature
-		
 	; If we were given a model then use it
 	IF DEFINED_CRT_MODEL
 	  defc __crt_model = CRT_MODEL

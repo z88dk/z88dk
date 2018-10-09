@@ -453,9 +453,6 @@ l_dcal:
 		jp	(hl)
 
 
-		defm  "Small C+ OZ"	;Unnecessary file signature
-		defb	0
-		
 		defc ansipixels = 236
 		IF !DEFINED_ansicolumns
 			 defc DEFINED_ansicolumns = 1

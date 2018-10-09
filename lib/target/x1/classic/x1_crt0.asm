@@ -141,7 +141,7 @@ IF CRT_ENABLE_STDIO = 1
 ENDIF
 
 	push    hl				; return code
-
+end:	jr	end
 	rst	0
 
 cleanup_exit:

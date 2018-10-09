@@ -319,7 +319,6 @@ __VideoVariables:
         defb  25, 25                    ; Y_SIZ_VID
         defb  0
 
-         defm  "Small C+ Enterprise"
 end:	 defb	0
 
 

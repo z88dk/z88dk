@@ -295,7 +295,6 @@ FRAMES:
 
 
 
-         defm  "Small C+ OSCA"
 end:
          defb  0
 

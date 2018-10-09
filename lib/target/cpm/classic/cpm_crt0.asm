@@ -218,7 +218,6 @@ peekbyte_code:
 		nop
 ENDIF
 
-        defm  	"Small C+ CP/M"
 
         INCLUDE "crt/classic/crt_runtime_selection.asm"
 
