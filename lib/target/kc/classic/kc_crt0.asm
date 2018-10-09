@@ -119,8 +119,6 @@ start1:	ld	sp,0		;Restore stack to entry value
 l_dcal:	jp	(hl)		;Used for function pointer calls
 
 	
-	 defm  "Small C+ KC"	;Unnecessary file signature
-	 defb	0
 	 
 
 

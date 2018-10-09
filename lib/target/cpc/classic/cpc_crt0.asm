@@ -167,9 +167,6 @@ ENDIF
 
 
 
-                defm    "Small C+ CPC"
-                defb    0
-
 		INCLUDE "crt/classic/crt_runtime_selection.asm"
 
 		INCLUDE "crt/classic/crt_section.asm" 

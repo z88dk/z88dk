@@ -280,7 +280,6 @@ msxbios:
 	ei			; make sure interrupts are enabled
 	ret
 
-	defm	"Small C+ MSX"
 end:	defb	0
 
 	INCLUDE "crt/classic/crt_runtime_selection.asm"

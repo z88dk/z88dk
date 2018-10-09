@@ -170,8 +170,6 @@ l_dcal:
         jp      (hl)
 
 
-	defm  "Small C+ J.ACE"
-	defb  0
         INCLUDE "crt/classic/crt_runtime_selection.asm"
 
 ;---------------------------------------------------------------------------

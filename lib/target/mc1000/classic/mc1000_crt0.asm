@@ -342,9 +342,6 @@ irq_hndl:
 		ret
 
 
-        defm  "Small C+ MC1000"
-        defb   0
-
 		
 ; If we were given an address for the BSS then use it
 IF DEFINED_CRT_ORG_BSS

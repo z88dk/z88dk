@@ -86,8 +86,6 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 
 
 
-	defm    "Small C+ Alphatro"   ;Unnecessary file signature
-	defb    0
         INCLUDE "crt/classic/crt_runtime_selection.asm"
 
         defc    __crt_org_bss = CRT_ORG_BSS

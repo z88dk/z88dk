@@ -110,7 +110,6 @@ l_dcal:	jp	(hl)		;Used for function pointer calls
 
 
 
-	defm	"Small C+ PPS"	;Unnecessary file signature
 end:	defb	0
 
         INCLUDE "crt/classic/crt_runtime_selection.asm"
