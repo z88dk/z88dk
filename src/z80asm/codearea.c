@@ -613,6 +613,10 @@ void fwrite_codearea(const char *filename, FILE **pbinfile, FILE **prelocfile)
 						Str_append(new_name, section->name);
 
                         xfclose_remove_empty(*pbinfile);
+
+						if (opts.verbose)
+							printf("Creating binary '%s'\n", path_canon(get_bin_filename(Str_data(new_name))));
+
 						*pbinfile = xfopen(get_bin_filename(Str_data(new_name)), "wb");
 
 						if (*prelocfile) {

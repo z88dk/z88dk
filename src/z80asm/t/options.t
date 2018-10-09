@@ -34,10 +34,12 @@ my $verbose_text = <<'END';
 Reading library 'z80asm-z80-.lib'
 Predefined constant: __CPU_Z80__ = $0001
 Assembling 'test.asm' to 'test.o'
-Reading 'test.asm'
+Reading 'test.asm' = 'test.asm'
+Writing object file 'test.o'
 Module 'test' size: 3 bytes
 
 Code size: 3 bytes ($0000 to $0002)
+Creating binary 'test.bin'
 END
 
 for my $options ('-v', '--verbose') {

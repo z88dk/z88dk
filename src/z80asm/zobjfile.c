@@ -222,6 +222,10 @@ void write_obj_file(const char *source_filename )
 
 	/* open file */
 	obj_filename = get_obj_filename( source_filename );
+
+	if (opts.verbose)
+		printf("Writing object file '%s'\n", path_canon(obj_filename));
+
 	fp = xfopen( obj_filename, "wb" );
 
 	/* write header */

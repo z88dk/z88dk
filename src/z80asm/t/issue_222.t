@@ -107,10 +107,12 @@ z80asm($asm, "+zx -v", 0, <<'END');
 	Reading library 'z80asm-z80-.lib'
 	Predefined constant: __CPU_Z80__ = $0001
 	Assembling 'test.asm' to 'test.o'
-	Reading 'test.asm'
+	Reading 'test.asm' = 'test.asm'
+	Writing object file 'test.o'
 	Module 'test' size: 4 bytes
 
 	Code size: 4 bytes ($5CD0 to $5CD3)
+	Creating binary 'test.bin'
 	appmake +zx -b "test.bin" -o "test.tap" --org 23760
 END
 check_bin_file("test.bin", $bin);
@@ -244,10 +246,12 @@ z80asm($asm, "+zx81 -v", 0, <<'END', "");
 	Reading library 'z80asm-z80-.lib'
 	Predefined constant: __CPU_Z80__ = $0001
 	Assembling 'test.asm' to 'test.o'
-	Reading 'test.asm'
+	Reading 'test.asm' = 'test.asm'
+	Writing object file 'test.o'
 	Module 'test' size: 4 bytes
 
 	Code size: 4 bytes ($4082 to $4085)
+	Creating binary 'test.bin'
 	appmake +zx81 -b "test.bin" -o "test.P" --org 16514
 END
 check_bin_file("test.bin", $bin);

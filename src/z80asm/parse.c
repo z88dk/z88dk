@@ -486,13 +486,13 @@ bool parse_file(const char *filename)
 	int num_errors = get_num_errors();
 
 	ctx = ParseCtx_new();
-	if (opts.verbose)
-		printf("Reading '%s'\n", filename);	/* display name of file */
-
 	src_push();
 	{
 		if (src_open(filename, opts.inc_path))
 		{
+			if (opts.verbose)
+				printf("Reading '%s' = '%s'\n", path_canon(filename), path_canon(src_filename()));	/* display name of file */
+
 			sym.tok = TK_NIL;
 			while (sym.tok != TK_END)
 				parseline(ctx);				/* before parsing it */

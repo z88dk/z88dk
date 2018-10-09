@@ -873,7 +873,7 @@ static const char *check_library(const char *lib_name)
 		return lib_name;
 	
 	if (opts.verbose)
-		printf("Library '%s' not found\n", lib_name);
+		printf("Library '%s' not found\n", path_canon(lib_name));
 
 	return NULL;
 }

@@ -969,6 +969,9 @@ CreateBinFile( void )
         filename = get_bin_filename( get_first_module(NULL)->filename );		/* add '.bin' extension */
 
     /* binary output to filename.bin */
+	if (opts.verbose)
+		printf("Creating binary '%s'\n", path_canon(filename));
+
     binaryfile = xfopen( filename, "wb" );
 	inital_binaryfile = binaryfile;
 
