@@ -379,7 +379,7 @@ int cpc_exec(char* target)
         fclose(fpout);
 
         if (disk) {
-            return cpm_write_file_to_image("cpcsystem", NULL, filename, NULL, NULL);
+            return cpm_write_file_to_image("cpcsystem", "dsk", NULL, filename, NULL, NULL);
         }
     }
 

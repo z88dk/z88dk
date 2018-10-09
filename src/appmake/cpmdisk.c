@@ -154,6 +154,43 @@ void cpm_write_file(cpm_handle* h, char filename[11], void* data, size_t len)
     }
 }
 
+// Write a raw disk, no headers for tracks etc
+int cpm_write_raw(cpm_handle* h, const char* filename)
+{
+    size_t offs;
+    FILE* fp;
+    int i, j, s;
+    int track_length = h->spec.sector_size * h->spec.sectors_per_track;
+
+    if ((fp = fopen(filename, "wb")) == NULL) {
+        return -1;
+    }
+
+    for (i = 0; i < h->spec.tracks; i++) {
+        for (s = 0; s < h->spec.sides; s++) {
+            uint8_t* ptr;
+
+            if ( h->spec.alternate_sides == 0 ) {
+                offs = track_length * i + (s * track_length * h->spec.tracks);
+            } else {
+                offs = track_length * ( 2* i + s);
+            }
+            for (j = 0; j < h->spec.sectors_per_track; j++) {
+                 int sect = j; // TODO: Skew
+                 if ( h->spec.has_skew && i + (i*h->spec.sides) >= h->spec.skew_track_start ) {
+		     for ( sect = 0; sect < h->spec.sectors_per_track; sect++ ) {
+			if ( h->spec.skew_tab[sect] == j ) break;
+		     }
+                 }
+                 fwrite(h->image + offs + (sect * h->spec.sector_size), h->spec.sector_size, 1, fp);
+            }
+        }
+    }
+    fclose(fp);
+    return 0;
+}
+
+
 int cpm_write_edsk(cpm_handle* h, const char* filename)
 {
     uint8_t header[256] = { 0 };
