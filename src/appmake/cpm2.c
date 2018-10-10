@@ -163,8 +163,39 @@ static cpm_discspec nascom_spec = {
     .extent_size = 2048,
     .byte_size_extents = 1,
     .first_sector_offset = 1,
-  //  .alternate_sides = 1,
 };
+
+static cpm_discspec qc10_spec = {
+    .sectors_per_track = 10,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x3e,
+    .filler_byte = 0xe5,
+    .boottracks = 4,
+    .directory_entries = 64,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .alternate_sides = 1,
+};
+
+static cpm_discspec tiki100_spec = {
+    .sectors_per_track = 10,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x3e,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+};
+
+
+
 
 
 
@@ -185,6 +216,8 @@ struct formats {
     { "nascomcpm", "Nascom CPM",         &nascom_spec, 0, NULL, 1 },
     { "mz2500cpm", "Sharp MZ2500 - CPM", &mz2500cpm_spec, 0, NULL, 1 },
     { "osborne1",  "Osborne 1",          &osborne_spec, 0, NULL, 1 },
+    { "qc10",      "Epson QC-10, QX-10", &qc10_spec, 0, NULL, 1 },
+    { "tiki100-40t","Tiki 100 (200k)",   &tiki100_spec, 0, NULL, 1 },
     { NULL, NULL }
 };
 
