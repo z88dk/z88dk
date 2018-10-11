@@ -28,7 +28,8 @@ l_fast_utoa:
    dec h
    jr z, eight_bit
    
-   ld bc,-100+256
+;  ld bc,-100+256
+   ld c,0xff & (-100+256)
    push bc
    
    ld bc,-1000+256
