@@ -15,7 +15,7 @@
 ;; void stencil_add_side(int x1, int y1, int x2, int y2, unsigned char *stencil)
 
 
-		SECTION   code_clib
+		SECTION   code_graphics
                 PUBLIC    stencil_add_side
                 PUBLIC    _stencil_add_side
 

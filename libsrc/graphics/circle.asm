@@ -13,7 +13,7 @@
 ;Usage: circle(struct *pixels)
 
 
-                SECTION         code_clib
+                SECTION         code_graphics
                 PUBLIC    circle
                 PUBLIC    _circle
 

@@ -11,7 +11,7 @@
 ;
 
 
-        SECTION code_clib
+        SECTION code_graphics
                 PUBLIC    draw
                 PUBLIC    _draw
                 EXTERN     swapgfxbk

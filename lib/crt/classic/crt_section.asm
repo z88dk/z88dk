@@ -102,7 +102,9 @@ ENDIF
 		SECTION	code_font
 		SECTION	code_font_fzx
 		SECTION	code_z80
-
+IF !__crt_org_graphics
+		SECTION code_graphics
+ENDIF
 		SECTION code_user
 		SECTION rodata_fp
 		SECTION rodata_compiler
@@ -173,6 +175,9 @@ ENDIF
 		SECTION bss_clib
 		SECTION bss_string
 		SECTION bss_alloc_balloc
+IF !__crt_org_graphics
+		SECTION bss_graphics
+ENDIF
 		SECTION bss_user
 IF __crt_model > 0
         SECTION DATA
@@ -189,6 +194,14 @@ IF __crt_model > 0
 		SECTION DATA_END
 ENDIF
 		SECTION BSS_END
+
+IF __crt_org_graphics
+		SECTION	HIMEM
+		org	__crt_org_graphics
+		SECTION code_graphics
+		SECTION bss_graphics
+		SECTION HIMEM_END
+ENDIF
 
 
 IF CLIB_BALLOC_TABLE_SIZE > 0

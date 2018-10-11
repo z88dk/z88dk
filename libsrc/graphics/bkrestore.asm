@@ -6,7 +6,7 @@
 ;	$Id: bkrestore.asm,v 1.9 2017-01-02 21:51:24 aralbrec Exp $
 ;
 
-	SECTION	 code_clib
+	SECTION	 code_graphics
 	PUBLIC    bkrestore
 	PUBLIC    _bkrestore
 	EXTERN	pixeladdress

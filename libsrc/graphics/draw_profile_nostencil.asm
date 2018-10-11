@@ -11,7 +11,7 @@
 
 	INCLUDE	"graphics/grafix.inc"
 
-		SECTION	  code_clib
+		SECTION	  code_graphics
                 PUBLIC    draw_profile
                 PUBLIC    _draw_profile
 
@@ -441,7 +441,7 @@ is_areamode:
 	pop	hl
 	ret
 
-	SECTION		bss_clib
+	SECTION		bss_graphics
 _areaptr:	defw	0
 
 _percent:	defw	0

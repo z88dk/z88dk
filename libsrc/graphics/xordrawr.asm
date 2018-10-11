@@ -13,7 +13,7 @@
 ;Usage: xordrawr(struct *pixels)
 
 
-                SECTION         code_clib
+                SECTION         code_graphics
                 PUBLIC    xordrawr
                 PUBLIC    _xordrawr
                 EXTERN     swapgfxbk

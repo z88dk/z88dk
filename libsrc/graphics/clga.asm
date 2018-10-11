@@ -14,7 +14,7 @@
 
 
 
-                SECTION         code_clib
+                SECTION         code_graphics
                 PUBLIC    clga
                 PUBLIC    _clga
                 EXTERN     swapgfxbk

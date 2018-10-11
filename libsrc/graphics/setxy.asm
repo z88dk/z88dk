@@ -1,5 +1,5 @@
 	INCLUDE	"graphics/grafix.inc"
-        SECTION code_clib
+        SECTION code_graphics
 	PUBLIC	setxy
 
 	EXTERN	__gfx_coords

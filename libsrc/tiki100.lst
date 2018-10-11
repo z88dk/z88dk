@@ -19,6 +19,7 @@ graphics/lftscrol
 graphics/tiki100/swapgfxbk
 graphics/tiki100/w_putsprite
 graphics/tiki100/w_stencil_render
+graphics/tiki100/l_graphics_cmp
 graphics/draw_profile
 tiki100/gr_setpalette
 tiki100/gr_defmod

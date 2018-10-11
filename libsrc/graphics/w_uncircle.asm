@@ -12,7 +12,7 @@
 
 ;Usage: uncircle(struct *pixels)
 
-	SECTION   code_clib
+	SECTION   code_graphics
 	PUBLIC    uncircle
 	PUBLIC    _uncircle
 	EXTERN     w_draw_circle

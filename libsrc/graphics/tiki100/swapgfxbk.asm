@@ -13,11 +13,12 @@
 ;	$Id: swapgfxbk.asm,v 1.2 2017-01-02 22:57:59 aralbrec Exp $
 ;
 
-		PUBLIC    swapgfxbk
-      PUBLIC    _swapgfxbk
+	SECTION	code_graphics
+	PUBLIC	swapgfxbk
+	PUBLIC	_swapgfxbk
 
-		PUBLIC    swapgfxbk1
-      PUBLIC    _swapgfxbk1
+	PUBLIC	swapgfxbk1
+	PUBLIC	_swapgfxbk1
 
 
 
@@ -44,4 +45,14 @@
 
 
 
+	SECTION	code_crt_init
+	EXTERN	__BSS_END_tail
+	EXTERN	__HIMEM_head
+	EXTERN	__HIMEM_END_tail
+	ld	hl,__BSS_END_tail
+	ld	de,__HIMEM_head
+	ld	bc,__HIMEM_END_tail - __HIMEM_head
+	ldir
 
+
+; TODO: Copy graphics to high memory

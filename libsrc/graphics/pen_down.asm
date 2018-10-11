@@ -5,7 +5,7 @@
 ;       $Id: pen_down.asm $
 ;
 
-        SECTION   code_clib
+        SECTION   code_graphics
         PUBLIC    pen_down
         PUBLIC    _pen_down
 
@@ -19,7 +19,7 @@
 	ret
 
 	
-		SECTION		bss_clib
+		SECTION		bss_graphics
 		PUBLIC		__pen
 
 __pen:			defb		0	; leftmost bit: pen up/down

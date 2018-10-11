@@ -1,6 +1,7 @@
 ; libsrc/graphics/ts2068hr/w_pixladdr.asm
 ; posted by rdk77, 11/11/2010
 
+	SECTION	code_graphics
         PUBLIC    w_pixeladdress
 
         INCLUDE "graphics/grafix.inc"

@@ -13,7 +13,7 @@
 
 	INCLUDE	"graphics/grafix.inc"
 
-		SECTION         code_clib
+		SECTION         code_graphics
 
 		
 	PUBLIC    putc4x6
@@ -177,7 +177,7 @@
 		ret
 
 
-		SECTION		bss_clib
+		SECTION		bss_graphics
 
 	PUBLIC    x_4x6
 	PUBLIC    _x_4x6

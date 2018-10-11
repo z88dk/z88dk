@@ -1,6 +1,6 @@
 
 
-		SECTION		bss_clib
+		SECTION		bss_graphics
 		PUBLIC		__gfx_coords
 
 

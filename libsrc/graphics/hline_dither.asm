@@ -9,7 +9,7 @@
 ;	hline_dither(int x1, int y1, int x2, unsigned char intensity)
 ;
 
-	SECTION  code_clib
+	SECTION  code_graphics
 	PUBLIC	surface_hline_dither
 	PUBLIC	_surface_hline_dither
 	EXTERN	base_graphics

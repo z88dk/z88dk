@@ -6,7 +6,7 @@
 
 ;Usage: xorplot(struct *pixel)
 
-		SECTION	  code_clib
+		SECTION	  code_graphics
                 PUBLIC    xorplot
                 PUBLIC    _xorplot
                 EXTERN     swapgfxbk

@@ -15,7 +15,7 @@
 ;Result is true/false
 
 
-        SECTION code_clib
+        SECTION code_graphics
                 PUBLIC    point
                 PUBLIC    _point
 

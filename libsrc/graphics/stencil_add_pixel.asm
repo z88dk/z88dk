@@ -20,7 +20,7 @@
 
 
 	INCLUDE	"graphics/grafix.inc"
-		SECTION	  code_clib
+		SECTION	  code_graphics
                 PUBLIC    stencil_add_pixel
                 PUBLIC    _stencil_add_pixel
                 PUBLIC	stencil_ptr
@@ -48,5 +48,5 @@
 		ld	(hl),a
 		ret
 
-		SECTION   bss_clib
+		SECTION   bss_graphics
 .stencil_ptr	defw	0

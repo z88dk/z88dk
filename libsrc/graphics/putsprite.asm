@@ -9,7 +9,7 @@
 ; $Id: putsprite.asm,v 1.9 2016-07-02 09:01:35 dom Exp $
 ;
 
-        SECTION code_clib
+        SECTION code_graphics
 	PUBLIC    putsprite
 	PUBLIC    _putsprite
 	EXTERN	pixeladdress
@@ -179,6 +179,6 @@
          djnz     woloop
 	 jp       __graphics_end
 
-	SECTION bss_clib
+	SECTION bss_graphics
 .actcoord
 	 defw	0

@@ -14,7 +14,7 @@
 
 
 
-        SECTION code_clib
+        SECTION code_graphics
                 PUBLIC    unplot
                 PUBLIC    _unplot
                 EXTERN     swapgfxbk

@@ -20,13 +20,13 @@
 
 
 	INCLUDE	"graphics/grafix.inc"
-		SECTION   code_clib
+		SECTION   code_graphics
                 PUBLIC    stencil_add_pixel
                 PUBLIC    _stencil_add_pixel
                 PUBLIC	stencil_ptr
                 EXTERN	__gfx_coords
                 
-                EXTERN		l_cmp
+                EXTERN		l_graphics_cmp
 
 
 
@@ -34,13 +34,13 @@
 ._stencil_add_pixel
 		push    hl
 		ld      hl,maxy
-		call    l_cmp
+		call    l_graphics_cmp
 		pop     hl
 		ret     nc               ; Return if Y overflows
 
 		push    de
 		ld      de,maxx
-		call    l_cmp
+		call    l_graphics_cmp
 		pop     de
 		ret     c               ; Return if X overflows
 
@@ -56,7 +56,7 @@
 		ld	d,(hl)
 		dec hl
 		ex	(sp),hl		; X <-> ptr to stencil
-		call	l_cmp	; X > original X ?  [carry set if DE < HL]
+		call	l_graphics_cmp	; X > original X ?  [carry set if DE < HL]
 		ex	de,hl
 		pop hl			; ptr to stencil
 		jr	c,noplot
@@ -75,7 +75,7 @@
 		ld	d,(hl)
 		dec hl
 		ex	(sp),hl		; X <-> ptr to stencil
-		call	l_cmp	; X < original X ?   [carry set if DE < HL]
+		call	l_graphics_cmp	; X < original X ?   [carry set if DE < HL]
 		ex	de,hl
 		pop hl			; ptr to stencil
 		ret nc
@@ -84,5 +84,5 @@
 		ld	(hl),d
 		ret
 
-		SECTION  bss_clib
+		SECTION  bss_graphics
 .stencil_ptr	defw	0

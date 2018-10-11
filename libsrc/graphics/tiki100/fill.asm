@@ -1,4 +1,4 @@
-	SECTION code_clib
+	SECTION code_graphics
 	PUBLIC	fill
    PUBLIC   _fill
 	EXTERN	w_pixeladdress

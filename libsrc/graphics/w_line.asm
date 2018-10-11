@@ -1,6 +1,6 @@
 	INCLUDE	"graphics/grafix.inc"
 	
-        SECTION code_clib
+        SECTION code_graphics
 	PUBLIC	w_line
 
 	EXTERN	w_line_r

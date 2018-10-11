@@ -6,7 +6,7 @@
 ;	$Id: clg.asm,v 1.2 2016-07-02 09:01:36 dom Exp $
 ;
 
-	SECTION   code_clib
+	SECTION   code_graphics
         PUBLIC    clg
         PUBLIC    _clg
 		

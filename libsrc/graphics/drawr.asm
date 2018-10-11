@@ -13,7 +13,7 @@
 ;Usage: drawr(struct *pixels)
 
 
-                SECTION         code_clib
+                SECTION         code_graphics
                 PUBLIC    drawr
                 PUBLIC    _drawr
                 EXTERN     swapgfxbk
