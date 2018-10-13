@@ -32,9 +32,12 @@ _gr_setpalette:
 	push	hl
 	push	bc
 
-	ld	b,e
-	ld	d,0
+	ld	d,e		; Number of colours
+	ld	b,0		; Current position
+
+	ld	a,e
 set_loop:
+	push	af
 	ld	a,(hl)
 	inc	hl
 	push	bc
@@ -44,8 +47,10 @@ set_loop:
 	pop	hl
 	pop	de
 	pop	bc
-	inc	d
-	djnz	set_loop
+	inc	b
+	pop	af
+	dec	a
+	jr	nz,set_loop
 
 	ret
 	
@@ -59,42 +64,38 @@ set_loop:
 ;
 ; Input:
 ; 	A = Palette
-; 	D = Position
-; 	E = Size
+; 	B = Position
+;	D = number of colours
 ;
 .do_set
-	ld	hl,($F04D)
-	cpl				; complement color value
-	ld	c,a
-	di
-	LD	A,(hl)			; Make sure it's not writing to palette when the palette is updated, just in case
-	and	$7F
-	OUT	($0C),A
-	ld	b,$20			; Wait a bit
-.wait_loop2
-	djnz	wait_loop2
-	ld	a,c			; Store palette to be written
-	ld	(hl),a
-	OUT	($14),A
-	ei
+	cpl
+        LD E,A
+	ld	hl,$f04d
 .palette_loop
-	DI
-	LD	a,(hl)			; Prepare graphics port
+        PUSH DE
+        LD A,E
+        DI
+        OUT ($14),A             ; Palette register (prepare the color to be loaded)
+        OUT ($14),A             ; Palette register (do it again to be sure)
+	ld	a,(hl)
 	and	$30
-	or	b			; palette position
-	ld	c,a
-	or	$80
-	OUT	($0C),A			; Enable writing to palette at end of this scanline
-	LD	b,$20			; wait for HBLANK to get the color copied in the requested palette position
-.wait_loop
-	djnz	wait_loop
-	ld	a,c
-	LD	(hl),a			; graphics port might have changed, so update corresponding data in RAM
-	OUT	($0C),A			; disable writes to the palette
-	EI
-	ld	a,d			; move to next palette position for this color and palette size
-	add	a,e
+	add	b
 	ld	d,a
-	CP	16
-	JR	C,palette_loop
-	RET
+	or	$80
+        OUT ($0C),A             ; set graphics mode enabling graphics
+        LD C,0
+.wait_loop
+        DEC C
+        JP NZ,wait_loop         ; wait for HBLANK to get the color copied in the requested palette position
+        LD A,D
+        OUT ($0C),A                     ; set graphics mode
+        EI
+        POP DE
+        LD A,B
+        ADD D                   ; move to next palette position
+        LD B,A
+        CP 16
+        JR C,palette_loop
+        RET
+
+
