@@ -7,9 +7,10 @@
 		PUBLIC		generic_console_set_paper
 		PUBLIC		generic_console_set_inverse
 		PUBLIC		generic_console_printc
-		PUBLIC		generic_console_vpeek
 		PUBLIC		generic_console_scrollup
 		PUBLIC		generic_console_setup_mode
+		PUBLIC		generic_console_get_mode
+		PUBLIC		generic_console_xypos
 
 		EXTERN		generic_console_font32
 		EXTERN		generic_console_udg32
@@ -78,14 +79,14 @@ not_udg:
 	ld	bc,8
 	ldir
 	pop	bc
-	call	xypos		;hl = screenposition
+	call	generic_console_xypos		;hl = screenposition
 	pop	de		;de = character buffer
 	ld	a,(generic_console_flags)
 	rlca	
 	sbc	a
 	ld	c,a
 	call	swapgfxbk
-	call	get_mode
+	call	generic_console_get_mode
 	ex	af,af
 	ld	b,8
 printc_1:
@@ -220,14 +221,14 @@ is_paper_MODE3:
 
 
 
-xypos:
+generic_console_xypos:
 	; Each character row is 128 x 8 bytes
 	push	af
 	ld	h,b	;x256
 	ld	l,0	
 	add	hl,hl	;x512
 	add	hl,hl	;x1024
-	call	get_mode
+	call	generic_console_get_mode
 	dec	a
 	jr	z,done		;mode 1	; 1024x256x2
 	sla	c
@@ -241,10 +242,6 @@ done:
 	ret
 	
 
-
-generic_console_vpeek:
-	scf
-	ret
 
 generic_console_scrollup:
 	push	bc
@@ -266,7 +263,7 @@ generic_console_scrollup:
 	ret
 
 
-get_mode:
+generic_console_get_mode:
 	ld	a,(PORT_0C_COPY)
 	rrca
 	rrca
@@ -343,4 +340,6 @@ __MODE3_attr:	defb	@00001111, 0
         rrca
         and     3
 	call	generic_console_setup_mode
+	ld	a,201
+	ld	(CURSOR_BLINK_VECTOR),a
 
