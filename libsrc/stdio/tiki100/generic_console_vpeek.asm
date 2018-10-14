@@ -120,7 +120,33 @@ not_set:
 
 vpeek_MODE3:
 	ex	af,af
-	xor	a
+	push	de
+	ld	c,0	;resulting byte
+	ld	d,@00000001	
+	ld	b,4
+vpeek_MODE3_0:
+	ld	a,(hl)
+	and	15
+	jr	z,right_nibble
+	ld	a,c
+	or	d
+	ld	c,a
+right_nibble:
+	sla	d
+	ld	a,(hl)
+	and	240
+	jr	z,vpeek_MODE3_loop
+	ld	a,c
+	or	d
+	ld	c,a
+vpeek_MODE3_loop:
+	sla	d
+	inc	hl
+	djnz	vpeek_MODE3_0
+	ld	a,c
+	ld	bc,124
+	add	hl,bc
+	pop	de
 	ex	af,af
 	ret
 
