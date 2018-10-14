@@ -26,4 +26,5 @@ tiki100/gr_defmod
 tiki100/gr_scroll
 stdio/tiki100/CRT_FONT
 stdio/tiki100/generic_console
+stdio/tiki100/generic_console_ioctl
 @font/font_8x8/font_8x8.lst

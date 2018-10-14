@@ -2,7 +2,6 @@
 
 		SECTION		code_himem
 
-		PUBLIC		generic_console_ioctl
 		PUBLIC		generic_console_cls
 		PUBLIC		generic_console_set_ink
 		PUBLIC		generic_console_set_paper
@@ -10,22 +9,19 @@
 		PUBLIC		generic_console_printc
 		PUBLIC		generic_console_vpeek
 		PUBLIC		generic_console_scrollup
+		PUBLIC		generic_console_setup_mode
 
 		EXTERN		generic_console_font32
 		EXTERN		generic_console_udg32
 		EXTERN		generic_console_flags
+		EXTERN		__console_w
 
-		EXTERN		gr_defmod
-		EXTERN		gr_vscroll_abs
 		EXTERN		gr_setpalette
 		EXTERN		swapgfxbk
 		EXTERN		swapgfxbk1
-		EXTERN		clg
 
 		INCLUDE		"target/cpm/def/tiki100.def"
 
-generic_console_ioctl:
-	scf
 generic_console_set_inverse:
 	ret
 
@@ -44,30 +40,14 @@ generic_console_set_paper:
 	ret
 
 generic_console_cls:
-IF 0
-	call	clg
-	ret
-ELSE
-IF 0
-	ld	hl,1
-	call	gr_defmod
-	ld	hl,2
-	push	hl
-	ld	hl,palette
-	push	hl
-	call	gr_setpalette
-	pop	bc
-	pop	bc
-ENDIF
 	call	swapgfxbk
 	ld	hl,0
 	ld	de,1
 	ld	bc,32768
-	ld	(hl),0
+	ld	(hl),0		; TODO - as colour??
 	ldir
 	call	swapgfxbk1
 	ret
-ENDIF
 
 ; c = x
 ; b = y
@@ -295,8 +275,37 @@ get_mode:
 	and	3
 	ret
 
+	SECTION	code_clib
+
+; Entry: a = mode
+generic_console_setup_mode:
+	ld	c, 128
+	ld	de,2
+	ld	hl,palette_MODE1
+	and	a
+	jr	z,set_columns	;0
+	dec	a
+	jr	z,set_columns	;1
+	ld	hl,palette
+	ld	de,16
+	ld	c,64
+	dec	a
+	jr	z,set_columns	;2
+	ld	c,32		;3
+set_columns:
+	ld	a,c
+	ld	(__console_w),a
+	push	de	;number of colours
+	push	hl	;palette
+	call	gr_setpalette
+	pop	bc
+	pop	bc
+	ret
 
 	SECTION	rodata_clib
+
+palette_MODE1:
+	defb	0, 255
 
 palette:
 	;        RRRGGGBB
@@ -318,6 +327,8 @@ palette:
 	defb	@11111111	;WHITE
 
 
+
+
 	SECTION	data_himem
 __MODE2_attr:	defb	@00000011, 0
 __MODE3_attr:	defb	@00001111, 0
@@ -325,11 +336,11 @@ __MODE3_attr:	defb	@00001111, 0
 
 
 	SECTION	code_crt_init
+        ld      a,(PORT_0C_COPY)
+        rrca
+        rrca
+        rrca
+        rrca
+        and     3
+	call	generic_console_setup_mode
 
-	ld	hl,16
-	push	hl
-	ld	hl,palette
-	push	hl
-	call	gr_setpalette
-	pop	bc
-	pop	bc

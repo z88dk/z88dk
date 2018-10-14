@@ -1,0 +1,6 @@
+;
+; Extra definitions for the TIKI100
+;
+
+
+	defc		PORT_0C_COPY = $F04D
