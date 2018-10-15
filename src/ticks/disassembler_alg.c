@@ -296,7 +296,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen)
                             else if ( p == 1 ) BUF_PRINTF("%-8s(de),a","ld");
                             else if ( p == 2 && !isgbz80()) BUF_PRINTF("%-8s(%s),%s","ld", handle_addr16(state, opbuf1, sizeof(opbuf1)), handle_hl(state->index));
                             else if ( p == 2 && isgbz80() ) BUF_PRINTF("%-8s(hl+),a","ld");
-                            else if ( p == 3 && !isgbz80() ) BUF_PRINTF("%-8s (%s),a","ld", handle_addr16(state, opbuf1, sizeof(opbuf1)));
+                            else if ( p == 3 && !isgbz80() ) BUF_PRINTF("%-8s(%s),a","ld", handle_addr16(state, opbuf1, sizeof(opbuf1)));
                             else if ( p == 3 && isgbz80() ) BUF_PRINTF("%-8s(hl-),a","ld");                            
                         } else if ( q == 1 ) {
                             if ( p == 0 ) BUF_PRINTF("%-8sa,(bc)","ld");
