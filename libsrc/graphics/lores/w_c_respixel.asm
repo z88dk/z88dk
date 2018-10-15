@@ -5,7 +5,7 @@
 
 
 
-        SECTION code_clib
+        SECTION code_graphics
 	PUBLIC	c_respixel
         defc    NEEDunplot = 1
 

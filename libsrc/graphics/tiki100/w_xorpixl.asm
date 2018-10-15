@@ -5,10 +5,10 @@
 
 
         SECTION code_graphics
-	PUBLIC	c_xorpixel
+	PUBLIC	w_xorpixel
         defc    NEEDxor = 1
 
 
 
-.c_xorpixel			
-	INCLUDE "c_pixel.asm"
+.w_xorpixel			
+	INCLUDE "w_pixel.asm"

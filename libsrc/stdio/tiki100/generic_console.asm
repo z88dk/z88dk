@@ -2,20 +2,21 @@
 
 		SECTION		code_himem
 
-		PUBLIC		generic_console_cls
 		PUBLIC		generic_console_set_ink
 		PUBLIC		generic_console_set_paper
 		PUBLIC		generic_console_set_inverse
 		PUBLIC		generic_console_printc
 		PUBLIC		generic_console_scrollup
-		PUBLIC		generic_console_setup_mode
-		PUBLIC		generic_console_get_mode
 		PUBLIC		generic_console_xypos
 
 		EXTERN		generic_console_font32
 		EXTERN		generic_console_udg32
 		EXTERN		generic_console_flags
+		EXTERN		generic_console_get_mode
 		EXTERN		__console_w
+
+		EXTERN		__MODE2_attr
+		EXTERN		__MODE3_attr
 
 		EXTERN		gr_setpalette
 		EXTERN		swapgfxbk
@@ -23,14 +24,13 @@
 
 		INCLUDE		"target/cpm/def/tiki100.def"
 
-generic_console_set_inverse:
-	ret
 
 generic_console_set_ink:
 	and	15
 	ld	(__MODE3_attr),a
 	and	3
 	ld	(__MODE2_attr),a
+generic_console_set_inverse:
 	ret
 
 generic_console_set_paper:
@@ -40,15 +40,6 @@ generic_console_set_paper:
 	ld	(__MODE2_attr + 1),a
 	ret
 
-generic_console_cls:
-	call	swapgfxbk
-	ld	hl,0
-	ld	de,1
-	ld	bc,32768
-	ld	(hl),0		; TODO - as colour??
-	ldir
-	call	swapgfxbk1
-	ret
 
 ; c = x
 ; b = y
@@ -262,84 +253,4 @@ generic_console_scrollup:
 	pop	bc
 	ret
 
-
-generic_console_get_mode:
-	ld	a,(PORT_0C_COPY)
-	rrca
-	rrca
-	rrca
-	rrca	
-	and	3
-	ret
-
-	SECTION	code_clib
-
-; Entry: a = mode
-generic_console_setup_mode:
-	ld	c, 128
-	ld	de,2
-	ld	hl,palette_MODE1
-	and	a
-	jr	z,set_columns	;0
-	dec	a
-	jr	z,set_columns	;1
-	ld	hl,palette
-	ld	de,16
-	ld	c,64
-	dec	a
-	jr	z,set_columns	;2
-	ld	c,32		;3
-set_columns:
-	ld	a,c
-	ld	(__console_w),a
-	push	de	;number of colours
-	push	hl	;palette
-	call	gr_setpalette
-	pop	bc
-	pop	bc
-	ret
-
-	SECTION	rodata_clib
-
-palette_MODE1:
-	defb	0, 255
-
-palette:
-	;        RRRGGGBB
-	defb	@00000000	;BLACK
-	defb	@00000010	;BLUE
-	defb	@00010100	;GREEN
-	defb	@00010110	;CYAN
-	defb	@10000000	;RED
-	defb	@10000011	;MAGENTA
-	defb	@10100100	;BROWN?
-	defb	@11011001	;LIGHT GREY
-	defb	@00101001	;DARK GREY
-	defb	@00000011	;LIGHT BLUE
-	defb	@00011100	;LIGHT GREEN
-	defb	@00011111	;LIGHT CYAN
-	defb	@11100000	;LIGHT RED
-	defb	@11100011	;LIGHT MAGENTA
-	defb	@11111100	;YELLOW
-	defb	@11111111	;WHITE
-
-
-
-
-	SECTION	data_himem
-__MODE2_attr:	defb	@00000011, 0
-__MODE3_attr:	defb	@00001111, 0
-
-
-
-	SECTION	code_crt_init
-        ld      a,(PORT_0C_COPY)
-        rrca
-        rrca
-        rrca
-        rrca
-        and     3
-	call	generic_console_setup_mode
-	ld	a,201
-	ld	(CURSOR_BLINK_VECTOR),a
 

@@ -6,10 +6,10 @@
 
 
         SECTION code_graphics
-	PUBLIC	c_respixel
+	PUBLIC	w_respixel
         defc    NEEDunplot = 1
 
 
-.c_respixel			
-	INCLUDE "c_pixel.asm"
+.w_respixel			
+	INCLUDE "w_pixel.asm"
 
