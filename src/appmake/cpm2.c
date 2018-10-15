@@ -207,7 +207,7 @@ struct formats {
      void          *bootsector;
      char           force_com_extension;
 } formats[] = {
-    { "attache",   "Otrone Attache",     &attache_spec, 0, NULL, 1 },
+    { "attache",   "Otrona Attache'",     &attache_spec, 0, NULL, 1 },
     { "cpcsystem", "CPC System Disc",    &cpcsystem_spec, 0, NULL, 0 },
     { "dmv",       "NCR Decision Mate",  &dmv_spec, 16, "\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5NCR F3", 1 },
     { "einstein",  "Tatung Einstein",    &einstein_spec, 0, NULL, 1 },

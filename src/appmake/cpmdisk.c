@@ -241,11 +241,11 @@ int cpm_write_edsk(cpm_handle* h, const char* filename)
                 *ptr++ = i; // Track
                 *ptr++ = s; // Side
                 if ( 0 && h->spec.has_skew && i + (i*h->spec.sides) >= h->spec.skew_track_start ) {
-                    *ptr++ = h->spec.skew_tab[j] + h->spec.first_sector_offset; // Secotr ID
+                    *ptr++ = h->spec.skew_tab[j] + h->spec.first_sector_offset; // Sector ID
                 } else if (  i + (i*h->spec.sides) <= h->spec.boottracks && h->spec.boot_tracks_sector_offset ) {
-                    *ptr++ = j + h->spec.boot_tracks_sector_offset; // Secotr ID
+                    *ptr++ = j + h->spec.boot_tracks_sector_offset; // Sector ID
                 } else {
-                    *ptr++ = j + h->spec.first_sector_offset; // Secotr ID
+                    *ptr++ = j + h->spec.first_sector_offset; // Sector ID
                 }
                 *ptr++ = sector_size;
                 *ptr++ = 0; // FDC status register 1
