@@ -199,7 +199,11 @@ IF __crt_org_graphics
 		SECTION	HIMEM
 		org	__crt_org_graphics
 		SECTION code_graphics
+		SECTION code_himem
+		SECTION data_himem
+		SECTION data_graphics
 		SECTION bss_graphics
+		SECTION bss_himem
 		SECTION HIMEM_END
 ENDIF
 
