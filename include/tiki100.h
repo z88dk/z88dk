@@ -18,11 +18,6 @@
 #include <psg.h>
 
 
-/* If in CP/M mode (the only existing mode, ATM), exclude the global definitions for GFX lib */
-#pragma output nogfxglobals
-
-
-
 /* 
 	Set graphics mode 
 		0 = Freeze dot-clock (one-pixel display)
@@ -31,6 +26,8 @@
 		3 = 256x256x16
 */
 extern void __LIB__  gr_defmod(int mode) __z88dk_fastcall;
+
+extern int __LIB__ gr_getmod(void);
 
 /* 
 	Set color palette ('len' must be a fraction of 16)

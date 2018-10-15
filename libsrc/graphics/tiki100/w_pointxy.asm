@@ -6,10 +6,10 @@
 
 
         SECTION code_graphics
-	PUBLIC	c_pointxy
+	PUBLIC	w_pointxy
         defc    NEEDpoint= 1
 
 
-.c_pointxy			
-	INCLUDE "w_c_pixel.asm"
+.w_pointxy			
+	INCLUDE "w_pixel.asm"
 

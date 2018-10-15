@@ -4,12 +4,12 @@
 
 
         SECTION code_graphics
-	PUBLIC	c_plotpixel
+	PUBLIC	w_plotpixel
 	defc	NEEDplot = 1
 
 
-.c_plotpixel			
-	INCLUDE "w_c_pixel.asm"
+.w_plotpixel			
+	INCLUDE "w_pixel.asm"
 
 
 
