@@ -12,7 +12,7 @@
 	INCLUDE	"graphics/grafix.inc"
 
 
-		SECTION	  code_clib
+		SECTION	  code_graphics
                 PUBLIC    draw_profile
                 PUBLIC    _draw_profile
 
@@ -466,7 +466,7 @@ resize:
 
 IF (maxx > 256)
 
-	;EXTERN  l_cmp
+	;EXTERN  l_graphics_cmp
 	; TODO
 	ret
 
@@ -537,7 +537,7 @@ is_areamode:
 ;	djnz lbottom
 ;	ret
 
-	SECTION	bss_clib
+	SECTION	bss_graphics
 
 _areaptr:	defw	0
 

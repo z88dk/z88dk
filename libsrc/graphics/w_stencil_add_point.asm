@@ -14,7 +14,7 @@
 ;; void stencil_add_point(int x, int y, unsigned char *stencil)
 
 
-		SECTION   code_clib
+		SECTION   code_graphics
                 PUBLIC    stencil_add_point
                 PUBLIC    _stencil_add_point
 

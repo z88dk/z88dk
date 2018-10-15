@@ -35,9 +35,10 @@ _gr_defmod:
 	ld	hl,$F04D
 	DI
 	ld	a,(hl)
-	and	$CF
+	and	$4F
 	or	b
 	LD	(hl),A		; Video port: copy of the value sent to the video port address 0CH
+	OUT	($0C),A		; set graphics mode
 	OUT	($0C),A		; set graphics mode
 	EI
 	RET

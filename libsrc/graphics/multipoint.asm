@@ -12,7 +12,7 @@
 ;pick a vertical or horizontal bit bar, up to 16 bits long
 
 
-        SECTION code_clib
+        SECTION code_graphics
                 PUBLIC    multipoint
                 PUBLIC    _multipoint
 

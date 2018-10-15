@@ -5,7 +5,7 @@
 ;       $Id: pen_up.asm $
 ;
 
-        SECTION   code_clib
+        SECTION   code_graphics
         PUBLIC    pen_up
         PUBLIC    _pen_up
         

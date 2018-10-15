@@ -13,11 +13,11 @@
 
 	INCLUDE	"graphics/grafix.inc"
 
-	SECTION code_clib
+	SECTION code_graphics
 	PUBLIC	stencil_render
 	PUBLIC	_stencil_render
 	EXTERN	dither_pattern
-	;EXTERN	l_cmp
+	;EXTERN	l_graphics_cmp
 
 	;EXTERN swapgfxbk
 	EXTERN w_pixeladdress

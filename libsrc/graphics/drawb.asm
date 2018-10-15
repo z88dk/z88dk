@@ -10,7 +10,7 @@
 ;
 
 
-                SECTION         code_clib
+                SECTION         code_graphics
                 PUBLIC    drawb
                 PUBLIC    _drawb
 

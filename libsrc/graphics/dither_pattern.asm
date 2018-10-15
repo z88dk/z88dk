@@ -9,7 +9,7 @@
 ;	$Id: dither_pattern.asm,v 1.3 2016-04-22 20:17:17 dom Exp $
 ;
 
-	SECTION  code_clib
+	SECTION  code_graphics
 	PUBLIC	dither_pattern
 	
 .dither_pattern

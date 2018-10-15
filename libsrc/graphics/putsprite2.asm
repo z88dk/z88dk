@@ -13,7 +13,7 @@
 ;
 
 
-        SECTION code_clib
+        SECTION code_graphics
 	PUBLIC    putsprite
 	PUBLIC    _putsprite
 

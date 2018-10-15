@@ -9,7 +9,7 @@
 ; $Id: w_putsprite.asm,v 1.5 2017-01-02 22:57:59 aralbrec Exp $
 ;
 
-		SECTION code_clib
+	SECTION code_graphics
         PUBLIC    putsprite
         PUBLIC    _putsprite
         EXTERN    w_pixeladdress

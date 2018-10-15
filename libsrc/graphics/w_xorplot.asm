@@ -12,7 +12,7 @@
 
 ;Usage: xorplot(int x, int y)
 
-		SECTION   code_clib
+		SECTION   code_graphics
                 PUBLIC    xorplot
                 PUBLIC    _xorplot
                 EXTERN     swapgfxbk

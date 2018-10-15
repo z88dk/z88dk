@@ -5,7 +5,7 @@
 ;       $Id: w_move.asm $
 ;
 
-        SECTION code_clib
+        SECTION code_graphics
 			PUBLIC    move
 			PUBLIC    _move
 			EXTERN     swapgfxbk

@@ -14,7 +14,7 @@
 ;; void stencil_add_liner(int dx, int dy, unsigned char *stencil)
 
 
-		SECTION	  code_clib
+		SECTION	  code_graphics
                 PUBLIC    stencil_add_liner
                 PUBLIC    _stencil_add_liner
 

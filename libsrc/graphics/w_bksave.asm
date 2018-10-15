@@ -6,7 +6,7 @@
 ;	$Id: w_bksave.asm $
 ;
 
-	SECTION	  code_clib
+	SECTION	  code_graphics
 	PUBLIC    bksave
 	PUBLIC    _bksave
 	EXTERN	w_pixeladdress

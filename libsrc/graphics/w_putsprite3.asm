@@ -13,7 +13,7 @@
 ; $Id: w_putsprite3.asm,v 2017 - Stefano Exp $
 ;
 
-	SECTION code_clib
+	SECTION code_graphics
 	PUBLIC    putsprite
    PUBLIC    _putsprite
 
@@ -273,7 +273,7 @@
 	ret
 
 
-	SECTION  bss_clib
+	SECTION  bss_graphics
 .oldx
          defw   0
 

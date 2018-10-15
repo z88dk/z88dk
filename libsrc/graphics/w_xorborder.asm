@@ -8,7 +8,7 @@
 ;
 
 	INCLUDE "graphics/grafix.inc"
- 	SECTION code_clib
+ 	SECTION code_graphics
 	PUBLIC	xorborder
 	PUBLIC	_xorborder
 

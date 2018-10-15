@@ -1,6 +1,6 @@
 
 
-		SECTION		code_clib
+		SECTION		code_graphics
 		PUBLIC		__graphics_end
 
 		EXTERN		swapgfxbk1

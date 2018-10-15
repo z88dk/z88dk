@@ -228,7 +228,7 @@ long get_org_addr(char *crtfile)
 
 FILE *fopen_bin(const char *fname,const  char *crtfile)
 {
-    FILE   *fcode = NULL, *fdata = NULL, *fin = NULL;
+    FILE   *fcode = NULL, *fdata = NULL, *fin = NULL, *fhimem = NULL;
     char    name[FILENAME_MAX+1];
     char    tname[FILENAME_MAX+1];
     char    cmdline[FILENAME_MAX*2 + 128];
@@ -290,8 +290,13 @@ FILE *fopen_bin(const char *fname,const  char *crtfile)
         strcpy(name, fname);
         suffix_change(name, "_DATA.bin");
         if ( stat(name, &st_file2) < 0 ) {
-             /* Nope, everything was all in one file */
-             return fcode;
+             /* What about having a _HIMEM.bin file? */
+             strcpy(name, fname);
+             suffix_change(name, "_HIMEM.bin");
+             if ( stat(name, &st_file2) < 0 ) {
+                 /* Nope, everything was all in one file */
+                 return fcode;
+             }
         }
     } else {
         // new c lib compile
@@ -311,7 +316,7 @@ FILE *fopen_bin(const char *fname,const  char *crtfile)
 
     // 0: ram model, complete binary is "*_CODE.bin"
 
-    if (crt_model == 0) return fcode;
+    //if (crt_model == 0) return fcode;
 
     // form complete binary
 
@@ -338,7 +343,7 @@ FILE *fopen_bin(const char *fname,const  char *crtfile)
         if ((fdata = fopen(name, "rb")) == NULL)
             exit_log(1, "ERROR: File %s not found for a rom model compile\n", name);
 
-    } else {
+    } else if ( crt_model == 2 ) {
 
         // 2: compressed rom model, complete binary is "*_CODE.bin" + zx7("*_DATA.bin")
 
@@ -353,9 +358,21 @@ FILE *fopen_bin(const char *fname,const  char *crtfile)
 
     }
 
-    while ((c = fgetc(fdata)) != EOF)
-        fputc(c, fin);
-    fclose(fdata);
+    if ( fdata != NULL ) {
+        while ((c = fgetc(fdata)) != EOF)
+            fputc(c, fin);
+        fclose(fdata);
+    }
+
+    // If we have a HIMEM then append it as well
+    strcpy(name, fname);
+    suffix_change(name, "_HIMEM.bin");
+    if ( ( fhimem = fopen(name, "rb")) != NULL ) {
+        while ((c = fgetc(fhimem)) != EOF)
+            fputc(c, fin);
+        fclose(fhimem);
+    }
+
 
     // return complete binary file
 
