@@ -99,6 +99,9 @@ extern option_t  lynx_options;
 extern int       m5_exec(char *target);
 extern option_t  m5_options;
 
+extern int       mameql_exec(char *target);
+extern option_t  mameql_options;
+
 extern int       mc_exec(char *target);
 extern option_t  mc_options;
 
@@ -116,6 +119,7 @@ extern option_t  mz_options;
 
 extern int       mz2500_exec(char *target);
 extern option_t  mz2500_options;
+
 extern int       nascom_exec(char *target);
 extern option_t  nascom_options;
 
@@ -294,6 +298,10 @@ struct {
       "Generates a tape file for the Sord M5, optional WAV file",
       NULL,
       m5_exec,   &m5_options },
+    { "bin2mql",   "mameql",  "(C) 2018 dom",
+      "Create a Mame quickload file (z80bin)",
+      NULL,
+      mameql_exec,   &mameql_options },
     { "mc1000",   "mc",      "(C) 2013 Stefano Bodrato",
       "Generates a CAS file for the CCE MC-1000, optional WAV file",
       NULL,

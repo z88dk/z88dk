@@ -182,6 +182,7 @@
     <ClCompile Include="..\..\src\appmake\kc.c" />
     <ClCompile Include="..\..\src\appmake\lynx.c" />
     <ClCompile Include="..\..\src\appmake\m5.c" />
+    <ClCompile Include="..\..\src\appmake\mameql.c" />
     <ClCompile Include="..\..\src\appmake\mc.c" />
     <ClCompile Include="..\..\src\appmake\msx.c" />
     <ClCompile Include="..\..\src\appmake\mtx.c" />
