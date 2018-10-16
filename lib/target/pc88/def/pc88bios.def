@@ -29,6 +29,10 @@ defc BREAKX = $35C2 ; Check the status of the Control-STOP key.
 
 defc BEEP   = $3E9B ; Sounds the buffer
 
+; Misc routines
+defc ISFLIO = $5372 ; Tests if I/O to device is taking place
+;; defc CALBAS = $ ; Executes inter-slot call to the routine in BASIC interpreter
+
 
 
 lston
