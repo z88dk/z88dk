@@ -2,9 +2,6 @@
 
 		SECTION		code_himem
 
-		PUBLIC		generic_console_set_ink
-		PUBLIC		generic_console_set_paper
-		PUBLIC		generic_console_set_inverse
 		PUBLIC		generic_console_printc
 		PUBLIC		generic_console_scrollup
 		PUBLIC		generic_console_xypos
@@ -23,22 +20,6 @@
 		EXTERN		swapgfxbk1
 
 		INCLUDE		"target/cpm/def/tiki100.def"
-
-
-generic_console_set_ink:
-	and	15
-	ld	(__MODE3_attr),a
-	and	3
-	ld	(__MODE2_attr),a
-generic_console_set_inverse:
-	ret
-
-generic_console_set_paper:
-	and	15
-	ld	(__MODE3_attr + 1),a
-	and	3
-	ld	(__MODE2_attr + 1),a
-	ret
 
 
 ; c = x

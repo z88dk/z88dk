@@ -36,6 +36,8 @@ stdio/tiki100/generic_console
 stdio/tiki100/generic_console_cls
 stdio/tiki100/generic_console_ioctl
 stdio/tiki100/generic_console_vpeek
+stdio/tiki100/generic_console_set_ink
+stdio/tiki100/generic_console_set_paper
 stdio/tiki100/generic_console_get_mode
 stdio/tiki100/conio_vars
 @font/font_8x8/font_8x8.lst
