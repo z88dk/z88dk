@@ -243,7 +243,7 @@ double CalcStand(
     else if (oper == zand)
         return ((unsigned int)left & (unsigned int)right);
     else if (oper == mult)
-        return ((unsigned int)left * (unsigned int)right);
+        return (left * right);
     else if (oper == asl) {
         if ( ((left_kind == KIND_INT || left_kind == KIND_CHAR) && right >= 16) ||
              (left_kind == KIND_LONG && right >= 32) ) {
