@@ -1,3 +1,6 @@
+stdio/inkey/fgetc_cons
+stdio/inkey/getk
 stdio/super80/generic_console
+@input/input_keyboard.lst
 @stdio/stdio.lst
 @z80.lst
