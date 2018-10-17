@@ -27,7 +27,7 @@ all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	trs80_clib.lib vg5k_clib.lib vz_clib.lib  x07_clib.lib \
 	embedded_clib.lib test_clib.lib testrcm_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
 	pv1000_clib.lib pv2000_clib.lib coleco_clib.lib multi8_clib.lib alphatro_clib.lib  spc1000_clib.lib \
-	laser500_clib.lib super80_clib.lib \
+	laser500_clib.lib super80_clib.lib super80_vduem_clib.lib \
 	preempt.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib gendos.lib ndos.lib  \
@@ -926,6 +926,15 @@ super80_clib.lib:
 	$(MAKE) gfxdeps
 	$(call buildgeneric,super80)
 	TARGET=super80 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsuper80 -x$(OUTPUT_DIRECTORY)/super80_clib @$(LISTFILE_DIRECTORY)/super80.lst
+
+super80_vduem_clib.lib:
+	@echo ''
+	@echo '--- Building Super80 VDUEM Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(call buildgeneric,super80)
+	TARGET=super80 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsuper80 -x$(OUTPUT_DIRECTORY)/super80_vduem_clib @$(LISTFILE_DIRECTORY)/super80_vduem.lst
+
 
 
 

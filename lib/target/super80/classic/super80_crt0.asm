@@ -22,8 +22,6 @@
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
-        defc    CONSOLE_COLUMNS = 32
-        defc    CONSOLE_ROWS = 16
 
 
         defc    TAR__no_ansifont = 1
