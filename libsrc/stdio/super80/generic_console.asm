@@ -43,7 +43,7 @@ generic_console_ioctl:
 generic_console_set_inverse:
 	ret
 
-generic_console_set_ink:
+generic_console_set_paper:
 	and	15
 	rla
 	rla
@@ -57,7 +57,7 @@ generic_console_set_ink:
 	ret
 
 	
-generic_console_set_paper:
+generic_console_set_ink:
 	and	15
 	ld	e,a
 	ld	a,(__super80_attr)
@@ -87,7 +87,7 @@ generic_console_cls:
 generic_console_printc:
 	call	xypos
 	ld	(hl),a
-	set	6,h		;Move to fe range
+	set	6,h
 	ld	a,(__super80_attr)
 	ld	(hl),a
 	ret
