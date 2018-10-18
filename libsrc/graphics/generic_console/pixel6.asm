@@ -12,14 +12,26 @@
 	EXTERN	generic_console_vpeek
 	EXTERN	generic_console_plotc
 	EXTERN	generic_console_pointxy
+	EXTERN	__console_w
+	EXTERN	__console_h
 
 
-			ld	a,h
-			cp	maxx
-			ret	nc
-			ld	a,l
-			cp	maxy
-			ret	nc		; y0	out of range
+                ld      a,(__console_w)
+                add     a
+                dec     a
+                cp      h
+                ret     c
+
+                ld      a,(__console_h)
+		ld	e,a
+                add     a
+		add	e
+                dec     a
+                cp      l
+                ret     c
+
+
+
 			
 			push	ix
 			push	bc		;Save entry bc

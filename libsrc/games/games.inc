@@ -173,6 +173,12 @@ IF FORaussie
         defc sndbit_mask   = 128	; bit 6 should stay 'on'
 ENDIF
 
+IF FORsuper80
+	defc	sndbit_port = $F0
+	defc	sndbit_bit = 3
+	defc	sndbit_mask = 8
+ENDIF
+
 
 ; Compatibily ones only, the following ports don't have a beeper
 IF FOReinstein
@@ -279,4 +285,5 @@ IF FORsmc777
     defc sndbit_bit    = 3
     defc sndbit_mask   = $0F			; $0F for full volume output
 ENDIF
+
 

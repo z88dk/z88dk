@@ -100,7 +100,7 @@ int mameql_exec(char *target)
     // Start address
     writeword(origin, fpout);
     // End address
-    writeword(origin + binname_sb.st_size, fpout);
+    writeword(origin + binname_sb.st_size - 1, fpout);
 
     for ( i = 0; i < binname_sb.st_size; i++) {
         c = getc(fpin);
