@@ -932,6 +932,7 @@ super80_vduem_clib.lib:
 	@echo '--- Building Super80 VDUEM Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
+	@$(RM) -f video/mc6845/*.o
 	$(call buildgeneric,super80)
 	TARGET=super80 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsuper80 -x$(OUTPUT_DIRECTORY)/super80_vduem_clib @$(LISTFILE_DIRECTORY)/super80_vduem.lst
 

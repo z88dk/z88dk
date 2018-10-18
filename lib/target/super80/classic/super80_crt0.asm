@@ -111,6 +111,22 @@ program:
 	call    crt0_init_bss
 	ld	(exitsp),sp
 	im	1
+; F0 General Purpose output port
+; Bit 0 - cassette output
+; Bit 1 - cassette relay control; 0=relay on
+; Bit 2 - turns screen on and off;0=screen off	
+;		Toggles colour/text on 6845 models
+; Bit 3 - Available for user projects [We will use it for sound]
+; Bit 4 - Available for user projects [We will use it for video switching]
+;		PCG banking?
+; Bit 5 - cassette LED; 0=LED on
+; Bit 6/7 - not decoded
+	ld	a,@00110110
+	out	($F0),a
+	ld	(PORT_F0_COPY),a
+	ld	a,$BE
+	out	($F1),a
+	ld	(PORT_F1_COPY),a
     	ei
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of
@@ -132,3 +148,10 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
         INCLUDE "crt/classic/crt_runtime_selection.asm"
 
         INCLUDE "crt/classic/crt_section.asm"
+
+	SECTION	bss_crt
+	PUBLIC	PORT_F0_COPY
+	PUBLIC	PORT_F1_COPY
+
+PORT_F0_COPY:	defb	0
+PORT_F1_COPY:	defb	0

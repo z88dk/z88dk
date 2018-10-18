@@ -85,6 +85,8 @@ generic_console_cls:
 ; a = character to print
 ; e = raw
 generic_console_printc:
+        rr      e
+        call    nc,map_character
 	call	xypos
 	ld	(hl),a
 	set	6,h
@@ -99,11 +101,57 @@ generic_console_printc:
 ;        a = character,
 ;        c = failure
 generic_console_vpeek:
+	ld	a,e
         call    xypos
-        ld      a,(hl)
+	ld	d,(hl)
+	rra
+	call	nc,vpeek_unmap
+	ld	a,d
+	and	a
+	ret
+
+; Unmap characters:
+; Need to handle
+vpeek_unmap:
+        ld      a,d
+        cp      128 + 16
+        ret     c               ; It's a block graphic
+        sub     16
+        ld      d,a
+        cp      128 + 16
+        ret     c               ; First 16 UDGs
+        ld      a,(__super80_custom_font)
         and     a
+        ret     z               ; It's all UDGs
+        ld      a,d
+        sub     128 - 16
+        ld      d,a
         ret
 
+
+; We use the PCG to hold both font/UDGs and block graphics
+; Characters 128 -> 143 = block graphics
+; Characters 144 -> 255 = udgs *OR* inverse text
+;
+; If we're input with 128 onwards then we need to add 16
+; Entry: d = a = character
+;        bc = coordinates
+; Exit:   a = character to print
+map_character:
+        ld      a,(__super80_custom_font)
+        and     a
+        ld      a,d
+        jr      z,no_custom_font
+        cp      128
+        ret     nc
+        or      128
+        ret
+
+no_custom_font:
+        cp      128
+        ret     c
+        add     16              ;UDGs are shifted by 16
+        ret
 
 xypos:
 	ld	l,b
@@ -150,3 +198,11 @@ generic_console_scrollup_4:
 	SECTION data_clib
 
 __super80_attr:	defb	0x0e		;white on black
+
+__super80_mode:     defb            0
+                ; Mode 0 = 80 column
+                ; Mode 1 = 64 column
+                ; Mode 2 = 40 column
+
+__super80_custom_font:
+                defb            0
