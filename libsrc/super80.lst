@@ -1,6 +1,7 @@
 stdio/inkey/fgetc_cons
 stdio/inkey/getk
 stdio/super80/generic_console
+stdio/super80/conio_map_colour
 graphics/generic_console/getmaxx
 graphics/generic_console/getmaxy6
 @gfxbase.lst

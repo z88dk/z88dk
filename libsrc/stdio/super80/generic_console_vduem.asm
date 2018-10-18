@@ -31,6 +31,7 @@
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
 
+		EXTERN		conio_map_colour
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
 		EXTERN		__super80_attr
@@ -45,6 +46,7 @@ generic_console_set_inverse:
 	ret
 
 generic_console_set_paper:
+	call	conio_map_colour
 	and	15
 	rla
 	rla
@@ -59,6 +61,7 @@ generic_console_set_paper:
 
 	
 generic_console_set_ink:
+	call	conio_map_colour
 	and	15
 	ld	e,a
 	ld	a,(__super80_attr)
