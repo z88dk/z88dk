@@ -24,5 +24,8 @@ graphics/stencil_render2
 graphics/text/swapgfxbk
 @input/input_keyboard.lst
 @stdio/stdio.lst
+games/super80/bit_open
+games/super80/bit_close
+@games/games.lst
 @video/mc6845/mc6845.lst
 @z80.lst
