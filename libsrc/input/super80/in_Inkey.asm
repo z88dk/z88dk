@@ -11,7 +11,7 @@ EXTERN in_keytranstbl
 
 ; exit : carry set and HL = 0 for no keys registered
 ;        else HL = ASCII character code
-; uses : AF,BC,DE,HL
+; uses : AF,BC,DE,HL, af'
 ;
 
 ; Write bit corresponding to line to PIO port A 0xf9
@@ -22,7 +22,7 @@ EXTERN in_keytranstbl
 ._in_Inkey
 	; First four rows we mask off bit 7
 	ld	b,4
-	ld	e,0
+	ld	de,0
 	ld	a,@11111110
 inkey_1:
 	out	(0xf8),a
