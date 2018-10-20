@@ -121,8 +121,23 @@ program:
 ;		PCG banking?
 ; Bit 5 - cassette LED; 0=LED on
 ; Bit 6/7 - not decoded
-	ld	a,@00110110
+	ld	c,@00110110
+	ld	a,c
 	out	($F0),a
+	; So we're on the text page
+	ld	hl,$f000
+	ld	(hl),32
+	res	2,a		;Swich to colour
+	out	($F0),a
+	ld	(hl),0		;Black on black
+	set	2,a
+	out	($F0),a
+	ld	a,(hl)	
+	cp	32
+	jr	z,is_super80v
+	res	2,c		;If bit 2 is zero, indicate we're on super80r
+is_super80v:
+	ld	a,c
 	ld	(PORT_F0_COPY),a
 	ld	a,$BE
 	out	($F1),a

@@ -77,7 +77,8 @@ generic_console_cls:
 	ld	(hl),32
 	ldir
 	ld	a,(PORT_F0_COPY)
-	push	af
+	bit	2,a	; If bit 2 is reset, then we're on an r with no colour
+	ret	z
 	res	2,a
 	out	($F0),a
 	ld	hl, COLOUR_MAP
@@ -100,6 +101,8 @@ generic_console_printc:
 	call	xypos
 	ld	(hl),a
 	ld	a,(PORT_F0_COPY)
+	bit	2,a
+	ret	z
 	push	af
 	res	2,a
 	out	($F0),a
@@ -195,6 +198,8 @@ generic_console_scrollup_3:
 	inc	hl
 	djnz	generic_console_scrollup_3
 	ld	a,(PORT_F0_COPY)
+	bit	2,a	
+	jr	z,no_scroll_colour
 	push	af
 	res	2,a
 	out	($F0),a
@@ -211,6 +216,7 @@ generic_console_scrollup_4:
 	djnz	generic_console_scrollup_4
 	pop	af
 	out	($F0),a
+no_scroll_colour:
 	pop	bc
 	pop	de
 	ret
