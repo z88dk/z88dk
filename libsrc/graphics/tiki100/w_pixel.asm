@@ -18,6 +18,7 @@
 
         push    hl              ;save x
         call    getmaxy         ;hl = maxy
+	inc	hl
         call    l_graphics_cmp
         pop     hl
         ret     nc
@@ -25,6 +26,7 @@
         ex      de,hl           ;de = x, hl = y
         push    hl              ;save y
         call    getmaxx
+	inc	hl
         call    l_graphics_cmp
         pop     hl
         ret     nc
@@ -74,7 +76,7 @@ IF NEEDxor
 	and	(hl)
 	jr	z,do_xor_plot
 	; We need to reset
-	ld	b,0
+	ld	d,0
 do_xor_plot:
 	ld	a,(hl)
 	and	c
