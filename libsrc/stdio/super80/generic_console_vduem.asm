@@ -79,6 +79,7 @@ generic_console_cls:
 	ld	a,(PORT_F0_COPY)
 	bit	2,a	; If bit 2 is reset, then we're on an r with no colour
 	ret	z
+	push	af
 	res	2,a
 	out	($F0),a
 	ld	hl, COLOUR_MAP
@@ -203,7 +204,7 @@ generic_console_scrollup_3:
 	push	af
 	res	2,a
 	out	($F0),a
-	ld	hl, COLOUR_MAP + 79
+	ld	hl, COLOUR_MAP + 80
 	ld	de, COLOUR_MAP
 	ld	bc, 80 * 24
 	ldir
