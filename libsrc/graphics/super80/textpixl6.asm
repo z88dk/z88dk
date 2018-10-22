@@ -98,7 +98,7 @@ textpixl:
 ;	.X .X .X .X
 ;	XX XX XX XX
 
-	defb	184, 185, 186, 17
+	defb	184, 185, 186, 187
 
 ;	.. X. .X XX
 ;	XX XX XX XX
