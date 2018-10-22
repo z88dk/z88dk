@@ -3,7 +3,7 @@
 ;
 ;	getk() Read key status
 ;
-;	Stefano Bodrato - Apr. 2000
+;	Stefano Bodrato - 2018
 ;
 ;
 ;	$Id: getk.asm $
