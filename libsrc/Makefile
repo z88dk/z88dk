@@ -21,7 +21,7 @@ all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	msx_clib.lib mtx_clib.lib mz_clib.lib mz2500_clib.lib x1_clib.lib \
 	nascom_clib.lib  newbrain_clib.lib \
 	osca_clib.lib ozansi_clib.lib pacman_clib.lib p2000_clib.lib  \
-	pc6001_clib.lib pps_clib.lib px4.lib px8.lib \
+	pc6001_clib.lib pc88_clib.lib pps_clib.lib px4.lib px8.lib \
 	rex_clib.lib rx78_clib.lib sc3000_clib.lib sms_clib.lib lynx_clib.lib \
 	svi_clib.lib sam_clib.lib  sorcerer_clib.lib  sos_clib.lib tiki100.lib \
 	trs80_clib.lib vg5k_clib.lib vz_clib.lib  x07_clib.lib \
@@ -329,6 +329,14 @@ pc6001_clib.lib:
 	$(MAKE) gfxdeps
 	$(call buildgeneric,pc6001)
 	TARGET=pc6001 TYPE=z80 $(LIBLINKER) -DFORpc6001 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pc6001_clib @$(LISTFILE_DIRECTORY)/pc6001.lst
+	
+# PC8801 lib - Stefano
+pc88_clib.lib:
+	@echo ''
+	@echo '--- Building PC8801 Library ---'
+	@echo ''
+	$(call buildgeneric,pc88)
+	TARGET=pc88 TYPE=z80 $(LIBLINKER) -DFORpc88 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pc88_clib @$(LISTFILE_DIRECTORY)/pc88.lst
 
 # Native for sprinter - dom
 pps_clib.lib:
