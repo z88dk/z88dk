@@ -1,0 +1,6 @@
+stdio/pc88/fgetc_cons
+stdio/pc88/getk
+stdio/pc88/fputc_cons
+@stdio/stdio_binary.lst
+games/joystick
+@z80.lst
