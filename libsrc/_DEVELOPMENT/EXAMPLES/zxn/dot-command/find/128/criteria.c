@@ -65,20 +65,26 @@ unsigned char criteria_apply(void)
 
 unsigned char criteria_exec(void)
 {
+   unsigned char *p;
+   
    // match file against executables
-   // nex, o, p, sna, snx, tap, z80
+   // bas, dot, nex, o, p, sna, snx, tap, z80
    
    if (dirent_lfn.attr & ESX_DIR_A_DIR) return 0;
    
-   if (glob_fat(dirent_lfn.name, "*.nex") ||
-       glob_fat(dirent_lfn.name, "*.o") ||
-       glob_fat(dirent_lfn.name, "*.p") ||
-       glob_fat(dirent_lfn.name, "*.sna") ||
-       glob_fat(dirent_lfn.name, "*.snx") ||
-       glob_fat(dirent_lfn.name, "*.tap") ||
-       glob_fat(dirent_lfn.name, "*.z80"))
-   return 1;
+   p = basename_ext(dirent_lfn.name);
    
+   if ((stricmp(p, ".bas") == 0) ||
+       (stricmp(p, ".dot") == 0) ||
+       (stricmp(p, ".nex") == 0) ||
+       (stricmp(p, ".o") == 0) ||
+       (stricmp(p, ".p") == 0) ||
+       (stricmp(p, ".sna") == 0) ||
+       (stricmp(p, ".snx") == 0) ||
+       (stricmp(p, ".tap") == 0) ||
+       (stricmp(p, ".z80") == 0))
+   return 1;
+
    return 0;
 }
 

@@ -21,7 +21,8 @@ CRITERIA
 
 -exec
   file must be an executable
-  nex o p sna snx tap z80
+  bas dot nex o p sna snx
+  tap z80
 
 -mindepth N, -mindepth=N
   ignore until at least N

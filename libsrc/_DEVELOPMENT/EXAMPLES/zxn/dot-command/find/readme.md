@@ -42,7 +42,8 @@ CRITERIA
 
 -exec
   file must be an executable
-  nex o p sna snx tap z80
+  bas dot nex o p sna snx
+  tap z80
 
 -mindepth N, -mindepth=N
   ignore until at least N
@@ -107,7 +108,7 @@ OTHER
 -version
   print version info and exit
 
-find 1.0 zx-next 128k z88dk.org
+find 1.1 zx-next 128k z88dk.org
 ~~~
 
 ## Examples
