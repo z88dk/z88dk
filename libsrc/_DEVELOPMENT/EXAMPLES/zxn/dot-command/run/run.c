@@ -57,7 +57,9 @@ struct type types[] = {
    { ".z80", load_snap },
    { ".o", load_snap },
    { ".p", load_snap },
-   { ".nex", load_nex }
+   { ".nex", load_nex },
+   { ".dot", load_dot },
+   { ".bas", load_bas }
 };
 
 // MAIN

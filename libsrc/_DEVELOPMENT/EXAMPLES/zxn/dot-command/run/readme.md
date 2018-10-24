@@ -37,7 +37,7 @@ matches other than the first.
 Programs having the following extensions are identified as executable:
 
 ~~~
-nex, o, p, sna, snx, tap, z80
+bas, dot, nex, o, p, sna, snx, tap, z80
 ~~~
 
 ## Compiling
@@ -53,8 +53,8 @@ The help text is reproduced here:
 ~~~
 .run [OPTIONS] FILE
 
-supported extensions:
-nex o p sna snx tap z80
+supported extensions:  bas
+dot nex o p sna snx tap z80
 
 options:
 
@@ -64,7 +64,7 @@ options:
 -r = retain cwd on clean exit
 -N = select Nth FILE match
 
-run 1.2 zx-next 128k z88dk.org
+run 1.4 zx-next z88dk.org
 ~~~
 
 ## Examples

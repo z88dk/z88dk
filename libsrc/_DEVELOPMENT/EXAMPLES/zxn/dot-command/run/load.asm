@@ -2,6 +2,8 @@ INCLUDE "config_zxn_private.inc"
 
 SECTION code_user
 
+PUBLIC _load_bas
+PUBLIC _load_dot
 PUBLIC _load_snap
 PUBLIC _load_nex
 
@@ -9,8 +11,122 @@ defc MAX_NAME_LEN = 12         ; 8.3 only
 
 EXTERN _mode48
 EXTERN _dirent_sfn
+EXTERN _flags
+EXTERN asm_puts, asm_exit
 
 defc PROGRAM_NAME = _dirent_sfn + 1;
+
+;;;;;;;;;;;;;;;;;;;;;
+; void load_bas(void)
+;;;;;;;;;;;;;;;;;;;;;
+
+_load_bas:
+
+   ; can't load in 48k mode
+   
+   ld a,(_mode48)
+   
+   or a
+   ret nz
+   
+   ; can't load a bas from here so print message giving instructions
+   
+   ld de,bas_name
+   call copy_filename
+   
+   ld a,'"'
+   ld (de),a
+
+   ld hl,bas_msg
+   call asm_puts
+   
+   ; ensure that cwd is not returned to on exit
+
+   ld a,(_flags)
+   or 0x04                     ; option --cd
+   ld (_flags),a
+   
+   ; exit without error
+   
+   ld hl,0
+   jp asm_exit
+   
+bas_msg:
+
+   defm "\nTo start - LOAD ", '"'
+
+bas_name:
+
+   defs MAX_NAME_LEN + 2
+
+;;;;;;;;;;;;;;;;;;;;;
+; void load_dot(void)
+;;;;;;;;;;;;;;;;;;;;;
+
+_load_dot:
+
+   call close_dot_handle
+
+   ld sp,(__SYSVAR_ERRSP)
+   
+   ld iy,__SYS_IY
+   ld hl,__SYS_HLP
+   exx
+
+   ; make room for dot command name
+   
+   ld bc,dot_stub_end - dot_stub + MAX_NAME_LEN + 1
+   
+   rst __ESX_RST_ROM
+   defw __ROM3_BC_SPACES
+
+   push de                     ; save start address
+   
+   ; copy dot_stub
+   
+   ld hl,dot_stub
+   ld bc,dot_stub_end - dot_stub
+   
+   ldir
+
+   ; copy filename
+   
+   ld ix,dot_name - nex_stub_end
+   add ix,de                   ; ix = address of dot name
+
+   call copy_filename
+   
+   xor a
+   ld (de),a
+
+   ; start dot command
+   
+   pop hl                      ; hl = start address
+   rst __ESX_RST_EXITDOT
+
+dot_stub:
+
+   push ix
+   pop hl
+
+   rst __ESX_RST_SYS
+   defb __ESX_M_EXECCMD
+   
+   jr c, dot_stub_err
+   
+   rst 8
+   defb __ERRB_0_OK - 1 
+
+dot_stub_err:
+
+   rst 8
+   defb __ERRB_Q_PARAMETER_ERROR - 1
+
+dot_name:
+
+   defm "./"
+
+dot_stub_end:
 
 ;;;;;;;;;;;;;;;;;;;;;;
 ; void load_snap(void)
