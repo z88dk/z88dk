@@ -190,7 +190,6 @@ END
 # test error
 z80asm("cu.wait 0,1", "--cpu=z80", 1, "", <<'END');
 Error at file 'test.asm' line 1: illegal identifier
-1 errors occurred during assembly
 END
 
 #------------------------------------------------------------------------------

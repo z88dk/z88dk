@@ -393,7 +393,6 @@ int z80asm_main( int argc, char *argv[] )
 
     if ( get_num_errors() )
     {
-        info_total_errors();
         return 1;	/* signal error */
     }
     else

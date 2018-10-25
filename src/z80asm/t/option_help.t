@@ -54,7 +54,8 @@ Code Generation Options:
   --cpu=z180             Assemble for the Z180
   --cpu=r2k              Assemble for the Rabbit 2000
   --cpu=r3k              Assemble for the Rabbit 3000
-  --ti83plus             Interpret 'Invoke' as RST 28h
+  --cpu=ti83plus         Assemble for the TI83Plus
+  --cpu=ti83             Assemble for the TI83
   --IXIY                 Swap IX and IY registers
   --debug                Add debug info to map file
 
@@ -65,14 +66,14 @@ Environment:
 
 Libraries:
   -x, --make-lib=FILE    Create a library file.lib
-  -i, --use-lib=FILE     Link library file.lib
+  -i, --link-lib=FILE    Link library file.lib
 
 Binary Output:
-  -O=DIR                 Output directory
+  -O, --out-dir=DIR      Output directory
   -o, --output=FILE      Output binary file
   -b, --make-bin         Assemble and link/relocate to file.bin
   --split-bin            Create one binary file per section
-  -d, --date-stamp       Assemble only updated files
+  -d, --update           Assemble only updated files
   -r, --origin=ADDR      Relocate binary file to given address (decimal or hex)
   -R, --relocatable      Create relocatable code
   --reloc-info           Geneate binary file relocation information
@@ -94,7 +95,6 @@ END
 	run("z80asm $opt=x", 1, "", <<END);
 Error: illegal option '$opt=x'
 Error: source filename missing
-2 errors occurred during assembly
 END
 }
 

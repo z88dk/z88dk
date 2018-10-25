@@ -22,7 +22,6 @@ mkdir("test_dir");
 
 run("z80asm -b -Itest_dir f_not_found.asm", 1, "", <<'...');
 Error: cannot read file 'f_not_found.asm'
-1 errors occurred during assembly
 ...
 
 unlink_testfiles();

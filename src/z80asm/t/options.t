@@ -65,13 +65,11 @@ for my $options ('-v', '--verbose') {
 t_z80asm_capture("-v=x", 	"", 	<<'ERR', 1);
 Error: illegal option '-v=x'
 Error: source filename missing
-2 errors occurred during assembly
 ERR
 
 t_z80asm_capture("--verbose=x", 	"", 	<<'ERR', 1);
 Error: illegal option '--verbose=x'
 Error: source filename missing
-2 errors occurred during assembly
 ERR
 
 # not verbose
@@ -84,13 +82,11 @@ is read_file(bin_file(), binmode => ':raw'), "\0";
 t_z80asm_capture("-nv=x", 	"", 	<<'ERR', 1);
 Error: illegal option '-nv=x'
 Error: source filename missing
-2 errors occurred during assembly
 ERR
 
 t_z80asm_capture("--not-verbose=x", 	"", 	<<'ERR', 1);
 Error: illegal option '--not-verbose=x'
 Error: source filename missing
-2 errors occurred during assembly
 ERR
 
 #------------------------------------------------------------------------------
@@ -318,10 +314,10 @@ t_binary(read_file($bin, binmode => ':raw'), "\0");
 unlink_testfiles($bin);
 
 #------------------------------------------------------------------------------
-# -d, --date-stamp
+# -d, --update
 #------------------------------------------------------------------------------
 
-for my $options ('-d', '--date-stamp') {
+for my $options ('-d', '--update') {
 	# first compiles; second skips
 	unlink_testfiles();
 	write_file(asm_file(), "nop");
@@ -399,18 +395,63 @@ z80asm(
 # -R, --relocatable - tested in reloc.t
 
 #------------------------------------------------------------------------------
+# --cpu=z80
+#------------------------------------------------------------------------------
+
+t_z80asm_ok(0, "halt", "\x76");
+t_z80asm_ok(0, "halt", "\x76", "--cpu=z80");
+t_z80asm_ok(0, "halt", "\x76", "-mz80");
+t_z80asm_ok(0, "halt", "\x76", "-m=z80");
+
+#------------------------------------------------------------------------------
+# --cpu=z80-zxn
+#------------------------------------------------------------------------------
+
+t_z80asm_ok(0, "swapnib", "\xED\x23", "--cpu=z80-zxn");
+t_z80asm_ok(0, "swapnib", "\xED\x23", "-mz80-zxn");
+t_z80asm_ok(0, "swapnib", "\xED\x23", "-m=z80-zxn");
+
+#------------------------------------------------------------------------------
+# --cpu=z180
+#------------------------------------------------------------------------------
+
+t_z80asm_ok(0, "slp", "\xED\x76", "--cpu=z180");
+t_z80asm_ok(0, "slp", "\xED\x76", "-mz180");
+t_z80asm_ok(0, "slp", "\xED\x76", "-m=z180");
+
+#------------------------------------------------------------------------------
 # --cpu=r2k
 #------------------------------------------------------------------------------
 
 t_z80asm_ok(0, "ex (sp),hl", "\xE3");
 t_z80asm_ok(0, "ex (sp),hl", "\xED\x54", "--cpu=r2k");
+t_z80asm_ok(0, "ex (sp),hl", "\xED\x54", "-mr2k");
+t_z80asm_ok(0, "ex (sp),hl", "\xED\x54", "-m=r2k");
 
 #------------------------------------------------------------------------------
-# --ti83plus
+# --cpu=r3k
+#------------------------------------------------------------------------------
+
+t_z80asm_ok(0, "push su", "\xED\x66", "--cpu=r3k");
+t_z80asm_ok(0, "push su", "\xED\x66", "-mr3k");
+t_z80asm_ok(0, "push su", "\xED\x66", "-m=r3k");
+
+#------------------------------------------------------------------------------
+# --cpu=ti83
 #------------------------------------------------------------------------------
 
 t_z80asm_ok(0, "invoke 0x1234", "\xCD\x34\x12");
-t_z80asm_ok(0, "invoke 0x1234", "\xEF\x34\x12", "--ti83plus");
+t_z80asm_ok(0, "invoke 0x1234", "\xCD\x34\x12", "--cpu=ti83");
+t_z80asm_ok(0, "invoke 0x1234", "\xCD\x34\x12", "-mti83");
+t_z80asm_ok(0, "invoke 0x1234", "\xCD\x34\x12", "-m=ti83");
+
+#------------------------------------------------------------------------------
+# --cpu=ti83plus
+#------------------------------------------------------------------------------
+
+t_z80asm_ok(0, "invoke 0x1234", "\xEF\x34\x12", "--cpu=ti83plus");
+t_z80asm_ok(0, "invoke 0x1234", "\xEF\x34\x12", "-mti83plus");
+t_z80asm_ok(0, "invoke 0x1234", "\xEF\x34\x12", "-m=ti83plus");
 
 #------------------------------------------------------------------------------
 # --IXIY
@@ -452,8 +493,7 @@ t_z80asm_ok(0, $asm, $bin, "-i".$lib);
 # no -L, only file name : error
 write_file(asm_file(), $asm);
 t_z80asm_capture("-i".$lib_base." ".asm_file(), "", 
-		"Error: cannot read file 'test.lib'\n".
-		"1 errors occurred during assembly\n", 1);
+		"Error: cannot read file 'test.lib'\n", 1);
 
 # -L : OK
 for my $options ('-L', '-L=', '--lib-path', '--lib-path=') {
@@ -482,8 +522,7 @@ t_z80asm_error($asm, "Error at file 'test.asm' line 1: symbol '_value23' not def
 for my $options ('-D23', '-Da*') {
 	write_file(asm_file(), $asm);
 	t_z80asm_capture("$options ".asm_file(), "", 
-					"Error: illegal identifier\n".
-					"1 errors occurred during assembly\n", 1);
+					"Error: illegal identifier\n", 1);
 }
 
 # -D
@@ -499,7 +538,7 @@ delete $ENV{TEST_ENV};
 t_z80asm_ok(0, $asm, "\x3E\x01", '"-D=_value${TEST_ENV}23"');
 
 #------------------------------------------------------------------------------
-# -i, --use-lib, -x, --make-lib
+# -i, --link-lib, -x, --make-lib
 #------------------------------------------------------------------------------
 
 unlink_testfiles();
@@ -527,7 +566,7 @@ ok copy(lib_file(), $lib), "create $lib";
 unlink(o_file(), lib_file());
 
 # link with the library
-for my $options ('-i', '-i=', '--use-lib', '--use-lib=') {
+for my $options ('-i', '-i=', '--link-lib', '--link-lib=') {
 	t_z80asm_ok(0, "
 		EXTERN one
 		jp one

@@ -110,7 +110,6 @@ next:
 		m1
 ...
 Error at file 'test.asm' line 7: symbol 'next' already defined
-1 errors occurred during assembly
 ...
 
 t_asmpp_ok(<<'...', "", "\xC3\x03\x00\xC3\x06\x00");

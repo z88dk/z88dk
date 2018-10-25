@@ -500,7 +500,6 @@ for my $op ("jr", "djnz", "jr nc,") {
 	eq_or_diff_text $stdout, "", "stdout";
 	eq_or_diff_text $stderr, <<'...', "stderr";
 Error at file 'test.asm' line 2: relative jump address must be local
-1 errors occurred during assembly
 ...
 	ok !!$return == !!1, "retval";
 }

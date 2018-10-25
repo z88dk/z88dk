@@ -103,7 +103,6 @@ Module 'test' size: 4 bytes
 Code size: 4 bytes ($0000 to $0003)
 OUT
 Error at file 'test.asm' line 2: symbol '__z80asm__rld' not defined
-1 errors occurred during assembly
 ERR
 
 

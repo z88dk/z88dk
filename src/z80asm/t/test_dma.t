@@ -26,7 +26,6 @@ z80asm(<<'ASM', "-b", 1, "", <<'ERR');
 	ld a,2
 ASM
 Error at file 'test.asm' line 2: illegal identifier
-1 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
@@ -46,7 +45,6 @@ z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
 	ld a,2
 ASM
 Error at file 'test.asm' line 2: syntax error
-1 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
@@ -56,7 +54,6 @@ z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
 	ld a,2
 ASM
 Error at file 'test.asm' line 3: expected constant expression
-1 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
@@ -65,7 +62,6 @@ z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
 	ld a,2
 ASM
 Error at file 'test.asm' line 2: integer '-1' out of range
-1 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
@@ -74,7 +70,6 @@ z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
 	ld a,2
 ASM
 Error at file 'test.asm' line 2: base register byte '255' is illegal
-1 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
@@ -89,7 +84,6 @@ Error at file 'test.asm' line 2: base register byte '0' is illegal
 Error at file 'test.asm' line 3: base register byte '2' is illegal
 Error at file 'test.asm' line 4: base register byte '3' is illegal
 Error at file 'test.asm' line 5: base register byte '128' is illegal
-4 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
@@ -98,7 +92,6 @@ z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
 	ld a,2
 ASM
 Error at file 'test.asm' line 2: base register byte '0' is illegal
-1 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
@@ -114,7 +107,6 @@ z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
 	ld a,2
 ASM
 Error at file 'test.asm' line 2: DMA too many arguments
-1 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
@@ -124,7 +116,6 @@ z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
 	ld a,2
 ASM
 Error at file 'test.asm' line 3: DMA too many arguments
-1 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
@@ -132,7 +123,6 @@ z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
 	dma.wr0 1, 
 ASM
 Error at file 'test.asm' line 3: syntax error
-1 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
@@ -141,7 +131,6 @@ lbl:dma.wr0 0x09
 	ld a,2
 ASM
 Error at file 'test.asm' line 2: DMA missing register group member(s)
-1 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
@@ -244,7 +233,6 @@ Error at file 'test.asm' line 5: base register byte '5' is illegal
 Error at file 'test.asm' line 6: base register byte '6' is illegal
 Error at file 'test.asm' line 7: base register byte '7' is illegal
 Error at file 'test.asm' line 8: base register byte '128' is illegal
-7 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
@@ -263,7 +251,6 @@ z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
 	ld a,2
 ASM
 Error at file 'test.asm' line 2: DMA missing register group member(s)
-1 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
@@ -273,7 +260,6 @@ z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
 	ld a,2
 ASM
 Error at file 'test.asm' line 3: expected constant expression
-1 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
@@ -288,7 +274,6 @@ Error at file 'test.asm' line 2: port A timing is illegal
 Error at file 'test.asm' line 3: port A timing is illegal
 Error at file 'test.asm' line 4: port A timing is illegal
 Error at file 'test.asm' line 5: port A timing is illegal
-4 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
@@ -351,7 +336,6 @@ Error at file 'test.asm' line 6: base register byte '5' is illegal
 Error at file 'test.asm' line 7: base register byte '6' is illegal
 Error at file 'test.asm' line 8: base register byte '7' is illegal
 Error at file 'test.asm' line 9: base register byte '128' is illegal
-8 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
@@ -370,7 +354,6 @@ z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
 	ld a,2
 ASM
 Error at file 'test.asm' line 2: DMA missing register group member(s)
-1 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
@@ -380,7 +363,6 @@ z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
 	ld a,2
 ASM
 Error at file 'test.asm' line 3: expected constant expression
-1 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
@@ -391,7 +373,6 @@ z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
 ASM
 Error at file 'test.asm' line 2: port B timing is illegal
 Error at file 'test.asm' line 3: port B timing is illegal
-2 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
@@ -435,7 +416,6 @@ z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
 	ld a,2
 ASM
 Error at file 'test.asm' line 2: DMA missing register group member(s)
-1 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
@@ -462,7 +442,6 @@ ASM
 Error at file 'test.asm' line 2: base register byte '1' is illegal
 Error at file 'test.asm' line 3: base register byte '2' is illegal
 Error at file 'test.asm' line 4: base register byte '3' is illegal
-3 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
@@ -500,7 +479,6 @@ z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
 	ld a,2
 ASM
 Error at file 'test.asm' line 2: DMA missing register group member(s)
-1 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
@@ -520,7 +498,6 @@ z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
 	ld a,2
 ASM
 Error at file 'test.asm' line 2: DMA missing register group member(s)
-1 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
@@ -545,7 +522,6 @@ z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
 	ld a,2
 ASM
 Error at file 'test.asm' line 2: base register byte '2' is illegal
-1 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
@@ -554,7 +530,6 @@ z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
 	ld a,2
 ASM
 Error at file 'test.asm' line 2: DMA does not support interrupts
-1 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
@@ -565,7 +540,6 @@ z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
 ASM
 Error at file 'test.asm' line 2: DMA mode is illegal
 Error at file 'test.asm' line 3: DMA mode is illegal
-2 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
@@ -584,7 +558,6 @@ z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
 	ld a,2
 ASM
 Error at file 'test.asm' line 2: DMA missing register group member(s)
-1 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
@@ -593,7 +566,6 @@ z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
 	ld a,2
 ASM
 Error at file 'test.asm' line 2: DMA missing register group member(s)
-1 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
@@ -622,7 +594,6 @@ z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
 	ld a,2
 ASM
 Error at file 'test.asm' line 2: DMA missing register group member(s)
-1 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
@@ -650,7 +621,6 @@ ASM
 Error at file 'test.asm' line 2: base register byte '1' is illegal
 Error at file 'test.asm' line 3: base register byte '4' is illegal
 Error at file 'test.asm' line 4: base register byte '64' is illegal
-3 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", <<'WARN');
@@ -1635,7 +1605,6 @@ Error at file 'test.asm' line 478: illegal DMA command
 Error at file 'test.asm' line 479: illegal DMA command
 Error at file 'test.asm' line 480: illegal DMA command
 Error at file 'test.asm' line 481: illegal DMA command
-480 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
@@ -1751,7 +1720,6 @@ z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
 ASM
 Error at file 'test.asm' line 2: DMA missing register group member(s)
 Error at file 'test.asm' line 3: DMA missing register group member(s)
-2 errors occurred during assembly
 ERR
 
 z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
@@ -1774,7 +1742,6 @@ z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
 ASM
 Error at file 'test.asm' line 2: DMA read mask is illegal
 Error at file 'test.asm' line 3: DMA read mask is illegal
-2 errors occurred during assembly
 ERR
 
 unlink_testfiles();

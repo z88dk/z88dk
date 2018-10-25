@@ -270,8 +270,8 @@ sub test_asm {
 			if (/Error at file .*? line (\d+)/) {
 				$lines_error[$1] = 1;
 			}
-			elsif (/\d+ errors occurred during assembly/) {
-			}
+#			elsif (/\d+ errors occurred during assembly/) {
+#			}
 			else {
 				diag $_;
 				ok 0, "cannot parse error line";

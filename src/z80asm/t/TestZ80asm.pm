@@ -130,7 +130,7 @@ sub z80asm {
 		$err_text .= "$_\n";
 		$num_errors++ if /Error/i;
 	}
-	$err_text .= "$num_errors errors occurred during assembly\n" if $num_errors;
+	#$err_text .= "$num_errors errors occurred during assembly\n" if $num_errors;
 	
 	# assembly command line
 	my $z80asm = $Z80ASM." ".

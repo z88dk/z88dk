@@ -9,12 +9,6 @@
 
 ---
 errors:
-  # Information
-  - type	: ErrInfo
-    func	: info_total_errors
-    args	: void
-    message	: '"%d errors occurred during assembly", get_num_errors()'
-	
   # File errors
   - type	: ErrError
     func	: error_read_file

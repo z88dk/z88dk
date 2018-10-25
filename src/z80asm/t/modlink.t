@@ -589,7 +589,6 @@ is $stdout, "";
 is $stderr, <<'END';
 Error at file 'test.asm' line 5: symbol 'sd_write_block_2gb' not defined
 Error at file 'test.asm' line 1: symbol 'sd_write_block_2gb' not defined
-2 errors occurred during assembly
 END
 is !!$return, !!1;
 

@@ -16,7 +16,6 @@ require './t/testlib.pl';
 
 z80asm("xx: defdb", "", 1, "", <<END);
 Error at file 'test.asm' line 1: syntax error
-1 errors occurred during assembly
 END
 
 unlink_testfiles();
@@ -25,7 +24,6 @@ check_bin_file("test.bin", pack("C*", 0, 0));
 
 z80asm("xx: defdb xx,", "", 1, "", <<END);
 Error at file 'test.asm' line 1: syntax error
-1 errors occurred during assembly
 END
 
 unlink_testfiles();

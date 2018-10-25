@@ -19,7 +19,6 @@ z80asm(<<'END', "", 1, "", <<'END');
 	ld
 END
 Error at file 'test.asm' line 10: syntax error
-1 errors occurred during assembly
 END
 
 z80asm(<<'END', "", 1, "", <<'END');
@@ -28,7 +27,6 @@ z80asm(<<'END', "", 1, "", <<'END');
 	ld
 END
 Error at file 'test.asm' line 11: syntax error
-1 errors occurred during assembly
 END
 
 z80asm(<<'END', "", 1, "", <<'END');
@@ -37,7 +35,6 @@ z80asm(<<'END', "", 1, "", <<'END');
 	ld
 END
 Error at file 'hello.asm' line 11: syntax error
-1 errors occurred during assembly
 END
 
 z80asm(<<'END', "", 1, "", <<'END');
@@ -47,7 +44,6 @@ z80asm(<<'END', "", 1, "", <<'END');
 	ld
 END
 Error at file 'test.asm' line 10: syntax error
-1 errors occurred during assembly
 END
 
 z80asm(<<'END', "", 1, "", <<'END');
@@ -57,7 +53,6 @@ z80asm(<<'END', "", 1, "", <<'END');
 	ld
 END
 Error at file 'test.c' line 10: syntax error
-1 errors occurred during assembly
 END
 
 z80asm(<<'END', "", 1, "", <<'END');
@@ -67,7 +62,6 @@ z80asm(<<'END', "", 1, "", <<'END');
 END
 Error at file 'test.asm' line 2: expected constant expression
 Error at file 'test.asm' line 3: expected constant expression
-2 errors occurred during assembly
 END
 
 z80asm(<<'END', "", 1, "", <<'END');
@@ -77,7 +71,6 @@ z80asm(<<'END', "", 1, "", <<'END');
 END
 Error at file 'test.asm' line 2: expected constant expression
 Error at file 'test.asm' line 3: expected constant expression
-2 errors occurred during assembly
 END
 
 unlink_testfiles();

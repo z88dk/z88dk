@@ -29,7 +29,6 @@ unlink "test2.lst";
 
 run('z80asm -b -otest.bin "@test1.lst"', 1, '', <<'...');
 Error at file 'test1.lst' line 2: cannot read file 'test2.lst'
-1 errors occurred during assembly
 ...
 
 

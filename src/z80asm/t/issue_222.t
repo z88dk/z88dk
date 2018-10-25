@@ -130,7 +130,6 @@ check_bin_file("test.tap", $rem_tap);
 unlink_testfiles();
 z80asm($asm, "+zx -r23759", 1, "", <<'END');
 	Error: invalid ORG value '23759'
-	1 errors occurred during assembly
 END
 check_bin_file("test.bin", $bin);
 ok ! -f "test.tap", "no test.tap";

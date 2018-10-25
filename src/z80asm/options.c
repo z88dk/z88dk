@@ -63,6 +63,8 @@ static void option_cpu_z80_zxn(void);
 static void option_cpu_z180(void);
 static void option_cpu_r2k(void);
 static void option_cpu_r3k(void);
+static void option_cpu_ti83(void);
+static void option_cpu_ti83plus(void);
 static void option_appmake_zx(void);
 static void option_appmake_zx81(void);
 static void option_filler(const char *filler_arg );
@@ -179,73 +181,105 @@ static void process_opt( int *parg, int argc, char *argv[] )
     int		 j;
 	const char *opt_arg_ptr;
 
-    /* search opts_lu[] */
-    for ( j = 0; j < NUM_ELEMS( opts_lu ); j++ )
-    {
-        if ( ( opt_arg_ptr = check_option( argv[II], opts_lu[j].long_opt ) ) != NULL ||
-                ( opt_arg_ptr = check_option( argv[II], opts_lu[j].short_opt ) ) != NULL )
-        {
-            /* found option, opt_arg_ptr points to after option */
-            switch ( opts_lu[j].type )
-            {
-            case OptSet:
-                if ( *opt_arg_ptr )
-                    error_illegal_option( argv[II] );
-                else
-                    *( ( bool * )( opts_lu[j].arg ) ) = true;
-
-                break;
-
-            case OptCall:
-                if ( *opt_arg_ptr )
-                    error_illegal_option( argv[II] );
-                else
-                    ( ( void ( * )( void ) )( opts_lu[j].arg ) )();
-
-                break;
-
-            case OptCallArg:
-				if (*opt_arg_ptr) {
-					opt_arg_ptr = expand_environment_variables(opt_arg_ptr);
-					((void(*)(const char *))(opts_lu[j].arg))(opt_arg_ptr);
-				}
-                else
-                    error_illegal_option( argv[II] );
-
-                break;
-
-            case OptString:
-				if (*opt_arg_ptr) {
-					opt_arg_ptr = expand_environment_variables(opt_arg_ptr);
-                    *( ( const char ** )( opts_lu[j].arg ) ) = opt_arg_ptr;
-				}
-                else
-                    error_illegal_option( argv[II] );
-
-                break;
-
-            case OptStringList:
-				if (*opt_arg_ptr)
+	/* search options that are exceptions to the look-up table */
+	if (strcmp(argv[II], "-mz80-zxn") == 0 || strcmp(argv[II], "-m=z80-zxn") == 0) {
+		option_cpu_z80_zxn();
+		return;
+	}
+	else if (strcmp(argv[II], "-mz80") == 0 || strcmp(argv[II], "-m=z80") == 0) {
+		option_cpu_z80();
+		return;
+	}
+	else if (strcmp(argv[II], "-mz180") == 0 || strcmp(argv[II], "-m=z180") == 0) {
+		option_cpu_z180();
+		return;
+	}
+	else if(strcmp(argv[II], "-mr2k") == 0 || strcmp(argv[II], "-m=r2k") == 0) {
+		option_cpu_r2k();
+		return;
+	}
+	else if(strcmp(argv[II], "-mr3k") == 0 || strcmp(argv[II], "-m=r3k") == 0) {
+		option_cpu_r3k();
+		return;
+	}
+	else if (strcmp(argv[II], "-mti83") == 0 || strcmp(argv[II], "-m=ti83") == 0) {
+		option_cpu_ti83();
+		return;
+	}
+	else if (strcmp(argv[II], "-mti83plus") == 0 || strcmp(argv[II], "-m=ti83plus") == 0) {
+		option_cpu_ti83plus();
+		return;
+	}
+	else {
+		/* search opts_lu[] */
+		for (j = 0; j < NUM_ELEMS(opts_lu); j++)
+		{
+			if ((opt_arg_ptr = check_option(argv[II], opts_lu[j].long_opt)) != NULL ||
+				(opt_arg_ptr = check_option(argv[II], opts_lu[j].short_opt)) != NULL)
+			{
+				/* found option, opt_arg_ptr points to after option */
+				switch (opts_lu[j].type)
 				{
-					UT_array **p_path = (UT_array **)opts_lu[j].arg;
-					opt_arg_ptr = expand_environment_variables(opt_arg_ptr);
-					argv_push(*p_path, opt_arg_ptr);
+				case OptSet:
+					if (*opt_arg_ptr)
+						error_illegal_option(argv[II]);
+					else
+						*((bool *)(opts_lu[j].arg)) = true;
+
+					break;
+
+				case OptCall:
+					if (*opt_arg_ptr)
+						error_illegal_option(argv[II]);
+					else
+						((void(*)(void))(opts_lu[j].arg))();
+
+					break;
+
+				case OptCallArg:
+					if (*opt_arg_ptr) {
+						opt_arg_ptr = expand_environment_variables(opt_arg_ptr);
+						((void(*)(const char *))(opts_lu[j].arg))(opt_arg_ptr);
+					}
+					else
+						error_illegal_option(argv[II]);
+
+					break;
+
+				case OptString:
+					if (*opt_arg_ptr) {
+						opt_arg_ptr = expand_environment_variables(opt_arg_ptr);
+						*((const char **)(opts_lu[j].arg)) = opt_arg_ptr;
+					}
+					else
+						error_illegal_option(argv[II]);
+
+					break;
+
+				case OptStringList:
+					if (*opt_arg_ptr)
+					{
+						UT_array **p_path = (UT_array **)opts_lu[j].arg;
+						opt_arg_ptr = expand_environment_variables(opt_arg_ptr);
+						argv_push(*p_path, opt_arg_ptr);
+					}
+					else
+						error_illegal_option(argv[II]);
+
+					break;
+
+				default:
+					xassert(0);
 				}
-                else
-                    error_illegal_option( argv[II] );
 
-                break;
+				return;
+			}
+		}
 
-            default:
-                xassert(0);
-            }
+		/* not found */
+		error_illegal_option(argv[II]);
 
-            return;
-        }
-    }
-
-    /* not found */
-    error_illegal_option( argv[II] );
+	}
 
 #undef II
 }
@@ -687,6 +721,18 @@ static void option_cpu_r3k(void)
 {
 	opts.cpu = CPU_R3K;
 	opts.cpu_name = CPU_R3K_NAME;
+}
+
+static void option_cpu_ti83(void)
+{
+	option_cpu_z80();
+	opts.ti83plus = false;
+}
+
+static void option_cpu_ti83plus(void)
+{
+	option_cpu_z80();
+	opts.ti83plus = true;
 }
 
 static void define_assembly_defines()

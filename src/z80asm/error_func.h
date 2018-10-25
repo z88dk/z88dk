@@ -2,7 +2,6 @@
 
 #pragma once
 
-extern void info_total_errors(void);
 extern void error_read_file(const char *filename);
 extern void error_write_file(const char *filename);
 extern void error_include_recursion(const char *filename);

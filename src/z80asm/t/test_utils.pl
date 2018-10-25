@@ -130,9 +130,9 @@ sub t_z80asm {
 	$args{err} ||= ""; $args{linkerr} ||= ""; 
 	chomp($args{err}); chomp($args{linkerr}); chomp($stderr);
 	my $exp_err_screen = my $exp_err_file = $args{err}.$args{linkerr};
-	if (! defined($args{bin})) {
-		$exp_err_screen .= "\n1 errors occurred during assembly";
-	}
+#	if (! defined($args{bin})) {
+#		$exp_err_screen .= "\n1 errors occurred during assembly";
+#	}
 	$errors++ unless $stderr eq $exp_err_screen;
 	is $stderr, $exp_err_screen, "$line err";
 	if ($stderr && $stderr !~ /option.*deprecated/) {	# option deprecated: before error file is created
@@ -246,8 +246,7 @@ sub t_z80asm_error {
 		system $cmd;
 	};
 	is $stdout, "", "$line stdout";
-	is $stderr, $expected_err."\n".
-				"1 errors occurred during assembly\n", "$line stderr";
+	is $stderr, $expected_err."\n", "$line stderr";
 	ok $return != 0, "$line exit value";
 	ok -f err_file(), "$line error file found";
 	ok ! -f o_file(), "$line object file deleted";

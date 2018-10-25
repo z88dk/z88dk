@@ -38,7 +38,6 @@ z80asm(<<END, "-b", 1, "", <<END);
 		binary "test1.dat"
 END
 Error at file 'test.asm' line 2: max. code size of 65536 bytes reached
-1 errors occurred during assembly
 END
 
 unlink_testfiles();
@@ -47,7 +46,6 @@ z80asm(<<END, "-b", 1, "", <<END);
 		binary "test1.dat"
 END
 Error at file 'test.asm' line 1: max. code size of 65536 bytes reached
-1 errors occurred during assembly
 END
 
 # -I; more complete tests in INCLUDE
@@ -60,7 +58,6 @@ z80asm(<<END, "-b", 1, "", <<END);
 		binary "test1.dat"
 END
 Error at file 'test.asm' line 1: cannot read file 'test1.dat'
-1 errors occurred during assembly
 END
 
 z80asm(<<END, "-b -Itest_dir");

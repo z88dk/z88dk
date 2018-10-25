@@ -41,7 +41,6 @@ END
 END
 	run("z80asm test.asm", 1, "", <<END);
 Error at file 'test_dir${slash}test.inc' line 1: syntax error
-1 errors occurred during assembly
 END
 
 	spew("test.asm", <<END);
@@ -50,7 +49,6 @@ END
 END
 	run("z80asm test.asm", 1, "", <<END);
 Error at file 'test_dir${slash}test.c' line 1: syntax error
-1 errors occurred during assembly
 END
 
 }
