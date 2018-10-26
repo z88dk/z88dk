@@ -604,11 +604,9 @@ void immed2(void)
 }
 
 /* Partial instruction to access literal */
-void immedlit(int lab)
+void immedlit(int lab, int offs)
 {
-    immed();
-    queuelabel(lab);
-    outbyte('+');
+    outfmt("\tld\thl,i_%d+%d",lab,offs);
 }
 
 /* Push long onto stack */

@@ -171,6 +171,8 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     buffer_fps_num = 0;
     while ( tmpfiles[argnumber+1] ) {
         Type *type;        
+        char *before, *start;
+
         argnumber++;
         rewind(tmpfiles[argnumber]);
         set_temporary_input(tmpfiles[argnumber]);
@@ -185,6 +187,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             }
         }
         /* ordinary call */
+        setstage(&before, &start);
         expr = expression(&vconst, &val, &type);
         if (expr == KIND_CARRY) {
             zcarryconv();
@@ -202,7 +205,17 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             prototype = array_get_byindex(functype->parameters, proto_argnumber);
 
             if ( prototype->kind != KIND_ELLIPSES && type->kind != prototype->kind ) {
-                expr = ForceArgs(prototype, type, vconst);
+                if ( vconst && type->kind == KIND_DOUBLE && kind_is_integer(prototype->kind)) {
+                     LVALUE lval = {0};
+                     clearstage(before,start);
+		     start = NULL;
+                     lval.val_type = prototype->kind;
+                     lval.const_val = val;
+                     load_constant(&lval);
+                     expr = prototype->kind;
+                } else {
+                    expr = ForceArgs(prototype, type, vconst);
+                }
             }
             // if ( (protoarg & ( SMALLC << 16)) !=  (packedArgumentType & (SMALLC << 16)) ) {
             //     warning(W_PARAM_CALLINGCONVENTION_MISMATCH, funcname, argnumber, "__smallc/__stdc");
@@ -211,6 +224,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             //     warning(W_PARAM_CALLINGCONVENTION_MISMATCH, funcname, argnumber, "__z88dk_callee");
             // }
         }
+        //clearstage(before,start);
         if ( function_pointer_call == 0 && tmpfiles[argnumber+1] == NULL &&
             ( (functype->flags & FASTCALL) == FASTCALL || (builtin_flags & FASTCALL) == FASTCALL ) ) {
                  /* fastcall of single expression OR the last argument of a builtin */

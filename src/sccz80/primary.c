@@ -48,8 +48,7 @@ int primary(LVALUE* lval)
             lval->ptr_type = KIND_CHAR; /* djm 9/3/99 */
             lval->val_type = KIND_INT;
             lval->flags = FLAGS_NONE;
-            immedlit(litlab);
-            outdec(lval->const_val);
+            immedlit(litlab,lval->const_val);
             nl();
             return 0;
         } else if ((ptr = findloc(sname))) {

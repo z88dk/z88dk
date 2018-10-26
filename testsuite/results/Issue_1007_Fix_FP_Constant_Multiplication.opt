@@ -14,13 +14,9 @@
 
 
 ._main
-	ld	hl,i_3+0
-	call	dload
-	call	ifix
+	ld	hl,9	;const
 	push	hl
-	ld	hl,i_5+0
-	call	dload
-	call	ifix
+	ld	hl,20	;const
 	push	hl
 	call	_do_something
 	pop	bc
@@ -28,19 +24,6 @@
 	ret
 
 
-	SECTION	rodata_compiler
-.i_2
-	;0.450000
-	defb	102,102,102,102,102,127
-.i_3
-	;9.000000
-	defb	0,0,0,0,16,132
-.i_4
-	;0.500000
-	defb	0,0,0,0,0,128
-.i_5
-	;20.000000
-	defb	0,0,0,0,32,133
 
 
 	SECTION	bss_compiler

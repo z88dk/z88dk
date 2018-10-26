@@ -75,6 +75,7 @@ typedef enum {
     KIND_CARRY
 } Kind;
 
+#define kind_is_integer(k) ( k == KIND_CHAR || k == KIND_INT || k == KIND_SHORT || k == KIND_LONG )
 
 typedef struct {
     size_t    size;

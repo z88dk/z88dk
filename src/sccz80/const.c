@@ -30,6 +30,7 @@ static Type *get_member(Type *tag);
 typedef struct elem_s {
     struct elem_s *next;
     int            refcount;
+    int            written;
     int            litlab;
     double         value;
     unsigned char  fa[MAX_MANTISSA_SIZE+1];      /* The parsed representation */
@@ -69,8 +70,7 @@ int constant(LVALUE* lval)
         lval->ptr_type = KIND_CHAR; /* djm 9/3/99 */
         lval->val_type = KIND_INT;
         lval->flags = FLAGS_NONE;
-        immedlit(litlab);
-        outdec(lval->const_val);
+        immedlit(litlab,lval->const_val);
         nl();
         return (1);
     } 
@@ -699,9 +699,21 @@ elem_t *get_elem_for_fa(unsigned char fa[], double value)
     elem->refcount = 0;
     elem->litlab = getlabel();
     elem->value = value;
+    elem->written = 0;
     memcpy(elem->fa, fa, 6);
     LL_APPEND(double_queue, elem);
     return elem;
+}
+
+void indicate_double_written(int litlab)
+{
+    elem_t  *elem;
+
+    LL_FOREACH(double_queue, elem ) {
+        if ( elem->litlab == litlab ) {
+	    elem->written = 1;
+	}
+    }
 }
 
 elem_t *get_elem_for_buf(char *str, double value) 
@@ -717,6 +729,7 @@ elem_t *get_elem_for_buf(char *str, double value)
     elem->litlab = getlabel();
     elem->refcount = 0;
     elem->value = value;
+    elem->written = 0;
     strcpy(elem->str,str);
     LL_APPEND(double_queue, elem);
     return elem;
@@ -729,7 +742,7 @@ void write_double_queue(void)
     elem_t  *elem;
 
     LL_FOREACH(double_queue, elem ) {
-        if ( 1 || elem->refcount ) {
+        if ( elem->written ) {
             output_section(c_rodata_section); // output_section("text");
             prefix();
             queuelabel(elem->litlab);
@@ -739,7 +752,7 @@ void write_double_queue(void)
                 defmesg(); outstr(elem->str); outstr("\"\n");
                 defbyte(); outdec(0); nl();
             } else {
-                //outfmt("\t;%lf ref: %d\n",elem->value,elem->refcount);
+                //outfmt("\t;%lf ref: %d written: %d\n",elem->value,elem->refcount, elem->written);
                 outfmt("\t;%lf\n",elem->value);
                 outfmt("\tdefb\t%d,%d,%d,%d,%d,%d\n", elem->fa[0], elem->fa[1], elem->fa[2], elem->fa[3], elem->fa[4], elem->fa[5]);
             }
@@ -803,8 +816,7 @@ void load_double_into_fa(LVALUE *lval)
         snprintf(buf, sizeof(buf), "%lf", lval->const_val);
         elem = get_elem_for_buf(buf, lval->const_val);
         elem->refcount++;
-        immedlit(elem->litlab);
-        outdec(0);
+        immedlit(elem->litlab,0);
         nl();
         callrts("__atof2");
         WriteDefined("math_atof", 1);
@@ -813,8 +825,7 @@ void load_double_into_fa(LVALUE *lval)
         
         elem = get_elem_for_fa(fa,lval->const_val);
         elem->refcount++;
-        immedlit(elem->litlab);
-        outdec(0);
+        immedlit(elem->litlab,0);
         nl();
         callrts("dload");
     }
