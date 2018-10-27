@@ -16,13 +16,13 @@ target = $(firstword $(subst -, ,$*))
 ${jobs}: job-%:
 	$(eval cpu := $(shell \
 		if [ "$(target)" = "z180" ]; then \
-			echo "--cpu=z180"; \
+			echo "-mz180"; \
 		elif \
 			[ "$(target)" = "yaz180" ]; then \
-			echo "--cpu=z180"; \
+			echo "-mz180"; \
 		elif \
 			[ "$(target)" = "zxn" ]; then \
-			echo "--cpu=z80-zxn"; \
+			echo "-mz80-zxn"; \
 		else \
 			echo "";  \
 		fi) )

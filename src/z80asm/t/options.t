@@ -856,7 +856,7 @@ t_z80asm_ok(0, "
 	0xED, 0x3C,
 	0xED, 0x64, 23, 
 	
-), "--cpu=z180");
+), "-mz180");
 
 t_z80asm_error("slp			", "Error at file 'test.asm' line 1: illegal identifier");
 t_z80asm_error("mlt bc		", "Error at file 'test.asm' line 1: illegal identifier");
@@ -881,7 +881,7 @@ t_z80asm_ok(0, "
 	0xD3, 0x3A, 0xFE, 0x00,
 	0xDB, 0x3A, 0xFE, 0x00,
 	
-), "--cpu=r2k");
+), "-mr2k");
 	
 # __CPU_xxx_contants___
 #------------------------------------------------------------------------------
@@ -914,23 +914,23 @@ t_z80asm_capture('-b test.asm', "", "", 0);
 t_binary(read_binfile("test.bin"), "\1");
 
 unlink "test.bin";
-t_z80asm_capture('--cpu=z80 -b test.asm', "", "", 0);
+t_z80asm_capture('-mz80 -b test.asm', "", "", 0);
 t_binary(read_binfile("test.bin"), "\1");
 
 unlink "test.bin";
-t_z80asm_capture('--cpu=z80-zxn -b test.asm', "", "", 0);
+t_z80asm_capture('-mz80-zxn -b test.asm', "", "", 0);
 t_binary(read_binfile("test.bin"), "\2");
 
 unlink "test.bin";
-t_z80asm_capture('--cpu=z180 -b test.asm', "", "", 0);
+t_z80asm_capture('-mz180 -b test.asm', "", "", 0);
 t_binary(read_binfile("test.bin"), "\3");
 
 unlink "test.bin";
-t_z80asm_capture('--cpu=r2k -b test.asm', "", "", 0);
+t_z80asm_capture('-mr2k -b test.asm', "", "", 0);
 t_binary(read_binfile("test.bin"), "\4");
 
 unlink "test.bin";
-t_z80asm_capture('--cpu=r3k -b test.asm', "", "", 0);
+t_z80asm_capture('-mr3k -b test.asm', "", "", 0);
 t_binary(read_binfile("test.bin"), "\5");
 
 unlink_testfiles();

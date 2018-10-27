@@ -23,11 +23,11 @@ spew("test.asm",<<END);
 		call   __z80asm__cpir
 END
 
-run("z80asm --cpu=z80 -b test.asm");
+run("z80asm -mz80 -b test.asm");
 my $bin1 = hexdump(slurp("test.bin"));
 note $bin1;
 
-run("z80asm --cpu=r2k -b test.asm");
+run("z80asm -mr2k -b test.asm");
 my $bin2 = hexdump(slurp("test.bin"));
 note $bin2;
 

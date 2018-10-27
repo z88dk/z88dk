@@ -22,7 +22,7 @@ for my $cpu (@CPUS) {
 	for my $a (0..15) {
 		$test_nr++;
 		note "Test $test_nr: cpu:$cpu, a:$a";
-		my $r = ticks(<<END, "--cpu=$cpu");
+		my $r = ticks(<<END, "-m$cpu");
 				ld a, $a
 				call l_hex_nibble
 				rst 0

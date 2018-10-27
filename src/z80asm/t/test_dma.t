@@ -28,7 +28,7 @@ ASM
 Error at file 'test.asm' line 2: illegal identifier
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
+z80asm(<<'ASM', "-b -mz80-zxn", 0, "", "");
 	ld a,1
 	dma.wr0 1
 	ld a,2
@@ -39,7 +39,7 @@ check_bin_file("test.bin", pack("C*", 0x3E, 1, 0x01, 0x3E, 2));
 # DMA.WR0
 #------------------------------------------------------------------------------
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	ld a,1
 	dma.wr0
 	ld a,2
@@ -47,7 +47,7 @@ ASM
 Error at file 'test.asm' line 2: syntax error
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	extern ext
 	ld a,1
 	dma.wr0 ext
@@ -56,7 +56,7 @@ ASM
 Error at file 'test.asm' line 3: expected constant expression
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	ld a,1
 	dma.wr0 -1
 	ld a,2
@@ -64,7 +64,7 @@ ASM
 Error at file 'test.asm' line 2: integer '-1' out of range
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	ld a,1
 	dma.wr0 255
 	ld a,2
@@ -72,7 +72,7 @@ ASM
 Error at file 'test.asm' line 2: base register byte '255' is illegal
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	ld a,1
 	dma.wr0 0
 	dma.wr0 2
@@ -86,7 +86,7 @@ Error at file 'test.asm' line 4: base register byte '3' is illegal
 Error at file 'test.asm' line 5: base register byte '128' is illegal
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	ld a,1
 	dma.wr0 0
 	ld a,2
@@ -94,14 +94,14 @@ ASM
 Error at file 'test.asm' line 2: base register byte '0' is illegal
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
+z80asm(<<'ASM', "-b -mz80-zxn", 0, "", "");
 	ld a,1
 	dma.wr0 1
 	ld a,2
 ASM
 check_bin_file("test.bin", pack("C*", 0x3E, 1, 0x01, 0x3E, 2));
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	ld a,1
 	dma.wr0 1, 99
 	ld a,2
@@ -109,7 +109,7 @@ ASM
 Error at file 'test.asm' line 2: DMA too many arguments
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	ld a,1
 	dma.wr0 1, 
 			99
@@ -118,14 +118,14 @@ ASM
 Error at file 'test.asm' line 3: DMA too many arguments
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	ld a,1
 	dma.wr0 1, 
 ASM
 Error at file 'test.asm' line 3: syntax error
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	ld a,1
 lbl:dma.wr0 0x09
 	ld a,2
@@ -133,7 +133,7 @@ ASM
 Error at file 'test.asm' line 2: DMA missing register group member(s)
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
+z80asm(<<'ASM', "-b -mz80-zxn", 0, "", "");
 	ld a,1
 lbl:dma.wr0 0x09, 
 			lbl
@@ -144,7 +144,7 @@ check_bin_file("test.bin", pack("C*",
 				0x09, 0x02, 
 				0x3E, 2));
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
+z80asm(<<'ASM', "-b -mz80-zxn", 0, "", "");
 	ld a,1
 lbl:dma.wr0 0x11, 
 			lbl
@@ -155,7 +155,7 @@ check_bin_file("test.bin", pack("C*",
 				0x11, 0x02, 
 				0x3E, 2));
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
+z80asm(<<'ASM', "-b -mz80-zxn", 0, "", "");
 	ld a,1
 lbl:dma.wr0 0x19, 
 			lbl+0x8000
@@ -166,7 +166,7 @@ check_bin_file("test.bin", pack("C*",
 				0x19, 0x02, 0x80,
 				0x3E, 2));
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
+z80asm(<<'ASM', "-b -mz80-zxn", 0, "", "");
 	ld a,1
 lbl:dma.wr0 0x21, 
 			lbl
@@ -177,7 +177,7 @@ check_bin_file("test.bin", pack("C*",
 				0x21, 0x02,
 				0x3E, 2));
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
+z80asm(<<'ASM', "-b -mz80-zxn", 0, "", "");
 	ld a,1
 lbl:dma.wr0 0x41, 
 			lbl
@@ -188,7 +188,7 @@ check_bin_file("test.bin", pack("C*",
 				0x41, 0x02,
 				0x3E, 2));
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
+z80asm(<<'ASM', "-b -mz80-zxn", 0, "", "");
 	ld a,1
 lbl:dma.wr0 0x61, 
 			lbl+0x8000
@@ -199,7 +199,7 @@ check_bin_file("test.bin", pack("C*",
 				0x61, 0x02, 0x80,
 				0x3E, 2));
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
+z80asm(<<'ASM', "-b -mz80-zxn", 0, "", "");
 	ld a,1
 lbl:dma.wr0 0x79, 
 			lbl+0x4000,
@@ -215,7 +215,7 @@ check_bin_file("test.bin", pack("C*",
 # DMA.WR1
 #------------------------------------------------------------------------------
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	ld a,1
 	dma.wr1 1
 	dma.wr1 2
@@ -235,7 +235,7 @@ Error at file 'test.asm' line 7: base register byte '7' is illegal
 Error at file 'test.asm' line 8: base register byte '128' is illegal
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
+z80asm(<<'ASM', "-b -mz80-zxn", 0, "", "");
 	ld a,1
 	dma.wr1 0x04
 	ld a,2
@@ -245,7 +245,7 @@ check_bin_file("test.bin", pack("C*",
 				0x04, 
 				0x3E, 2));
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	ld a,1
 	dma.wr1 0x44
 	ld a,2
@@ -253,7 +253,7 @@ ASM
 Error at file 'test.asm' line 2: DMA missing register group member(s)
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	extern ext
 	ld a,1
 	dma.wr1 0x44, ext
@@ -262,7 +262,7 @@ ASM
 Error at file 'test.asm' line 3: expected constant expression
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	ld a,1
 	dma.wr1 0x44, 0x10
 	dma.wr1 0x44, 0x20
@@ -276,7 +276,7 @@ Error at file 'test.asm' line 4: port A timing is illegal
 Error at file 'test.asm' line 5: port A timing is illegal
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
+z80asm(<<'ASM', "-b -mz80-zxn", 0, "", "");
 	ld a,1
 	dma.wr1 0x44, 0x00
 	dma.wr1 0x44, 0x01
@@ -291,7 +291,7 @@ check_bin_file("test.bin", pack("C*",
 				0x3E, 2));
 
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", <<'WARN');
+z80asm(<<'ASM', "-b -mz80-zxn", 0, "", <<'WARN');
 	ld a,1
 	dma.wr1 0x44, 0x80
 	dma.wr1 0x44, 0x40
@@ -316,7 +316,7 @@ check_bin_file("test.bin", pack("C*",
 # DMA.WR2
 #------------------------------------------------------------------------------
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	ld a,1
 	dma.wr2 1
 	dma.wr2 2
@@ -338,7 +338,7 @@ Error at file 'test.asm' line 8: base register byte '7' is illegal
 Error at file 'test.asm' line 9: base register byte '128' is illegal
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
+z80asm(<<'ASM', "-b -mz80-zxn", 0, "", "");
 	ld a,1
 	dma.wr2 0x00
 	ld a,2
@@ -348,7 +348,7 @@ check_bin_file("test.bin", pack("C*",
 				0x00, 
 				0x3E, 2));
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	ld a,1
 	dma.wr2 0x40
 	ld a,2
@@ -356,7 +356,7 @@ ASM
 Error at file 'test.asm' line 2: DMA missing register group member(s)
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	extern ext
 	ld a,1
 	dma.wr2 0x40, ext
@@ -365,7 +365,7 @@ ASM
 Error at file 'test.asm' line 3: expected constant expression
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	ld a,1
 	dma.wr2 0x40, 0x10
 	dma.wr2 0x40, 0x03
@@ -375,7 +375,7 @@ Error at file 'test.asm' line 2: port B timing is illegal
 Error at file 'test.asm' line 3: port B timing is illegal
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
+z80asm(<<'ASM', "-b -mz80-zxn", 0, "", "");
 	ld a,1
 	dma.wr2 0x40, 0x00
 	dma.wr2 0x40, 0x01
@@ -389,7 +389,7 @@ check_bin_file("test.bin", pack("C*",
 				0x40, 0x02,
 				0x3E, 2));
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", <<'WARN');
+z80asm(<<'ASM', "-b -mz80-zxn", 0, "", <<'WARN');
 	ld a,1
 	dma.wr2 0x40, 0x80
 	dma.wr2 0x40, 0x40
@@ -410,7 +410,7 @@ check_bin_file("test.bin", pack("C*",
 				0x40, 0x04,
 				0x3E, 2));
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	ld a,1
 	dma.wr2 0x40, 0x20
 	ld a,2
@@ -418,7 +418,7 @@ ASM
 Error at file 'test.asm' line 2: DMA missing register group member(s)
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
+z80asm(<<'ASM', "-b -mz80-zxn", 0, "", "");
 	ld a,1
 lbl:dma.wr2 0x40, 0x20, lbl
 	ld a,2
@@ -432,7 +432,7 @@ check_bin_file("test.bin", pack("C*",
 # DMA.WR3
 #------------------------------------------------------------------------------
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	ld a,1
 	dma.wr3 1
 	dma.wr2 2
@@ -444,7 +444,7 @@ Error at file 'test.asm' line 3: base register byte '2' is illegal
 Error at file 'test.asm' line 4: base register byte '3' is illegal
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
+z80asm(<<'ASM', "-b -mz80-zxn", 0, "", "");
 	ld a,1
 	dma.wr3 0x00
 	ld a,2
@@ -455,7 +455,7 @@ check_bin_file("test.bin", pack("C*",
 				0x3E, 2));
 
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", <<'WARN');
+z80asm(<<'ASM', "-b -mz80-zxn", 0, "", <<'WARN');
 	ld a,1
 	dma.wr3 0b00000100
 	dma.wr3 0b00100000
@@ -473,7 +473,7 @@ check_bin_file("test.bin", pack("C*",
 				0xC0, 
 				0x3E, 2));
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	ld a,1
 	dma.wr3 0x88
 	ld a,2
@@ -481,7 +481,7 @@ ASM
 Error at file 'test.asm' line 2: DMA missing register group member(s)
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
+z80asm(<<'ASM', "-b -mz80-zxn", 0, "", "");
 	extern ext
 	ld a,1
 	dma.wr3 0x88, 23
@@ -492,7 +492,7 @@ check_bin_file("test.bin", pack("C*",
 				0x88, 23,
 				0x3E, 2));
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	ld a,1
 	dma.wr3 0x98, 23
 	ld a,2
@@ -500,7 +500,7 @@ ASM
 Error at file 'test.asm' line 2: DMA missing register group member(s)
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
+z80asm(<<'ASM', "-b -mz80-zxn", 0, "", "");
 	extern ext
 	ld a,1
 	dma.wr3 0x98, 23, 45
@@ -516,7 +516,7 @@ check_bin_file("test.bin", pack("C*",
 # DMA.WR4
 #------------------------------------------------------------------------------
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	ld a,1
 	dma.wr4 2
 	ld a,2
@@ -524,7 +524,7 @@ ASM
 Error at file 'test.asm' line 2: base register byte '2' is illegal
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	ld a,1
 	dma.wr4 0x11
 	ld a,2
@@ -532,7 +532,7 @@ ASM
 Error at file 'test.asm' line 2: DMA does not support interrupts
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	ld a,1
 	dma.wr4 0x01
 	dma.wr4 0x61
@@ -542,7 +542,7 @@ Error at file 'test.asm' line 2: DMA mode is illegal
 Error at file 'test.asm' line 3: DMA mode is illegal
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
+z80asm(<<'ASM', "-b -mz80-zxn", 0, "", "");
 	ld a,1
 	dma.wr4 0x40
 	ld a,2
@@ -552,7 +552,7 @@ check_bin_file("test.bin", pack("C*",
 				0xC1, 
 				0x3E, 2));
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	ld a,1
 	dma.wr4 0x44
 	ld a,2
@@ -560,7 +560,7 @@ ASM
 Error at file 'test.asm' line 2: DMA missing register group member(s)
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	ld a,1
 	dma.wr4 0x48
 	ld a,2
@@ -568,7 +568,7 @@ ASM
 Error at file 'test.asm' line 2: DMA missing register group member(s)
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
+z80asm(<<'ASM', "-b -mz80-zxn", 0, "", "");
 	ld a,1
 	dma.wr4 0x44, 23
 	ld a,2
@@ -578,7 +578,7 @@ check_bin_file("test.bin", pack("C*",
 				0xC5, 23,
 				0x3E, 2));
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
+z80asm(<<'ASM', "-b -mz80-zxn", 0, "", "");
 	ld a,1
 	dma.wr4 0x48, 23
 	ld a,2
@@ -588,7 +588,7 @@ check_bin_file("test.bin", pack("C*",
 				0xC9, 23,
 				0x3E, 2));
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	ld a,1
 	dma.wr4 0x4C
 	ld a,2
@@ -596,7 +596,7 @@ ASM
 Error at file 'test.asm' line 2: DMA missing register group member(s)
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
+z80asm(<<'ASM', "-b -mz80-zxn", 0, "", "");
 	ld a,1
 	dma.wr4 0x4C, 0x1234
 	ld a,2
@@ -611,7 +611,7 @@ check_bin_file("test.bin", pack("C*",
 # DMA.WR5
 #------------------------------------------------------------------------------
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	ld a,1
 	dma.wr5 0x01
 	dma.wr5 0x04
@@ -623,7 +623,7 @@ Error at file 'test.asm' line 3: base register byte '4' is illegal
 Error at file 'test.asm' line 4: base register byte '64' is illegal
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", <<'WARN');
+z80asm(<<'ASM', "-b -mz80-zxn", 0, "", <<'WARN');
 	ld a,1
 	dma.wr5 0
 	dma.wr5 0x08
@@ -641,7 +641,7 @@ check_bin_file("test.bin", pack("C*",
 # DMA.WR6 | DMA.CMD
 #------------------------------------------------------------------------------
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	ld a,1
 	dma.wr6 0x00
 	dma.cmd 0x00
@@ -1607,7 +1607,7 @@ Error at file 'test.asm' line 480: illegal DMA command
 Error at file 'test.asm' line 481: illegal DMA command
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
+z80asm(<<'ASM', "-b -mz80-zxn", 0, "", "");
 	ld a,1
 	
 	dma.wr6 0x83
@@ -1634,7 +1634,7 @@ check_bin_file("test.bin", pack("C*",
 				0xD3,
 				0x3E, 2));
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", <<'WARN');
+z80asm(<<'ASM', "-b -mz80-zxn", 0, "", <<'WARN');
 	ld a,1
 	
 	dma.wr6 0xC3
@@ -1712,7 +1712,7 @@ check_bin_file("test.bin", pack("C*",
 				0xB3,
 				0x3E, 2));
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	ld a,1
 	dma.wr6 0xBB
 	dma.cmd 0xBB
@@ -1722,7 +1722,7 @@ Error at file 'test.asm' line 2: DMA missing register group member(s)
 Error at file 'test.asm' line 3: DMA missing register group member(s)
 ERR
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 0, "", "");
+z80asm(<<'ASM', "-b -mz80-zxn", 0, "", "");
 	ld a,1
 	dma.wr6 0xBB, 0x7F
 	dma.cmd 0xBB, 0x7F
@@ -1734,7 +1734,7 @@ check_bin_file("test.bin", pack("C*",
 				0xBB, 0x7F,
 				0x3E, 2));
 
-z80asm(<<'ASM', "-b --cpu=z80-zxn", 1, "", <<'ERR');
+z80asm(<<'ASM', "-b -mz80-zxn", 1, "", <<'ERR');
 	ld a,1
 	dma.wr6 0xBB, 0x80
 	dma.cmd 0xBB, 0x80

@@ -71,7 +71,7 @@ for my $cpu ('z80', 'r2k') { #, 'z80-zxn', 'z180', 'r3k') {
 		# write test code
 		if (@asm) {
 			push @OUTPUT, "z80asm(\n";
-			push @OUTPUT, "    options => \"-l -b --cpu=$cpu".
+			push @OUTPUT, "    options => \"-l -b -m$cpu".
 						  ($rabbit ? " -DRABBIT" : "")."\",\n";
 			unless ($error) {
 				push @OUTPUT, "    asm1 => <<'END_ASM',\n";

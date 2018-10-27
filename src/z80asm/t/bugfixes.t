@@ -269,7 +269,7 @@ z80asm(
 							;; 78 B1 20 02 CB 95 ED 54 F1 C9 BE 23 
 							;; 0B F5 ED 54 CB C5 18 EA
 ASM
-	options	=> "$list -b --cpu=r2k",
+	options	=> "$list -b -mr2k",
 );
 }
 

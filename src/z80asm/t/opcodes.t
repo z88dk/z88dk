@@ -9,7 +9,7 @@ BEGIN {
 };
 
 z80asm(
-    options => "-l -b --cpu=z80",
+    options => "-l -b -mz80",
     asm1 => <<'END_ASM',
         public ZERO
         defc ZERO    = 0
@@ -2232,7 +2232,7 @@ ENDIF
 END_ASM
 );
 z80asm(
-    options => "-l -b --cpu=z80",
+    options => "-l -b -mz80",
     asm  => <<'END_ASM',
         ldx                             ;; error: syntax error
         ld                              ;; error: syntax error
@@ -2333,7 +2333,7 @@ ENDIF
 END_ASM
 );
 z80asm(
-    options => "-l -b --cpu=r2k -DRABBIT",
+    options => "-l -b -mr2k -DRABBIT",
     asm1 => <<'END_ASM',
         public ZERO
         defc ZERO    = 0
@@ -4398,7 +4398,7 @@ ENDIF
 END_ASM
 );
 z80asm(
-    options => "-l -b --cpu=r2k -DRABBIT",
+    options => "-l -b -mr2k -DRABBIT",
     asm  => <<'END_ASM',
         ldx                             ;; error: syntax error
         ld                              ;; error: syntax error

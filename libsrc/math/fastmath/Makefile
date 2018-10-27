@@ -24,35 +24,35 @@ OBJECTS = $(CLASSIC_OBJECTS) $(NEWLIB_OBJECTS)
 all: dirs $(OBJECTS) fastmath.lst $(OUTPUT_DIRECTORY)/fastmath.lib $(OUTPUT_DIRECTORY)/fastmath_ixiy.lib
 
 obj/z80/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@$(ASSEMBLER) -I../ --cpu=z80 -D__CLASSIC $^
+	@$(ASSEMBLER) -I../ -mz80 -D__CLASSIC $^
 	@mv $(^:.asm=.o) $@
 
 obj/ixiy/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@$(ASSEMBLER) -I../ --IXIY --cpu=z80 -D__CLASSIC $^
+	@$(ASSEMBLER) -I../ --IXIY -mz80 -D__CLASSIC $^
 	@mv $(^:.asm=.o) $@
 
 obj/r2k/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@$(ASSEMBLER) -I../ --cpu=r2k -D__CLASSIC $^
+	@$(ASSEMBLER) -I../ -mr2k -D__CLASSIC $^
 	@mv $(^:.asm=.o) $@
 
 obj/z80-zxn/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@$(ASSEMBLER) -I../ --cpu=z80-zxn -D__CLASSIC $^
+	@$(ASSEMBLER) -I../ -mz80-zxn -D__CLASSIC $^
 	@mv $(^:.asm=.o) $@
 
 obj/z80/%.o: %.asm
-	@$(ASSEMBLER) -I../ --cpu=z80 -D__CLASSIC $^
+	@$(ASSEMBLER) -I../ -mz80 -D__CLASSIC $^
 	@mv $(^:.asm=.o) $@
 
 obj/ixiy/%.o: %.asm
-	@$(ASSEMBLER) -I../ --IXIY --cpu=z80 -D__CLASSIC $^
+	@$(ASSEMBLER) -I../ --IXIY -mz80 -D__CLASSIC $^
 	@mv $(^:.asm=.o) $@
 
 obj/r2k/%.o: %.asm
-	@$(ASSEMBLER) -I../ --cpu=r2k -D__CLASSIC $^
+	@$(ASSEMBLER) -I../ -mr2k -D__CLASSIC $^
 	@mv $(^:.asm=.o) $@
 
 obj/z80-zxn/%.o: %.asm
-	@$(ASSEMBLER) -I../ --cpu=z80-zxn -D__CLASSIC $^
+	@$(ASSEMBLER) -I../ -mz80-zxn -D__CLASSIC $^
 	@mv $(^:.asm=.o) $@
 
 obj/z80/%.o: %.c

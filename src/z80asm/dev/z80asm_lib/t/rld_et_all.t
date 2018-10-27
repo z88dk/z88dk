@@ -28,7 +28,7 @@ for my $cpu (@CPUS) {
 					$test_nr++;
 					note "Test $test_nr: cpu:$cpu, carry:$carry, a:$a, data:$data, op:$op";
 					my $carry_set = $carry ? "scf" : "and a";
-					my $r = ticks(<<END, "--cpu=$cpu");
+					my $r = ticks(<<END, "-m$cpu");
 						defc data = 0x100
 								$carry_set
 								ld bc, $bc

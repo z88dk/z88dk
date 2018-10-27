@@ -173,12 +173,12 @@ add("cu.stop", 			0xFF, 0xFF);
 # cu.nop  -> 16-bit encoding 0x0000 (do nothing cu.move)
 add("cu.nop", 			0x00, 0x00);
 
-z80asm(join('', @asm), "--cpu=z80-zxn -l -b", 0, "", "");
+z80asm(join('', @asm), "-mz80-zxn -l -b", 0, "", "");
 check_bin_file("test.bin", join('', @bin));
 
 #------------------------------------------------------------------------------
 # test list file
-z80asm(<<END, "--cpu=z80-zxn -l", 0, "", "");
+z80asm(<<END, "-mz80-zxn -l", 0, "", "");
 	cu.wait 0,1
 END
 check_text_file("test.lis", <<END);
@@ -188,7 +188,7 @@ END
 
 #------------------------------------------------------------------------------
 # test error
-z80asm("cu.wait 0,1", "--cpu=z80", 1, "", <<'END');
+z80asm("cu.wait 0,1", "-mz80", 1, "", <<'END');
 Error at file 'test.asm' line 1: illegal identifier
 END
 
@@ -207,7 +207,7 @@ spew("test1.asm", <<"END");
 END
 run("z80asm test1.asm", 0, "", "");
 
-z80asm(<<'END', "--cpu=z80-zxn -b -otest.bin test1.o", 0, "", "");
+z80asm(<<'END', "-mz80-zxn -b -otest.bin test1.o", 0, "", "");
 	extern VER,HOR,REG,VAL
 	cu.wait VER,HOR
 	cu.move REG,VAL

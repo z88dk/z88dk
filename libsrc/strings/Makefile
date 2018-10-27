@@ -22,32 +22,32 @@ OBJECTS = $(CLASSIC_OBJECTS) $(NEWLIB_OBJECTS)
 all: dirs $(OBJECTS) $(NEWLIB_PHONY)
 
 newlib-z80: 
-	@$(ASSEMBLER) -d -O=obj/z80/x -I.. --cpu=z80 -D__CLASSIC $(NEWLIBGLOBS)
+	@$(ASSEMBLER) -d -O=obj/z80/x -I.. -mz80 -D__CLASSIC $(NEWLIBGLOBS)
 
 newlib-r2k: 
-	@$(ASSEMBLER) -d -O=obj/r2k/x -I.. --cpu=r2k -D__CLASSIC $(NEWLIBGLOBS)
+	@$(ASSEMBLER) -d -O=obj/r2k/x -I.. -mr2k -D__CLASSIC $(NEWLIBGLOBS)
 
 newlib-z80-zxn: 
-	@$(ASSEMBLER) -d -O=obj/z80-zxn/x -I.. --cpu=z80-zxn -D__CLASSIC $(NEWLIBGLOBS)
+	@$(ASSEMBLER) -d -O=obj/z80-zxn/x -I.. -mz80-zxn -D__CLASSIC $(NEWLIBGLOBS)
 
 newlib-ixiy: 
-	@$(ASSEMBLER) -d -O=obj/ixiy/x -I.. --cpu=z80 --IXIY -D__CLASSIC $(NEWLIBGLOBS)
+	@$(ASSEMBLER) -d -O=obj/ixiy/x -I.. -mz80 --IXIY -D__CLASSIC $(NEWLIBGLOBS)
 
 
 obj/z80/%.o: %.asm
-	@$(ASSEMBLER) -I../ --cpu=z80 -D__CLASSIC $^
+	@$(ASSEMBLER) -I../ -mz80 -D__CLASSIC $^
 	@mv $(^:.asm=.o) $@
 
 obj/ixiy/%.o: %.asm
-	@$(ASSEMBLER) -I../ --IXIY --cpu=z80 -D__CLASSIC $^
+	@$(ASSEMBLER) -I../ --IXIY -mz80 -D__CLASSIC $^
 	@mv $(^:.asm=.o) $@
 
 obj/r2k/%.o: %.asm
-	@$(ASSEMBLER) -I../ --cpu=r2k -D__CLASSIC $^
+	@$(ASSEMBLER) -I../ -mr2k -D__CLASSIC $^
 	@mv $(^:.asm=.o) $@
 
 obj/z80-zxn/%.o: %.asm
-	@$(ASSEMBLER) -I../ --cpu=z80-zxn -D__CLASSIC $^
+	@$(ASSEMBLER) -I../ -mz80-zxn -D__CLASSIC $^
 	@mv $(^:.asm=.o) $@
 
 obj/z80/%.o: %.c
