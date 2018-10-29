@@ -126,6 +126,9 @@ extern option_t  nascom_options;
 extern int       nec_exec(char *target);
 extern option_t  nec_options;
 
+extern int       pc88_exec(char *target);
+extern option_t  pc88_options;
+
 extern int       p2000_exec(char *target);
 extern option_t  p2000_options;
 
@@ -334,6 +337,10 @@ struct {
       "PC-6001 (and others) CAS format conversion utility",
       NULL,
       nec_exec,    &nec_options },
+    { "bin2t88",   "pc88",       "(C) 2018 Stefano Bodrato",
+      "PC-8801 T88 format conversion utility",
+      NULL,
+      pc88_exec,    &pc88_options },
     { "bin2nwbn",  "newbrain",       "(C) 2007 Stefano Bodrato",
       "BASIC loader + data block in Tape format or plain TXT (less efficient)",
       NULL,
