@@ -255,6 +255,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\mameql.c"
+				>
+			</File>
+			<File
 				RelativePath=".\msx.c"
 				>
 			</File>
@@ -292,6 +296,10 @@
 			</File>
 			<File
 				RelativePath=".\p2000.c"
+				>
+			</File>
+			<File
+				RelativePath=".\pc88.c"
 				>
 			</File>
 			<File
