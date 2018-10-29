@@ -48,7 +48,7 @@
 
 IF (!DEFINED_startup || (startup=1))
         IFNDEF CRT_ORG_CODE
-                defc CRT_ORG_CODE  = 32768
+                defc CRT_ORG_CODE  = $8A00
         ENDIF
 ELSE
         IFNDEF CRT_ORG_CODE
