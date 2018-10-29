@@ -180,10 +180,9 @@ int pc88_exec(char* target)
 		writebyte_cksum((unsigned char)(pos & 0xff), fpout, &checksum);  // LSB
 		writebyte(0x100 - (checksum & 0xff), fpout);
 		
-		#define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
+		len2=128;
 		for (i=0; i<len; i+=len2) {
-			len2=MIN(len-i,128);
-			//pc88_write_data_block(len2, fpin, fpout);
+			if ((len-i)<128) len2=len-i;
 			writebyte(0x3a, fpout);
 			checksum = 0;
 			writebyte_cksum(len2, fpout, &checksum);
