@@ -8,16 +8,20 @@
 #include "appmake.h"
 #include "fcntl.h"
 
-
+/* Binding to functions in nec.c */
+extern void nec_rawout (FILE *fpout, unsigned char b);
+extern void nec_bit (FILE *fpout, unsigned char bit);
+extern char nec_fast;
 
 static char             *binname      = NULL;
 static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
 static int               origin       = -1;
+static char              audio        = 0;
 static char              dumb         = 0;
 static char              help         = 0;
 
-static long elapsed;
+static long              elapsed;
 
 
 /* Options that are available for this module */
@@ -26,6 +30,8 @@ option_t pc88_options[] = {
     { 'b', "binfile",  "Linked binary file",         OPT_STR,   &binname },
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
+    {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
+    {  0,  "fast",     "Create a fast loading WAV",  OPT_BOOL,  &nec_fast },
     {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
     {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
@@ -57,6 +63,11 @@ void pc88_write_data_tag(int datlen, FILE* fpout)
 
 
 
+long getlong (FILE *fpin)
+{
+	return (fgetc(fpin)+256*fgetc(fpin)+65536*fgetc(fpin)+16777216*fgetc(fpin));
+}
+
 
 /*
  * Execution starts here
@@ -65,13 +76,14 @@ void pc88_write_data_tag(int datlen, FILE* fpout)
 int pc88_exec(char* target)
 {
     char filename[FILENAME_MAX + 1];
+    char wavfile[FILENAME_MAX+1];
     char name[10];
     char buf[25];
     FILE* fpin;
     FILE* fpout;
     int len, len2;
     long pos;
-	unsigned long checksum;
+	unsigned long checksum, ticks;
     int c, i, j;
 
     if (help)
@@ -81,6 +93,7 @@ int pc88_exec(char* target)
         return -1;
     }
 
+	
 	/* Creating the ".T88" file */
 	
     if (dumb)
@@ -214,11 +227,14 @@ int pc88_exec(char* target)
         fclose(fpout);
 	}
 
-    if ((dumb)) {
-        if ((fpin = fopen(filename, "rb")) == NULL) {
-            fprintf(stderr, "Can't open file %s for dumb analisys\n", filename);
-            myexit(NULL, 1);
-        }
+	/* ***************************************** */
+	/*  Now, if requested, create the audio file */
+	/* ***************************************** */
+	if (( audio ) || ( nec_fast )) {
+		if ( (fpin=fopen(filename,"rb") ) == NULL ) {
+			fprintf(stderr,"Can't open file %s for wave conversion\n",filename);
+			myexit(NULL,1);
+		}
 		
 		for (i=0; i<23; i++)
 			buf[i]=fgetc(fpin);
@@ -228,50 +244,112 @@ int pc88_exec(char* target)
 		}
 		fgetc(fpin);
 		
+        strcpy(wavfile,filename);
+
+			suffix_change(wavfile,".RAW");
+
+		if ( (fpout=fopen(wavfile,"wb") ) == NULL ) {
+			fprintf(stderr,"Can't open output raw audio file %s\n",wavfile);
+			myexit(NULL,1);
+		}
+		
 		while (i!=0) {
 			i=fgetc(fpin)+256*fgetc(fpin);
 			switch (i)
 			{
 				case 1:
-					printf ("T88 file version: ");
 					fgetc(fpin); fgetc(fpin);
-					printf ("%X\n",fgetc(fpin)+256*fgetc(fpin));
+					if (dumb) {
+						printf ("T88 file version: ");
+						printf ("%X\n",fgetc(fpin)+256*fgetc(fpin));
+					} else {
+						fgetc(fpin); fgetc(fpin);
+					}
 					break;
 				case 0x100:
-					printf ("  -Blank- (0100): ");
-					i=fgetc(fpin)+256*fgetc(fpin);
-					//for (j=1; j<=i; j++) c=fgetc(fpin);
-					printf (" elapsed=%0.2f sec., ",(float)(fgetc(fpin)+256*fgetc(fpin)+65536*fgetc(fpin)+16777216*fgetc(fpin))/4800);
-					printf (" tick=%0.2f sec.\n",(float)(fgetc(fpin)+256*fgetc(fpin)+65536*fgetc(fpin)+16777216*fgetc(fpin))/4800);
+					if (dumb)
+						printf ("  -Blank- : ");
+					fgetc(fpin); fgetc(fpin);	/* TAG length */
+					ticks=getlong(fpin);
+					if (dumb)
+						printf (" elapsed=%0.2f sec., ",(float) ticks / 4800);
+					ticks=getlong(fpin);
+					if (dumb)
+						printf (" ticks=%0.2f sec.\n",(float) ticks / 4800);
+
+					for (i = 0; (i < ticks); i++)	/* duration approximated */
+						fputc(0x80, fpout);
+					
 					break;
 				case 0x102:
-					printf ("  SPACE tone (0102): ");
-					i=fgetc(fpin)+256*fgetc(fpin);
-					//for (j=1; j<=i; j++) c=fgetc(fpin);
-					printf (" elapsed=%0.2f sec., ",(float)(fgetc(fpin)+256*fgetc(fpin)+65536*fgetc(fpin)+16777216*fgetc(fpin))/4800);
-					printf (" tick=%0.2f sec.\n",(float)(fgetc(fpin)+256*fgetc(fpin)+65536*fgetc(fpin)+16777216*fgetc(fpin))/4800);
+					if (dumb)
+						printf ("  SPACE tone : ");  /* 1200 */
+					fgetc(fpin); fgetc(fpin);	/* TAG length */
+					ticks=getlong(fpin);
+					if (dumb)
+						printf (" elapsed=%0.2f sec., ",(float) ticks / 4800);
+					ticks=getlong(fpin);
+					if (dumb)
+						printf (" ticks=%0.2f sec.\n",(float) ticks / 4800);
+					
+					for (i = 0; (i < (ticks/9)); i++)	/* duration approximated */
+						nec_bit(fpout, 0);
+					
 					break;
 				case 0x103:
-					printf ("  MARK tone (0103): ");
-					i=fgetc(fpin)+256*fgetc(fpin);
-					//for (j=1; j<=i; j++) c=fgetc(fpin);
-					printf (" elapsed=%0.2f sec., ",(float)(fgetc(fpin)+256*fgetc(fpin)+65536*fgetc(fpin)+16777216*fgetc(fpin))/4800);
-					printf (" tick=%0.2f sec.\n",(float)(fgetc(fpin)+256*fgetc(fpin)+65536*fgetc(fpin)+16777216*fgetc(fpin))/4800);
+					if (dumb)
+						printf ("  MARK tone : ");	/* 2400 */
+					fgetc(fpin); fgetc(fpin);	/* TAG length */
+					ticks=getlong(fpin);
+					if (dumb)
+						printf (" elapsed=%0.2f sec., ",(float) ticks / 4800);
+					ticks=getlong(fpin);
+					if (dumb)
+						printf (" ticks=%0.2f sec.\n",(float) ticks / 4800);
+					
+					for (i = 0; (i < (ticks/7)); i++)	/* duration approximated */
+						nec_bit(fpout, 1);
+					
 					break;
 				case 0x101:
-					printf ("    Data block (0101): ");
+					if (dumb)
+						printf ("    Data block : ");
 					i=fgetc(fpin)+256*fgetc(fpin);
-					printf ("TAG len: %d\n",i);
-					for (j=1; j<=i; j++) c=fgetc(fpin);
+					if (dumb)
+						printf ("TAG length: %d\n",i);
+					for (j=1; j<=10; j++) c=fgetc(fpin);
+					j=fgetc(fpin)+256*fgetc(fpin);
+					switch (j) {
+					case 0x00cc:
+						printf ("      600 baud.   WARNING: data will be saved at 1200 bps\n");
+						break;
+					case 0x01cc:
+						if (dumb)
+							printf ("      1200 baud\n");
+						break;
+					default:
+						printf ("   WARNING: unexpected value for 'baud rate': 0x%X\n",j);
+						break;
+					}
+					i-=12;
+					for (j=1; j<=i; j++)
+						nec_rawout(fpout,fgetc(fpin));
 					break;
 				default:
-					printf ("TAG type: %X\n",i);
+					if (dumb)
+						printf ("TAG type: %X\n",i);
 					i=fgetc(fpin)+256*fgetc(fpin);
-					printf ("TAG len: %X\n",i);
+					if (dumb)
+						printf ("TAG len: %X\n",i);
 					for (j=1; j<=i; j++) c=fgetc(fpin);
 					break;
 			}
 		}
+        fclose(fpin);
+        fclose(fpout);
+
+		/* Now complete with the WAV header */
+		raw2wav(wavfile);
 	}
 
     return 0;
