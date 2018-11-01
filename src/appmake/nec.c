@@ -19,7 +19,8 @@ static int               origin       = -1;
 static int               mode         = -1;
 static char              help         = 0;
 static char              audio        = 0;
-static char              fast         = 0;
+
+char              nec_fast = 0;
 //static char              dumb         = 0;
 
 
@@ -30,7 +31,7 @@ option_t nec_options[] = {
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
     {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
-    {  0,  "fast",     "Create a fast loading WAV",  OPT_BOOL,  &fast },
+    {  0,  "fast",     "Create a fast loading WAV",  OPT_BOOL,  &nec_fast },
 //    {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
 	{  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
     {  0,  "mode",     "0..5: 16k,32k,mk2,n,ROM,n88", OPT_INT,  &mode },
@@ -70,11 +71,11 @@ enum {
 /* variation, so here it is !                              */
 
 
-void nec_bit (FILE *fpout, unsigned char bit)
+extern void nec_bit (FILE *fpout, unsigned char bit)
 {
 	int i, period0, period1;
   
-	if ( fast ) {
+	if ( nec_fast ) {
 		period1 = 8;
 		period0 = 14;
 	} else {
@@ -101,7 +102,7 @@ void nec_bit (FILE *fpout, unsigned char bit)
 	}
 }
 
-void nec_rawout (FILE *fpout, unsigned char b)
+extern void nec_rawout (FILE *fpout, unsigned char b)
 {
   /* bit order is reversed ! */
   static unsigned char c[8] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
@@ -385,7 +386,7 @@ int nec_exec(char *target)
 	/* ***************************************** */
 	/*  Now, if requested, create the audio file */
 	/* ***************************************** */
-	if (( audio ) || ( fast )) {
+	if (( audio ) || ( nec_fast )) {
 		if ( (fpin=fopen(filename,"rb") ) == NULL ) {
 			fprintf(stderr,"Can't open file %s for wave conversion\n",filename);
 			myexit(NULL,1);
