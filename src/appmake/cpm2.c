@@ -194,6 +194,20 @@ static cpm_discspec tiki100_spec = {
     .first_sector_offset = 1,
 };
 
+static cpm_discspec svi40ss_spec = {
+    .sectors_per_track = 17,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x52,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+};
+
 
 
 
@@ -217,6 +231,7 @@ struct formats {
     { "mz2500cpm", "Sharp MZ2500 - CPM", &mz2500cpm_spec, 0, NULL, 1 },
     { "osborne1",  "Osborne 1",          &osborne_spec, 0, NULL, 1 },
     { "qc10",      "Epson QC-10, QX-10", &qc10_spec, 0, NULL, 1 },
+    { "svi-40ss",   "SVI 40ss (174k)",   &svi40ss_spec, 0, NULL, 1 },
     { "tiki100-40t","Tiki 100 (200k)",   &tiki100_spec, 0, NULL, 1 },
     { NULL, NULL }
 };
