@@ -292,7 +292,7 @@ int pc88_exec(char* target)
 					if (dumb)
 						printf (" ticks=%0.2f sec.\n",(float) ticks / 4800);
 					
-					for (i = 0; (i < (ticks/9)); i++)	/* duration approximated */
+					for (i = 0; (i < (ticks/4)); i++)	/* duration approximated */
 						nec_bit(fpout, 0);
 					
 					break;
@@ -307,7 +307,7 @@ int pc88_exec(char* target)
 					if (dumb)
 						printf (" ticks=%0.2f sec.\n",(float) ticks / 4800);
 					
-					for (i = 0; (i < (ticks/7)); i++)	/* duration approximated */
+					for (i = 0; (i < (ticks/4)); i++)	/* duration approximated */
 						nec_bit(fpout, 1);
 					
 					break;
