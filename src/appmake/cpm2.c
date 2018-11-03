@@ -208,6 +208,26 @@ static cpm_discspec svi40ss_spec = {
     .first_sector_offset = 1,
 };
 
+static cpm_discspec col1_spec = {
+    .sectors_per_track = 8,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x52,
+    .filler_byte = 0xe5,
+    .boottracks = 0,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .offset = 13312,
+    .has_skew = 1,
+    .skew_track_start = 0,
+    .skew_tab = { 0, 5, 2, 7, 4, 1, 6, 3 }
+};
+
+
+
 
 
 
@@ -223,6 +243,7 @@ struct formats {
 } formats[] = {
     { "attache",   "Otrona Attache'",     &attache_spec, 0, NULL, 1 },
     { "cpcsystem", "CPC System Disc",    &cpcsystem_spec, 0, NULL, 0 },
+    { "col1",      "Coleco ADAM 40T SSDD", &col1_spec, 0, NULL, 1 },
     { "dmv",       "NCR Decision Mate",  &dmv_spec, 16, "\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5NCR F3", 1 },
     { "einstein",  "Tatung Einstein",    &einstein_spec, 0, NULL, 1 },
     { "kayproii",  "Kaypro ii",          &kayproii_spec, 0, NULL, 1 },

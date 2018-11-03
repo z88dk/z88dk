@@ -19,6 +19,7 @@ typedef struct {
     uint8_t   has_skew;
     uint16_t  skew_track_start;
     uint8_t   skew_tab[10];
+    uint32_t  offset;		/* Offset to directory */
 } cpm_discspec;
 
 typedef struct cpm_handle_s cpm_handle;
