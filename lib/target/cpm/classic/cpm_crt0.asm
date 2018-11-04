@@ -35,6 +35,7 @@
 ; Some scope definitions
 ;-----------------------
 
+	EXTERN	cpm_platform_init
 	EXTERN    _main		;main() is always external to crt0
 
 	PUBLIC    cleanup		;jp'd to by exit()
@@ -97,7 +98,8 @@ IF (startup=3)
 ENDIF
         INCLUDE "crt/classic/crt_init_sp.asm"
         INCLUDE "crt/classic/crt_init_atexit.asm"
-        call    crt0_init_bss   ;Initialise any data setup by sdcc
+        call    crt0_init_bss   
+	call	cpm_platform_init	;Any platform specific init
 	ld      (exitsp),sp
 
 ; Memory banking for Spectrum +3
