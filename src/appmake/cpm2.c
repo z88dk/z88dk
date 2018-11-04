@@ -402,6 +402,11 @@ static void create_filename(const char* binary, char* cpm_filename, char force_c
 {
     int count = 0;
     int dest = 0;
+    char *ptr;
+
+    if ( (ptr = strchr(binary,'/') ) || (ptr = strrchr(binary,'\\')) ) {
+        binary = ptr + 1;
+    }
 
     while (count < 8 && count < strlen(binary) && binary[count] != '.') {
         if (binary[count] > 127) {
