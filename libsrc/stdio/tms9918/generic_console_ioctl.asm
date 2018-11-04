@@ -8,7 +8,7 @@
 	EXTERN	generic_console_font32
 	EXTERN	generic_console_udg32
 
-IF !FORspc1000 && !FOReinstein
+IF !FORspc1000 && !FOReinstein && !FORsvi
 	PUBLIC		generic_console_ioctl
 
 	defc		generic_console_ioctl = __tms9918_console_ioctl
