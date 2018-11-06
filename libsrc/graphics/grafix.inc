@@ -57,6 +57,12 @@ IF FORpc6001
 	defc USEplotc   = 1		; We call generic_console_plotc, not _printc for text mode
 ENDIF
 
+IF FORpc88
+	DEFINE gotgfx
+	defc maxx	= 160
+	defc maxy	= 100
+ENDIF
+
 IF FORvz
 	DEFINE gotgfx
 	IF BLOCKgfx
