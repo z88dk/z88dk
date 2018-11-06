@@ -340,6 +340,11 @@ pc88_clib.lib:
 	$(call buildgeneric,pc88)
 	$(MAKE) -C games TARGET=pc88
 	TARGET=pc88 TYPE=z80 $(LIBLINKER) -DFORpc88 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pc88_clib @$(LISTFILE_DIRECTORY)/pc88.lst
+	@echo ''
+	@echo '--- Building PC8801 160x100 graphics Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(LIBLINKER) -DFORpc88 -x$(OUTPUT_DIRECTORY)/gfxpc88 @$(LISTFILE_DIRECTORY)/gfxpc88.lst
 
 # Native for sprinter - dom
 pps_clib.lib:
