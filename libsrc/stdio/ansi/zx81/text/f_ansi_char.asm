@@ -3,8 +3,8 @@
 ;	By Stefano Bodrato - Apr. 2000 / Oct 2017
 ;
 ;	set it up with:
-;	.text_cols	= max columns
-;	.text_rows	= max rows
+;	.console_w = max columns
+;	.console_h = max rows
 ;
 ;	Display a char in location (ansi_ROW),(ansi_COLUMN)
 ;	A=char to display
@@ -18,16 +18,12 @@
 	
 	EXTERN	asctozx81
 	
-	PUBLIC	text_cols
-	PUBLIC	text_rows
 
 	EXTERN	ansi_ROW
 	EXTERN	ansi_COLUMN
 	
 	EXTERN	zx_inverse
 
-.text_cols   defb 32
-.text_rows   defb 24
 
 
 .ansi_CHAR

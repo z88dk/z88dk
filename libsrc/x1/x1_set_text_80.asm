@@ -11,7 +11,7 @@
 	PUBLIC	_x1_set_text_80
 ;	EXTERN		x1_get_pcg_version
 	EXTERN		set_crtc_10
-	EXTERN	text_cols
+	EXTERN	__console_w
 
 
 x1_set_text_80:
@@ -37,7 +37,7 @@ set_vmode:
 		out		(c),a
 
 		ld		a,80
-		ld		(text_cols),a
+		ld		(__console_w),a
 
 		ret
 
