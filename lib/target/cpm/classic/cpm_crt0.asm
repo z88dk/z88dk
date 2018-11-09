@@ -92,7 +92,7 @@ ENDIF
 	ld      (start1+1),sp	;Save entry stack
 IF (startup=3)
 	; Increase to cover +3 MEM banking
-	defc	__clib_exit_stack_size_t  = __clib_exit_stack_size + 18
+	defc	__clib_exit_stack_size_t  = __clib_exit_stack_size + 18 + 18
 	UNDEFINE __clib_exit_stack_size
 	defc	__clib_exit_stack_size = __clib_exit_stack_size_t
 ENDIF
