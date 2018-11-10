@@ -73,6 +73,7 @@ define buildgeneric
 	$(MAKE) -C adt-newlib
 	$(MAKE) -C algorithm
 	$(MAKE) -C rect
+	$(MAKE) -C arch/z80
 endef
 
 #  short script to sort out gfx dependencies
@@ -1389,6 +1390,7 @@ classic-clean:
 	$(MAKE) -C nc100 clean
 	$(MAKE) -C compress/zx7 clean
 	$(MAKE) -C font clean
+	$(MAKE) -C arch clean
 	$(RM) *.lib
 
 new-clean:

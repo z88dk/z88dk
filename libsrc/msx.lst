@@ -84,7 +84,6 @@ psg/msx/get_psg
 psg/msx/set_psg
 psg/msx/set_psg_callee
 @psg/psg.lst
-msx/asmlib/AsmCall
 msx/asmlib/BiosCall
 msx/asmlib/DosCall
 msx/asmlib/UnapiBuildCodeBlock
