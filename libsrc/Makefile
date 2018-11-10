@@ -73,6 +73,7 @@ define buildgeneric
 	$(MAKE) -C adt-newlib
 	$(MAKE) -C algorithm
 	$(MAKE) -C rect
+	$(MAKE) -C arch/z80
 endef
 
 #  short script to sort out gfx dependencies
@@ -769,6 +770,7 @@ msx_clib.lib:
 	$(RM) games/msx/*.o
 	$(MAKE) -C games TARGET=msx
 	$(MAKE) -C msx TARGET=msx
+	$(MAKE) -C msx/asmlib TARGET=msx
 	$(MAKE) -C psg
 	TARGET=msx TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/msx_clib @$(LISTFILE_DIRECTORY)/msx.lst
 
@@ -1388,6 +1390,7 @@ classic-clean:
 	$(MAKE) -C nc100 clean
 	$(MAKE) -C compress/zx7 clean
 	$(MAKE) -C font clean
+	$(MAKE) -C arch clean
 	$(RM) *.lib
 
 new-clean:
