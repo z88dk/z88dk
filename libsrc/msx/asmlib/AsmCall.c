@@ -19,7 +19,7 @@ void AsmCall(uint16_t address, Z80_registers* regs, register_usage inRegistersDe
     push    de
     pop     ix   ;IX=&Z80regs
 
-    ld      de,#CONT
+    ld      de,CONT
     push    de
     push    hl
 
