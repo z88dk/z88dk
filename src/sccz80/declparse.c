@@ -512,7 +512,7 @@ static void parse_trailing_modifiers(Type *type)
             continue;
         } else if ( amatch("__z88dk_sdccdecl")) {
             type->flags |= SDCCDECL;
-            type->flags &= ~SMALLC;
+            type->flags &= ~(SMALLC|FLOATINGDECL);
             continue;
         } else if ( amatch("__z88dk_params_offset")) {
             needchar('(');
@@ -1473,7 +1473,7 @@ static void declfunc(Type *type, enum storage_type storage)
             }
         }
         // Take the prototype flags
-        type->flags |= currfn->ctype->flags;
+        type->flags = (type->flags & ~(SMALLC)) | currfn->ctype->flags;
         if ( currfn->ctype->funcattrs.params_offset ) 
             type->funcattrs.params_offset = currfn->ctype->funcattrs.params_offset;
         type->funcattrs.shortcall_rst = currfn->ctype->funcattrs.shortcall_rst;
