@@ -1208,7 +1208,7 @@ Index: src/z80/peep.c
 -  if(IS_Z180 && ISINST(pl->line, "tst\t"))
 -    return(argCont(pl->line + 4, what));
 +    if (!IS_GB && !IS_RAB && ISINST(pl->line, "in\t"))
-+        return(!strstr(strchr(pl->line + 4, ','), "(c)") && (*what == 'a') || strstr(strchr(pl->line + 4, ','), "(c)") && ((*what == 'b') || (*what == 'c')));
++        return(!strstr(strchr(pl->line + 3, ','), "(c)") && (*what == 'a') || strstr(strchr(pl->line + 4, ','), "(c)") && ((*what == 'b') || (*what == 'c')));
  
 -  if(IS_RAB && ISINST(pl->line, "mul"))
 -    return(!strcmp(what, "b") || !strcmp(what, "c") || !strcmp(what, "d") || !strcmp(what, "e"));
