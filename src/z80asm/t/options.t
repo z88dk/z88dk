@@ -63,13 +63,11 @@ for my $options ('-v', '--verbose') {
 
 # check no arguments
 t_z80asm_capture("-v=x", 	"", 	<<'ERR', 1);
-Error: illegal option '-v=x'
-Error: source filename missing
+Error: illegal option: -v=x
 ERR
 
 t_z80asm_capture("--verbose=x", 	"", 	<<'ERR', 1);
-Error: illegal option '--verbose=x'
-Error: source filename missing
+Error: illegal option: --verbose=x
 ERR
 
 # not verbose
@@ -80,13 +78,11 @@ is read_file(bin_file(), binmode => ':raw'), "\0";
 
 # check no arguments
 t_z80asm_capture("-nv=x", 	"", 	<<'ERR', 1);
-Error: illegal option '-nv=x'
-Error: source filename missing
+Error: illegal option: -nv=x
 ERR
 
 t_z80asm_capture("--not-verbose=x", 	"", 	<<'ERR', 1);
-Error: illegal option '--not-verbose=x'
-Error: source filename missing
+Error: illegal option: --not-verbose=x
 ERR
 
 #------------------------------------------------------------------------------
@@ -538,7 +534,7 @@ delete $ENV{TEST_ENV};
 t_z80asm_ok(0, $asm, "\x3E\x01", '"-D=_value${TEST_ENV}23"');
 
 #------------------------------------------------------------------------------
-# -i, --link-lib, -x, --make-lib
+# -i, --use-lib, -x, --make-lib
 #------------------------------------------------------------------------------
 
 unlink_testfiles();
@@ -566,7 +562,7 @@ ok copy(lib_file(), $lib), "create $lib";
 unlink(o_file(), lib_file());
 
 # link with the library
-for my $options ('-i', '-i=', '--link-lib', '--link-lib=') {
+for my $options ('-i', '-i=', '--use-lib', '--use-lib=') {
 	t_z80asm_ok(0, "
 		EXTERN one
 		jp one
@@ -932,6 +928,17 @@ t_binary(read_binfile("test.bin"), "\4");
 unlink "test.bin";
 t_z80asm_capture('-mr3k -b test.asm', "", "", 0);
 t_binary(read_binfile("test.bin"), "\5");
+
+#------------------------------------------------------------------------------
+# --
+#------------------------------------------------------------------------------
+write_file("-test.asm", "nop");
+t_z80asm_capture("-b -test.asm", "", <<END, 1);
+Error: illegal option: -test.asm
+END
+t_z80asm_capture("-b -- -test.asm", "", "", 0);
+t_binary(read_binfile("-test.bin"), "\x00");
+unlink(<-test.*>);
 
 unlink_testfiles();
 done_testing();

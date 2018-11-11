@@ -14,9 +14,7 @@
 # When the expression to be computed is based on symbols from different sections
 # or modules, the evaluation needs to be postponed to the link phase.
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 require './t/testlib.pl';
 

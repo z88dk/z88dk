@@ -8,9 +8,7 @@
 #
 # Compile enigma.c for CPM and run it under a CPM emulator
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 use Path::Tiny;
 require './t/testlib.pl';

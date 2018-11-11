@@ -86,7 +86,7 @@ OPT(OptCallArg, option_define, "-D", "--define", "Define a static symbol", "SYMB
 
 OPT_TITLE("Libraries:")
 OPT(OptCallArg, option_make_lib, "-x", "--make-lib", "Create a library file" FILEEXT_LIB, "FILE")
-OPT(OptCallArg, option_use_lib, "-i", "--link-lib", "Link library file" FILEEXT_LIB, "FILE")
+OPT(OptCallArg, option_use_lib, "-i", "--use-lib", "Use library file" FILEEXT_LIB, "FILE")
 
 OPT_TITLE("Binary Output:")
 OPT(OptString, (void*)&opts.output_directory, "-O", "--out-dir", "Output directory", "DIR")

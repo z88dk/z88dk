@@ -132,6 +132,32 @@ DEFINE_dtor_module()
 *   Parse command line, set options, including opts.files with list of
 *	input files, including parsing of '@' lists
 *----------------------------------------------------------------------------*/
+static void process_env_options()
+{
+	const char *opts = getenv("Z80ASM");
+	if (!opts)
+		return;
+
+	// add dummy program name option
+	argv_t* args = argv_new();
+	argv_push(args, "z80asm");
+
+	char *opts_copy = xstrdup(opts);		// strtok needs writeable string
+	char *tok = strtok(opts_copy, " ");
+	while (tok) {
+		argv_push(args, tok);
+		tok = strtok(NULL, " ");
+	}
+
+	// parse args
+	int argc = argv_len(args);
+	int arg;
+	process_options(&arg, argc, argv_front(args));
+
+	xfree(opts_copy);
+	argv_free(args);
+}
+
 void parse_argv( int argc, char *argv[] )
 {
     int arg;
@@ -141,10 +167,14 @@ void parse_argv( int argc, char *argv[] )
     if ( argc == 1 )
         exit_copyright();					/* exit if no arguments */
 
-    process_options( &arg, argc, argv );	/* process all options, set arg to next */
+	if (!get_num_errors())
+		process_env_options();				/* process options from Z80ASM environment variable */
 
-    if ( arg >= argc )
-        error_no_src_file();				/* no source file */
+	if (!get_num_errors())
+		process_options( &arg, argc, argv );/* process all options, set arg to next */
+
+	if (!get_num_errors() && arg >= argc)
+		error_no_src_file();				/* no source file */
 
 	if ( ! get_num_errors() )
         process_files( arg, argc, argv );	/* process each source file */
@@ -287,10 +317,16 @@ static void process_opt( int *parg, int argc, char *argv[] )
 static void process_options( int *parg, int argc, char *argv[] )
 {
 #define II (*parg)
-
-    for ( II = 1; II < argc && (argv[II][0] == '-' || argv[II][0] == '+'); II++ )
-        process_opt( &II, argc, argv );
-
+	for (II = 1; II < argc && (argv[II][0] == '-' || argv[II][0] == '+'); II++) {
+		if (strcmp(argv[II], "--") == 0) {
+			// end of options
+			II++;
+			break;
+		}
+		else {
+			process_opt(&II, argc, argv);
+		}
+	}
 #undef II
 }
 
@@ -337,11 +373,6 @@ static void process_file(char *filename )
 	cstr_strip(filename);
 	switch (filename[0])
 	{
-	case '-':		/* Illegal source file name */
-	case '+':
-		error_illegal_src_filename(filename);
-		break;
-
 	case '\0':		/* no file */
 		break;
 
@@ -383,6 +414,10 @@ void expand_list_glob(const char *filename)
 {
 	if (strpbrk(filename, "*?") != NULL) {		// is a pattern
 		argv_t *files = path_find_glob(filename);
+
+		if (argv_len(files) == 0)
+			error_glob_no_files(filename);		// error if pattern matched no file
+
 		for (char **p = argv_front(files); *p; p++) {
 			char *filename = *p;
 			src_push();

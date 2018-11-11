@@ -10,9 +10,7 @@
 # Test https://github.com/z88dk/z88dk/issues/270
 # z80asm: ignoring org -1 for sections when data is in object file separate from memory map file
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 require './t/testlib.pl';
 

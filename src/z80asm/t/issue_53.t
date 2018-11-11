@@ -10,9 +10,7 @@
 # Test https://github.com/z88dk/z88dk/issues/53
 # z80asm: public constants not being listed in global .def file
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 require './t/testlib.pl';
 

@@ -3,9 +3,7 @@
 #------------------------------------------------------------------------------
 # Test cpu opcode files created by ../dev/cpu/cpu.pl
 #------------------------------------------------------------------------------
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 use File::Basename;
 

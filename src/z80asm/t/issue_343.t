@@ -10,12 +10,8 @@
 # Test https://github.com/z88dk/z88dk/issues/343
 # z80asm: Rabbit emulation of cpi and cpir is broken
 
-use strict;
-use warnings;
-use v5.10;
-
+use Modern::Perl;
 use Test::More;
-
 require './t/testlib.pl';
 
 spew("test.asm",<<END);

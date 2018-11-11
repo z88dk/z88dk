@@ -70,8 +70,7 @@ note "BUG_0003";
 z80asm(
 	options => "-h=x",
 	error 	=> <<'ERR',
-Error: illegal option '-h=x'
-Error: source filename missing
+Error: illegal option: -h=x
 ERR
 );
 

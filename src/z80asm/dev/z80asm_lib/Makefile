@@ -10,7 +10,7 @@
 PROJ		:= z80asm
 
 INSTALL 	?= install
-Z80ASM		?= ../../$(PROJ)
+Z80ASM_EXE	?= ../../$(PROJ)
 SRC			:= $(filter-out test.asm,$(wildcard *.asm))
 
 #------------------------------------------------------------------------------
@@ -20,7 +20,7 @@ define MAKE_LIB
 all: $(PROJ)-$(strip $(1)).lib
 
 $(PROJ)-$(strip $(1)).lib: $(PROJ)_lib.lst $(SRC) Makefile ../../zobjfile.h
-	$(Z80ASM) -x$(PROJ)-$(strip $(1)).lib $(2) @$(PROJ)_lib.lst
+	$(Z80ASM_EXE) -x$(PROJ)-$(strip $(1)).lib $(2) @$(PROJ)_lib.lst
 
 clean::
 	$(RM) $(PROJ)-$(strip $(1)).lib

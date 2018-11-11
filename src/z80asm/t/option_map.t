@@ -9,9 +9,7 @@
 #
 # Test map file
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 require './t/testlib.pl';
 

@@ -10,9 +10,7 @@
 # Test https://github.com/z88dk/z88dk/issues/673
 # z80asm: MODULE directive cannot accept names that coincide with register or flag names
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 require './t/testlib.pl';
 

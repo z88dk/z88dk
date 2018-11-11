@@ -10,9 +10,7 @@
 # Test https://github.com/z88dk/z88dk/issues/850
 # (z80asm) Doesn't handle empty library files
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 require './t/testlib.pl';
 

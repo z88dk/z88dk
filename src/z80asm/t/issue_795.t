@@ -10,9 +10,7 @@
 # Test https://github.com/z88dk/z88dk/issues/795
 # Missing .lst file within lst file doesn't error
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 require './t/testlib.pl';
 
@@ -39,8 +37,9 @@ test2.asm
 ...
 unlink "test2.lst";
 
-run('z80asm -b -otest.bin "@test1.lst"', 0, '', '');
-check_bin_file("test.bin", pack("C*", 1, 2));
+run('z80asm -b -otest.bin "@test1.lst"', 1, '', <<'...');
+Error at file 'test1.lst' line 2: pattern 'test2*.lst' returned no files
+...
 
 unlink_testfiles();
 done_testing();

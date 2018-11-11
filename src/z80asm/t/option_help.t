@@ -8,9 +8,7 @@
 #
 # Test -h
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 require './t/testlib.pl';
 
@@ -66,7 +64,7 @@ Environment:
 
 Libraries:
   -x, --make-lib=FILE    Create a library file.lib
-  -i, --link-lib=FILE    Link library file.lib
+  -i, --use-lib=FILE     Use library file.lib
 
 Binary Output:
   -O, --out-dir=DIR      Output directory
@@ -93,8 +91,7 @@ Appmake Options:
 END
 
 	run("z80asm $opt=x", 1, "", <<END);
-Error: illegal option '$opt=x'
-Error: source filename missing
+Error: illegal option: $opt=x
 END
 }
 

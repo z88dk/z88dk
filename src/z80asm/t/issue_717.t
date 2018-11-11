@@ -10,9 +10,7 @@
 # Test https://github.com/z88dk/z88dk/issues/717
 # z80asm: sections with ALIGN property should not insert padding if the section is empty
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 require './t/testlib.pl';
 

@@ -9,9 +9,7 @@
 # Test https://github.com/z88dk/z88dk/issues/999
 # z80asm: unable to build consolidated object file from c source
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 use Path::Tiny;
 require './t/testlib.pl';

@@ -9,9 +9,7 @@
 # Test https://github.com/z88dk/z88dk/issues/885
 # z80asm: bug in application of all operators in defined constants in some circumstances
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 use Path::Tiny;
 require './t/testlib.pl';

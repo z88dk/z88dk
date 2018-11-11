@@ -29,7 +29,7 @@ $ENV{PATH} = join($Config{path_sep},
 			$ENV{PATH});
 
 our $KEEP_FILES;
-our $Z80ASM = $ENV{Z80ASM} || "./z80asm";
+our $Z80ASM_EXE = $ENV{Z80ASM_EXE} || "./z80asm";
 
 our $AR = -d "ar" ? "ar" : "../../src/z80nm";
 
@@ -133,7 +133,7 @@ sub z80asm {
 	#$err_text .= "$num_errors errors occurred during assembly\n" if $num_errors;
 	
 	# assembly command line
-	my $z80asm = $Z80ASM." ".
+	my $z80asm = $Z80ASM_EXE." ".
 				($args{options} || "-b").
 				" @asm_files";
 
