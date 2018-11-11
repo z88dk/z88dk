@@ -1253,7 +1253,7 @@ Index: src/z80/peep.c
 +        return FALSE;
 +
 +      if (ISINST(pl->line, "out0"))
-+          return(argContPrec(pl->line + 4, what, 2));
++          return(argContPrec(pl->line + 5, what, 2));
 +    }
 +
 +    if(IS_RAB && ISINST(pl->line, "mul"))
