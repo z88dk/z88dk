@@ -341,7 +341,7 @@ static void output_double_string_load(double value)
     output_section(c_init_section);
     lval.const_val = value;
     load_double_into_fa(&lval);
-    immedlit(dumplocation); outdec(0); nl();
+    immedlit(dumplocation,0); nl();
     callrts("dstore");
     output_section(c_data_section);
 }

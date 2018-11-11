@@ -16,7 +16,7 @@ OBJECTS = $(CLASSIC_OBJECTS)
 all: dirs $(OBJECTS) $(NEWLIB_TARGETS)
 
 obj/newlib-z80:  
-	@$(ASSEMBLER) -d -O=obj/z80/x -I$(NEWLIB_DIRECTORY) -I../.. --cpu=z80 -D__CLASSIC -D__SCCZ80 $(NEWLIBGLOBS)
+	@$(ASSEMBLER) -d -O=obj/z80/x -I$(NEWLIB_DIRECTORY) -I../.. -mz80 -D__CLASSIC -D__SCCZ80 $(NEWLIBGLOBS)
 
 dirs:
 	@mkdir -p obj/z80 obj/z80-zxn obj/ixiy obj/r2k

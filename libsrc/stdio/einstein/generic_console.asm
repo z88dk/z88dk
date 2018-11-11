@@ -43,19 +43,18 @@ generic_console_ioctl:
 	; Set the mode here
 	ex	de,hl
 	ld	a,(hl)
-	ld	c,80
+	ld	bc,$1950
 	cp	10
 	jr	z,set_mode
-	ld	c,32
-	cp	0
+	ld	bc,$1820
+	and	a
 	jr	z,set_mode
 	scf
 	ret
 
 set_mode:
 	ld	(__einstein_mode),a
-	ld	a,c
-	ld	(__console_w),a
+	ld	(__console_w),bc
 	and	a
 	ret
 
@@ -85,15 +84,19 @@ generic_console_vpeek:
 	ld	a,(__einstein_mode)
 	cp	10
 	jp	nz,__tms9918_console_vpeek
+	ld	a,e		;Save raw mode
         call    calc_xypos
-	ld	c,l
-	ld	b,h
+	ld	e,a		;Raw mode back
 	in	a,(c)
-	cp	160		;Inverse characters are from 160
-	ccf
-	ret	nc
-	sub	128
+	rr	e
+	call	nc,vpeek_unmap
 	and	a
+	ret
+
+vpeek_unmap:
+	cp	160		;Inverse characters are from 160
+	ret	c
+	sub	128
         ret
 
 
@@ -109,8 +112,6 @@ generic_console_printc:
 	rr	e
 	call	nc,convert_inverse
 	call	calc_xypos
-	ld	c,l
-	ld	b,h
 	out	(c),a
 	ret
 
@@ -135,9 +136,8 @@ xypos_1:
 	add	hl,de
 	djnz	xypos_1
 	add	hl,bc			;hl is now offset in display
-	ld	d,h
-	ld	h,l
-	ld	l,d
+	ld	c,h
+	ld	b,l
 	ret
 
 
@@ -147,7 +147,7 @@ generic_console_scrollup:
 	jp	nz,__tms9918_scrollup
 	push	bc
 	push	de
-	ld	b,23
+	ld	b,24
 	ld	hl,$4050		;Row 1
 	ld	de,80			;Characters in row
 row_loop:
@@ -184,6 +184,14 @@ clear_loop:
 	pop	bc
 	ret
 
+	SECTION	code_crt_init
+
+	EXTERN	asm_set_cursor_state
+	ld	hl,$fb45
+	res	0,(hl)		;DOS80 disable cursor
+	res	2,(hl)		;XTAL 80 column cursor flag
+	ld	l,$20
+	call	asm_set_cursor_state
 
 	SECTION		bss_clib
 

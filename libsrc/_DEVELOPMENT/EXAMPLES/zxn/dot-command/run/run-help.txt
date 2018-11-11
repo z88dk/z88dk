@@ -1,0 +1,14 @@
+.run [OPTIONS] FILE
+
+supported extensions:  bas
+dot nex o p sna snx tap z80
+
+options:
+
+-p = list dirs in PATH
+-? = list FILE matches
+-c = cd to FILE location
+-r = retain cwd on clean exit
+-N = select Nth FILE match
+
+run 1.4 zx-next z88dk.org

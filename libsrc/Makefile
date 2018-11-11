@@ -21,13 +21,14 @@ all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	msx_clib.lib mtx_clib.lib mz_clib.lib mz2500_clib.lib x1_clib.lib \
 	nascom_clib.lib  newbrain_clib.lib \
 	osca_clib.lib ozansi_clib.lib pacman_clib.lib p2000_clib.lib  \
-	pc6001_clib.lib pps_clib.lib px4.lib px8.lib \
+	pc6001_clib.lib pc88_clib.lib pps_clib.lib px4.lib px8.lib \
 	rex_clib.lib rx78_clib.lib sc3000_clib.lib sms_clib.lib lynx_clib.lib \
 	svi_clib.lib sam_clib.lib  sorcerer_clib.lib  sos_clib.lib tiki100.lib \
 	trs80_clib.lib vg5k_clib.lib vz_clib.lib  x07_clib.lib \
 	embedded_clib.lib test_clib.lib testrcm_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
 	pv1000_clib.lib pv2000_clib.lib coleco_clib.lib multi8_clib.lib alphatro_clib.lib  spc1000_clib.lib \
-	laser500_clib.lib \
+	laser500_clib.lib super80_clib.lib super80_vduem_clib.lib \
+	adam.lib \
 	preempt.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib gendos.lib ndos.lib  \
@@ -72,6 +73,7 @@ define buildgeneric
 	$(MAKE) -C adt-newlib
 	$(MAKE) -C algorithm
 	$(MAKE) -C rect
+	$(MAKE) -C arch/z80
 endef
 
 #  short script to sort out gfx dependencies
@@ -329,6 +331,21 @@ pc6001_clib.lib:
 	$(MAKE) gfxdeps
 	$(call buildgeneric,pc6001)
 	TARGET=pc6001 TYPE=z80 $(LIBLINKER) -DFORpc6001 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pc6001_clib @$(LISTFILE_DIRECTORY)/pc6001.lst
+	
+# PC8801 lib - Stefano
+pc88_clib.lib:
+	@echo ''
+	@echo '--- Building PC8801 Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(call buildgeneric,pc88)
+	$(MAKE) -C games TARGET=pc88
+	TARGET=pc88 TYPE=z80 $(LIBLINKER) -DFORpc88 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pc88_clib @$(LISTFILE_DIRECTORY)/pc88.lst
+	@echo ''
+	@echo '--- Building PC8801 160x100 graphics Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(LIBLINKER) -DFORpc88 -x$(OUTPUT_DIRECTORY)/gfxpc88 @$(LISTFILE_DIRECTORY)/gfxpc88.lst
 
 # Native for sprinter - dom
 pps_clib.lib:
@@ -753,6 +770,7 @@ msx_clib.lib:
 	$(RM) games/msx/*.o
 	$(MAKE) -C games TARGET=msx
 	$(MAKE) -C msx TARGET=msx
+	$(MAKE) -C msx/asmlib TARGET=msx
 	$(MAKE) -C psg
 	TARGET=msx TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/msx_clib @$(LISTFILE_DIRECTORY)/msx.lst
 
@@ -803,10 +821,22 @@ einstein.lib:
 	@echo '--- Building Tatung Einstein Library ---'
 	@echo ''
 	$(MAKE) msxdeps
+	@$(RM) -f video/mc6845/*.o
 	$(MAKE) -C games TARGET=cpm SUBTYPE=einstein
 	$(MAKE) -C msx TARGET=test
 	$(MAKE) -C psg
 	TARGET=einstein TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFOReinstein -x$(OUTPUT_DIRECTORY)/einstein @$(LISTFILE_DIRECTORY)/einstein.lst
+
+# Coleco Adam library 
+adam.lib:
+	@echo ''
+	@echo '--- Building Coleco Adam Library ---'
+	@echo ''
+	$(MAKE) msxdeps
+	$(MAKE) -C games TARGET=cpm SUBTYPE=coleco
+	$(MAKE) -C msx TARGET=test
+	$(MAKE) -C psg
+	TARGET=coleco TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcoleco -x$(OUTPUT_DIRECTORY)/adam @$(LISTFILE_DIRECTORY)/adam.lst
 
 # SORD M5 library - Stefano
 m5_clib.lib:
@@ -916,6 +946,28 @@ laser500_clib.lib:
 	$(call buildgeneric,laser500)
 	$(MAKE) -C games TARGET=laser500
 	TARGET=laser500 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORlaser500 -x$(OUTPUT_DIRECTORY)/laser500_clib @$(LISTFILE_DIRECTORY)/laser500.lst
+
+# Dick Smith Super80 - dom
+super80_clib.lib:
+	@echo ''
+	@echo '--- Building Super80 Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(call buildgeneric,super80)
+	$(MAKE) -C games TARGET=super80
+	TARGET=super80 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsuper80 -x$(OUTPUT_DIRECTORY)/super80_clib @$(LISTFILE_DIRECTORY)/super80.lst
+
+super80_vduem_clib.lib:
+	@echo ''
+	@echo '--- Building Super80 VDUEM Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	@$(RM) -f video/mc6845/*.o
+	$(call buildgeneric,super80)
+	$(MAKE) -C games TARGET=super80
+	TARGET=super80 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsuper80 -x$(OUTPUT_DIRECTORY)/super80_vduem_clib @$(LISTFILE_DIRECTORY)/super80_vduem.lst
+
+
 
 
 # Triumph Adler Alphatronic PC - dom
@@ -1093,7 +1145,7 @@ rcmx000_clib.lib:
 	@echo '--- Building RCM2/3000 Library ---'
 	@echo ''
 	$(call buildgeneric,rcmx000)
-	TARGET=rcmx000 TYPE=r2k $(LIBLINKER) --cpu=r2k -DSTANDARDESCAPECHARS -DFORrcmx000 -x$(OUTPUT_DIRECTORY)/rcmx000_clib @$(LISTFILE_DIRECTORY)/rcmx000.lst
+	TARGET=rcmx000 TYPE=r2k $(LIBLINKER) -mr2k -DSTANDARDESCAPECHARS -DFORrcmx000 -x$(OUTPUT_DIRECTORY)/rcmx000_clib @$(LISTFILE_DIRECTORY)/rcmx000.lst
 
 # embedded target - contributed by Daniel Wallner
 embedded_clib.lib:
@@ -1119,7 +1171,9 @@ g800_clib.lib:
 	@echo '--- Building Sharp PC-G8xx/E2xx Library ---'
 	@echo ''
 	$(call buildgeneric,g800)
+	$(MAKE) gfxdeps
 	TARGET=g800 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORg800 -x$(OUTPUT_DIRECTORY)/g800_clib @$(LISTFILE_DIRECTORY)/g800.lst
+	$(MAKE) gfxdeps
 	TARGET=g800 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORg800 -x$(OUTPUT_DIRECTORY)/g850_clib @$(LISTFILE_DIRECTORY)/g850.lst
 
 # Camputers Lynx - Stefano Bodrato
@@ -1128,6 +1182,7 @@ lynx_clib.lib:
 	@echo '--- Building Camputers Lynx Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
+	@$(RM) -f video/mc6845/*.o
 	$(call buildgeneric,lynx)
 	$(MAKE) -C games TARGET=lynx
 	TARGET=lynx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORlynx -x$(OUTPUT_DIRECTORY)/lynx_clib @$(LISTFILE_DIRECTORY)/lynx.lst
@@ -1335,6 +1390,7 @@ classic-clean:
 	$(MAKE) -C nc100 clean
 	$(MAKE) -C compress/zx7 clean
 	$(MAKE) -C font clean
+	$(MAKE) -C arch clean
 	$(RM) *.lib
 
 new-clean:

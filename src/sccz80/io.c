@@ -150,6 +150,7 @@ void discardbuffer(t_buffer* buf)
         return;
     if (currentbuffer == buf)
         currentbuffer = (t_buffer*)currentbuffer->before;
+    *buf->next = '\0';
     FREENULL(buf->start);
     buf->start = buf->next = 0;
     FREENULL(buf);
@@ -183,10 +184,10 @@ void setstage(char** before, char** start)
 
 void clearstage_info(const char *file, int line, char* before, char* start)
 {
-   // printf("%s:%d Clearing stage %s\n",file, line,before);
     *stagenext = 0;
-    if ((stagenext = before))
+    if ((stagenext = before)) {
         return;
+    }
     if (start) {
         if (output != NULL) {
 #ifdef INBUILT_OPTIMIZER
@@ -259,6 +260,16 @@ int outstage(char c)
 
 void outstr(const char *ptr)
 {
+    const char *loc;
+    if ( stagenext == NULL && currentbuffer == NULL) {
+        loc = ptr;
+        while (   (loc = strstr(loc,"ld\thl,i_")) != NULL ) {
+            int lab;
+            loc += strlen("ld\thl,i_");
+            lab = atoi(loc);
+            indicate_double_written(lab);     
+        }
+    }
     while (outbyte(*ptr++))
         ;
 }

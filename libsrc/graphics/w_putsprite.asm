@@ -9,7 +9,7 @@
 ; $Id: w_putsprite.asm,v 1.8 2017-01-02 21:51:24 aralbrec Exp $
 ;
 
-        SECTION code_clib
+        SECTION code_graphics
         PUBLIC    putsprite
         PUBLIC    _putsprite
         EXTERN    w_pixeladdress
@@ -232,7 +232,7 @@
          djnz     woloop
          jp       swapgfxbk1
 
-	SECTION  bss_clib
+	SECTION  bss_graphics
 .oldx
          defw   0
 .curx

@@ -9,6 +9,7 @@ stdio/ansi/osca/f_ansi_cls
 stdio/ansi/generic/f_ansi_dline
 stdio/ansi/osca/f_ansi_scrollup
 @stdio/stdio.lst
+graphics/w_dcircle_square.asm
 @gfxbasew.lst
 graphics/osca/drawb
 graphics/osca/undrawb

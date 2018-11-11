@@ -6,7 +6,7 @@
 ;	$Id: dcircle.asm,v 1.4 2016-04-23 21:05:46 dom Exp $
 ;
 
-		SECTION   code_clib
+		SECTION   code_graphics
                 PUBLIC    draw_circle
 
 DEFVARS 0

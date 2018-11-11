@@ -1,6 +1,6 @@
 	INCLUDE	"graphics/grafix.inc"
 
-        SECTION code_clib
+        SECTION code_graphics
 	PUBLIC	Line_r
 
 	EXTERN	__gfx_coords
@@ -339,6 +339,6 @@
 				pop	de
 				ret
 
-	        SECTION bss_clib
+	        SECTION bss_graphics
 .bc1save defw	0
 .de1save defw	0

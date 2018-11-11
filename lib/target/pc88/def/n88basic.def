@@ -1,0 +1,162 @@
+lstoff
+
+; PC-8801 BASIC function and variable definitions
+;
+; $Id: n88basic.def $
+;
+
+
+; System variables
+
+; SUBROUTINES FOR READ/WRITE CALLS OF THE INTER-SLOT
+
+defc USRTAB = $E635	;2 Address to call with Basic USR0 
+defc USR0 = $E635	;2 Address to call with Basic USR0 
+defc USR1 = $E637	;2 Address to call with Basic USR1 
+defc USR2 = $E639	;2 Address to call with Basic USR2 
+defc USR3 = $E63B	;2 Address to call with Basic USR3 
+defc USR4 = $E63D	;2 Address to call with Basic USR4 
+defc USR5 = $E63F	;2 Address to call with Basic USR5 
+defc USR6 = $E641	;2 Address to call with Basic USR6 
+defc USR7 = $E643	;2 Address to call with Basic USR7 
+defc USR8 = $E645	;2 Address to call with Basic USR8 
+defc USR9 = $E647	;2 Address to call with Basic USR9 
+defc USR10 = $E649	;2 Address to call with Basic USR9 
+defc CLMLST = $E650	;1 Column space. It’s uncertain what this address actually stores 
+
+
+; AREA TO SAVE VDP REGISTERS
+; defc TRGFLG = $	;1 Information about trigger buttons and space bar state 
+defc FORCLR = $F01E	;1 Foreground color 
+defc BAKCLR = $F01F	;1 Background color 
+defc BDRCLR = $F020	;1 Border color 
+defc MAXUPD = $E7E5	;3 Jump instruction used by Basic LINE command. The routines used are: RIGHTC, LEFTC, UPC and DOWNC 
+defc MINUPD = $E7E2	;3 Jump instruction used by Basic LINE command. The routines used are: RIGHTC, LEFTC, UPC and DOWNC 
+defc ATRBYT = $F044	;1 Attribute byte (for graphical routines it’s used to read the color) 
+
+
+; USED BY BASIC INTERNALLY
+defc ERRFLG = $E649	;1 Basic Error code 
+defc LPTPOS = $E64B	;1 Position of the printer head
+defc PRTFLG = $E64C	;1 Printer output flag is read by OUTDO
+
+defc CURLIN = $E656	;2 Line number the Basic interpreter is working on, in direct mode it will be filled with #FFFF
+defc KBUF   = $E87A
+
+defc DIMFLG = $EABC  ; ARRAY FLAG
+defc VALTYP = $EABD  ; Type indicator
+defc DORES  = $EABE  ; Indicates whether stored word can be crunched
+defc DONUM  = $EABF  ; Flag for crunch
+defc CONTXT = $EAC0  ; Text address used by CNRGET
+defc CONSAV = $EAC2  ; Store token of constant after calling CHRGET
+defc CONTYP = $EAC3  ; Type of stored constant
+defc CONLO  = $EAC4  ; Value of stored constant
+
+defc STKTOP = $E654  ; Top location to be used for the stack
+defc TXTTAB = $E658  ; Starting address of BASIC text area
+defc TEMPPT = $EACE  ; Starting address of unused area of temporary descriptor
+defc TEMPST = $EAD0  ; Temporary descriptors
+defc TMPSTR = $EAEE  ; Temporary string
+defc DSCTMP = $EAEE  ; String descriptor which is the result of string fun.
+defc FRETOP = $EAF1  ; Starting address of unused area of string area
+defc TEMP3  = $EAF3  ; Used for garbage collection or by USR function
+
+defc ENDFOR = $EAF7  ; Next address of FOR st.
+defc DATLIN = $EAF9  ; Line number of DATA st.read by READ st.
+defc SUBFLG = $EAFB  ; Flag for array for USR fun.
+defc FLGINP = $EAFC  ; Flag for INPUT or READ
+defc TEMP   = $EAFD  ; Location for temporary reservation for st.code
+defc PTRFLG = $EAFF  ; =0 if no line number converted to pointers
+defc AUTFLG = $EB00  ; AUTO mode flag
+defc AUTLIN = $EB01  ; Current line number for auto
+defc AUTINC = $EB03  ; Increment for auto
+defc SAVTXT = $EB05  ; Text pointer for resume
+defc SAVSTK = $EB07  ; Save stack when error occurs
+defc ERRLIN = $EB09  ; Line where last error
+; defc DOT    = $  ; Current line for edit & list
+defc ERRTXT = $EB0B  ; Text pointer for use by RESUME
+defc ONELIN = $EB0D  ; LINE to go when error
+defc ONEFLG = $EB0F  ; =1 if executing an error trap routine
+defc NXTOPR = $EF9A  ; Next operator in EVAL
+defc OLDLIN = $EB12  ; old line number set up ^C ...
+defc OLDTXT = $EB14  ; Points st. to be executed next
+defc VARTAB = $EB16  ; Pointer to start of variable space
+defc ARYTAB = $EB18  ; Pointer to begin of array table
+defc STREND = $EACC
+defc DATPTR = $EB21  ; DATA pointer
+defc DEFTBL = $EB23  ; Default valtype for each letter
+
+; USER FUNCTION PARAMETERS
+defc PRMSTK = $EB3D  ; Previous definition block on stack
+defc PRMLEN = $EB3F  ; Number of bytes of objective table
+defc PARM1  = $EB41  ; Objective prameter definition table
+defc PRMPRV = $EBA5  ; Pointer to previous parameter block
+defc PRMLN2 = $EBA7  ; Size of parameter block
+defc PARM2  = $EBA9  ; For parameter storage
+defc PRMFLG = $EC0D  ; Flag to indicate whether PARM1 was searching
+defc ARYTA2 = $EC0E  ; End point of search
+defc NOFUNS = $EC10  ; 0 if no function active
+defc TEMP9  = $EC11  ; Location of temporary storage for garbage collection
+defc FUNACT = $EC13  ; Count of active functions
+defc SWPTMP = $EC33  ; Value of first  variable in SWAP st.
+defc TRCFLG = $EC3B  ; 0 MEANS NO TRACE
+
+; MATH-PACK
+defc FBUFFR = $EC52  ; Buffer for fout
+;defc DECTMP = $  ; Used to transform decimal integer to floating point number
+;defc DECTM2 = $  ; Used at division routine execution
+;defc DECCNT = $  ; Used at division routine execution
+defc FACCU  = $EC41  ; alias for DECIMAL ACCUMULATOR
+defc FACLOW = $EC43  ; DECIMAL ACCUMULATOR + 2
+;defc HOLD8  = $  ; (48 bytes) Double precision operations work area
+;defc HOLD2  = $  ; (8 bytes)
+;defc HOLD   = $  ; (9 bytes)
+defc ARG    = $EC51  ; Area to set the value to be calculate with DAC
+defc RNDX   = $E610  ; Last random number
+
+; DATA AREA USED BY BASIC INTERPRETER
+defc MAXFIL = $EC7E  ; High legal file number
+;defc FILTAB = $  ; Starting address of of file data area
+;defc NULBUF = $  ; Points to file 0 buffer ( used in SAVE & LOAD st.)
+defc PTRFIL = $EC88  ; Points to file data of currently accessing file
+;defc RUNFLG = $  ; Non-zero for run after load
+defc FILNAM = $EC8F  ; Name for FILES, NAME & others
+;defc FILNM2 = $  ; Second name for NAME
+defc NLONLY = $ECA3  ; <>0 when loading program
+;defc SAVEND = $  ; End address for BSAVE
+defc FNKSTR = $E6F2  ; FUNCTION KEY AREA
+;defc CGPNT  = $  ; Address to store charecter font in ROM
+;; defc CGTABL = $0004  ; Found in CBIOS..  does it exist on the regular BIOS too ?
+
+
+
+defc MINDEL = $F023
+defc MAXDEL = $F021
+
+
+; DATA AREA FOR CIRCLE STATEMENT
+defc ASPECT = $F072  ; Aspect ratio of the circle; set by <ratio> of CIRCLE
+defc CENCNT = $F074  ; End count
+defc CLINEF = $F07B  ; Flag to draw line to centre
+defc CNPNTS = $F07C  ; Point to be plotted
+defc CPLOTF = $F07A  ; Plot polarity flag
+defc CPCNT  = $F085  ; 1/8 of number of points in circle
+defc CPCNT8 = $F07E
+defc CRCSUM = $F078
+defc CSTCNT = $F074
+defc CSCLXY = $F084  ; Scale of X & Y
+defc CSAVEA = $F04C  ; reservation area of ADVGRP
+defc CSAVEM = $F04E  ; reservation area of ADVGRP
+defc CXOFF  = $F080  ; X offset from center
+defc CYOFF  = $F082  ; Y offset from center
+
+
+; DATA AREA FOR PAINT STATEMENT
+defc SKPCNT = $F06D  ; Skip count
+defc MOVCNT = $F06B  ; Movement count
+defc PDIREC = $F06A  ; Direction of the paint
+defc LFPROG = $F06F
+defc RTPROG = $F070
+
+
+lston

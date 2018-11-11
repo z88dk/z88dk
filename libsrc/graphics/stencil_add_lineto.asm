@@ -14,7 +14,7 @@
 ;; void stencil_add_lineto(int x, int y, unsigned char *stencil)
 
 
-		SECTION   code_clib
+		SECTION   code_graphics
                 PUBLIC    stencil_add_lineto
                 PUBLIC    _stencil_add_lineto
 

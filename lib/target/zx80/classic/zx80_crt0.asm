@@ -131,8 +131,6 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 
 
 
-;                defm  "Small C+ ZX80"   ;Unnecessary file signature
-;                defb    0
 
 ;zx80_cls:
 ;	LD      HL,($400A)      ; fetch E-LINE

@@ -1,72 +1,56 @@
 /*
- * Run program with PATH search
- * aralbrec @ z88dk.org
+ * RUN program with PATH search
+ * aralbrec@z88dk.org
 */
-
-// zcc +zxn -v -startup=30 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 --opt-code-size @zproject.lst -o run -pragma-include:zpragma.inc -subtype=dot -Cz"--clean" -create-app
-// zcc +zxn -v -startup=30 -clib=new @zproject.lst -o run -pragma-include:zpragma.inc -subtype=dot -Cz"--clean" -create-app
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <libgen.h>
 #include <ctype.h>
-#include <errno.h>
+#include <libgen.h>
 #include <arch/zxn.h>
 #include <arch/zxn/esxdos.h>
-#include <compress/zx7.h>
-#include <input.h>
+#include <errno.h>
 
-#include "globals.h"
+#include "error.h"
 #include "load.h"
 #include "option.h"
 #include "path.h"
 #include "run.h"
+#include "run-help.h"
+#include "sort.h"
+#include "user_interaction.h"
 
-//////////
+// GLOBAL
+
+unsigned char name[64];                          // filename being matched
+unsigned char PATH[PATHSZ];                      // environment variable PATH
+unsigned char cwd[ESX_PATHNAME_MAX + 1] = "/";   // current working directory
+unsigned char current_drive[] = "C:/";
+unsigned char buffer[512];
+
+struct esx_dirent dirent_sfn;
+struct esx_dirent_lfn dirent_lfn;
+
+unsigned char mode48;
+
 // OPTIONS
-//////////
 
-#define OPT_FLAG_QQ  0x01
-#define OPT_FLAG_P   0x02
-#define OPT_FLAG_B   0x04
-#define OPT_FLAG_I   0x08
-#define OPT_FLAG_R   0x10
-#define OPT_FLAG_C   0x20
-
-unsigned char opt_flag = 0;
-unsigned char opt_n = 0;
-
-struct opt
-{
-   unsigned char *name;
-   unsigned char  flag;
+struct flag flags = {
+   0,                          // option
+   0                           // select Nth
 };
 
-struct opt option[] = {
-   { "-?", OPT_FLAG_QQ | OPT_FLAG_R },
-   { "-p", OPT_FLAG_P | OPT_FLAG_R },
-   { "--path", OPT_FLAG_P | OPT_FLAG_R },
-   { "-l", OPT_FLAG_B | OPT_FLAG_R },
-   { "--list", OPT_FLAG_B | OPT_FLAG_R },
-   { "-i", OPT_FLAG_I | OPT_FLAG_R },
-   { "--info", OPT_FLAG_I | OPT_FLAG_R},
-   { "-r", OPT_FLAG_R },
-   { "-c", OPT_FLAG_C },
-   { "--cd", OPT_FLAG_C },
+static struct opt options[] = {
+   { "-?", OPT_TYPE_EXACT, (optfunc_t)option_exec_question },
+   { "-p", OPT_TYPE_EXACT, (optfunc_t)option_exec_path },
+   { "-c", OPT_TYPE_EXACT, (optfunc_t)option_exec_cd },
+   { "-r", OPT_TYPE_EXACT, (optfunc_t)option_exec_cwd },
 };
 
-/////////////
 // FILE TYPES
-/////////////
 
-struct ptype
-{
-   unsigned char *ext;
-   void (*load)(void);
-};
-
-struct ptype types[] = {
+struct type types[] = {
    { ".tap", load_tap },
    { ".sna", load_snap },
    { ".snx", load_snap },
@@ -74,344 +58,237 @@ struct ptype types[] = {
    { ".o", load_snap },
    { ".p", load_snap },
    { ".nex", load_nex },
-   { ".exe", load_exe },
+   { ".dot", load_dot },
+   { ".bas", load_bas }
 };
 
-struct ptype *program_type;
+// MAIN
 
-// qsort types array
-
-int sort_type(struct ptype *a, struct ptype *b)
+unsigned char *advance_past_drive(unsigned char *p)
 {
-   return stricmp(a->ext, b->ext);
+   return (isalpha(p[0]) && (p[1] == ':')) ? (p + 2) : p;
 }
 
-// bsearch types array on extension
+unsigned char fin = 0xff;
+unsigned char gin = 0xff;
 
-int find_type(char *ext, struct ptype *a)
-{
-   return stricmp(ext, a->ext);
-}
-
-///////////////////////////
-// USAGE INFORMATION (TEXT)
-///////////////////////////
-
-extern unsigned char usage[];
-
-///////////////////////////////////////////
-// LOCATION OF GLOBAL ENVIRONMENT VARIABLES
-///////////////////////////////////////////
-
-extern unsigned char _ENV_FNAME[];
-
-/////////////////////////
-// RESTORE ORIGINAL STATE
-/////////////////////////
-
-unsigned char old_cpu_speed;
-
-////////////
-// FUNCTIONS
-////////////
-
-int error(char *s)
-{
-   esx_f_chdir(cwd);
-
-   s[strlen(s)-1] += 0x80;  
-   return (int)s;
-}
-
-void user_interact(void)
-{
-   // progress cursor
-         
-   printf("%c" "\x08", cursor[cpos]);
-
-   if (++cpos >= (sizeof(cursor) - 1))
-      cpos = 0;
-         
-   // allow user to interrupt
-      
-   if (in_key_pressed(IN_KEY_SCANCODE_SPACE | 0x8000))
-   {
-      printf("<break>\n");
-
-      in_wait_nokey();
-      exit(error("L Break into Program"));
-   }
-}
-
-unsigned char *parse_options(unsigned char *cl)
-{
-   unsigned char *p;
-   
-   p = cl;
-   
-   while (*(p = strstrip(p)))
-   {
-      // options list
-      
-      for (unsigned char i = 0; i != sizeof(option)/sizeof(*option); ++i)
-      {
-         unsigned int len;
-            
-         len = strlen(option[i].name);
-            
-         if ((strncmp(option[i].name, p, len) == 0) && (isspace(p[len]) || (p[len] == 0)))
-         {
-            p += len;
-            opt_flag |= option[i].flag;
-            
-            goto another;
-         }
-      }
-      
-      // -n
-      
-      if ((*p == '-') && !isspace(*(p + 1)))
-      {
-         unsigned int val;
-         unsigned char *end;
-         
-         errno = 0;
-      
-         if (((val = _strtou_(p + 1, &end, 0)) <= 255) && (errno == 0))
-         {
-            opt_n = val;
-            p = end;
-            
-            goto another;
-         }
-      }
-      
-      // unrecognized
-      
-      break;
-
-another:
-
-   }
-   
-   return p;
-}
-
-unsigned char *parse_filename(unsigned char *cl)
-{
-   unsigned char quote;
-   unsigned char *p, *q;
-   
-   p = strstrip(cl);
-
-   if ((*p == '\'') || (*p == '"'))
-      quote = *p++;
-   else
-      quote = 0;
-
-   for (q = program_name; *p && ((q - program_name) != (sizeof(program_name) - 5)); ++p)
-   {
-      // quoting
-      
-      if (*p == quote)
-      {
-         ++p;
-         break;
-      }
-            
-      // part of filename
-      
-      if ((quote == 0) && isspace(*p))
-         break;
-      
-      *q++ = *p;
-   }
-         
-   if (*p && !isspace(*p))
-      exit(error("F Invalid file name"));
-
-   *q = 0;
-
-   return p;
-}
-
-void cleanup(void)
+void close_open_files(void)
 {
    if (fin != 0xff) esx_f_close(fin);
-   if (fdir != 0xff) esx_f_close(fdir);
+   if (gin != 0xff) esx_f_close(gin);
 
-   if ((opt_flag & (OPT_FLAG_R | OPT_FLAG_C)) == OPT_FLAG_R) esx_f_chdir(cwd);
+   fin = gin = 0xff;
+}
 
-   // must make the decision here if it
-   // is safe to return to basic; if not
-   // perform a soft reset
-   
-   printf(" \n");
-   
+static unsigned char old_cpu_speed;
+
+static void cleanup(void)
+{
+   path_close();
+   close_open_files();
+
+   puts(" ");                          // erase any cursor left behind
+
+   if ((flags.option & (FLAG_OPTION_CWD | FLAG_OPTION_CD)) == FLAG_OPTION_CWD)
+      esx_f_chdir(cwd);
+
    ZXN_NEXTREGA(REG_TURBO_MODE, old_cpu_speed);
 }
 
-extern unsigned char *fix_command_line(char *s) __z88dk_fastcall;
+extern unsigned char _ENV_FNAME[];     // environment file defined by library
 
-int main(unsigned int no, unsigned char *cl)
+int main(unsigned int argc, char **argv)
 {
-   unsigned char *p;
+   static unsigned char *p;
+   static struct opt *found;
+   static struct type *tfound;
+   static unsigned char first;
+   static unsigned int num;
 
-   // clean up on exit
-   
-   atexit(cleanup);
+   // initialization
 
-   // record initial state
-   
    old_cpu_speed = ZXN_READ_REG(REG_TURBO_MODE);
    ZXN_NEXTREG(REG_TURBO_MODE, RTM_14MHZ);
-   
-   if (esx_f_getcwd(cwd))
-      strcpy(cwd, "/");
 
-   // parse options from an unprocessed command line
-   
-   p = fix_command_line(cl);
-   p = parse_options(p);
+   esx_f_getcwd(cwd);
+   current_drive[0] = cwd[0];
 
-   // filename with weak quoting
+   atexit(cleanup);
    
-   p = parse_filename(p);
-   command_line = cl + (p - PATH);
-
-   // what are we doing ?
-
-   // print usage if no options and no filename given
+   // esxdos is ruled out by the crt
    
-   if ((opt_flag == 0) && (program_name[0] == 0))
+   mode48 = (esx_m_dosversion() == ESX_DOSVERSION_NEXTOS_48K);
+
+   // parse options
+
+   qsort(options, sizeof(options)/sizeof(*options), sizeof(*options), sort_option);
+
+   for (unsigned char i = 1; i < (unsigned char)argc; ++i)
    {
-      *dzx7_standard(usage, PATH) = 0;   // PATH is 512 bytes so ok to decompress there
-      printf("\n%s", PATH);
+      unsigned int ret;
+
+      // strip surrounding whitespace possibly from quoting
+
+      p = strrstrip(strstrip(argv[i]));
+
+      // check for option
+
+      if (found = bsearch(p, options, sizeof(options)/sizeof(*options), sizeof(*options), find_option))
+      {
+         if ((ret = (found->action)()) != OPT_ACTION_OK)
+            exit(ret);
+      }
+      else
+      {
+         // check for -N
+
+         if ((*p == '-') && option_unsigned_number(p + 1, &ret))
+         {
+            flags.n = ret;
+         }
+         else
+         {
+            // must be a name
+
+            if (*name) exit((int)err_multiple_name);
+            strlcpy(name, p, sizeof(name));
+         }
+      }
+   }
+
+   // help
+
+   if (((flags.option & (FLAG_OPTION_Q | FLAG_OPTION_PATH)) == 0) && (*name == 0))
+   {
+      puts(run_help);
       exit(0);
    }
-   
-   printf("\nFilename... %s\n", program_name[0] ? basename(program_name) : "<none>");
 
-   // read PATH
-   
+   // filename
+
+   p = basename(advance_past_drive(name));
+   printf("\nFilename... %s\n", *name ? p : "<none>");
+
+   // environment variable PATH
+
    printf("Loading PATH... ");
-   
-   PATH[0] = 0;
 
    if ((fin = esx_f_open(_ENV_FNAME, ESX_MODE_R | ESX_MODE_OPEN_EXIST)) != 0xff)
    {
-      printf("%s\n", env_getenv(fin, "PATH", PATH, sizeof(PATH) - 1, buf, sizeof(buf)) ? "ok\n" : "undefined\n");
-
-      esx_f_close(fin);
-      fin = 0xff;
+      puts(env_getenv(fin, "PATH", PATH, sizeof(PATH) - 1, buffer, sizeof(buffer)) ? "ok\n" : "undefined\n");
+      close_open_files();
    }
    else
-      printf("fail\n");
-   
+      puts("missing");
+
    // -p
 
-   if (opt_flag & OPT_FLAG_P)
+   if (flags.option & FLAG_OPTION_PATH)
    {
-      option_print_path();
-      exit(0);
-   }
+      puts("\nPath Walk\n");
 
-   // program is required
-   
-   if (program_name[0] == 0)
-      exit(error("F Missing file name"));
-   
-   // -?
-   
-   if (opt_flag & OPT_FLAG_QQ)
-   {
-      option_print_find_dirs();
-      exit(0);
-   }
+      p = path_open();
 
-   // find the program
-   
-   printf("Searching...\n");
-   
-   if (opt_n == 0)
-   {
-      if ((fin = esx_f_open(program_name, ESX_MODE_R | ESX_MODE_OPEN_EXIST)) != 0xff)
-         strcpy(PATH, program_name);
-   }
-   
-   if (fin == 0xff)
-   {
-      if (opt_n == 0) opt_n = 1;
-
-      for (p = path_open(); p != 0; p = path_next())
+      for (p = path_next(); p; p = path_next())
       {
-         // progress cursor
-         // allow user to interrupt
-      
-         user_interact();
-         
-         // check this directory
-         
-         esx_f_chdir("/");
-         if ((*p == 0) || esx_f_chdir(p)) continue;
-         
-         if ((fin = esx_f_open(basename(program_name), ESX_MODE_R | ESX_MODE_OPEN_EXIST)) != 0xff)
+         user_interaction();
+         printf("%s %s\n", esx_f_chdir(p) ? "X" : "O", p);
+      }
+
+      path_close();
+
+      puts("\nDone");
+
+      exit(0);
+   }
+
+   // name is required
+
+   if (*name == 0)
+      exit((int)err_missing_filename);
+
+   // search
+
+   puts("\nSearching...\n");
+   qsort(types, sizeof(types)/sizeof(*types), sizeof(*types), sort_type);
+
+   num = 0;
+   strcpy(name, p);
+
+   for (p = path_open(); p; p = path_next())
+   {
+      user_interaction_spin();
+
+      // walk the directory
+
+      if ((fin = esx_f_opendir(p)) != 0xff)
+         gin = esx_f_opendir_ex(p, ESX_DIR_USE_LFN);
+
+      if (gin != 0xff)
+      {
+         first = 1;
+
+         while ((esx_f_readdir(fin, &dirent_sfn) == 1) && (esx_f_readdir(gin, &dirent_lfn) == 1))
          {
-            printf("+ %s\n", p);
-            
-            if (--opt_n == 0)
+            user_interaction_spin();
+
+            if (((dirent_sfn.attr & ESX_DIR_A_DIR) == 0) && ((stricmp(dirent_sfn.name, name) == 0) || glob_fat(dirent_lfn.name, name)))
             {
-               strcpy(PATH, p);
-               strcat(PATH, "/");
-               strcat(PATH, basename(program_name));
-               break;
+               // match, check type
+
+               if (tfound = bsearch(basename_ext(dirent_sfn.name), types, sizeof(types)/sizeof(*types), sizeof(*types), find_type))
+               {
+                  if (first)
+                  {
+                     first = 0;
+                     printf(" \n%s\n\n", p);
+                  }
+
+                  printf("%u - %s\n", ++num, dirent_lfn.name);
+
+                  if (((flags.option & FLAG_OPTION_Q) == 0) && (flags.n <= num))
+                  {
+                     first = 0xff;
+                     break;
+                  }
+               }
             }
-            
-            esx_f_close(fin);
-            fin = 0xff;
          }
       }
+      
+      close_open_files();
+
+      if (first == 0xff) break;
    }
 
    path_close();
 
-   if (fin == 0xff)
-      exit(error("F File not found"));
-   
-   printf("\nFound:\n%s\n", PATH);
+   // -?
+
+   if (flags.option & FLAG_OPTION_Q)
+      exit(0);
+
+   //
+
+   if (first != 0xff)
+      exit((int)err_file_not_found);
+
+   if (esx_f_chdir(p))
+      exit(errno);
 
    // -c
-   
-   if (opt_flag & OPT_FLAG_C)
+
+   if (flags.option & FLAG_OPTION_CD)
    {
-      printf("\nChanging directory\n");
+      puts(" \nChanging to directory");
       exit(0);
    }
 
-   // check extension of filename
-   
-   program_type = 0;
-   qsort(types, sizeof(types)/sizeof(*types), sizeof(*types), sort_type);
-   
-   while ((p = strrchr(program_name, '.')) == 0)
-      strcat(program_name, ".exe");
-
-   program_type = bsearch(p, types, sizeof(types)/sizeof(*types), sizeof(*types), find_type);
-
-   if (program_type == 0)
-      exit(error("F Unknown file type"));
-
-   // load program
-
-   if (stricmp(program_type->ext, ".exe") != 0)
-   {
-      esx_f_close(fin);
-      fin = 0xff;
-   }
+   // execute
 
    ZXN_NEXTREGA(REG_TURBO_MODE, old_cpu_speed);
-   
-   (program_type->load)();
-   
-   return error("R Loading error");
+
+   (tfound->load)();
+
+   return (int)err_loading_error;
 }

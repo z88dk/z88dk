@@ -1,6 +1,6 @@
 ;
 ;       Otrona Attachè graphics routines
-;		console driven video HW access
+;		direct video HW access
 ;
 ;       Stefano Bodrato 2018
 ;
@@ -8,20 +8,17 @@
 ;       Plot pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: w_plotpixel.asm $
+;	$Id: w_plotpixl.asm $
 ;
 
 
 			INCLUDE	"graphics/grafix.inc"
 
-			SECTION code_clib
+			SECTION smc_clib
 			PUBLIC	w_plotpixel
 
 			EXTERN     l_cmp
-			EXTERN	GFX_COUT
-			EXTERN	div64
-			
-			EXTERN	__gfx_coords
+			EXTERN	plot_setup
 
 .w_plotpixel
                         push    hl
@@ -35,33 +32,29 @@
                         call    l_cmp
                         pop     de
                         ret     c               ; Return if X overflows
-                        
-                        ld      (__gfx_coords),hl     ; store X
-                        ld      (__gfx_coords+2),de   ; store Y: COORDS must be 2 bytes wider
-		
-						push de
-						push hl
-
-						LD 	C,27
-						CALL	GFX_COUT
-						LD 	C,'0'
-						CALL	GFX_COUT
-
-						pop de		; X coordinate
-						call div64
-						ld	c,e
-						CALL	GFX_COUT
-						ld	c,d
-						CALL	GFX_COUT
+                       
+						call	plot_setup
+						OR		$40				; SMC instruction changed from RES to SET
 						
-						pop de		; y coordinate
+						AND	0E7H    ; mask for SMC code
+						OR	B
+						XOR	18H					; @11000: mask for the the 2 changed bits
 						
-						ld	hl,maxy-1		; flip vertically
-						sbc hl,de
-						ex de,hl
+						LD	(GRFBIT+1),A
+						
+						;CALL	XDDR			; SET X ADDRESS
+						LD 	A,L					; X COORDINATE IN [HL]
+						AND	0FCH				; @11111100, mask out the 2 rightmost bits
+						OR	H
+						RRCA
+						RRCA
 
-						call div64
-						ld	c,e
-						CALL	GFX_COUT
-						ld	c,d
-						JP	GFX_COUT
+						LD 	B,A
+						LD 	C,0FEH				; DISPLAY DATA
+						IN	A,(C)
+GRFBIT:					SET	0,A					; MODIFIED BIT SET
+						OUT	(C),A
+						
+						EI
+						RET
+

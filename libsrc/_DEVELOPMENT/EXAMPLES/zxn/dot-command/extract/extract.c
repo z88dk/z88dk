@@ -3,19 +3,6 @@
  * aralbrec @ z88dk.org
 */
 
-// ZX SPECTRUM
-//
-// zcc +zx -vn -startup=30 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 --opt-code-size extract.c help-zx.asm -o extract -subtype=dot -create-app
-// zcc +zx -vn -startup=30 -clib=new extract.c help-zx.asm -o extract -subtype=dot -create-app
-
-// ZX NEXT
-//
-// zcc +zxn -vn -startup=30 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 --opt-code-size extract.c help-zxn.asm -o extract -subtype=dot -create-app
-// zcc +zxn -vn -startup=30 -clib=new extract.c help-zxn.asm -o extract -subtype=dot -create-app
-
-#pragma printf = "s X c u lu lX"
-#pragma output CLIB_EXIT_STACK_SIZE = 1
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -25,20 +12,13 @@
 #include <limits.h>
 #include <ctype.h>
 #include <compress/zx7.h>
-#include <input.h>
 #include <z80.h>
-
-#if __ZXNEXT
-
 #include <arch/zxn.h>
 #include <arch/zxn/esxdos.h>
 
-#else
+#include "user_interaction.h"
 
-#include <arch/zx.h>
-#include <arch/zx/esxdos.h>
-
-#endif
+#define min(a,b)  (((a) < (b)) ? (a) : (b))
 
 // command line parsing
 
@@ -62,11 +42,13 @@ struct opt options;          // all initialized to zero
 unsigned char fin  = 0xff;   // file descriptor
 unsigned char fout = 0xff;   // file descriptor
 
-struct esxdos_stat st;       // file info
+unsigned char  mmu_reg;      // 8k mmu register to use when loading memory
+unsigned char *mmu_addr;     // start address of mmu slot
+
+struct esx_mode screen_mode; // information about screen
+struct esx_stat st;          // file info
 
 unsigned char buffer[512];   // file buffer
-
-unsigned char mmu2_state;
 
 extern unsigned char help[]; // compressed help text
 
@@ -90,7 +72,7 @@ int error(char *fmt, ...)
    for (p = ebuf; p = strchr(p, '\n'); )
       *p = '\r';
    
-   ebuf[strlen(ebuf)-1] += 0x80;  
+   ebuf[strlen(ebuf) - 1] += 0x80;  
    return (int)ebuf;
 }
 
@@ -99,25 +81,32 @@ int error(char *fmt, ...)
 void hexdump(uint32_t base, unsigned char *lbuffer, uint16_t len)
 {
    static unsigned char *buffer;
+   static unsigned char N;
    
    buffer = lbuffer;
+   N = screen_mode.cols ? screen_mode.cols : 8;
 
    while (len)
    {
       unsigned char i;
       
-      printf("%08lX\n", base);
-      
-      for (i = 0; (i != 8) && (i < len); ++i)
+      printf("%08lX%s", base, (screen_mode.cols == 0) ? "\n" : " ");
+
+      for (i = 0; (i != N) && (i < len); ++i)
          printf("%02X ", buffer[i]);
-      
-      if (i != 8)
-         printf("%*s", (8 - i) * 3, "");
-      
-      for (i = 0; (i != 8) && (i < len); ++i)
+
+      if (i != N)
+         printf("%*s", (N - i) * 3, "");
+
+      for (i = 0; (i != N) && (i < len); ++i)
+      {
          printf("%c", isprint(buffer[i]) ? buffer[i] : '?');
+         
+         if (screen_mode.cols && ((i & 0x7) == 0x7))
+            printf(" ");
+      }
       
-      if (i != 8)
+      if (screen_mode.cols || (i != N))
          printf("\n");
       
       base += i;
@@ -129,22 +118,16 @@ void hexdump(uint32_t base, unsigned char *lbuffer, uint16_t len)
 
 // clean up at exit
 
-void cleanup_files(void)
+static unsigned char old_cpu_speed;
+
+void cleanup(void)
 {
-   if (fin != 0xff)
-      esxdos_f_close(fin);
+   if (fin != 0xff) esx_f_close(fin);
+   if (fout != 0xff) esx_f_close(fout);
    
-   if (fout != 0xff)
-      esxdos_f_close(fout);
-}
-
-#if __ZXNEXT
-
-// determine 8k page from linear address
-
-unsigned long page_number(unsigned long address)
-{
-   return (address & 0xffffe000) >> 13;
+   puts("    ");
+   
+   ZXN_NEXTREGA(REG_TURBO_MODE, old_cpu_speed);
 }
 
 // bank 8k page into mmu2
@@ -157,37 +140,59 @@ unsigned char page_present(unsigned long address)
    
    // maximum of 224 8k pages on the zx next
    
-   if ((p = (unsigned char)(page_number(address))) >= 224)
+   if ((p = zxn_page_from_addr(address)) > (unsigned char)__ZXNEXT_LAST_PAGE)
       return 0;
    
    // page in bank and test for presence
    
-   ZXN_WRITE_MMU2(p);
+   ZXN_WRITE_REG(mmu_reg, p);
+
+   p = z80_bpeek(mmu_addr);
+   z80_bpoke(mmu_addr, ~p);
    
-   p = z80_bpeek(0x4000);
-   
-   z80_bpoke(0x4000, ~p);
-   
-   q = z80_bpeek(0x4000);
-   
-   z80_bpoke(0x4000, p);
+   q = z80_bpeek(mmu_addr);
+   z80_bpoke(mmu_addr, p);
    
    return q == (unsigned char)(~p);
 }
 
-#endif
-
 // program starts
+
+extern unsigned char extract_get_mmu(void) __preserves_regs(b,c,d,e);
 
 int main(int argc, char **argv)
 {
    static unsigned char hex;
    static unsigned int  size;
+   
    static uint32_t      remaining;
    static uint32_t      total;
    
+   static uint32_t      transferred;
+   static uint32_t      transfer_size;
+   
    unsigned char i;
    
+   // initialization
+
+   old_cpu_speed = ZXN_READ_REG(REG_TURBO_MODE);
+   ZXN_NEXTREG(REG_TURBO_MODE, RTM_14MHZ);
+   
+   atexit(cleanup);
+   
+   // determine which mmu slot to use for paging
+   
+   mmu_reg = extract_get_mmu() + REG_MMU0;
+   mmu_addr = (void *)zxn_addr_from_page(mmu_reg - REG_MMU0);
+
+   // find out screen column width
+   // esxdos ruled out by crt
+   
+   if ((esx_m_dosversion() == ESX_DOSVERSION_NEXTOS_48K) || esx_ide_mode_get(&screen_mode))
+      screen_mode.cols = 32;
+   
+   screen_mode.cols = ((screen_mode.cols - 9) / 33) * 8;   // calculation for hexdump
+
    // parse command line
 
    for (i = 2; i < (unsigned char)argc; ++i)
@@ -207,11 +212,7 @@ int main(int argc, char **argv)
          if (*options.outname == 0)
             return error("%s: Missing out file", p);
       }
-#if __ZXNEXT
       else if (!stricmp(p, "-m") || !stricmp(p, "-ml") || !stricmp(p, "-mb") || !stricmp(p, "-mp"))
-#else
-      else if (!stricmp(p, "-m"))
-#endif
       {
          unsigned char *end;
          
@@ -221,16 +222,16 @@ int main(int argc, char **argv)
          options.mem = 2 - (*(p + 2) == 0);
          options.memaddr = strtoul(argv[++i], &end, 0);
 
-			if (errno || *end)
+         if (errno || *end)
             return error("%s: Bad address", p);
-			
-			if (*(p + 2) == 'b')
-				options.memaddr *= 0x4000U;   // 16k bank number given
-			
-			if (*(p + 2) == 'p')
-				options.memaddr *= 0x2000U;   // 8k page number given
+         
+         if (*(p + 2) == 'b')
+            options.memaddr *= 0x4000U;   // 16k bank number given
+         
+         if (*(p + 2) == 'p')
+            options.memaddr *= 0x2000U;   // 8k page number given
 
-         if (((options.mem == 1) && (options.memaddr & 0xffff0000UL)) || ((options.mem == 2) && ((unsigned int)(options.memaddr >> 16) >= 28U)))
+         if (((options.mem == 1) && (options.memaddr & 0xffff0000UL)) || ((options.mem == 2) && ((options.memaddr >> 12) > __ZXNEXT_LAST_PAGE)))
             return error("%s: Out of range", p);
       }
       else if ((*p == '+') || (*p == '-'))
@@ -261,11 +262,10 @@ int main(int argc, char **argv)
    
    if ((unsigned char)argc < 2)
    {
-      // zx7 compressed the help text from 434 bytes to 266 bytes.
-      // the decompressor is somewhere around 70-80 bytes.
+      // compressed help text saves some space
       
-      dzx7_standard(help, buffer);
-      printf("%s", buffer);
+      *dzx7_standard(help, buffer) = 0;
+      puts(buffer);
       
       return 0;
    }
@@ -274,55 +274,57 @@ int main(int argc, char **argv)
    if (options.outname && (stricmp(options.outname, options.inname) == 0))
       return error("In and out files are same");
    
-   atexit(cleanup_files);
-   
    // open input file
    
-   fin = esxdos_f_open(options.inname, ESXDOS_MODE_OPEN_EXIST | ESXDOS_MODE_R);
-   
-   if (errno)
+   if ((fin = esx_f_open(options.inname, ESX_MODE_OPEN_EXIST | ESX_MODE_R)) == 0xff)
       return error("%u: Can't open %s", errno, options.inname);
-   
+
+   if (esx_f_fstat(fin, &st))
+      return error("%u: Can't stat %s", errno, options.inname);
+
    if (options.offset)
    {
-      if (esxdos_f_fstat(fin, &st) < 0)
-         return error("%u: Can't stat %s", errno, options.inname);
-      
       if (options.offset < 0)
          if ((int32_t)(options.offset += st.size) < 0)
             options.offset = 0;
-   
-      esxdos_f_read(fin, buffer, 1);   // reported bug: esxdos cannot seek unless r/w has occurred first
-      esxdos_f_seek(fin, options.offset, ESXDOS_SEEK_SET);
+      
+      if (options.offset >= st.size)
+         return error("Offset exceeds input size");
+
+      esx_f_seek(fin, options.offset, ESX_SEEK_SET);
    
       if (errno)
-         return error("Can't seek to %lu in\n%s", options.offset, options.inname);
+         return error("Can't seek to %lu in %s", options.offset, options.inname);
    }
    
+   // transfer size
+
+   remaining = (options.length == 0) ? ULONG_MAX : options.length;
+   transfer_size = min((unsigned long)(st.size - options.offset), remaining);
+
    // open output file
    
    if (options.outname != NULL)
    {
       if (options.append)
-         fout = esxdos_f_open(options.outname, ESXDOS_MODE_OPEN_CREAT | ESXDOS_MODE_R | ESXDOS_MODE_W);
+         fout = esx_f_open(options.outname, ESX_MODE_OPEN_CREAT | ESX_MODE_RW);
       else
-         fout = esxdos_f_open(options.outname, (options.force == 0) ? ESXDOS_MODE_CREAT_NOEXIST | ESXDOS_MODE_W : ESXDOS_MODE_CREAT_TRUNC | ESXDOS_MODE_W);
+         fout = esx_f_open(options.outname, (options.force == 0) ? (ESX_MODE_OPEN_CREAT_NOEXIST | ESX_MODE_W) : (ESX_MODE_OPEN_CREAT_TRUNC | ESX_MODE_W));
       
       if (errno)
          return error("%u: Can't open %s%s", errno, options.outname, options.force ? "" : " (-f)");
       
       if (options.append)
       {
-         if (esxdos_f_fstat(fout, &st) < 0)
+         if (esx_f_fstat(fout, &st))
             return error("%u: Can't stat %s", errno, options.outname);
          
          if (st.size > 0)
          {
-            esxdos_f_read(fout, buffer, 1);   // reported bug: esxdos cannot seek unless r/w has occurred first
-            esxdos_f_seek(fout, st.size, ESXDOS_SEEK_SET);
+            esx_f_seek(fout, st.size, ESX_SEEK_SET);
             
             if (errno)
-               return error("Can't seek to %lu in\n%s", st.size, options.outname);
+               return error("Can't seek to %lu in %s", st.size, options.outname);
          }
       }
    }
@@ -330,7 +332,6 @@ int main(int argc, char **argv)
    // copy input to output
    
    hex = (fout == 0xff) && (options.mem == 0);
-   remaining = (options.length == 0) ? ULONG_MAX : options.length;
    total = 0UL;
 
    while (remaining && (size = esxdos_f_read(fin, buffer, (remaining > sizeof(buffer)) ? sizeof(buffer) : remaining)))
@@ -341,10 +342,11 @@ int main(int argc, char **argv)
       
       if (fout != 0xff)
       {
-         esxdos_f_write(fout, buffer, size);
-         
-         if (errno)
+         if (esx_f_write(fout, buffer, size) != size)
             return error("%u: Error writing file", errno);
+         
+         transferred += size;
+         printf("%03u%%" "\x08\x08\x08\x08", (unsigned int)(transferred * 100 / transfer_size));
       }
       
       // write to 64k memory
@@ -370,16 +372,16 @@ int main(int argc, char **argv)
          }
       }
 
-#if __ZXNEXT
-
       // write to zx next paged memory
       
       if (options.mem == 2)
       {
+         static unsigned char mmu_state;
+         
          unsigned int tmp;
          unsigned int max;
          
-         mmu2_state = ZXN_READ_MMU2();
+         mmu_state = ZXN_READ_REG(mmu_reg);
          
          for (tmp = size; tmp; tmp -= max)
          {
@@ -388,28 +390,26 @@ int main(int argc, char **argv)
             max = 0x2000 - (unsigned int)(options.memaddr & 0x1fff);
             if (max >= tmp) max = tmp;
             
-            // page 8k into mmu2
+            // page 8k into mmu5
             
             if (page_present(options.memaddr) == 0)
                break;
             
-            memcpy((void*)((unsigned int)(options.memaddr & 0x1fff) + 0x4000), buffer, max);
+            memcpy((void*)((unsigned int)(options.memaddr & 0x1fff) + mmu_addr), buffer, max);
             options.memaddr += max;
          }
          
-         ZXN_WRITE_MMU2(mmu2_state);
+         ZXN_WRITE_REG(mmu_reg, mmu_state);
          
          if (tmp)
          {
             options.mem = 0;
-            printf("Stopped at page %u (%lu bytes)\n", (unsigned int)(page_number(options.memaddr)), total);
+            printf("Stopped at page %u (%lu bytes)\n", (unsigned int)(zxn_page_from_addr(options.memaddr)), total);
             
             if (fout == 0xff)
                break;
          }
       }
-
-#endif
 
       // hexdump
       
@@ -422,11 +422,7 @@ int main(int argc, char **argv)
       
       // allow user to interrupt
       
-      if (in_key_pressed(IN_KEY_SCANCODE_SPACE | 0x8000))
-      {
-         in_wait_nokey();
-         return error("L Break into Program");
-      }
+      user_interaction();
    }
    
    if (errno)

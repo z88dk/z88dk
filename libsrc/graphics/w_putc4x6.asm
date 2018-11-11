@@ -13,7 +13,7 @@
 
 	INCLUDE	"graphics/grafix.inc"
 
-		SECTION         code_clib
+		SECTION         code_graphics
 
 		
 	PUBLIC    putc4x6
@@ -25,7 +25,7 @@
 	EXTERN	plot
 	EXTERN	unplot
 	EXTERN	clg
-        EXTERN     l_cmp
+        EXTERN     l_graphics_cmp
 
 
 .putc4x6
@@ -153,7 +153,7 @@
 		
 		push    hl
 		ld      hl,maxx
-		call    l_cmp
+		call    l_graphics_cmp
 		pop     hl
 		call  nc,do_nl
 		
@@ -181,7 +181,7 @@
 		ret
 
 
-		SECTION		bss_clib
+		SECTION		bss_graphics
 
 	PUBLIC    x_4x6
 	PUBLIC    _x_4x6

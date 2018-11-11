@@ -8,8 +8,11 @@
 	EXTERN	generic_console_cls
 	EXTERN	generic_console_font32
 	EXTERN	generic_console_udg32
+	EXTERN	__mc1000_modeval
 	EXTERN	__mc1000_mode
-	EXTERN	__console_h
+	EXTERN	__console_w
+
+	INCLUDE	"target/mc1000/def/mc1000.def"
 
 
 ; a = ioctl
@@ -34,21 +37,28 @@ check_mode:
 	cp	IOCTL_GENCON_SET_MODE
 	jr	nz,failure
 	ld	a,c
-	ld	l,0x9e
-	ld	h,24
+	and	31
+	ld	e,MODE_1
+	ld	hl,$1820		;rows cols
 	cp	1
 	jr	z,set_mode
-	ld	h,16
-	ld	l,a
+	ld	hl,$1020
+	ld	e,MODE_0
 	and	a
 	jr	z,set_mode
+	ld	hl,$1810
+	ld	e,MODE_2
 	cp	2
 	jr	nz,failure
 set_mode:
-	ld	a,h
-	ld	(__console_h),a
-	ld	a,l
+	bit	5,c
+	jr	z,not_css
+	set	1,e
+not_css:
 	ld	(__mc1000_mode),a
+	ld	(__console_w),hl
+	ld	a,e
+	ld	(__mc1000_modeval),a
 	out	($80),a
 	ld      ($f5),a		;Keep basic up-to-date with mode
         ld      hl,dummy_return

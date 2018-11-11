@@ -1,60 +1,64 @@
-#include <stdio.h>
-#include <libgen.h>
-#include <arch/zx/esxdos.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
 
-#include "globals.h"
+#include "error.h"
 #include "option.h"
-#include "path.h"
 #include "run.h"
 
-void option_print_path(void)
+// option arguments 
+
+unsigned char option_unsigned_number(unsigned char *p, unsigned int *res)
 {
-   unsigned char *p;
-   
-   printf("Path Walk\n\n");
-   
-   for (p = path_open(); p != 0; p = path_next())
+   static unsigned char *endp;
+
+   if (p && *p)
    {
-      if (*p == 0) continue;
-      
-      esx_f_chdir("/");
-      printf("%s %s\n", esx_f_chdir(p) ? "X" : "O", p);
-   }
-   
-   path_close();
+      unsigned int num;
 
-   printf("\nDone\n");
-}
-
-void option_print_find_dirs(void)
-{
-   unsigned char *p;
-   unsigned char  i;
-   
-   printf("Locating...\n\n");
-   
-   i = 0;
-   for (p = path_open(); p != 0; p = path_next())
-   {
-      // progress cursor
-      // allow user to interrupt
+      errno = 0;
+      num = _strtou_(p, &endp, 0);
       
-      user_interact();
-         
-      // check this directory
-
-      esx_f_chdir("/");
-      if ((*p == 0) || esx_f_chdir(p)) continue;
-      
-      if ((fin = esx_f_open(basename(program_name), ESX_MODE_R | ESX_MODE_OPEN_EXIST)) != 0xff)
+      if ((errno == 0) && (*endp == 0))
       {
-         printf("%2u %s\n", ++i, p);
-         esx_f_close(fin);
-         fin = 0xff;
+         *res = num;
+         return 1;
       }
    }
    
-   path_close();
+   return 0;
+}
 
-   printf(" \nDone\n");
+// options
+
+// cd
+
+unsigned int option_exec_cd(void)
+{
+   flags.option |= FLAG_OPTION_CD;
+   return OPT_ACTION_OK;
+}
+
+// cwd
+
+unsigned int option_exec_cwd(void)
+{
+   flags.option |= FLAG_OPTION_CWD;
+   return OPT_ACTION_OK;
+}
+
+// ?
+
+unsigned int option_exec_question(void)
+{
+   flags.option |= (FLAG_OPTION_Q | FLAG_OPTION_CWD);
+   return OPT_ACTION_OK;
+}
+
+// path
+
+unsigned int option_exec_path(void)
+{
+   flags.option |= (FLAG_OPTION_PATH | FLAG_OPTION_CWD);
+   return OPT_ACTION_OK;
 }

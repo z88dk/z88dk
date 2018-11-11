@@ -3,7 +3,7 @@
 
 
 
-        SECTION code_clib
+        SECTION code_graphics
 	PUBLIC	c_plotpixel
 	defc	NEEDplot = 1
 

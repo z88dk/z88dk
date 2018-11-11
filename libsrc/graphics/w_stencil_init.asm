@@ -13,7 +13,7 @@
 ;
 
 	INCLUDE	"graphics/grafix.inc"
-		SECTION   code_clib
+		SECTION   code_graphics
                 PUBLIC    stencil_init
                 PUBLIC    _stencil_init
 

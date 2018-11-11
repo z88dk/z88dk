@@ -13,6 +13,7 @@
 
 	push	hl		;save x
 	call	getmaxy		;hl = maxy
+	inc	hl
 	call	l_cmp
 	pop	hl
 	ret	nc
@@ -20,6 +21,7 @@
 	ex	de,hl		;de = x, hl = y
 	push	hl		;save y
 	call	getmaxx
+	inc	hl
 	call	l_cmp
 	pop	hl
 	ret	nc

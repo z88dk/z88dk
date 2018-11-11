@@ -13,7 +13,7 @@
 
 
 
-        SECTION code_clib
+        SECTION code_graphics
                 PUBLIC    plot
                 PUBLIC    _plot
                 EXTERN     swapgfxbk

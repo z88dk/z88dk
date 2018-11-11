@@ -13,38 +13,6 @@
 
         SECTION  code_clib
 	PUBLIC	ansi_SCROLLUP
-	EXTERN	bee_attr
-	EXTERN	ansicolumns
+	EXTERN	generic_console_scrollup
 
-
-.ansi_SCROLLUP
-	ld	hl,$f000+ansicolumns
-	ld	de,$f000
-	ld	bc,ansicolumns*24
-	ldir
-	ld	hl,$F000+ansicolumns*24
-	ld	(hl),32 ;' '
-	ld	d,h
-	ld	e,l
-	inc	de
-	ld	bc,ansicolumns-1
-	ldir
-	
-	ld	a,64
-	out (8),a
-	ld a,(bee_attr)
-	ld	hl,$f800+ansicolumns
-	ld	de,$f800
-	ld	bc,ansicolumns*24
-	ldir
-	ld	hl,$F800+ansicolumns*24
-	ld	(hl),a
-	ld	d,h
-	ld	e,l
-	inc	de
-	ld	bc,ansicolumns-1
-	ldir
-	xor a
-	out (8),a
-
-	ret
+	defc	ansi_SCROLLUP = generic_console_scrollup

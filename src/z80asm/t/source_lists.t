@@ -55,7 +55,6 @@ spew("test2.lst",
 	"test1.lst");
 run('z80asm -b test1.asm "@test1.lst"', 1, "", <<'ERR');
 Error at file 'test2.lst' line 7: cannot include file 'test1.lst' recursively
-1 errors occurred during assembly
 ERR
 
 # expand environment variables in source and list files
@@ -129,7 +128,6 @@ spew("test1.lst", <<'END');
 END
 run('z80asm -b "@test1.lst"', 1, "", <<'ERR');
 Error at file 'test1.lst' line 1: pattern 'test_dir/*.asm' returned no files
-1 errors occurred during assembly
 ERR
 
 # use globs in recursive list file name

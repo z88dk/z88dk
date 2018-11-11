@@ -13,6 +13,7 @@ static char             *c_crt_filename      = NULL;
 static char             *c_disc_format       = NULL;
 static char             *c_output_file      = NULL;
 static char             *c_boot_filename     = NULL;
+static char             *c_disc_container    = "dsk";
 static char              help         = 0;
 
 
@@ -24,6 +25,7 @@ option_t cpm2_options[] = {
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &c_crt_filename },
     { 'o', "output",   "Name of output file",        OPT_STR|OPT_OUTPUT,   &c_output_file },
     { 's', "bootfile", "Name of the boot file",      OPT_STR,   &c_boot_filename },
+    {  0,  "container", "Type of container (raw,dsk)", OPT_STR, &c_disc_container },
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
@@ -112,6 +114,7 @@ static cpm_discspec microbee_spec = {
     .extent_size = 4096,
     .byte_size_extents = 1,
     .first_sector_offset = 0x15,
+    .boot_tracks_sector_offset = 1,
     .alternate_sides = 1,
     .has_skew = 1,
     .skew_track_start = 5,
@@ -148,6 +151,86 @@ static cpm_discspec mz2500cpm_spec = {
     .alternate_sides = 1
 };
 
+static cpm_discspec nascom_spec = {
+    .sectors_per_track = 10,
+    .tracks = 77,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+};
+
+static cpm_discspec qc10_spec = {
+    .sectors_per_track = 10,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x3e,
+    .filler_byte = 0xe5,
+    .boottracks = 4,
+    .directory_entries = 64,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .alternate_sides = 1,
+};
+
+static cpm_discspec tiki100_spec = {
+    .sectors_per_track = 10,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x3e,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+};
+
+static cpm_discspec svi40ss_spec = {
+    .sectors_per_track = 17,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x52,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+};
+
+static cpm_discspec col1_spec = {
+    .sectors_per_track = 8,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x52,
+    .filler_byte = 0xe5,
+    .boottracks = 0,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .offset = 13312,
+    .has_skew = 1,
+    .skew_track_start = 0,
+    .skew_tab = { 0, 5, 2, 7, 4, 1, 6, 3 }
+};
+
+
+
+
+
+
 
 
 struct formats {
@@ -158,20 +241,36 @@ struct formats {
      void          *bootsector;
      char           force_com_extension;
 } formats[] = {
-    { "attache",   "Otrone Attache",     &attache_spec, 0, NULL, 1 },
+    { "attache",   "Otrona Attache'",     &attache_spec, 0, NULL, 1 },
     { "cpcsystem", "CPC System Disc",    &cpcsystem_spec, 0, NULL, 0 },
+    { "col1",      "Coleco ADAM 40T SSDD", &col1_spec, 0, NULL, 1 },
     { "dmv",       "NCR Decision Mate",  &dmv_spec, 16, "\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5NCR F3", 1 },
     { "einstein",  "Tatung Einstein",    &einstein_spec, 0, NULL, 1 },
     { "kayproii",  "Kaypro ii",          &kayproii_spec, 0, NULL, 1 },
     { "microbee-ds80",  "Microbee DS80", &microbee_spec, 0, NULL, 1 },
+    { "nascomcpm", "Nascom CPM",         &nascom_spec, 0, NULL, 1 },
     { "mz2500cpm", "Sharp MZ2500 - CPM", &mz2500cpm_spec, 0, NULL, 1 },
     { "osborne1",  "Osborne 1",          &osborne_spec, 0, NULL, 1 },
+    { "qc10",      "Epson QC-10, QX-10", &qc10_spec, 0, NULL, 1 },
+    { "svi-40ss",   "SVI 40ss (174k)",   &svi40ss_spec, 0, NULL, 1 },
+    { "tiki100-40t","Tiki 100 (200k)",   &tiki100_spec, 0, NULL, 1 },
     { NULL, NULL }
+};
+
+struct container {
+    const char        *name;
+    const char        *description;
+    int              (*writer)(cpm_handle *h, const char *filename);
+} containers[] = {
+    { "dsk",        "CPC extended .dsk format",    cpm_write_edsk },
+    { "raw",        "Raw image",                   cpm_write_raw },
+    { NULL, NULL, NULL }
 };
 
 static void dump_formats()
 {
     struct formats* f = &formats[0];
+    struct container *c = &containers[0];
 
     printf("Supported CP/M formats:\n\n");
 
@@ -179,6 +278,12 @@ static void dump_formats()
         printf("%-20s%s\n", f->name, f->description);
         printf("%d tracks, %d sectors/track, %d bytes/sector, %d entries, %d bytes/extent\n\n", f->spec->tracks, f->spec->sectors_per_track, f->spec->sector_size, f->spec->directory_entries, f->spec->extent_size);
         f++;
+    }
+
+    printf("\nSupported containers:\n\n");
+    while ( c->name ) {
+        printf("%-20s%s\n", c->name, c->description);
+        c++;
     }
     exit(1);
 }
@@ -191,17 +296,19 @@ int cpm2_exec(char* target)
     if (c_binary_name == NULL) {
         return -1;
     }
-    if (c_disc_format == NULL) {
+    if (c_disc_format == NULL || c_disc_container == NULL ) {
         dump_formats();
         return -1;
     }
-    return cpm_write_file_to_image(c_disc_format, c_output_file, c_binary_name, c_crt_filename, c_boot_filename);
+    return cpm_write_file_to_image(c_disc_format, c_disc_container, c_output_file, c_binary_name, c_crt_filename, c_boot_filename);
 }
 
-int cpm_write_file_to_image(const char* disc_format, const char* output_file, const char* binary_name, const char* crt_filename, const char* boot_filename)
+int cpm_write_file_to_image(const char *disc_format, const char *container, const char* output_file, const char* binary_name, const char* crt_filename, const char* boot_filename)
 {
     cpm_discspec* spec = NULL;
     struct formats* f = &formats[0];
+    struct container *c = &containers[0];
+    int (*writer)(cpm_handle *h, const char *filename) = NULL;
     char disc_name[FILENAME_MAX + 1];
     char cpm_filename[12] = "APP     COM";
     void* filebuf;
@@ -216,10 +323,22 @@ int cpm_write_file_to_image(const char* disc_format, const char* output_file, co
         }
         f++;
     }
-
     if (spec == NULL) {
         return -1;
     }
+
+    while (c->name != NULL) {
+        if (strcasecmp(container, c->name) == 0) {
+            writer = c->writer;
+            break;
+        }
+        c++;
+    }
+    if (writer == NULL) {
+        return -1;
+    }
+
+
 
     if (output_file == NULL) {
         strcpy(disc_name, binary_name);
@@ -270,7 +389,8 @@ int cpm_write_file_to_image(const char* disc_format, const char* output_file, co
     }
 
     cpm_write_file(h, cpm_filename, filebuf, binlen);
-    if (cpm_write_edsk(h, disc_name) < 0) {
+    
+    if (writer(h, disc_name) < 0) {
         exit_log(1, "Can't write disc image");
     }
     cpm_free(h);
@@ -282,6 +402,11 @@ static void create_filename(const char* binary, char* cpm_filename, char force_c
 {
     int count = 0;
     int dest = 0;
+    char *ptr;
+
+    if ( (ptr = strchr(binary,'/') ) || (ptr = strrchr(binary,'\\')) ) {
+        binary = ptr + 1;
+    }
 
     while (count < 8 && count < strlen(binary) && binary[count] != '.') {
         if (binary[count] > 127) {

@@ -66,3 +66,11 @@
    ELSE
      defc __CLIB_FGETC_CONS_DELAY = 50
    ENDIF
+
+   ; Some ports (looking at you tiki100) need to have graphics routines stored out
+   ; of paging harm. Normally we'd just use code_driver and keep the routines close
+   ; the start of the address space. However for tiki100, we need them at the end,
+   ; (in this case > 32768)
+   IF DEFINED_CRT_ORG_GRAPHICS
+       defc __crt_org_graphics = CRT_ORG_GRAPHICS
+   ENDIF

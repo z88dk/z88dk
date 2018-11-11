@@ -21,7 +21,6 @@ unlink_testfiles();
 # not possible to create empty library file
 run('z80asm -xtest.lib "test*.asm"', 1, '', <<'...');
 Error: pattern 'test*.asm' returned no files
-1 errors occurred during assembly
 ...
 
 # force the error and check behaviour
@@ -37,7 +36,6 @@ spew("test.asm", <<'...');
 ...
 run('z80asm -b -itest.lib test.asm', 1, '', <<'...');
 Error at file 'test.asm' line 2: symbol 'main' not defined
-1 errors occurred during assembly
 ...
 
 unlink_testfiles();

@@ -14,7 +14,7 @@
 ;Usage: clga(struct *pixels)
 
 	INCLUDE "graphics/grafix.inc"
- 	SECTION code_clib
+ 	SECTION code_graphics
 	PUBLIC    clga
 	PUBLIC    _clga
 

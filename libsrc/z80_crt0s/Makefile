@@ -13,11 +13,11 @@ $(OUTPUT_DIRECTORY)/z80_crt0.lib:
 
 $(OUTPUT_DIRECTORY)/z180_crt0.lib:
 	@$(MAKE) clean
-	$(LIBLINKER) -I.. -x$@ --cpu=z180 @crt0_z180.lst
+	$(LIBLINKER) -I.. -x$@ -mz180 @crt0_z180.lst
 
 $(OUTPUT_DIRECTORY)/rcmx000_crt0.lib:
 	@$(MAKE) clean
-	$(LIBLINKER) -I.. --cpu=r2k -x$@ @rcm.lst
+	$(LIBLINKER) -I.. -mr2k -x$@ @rcm.lst
 
 # this one uses iy in place of ix
 $(OUTPUT_DIRECTORY)/z80iy_crt0.lib:

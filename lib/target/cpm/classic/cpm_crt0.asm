@@ -35,6 +35,7 @@
 ; Some scope definitions
 ;-----------------------
 
+	EXTERN	cpm_platform_init
 	EXTERN    _main		;main() is always external to crt0
 
 	PUBLIC    cleanup		;jp'd to by exit()
@@ -91,13 +92,14 @@ ENDIF
 	ld      (start1+1),sp	;Save entry stack
 IF (startup=3)
 	; Increase to cover +3 MEM banking
-	defc	__clib_exit_stack_size_t  = __clib_exit_stack_size + 18
+	defc	__clib_exit_stack_size_t  = __clib_exit_stack_size + 18 + 18
 	UNDEFINE __clib_exit_stack_size
 	defc	__clib_exit_stack_size = __clib_exit_stack_size_t
 ENDIF
         INCLUDE "crt/classic/crt_init_sp.asm"
         INCLUDE "crt/classic/crt_init_atexit.asm"
-        call    crt0_init_bss   ;Initialise any data setup by sdcc
+        call    crt0_init_bss   
+	call	cpm_platform_init	;Any platform specific init
 	ld      (exitsp),sp
 
 ; Memory banking for Spectrum +3
@@ -218,7 +220,6 @@ peekbyte_code:
 		nop
 ENDIF
 
-        defm  	"Small C+ CP/M"
 
         INCLUDE "crt/classic/crt_runtime_selection.asm"
 

@@ -256,9 +256,17 @@ int zxshadow_end[]={26, ADDR, 33, 0x38, 0x00, 0x22, 0x8D, 0x5C, 0x22, 0x8F, 0x5C
 
 
 
-/*****************************/
-/* Microsoft BASIC detection */
-/*****************************/
+/***********************************/
+/* Microsoft BASIC detection, 6502 */
+/***********************************/
+int msbas_6502_gosub[]={22, ADDR, 0xA9, 0x03, 0x20, SKIP, SKIP, 0xA5, SKIP, 0x48, 0xA5, SKIP, 0x48, 0xA5, SKIP, 0x48, 0xA5, SKIP, 0x48, 0xA9, SKIP, 0x48, 0x20};
+int msbas_6502_goto[]={21, ADDR, 0xA5, SKIP, 0xE5, SKIP, 0xA5, SKIP, 0xE5, SKIP,  0xB0, SKIP,      0x98, 0x38, 0x65, SKIP, 0xA6, SKIP, 0x90, SKIP, 0xE8, 0xB0};
+
+ 
+
+/********************************************/
+/* Microsoft BASIC detection, Intel & Zilog */
+/********************************************/
 
 int restore_bastxt_skel[]={14, 0xEB, 0x2A, CATCH, CATCH, 0x28, 0x0E, 0xEB, SKIP_CALL, 0xE5, SKIP_CALL, 0x60, 0x69, 0xD1, 0xD2};
 int microsoft_skel[]={9, CATCH, 'i', 'c', 'r', 'o', 's', 'o', 'f', 't'};
@@ -1037,6 +1045,21 @@ int main(int argc, char *argv[])
 	/***********************************/
 	/* Microsoft BASIC related section */
 	/***********************************/
+	
+	res=find_skel(msbas_6502_gosub);
+	if (res<0)
+		res=find_skel(msbas_6502_goto);
+	if (res>0) {
+		printf("\n# Microsoft AppleSoft/PET (6502) BASIC found\n");
+		brand=find_skel(microsoft_skel);
+		if (brand>0)
+			printf("#  Microsoft signature found\n");
+			else printf("#  Microsoft signature not found\n");
+		brand=find_skel(msbas_6502_goto);
+		if (brand>0)
+			printf("#  Extended BASIC detected\n");
+	}
+		
 	res=find_skel(restore_bastxt_skel);
 	if (res<0)
 		res=find_skel(bastxt_skel);

@@ -12,7 +12,7 @@
 ;
 
 
-                SECTION         code_clib
+                SECTION         code_graphics
 	PUBLIC    getsprite
 	PUBLIC    _getsprite
 	EXTERN	pixeladdress
@@ -109,6 +109,6 @@
 	
 	jp	__graphics_end
 
-                SECTION         bss_clib
+                SECTION         bss_graphics
 .actcoord
 	 defw	0

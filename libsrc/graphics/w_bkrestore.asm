@@ -6,7 +6,7 @@
 ;	$Id: w_bkrestore.asm $
 ;
 
-	SECTION	 code_clib
+	SECTION	 code_graphics
 	PUBLIC    bkrestore
 	PUBLIC    _bkrestore
 	EXTERN	w_pixeladdress

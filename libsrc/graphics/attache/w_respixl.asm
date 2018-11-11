@@ -1,6 +1,6 @@
 ;
 ;       Otrona Attachè graphics routines
-;		console driven video HW access
+;		direct video HW access
 ;
 ;       Stefano Bodrato 2018
 ;
@@ -14,25 +14,47 @@
 
 			INCLUDE	"graphics/grafix.inc"
 
-			SECTION code_clib
+			SECTION smc_clib
 			PUBLIC	w_respixel
+
+			EXTERN     l_cmp
+			EXTERN	plot_setup
 			
-			EXTERN	w_plotpixel
-			EXTERN	w_xorpixel
-			
-				EXTERN	setres
-				EXTERN	swapgfxbk1
 
 .w_respixel
-.w_xorpixel
-						push hl
-						push de
+                        push    hl
+                        ld      hl,maxy
+                        call    l_cmp
+                        pop     hl
+                        ret     nc               ; Return if Y overflows
 						
-						call setres
+                        push    de
+                        ld      de,maxx
+                        call    l_cmp
+                        pop     de
+                        ret     c               ; Return if X overflows
+						
+						call plot_setup
+                        						
+						AND	0E7H    ; mask for SMC code
+						OR	B
+						XOR	18H					; @11000: mask for the the 2 changed bits
+						
+						LD	(GRFBIT+1),A
+						
+						;CALL	XDDR			; SET X ADDRESS
+						LD 	A,L					; X COORDINATE IN [HL]
+						AND	0FCH				; @11111100, mask out the 2 rightmost bits
+						OR	H
+						RRCA
+						RRCA
 
-						pop de
-						pop hl
+						LD 	B,A
+						LD 	C,0FEH				; DISPLAY DATA
+						IN	A,(C)
+GRFBIT:					RES	0,A					; MODIFIED BIT SET
+						OUT	(C),A
 						
-						call	w_plotpixel
-						
-						jp	swapgfxbk1
+						EI
+						RET
+

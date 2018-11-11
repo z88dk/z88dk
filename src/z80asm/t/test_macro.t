@@ -42,7 +42,6 @@ z80asm(<<'END', "", 1, "", <<'ERR');
 	nil
 END
 Error at file 'test.asm' line 2: macro 'nil' redefined
-1 errors occurred during assembly
 ERR
 
 z80asm(<<'END', "", 1, "", <<'ERR');
@@ -51,7 +50,6 @@ z80asm(<<'END', "", 1, "", <<'ERR');
 END
 Error at file 'test.asm' line 1: syntax error
 Error at file 'test.asm' line 2: syntax error
-2 errors occurred during assembly
 ERR
 
 z80asm(<<'END');

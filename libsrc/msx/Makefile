@@ -50,3 +50,4 @@ dirs:
 clean:
 	$(RM) -fr obj
 	$(RM) -f */*.o
+	$(MAKE) -C asmlib clean

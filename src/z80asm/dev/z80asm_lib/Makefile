@@ -32,16 +32,16 @@ endef
 #------------------------------------------------------------------------------
 # Call for all variants
 #------------------------------------------------------------------------------
-$(eval $(call MAKE_LIB,	z80-,			--cpu=z80				))
-$(eval $(call MAKE_LIB,	z80-ixiy,		--cpu=z80 		--IXIY	))
-$(eval $(call MAKE_LIB,	z80_zxn-,		--cpu=z80-zxn			))
-$(eval $(call MAKE_LIB,	z80_zxn-ixiy,	--cpu=z80-zxn 	--IXIY	))
-$(eval $(call MAKE_LIB,	z180-,			--cpu=z180				))
-$(eval $(call MAKE_LIB,	z180-ixiy,		--cpu=z180 		--IXIY	))
-$(eval $(call MAKE_LIB,	r2k-,			--cpu=r2k				))
-$(eval $(call MAKE_LIB,	r2k-ixiy,		--cpu=r2k 		--IXIY	))
-$(eval $(call MAKE_LIB,	r3k-,			--cpu=r3k				))
-$(eval $(call MAKE_LIB,	r3k-ixiy,		--cpu=r3k 		--IXIY	))
+$(eval $(call MAKE_LIB,	z80-,			-mz80				))
+$(eval $(call MAKE_LIB,	z80-ixiy,		-mz80 		--IXIY	))
+$(eval $(call MAKE_LIB,	z80_zxn-,		-mz80-zxn			))
+$(eval $(call MAKE_LIB,	z80_zxn-ixiy,	-mz80-zxn 	--IXIY	))
+$(eval $(call MAKE_LIB,	z180-,			-mz180				))
+$(eval $(call MAKE_LIB,	z180-ixiy,		-mz180 		--IXIY	))
+$(eval $(call MAKE_LIB,	r2k-,			-mr2k				))
+$(eval $(call MAKE_LIB,	r2k-ixiy,		-mr2k 		--IXIY	))
+$(eval $(call MAKE_LIB,	r3k-,			-mr3k				))
+$(eval $(call MAKE_LIB,	r3k-ixiy,		-mr3k 		--IXIY	))
 
 $(PROJ)_lib.lst: $(SRC)
 	$(RM) $(PROJ)_lib.lst

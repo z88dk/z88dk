@@ -14,7 +14,7 @@
 
 	INCLUDE	"graphics/grafix.inc"
 
-                SECTION         code_clib
+                SECTION         code_graphics
         PUBLIC    do_fill
         EXTERN	pixeladdress
 
@@ -158,5 +158,5 @@
 
 	ret
 
-	SECTION	bss_clib
+	SECTION	bss_graphics
 .spsave	defw 0

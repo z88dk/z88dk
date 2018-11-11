@@ -62,3 +62,4 @@ psg/einstein/get_psg
 psg/einstein/set_psg
 psg/einstein/set_psg_callee
 @psg/psg.lst
+@video/mc6845/mc6845.lst

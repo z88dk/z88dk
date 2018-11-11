@@ -22,7 +22,7 @@ for my $cpu (@CPUS) {
 	$test_nr++;
 	note "Test $test_nr: cpu:$cpu";
 
-	my $r = ticks(<<END, "--cpu=$cpu");
+	my $r = ticks(<<END, "-m$cpu");
 				jr start
 		data:	defb 0x01, 0x23, 0x45, 0x67, 0x89
 		start:	ld hl, start-1
@@ -43,7 +43,7 @@ END
 	$test_nr++;
 	note "Test $test_nr: cpu:$cpu";
 
-	$r = ticks(<<END, "--cpu=$cpu");
+	$r = ticks(<<END, "-m$cpu");
 				jr start
 		arg1:	defb 0x01, 0x23, 0x45, 0x67, 0x89
 		arg1e:

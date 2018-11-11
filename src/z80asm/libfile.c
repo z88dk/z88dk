@@ -45,8 +45,8 @@ void make_library(const char *lib_filename, argv_t *src_files)
 	if ( lib_filename == NULL )
 		return;					/* ERROR */
 
-    if ( opts.verbose )
-        printf("Creating library '%s'\n", lib_filename );
+	if (opts.verbose)
+		printf("Creating library '%s'\n", path_canon(lib_filename));
 
 	/* write library header */
 	lib_file = xfopen( lib_filename, "wb" );	

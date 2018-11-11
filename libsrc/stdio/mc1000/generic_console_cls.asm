@@ -4,6 +4,7 @@
 
 		PUBLIC		generic_console_cls
 
+		EXTERN		__mc1000_modeval
 		EXTERN		__mc1000_mode
 
 		EXTERN		CONSOLE_COLUMNS
@@ -14,8 +15,9 @@
 
 generic_console_cls:
 	ld	a,(__mc1000_mode)
-	cp	0x9e
-	jr	z,hires_cls
+	and	a
+	jr	nz,hires_cls
+	ld	a,(__mc1000_modeval)
 	out	($80),a
 	ld	hl, DISPLAY
 	ld	de, DISPLAY +1
@@ -27,6 +29,8 @@ generic_console_cls:
 	ret
 
 hires_cls:
+	ld	a,(__mc1000_modeval)
+	res	0,a
 	ld	hl,DISPLAY
 	ld	de,DISPLAY + 1
 	ld	bc, 32 * 192 - 1

@@ -16,6 +16,7 @@ static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
 static int               origin       = -1;
 static char              audio        = 0;
+static char              c_disk       = 0;
 static char              fast         = 0;
 static char              dumb         = 0;
 static char              loud         = 0;
@@ -25,6 +26,7 @@ static unsigned char              h_lvl;
 static unsigned char              l_lvl;
 
 
+static int	create_disk();
 
 /* Options that are available for this module */
 option_t svi_options[] = {
@@ -37,6 +39,7 @@ option_t svi_options[] = {
     {  0,  "fast",     "Tweak the audio tones to run a bit faster",  OPT_BOOL,  &fast },
     {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
     {  0,  "loud",     "Louder audio volume",        OPT_BOOL,  &loud },
+    {  0,  "disk",     "Create a .dsk image",        OPT_BOOL,  &c_disk },
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
 };
 
@@ -127,6 +130,10 @@ int svi_exec(char* target)
 
     if (binname == NULL || (!dumb && (crtfile == NULL && origin == -1))) {
         return -1;
+    }
+
+    if ( c_disk ) {
+        return create_disk();
     }
 
     if (origin != -1) {
@@ -312,4 +319,85 @@ int svi_exec(char* target)
     } /* END of WAV CONVERSION BLOCK */
 
     return 0;
+}
+
+static cpm_discspec spec = {
+    .sectors_per_track = 18,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 128,
+    .gap3_length = 0x52,
+    .filler_byte = 0xe5,
+    .boottracks = 3,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+};
+
+static uint8_t    sectorbuf[256];
+
+static int create_disk()
+{
+    char    disc_name[FILENAME_MAX+1];
+    char    bootname[FILENAME_MAX+1];
+    FILE   *fpin,*fpout;
+    int track, sector;
+    size_t binlen;
+
+    if ( outfile == NULL ) {
+        strcpy(disc_name,binname);
+        suffix_change(disc_name,".svi");
+    } else {
+        strcpy(disc_name,outfile);
+    }
+
+
+    strcpy(bootname, binname);
+    suffix_change(bootname, "_BOOTSTRAP.bin");
+
+    if ( (fpin=fopen_bin(bootname, crtfile) ) == NULL ) {
+        exit_log(1,"Can't open input file %s\n",bootname);
+    }
+    if ( fseek(fpin,0,SEEK_END) ) {
+        fclose(fpin);
+        exit_log(1,"Couldn't determine size of file\n");
+    }
+    binlen = ftell(fpin);
+    fseek(fpin,0L,SEEK_SET);
+
+    if ( binlen > 128 ) {
+        exit_log(1, "Bootstrap has length %d > 128", binlen);
+    }
+    memset(sectorbuf, 0, sizeof(sectorbuf));
+    fread(sectorbuf, 1, 128, fpin);
+    fclose(fpin);
+
+    if ( (fpout = fopen(disc_name, "wb")) == NULL ) {
+        exit_log(1,"Can't open output file %s\n",disc_name);
+    }
+
+    if ((fpin = fopen_bin(binname, crtfile)) == NULL) {
+        exit_log(1,"Can't open input file %s\n",bootname);
+    }
+
+    // First track has 18 sectors of 128 bytes
+    fwrite(sectorbuf, 1, 128, fpout);	// Track 0, sector 0
+
+    // And now we're on track 1, we have 17 sectors of 256 bytes
+    for ( track = 0; track < 40; track++ ) {
+        for ( sector = (track == 0 ? 1 : 0); sector < (track == 0 ? 18 : 17); sector++ ) {
+            int size = track == 0 ? 128 : 256;
+            memset(sectorbuf, 0, sizeof(sectorbuf));
+            if ( !feof(fpin) ) {
+                fread(sectorbuf, 1, size, fpin);
+            }
+            fwrite(sectorbuf, 1, size, fpout);	
+        }
+    }
+    fclose(fpout);
+    fclose(fpin);
+
+    return 0;
+
 }

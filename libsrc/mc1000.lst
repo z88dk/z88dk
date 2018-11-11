@@ -5,6 +5,11 @@ stdio/mc1000/generic_console
 stdio/mc1000/generic_console_cls
 stdio/mc1000/generic_console_ioctl
 stdio/mc1000/generic_console_vpeek
+stdio/mc1000/printc_MODE1
+stdio/mc1000/printc_MODE2
+stdio/mc1000/vpeek_MODE1
+stdio/mc1000/vpeek_MODE2
+stdio/mc1000/vpeek_screendollar
 stdio/mc1000/conio_vars
 stdio/mc1000/CRT_FONT
 stdio/ansi/mc1000/f_ansi_attr
@@ -43,5 +48,6 @@ psg/mc1000/set_psg
 psg/mc1000/set_psg_callee
 psg/mc1000/get_psg
 psg/mc1000/psg_init
+@video/mc6847/mc6847.lst
 @psg/psg.lst
 @z80.lst

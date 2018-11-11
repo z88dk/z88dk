@@ -1,0 +1,129 @@
+ls - list directory contents
+
+ls [OPTION]... [FILE]...
+
+List information about FILEs
+(the current dir by default).
+
+Sort entries alphabetically if
+-StUX and --sort are not used.
+
+FILTER FILES
+
+-a, --all
+  do not ignore .*
+
+-A, --almost-all
+  ignore . and ..
+
+-B, --ignore-backups
+  do not list *.bak
+
+Wildcards accepted.
+
+LIST STYLE
+
+-C
+  list entries by columns
+
+-l
+  use a long listing format
+
+-m
+  comma separated list
+
+-x
+  list entries by lines
+
+-1
+  list one file per line
+
+--format=across : -x
+--fromat=commas : -m
+--format=horizontal : -x
+--format=long : -l
+--format=single-column : -1
+--format=verbose : -l
+--format=vertical : -C
+
+-s, --size
+  print file size
+
+-w, --width=COLS
+  set output width to COLS.
+
+--lfn=off
+  print 8.3 filenames
+
+--lfn=on
+  print lfn filenames
+
+--lfn=both
+  print both 8.3 and lfn
+
+SORT METHOD
+
+-S
+  sort by size largest first
+
+-t
+  sort by time newest first
+
+-U
+  do not sort
+
+-X
+  sort by extension
+
+--sort=none : -U
+--sort=size : -S
+--sort=time : -t
+--sort=extension : -X
+
+-r, --reverse
+  reverse sort order
+
+--gdf,
+--group-directories-first
+  list directories before files
+
+FILE SIZE FORMAT
+
+-h, --human-readable
+  sizes in K,M,G (*1024)
+
+--si
+  sizes in KB,MB,GB (*1000)
+
+--block-size=SIZE
+  sizes scaled by SIZE
+
+DATE-TIME FORMAT
+
+--time-style=long-iso
+  2002-03-30 23:45
+
+--time-style=iso
+  2002-03-30, 03-30 23:45
+
+--time-style=locale
+  Mar-30-2002 23:45
+
+DIRECTORY PROCESSING
+
+-d, --directory
+  list dirs and do not enter
+
+-R, --recursive
+  list subdirs recursively
+
+--system
+  include system files
+
+OTHER
+
+--help
+  print this help and exit
+
+--version
+  print version info and exit

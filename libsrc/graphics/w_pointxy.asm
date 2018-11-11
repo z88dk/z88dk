@@ -1,8 +1,8 @@
 	INCLUDE	"graphics/grafix.inc"
 
-        SECTION code_clib
+        SECTION code_graphics
 	PUBLIC	w_pointxy
-	EXTERN		l_cmp
+	EXTERN		l_graphics_cmp
 
 
 	EXTERN	w_pixeladdress
@@ -31,13 +31,13 @@
 .w_pointxy
                         push    hl
                         ld      hl,maxy
-                        call    l_cmp
+                        call    l_graphics_cmp
                         pop     hl
                         ret     nc               ; Return if Y overflows
 
                         push    de
                         ld      de,maxx
-                        call    l_cmp
+                        call    l_graphics_cmp
                         pop     de
                         ret     c               ; Return if X overflows
                         

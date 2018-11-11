@@ -1,5 +1,5 @@
 
-        SECTION code_clib
+        SECTION code_graphics
 	PUBLIC	rightbitmask
 
 ;

@@ -96,6 +96,9 @@
  *      zcc +z9001 -Dspritesize=20 -DSOUND -lgfx9001krt -create-app dstar.c
  *      zcc +kc -Dspritesize=20 -create-app dstar.c
  *
+ *      Sharp PC-G850:
+ *      zcc +g800 -clib=g850 -Dspritesize=5 -create-app dstar.c
+ *
  *      SPC-1000:
  *      zcc +spc1000 -Dspritesize=16 -create-app dstar.c
  *

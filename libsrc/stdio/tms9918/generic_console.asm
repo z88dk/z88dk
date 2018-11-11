@@ -40,7 +40,7 @@ ENDIF
 ; The Tatung Einstein has a TMS9928A as a main display and
 ; an 80 column 6845 as a secondary display.
 ;
-IF !FORspc1000 && !FOReinstein
+IF !FORspc1000 && !FOReinstein && !FORsvi
                 PUBLIC          generic_console_cls
                 PUBLIC          generic_console_scrollup
                 PUBLIC          generic_console_printc

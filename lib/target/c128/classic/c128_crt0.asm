@@ -155,9 +155,6 @@ l_dcal:
 
 
 
-	defm  "Small C+ C128"
-	defb  0
-
 
 	
 ; If we were given an address for the BSS then use it

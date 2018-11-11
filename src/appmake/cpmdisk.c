@@ -27,7 +27,7 @@ static int first_free_extent(cpm_handle* h)
 
 static size_t find_first_free_directory_entry(cpm_handle* h)
 {
-    size_t directory_offset = (h->spec.boottracks * h->spec.sectors_per_track * h->spec.sector_size * 1);
+    size_t directory_offset = h->spec.offset ? h->spec.offset : (h->spec.boottracks * h->spec.sectors_per_track * h->spec.sector_size * 1);
     int i;
 
     for (i = 0; i < h->spec.directory_entries; i++) {
@@ -76,8 +76,8 @@ cpm_handle* cpm_create(cpm_discspec* spec)
 	}
     }
 #endif
-    size_t directory_offset = (h->spec.boottracks * h->spec.sectors_per_track * h->spec.sector_size * 1);
-	memset(h->image +directory_offset, 0xe5, 512);
+    size_t directory_offset = h->spec.offset ? h->spec.offset : (h->spec.boottracks * h->spec.sectors_per_track * h->spec.sector_size * 1);
+    memset(h->image +directory_offset, 0xe5, 512);
     return h;
 }
 
@@ -117,7 +117,11 @@ void cpm_write_file(cpm_handle* h, char filename[11], void* data, size_t len)
     // Now, write the directory entry, we can start from extent 1
     current_extent = first_free_extent(h);
     // We need to turn that extent into an offset into the disc
-    offset = (h->spec.boottracks * h->spec.sectors_per_track * h->spec.sector_size * 1) + (current_extent * h->spec.extent_size);
+    if ( h->spec.offset ) {
+        offset = h->spec.offset + (current_extent * h->spec.extent_size);
+    } else {
+        offset = (h->spec.boottracks * h->spec.sectors_per_track * h->spec.sector_size * 1) + (current_extent * h->spec.extent_size);
+    }
     memcpy(h->image + offset, data, len);
 
     for (i = 0; i <= (num_extents / extents_per_entry); i++) {
@@ -153,6 +157,43 @@ void cpm_write_file(cpm_handle* h, char filename[11], void* data, size_t len)
         directory_offset += 32;
     }
 }
+
+// Write a raw disk, no headers for tracks etc
+int cpm_write_raw(cpm_handle* h, const char* filename)
+{
+    size_t offs;
+    FILE* fp;
+    int i, j, s;
+    int track_length = h->spec.sector_size * h->spec.sectors_per_track;
+
+    if ((fp = fopen(filename, "wb")) == NULL) {
+        return -1;
+    }
+
+    for (i = 0; i < h->spec.tracks; i++) {
+        for (s = 0; s < h->spec.sides; s++) {
+            uint8_t* ptr;
+
+            if ( h->spec.alternate_sides == 0 ) {
+                offs = track_length * i + (s * track_length * h->spec.tracks);
+            } else {
+                offs = track_length * ( 2* i + s);
+            }
+            for (j = 0; j < h->spec.sectors_per_track; j++) {
+                 int sect = j; // TODO: Skew
+                 if ( h->spec.has_skew && i + (i*h->spec.sides) >= h->spec.skew_track_start ) {
+		     for ( sect = 0; sect < h->spec.sectors_per_track; sect++ ) {
+			if ( h->spec.skew_tab[sect] == j ) break;
+		     }
+                 }
+                 fwrite(h->image + offs + (sect * h->spec.sector_size), h->spec.sector_size, 1, fp);
+            }
+        }
+    }
+    fclose(fp);
+    return 0;
+}
+
 
 int cpm_write_edsk(cpm_handle* h, const char* filename)
 {
@@ -203,10 +244,12 @@ int cpm_write_edsk(cpm_handle* h, const char* filename)
             for (j = 0; j < h->spec.sectors_per_track; j++) {
                 *ptr++ = i; // Track
                 *ptr++ = s; // Side
-                if ( h->spec.has_skew && i + (i*h->spec.sides) >= h->spec.skew_track_start ) {
-                    *ptr++ = h->spec.skew_tab[j] + h->spec.first_sector_offset; // Secotr ID
+                if ( 0 && h->spec.has_skew && i + (i*h->spec.sides) >= h->spec.skew_track_start ) {
+                    *ptr++ = h->spec.skew_tab[j] + h->spec.first_sector_offset; // Sector ID
+                } else if (  i + (i*h->spec.sides) <= h->spec.boottracks && h->spec.boot_tracks_sector_offset ) {
+                    *ptr++ = j + h->spec.boot_tracks_sector_offset; // Sector ID
                 } else {
-                    *ptr++ = j + h->spec.first_sector_offset; // Secotr ID
+                    *ptr++ = j + h->spec.first_sector_offset; // Sector ID
                 }
                 *ptr++ = sector_size;
                 *ptr++ = 0; // FDC status register 1
@@ -215,7 +258,15 @@ int cpm_write_edsk(cpm_handle* h, const char* filename)
                 *ptr++ = h->spec.sector_size / 256;
             }
             fwrite(header, 256, 1, fp);
-            fwrite(h->image + offs, track_length, 1, fp);
+            for (j = 0; j < h->spec.sectors_per_track; j++) {
+                 int sect = j; // TODO: Skew
+                 if ( h->spec.has_skew && i + (i*h->spec.sides) >= h->spec.skew_track_start ) {
+		     for ( sect = 0; sect < h->spec.sectors_per_track; sect++ ) {
+			if ( h->spec.skew_tab[sect] == j ) break;
+		     }
+                 }
+                 fwrite(h->image + offs + (sect * h->spec.sector_size), h->spec.sector_size, 1, fp);
+            }
         }
     }
     fclose(fp);

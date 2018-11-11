@@ -96,8 +96,6 @@ l_dcal:
 	defb	107,64,81,55,18,9,16,17,$48,$0F,$2F,$0F,0,0,0,0  
 
 
-	defm  "Small C+ MicroBEE"
-	defb   0
 
         INCLUDE "crt/classic/crt_runtime_selection.asm"
 

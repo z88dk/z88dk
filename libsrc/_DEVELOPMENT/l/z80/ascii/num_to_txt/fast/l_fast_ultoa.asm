@@ -158,7 +158,8 @@ do_16:
    ld bc,-10+256
    push bc
       
-   ld bc,-100+256
+;  ld bc,-100+256
+   ld c,0xff & (-100+256)
    push bc
    
    ld bc,-1000

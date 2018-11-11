@@ -17,23 +17,19 @@ require './t/testlib.pl';
 unlink_testfiles();
 z80asm("phase -1", "", 1, "", <<'END');
 Error at file 'test.asm' line 1: integer '-1' out of range
-1 errors occurred during assembly
 END
 
 z80asm("phase 65536", "", 1, "", <<'END');
 Error at file 'test.asm' line 1: integer '65536' out of range
-1 errors occurred during assembly
 END
 
 z80asm("phase x", "", 1, "", <<'END');
 Error at file 'test.asm' line 1: symbol 'x' not defined
 Error at file 'test.asm' line 1: expected constant expression
-2 errors occurred during assembly
 END
 
 z80asm("extern x \n phase x", "", 1, "", <<'END');
 Error at file 'test.asm' line 2: expected constant expression
-1 errors occurred during assembly
 END
 
 unlink_testfiles();

@@ -25,7 +25,7 @@ extern size_t sizeof_relocroutine, sizeof_reloctable;
 
 extern const char *GetLibfile(const char *filename );
 
-extern void assemble_file( char *filename );
+extern void assemble_file( const char *filename );
 extern bool Pass2info(range_t range);
 extern bool Pass2infoExpr(range_t range, Expr *expr);
 extern int z80asm_main(int argc, char *argv[]);

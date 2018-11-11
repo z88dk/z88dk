@@ -23,7 +23,6 @@ z80asm(<<'...', "", 1, "", <<'...');
 	defc aaa = aaa
 ...
 Error at file 'test.asm' line 1: expression for 'aaa' depends on itself
-1 errors occurred during assembly
 ...
 
 unlink_testfiles();

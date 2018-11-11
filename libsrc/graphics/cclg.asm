@@ -9,7 +9,7 @@
 ;       $Id: cclg.asm $
 ;
 
-			SECTION	code_clib
+			SECTION	code_graphics
 			PUBLIC    cclg
          PUBLIC    _cclg
 

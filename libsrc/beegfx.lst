@@ -60,3 +60,11 @@ graphics/pen_down
 graphics/putc4x6
 graphics/swapgfxbk_foo
 graphics/drawbox
+graphics/lores/c_plotpixel
+graphics/lores/c_respixel
+graphics/lores/c_xorpixel
+graphics/lores/c_plot
+graphics/lores/c_unplot
+graphics/lores/c_xorplot
+graphics/lores/c_pointxy
+graphics/lores/c_point

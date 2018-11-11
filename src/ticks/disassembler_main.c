@@ -11,6 +11,7 @@ static void disassemble_loop(int start, int end);
 
 unsigned char *mem;
 int  c_cpu = CPU_Z80;
+int  inverted = 0;
 
 
 static void usage(char *program)
@@ -67,6 +68,9 @@ int main(int argc, char **argv)
             case 'e':
                 end = strtol(argv[1], &endp, 0);
                 argc--; argv++;
+                break;
+            case 'i':
+                inverted = 255;
                 break;
             case 'x':
                 read_symbol_file(argv[1]);
@@ -136,5 +140,5 @@ static void disassemble_loop(int start, int end)
 
 uint8_t get_memory(int pc)
 {
-    return mem[pc % 65536];
+    return mem[pc % 65536] ^ inverted;
 }

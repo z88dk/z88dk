@@ -1,10 +1,10 @@
         INCLUDE "graphics/grafix.inc"
 
-        SECTION code_clib
+        SECTION code_graphics
         PUBLIC    w_line_r
         
         EXTERN     line
-        ;EXTERN     l_cmp
+        ;EXTERN     l_graphics_cmp
 
         EXTERN    __gfx_coords
 
@@ -96,7 +96,7 @@
                 pop     de                      ; DE = absolute y distance
                 pop     hl                      ; HL = absolute x distance
 
-                        ;call    l_cmp           ; CMP HL,DE  [carry set if DE < HL]
+                        ;call    l_graphics_cmp           ; CMP HL,DE  [carry set if DE < HL]
 
                         ld	a,d					; CMP DE,HL  [carry set if HL < DE]
                         add	$80

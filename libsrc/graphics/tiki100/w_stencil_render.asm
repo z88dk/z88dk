@@ -13,8 +13,9 @@
 
 	INCLUDE	"graphics/grafix.inc"
 
+	SECTION	code_graphics
 	PUBLIC	stencil_render
-   PUBLIC   _stencil_render
+	PUBLIC   _stencil_render
 	EXTERN	dither_pattern
 	;EXTERN	l_cmp
 

@@ -5,8 +5,7 @@ cache:
   - ~/perl5/
   - ~/.ccache
  
-
-language: c
+language: cpp
 
 # https://docs.travis-ci.com/user/languages/cpp/ - support C11
 # linux: gcc-4.9 and clang-3.6
@@ -20,6 +19,7 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
+            - gcc-4.9
             - g++-4.9
             - dos2unix
             - libboost-all-dev
@@ -27,22 +27,6 @@ matrix:
             - texi2html
       env:
          - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
-
-#    - os: linux
-#      addons:
-#        apt:
-#          sources:
-#            - ubuntu-toolchain-r-test
-#            - llvm-toolchain-precise-3.6
-#          packages:
-#            - clang-3.6
-#      env:
-#         - MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
-
-#    - os: osx
-#      osx_image: xcode7.3
-#      env:
-#        - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
 
     - os: osx
       osx_image: xcode7.3

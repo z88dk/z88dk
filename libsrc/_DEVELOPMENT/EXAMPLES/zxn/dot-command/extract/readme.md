@@ -1,15 +1,12 @@
 # .EXTRACT dot command
 
-To use, copy "EXTRACT" to the sd card's BIN directory. \\
-This program can be compiled for either the zx spectrum or the zx next.  The zx next version includes options to use the full memory space.
+To use, copy "EXTRACT" to the sd card's DOT directory.
 
 ## Compiling
 
-`zsdcc` compile (optimization is high so compile time will be long).
 ~~~
-zcc +zxn -vn -startup=30 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 --opt-code-size extract.c help-zxn.asm -o extract -subtype=dot -create-app
+zcc +zxn -v -startup=30 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 --opt-code-size @zproject.lst -o extract -pragma-include:zpragma.inc -subtype=dot -Cz"--clean" -create-app
 ~~~
-An `sccz80` compile produces code that is too large for esxdos.  Compile line can be found in `extract.c`.
 
 ## Usage
 
@@ -46,10 +43,12 @@ output:
   -a  = append to out file
   -m  = copy to 64k addr
   -ml = copy to linear addr
+  -mp = copy to start of page
+  -mb = copy to start of bank
 
 no -o,-a,-m* generates hexdump
 
-extract v1.1 zx-next z88dk.org
+extract v1.3 zx-next z88dk
 ~~~
 
 ## Examples

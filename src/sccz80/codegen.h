@@ -16,7 +16,7 @@ extern void indirect(LVALUE *lval);
 extern void swap(void);
 extern void immed(void);
 extern void immed2(void);
-extern void immedlit(int lab);
+extern void immedlit(int lab,int offs);
 extern void lpush(void);
 extern void zpushde(void);
 extern void zpush(void);

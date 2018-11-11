@@ -19,6 +19,7 @@ cpm/a_memsize
 cpm/a_driveb
 cpm/a_serialport
 cpm/a_keyspeed
+cpm/cpm_platform_init
 @fcntl/cpm/fcntl.lst
 games/joystick
 @z80.lst

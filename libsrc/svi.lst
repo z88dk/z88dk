@@ -1,6 +1,7 @@
 stdio/msx/fgetc_cons
 stdio/msx/getk
 stdio/msx/fputc_cons
+stdio/svi/generic_console
 @stdio/tms9918/tms9918.lst
 @font/font_8x8/font_8x8.lst
 @stdio/ansicore.lst
@@ -81,4 +82,5 @@ psg/msx/get_psg
 psg/msx/set_psg
 psg/msx/set_psg_callee
 @psg/psg.lst
+@video/mc6845/mc6845.lst
 @z80.lst

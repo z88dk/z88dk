@@ -299,18 +299,30 @@ int zx_exec(char *target)
 
             for (j = 0; j < mb->num; ++j)
             {
+                int p;
                 struct section_bin *sb = &mb->secbin[j];
+
+                p = sb->org & 0x3fff;
 
                 if (sb->org < 0xc000)
                 {
-                    errors++;
-                    fprintf(stderr, "Error: Section %s has org less than 0xc000 (%#04x)\n", sb->section_name, sb->org);
+                    if (((i == 5) && (sb->org >= 0x4000) && (sb->org < 0x8000)) || ((i == 2) && (sb->org >= 0x8000)))
+                    {
+                        // do nothing okay
+                    }
+                    else
+                    {
+                        errors++;
+                        fprintf(stderr, "Error: Section %s has org outside allowed range (%#04x)\n", sb->section_name, sb->org);
+                    }
                 }
-                else if ((sb->org + sb->size) > 0x10000)
+                else if ((p + sb->size) > 0x4000)
                 {
                     errors++;
-                    fprintf(stderr, "Error: Section %s exceeds 16k boundary by %d bytes\n", sb->section_name, sb->org + sb->size - 0x10000);
+                    fprintf(stderr, "Error: Section %s exceeds 16k boundary by %d bytes\n", sb->section_name, p + sb->size - 0x4000);
                 }
+
+                sb->org = p + 0xc000;
             }
         }
     }

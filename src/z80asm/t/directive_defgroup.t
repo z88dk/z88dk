@@ -96,7 +96,6 @@ END
 Error at file 'test.asm' line 3: expected constant expression
 Error at file 'test.asm' line 4: symbol 'undefined' not defined
 Error at file 'test.asm' line 4: expected constant expression
-3 errors occurred during assembly
 ERR
 
 # range errors
@@ -111,7 +110,6 @@ z80asm(<<'END', "", 1, "", <<'ERR');
 END
 Error at file 'test.asm' line 3: integer '65536' out of range
 Error at file 'test.asm' line 5: integer '-32769' out of range
-2 errors occurred during assembly
 ERR
 
 # {} block
@@ -120,7 +118,6 @@ z80asm(<<'END', "", 1, "", <<'ERR');
 	defgroup 
 END
 Error at file 'test.asm' line 2: missing {} block
-1 errors occurred during assembly
 ERR
 
 unlink_testfiles();
@@ -128,7 +125,6 @@ z80asm(<<'END', "", 1, "", <<'ERR');
 	defgroup  {
 END
 Error at file 'test.asm' line 2: {} block not closed
-1 errors occurred during assembly
 ERR
 
 # BUG_0032 : DEFGROUP ignores name after assignment

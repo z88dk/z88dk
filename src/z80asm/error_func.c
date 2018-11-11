@@ -6,15 +6,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void info_total_errors(void)
-{
-	STR_DEFINE(msg, STR_SIZE);
-
-	Str_append_sprintf( msg, "%d errors occurred during assembly", get_num_errors() );
-	do_error( ErrInfo, Str_data(msg) );
-	
-	STR_DELETE(msg);
-}
 void error_read_file(const char *filename)
 {
 	STR_DEFINE(msg, STR_SIZE);

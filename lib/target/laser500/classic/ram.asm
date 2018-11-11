@@ -16,11 +16,11 @@ basicstart:
    defb 0xFF, 0xFF                           ; pointer to next basic line in memory
    defb 0xE2, 0x07                           ; 2018
    defb 0x41, 0xF0, 0x0C                     ; A=&H   
-   defw start			 	     ; address
+   defw start                                ; address
    defb 0x3A                                 ; :
    defb 0xB6, 0x20, 0x41                     ; CALL A
    defb 0x3A                                 ; :
-   defb 0x81				     ; END
+   defb 0x81                                 ; END
    defb 0x00                                 ; basic line terminator    
    
 start:
@@ -55,9 +55,4 @@ start1:
 
 l_dcal:
         jp      (hl)
-
-
-
-	defm  "Small C+ VZ"
-	defb   0
 

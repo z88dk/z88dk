@@ -14,7 +14,7 @@
 
 
 
-        SECTION code_clib
+        SECTION code_graphics
                 PUBLIC    undrawr
                 PUBLIC    _undrawr
                 EXTERN     swapgfxbk

@@ -19,7 +19,6 @@ for my $DEFB (qw(DEFB DEFM)) {
 
 	z80asm("xx: $DEFB", "", 1, "", <<END);
 Error at file 'test.asm' line 1: syntax error
-1 errors occurred during assembly
 END
 
 	unlink_testfiles();
@@ -28,7 +27,6 @@ END
 
 	z80asm("xx: $DEFB xx,", "", 1, "", <<END);
 Error at file 'test.asm' line 1: syntax error
-1 errors occurred during assembly
 END
 
 	unlink_testfiles();
@@ -37,12 +35,10 @@ END
 
 	z80asm("xx: $DEFB \"", "", 1, "", <<END);
 Error at file 'test.asm' line 1: unclosed quoted string
-1 errors occurred during assembly
 END
 
 	z80asm("xx: $DEFB \"hello", "", 1, "", <<END);
 Error at file 'test.asm' line 1: unclosed quoted string
-1 errors occurred during assembly
 END
 
 	# escape chars

@@ -7,9 +7,9 @@
 ;
 
 
-        SECTION code_clib
+        SECTION code_graphics
 	PUBLIC w_draw_circle
-	EXTERN l_cmp
+	EXTERN l_graphics_cmp
 
 DEFVARS 0
 {
@@ -70,7 +70,7 @@ DEFVARS 0
 		ld e,(iy+cxl)
 		ld h,b
 		ld l,c
-		call l_cmp
+		call l_graphics_cmp
 		ret nc
 ;Line 9910
 		bit 7,(iy+dahi)

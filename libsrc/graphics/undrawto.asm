@@ -13,7 +13,7 @@
 ;Usage: undrawto(struct *pixels)
 
 
-        SECTION code_clib
+        SECTION code_graphics
                 PUBLIC    undrawto
                 PUBLIC    _undrawto
                 EXTERN     swapgfxbk

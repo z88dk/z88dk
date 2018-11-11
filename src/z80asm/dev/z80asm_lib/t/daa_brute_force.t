@@ -41,7 +41,7 @@ for my $cpu (@CPUS) {
 							($nflag 	? 0x02 : 0) |
 							($hcarry 	? 0x10 : 0) |
 							($carry		? 0x01 : 0);
-						my $r = ticks(<<END, "--cpu=$cpu");
+						my $r = ticks(<<END, "-m$cpu");
 								ld h, $a
 								ld l, $f
 								push hl

@@ -11,7 +11,7 @@
 ;Usage: fill(struct *pixel)
 
 
-                SECTION         code_clib
+                SECTION         code_graphics
                 PUBLIC    fill
                 PUBLIC    _fill
 

@@ -13,7 +13,7 @@
 ;Usage: lscroll(struct *pixels)
 
 
-        SECTION code_clib
+        SECTION code_graphics
                 PUBLIC    lscroll
                 PUBLIC    _lscroll
 

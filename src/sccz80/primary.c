@@ -48,8 +48,7 @@ int primary(LVALUE* lval)
             lval->ptr_type = KIND_CHAR; /* djm 9/3/99 */
             lval->val_type = KIND_INT;
             lval->flags = FLAGS_NONE;
-            immedlit(litlab);
-            outdec(lval->const_val);
+            immedlit(litlab,lval->const_val);
             nl();
             return 0;
         } else if ((ptr = findloc(sname))) {
@@ -243,7 +242,7 @@ double CalcStand(
     else if (oper == zand)
         return ((unsigned int)left & (unsigned int)right);
     else if (oper == mult)
-        return ((unsigned int)left * (unsigned int)right);
+        return (left * right);
     else if (oper == asl) {
         if ( ((left_kind == KIND_INT || left_kind == KIND_CHAR) && right >= 16) ||
              (left_kind == KIND_LONG && right >= 32) ) {

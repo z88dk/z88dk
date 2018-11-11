@@ -13,7 +13,7 @@
 ;Usage: drawto(struct *pixels)
 
 
-        SECTION code_clib
+        SECTION code_graphics
                 PUBLIC    drawto
                 PUBLIC    _drawto
                 EXTERN     swapgfxbk

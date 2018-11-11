@@ -85,8 +85,6 @@ l_dcal:
         jp      (hl)
 
 
-	defm  "Small C+ Lynx"
-	defb  0
 
         INCLUDE "crt/classic/crt_runtime_selection.asm"
 

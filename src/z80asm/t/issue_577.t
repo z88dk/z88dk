@@ -27,7 +27,7 @@ END
 check_bin_file("test.bin", pack("C*", 1, 2));
 
 for my $cpu (qw( r2k r3k )) {
-	z80asm(<<END, "-b --cpu=$cpu", "", "");
+	z80asm(<<END, "-b -m$cpu", "", "");
 		jp Lz, 0
 		jp Lo, 0
 END

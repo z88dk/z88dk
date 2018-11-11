@@ -30,7 +30,7 @@ for my $cpu (@CPUS) {
 					$test_nr++;
 					note "Test $test_nr: cpu:$cpu, carry:$carry, data:$data, a:$a, bc:$bc, op:$op";
 					my $carry_set = $carry ? "scf" : "and a";
-					my $r = ticks(<<END, "--cpu=$cpu");
+					my $r = ticks(<<END, "-m$cpu");
 						defc data = 0x100
 								$carry_set
 								ld de, $de
@@ -72,7 +72,7 @@ for my $cpu (@CPUS) {
 				note "Test $test_nr: cpu:$cpu, carry:$carry, data:$data, a:$a, op:$op";
 				my $carry_set = $carry ? "scf" : "and a";
 				my $start = $op =~ /cpir/ ? 'data' : 'end-1';
-				my $r = ticks(<<END, "--cpu=$cpu");
+				my $r = ticks(<<END, "-m$cpu");
 								jr start
 						.data	defs 5, $data
 						.end

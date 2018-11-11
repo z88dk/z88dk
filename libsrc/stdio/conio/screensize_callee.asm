@@ -6,8 +6,8 @@ PUBLIC screensize_callee
 PUBLIC _screensize_callee
 PUBLIC ASMDISP_SCREENSIZE_CALLEE
 
-EXTERN	text_cols
-EXTERN	text_rows
+EXTERN	__console_w
+EXTERN	__console_h
 
 
 .screensize_callee
@@ -21,10 +21,16 @@ EXTERN	text_rows
 .asmentry
 
    ; bc = x    de = y
-   ld	a,(text_cols)
+   ld	a,(__console_w)
    ld	(bc),a
-   ld	a,(text_rows)
+   inc  bc
+   xor  a
+   ld   (bc),a
+   ld	a,(__console_h)
    ld	(de),a
+   inc  de
+   xor  a
+   ld   (de),a
 
    ret
 
