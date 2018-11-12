@@ -31,7 +31,7 @@
 
         PUBLIC    cleanup
         PUBLIC    l_dcal
-        ;PUBLIC    pc88bios
+        PUBLIC    pc88bios
 
 
 ;--------
@@ -69,34 +69,24 @@ ENDIF
 ;----------------------
 start:
 
+IF (!DEFINED_startup || (startup=1))
 		ld	a,$FF				; back to main ROM
 		out ($71),a				; bank switching
-
-IF (startup=2)
-IF !DEFINED_noprotectmsdos
-	; This protection takes little less than 50 bytes
-	defb	$eb,$04		;MS DOS protection... JMPS to MS-DOS message if Intel
-	ex	de,hl
-	jp	begin		;First decent instruction for Z80, it survived up to here !
-	defb	$b4,$09		;DOS protection... MOV AH,9 (Err msg for MS-DOS)
-	defb	$ba
-	defw	dosmessage	;DOS protection... MOV DX,OFFSET dosmessage
-	defb	$cd,$21		;DOS protection... INT 21h.
-	defb	$cd,$20		;DOS protection... INT 20h.
-
-dosmessage:
-	defm	"This program is for NEC PC8801."
-	defb	13,10,'$'
-
-begin:
-ENDIF
 ENDIF
 
         ld      (start1+1),sp
+		
+	; Increase to cover ROM banking
+	defc	__clib_exit_stack_size_t  = __clib_exit_stack_size + 18
+	UNDEFINE __clib_exit_stack_size
+	defc	__clib_exit_stack_size = __clib_exit_stack_size_t
+	
 	INCLUDE	"crt/classic/crt_init_sp.asm"
 	INCLUDE	"crt/classic/crt_init_atexit.asm"
 	call	crt0_init_bss
         ld      (exitsp),sp
+		
+		;ld	sp,$c000
 
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
@@ -168,16 +158,12 @@ l_dcal:
 
 
 
+; JP table, this will be, sooner or later, moved to a convenient position in RAM
+; (e.g.  just before $C000) to be able to bounce between different RAM/ROM pages
+pc88bios:
+	jp	(ix)
 
 
-
-; Safe BIOS call
-;pc88bios:
-	;call	CALSLT
-	;ei			; make sure interrupts are enabled
-	;ret
-
-end:	defb	0
 
 	INCLUDE "crt/classic/crt_runtime_selection.asm"
 	INCLUDE "crt/classic/crt_section.asm"
