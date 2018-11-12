@@ -5,7 +5,7 @@
 	PUBLIC	cleargraphics
    PUBLIC   _cleargraphics
 
-	EXTERN	base_graphics
+	EXTERN	pc88bios
 
 ;
 ;	$Id: clsgraph.asm $
@@ -39,7 +39,9 @@
 	ld      ($E6B4),a	; Default Text attribute (0=default, $98=graphics)
 	ld      b,80		; columns
 	ld      c,25		; rows
-	call    $6f6b		; CRTSET
+	;call    $6f6b		; CRTSET
+	ld      ix,$6f6b		; CRTSET
+	call	pc88bios
 	
 	pop     af
 	out     ($71),a
