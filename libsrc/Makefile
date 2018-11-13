@@ -207,7 +207,8 @@ z88_clib.lib:
 	$(call buildgeneric,z88)
 	$(MAKE) -C fcntl/z88
 	$(MAKE) -C games TARGET=z88
-	$(MAKE) -C z88 
+	$(MAKE) -C rs232/z88 
+	$(MAKE) -C arch/z88 
 	TARGET=z88 TYPE=z80 $(LIBLINKER) -I$(Z88DK_LIB)/target/z88/def -DSTANDARDESCAPECHARS -DFORz88 -x$(OUTPUT_DIRECTORY)/z88_clib @$(LISTFILE_DIRECTORY)/z88.lst
 
 # ZX Spectrum fcntl - dom/stefano
@@ -1136,6 +1137,7 @@ tiki100.lib:
 	@echo ''
 	@echo '--- Building TIKI-100 Library ---'
 	@echo ''
+	$(call buildgeneric,cpm)
 	$(MAKE) gfxdeps
 	$(MAKE) -C psg
 	TARGET=tiki100 TYPE=z80 $(LIBLINKER) -DFORtiki100 -x$(OUTPUT_DIRECTORY)/tiki100 @$(LISTFILE_DIRECTORY)/tiki100.lst
@@ -1355,7 +1357,6 @@ classic-clean:
 	$(MAKE) -C regex clean
 	$(MAKE) -C time clean
 	$(MAKE) -C z80_crt0s clean
-	$(MAKE) -C z88 clean
 	$(MAKE) -C zxvgs clean
 	$(MAKE) -C adt clean
 	$(MAKE) -C adt-newlib clean
@@ -1387,7 +1388,6 @@ classic-clean:
 	$(MAKE) -C games clean
 	$(MAKE) -C x1 clean
 	$(MAKE) -C math clean
-	$(MAKE) -C nc100 clean
 	$(MAKE) -C compress/zx7 clean
 	$(MAKE) -C font clean
 	$(MAKE) -C arch clean

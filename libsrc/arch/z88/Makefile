@@ -3,7 +3,7 @@
 #
 # $Id: Makefile,v 1.18 2016-07-12 19:41:25 dom Exp $
 
-include ../Make.config
+include ../../Make.config
 
 CFILES = \
 	DeRegisterInt.c \
