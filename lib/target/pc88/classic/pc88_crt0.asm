@@ -31,8 +31,8 @@
 
         PUBLIC    cleanup
         PUBLIC    l_dcal
+		
         PUBLIC    pc88bios
-
 
 ;--------
 ; Some scope definitions
@@ -86,8 +86,8 @@ ENDIF
 	call	crt0_init_bss
         ld      (exitsp),sp
 		
-		;ld	sp,$c000
-
+;		ld	sp,$c000
+		
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
 ; the compiled program and the stack pointer
@@ -96,40 +96,9 @@ ENDIF
 	ENDIF
 
 IF (startup=2)
-;	;ld	c,25		;Save the default disc
-;	;call	5
-;	ld	a,(DEFAULTDRV)
-;	ld	(defltdsk),a
 ;
-;	ld	hl,$80
-;        ld      a,(hl)
-;        ld      b,0
-;        and     a
-;        jr      z,argv_done
-;        ld      c,a
-;        add     hl,bc   ;now points to the end of the command line
-;	INCLUDE	"crt/classic/crt_command_line.asm"
-;
-;        push    hl      ;argv
-;        push    bc      ;argc
-;        call    _main		;Call user code
-;	pop	bc	;kill argv;
-;	pop	bc	;kill argc
-;
-;	ld	a,(defltdsk)	;Restore default disc
-;	ld	(DEFAULTDRV),a
-;	;ld	e,a
-;	;ld	c,14
-;	;call	5
-ELSE
 
-;       LD HL,$E5FE
-;       LD SP,HL
-;       LD BC,$0253
-;       LD HL,$00BE
-;       LD DE,$E600
-;;       LD ($EACC),HL			; STREND (aka STRTOP) - string area top address
-;       LDIR
+ELSE
 
 ;** If NOT IDOS mode, just get rid of BASIC screen behaviour **
 	;call ERAFNK	; Hide function key strings
@@ -150,6 +119,10 @@ ENDIF
 
 start1:
         ld      sp,0
+		
+		ld		a,255		; restore Main ROM
+		out     ($71),a
+
         ret
 
 l_dcal:
@@ -161,8 +134,12 @@ l_dcal:
 ; JP table, this will be, sooner or later, moved to a convenient position in RAM
 ; (e.g.  just before $C000) to be able to bounce between different RAM/ROM pages
 pc88bios:
+	push	af
+	ld		a,$FF		; MAIN ROM
+	out     ($71),a
+	pop		af
 	jp	(ix)
-
+	
 
 
 	INCLUDE "crt/classic/crt_runtime_selection.asm"
