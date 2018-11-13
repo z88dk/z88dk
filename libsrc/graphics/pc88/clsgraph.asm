@@ -25,15 +25,15 @@
 .cleargraphics
 ._cleargraphics
 
-    in      a,($71)
-	push    af
+;    in      a,($71)	; current ROM bank
+;	push    af
 	
 	xor     a
 	ld      ($E6B8),a	; Hide function key bar
 	cpl
 	ld      ($E6B9),a	; Color/Monochrome switch (monochrome supports underline attribute, etc..)
 	
-	out     ($71),a
+	;out     ($71),a		; main ROM bank
 	
 	ld		a,$98
 	ld      ($E6B4),a	; Default Text attribute (0=default, $98=graphics)
@@ -43,8 +43,8 @@
 	ld      ix,$6f6b		; CRTSET
 	call	pc88bios
 	
-	pop     af
-	out     ($71),a
+;	pop     af
+;	out     ($71),a			; restore previous ROM bank
 
 	; now let's fill the text area with NUL
 	in	a,(0x32)
