@@ -1,7 +1,7 @@
 include ../Make.config
 
 
-SUBDIRS = z80 
+SUBDIRS = z80 c128
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
 all: subdirs-all

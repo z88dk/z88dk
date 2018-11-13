@@ -4,7 +4,7 @@
 # $Id: Makefile,v 1.1 2008-06-23 17:37:54 stefano Exp $
 #
 
-include ../Make.config
+include ../../Make.config
 
 CIAFILES = \
 	getkeyscia.c \

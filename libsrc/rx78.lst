@@ -17,7 +17,7 @@ psg/sn76489/psg_init.asm
 psg/sn76489/set_psg.asm
 psg/sn76489/set_psg_callee.asm
 @psg/psg.lst
-rx78/load_palette
+arch/rx78/load_palette
 graphics/rx78/clg
 graphics/rx78/pixladdr
 graphics/rx78/plotpixl

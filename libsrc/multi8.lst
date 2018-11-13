@@ -8,9 +8,9 @@ stdio/multi8/conio_vars
 stdio/multi8/conio_map_colour
 stdio/multi8/CRT_FONT
 @font/font_8x8/font_8x8.lst
-multi8/tape_load
-multi8/asm_tape_load
-multi8/load_palette
+arch/multi8/tape_load
+arch/multi8/asm_tape_load
+arch/multi8/load_palette
 @stdio/stdio.lst
 graphics/multi8/clg
 graphics/multi8/w_pixladdr

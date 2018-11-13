@@ -988,6 +988,7 @@ spc1000_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) msxdeps
 	$(call buildgeneric,spc1000)
+	$(MAKE) -C msx TARGET=test
 	$(MAKE) -C msx TARGET=spc1000
 	TARGET=spc1000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORspc1000 -x$(OUTPUT_DIRECTORY)/spc1000_clib @$(LISTFILE_DIRECTORY)/spc1000.lst
 
@@ -1088,7 +1089,7 @@ c128ansi_clib.lib:
 	@echo '--- Building Commodore 128 ANSI Library ---'
 	@echo ''
 	$(call buildgeneric,c128)
-	$(MAKE) -C c128
+	$(MAKE) -C arch/c128
 	$(MAKE) -C games TARGET=c128
 	TARGET=c128 TYPE=z80 $(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/c128cpm @$(LISTFILE_DIRECTORY)/c128cpm.lst
 	TARGET=c128 TYPE=z80 $(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/c128ansi_clib @$(LISTFILE_DIRECTORY)/c128ansi.lst
@@ -1338,7 +1339,6 @@ clean: classic-clean new-clean
 classic-clean:
 	$(MAKE) -C ace clean
 	$(MAKE) -C assert clean
-	$(MAKE) -C c128 clean
 	$(MAKE) -C cpm clean
 	$(MAKE) -C ctype clean
 	$(MAKE) -C fcntl clean

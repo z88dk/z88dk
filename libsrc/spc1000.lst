@@ -18,7 +18,7 @@ stdio/ansi/msx/f_ansi_cls_nobios
 @font/font_8x8/font_8x8.lst
 @stdio/stdio.lst
 @input/input_keyboard.lst
-spc1000/tms9918
+arch/spc1000/tms9918
 games/spc1000/joystick
 graphics/spc1000/cleargraphics
 graphics/spc1000/getmaxx
