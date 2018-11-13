@@ -1,3 +1,5 @@
+pc88/pc88_break
+pc88/pc88_clearkey
 stdio/pc88/fgetc_cons
 stdio/pc88/getk
 stdio/pc88/fputc_cons
