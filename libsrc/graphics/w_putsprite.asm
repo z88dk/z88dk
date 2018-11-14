@@ -6,7 +6,7 @@
 ; Generic high resolution version
 ;
 ;
-; $Id: w_putsprite.asm,v 1.8 2017-01-02 21:51:24 aralbrec Exp $
+; $Id: w_putsprite.asm $
 ;
 
         SECTION code_graphics
@@ -22,9 +22,6 @@
 ; __gfx_coords: d,e (vert-horz)
 ; sprite: (ix)
 
-
-.offsets_table
-         defb   1,2,4,8,16,32,64,128
 
 
 .putsprite
@@ -232,6 +229,7 @@
          djnz     woloop
          jp       swapgfxbk1
 
+
 	SECTION  bss_graphics
 .oldx
          defw   0
@@ -239,4 +237,9 @@
          defw   0
 .cury
          defw   0
+
+
+	SECTION	rodata_clib
+.offsets_table
+         defb   1,2,4,8,16,32,64,128
 
