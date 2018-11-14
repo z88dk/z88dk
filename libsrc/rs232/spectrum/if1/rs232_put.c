@@ -14,7 +14,7 @@
 #include <rs232.h>
 
 
-u8_t __FASTCALL__ rs232_put(i8_t char)
+uint8_t __FASTCALL__ rs232_put(uint8_t char)
 {       
 #asm
         ld      a,l     		;get byte

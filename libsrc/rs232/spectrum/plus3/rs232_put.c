@@ -15,7 +15,7 @@
 #include <rs232.h>
 
 
-u8_t rs232_put(i8_t char)
+uint8_t rs232_put(uint8_t char)
 {	/* Fastcall so implicit push */
 #asm
 
