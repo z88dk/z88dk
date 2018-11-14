@@ -294,9 +294,9 @@ extern int __LIB__ get_device_count();
 
 // And now a list of the same non-FASTCALL functions using CALLEE linkage
 
-extern int  __LIB__  rename_file_callee(char * filea, char * fileb);
-extern int  __LIB__  find_file_callee (char *filename, struct flos_file *file);
-extern int  __LIB__  force_load_callee(char *address, int bank);
+extern int  __LIB__  rename_file_callee(char * filea, char * fileb) __smallc __z88dk_callee;
+extern int  __LIB__  find_file_callee (char *filename, struct flos_file *file) __smallc __z88dk_callee;
+extern int  __LIB__  force_load_callee(char *address, int bank) __smallc __z88dk_callee;
 
 
 // And now we make CALLEE linkage default to make compiled progs shorter and faster

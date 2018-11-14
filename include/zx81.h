@@ -363,17 +363,17 @@ extern void __LIB__  zx_print_row(char *buf) __z88dk_fastcall;
 #define LDERR_BREAK               3       // BREAK pressed
 #define LDERR_WRONG_BLOCK         4       // LOAD error: loaded block has wrong type
 
-extern int  __LIB__            tape_load_block(void *addr, size_t len, unsigned char type);
+extern int  __LIB__            tape_load_block(void *addr, size_t len, unsigned char type) __smallc;
 
 // SAVE - return with nonzero if BREAK is pressed
 // example values for custom speed:
 // 3  = 4800 bps, 9  = 3600 bps
 // 20 = 2400 bps, 40 = 1200 bps
 extern void __LIB__  set_tape_speed(unsigned char speed);
-extern int  __LIB__            tape_save_block(void *addr, size_t len, unsigned char type);
+extern int  __LIB__            tape_save_block(void *addr, size_t len, unsigned char type) __smallc;
 
-extern int  __LIB__  tape_load_block_callee(void *addr, size_t len, unsigned char type);
-extern int  __LIB__  tape_save_block_callee(void *addr, size_t len, unsigned char type);
+extern int  __LIB__  tape_load_block_callee(void *addr, size_t len, unsigned char type) __smallc __z88dk_callee;
+extern int  __LIB__  tape_save_block_callee(void *addr, size_t len, unsigned char type) __smallc __z88dk_callee;
 
 #define tape_save_block(a,b,c) tape_save_block_callee(a,b,c)
 #define tape_load_block(a,b,c) tape_load_block_callee(a,b,c)

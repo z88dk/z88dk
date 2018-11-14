@@ -146,7 +146,7 @@ extern void wait_sub_cpu();
 #define TV_CHANNEL_12   0x1b
 
 // Cassette Recorder
-extern int __FASTCALL__ tape(int command);
+extern int __LIB__ tape(int command) __z88dk_fastcall;
 extern void tape_status(int command);
 #define SUBCPU_TAPE_CONTROL   0xe9
 #define SUBCPU_TAPE_STATUS    0xea

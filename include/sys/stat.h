@@ -30,7 +30,7 @@ struct stat {
 	int	st_rdev;	/* ? */
 };
 
-extern int __LIB__ __SAVEFRAME__ stat(char *filename, struct stat *buf);
+extern int __LIB__ __SAVEFRAME__ stat(char *filename, struct stat *buf) __smallc;
 
 extern int __LIB__  mkdir(char *dirname);
 #define mkdir(a,b) mkdir(a)
