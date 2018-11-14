@@ -1,0 +1,12 @@
+;Definitions for SV-805 serial board
+
+
+	defc TTDATA   =    28h         ; Data port of WD8250
+	defc TTIER    =    TTDATA+1    ; Interrupt enable register
+	defc TTIDENT  =    TTDATA+2    ; Interrupt ident register
+	defc TTLCR    =    TTDATA+3    ; Line control register
+	defc TTMCR    =    TTDATA+4    ; Modem control register
+	defc TTSTAT   =    TTDATA+5    ; Line status register
+	defc TTMODST  =    TTDATA+6    ; Modem status register
+	defc DLL      =    TTDATA      ; Divisor latch low
+	defc DLH      =    TTDATA+1    ; Divisor latch high
