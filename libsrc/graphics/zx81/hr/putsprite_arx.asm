@@ -6,9 +6,11 @@
 ; ZX81 - ARX816 mode version
 ;
 ;
-; $Id: putsprite_arx.asm,v 1.3 2017-01-02 22:58:00 aralbrec Exp $
+; $Id: putsprite_arx.asm  $
 ;
 
+	SECTION   smc_clib
+	
 	PUBLIC    putsprite
    PUBLIC    _putsprite
 	EXTERN	pixeladdress
@@ -19,14 +21,6 @@
 
 ; coords: d,e (vert-horz)
 ; sprite: (ix)
-
-
-.offsets_table
-         defb	1,2,4,8,16,32,64,128
-
-.actcoord
-	 defw	0
-
 
 .putsprite
 ._putsprite
@@ -194,3 +188,14 @@
          pop      bc
          djnz     woloop
 	 jp       swapgfxbk1
+
+	 
+
+	SECTION	rodata_clib
+.offsets_table
+         defb	1,2,4,8,16,32,64,128
+
+	SECTION	bss_clib
+.actcoord
+	 defw	0
+

@@ -8,6 +8,12 @@
 ; modified by Stefano Bodrato - Aug 2002
 ;
 
+;
+;	$Id: putsprite.asm $
+;
+
+        SECTION smc_clib
+		
 	PUBLIC    putsprite
    PUBLIC    _putsprite
 	EXTERN	pixeladdress
@@ -16,17 +22,10 @@
 
 	INCLUDE	"graphics/grafix.inc"
 
-;
-;	$Id: putsprite.asm,v 1.5 2017-01-02 22:57:58 aralbrec Exp $
-;
-
 ; __gfx_coords: d,e (vert-horz)
 ; sprite: (ix)
 
 
-.offsets_table
-	defb	1,2,4,8,16,32,64,128
-	
 .putsprite
 ._putsprite
 
@@ -152,3 +151,9 @@
          ;ret
          jp	swapgfxbk1
 
+		 
+	SECTION rodata_clib
+	
+.offsets_table
+	defb	1,2,4,8,16,32,64,128
+	
