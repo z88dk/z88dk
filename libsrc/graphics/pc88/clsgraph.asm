@@ -39,10 +39,18 @@
 	ld      ($E6B4),a	; Default Text attribute (0=default, $98=graphics)
 	ld      b,80		; columns
 	ld      c,25		; rows
+
+	ld a,($E6A7)		; CursorMode
+	res	0,a				; hide cursor
+	ld ($E6A7),a
+	or	$80				; complete CRTC command for cursor mode
+	ld ($E6A8),a		; CursorCommand
+
 	;call    $6f6b		; CRTSET
 	ld      ix,$6f6b		; CRTSET
 	call	pc88bios
 	
+	   
 ;	pop     af
 ;	out     ($71),a			; restore previous ROM bank
 
