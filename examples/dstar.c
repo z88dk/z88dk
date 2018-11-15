@@ -94,6 +94,7 @@
  *
  *      NEC PC-8801:
  *      zcc +pc88 -lgfxpc88 -create-app -DSOUND -Dspritesize=10 dstar.c
+ *      zcc +pc88 -lgfxpc88hr200 -create-app -lm -Dspritesize=21 -DSOUND dstar.c
  *
  *      Robotron KC:
  *      zcc +z9001 -Dspritesize=20 -DSOUND -lgfx9001krt -create-app dstar.c
