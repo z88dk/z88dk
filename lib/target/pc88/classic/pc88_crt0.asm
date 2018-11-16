@@ -76,7 +76,11 @@ ENDIF
 
         ld      (start1+1),sp
 		
-	; Increase to cover ROM banking
+		; Last minute hack to keep the stack in a safe place and permit the hirez graphics to page
+		; the GVRAM banks in and out
+		ld	sp,$BFFF
+		
+	; Increase to cover ROM banking (useless at the moment, we're wasting 18 bytes!!)
 	defc	__clib_exit_stack_size_t  = __clib_exit_stack_size + 18
 	UNDEFINE __clib_exit_stack_size
 	defc	__clib_exit_stack_size = __clib_exit_stack_size_t
@@ -84,9 +88,8 @@ ENDIF
 	INCLUDE	"crt/classic/crt_init_sp.asm"
 	INCLUDE	"crt/classic/crt_init_atexit.asm"
 	call	crt0_init_bss
-        ld      (exitsp),sp
-		
-;		ld	sp,$c000
+	
+        ld      (exitsp),sp	
 		
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
@@ -131,7 +134,7 @@ l_dcal:
 
 
 
-; JP table, this will be, sooner or later, moved to a convenient position in RAM
+; JP table, this could be, sooner or later, moved to a convenient position in RAM
 ; (e.g.  just before $C000) to be able to bounce between different RAM/ROM pages
 pc88bios:
 	push	af
