@@ -347,6 +347,11 @@ pc88_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(LIBLINKER) -DFORpc88 -x$(OUTPUT_DIRECTORY)/gfxpc88 @$(LISTFILE_DIRECTORY)/gfxpc88.lst
+	@echo ''
+	@echo '--- Building PC8801 640x200 Mono Graphics Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(LIBLINKER) -DFORpc88hr200 -x$(OUTPUT_DIRECTORY)/gfxpc88hr200 @$(LISTFILE_DIRECTORY)/gfxpc88hr200.lst
 
 # Native for sprinter - dom
 pps_clib.lib:
