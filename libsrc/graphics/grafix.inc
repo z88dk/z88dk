@@ -63,6 +63,12 @@ IF FORpc88
 	defc maxy	= 100
 ENDIF
 
+IF FORpc88hr200
+	DEFINE gotgfx
+	defc maxx	= 640
+	defc maxy	= 200
+ENDIF
+
 IF FORvz
 	DEFINE gotgfx
 	IF BLOCKgfx
