@@ -763,6 +763,7 @@ svi_clib.lib:
 	$(MAKE) -C games TARGET=svi
 	$(MAKE) -C msx TARGET=svi
 	$(MAKE) -C psg
+	$(MAKE) -C rs232/svi
 	TARGET=svi TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsvi -x$(OUTPUT_DIRECTORY)/svi_clib @$(LISTFILE_DIRECTORY)/svi.lst
 
 # MSX library - Stefano

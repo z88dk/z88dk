@@ -38,9 +38,9 @@ uint8_t rs232_params(uint8_t param, uint8_t parity) __naked
 	ld	d,0
 	ld	hl,baud_divisors
 	add	hl,de
-	ld	d,(hl)
-	inc	hl
 	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
 	ld	a,d
 	or	e
 	ld	hl,RS_ERR_BAUD_NOT_AVAIL
