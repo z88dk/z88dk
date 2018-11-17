@@ -20,9 +20,9 @@ wait_for_ready:
 	and	$20
 	jr	z,wait_for_ready
 	; Assume weve got hardware CTS on
-	in	a,(TTMODST)
-	and	$10
-	jr	z,wait_for_ready
+	;in	a,(TTMODST)
+	;and	$10
+	;jr	z,wait_for_ready
 	ld	a,l
 	out	(TTDATA),a
 	ld	hl,RS_ERR_OK
