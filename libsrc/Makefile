@@ -1266,7 +1266,7 @@ x1_clib.lib:
 	@echo '--- Building Sharp X1 Library ---'
 	@echo ''
 	$(call buildgeneric,x1)
-	$(MAKE) -C x1 
+	$(MAKE) -C arch/x1 
 	TARGET=x1 TYPE=z80 $(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1_clib @$(LISTFILE_DIRECTORY)/x1.lst
 
 # Philips VG5000 lib - Joaopa, Stefano
@@ -1392,7 +1392,6 @@ classic-clean:
 	$(MAKE) -C sprites/software/sp1 clean
 	$(MAKE) -C sdcard clean
 	$(MAKE) -C games clean
-	$(MAKE) -C x1 clean
 	$(MAKE) -C math clean
 	$(MAKE) -C compress/zx7 clean
 	$(MAKE) -C font clean
