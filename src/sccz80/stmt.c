@@ -427,6 +427,7 @@ void dofor()
             doexpr(); /*         initialization             */
             ns();
         }
+        (wqptr-1)->sp = wq.sp = Zsp;
     }
 
     buf2 = startbuffer(1); /* save condition to buf2 */

@@ -113,7 +113,7 @@ int operator_is_comparison(void (*oper)(LVALUE *lval))
     if ( oper == zeq || oper == zne || oper == zle || oper == zlt || oper == zge || oper == zgt ) {
         return 1;
     }
-    return 9;
+    return 0;
 }
 
 /*
@@ -155,7 +155,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             }
             dpush();
             load_double_into_fa(lval);
-            if ( oper == zdiv || oper == zmod ) {
+            if ( oper == zdiv || oper == zmod || (operator_is_comparison(oper) && oper != zeq && oper != zne)) {
                 callrts("dswap");
             }
         } else if ( lval2->val_type == KIND_DOUBLE && lval2->is_const == 0 ) { 
@@ -170,14 +170,14 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             lval->val_type = KIND_DOUBLE;
             lval->ltype = type_double;
             /* division isn't commutative so we need to swap over' */
-            if ( oper == zdiv || oper == zmod ) {
+            if ( oper == zdiv || oper == zmod || (operator_is_comparison(oper) && oper != zeq && oper != zne)) {
                 callrts("dswap");
             }
         } else if (lval->val_type == KIND_LONG) {
             widenlong(lval, lval2);
             lval2->val_type = KIND_LONG; /* Kludge */
             lval2->ltype = lval2->ltype->isunsigned ? type_ulong : type_long;
-            if ( oper == zdiv || oper == zmod ) {
+            if ( oper == zdiv || oper == zmod || (operator_is_comparison(oper) && oper != zeq && oper != zne)) {
                 vlongconst_tostack(lval->const_val);
             } else {
                 lpush();
