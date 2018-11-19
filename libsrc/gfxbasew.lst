@@ -49,3 +49,7 @@ graphics/lores/c_unplot
 graphics/lores/c_xorplot
 graphics/lores/w_c_pointxy
 graphics/lores/c_point
+graphics/__gfx_color
+graphics/cclg
+graphics/cplot
+graphics/w_cplot_callee
