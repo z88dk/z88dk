@@ -15,6 +15,12 @@
 .clg
 ._clg
 
+	ld a,($E6A7)		; CursorMode
+	res	0,a				; hide cursor
+	ld ($E6A7),a
+	or	$80				; complete CRTC command for cursor mode
+	ld ($E6A8),a		; CursorCommand
+
 	ld	hl, TEXT_DISPLAY
 	ld	de,120
 	ld	c,25
@@ -36,9 +42,17 @@ cls_3:
 	jr	nz,cls_1
 
 	call swapgfxbk
+	call clearpage	; green plane
+	out ($5d),a
+	call clearpage	; red plane
+	out ($5c),a
+	call clearpage	; blue plane
 	
-;	ld	hl,$C000
-;	ld	(base_graphics),hl
+
+	jp swapgfxbk1
+
+	
+.clearpage
 		
 	ld	hl,0
 	ld	d,h
@@ -91,5 +105,4 @@ cls_3:
 	djnz	clgloop
 
 	ld	sp,hl
-
-	jp swapgfxbk1
+	ret
