@@ -25,9 +25,6 @@
 
 .swapgfxbk
 ._swapgfxbk
-		;call kjt_wait_vrt		; wait for last line of display
-		;call kjt_page_in_video	; page video RAM in at $2000-$3fff
-		
 		di
 		out ($5e),a		; green	plane GVRAM page
 		ret
