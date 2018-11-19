@@ -29,13 +29,12 @@
 		;call kjt_page_in_video	; page video RAM in at $2000-$3fff
 		
 		di
-		ld	a,255
 		out ($5e),a		; green	plane GVRAM page
 		ret
 
 .swapgfxbk1
 ._swapgfxbk1
-        ei
+		ei
 		out ($5f),a		; back to standard RAM
 		ret
 
