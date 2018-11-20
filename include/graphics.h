@@ -60,11 +60,11 @@ extern void __LIB__ pen_up(void);
 extern void __LIB__ pen_down(void);
 /* Relative draw (keeping pen up or down) */
 extern void __LIB__ move(int px, int py) __smallc;
-/* Draw up to a sprcified point */
+/* Draw up to a specified point */
 extern void __LIB__ drawto(int x2, int y2) __smallc;
-/* Draw up to a sprcified point in XOR mode*/
+/* Draw up to a specified point in XOR mode*/
 extern void __LIB__ xordrawto(int x2, int y2) __smallc;
-/* Undraw up to a sprcified point */
+/* Undraw up to a specified point */
 extern void __LIB__ undrawto(int x2, int y2) __smallc;
 /* Draw a box */
 extern void __LIB__ drawb(int tlx, int tly, int width, int height) __smallc;
@@ -138,6 +138,7 @@ extern void __LIB__ c_xorplot(int x, int y) __smallc;
 /* Get pixel status */
 extern int __LIB__ c_point(int x, int y) __smallc;
 
+
 /* Colour graphics, only few targets are supported */
 /* ZX Spectrum has its own implementation aside */
 /* Init GFX mode and clear map */
@@ -147,6 +148,16 @@ extern void __LIB__ cclg(void) __smallc;
 extern void __LIB__           cplot(int x, int y, int c) __smallc;
 extern void __LIB__    cplot_callee(int x, int y, int c) __smallc __z88dk_callee;
 #define cplot(a,b,c)           cplot_callee(a,b,c)
+
+/* Draw */
+extern void __LIB__           cdrawr(int x, int y, int c) __smallc;
+extern void __LIB__    cdrawr_callee(int x, int y, int c) __smallc __z88dk_callee;
+#define cdrawr(a,b,c)           cdrawr_callee(a,b,c)
+
+/* Relative draw */
+extern void __LIB__           cdraw(int x1, int y1, int x2, int y2, int c) __smallc;
+extern void __LIB__    cdraw_callee(int x1, int y1, int x2, int y2, int c) __smallc __z88dk_callee;
+#define cdraw(a,b,c,d,e)           cdraw_callee(a,b,c,d,e)
 
 /* Get a pixel from screen */
 extern char __LIB__           cpoint(int x, int y) __smallc;
