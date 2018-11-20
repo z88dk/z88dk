@@ -25,6 +25,7 @@
 ;  afbcdehl/.... different
 ;
 .w_cplotpixel
+				out ($5e),a		; green page
 				ld	a,(__gfx_color)
 				bit 2,a
 				push	hl
@@ -65,6 +66,6 @@
 .noblue
 				call    w_respixel
 .bdone
-				out ($5d),a		; back to green page
 				ret
+
 
