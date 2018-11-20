@@ -53,3 +53,7 @@ graphics/__gfx_color
 graphics/cclg
 graphics/cplot
 graphics/w_cplot_callee
+graphics/cdraw
+graphics/w_cdraw_callee
+graphics/cdrawr
+graphics/w_cdrawr_callee
