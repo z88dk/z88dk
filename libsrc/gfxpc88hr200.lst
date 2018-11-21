@@ -1,5 +1,4 @@
 @gfxbasew.lst
-graphics/pc88/w_cplotpixl
 graphics/pc88/w_clg
 graphics/pc88/w_pixladdr
 graphics/clrarea
