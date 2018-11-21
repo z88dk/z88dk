@@ -149,16 +149,6 @@ extern void __LIB__           cplot(int x, int y, int c) __smallc;
 extern void __LIB__    cplot_callee(int x, int y, int c) __smallc __z88dk_callee;
 #define cplot(a,b,c)           cplot_callee(a,b,c)
 
-/* Draw */
-extern void __LIB__           cdrawr(int x, int y, int c) __smallc;
-extern void __LIB__    cdrawr_callee(int x, int y, int c) __smallc __z88dk_callee;
-#define cdrawr(a,b,c)           cdrawr_callee(a,b,c)
-
-/* Relative draw */
-extern void __LIB__           cdraw(int x1, int y1, int x2, int y2, int c) __smallc;
-extern void __LIB__    cdraw_callee(int x1, int y1, int x2, int y2, int c) __smallc __z88dk_callee;
-#define cdraw(a,b,c,d,e)           cdraw_callee(a,b,c,d,e)
-
 /* Get a pixel from screen */
 extern char __LIB__           cpoint(int x, int y) __smallc;
 extern char __LIB__    cpoint_callee(int x, int y) __smallc __z88dk_callee;
