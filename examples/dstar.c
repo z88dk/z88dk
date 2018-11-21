@@ -94,7 +94,7 @@
  *
  *      NEC PC-8801:
  *      zcc +pc88 -lgfxpc88 -create-app -DSOUND -Dspritesize=10 dstar.c
- *      zcc +pc88 -lgfxpc88hr200 -create-app -lm -Dspritesize=21 -DSOUND dstar.c
+ *      zcc +pc88 -lgfxpc88hr200 -create-app -lm -Dspritemem=102 -DSOUND dstar.c
  *
  *      Robotron KC:
  *      zcc +z9001 -Dspritesize=20 -DSOUND -lgfx9001krt -create-app dstar.c
@@ -154,11 +154,9 @@
 /* #define spritesize 16  -->  Big screen mode 256x144  */
 /* #define spritesize 20  -->  Wide screen mode 320x160 */
 /* #define spritesize 21  -->  Wide screen mode 512x192 */
+/* #define spritemem  102  -->  640x200 */
 /* #define spritesize 28  -->  Extra wide screen mode 1024x256 */
 
-#ifndef spritesize
-#define spritesize 6
-#endif
 
 /* Single sprite memory usage, including bytes for its size */
 #if (spritesize == 10)
@@ -174,6 +172,10 @@
   #define spritemem 62
   #define xsize 20
 #endif
+#if (spritemem == 102)	// 640x200
+  #define spritesize 20
+  #define xsize 40
+#endif
 #if (spritesize == 21)
   #define spritemem 90
   #define xsize 32
@@ -182,10 +184,14 @@
   #define spritemem 226
   #define xsize 64
 #endif
+
 #ifndef spritemem
   #define spritemem (spritesize+2)
 #endif
 
+#ifndef spritesize
+#define spritesize 6
+#endif
 
 #include "dstar.h"
  
@@ -308,7 +314,7 @@ void DrawBoard(void)
 	{
 		for (x=0 ; x!=16 ; x++)
 		{
-#if (spritesize > 20)
+#ifdef xsize
 			putsprite(spr_or,(x*xsize),(y*spritesize),sprites + (spritemem * (*ptr++)));
 #else
 			putsprite(spr_or,(x*spritesize),(y*spritesize),sprites + (spritemem * (*ptr++)));
@@ -370,7 +376,7 @@ void MovePiece(char *ptr, char plusx, char plusy)
 		if(TestNextPosIsStop(*(locn+temp2))) return; /* till edge */
 
 		y = (*(ptr) / 16);
-#if (spritesize >= 21)
+#ifdef xsize
 		x = (*(ptr) - (y * 16)) * xsize;
 #else
 		x = (*(ptr) - (y * 16)) * spritesize;
@@ -379,7 +385,7 @@ void MovePiece(char *ptr, char plusx, char plusy)
 		
 		if(*(locn+temp2)==BUBB)
 		{
-#if (spritesize >= 21)
+#ifdef xsize
 			putsprite(spr_xor,x+(plusx*xsize),y+(plusy*spritesize),sprites + (spritemem * BUBB));
 #else
 			putsprite(spr_xor,x+(plusx*spritesize),y+(plusy*spritesize),sprites + (spritemem * BUBB));
@@ -396,7 +402,7 @@ void MovePiece(char *ptr, char plusx, char plusy)
  		/* remove old */
 		putsprite(spr_xor,x,y,sprites + (spritemem * temp));
 		/* put new */
-#if (spritesize >= 21)
+#ifdef xsize
 		putsprite(spr_xor,x+(plusx*xsize),y+(plusy*spritesize),sprites + (spritemem * temp));
 #else
 		putsprite(spr_xor,x+(plusx*spritesize),y+(plusy*spritesize),sprites + (spritemem * temp));
