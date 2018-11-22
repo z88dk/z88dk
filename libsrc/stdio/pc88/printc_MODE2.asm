@@ -39,73 +39,68 @@ not_udg:
 
 	call	l_push_di
 	ld	b,8
-loop:
+loop:	push	bc
 	ld	a,(de)		;pick up font form main memory
 	xor	c
-	push	bc
-	push	de
-	ld	b,a		;save byte
+	exx
+	ld	h,a		;save ink version
+	cpl
+	ld	l,a		;save paper version
 
 	ld	de,(__pc88_ink)
 	
 	rrc	e	;Ink
 	ld	a,e
 	sbc	a,a	;= 255 if it was set
-	and	b
+	and	h
 	ld	c,a	;Contains ink blue to be set
-IF 0
+
 	rrc	d	;paper
 	ld	a,d
-	rlca		;bit 0 = green bit
-	sbc	a,a	;
-	cpl		;0 if set, 255 if not set
-	xor	b	;a = bits to be set for green paper
+	sbc	a,a	;255 if set, 0 = if not set
+	and	l
 	or	c	;So now we have the blue byte
-ENDIF
 
 	out	($5c),a	;Switch to blue
+	exx
 	ld	(hl),a	;And write it
+	exx
 
 	rrc	e	;Ink
 	ld	a,e
 	sbc	a,a	;= 255 if it was set
-	and	b
+	and	h
 	ld	c,a	;Contains ink green to be set
-IF 0
+
 	rrc	d	;paper
 	ld	a,d
-	rlca		;bit 0 = green bit
 	sbc	a,a	;
-	cpl		;0 if set, 255 if not set
-	xor	b	;a = bits to be set for green paper
+	and	l
 	or	c	;So now we have the green byte
-ENDIF
 
 	out	($5e),a	;Switch to green
+	exx
 	ld	(hl),a	;And write it
+	exx
 
 	rrc	e	;Ink
 	ld	a,e
 	sbc	a,a	;= 255 if it was set
-	and	b
+	and	h
 	ld	c,a	;Contains ink green to be set
 
-IF 0
 	rrc	d	;paper
 	ld	a,d
-	rlca		;bit 0 = green bit
 	sbc	a,a	;
-	cpl		;0 if set, 255 if not set
-	xor	b	;a = bits to be set for green paper
+	and	l
 	or	c	;So now we have the green byte
-ENDIF
 
 	out	($5d),a	;Switch to red
+	exx
 	ld	(hl),a	;And write it
 
 	out	($5f),a	;Back to main memory
 
-	pop	de	;Get font address back
 	inc	de
 	ld	bc,80	;Next row
 	add	hl,bc
