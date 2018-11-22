@@ -8,7 +8,12 @@ stdio/pc88/fgetc_cons
 stdio/pc88/getk
 stdio/pc88/fputc_cons
 stdio/pc88/generic_console
+stdio/pc88/generic_console_ioctl
+stdio/pc88/printc_MODE2
+stdio/pc88/conio_vars
+stdio/pc88/CRT_FONT
 @stdio/stdio_binary.lst
+@font/font_8x8/font_8x8.lst
 games/pc88/bit_open
 games/pc88/bit_open_di
 games/pc88/bit_close

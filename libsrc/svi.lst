@@ -83,4 +83,9 @@ psg/msx/set_psg
 psg/msx/set_psg_callee
 @psg/psg.lst
 @video/mc6845/mc6845.lst
+rs232/svi/rs232_close
+rs232/svi/rs232_get
+rs232/svi/rs232_init
+rs232/svi/rs232_params
+rs232/svi/rs232_put
 @z80.lst
