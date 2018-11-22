@@ -10,6 +10,7 @@
 	EXTERN	__pc88_mode
 	EXTERN	generic_console_font32
 	EXTERN	generic_console_udg32
+	EXTERN	pc88bios
 
 	INCLUDE	"ioctl.def"
 
@@ -36,12 +37,22 @@ check_mode:
 	cp	IOCTL_GENCON_SET_MODE
 	jr	nz,failure
 	ld	a,c
+	ld	bc,$5019
 	and	a
 	jr	z,set_mode
 	cp	2
+	jr	z,set_mode
+	cp	1
+	ld	bc,$2519
 	jr	nz,failure
 set_mode:
 	ld	(__pc88_mode),a
+	ld	a,b
+	ld	(__console_w),a
+	ld	a,c
+	ld	(__console_h),a
+        ld      ix,$6f6b                ; CRTSET
+        call    pc88bios
 	call	generic_console_cls
 	and	a
 	ret

@@ -20,6 +20,7 @@
 		EXTERN		__pc88_ink
 		EXTERN		__pc88_paper
 		EXTERN		printc_MODE2
+		EXTERN		scrollup_MODE2
 
 
 		defc		DISPLAY = 0xf3c8
@@ -93,7 +94,9 @@ generic_console_printc:
 	cp	2
 	jp	z,printc_MODE2
 	push	de
+	call	generic_console_scale
 	call	xypos
+not_40_col:
 	pop	de
 	ld	(hl),d
 	ret
@@ -111,10 +114,23 @@ generic_console_pointxy:
 ;        a = character,
 ;        c = failure
 generic_console_vpeek:
+	call	generic_console_scale
         call    xypos
 	ld	a,(hl)
 	and	a
 	ret
+
+
+generic_console_scale:
+        push    af
+        ld      a,(__pc88_mode)
+        cp      1
+        jr      nz,no_scale
+        sla     c               ;40 -> 80 column
+no_scale:
+        pop     af
+        ret
+
 
 
 xypos:
@@ -133,6 +149,9 @@ generic_console_printc_3:
 generic_console_scrollup:
 	push	de
 	push	bc
+	ld	a,(__pc88_mode)
+	cp	2
+	jp	z,scrollup_MODE2
 	ld	hl, DISPLAY + 120
 	ld	de, DISPLAY
 	ld	bc, 120 * 24

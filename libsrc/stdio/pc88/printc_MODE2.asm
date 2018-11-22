@@ -1,6 +1,7 @@
 
 	SECTION	code_clib
 	PUBLIC	printc_MODE2
+	PUBLIC	scrollup_MODE2
 
 	EXTERN	__pc88_ink
 	EXTERN	__pc88_paper
@@ -122,4 +123,40 @@ generic_console_xypos_graphics_1:
         add     hl,bc
         ret
 
+scrollup_MODE2:
+	call	l_push_di
+	ld	a,(__pc88_paper)
+	ld	d,a
+	out	($5c),a
+	call	scroll_gfx
+	out	($5e),a
+	call	scroll_gfx
+	out	($5d),a
+	call	scroll_gfx
+	ld	($5f),a
+	call	l_pop_ei
+	pop	bc
+	pop	de
+	ret
+	
+scroll_gfx:
+	ld	a,d
+	ld	hl,$c000 + 80 * 8
+	ld	de,$c000
+	ld	bc,80*192
+	ldir
+	ex	de,hl	;hl
+	ld	d,a
+	rrc	d
+	ld	a,d
+	sbc	a
+	push	de
+	ld	d,h
+	ld	e,l
+	inc	de
+	ld	(hl),a
+	ld	bc,80*8
+	ldir
+	pop	de
+	ret
 
