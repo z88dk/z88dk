@@ -18,6 +18,8 @@ pc88_clearkey:
 _pc88_clearkey:
 	push	ix
 	
+	xor	a
+	ld	($E6B8),a
 	ld      ix,$69e1
 	call	pc88bios
 
