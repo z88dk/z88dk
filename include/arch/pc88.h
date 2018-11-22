@@ -7,15 +7,29 @@
 #ifndef __PC88_H__
 #define __PC88_H__
 
+#include <sys/types.h>
+
 
 // Misc functions
 
 // Check if Ctrl-STOP is being pressed (1=if pressed, 0 if not)
-extern int __LIB__ pc88_break();
+extern bool_t __LIB__ pc88_break();
 
 // Clear the keyboard buffer
 extern void __LIB__ pc88_clearkey();
 
+// TRUE if the current DIP switch settings are in V2 mode
+extern bool_t __LIB__ pc88_v2mode();
+
+
+// Display related functions
+
+// Show/Hide the text cursor
+extern void __LIB__ pc88_cursoron();
+extern void __LIB__ pc88_cursoroff();
+
+// Move the screen cursor to a given position
+extern void __LIB__ pc88_locate(unsigned int x, unsigned int y) __smallc;
 
 
 #endif
