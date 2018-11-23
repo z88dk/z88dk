@@ -15,12 +15,16 @@
 	PUBLIC	_pc88_break
 	
 	EXTERN	pc88bios
+	EXTERN	brksave
 
 	
         INCLUDE "target/pc88/def/n88bios.def"
 
 pc88_break:
 _pc88_break:
+	ld	a,(brksave)
+	dec	a
+	ret z
 	push	ix
 	ld	ix,BREAKX
 	call pc88bios
