@@ -27,6 +27,9 @@ _pc88_crtset:
 	
 	ld	b,l		; columns
 	
+	xor	a
+	ld	($E6B8),a		; disable FN key help bar
+	
 	ld      ix,$6F6B		; CRTSET - B=columns, C=rows
 	call	pc88bios
 
