@@ -15,6 +15,12 @@
 // Check if Ctrl-STOP is being pressed (1=if pressed, 0 if not)
 extern bool_t __LIB__ pc88_break();
 
+// Disable the CTRL-STOP effect (when a BASIC routine is being called)
+extern void __LIB__ pc88_breakoff();
+
+// Restore the CTRL-STOP break command
+extern void __LIB__ pc88_breakon();
+
 // Clear the keyboard buffer
 extern void __LIB__ pc88_clearkey();
 
