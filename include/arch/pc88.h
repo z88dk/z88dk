@@ -37,5 +37,7 @@ extern void __LIB__ pc88_cursoroff();
 // Move the screen cursor to a given position
 extern void __LIB__ pc88_locate(unsigned int x, unsigned int y) __smallc;
 
+// Set text windows (40 or 80 columns, 20 or 25 rows)
+extern void __LIB__ pc88_crtset(int width, int height) __smallc;
 
 #endif
