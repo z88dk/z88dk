@@ -131,7 +131,7 @@ ENDIF
 start1:
         ld      sp,0
 		
-		ld		a,255		; restore Main ROM
+		ld		a,$FF		; restore Main ROM
 		out     ($71),a
 		
 		ld      hl,(timer_retaddr+1)	; restore interrupt pointers
@@ -152,9 +152,6 @@ pc88_timer:
 		
 		ld		a,1			; set interrupt levels to disable also the "VRTC interrupt"
 		out     ($E4),a
-		
-		ld		a,$FF		; Switch banking to MAIN ROM
-		out     ($71),a
 		
 		ld	hl,(FRAMES)
 		inc	hl
