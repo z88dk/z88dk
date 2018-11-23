@@ -72,6 +72,14 @@ start:
 IF (!DEFINED_startup || (startup=1))
 		ld	a,$FF				; back to main ROM
 		out ($71),a				; bank switching
+		
+		
+		ld	hl,($f302)
+		ld	(timer_retaddr+1),hl
+		
+		ld	hl,pc88_timer
+		ld ($f302),hl			; JP location for timer interrupt
+		
 ENDIF
 
         ld      (start1+1),sp
@@ -125,6 +133,9 @@ start1:
 		
 		ld		a,255		; restore Main ROM
 		out     ($71),a
+		
+		ld      hl,(timer_retaddr+1)	; restore interrupt pointers
+		ld      ($f302),hl
 
         ret
 
@@ -133,8 +144,37 @@ l_dcal:
 
 
 
+; Timer interrupt handler extension, usual jiffy driven interrupt (1/60 sec.)
 
-; JP table, this could be, sooner or later, moved to a convenient position in RAM
+pc88_timer:
+		push hl
+		push af
+		
+		ld		a,1			; set interrupt levels to disable also the "VRTC interrupt"
+		out     ($E4),a
+		
+		ld		a,$FF		; Switch banking to MAIN ROM
+		out     ($71),a
+		
+		ld	hl,(FRAMES)
+		inc	hl
+		ld	(FRAMES),hl
+		ld	a,h
+		or	l
+		jr	nz,skip_msw
+		ld	hl,(FRAMES+2)
+		inc	hl
+		ld	(FRAMES+2),hl
+skip_msw:
+
+		pop	af
+		pop	hl
+
+timer_retaddr:
+		jp	0
+
+
+; ROM interposer. This could be, sooner or later, moved to a convenient position in RAM
 ; (e.g.  just before $C000) to be able to bounce between different RAM/ROM pages
 pc88bios:
 	push	af
@@ -155,10 +195,21 @@ pc88bios:
 
 	SECTION		bss_crt
 
-; Keeping the BREAK status
+
+	PUBLIC	FRAMES
 	PUBLIC	brksave
 	PUBLIC	defltdsk
-brksave:	defb	1
+
+FRAMES:
+		defw	0
+		defw	0
+
+brksave:	defb	1		; Keeping the BREAK enable flag, used by pc88_break, etc..
+
+
+
+; This last part at the moment is useless, but doesn't harm
+
 defltdsk:       defb    0	; Default disc
 IF (startup=2)
 IF !DEFINED_nofileio
