@@ -6,6 +6,7 @@ arch/pc88/pc88_v2mode
 arch/pc88/pc88_cursoroff
 arch/pc88/pc88_cursoron
 arch/pc88/pc88_locate
+arch/pc88/pc88_crtset
 stdio/pc88/fgetc_cons
 stdio/pc88/getk
 stdio/pc88/fputc_cons
