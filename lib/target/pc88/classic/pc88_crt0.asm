@@ -106,6 +106,9 @@ ENDIF
 		INCLUDE "crt/classic/crt_init_amalloc.asm"
 	ENDIF
 
+	ld	a,(defltdsk)
+	ld	($EC85),a
+	
 IF (startup=2)
 ;
 
@@ -136,6 +139,9 @@ start1:
 		
 		ld      hl,(timer_retaddr+1)	; restore interrupt pointers
 		ld      ($f302),hl
+
+		ld	a,($EC85)
+		ld	(defltdsk),a
 
         ret
 
@@ -208,6 +214,8 @@ brksave:	defb	1		; Keeping the BREAK enable flag, used by pc88_break, etc..
 ; This last part at the moment is useless, but doesn't harm
 
 defltdsk:       defb    0	; Default disc
+
+
 IF (startup=2)
 IF !DEFINED_nofileio
 	PUBLIC	__fcb
