@@ -91,7 +91,7 @@ _load_dot:
 
    ; copy filename
    
-   ld ix,dot_name - nex_stub_end
+   ld ix,dot_name - dot_stub_end
    add ix,de                   ; ix = address of dot name
 
    call copy_filename
