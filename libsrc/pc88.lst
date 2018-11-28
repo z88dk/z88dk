@@ -5,6 +5,7 @@ arch/pc88/pc88_clearkey
 arch/pc88/pc88_v2mode
 arch/pc88/pc88_mode
 arch/pc88/pc88_8mhz
+arch/pc88/pc88_fm_addr
 arch/pc88/pc88_cursoroff
 arch/pc88/pc88_cursoron
 arch/pc88/pc88_locate
