@@ -9,8 +9,6 @@
 ;	- 1 V1(H)
 ;	- 2 V2 mode
 ;
-;	Clears the keyboard buffer
-;
 ;	$Id: pc88_mode.asm $
 ;
 
@@ -20,7 +18,6 @@
 	
 pc88_mode:
 _pc88_mode:
-Check_Mode:
     in a,($31)		;bit76: 10=V1S 11=V1H 01=V2
     rlca
     rlca
