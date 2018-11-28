@@ -30,8 +30,11 @@ extern bool_t __LIB__ pc88_v2mode();
 // TRUE if the CPU speed is 8mhz
 extern bool_t __LIB__ pc88_8mhz();
 
-// TRUE if the current DIP switch settings are in V2 mode
+// Test the PC88 mode:  0=V1(S), 1=V1(H), 2=V2
 extern int __LIB__ pc88_mode();
+
+// Look for an FM chip. Address for FM if found, otherwise 0
+extern int __LIB__ pc88_fm_addr();
 
 
 // Display related functions
