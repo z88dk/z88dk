@@ -27,6 +27,12 @@ extern void __LIB__ pc88_clearkey();
 // TRUE if the current DIP switch settings are in V2 mode
 extern bool_t __LIB__ pc88_v2mode();
 
+// TRUE if the CPU speed is 8mhz
+extern bool_t __LIB__ pc88_8mhz();
+
+// TRUE if the current DIP switch settings are in V2 mode
+extern int __LIB__ pc88_mode();
+
 
 // Display related functions
 
