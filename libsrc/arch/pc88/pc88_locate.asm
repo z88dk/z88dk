@@ -23,6 +23,10 @@ _pc88_locate:
 	push de
 	push hl
 	push bc
+	
+;	ld	h,e
+;	ld	l,d
+;	call $429D
 
 	LD A,E
 	LD ($EF87),A		; TTYPOS X
