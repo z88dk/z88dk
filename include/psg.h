@@ -95,6 +95,12 @@
 #define psgT(hz)		((int)(118750.0 / (hz)))
 #endif
 
+#ifdef __PC88__
+// 3.9936 Mhz, but is sounded bad when split as suggested.
+//   This value was chosen by trial and error.
+#define psgT(hz)		((int)(74000.0 / (hz)))
+#endif
+
 #ifdef __SVI__
 #include <msx.h>
 #define psgT(hz)		((int)(111760.0 / (hz)))
