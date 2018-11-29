@@ -15,6 +15,8 @@
 	
 pc88_cursoroff:
 _pc88_cursoroff:
+	; jp 428Bh
+	
 	ld a,($E6A7)		; CursorMode
 	res	0,a				; hide cursor
 	ld ($E6A7),a
