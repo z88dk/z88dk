@@ -339,6 +339,7 @@ pc88_clib.lib:
 	@echo '--- Building PC8801 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
+	$(MAKE) -C psg
 	$(call buildgeneric,pc88)
 	$(MAKE) -C games TARGET=pc88
 	TARGET=pc88 TYPE=z80 $(LIBLINKER) -DFORpc88 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pc88_clib @$(LISTFILE_DIRECTORY)/pc88.lst
