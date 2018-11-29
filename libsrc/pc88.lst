@@ -27,4 +27,8 @@ games/pc88/bit_close_ei
 games/joystick
 time/pc88/clock
 @games/games.lst
+psg/pc88/set_psg
+psg/pc88/set_psg_callee
+psg/pc88/psg_init
+@psg/psg.lst
 @z80.lst
