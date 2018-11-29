@@ -4,7 +4,7 @@
 ;
 ;	void pc88_cursoron();
 ;
-;	Enables the text cursor
+;	Enable the text cursor
 ;
 ;	$Id: pc88_cursoron.asm $
 ;
@@ -15,6 +15,8 @@
 	
 pc88_cursoron:
 _pc88_cursoron:
+	; jp 4290h
+	
 	ld a,($E6A7)		; CursorMode
 	set	0,a				; show cursor
 	ld ($E6A7),a
