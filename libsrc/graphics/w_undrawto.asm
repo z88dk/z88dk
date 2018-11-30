@@ -5,35 +5,29 @@
 ;
 ;       Stubs Written by D Morris - 30/9/98
 ;
+;       Wide resolution (int type parameters) version by Stefano Bodrato
 ;
-;	$Id: w_undrawto.asm,v 1.4 2016-04-23 20:37:40 dom Exp $
+;	$Id: w_undrawto.asm $
 ;
 
 
-;Usage: undrawto(struct *pixels)
+; CALLER LINKAGE FOR FUNCTION POINTERS
 
-
-	SECTION   code_graphics
-                PUBLIC    undrawto
-                PUBLIC    _undrawto
-                EXTERN     swapgfxbk
-                EXTERN	__graphics_end
-
-                EXTERN     w_line
-                EXTERN     w_respixel
-
+SECTION code_graphics
+PUBLIC undrawto
+PUBLIC _undrawto
+EXTERN undrawto_callee
+EXTERN ASMDISP_UNDRAWTO_CALLEE
 
 .undrawto
 ._undrawto
-		push	ix
-		ld	ix,4
-		add	ix,sp
-		ld	l,(ix+2)
-		ld	h,(ix+3)
-		ld	e,(ix+0)
-		ld	d,(ix+1)
-                call    swapgfxbk
-                ld      ix,w_respixel
-                call    w_line
-                jp      __graphics_end
 
+		pop	af
+		pop	de
+		pop	hl
+		push	hl
+		push	de
+		push	af
+
+
+   jp undrawto_callee + ASMDISP_UNDRAWTO_CALLEE
