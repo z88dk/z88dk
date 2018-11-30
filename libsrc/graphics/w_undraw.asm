@@ -26,6 +26,7 @@ EXTERN ASMDISP_UNDRAW_CALLEE
 .undraw
 ._undraw
 		pop af
+		
 		pop de
 		pop	hl
 		exx			; w_respixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
@@ -37,6 +38,7 @@ EXTERN ASMDISP_UNDRAW_CALLEE
 		exx
 		push hl
 		push de
+		exx
 		
 		push af		; ret addr
 		
