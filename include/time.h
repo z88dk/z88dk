@@ -89,22 +89,51 @@ extern time_t __LIB__  __SAVEFRAME__ mktime(struct tm *tp);
 
 
 
+/* This is a really simple fn which will barf over midnight,.. */
 
 #ifndef FAKECLOCK
-
-// This is a really simple fn which will barf over midnight,..
 extern clock_t __LIB__ clock(void);
-
-// This could make srand(time(NULL)) work, but do not expect much more..
-#define time(NULL) clock()
-
 #endif
-
 
 extern int FRAMES;
 
+/* This could make srand(time(NULL)) work, but do not expect much more.. */
 
+#ifdef __ENTERPRISE__
+#define time(NULL) clock()
+#endif
 
+#ifdef __NEWBRAIN__
+#define time(NULL) clock()
+#endif
+
+#ifdef __RCMX000__
+#define time(NULL) clock()
+#endif
+
+#ifdef __SPECTRUM__
+#define time(NULL) clock()
+#endif
+
+#ifdef __ZX81__
+#define time(NULL) clock()
+#endif
+
+#ifdef __ZX80__
+#define time(NULL) clock()
+#endif
+
+#ifdef __MC1000__
+#define time(NULL) clock()
+#endif
+
+#ifdef __OSCA__
+#define time(NULL) clock()
+#endif
+
+#ifdef __PACMAN__
+#define time(NULL) clock()
+#endif
 
 // MSDOS Time for FAT
 
