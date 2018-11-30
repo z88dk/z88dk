@@ -5,33 +5,29 @@
 ;
 ;       Stubs Written by D Morris - 30/9/98
 ;
-;       Wide resolution (WORD based parameters) version by Stefano Bodrato
+;       Wide resolution (int type parameters) version by Stefano Bodrato
 ;
-;	$Id: w_undrawr.asm,v 1.5 2016-04-23 20:37:40 dom Exp $
+;	$Id: w_undrawr.asm $
 ;
 
 
-	SECTION   code_graphics
-                PUBLIC    undrawr
-                PUBLIC    _undrawr
-                EXTERN     swapgfxbk
-                EXTERN __graphics_end
+; CALLER LINKAGE FOR FUNCTION POINTERS
 
-                EXTERN     w_line_r
-                EXTERN     w_respixel
-
+SECTION code_graphics
+PUBLIC undrawr
+PUBLIC _undrawr
+EXTERN undrawr_callee
+EXTERN ASMDISP_UNDRAWR_CALLEE
 
 .undrawr
 ._undrawr
-		push	ix
-		ld	ix,2
-		add	ix,sp
-		ld	e,(ix+2)
-		ld	d,(ix+3)
-		ld	l,(ix+4)
-		ld	h,(ix+5)
-                call    swapgfxbk
-                ld      ix,w_respixel
-                call    w_line_r
-                jp      __graphics_end
 
+		pop	af
+		pop	de
+		pop	hl
+		push	hl
+		push	de
+		push	af
+
+
+   jp undrawr_callee + ASMDISP_UNDRAWR_CALLEE
