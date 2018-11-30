@@ -5,43 +5,40 @@
 ;
 ;       Stubs Written by D Morris - 30/9/98
 ;
-;       Wide resolution (WORD based parameters) version by Stefano Bodrato
-;
-;	$Id: w_undraw.asm,v 1.5 2016-04-23 20:37:40 dom Exp $
+;       Wide resolution (int type parameters) version by Stefano Bodrato
 ;
 
+;
+;	$Id: w_undraw.asm $
+;
 
-	SECTION   code_graphics
-                PUBLIC    undraw
-                PUBLIC   _undraw
-                EXTERN     swapgfxbk
-                EXTERN     swapgfxbk1
-                EXTERN __graphics_end
+;
+; CALLER LINKAGE FOR FUNCTION POINTERS
+; ----- void  undraw(int x, int y, int x2, int y2)
 
-                EXTERN     w_line
-                EXTERN     w_respixel
+SECTION code_graphics
+PUBLIC undraw
+PUBLIC _undraw
+EXTERN undraw_callee
+EXTERN ASMDISP_UNDRAW_CALLEE
 
 
 .undraw
 ._undraw
-		push	ix
-		ld	ix,4
-		add	ix,sp
-		ld	l,(ix+6)
-		ld	h,(ix+7)
-		ld	e,(ix+4)
-		ld	d,(ix+5)
-
-		call    swapgfxbk
-		call	w_respixel
-                call    swapgfxbk1
-
-		ld	l,(ix+2)
-		ld	h,(ix+3)
-		ld	e,(ix+0)
-		ld	d,(ix+1)
-
-		call    swapgfxbk
-                ld      ix,w_respixel
-                call    w_line
-                jp      __graphics_end
+		pop af
+		pop de
+		pop	hl
+		exx			; w_respixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
+		pop hl
+		pop de
+		
+		push de
+		push hl
+		exx
+		push hl
+		push de
+		
+		push af		; ret addr
+		
+   jp undraw_callee + ASMDISP_UNDRAW_CALLEE
+ 
