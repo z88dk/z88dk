@@ -36,25 +36,25 @@ PUBLIC ASMDISP_UNDRAW_CALLEE
 		
 		push af		; ret addr
 		
-		;push	ix
+		exx
 		
 .asmentry
 		
-		exx
 ;		ld	l,(ix+6)
 ;		ld	h,(ix+7)
 ;		ld	e,(ix+4)
 ;		ld	d,(ix+5)
 ;		ld	c,(ix+8)
 		
+		push ix
+		
 		push hl
 		push de
-		
-		push ix
+
 		call    swapgfxbk
 		call	w_respixel
-		call    swapgfxbk1
-		pop ix
+		;call    swapgfxbk1
+		;pop ix
 
 		exx
 		;ld	l,(ix+0)
@@ -70,8 +70,8 @@ PUBLIC ASMDISP_UNDRAW_CALLEE
 		or a
 		sbc hl,bc
 
-		call    swapgfxbk
-		push	ix
+		;call    swapgfxbk
+		;push	ix
 		ld      ix,w_respixel
 		call    w_line_r
 		jp      __graphics_end
