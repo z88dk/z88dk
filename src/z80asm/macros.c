@@ -282,6 +282,19 @@ static bool collect_equ(char **in, UT_string *name)
 			}
 			return false;
 		}
+		
+		if (utstring_body(name)[0] == '.') {			// old-style label
+			// remove starting dot from name
+			UT_string *temp;
+			utstring_new(temp);
+			utstring_printf(temp, "%s", &utstring_body(name)[1]);
+			utstring_clear(name);
+			utstring_concat(name, temp);
+			utstring_free(temp);
+		}
+		else if (*p == ':') {							// colon after name
+			p++;
+		}
 
 		while (isspace(*p)) p++;
 
