@@ -152,6 +152,7 @@
 	GLOBAL	fgetc_cons_inkey
 	GLOBAL	fputc_cons
 	GLOBAL	fgets_cons
+	GLOBAL	puts_cons
 	GLOBAL	fabandon
 	GLOBAL	fdtell
 	GLOBAL	fdgetpos
