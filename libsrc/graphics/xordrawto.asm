@@ -6,37 +6,30 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: xordrawto.asm,v 1.1 2016-11-10 07:34:56 stefano Exp $
+;	$Id: xordrawto.asm $
 ;
 
+; CALLER LINKAGE FOR FUNCTION POINTERS
+; ----- void  xordrawto(int x2, int y2)
 
-;Usage: xordrawto(struct *pixels)
 
-
-                SECTION         code_graphics
-                PUBLIC    xordrawto
-                PUBLIC    _xordrawto
-                EXTERN     swapgfxbk
-                EXTERN	__graphics_end
-
-				EXTERN	__gfx_coords
-
-                EXTERN     Line
-                EXTERN     xorpixel
-
+		SECTION   code_graphics
+		
+		PUBLIC    xordrawto
+		PUBLIC	  _xordrawto
+		
+		EXTERN xordrawto_callee
+		EXTERN ASMDISP_XORDRAWTO_CALLEE
 
 
 .xordrawto
 ._xordrawto
-		push	ix
-		ld	ix,2
-		add	ix,sp
-		ld	hl,(__gfx_coords)
-		ld	e,(ix+2)	;y
-		ld	d,(ix+4)	;x
-
-                call    swapgfxbk
-                ld      ix,xorpixel
-                call    Line
-                jp      __graphics_end
-
+	pop	af	; ret addr
+	pop de	; y2
+	pop hl
+	push hl
+	push de
+	ld	d,l	; x2
+	push	af	; ret addr
+		
+   jp xordrawto_callee + ASMDISP_XORDRAWTO_CALLEE
