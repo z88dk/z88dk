@@ -36,28 +36,29 @@ PUBLIC ASMDISP_DRAW_CALLEE
 		
 		push af		; ret addr
 		
-		;push	ix
+		exx
 		
 .asmentry
 		
-		exx
 ;		ld	l,(ix+6)
 ;		ld	h,(ix+7)
 ;		ld	e,(ix+4)
 ;		ld	d,(ix+5)
 ;		ld	c,(ix+8)
 		
-		push hl
-		push de
 		
 		;ld	a,c
 		;ld	(__gfx_color),a
 
 		push ix
+		
+		push hl
+		push de
+		
 		call    swapgfxbk
 		call	w_plotpixel
-		call    swapgfxbk1
-		pop ix
+		;call    swapgfxbk1
+		;pop ix
 
 		exx
 		;ld	l,(ix+0)
@@ -73,8 +74,8 @@ PUBLIC ASMDISP_DRAW_CALLEE
 		or a
 		sbc hl,bc
 
-		call    swapgfxbk
-		push	ix
+		;call    swapgfxbk
+		;push	ix
 		ld      ix,w_plotpixel
 		call    w_line_r
 		jp      __graphics_end
