@@ -20,8 +20,9 @@ long	tlines	= 0;
 long	tbytes	= 0;
 long	bytes;
 
+static int count(FILE *fp, char *filename);
 
-output(long lines, long words, long bytes, char *filename)
+static void output(long lines, long words, long bytes, char *filename)
 {
 	printf("%07ld ", lines);
 	printf("%07ld ", words);
@@ -93,9 +94,7 @@ int main(int argc, char *argv[])
 	}
 }
 
-count(fp, filename)
-FILE		*fp;			/* File pointer			*/
-char		*filename;		/* File name string		*/
+int count(FILE *fp, char *filename)
 {
 	register int c, inword;
 	long lines;

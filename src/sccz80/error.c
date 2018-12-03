@@ -25,7 +25,8 @@ static char   *c_default_categories[] = {
     "incorrect-function-declspec",
     "invalid-value",
     "invalid-function-definition",
-    "limited-range"
+    "limited-range",
+    "implicit-function-definition"
 };
 static int     c_default_categories_num = sizeof(c_default_categories) / sizeof(c_default_categories[0]);
 

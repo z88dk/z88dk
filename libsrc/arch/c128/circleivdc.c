@@ -10,6 +10,8 @@ $Id: circleivdc.c,v 1.1 2008-06-23 17:34:32 stefano Exp $
 #include <stdlib.h>
 #include <c128/vdc.h>
 
+extern void circlepointsvdc(int XC, int YC, int X, int Y);
+
 /* draw circle in 640 x 680 interlace bit map using bresenham's algorithm */
 
 void circleivdc(int XC, int YC, int R)

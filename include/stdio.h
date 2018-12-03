@@ -311,6 +311,8 @@ extern int __LIB__ fputc_cons(char c);
 /* Read a string using the default keyboard driver */
 extern char __LIB__ *fgets_cons(char *s, size_t n) __smallc;
 
+extern int __LIB__ puts_cons(char *s);
+
 /* Abandon file - can be the generic version */
 extern void __LIB__ fabandon(FILE *);
 /* Get file position for file handle fd */
