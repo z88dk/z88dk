@@ -60,7 +60,7 @@ extern void __LIB__ xordraw_callee(int x1, int y1, int x2, int y2) __smallc __z8
 
 /* Remove a line */
 extern void __LIB__ undraw(int x1, int y1, int x2, int y2) __smallc;
-extern void __LIB__ unrdraw_callee(int x1, int y1, int x2, int y2) __smallc __z88dk_callee;
+extern void __LIB__ undraw_callee(int x1, int y1, int x2, int y2) __smallc __z88dk_callee;
 #define undraw(a,b,c,d)           undraw_callee(a,b,c,d)
 
 /* Relative draw */
