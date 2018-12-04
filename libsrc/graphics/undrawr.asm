@@ -1,42 +1,39 @@
-;
-;       Z88 Graphics Functions - Small C+ stubs
-;
-;       Written around the Interlogic Standard Library
-;
-;       Stubs Written by D Morris - 30/9/98
-;
-;
-;	$Id: undrawr.asm,v 1.7 2016-04-13 21:09:09 dom Exp $
-;
+    SECTION         code_clib
 
+    PUBLIC  undrawr
+    PUBLIC  _undrawr
 
-;Usage: undrawr(struct *pixels)
+    EXTERN respixel
+    EXTERN draw_main
+    EXTERN last_pos
 
+undrawr:
+_undrawr:
+    push ix
+    ld ix,2
+    add ix,sp
 
+    ld de,(last_pos); x0/y0
+    ld h,(ix+4); xr
+    ld l,(ix+2); yr
 
-        SECTION code_graphics
-                PUBLIC    undrawr
-                PUBLIC    _undrawr
-                EXTERN     swapgfxbk
-                EXTERN	__graphics_end
+    ld a,h
+    add d
+    ld h,a
 
+    ld a,l
+    add e
+    ld l,a
 
-                EXTERN     Line_r
-                EXTERN     respixel
+    push hl
+    push iy
+    ld iy,respixel
+    call draw_main
+    pop iy
 
+    pop hl
+    ld (last_pos),hl
 
+    pop ix
 
-.undrawr
-._undrawr
-		push	ix
-		ld	ix,2
-		add	ix,sp
-		ld	e,(ix+2)
-		ld	d,(ix+3)
-		ld	l,(ix+4)
-		ld	h,(ix+5)
-                ld      ix,respixel
-                call    swapgfxbk
-                call    Line_r
-                jp      __graphics_end
-
+    ret
