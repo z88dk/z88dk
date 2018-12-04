@@ -1,39 +1,34 @@
-    SECTION         code_clib
+;
+;       Z88 Graphics Functions - Small C+ stubs
+;
+;       Written around the Interlogic Standard Library
+;
+;       Stubs Written by D Morris - 30/9/98
+;
+;
+;	$Id: undrawr.asm $
+;
 
-    PUBLIC  undrawr
-    PUBLIC  _undrawr
+; CALLER LINKAGE FOR FUNCTION POINTERS
+; ----- void  undrawr(int x2, int y2)
 
-    EXTERN respixel
-    EXTERN draw_main
-    EXTERN last_pos
 
-undrawr:
-_undrawr:
-    push ix
-    ld ix,2
-    add ix,sp
+		SECTION   code_graphics
+		
+		PUBLIC    undrawr
+		PUBLIC	  _undrawr
+		
+		EXTERN undrawr_callee
+		EXTERN ASMDISP_UNDRAWR_CALLEE
 
-    ld de,(last_pos); x0/y0
-    ld h,(ix+4); xr
-    ld l,(ix+2); yr
 
-    ld a,h
-    add d
-    ld h,a
-
-    ld a,l
-    add e
-    ld l,a
-
-    push hl
-    push iy
-    ld iy,respixel
-    call draw_main
-    pop iy
-
-    pop hl
-    ld (last_pos),hl
-
-    pop ix
-
-    ret
+.undrawr
+._undrawr
+	pop	af	; ret addr
+	pop de	; y
+	pop hl	; x
+	push hl
+	push de
+	push	af	; ret addr
+		
+   jp undrawr_callee + ASMDISP_UNDRAWR_CALLEE
