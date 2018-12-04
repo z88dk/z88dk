@@ -48,6 +48,8 @@ extern int __LIB__ point(int x, int y) __smallc;
 /* Get horizontal or vertical pixel bar, up to 16 pixel long */
 extern int __LIB__ multipoint(int hv, int length, int x, int y) __smallc;
 
+
+
 /* Draw a line */
 extern void __LIB__ draw(int x1, int y1, int x2, int y2) __smallc;
 extern void __LIB__ draw_callee(int x1, int y1, int x2, int y2) __smallc __z88dk_callee;
@@ -77,6 +79,8 @@ extern void __LIB__ xordrawr_callee(int px, int py) __smallc __z88dk_callee;
 extern void __LIB__ undrawr(int px, int py) __smallc;
 extern void __LIB__ undrawr_callee(int px, int py) __smallc __z88dk_callee;
 #define undrawr(a,b)           undrawr_callee(a,b)
+
+
 
 /* Pen up for 'move' */
 extern void __LIB__ pen_up(void);
