@@ -5,10 +5,10 @@ graphics/w_bkrestore
 graphics/w_circle
 graphics/w_uncircle
 graphics/w_dcircle
-graphics/w_draw
-graphics/w_draw_callee
 graphics/w_undraw
 graphics/w_undraw_callee
+graphics/w_draw
+graphics/w_draw_callee
 graphics/w_xordraw
 graphics/w_xordraw_callee
 graphics/w_drawto
