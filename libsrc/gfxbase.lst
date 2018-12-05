@@ -25,6 +25,7 @@ graphics/getmaxy
 graphics/lbitmask
 graphics/line
 graphics/liner
+graphics/lftscrol
 graphics/lscroll
 graphics/plot
 graphics/point
@@ -46,6 +47,8 @@ graphics/drawb
 graphics/undrawb
 graphics/drawbox
 graphics/setxy
+graphics/setpos
+graphics/setpos_callee
 graphics/move
 graphics/pen_up
 graphics/pen_down
