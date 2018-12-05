@@ -14,11 +14,11 @@ stdio/bee/copy_font
 @font/font_8x8/font_8x8.lst
 games/bee/joystick
 @games/games.lst
+@gfxbase.lst
 graphics/dcircle
 graphics/clg
 graphics/clrarea
 graphics/generic_console/clsgraph
-graphics/lftscrol
 graphics/bee/textpixl
 graphics/generic_console/plotpixl
 graphics/generic_console/respixl
@@ -27,7 +27,5 @@ graphics/generic_console/pointxy
 graphics/generic_console/getmaxx
 graphics/generic_console/getmaxy
 graphics/putsprite3
-graphics/liner
 graphics/stencil_render2
 graphics/text/swapgfxbk
-@gfxbase.lst
