@@ -23,12 +23,12 @@
 .setpos_callee
 ._setpos_callee	
 	pop	af	; ret addr
-	pop hl	; y
 	pop de
-	ld	h,d	; x
+	pop hl
 	push	af	; ret addr
 	
 .asmentry
+	ld	h,e
 	jp	setxy
 
 
