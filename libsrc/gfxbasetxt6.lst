@@ -52,6 +52,8 @@ graphics/undrawb
 graphics/unplot
 graphics/drawbox
 graphics/setxy
+graphics/setpos
+graphics/setpos_callee
 graphics/move
 graphics/pen_up
 graphics/pen_down
