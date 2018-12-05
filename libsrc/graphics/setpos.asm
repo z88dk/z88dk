@@ -22,11 +22,10 @@
 .setpos
 ._setpos	
 	pop	af	; ret addr
-	pop hl	; y
 	pop de
-	push de
+	pop hl
 	push hl
-	ld	h,d	; x
+	push de
 	push	af	; ret addr
 	
 	jp setpos_callee + ASMDISP_SETPOS_CALLEE
