@@ -4,11 +4,8 @@ graphics/clg
 graphics/attache/clsgraph
 graphics/clrarea
 graphics/w_clga
-graphics/w_undraw
 graphics/w_drawb
 graphics/w_undrawb
-graphics/w_undrawr
-graphics/w_undrawto
 graphics/w_xorborder
 graphics/w_putsprite2
 graphics/w_stencil_render2
