@@ -46,6 +46,8 @@ graphics/dither_pattern
 graphics/rbitmask
 graphics/rscroll
 graphics/w_setxy
+graphics/w_setpos
+graphics/w_setpos_callee
 graphics/w_move
 graphics/pen_up
 graphics/pen_down
