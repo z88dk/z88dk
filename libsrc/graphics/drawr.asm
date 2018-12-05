@@ -6,36 +6,29 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: drawr.asm,v 1.8 2016-04-13 21:09:09 dom Exp $
+;	$Id: drawr.asm $
 ;
 
+; CALLER LINKAGE FOR FUNCTION POINTERS
+; ----- void  drawr(int x, int y)
 
-;Usage: drawr(struct *pixels)
 
-
-                SECTION         code_graphics
-                PUBLIC    drawr
-                PUBLIC    _drawr
-                EXTERN     swapgfxbk
-                EXTERN        __graphics_end
-
-                EXTERN     Line_r
-                EXTERN     plotpixel
-
+		SECTION   code_graphics
+		
+		PUBLIC    drawr
+		PUBLIC	  _drawr
+		
+		EXTERN drawr_callee
+		EXTERN ASMDISP_DRAWR_CALLEE
 
 
 .drawr
 ._drawr
-		push	ix
-		ld	ix,2
-		add	ix,sp
-		ld	e,(ix+2)	;py
-		ld	d,(ix+3)
-		ld	l,(ix+4)	;px
-		ld	h,(ix+5)
-
-                call    swapgfxbk
-                ld      ix,plotpixel
-                call    Line_r
-                jp      __graphics_end
-
+	pop	af	; ret addr
+	pop de	; y
+	pop hl	; x
+	push hl
+	push de
+	push	af	; ret addr
+		
+   jp drawr_callee + ASMDISP_DRAWR_CALLEE

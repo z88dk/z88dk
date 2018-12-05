@@ -1,18 +1,21 @@
-      SECTION code_clib
+
+      SECTION code_graphics
 
       PUBLIC  plotpixel
 
       EXTERN sety
       EXTERN setx
       EXTERN getpat
-      EXTERN last_pos
+	  
+      EXTERN __gfx_coords
 
 ; in: hl=(x,y)
 plotpixel:
       push af
       push bc
       push hl
-      ld (last_pos),hl
+	  
+      ld (__gfx_coords),hl
       call sety
       call getpat
       call setx

@@ -5,57 +5,45 @@
 ;
 ;       Stubs Written by D Morris - 30/9/98
 ;
-;       Wide resolution (WORD based parameters) version by Stefano Bodrato
-;
-;	$Id: w_draw.asm,v 1.7 2016-10-18 06:52:34 stefano Exp $
+;       Wide resolution (int type parameters) version by Stefano Bodrato
 ;
 
+;
+;	$Id: w_draw.asm $
+;
 
-        SECTION code_graphics
-                PUBLIC    draw
-                PUBLIC    _draw
-                EXTERN     swapgfxbk
-                EXTERN     swapgfxbk1
-                EXTERN	__graphics_end
+;
+; CALLER LINKAGE FOR FUNCTION POINTERS
+; ----- void  draw(int x, int y, int x2, int y2)
 
-                EXTERN     w_line_r
-                EXTERN     w_plotpixel
+SECTION code_graphics
+PUBLIC draw
+PUBLIC _draw
+EXTERN draw_callee
+EXTERN ASMDISP_DRAW_CALLEE
 
+;EXTERN    __gfx_color
 
 .draw
 ._draw
-		push	ix
-		ld	ix,4
-		add	ix,sp
-		ld	l,(ix+6)
-		ld	h,(ix+7)
-		ld	e,(ix+4)
-		ld	d,(ix+5)
+		pop af
+		;pop bc	; color
 		
+		pop de
+		pop	hl
+		exx			; w_plotpixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
+		pop hl
+		pop de
+		
+		push de
+		push hl
+		exx
 		push hl
 		push de
-		push ix
-
-		call    swapgfxbk
-		call	w_plotpixel
-		call    swapgfxbk1
-
-		pop ix
-		ld	l,(ix+0)
-		ld	h,(ix+1)
-		pop bc
-		or a
-		sbc hl,bc
-		ex de,hl
+		;exx
 		
-		ld	l,(ix+2)
-		ld	h,(ix+3)
-		pop bc
-		or a
-		sbc hl,bc
-
-		call    swapgfxbk
-		ld      ix,w_plotpixel
-		call    w_line_r
-		jp      __graphics_end
-
+		;push bc		
+		push af		; ret addr
+		
+   jp draw_callee + ASMDISP_DRAW_CALLEE
+ 
