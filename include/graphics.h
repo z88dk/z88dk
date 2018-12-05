@@ -91,6 +91,11 @@ extern void __LIB__ pen_down(void);
 /* Relative draw (keeping pen up or down) */
 extern void __LIB__ move(int px, int py) __smallc;
 
+/* Set absolute position of graphics cursor */
+extern void __LIB__ setpos(int x, int y) __smallc;
+extern void __LIB__ setpos_callee(int px, int py) __smallc __z88dk_callee;
+#define setpos(a,b)           setpos_callee(a,b)
+
 /* Draw up to a specified point */
 extern void __LIB__ drawto(int x2, int y2) __smallc;
 extern void __LIB__ drawto_callee(int x2, int y2) __smallc __z88dk_callee;
