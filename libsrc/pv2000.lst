@@ -11,10 +11,10 @@ stdio/ansi/msx/f_ansi_scrollup_nobios
 @stdio/stdio.lst
 @font/font_8x8/font_8x8.lst
 @input/input_keyboard.lst
+@gfxbase.lst
 graphics/dcircle
 graphics/msx/gen_clg
 graphics/clrarea
-graphics/lftscrol
 graphics/msx/pixladdr
 graphics/msx/plotpixl
 graphics/msx/respixl
@@ -26,7 +26,6 @@ graphics/getsprite
 graphics/msx/putsprite
 graphics/msx/bksave
 graphics/msx/bkrestore
-graphics/liner
 graphics/msx/swapgfxbk
 graphics/msx/stencil_render
 graphics/msx/surface/surface_circle
@@ -42,7 +41,6 @@ psg/sn76489/psg_envelope
 psg/sn76489/psg_init.asm
 psg/sn76489/set_psg.asm
 psg/sn76489/set_psg_callee.asm
-@gfxbase.lst
 msx/gen_filvrm
 msx/gen_ldirmv
 msx/gen_ldirvm
