@@ -177,6 +177,6 @@
          ret
 
 
-	SECTION rodata_club
+	SECTION rodata_clib
 .offsets_table
          defb	128,64,32,16,8,4,2,1
