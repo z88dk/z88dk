@@ -3,7 +3,6 @@ graphics/dcircle
 graphics/clg
 graphics/clrarea
 graphics/pc88/clsgraph
-graphics/lftscrol
 graphics/pc88/pcalc
 graphics/pc88/plotpixl
 graphics/pc88/respixl
@@ -13,7 +12,6 @@ graphics/fill
 graphics/dfill
 graphics/putsprite2
 graphics/getsprite
-graphics/liner
 graphics/stencil_render2
 graphics/bksave
 graphics/bkrestore
