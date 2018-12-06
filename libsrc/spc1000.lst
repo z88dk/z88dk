@@ -20,6 +20,7 @@ stdio/ansi/msx/f_ansi_cls_nobios
 @input/input_keyboard.lst
 arch/spc1000/tms9918
 games/spc1000/joystick
+@gfxbase.lst
 graphics/spc1000/cleargraphics
 graphics/spc1000/getmaxx
 graphics/spc1000/getmaxy
@@ -48,7 +49,6 @@ graphics/generic_console/div3
 graphics/putsprite3
 graphics/dcircle2
 graphics/clrarea
-graphics/lftscrol
 graphics/fill
 graphics/getsprite
 msx/gen_filvrm
@@ -75,7 +75,6 @@ msx/gen_vread
 msx/gen_vwrite
 msx/gen_vwrite_direct
 @msx/genmsx.lst
-@gfxbase.lst
 psg/spc1000/set_psg
 psg/spc1000/set_psg_callee
 psg/spc1000/get_psg
