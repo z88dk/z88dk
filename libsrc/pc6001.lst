@@ -21,6 +21,7 @@ stdio/ansi/pc6001/f_ansi_scrollup
 @stdio/stdio.lst
 @font/font_8x8/font_8x8.lst
 games/pc6001/joystick
+@gfxbase.lst
 graphics/pc6001/clsgraph
 graphics/pc6001/getmaxx
 graphics/pc6001/getmaxy
@@ -49,13 +50,10 @@ graphics/generic_console/div3
 graphics/dcircle
 graphics/clg
 graphics/clrarea
-graphics/lftscrol
 graphics/fill
 graphics/dfill
 graphics/getsprite
-graphics/liner
 graphics/stencil_render2
-@gfxbase.lst
 psg/pc6001/set_psg
 psg/pc6001/set_psg_callee
 psg/pc6001/get_psg
