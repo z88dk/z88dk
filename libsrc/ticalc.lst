@@ -15,7 +15,6 @@ stdio/ansi/ticalc/f_ansi_scrollup
 graphics/dcircle
 graphics/ticalc/clg
 graphics/clrarea
-graphics/lftscrol
 graphics/ticalc/pixladdr
 graphics/plotpixl
 graphics/respixl
@@ -23,7 +22,6 @@ graphics/xorpixl
 graphics/pointxy
 graphics/fill
 graphics/getsprite
-graphics/liner
 graphics/stencil_render
 graphics/ticalc/putsprite
 graphics/ticalc/bksave
