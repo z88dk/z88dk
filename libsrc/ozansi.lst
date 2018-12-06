@@ -12,7 +12,6 @@ stdio/ansi/oz/f_ansi_scrollup
 graphics/dcircle
 graphics/oz/clg
 graphics/clrarea
-graphics/lftscrol
 graphics/plotpixl
 graphics/respixl
 graphics/xorpixl
@@ -25,7 +24,6 @@ graphics/bksave
 graphics/bkrestore
 graphics/spectrum/rowtab
 graphics/oz/pixladdr
-graphics/liner
 graphics/oz/stencil_render
 graphics/oz/swapgfxbk
 games/joystick
