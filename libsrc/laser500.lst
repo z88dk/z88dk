@@ -11,6 +11,7 @@ stdio/laser500/CRT_FONT
 @stdio/stdio.lst
 @font/font_8x8/font_8x8.lst
 @input/input_keyboard.lst
+@gfxbasew.lst
 graphics/laser500/getmaxx
 graphics/laser500/getmaxy
 graphics/laser500/plot_MODE0
@@ -28,7 +29,6 @@ graphics/laser500/w_xorpixel
 graphics/laser500/xor_MODE0
 graphics/laser500/xor_MODE2
 graphics/w_dcircle_square.asm
-@gfxbasew.lst
 graphics/text/swapgfxbk
 games/laser500/bit_open
 games/laser500/bit_close
