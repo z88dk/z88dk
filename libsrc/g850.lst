@@ -22,7 +22,6 @@ graphics/uncircle
 graphics/g800/clsgraph_850
 graphics/g800/getmaxx
 graphics/g800/getmaxy_850
-graphics/g800/last_pos
 graphics/g800/locate
 graphics/g800/plotpixel
 graphics/g800/point
