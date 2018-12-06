@@ -5,6 +5,9 @@ graphics/w_bkrestore
 graphics/w_circle
 graphics/w_uncircle
 graphics/w_dcircle
+graphics/w_drawb
+graphics/w_undrawb
+graphics/w_xorborder
 graphics/w_undraw
 graphics/w_undraw_callee
 graphics/w_draw
@@ -29,6 +32,7 @@ graphics/lbitmask
 graphics/w_line
 graphics/w_liner
 graphics/lscroll
+graphics/lftscrol
 graphics/w_plot
 graphics/w_unplot
 graphics/w_xorplot
