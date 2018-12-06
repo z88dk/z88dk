@@ -25,7 +25,6 @@ graphics/mz/pointxy
 graphics/fill
 graphics/dfill2
 graphics/putsprite2
-graphics/liner
 graphics/stencil_render2
 graphics/swapgfxbk_foo
 @games/games.lst
