@@ -10,10 +10,10 @@ stdio/lynx/CRT_FONT
 @font/font_8x8/font_8x8.lst
 @input/input_keyboard.lst
 @stdio/stdio.lst
+@gfxbase.lst
 graphics/dcircle
 graphics/clg
 graphics/clrarea
-graphics/lftscrol
 graphics/lynx/textpixl
 graphics/generic_console/clsgraph
 graphics/generic_console/plotpixl
@@ -23,9 +23,7 @@ graphics/generic_console/pointxy
 graphics/generic_console/getmaxx
 graphics/generic_console/getmaxy
 graphics/putsprite3
-graphics/liner
 graphics/stencil_render2
 graphics/text/swapgfxbk
-@gfxbase.lst
 @video/mc6845/mc6845.lst
 @z80.lst
