@@ -1,12 +1,9 @@
-graphics/w_dcircle_square.asm
 @gfxbasew.lst
+graphics/w_dcircle_square.asm
 graphics/clg
 graphics/attache/clsgraph
 graphics/clrarea
 graphics/w_clga
-graphics/w_drawb
-graphics/w_undrawb
-graphics/w_xorborder
 graphics/w_putsprite2
 graphics/w_stencil_render2
 graphics/attache/plot_setup
@@ -14,7 +11,5 @@ graphics/attache/w_plotpixl
 graphics/attache/w_respixl
 graphics/attache/w_xorpixl
 graphics/attache/w_pointxy
-graphics/w_multipoint
-graphics/lftscrol
 graphics/swapgfxbk_foo
 graphics/draw_profile
