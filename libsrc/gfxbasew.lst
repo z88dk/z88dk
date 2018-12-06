@@ -47,6 +47,7 @@ graphics/w_stencil_add_pixel
 graphics/w_stencil_init
 graphics/w_stencil_render2
 graphics/dither_pattern
+graphics/draw_profile
 graphics/rbitmask
 graphics/rscroll
 graphics/w_setxy
