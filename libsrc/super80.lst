@@ -9,7 +9,6 @@ graphics/dcircle
 graphics/clg
 graphics/clrarea
 graphics/generic_console/clsgraph
-graphics/lftscrol
 graphics/super80/textpixl6
 graphics/generic_console/clsgraph
 graphics/generic_console/plotpixl6
@@ -19,7 +18,6 @@ graphics/generic_console/pointxy6
 graphics/generic_console/div3
 graphics/generic_console/swapgfxbk
 graphics/putsprite3
-graphics/liner
 graphics/stencil_render2
 graphics/text/swapgfxbk
 @input/input_keyboard.lst
