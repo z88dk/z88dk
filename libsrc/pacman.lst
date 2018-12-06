@@ -7,7 +7,6 @@ graphics/dcircle
 graphics/clg
 graphics/clrarea
 graphics/pacman/clsgraph
-graphics/lftscrol
 graphics/pacman/char_address
 graphics/pacman/textpixl
 graphics/pacman/plotpixl
@@ -17,7 +16,6 @@ graphics/pacman/pointxy
 graphics/fill
 graphics/dfill2
 graphics/putsprite2
-graphics/liner
 graphics/stencil_render2
 graphics/text/swapgfxbk
 games/pacman/joystick
