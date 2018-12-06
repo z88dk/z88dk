@@ -1,5 +1,5 @@
-graphics/w_dcircle_square.asm
 @gfxbasew.lst
+graphics/w_dcircle_square.asm
 graphics/w_drawb
 graphics/w_undrawb
 graphics/w_xorborder
