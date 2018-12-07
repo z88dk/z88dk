@@ -3,7 +3,7 @@
 ; original code by Patrick Davidson (TI 85)
 ; modified by Stefano Bodrato - nov 2010
 ;
-; TS2068 high resolution version
+; OSCA (v6z80p) high resolution version
 ;
 ;
 ; $Id: w_putsprite.asm $
