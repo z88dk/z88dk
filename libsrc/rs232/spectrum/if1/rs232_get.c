@@ -17,10 +17,10 @@
 #include <rs232.h>
 
 
-u8_t __FASTCALL__ rs232_get(i8_t *char)
-{	/* fastcall so implicit push */
+uint8_t rs232_get(uint8_t *char) __naked __z88dk_fastcall
+{
 #asm
-;        push	hl
+        push	hl
 ;	rst	8
 ;	defb	$1d  		; Calls the Hook Code here
 
@@ -32,7 +32,6 @@ u8_t __FASTCALL__ rs232_get(i8_t *char)
 	ld	(de),a
 	ld	hl,RS_ERR_OK
 	ret
-	;; pop	bc; fastcall so implicit push  
 	
 ;https://www.z88dk.org/wiki/doku.php?id=library:serial
 ;

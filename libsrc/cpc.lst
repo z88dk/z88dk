@@ -16,6 +16,7 @@ stdio/ansi/cpc/f_ansi_cls
 stdio/ansi/cpc/f_ansi_dline
 stdio/ansi/cpc/f_ansi_scrollup
 @stdio/stdio.lst
+@gfxbasew.lst
 graphics/w_drawb
 graphics/w_undrawb
 graphics/w_xorborder
@@ -32,7 +33,6 @@ graphics/cpc/w_putsprite
 graphics/w_stencil_render
 graphics/draw_profile
 graphics/w_pointxy
-@gfxbasew.lst
 time/cpc/clock
 games/cpc/joystick
 cpc/firmware

@@ -4,6 +4,7 @@
 ; modified by Stefano Bodrato - Jan 2001
 ;
 
+	SECTION	 smc_clib
 	PUBLIC    putsprite
    PUBLIC    _putsprite
 	EXTERN	cpygraph
@@ -12,15 +13,13 @@
 	INCLUDE	"graphics/grafix.inc"
 
 ;
-;	$Id: putsprite.asm,v 1.7 2017-01-02 22:57:59 aralbrec Exp $
+;	$Id: putsprite.asm $
 ;
 
 ; __gfx_coords: d,e (vert-horz)
 ; sprite: (ix)
 
 
-.offsets_table
-         defb	128,64,32,16,8,4,2,1
 
 .putsprite
 ._putsprite
@@ -146,3 +145,7 @@
          ;ret
          jp	cpygraph
 
+
+	SECTION rodata_clib
+.offsets_table
+         defb	128,64,32,16,8,4,2,1

@@ -207,8 +207,6 @@ init_loop:
 	inc	hl
 	inc	c
 	djnz	init_loop
-	ld	l,$20
-	call	asm_set_cursor_state
 
 	SECTION	rodata_clib
 mc6845_init:
@@ -223,7 +221,7 @@ mc6845_init:
 	defb	$00	;Interlace and skew
 	defb	$07	;Maximum raster address
 	defb	$00	;Cursor start raster
-	defb	$07	;Cursor end raster
+	defb	$00	;Cursor end raster
 	defb	$00	;Display start address (high)
 	defb	$00	;Display start address (low)
 	defb	$00	;Cursor address (high)

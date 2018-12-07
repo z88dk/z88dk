@@ -18,7 +18,6 @@ stdio/ansi/msx/f_ansi_scrollup_nobios
 graphics/dcircle
 graphics/msx/gen_clg
 graphics/clrarea
-graphics/lftscrol
 graphics/msx/pixladdr
 graphics/msx/plotpixl
 graphics/msx/respixl
@@ -28,7 +27,6 @@ graphics/getsprite
 graphics/msx/putsprite
 graphics/msx/bksave
 graphics/msx/bkrestore
-graphics/liner
 graphics/msx/swapgfxbk
 graphics/msx/stencil_render
 graphics/msx/surface/surface_circle

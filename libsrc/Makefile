@@ -207,7 +207,8 @@ z88_clib.lib:
 	$(call buildgeneric,z88)
 	$(MAKE) -C fcntl/z88
 	$(MAKE) -C games TARGET=z88
-	$(MAKE) -C z88 
+	$(MAKE) -C rs232/z88 
+	$(MAKE) -C arch/z88 
 	TARGET=z88 TYPE=z80 $(LIBLINKER) -I$(Z88DK_LIB)/target/z88/def -DSTANDARDESCAPECHARS -DFORz88 -x$(OUTPUT_DIRECTORY)/z88_clib @$(LISTFILE_DIRECTORY)/z88.lst
 
 # ZX Spectrum fcntl - dom/stefano
@@ -338,6 +339,7 @@ pc88_clib.lib:
 	@echo '--- Building PC8801 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
+	$(MAKE) -C psg
 	$(call buildgeneric,pc88)
 	$(MAKE) -C games TARGET=pc88
 	TARGET=pc88 TYPE=z80 $(LIBLINKER) -DFORpc88 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pc88_clib @$(LISTFILE_DIRECTORY)/pc88.lst
@@ -346,6 +348,11 @@ pc88_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(LIBLINKER) -DFORpc88 -x$(OUTPUT_DIRECTORY)/gfxpc88 @$(LISTFILE_DIRECTORY)/gfxpc88.lst
+	@echo ''
+	@echo '--- Building PC8801 640x200 Mono Graphics Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(LIBLINKER) -DFORpc88hr200 -x$(OUTPUT_DIRECTORY)/gfxpc88hr200 @$(LISTFILE_DIRECTORY)/gfxpc88hr200.lst
 
 # Native for sprinter - dom
 pps_clib.lib:
@@ -757,6 +764,7 @@ svi_clib.lib:
 	$(MAKE) -C games TARGET=svi
 	$(MAKE) -C msx TARGET=svi
 	$(MAKE) -C psg
+	$(MAKE) -C rs232/svi
 	TARGET=svi TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsvi -x$(OUTPUT_DIRECTORY)/svi_clib @$(LISTFILE_DIRECTORY)/svi.lst
 
 # MSX library - Stefano
@@ -988,6 +996,7 @@ spc1000_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) msxdeps
 	$(call buildgeneric,spc1000)
+	$(MAKE) -C msx TARGET=test
 	$(MAKE) -C msx TARGET=spc1000
 	TARGET=spc1000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORspc1000 -x$(OUTPUT_DIRECTORY)/spc1000_clib @$(LISTFILE_DIRECTORY)/spc1000.lst
 
@@ -1088,7 +1097,7 @@ c128ansi_clib.lib:
 	@echo '--- Building Commodore 128 ANSI Library ---'
 	@echo ''
 	$(call buildgeneric,c128)
-	$(MAKE) -C c128
+	$(MAKE) -C arch/c128
 	$(MAKE) -C games TARGET=c128
 	TARGET=c128 TYPE=z80 $(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/c128cpm @$(LISTFILE_DIRECTORY)/c128cpm.lst
 	TARGET=c128 TYPE=z80 $(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/c128ansi_clib @$(LISTFILE_DIRECTORY)/c128ansi.lst
@@ -1135,6 +1144,7 @@ tiki100.lib:
 	@echo ''
 	@echo '--- Building TIKI-100 Library ---'
 	@echo ''
+	$(call buildgeneric,cpm)
 	$(MAKE) gfxdeps
 	$(MAKE) -C psg
 	TARGET=tiki100 TYPE=z80 $(LIBLINKER) -DFORtiki100 -x$(OUTPUT_DIRECTORY)/tiki100 @$(LISTFILE_DIRECTORY)/tiki100.lst
@@ -1257,7 +1267,7 @@ x1_clib.lib:
 	@echo '--- Building Sharp X1 Library ---'
 	@echo ''
 	$(call buildgeneric,x1)
-	$(MAKE) -C x1 
+	$(MAKE) -C arch/x1 
 	TARGET=x1 TYPE=z80 $(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1_clib @$(LISTFILE_DIRECTORY)/x1.lst
 
 # Philips VG5000 lib - Joaopa, Stefano
@@ -1338,7 +1348,6 @@ clean: classic-clean new-clean
 classic-clean:
 	$(MAKE) -C ace clean
 	$(MAKE) -C assert clean
-	$(MAKE) -C c128 clean
 	$(MAKE) -C cpm clean
 	$(MAKE) -C ctype clean
 	$(MAKE) -C fcntl clean
@@ -1355,7 +1364,6 @@ classic-clean:
 	$(MAKE) -C regex clean
 	$(MAKE) -C time clean
 	$(MAKE) -C z80_crt0s clean
-	$(MAKE) -C z88 clean
 	$(MAKE) -C zxvgs clean
 	$(MAKE) -C adt clean
 	$(MAKE) -C adt-newlib clean
@@ -1385,9 +1393,7 @@ classic-clean:
 	$(MAKE) -C sprites/software/sp1 clean
 	$(MAKE) -C sdcard clean
 	$(MAKE) -C games clean
-	$(MAKE) -C x1 clean
 	$(MAKE) -C math clean
-	$(MAKE) -C nc100 clean
 	$(MAKE) -C compress/zx7 clean
 	$(MAKE) -C font clean
 	$(MAKE) -C arch clean

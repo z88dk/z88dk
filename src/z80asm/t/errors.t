@@ -300,14 +300,17 @@ t_z80asm_capture("-b -i".$lib." ".asm_file(), "",
 # error_no_src_file
 unlink_testfiles();
 t_z80asm_capture("-b", "",
-		"Error: source filename missing\n", 1);
+		"Error: source file missing\n", 1);
 
 #------------------------------------------------------------------------------
 # error_illegal_option
 unlink_testfiles();
 write_file(asm_file(), "");
 t_z80asm_capture("-Zillegaloption ".asm_file(), "",
-		"Error: illegal option '-Zillegaloption'\n",
+		"Error: illegal option: -Zillegaloption\n",
+		1);
+t_z80asm_capture("+Zillegaloption ".asm_file(), "",
+		"Error: illegal option: +Zillegaloption\n",
 		1);
 
 #------------------------------------------------------------------------------
@@ -374,7 +377,7 @@ t_z80asm_error("defs 65536, 0xAA \n defb 0xAA \n",
 unlink_testfiles();
 write_file(asm_file(), "nop");
 t_z80asm_capture(asm_file()." -IllegalFilename", "",
-		"Error: illegal source filename '-IllegalFilename'\n", 1);
+		"Error: cannot read file '-IllegalFilename'\n", 1);
 
 #------------------------------------------------------------------------------
 # error_org_redefined - tested in directives.t

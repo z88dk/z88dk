@@ -10,9 +10,7 @@
 # Test https://github.com/z88dk/z88dk/issues/655
 # z80asm: object file incorrect with correct lis input
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 require './t/testlib.pl';
 

@@ -7,9 +7,7 @@
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk
 #------------------------------------------------------------------------------
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 use Cwd qw( cwd abs_path );
 use File::Basename;

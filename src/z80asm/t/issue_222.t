@@ -10,9 +10,7 @@
 # Test https://github.com/z88dk/z88dk/issues/222
 # z80asm: Can I use the assembler to make a .tap image, like pasmo does?
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 require './t/testlib.pl';
 
@@ -129,7 +127,7 @@ check_bin_file("test.tap", $rem_tap);
 # error for -r below 23760
 unlink_testfiles();
 z80asm($asm, "+zx -r23759", 1, "", <<'END');
-	Error: invalid ORG value '23759'
+	Error: invalid origin: 23759
 END
 check_bin_file("test.bin", $bin);
 ok ! -f "test.tap", "no test.tap";

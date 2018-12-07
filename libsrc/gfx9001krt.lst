@@ -1,5 +1,5 @@
-graphics/w_dcircle_square.asm
 @gfxbasew.lst
+graphics/w_dcircle_square.asm
 graphics/z9001/clg
 graphics/z9001/clga2
 graphics/z9001/fill

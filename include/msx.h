@@ -4,7 +4,7 @@
  * Most of the functions are based on GFX,
  * a small graphics library by Rafael de Oliveira Jannone - (C) 2004
  *
- * $Id: msx.h,v 1.24 2016-06-16 20:54:11 dom Exp $
+ * $Id: msx.h $
  */
 
 #ifndef __MSX_H__
@@ -299,7 +299,7 @@ typedef struct {
 extern int  __LIB__ msx_get_stick(unsigned int id);
 
 // Get state of joystick button (trigger) number \a id, true = pressed
-extern int  __LIB__ msx_get_trigger(unsigned int id);
+extern bool_t  __LIB__ msx_get_trigger(unsigned int id);
 
 extern unsigned int st_dir[];
 
@@ -327,11 +327,11 @@ extern int __LIB__ msx_type();
 extern int __LIB__ msx_vram();
 
 // Check if the line printer is ready (1=ready, 0 if not)
-extern int __LIB__ msx_lpt();
+extern bool_t __LIB__ msx_lpt();
 #define lpt_ready() msx_lpt()
 
 // Check if Ctrl-STOP is being pressed (1=if pressed, 0 if not)
-extern int __LIB__ msx_break();
+extern bool_t __LIB__ msx_break();
 
 // Clear the keyboard buffer
 extern void __LIB__ msx_clearkey();

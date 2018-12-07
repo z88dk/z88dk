@@ -37,11 +37,35 @@ depending on the target platform you're running tail on.
 
 
 #include <bdscio.h>
+#include <stdio.h>
 
 #define  LINES  1000     /* max lines to display */
 #define  OS1LINES  10    /* default lines to display */
 #define  SIZECP  2       /* size of pointer to char in bytes */
 
+
+/* saveline -- store lines and save pointers to them */
+void saveline(line,linbuf,nsave,ntail)
+char *line, *linbuf[];
+int  *nsave, ntail;
+{
+     char *p;
+
+     if(*nsave < ntail) {
+          if((p=alloc(strlen(line)+1)) == NULL)
+               error("tail: out of room in saveline #1");
+          strcpy(p,line);
+          linbuf[(*nsave)++]=p;
+          }
+     else
+          {free(linbuf[0]);
+          movmem(&linbuf[1],&linbuf[0],(ntail-1)*SIZECP);
+          if((p=alloc(strlen(line)+1)) == NULL)
+               error("tail: out of room in saveline #2");
+          strcpy(p,line);
+          linbuf[ntail-1]=p;
+          }
+}
 
 int main(int argc, char *argv[])
 {
@@ -71,27 +95,4 @@ int main(int argc, char *argv[])
 }
 
 
-
-/* saveline -- store lines and save pointers to them */
-saveline(line,linbuf,nsave,ntail)
-char *line, *linbuf[];
-int  *nsave, ntail;
-{
-     char *p;
-
-     if(*nsave < ntail) {
-          if((p=alloc(strlen(line)+1)) == NULL)
-               error("tail: out of room in saveline #1");
-          strcpy(p,line);
-          linbuf[(*nsave)++]=p;
-          }
-     else
-          {free(linbuf[0]);
-          movmem(&linbuf[1],&linbuf[0],(ntail-1)*SIZECP);
-          if((p=alloc(strlen(line)+1)) == NULL)
-               error("tail: out of room in saveline #2");
-          strcpy(p,line);
-          linbuf[ntail-1]=p;
-          }
-}
 

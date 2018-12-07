@@ -19,14 +19,12 @@ graphics/clg
 graphics/clrarea
 graphics/zx81/clsgraph
 graphics/zx80/zx_hardcopy
-graphics/lftscrol
 graphics/zx80/textpixl
 graphics/zx80/plotpixl
 graphics/zx80/respixl
 graphics/zx80/xorpixl
 graphics/zx80/pointxy
 graphics/putsprite3
-graphics/liner
 graphics/stencil_render2
 graphics/text/swapgfxbk
 games/zx81snd/bit_open

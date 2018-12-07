@@ -8,9 +8,7 @@
 #
 # Test source lists (@files)
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 use File::Path 'make_path';
 require './t/testlib.pl';

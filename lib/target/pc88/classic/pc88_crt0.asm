@@ -31,8 +31,8 @@
 
         PUBLIC    cleanup
         PUBLIC    l_dcal
-        ;PUBLIC    pc88bios
-
+		
+        PUBLIC    pc88bios
 
 ;--------
 ; Some scope definitions
@@ -69,35 +69,36 @@ ENDIF
 ;----------------------
 start:
 
+IF (!DEFINED_startup || (startup=1))
 		ld	a,$FF				; back to main ROM
 		out ($71),a				; bank switching
-
-IF (startup=2)
-IF !DEFINED_noprotectmsdos
-	; This protection takes little less than 50 bytes
-	defb	$eb,$04		;MS DOS protection... JMPS to MS-DOS message if Intel
-	ex	de,hl
-	jp	begin		;First decent instruction for Z80, it survived up to here !
-	defb	$b4,$09		;DOS protection... MOV AH,9 (Err msg for MS-DOS)
-	defb	$ba
-	defw	dosmessage	;DOS protection... MOV DX,OFFSET dosmessage
-	defb	$cd,$21		;DOS protection... INT 21h.
-	defb	$cd,$20		;DOS protection... INT 20h.
-
-dosmessage:
-	defm	"This program is for NEC PC8801."
-	defb	13,10,'$'
-
-begin:
-ENDIF
+		
+		
+		ld	hl,($f302)
+		ld	(timer_retaddr+1),hl
+		
+		ld	hl,pc88_timer
+		ld ($f302),hl			; JP location for timer interrupt
+		
 ENDIF
 
         ld      (start1+1),sp
+		
+		; Last minute hack to keep the stack in a safe place and permit the hirez graphics to page
+		; the GVRAM banks in and out
+		ld	sp,$BFFF
+		
+	; Increase to cover ROM banking (useless at the moment, we're wasting 18 bytes!!)
+	defc	__clib_exit_stack_size_t  = __clib_exit_stack_size + 18
+	UNDEFINE __clib_exit_stack_size
+	defc	__clib_exit_stack_size = __clib_exit_stack_size_t
+	
 	INCLUDE	"crt/classic/crt_init_sp.asm"
 	INCLUDE	"crt/classic/crt_init_atexit.asm"
 	call	crt0_init_bss
-        ld      (exitsp),sp
-
+	
+        ld      (exitsp),sp	
+		
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
 ; the compiled program and the stack pointer
@@ -105,41 +106,13 @@ ENDIF
 		INCLUDE "crt/classic/crt_init_amalloc.asm"
 	ENDIF
 
+	ld	a,(defltdsk)
+	ld	($EC85),a
+	
 IF (startup=2)
-;	;ld	c,25		;Save the default disc
-;	;call	5
-;	ld	a,(DEFAULTDRV)
-;	ld	(defltdsk),a
 ;
-;	ld	hl,$80
-;        ld      a,(hl)
-;        ld      b,0
-;        and     a
-;        jr      z,argv_done
-;        ld      c,a
-;        add     hl,bc   ;now points to the end of the command line
-;	INCLUDE	"crt/classic/crt_command_line.asm"
-;
-;        push    hl      ;argv
-;        push    bc      ;argc
-;        call    _main		;Call user code
-;	pop	bc	;kill argv;
-;	pop	bc	;kill argc
-;
-;	ld	a,(defltdsk)	;Restore default disc
-;	ld	(DEFAULTDRV),a
-;	;ld	e,a
-;	;ld	c,14
-;	;call	5
-ELSE
 
-;       LD HL,$E5FE
-;       LD SP,HL
-;       LD BC,$0253
-;       LD HL,$00BE
-;       LD DE,$E600
-;;       LD ($EACC),HL			; STREND (aka STRTOP) - string area top address
-;       LDIR
+ELSE
 
 ;** If NOT IDOS mode, just get rid of BASIC screen behaviour **
 	;call ERAFNK	; Hide function key strings
@@ -160,6 +133,16 @@ ENDIF
 
 start1:
         ld      sp,0
+		
+		ld		a,$FF		; restore Main ROM
+		out     ($71),a
+		
+		ld      hl,(timer_retaddr+1)	; restore interrupt pointers
+		ld      ($f302),hl
+
+		ld	a,($EC85)
+		ld	(defltdsk),a
+
         ret
 
 l_dcal:
@@ -167,17 +150,43 @@ l_dcal:
 
 
 
+; Timer interrupt handler extension, usual jiffy driven interrupt (1/60 sec.)
+
+pc88_timer:
+		push hl
+		push af
+		
+		ld		a,1			; set interrupt levels to disable also the "VRTC interrupt"
+		out     ($E4),a
+		
+		ld	hl,(FRAMES)
+		inc	hl
+		ld	(FRAMES),hl
+		ld	a,h
+		or	l
+		jr	nz,skip_msw
+		ld	hl,(FRAMES+2)
+		inc	hl
+		ld	(FRAMES+2),hl
+skip_msw:
+
+		pop	af
+		pop	hl
+
+timer_retaddr:
+		jp	0
 
 
+; ROM interposer. This could be, sooner or later, moved to a convenient position in RAM
+; (e.g.  just before $C000) to be able to bounce between different RAM/ROM pages
+pc88bios:
+	push	af
+	ld		a,$FF		; MAIN ROM
+	out     ($71),a
+	pop		af
+	jp	(ix)
+	
 
-
-; Safe BIOS call
-;pc88bios:
-	;call	CALSLT
-	;ei			; make sure interrupts are enabled
-	;ret
-
-end:	defb	0
 
 	INCLUDE "crt/classic/crt_runtime_selection.asm"
 	INCLUDE "crt/classic/crt_section.asm"
@@ -189,11 +198,24 @@ end:	defb	0
 
 	SECTION		bss_crt
 
-; Keeping the BREAK status
+
+	PUBLIC	FRAMES
 	PUBLIC	brksave
 	PUBLIC	defltdsk
-brksave:	defb	1
+
+FRAMES:
+		defw	0
+		defw	0
+
+brksave:	defb	1		; Keeping the BREAK enable flag, used by pc88_break, etc..
+
+
+
+; This last part at the moment is useless, but doesn't harm
+
 defltdsk:       defb    0	; Default disc
+
+
 IF (startup=2)
 IF !DEFINED_nofileio
 	PUBLIC	__fcb

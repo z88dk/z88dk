@@ -3,13 +3,13 @@
 ; original code by Patrick Davidson (TI 85)
 ; modified by Stefano Bodrato - Jan 2001
 ;
-; ZX Spectrum version
-; new version using Alvin's offset tricks,
-; no need anymore of the row table, saving a lot of memory.
+; Z9001 version
 ;
 ;
-; $Id: putsprite.asm,v 1.2 2017-01-02 22:57:59 aralbrec Exp $
+; $Id: putsprite.asm $
 ;
+
+	SECTION   smc_clib
 
 	PUBLIC    putsprite
    PUBLIC    _putsprite
@@ -22,8 +22,6 @@
 ; sprite: (ix)
 
 
-.offsets_table
-         defb	128,64,32,16,8,4,2,1
 
 .putsprite
 ._putsprite
@@ -177,3 +175,8 @@
          ei
          ret
 
+
+	SECTION	rodata_clib
+	
+.offsets_table
+         defb	128,64,32,16,8,4,2,1

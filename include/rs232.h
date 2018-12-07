@@ -13,7 +13,7 @@
 #define __RS232_H__
 
 #include <sys/compiler.h>
-#include <sys/types.h>
+#include <stdint.h>
 
 /* Baudrate settings */
 #define RS_BAUD_50                      0x00
@@ -77,23 +77,23 @@
 
 
 /* Set up the parameters for the serial interface use | of parameters above */
-extern u8_t __LIB__ rs232_params(u8_t params,u8_t parity);
+extern uint8_t __LIB__ rs232_params(uint8_t params,uint8_t parity) __smallc;
 
 /* Initialise the serial interface */
-extern u8_t __LIB__ rs232_init();
+extern uint8_t __LIB__ rs232_init(void);
 
 /* Close the interface */
-extern u8_t __LIB__ rs232_close();
+extern uint8_t __LIB__ rs232_close(void);
 
 
 /* Write a byte to the serial interface */
-extern u8_t  __LIB__ rs232_put(i8_t);
+extern uint8_t  __LIB__ rs232_put(uint8_t) __z88dk_fastcall;
 
 
 /* Read a byte from the serial, returns RS_ERR_NO_DATA if an error, places
    data in the pointer supplied
 */
-extern u8_t  __LIB__ rs232_get(i8_t *);
+extern uint8_t  __LIB__ rs232_get(uint8_t *) __z88dk_fastcall;
 
 
 

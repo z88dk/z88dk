@@ -2,11 +2,11 @@
 
 SECTION code_esxdos
 
-PUBLIC _esx_ide_browser
+PUBLIC esx_ide_browser
 
 EXTERN asm_esx_ide_browser
 
-_esx_ide_browser:
+esx_ide_browser:
 
    pop af
    pop de

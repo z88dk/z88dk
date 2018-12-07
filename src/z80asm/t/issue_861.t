@@ -9,9 +9,7 @@
 # Test https://github.com/z88dk/z88dk/issues/861
 # allow "jr $+offset" to parse code for other assemblers
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 require './t/testlib.pl';
 

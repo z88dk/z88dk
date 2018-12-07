@@ -8,9 +8,11 @@
 ; no need anymore of the row table, saving a lot of memory.
 ;
 ;
-; $Id: putsprite.asm,v 1.2 2017-01-02 22:57:59 aralbrec Exp $
+; $Id: putsprite.asm $
 ;
 
+	SECTION   smc_clib
+	
 	PUBLIC    putsprite
    PUBLIC    _putsprite
 	EXTERN	pixeladdress
@@ -25,9 +27,6 @@
 ; __gfx_coords: d,e (vert-horz)
 ; sprite: (ix)
 
-
-.offsets_table
-         defb	128,64,32,16,8,4,2,1
 
 .putsprite
 ._putsprite
@@ -203,3 +202,7 @@
          ;ei
          ret
 
+
+	SECTION rodata_club
+.offsets_table
+         defb	128,64,32,16,8,4,2,1

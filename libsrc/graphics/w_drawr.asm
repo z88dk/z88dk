@@ -5,33 +5,31 @@
 ;
 ;       Stubs Written by D Morris - 30/9/98
 ;
-;       Wide resolution (WORD based parameters) version by Stefano Bodrato
+;       Wide resolution (int type parameters) version by Stefano Bodrato
 ;
-;	$Id: w_drawr.asm,v 1.4 2016-04-13 21:09:09 dom Exp $
+;	$Id: w_drawr.asm $
 ;
 
 
-        SECTION code_graphics
-                PUBLIC    drawr
-                PUBLIC    _drawr
-                EXTERN     swapgfxbk
-                EXTERN	__graphics_end
+; CALLER LINKAGE FOR FUNCTION POINTERS
 
-                EXTERN     w_line_r
-                EXTERN     w_plotpixel
-
+SECTION code_graphics
+PUBLIC drawr
+PUBLIC _drawr
+EXTERN drawr_callee
+EXTERN ASMDISP_DRAWR_CALLEE
 
 .drawr
 ._drawr
-		push	ix
-		ld	ix,2
-		add	ix,sp
-		ld	e,(ix+2)
-		ld	d,(ix+3)
-		ld	l,(ix+4)
-		ld	h,(ix+5)
-                call    swapgfxbk
-                ld      ix,w_plotpixel
-                call    w_line_r
-                jp      __graphics_end
 
+		pop	af
+		;pop bc
+		pop	de
+		pop	hl
+		push	hl
+		push	de
+		;push	bc
+		push	af
+
+
+   jp drawr_callee + ASMDISP_DRAWR_CALLEE

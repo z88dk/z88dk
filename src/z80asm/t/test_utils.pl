@@ -22,10 +22,10 @@ my $STOP_ON_ERR = grep {/-stop/} @ARGV;
 my $KEEP_FILES	= grep {/-keep/} @ARGV; 
 my $test	 = "test";
 
-sub z80asm	 { $ENV{Z80ASM} || "./z80asm" }
+sub z80asm	 { $ENV{Z80ASM_EXE} || "./z80asm" }
 
 my @TEST_EXT = (qw( asm lis inc bin map o lib sym def err 
-					exe c lst prj i reloc tap P ));
+					exe c cpp lst prj i reloc tap P ));
 my @MAIN_TEST_FILES;
 my @TEST_FILES;
 my @IDS = ("", 0 .. 20);
@@ -486,14 +486,14 @@ sub t_compile_module {
 	my($init_code, $main_code, $compile_args) = @_;
 
 	# modules to include always
-	$compile_args .= " -DMEMALLOC_DEBUG lib/alloc.c";
+	$compile_args .= " lib/alloc.o ";
 	
 	# wait for previous run to finish
 	while (-f 'test.exe' && ! unlink('test.exe')) {
 		sleep(1);
 	}
 	
-	my($CFLAGS, $LDFLAGS) = get_gcc_options();
+	my($CFLAGS, $CXXFLAGS, $LDFLAGS) = get_gcc_options();
 	
 	# get list of object files
 	my %modules;
@@ -681,10 +681,6 @@ sub get_copyright {
 sub get_gcc_options {
 	our %FLAGS;
 	
-	# hack
-#	$ENV{LOCAL_LIB} = "lib";
-#	$ENV{OPT} ||= "";
-	
 	if ( ! %FLAGS ) {
 		my %vars;
 		open(my $pipe, "make -p|") or die;
@@ -696,25 +692,23 @@ sub get_gcc_options {
 		}
 		close($pipe) or die;
 		
-		$FLAGS{CFLAGS}   ||= '';
-		$FLAGS{CPPFLAGS} ||= '';
-		$FLAGS{LDFLAGS}  ||= '';
-
 		while (my($flag, $text) = each %vars) {
-			if ($flag =~ /^\w*(CFLAGS|CPPFLAGS|LDFLAGS)$/) {
-				$flag = $1;
+			if ($flag =~ /(CFLAGS|CXXFLAGS|LDFLAGS)$/) {
+				my $redo;
+				do {
+					$redo = 0;
+					$redo += ($text =~ s/\$\((\w+)\)/ $vars{$1} || "" /ge);
+					$redo += ($text =~ s/\$\(shell (.*?)\)/ `$1` /ge);
+				} while ($redo);
 				
-				$text =~ s/\$\((\w+)\)/ $vars{$1} || "" /ge;
-				
-				$text =~ s/\$\(shell (.*?)\)/ `$1` /ge;
 				$text =~ s/\s+/ /g;
 			
-				$FLAGS{$flag} = join(" ", $FLAGS{$flag}, $text);
+				$FLAGS{$flag} = join(" ", ($FLAGS{$flag}//''), $text);
 			}
 		}
 	}
 	
-	return @FLAGS{qw( CFLAGS LDFLAGS )};
+	return @FLAGS{qw( LOCAL_CFLAGS LOCAL_CXXFLAGS LDFLAGS )};
 };
 
 1;

@@ -10,9 +10,7 @@
 # Test https://github.com/z88dk/z88dk/issues/54
 # z80asm: overflow errors in calculated constants at linking stage
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 require './t/testlib.pl';
 

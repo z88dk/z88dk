@@ -10,9 +10,7 @@
 # Test https://github.com/z88dk/z88dk/issues/441
 # z80asm: add command line option for specifying the output directory
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 use File::Find 'finddepth';
 require './t/testlib.pl';

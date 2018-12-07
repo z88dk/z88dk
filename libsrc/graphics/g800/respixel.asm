@@ -1,3 +1,6 @@
+
+      SECTION code_graphics
+
       SECTION code_clib
 
       PUBLIC  respixel
@@ -5,14 +8,14 @@
       EXTERN sety
       EXTERN setx
       EXTERN getpat
-      EXTERN last_pos
+      EXTERN __gfx_coords
 
 ; in: hl=(x,y)
 respixel:
       push af
       push bc
       push hl
-      ld (last_pos),hl
+      ld (__gfx_coords),hl
       call sety
       call getpat
       ld a,b

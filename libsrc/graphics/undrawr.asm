@@ -6,37 +6,29 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: undrawr.asm,v 1.7 2016-04-13 21:09:09 dom Exp $
+;	$Id: undrawr.asm $
 ;
 
-
-;Usage: undrawr(struct *pixels)
-
-
-
-        SECTION code_graphics
-                PUBLIC    undrawr
-                PUBLIC    _undrawr
-                EXTERN     swapgfxbk
-                EXTERN	__graphics_end
+; CALLER LINKAGE FOR FUNCTION POINTERS
+; ----- void  undrawr(int x2, int y2)
 
 
-                EXTERN     Line_r
-                EXTERN     respixel
-
+		SECTION   code_graphics
+		
+		PUBLIC    undrawr
+		PUBLIC	  _undrawr
+		
+		EXTERN undrawr_callee
+		EXTERN ASMDISP_UNDRAWR_CALLEE
 
 
 .undrawr
 ._undrawr
-		push	ix
-		ld	ix,2
-		add	ix,sp
-		ld	e,(ix+2)
-		ld	d,(ix+3)
-		ld	l,(ix+4)
-		ld	h,(ix+5)
-                ld      ix,respixel
-                call    swapgfxbk
-                call    Line_r
-                jp      __graphics_end
-
+	pop	af	; ret addr
+	pop de	; y
+	pop hl	; x
+	push hl
+	push de
+	push	af	; ret addr
+		
+   jp undrawr_callee + ASMDISP_UNDRAWR_CALLEE

@@ -48,12 +48,12 @@ struct acetapehdr {             // standard tape header
    char          name2[10];
 };
 
-extern int  __LIB__            tape_save(char *name, size_t loadstart,void *start, size_t len);
-extern int  __LIB__            tape_save_block(void *addr, size_t len, unsigned char type);
-extern int  __LIB__            tape_load_block(void *addr, size_t len, unsigned char type);
+extern int  __LIB__            tape_save(char *name, size_t loadstart,void *start, size_t len) __smallc;
+extern int  __LIB__            tape_save_block(void *addr, size_t len, unsigned char type) __smallc;
+extern int  __LIB__            tape_load_block(void *addr, size_t len, unsigned char type) __smallc;
 
-extern int  __LIB__  tape_save_block_callee(void *addr, size_t len, unsigned char type);
-extern int  __LIB__  tape_load_block_callee(void *addr, size_t len, unsigned char type);
+extern int  __LIB__  tape_save_block_callee(void *addr, size_t len, unsigned char type)  __smallc __z88dk_callee;
+extern int  __LIB__  tape_load_block_callee(void *addr, size_t len, unsigned char type) __smallc __z88dk_callee;
 
 #define tape_save_block(a,b,c) tape_save_block_callee(a,b,c)
 #define tape_load_block(a,b,c) tape_load_block_callee(a,b,c)

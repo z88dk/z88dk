@@ -9,12 +9,8 @@
 # Test https://github.com/z88dk/z88dk/issues/341
 # z80asm: Produce a debugger-friendly filename/bank/memory address file
 
-use strict;
-use warnings;
-use v5.10;
-
+use Modern::Perl;
 use Test::More;
-
 require './t/testlib.pl';
 
 unlink_testfiles();

@@ -9,9 +9,7 @@
 # Test https://github.com/z88dk/z88dk/issues/889
 # z80asm: premature range check during calculation of defb
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 use Path::Tiny;
 require './t/testlib.pl';

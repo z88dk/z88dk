@@ -3,7 +3,7 @@
  *
  *      Stefano Bodrato - 6/9/2004
  *
- *	$Id: zxinterface1.h,v 1.11 2016-07-01 22:09:25 dom Exp $
+ *	$Id: zxinterface1.h $
  */
 
 
@@ -129,10 +129,10 @@ extern int __LIB__ if1_find_sector (int drive);
 extern int __LIB__ if1_find_sector_map (char *mdvmap);
 
 // Returns true if the current program has been loaded from microdrive
-extern int __LIB__ if1_from_mdv();
+extern bool_t __LIB__ if1_from_mdv();
 
 // Returns true if the system variables are already present
-extern int __LIB__ if1_installed();
+extern bool_t __LIB__ if1_installed();
 
 // Returns the ROM version of the Interface 1
 extern int __LIB__ if1_edition();

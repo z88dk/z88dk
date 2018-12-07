@@ -5,35 +5,29 @@
 ;
 ;       Stubs Written by D Morris - 30/9/98
 ;
+;       Wide resolution (int type parameters) version by Stefano Bodrato
 ;
-;	$Id: w_xordrawto.asm,v 1.1 2016-11-10 07:34:55 stefano Exp $
+;	$Id: w_xordrawto.asm $
 ;
 
 
-;Usage: xordrawto(struct *pixels)
+; CALLER LINKAGE FOR FUNCTION POINTERS
 
-
-        SECTION code_graphics
-                PUBLIC    xordrawto
-                PUBLIC    _xordrawto
-                EXTERN     swapgfxbk
-                EXTERN	__graphics_end
-
-                EXTERN     w_line
-                EXTERN     w_xorpixel
-
+SECTION code_graphics
+PUBLIC xordrawto
+PUBLIC _xordrawto
+EXTERN xordrawto_callee
+EXTERN ASMDISP_XORDRAWTO_CALLEE
 
 .xordrawto
 ._xordrawto
-		push	ix
-		ld	ix,4
-		add	ix,sp
-		ld	l,(ix+2)
-		ld	h,(ix+3)
-		ld	e,(ix+0)
-		ld	d,(ix+1)
-                call    swapgfxbk
-                ld      ix,w_xorpixel
-                call    w_line
-                jp      __graphics_end
 
+		pop	af
+		pop	de
+		pop	hl
+		push	hl
+		push	de
+		push	af
+
+
+   jp xordrawto_callee + ASMDISP_XORDRAWTO_CALLEE

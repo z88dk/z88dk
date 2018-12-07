@@ -150,7 +150,7 @@ prove_perl: $(TARGET)
 	perl -S prove t/*.t
 
 testmsvc : $(MSVC_TARGET)
-	$(MAKE) Z80ASM=$(MSVC_TARGET) prove
+	$(MAKE) Z80ASM_EXE=$(MSVC_TARGET) prove
 
 clean::
 	$(RM) zcc_opt.def zcc_proj.lst

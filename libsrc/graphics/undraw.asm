@@ -6,20 +6,20 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: undraw.asm,v 1.7 2016-04-13 21:09:09 dom Exp $
+;	$Id: undraw.asm $
 ;
 
+; CALLER LINKAGE FOR FUNCTION POINTERS
+; ----- void  undraw(int x, int y, int x2, int y2)
 
 
-        SECTION code_graphics
-                PUBLIC    undraw
-                PUBLIC    _undraw
-                EXTERN     swapgfxbk
-                EXTERN	__graphics_end
-
-                EXTERN     Line
-                EXTERN     respixel
-
+		SECTION   code_graphics
+		
+		PUBLIC    undraw
+		PUBLIC	  _undraw
+		
+		EXTERN undraw_callee
+		EXTERN ASMDISP_UNDRAW_CALLEE
 
 
 .undraw
@@ -31,13 +31,7 @@
 		ld	h,(ix+8)	;x0
 		ld	e,(ix+2)	;y1
 		ld	d,(ix+4)	;x1
-		call    swapgfxbk
-		push	hl
-		push    de
-		call	respixel
-		pop     de
-		pop	hl
-                ld      ix,respixel
-                call    Line
-		jp	__graphics_end
-
+		pop	ix
+		
+   jp undraw_callee + ASMDISP_UNDRAW_CALLEE
+  

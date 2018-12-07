@@ -8,9 +8,7 @@
 #
 # Test macros
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 require './t/testlib.pl';
 
@@ -72,9 +70,12 @@ three  equ  3
 four   Equ  4
 five   EQU  5
 six    set  6
-defb one,two,three,four,five,six
+.seven set  7
+eight: set  8
+defb one,two,three,four,five,six,seven,eight
 END
-check_bin_file("test.bin", pack("C*", 1..6));
+check_bin_file("test.bin", pack("C*", 1..8));
+
 
 unlink_testfiles();
 done_testing();

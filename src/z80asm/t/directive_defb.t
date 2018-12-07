@@ -8,9 +8,7 @@
 #
 # Test DEFB, DEFM - more complete tests in build_opcodes.asm
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 require './t/testlib.pl';
 

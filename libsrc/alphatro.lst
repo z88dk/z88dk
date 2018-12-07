@@ -7,6 +7,7 @@ stdio/alphatro/conio_vars
 stdio/alphatro/conio_map_colour
 @stdio/stdio.lst
 @input/input_keyboard.lst
+@gfxbasetxt6.lst
 graphics/generic_console/plotpixl6
 graphics/generic_console/respixl6
 graphics/generic_console/xorpixl6
@@ -16,6 +17,5 @@ graphics/dcircle2
 graphics/__gfx_coords
 graphics/alphatro/textpixl6
 graphics/alphatro/cleargraphics
-@gfxbasetxt6.lst
 @video/mc6845/mc6845.lst
 @z80.lst

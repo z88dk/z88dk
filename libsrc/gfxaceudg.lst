@@ -1,3 +1,4 @@
+@gfxbase.lst
 graphics/dcircle
 graphics/clg
 graphics/clrarea
@@ -16,4 +17,3 @@ graphics/putsprite2
 graphics/draw_profile
 graphics/stencil_render2
 graphics/swapgfxbk_foo
-@gfxbase.lst

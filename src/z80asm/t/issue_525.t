@@ -10,9 +10,7 @@
 # z80asm: single star in path should glob into list of directories
 #-----------------------------------------------------------------------------
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 use Path::Tiny;
 require './t/testlib.pl';

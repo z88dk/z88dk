@@ -11,9 +11,7 @@
 # z80asm: superfluous section generated in compile
 # caused by expressions DEFC aaa = aaa
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 require './t/testlib.pl';
 

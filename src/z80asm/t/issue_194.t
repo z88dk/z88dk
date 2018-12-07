@@ -10,9 +10,7 @@
 # Test https://github.com/z88dk/z88dk/issues/194
 # z80asm: wrong assembly of DDCB with no index
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 require './t/testlib.pl';
 

@@ -6,10 +6,10 @@
 ; TS2068 high resolution version
 ;
 ;
-; $Id: w_putsprite.asm,v 1.6 2016-07-02 09:01:36 dom Exp $
+; $Id: w_putsprite.asm $
 ;
 
-	SECTION   code_clib
+	SECTION   smc_clib
         PUBLIC    putsprite
         PUBLIC    _putsprite
         EXTERN     w_pixeladdress
@@ -216,6 +216,7 @@
 	SECTION rodata_club
 .offsets_table
          defb   1,2,4,8,16,32,64,128
+
 	SECTION bss_clib
 .curaddr
          defw   0

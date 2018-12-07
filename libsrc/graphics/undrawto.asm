@@ -6,37 +6,30 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: undrawto.asm,v 1.8 2016-07-02 09:01:35 dom Exp $
+;	$Id: undrawto.asm $
 ;
 
+; CALLER LINKAGE FOR FUNCTION POINTERS
+; ----- void  undrawto(int x2, int y2)
 
-;Usage: undrawto(struct *pixels)
 
-
-        SECTION code_graphics
-                PUBLIC    undrawto
-                PUBLIC    _undrawto
-                EXTERN     swapgfxbk
-                EXTERN	__graphics_end
-
-				EXTERN	__gfx_coords
-
-                EXTERN     Line
-                EXTERN     respixel
-
+		SECTION   code_graphics
+		
+		PUBLIC    undrawto
+		PUBLIC	  _undrawto
+		
+		EXTERN undrawto_callee
+		EXTERN ASMDISP_UNDRAWTO_CALLEE
 
 
 .undrawto
 ._undrawto
-		push	ix
-		ld	ix,2
-		add	ix,sp
-		ld	hl,(__gfx_coords)
-		ld	e,(ix+2)	;y
-		ld	d,(ix+4)	;x
-
-                call    swapgfxbk
-                ld      ix,respixel
-                call    Line
-                jp      __graphics_end
-
+	pop	af	; ret addr
+	pop de	; y2
+	pop hl
+	push hl
+	push de
+	ld	d,l	; x2
+	push	af	; ret addr
+		
+   jp undrawto_callee + ASMDISP_UNDRAWTO_CALLEE

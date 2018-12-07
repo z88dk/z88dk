@@ -10,9 +10,7 @@
 # Test https://github.com/z88dk/z88dk/issues/65
 # z80asm: separate BSS section not generated from object file if BSS org was -1 at assembly time
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 require './t/testlib.pl';
 

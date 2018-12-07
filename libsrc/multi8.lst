@@ -8,10 +8,11 @@ stdio/multi8/conio_vars
 stdio/multi8/conio_map_colour
 stdio/multi8/CRT_FONT
 @font/font_8x8/font_8x8.lst
-multi8/tape_load
-multi8/asm_tape_load
-multi8/load_palette
+arch/multi8/tape_load
+arch/multi8/asm_tape_load
+arch/multi8/load_palette
 @stdio/stdio.lst
+@gfxbasew.lst
 graphics/multi8/clg
 graphics/multi8/w_pixladdr
 graphics/multi8/w_plotpixl
@@ -20,10 +21,8 @@ graphics/multi8/w_xorpixl
 graphics/multi8/w_pointxy
 graphics/clrarea
 graphics/draw_profile
-graphics/lftscrol
 graphics/swapgfxbk_foo
 graphics/w_putsprite2
-@gfxbasew.lst
 psg/multi8/set_psg
 psg/multi8/set_psg_callee
 psg/multi8/get_psg
