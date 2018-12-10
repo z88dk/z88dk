@@ -17,27 +17,23 @@
 ; ----- void  undrawr(int x2, int y2)
 
 
-SECTION   code_graphics
+SECTION smc_clib
 
-PUBLIC     undrawr
-PUBLIC    _undrawr
+PUBLIC     undrawr_callee
+PUBLIC    _undrawr_callee
 
-EXTERN    undrawr_callee
-EXTERN    ASMDISP_UNDRAWR_CALLEE
+	EXTERN    undrawr
 
-
-.undrawr
-._undrawr
-	ld	hl,retaddr
-	ex (sp),hl
-	ld	hl,undrawr
-	jp (hl)
+.undrawr_callee
+._undrawr_callee
+	pop af	; ret addr
+	pop	bc
+	pop	de
+	push af	; ret addr
+	push de
+	push bc
 	
-.retaddr
-   pop af
-   pop de
-   pop hl
-   push af
-	
-jp undrawr_callee + ASMDISP_UNDRAWR_CALLEE
-
+	call undrawr
+	pop bc
+	pop bc
+	ret
