@@ -49,6 +49,8 @@ graphics/drawbox
 graphics/setxy
 graphics/setpos
 graphics/setpos_callee
+graphics/getx
+graphics/gety
 graphics/move
 graphics/pen_up
 graphics/pen_down
