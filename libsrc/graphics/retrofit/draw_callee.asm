@@ -7,7 +7,8 @@
 ;	$Id: draw_callee.asm $
 ;
 
-SECTION code_graphics
+SECTION smc_clib
+
 PUBLIC draw_callee
 PUBLIC _draw_callee
 
@@ -17,14 +18,16 @@ PUBLIC _draw_callee
 ._draw_callee
 	ld	hl,retaddr
 	ex (sp),hl
+	ld	(retaddr0+1),hl
 	ld	hl,draw
 	jp (hl)
 	
 .retaddr
-		pop hl
 		pop bc
 		pop bc
 		pop bc
 		pop bc
+.retaddr0
+		ld	hl,0
 		jp (hl)
 
