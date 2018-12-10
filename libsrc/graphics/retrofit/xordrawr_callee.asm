@@ -17,27 +17,23 @@
 ; ----- void  xordrawr(int x2, int y2)
 
 
-SECTION   code_graphics
+SECTION smc_clib
 
-PUBLIC     xordrawr
-PUBLIC    _xordrawr
+PUBLIC     xordrawr_callee
+PUBLIC    _xordrawr_callee
 
-EXTERN    xordrawr_callee
-EXTERN    ASMDISP_XORDRAWR_CALLEE
+	EXTERN    xordrawr
 
-
-.xordrawr
-._xordrawr
-	ld	hl,retaddr
-	ex (sp),hl
-	ld	hl,xordrawr
-	jp (hl)
+.xordrawr_callee
+._xordrawr_callee
+	pop af	; ret addr
+	pop	bc
+	pop	de
+	push af	; ret addr
+	push de
+	push bc
 	
-.retaddr
-   pop af
-   pop de
-   pop hl
-   push af
-	
-jp xordrawr_callee + ASMDISP_XORDRAWR_CALLEE
-
+	call xordrawr
+	pop bc
+	pop bc
+	ret
