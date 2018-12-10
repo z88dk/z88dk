@@ -53,6 +53,8 @@ graphics/rscroll
 graphics/w_setxy
 graphics/w_setpos
 graphics/w_setpos_callee
+graphics/w_getx
+graphics/w_gety
 graphics/w_move
 graphics/pen_up
 graphics/pen_down
