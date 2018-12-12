@@ -3,10 +3,6 @@
 ;
 ;       Written around the Interlogic Standard Library
 ;
-;       Stubs Written by D Morris - 30/9/98
-;
-;       Wide resolution (int type parameters) version by Stefano Bodrato
-;
 
 ;
 ;	$Id: drawr_callee.asm $
@@ -17,7 +13,7 @@
 ; ----- void  drawr(int x2, int y2)
 
 
-SECTION smc_clib
+SECTION code_graphics
 
 PUBLIC     drawr_callee
 PUBLIC    _drawr_callee
