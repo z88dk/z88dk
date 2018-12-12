@@ -3,10 +3,6 @@
 ;
 ;       Written around the Interlogic Standard Library
 ;
-;       Stubs Written by D Morris - 30/9/98
-;
-;       Wide resolution (int type parameters) version by Stefano Bodrato
-;
 
 ;
 ;	$Id: undrawr_callee.asm $
@@ -17,7 +13,7 @@
 ; ----- void  undrawr(int x2, int y2)
 
 
-SECTION smc_clib
+SECTION code_graphics
 
 PUBLIC     undrawr_callee
 PUBLIC    _undrawr_callee
