@@ -41,6 +41,11 @@ graphics/line
 graphics/liner
 graphics/lscroll
 graphics/plot
+graphics/plot_callee
+graphics/unplot
+graphics/unplot_callee
+graphics/xorplot
+graphics/xorplot_callee
 graphics/point
 graphics/putsprite3
 graphics/dither_pattern
@@ -49,7 +54,6 @@ graphics/rbitmask
 graphics/rscroll
 graphics/uncircle
 graphics/undrawb
-graphics/unplot
 graphics/drawbox
 graphics/setxy
 graphics/setpos
@@ -61,7 +65,6 @@ graphics/pen_up
 graphics/pen_down
 graphics/putc4x6
 graphics/xorborder
-graphics/xorplot
 graphics/text6/plotpixl
 graphics/text6/respixl
 graphics/text6/xorpixl
