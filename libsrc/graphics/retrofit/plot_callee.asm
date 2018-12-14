@@ -5,23 +5,23 @@
 ;
 
 ;
-;	$Id: xordrawr_callee.asm $
+;	$Id: plot_callee.asm $
 ;
 
 ;
 ; CALLER LINKAGE FOR FUNCTION POINTERS
-; ----- void  xordrawr(int x2, int y2)
+; ----- void  plot(int x, int y)
 
 
 SECTION code_graphics
 
-PUBLIC     xordrawr_callee
-PUBLIC    _xordrawr_callee
+PUBLIC     plot_callee
+PUBLIC    _plot_callee
 
-	EXTERN    xordrawr
+	EXTERN    plot
 
-.xordrawr_callee
-._xordrawr_callee
+.plot_callee
+._plot_callee
 	pop af	; ret addr
 	pop	bc
 	pop	de
@@ -29,7 +29,7 @@ PUBLIC    _xordrawr_callee
 	push de
 	push bc
 	
-	call xordrawr
+	call plot
 	pop bc
 	pop bc
 	ret

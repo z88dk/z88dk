@@ -1,8 +1,11 @@
-graphics/px8/draw
-graphics/px8/undraw
-graphics/px8/xordraw
-graphics/draw_profile_nostencil
 @gfxbasew.lst
+graphics/px8/draw
+graphics/retrofit/draw_callee
+graphics/px8/undraw
+graphics/retrofit/undraw_callee
+graphics/px8/xordraw
+graphics/retrofit/xordraw_callee
+graphics/draw_profile_nostencil
 graphics/px8/clg
 graphics/w_drawb
 graphics/w_undrawb

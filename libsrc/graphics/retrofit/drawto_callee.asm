@@ -3,10 +3,6 @@
 ;
 ;       Written around the Interlogic Standard Library
 ;
-;       Stubs Written by D Morris - 30/9/98
-;
-;       Wide resolution (int type parameters) version by Stefano Bodrato
-;
 
 ;
 ;	$Id: drawto_callee.asm $
@@ -17,27 +13,23 @@
 ; ----- void  drawto(int x2, int y2)
 
 
-SECTION   code_graphics
+SECTION code_graphics
 
-PUBLIC     drawto
-PUBLIC    _drawto
+PUBLIC     drawto_callee
+PUBLIC    _drawto_callee
 
-EXTERN    drawto_callee
-EXTERN    ASMDISP_DRAWTO_CALLEE
+	EXTERN    drawto
 
-
-.drawto
-._drawto
-	ld	hl,retaddr
-	ex (sp),hl
-	ld	hl,drawto
-	jp (hl)
+.drawto_callee
+._drawto_callee
+	pop af	; ret addr
+	pop	bc
+	pop	de
+	push af	; ret addr
+	push de
+	push bc
 	
-.retaddr
-   pop af
-   pop de
-   pop hl
-   push af
-	
-jp drawto_callee + ASMDISP_DRAWTO_CALLEE
-
+	call drawto
+	pop bc
+	pop bc
+	ret

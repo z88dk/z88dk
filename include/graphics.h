@@ -96,6 +96,10 @@ extern void __LIB__ setpos(int x, int y) __smallc;
 extern void __LIB__ setpos_callee(int px, int py) __smallc __z88dk_callee;
 #define setpos(a,b)           setpos_callee(a,b)
 
+/* Get current X position of graphics cursor */
+extern int __LIB__ getx();
+extern int __LIB__ gety();
+
 /* Draw up to a specified point */
 extern void __LIB__ drawto(int x2, int y2) __smallc;
 extern void __LIB__ drawto_callee(int x2, int y2) __smallc __z88dk_callee;

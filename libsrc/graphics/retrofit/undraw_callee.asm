@@ -7,7 +7,8 @@
 ;	$Id: undraw_callee.asm $
 ;
 
-SECTION code_graphics
+SECTION smc_clib
+
 PUBLIC undraw_callee
 PUBLIC _undraw_callee
 
@@ -17,14 +18,16 @@ PUBLIC _undraw_callee
 ._undraw_callee
 	ld	hl,retaddr
 	ex (sp),hl
+	ld	(retaddr0+1),hl
 	ld	hl,undraw
 	jp (hl)
 	
 .retaddr
-		pop hl
 		pop bc
 		pop bc
 		pop bc
 		pop bc
+.retaddr0
+		ld	hl,0
 		jp (hl)
 
