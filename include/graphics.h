@@ -50,8 +50,8 @@ extern void __LIB__ xorplot_callee(int x, int y) __smallc __z88dk_callee;
 
 /* Get pixel status */
 extern int __LIB__ point(int x, int y) __smallc;
-extern void __LIB__ point_callee(int x, int y) __smallc __z88dk_callee;
-#define point(a,b)           point_callee(a,b)
+//extern void __LIB__ point_callee(int x, int y) __smallc __z88dk_callee;
+//#define point(a,b)           point_callee(a,b)
 
 /* Get horizontal or vertical pixel bar, up to 16 pixel long */
 extern int __LIB__ multipoint(int hv, int length, int x, int y) __smallc;
