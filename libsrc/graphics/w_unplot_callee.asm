@@ -18,6 +18,7 @@
 		
                 PUBLIC    unplot_callee
                 PUBLIC    _unplot_callee
+				PUBLIC    ASMDISP_UNPLOT_CALLEE
 				
                 EXTERN     swapgfxbk
                 EXTERN    __graphics_end
