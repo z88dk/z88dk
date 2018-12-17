@@ -5,32 +5,31 @@
 ;
 ;       Stubs Written by D Morris - 30/9/98
 ;
-;       Wide resolution (WORD based parameters) version by Stefano Bodrato
 ;
-;	$Id: w_unplot.asm,v 1.4 2017-01-02 21:51:24 aralbrec Exp $
+;	$Id: w_unplot.asm $
 ;
 
-;Usage: unplot(int x, int y)
+; CALLER LINKAGE FOR FUNCTION POINTERS
+; ----- void  unplot(int x, int y)
 
 
-	SECTION   code_graphics
-                PUBLIC    unplot
-                PUBLIC    _unplot
-                EXTERN     swapgfxbk
-                EXTERN    swapgfxbk1
-
-                EXTERN     w_respixel
+		SECTION   code_graphics
+		
+		PUBLIC    unplot
+		PUBLIC	  _unplot
+		
+		EXTERN unplot_callee
+		EXTERN ASMDISP_UNPLOT_CALLEE
 
 .unplot
 ._unplot
-		pop	bc
-		pop	de
-		pop	hl
-		push	hl
-		push	de
-		push	bc
 
-                call    swapgfxbk
-                call    w_respixel
-                jp      swapgfxbk1
+   pop af
+   pop de	; y
+   pop hl	; x
+   push hl
+   push de
+   push af
 
+   jp unplot_callee + ASMDISP_UNPLOT_CALLEE
+   

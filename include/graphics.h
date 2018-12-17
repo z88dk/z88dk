@@ -35,15 +35,23 @@ extern void __LIB__ fill(int x, int y) __smallc;
 
 /* Plot a pixel to screen */
 extern void __LIB__ plot(int x, int y) __smallc;
+extern void __LIB__ plot_callee(int x, int y) __smallc __z88dk_callee;
+#define plot(a,b)           plot_callee(a,b)
 
 /* Unplot a pixel */
 extern void __LIB__ unplot(int x, int y) __smallc;
+extern void __LIB__ unplot_callee(int x, int y) __smallc __z88dk_callee;
+#define unplot(a,b)           unplot_callee(a,b)
 
 /* XORs a pixel on screen */
 extern void __LIB__ xorplot(int x, int y) __smallc;
+extern void __LIB__ xorplot_callee(int x, int y) __smallc __z88dk_callee;
+#define xorplot(a,b)           xorplot_callee(a,b)
 
 /* Get pixel status */
 extern int __LIB__ point(int x, int y) __smallc;
+extern void __LIB__ point_callee(int x, int y) __smallc __z88dk_callee;
+#define point(a,b)           point_callee(a,b)
 
 /* Get horizontal or vertical pixel bar, up to 16 pixel long */
 extern int __LIB__ multipoint(int hv, int length, int x, int y) __smallc;

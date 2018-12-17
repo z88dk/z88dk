@@ -34,9 +34,13 @@ graphics/w_liner
 graphics/lscroll
 graphics/lftscrol
 graphics/w_plot
+graphics/w_plot_callee
 graphics/w_unplot
+graphics/w_unplot_callee
 graphics/w_xorplot
+graphics/w_xorplot_callee
 graphics/w_point
+graphics/w_point_callee
 graphics/w_multipoint
 graphics/w_stencil_add_circle
 graphics/w_stencil_add_liner

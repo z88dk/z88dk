@@ -1,27 +1,35 @@
 ;
-;       Z88DK Graphics Functions - Small C+ stubs
+;       Z88 Graphics Functions - Small C+ stubs
 ;
-;	$Id: xorplot.asm,v 1.5 2016-04-22 20:17:17 dom Exp $
+;       Written around the Interlogic Standard Library
+;
+;       Stubs Written by D Morris - 30/9/98
+;
+;
+;	$Id: xorplot.asm $
 ;
 
-;Usage: xorplot(struct *pixel)
+; CALLER LINKAGE FOR FUNCTION POINTERS
+; ----- void  xorplot(int x, int y)
 
-		SECTION	  code_graphics
-                PUBLIC    xorplot
-                PUBLIC    _xorplot
-                EXTERN     swapgfxbk
-                EXTERN     __graphics_end
 
-                EXTERN     xorpixel
+		SECTION   code_graphics
+		
+		PUBLIC    xorplot
+		PUBLIC	  _xorplot
+		
+		EXTERN xorplot_callee
+		EXTERN ASMDISP_XORPLOT_CALLEE
 
+		
 .xorplot
 ._xorplot
-		push	ix
-		ld	ix,2
-		add	ix,sp
-		ld	l,(ix+2)
-		ld	h,(ix+4)
-                call    swapgfxbk
-                call    xorpixel
-                jp      __graphics_end
-
+	pop	af	; ret addr
+	pop hl	; y
+	pop de	; x
+	push de
+	push hl
+	ld	h,e
+	push	af	; ret addr
+		
+   jp xorplot_callee + ASMDISP_XORPLOT_CALLEE

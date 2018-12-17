@@ -6,38 +6,32 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;       $Id: point.asm,v 1.7 2016-04-13 21:09:09 dom Exp $
+;	$Id: point.asm $
 ;
 
-
-;Usage: point(struct *pixel)
+; CALLER LINKAGE FOR FUNCTION POINTERS
+; ----- void  point(int x, int y)
 ;Result is true/false
 
 
-        SECTION code_graphics
-                PUBLIC    point
-                PUBLIC    _point
-
-                EXTERN     pointxy
-                EXTERN     swapgfxbk
-                EXTERN     swapgfxbk1
-
+		SECTION   code_graphics
+		
+		PUBLIC    point
+		PUBLIC	  _point
+		
+		EXTERN point_callee
+		EXTERN ASMDISP_POINT_CALLEE
 
 .point
 ._point
-		push	ix
-                ld      ix,2
-                add     ix,sp
-                ld      l,(ix+2)
-                ld      h,(ix+4)
-                call    swapgfxbk
-                call    pointxy
-                push    af
-                call    swapgfxbk1
-                pop     af
-		pop	ix
-                ld      hl,1
-                ret     nz       ;pixel set
-                dec     hl
-                ret
 
+	pop	af	; ret addr
+	pop hl	; y
+	pop de
+	push de
+	push hl
+	ld	h,e	; x
+	push	af	; ret addr
+
+   jp point_callee + ASMDISP_POINT_CALLEE
+   

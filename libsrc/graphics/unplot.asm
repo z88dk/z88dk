@@ -6,32 +6,30 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: unplot.asm,v 1.7 2016-04-13 21:09:09 dom Exp $
+;	$Id: unplot.asm $
 ;
 
-
-;Usage: unplot(struct *pixel)
-
-
-
-        SECTION code_graphics
-                PUBLIC    unplot
-                PUBLIC    _unplot
-                EXTERN     swapgfxbk
-                EXTERN    __graphics_end
-
-                EXTERN     respixel
+; CALLER LINKAGE FOR FUNCTION POINTERS
+; ----- void  unplot(int x, int y)
 
 
+		SECTION   code_graphics
+		
+		PUBLIC    unplot
+		PUBLIC	  _unplot
+		
+		EXTERN unplot_callee
+		EXTERN ASMDISP_UNPLOT_CALLEE
 
+		
 .unplot
 ._unplot
-		push	ix
-		ld	ix,2
-		add	ix,sp
-		ld	l,(ix+2)
-		ld	h,(ix+4)
-                call    swapgfxbk
-                call    respixel
-                jp      __graphics_end
-
+	pop	af	; ret addr
+	pop hl	; y
+	pop de	; x
+	push de
+	push hl
+	ld	h,e
+	push	af	; ret addr
+		
+   jp unplot_callee + ASMDISP_UNPLOT_CALLEE

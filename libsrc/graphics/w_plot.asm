@@ -5,33 +5,31 @@
 ;
 ;       Stubs Written by D Morris - 30/9/98
 ;
-;       Wide resolution (WORD based parameters) version by Stefano Bodrato
 ;
-;	$Id: w_plot.asm,v 1.3 2016-04-13 21:09:09 dom Exp $
+;	$Id: w_plot.asm $
 ;
 
-;Usage: plot(int x, int y)
+; CALLER LINKAGE FOR FUNCTION POINTERS
+; ----- void  plot(int x, int y)
 
 
-
-        SECTION code_graphics
-                PUBLIC    plot
-                PUBLIC    _plot
-                EXTERN     swapgfxbk
-                EXTERN    swapgfxbk1
-
-                EXTERN     w_plotpixel
+		SECTION   code_graphics
+		
+		PUBLIC    plot
+		PUBLIC	  _plot
+		
+		EXTERN plot_callee
+		EXTERN ASMDISP_PLOT_CALLEE
 
 .plot
 ._plot
-		pop	bc
-		pop	de
-		pop	hl
-		push	hl
-		push	de
-		push	bc
 
-                call    swapgfxbk
-                call    w_plotpixel
-                jp      swapgfxbk1
+   pop af
+   pop de	; y
+   pop hl	; x
+   push hl
+   push de
+   push af
 
+   jp plot_callee + ASMDISP_PLOT_CALLEE
+   
