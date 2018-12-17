@@ -18,6 +18,7 @@
 		
                 PUBLIC    xorplot_callee
                 PUBLIC    _xorplot_callee
+				PUBLIC    ASMDISP_XORPLOT_CALLEE
 				
                 EXTERN     swapgfxbk
                 EXTERN    __graphics_end
