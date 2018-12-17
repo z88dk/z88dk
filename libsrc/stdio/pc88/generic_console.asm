@@ -54,26 +54,31 @@ generic_console_cls:
 	call	l_pop_ei
 
 clear_text:
+	in	a,($32)
+	push	af
+	res	4,a
+	out	($32),a
+
 	; Clearing for text
 	ld	hl, DISPLAY
-	ld	de,120
 	ld	c,25
 cls_1:
-	push	hl
 	ld	b,80
 cls_2:
 	ld	(hl),' '
 	inc	hl
 	djnz	cls_2
-	ld	b,40
+	ld	b,20
 cls_3:
 	ld	(hl),0
 	inc	hl
+	ld	(hl),0
+	inc	hl
 	djnz	cls_3
-	pop	hl
-	add	hl,de
 	dec	c
 	jr	nz,cls_1
+	pop	af
+	out	($32),a
 	ret
 
 clear_plane:
@@ -98,7 +103,14 @@ generic_console_printc:
 	call	xypos
 not_40_col:
 	pop	de
+	in	a,($32)
+	ld	e,a
+	res	4,a
+	out	($32),a
 	ld	(hl),d
+	; TODO: Attribute
+	ld	a,e
+	out	($32),a
 	ret
 
 
@@ -116,7 +128,16 @@ generic_console_pointxy:
 generic_console_vpeek:
 	call	generic_console_scale
         call    xypos
-	ld	a,(hl)
+	in	a,($32)
+	ld	c,a
+	res	4,a
+	out	($32),a
+
+	ld	d,(hl)
+
+	ld	a,c
+	out	($32),a
+	ld	a,d
 	and	a
 	ret
 
@@ -152,6 +173,10 @@ generic_console_scrollup:
 	ld	a,(__pc88_mode)
 	cp	2
 	jp	z,scrollup_MODE2
+	in	a,($32)
+	push	af
+	res	4,a
+	out	($32),a
 	ld	hl, DISPLAY + 120
 	ld	de, DISPLAY
 	ld	bc, 120 * 24
@@ -167,6 +192,8 @@ scroll_2:
 	ld	(hl),0
 	inc	hl
 	djnz	scroll_2
+	pop	af
+	out	($32),a
 	pop	bc
 	pop	de
 	ret
@@ -176,3 +203,9 @@ scroll_2:
 	EXTERN	pc88_cursoroff
 
 	call	pc88_cursoroff
+	ld	hl,$E6B9
+	res	1,(hl)
+	ld	a,($E6C0)
+	set	1,a
+	ld	($E6C0),a
+	out	($30),a
