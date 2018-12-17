@@ -22,7 +22,7 @@
 				PUBLIC    ASMDISP_POINT_CALLEE
 				
                 EXTERN     swapgfxbk
-                EXTERN    __graphics_end
+                EXTERN    swapgfxbk1
 
                 EXTERN     w_pointxy
 				
@@ -39,6 +39,14 @@
 		push	ix
                 call    swapgfxbk
                 call    w_pointxy
-                jp      __graphics_end
+				
+                push    af
+                call    swapgfxbk1
+                pop     af
+		pop	ix
+                ld      hl,1
+                ret     nz       ;pixel set
+                dec     hl
+                ret
 
 DEFC ASMDISP_POINT_CALLEE = # asmentry - point_callee
