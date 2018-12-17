@@ -18,6 +18,7 @@
 		
                 PUBLIC    plot_callee
                 PUBLIC    _plot_callee
+				PUBLIC    ASMDISP_PLOT_CALLEE
 				
                 EXTERN     swapgfxbk
                 EXTERN    __graphics_end
