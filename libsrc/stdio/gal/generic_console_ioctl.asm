@@ -11,6 +11,7 @@
 	EXTERN	__gal_mode
 	EXTERN	__console_w
 
+	EXTERN	__CLIB_DISABLE_MODE1
 
 	; Set bit 1 for hires
 	defc	LATCH = $2038
@@ -36,6 +37,9 @@ check_set_udg:
 	jr	success
 check_mode:
 	cp	IOCTL_GENCON_SET_MODE
+	jr	nz,failure
+	ld	a,__CLIB_DISABLE_MODE1
+	and	a
 	jr	nz,failure
 	ld	hl,$1020
 	ld	a,c

@@ -102,4 +102,9 @@ IF CLIB_DISABLE_MODE1 = 1
         defc    pointxy_MODE1 = noop
         defc    pixeladdress_MODE1 = noop
         defc    scrollup_MODE1 = noop
+	PUBLIC	__CLIB_DISABLE_MODE1
+	defc	__CLIB_DISABLE_MODE1 = 1
+ELSE
+	PUBLIC	__CLIB_DISABLE_MODE1
+	defc	__CLIB_DISABLE_MODE1 = 0
 ENDIF
