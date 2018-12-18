@@ -5,7 +5,7 @@
 
 include ../../Make.config
 
-all: mzx_tiny m81_tiny mzx m81
+all: mzx_tiny m81_tiny mlambda_tiny mzx m2068 m81 mlambda
 
 mzx_tiny:
 	$(RM) -f *.o* ../../mzx_tiny.lib
