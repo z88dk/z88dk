@@ -42,6 +42,7 @@ graphics/w_xorplot_callee
 graphics/w_point
 graphics/w_point_callee
 graphics/w_multipoint
+graphics/w_multipoint_callee
 graphics/w_stencil_add_circle
 graphics/w_stencil_add_liner
 graphics/w_stencil_add_lineto
