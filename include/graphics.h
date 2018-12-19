@@ -10,6 +10,7 @@
 #define __GFX_H__
 
 #include <sys/compiler.h>
+#include <sys/types.h>
 #include <stdint.h>
 
 #pragma output graphics
@@ -33,6 +34,7 @@ struct window {
 /* Fills an area */
 extern void __LIB__ fill(int x, int y) __smallc;
 
+
 /* Plot a pixel to screen */
 extern void __LIB__ plot(int x, int y) __smallc;
 extern void __LIB__ plot_callee(int x, int y) __smallc __z88dk_callee;
@@ -48,14 +50,16 @@ extern void __LIB__ xorplot(int x, int y) __smallc;
 extern void __LIB__ xorplot_callee(int x, int y) __smallc __z88dk_callee;
 #define xorplot(a,b)           xorplot_callee(a,b)
 
+
 /* Get pixel status */
-extern int __LIB__ point(int x, int y) __smallc;
-extern void __LIB__ point_callee(int x, int y) __smallc __z88dk_callee;
+extern bool_t __LIB__ point(int x, int y) __smallc;
+extern bool_t __LIB__ point_callee(int x, int y) __smallc __z88dk_callee;
 #define point(a,b)           point_callee(a,b)
 
 /* Get horizontal or vertical pixel bar, up to 16 pixel long */
-extern int __LIB__ multipoint(int hv, int length, int x, int y) __smallc;
-
+extern bool_t __LIB__ multipoint(int hv, int length, int x, int y) __smallc;
+extern bool_t __LIB__ multipoint_callee(int hv, int length, int x, int y) __smallc __z88dk_callee;
+#define multipoint(a,b,c,d)           multipoint_callee(a,b,c,d)
 
 
 /* Draw a line */
