@@ -36,6 +36,10 @@
 	pop bc	; h/v
 	ld	b,a
 	ex af,af
+	push de
+	push de
+	push de
+	push de
 	push af	; ret addr
 	
 	
