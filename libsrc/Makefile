@@ -1174,6 +1174,8 @@ gal_clib.lib:
 	$(call buildgeneric,gal)
 	$(MAKE) -C games TARGET=gal
 	TARGET=gal TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgal -x$(OUTPUT_DIRECTORY)/gal_clib @$(LISTFILE_DIRECTORY)/gal.lst
+	$(MAKE) gfxdeps
+	TARGET=gal TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgal -Dtextgraphics -x$(OUTPUT_DIRECTORY)/gfxgaltext @arch/gal/gfxgaltext.lst
 
 # Sharp PC-G8xx/E2xx - Stefano Bodrato
 g800_clib.lib:

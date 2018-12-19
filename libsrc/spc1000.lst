@@ -20,7 +20,6 @@ stdio/ansi/msx/f_ansi_cls_nobios
 @input/input_keyboard.lst
 arch/spc1000/tms9918
 games/spc1000/joystick
-@gfxbase.lst
 graphics/spc1000/cleargraphics
 graphics/spc1000/getmaxx
 graphics/spc1000/getmaxy
@@ -51,6 +50,7 @@ graphics/dcircle2
 graphics/clrarea
 graphics/fill
 graphics/getsprite
+@gfxbase.lst
 msx/gen_filvrm
 msx/gen_ldirmv
 msx/gen_ldirvm
