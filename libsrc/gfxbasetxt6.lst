@@ -51,6 +51,7 @@ graphics/point_callee
 graphics/putsprite3
 graphics/dither_pattern
 graphics/multipoint
+graphics/multipoint_callee
 graphics/rbitmask
 graphics/rscroll
 graphics/uncircle
