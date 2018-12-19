@@ -366,8 +366,13 @@ ENDIF
 IF FORgal
 	DEFINE gotgfx
 	; This size reflects the Gal+ screen mode
-	defc maxx	= 256
-	defc maxy	= 208
+        IF textgraphics
+    	    defc maxx	= 64
+	    defc maxy	= 48
+        ELSE
+    	    defc maxx	= 256
+	    defc maxy	= 208
+        ENDIF
 	defc blankch	= 32
 ENDIF
 
