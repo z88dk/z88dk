@@ -35,6 +35,10 @@
 	ld	b,c	; length
 	pop de
 	ld	c,e	; h/v
+	push de
+	push bc	; just to re-balance the stack
+	push bc
+	push hl
 	push	af	; ret addr
 	
 	
