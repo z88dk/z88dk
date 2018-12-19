@@ -36,6 +36,7 @@ graphics/xorplot_callee
 graphics/point
 graphics/point_callee
 graphics/multipoint
+graphics/multipoint_callee
 graphics/draw_profile
 graphics/stencil_add_circle
 graphics/stencil_add_liner
