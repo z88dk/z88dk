@@ -15,7 +15,6 @@ stdio/ansi/aquarius/f_ansi_scrollup
 @input/input_keyboard.lst
 @gfxbasetxt6.lst
 graphics/aquarius/textpixl6
-games/aquarius/joystick
 games/aquarius/bit_open
 games/aquarius/bit_open_di
 games/aquarius/bit_close
