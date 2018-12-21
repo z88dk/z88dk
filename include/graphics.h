@@ -57,8 +57,8 @@ extern bool_t __LIB__ point_callee(int x, int y) __smallc __z88dk_callee;
 #define point(a,b)           point_callee(a,b)
 
 /* Get horizontal or vertical pixel bar, up to 16 pixel long */
-extern bool_t __LIB__ multipoint(int hv, int length, int x, int y) __smallc;
-extern bool_t __LIB__ multipoint_callee(int hv, int length, int x, int y) __smallc __z88dk_callee;
+extern int __LIB__ multipoint(int hv, int length, int x, int y) __smallc;
+extern int __LIB__ multipoint_callee(int hv, int length, int x, int y) __smallc __z88dk_callee;
 #define multipoint(a,b,c,d)           multipoint_callee(a,b,c,d)
 
 
