@@ -166,6 +166,13 @@ extern unsigned char *joystick_type[];
 	#define GAME_DEVICES 3
 #endif
 
+#ifdef __SC3000__
+#ifdef DEFINE_JOYSTICK_TYPE
+	unsigned char *joystick_type[] = { "Joystick 1", "Joystick 2"};
+#endif
+	#define GAME_DEVICES 2
+#endif
+
 #ifdef __SPECTRUM__
 #ifdef DEFINE_JOYSTICK_TYPE
 	unsigned char *joystick_type[] = {"Kempston","Sinclair 1","Sinclair 2","Cursor","Fuller"};
