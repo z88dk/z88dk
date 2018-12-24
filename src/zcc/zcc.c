@@ -2799,6 +2799,7 @@ void remove_temporary_files(void)
             remove_file_with_extension(temporary_filenames[j], ".sym");
             remove_file_with_extension(temporary_filenames[j], ".def");
             remove_file_with_extension(temporary_filenames[j], ".tmp");
+            remove_file_with_extension(temporary_filenames[j], ".lis");
         }
     }
 }
