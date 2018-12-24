@@ -3171,7 +3171,8 @@ int main (int argc, char **argv){
             break;
           case 0x28:    // (ZXN) bsla de,b
             if ( c_cpu == CPU_Z80_ZXN ) {
-                for ( int count  = 0 ; count < (b & 0x0f); count++ ) {
+                int count;
+                for ( count  = 0 ; count < (b & 0x0f); count++ ) {
                     SLA(e);
                     RL(d);
                 }
@@ -3182,7 +3183,8 @@ int main (int argc, char **argv){
             break;
           case 0x29:    // (ZXN) bsra de,b
             if ( c_cpu == CPU_Z80_ZXN ) {
-                for ( int count  = 0 ; count < (b & 0x0f); count++ ) {
+                int count;
+                for ( count  = 0 ; count < (b & 0x0f); count++ ) {
                     SRA(d);
                     RR(e);
                 }
@@ -3193,7 +3195,8 @@ int main (int argc, char **argv){
             break;
           case 0x2a:    // (ZXN) bsrl de,b
             if ( c_cpu == CPU_Z80_ZXN ) {
-                for ( int count  = 0 ; count < (b & 0x0f); count++ ) {
+                int count;
+                for ( count  = 0 ; count < (b & 0x0f); count++ ) {
                     SRL(d);
                     RR(e);
                 }
@@ -3204,7 +3207,8 @@ int main (int argc, char **argv){
             break;
           case 0x2b:    // (ZXN) bsrf de,b
             if ( c_cpu == CPU_Z80_ZXN ) {
-                for ( int count  = 0 ; count < (b & 0x0f); count++ ) {
+                int count;
+                for ( count  = 0 ; count < (b & 0x0f); count++ ) {
                     RR(d);
                     d |= 128;
                     RR(e);
@@ -3218,7 +3222,8 @@ int main (int argc, char **argv){
             if ( c_cpu == CPU_Z180 ) {
               TEST(l, 7);
             } else if ( c_cpu == CPU_Z80_ZXN ) {
-                for ( int count  = 0 ; count < (b & 0x07); count++ ) {
+                int count;
+                for ( count  = 0 ; count < (b & 0x07); count++ ) {
                     ff |= ( d & 128) ? 256 : 0;
                     RL(e);
                     RL(d);
