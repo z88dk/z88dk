@@ -8,9 +8,7 @@
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk
 #------------------------------------------------------------------------------
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 
 #------------------------------------------------------------------------------
 # Programatic opcode generator
@@ -317,6 +315,7 @@ for my $cpu (@CPUS) {
 	elsif ($z80_zxn) {
 		add_opc($cpu, "mul d, e", 0xED, 0x30);
 		add_opc($cpu, "mul de",   0xED, 0x30);
+		add_opc($cpu, "mlt de",   0xED, 0x30);
 	}
 	elsif ($rabbit) {
 		add_opc($cpu, "mul", 0xF7);
@@ -548,6 +547,11 @@ for my $cpu (@CPUS) {
 	if ($z80_zxn) {
 		add_opc($cpu, "swapnib", 		0xED, 0x23);
 		add_opc($cpu, "mirror a", 		0xED, 0x24);
+		add_opc($cpu, "bsla de,b",		0xED, 0x28);
+		add_opc($cpu, "bsra de,b",		0xED, 0x29);
+		add_opc($cpu, "bsrl de,b",		0xED, 0x2A);
+		add_opc($cpu, "bsrf de,b",		0xED, 0x2B);
+		add_opc($cpu, "brlc de,b",		0xED, 0x2C);
 		
 #		add_opc($cpu, "mirror de", 		0xED, 0x26);
 		
@@ -559,6 +563,11 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "add de, %m",		0xED, 0x35, '%m', '%m');
 		add_opc($cpu, "add bc, %m",		0xED, 0x36, '%m', '%m');
 		
+		add_opc($cpu, "push %M",	 	0xED, 0x8A, '%M', '%M');
+#		add_opc($cpu, "pop x",		 	0xED, 0x8B);
+
+		add_opc($cpu, "outinb",			0xED, 0x90);
+
 		add_opc($cpu, "mmu %c, %n",		0xED, 0x91, '0x50+%c(0..7)', '%n');
 		for my $page (0..7) {
 			add_opc($cpu, "mmu$page %n",0xED, 0x91, 0x50+$page, '%n');
@@ -569,27 +578,21 @@ for my $cpu (@CPUS) {
 			add_opc($cpu, "mmu$page a",	0xED, 0x92, 0x50+$page);
 		}
 
-		add_opc($cpu, "push %M",	 	0xED, 0x8A, '%M', '%M');
-#		add_opc($cpu, "pop x",		 	0xED, 0x8B);
-
-		add_opc($cpu, "outinb",			0xED, 0x90);
-		
 		add_opc($cpu, "nextreg %n, %n",	0xED, 0x91, '%n', '%n');
 		add_opc($cpu, "nextreg %n, a",	0xED, 0x92, '%n');
-
+		
 		add_opc($cpu, "pixeldn",		0xED, 0x93);
 		add_opc($cpu, "pixelad",		0xED, 0x94);
 		add_opc($cpu, "setae",			0xED, 0x95);
-		
+
+		add_opc($cpu, "jp (c)",			0xED, 0x98);
+
 		add_opc($cpu, "ldix",			0xED, 0xA4);
 		add_opc($cpu, "ldws",			0xED, 0xA5);
 		add_opc($cpu, "lddx",			0xED, 0xAC);
 		add_opc($cpu, "ldirx",			0xED, 0xB4);
-		add_opc($cpu, "lddrx",			0xED, 0xBC);
-		
-		add_opc($cpu, "ldirscale",		0xED, 0xB6);
-		
 		add_opc($cpu, "ldpirx",			0xED, 0xB7);
+		add_opc($cpu, "lddrx",			0xED, 0xBC);
 	}
 }
 
