@@ -420,7 +420,12 @@ tokens:
   - name    : DMA_WR5
   - name    : DMA_WR6
   - name    : DMA_CMD
-  
+  - name 	: BSLA
+  - name 	: BSRA
+  - name 	: BSRL
+  - name 	: BSRF
+  - name 	: BRLC
+
   # Z180 specific opcodes
   - name    : SLP 
   - name    : MLT 

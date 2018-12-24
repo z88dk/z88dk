@@ -4221,7 +4221,6 @@
  lsidr                          ; Error
  lsir                           ; Error
  mlt bc                         ; Error
- mlt de                         ; Error
  mlt hl                         ; Error
  mlt sp                         ; Error
  mmu -1, -128                   ; Error
