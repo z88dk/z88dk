@@ -26,7 +26,7 @@ graphics/rx78/respixl
 graphics/rx78/xorpixl
 graphics/rx78/pointxy
 graphics/rx78/swapgfxbk
-graphics/putsprite3
+graphics/putsprite2
 graphics/dcircle
 graphics/clrarea
 graphics/fill
