@@ -1,6 +1,11 @@
 graphics/__graphics_end
 graphics/__gfx_coords
 graphics/circle
+graphics/circle_callee
+graphics/uncircle
+graphics/uncircle_callee
+graphics/xorcircle
+graphics/xorcircle_callee
 graphics/clga
 graphics/draw
 graphics/draw_callee
@@ -48,7 +53,6 @@ graphics/stencil_init
 graphics/dither_pattern
 graphics/rbitmask
 graphics/rscroll
-graphics/uncircle
 graphics/drawb
 graphics/undrawb
 graphics/drawbox
