@@ -6,19 +6,20 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: w_uncircle.asm,v 1.4 2016-04-23 20:37:40 dom Exp $
+;	$Id: w_uncircle.asm $
 ;
 
 
-;Usage: uncircle(struct *pixels)
+; Usage: uncircle(int x, int y, int radius, int skip);
 
-	SECTION   code_graphics
-	PUBLIC    uncircle
-	PUBLIC    _uncircle
-	EXTERN     w_draw_circle
-	EXTERN     w_respixel
-	EXTERN     swapgfxbk
-	EXTERN	   __graphics_end
+
+		SECTION     code_graphics
+		
+		PUBLIC      uncircle
+		PUBLIC      _uncircle
+
+		EXTERN      uncircle_callee
+		EXTERN      ASMDISP_UNCIRCLE_CALLEE
 
 
 .uncircle
@@ -36,8 +37,6 @@
 		ld h,(ix+7)
 		ld e,(ix+8)	;x
 		ld d,(ix+9)
-		ld ix,w_respixel
-		call swapgfxbk
-		call w_draw_circle
-		jp   __graphics_end
 
+		
+		jp uncircle_callee + ASMDISP_UNCIRCLE_CALLEE
