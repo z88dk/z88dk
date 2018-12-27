@@ -14,6 +14,7 @@
 ; $Id: putsprite3.asm $
 ;
 
+	SECTION	 smc_clib
 
 	PUBLIC    putsprite
 	PUBLIC    _putsprite
