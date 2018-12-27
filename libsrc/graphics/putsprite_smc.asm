@@ -16,6 +16,7 @@
 	SECTION	 smc_clib
 
 	PUBLIC    putsprite
+	PUBLIC    _putsprite
 
 	EXTERN	pixel
 	EXTERN	pixmode
@@ -25,6 +26,7 @@
 ; sprite: (ix)
 
 .putsprite
+._putsprite
 
         ld      hl,2   
         add     hl,sp
