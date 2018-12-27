@@ -3,7 +3,11 @@ graphics/__graphics_end
 graphics/w_bksave
 graphics/w_bkrestore
 graphics/w_circle
+graphics/w_circle_callee
 graphics/w_uncircle
+graphics/w_uncircle_callee
+graphics/w_xorcircle
+graphics/w_xorcircle_callee
 graphics/w_dcircle
 graphics/w_drawb
 graphics/w_undrawb
