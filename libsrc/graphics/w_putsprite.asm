@@ -9,7 +9,7 @@
 ; $Id: w_putsprite.asm $
 ;
 
-        SECTION code_graphics
+        SECTION   smc_clib
         PUBLIC    putsprite
         PUBLIC    _putsprite
         EXTERN    w_pixeladdress
