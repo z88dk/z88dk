@@ -138,9 +138,18 @@ extern void __LIB__ xorborder(int tlx, int tly, int width, int height) __smallc;
 
 /* Draw a circle */
 extern void __LIB__ circle(int x, int y, int radius, int skip) __smallc;
+extern void __LIB__ circle_callee(int x, int y, int radius, int skip) __smallc __z88dk_callee;
+#define circle(a,b,c,d)           circle_callee(a,b,c,d)
 
 /* Undraw a circle */
 extern void __LIB__ uncircle(int x, int y, int radius, int skip) __smallc;
+extern void __LIB__ uncircle_callee(int x, int y, int radius, int skip) __smallc __z88dk_callee;
+#define uncircle(a,b,c,d)           uncircle_callee(a,b,c,d)
+
+/* Draw a circle in XOR mode */
+extern void __LIB__ xorcircle(int x, int y, int radius, int skip) __smallc;
+extern void __LIB__ xorcircle_callee(int x, int y, int radius, int skip) __smallc __z88dk_callee;
+#define xorcircle(a,b,c,d)           xorcircle_callee(a,b,c,d)
 
 /* Init GFX mode and clear map */
 extern void __LIB__ clg(void);

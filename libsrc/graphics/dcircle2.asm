@@ -10,6 +10,8 @@
 ;	$Id: dcircle2.asm,v 1.6 2017-01-02 21:51:24 aralbrec Exp $
 ;
 
+			SECTION   smc_clib
+			
                 PUBLIC    draw_circle
 
 DEFVARS 0

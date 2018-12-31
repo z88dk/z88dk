@@ -26,8 +26,8 @@
 		push	ix
 		ld	ix,2
 		add	ix,sp
-		ld	b,(ix+2)
-		ld	c,(ix+4)
+		ld	c,(ix+2)
+		ld	b,(ix+4)
 		ld	l,(ix+6)
 		ld	h,(ix+8)
                 ld      ix,respixel

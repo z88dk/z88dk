@@ -6,24 +6,24 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: uncircle.asm $
+;	$Id: xorcircle.asm $
 ;
 
 
-; Usage: uncircle(int x, int y, int radius, int skip);
+; Usage: xorcircle(int x, int y, int radius, int skip);
 
 
 		SECTION     code_graphics
 		
-		PUBLIC      uncircle
-		PUBLIC      _uncircle
+		PUBLIC      xorcircle
+		PUBLIC      _xorcircle
 
-		EXTERN      uncircle_callee
-		EXTERN      ASMDISP_UNCIRCLE_CALLEE
+		EXTERN      xorcircle_callee
+		EXTERN      ASMDISP_XORCIRCLE_CALLEE
 
 
-.uncircle
-._uncircle
+.xorcircle
+._xorcircle
 		push	ix
 		ld	ix,2
 		add	ix,sp
@@ -32,4 +32,4 @@
 		ld	c,(ix+6)	;y
 		ld	b,(ix+8)	;x
 		
-		jp uncircle_callee + ASMDISP_UNCIRCLE_CALLEE
+		jp xorcircle_callee + ASMDISP_XORCIRCLE_CALLEE

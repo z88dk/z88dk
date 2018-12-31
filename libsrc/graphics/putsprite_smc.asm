@@ -13,8 +13,10 @@
 ;	$Id: putsprite_smc.asm,v 1.3 2016-07-02 09:01:35 dom Exp $
 ;
 
+	SECTION	 smc_clib
 
 	PUBLIC    putsprite
+	PUBLIC    _putsprite
 
 	EXTERN	pixel
 	EXTERN	pixmode
@@ -24,6 +26,7 @@
 ; sprite: (ix)
 
 .putsprite
+._putsprite
 
         ld      hl,2   
         add     hl,sp

@@ -1,6 +1,11 @@
 graphics/__gfx_coords
 graphics/__graphics_end
 graphics/circle
+graphics/circle_callee
+graphics/uncircle
+graphics/uncircle_callee
+graphics/xorcircle
+graphics/xorcircle_callee
 graphics/clg
 graphics/clga
 graphics/clrarea
@@ -54,7 +59,6 @@ graphics/multipoint
 graphics/multipoint_callee
 graphics/rbitmask
 graphics/rscroll
-graphics/uncircle
 graphics/undrawb
 graphics/drawbox
 graphics/setxy

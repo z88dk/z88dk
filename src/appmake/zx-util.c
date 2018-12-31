@@ -1941,10 +1941,15 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
             else
                 size += 512;
             
-            fread(scr, size, 1, fin);
-            fclose(fin);
+            if (fread(scr, size, 1, fin) == 1)
+                fwrite(scr, size, 1, fout);
+            else
+            {
+                nh.LoadingScreen = 0;
+                fprintf(stderr, "Warning: Loading screen not used (wrong size, palette %sexpected)\n", zxnex->nopalette ? "not " : "");
+            }
 
-            fwrite(scr, size, 1, fout);
+            fclose(fin);
         }
     }
 
@@ -1984,20 +1989,6 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
                     mainbank_occupied |= 1 << j;
             }
         }
-
-        // NOT NEEDED FOR NEX FORMAT BECAUSE NEX DOES NOT COOPERATE WITH NEXTZXOS
-        //
-        // mark all pages occupied above the lowest page
-        // temporary to accommodate z88dk normally placing stack and heap at top of memory
-        //
-        // for (i = 0; i < 8; ++i)
-        // {
-        //     if (mainbank_occupied & (1 << i))
-        //     {
-        //         mainbank_occupied = 0xff - (1 << i) + 1;
-        //         break;
-        //     }
-        // }
 
         // bank 5
 
