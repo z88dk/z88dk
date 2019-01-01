@@ -1,6 +1,21 @@
+Index: src/SDCC.y
+===================================================================
+--- src/SDCC.y	(revision 10788)
++++ src/SDCC.y	(working copy)
+@@ -185,6 +185,10 @@
+           cleanUpLevel (SymbolTab, 1);
+         }
+    | addressmod
++        {
++            /* Reported by @aralbrec that GNU Bison requires this.
++             */
++        }
+    ;
+ 
+ function_definition
 Index: src/SDCCasm.c
 ===================================================================
---- src/SDCCasm.c	(revision 10761)
+--- src/SDCCasm.c	(revision 10788)
 +++ src/SDCCasm.c	(working copy)
 @@ -403,8 +403,8 @@
  static const ASM_MAPPING _asxxxx_mapping[] = {
@@ -23,7 +38,7 @@ Index: src/SDCCasm.c
     "; ---------------------------------\n"
 Index: src/SDCCglue.c
 ===================================================================
---- src/SDCCglue.c	(revision 10761)
+--- src/SDCCglue.c	(revision 10788)
 +++ src/SDCCglue.c	(working copy)
 @@ -189,7 +189,7 @@
             (sym->_isparm && !IS_REGPARM (sym->etype) && !IS_STATIC (sym->localof->etype))) &&
@@ -115,9 +130,9 @@ Index: src/SDCCglue.c
  
 Index: src/SDCCmain.c
 ===================================================================
---- src/SDCCmain.c	(revision 10761)
+--- src/SDCCmain.c	(revision 10788)
 +++ src/SDCCmain.c	(working copy)
-@@ -493,16 +493,15 @@
+@@ -490,16 +490,15 @@
  {
    int i;
  
@@ -143,7 +158,7 @@ Index: src/SDCCmain.c
  static void
 Index: src/SDCCopt.c
 ===================================================================
---- src/SDCCopt.c	(revision 10761)
+--- src/SDCCopt.c	(revision 10788)
 +++ src/SDCCopt.c	(working copy)
 @@ -982,7 +982,7 @@
        /* TODO: Eliminate it, convert any SEND of volatile into DUMMY_READ_VOLATILE. */
@@ -207,7 +222,7 @@ Index: src/SDCCopt.c
                  continue;
 Index: src/z80/peep.c
 ===================================================================
---- src/z80/peep.c	(revision 10761)
+--- src/z80/peep.c	(revision 10788)
 +++ src/z80/peep.c	(working copy)
 @@ -218,6 +218,88 @@
    return(arg[0] == '#') ? FALSE : StrStr(arg, what) != NULL;
