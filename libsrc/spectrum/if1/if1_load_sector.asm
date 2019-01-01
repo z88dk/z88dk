@@ -153,7 +153,8 @@ error_exit:
 
 ; close file, and go back to main
 ok_close:
-                call    1               ; unpage
+                call    CLOSE_M         ; close file
+		call    1               ; unpage
                 ei
                 ld      a,(sector)
                 ld      l,a
