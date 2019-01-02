@@ -1,7 +1,7 @@
 	
-                SECTION         code_graphics
+	SECTION         code_graphics
+				
 	PUBLIC	drawbox
-	EXTERN	plotpixel
 
 ;
 ;	$Id: drawbox.asm $
