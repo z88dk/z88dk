@@ -36,6 +36,7 @@ graphics/undrawb_callee
 graphics/xordrawb
 graphics/xordrawb_callee
 graphics/xorborder
+graphics/xorborder_callee
 graphics/drawbox
 graphics/draw_profile
 graphics/stencil_render2
