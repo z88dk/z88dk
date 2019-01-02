@@ -25,6 +25,14 @@ graphics/undrawto
 graphics/undrawto_callee
 graphics/xordrawto
 graphics/xordrawto_callee
+graphics/drawb
+graphics/drawb_callee
+graphics/undrawb
+graphics/undrawb_callee
+graphics/xordrawb
+graphics/xordrawb_callee
+graphics/xorborder
+graphics/drawbox
 graphics/getmaxx
 graphics/getmaxy
 graphics/lbitmask
@@ -53,9 +61,6 @@ graphics/stencil_init
 graphics/dither_pattern
 graphics/rbitmask
 graphics/rscroll
-graphics/drawb
-graphics/undrawb
-graphics/drawbox
 graphics/setxy
 graphics/setpos
 graphics/setpos_callee
@@ -65,7 +70,6 @@ graphics/move
 graphics/pen_up
 graphics/pen_down
 graphics/putc4x6
-graphics/xorborder
 graphics/lores/c_plotpixel
 graphics/lores/c_respixel
 graphics/lores/c_xorpixel
