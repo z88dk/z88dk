@@ -991,10 +991,10 @@ int main (int argc, char **argv){
           LDRRIM(xh, xl);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x31: // LD SP,nn / (EZ80) ld iy,(ix+d)
-        if ( isez80() && ih == 0 || iy == 1 ) {
+        if ( isez80() && ih == 0 ) {
             t = (get_memory(pc++)^128)-128;
             st += 5;
-            if ( ih == 0 ) {  // ld iy,(ix+d)
+            if ( iy == 0 ) {  // ld iy,(ix+d)
                 yl = get_memory(t+(xl|xh<<8));
                 yh = get_memory(t+(xl|xh<<8) + 1);
             } else {  // ld ix,(iy+d)
@@ -1231,10 +1231,10 @@ int main (int argc, char **argv){
           LDPIN(xh, xl);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x3e: // LD A,n / (EZ80) ld (ix+d),iy (prefixed)
-        if ( isez80() && ih == 0 || iy == 1 ) {
+        if ( isez80() && ih == 0 ) {
             t = (get_memory(pc++)^128)-128;
             st += 5;
-            if ( ih == 0 ) {  // ld (ix+d),iy
+            if ( iy == 0 ) {  // ld (ix+d),iy
                 put_memory(t+(xl|xh<<8),yl);
                 put_memory(t+(xl|xh<<8) + 1,yh);
             } else {  // ld (iy+d),iy
@@ -1248,10 +1248,10 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x07: // RLCA / (EZ80) ld bc,(ix+d) (prefixed)
         st+= isez80() ? 1 :  israbbit() ? 2 : isz180() ? 3 : 4;
-        if ( isez80() && ih == 0 || iy == 1 ) {
+        if ( isez80() && ih == 0 ) {
             t = (get_memory(pc++)^128)-128;
             st += 4;
-            if ( ih == 0 ) {  // ld bc,(ix+d)
+            if ( iy == 0 ) {  // ld bc,(ix+d)
                 c = get_memory(t+(xl|xh<<8));
                 b = get_memory(t+(xl|xh<<8) + 1);
             } else {  // ld bc,(iy+d)
@@ -1276,10 +1276,10 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x0f: // RRCA / (EZ80) ld (ix+d),bc (prefixed)
         st+= isez80() ? 1 : israbbit() ? 2 : isz180() ? 3 : 4;
-        if ( isez80() && ih == 0 || iy == 1 ) {
+        if ( isez80() && ih == 0 ) {
             t = (get_memory(pc++)^128)-128;
             st += 4;
-            if ( ih == 0 ) {  // ld (ix+d),bc
+            if ( iy == 0 ) {  // ld (ix+d),bc
                 put_memory(t+(xl|xh<<8),c);
                 put_memory(t+(xl|xh<<8) + 1,b);
             } else {  // ld (iy+d),bc
@@ -1306,10 +1306,10 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x17: // RLA,  (EZ80) ld de,(ix+d) (prefixed)
         st+= isez80() ? 1 :  israbbit() ? 2 : isz180() ? 3 : 4;
-        if ( isez80() && ih == 0 || iy == 1 ) {
+        if ( isez80() && ih == 0 ) {
             t = (get_memory(pc++)^128)-128;
             st += 4;
-            if ( ih == 0 ) {  // ld de,(ix+d)
+            if ( iy == 0 ) {  // ld de,(ix+d)
                 e = get_memory(t+(xl|xh<<8));
                 d = get_memory(t+(xl|xh<<8) + 1);
             } else {  // ld de,(iy+d)
@@ -1336,10 +1336,10 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x1f: // RRA / (EZ80) ld (ix+d),de (prefixed)
         st+= isez80() ? 1 : israbbit() ? 2 :isz180() ? 3 : 4;
-        if ( isez80() && ih == 0 || iy == 1 ) {
+        if ( isez80() && ih == 0 ) {
             t = (get_memory(pc++)^128)-128;
             st += 4;
-            if ( ih == 0 ) {  // ld (ix+d),de
+            if ( iy == 0 ) {  // ld (ix+d),de
                 put_memory(t+(xl|xh<<8),e);
                 put_memory(t+(xl|xh<<8) + 1,d);
             } else {  // ld (iy+d),de
@@ -1453,10 +1453,10 @@ int main (int argc, char **argv){
           pc++;
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x27: // DAA / (RCM) add sp,d / (EZ80) ld hl,(ix+d) (prefixed)
-        if ( isez80() && ih == 0 || iy == 1 ) {
+        if ( isez80() && ih == 0 ) {
             t = (get_memory(pc++)^128)-128;
             st += 5;
-            if ( ih == 0 ) {  // ld hl,(ix+d)
+            if ( iy == 0 ) {  // ld hl,(ix+d)
                 l = get_memory(t+(xl|xh<<8));
                 h = get_memory(t+(xl|xh<<8) + 1);
             } else {  // ld hl,(iy+d)
@@ -1492,10 +1492,10 @@ int main (int argc, char **argv){
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x2f: // CPL / (EZ80) ld (ix+d),hl
-        if ( isez80() && ih == 0 || iy == 1 ) {
+        if ( isez80() && ih == 0 ) {
             t = (get_memory(pc++)^128)-128;
             st += 5;
-            if ( ih == 0 ) {  // ld (ix+d),hl
+            if ( iy == 0 ) {  // ld (ix+d),hl
                 put_memory(t+(xl|xh<<8),l);
                 put_memory(t+(xl|xh<<8) + 1,h);
             } else {  // ld (iy+d),hl
@@ -1520,10 +1520,10 @@ int main (int argc, char **argv){
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x37: // SCF/ (EZ80) ld ix,(ix+d) (prefixed)
-        if ( isez80() && ih == 0 || iy == 1 ) {
+        if ( isez80() && ih == 0) {
             t = (get_memory(pc++)^128)-128;
             st += 5;
-            if ( ih == 0 ) {  // ld ix,(ix+d)
+            if ( iy == 0 ) {  // ld ix,(ix+d)
                 unsigned char tl;
                 tl = get_memory(t+(xl|xh<<8));
                 xh = get_memory(t+(xl|xh<<8) + 1);
@@ -1552,10 +1552,10 @@ int main (int argc, char **argv){
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x3f: // CCF / (EZ80) ld (ix+d),ix
-        if ( isez80() && ih == 0 || iy == 1 ) {
+        if ( isez80() && ih == 0 ) {
             t = (get_memory(pc++)^128)-128;
             st += 5;
-            if ( ih == 0 ) {  // ld (ix+d),ix
+            if ( iy == 0 ) {  // ld (ix+d),ix
                 put_memory(t+(xl|xh<<8),xl);
                 put_memory(t+(xl|xh<<8) + 1,xh);
             } else {  // ld (iy+d),iy
