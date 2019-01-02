@@ -136,13 +136,16 @@ extern void __LIB__ xordrawb(int tlx, int tly, int width, int height) __smallc;
 extern void __LIB__ xordrawb_callee(int tlx, int tly, int width, int height) __smallc __z88dk_callee;
 #define xordrawb(a,b,c,d)           xordrawb_callee(a,b,c,d)
 
-/* Unraw a box (minimum size: 3x3) */
+/* Undraw a box (minimum size: 3x3) */
 extern void __LIB__ undrawb(int tlx, int tly, int width, int height) __smallc;
 extern void __LIB__ undrawb_callee(int tlx, int tly, int width, int height) __smallc __z88dk_callee;
 #define undrawb(a,b,c,d)           undrawb_callee(a,b,c,d)
 
 /* Draw a dotted border */
 extern void __LIB__ xorborder(int tlx, int tly, int width, int height) __smallc;
+extern void __LIB__ xorborder_callee(int tlx, int tly, int width, int height) __smallc __z88dk_callee;
+#define xorborder(a,b,c,d)           xorborder_callee(a,b,c,d)
+
 
 /* Draw a circle */
 extern void __LIB__ circle(int x, int y, int radius, int skip) __smallc;
