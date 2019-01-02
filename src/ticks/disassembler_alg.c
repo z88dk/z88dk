@@ -239,6 +239,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen)
     const char  *label;
     size_t       offs = 0;
     int          start_pc = pc;
+    char         dolf = 0; 
     char         opbuf1[256];
     char         opbuf2[256];
 
@@ -378,7 +379,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen)
                 } else if ( z == 1 ) {
                     if  ( q == 0 ) BUF_PRINTF("%-8s%s","pop", handle_register16_2(state,p, state->index));
                     else if ( q == 1 ) {
-                        if ( p == 0 ) BUF_PRINTF("ret");
+                        if ( p == 0 ) { BUF_PRINTF("ret"); dolf=1; }
                         else if ( p == 1 && !isgbz80() ) BUF_PRINTF("exx");
                         else if ( p == 1 && isgbz80() ) BUF_PRINTF("reti");
                         else if ( p == 2 ) BUF_PRINTF("%-8s(%s)","jp",handle_register16(state, 2, state->index)); 
@@ -648,6 +649,9 @@ int disassemble2(int pc, char *bufstart, size_t buflen)
     offs += snprintf(buf + offs, buflen - offs, ";[%04x] ", start_pc);
     for ( i = state->skip; i < state->len; i++ ) {
         offs += snprintf(buf + offs, buflen - offs,"%s%02x", i ? " " : "", state->instr_bytes[i]);
+    }
+    if ( dolf ) {
+        offs += snprintf(buf + offs, buflen - offs,"\n");
     }
 
     return state->len;
