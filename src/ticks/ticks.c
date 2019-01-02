@@ -32,12 +32,12 @@
           a= get_memory(pc++)
 
 #define LDRP(a, b, r)           \
-          st += israbbit() ? (&a == &h) ? 2 : 6 : 7, \
+          st += isez80() ? 2 : israbbit() ? (&a == &h) ? 2 : 6 : 7, \
           r= get_memory(mp= b|a<<8),   \
           ++mp
 
 #define LDRPI(a, b, r)          \
-          st += israbbit() ? 7 : isz180() ? 11 : 15, \
+          st += isez80() ? 3 : israbbit() ? 7 : isz180() ? 11 : 15, \
           r= get_memory(((get_memory(pc++)^128)-128+(b|a<<8))&65535)
 
 #define LEA(r1, r2, s1, s2, t) do { \ 
@@ -48,12 +48,12 @@
 } while (0)
 
 #define LDPR(a, b, r)           \
-          st += israbbit() ? (&a == &h) ? 6 : 7 : 7, \
+          st += isez80() ? 2 : israbbit() ? (&a == &h) ? 6 : 7 : 7, \
           put_memory(b|a<<8,r),       \
           mp= b+1&255 | a<<8
 
 #define LDPRI(a, b, r)          \
-          st += israbbit() ? 11 : 15, \
+          st += isez80() ? 3 : israbbit() ? 11 : 15, \
           put_memory(((get_memory(pc++)^128)-128+(b|a<<8))&65535,r)
 
 #define LDRR(dr, sr, dr_, n) do {          \
@@ -74,35 +74,35 @@
           put_memory(((t^128)-128+(b|a<<8))&65535, get_memory(pc++))
 
 #define INCW(a, b)              \
-          st += israbbit() ? 2 : 6, \
+          st +=isez80() ? 1 : israbbit() ? 2 : 6, \
           ++b || a++
 
 #define DECW(a, b)              \
-          st += israbbit() ? 2 : 6, \
+          st += isez80() ? 1 : israbbit() ? 2 : 6, \
           b-- || a--
 
 // TODO: Should affect alternate flags if altd
 #define INC(r)                  \
-          st += israbbit() ? 2 : 4, \
+          st +=isez80() ? 1 : israbbit() ? 2 : 4, \
           ff= ff&256            \
             | (fr= r= (fa= r)+(fb= 1))
 
 // TODO: Should affect alternate flags if altd
 #define DEC(r)                  \
-          st += israbbit() ? 2 : 4, \
+          st +=isez80() ? 1 : israbbit() ? 2 : 4, \
           ff= ff&256            \
             | (fr= r= (fa= r)+(fb= -1))
 
 // TODO: Should affect alternate flags if altd
 #define INCPI(a, b)             \
-          st += israbbit() ? 12 : 19, \
+          st +=isez80() ? 5 : israbbit() ? 12 : 19, \
           fa= get_memory(t= (get_memory(pc++)^128)-128+(b|a<<8)), \
           ff= ff&256            \
             | (fr= put_memory(t,fa+(fb=1)))
 
 // TODO: Should affect alternate flags if altd
 #define DECPI(a, b)             \
-          st += israbbit() ? 12 : 19, \
+          st +=isez80() ? 5 : israbbit() ? 12 : 19, \
           fa= get_memory(t= (get_memory(pc++)^128)-128+(b|a<<8)), \
           ff= ff&256            \
             | (fr= put_memory(t,fa+(fb=-1)))
@@ -1132,7 +1132,7 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x34: // INC (HL) // INC (IX+d) // INC (IY+d)
         if( ih ) 
-          st+= israbbit() ? 8 : 11,
+          st+=isez80() ? 4 : israbbit() ? 8 : 11,
           fa= get_memory(t= l | h<<8),
           ff= ff&256
             | (fr= put_memory(t,fa+(fb=+1)));
@@ -1174,7 +1174,7 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x35: // DEC (HL) // DEC (IX+d) // DEC (IY+d)
         if( ih )
-          st+= israbbit() ? 8 : 11,
+          st+=isez80() ? 4 : israbbit() ? 8 : 11,
           fa= get_memory(t= l | h<<8),
           ff= ff&256
             | (fr= put_memory(t,fa+(fb=-1)));
@@ -2082,43 +2082,43 @@ int main (int argc, char **argv){
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x98: // SBC A,B
-        SBC(b,  israbbit() ? 2 : 4);
+        SBC(b, isez80() ? 1 : israbbit() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x99: // SBC A,C
-        SBC(c,  israbbit() ? 2 : 4);
+        SBC(c, isez80() ? 1 : israbbit() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x9a: // SBC A,D
-        SBC(d,  israbbit() ? 2 : 4);
+        SBC(d, isez80() ? 1 : israbbit() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x9b: // SBC A,E
-        SBC(e,  israbbit() ? 2 : 4);
+        SBC(e, isez80() ? 1 : israbbit() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x9c: // SBC A,H // SBC A,IXh // SBC A,IYh
         if( ih )
-          SBC(h, israbbit() ? 2 : 4);
+          SBC(h,isez80() ? 1 : israbbit() ? 2 : 4);
         else if( iy && canixh() )
-          SBC(yh, 4);
+          SBC(yh,isez80() ? 1 : 4);
         else if ( canixh() )
-          SBC(xh, 4);
+          SBC(xh,isez80() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x9d: // SBC A,L // SBC A,IXl // SBC A,IYl
         if( ih )
-          SBC(l, israbbit() ? 2 : 4);
+          SBC(l,isez80() ? 1 : israbbit() ? 2 : 4);
         else if( iy && canixh() )
-          SBC(yl, 4);
+          SBC(yl,isez80() ? 1 : 4);
         else if ( canixh() )
-          SBC(xl, 4);
+          SBC(xl,isez80() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x9e: // SBC A,(HL) // SBC A,(IX+d) // SBC A,(IY+d)
         if( ih )
-          SBC(get_memory(l|h<<8), israbbit() ? 5 : 7);
+          SBC(get_memory(l|h<<8),isez80() ? 2 : israbbit() ? 5 : 7);
         else if( iy )
-          SBC(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535),  7);
+          SBC(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535), isez80() ? 3 : 7);
         else
-          SBC(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535),  7);
+          SBC(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535), isez80() ? 3 : 7);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x9f: // SBC A,A
-        st+=  israbbit() ? 2 : 4;
+        st+= isez80() ? 1 : israbbit() ? 2 : 4;
         if ( altd ) {
           fb_= ~(fa_= a);
           fr_= a_= (ff_= (ff_&256)/-256);
@@ -2128,43 +2128,43 @@ int main (int argc, char **argv){
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xa0: // AND B
-        AND(b, israbbit() ? 2 : 4);
+        AND(b, isez80() ? 1 : israbbit() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xa1: // AND C
-        AND(c, israbbit() ? 2 : 4);
+        AND(c, isez80() ? 1 : israbbit() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xa2: // AND D
-        AND(d, israbbit() ? 2 : 4);
+        AND(d, isez80() ? 1 : israbbit() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xa3: // AND E
-        AND(e, israbbit() ? 2 : 4);
+        AND(e, isez80() ? 1 : israbbit() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xa4: // AND H // AND IXh // AND IYh
         if( ih )
-          AND(h, israbbit() ? 2 : 4);
+          AND(h,  isez80() ? 1 :israbbit() ? 2 : 4);
         else if( iy && canixh() )
-          AND(yh, 4);
+          AND(yh, isez80() ? 1 : 4);
         else if ( canixh() )
-          AND(xh, 4);
+          AND(xh, isez80() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xa5: // AND L // AND IXl // AND IYl
         if( ih )
-          AND(l, israbbit() ? 2 : 4);
+          AND(l, isez80() ? 1 : israbbit() ? 2 : 4);
         else if( iy && canixh() )
-          AND(yl, 4);
+          AND(yl, isez80() ? 1 : 4);
         else if ( canixh() )
-          AND(xl, 4);
+          AND(xl, isez80() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xa6: // AND (HL) // AND (IX+d) // AND (IY+d)
         if( ih )
-          AND(get_memory(l|h<<8), israbbit() ? 5 : 7);
+          AND(get_memory(l|h<<8), isez80() ? 2 : israbbit() ? 5 : 7);
         else if( iy )
-          AND(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535), 7);
+          AND(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535), isez80() ? 3 : 7);
         else
-          AND(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535), 7);
+          AND(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535), isez80() ? 3 : 7);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xa7: // AND A
-        st+=israbbit() ? 2 : 4;
+        st+=isez80() ? 1 : israbbit() ? 2 : 4;
         if ( altd ) {
           fa_= ~(ff_= fr_= a_);
           fb_= 0;
@@ -2174,84 +2174,84 @@ int main (int argc, char **argv){
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xa8: // XOR B
-        XOR(b,  israbbit() ? 2 : 4);
+        XOR(b,isez80() ? 1 : israbbit() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xa9: // XOR C
-        XOR(c,  israbbit() ? 2 : 4);
+        XOR(c,isez80() ? 1 : israbbit() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xaa: // XOR D
-        XOR(d,  israbbit() ? 2 : 4);
+        XOR(d,isez80() ? 1 : israbbit() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xab: // XOR E
-        XOR(e,  israbbit() ? 2 : 4);
+        XOR(e,isez80() ? 1 : israbbit() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xac: // XOR H // XOR IXh // XOR IYh
         if( ih )
-          XOR(h, 4);
+          XOR(h,isez80() ? 1 : 4);
         else if( iy )
-          XOR(yh, 4);
+          XOR(yh,isez80() ? 1 : 4);
         else
-          XOR(xh, 4);
+          XOR(xh,isez80() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xad: // XOR L // XOR IXl // XOR IYl
         if( ih )
-          XOR(l,  israbbit() ? 2 : 4);
+          XOR(l,isez80() ? 1 : israbbit() ? 2 : 4);
         else if( iy && canixh() )
-          XOR(yl, 4);
+          XOR(yl,isez80() ? 1 : 4);
         else if ( canixh() )
-          XOR(xl, 4);
+          XOR(xl,isez80() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xae: // XOR (HL) // XOR (IX+d) // XOR (IY+d)
         if( ih )
-          XOR(get_memory(l|h<<8), israbbit() ? 5 : 7);
+          XOR(get_memory(l|h<<8),isez80() ? 2 : israbbit() ? 5 : 7);
         else if( iy )
-          XOR(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535), 7);
+          XOR(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535),isez80() ? 3 : 7);
         else
-          XOR(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535), 7);
+          XOR(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535),isez80() ? 3 : 7);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xaf: // XOR A
-        st+= 4;
+        st+=isez80() ? 1 : israbbit() ? 2 : 4;
         a= ff= fr= fb= 0;
         fa= 256;
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xb0: // OR B
-        OR(b, israbbit() ? 2 : 4);
+        OR(b,isez80() ? 1 : israbbit() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xb1: // OR C
-        OR(c,  israbbit() ? 2 : 4);
+        OR(c,isez80() ? 1 : israbbit() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xb2: // OR D
-        OR(d, israbbit() ? 2 : 4);
+        OR(d,isez80() ? 1 : israbbit() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xb3: // OR E
-        OR(e, israbbit() ? 2 : 4);
+        OR(e,isez80() ? 1 : israbbit() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xb4: // OR H // OR IXh // OR IYh
         if( ih )
-          OR(h, israbbit() ? 2 : 4);
+          OR(h,isez80() ? 1 : israbbit() ? 2 : 4);
         else if( iy && canixh() )
-          OR(yh, 4);
+          OR(yh,isez80() ? 1 : 4);
         else if ( canixh() )
-          OR(xh, 4);
+          OR(xh,isez80() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xb5: // OR L // OR IXl // OR IYl
         if( ih )
-          OR(l, israbbit() ? 2 : 4);
+          OR(l,isez80() ? 1 : israbbit() ? 2 : 4);
         else if( iy && canixh() )
-          OR(yl, 4);
+          OR(yl,isez80() ? 1 : 4);
         else if ( canixh() )
-          OR(xl, 4);
+          OR(xl,isez80() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xb6: // OR (HL) // OR (IX+d) // OR (IY+d)
         if( ih )
-          OR(get_memory(l|h<<8), israbbit() ? 5 : 7);
+          OR(get_memory(l|h<<8),isez80() ? 2 : israbbit() ? 5 : 7);
         else if( iy )
-          OR(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535), 7);
+          OR(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535),isez80() ? 3 : 7);
         else
-          OR(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535), 7);
+          OR(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535),isez80() ? 3 : 7);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xb7: // OR A
-        st+= israbbit() ? 2 : 4;
+        st+=isez80() ? 1 : israbbit() ? 2 : 4;
         if ( altd ) {
           fa_= 256
             | (ff_= fr_= a);
@@ -2263,46 +2263,46 @@ int main (int argc, char **argv){
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xb8: // CP B
-        CP(b, israbbit() ? 2 : 4);
+        CP(b,isez80() ? 1 : israbbit() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xb9: // CP C
-        CP(c, israbbit() ? 2 : 4);
+        CP(c,isez80() ? 1 : israbbit() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xba: // CP D
-        CP(d, israbbit() ? 2 : 4);
+        CP(d,isez80() ? 1 : israbbit() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xbb: // CP E
-        CP(e, israbbit() ? 2 : 4);
+        CP(e,isez80() ? 1 : israbbit() ? 2 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xbc: // CP H // CP IXh // CP IYh
         if( ih )
-          CP(h, israbbit() ? 2 : 4);
+          CP(h,isez80() ? 1 : israbbit() ? 2 : 4);
         else if( iy && canixh() )
-          CP(yh, 4);
+          CP(yh,isez80() ? 1 : 4);
         else if ( canixh() )
-          CP(xh, 4);
+          CP(xh,isez80() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xbd: // CP L // CP IXl // CP IYl
         if( ih )
-          CP(l, israbbit() ? 2 : 4);
+          CP(l,isez80() ? 1 : israbbit() ? 2 : 4);
         else if( iy && canixh() )
-          CP(yl, 4);
+          CP(yl,isez80() ? 1 : 4);
         else if (canixh())
-          CP(xl, 4);
+          CP(xl,isez80() ? 1 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xbe: // CP (HL) // CP (IX+d) // CP (IY+d)
         if( ih )
           w= get_memory(l|h<<8),
-          CP(w, israbbit() ? 5 : 7);
+          CP(w,isez80() ? 2 : israbbit() ? 5 : 7);
         else if( iy )
           w= get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535),
-          CP(w, 7);
+          CP(w,isez80() ? 3 : 7);
         else
           w= get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535),
-          CP(w, 7);
+          CP(w,isez80() ? 3 : 7);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xbf: // CP A
-        st+= israbbit() ? 2 : 4;  
+        st+=isez80() ? 1 : israbbit() ? 2 : 4;  
         if ( altd ) {
           fr_= 0;
           fb_= ~(fa_= a);
@@ -2730,11 +2730,11 @@ int main (int argc, char **argv){
           sp= xl | xh<<8;
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xdd: // OP DD
-        st+= israbbit() ? 2 : isz180() ? 3 : 4;
+        st+= isez80() ? 1 : israbbit() ? 2 : isz180() ? 3 : 4;
         ih= iy= 0;
         ih=0;break;
       case 0xfd: // OP FD
-        st+= israbbit() ? 2 : isz180() ? 3 : 4;
+        st+= isez80() ? 1 : israbbit() ? 2 : isz180() ? 3 : 4;
         ih= 0;
         iy= 1;
         ih=0;break;
