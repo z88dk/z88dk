@@ -38,26 +38,12 @@
 		pop	de
 .rowloop
 		push	bc
-		
-		push	hl
-		push	de
-		ld	de, p_RET1
-		push	de
-		jp	(ix)	;	execute PLOT at (h,l)
-.p_RET1
-		pop	de
-		pop	hl
+
+		call p_sub
 		inc	l
 		ex	de,hl
 
-		push	hl
-		push	de
-		ld	de, p_RET2
-		push	de
-		jp	(ix)	;	execute PLOT at (h,l)
-.p_RET2
-		pop	de
-		pop	hl
+		call p_sub
 		inc	l
 		ex	de,hl
 
@@ -82,25 +68,11 @@
 .vrowloop
 		push	bc
 		
-		push	hl
-		push	de
-		ld	de, p_RET3
-		push	de
-		jp	(ix)	;	execute PLOT at (h,l)
-.p_RET3
-		pop	de
-		pop	hl
+		call p_sub
 		inc	h
 		ex	de,hl
 		
-		push	hl
-		push	de
-		ld	de, p_RET4
-		push	de
-		jp	(ix)	;	execute PLOT at (h,l)
-.p_RET4
-		pop	de
-		pop	hl
+		call p_sub
 		inc	h
 		ex	de,hl
 		
@@ -108,4 +80,15 @@
 		
 		djnz	vrowloop
 
+		ret
+
+.p_sub
+		push	hl
+		push	de
+		ld	de, p_RET1
+		push	de
+		jp	(ix)	;	execute PLOT at (h,l)
+.p_RET1
+		pop	de
+		pop	hl
 		ret
