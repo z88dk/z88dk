@@ -92,6 +92,20 @@ extern void __LIB__ undrawr(int px, int py) __smallc;
 extern void __LIB__ undrawr_callee(int px, int py) __smallc __z88dk_callee;
 #define undrawr(a,b)           undrawr_callee(a,b)
 
+/* Draw up to a specified point */
+extern void __LIB__ drawto(int x2, int y2) __smallc;
+extern void __LIB__ drawto_callee(int x2, int y2) __smallc __z88dk_callee;
+#define drawto(a,b)           drawto_callee(a,b)
+
+/* Draw up to a specified point in XOR mode*/
+extern void __LIB__ xordrawto(int x2, int y2) __smallc;
+extern void __LIB__ xordrawto_callee(int x2, int y2) __smallc __z88dk_callee;
+#define xordrawto(a,b)           xordrawto_callee(a,b)
+
+/* Undraw up to a specified point */
+extern void __LIB__ undrawto(int x2, int y2) __smallc;
+extern void __LIB__ undrawto_callee(int x2, int y2) __smallc __z88dk_callee;
+#define undrawto(a,b)           undrawto_callee(a,b)
 
 
 /* Pen up for 'move' */
@@ -112,26 +126,20 @@ extern void __LIB__ setpos_callee(int px, int py) __smallc __z88dk_callee;
 extern int __LIB__ getx();
 extern int __LIB__ gety();
 
-/* Draw up to a specified point */
-extern void __LIB__ drawto(int x2, int y2) __smallc;
-extern void __LIB__ drawto_callee(int x2, int y2) __smallc __z88dk_callee;
-#define drawto(a,b)           drawto_callee(a,b)
-
-/* Draw up to a specified point in XOR mode*/
-extern void __LIB__ xordrawto(int x2, int y2) __smallc;
-extern void __LIB__ xordrawto_callee(int x2, int y2) __smallc __z88dk_callee;
-#define xordrawto(a,b)           xordrawto_callee(a,b)
-
-/* Undraw up to a specified point */
-extern void __LIB__ undrawto(int x2, int y2) __smallc;
-extern void __LIB__ undrawto_callee(int x2, int y2) __smallc __z88dk_callee;
-#define undrawto(a,b)           undrawto_callee(a,b)
-
-/* Draw a box */
+/* Draw a box (minimum size: 3x3) */
 extern void __LIB__ drawb(int tlx, int tly, int width, int height) __smallc;
+extern void __LIB__ drawb_callee(int tlx, int tly, int width, int height) __smallc __z88dk_callee;
+#define drawb(a,b,c,d)           drawb_callee(a,b,c,d)
 
-/* Undraw a box */
+/* Draw a box in XOR mode (minimum size: 3x3) */
+extern void __LIB__ xordrawb(int tlx, int tly, int width, int height) __smallc;
+extern void __LIB__ xordrawb_callee(int tlx, int tly, int width, int height) __smallc __z88dk_callee;
+#define xordrawb(a,b,c,d)           xordrawb_callee(a,b,c,d)
+
+/* Unraw a box (minimum size: 3x3) */
 extern void __LIB__ undrawb(int tlx, int tly, int width, int height) __smallc;
+extern void __LIB__ undrawb_callee(int tlx, int tly, int width, int height) __smallc __z88dk_callee;
+#define undrawb(a,b,c,d)           undrawb_callee(a,b,c,d)
 
 /* Draw a dotted border */
 extern void __LIB__ xorborder(int tlx, int tly, int width, int height) __smallc;
