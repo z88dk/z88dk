@@ -21,6 +21,14 @@
 ;
 ;	$Id: app_crt0.asm,v 1.30 2016-07-15 19:32:43 dom Exp $
 
+        PUBLIC    cleanup               ;jp'd to by exit()
+        PUBLIC    l_dcal                ;jp(hl)
+
+
+        PUBLIC    processcmd    ;Processing <> commands
+
+
+        PUBLIC  _cpfar2near     ;Conversion of far to near data
 
 ;--------
 ; Call up some header files (probably too many but...)
