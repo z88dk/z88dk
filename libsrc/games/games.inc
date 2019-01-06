@@ -118,6 +118,7 @@ IF FORtrs80
         defc sndbit_port   = 255
         defc sndbit_bit    = 1
         defc sndbit_mask   = 3
+	defc JOYSTICK_inkey = 1
 ENDIF
 
 IF FORvg5k
