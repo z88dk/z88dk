@@ -157,6 +157,13 @@ extern unsigned char *joystick_type[];
 	#define GAME_DEVICES 2
 #endif
 
+#ifdef __LYNX__
+#ifdef DEFINE_JOYSTICK_TYPE
+	unsigned char *joystick_type[] = { "QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
+#endif
+	#define GAME_DEVICES 4
+#endif
+
 #ifdef __RX78__
 #ifdef DEFINE_JOYSTICK_TYPE
 	unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2", "QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
