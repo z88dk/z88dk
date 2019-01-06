@@ -42,11 +42,12 @@ noctrl:
 rotate_loop:
 	and	@00001111
 	jr	z,rotate_done
-	sla	b
+	rlc	b
 	dec	a
 	jr	nz,rotate_loop
 
 rotate_done:
+	ld	a,b
 	out	(0xf8),a
 	in	a,(0xfa)
 	cpl

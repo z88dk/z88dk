@@ -17,3 +17,6 @@ games/obj/${TARGET}/bit_close
 games/obj/${TARGET}/bit_close_ei
 games/obj/${TARGET}/beeper
 games/obj/${TARGET}/joystick_type
+games/obj/${TARGET}/joystick_sc
+games/obj/${TARGET}/kjoystick
+games/obj/${TARGET}/joystick_inkey

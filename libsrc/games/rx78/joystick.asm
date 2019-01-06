@@ -3,6 +3,7 @@
 	SECTION	code_clib
 	PUBLIC	joystick
 	PUBLIC	_joystick
+	EXTERN	joystick_inkey
 
 ; 0 = #define MOVE_RIGHT 1
 ; 1 = #define MOVE_LEFT  2
@@ -14,6 +15,10 @@
 
 ; hl = 1 - player 1 joystick
 ;    = 2 - player 2 joystick
+;    = 3 - qaop
+;    = 4 - 8246
+;    = 5 - hjkl
+;    = 6 - cursors
 
 ; Ports 10, 11, 12 = J1 13, 14, 15 = J2
 
@@ -24,6 +29,10 @@ _joystick:
 	cp	1
 	jr	z,read_joystick
 	ld	h,13
+	cp	2
+	jr	z,read_joystick
+	sub	2
+	jp	joystick_inkey
 
 read_joystick:
 	ld	bc,0xf4

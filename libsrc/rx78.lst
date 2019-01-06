@@ -32,5 +32,6 @@ graphics/clrarea
 graphics/fill
 graphics/getsprite
 games/rx78/joystick
+games/rx78/keys_joystick
 @games/games.lst
 @z80.lst
