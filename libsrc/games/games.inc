@@ -246,14 +246,16 @@ ENDIF
 
 IF FORsc3000
 	defc sndbit_port	= $7F		; also valid for SG-1000
-    defc sndbit_bit    = 3
-    defc sndbit_mask   = $0F			; $0F for full volume output
+        defc sndbit_bit    = 3
+        defc sndbit_mask   = $0F			; $0F for full volume output
+	defc JOYSTICK_inkey = 1
 ENDIF
 
 IF FORm5
 	defc sndbit_port	= $20
-    defc sndbit_bit    = 3
-    defc sndbit_mask   = $0F			; $0F for full volume output
+        defc sndbit_bit    = 3
+        defc sndbit_mask   = $0F			; $0F for full volume output
+	defc JOYSTICK_inkey = 1
 ENDIF
 
 IF FORmtx

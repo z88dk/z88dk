@@ -34,6 +34,7 @@ graphics/msx/surface/surface_draw
 graphics/msx/surface/surface_pixladdr
 graphics/msx/surface/surface_plotpixl
 graphics/msx/surface/surface_stencil_render
+games/m5/keys_joystick
 games/m5/joystick
 psg/sn76489/bit_open
 @games/games.lst
