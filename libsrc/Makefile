@@ -986,6 +986,7 @@ alphatro_clib.lib:
 	@$(RM) -f video/mc6845/*.o
 	$(MAKE) gfxdeps
 	$(call buildgeneric,alphatro)
+	$(MAKE) -C games TARGET=alphatro
 	TARGET=alphatro TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORalphatro -x$(OUTPUT_DIRECTORY)/alphatro_clib @$(LISTFILE_DIRECTORY)/alphatro.lst
 
 # SPC-1000 - dom
