@@ -17,6 +17,7 @@ games/trs80/bit_open
 games/trs80/bit_open_di
 games/trs80/bit_close
 games/trs80/bit_close_ei
+games/trs80/keys_joystick
 @games/games.lst
 @video/mc6845/mc6845.lst
 @z80.lst

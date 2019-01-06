@@ -33,7 +33,7 @@ graphics/text/swapgfxbk
 games/laser500/bit_open
 games/laser500/bit_close
 games/laser500/joystick
-games/laser500/joystick
+games/laser500/keys_joystick
 @games/games_mwr.lst
 games/obj/laser500/joystick_type
 @z80.lst

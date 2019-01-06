@@ -35,7 +35,8 @@ graphics/msx/surface/surface_draw
 graphics/msx/surface/surface_pixladdr
 graphics/msx/surface/surface_plotpixl
 graphics/msx/surface/surface_stencil_render
-games/msx/joystick
+games/svi/joystick
+games/svi/keys_joystick
 games/msx/bit_open
 games/msx/bit_open_di
 games/msx/bit_close

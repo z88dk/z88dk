@@ -34,6 +34,7 @@ graphics/msx/surface/surface_plotpixl
 graphics/msx/surface/surface_stencil_render
 psg/sn76489/bit_open
 games/sc3000/joystick
+games/sc3000/keys_joystick
 @games/games.lst
 psg/sn76489/psg_tone
 psg/sn76489/psg_volume

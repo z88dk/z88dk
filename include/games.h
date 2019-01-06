@@ -2,6 +2,7 @@
 #define __GAMES_H__
 
 #include <sys/compiler.h>
+#include <stdint.h>
 
 #ifdef __TIKI100__
 #include <tiki100.h>
@@ -40,6 +41,10 @@ extern void __LIB__ putsprite(int ortype, int x, int y, void *sprite) __smallc;
 
 /* Joystick (or whatever game device) control function */
 extern unsigned int __LIB__  joystick(int game_device) __z88dk_fastcall;
+
+/* Internal keyboard joysticks that use inkey driver */
+extern uint8_t __LIB__ joystick_sc(int *scan_codes) __z88dk_fastcall;
+extern uint8_t __LIB__ kjoystick(uint8_t keycodes) __z88dk_fastcall;
 
 #define MOVE_RIGHT 1
 #define MOVE_LEFT  2
@@ -91,9 +96,9 @@ extern unsigned char *joystick_type[];
 
 #ifdef __M5__
 #ifdef DEFINE_JOYSTICK_TYPE
-	unsigned char *joystick_type[] = { "Cursor keys + Space"};
+	unsigned char *joystick_type[] = { "Joystick 1 + Space", "QAOP-MN", "8246-05", "hjkl-sd"};
 #endif
-	#define GAME_DEVICES 1
+	#define GAME_DEVICES 4
 #endif
 
 #ifdef __MSX__
@@ -126,9 +131,9 @@ extern unsigned char *joystick_type[];
 
 #ifdef __LASER500__
 #ifdef DEFINE_JOYSTICK_TYPE
-	unsigned char *joystick_type[] = {"Joystick 1"};
+	unsigned char *joystick_type[] = {"Joystick 1", "QAOP-MN", "8246-05", "hjkl-sd"};
 #endif
-	#define GAME_DEVICES 1
+	#define GAME_DEVICES 4
 #endif
 
 #ifdef __MC1000__
@@ -152,25 +157,32 @@ extern unsigned char *joystick_type[];
 	#define GAME_DEVICES 2
 #endif
 
+#ifdef __LYNX__
+#ifdef DEFINE_JOYSTICK_TYPE
+	unsigned char *joystick_type[] = { "QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
+#endif
+	#define GAME_DEVICES 4
+#endif
+
 #ifdef __RX78__
 #ifdef DEFINE_JOYSTICK_TYPE
-	unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2"};
+	unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2", "QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
 #endif
-	#define GAME_DEVICES 2
+	#define GAME_DEVICES 6
 #endif
 
 #ifdef __SVI__
 #ifdef DEFINE_JOYSTICK_TYPE
-	unsigned char *joystick_type[] = { "Cursor", "Joystick 1", "Joystick 2"};
+	unsigned char *joystick_type[] = { "Joystick 1", "Joystick 2", "QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
 #endif
-	#define GAME_DEVICES 3
+	#define GAME_DEVICES 6
 #endif
 
 #ifdef __SC3000__
 #ifdef DEFINE_JOYSTICK_TYPE
-	unsigned char *joystick_type[] = { "Joystick 1", "Joystick 2"};
+	unsigned char *joystick_type[] = { "Joystick 1", "Joystick 2", "QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
 #endif
-	#define GAME_DEVICES 2
+	#define GAME_DEVICES 6
 #endif
 
 #ifdef __SPECTRUM__
@@ -179,6 +191,35 @@ extern unsigned char *joystick_type[];
 #endif
 	#define GAME_DEVICES 5
 #endif
+
+#ifdef __SUPER80__
+#ifdef DEFINE_JOYSTICK_TYPE
+	unsigned char *joystick_type[] = {"QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
+#endif
+	#define GAME_DEVICES 4
+#endif
+
+#ifdef __AQUARIUS__
+#ifdef DEFINE_JOYSTICK_TYPE
+	unsigned char *joystick_type[] = {"QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
+#endif
+	#define GAME_DEVICES 4
+#endif
+
+#ifdef __ALPHATRO__
+#ifdef DEFINE_JOYSTICK_TYPE
+	unsigned char *joystick_type[] = {"QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
+#endif
+	#define GAME_DEVICES 4
+#endif
+
+#ifdef __TRS80__
+#ifdef DEFINE_JOYSTICK_TYPE
+	unsigned char *joystick_type[] = {"QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
+#endif
+	#define GAME_DEVICES 4
+#endif
+
 
 #ifdef __ACE__
 #ifdef DEFINE_JOYSTICK_TYPE

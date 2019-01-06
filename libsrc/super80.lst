@@ -24,5 +24,6 @@ graphics/text/swapgfxbk
 @stdio/stdio.lst
 games/super80/bit_open
 games/super80/bit_close
+games/super80/keys_joystick
 @games/games.lst
 @z80.lst
