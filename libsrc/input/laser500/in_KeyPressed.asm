@@ -67,7 +67,7 @@ check_actual_key:
 	ret
 fail:
 	ld	hl,0	
-	scf
+	and	a
 	ret
 
 ; Figure out which port we should be reading from
@@ -82,7 +82,6 @@ row_0_9_loop:
 	ret	z
 	scf
 	rl	e
-	rl	h
 	dec	a
 	jr	row_0_9_loop
 ports_a_d:

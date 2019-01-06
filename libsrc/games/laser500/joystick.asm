@@ -14,14 +14,15 @@
         PUBLIC    joystick
 	PUBLIC	_joystick
 	EXTERN	get_psg
+	EXTERN	joystick_inkey
 
 
 .joystick
 ._joystick
 	;__FASTCALL__ : joystick no. in HL
 	ld	hl,0
-	cp	1
-	ret	nz
+	dec	a
+	jp	nz,joystick_inkey
 
 ; 0 = #define MOVE_RIGHT 1
 ; 1 = #define MOVE_LEFT  2
