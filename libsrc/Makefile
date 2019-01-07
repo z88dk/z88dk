@@ -614,6 +614,7 @@ sorcerer_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(call buildgeneric,srr)
+	$(MAKE) -C games TARGET=srr
 	TARGET=srr TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsorcerer -x$(OUTPUT_DIRECTORY)/sorcerer_clib @$(LISTFILE_DIRECTORY)/sorcerer.lst
 
 # Sharp MZ lib - Stefano

@@ -226,13 +226,19 @@ IF FORlynx
         defc sndbit_port   = 0
         defc sndbit_bit    = 0
         defc sndbit_mask   = 0
-	defc JOYSTICK_inkey = 1
 ENDIF
 
 IF FORosca
         defc sndbit_port   = 0
         defc sndbit_bit    = 0
         defc sndbit_mask   = 0
+ENDIF
+
+IF FORsrr
+        defc sndbit_port   = 0
+        defc sndbit_bit    = 0
+        defc sndbit_mask   = 0
+	defc JOYSTICK_inkey = 1
 ENDIF
 
 ; ********************************************************
