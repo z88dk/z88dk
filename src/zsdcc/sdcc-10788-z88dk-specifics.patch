@@ -1,18 +1,3 @@
-Index: src/SDCC.y
-===================================================================
---- src/SDCC.y	(revision 10788)
-+++ src/SDCC.y	(working copy)
-@@ -185,6 +185,10 @@
-           cleanUpLevel (SymbolTab, 1);
-         }
-    | addressmod
-+        {
-+            /* Reported by @aralbrec that GNU Bison requires this.
-+             */
-+        }
-    ;
- 
- function_definition
 Index: src/SDCCasm.c
 ===================================================================
 --- src/SDCCasm.c	(revision 10788)
