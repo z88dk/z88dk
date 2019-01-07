@@ -27,6 +27,7 @@ graphics/__gfx_coords
 graphics/vg5k/textpixl6
 graphics/vg5k/cleargraphics
 games/vg5k/joystick
+games/vg5k/keys_joystick
 games/vg5k/bit_open
 games/vg5k/bit_open_di
 games/vg5k/bit_close
