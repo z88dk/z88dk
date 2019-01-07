@@ -614,6 +614,7 @@ sorcerer_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(call buildgeneric,srr)
+	$(MAKE) -C games TARGET=srr
 	TARGET=srr TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsorcerer -x$(OUTPUT_DIRECTORY)/sorcerer_clib @$(LISTFILE_DIRECTORY)/sorcerer.lst
 
 # Sharp MZ lib - Stefano
@@ -999,6 +1000,7 @@ spc1000_clib.lib:
 	$(call buildgeneric,spc1000)
 	$(MAKE) -C msx TARGET=test
 	$(MAKE) -C msx TARGET=spc1000
+	$(MAKE) -C games TARGET=spc1000
 	TARGET=spc1000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORspc1000 -x$(OUTPUT_DIRECTORY)/spc1000_clib @$(LISTFILE_DIRECTORY)/spc1000.lst
 
 # Casio PV1000 - dom

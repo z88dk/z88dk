@@ -22,5 +22,6 @@ graphics/dfill2
 graphics/putsprite3
 graphics/stencil_render2
 graphics/text/swapgfxbk
-games/joystick
+games/srr/keys_joystick
+@games/games.lst
 @z80.lst

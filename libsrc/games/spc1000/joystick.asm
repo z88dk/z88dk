@@ -6,6 +6,7 @@
         PUBLIC    joystick
 	PUBLIC	_joystick
 	EXTERN	get_psg
+	EXTERN	joystick_inkey
 
 
 .joystick
@@ -14,8 +15,8 @@
 	ld	a,14
 	dec	l
 	jr	z,got_port
-	ld	hl,0	
-	ret
+	ld	a,l
+	jp	joystick_inkey
 
 got_port:
 	ld	l,a
