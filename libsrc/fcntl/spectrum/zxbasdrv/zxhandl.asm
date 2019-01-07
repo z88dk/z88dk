@@ -3,8 +3,10 @@
 ;
 ; Stefano - 5/7/2006
 ;
-; $Id: zxhandl.asm,v 1.2 2015-01-19 01:32:43 pauloscustodio Exp $
+; $Id: zxhandl.asm $
 
+	SECTION smc_clib
+	
 	PUBLIC	zxhandl
 	
 ; handles: list of used streams, we keep #14 an #15 reserved,
