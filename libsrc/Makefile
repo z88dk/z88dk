@@ -1000,6 +1000,7 @@ spc1000_clib.lib:
 	$(call buildgeneric,spc1000)
 	$(MAKE) -C msx TARGET=test
 	$(MAKE) -C msx TARGET=spc1000
+	$(MAKE) -C games TARGET=spc1000
 	TARGET=spc1000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORspc1000 -x$(OUTPUT_DIRECTORY)/spc1000_clib @$(LISTFILE_DIRECTORY)/spc1000.lst
 
 # Casio PV1000 - dom
