@@ -63,7 +63,10 @@ set_mode:
 	ld	(__gal_mode),a
 	and	a
 	jr	nz,not_mode0
-
+ 	ld	a,$c
+	ld	($2ba8),a
+	ld	hl,$bfe0
+	ld	($2a6a),hl
 	halt
 	im	1
 not_mode0:
