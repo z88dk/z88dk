@@ -70,6 +70,10 @@
 #define psgT(hz)		((int)(125000.0 / (hz)))
 #endif
 
+#ifdef __GAL__
+#define psgT(hz)		((int)(1536000.0 / (hz)))
+#endif
+
 #ifdef __MC1000__
 // CPU clock: 3.57 mhz, let's divide by 32
 #define psgT(hz)		((int)(111562.5 / (hz)))
