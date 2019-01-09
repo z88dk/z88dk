@@ -89,7 +89,7 @@
 	cp	9
 	jr	nc,putspritew
 
-	 di
+	 ;di
          ld       d,(ix+0)
          ld       b,(ix+1)
 ._oloop  push     bc                ;Save # of rows
@@ -124,7 +124,7 @@
 
 
 .putspritew
-	 di
+	 ;di
          ld       d,(ix+0)
          ld       b,(ix+1)        
 .woloop  push     bc                ;Save # of rows
