@@ -98,14 +98,19 @@ endif
         ; --- nothing more ?
 
 init:
-        im      1
-	INCLUDE	"crt/classic/crt_init_sp.asm"
-	INCLUDE	"crt/classic/crt_init_atexit.asm"
+
+		INCLUDE	"crt/classic/crt_init_sp.asm"
+		
         ld      a,@111000       ; White PAPER, black INK
         call    zx_internal_cls
         ld      (hl),0
         ld      bc,42239
         ldir
+
+		INCLUDE	"crt/classic/crt_init_atexit.asm"
+		call	crt0_init_bss
+
+		im      1
         ei
 ELSE
 
