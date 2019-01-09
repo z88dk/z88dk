@@ -1,11 +1,11 @@
-; $Id: bit_fx2_mwr.asm,v 1.3 2016-04-23 21:06:32 dom Exp $
+; $Id: bit_fx2_mwr.asm $
 ;
 ; 1 bit sound library - version for "memory write" I/O architectures
 ; sound effects module.
 ; Alternate sound library by Stefano Bodrato
 ;
 
-          SECTION    code_clib
+          SECTION    smc_clib
           PUBLIC     bit_fx2
           PUBLIC     _bit_fx2
           INCLUDE  "games/games.inc"
