@@ -1487,10 +1487,28 @@ void mult(LVALUE* lval)
         Zsp += 6;
         break;
     case KIND_CHAR:
-        if ( lval->ltype->isunsigned && c_cpu == CPU_Z180 ) {
-            ot("ld\th,e\n");
-            ot("mlt\thl\n");
-            break;
+        if ( lval->ltype->isunsigned ) {
+            if (c_cpu == CPU_Z180 ) {
+                ot("ld\th,e\n");
+                ot("mlt\thl\n");
+                break;
+            } else if ( (c_cpu & CPU_RABBIT) ) {
+                // For Rabbit we want to use the mul instruction
+            } else if ( c_speed_optimisation & OPT_UCHAR_MULT ) {
+                int label1 = getlabel();
+                int label2 = getlabel();
+                ol("ld\th,l");
+                ol("ld\tl,0");
+                ol("ld\td,l");
+                ol("ld\tb,8");
+                postlabel(label1);
+                ol("add\thl,hl");
+                opjumpr("nc,",label2);
+		ol("add\thl,de");
+		postlabel(label2);
+		outfmt("\tdjnz\ti_%d\n",label1);
+                break;
+            }
         }
     default:
         callrts("l_mult"); 

@@ -36,6 +36,37 @@
 %check 0 <= %1 <= 254
 	ld	hl,%1	;const
 	add	hl,sp
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+=
+	ld	hl,(sp + %1)
+
+%check 0 <= %1 <= 254
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	c,(hl)
+	inc	hl
+	ld	b,(hl)
+	ld	hl,%2
+=
+	ld	hl,(sp + %1)
+	ld	c,l
+	ld	b,h
+	ld	hl,%2
+
+	ld	c,l
+	ld	b,h
+	ld	hl,%2	;const
+	add	hl,bc
+=
+	ld	bc,%2
+	add	hl,bc
+
+%check 0 <= %1 <= 254
+	ld	hl,%1	;const
+	add	hl,sp
 	inc	(hl)
 	ld	a,(hl)
 	inc	hl
