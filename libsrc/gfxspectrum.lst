@@ -1,4 +1,3 @@
-@gfxbase.lst
 graphics/dcircle
 graphics/spectrum/clg
 graphics/clrarea2
@@ -19,3 +18,4 @@ graphics/spectrum/rowtab
 graphics/spectrum/pixladdr
 graphics/spectrum/swapgfxbk
 graphics/spectrum/zx_hardcopy
+@gfxbase.lst
