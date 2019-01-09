@@ -141,21 +141,22 @@ static char *handle_register8(dcontext *state, uint8_t y, char *buf, size_t bufl
         { "b", "c", "d", "e", "iyh", "ixl", "(iy", "a" }
     };
     size_t offs = 0;
+    int index = state->index;
 
     /* Turn of ixl/h handling for Rabbit and Z180 */
     if ( !canixh() && y != 6 ) {
-        state->index = 0;
+        index = 0;
     }
-    if ( y == 6 && state->index ) {
+    if ( y == 6 && index ) {
         int8_t displacement = state->displacement;
 
         if ( state->prefix != 0xcb )
             READ_BYTE(state, displacement);
-        BUF_PRINTF("%s%s$%02x)", table[state->index][y],
+            BUF_PRINTF("%s%s$%02x)", table[index][y],
                                     displacement < 0 ? "-" : "+", displacement < 0 ? -displacement : displacement);
         return buf;
     } 
-    BUF_PRINTF("%s", table[state->index][y]);
+    BUF_PRINTF("%s", table[index][y]);
     return buf;
 }
 
