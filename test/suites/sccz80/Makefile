@@ -5,7 +5,7 @@ include ../make.config
 CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED
 
 
-all:	test_mult.bin test_callee.bin test_lshift.bin test_autoinit.bin test_sizeof.bin test_rshift.bin test_division.bin test_offsetof.bin test_compare0.bin test_compare_const.bin test_compare_mconst.bin test_compare.bin
+all:	test_mult.bin test_callee.bin test_lshift.bin test_autoinit.bin test_sizeof.bin test_rshift.bin test_division.bin test_offsetof.bin test_compare0.bin test_compare_const.bin test_compare_mconst.bin test_compare.bin test_zxn_rshift.bin test_zxn_lshift.bin
 
 
 
@@ -26,6 +26,10 @@ test_compare.bin: $(SOURCES) compare.c
 test_%.bin: $(SOURCES) %.c
 	$(compile)
 	$(runtest)
+
+test_zxn_%.bin: $(SOURCES) %.c
+	$(compile_zxn)
+	$(runtest_zxn)
 
 clean:
 	rm -f *.bin *.map $(OBJECTS) zcc_opt.def *~
