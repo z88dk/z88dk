@@ -187,6 +187,7 @@ extern int  __LIB__  ulaplus_get(unsigned char attribute) __z88dk_fastcall;
 // INTERFACE FOR CALLING BASIC
 ///////////////////////////////
 
+// Check syntax of an immediate BASIC command (e.g. {TK_CLS, '#', 13} would probe the Interface 1), max 20 bytes.
 extern int  __LIB__  zx_syntax(char *statement) __z88dk_fastcall;
 
 // enter BASIC at a given program line, execution will stop gettin back to the
