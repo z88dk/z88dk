@@ -165,8 +165,20 @@ extern void __LIB__ xorcircle_callee(int x, int y, int radius, int skip) __small
 /* Init GFX mode and clear map */
 extern void __LIB__ clg(void);
 
-/* Clear area of map */
+/* Clear area of graphics map */
 extern void __LIB__ clga(int tlx, int tly, int width, int height) __smallc;
+extern void __LIB__ clga_callee(int tlx, int tly, int width, int height) __smallc __z88dk_callee;
+#define clga(a,b,c,d)           clga_callee(a,b,c,d)
+
+/* Invert an area in the graphics map */
+extern void __LIB__ xorclga(int tlx, int tly, int width, int height) __smallc;
+extern void __LIB__ xorclga_callee(int tlx, int tly, int width, int height) __smallc __z88dk_callee;
+#define xorclga(a,b,c,d)           xorclga_callee(a,b,c,d)
+
+/* Draw a filled box in the graphics map */
+extern void __LIB__ fillb(int tlx, int tly, int width, int height) __smallc;
+extern void __LIB__ fillb_callee(int tlx, int tly, int width, int height) __smallc __z88dk_callee;
+#define fillb(a,b,c,d)           fillb_callee(a,b,c,d)
 
 
 /* pseudo text console support, 4x6 font */
