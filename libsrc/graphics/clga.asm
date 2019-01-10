@@ -1,26 +1,22 @@
 ;
 ;       Z88 Graphics Functions - Small C+ stubs
-;
 ;       Written around the Interlogic Standard Library
-;
 ;       Stubs Written by D Morris - 30/9/98
 ;
-;
-;	$Id: clga.asm,v 1.7 2016-04-13 21:09:09 dom Exp $
+;	$Id: clga.asm $
 ;
 
 
 ;Usage: clga(struct *pixels)
 
 
-
-                SECTION         code_graphics
-                PUBLIC    clga
-                PUBLIC    _clga
-                EXTERN     swapgfxbk
-		EXTERN	  __graphics_end
-                EXTERN     cleararea
-
+		SECTION         code_graphics
+		
+		PUBLIC    clga
+		PUBLIC    _clga
+		
+		EXTERN clga_callee
+		EXTERN ASMDISP_CLGA_CALLEE
 
 .clga
 ._clga
@@ -31,7 +27,6 @@
 		ld	b,(ix+4)
 		ld	l,(ix+6)
 		ld	h,(ix+8)
-                call    swapgfxbk
-                call    cleararea
-                jp      __graphics_end
-
+		pop	ix
+		
+   jp clga_callee + ASMDISP_CLGA_CALLEE
