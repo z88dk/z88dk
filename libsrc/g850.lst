@@ -10,9 +10,7 @@ stdio/ansi/g800/f_ansi_scrollup_850
 @stdio/stdio.lst
 games/joystick
 @z80.lst
-graphics/__graphics_end
 graphics/clg
-graphics/clrarea
 graphics/dcircle
 graphics/dfill2
 graphics/fill
