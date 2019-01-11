@@ -4,10 +4,8 @@ stdio/pv1000/getk
 @stdio/stdio.lst
 games/pv1000/joystick
 games/obj/pv1000/joystick_type
-@gfxbase.lst
 graphics/dcircle
 graphics/clg
-graphics/clrarea
 graphics/generic_console/clsgraph
 graphics/pv1000/textpixl
 graphics/generic_console/plotpixl
@@ -17,4 +15,5 @@ graphics/generic_console/pointxy
 graphics/putsprite3
 graphics/stencil_render2
 graphics/text/swapgfxbk
+@gfxbase.lst
 @z80.lst
