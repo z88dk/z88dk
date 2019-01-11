@@ -16,7 +16,6 @@ games/bee/joystick
 @games/games.lst
 graphics/dcircle
 graphics/clg
-graphics/clrarea
 graphics/generic_console/clsgraph
 graphics/bee/textpixl
 graphics/generic_console/plotpixl
