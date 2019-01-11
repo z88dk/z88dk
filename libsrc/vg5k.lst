@@ -16,16 +16,15 @@ stdio/vg5k/conio_vars
 @stdio/stdio_ixiy.lst
 @font/font_8x8/font_8x8.lst
 @input/input_keyboard.lst
-@gfxbasetxt6.lst
 graphics/generic_console/plotpixl6
 graphics/generic_console/respixl6
 graphics/generic_console/xorpixl6
 graphics/generic_console/pointxy6
 graphics/generic_console/div3
 graphics/dcircle2
-graphics/__gfx_coords
 graphics/vg5k/textpixl6
 graphics/vg5k/cleargraphics
+@gfxbasetxt6.lst
 games/vg5k/joystick
 games/vg5k/keys_joystick
 games/vg5k/bit_open
