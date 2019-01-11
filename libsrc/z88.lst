@@ -83,7 +83,6 @@ graphics/clg
 graphics/clsgraph
 graphics/z88/closegfx
 graphics/z88/clrarea
-graphics/lftscrol
 graphics/plotpixl
 graphics/respixl
 graphics/xorpixl
@@ -91,7 +90,6 @@ graphics/pointxy
 graphics/fill
 graphics/dfill
 graphics/getsprite
-graphics/liner
 graphics/putsprite2
 graphics/bksave
 graphics/bkrestore
@@ -99,5 +97,6 @@ graphics/z88/pixladdr
 graphics/z88/swapgfxbk
 graphics/stencil_render
 graphics/z88/window
+@gfxbase.lst
 @z80.lst
 
