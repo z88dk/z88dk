@@ -1,6 +1,5 @@
 graphics/pc88/w_clg
 graphics/pc88/w_pixladdr
-graphics/clrarea
 graphics/pc88/w_putsprite
 graphics/pc88/w_stencil_render
 graphics/w_plotpixl
@@ -9,7 +8,6 @@ graphics/w_xorpixl
 graphics/w_drawb
 graphics/w_undrawb
 graphics/w_xorborder
-graphics/lftscrol
 graphics/pc88/swapgfxbk_hr
 graphics/draw_profile
 graphics/w_pointxy
