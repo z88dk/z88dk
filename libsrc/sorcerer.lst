@@ -7,10 +7,8 @@ stdio/sorcerer/generic_console_ioctl
 @stdio/stdio.lst
 @font/font_8x8/font_8x8.lst
 @input/input_keyboard.lst
-@gfxbase.lst
 graphics/dcircle
 graphics/clg
-graphics/clrarea
 graphics/generic_console/clsgraph
 graphics/sorcerer/textpixl
 graphics/generic_console/plotpixl
@@ -22,6 +20,7 @@ graphics/dfill2
 graphics/putsprite3
 graphics/stencil_render2
 graphics/text/swapgfxbk
+@gfxbase.lst
 games/srr/keys_joystick
 @games/games.lst
 @z80.lst
