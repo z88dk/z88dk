@@ -11,6 +11,10 @@ graphics/w_xorcircle_callee
 graphics/w_dcircle
 graphics/w_clga
 graphics/w_clga_callee
+graphics/w_xorclga
+graphics/w_xorclga_callee
+graphics/w_fillb
+graphics/w_fillb_callee
 graphics/w_area
 graphics/w_drawbox
 graphics/w_drawb
