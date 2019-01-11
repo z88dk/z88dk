@@ -1,4 +1,3 @@
-@gfxbasew.lst
 graphics/px8/draw
 graphics/retrofit/draw_callee
 graphics/px8/undraw
@@ -16,3 +15,4 @@ graphics/px8/w_respixl
 graphics/px8/w_xorpixl
 graphics/swapgfxbk_foo.asm
 graphics/w_pointxy
+@gfxbasew.lst
