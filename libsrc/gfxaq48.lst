@@ -1,9 +1,6 @@
-@gfxbase.lst
 graphics/dcircle
 graphics/clg
-graphics/clrarea
 graphics/text/clsgraph
-graphics/lftscrol
 graphics/aquarius/textpixl
 graphics/text/plotpixl
 graphics/text/respixl
@@ -12,7 +9,7 @@ graphics/text/pointxy
 graphics/fill
 graphics/dfill2
 graphics/putsprite2
-graphics/liner
 graphics/draw_profile
 graphics/stencil_render2
 graphics/text/swapgfxbk
+@gfxbase.lst
