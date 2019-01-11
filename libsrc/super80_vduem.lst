@@ -12,15 +12,14 @@ graphics/generic_console/xorpixl
 graphics/generic_console/pointxy
 graphics/generic_console/getmaxy
 graphics/generic_console/getmaxx
-@gfxbase.lst
 graphics/dcircle
 graphics/clg
-graphics/clrarea
 graphics/generic_console/clsgraph
 graphics/super80/textpixl
 graphics/putsprite3
 graphics/stencil_render2
 graphics/text/swapgfxbk
+@gfxbase.lst
 @input/input_keyboard.lst
 @stdio/stdio.lst
 games/super80/bit_open
