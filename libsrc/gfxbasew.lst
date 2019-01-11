@@ -9,6 +9,9 @@ graphics/w_uncircle_callee
 graphics/w_xorcircle
 graphics/w_xorcircle_callee
 graphics/w_dcircle
+graphics/w_clga
+graphics/w_clga_callee
+graphics/w_area
 graphics/w_drawbox
 graphics/w_drawb
 graphics/w_drawb_callee
