@@ -6,9 +6,6 @@ graphics/px8/xordraw
 graphics/retrofit/xordraw_callee
 graphics/draw_profile_nostencil
 graphics/px8/clg
-graphics/w_drawb
-graphics/w_undrawb
-graphics/w_xorborder
 graphics/w_putsprite3
 graphics/px8/w_plotpixl
 graphics/px8/w_respixl
