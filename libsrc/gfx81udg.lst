@@ -1,10 +1,6 @@
-@gfxbase.lst
-graphics/__gfx_coords
-graphics/__graphics_end
 graphics/zx81/udg/clg
 graphics/zx81/clsgraph
 graphics/zx81/udg/zx_hardcopy
-graphics/clrarea
 graphics/dcircle2
 graphics/stencil_render2
 graphics/stencil_add_circle
@@ -26,3 +22,4 @@ graphics/zx81/udg/pointxy
 graphics/fill
 graphics/dfill2
 graphics/zx81/swapgfxbk
+@gfxbase.lst
