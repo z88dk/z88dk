@@ -1,7 +1,5 @@
-@gfxbase.lst
 graphics/dcircle
 graphics/clg
-graphics/clrarea
 graphics/pc88/clsgraph
 graphics/pc88/pcalc
 graphics/pc88/plotpixl
@@ -16,3 +14,4 @@ graphics/stencil_render2
 graphics/bksave
 graphics/bkrestore
 graphics/swapgfxbk_foo
+@gfxbase.lst
