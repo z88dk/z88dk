@@ -10,12 +10,10 @@ stdio/ansi/generic/f_ansi_dline
 stdio/ansi/osca/f_ansi_scrollup
 @stdio/stdio.lst
 graphics/w_dcircle_square.asm
-@gfxbasew.lst
 graphics/osca/drawb
 graphics/osca/undrawb
 graphics/osca/xorborder
 graphics/osca/clg
-graphics/osca/clga2
 graphics/osca/w_pixladdr
 graphics/osca/fill
 graphics/clrarea
@@ -32,6 +30,7 @@ graphics/osca/cclg
 graphics/osca/cplot
 graphics/osca/cplot_callee
 graphics/osca/cplotpixel
+@gfxbasew.lst
 games/osca/joystick
 @games/games.lst
 time/osca/clock
