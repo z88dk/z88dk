@@ -23,7 +23,6 @@ graphics/pointxy
 graphics/fill
 graphics/dfill
 graphics/getsprite
-graphics/liner
 graphics/stencil_render
 graphics/spectrum/putsprite
 graphics/spectrum/bksave
