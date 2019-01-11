@@ -18,7 +18,6 @@ psg/sn76489/set_psg.asm
 psg/sn76489/set_psg_callee.asm
 @psg/psg.lst
 arch/rx78/load_palette
-@gfxbase.lst
 graphics/rx78/clg
 graphics/rx78/pixladdr
 graphics/rx78/plotpixl
@@ -28,9 +27,9 @@ graphics/rx78/pointxy
 graphics/rx78/swapgfxbk
 graphics/putsprite2
 graphics/dcircle
-graphics/clrarea
 graphics/fill
 graphics/getsprite
+@gfxbase.lst
 games/rx78/joystick
 games/rx78/keys_joystick
 @games/games.lst
