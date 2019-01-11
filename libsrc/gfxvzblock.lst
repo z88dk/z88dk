@@ -1,9 +1,6 @@
-@gfxbase.lst
 graphics/dcircle
 graphics/clg
-graphics/clrarea
 graphics/generic_console/clsgraph
-graphics/lftscrol
 graphics/vz200/textpixl
 graphics/generic_console/plotpixl
 graphics/generic_console/respixl
@@ -13,3 +10,4 @@ graphics/putsprite3
 graphics/liner
 graphics/stencil_render2
 graphics/text/swapgfxbk
+@gfxbase.lst
