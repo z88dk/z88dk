@@ -1,8 +1,5 @@
-@gfxbase.lst
 graphics/dcircle
 graphics/px4/clg
-graphics/clrarea
-graphics/lftscrol
 graphics/px4/pixladdr
 graphics/plotpixl
 graphics/respixl
@@ -11,12 +8,12 @@ graphics/pointxy
 graphics/fill
 graphics/dfill
 graphics/getsprite
-graphics/liner
 graphics/stencil_render
 graphics/px4/putsprite
 graphics/px4/bksave
 graphics/px4/bkrestore
 graphics/px4/swapgfxbk
+@gfxbase.lst
 @stdio/ansicore.lst
 stdio/ansi/px4/f_ansi_attr
 stdio/ansi/px4/f_ansi_bel
