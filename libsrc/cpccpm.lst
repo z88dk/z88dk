@@ -5,12 +5,10 @@ stdio/ansi/cpc/f_ansi_char
 stdio/ansi/cpc/f_ansi_cls
 stdio/ansi/cpc/f_ansi_dline
 stdio/ansi/cpc/f_ansi_scrollup
-@gfxbasew.lst
 graphics/w_drawb
 graphics/w_undrawb
 graphics/w_xorborder
 graphics/cpc/clg
-graphics/cpc/clga2
 graphics/cpc/w_pixeladdress
 graphics/cpc/fill
 graphics/w_plotpixl
@@ -22,6 +20,7 @@ graphics/cpc/w_putsprite
 graphics/w_stencil_render
 graphics/draw_profile
 graphics/w_pointxy
+@gfxbasew.lst
 time/cpc/clock
 games/cpc/joystick
 cpc/cpmfirmware
