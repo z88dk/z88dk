@@ -1,5 +1,3 @@
-graphics/__gfx_coords4
-graphics/__graphics_end
 graphics/enterprise/circle
 graphics/enterprise/uncircle
 graphics/enterprise/fill
@@ -28,3 +26,4 @@ graphics/enterprise/setxy
 graphics/w_putsprite3
 graphics/draw_profile_nostencil
 graphics/swapgfxbk_foo
+@gfxbasew.lst
