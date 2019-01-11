@@ -11,9 +11,7 @@ stdio/ansi/abc80/f_ansi_dline
 stdio/ansi/abc80/f_ansi_scrollup
 @stdio/stdio.lst
 time/abc80/clock
-@gfxbase.lst
 graphics/clg
-graphics/clrarea
 graphics/abc80/clsgraph
 graphics/dcircle
 graphics/abc80/pixel
@@ -27,6 +25,7 @@ graphics/putsprite3
 graphics/draw_profile
 graphics/stencil_render2
 graphics/swapgfxbk_foo
+@gfxbase.lst
 games/obj/${TARGET}/joystick
 abc80/abc_inv
 abc80/abc_cursor
