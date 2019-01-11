@@ -4,10 +4,8 @@ stdio/super80/generic_console
 stdio/super80/conio_map_colour
 graphics/generic_console/getmaxx
 graphics/generic_console/getmaxy6
-@gfxbase.lst
 graphics/dcircle
 graphics/clg
-graphics/clrarea
 graphics/generic_console/clsgraph
 graphics/super80/textpixl6
 graphics/generic_console/clsgraph
@@ -20,6 +18,7 @@ graphics/generic_console/swapgfxbk
 graphics/putsprite3
 graphics/stencil_render2
 graphics/text/swapgfxbk
+@gfxbase.lst
 @input/input_keyboard.lst
 @stdio/stdio.lst
 games/super80/bit_open
