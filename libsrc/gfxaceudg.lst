@@ -1,10 +1,6 @@
-@gfxbase.lst
 graphics/dcircle
 graphics/clg
-graphics/clrarea
-graphics/ace/udg/zx_hardcopy
 graphics/ace/udg/clsgraph
-graphics/lftscrol
 graphics/text6/div3
 graphics/text6/loadudg6
 graphics/ace/udg/plotpixl
@@ -17,3 +13,5 @@ graphics/putsprite2
 graphics/draw_profile
 graphics/stencil_render2
 graphics/swapgfxbk_foo
+graphics/ace/udg/zx_hardcopy
+@gfxbase.lst
