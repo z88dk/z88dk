@@ -12,10 +12,8 @@ stdio/ansi/msx/f_ansi_scrollup_nobios
 @stdio/stdio.lst
 time/sc3000/clock
 @input/input_keyboard.lst
-@gfxbase.lst
 graphics/dcircle
 graphics/msx/gen_clg
-graphics/clrarea
 graphics/msx/pixladdr
 graphics/msx/plotpixl
 graphics/msx/respixl
@@ -32,6 +30,7 @@ graphics/msx/surface/surface_draw
 graphics/msx/surface/surface_pixladdr
 graphics/msx/surface/surface_plotpixl
 graphics/msx/surface/surface_stencil_render
+@gfxbase.lst
 psg/sn76489/bit_open
 games/sc3000/joystick
 games/sc3000/keys_joystick
