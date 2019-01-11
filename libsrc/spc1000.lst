@@ -49,7 +49,6 @@ graphics/spc1000/textpixl6
 graphics/generic_console/div3
 graphics/putsprite3
 graphics/dcircle2
-graphics/clrarea
 graphics/fill
 graphics/getsprite
 @gfxbase.lst
