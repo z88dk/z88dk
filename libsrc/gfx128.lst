@@ -1,7 +1,5 @@
-@gfxbase.lst
 graphics/dcircle
 graphics/clg
-graphics/clrarea
 graphics/text/clsgraph
 graphics/lftscrol
 graphics/c128/textpixl
@@ -16,3 +14,4 @@ graphics/liner
 graphics/draw_profile
 graphics/stencil_render2
 graphics/text/swapgfxbk
+@gfxbase.lst
