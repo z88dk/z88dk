@@ -1,10 +1,6 @@
-@gfxbase.lst
-graphics/__gfx_coords
-graphics/__graphics_end
 graphics/zx81/clg
 graphics/zx81/clsgraph
 graphics/zx81/zx_hardcopy
-graphics/clrarea
 graphics/dcircle2
 graphics/stencil_render2
 graphics/stencil_add_circle
@@ -29,3 +25,4 @@ stdio/ansi/zx81/text/f_ansi_char
 stdio/ansi/zx81/text/f_ansi_cls
 stdio/ansi/zx81/text/f_ansi_dline
 stdio/ansi/zx81/text/f_ansi_scrollup
+@gfxbase.lst
