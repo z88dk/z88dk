@@ -2,9 +2,7 @@ stdio/abc800/fgetc_cons
 stdio/abc800/fputc_cons
 stdio/abc800/getk
 @stdio/stdio.lst
-@gfxbase.lst
 graphics/clg
-graphics/clrarea
 graphics/abc80/clsgraph
 graphics/dcircle
 graphics/abc80/pixel
@@ -18,6 +16,7 @@ graphics/putsprite_smc
 graphics/draw_profile
 graphics/stencil_render2
 graphics/swapgfxbk_foo
+@gfxbase.lst
 games/obj/${TARGET}/joystick
 abc800/abc_cursor
 abc800/abc_vdu
