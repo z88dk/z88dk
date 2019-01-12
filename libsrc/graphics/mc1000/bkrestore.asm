@@ -3,10 +3,10 @@
 ;
 ;	MC-1000 version
 ;
-;	$Id: bkrestore.asm,v 1.5 2016-06-21 20:16:35 dom Exp $
+;	$Id: bkrestore.asm $
 ;
 
-	SECTION	  code_clib
+	SECTION smc_clib
 	PUBLIC    bkrestore
 	PUBLIC    _bkrestore
 	
