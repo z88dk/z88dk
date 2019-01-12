@@ -496,6 +496,13 @@ IF FORlaser500
 	defc blankch = 32
 ENDIF
 
+IF FORz80tvgame
+	DEFINE gotgfx
+	defc maxx = 168
+	defc maxy = 208
+	defc blankch = 32
+ENDIF
+
 ; =============================================
 
 
