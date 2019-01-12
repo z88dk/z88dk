@@ -331,6 +331,7 @@ pc6001_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(call buildgeneric,pc6001)
+	$(MAKE) -C games TARGET=pc6001
 	TARGET=pc6001 TYPE=z80 $(LIBLINKER) -DFORpc6001 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pc6001_clib @$(LISTFILE_DIRECTORY)/pc6001.lst
 	
 # PC8801 lib - Stefano

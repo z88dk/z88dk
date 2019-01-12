@@ -21,6 +21,7 @@ stdio/ansi/pc6001/f_ansi_scrollup
 @stdio/stdio.lst
 @font/font_8x8/font_8x8.lst
 games/pc6001/joystick
+games/obj/pc6001/joystick_type
 graphics/pc6001/clsgraph
 graphics/pc6001/getmaxx
 graphics/pc6001/getmaxy
