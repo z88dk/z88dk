@@ -9,7 +9,6 @@
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
-		PUBLIC		generic_console_ioctl
 
 		PUBLIC		generic_console_xypos_graphics
 
@@ -24,8 +23,6 @@
 
 		defc		DISPLAY = $c03c + 4
 
-generic_console_ioctl:
-	scf
 generic_console_set_ink:
 generic_console_set_paper:
 generic_console_set_inverse:
