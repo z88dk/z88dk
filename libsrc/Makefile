@@ -944,7 +944,7 @@ z80tvgame_clib.lib:
 	$(MAKE) gfxdeps
 	$(call buildgeneric,z80tvgame)
 	$(MAKE) -C games TARGET=z80tvgame
-	TARGET=z80tvgame TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORfp1100 -x$(OUTPUT_DIRECTORY)/z80tvgame_clib @$(LISTFILE_DIRECTORY)/z80tvgame.lst
+	TARGET=z80tvgame TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz80tvgame -x$(OUTPUT_DIRECTORY)/z80tvgame_clib @$(LISTFILE_DIRECTORY)/z80tvgame.lst
 
 
 # Mitsubishi Multi8 - dom
