@@ -28,7 +28,7 @@ all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	embedded_clib.lib test_clib.lib testrcm_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
 	pv1000_clib.lib pv2000_clib.lib coleco_clib.lib multi8_clib.lib alphatro_clib.lib  spc1000_clib.lib \
 	laser500_clib.lib super80_clib.lib super80_vduem_clib.lib \
-	adam.lib \
+	adam.lib z80tvgame_clib.lib \
 	preempt.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib gendos.lib ndos.lib  \
@@ -935,6 +935,16 @@ fp1100_clib.lib:
 	$(MAKE) gfxdeps
 	$(call buildgeneric,fp1100)
 	TARGET=fp1100 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORfp1100 -x$(OUTPUT_DIRECTORY)/fp1100_clib @$(LISTFILE_DIRECTORY)/fp1100.lst
+
+# Z80 TV Game
+z80tvgame_clib.lib:
+	@echo ''
+	@echo '--- Building Z80 TV Game Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(call buildgeneric,z80tvgame)
+	$(MAKE) -C games TARGET=z80tvgame
+	TARGET=z80tvgame TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORfp1100 -x$(OUTPUT_DIRECTORY)/z80tvgame_clib @$(LISTFILE_DIRECTORY)/z80tvgame.lst
 
 
 # Mitsubishi Multi8 - dom

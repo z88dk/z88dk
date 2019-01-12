@@ -299,6 +299,13 @@ extern unsigned char *joystick_type[];
 	#define GAME_DEVICES 4
 #endif
 
+#ifdef __Z80TVGAME__
+#ifdef DEFINE_JOYSTICK_TYPE
+	unsigned char *joystick_type[] = { "Joystick" };
+#endif
+	#define GAME_DEVICES 1
+#endif
+
 #ifdef __Z9001__
 #ifdef DEFINE_JOYSTICK_TYPE
 	unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2"};

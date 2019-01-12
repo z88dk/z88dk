@@ -196,6 +196,11 @@ IF FORsuper80
 	defc JOYSTICK_inkey = 1
 ENDIF
 
+IF FORz80tvgame
+	defc	sndbit_port = $02
+	defc	sndbit_bit = 0
+	defc	sndbit_mask = 1
+ENDIF
 
 ; Compatibily ones only, the following ports don't have a beeper
 IF FOReinstein

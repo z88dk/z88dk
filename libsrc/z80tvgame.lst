@@ -1,0 +1,8 @@
+stdio/z80tvgame/generic_console
+stdio/z80tvgame/generic_console_vpeek
+stdio/z80tvgame/CRT_FONT
+@stdio/stdio.lst
+@font/font_8x8/font_8x8.lst
+games/z80tvgame/joystick
+@games/games.lst
+@z80.lst
