@@ -7,7 +7,7 @@
 ; $Id: bksave.asm $
 ;
 
-	SECTION	  smc_clib
+	SECTION	  code_clib
 	
 	PUBLIC    bksave
 	PUBLIC    _bksave
