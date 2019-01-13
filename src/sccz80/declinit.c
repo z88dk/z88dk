@@ -120,10 +120,21 @@ int agg_init(Type *type)
             size += str_init(type->ptr->tag);
             dim--;
             needchar('}');
-        } else if ( type->ptr->kind == KIND_ARRAY && type->ptr->ptr->kind != KIND_CHAR ) {
-            needchar('{');
-            size += agg_init(type->ptr);
-            needchar('}');
+        } else if ( type->ptr && type->ptr->kind == KIND_ARRAY) {
+            if ( type->ptr->ptr->kind != KIND_CHAR ) {
+                needchar('{');
+                size += agg_init(type->ptr);
+                needchar('}');
+            } else {
+               char needbrace = 0;
+               if ( cmatch('{') ) 
+                   needbrace = 1;
+               if ( rcmatch('"') )
+                   size += init(type->ptr,1);
+               else 
+                   size += agg_init(type->ptr);
+               if ( needbrace ) needchar('}');
+            }
         } else {
             char needbrace = 0;
             if ( cmatch('{') ) 
