@@ -11,5 +11,5 @@
 
 int dir_move_next()
 {
-	return (fc_dirpos=bdos(CPM_FNXT,fc_dir));
+	return (fc_dirpos=bdos(CPM_FNXT,&fc_dir));
 }
