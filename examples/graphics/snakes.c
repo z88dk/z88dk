@@ -107,7 +107,7 @@ int move_snake(struct snake* p)
 int play_game()
 {
     while (1) {
-        if (move_snake(p1) == 0) {
+        if (move_snake(&p1) == 0) {
 #ifdef PSG
             psg_envelope(envD, psgT(10), chanAll); // set a fading volume envelope on all channels
 #endif
@@ -119,7 +119,7 @@ int play_game()
         psg_tone(1, psgT(p1->x + p1->y + 10 * (15 + 2 * p1->x_incr + p1->y_incr)));
 #endif
 
-        if (move_snake(p2) == 0) {
+        if (move_snake(&p2) == 0) {
 #ifdef PSG
             psg_envelope(envD, psgT(10), chanAll); // set a fading volume envelope on all channels
 #endif
