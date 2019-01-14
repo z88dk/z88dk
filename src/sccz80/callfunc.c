@@ -193,6 +193,8 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             zcarryconv();
             expr = KIND_INT;
             type = type_int;
+        } else if ( expr == KIND_STRUCT ) {
+            errorfmt("Cannot pass structure as function parameter (argument number %d)",0, argnumber);
         }
         if ( functype->funcattrs.oldstyle == 0 && argnumber <= array_len(functype->parameters)) {       
             int proto_argnumber;
