@@ -29,6 +29,8 @@ graphics/lftscrol
 graphics/cpc/swapgfxbk
 graphics/cpc/w_putsprite
 graphics/w_stencil_render
+graphics/cpc/w_clga
+graphics/retrofit/clga_callee
 graphics/draw_profile
 graphics/w_pointxy
 @gfxbasew.lst
