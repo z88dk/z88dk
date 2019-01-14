@@ -2,6 +2,8 @@ graphics/w_dcircle_square.asm
 graphics/z9001/clg
 graphics/z9001/fill
 graphics/z9001/w_pixladdr
+graphics/z9001/w_clga
+graphics/retrofit/clga_callee
 graphics/z9001/w_putsprite
 graphics/z9001/w_stencil_render
 graphics/w_plotpixl
