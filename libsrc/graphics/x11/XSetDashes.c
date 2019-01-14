@@ -9,5 +9,5 @@
 #include <X11/Xlib.h>
 
 
-void XSetDashes(Display *display, GC *gc, int dash_offset, int dash_list, int list_length) {
+void XSetDashes(Display *display, GC *gc, int dash_offset, char dash_list[], int list_length) {
 }
