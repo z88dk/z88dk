@@ -12,7 +12,6 @@
 	SECTION   smc_clib
         PUBLIC    putsprite
         PUBLIC   _putsprite
-		
         EXTERN     w_pixeladdress
         ;EXTERN    vdcset
         ;EXTERN    vdcget
@@ -20,7 +19,7 @@
         EXTERN    swapgfxbk
         EXTERN    __graphics_end
 
-
+        INCLUDE "graphics/grafix.inc"
 
 ; __gfx_coords: d,e (vert-horz)
 ; sprite: (ix)
@@ -149,8 +148,7 @@ loopa3:
          djnz     _oloop
 
          jp       __graphics_end
-		 
-		 
+
 
 
 .putspritew
@@ -178,21 +176,25 @@ loopa3:
 
 .wnotedge
 .wsmc2   cp       1
-         jp       nz,nextline
-         ld       c,(ix+2)
+         jp       z,wover_1
+
+         djnz     wiloop
+		 jp       line_end
+
+        
+
+.wover_1 ld       c,(ix+2)
          inc      ix
          djnz     wiloop
          dec      ix
-
-.nextline
+.line_end
          call     next_line
 
-         pop      bc                ;Restore data
+         pop      bc
          djnz     woloop
-
+		 
          jp       __graphics_end
-        
-
+		 
 
 
 ;_____________________________________________________
@@ -272,8 +274,6 @@ loop6:
         pop     bc
         pop     de
         ret
-		
-		
 ;_____________________________________________________
 
 .next_line
@@ -355,14 +355,12 @@ loop6a:
         pop     bc
         pop     de
         ret
-
 		
-
+		
 	SECTION	rodata_clib
 .offsets_table
          defb   1,2,4,8,16,32,64,128
-
-
+		 
 	SECTION	bss_clib
 .lineaddr
          defw   0
