@@ -1,6 +1,8 @@
 graphics/ts2068hr/zx_hardcopy
 graphics/ts2068hr/xorborder
 graphics/ts2068hr/clg
+graphics/ts2068hr/w_clga
+graphics/retrofit/clga_callee
 graphics/ts2068hr/w_pixladdr
 graphics/ts2068hr/fill
 graphics/w_plotpixl
