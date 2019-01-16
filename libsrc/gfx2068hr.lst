@@ -8,6 +8,7 @@ graphics/ts2068hr/fill
 graphics/w_plotpixl
 graphics/w_respixl
 graphics/w_xorpixl
+graphics/w_pointxy
 graphics/lftscrol
 graphics/spectrum/swapgfxbk
 graphics/ts2068hr/w_putsprite
