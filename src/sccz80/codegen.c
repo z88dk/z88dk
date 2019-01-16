@@ -2033,7 +2033,8 @@ void zand_const(LVALUE *lval, int32_t value)
             zand(lval); // 3
         }
     } else {
-        if ( value == 0 ) {
+        uint16_t val = value;
+        if ( val == 0 ) {
             vconst(0);
         } else if ( (value % 65536) == 0xff ) {
             ol("ld\th,0");
@@ -2048,8 +2049,10 @@ void zand_const(LVALUE *lval, int32_t value)
             outfmt("\tand\t#(%d %% 256)\n",(value % 65536) / 256);
             ol("ld\th,a");
             ol("ld\tl,0");            
-        } else if ( value == 0xffff ) {
+        } else if ( value == (uint16_t)0xffff ) {
             // Do nothing
+        } else if ( val == 0xfffe ) {
+            ol("res\t0,l");
         } else {
             const2(value & 0xffff);
             zand(lval);

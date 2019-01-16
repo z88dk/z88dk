@@ -3788,3 +3788,127 @@
 =
 	ld	h,(hl)
 	ld	l,0
+
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ld	hl,%1	;const
+	call	l_pint
+	ld	hl,%2
+=
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+	ld	(hl),#(%1 %% 256)
+	inc	hl
+	ld	(hl),#(%1 / 256)
+	ld	hl,%2
+
+	ld	(hl),#(0 % 256)
+	inc	hl
+	ld	(hl),#(0 / 256)
+=
+	xor	a
+	ld	(hl),a
+	inc	hl
+	ld	(hl),a
+
+	ld	l,a
+	ld	h,0
+	call	l_lneg
+	jp	%2c,%1
+=
+	and	a
+	jp	%2z,%1
+
+	push	hl
+	call	l_gint	;
+	res	%1,l
+	pop	de
+	call	l_pint
+=
+	res	%1,(hl)
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+.%1
+	ld	hl,%2	;const
+=
+.%1
+	ld	hl,%2	;const
+
+%check 0 <= %1 <= 127
+	call	l_gchar
+	ld	de,%1
+	and	a
+	sbc	hl,de
+	jp	%2,%3
+	ld	hl,%4
+=
+	ld	a,(hl)
+	cp	%1
+	jp	%2,%3
+	ld	hl,%4
+
+	call	l_gchar
+	ld	a,l
+	cp	%1
+	jp	%2,%3
+	ld	hl,%4
+=
+	ld	a,(hl)
+	cp	%1
+	jp	%2,%3
+	ld	hl,%4
+
+	call	l_gchar
+	ld	a,l
+	and	a
+	jp	%1
+	ld	hl,%2
+=
+	ld	a,(hl)
+	and	a
+	jp	%1
+	ld	hl,%2
+
+	call	l_gchar
+	ld	a,l
+	call	l_sxt
+=
+	call	l_gchar
+
+	call	l_gchar
+	pop	de
+	ld	a,l
+	ld	(de),a
+	ld	hl,%1
+=
+	pop	de
+	ld	a,(hl)
+	ld	(de),a
+	ld	hl,%1
+
+%check 0 <= %1 <= 127
+	call	l_gchar
+	ld	de,%1
+	and	a
+	sbc	hl,de
+	scf
+	jr	%2,ASMPC+3
+	ccf
+	j%4	%3
+=
+	ld	a,(hl)
+	cp	%1
+	scf
+	jr	%2,ASMPC+3
+	ccf
+	j%4	%3
