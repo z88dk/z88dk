@@ -1,5 +1,6 @@
 graphics/__graphics_end
 graphics/__gfx_coords
+graphics/getsprite2
 graphics/circle
 graphics/circle_callee
 graphics/uncircle
