@@ -45,10 +45,10 @@ char arrow_mask[] =
 		'\x1E'
 	};
 
-/* background for sprite must be 4 bytes larger than a normal sprite to save its position */
+/* background for sprite must be 6 bytes larger than a normal sprite as a work area, current position storage, etc.. */
 char arrow_bk[] = 
 	{ 8,8,              // size
-	  0,0, 0,0,         // position
+	  0,0,0,0,0,0,      // overhead (work area..)
 	  0,0,0,0,0,0,0,0,  // data
 	  0,0,0,0,0,0,0,0
 	};
@@ -123,7 +123,7 @@ char *ptr;
 		   flag=0;
 		}
 	}
-	
+
 	bkrestore(arrow_bk);
 	getsprite(x,y,spritest);
 	undrawb(x-1,y-1,14,14);
