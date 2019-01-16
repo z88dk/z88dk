@@ -14,19 +14,21 @@
  *
  *	Stefano, Jan 2001
  *
- *	$Id: games.h,v 1.29 2016-11-28 07:33:11 stefano Exp $
+ *	$Id: games.h $
  *
  */
 
-/* save the sprite background in another sprite */
+/* save the sprite background in another sprite (not yet working with coordinates > 255) */
 extern void __LIB__ bksave(int x, int y, void *sprite) __smallc;
 extern void __LIB__  bkrestore(void *sprite) __z88dk_fastcall;
 
-/* pick up a sprite directly from the screen */
-extern void __LIB__ getsprite(int x, int y, void *sprite) __smallc; // This isn't still finished
+/* pick up a sprite directly from the screen  (not yet working with coordinates > 255) */
+extern void __LIB__ getsprite(int x, int y, void *sprite) __smallc;
 
 /* draw a sprite of variable size */
 extern void __LIB__ putsprite(int ortype, int x, int y, void *sprite) __smallc;
+extern void __LIB__ putsprite_callee(int ortype, int x, int y, void *sprite) __smallc __z88dk_callee;
+#define putsprite(a,b,c,d)           putsprite_callee(a,b,c,d)
 
 #define spr_and  166+47*256 // CPL - AND (HL)
 #define spr_or   182 // OR (HL)
