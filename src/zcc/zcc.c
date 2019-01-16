@@ -2399,6 +2399,33 @@ void print_help_text(const char *program)
         fprintf(stderr,"%-20s %s\n", c_aliases[i],c_aliases[i+1]);
     }
 
+    if ( c_clib_array_num ) {
+        fprintf(stderr,"\n-clib options:\n\n");
+        for ( i = 0; i < c_clib_array_num; i++ ) {
+            char buf[LINEMAX+1];
+            char *ptr = c_clib_array[i];
+            char *dest = buf;
+            while ( *ptr && !isspace(*ptr)) {
+                *dest++ = *ptr++;
+            }
+            *dest = 0;
+            fprintf(stderr,"-clib=%-14s\n", buf);
+        }
+    }
+    if ( c_subtype_array_num ) {
+        fprintf(stderr,"\n-subtype options:\n\n");
+        for ( i = 0; i < c_subtype_array_num; i++ ) {
+            char buf[LINEMAX+1];
+            char *ptr = c_subtype_array[i];
+            char *dest = buf;
+            while ( *ptr && !isspace(*ptr)) {
+                *dest++ = *ptr++;
+            }
+            *dest = 0;
+            fprintf(stderr,"-subtype=%-11s\n", buf);
+        }
+    }
+
     exit(0);
 }
 
