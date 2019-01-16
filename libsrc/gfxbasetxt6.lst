@@ -1,5 +1,6 @@
 graphics/__gfx_coords
 graphics/__graphics_end
+graphics/retrofit/putsprite_callee
 graphics/getsprite2
 graphics/circle
 graphics/circle_callee
