@@ -8,13 +8,14 @@
 ; Generic version (just a bit slow)
 ;
 ;
-; $Id: getsprite.asm,v 1.9 2016-07-02 09:01:35 dom Exp $
+; $Id: getsprite.asm $
 ;
 
 
                 SECTION   smc_clib
 	PUBLIC    getsprite
 	PUBLIC    _getsprite
+	PUBLIC    getsprite_sub
 	EXTERN	pixeladdress
 	EXTERN     swapgfxbk
         EXTERN	__graphics_end
@@ -29,25 +30,28 @@
 
 .getsprite
 ._getsprite
+
 	push	ix
 
-        ld      hl,4
-        add     hl,sp
-        ld      e,(hl)
-        inc     hl
-        ld      d,(hl)  ; sprite address
+	ld      hl,4
+	add     hl,sp
+	ld      e,(hl)
+	inc     hl
+	ld      d,(hl)  ; sprite address
 	push	de
 	pop	ix
 
-        inc     hl
-        ld      e,(hl)  
- 	inc	hl
-        inc     hl
-        ld      d,(hl)	; x and y __gfx_coords
+	inc     hl
+	ld      e,(hl)  
+	inc     hl
+	inc     hl
+	ld      d,(hl)	; x and y __gfx_coords
 
+	
 	ld	h,d
 	ld	l,e
 
+.getsprite_sub
 	ld	(actcoord),hl	; save current coordinates
 
 	call	swapgfxbk
