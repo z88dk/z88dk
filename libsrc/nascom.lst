@@ -10,10 +10,8 @@ stdio/ansi/nascom/f_ansi_cls
 stdio/ansi/generic/f_ansi_dline
 stdio/ansi/nascom/f_ansi_scrollup
 @stdio/stdio.lst
-@gfxbase.lst
 graphics/dcircle
 graphics/clg
-graphics/clrarea
 graphics/generic_console/clsgraph
 graphics/generic_console/plotpixl6
 graphics/generic_console/respixl6
@@ -26,5 +24,6 @@ graphics/fill
 graphics/dfill2
 graphics/putsprite3
 graphics/stencil_render2
+@gfxbase.lst
 games/joystick
 @z80.lst

@@ -36,6 +36,7 @@ IF FORsvi
         defc sndbit_port   = 150
         defc sndbit_bit    = 7
         defc sndbit_mask   = 158        ; bit 7 (key click) and 5 (tape)
+	defc JOYSTICK_inkey = 1
 ENDIF
 
 IF FORsam
@@ -60,6 +61,14 @@ IF FORaquarius
         defc sndbit_port   = 252
         defc sndbit_bit    = 0
         defc sndbit_mask   = 1
+	defc JOYSTICK_inkey = 1
+ENDIF
+
+IF FORalphatro
+        defc sndbit_port   = 0
+        defc sndbit_bit    = 0
+        defc sndbit_mask   = 0
+	defc JOYSTICK_inkey = 1
 ENDIF
 
 IF FORenterprise
@@ -116,6 +125,7 @@ IF FORtrs80
         defc sndbit_port   = 255
         defc sndbit_bit    = 1
         defc sndbit_mask   = 3
+	defc JOYSTICK_inkey = 1
 ENDIF
 
 IF FORvg5k
@@ -183,8 +193,14 @@ IF FORsuper80
 	defc	sndbit_port = $F0
 	defc	sndbit_bit = 3
 	defc	sndbit_mask = 8
+	defc JOYSTICK_inkey = 1
 ENDIF
 
+IF FORz80tvgame
+	defc	sndbit_port = $02
+	defc	sndbit_bit = 0
+	defc	sndbit_mask = 1
+ENDIF
 
 ; Compatibily ones only, the following ports don't have a beeper
 IF FOReinstein
@@ -223,6 +239,26 @@ IF FORosca
         defc sndbit_mask   = 0
 ENDIF
 
+IF FORsrr
+        defc sndbit_port   = 0
+        defc sndbit_bit    = 0
+        defc sndbit_mask   = 0
+	defc JOYSTICK_inkey = 1
+ENDIF
+
+IF FORspc1000
+        defc sndbit_port   = 0
+        defc sndbit_bit    = 0
+        defc sndbit_mask   = 0
+	defc JOYSTICK_inkey = 1
+ENDIF
+
+IF FORpc6001
+        defc sndbit_port   = 0
+        defc sndbit_bit    = 0
+        defc sndbit_mask   = 0
+ENDIF
+
 ; ********************************************************
 ;  SN76489 PSG chip definitions
 ; ********************************************************
@@ -235,14 +271,16 @@ ENDIF
 
 IF FORsc3000
 	defc sndbit_port	= $7F		; also valid for SG-1000
-    defc sndbit_bit    = 3
-    defc sndbit_mask   = $0F			; $0F for full volume output
+        defc sndbit_bit    = 3
+        defc sndbit_mask   = $0F			; $0F for full volume output
+	defc JOYSTICK_inkey = 1
 ENDIF
 
 IF FORm5
 	defc sndbit_port	= $20
-    defc sndbit_bit    = 3
-    defc sndbit_mask   = $0F			; $0F for full volume output
+        defc sndbit_bit    = 3
+        defc sndbit_mask   = $0F			; $0F for full volume output
+	defc JOYSTICK_inkey = 1
 ENDIF
 
 IF FORmtx
@@ -264,6 +302,13 @@ IF FORpv2000
 ENDIF
 
 
+IF FORrx78
+	defc sndbit_port	= $FF
+	defc sndbit_bit    = 3
+	defc sndbit_mask   = $0F			; $0F for full volume output
+	defc JOYSTICK_inkey = 1
+ENDIF
+
 ; ********************************************************
 ;   This last part refers to NOT YET supported hardware
 ; ********************************************************
@@ -280,11 +325,6 @@ IF FORpasopia
     defc sndbit_mask   = $0F			; $0F for full volume output
 ENDIF
 
-IF FORrx78
-	defc sndbit_port	= $FF
-    defc sndbit_bit    = 3
-    defc sndbit_mask   = $0F			; $0F for full volume output
-ENDIF
 
 IF FORsmc777
 	defc sndbit_port	= $53		; possibly valid also for Sony SMC 70
@@ -293,3 +333,6 @@ IF FORsmc777
 ENDIF
 
 
+IF !JOYSTICK_inkey
+	defc	JOYSTICK_inkey = 0
+ENDIF

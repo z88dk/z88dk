@@ -1311,7 +1311,7 @@ void zadd(LVALUE* lval)
         Zsp += 6;
         break;
     default:
-        ol("add\thl,de");
+        ol("add\thl,de");	// 11T
     }
 }
 
@@ -1487,10 +1487,28 @@ void mult(LVALUE* lval)
         Zsp += 6;
         break;
     case KIND_CHAR:
-        if ( lval->ltype->isunsigned && c_cpu == CPU_Z180 ) {
-            ot("ld\th,e\n");
-            ot("mlt\thl\n");
-            break;
+        if ( lval->ltype->isunsigned ) {
+            if (c_cpu == CPU_Z180 ) {
+                ot("ld\th,e\n");
+                ot("mlt\thl\n");
+                break;
+            } else if ( (c_cpu & CPU_RABBIT) ) {
+                // For Rabbit we want to use the mul instruction
+            } else if ( c_speed_optimisation & OPT_UCHAR_MULT ) {
+                int label1 = getlabel();
+                int label2 = getlabel();
+                ol("ld\th,l");
+                ol("ld\tl,0");
+                ol("ld\td,l");
+                ol("ld\tb,8");
+                postlabel(label1);
+                ol("add\thl,hl");
+                opjumpr("nc,",label2);
+		ol("add\thl,de");
+		postlabel(label2);
+		outfmt("\tdjnz\ti_%d\n",label1);
+                break;
+            }
         }
     default:
         callrts("l_mult"); 
@@ -2232,7 +2250,7 @@ void asr_const(LVALUE *lval, int32_t value)
                 ol("sbc\ta");
                 ol("ld\th,a");
             }
-        } else if ( value == 15 && utype(lval) ) {
+        } else if ( value == 15 && utype(lval) && c_cpu != CPU_Z80ZXN ) {
             ol("rl\th");   /* 7 bytes, 26T */
             vconst(0);
             ol("rl\tl");
@@ -2240,11 +2258,22 @@ void asr_const(LVALUE *lval, int32_t value)
             asr_const(lval, 1);
             asr_const(lval, 1);
         } else if ( value != 0 ) {
-            const2(value & 0xffff);  /* 6 bytes */
-            if ( utype(lval))
-                callrts("l_asr_u_hl_by_e");
-            else
-                callrts("l_asr_hl_by_e");
+            if ( c_cpu == CPU_Z80ZXN ) {   // 6 bytes, 22T
+                ol("ex\tde,hl");   // 1, 4T
+                outfmt("\tld\tb,%d\n", value & 15); // 2, 7T
+                if ( utype(lval) ) {   // 2, 8T
+                    ol("bsrl\tde,b");
+                } else {
+                    ol("bsra\tde,b");
+                }
+                ol("ex\tde,hl");   // 1, 4T
+            } else {
+                const2(value & 0xffff);  /* 6 bytes */
+                if ( utype(lval))
+                    callrts("l_asr_u_hl_by_e");
+                else
+                    callrts("l_asr_hl_by_e");
+            }
         }
     }
 }
@@ -2271,10 +2300,17 @@ void asl_16bit_const(LVALUE *lval, int value)
         case 0:
             return;
         case 10:  // 7 bytes, 8 + 8 + 4 + 7 = 27T
-            ol("sla\tl");
-            ol("sla\tl");
-            ol("ld\th,l");
-            ol("ld\tl,0");
+            if ( c_cpu == CPU_Z80ZXN ) {  // 6 bytes, 23T
+                ol("ex\tde,hl");   // 1, 4T
+                ol("ld\tb,10");    // 2, 7T
+                ol("bsla\tde,b");  // 2, 8T
+                ol("ex\tde,hl");   // 1, 4T
+            } else {
+                ol("sla\tl");
+                ol("sla\tl");
+                ol("ld\th,l");
+                ol("ld\tl,0");
+            }
             break;
         case 9: // 6 bytes, 8 + 4 + 7 = 19T
             ol("sla\tl"); 
@@ -2286,7 +2322,13 @@ void asl_16bit_const(LVALUE *lval, int value)
             ol("ld\tl,0");
         break;
         case 7:
-            if ( c_speed_optimisation & OPT_LSHIFT32 ) {
+            if ( c_cpu == CPU_Z80ZXN ) {  // 6 bytes, 23T
+                ol("ex\tde,hl");   // 1, 4T
+                ol("ld\tb,7");     // 2, 7T
+                ol("bsla\tde,b");  // 2, 8T
+                ol("ex\tde,hl");   // 1, 4T
+                break;
+            } else if ( c_speed_optimisation & OPT_LSHIFT32 ) {
                 ol("rr\th");  // 9 bytes, 8 + 4  + 8 + 7 + 8 = 35T
                 ol("ld\th,l");
                 ol("rr\th");
@@ -2296,11 +2338,32 @@ void asl_16bit_const(LVALUE *lval, int value)
             }
             ol("add\thl,hl");  // 77T
         case 6:
+            if ( c_cpu == CPU_Z80ZXN ) {  // 6 bytes, 23T
+                ol("ex\tde,hl");   // 1, 4T
+                ol("ld\tb,6");     // 2, 7T
+                ol("bsla\tde,b");  // 2, 8T
+                ol("ex\tde,hl");   // 1, 4T
+                break;
+            }
             ol("add\thl,hl");  // 66T
             // Fall through
-        case 5:
+        case 5:  // 5 bytes, 55T
+            if ( c_cpu == CPU_Z80ZXN ) {  // 6 bytes, 23T
+                ol("ex\tde,hl");   // 1, 4T
+                ol("ld\tb,5");     // 2, 7T
+                ol("bsla\tde,b");  // 2, 8T
+                ol("ex\tde,hl");   // 1, 4T
+                break;
+            }
             ol("add\thl,hl");  // 55T
-        case 4:
+        case 4:   // 4 bytes, 44T
+            if ( c_cpu == CPU_Z80ZXN ) {  // 6 bytes, 23T
+                ol("ex\tde,hl");   // 1, 4T
+                ol("ld\tb,4");     // 2, 7T
+                ol("bsla\tde,b");  // 2, 8T
+                ol("ex\tde,hl");   // 1, 4T
+                break;
+            }
             ol("add\thl,hl"); // 44T
         case 3:
             ol("add\thl,hl"); // 33T
@@ -2313,6 +2376,11 @@ void asl_16bit_const(LVALUE *lval, int value)
             if ( value >= 16 ) {
                 warningfmt("overflow","Left shifting by more than the size of the object");
                 vconst(0);
+            } else if ( c_cpu == CPU_Z80ZXN ) {  // 6 bytes, 23T
+                ol("ex\tde,hl");   // 1, 4T
+                outfmt("\tld\tb,%d\n", value & 15); // 2, 7T
+                ol("bsla\tde,b");  // 2, 8T
+                ol("ex\tde,hl");   // 1, 4T
             } else {
                 const2(value & 0xffff);
                 swap();

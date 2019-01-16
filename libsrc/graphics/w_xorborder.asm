@@ -1,95 +1,39 @@
 ;
-; Xorborder
+; XorBorder
 ;
 ; Generic high resolution version
 ;
+
 ;
-; $Id: w_xorborder.asm,v 1.1 2016-10-18 06:52:34 stefano Exp $
+;	$Id: w_xorborder.asm $
 ;
 
-	INCLUDE "graphics/grafix.inc"
- 	SECTION code_graphics
-	PUBLIC	xorborder
-	PUBLIC	_xorborder
+SECTION code_graphics
 
-	EXTERN	w_xorpixel
-	EXTERN	w_line_r
+PUBLIC xorborder
+PUBLIC _xorborder
 
-	EXTERN	swapgfxbk
-	EXTERN	swapgfxbk1
-	EXTERN	__graphics_end
+EXTERN xorborder_callee
+EXTERN ASMDISP_XORBORDER_CALLEE
 
 	
 .xorborder
 ._xorborder
-		push	ix
-		ld	ix,4
-		add	ix,sp
-		ld	l,(ix+6)
-		ld	h,(ix+7)
-		ld	e,(ix+4)
-		ld	d,(ix+5)
+
+		pop af
+		
+		pop de
+		pop	hl
+		exx			; w_plotpixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
+		pop de
+		pop hl
 		
 		push hl
 		push de
-		push ix
-
-		call    swapgfxbk
-		call	w_xorpixel
-		call    swapgfxbk1
-
-		pop ix
-		ld	e,(ix+0)
-		ld	d,(ix+1)
-		ld  hl,0
-		push ix
+		exx
+		push hl
+		push de
 		
-		call    swapgfxbk
-		ld      ix,w_xorpixel
-		call    w_line_r
-		call    swapgfxbk1
+		push af		; ret addr
 		
-		pop ix
-		ld	l,(ix+2)
-		ld	h,(ix+3)
-		ld  de,0
-		push ix
-		
-		call    swapgfxbk
-		ld      ix,w_xorpixel
-		call    w_line_r
-		call    swapgfxbk1
-		
-		pop ix
-		pop de
-		pop hl
-		push ix
-		
-		call    swapgfxbk
-		call	w_xorpixel
-		call    swapgfxbk1
-		
-		pop ix
-		ld	l,(ix+2)
-		ld	h,(ix+3)
-		ld  de,0
-		push ix
-		
-		call    swapgfxbk
-		ld      ix,w_xorpixel
-		call    w_line_r
-		call    swapgfxbk1
-
-		pop ix
-		ld	e,(ix+0)
-		ld	d,(ix+1)
-		ld  hl,0
-		push ix
-		
-		call    swapgfxbk
-		ld      ix,w_xorpixel
-		call    w_line_r
-		call    swapgfxbk1
-
-		jp      __graphics_end
-
+   jp xorborder_callee + ASMDISP_XORBORDER_CALLEE

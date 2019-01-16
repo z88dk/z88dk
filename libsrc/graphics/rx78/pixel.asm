@@ -1,5 +1,6 @@
 	INCLUDE	"graphics/grafix.inc"
 	EXTERN pixeladdress
+	EXTERN __gfx_coords
 
 ; Generic code to handle the pixel commands
 ; Define NEEDxxx before including
@@ -12,6 +13,9 @@ ENDIF
 	ld	a,l
 	cp	maxy
 	ret	nc
+	
+	ld	(__gfx_coords),hl
+
 	push	bc	;Save callers value
 	call	pixeladdress		;hl = address, a = pixel number
 	ld	b,a

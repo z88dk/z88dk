@@ -5,40 +5,32 @@
 ;
 ;       Stubs Written by D Morris - 30/9/98
 ;
-;       Wide resolution (WORD based parameters) version by Stefano Bodrato
 ;
-;	$Id: w_point.asm,v 1.4 2017-01-02 21:51:24 aralbrec Exp $
+;	$Id: w_point.asm $
 ;
 
-
-;Usage: point(struct *pixel)
+; CALLER LINKAGE FOR FUNCTION POINTERS
+; ----- void  point(int x, int y)
 ;Result is true/false
 
 
-        SECTION code_graphics
-                PUBLIC    point
-                PUBLIC    _point
-
-                EXTERN     w_pointxy
-                EXTERN     swapgfxbk
-                EXTERN     swapgfxbk1
-
+		SECTION   code_graphics
+		
+		PUBLIC    point
+		PUBLIC	  _point
+		
+		EXTERN point_callee
+		EXTERN ASMDISP_POINT_CALLEE
 
 .point
 ._point
-		pop	bc
-		pop	de
-		pop	hl
-		push	hl
-		push	de
-		push	bc
 
-                call    swapgfxbk
-                call    w_pointxy
-                push    af
-                call    swapgfxbk1
-                pop     af
-                ld      hl,1
-                ret     nz       ;pixel set
-                dec     hl
-                ret
+   pop af
+   pop de	; y
+   pop hl	; x
+   push hl
+   push de
+   push af
+
+   jp point_callee + ASMDISP_POINT_CALLEE
+   

@@ -16,12 +16,10 @@ stdio/ansi/cpc/f_ansi_cls
 stdio/ansi/cpc/f_ansi_dline
 stdio/ansi/cpc/f_ansi_scrollup
 @stdio/stdio.lst
-@gfxbasew.lst
 graphics/w_drawb
 graphics/w_undrawb
 graphics/w_xorborder
 graphics/cpc/clg
-graphics/cpc/clga2
 graphics/cpc/w_pixeladdress
 graphics/cpc/fill
 graphics/w_plotpixl
@@ -31,8 +29,11 @@ graphics/lftscrol
 graphics/cpc/swapgfxbk
 graphics/cpc/w_putsprite
 graphics/w_stencil_render
+graphics/cpc/w_clga
+graphics/retrofit/clga_callee
 graphics/draw_profile
 graphics/w_pointxy
+@gfxbasew.lst
 time/cpc/clock
 games/cpc/joystick
 cpc/firmware

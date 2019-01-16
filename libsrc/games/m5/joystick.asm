@@ -8,6 +8,7 @@
 	SECTION code_clib
         PUBLIC    joystick
         PUBLIC    _joystick
+	EXTERN	joystick_inkey
 
 
 
@@ -16,6 +17,14 @@
 	;__FASTCALL__ : joystick no. in HL
 		
 	ld	a,l
+	cp	1
+	jr	z,do_joystick
+	dec	a
+	jp	joystick_inkey
+
+
+
+do_joystick:
 
 	ld	hl,0
 	dec	a
@@ -42,12 +51,12 @@
 	
 	ld	e,a
 	in a,($30)	; keyboard row scan
-	and $40	; mask the SPACE key
+	rrca
+	rrca		; FIRE
+	and $10	; mask the SPACE key
 	;FUDLR
-	rra
-	rra		; FIRE
 	or e
-	ld	l,e
+	ld	l,a
 	
 .no_cursor
 	ret

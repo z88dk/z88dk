@@ -3,6 +3,9 @@
 		Spirograph curves
 		Stefano Bodrato 2014
 		ref: http://linuxgazette.net/133/luana.html
+		
+		For graphics only devices (no text), add "-pragma-redirect=fputc_cons=putc4x6"
+		On Sinclair computers the specific maths library can be used, but in full form only (TINY mode will fail).
 	*/
 
 	#include <graphics.h>

@@ -4,10 +4,10 @@
 ; VZ200/300 version
 ;
 ;
-; $Id: bkrestore.asm,v 1.7 2016-06-20 21:47:41 dom Exp $
+; $Id: bkrestore.asm $
 ;
 
-	SECTION	code_clib
+	SECTION smc_clib
 	PUBLIC    bkrestore
 	PUBLIC   _bkrestore
 	EXTERN	pixeladdress

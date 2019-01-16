@@ -20,6 +20,6 @@ int dir_move_first()
 {
 	fc_dirbuf=dirbuf;
 	bdos(CPM_SDMA,fc_dirbuf);
-	parsefcb(fc_dir,"*.*");
-	return (fc_dirpos=bdos(CPM_FFST,fc_dir));
+	parsefcb(&fc_dir,"*.*");
+	return (fc_dirpos=bdos(CPM_FFST,&fc_dir));
 }

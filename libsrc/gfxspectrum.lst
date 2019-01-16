@@ -1,7 +1,6 @@
-@gfxbase.lst
 graphics/dcircle
 graphics/spectrum/clg
-graphics/clrarea2
+graphics/spectrum/clrarea2
 graphics/lftscrol
 graphics/plotpixl
 graphics/respixl
@@ -10,7 +9,6 @@ graphics/pointxy
 graphics/fill
 graphics/dfill
 graphics/getsprite
-graphics/liner
 graphics/stencil_render
 graphics/spectrum/putsprite
 graphics/spectrum/bksave
@@ -19,3 +17,4 @@ graphics/spectrum/rowtab
 graphics/spectrum/pixladdr
 graphics/spectrum/swapgfxbk
 graphics/spectrum/zx_hardcopy
+@gfxbase.lst

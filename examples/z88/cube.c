@@ -41,7 +41,7 @@ void main()
     win->number='4';
 
         /* Open map with width 256 on window #4 */
-    window(win);
+    window(&win);
 
 
         x[0]=-SIZE; y[0]=-SIZE; z[0]=-SIZE;
@@ -91,5 +91,5 @@ void main()
                 draw(x[2]+mx,y[2]+my,x[6]+mx,y[6]+my);
                 draw(x[1]+mx,y[1]+my,x[5]+mx,y[5]+my);
         }
-        closegfx(win);
+        closegfx(&win);
 }

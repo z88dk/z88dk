@@ -21,11 +21,14 @@
 	PUBLIC    joystick
 	PUBLIC    _joystick
 	EXTERN	getk
+	EXTERN	joystick_inkey
 
 .joystick
 ._joystick
 	;__FASTALL__ : joystick no. in HL
 	ld	a,l
+	cp	3
+	jr	nc,try_keyboard
 	ld	bc,0x07
 	cp	1
 	jr	nz,read_joystick
@@ -54,3 +57,6 @@ no_left:
 	set	4,l	;fire
 	ret
 
+try_keyboard:
+	sub	2
+	jp	joystick_inkey

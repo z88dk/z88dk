@@ -18,4 +18,6 @@ graphics/__gfx_coords
 graphics/alphatro/textpixl6
 graphics/alphatro/cleargraphics
 @video/mc6845/mc6845.lst
+games/alphatro/keys_joystick
+@games/games.lst
 @z80.lst

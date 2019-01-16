@@ -80,7 +80,7 @@ void main()
     win->flags = WIN_BORDER | WIN_SHADOW;
     win->height = 20;
     win->width = 40;
-    win_open(win);
+    win_open(&win);
     x = 40;
     y = 20;
 
@@ -148,7 +148,7 @@ void main()
         }
     }
 
-    win_close(win);
+    win_close(&win);
     while (getk() != 13)
         ;
 }

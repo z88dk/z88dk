@@ -145,6 +145,12 @@ int kc_exec(char* target)
         writebyte(c, fpout);
     }
 
+    // Pad the block out to 128 bytes
+    while( (i % 128) > 0) {
+        writebyte(0, fpout);
+        i++;
+    }
+
     fclose(fpin);
     fclose(fpout);
 

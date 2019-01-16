@@ -16,10 +16,6 @@
 
 .rnd_erase
 ._rnd_erase
-	pop	bc
-	pop	hl
-	push	hl
-	push	bc
 	
 	call	zxgetfname2
 	

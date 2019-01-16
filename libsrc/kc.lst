@@ -10,11 +10,9 @@ stdio/kc/CRT_FONT
 @font/font_8x8/font_8x8.lst
 games/joystick
 graphics/w_dcircle_square.asm
-@gfxbasew.lst
 graphics/kc/clg
 graphics/kc/w_pixladdr
 graphics/kc/swapgfxbk
-graphics/w_clga
 graphics/kc/w_stencil_render
 graphics/w_putsprite
 graphics/w_plotpixl
@@ -22,4 +20,5 @@ graphics/w_respixl
 graphics/w_xorpixl
 graphics/swapgfxbk_foo
 graphics/w_pointxy
+@gfxbasew.lst
 @z80.lst

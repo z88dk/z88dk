@@ -18,10 +18,8 @@ stdio/bee/copy_font
 @stdio/stdio.lst
 games/bee/joystick
 @games/games.lst
-@gfxbase.lst
 graphics/dcircle
 graphics/clg
-graphics/clrarea
 graphics/generic_console/clsgraph
 graphics/bee/textpixl
 graphics/generic_console/plotpixl
@@ -33,4 +31,5 @@ graphics/generic_console/getmaxy
 graphics/putsprite3
 graphics/stencil_render2
 graphics/text/swapgfxbk
+@gfxbase.lst
 @z80.lst

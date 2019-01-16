@@ -1766,6 +1766,11 @@
  bool hl'                       ; Error
  bool ix                        ; Error
  bool iy                        ; Error
+ brlc de,b                      ; Error
+ bsla de,b                      ; Error
+ bsra de,b                      ; Error
+ bsrf de,b                      ; Error
+ bsrl de,b                      ; Error
  call lo, -32768                ; Error
  call lo, 32767                 ; Error
  call lo, 65535                 ; Error
@@ -3985,6 +3990,7 @@
  ipset 3                        ; Error
  ipset 4                        ; Error
  ipset 4                        ; Error
+ jp (c)                         ; Error
  jp lo, -32768                  ; Error
  jp lo, 32767                   ; Error
  jp lo, 65535                   ; Error
@@ -4205,7 +4211,6 @@
  lddrx                          ; Error
  lddsr                          ; Error
  lddx                           ; Error
- ldirscale                      ; Error
  ldirx                          ; Error
  ldisr                          ; Error
  ldix                           ; Error

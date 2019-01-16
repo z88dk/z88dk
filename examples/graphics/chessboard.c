@@ -18,7 +18,11 @@
       #if defined __G800__ || defined __TI85__ || defined __TI86__ || defined __Z88__ || defined __VZ200__
          #include "ti_chessboard.h"
       #else
-         #include "chessboard.h"
+         #if defined __RX78__
+           #include "chessb16.h"
+         #else
+           #include "chessboard.h"
+         #endif
       #endif
    #endif
 #endif

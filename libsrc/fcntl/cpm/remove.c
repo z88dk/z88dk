@@ -18,13 +18,13 @@ int remove(char *name)
     int       retval;
     unsigned char uid;
 
-    if ( setfcb(fc,name) ) 
+    if ( setfcb(&fc,name) ) 
 	return 0;
 
 	uid = getuid();
 	setuid(fc->uid);
 
-    retval = bdos(CPM_DEL,fc);
+    retval = bdos(CPM_DEL,&fc);
 
     setuid(uid);
     return retval;

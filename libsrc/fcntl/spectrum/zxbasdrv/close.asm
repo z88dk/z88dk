@@ -6,7 +6,7 @@
 ;
 ; int close(int handle)
 ;
-; $Id: close.asm,v 1.6 2016-06-23 20:40:25 dom Exp $
+; $Id: close.asm $
 
 	SECTION code_clib
 	PUBLIC	close
@@ -14,36 +14,32 @@
 	
 	EXTERN	zxhandl
 	
-	EXTERN	zx_setint
+	EXTERN	zx_setint_callee
+	EXTERN ASMDISP_ZX_SETINT_CALLEE
 	EXTERN	zx_goto
 	
-; BASIC variable names for numeric values
-.svar	defb 'S',0
 
 .close
 ._close
 	pop	hl
-	pop	bc
-	push	bc
+	pop	de
+	push	de
 	push	hl
 	
-	ld	a,c
+	ld	a,e
 	cp	3
 	jr	z,islpt
 
-	ld	hl,svar
-	push	hl		; BASIC variable S
-	push	bc		; file handle (stream #)
-	call	zx_setint
-	pop	de
-	pop	hl
 	ld	hl,zxhandl
-	xor	a
 	add	hl,de
-	ld	(hl),a		; free flag for handle
+	ld	(hl),0		; free flag for handle
 
 				; note: here we could prevent the "special"
 				; stream numbers from being closed
+
+	ld	hl,svar
+	
+	call	zx_setint_callee + ASMDISP_ZX_SETINT_CALLEE
 
 	ld	hl,7550		; BASIC routine for "close"
 .goto_basic
@@ -58,3 +54,9 @@
 
 .islpt	ld	bc,7750		; BASIC routine for "close printer device"
 	jr	goto_basic
+
+
+	SECTION rodata_clib
+	
+; BASIC variable names for numeric values
+.svar	defb 'S',0

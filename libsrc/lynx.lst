@@ -10,10 +10,8 @@ stdio/lynx/CRT_FONT
 @font/font_8x8/font_8x8.lst
 @input/input_keyboard.lst
 @stdio/stdio.lst
-@gfxbase.lst
 graphics/dcircle
 graphics/clg
-graphics/clrarea
 graphics/lynx/textpixl
 graphics/generic_console/clsgraph
 graphics/generic_console/plotpixl
@@ -25,5 +23,8 @@ graphics/generic_console/getmaxy
 graphics/putsprite3
 graphics/stencil_render2
 graphics/text/swapgfxbk
+@gfxbase.lst
 @video/mc6845/mc6845.lst
+games/lynx/keys_joystick
+@games/games.lst
 @z80.lst

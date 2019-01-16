@@ -12,8 +12,6 @@ graphics/tiki100/w_xorpixl
 graphics/tiki100/w_pointxy
 graphics/tiki100/getmaxx
 graphics/tiki100/getmaxy
-@gfxbasew.lst
-graphics/w_clga
 graphics/w_plotpixl
 graphics/w_respixl
 graphics/w_xorpixl
@@ -22,6 +20,7 @@ graphics/tiki100/fill
 graphics/tiki100/w_putsprite
 graphics/tiki100/w_stencil_render
 graphics/tiki100/l_graphics_cmp
+@gfxbasew.lst
 arch/tiki100/gr_setpalette
 arch/tiki100/gr_defmod
 arch/tiki100/gr_scroll

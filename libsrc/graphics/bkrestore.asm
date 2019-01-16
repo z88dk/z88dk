@@ -3,10 +3,11 @@
 ;
 ;	Generic version (just a bit slow)
 ;
-;	$Id: bkrestore.asm,v 1.9 2017-01-02 21:51:24 aralbrec Exp $
+;	$Id: bkrestore.asm $
 ;
 
-	SECTION	 code_graphics
+	SECTION smc_clib
+	
 	PUBLIC    bkrestore
 	PUBLIC    _bkrestore
 	EXTERN	pixeladdress

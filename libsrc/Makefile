@@ -28,7 +28,7 @@ all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	embedded_clib.lib test_clib.lib testrcm_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
 	pv1000_clib.lib pv2000_clib.lib coleco_clib.lib multi8_clib.lib alphatro_clib.lib  spc1000_clib.lib \
 	laser500_clib.lib super80_clib.lib super80_vduem_clib.lib \
-	adam.lib \
+	adam.lib z80tvgame_clib.lib \
 	preempt.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib gendos.lib ndos.lib  \
@@ -331,6 +331,7 @@ pc6001_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(call buildgeneric,pc6001)
+	$(MAKE) -C games TARGET=pc6001
 	TARGET=pc6001 TYPE=z80 $(LIBLINKER) -DFORpc6001 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pc6001_clib @$(LISTFILE_DIRECTORY)/pc6001.lst
 	
 # PC8801 lib - Stefano
@@ -614,6 +615,7 @@ sorcerer_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(call buildgeneric,srr)
+	$(MAKE) -C games TARGET=srr
 	TARGET=srr TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsorcerer -x$(OUTPUT_DIRECTORY)/sorcerer_clib @$(LISTFILE_DIRECTORY)/sorcerer.lst
 
 # Sharp MZ lib - Stefano
@@ -935,6 +937,16 @@ fp1100_clib.lib:
 	$(call buildgeneric,fp1100)
 	TARGET=fp1100 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORfp1100 -x$(OUTPUT_DIRECTORY)/fp1100_clib @$(LISTFILE_DIRECTORY)/fp1100.lst
 
+# Z80 TV Game
+z80tvgame_clib.lib:
+	@echo ''
+	@echo '--- Building Z80 TV Game Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(call buildgeneric,z80tvgame)
+	$(MAKE) -C games TARGET=z80tvgame
+	TARGET=z80tvgame TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz80tvgame -x$(OUTPUT_DIRECTORY)/z80tvgame_clib @$(LISTFILE_DIRECTORY)/z80tvgame.lst
+
 
 # Mitsubishi Multi8 - dom
 multi8_clib.lib:
@@ -986,6 +998,7 @@ alphatro_clib.lib:
 	@$(RM) -f video/mc6845/*.o
 	$(MAKE) gfxdeps
 	$(call buildgeneric,alphatro)
+	$(MAKE) -C games TARGET=alphatro
 	TARGET=alphatro TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORalphatro -x$(OUTPUT_DIRECTORY)/alphatro_clib @$(LISTFILE_DIRECTORY)/alphatro.lst
 
 # SPC-1000 - dom
@@ -998,6 +1011,7 @@ spc1000_clib.lib:
 	$(call buildgeneric,spc1000)
 	$(MAKE) -C msx TARGET=test
 	$(MAKE) -C msx TARGET=spc1000
+	$(MAKE) -C games TARGET=spc1000
 	TARGET=spc1000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORspc1000 -x$(OUTPUT_DIRECTORY)/spc1000_clib @$(LISTFILE_DIRECTORY)/spc1000.lst
 
 # Casio PV1000 - dom
@@ -1174,6 +1188,8 @@ gal_clib.lib:
 	$(call buildgeneric,gal)
 	$(MAKE) -C games TARGET=gal
 	TARGET=gal TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgal -x$(OUTPUT_DIRECTORY)/gal_clib @$(LISTFILE_DIRECTORY)/gal.lst
+	$(MAKE) gfxdeps
+	TARGET=gal TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgal -Dtextgraphics -x$(OUTPUT_DIRECTORY)/gfxgaltext @arch/gal/gfxgaltext.lst
 
 # Sharp PC-G8xx/E2xx - Stefano Bodrato
 g800_clib.lib:

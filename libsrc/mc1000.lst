@@ -19,12 +19,9 @@ stdio/ansi/mc1000/f_ansi_char
 @font/font_8x8/font_8x8.lst
 @stdio/ansicore.lst
 @stdio/stdio.lst
-@gfxbase.lst
 graphics/mc1000/clg
 graphics/mc1000/pixladdr
 graphics/dcircle2
-graphics/clrarea
-graphics/lftscrol
 graphics/mc1000/plotpixl
 graphics/mc1000/respixl
 graphics/mc1000/xorpixl
@@ -37,6 +34,7 @@ graphics/mc1000/bksave
 graphics/mc1000/bkrestore
 graphics/mc1000/swapgfxbk
 graphics/mc1000/stencil_render
+@gfxbase.lst
 time/mc1000/clock
 games/mc1000/joystick
 games/mc1000/bit_open

@@ -6,7 +6,7 @@
 ; c128 high resolution version
 ;
 ;
-; $Id: w_putsprite.asm,v 1.5 2016-07-02 09:01:35 dom Exp $
+; $Id: w_putsprite.asm $
 ;
 
 	SECTION   smc_clib
@@ -15,8 +15,9 @@
         EXTERN     w_pixeladdress
         ;EXTERN    vdcset
         ;EXTERN    vdcget
-        ;EXTERN    swapgfxbk
-        ;EXTERN  swapgfxbk1
+		
+        EXTERN    swapgfxbk
+        EXTERN    __graphics_end
 
         INCLUDE "graphics/grafix.inc"
 
@@ -54,7 +55,7 @@
         ld      (ortype),a      ; Self modifying code
         ld      (ortype2),a     ; Self modifying code
 
-        ;call    swapgfxbk
+        call    swapgfxbk
         ; @@@@@@@@@@@@
         ld      h,b
         ld      l,c
@@ -145,9 +146,9 @@ loopa3:
 
          pop      bc                ;Restore data
          djnz     _oloop
-	pop	ix		;restore callers
-         ret
-         ;jp       swapgfxbk1
+
+         jp       __graphics_end
+
 
 
 .putspritew
@@ -178,28 +179,22 @@ loopa3:
          jp       z,wover_1
 
          djnz     wiloop
+		 jp       line_end
 
-         call     next_line
-
-         pop      bc                ;Restore data
-         djnz     woloop
-	 pop	ix		;restore callers
-         ret
-         ;jp       swapgfxbk1
         
 
 .wover_1 ld       c,(ix+2)
          inc      ix
          djnz     wiloop
          dec      ix
-
+.line_end
          call     next_line
 
          pop      bc
          djnz     woloop
-	 pop	ix		;restore callers
-         ret
-         ;jp       swapgfxbk1
+		 
+         jp       __graphics_end
+		 
 
 
 ;_____________________________________________________
@@ -360,10 +355,12 @@ loop6a:
         pop     bc
         pop     de
         ret
-
+		
+		
 	SECTION	rodata_clib
 .offsets_table
          defb   1,2,4,8,16,32,64,128
+		 
 	SECTION	bss_clib
 .lineaddr
          defw   0

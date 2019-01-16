@@ -13,10 +13,8 @@ stdio/ansi/zx81/text/f_ansi_dline
 stdio/ansi/zx81/text/f_ansi_scrollup
 @stdio/stdio.lst
 time/zx81/clock
-@gfxbase.lst
 graphics/dcircle
 graphics/clg
-graphics/clrarea
 graphics/zx81/clsgraph
 graphics/zx80/zx_hardcopy
 graphics/zx80/textpixl
@@ -27,6 +25,7 @@ graphics/zx80/pointxy
 graphics/putsprite3
 graphics/stencil_render2
 graphics/text/swapgfxbk
+@gfxbase.lst
 games/zx81snd/bit_open
 games/zx81snd/bit_open_di
 games/zx81snd/bit_close

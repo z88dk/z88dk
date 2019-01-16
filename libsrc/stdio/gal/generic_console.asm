@@ -3,22 +3,23 @@
 		SECTION		code_clib
 
 		PUBLIC		generic_console_cls
-		PUBLIC		generic_console_vpeek
 		PUBLIC		generic_console_printc
 		PUBLIC		generic_console_scrollup
-		PUBLIC		generic_console_ioctl
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
-		PUBLIC		generic_console_pointxy
+		PUBLIC		generic_console_text_xypos
+
+
+		EXTERN		printc_MODE1
+		EXTERN		scrollup_MODE1
 
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
+		EXTERN		__gal_mode
 
 		defc		DISPLAY = 0x2800
 
-generic_console_ioctl:
-	scf
 generic_console_set_paper:
 generic_console_set_inverse:
 generic_console_set_ink:
@@ -32,6 +33,18 @@ generic_console_cls:
 	ld	bc, +(CONSOLE_COLUMNS * CONSOLE_ROWS) - 1
 	ld	(hl),32
 	ldir
+	ld	a,(__gal_mode)
+	cp	1
+	ret	nz
+	ld	hl, ($2a6a)
+	ld	de,$20
+	add	hl,de
+	ld	d,h	
+	ld	e,l
+	inc	de
+	ld	bc, +(32 * 208) - 1
+	ld	(hl),0xff
+	ldir
 	ret
 
 ; c = x
@@ -39,34 +52,21 @@ generic_console_cls:
 ; a = character to print
 ; e = raw
 generic_console_printc:
+	ld	d,a
+	ld	a,(__gal_mode)
+	cp	1
+	jp	z,printc_MODE1
 	push	de
-	call	xypos
+	call	generic_console_text_xypos
 	pop	de
+	ld	a,d
 	rr	e
 	call	nc,convert_character
 	ld	(hl),a
 	ret
 
 
-generic_console_pointxy:
-	call	generic_console_vpeek
-	and	a
-	ret
-
-;Entry: c = x,
-;       b = y
-;       e = rawmode
-;Exit:  nc = success
-;        a = character,
-;        c = failure
-generic_console_vpeek:
-        call    xypos
-	ld	a,(hl)
-	and	a
-	ret
-
-
-xypos:
+generic_console_text_xypos:
 	ld	hl,DISPLAY - CONSOLE_COLUMNS
 	ld	de,CONSOLE_COLUMNS
 	inc	b
@@ -89,6 +89,9 @@ convert_character:
 generic_console_scrollup:
 	push	de
 	push	bc
+	ld	a,(__gal_mode)
+	cp	1
+	jp	z,scrollup_MODE1
 	ld	hl, DISPLAY + CONSOLE_COLUMNS
 	ld	de, DISPLAY
 	ld	bc,+ ((CONSOLE_COLUMNS) * (CONSOLE_ROWS-1))

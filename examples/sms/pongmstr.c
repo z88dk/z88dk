@@ -497,7 +497,7 @@ void main() {
 		playfield.score1 = 0;
 		draw_score(&playfield);
 
-		setup_paddles(paddles, playfield);
+		setup_paddles(paddles, &playfield);
 		deploy_ball(&ball);
 		while ((playfield.score0 < 20) && (playfield.score1 < 20)) {
 			joy1 = read_joypad1();

@@ -11,10 +11,8 @@ stdio/ansi/generic/f_ansi_dline
 stdio/ansi/z1013/f_ansi_scrollup
 @stdio/stdio.lst
 games/joystick
-@gfxbase.lst
 graphics/dcircle
 graphics/clg
-graphics/clrarea
 graphics/text/clsgraph
 graphics/z1013/textpixl
 graphics/text/plotpixl
@@ -26,4 +24,5 @@ graphics/dfill2
 graphics/putsprite3
 graphics/stencil_render2
 graphics/text/swapgfxbk
+@gfxbase.lst
 @z80.lst

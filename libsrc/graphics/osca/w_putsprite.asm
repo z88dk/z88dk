@@ -3,7 +3,7 @@
 ; original code by Patrick Davidson (TI 85)
 ; modified by Stefano Bodrato - nov 2010
 ;
-; TS2068 high resolution version
+; OSCA (v6z80p) high resolution version
 ;
 ;
 ; $Id: w_putsprite.asm $
@@ -213,7 +213,7 @@
 	pop	ix	;restore callers
          jp       swapgfxbk1
 
-	SECTION rodata_club
+	SECTION rodata_clib
 .offsets_table
          defb   1,2,4,8,16,32,64,128
 

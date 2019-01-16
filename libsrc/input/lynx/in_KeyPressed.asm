@@ -44,6 +44,7 @@ check_shift:
 	and	15
 	ld	b,a
 	in	a,(c)
+	cpl
 	and	h		;Check with mask
 	jr	z,fail
 	ld	hl,1

@@ -6,21 +6,20 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: circle.asm,v 1.6 2016-04-13 21:09:09 dom Exp $
+;	$Id: circle.asm $
 ;
 
 
-;Usage: circle(struct *pixels)
+; Usage: circle(int x, int y, int radius, int skip);
 
 
-                SECTION         code_graphics
-                PUBLIC    circle
-                PUBLIC    _circle
+		SECTION     code_graphics
+		
+		PUBLIC      circle
+		PUBLIC      _circle
 
-                EXTERN     draw_circle
-                EXTERN     plotpixel
-                EXTERN     swapgfxbk
-		EXTERN    __graphics_end
+		EXTERN      circle_callee
+		EXTERN      ASMDISP_CIRCLE_CALLEE
 
 
 .circle
@@ -32,8 +31,5 @@
 		ld	d,(ix+4)	;radius
 		ld	c,(ix+6)	;y
 		ld	b,(ix+8)	;x
-                ld      ix,plotpixel
-                call    swapgfxbk
-                call    draw_circle
-                jp      __graphics_end
-
+		
+		jp circle_callee + ASMDISP_CIRCLE_CALLEE

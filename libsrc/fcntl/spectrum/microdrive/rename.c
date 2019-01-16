@@ -16,10 +16,10 @@ int blkcount, currblock;
 struct M_CHAN mybuf;
 
   // check if "newname" already exists
-  if (if1_load_record (1, newname, 0, mybuf) != -1 ) return (-1);
+  if (if1_load_record (1, newname, 0, &mybuf) != -1 ) return (-1);
 
   // load first file record and check for its existence
-  if ((currblock = if1_load_record (1, oldname, 0, mybuf)) == -1 )
+  if ((currblock = if1_load_record (1, oldname, 0, &mybuf)) == -1 )
     return (-1);
 
   /* now rename every file record
@@ -28,8 +28,8 @@ struct M_CHAN mybuf;
   for (blkcount=1; blkcount < 255; blkcount++)
     {
        if1_setname(newname,&mybuf->recname[0]);
-       if (if1_write_sector (1, currblock, mybuf) == -1) return (-1);
-       currblock = if1_load_record (1, oldname, blkcount, mybuf);
+       if (if1_write_sector (1, currblock, &mybuf) == -1) return (-1);
+       currblock = if1_load_record (1, oldname, blkcount, &mybuf);
        if (currblock == -1) return 0;
     }
     return (0);

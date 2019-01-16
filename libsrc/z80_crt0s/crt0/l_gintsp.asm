@@ -8,8 +8,12 @@ PUBLIC l_gintsp
 	add	hl,sp
 	inc hl
 	inc hl
+IF EZ80
+	defb	0xeb, 0x27	;ld hl,(hl)
+ELSE
 	ld a,(hl)
 	inc     hl
 	ld h,(hl)
 	ld l,a
+ENDIF
 	ret

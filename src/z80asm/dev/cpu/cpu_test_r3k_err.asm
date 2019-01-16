@@ -306,6 +306,11 @@
  bit 8, iyl                     ; Error
  bit 8, l                       ; Error
  bit 8, l                       ; Error
+ brlc de,b                      ; Error
+ bsla de,b                      ; Error
+ bsra de,b                      ; Error
+ bsrf de,b                      ; Error
+ bsrl de,b                      ; Error
  cp a, ixh                      ; Error
  cp a, ixl                      ; Error
  cp a, iyh                      ; Error
@@ -603,6 +608,7 @@
  ipset -1                       ; Error
  ipset 4                        ; Error
  ipset 4                        ; Error
+ jp (c)                         ; Error
  ld a, i                        ; Error
  ld a, ixh                      ; Error
  ld a, ixl                      ; Error
@@ -669,7 +675,6 @@
  ld r, a                        ; Error
  lddrx                          ; Error
  lddx                           ; Error
- ldirscale                      ; Error
  ldirx                          ; Error
  ldix                           ; Error
  ldpirx                         ; Error

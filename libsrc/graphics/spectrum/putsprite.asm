@@ -17,6 +17,9 @@
    PUBLIC    _putsprite
 	EXTERN	pixeladdress
 	EXTERN	zx_saddrpdown
+	
+	EXTERN     swapgfxbk
+	EXTERN	__graphics_end
 
 	INCLUDE	"graphics/grafix.inc"
 
@@ -26,8 +29,8 @@
 
 .putsprite
 ._putsprite
-
-        ld      hl,2   
+	push	ix
+        ld      hl,4   
         add     hl,sp
         ld      e,(hl)
         inc     hl
@@ -58,6 +61,7 @@
 	push	af
 	ld	h,a
 	ld	l,e
+	call	swapgfxbk
 	call	pixeladdress	
 	ld	h,d
 	ld	l,e
@@ -85,7 +89,7 @@
 	cp	9
 	jr	nc,putspritew
 
-	 di
+	 ;di
          ld       d,(ix+0)
          ld       b,(ix+1)
 ._oloop  push     bc                ;Save # of rows
@@ -116,12 +120,11 @@
 
          pop      bc                ;Restore data
          djnz     _oloop
-         ei
-         ret
+		jp       __graphics_end
 
 
 .putspritew
-	 di
+	 ;di
          ld       d,(ix+0)
          ld       b,(ix+1)        
 .woloop  push     bc                ;Save # of rows
@@ -156,9 +159,9 @@
 
          pop      bc                ;Restore data
          djnz     woloop
-         ei
-         ret
+	 jp       __graphics_end
 
+	 
 .wover_1 ld       c,(ix+2)
          inc      ix
          djnz     wiloop
@@ -173,8 +176,7 @@
 
          pop      bc
          djnz     woloop
-         ei
-         ret
+	 jp       __graphics_end
 
 
 	SECTION rodata_clib

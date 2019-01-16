@@ -1,15 +1,15 @@
 	
-                SECTION         code_graphics
+	SECTION         code_graphics
+				
 	PUBLIC	drawbox
-	EXTERN	plotpixel
 
 ;
-;	$Id: drawbox.asm,v 1.6 2016-04-13 21:09:09 dom Exp $
+;	$Id: drawbox.asm $
 ;
 
 ; ***********************************************************************
 ;
-; Clear specified graphics area in map.
+; Draw a box.
 ; Generic version
 ;
 ; Stefano Bodrato - March 2002
@@ -20,7 +20,12 @@
 ;
 
 .drawbox
-
+		ld	a,2
+		cp b
+		ret nc
+		cp c
+		ret nc
+		
 		push	bc
 		push	hl
 
@@ -28,32 +33,17 @@
 		push	hl
 		ld	a,h
 		add	a,b
-		ret	c	; overflow ?
 		dec	a
 		ld	h,a
 		pop	de
 .rowloop
 		push	bc
-		
-		push	hl
-		push	de
-		ld	de, p_RET1
-		push	de
-		jp	(ix)	;	execute PLOT at (h,l)
-.p_RET1
-		pop	de
-		pop	hl
+
+		call p_sub
 		inc	l
 		ex	de,hl
 
-		push	hl
-		push	de
-		ld	de, p_RET2
-		push	de
-		jp	(ix)	;	execute PLOT at (h,l)
-.p_RET2
-		pop	de
-		pop	hl
+		call p_sub
 		inc	l
 		ex	de,hl
 
@@ -65,10 +55,12 @@
 		pop	bc
 
 ; -- Horizontal lines --
+		inc	h
+		dec b
+		dec b
 		push	hl
 		ld	a,l
 		add	a,c
-		ret	c	; overflow ?
 		dec	a
 		ld	l,a
 		pop	de
@@ -76,25 +68,11 @@
 .vrowloop
 		push	bc
 		
-		push	hl
-		push	de
-		ld	de, p_RET3
-		push	de
-		jp	(ix)	;	execute PLOT at (h,l)
-.p_RET3
-		pop	de
-		pop	hl
+		call p_sub
 		inc	h
 		ex	de,hl
 		
-		push	hl
-		push	de
-		ld	de, p_RET4
-		push	de
-		jp	(ix)	;	execute PLOT at (h,l)
-.p_RET4
-		pop	de
-		pop	hl
+		call p_sub
 		inc	h
 		ex	de,hl
 		
@@ -102,4 +80,15 @@
 		
 		djnz	vrowloop
 
+		ret
+
+.p_sub
+		push	hl
+		push	de
+		ld	de, p_RET1
+		push	de
+		jp	(ix)	;	execute PLOT at (h,l)
+.p_RET1
+		pop	de
+		pop	hl
 		ret

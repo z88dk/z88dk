@@ -1,12 +1,14 @@
-	SECTION code_graphics
-	PUBLIC	xorborder
-   PUBLIC   _xorborder
-	EXTERN	xorpixel
-        EXTERN     swapgfxbk
-	EXTERN	__graphics_end
 
+	SECTION code_graphics
+	
+	PUBLIC	xorborder
+	PUBLIC   _xorborder
+	
+	EXTERN    xorborder_callee
+	EXTERN    ASMDISP_XORBORDER_CALLEE
+		
 ;
-;	$Id: xorborder.asm,v 1.7 2017-01-02 21:51:24 aralbrec Exp $
+;	$Id: xorborder.asm $
 ;
 
 ; ***********************************************************************
@@ -24,7 +26,6 @@
 .xorborder
 ._xorborder
 		push	ix
-		call	swapgfxbk
 		
 		ld	ix,2
 		add	ix,sp
@@ -32,60 +33,7 @@
 		ld	b,(ix+4)
 		ld	l,(ix+6)
 		ld	h,(ix+8)
-
-		push	bc
-		push	hl
-
-; -- Vertical lines --
-		push	hl
-		ld	a,h
-		add	a,b
-		ret	c	; overflow ?
-		dec	a
-		ld	h,a
-		pop	de
-.rowloop
-		push	bc
 		
-		inc	l
-		ex	de,hl
-		push	hl
-		push	de
-		call	xorpixel
-		pop	de
-		pop	hl
-		inc	l
+		pop ix
 
-		pop	bc
-		dec	c
-		jr	nz,rowloop
-
-		pop	hl
-		pop	bc
-
-; -- Horizontal lines --
-		push	hl
-		ld	a,l
-		add	a,c
-		;ret	c	; overflow ?
-		dec	a
-		ld	l,a
-		pop	de
-
-.vrowloop
-		push	bc
-		
-		push	hl
-		push	de
-		call	xorpixel
-		pop	de
-		pop	hl
-		inc	h
-		ex	de,hl
-		inc	h
-		
-		pop	bc
-		
-		djnz	vrowloop
-		
-		jp	__graphics_end
+   jp xorborder_callee + ASMDISP_XORBORDER_CALLEE

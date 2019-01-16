@@ -14,7 +14,7 @@
 extern char *_Xsmallfont;
 
 
-void XSetStandardProperties(Display *display, Window win, char *window_name, char *icon_name, char *icon_pixmap, char *argv, int argc, int *size_hints) {
+void XSetStandardProperties(Display *display, Window win, char *window_name, char *icon_name, char *icon_pixmap, char **argv, int argc, int *size_hints) {
 
 	struct _XWIN *mywin;
 	

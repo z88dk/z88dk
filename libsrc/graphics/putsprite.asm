@@ -9,7 +9,7 @@
 ; $Id: putsprite.asm,v 1.9 2016-07-02 09:01:35 dom Exp $
 ;
 
-        SECTION code_graphics
+        SECTION   smc_clib
 	PUBLIC    putsprite
 	PUBLIC    _putsprite
 	EXTERN	pixeladdress
@@ -21,9 +21,6 @@
 ; __gfx_coords: d,e (vert-horz)
 ; sprite: (ix)
 
-
-.offsets_table
-         defb	1,2,4,8,16,32,64,128
 
 
 
@@ -182,3 +179,8 @@
 	SECTION bss_graphics
 .actcoord
 	 defw	0
+
+	SECTION	rodata_clib
+
+.offsets_table
+         defb	1,2,4,8,16,32,64,128

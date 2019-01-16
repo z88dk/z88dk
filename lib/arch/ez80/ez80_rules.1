@@ -1,0 +1,92 @@
+	call	l_gint
+=
+	ld	hl,(hl)
+
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+=
+	ld	hl,(hl)
+
+	ld	c,(hl)
+	inc	hl
+	ld	b,(hl)
+=
+	ld	bc,(hl)
+	inc	hl
+
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+=
+	ld	de,(hl)
+	inc	hl
+
+	call	l_pint
+=
+	ex	de,hl
+	ld	(hl),de
+	ex	de,hl
+
+	call	l_glonghlp	;too long
+=
+	ld	hl,(hl)
+	ld	de,(hl)
+	inc	hl
+	inc	hl
+	ld	hl,(hl)
+	ex	de,hl
+
+	call	l_glong	;too long
+=
+	ld	de,(hl)
+	inc	hl
+	inc	hl
+	ld	hl,(hl)
+	ex	de,hl
+
+	call	l_glong2sp_hlp	;too long
+=
+	ld	hl,(hl)
+	ld	de,(hl)
+	inc	hl
+	inc	hl
+	ld	hl,(hl)
+	push	hl
+	push	de
+
+	call	l_glong2sp	;too long
+=
+	ld	de,(hl)
+	inc	hl
+	inc	hl
+	ld	hl,(hl)
+	push	hl
+	push	de
+
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
+=
+	ld	(hl),de
+
+	ex	de,hl
+	ex	de,hl
+=
+
+	ld	de,(hl)
+=
+	defb	0xed, 0x17
+
+	ld	hl,(hl)
+=
+	defb	0xed, 0x27
+
+	ld	(hl),de
+=
+	defb	0xed, 0x1f
+
+	ld	bc,(hl)
+=
+	defb	0xed, 0x07

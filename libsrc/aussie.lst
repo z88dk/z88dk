@@ -1,8 +1,6 @@
 graphics/w_dcircle_square.asm
-@gfxbasew.lst
 graphics/aussie/clg
 graphics/aussie/w_pixladdr
-graphics/clrarea
 graphics/aussie/w_plotpixl
 graphics/aussie/w_respixl
 graphics/aussie/w_xorpixl
@@ -10,6 +8,7 @@ graphics/lftscrol
 graphics/swapgfxbk_foo
 graphics/draw_profile
 graphics/aussie/w_pointxy
+@gfxbasew.lst
 games/aussie/bit_open
 games/aussie/bit_open_di
 games/aussie/bit_close

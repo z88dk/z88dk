@@ -12,10 +12,8 @@ stdio/ansi/msx/f_ansi_scrollup_nobios
 @stdio/stdio.lst
 @font/font_8x8/font_8x8.lst
 time/mtx/clock
-@gfxbase.lst
 graphics/dcircle
 graphics/msx/gen_clg
-graphics/clrarea
 graphics/msx/pixladdr
 graphics/msx/plotpixl
 graphics/msx/respixl
@@ -34,6 +32,7 @@ graphics/msx/surface/surface_draw
 graphics/msx/surface/surface_pixladdr
 graphics/msx/surface/surface_plotpixl
 graphics/msx/surface/surface_stencil_render
+@gfxbase.lst
 games/mtx/joystick
 psg/sn76489/bit_open
 @games/games.lst

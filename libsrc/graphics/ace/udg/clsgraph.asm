@@ -27,7 +27,7 @@
 	call loadudg6
 
 	ld	hl,(base_graphics)
-	ld	bc,maxx*maxy/6
+	ld	bc,32*24
 .clean
 	ld	(hl),blankch
 	inc	hl

@@ -1,13 +1,10 @@
-@gfxbasew.lst
 graphics/ts2068hr/zx_hardcopy
-graphics/ts2068hr/drawb
-graphics/ts2068hr/undrawb
 graphics/ts2068hr/xorborder
 graphics/ts2068hr/clg
-graphics/ts2068hr/clga2
+graphics/ts2068hr/w_clga
+graphics/retrofit/clga_callee
 graphics/ts2068hr/w_pixladdr
 graphics/ts2068hr/fill
-graphics/clrarea
 graphics/w_plotpixl
 graphics/w_respixl
 graphics/w_xorpixl
@@ -17,3 +14,4 @@ graphics/ts2068hr/w_putsprite
 graphics/ts2068hr/w_stencil_render
 graphics/draw_profile
 graphics/w_pointxy
+@gfxbasew.lst

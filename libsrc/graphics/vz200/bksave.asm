@@ -4,10 +4,10 @@
 ; VZ200/300 version
 ;
 ;
-; $Id: bksave.asm,v 1.8 2017-01-02 22:57:59 aralbrec Exp $
+; $Id: bksave.asm $
 ;
 
-	SECTION	 code_clib
+	SECTION smc_clib
 	PUBLIC    bksave
 	PUBLIC    _bksave
 	EXTERN	pixeladdress

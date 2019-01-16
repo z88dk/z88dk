@@ -10,12 +10,10 @@ stdio/ansi/vz200/f_ansi_cls
 stdio/ansi/vz200/f_ansi_dline
 stdio/ansi/vz200/f_ansi_scrollup
 @stdio/stdio.lst
-@gfxbase.lst
 graphics/dcircle
 graphics/clg
 graphics/cclg
 graphics/vz200/clsgraph
-graphics/clrarea
 graphics/vz200/pixladdr
 graphics/plotpixl
 graphics/respixl
@@ -29,6 +27,7 @@ graphics/vz200/putsprite
 graphics/vz200/bksave
 graphics/vz200/bkrestore
 graphics/vz200/swapgfxbk
+@gfxbase.lst
 games/vz/bit_open
 games/vz/bit_open_di
 games/vz/bit_close

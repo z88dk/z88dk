@@ -12,12 +12,9 @@ stdio/ansi/generic/f_ansi_dline
 stdio/ansi/sharp-mz/f_ansi_scrollup
 @stdio/stdio.lst
 psg/sn76489/bit_open
-@gfxbase.lst
 graphics/dcircle
 graphics/clg
 graphics/mz/clsgraph
-graphics/clrarea
-graphics/lftscrol
 graphics/mz/plotpixl
 graphics/mz/respixl
 graphics/mz/xorpixl
@@ -27,6 +24,7 @@ graphics/dfill2
 graphics/putsprite2
 graphics/stencil_render2
 graphics/swapgfxbk_foo
+@gfxbase.lst
 @games/games.lst
 psg/sn76489/psg_tone
 psg/sn76489/psg_volume

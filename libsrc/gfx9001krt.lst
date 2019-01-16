@@ -1,9 +1,9 @@
-@gfxbasew.lst
 graphics/w_dcircle_square.asm
 graphics/z9001/clg
-graphics/z9001/clga2
 graphics/z9001/fill
 graphics/z9001/w_pixladdr
+graphics/z9001/w_clga
+graphics/retrofit/clga_callee
 graphics/z9001/w_putsprite
 graphics/z9001/w_stencil_render
 graphics/w_plotpixl
@@ -16,3 +16,4 @@ graphics/lftscrol
 graphics/swapgfxbk_foo
 graphics/draw_profile
 graphics/w_pointxy
+@gfxbasew.lst

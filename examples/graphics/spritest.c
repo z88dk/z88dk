@@ -45,59 +45,26 @@ char arrow_mask[] =
 		'\x1E'
 	};
 
+/* background for sprite must be 4 bytes larger than a normal sprite to save its position */
 char arrow_bk[] = 
-	{ 8,8,
-	  0,0,
-	  0,0,0,0,0,0,0,0,
+	{ 8,8,              // size
+	  0,0, 0,0,         // position
+	  0,0,0,0,0,0,0,0,  // data
 	  0,0,0,0,0,0,0,0
 	};
 
-/*
-extern char bullet[];
-extern char arrow[];
-extern char arrow_mask[];
-extern char arrow_bk[];
+	
 
-#asm
-._bullet
- defb	11,3
- defb	@11100000, @11100000
- defb	@10111111, @10100000
- defb	@11100000, @11100000
-
-._arrow
- defb	8,8
- defb	@00000000
- defb	@01100000
- defb	@01110000
- defb	@01111000
- defb	@01111100
- defb	@00011000
- defb	@00001100
- defb	@00000000
- 
-._arrow_mask
- defb	8,8
- defb	@11100000
- defb	@10010000
- defb	@10001000
- defb	@10000100
- defb	@10000010
- defb	@11100110
- defb	@00010010
- defb	@00011110
-
-
-._arrow_bk
- defb	8,8
- defw	0
- defw	0   ; <- extra word used to store coordinates in "wide rez" mode
- defb	0,0,0,0,0,0,0,0
- defb	0,0,0,0,0,0,0,0
-
-#endasm
-*/
-
+/* Empty sprite to be loaded with getsprite */
+char spritest[] = 
+	{ 12,12,               // size
+		0,0,0,0,0,0,0,0,0,  // data
+		0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,
+	};
+	
+	
 main()
 {
 int x,y,z;
@@ -139,7 +106,7 @@ char *ptr;
 	                	x--;
 	                	flag=1;
 	                        break;
-	                case 32:
+	                case ' ':
 	                        flag=2;
 	                        break;
 	                default:
@@ -156,5 +123,16 @@ char *ptr;
 		   flag=0;
 		}
 	}
+	
+	bkrestore(arrow_bk);
+	getsprite(x,y,spritest);
+	undrawb(x-1,y-1,14,14);
+	undrawb(x-2,y-2,16,16);
+	xorborder(x-2,y-2,16,16);
+	clga (0,0,17,17);
+	xorborder(0,0,16,16);
+	putsprite(spr_or,2,2,spritest);
+	while (getk() != 0) {};
+	while (getk() != ' ') {};
 }
 
