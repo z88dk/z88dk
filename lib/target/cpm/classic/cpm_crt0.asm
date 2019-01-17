@@ -16,7 +16,7 @@
 ;	#pragma output nostreams - No stdio disc files
 ;	#pragma output nofileio  - No fileio at all, use in conjunction to "-lndos"
 ;	#pragma output noprotectmsdos - strip the MS-DOS protection header
-;	#pragma output protect8080 - add a check to prevent the program on an 8080 CPU (not compatible)
+;	#pragma output protect8080 - add a check to block the program on an 8080 CPU (not compatible)
 ;	#pragma output noredir   - do not insert the file redirection option while parsing the
 ;	                           command line arguments (useless if "nostreams" is set)
 ;	#pragma output nogfxglobals - No global variables for graphics (required for GFX on TIKI-100, Einstein, and Spectrum +3)
