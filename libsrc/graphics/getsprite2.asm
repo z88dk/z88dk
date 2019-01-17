@@ -47,10 +47,11 @@
 	inc     hl
 	ld      d,(hl)	; x and y __gfx_coords
 
+	
+.getsprite_sub
 	ld	h,d	; X
 	ld	l,e	; Y
 
-.getsprite_sub
 	dec h
 	ld	c,h	; keep copy of X position
 	
