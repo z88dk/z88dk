@@ -16,6 +16,7 @@
 ;	#pragma output nostreams - No stdio disc files
 ;	#pragma output nofileio  - No fileio at all, use in conjunction to "-lndos"
 ;	#pragma output noprotectmsdos - strip the MS-DOS protection header
+;	#pragma output protect8080 - add a check to prevent the program on an 8080 CPU (not compatible)
 ;	#pragma output noredir   - do not insert the file redirection option while parsing the
 ;	                           command line arguments (useless if "nostreams" is set)
 ;	#pragma output nogfxglobals - No global variables for graphics (required for GFX on TIKI-100, Einstein, and Spectrum +3)
@@ -71,6 +72,22 @@ dosmessage:
 	defb	13,10,'$'
 
 begin:
+ENDIF
+
+IF DEFINED_protect8080
+	xor a
+	ld	e,a
+	set 1,e		; $cb, $cb
+	add e
+	jr	nz,isz80
+	ld	c,9		; print string
+	ld	de,err8080
+	call	5	; BDOS
+	jp	0
+err8080:
+	defm	"Z80 CPU required"
+	defb	13,10,'$'
+isz80:
 ENDIF
 
 IF (startup=2)
