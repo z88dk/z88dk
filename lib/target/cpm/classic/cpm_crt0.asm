@@ -16,7 +16,7 @@
 ;	#pragma output nostreams - No stdio disc files
 ;	#pragma output nofileio  - No fileio at all, use in conjunction to "-lndos"
 ;	#pragma output noprotectmsdos - strip the MS-DOS protection header
-;	#pragma output protect8080 - add a check to block the program on an 8080 CPU (not compatible)
+;	#pragma output protect8080 - add a check to block the program when on an 8080 CPU (not compatible)
 ;	#pragma output noredir   - do not insert the file redirection option while parsing the
 ;	                           command line arguments (useless if "nostreams" is set)
 ;	#pragma output nogfxglobals - No global variables for graphics (required for GFX on TIKI-100, Einstein, and Spectrum +3)
@@ -75,17 +75,18 @@ begin:
 ENDIF
 
 IF DEFINED_protect8080
-	xor a
-	ld	e,a
-	set 1,e		; $cb, $cb
-	add e
-	jr	nz,isz80
+
+	ld	a,$7F			; 01111111 into accumulator
+	inc	a			; make it overflow ie. 10000000
+	jp	pe,isz80	; only 8080 resets for odd parity here
+
 	ld	c,9		; print string
 	ld	de,err8080
 	call	5	; BDOS
 	jp	0
+	
 err8080:
-	defm	"Z80 CPU required"
+	defm	"This program requires a Z80 CPU."
 	defb	13,10,'$'
 isz80:
 ENDIF
