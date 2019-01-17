@@ -48,10 +48,10 @@
 	ld      d,(hl)	; x and y __gfx_coords
 
 	
+.getsprite_sub
 	ld	h,d
 	ld	l,e
 
-.getsprite_sub
 	ld	(actcoord),hl	; save current coordinates
 
 	call	swapgfxbk

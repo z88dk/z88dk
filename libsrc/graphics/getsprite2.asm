@@ -47,10 +47,11 @@
 	inc     hl
 	ld      d,(hl)	; x and y __gfx_coords
 
+	
+.getsprite_sub
 	ld	h,d	; X
 	ld	l,e	; Y
 
-.getsprite_sub
 	dec h
 	ld	c,h	; keep copy of X position
 	
@@ -62,7 +63,7 @@
 	ld	e,$fe	; trailing byte for "set 7,.." instruction
 
 	ld	a,7
-	or	b	; mess up the byte boundary check if the sprite edge is not exactly on a byte
+	and	b	; SMC for an extra the byte boundary check if the sprite edge is not exactly on a byte
 	jr	z,skip_inc	; NOP
 	ld	a,$23		; INC IX
 .skip_inc
