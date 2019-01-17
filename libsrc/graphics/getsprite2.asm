@@ -63,7 +63,7 @@
 	ld	e,$fe	; trailing byte for "set 7,.." instruction
 
 	ld	a,7
-	or	b	; mess up the byte boundary check if the sprite edge is not exactly on a byte
+	and	b	; SMC for an extra the byte boundary check if the sprite edge is not exactly on a byte
 	jr	z,skip_inc	; NOP
 	ld	a,$23		; INC IX
 .skip_inc
