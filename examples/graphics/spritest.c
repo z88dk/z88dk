@@ -45,10 +45,11 @@ char arrow_mask[] =
 		'\x1E'
 	};
 
-/* background for sprite must be 6 bytes larger than a normal sprite as a work area, current position storage, etc.. */
+/* background for sprite must be (up to) 8 bytes larger than a normal sprite as a work area, current position storage, etc.. */
+/* it also depends on the way bksave is implemented */
 char arrow_bk[] = 
 	{ 8,8,              // size
-	  0,0,0,0,0,0,      // overhead (work area..)
+	  0,0,0,0,0,0,0,0,  // overhead (work area..)
 	  0,0,0,0,0,0,0,0,  // data
 	  0,0,0,0,0,0,0,0
 	};
@@ -74,6 +75,7 @@ char *ptr;
 
   clg();
   //printf("%c",12);		//clear screen
+  
   for (x=10; x<39; x=x+3)	//put some trash on screen
   {
 	putsprite(spr_or,2*x,x,bullet);
@@ -91,19 +93,23 @@ char *ptr;
 	{
 	        switch( getk() ) {
 	                case 'q':
-	                	y=y-speed;
+	                case 'Q':
+	                	y=y-(1+speed>>1);
 	                	flag=1;
 	                        break;
 	                case 'a':
-	                	y=y+speed;
+	                case 'A':
+	                	y=y+(1+speed>>1);
 	                	flag=1;
 	                        break;
 	                case 'p':
-	                	x++;
+	                case 'P':
+	                	x=x+(1+speed>>1);
 	                	flag=1;
 	                        break;
 	                case 'o':
-	                	x--;
+	                case 'O':
+	                	x=x-(1+speed>>1);
 	                	flag=1;
 	                        break;
 	                case ' ':
@@ -115,13 +121,13 @@ char *ptr;
 	        
 	        if (flag==1)
 	        {
-	           if (speed<4) speed=speed+1;
-		   bkrestore(arrow_bk);
-		   bksave(x,y,arrow_bk);
-		   putsprite(spr_or,x,y,arrow);
-		   putsprite(spr_mask,x,y,arrow_mask);
-		   flag=0;
-		}
+               if (speed<9) speed=speed+1;
+               bkrestore(arrow_bk);
+               bksave(x,y,arrow_bk);
+               putsprite(spr_or,x,y,arrow);
+               putsprite(spr_mask,x,y,arrow_mask);
+               flag=0;
+			}
 	}
 
 	bkrestore(arrow_bk);
@@ -132,6 +138,7 @@ char *ptr;
 	clga (0,0,17,17);
 	xorborder(0,0,16,16);
 	putsprite(spr_or,2,2,spritest);
+	
 	while (getk() != 0) {};
 	while (getk() != ' ') {};
 }
