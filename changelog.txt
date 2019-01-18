@@ -1,7 +1,25 @@
 Concise Record of Changes to Z88DK Releases
 -------------------------------------------
 
-z88dk vX.XX  - XX.XX.XXXX
+z88dk v1.99C - 19.01.2019
+
+This release of z88dk contains many significant changes over the 1.99B,
+significantly increasing the number of supported systems, improving source
+code compatibility between the two compilers and natively supporting 
+more z80 derivative CPUs. The major changes are detailed below:
+
+* sccz80 has seen many changes, included frontend parsing enhancements and
+  code generator optimisations
+* sccz80 accepts the same extension syntax as zsdcc
+* The sccz80 preprocessor has been changed to ucpp which is C99 compatible
+* z80asm now supports Rabbit 2000/3000, z180 and ZX Next CPUs
+* Appmake can now generate disc images for many CP/M machines
+* Classic supports several new targets
+* Classic provides a standard VT52 console for many targets
+* newlib now provides extensive support for the ZX Spectrum Next
+* newlib support for the RC2014 and z180 has been significantly improved
+
+A more detailed (incomplete) changelist follows:
 
 - [classiclib] The value of FOPEN_MAX can now be controlled at link time with
   -pragma-define=CLIB_FOPEN_MAX=YY. The default for YY is 10.
@@ -37,16 +55,20 @@ z88dk vX.XX  - XX.XX.XXXX
 - [classiclib] Marked adt and balloc classic apis as deprecated
 - [classiclib] +cpc cpcrslib has been imported
 - [classiclib] CPC, MSX, SVI, ZX81, Galaksija, Sam, X1, Z1013 port improvements
-- [classiclib] New ports for Casio PV-1000, PV-2000, Colecovision, Mitsubishi Multi8
-  Alphatronic PC
+- [classiclib] New ports for Casio PV-1000, PV-2000, FP-1100, Colecovision, Coleco Adam, 
+  Mitsubishi Multi8, Alphatronic PC, NEC PC-8800, Dick Smith Super80, Z80 TV Game Console,
+  Bandai RX78, Sharp MZ2500, Samsung SPC-1000, VTech Laser 350/500/700
 - [classiclib] +m5 ROM cartridge support
 - [classiclib] SC-3000 target now runs on SG-1000 console
 - [classiclib] +aquarius 8k ROM cartridges can now be created
 - [classiclib] inkey() implementations for Jupiter Ace, Sord M5, PV-2000, SC-3000,
-  VZ-200, TRS80, Exidy Sorcerer
+  VZ-200, TRS80, Exidy Sorcerer, Alphatronic PC, Camputers Lynx, VG5K, Super-80, SVI
+  TRS80, 
 - [classiclib] SMS stability improvements
 - [classiclib] [all] New kbhit() implementation
 - [classiclib] Now shares ctype, string and most of stdlib with newlib
+- [classiclib] +gal Galaksija hires graphics is now supported
+- [classiclib] +svi 80 column and rs232 support
 - [newlib] +sms devKit SMS has been incorporated
 - [newlib] +zxn Extensive support for the ZX Spectrum Next
 - [newlib] +rc2014 Many enhancements for the RC2014
@@ -100,7 +122,7 @@ z88dk vX.XX  - XX.XX.XXXX
 - [ticks] [classiclib] #101,#106: Now supports the +test target
 - [ticks] [classiclib] File IO is now available
 - [ticks] A debugger is now available
-- [ticks] Now supports Rabbit, z180 and ZX Next cpus
+- [ticks] Now supports Rabbit, z180 and ZX Next, ez80 cpus
 - [ticks] Now supports ZX Next MMU paging
 - [z80asm] Rabbit 2000 and 3000 are now fully supported
 - [z80asm] Z180 is now fully supported
