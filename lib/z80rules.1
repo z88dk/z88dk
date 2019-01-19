@@ -3912,3 +3912,17 @@
 	jr	%2,ASMPC+3
 	ccf
 	j%4	%3
+
+	inc	hl
+	ld	bc,%1
+	add	hl,bc
+=
+	ld	bc,%eval( %1 1 +)
+	add	hl,bc
+
+	dec	hl
+	ld	bc,%1
+	add	hl,bc
+=
+	ld	bc,%eval( %1 1 -)
+	add	hl,bc
