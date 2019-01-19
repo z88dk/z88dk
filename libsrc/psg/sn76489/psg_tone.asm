@@ -40,7 +40,12 @@
 	
 	or	a, $80
 	or	a, b		; Prepares the first byte of the command
+IF HAVE16bitbus
+        ld      bc,psgport
+        out     (c),a
+ELSE
 	out	(psgport), a	; Sends it
+ENDIF
 	
 	ld	a, e
 	srl	a
@@ -58,6 +63,11 @@
 	and	a, $30		; Bits 8, 9 of the frequency go to bytes 4,5 of the register
 	
 	or	a, b		; Puts them together
+IF HAVE16bitbus
+        ld      bc,psgport
+        out     (c),a
+ELSE
 	out	(psgport), a	; Sends the second byte of the command
+ENDIF
 
 	ret
