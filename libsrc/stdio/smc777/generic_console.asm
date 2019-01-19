@@ -166,6 +166,14 @@ __smc777_attr:	defb	7
 	SECTION	code_crt_init
 
         EXTERN  asm_set_cursor_state
+	EXTERN	copy_font_8x8
+	EXTERN	CRT_FONT
+
         ld      l,$20
         call    asm_set_cursor_state
-
+	ld	bc,$1000 + (32 * 8)
+	ld	e,96
+	ld	hl,CRT_FONT
+	ld	a,h
+	or	l
+	call	nz,copy_font_8x8

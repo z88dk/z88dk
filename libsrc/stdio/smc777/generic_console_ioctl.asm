@@ -11,6 +11,7 @@
 	EXTERN	__smc777_mode
 	EXTERN	__console_h
 	EXTERN	__console_w
+	EXTERN	copy_font_8x8
 
 
 ; a = ioctl
@@ -23,7 +24,11 @@ generic_console_ioctl:
 	cp	IOCTL_GENCON_SET_FONT32
 	jr	nz,check_set_udg
 	ld	(generic_console_font32),bc
-	;; TODO: Copy
+	ld	l,c
+	ld	h,b
+	ld	bc, $1000 + (8 * 32)
+	ld	e,96
+	call	copy_font_8x8
 success:
 	and	a
 	ret
@@ -31,7 +36,11 @@ check_set_udg:
 	cp	IOCTL_GENCON_SET_UDGS
 	jr	nz,check_mode
 	ld	(generic_console_udg32),bc
-	;; TODO: Copy
+	ld	l,c
+	ld	h,b
+	ld	bc, $1000 + (8 * 128)
+	ld	e,128
+	call	copy_font_8x8
 	jr	success
 check_mode:
 	cp	IOCTL_GENCON_SET_MODE
