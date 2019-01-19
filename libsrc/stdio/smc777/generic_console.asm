@@ -8,19 +8,15 @@
 		PUBLIC		generic_console_vpeek
 		PUBLIC		generic_console_scrollup
 		PUBLIC		generic_console_printc
-		PUBLIC		generic_console_ioctl
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
 
 		EXTERN		generic_console_flags
+		EXTERN		__smc777_mode
 
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
-
-generic_console_ioctl:
-	scf
-	ret
 
 generic_console_set_inverse:
 	ld	a,(generic_console_flags)
@@ -99,6 +95,13 @@ generic_console_printc_1:
 	djnz	generic_console_printc_1
 generic_console_printc_3:
 	add	hl,bc			;hl now points to address in display
+	ex	af,af
+	ld	a,(__smc777_mode)
+	and	a
+	jr	z,is_80_col
+	add	hl,bc
+is_80_col:
+	ex	af,af
 	ld	c,h			;And swap round
 	ld	b,l
 	ret
