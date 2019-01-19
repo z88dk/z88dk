@@ -58,6 +58,52 @@
 
 
 
+#undef  __CPM
+#define __CPM       22
+
+#define __CPM_RCON  1
+#define __CPM_WCON  2
+#define __CPM_RRDR  3
+#define __CPM_WPUN  4
+#define __CPM_WLST  5
+#define __CPM_DCIO  6
+#define __CPM_GIOB  7
+#define __CPM_SIOB  8
+#define __CPM_PRST  9
+#define __CPM_RCOB  10
+#define __CPM_ICON  11
+#define __CPM_VERS  12
+#define __CPM_RDS   13
+#define __CPM_LGIN  14
+#define __CPM_OPN   15
+#define __CPM_CLS   16
+#define __CPM_FFST  17
+#define __CPM_FNXT  18
+#define __CPM_DEL   19
+#define __CPM_READ  20
+#define __CPM_WRIT  21
+#define __CPM_MAKE  22
+#define __CPM_REN   23
+#define __CPM_ILOG  24
+#define __CPM_IDRV  25
+#define __CPM_SDMA  26
+#define __CPM_SUID  32
+#define __CPM_RRAN  33
+#define __CPM_WRAN  34
+#define __CPM_CFS   35
+#define __CPM_DSEG  51
+
+
+
+
+
+
+
+
+
+
+
+
 #undef  __Z80
 #define __Z80  0x02
 
@@ -487,7 +533,7 @@
 #define __IO_ACIA_RX_SIZE      0x100
 #define __IO_ACIA_RX_FULLISH   0xf8
 #define __IO_ACIA_RX_EMPTYISH 0x08
-#define __IO_ACIA_TX_SIZE      0x10
+#define __IO_ACIA_TX_SIZE      0x40
 
 
 
@@ -608,7 +654,7 @@
 #define __IO_SIO_RX_SIZE        0x100
 #define __IO_SIO_RX_FULLISH     0xf8
 #define __IO_SIO_RX_EMPTYISH    0x08
-#define __IO_SIO_TX_SIZE        0x10
+#define __IO_SIO_TX_SIZE        0x40
 
 
 

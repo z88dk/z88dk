@@ -1,5 +1,6 @@
 @adt/adt_sdcc_ix.lst
 @alloc/alloc_sdcc_ix.lst
+@arch/cpm/cpm_sdcc_ix.lst
 @compress/compress_sdcc_ix.lst
 @ctype/ctype_sdcc_ix.lst
 @drivers/drivers.lst
@@ -9,6 +10,7 @@
 @font/font_8x8/fonts.lst
 @font/fzx/fzx_sdcc_ix.lst
 @im2/im2_sdcc.lst
+@input/cpm/input_sdcc_ix.lst
 @inttypes/inttypes_sdcc_ix.lst
 @l/l.lst
 @l/sdcc.lst
@@ -24,6 +26,7 @@
 @target/rc2014/default/default.lst
 @target/rc2014/device/device.lst
 @target/rc2014/driver/driver_sdcc_ix.lst
+@target/cpm/driver/driver.lst
 @threads/threads_sdcc_ix.lst
 @time/time_sdcc.lst
 @z80/z80_sdcc.lst

@@ -59,6 +59,51 @@ defc __IO_SIO_PORT_OFFSET_D = 0x01
 
 
 
+defc __CPM      = 22
+
+defc __CPM_RCON = 1
+defc __CPM_WCON = 2
+defc __CPM_RRDR = 3
+defc __CPM_WPUN = 4
+defc __CPM_WLST = 5
+defc __CPM_DCIO = 6
+defc __CPM_GIOB = 7
+defc __CPM_SIOB = 8
+defc __CPM_PRST = 9
+defc __CPM_RCOB = 10
+defc __CPM_ICON = 11
+defc __CPM_VERS = 12
+defc __CPM_RDS  = 13
+defc __CPM_LGIN = 14
+defc __CPM_OPN  = 15
+defc __CPM_CLS  = 16
+defc __CPM_FFST = 17
+defc __CPM_FNXT = 18
+defc __CPM_DEL  = 19
+defc __CPM_READ = 20
+defc __CPM_WRIT = 21
+defc __CPM_MAKE = 22
+defc __CPM_REN  = 23
+defc __CPM_ILOG = 24
+defc __CPM_IDRV = 25
+defc __CPM_SDMA = 26
+defc __CPM_SUID = 32
+defc __CPM_RRAN = 33
+defc __CPM_WRAN = 34
+defc __CPM_CFS  = 35
+defc __CPM_DSEG = 51
+
+
+
+
+
+
+
+
+
+
+
+
 defc __Z80 = 0x02
 
 defc __Z80_NMOS = 0x01
@@ -487,7 +532,7 @@ defc __IO_ACIA_SR_IRQ         = 0x80
 defc __IO_ACIA_RX_SIZE     = 0x100
 defc __IO_ACIA_RX_FULLISH  = 0xf8
 defc __IO_ACIA_RX_EMPTYISH = 0x08
-defc __IO_ACIA_TX_SIZE     = 0x10
+defc __IO_ACIA_TX_SIZE     = 0x40
 
 
 
@@ -608,7 +653,7 @@ defc __IO_SIO_RR1_SDLC_EOF      = 0x80
 defc __IO_SIO_RX_SIZE      = 0x100
 defc __IO_SIO_RX_FULLISH      = 0xf8
 defc __IO_SIO_RX_EMPTYISH      = 0x08
-defc __IO_SIO_TX_SIZE      = 0x10
+defc __IO_SIO_TX_SIZE      = 0x40
 
 
 
