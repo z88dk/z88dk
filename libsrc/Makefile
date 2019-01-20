@@ -844,6 +844,7 @@ smc777.lib:
 	@echo ''
 	@$(RM) -f video/mc6845/*.o
 	$(MAKE) -C psg
+	$(MAKE) -C games TARGET=cpm SUBTYPE=smc777
 	TARGET=smc777 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsmc777 -x$(OUTPUT_DIRECTORY)/smc777 @$(LISTFILE_DIRECTORY)/smc777.lst
 
 
