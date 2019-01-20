@@ -48,6 +48,7 @@ ENDIF
 
 IF FORsmc777
 	defc psgport	= $53		; possibly valid also for Sony SMC 70
+	defc HAVE16bitbus = 1
 ENDIF
 
 
