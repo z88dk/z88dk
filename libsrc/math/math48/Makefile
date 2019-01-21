@@ -4,21 +4,31 @@
 
 include ../../Make.config
 
-CFILES = ftoe_impl.c ftoa_impl.c atof_impl.c
+TARGET ?= test
 
-AFILES  = $(CFILES:.c=.asm)
-OBJECTS = $(CFILES:.c=.o)
+#NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/math/float/math48/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/math/float/math48/c/sdcc_ix/*.asm" "$(NEWLIB_DIRECTORY)/math/float/math48/lm/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/math/float/math48/lm/c/sdcc_ix/*.asm" "$(NEWLIB_DIRECTORY)/math/float/math48/lm/z80/*.asm" "$(NEWLIB_DIRECTORY)/math/float/math48/z80/*.asm"
+
+AFILES = $(wildcard *.asm)
+CFILES  = $(wildcard *.c)
+OBJECTS = $(CFILES:.c=.o) $(AFILES:.asm=.o)
 
 
-all: ../../math48.lib
+all: dirs $(OUTPUT_DIRECTORY)/math48.lib $(OUTPUT_DIRECTORY)/math48_iy.lib
 
 
-../../math48.lib: $(OBJECTS)
-	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/math48 @math48.lst
+$(OUTPUT_DIRECTORY)/math48.lib: $(addprefix obj/z80/, $(OBJECTS))
+	@$(ASSEMBLER) -d -O=obj/z80/x/x -I.. -mz80 -D__CLASSIC @newlibfiles.lst
+	TYPE=z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/math48 @math48.lst
 
-.c.o:
-	$(ZCC) +test $(CFLAGS) -c  $*.c
+$(OUTPUT_DIRECTORY)/math48_iy.lib: $(addprefix obj/ixiy/, $(OBJECTS))
+	@$(ASSEMBLER) -d -O=obj/ixiy/x/x -I.. -mz80 --IXIY -D__CLASSIC @newlibfiles.lst
+	TYPE=ixiy $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/math48_iy --IXIY @math48.lst
 
+dirs:
+	@mkdir -p obj/z80 obj/ixiy obj/r2k
+
+.PHONY: dirs
 
 clean:
-	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i $(AFILES)
+	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i
+	$(RM) -fr obj
