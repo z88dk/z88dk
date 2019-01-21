@@ -9,17 +9,17 @@ AFILES  = $(wildcard *.asm)
 CFILES  = $(wildcard *.c)
 OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
 
-all: dirs $(OUTPUT_DIRECTORY)/gen_math.lib $(OUTPUT_DIRECTORY)/gen_mathiy.lib $(OUTPUT_DIRECTORY)/zx81_math.lib
+all: dirs $(OUTPUT_DIRECTORY)/genmath.lib $(OUTPUT_DIRECTORY)/genmath_iy.lib $(OUTPUT_DIRECTORY)/genmath_zx81.lib
 
 
-$(OUTPUT_DIRECTORY)/gen_math.lib: $(addprefix obj/z80/, $(OBJECTS))
-	TYPE=z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/gen_math @genmath.lst
+$(OUTPUT_DIRECTORY)/genmath.lib: $(addprefix obj/z80/, $(OBJECTS))
+	TYPE=z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/genmath @genmath.lst
 
-$(OUTPUT_DIRECTORY)/gen_mathiy.lib: $(addprefix obj/ixiy/, $(OBJECTS))
-	TYPE=ixiy $(LIBLINKER) --IXIY -x$(OUTPUT_DIRECTORY)/gen_mathiy @genmath.lst
+$(OUTPUT_DIRECTORY)/genmath_iy.lib: $(addprefix obj/ixiy/, $(OBJECTS))
+	TYPE=ixiy $(LIBLINKER) --IXIY -x$(OUTPUT_DIRECTORY)/genmath_iy @genmath.lst
 
-$(OUTPUT_DIRECTORY)/zx81_math.lib: $(addprefix obj/ixiy/, $(OBJECTS))
-	TYPE=ixiy $(LIBLINKER) --IXIY -x$(OUTPUT_DIRECTORY)/zx81_math @genmathzx81.lst
+$(OUTPUT_DIRECTORY)/genmath_zx81.lib: $(addprefix obj/ixiy/, $(OBJECTS))
+	TYPE=ixiy $(LIBLINKER) --IXIY -x$(OUTPUT_DIRECTORY)/genmath_zx81 @genmathzx81.lst
 
 dirs:
 	@mkdir -p obj/z80 obj/zx81 obj/ixiy
