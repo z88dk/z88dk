@@ -4,6 +4,8 @@ include ../Make.config
 
 TARGET ?= test
 
+CFLAGS += $(TARGET_CFLAGS)
+
 ifeq ($(SUBTYPE),) 
 SUBTYPE=$(TARGET)
 OBJSUBDIR = $(TARGET)

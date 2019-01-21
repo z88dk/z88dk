@@ -309,15 +309,22 @@ IF FORrx78
 	defc JOYSTICK_inkey = 1
 ENDIF
 
-; ********************************************************
-;   This last part refers to NOT YET supported hardware
-; ********************************************************
+IF FORsmc777
+    defc sndbit_port	= $53		; possibly valid also for Sony SMC 70
+    defc sndbit_bit    = 3
+    defc sndbit_mask   = $0F			; $0F for full volume output
+ENDIF
+
 
 IF FORcoleco
 	defc sndbit_port	= $E0		; also valid for Coleco Adam and Pencil II
     defc sndbit_bit    = 3
     defc sndbit_mask   = $0F			; $0F for full volume output
 ENDIF
+
+; ********************************************************
+;   This last part refers to NOT YET supported hardware
+; ********************************************************
 
 IF FORpasopia
 	defc sndbit_port	= $3A		; Pasopia has also a second PSG on port $3B
@@ -326,11 +333,6 @@ IF FORpasopia
 ENDIF
 
 
-IF FORsmc777
-	defc sndbit_port	= $53		; possibly valid also for Sony SMC 70
-    defc sndbit_bit    = 3
-    defc sndbit_mask   = $0F			; $0F for full volume output
-ENDIF
 
 
 IF !JOYSTICK_inkey

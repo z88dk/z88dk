@@ -26,4 +26,6 @@ psg/sn76489/psg_init.asm
 psg/sn76489/set_psg.asm
 psg/sn76489/set_psg_callee.asm
 @psg/psg.lst
+games/smc777/joystick
+@games/games.lst
 @video/mc6845/mc6845.lst
