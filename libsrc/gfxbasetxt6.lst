@@ -3,7 +3,7 @@ graphics/__graphics_end
 graphics/retrofit/putsprite_callee
 graphics/getsprite2
 graphics/bksave2
-graphics/bkrestore2
+graphics/bkrestore3
 graphics/circle
 graphics/circle_callee
 graphics/uncircle
