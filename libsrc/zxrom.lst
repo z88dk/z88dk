@@ -1,2 +1,3 @@
 graphics/spectrum/rom_putsprite
 games/beeper
+stdio/spectrum/generic_console_scrollup
