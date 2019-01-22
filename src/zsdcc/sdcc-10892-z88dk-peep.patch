@@ -1,0 +1,390 @@
+Index: src/z80/peep.c
+===================================================================
+--- src/z80/peep.c	(revision 10892)
++++ src/z80/peep.c	(working copy)
+@@ -201,6 +201,109 @@
+   return NULL;
+ }
+ 
++/* returns 0 = not found, 1 = found as (rp), 2 = found as register */
++static int argContPrec_helper(const char *arg, const char *what)
++{
++  const char *p;
++  int q;
++
++  /* immediate operator anywhere indicates constant */
++
++  if (strchr(arg, '#')) return 0;
++
++  /* round brackets indicate (rp) or (NN) */
++
++  if (p = strchr(arg, '('))
++  {
++    switch(*what)
++    {
++      case 'a':
++        return 0;
++      case 'b':
++      case 'c':
++        return (!strncmp("bc)", p+1, 3)) ? 1 : 0;
++      case 'd':
++	  case 'e':
++        return (!strncmp("de)", p+1, 3)) ? 1 : 0;
++      case 'h':
++      case 'l':
++        return (!strncmp("hl)", p+1, 3)) ? 1 : 0;
++      case 'i':
++        // ix and iy
++        return (!strncmp(what, p+1, 2) && (p[3] == ')')) ? 1 : 0;
++      default:
++        // unrecognized so return true
++        return 1;
++    }
++  }
++
++  /* register, NN, label without '#' */
++
++  for (p = arg; isspace(*p); ++p) ;
++  for (q = strlen(p); q && isspace(p[q-1]); --q) ;
++
++  /* 'p' points to arg 'q' chars in length */
++
++  if ((q == 0) || (q > 3)) return 0;
++
++  switch(*what)
++  {
++    case 'a':
++      return ((p[0] == 'a') && ((q == 1) || (q == 2) && (p[1] == 'f'))) ? 2 : 0;
++    case 'b':
++      return ((p[0] == 'b') && ((q == 1) || (q == 2) && (p[1] == 'c'))) ? 2 : 0;
++    case 'c':
++      return ((q == 1) && (p[0] == 'c') || (q == 2) && (p[0] == 'b') && (p[1] == 'c')) ? 2 : 0;
++    case 'd':
++      return ((p[0] == 'd') && ((q == 1) || (q == 2) && (p[1] == 'e'))) ? 2 : 0;
++    case 'e':
++      return ((q == 1) && (p[0] == 'e') || (q == 2) && (p[0] == 'd') && (p[1] == 'e')) ? 2 : 0;
++    case 'h':
++      return ((p[0] == 'h') && ((q == 1) || (q == 2) && (p[1] == 'l'))) ? 2 : 0;
++    case 'l':
++      return ((q == 1) && (p[0] == 'l') || (q == 2) && (p[0] == 'h') && (p[1] == 'l')) ? 2 : 0;
++    case 'i':
++      // ix and iy
++      return ((p[0] == what[0]) && (p[1] == what[1]) && ((q == 2) || (q == 3) && ((p[2] == 'l') || (p[2] == 'h')))) ? 2 : 0;
++    default:
++      // unrecognized so return true
++      return 2;
++  }
++}
++
++/* Check precisely if reading arg implies reading what. */
++/* returns 0 = not found, 1 = found as (rp), 2 = found as register */
++/* sides & 0x01 indicates check left side, sides & 0x02 indicates check right side */
++static int argContPrec(const char *arg, const char *what, unsigned int sides)
++{
++  const char *p;
++  char buffer[128];
++  int ret;
++
++  // locate comma
++
++  p = strchr(arg, ',');
++
++  // check second parameter
++
++  if ((sides & 0x02) && p && (ret = argContPrec_helper(p+1, what)))
++    return ret;
++
++  // check first parameter
++
++  if (!(sides & 0x01)) return 0;
++
++  // if no second parameter
++
++  if (!p) return argContPrec_helper(arg, what);
++
++  // must separate first parameter from second
++
++  buffer[0] = '\0';
++  strncat(buffer, arg, ((p-arg) > 127) ? 127 : p-arg);
++  return argContPrec_helper(buffer, what);
++}
++
+ /* Check if reading arg implies reading what. */
+ static bool argCont(const char *arg, const char *what)
+ {
+@@ -250,10 +353,10 @@
+   if(strcmp(pl->line, "call\t__initrleblock") == 0)
+     return TRUE;
+ 
+-  if(strcmp(pl->line, "call\t___sdcc_call_hl") == 0 && (strchr(what, 'h') != 0 || strchr(what, 'l') != 0))
++  if(strcmp(pl->line, "call\t___sdcc_call_hl") == 0 && strchr("hl", *what) != 0)
+     return TRUE;
+ 
+-  if(strcmp(pl->line, "call\t___sdcc_call_iy") == 0 && strstr(what, "iy") != 0)
++  if(strcmp(pl->line, "call\t___sdcc_call_iy") == 0 && strchr("iy", *what) != 0)
+     return TRUE;
+ 
+   if(strncmp(pl->line, "call\t", 5) == 0 && strchr(pl->line, ',') == 0)
+@@ -285,24 +388,32 @@
+   if(ISINST(pl->line, "reti") || ISINST(pl->line, "retn"))
+     return(false);
+ 
+-  if(ISINST(pl->line, "ret")) // --reserev-regs-iy uses ret in code gen for calls through function pointers
++  if(ISINST(pl->line, "ret")) // --reserve-regs-iy uses ret in code gen for calls through function pointers
+     return(IY_RESERVED ? isReturned(what) || z80MightBeParmInCallFromCurrentFunction(what) : isReturned(what));
+ 
+   if(!strcmp(pl->line, "ex\t(sp), hl") || !strcmp(pl->line, "ex\t(sp),hl"))
+-    return(!strcmp(what, "h") || !strcmp(what, "l"));
++    return(strchr("hl", *what) != 0);
++
+   if(!strcmp(pl->line, "ex\t(sp), ix") || !strcmp(pl->line, "ex\t(sp),ix"))
+-    return(!!strstr(what, "ix"));
++    return(strchr("ix", *what) != 0);
++
+   if(!strcmp(pl->line, "ex\t(sp), iy") || !strcmp(pl->line, "ex\t(sp),iy"))
+-    return(!!strstr(what, "iy"));
++    return(strchr("iy", *what) != 0);
++
+   if(!strcmp(pl->line, "ex\tde, hl") || !strcmp(pl->line, "ex\tde,hl"))
+-    return(!strcmp(what, "h") || !strcmp(what, "l") || !strcmp(what, "d") || !strcmp(what, "e"));
++    return(strchr("dehl", *what) != 0);
++
++  if (!IS_GB && ISINST(pl->line, "exx"))
++    return(strchr("bcdehl", *what) != 0);
++
+   if(ISINST(pl->line, "ld"))
+     {
+-      if(argCont(strchr(pl->line, ','), what))
+-        return(true);
+-      if(*(strchr(pl->line, ',') - 1) == ')' && strstr(pl->line + 3, what) && (strchr(pl->line, '#') == 0 || strchr(pl->line, '#') > strchr(pl->line, ',')))
+-        return(true);
+-      return(false);
++      /* anything found to right of comma is a read */
++      if(argContPrec(pl->line + 3, what, 2))
++        return (true);
++
++     /* only (ix), (iy), (bc), (de), (hl) to left of comma is a read */
++      return (argContPrec(pl->line + 3, what, 1) == 1);
+     }
+ 
+   if(!strcmp(pl->line, "xor\ta, a") || !strcmp(pl->line, "xor\ta,a"))
+@@ -315,29 +426,20 @@
+      ISINST(pl->line, "sub") ||
+      ISINST(pl->line, "xor"))
+     {
+-      const char *arg = pl->line + 4;
+-      while(isspace(*arg))
+-        arg++;
+-      if(*arg == 'a' && *(arg + 1) == ',')
+-        {
+-          if(!strcmp(what, "a"))
+-            return(true);
+-          arg += 2;
+-        }
+-      return(argCont(arg, what));
++      return(argContPrec(pl->line + 4, what, 3));
+     }
+ 
+   if(ISINST(pl->line, "or") || ISINST(pl->line, "cp") )
+     {
+-      if(argCont(pl->line + 3, what))
++      if (*what == 'a')
++        return (true);
++      if (argContPrec(pl->line + 3, what, 3))
+         return(true);
+-      if(strcmp("a", what) == 0)
+-        return(true);
+       return(false);
+     }
+ 
+   if(ISINST(pl->line, "neg"))
+-    return(strcmp(what, "a") == 0);
++    return(*what == 'a');
+ 
+   if(ISINST(pl->line, "pop"))
+     return(false);
+@@ -348,13 +450,16 @@
+   if(ISINST(pl->line, "dec") ||
+      ISINST(pl->line, "inc"))
+     {
+-      return(argCont(pl->line + 4, what));
++      return(argContPrec(pl->line + 4, what, 3));
+     }
+ 
+   if(ISINST(pl->line, "cpl"))
+-    return(!strcmp(what, "a"));
++    return(*what == 'a');
+ 
+-  if(ISINST(pl->line, "di") || ISINST(pl->line, "ei"))
++  if(ISINST(pl->line, "di")   ||
++     ISINST(pl->line, "ei")   ||
++     ISINST(pl->line, "halt") ||
++     ISINST(pl->line, "im"))
+     return(false);
+ 
+   // Rotate and shift group
+@@ -363,24 +468,29 @@
+      ISINST(pl->line, "rrca") ||
+      ISINST(pl->line, "rra"))
+     {
+-      return(strcmp(what, "a") == 0);
++      return(*what == 'a');
+     }
++
+   if(ISINST(pl->line, "rl") ||
+      ISINST(pl->line, "rr"))
+     {
+-      return(argCont(pl->line + 3, what));
++      return(argContPrec(pl->line + 3, what, 3));
+     }
++
+   if(ISINST(pl->line, "rlc") ||
+      ISINST(pl->line, "sla") ||
+      ISINST(pl->line, "sra") ||
+      ISINST(pl->line, "srl"))
+     {
+-      return(argCont(pl->line + 4, what));
++      return(argContPrec(pl->line + 4, what, 3));
+     }
++
+   if(!IS_GB && !IS_RAB &&
+     (ISINST(pl->line, "rld") ||
+      ISINST(pl->line, "rrd")))
+-    return(!!strstr("ahl", what));
++    {
++      return(strchr("ahl", *what) != 0);
++    }
+ 
+   // Bit set, reset and test group
+   if(ISINST(pl->line, "bit") ||
+@@ -387,7 +497,7 @@
+      ISINST(pl->line, "set") ||
+      ISINST(pl->line, "res"))
+     {
+-      return(argCont(pl->line + 4, what));
++      return(argContPrec(pl->line + 4, what, 3));
+     }
+ 
+  if(ISINST(pl->line, "ccf") ||
+@@ -394,31 +504,71 @@
+     ISINST(pl->line, "nop"))
+     return(false);
+ 
+-  if(ISINST(pl->line, "jp") || ISINST(pl->line, "jr"))
++  if(ISINST(pl->line, "jp") ||
++    ISINST(pl->line, "jr"))
+     return(false);
+ 
+   if(ISINST(pl->line, "djnz"))
+-    return(strchr(what, 'b') != 0);
++    return(*what == 'b');
+ 
+-  if(!IS_GB && ISINST(pl->line, "ldir"))
+-    return(!strcmp(what, "b") || !strcmp(what, "c") || !strcmp(what, "d") || !strcmp(what, "e") || !strcmp(what, "h") || !strcmp(what, "l"));
++  if(!IS_GB &&
++    (ISINST(pl->line, "ldir") ||
++    ISINST(pl->line, "ldi")   ||
++    ISINST(pl->line, "ldd")   ||
++    ISINST(pl->line, "lddr")))
++    return(strchr("bcdehl", *what) != 0);
+ 
+-  if(!IS_GB && !IS_RAB && ISINST(pl->line, "out"))
+-    return(strstr(strchr(pl->line + 4, ','), what) != 0 || strstr(pl->line + 4, "(c)") && (!strcmp(what, "b") || !strcmp(what, "c")));
+-  if(!IS_GB && !IS_RAB && ISINST(pl->line, "in"))
+-    return(!strstr(strchr(pl->line + 4, ','), "(c)") && !strcmp(what, "a") || strstr(strchr(pl->line + 4, ','), "(c)") && (!strcmp(what, "b") || !strcmp(what, "c")));
++  if(!IS_GB && !IS_RAB &&
++    (ISINST(pl->line, "cpir") ||
++    ISINST(pl->line, "cpi")   ||
++    ISINST(pl->line, "cpd")   ||
++    ISINST(pl->line, "cpdr")))
++    return(strchr("abchl", *what) != 0);
+ 
+   if(!IS_GB && !IS_RAB &&
+-    (ISINST(pl->line, "ini") || ISINST(pl->line, "ind") || ISINST(pl->line, "inir") || ISINST(pl->line, "indr") ||
+-    ISINST(pl->line, "outi") || ISINST(pl->line, "outd") || ISINST(pl->line, "otir") || ISINST(pl->line, "otdr")))
+-    return(!strcmp(what, "b") || !strcmp(what, "c") || !strcmp(what, "h") || !strcmp(what, "l"));
++    (ISINST(pl->line, "ini") ||
++    ISINST(pl->line, "ind")  ||
++    ISINST(pl->line, "inir") ||
++    ISINST(pl->line, "indr") ||
++    ISINST(pl->line, "outi") ||
++    ISINST(pl->line, "outd") ||
++    ISINST(pl->line, "otir") ||
++    ISINST(pl->line, "otdr")))
++  return(strchr("bchl", *what) != 0);
+ 
+-  if((IS_Z180 || IS_EZ80_Z80) && ISINST(pl->line, "mlt"))
+-    return(argCont(pl->line + 4, what));
++  if(IS_Z180 || IS_EZ80_Z80)
++  {
++    if(ISINST(pl->line, "mlt"))
++      return(strchr(pl->line + 4, *what) != 0);
+ 
+-  if((IS_Z180 || IS_EZ80_Z80) && ISINST(pl->line, "tst"))
+-    return(argCont(pl->line + 4, what));
++    if(ISINST(pl->line, "tst"))
++      return(argContPrec(pl->line + 4, what, 3));
++ 
++    if(ISINST(pl->line, "tstio"))
++      return(*what == 'c');
+ 
++    if(ISINST(pl->line, "slp"))
++      return (false);
++
++    if(ISINST(pl->line, "otim") ||
++      ISINST(pl->line, "otimr") ||
++      ISINST(pl->line, "otdm") ||
++      ISINST(pl->line, "otdmr"))
++      return(strchr("bchl", *what) != 0);
++
++    if(ISINST(pl->line, "in0"))
++      return (false);
++
++    if(ISINST(pl->line, "out0"))
++      return(argContPrec(pl->line + 5, what, 2));
++  }
++
++  if(!IS_GB && !IS_RAB && ISINST(pl->line, "out"))
++    return(strstr(strchr(pl->line + 4, ','), what) != 0 || strstr(pl->line + 4, "(c)") && ((*what == 'b') || (*what == 'c')));
++
++  if(!IS_GB && !IS_RAB && ISINST(pl->line, "in"))
++    return(!strstr(strchr(pl->line + 3, ','), "(c)") && (*what == 'a') || strstr(strchr(pl->line + 3, ','), "(c)") && ((*what == 'b') || (*what == 'c')));
++
+   if(IS_RAB && ISINST(pl->line, "mul"))
+     return(!strcmp(what, "b") || !strcmp(what, "c") || !strcmp(what, "d") || !strcmp(what, "e"));
+ 
+@@ -500,24 +650,25 @@
+       if(!strcmp(what, "iy"))
+         return !preserved_regs[IYL_IDX] && !preserved_regs[IYH_IDX];
+     }
++
+   if(strcmp(pl->line, "ret") == 0)
+     return true;
+   if(strcmp(pl->line, "ld\tiy")  == 0 && strncmp(what, "iy", 2) == 0)
+     return true;
+ 
+-  if (IS_Z180 || IS_EZ80_Z80)
++  if(IS_Z180 || IS_EZ80_Z80)
+     {
+-      if (ISINST(pl->line, "mlt"))
++      if(ISINST(pl->line, "mlt"))
+         return(strchr(pl->line + 4, *what) != 0);
+ 
+-      if (ISINST(pl->line, "otim") ||
+-        ISINST(pl->line, "otimr") ||
+-        ISINST(pl->line, "otdm") ||
+-        ISINST(pl->line, "otdmr"))
+-        return(strchr("bchl", *what) != NULL);
++      if(ISINST(pl->line, "otim")   ||
++          ISINST(pl->line, "otimr") ||
++          ISINST(pl->line, "otdm")  ||
++          ISINST(pl->line, "otdmr"))
++        return(strchr("bchl", *what) != 0);
+ 
+-      if (ISINST(pl->line, "in0"))
+-        return(!strncmp(pl->line + 4, what, strlen(what)));
++      if(ISINST(pl->line, "in0"))
++        return(argContPrec(pl->line + 4, what, 1));
+     }
+ 
+   return(false);
