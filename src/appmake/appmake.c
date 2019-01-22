@@ -396,7 +396,7 @@ int zcc_strrcspn(char *s, char *reject)
 }
 
 /* Generic change suffix routine - make sure name is long enough to hold the suffix */
-void suffix_change(char *name, char *suffix)
+void suffix_change(char *name, const char *suffix)
 {
     int index;
 
@@ -407,7 +407,7 @@ void suffix_change(char *name, char *suffix)
 }
 
 /* Variant for the generic change suffix routine */
-void any_suffix_change(char *name, char *suffix, char suffix_delimiter)
+void any_suffix_change(char *name, const char *suffix, char suffix_delimiter)
 {
     int index;
 

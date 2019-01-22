@@ -273,9 +273,104 @@ int cpm_write_edsk(cpm_handle* h, const char* filename)
     return 0;
 }
 
+
 void cpm_free(cpm_handle* h)
 {
     free(h->image);
     free(h->extents);
     free(h);
 }
+
+int cpm_write_d88(cpm_handle* h, const char* filename)
+{
+    uint8_t header[1024] = { 0 };
+    uint8_t *ptr;
+    size_t offs;
+    FILE* fp;
+    int i, j, s;
+    int sector_size = 0;
+    int track_length = h->spec.sector_size * h->spec.sectors_per_track;
+
+
+    if ((fp = fopen(filename, "wb")) == NULL) {
+        return -1;
+    }
+
+
+    i = h->spec.sector_size;
+    while (i > 128) {
+        sector_size++;
+        i /= 2;
+    }
+
+    ptr = header;
+    memcpy(ptr, "z88dk-appmake", 13); ptr += 17;
+    ptr += 9;  // Reserved
+    *ptr++ = 0; // Protect
+    // Calculate data size of the disc
+    offs = track_length * h->spec.tracks * h->spec.sides;
+    *ptr++ =  (offs < (368640 + 655360) / 2) ? MEDIA_TYPE_2D : (offs < (737280 + 1228800) / 2) ? MEDIA_TYPE_2DD : MEDIA_TYPE_2HD;
+    // Calculate the file length of the disc image
+    offs = sizeof(d88_hdr_t) + (sizeof(d88_sct_t) * h->spec.sectors_per_track + track_length) * (h->spec.tracks * h->spec.sides);
+    *ptr++ = offs % 256;
+    *ptr++ = (offs / 256) % 256;
+    *ptr++ = (offs / 65536) % 256;
+    *ptr++ = (offs / 65536) / 256;
+    
+    for ( i = 0; i < h->spec.tracks * h->spec.sides; i++ ) {
+        offs = sizeof(d88_hdr_t) + (sizeof(d88_sct_t) * h->spec.sectors_per_track +  track_length) * i;
+        *ptr++ = offs % 256;
+        *ptr++ = (offs / 256) % 256;
+        *ptr++ = (offs / 65536) % 256;
+        *ptr++ = (offs / 65536) / 256;
+        if ( h->spec.sides == 1 ) {
+           *ptr++ = 0;
+           *ptr++ = 0;
+           *ptr++ = 0;
+           *ptr++ = 0;
+        }
+    }
+    fwrite(header, sizeof(d88_hdr_t), 1, fp);
+
+    for (i = 0; i < h->spec.tracks; i++) {
+        for (s = 0; s < h->spec.sides; s++) {
+
+            if ( h->spec.alternate_sides == 0 ) {
+                offs = track_length * i + (s * track_length * h->spec.tracks);
+            } else {
+                offs = track_length * ( 2* i + s);
+            }
+            for (j = 0; j < h->spec.sectors_per_track; j++) {
+                 uint8_t *ptr = header;
+
+                 int sect = j; // TODO: Skew
+                 if ( h->spec.has_skew && i + (i*h->spec.sides) >= h->spec.skew_track_start ) {
+		     for ( sect = 0; sect < h->spec.sectors_per_track; sect++ ) {
+			if ( h->spec.skew_tab[sect] == j ) break;
+		     }
+                 }
+                 *ptr++ = i; 		//track
+		 *ptr++ = s;		//head
+		 *ptr++ = j+1;		//sector
+                 *ptr++ = sector_size;  //n
+                 *ptr++ = (h->spec.sectors_per_track) % 256;
+                 *ptr++ = (h->spec.sectors_per_track) / 256;
+                 *ptr++ = 0;		//dens
+                 *ptr++ = 0;		//del
+                 *ptr++ = 0;		//stat
+                 *ptr++ = 0;		//reserved
+                 *ptr++ = 0;		//reserved
+                 *ptr++ = 0;		//reserved
+                 *ptr++ = 0;		//reserved
+                 *ptr++ = 0;		//reserved
+                 *ptr++ = (h->spec.sector_size % 256);
+                 *ptr++ = (h->spec.sector_size / 256);
+                 fwrite(header, ptr - header, 1, fp);
+                 fwrite(h->image + offs + (sect * h->spec.sector_size), h->spec.sector_size, 1, fp);
+            }
+        }
+    }
+    fclose(fp);
+    return 0;
+}
+

@@ -490,8 +490,8 @@ extern void         exit_log(int code, char *fmt, ...);
 extern long         parameter_search(const char *filen,const  char *ext,const char *target);
 extern FILE        *fopen_bin(const char *fname,const  char *crtfile);
 extern long         get_org_addr(char *crtfile);
-extern void         suffix_change(char *name, char *suffix);
-extern void         any_suffix_change(char *name, char *suffix, char schar);
+extern void         suffix_change(char *name, const char *suffix);
+extern void         any_suffix_change(char *name, const char *suffix, char schar);
 
 extern void        *must_malloc(size_t sz);
 extern void        *must_realloc(void *p, size_t sz);

@@ -229,10 +229,10 @@ static cpm_discspec col1_spec = {
 
 static cpm_discspec smc777_spec = {
     .sectors_per_track = 16,
-    .tracks = 80,
-    .sides = 1,
+    .tracks = 70,
+    .sides = 2,
     .sector_size = 256,
-    .gap3_length = 0x52,
+    .gap3_length = 0x17,
     .filler_byte = 0xe5,
     .boottracks = 2,
     .directory_entries = 128,
@@ -279,11 +279,13 @@ struct formats {
 
 struct container {
     const char        *name;
+    const char        *extension;
     const char        *description;
     int              (*writer)(cpm_handle *h, const char *filename);
 } containers[] = {
-    { "dsk",        "CPC extended .dsk format",    cpm_write_edsk },
-    { "raw",        "Raw image",                   cpm_write_raw },
+    { "dsk",        ".dsk", "CPC extended .dsk format",    cpm_write_edsk },
+    { "d88",        ".D88", "d88 format",                  cpm_write_d88 },
+    { "raw",        ".img", "Raw image",                   cpm_write_raw },
     { NULL, NULL, NULL }
 };
 
@@ -362,7 +364,7 @@ int cpm_write_file_to_image(const char *disc_format, const char *container, cons
 
     if (output_file == NULL) {
         strcpy(disc_name, binary_name);
-        suffix_change(disc_name, ".dsk");
+        suffix_change(disc_name, c->extension);
     } else {
         strcpy(disc_name, output_file);
     }
