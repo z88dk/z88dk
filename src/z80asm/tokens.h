@@ -256,43 +256,48 @@
 #define _TK_DMA_WR5	251
 #define _TK_DMA_WR6	252
 #define _TK_DMA_CMD	253
-#define _TK_SLP	254
-#define _TK_MLT	255
-#define _TK_IN0	256
-#define _TK_OUT0	257
-#define _TK_OTIM	258
-#define _TK_OTIMR	259
-#define _TK_OTDM	260
-#define _TK_OTDMR	261
-#define _TK_TST	262
-#define _TK_TSTIO	263
-#define _TK_ALTD	264
-#define _TK_BOOL	265
-#define _TK_IOE	266
-#define _TK_IOI	267
-#define _TK_IPRES	268
-#define _TK_IPSET	269
-#define _TK_IDET	270
-#define _TK_LDDSR	271
-#define _TK_LDISR	272
-#define _TK_LDP	273
-#define _TK_LSDR	274
-#define _TK_LSIR	275
-#define _TK_LSDDR	276
-#define _TK_LSIDR	277
-#define _TK_MUL	278
-#define _TK_IP	279
-#define _TK_SU	280
-#define _TK_RDMODE	281
-#define _TK_SETUSR	282
-#define _TK_SURES	283
-#define _TK_SYSCALL	284
-#define _TK_UMA	285
-#define _TK_UMS	286
-#define _TK_CALL_OZ	287
-#define _TK_CALL_PKG	288
-#define _TK_FPP	289
-#define _TK_INVOKE	290
+#define _TK_BSLA	254
+#define _TK_BSRA	255
+#define _TK_BSRL	256
+#define _TK_BSRF	257
+#define _TK_BRLC	258
+#define _TK_SLP	259
+#define _TK_MLT	260
+#define _TK_IN0	261
+#define _TK_OUT0	262
+#define _TK_OTIM	263
+#define _TK_OTIMR	264
+#define _TK_OTDM	265
+#define _TK_OTDMR	266
+#define _TK_TST	267
+#define _TK_TSTIO	268
+#define _TK_ALTD	269
+#define _TK_BOOL	270
+#define _TK_IOE	271
+#define _TK_IOI	272
+#define _TK_IPRES	273
+#define _TK_IPSET	274
+#define _TK_IDET	275
+#define _TK_LDDSR	276
+#define _TK_LDISR	277
+#define _TK_LDP	278
+#define _TK_LSDR	279
+#define _TK_LSIR	280
+#define _TK_LSDDR	281
+#define _TK_LSIDR	282
+#define _TK_MUL	283
+#define _TK_IP	284
+#define _TK_SU	285
+#define _TK_RDMODE	286
+#define _TK_SETUSR	287
+#define _TK_SURES	288
+#define _TK_SYSCALL	289
+#define _TK_UMA	290
+#define _TK_UMS	291
+#define _TK_CALL_OZ	292
+#define _TK_CALL_PKG	293
+#define _TK_FPP	294
+#define _TK_INVOKE	295
 
 #ifndef NO_TOKEN_ENUM
 typedef enum tokid_t
@@ -551,42 +556,47 @@ typedef enum tokid_t
 	TK_DMA_WR5	= 251,
 	TK_DMA_WR6	= 252,
 	TK_DMA_CMD	= 253,
-	TK_SLP	= 254,
-	TK_MLT	= 255,
-	TK_IN0	= 256,
-	TK_OUT0	= 257,
-	TK_OTIM	= 258,
-	TK_OTIMR	= 259,
-	TK_OTDM	= 260,
-	TK_OTDMR	= 261,
-	TK_TST	= 262,
-	TK_TSTIO	= 263,
-	TK_ALTD	= 264,
-	TK_BOOL	= 265,
-	TK_IOE	= 266,
-	TK_IOI	= 267,
-	TK_IPRES	= 268,
-	TK_IPSET	= 269,
-	TK_IDET	= 270,
-	TK_LDDSR	= 271,
-	TK_LDISR	= 272,
-	TK_LDP	= 273,
-	TK_LSDR	= 274,
-	TK_LSIR	= 275,
-	TK_LSDDR	= 276,
-	TK_LSIDR	= 277,
-	TK_MUL	= 278,
-	TK_IP	= 279,
-	TK_SU	= 280,
-	TK_RDMODE	= 281,
-	TK_SETUSR	= 282,
-	TK_SURES	= 283,
-	TK_SYSCALL	= 284,
-	TK_UMA	= 285,
-	TK_UMS	= 286,
-	TK_CALL_OZ	= 287,
-	TK_CALL_PKG	= 288,
-	TK_FPP	= 289,
-	TK_INVOKE	= 290,
+	TK_BSLA	= 254,
+	TK_BSRA	= 255,
+	TK_BSRL	= 256,
+	TK_BSRF	= 257,
+	TK_BRLC	= 258,
+	TK_SLP	= 259,
+	TK_MLT	= 260,
+	TK_IN0	= 261,
+	TK_OUT0	= 262,
+	TK_OTIM	= 263,
+	TK_OTIMR	= 264,
+	TK_OTDM	= 265,
+	TK_OTDMR	= 266,
+	TK_TST	= 267,
+	TK_TSTIO	= 268,
+	TK_ALTD	= 269,
+	TK_BOOL	= 270,
+	TK_IOE	= 271,
+	TK_IOI	= 272,
+	TK_IPRES	= 273,
+	TK_IPSET	= 274,
+	TK_IDET	= 275,
+	TK_LDDSR	= 276,
+	TK_LDISR	= 277,
+	TK_LDP	= 278,
+	TK_LSDR	= 279,
+	TK_LSIR	= 280,
+	TK_LSDDR	= 281,
+	TK_LSIDR	= 282,
+	TK_MUL	= 283,
+	TK_IP	= 284,
+	TK_SU	= 285,
+	TK_RDMODE	= 286,
+	TK_SETUSR	= 287,
+	TK_SURES	= 288,
+	TK_SYSCALL	= 289,
+	TK_UMA	= 290,
+	TK_UMS	= 291,
+	TK_CALL_OZ	= 292,
+	TK_CALL_PKG	= 293,
+	TK_FPP	= 294,
+	TK_INVOKE	= 295,
 } tokid_t;
 #endif

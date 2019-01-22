@@ -7,10 +7,8 @@ stdio/ansi/generic/f_ansi_dline
 stdio/ansi/msx/f_ansi_scrollup_nobios
 @stdio/tms9918/tms9918.lst
 @font/font_8x8/font_8x8.lst
-@gfxbase.lst
 graphics/dcircle
 graphics/msx/gen_clg
-graphics/clrarea
 graphics/lftscrol
 graphics/msx/pixladdr
 graphics/msx/plotpixl
@@ -31,6 +29,7 @@ graphics/msx/surface/surface_draw
 graphics/msx/surface/surface_pixladdr
 graphics/msx/surface/surface_plotpixl
 graphics/msx/surface/surface_stencil_render
+@gfxbase.lst
 @msx/genmsx.lst
 msx/gen_msxbios
 msx/gen_filvrm

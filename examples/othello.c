@@ -89,6 +89,20 @@ commands may be typed:
 */
 
 
+/* z88dk specific opt */
+#ifdef SCCZ80
+int chkmov( char b[64], char p, int x, int y ) __smallc __z88dk_callee;
+int chkmv1( char b[64], char p, int x, int y, int m, int n ) __smallc __z88dk_callee;
+int cntbrd(char b[64], char p) __smallc __z88dk_callee;
+void prtbrd(char b[64]) __z88dk_fastcall;
+int prtscr(char b[64]) __z88dk_fastcall;
+void putmov(char b[64], char p, int x, int y) __smallc __z88dk_callee;
+char notak1(char b[64], char p,char o,char e,int x,int y,int m,int n) __smallc __z88dk_callee;
+char notake(char b[64],char p,char o,char e,int x,int y) __smallc __z88dk_callee;
+int fillmt(char b[64], char p, char o, char e, struct mt t[64]) __smallc __z88dk_callee;
+#endif
+
+
 #define BLACK '*'
 #define WHITE 'O'
 #define EMPTY '-'
@@ -393,7 +407,6 @@ char skipbl()
 	return c;
 }
 
-
 int chkmv1( char b[64], char p, int x, int y, int m, int n )
 {
 	int k;
@@ -418,6 +431,7 @@ int chkmov( char b[64], char p, int x, int y )
 		chkmv1(b,p,x,y,-1,1)+ chkmv1(b,p,x,y,-1,-1);
 }
 
+
 int chkmvs( char b[64], char p )
 {
 	int i,j,k;
@@ -432,6 +446,7 @@ void cpybrd(char a[64], char b[64])
 {
 	memcpy(a,b,64);
 }
+
 
 int cntbrd(char b[64], char p)
 {

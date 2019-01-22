@@ -67,6 +67,7 @@ not_graphics_mode:
 	out	($41),a
 	ld	hl,SYSVAR_mem6800
 	ld	a,(hl)
+	and	@11110111
 	or	d
 	ld	(hl),a	
 	ld	($4000 + $2800),a	;Enable/disable graphics

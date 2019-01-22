@@ -7,6 +7,7 @@
 		SECTION	code_clib
 		PUBLIC	joystick
 		PUBLIC	_joystick
+		EXTERN	joystick_inkey
 
 
 ; Port $dd:
@@ -35,6 +36,9 @@
 
 joystick:
 _joystick:
+	ld	a,l
+	cp	3
+	jr	nc,handle_keyboard
 	ld	h,0
 	in	a,($de)		;Select row 7 (only needed on SC-3000, no effect on SG-1000)
 	and	248
@@ -92,3 +96,7 @@ not_down_j1:
 	ret	z
 	set	3,l
 	ret
+
+handle_keyboard:
+	sub	2
+	jp	joystick_inkey

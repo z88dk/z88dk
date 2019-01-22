@@ -1,10 +1,7 @@
-@gfxbasew.lst
 graphics/w_drawb
 graphics/w_undrawb
 graphics/w_xorborder
-graphics/w_clga
 graphics/c128/clg
-graphics/clrarea
 graphics/c128/w_pixladdr
 graphics/c128/w_plotpixl
 graphics/c128/w_respixl
@@ -15,3 +12,4 @@ graphics/c128/w_putsprite
 graphics/c128/w_pointxy
 graphics/draw_profile
 graphics/c128/w_stencil_render
+@gfxbasew.lst

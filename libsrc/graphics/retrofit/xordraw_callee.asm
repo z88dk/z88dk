@@ -7,7 +7,8 @@
 ;	$Id: xordraw_callee.asm $
 ;
 
-SECTION code_graphics
+SECTION smc_clib
+
 PUBLIC xordraw_callee
 PUBLIC _xordraw_callee
 
@@ -17,14 +18,16 @@ PUBLIC _xordraw_callee
 ._xordraw_callee
 	ld	hl,retaddr
 	ex (sp),hl
+	ld	(retaddr0+1),hl
 	ld	hl,xordraw
 	jp (hl)
 	
 .retaddr
-		pop hl
 		pop bc
 		pop bc
 		pop bc
 		pop bc
+.retaddr0
+		ld	hl,0
 		jp (hl)
 

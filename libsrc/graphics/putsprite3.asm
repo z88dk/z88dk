@@ -14,6 +14,7 @@
 ; $Id: putsprite3.asm $
 ;
 
+	SECTION	 smc_clib
 
 	PUBLIC    putsprite
 	PUBLIC    _putsprite
@@ -87,9 +88,6 @@
 
 .iloopx	sla	c		;Test leftmost pixel
 	jr	nc,noplotx	;See if a plot is needed
-
-	pop	af
-	push	af
 
 	push	hl
 	;push	bc	; this should be done by the called routine

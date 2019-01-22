@@ -111,6 +111,8 @@ int heir1(LVALUE* lval)
                     warningfmt("incompatible-function-types","Assigning SMALLC function pointer with non-SMALLC function");
                 }
             }
+        } else if ( lval->ltype->kind == KIND_STRUCT ) {
+            errorfmt("Cannot assign to aggregate",0);
         } 
         if ( lval2.ltype->kind == KIND_VOID ) {
             warningfmt("void","Assigning from a void expression");

@@ -1,7 +1,5 @@
-@gfxbase.lst
 graphics/dcircle
 graphics/clg
-graphics/clrarea
 graphics/kaypro/clsgraph_83
 graphics/kaypro/plotpixl_83
 graphics/kaypro/plot_end_83
@@ -10,3 +8,4 @@ graphics/kaypro/respixl_83
 graphics/putsprite3
 graphics/stencil_render2
 graphics/kaypro/swapgfxbk_83
+@gfxbase.lst

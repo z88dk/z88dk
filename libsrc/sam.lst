@@ -13,10 +13,9 @@ stdio/ansi/sam/f_ansi_scrollup
 @stdio/stdio.lst
 time/spectrum/clock
 @input/spectrum.lst
-@gfxbase.lst
 graphics/dcircle
 graphics/spectrum/clg
-graphics/clrarea2
+graphics/spectrum/clrarea2
 graphics/plotpixl
 graphics/respixl
 graphics/xorpixl
@@ -31,6 +30,7 @@ graphics/spectrum/bkrestore
 graphics/spectrum/rowtab
 graphics/spectrum/pixladdr
 graphics/sam/swapgfxbk
+@gfxbase.lst
 games/sam/beeper
 games/spectrum/bit_open
 games/spectrum/bit_open_di

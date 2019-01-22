@@ -6,10 +6,10 @@
 ; TIKI-100 high resolution version
 ;
 ;
-; $Id: w_putsprite.asm,v 1.5 2017-01-02 22:57:59 aralbrec Exp $
+; $Id: w_putsprite.asm $
 ;
 
-	SECTION code_graphics
+	SECTION smc_clib
         PUBLIC    putsprite
         PUBLIC    _putsprite
         EXTERN    w_pixeladdress

@@ -1,10 +1,7 @@
 graphics/w_dcircle_square.asm
-@gfxbasew.lst
 graphics/bee/w_clg_320
 graphics/bee/w_clsgraph_320
 graphics/bee/w_pixladdr
-graphics/clrarea
-graphics/w_clga
 graphics/w_drawb
 graphics/w_undrawb
 graphics/w_xorborder
@@ -20,3 +17,4 @@ graphics/draw_profile
 graphics/w_pointxy
 graphics/bee/div5
 graphics/bee/div11
+@gfxbasew.lst

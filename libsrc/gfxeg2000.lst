@@ -1,9 +1,6 @@
-@gfxbase.lst
 graphics/dcircle
 graphics/eg2000/clg
 graphics/eg2000/clsgraph
-graphics/clrarea
-graphics/lftscrol
 graphics/cclg
 graphics/eg2000/cplot
 graphics/eg2000/cplot_callee
@@ -23,3 +20,4 @@ graphics/eg2000/putsprite
 graphics/eg2000/bksave
 graphics/eg2000/bkrestore
 graphics/swapgfxbk_foo
+@gfxbase.lst

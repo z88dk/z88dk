@@ -74,3 +74,10 @@
    IF DEFINED_CRT_ORG_GRAPHICS
        defc __crt_org_graphics = CRT_ORG_GRAPHICS
    ENDIF
+
+   ; Custom memory map
+   IF DEFINED_MMAP
+       defc __MMAP = MMAP
+   ELSE
+       defc __MMAP = 0
+   ENDIF

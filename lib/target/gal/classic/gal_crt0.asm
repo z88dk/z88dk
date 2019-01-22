@@ -62,7 +62,12 @@ IF CRT_ENABLE_STDIO = 1
 ENDIF
 
 cleanup_exit:
+	halt
+	im	1
 start1: ld      sp,0            ;Restore stack to entry value
+vpeek_noop:
+	scf
+noop:
         ret
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
@@ -79,3 +84,27 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 	ld	hl,$2800
 	ld	(base_graphics),hl
 
+
+IF CLIB_DISABLE_MODE1 = 1
+        PUBLIC  vpeek_MODE1
+        PUBLIC  printc_MODE1
+        PUBLIC  plot_MODE1
+        PUBLIC  res_MODE1
+        PUBLIC  xor_MODE1
+        PUBLIC  pointxy_MODE1
+        PUBLIC  pixeladdress_MODE1
+	PUBLIC  scrollup_MODE1
+        defc    vpeek_MODE1 = vpeek_noop
+        defc    printc_MODE1 = noop
+        defc    plot_MODE1 = noop
+        defc    res_MODE1 = noop
+        defc    xor_MODE1 = noop
+        defc    pointxy_MODE1 = noop
+        defc    pixeladdress_MODE1 = noop
+        defc    scrollup_MODE1 = noop
+	PUBLIC	__CLIB_DISABLE_MODE1
+	defc	__CLIB_DISABLE_MODE1 = 1
+ELSE
+	PUBLIC	__CLIB_DISABLE_MODE1
+	defc	__CLIB_DISABLE_MODE1 = 0
+ENDIF

@@ -1,21 +1,22 @@
 ;
 ; Sprite Rendering Routine
 ; original code by Patrick Davidson (TI 85)
-; modified by Stefano Bodrato - nov 2010
+; modified by Stefano Bodrato
 ;
 ; TS2068 high resolution version
 ;
 ;
-; $Id: w_putsprite.asm,v 1.5 2016-07-02 09:01:36 dom Exp $
+; $Id: w_putsprite.asm $
 ;
 
 	SECTION   smc_clib
         PUBLIC    putsprite
         PUBLIC    _putsprite
         EXTERN     w_pixeladdress
+		EXTERN     zx_saddrpdown
 
         EXTERN     swapgfxbk
-        EXTERN    swapgfxbk1
+        EXTERN    __graphics_end
 
         INCLUDE "graphics/grafix.inc"
 
@@ -56,9 +57,9 @@
         ; @@@@@@@@@@@@
         ld      h,b
         ld      l,c
-        ld      (oldx),hl
-        ld      (cury),de
         call    w_pixeladdress
+		ld	(saddr+1),de
+		ld	(saddr1+1),de
         ; ------
         ;ld		a,(hl)
         ; @@@@@@@@@@@@
@@ -114,23 +115,18 @@
 
 ._notedge djnz     _iloop
 
-        push   de
+        ;push   de
         ;@@@@@@@@@@
         ;Go to next line
         ;@@@@@@@@@@
-         ld      hl,(oldx)
-         ld      de,(cury)
-         inc     de
-         ld      (cury),de
-         call    w_pixeladdress
-         ld      h,d
-         ld      l,e
+.saddr	ld hl,0
+		call zx_saddrpdown
+		ld	(saddr+1),hl
         ;@@@@@@@@@@
-        pop     de
+        ;pop     de
          pop      bc                ;Restore data
          djnz     _oloop
-	pop	ix	;restore callers
-         jp       swapgfxbk1
+		 jp       __graphics_end
 
 
 .putspritew
@@ -172,57 +168,31 @@
 
          djnz     wiloop
 
-        push   de
+.close_line
+        ;push   de
         ;@@@@@@@@@@
         ;Go to next line
         ;@@@@@@@@@@
-         ld      hl,(oldx)
-         ld      de,(cury)
-         inc     de
-         ld      (cury),de
-         call    w_pixeladdress
-         ld      h,d
-         ld      l,e
+.saddr1	ld hl,0
+		call zx_saddrpdown
+		ld	(saddr1+1),hl
         ;@@@@@@@@@@
-        pop     de
+        ;pop     de
 
          pop      bc                ;Restore data
          djnz     woloop
-	pop	ix	;restore callers
-         jp       swapgfxbk1
+         jp       __graphics_end
         
 
 .wover_1 ld       c,(ix+2)
          inc      ix
          djnz     wiloop
          dec      ix
+		 jr close_line
 
-        push   de
-        ;@@@@@@@@@@
-        ;Go to next line
-        ;@@@@@@@@@@
-         ld      hl,(oldx)
-         ld      de,(cury)
-         inc     de
-         ld      (cury),de
-         call    w_pixeladdress
-         ld      h,d
-         ld      l,e
-        ;@@@@@@@@@@
-        pop     de
 
-         pop      bc
-         djnz     woloop
-	pop	ix	;restore callers
-         jp       swapgfxbk1
 
 	SECTION	rodata_clib
 .offsets_table
          defb   1,2,4,8,16,32,64,128
-	SECTION bss_clib
-.oldx
-         defw   0
-.cury
-         defw   0
-
 

@@ -3,22 +3,20 @@
 ;
 ;       Written around the Interlogic Standard Library
 ;
-;       Stubs Written by D Morris - 30/9/98
 ;
+; ----- void __CALLEE__ undrawb(int x, int y, int h, int v)
 ;
-;	$Id: undrawb.asm,v 1.6 2016-04-13 21:09:09 dom Exp $
+;	$Id: undrawb.asm $
 ;
 
 
+		SECTION         code_graphics
+		
+		PUBLIC    undrawb
+		PUBLIC    _undrawb
 
-        SECTION code_graphics
-                PUBLIC    undrawb
-                PUBLIC    _undrawb
-
-                EXTERN     drawbox
-                EXTERN     respixel
-                EXTERN     swapgfxbk
-                EXTERN	__graphics_end
+		EXTERN    undrawb_callee
+		EXTERN    ASMDISP_UNDRAWB_CALLEE
 
 
 .undrawb
@@ -26,12 +24,10 @@
 		push	ix
 		ld	ix,2
 		add	ix,sp
-		ld	b,(ix+2)
-		ld	c,(ix+4)
+		ld	c,(ix+2)
+		ld	b,(ix+4)
 		ld	l,(ix+6)
 		ld	h,(ix+8)
-                ld      ix,respixel
-                call    swapgfxbk
-                call    drawbox
-                jp      __graphics_end
-
+		pop	ix
+		
+   jp undrawb_callee + ASMDISP_UNDRAWB_CALLEE

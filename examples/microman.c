@@ -22,14 +22,17 @@
 
         ZX81 (high resolution mode)
         --------------------------------
-        WRX, SMOOTH, FAST and very compact (16K):
-        zcc +zx81 -subtype=wrx64 -clib=wrx64 -DSIZE=6 -DCOMPACT=3 -create-app -omicroman -DZX81LOMEM microman.c
+        WRX, SMOOTH, FAST and very compact, Kempston Joystick by default (16K):
+        zcc +zx81 -subtype=wrx64 -clib=wrx64 -DSIZE=6 -DCOMPACT=3 -create-app -omicroman -DZX81LOMEM -O3 microman.c
         WRX, FAST and compact mode (16K):
-        zcc +zx81 -subtype=wrx64 -clib=wrx64 -DSIZE=6 -DCOMPACT=2 -create-app -omicroman -DZX81LOMEM -O3 microman.c
+		zcc +zx81 -subtype=wrx64 -clib=wrx64 -DSIZE=6 -DCOMPACT=2 -create-app -omicroman -DZX81LOMEM -O3 -DJOYSTICK_DIALOG -pragma-redirect=fputc_cons=putc4x6 microman.c
 		As above, ARX mode
-        zcc +zx81 -subtype=arx64 -clib=arx64 -DSIZE=6 -DCOMPACT=2 -create-app -omicroman -DZX81LOMEM -O3 microman.c
+        zcc +zx81 -subtype=arx64 -clib=arx64 -DSIZE=6 -DCOMPACT=2 -create-app -omicroman -DZX81LOMEM -O3 -DJOYSTICK_DIALOG -pragma-redirect=fputc_cons=putc4x6 microman.c
 		As above, Memotech HRG (you may like to uncomment also "mt_hrg_off")
-		zcc +zx81 -clib=mt64 -DSIZE=6 -DCOMPACT=2 -create-app  -DZX81LOMEM microman.c
+		zcc +zx81 -clib=mt64 -DSIZE=6 -DCOMPACT=2 -create-app -DZX81LOMEM -O3 microman.c
+		G007, very simple because it is not possible to limit to a single screen slice, add "CLS 4" in the BASIC program before the USR call
+		zcc +zx81 -clib=g007 -DSIZE=6 -DCOMPACT=3 -create-app -DZX81LOMEM -O3 -Cz--disable-autorun microman.c
+
         Full board mode (SLOW):
         zcc +zx81 -subtype=wrx192 -clib=wrx192 -startup=3 -DSIZE=8 -create-app -omicroman microman.c
 
@@ -39,7 +42,7 @@
         zcc +aquarius -lndos -create-app -DSOUND -DSIZE=6 -DCOMPACT=3 -DJOYSTICK_DIALOG -omicroman microman.c
 
 
-        $Id: microman.c,v 1.6 2015-01-22 11:13:35 stefano Exp $
+        $Id: microman.c $
 
 */
 

@@ -309,7 +309,7 @@ static char  *c_asmopts = NULL;
 static char  *c_altmathlib = NULL;
 static char  *c_altmathflags = NULL; // "-math-z88 -D__NATIVE_MATH__";
 static char  *c_startuplib = "z80_crt0";
-static char  *c_genmathlib = "gen_math";
+static char  *c_genmathlib = "genmath";
 static int    c_stylecpp = outspecified;
 static char  *c_vasmopts = NULL;
 static char  *c_vlinkopts = NULL;
@@ -330,6 +330,8 @@ static int    c_clib_array_num = 0;
 
 static char **c_aliases = NULL;
 static int    c_aliases_num = 0;
+
+static char   c_help = 0;
 
 static arg_t  config[] = {
     { "OPTIONS", 0, SetStringConfig, &c_options, NULL, "Extra options for port" },
@@ -448,7 +450,7 @@ static arg_t     myargs[] = {
     { "l", AF_MORE, AddLinkLibrary, NULL, NULL, "Add a library" },
     { "O", AF_MORE, SetNumber, &peepholeopt, NULL, "Set the peephole optimiser setting for copt" },
     { "SO", AF_MORE, SetNumber, &sdccpeepopt, NULL, "Set the peephole optimiser setting for sdcc-peephole" },
-    { "h", 0, print_help_config, NULL, NULL, "Display this text" },
+    { "h", AF_BOOL_TRUE, SetBoolean, &c_help, NULL, "Display this text" },
     { "v", AF_BOOL_TRUE, SetBoolean, &verbose, NULL, "Output all commands that are run (-vn suppresses)" },
     { "bn", AF_MORE, SetString, &c_linker_output_file, NULL, "Set the output file for the linker stage" },
     { "vn", AF_BOOL_FALSE, SetBoolean, &verbose, NULL, "Run the compile stages silently" },
@@ -978,7 +980,7 @@ int main(int argc, char **argv)
     }
 
 
-    if (nfiles <= 0) {
+    if (nfiles <= 0 || c_help) {
         print_help_text(argv[0]);
         exit(0);
     }
@@ -2371,10 +2373,6 @@ void add_file_to_process(char *filename)
 
 
 
-void print_help_config(arg_t *arg, char *val)
-{
-    print_help_text(gargv[0]);
-}
 
 void usage(const char *program)
 {
@@ -2385,6 +2383,7 @@ void usage(const char *program)
 void print_help_text(const char *program)
 {
     arg_t      *cur = &myargs[0];
+    int         i;
 
     usage(program);
 
@@ -2393,6 +2392,38 @@ void print_help_text(const char *program)
     while (cur->help) {
         fprintf(stderr,"-%-20s %s%s\n", cur->name, cur->flags & AF_DEPRECATED ? "(deprecated) " : "", cur->help);
         cur++;
+    }
+
+    fprintf(stderr,"\nArgument Aliases:\n\n");
+    for ( i = 0; i < c_aliases_num; i+=2 ) {
+        fprintf(stderr,"%-20s %s\n", c_aliases[i],c_aliases[i+1]);
+    }
+
+    if ( c_clib_array_num ) {
+        fprintf(stderr,"\n-clib options:\n\n");
+        for ( i = 0; i < c_clib_array_num; i++ ) {
+            char buf[LINEMAX+1];
+            char *ptr = c_clib_array[i];
+            char *dest = buf;
+            while ( *ptr && !isspace(*ptr)) {
+                *dest++ = *ptr++;
+            }
+            *dest = 0;
+            fprintf(stderr,"-clib=%-14s\n", buf);
+        }
+    }
+    if ( c_subtype_array_num ) {
+        fprintf(stderr,"\n-subtype options:\n\n");
+        for ( i = 0; i < c_subtype_array_num; i++ ) {
+            char buf[LINEMAX+1];
+            char *ptr = c_subtype_array[i];
+            char *dest = buf;
+            while ( *ptr && !isspace(*ptr)) {
+                *dest++ = *ptr++;
+            }
+            *dest = 0;
+            fprintf(stderr,"-subtype=%-11s\n", buf);
+        }
     }
 
     exit(0);
@@ -2799,6 +2830,7 @@ void remove_temporary_files(void)
             remove_file_with_extension(temporary_filenames[j], ".sym");
             remove_file_with_extension(temporary_filenames[j], ".def");
             remove_file_with_extension(temporary_filenames[j], ".tmp");
+            remove_file_with_extension(temporary_filenames[j], ".lis");
         }
     }
 }
@@ -2947,7 +2979,7 @@ int find_zcc_config_fileFile(const char *program, char *arg, int gc, char *buf, 
     } 
     // Without a config file, we should just print usage and then exit
     fprintf(stderr, "A config file must be specified with +file as the first argument\n\n");
-    usage(program);
+    print_help_text(program);
     exit(1);
 }
 

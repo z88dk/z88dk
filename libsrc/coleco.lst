@@ -11,10 +11,8 @@ stdio/coleco/getk
 @stdio/tms9918/tms9918.lst
 @stdio/stdio.lst
 @font/font_8x8/font_8x8.lst
-@gfxbase.lst
 graphics/dcircle
 graphics/msx/gen_clg
-graphics/clrarea
 graphics/msx/pixladdr
 graphics/msx/plotpixl
 graphics/msx/respixl
@@ -33,6 +31,7 @@ graphics/msx/surface/surface_draw
 graphics/msx/surface/surface_pixladdr
 graphics/msx/surface/surface_plotpixl
 graphics/msx/surface/surface_stencil_render
+@gfxbase.lst
 psg/sn76489/bit_open
 games/coleco/joystick
 games/obj/coleco/joystick_type

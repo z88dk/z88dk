@@ -22,7 +22,7 @@
 ;	$Id: f_ansi_char.asm,v 1.12 2016-06-13 22:07:53 dom Exp $
 ;
 
-	SECTION	code_clib
+	SECTION	smc_clib
 	PUBLIC	ansi_CHAR
 	
 

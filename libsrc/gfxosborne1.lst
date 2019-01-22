@@ -1,7 +1,5 @@
-@gfxbase.lst
 graphics/dcircle
 graphics/clg
-graphics/clrarea
 graphics/osborne/clsgraph
 graphics/osborne/textpixl
 graphics/osborne/plotpixl
@@ -13,3 +11,4 @@ graphics/dfill2
 graphics/putsprite3
 graphics/stencil_render2
 graphics/swapgfxbk_foo
+@gfxbase.lst

@@ -3,10 +3,11 @@
 ;
 ;	MC-1000 version
 ;
-;	$Id: bksave.asm,v 1.6 2016-07-02 09:01:35 dom Exp $
+;	$Id: bksave.asm $
 ;
 
-	SECTION	code_clib
+	SECTION smc_clib
+	
 	PUBLIC    bksave
 	PUBLIC    _bksave
 	PUBLIC	bkpixeladdress

@@ -86,8 +86,6 @@
 	ld	hl,6	;const
 	add	hl,sp
 	call	l_gchar
-	ld	a,l
-	call	l_sxt
 	exx
 	pop	hl
 	pop	de

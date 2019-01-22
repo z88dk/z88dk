@@ -296,6 +296,11 @@
  bit 7, iyh                     ; FD CB 7C
  bit 7, iyl                     ; FD CB 7D
  bit 7, l                       ; CB 7D
+ brlc de,b                      ; ED 2C
+ bsla de,b                      ; ED 28
+ bsra de,b                      ; ED 29
+ bsrf de,b                      ; ED 2B
+ bsrl de,b                      ; ED 2A
  call -32768                    ; CD 00 80
  call 32767                     ; CD FF 7F
  call 65535                     ; CD FF FF
@@ -459,6 +464,7 @@
  indr                           ; ED BA
  ini                            ; ED A2
  inir                           ; ED B2
+ jp (c)                         ; ED 98
  jp (hl)                        ; E9
  jp (ix)                        ; DD E9
  jp (iy)                        ; FD E9
@@ -826,12 +832,12 @@
  lddx                           ; ED AC
  ldi                            ; ED A0
  ldir                           ; ED B0
- ldirscale                      ; ED B6
  ldirx                          ; ED B4
  ldix                           ; ED A4
  ldpirx                         ; ED B7
  ldws                           ; ED A5
  mirror a                       ; ED 24
+ mlt de                         ; ED 30
  mmu 0, -128                    ; ED 91 50 80
  mmu 0, 127                     ; ED 91 50 7F
  mmu 0, 255                     ; ED 91 50 FF

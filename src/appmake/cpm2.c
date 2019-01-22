@@ -227,6 +227,25 @@ static cpm_discspec col1_spec = {
 };
 
 
+static cpm_discspec smc777_spec = {
+    .sectors_per_track = 16,
+    .tracks = 80,
+    .sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x52,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_track_start = 3,
+    .skew_tab = { 0,3,6,9,0xc,0xf,2,5,8,0xb,0xE,1,4,7,0xa,0xd }
+};
+
+
+
 
 
 
@@ -252,6 +271,7 @@ struct formats {
     { "mz2500cpm", "Sharp MZ2500 - CPM", &mz2500cpm_spec, 0, NULL, 1 },
     { "osborne1",  "Osborne 1",          &osborne_spec, 0, NULL, 1 },
     { "qc10",      "Epson QC-10, QX-10", &qc10_spec, 0, NULL, 1 },
+    { "smc777",    "Sony SMC-70/SMC-777",&smc777_spec, 0, NULL, 1 },
     { "svi-40ss",   "SVI 40ss (174k)",   &svi40ss_spec, 0, NULL, 1 },
     { "tiki100-40t","Tiki 100 (200k)",   &tiki100_spec, 0, NULL, 1 },
     { NULL, NULL }

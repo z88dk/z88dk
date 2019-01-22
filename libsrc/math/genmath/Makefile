@@ -5,42 +5,26 @@
 
 include ../../Make.config
 
-AFILES  = $(CFILES:.c=.asm)
-OBJECTS = $(CFILES:.c=.o)
+AFILES  = $(wildcard *.asm)
+CFILES  = $(wildcard *.c)
+OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
 
-all: zx81math genmath
+all: dirs $(OUTPUT_DIRECTORY)/genmath.lib $(OUTPUT_DIRECTORY)/genmath_iy.lib $(OUTPUT_DIRECTORY)/genmath_zx81.lib
 
-genmath: $(OBJECTS)
-	$(ZCC) +test $(CFLAGS) acos.c
-	$(ZCC) +test $(CFLAGS) asin.c
-	$(ZCC) +test $(CFLAGS) atan2.c
-	$(ZCC) +test $(CFLAGS) atof.c
-	$(ZCC) +test $(CFLAGS) cosh.c
-	$(ZCC) +test $(CFLAGS) ftoa.c
-	$(ZCC) +test $(CFLAGS) ftoe.c
-	$(ZCC) +test $(CFLAGS) pow.c
-	$(ZCC) +test $(CFLAGS) sinh.c
-	$(ZCC) +test $(CFLAGS) tanh.c
-	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/gen_math @genlist
 
-zx81math:
-	$(RM) -f *.o
-	$(ZCC) +test $(CFLAGS) -Ca--IXIY acos.c
-	$(ZCC) +test $(CFLAGS) -Ca--IXIY asin.c
-	$(ZCC) +test $(CFLAGS) -Ca--IXIY atan2.c
-	$(ZCC) +test $(CFLAGS) -Ca--IXIY atof.c
-	$(ZCC) +test $(CFLAGS) -Ca--IXIY cosh.c
-	$(ZCC) +test $(CFLAGS) -Ca--IXIY ftoa.c
-	$(ZCC) +test $(CFLAGS) -Ca--IXIY ftoe.c
-	$(ZCC) +test $(CFLAGS) -Ca--IXIY pow.c
-	$(ZCC) +test $(CFLAGS) -Ca--IXIY sinh.c
-	$(ZCC) +test $(CFLAGS) -Ca--IXIY tanh.c
-	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/zx81_math --IXIY @zx81list
-	$(RM) -f *.o
+$(OUTPUT_DIRECTORY)/genmath.lib: $(addprefix obj/z80/, $(OBJECTS))
+	TYPE=z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/genmath @genmath.lst
 
-.c.o:
-	$(ZCC) +test $(CFLAGS) $*.c
+$(OUTPUT_DIRECTORY)/genmath_iy.lib: $(addprefix obj/ixiy/, $(OBJECTS))
+	TYPE=ixiy $(LIBLINKER) --IXIY -x$(OUTPUT_DIRECTORY)/genmath_iy @genmath.lst
+
+$(OUTPUT_DIRECTORY)/genmath_zx81.lib: $(addprefix obj/ixiy/, $(OBJECTS))
+	TYPE=ixiy $(LIBLINKER) --IXIY -x$(OUTPUT_DIRECTORY)/genmath_zx81 @genmathzx81.lst
+
+dirs:
+	@mkdir -p obj/z80 obj/zx81 obj/ixiy
 
 clean:
-	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i $(AFILES)
+	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i *.opt
+	$(RM) -fr obj
 

@@ -1,10 +1,9 @@
-@gfxbase.lst
 graphics/dcircle
 graphics/clg
-graphics/clrarea
 graphics/kaypro/clsgraph
 graphics/kaypro/plotpixl
 graphics/kaypro/respixl
 graphics/putsprite3
 graphics/stencil_render2
 graphics/kaypro/swapgfxbk
+@gfxbase.lst

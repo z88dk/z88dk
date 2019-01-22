@@ -18,7 +18,7 @@ EXTERN CLIB_KEYBOARD_ADDRESS
 ._in_KeyPressed
 	ld	bc,0x7fff
 	in	a,(c)
-	ld	e,@0011000
+	ld	e,@00110000
 	bit	7,l
 	jr	z,noshift
 	bit	4,a
@@ -44,8 +44,9 @@ map_loop:
 	jr	map_loop
 done:
 	in	a,(c)
+	cpl
 	and	h		;Check with mask
-	jr	nz,fail
+	jr	z,fail
 	ld	hl,1
 	scf
 	ret

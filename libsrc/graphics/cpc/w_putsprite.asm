@@ -15,7 +15,7 @@
         EXTERN     w_pixeladdress
 
         EXTERN     swapgfxbk
-        EXTERN    swapgfxbk1
+	EXTERN	__graphics_end
 
         INCLUDE "graphics/grafix.inc"
 
@@ -25,7 +25,7 @@
 .putsprite
 ._putsprite
         push	ix		;save callers
-        ld      hl,4   
+        ld      hl,4
         add     hl,sp
         ld      e,(hl)
         inc     hl
@@ -59,7 +59,8 @@
 ;        ld      (oldx),hl
 ;        ld      (cury),de
         call    w_pixeladdress
-        ld      (lineaddr),de
+        ld      (lineaddr+1),de
+		ld      (lineaddr1+1),de
         ; ------
         ;ld		a,(hl)
         ; @@@@@@@@@@@@
@@ -110,7 +111,8 @@
         ;@@@@@@@@@@
         ;Go to next line
         ;@@@@@@@@@@
-        ld      hl,(lineaddr)
+.lineaddr
+		ld	hl,0
 		LD A,H
 		ADD 8
 		LD H,A
@@ -122,12 +124,11 @@
 		ADC H
 		LD H,A
 .nowrap
-        ld      (lineaddr),hl
+        ld      (lineaddr+1),hl
         ;@@@@@@@@@@
          pop      bc                ;Restore data
          djnz     _oloop
-	pop	ix	;restore callers
-         jp       swapgfxbk1
+         jp       __graphics_end
 
 
 .putspritew
@@ -161,10 +162,12 @@
 
          djnz     wiloop
 
+.nextline
         ;@@@@@@@@@@
         ;Go to next line
         ;@@@@@@@@@@
-        ld      hl,(lineaddr)
+.lineaddr1
+		ld	hl,0
 		LD A,H
 		ADD 8
 		LD H,A
@@ -176,48 +179,23 @@
 		ADC H
 		LD H,A
 .nowrap2
-        ld      (lineaddr),hl
+        ld      (lineaddr1+1),hl
         ;@@@@@@@@@@
 
          pop      bc                ;Restore data
          djnz     woloop
-	pop	ix	;restore callers
-         jp       swapgfxbk1
+         jp       __graphics_end
         
 
 .wover_1 ld       c,(ix+2)
          inc      ix
          djnz     wiloop
          dec      ix
+		 jr nextline
 
-        ;@@@@@@@@@@
-        ;Go to next line
-        ;@@@@@@@@@@
-        ld      hl,(lineaddr)
-		LD A,H
-		ADD 8
-		LD H,A
-		JR NC,nowrap3
-		LD A,$50
-		ADD L
-		LD L,A
-		LD A,$C0
-		ADC H
-		LD H,A
-.nowrap3
-        ld      (lineaddr),hl
-        ;@@@@@@@@@@
 
-         pop      bc
-         djnz     woloop
-	pop	ix	;restore callers
-         jp       swapgfxbk1
 
 	SECTION	rodata_clib
 .offsets_table
          defb   1,2,4,8,16,32,64,128
-
-	SECTION bss_clib
-.lineaddr
-         defw   0
 

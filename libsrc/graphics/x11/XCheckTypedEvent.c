@@ -8,6 +8,6 @@
 #define _BUILDING_X
 #include <X11/Xlib.h>
 
-int XCheckTypedEvent(Display *display, int type, int *event) {
+int XCheckTypedEvent(Display *display, int type, XEvent *event) {
 	return 0;
 }

@@ -2,10 +2,8 @@ stdio/pacman/fgetc_cons
 stdio/pacman/fputc_cons
 stdio/pacman/getk
 @stdio/stdio.lst
-@gfxbase.lst
 graphics/dcircle
 graphics/clg
-graphics/clrarea
 graphics/pacman/clsgraph
 graphics/pacman/char_address
 graphics/pacman/textpixl
@@ -18,6 +16,7 @@ graphics/dfill2
 graphics/putsprite2
 graphics/stencil_render2
 graphics/text/swapgfxbk
+@gfxbase.lst
 games/pacman/joystick
 @time/time.lst
 time/pacman/clock

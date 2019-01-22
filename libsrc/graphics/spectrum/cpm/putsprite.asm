@@ -30,8 +30,8 @@
 
 .putsprite
 ._putsprite
-
-		ld      hl,2   
+	push	ix
+        ld      hl,4   
 		add     hl,sp
 		ld      e,(hl)
 		inc     hl
@@ -131,7 +131,7 @@
 
          pop      bc                ;Restore data
          djnz     _oloop
-         ;ei
+         pop	ix
          ret
 
 
@@ -182,7 +182,7 @@
 
          pop      bc                ;Restore data
          djnz     woloop
-         ;ei
+         pop	ix
          ret
 
 .wover_1 ld       c,(ix+2)
@@ -199,10 +199,10 @@
 
          pop      bc
          djnz     woloop
-         ;ei
+         pop	ix
          ret
 
 
-	SECTION rodata_club
+	SECTION rodata_clib
 .offsets_table
          defb	128,64,32,16,8,4,2,1

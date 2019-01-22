@@ -1,16 +1,5 @@
 /*
- *      Routines to initialise variables
- *      Split from decl.c 11/3/98 djm
- *
- *      14/3/99 djm Solved many problems with string initialisation
- *      char arrays in structs now initialised correctly, strings
- *      truncated if too long, all seems to be fine - hurrah!
- *
- *        2/2/02 djm - This file needs to rewritten to be more flexible
- * 
- *      3/2/02 djm - Unspecified structure members are now padded out
- *
- *      $Id: declinit.c,v 1.18 2016-07-15 12:45:18 pauloscustodio Exp $
+ * Handle initialisation
  */
 
 #include "ccdefs.h"
@@ -18,8 +7,6 @@
 static void output_double_string_load(double value);
 static int init(Type *type, int dump);
 static int agg_init(Type *type);
-
-
 
 
 /*
@@ -33,7 +20,8 @@ int initials(const char *dropname, Type *type)
 
     // We can only use rodata_compile (i.e. ROM if double string isn't enabled)
     if ( (type->isconst && !c_double_strings) ||
-        ( (ispointer(type) || type->kind == KIND_ARRAY) && type->ptr->isconst ) )  {
+        ( (ispointer(type) || type->kind == KIND_ARRAY) && 
+		(type->ptr->isconst || (ispointer(type->ptr) && type->ptr->ptr->isconst) ) ) ) {
         output_section(c_rodata_section);
     } else {
         output_section(c_data_section);
@@ -132,12 +120,27 @@ int agg_init(Type *type)
             size += str_init(type->ptr->tag);
             dim--;
             needchar('}');
-        } else if ( type->ptr->kind == KIND_ARRAY ) {
-            needchar('{');
-            size += agg_init(type->ptr);
-            needchar('}');
+        } else if ( type->ptr && type->ptr->kind == KIND_ARRAY) {
+            if ( type->ptr->ptr->kind != KIND_CHAR ) {
+                needchar('{');
+                size += agg_init(type->ptr);
+                needchar('}');
+            } else {
+               char needbrace = 0;
+               if ( cmatch('{') ) 
+                   needbrace = 1;
+               if ( rcmatch('"') )
+                   size += init(type->ptr,1);
+               else 
+                   size += agg_init(type->ptr);
+               if ( needbrace ) needchar('}');
+            }
         } else {
+            char needbrace = 0;
+            if ( cmatch('{') ) 
+               needbrace = 1;
             size += init(type->ptr,1);
+            if ( needbrace ) needchar('}');
         }
         done++;
         if (cmatch(',') == 0)

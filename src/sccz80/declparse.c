@@ -1157,7 +1157,7 @@ Type *asm_function(const char *name)
     strcpy(type->name, name);
     type->kind = KIND_FUNC;
     type->funcattrs.oldstyle = 1;
-    type->return_type = type_void;
+    type->return_type = type_ulong;
     type->parameters = array_init(NULL);
     array_add(type->parameters, make_pointer(type_char));
     type->size = 0;

@@ -13,10 +13,8 @@ stdio/ansi/msx/f_ansi_scrollup
 @stdio/stdio_binary.lst
 time/msx/clock
 @fcntl/cpm/fcntl.lst
-@gfxbase.lst
 graphics/dcircle
 graphics/msx/clg
-graphics/clrarea
 graphics/msx/pixladdr
 graphics/msx/plotpixl
 graphics/msx/respixl
@@ -34,6 +32,7 @@ graphics/msx/surface/surface_draw
 graphics/msx/surface/surface_pixladdr
 graphics/msx/surface/surface_plotpixl
 graphics/msx/surface/surface_stencil_render
+@gfxbase.lst
 games/msx/joystick
 games/msx/bit_open
 games/msx/bit_open_di

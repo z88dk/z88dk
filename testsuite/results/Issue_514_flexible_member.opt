@@ -13,9 +13,7 @@
 	push	hl
 	add	hl,sp
 	call	l_gint	;
-	inc	hl
-	inc	hl
-	ld	bc,6
+	ld	bc,8
 	add	hl,bc
 	ld	(hl),#(17 % 256)
 	inc	hl
@@ -31,9 +29,7 @@
 	push	hl
 	add	hl,sp
 	call	l_gint	;
-	inc	hl
-	inc	hl
-	ld	bc,6
+	ld	bc,8
 	add	hl,bc
 	ld	(hl),#(17 % 256)
 	inc	hl

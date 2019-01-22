@@ -84,7 +84,7 @@ void read_symbol_file(char *filename)
                     // We've got at least 3, do something (it's an old format)
                     symbol *sym = calloc(1,sizeof(*sym));
                     sym->name = strdup(argv[0]);
-                    sym->address = strtol(argv[2], NULL, 16);
+                    sym->address = strtol(argv[2] + 1, NULL, 16);
                     sym->symtype = SYM_ADDRESS;
                     if ( sym->address >= 0 && sym->address <= 65535 ) {
                         LL_APPEND(symbols[sym->address], sym);

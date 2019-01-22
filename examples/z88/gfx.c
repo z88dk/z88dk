@@ -14,7 +14,7 @@ void main()
     mine->number = '4';
 
     /* Open map with width 256 on window #4 */
-    window(mine);
+    window(&mine);
 
     /* Clear the graphics window */
     clg();
@@ -39,5 +39,5 @@ void main()
     drawr(-10, 10);
 
     /* Close the graphics window */
-    closegfx(mine);
+    closegfx(&mine);
 }

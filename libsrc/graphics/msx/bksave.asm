@@ -6,7 +6,8 @@
 ;	$Id: bksave.asm,v 1.7 2016-07-02 09:01:36 dom Exp $
 ;
 
-	SECTION   code_clib
+	SECTION smc_clib
+	
 	PUBLIC    bksave
 	PUBLIC    _bksave
 	PUBLIC	bkpixeladdress

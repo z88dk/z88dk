@@ -5,6 +5,15 @@
 ;	$Id: bas_crt0.asm,v 1.21 2016-06-21 20:49:06 dom Exp $
 
 
+        PUBLIC    cleanup               ;jp'd to by exit()
+        PUBLIC    l_dcal                ;jp(hl)
+
+
+        PUBLIC    processcmd    ;Processing <> commands
+
+
+        PUBLIC  _cpfar2near     ;Conversion of far to near data
+
 ;-----------
 ; The .def files that we need here
 ;-----------

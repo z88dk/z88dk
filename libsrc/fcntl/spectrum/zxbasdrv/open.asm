@@ -5,7 +5,7 @@
 ;
 ; int open(char *name, int flags, mode_t mode)
 ;
-; $Id: open.asm,v 1.7 2016-06-23 20:40:25 dom Exp $
+; $Id: open.asm $
 
 	SECTION code_clib
 	PUBLIC	open
@@ -13,7 +13,8 @@
 	
 	EXTERN	zxhandl
 	
-	EXTERN	zx_setint
+	EXTERN	zx_setint_callee
+	EXTERN ASMDISP_ZX_SETINT_CALLEE
 	EXTERN	zx_goto
 	EXTERN	zxgetfname
 
@@ -28,15 +29,14 @@
 	inc hl
 
 	push	hl
-	ld	de,fvar		; BASIC variable F
-	push	de
-	ld	b,(hl)		; mode flag
+	
+	ld	e,(hl)		; mode flag
 	inc	hl
-	ld	c,(hl)
-	push	bc
-	call	zx_setint
-	pop	bc
-	pop	bc
+	ld	d,(hl)
+	
+	ld	hl,fvar		; BASIC variable F
+	call	zx_setint_callee + ASMDISP_ZX_SETINT_CALLEE
+	
 	pop	hl
 
 	inc hl
@@ -63,19 +63,16 @@
 	jr	hloop
 .hfound
 	inc	a
-	ld	(hl),a
-	ld	c,b
-	ld	b,0
+	ld	(hl),a		; set handle as busy
+	
+	ld	e,b
+	ld	d,0
+	push de		; save file handle
 
 	ld	hl,svar		; BASIC variable S
-	push	hl
-	push	bc		; file handle
-	call	zx_setint
-	pop	bc
-	pop	hl
+	call	zx_setint_callee + ASMDISP_ZX_SETINT_CALLEE
 
-	push	bc		; save file handle
-				; BASIC routine for "open"
+					; BASIC routine for "open"
 	ld	hl,7500		; now it is __FASTCALL__
 	call	zx_goto
 	pop	hl		; file handle
@@ -94,6 +91,9 @@
 	pop	hl		; file handle
 	ret	nz
 
+	ld	de,zxhandl
+	add	hl,de
+	ld	(hl),0		; free flag for handle
 	ld	hl,-1		; stream isn't open: file not found !
 	ret
 
@@ -106,7 +106,9 @@
 	ld	hl,3		; force stream #3 as file handle
 	ret
 
-; BASIC variable names for numeric values
+
 	SECTION rodata_clib
+	
+; BASIC variable names for numeric values
 .fvar	defb 'F',0
 .svar	defb 'S',0

@@ -1,5 +1,6 @@
 @adt/adt_sccz80.lst
 @alloc/alloc_sccz80.lst
+@arch/cpm/cpm_sccz80.lst
 @compress/compress_sccz80.lst
 @ctype/ctype_sccz80.lst
 @drivers/drivers.lst
@@ -9,6 +10,7 @@
 @font/font_8x8/fonts.lst
 @font/fzx/fzx_sccz80.lst
 @im2/im2_sccz80.lst
+@input/cpm/input_sccz80.lst
 @inttypes/inttypes_sccz80.lst
 @l/l.lst
 @l/sccz80.lst
@@ -24,6 +26,7 @@
 @target/rc2014/default/default.lst
 @target/rc2014/device/device.lst
 @target/rc2014/driver/driver_sccz80.lst
+@target/cpm/driver/driver.lst
 @threads/threads_sccz80.lst
 @time/time_sccz80.lst
 @z80/z80_sccz80.lst

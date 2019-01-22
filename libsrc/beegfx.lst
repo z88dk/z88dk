@@ -1,9 +1,7 @@
-@gfxbase.lst
 graphics/__gfx_coords
 graphics/__graphics_end
 graphics/bee/clg
 graphics/bee/clsgraph
-graphics/clrarea
 graphics/dcircle2
 graphics/stencil_render2
 graphics/text6/div3
@@ -25,3 +23,4 @@ graphics/lores/c_unplot
 graphics/lores/c_xorplot
 graphics/lores/c_pointxy
 graphics/lores/c_point
+@gfxbase.lst

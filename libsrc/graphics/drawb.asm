@@ -3,21 +3,20 @@
 ;
 ;       Written around the Interlogic Standard Library
 ;
-;       Stubs Written by D Morris - 30/9/98
 ;
+; ----- void __CALLEE__ drawb(int x, int y, int h, int v)
 ;
-;	$Id: drawb.asm,v 1.7 2016-04-13 21:09:09 dom Exp $
+;	$Id: drawb.asm $
 ;
 
 
-                SECTION         code_graphics
-                PUBLIC    drawb
-                PUBLIC    _drawb
+		SECTION         code_graphics
+		
+		PUBLIC    drawb
+		PUBLIC    _drawb
 
-                EXTERN     drawbox
-                EXTERN     plotpixel
-                EXTERN     swapgfxbk
-                EXTERN        __graphics_end
+		EXTERN    drawb_callee
+		EXTERN    ASMDISP_DRAWB_CALLEE
 
 
 .drawb
@@ -29,8 +28,6 @@
 		ld	b,(ix+4)
 		ld	l,(ix+6)
 		ld	h,(ix+8)
-                ld      ix,plotpixel
-                call    swapgfxbk
-                call    drawbox
-                jp      __graphics_end
-
+		pop	ix
+		
+   jp drawb_callee + ASMDISP_DRAWB_CALLEE

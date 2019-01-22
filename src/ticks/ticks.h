@@ -61,7 +61,8 @@ extern long long st;
 #define canaltreg() ( ( c_cpu & (CPU_8080|CPU_GBZ80)) == 0 )
 #define canindex() ( ( c_cpu & (CPU_8080|CPU_GBZ80)) == 0 )
 #define canixh() ( c_cpu & (CPU_Z80|CPU_Z80_ZXN|CPU_R800|CPU_EZ80))
-#define cansll() ( 1 ) // c_cpu & (CPU_Z80|CPU_Z80_ZXN))
+#define cansll() ( c_cpu & (CPU_Z80|CPU_Z80_ZXN))
+#define canz180() ( c_cpu & (CPU_Z180|CPU_EZ80))
 #define cancbundoc() ( c_cpu & (CPU_Z80|CPU_Z80_ZXN))
 
 extern int c_cpu;

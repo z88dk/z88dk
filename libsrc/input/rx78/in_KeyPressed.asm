@@ -25,7 +25,7 @@ PUBLIC _in_KeyPressed
 	jr	z,fail
 	res	2,c
 .nocaps
-	bit	0,l
+	bit	6,l
 	jr	z,nofunc
 	bit	0,a
 	jr	z,fail

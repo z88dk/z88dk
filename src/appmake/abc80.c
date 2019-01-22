@@ -264,7 +264,7 @@ int abc80_exec(char* target)
 	 *        We mark every 252 bytes block (4 bytes)
 	 */
 
-        if ((fpout = fopen(tmpname, "rb")) == NULL) {
+        if ((fpin = fopen(tmpname, "rb")) == NULL) {
             myexit("Can't open temp file\n", 1);
         }
 

@@ -10,10 +10,8 @@ stdio/ansi/p2000/f_ansi_dline
 stdio/ansi/p2000/f_ansi_scrollup
 @stdio/stdio.lst
 time/p2000/clock
-@gfxbase.lst
 graphics/dcircle
 graphics/clg
-graphics/clrarea
 graphics/p2000/clsgraph
 graphics/text6/div3
 graphics/p2000/plotpixl
@@ -25,6 +23,7 @@ graphics/dfill2
 graphics/putsprite2
 graphics/stencil_render2
 graphics/p2000/swapgfxbk
+@gfxbase.lst
 games/p2000/bit_open
 games/p2000/bit_open_di
 games/p2000/bit_close

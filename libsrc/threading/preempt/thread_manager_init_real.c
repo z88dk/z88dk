@@ -11,7 +11,7 @@
  
 void thread_manager_init_real(scheduler_t *scheduler)
 {
-    memset(threadbase, 0, sizeof(threadbase_t));
+    memset(&threadbase, 0, sizeof(threadbase_t));
 #asm
     	pop	de
 	pop	hl

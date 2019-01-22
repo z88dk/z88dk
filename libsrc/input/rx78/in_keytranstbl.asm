@@ -17,7 +17,7 @@ PUBLIC in_keytranstbl
 	defb	'o', 'n', 'm', 'l', 'k', 'j', 'i', 'h'	; o, n, m, l, k, j, i, h
 	defb	'w', 'v', 'u', 't', 's', 'r', 'q', 'p'	; w, v, u, t, s, r, q, p
 	defb	  9,  11, ']','\\', '[', 'z', 'y', 'x'	; RIGHTARR, UPARR, ], \, [, z, y, x
-	defb	 12, 255, 255,   8,  10,  11,   9, ' '	; DEL, -, CLR, LEFt, RIGHT, UP, DOWN, SPC
+	defb	 12, 255, 255,   8,   9,  11,  10, ' '	; DEL, -, CLR, LEFt, RIGHT, UP, DOWN, SPC
 	defb	  6, 255,  13, 255,  27, 255, 255, 255	; CAPS, -, RET, -, STOP, -, -, -
 	defb	255, 255, 255, 255, 255, 255, 255, 255	; -, -, -, -, -, SHIFT, -, CTRL
 

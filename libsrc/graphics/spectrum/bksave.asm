@@ -3,10 +3,11 @@
 ;
 ;	ZX Spectrum version (speeded up with a row table)
 ;
-;	$Id: bksave.asm,v 1.5 2016-07-02 09:01:36 dom Exp $
+;	$Id: bksave.asm $
 ;
 
-	SECTION	  code_clib
+	SECTION smc_clib
+	
 	PUBLIC    bksave
 	PUBLIC    _bksave
 	EXTERN	zx_rowtab

@@ -1,0 +1,41 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	data_compiler
+._font
+	defw	0
+	defw	1
+	defw	2
+	defw	3
+	SECTION	code_compiler
+	SECTION	data_compiler
+._font2
+	defb	0
+	defb	1
+	defb	2
+	defb	3
+	SECTION	code_compiler
+	SECTION	data_compiler
+._y
+	defb	1
+	defb	2
+	defb	3
+	SECTION	code_compiler
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_font
+	GLOBAL	_font2
+
+
+
+

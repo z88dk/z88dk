@@ -11,10 +11,8 @@ stdio/ansi/ticalc/f_ansi_dline
 stdio/ansi/ticalc/f_ansi_scrollup
 @stdio/stdio.lst
 @tigray.lst
-@gfxbase.lst
 graphics/dcircle
 graphics/ticalc/clg
-graphics/clrarea
 graphics/ticalc/pixladdr
 graphics/plotpixl
 graphics/respixl
@@ -27,6 +25,7 @@ graphics/ticalc/putsprite
 graphics/ticalc/bksave
 graphics/ticalc/bkrestore
 graphics/ticalc/swapgfxbk
+@gfxbase.lst
 games/ticalc/joystick
 games/ticalc/bit_open
 games/ticalc/bit_open_di

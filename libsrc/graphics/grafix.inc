@@ -365,8 +365,14 @@ ENDIF
 
 IF FORgal
 	DEFINE gotgfx
-	defc maxx	= 64
-	defc maxy	= 48
+	; This size reflects the Gal+ screen mode
+        IF textgraphics
+    	    defc maxx	= 64
+	    defc maxy	= 48
+        ELSE
+    	    defc maxx	= 256
+	    defc maxy	= 208
+        ENDIF
 	defc blankch	= 32
 ENDIF
 
@@ -487,6 +493,13 @@ IF FORlaser500
 	DEFINE gotgfx
 	defc maxx = 320
 	defc maxy = 192
+	defc blankch = 32
+ENDIF
+
+IF FORz80tvgame
+	DEFINE gotgfx
+	defc maxx = 168
+	defc maxy = 208
 	defc blankch = 32
 ENDIF
 

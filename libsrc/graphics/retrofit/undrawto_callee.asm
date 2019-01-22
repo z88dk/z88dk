@@ -3,10 +3,6 @@
 ;
 ;       Written around the Interlogic Standard Library
 ;
-;       Stubs Written by D Morris - 30/9/98
-;
-;       Wide resolution (int type parameters) version by Stefano Bodrato
-;
 
 ;
 ;	$Id: undrawto_callee.asm $
@@ -17,27 +13,23 @@
 ; ----- void  undrawto(int x2, int y2)
 
 
-SECTION   code_graphics
+SECTION code_graphics
 
-PUBLIC     undrawto
-PUBLIC    _undrawto
+PUBLIC     undrawto_callee
+PUBLIC    _undrawto_callee
 
-EXTERN    undrawto_callee
-EXTERN    ASMDISP_UNDRAWTO_CALLEE
+	EXTERN    undrawto
 
-
-.undrawto
-._undrawto
-	ld	hl,retaddr
-	ex (sp),hl
-	ld	hl,undrawto
-	jp (hl)
+.undrawto_callee
+._undrawto_callee
+	pop af	; ret addr
+	pop	bc
+	pop	de
+	push af	; ret addr
+	push de
+	push bc
 	
-.retaddr
-   pop af
-   pop de
-   pop hl
-   push af
-	
-jp undrawto_callee + ASMDISP_UNDRAWTO_CALLEE
-
+	call undrawto
+	pop bc
+	pop bc
+	ret

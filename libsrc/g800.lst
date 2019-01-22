@@ -10,10 +10,7 @@ stdio/ansi/g800/f_ansi_scrollup
 @stdio/stdio.lst
 games/joystick
 @z80.lst
-@gfxbase.lst
-graphics/__graphics_end
 graphics/clg
-graphics/clrarea
 graphics/dcircle
 graphics/dfill2
 graphics/fill
@@ -25,8 +22,10 @@ graphics/g800/getmaxy
 graphics/g800/locate
 graphics/g800/plotpixel
 graphics/g800/point
+graphics/retrofit/point_callee
 graphics/g800/pointxy
 graphics/g800/respixel
 graphics/g800/xorpixel
 graphics/putsprite3
 graphics/stencil_render2
+@gfxbase.lst
