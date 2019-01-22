@@ -24,6 +24,7 @@
 	EXTERN	CRT_FONT
 	EXTERN	CRT_FONT_64
 	EXTERN	__zx_console_attr
+	EXTERN	generic_console_scrollup
 
 ;
 ; Entry:	a= char to print
@@ -293,91 +294,11 @@ ENDIF
 ; Blanking the bottom row..
 .scrollup
  	push	hl
-IF FORts2068
-	ld	a,(hrgmode)
-	and	a
-	jr	nz,hrgscroll
-ENDIF
-	ld	a,($dff)
-	cp	$17
-	jr	nz,ts2068_rom
-	call	call_rom3
-	defw	3582	;scrollup
-     	pop	hl
-	ret
-.ts2068_rom
-	call	call_rom3
-	defw	$939	; TS2068 scrollup
+	call generic_console_scrollup
 	pop	hl
 	ret
 
-IF FORts2068
-	EXTERN	zx_rowtab
-.hrgscroll
-	push	ix
-        ld      ix,zx_rowtab
-        ld      a,8
-.outer_loop
-        push    af
-        push    ix
-        ld      a,23
-.inner_loop
-        ld      e,(ix+16)
-        ld      d,(ix+17)
-        ex      de,hl
-        ld      e,(ix+0)
-        ld      d,(ix+1)
-        ld      bc,32
-        ldir
-; second display
-        dec     de
-        dec     hl
-        set     5,d
-        set     5,h
-        ld      bc,32
-        lddr
-        ld      bc,16
-        add     ix,bc
-        dec     a
-        jr      nz,inner_loop
-        pop     ix
-        pop     af
-        inc     ix
-        inc     ix
-        dec     a
-        jr      nz,outer_loop
-; clear
-        ld      ix,zx_rowtab + (192 - 8) * 2
-        ld      a,8
-.clear_loop
-        push    ix
-        ld      e,(ix+0)
-        ld      d,(ix+1)
-        ld      h,d
-        ld      l,e
-        ld      (hl),0
-        inc     de
-        ld      bc,31
-        ldir
-; second display
-        dec hl
-        dec de
-        set     5,d
-        set     5,h
-        ex      de,hl
-        ld      (hl),0
-        ld      bc,31
-        lddr
-        pop     ix
-        inc     ix
-        inc     ix
-        dec     a
-        jr      nz,clear_loop
-	pop	ix
-        pop     hl
-        ret
-
-ENDIF
+	
 
 ; This nastily inefficient table is the code table for the routines
 ; Done this way for future! Expansion
