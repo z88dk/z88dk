@@ -24,6 +24,10 @@
 	EXTERN	CRT_FONT
 	EXTERN	CRT_FONT_64
 	EXTERN	__zx_console_attr
+	EXTERN	__zx_32col_font
+	EXTERN	__zx_64col_font
+	EXTERN	__zx_32col_udgs
+	EXTERN	__ts2068_hrgmode
 	EXTERN	generic_console_scrollup
 
 ;
@@ -33,7 +37,7 @@
 .fputc_cons_native
 IF FORts2068
 	in	a,(255)
-	ld	hl,hrgmode
+	ld	hl,__ts2068_hrgmode
 	ld	(hl),0
 	and	7
 	cp	6
@@ -77,7 +81,7 @@ ENDIF
 	add	hl,hl
 	add	hl,hl
 	add	hl,hl
-	ld	bc,(udgaddr)
+	ld	bc,(__zx_32col_udgs)
 	add	hl,bc
 	jp	print32_entry
 .putit_out2
@@ -115,7 +119,7 @@ ENDIF
 	add	hl,hl  
 	add	hl,hl  
 	add	hl,hl  
-	ld	bc,(font64addr)
+	ld	bc,(__zx_64col_font)
 	add	hl,bc
 
 	; a = mask
@@ -147,7 +151,7 @@ ENDIF
 	dec	h
 IF FORts2068
 	; No __zx_console_attribute setting for hires mode
-	ld	a,(hrgmode)
+	ld	a,(__ts2068_hrgmode)
 	and	a
 	jr	nz,cbak
 ENDIF
@@ -167,7 +171,7 @@ ENDIF
 	bit	6,l  
 	jr	z,char4
 IF FORts2068
-	ld	a,(hrgmode)
+	ld	a,(__ts2068_hrgmode)
 	and	a
 	jr	z,cbak1
 	bit	7,l
@@ -196,7 +200,7 @@ ENDIF
 	add	hl,hl
 	add	hl,hl
 	add	hl,hl
-	ld	bc,(fontaddr)
+	ld	bc,(__zx_32col_font)
 	add	hl,bc
 .print32_entry
 	ld	b,8
@@ -215,7 +219,7 @@ ENDIF
 	dec	d
 	ld	hl,(chrloc)
 IF FORts2068
-	ld	a,(hrgmode)
+	ld	a,(__ts2068_hrgmode)
 	and	a
 	jr	nz,increment
 ENDIF
@@ -260,7 +264,7 @@ ENDIF
 just_calculate:
 IF FORts2068
 	; In highres mode, we've got to divide again
-	ld	a,(hrgmode)
+	ld	a,(__ts2068_hrgmode)
 	and	a
 	jr	z,not_hrg_calc
 	srl	l
@@ -280,7 +284,7 @@ ENDIF
 IF FORts2068
 	pop	af
 	ret	z
-	ld	a,(hrgmode)
+	ld	a,(__ts2068_hrgmode)
 	and	$20
 	add	h
 	ld	h,a
@@ -407,7 +411,7 @@ ENDIF
 	ld      (hl),l
 	ldir
 IF FORts2068
-	ld	a,(hrgmode)
+	ld	a,(__ts2068_hrgmode)
 	and	a
 	jr	nz,cls_hrg
 ENDIF
@@ -510,9 +514,9 @@ ENDIF
 	and	a
 	ld	de,print32
 	sbc	hl,de
-	ld	de,fontaddr
+	ld	de,__zx_32col_font
 	jr	nc,dofont_setit
-	ld	de,font64addr
+	ld	de,__zx_64col_font
 .dofont_setit
 	ld	hl,(params)
 	ex	de,hl
@@ -522,7 +526,7 @@ ENDIF
 	ret
 
 .doudg	ld	hl,(params)
-	ld	(udgaddr),hl
+	ld	(__zx_32col_udgs),hl
 	ret
 
 .setfont
@@ -637,15 +641,9 @@ ENDIF
 ; Bit 1 = scroll disabled
 .control_flags	defb	0
 
-IF FORts2068
-.hrgmode	defb	0
-ENDIF
 
 	SECTION data_clib
 
-.fontaddr	defw	CRT_FONT
-.font64addr	defw	CRT_FONT_64
-.udgaddr	defw	65368
 .print_routine	defw	print64
 .deltax		defb	1		;how much to move in x 
 
