@@ -23,9 +23,29 @@
         ld      hl,$5c7a
         inc     (hl)
 
-        
+
 key_chk:
 ;--- --- --- --- cut here to remove the keyboard handler --- --- --- --- 
+IF !DEFINED_tinykbdhandler
+;--- --- --- --- 
+        EXTERN in_Inkey
+		
+        push    bc
+        push    de
+        and 3		; crap way to slow down the keyboard scanning a little bit
+        ld	a,0
+        jr nz,kfound
+        call	in_Inkey
+        ld		a,l
+kfound:
+        ld      ($5C08),a
+        pop     de
+        pop     bc
+
+;--- --- --- --- 
+ELSE
+;--- --- --- --- 
+
         push    bc
         push    de
 
@@ -49,6 +69,8 @@ kfound:
         ld      ($5C08),a
         pop     de
         pop     bc
+;--- --- --- ---
+ENDIF
 ;--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
         pop     hl	; End of interrrupt
@@ -57,7 +79,8 @@ kfound:
         ret
 
 
-
+		
+IF DEFINED_tinykbdhandler
 ;--- --- --- --- cut here to remove the keyboard handler --- --- --- --- 
 
 ; Read keyboard row, used by interrupt service routine
@@ -128,4 +151,5 @@ r8:     defb    $7f
         defb    'b'
 
 ;--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+ENDIF
 
