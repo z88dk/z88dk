@@ -21,7 +21,7 @@ static int first_free_extent(cpm_handle* h)
             return i;
         }
     }
-    myexit("No free extents on disc\n", 1);
+    exit_log(1,"No free extents on disc\n");
     return -1;
 }
 
@@ -36,7 +36,7 @@ static size_t find_first_free_directory_entry(cpm_handle* h)
         }
         directory_offset += 32;
     }
-    myexit("No free directory entries on disc\n", 1);
+    exit_log(1,"No free directory entries on disc\n");
     return 0;
 }
 
@@ -144,6 +144,7 @@ void cpm_write_file(cpm_handle* h, char filename[11], void* data, size_t len)
         ptr = &direntry[16];
         for (j = 0; j < extents_per_entry; j++) {
             if (j < extents_to_write) {
+                h->extents[current_extent] = 1;
                 if (h->spec.byte_size_extents) {
                     direntry[j + 16] = (current_extent) % 256;
                 } else {

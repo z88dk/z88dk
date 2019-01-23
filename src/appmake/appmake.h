@@ -514,6 +514,12 @@ extern void         writebyte_cksum(unsigned char c, FILE *fp, unsigned long *ck
 extern void         writeword_cksum(unsigned int i, FILE *fp, unsigned long *cksum);
 extern void         writestring_cksum(char *mystring, FILE *fp, unsigned long *cksum);
 
+
+extern void         writebyte_b(unsigned char c, uint8_t **pptr);
+extern void         writeword_b(unsigned int i, uint8_t **pptr);
+extern void         writelong_b(unsigned long i, uint8_t **pptr);
+extern void         writestring_b(char *mystring, uint8_t **pptr);
+
 extern void         raw2wav(char *rawfilename);
 
 extern void         zx_pilot(int pilot_len, FILE *fpout);

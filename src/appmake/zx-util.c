@@ -2094,3 +2094,206 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
 
     return 0;
 }
+
+// Layout a +3 file
+// \param inbuf The input buffer containing the file
+// \param filelen Number of bytes to read
+// \param file_type Spectrum file type
+// \param total_len How long the returned block is
+// \return Allocated buffer containing the whole file (should be freed)
+uint8_t *zx3_layout_file(uint8_t *inbuf, size_t filelen, int start_address, int file_type, size_t *total_len_ptr)
+{
+     uint8_t *buf = must_malloc(filelen + 128);
+     uint8_t *ptr = buf;
+     int      cksum, i;
+     size_t   total_len = 0;
+
+     memcpy(buf,"PLUS3DOS", 8);
+     buf[8] = 0x1a;
+     buf[9] = 0x01;	// Issue number
+     buf[10] = 0x00;    // Version number
+     // 11 - 14 = filelength
+     // 15 - 22 = header data
+     // +---------------+-------+-------+-------+-------+-------+-------+-------+
+     // | BYTE		|   0	|   1	|   2	|   3	|   4	|   5	|   6	|
+     // +---------------+-------+-------+-------+-------+-------+-------+-------+
+     // | Program	    0	file length	8000h or LINE	offset to prog	|
+     // | Numeric array	    1	file length	xxx	name	xxx	xxx	|
+     // | Character array   2	file length	xxx	name	xxx	xxx	|
+     // | CODE or SCREEN$   3	file length	load address	xxx	xxx	|
+     // +-----------------------------------------------------------------------+
+     // 127 = checksum (sum of 0..126 mod 256)
+     ptr = buf + 128;
+
+     while ( total_len < filelen ) {
+         buf[128 + total_len] = inbuf[total_len];
+         total_len++;
+     }
+
+     // Now populate the +3 dos header
+     buf[15] = file_type;
+     buf[16] = total_len % 256;
+     buf[17] = total_len / 256;
+     buf[18] = start_address % 256;
+     buf[19] = start_address / 256;
+     buf[20] = file_type == 0 ? total_len % 256 : 0;
+     buf[21] = file_type == 0 ? total_len / 256 : 0;
+
+     // And then the overall file header
+     total_len += 128;
+     buf[11] = total_len % 256;
+     buf[12] = (total_len / 256) % 256;
+     buf[13] = (total_len / 65536) % 256;
+     buf[14] = (total_len / 65536) / 256;
+
+     // And now do the checksum
+     for ( i = 0, cksum = 0; i < 127; i++ ) {
+         cksum += buf[i];
+     }
+     buf[127] = cksum % 256;
+     *total_len_ptr = total_len;
+     return buf;
+}
+
+int zx_plus3(struct zx_common *zxc, struct zx_tape *zxt)
+{
+    uint8_t  buffer[1024];  // Temporary buffer
+    uint8_t *ptr;
+    char    disc_image_name[FILENAME_MAX+1];
+    char    cpm_filename[20];
+    char    basic_filename[20];
+    char    tbuf[50];
+    size_t  origin;
+    size_t  binary_length;
+    int     len;
+    cpm_handle *h;
+    FILE   *fpin;
+    void   *file_buf;
+    size_t  file_len;
+
+    if (zxc->outfile == NULL) {
+        strcpy(disc_image_name, zxc->binname);
+        suffix_change(disc_image_name, ".dsk");
+    } else {
+        strcpy(disc_image_name, zxc->outfile);
+    }
+
+
+    if (zxt->blockname == NULL)
+        zxt->blockname = zxc->binname;
+
+
+    if (strcmp(zxc->binname, disc_image_name) == 0) {
+        fprintf(stderr, "Input and output file names must be different\n");
+        myexit(NULL, 1);
+    }
+
+
+    if (zxc->origin != -1) {
+        origin = zxc->origin;
+    } else {
+        if ((origin = get_org_addr(zxc->crtfile)) == -1) {
+            myexit("Could not find parameter ZORG (not z88dk compiled?)\n", 1);
+        }
+    }
+
+    if ((fpin = fopen_bin(zxc->binname, zxc->crtfile)) == NULL) {
+        exit_log(1,"Can't open input file %s\n", zxc->binname);
+    }
+
+    if (fseek(fpin, 0, SEEK_END)) {
+        fclose(fpin);
+        exit_log(1,"Couldn't determine size of file\n");
+    }
+
+    binary_length = ftell(fpin);
+    fseek(fpin, 0L, SEEK_SET);
+
+    if ( (h = cpm_create_with_format("plus3")) == NULL ) {
+        fclose(fpin);
+        exit_log(1,"Cannot find disc specification\n");
+    }
+
+    // Lets do some filename mangling
+    cpm_create_filename(zxc->binname, basic_filename, 0, 1);
+
+    // Create the basic file
+
+    // Write the basic file
+    ptr = buffer; 
+    writebyte_b(0, &ptr);		// MSB of basic line
+    writebyte_b(10, &ptr);		// MSB
+    writeword_b(0, &ptr);		// Line length, we'll fix up later
+    writebyte_b(0xfd, &ptr);		// CLEAR
+    writebyte_b(0xb0, &ptr);		// VAL
+    if ( zxt->clear_address == -1 ) {
+        zxt->clear_address = origin - 1;
+    }
+    snprintf(tbuf,sizeof(tbuf),"\"%i\":", zxt->clear_address);
+    writestring_b(tbuf, &ptr);
+    if ( zxt->screen ) {
+        suffix_change(basic_filename, ".SCR");
+        writebyte_b(0xef, &ptr);	/* LOAD */
+        writebyte_b('"', &ptr);
+        writestring_b(basic_filename, &ptr);
+        writebyte_b('"', &ptr);
+        writebyte_b(0xaa, &ptr);	/* SCREEN$ */
+        writebyte_b(':', &ptr);
+    }
+    suffix_change(basic_filename, ".BIN");
+    writebyte_b(0xef, &ptr);	/* LOAD */
+    writebyte_b('"', &ptr);
+    writestring_b(basic_filename, &ptr);
+    writebyte_b('"', &ptr);
+    writebyte_b(0xaf, &ptr);	/* CODE */
+    writebyte_b(':', &ptr);
+    writebyte_b(0xf9, &ptr);	/* RANDOMIZE */
+    writebyte_b(0xc0, &ptr);	/* USR */
+    writebyte_b(0xb0, &ptr);	/* VAL */
+    snprintf(tbuf,sizeof(tbuf), "\"%i\"", (int)origin);           /* Location for USR */
+    writestring_b(tbuf, &ptr);
+    writebyte_b(0x0d, &ptr);	/* ENTER (end of BASIC line) */
+    len = ptr - buffer;
+    buffer[2] = len % 256; 
+    buffer[3] = len / 256; 
+
+    // And now we can write the file
+    file_buf = zx3_layout_file(buffer, len, 10, 0, &file_len);
+    cpm_write_file(h, "DISK       ", file_buf, file_len);
+    free(file_buf);
+
+    // Read the screen$
+    if ( zxt->screen ) {
+        uint8_t scrbuf[6912] = {0};
+        FILE    *fpscr = fopen(zxt->screen, "rb");
+
+        if ( fpscr == NULL ) {
+            fclose(fpin);
+            exit_log(1,"Cannot open SCREEN$ file %s\n", zxt->screen);
+        }
+        suffix_change(basic_filename, ".SCR");
+        fread(scrbuf, 1, 6912, fpscr);
+        fclose(fpscr);
+        file_buf = zx3_layout_file(scrbuf, 6912, 16384, 3, &file_len);
+        cpm_create_filename(basic_filename, cpm_filename, 0, 0);
+        cpm_write_file(h, cpm_filename, file_buf, file_len);
+        free(file_buf);
+    }
+    // Read the binary
+    ptr = must_malloc(binary_length);
+    fread(ptr, 1, binary_length, fpin);
+    fclose(fpin);
+
+    // And write it
+    suffix_change(basic_filename, ".BIN");
+    cpm_create_filename(basic_filename, cpm_filename, 0, 0);
+    file_buf = zx3_layout_file(ptr, binary_length, origin, 3, &file_len);
+    cpm_write_file(h, cpm_filename, file_buf, file_len);
+    free(file_buf);
+    free(ptr);
+    // Finalise the image
+    if ( cpm_write_edsk(h, disc_image_name) < 0 ) {
+        exit_log(1,"Can't write disc image");
+    }
+    return 0;
+}
