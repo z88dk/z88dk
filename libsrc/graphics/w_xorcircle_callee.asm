@@ -49,8 +49,10 @@
 		
 		
 .asmentry
-                ld      ix,w_xorpixel
+		push	af
                 call    swapgfxbk
+		pop	af
+                ld      ix,w_xorpixel
                 call    w_draw_circle
                 jp      __graphics_end
 

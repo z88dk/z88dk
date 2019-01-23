@@ -44,8 +44,10 @@
 		
 		
 .asmentry
-                ld      ix,respixel
+		push	af
                 call    swapgfxbk
+		pop	af
+                ld      ix,respixel
                 call    draw_circle
                 jp      __graphics_end
 
