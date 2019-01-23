@@ -4,33 +4,17 @@
 ;       (C) 1995-1998 D.J.Morris
 ;
 ;	HiRez, NO radius correction square pixels assumed
+;	Opt by Stefano, 2019: no table on stack, index register is now used for plot sub
 ;
 ;	$Id: w_dcircle_square.asm $
 ;
 
 
-        SECTION code_graphics
+	SECTION code_clib
 	PUBLIC w_draw_circle
 	EXTERN l_graphics_cmp
 
-DEFVARS 0
-{
-        x0l     ds.b    1
-        x0h     ds.b    1
-        y0l     ds.b    1
-        y0h     ds.b    1
-        rlv      ds.b    1
-        rh      ds.b    1
-        cxl     ds.b    1
-        cxh     ds.b    1
-        dal     ds.b    1
-        dahi    ds.b    1
-        scale   ds.b    1
-}
 
-
-
-;iy points to table on stack (above)
 
 ;Entry:
 ;       de = x0, hl = y0, bc = radius, a = scale factor
@@ -38,59 +22,55 @@ DEFVARS 0
 ;       ix=plot routine
 
 .w_draw_circle
-		ld iy,-11   ;create buffer on stack
-		add iy,sp
-		ld sp,iy
+		;ld	(w_pix+1),ix
 
-		ld (iy+x0l),e
-		ld (iy+x0h),d
-		ld (iy+y0l),l
-		ld (iy+y0h),h
-		ld (iy+rlv),c
-		ld (iy+rh),b
-		ld (iy+scale),a        ;step factor - usually 1
-
-		call l9900
-		ld hl,11
-		add hl,sp
-		ld sp,hl
-		ret
+;		ld ix,-11   ;create buffer on stack
+;		add ix,sp
+;		ld sp,ix
+		ld a,1
+		ld (scale),a        ;step factor - usually 1
+		
+		ld (x0l),de
+		ld (y0l),hl
+		ld (rlv),bc
+		
+		;call l9900
+		;ld hl,11
+		;add hl,sp
+		;ld sp,hl
+		;ret
 
 ;Line 9900
 .l9900
-		ld (iy+cxl),0
-		ld (iy+cxh),0
+		xor a
+		ld (cxl),a
+		ld (cxh),a
 		srl b
 		rr c
-		ld (iy+dal),c
-		ld (iy+dahi),b
+		ld (dal),bc
 ;Line 9905
 .l9905
-		ld b,(iy+rh)
-		ld c,(iy+rlv)
-		ld d,(iy+cxh)
-		ld e,(iy+cxl)
+		ld bc,(rlv)
+		ld de,(cxl)
 		ld h,b
 		ld l,c
 		call l_graphics_cmp
 		ret nc
 ;Line 9910
-		bit 7,(iy+dahi)
+		ld	a,(dahi)
+		bit 7,a
 		jr z,l9915
 
-		ld c,(iy+dal)
-		ld b,(iy+dahi)
-		ld e,(iy+rlv)
-		ld h,(iy+rh)
+		ld bc,(dal)
+		ld hl,(rlv)
 		add hl,bc
 		ld b,h
 		ld c,l
-		ld (iy+dal),c
-		ld (iy+dahi),b
+		ld (dal),bc
 
-		ld d,(iy+rh)
-		ld e,(iy+rlv)
-		ld c,(iy+scale)
+		ld de,(rlv)
+		ld a,(scale)
+		ld c,a
 		ld b,0
 		ld h,d
 		ld l,e
@@ -98,29 +78,23 @@ DEFVARS 0
 		sbc hl,bc
 		ld b,h
 		ld c,l
-		ld (iy+rlv),c
-		ld (iy+rh),b
+		ld (rlv),bc
 ;Line 9915
 .l9915
-		ld b,(iy+dahi)
-		ld c,(iy+dal)
+		ld bc,(dal)
 		dec bc
 		ld h,b
 		ld l,c
-		ld d,(iy+cxh)
-		ld e,(iy+cxl)
+		ld de,(cxl)
 		or a
 		sbc hl,de
 		ld b,h
 		ld c,l
-		ld (iy+dal),c
-		ld (iy+dahi),b
+		ld (dal),bc
 
 .l9920
-		ld b,(iy+y0h)
-		ld c,(iy+y0l)
-		ld d,(iy+rh)
-		ld e,(iy+rlv)
+		ld bc,(y0l)
+		ld de,(rlv)
 		;srl d
 		;rr e
 		ld h,b
@@ -128,10 +102,8 @@ DEFVARS 0
 		add hl,de
 		push hl
 
-		ld b,(iy+x0h)
-		ld c,(iy+x0l)
-		ld d,(iy+cxh)
-		ld e,(iy+cxl)
+		ld bc,(x0l)
+		ld de,(cxl)
 		ld h,b
 		ld l,c
 		add hl,de
@@ -139,10 +111,8 @@ DEFVARS 0
 
 		call do_w_plot; (cx,r)
 
-		ld b,(iy+y0h)
-		ld c,(iy+y0l)
-		ld d,(iy+rh)
-		ld e,(iy+rlv)
+		ld bc,(y0l)
+		ld de,(rlv)
 		;srl d
 		;rr e
 		ld h,b
@@ -150,10 +120,8 @@ DEFVARS 0
 		add hl,de
 		push hl
 
-		ld b,(iy+x0h)
-		ld c,(iy+x0l)
-		ld d,(iy+cxh)
-		ld e,(iy+cxl)
+		ld bc,(x0l)
+		ld de,(cxl)
 		ld h,b
 		ld l,c
 		or a
@@ -162,10 +130,8 @@ DEFVARS 0
 
 		call do_w_plot; (-cx,r)
 
-		ld b,(iy+y0h)
-		ld c,(iy+y0l)
-		ld d,(iy+rh)
-		ld e,(iy+rlv)
+		ld bc,(y0l)
+		ld de,(rlv)
 		;srl d
 		;rr e
 		ld h,b
@@ -174,10 +140,8 @@ DEFVARS 0
 		sbc hl,de
 		push hl
 
-		ld b,(iy+x0h)
-		ld c,(iy+x0l)
-		ld d,(iy+cxh)
-		ld e,(iy+cxl)
+		ld bc,(x0l)
+		ld de,(cxl)
 		ld h,b
 		ld l,c
 		add hl,de
@@ -185,10 +149,8 @@ DEFVARS 0
 
 		call do_w_plot; (cx,-r)
 
-		ld b,(iy+y0h)
-		ld c,(iy+y0l)
-		ld d,(iy+rh)
-		ld e,(iy+rlv)
+		ld bc,(y0l)
+		ld de,(rlv)
 		;srl d
 		;rr e
 		ld h,b
@@ -197,10 +159,8 @@ DEFVARS 0
 		sbc hl,de
 		push hl
 
-		ld b,(iy+x0h)
-		ld c,(iy+x0l)
-		ld d,(iy+cxh)
-		ld e,(iy+cxl)
+		ld bc,(x0l)
+		ld de,(cxl)
 		ld h,b
 		ld l,c
 		or a
@@ -210,11 +170,8 @@ DEFVARS 0
 		call do_w_plot; (-cx,-r)
 
 
-
-		ld b,(iy+y0h)
-		ld c,(iy+y0l)
-		ld d,(iy+cxh)
-		ld e,(iy+cxl)
+		ld bc,(y0l)
+		ld de,(cxl)
 		;srl d
 		;rr e
 		ld h,b
@@ -222,10 +179,8 @@ DEFVARS 0
 		add hl,de
 		push hl
 
-		ld b,(iy+x0h)
-		ld c,(iy+x0l)
-		ld d,(iy+rh)
-		ld e,(iy+rlv)
+		ld bc,(x0l)
+		ld de,(rlv)
 		ld h,b
 		ld l,c
 		add hl,de
@@ -233,10 +188,8 @@ DEFVARS 0
 
 		call do_w_plot; (r,cx)
 
-		ld b,(iy+y0h)
-		ld c,(iy+y0l)
-		ld d,(iy+cxh)
-		ld e,(iy+cxl)
+		ld bc,(y0l)
+		ld de,(cxl)
 		;srl d
 		;rr e
 		ld h,b
@@ -244,10 +197,8 @@ DEFVARS 0
 		add hl,de
 		push hl
 
-		ld b,(iy+x0h)
-		ld c,(iy+x0l)
-		ld d,(iy+rh)
-		ld e,(iy+rlv)
+		ld bc,(x0l)
+		ld de,(rlv)
 		ld h,b
 		ld l,c
 		or a
@@ -256,10 +207,8 @@ DEFVARS 0
 
 		call do_w_plot; (-r,cx)
 
-		ld b,(iy+y0h)
-		ld c,(iy+y0l)
-		ld d,(iy+cxh)
-		ld e,(iy+cxl)
+		ld bc,(y0l)
+		ld de,(cxl)
 		;srl d
 		;rr e
 		ld h,b
@@ -268,10 +217,8 @@ DEFVARS 0
 		sbc hl,de
 		push hl
 
-		ld b,(iy+x0h)
-		ld c,(iy+x0l)
-		ld d,(iy+rh)
-		ld e,(iy+rlv)
+		ld bc,(x0l)
+		ld de,(rlv)
 		ld h,b
 		ld l,c
 		add hl,de
@@ -279,10 +226,8 @@ DEFVARS 0
 
 		call do_w_plot; (r,-cx)
 
-		ld b,(iy+y0h)
-		ld c,(iy+y0l)
-		ld d,(iy+cxh)
-		ld e,(iy+cxl)
+		ld bc,(y0l)
+		ld de,(cxl)
 		;srl d
 		;rr e
 		ld h,b
@@ -291,10 +236,8 @@ DEFVARS 0
 		sbc hl,de
 		push hl
 
-		ld b,(iy+x0h)
-		ld c,(iy+x0l)
-		ld d,(iy+rh)
-		ld e,(iy+rlv)
+		ld bc,(x0l)
+		ld de,(rlv)
 		ld h,b
 		ld l,c
 		or a
@@ -303,18 +246,42 @@ DEFVARS 0
 
 		call do_w_plot ; (-r,-cx)
 
-		ld b,(iy+cxh)
-		ld c,(iy+cxl)
-		ld e,(iy+scale)
+		ld bc,(cxl)
+		ld a,(scale)
+		ld e,a
 		ld d,0
 		ld h,b
 		ld l,c
 		add hl,de
 		ld b,h
 		ld c,l
-		ld (iy+cxh),b
-		ld (iy+cxl),c
+		ld (cxl),bc
 		jp l9905
 
+		
+	SECTION smc_clib
+	
 .do_w_plot
 		jp (ix)
+
+
+	SECTION bss_clib
+
+
+.x0l     defb    0
+.x0h     defb    0
+
+.y0l     defb    0
+.y0h     defb    0
+
+.rlv     defb    0
+.rh      defb    0
+
+.cxl     defb    0
+.cxh     defb    0
+
+.dal     defb    0
+.dahi    defb    0
+
+.scale   defb    0
+
