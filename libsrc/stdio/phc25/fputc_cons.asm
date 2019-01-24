@@ -26,7 +26,7 @@ ELSE
 	cp	13
 ENDIF
 	jr	nz,nocr
-	call	$108C
+	call	doputc
 IF STANDARDESCAPECHARS	
 	ld	a,13
 ELSE
@@ -39,4 +39,10 @@ ENDIF
 ;	ld	a,$----
 ;.nobs
 
-	jp	$108C
+.doputc
+	ld	e,a
+	ld 	a,(1)
+	cp  $af
+	ld	a,e
+	jp	z,$108C		; Western ROM
+	jp	$1089		; Japanese ROM
