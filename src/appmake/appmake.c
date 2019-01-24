@@ -396,7 +396,7 @@ int zcc_strrcspn(char *s, char *reject)
 }
 
 /* Generic change suffix routine - make sure name is long enough to hold the suffix */
-void suffix_change(char *name, char *suffix)
+void suffix_change(char *name, const char *suffix)
 {
     int index;
 
@@ -407,7 +407,7 @@ void suffix_change(char *name, char *suffix)
 }
 
 /* Variant for the generic change suffix routine */
-void any_suffix_change(char *name, char *suffix, char suffix_delimiter)
+void any_suffix_change(char *name, const char *suffix, char suffix_delimiter)
 {
     int index;
 
@@ -640,14 +640,11 @@ void writebyte(unsigned char c, FILE *fp)
         fputc(c,fp);
 }
 
-
-
 void writeword(unsigned int i, FILE *fp)
 {
     fputc(i%256,fp);
     fputc(i/256,fp);
 }
-
 
 void writestring(char *mystring, FILE *fp)
 {
@@ -658,13 +655,41 @@ void writestring(char *mystring, FILE *fp)
     }
 }
 
-
 void writelong(unsigned long i, FILE *fp)
 {
     writeword(i%65536,fp);
     writeword(i/65536,fp);
 }
 
+void writebyte_b(unsigned char c, uint8_t **pptr)
+{
+   uint8_t *ptr = *pptr;
+   *ptr++ = c;
+   *pptr = ptr; 
+}
+
+void writeword_b(unsigned int i, uint8_t **pptr)
+{
+   uint8_t *ptr = *pptr;
+   *ptr++ = i % 256;
+   *ptr++ = i / 256;
+   *pptr = ptr; 
+}
+
+void writestring_b(char *mystring, uint8_t **pptr)
+{
+    size_t c;
+
+    for (c=0; c < strlen(mystring); c++) {
+        writebyte_b(mystring[c],pptr);
+    }
+}
+
+void writelong_b(unsigned long i, uint8_t **pptr)
+{
+    writeword_b(i%65536,pptr);
+    writeword_b(i/65536,pptr);
+}
 
 
 void writeword_p(unsigned int i, FILE *fp,unsigned char *p)

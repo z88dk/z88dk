@@ -6,6 +6,13 @@
    sectors
  */
 
+// d88 media type
+#define MEDIA_TYPE_2D   0x00
+#define MEDIA_TYPE_2DD  0x10
+#define MEDIA_TYPE_2HD  0x20
+#define MEDIA_TYPE_144  0x30
+#define MEDIA_TYPE_UNK  0xff
+
 typedef struct {
         char title[17];
         uint8_t rsrv[9];

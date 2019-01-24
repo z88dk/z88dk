@@ -2,6 +2,8 @@
 stdio/spectrum/fgetc_cons
 stdio/spectrum/fputc_cons_rom_rst
 stdio/ts2068/fputc_cons
+stdio/ts2068/generic_console_scrollup
+stdio/spectrum/console_vars
 stdio/spectrum/getk
 stdio/spectrum/CRT_FONT
 stdio/spectrum/CRT_FONT_64

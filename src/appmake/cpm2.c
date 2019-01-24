@@ -31,7 +31,6 @@ option_t cpm2_options[] = {
 
 static struct formats   *get_format(const char *name);
 static void              dump_formats();
-static void              create_filename(const char *binary_name, char *cpm_filename, char force_com_extension);
 
 static cpm_discspec einstein_spec = {
     .sectors_per_track = 10,
@@ -229,10 +228,10 @@ static cpm_discspec col1_spec = {
 
 static cpm_discspec smc777_spec = {
     .sectors_per_track = 16,
-    .tracks = 80,
-    .sides = 1,
+    .tracks = 70,
+    .sides = 2,
     .sector_size = 256,
-    .gap3_length = 0x52,
+    .gap3_length = 0x17,
     .filler_byte = 0xe5,
     .boottracks = 2,
     .directory_entries = 128,
@@ -245,6 +244,19 @@ static cpm_discspec smc777_spec = {
 };
 
 
+static cpm_discspec plus3_spec = {
+    .sectors_per_track = 9,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 1,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+};
 
 
 
@@ -270,6 +282,7 @@ struct formats {
     { "nascomcpm", "Nascom CPM",         &nascom_spec, 0, NULL, 1 },
     { "mz2500cpm", "Sharp MZ2500 - CPM", &mz2500cpm_spec, 0, NULL, 1 },
     { "osborne1",  "Osborne 1",          &osborne_spec, 0, NULL, 1 },
+    { "plus3",     "Spectrum +3 173k",   &plus3_spec, 0, NULL, 1 },
     { "qc10",      "Epson QC-10, QX-10", &qc10_spec, 0, NULL, 1 },
     { "smc777",    "Sony SMC-70/SMC-777",&smc777_spec, 0, NULL, 1 },
     { "svi-40ss",   "SVI 40ss (174k)",   &svi40ss_spec, 0, NULL, 1 },
@@ -279,11 +292,13 @@ struct formats {
 
 struct container {
     const char        *name;
+    const char        *extension;
     const char        *description;
     int              (*writer)(cpm_handle *h, const char *filename);
 } containers[] = {
-    { "dsk",        "CPC extended .dsk format",    cpm_write_edsk },
-    { "raw",        "Raw image",                   cpm_write_raw },
+    { "dsk",        ".dsk", "CPC extended .dsk format",    cpm_write_edsk },
+    { "d88",        ".D88", "d88 format",                  cpm_write_d88 },
+    { "raw",        ".img", "Raw image",                   cpm_write_raw },
     { NULL, NULL, NULL }
 };
 
@@ -323,6 +338,26 @@ int cpm2_exec(char* target)
     return cpm_write_file_to_image(c_disc_format, c_disc_container, c_output_file, c_binary_name, c_crt_filename, c_boot_filename);
 }
 
+// TODO: Needs bootsector handling
+cpm_handle *cpm_create_with_format(const char *disc_format) 
+{
+    cpm_discspec* spec = NULL;
+    struct formats* f = &formats[0];
+
+    while (f->name != NULL) {
+        if (strcasecmp(disc_format, f->name) == 0) {
+            spec = f->spec;
+            break;
+        }
+        f++;
+    }
+    if (spec == NULL) {
+        return NULL;
+    }
+    return cpm_create(spec);
+}
+
+
 int cpm_write_file_to_image(const char *disc_format, const char *container, const char* output_file, const char* binary_name, const char* crt_filename, const char* boot_filename)
 {
     cpm_discspec* spec = NULL;
@@ -359,15 +394,14 @@ int cpm_write_file_to_image(const char *disc_format, const char *container, cons
     }
 
 
-
     if (output_file == NULL) {
         strcpy(disc_name, binary_name);
-        suffix_change(disc_name, ".dsk");
+        suffix_change(disc_name, c->extension);
     } else {
         strcpy(disc_name, output_file);
     }
 
-    create_filename(binary_name, cpm_filename, f->force_com_extension);
+    cpm_create_filename(binary_name, cpm_filename, f->force_com_extension, 0);
 
     // Open the binary file
     if ((binary_fp = fopen_bin(binary_name, crt_filename)) == NULL) {
@@ -418,7 +452,7 @@ int cpm_write_file_to_image(const char *disc_format, const char *container, cons
     return 0;
 }
 
-static void create_filename(const char* binary, char* cpm_filename, char force_com_extension)
+void cpm_create_filename(const char* binary, char* cpm_filename, char force_com_extension, char include_dot)
 {
     int count = 0;
     int dest = 0;
@@ -437,8 +471,13 @@ static void create_filename(const char* binary, char* cpm_filename, char force_c
         count++;
     }
     dest = count;
-    while (dest < 8) {
-        cpm_filename[dest++] = ' ';
+
+    if ( include_dot ) {
+        cpm_filename[dest++] = '.';
+    } else {
+       while (dest < 8) {
+           cpm_filename[dest++] = ' ';
+       }
     }
     if (force_com_extension) {
         cpm_filename[dest++] = 'C';
@@ -449,7 +488,7 @@ static void create_filename(const char* binary, char* cpm_filename, char force_c
             count++;
         }
         if (count < strlen(binary)) {
-            while (dest < 12 && count < strlen(binary)) {
+            while (dest < (12 + include_dot) && count < strlen(binary)) {
                 if (binary[count] == '.') {
                     count++;
                     continue;
@@ -463,8 +502,11 @@ static void create_filename(const char* binary, char* cpm_filename, char force_c
                 count++;
             }
         }
-        while (dest < 12) {
-            cpm_filename[dest++] = ' ';
+        if ( !include_dot ) {
+            while (dest < 12) {
+                cpm_filename[dest++] = ' ';
+            }
         }
     }
+    cpm_filename[dest++] = 0;
 }

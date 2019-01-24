@@ -274,7 +274,9 @@ zxrom.lib:
 	@echo ''
 	@echo '--- Building ZXROM Library ---'
 	@echo ''
-	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/zxrom @$(LISTFILE_DIRECTORY)/zxrom.lst
+	$(RM) stdio/spectrum/generic_console_scrollup.o
+	$(LIBLINKER) -DFORzx -DNOROMCALLS -x$(OUTPUT_DIRECTORY)/zxrom @$(LISTFILE_DIRECTORY)/zxrom.lst
+	$(RM) stdio/spectrum/generic_console_scrollup.o
 
 # ZXVGS - yarek
 zxvgs.lib:

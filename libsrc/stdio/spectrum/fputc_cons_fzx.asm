@@ -11,6 +11,8 @@
 		EXTERN	__fzx_puts_newline
 		EXTERN	call_rom3
 		EXTERN	CRT_FONT_FZX
+		
+	EXTERN	generic_console_scrollup
 
 ; Erase the previous character (used by fgets_cons)
 fgets_cons_erase_character_fzx:
@@ -135,8 +137,9 @@ scroll:
 	sub	c
 	ld	(ix+7),a
 	; now to scroll by the right amount (for the moment just do a character)
-	call	call_rom3
-	defw	3582
+	;call	call_rom3
+	;defw	3582
+	call generic_console_scrollup
 	pop	af
 	jr	loop
 

@@ -490,8 +490,8 @@ extern void         exit_log(int code, char *fmt, ...);
 extern long         parameter_search(const char *filen,const  char *ext,const char *target);
 extern FILE        *fopen_bin(const char *fname,const  char *crtfile);
 extern long         get_org_addr(char *crtfile);
-extern void         suffix_change(char *name, char *suffix);
-extern void         any_suffix_change(char *name, char *suffix, char schar);
+extern void         suffix_change(char *name, const char *suffix);
+extern void         any_suffix_change(char *name, const char *suffix, char schar);
 
 extern void        *must_malloc(size_t sz);
 extern void        *must_realloc(void *p, size_t sz);
@@ -513,6 +513,12 @@ extern void         writestring_pk(char *mystring, FILE *fp,unsigned char *p);
 extern void         writebyte_cksum(unsigned char c, FILE *fp, unsigned long *cksum);
 extern void         writeword_cksum(unsigned int i, FILE *fp, unsigned long *cksum);
 extern void         writestring_cksum(char *mystring, FILE *fp, unsigned long *cksum);
+
+
+extern void         writebyte_b(unsigned char c, uint8_t **pptr);
+extern void         writeword_b(unsigned int i, uint8_t **pptr);
+extern void         writelong_b(unsigned long i, uint8_t **pptr);
+extern void         writestring_b(char *mystring, uint8_t **pptr);
 
 extern void         raw2wav(char *rawfilename);
 

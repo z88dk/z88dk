@@ -24,6 +24,11 @@
 	EXTERN	CRT_FONT
 	EXTERN	CRT_FONT_64
 	EXTERN	__zx_console_attr
+	EXTERN	__zx_32col_font
+	EXTERN	__zx_64col_font
+	EXTERN	__zx_32col_udgs
+	EXTERN	__ts2068_hrgmode
+	EXTERN	generic_console_scrollup
 
 ;
 ; Entry:	a= char to print
@@ -32,7 +37,7 @@
 .fputc_cons_native
 IF FORts2068
 	in	a,(255)
-	ld	hl,hrgmode
+	ld	hl,__ts2068_hrgmode
 	ld	(hl),0
 	and	7
 	cp	6
@@ -76,7 +81,7 @@ ENDIF
 	add	hl,hl
 	add	hl,hl
 	add	hl,hl
-	ld	bc,(udgaddr)
+	ld	bc,(__zx_32col_udgs)
 	add	hl,bc
 	jp	print32_entry
 .putit_out2
@@ -114,7 +119,7 @@ ENDIF
 	add	hl,hl  
 	add	hl,hl  
 	add	hl,hl  
-	ld	bc,(font64addr)
+	ld	bc,(__zx_64col_font)
 	add	hl,bc
 
 	; a = mask
@@ -146,7 +151,7 @@ ENDIF
 	dec	h
 IF FORts2068
 	; No __zx_console_attribute setting for hires mode
-	ld	a,(hrgmode)
+	ld	a,(__ts2068_hrgmode)
 	and	a
 	jr	nz,cbak
 ENDIF
@@ -166,7 +171,7 @@ ENDIF
 	bit	6,l  
 	jr	z,char4
 IF FORts2068
-	ld	a,(hrgmode)
+	ld	a,(__ts2068_hrgmode)
 	and	a
 	jr	z,cbak1
 	bit	7,l
@@ -195,7 +200,7 @@ ENDIF
 	add	hl,hl
 	add	hl,hl
 	add	hl,hl
-	ld	bc,(fontaddr)
+	ld	bc,(__zx_32col_font)
 	add	hl,bc
 .print32_entry
 	ld	b,8
@@ -214,7 +219,7 @@ ENDIF
 	dec	d
 	ld	hl,(chrloc)
 IF FORts2068
-	ld	a,(hrgmode)
+	ld	a,(__ts2068_hrgmode)
 	and	a
 	jr	nz,increment
 ENDIF
@@ -259,7 +264,7 @@ ENDIF
 just_calculate:
 IF FORts2068
 	; In highres mode, we've got to divide again
-	ld	a,(hrgmode)
+	ld	a,(__ts2068_hrgmode)
 	and	a
 	jr	z,not_hrg_calc
 	srl	l
@@ -279,7 +284,7 @@ ENDIF
 IF FORts2068
 	pop	af
 	ret	z
-	ld	a,(hrgmode)
+	ld	a,(__ts2068_hrgmode)
 	and	$20
 	add	h
 	ld	h,a
@@ -293,91 +298,11 @@ ENDIF
 ; Blanking the bottom row..
 .scrollup
  	push	hl
-IF FORts2068
-	ld	a,(hrgmode)
-	and	a
-	jr	nz,hrgscroll
-ENDIF
-	ld	a,($dff)
-	cp	$17
-	jr	nz,ts2068_rom
-	call	call_rom3
-	defw	3582	;scrollup
-     	pop	hl
-	ret
-.ts2068_rom
-	call	call_rom3
-	defw	$939	; TS2068 scrollup
+	call generic_console_scrollup
 	pop	hl
 	ret
 
-IF FORts2068
-	EXTERN	zx_rowtab
-.hrgscroll
-	push	ix
-        ld      ix,zx_rowtab
-        ld      a,8
-.outer_loop
-        push    af
-        push    ix
-        ld      a,23
-.inner_loop
-        ld      e,(ix+16)
-        ld      d,(ix+17)
-        ex      de,hl
-        ld      e,(ix+0)
-        ld      d,(ix+1)
-        ld      bc,32
-        ldir
-; second display
-        dec     de
-        dec     hl
-        set     5,d
-        set     5,h
-        ld      bc,32
-        lddr
-        ld      bc,16
-        add     ix,bc
-        dec     a
-        jr      nz,inner_loop
-        pop     ix
-        pop     af
-        inc     ix
-        inc     ix
-        dec     a
-        jr      nz,outer_loop
-; clear
-        ld      ix,zx_rowtab + (192 - 8) * 2
-        ld      a,8
-.clear_loop
-        push    ix
-        ld      e,(ix+0)
-        ld      d,(ix+1)
-        ld      h,d
-        ld      l,e
-        ld      (hl),0
-        inc     de
-        ld      bc,31
-        ldir
-; second display
-        dec hl
-        dec de
-        set     5,d
-        set     5,h
-        ex      de,hl
-        ld      (hl),0
-        ld      bc,31
-        lddr
-        pop     ix
-        inc     ix
-        inc     ix
-        dec     a
-        jr      nz,clear_loop
-	pop	ix
-        pop     hl
-        ret
-
-ENDIF
+	
 
 ; This nastily inefficient table is the code table for the routines
 ; Done this way for future! Expansion
@@ -486,7 +411,7 @@ ENDIF
 	ld      (hl),l
 	ldir
 IF FORts2068
-	ld	a,(hrgmode)
+	ld	a,(__ts2068_hrgmode)
 	and	a
 	jr	nz,cls_hrg
 ENDIF
@@ -589,9 +514,9 @@ ENDIF
 	and	a
 	ld	de,print32
 	sbc	hl,de
-	ld	de,fontaddr
+	ld	de,__zx_32col_font
 	jr	nc,dofont_setit
-	ld	de,font64addr
+	ld	de,__zx_64col_font
 .dofont_setit
 	ld	hl,(params)
 	ex	de,hl
@@ -601,7 +526,7 @@ ENDIF
 	ret
 
 .doudg	ld	hl,(params)
-	ld	(udgaddr),hl
+	ld	(__zx_32col_udgs),hl
 	ret
 
 .setfont
@@ -716,15 +641,9 @@ ENDIF
 ; Bit 1 = scroll disabled
 .control_flags	defb	0
 
-IF FORts2068
-.hrgmode	defb	0
-ENDIF
 
 	SECTION data_clib
 
-.fontaddr	defw	CRT_FONT
-.font64addr	defw	CRT_FONT_64
-.udgaddr	defw	65368
 .print_routine	defw	print64
 .deltax		defb	1		;how much to move in x 
 

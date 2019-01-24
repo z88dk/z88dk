@@ -5,7 +5,7 @@
 ;
 ; Stefano Bodrato, 19/02/2009
 ;
-; $Id: spec_crt0_rom_isr.as1,v 1.3 2009-06-10 17:26:05 stefano Exp $
+; $Id: spec_crt0_rom_isr.asm $
 ;
 
 
@@ -18,15 +18,41 @@
         ld      ($5c78),hl
         ld      a,h
         or      l
+		ld		a,l
         jr      nz,key_chk
         ld      hl,$5c7a
         inc     (hl)
-        
+
+
 key_chk:
 ;--- --- --- --- cut here to remove the keyboard handler --- --- --- --- 
+IF !DEFINED_tinykbdhandler
+;--- --- --- --- 
+        EXTERN in_Inkey
+		
         push    bc
         push    de
-        
+        and 3		; crap way to slow down the keyboard scanning a little bit
+        ld	a,0
+        jr nz,kfound
+        call	in_Inkey
+        ld		a,l
+kfound:
+        ld      ($5C08),a
+        pop     de
+        pop     bc
+
+;--- --- --- --- 
+ELSE
+;--- --- --- --- 
+
+        push    bc
+        push    de
+
+		and 3		; crap way to slow down the keyboard scanning a little bit
+		ld	a,0
+		jr nz,kfound
+		
         ld      hl,r1
         ld      c,$fe   ; lower part of keyboard port address is always $fe
         ld      d,8
@@ -43,6 +69,8 @@ kfound:
         ld      ($5C08),a
         pop     de
         pop     bc
+;--- --- --- ---
+ENDIF
 ;--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
         pop     hl	; End of interrrupt
@@ -51,7 +79,8 @@ kfound:
         ret
 
 
-
+		
+IF DEFINED_tinykbdhandler
 ;--- --- --- --- cut here to remove the keyboard handler --- --- --- --- 
 
 ; Read keyboard row, used by interrupt service routine
@@ -122,4 +151,5 @@ r8:     defb    $7f
         defb    'b'
 
 ;--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+ENDIF
 

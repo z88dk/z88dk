@@ -8,24 +8,14 @@
 ;	Scrollup
 ;
 ;
-;	$Id: f_ansi_scrollup.asm,v 1.6 2016-04-04 18:31:23 dom Exp $
+;	$Id: f_ansi_scrollup.asm $
 ;
 
 	SECTION	code_clib
 	PUBLIC	ansi_SCROLLUP
 
-	EXTERN  call_rom3
+	EXTERN	generic_console_scrollup
 
 
 .ansi_SCROLLUP
-	 ld		a,($dff)
-	 cp		$17
-	 jr		nz,ts2068_rom
-	 call    call_rom3
-	 defw	3582	;scrollup
-	 ret
-.ts2068_rom
-	 call    call_rom3
-     	defw	$939	; TS2068 scrollup
-	 ret
- 
+	jp generic_console_scrollup

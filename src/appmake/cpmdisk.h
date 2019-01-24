@@ -29,10 +29,13 @@ extern void cpm_write_boot_track(cpm_handle *h, void *data, size_t len);
 extern void cpm_write_file(cpm_handle *h, char filename[11], void *data, size_t len);
 extern int cpm_write_raw(cpm_handle *h, const char *filename);
 extern int cpm_write_edsk(cpm_handle *h, const char *filename);
+extern int cpm_write_d88(cpm_handle *h, const char *filename);
 extern void cpm_free(cpm_handle *h);
 
+cpm_handle *cpm_create_with_format(const char *disc_format);
 int cpm_write_file_to_image(const char *disc_format, const char *container, const char *output_file, const char *binary_name, const char *crt_filename, const char *boot_filename);
 void cpm_write_sector(cpm_handle *h, int track, int sector, int head, void *data);
+void cpm_create_filename(const char *binary_name, char *cpm_filename, char force_com_extension, char include_dot);
 
 #endif
 

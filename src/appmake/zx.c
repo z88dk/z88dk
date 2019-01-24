@@ -103,6 +103,7 @@ static char tap = 0;   // .tap tape
 static char sna = 0;   // .sna 48k/128k snapshot
 static char dot = 0;   //  esxdos dot command
 static char bin = 0;   // .bin output binaries with banks correctly merged
+static char plus3 = 0; // Generate +3 disc
 
 /* Options that are available for this module */
 option_t zx_options[] = {
@@ -136,6 +137,7 @@ option_t zx_options[] = {
     { 0,  "clean",    "Remove consumed source binaries\n", OPT_BOOL, &zxc.clean },
 
     { 0,  "dot",      "Make esxdos dot command instead of .tap\n", OPT_BOOL, &dot },
+    { 0,  "plus3",    "Make Spectrum +3 .dsk instead of .tap\n", OPT_BOOL, &plus3 },
 
     { 0,  "audio",     "Create also a WAV file",    OPT_BOOL,  &zxt.audio },
     { 0,  "ts2068",    "TS2068 BASIC relocation (if possible)",  OPT_BOOL,  &zxt.ts2068 },
@@ -187,13 +189,16 @@ int zx_exec(char *target)
 
     // generate output
 
-    tap = !dot && !sna && !bin;
+    tap = !dot && !sna && !bin && !plus3;
 
     if (tap && (zxc.main_fence > 0))
         fprintf(stderr, "Warning: Main-fence is ignored for tap compiles\n");
 
     if (tap)
         return zx_tape(&zxc, &zxt);
+
+    if (plus3)
+        return zx_plus3(&zxc, &zxt);
 
     // output formats below need banked memory model
 
