@@ -18,6 +18,6 @@ to install z88dk.
 
 `sdcc-9958-z88dk.patch` is the previous zsdcc standard patch, retained for comparison and building against sdcc r9958.
 
-`sdcc-10892-z88dk-peep.patch` has been submitted as sdcc [feature request # 289](https://sourceforge.net/p/sdcc/patches/289/) for review, test, and integrate from that end. This file is retained for the record. z88dk does not normally use the sdcc peephole optimisation, so these patches remain optional.
+`sdcc-10892-z88dk-peep.patch` has been submitted as sdcc [feature request # 289](https://sourceforge.net/p/sdcc/patches/289/) for review, test, and integrate from that end. This file is retained for the record. z88dk does not normally use the sdcc peephole optimiser, so these patches remain optional.
 
-`sdcc-z88dk.patch` = `sdcc-9958-z88dk.patch` - (previously committed additions and fixes to sdcc for Z88DK + `sdcc-10892-z88dk-peep.patch`)  Essentially, the remaining patch items are just those things which are Z88DK specific, which don't make sense to push into sdcc.
+`sdcc-z88dk.patch` = `sdcc-9958-z88dk.patch` - previously committed additions and fixes to sdcc for Z88DK - `sdcc-10892-z88dk-peep.patch`.  Essentially, the patch items remaining are just those things which are zsdcc specific, which don't make sense to push into sdcc.
