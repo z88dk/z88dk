@@ -21,11 +21,9 @@
 IF STANDARDESCAPECHARS
 	cp	13
 	jr	nz,not_return
-	ld	a,10
+	ld	l,10
 .not_return
 ENDIF
-	and	a
-	ret	z
 	xor	a
 	ld	(23560),a
 	ret
