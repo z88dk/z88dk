@@ -1,0 +1,89 @@
+/*
+ *        Pasopia generator
+ *
+ *        $Id: pasopia7.c,v 1.6 2016-06-26 00:46:55 aralbrec Exp $
+ */
+
+#include "appmake.h"
+
+
+static char             *binname      = NULL;
+static char             *crtfile      = NULL;
+static char             *outfile      = NULL;
+static int               origin       = -1;
+static char              help         = 0;
+
+
+/* Options that are available for this module */
+option_t pasopia7_options[] = {
+    { 'h', "help",     "Display this help",          OPT_BOOL,  &help},
+    { 'b', "binfile",  "Linked binary file",         OPT_STR,   &binname },
+    { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
+    { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
+    {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
+    {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
+};
+
+static cpm_discspec pasopia_spec = {
+    .sectors_per_track = 16,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 1024,
+    .byte_size_extents = 0,
+    .first_sector_offset = 1,
+};
+
+
+int pasopia7_exec(char *target)
+{
+    char    buf[4096] = {0};
+    char    filename[FILENAME_MAX+1];
+    FILE    *fpin;
+    cpm_handle *h;
+    long    pos;
+    int     c;
+    int     i;
+    int     len, blocklen;
+    int     cksum;
+
+    if ( help )
+        return -1;
+
+    if ( binname == NULL ) {
+        return -1;
+    }
+
+    strcpy(filename, binname);
+
+    if ( ( fpin = fopen_bin(binname, crtfile) ) == NULL ) {
+        exit_log(1,"Cannot open binary file <%s>\n",binname);
+    }
+
+    if (fseek(fpin, 0, SEEK_END)) {
+        fclose(fpin);
+        exit_log(1,"Couldn't determine size of file\n");
+    }
+
+    pos = ftell(fpin);
+    fseek(fpin, 0L, SEEK_SET);
+    fread(buf, 1, 4096, fpin);
+    fclose(fpin);
+
+
+    h = cpm_create(&pasopia_spec);
+
+    for ( i = 0; i < 4; i++ ) {
+        cpm_write_sector(h, 1, i, 0, buf + i * 256);
+    }
+
+    suffix_change(filename, ".dsk");
+    cpm_write_edsk(h, filename);
+
+    return 0;
+}
+
