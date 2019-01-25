@@ -41,15 +41,13 @@ static cpm_discspec pasopia_spec = {
 
 int pasopia7_exec(char *target)
 {
-    char    buf[4096] = {0};
+    char    *buf;
     char    filename[FILENAME_MAX+1];
     FILE    *fpin;
     cpm_handle *h;
     long    pos;
-    int     c;
-    int     i;
-    int     len, blocklen;
     int     cksum;
+    int     t,s,w;
 
     if ( help )
         return -1;
@@ -71,18 +69,29 @@ int pasopia7_exec(char *target)
 
     pos = ftell(fpin);
     fseek(fpin, 0L, SEEK_SET);
+    buf = must_malloc(pos);
     fread(buf, 1, 4096, fpin);
     fclose(fpin);
 
 
     h = cpm_create(&pasopia_spec);
 
-    for ( i = 0; i < 4; i++ ) {
-        cpm_write_sector(h, 1, i, 0, buf + i * 256);
+    t = 1;
+    s = 0;
+    w = 0;
+    while ( w < pos ) {
+        cpm_write_sector(h, t, s, 0, buf + w);
+        s++;
+        if ( s == 16 ) {
+            s = 0;
+            t++;
+        }
+        w += 256;
     }
 
     suffix_change(filename, ".dsk");
     cpm_write_edsk(h, filename);
+    free(buf);
 
     return 0;
 }

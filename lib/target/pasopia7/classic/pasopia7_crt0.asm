@@ -1,11 +1,11 @@
 ;
-;	Startup for test emulator
+;	Startup for Pasopia 7
 ;
-;	$Id: test_crt0.asm,v 1.12 2016-06-21 20:49:07 dom Exp $
+;	Just limited to 4k at the moment for experimentation
+;	Will have a 64k loading mode as well
 
 
-	module pasopia7_crt0
-	org	  0xd000
+	MODULE pasopia7_crt0
 
 
 ;--------
@@ -28,19 +28,39 @@
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = 65280
 	defc	CRT_KEY_DEL = 127
+	defc	CRT_ORG_CODE = 0xd000
+        defc    CONSOLE_COLUMNS = 40
+        defc    CONSOLE_ROWS = 24
 	defc	__CPU_CLOCK = 4000000
         INCLUDE "crt/classic/crt_rules.inc"
 
+	org	CRT_ORG_CODE	
+
 	di
+	ld	hl,$d000	;Just read 2k into d000 to give us a bit extra
+	ld	de,$0101
+	ld	bc,$4012
+	call	$41f9
+	ld	c,$13
+	call	$41f9
+	ld	hl,$d800	;Just read 2k into d000 to give us a bit extra
+	ld	de,$0201
+	ld	bc,$4012
+	call	$41f9
+	ld	c,$13
+	call	$41f9
+
+
+	ld	a,0
+	ld	(__pasopia_page),a
+	out	($3c),a
 
 program:
         INCLUDE "crt/classic/crt_init_sp.asm"
         INCLUDE "crt/classic/crt_init_atexit.asm"
 	call    crt0_init_bss
 	ld	(exitsp),sp
-IF !__CPU_R2K__
     	ei
-ENDIF
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of
 ; the compiled program and the stack pointer
@@ -60,5 +80,9 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 	
 	INCLUDE	"crt/classic/crt_section.asm"
 
-	SECTION rodata_clib
-end:            defb    0               ; null file name
+	SECTION	bss_crt
+	PUBLIC	__pasopia_page
+__pasopia_page:	defb	0
+
+	;INCLUDE	"target/pasopia7/classic/bootstrap.asm"
+

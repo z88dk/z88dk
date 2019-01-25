@@ -977,6 +977,7 @@ pasopia7_clib.lib:
 	@echo '--- Building Toshiba Pasopia7 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
+	@$(RM) -f video/mc6845/*.o
 	$(call buildgeneric,pasopia7)
 	TARGET=pasopia7 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORpasopia7 -x$(OUTPUT_DIRECTORY)/pasopia7_clib @$(LISTFILE_DIRECTORY)/pasopia7.lst
 
