@@ -979,6 +979,7 @@ pasopia7_clib.lib:
 	$(MAKE) gfxdeps
 	@$(RM) -f video/mc6845/*.o
 	$(call buildgeneric,pasopia7)
+	$(MAKE) -C games TARGET=pasopia7
 	TARGET=pasopia7 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORpasopia7 -x$(OUTPUT_DIRECTORY)/pasopia7_clib @$(LISTFILE_DIRECTORY)/pasopia7.lst
 
 # VTech VZ700- dom

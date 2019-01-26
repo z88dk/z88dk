@@ -1,6 +1,11 @@
+stdio/inkey/fgetc_cons
+stdio/inkey/getk
 stdio/pasopia7/fputc_cons_native
 stdio/pasopia7/generic_console
 @font/font_8x8/font_8x8.lst
 @stdio/stdio.lst
+@input/input_keyboard.lst
+games/pasopia7/joystick
+@games/games.lst
 @z80.lst
 @video/mc6845/mc6845.lst

@@ -13,6 +13,7 @@
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
 
+		EXTERN		generic_console_flags
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
 		EXTERN		__pasopia_page
@@ -21,7 +22,20 @@
 
 generic_console_ioctl:
 	scf
+	ret
+
 generic_console_set_inverse:
+	ld	a,(generic_console_flags)
+	rrca
+	rrca
+	rrca
+	rrca
+	and	8
+	ld	e,a
+	ld	a,(__pasopia7_attr)
+	and	@11110111
+	or	e
+	ld	(__pasopia7_attr),a
 	ret
 
 generic_console_set_ink:
