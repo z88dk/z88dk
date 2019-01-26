@@ -7,5 +7,15 @@ stdio/pasopia7/generic_console
 @input/input_keyboard.lst
 games/pasopia7/joystick
 @games/games.lst
-@z80.lst
+graphics/generic_console/getmaxx1
+graphics/generic_console/getmaxy1
+graphics/generic_console/plotpixl1
+graphics/generic_console/respixl1
+graphics/generic_console/xorpixl1
+graphics/generic_console/pointxy1
+graphics/generic_console/swapgfxbk.asm
+graphics/dcircle2
+graphics/__gfx_coords
+@gfxbase.lst
 @video/mc6845/mc6845.lst
+@z80.lst

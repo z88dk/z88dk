@@ -27,11 +27,17 @@
 
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = 65280
+        defc    TAR__fputc_cons_generic = 1
 	defc	CRT_KEY_DEL = 127
 	defc	CRT_ORG_CODE = 0xd000
         defc    CONSOLE_COLUMNS = 40
-        defc    CONSOLE_ROWS = 24
+        defc    CONSOLE_ROWS = 25
 	defc	__CPU_CLOCK = 4000000
+
+	defc	GRAPHICS_CHAR_SET = 135
+	defc	GRAPHICS_CHAR_UNSET = 32
+	PUBLIC	GRAPHICS_CHAR_SET
+	PUBLIC	GRAPHICS_CHAR_UNSET
         INCLUDE "crt/classic/crt_rules.inc"
 
 	org	CRT_ORG_CODE	
