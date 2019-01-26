@@ -36,16 +36,19 @@ static cpm_discspec pasopia_spec = {
     .extent_size = 1024,
     .byte_size_extents = 0,
     .first_sector_offset = 1,
+    .alternate_sides = 0
 };
 
 
 int pasopia7_exec(char *target)
 {
     char    *buf;
+    char    bootbuf[512];
     char    filename[FILENAME_MAX+1];
-    FILE    *fpin;
+    char    bootname[FILENAME_MAX+1];
+    FILE    *fpin, *bootstrap_fp;
     cpm_handle *h;
-    long    pos;
+    long    pos, bootlen;
     int     cksum;
     int     t,s,w;
 
@@ -56,8 +59,29 @@ int pasopia7_exec(char *target)
         return -1;
     }
 
-    strcpy(filename, binname);
+    strcpy(bootname, binname);
+    suffix_change(bootname, "_BOOTSTRAP.bin");
+    if ( (bootstrap_fp=fopen_bin(bootname, crtfile) ) == NULL ) {
+        exit_log(1,"Can't open input file %s\n",bootname);
+    }
+    if ( fseek(bootstrap_fp,0,SEEK_END) ) {
+        fclose(bootstrap_fp);
+        fprintf(stderr,"Couldn't determine size of file\n");
+    }
+    bootlen = ftell(bootstrap_fp);
+    fseek(bootstrap_fp,0L,SEEK_SET);
 
+    if ( bootlen > 512 ) {
+        exit_log(1, "Bootstrap has length %d > 512", bootlen);
+    }
+    memset(bootbuf, 0, sizeof(bootbuf));
+    if ( fread(bootbuf, 1, bootlen, bootstrap_fp) != bootlen ) {
+        exit_log(1, "Cannot read whole bootstrap file");
+    }
+    fclose(bootstrap_fp);
+
+
+    strcpy(filename, binname);
     if ( ( fpin = fopen_bin(binname, crtfile) ) == NULL ) {
         exit_log(1,"Cannot open binary file <%s>\n",binname);
     }
@@ -70,19 +94,24 @@ int pasopia7_exec(char *target)
     pos = ftell(fpin);
     fseek(fpin, 0L, SEEK_SET);
     buf = must_malloc(pos);
-    fread(buf, 1, 4096, fpin);
+    fread(buf, 1, pos, fpin);
     fclose(fpin);
 
 
     h = cpm_create(&pasopia_spec);
 
-    t = 1;
+    // Write the bootstrap to track 1
+    cpm_write_sector(h, 1, 0, 0, bootbuf);
+    cpm_write_sector(h, 1, 1, 0, bootbuf + 256);
+
+    // Write input file
+    t = 2;
     s = 0;
     w = 0;
     while ( w < pos ) {
         cpm_write_sector(h, t, s, 0, buf + w);
         s++;
-        if ( s == 16 ) {
+        if ( s == 8) {
             s = 0;
             t++;
         }

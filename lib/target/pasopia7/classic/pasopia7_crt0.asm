@@ -1,8 +1,5 @@
 ;
 ;	Startup for Pasopia 7
-;
-;	Just limited to 4k at the moment for experimentation
-;	Will have a 64k loading mode as well
 
 
 	MODULE pasopia7_crt0
@@ -28,11 +25,12 @@
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = 65280
         defc    TAR__fputc_cons_generic = 1
-	defc	CRT_KEY_DEL = 127
-	defc	CRT_ORG_CODE = 0xd000
+	defc	CRT_KEY_DEL = 12
+	defc	CRT_ORG_CODE = 0
         defc    CONSOLE_COLUMNS = 40
         defc    CONSOLE_ROWS = 25
 	defc	__CPU_CLOCK = 4000000
+	defc	CLIB_FGETC_CONS_DELAY = 150
 
 	defc	GRAPHICS_CHAR_SET = 135
 	defc	GRAPHICS_CHAR_UNSET = 32
@@ -42,30 +40,79 @@
 
 	org	CRT_ORG_CODE	
 
-	di
-	ld	hl,$d000	;Just read 2k into d000 to give us a bit extra
-	ld	de,$0101
-	ld	bc,$4012
-	call	$41f9
-	ld	c,$13
-	call	$41f9
-	ld	hl,$d800	;Just read 2k into d000 to give us a bit extra
-	ld	de,$0201
-	ld	bc,$4012
-	call	$41f9
-	ld	c,$13
-	call	$41f9
+if (ASMPC<>$0000)
+        defs    CODE_ALIGNMENT_ERROR
+endif
 
+        jp      program
 
-	ld	a,0
-	ld	(__pasopia_page),a
-	out	($3c),a
+        defs    $0008-ASMPC
+if (ASMPC<>$0008)
+        defs    CODE_ALIGNMENT_ERROR
+endif
+        jp      restart08
+
+        defs    $0010-ASMPC
+if (ASMPC<>$0010)
+        defs    CODE_ALIGNMENT_ERROR
+endif
+        jp      restart10
+        defs    $0018-ASMPC
+if (ASMPC<>$0018)
+        defs    CODE_ALIGNMENT_ERROR
+endif
+        jp      restart18
+
+        defs    $0020-ASMPC
+if (ASMPC<>$0020)
+        defs    CODE_ALIGNMENT_ERROR
+endif
+        jp      restart20
+
+    defs        $0028-ASMPC
+if (ASMPC<>$0028)
+        defs    CODE_ALIGNMENT_ERROR
+endif
+        jp      restart28
+
+        defs    $0030-ASMPC
+if (ASMPC<>$0030)
+        defs    CODE_ALIGNMENT_ERROR
+endif
+        jp      restart30
+
+        defs    $0038-ASMPC
+if (ASMPC<>$0038)
+        defs    CODE_ALIGNMENT_ERROR
+endif
+	ei
+	ret
+
+; NMI routine
+        defs    $0066-ASMPC
+if (ASMPC<>$0066)
+        defs    CODE_ALIGNMENT_ERROR
+endif
+	ret
+
+restart08:
+restart10:
+restart18:
+restart20:
+restart28:
+restart30:
+        ret
+
 
 program:
+	di
+
         INCLUDE "crt/classic/crt_init_sp.asm"
         INCLUDE "crt/classic/crt_init_atexit.asm"
 	call    crt0_init_bss
 	ld	(exitsp),sp
+	ld	a,2
+	ld	(__pasopia_page),a
     	ei
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of
@@ -75,7 +122,7 @@ IF DEFINED_USING_amalloc
 ENDIF
 	call	_main
 cleanup:
-	jp	0
+	jp	cleanup
 
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
@@ -90,5 +137,5 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 	PUBLIC	__pasopia_page
 __pasopia_page:	defb	0
 
-	;INCLUDE	"target/pasopia7/classic/bootstrap.asm"
+	INCLUDE	"target/pasopia7/classic/bootstrap.asm"
 
