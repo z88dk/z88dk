@@ -28,7 +28,7 @@ all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	embedded_clib.lib test_clib.lib testrcm_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
 	pv1000_clib.lib pv2000_clib.lib coleco_clib.lib multi8_clib.lib alphatro_clib.lib  spc1000_clib.lib \
 	laser500_clib.lib super80_clib.lib super80_vduem_clib.lib \
-	adam.lib z80tvgame_clib.lib smc777.lib \
+	adam.lib z80tvgame_clib.lib smc777.lib pasopia7_clib.lib \
 	preempt.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib 
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib gendos.lib ndos.lib  \
@@ -970,6 +970,17 @@ multi8_clib.lib:
 	$(MAKE) gfxdeps
 	$(call buildgeneric,multi8)
 	TARGET=multi8 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmulti8 -x$(OUTPUT_DIRECTORY)/multi8_clib @$(LISTFILE_DIRECTORY)/multi8.lst
+
+# Pasopia7 Multi8 - dom
+pasopia7_clib.lib:
+	@echo ''
+	@echo '--- Building Toshiba Pasopia7 Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	@$(RM) -f video/mc6845/*.o
+	$(call buildgeneric,pasopia7)
+	$(MAKE) -C games TARGET=pasopia7
+	TARGET=pasopia7 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORpasopia7 -x$(OUTPUT_DIRECTORY)/pasopia7_clib @$(LISTFILE_DIRECTORY)/pasopia7.lst
 
 # VTech VZ700- dom
 laser500_clib.lib:

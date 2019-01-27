@@ -99,6 +99,11 @@
 #define psgT(hz)		((int)(118750.0 / (hz)))
 #endif
 
+#ifdef __PASOPIA7__
+// 1996800 / 16 ?
+#define psgT(hz)		((int)(125000.0 / (hz)))
+#endif
+
 #ifdef __PC88__
 // 3.9936 Mhz, but is sounded bad when split as suggested.
 //   This value was chosen by trial and error.
