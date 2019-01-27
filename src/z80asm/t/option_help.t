@@ -55,6 +55,7 @@ Code Generation Options:
   --cpu=ti83plus         Assemble for the TI83Plus
   --cpu=ti83             Assemble for the TI83
   --IXIY                 Swap IX and IY registers
+  --opt=speed            Optimize for speed
   --debug                Add debug info to map file
 
 Environment:

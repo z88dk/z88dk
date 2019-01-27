@@ -17,6 +17,8 @@ Define CPU opcodes
 #include "parse.h"
 #include "z80asm.h"
 
+#include <assert.h>
+
 #ifdef _MSC_VER
 #define snprintf _snprintf
 #endif
@@ -48,8 +50,31 @@ void add_opcode(int opcode)
 /* add opcode followed by jump relative offset expression */
 void add_opcode_jr(int opcode, Expr *expr)
 {
-	add_opcode(opcode);
-	Pass2infoExpr(RANGE_JR_OFFSET, expr);
+	if (opts.opt_speed) {
+		switch (opcode) {
+		case Z80_JR:
+			add_opcode(Z80_JP);
+			Pass2infoExpr(RANGE_WORD, expr);
+			break;
+		case Z80_JR_FLAG(FLAG_NZ):
+		case Z80_JR_FLAG(FLAG_Z):
+		case Z80_JR_FLAG(FLAG_NC):
+		case Z80_JR_FLAG(FLAG_C):
+			add_opcode(opcode - Z80_JR_FLAG(0) + Z80_JP_FLAG(0));
+			Pass2infoExpr(RANGE_WORD, expr);
+			break;
+		case Z80_DJNZ:		// "dec b; jp nz" is always slower
+			add_opcode(opcode);
+			Pass2infoExpr(RANGE_JR_OFFSET, expr);
+			break;
+		default:
+			assert(0);
+		}
+	}
+	else {
+		add_opcode(opcode);
+		Pass2infoExpr(RANGE_JR_OFFSET, expr);
+	}
 }
 
 /* add opcode followed by 8-bit unsigned expression */
