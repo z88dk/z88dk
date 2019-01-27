@@ -31,9 +31,6 @@ typedef struct {
 } d88_sct_t;
 
 
-FILE  *d88_create_disk(const char *name, d88_hdr_t *header, int num_tracks, int sectors_per_track, int sector_size);
-int   d88_write_sector(FILE *handle, d88_sct_t *sector, void *data, size_t datalen);
-
 
 
 #endif
