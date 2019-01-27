@@ -154,15 +154,15 @@ generic_console_scrollup:
 	add	hl,hl
 	add	hl,hl
 	add	hl,hl
-	ld	c,l
-	ld	b,h
-	ld	hl, $8000
-	ld	d,h
-	ld	e,l
+	ld	bc,$8000
 	add	hl,bc
+	ld	de,$8000
 
-	ld	bc, 40 * 25
-scrollup_loop:
+	ld	c,24
+scroll_row:
+	ld	a,(__console_w)
+	ld	b,a
+scroll_char:
 	push	bc
 	ld	a,(hl)
 	ld	(de),a
@@ -172,10 +172,9 @@ scrollup_loop:
 	add	hl,bc
 	ex	de,hl
 	pop	bc
-	dec	bc
-	ld	a,b
-	or	c
-	jr	nz,scrollup_loop
+	djnz	scroll_char
+	dec	c
+	jr	nz,scroll_row
 
 	; And we have to clear the bottom line
 	ld	a,(__console_w)

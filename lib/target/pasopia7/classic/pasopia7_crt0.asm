@@ -113,6 +113,7 @@ program:
 	ld	(exitsp),sp
 	ld	a,2
 	ld	(__pasopia_page),a
+	im	1
     	ei
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of
