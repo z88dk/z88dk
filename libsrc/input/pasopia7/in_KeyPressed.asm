@@ -4,6 +4,7 @@ SECTION code_clib
 PUBLIC in_KeyPressed
 PUBLIC _in_KeyPressed
 EXTERN in_getrow
+INCLUDE "target/pasopia7/def/pasopia7.def"
 
 ; Determines if a key is pressed using the scan code
 ; returned by in_LookupKey.
@@ -17,8 +18,8 @@ EXTERN in_getrow
 .in_KeyPressed
 ._in_KeyPressed
 	ld	a,@00010001		;Shift row
-	out	(30),a
-	in	a,($31)
+	out	(KEY_SCAN),a
+	in	a,(KEY_DATA)
 	bit	7,l
 	jr	nz,check_shift
 	bit	1,a
@@ -41,8 +42,8 @@ check_shift:
 
 .nofunc
 	call	in_getrow
-	out	($30),a
-	in	a,($31)
+	out	(KEY_SCAN),a
+	in	a,(KEY_DATA)
 	cpl
 	and	h		;Check with mask
 	jr	z,fail

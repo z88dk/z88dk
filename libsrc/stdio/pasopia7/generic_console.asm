@@ -19,6 +19,7 @@
 		EXTERN		__pasopia_page
 		EXTERN		__console_w
 
+		INCLUDE		"target/pasopia7/def/pasopia7.def"
 
 generic_console_ioctl:
 	scf
@@ -54,12 +55,12 @@ generic_console_set_paper:
 generic_console_cls:
 	ld	a,(__pasopia_page)
 	or	4		; Page VRAM in
-	out	($3c),a
+	out	(MEM_MODE),a
 	ld	a,$44
-	out	($0c),a
+	out	(VRAM_PLANE),a
 
 	ld	a,(__pasopia7_attr)
-	out	($0d),a		;Set attribute data	
+	out	(DISP_CTRL),a		;Set attribute data	
 	ld	bc, 80 * 25
 	ld	hl, $8000
 	ld	de,8
@@ -72,7 +73,7 @@ cls_loop:
 	jr	nz,cls_loop
 
 	ld	a,(__pasopia_page)
-	out	($3c),a
+	out	(MEM_MODE),a
 
 	ret
 
@@ -85,14 +86,14 @@ generic_console_printc:
 	ld	d,a		;Save attribute
 	ld	a,(__pasopia_page)
 	or	4		; Page VRAM in
-	out	($3c),a
+	out	(MEM_MODE),a
 	ld	a,(__pasopia7_attr)
-	out	($0d),a		;Set attribute
+	out	(DISP_CTRL),a		;Set attribute
 	ld	a,$44		;Select text VRAM
-	out	($0c),a
+	out	(VRAM_PLANE),a
 	ld	(hl),d
 	ld	a,(__pasopia_page)
-	out	($3c),a
+	out	(MEM_MODE),a
 	ret
 
 
@@ -105,10 +106,10 @@ generic_console_vpeek:
         call    xypos
 	ld	a,(__pasopia_page)
 	or	4		; Page VRAM in
-	out	($3c),a
+	out	(MEM_MODE),a
         ld      d,(hl)
 	xor	4
-	out	($3c),a
+	out	(MEM_MODE),a
 	ld	a,d
         and     a
         ret
@@ -144,9 +145,9 @@ generic_console_scrollup:
 	push	bc
 	ld	a,(__pasopia_page)
 	or	4		; Page VRAM in
-	out	($3c),a
+	out	(MEM_MODE),a
 	ld	a,$44
-	out	($0c),a
+	out	(VRAM_PLANE),a
 
 	ld	hl,(__console_w)
 	ld	h,0
@@ -160,7 +161,7 @@ generic_console_scrollup:
 	ld	e,l
 	add	hl,bc
 
-	ld	bc, 40 * 24
+	ld	bc, 40 * 25
 scrollup_loop:
 	push	bc
 	ld	a,(hl)
@@ -194,7 +195,7 @@ scroll_1:
 
 
 	ld	a,(__pasopia_page)
-	out	($3c),a
+	out	(MEM_MODE),a
 
 	pop	bc
 	pop	de
@@ -210,7 +211,7 @@ __pasopia7_attr:
 
 	ld	a,0			;Disable cursor blinking (bit 5)
 					;No attribute wrap (bit 4)
-	out	($0a),a		;Video PIO, port C
+	out	(VIDEO_MISC),a		;Video PIO, port C
         ld      l,$20
         call    asm_set_cursor_state
 	

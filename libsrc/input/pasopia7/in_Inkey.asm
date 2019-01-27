@@ -12,6 +12,8 @@ EXTERN in_rowtable
 EXTERN	l_push_di
 EXTERN	l_pop_ei
 
+INCLUDE "target/pasopia7/def/pasopia7.def"
+
 ; exit : carry set and HL = 0 for no keys registered
 ;        else HL = ASCII character code
 ; uses : AF,BC,DE,HL
@@ -27,8 +29,8 @@ read_loop:
 	ld	a,(hl)
 	ld	c,a
 	inc	hl
-	out	($30),a
-	in	a,($31)
+	out	(KEY_SCAN),a
+	in	a,(KEY_DATA)
 	cpl
 	and	a
 	jr	nz,gotkey
@@ -57,8 +59,8 @@ doneinc:
 	; Check for shift and control
 	ld	bc, 96 * 2
         ld      a,@00010001             ;Modifer row
-        out     ($30),a
-        in      a,($31)
+        out     (KEY_SCAN),a
+        in      a,(KEY_DATA)
 	bit	0,a		;Control
 	jr	z, got_modifier
 	ld	bc, 96
