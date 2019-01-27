@@ -189,6 +189,12 @@ IF FORaussie
         defc sndbit_mask   = 128	; bit 6 should stay 'on'
 ENDIF
 
+IF FORpasopia7
+    defc sndbit_port	= $30	
+    defc sndbit_bit    = 7
+    defc sndbit_mask   = $80	
+ENDIF
+
 IF FORsuper80
 	defc	sndbit_port = $F0
 	defc	sndbit_bit = 3
@@ -265,6 +271,7 @@ IF FORsmc777
     defc sndbit_mask   = $15
 ENDIF
 
+
 ; ********************************************************
 ;  SN76489 PSG chip definitions
 ; ********************************************************
@@ -318,20 +325,16 @@ ENDIF
 
 
 IF FORcoleco
-	defc sndbit_port	= $E0		; also valid for Coleco Adam and Pencil II
+    defc sndbit_port	= $E0		; also valid for Coleco Adam and Pencil II
     defc sndbit_bit    = 3
     defc sndbit_mask   = $0F			; $0F for full volume output
 ENDIF
+
 
 ; ********************************************************
 ;   This last part refers to NOT YET supported hardware
 ; ********************************************************
 
-IF FORpasopia7
-	defc sndbit_port	= $3A		; Pasopia has also a second PSG on port $3B
-    defc sndbit_bit    = 3
-    defc sndbit_mask   = $0F			; $0F for full volume output
-ENDIF
 
 
 

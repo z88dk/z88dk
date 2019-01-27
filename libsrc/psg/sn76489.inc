@@ -51,4 +51,8 @@ IF FORsmc777
 	defc HAVE16bitbus = 1
 ENDIF
 
+IF FORpasopia7
+	defc psgport 	= $3a		; There's a second one on 3b
+ENDIF
+
 
