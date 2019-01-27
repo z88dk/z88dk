@@ -2,7 +2,7 @@
 ;
 
 
-		SECTION		code_clib
+		SECTION		code_driver
 
 		PUBLIC		generic_console_cls
 		PUBLIC		generic_console_vpeek
@@ -58,12 +58,12 @@ generic_console_cls:
 	ld	a,$44
 	out	($0c),a
 
-	ld	bc, CONSOLE_COLUMNS * CONSOLE_ROWS
+	ld	a,(__pasopia7_attr)
+	out	($0d),a		;Set attribute data	
+	ld	bc, 80 * 25
 	ld	hl, $8000
 	ld	de,8
 cls_loop:
-	ld	a,(__pasopia7_attr)
-	out	($0d),a		;Set attribute data	
 	ld	(hl),' '
 	add	hl,de
 	dec	bc
@@ -142,6 +142,60 @@ generic_console_printc_3:
 generic_console_scrollup:
 	push	de
 	push	bc
+	ld	a,(__pasopia_page)
+	or	4		; Page VRAM in
+	out	($3c),a
+	ld	a,$44
+	out	($0c),a
+
+	ld	hl,(__console_w)
+	ld	h,0
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	ld	c,l
+	ld	b,h
+	ld	hl, $8000
+	ld	d,h
+	ld	e,l
+	add	hl,bc
+
+	ld	bc, 40 * 24
+scrollup_loop:
+	push	bc
+	ld	a,(hl)
+	ld	(de),a
+	ld	bc,8
+	add	hl,bc
+	ex	de,hl
+	add	hl,bc
+	ex	de,hl
+	pop	bc
+	dec	bc
+	ld	a,b
+	or	c
+	jr	nz,scrollup_loop
+
+	; And we have to clear the bottom line
+	ld	a,(__console_w)
+	ld	b, CONSOLE_ROWS - 1
+	ld	c,0
+scroll_1:
+	push	af
+	push	bc
+	ld	e,0
+	ld	a,' '
+	call	generic_console_printc
+	pop	bc
+	inc	c
+	pop	af
+	dec	a
+	jr	nz,scroll_1
+
+
+	ld	a,(__pasopia_page)
+	out	($3c),a
+
 	pop	bc
 	pop	de
 	ret
