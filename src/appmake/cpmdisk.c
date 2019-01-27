@@ -199,6 +199,7 @@ int cpm_write_raw(cpm_handle* h, const char* filename)
 int cpm_write_edsk(cpm_handle* h, const char* filename)
 {
     uint8_t header[256] = { 0 };
+    char    title[15];
     size_t offs;
     FILE* fp;
     int i, j, s;
@@ -216,7 +217,8 @@ int cpm_write_edsk(cpm_handle* h, const char* filename)
     }
     memset(header, 0, 256);
     memcpy(header, "EXTENDED CPC DSK FILE\r\nDisk-Info\r\n", 34);
-    memcpy(header + 0x22, "z88dk", 5);
+    snprintf(title,sizeof(title),"z88dk/%s", h->spec.name ? h->spec.name : "appmake");
+    memcpy(header + 0x22, title, strlen(title));
     header[0x30] = h->spec.tracks;
     header[0x31] = h->spec.sides;
     for (i = 0; i < h->spec.tracks * h->spec.sides; i++) {
@@ -285,6 +287,7 @@ void cpm_free(cpm_handle* h)
 int cpm_write_d88(cpm_handle* h, const char* filename)
 {
     uint8_t header[1024] = { 0 };
+    char    title[18];
     uint8_t *ptr;
     size_t offs;
     FILE* fp;
@@ -305,7 +308,8 @@ int cpm_write_d88(cpm_handle* h, const char* filename)
     }
 
     ptr = header;
-    memcpy(ptr, "z88dk-appmake", 13); ptr += 17;
+    snprintf(title,sizeof(title),"z88dk/%s", h->spec.name ? h->spec.name : "appmake");
+    memcpy(ptr, title, strlen(title)); ptr += 17;
     ptr += 9;  // Reserved
     *ptr++ = 0; // Protect
     // Calculate data size of the disc

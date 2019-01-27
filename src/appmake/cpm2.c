@@ -33,6 +33,7 @@ static struct formats   *get_format(const char *name);
 static void              dump_formats();
 
 static cpm_discspec einstein_spec = {
+    .name = "Einstein",
     .sectors_per_track = 10,
     .tracks = 40,
     .sides = 1,
@@ -45,6 +46,7 @@ static cpm_discspec einstein_spec = {
 };
 
 static cpm_discspec attache_spec = {
+    .name = "Attache",
     .sectors_per_track = 10,
     .tracks = 40,
     .sides = 2,
@@ -59,6 +61,7 @@ static cpm_discspec attache_spec = {
 };
 
 static cpm_discspec osborne_spec = {
+    .name = "Osborne",
     .sectors_per_track = 5,
     .tracks = 40,
     .sides = 1,
@@ -73,6 +76,7 @@ static cpm_discspec osborne_spec = {
 };
 
 static cpm_discspec dmv_spec = {
+    .name = "NEC DMV",
     .sectors_per_track = 8,
     .tracks = 40,
     .sides = 2,
@@ -88,6 +92,7 @@ static cpm_discspec dmv_spec = {
 
 
 static cpm_discspec cpcsystem_spec = {
+    .name = "CPCSystem",
     .sectors_per_track = 9,
     .tracks = 40,
     .sides = 1,
@@ -102,6 +107,7 @@ static cpm_discspec cpcsystem_spec = {
 };
 
 static cpm_discspec microbee_spec = {
+    .name = "Microbee",
     .sectors_per_track = 10,
     .tracks = 80,
     .sides = 2,
@@ -122,6 +128,7 @@ static cpm_discspec microbee_spec = {
 
 
 static cpm_discspec kayproii_spec = {
+    .name = "KayproII",
     .sectors_per_track = 10,
     .tracks = 40,
     .sides = 1,
@@ -136,6 +143,7 @@ static cpm_discspec kayproii_spec = {
 };
 
 static cpm_discspec mz2500cpm_spec = {
+    .name = "MZ2500CPM",
     .sectors_per_track = 16,
     .tracks = 80,
     .sides = 2,
@@ -151,6 +159,7 @@ static cpm_discspec mz2500cpm_spec = {
 };
 
 static cpm_discspec nascom_spec = {
+    .name = "Nascom",
     .sectors_per_track = 10,
     .tracks = 77,
     .sides = 2,
@@ -165,6 +174,7 @@ static cpm_discspec nascom_spec = {
 };
 
 static cpm_discspec qc10_spec = {
+    .name = "QC10",
     .sectors_per_track = 10,
     .tracks = 40,
     .sides = 2,
@@ -180,6 +190,7 @@ static cpm_discspec qc10_spec = {
 };
 
 static cpm_discspec tiki100_spec = {
+    .name = "Tiki100",
     .sectors_per_track = 10,
     .tracks = 40,
     .sides = 1,
@@ -194,6 +205,7 @@ static cpm_discspec tiki100_spec = {
 };
 
 static cpm_discspec svi40ss_spec = {
+    .name = "SVI40SS",
     .sectors_per_track = 17,
     .tracks = 40,
     .sides = 1,
@@ -208,6 +220,7 @@ static cpm_discspec svi40ss_spec = {
 };
 
 static cpm_discspec col1_spec = {
+    .name = "ColAdam",
     .sectors_per_track = 8,
     .tracks = 40,
     .sides = 1,
@@ -227,6 +240,7 @@ static cpm_discspec col1_spec = {
 
 
 static cpm_discspec smc777_spec = {
+    .name = "SMC-777",
     .sectors_per_track = 16,
     .tracks = 70,
     .sides = 2,
@@ -245,6 +259,7 @@ static cpm_discspec smc777_spec = {
 
 
 static cpm_discspec plus3_spec = {
+    .name = "ZX+3",
     .sectors_per_track = 9,
     .tracks = 40,
     .sides = 1,

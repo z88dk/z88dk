@@ -3,6 +3,7 @@
 #define CPMDISK_H
 
 typedef struct {
+    const char *name;			// Name of the format
     uint8_t   sectors_per_track;
     uint8_t   tracks;
     uint8_t   sides;

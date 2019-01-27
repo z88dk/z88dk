@@ -23,6 +23,7 @@ option_t fp1100_options[] = {
 };
 
 static cpm_discspec fp1100_spec = {
+    .name = "FP-1100",
     .sectors_per_track = 16,
     .tracks = 40,
     .sides = 2,

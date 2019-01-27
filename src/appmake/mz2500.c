@@ -29,6 +29,7 @@ option_t mz2500_options[] = {
 };
 
 static cpm_discspec spec = {
+    .name = "MZ2500",
     .sectors_per_track = 16,
     .tracks = 40,
     .sides = 2,

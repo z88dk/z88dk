@@ -25,6 +25,7 @@ option_t pasopia7_options[] = {
 };
 
 static cpm_discspec pasopia_spec = {
+    .name = "Pasopia7",
     .sectors_per_track = 16,
     .tracks = 40,
     .sides = 1,

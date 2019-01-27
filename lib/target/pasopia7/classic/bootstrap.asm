@@ -78,7 +78,7 @@ failed:
 	defb	0
 
 banner:
-	defm	"z88dk bootstrap loader, loading"
+	defm	"z88dk Pasopia Bootstrap - Loading"
 	defb	10,13
 	defb	0
 
