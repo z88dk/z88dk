@@ -8,7 +8,6 @@
 		PUBLIC		generic_console_vpeek
 		PUBLIC		generic_console_scrollup
 		PUBLIC		generic_console_printc
-		PUBLIC		generic_console_ioctl
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
@@ -20,10 +19,6 @@
 		EXTERN		__console_w
 
 		INCLUDE		"target/pasopia7/def/pasopia7.def"
-
-generic_console_ioctl:
-	scf
-	ret
 
 generic_console_set_inverse:
 	ld	a,(generic_console_flags)
