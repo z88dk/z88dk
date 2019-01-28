@@ -202,7 +202,11 @@ ENDIF
 	; reg1 - GRAPH MODE
 	; (it was first set to $80)
     ;ld    a,$E2   ; MTX, M5
+IF FORadam
+    ld	a,$D0		;Disable interrupt on Adam
+ELSE
 	ld    a,$E0   ; MTX, M5
+ENDIF
     call    VDPreg_Write
 	
 	

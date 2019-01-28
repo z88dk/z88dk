@@ -27,6 +27,9 @@
 
 	EXTERN	msx_set_mode
 
+	EXTERN	nmi_vectors
+	EXTERN	asm_interrupt_handler
+	EXTERN	asm_im1_handler
 
 ;--------
 ; Set an origin for the application (-zorg=) default to 32768
@@ -53,11 +56,11 @@ start:
 	; Hook the interrupt
 	ld	a,0xc3
 	ld	($7498),a	;jp
-	ld	hl,nmi_int
+	ld	hl,nmi_handler
 	ld	($7499),hl
 	ld	a,0xc3
 	ld	($749b),a	;jp
-	ld	hl,mask_int
+	ld	hl,asm_im1_handler
 	ld	($749c),hl
 
         INCLUDE "crt/classic/crt_init_sp.asm"
@@ -101,18 +104,21 @@ start1: ld      sp,0            ;Restore stack to entry value
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
 
-nmi_int:
-        push    af
-        push    hl
-        ; Flow into int_VBL
-        INCLUDE "crt/classic/tms9118/interrupt_handler.asm"
 
-; Not sure when this is called, but don't do anything
-mask_int:
-	ex	(sp),hl
+; On the PV-2000, the NMI receives the VDP interrupt
+nmi_handler:
+	push	af
+	push	hl
+	ld	a,($4001)	;VDP status register
+	or	a
+	jp	p,not_VBL	;Bit 7 not set
+
+	ld	hl,nmi_vectors
+	call	asm_interrupt_handler
+not_VBL:
 	pop	hl
-	ei
-	reti
+	pop	af
+	retn
 
 ; ---------------
 ; MSX specific stuff
@@ -139,12 +145,6 @@ msxbios:
 
 			
 
-	PUBLIC	raster_procs	;Raster interrupt handlers
-	PUBLIC	pause_procs	;Pause interrupt handlers
-
-	PUBLIC	timer		;This is incremented every time a VBL/HBL interrupt happens
-	PUBLIC	_pause_flag	;This alternates between 0 and 1 every time pause is pressed
-
 	PUBLIC	RG0SAV		;keeping track of VDP register values
 	PUBLIC	RG1SAV
 	PUBLIC	RG2SAV
@@ -153,11 +153,6 @@ msxbios:
 	PUBLIC	RG5SAV
 	PUBLIC	RG6SAV
 	PUBLIC	RG7SAV       
-
-raster_procs:		defw	0	;Raster interrupt handlers
-pause_procs:		defs	8	;Pause interrupt handlers
-timer:				defw	0	;This is incremented every time a VBL/HBL interrupt happens
-_pause_flag:		defb	0	;This alternates between 0 and 1 every time pause is pressed
 
 RG0SAV:		defb	0	;keeping track of VDP register values
 RG1SAV:		defb	0

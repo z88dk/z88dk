@@ -65,4 +65,5 @@ msx/gen_vram
 msx/gen_vread
 msx/gen_vwrite
 msx/gen_vwrite_direct
+arch/tms9918/add_raster_im1
 @z80.lst

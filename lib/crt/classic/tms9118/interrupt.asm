@@ -18,6 +18,4 @@ done_read:
 int_not_VBL:
 	pop	hl
 	pop	af
-	ei
-	reti
-
+	; Needs following with ei/reti or retn as appropriate

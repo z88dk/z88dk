@@ -67,4 +67,5 @@ msx/gen_setrd
 msx/gen_filvrm
 msx/gen_ldirvm
 msx/gen_ldirmv
+arch/tms9918/add_raster_im1
 @z80.lst
