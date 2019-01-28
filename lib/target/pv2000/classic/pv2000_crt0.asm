@@ -109,9 +109,10 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 nmi_handler:
 	push	af
 	push	hl
-	ld	a,($4001)	;VDP status register
-	or	a
-	jp	p,not_VBL	;Bit 7 not set
+; Polling the VDP from the NMI causes graphical glitches
+;	ld	a,($4001)	;VDP status register
+;	or	a
+;	jp	p,not_VBL	;Bit 7 not set
 
 	ld	hl,nmi_vectors
 	call	asm_interrupt_handler

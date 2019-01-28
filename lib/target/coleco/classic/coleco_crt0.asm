@@ -91,9 +91,8 @@ cleanup:
 
 
 nmi_int:
-	INCLUDE	"crt/classic/tms9118/interrupt.asm"
-	retn
-int_VBL:
+	push	af
+	push	hl
 	ld	hl,nmi_vectors
 	call	asm_interrupt_handler
 	pop	hl
