@@ -28,6 +28,7 @@
 	EXTERN	msx_set_mode
 
 	EXTERN	nmi_vectors
+	EXTERN	im1_vectors
 	EXTERN	asm_interrupt_handler
 	EXTERN	asm_im1_handler
 
@@ -60,7 +61,7 @@ start:
 	ld	($7499),hl
 	ld	a,0xc3
 	ld	($749b),a	;jp
-	ld	hl,asm_im1_handler
+	ld	hl,mask_int
 	ld	($749c),hl
 
         INCLUDE "crt/classic/crt_init_sp.asm"
@@ -104,6 +105,15 @@ start1: ld      sp,0            ;Restore stack to entry value
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
 
+mask_int:
+	ex      (sp),hl		;Discard return address
+	push	af
+	ld	hl,im1_vectors
+	call	asm_interrupt_handler
+	pop	af
+	pop	hl	
+	ei
+	reti
 
 ; On the PV-2000, the NMI receives the VDP interrupt
 nmi_handler:
