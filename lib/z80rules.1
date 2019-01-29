@@ -276,6 +276,40 @@
 	ret	z
 .%1
 
+	jp	c,%1
+	ld	hl,%3	;const
+	jr	%2
+.%1
+	ld	hl,%4	;const
+.%2
+	ret
+=
+	ld	hl,%3	;const
+	ret	nc
+.%1
+	ld	hl,%4	;const
+.%2
+	ret
+
+	jr	c,%1
+.%2
+	jp	%3
+.%1
+	ret
+=
+	ret	c
+.%2
+	jp	%3
+.%1
+	ret
+
+	jp	z,%1
+.%1
+	ret
+=
+.%1
+	ret
+
 	push	hl
 	ld	hl,%1	;const
 	pop	de
