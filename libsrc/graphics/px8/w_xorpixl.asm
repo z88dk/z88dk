@@ -3,7 +3,9 @@
         SECTION code_clib
         PUBLIC    w_xorpixel
 
+        EXTERN     w_plotpixel
         EXTERN     w_respixel
+        EXTERN     w_pointxy
 
 ;
 ;       $Id: w_xorpixl.asm $
@@ -26,4 +28,10 @@
 ;  afbcdehl/.... different
 ;
 .w_xorpixel
-					jp w_respixel
+		push hl
+		push de
+		call w_pointxy
+		pop de
+		pop hl
+		jp	z,w_plotpixel
+		jp	w_respixel
