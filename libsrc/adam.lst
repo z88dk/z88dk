@@ -30,7 +30,6 @@ graphics/msx/surface/surface_pixladdr
 graphics/msx/surface/surface_plotpixl
 graphics/msx/surface/surface_stencil_render
 @gfxbase.lst
-@msx/genmsx.lst
 msx/gen_msxbios
 msx/gen_filvrm
 msx/gen_ldirmv
@@ -55,6 +54,8 @@ msx/gen_vram
 msx/gen_vread
 msx/gen_vwrite
 msx/gen_vwrite_direct
+msx/l_tms9918_disable_interrupts_nmi
+@msx/genmsx.lst
 games/coleco/joystick
 games/obj/coleco/joystick_type
 psg/sn76489/bit_open

@@ -31,7 +31,6 @@ graphics/msx/surface/surface_pixladdr
 graphics/msx/surface/surface_plotpixl
 graphics/msx/surface/surface_stencil_render
 @gfxbase.lst
-@msx/genmsx.lst
 msx/gen_msxbios
 msx/gen_filvrm
 msx/gen_ldirmv
@@ -56,6 +55,8 @@ msx/gen_vram
 msx/gen_vread
 msx/gen_vwrite
 msx/gen_vwrite_direct
+msx/l_tms9918_disable_interrupts_im1
+@msx/genmsx.lst
 psg/einstein/psg_init
 psg/einstein/get_psg
 psg/einstein/set_psg

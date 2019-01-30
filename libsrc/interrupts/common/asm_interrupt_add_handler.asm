@@ -13,9 +13,7 @@
 asm_interrupt_add_handler:
 	ld	a,(hl)
 	inc	hl
-	ld	h,(hl)
-	ld	l,a
-	or	h
+	or	(hl)
 	jr	nz,try_next_slot
 	; We have our slot, insert our handler
 	ld	(hl),d

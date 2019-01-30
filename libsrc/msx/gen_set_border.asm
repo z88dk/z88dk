@@ -5,8 +5,8 @@
 	PUBLIC		msx_set_border
 	PUBLIC		_msx_set_border
 
-	EXTERN		l_push_di
-	EXTERN		l_pop_ei
+	EXTERN		l_tms9918_disable_interrupts
+	EXTERN		l_tms9918_enable_interrupts
 	EXTERN		RG0SAV
 
 	INCLUDE		"msx/vdp.inc"
@@ -20,7 +20,7 @@ _msx_set_border:
 	and	@11110000
 	or	l
 	ld      e,a
-	call	l_push_di
+	call	l_tms9918_disable_interrupts
 	ld	a,e
 	ld	(RG0SAV+7),a
 IF VDP_CMD < 0
@@ -35,6 +35,6 @@ IF VDP_CMD < 0
 ELSE
         out     (c),a
 ENDIF
-	call	l_pop_ei
+	call	l_tms9918_enable_interrupts
 	ret
 

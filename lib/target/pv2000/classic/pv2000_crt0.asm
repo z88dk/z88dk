@@ -31,6 +31,8 @@
 	EXTERN	im1_vectors
 	EXTERN	asm_interrupt_handler
 	EXTERN	asm_im1_handler
+	EXTERN	__vdp_enable_status
+	EXTERN	VDP_STATUS
 
 ;--------
 ; Set an origin for the application (-zorg=) default to 32768
@@ -115,15 +117,17 @@ mask_int:
 	ei
 	reti
 
+
 ; On the PV-2000, the NMI receives the VDP interrupt
 nmi_handler:
 	push	af
 	push	hl
+	ld	a,(__vdp_enable_status)
+	rlca
+	jr	c,skip_vbl
 ; Polling the VDP from the NMI causes graphical glitches
-;	ld	a,($4001)	;VDP status register
-;	or	a
-;	jp	p,not_VBL	;Bit 7 not set
-
+	ld	a,(-VDP_STATUS)	;VDP status register
+skip_vbl:
 	ld	hl,nmi_vectors
 	call	asm_interrupt_handler
 not_VBL:

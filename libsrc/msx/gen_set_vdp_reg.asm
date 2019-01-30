@@ -14,8 +14,8 @@
 	PUBLIC	set_vdp_reg
 	PUBLIC	_set_vdp_reg
 	EXTERN	RG0SAV
-	EXTERN	l_push_di
-	EXTERN	l_pop_ei
+	EXTERN	l_tms9918_disable_interrupts
+	EXTERN	l_tms9918_enable_interrupts
 
 	INCLUDE	"msx/vdp.inc"
 
@@ -28,7 +28,7 @@
 	ld	a,d
 	inc	hl
 	inc	hl
-	call	l_push_di
+	call	l_tms9918_disable_interrupts
 IF VDP_CMD < 0
 	ld	(-VDP_CMD),a
 ELSE
@@ -43,7 +43,7 @@ IF VDP_CMD < 0
 ELSE
 	out	(c),a
 ENDIF
-	call	l_pop_ei
+	call	l_tms9918_enable_interrupts
 
 	cp	8
 	ret	nc		;REgister out of boundds

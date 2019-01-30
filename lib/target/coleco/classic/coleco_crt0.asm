@@ -26,6 +26,8 @@
 	EXTERN    asm_im1_handler
 	EXTERN    nmi_vectors
         EXTERN    asm_interrupt_handler
+	EXTERN    __vdp_enable_status
+	EXTERN    VDP_STATUS
 
 	defc	CONSOLE_COLUMNS = 32
 	defc	CONSOLE_ROWS = 24
@@ -93,6 +95,11 @@ cleanup:
 nmi_int:
 	push	af
 	push	hl
+	ld	a,(__vdp_enable_status)
+	rlca
+	jr	c,no_vbl
+	in	a,(VDP_STATUS)
+no_vbl:
 	ld	hl,nmi_vectors
 	call	asm_interrupt_handler
 	pop	hl
