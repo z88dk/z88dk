@@ -90,7 +90,7 @@ zxcurrah.tap: zxcurrah.c
 	zcc +zx -vn zxcurrah.c -lndos -create-app -ozxcurrah.bin -lm
 
 threading.tap: preempt.c
-	zcc +zx -vn preempt.c -lim2 -lndos -create-app -othreading.bin -lpreempt
+	zcc +zx -vn preempt.c -lndos -create-app -othreading.bin -lpreempt
 
 opusdump.tap: opusdump.c
 	zcc +zx -vn opusdump.c -lndos -create-app -lrs232plus -oopusdump.bin

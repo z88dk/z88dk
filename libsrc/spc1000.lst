@@ -75,6 +75,7 @@ msx/gen_vram
 msx/gen_vread
 msx/gen_vwrite
 msx/gen_vwrite_direct
+msx/l_tms9918_disable_interrupts_im1
 @msx/genmsx.lst
 psg/spc1000/set_psg
 psg/spc1000/set_psg_callee

@@ -32,7 +32,7 @@ all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	preempt.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib 
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib gendos.lib ndos.lib  \
-	 im2.lib lib3d.lib x11.lib fastmath.lib
+	 lib3d.lib x11.lib fastmath.lib
 
 c128libs: c128ansi_clib.lib gfx128.lib gfx128hr.lib gfx128hr480.lib 
 
@@ -57,6 +57,7 @@ zx81libs: zx81_clib.lib gfx81.lib gfxlambda.lib gfx81udg.lib gfx81hr64.lib gfx81
 define buildgeneric
 	$(MAKE) -C ctype
 	$(MAKE) -C strings
+	$(MAKE) -C interrupts
 	$(MAKE) -C regex
 	$(MAKE) -C stdio
 	$(MAKE) -C setjmp
@@ -128,13 +129,6 @@ zx81deps:
 	@$(RM) -f zx81/chroma81/*.o
 	@$(RM) -f time/zx81/*.o
 
-
-# interrupt mode 2 library - aralbrec
-im2.lib:
-	@echo ''
-	@echo '--- Building IM 2 Library ---'
-	@echo ''
-	$(MAKE) -C im2 
 
 # Generic maths build - dom, stefano
 gen_math.lib:
@@ -860,7 +854,7 @@ adam.lib:
 	$(MAKE) -C games TARGET=cpm SUBTYPE=coleco
 	$(MAKE) -C msx TARGET=test
 	$(MAKE) -C psg
-	TARGET=coleco TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcoleco -x$(OUTPUT_DIRECTORY)/adam @$(LISTFILE_DIRECTORY)/adam.lst
+	TARGET=coleco TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcoleco -DFORadam -x$(OUTPUT_DIRECTORY)/adam @$(LISTFILE_DIRECTORY)/adam.lst
 
 # SORD M5 library - Stefano
 m5_clib.lib:
@@ -1394,6 +1388,7 @@ classic-clean:
 	$(MAKE) -C fcntl clean
 	$(MAKE) -C math clean
 	$(MAKE) -C graphics clean
+	$(MAKE) -C interrupts clean
 	$(MAKE) -C net clean
 	$(MAKE) -C rex clean
 	$(MAKE) -C rs232 clean
@@ -1409,7 +1404,6 @@ classic-clean:
 	$(MAKE) -C adt clean
 	$(MAKE) -C adt-newlib clean
 	$(MAKE) -C alloc clean
-	$(MAKE) -C im2 clean
 	$(MAKE) -C rect clean
 	$(MAKE) -C algorithm clean
 	$(MAKE) -C debug clean

@@ -18,6 +18,9 @@
 
         EXTERN    _main           ;main() is always external to crt0 code
 
+	EXTERN	asm_im1_handler
+	EXTERN	asm_nmi_handler
+
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
@@ -85,15 +88,14 @@ endif
 if (ASMPC<>$0038)
         defs    CODE_ALIGNMENT_ERROR
 endif
-	ei
-	ret
+	jp	asm_im1_handler
 
 ; NMI routine
         defs    $0066-ASMPC
 if (ASMPC<>$0066)
         defs    CODE_ALIGNMENT_ERROR
 endif
-	ret
+	jp	asm_nmi_handler
 
 restart08:
 restart10:
