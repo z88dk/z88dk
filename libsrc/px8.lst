@@ -1,4 +1,6 @@
 arch/px8/subcpu_call
+arch/px8/subcpu_command
+arch/px8/subcpu_function
 graphics/px8/draw
 graphics/retrofit/draw_callee
 graphics/px8/undraw
