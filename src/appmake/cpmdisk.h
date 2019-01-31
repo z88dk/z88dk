@@ -35,8 +35,13 @@ extern void cpm_free(cpm_handle *h);
 
 cpm_handle *cpm_create_with_format(const char *disc_format);
 int cpm_write_file_to_image(const char *disc_format, const char *container, const char *output_file, const char *binary_name, const char *crt_filename, const char *boot_filename);
-void cpm_write_sector(cpm_handle *h, int track, int sector, int head, void *data);
+void cpm_write_sector(cpm_handle *h, int track, int sector, int head, const void *data);
+void cpm_read_sector(cpm_handle *h, int track, int sector, int head, void *data);
+void cpm_read_sector_lba(cpm_handle *h, int sector_nr, int count, void *data);
+void cpm_write_sector_lba(cpm_handle *h, int sector_nr, int count, const void *data);
 void cpm_create_filename(const char *binary_name, char *cpm_filename, char force_com_extension, char include_dot);
+int cpm_get_sector_size(cpm_handle *h);
+int cpm_get_sector_count(cpm_handle *h);
 
 #endif
 

@@ -64,16 +64,16 @@ cpm_handle* cpm_create(cpm_discspec* spec)
 #if 0
     // Code that marks each sector so we can see what is actually loaded
     for ( int t = 0, offs = 0; t < spec->tracks; t++ ) {
-	for ( int head = 0; head < spec->sides; head++ ) {
-	   for ( int s = 0; s < spec->sectors_per_track; s++ ) {
+        for ( int head = 0; head < spec->sides; head++ ) {
+           for ( int s = 0; s < spec->sectors_per_track; s++ ) {
               for ( int b = 0; b < spec->sector_size / 4 ; b++ ) {
                  h->image[offs++] = t; //^ 255;
                  h->image[offs++] = head; //^ 255;
                  h->image[offs++] = s; //^ 255;
                  h->image[offs++] = 0; //^ 255;
               }
-	   }
-	}
+           }
+        }
     }
 #endif
     size_t directory_offset = h->spec.offset ? h->spec.offset : (h->spec.boottracks * h->spec.sectors_per_track * h->spec.sector_size * 1);
@@ -86,7 +86,29 @@ void cpm_write_boot_track(cpm_handle* h, void* data, size_t len)
     memcpy(h->image, data, len);
 }
 
-void cpm_write_sector(cpm_handle *h, int track, int sector, int head, void *data)
+void cpm_write_sector_lba(cpm_handle *h, int sector_nr, int count, const void *data)
+{
+    uint8_t *ptr = data;
+    int      i;
+
+    for ( i = 0; i < count; i++ ) {
+        int track = sector_nr / h->spec.sectors_per_track;
+        int sector = sector_nr % h->spec.sectors_per_track;
+        int head;
+
+        if ( h->spec.alternate_sides == 0 ) {
+            head = track % 2;
+                   track /= 2;
+            } else {
+                   head = track >= h->spec.tracks ? 1 : 0;
+        }
+        cpm_write_sector(h, track, sector, head, ptr);
+        sector_nr++;
+        ptr += h->spec.sector_size;
+    }
+}
+
+void cpm_write_sector(cpm_handle *h, int track, int sector, int head, const void *data)
 {
     size_t offset;
     size_t track_length = h->spec.sectors_per_track * h->spec.sector_size;
@@ -99,6 +121,43 @@ void cpm_write_sector(cpm_handle *h, int track, int sector, int head, void *data
 
     offset += sector * h->spec.sector_size;
     memcpy(&h->image[offset], data, h->spec.sector_size);
+}
+
+void cpm_read_sector_lba(cpm_handle *h, int sector_nr, int count, void *data)
+{
+    uint8_t *ptr = data;
+    int      i;
+
+    for ( i = 0; i < count; i++ ) {
+        int track = sector_nr / h->spec.sectors_per_track;
+        int sector = sector_nr % h->spec.sectors_per_track;
+        int head;
+
+        if ( h->spec.alternate_sides == 0 ) {
+            head = track % 2;
+                   track /= 2;
+            } else {
+                   head = track >= h->spec.tracks ? 1 : 0;
+        }
+        cpm_read_sector(h, track, sector, head, ptr);
+        sector_nr++;
+        ptr += h->spec.sector_size;
+    }
+}
+
+void cpm_read_sector(cpm_handle *h, int track, int sector, int head, void *data)
+{
+    size_t offset;
+    size_t track_length = h->spec.sectors_per_track * h->spec.sector_size;
+
+    if ( h->spec.alternate_sides == 0 ) {
+        offset = track_length * track + (head * track_length * h->spec.tracks);
+    } else {
+        offset = track_length * ( 2* track + head);
+    }
+
+    offset += sector * h->spec.sector_size;
+    memcpy(data, &h->image[offset], h->spec.sector_size);
 }
 
 void cpm_write_file(cpm_handle* h, char filename[11], void* data, size_t len)
@@ -183,9 +242,9 @@ int cpm_write_raw(cpm_handle* h, const char* filename)
             for (j = 0; j < h->spec.sectors_per_track; j++) {
                  int sect = j; // TODO: Skew
                  if ( h->spec.has_skew && i + (i*h->spec.sides) >= h->spec.skew_track_start ) {
-		     for ( sect = 0; sect < h->spec.sectors_per_track; sect++ ) {
-			if ( h->spec.skew_tab[sect] == j ) break;
-		     }
+                     for ( sect = 0; sect < h->spec.sectors_per_track; sect++ ) {
+                        if ( h->spec.skew_tab[sect] == j ) break;
+                     }
                  }
                  fwrite(h->image + offs + (sect * h->spec.sector_size), h->spec.sector_size, 1, fp);
             }
@@ -264,9 +323,9 @@ int cpm_write_edsk(cpm_handle* h, const char* filename)
             for (j = 0; j < h->spec.sectors_per_track; j++) {
                  int sect = j; // TODO: Skew
                  if ( h->spec.has_skew && i + (i*h->spec.sides) >= h->spec.skew_track_start ) {
-		     for ( sect = 0; sect < h->spec.sectors_per_track; sect++ ) {
-			if ( h->spec.skew_tab[sect] == j ) break;
-		     }
+                     for ( sect = 0; sect < h->spec.sectors_per_track; sect++ ) {
+                        if ( h->spec.skew_tab[sect] == j ) break;
+                     }
                  }
                  fwrite(h->image + offs + (sect * h->spec.sector_size), h->spec.sector_size, 1, fp);
             }
@@ -350,24 +409,24 @@ int cpm_write_d88(cpm_handle* h, const char* filename)
 
                  int sect = j; // TODO: Skew
                  if ( h->spec.has_skew && i + (i*h->spec.sides) >= h->spec.skew_track_start ) {
-		     for ( sect = 0; sect < h->spec.sectors_per_track; sect++ ) {
-			if ( h->spec.skew_tab[sect] == j ) break;
-		     }
+                     for ( sect = 0; sect < h->spec.sectors_per_track; sect++ ) {
+                        if ( h->spec.skew_tab[sect] == j ) break;
+                     }
                  }
-                 *ptr++ = i; 		//track
-		 *ptr++ = s;		//head
-		 *ptr++ = j+1;		//sector
+                 *ptr++ = i;                 //track
+                 *ptr++ = s;                //head
+                 *ptr++ = j+1;                //sector
                  *ptr++ = sector_size;  //n
                  *ptr++ = (h->spec.sectors_per_track) % 256;
                  *ptr++ = (h->spec.sectors_per_track) / 256;
-                 *ptr++ = 0;		//dens
-                 *ptr++ = 0;		//del
-                 *ptr++ = 0;		//stat
-                 *ptr++ = 0;		//reserved
-                 *ptr++ = 0;		//reserved
-                 *ptr++ = 0;		//reserved
-                 *ptr++ = 0;		//reserved
-                 *ptr++ = 0;		//reserved
+                 *ptr++ = 0;                //dens
+                 *ptr++ = 0;                //del
+                 *ptr++ = 0;                //stat
+                 *ptr++ = 0;                //reserved
+                 *ptr++ = 0;                //reserved
+                 *ptr++ = 0;                //reserved
+                 *ptr++ = 0;                //reserved
+                 *ptr++ = 0;                //reserved
                  *ptr++ = (h->spec.sector_size % 256);
                  *ptr++ = (h->spec.sector_size / 256);
                  fwrite(header, ptr - header, 1, fp);
@@ -379,3 +438,13 @@ int cpm_write_d88(cpm_handle* h, const char* filename)
     return 0;
 }
 
+
+int cpm_get_sector_size(cpm_handle *h)
+{
+    return h->spec.sector_size;
+}
+
+int cpm_get_sector_count(cpm_handle *h)
+{
+    return h->spec.sides  * h->spec.sectors_per_track * h->spec.tracks;
+}
