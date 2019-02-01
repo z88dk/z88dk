@@ -1,16 +1,16 @@
+
         INCLUDE "graphics/grafix.inc"
 
         SECTION code_clib
+		
         PUBLIC    w_plotpixel
+		PUBLIC    w_pixel
 
-        EXTERN     l_cmp
+        EXTERN     l_graphics_cmp
 
         EXTERN    __gfx_coords
-        EXTERN    px8_conout
+        EXTERN    subcpu_call
 
-;
-;       $Id: w_plotpixl.asm, stefano - 2017 $
-;
 
 ; ******************************************************************
 ;
@@ -24,43 +24,57 @@
 ;
 ; in:  hl,de    = (x,y) coordinate of pixel
 ;
-; registers changed after return:
-;  ......../ixiy same
-;  afbcdehl/.... different
-;
-.w_plotpixel
-                        push    hl
-                        ld      hl,maxy
-                        call    l_cmp
-                        pop     hl
-                        ret     nc               ; Return if Y overflows
 
-                        push    de
-                        ld      de,maxx
-                        call    l_cmp
-                        pop     de
-                        ret     c               ; Return if X overflows
-                        
-                        ld      (__gfx_coords),hl     ; store X
-                        ld      (__gfx_coords+2),de   ; store Y: COORDS must be 2 bytes wider
-                        push	hl
-						push	de
+.w_plotpixel
+			ld	a,2
+.w_pixel
+			ld	(mode),a
+			
+			push    hl
+			ld      hl,maxy
+			call    l_graphics_cmp
+			pop     hl
+			ret     nc               ; Return if Y overflows
+
+			push    de
+			ld      de,maxx
+			call    l_graphics_cmp
+			pop     de
+			ret     c               ; Return if X overflows
+			
+			ld      (__gfx_coords),hl     ; store X
+			ld      (__gfx_coords+2),de   ; store Y: COORDS must be 2 bytes wider
+			
+			ld	bc,xcoord
+			ld	a,h
+			ld	(bc),a		; X (MSB)
+			inc	bc
+			ld	a,l
+			ld	(bc),a		; X (LSB)
+			inc	bc
+			ld	a,e
+			ld	(bc),a		; Y
+			
+			ld	hl,packet
+			jp	subcpu_call
+
+
+	SECTION	data_clib
+
+packet:
+	defw	sndpkt
+	defw	5		; packet sz
+	defw	xcoord	; packet addr expected back from the slave CPU (useless)
+	defw	1		; size of the expected packet being received ('bytes'+1)
+
 						
-						ld	c,27		; ESCape
-						call px8_conout
-						
-						ld	c,0xc7		; PSET/PRESET
-						call px8_conout
-						ld	c,1		; PSET (PRESET=0)
-						call px8_conout
-						pop de
-						ld c,e
-						call px8_conout	; y
-						pop hl
-						push hl
-						ld c,h
-						call px8_conout	; x (msb)
-						pop hl
-						ld c,l
-						jp px8_conout	; x (lsb)
+sndpkt:
+	defb	$27		; slave CPU command to paint a pixel
+xcoord:
+	defb	0		; MSB
+	defb	0		; LSB
+ycoord:
+	defb	0
+mode:
+	defb	2		; 0:res, 2:plot, 3:xor
 
