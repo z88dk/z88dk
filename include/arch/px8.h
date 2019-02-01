@@ -44,6 +44,25 @@ struct SUBCPU_MASTERPACKET {
 #define LCD_7LINES subcpu_command("\001\025\001")
 #define LCD_8LINES subcpu_command("\001\025\000")
 
+/* Macros for cassette player */
+#define CMT_HEAD_ON subcpu_command("\000\101")
+#define CMT_HEAD_OFF subcpu_command("\000\102")
+#define CMT_REW subcpu_command("\000\105")
+#define CMT_FF subcpu_command("\000\106")
+#define CMT_SLOW_REW subcpu_command("\000\107")
+#define CMT_PLAY subcpu_command("\000\110")
+#define CMT_RECORD subcpu_command("\000\111")
+#define CMT_STOP subcpu_command("\000\112")
+#define CMT_UNPROTECT_WR_AREA subcpu_command("\000\126")
+
+
+/* Macros for ROM and SPEAKER */
+#define PROM_ON subcpu_command("\001\160\001")
+#define PROM_OFF subcpu_command("\001\160\000")
+//#define SPK_ON subcpu_command("\001\162\001")		<- documentation suggest this option but MXO-PX8.ASM uses 0x80 (200 in octal)
+#define SPK_ON subcpu_command("\001\162\200")
+#define SPK_OFF subcpu_command("\001\162\000")
+
 
 /* Talk to SUB-CPU via self-built packets. */
 extern int __LIB__ subcpu_call(void *masterpacket) __z88dk_fastcall;
