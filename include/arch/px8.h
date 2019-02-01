@@ -43,6 +43,11 @@ struct SUBCPU_MASTERPACKET {
 /* Macros for TEXT mode options*/
 #define LCD_7LINES subcpu_command("\001\025\001")
 #define LCD_8LINES subcpu_command("\001\025\000")
+#define LCD_CURSOR_OFF subcpu_command("\001\026\000")
+#define LCD_CURSOR_UNDERLINE subcpu_command("\001\026\001")
+#define LCD_CURSOR_UNDERLINE_BLINK subcpu_command("\001\026\003")
+#define LCD_CURSOR_BLOCK subcpu_command("\001\026\005")
+#define LCD_CURSOR_BLOCK_BLINK subcpu_command("\001\026\007")
 
 /* Macros for cassette player */
 #define CMT_HEAD_ON subcpu_command("\000\101")
