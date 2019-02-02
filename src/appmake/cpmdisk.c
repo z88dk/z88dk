@@ -53,7 +53,7 @@ static void fat_write_file(disc_handle* h, char *filename, void* data, size_t le
 
 // Generic routines
 
-static disc_handle *disc_create(disc_spec* spec)
+disc_handle *disc_create(disc_spec* spec)
 {
     disc_handle* h = calloc(1, sizeof(*h));
     size_t len;

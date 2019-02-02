@@ -45,6 +45,7 @@ extern int cpm_write_file_to_image(const char *disc_format, const char *containe
 
 
 // Create an in memory disc image
+extern disc_handle *disc_create(disc_spec *spec);
 extern disc_handle *cpm_create(disc_spec *spec);
 extern disc_handle *fat_create(disc_spec* spec);
 

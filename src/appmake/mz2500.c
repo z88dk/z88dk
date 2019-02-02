@@ -36,10 +36,6 @@ static disc_spec spec = {
     .sector_size = 256,
     .gap3_length = 0x17,
     .filler_byte = 0xe5,
-    .boottracks = 2,
-    .directory_entries = 128,
-    .extent_size = 2048,
-    .byte_size_extents = 0,
     .first_sector_offset = 1,
     .alternate_sides = 1
 };
@@ -115,7 +111,7 @@ int mz2500_exec(char* target)
     len = ftell(fpin);
     fseek(fpin, 0L, SEEK_SET);
 
-    h = cpm_create(&spec);
+    h = disc_create(&spec);
 
     /* Disk block #2 (directory) */
     memset(sectorbuf, 0, sizeof(sectorbuf));

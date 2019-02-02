@@ -30,10 +30,6 @@ static disc_spec fp1100_spec = {
     .sector_size = 256,
     .gap3_length = 0x17,
     .filler_byte = 0xe5,
-    .boottracks = 2,
-    .directory_entries = 128,
-    .extent_size = 1024,
-    .byte_size_extents = 0,
     .first_sector_offset = 1,
     .alternate_sides = 0
 };
@@ -96,7 +92,7 @@ int fp1100_exec(char *target)
     fclose(fpin);
 
 
-    h = cpm_create(&fp1100_spec);
+    h = disc_create(&fp1100_spec);
 
     // Write the bootstrap to track 0
     disc_write_sector(h, 0, 0, 0, bootbuf);

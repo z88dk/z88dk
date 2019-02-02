@@ -270,7 +270,7 @@ struct {
       "Extracts bytes from input file",
       extract_longhelp,
       extract_exec,    &extract_options },
-    { "bin2fat",  "fat",      "(C) 2018 dom",
+    { "bin2fat",  "fat",      "(C) 2019 dom + ChaN",
       "Creates a FAT disc for many platforms",
       NULL,
       fat_exec,   &fat_options },
