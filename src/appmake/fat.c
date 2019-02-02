@@ -4,7 +4,6 @@
 #include "ff.h"			/* Obtains integer types */
 #include "diskio.h"		/* Declarations of disk functions */
 
-static int fat_write_file_to_image(const char *disc_format, const char *container, const char* output_file, const char* binary_name, const char* crt_filename, const char* boot_filename);
 
 static char             *c_binary_name      = NULL;
 static char             *c_crt_filename      = NULL;
@@ -55,6 +54,7 @@ static struct formats {
      char           force_com_extension;
 } formats[] = {
     { "msxdos",    "MSXDOS DSDD",        &msxdos_fat12, 0, NULL, 1 },
+    { "msxbasic",  "MSXDOS DSDD (BASIC)",&msxdos_fat12, 0, NULL, 0 },
     { NULL, NULL }
 };
 

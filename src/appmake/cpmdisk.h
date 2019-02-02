@@ -42,6 +42,7 @@ typedef struct disc_handle_s disc_handle;
 extern disc_handle *cpm_create_with_format(const char *disc_format);
 extern void cpm_create_filename(const char *binary_name, char *cpm_filename, char force_com_extension, char include_dot);
 extern int cpm_write_file_to_image(const char *disc_format, const char *container, const char *output_file, const char *binary_name, const char *crt_filename, const char *boot_filename);
+extern int fat_write_file_to_image(const char *disc_format, const char *container, const char* output_file, const char* binary_name, const char* crt_filename, const char* boot_filename);
 
 
 // Create an in memory disc image
