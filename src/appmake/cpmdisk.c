@@ -566,7 +566,6 @@ disc_handle *fat_create(disc_spec* spec)
 
     current_fat_handle = h;
     // Create a file system
-    printf("Cluster size %d\n",spec->cluster_size);
     if ( (res = f_mkfs("1", spec->fat_format_flags, spec->cluster_size, buf, sizeof(buf), spec->number_of_fats, spec->directory_entries)) != FR_OK) {
         exit_log(1, "Cannot create FAT filesystem: %d\n",res);
     }
@@ -621,7 +620,6 @@ DRESULT disk_read (
 	UINT count		/* Number of sectors to read */
 )
 {
-    printf("Read sector %d,%d\n",sector,count);
     disc_read_sector_lba(current_fat_handle, sector, count, buff);
 
     return RES_OK;
@@ -635,7 +633,6 @@ DRESULT disk_write (
 	UINT count			/* Number of sectors to write */
 )
 {
-    printf("Write sector %d,%d\n",sector,count);
     disc_write_sector_lba(current_fat_handle, sector, count, buff);
 
     return RES_OK;
@@ -651,7 +648,6 @@ DRESULT disk_ioctl (
     switch ( cmd ) {
     case GET_SECTOR_COUNT:
         val = disc_get_sector_count(current_fat_handle);
-	printf("Get sector count %d\n",val);
         *(DWORD *)buff = val;
         break;
 
