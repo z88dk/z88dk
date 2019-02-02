@@ -32,7 +32,7 @@ option_t cpm2_options[] = {
 static struct formats   *get_format(const char *name);
 static void              dump_formats();
 
-static cpm_discspec einstein_spec = {
+static disc_spec einstein_spec = {
     .name = "Einstein",
     .sectors_per_track = 10,
     .tracks = 40,
@@ -45,7 +45,7 @@ static cpm_discspec einstein_spec = {
     .extent_size = 2048
 };
 
-static cpm_discspec attache_spec = {
+static disc_spec attache_spec = {
     .name = "Attache",
     .sectors_per_track = 10,
     .tracks = 40,
@@ -60,7 +60,7 @@ static cpm_discspec attache_spec = {
     .first_sector_offset = 1,
 };
 
-static cpm_discspec osborne_spec = {
+static disc_spec osborne_spec = {
     .name = "Osborne",
     .sectors_per_track = 5,
     .tracks = 40,
@@ -75,7 +75,7 @@ static cpm_discspec osborne_spec = {
     .first_sector_offset = 1,
 };
 
-static cpm_discspec dmv_spec = {
+static disc_spec dmv_spec = {
     .name = "NEC DMV",
     .sectors_per_track = 8,
     .tracks = 40,
@@ -91,7 +91,7 @@ static cpm_discspec dmv_spec = {
 };
 
 
-static cpm_discspec cpcsystem_spec = {
+static disc_spec cpcsystem_spec = {
     .name = "CPCSystem",
     .sectors_per_track = 9,
     .tracks = 40,
@@ -106,7 +106,7 @@ static cpm_discspec cpcsystem_spec = {
     .first_sector_offset = 0x41,
 };
 
-static cpm_discspec microbee_spec = {
+static disc_spec microbee_spec = {
     .name = "Microbee",
     .sectors_per_track = 10,
     .tracks = 80,
@@ -127,7 +127,7 @@ static cpm_discspec microbee_spec = {
 };
 
 
-static cpm_discspec kayproii_spec = {
+static disc_spec kayproii_spec = {
     .name = "KayproII",
     .sectors_per_track = 10,
     .tracks = 40,
@@ -142,7 +142,7 @@ static cpm_discspec kayproii_spec = {
     .first_sector_offset = 0,
 };
 
-static cpm_discspec mz2500cpm_spec = {
+static disc_spec mz2500cpm_spec = {
     .name = "MZ2500CPM",
     .sectors_per_track = 16,
     .tracks = 80,
@@ -158,7 +158,7 @@ static cpm_discspec mz2500cpm_spec = {
     .alternate_sides = 1
 };
 
-static cpm_discspec nascom_spec = {
+static disc_spec nascom_spec = {
     .name = "Nascom",
     .sectors_per_track = 10,
     .tracks = 77,
@@ -173,7 +173,7 @@ static cpm_discspec nascom_spec = {
     .first_sector_offset = 1,
 };
 
-static cpm_discspec qc10_spec = {
+static disc_spec qc10_spec = {
     .name = "QC10",
     .sectors_per_track = 10,
     .tracks = 40,
@@ -189,7 +189,7 @@ static cpm_discspec qc10_spec = {
     .alternate_sides = 1,
 };
 
-static cpm_discspec tiki100_spec = {
+static disc_spec tiki100_spec = {
     .name = "Tiki100",
     .sectors_per_track = 10,
     .tracks = 40,
@@ -204,7 +204,7 @@ static cpm_discspec tiki100_spec = {
     .first_sector_offset = 1,
 };
 
-static cpm_discspec svi40ss_spec = {
+static disc_spec svi40ss_spec = {
     .name = "SVI40SS",
     .sectors_per_track = 17,
     .tracks = 40,
@@ -219,7 +219,7 @@ static cpm_discspec svi40ss_spec = {
     .first_sector_offset = 1,
 };
 
-static cpm_discspec col1_spec = {
+static disc_spec col1_spec = {
     .name = "ColAdam",
     .sectors_per_track = 8,
     .tracks = 40,
@@ -239,7 +239,7 @@ static cpm_discspec col1_spec = {
 };
 
 
-static cpm_discspec smc777_spec = {
+static disc_spec smc777_spec = {
     .name = "SMC-777",
     .sectors_per_track = 16,
     .tracks = 70,
@@ -258,7 +258,7 @@ static cpm_discspec smc777_spec = {
 };
 
 
-static cpm_discspec plus3_spec = {
+static disc_spec plus3_spec = {
     .name = "ZX+3",
     .sectors_per_track = 9,
     .tracks = 40,
@@ -279,10 +279,10 @@ static cpm_discspec plus3_spec = {
 
 
 
-struct formats {
+static struct formats {
      const char    *name;
      const char    *description;
-     cpm_discspec  *spec;
+     disc_spec  *spec;
      size_t         bootlen; 
      void          *bootsector;
      char           force_com_extension;
@@ -305,22 +305,9 @@ struct formats {
     { NULL, NULL }
 };
 
-struct container {
-    const char        *name;
-    const char        *extension;
-    const char        *description;
-    int              (*writer)(cpm_handle *h, const char *filename);
-} containers[] = {
-    { "dsk",        ".dsk", "CPC extended .dsk format",    cpm_write_edsk },
-    { "d88",        ".D88", "d88 format",                  cpm_write_d88 },
-    { "raw",        ".img", "Raw image",                   cpm_write_raw },
-    { NULL, NULL, NULL }
-};
-
 static void dump_formats()
 {
     struct formats* f = &formats[0];
-    struct container *c = &containers[0];
 
     printf("Supported CP/M formats:\n\n");
 
@@ -331,18 +318,17 @@ static void dump_formats()
     }
 
     printf("\nSupported containers:\n\n");
-    while ( c->name ) {
-        printf("%-20s%s\n", c->name, c->description);
-        c++;
-    }
+    disc_print_writers(stdout);
     exit(1);
 }
 
 int cpm2_exec(char* target)
 {
 
-    if (help)
+    if (help) {
+        dump_formats();
         return -1;
+    }
     if (c_binary_name == NULL) {
         return -1;
     }
@@ -354,9 +340,9 @@ int cpm2_exec(char* target)
 }
 
 // TODO: Needs bootsector handling
-cpm_handle *cpm_create_with_format(const char *disc_format) 
+disc_handle *cpm_create_with_format(const char *disc_format) 
 {
-    cpm_discspec* spec = NULL;
+    disc_spec* spec = NULL;
     struct formats* f = &formats[0];
 
     while (f->name != NULL) {
@@ -375,15 +361,15 @@ cpm_handle *cpm_create_with_format(const char *disc_format)
 
 int cpm_write_file_to_image(const char *disc_format, const char *container, const char* output_file, const char* binary_name, const char* crt_filename, const char* boot_filename)
 {
-    cpm_discspec* spec = NULL;
+    disc_spec* spec = NULL;
     struct formats* f = &formats[0];
-    struct container *c = &containers[0];
-    int (*writer)(cpm_handle *h, const char *filename) = NULL;
+    const char      *extension;
+    disc_writer_func writer = disc_get_writer(container, &extension);
     char disc_name[FILENAME_MAX + 1];
     char cpm_filename[12] = "APP     COM";
     void* filebuf;
     FILE* binary_fp;
-    cpm_handle* h;
+    disc_handle* h;
     size_t binlen;
 
     while (f->name != NULL) {
@@ -397,13 +383,6 @@ int cpm_write_file_to_image(const char *disc_format, const char *container, cons
         return -1;
     }
 
-    while (c->name != NULL) {
-        if (strcasecmp(container, c->name) == 0) {
-            writer = c->writer;
-            break;
-        }
-        c++;
-    }
     if (writer == NULL) {
         return -1;
     }
@@ -411,7 +390,7 @@ int cpm_write_file_to_image(const char *disc_format, const char *container, cons
 
     if (output_file == NULL) {
         strcpy(disc_name, binary_name);
-        suffix_change(disc_name, c->extension);
+        suffix_change(disc_name, extension);
     } else {
         strcpy(disc_name, output_file);
     }
@@ -450,19 +429,19 @@ int cpm_write_file_to_image(const char *disc_format, const char *container, cons
             bootbuf = malloc(max_bootsize);
             fread(bootbuf, bootlen, 1, binary_fp);
             fclose(binary_fp);
-            cpm_write_boot_track(h, bootbuf, bootlen);
+            disc_write_boot_track(h, bootbuf, bootlen);
             free(bootbuf);
         }
     } else if (f->bootsector) {
-        cpm_write_boot_track(h, f->bootsector, f->bootlen);
+        disc_write_boot_track(h, f->bootsector, f->bootlen);
     }
 
-    cpm_write_file(h, cpm_filename, filebuf, binlen);
+    disc_write_file(h, cpm_filename, filebuf, binlen);
     
     if (writer(h, disc_name) < 0) {
         exit_log(1, "Can't write disc image");
     }
-    cpm_free(h);
+    disc_free(h);
 
     return 0;
 }

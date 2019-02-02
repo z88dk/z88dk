@@ -1,66 +1,71 @@
-/* Simple CP/M disc writer - wraps it all up in an EDSK file */
-
+/*
+ * Disc image handling
+ */
 
 #include "appmake.h"
+#include "diskio.h"
 
 
-struct cpm_handle_s {
-    cpm_discspec  spec;
+// d88 media type
+#define MEDIA_TYPE_2D   0x00
+#define MEDIA_TYPE_2DD  0x10
+#define MEDIA_TYPE_2HD  0x20
+#define MEDIA_TYPE_144  0x30
+#define MEDIA_TYPE_UNK  0xff
+
+typedef struct {
+        char title[17];
+        uint8_t rsrv[9];
+        uint8_t protect;
+        uint8_t type;
+        uint32_t size;
+        uint32_t trkptr[164];
+} d88_hdr_t;
+
+typedef struct {
+        uint8_t c, h, r, n;
+        uint16_t nsec;
+        uint8_t dens, del, stat;
+        uint8_t rsrv[5];
+        uint16_t size;
+} d88_sct_t;
+
+
+struct disc_handle_s {
+    disc_spec  spec;
 
     uint8_t      *image;
+
+    // CP/M information
     uint8_t      *extents;
     int           num_extents;
+
+    // FAT information
+    FATFS         fatfs;
+
+    // Routine delegation
+    void         (*write_file)(disc_handle *h, char *filename, void *data, size_t bin);
 };
 
-static int first_free_extent(cpm_handle* h)
+
+static void cpm_write_file(disc_handle* h, char *filename, void* data, size_t len);
+static void fat_write_file(disc_handle* h, char *filename, void* data, size_t len);
+
+// Generic routines
+
+static disc_handle *disc_create(disc_spec* spec)
 {
-    int i;
-
-    for (i = 0; i < h->num_extents; i++) {
-        if (h->extents[i] == 0) {
-            return i;
-        }
-    }
-    exit_log(1,"No free extents on disc\n");
-    return -1;
-}
-
-static size_t find_first_free_directory_entry(cpm_handle* h)
-{
-    size_t directory_offset = h->spec.offset ? h->spec.offset : (h->spec.boottracks * h->spec.sectors_per_track * h->spec.sector_size * 1);
-    int i;
-
-    for (i = 0; i < h->spec.directory_entries; i++) {
-        if (h->image[directory_offset] == h->spec.filler_byte) {
-            return directory_offset;
-        }
-        directory_offset += 32;
-    }
-    exit_log(1,"No free directory entries on disc\n");
-    return 0;
-}
-
-cpm_handle* cpm_create(cpm_discspec* spec)
-{
-    cpm_handle* h = calloc(1, sizeof(*h));
+    disc_handle* h = calloc(1, sizeof(*h));
     size_t len;
     int directory_extents;
     int i;
 
     h->spec = *spec;
-
     len = spec->tracks * spec->sectors_per_track * spec->sector_size * spec->sides;
     h->image = calloc(len, sizeof(char));
     memset(h->image, spec->filler_byte, len);
 
-    directory_extents = (h->spec.directory_entries * 32) / h->spec.extent_size;
-    h->num_extents = ((spec->tracks - h->spec.boottracks) * h->spec.sectors_per_track * h->spec.sector_size) / h->spec.extent_size + 1;
-    h->extents = calloc(h->num_extents, sizeof(uint8_t));
 
-    /* Now reserve the directory extents */
-    for (i = 0; i < directory_extents; i++) {
-        h->extents[i] = 1;
-    }
 #if 0
     // Code that marks each sector so we can see what is actually loaded
     for ( int t = 0, offs = 0; t < spec->tracks; t++ ) {
@@ -76,19 +81,23 @@ cpm_handle* cpm_create(cpm_discspec* spec)
         }
     }
 #endif
-    size_t directory_offset = h->spec.offset ? h->spec.offset : (h->spec.boottracks * h->spec.sectors_per_track * h->spec.sector_size * 1);
-    memset(h->image +directory_offset, 0xe5, 512);
     return h;
 }
 
-void cpm_write_boot_track(cpm_handle* h, void* data, size_t len)
+void disc_write_file(disc_handle* h, char *filename, void* data, size_t len)
+{
+    h->write_file(h, filename, data, len);
+}
+
+
+void disc_write_boot_track(disc_handle* h, void* data, size_t len)
 {
     memcpy(h->image, data, len);
 }
 
-void cpm_write_sector_lba(cpm_handle *h, int sector_nr, int count, const void *data)
+void disc_write_sector_lba(disc_handle *h, int sector_nr, int count, const void *data)
 {
-    uint8_t *ptr = data;
+    const uint8_t *ptr = data;
     int      i;
 
     for ( i = 0; i < count; i++ ) {
@@ -102,13 +111,13 @@ void cpm_write_sector_lba(cpm_handle *h, int sector_nr, int count, const void *d
             } else {
                    head = track >= h->spec.tracks ? 1 : 0;
         }
-        cpm_write_sector(h, track, sector, head, ptr);
+        disc_write_sector(h, track, sector, head, ptr);
         sector_nr++;
         ptr += h->spec.sector_size;
     }
 }
 
-void cpm_write_sector(cpm_handle *h, int track, int sector, int head, const void *data)
+void disc_write_sector(disc_handle *h, int track, int sector, int head, const void *data)
 {
     size_t offset;
     size_t track_length = h->spec.sectors_per_track * h->spec.sector_size;
@@ -123,7 +132,7 @@ void cpm_write_sector(cpm_handle *h, int track, int sector, int head, const void
     memcpy(&h->image[offset], data, h->spec.sector_size);
 }
 
-void cpm_read_sector_lba(cpm_handle *h, int sector_nr, int count, void *data)
+void disc_read_sector_lba(disc_handle *h, int sector_nr, int count, void *data)
 {
     uint8_t *ptr = data;
     int      i;
@@ -139,13 +148,13 @@ void cpm_read_sector_lba(cpm_handle *h, int sector_nr, int count, void *data)
             } else {
                    head = track >= h->spec.tracks ? 1 : 0;
         }
-        cpm_read_sector(h, track, sector, head, ptr);
+        disc_read_sector(h, track, sector, head, ptr);
         sector_nr++;
         ptr += h->spec.sector_size;
     }
 }
 
-void cpm_read_sector(cpm_handle *h, int track, int sector, int head, void *data)
+void disc_read_sector(disc_handle *h, int track, int sector, int head, void *data)
 {
     size_t offset;
     size_t track_length = h->spec.sectors_per_track * h->spec.sector_size;
@@ -160,66 +169,68 @@ void cpm_read_sector(cpm_handle *h, int track, int sector, int head, void *data)
     memcpy(data, &h->image[offset], h->spec.sector_size);
 }
 
-void cpm_write_file(cpm_handle* h, char filename[11], void* data, size_t len)
+
+
+
+int disc_get_sector_size(disc_handle *h)
 {
-    size_t num_extents = (len / h->spec.extent_size) + 1;
-    size_t directory_offset;
-    size_t offset;
-    uint8_t* dir_ptr;
-    uint8_t direntry[32];
-    uint8_t* ptr;
-    int i, j, current_extent;
-    int extents_per_entry = h->spec.byte_size_extents ? 16 : 8;
+    return h->spec.sector_size;
+}
 
-    directory_offset = find_first_free_directory_entry(h);
-    dir_ptr = h->image + directory_offset;
-    // Now, write the directory entry, we can start from extent 1
-    current_extent = first_free_extent(h);
-    // We need to turn that extent into an offset into the disc
-    if ( h->spec.offset ) {
-        offset = h->spec.offset + (current_extent * h->spec.extent_size);
-    } else {
-        offset = (h->spec.boottracks * h->spec.sectors_per_track * h->spec.sector_size * 1) + (current_extent * h->spec.extent_size);
+int disc_get_sector_count(disc_handle *h)
+{
+    return h->spec.sides  * h->spec.sectors_per_track * h->spec.tracks;
+}
+
+
+void disc_free(disc_handle* h)
+{
+    free(h->image);
+    free(h->extents);
+    free(h);
+}
+
+// Image writing routines
+
+struct container {
+    const char        *name;
+    const char        *extension;
+    const char        *description;
+    disc_writer_func   writer;
+} containers[] = {
+    { "dsk",        ".dsk", "CPC extended .dsk format",    disc_write_edsk },
+    { "d88",        ".D88", "d88 format",                  disc_write_d88 },
+    { "raw",        ".img", "Raw image",                   disc_write_raw },
+    { NULL, NULL, NULL }
+};
+
+disc_writer_func disc_get_writer(const char *container_name, const char **extension)
+{
+    struct container *c = &containers[0];
+    while (c->name != NULL) {
+        *extension = c->extension;
+        if (strcasecmp(container_name, c->name) == 0) {
+            return c->writer;
+        }
+        c++;
     }
-    memcpy(h->image + offset, data, len);
+    return NULL;
+}
 
-    for (i = 0; i <= (num_extents / extents_per_entry); i++) {
-        int extents_to_write;
+void disc_print_writers(FILE *fp)
+{
+    struct container *c = &containers[0];
 
-        memset(direntry, 0, sizeof(direntry));
-
-        direntry[0] = 0; // User 0
-        memcpy(direntry + 1, filename, 11);
-        direntry[12] = i; // Extent number
-        direntry[13] = 0;
-        direntry[14] = 0;
-        if (num_extents - (i * extents_per_entry) > extents_per_entry) {
-            direntry[15] = 0x80;
-            extents_to_write = extents_per_entry;
-        } else {
-            direntry[15] = ((len % (extents_per_entry * h->spec.extent_size)) / 128) + 1;
-            extents_to_write = (num_extents - (i * extents_per_entry));
-        }
-        ptr = &direntry[16];
-        for (j = 0; j < extents_per_entry; j++) {
-            if (j < extents_to_write) {
-                h->extents[current_extent] = 1;
-                if (h->spec.byte_size_extents) {
-                    direntry[j + 16] = (current_extent) % 256;
-                } else {
-                    direntry[j * 2 + 16] = (current_extent) % 256;
-                    direntry[j * 2 + 16 + 1] = (current_extent) / 256;
-                }
-                current_extent++;
-            }
-        }
-        memcpy(h->image + directory_offset, direntry, 32);
-        directory_offset += 32;
+    while ( c->name ) {
+        fprintf(fp, "%-20s%s\n", c->name, c->description);
+        c++;
     }
 }
 
+
+
 // Write a raw disk, no headers for tracks etc
-int cpm_write_raw(cpm_handle* h, const char* filename)
+int disc_write_raw(disc_handle* h, const char* filename)
 {
     size_t offs;
     FILE* fp;
@@ -255,7 +266,7 @@ int cpm_write_raw(cpm_handle* h, const char* filename)
 }
 
 
-int cpm_write_edsk(cpm_handle* h, const char* filename)
+int disc_write_edsk(disc_handle* h, const char* filename)
 {
     uint8_t header[256] = { 0 };
     char    title[15];
@@ -336,14 +347,8 @@ int cpm_write_edsk(cpm_handle* h, const char* filename)
 }
 
 
-void cpm_free(cpm_handle* h)
-{
-    free(h->image);
-    free(h->extents);
-    free(h);
-}
 
-int cpm_write_d88(cpm_handle* h, const char* filename)
+int disc_write_d88(disc_handle* h, const char* filename)
 {
     uint8_t header[1024] = { 0 };
     char    title[18];
@@ -438,13 +443,224 @@ int cpm_write_d88(cpm_handle* h, const char* filename)
     return 0;
 }
 
-
-int cpm_get_sector_size(cpm_handle *h)
+// CP/M routines
+static int first_free_extent(disc_handle* h)
 {
-    return h->spec.sector_size;
+    int i;
+
+    for (i = 0; i < h->num_extents; i++) {
+        if (h->extents[i] == 0) {
+            return i;
+        }
+    }
+    exit_log(1,"No free extents on disc\n");
+    return -1;
 }
 
-int cpm_get_sector_count(cpm_handle *h)
+static size_t find_first_free_directory_entry(disc_handle* h)
 {
-    return h->spec.sides  * h->spec.sectors_per_track * h->spec.tracks;
+    size_t directory_offset = h->spec.offset ? h->spec.offset : (h->spec.boottracks * h->spec.sectors_per_track * h->spec.sector_size * 1);
+    int i;
+
+    for (i = 0; i < h->spec.directory_entries; i++) {
+        if (h->image[directory_offset] == h->spec.filler_byte) {
+            return directory_offset;
+        }
+        directory_offset += 32;
+    }
+    exit_log(1,"No free directory entries on disc\n");
+    return 0;
 }
+
+disc_handle *cpm_create(disc_spec* spec)
+{
+    disc_handle* h = disc_create(spec);
+    int directory_extents;
+    int i;
+
+
+    directory_extents = (h->spec.directory_entries * 32) / h->spec.extent_size;
+    h->num_extents = ((spec->tracks - h->spec.boottracks) * h->spec.sectors_per_track * h->spec.sector_size) / h->spec.extent_size + 1;
+    h->extents = calloc(h->num_extents, sizeof(uint8_t));
+
+    /* Now reserve the directory extents */
+    for (i = 0; i < directory_extents; i++) {
+        h->extents[i] = 1;
+    }
+
+    h->write_file = cpm_write_file;
+    size_t directory_offset = h->spec.offset ? h->spec.offset : (h->spec.boottracks * h->spec.sectors_per_track * h->spec.sector_size * 1);
+    memset(h->image +directory_offset, 0xe5, 512);
+    return h;
+}
+
+
+static void cpm_write_file(disc_handle* h, char *filename, void* data, size_t len)
+{
+    size_t num_extents = (len / h->spec.extent_size) + 1;
+    size_t directory_offset;
+    size_t offset;
+    uint8_t* dir_ptr;
+    uint8_t direntry[32];
+    uint8_t* ptr;
+    int i, j, current_extent;
+    int extents_per_entry = h->spec.byte_size_extents ? 16 : 8;
+
+    directory_offset = find_first_free_directory_entry(h);
+    dir_ptr = h->image + directory_offset;
+    // Now, write the directory entry, we can start from extent 1
+    current_extent = first_free_extent(h);
+    // We need to turn that extent into an offset into the disc
+    if ( h->spec.offset ) {
+        offset = h->spec.offset + (current_extent * h->spec.extent_size);
+    } else {
+        offset = (h->spec.boottracks * h->spec.sectors_per_track * h->spec.sector_size * 1) + (current_extent * h->spec.extent_size);
+    }
+    memcpy(h->image + offset, data, len);
+
+    for (i = 0; i <= (num_extents / extents_per_entry); i++) {
+        int extents_to_write;
+
+        memset(direntry, 0, sizeof(direntry));
+
+        direntry[0] = 0; // User 0
+        memcpy(direntry + 1, filename, 11);
+        direntry[12] = i; // Extent number
+        direntry[13] = 0;
+        direntry[14] = 0;
+        if (num_extents - (i * extents_per_entry) > extents_per_entry) {
+            direntry[15] = 0x80;
+            extents_to_write = extents_per_entry;
+        } else {
+            direntry[15] = ((len % (extents_per_entry * h->spec.extent_size)) / 128) + 1;
+            extents_to_write = (num_extents - (i * extents_per_entry));
+        }
+        ptr = &direntry[16];
+        for (j = 0; j < extents_per_entry; j++) {
+            if (j < extents_to_write) {
+                h->extents[current_extent] = 1;
+                if (h->spec.byte_size_extents) {
+                    direntry[j + 16] = (current_extent) % 256;
+                } else {
+                    direntry[j * 2 + 16] = (current_extent) % 256;
+                    direntry[j * 2 + 16 + 1] = (current_extent) / 256;
+                }
+                current_extent++;
+            }
+        }
+        memcpy(h->image + directory_offset, direntry, 32);
+        directory_offset += 32;
+    }
+}
+
+// FAT filesystem - we delegate mostly to FatFS
+
+// Nasty static reference to file, TODO, I can do this better
+static disc_handle *current_fat_handle = NULL;
+
+disc_handle *fat_create(disc_spec* spec)
+{
+    disc_handle *h = disc_create(spec);
+    char         buf[1024];
+    FRESULT      res;
+
+    current_fat_handle = h;
+    // Create a file system
+    printf("Cluster size %d\n",spec->cluster_size);
+    if ( (res = f_mkfs("1", spec->fat_format_flags, spec->cluster_size, buf, sizeof(buf), spec->number_of_fats, spec->directory_entries)) != FR_OK) {
+        exit_log(1, "Cannot create FAT filesystem: %d\n",res);
+    }
+
+    // And now we need to mount it
+    if ( (res = f_mount(&h->fatfs, "1", 1)) != FR_OK ) {
+        exit_log(1, "Cannot mount newly create FAT filesystem: %d\n",res);
+    }
+
+    h->write_file = fat_write_file;
+    return h;
+}
+
+static void fat_write_file(disc_handle* h, char *filename, void* data, size_t len)
+{
+    FIL file={0};
+    UINT written;
+
+    if ( f_open(&file, filename, FA_WRITE|FA_CREATE_ALWAYS) != FR_OK ) {
+        exit_log(1, "Cannot create file <%s> on FAT image", filename);
+    }
+
+    if ( f_write(&file, data, len, &written) != FR_OK ) {
+        exit_log(1, "Cannot write file contents to FAT image");
+    }
+
+    f_close(&file);
+}
+
+
+// FATFs interface
+
+DSTATUS disk_status (
+	BYTE pdrv		/* Physical drive nmuber to identify the drive */
+)
+{
+    return RES_OK;
+}
+
+DSTATUS disk_initialize (
+	BYTE pdrv				/* Physical drive nmuber to identify the drive */
+)
+{
+    return RES_OK;
+}
+
+
+DRESULT disk_read (
+	BYTE pdrv,		/* Physical drive nmuber to identify the drive */
+	BYTE *buff,		/* Data buffer to store read data */
+	DWORD sector,	/* Start sector in LBA */
+	UINT count		/* Number of sectors to read */
+)
+{
+    printf("Read sector %d,%d\n",sector,count);
+    disc_read_sector_lba(current_fat_handle, sector, count, buff);
+
+    return RES_OK;
+}
+
+
+DRESULT disk_write (
+	BYTE pdrv,			/* Physical drive nmuber to identify the drive */
+	const BYTE *buff,	/* Data to be written */
+	DWORD sector,		/* Start sector in LBA */
+	UINT count			/* Number of sectors to write */
+)
+{
+    printf("Write sector %d,%d\n",sector,count);
+    disc_write_sector_lba(current_fat_handle, sector, count, buff);
+
+    return RES_OK;
+}
+
+DRESULT disk_ioctl (
+	BYTE pdrv,		/* Physical drive nmuber (0..) */
+	BYTE cmd,		/* Control code */
+	void *buff		/* Buffer to send/receive control data */
+)
+{
+    int    val;
+    switch ( cmd ) {
+    case GET_SECTOR_COUNT:
+        val = disc_get_sector_count(current_fat_handle);
+	printf("Get sector count %d\n",val);
+        *(DWORD *)buff = val;
+        break;
+
+    case GET_SECTOR_SIZE:
+    case GET_BLOCK_SIZE:
+        val = disc_get_sector_size(current_fat_handle);
+        *(WORD *)buff = val;
+        break;
+    }
+    return RES_OK;
+}
+

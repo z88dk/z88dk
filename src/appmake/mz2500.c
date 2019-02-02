@@ -28,7 +28,7 @@ option_t mz2500_options[] = {
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
 };
 
-static cpm_discspec spec = {
+static disc_spec spec = {
     .name = "MZ2500",
     .sectors_per_track = 16,
     .tracks = 40,
@@ -47,14 +47,14 @@ static cpm_discspec spec = {
 static uint8_t    sectorbuf[256];
 
 
-void write_sector(cpm_handle *h, int track, int sector, int head) 
+void write_sector(disc_handle *h, int track, int sector, int head) 
 {
     int  i;
 
     for ( i = 0; i < sizeof(sectorbuf);i++ ) {
         sectorbuf[i] ^= 0xff;
     }
-    cpm_write_sector(h, track, sector, head, sectorbuf);
+    disc_write_sector(h, track, sector, head, sectorbuf);
 
 }
 
@@ -71,7 +71,7 @@ int mz2500_exec(char* target)
     int len, namelen;
     int i, j, c;
     int track, sector, head, written;
-    cpm_handle *h;
+    disc_handle *h;
 
     if (help)
         return -1;
@@ -167,8 +167,8 @@ int mz2500_exec(char* target)
     }
 
     fclose(fpin);
-    cpm_write_edsk(h, filename);
-    cpm_free(h);
+    disc_write_edsk(h, filename);
+    disc_free(h);
 
     return 0;
 }

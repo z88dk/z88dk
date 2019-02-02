@@ -22,7 +22,7 @@ option_t fp1100_options[] = {
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
-static cpm_discspec fp1100_spec = {
+static disc_spec fp1100_spec = {
     .name = "FP-1100",
     .sectors_per_track = 16,
     .tracks = 40,
@@ -45,7 +45,7 @@ int fp1100_exec(char *target)
     char    filename[FILENAME_MAX+1];
     char    bootname[FILENAME_MAX+1];
     FILE    *fpin, *bootstrap_fp;
-    cpm_handle *h;
+    disc_handle *h;
     long    pos, bootlen;
     int     cksum;
     int     t,s,w,head = 0;
@@ -99,7 +99,7 @@ int fp1100_exec(char *target)
     h = cpm_create(&fp1100_spec);
 
     // Write the bootstrap to track 0
-    cpm_write_sector(h, 0, 0, 0, bootbuf);
+    disc_write_sector(h, 0, 0, 0, bootbuf);
 
     // Write input file
     t = 0;
@@ -107,7 +107,7 @@ int fp1100_exec(char *target)
     w = 0;
     head = 0;
     while ( w < pos ) {
-        cpm_write_sector(h, t, s, head, buf + w);
+        disc_write_sector(h, t, s, head, buf + w);
         s++;
         if ( s == 16 ) {
            t++;
@@ -117,7 +117,7 @@ int fp1100_exec(char *target)
     }
 
     suffix_change(filename, ".d88");
-    cpm_write_d88(h, filename);
+    disc_write_d88(h, filename);
     free(buf);
 
     return 0;

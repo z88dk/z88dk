@@ -11,7 +11,7 @@ static char             *c_crt_filename      = NULL;
 static char             *c_disc_format       = NULL;
 static char             *c_output_file      = NULL;
 static char             *c_boot_filename     = NULL;
-static char             *c_disc_container    = "dsk";
+static char             *c_disc_container    = "raw";
 static char              help         = 0;
 
 
@@ -28,8 +28,8 @@ option_t fat_options[] = {
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
-static cpm_discspec dsdd_fat12 = {
-    .name = "FAT12-DSDD",
+static disc_spec msxdos_fat12 = {
+    .name = "MSXDOS-F12",
     .sectors_per_track = 9,
     .tracks = 80,
     .sides = 2,
@@ -37,9 +37,43 @@ static cpm_discspec dsdd_fat12 = {
     .gap3_length = 0x2a,
     .filler_byte = 0xe5,
     .boottracks = 0,
-    .directory_entries = 0,
-    .extent_size = 2048
+    .directory_entries = 112,
+    .number_of_fats = 2,
+    .cluster_size = 1024,
+    .fat_format_flags = FM_FAT|FM_SFD,
+    .alternate_sides = 1,
+    .first_sector_offset = 1	// Required for .dsk
 };
+
+
+static struct formats {
+     const char    *name;
+     const char    *description;
+     disc_spec  *spec;
+     size_t         bootlen; 
+     void          *bootsector;
+     char           force_com_extension;
+} formats[] = {
+    { "msxdos",    "MSXDOS DSDD",        &msxdos_fat12, 0, NULL, 1 },
+    { NULL, NULL }
+};
+
+static void dump_formats()
+{
+    struct formats* f = &formats[0];
+
+    printf("Supported FAT formats:\n\n");
+
+    while (f->name) {
+        printf("%-20s%s\n", f->name, f->description);
+        printf("%d tracks, %d sectors/track, %d bytes/sector, %d entries, %d bytes/cluster\n\n", f->spec->tracks, f->spec->sectors_per_track, f->spec->sector_size, f->spec->directory_entries, f->spec->cluster_size);
+        f++;
+    }
+
+    printf("\nSupported containers:\n\n");
+    disc_print_writers(stdout);
+    exit(1);
+}
 
 
 int fat_exec(char *target)
@@ -50,125 +84,71 @@ int fat_exec(char *target)
         return -1;
     }
     if (c_disc_format == NULL || c_disc_container == NULL ) {
+        dump_formats(); 
         return -1;
     }
     return fat_write_file_to_image(c_disc_format, c_disc_container, c_output_file, c_binary_name, c_crt_filename, c_boot_filename);
 }
 
-static cpm_handle* h;
 
 int fat_write_file_to_image(const char *disc_format, const char *container, const char* output_file, const char* binary_name, const char* crt_filename, const char* boot_filename)
 {
-    char          buf[1024];
-    cpm_discspec* spec = &dsdd_fat12;
-    char *disc_name = "a.raw";
-    int (*writer)(cpm_handle *h, const char *filename) = cpm_write_raw;
-    int ret;
+    disc_handle      *h;
+    char              dos_filename[20];
+    char              buf[1024];
+    struct formats   *f = &formats[0];
+    disc_spec        *spec = NULL;
+    char              disc_name[FILENAME_MAX+1];
+    const char       *extension;
+    disc_writer_func  writer = disc_get_writer(container, &extension);
+    int               ret;
+    FILE             *binary_fp;
+    size_t            binlen;
+    void             *filebuf;
 
-    h = cpm_create(spec);
 
-    ret = f_mkfs("1", FM_FAT, 1024, buf, sizeof(buf));
-	printf("Mkfs gave %d\n",ret);
+    while (f->name != NULL) {
+        if (strcasecmp(disc_format, f->name) == 0) {
+            spec = f->spec;
+            break;
+        }
+        f++;
+    }
+    if ( spec == NULL || writer == NULL ) {
+        return -1;
+    }
+
+    if (output_file == NULL) {
+        strcpy(disc_name, binary_name);
+        suffix_change(disc_name, extension);
+    } else {
+        strcpy(disc_name, output_file);
+    }
+
+    cpm_create_filename(binary_name, dos_filename, f->force_com_extension, 1);
+
+    // Open the binary file
+    if ((binary_fp = fopen_bin(binary_name, crt_filename)) == NULL) {
+        exit_log(1, "Can't open input file %s\n", binary_name);
+    }
+    if (fseek(binary_fp, 0, SEEK_END)) {
+        fclose(binary_fp);
+        exit_log(1, "Couldn't determine size of file\n");
+    }
+    binlen = ftell(binary_fp);
+    fseek(binary_fp, 0L, SEEK_SET);
+    filebuf = malloc(binlen);
+    fread(filebuf, binlen, 1, binary_fp);
+    fclose(binary_fp);
+
+    h = fat_create(spec);
+    disc_write_file(h, dos_filename, filebuf, binlen);
 
     if (writer(h, disc_name) < 0) {
         exit_log(1, "Can't write disc image");
     }
-    cpm_free(h);
+    disc_free(h);
     return 0;
 }
 
-
-
-
-/*-----------------------------------------------------------------------*/
-/* Get Drive Status                                                      */
-/*-----------------------------------------------------------------------*/
-
-DSTATUS disk_status (
-	BYTE pdrv		/* Physical drive nmuber to identify the drive */
-)
-{
-    return RES_OK;
-}
-
-
-
-/*-----------------------------------------------------------------------*/
-/* Inidialize a Drive                                                    */
-/*-----------------------------------------------------------------------*/
-
-DSTATUS disk_initialize (
-	BYTE pdrv				/* Physical drive nmuber to identify the drive */
-)
-{
-    return RES_OK;
-}
-
-
-
-/*-----------------------------------------------------------------------*/
-/* Read Sector(s)                                                        */
-/*-----------------------------------------------------------------------*/
-
-DRESULT disk_read (
-	BYTE pdrv,		/* Physical drive nmuber to identify the drive */
-	BYTE *buff,		/* Data buffer to store read data */
-	DWORD sector,	/* Start sector in LBA */
-	UINT count		/* Number of sectors to read */
-)
-{
-    cpm_read_sector_lba(h, sector, count, buff);
-
-    return RES_OK;
-}
-
-
-
-/*-----------------------------------------------------------------------*/
-/* Write Sector(s)                                                       */
-/*-----------------------------------------------------------------------*/
-
-#if FF_FS_READONLY == 0
-
-DRESULT disk_write (
-	BYTE pdrv,			/* Physical drive nmuber to identify the drive */
-	const BYTE *buff,	/* Data to be written */
-	DWORD sector,		/* Start sector in LBA */
-	UINT count			/* Number of sectors to write */
-)
-{
-    cpm_write_sector_lba(h, sector, count, buff);
-
-    return RES_OK;
-}
-
-#endif
-
-
-/*-----------------------------------------------------------------------*/
-/* Miscellaneous Functions                                               */
-/*-----------------------------------------------------------------------*/
-
-DRESULT disk_ioctl (
-	BYTE pdrv,		/* Physical drive nmuber (0..) */
-	BYTE cmd,		/* Control code */
-	void *buff		/* Buffer to send/receive control data */
-)
-{
-    int    val;
-    switch ( cmd ) {
-    case GET_SECTOR_COUNT:
-        val = cpm_get_sector_count(h);
-	printf("Get sector count %d\n",val);
-        *(DWORD *)buff = val;
-        break;
-
-    case GET_SECTOR_SIZE:
-    case GET_BLOCK_SIZE:
-        val = cpm_get_sector_size(h);
-        *(WORD *)buff = val;
-        break;
-    }
-    return RES_OK;
-}
 

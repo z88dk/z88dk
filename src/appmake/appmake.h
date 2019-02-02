@@ -20,7 +20,6 @@
 #include <unistd.h>
 #endif
 
-#include "d88.h"
 #include "cpmdisk.h"
 
 extern char c_install_dir[];
