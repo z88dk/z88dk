@@ -224,7 +224,6 @@
   <ItemGroup>
     <ClInclude Include="..\..\src\appmake\appmake.h" />
     <ClInclude Include="..\..\src\appmake\cpmdisk.h" />
-    <ClInclude Include="..\..\src\appmake\d88.h" />
     <ClInclude Include="..\..\src\appmake\zx-util.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

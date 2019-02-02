@@ -20,7 +20,6 @@
 #include <unistd.h>
 #endif
 
-#include "d88.h"
 #include "cpmdisk.h"
 
 extern char c_install_dir[];
@@ -75,6 +74,9 @@ extern option_t  cpm2_options;
 
 extern int       enterprise_exec(char *target);
 extern option_t  enterprise_options;
+
+extern int       fat_exec(char *target);
+extern option_t  fat_options;
 
 extern int       fp1100_exec(char *target);
 extern option_t  fp1100_options;
@@ -268,6 +270,10 @@ struct {
       "Extracts bytes from input file",
       extract_longhelp,
       extract_exec,    &extract_options },
+    { "bin2fat",  "fat",      "(C) 2019 dom + ChaN",
+      "Creates a FAT disc for many platforms",
+      NULL,
+      fat_exec,   &fat_options },
     { "fp1kd88",  "fp1100",      "(C) 2018 Dominic Morris",
       "Creates a .d88 for the Casio FP-1100",
       NULL,

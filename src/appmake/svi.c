@@ -321,7 +321,7 @@ int svi_exec(char* target)
     return 0;
 }
 
-static cpm_discspec spec = {
+static disc_spec spec = {
     .sectors_per_track = 18,
     .tracks = 40,
     .sides = 1,

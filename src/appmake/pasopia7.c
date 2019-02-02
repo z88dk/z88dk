@@ -24,7 +24,7 @@ option_t pasopia7_options[] = {
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
-static cpm_discspec pasopia_spec = {
+static disc_spec pasopia_spec = {
     .name = "Pasopia7",
     .sectors_per_track = 16,
     .tracks = 40,
@@ -48,7 +48,7 @@ int pasopia7_exec(char *target)
     char    filename[FILENAME_MAX+1];
     char    bootname[FILENAME_MAX+1];
     FILE    *fpin, *bootstrap_fp;
-    cpm_handle *h;
+    disc_handle *h;
     long    pos, bootlen;
     int     cksum;
     int     t,s,w;
@@ -102,15 +102,15 @@ int pasopia7_exec(char *target)
     h = cpm_create(&pasopia_spec);
 
     // Write the bootstrap to track 1
-    cpm_write_sector(h, 1, 0, 0, bootbuf);
-    cpm_write_sector(h, 1, 1, 0, bootbuf + 256);
+    disc_write_sector(h, 1, 0, 0, bootbuf);
+    disc_write_sector(h, 1, 1, 0, bootbuf + 256);
 
     // Write input file
     t = 2;
     s = 0;
     w = 0;
     while ( w < pos ) {
-        cpm_write_sector(h, t, s, 0, buf + w);
+        disc_write_sector(h, t, s, 0, buf + w);
         s++;
         if ( s == 8) {
             s = 0;
@@ -120,7 +120,7 @@ int pasopia7_exec(char *target)
     }
 
     suffix_change(filename, ".dsk");
-    cpm_write_edsk(h, filename);
+    disc_write_edsk(h, filename);
     free(buf);
 
     return 0;
