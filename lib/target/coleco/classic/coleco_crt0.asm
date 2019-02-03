@@ -125,24 +125,3 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
         ENDIF
 	INCLUDE	"crt/classic/crt_section.asm"
 
-        SECTION bss_crt
-
-
-        PUBLIC  RG0SAV          ;keeping track of VDP register values
-        PUBLIC  RG1SAV
-        PUBLIC  RG2SAV
-        PUBLIC  RG3SAV
-        PUBLIC  RG4SAV
-        PUBLIC  RG5SAV
-        PUBLIC  RG6SAV
-        PUBLIC  RG7SAV
-
-
-RG0SAV:         defb    0       ;keeping track of VDP register values
-RG1SAV:         defb    0
-RG2SAV:         defb    0
-RG3SAV:         defb    0
-RG4SAV:         defb    0
-RG5SAV:         defb    0
-RG6SAV:         defb    0
-RG7SAV:         defb    0

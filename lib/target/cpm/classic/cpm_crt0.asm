@@ -270,12 +270,6 @@ ENDIF
 		PUBLIC	_vdcDispMem
 _vdcDispMem:				; Label used by "c128cpm.lib" only
 end:		defb	0		; null file name
-IF !DEFINED_nogfxglobals
-		PUBLIC	RG0SAV
-RG0SAV:		defb	1*8		; VDP graphics driver (Einstein)
-							; Also used to remember the border color for the ZX Spectrum +3 
-							; in CP/M mode (Blue is default)
-ENDIF
 
 
 	SECTION  rodata_clib
