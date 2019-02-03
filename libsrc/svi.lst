@@ -90,4 +90,5 @@ rs232/svi/rs232_params
 rs232/svi/rs232_put
 arch/svi/im1_init
 arch/svi/nmi_init
+msx/l_tms9918_disable_interrupts_im1
 @z80.lst
