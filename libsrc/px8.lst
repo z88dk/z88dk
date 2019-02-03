@@ -1,13 +1,14 @@
 arch/px8/subcpu_call
 arch/px8/subcpu_command
 arch/px8/subcpu_function
+graphics/w_dcircle_square.asm
 graphics/px8/draw
 graphics/retrofit/draw_callee
 graphics/px8/undraw
 graphics/retrofit/undraw_callee
 graphics/draw_profile_nostencil
 graphics/px8/clg
-graphics/w_putsprite3
+graphics/px8/w_putsprite
 graphics/px8/w_plotpixl
 graphics/px8/w_respixl
 graphics/px8/w_xorpixl
