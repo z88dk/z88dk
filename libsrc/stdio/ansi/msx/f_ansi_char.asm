@@ -16,7 +16,6 @@
 	
 	PUBLIC	ansi_CHAR
 
-	EXTERN	msxbios
 	
 	EXTERN	FILVRM
 	EXTERN	LDIRVM
@@ -70,9 +69,8 @@
 	ld	e,a
 	ld	a,(__console_y)
 	ld	d,a
-	ld	ix,LDIRVM
 	push	de
-	call	msxbios
+	call	LDIRVM
 	pop	de
 	jp	set_attribute
 	
@@ -377,8 +375,7 @@ ENDIF
 	add	hl,de
 	ld	a,(__tms9918_attribute)
 	ld	bc,8
-	ld	ix,FILVRM
-	call	msxbios
+	call	FILVRM
   	jp	__graphics_end
 
 
