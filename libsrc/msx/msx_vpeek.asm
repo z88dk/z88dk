@@ -1,58 +1,55 @@
 ;
-;	MSX specific routines
+;        MSX specific routines
 ;
-;	Improved functions by Rafael de Oliveira Jannone
-;	Originally released in 2004 for GFX - a small graphics library
+;        Improved functions by Rafael de Oliveira Jannone
+;        Originally released in 2004 for GFX - a small graphics library
 ;
-;	int msx_vpeek(int address);
+;        int msx_vpeek(int address);
 ;
-;	Read the MSX video memory
+;        Read the MSX video memory
 ;
-;	$Id: msx_vpeek.asm,v 1.10 2016-06-16 19:30:25 dom Exp $
+;        $Id: msx_vpeek.asm,v 1.10 2016-06-16 19:30:25 dom Exp $
 ;
 
         SECTION code_clib
-	PUBLIC	msx_vpeek
-	PUBLIC	_msx_vpeek
-	
-	INCLUDE	"msx/vdp.inc"
+        PUBLIC  msx_vpeek
+        PUBLIC  _msx_vpeek
+        EXTERN  l_tms9918_disable_interrupts
+        EXTERN  l_tms9918_enable_interrupts
+        
+        INCLUDE        "msx/vdp.inc"
 
 
 msx_vpeek:
 _msx_vpeek:
-	; (FASTCALL) -> HL = address
-
-	;ld	ix,RDVRM
-	;call	msxbios
-	
-	; enter vdp address pointer
-	ld	a,l
-	di
+        ; (FASTCALL) -> HL = address
+        ; enter vdp address pointer
+        ld      a,l
+        call    l_tms9918_disable_interrupts
 IF VDP_CMD < 0
-	ld	(-VDP_CMD),a
+        ld      (-VDP_CMD),a
 ELSE
-	ld	bc,VDP_CMD
-	out	(c),a
+        ld      bc,VDP_CMD
+        out     (c),a
 ENDIF
-	ld	a,h
-	and	@00111111
-	ei
+        ld      a,h
+        and     @00111111
 IF VDP_CMD < 0
-	ld	(-VDP_CMD),a
-	out	(c),a
+        ld      (-VDP_CMD),a
+        out     (c),a
 ENDIF
-
-	; read data
+        ; read data
 IF VDP_DATAIN < 0
-	ld	a,(-VDP_DATAIN)
+        ld      a,(-VDP_DATAIN)
 ELSE
-	IF VDP_DATAIN > 255
-		ld	a,+(VDP_DATAIN / 256)
-	ENDIF
-	in	a,(VDP_DATAIN % 256)
+    IF VDP_DATAIN > 255
+            ld        a,+(VDP_DATAIN / 256)
+    ENDIF
+        in      a,(VDP_DATAIN % 256)
 ENDIF
-	
-	ld	h,0
-	ld	l,a
-	ret
+        
+        ld      h,0
+        ld      l,a
+        call    l_tms9918_enable_interrupts
+        ret
 

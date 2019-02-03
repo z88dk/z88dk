@@ -10,7 +10,6 @@
         EXTERN  __tms9918_cls
         EXTERN  __console_w
         EXTERN  msx_set_mode
-        EXTERN  msxbios
         EXTERN  LDIRVM
 
 IF !FORspc1000 && !FOReinstein && !FORsvi
@@ -74,12 +73,10 @@ set_font:
         ld      hl,(generic_console_font32)
         ld      de, $2000 + 256
         ld      bc, 768                        ;96 characters
-        ld      ix, LDIRVM
-        call    msxbios
+        call    LDIRVM
         ld      hl,(generic_console_udg32)
         ld      de, $2000 + 1024
         ld      bc, 1024                ;128 characters
-        ld      ix, LDIRVM
-        call    msxbios
+        call    LDIRVM
         pop     ix
         ret

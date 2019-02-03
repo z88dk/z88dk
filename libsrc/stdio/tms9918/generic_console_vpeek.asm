@@ -8,19 +8,10 @@
         EXTERN  generic_console_udg32
         EXTERN  screendollar
         EXTERN  screendollar_with_count
-        EXTERN  msxbios
         EXTERN  __tms9918_screen_mode
         EXTERN  __tms9918_text_xypos
 
-IF FORmsx
-        INCLUDE "target/msx/def/msxbios.def"
-ENDIF
-IF FORsvi
-        INCLUDE "target/svi/def/svibios.def"
-ENDIF
-IF FORmtx | FORpv2000 | FORsc3000 | FORm5 | FOReinstein | FORcoleco | FORspc1000
         EXTERN  LDIRMV
-ENDIF
 
 IF !FORspc1000 && !FOReinstein && !FORsvi
         PUBLIC  generic_console_vpeek
@@ -41,8 +32,7 @@ __tms9918_console_vpeek:
         add     hl,sp
         ex      de,hl   ;de = space on stack, hl = screen address
         ld      bc,1
-        ld      ix,LDIRMV
-        call    msxbios
+        call    LDIRMV
         pop     bc
         pop     ix
         ld      a,c
@@ -66,9 +56,8 @@ vpeek_mode2:
         ; de = VDP address
         ; hl = buffer
         ex      de,hl
-        ld      ix,LDIRMV
         ld      bc,8
-        call    msxbios
+        call    LDIRMV
         pop     de                ;buffer
         ld      hl,(generic_console_font32)
         call    screendollar

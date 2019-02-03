@@ -4,8 +4,8 @@
 
 	PUBLIC	pix_return
 
-	EXTERN	l_push_di
-	EXTERN	l_pop_ei
+	EXTERN	l_tms9918_disable_interrupts
+	EXTERN	l_tms9918_enable_interrupts
 
 	INCLUDE	"graphics/grafix.inc"
 	INCLUDE	"msx/vdp.inc"
@@ -54,7 +54,7 @@
 	add	hl,de		; + Y&7
 	
 ;-------
-	call	l_push_di
+	call	l_tms9918_disable_interrupts
 IF VDP_CMD < 0
 	ld	a,l
 	ld	(-VDP_CMD),a
@@ -72,7 +72,7 @@ ELSE
 	in	a, (VDP_DATAIN)
 	ld	e,a
 ENDIF
-	call	l_pop_ei
+	call	l_tms9918_enable_interrupts
 	ld	a,e
 	ex	de,hl		;de = VDP address
 	ld	hl,pixelbyte
@@ -88,7 +88,7 @@ ENDIF
 
 .pix_return
          ld       (hl),a	; hl points to "pixelbyte"
-	call	l_push_di
+	call	l_tms9918_disable_interrupts
 IF VDP_CMD < 0
 	ld	a,e
 	ld	(-VDP_CMD),a
@@ -108,7 +108,7 @@ ELSE
          ld       a,(pixelbyte) ; Can it be optimized ? what about VDP timing ?
          out      (VDP_DATA), a
 ENDIF
-	call	l_pop_ei
+	call	l_tms9918_enable_interrupts
          pop      bc
          ret
 

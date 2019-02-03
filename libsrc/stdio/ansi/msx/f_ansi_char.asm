@@ -18,12 +18,8 @@
 
 	EXTERN	msxbios
 	
-IF FORmsx
-        INCLUDE "target/msx/def/msxbios.def"
-ELSE
 	EXTERN	FILVRM
 	EXTERN	LDIRVM
-ENDIF
 
 
 	EXTERN	__tms9918_attribute

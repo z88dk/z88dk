@@ -14,7 +14,6 @@
         EXTERN  generic_console_font32
         EXTERN  generic_console_udg32
 
-        EXTERN  msxbios
         EXTERN  __console_w
         EXTERN  ansi_SCROLLUP
         EXTERN  ansi_cls
@@ -93,8 +92,7 @@ clear_text:
         ld      hl,$0000
         ld      bc,960
         ld      a,32
-        ld      ix,FILVRM
-        call    msxbios
+        call    FILVRM
         ret
 
 
@@ -129,14 +127,12 @@ scroll_text_1:
 
         ld      de,__tms9918_scroll_buffer
         ld      bc,256
-        ld      ix,LDIRMV
-        call    msxbios
+        call    LDIRMV
         pop     de
         push    de
         ld      hl,__tms9918_scroll_buffer
         ld      bc,256
-        ld      ix,LDIRVM
-        call    msxbios
+        call    LDIRVM
         pop     de      ;Destination
         pop     hl
         inc     d
@@ -149,8 +145,7 @@ scroll_text_1:
         call    __tms9918_text_xypos
         pop     bc
         ld      a,' '
-        ld      ix,FILVRM
-        call    msxbios
+        call    FILVRM
         pop     ix
         jr      scroll_rejoin
 
@@ -171,8 +166,7 @@ __tms9918_printc:
         pop     de
         ld      a,d
         ld      bc,1
-        ld      ix,FILVRM
-        call    msxbios
+        call    FILVRM
         pop     ix
         ret
 tms9918_printc_1:
@@ -197,9 +191,8 @@ tms9918_printc_rejoin:
         ld      e,a
         ld      d,b
         push    de
-        ld      ix,LDIRVM
         ld      bc,8
-        call    msxbios
+        call    LDIRVM
         pop     hl
         ld      de,8192
         add     hl,de        
@@ -215,8 +208,7 @@ tms9918_printc_rejoin:
 not_inverse:
         pop     hl
         ld      bc,8
-        ld      ix,FILVRM
-        call    msxbios
+        call    FILVRM
         pop     ix
         ret
 
