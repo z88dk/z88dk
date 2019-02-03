@@ -40,13 +40,27 @@ endif
 
 
 EX8.COM: ex8.c
-	$(CC) +msx -vn -subtype=msxdos -create-app -oex8 ex8.c
+	$(CC) +msx -vn -subtype=msxdos -create-app -oex8 ex8.c -lmsxbios
 
 ADVA.COM: ../console/adv_a.c
 	$(CC) +msx -vn -subtype=msxdos ../console/adv_a.c -I../console -DCOMPUTE_SCORE -DPICS -DDISK -create-app -clib=ansi -oadva.bin
 
+ex6.cas: ex6.c
+	$(CC) $(CFLAGS) -oex6.bin ex6.c -lmsxbios
+
+ex7.cas: ex7.c
+	$(CC) $(CFLAGS) -oex7.bin ex7.c -lmsxbios
+
+
+showlib3d.cas: showlib3d.c
+	$(CC) $(CFLAGS) -oshowlib3d.bin showlib3d.c -lmsxbios
+
+ex11.cas: ex11.c
+	$(CC) $(CFLAGS) -oex11.bin ex11.c -lmsxbios
+
 %.cas: %.c
 	$(CC) $(CFLAGS) -o$*.bin $*.c
+
 
 dstar.cas: ../dstar.c
 	$(CC) $(CFLAGS) ../dstar.c -I.. -Dspritesize=16 -DSOUND -create-app -odstar.bin
@@ -58,7 +72,7 @@ microman.cas: ../microman.c
 	$(CC) $(CFLAGS) ../microman.c -I.. -DSOUND -DJOYSTICK_DIALOG -create-app -omicroman.bin
 
 wall.cas: ../wall.c
-	$(CC) $(CFLAGS) ../wall.c -I.. -DJOYSTICK -DBANNERS -Dspritesize=8 -DSOUND -DCLOCK -create-app -owall.bin
+	$(CC) $(CFLAGS) ../wall.c -I.. -DJOYSTICK -DBANNERS -Dspritesize=8 -DSOUND -DCLOCK -create-app -owall.bin -lmsxbios
 
 globe.cas: ../graphics/globe.c
 	$(CC) $(CFLAGS) ../graphics/globe.c -I../graphics -create-app -pragma-redirect=fputc_cons=putc4x6 -oglobe.bin
