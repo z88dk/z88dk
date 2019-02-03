@@ -366,7 +366,7 @@ int cpm_write_file_to_image(const char *disc_format, const char *container, cons
     const char      *extension;
     disc_writer_func writer = disc_get_writer(container, &extension);
     char disc_name[FILENAME_MAX + 1];
-    char cpm_filename[12] = "APP     COM";
+    char cpm_filename[20] = "APP     COM";
     void* filebuf;
     FILE* binary_fp;
     disc_handle* h;
@@ -439,7 +439,7 @@ int cpm_write_file_to_image(const char *disc_format, const char *container, cons
     disc_write_file(h, cpm_filename, filebuf, binlen);
     
     if (writer(h, disc_name) < 0) {
-        exit_log(1, "Can't write disc image");
+        exit_log(1, "Can't write disc image\n");
     }
     disc_free(h);
 
