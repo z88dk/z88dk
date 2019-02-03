@@ -20,7 +20,7 @@
         EXTERN  l_tms9918_disable_interrupts
         EXTERN  l_tms9918_enable_interrupts
 
-        INCLUDE "msx/vdp.inc"
+        INCLUDE "arch/tms9918/vdp.inc"
         
 
 msx_vpoke_callee:

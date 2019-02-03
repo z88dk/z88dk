@@ -12,7 +12,7 @@
     PUBLIC   msx_set_mode
     PUBLIC   _msx_set_mode
     
-    INCLUDE  "msx/vdp.inc"
+    INCLUDE  "arch/tms9918/vdp.inc"
 
     EXTERN   SETWRT
     EXTERN   FILVRM

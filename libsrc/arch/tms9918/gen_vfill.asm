@@ -16,21 +16,19 @@
 	EXTERN     FILVRM
 
 	
-	INCLUDE	"msx/vdp.inc"
+	INCLUDE	"arch/tms9918/vdp.inc"
 
 
 msx_vfill:
 _msx_vfill:
-
-	ld      ix,2
+        push    ix
+	ld      ix,4
 	add     ix,sp
-
-	ld c, (ix+0)	; count
-	ld b, (ix+1)
-
-	ld a, (ix+2)	; value
-
-	ld l, (ix+4)	; addr
-	ld h, (ix+5)
-
-	jp	FILVRM
+	ld c,   (ix+0)	; count
+	ld b,   (ix+1)
+	ld a,   (ix+2)	; value
+	ld l,   (ix+4)	; addr
+	ld h,   (ix+5)
+	call    FILVRM
+        pop     ix
+        ret

@@ -1,13 +1,15 @@
 include ../Make.config
 
 
-SUBDIRS = z80 c128 z88 x1
-CLEANDIRS = $(SUBDIRS:%=clean-%)
+SUBDIRS = z80 c128 z88 x1 msx 
+# Directories that need a target passed down
+TARGETDIRS = tms9918
+CLEANDIRS = $(SUBDIRS:%=clean-%) $(TARGETDIRS:%=clean-%)
 
-all: subdirs-all
+all: 
 
 
-subdirs-all: $(SUBDIRS)
+subdirs-all: $(SUBDIRS) $(TARGETDIRS)
 
 subdirs-clean: $(SUBDIRS_CLEAN)
 
@@ -20,6 +22,8 @@ subdirs-clean: $(CLEANDIRS)
 .PHONY:	subdirs-all $(SUBDIRS) $(SUBDIRS_CLEAN)
 
 
+tms9918:
+	$(MAKE) -C tms9918 TARGET=$(TARGET) all
 
 $(SUBDIRS):
 	$(MAKE) -C $@ all

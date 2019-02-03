@@ -14,7 +14,7 @@
 
 	EXTERN     SETRD
 	
-	INCLUDE	"msx/vdp.inc"
+	INCLUDE	"arch/tms9918/vdp.inc"
 
 
 msx_vread:

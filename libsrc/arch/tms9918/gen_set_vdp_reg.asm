@@ -17,7 +17,7 @@
 	EXTERN	l_tms9918_disable_interrupts
 	EXTERN	l_tms9918_enable_interrupts
 
-	INCLUDE	"msx/vdp.inc"
+	INCLUDE	"arch/tms9918/vdp.inc"
 
 
 .set_vdp_reg
@@ -25,26 +25,26 @@
 	ld	hl, 2
 	add	hl, sp
 	ld	d, (hl)		; Value
-	ld	a,d
 	inc	hl
 	inc	hl
 	call	l_tms9918_disable_interrupts
 IF VDP_CMD < 0
+	ld	a,d
 	ld	(-VDP_CMD),a
 ELSE
 	ld	bc,VDP_CMD
-	out	(c),a
+	out	(c),d
 ENDIF
 	
 	ld	e, (hl)		; Register #
-	ld	a,e
 IF VDP_CMD < 0
+	ld	a,e
 	ld	(-VDP_CMD),a
 ELSE
-	out	(c),a
+	out	(c),e
 ENDIF
 	call	l_tms9918_enable_interrupts
-
+        ld      a,e
 	cp	8
 	ret	nc		;REgister out of boundds
 

@@ -108,7 +108,6 @@ msxdeps:
 	@$(RM) -f psg/msx/*.o
 	@$(RM) -f psg/sn76489/*.o
 	@$(RM) -f time/msx/*.o
-	@$(RM) -f msx/*.o
 
 zx81deps:
 	@$(RM) -f stdio/zx81/*.o
@@ -760,10 +759,13 @@ svi_clib.lib:
 	$(call buildgeneric,svi)
 	$(RM) games/msx/*.o
 	$(MAKE) -C games TARGET=svi
-	$(MAKE) -C msx TARGET=svi
+	$(MAKE) -C arch/msx/msxbios
+	$(MAKE) -C arch/svi TARGET=svi
+	$(MAKE) -C arch/tms9918 TARGET=svi
 	$(MAKE) -C psg
 	$(MAKE) -C rs232/svi
 	TARGET=svi TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsvi -x$(OUTPUT_DIRECTORY)/svi_clib @$(LISTFILE_DIRECTORY)/svi.lst
+	TARGET=svi TYPE=z80 $(LIBLINKER) -DFORsvi -x$(OUTPUT_DIRECTORY)/svibios @arch/svi/arch_svibios.lst
 
 # MSX library - Stefano
 msx_clib.lib:
@@ -775,10 +777,11 @@ msx_clib.lib:
 	$(MAKE) -C fcntl/cpm
 	$(RM) games/msx/*.o
 	$(MAKE) -C games TARGET=msx
-	$(MAKE) -C msx TARGET=msx
-	$(MAKE) -C msx/asmlib TARGET=msx
+	$(MAKE) -C arch/msx 
+	$(MAKE) -C arch/tms9918 TARGET=msx
 	$(MAKE) -C psg
 	TARGET=msx TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/msx_clib @$(LISTFILE_DIRECTORY)/msx.lst
+	TARGET=msx TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/msxbios @arch/msx/arch_msxbios.lst
 
 # MTX library - Stefano
 mtx_clib.lib:
@@ -789,7 +792,7 @@ mtx_clib.lib:
 	$(MAKE) -C games TARGET=mtx
 	$(call buildgeneric,mtx)
 	$(MAKE) -C games TARGET=mtx
-	$(MAKE) -C msx TARGET=test
+	$(MAKE) -C arch/tms9918 TARGET=mtx
 	TARGET=mtx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmtx -x$(OUTPUT_DIRECTORY)/mtx_clib @$(LISTFILE_DIRECTORY)/mtx.lst
 
 # Enterprise library - Stefano
@@ -829,7 +832,7 @@ einstein.lib:
 	$(MAKE) msxdeps
 	@$(RM) -f video/mc6845/*.o
 	$(MAKE) -C games TARGET=cpm SUBTYPE=einstein
-	$(MAKE) -C msx TARGET=test
+	$(MAKE) -C arch/tms9918 TARGET=cpm SUBTYPE=einstein
 	$(MAKE) -C psg
 	TARGET=einstein TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFOReinstein -x$(OUTPUT_DIRECTORY)/einstein @$(LISTFILE_DIRECTORY)/einstein.lst
 
@@ -852,7 +855,7 @@ adam.lib:
 	@echo ''
 	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=cpm SUBTYPE=coleco
-	$(MAKE) -C msx TARGET=test
+	$(MAKE) -C arch/tms9918 TARGET=coleco
 	$(MAKE) -C psg
 	TARGET=coleco TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcoleco -DFORadam -x$(OUTPUT_DIRECTORY)/adam @$(LISTFILE_DIRECTORY)/adam.lst
 
@@ -864,7 +867,7 @@ m5_clib.lib:
 	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=m5
 	$(call buildgeneric,m5)
-	$(MAKE) -C msx TARGET=test
+	$(MAKE) -C arch/tms9918 TARGET=m5
 	TARGET=m5 TYPE=z80 $(LIBLINKER) -DFORm5 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/m5_clib @$(LISTFILE_DIRECTORY)/m5.lst
 
 # MC-1000 library - Stefano
@@ -1028,8 +1031,7 @@ spc1000_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) msxdeps
 	$(call buildgeneric,spc1000)
-	$(MAKE) -C msx TARGET=test
-	$(MAKE) -C msx TARGET=spc1000
+	$(MAKE) -C arch/tms9918 TARGET=spc1000
 	$(MAKE) -C games TARGET=spc1000
 	TARGET=spc1000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORspc1000 -x$(OUTPUT_DIRECTORY)/spc1000_clib @$(LISTFILE_DIRECTORY)/spc1000.lst
 
@@ -1052,7 +1054,7 @@ pv2000_clib.lib:
 	$(MAKE) -C games TARGET=pv2000
 	$(call buildgeneric,pv2000)
 	$(MAKE) -C games TARGET=pv2000
-	$(MAKE) -C msx TARGET=pv2000
+	$(MAKE) -C arch/tms9918 TARGET=pv2000
 	TARGET=pv2000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORpv2000 -x$(OUTPUT_DIRECTORY)/pv2000_clib @$(LISTFILE_DIRECTORY)/pv2000.lst
 
 # Colecovision - dom/stefano
@@ -1064,8 +1066,7 @@ coleco_clib.lib:
 	$(MAKE) -C games TARGET=coleco
 	$(call buildgeneric,coleco)
 	$(MAKE) -C games TARGET=coleco
-	$(MAKE) -C msx 
-	$(MAKE) -C msx TARGET=coleco
+	$(MAKE) -C arch/tms9918 TARGET=coleco
 	TARGET=coleco TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcoleco -x$(OUTPUT_DIRECTORY)/coleco_clib @$(LISTFILE_DIRECTORY)/coleco.lst
 
 # Untested C lib for NC100 machines - dom
@@ -1240,7 +1241,7 @@ sms_clib.lib:
 	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=sms
 	$(call buildgeneric,sms)
-	$(MAKE) -C msx TARGET=test
+	$(MAKE) -C arch/tms9918 TARGET=sms
 	TARGET=sms TYPE=z80 $(LIBLINKER) -DFORsms -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sms_clib @$(LISTFILE_DIRECTORY)/sms.lst
 
 # Sega SC-3000 - stefano
@@ -1251,7 +1252,7 @@ sc3000_clib.lib:
 	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=sc3000
 	$(call buildgeneric,sc3000)
-	$(MAKE) -C msx TARGET=test
+	$(MAKE) -C arch/tms9918 TARGET=sc3000
 	TARGET=sc3000 TYPE=z80 $(LIBLINKER) -DFORsc3000 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sc3000_clib @$(LISTFILE_DIRECTORY)/sc3000.lst
 
 # Test platform - dom
@@ -1414,7 +1415,6 @@ classic-clean:
 	$(RM) abc80/*.o
 	$(RM) abc800/*.o
 	$(MAKE) -C enterprise clean
-	$(MAKE) -C msx clean
 	$(MAKE) -C psg clean
 	$(RM) newbrain/*.o
 	$(RM) ts2068/*.o

@@ -1,0 +1,2 @@
+arch/svi/svibios/obj/${TARGET}/*
+@arch/msx/arch_msxbios.lst

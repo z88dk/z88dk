@@ -11,7 +11,7 @@
         PUBLIC  FILVRM
         EXTERN  SETWRT
         
-        INCLUDE "msx/vdp.inc"
+        INCLUDE "arch/tms9918/vdp.inc"
         
 FILVRM:
         push    af

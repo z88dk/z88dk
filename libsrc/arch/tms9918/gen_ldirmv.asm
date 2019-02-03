@@ -12,7 +12,7 @@
 	PUBLIC	_LDIRMV
 	EXTERN		SETRD
 	
-	INCLUDE	"msx/vdp.inc"
+	INCLUDE	"arch/tms9918/vdp.inc"
 	
 LDIRMV:
 _LDIRMV:

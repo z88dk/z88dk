@@ -18,7 +18,7 @@
 	
 	;EXTERN	SCRMOD
 
-	INCLUDE	"msx/vdp.inc"
+	INCLUDE	"arch/tms9918/vdp.inc"
 
 msx_color:
 _msx_color:

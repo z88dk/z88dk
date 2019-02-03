@@ -22,7 +22,7 @@ IF FORmsx
 ENDIF
 
 IF FORsvi
-    INCLUDE	"msx/vdp.inc"
+    INCLUDE	"arch/tms9918/vdp.inc"
     INCLUDE "target/svi/def/svibios.def"
     INCLUDE "target/svi/def/svibasic.def"
 ENDIF
@@ -181,7 +181,7 @@ IF FORsc3000
 	; using the ROM font
 ELSE
 .font
-binary "../stdio/ansi/FONT8.BIN"
+binary "../../../stdio/ansi/FONT8.BIN"
 ENDIF
 
 ENDIF
