@@ -173,6 +173,10 @@
     <ClCompile Include="..\..\src\appmake\cpmdisk.c" />
     <ClCompile Include="..\..\src\appmake\enterprise.c" />
     <ClCompile Include="..\..\src\appmake\extract.c" />
+    <ClCompile Include="..\..\src\appmake\fat.c" />
+    <ClCompile Include="..\..\src\appmake\ff.c" />
+    <ClCompile Include="..\..\src\appmake\fp1100.c" />
+    <ClCompile Include="..\..\src\appmake\fp1100.c" />
     <ClCompile Include="..\..\src\appmake\fp1100.c" />
     <ClCompile Include="..\..\src\appmake\galaksija.c" />
     <ClCompile Include="..\..\src\appmake\glue.c" />
@@ -224,6 +228,9 @@
   <ItemGroup>
     <ClInclude Include="..\..\src\appmake\appmake.h" />
     <ClInclude Include="..\..\src\appmake\cpmdisk.h" />
+    <ClInclude Include="..\..\src\appmake\diskio.h" />
+    <ClInclude Include="..\..\src\appmake\ff.h" />
+    <ClInclude Include="..\..\src\appmake\ffconf.h" />
     <ClInclude Include="..\..\src\appmake\zx-util.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
