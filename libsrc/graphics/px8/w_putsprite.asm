@@ -184,9 +184,7 @@
         ;@@@@@@@@@@
         ;Go to next byte
         ;@@@@@@@@@@
-		 push hl
          push bc
-         push de
          ex	af,af
 		 call	pix_return
          ld      hl,(curx)
@@ -198,9 +196,7 @@
          ld      h,d
          ld      l,e
          ex	af,af
-         pop   de
          pop   bc
-		 pop   hl
         ;@@@@@@@@@@
 		ret
 
