@@ -15,7 +15,7 @@
 
         SECTION code_clib
 	PUBLIC	ansi_attr
-	EXTERN	msx_attr
+	EXTERN	__tms9918_attribute
 	EXTERN	INVRS
 	EXTERN	BOLD
 
@@ -26,7 +26,7 @@
         ld	(BOLD),a
         ld	(BOLD+1),a
         ld      a,$F1
-        ld      (msx_attr),a
+        ld      (__tms9918_attribute),a
         ret
 .noreset
         cp      1
@@ -62,16 +62,16 @@
 .noCunderline
         cp      5
         jr      nz,noblink
-        ld      a,(msx_attr)
+        ld      a,(__tms9918_attribute)
         or      @10000000
-        ld      (msx_attr),a
+        ld      (__tms9918_attribute),a
         ret
 .noblink
         cp      25
         jr      nz,nocblink
-        ld      a,(msx_attr)
+        ld      a,(__tms9918_attribute)
         and     @01111111
-        ld      (msx_attr),a
+        ld      (__tms9918_attribute),a
         ret
 .nocblink
         cp      7
@@ -88,7 +88,7 @@
 .noCreverse
         cp      8
         jr      nz,noinvis
-        ld      a,(msx_attr)
+        ld      a,(__tms9918_attribute)
         ld      (oldattr),a
         and     @1111
         ld      e,a
@@ -97,7 +97,7 @@
         rla
         rla
         or      e
-        ld      (msx_attr),a
+        ld      (__tms9918_attribute),a
         ret
 .oldattr
         defb     0
@@ -105,7 +105,7 @@
         cp      28
         jr      nz,nocinvis
         ld      a,(oldattr)
-        ld      (msx_attr),a
+        ld      (__tms9918_attribute),a
         ret
 .nocinvis
         cp      30
@@ -127,10 +127,10 @@
         rla
         rla
         ld      e,a
-        ld      a,(msx_attr)
+        ld      a,(__tms9918_attribute)
         and     @00001111
         or      e
-        ld      (msx_attr),a 
+        ld      (__tms9918_attribute),a 
 
 .nofore
         cp      40
@@ -148,10 +148,10 @@
 		add 7	; (2,4,6,8 -> 9,11,13,15; red, yellow, magenta, white)
 .odd_attr
         ld      e,a
-        ld      a,(msx_attr)
+        ld      a,(__tms9918_attribute)
         and     @11110000
         or      e
-        ld      (msx_attr),a
+        ld      (__tms9918_attribute),a
         ret
 
 .noback

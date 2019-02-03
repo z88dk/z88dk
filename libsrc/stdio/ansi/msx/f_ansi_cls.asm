@@ -14,7 +14,7 @@
         PUBLIC    ansi_cls
         PUBLIC    _ansi_cls
         EXTERN	msxbios
-        EXTERN	msx_attr
+        EXTERN	__tms9918_attribute
 
         INCLUDE	"graphics/grafix.inc"
 
@@ -43,7 +43,7 @@ ENDIF
 	ld	(SCRMOD),a
 	call	msxbios
 
-	ld a,(msx_attr)
+	ld a,(__tms9918_attribute)
 	and $0F
 	ld	(BDRCLR),a	;border
 	ld	ix,CHGCLR
@@ -51,7 +51,7 @@ ENDIF
 
 	ld bc,6144
 
-	ld a,(msx_attr)
+	ld a,(__tms9918_attribute)
 
 	ld hl,8192
 

@@ -1,33 +1,30 @@
 
 
-		SECTION		code_clib
+        SECTION code_clib
 
-		PUBLIC		__tms9918_cls
-		PUBLIC		__tms9918_scrollup
-		PUBLIC		__tms9918_printc
-                PUBLIC          __tms9918_set_ink
-                PUBLIC          __tms9918_set_paper
-                PUBLIC          __tms9918_set_inverse
-		EXTERN		msx_attr
+        PUBLIC  __tms9918_cls
+        PUBLIC  __tms9918_scrollup
+        PUBLIC  __tms9918_printc
+        PUBLIC  __tms9918_set_ink
+        PUBLIC  __tms9918_set_paper
+        PUBLIC  __tms9918_set_inverse
+        PUBLIC  __tms9918_text_xypos
+        EXTERN  __tms9918_attribute
 
-		EXTERN		generic_console_font32
-		EXTERN		generic_console_udg32
+        EXTERN  generic_console_font32
+        EXTERN  generic_console_udg32
 
-		EXTERN		tms9918_w
-		EXTERN		CONSOLE_COLUMNS
-		EXTERN		CONSOLE_ROWS
-        	EXTERN		msxbios
-		EXTERN		ansi_SCROLLUP
-		EXTERN		ansi_cls
-		EXTERN		conio_map_colour
-		EXTERN		CRT_FONT
-		EXTERN		generic_console_flags
-
-IF FORmsx
-	        INCLUDE "target/msx/def/msxbios.def"
-ELSE
-        	INCLUDE "target/svi/def/svibios.def"
-ENDIF
+        EXTERN  msxbios
+        EXTERN  __console_w
+        EXTERN  ansi_SCROLLUP
+        EXTERN  ansi_cls
+        EXTERN  conio_map_colour
+        EXTERN  generic_console_flags
+        EXTERN  __tms9918_screen_mode
+        EXTERN  __tms9918_scroll_buffer
+        EXTERN  FILVRM
+        EXTERN  LDIRVM
+        EXTERN  LDIRMV
 
 
 ;
@@ -41,62 +38,123 @@ ENDIF
 ; an 80 column 6845 as a secondary display.
 ;
 IF !FORspc1000 && !FOReinstein && !FORsvi
-                PUBLIC          generic_console_cls
-                PUBLIC          generic_console_scrollup
-                PUBLIC          generic_console_printc
-                PUBLIC          generic_console_set_ink
-                PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_inverse
+        PUBLIC  generic_console_cls
+        PUBLIC  generic_console_scrollup
+        PUBLIC  generic_console_printc
+        PUBLIC  generic_console_set_ink
+        PUBLIC  generic_console_set_paper
+        PUBLIC  generic_console_set_inverse
 
-		defc	generic_console_cls = __tms9918_cls
-		defc	generic_console_scrollup = __tms9918_scrollup
-		defc	generic_console_printc = __tms9918_printc
-		defc	generic_console_set_ink = __tms9918_set_ink
-		defc	generic_console_set_paper = __tms9918_set_paper
-		defc	generic_console_set_inverse = __tms9918_set_inverse
+        defc        generic_console_cls = __tms9918_cls
+        defc        generic_console_scrollup = __tms9918_scrollup
+        defc        generic_console_printc = __tms9918_printc
+        defc        generic_console_set_ink = __tms9918_set_ink
+        defc        generic_console_set_paper = __tms9918_set_paper
+        defc        generic_console_set_inverse = __tms9918_set_inverse
 ENDIF
 
 
 __tms9918_set_inverse:
-	ret
+        ret
 
 __tms9918_set_ink:
-	call	conio_map_colour
-	rla
-	rla
-	rla
-	rla
-	and	@11110000
-	ld	b,0x0f
+        call    conio_map_colour
+        rla
+        rla
+        rla
+        rla
+        and     @11110000
+        ld      b,0x0f
 set_attr:
-	ld	c,a
-	ld	hl,msx_attr
-	ld	a,(hl)
-	and	b
-	or	c
-	ld	(hl),a
-	ret
+        ld      c,a
+        ld      hl,__tms9918_attribute
+        ld      a,(hl)
+        and     b
+        or      c
+        ld      (hl),a
+        ret
 
 __tms9918_set_paper:
-	call	conio_map_colour
-	and	15
-	ld	b,0xf0
-	jr	set_attr
-	
+        call    conio_map_colour
+        and     15
+        ld      b,0xf0
+        jr      set_attr
+        
 
 __tms9918_cls:
-	call	ansi_cls
-	ret
+        ld      a,(__tms9918_screen_mode)
+        cp      2
+        jr      nz,clear_text
+        call    ansi_cls
+        ret
+
+clear_text:
+        ; Lets just clear the maximum size
+        ld      hl,$0000
+        ld      bc,960
+        ld      a,32
+        ld      ix,FILVRM
+        call    msxbios
+        ret
+
 
 __tms9918_scrollup:
-	push	de
-	push	bc
-	call	ansi_SCROLLUP
-	pop	bc
-	pop	de
-	ret
+        push    de
+        push    bc
+        ld      a,(__tms9918_screen_mode)
+        ld      b,3
+        ld      hl,32
+        and     a
+        jr      z,scroll_text
+        ld      b,4
+        ld      hl,40
+        cp      1
+        jr      z,scroll_text
+        call    ansi_SCROLLUP
+scroll_rejoin:
+        pop     bc
+        pop     de
+        ret
 
-;  V-RAM memory map TMS9918 so address can be changed but it is the address when initializing with BASIC system Graphic mode 2 (SCREEN 2 in MSX) is used 00000 H - 007 FFH: Pattern generator top 00800 H -00FFFH: pattern generator middle 01000H - 017FFH: pattern generator low 01800H - 01BFFH: sprite pattern generator 01C00H - 01F7FH: pattern name table 01F00H - 01FFFH: sprite attribute 02000H - 03FFFH: color table　
+
+; Entry: bc = width
+scroll_text:
+        push    ix
+        push    hl      ;Save width for later
+        ld      de,0    ;destination
+scroll_text_1:
+        push    bc
+        push    hl      ;Source
+        push    de      ;Destination
+
+        ld      de,__tms9918_scroll_buffer
+        ld      bc,256
+        ld      ix,LDIRMV
+        call    msxbios
+        pop     de
+        push    de
+        ld      hl,__tms9918_scroll_buffer
+        ld      bc,256
+        ld      ix,LDIRVM
+        call    msxbios
+        pop     de      ;Destination
+        pop     hl
+        inc     d
+        inc     h
+        pop     bc
+        djnz    scroll_text_1
+        ; And blank characters out
+        ld      b,23
+        ld      c,0
+        call    __tms9918_text_xypos
+        pop     bc
+        ld      a,' '
+        ld      ix,FILVRM
+        call    msxbios
+        pop     ix
+        jr      scroll_rejoin
+
+
 
 
 ; c = x
@@ -104,55 +162,76 @@ __tms9918_scrollup:
 ; a = d = character to print
 ; e = raw
 __tms9918_printc:
-	push	ix
-	rl	e
-	jr	c,tms9918_printc_1
-	; Here we can interpret any extra codes (eg for setting colours)
-
+        push    ix
+        ld      a,(__tms9918_screen_mode)
+        cp      2
+        jr      z,tms9918_printc_1
+        push    de                ;Save character
+        call    __tms9918_text_xypos
+        pop     de
+        ld      a,d
+        ld      bc,1
+        ld      ix,FILVRM
+        call    msxbios
+        pop     ix
+        ret
 tms9918_printc_1:
-	bit	7,a
-	jr	nz,tms9918_printc_handle_udgs
-	sub	32
-	ld	de,(generic_console_font32)
+        ld      a,d
+        ld      de,(generic_console_font32)
+        dec     d
+        bit     7,a
+        jr      z,tms9918_printc_rejoin
+        ld      de,(generic_console_udg32)
+        res     7,a
 tms9918_printc_rejoin:
-	ld	l,a
-	ld	h,0
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,de
-	ld	a,c
-	add	a
-	add	a
-	add	a
-	ld	e,a
-	ld	d,b
-	push	de
-	ld	ix,LDIRVM
-	ld	bc,8
-	call	msxbios
-	pop	hl
-	ld	de,8192
-	add	hl,de	
-	push	hl
-	ld	a,(msx_attr)
-	ld	hl,generic_console_flags
-	bit	7,(hl)
-	jr	z,not_inverse
-	rlca
-	rlca
-	rlca
-	rlca
+        ld      l,a
+        ld      h,0
+        add     hl,hl
+        add     hl,hl
+        add     hl,hl
+        add     hl,de
+        ld      a,c
+        add     a
+        add     a
+        add     a
+        ld      e,a
+        ld      d,b
+        push    de
+        ld      ix,LDIRVM
+        ld      bc,8
+        call    msxbios
+        pop     hl
+        ld      de,8192
+        add     hl,de        
+        push    hl
+        ld      a,(__tms9918_attribute)
+        ld      hl,generic_console_flags
+        bit     7,(hl)
+        jr      z,not_inverse
+        rlca
+        rlca
+        rlca
+        rlca
 not_inverse:
-	pop	hl
-	ld	bc,8
-	ld	ix,FILVRM
-	call	msxbios
-	pop	ix
-	ret
+        pop     hl
+        ld      bc,8
+        ld      ix,FILVRM
+        call    msxbios
+        pop     ix
+        ret
 
-tms9918_printc_handle_udgs:
-	sub	128
-	ld	de,(generic_console_udg32)
-	jr	tms9918_printc_rejoin
+
+; Entry: b = row, c = column
+__tms9918_text_xypos:
+        ld      de,(__console_w)
+        ld      d,0
+        ld      hl,0
+        and     a
+        sbc     hl,de
+        inc     b
+xypos_1:
+        add     hl,de
+        djnz    xypos_1
+        add     hl,bc
+        ret
 

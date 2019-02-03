@@ -17,7 +17,7 @@
         EXTERN	msx_set_mode
 
         EXTERN	msx_color
-        EXTERN	msx_attr
+        EXTERN	__tms9918_attribute
 
         EXTERN	FILVRM
 
@@ -30,14 +30,14 @@
 	ld    hl,2		; set graphics mode
 	call  msx_set_mode
 
-	ld a,(msx_attr)
+	ld a,(__tms9918_attribute)
 	and $0F
 	ld	h,0
 	ld	l,a
 	
 	push hl		; border
 	push hl		; paper
-	ld a,(msx_attr)
+	ld a,(__tms9918_attribute)
 	rra
 	rra
 	rra
@@ -52,7 +52,7 @@
 
 	ld bc,6144
 
-	ld a,(msx_attr)
+	ld a,(__tms9918_attribute)
 
 	ld hl,8192
 	

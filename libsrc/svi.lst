@@ -63,7 +63,7 @@ msx/msx_map_m2_pixel
 msx/msx_map_m2_subpixel
 msx/svi_screen
 msx/msx_screenmode
-msx/msx_set_mode
+msx/gen_set_mode
 msx/msx_text
 msx/msx_type
 msx/msx_vfill

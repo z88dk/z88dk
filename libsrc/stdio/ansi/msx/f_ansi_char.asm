@@ -26,7 +26,7 @@ ELSE
 ENDIF
 
 
-	EXTERN	msx_attr
+	EXTERN	__tms9918_attribute
 	
 	EXTERN	ansicharacter_pixelwidth
 	EXTERN	ansifont_is_packed
@@ -319,7 +319,7 @@ ENDIF
 ;         and      @00111111	; masked with "write command" bits
 ;         or       @01000000
 ;         out      (VDP_CMD), a
-;         ld       a,(msx_attr)
+;         ld       a,(__tms9918_attribute)
 ;         out      (VDP_DATA), a
 
 ;**************
@@ -379,7 +379,7 @@ ENDIF
 .set_attribute
 	ld	hl,8192
 	add	hl,de
-	ld	a,(msx_attr)
+	ld	a,(__tms9918_attribute)
 	ld	bc,8
 	ld	ix,FILVRM
 	call	msxbios
