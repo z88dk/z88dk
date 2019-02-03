@@ -25,7 +25,7 @@ obj/$(OBJSUBDIR)/%.o: %.c
 	$(ZCC) +$(TARGET) $(CFLAGS) -o $@  $^
 
 obj/$(OBJSUBDIR)/%.o: %.asm
-	$(ASSEMBLER) $(ASMFLAGS) -I../..  $^
+	@$(ASSEMBLER) $(ASMFLAGS) -I../..  $^
 	@mv $(^:.asm=.o) $@
 
 dirs:

@@ -4,5 +4,5 @@
 	PUBLIC		VDP_CMD
 	PUBLIC		VDP_STATUS
 
-	INCLUDE		"arch/tms9918/vdp.inc"
+	INCLUDE		"video/tms9918/vdp.inc"
 

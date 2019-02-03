@@ -41,5 +41,5 @@ psg/sn76489/psg_envelope
 psg/sn76489/psg_init.asm
 psg/sn76489/set_psg.asm
 psg/sn76489/set_psg_callee.asm
-@arch/tms9918/arch_tms9918.lst
+@video/tms9918/video_tms9918.lst
 @z80.lst

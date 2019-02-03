@@ -8,7 +8,7 @@
 	EXTERN	l_tms9918_enable_interrupts
 
 	INCLUDE	"graphics/grafix.inc"
-	INCLUDE	"msx/vdp.inc"
+	INCLUDE	"video/tms9918/vdp.inc"
 
 ;
 ;	$Id: pixladdr.asm $

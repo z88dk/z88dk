@@ -5,7 +5,7 @@
 	PUBLIC	l_tms9918_enable_interrupts	
 	PUBLIC	__vdp_enable_status
 
-	INCLUDE	"arch/tms9918/vdp.inc"
+	INCLUDE	"video/tms9918/vdp.inc"
 
 
 l_tms9918_disable_interrupts:

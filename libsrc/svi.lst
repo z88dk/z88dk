@@ -53,5 +53,5 @@ rs232/svi/rs232_init
 rs232/svi/rs232_params
 rs232/svi/rs232_put
 @arch/svi/arch_svi.lst
-@arch/tms9918/arch_tms9918.lst
+@video/tms9918/video_tms9918.lst
 @z80.lst

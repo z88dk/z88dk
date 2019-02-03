@@ -17,7 +17,7 @@
         EXTERN  l_tms9918_disable_interrupts
         EXTERN  l_tms9918_enable_interrupts
         
-        INCLUDE        "arch/tms9918/vdp.inc"
+        INCLUDE        "video/tms9918/vdp.inc"
 
 
 msx_vpeek:

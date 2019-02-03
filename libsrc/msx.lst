@@ -45,5 +45,5 @@ psg/msx/set_psg
 psg/msx/set_psg_callee
 @psg/psg.lst
 @arch/msx/arch_msx.lst
-@arch/tms9918/arch_tms9918.lst
+@video/tms9918/video_tms9918.lst
 @z80.lst

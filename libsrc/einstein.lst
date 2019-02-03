@@ -31,7 +31,7 @@ graphics/msx/surface/surface_pixladdr
 graphics/msx/surface/surface_plotpixl
 graphics/msx/surface/surface_stencil_render
 @gfxbase.lst
-@arch/tms9918/arch_tms9918.lst
+@video/tms9918/video_tms9918.lst
 psg/einstein/psg_init
 psg/einstein/get_psg
 psg/einstein/set_psg

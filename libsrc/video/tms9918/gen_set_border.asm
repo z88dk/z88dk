@@ -9,7 +9,7 @@
 	EXTERN		l_tms9918_enable_interrupts
 	EXTERN		RG0SAV
 
-	INCLUDE		"arch/tms9918/vdp.inc"
+	INCLUDE		"video/tms9918/vdp.inc"
 
 msx_set_border:
 _msx_set_border:

@@ -12,7 +12,7 @@
 	PUBLIC	msx_vram
 	PUBLIC	_msx_vram
 
-	INCLUDE	"arch/tms9918/vdp.inc"
+	INCLUDE	"video/tms9918/vdp.inc"
 
 msx_vram:
 _msx_vram:

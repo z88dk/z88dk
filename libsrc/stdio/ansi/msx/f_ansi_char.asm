@@ -33,7 +33,7 @@
 	EXTERN     swapgfxbk
         EXTERN	__graphics_end
 
-	INCLUDE	"msx/vdp.inc"
+	INCLUDE	"video/tms9918/vdp.inc"
 
 ; Dirty thing for self modifying code
 	PUBLIC	INVRS

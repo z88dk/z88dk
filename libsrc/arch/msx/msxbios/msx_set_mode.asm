@@ -22,7 +22,7 @@ IF FORmsx
 ENDIF
 
 IF FORsvi
-    INCLUDE	"arch/tms9918/vdp.inc"
+    INCLUDE	"video/tms9918/vdp.inc"
     INCLUDE "target/svi/def/svibios.def"
     INCLUDE "target/svi/def/svibasic.def"
 ENDIF

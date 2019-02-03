@@ -52,7 +52,7 @@ graphics/dcircle2
 graphics/fill
 graphics/getsprite
 @gfxbase.lst
-@arch/tms9918/arch_tms9918.lst
+@video/tms9918/video_tms9918.lst
 psg/spc1000/set_psg
 psg/spc1000/set_psg_callee
 psg/spc1000/get_psg

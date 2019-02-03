@@ -8,7 +8,7 @@
 	PUBLIC	SETRD
 	PUBLIC	_SETRD
 
-	INCLUDE	"arch/tms9918/vdp.inc"
+	INCLUDE	"video/tms9918/vdp.inc"
 
 ;==============================================================
 ; VRAM to HL
