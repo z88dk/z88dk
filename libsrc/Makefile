@@ -28,11 +28,11 @@ all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	embedded_clib.lib test_clib.lib testrcm_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
 	pv1000_clib.lib pv2000_clib.lib coleco_clib.lib multi8_clib.lib alphatro_clib.lib  spc1000_clib.lib \
 	laser500_clib.lib super80_clib.lib super80_vduem_clib.lib \
-	adam.lib z80tvgame_clib.lib smc777.lib \
+	adam.lib z80tvgame_clib.lib smc777.lib pasopia7_clib.lib \
 	preempt.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib 
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib gendos.lib ndos.lib  \
-	 im2.lib lib3d.lib x11.lib fastmath.lib
+	 lib3d.lib x11.lib fastmath.lib
 
 c128libs: c128ansi_clib.lib gfx128.lib gfx128hr.lib gfx128hr480.lib 
 
@@ -57,6 +57,7 @@ zx81libs: zx81_clib.lib gfx81.lib gfxlambda.lib gfx81udg.lib gfx81hr64.lib gfx81
 define buildgeneric
 	$(MAKE) -C ctype
 	$(MAKE) -C strings
+	$(MAKE) -C interrupts
 	$(MAKE) -C regex
 	$(MAKE) -C stdio
 	$(MAKE) -C setjmp
@@ -128,13 +129,6 @@ zx81deps:
 	@$(RM) -f zx81/chroma81/*.o
 	@$(RM) -f time/zx81/*.o
 
-
-# interrupt mode 2 library - aralbrec
-im2.lib:
-	@echo ''
-	@echo '--- Building IM 2 Library ---'
-	@echo ''
-	$(MAKE) -C im2 
 
 # Generic maths build - dom, stefano
 gen_math.lib:
@@ -860,7 +854,7 @@ adam.lib:
 	$(MAKE) -C games TARGET=cpm SUBTYPE=coleco
 	$(MAKE) -C msx TARGET=test
 	$(MAKE) -C psg
-	TARGET=coleco TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcoleco -x$(OUTPUT_DIRECTORY)/adam @$(LISTFILE_DIRECTORY)/adam.lst
+	TARGET=coleco TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcoleco -DFORadam -x$(OUTPUT_DIRECTORY)/adam @$(LISTFILE_DIRECTORY)/adam.lst
 
 # SORD M5 library - Stefano
 m5_clib.lib:
@@ -970,6 +964,17 @@ multi8_clib.lib:
 	$(MAKE) gfxdeps
 	$(call buildgeneric,multi8)
 	TARGET=multi8 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmulti8 -x$(OUTPUT_DIRECTORY)/multi8_clib @$(LISTFILE_DIRECTORY)/multi8.lst
+
+# Pasopia7 Multi8 - dom
+pasopia7_clib.lib:
+	@echo ''
+	@echo '--- Building Toshiba Pasopia7 Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	@$(RM) -f video/mc6845/*.o
+	$(call buildgeneric,pasopia7)
+	$(MAKE) -C games TARGET=pasopia7
+	TARGET=pasopia7 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORpasopia7 -x$(OUTPUT_DIRECTORY)/pasopia7_clib @$(LISTFILE_DIRECTORY)/pasopia7.lst
 
 # VTech VZ700- dom
 laser500_clib.lib:
@@ -1383,6 +1388,7 @@ classic-clean:
 	$(MAKE) -C fcntl clean
 	$(MAKE) -C math clean
 	$(MAKE) -C graphics clean
+	$(MAKE) -C interrupts clean
 	$(MAKE) -C net clean
 	$(MAKE) -C rex clean
 	$(MAKE) -C rs232 clean
@@ -1398,7 +1404,6 @@ classic-clean:
 	$(MAKE) -C adt clean
 	$(MAKE) -C adt-newlib clean
 	$(MAKE) -C alloc clean
-	$(MAKE) -C im2 clean
 	$(MAKE) -C rect clean
 	$(MAKE) -C algorithm clean
 	$(MAKE) -C debug clean

@@ -64,10 +64,7 @@
         ld      (oldx),hl
         ld      (cury),de
         call    w_pixeladdress
-        ; ------
-        ;ld		a,(hl)
-        ; @@@@@@@@@@@@
-         ld       c,a
+       ; @@@@@@@@@@@@
          ld       hl,offsets_table
          ld       c,a
          ld       b,0

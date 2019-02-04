@@ -57,3 +57,11 @@ IF FORsmc777
 	defc	register_r = 0x19
 	defc	register_w = 0x19
 ENDIF
+
+IF FORpasopia7
+	defc	address_r = 0x10
+	defc	status_r = 0 
+	defc	address_w = 0x10
+	defc	register_r = 0x11
+	defc	register_w = 0x11
+ENDIF

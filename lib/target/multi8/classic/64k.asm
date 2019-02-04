@@ -10,6 +10,9 @@
 	defc	VRAM_OUT = 0x2f
 	INCLUDE	"crt/classic/crt_rules.inc"
 
+	EXTERN	im1_handler
+	EXTERN	nmi_handler
+
         org     CRT_ORG_CODE
 
 if (ASMPC<>$0000)
@@ -57,16 +60,13 @@ endif
 if (ASMPC<>$0038)
         defs    CODE_ALIGNMENT_ERROR
 endif
-	; TODO: Some interrupt routine
-	ei	
-	reti
+	jp	im1_handler
 
         defs    $0066 - ASMPC
 if (ASMPC<>$0066)
         defs    CODE_ALIGNMENT_ERROR
 endif
-nmi:
-	retn
+	jp	nmi_handler
 
 restart10:
 restart08:

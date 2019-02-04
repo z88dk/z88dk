@@ -382,7 +382,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen)
                     else if ( q == 1 ) {
                         if ( p == 0 ) { BUF_PRINTF("ret"); dolf=1; }
                         else if ( p == 1 && !isgbz80() ) BUF_PRINTF("exx");
-                        else if ( p == 1 && isgbz80() ) BUF_PRINTF("reti");
+                        else if ( p == 1 && isgbz80() ) { BUF_PRINTF("reti"); dolf=1; }
                         else if ( p == 2 ) BUF_PRINTF("%-8s(%s)","jp",handle_register16(state, 2, state->index)); 
                         else if ( p == 3 ) BUF_PRINTF("%-8ssp,%s", "ld", handle_register16(state, 2, state->index)); 
                     }
@@ -555,19 +555,19 @@ int disassemble2(int pc, char *bufstart, size_t buflen)
                                         break;
                                     case 5:
                                         if ( israbbit() && y == 0 ) BUF_PRINTF("lret");
-                                        if ( y == 1 ) BUF_PRINTF("reti");
+                                        if ( y == 1 ) { BUF_PRINTF("reti"); dolf=1; }
                                         else if ( israbbit() && y == 3 ) BUF_PRINTF("ipres");
                                         else if ( israbbit() && y == 4 ) BUF_PRINTF("%-8s(%s),hl","ldp", handle_addr16(state, opbuf1, sizeof(opbuf1)));
                                         else if ( israbbit() && y == 5 ) BUF_PRINTF("%-8shl,(%s)","ldp", handle_addr16(state, opbuf1, sizeof(opbuf1)));
                                         else if ( israbbit() && y == 6 ) BUF_PRINTF("%-8s", c_cpu == CPU_R3K ? "syscall" : "nop");
                                         else if ( israbbit() && y == 7 ) BUF_PRINTF("%-8s", c_cpu == CPU_R3K ? "sures" : "nop");
-                                        else if ( (isz180() || isez80()) && y == 0 ) BUF_PRINTF("retn");
+                                        else if ( (isz180() || isez80()) && y == 0 ) { BUF_PRINTF("retn"); dolf=1; }
                                         else if ( isez80() && y == 2 ) BUF_PRINTF("%-8siy,ix%s","lea",handle_displacement(state, opbuf1, sizeof(opbuf1)));                                        
                                         else if ( isez80() && y == 4 ) BUF_PRINTF("%-8six%s","pea",handle_displacement(state, opbuf1, sizeof(opbuf1)));                                        
                                         else if ( isez80() && y == 5 ) BUF_PRINTF("%-8smb,a","ld");                                        
                                         else if ( isez80() && y == 7 ) BUF_PRINTF("stmix");                                        
                                         else if ( (isz180() || isez80()) && y != 0 ) BUF_PRINTF("nop");
-                                        else if ( !israbbit() ) BUF_PRINTF("retn"); 
+                                        else if ( !israbbit() ) { BUF_PRINTF("retn"); dolf=1; }
                                         break;
                                     case 6:
                                         if ( isez80() && y == 4 ) BUF_PRINTF("%-8siy%s","pea",handle_displacement(state, opbuf1, sizeof(opbuf1)));                                        

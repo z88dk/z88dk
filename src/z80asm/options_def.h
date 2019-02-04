@@ -31,6 +31,7 @@ OPT_VAR( bool,		date_stamp,	false	)
 OPT_VAR( bool,		relocatable, false	)
 OPT_VAR( bool,      reloc_info, false   )	/* generate .reloc file */
 OPT_VAR( bool,		library,	false	)	/* true if linking with libs */
+OPT_VAR( bool,		opt_speed,	false   )
 
 OPT_VAR(appmake_t, appmake, APPMAKE_NONE)
 OPT_VAR(const char *, appmake_opts, "")
@@ -77,6 +78,7 @@ OPT(OptCall, option_cpu_r3k, "", "--cpu=r3k", "Assemble for the Rabbit 3000", ""
 OPT(OptCall, option_cpu_ti83plus, "", "--cpu=ti83plus", "Assemble for the TI83Plus", "")
 OPT(OptCall, option_cpu_ti83, "", "--cpu=ti83", "Assemble for the TI83", "")
 OPT(OptSet, &opts.swap_ix_iy, "-IXIY", "--IXIY", "Swap IX and IY registers", "")
+OPT(OptSet, &opts.opt_speed, "", "--opt=speed", "Optimize for speed", "")
 OPT(OptCall, option_debug_info, "", "--debug", "Add debug info to map file", "")
 
 OPT_TITLE("Environment:")

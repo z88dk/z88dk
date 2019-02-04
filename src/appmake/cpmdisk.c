@@ -1,92 +1,123 @@
-/* Simple CP/M disc writer - wraps it all up in an EDSK file */
-
+/*
+ * Disc image handling
+ */
 
 #include "appmake.h"
+#include "diskio.h"
 
 
-struct cpm_handle_s {
-    cpm_discspec  spec;
+// d88 media type
+#define MEDIA_TYPE_2D   0x00
+#define MEDIA_TYPE_2DD  0x10
+#define MEDIA_TYPE_2HD  0x20
+#define MEDIA_TYPE_144  0x30
+#define MEDIA_TYPE_UNK  0xff
+
+typedef struct {
+        char title[17];
+        uint8_t rsrv[9];
+        uint8_t protect;
+        uint8_t type;
+        uint32_t size;
+        uint32_t trkptr[164];
+} d88_hdr_t;
+
+typedef struct {
+        uint8_t c, h, r, n;
+        uint16_t nsec;
+        uint8_t dens, del, stat;
+        uint8_t rsrv[5];
+        uint16_t size;
+} d88_sct_t;
+
+
+struct disc_handle_s {
+    disc_spec  spec;
 
     uint8_t      *image;
+
+    // CP/M information
     uint8_t      *extents;
     int           num_extents;
+
+    // FAT information
+    FATFS         fatfs;
+
+    // Routine delegation
+    void         (*write_file)(disc_handle *h, char *filename, void *data, size_t bin);
 };
 
-static int first_free_extent(cpm_handle* h)
+
+static void cpm_write_file(disc_handle* h, char *filename, void* data, size_t len);
+static void fat_write_file(disc_handle* h, char *filename, void* data, size_t len);
+
+// Generic routines
+
+disc_handle *disc_create(disc_spec* spec)
 {
-    int i;
-
-    for (i = 0; i < h->num_extents; i++) {
-        if (h->extents[i] == 0) {
-            return i;
-        }
-    }
-    exit_log(1,"No free extents on disc\n");
-    return -1;
-}
-
-static size_t find_first_free_directory_entry(cpm_handle* h)
-{
-    size_t directory_offset = h->spec.offset ? h->spec.offset : (h->spec.boottracks * h->spec.sectors_per_track * h->spec.sector_size * 1);
-    int i;
-
-    for (i = 0; i < h->spec.directory_entries; i++) {
-        if (h->image[directory_offset] == h->spec.filler_byte) {
-            return directory_offset;
-        }
-        directory_offset += 32;
-    }
-    exit_log(1,"No free directory entries on disc\n");
-    return 0;
-}
-
-cpm_handle* cpm_create(cpm_discspec* spec)
-{
-    cpm_handle* h = calloc(1, sizeof(*h));
+    disc_handle* h = calloc(1, sizeof(*h));
     size_t len;
     int directory_extents;
     int i;
 
     h->spec = *spec;
-
     len = spec->tracks * spec->sectors_per_track * spec->sector_size * spec->sides;
     h->image = calloc(len, sizeof(char));
     memset(h->image, spec->filler_byte, len);
 
-    directory_extents = (h->spec.directory_entries * 32) / h->spec.extent_size;
-    h->num_extents = ((spec->tracks - h->spec.boottracks) * h->spec.sectors_per_track * h->spec.sector_size) / h->spec.extent_size + 1;
-    h->extents = calloc(h->num_extents, sizeof(uint8_t));
 
-    /* Now reserve the directory extents */
-    for (i = 0; i < directory_extents; i++) {
-        h->extents[i] = 1;
-    }
 #if 0
     // Code that marks each sector so we can see what is actually loaded
     for ( int t = 0, offs = 0; t < spec->tracks; t++ ) {
-	for ( int head = 0; head < spec->sides; head++ ) {
-	   for ( int s = 0; s < spec->sectors_per_track; s++ ) {
+        for ( int head = 0; head < spec->sides; head++ ) {
+           for ( int s = 0; s < spec->sectors_per_track; s++ ) {
               for ( int b = 0; b < spec->sector_size / 4 ; b++ ) {
                  h->image[offs++] = t; //^ 255;
                  h->image[offs++] = head; //^ 255;
                  h->image[offs++] = s; //^ 255;
                  h->image[offs++] = 0; //^ 255;
               }
-	   }
-	}
+           }
+        }
     }
 #endif
-    size_t directory_offset = h->spec.offset ? h->spec.offset : (h->spec.boottracks * h->spec.sectors_per_track * h->spec.sector_size * 1);
-    memset(h->image +directory_offset, 0xe5, 512);
     return h;
 }
 
-void cpm_write_boot_track(cpm_handle* h, void* data, size_t len)
+void disc_write_file(disc_handle* h, char *filename, void* data, size_t len)
+{
+    h->write_file(h, filename, data, len);
+}
+
+
+void disc_write_boot_track(disc_handle* h, void* data, size_t len)
 {
     memcpy(h->image, data, len);
 }
 
-void cpm_write_sector(cpm_handle *h, int track, int sector, int head, void *data)
+void disc_write_sector_lba(disc_handle *h, int sector_nr, int count, const void *data)
+{
+    const uint8_t *ptr = data;
+    int      i;
+
+    for ( i = 0; i < count; i++ ) {
+        int track = sector_nr / h->spec.sectors_per_track;
+        int sector = sector_nr % h->spec.sectors_per_track;
+        int head;
+
+        if ( h->spec.alternate_sides == 0 ) {
+            head = track % 2;
+                   track /= 2;
+            } else {
+                   head = track >= h->spec.tracks ? 1 : 0;
+        }
+        disc_write_sector(h, track, sector, head, ptr);
+        sector_nr++;
+        ptr += h->spec.sector_size;
+    }
+}
+
+void disc_write_sector(disc_handle *h, int track, int sector, int head, const void *data)
 {
     size_t offset;
     size_t track_length = h->spec.sectors_per_track * h->spec.sector_size;
@@ -101,7 +132,370 @@ void cpm_write_sector(cpm_handle *h, int track, int sector, int head, void *data
     memcpy(&h->image[offset], data, h->spec.sector_size);
 }
 
-void cpm_write_file(cpm_handle* h, char filename[11], void* data, size_t len)
+void disc_read_sector_lba(disc_handle *h, int sector_nr, int count, void *data)
+{
+    uint8_t *ptr = data;
+    int      i;
+
+    for ( i = 0; i < count; i++ ) {
+        int track = sector_nr / h->spec.sectors_per_track;
+        int sector = sector_nr % h->spec.sectors_per_track;
+        int head;
+
+        if ( h->spec.alternate_sides == 0 ) {
+            head = track % 2;
+                   track /= 2;
+            } else {
+                   head = track >= h->spec.tracks ? 1 : 0;
+        }
+        disc_read_sector(h, track, sector, head, ptr);
+        sector_nr++;
+        ptr += h->spec.sector_size;
+    }
+}
+
+void disc_read_sector(disc_handle *h, int track, int sector, int head, void *data)
+{
+    size_t offset;
+    size_t track_length = h->spec.sectors_per_track * h->spec.sector_size;
+
+    if ( h->spec.alternate_sides == 0 ) {
+        offset = track_length * track + (head * track_length * h->spec.tracks);
+    } else {
+        offset = track_length * ( 2* track + head);
+    }
+
+    offset += sector * h->spec.sector_size;
+    memcpy(data, &h->image[offset], h->spec.sector_size);
+}
+
+
+
+
+int disc_get_sector_size(disc_handle *h)
+{
+    return h->spec.sector_size;
+}
+
+int disc_get_sector_count(disc_handle *h)
+{
+    return h->spec.sides  * h->spec.sectors_per_track * h->spec.tracks;
+}
+
+
+void disc_free(disc_handle* h)
+{
+    free(h->image);
+    free(h->extents);
+    free(h);
+}
+
+// Image writing routines
+
+struct container {
+    const char        *name;
+    const char        *extension;
+    const char        *description;
+    disc_writer_func   writer;
+} containers[] = {
+    { "dsk",        ".dsk", "CPC extended .dsk format",    disc_write_edsk },
+    { "d88",        ".D88", "d88 format",                  disc_write_d88 },
+    { "raw",        ".img", "Raw image",                   disc_write_raw },
+    { NULL, NULL, NULL }
+};
+
+disc_writer_func disc_get_writer(const char *container_name, const char **extension)
+{
+    struct container *c = &containers[0];
+    while (c->name != NULL) {
+        *extension = c->extension;
+        if (strcasecmp(container_name, c->name) == 0) {
+            return c->writer;
+        }
+        c++;
+    }
+    return NULL;
+}
+
+void disc_print_writers(FILE *fp)
+{
+    struct container *c = &containers[0];
+
+    while ( c->name ) {
+        fprintf(fp, "%-20s%s\n", c->name, c->description);
+        c++;
+    }
+}
+
+
+
+// Write a raw disk, no headers for tracks etc
+int disc_write_raw(disc_handle* h, const char* filename)
+{
+    size_t offs;
+    FILE* fp;
+    int i, j, s;
+    int track_length = h->spec.sector_size * h->spec.sectors_per_track;
+
+    if ((fp = fopen(filename, "wb")) == NULL) {
+        return -1;
+    }
+
+    for (i = 0; i < h->spec.tracks; i++) {
+        for (s = 0; s < h->spec.sides; s++) {
+            uint8_t* ptr;
+
+            if ( h->spec.alternate_sides == 0 ) {
+                offs = track_length * i + (s * track_length * h->spec.tracks);
+            } else {
+                offs = track_length * ( 2* i + s);
+            }
+            for (j = 0; j < h->spec.sectors_per_track; j++) {
+                 int sect = j; // TODO: Skew
+                 if ( h->spec.has_skew && i + (i*h->spec.sides) >= h->spec.skew_track_start ) {
+                     for ( sect = 0; sect < h->spec.sectors_per_track; sect++ ) {
+                        if ( h->spec.skew_tab[sect] == j ) break;
+                     }
+                 }
+                 fwrite(h->image + offs + (sect * h->spec.sector_size), h->spec.sector_size, 1, fp);
+            }
+        }
+    }
+    fclose(fp);
+    return 0;
+}
+
+
+int disc_write_edsk(disc_handle* h, const char* filename)
+{
+    uint8_t header[256] = { 0 };
+    char    title[15];
+    size_t offs;
+    FILE* fp;
+    int i, j, s;
+    int track_length = h->spec.sector_size * h->spec.sectors_per_track;
+    int sector_size = 0;
+
+    i = h->spec.sector_size;
+    while (i > 128) {
+        sector_size++;
+        i /= 2;
+    }
+
+    if ((fp = fopen(filename, "wb")) == NULL) {
+        return -1;
+    }
+    memset(header, 0, 256);
+    memcpy(header, "EXTENDED CPC DSK FILE\r\nDisk-Info\r\n", 34);
+    snprintf(title,sizeof(title),"z88dk/%s", h->spec.name ? h->spec.name : "appmake");
+    memcpy(header + 0x22, title, strlen(title));
+    header[0x30] = h->spec.tracks;
+    header[0x31] = h->spec.sides;
+    for (i = 0; i < h->spec.tracks * h->spec.sides; i++) {
+        header[0x34 + i] = (h->spec.sector_size * h->spec.sectors_per_track + 256) / 256;
+    }
+    fwrite(header, 256, 1, fp);
+
+    for (i = 0; i < h->spec.tracks; i++) {
+        for (s = 0; s < h->spec.sides; s++) {
+            uint8_t* ptr;
+
+            if ( h->spec.alternate_sides == 0 ) {
+                offs = track_length * i + (s * track_length * h->spec.tracks);
+            } else {
+                offs = track_length * ( 2* i + s);
+            }
+            memset(header, 0, 256);
+            memcpy(header, "Track-Info\r\n", 12);
+            header[0x10] = i;
+            header[0x11] = s; // side
+            header[0x14] = sector_size;
+            header[0x15] = h->spec.sectors_per_track;
+            header[0x16] = h->spec.gap3_length;
+            header[0x17] = h->spec.filler_byte;
+            ptr = header + 0x18;
+            for (j = 0; j < h->spec.sectors_per_track; j++) {
+                *ptr++ = i; // Track
+                *ptr++ = s; // Side
+                if ( 0 && h->spec.has_skew && i + (i*h->spec.sides) >= h->spec.skew_track_start ) {
+                    *ptr++ = h->spec.skew_tab[j] + h->spec.first_sector_offset; // Sector ID
+                } else if (  i + (i*h->spec.sides) <= h->spec.boottracks && h->spec.boot_tracks_sector_offset ) {
+                    *ptr++ = j + h->spec.boot_tracks_sector_offset; // Sector ID
+                } else {
+                    *ptr++ = j + h->spec.first_sector_offset; // Sector ID
+                }
+                *ptr++ = sector_size;
+                *ptr++ = 0; // FDC status register 1
+                *ptr++ = 0; // FDC status register 2
+                *ptr++ = h->spec.sector_size % 256;
+                *ptr++ = h->spec.sector_size / 256;
+            }
+            fwrite(header, 256, 1, fp);
+            for (j = 0; j < h->spec.sectors_per_track; j++) {
+                 int sect = j; // TODO: Skew
+                 if ( h->spec.has_skew && i + (i*h->spec.sides) >= h->spec.skew_track_start ) {
+                     for ( sect = 0; sect < h->spec.sectors_per_track; sect++ ) {
+                        if ( h->spec.skew_tab[sect] == j ) break;
+                     }
+                 }
+                 fwrite(h->image + offs + (sect * h->spec.sector_size), h->spec.sector_size, 1, fp);
+            }
+        }
+    }
+    fclose(fp);
+    return 0;
+}
+
+
+
+int disc_write_d88(disc_handle* h, const char* filename)
+{
+    uint8_t header[1024] = { 0 };
+    char    title[18];
+    uint8_t *ptr;
+    size_t offs;
+    FILE* fp;
+    int i, j, s;
+    int sector_size = 0;
+    int track_length = h->spec.sector_size * h->spec.sectors_per_track;
+
+
+    if ((fp = fopen(filename, "wb")) == NULL) {
+        return -1;
+    }
+
+
+    i = h->spec.sector_size;
+    while (i > 128) {
+        sector_size++;
+        i /= 2;
+    }
+
+    ptr = header;
+    snprintf(title,sizeof(title),"z88dk/%s", h->spec.name ? h->spec.name : "appmake");
+    memcpy(ptr, title, strlen(title)); ptr += 17;
+    ptr += 9;  // Reserved
+    *ptr++ = 0; // Protect
+    // Calculate data size of the disc
+    offs = track_length * h->spec.tracks * h->spec.sides;
+    *ptr++ =  (offs < (368640 + 655360) / 2) ? MEDIA_TYPE_2D : (offs < (737280 + 1228800) / 2) ? MEDIA_TYPE_2DD : MEDIA_TYPE_2HD;
+    // Calculate the file length of the disc image
+    offs = sizeof(d88_hdr_t) + (sizeof(d88_sct_t) * h->spec.sectors_per_track + track_length) * (h->spec.tracks * h->spec.sides);
+    *ptr++ = offs % 256;
+    *ptr++ = (offs / 256) % 256;
+    *ptr++ = (offs / 65536) % 256;
+    *ptr++ = (offs / 65536) / 256;
+    
+    for ( i = 0; i < h->spec.tracks * h->spec.sides; i++ ) {
+        offs = sizeof(d88_hdr_t) + (sizeof(d88_sct_t) * h->spec.sectors_per_track +  track_length) * i;
+        *ptr++ = offs % 256;
+        *ptr++ = (offs / 256) % 256;
+        *ptr++ = (offs / 65536) % 256;
+        *ptr++ = (offs / 65536) / 256;
+        if ( h->spec.sides == 1 ) {
+           *ptr++ = 0;
+           *ptr++ = 0;
+           *ptr++ = 0;
+           *ptr++ = 0;
+        }
+    }
+    fwrite(header, sizeof(d88_hdr_t), 1, fp);
+
+    for (i = 0; i < h->spec.tracks; i++) {
+        for (s = 0; s < h->spec.sides; s++) {
+
+            if ( h->spec.alternate_sides == 0 ) {
+                offs = track_length * i + (s * track_length * h->spec.tracks);
+            } else {
+                offs = track_length * ( 2* i + s);
+            }
+            for (j = 0; j < h->spec.sectors_per_track; j++) {
+                 uint8_t *ptr = header;
+
+                 int sect = j; // TODO: Skew
+                 if ( h->spec.has_skew && i + (i*h->spec.sides) >= h->spec.skew_track_start ) {
+                     for ( sect = 0; sect < h->spec.sectors_per_track; sect++ ) {
+                        if ( h->spec.skew_tab[sect] == j ) break;
+                     }
+                 }
+                 *ptr++ = i;                 //track
+                 *ptr++ = s;                //head
+                 *ptr++ = j+1;                //sector
+                 *ptr++ = sector_size;  //n
+                 *ptr++ = (h->spec.sectors_per_track) % 256;
+                 *ptr++ = (h->spec.sectors_per_track) / 256;
+                 *ptr++ = 0;                //dens
+                 *ptr++ = 0;                //del
+                 *ptr++ = 0;                //stat
+                 *ptr++ = 0;                //reserved
+                 *ptr++ = 0;                //reserved
+                 *ptr++ = 0;                //reserved
+                 *ptr++ = 0;                //reserved
+                 *ptr++ = 0;                //reserved
+                 *ptr++ = (h->spec.sector_size % 256);
+                 *ptr++ = (h->spec.sector_size / 256);
+                 fwrite(header, ptr - header, 1, fp);
+                 fwrite(h->image + offs + (sect * h->spec.sector_size), h->spec.sector_size, 1, fp);
+            }
+        }
+    }
+    fclose(fp);
+    return 0;
+}
+
+// CP/M routines
+static int first_free_extent(disc_handle* h)
+{
+    int i;
+
+    for (i = 0; i < h->num_extents; i++) {
+        if (h->extents[i] == 0) {
+            return i;
+        }
+    }
+    exit_log(1,"No free extents on disc\n");
+    return -1;
+}
+
+static size_t find_first_free_directory_entry(disc_handle* h)
+{
+    size_t directory_offset = h->spec.offset ? h->spec.offset : (h->spec.boottracks * h->spec.sectors_per_track * h->spec.sector_size * 1);
+    int i;
+
+    for (i = 0; i < h->spec.directory_entries; i++) {
+        if (h->image[directory_offset] == h->spec.filler_byte) {
+            return directory_offset;
+        }
+        directory_offset += 32;
+    }
+    exit_log(1,"No free directory entries on disc\n");
+    return 0;
+}
+
+disc_handle *cpm_create(disc_spec* spec)
+{
+    disc_handle* h = disc_create(spec);
+    int directory_extents;
+    int i;
+
+
+    directory_extents = (h->spec.directory_entries * 32) / h->spec.extent_size;
+    h->num_extents = ((spec->tracks - h->spec.boottracks) * h->spec.sectors_per_track * h->spec.sector_size) / h->spec.extent_size + 1;
+    h->extents = calloc(h->num_extents, sizeof(uint8_t));
+
+    /* Now reserve the directory extents */
+    for (i = 0; i < directory_extents; i++) {
+        h->extents[i] = 1;
+    }
+
+    h->write_file = cpm_write_file;
+    size_t directory_offset = h->spec.offset ? h->spec.offset : (h->spec.boottracks * h->spec.sectors_per_track * h->spec.sector_size * 1);
+    memset(h->image +directory_offset, 0xe5, 512);
+    return h;
+}
+
+
+static void cpm_write_file(disc_handle* h, char *filename, void* data, size_t len)
 {
     size_t num_extents = (len / h->spec.extent_size) + 1;
     size_t directory_offset;
@@ -159,219 +553,110 @@ void cpm_write_file(cpm_handle* h, char filename[11], void* data, size_t len)
     }
 }
 
-// Write a raw disk, no headers for tracks etc
-int cpm_write_raw(cpm_handle* h, const char* filename)
+// FAT filesystem - we delegate mostly to FatFS
+
+// Nasty static reference to file, TODO, I can do this better
+static disc_handle *current_fat_handle = NULL;
+
+disc_handle *fat_create(disc_spec* spec)
 {
-    size_t offs;
-    FILE* fp;
-    int i, j, s;
-    int track_length = h->spec.sector_size * h->spec.sectors_per_track;
+    disc_handle *h = disc_create(spec);
+    char         buf[1024];
+    FRESULT      res;
 
-    if ((fp = fopen(filename, "wb")) == NULL) {
-        return -1;
+    current_fat_handle = h;
+    // Create a file system
+    if ( (res = f_mkfs("1", spec->fat_format_flags, spec->cluster_size, buf, sizeof(buf), spec->number_of_fats, spec->directory_entries)) != FR_OK) {
+        exit_log(1, "Cannot create FAT filesystem: %d\n",res);
     }
 
-    for (i = 0; i < h->spec.tracks; i++) {
-        for (s = 0; s < h->spec.sides; s++) {
-            uint8_t* ptr;
-
-            if ( h->spec.alternate_sides == 0 ) {
-                offs = track_length * i + (s * track_length * h->spec.tracks);
-            } else {
-                offs = track_length * ( 2* i + s);
-            }
-            for (j = 0; j < h->spec.sectors_per_track; j++) {
-                 int sect = j; // TODO: Skew
-                 if ( h->spec.has_skew && i + (i*h->spec.sides) >= h->spec.skew_track_start ) {
-		     for ( sect = 0; sect < h->spec.sectors_per_track; sect++ ) {
-			if ( h->spec.skew_tab[sect] == j ) break;
-		     }
-                 }
-                 fwrite(h->image + offs + (sect * h->spec.sector_size), h->spec.sector_size, 1, fp);
-            }
-        }
+    // And now we need to mount it
+    if ( (res = f_mount(&h->fatfs, "1", 1)) != FR_OK ) {
+        exit_log(1, "Cannot mount newly create FAT filesystem: %d\n",res);
     }
-    fclose(fp);
-    return 0;
+
+    h->write_file = fat_write_file;
+    return h;
+}
+
+static void fat_write_file(disc_handle* h, char *filename, void* data, size_t len)
+{
+    FIL file={0};
+    UINT written;
+
+    if ( f_open(&file, filename, FA_WRITE|FA_CREATE_ALWAYS) != FR_OK ) {
+        exit_log(1, "Cannot create file <%s> on FAT image", filename);
+    }
+
+    if ( f_write(&file, data, len, &written) != FR_OK ) {
+        exit_log(1, "Cannot write file contents to FAT image");
+    }
+
+    f_close(&file);
 }
 
 
-int cpm_write_edsk(cpm_handle* h, const char* filename)
+// FATFs interface
+
+DSTATUS disk_status (
+	BYTE pdrv		/* Physical drive nmuber to identify the drive */
+)
 {
-    uint8_t header[256] = { 0 };
-    size_t offs;
-    FILE* fp;
-    int i, j, s;
-    int track_length = h->spec.sector_size * h->spec.sectors_per_track;
-    int sector_size = 0;
+    return RES_OK;
+}
 
-    i = h->spec.sector_size;
-    while (i > 128) {
-        sector_size++;
-        i /= 2;
-    }
-
-    if ((fp = fopen(filename, "wb")) == NULL) {
-        return -1;
-    }
-    memset(header, 0, 256);
-    memcpy(header, "EXTENDED CPC DSK FILE\r\nDisk-Info\r\n", 34);
-    memcpy(header + 0x22, "z88dk", 5);
-    header[0x30] = h->spec.tracks;
-    header[0x31] = h->spec.sides;
-    for (i = 0; i < h->spec.tracks * h->spec.sides; i++) {
-        header[0x34 + i] = (h->spec.sector_size * h->spec.sectors_per_track + 256) / 256;
-    }
-    fwrite(header, 256, 1, fp);
-
-    for (i = 0; i < h->spec.tracks; i++) {
-        for (s = 0; s < h->spec.sides; s++) {
-            uint8_t* ptr;
-
-            if ( h->spec.alternate_sides == 0 ) {
-                offs = track_length * i + (s * track_length * h->spec.tracks);
-            } else {
-                offs = track_length * ( 2* i + s);
-            }
-            memset(header, 0, 256);
-            memcpy(header, "Track-Info\r\n", 12);
-            header[0x10] = i;
-            header[0x11] = s; // side
-            header[0x14] = sector_size;
-            header[0x15] = h->spec.sectors_per_track;
-            header[0x16] = h->spec.gap3_length;
-            header[0x17] = h->spec.filler_byte;
-            ptr = header + 0x18;
-            for (j = 0; j < h->spec.sectors_per_track; j++) {
-                *ptr++ = i; // Track
-                *ptr++ = s; // Side
-                if ( 0 && h->spec.has_skew && i + (i*h->spec.sides) >= h->spec.skew_track_start ) {
-                    *ptr++ = h->spec.skew_tab[j] + h->spec.first_sector_offset; // Sector ID
-                } else if (  i + (i*h->spec.sides) <= h->spec.boottracks && h->spec.boot_tracks_sector_offset ) {
-                    *ptr++ = j + h->spec.boot_tracks_sector_offset; // Sector ID
-                } else {
-                    *ptr++ = j + h->spec.first_sector_offset; // Sector ID
-                }
-                *ptr++ = sector_size;
-                *ptr++ = 0; // FDC status register 1
-                *ptr++ = 0; // FDC status register 2
-                *ptr++ = h->spec.sector_size % 256;
-                *ptr++ = h->spec.sector_size / 256;
-            }
-            fwrite(header, 256, 1, fp);
-            for (j = 0; j < h->spec.sectors_per_track; j++) {
-                 int sect = j; // TODO: Skew
-                 if ( h->spec.has_skew && i + (i*h->spec.sides) >= h->spec.skew_track_start ) {
-		     for ( sect = 0; sect < h->spec.sectors_per_track; sect++ ) {
-			if ( h->spec.skew_tab[sect] == j ) break;
-		     }
-                 }
-                 fwrite(h->image + offs + (sect * h->spec.sector_size), h->spec.sector_size, 1, fp);
-            }
-        }
-    }
-    fclose(fp);
-    return 0;
+DSTATUS disk_initialize (
+	BYTE pdrv				/* Physical drive nmuber to identify the drive */
+)
+{
+    return RES_OK;
 }
 
 
-void cpm_free(cpm_handle* h)
+DRESULT disk_read (
+	BYTE pdrv,		/* Physical drive nmuber to identify the drive */
+	BYTE *buff,		/* Data buffer to store read data */
+	DWORD sector,	/* Start sector in LBA */
+	UINT count		/* Number of sectors to read */
+)
 {
-    free(h->image);
-    free(h->extents);
-    free(h);
+    disc_read_sector_lba(current_fat_handle, sector, count, buff);
+
+    return RES_OK;
 }
 
-int cpm_write_d88(cpm_handle* h, const char* filename)
+
+DRESULT disk_write (
+	BYTE pdrv,			/* Physical drive nmuber to identify the drive */
+	const BYTE *buff,	/* Data to be written */
+	DWORD sector,		/* Start sector in LBA */
+	UINT count			/* Number of sectors to write */
+)
 {
-    uint8_t header[1024] = { 0 };
-    uint8_t *ptr;
-    size_t offs;
-    FILE* fp;
-    int i, j, s;
-    int sector_size = 0;
-    int track_length = h->spec.sector_size * h->spec.sectors_per_track;
+    disc_write_sector_lba(current_fat_handle, sector, count, buff);
 
+    return RES_OK;
+}
 
-    if ((fp = fopen(filename, "wb")) == NULL) {
-        return -1;
+DRESULT disk_ioctl (
+	BYTE pdrv,		/* Physical drive nmuber (0..) */
+	BYTE cmd,		/* Control code */
+	void *buff		/* Buffer to send/receive control data */
+)
+{
+    int    val;
+    switch ( cmd ) {
+    case GET_SECTOR_COUNT:
+        val = disc_get_sector_count(current_fat_handle);
+        *(DWORD *)buff = val;
+        break;
+
+    case GET_SECTOR_SIZE:
+    case GET_BLOCK_SIZE:
+        val = disc_get_sector_size(current_fat_handle);
+        *(WORD *)buff = val;
+        break;
     }
-
-
-    i = h->spec.sector_size;
-    while (i > 128) {
-        sector_size++;
-        i /= 2;
-    }
-
-    ptr = header;
-    memcpy(ptr, "z88dk-appmake", 13); ptr += 17;
-    ptr += 9;  // Reserved
-    *ptr++ = 0; // Protect
-    // Calculate data size of the disc
-    offs = track_length * h->spec.tracks * h->spec.sides;
-    *ptr++ =  (offs < (368640 + 655360) / 2) ? MEDIA_TYPE_2D : (offs < (737280 + 1228800) / 2) ? MEDIA_TYPE_2DD : MEDIA_TYPE_2HD;
-    // Calculate the file length of the disc image
-    offs = sizeof(d88_hdr_t) + (sizeof(d88_sct_t) * h->spec.sectors_per_track + track_length) * (h->spec.tracks * h->spec.sides);
-    *ptr++ = offs % 256;
-    *ptr++ = (offs / 256) % 256;
-    *ptr++ = (offs / 65536) % 256;
-    *ptr++ = (offs / 65536) / 256;
-    
-    for ( i = 0; i < h->spec.tracks * h->spec.sides; i++ ) {
-        offs = sizeof(d88_hdr_t) + (sizeof(d88_sct_t) * h->spec.sectors_per_track +  track_length) * i;
-        *ptr++ = offs % 256;
-        *ptr++ = (offs / 256) % 256;
-        *ptr++ = (offs / 65536) % 256;
-        *ptr++ = (offs / 65536) / 256;
-        if ( h->spec.sides == 1 ) {
-           *ptr++ = 0;
-           *ptr++ = 0;
-           *ptr++ = 0;
-           *ptr++ = 0;
-        }
-    }
-    fwrite(header, sizeof(d88_hdr_t), 1, fp);
-
-    for (i = 0; i < h->spec.tracks; i++) {
-        for (s = 0; s < h->spec.sides; s++) {
-
-            if ( h->spec.alternate_sides == 0 ) {
-                offs = track_length * i + (s * track_length * h->spec.tracks);
-            } else {
-                offs = track_length * ( 2* i + s);
-            }
-            for (j = 0; j < h->spec.sectors_per_track; j++) {
-                 uint8_t *ptr = header;
-
-                 int sect = j; // TODO: Skew
-                 if ( h->spec.has_skew && i + (i*h->spec.sides) >= h->spec.skew_track_start ) {
-		     for ( sect = 0; sect < h->spec.sectors_per_track; sect++ ) {
-			if ( h->spec.skew_tab[sect] == j ) break;
-		     }
-                 }
-                 *ptr++ = i; 		//track
-		 *ptr++ = s;		//head
-		 *ptr++ = j+1;		//sector
-                 *ptr++ = sector_size;  //n
-                 *ptr++ = (h->spec.sectors_per_track) % 256;
-                 *ptr++ = (h->spec.sectors_per_track) / 256;
-                 *ptr++ = 0;		//dens
-                 *ptr++ = 0;		//del
-                 *ptr++ = 0;		//stat
-                 *ptr++ = 0;		//reserved
-                 *ptr++ = 0;		//reserved
-                 *ptr++ = 0;		//reserved
-                 *ptr++ = 0;		//reserved
-                 *ptr++ = 0;		//reserved
-                 *ptr++ = (h->spec.sector_size % 256);
-                 *ptr++ = (h->spec.sector_size / 256);
-                 fwrite(header, ptr - header, 1, fp);
-                 fwrite(h->image + offs + (sect * h->spec.sector_size), h->spec.sector_size, 1, fp);
-            }
-        }
-    }
-    fclose(fp);
-    return 0;
+    return RES_OK;
 }
 

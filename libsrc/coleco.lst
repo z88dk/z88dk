@@ -65,5 +65,7 @@ msx/gen_vram
 msx/gen_vread
 msx/gen_vwrite
 msx/gen_vwrite_direct
+msx/l_tms9918_disable_interrupts_nmi
 @msx/genmsx.lst
+arch/tms9918/add_raster_nmi
 @z80.lst

@@ -3004,7 +3004,6 @@ void zle_const(LVALUE *lval, int32_t value)
                 ol("ld\ta,e");
             } else {
                 ol("ld\ta,d");
-                ol("or\te");
                 if ( !utype(lval)) {
                     ol("rla");
                     ol("jr\tc,ASMPC+8");

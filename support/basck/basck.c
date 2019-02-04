@@ -4,10 +4,23 @@
  *   This tool looks for known 'fingerprints' in the code and tries to identify
  *   function entry points and to provide a cross-reference for further ROM analysis.
  *
- *   It works with Sinclair, Microsoft or Hu-BASIC ROMs or raw datafiles (tape images, etc..), giving hints to 
+ *   It works with Sinclair, Microsoft or Hu-BASIC ROMs on raw datafiles (tape images, etc..), giving hints to 
  *   set-up a brand new target port or to just extend it with an alternative shortcuts (i.e. in the FP package).
  *
- *   $Id: basck.c - updated in 2018 $
+ *   $Id: basck.c $
+ *
+ *
+ *   Simpler way to adapt a Microsoft BASIC subroutine to z88dk:
+ *    > basck -map romfile.rom |grep PRS
+ *              PRS     = $AAAA   ; Create string entry and print it
+ *
+ *   extern void rom_prs(char * str) __z88dk_fastcall @0xAAAA;
+ *
+ *   main() {
+ *   rom_prs ("Hello WORLD !");
+ *   while (1){};
+ *   }
+ *
  */
 
 unsigned char  *img;
@@ -17,7 +30,8 @@ int  l;
 char token[1000];
 int address;
 
-/* For the SKOOL mode, refer to:  http://pythonhosted.org/skoolkit */
+/* For the SKOOL mode (disassembler), refer to:  http://skoolkit.ca/ */
+
 /* usage example in skool mode:
 		basck -ctl p2000.bin > p2000.ctl
 		---> we look into the created file and see:  "(Detected position for ORG:  4096)"

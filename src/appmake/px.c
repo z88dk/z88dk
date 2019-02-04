@@ -46,7 +46,7 @@ int px_exec(char* target)
     int len, len2, namelen;
     int c, i;
     int b, blk;
-    char* p;
+    char* p,*ptr;
     char entry_skeleton[] = { 0, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'C', 'O', 'M', 0, 0, 0, 1 };
     char header[] = "H80Z88DK         xV01010188";
 
@@ -63,7 +63,13 @@ int px_exec(char* target)
         strcpy(filename, outfile);
     }
 
-    for (p = filename; *p != '\0'; ++p)
+    ptr = strrchr(filename, '/');
+    if ( ptr == NULL ) 
+        ptr = strrchr(filename, '\\');
+    if ( ptr == NULL ) 
+        ptr = filename;
+
+    for (p = ptr ; *p != '\0'; ++p)
         *p = toupper(*p);
 
     suffix_change(filename, ".ROM");

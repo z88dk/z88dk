@@ -20,7 +20,6 @@
 #include <unistd.h>
 #endif
 
-#include "d88.h"
 #include "cpmdisk.h"
 
 extern char c_install_dir[];
@@ -30,7 +29,9 @@ extern char c_install_dir[];
 #define OPT_BASE_MASK 127
 typedef enum { OPT_NONE, OPT_BOOL, OPT_INT, OPT_STR, OPT_INPUT=128, OPT_OUTPUT=256 } type_t;
 
+#ifndef WIN32
 enum { FALSE = 0, TRUE };
+#endif
 
 typedef struct {
     char     sopt;
@@ -75,6 +76,9 @@ extern option_t  cpm2_options;
 
 extern int       enterprise_exec(char *target);
 extern option_t  enterprise_options;
+
+extern int       fat_exec(char *target);
+extern option_t  fat_options;
 
 extern int       fp1100_exec(char *target);
 extern option_t  fp1100_options;
@@ -125,6 +129,9 @@ extern option_t  nascom_options;
 
 extern int       nec_exec(char *target);
 extern option_t  nec_options;
+
+extern int       pasopia7_exec(char *target);
+extern option_t  pasopia7_options;
 
 extern int       pc88_exec(char *target);
 extern option_t  pc88_options;
@@ -265,6 +272,10 @@ struct {
       "Extracts bytes from input file",
       extract_longhelp,
       extract_exec,    &extract_options },
+    { "bin2fat",  "fat",      "(C) 2019 dom + ChaN",
+      "Creates a FAT disc for many platforms",
+      NULL,
+      fat_exec,   &fat_options },
     { "fp1kd88",  "fp1100",      "(C) 2018 Dominic Morris",
       "Creates a .d88 for the Casio FP-1100",
       NULL,
@@ -337,6 +348,10 @@ struct {
       "PC-6001 (and others) CAS format conversion utility",
       NULL,
       nec_exec,    &nec_options },
+    { "bin2pas",   "pasopia7",  "(C) 2019 z88dk",
+      "Convert binary file to .wav",
+      NULL,
+      pasopia7_exec,    &pasopia7_options },
     { "bin2t88",   "pc88",       "(C) 2018 Stefano Bodrato",
       "PC-8801 T88 format conversion utility",
       NULL,

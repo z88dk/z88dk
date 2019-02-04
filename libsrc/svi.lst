@@ -86,4 +86,6 @@ rs232/svi/rs232_get
 rs232/svi/rs232_init
 rs232/svi/rs232_params
 rs232/svi/rs232_put
+arch/svi/im1_init
+arch/svi/nmi_init
 @z80.lst

@@ -40,7 +40,7 @@
           st += isez80() ? 3 : israbbit() ? 7 : isz180() ? 11 : 15, \
           r= get_memory(((get_memory(pc++)^128)-128+(b|a<<8))&65535)
 
-#define LEA(r1, r2, s1, s2, t) do { \ 
+#define LEA(r1, r2, s1, s2, t) do { \
     uint16_t offs = ((get_memory(pc++)^128)-128+(s1|s2<<8))&65535; \
     r2 = get_memory(offs); \
     r1 = get_memory(offs+1); \

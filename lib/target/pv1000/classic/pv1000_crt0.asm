@@ -22,6 +22,9 @@
 ;--------
 
         EXTERN    _main           ;main() is always external to crt0 code
+	EXTERN	im1_vectors
+	EXTERN	nmi_vectors
+	EXTERN	asm_interrupt_handler
 
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
@@ -93,16 +96,27 @@ if (ASMPC<>$0038)
 endif
 ; IM1 interrupt routine
 	push	af
+	push	hl
 	in	a,($bf)
+	ld	hl,im1_vectors
+	call	asm_interrupt_handler
+	pop	hl
 	pop	af
+	ei
 	reti
+
 
 	defs	$0066 - ASMPC
 if (ASMPC<>$0066)
         defs    CODE_ALIGNMENT_ERROR
 endif
 nmi:
-	; Should jump to pause
+	push	af
+	push	hl
+	ld	hl,nmi_vectors
+	call	asm_interrupt_handler
+	pop	hl
+	pop	af
 	retn
 
 ; Restart routines, nothing sorted yet

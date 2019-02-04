@@ -2166,7 +2166,7 @@ int zx_plus3(struct zx_common *zxc, struct zx_tape *zxt)
     size_t  origin;
     size_t  binary_length;
     int     len;
-    cpm_handle *h;
+    disc_handle *h;
     FILE   *fpin;
     void   *file_buf;
     size_t  file_len;
@@ -2259,7 +2259,7 @@ int zx_plus3(struct zx_common *zxc, struct zx_tape *zxt)
 
     // And now we can write the file
     file_buf = zx3_layout_file(buffer, len, 10, 0, &file_len);
-    cpm_write_file(h, "DISK       ", file_buf, file_len);
+    disc_write_file(h, "DISK       ", file_buf, file_len);
     free(file_buf);
 
     // Read the screen$
@@ -2276,7 +2276,7 @@ int zx_plus3(struct zx_common *zxc, struct zx_tape *zxt)
         fclose(fpscr);
         file_buf = zx3_layout_file(scrbuf, 6912, 16384, 3, &file_len);
         cpm_create_filename(basic_filename, cpm_filename, 0, 0);
-        cpm_write_file(h, cpm_filename, file_buf, file_len);
+        disc_write_file(h, cpm_filename, file_buf, file_len);
         free(file_buf);
     }
     // Read the binary
@@ -2288,11 +2288,11 @@ int zx_plus3(struct zx_common *zxc, struct zx_tape *zxt)
     suffix_change(basic_filename, ".BIN");
     cpm_create_filename(basic_filename, cpm_filename, 0, 0);
     file_buf = zx3_layout_file(ptr, binary_length, origin, 3, &file_len);
-    cpm_write_file(h, cpm_filename, file_buf, file_len);
+    disc_write_file(h, cpm_filename, file_buf, file_len);
     free(file_buf);
     free(ptr);
     // Finalise the image
-    if ( cpm_write_edsk(h, disc_image_name) < 0 ) {
+    if ( disc_write_edsk(h, disc_image_name) < 0 ) {
         exit_log(1,"Can't write disc image");
     }
     return 0;

@@ -398,6 +398,7 @@ extern void __LIB__ object_render_flatshading(surface_t* s, object_t* obj, vecto
 /// render object obj with wireframes
 extern void __LIB__ object_render_wireframe(surface_t* s, object_t* obj, vector_t* pbuffer) __smallc;
 
-
+// Add a raster interrupt handler
+extern void __LIB__ add_raster_int(void *);
 
 #endif

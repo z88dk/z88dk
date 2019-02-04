@@ -8,8 +8,8 @@
 	PUBLIC	SETWRT
 	PUBLIC	_SETWRT
 
-	EXTERN	l_push_di
-	EXTERN	l_pop_ei
+	EXTERN	l_tms9918_disable_interrupts
+	EXTERN	l_tms9918_enable_interrupts
 
 	INCLUDE	"msx/vdp.inc"
 
@@ -20,7 +20,7 @@
 ;==============================================================
 .SETWRT
 ._SETWRT
-	call	l_push_di
+	call	l_tms9918_disable_interrupts
 	ld    a,l
 IF VDP_CMD < 0
 	ld	(-VDP_CMD),a
@@ -35,5 +35,5 @@ IF VDP_CMD < 0
 ELSE
 	out	(c),a
 ENDIF
-	call	l_pop_ei
+	call	l_tms9918_enable_interrupts
 	ret

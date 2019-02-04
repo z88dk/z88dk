@@ -20,6 +20,7 @@ static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
 static int               origin       = -1;
 static char              fmsx         = 0;
+static char              disk         = 0;
 static char              audio        = 0;
 static char              fast         = 0;
 static char              dumb         = 0;
@@ -47,6 +48,7 @@ option_t msx_options[] = {
     {  0,  "fast",     "Tweak the audio tones to run a bit faster",  OPT_BOOL,  &fast },
     {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
     {  0,  "loud",     "Louder audio volume",        OPT_BOOL,  &loud },
+    {  0,  "disk",     "Create an MSXDOS disc",      OPT_BOOL,  &disk },
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
 };
 
@@ -229,6 +231,10 @@ int msx_exec(char* target)
         fclose(fpout);
     }
 
+    if ( disk ) {
+        return fat_write_file_to_image("msxbasic", "raw", NULL, filename, NULL, NULL);
+    }
+
     /* ***************************************** */
     /*  Now, if requested, create the audio file */
     /* ***************************************** */
@@ -310,3 +316,5 @@ int msx_exec(char* target)
 
     return 0;
 }
+
+

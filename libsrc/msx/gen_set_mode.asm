@@ -16,8 +16,8 @@
 
 	EXTERN	SETWRT
 	EXTERN	FILVRM
-	EXTERN	l_push_di
-	EXTERN	l_pop_ei
+	EXTERN	l_tms9918_disable_interrupts
+	EXTERN	l_tms9918_enable_interrupts
 
 msx_set_mode:
 _msx_set_mode:
@@ -202,7 +202,11 @@ ENDIF
 	; reg1 - GRAPH MODE
 	; (it was first set to $80)
     ;ld    a,$E2   ; MTX, M5
+IF FORadam
+    ld	a,$D0		;Disable interrupt on Adam
+ELSE
 	ld    a,$E0   ; MTX, M5
+ENDIF
     call    VDPreg_Write
 	
 	
@@ -257,7 +261,7 @@ VDPreg_Write:
 ;»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»
 
 	ld		d,a
-	call	l_push_di
+	call	l_tms9918_disable_interrupts
 	ld		a,d
 IF VDP_CMD < 0
 	ld	(-VDP_CMD),a
@@ -274,6 +278,6 @@ ELSE
 	out	(c),a
 ENDIF
 	inc     e
-	call	l_pop_ei
+	call	l_tms9918_enable_interrupts
 	ret
 
