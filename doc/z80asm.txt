@@ -1176,7 +1176,7 @@ following is a label definition:
     ; routine definition
     .mainmenu call xxx ; a label is preceded with '.'
 
-    endmain:  ret                ; or followed by '.'
+    endmain:  ret                ; or followed by ':'
 
 It is not allowed to position two labels on the same line. However, you may place
 as many label after each other - even though no code is between them. They just
@@ -1186,15 +1186,15 @@ It is not allowed to specify two identical address labels in the same source
 file.
 
 If you want to declare an address globally accessible to other modules, then use
-XDEF for the address label definition, otherwise the label definition will be
+PUBLIC for the address label definition, otherwise the label definition will be
 interpreted as a local address label.
 
-    XDEF mainmenu
+    PUBLIC mainmenu
     ...
-    .mainmenu ; label accessible from other modules with XREF
+    .mainmenu ; label accessible from other modules through PUBLIC directive
 
-You may use before or after the label - z80asm automatically handles the scope
-resolution as long as you use XDEF to define it as globally accessible.
+You may use it before or after the label - z80asm automatically handles the scope
+resolution as long as you use PUBLIC to define it as globally accessible.
 
 
 5.9. Writing Z80 mnemonic instructions
