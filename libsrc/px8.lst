@@ -13,6 +13,6 @@ graphics/px8/w_plotpixl
 graphics/px8/w_respixl
 graphics/px8/w_xorpixl
 graphics/px8/w_pixeladdress
+graphics/px8/w_pointxy
 graphics/swapgfxbk_foo.asm
-graphics/w_pointxy
 @gfxbasew.lst
