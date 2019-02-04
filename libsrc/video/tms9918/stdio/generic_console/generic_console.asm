@@ -1,5 +1,6 @@
 
 
+	MODULE	tms9918_generic_console
         SECTION code_clib
 
         PUBLIC  __tms9918_cls

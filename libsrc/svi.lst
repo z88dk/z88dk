@@ -2,15 +2,8 @@ stdio/msx/fgetc_cons
 stdio/msx/getk
 stdio/msx/fputc_cons
 stdio/svi/generic_console
-@stdio/tms9918/tms9918.lst
 @font/font_8x8/font_8x8.lst
 @stdio/ansicore.lst
-stdio/ansi/msx/f_ansi_attr
-stdio/ansi/msx/f_ansi_bel
-stdio/ansi/msx/f_ansi_char
-stdio/ansi/msx/f_ansi_cls_nobios
-stdio/ansi/generic/f_ansi_dline
-stdio/ansi/msx/f_ansi_scrollup_nobios
 @stdio/stdio.lst
 @input/input_keyboard.lst
 time/msx/clock
