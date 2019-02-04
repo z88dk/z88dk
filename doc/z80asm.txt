@@ -2390,35 +2390,41 @@ Index
     7.11. DEFVARS <16-bit expression> '{' [<name>] [<storage_size>
     <size_multiplier>] '}'
 
-    7.12. FPP <8-bit expression>
+    7.12. EXTERN name {, name}
 
-    7.13. IF <logical expression> ... [ELSE] ... ENDIF
+    7.13. FPP <8-bit expression>
 
-    7.14. IFDEF <name> ... [ELSE] ... ENDIF
+    7.14. GLOBAL name {, name}
 
-    7.15. IFNDEF <name> ... [ELSE] ... ENDIF
+    7.15. IF <logical expression> ... [ELSE] ... ENDIF
 
-    7.16. INCLUDE "filename"
+    7.16. IFDEF <name> ... [ELSE] ... ENDIF
 
-    7.17. INVOKE <16-bit expression>
+    7.17. IFNDEF <name> ... [ELSE] ... ENDIF
 
-    7.18. LIB name {,name}
+    7.18. INCLUDE "filename"
 
-    7.19. LINE <32-bit expr>
+    7.19. INVOKE <16-bit expression>
 
-    7.20. LSTOFF
+    7.20. LIB name {,name}
 
-    7.21. LSTON
+    7.21. LINE <32-bit expr>
 
-    7.22. MODULE name
+    7.22. LSTOFF
 
-    7.23. ORG <16-bit expression>
+    7.23. LSTON
 
-    7.24. XDEF name {, name}
+    7.24. MODULE name
 
-    7.25. XLIB name
+    7.25. ORG <16-bit expression>
 
-    7.26. XREF name {, name}
+    7.26. PUBLIC name {, name}
+
+    7.27. XDEF name {, name}
+
+    7.28. XLIB name
+
+    7.29. XREF name {, name}
 
   8. Run time error messages
 
