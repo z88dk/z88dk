@@ -736,7 +736,7 @@ rex_clib.lib:
 	@echo '--- Building Xircom Rex Library ---'
 	@echo ''
 	$(call buildgeneric,rex)
-	$(MAKE) -C rex
+	$(MAKE) -C arch/rex
 	TARGET=rex TYPE=z80 $(LIBLINKER) -DFORrex -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/rex_clib.lib @$(LISTFILE_DIRECTORY)/rex6000.lst
 
 # Sam Coupe library - Stefano & Frode
@@ -1391,7 +1391,6 @@ classic-clean:
 	$(MAKE) -C graphics clean
 	$(MAKE) -C interrupts clean
 	$(MAKE) -C net clean
-	$(MAKE) -C rex clean
 	$(MAKE) -C rs232 clean
 	$(MAKE) -C setjmp clean
 	$(MAKE) -C spectrum clean
