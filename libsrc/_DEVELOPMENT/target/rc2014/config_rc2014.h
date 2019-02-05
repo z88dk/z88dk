@@ -533,7 +533,7 @@
 #define __IO_ACIA_RX_SIZE      0x100
 #define __IO_ACIA_RX_FULLISH   0xf8
 #define __IO_ACIA_RX_EMPTYISH 0x08
-#define __IO_ACIA_TX_SIZE      0x40
+#define __IO_ACIA_TX_SIZE      0x10
 
 
 
@@ -654,7 +654,7 @@
 #define __IO_SIO_RX_SIZE        0x100
 #define __IO_SIO_RX_FULLISH     0xf8
 #define __IO_SIO_RX_EMPTYISH    0x08
-#define __IO_SIO_TX_SIZE        0x40
+#define __IO_SIO_TX_SIZE        0x10
 
 
 

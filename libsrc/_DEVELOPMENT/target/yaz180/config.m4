@@ -38,6 +38,7 @@ dnl############################################################
 
 include(`target/z88dk_version.m4')
 include(`target/yaz180/config/config_target.m4')
+include(`target/yaz180/config/config_cpm.m4')
 include(`target/yaz180/config/config_cpu.m4')
 include(`target/yaz180/config/config_clib.m4')
 include(`target/yaz180/config/config_clib_const.m4')
