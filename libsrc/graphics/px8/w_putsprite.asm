@@ -45,6 +45,11 @@
         ld      b,(hl)  ; x and y __gfx_coords
 		
 
+		xor		a
+		ld		(smc1),a	; reset SMC tricks, they will be updated only for mask operations
+		ld		(smc2),a
+		ld		(smc3),a
+		
         inc     hl
         ld      a,(hl)  ; and/or/xor mode
 		
@@ -52,13 +57,20 @@
 		; 182 - or  [10 110 110] -> 2
 		; 174 - xor [10 101 110] -> 3
 		
-		ld	e,1
-		cp	166	; and(hl) opcode
+		ld	e,3
+		cp	174	; xor(hl) opcode
 		jr	z,setmode
-		inc e
+		dec	e
 		cp	182	; or(hl) opcode
 		jr	z,setmode
-		inc e
+		dec	e
+		
+		ld	a,$2F		; CPL
+		ld	(smc1),a
+		ld	(smc2),a
+		ld	a,$37		; SCF
+		ld	(smc3),a
+		
 .setmode
 		ld	a,e
 		ld	(operation),a
@@ -121,6 +133,8 @@
 		ld	b,0
 .loopcount
 		ld	a,(hl)
+.smc1
+		nop		; nop/cpl
 		ld	(de),a
 		inc hl
 		inc de
@@ -129,6 +143,8 @@
 		jr	z,noloop
 		djnz	loopcount
 .noloop
+.smc2
+		nop		; nop/cpl
 		ld	(de),a	; add a blank byte on every row for possible shifting
 		inc de
 		dec c
@@ -139,6 +155,8 @@
 .loopcount2
 		ld	b,0
 		xor a
+.smc3
+		nop		; nop/scf
 		push	af
 		cp	b
 		jr	z,noshift
