@@ -4,7 +4,7 @@
 # $Id: Makefile,v 1.4 2006-06-18 17:59:39 dom Exp $
 
 
-include ../../Make.config
+include ../../../Make.config
 
 all: 	DsDisplayEllipse.o
 
