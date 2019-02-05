@@ -6,7 +6,7 @@ graphics/px8/draw
 graphics/retrofit/draw_callee
 graphics/px8/undraw
 graphics/retrofit/undraw_callee
-graphics/draw_profile_nostencil
+graphics/draw_profile
 graphics/px8/clg
 graphics/px8/w_putsprite
 graphics/px8/w_plotpixl
