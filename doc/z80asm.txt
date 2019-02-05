@@ -568,13 +568,13 @@ file.
 2.6. Scope of symbols in source modules
 ---------------------------------------
 
-All source modules may refer to each others symbols by using XREF directives.
+All source modules may refer to each others symbols by using EXTERN directives.
 This means that you refer to external information outside the current source
 module. The opposite of an external module reference is to declare symbols
-globally available using a XDEF directive, i.e. making symbols available to other
-source modules. Finally it is possible to have local symbols that is not known to
+globally available using a PUBLIC directive, i.e. making symbols available to other
+source modules. Finally it is possible to have local symbols that are not known to
 other source modules than the current. A label or constant that has not been
-declared with XREF, XDEF or XLIB is local to the module.
+declared with EXTERN, PUBLIC or GLOBAL is local to the module.
 
 
 2.7. Using arithmetic and relational expressions
