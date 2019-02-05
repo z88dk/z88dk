@@ -38,6 +38,17 @@ else
 all: $(EXECFILES) dstar.cas microman.cas othello.cas wall.cas globe.cas snakes.cas vtstone.cas
 endif
 
+ex6.cas: ../msx/ex6.c
+	$(CC) $(CFLAGS) -oex6.bin ../msx/ex6.c -lsvibios
+
+ex7.cas: ../msx/ex7.c
+	$(CC) $(CFLAGS) -oex7.bin ../msx/ex7.c -lsvibios
+
+ex11.cas: ../msx/ex11.c
+	$(CC) $(CFLAGS) -oex11.bin ../msx/ex11.c -lsvibios
+
+showlib3d.cas: ../msx/showlib3d.c
+	$(CC) $(CFLAGS) -oshowlib3d.bin ../msx/showlib3d.c -lsvibios
 
 #ex8.com: ex8.c
 #	$(CC) +cpm -create-app -lsvicpm -oex8 ex8.c
@@ -55,7 +66,7 @@ microman.cas: ../microman.c
 	$(CC) $(CFLAGS) ../microman.c -I.. -DSOUND -DJOYSTICK_DIALOG -create-app -omicroman.bin
 
 wall.cas: ../wall.c
-	$(CC) $(CFLAGS) ../wall.c -I.. -DJOYSTICK -DBANNERS -Dspritesize=8 -DSOUND -DCLOCK -create-app -owall.bin
+	$(CC) $(CFLAGS) ../wall.c -I.. -DJOYSTICK -DBANNERS -Dspritesize=8 -DSOUND -DCLOCK -create-app -owall.bin -lsvibios
 
 globe.cas: ../graphics/globe.c
 	$(CC) $(CFLAGS) ../graphics/globe.c -I../graphics -create-app -pragma-redirect=fputc_cons=putc4x6 -oglobe.bin

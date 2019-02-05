@@ -18,7 +18,7 @@
         EXTERN	__graphics_end
 
 	INCLUDE	"graphics/grafix.inc"
-	INCLUDE	"msx/vdp.inc"
+	INCLUDE	"video/tms9918/vdp.inc"
 
 
 ; __gfx_coords: d,e (vert-horz)

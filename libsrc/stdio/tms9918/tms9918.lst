@@ -1,4 +1,3 @@
-stdio/tms9918/conio_vars
 stdio/tms9918/generic_console
 stdio/tms9918/generic_console_ioctl
 stdio/tms9918/generic_console_vpeek

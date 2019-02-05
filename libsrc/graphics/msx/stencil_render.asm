@@ -12,7 +12,7 @@
 ;
 
 	INCLUDE	"graphics/grafix.inc"
-	INCLUDE	"msx/vdp.inc"
+	INCLUDE	"video/tms9918/vdp.inc"
 
 	SECTION code_clib
 	PUBLIC	stencil_render

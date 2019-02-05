@@ -1,0 +1,10 @@
+arch/msx/asmlib/obj/UnapiBuildCodeBlock
+arch/msx/asmlib/obj/UnapiCall
+arch/msx/asmlib/obj/UnapiGetRamHelper
+arch/msx/asmlib/obj/UnapiGetCount
+arch/msx/asmlib/obj/UnapiParseCodeBlock
+arch/msx/asmlib/obj/BiosCall
+arch/msx/asmlib/obj/UnapiRead
+arch/msx/asmlib/obj/DosCall
+arch/msx/obj/msx/im1_init
+arch/msx/obj/msx/nmi_init
