@@ -29,6 +29,8 @@ __tms9918_console_ioctl:
         cp      IOCTL_GENCON_SET_FONT32
         jr      nz,check_set_udg
         ld      (generic_console_font32),bc
+set_font_success:
+        call    set_font
 success:
         and     a
         ret
@@ -36,7 +38,7 @@ check_set_udg:
         cp      IOCTL_GENCON_SET_UDGS
         jr      nz,check_mode
         ld      (generic_console_udg32),bc
-        jr      success
+        jr      set_font_success
 check_mode:
         cp      IOCTL_GENCON_SET_MODE
         jr      nz,failure
