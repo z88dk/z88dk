@@ -66,7 +66,7 @@ extern int __LIB__ lcd_set_udg(int code, void *pattern) __smallc;
 #define CHARSET_SPAIN   esc_sequence("\001CS")
 #define CHARSET_NORWAY  esc_sequence("\001CN")
 
-/* Macros for cassette player */
+/* Cassette Player Macros */
 #define CMT_HEAD_ON subcpu_command("\000\101")
 #define CMT_HEAD_OFF subcpu_command("\000\102")
 #define CMT_REW subcpu_command("\000\105")
@@ -77,8 +77,14 @@ extern int __LIB__ lcd_set_udg(int code, void *pattern) __smallc;
 #define CMT_STOP subcpu_command("\000\112")
 #define CMT_UNPROTECT_WR_AREA subcpu_command("\000\126")
 
-/* Macros for keyboard */
+/* Keyboard Macros */
 #define KBD_REPEAT_OFF   esc_sequence("\000\173")
+
+/* Keyboard Functions */
+// Test STOP key and CTL-STOP
+extern bool_t __LIB__ px8_break();
+// Test STOP key only
+extern bool_t __LIB__ px8_stop();
 
 /* Misc Macros */
 #define PROM_ON   subcpu_command("\001\160\001")
@@ -101,6 +107,31 @@ extern int __LIB__ lcd_set_udg(int code, void *pattern) __smallc;
 #define CONSOLE_KEY_OFF  esc_sequence("\001\323\001")
 #define CONSOLE_KEY_ON   esc_sequence("\001\323\000")
 
+// Key code map
+#define KEY_PF1  0xe0
+#define KEY_PF2  0xe1
+#define KEY_PF3  0xe2
+#define KEY_PF4  0xe3
+#define KEY_PF5  0xe4
+#define KEY_PF6  0xe5	// (SHIFT-F1)
+#define KEY_PF7  0xe6	// (SHIFT-F2)
+#define KEY_PF8  0xe7	// (SHIFT-F3)
+#define KEY_PF9  0xe8	// (SHIFT-F4)
+#define KEY_PF10 0xe9	// (SHIFT-F5)
+
+// Default values for cursor keys (can be remapped)
+#define KEY_RIGHT       0x1c
+#define KEY_LEFT        0x1d
+#define KEY_UP          0x1e
+#define KEY_DOWN        0x1f
+#define KEY_CTRL_RIGHT  0xff
+#define KEY_CTRL_LEFT   0xfe
+#define KEY_CTRL_UP     0xfa
+#define KEY_CTRL_DOWN   0xfb
+
+// Choose the virtual screen (1 or 2)
+#define CONSOLE_VIRTUAL_1  esc_sequence("\001\321\000")
+#define CONSOLE_VIRTUAL_2  esc_sequence("\001\321\001")
 
 /* Talk to SUB-CPU via self-built packets. */
 extern int __LIB__ subcpu_call(void *masterpacket) __z88dk_fastcall;
