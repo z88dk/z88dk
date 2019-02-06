@@ -1,3 +1,5 @@
+include ../../Make.config
+
 all:
 
 clean:

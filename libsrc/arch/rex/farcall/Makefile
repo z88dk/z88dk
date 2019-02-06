@@ -1,4 +1,4 @@
-
+include ../../../Make.config
 
 all:
 
