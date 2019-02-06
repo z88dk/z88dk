@@ -40,6 +40,13 @@ struct SUBCPU_MASTERPACKET {
 #define LCD_OFF subcpu_command("\001\021\000")
 #define LCD_TEXT subcpu_command("\001\022\001")
 #define LCD_GRAPHICS subcpu_command("\001\022\000")
+
+/* Functions for LCD*/
+
+// Define 8x8 User Defined Graphics character (6x8 visible by default), valid codes:  E0h..FFh
+extern int __LIB__ lcd_set_udg(int code, void *pattern) __smallc;
+
+
 /* Macros for TEXT mode options*/
 #define LCD_7LINES subcpu_command("\001\025\001")
 #define LCD_8LINES subcpu_command("\001\025\000")
@@ -48,6 +55,16 @@ struct SUBCPU_MASTERPACKET {
 #define LCD_CURSOR_UNDERLINE_BLINK subcpu_command("\001\026\003")
 #define LCD_CURSOR_BLOCK subcpu_command("\001\026\005")
 #define LCD_CURSOR_BLOCK_BLINK subcpu_command("\001\026\007")
+// 'codepage' related
+#define CHARSET_USASCII esc_sequence("\001CU")
+#define CHARSET_FRANCE  esc_sequence("\001CF")
+#define CHARSET_GERMANY esc_sequence("\001CG")
+#define CHARSET_ENGLAND esc_sequence("\001CE")
+#define CHARSET_DENMARK esc_sequence("\001CD")
+#define CHARSET_SWEDEN  esc_sequence("\001CW")
+#define CHARSET_ITALY   esc_sequence("\001CI")
+#define CHARSET_SPAIN   esc_sequence("\001CS")
+#define CHARSET_NORWAY  esc_sequence("\001CN")
 
 /* Macros for cassette player */
 #define CMT_HEAD_ON subcpu_command("\000\101")
@@ -60,13 +77,29 @@ struct SUBCPU_MASTERPACKET {
 #define CMT_STOP subcpu_command("\000\112")
 #define CMT_UNPROTECT_WR_AREA subcpu_command("\000\126")
 
+/* Macros for keyboard */
+#define KBD_REPEAT_OFF   esc_sequence("\000\173")
 
-/* Macros for ROM and SPEAKER */
-#define PROM_ON subcpu_command("\001\160\001")
-#define PROM_OFF subcpu_command("\001\160\000")
-//#define SPK_ON subcpu_command("\001\162\001")		<- documentation suggest this option but MXO-PX8.ASM uses 0x80 (200 in octal)
-#define SPK_ON subcpu_command("\001\162\200")
-#define SPK_OFF subcpu_command("\001\162\000")
+/* Misc Macros */
+#define PROM_ON   subcpu_command("\001\160\001")
+#define PROM_OFF  subcpu_command("\001\160\000")
+//#define SPK_ON  subcpu_command("\001\162\001")		<- documentation suggest this option but MXO-PX8.ASM uses 0x80 (200 in octal)
+#define SPK_ON    subcpu_command("\001\162\200")
+#define SPK_OFF   subcpu_command("\001\162\000")
+#define HARDCOPY     esc_sequence("\000P")
+// In 'secret mode' every character being printed is converted to SPACE
+#define CONSOLE_SECRET_ON    esc_sequence("\000\173")
+#define CONSOLE_SECRET_OFF   esc_sequence("\000\175")
+// Deals with the computer LEDs
+#define LED_INS_ON   esc_sequence("\000\240")
+#define LED_INS_OFF  esc_sequence("\000\241")
+#define LED_CAPS_ON  esc_sequence("\000\242")
+#define LED_CAPS_OFF esc_sequence("\000\243")
+#define LED_NUM_ON   esc_sequence("\000\244")
+#define LED_NUM_OFF  esc_sequence("\000\245")
+// Hide the banner showing the FN key associations
+#define CONSOLE_KEY_OFF  esc_sequence("\001\323\001")
+#define CONSOLE_KEY_ON   esc_sequence("\001\323\000")
 
 
 /* Talk to SUB-CPU via self-built packets. */
@@ -77,10 +110,14 @@ extern int __LIB__ subcpu_call(void *masterpacket) __z88dk_fastcall;
    e.g. subcpu_command("\001\026\005"), or create char mycommand[]={1,0x12,5};*/
 extern int __LIB__ subcpu_command(void *cmdsequence) __z88dk_fastcall;
 
-/* Full communication with SUB-CPU, use structures to pass the whole parameter blocks and sizeof() for the *_sz part
- * 
+/* Full communication with SUB-CPU, use structures to pass the whole parameter blocks and sizeof() for the *_sz parameters
  * (uses the parameters on stack, can't be converted to "CALLEE") */
 extern int __LIB__ subcpu_function(int rcvpkt_sz, void *rcvpkt, int sndpkt_sz, void *sndpkt) __smallc;
+
+/* Send a command/parameters ESC sequence to the console.
+   The command sequence is: <parameters number>, <command code (without leading ESC)>, <parameter list>
+*/
+extern int __LIB__ esc_sequence(void *cmdsequence) __z88dk_fastcall;
 
 
 #endif
