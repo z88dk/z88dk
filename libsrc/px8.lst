@@ -3,6 +3,7 @@ arch/px8/subcpu_command
 arch/px8/subcpu_function
 arch/px8/esc_sequence
 arch/px8/lcd_set_udg
+arch/px8/px8_break
 graphics/w_dcircle_square.asm
 graphics/px8/draw
 graphics/retrofit/draw_callee
