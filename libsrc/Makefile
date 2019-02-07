@@ -588,7 +588,7 @@ cpm_clib.lib:
 	$(MAKE) gfxdeps
 	$(LIBLINKER) -DFORkaypro -x$(OUTPUT_DIRECTORY)/gfxkp @$(LISTFILE_DIRECTORY)/gfxkp.lst
 	$(MAKE) gfxdeps
-	$(LIBLINKER) -DFORkaypro83 -x$(OUTPUT_DIRECTORY)/gfxkp83 @$(LISTFILE_DIRECTORY)/gfxkp83.lst
+	$(LIBLINKER) -DFORkaypro83 -I$(Z88DK_LIB) -x$(OUTPUT_DIRECTORY)/gfxkp83 @$(LISTFILE_DIRECTORY)/arch/kaypro83/gfxkp83.lst
 	@echo ''
 	@echo '--- Building Otrona Attache Library ---'
 	@echo ''

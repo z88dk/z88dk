@@ -1,14 +1,6 @@
-	INCLUDE	"graphics/grafix.inc"
-
-                SECTION         code_clib
+        SECTION code_graphics
 	PUBLIC	cleargraphics
-   PUBLIC   _cleargraphics
 
-	EXTERN	base_graphics
-
-;
-;	$Id: clsgraph_83.asm $
-;
 
 ; ******************************************************************
 ;
@@ -22,10 +14,9 @@
 ;		.f....../....	different
 ;
 .cleargraphics
-._cleargraphics
 	ld	hl,$3000
 	ld	de,$3001
-	ld	bc,1024*3-1
+	ld	bc,#(128 * 24) - 1
 	ld	(hl),' '
 	ldir
 	ret
