@@ -5,7 +5,7 @@ TARGETANSI = abc80 ace aquarius bee cpc gal mc1000 msx mtx mz nascom osca p2000 
 
 TARGETGENERIC = abc80 ace alphatro aquarius bee cpc coleco fp1100 laser500 mc1000 nascom pv1000 pps rx78 spc1000 srr super80 trs80 vg5k vz z1013 zx80 zx81 msx pv2000 sc3000 svi m5 mtx multi8 z80tvgame z9001
 
-CPMSUBTYPES = px px32k px4 einstein attache osborne1 kayproii mz2500 microbee qc10 nascom tiki100 svi dmv adam smc777
+CPMSUBTYPES = px px32k px4 einstein attache osborne1 kaypro83 kaypro84 mz2500 microbee qc10 nascom tiki100 svi dmv adam smc777
 
 EXES = $(addprefix bin/,$(addsuffix /world, $(TARGETS))) $(addprefix bin/,$(addsuffix /ansitest, $(TARGETANSI))) $(addprefix bin/,$(addsuffix /world_conio, $(TARGETGENERIC))) $(addprefix bin/cpm/,$(addsuffix /world, $(CPMSUBTYPES)))
 
