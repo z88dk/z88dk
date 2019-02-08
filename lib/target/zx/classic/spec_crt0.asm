@@ -32,9 +32,9 @@
         PUBLIC    l_dcal          ; jp(hl)
 
         PUBLIC    call_rom3       ; Interposer
-       
+
         PUBLIC    _FRAMES
-        defc      _FRAMES = 23672 ; Timer
+
 
 	PUBLIC	  __SYSVAR_BORDCR
 	defc	  __SYSVAR_BORDCR = 23624
@@ -43,20 +43,14 @@
         IF DEFINED_ZXVGS
             IF !DEFINED_CRT_ORG_CODE
                 DEFC    CRT_ORG_CODE = $5CCB     ; repleaces BASIC program
-		defc	DEFINED_CRT_ORG_CODE = 1
+		            defc    DEFINED_CRT_ORG_CODE = 1
             ENDIF
-
-	    defc TAR__register_sp = 0xff57	; below UDG, keep eye when using banks
+	          defc TAR__register_sp = 0xff57	; below UDG, keep eye when using banks
         ENDIF
 
         
         IF      !DEFINED_CRT_ORG_CODE
-            IF (startup=2)                 ; ROM ?
-                defc    CRT_ORG_CODE  = 0
-		defc	TAR__register_sp = 32767	
-            ELSE
                 defc    CRT_ORG_CODE  = 32768
-            ENDIF
         ENDIF
 
 	; We default to the 64 column terminal driver
@@ -67,12 +61,17 @@
         defc    TAR__fputc_cons_generic = 1
 
 	defc	DEF__register_sp = -1
-        defc    TAR__clib_exit_stack_size = 32
+  defc  TAR__clib_exit_stack_size = 32
 	defc	CRT_KEY_DEL = 12
 	defc __CPU_CLOCK = 3500000
 	INCLUDE	"crt/classic/crt_rules.inc"
 
-        org     CRT_ORG_CODE
+        IF (startup=2)                 ; ROM ?
+            org    0
+            defc   TAR__register_sp = 32767	
+        ELSE
+            org     CRT_ORG_CODE
+        ENDIF
 
 
 start:
@@ -195,8 +194,67 @@ zx_internal_cls:
         out     (254),a
         ret
 
+PUBLIC zx_internal_scroll
+zx_internal_scroll:
+        push    ix
+        ld      ix,zx_rowtab
+        ld      a,8
+.outer_loop
+        push    af
+        push    ix
+        ld      a,23
+.inner_loop
+        ld      e,(ix+16)
+        ld      d,(ix+17)
+        ex      de,hl
+        ld      e,(ix+0)
+        ld      d,(ix+1)
+        ld      bc,32
+        ldir
+		
+        ld      bc,16
+        add     ix,bc
+        dec     a
+        jr      nz,inner_loop
+        pop     ix
+        pop     af
+        inc     ix
+        inc     ix
+        dec     a
+        jr      nz,outer_loop
+; clear
+        ld      ix,zx_rowtab + (192 - 8) * 2
+        ld      a,8
+.clear_loop
+        push    ix
+        ld      e,(ix+0)
+        ld      d,(ix+1)
+        ld      h,d
+        ld      l,e
+        ld      (hl),0
+        inc     de
+        ld      bc,31
+        ldir
+        pop     ix
+        inc     ix
+        inc     ix
+        dec     a
+        jr      nz,clear_loop
+		
+		ld      hl,$4000+6880
+		ld      de,$4000+6881
+		ld      bc,31
+		ld      a,(__zx_console_attr)
+		ld      (hl),a
+		ldir
+		
+        pop     ix
+        ret
 
 ELSE
+
+        defc      _FRAMES = 23672 ; Timer
+
   IF DEFINED_ZXVGS
         POP     BC              ;let's say exit code goes to BC
         RST     8
@@ -349,6 +407,10 @@ ENDIF
 
 	SECTION bss_crt
 IF startup=2
+
+_FRAMES:
+  defs 3
+  
 	PUBLIC  romsvc
 romsvc:         defs    10  ; Pointer to the end of the sysdefvars
                             ; used by the ROM version of some library
