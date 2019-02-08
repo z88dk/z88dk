@@ -21,63 +21,12 @@ generic_console_scrollup:
         push    hl
 		
 IF NOROMCALLS
-	; Code to be used when the original ROM is missing or not available
-        push    ix
-        ld      ix,zx_rowtab
-        ld      a,8
-.outer_loop
-        push    af
-        push    ix
-        ld      a,23
-.inner_loop
-        ld      e,(ix+16)
-        ld      d,(ix+17)
-        ex      de,hl
-        ld      e,(ix+0)
-        ld      d,(ix+1)
-        ld      bc,32
-        ldir
-		
-        ld      bc,16
-        add     ix,bc
-        dec     a
-        jr      nz,inner_loop
-        pop     ix
-        pop     af
-        inc     ix
-        inc     ix
-        dec     a
-        jr      nz,outer_loop
-; clear
-        ld      ix,zx_rowtab + (192 - 8) * 2
-        ld      a,8
-.clear_loop
-        push    ix
-        ld      e,(ix+0)
-        ld      d,(ix+1)
-        ld      h,d
-        ld      l,e
-        ld      (hl),0
-        inc     de
-        ld      bc,31
-        ldir
-        pop     ix
-        inc     ix
-        inc     ix
-        dec     a
-        jr      nz,clear_loop
-		
-		ld      hl,$4000+6880
-		ld      de,$4000+6881
-		ld      bc,31
-		ld      a,(__zx_console_attr)
-		ld      (hl),a
-		ldir
-		
-        pop     ix
+
+        EXTERN  zx_internal_scroll
+        
+        call    zx_internal_scroll
         pop     hl
         ret
-
 
 ELSE
 
