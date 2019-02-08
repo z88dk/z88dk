@@ -32,9 +32,9 @@
         PUBLIC    l_dcal          ; jp(hl)
 
         PUBLIC    call_rom3       ; Interposer
-
+       
         PUBLIC    _FRAMES
-
+        
 
 	PUBLIC	  __SYSVAR_BORDCR
 	defc	  __SYSVAR_BORDCR = 23624
@@ -43,14 +43,21 @@
         IF DEFINED_ZXVGS
             IF !DEFINED_CRT_ORG_CODE
                 DEFC    CRT_ORG_CODE = $5CCB     ; repleaces BASIC program
-		            defc    DEFINED_CRT_ORG_CODE = 1
+		defc	DEFINED_CRT_ORG_CODE = 1
             ENDIF
-	          defc TAR__register_sp = 0xff57	; below UDG, keep eye when using banks
+
+	    defc TAR__register_sp = 0xff57	; below UDG, keep eye when using banks
         ENDIF
 
         
         IF      !DEFINED_CRT_ORG_CODE
-                defc    CRT_ORG_CODE  = 32768
+            IF (startup=2)                 ; ROM ?
+                defc  CRT_ORG_CODE  = 0
+		            defc	TAR__register_sp = 32767
+            ELSE
+                defc  _FRAMES = 23672 ; Timer	
+                defc  CRT_ORG_CODE  = 32768
+            ENDIF
         ENDIF
 
 	; We default to the 64 column terminal driver
@@ -61,17 +68,12 @@
         defc    TAR__fputc_cons_generic = 1
 
 	defc	DEF__register_sp = -1
-  defc  TAR__clib_exit_stack_size = 32
+        defc    TAR__clib_exit_stack_size = 32
 	defc	CRT_KEY_DEL = 12
 	defc __CPU_CLOCK = 3500000
 	INCLUDE	"crt/classic/crt_rules.inc"
 
-        IF (startup=2)                 ; ROM ?
-            org    0
-            defc   TAR__register_sp = 32767	
-        ELSE
-            org     CRT_ORG_CODE
-        ENDIF
+        org     CRT_ORG_CODE
 
 
 start:
@@ -193,6 +195,21 @@ zx_internal_cls:
         rrca
         out     (254),a
         ret
+
+
+ELSE
+  IF DEFINED_ZXVGS
+        POP     BC              ;let's say exit code goes to BC
+        RST     8
+        DEFB    $FD             ;Program finished
+  ELSE
+cleanup_exit:
+        ld      hl,10072        ;Restore hl' to what basic wants
+        exx
+        pop     bc
+start1: ld      sp,0            ;Restore stack to entry value
+        ret
+  ENDIF
 ENDIF
 
 
@@ -333,11 +350,9 @@ ENDIF
 
 	SECTION bss_crt
 IF startup=2
-
-_FRAMES:
-  defs 3
-  
 	PUBLIC  romsvc
+	
+_FRAMES:        defs    3
 romsvc:         defs    10  ; Pointer to the end of the sysdefvars
                             ; used by the ROM version of some library
 ENDIF
