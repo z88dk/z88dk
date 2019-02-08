@@ -3,7 +3,7 @@
 	MODULE	tms9918_generic_console
         SECTION code_clib
 
-        PUBLIC  __tms9918_cls
+        EXTERN	__tms9918_cls
         PUBLIC  __tms9918_scrollup
         PUBLIC  __tms9918_printc
         PUBLIC  __tms9918_set_ink
@@ -80,21 +80,6 @@ __tms9918_set_paper:
         ld      b,0xf0
         jr      set_attr
         
-
-__tms9918_cls:
-        ld      a,(__tms9918_screen_mode)
-        cp      2
-        jr      nz,clear_text
-        call    ansi_cls
-        ret
-
-clear_text:
-        ; Lets just clear the maximum size
-        ld      hl,$0000
-        ld      bc,960
-        ld      a,32
-        call    FILVRM
-        ret
 
 
 __tms9918_scrollup:

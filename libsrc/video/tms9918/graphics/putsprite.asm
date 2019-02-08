@@ -177,14 +177,17 @@ IF VDP_DATA < 0
 	ld	a,(pixelbyte)
 	ld	(-VDP_DATA),a
 ELSE
-         ld       a,l		; LSB of video memory ptr
-         out      (VDP_CMD),a
-         ld       a,h		; MSB of video mem ptr
-         and      @00111111	; masked with "write command" bits
-         or       @01000000
-         out      (VDP_CMD), a
-         ld       a,(pixelbyte)
-         out      (VDP_DATA), a
+        push    bc
+        ld      bc,VDP_CMD
+        out     (c),l           ;LSB of video memory ptr
+        ld      a,h		; MSB of video mem ptr
+        and     @00111111	; masked with "write command" bits
+        or      @01000000
+        out     (c),a
+        ld      a,(pixelbyte)
+        ld      bc,VDP_DATA
+        out     (c),a
+        pop     bc
 ENDIF
 ;**************
          ld       a,8
@@ -203,12 +206,15 @@ IF VDP_DATA < 0
 	ld	(-VDP_CMD),a
 	ld	a,(-VDP_DATAIN)
 ELSE
-         ld       a,l		; LSB of video memory ptr
-         out      (VDP_CMD), a
-         ld       a,h		; MSB of video mem ptr
-         and      @00111111	; masked with "read command" bits
-         out      (VDP_CMD), a
-         in       a, (VDP_DATAIN)
+        push    bc
+        ld      bc,VDP_CMD
+        out     (c),l
+        ld      a,h		; MSB of video mem ptr
+        and     @00111111	; masked with "read command" bits
+        out     (c),a
+        ld      bc,VDP_DATAIN
+        in      a,(c)
+        pop     bc
 ENDIF
          ld       (pixelbyte),a
 ;**************
@@ -228,14 +234,17 @@ IF VDP_DATA < 0
 	ld	a,(pixelbyte)
 	ld	(-VDP_DATA),a
 ELSE
-         ld       a,l		; LSB of video memory ptr
-         out      (VDP_CMD),a
-         ld       a,h		; MSB of video mem ptr
-         and      @00111111	; masked with "write command" bits
-         or       @01000000
-         out      (VDP_CMD), a
-         ld       a,(pixelbyte)
-         out      (VDP_DATA), a
+        push    bc
+        ld      bc,VDP_CMD
+        out     (c),l           ; LSB of video memory ptr
+        ld      a,h		; MSB of video mem ptr
+        and     @00111111	; masked with "write command" bits
+        or      @01000000
+        out     (c),a
+        ld      bc,VDP_DATA
+        ld      a,(pixelbyte)
+        out     (c),a
+        pop     bc
 ENDIF
 ;**************
 	push	de

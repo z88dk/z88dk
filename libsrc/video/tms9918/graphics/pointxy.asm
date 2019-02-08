@@ -43,7 +43,7 @@
 				ld	b,a
 				ld	a,1
 				jr	z, test_pixel		; pixel is at bit 0...
-.pixel_position	rlca
+.pixel_position			rlca
 				djnz	pixel_position
 .test_pixel			;ex	de,hl
 				and	(hl)

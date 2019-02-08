@@ -1,7 +1,7 @@
 
 include ../../Make.config
 
-SUBDIRS = stdio
+SUBDIRS = stdio graphics
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
 TARGET ?= test

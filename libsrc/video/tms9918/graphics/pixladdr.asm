@@ -14,21 +14,6 @@
 ;	$Id: pixladdr.asm $
 ;
 
-; ******************************************************************
-;
-; Get absolute	pixel address in map of virtual (x,y) coordinate.
-;
-; in:  hl	= (x,y) coordinate of pixel (h,l)
-;
-; out: de	= address	of pixel byte
-;	   a	= bit number of byte where pixel is to be placed
-;	  fz	= 1 if bit number is 0 of pixel position
-;
-; registers changed	after return:
-;  ......../ixiy same
-;  afbcdehl/.... different
-;
-	;;EXTERN	base_graphics
 
 .pixeladdress
 	
@@ -62,21 +47,21 @@ IF VDP_CMD < 0
 	and	@00111111	;7
 	ld	(-VDP_CMD),a
 	ld	a,(-VDP_DATAIN)
-	ld	e,a
 ELSE
-	ld	a,l		; LSB of video memory ptr
-	out	(VDP_CMD), a
+        push    bc
+        ld      bc,VDP_CMD
+	out	(c), l          ; LSB of video memory ptr
 	ld	a,h		; MSB of video mem ptr
 	and	@00111111	; masked with "read command" bits
-	out	(VDP_CMD), a
-	in	a, (VDP_DATAIN)
-	ld	e,a
+	out	(c), a
+        ld      bc,VDP_DATAIN
+        in      a,(c)
+        pop     bc
 ENDIF
-	call	l_tms9918_enable_interrupts
-	ld	a,e
 	ex	de,hl		;de = VDP address
 	ld	hl,pixelbyte
 	ld	(hl),a
+	call	l_tms9918_enable_interrupts
 ;-------
 
         ld	a,c
@@ -87,7 +72,7 @@ ENDIF
 
 
 .pix_return
-         ld       (hl),a	; hl points to "pixelbyte"
+        ld       (hl),a	; hl points to "pixelbyte"
 	call	l_tms9918_disable_interrupts
 IF VDP_CMD < 0
 	ld	a,e
@@ -99,18 +84,19 @@ IF VDP_CMD < 0
 	ld	a,(pixelbyte)
 	ld	(-VDP_DATA),a
 ELSE
-         ld       a,e		; LSB of video memory ptr
-         out      (VDP_CMD),a
-         ld       a,d		; MSB of video mem ptr
-         and      @00111111	; masked with "write command" bits
-         or       @01000000
-         out      (VDP_CMD), a
-         ld       a,(pixelbyte) ; Can it be optimized ? what about VDP timing ?
-         out      (VDP_DATA), a
+        ld      bc,VDP_CMD
+        out     (c),e
+        ld      a,d		; MSB of video mem ptr
+        and     @00111111	; masked with "write command" bits
+        or      @01000000
+        out     (c),a
+        ld      a,(pixelbyte) ; Can it be optimized ? what about VDP timing ?
+        ld      bc,VDP_DATA
+        out     (c),a
 ENDIF
 	call	l_tms9918_enable_interrupts
-         pop      bc
-         ret
+        pop      bc
+        ret
 
 	SECTION bss_clib
 	PUBLIC	pixelbyte

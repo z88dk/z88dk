@@ -43,3 +43,4 @@ video/tms9918/obj/${TARGET}/vdpport
 video/tms9918/obj/${TARGET}/msx_set_sprite_16
 video/tms9918/obj/${TARGET}/msx_set_mangled_mode
 video/tms9918/stdio/**/obj/${TARGET}/*
+video/tms9918/graphics/obj/${TARGET}/*
