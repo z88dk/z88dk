@@ -33,7 +33,6 @@
 
         PUBLIC    call_rom3       ; Interposer
        
-        PUBLIC    _FRAMES
         
 
 	PUBLIC	  __SYSVAR_BORDCR
@@ -55,6 +54,7 @@
                 defc  CRT_ORG_CODE  = 0
 		            defc	TAR__register_sp = 32767
             ELSE
+                PUBLIC    _FRAMES
                 defc  _FRAMES = 23672 ; Timer	
                 defc  CRT_ORG_CODE  = 32768
             ENDIF
