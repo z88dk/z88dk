@@ -11,8 +11,10 @@
         EXTERN  __console_w
         EXTERN  msx_set_mode
         EXTERN  LDIRVM
+ 
+        INCLUDE "video/tms9918/vdp.inc"
 
-IF !FORspc1000 && !FOReinstein && !FORsvi
+IF VDP_EXPORT_DIRECT = 1
         PUBLIC  generic_console_ioctl
 
         defc    generic_console_ioctl = __tms9918_console_ioctl

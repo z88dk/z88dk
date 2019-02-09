@@ -141,12 +141,15 @@ IF VDP_CMD < 0
 	ld	(-VDP_CMD),a
 	ld	a,(-VDP_DATAIN)
 ELSE
-	ld	a,l		; LSB of video memory ptr
-	out	(VDP_CMD), a
+	push	bc
+	ld	bc,VDP_CMD
+	out	(c),l		; LSB of video memory ptr
 	ld	a,h		; MSB of video mem ptr
 	and	@00111111	; masked with "read command" bits
-	out	(VDP_CMD), a
-	in	a, (VDP_DATAIN)
+	out	(c),a
+	ld	bc,VDP_DATAIN
+	in	a,(c)
+	pop	bc
 ENDIF
 	ld (chline_buffer),a
 
@@ -161,12 +164,15 @@ IF VDP_CMD < 0
 	ld	(-VDP_CMD),a
 	ld	a,(-VDP_DATAIN)
 ELSE	
-	ld	a,l		; LSB of video memory ptr
-	out	(VDP_CMD), a
+	push	bc
+	ld	bc,VDP_CMD
+	out	(c),l
 	ld	a,h		; MSB of video mem ptr
 	and	@00111111	; masked with "read command" bits
-	out	(VDP_CMD), a
-	in	a, (VDP_DATAIN)
+	out	(c),a
+	ld	bc,VDP_DATAIN
+	in	a,(c)
+	pop	bc
 ENDIF
 	ld (chline_buffer+1),a
 ;**************
@@ -270,14 +276,17 @@ IF VDP_CMD < 0
 	ld	a,(chline_buffer)
 	ld	(-VDP_DATA),a
 ELSE
-         ld       a,l		; LSB of video memory ptr
-         out      (VDP_CMD),a
+	push	bc
+	ld	bc,VDP_CMD
+	out	(c),l
          ld       a,h		; MSB of video mem ptr
          and      @00111111	; masked with "write command" bits
          or       @01000000
-         out      (VDP_CMD), a
+	out	(c),a
+	ld	bc,VDP_DATA
          ld       a,(chline_buffer)
-         out      (VDP_DATA), a
+	out	(c),a
+	pop	bc
 ENDIF
 
 	ld de,8	; next row
@@ -293,15 +302,17 @@ IF VDP_CMD < 0
 	ld	a,(chline_buffer+1)
 	ld	(-VDP_DATA),a
 ELSE
-		 
-         ld       a,l		; LSB of video memory ptr
-         out      (VDP_CMD),a
+	push	bc
+	ld	bc,VDP_CMD		 
+	out	(c),l
          ld       a,h		; MSB of video mem ptr
          and      @00111111	; masked with "write command" bits
          or       @01000000
-         out      (VDP_CMD), a
+	out	(c),a
+	ld	bc,VDP_DATA
          ld       a,(chline_buffer+1)
-         out      (VDP_DATA), a
+	out	(c),a
+	pop	bc
 ENDIF
 		 
 ;	ld de,8192-8	; attribute
@@ -331,12 +342,15 @@ IF VDP_CMD < 0
 	ld	(-VDP_CMD),a
 	ld	a,(-VDP_DATAIN)
 ELSE
-	ld	a,l		; LSB of video memory ptr
-	out	(VDP_CMD), a
+	push	bc
+	ld	bc,VDP_CMD
+	out	(c),l
 	ld	a,h		; MSB of video mem ptr
 	and	@00111111	; masked with "read command" bits
-	out	(VDP_CMD), a
-	in	a, (VDP_DATAIN)
+	out	(c),a
+	ld	bc,VDP_DATAIN
+	in	a,(c)
+	pop	bc
 ENDIF
 	ld (chline_buffer),a
 
@@ -351,12 +365,15 @@ IF VDP_CMD < 0
 	ld	(-VDP_CMD),a
 	ld	a,(-VDP_DATAIN)
 ELSE	
-	ld	a,l		; LSB of video memory ptr
-	out	(VDP_CMD), a
+	push	bc
+	ld	bc,VDP_CMD
+	out	(c),l
 	ld	a,h		; MSB of video mem ptr
 	and	@00111111	; masked with "read command" bits
-	out	(VDP_CMD), a
-	in	a, (VDP_DATAIN)
+	out	(c),a
+	ld	bc,VDP_DATAIN
+	in	a,(c)
+	pop	bc
 ENDIF
 	ld (chline_buffer+1),a
 ;**************

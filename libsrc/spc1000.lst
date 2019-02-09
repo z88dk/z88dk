@@ -10,8 +10,6 @@ stdio/spc1000/printc_MODE1
 stdio/spc1000/printc_MODE2
 stdio/spc1000/conio_vars
 stdio/spc1000/CRT_FONT
-stdio/spc1000/generic_console_tms9118_redirect
-stdio/spc1000/generic_console_tms9118_stub
 @font/font_8x8/font_8x8.lst
 @stdio/stdio.lst
 @input/input_keyboard.lst
@@ -48,12 +46,12 @@ graphics/putsprite3
 graphics/dcircle2
 graphics/fill
 graphics/getsprite
+@video/tms9918/video_tms9918.lst
 @gfxbase.lst
 psg/spc1000/set_psg
 psg/spc1000/set_psg_callee
 psg/spc1000/get_psg
 psg/spc1000/psg_init
 @psg/psg.lst
-@video/tms9918/video_tms9918.lst
 @video/mc6847/mc6847.lst
 @z80.lst

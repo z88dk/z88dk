@@ -103,8 +103,6 @@ msxdeps:
 	@$(RM) -f games/msx/*.o
 	@$(RM) -f graphics/*.o
 	@$(RM) -f graphics/*/*.o
-	@$(RM) -f graphics/msx/*.o
-	@$(RM) -f graphics/msx/surface/*.o
 	@$(RM) -f psg/msx/*.o
 	@$(RM) -f psg/sn76489/*.o
 	@$(RM) -f time/msx/*.o

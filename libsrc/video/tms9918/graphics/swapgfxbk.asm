@@ -6,18 +6,11 @@
 ;	$Id: swapgfxbk.asm,v 1.7 2017-01-02 22:57:58 aralbrec Exp $
 ;
 
+                MODULE    __tms9918_swapgfxbk
 		SECTION   code_clib
                 PUBLIC    swapgfxbk
-                PUBLIC    _swapgfxbk
-		EXTERN	pixeladdress
-
 		PUBLIC	swapgfxbk1
-      PUBLIC   _swapgfxbk1
 
 .swapgfxbk
-._swapgfxbk
-		ret
-
 .swapgfxbk1
-._swapgfxbk1
                 ret

@@ -9,12 +9,12 @@
 ; $Id: putsprite.asm $
 ;
 
-	SECTION   smc_clib
-	PUBLIC    putsprite
-	PUBLIC    _putsprite
-	EXTERN	pixeladdress
-	EXTERN	pixelbyte
-	EXTERN     swapgfxbk
+	SECTION smc_clib
+	PUBLIC  putsprite
+	PUBLIC  _putsprite
+	EXTERN	__tms9918_pixeladdress
+	EXTERN	__tms9918_pixelbyte
+	EXTERN  swapgfxbk
         EXTERN	__graphics_end
 
 	INCLUDE	"graphics/grafix.inc"
@@ -61,7 +61,7 @@
 	ld	(actcoord),hl	; save current coordinates
 
 	call    swapgfxbk
-	call	pixeladdress
+	call	__tms9918_pixeladdress
 
          ld       hl,offsets_table
          ld       c,a
@@ -88,7 +88,7 @@
 ._smc1   ld       a,1               ;Load pixel mask
 ._iloop
 	 push     hl			;*
-	 ld       hl,pixelbyte		;*
+	 ld       hl,__tms9918_pixelbyte		;*
 	 sla      c                 ;Test leftmost pixel
          jr       nc,_noplot        ;See if a plot is needed
          ld       e,a
@@ -122,7 +122,7 @@
 .wsmc1    ld       a,1               ;Load pixel mask
 .wiloop
 	 push     hl			;*
-	 ld       hl,pixelbyte		;*
+	 ld       hl,__tms9918_pixelbyte		;*
          sla      c                 ;Test leftmost pixel
          jr       nc,wnoplot         ;See if a plot is needed
          ld       e,a
@@ -174,17 +174,20 @@ IF VDP_DATA < 0
 	and	@00111111
 	or	@01000000
 	ld	(-VDP_CMD),a
-	ld	a,(pixelbyte)
+	ld	a,(__tms9918_pixelbyte)
 	ld	(-VDP_DATA),a
 ELSE
-         ld       a,l		; LSB of video memory ptr
-         out      (VDP_CMD),a
-         ld       a,h		; MSB of video mem ptr
-         and      @00111111	; masked with "write command" bits
-         or       @01000000
-         out      (VDP_CMD), a
-         ld       a,(pixelbyte)
-         out      (VDP_DATA), a
+        push    bc
+        ld      bc,VDP_CMD
+        out     (c),l           ;LSB of video memory ptr
+        ld      a,h		; MSB of video mem ptr
+        and     @00111111	; masked with "write command" bits
+        or      @01000000
+        out     (c),a
+        ld      a,(__tms9918_pixelbyte)
+        ld      bc,VDP_DATA
+        out     (c),a
+        pop     bc
 ENDIF
 ;**************
          ld       a,8
@@ -203,14 +206,17 @@ IF VDP_DATA < 0
 	ld	(-VDP_CMD),a
 	ld	a,(-VDP_DATAIN)
 ELSE
-         ld       a,l		; LSB of video memory ptr
-         out      (VDP_CMD), a
-         ld       a,h		; MSB of video mem ptr
-         and      @00111111	; masked with "read command" bits
-         out      (VDP_CMD), a
-         in       a, (VDP_DATAIN)
+        push    bc
+        ld      bc,VDP_CMD
+        out     (c),l
+        ld      a,h		; MSB of video mem ptr
+        and     @00111111	; masked with "read command" bits
+        out     (c),a
+        ld      bc,VDP_DATAIN
+        in      a,(c)
+        pop     bc
 ENDIF
-         ld       (pixelbyte),a
+         ld       (__tms9918_pixelbyte),a
 ;**************
          pop      af
          ret
@@ -225,24 +231,27 @@ IF VDP_DATA < 0
 	and	@00111111
 	or	@01000000
 	ld	(-VDP_CMD),a
-	ld	a,(pixelbyte)
+	ld	a,(__tms9918_pixelbyte)
 	ld	(-VDP_DATA),a
 ELSE
-         ld       a,l		; LSB of video memory ptr
-         out      (VDP_CMD),a
-         ld       a,h		; MSB of video mem ptr
-         and      @00111111	; masked with "write command" bits
-         or       @01000000
-         out      (VDP_CMD), a
-         ld       a,(pixelbyte)
-         out      (VDP_DATA), a
+        push    bc
+        ld      bc,VDP_CMD
+        out     (c),l           ; LSB of video memory ptr
+        ld      a,h		; MSB of video mem ptr
+        and     @00111111	; masked with "write command" bits
+        or      @01000000
+        out     (c),a
+        ld      bc,VDP_DATA
+        ld      a,(__tms9918_pixelbyte)
+        out     (c),a
+        pop     bc
 ENDIF
 ;**************
 	push	de
         ld	hl,(actcoord)
 	inc	l
 	ld	(actcoord),hl
-	call	pixeladdress
+	call	__tms9918_pixeladdress
 	ld	h,d
 	ld	l,e
 	pop	de

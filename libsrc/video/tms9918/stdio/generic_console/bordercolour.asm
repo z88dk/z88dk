@@ -2,19 +2,20 @@
 ;
 ;
 
-		SECTION		code_clib
+	SECTION		code_clib
+	PUBLIC		__tms9918_bordercolor
+	EXTERN		conio_map_colour
+	EXTERN		msx_set_border
 
-IF FORspc1000
-		PUBLIC		__tms9918_bordercolor
-ELSE
-		PUBLIC		bordercolor
-		PUBLIC		_bordercolor
+        INCLUDE "video/tms9918/vdp.inc"
 
-		defc	bordercolor = __tms9918_bordercolor
-		defc	_bordercolor = __tms9918_bordercolor
+IF VDP_EXPORT_DIRECT = 1
+	PUBLIC		bordercolor
+	PUBLIC		_bordercolor
+
+	defc	bordercolor = __tms9918_bordercolor
+	defc	_bordercolor = __tms9918_bordercolor
 ENDIF
-		EXTERN		conio_map_colour
-		EXTERN		msx_set_border
 
 __tms9918_bordercolor:
 	ld	a,l
