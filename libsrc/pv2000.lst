@@ -8,6 +8,7 @@ graphics/dcircle
 graphics/fill
 graphics/dfill2
 graphics/getsprite
+@video/tms9918/video_tms9918_nmi.lst
 @gfxbase.lst
 psg/sn76489/bit_open
 @games/games.lst
@@ -17,5 +18,4 @@ psg/sn76489/psg_envelope
 psg/sn76489/psg_init.asm
 psg/sn76489/set_psg.asm
 psg/sn76489/set_psg_callee.asm
-@video/tms9918/video_tms9918_nmi.lst
 @z80.lst

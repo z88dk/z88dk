@@ -7,8 +7,8 @@ graphics/fill
 graphics/dfill2
 graphics/getsprite
 graphics/liner
-@gfxbase.lst
 @video/tms9918/video_tms9918.lst
+@gfxbase.lst
 psg/einstein/psg_init
 psg/einstein/get_psg
 psg/einstein/set_psg

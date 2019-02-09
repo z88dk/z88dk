@@ -462,8 +462,10 @@ ENDIF
 
 IF FORspc1000
 	DEFINE gotgfx
-	defc maxx	= 64		;Text graphics settings
-	defc maxy	= 48
+	;defc maxx	= 64		;Text graphics settings
+	;defc maxy	= 48
+	defc maxx	= 256		;Graphics/VDP
+	defc maxy	= 192
 	defc blankch    = 32
 	defc USEplotc   = 1		; We call generic_console_plotc, not _printc for text mode
 ENDIF

@@ -8,6 +8,8 @@ time/msx/clock
 @fcntl/cpm/fcntl.lst
 graphics/dcircle
 graphics/getsprite
+@video/tms9918/video_tms9918.lst
+@gfxbase.lst
 games/msx/joystick
 games/msx/bit_open
 games/msx/bit_open_di
@@ -20,6 +22,4 @@ psg/msx/set_psg
 psg/msx/set_psg_callee
 @psg/psg.lst
 @arch/msx/arch_msx.lst
-@video/tms9918/video_tms9918.lst
-@gfxbase.lst
 @z80.lst

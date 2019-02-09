@@ -10,6 +10,8 @@ IF FORsms
 	defc VDP_CMD     = $bf
 	defc VDP_STATUS  = $bf ; ?
 	defc VRAM_SIZE   = 16
+	defc VDP_EXPORT_DIRECT = 1
+	defc VDP_EXPORT_GFX_DIRECT = 1
 ENDIF
 	
 IF FORsc3000
@@ -18,6 +20,8 @@ IF FORsc3000
 	defc VDP_CMD     = $bf
 	defc VDP_STATUS  = $bf ; ?
 	defc VRAM_SIZE   = 16
+	defc VDP_EXPORT_DIRECT = 1
+	defc VDP_EXPORT_GFX_DIRECT = 1
 ENDIF
 	
 IF FORmsx
@@ -26,6 +30,8 @@ IF FORmsx
 	defc VDP_CMD     = $99
 	defc VDP_STATUS  = $99
 	defc VRAM_SIZE   = 16		; extended are able to get the right size
+	defc VDP_EXPORT_DIRECT = 1
+	defc VDP_EXPORT_GFX_DIRECT = 1
 ENDIF
 
 IF FORsvi
@@ -34,6 +40,8 @@ IF FORsvi
 	defc VDP_CMD     = $81
 	defc VDP_STATUS  = $85
 	defc VRAM_SIZE   = 16
+	defc VDP_EXPORT_DIRECT = 0
+	defc VDP_EXPORT_GFX_DIRECT = 1
 ENDIF
 
 IF FORm5
@@ -42,6 +50,8 @@ IF FORm5
 	defc VDP_CMD     = $11
 	defc VDP_STATUS  = $11
 	defc VRAM_SIZE   = 16
+	defc VDP_EXPORT_DIRECT = 1
+	defc VDP_EXPORT_GFX_DIRECT = 1
 ENDIF
 
 IF FORmtx
@@ -50,6 +60,8 @@ IF FORmtx
 	defc VDP_CMD     = 2
 	defc VDP_STATUS  = 2
 	defc VRAM_SIZE   = 16		; extended are able to get the right size
+	defc VDP_EXPORT_DIRECT = 1
+	defc VDP_EXPORT_GFX_DIRECT = 1
 ENDIF
 
 IF FOReinstein
@@ -58,6 +70,8 @@ IF FOReinstein
 	defc VDP_CMD     = 9
 	defc VDP_STATUS  = 9
 	defc VRAM_SIZE   = 16
+	defc VDP_EXPORT_DIRECT = 0
+	defc VDP_EXPORT_GFX_DIRECT = 1
 ENDIF
 
 IF FORpv2000
@@ -66,6 +80,8 @@ IF FORpv2000
 	defc VDP_CMD     = -0x4001
 	defc VDP_STATUS  = -0x4001
 	defc VRAM_SIZE   = 16
+	defc VDP_EXPORT_DIRECT = 1
+	defc VDP_EXPORT_GFX_DIRECT = 1
 ENDIF
 
 IF FORsg1000
@@ -74,6 +90,8 @@ IF FORsg1000
 	defc VDP_CMD     = 0xbf
 	defc VDP_STATUS  = 0xbf
 	defc VRAM_SIZE   = 16
+	defc VDP_EXPORT_DIRECT = 1
+	defc VDP_EXPORT_GFX_DIRECT = 1
 ENDIF
 
 IF FORcoleco
@@ -82,6 +100,8 @@ IF FORcoleco
 	defc VDP_CMD     = 0xbf
 	defc VDP_STATUS  = 0xbf
 	defc VRAM_SIZE   = 16
+	defc VDP_EXPORT_DIRECT = 1
+	defc VDP_EXPORT_GFX_DIRECT = 1
 ENDIF
 
 IF FORspc1000
@@ -90,5 +110,6 @@ IF FORspc1000
 	defc VDP_CMD     = 0xc801
 	defc VDP_STATUS  = 0xc801
 	defc VRAM_SIZE   = 16
-
+	defc VDP_EXPORT_DIRECT = 0
+	defc VDP_EXPORT_GFX_DIRECT = 0
 ENDIF

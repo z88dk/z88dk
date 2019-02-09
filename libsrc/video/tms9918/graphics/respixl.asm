@@ -1,49 +1,38 @@
-	INCLUDE	"graphics/grafix.inc"
 
-	SECTION code_clib
-	PUBLIC	respixel
+        MODULE __tms9918_respixel
+        SECTION code_clib
+        PUBLIC  __tms9918_respixel
 
-	EXTERN pixeladdress
-	EXTERN	__gfx_coords
-	EXTERN	pix_return
+        EXTERN  __tms9918_pixeladdress
+        EXTERN  __gfx_coords
+        EXTERN  __tms9918_pix_return
 
-;
-;	$Id: respixl.asm,v 1.9 2016-07-02 09:01:36 dom Exp $
-;
+        INCLUDE "video/tms9918/vdp.inc"
+        INCLUDE "graphics/grafix.inc"
 
-; ******************************************************************
-;
-; Reset pixel at (x,y) coordinate
-;
-; Design & programming by Gunther Strube, Copyright (C) InterLogic 1995
-;
+IF VDP_EXPORT_GFX_DIRECT = 1
+        PUBLIC  respixel
+        defc    respixel = __tms9918_respixel
+ENDIF
+
 ; in:  hl = (x,y) coordinate of pixel (h,l)
-;
-; registers changed	after return:
-;  ..bc..../ixiy same
-;  af..dehl/.... different
-;
-.respixel
-			IF maxx <> 256
-				ld	a,h
-				cp	maxx
-				ret	nc
-			ENDIF
+.__tms9918_respixel
+        ld      a,l
+        cp      192
+        ret     nc                        ; y0        out of range
+                                
+        ld      (__gfx_coords),hl
 
-				ld	a,l
-				cp	maxy
-				ret	nc			; y0	out of range
-				
-				ld	(__gfx_coords),hl
-
-				push	bc
-				call	pixeladdress
-				ld	b,a
-				ld	a,1
-				jr	z, reset_pixel
-.reset_position			rlca
-				djnz	reset_position
-.reset_pixel			;ex	de,hl
-				cpl
-				and	(hl)
-				jp	pix_return
+        push    bc
+        call    __tms9918_pixeladdress
+        ld      b,a
+        ld      a,1
+        jr      z, reset_pixel
+.reset_position
+        rlca
+        djnz    reset_position
+.reset_pixel
+        ;ex     de,hl
+        cpl
+        and     (hl)
+        jp      __tms9918_pix_return

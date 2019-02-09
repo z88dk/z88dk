@@ -11,7 +11,7 @@
 	EXTERN	__spc1000_mode
 	EXTERN	generic_console_font32
 	EXTERN	generic_console_udg32
-        EXTERN  tms9918_console_ioctl
+        EXTERN  __tms9918_console_ioctl
 
 	INCLUDE	"target/spc1000/def/spc1000.def"
 
@@ -69,7 +69,7 @@ check_mode:
         add     hl,sp
         ex      de,hl
         ld      a,IOCTL_GENCON_SET_MODE
-        call    tms9918_console_ioctl
+        call    __tms9918_console_ioctl
         pop     hl
 	jr	success
 

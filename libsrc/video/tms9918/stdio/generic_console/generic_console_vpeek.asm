@@ -13,7 +13,9 @@
 
         EXTERN  LDIRMV
 
-IF !FORspc1000 && !FOReinstein && !FORsvi
+        INCLUDE "video/tms9918/vdp.inc"
+
+IF VDP_EXPORT_DIRECT = 1
         PUBLIC  generic_console_vpeek
         defc    generic_console_vpeek = __tms9918_console_vpeek
 ENDIF

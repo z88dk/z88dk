@@ -6,7 +6,6 @@ graphics/fill
 graphics/dfill2
 graphics/getsprite
 graphics/liner
-@gfxbase.lst
 games/coleco/joystick
 games/obj/coleco/joystick_type
 psg/sn76489/bit_open
@@ -18,4 +17,5 @@ psg/sn76489/set_psg.asm
 psg/sn76489/set_psg_callee.asm
 @psg/psg.lst
 @video/tms9918/video_tms9918.lst
+@gfxbase.lst
 arch/adam/cpm_platform_init

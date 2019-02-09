@@ -9,8 +9,8 @@
         PUBLIC  __tms9918_set_ink
         PUBLIC  __tms9918_set_paper
         PUBLIC  __tms9918_set_inverse
-        PUBLIC  __tms9918_text_xypos
         EXTERN  __tms9918_attribute
+        EXTERN  __tms9918_text_xypos
 
         EXTERN  generic_console_font32
         EXTERN  generic_console_udg32
@@ -26,6 +26,8 @@
         EXTERN  LDIRVM
         EXTERN  LDIRMV
 
+        INCLUDE "video/tms9918/vdp.inc"
+
 
 ;
 ; The SPC-1000 has both a MC6847 and optionally a TMS9228A
@@ -37,7 +39,7 @@
 ; The Tatung Einstein has a TMS9928A as a main display and
 ; an 80 column 6845 as a secondary display.
 ;
-IF !FORspc1000 && !FOReinstein && !FORsvi
+IF VDP_EXPORT_DIRECT = 1
         PUBLIC  generic_console_cls
         PUBLIC  generic_console_scrollup
         PUBLIC  generic_console_printc
@@ -198,18 +200,4 @@ not_inverse:
         pop     ix
         ret
 
-
-; Entry: b = row, c = column
-__tms9918_text_xypos:
-        ld      de,(__console_w)
-        ld      d,0
-        ld      hl,0
-        and     a
-        sbc     hl,de
-        inc     b
-xypos_1:
-        add     hl,de
-        djnz    xypos_1
-        add     hl,bc
-        ret
 

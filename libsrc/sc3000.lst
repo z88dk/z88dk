@@ -7,6 +7,7 @@ time/sc3000/clock
 @input/input_keyboard.lst
 graphics/dcircle
 graphics/getsprite
+@video/tms9918/video_tms9918.lst
 @gfxbase.lst
 psg/sn76489/bit_open
 games/sc3000/joystick
@@ -18,5 +19,4 @@ psg/sn76489/psg_envelope
 psg/sn76489/psg_init.asm
 psg/sn76489/set_psg.asm
 psg/sn76489/set_psg_callee.asm
-@video/tms9918/video_tms9918.lst
 @z80.lst

@@ -21,7 +21,7 @@
 
          ;EXTERN swapgfxbk
          EXTERN pixeladdress
-         EXTERN pixelbyte
+         EXTERN __tms9918_pixelbyte
          EXTERN leftbitmask, rightbitmask
          ;EXTERN swapgfxbk1
 
@@ -151,7 +151,7 @@
                  ; and on the pattern being set in (pattern1+1)
 .mask_pattern
          ld      d,a                ; keep a copy of mask
-         ld      a,(pixelbyte)        ; mask data taken from screen
+         ld      a,(__tms9918_pixelbyte)        ; mask data taken from screen
          and     d
          ld      e,a                ; save masked data
          ld      a,d                ; retrieve mask

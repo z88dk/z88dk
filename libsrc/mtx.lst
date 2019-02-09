@@ -9,6 +9,7 @@ graphics/dcircle
 graphics/fill
 graphics/dfill2
 graphics/getsprite
+@video/tms9918/video_tms9918.lst
 @gfxbase.lst
 games/mtx/joystick
 psg/sn76489/bit_open
@@ -19,5 +20,4 @@ psg/sn76489/psg_envelope
 psg/sn76489/psg_init.asm
 psg/sn76489/set_psg.asm
 psg/sn76489/set_psg_callee.asm
-@video/tms9918/video_tms9918.lst
 @z80.lst

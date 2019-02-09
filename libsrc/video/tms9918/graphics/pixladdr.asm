@@ -1,8 +1,8 @@
 
+        MODULE  __tms9918_pixeladdress
 	SECTION	code_clib
-	PUBLIC	pixeladdress
-
-	PUBLIC	pix_return
+	PUBLIC	__tms9918_pixeladdress
+	PUBLIC	__tms9918_pix_return
 
 	EXTERN	l_tms9918_disable_interrupts
 	EXTERN	l_tms9918_enable_interrupts
@@ -15,8 +15,7 @@
 ;
 
 
-.pixeladdress
-	
+.__tms9918_pixeladdress
 	ld	c,h		; X
 	ld	b,l		; Y
 	
@@ -59,7 +58,7 @@ ELSE
         pop     bc
 ENDIF
 	ex	de,hl		;de = VDP address
-	ld	hl,pixelbyte
+	ld	hl,__tms9918_pixelbyte
 	ld	(hl),a
 	call	l_tms9918_enable_interrupts
 ;-------
@@ -71,8 +70,8 @@ ENDIF
 	ret
 
 
-.pix_return
-        ld       (hl),a	; hl points to "pixelbyte"
+.__tms9918_pix_return
+        ld       (hl),a	; hl points to "__tms9918_pixelbyte"
 	call	l_tms9918_disable_interrupts
 IF VDP_CMD < 0
 	ld	a,e
@@ -81,7 +80,7 @@ IF VDP_CMD < 0
 	and	@00111111
 	or	@01000000
 	ld	(-VDP_CMD),a
-	ld	a,(pixelbyte)
+	ld	a,(__tms9918_pixelbyte)
 	ld	(-VDP_DATA),a
 ELSE
         ld      bc,VDP_CMD
@@ -90,7 +89,7 @@ ELSE
         and     @00111111	; masked with "write command" bits
         or      @01000000
         out     (c),a
-        ld      a,(pixelbyte) ; Can it be optimized ? what about VDP timing ?
+        ld      a,(__tms9918_pixelbyte) ; Can it be optimized ? what about VDP timing ?
         ld      bc,VDP_DATA
         out     (c),a
 ENDIF
@@ -99,7 +98,7 @@ ENDIF
         ret
 
 	SECTION bss_clib
-	PUBLIC	pixelbyte
+	PUBLIC	__tms9918_pixelbyte
 
-.pixelbyte
+.__tms9918_pixelbyte
 	 defb	0

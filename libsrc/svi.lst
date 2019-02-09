@@ -9,6 +9,8 @@ stdio/svi/generic_console
 time/msx/clock
 graphics/dcircle
 graphics/getsprite
+@video/tms9918/video_tms9918.lst
+@gfxbase.lst
 games/svi/joystick
 games/svi/keys_joystick
 games/msx/bit_open
@@ -28,6 +30,4 @@ rs232/svi/rs232_init
 rs232/svi/rs232_params
 rs232/svi/rs232_put
 @arch/svi/arch_svi.lst
-@video/tms9918/video_tms9918.lst
-@gfxbase.lst
 @z80.lst

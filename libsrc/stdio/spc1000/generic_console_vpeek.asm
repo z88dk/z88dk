@@ -8,7 +8,7 @@
 		EXTERN		vpeek_MODE1
 		EXTERN		vpeek_MODE2
 		EXTERN		generic_console_calc_xypos
-		EXTERN		tms9918_console_vpeek
+		EXTERN		__tms9918_console_vpeek
 
 
 
@@ -25,7 +25,7 @@ generic_console_vpeek:
 	cp	2
 	jp	z,vpeek_MODE2
 	cp	10
-	jp	z,tms9918_console_vpeek
+	jp	z,__tms9918_console_vpeek
         call    generic_console_calc_xypos
 	ld	c,l
 	ld	b,h
