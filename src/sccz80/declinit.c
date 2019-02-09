@@ -90,6 +90,7 @@ int str_init(Type *tag)
             init(ptr,1);
         }
     }
+    swallow(",");
     // Pad out the union
     if ( sz < tag->size) {
         defstorage();
