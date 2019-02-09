@@ -80,7 +80,6 @@ ELSE
         PUBLIC          __tms9918_set_ink
         PUBLIC          __tms9918_set_paper
         PUBLIC          __tms9918_set_inverse
-        PUBLIC          __tms9918_spc1000_stub
         PUBLIC          __tms9918_plotpixel
         PUBLIC          __tms9918_respixel
         PUBLIC          __tms9918_xorpixel
@@ -99,6 +98,7 @@ ELSE
 	defc		__tms9918_plotpixel = stub
 	defc		__tms9918_xorpixel = stub
 	defc		__tms9918_respixel = stub
+	defc		__tms9918_pointxy = stub
         defc            __tms9918_getmaxx = stub
         defc            __tms9918_getmaxy = stub
 
