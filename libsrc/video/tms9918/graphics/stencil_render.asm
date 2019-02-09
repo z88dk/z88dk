@@ -20,7 +20,7 @@
          EXTERN        dither_pattern
 
          ;EXTERN swapgfxbk
-         EXTERN pixeladdress
+         EXTERN __tms9918_pixeladdress
          EXTERN __tms9918_pixelbyte
          EXTERN leftbitmask, rightbitmask
          ;EXTERN swapgfxbk1
@@ -76,7 +76,7 @@
         ld       l,c        ; Y
                          
         push     bc
-        call     pixeladdress                ; bitpos0 = pixeladdress(x,y)
+        call     __tms9918_pixeladdress                ; bitpos0 = pixeladdress(x,y)
         call     leftbitmask                ; LeftBitMask(bitpos0)
         pop      bc
         push     de                        
@@ -91,7 +91,7 @@
         ld       h,b                ; X2
         ld       l,c                ; Y
 
-        call     pixeladdress                ; bitpos1 = pixeladdress(x+width-1,y)
+        call     __tms9918_pixeladdress                ; bitpos1 = pixeladdress(x+width-1,y)
         call     rightbitmask                ; RightBitMask(bitpos1)
         ld       (bitmaskr+1),a                ; bitmask1 = LeftBitMask(bitpos0)
 
