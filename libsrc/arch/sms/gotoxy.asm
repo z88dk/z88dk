@@ -2,7 +2,7 @@
 	PUBLIC	gotoxy
 	PUBLIC	_gotoxy
 	
-	INCLUDE "sms/sms.hdr"
+	INCLUDE "arch/sms/sms.hdr"
 
 	EXTERN	fputc_vdp_offs
 	

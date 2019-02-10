@@ -1413,12 +1413,7 @@ classic-clean:
 	$(RM) abc800/*.o
 	$(MAKE) -C enterprise clean
 	$(MAKE) -C psg clean
-	$(RM) newbrain/*.o
-	$(RM) ts2068/*.o
-	$(RM) tiki100/*.o
-	$(RM) vz/*.o
 	$(RM) cpc/*.o
-	$(MAKE) -C sms clean
 	$(MAKE) -C sos clean
 	$(MAKE) -C threading/preempt clean
 	$(MAKE) -C sprites/software/sp1 clean
