@@ -4,4 +4,4 @@
 
 .standard_font
 ._standard_font
-        BINARY  "sms/FONT8.BIN"
+        BINARY  "target/sms/FONT8.BIN"

@@ -2,7 +2,7 @@
 	PUBLIC	set_bkg_map
 	PUBLIC	_set_bkg_map
 
-	INCLUDE "sms/sms.hdr"
+	INCLUDE "target/sms/sms.hdr"
 	
 	EXTERN	DrawOneLine
 	

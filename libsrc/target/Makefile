@@ -1,7 +1,7 @@
 include ../Make.config
 
 
-SUBDIRS = z80 
+SUBDIRS = c128 z88 x1 msx svi nc100 rex
 # Directories that need a target passed down
 CLEANDIRS = $(SUBDIRS:%=clean-%) $(TARGETDIRS:%=clean-%)
 

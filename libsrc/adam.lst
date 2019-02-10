@@ -18,4 +18,4 @@ psg/sn76489/set_psg_callee.asm
 @psg/psg.lst
 @video/tms9918/video_tms9918.lst
 @gfxbase.lst
-arch/adam/cpm_platform_init
+target/adam/cpm_platform_init

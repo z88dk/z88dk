@@ -21,5 +21,5 @@ psg/msx/get_psg
 psg/msx/set_psg
 psg/msx/set_psg_callee
 @psg/psg.lst
-@arch/msx/arch_msx.lst
+@target/msx/arch_msx.lst
 @z80.lst
