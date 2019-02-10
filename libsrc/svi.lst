@@ -29,5 +29,5 @@ rs232/svi/rs232_get
 rs232/svi/rs232_init
 rs232/svi/rs232_params
 rs232/svi/rs232_put
-@arch/svi/arch_svi.lst
+@target/svi/arch_svi.lst
 @z80.lst

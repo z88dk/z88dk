@@ -2,7 +2,7 @@
 	SECTION code_clib
 	PUBLIC	DrawOneLine
 	
-	INCLUDE "arch/sms/sms.hdr"
+	INCLUDE "target/sms/sms.hdr"
 
 	
 	EXTERN	VRAMToHL

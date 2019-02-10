@@ -13,7 +13,7 @@ stdio/spc1000/CRT_FONT
 @font/font_8x8/font_8x8.lst
 @stdio/stdio.lst
 @input/input_keyboard.lst
-arch/spc1000/tms9918
+target/spc1000/tms9918
 games/spc1000/joystick
 games/spc1000/keys_joystick
 @games/games.lst

@@ -11,10 +11,10 @@ stdio/gal/vpeek_MODE1
 stdio/gal/scrollup_MODE1
 stdio/gal/vpeek_screendollar
 @stdio/stdio.lst
-arch/gal/scrolluptxt
-arch/gal/scrolldowntxt
-arch/gal/invtxt
-arch/gal/filltxt
+target/gal/scrolluptxt
+target/gal/scrolldowntxt
+target/gal/invtxt
+target/gal/filltxt
 @font/font_8x8/font_8x8.lst
 @stdio/ansicore.lst
 stdio/ansi/gal/f_ansi_attr
