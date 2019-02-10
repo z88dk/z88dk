@@ -17,7 +17,7 @@ z88dk-copt$(EXESUFFIX):	$(OBJS)
 %.o: %.c
 	$(CC) -c -o $@ $(CFLAGS) $(LOCAL_CFLAGS) $(INCLUDES) $^
 
-install:
+install: z88dk-copt$(EXESUFFIX)
 	$(INSTALL) z88dk-copt$(EXESUFFIX) $(PREFIX)/bin/z88dk-copt$(EXESUFFIX)
 
 clean:

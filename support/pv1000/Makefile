@@ -57,7 +57,7 @@ clean::
 	$(RM) $(OBJS) $(DEPENDS) *.bak t/*.bak
 
 #------------------------------------------------------------------------------
-install: 
+install: $(PROJ)$(EXESUFFIX)
 	$(INSTALL) $(PROJ)$(EXESUFFIX) $(PREFIX)/bin/$(PROJ)$(EXESUFFIX)
 
 -include $(DEPENDS)

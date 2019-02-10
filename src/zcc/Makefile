@@ -18,7 +18,7 @@ zcc$(EXESUFFIX):	$(OBJS)
 %.o: %.c
 	$(CC) -c -o $@ $(CFLAGS) $(INCLUDES) $^
 
-install:
+install: zcc$(EXESUFFIX)
 	$(INSTALL) zcc$(EXESUFFIX) $(PREFIX)/bin/
 
 clean:

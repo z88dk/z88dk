@@ -14,7 +14,7 @@ all: z88dk-z80svg$(EXESUFFIX)
 z88dk-z80svg$(EXESUFFIX):	$(OBJS)
 	$(CC) -o z88dk-z80svg$(EXESUFFIX) $(CFLAGS) $(OBJS) $(LIBS)
 
-install: 
+install: z88dk-z80svg$(EXESUFFIX)
 	$(INSTALL) z88dk-z80svg$(EXESUFFIX) $(PREFIX)/bin/z88dk-z80svg$(EXESUFFIX)
 
 clean:

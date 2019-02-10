@@ -13,7 +13,7 @@ all: z88dk-lstmanip$(EXESUFFIX)
 z88dk-lstmanip$(EXESUFFIX):	$(OBJS)
 	$(CC) -o $@ $(CFLAGS) $(OBJS)
 
-install: 
+install: z88dk-lstmanip$(EXESUFFIX)
 	$(INSTALL) z88dk-lstmanip$(EXESUFFIX) $(PREFIX)/bin/z88dk-lstmanip$(EXESUFFIX)
 
 clean:

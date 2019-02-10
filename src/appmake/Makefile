@@ -1,30 +1,61 @@
-INSTALL ?= install
+#-----------------------------------------------------------------------------
+# appmake - Z88dk application creator
+#-----------------------------------------------------------------------------
+PROJ		:= appmake
 
-INCLUDES += -I..
+ifeq ($(OS),Windows_NT)
+  EXE	:= .exe
+else
+  EXE 	:= $(EXESUFFIX)
+endif
 
-OBJS = appmake.o z88.o zxvgs.o zx.o z88shell.o abc80.o zx81.o msx.o mtx.o mz.o nec.o p2000.o pc88.o px.o \
-	aquarius.o c7420.o rom.o sorcerer.o sos.o svi.o sc3000.o ace-tap.o hex.o lynx.o rex6000.o tixx.o nascom.o \
-	cpc.o m5.o mc.o newbrain.o newext.o sms.o trs80.o c128.o galaksija.o vz.o enterprise.o x07.o residos.o \
-	inject.o vg5k.o z1013.o extract.o z9001.o kc.o glue.o zxn.o zx-util.o x1.o multi8.o spc1000.o mz2500.o \
-	fp1100.o cpmdisk.o cpm2.o mameql.o pasopia7.o fat.o ff.o
+CC			?= gcc
+CFLAGS		+= -Wall -std=gnu11 -MMD 
 
+INSTALL 	?= install
 
-all: appmake$(EXESUFFIX)
+SRCS 		:= $(wildcard *.c)
 
-CFLAGS += -g
+OBJS_ALL	:= $(SRCS:.c=.o)
+OBJS		:= $(OBJS_ALL:$(PROJ).o=)
 
-%.o: %.c appmake.h zx-util.h d88.h cpmdisk.h
-	$(CC) $(CFLAGS) $(INCLUDES) -c $<
+DEPENDS		:= $(SRCS:.c=.d) $(T_SRCS:.c=.d)
 
-appmake$(EXESUFFIX): $(OBJS)
-	$(CC) -o appmake$(EXESUFFIX) $(LDFLAGS) $(OBJS)
+#------------------------------------------------------------------------------
+.PHONY: all clean test install
 
-install:
-	$(INSTALL) appmake$(EXESUFFIX) $(PREFIX)/bin/$(EXEC_PREFIX)appmake$(EXESUFFIX)
+#------------------------------------------------------------------------------
+define MAKE_EXE
+all: $(1)$(EXE)
 
-clean:
-	$(RM) appmake$(EXESUFFIX) $(OBJS) core
-	$(RM) -rf Debug Release
+$(1)$(EXE): $(2)
+	$(CC) $(CFLAGS) -o $(1)$(EXE) $(2) $(LDFLAGS)
+	
+clean::
+	$(RM) $(1)$(EXE) $(2)
 
+test:: $(1)$(EXE)
+ifeq ($(3),1)
+	./$(1)$(EXE)
+endif
 
+valgrind:: $(1)$(EXE)
+	$(VALGRIND) $(1)$(EXE)
+endef
 
+#------------------------------------------------------------------------------
+$(eval $(call MAKE_EXE,$(PROJ),$(OBJS_ALL),0))
+
+#------------------------------------------------------------------------------
+test:: $(PROJ)$(EXE)
+	perl -S prove t/*.t
+
+#------------------------------------------------------------------------------
+clean::
+	$(RM) $(OBJS) $(DEPENDS) *.bak t/*.bak
+
+#------------------------------------------------------------------------------
+install: $(PROJ)$(EXE)
+	$(INSTALL) $(PROJ)$(EXE) $(PREFIX)/bin/$(PROJ)$(EXE)
+
+-include $(DEPENDS)
