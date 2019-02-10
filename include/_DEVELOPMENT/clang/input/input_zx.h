@@ -85,17 +85,12 @@ extern void in_wait_nokey(void);
 // joysticks
 ////////////
 
-#ifdef __CLANG
-typedef uint16_t (*JOYFUNC)(udk_t *);
-#endif
-
-#ifdef __SDCC
-typedef uint16_t (*JOYFUNC)(udk_t *);
-#endif
-
 #ifdef __SCCZ80
-#define JOYFUNC  void*
+typedef uint16_t (*JOYFUNC)(udk_t *) __z88dk_fastcall;
+#else
+typedef uint16_t (*JOYFUNC)(udk_t *);
 #endif
+
 
 extern uint16_t in_stick_keyboard(udk_t *u);
 

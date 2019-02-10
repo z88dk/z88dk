@@ -1115,6 +1115,8 @@ Type *dodeclare2(Type **base_type, decl_mode mode)
         }
     }
 
+#if 0
+    // Issue 1103: We need to support fastcall for function pointers
     if ( ispointer(type) && type->ptr->kind == KIND_FUNC ) {
         /* Function pointers, fastcall isn't valid */
         if ( type->ptr->flags & FASTCALL ) {
@@ -1122,6 +1124,7 @@ Type *dodeclare2(Type **base_type, decl_mode mode)
             type->ptr->flags &= ~FASTCALL;
         }
     }
+#endif
 
     return type;
 }

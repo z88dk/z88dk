@@ -787,6 +787,18 @@ void callstk(Type *type, int n, int isfarptr)
         }
         loadargc(n);
         callrts("l_farcall");
+    } else if ( type->flags & FASTCALL && n == 2) {
+         int label = getlabel();		  
+         ol("pop\tde"); /* function */		
+         outstr("\tld\tbc,"); /* ret address */		
+         printlabel(label);		
+         nl();		
+         /* Argument in hl, on stack */		
+         ol("push\thl");		
+         ol("push\tbc"); /* Return address */		
+         ol("push\tde");		
+         ol("ret");		
+         postlabel(label);
     } else {
         if (n == 2) {
             /* At this point, TOS = function, hl = argument */
