@@ -105,13 +105,13 @@ int heir1(LVALUE* lval)
             } else if ( lval->ltype->ptr->kind == KIND_FUNC && rhs->ptr->kind == KIND_FUNC ) {
                 // Check flag assignment
                 if ( (rhs->ptr->flags & FASTCALL) != (lval->ltype->ptr->flags & FASTCALL) ) {
-                    warningfmt("incompatible-function-types","Assigning %s function pointer with %s function", (lval->ltype->ptr->flags & FASTCALL) ? "FASTCALL" : "non-FASTCALL", (rhs->ptr->flags & FASTCALL) ? "FASTCALL" : "non-FASTCALL");
+                    warningfmt("incompatible-function-types","Assigning %sFASTCALL function pointer with %sFASTCALL function", (lval->ltype->ptr->flags & FASTCALL) ? "" : "non-", (rhs->ptr->flags & FASTCALL) ? "" : "non-");
                 }
-                if ( (lval->ltype->ptr->flags & CALLEE) && (rhs->ptr->flags & CALLEE) == 0 ) {
-                    warningfmt("incompatible-function-types","Assigning CALLEE function pointer with non-CALLEE function");
+                if ( (lval->ltype->ptr->flags & CALLEE) != (rhs->ptr->flags & CALLEE) ) {
+                    warningfmt("incompatible-function-types","Assigning %sCALLEE function pointer with %sCALLEE function", (lval->ltype->ptr->flags & CALLEE) ? "" :  "non-",  (rhs->ptr->flags & CALLEE) ? "" : "non-");
                 }
-                if ( (lval->ltype->ptr->flags & SMALLC) && (rhs->ptr->flags & SMALLC) == 0 ) {
-                    warningfmt("incompatible-function-types","Assigning SMALLC function pointer with non-SMALLC function");
+                if ( (lval->ltype->ptr->flags & SMALLC) != (rhs->ptr->flags & SMALLC) ) {
+                    warningfmt("incompatible-function-types","Assigning %s function pointer with %s function", (lval->ltype->ptr->flags & SMALLC) ? "__smallc" : "__stdc", (rhs->ptr->flags & SMALLC) ? "__smallc" : "__stdc");
                 }
             }
         } else if ( lval->ltype->kind == KIND_STRUCT ) {

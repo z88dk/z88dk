@@ -1,6 +1,6 @@
 
 Z80ASM = $(EXEC_PREFIX)z80asm
-ZX7 = $(EXEC_PREFIX)zx7
+ZX7 = z88dk-zx7
 
 TARGET ?= z80 cpm m rc2014 sms vgl yaz180 z180 zx zxn
 

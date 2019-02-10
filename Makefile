@@ -37,8 +37,13 @@ Z88DK_PATH	= $(shell pwd)
 
 export CC INSTALL CFLAGS EXEC_PREFIX CROSS
 
-all: 	setup appmake copt zcpp ucpp sccz80 z80asm zcc zpragma zx7 z80nm zobjcopy \
-	lstmanip ticks z80svg font2pv1000 testsuite z88dk-lib zsdcc
+all: 	setup bin/appmake$(EXESUFFIX) bin/z88dk-copt$(EXESUFFIX) bin/z88dk-zcpp$(EXESUFFIX) \
+	bin/z88dk-ucpp$(EXESUFFIX) bin/sccz80$(EXESUFFIX) bin/z80asm$(EXESUFFIX) \
+	bin/zcc$(EXESUFFIX) bin/z88dk-zpragma$(EXESUFFIX) bin/z88dk-zx7$(EXESUFFIX) \
+	bin/z80nm$(EXESUFFIX) bin/zobjcopy$(EXESUFFIX) bin/z88dk-lstmanip$(EXESUFFIX) \
+	bin/z88dk-ticks$(EXESUFFIX) bin/z88dk-z80svg$(EXESUFFIX) \
+	bin/z88dk-font2pv1000$(EXESUFFIX) bin/z88dk-basck$(EXESUFFIX) \
+	testsuite bin/z88dk-lib$(EXESUFFIX) bin/zsdcc$(EXESUFFIX)
 
 setup:
 	$(shell if [ "${git_count}" != "" ]; then \
@@ -55,7 +60,6 @@ setup:
         fi)
 	@mkdir -p bin
 
-zsdcc: bin/zsdcc$(EXESUFFIX)
 
 bin/zsdcc$(EXESUFFIX):
 	svn checkout -r 10892 svn://svn.code.sf.net/p/sdcc/code/trunk/sdcc -q $(SDCC_PATH)
@@ -73,68 +77,56 @@ bin/zsdcc$(EXESUFFIX):
 	cd $(SDCC_PATH) && mv ./bin/sdcpp $(Z88DK_PATH)/bin/zsdcpp
 	$(RM) -fR $(SDCC_PATH)
 
-appmake:
-	$(MAKE) -C src/appmake
+bin/appmake$(EXESUFFIX):
 	$(MAKE) -C src/appmake PREFIX=`pwd` install
 
-copt:
-	$(MAKE) -C src/copt
+bin/z88dk-copt$(EXESUFFIX):
 	$(MAKE) -C src/copt PREFIX=`pwd` install
 
-ucpp:
-	$(MAKE) -C src/ucpp
+bin/z88dk-ucpp$(EXESUFFIX):
 	$(MAKE) -C src/ucpp PREFIX=`pwd` install
 
-zcpp:
-	$(MAKE) -C src/cpp
+bin/z88dk-zcpp$(EXESUFFIX):
 	$(MAKE) -C src/cpp PREFIX=`pwd` install
 
-sccz80:
-	$(MAKE) -C src/sccz80
+bin/sccz80$(EXESUFFIX):
 	$(MAKE) -C src/sccz80 PREFIX=`pwd` install
 
-z80asm:
+bin/z80asm$(EXESUFFIX):
 	$(MAKE) -C src/z80asm
 	$(MAKE) -C src/z80asm PREFIX=`pwd` PREFIX_SHARE=`pwd` install
 
-zcc:
-	$(MAKE) -C src/zcc
+bin/zcc$(EXESUFFIX):
 	$(MAKE) -C src/zcc PREFIX=`pwd` install
 
-zpragma:
-	$(MAKE) -C src/zpragma
+bin/z88dk-zpragma$(EXESUFFIX):
 	$(MAKE) -C src/zpragma PREFIX=`pwd` install
 
-zx7:
-	$(MAKE) -C src/zx7
+bin/z88dk-zx7$(EXESUFFIX):
 	$(MAKE) -C src/zx7 PREFIX=`pwd` install
 
-z80nm:
-	$(MAKE) -C src/z80nm
+bin/z80nm$(EXESUFFIX):
 	$(MAKE) -C src/z80nm PREFIX=`pwd` install
 
-zobjcopy:
-	$(MAKE) -C src/zobjcopy
+bin/zobjcopy$(EXESUFFIX):
 	$(MAKE) -C src/zobjcopy PREFIX=`pwd` install
 
-lstmanip:
-	$(MAKE) -C src/lstmanip
+bin/z88dk-lstmanip$(EXESUFFIX):
 	$(MAKE) -C src/lstmanip PREFIX=`pwd` install
 
-z80svg:
-	$(MAKE) -C support/graphics
+bin/z88dk-z80svg$(EXESUFFIX):
 	$(MAKE) -C support/graphics PREFIX=`pwd` install
 
-font2pv1000:
-	$(MAKE) -C support/pv1000
+bin/z88dk-basck$(EXESUFFIX):
+	$(MAKE) -C support/basck PREFIX=`pwd` install
+
+bin/z88dk-font2pv1000$(EXESUFFIX):
 	$(MAKE) -C support/pv1000 PREFIX=`pwd` install
 
-ticks:
-	$(MAKE) -C src/ticks
+bin/z88dk-ticks$(EXESUFFIX):
 	$(MAKE) -C src/ticks PREFIX=`pwd` install
 
-z88dk-lib:
-	$(MAKE) -C src/z88dk-lib
+bin/z88dk-lib$(EXESUFFIX):
 	$(MAKE) -C src/z88dk-lib PREFIX=`pwd` install
 
 

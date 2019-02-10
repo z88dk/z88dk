@@ -33,7 +33,7 @@ all: z80nm$(EXESUFFIX)
 z80nm$(EXESUFFIX):	$(OBJS)
 	$(CC) -o z80nm$(EXESUFFIX) $(CFLAGS) $(OBJS)
 
-install: 
+install:  z80nm$(EXESUFFIX)
 	$(INSTALL) z80nm$(EXESUFFIX) $(PREFIX)/bin/$(EXEC_PREFIX)z80nm$(EXESUFFIX)
 
 clean:
