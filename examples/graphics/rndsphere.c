@@ -13,9 +13,8 @@
 #include <stdlib.h>
 
 int x,y;
-long x1,n;
+long x1,n;   // with very small resolutions the int type will suffice
 int xc,yc;
-float r;
 
 void main()
 {
