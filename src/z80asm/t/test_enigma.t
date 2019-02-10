@@ -17,7 +17,7 @@ my $NUL 		= ($^O eq 'MSWin32') ? 'nul' : '/dev/null';
 my $CPM_DIR     = '../../ext/cpm';
 my $CPM         = '../../ext/cpm/cpm';
 my $TICKS_DIR	= '../ticks';
-my $TICKS		= '../ticks/ticks';
+my $TICKS		= '../ticks/z88dk-ticks';
 my $ENIGMA      = '../../examples/console/enigma.c';
 
 # build CP/M
