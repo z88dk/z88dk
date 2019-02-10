@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # font2pv1000 - convert 8x8 bitmap fonts/chars to pv-1000 format
 #-----------------------------------------------------------------------------
-PROJ		:= font2pv1000
+PROJ		:= z88dk-font2pv1000
 
 ifeq ($(OS),Windows_NT)
   EXE	:= .exe
@@ -58,6 +58,6 @@ clean::
 
 #------------------------------------------------------------------------------
 install: 
-	$(INSTALL) $(PROJ)$(EXESUFFIX) $(PREFIX)/bin/$(EXEC_PREFIX)$(PROJ)$(EXESUFFIX)
+	$(INSTALL) $(PROJ)$(EXESUFFIX) $(PREFIX)/bin/$(PROJ)$(EXESUFFIX)
 
 -include $(DEPENDS)

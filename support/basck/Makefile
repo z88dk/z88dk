@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
-# zpragma - Parse files and create zcc_opt.def
+# basck - find entry points in 8 bit basics
 #-----------------------------------------------------------------------------
-PROJ		:= z88dk-zpragma
+PROJ		:= z88dk-basck
 
 ifeq ($(OS),Windows_NT)
   EXE	:= .exe
@@ -57,7 +57,7 @@ clean::
 	$(RM) $(OBJS) $(DEPENDS) *.bak t/*.bak
 
 #------------------------------------------------------------------------------
-install: $(PROJ)$(EXE)
-	$(INSTALL) $(PROJ)$(EXE) $(PREFIX)/bin/$(PROJ)$(EXE)
+install: 
+	$(INSTALL) $(PROJ)$(EXESUFFIX) $(PREFIX)/bin/$(PROJ)$(EXESUFFIX)
 
 -include $(DEPENDS)

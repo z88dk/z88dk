@@ -38,7 +38,7 @@ Z88DK_PATH	= $(shell pwd)
 export CC INSTALL CFLAGS EXEC_PREFIX CROSS
 
 all: 	setup appmake copt zcpp ucpp sccz80 z80asm zcc zpragma zx7 z80nm zobjcopy \
-	lstmanip ticks z80svg font2pv1000 testsuite z88dk-lib zsdcc
+	lstmanip ticks z80svg font2pv1000 basck testsuite z88dk-lib zsdcc
 
 setup:
 	$(shell if [ "${git_count}" != "" ]; then \
@@ -124,6 +124,10 @@ lstmanip:
 z80svg:
 	$(MAKE) -C support/graphics
 	$(MAKE) -C support/graphics PREFIX=`pwd` install
+
+basck:
+	$(MAKE) -C support/basck
+	$(MAKE) -C support/basck PREFIX=`pwd` install
 
 font2pv1000:
 	$(MAKE) -C support/pv1000

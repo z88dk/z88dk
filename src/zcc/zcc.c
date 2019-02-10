@@ -267,13 +267,13 @@ static char  *c_aslink_exe = "aslink";
 
 static char  *c_clang_exe = "zclang";
 static char  *c_llvm_exe = "zllvm-cbe";
-static char  *c_sdcc_exe = EXEC_PREFIX "zsdcc";
+static char  *c_sdcc_exe = "zsdcc";
 static char  *c_sccz80_exe = EXEC_PREFIX "sccz80";
-static char  *c_cpp_exe = EXEC_PREFIX "ucpp";
-static char  *c_sdcc_preproc_exe = EXEC_PREFIX "zsdcpp";
-static char  *c_zpragma_exe = EXEC_PREFIX "zpragma";
-static char  *c_copt_exe = EXEC_PREFIX "copt";
-static char  *c_appmake_exe = EXEC_PREFIX "appmake";
+static char  *c_cpp_exe = "z88dk-ucpp";
+static char  *c_sdcc_preproc_exe = "zsdcpp";
+static char  *c_zpragma_exe = "z88dk-zpragma";
+static char  *c_copt_exe = "z88dk-copt";
+static char  *c_appmake_exe = "appmake";
 #ifndef WIN32
 static char  *c_copycmd = "cat";
 #else
@@ -971,9 +971,9 @@ int main(int argc, char **argv)
         char cmdline[FILENAME_MAX + 128];
 
 #ifdef _WIN32
-        snprintf(cmdline, FILENAME_MAX + 127, "zpragma < \"%s\" > nul", pragincname);
+        snprintf(cmdline, FILENAME_MAX + 127, "%s < \"%s\" > nul",c_zpragma_exe, pragincname);
 #else
-        snprintf(cmdline, FILENAME_MAX + 127, "zpragma < \"%s\" > /dev/null", pragincname);
+        snprintf(cmdline, FILENAME_MAX + 127, "%s < \"%s\" > /dev/null",c_zpragma_exe, pragincname);
 #endif
         if (verbose) printf("%s\n", cmdline);
         system(cmdline);

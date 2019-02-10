@@ -17,7 +17,7 @@ z88dk-dis$(EXESUFFIX):	$(DISOBJS)
 
 install:
 	$(INSTALL) ticks$(EXESUFFIX) $(PREFIX)/bin/$(EXEC_PREFIX)ticks$(EXESUFFIX)
-	$(INSTALL) z88dk-dis$(EXESUFFIX) $(PREFIX)/bin/$(EXEC_PREFIX)z88dk-dis$(EXESUFFIX)
+	$(INSTALL) z88dk-dis$(EXESUFFIX) $(PREFIX)/bin/z88dk-dis$(EXESUFFIX)
 
 clean:
 	$(RM) ticks$(EXESUFFIX) $(OBJS) core
