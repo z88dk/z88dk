@@ -42,7 +42,7 @@ eplibs: enterprise_clib.lib gfxep.lib gfxephr.lib
 
 cpclibs: cpc_clib.lib  cpcfs.lib cpc_math.lib
 
-z88libs: z88_math.lib  z88_clib.lib net.lib  
+z88libs: z88_math.lib  z88_clib.lib   
 
 tilibs: ti82_clib.lib ti83_clib.lib ti83p_clib.lib ti85_clib.lib ti86_clib.lib
 
@@ -181,13 +181,6 @@ z80_crt0.lib:
 	@echo ''
 	$(MAKE) -C z80_crt0s 
 
-
-# ZSock API (wrappers to package calls) - dom
-net.lib:
-	@echo ''
-	@echo '--- Building Z88 ZSock Library ---'
-	@echo ''
-	$(MAKE) -C net 
 
 # z88 library - dom
 z88_clib.lib: 
@@ -1388,7 +1381,6 @@ classic-clean:
 	$(MAKE) -C math clean
 	$(MAKE) -C graphics clean
 	$(MAKE) -C interrupts clean
-	$(MAKE) -C net clean
 	$(MAKE) -C rs232 clean
 	$(MAKE) -C setjmp clean
 	$(MAKE) -C spectrum clean

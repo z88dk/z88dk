@@ -25,10 +25,16 @@ CFILES = \
 AFILES  = $(CFILES:.c=.asm)
 OBJECTS = $(CFILES:.c=.o)
 
-all: $(OBJECTS)
+all: $(OBJECTS) net
 
 .c.o:
 	$(ZCC) +z88 $(CFLAGS) $*.c
 
+net:
+	$(MAKE) -C net
+
 clean:
 	$(RM) *.obj *.sym *.map *.o* *~ zcc_opt.def *.i $(AFILES)
+	$(MAKE) -C net clean
+
+.PHONY: net
