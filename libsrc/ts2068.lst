@@ -21,7 +21,7 @@ stdio/ansi/ts2068/f_ansi_scrollup
 time/spectrum/clock
 games/spectrum/joystick
 @games/games.lst
-@spectrum/spectrum.lst
+@target/zx/spectrum.lst
 @font/font_4x8/font_4x8.lst
 @font/font_8x8/font_8x8.lst
 target/ts2068/ts_vmod

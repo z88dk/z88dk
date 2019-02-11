@@ -212,7 +212,7 @@ zx_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(call buildgeneric,zx)
-	$(MAKE) -C spectrum
+	$(MAKE) -C target/zx
 	$(MAKE) -C games TARGET=zx
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zx_clib @$(LISTFILE_DIRECTORY)/zx.lst
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zxcpm @$(LISTFILE_DIRECTORY)/zxcpm.lst
@@ -233,7 +233,7 @@ ts2068_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(call buildgeneric,zx)
-	$(MAKE) -C spectrum
+	$(MAKE) -C target/zx
 	$(MAKE) -C games TARGET=zx
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORzx -DFORts2068 -DA80COL -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(LISTFILE_DIRECTORY)/ts2068.lst
 
@@ -349,7 +349,7 @@ pps_clib.lib:
 	$(MAKE) gfxdeps
 	$(call buildgeneric,pps)
 	$(MAKE) -C fcntl/sprinter
-	$(MAKE) -C spectrum 
+	$(MAKE) -C target/zx
 	$(MAKE) -C games TARGET=pps
 	TARGET=pps TYPE=z80 $(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pps_clib @$(LISTFILE_DIRECTORY)/pps.lst
 
@@ -738,7 +738,7 @@ sam_clib.lib:
 	$(MAKE) gfxdeps
 	$(call buildgeneric,sam)
 	$(MAKE) -C games TARGET=sam
-	$(MAKE) -C spectrum
+	$(MAKE) -C target/zx
 	TARGET=sam TYPE=z80 $(LIBLINKER) -DFORsam -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sam_clib @$(LISTFILE_DIRECTORY)/sam.lst
 
 # Spectravideo SVI library - Stefano
@@ -1383,7 +1383,6 @@ classic-clean:
 	$(MAKE) -C interrupts clean
 	$(MAKE) -C rs232 clean
 	$(MAKE) -C setjmp clean
-	$(MAKE) -C spectrum clean
 	$(MAKE) -C stdio clean
 	$(MAKE) -C stdlib clean
 	$(MAKE) -C strings clean

@@ -3,7 +3,7 @@
 #
 # $Id: Makefile,v 1.13 2016-10-26 13:03:31 stefano Exp $
 
-include ../Make.config
+include ../../Make.config
 
 
 all:
