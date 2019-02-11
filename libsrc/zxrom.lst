@@ -3,3 +3,5 @@ games/beeper
 stdio/spectrum/generic_console_scrollup
 stdio/spectrum/fgetc_cons_rom
 stdio/spectrum/getk_rom
+spectrum/tape/tape_load_block_callee_rom
+spectrum/tape/tape_save_block_callee_rom
