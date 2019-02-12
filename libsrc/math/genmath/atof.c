@@ -12,13 +12,13 @@
 
 /* decimal to (double) binary conversion */
 
-double atof(s)
-char s[];		/* s points to a character string */
+/* s points to a character string */
+double atof(char *s)
 {
 	double sum,		/* the partial result */
 		scale;		/* scale factor for the next digit */
 	double ten;
-	unsigned char *start,	/* copy if input pointer */
+	char *start,	/* copy if input pointer */
 		*end,		/* points to end of number */
 		c;			/* character from input line */
 	int minus,		/* nonzero if number is negative */
