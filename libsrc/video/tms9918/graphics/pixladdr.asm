@@ -4,6 +4,7 @@
 	PUBLIC	__tms9918_pixeladdress
 	PUBLIC	__tms9918_pix_return
 
+	EXTERN	__tms9918_attribute
 	EXTERN	l_tms9918_disable_interrupts
 	EXTERN	l_tms9918_enable_interrupts
 
@@ -82,6 +83,16 @@ IF VDP_CMD < 0
 	ld	(-VDP_CMD),a
 	ld	a,(__tms9918_pixelbyte)
 	ld	(-VDP_DATA),a
+	; And support colour as well
+	ld	a,e
+	ld	(-VDP_CMD),a
+	ld	a,d
+	add	$20		;Move to bitmap to colour
+	and	@00111111
+	or	@01000000
+	ld	(-VDP_CMD),a
+	ld	a,(__tms9918_attribute)
+	ld	(-VDP_DATA),a
 ELSE
         ld      bc,VDP_CMD
         out     (c),e
@@ -90,6 +101,16 @@ ELSE
         or      @01000000
         out     (c),a
         ld      a,(__tms9918_pixelbyte) ; Can it be optimized ? what about VDP timing ?
+        ld      bc,VDP_DATA
+        out     (c),a
+        ld      bc,VDP_CMD
+        out     (c),e
+        ld      a,d		; MSB of video mem ptr
+	add	$20
+        and     @00111111	; masked with "write command" bits
+        or      @01000000
+        out     (c),a
+	ld	a,(__tms9918_attribute)
         ld      bc,VDP_DATA
         out     (c),a
 ENDIF
