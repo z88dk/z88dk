@@ -34,7 +34,7 @@ extern void zclibcallop(void);
 extern char dopref(SYMBOL *sym);
 extern void callrts(char *sname);
 extern void zret(void);
-extern void callstk(Type *type, int n, int isfarptr);
+extern void callstk(Type *type, int n, int isfarptr, int last_argument_size);
 extern void jump(int label);
 extern void opjump(char *, int);
 extern void testjump(LVALUE *,int label);

@@ -43,8 +43,7 @@
 ._func3
 	ld	hl,_scall
 	push	hl
-	ld	hl,0	;const
-	call	l_gintspsp	;
+	push	hl
 	ld	hl,2	;const
 	ld	de,0
 	ex	de,hl

@@ -3926,3 +3926,10 @@
 =
 	ld	bc,%eval( %1 1 -)
 	add	hl,bc
+
+	push	hl
+	ld	hl,0	;const
+	call	l_gintspsp	;%1
+=
+	push	hl
+	push	hl

@@ -42,6 +42,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     int   save_fps_num;
     int   function_pointer_call = ptr == NULL ? YES : NO;
     int   savesp;
+    int   last_argument_size;
     enum symbol_flags builtin_flags = 0;
     char   *funcname = "(unknown)";
     Type   *functype = ptr ? ptr->ctype: fnptr_type->ptr;
@@ -229,7 +230,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
         //clearstage(before,start);
         if ( function_pointer_call == 0 && tmpfiles[argnumber+1] == NULL &&
             ( (functype->flags & FASTCALL) == FASTCALL || (builtin_flags & FASTCALL) == FASTCALL ) ) {
-                 /* fastcall of single expression OR the last argument of a builtin */
+            /* fastcall of single expression OR the last argument of a builtin */
         } else {
             if (argnumber == watcharg) {
                 if (ptr)
@@ -257,20 +258,24 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
                 }
             } else {
                 if (expr == KIND_LONG || expr == KIND_CPTR) {
-                    swap(); /* MSW -> hl */
-                    swapstk(); /* MSW -> stack, addr -> hl */
-                    zpushde(); /* LSW -> stack, addr = hl */
+                    if ( tmpfiles[argnumber+1] != NULL ) {
+                        swap(); /* MSW -> hl */
+                        swapstk(); /* MSW -> stack, addr -> hl */
+                        zpushde(); /* LSW -> stack, addr = hl */
+                    }
                     nargs += 4;
+                    last_argument_size = 4;
                 } else if (expr == KIND_DOUBLE) {
                     dpush_under(KIND_INT);
                     nargs += 6;
+                    last_argument_size = 6;
                     mainpop();
                 } else {
-                    /* If we've only got one 2 byte argment, don't swap the stack */
-                    if ( tmpfiles[argnumber+1] != NULL  || nargs != 0) {
+                    if ( tmpfiles[argnumber+1] != NULL ) {
                         swapstk();
                     }
                     nargs += 2;
+                    last_argument_size = 2;
                 }
             }
         }
@@ -310,7 +315,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             outname(funcname, dopref(ptr)); nl();
         }
     } else {
-        callstk(functype, nargs, fnptr_type->kind == KIND_CPTR);
+        callstk(functype, nargs, fnptr_type->kind == KIND_CPTR, last_argument_size);
     }
 
     if (functype->flags & CALLEE ) {

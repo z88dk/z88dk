@@ -492,6 +492,9 @@ static void parse_trailing_modifiers(Type *type)
     }
     while (1) {
         if (amatch("__z88dk_fastcall") || amatch("__FASTCALL__")) {
+            if( type->parameters && array_len(type->parameters) != 1 ) {
+                warningfmt("sdcc-compat", "SDCC only supports a single parameter for __z88dk_fastcall\n");
+            }
             type->flags |= FASTCALL;
             type->flags &= ~FLOATINGDECL;
         } else if (amatch("__z88dk_callee") || amatch("__CALLEE__")) {

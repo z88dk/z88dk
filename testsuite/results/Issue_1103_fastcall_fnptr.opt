@@ -11,16 +11,14 @@
 ._test1
 	ld	hl,_func_fcall
 	push	hl
-	ld	d,h
-	ld	e,l
-	ld	hl,1	;const
-	ld	bc,i_2
 	push	hl
+	ld	hl,1	;const
+	pop	af
+	ld	bc,i_2
 	push	bc
-	push	de
+	push	af
 	ret
 .i_2
-	pop	bc
 	pop	bc
 	ret
 
@@ -29,8 +27,7 @@
 ._test2
 	ld	hl,_func
 	push	hl
-	ld	hl,0	;const
-	call	l_gintspsp	;
+	push	hl
 	ld	hl,1	;const
 	ex	(sp),hl
 	call	l_jphl
@@ -43,8 +40,7 @@
 ._test3
 	ld	hl,_func_callee
 	push	hl
-	ld	hl,0	;const
-	call	l_gintspsp	;
+	push	hl
 	ld	hl,1	;const
 	ex	(sp),hl
 	call	l_jphl
