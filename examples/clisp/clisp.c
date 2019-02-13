@@ -493,6 +493,27 @@ main(void)
 #endif
 #endif
 
+#if defined(SHORT)||defined(MINIMALISTIC)||defined(TINYMEM)||defined(LARGEMEM)||defined(GRAPHICS)
+printf("Build opt: [ ");
+#ifdef SHORT
+printf("SHORT ");
+#endif
+#ifdef MINIMALISTIC
+printf("MINIMALISTIC ");
+#endif
+#ifdef TINYMEM
+printf("TINYMEM ");
+#endif
+#ifdef LARGEMEM
+printf("LARGEMEM ");
+#endif
+#ifdef GRAPHICS
+printf("GRAPHICS ");
+#endif
+printf("]\n");
+#endif
+
+
 #ifdef INITONLY
   printf("\n...memory structures ready.\n");
 #else
@@ -1291,13 +1312,13 @@ fcall(long f, long av[2])  /*, int n*/
 	pen_down();
     break;
   case KW_RIGHT:
-	turn_right(int_get_c(av[0]));
+	turn_right((int)int_get_c(av[0]));
     break;
   case KW_LEFT:
-	turn_left(int_get_c(av[0]));
+	turn_left((int)int_get_c(av[0]));
     break;
   case KW_FWD:
-	fwd(int_get_c(av[0]));
+	fwd((int)int_get_c(av[0]));
     break;
 #endif
 
