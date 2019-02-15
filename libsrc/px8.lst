@@ -28,3 +28,4 @@ stdio/ansi/px8/f_ansi_char
 stdio/ansi/px8/f_ansi_cls
 stdio/ansi/generic/f_ansi_dline
 stdio/ansi/px8/f_ansi_scrollup
+stdio/ansi/px8/_font_8x6_px
