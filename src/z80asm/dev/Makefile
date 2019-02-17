@@ -7,6 +7,13 @@
 #
 # Makefile to generate C files, to be called from the .. directory
 
+# EXESUFFIX is passed when cross-compiling Win32 on Linux
+ifeq ($(OS),Windows_NT)
+  EXESUFFIX 		:= .exe
+else
+  EXESUFFIX 		?=
+endif
+
 ASTYLE = astyle \
 	--mode=c \
 	--lineend=linux \

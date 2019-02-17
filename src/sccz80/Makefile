@@ -4,6 +4,13 @@
 # $Id: Makefile,v 1.17 2016-07-10 16:09:00 dom Exp $
 #
 
+# EXESUFFIX is passed when cross-compiling Win32 on Linux
+ifeq ($(OS),Windows_NT)
+  EXESUFFIX 		:= .exe
+else
+  EXESUFFIX 		?=
+endif
+
 INSTALL ?= install
 
 OBJS =	callfunc.o     	\

@@ -1,6 +1,14 @@
 #------------------------------------------------------------------------------
 # z88dk z80nm Makefile
 #------------------------------------------------------------------------------
+
+# EXESUFFIX is passed when cross-compiling Win32 on Linux
+ifeq ($(OS),Windows_NT)
+  EXESUFFIX 		:= .exe
+else
+  EXESUFFIX 		?=
+endif
+
 include ../Make.common
 
 SRCS 		:= $(wildcard *.c) \
@@ -21,7 +29,7 @@ CFLAGS += -Wall -std=gnu11 -MMD -std=gnu11 -I../common -I../../ext/uthash/src -I
 INSTALL ?= install
 
 # Use these flags both in Windows_NT and in a MinGW build in Unix
-ifeq ($(EXE),.exe)
+ifeq ($(EXESUFFIX),.exe)
 CFLAGS	+= \
 -I../../ext/getopt 
 OBJS	+= \

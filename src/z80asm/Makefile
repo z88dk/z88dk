@@ -7,6 +7,13 @@
 #------------------------------------------------------------------------------
 PROJ		:= z80asm
 
+# EXESUFFIX is passed when cross-compiling Win32 on Linux
+ifeq ($(OS),Windows_NT)
+  EXESUFFIX 		:= .exe
+else
+  EXESUFFIX 		?=
+endif
+
 include ../Make.common
 
 CC 		?= gcc
@@ -26,7 +33,7 @@ TEST_SRC_LIB	:= t/testlib.c
 #------------------------------------------------------------------------------
 # variables
 #------------------------------------------------------------------------------
-TARGET 		= $(PROJ)$(EXE)
+TARGET 		= $(PROJ)$(EXESUFFIX)
 MSVC_TARGET 	= ../../win32/Debug/$(TARGET)
 
 OPT 		= -O3
@@ -95,7 +102,7 @@ clean::
 #------------------------------------------------------------------------------
 # intall
 #------------------------------------------------------------------------------
-install:
+install: $(TARGET) z80asm_lib
 	$(INSTALL) $(TARGET)     $(PREFIX)/bin/$(EXEC_PREFIX)$(TARGET)
 	$(INSTALL) asmpp.pl      $(PREFIX)/bin/asmpp.pl
 	$(MAKE) -C dev/z80asm_lib install PREFIX=$(PREFIX_SHARE)
@@ -126,13 +133,13 @@ t/libtestlib.a : $(OBJS) $(TEST_SRC_LIB:.c=.o)
 $(TEST_SRC_MAIN:.c=.o) : t/libtestlib.a
 
 .o.out :
-	$(CC) $(CFLAGS) $< -o $(<:.o=$(EXE)) $(LDFLAGS) -Lt -ltestlib
-	$(<:.o=$(EXE)) 2> $@~
+	$(CC) $(CFLAGS) $< -o $(<:.o=$(EXESUFFIX)) $(LDFLAGS) -Lt -ltestlib
+	$(<:.o=$(EXESUFFIX)) 2> $@~
 	diff -w $(<:.o=.bmk) $@~
 	mv -f $@~ $@
 
 clean::
-	$(RM) t/libtestlib.a t/*.o t/*.out lib/t/*.o lib/t/*.out $(TEST_SRC_MAIN:.c=$(EXE))
+	$(RM) t/libtestlib.a t/*.o t/*.out lib/t/*.o lib/t/*.out $(TEST_SRC_MAIN:.c=$(EXESUFFIX))
 
 test: $(TARGET) z80asm_lib
 	$(MAKE) dev

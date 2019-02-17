@@ -6,6 +6,8 @@
 #
 
 # ---> Configurable parameters are below his point
+
+# EXESUFFIX is passed when cross-compiling Win32 on Linux
 ifeq ($(OS),Windows_NT)
   EXESUFFIX 		:= .exe
 else
@@ -77,56 +79,55 @@ bin/zsdcc$(EXESUFFIX):
 	cd $(SDCC_PATH) && mv ./bin/sdcpp $(Z88DK_PATH)/bin/zsdcpp
 	$(RM) -fR $(SDCC_PATH)
 
-bin/appmake$(EXESUFFIX):
+bin/appmake$(EXESUFFIX): $(wildcard src/appmake/*.c src/appmake/*.h)
 	$(MAKE) -C src/appmake PREFIX=`pwd` install
 
-bin/z88dk-copt$(EXESUFFIX):
+bin/z88dk-copt$(EXESUFFIX): $(wildcard src/copt/*.c src/copt/*.h)
 	$(MAKE) -C src/copt PREFIX=`pwd` install
 
-bin/z88dk-ucpp$(EXESUFFIX):
+bin/z88dk-ucpp$(EXESUFFIX): $(wildcard src/ucpp/*.c src/ucpp/*.h)
 	$(MAKE) -C src/ucpp PREFIX=`pwd` install
 
-bin/z88dk-zcpp$(EXESUFFIX):
+bin/z88dk-zcpp$(EXESUFFIX): $(wildcard src/cpp/*.c src/cpp/*.h)
 	$(MAKE) -C src/cpp PREFIX=`pwd` install
 
-bin/sccz80$(EXESUFFIX):
+bin/sccz80$(EXESUFFIX): $(wildcard src/sccz80/*.c src/sccz80/*.h)
 	$(MAKE) -C src/sccz80 PREFIX=`pwd` install
 
-bin/z80asm$(EXESUFFIX):
-	$(MAKE) -C src/z80asm
+bin/z80asm$(EXESUFFIX): $(wildcard src/z80asm/*.c src/z80asm/*.h)
 	$(MAKE) -C src/z80asm PREFIX=`pwd` PREFIX_SHARE=`pwd` install
 
-bin/zcc$(EXESUFFIX):
+bin/zcc$(EXESUFFIX): $(wildcard src/zcc/*.c src/zcc/*.h)
 	$(MAKE) -C src/zcc PREFIX=`pwd` install
 
-bin/z88dk-zpragma$(EXESUFFIX):
+bin/z88dk-zpragma$(EXESUFFIX): $(wildcard src/zpragma/*.c src/zpragma/*.h)
 	$(MAKE) -C src/zpragma PREFIX=`pwd` install
 
-bin/z88dk-zx7$(EXESUFFIX):
+bin/z88dk-zx7$(EXESUFFIX): $(wildcard src/zx7/*.c src/zx7/*.h)
 	$(MAKE) -C src/zx7 PREFIX=`pwd` install
 
-bin/z80nm$(EXESUFFIX):
+bin/z80nm$(EXESUFFIX): $(wildcard src/z80nm/*.c src/z80nm/*.h)
 	$(MAKE) -C src/z80nm PREFIX=`pwd` install
 
-bin/zobjcopy$(EXESUFFIX):
+bin/zobjcopy$(EXESUFFIX): $(wildcard src/zobjcopy/*.c src/zobjcopy/*.h)
 	$(MAKE) -C src/zobjcopy PREFIX=`pwd` install
 
-bin/z88dk-lstmanip$(EXESUFFIX):
+bin/z88dk-lstmanip$(EXESUFFIX): $(wildcard src/lstmanip/*.c src/lstmanip/*.h)
 	$(MAKE) -C src/lstmanip PREFIX=`pwd` install
 
-bin/z88dk-z80svg$(EXESUFFIX):
+bin/z88dk-z80svg$(EXESUFFIX): $(wildcard support/graphics/*.c support/graphics/*.h)
 	$(MAKE) -C support/graphics PREFIX=`pwd` install
 
-bin/z88dk-basck$(EXESUFFIX):
+bin/z88dk-basck$(EXESUFFIX): $(wildcard support/basck/*.c support/basck/*.h)
 	$(MAKE) -C support/basck PREFIX=`pwd` install
 
-bin/z88dk-font2pv1000$(EXESUFFIX):
+bin/z88dk-font2pv1000$(EXESUFFIX): $(wildcard support/pv1000/*.c support/pv1000/*.h)
 	$(MAKE) -C support/pv1000 PREFIX=`pwd` install
 
-bin/z88dk-ticks$(EXESUFFIX):
+bin/z88dk-ticks$(EXESUFFIX): $(wildcard src/ticks/*.c src/ticks/*.h)
 	$(MAKE) -C src/ticks PREFIX=`pwd` install
 
-bin/z88dk-lib$(EXESUFFIX):
+bin/z88dk-lib$(EXESUFFIX): $(wildcard src/z88dk-lib/*.c src/z88dk-lib/*.h)
 	$(MAKE) -C src/z88dk-lib PREFIX=`pwd` install
 
 

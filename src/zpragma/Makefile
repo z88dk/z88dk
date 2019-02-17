@@ -3,10 +3,11 @@
 #-----------------------------------------------------------------------------
 PROJ		:= z88dk-zpragma
 
+# EXESUFFIX is passed when cross-compiling Win32 on Linux
 ifeq ($(OS),Windows_NT)
-  EXE	:= .exe
+  EXESUFFIX 		:= .exe
 else
-  EXE 	:= $(EXESUFFIX)
+  EXESUFFIX 		?=
 endif
 
 CC			?= gcc
@@ -28,28 +29,28 @@ DEPENDS		:= $(SRCS:.c=.d) $(T_SRCS:.c=.d)
 
 #------------------------------------------------------------------------------
 define MAKE_EXE
-all: $(1)$(EXE)
+all: $(1)$(EXESUFFIX)
 
-$(1)$(EXE): $(2)
-	$(CC) $(CFLAGS) -o $(1)$(EXE) $(2) $(LDFLAGS)
+$(1)$(EXESUFFIX): $(2)
+	$(CC) $(CFLAGS) -o $(1)$(EXESUFFIX) $(2) $(LDFLAGS)
 	
 clean::
-	$(RM) $(1)$(EXE) $(2)
+	$(RM) $(1)$(EXESUFFIX) $(2)
 
-test:: $(1)$(EXE)
+test:: $(1)$(EXESUFFIX)
 ifeq ($(3),1)
-	./$(1)$(EXE)
+	./$(1)$(EXESUFFIX)
 endif
 
-valgrind:: $(1)$(EXE)
-	$(VALGRIND) $(1)$(EXE)
+valgrind:: $(1)$(EXESUFFIX)
+	$(VALGRIND) $(1)$(EXESUFFIX)
 endef
 
 #------------------------------------------------------------------------------
 $(eval $(call MAKE_EXE,$(PROJ),$(OBJS_ALL),0))
 
 #------------------------------------------------------------------------------
-test:: $(PROJ)$(EXE)
+test:: $(PROJ)$(EXESUFFIX)
 	perl -S prove t/*.t
 
 #------------------------------------------------------------------------------
@@ -57,7 +58,7 @@ clean::
 	$(RM) $(OBJS) $(DEPENDS) *.bak t/*.bak
 
 #------------------------------------------------------------------------------
-install: $(PROJ)$(EXE)
-	$(INSTALL) $(PROJ)$(EXE) $(PREFIX)/bin/$(PROJ)$(EXE)
+install: $(PROJ)$(EXESUFFIX)
+	$(INSTALL) $(PROJ)$(EXESUFFIX) $(PREFIX)/bin/$(PROJ)$(EXESUFFIX)
 
 -include $(DEPENDS)
