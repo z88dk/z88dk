@@ -2,7 +2,7 @@ Library file test.lib at $0000: Z80LMF12
 Object  file test.lib at $0010: Z80RMF12
   Deleted...
 
-Object  file test.lib at $0361: Z80RMF12
+Object  file test.lib at $0385: Z80RMF12
   Name: file1
   Section text_1: 63 bytes, ORG $0000
     C $0000: 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10
@@ -40,11 +40,12 @@ Object  file test.lib at $0361: Z80RMF12
     E Cw $0000 $0001: msg2-msg1 (section data_1) (file file1.asm:231)
     E =  $0000 $0000: _start := start1 (section text_1) (file file1.asm:321)
     E BW $0000 $0001: start1 (section text_1) (file file1.asm:231)
+    E Jb $0000 $0001: start1 (section text_1) (file file1.asm:456)
 
-Object  file test.lib at $06B2: Z80RMF12
+Object  file test.lib at $06FA: Z80RMF12
   Deleted...
 
-Object  file test.lib at $0A03: Z80RMF12
+Object  file test.lib at $0A6F: Z80RMF12
   Name: file1
   Section text_1: 63 bytes, ORG $0000
     C $0000: 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10
@@ -82,4 +83,5 @@ Object  file test.lib at $0A03: Z80RMF12
     E Cw $0000 $0001: msg2-msg1 (section data_1) (file file1.asm:231)
     E =  $0000 $0000: _start := start1 (section text_1) (file file1.asm:321)
     E BW $0000 $0001: start1 (section text_1) (file file1.asm:231)
+    E Jb $0000 $0001: start1 (section text_1) (file file1.asm:456)
 

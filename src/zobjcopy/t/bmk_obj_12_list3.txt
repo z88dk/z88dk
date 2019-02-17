@@ -1,4 +1,4 @@
-Object  file test.o at $0000: Z80RMF11
+Object  file test.o at $0000: Z80RMF12
   Name: file1
   Section text_1: 63 bytes, ORG $0000
   Section text_2: 64 bytes, ALIGN 16
@@ -25,3 +25,4 @@ Object  file test.o at $0000: Z80RMF11
     E Cw $0000 $0001: msg2-msg1 (section data_1) (file file1.asm:231)
     E =  $0000 $0000: _start := start1 (section text_1) (file file1.asm:321)
     E BW $0000 $0001: start1 (section text_1) (file file1.asm:231)
+    E Jb $0000 $0001: start1 (section text_1) (file file1.asm:456)
