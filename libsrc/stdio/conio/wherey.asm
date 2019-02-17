@@ -10,7 +10,7 @@ EXTERN __console_x
 .wherey
 ._wherey
 
-	ld	a,(__console_x)
+	ld	a,(__console_y)
 	ld	l,a
 	ld	h,0
 	ret
