@@ -168,8 +168,14 @@ static char *remove_mingw_prefix(char *str)
 			str += strlen(root);
 		}
 		else if (isalpha(str[0]) && str[1] == ':' && str[2] == '/') {
-			// if MinGW, convert path C:/... to /c/...
-			str[1] = tolower(str[0]); str[0] = '/';
+			// if MinGW/msys/1.0, convert path C:/... to /C/... with upper case drive letter
+			// if msys2,          convert path C:/... to /c/... with lower case drive letter
+			if (substr_iseq(root + strlen(root) - 8, 8, "msys/1.0")) {	
+				str[1] = toupper(str[0]); str[0] = '/';
+			}
+			else {
+				str[1] = tolower(str[0]); str[0] = '/';
+			}
 		}
 	}
 
