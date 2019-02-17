@@ -37,6 +37,7 @@ obj/${TYPE}/math/integer/small/l_small_divu_32_32x32
 obj/${TYPE}/math/integer/small/l_small_divu_64_64x8
 obj/${TYPE}/math/integer/small/l_small_divu_64_64x64
 obj/${TYPE}/math/integer/small/l_small_mul_16_16x16
+obj/${TYPE}/math/integer/small/l_small_mul_32_16x16
 obj/${TYPE}/math/integer/small/l_small_mul_32_32x32
 obj/${TYPE}/math/integer/small/l_small_mul_40_32x8
 obj/${TYPE}/math/integer/small/l_small_mul_64_32x32

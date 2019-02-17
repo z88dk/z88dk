@@ -80,7 +80,8 @@ int main(int argc, char **argv)
         usage();
     }
 
-    if ( output && ( outp = fopen(output,"w") ) == NULL ) {
+	/* binary to write LF EOL consitent with .gitattribures */
+    if ( output && ( outp = fopen(output,"wb") ) == NULL ) { 
         fprintf(stderr,"Cannot open outputfile <%s>\n",output);
         exit(1);
     }
@@ -118,7 +119,8 @@ static void read_list_file(char *filename)
 
     snprintf(filen, sizeof(filen),"%s%s", strncmp(filename, newlibpath, strlen(newlibpath)) == 0 ? "" : newlibpath, filename);
 
-    if ( (fp = fopen(filen,"r")) == NULL ) {
+	/* binary to accept any EOL */
+    if ( (fp = fopen(filen,"rb")) == NULL ) {	
         fprintf(stderr, "Cannot open file <%s>\n",filen);
         return;
     }
@@ -166,8 +168,8 @@ static char *remove_mingw_prefix(char *str)
 			str += strlen(root);
 		}
 		else if (isalpha(str[0]) && str[1] == ':' && str[2] == '/') {
-			// if MinGW, convert path c:/... to /c/...
-			str[1] = str[0]; str[0] = '/';
+			// if MinGW, convert path C:/... to /c/...
+			str[1] = tolower(str[0]); str[0] = '/';
 		}
 	}
 
