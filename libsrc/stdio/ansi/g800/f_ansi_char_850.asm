@@ -40,17 +40,10 @@ IF USE_ATTR
 	EXTERN	g850_attr
 ENDIF
 
-	
 
 
 defc SCREENMODE_VISIBLECURSOR_MASK=0x01
 defc SCREENMODE_VISIBLECURSOR_BIT=0
-
-;
-; Screen size
-;
-
-
 
 
 
@@ -807,7 +800,8 @@ clear_region0:
 	ld (HL), ' '
 IF USE_ATTR
 	; Delete one attribute
-	ld BC, (CONSOLE_COLUMNS * 8 + 8)
+	;ld BC, (CONSOLE_COLUMNS * 8 + 8)
+	ld	bc,attr-vram
 	add HL, BC
 	ld (HL), 0
 ENDIF
@@ -830,7 +824,8 @@ IF USE_ATTR
 	; Delete attribute
 	pop HL
 	pop DE
-	ld BC, (CONSOLE_COLUMNS * 8 + 8)
+	;ld BC, (CONSOLE_COLUMNS * 8 + 8)
+	ld	bc,attr-vram
 	add HL, BC
 	ex DE, HL
 	add HL, BC
@@ -862,7 +857,8 @@ IF USE_ATTR
 	ldir
 	pop HL
 	pop DE
-	ld BC, (CONSOLE_COLUMNS * 8 + 8)
+	;ld BC, (CONSOLE_COLUMNS * 8 + 8)
+	ld	bc,attr-vram
 	add HL, BC
 	ex DE, HL
 	add HL, BC
@@ -870,7 +866,8 @@ IF USE_ATTR
 	pop BC
 	ldir
 
-	ld BC, -(CONSOLE_COLUMNS * 8 + 8)
+	;ld BC, -(CONSOLE_COLUMNS * 8 + 8)
+	ld	bc,-(attr-vram)
 	add HL, BC
 	ex DE, HL
 	add HL, BC
