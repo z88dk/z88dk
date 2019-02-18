@@ -42,7 +42,7 @@ export CC INSTALL CFLAGS EXEC_PREFIX CROSS
 all: 	setup bin/appmake$(EXESUFFIX) bin/z88dk-copt$(EXESUFFIX) bin/z88dk-zcpp$(EXESUFFIX) \
 	bin/z88dk-ucpp$(EXESUFFIX) bin/sccz80$(EXESUFFIX) bin/z80asm$(EXESUFFIX) \
 	bin/zcc$(EXESUFFIX) bin/z88dk-zpragma$(EXESUFFIX) bin/z88dk-zx7$(EXESUFFIX) \
-	bin/z80nm$(EXESUFFIX) bin/zobjcopy$(EXESUFFIX) bin/z88dk-lstmanip$(EXESUFFIX) \
+	bin/z80nm$(EXESUFFIX) bin/zobjcopy$(EXESUFFIX)  \
 	bin/z88dk-ticks$(EXESUFFIX) bin/z88dk-z80svg$(EXESUFFIX) \
 	bin/z88dk-font2pv1000$(EXESUFFIX) bin/z88dk-basck$(EXESUFFIX) \
 	testsuite bin/z88dk-lib$(EXESUFFIX) bin/zsdcc$(EXESUFFIX)
@@ -112,10 +112,8 @@ bin/z80nm$(EXESUFFIX): $(wildcard src/z80nm/*.c src/z80nm/*.h)
 bin/zobjcopy$(EXESUFFIX): $(wildcard src/zobjcopy/*.c src/zobjcopy/*.h)
 	$(MAKE) -C src/zobjcopy PREFIX=`pwd` install
 
-bin/z88dk-lstmanip$(EXESUFFIX): $(wildcard src/lstmanip/*.c src/lstmanip/*.h)
-	$(MAKE) -C src/lstmanip PREFIX=`pwd` install
-
 bin/z88dk-z80svg$(EXESUFFIX): $(wildcard support/graphics/*.c support/graphics/*.h)
+	$(MAKE) -C support/graphics PREFIX=`pwd` install
 	$(MAKE) -C support/graphics PREFIX=`pwd` install
 
 bin/z88dk-basck$(EXESUFFIX): $(wildcard support/basck/*.c support/basck/*.h)
@@ -147,7 +145,6 @@ install: install-clean
 	$(MAKE) -C src/zpragma PREFIX=$(DESTDIR)/$(prefix) install
 	$(MAKE) -C src/zx7 PREFIX=$(DESTDIR)/$(prefix) install
 	$(MAKE) -C src/z80nm PREFIX=$(DESTDIR)/$(prefix) install
-	$(MAKE) -C src/lstmanip PREFIX=$(DESTDIR)/$(prefix) install
 	$(MAKE) -C src/ticks PREFIX=$(DESTDIR)/$(prefix) install
 	$(MAKE) -C src/z88dk-lib PREFIX=$(DESTDIR)/$(prefix) install
 	$(MAKE) -C support/graphics PREFIX=$(DESTDIR)/$(prefix) install
@@ -182,7 +179,6 @@ clean-bins:
 	$(MAKE) -C src/common clean
 	$(MAKE) -C src/copt clean
 	$(MAKE) -C src/cpp clean
-	$(MAKE) -C src/lstmanip clean
 	$(MAKE) -C src/sccz80 clean
 	$(MAKE) -C src/ticks clean
 	$(MAKE) -C src/ucpp clean
