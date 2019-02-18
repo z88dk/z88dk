@@ -114,7 +114,6 @@ bin/zobjcopy$(EXESUFFIX): $(wildcard src/zobjcopy/*.c src/zobjcopy/*.h)
 
 bin/z88dk-z80svg$(EXESUFFIX): $(wildcard support/graphics/*.c support/graphics/*.h)
 	$(MAKE) -C support/graphics PREFIX=`pwd` install
-	$(MAKE) -C support/graphics PREFIX=`pwd` install
 
 bin/z88dk-basck$(EXESUFFIX): $(wildcard support/basck/*.c support/basck/*.h)
 	$(MAKE) -C support/basck PREFIX=`pwd` install

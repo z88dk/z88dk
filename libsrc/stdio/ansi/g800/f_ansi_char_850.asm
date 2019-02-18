@@ -15,8 +15,9 @@
 ;	$Id: f_ansi_char_850.asm $
 ;
 
+
 	SECTION  code_clib	
-		
+
 	PUBLIC	ansi_CHAR
 	
 	EXTERN	__console_w
@@ -34,31 +35,15 @@
 	PUBLIC	init_screen
 	PUBLIC	scroll_up
 	PUBLIC	screenmode
-
-;ATTR_REVERSE_MASK=0x01
-;ATTR_REVERSE_BIT=0
-;ATTR_UNDERLINE_MASK=0x02
-;ATTR_UNDERLINE_BIT=1
-;ATTR_BLINK_MASK=0x04
-;ATTR_BLINK_BIT=2
-;ATTR_BOLD_MASK=0x08
-;ATTR_BOLD_BIT=3
-;ATTR_KANJIH_BIT=4
-;ATTR_KANJIH_MASK=0x10
-;ATTR_KANJIL_BIT=5
-;ATTR_KANJIL_MASK=0x20
-
 	
+IF USE_ATTR
+	EXTERN	g850_attr
+ENDIF
+
 
 
 defc SCREENMODE_VISIBLECURSOR_MASK=0x01
 defc SCREENMODE_VISIBLECURSOR_BIT=0
-
-;
-; Screen size
-;
-
-
 
 
 
@@ -73,6 +58,14 @@ _print_char:
 	push DE
 	call vram_addr
 	ld (HL), A
+	
+IF USE_ATTR
+	ld	de,attr-vram
+	add hl,de
+	ld	a,(g850_attr)
+	ld	(hl),a
+ENDIF
+
 	pop DE
 	call update_vcell
 ;	pop HL
@@ -310,6 +303,7 @@ ENDIF
 	xor H
 	ld C, A
 	ret
+	
 IF USE_ATTR
 font_bold:
 	defb 0, 0
@@ -806,7 +800,8 @@ clear_region0:
 	ld (HL), ' '
 IF USE_ATTR
 	; Delete one attribute
-	ld BC, (CONSOLE_COLUMNS * 8 + 8)
+	;ld BC, (CONSOLE_COLUMNS * 8 + 8)
+	ld	bc,attr-vram
 	add HL, BC
 	ld (HL), 0
 ENDIF
@@ -829,7 +824,8 @@ IF USE_ATTR
 	; Delete attribute
 	pop HL
 	pop DE
-	ld BC, (CONSOLE_COLUMNS * 8 + 8)
+	;ld BC, (CONSOLE_COLUMNS * 8 + 8)
+	ld	bc,attr-vram
 	add HL, BC
 	ex DE, HL
 	add HL, BC
@@ -861,7 +857,8 @@ IF USE_ATTR
 	ldir
 	pop HL
 	pop DE
-	ld BC, (CONSOLE_COLUMNS * 8 + 8)
+	;ld BC, (CONSOLE_COLUMNS * 8 + 8)
+	ld	bc,attr-vram
 	add HL, BC
 	ex DE, HL
 	add HL, BC
@@ -869,7 +866,8 @@ IF USE_ATTR
 	pop BC
 	ldir
 
-	ld BC, -(CONSOLE_COLUMNS * 8 + 8)
+	;ld BC, -(CONSOLE_COLUMNS * 8 + 8)
+	ld	bc,-(attr-vram)
 	add HL, BC
 	ex DE, HL
 	add HL, BC

@@ -1,3 +1,9 @@
+
+;
+; This is rather a 4x6 pixel font, the extra spacing dots are added by the display driver.
+;
+
+
 SECTION rodata_font
 SECTION rodata_font_8x8
 
