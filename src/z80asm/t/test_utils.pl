@@ -10,6 +10,7 @@
 #-----------------------------------------------------------------------------
 
 use Modern::Perl;
+use Config;
 use Path::Tiny;
 use File::Slurp;
 use Capture::Tiny::Extended 'capture';
@@ -489,7 +490,7 @@ sub t_compile_module {
 	$compile_args .= " lib/alloc.o ";
 	
 	# wait for previous run to finish
-	while (-f 'test.exe' && ! unlink('test.exe')) {
+	while (-f 'test'.$Config{_exe} && ! unlink('test'.$Config{_exe})) {
 		sleep(1);
 	}
 	
@@ -575,7 +576,7 @@ int main (int argc, char **argv)
 	write_file("test.c", $main_code);
 
 	# build
-	my $cc = "gcc $CFLAGS -O0 -o test.exe test.c $compile_args $LDFLAGS";
+	my $cc = "gcc $CFLAGS -O0 -o test$Config{_exe} test.c $compile_args $LDFLAGS";
 	note "line ", (caller)[2], ": $cc";
 	
 	my $ok = (0 == system($cc));
@@ -588,8 +589,8 @@ int main (int argc, char **argv)
 sub t_run_module {
 	my($args, $expected_out, $expected_err, $expected_exit) = @_;
 	
-	note "line ", (caller)[2], ": test.exe @$args";
-	my($out, $err, $exit) = capture { system("./test.exe", @$args) };
+	note "line ", (caller)[2], ": test$Config{_exe} @$args";
+	my($out, $err, $exit) = capture { system("./test$Config{_exe}", @$args) };
 	note "line ", (caller)[2], ": exit ", $exit >> 8;
 	
 	$err = normalize($err);
