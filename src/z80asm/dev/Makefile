@@ -56,6 +56,7 @@ parse_rules.h : parse_rules.rl tokens.h scan_def.h \
 all:: t/opcodes.t
 
 t/opcodes.t: dev/build_opcodes.pl dev/build_opcodes.asm dev/Makefile
+	$(MAKE) -C dev/z80pack-1.21/z80asm
 	perl dev/build_opcodes.pl
 
 #------------------------------------------------------------------------------
