@@ -709,7 +709,7 @@ sub get_gcc_options {
 		}
 	}
 	
-	return @FLAGS{qw( LOCAL_CFLAGS LOCAL_CXXFLAGS LDFLAGS )};
+	return map {$_ // ''} @FLAGS{qw( LOCAL_CFLAGS LOCAL_CXXFLAGS LDFLAGS )};
 };
 
 1;
