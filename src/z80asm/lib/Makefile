@@ -10,11 +10,23 @@
 
 TARGET		= libclibrary.a
 
-include ../../Make.common
+# EXESUFFIX is passed when cross-compiling Win32 on Linux
+ifeq ($(OS),Windows_NT)
+  EXESUFFIX 		:= .exe
+else
+  EXESUFFIX 		?=
+endif
+
+# UNIXem is needed in both Windows_NT and in a MinGW build in Unix
+ifeq ($(EXESUFFIX),.exe)
+  UNIXem_CFLAGS	:= -I../../../ext/UNIXem/include
+  UNIXem_OBJS	:=   ../../../ext/UNIXem/src/glob.o \
+				     ../../../ext/UNIXem/src/dirent.o
+endif
 
 CC		= gcc
 CFLAGS		+= -g -Wall -Wextra -MMD -I. -I../../common -I../../../ext/uthash/src \
-		   $(UNIXem_CFLAGS)\
+		   $(UNIXem_CFLAGS) \
 		   $(OPTFLAGS)
 LDLIBS		+= $(OPTLIBS) $(TARGET)
 PREFIX  	?= /usr/local

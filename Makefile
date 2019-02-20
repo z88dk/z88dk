@@ -6,6 +6,8 @@
 #
 
 # ---> Configurable parameters are below his point
+
+# EXESUFFIX is passed when cross-compiling Win32 on Linux
 ifeq ($(OS),Windows_NT)
   EXESUFFIX 		:= .exe
 else
@@ -37,13 +39,17 @@ Z88DK_PATH	= $(shell pwd)
 
 export CC INSTALL CFLAGS EXEC_PREFIX CROSS
 
-all: 	setup bin/appmake$(EXESUFFIX) bin/z88dk-copt$(EXESUFFIX) bin/z88dk-zcpp$(EXESUFFIX) \
+ALL = setup bin/appmake$(EXESUFFIX) bin/z88dk-copt$(EXESUFFIX) bin/z88dk-zcpp$(EXESUFFIX) \
 	bin/z88dk-ucpp$(EXESUFFIX) bin/sccz80$(EXESUFFIX) bin/z80asm$(EXESUFFIX) \
 	bin/zcc$(EXESUFFIX) bin/z88dk-zpragma$(EXESUFFIX) bin/z88dk-zx7$(EXESUFFIX) \
 	bin/z80nm$(EXESUFFIX) bin/zobjcopy$(EXESUFFIX)  \
 	bin/z88dk-ticks$(EXESUFFIX) bin/z88dk-z80svg$(EXESUFFIX) \
 	bin/z88dk-font2pv1000$(EXESUFFIX) bin/z88dk-basck$(EXESUFFIX) \
-	testsuite bin/z88dk-lib$(EXESUFFIX) bin/zsdcc$(EXESUFFIX)
+	testsuite bin/z88dk-lib$(EXESUFFIX) 
+ALL_EXT = bin/zsdcc$(EXESUFFIX)
+
+.PHONY: $(ALL)
+all: 	$(ALL) $(ALL_EXT)
 
 setup:
 	$(shell if [ "${git_count}" != "" ]; then \
@@ -93,7 +99,6 @@ bin/sccz80$(EXESUFFIX):
 	$(MAKE) -C src/sccz80 PREFIX=`pwd` install
 
 bin/z80asm$(EXESUFFIX):
-	$(MAKE) -C src/z80asm
 	$(MAKE) -C src/z80asm PREFIX=`pwd` PREFIX_SHARE=`pwd` install
 
 bin/zcc$(EXESUFFIX):

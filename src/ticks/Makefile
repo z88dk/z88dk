@@ -1,4 +1,11 @@
 
+# EXESUFFIX is passed when cross-compiling Win32 on Linux
+ifeq ($(OS),Windows_NT)
+  EXESUFFIX 		:= .exe
+else
+  EXESUFFIX 		?=
+endif
+
 OBJS = ticks.o hook_console.o hook_io.o hook_misc.o hook.o debugger.o linenoise.o utf8.o syms.o disassembler_alg.o memory.o
 
 
