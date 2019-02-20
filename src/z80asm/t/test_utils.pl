@@ -60,7 +60,8 @@ sub unlink_testfiles {
 		diag "$line -keep : kept test files";
 	}
 	else {
-		_unlink_files($line, @TEST_FILES, @additional_files, <test*.bin>, <test*.reloc>);
+		_unlink_files($line, @TEST_FILES, @additional_files, 
+					  'test'.$Config{_exe}, <test*.bin>, <test*.reloc>);
 	}
 }
 
