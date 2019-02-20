@@ -4,8 +4,14 @@ Concise Record of Changes to Z88DK Releases
 z88dk vx.x.x - xx.xx.xxxx
 
 - [appmake] Autobooting +3 discs can now be created
+- [appmake] MSX-DOS format discs can now be created
+- [classic] Interrupt handlers can now be added on many targets
 - [classic] Sony SMC-70/SMC-777 support added via +cpm -subtype=smc777
 - [classic] Toshiba Pasopia 7 support added
+- [classic] TMS9918 platforms now support Modes 0 and 1 for gencon
+- [classic] +spc1000: Graphics are now supported on the TMS9928
+- [classic] +cpm: -subtype=kaypro83 - two graphics modes
+- [classic] +cpm: Improved getk() behaviour
 - [zsdcc] Upgraded to 3.8.5 r10892
 
 z88dk v1.99C - 19.01.2019
