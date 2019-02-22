@@ -70,7 +70,7 @@ if (Test::More->builder->is_passing) {
 	ok 0==system($cmd), $cmd;
 
 	# cleanup output
-	$output = path('enigma.out')->slurp_raw;
+	my $output = path('enigma.out')->slurp_raw;
 	for ($output) {
 		s/^Ticks:\s*\d+\s*//m;
 		s/\r\n/\n/g;
