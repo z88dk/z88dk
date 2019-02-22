@@ -4,13 +4,13 @@
 
 # EXESUFFIX is passed when cross-compiling Win32 on Linux
 ifeq ($(OS),Windows_NT)
-  EXE 		:= .exe
+  EXESUFFIX 		:= .exe
 else
-  EXE 		:= $(EXESUFFIX)
+  EXESUFFIX 		?=
 endif
 
 # UNIXem is needed in both Windows_NT and in a MinGW build in Unix
-ifeq ($(EXE),.exe)
+ifeq ($(EXESUFFIX),.exe)
   UNIXem_CFLAGS	:= -I../../ext/UNIXem/include
   UNIXem_OBJS	:= ../../ext/UNIXem/src/glob.o \
 		   ../../ext/UNIXem/src/dirent.o
