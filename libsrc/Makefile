@@ -1048,6 +1048,15 @@ pv2000_clib.lib:
 	$(MAKE) -C video/tms9918 TARGET=pv2000
 	TARGET=pv2000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORpv2000 -x$(OUTPUT_DIRECTORY)/pv2000_clib @$(LISTFILE_DIRECTORY)/pv2000.lst
 
+# Bandai Supervision 8000 - dom
+sv8000_clib.lib:
+	@echo ''
+	@echo '--- Building Bandai Supervision 8000 Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(call buildgeneric,sv8000)
+	TARGET=sv8000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsv8000 -x$(OUTPUT_DIRECTORY)/sv8000_clib @$(LISTFILE_DIRECTORY)/sv8000.lst
+
 # Colecovision - dom/stefano
 coleco_clib.lib:
 	@echo ''
