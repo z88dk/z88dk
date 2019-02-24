@@ -505,6 +505,14 @@ IF FORz80tvgame
 	defc blankch = 32
 ENDIF
 
+IF FORsv8000
+	DEFINE gotgfx
+	defc maxx = 256
+	defc maxy = 96
+	defc blankch = 32
+ENDIF
+
+
 ; =============================================
 
 

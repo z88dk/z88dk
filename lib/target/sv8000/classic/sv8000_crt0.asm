@@ -25,6 +25,10 @@
 
         defc    CONSOLE_COLUMNS = 32
         defc    CONSOLE_ROWS = 16
+	PUBLIC	GRAPHICS_CHAR_SET
+	PUBLIC	GRAPHICS_CHAR_UNSET
+	defc	GRAPHICS_CHAR_SET = 160
+	defc	GRAPHICS_CHAR_UNSET = 32
 
         defc    CRT_ORG_BSS = 0x8000
         defc    CRT_ORG_CODE = 0x0000
@@ -137,6 +141,16 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
         ENDIF
         INCLUDE "crt/classic/crt_section.asm"
 
+IF CLIB_DISABLE_MODE0 = 1
+        PUBLIC  plot_MODE0
+        PUBLIC  res_MODE0
+        PUBLIC  xor_MODE0
+        PUBLIC  pointxy_MODE0
+        defc    plot_MODE0 = noop
+        defc    res_MODE0 = noop
+        defc    xor_MODE0 = noop
+        defc    pointxy_MODE0 = noop
+ENDIF
 
 IF CLIB_DISABLE_MODE1 = 1
         PUBLIC  vpeek_MODE1
