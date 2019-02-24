@@ -1,3 +1,10 @@
 stdio/sv8000/generic_console
+stdio/sv8000/generic_console_ioctl
+stdio/sv8000/generic_console_vpeek
+stdio/sv8000/printc_MODE1
+stdio/sv8000/vpeek_MODE1
+stdio/sv8000/conio_vars
+stdio/sv8000/CRT_FONT
 @stdio/stdio.lst
+@font/font_8x8/font_8x8.lst
 @z80.lst
