@@ -93,6 +93,7 @@ restart18:
 restart20:
 restart28:
 restart30:
+noop:
 	ret
 
 program:
@@ -135,3 +136,22 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
             defc __crt_model = 1
         ENDIF
         INCLUDE "crt/classic/crt_section.asm"
+
+
+IF CLIB_DISABLE_MODE1 = 1
+        PUBLIC  vpeek_MODE1
+        PUBLIC  printc_MODE1
+        PUBLIC  plot_MODE1
+        PUBLIC  res_MODE1
+        PUBLIC  xor_MODE1
+        PUBLIC  pointxy_MODE1
+        PUBLIC  pixeladdress_MODE1
+	EXTERN	vpeek_noop
+        defc    vpeek_MODE1 = vpeek_noop
+        defc    printc_MODE1 = noop
+        defc    plot_MODE1 = noop
+        defc    res_MODE1 = noop
+        defc    xor_MODE1 = noop
+        defc    pointxy_MODE1 = noop
+        defc    pixeladdress_MODE1 = noop
+ENDIF
