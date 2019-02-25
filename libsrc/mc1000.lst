@@ -9,7 +9,6 @@ stdio/mc1000/printc_MODE1
 stdio/mc1000/printc_MODE2
 stdio/mc1000/vpeek_MODE1
 stdio/mc1000/vpeek_MODE2
-stdio/mc1000/vpeek_screendollar
 stdio/mc1000/conio_vars
 stdio/mc1000/CRT_FONT
 stdio/ansi/mc1000/f_ansi_attr

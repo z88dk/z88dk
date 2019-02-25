@@ -9,7 +9,6 @@ stdio/gal/conio_vars
 stdio/gal/printc_MODE1
 stdio/gal/vpeek_MODE1
 stdio/gal/scrollup_MODE1
-stdio/gal/vpeek_screendollar
 @stdio/stdio.lst
 target/gal/scrolluptxt
 target/gal/scrolldowntxt

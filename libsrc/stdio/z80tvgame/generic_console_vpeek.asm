@@ -3,7 +3,6 @@
 
 	PUBLIC		generic_console_vpeek
 
-        EXTERN          vpeek_screendollar
 	EXTERN		generic_console_xypos_graphics
         EXTERN          screendollar
         EXTERN          screendollar_with_count
@@ -53,7 +52,6 @@ vpeek_1:
 	inc	h
 no_overflow:
 	djnz	vpeek_1
-vpeek_screendollar:
         pop     de              ;the buffer on the stack
         ld      hl,(generic_console_font32)
         call    screendollar

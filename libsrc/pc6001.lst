@@ -10,7 +10,6 @@ stdio/pc6001/vpeek_MODE1
 stdio/pc6001/vpeek_MODE2
 stdio/pc6001/printc_MODE1
 stdio/pc6001/printc_MODE2
-stdio/pc6001/vpeek_screendollar
 @stdio/ansicore.lst
 stdio/ansi/pc6001/f_ansi_attr
 stdio/ansi/pc6001/f_ansi_bel
