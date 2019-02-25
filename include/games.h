@@ -251,6 +251,12 @@ extern const unsigned char *joystick_type[];
 	#define GAME_DEVICES 4
 #endif
 
+#ifdef __SV8000_
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = {"Joystick R", "Joystick L" };
+#endif
+	#define GAME_DEVICES 2
+#endif
 
 #ifdef __ACE__
 #ifdef DEFINE_JOYSTICK_TYPE

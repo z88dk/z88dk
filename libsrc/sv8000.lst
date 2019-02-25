@@ -37,4 +37,7 @@ psg/sv8000/set_psg_callee
 psg/sv8000/get_psg
 psg/sv8000/psg_init
 @psg/psg.lst
+games/sv8000/joystick
+games/obj/sv8000/joystick_type
+@games/games.lst
 @z80.lst

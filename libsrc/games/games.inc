@@ -209,6 +209,12 @@ IF FORz80tvgame
 ENDIF
 
 ; Compatibily ones only, the following ports don't have a beeper
+IF FORsv8000
+        defc sndbit_port   = 0
+        defc sndbit_bit    = 0
+        defc sndbit_mask   = 0
+ENDIF
+
 IF FOReinstein
         defc sndbit_port   = 0
         defc sndbit_bit    = 0

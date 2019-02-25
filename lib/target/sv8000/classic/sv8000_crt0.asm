@@ -106,16 +106,21 @@ program:
 	call    crt0_init_bss
 	ld	(exitsp),sp
     	ei
-	; Reset to text mode
+	; Enable AY ports
 	ld	a,7
 	out	($c1),a
 	ld	a,$7f
 	out	($c0),a
 	
+	; Reset to text mode
 	ld	a,14
 	out	($c1),a
 	ld	a,0
 	out	($c0),a
+
+	; Enable keyboard scanning
+	ld	a,$92
+	out	($83),a
 	
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of
