@@ -1,0 +1,116 @@
+; MSX-DOS2 command and error codes
+; Source: http://map.grauw.nl/resources/dos2_environment.php
+;         http://map.grauw.nl/resources/dos2_functioncalls.php
+
+	; Error codes
+	defc	_FFIRST = $40
+	defc	_FNEXT  = $41
+	defc	_FNEW	= $42
+	defc	_OPEN	= $43
+	defc	_CREATE = $44
+	defc	_CLOSE	= $45
+	defc	_ENSURE = $46
+	defc	_DUP	= $47
+	defc	_READ	= $48
+	defc	_WRITE	= $49
+	defc	_SEEK	= $4a
+	defc	_IOCTL	= $4b
+	defc	_HTEST	= $4c
+	defc	_DELETE	= $4d
+	defc	_RENAME	= $4e
+	defc	_MOVE	= $4f
+	defc	_ATTR	= $50
+	defc	_FTIME	= $51
+	defc	_HDELETE = $52
+	defc	_HRENAME = $53
+	defc	_HMOVE	= $54
+	defc	_HATTR	= $55
+	defc	_HFTIME = $56
+	defc	_GETDTA	= $57
+	defc	_GETVFY = $58
+	defc	_GETCD	= $59
+	defc	_CHDIR	= $5a
+	defc	_PARSE	= $5b
+	defc	_PFILE	= $5c
+	defc	_CHLCHR	= $5d
+	defc	_WPATH	= $5e
+	defc	_FLUSH	= $5f
+	defc	_FORK	= $60
+	defc	_JOIN	= $61
+	defc	_TERM	= $62
+	defc	_DEFAB	= $63
+	defc	_DEFER	= $64
+	defc	_ERROR	= $65
+	defc	_EXPLAIN = $66
+	defc	_FORMAT	= $67
+	defc	_RAMD	= $68
+	defc	_BUFFER	= $69
+	defc	_ASSIGN	= $6a
+	defc	_GENV	= $6b
+	defc	_SENV	= $6c
+	defc	_FENV	= $6d
+	defc	_DSKCHK	= $6e
+	defc	_DOSVER	= $6f
+	defc	_REDIR	= $70
+
+	; Error codes
+
+	; Disk errors
+	defc	E_NCOMP	= $ff
+	defc	E_WRERR	= $fe
+	defc	E_DISK	= $fd
+	defc	E_NRDY	= $fc
+	defc	E_VERFY	= $fb
+	defc	E_DATA	= $fa
+	defc	E_RNF	= $f9
+	defc	E_WPROT	= $f8
+	defc	E_UFORM	= $f7
+	defc	E_NDOS	= $f6
+	defc	E_WDISK	= $f5
+	defc	E_WFILE	= $f4
+	defc	E_SEEK	= $f3
+	defc	E_IFAT	= $f2
+	defc	E_NOUPB	= $f1
+	defc	E_IFORM	= $f0
+
+	; MSX-DOS function errors
+	defc	E_INTER	= $df
+	defc	E_NORAM	= $de
+	defc	E_IBDOS	= $dc
+	defc	E_IDRV	= $db
+	defc	E_IFNM	= $da
+	defc	E_IPATH	= $d9
+	defc	E_PLONG	= $d8
+	defc	E_NOFIL	= $d7
+	defc	E_NODIR	= $d6
+	defc	E_DRFUL	= $d5
+	defc	E_DKFUL = $d4
+	defc	E_DUPF	= $d3
+	defc	E_DIRE	= $d2
+	defc	E_FILRO	= $d1
+	defc	E_DIRNE	= $d0
+	defc	E_IATTR	= $cf
+	defc	E_DOT	= $ce
+	defc	E_SYSX	= $cd
+	defc	E_DIRX	= $cc
+	defc	E_FILEX	= $cb
+	defc	E_FOPEN	= $ca
+	defc	E_OV64K	= $c9
+	defc	E_FILE	= $c8
+	defc	E_EOF	= $c7
+	defc	E_ACCV	= $c6
+	defc	E_IPROC	= $c5
+	defc	E_NHAND	= $c4
+	defc	E_IHAND	= $c3
+	defc	E_NOPEN	= $c2
+	defc	E_IDEV	= $c1
+	defc	E_IENV	= $c0
+	defc	E_ELONG	= $bf
+	defc	E_IDATE	= $be
+	defc	E_ITIME	= $bd
+	defc	E_RAMDX	= $bc
+	defc	E_NRAMD	= $bb
+	defc	E_HDEAD	= $ba
+	defc	E_EOL	= $b9
+	defc	E_ISBFN	= $b8
+
