@@ -442,9 +442,9 @@ ENDIF
 
 IF FORpacman
 	DEFINE gotgfx
-	defc maxx	= 56
+	defc maxx	= 84
 	defc maxy	= 72
-	defc blankch	= 30
+	defc blankch	= 192
 ENDIF
 
 IF FORpv1000
