@@ -1,13 +1,13 @@
 ;
 ;       Generic pseudo graphics routines for text-only platforms
 ;
-;       PacMan Hardware port by Stefano Bodrato, 2017
+;       Written by Stefano Bodrato 07/09/2007
 ;
 ;
 ;       Get pixel at (x,y) coordinate.
 ;
 ;
-;	$Id:$
+;	$Id: pointxy.asm $
 ;
 
 
@@ -18,7 +18,7 @@
 
 			EXTERN  textpixl
 			EXTERN  __gfx_coords
-			EXTERN	char_address
+			EXTERN  base_graphics
 
 
 .pointxy
@@ -34,20 +34,29 @@
 			push	hl			
 			
 			ld	(__gfx_coords),hl
-
+			
 			;push	bc
 
-			ld	c,a	
+			ld	c,l
 			ld	b,h
 
 			push	bc
-
-			srl	b	; x/2
-			srl	c	; y/2
 			
-			
-			call	char_address
-
+			srl	b
+			srl	c
+			ld	hl,(base_graphics)
+			ld	a,c
+			ld	c,b	; !!
+			and	a
+			ld	b,a
+			ld	de,maxx/2
+			jr	z,r_zero
+.r_loop
+			add	hl,de
+			djnz	r_loop
+.r_zero						; hl = char address
+			ld	e,c
+			add	hl,de
 			
 			ld	a,(hl)		; get current symbol
 
