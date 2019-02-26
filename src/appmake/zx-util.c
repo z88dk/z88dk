@@ -2254,8 +2254,8 @@ int zx_plus3(struct zx_common *zxc, struct zx_tape *zxt)
     writestring_b(tbuf, &ptr);
     writebyte_b(0x0d, &ptr);	/* ENTER (end of BASIC line) */
     len = ptr - buffer;
-    buffer[2] = len % 256; 
-    buffer[3] = len / 256; 
+    buffer[2] = (len-4) % 256; 
+    buffer[3] = (len-4) / 256; 
 
     // And now we can write the file
     file_buf = zx3_layout_file(buffer, len, 10, 0, &file_len);
