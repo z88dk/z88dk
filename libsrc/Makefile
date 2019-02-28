@@ -1,4 +1,4 @@
-#
+
 #
 # Ah, that'd be nice, a library makefile!
 #
@@ -766,6 +766,7 @@ msx_clib.lib:
 	$(MAKE) msxdeps
 	$(call buildgeneric,msx)
 	$(MAKE) -C fcntl/cpm
+	$(MAKE) -C fcntl/msxdos2
 	$(RM) games/msx/*.o
 	$(MAKE) -C games TARGET=msx
 	$(MAKE) -C target/msx 
