@@ -9,6 +9,12 @@
                 defc CRT_ORG_CODE = $100   ; MSXDOS
         ENDIF
 
+	IF !DEFINED_MSXDOS
+		defc MSXDOS = 5
+	ENDIF
+	PUBLIC MSXDOS
+
+
 	org CRT_ORG_CODE
 
 ;----------------------
@@ -63,15 +69,6 @@ ENDIF
         call    _main		;Call user code
 	pop	bc	;kill argv
 	pop	bc	;kill argc
-
-	ld	a,(defltdsk)	;Restore default disc
-	ld	($F306),a
-	;ld	e,a
-	;ld	c,14
-	;call	5
-	ld	ix,$d2	; TOTEXT - force text mode on exit
-	call	msxbios
-;**
 	
 cleanup:
 ;
@@ -84,8 +81,8 @@ IF CRT_ENABLE_STDIO = 1
 ENDIF
 
 start1:
-        ld      sp,0
-        ret
+	ld	sp,0
+	jp	0
 
 l_dcal:
         jp      (hl)
