@@ -81,6 +81,7 @@ IF CRT_ENABLE_STDIO = 1
 ENDIF
 
 start1:
+	ld	sp,0
 	jp	0
 
 l_dcal:

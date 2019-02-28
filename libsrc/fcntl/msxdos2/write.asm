@@ -18,7 +18,6 @@
 	push	de
 	push	hl
 	push	af
-	ld	b,c
 	ld	c,_WRITE
 	call	MSXDOS
 	ld	(msxdos_error),a
