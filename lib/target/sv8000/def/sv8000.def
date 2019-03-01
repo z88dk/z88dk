@@ -1,0 +1,9 @@
+
+
+	defc	DISPLAY = $c000
+
+	; ag = css = $10
+	; gm2 = $40
+	; gm1 = gm0 = $8
+	defc	MODE_0 = $00
+	defc	MODE_1 = $5a
