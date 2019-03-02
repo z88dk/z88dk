@@ -200,6 +200,7 @@ struct container {
 } containers[] = {
     { "dsk",        ".dsk", "CPC extended .dsk format",    disc_write_edsk },
     { "d88",        ".D88", "d88 format",                  disc_write_d88 },
+    { "ana",        ".dump", "Anadisk format",             disc_write_anadisk },
     { "raw",        ".img", "Raw image",                   disc_write_raw },
     { NULL, NULL, NULL }
 };
@@ -442,6 +443,75 @@ int disc_write_d88(disc_handle* h, const char* filename)
     fclose(fp);
     return 0;
 }
+
+int disc_write_anadisk(disc_handle* h, const char* filename)
+{
+    char    title[18];
+    uint8_t *ptr;
+    size_t offs;
+    FILE* fp;
+    int i, j, s;
+    int sector_size = 0;
+    int track_length = h->spec.sector_size * h->spec.sectors_per_track;
+
+
+    if ((fp = fopen(filename, "wb")) == NULL) {
+        return -1;
+    }
+
+
+    i = h->spec.sector_size;
+    while (i > 128) {
+        sector_size++;
+        i /= 2;
+    }
+
+    for (i = 0; i < h->spec.tracks; i++) {
+        for (s = 0; s < h->spec.sides; s++) {
+
+            if ( h->spec.alternate_sides == 0 ) {
+                offs = track_length * i + (s * track_length * h->spec.tracks);
+            } else {
+                offs = track_length * ( 2* i + s);
+            }
+            for (j = 0; j < h->spec.sectors_per_track; j++) {
+                uint8_t header[8] = { 0 };
+
+
+                int sect = j; // TODO: Skew
+                if ( h->spec.has_skew && i + (i*h->spec.sides) >= h->spec.skew_track_start ) {
+                    for ( sect = 0; sect < h->spec.sectors_per_track; sect++ ) {
+                    if ( h->spec.skew_tab[sect] == j ) break;
+                    }
+                }
+
+                // Track header:
+                // physical cylinder
+                // physical head
+                // cylinder
+                // head
+                // secotr number
+                // size code
+                // length (little endian) word
+                header[0] = i;
+                header[1] = s;
+                header[2] = i;
+                header[3] = s;
+                header[4] = sect + h->spec.first_sector_offset;
+                header[5] = sector_size;
+                header[6] = h->spec.sector_size % 256;
+                header[7] = h->spec.sector_size / 256;
+
+                fwrite(header, 8, 1, fp);
+                fwrite(h->image + offs + (sect * h->spec.sector_size), h->spec.sector_size, 1, fp);
+            }
+        }
+    }
+    fclose(fp);
+    return 0;
+}
+
+
 
 // CP/M routines
 static int first_free_extent(disc_handle* h)

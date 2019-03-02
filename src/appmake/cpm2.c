@@ -274,6 +274,27 @@ static disc_spec plus3_spec = {
 };
 
 
+static disc_spec bic_spec = {
+    .name = "A1505/BIC",
+    .sectors_per_track = 5,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 1024,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 4,
+    .directory_entries = 128,
+    .alternate_sides = 1,
+    .extent_size = 2048,
+    .byte_size_extents = 0,
+    .first_sector_offset = 1,
+};
+
+
+
+
+
+
 
 
 
@@ -287,7 +308,8 @@ static struct formats {
      void          *bootsector;
      char           force_com_extension;
 } formats[] = {
-    { "attache",   "Otrona Attache'",     &attache_spec, 0, NULL, 1 },
+    { "attache",   "Otrona Attache'",    &attache_spec, 0, NULL, 1 },
+    { "bic",       "BIC / A5105",	 &bic_spec, 0, NULL, 1 },
     { "cpcsystem", "CPC System Disc",    &cpcsystem_spec, 0, NULL, 0 },
     { "col1",      "Coleco ADAM 40T SSDD", &col1_spec, 0, NULL, 1 },
     { "dmv",       "NCR Decision Mate",  &dmv_spec, 16, "\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5NCR F3", 1 },

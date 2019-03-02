@@ -60,6 +60,7 @@ extern disc_writer_func disc_get_writer(const char *container_name, const char *
 extern int disc_write_raw(disc_handle *h, const char *filename);
 extern int disc_write_edsk(disc_handle *h, const char *filename);
 extern int disc_write_d88(disc_handle *h, const char *filename);
+extern int disc_write_anadisk(disc_handle* h, const char* filename);
 extern void disc_print_writers(FILE *fp);
 
 
