@@ -8,6 +8,9 @@
 	PUBLIC	SETRD
 	PUBLIC	_SETRD
 
+        EXTERN  l_tms9918_disable_interrupts
+        EXTERN  l_tms9918_enable_interrupts
+
 	INCLUDE	"video/tms9918/vdp.inc"
 
 ;==============================================================
@@ -19,7 +22,7 @@
 ;==============================================================
 .SETRD
 ._SETRD
-	di
+	call	l_tms9918_disable_interrupts
 	ld      a,l
 IF VDP_CMD < 0
 	ld	(-VDP_CMD),a
@@ -34,5 +37,5 @@ IF VDP_CMD < 0
 ELSE
 	out	(c),a
 ENDIF
-	ei
+	call	l_tms9918_enable_interrupts
 	ret
