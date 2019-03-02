@@ -31,6 +31,7 @@
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
 
+		EXTERN		generic_console_flags
 		EXTERN		conio_map_colour
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
@@ -93,7 +94,16 @@ generic_console_printc:
 	call	xypos
 	ld	(hl),a
 	set	6,h
+	ld	a,(generic_console_flags)
+	rlca
 	ld	a,(__super80_attr)
+	jr	nc,place
+	; Invert by inverting the colours
+	rlca
+	rlca
+	rlca
+	rlca
+place:
 	ld	(hl),a
 	ret
 
