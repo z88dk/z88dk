@@ -21,7 +21,7 @@ int initials(const char *dropname, Type *type)
     // We can only use rodata_compile (i.e. ROM if double string isn't enabled)
     if ( (type->isconst && !c_double_strings) ||
         ( (ispointer(type) || type->kind == KIND_ARRAY) && 
-		(type->ptr->isconst || (ispointer(type->ptr) && type->ptr->ptr->isconst) ) ) ) {
+		(type->ptr->isconst || ((ispointer(type->ptr) || type->ptr->kind == KIND_ARRAY) && type->ptr->ptr->isconst) ) ) ) {
         output_section(c_rodata_section);
     } else {
         output_section(c_data_section);
