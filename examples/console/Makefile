@@ -1,5 +1,5 @@
 
-TARGETS = abc80 abc800 ace alphatro aquarius bee c128 c7420 coleco cpc cpm enterprise fp1100 g800 gal kc lambda laser500 lynx m5 mc1000 msx mtx multi8 mz nascom nc newbrain osca oz p2000 pacman pasopia7 pc6001 pps pv1000 pv2000 rcmx000 rx78 sam sc3000 sos spc1000 srr svi test ti82 ti83 ti85 ti86 ti8x trs80 ts2068 vg5k vz x07 x1 z1013 z9001 z88 zx zx80 zx81 
+TARGETS = abc80 abc800 ace alphatro aquarius bee c128 c7420 coleco cpc cpm enterprise fp1100 g800 gal kc lambda laser500 lynx m5 mc1000 msx mtx multi8 mz nascom nc newbrain osca oz p2000 pacman pasopia7 pc6001 pps pv1000 pv2000 rcmx000 rx78 sam sc3000 sos spc1000 srr sv8000 svi test ti82 ti83 ti85 ti86 ti8x trs80 ts2068 vg5k vz x07 x1 z1013 z9001 z88 zx zx80 zx81 
 
 TARGETANSI = abc80 ace aquarius bee cpc gal mc1000 msx mtx mz nascom osca p2000 pc6001 pps sam sc3000 svi ti82 ti83 ti85 ti86 ti8x ts2068 vz x1 z1013 z88 zx z9001
 
