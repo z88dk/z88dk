@@ -17,6 +17,49 @@ static int SetMiniFunc(unsigned char* arg, uint32_t* format_option_ptr);
 static Kind ForceArgs(Type *dest, Type *src, int isconst);
 
 
+/* msys2 tmpfile() is broken:
+   it creates the temporary file in the root directory of C:\ 
+   and therefore needs elevated privileges.
+   It returns NULL and sets errno to EACCES when run 
+   with normal privileges.
+   This causes the sccz80 compiler to generate wrong code.
+*/
+#ifdef _WIN32
+#  include <time.h>
+#  define my_tmpfile    w32_tmpfile
+#else
+#  define my_tmpfile    tmpfile
+#endif
+ 
+#ifdef _WIN32
+static FILE* w32_tmpfile()
+{
+    static char tmpnambuf[] = "sccz80XXXX";
+    static int  inited = 0;
+    char        *tmpnam;
+    FILE        *fp;
+    
+    if (!inited) {
+        /* Randomize temporary filenames for windows */
+        snprintf(tmpnambuf, sizeof(tmpnambuf), 
+                 "sccz80%04X", ((unsigned int)time(NULL)) & 0xffff);
+        inited = 1;
+    }
+
+    if ((tmpnam = _tempnam(".\\", tmpnambuf)) == NULL) {
+        fprintf(stderr, "Failed to create temporary filename\n");
+        exit(1);
+    }
+
+    if ((fp = fopen(tmpnam, "w+")) == NULL) {
+        perror(tmpnam);
+        exit(1);
+    }
+    
+    return fp;
+}
+#endif
+   
 /*
  *      Perform a function call
  *
@@ -76,7 +119,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             break;
         }
         argnumber++;
-        tmpfiles[argnumber] = tmpfile();
+        tmpfiles[argnumber] = my_tmpfile();
         push_buffer_fp(tmpfiles[argnumber]);
 
         setstage(&before, &start);
