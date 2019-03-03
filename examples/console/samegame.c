@@ -13,6 +13,7 @@
 
 
 #ifdef __SV8000__
+#pragma redirect CRT_FONT=_font_8x8_bbc_system
 #define USE_UDGS 1
 #define JOYSTICK_NUM 1
 #define ARENA_W 20
