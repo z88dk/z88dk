@@ -1,5 +1,6 @@
 stdio/conio/wherex
 stdio/conio/wherey
+stdio/conio/cputs
 stdio/conio/gotoxy
 stdio/conio/gotoxy_callee
 stdio/conio/screensize
