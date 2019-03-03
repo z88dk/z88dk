@@ -34,7 +34,6 @@
 #define BALL 3
 #define BOX 4
 
-extern unsigned char levels[];
 
 /* Mapping between block numbers and ascii characters */
 static const char blocks[] = { ' ', 'X', '@', '#', '$' };
@@ -402,7 +401,7 @@ main()
   gotoxy(0,0);
   cputs("DSTAR TERMINAL");
   playgame(); /* Play the game */
-  return;
+  return 0;
 }
 
 static void playgame()
@@ -592,7 +591,9 @@ static int checkfinish()
 static void setuplevel()
 {
   int y, x;
-  unsigned char *ptr, *ptr2;
+  const unsigned char *ptr;
+  unsigned char *ptr2;
+
   ptr2 = board;
   ptr = &levels[level][0];
   /* ptr points to start of level now */
