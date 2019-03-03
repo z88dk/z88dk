@@ -15,6 +15,6 @@
         and     a
         ld      hl, 15
         ret     z
-        ld      hl,91
+        ld      hl,95
         ret
 
