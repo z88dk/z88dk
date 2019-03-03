@@ -7,11 +7,14 @@ z88dk vx.x.x - xx.xx.xxxx
 - [appmake] MSX-DOS format discs can now be created
 - [classic] Interrupt handlers can now be added on many targets
 - [classic] Sony SMC-70/SMC-777 support added via +cpm -subtype=smc777
-- [classic] Toshiba Pasopia 7 support added
+- [classic] +pasopia7 Toshiba Pasopia 7 support added
+- [classic] +sv8000 Badai Supervision 8000 support added
+- [classic] +msx: MSXDOS2 library available via -subtype=msxdos2
 - [classic] TMS9918 platforms now support Modes 0 and 1 for gencon
 - [classic] +spc1000: Graphics are now supported on the TMS9928
 - [classic] +cpm: -subtype=kaypro83 - two graphics modes
 - [classic] +cpm: Improved getk() behaviour
+- [classic] Targets can now register interrupt handlers
 - [zsdcc] Upgraded to 3.8.5 r10892
 
 z88dk v1.99C - 19.01.2019
