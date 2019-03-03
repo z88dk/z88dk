@@ -36,7 +36,7 @@
 
 
 /* Mapping between block numbers and ascii characters */
-static const char blocks[] = { ' ', 'X', '@', '#', '$' };
+static const unsigned char blocks[] = { ' ', 'X', '@', '#', '$' };
 static unsigned char balloffset; /* Ball position */
 static unsigned char boxoffset;  /* Box position */
 static unsigned char ballorbox;  /* 1 if box, 0 if ball */
@@ -379,14 +379,14 @@ static const unsigned char levels[][38] = {
 static void playgame();
 static void setupgame();
 static void gamekeys();
-static void left(char* ptr);
-static void right(char* ptr);
-static void down(char* ptr);
-static void up(char* ptr);
+static void left(unsigned char *ptr);
+static void right(unsigned char *ptr);
+static void down(unsigned char *ptr);
+static void up(unsigned char *ptr);
 static void setuplevel();
 static void drawboard();
 static int checkfinish();
-static int standardmiddle(char nextpos);
+static int standardmiddle(unsigned char nextpos);
 
 int
 main()
@@ -487,9 +487,9 @@ static void gamekeys()
  * will only comment the first one - it's fairly obvious what is
  * happening though
  */
-static void left(char* ptr)
+static void left(unsigned char *ptr)
 {
-  unsigned char* locn;
+  unsigned char *locn;
 
   while (1) {
     locn = *(ptr) + board;
@@ -502,7 +502,7 @@ static void left(char* ptr)
   }
 }
 
-static void right(char* ptr)
+static void right(unsigned char *ptr)
 {
   unsigned char* locn;
 
@@ -517,9 +517,9 @@ static void right(char* ptr)
   }
 }
 
-static void down(char* ptr)
+static void down(unsigned char *ptr)
 {
-  unsigned char* locn;
+  unsigned char *locn;
 
   while (1) {
     locn = *(ptr) + board;
@@ -532,9 +532,9 @@ static void down(char* ptr)
   }
 }
 
-static void up(char* ptr)
+static void up(unsigned char *ptr)
 {
-  unsigned char* locn;
+  unsigned char *locn;
 
   while (1) {
     locn = *(ptr) + board;
@@ -551,7 +551,7 @@ static void up(char* ptr)
  * if we hit anything we want to stop, if we're ball then if we
  * hit anything except for bubble we wanna stop
  */
-static int standardmiddle(char nextpos)
+static int standardmiddle(unsigned char nextpos)
 {
   if (ballorbox)
     return (nextpos); /* For box */
@@ -566,7 +566,7 @@ static int standardmiddle(char nextpos)
  */
 static int checkfinish()
 {
-  unsigned char* ptr;
+  unsigned char *ptr;
   int i;
   ptr = board;
   for (i = 1; i != 144; i++) {
@@ -620,8 +620,8 @@ static void setuplevel()
 
 static void drawboard()
 {
-  int x, y;
-  unsigned char* ptr;
+  unsigned char x, y;
+  unsigned char *ptr;
 
   ptr = board;
   for (y = 0; y != 9; y++) {
