@@ -20,13 +20,13 @@ zxn/%.opt: zxn/%.c
 	mv -f tmp1.opt $@
 
 rabbit/%.opt: rabbit/%.c
-	zcc +rcmx000 -vn -a $^ -o -o tmp1.opt
+	zcc +rcmx000 -vn -a $^ -o tmp1.opt
 	@cat tmp1.opt | grep -v '^;'  | grep -v MODULE> tmp2.opt
 	diff -w tmp2.opt results/$@
 	mv -f tmp1.opt $@
 
 %.opt:	%.c
-	zcc +test -vn -a $^ -o -o tmp1.opt
+	zcc +test -vn -a $^ -o tmp1.opt
 	@cat tmp1.opt | grep -v '^;'  | grep -v MODULE> tmp2.opt
 	diff -w tmp2.opt results/$@
 	mv -f tmp1.opt $@
