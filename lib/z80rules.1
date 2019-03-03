@@ -3933,3 +3933,28 @@
 =
 	push	hl
 	push	hl
+
+	ld	l,(hl)
+	ld	h,0
+	ld	de,6
+	call	l_asr_u_hl_by_e
+	ld	a,l
+	and	#(3 %% 256)
+	ld	l,a
+=
+	ld	a,(hl)
+	rlca
+	rlca
+	and	#(3 %% 256)
+	ld	l,a
+	ld	h,0
+
+	ld	l,(hl)
+	ld	h,0
+	ld	a,l
+	ld	(%1),a
+	ld	hl,%2
+=
+	ld	a,(hl)
+	ld	(%1),a
+	ld	hl,%2

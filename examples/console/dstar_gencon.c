@@ -590,7 +590,7 @@ static int checkfinish()
  */
 static void setuplevel()
 {
-  int y, x;
+  int y;
   const unsigned char *ptr;
   unsigned char *ptr2;
 
@@ -602,14 +602,12 @@ static void setuplevel()
   boxoffset = *ptr++;
 
   /* Now, decompress level into board */
-  for (y = 0; y != 9; y++) {
-    for (x = 0; x != 4; x++) {
-      *ptr2++ = ((*ptr) >> 6) & 3;
-      *ptr2++ = ((*ptr) >> 4) & 3;
-      *ptr2++ = ((*ptr) >> 2) & 3;
-      *ptr2++ = (*ptr) & 3;
-      ptr++;
-    }
+  for (y = 0; y != 36; y++) {
+    *ptr2++ = ((*ptr) >> 6) & 3;
+    *ptr2++ = ((*ptr) >> 4) & 3;
+    *ptr2++ = ((*ptr) >> 2) & 3;
+    *ptr2++ = (*ptr) & 3;
+    ptr++;
   }
   /* Now, plot the ball and box into the internal map */
   ptr2 = board;
