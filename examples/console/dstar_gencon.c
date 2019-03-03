@@ -3,7 +3,9 @@
  *
  *      Program history is in other versions of dstar
  *
- *      -DUSE_JOYSTICK switches to using the joystick
+ *     -DUSE_JOYSTICK switches to using the joystick
+ *     -DUSE_UDGS uses UDGs for the characters
+ *     -DSWITCH_MODE=x switches to screenmode x for display
  */
 
 
@@ -12,6 +14,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <games.h>
+#include <sys/ioctl.h>
 
 
 /* Key definitions, change these to define your keys! */
@@ -36,7 +39,11 @@
 
 
 /* Mapping between block numbers and ascii characters */
+#ifdef USE_UDGS
+static const unsigned char blocks[] = { ' ', 128, 129, 130, 131 };
+#else
 static const unsigned char blocks[] = { ' ', 'X', '@', '#', '$' };
+#endif
 static unsigned char balloffset; /* Ball position */
 static unsigned char boxoffset;  /* Box position */
 static unsigned char ballorbox;  /* 1 if box, 0 if ball */
@@ -47,6 +54,46 @@ static unsigned char y_offset;
 
 static unsigned char board[144]; /* Level internal map thing */
 
+
+#ifdef USE_UDGS
+static unsigned char udgs[] = {
+    0b01111110,	// Wall
+    0b10101001,
+    0b11000111,
+    0b10110001,
+    0b11001011,
+    0b10100101,
+    0b10101001,
+    0b01111110,
+
+    0b00000000, // bubble
+    0b00000000,
+    0b00011000,
+    0b00100100,
+    0b00100100,
+    0b00011000,
+    0b00000000,
+    0b00000000,
+
+    0b00000000, // movable ball
+    0b00111100,
+    0b01110110,
+    0b01111010,
+    0b01111010,
+    0b01111110,
+    0b00111100,
+    0b00000000,
+
+    0b00000000, // movable block
+    0b01111110,
+    0b01000010,
+    0b01000010,
+    0b01000010,
+    0b01000010,
+    0b01111110,
+    0b00000000
+};
+#endif
 
 // Level definition
 static const unsigned char levels[][38] = {
@@ -392,6 +439,16 @@ int
 main()
 {
   int  maxx, maxy;
+
+#ifdef USE_UDGS
+  void *param = &udgs;
+  console_ioctl(IOCTL_GENCON_SET_UDGS, &param);
+#endif
+
+#ifdef SWITCH_MODE
+   maxy = SWITCH_MODE;
+   console_ioctl(IOCTL_GENCON_SET_MODE, &maxy);
+#endif
 
   screensize(&maxx, &maxy);
   x_offset = (maxx - 16) / 2;
