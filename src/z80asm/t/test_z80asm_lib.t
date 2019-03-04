@@ -137,8 +137,8 @@ sub run {
 	my($cmd, $ret, $out, $err) = @_;
 	ok 1, $cmd;
 	my($stdout, $stderr, $return) = capture { system $cmd; };
-	is $stdout, ($out // ""), "stdout";
-	is $stderr, ($err // ""), "stderr";
+	is_text( $stdout, ($out // ""), "stdout" );
+	is_text( $stderr, ($err // ""), "stderr" );
 	ok !!$return == !!($ret // 0), "exit value";
 
 	if (!Test::More->builder->is_passing) {

@@ -187,7 +187,7 @@ sub compare_list_file {
 	chomp(@got);
 	@expected = sort(@expected);
 	
-	eq_or_diff \@got, \@expected, "compare $file";
+	is_text( \@got, \@expected, "compare $file" );
 }
 
 #------------------------------------------------------------------------------

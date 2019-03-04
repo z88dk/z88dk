@@ -479,7 +479,7 @@ t_binary(read_binfile("test.bin"), "\xFE\x10");
 unlink_testfiles();
 
 my $objs = "errors.o error_func.o scan.o lib/array.o lib/class.o lib/str.o lib/strhash.o lib/list.o  ../common/fileutil.o ../common/strutil.o ../common/die.o ../common/objfile.o ../../ext/regex/regcomp.o ../../ext/regex/regerror.o ../../ext/regex/regexec.o ../../ext/regex/regfree.o options.o model.o module.o sym.o symtab.o codearea.o expr.o listfile.o lib/srcfile.o macros.o hist.o lib/dbg.o ";
-if ($^O eq 'MSWin32') {
+if ($^O eq 'MSWin32' || $^O eq 'msys') {
 	  $objs .= "../../ext/UNIXem/src/glob.o ../../ext/UNIXem/src/dirent.o ";
 }
 
@@ -600,12 +600,12 @@ ERR
 
 ok ! -f "test1.err", "no errors, file deleted";
 
-eq_or_diff_text scalar(read_file('test2.err')), <<'END';
+is_text( scalar(read_file('test2.err')), <<'END' );
 Error: syntax error
 Error: syntax error
 END
 
-eq_or_diff_text scalar(read_file('test3.err')), <<'END';
+is_text( scalar(read_file('test3.err')), <<'END' );
 Error: syntax error
 END
 

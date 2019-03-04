@@ -13,7 +13,6 @@ use strict;
 use warnings;
 use Test::More;
 use File::Slurp;
-use Test::Differences;
 use Capture::Tiny::Extended 'capture';
 
 require './t/test_utils.pl';
@@ -169,7 +168,7 @@ t_asmpp_ok(<<'...', "",
 		"\x34\x33" .						# line 20
 		""
 );
-t_text(scalar(read_file("test.i")), <<'...');
+is_text(scalar(read_file("test.i")), <<'...');
 ;;test.asm:1
 		defc value = 4660
 ;;test.asm:2
@@ -219,7 +218,7 @@ t_asmpp_ok(<<'...', "-r0x1234", "\x12\x34\x12\x36");
 		defb .high.$,.low.asmpc
 		DEFB .HIGH.$,.LOW.ASMPC
 ...
-t_text(scalar(read_file("test.i")), <<'...');
+is_text(scalar(read_file("test.i")), <<'...');
 ;;test.asm:1
 AUTOLABEL_pc_1:
 		defb (((( AUTOLABEL_pc_1 ) >> 8) & 255)),((( AUTOLABEL_pc_1 ) & 255))
@@ -245,7 +244,7 @@ val		defl val+1
 val		defl val+1
 		defw val
 ...
-t_text(scalar(read_file("test.i")), <<'...');
+is_text(scalar(read_file("test.i")), <<'...');
 ;;test.asm:2
 		defb 1
 ;;test.asm:4
@@ -269,7 +268,7 @@ t_asmpp_ok(<<'...', "-Done -Dtwo=2 -Dthree=0x2+1", "\1\2\3\1\2\3");
 		defb one,two,three
 		DEFB one,two,three
 ...
-t_text(scalar(read_file("test.i")), <<'...');
+is_text(scalar(read_file("test.i")), <<'...');
 ;;test.asm:1
 		defb 1,2,3
 ;;test.asm:2
@@ -284,7 +283,7 @@ t_asmpp_ok(<<'...', "", "\1\2\3\4");
 		end
 		defb 5,6,7,8
 ...
-t_text(scalar(read_file("test.i")), <<'...');
+is_text(scalar(read_file("test.i")), <<'...');
 ;;test.asm:1
 		defb 1,2,3,4
 ...
@@ -294,7 +293,7 @@ t_asmpp_ok(<<'...', "", "\1\2\3\4");
 label:	end
 		defb 5,6,7,8
 ...
-t_text(scalar(read_file("test.i")), <<'...');
+is_text(scalar(read_file("test.i")), <<'...');
 ;;test.asm:1
 		defb 1,2,3,4
 ...
@@ -304,7 +303,7 @@ start:	defb 1,2,3,4
 label:	end start
 		defb 5,6,7,8
 ...
-t_text(scalar(read_file("test.i")), <<'...');
+is_text(scalar(read_file("test.i")), <<'...');
 ;;test.asm:1
 start:	defb 1,2,3,4
 ...
@@ -360,7 +359,7 @@ three:	EQU 10/3
 		"\0\0\0\0\1".
 		"\1\2\3".
 		"");
-t_text(scalar(read_file("test.i")), <<'...');
+is_text(scalar(read_file("test.i")), <<'...');
 ;;test.asm:1
 lbl1:	DEFW 4660
 ;;test.asm:2
@@ -421,7 +420,7 @@ lbl9:	DEFS 4
 t_asmpp_ok(<<'...', "", "\0");
 		nop
 ...
-t_text(scalar(read_file("test.i")), <<'...');
+is_text(scalar(read_file("test.i")), <<'...');
 ;;test.asm:1
 		nop
 ...
@@ -429,7 +428,7 @@ t_text(scalar(read_file("test.i")), <<'...');
 t_asmpp_ok(<<'...', "--ucase", "\0");
 		nop
 ...
-t_text(scalar(read_file("test.i")), <<'...');
+is_text(scalar(read_file("test.i")), <<'...');
 ;;test.asm:1
 		NOP
 ...
@@ -468,17 +467,6 @@ sub t_asmpp_error {
 	};
 	ok $return != 0, "exit value";
 	$stdout =~ s/^z80asm -b.*\s*//;
-	eq_or_diff_text $stdout, "", "stdout";
-	eq_or_diff_text $stderr, $error, "stderr";
-}
-
-#------------------------------------------------------------------------------
-sub t_text {
-	my($got, $expected) = @_;
-	my $line = (caller)[2];
-	for ($got, $expected) {
-		s/^\s+/\t/;
-		s/\s*$/\n/;
-	}
-	eq_or_diff_text $got, $expected, "[line ".$line."]";
+	is_text($stdout, "", "stdout");
+	is_text($stderr, $error, "stderr");
 }
