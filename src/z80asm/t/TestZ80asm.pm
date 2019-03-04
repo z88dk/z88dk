@@ -10,6 +10,7 @@
 # Library of test utilities to test z80asm
 
 use Modern::Perl;
+use Config;
 use Exporter 'import';
 use Test::More;
 use Test::Differences; 
@@ -21,17 +22,17 @@ use Capture::Tiny::Extended 'capture';
 our @EXPORT = qw( z80asm z80nm 
 				  read_binfile write_binfile test_binfile );
 
-use Config;
+#our $AR = -d "ar" ? "ar" : "../../src/z80nm";
+our $AR = "../z80nm";
+
 $ENV{PATH} = join($Config{path_sep}, 
 			".",
-			"../z80nm",
+			$AR,
 			"../../bin",
 			$ENV{PATH});
 
 our $KEEP_FILES;
 our $Z80ASM_EXE = $ENV{Z80ASM_EXE} || "./z80asm";
-
-our $AR = -d "ar" ? "ar" : "../../src/z80nm";
 
 #------------------------------------------------------------------------------
 # startup and cleanup
@@ -142,15 +143,15 @@ sub z80asm {
 	my($stdout, $stderr, $return) = capture { system $z80asm; };
 	
 	# check output
-	eq_or_diff_text $stdout, "", "stdout";
-	eq_or_diff_text $stderr, $err_text, "stderr";
+	is_text( $stdout, "", "stdout" );
+	is_text( $stderr, $err_text, "stderr" );
 	my $expected_ok = ($bin ne "") || $args{ok};
 	is !$return, !!$expected_ok, "exit";
 	
 	# check error file
 	for (sort keys %err_file) {
 		ok -f $_, "$_ exists";
-		eq_or_diff scalar(read_file($_)), $err_file{$_}, "$_ contents";
+		is_text( scalar(read_file($_)), $err_file{$_}, "$_ contents" );
 	}
 	
 	# check object file
@@ -252,11 +253,11 @@ sub z80nm {
 	my($stdout, $stderr, $return) = capture {
 		system "z80nm -a $o_file";
 	};
-	eq_or_diff_text $stdout, $expected_out, "$line stdout";
-	eq_or_diff_text $stderr, "", "$line stderr";
+	my $ok = is_text( $stdout, $expected_out, "$line stdout" );
+	is_text( $stderr, "", "$line stderr" );
 	ok !!$return == !!0, "$line retval";
 	
-	if ($stdout ne $expected_out) {
+	unless ($ok) {
 		my($file, $line) = (caller)[1,2];
 		my $out = "test.out";
 		system "head -$line $file > $out";
@@ -265,6 +266,29 @@ sub z80nm {
 		unlink "test.out";
 		die;		# need to refresh source
 	}
+}
+
+#------------------------------------------------------------------------------
+# EOL-agnostic text compare
+#------------------------------------------------------------------------------
+sub is_text {
+	my($got, $expected, $name) = @_;
+	
+	# normalize white space
+	for ($got, $expected) {
+		s/[ \t]+/ /g;
+		s/\r\n/\n/g;
+		s/\s+\z//;
+	}
+	eq_or_diff_text($got, $expected, $name);
+	return $got eq $expected;
+}
+
+
+sub chomp_eol {
+	local $_ = shift;
+	s/[\r\n]+\z//;
+	return $_;
 }
 
 1;

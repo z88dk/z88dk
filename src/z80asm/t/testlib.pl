@@ -8,16 +8,16 @@
 # Repository: https://github.com/z88dk/z88dk
 #------------------------------------------------------------------------------
 use Modern::Perl;
+use Config;
 use Test::More;
 use Cwd qw( cwd abs_path );
 use File::Basename;
 use File::Path 'remove_tree';
 
-my $IS_WIN32 = $^O eq 'MSWin32';
 my @TEST_EXT = qw( asm bin c d dat def err inc lis lst map o P out sym tap );
 
 # run z80asm from .
-$ENV{PATH} = ".".($IS_WIN32 ? ";" : ":").$ENV{PATH};
+$ENV{PATH} = ".".$Config{path_sep}.$ENV{PATH};
 
 # add path to z80asm top directory
 _prepend_path(_root());
@@ -35,7 +35,7 @@ sub _root {
 
 sub _prepend_path {
 	my($dir) = @_;
-	$ENV{PATH} = $dir . ($IS_WIN32 ? ';' : ':') . $ENV{PATH};
+	$ENV{PATH} = $dir . $Config{path_sep} . $ENV{PATH};
 }
 
 #------------------------------------------------------------------------------
@@ -80,7 +80,6 @@ sub run {
 	$err //= '';
 	
 	$cmd .= " >test.stdout 2>test.stderr";
-#	$cmd =~ s!/!\\!g if $IS_WIN32;
 	
 	ok 1, $cmd;
 	ok !!$return == !!system($cmd), "exit value";
