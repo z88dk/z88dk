@@ -31,6 +31,7 @@ option_t cpm2_options[] = {
 
 static struct formats   *get_format(const char *name);
 static void              dump_formats();
+static void              bic_write_system_file(disc_handle *h);
 
 static disc_spec einstein_spec = {
     .name = "Einstein",
@@ -307,9 +308,10 @@ static struct formats {
      size_t         bootlen; 
      void          *bootsector;
      char           force_com_extension;
+     void         (*extra_hook)(disc_handle *handle);
 } formats[] = {
     { "attache",   "Otrona Attache'",    &attache_spec, 0, NULL, 1 },
-    { "bic",       "BIC / A5105",	 &bic_spec, 0, NULL, 1 },
+    { "bic",       "BIC / A5105",	 &bic_spec, 0, NULL, 1, bic_write_system_file },
     { "cpcsystem", "CPC System Disc",    &cpcsystem_spec, 0, NULL, 0 },
     { "col1",      "Coleco ADAM 40T SSDD", &col1_spec, 0, NULL, 1 },
     { "dmv",       "NCR Decision Mate",  &dmv_spec, 16, "\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5NCR F3", 1 },
@@ -459,6 +461,10 @@ int cpm_write_file_to_image(const char *disc_format, const char *container, cons
     }
 
     disc_write_file(h, cpm_filename, filebuf, binlen);
+
+    if ( f->extra_hook ) {
+        f->extra_hook(h);
+    }
     
     if (writer(h, disc_name) < 0) {
         exit_log(1, "Can't write disc image\n");
@@ -466,6 +472,15 @@ int cpm_write_file_to_image(const char *disc_format, const char *container, cons
     disc_free(h);
 
     return 0;
+}
+
+static void bic_write_system_file(disc_handle *h)
+{
+    char buf[128] = {0};
+
+    buf[0] = 26; // Soft-EOF
+
+    disc_write_file(h, "SCPX5105SYS", buf, 1);
 }
 
 void cpm_create_filename(const char* binary, char* cpm_filename, char force_com_extension, char include_dot)
