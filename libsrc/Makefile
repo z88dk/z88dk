@@ -838,6 +838,15 @@ smc777.lib:
 	$(MAKE) -C games TARGET=cpm SUBTYPE=smc777 TARGET_CFLAGS=-subtype=smc777
 	TARGET=smc777 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsmc777 -x$(OUTPUT_DIRECTORY)/smc777 @$(LISTFILE_DIRECTORY)/smc777.lst
 
+# A5105 library
+bic.lib:
+	@echo ''
+	@echo '--- Building A5105 Library ---'
+	@echo ''
+	$(MAKE) -C video/upd7220 TARGET=bic
+	TARGET=bic TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORbic -x$(OUTPUT_DIRECTORY)/bic @$(LISTFILE_DIRECTORY)/bic.lst
+
+
 
 
 # Coleco Adam library 
