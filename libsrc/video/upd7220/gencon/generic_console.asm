@@ -83,7 +83,11 @@ generic_console_printc:
 ;        a = character,
 ;        c = failure
 generic_console_vpeek:
-	scf
+	call	xypos
+	call	CURS2
+	call	RDAT
+	ld	a,l
+	and	a
 	ret
 
 xypos:
@@ -120,5 +124,21 @@ WDAT2:
 	ld	a,UPD7220_COMMAND_WDAT
 	jr	write_2_command
 
+ckstatus:
+	in	a,(UPD_7220_STATUS_READ)
+	and	4
+	jr	z,ckstatus
+	ret
 
-
+RDAT:
+	ld	a,UPD7220_COMMAND_FIGS
+	ld	hl,$0102
+	call	write_2_command
+	ld	a,UPD7220_COMMAND_RDAT
+	out	(UPD_7220_COMMAND_WRITE),a
+	ld	bc,UPD_7220_FIFO_READ
+	call	ckstatus
+	in	l,(c)
+	call	ckstatus
+	in	h,(c)
+	ret

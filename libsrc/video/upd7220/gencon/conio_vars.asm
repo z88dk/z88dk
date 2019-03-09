@@ -7,4 +7,6 @@
 
 		PUBLIC		__upd7220_attr
 
+; PPPFIIII
+; paper, flash, ink
 .__upd7220_attr       defb $6
