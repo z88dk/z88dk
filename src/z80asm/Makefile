@@ -5,40 +5,52 @@
 # License: http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk
 #------------------------------------------------------------------------------
-PROJ		:= z80asm
+PROJ			:= z80asm
 
-include ../Make.common
+# EXESUFFIX is passed when cross-compiling Win32 on Linux
+ifeq ($(OS),Windows_NT)
+  EXESUFFIX 	:= .exe
+else
+  EXESUFFIX 	?=
+endif
 
-CC 		?= gcc
-INSTALL 	?= install
-CROSS		?= 0
+# UNIXem is needed in both Windows_NT and in a MinGW build in Unix
+ifeq ($(EXESUFFIX),.exe)
+  UNIXem_CFLAGS	:= -I../../ext/UNIXem/include
+  UNIXem_OBJS	:= ../../ext/UNIXem/src/glob.o \
+				   ../../ext/UNIXem/src/dirent.o
+endif
+
+CC 				?= gcc
+INSTALL 		?= install
+CROSS			?= 0
 
 #------------------------------------------------------------------------------
 # Object files
 #------------------------------------------------------------------------------
-SRCS		:= $(filter-out test.c,$(wildcard *.c lib/*.c ../common/*.c ../../ext/regex/reg*.c))
-OBJS 		:= $(SRCS:.c=.o) \
-		   $(UNIXem_OBJS)
-DEPENDS		:= $(SRCS:.c=.d)
+SRCS			:= $(filter-out test.c,$(wildcard *.c lib/*.c ../common/*.c ../../ext/regex/reg*.c))
+OBJS 			:= $(SRCS:.c=.o) \
+				   $(UNIXem_OBJS)
+DEPENDS			:= $(SRCS:.c=.d)
 TEST_SRC_MAIN	:= $(wildcard t/test_*.c)
 TEST_SRC_LIB	:= t/testlib.c
 
 #------------------------------------------------------------------------------
 # variables
 #------------------------------------------------------------------------------
-TARGET 		= $(PROJ)$(EXE)
+TARGET 			= $(PROJ)$(EXESUFFIX)
 MSVC_TARGET 	= ../../win32/Debug/$(TARGET)
 
-OPT 		= -O3
+OPT 			= -O3
 
-STD 		= -std=gnu11
-LOCAL_LIB 	:= lib
-LOCAL_CFLAGS 	+= -MMD -I. -I$(LOCAL_LIB) -It -g -Wall -ftabstop=4 $(STD) $(OPT) \
-		   -I../common \
-		   -I../../ext/optparse \
-		   -I../../ext/regex \
-		   -I../../ext/uthash/src \
-		   $(UNIXem_CFLAGS)
+STD 			= -std=gnu11
+LOCAL_LIB 		:= lib
+LOCAL_CFLAGS 	+= -MMD -I. -I$(LOCAL_LIB) -It -g -Wall $(STD) $(OPT) \
+				   -I../common \
+				   -I../../ext/optparse \
+				   -I../../ext/regex \
+				   -I../../ext/uthash/src \
+				   $(UNIXem_CFLAGS)
 
 #------------------------------------------------------------------------------
 # main
@@ -95,7 +107,7 @@ clean::
 #------------------------------------------------------------------------------
 # intall
 #------------------------------------------------------------------------------
-install:
+install: $(TARGET) z80asm_lib
 	$(INSTALL) $(TARGET)     $(PREFIX)/bin/$(EXEC_PREFIX)$(TARGET)
 	$(INSTALL) asmpp.pl      $(PREFIX)/bin/asmpp.pl
 	$(MAKE) -C dev/z80asm_lib install PREFIX=$(PREFIX_SHARE)
@@ -126,13 +138,13 @@ t/libtestlib.a : $(OBJS) $(TEST_SRC_LIB:.c=.o)
 $(TEST_SRC_MAIN:.c=.o) : t/libtestlib.a
 
 .o.out :
-	$(CC) $(CFLAGS) $< -o $(<:.o=$(EXE)) $(LDFLAGS) -Lt -ltestlib
-	$(<:.o=$(EXE)) 2> $@~
+	$(CC) $(CFLAGS) $< -o $(<:.o=$(EXESUFFIX)) $(LDFLAGS) -Lt -ltestlib
+	$(<:.o=$(EXESUFFIX)) 2> $@~
 	diff -w $(<:.o=.bmk) $@~
 	mv -f $@~ $@
 
 clean::
-	$(RM) t/libtestlib.a t/*.o t/*.out lib/t/*.o lib/t/*.out $(TEST_SRC_MAIN:.c=$(EXE))
+	$(RM) t/libtestlib.a t/*.o t/*.out lib/t/*.o lib/t/*.out $(TEST_SRC_MAIN:.c=$(EXESUFFIX))
 
 test: $(TARGET) z80asm_lib
 	$(MAKE) dev

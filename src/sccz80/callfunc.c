@@ -17,6 +17,49 @@ static int SetMiniFunc(unsigned char* arg, uint32_t* format_option_ptr);
 static Kind ForceArgs(Type *dest, Type *src, int isconst);
 
 
+/* msys2 tmpfile() is broken:
+   it creates the temporary file in the root directory of C:\ 
+   and therefore needs elevated privileges.
+   It returns NULL and sets errno to EACCES when run 
+   with normal privileges.
+   This causes the sccz80 compiler to generate wrong code.
+*/
+#ifdef _WIN32
+#  include <time.h>
+#  define my_tmpfile    w32_tmpfile
+#else
+#  define my_tmpfile    tmpfile
+#endif
+ 
+#ifdef _WIN32
+static FILE* w32_tmpfile()
+{
+    static char tmpnambuf[] = "sccz80XXXX";
+    static int  inited = 0;
+    char        *tmpnam;
+    FILE        *fp;
+    
+    if (!inited) {
+        /* Randomize temporary filenames for windows */
+        snprintf(tmpnambuf, sizeof(tmpnambuf), 
+                 "sccz80%04X", ((unsigned int)time(NULL)) & 0xffff);
+        inited = 1;
+    }
+
+    if ((tmpnam = _tempnam(".\\", tmpnambuf)) == NULL) {
+        fprintf(stderr, "Failed to create temporary filename\n");
+        exit(1);
+    }
+
+    if ((fp = fopen(tmpnam, "w+")) == NULL) {
+        perror(tmpnam);
+        exit(1);
+    }
+    
+    return fp;
+}
+#endif
+   
 /*
  *      Perform a function call
  *
@@ -42,6 +85,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     int   save_fps_num;
     int   function_pointer_call = ptr == NULL ? YES : NO;
     int   savesp;
+    int   last_argument_size;
     enum symbol_flags builtin_flags = 0;
     char   *funcname = "(unknown)";
     Type   *functype = ptr ? ptr->ctype: fnptr_type->ptr;
@@ -75,7 +119,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             break;
         }
         argnumber++;
-        tmpfiles[argnumber] = tmpfile();
+        tmpfiles[argnumber] = my_tmpfile();
         push_buffer_fp(tmpfiles[argnumber]);
 
         setstage(&before, &start);
@@ -229,7 +273,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
         //clearstage(before,start);
         if ( function_pointer_call == 0 && tmpfiles[argnumber+1] == NULL &&
             ( (functype->flags & FASTCALL) == FASTCALL || (builtin_flags & FASTCALL) == FASTCALL ) ) {
-                 /* fastcall of single expression OR the last argument of a builtin */
+            /* fastcall of single expression OR the last argument of a builtin */
         } else {
             if (argnumber == watcharg) {
                 if (ptr)
@@ -257,20 +301,24 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
                 }
             } else {
                 if (expr == KIND_LONG || expr == KIND_CPTR) {
-                    swap(); /* MSW -> hl */
-                    swapstk(); /* MSW -> stack, addr -> hl */
-                    zpushde(); /* LSW -> stack, addr = hl */
+                    if ( tmpfiles[argnumber+1] != NULL ) {
+                        swap(); /* MSW -> hl */
+                        swapstk(); /* MSW -> stack, addr -> hl */
+                        zpushde(); /* LSW -> stack, addr = hl */
+                    }
                     nargs += 4;
+                    last_argument_size = 4;
                 } else if (expr == KIND_DOUBLE) {
                     dpush_under(KIND_INT);
                     nargs += 6;
+                    last_argument_size = 6;
                     mainpop();
                 } else {
-                    /* If we've only got one 2 byte argment, don't swap the stack */
-                    if ( tmpfiles[argnumber+1] != NULL  || nargs != 0) {
+                    if ( tmpfiles[argnumber+1] != NULL ) {
                         swapstk();
                     }
                     nargs += 2;
+                    last_argument_size = 2;
                 }
             }
         }
@@ -310,7 +358,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             outname(funcname, dopref(ptr)); nl();
         }
     } else {
-        callstk(functype, nargs, fnptr_type->kind == KIND_CPTR);
+        callstk(functype, nargs, fnptr_type->kind == KIND_CPTR, last_argument_size);
     }
 
     if (functype->flags & CALLEE ) {

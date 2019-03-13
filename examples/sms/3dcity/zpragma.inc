@@ -2,7 +2,7 @@
 
 #pragma output   SMS_HDR_PRODUCT_CODE = 000000
 #pragma output   SMS_HDR_VERSION      = 100
-#pragma output   SMS_HDR_REGION       = 0x3
+#pragma output   SMS_HDR_REGION       = 0x4
 #pragma output   SMS_HDR_ROM_SIZE     = 0x1              // ignored; rom size is always set to 32k
 
 // SDSC Header - not generated if no SDSC pragmas are present

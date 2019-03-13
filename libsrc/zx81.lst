@@ -22,7 +22,7 @@ games/zx81snd/beeper
 games/zx81snd/bit_synth
 @games/games.lst
 z80_crt0s/z80_emu/afswap
-@zx81/zx81.lst
+@target/zx81/arch_zx81.lst
 psg/zx81/set_psg
 psg/zx81/set_psg_callee
 psg/zx81/get_psg

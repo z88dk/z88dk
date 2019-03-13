@@ -568,13 +568,13 @@ file.
 2.6. Scope of symbols in source modules
 ---------------------------------------
 
-All source modules may refer to each others symbols by using XREF directives.
+All source modules may refer to each others symbols by using EXTERN directives.
 This means that you refer to external information outside the current source
 module. The opposite of an external module reference is to declare symbols
-globally available using a XDEF directive, i.e. making symbols available to other
-source modules. Finally it is possible to have local symbols that is not known to
+globally available using a PUBLIC directive, i.e. making symbols available to other
+source modules. Finally it is possible to have local symbols that are not known to
 other source modules than the current. A label or constant that has not been
-declared with XREF, XDEF or XLIB is local to the module.
+declared with EXTERN, PUBLIC or GLOBAL is local to the module.
 
 
 2.7. Using arithmetic and relational expressions
@@ -1176,7 +1176,7 @@ following is a label definition:
     ; routine definition
     .mainmenu call xxx ; a label is preceded with '.'
 
-    endmain:  ret                ; or followed by '.'
+    endmain:  ret                ; or followed by ':'
 
 It is not allowed to position two labels on the same line. However, you may place
 as many label after each other - even though no code is between them. They just
@@ -1186,15 +1186,15 @@ It is not allowed to specify two identical address labels in the same source
 file.
 
 If you want to declare an address globally accessible to other modules, then use
-XDEF for the address label definition, otherwise the label definition will be
+PUBLIC for the address label definition, otherwise the label definition will be
 interpreted as a local address label.
 
-    XDEF mainmenu
+    PUBLIC mainmenu
     ...
-    .mainmenu ; label accessible from other modules with XREF
+    .mainmenu ; label accessible from other modules through PUBLIC directive
 
-You may use before or after the label - z80asm automatically handles the scope
-resolution as long as you use XDEF to define it as globally accessible.
+You may use it before or after the label - z80asm automatically handles the scope
+resolution as long as you use PUBLIC to define it as globally accessible.
 
 
 5.9. Writing Z80 mnemonic instructions
@@ -2390,35 +2390,41 @@ Index
     7.11. DEFVARS <16-bit expression> '{' [<name>] [<storage_size>
     <size_multiplier>] '}'
 
-    7.12. FPP <8-bit expression>
+    7.12. EXTERN name {, name}
 
-    7.13. IF <logical expression> ... [ELSE] ... ENDIF
+    7.13. FPP <8-bit expression>
 
-    7.14. IFDEF <name> ... [ELSE] ... ENDIF
+    7.14. GLOBAL name {, name}
 
-    7.15. IFNDEF <name> ... [ELSE] ... ENDIF
+    7.15. IF <logical expression> ... [ELSE] ... ENDIF
 
-    7.16. INCLUDE "filename"
+    7.16. IFDEF <name> ... [ELSE] ... ENDIF
 
-    7.17. INVOKE <16-bit expression>
+    7.17. IFNDEF <name> ... [ELSE] ... ENDIF
 
-    7.18. LIB name {,name}
+    7.18. INCLUDE "filename"
 
-    7.19. LINE <32-bit expr>
+    7.19. INVOKE <16-bit expression>
 
-    7.20. LSTOFF
+    7.20. LIB name {,name}
 
-    7.21. LSTON
+    7.21. LINE <32-bit expr>
 
-    7.22. MODULE name
+    7.22. LSTOFF
 
-    7.23. ORG <16-bit expression>
+    7.23. LSTON
 
-    7.24. XDEF name {, name}
+    7.24. MODULE name
 
-    7.25. XLIB name
+    7.25. ORG <16-bit expression>
 
-    7.26. XREF name {, name}
+    7.26. PUBLIC name {, name}
+
+    7.27. XDEF name {, name}
+
+    7.28. XLIB name
+
+    7.29. XREF name {, name}
 
   8. Run time error messages
 

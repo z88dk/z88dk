@@ -36,12 +36,12 @@ sub t_z80nm {
 	my($stdout, $stderr, $return) = capture {
 		system "z80nm -a $o_file";
 	};
-	eq_or_diff_text $stdout, $expected_out, "$line stdout";
-	eq_or_diff_text $stderr, "", "$line stderr";
+	my $ok = is_text( $stdout, $expected_out, "$line stdout" );
+	is_text( $stderr, "", "$line stderr" );
 	ok !!$return == !!0, "$line retval";
 
 
-	if ($stdout ne $expected_out) {
+	unless ($ok) {
 		my($file, $line) = (caller)[1,2];
 		my $out = "test.out";
 		system "head -$line $file > $out";
@@ -4464,7 +4464,7 @@ t_binary(read_binfile(bin_file()), "\xC3\x00\x00");
 unlink_testfiles();
 
 my $objs = "zobjfile.o lib/class.o lib/array.o errors.o error_func.o lib/str.o lib/strhash.o lib/list.o  ../common/fileutil.o ../common/strutil.o ../common/die.o ../common/objfile.o ../../ext/regex/regcomp.o ../../ext/regex/regerror.o ../../ext/regex/regexec.o ../../ext/regex/regfree.o scan.o options.o model.o module.o sym.o symtab.o lib/srcfile.o macros.o hist.o expr.o listfile.o codearea.o lib/dbg.o ";
-if ($^O eq 'MSWin32') {
+if ($^O eq 'MSWin32' || $^O eq 'msys') {
 	  $objs .= "../../ext/UNIXem/src/glob.o ../../ext/UNIXem/src/dirent.o ";
 }
 

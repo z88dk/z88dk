@@ -20,12 +20,12 @@
 
 		EXTERN		__MODE2_attr
 
-		EXTERN		tms9918_cls
-		EXTERN		tms9918_scrollup
-		EXTERN		tms9918_printc
-                EXTERN          tms9918_set_ink
-                EXTERN          tms9918_set_paper
-                EXTERN          tms9918_set_inverse
+		EXTERN		__tms9918_cls
+		EXTERN		__tms9918_scrollup
+		EXTERN		__tms9918_printc
+                EXTERN          __tms9918_set_ink
+                EXTERN          __tms9918_set_paper
+                EXTERN          __tms9918_set_inverse
 		EXTERN		generic_console_flags
 		EXTERN		mc6847_map_colour
 
@@ -51,7 +51,7 @@ generic_console_set_inverse:
 	ld	a,(__spc1000_mode)
 	cp	10
 	ld	a,b
-	jp	z,tms9918_set_inverse
+	jp	z,__tms9918_set_inverse
 	ret
 
 generic_console_set_paper:
@@ -68,7 +68,7 @@ generic_console_set_paper:
 	ld	a,(__spc1000_mode)
 	cp	10
 	ld	a,b
-	jp	z,tms9918_set_paper
+	jp	z,__tms9918_set_paper
 	ret
 
 generic_console_set_ink:
@@ -86,7 +86,7 @@ generic_console_set_ink:
 	ld	a,(__spc1000_mode)
 	cp	10
 	ld	a,b
-	jp	z,tms9918_set_ink
+	jp	z,__tms9918_set_ink
 	ret
 
 set_css:
@@ -107,7 +107,7 @@ generic_console_cls:
 	and	a
 	jr	z,cls_text
 	cp	10
-	jp	z,tms9918_cls
+	jp	z,__tms9918_cls
 	jr	cls_hires
 cls_text:
 	ld	bc,0
@@ -185,7 +185,7 @@ generic_console_printc:
 	jp	z,printc_MODE2
 	cp	10
 	ld	a,d
-	jp	z,tms9918_printc
+	jp	z,__tms9918_printc
 	call	generic_console_calc_xypos
 	ld	c,l
 	ld	b,h
@@ -245,7 +245,7 @@ generic_console_printc_3:
 generic_console_scrollup:
 	ld	a,(__spc1000_mode)
 	cp	10
-	jp	z,tms9918_scrollup
+	jp	z,__tms9918_scrollup
 	push	de
 	push	bc
 	and	a

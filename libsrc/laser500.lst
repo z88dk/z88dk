@@ -1,4 +1,4 @@
-arch/laser500/im1_init
+target/laser500/im1_init
 stdio/inkey/fgetc_cons
 stdio/inkey/getk
 stdio/laser500/generic_console

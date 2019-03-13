@@ -63,7 +63,6 @@ int SKOOLMODE = -1;
 #include <string.h>
 /* stdlib.h MUST be included to really open files as binary */
 #include <stdlib.h>
-#include <malloc.h>
 
 #define SKIP -1
 #define CATCH -2

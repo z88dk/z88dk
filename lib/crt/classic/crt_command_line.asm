@@ -27,6 +27,7 @@ argv_loop_2:
 	;ld	(hl),0
 	inc	hl
 
+IF CRT_ENABLE_STDIO
 IF !DEFINED_noredir
 IF !DEFINED_nostreams
 	EXTERN freopen
@@ -88,6 +89,7 @@ no_redir_stdout:
 	dec	hl
 	jr	argv_zloop
 no_redir_stdin:
+ENDIF
 ENDIF
 ENDIF
 

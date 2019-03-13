@@ -13,10 +13,12 @@
 	PUBLIC	clock
 	PUBLIC	_clock
 
+  EXTERN  _FRAMES
+
 .clock
 ._clock
-	ld	hl,(23672)
-	ld	a,(23674)
+	ld	hl,(_FRAMES)
+	ld	a,(_FRAMES+2)
 	ld	e,a
 	ld	d,0
 	ret

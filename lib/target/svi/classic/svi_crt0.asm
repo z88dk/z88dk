@@ -23,11 +23,11 @@
 ;--------
 
 	EXTERN    _main
+        EXTERN    msxbios
 
 	PUBLIC    cleanup
 	PUBLIC    l_dcal
 
-	PUBLIC    msxbios
 
 
 
@@ -98,14 +98,6 @@ ENDIF
 l_dcal:
         jp      (hl)
 
-; ---------------
-; MSX specific stuff
-; ---------------
-
-; Safe BIOS call
-msxbios:
-	push	ix
-	ret
 
         INCLUDE "crt/classic/crt_runtime_selection.asm"
 	INCLUDE	"crt/classic/crt_section.asm"

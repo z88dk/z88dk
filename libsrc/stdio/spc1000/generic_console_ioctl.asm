@@ -11,6 +11,7 @@
 	EXTERN	__spc1000_mode
 	EXTERN	generic_console_font32
 	EXTERN	generic_console_udg32
+        EXTERN  __tms9918_console_ioctl
 
 	INCLUDE	"target/spc1000/def/spc1000.def"
 
@@ -53,11 +54,23 @@ check_mode:
 	cp	2		;COLOUR
 	jr	z,set_mode
 	cp	10		;Switch to VDP
-	jr	nz,failure
+        jr      c,failure
+        ld      c,a
+        ld      a,10
 	ld	(__spc1000_mode),a
 	ld	a,24
 	ld	(__console_h),a
-	call	generic_console_cls
+        ld      a,c
+        sub     10
+        ld      l,a
+        ld      h,0
+        push    hl
+        ld      hl,0
+        add     hl,sp
+        ex      de,hl
+        ld      a,IOCTL_GENCON_SET_MODE
+        call    __tms9918_console_ioctl
+        pop     hl
 	jr	success
 
 set_mode:

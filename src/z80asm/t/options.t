@@ -231,7 +231,7 @@ for my $options ('-g', '--globaldef') {
 		options	=> $options,
 	);
 	ok -f def_file(), def_file();
-	eq_or_diff scalar(read_file(def_file())), <<'END', "deffile contents";
+	is_text( scalar(read_file(def_file())), <<'END', "deffile contents" );
 DEFC main                            = $0000
 DEFC x31_x31_x31_x31_x31_x31_x31_x31 = $0004
 DEFC x_32_x32_x32_x32_x32_x32_x32_x32 = $0005

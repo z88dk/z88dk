@@ -31,6 +31,7 @@
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
 
+		EXTERN		generic_console_flags
 		EXTERN		conio_map_colour
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
@@ -107,7 +108,16 @@ generic_console_printc:
 	push	af
 	res	2,a
 	out	($F0),a
+	ld	a,(generic_console_flags)
+	rlca
 	ld	a,(__super80_attr)
+	jr	nc,place
+	; Do inverse by reversing attributes
+	rlca
+	rlca
+	rlca
+	rlca
+place:
 	ld	(hl),a
 	pop	af
 	out	($F0),a

@@ -121,7 +121,10 @@ static int next_address = -1;
        int trace = 0;
 static int hotspot = 0;
 static int max_hotspot_addr = 0;
+static int last_hotspot_addr;
+static int last_hotspot_st;
 static int hotspots[65536];
+static int hotspots_t[65536];
 
 
 void debugger_init()
@@ -161,7 +164,12 @@ void debugger()
         if ( pc > max_hotspot_addr) {
             max_hotspot_addr = pc;
         }
+        if ( last_hotspot_addr != -1 ) {
+            hotspots_t[last_hotspot_addr] += st - last_hotspot_st;
+        }
         hotspots[pc]++;
+        last_hotspot_addr = pc;
+        last_hotspot_st = st;
     }
 
     if ( debugger_active == 0 ) {
@@ -599,7 +607,7 @@ static void print_hotspots()
         for ( i = 0; i < max_hotspot_addr; i++) {
             if ( hotspots[i] != 0 ) {
                 disassemble2(i, buf, sizeof(buf));
-                fprintf(fp, "%d\t\t%s\n",hotspots[i],buf);
+                fprintf(fp, "%d\t%d\t\t%s\n",hotspots[i],hotspots_t[i],buf);
             }
         }
         fclose(fp);

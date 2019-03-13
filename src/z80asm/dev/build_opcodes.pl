@@ -10,6 +10,7 @@
 # Build opcodes.t test code, using Udo Munk's z80pack assembler as a reference implementation
 
 use Modern::Perl;
+use Config;
 use File::Basename;
 use File::Slurp;
 use Iterator::Array::Jagged;
@@ -20,7 +21,7 @@ use Data::Dump 'dump';
 our $KEEP_FILES;
 $KEEP_FILES	 = grep {/-keep/} @ARGV; 
 
-my $UDOMUNK_ASM = "dev/z80pack-1.21/z80asm/z80asm.exe";
+my $UDOMUNK_ASM = "dev/z80pack-1.21/z80asm/z80asm".$Config{_exe};
 my $Z80EMU_SRCDIR = '../../libsrc/z80_crt0s/z80_emu';
 my @Z80EMU = qw(
 		rcmx_cpd

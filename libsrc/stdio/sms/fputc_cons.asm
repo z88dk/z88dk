@@ -1,7 +1,7 @@
 	SECTION code_clib	
 	PUBLIC	fputc_cons_native
 	
-	INCLUDE "sms/sms.hdr"
+	INCLUDE "target/sms/sms.hdr"
 
 	EXTERN	VRAMToHL
 	PUBLIC	fputc_vdp_offs

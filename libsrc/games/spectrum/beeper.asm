@@ -1,8 +1,8 @@
-; $Id: beeper.asm,v 1.5 2016-06-10 21:37:10 dom Exp $
+; $Id: beeper.asm $
 ;
 ; ZX Spectrum 1 bit sound functions
 ;
-; Stefano Bodrato - 28/9/2001
+; Stefano Bodrato - 2019
 ;
 
 	SECTION		code_clib
@@ -55,8 +55,12 @@
 ._beeper
      call    bit_open_di
 	push	ix		;save callers ix
+IF FORts2068
+	 call    1011
+ELSE
 	 call    call_rom3
 	 defw    949
+ENDIF
 	pop	ix		;restore callers ix
 	 di
 	 call    bit_close_ei

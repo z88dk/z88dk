@@ -36,8 +36,8 @@ games/spectrum/bit_open_di
 games/spectrum/bit_close
 games/spectrum/bit_close_ei
 @games/games.lst
-@spectrum/spectrum.lst
-@spectrum/fzx/fzx.lst
+@target/zx/spectrum.lst
+@target/zx/fzx/fzx.lst
 psg/spectrum/set_psg
 psg/spectrum/set_psg_callee
 psg/spectrum/get_psg

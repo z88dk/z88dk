@@ -37,5 +37,5 @@ games/spectrum/bit_open_di
 games/spectrum/bit_close
 games/spectrum/bit_close_ei
 @games/games.lst
-@spectrum/spectrum.lst
+@target/zx/spectrum.lst
 @z80.lst

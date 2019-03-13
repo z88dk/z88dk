@@ -492,6 +492,9 @@ static void parse_trailing_modifiers(Type *type)
     }
     while (1) {
         if (amatch("__z88dk_fastcall") || amatch("__FASTCALL__")) {
+            if( type->parameters && array_len(type->parameters) != 1 ) {
+                warningfmt("sdcc-compat", "SDCC only supports a single parameter for __z88dk_fastcall\n");
+            }
             type->flags |= FASTCALL;
             type->flags &= ~FLOATINGDECL;
         } else if (amatch("__z88dk_callee") || amatch("__CALLEE__")) {
@@ -1115,6 +1118,8 @@ Type *dodeclare2(Type **base_type, decl_mode mode)
         }
     }
 
+#if 0
+    // Issue 1103: We need to support fastcall for function pointers
     if ( ispointer(type) && type->ptr->kind == KIND_FUNC ) {
         /* Function pointers, fastcall isn't valid */
         if ( type->ptr->flags & FASTCALL ) {
@@ -1122,6 +1127,7 @@ Type *dodeclare2(Type **base_type, decl_mode mode)
             type->ptr->flags &= ~FASTCALL;
         }
     }
+#endif
 
     return type;
 }

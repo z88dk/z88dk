@@ -33,8 +33,7 @@
 
         PUBLIC    call_rom3       ; Interposer
        
-        PUBLIC    _FRAMES
-        defc      _FRAMES = 23672 ; Timer
+        
 
 	PUBLIC	  __SYSVAR_BORDCR
 	defc	  __SYSVAR_BORDCR = 23624
@@ -49,13 +48,17 @@
 	    defc TAR__register_sp = 0xff57	; below UDG, keep eye when using banks
         ENDIF
 
+        PUBLIC    _FRAMES
+        IF startup != 2
+                defc  _FRAMES = 23672 ; Timer	
+        ENDIF
         
         IF      !DEFINED_CRT_ORG_CODE
             IF (startup=2)                 ; ROM ?
-                defc    CRT_ORG_CODE  = 0
-		defc	TAR__register_sp = 32767	
+                defc  CRT_ORG_CODE  = 0
+		defc	TAR__register_sp = 32767
             ELSE
-                defc    CRT_ORG_CODE  = 32768
+                defc  CRT_ORG_CODE  = 32768
             ENDIF
         ENDIF
 
@@ -350,6 +353,7 @@ ENDIF
 	SECTION bss_crt
 IF startup=2
 	PUBLIC  romsvc
+_FRAMES:        defs    3
 romsvc:         defs    10  ; Pointer to the end of the sysdefvars
                             ; used by the ROM version of some library
 ENDIF

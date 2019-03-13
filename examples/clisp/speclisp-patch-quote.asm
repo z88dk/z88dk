@@ -14,7 +14,7 @@
 ;    CLEAR 65200
 ;    MERGE ""          <- SpecLisp LOADER
 ;    LOAD "" CODE      <- SpecLisp program
-;    LOAD "" CODE      <- SpecLisp program
+;    LOAD "" CODE      <- this program patch
 ;
 ;	.. RANDOMIZE USR USR "r"    (= 65504)
 

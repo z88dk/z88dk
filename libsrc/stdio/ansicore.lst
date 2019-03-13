@@ -4,3 +4,4 @@ stdio/ansi/f_ansi_putc
 stdio/ansi/fputc_cons
 stdio/ansi/f_ansi_dsr6
 stdio/ansi/vtrendition
+stdio/ansi/generic/f_ansi_dline_generic

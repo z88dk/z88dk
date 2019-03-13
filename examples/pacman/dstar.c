@@ -1,6 +1,7 @@
 /*
  *  D E A T H   S T A R  -  PacMan hardware version
- * 
+ *
+ *	add -DCUSTOM_FONT if you wish to provide your own ROM font.
  * 
  * * * * * * *
  *
@@ -272,25 +273,39 @@ void MovePiece(char *ptr, char plusx, char plusy)
 	}
 }
 
+#ifdef CUSTOM_FONT
+#define BLANK_SPACE ' '
+#define PIC_WALL    'X'
+#define PIC_BUBB    'o'
+#define PIC_BALL    'O'
+#define PIC_BOX     255
+#else
+#define BLANK_SPACE 0x40
+#define PIC_WALL    0x58
+#define PIC_BUBB    0x12
+#define PIC_BALL    0x14
+#define PIC_BOX     0x4F
+#endif
+
 /* PacMan 'text' resolution is 29x32 */
 void putpic(int x, int y, int picture) {			
 	if (picture == 0) {
-		display[VRAM_ADDRESS(x,y)]=0x40;
+		display[VRAM_ADDRESS(x,y)]=BLANK_SPACE;
 	}
 	if (picture == WALL) {
-		display[VRAM_ADDRESS(x,y)]=0x58;
+		display[VRAM_ADDRESS(x,y)]=PIC_WALL;
 		attr[VRAM_ADDRESS(x,y)]=1;
 	}
 	if (picture == BUBB) {
-		display[VRAM_ADDRESS(x,y)]=0x12;
+		display[VRAM_ADDRESS(x,y)]=PIC_BUBB;
 		attr[VRAM_ADDRESS(x,y)]=24;
 	}
 	if (picture == BALL) {
-		display[VRAM_ADDRESS(x,y)]=0x14;
+		display[VRAM_ADDRESS(x,y)]=PIC_BALL;
 		attr[VRAM_ADDRESS(x,y)]=9;
 	}
 	if (picture == BOX) {
-		display[VRAM_ADDRESS(x,y)]=0x4F;
+		display[VRAM_ADDRESS(x,y)]=PIC_BOX;
 		attr[VRAM_ADDRESS(x,y)]=9;
 	}
 

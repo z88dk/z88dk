@@ -1,0 +1,126 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	data_compiler
+._level_data
+	defm	""
+	defb	1
+
+	defm	""
+	defb	1
+
+	defm	""
+	defb	1
+
+	defm	""
+	defb	1
+
+	defm	""
+	defb	1
+
+	defm	""
+	defb	1
+
+	defm	""
+	defb	1
+
+	defm	""
+	defb	0
+
+	defm	"foo"
+	defb	0
+
+	defs	4
+	defm	"bar!"
+	defb	0
+
+	defs	3
+	defm	""
+	defb	1
+
+	defm	""
+	defb	1
+
+	defm	""
+	defb	1
+
+	defm	""
+	defb	1
+
+	defm	""
+	defb	1
+
+	defm	""
+	defb	1
+
+	defm	""
+	defb	1
+
+	defm	""
+	defb	0
+
+	defm	"foo"
+	defb	0
+
+	defs	4
+	defm	"bar!"
+	defb	0
+
+	defs	3
+	defm	""
+	defb	1
+
+	defm	""
+	defb	1
+
+	defm	""
+	defb	1
+
+	defm	""
+	defb	1
+
+	defm	""
+	defb	1
+
+	defm	""
+	defb	1
+
+	defm	""
+	defb	1
+
+	defm	""
+	defb	0
+
+	defm	"foo"
+	defb	0
+
+	defs	4
+	defm	"bar!"
+	defb	0
+
+	defs	3
+	SECTION	code_compiler
+
+._main
+	ld	hl,0	;const
+	ret
+
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_level_data
+	GLOBAL	_main
+
+
+
+

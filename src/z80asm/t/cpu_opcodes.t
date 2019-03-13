@@ -252,7 +252,7 @@ sub test_asm {
 	else {
 		my $bin_dump = HexDump($bin);
 		my $bmk_dump = HexDump($bmk);
-		eq_or_diff $bin_dump, $bmk_dump;
+		is_text( $bin_dump, $bmk_dump );
 	}
 	
 	# build failure for invalid opcodes

@@ -21,10 +21,10 @@ graphics/tiki100/w_putsprite
 graphics/tiki100/w_stencil_render
 graphics/tiki100/l_graphics_cmp
 @gfxbasew.lst
-arch/tiki100/gr_setpalette
-arch/tiki100/gr_defmod
-arch/tiki100/gr_scroll
-arch/tiki100/gr_getmode
+target/tiki100/gr_setpalette
+target/tiki100/gr_defmod
+target/tiki100/gr_scroll
+target/tiki100/gr_getmode
 stdio/tiki100/CRT_FONT
 stdio/tiki100/generic_console
 stdio/tiki100/generic_console_cls

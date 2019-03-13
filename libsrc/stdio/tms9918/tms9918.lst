@@ -1,7 +1,0 @@
-stdio/tms9918/conio_vars
-stdio/tms9918/generic_console
-stdio/tms9918/generic_console_ioctl
-stdio/tms9918/generic_console_vpeek
-stdio/tms9918/conio_map_colour
-stdio/tms9918/CRT_FONT
-stdio/tms9918/bordercolour
