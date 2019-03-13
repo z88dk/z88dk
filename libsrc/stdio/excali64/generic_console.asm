@@ -7,7 +7,6 @@
 		PUBLIC		generic_console_vpeek
 		PUBLIC		generic_console_scrollup
 		PUBLIC		generic_console_printc
-		PUBLIC		generic_console_ioctl
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
@@ -15,12 +14,11 @@
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
 		EXTERN		__excali64_attr
+		EXTERN		__console_w
 
 		defc		DISPLAY = $2000
 		defc		COLOUR_MAP = $2800
 
-generic_console_ioctl:
-	scf
 generic_console_set_inverse:
 	ret
 
@@ -113,8 +111,11 @@ generic_console_vpeek:
 
 
 xypos:
-	ld	hl,DISPLAY - CONSOLE_COLUMNS
-	ld	de,CONSOLE_COLUMNS
+	ld	hl,DISPLAY 
+	ld	de,(__console_w)
+	ld	d,0
+	and	a
+	sbc	hl,de
 	inc	b
 generic_console_printc_1:
 	add	hl,de
