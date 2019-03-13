@@ -40,7 +40,7 @@ generic_console_set_ink:
 	
 generic_console_set_paper:
 	and	7
-	rrca
+	rlca
 	ld	e,a
 	ld	a,(__excali64_attr)
 	and	@11110001
@@ -158,4 +158,11 @@ generic_console_scrollup_4:
 	pop	bc
 	pop	de
 	ret
+
+
+        SECTION code_crt_init
+
+        EXTERN  asm_set_cursor_state
+        ld      l,$20
+        call    asm_set_cursor_state
 
