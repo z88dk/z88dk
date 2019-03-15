@@ -24,7 +24,7 @@ Basic floating point functions - these are computed from first principles
  deg(x) - degrees in x radians
  rad(x) - radians in x degrees
 
-Derrivitive floating point functions (derrived from combinations of basic functions)
+Derivitive floating point functions (derrived from combinations of basic functions)
 
  pow10(x)- 10 to the x power
  acsc(x) - arc cosecant of x
@@ -781,46 +781,4 @@ auto float value;
 #endasm
 	return value;
 }
-
-
-/*** BeginHeader intel, intel16 */
-// Endian swapping routines.  Put in math.lib since they are useful for
-// things other than just tcp/ip.
-__root unsigned long intel( unsigned long );
-__root unsigned short intel16( unsigned short );
-#ifndef ntohs
-// This works because function is its own inverse
-#define ntohs intel16
-#define htons intel16
-#define ntohl intel
-#define htonl intel
-#endif
-/*** EndHeader */
-
-#asm __nodebug
-;
-; unsigned long intel(unsigned long)
-; returns the intel byte order dword converted from network byte order
-;
-
-intel::
-	ex		de,hl
-	ld		e,b
-	ld		d,c
-	ld		b,l
-	ld		c,h
-	ret
-
-;
-; unsigned intel16(unsigned)
-; returns the intel byte order word converted from network byte order
-;
-
-intel16::
-	ld		a,l
-	ld		l,h
-	ld		h,a
-	ret
-#endasm
-
 
