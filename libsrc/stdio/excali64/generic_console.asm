@@ -15,6 +15,7 @@
 		EXTERN		CONSOLE_ROWS
 		EXTERN		__excali64_attr
 		EXTERN		__console_w
+		EXTERN		__console_h
 
 		defc		DISPLAY = $2000
 		defc		COLOUR_MAP = $2800
@@ -48,6 +49,8 @@ generic_console_set_paper:
 
 generic_console_cls:
 	in	a,($50)
+	bit	4,a
+	jr	z,generic_console_cls
 	push	af
 	res	1,a
 	set	0,a
@@ -74,7 +77,10 @@ generic_console_cls:
 generic_console_printc:
 	call	xypos
 	ld	d,a
+printc_ready:
 	in	a,($50)
+	bit	4,a
+	jr	z,printc_ready
 	push	af
 	res	1,a
 	set	0,a
@@ -128,27 +134,55 @@ generic_console_printc_3:
 generic_console_scrollup:
 	push	de
 	push	bc
+	ld	hl,(__console_w)
+	ld	(t_console_w),hl
+scroll_ready:
 	in	a,($50)
+	bit	4,a
+	jr	z,scroll_ready
 	push	af
 	res	1,a
 	set	0,a
 	out	($70),a
-	ld	hl, DISPLAY + CONSOLE_COLUMNS
+
+	ld	hl, DISPLAY
+	ld	de, (t_console_w)
+	ld	d,0
+	add	hl,de
 	ld	de, DISPLAY
-	ld	bc,+ ((CONSOLE_COLUMNS) * (CONSOLE_ROWS-1))
+	ld	a,(t_console_h)
+	dec	a
+scroll_1:
+	ld	bc,(t_console_w)
+	ld	b,0
 	ldir
+	dec	a
+	jr	nz,scroll_1
+
 	ex	de,hl
-	ld	b,CONSOLE_COLUMNS
+	ld	a,(t_console_w)
+	ld	b,a
 generic_console_scrollup_3:
 	ld	(hl),32
 	inc	hl
 	djnz	generic_console_scrollup_3
-	ld	hl, COLOUR_MAP + CONSOLE_COLUMNS
+
+	ld	hl, COLOUR_MAP
+	ld	de, (t_console_w)
+	ld	d,0
+	add	hl,de
 	ld	de, COLOUR_MAP
-	ld	bc,+ ((CONSOLE_COLUMNS) * (CONSOLE_ROWS-1))
+	ld	a,(t_console_h)
+	dec	a
+scroll_2:
+	ld	bc,(t_console_w)
+	ld	b,0
 	ldir
+	dec	a
+	jr	nz,scroll_2
 	ex	de,hl
-	ld	b,CONSOLE_COLUMNS
+	ld	a,(t_console_w)
+	ld	b,a
 	ld	a,(__excali64_attr)
 generic_console_scrollup_4:
 	ld	(hl),a
@@ -160,6 +194,11 @@ generic_console_scrollup_4:
 	pop	de
 	ret
 
+
+	SECTION	bss_graphics
+
+t_console_w:	defb	0
+t_console_h:	defb	0
 
         SECTION code_crt_init
 
