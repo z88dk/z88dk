@@ -16,12 +16,15 @@
 		EXTERN		__excali64_attr
 		EXTERN		__console_w
 		EXTERN		__console_h
+		EXTERN		__excali64_font32
+		EXTERN		__excali64_udg32
 
 		EXTERN		conio_map_colour
 		EXTERN		conio_map_colour_bg
 
 		defc		DISPLAY = $2000
 		defc		COLOUR_MAP = $2800
+		defc		HIRES_MAP = $3000
 
 generic_console_set_inverse:
 	ret
@@ -70,6 +73,11 @@ generic_console_cls:
 	ld	a,(__excali64_attr)
 	ld	(hl),a
 	ldir
+	ld	hl, HIRES_MAP
+	ld	de, HIRES_MAP + 1
+	ld	bc, +(CONSOLE_COLUMNS * CONSOLE_ROWS) - 1
+	ld	(hl),4		;PCG bank 0
+	ldir
 	pop	af
 	out	($70),a
 	ret
@@ -95,6 +103,22 @@ printc_ready:
 	ld	h,a
 	ld	a,(__excali64_attr)
 	ld	(hl),a
+	; If we've got custom font or UDGs we need to toggle some bits
+	; and set the PCG bank reference
+	ld	bc,(__excali64_font32)
+	bit	7,d		;d = character being printed
+	jr	z,not_udg
+	ld	bc,(__excali64_udg32)
+not_udg:
+	ld	a,b
+	or	c
+	jr	z,not_custom
+	set	0,(hl)		;toggle graphics flag on attributes
+	ld	a,h
+	add	8
+	ld	h,a
+	ld	(hl),4		;PCG bank 0
+not_custom:
 	pop	af
 	out	($70),a
 	ret
@@ -192,6 +216,30 @@ generic_console_scrollup_4:
 	ld	(hl),a
 	inc	hl
 	djnz	generic_console_scrollup_4
+
+	ld	hl, HIRES_MAP
+	ld	de, (t_console_w)
+	ld	d,0
+	add	hl,de
+	ld	de, HIRES_MAP
+	ld	a,(t_console_h)
+	dec	a
+scroll_3:
+	ld	bc,(t_console_w)
+	ld	b,0
+	ldir
+	dec	a
+	jr	nz,scroll_3
+	ex	de,hl
+	ld	a,(t_console_w)
+	ld	b,a
+	ld	a,4		;PCG bank 0
+generic_console_scrollup_5:
+	ld	(hl),a
+	inc	hl
+	djnz	generic_console_scrollup_5
+
+
 	pop	af
 	out	($70),a
 	pop	bc

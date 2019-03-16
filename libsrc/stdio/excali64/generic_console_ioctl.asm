@@ -8,6 +8,10 @@
 	EXTERN	generic_console_cls
 	EXTERN	__console_h
 	EXTERN	__console_w
+	EXTERN	copy_font
+	EXTERN	__excali64_font32
+	EXTERN	__excali64_udg32
+	EXTERN	__excali64_mode
 
 
 ; a = ioctl
@@ -17,6 +21,26 @@ generic_console_ioctl:
 	ld	c,(hl)	;bc = where we point to
 	inc	hl
 	ld	b,(hl)
+        cp      IOCTL_GENCON_SET_FONT32
+        jr      nz,check_set_udg
+	ld	(__excali64_font32),bc
+	ld	hl,$6020		;96 chars, start from 32
+	ld	a,(__excali64_mode)
+	cp	2
+	call	nz,copy_font
+success:
+        and     a
+        ret
+check_set_udg:
+        cp      IOCTL_GENCON_SET_UDGS
+        jr      nz,check_mode
+	ld	(__excali64_udg32),bc
+	ld	hl,$8080		;128 chars, start from 128
+	ld	a,(__excali64_mode)
+	cp	2
+	call	nz,copy_font
+	jr	success
+
 check_mode:
 	cp	IOCTL_GENCON_SET_MODE
 	jr	nz,failure
@@ -44,9 +68,7 @@ vduloop:
 	inc	c
 	djnz	vduloop
 	call	generic_console_cls
-success:
-	and	a
-	ret
+	jr	success
 failure:
 	scf
 dummy_return:

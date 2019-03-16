@@ -2,4 +2,7 @@ stdio/excali64/generic_console
 stdio/excali64/generic_console_ioctl
 stdio/excali64/conio_vars
 stdio/excali64/conio_map_colour
+stdio/excali64/CRT_FONT
+stdio/excali64/copy_font
+@font/font_8x8/font_8x8.lst
 @video/mc6845/mc6845.lst
