@@ -14,6 +14,7 @@
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
 		EXTERN		__excali64_attr
+		EXTERN		__excali64_inverse_attr
 		EXTERN		__console_w
 		EXTERN		__console_h
 		EXTERN		__excali64_font32
@@ -27,31 +28,49 @@
 		defc		HIRES_MAP = $3000
 
 generic_console_set_inverse:
+	ld	a,(hl)
+	ld	(t_flags),a
 	ret
 
 generic_console_set_ink:
+	push	af
+	ld	de,__excali64_attr
+	call	set_ink
+	pop	af
+	ld	de,__excali64_inverse_attr
+	jr	set_paper
+
+set_ink:
 	call	conio_map_colour
 	and	15
 	rla
 	rla
 	rla
 	rla	
-	ld	e,a
-	ld	a,(__excali64_attr)
+	ld	c,a
+	ld	a,(de)
 	and	@00001111
-	or	e
-	ld	(__excali64_attr),a
+	or	c
+	ld	(de),a
 	ret
 
 	
 generic_console_set_paper:
+	push	af
+	ld	de,__excali64_attr
+	call	set_paper
+	pop	af
+	ld	de,__excali64_inverse_attr
+	jr	set_ink
+
+set_paper:
 	call	conio_map_colour_bg
 	rlca
-	ld	e,a
-	ld	a,(__excali64_attr)
+	ld	c,a
+	ld	a,(de)
 	and	@11110001
-	or	e
-	ld	(__excali64_attr),a
+	or	c
+	ld	(de),a
 	ret
 
 generic_console_cls:
@@ -101,8 +120,8 @@ printc_ready:
 	ld	a,h
 	add	8
 	ld	h,a
-	ld	a,(__excali64_attr)
-	ld	(hl),a
+	call	get_attr
+	ld	(hl),b
 	; If we've got custom font or UDGs we need to toggle some bits
 	; and set the PCG bank reference
 	ld	bc,(__excali64_font32)
@@ -123,6 +142,15 @@ not_custom:
 	out	($70),a
 	ret
 
+get_attr:
+	ld	a,(__excali64_attr)
+	ld	b,a
+	ld	a,(t_flags)
+	rlca
+	ret	nc
+	ld	a,(__excali64_inverse_attr)
+	ld	b,a
+	ret
 
 ;Entry: c = x,
 ;       b = y
@@ -251,6 +279,7 @@ generic_console_scrollup_5:
 
 t_console_w:	defb	0
 t_console_h:	defb	0
+t_flags:	defb	0
 
         SECTION code_crt_init
 

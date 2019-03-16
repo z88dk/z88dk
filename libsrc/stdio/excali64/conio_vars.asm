@@ -6,11 +6,13 @@
 		SECTION		data_graphics
 
 		PUBLIC		__excali64_attr
+		PUBLIC		__excali64_inverse_attr
 		PUBLIC		__excali64_mode
 		PUBLIC		__excali64_font32
 		PUBLIC		__excali64_udg32
 
 .__excali64_attr	defb	$70	; White on Black
+.__excali64_inverse_attr	defb @00001110	;Black on white
 .__excali64_mode	defb	$0	;80x25 text
 
 .__excali64_font32	defw	CRT_FONT
