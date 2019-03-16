@@ -17,6 +17,9 @@
 		EXTERN		__console_w
 		EXTERN		__console_h
 
+		EXTERN		conio_map_colour
+		EXTERN		conio_map_colour_bg
+
 		defc		DISPLAY = $2000
 		defc		COLOUR_MAP = $2800
 
@@ -24,6 +27,7 @@ generic_console_set_inverse:
 	ret
 
 generic_console_set_ink:
+	call	conio_map_colour
 	and	15
 	rla
 	rla
@@ -38,7 +42,7 @@ generic_console_set_ink:
 
 	
 generic_console_set_paper:
-	and	7
+	call	conio_map_colour_bg
 	rlca
 	ld	e,a
 	ld	a,(__excali64_attr)
