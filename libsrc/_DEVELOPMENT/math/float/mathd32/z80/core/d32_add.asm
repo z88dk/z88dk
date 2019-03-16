@@ -5,6 +5,45 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
+;
+;-------------------------------------------------------------------------
+; F_add - Rabbit floating point add
+;-------------------------------------------------------------------------
+; 1) first section: unpack from F_add: to sort: 78 clocks
+;    one unpacked number in hldebc the other in hl'de'bc'
+;    unpacked format: h==0; mantissa= lde, sign in b, exponent in c
+;         in addition af' holds  b xor b' used to test if add or sub needed
+;
+; 2) second section: sort from sort to align, sets up smaller number in hldebc and larger in hl'de'bc'
+;    This section sorts out the special cases:
+;       to alignzero - if no alignment (right) shift needed (11 clocks)
+;           alignzero has properties: up to 23 normalize shifts needed if signs differ
+;                                     not know which mantissa is larger for different signs until sub performed
+;                                     no alignment shifts needed
+;       to alignone  - if one alignment shift needed (31 clocks)
+;           alignone has properties: up to 23 normalize shifts needed if signs differ
+;                                    mantissa aligned is always smaller than other mantissa
+;                                    one alignment shift needed
+;       to align     - 2 to 23 alignment shifts needed (40 clocks)
+;           numbers alighed 2-23 have properties: max of 1 normalize shift needed
+;                                                 mantissa aligned always smaller
+;                                                 2-23 alignment shifts needed
+;       number too small to add, return larger number (to doadd1)
+;
+; 3) third section alignment - aligns smaller number mantissa with larger mantissa
+;    This section does the right shift. Lost bits shifted off, are tested. Up to 8 lost bits
+;    are used for the test. If any are non-zero a one is or'ed into remaining mantissa bit 0.
+;      align 2-23 - worst case 101 clocks (right shift by 7 with lost bits)
+; 4) 4th section add or subtract
+;
+; 5) 5th section post normalize - worst case 76 clocks for 7 left
+;
+; 6) 6th section pack up - 41 clocks
+;
+;-------------------------------------------------------------------------
+; sub small number: unpack (78)+sort(40) + align 7 right (101)+ subtract & norm 1(36  ) + packup (35)=290
+; sub 2 near equal with same exp: unpack(78)+sort(11)+sub(54)+norm(76)+pack(41)=260
+;-------------------------------------------------------------------------
 
 PUBLIC md32_sub
 PUBLIC md32_add

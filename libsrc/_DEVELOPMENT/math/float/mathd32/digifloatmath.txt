@@ -231,4 +231,146 @@ Exceptions - range errors
  1) Square root of a negative number
  2) argument of exponent type function too large (x>129.9).
  3) Log of a negative number.
+ 
+
+;-------------------------------------------------------------------------
+; F_add - Rabbit floating point add
+;-------------------------------------------------------------------------
+; 1) first section: unpack from F_add: to sort: 78 clocks
+;    one unpacked number in hldebc the other in hl'de'bc'
+;    unpacked format: h==0; mantissa= lde, sign in b, exponent in c
+;         in addition af' holds  b xor b' used to test if add or sub needed
+;
+; 2) second section: sort from sort to align, sets up smaller number in hldebc and larger in hl'de'bc'
+;    This section sorts out the special cases:
+;       to alignzero - if no alignment (right) shift needed (11 clocks)
+;           alignzero has properties: up to 23 normalize shifts needed if signs differ
+;                                     not know which mantissa is larger for different signs until sub performed
+;                                     no alignment shifts needed
+;       to alignone  - if one alignment shift needed (31 clocks)
+;           alignone has properties: up to 23 normalize shifts needed if signs differ
+;                                    mantissa aligned is always smaller than other mantissa
+;                                    one alignment shift needed
+;       to align     - 2 to 23 alignment shifts needed (40 clocks)
+;           numbers alighed 2-23 have properties: max of 1 normalize shift needed
+;                                                 mantissa aligned always smaller
+;                                                 2-23 alignment shifts needed
+;       number too small to add, return larger number (to doadd1)
+;
+; 3) third section alignment - aligns smaller number mantissa with larger mantissa
+;    This section does the right shift. Lost bits shifted off, are tested. Up to 8 lost bits
+;    are used for the test. If any are non-zero a one is or'ed into remaining mantissa bit 0.
+;      align 2-23 - worst case 101 clocks (right shift by 7 with lost bits)
+; 4) 4th section add or subtract
+;
+; 5) 5th section post normalize - worst case 76 clocks for 7 left
+;
+; 6) 6th section pack up - 41 clocks
+;
+;-------------------------------------------------------------------------
+; sub small number: unpack (78)+sort(40) + align 7 right (101)+ subtract & norm 1(36  ) + packup (35)=290
+; sub 2 near equal with same exp: unpack(78)+sort(11)+sub(54)+norm(76)+pack(41)=260
+;-------------------------------------------------------------------------
+
+;-------------------------------------------------------------------------
+; F_mul - Rabbit floating point multiply
+;-------------------------------------------------------------------------
+;
+; since the f80 only has support for 16x16bit multiplies
+; the multiplication of the mantissas needs to be broken
+; into stages and accumulated at the end.
+;
+; abc * def
+; assume worst overflow case: a=b=c=d=e=f=0xff (255)
+;
+; = (ab*2^8+c) * (de*2^8+f)
+; = ab*de*2^16 + ab*f*2^8 + c*de*2^8 + c*f
+;
+; =    ff fe 00 01 00 00     (ab*de*2^16)
+;    + 00 00 fe ff 01 00     (ab*f*2^8)
+;    + 00 00 fe ff 01 00     (c*de*2^8)
+;    + 00 00 00 00 fe 01     (f*c)
+;   -----------------------
+;      ff ff fe 00 00 01
+;
+; since there only a small number of cases where (f*c)
+; changes things we will ignore that multiply.
+;
+; assume smallest case: abc=0x8000 def=0x8000
+;
+; =   40 00 00 00 00 00
+;   + 00 00 00 00 00 00
+;   + 00 00 00 00 00 00
+;  -----------------------
+;     40 00 00 00 00 00
+;
+; In this case a shift left is required to keep the number
+; in the proper range for a ieee mantissa.
+;
+; the mul 16bit*16bit f80 multiply is signed so after each
+; unsigned multiply with the chance of the sign bit in one
+; of the operands set, we need to adjust the result back
+; to an unsigned value
+;
+; -n = 2^16-n (convert from signed to unsigned)
+;
+; -m*-n = m*n = (2^16-n)*(2^16-m)
+;             = 2^32 - 2^16*(m+n) + m*n
+;             = -2^16(m+n) + m*n
+;             = 2^16(m+n) + m*n   (if you bring to other side)
+;
+; -m*n  =-m*n = n*(2^16-m)
+;             = 2^16*n-n*m
+;
+;         m*n = -2^16*n+m*n
+;         m*n = 2^16*n+m*n (if you bring to other side)
+;
+; example: (using Rabbit Semiconductor algorithm)
+;
+;                  sign  exp   mantissa
+;   0x3fa0624e   =  0    0x7f  0xa0624e
+; * 0x4001eb85   =  0    0x80  0x81eb85
+; -------------
+;   0x4022ca2e   =  0    0x80  0xa2ca2e
+;
+;       0xa062    0xa062    0x81eb
+; *     0x81eb  *   0x85  *   0x4e
+; ------------  --------  --------
+;   0x51649bf6  0x5352ea  0x27959a
+;
+;   0x51649bf6 00
+; +     0x5342 ea
+; +     0x2795 9a
+; ---------------
+;   0x516516dd XX
+;
+; shift result left by one
+;
+;   0xa2ca2dba
+;
+; 0 0x80 0xa2ca2d -> 0x4022ca2d
+;
+;-------------------------------------------------------------------------
+; worst case run time 315 clocks, about 12.6us at 25mhz
+;-------------------------------------------------------------------------
+
+;-------------------------------------------------------------------------
+; F_div - floating point divide
+;-------------------------------------------------------------------------
+; r = x/y
+;
+; We calculate division of two floating point number by refining an
+; estimate of the reciprocal of y using newton iterations.  Each iteration
+; gives us just less than twice previous precision in binary bits (2n-2).
+;
+; 1/y can be calculated by:
+; w[i+1] = w[i]*2 - w[i]*w[i]*y  where w[0] is approx 1/y
+;
+; The initial table lookup gets us 5 bits of precision.  The next iterations
+; get 8, 14, and 26. At this point the number is rounded then multiplied
+; by x using F_mul.
+;-------------------------------------------------------------------------
+; 845 clocks worst case (close to average case)
+;-------------------------------------------------------------------------
+
 
