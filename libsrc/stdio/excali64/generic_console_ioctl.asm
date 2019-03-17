@@ -46,12 +46,12 @@ check_mode:
 	jr	nz,failure
 	ld	a,c
 	ld	l,80
-	ld	h,25
+	ld	h,24
 	ld	de,screen_80x25
 	and	a
 	jr	z,set_mode
 	ld	l,40
-	ld	h,25
+	ld	h,24
 	ld	de,screen_40x25
 	cp	1
 	jr	nz,failure

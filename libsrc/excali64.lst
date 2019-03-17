@@ -8,6 +8,8 @@ stdio/excali64/loadudg6
 @font/font_8x8/font_8x8.lst
 graphics/dcircle
 graphics/clg
+graphics/generic_console/getmaxx
+graphics/generic_console/getmaxy6
 graphics/generic_console/clsgraph
 graphics/generic_console/plotpixl6
 graphics/generic_console/respixl6
