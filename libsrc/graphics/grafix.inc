@@ -498,6 +498,15 @@ IF FORlaser500
 	defc blankch = 32
 ENDIF
 
+IF FORexcali64
+	DEFINE gotgfx
+	defc maxx = 160
+	defc maxy = 72
+	defc blankch = 32
+	defc USEplotc   = 1		; We call generic_console_plotc, not _printc for text mode
+	defc USEindex = 1
+ENDIF
+
 IF FORz80tvgame
 	DEFINE gotgfx
 	defc maxx = 168

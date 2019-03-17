@@ -10,6 +10,8 @@
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
+                PUBLIC          generic_console_plotc
+                PUBLIC          generic_console_pointxy
 
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
@@ -101,6 +103,34 @@ generic_console_cls:
 	out	($70),a
 	ret
 
+
+generic_console_plotc:
+	call	xypos
+	ld	d,a
+plotc_ready:
+        in      a,($50)
+        bit     4,a
+        jr      z,plotc_ready
+        push    af
+        res     1,a
+        set     0,a
+        out     ($70),a
+        ld      (hl),d
+	ld	a,h
+	add	8
+	ld	h,a
+	call	get_attr
+	ld	(hl),b
+	set	0,(hl)
+	ld	a,h
+	add	8
+	ld	h,a
+	ld	(hl),5		;PCG bank
+	pop	af
+	out	($70),a
+	ret
+
+
 ; c = x
 ; b = y
 ; a = character to print
@@ -150,6 +180,34 @@ get_attr:
 	ret	nc
 	ld	a,(__excali64_inverse_attr)
 	ld	b,a
+	ret
+
+;Check for a graphics character
+;Entry: c = x,
+;       b = y
+;Exit:  nc = success
+;        a = character,
+;        c = failure
+generic_console_pointxy:
+        call    xypos
+	in	a,($50)
+	push	af
+	res	1,a
+	set	0,a
+	out	($70),a
+        ld      d,(hl)
+	ld	a,h
+	add	16
+	ld	h,a
+	ld	a,(hl)
+	cp	5		;PCG bank
+	jr	z,is_graphics_pcg
+	ld	d,0
+is_graphics_pcg:
+	pop	af
+	out	($70),a
+	ld	a,d
+	and	a
 	ret
 
 ;Entry: c = x,

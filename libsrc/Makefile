@@ -832,7 +832,7 @@ einstein.lib:
 excali64.lib:
 	@echo ''
 	@echo '--- Building Excalibur 64 Library ---'
-	$(MAKE) msxdeps
+	$(MAKE) gfxdeps
 	@$(RM) -f video/mc6845/*.o
 	TARGET=excali64 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORexcali64 -x$(OUTPUT_DIRECTORY)/excali64 @$(LISTFILE_DIRECTORY)/excali64.lst
 

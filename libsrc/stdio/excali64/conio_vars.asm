@@ -32,8 +32,10 @@
 ; If compiled with a font option then set it up
 	EXTERN	copy_font
 	EXTERN	CRT_FONT
+	EXTERN	loadudg6
         ld      bc,CRT_FONT
         ld      a,b
         or      c
 	ld	hl,$6020
 	call	nz,copy_font
+	call	loadudg6
