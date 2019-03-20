@@ -1,0 +1,10 @@
+;
+; Port definitions for the BGR Excalibur 64
+
+
+	defc	PORT_KBD_ROW_SELECT = $61
+	defc	PORT_KBD_ROW_READ = $0
+
+	defc	PORT_SYSTEM_STATUS = $50
+	defc	PORT_BANKING = $70
+

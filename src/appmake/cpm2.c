@@ -14,6 +14,7 @@ static char             *c_disc_format       = NULL;
 static char             *c_output_file      = NULL;
 static char             *c_boot_filename     = NULL;
 static char             *c_disc_container    = "dsk";
+static char             *c_extension         = NULL;
 static char              help         = 0;
 
 
@@ -26,6 +27,7 @@ option_t cpm2_options[] = {
     { 'o', "output",   "Name of output file",        OPT_STR|OPT_OUTPUT,   &c_output_file },
     { 's', "bootfile", "Name of the boot file",      OPT_STR,   &c_boot_filename },
     {  0,  "container", "Type of container (raw,dsk)", OPT_STR, &c_disc_container },
+    {  0,  "extension", "Extension for the output file", OPT_STR, &c_extension},
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
@@ -450,7 +452,7 @@ int cpm_write_file_to_image(const char *disc_format, const char *container, cons
 
     if (output_file == NULL) {
         strcpy(disc_name, binary_name);
-        suffix_change(disc_name, extension);
+        suffix_change(disc_name, c_extension ? c_extension : extension);
     } else {
         strcpy(disc_name, output_file);
     }
