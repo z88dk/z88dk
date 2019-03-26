@@ -2061,6 +2061,13 @@ void zand_const(LVALUE *lval, int32_t value)
            ol("ld\ta,d");
            outfmt("\tand\t#(%d %% 256)\n",(value & 0xff000000) >> 24);
            ol("ld\td,a");
+        } else if ( (value & 0xffff0000) == 0x00000000 ) {
+            LVALUE tval = {0};
+
+            tval.val_type = KIND_INT;
+            tval.ltype = type_int;
+            zand_const(&tval, value % 65536);
+            const2(0);
         } else { // 13 bytes
             lpush(); // 4
             vlongconst(value); // 6

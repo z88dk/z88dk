@@ -91,7 +91,7 @@
 	ld	hl,65496	;const
 	add	hl,sp
 	ld	sp,hl
-	ld	hl,20+1+1	;const
+	ld	hl,22	;const
 	add	hl,sp
 	call	l_gint	;
 	exx
