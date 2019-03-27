@@ -38,11 +38,8 @@
 IF FORts2068
 	in	a,(255)
 	ld	hl,__ts2068_hrgmode
-	ld	(hl),0
 	and	7
-	cp	6
-	jr	nz,normal
-	dec	(hl)
+	ld	(hl),a
 .normal
 ENDIF
 	ld	hl,2
@@ -152,8 +149,8 @@ ENDIF
 IF FORts2068
 	; No __zx_console_attribute setting for hires mode
 	ld	a,(__ts2068_hrgmode)
-	and	a
-	jr	nz,cbak
+	cp	6
+	jr	z,cbak
 ENDIF
 	ld	a,h  
 	rrca  
@@ -172,8 +169,8 @@ ENDIF
 	jr	z,char4
 IF FORts2068
 	ld	a,(__ts2068_hrgmode)
-	and	a
-	jr	z,cbak1
+	cp	6
+	jr	nz,cbak1
 	bit	7,l
 	jr	z,char4
 ENDIF
@@ -220,8 +217,8 @@ ENDIF
 	ld	hl,(chrloc)
 IF FORts2068
 	ld	a,(__ts2068_hrgmode)
-	and	a
-	jr	nz,increment
+	cp	6
+	jr	z,increment
 ENDIF
 	ld	a,d  
 	rrca  
@@ -265,8 +262,8 @@ just_calculate:
 IF FORts2068
 	; In highres mode, we've got to divide again
 	ld	a,(__ts2068_hrgmode)
-	and	a
-	jr	z,not_hrg_calc
+	cp	6
+	jr	nz,not_hrg_calc
 	srl	l
 .not_hrg_calc
 ENDIF
@@ -285,7 +282,9 @@ IF FORts2068
 	pop	af
 	ret	z
 	ld	a,(__ts2068_hrgmode)
-	and	$20
+	cp	6
+	ret	z
+	ld	a,$20
 	add	h
 	ld	h,a
 not_second_screen:
@@ -412,8 +411,8 @@ ENDIF
 	ldir
 IF FORts2068
 	ld	a,(__ts2068_hrgmode)
-	and	a
-	jr	nz,cls_hrg
+	cp	6
+	jr	z,cls_hrg
 ENDIF
 	ld	a,(__zx_console_attr)
 	ld	(hl),a

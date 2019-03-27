@@ -6,14 +6,14 @@
 ; the second display
 ;
 
-		MODULE	generic_console_scrollup
-		SECTION	code_clib
-		PUBLIC	generic_console_scrollup
-		EXTERN	call_rom3
-		
-		EXTERN	__ts2068_hrgmode
+	MODULE	generic_console_scrollup
 
-		EXTERN	__zx_console_attr
+	SECTION	code_clib
+	PUBLIC	generic_console_scrollup
+	EXTERN	call_rom3
+	EXTERN	__ts2068_hrgmode
+
+	EXTERN	__zx_console_attr
         EXTERN  zx_rowtab
 
 		
@@ -67,24 +67,23 @@ IF NOROMCALLS
         dec     a
         jr      nz,clear_loop
 		
-		ld      hl,$4000+6880
-		ld      de,$4000+6881
-		ld      bc,31
-		ld      a,(__zx_console_attr)
-		ld      (hl),a
-		ldir
+	ld      hl,$4000+6880
+	ld      de,$4000+6881
+	ld      bc,31
+	ld      a,(__zx_console_attr)
+	ld      (hl),a
+	ldir
 		
         pop     ix
         pop     hl
         ret
-
-
 ELSE
-
   IF FORts2068
         ld      a,(__ts2068_hrgmode)
-        and     a
-        jr      nz,hrgscroll
+	cp	6	;Hires
+	jr	z,hrgscroll
+	cp	2	;High colour
+	jr	z,hrgscroll
   ENDIF
         ld      a,($dff)
         cp      $17
@@ -144,6 +143,7 @@ IF FORts2068
         ld      ix,zx_rowtab + (192 - 8) * 2
         ld      a,8
 .clear_loop
+	ex	af,af
         push    ix
         ld      e,(ix+0)
         ld      d,(ix+1)
@@ -159,12 +159,19 @@ IF FORts2068
         set     5,d
         set     5,h
         ex      de,hl
-        ld      (hl),0
+	ld	a,(__ts2068_hrgmode)
+	cp	6
+	ld	a,0
+	jr	z,clear_hires2
+	ld	a,(__zx_console_attr)
+clear_hires2:
+        ld      (hl),a
         ld      bc,31
         lddr
         pop     ix
         inc     ix
         inc     ix
+	ex	af,af
         dec     a
         jr      nz,clear_loop
         pop     ix
