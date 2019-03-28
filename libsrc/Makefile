@@ -236,6 +236,7 @@ ts2068_clib.lib:
 	$(call buildgeneric,zx)
 	$(MAKE) -C target/zx
 	$(MAKE) -C games TARGET=zx
+	$(RM) -f stdio/zx/*.o
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORzx -DFORts2068 -DA80COL -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(LISTFILE_DIRECTORY)/ts2068.lst
 
 # TS2068 HRG graphics lib - Stefano
