@@ -58,7 +58,11 @@
                 defc  CRT_ORG_CODE  = 0
 		defc	TAR__register_sp = 32767
             ELSE
-                defc  CRT_ORG_CODE  = 32768
+                IF DEFINED_CRT_TS2068
+                    defc  CRT_ORG_CODE  = 40000
+                ELSE
+                    defc  CRT_ORG_CODE  = 32768
+                ENDIF
             ENDIF
         ENDIF
 
