@@ -153,14 +153,15 @@ handle_attributes:
 
 get_attribute_address:
 IF FORts2068
+	ld	a,d
+	and	@0100000
+	ld	l,a
 	ld	a,(__ts2068_hrgmode)
 	cp	6
 	ret	z
 	cp	2
 	jr	nz,not_hi_colour
-	ld	a,d
-	add	$20
-	ld	d,a
+	set	5,d
 	ld	a,(__zx_console_attr)
 	ld	b,7
 hires_set_attr:
@@ -176,6 +177,9 @@ ENDIF
 	rrca
 	and	3
 	or	88
+IF FORts2068
+	or	l		;Add in screen 1 bit
+ENDIF
 	ld	d,a
 	ret
 
@@ -261,11 +265,12 @@ IF FORts2068
 	; So we're in hires mode
 	pop	af
 	ret	z		;Even column no need for it
-use_screen_1:
-	ld	a,h
-	add	$20
-	ld	h,a
+calc_screen1_offset:
+	set	5,h
 	ret
+use_screen_1:
+	pop	af
+	jr	calc_screen1_offset
 dont_use_screen_1:
 	pop	af
 ENDIF
