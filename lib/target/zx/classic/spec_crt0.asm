@@ -70,6 +70,10 @@
         defc    CONSOLE_COLUMNS = 64
         defc    CONSOLE_ROWS = 24
 
+	IF !CLIB_FGETC_CONS_DELAY
+		defc CLIB_FGETC_CONS_DELAY = 100
+	ENDIF
+
 	; We use the generic driver by default
         defc    TAR__fputc_cons_generic = 1
 
@@ -87,6 +91,10 @@ start:
         ; --- startup=2 ---> build a ROM
 
 IF (startup=2)
+
+	IF !CLIB_FGETC_CONS_DELAY
+		defc CLIB_FGETC_CONS_DELAY = 100
+	ENDIF
 
         di          ; put hardware in a stable state
         ld      a,$3F
