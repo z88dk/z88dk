@@ -5,7 +5,7 @@
 ; Used:  hl,bc,f
 ;
 
-	MODULE	code_clib
+	SECTION	code_clib
 	PUBLIC	conio_map_colour
 
 	EXTERN	__CLIB_CONIO_NATIVE_COLOUR
