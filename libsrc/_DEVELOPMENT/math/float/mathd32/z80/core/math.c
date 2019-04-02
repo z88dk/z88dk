@@ -568,7 +568,8 @@ __nodebug float bd2f(unsigned long x){
 	; here number is zero
 	jp .bdexit ; done, number zero returned as floating zero
 ; each test sets c with count, a with least part to shift
-.bbit: jp novf,.bbit4 		; if upper 4 bits are zero
+.bbit:
+   jp novf,.bbit4 		; if upper 4 bits are zero
    ; here upper 4 bits has bit, shift right 8 and left 1-3
    ld 	a,e ; very least
    ld 	e,d

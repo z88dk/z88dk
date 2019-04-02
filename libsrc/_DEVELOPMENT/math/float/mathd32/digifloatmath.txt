@@ -8,7 +8,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 Rabbit Semiconductor Rabbit Floating Point Package (ZFPP)
 -------------------------------------------------------------------------
 
-Floating point format (compatible with Intel/ IEE, etc.) is as follows:
+Floating point format (compatible with Intel/ IEEE, etc.) is as follows:
 
     seeeeeee emmmmmmm mmmmmmmm mmmmmmmm (s-sign, e-exponent, m-mantissa)
 
@@ -17,12 +17,12 @@ s- 1 negative, 0- positive
 e - 0-255 indicating the exponent
 m- mantissa 23 bits with implied 24th bit which is always 1
 exponent is biased by the amount bias set below
-;
+
 mantissa, when the hidden bit is added in, is 24 bits long
-and has a value in the range of 1.000 to 1.9999..
-;
+and has a value in the range of 1.000 to 1.9999...
+
 to match Intel 8087 or IEEE format use bias of 127
-;
+
 examples of numbers:
   sign  exponent   mantissa
     0   01111110 (1) 10000....    1.5 * 2 ^ (-1) = 0.75
@@ -133,7 +133,6 @@ Both results are free of bias with IEEE method having a slight edge with
 rounding error.
 -------------------------------------------------------------------------
 
-
 ******** Math Library Discussion *******
 
 Functions included in math libaries
@@ -144,7 +143,7 @@ Basic floating point functions - these are computed from first principles
  deg(x) - degrees in x radians
  rad(x) - radians in x degrees
 
-Derrivitive floating point functions (derived from combinations of basic functions)
+Derivative floating point functions (derived from combinations of basic functions)
 
  pow10(x)- 10 to the x power
  acsc(x) - arc cosecant of x
@@ -182,7 +181,7 @@ Basic floating point functions - these are computed from first principles
  floor(x) - largest integer less than or equal to x
  fmod(x,&n) - integer and fractional parts
 
-Derivitive floating point functions (derived from combinations of basic functions)
+Derivative floating point functions (derived from combinations of basic functions)
 
  acos(x) - arc cosine of x
  asin(x) - arc sine of x
@@ -220,7 +219,7 @@ Discussion of execution speed
  Floating add, subtract and multiply require approximately 350 clocks worst case on the Rabbit 2000
  microprocessor. Divide and square root require approximately 900 clocks. Sine and pow2, pow10 or exp
  require about 3200 clocks. Log, log2, log (base e), and atan need about 4000 clocks. Functions
- derrived from these functions often require 5000 or more clocks.
+ derived from these functions often require 5000 or more clocks.
 
 Exceptions - range errors
 
@@ -252,7 +251,7 @@ Exceptions - range errors
 ;                                    mantissa aligned is always smaller than other mantissa
 ;                                    one alignment shift needed
 ;       to align     - 2 to 23 alignment shifts needed (40 clocks)
-;           numbers alighed 2-23 have properties: max of 1 normalize shift needed
+;           numbers aligned 2-23 have properties: max of 1 normalize shift needed
 ;                                                 mantissa aligned always smaller
 ;                                                 2-23 alignment shifts needed
 ;       number too small to add, return larger number (to doadd1)

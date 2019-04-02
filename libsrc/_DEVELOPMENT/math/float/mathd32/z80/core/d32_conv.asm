@@ -33,7 +33,9 @@ md32_Bl_Bf:
    ex 	de,hl
    ld 	hl,0
    sbc 	hl,bc
-   jp 	novf,.blbf1
+;   jp 	novf,.blbf1
+   jp   po,.blbf1
+;---
 ; here negation of 0x80000000 = -2^31 = 0xcf000000
    ld 	bc,0cf00h
    ld 	de,0
@@ -65,7 +67,9 @@ md32_Hu_Bf:					; convert unsigned in hl to float in bcde
    jp 	md32_normalize  	; piggy back on existing code
 ; must shift right
 .blbfright
-   jp 	novf,.blbf4  		; shift right  1-4
+;  jp 	novf,.blbf4  		; shift right  1-4
+   jp   po,.blbf4
+;---
 ; here shift right 4-8
    rr 	hl
    rr 	de

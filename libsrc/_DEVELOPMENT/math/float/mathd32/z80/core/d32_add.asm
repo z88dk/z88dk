@@ -25,7 +25,7 @@
 ;                                    mantissa aligned is always smaller than other mantissa
 ;                                    one alignment shift needed
 ;       to align     - 2 to 23 alignment shifts needed (40 clocks)
-;           numbers alighed 2-23 have properties: max of 1 normalize shift needed
+;           numbers aligned 2-23 have properties: max of 1 normalize shift needed
 ;                                                 mantissa aligned always smaller
 ;                                                 2-23 alignment shifts needed
 ;       number too small to add, return larger number (to doadd1)
@@ -65,7 +65,7 @@ md32_add:
 
 	ld		a,h					; 2,
 	or		a						; 2,
-	jr		z,faunp1		; 5, add implicit bit if op1.e!=0
+	jr		z,faunp1		    ; 5, add implicit bit if op1.e!=0
 	scf							; 2,
 
 .faunp1
@@ -90,7 +90,7 @@ md32_add:
 
 	ld		a,h					; 2
 	or		a						; 2
-	jr		z,faunp2		; 5, add implicit bit if op2.e!=0
+	jr		z,faunp2		    ; 5, add implicit bit if op2.e!=0
 	scf							; 2
 
 .faunp2
@@ -275,7 +275,7 @@ md32_add:
 ; c is clear
 .fasub
 
-	ex		de',hl				; 2, subtract the mantissas
+	ex	de',hl				    ; 2, subtract the mantissas
 	sbc	hl,de					; 4
 	exx							; 2
 	sbc	hl,de					; 4
@@ -310,17 +310,23 @@ md32_normalize:
 	xor 	a
 	or 	l
 	jr 	z,fa8a				; 9
-	jp 	po,S24L             ; novf,S24L 		; 14 shift24 bits, most significent in low nibble
+;   jp novf,S24L 		    ; 14 shift24 bits, most significent in low nibble
+	jp 	po,S24L  
+;---     
 	jr 	S24H  				; 19 shift 24 bits in high
-.fa8a 							; 9
+.fa8a 					    ; 9
 	or 	d
 	jr 	z,fa8b				; 16
-	jp 	po,S16L             ; novf,S16L 		; 23 shift 16 bits in low nibble
-	jp 	S16H   			; 28 shift 16 bits in high
-.fa8b 							; 16
+;   jp novf,S16L 		    ; 23 shift 16 bits in low nibble
+	jp 	po,S16L
+;---
+	jp 	S16H   			    ; 28 shift 16 bits in high
+.fa8b 					    ; 16
 	or 	e
-	jr 	z,normzero 		;  23 all zeros
-	jp 	po,S8L              ;novf,S8L    		;  30
+	jr 	z,normzero 		    ;  23 all zeros
+;   jp novf,S8L    		    ;  30
+	jp 	po,S8L
+;---
 	jp 	S8H         		;  35
 
 
@@ -364,7 +370,9 @@ md32_normalize:
    rla
    rl 	de
    rl 	a  					; different shift, 4 clocks, sets flags
-   jp 	po,S24L4more     ; novf,S24L4more 	; if still no bits in high nibble, total of 7 shifts
+;  jp   novf,S24L4more 	    ; if still no bits in high nibble, total of 7 shifts
+   jp 	po,S24L4more
+;---
    rl 	de
    rla
 ; 0, 1 or 2 shifts possible here
@@ -435,8 +443,10 @@ md32_normalize:
 .S8L    							; 30  - worst 76 clocks to get past this section
 	rla
 	rla
-	rl 	a 						; 38 different shift  rr a not rra, sets novf flag if upper 4 bits zero
-	jp 	po,S8L4more                 ; novf,S8L4more 		; 45 if total is 7
+	rl 	a 						    ; 38 different shift  rr a not rra, sets novf flag if upper 4 bits zero
+;   jp novf,S8L4more 		        ; 45 if total is 7
+	jp 	po,S8L4more
+;---
 	rla  							; guaranteed
 	rla  							; 49 5th shift
 	jr 	c,S8Lover1 			; 54 if overshift
@@ -476,11 +486,13 @@ md32_normalize:
    rl 	de
    rl 	de
    rl 	de  					; 29 3 shifts
-   jp 	po,S16L4more              ;novf,S16L4more ; 36 if still not bits n upper after 3
+;  jp   novf,S16L4more          ; 36 if still not bits n upper after 3
+   jp 	po,S16L4more
+;---
    rl 	de  					; guaranteed shift 4
-   jp 	m,S16L4 		; 45 complete at 4
+   jp 	m,S16L4 		        ; 45 complete at 4
    rl 	de
-   jp 	m,S16L5 		; 54 complete at 5
+   jp 	m,S16L5 		        ; 54 complete at 5
    rl 	de  					; 6 shifts, case of 7 already taken care of must be good
    ld 	a,-14
    ld 	l,d

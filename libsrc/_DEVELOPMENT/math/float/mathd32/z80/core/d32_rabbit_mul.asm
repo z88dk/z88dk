@@ -7,7 +7,7 @@
 ;
 ;
 ;-------------------------------------------------------------------------
-; F_mul - Rabbit floating point multiply
+; md32_mul - Rabbit floating point multiply
 ;-------------------------------------------------------------------------
 ;
 ; since the f80 only has support for 16x16bit multiplies
@@ -88,6 +88,11 @@
 ; worst case run time 315 clocks, about 12.6us at 25mhz
 ;-------------------------------------------------------------------------
 
+INCLUDE "config_private.inc"
+
+SECTION code_clib
+SECTION code_math
+
 PUBLIC md32_mul
 
 md32_mul:
@@ -97,8 +102,7 @@ md32_mul:
 
 	add	hl,hl				; 2, shift exponent into h
 	scf						; 2, set implicit bit
-	rr		l					; 4, shift msb into mantissa
-
+	rr		l				; 4, shift msb into mantissa
 	exx						; 2
 
 	ld		hl,(sp+3)		; 9, get second operand off of stack
@@ -237,16 +241,18 @@ md32_mul:
 
 	rra						; 2, adjust the sign and exponent
 	jr		c,fm4			; 5
-	res	7,c				; 4, clear the implicit bit when doesn't match lsb of exp
+	res	7,c				    ; 4, clear the implicit bit when doesn't match lsb of exp
 
 .fm4
 ; wc=275+19=294
-	or		b					; 2
+	or		b				; 2
 	ld		b,a				; 2, put sign and 7 msbs into place
 
 ;.fmdone
 ;	ret                     ; lret
 ; wc=294+19=315
+
+    ret
 
 .fmzero
 	ld		b,0x00			; 4
@@ -257,7 +263,7 @@ md32_mul:
 
 .mulovl
 	ex		af,af'			; 2, get sign
-	and	a,0x7f			; 4, set INF
+	and	a,0x7f			    ; 4, set INF
 	ld		b,a				; 2
 	ld		c,0x80			; 4
 	ld		de,0x0000		; 6
