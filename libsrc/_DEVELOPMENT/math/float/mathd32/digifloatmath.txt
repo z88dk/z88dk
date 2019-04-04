@@ -46,7 +46,7 @@ example X=Y*Z;
     ld    (X),de
     ld    (X+2),bc
 
-example Z=Y/Z;
+example X=Y/Z;
     ld    de,(Y)
     ld    bc,(Y+2)
     push  bc
@@ -57,7 +57,7 @@ example Z=Y/Z;
     ld    (X),de
     ld    (X+2),bc
 
-example Z=Y+Z;
+example X=Y+Z;
     ld    de,(Y)
     ld    bc,(Y+2)
     push  bc
@@ -68,7 +68,7 @@ example Z=Y+Z;
     ld    (X),de
     ld    (X+2),bc
 
-example Z=Y-Z;
+example X=Y-Z;
     ld    de,(Y)
     ld    bc,(Y+2)
     push  bc

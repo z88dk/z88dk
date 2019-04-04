@@ -47,10 +47,10 @@
 ; worst case run time FIXME clocks
 ;-------------------------------------------------------------------------
 
-INCLUDE "config_private.inc"
-
 SECTION code_clib
 SECTION code_math
+
+EXTERN m32_mulu_32_16x16
 
 PUBLIC md32_mul
 
@@ -252,31 +252,4 @@ md32_mul:
     ld c,0x80
     ld de,0x0000
     ret                         ; done
-    
-
-    ; multiplication of two 16-bit numbers into a 32-bit product
-    ;
-    ; enter : bc = 16-bit multiplier   = x
-    ;         de = 16-bit multiplicand = y
-    ;
-    ; exit  : hlbc = 32-bit product
-    ;
-    ; uses  : af, bc, de, hl
-    
-EXTERN l_mulu_32_16x16
-
-.m32_mulu_32_16x16
-    ex de,hl    
-    ld d,b
-    ld e,c
-
-    ; compute:  dehl = hl * de
-    ; alters :  af, bc, de, hl
-    call l_mulu_32_16x16
-
-    ex de,hl
-    ld b,d
-    ld c,e
-
-    ret
 

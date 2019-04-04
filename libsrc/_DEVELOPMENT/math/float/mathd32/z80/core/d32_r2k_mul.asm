@@ -88,8 +88,6 @@
 ; worst case run time 315 clocks, about 12.6us at 25mhz
 ;-------------------------------------------------------------------------
 
-INCLUDE "config_private.inc"
-
 SECTION code_clib
 SECTION code_math
 
