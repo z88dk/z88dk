@@ -9,23 +9,23 @@ EXTERN cd32_sdcciyp_d2d32
 .cd32_sdcciyp_dload
 
    ; sdcc float primitive
-   ; Load float pointed to by HL into BCDE
+   ; Load float pointed to by HL into HLDE
    ;
-   ; Convert from sdcc float format to d32 format.
+   ; Convert from sdcc_float format to d32 format.
    ;
-   ; enter : HL = float * (sdcc format)
+   ; enter : HL = float * (sdcc_float )
    ;
-   ; exit  : HLDE = float (sdcc format)
+   ; exit  : HLDE = float (sdcc_float)
    ;
-   ; uses  : af, de, hl
+   ; uses  : f, bc, de, hl
 
    ld e,(hl)
    inc hl
    ld d,(hl)
    inc hl
-   ld a,(hl)
+   ld c,(hl)
    inc hl
    ld h,(hl)
-   ld l,a                      ; hlde = sdcc_float
+   ld l,c                       ; HLDE = sdcc_float
    
    jp cd32_sdcciyp_d2d32

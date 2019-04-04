@@ -6,13 +6,13 @@ PUBLIC cm48_sdcciyp_d322d
 
 .cm48_sdcciyp_d322d
 
-   ; convert math48 double to sdcc float
+   ; convert d32_float to sdcc_float
    ;
-   ; enter : BCDE = d32 float
+   ; enter : BCDE = d32_float
    ;
-   ; exit  : HLDE = sdcc float
+   ; exit  : HLDE = sdcc_float
    ;
-   ; uses  : bc, de, hl
+   ; uses  : f, bc, de, hl
 
    ld l,c
    ld h,b
@@ -22,4 +22,4 @@ PUBLIC cm48_sdcciyp_d322d
    rr h                 ; return sign from Carry
    rr l
 
-   ret
+   ret                  ; return HLDE = sdcc_float

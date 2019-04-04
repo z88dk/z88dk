@@ -6,11 +6,11 @@ PUBLIC cd32_sdcciyp_d2d32
 
 .cd32_sdcciyp_d2d32
 
-   ; convert sdcc float to d32 float
+   ; convert sdcc_float to d32_float
    ;
-   ; enter : HLDE = sdcc float
+   ; enter : HLDE = sdcc_float
    ;
-   ; exit  : BCDE = d32 float
+   ; exit  : BCDE = d32_float
    ;
    ; uses  : f, bc, de, hl
 
@@ -23,4 +23,4 @@ PUBLIC cd32_sdcciyp_d2d32
    ld c,l
    ld b,h
 
-   ret
+   ret                  ; return BCDE = d32_float
