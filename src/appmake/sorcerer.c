@@ -301,31 +301,34 @@ int sorcerer_exec(char* target)
 			writeword_pk(len, fpout, &parity); /* Program File Length */
 			writeword_pk(pos, fpout, &parity); /* Program Location */
 			writeword_pk(pos, fpout, &parity); /* GO Address: pos for autorun when LOADG (Sorcerer) / or LOADM (MicroBee w/FL_EXEC set to 0xff) */
+			
+			
+			if (bee) {
+				if (!bps300) {
+					bee1200 = 1; /* Speed (MicroBee at 1200 bps) */
+					bps300 = 1; /* MicroBee HEADER is always at 300 bps */
+				}
+				writebyte_pk(bee1200, fpout, &parity);
+				writebyte_pk(255, fpout, &parity); /* Autostart (FL_EXEC) */
+			} else {
+				writebyte_pk(0, fpout, &parity); /* Spare */
+				writebyte_pk(0, fpout, &parity); /* ... */
+			}
+
+			writebyte_pk(0, fpout, &parity); /* Spare */
+
+			writebyte_p(parity, fpout, &parity); /* Checksum for header and middle blocks*/
+
+			if (!bee) {
+				/* (Sorcerer only) - Data block leader (DGOS' standard padding sequence) */
+				for (j = 0; (j < leadinlength); j++)
+					writebyte_pk(0, fpout, &parity);
+				writebyte_pk(1, fpout, &parity); /* leading SOH */
+				parity = 0;
+			}
 		}
 
-        if (bee) {
-            if (!bps300) {
-                bee1200 = 1; /* Speed (MicroBee at 1200 bps) */
-                bps300 = 1; /* MicroBee HEADER is always at 300 bps */
-            }
-            writebyte_pk(bee1200, fpout, &parity);
-            writebyte_pk(255, fpout, &parity); /* Autostart (FL_EXEC) */
-        } else {
-            writebyte_pk(0, fpout, &parity); /* Spare */
-            writebyte_pk(0, fpout, &parity); /* ... */
-        }
 
-        writebyte_pk(0, fpout, &parity); /* Spare */
-
-        writebyte_p(parity, fpout, &parity); /* Checksum for header and middle blocks*/
-
-        if (!bee) {
-            /* (Sorcerer only) - Data block leader (DGOS' standard padding sequence) */
-            for (j = 0; (j < leadinlength); j++)
-                writebyte_pk(0, fpout, &parity);
-            writebyte_pk(1, fpout, &parity); /* leading SOH */
-            parity = 0;
-        }
 
         /* PROGRAM BLOCK */
 
