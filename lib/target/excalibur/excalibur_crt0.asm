@@ -70,10 +70,12 @@ IF CRT_ENABLE_STDIO = 1
         EXTERN     closeall
         call    closeall
 ENDIF
-        pop     bc
+        pop     hl
 start1:
         ld      sp,0
-        ret
+		
+		jp		$1904		; pass HL as a result to the USR(n) BASIC function
+        ;ret
 
 l_dcal:
         jp      (hl)
