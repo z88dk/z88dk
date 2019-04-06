@@ -14,11 +14,10 @@ PUBLIC cd32_sdcciyp_d2d32
    ;
    ; uses  : f, bc, de, hl
 
-
-   add hl,hl            ; put sign into Carry
-   inc h                ; adjust bias from 126 (sdcc) to 127 (IEEE)
-   rr h                 ; return sign from Carry
-   rr l
+;   add hl,hl            ; put sign into Carry
+;   inc h                ; adjust bias from 126 (sdcc) to 127 (IEEE)
+;   rr h                 ; return sign from Carry
+;   rr l
 
    ld c,l
    ld b,h

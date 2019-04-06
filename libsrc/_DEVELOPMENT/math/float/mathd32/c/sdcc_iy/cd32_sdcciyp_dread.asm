@@ -2,7 +2,7 @@
 SECTION code_clib
 SECTION code_fp_d32
 
-PUBLIC cd32_sdcciyp_dread1, cd32_sdcciyp_dread2
+PUBLIC cd32_sdcciyp_dread2, cd32_sdcciyp_dread1
 
 EXTERN cd32_sdcciyp_dload
 
@@ -15,7 +15,7 @@ EXTERN cd32_sdcciyp_dload
    ;
    ; enter : stack = sdcc_float right, sdcc_float left, ret1, ret0
    ;
-   ; exit  : stack = sdcc_float right, sdcc_float left, d32_float left, ret1, ret0
+   ; exit  : stack = sdcc_float right, sdcc_float left, ret1, d32_float left
    ;         BCDE = d32_float right
    ; 
    ; uses  : f, bc, de, hl
@@ -25,16 +25,14 @@ EXTERN cd32_sdcciyp_dload
    
    call cd32_sdcciyp_dload  ; return BCDE = d32_float left
    
-   pop af                   ; ret0
-   pop hl                   ; ret1
+   pop hl                   ; ret0
 
    push bc                  ; stack d32_float left
    push de
 
-   push hl                  ; ret1
-   push af                  ; ret0
+   push hl                  ; ret0
 
-   ld hl,8                  ; stack sdcc_float right
+   ld hl,12                  ; stack sdcc_float right
    add hl,sp
    
    jp cd32_sdcciyp_dload    ; return BCDE = d32_float right
@@ -49,7 +47,7 @@ EXTERN cd32_sdcciyp_dload
    ;
    ; enter : stack = sdcc_float, ret1, ret0
    ;
-   ; exit  : stack = sdcc_float, ret1, ret0
+   ; exit  : stack = sdcc_float, ret1
    ;         BCDE = d32_float
    ; 
    ; uses  : f, bc, de, hl

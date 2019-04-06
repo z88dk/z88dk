@@ -54,7 +54,7 @@ EXTERN m32_mulu_32_16x16
 
 PUBLIC md32_mul
 
-md32_mul:
+.md32_mul
     ld h,b                      ; BCDE -> HLDE
     ld l,c
     ld a,h                      ; put sign bit into A

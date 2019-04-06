@@ -15,7 +15,10 @@
 ; exit  : hlbc = 32-bit product
 ;
 ; uses  : af, bc, de, hl
-    
+
+SECTION code_clib
+SECTION code_fp_d32
+
 EXTERN l_mulu_32_16x16
 
 PUBLIC m32_mulu_32_16x16
