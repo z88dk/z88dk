@@ -6,7 +6,7 @@ SECTION code_math
 
 PUBLIC cd32_sdcciyp_dsneg
 
-EXTERN cd32_sdcciyp_dread1, md32_neg, cd32_sdcciyp_d322d
+EXTERN cd32_sdcciyp_dread1, md32_neg, cd32_sdcciyp_dret
 
 .cd32_sdcciyp_dsneg
 
@@ -25,4 +25,4 @@ EXTERN cd32_sdcciyp_dread1, md32_neg, cd32_sdcciyp_d322d
                             ; return BCDE = d32_float
    
 
-    jp cd32_sdcciyp_d322d   ; return DEHL = sdcc_float
+    jp cd32_sdcciyp_dret    ; return DEHL = sdcc_float

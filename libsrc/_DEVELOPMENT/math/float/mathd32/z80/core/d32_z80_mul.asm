@@ -62,6 +62,7 @@ PUBLIC md32_mul
     add hl,hl                   ; shift exponent into H
     scf                         ; set implicit bit
     rr l                        ; shift msb into mantissa
+
     exx                         ; first h' = eeeeeeee, lde' = 1mmmmmmm mmmmmmmm mmmmmmmm
 
     ld hl,0x02                  ; get second operand off of the stack
@@ -90,13 +91,16 @@ PUBLIC md32_mul
 
     sub a,0x7f                  ; subtract out bias, so when exponents are added only one bias present
     jr C,fmchkuf
+
     exx
+
     add a,h
     jp C,mulovl
     jr fmnouf
 
 .fmchkuf
     exx
+
     add a,h                     ; add the exponents
     jp NC,fmzero
 
@@ -117,14 +121,20 @@ PUBLIC md32_mul
                                 ;
                                 ; multiplication of two 24-bit numbers into a 32-bit product
                                 ;
-                                ; enter : lde = 24-bit multiplier   = x
-                                ;         lde' = 24-bit multiplicand = y
+                                ; = a*d*2^32 +
+                                ;   a*e*2^24 + b*d*2^24 +
+                                ;   b*e*2^16 + a*f*2^16 + c*e*2^16 +
+                                ;   b*f*2^8  + c*e*2^8
+                                ;
+                                ; enter : abc = lde  = 24-bit multiplier   = x
+                                ;         def = lde' = 24-bit multiplicand = y
                                 ;
                                 ; exit  : hlde  = 32-bit product
     ld h,l
     ld l,d
     push hl                     ; ab on stack
     push de                     ; bc on stack
+
     exx
 
     ld h,l
@@ -135,6 +145,7 @@ PUBLIC md32_mul
     push bc                     ; de on stack (again)
     push hl                     ; bc on stack
     push de                     ; ef on stack
+
     exx
 
     ld b,h
@@ -166,21 +177,24 @@ PUBLIC md32_mul
     adc a,a                     ; save ab*f msw + de*c msw carry in A
 
     pop bc                      ; de in BC
-    ex (sp),hl                  ; ab*f msw + de*c msw on stack, ab in HL
+    ex (sp),hl                  ; ab*f msw + de*c msw + lsw C on stack, ab in HL
     ex de,hl                    ; ab*f lsw + de*c lsw in HL, ab in DE
+
+    push af                     ; ab*f msw + de*c msw carry on stack
     push hl                     ; ab*f lsw + de*c lsw on stack
 
     call m32_mulu_32_16x16      ; ab*de => HLBC
-    
+
     pop de                      ; ab*f lsw + de*c lsw in DE
+    pop af                      ; ab*f msw + de*c msw carry in A
     ld e,a                      ; save ab*f msw + de*c msw carry in E
 
-    ld a,d                      ; start adding the products with 8 bit offset
-    add a,c                     ; ab*f lswh + de*c lswh + ab*de lswl
+    ld a,c                      ; start adding the products with 8 bit offset
+    add a,d                     ; ab*f lswh + de*c lswh + ab*de lswl
     ld d,a
 
     ld a,b
-    pop bc                      ; ab*f msw + de*c msw in BC
+    pop bc                      ; ab*f msw + de*c msw + lsw C in BC
     adc a,c                     ; ab*f mswl + de*c mswl
     ld c,a
 
@@ -243,7 +257,7 @@ PUBLIC md32_mul
     ld c,b
     ld d,b
     ld e,b
-    ret                         ; done
+    ret                         ; done zero
 
 .mulovl
     ex af,af                    ; get sign
@@ -251,5 +265,5 @@ PUBLIC md32_mul
     ld b,a
     ld c,0x80
     ld de,0x0000
-    ret                         ; done
+    ret                         ; done overflow
 

@@ -6,7 +6,7 @@ SECTION code_math
 
 PUBLIC cd32_sdcciyp_dsmul
 
-EXTERN cd32_sdcciyp_dread2, md32_mul, cd32_sdcciyp_d322d
+EXTERN cd32_sdcciyp_dread2, md32_mul, cd32_sdcciyp_dret
 
 .cd32_sdcciyp_dsmul
 
@@ -27,5 +27,5 @@ EXTERN cd32_sdcciyp_dread2, md32_mul, cd32_sdcciyp_d322d
     pop af                  ; discard d32_float left
     pop af
 
-    jp cd32_sdcciyp_d322d   ; return DEHL = sdcc_float
+    jp cd32_sdcciyp_dret    ; return DEHL = sdcc_float
 
