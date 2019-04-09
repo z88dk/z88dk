@@ -6,13 +6,14 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 
+SECTION code_clib
+SECTION code_math
 
+PUBLIC md32_fsdiv
 
-PUBLIC md32_div
+EXTERN md32_fsmul
 
-EXTERN md32_mul
-
-_divtable:
+._divtable
   DEFB 0x7f, 0x7b, 0x78, 0x74, 0x71, 0x6e, 0x6b, 0x68
   DEFB 0x66, 0x63, 0x61, 0x5e, 0x5c, 0x5a, 0x58, 0x56
   DEFB 0x55, 0x53, 0x51, 0x50, 0x4e, 0x4d, 0x4b, 0x4a
@@ -43,7 +44,7 @@ _divtable:
 	rr		b				; 4
 	ret                     ; lret
 
-md32_div:
+.md32_fsdiv
 	ld		h,b				; 2
 	ld		l,c				; 2
 

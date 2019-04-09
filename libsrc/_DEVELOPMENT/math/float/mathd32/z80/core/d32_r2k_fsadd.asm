@@ -45,18 +45,21 @@
 ; sub 2 near equal with same exp: unpack(78)+sort(11)+sub(54)+norm(76)+pack(41)=260
 ;-------------------------------------------------------------------------
 
-PUBLIC md32_sub
-PUBLIC md32_add
-PUBLIC md32_normalize
+SECTION code_clib
+SECTION code_math
+
+PUBLIC md32_fssub
+PUBLIC md32_fsadd
+PUBLIC md32_fsnormalize
 
 ; enter here for floating subtract, x-y x on stack, y in bcde
-md32_sub:
+.md32_fssub
 	ld		a,0x80				; 4, toggle the sign bit for subtraction
 	xor	b						; 2
 	ld		b,a					; 2
 
 ; enter here for floating add, x+y, x on stack, y in bcde, result in bcde
-md32_add:
+.md32_fsadd
 	ld		h,b					; 2
 	ld		l,c					; 2
 
@@ -305,7 +308,7 @@ md32_add:
 
 
 ; enter here with af' carry clear for float function Bl_Bf, Bg_Bf
-md32_normalize:
+.md32_fsnormalize
 ; now begin normalize
 	xor 	a
 	or 	l

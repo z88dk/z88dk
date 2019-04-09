@@ -6,6 +6,9 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 
+SECTION code_clib
+SECTION code_math
+
 PUBLIC md32_Hi_Bf
 PUBLIC md32_Bl_Bf
 PUBLIC md32_Hc_Bf
@@ -15,15 +18,16 @@ PUBLIC md32_Bg_Bf
 EXTERN md32_normalize
 
 ; convert integer in hl to float in bcde
-md32_Hi_Bf
+.md32_Hi_Bf
    ex 	de,hl  				; least to de
    ld 	a,d 					; sign
    rla    						; get sign to c
    sbc 	hl,hl  				; sign extension, all 1's if neg
    ld 	b,h
    ld 	c,l
+
 ; now convert long in bcde to float in bcde
-md32_Bl_Bf:
+.md32_Bl_Bf
    bit 	7,b 					; test sign, neg if neg
    jr 	z,.blbf2
    bool 	hl
@@ -42,14 +46,14 @@ md32_Bl_Bf:
    ret                      ; lret
 ;
 ; other entries
-md32_Bg_Bf:   				; convert unsigned long in bcde to float in bcde
+.md32_Bg_Bf   				; convert unsigned long in bcde to float in bcde
    ld 	h,b					; put working copy of unsigned MSB into h
    res	7,b					; ensure unsigned long's "sign" bit is reset
    jr	.bgbf0				; continue, with unsigned long number in hcde
 
-md32_Hc_Bf: 				; convert character in l to float in bcde
+.md32_Hc_Bf 				; convert character in l to float in bcde
    ld 	h,0
-md32_Hu_Bf:					; convert unsigned in hl to float in bcde
+.md32_Hu_Bf 				; convert unsigned in hl to float in bcde
    ex 	de,hl
    ld 	bc,0
 .blbf2

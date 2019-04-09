@@ -2,11 +2,9 @@
 SECTION code_clib
 SECTION code_math
 
-PUBLIC cd32_sdcciyp_dload
+PUBLIC cd32_sdcc_dload
 
-EXTERN cd32_sdcciyp_d2d32
-
-.cd32_sdcciyp_dload
+.cd32_sdcc_dload
 
     ; sdcc float primitive
     ; Load float pointed to by HL into BCDE

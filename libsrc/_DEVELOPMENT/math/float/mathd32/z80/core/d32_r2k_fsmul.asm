@@ -91,9 +91,9 @@
 SECTION code_clib
 SECTION code_math
 
-PUBLIC md32_mul
+PUBLIC md32_fsmul
 
-md32_mul:
+.md32_fsmul
 	ld		h,b				; 2, bcde -> hlde
 	ld		l,c				; 2
 	ld		a,h				; 2, put flag into a

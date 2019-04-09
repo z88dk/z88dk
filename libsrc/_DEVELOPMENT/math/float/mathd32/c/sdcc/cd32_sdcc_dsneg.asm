@@ -4,11 +4,11 @@
 SECTION code_clib
 SECTION code_math
 
-PUBLIC cd32_sdcciyp_dsneg
+PUBLIC cd32_sdcc_fsneg
 
-EXTERN cd32_sdcciyp_dread1, md32_neg, cd32_sdcciyp_dret
+EXTERN cd32_sdcc_dread1, md32_fsneg, cd32_sdcc_dret
 
-.cd32_sdcciyp_dsneg
+.cd32_sdcc_fsneg
 
     ; negate sdcc floats
     ;
@@ -18,11 +18,11 @@ EXTERN cd32_sdcciyp_dread1, md32_neg, cd32_sdcciyp_dret
     ;
     ; uses  : af, bc, de, hl
 
-    call cd32_sdcciyp_dread1
+    call cd32_sdcc_dread1
 
-;   call md32_neg           ; enter stack = sdcc_float, ret
+    call md32_fsneg         ; enter stack = sdcc_float, ret
                             ;        BCDE = d32_float
                             ; return BCDE = d32_float
    
 
-    jp cd32_sdcciyp_dret    ; return DEHL = sdcc_float
+    jp cd32_sdcc_dret       ; return DEHL = sdcc_float

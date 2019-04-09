@@ -2,9 +2,9 @@
 SECTION code_clib
 SECTION code_math
 
-PUBLIC cd32_sdcciyp_dret
+PUBLIC cd32_sdcc_dret
 
-.cd32_sdcciyp_dret
+.cd32_sdcc_dret
 
     ; return d32_float to sdcc_float
     ;

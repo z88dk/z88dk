@@ -1,0 +1,5 @@
+math/float/mathd32/z80/core/d32_fsconv
+math/float/mathd32/z80/core/d32_fsutil
+math/float/mathd32/z80/core/d32_z80_fsadd
+math/float/mathd32/z80/core/d32_z80_fsdiv
+math/float/mathd32/z80/core/d32_z80_fsmul

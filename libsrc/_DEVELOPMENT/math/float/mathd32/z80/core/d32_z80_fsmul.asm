@@ -52,9 +52,9 @@ SECTION code_math
 
 EXTERN m32_mulu_32_16x16
 
-PUBLIC md32_mul
+PUBLIC md32_fsmul
 
-.md32_mul
+.md32_fsmul
     ld h,b                      ; BCDE -> HLDE
     ld l,c
     ld a,h                      ; put sign bit into A
