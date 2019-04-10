@@ -481,7 +481,7 @@ void prestep(
         //intcheck(lval, lval);
         switch (lval->ptr_type) {
         case KIND_DOUBLE:
-            zadd_const(lval, (n * 6));
+            zadd_const(lval, (n * c_ieee_math ? 4 : 6));
             break;
         case KIND_STRUCT:
             zadd_const(lval, n * lval->ltype->ptr->tag->size);
@@ -524,7 +524,7 @@ void poststep(
         rvalue(lval);
         switch (lval->ptr_type) {
         case KIND_DOUBLE:
-            nstep(lval, n * 6, unstep);
+            nstep(lval, n * c_ieee_math ? 4 : 6, unstep);
             break;
         case KIND_STRUCT:
             nstep(lval, n * lval->ltype->ptr->tag->size, unstep);

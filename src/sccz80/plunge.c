@@ -632,7 +632,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         } else if (lval->ptr_type == KIND_LONG && lval2->ptr_type == KIND_LONG) {
             zdiv_const(lval,4); /* div by 4 */
         } else if (lval->ptr_type == KIND_DOUBLE && lval2->ptr_type == KIND_DOUBLE) {
-            zdiv_const(lval,6); /* div by 6 */
+            zdiv_const(lval,c_ieee_math ? 4 : 6); /* div by 6 */
         } else if (lval->ptr_type == KIND_STRUCT && lval2->ptr_type == KIND_STRUCT) {
             zdiv_const(lval, lval->ltype->ptr->tag->size);
         } else if ( lval->ptr_type == KIND_CHAR && lval->ptr_type == KIND_CHAR ) {

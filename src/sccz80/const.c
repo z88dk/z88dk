@@ -41,6 +41,10 @@ typedef struct elem_s {
 static elem_t    *double_queue = NULL;
 
 
+static void dofloat_ieee(double raw, unsigned char fa[]);
+static void dofloat_z80(double raw, unsigned char fa[]);
+
+
 /* Modified slightly to sort have two pools - one for strings and one
  * for doubles..
  */
@@ -629,6 +633,24 @@ static Type *get_member(Type *tag)
 
 void dofloat(double raw, unsigned char fa[])
 {
+    if ( c_ieee_math ) {
+        dofloat_ieee(raw, fa);
+    } else {
+        dofloat_z80(raw, fa);
+    }
+}
+
+static void dofloat_ieee(double raw, unsigned char fa[])
+{
+    // TOOD: ENDIAN + do this a lot better
+    float f = raw;
+
+    memcpy(fa, &f, 4);
+}
+
+
+static void dofloat_z80(double raw, unsigned char fa[])
+{
     double norm;
     double x = fabs(raw);
     double exp = log(x) / log(2);
@@ -823,10 +845,15 @@ void load_double_into_fa(LVALUE *lval)
     } else {
         dofloat(lval->const_val, fa);
         
-        elem = get_elem_for_fa(fa,lval->const_val);
-        elem->refcount++;
-        immedlit(elem->litlab,0);
-        nl();
-        callrts("dload");
+        if ( c_ieee_math ) {
+            outfmt("\tld\thl,$%02x%02x\n", fa[1], fa[0]);
+            outfmt("\tld\tde,$%02x%02x\n", fa[3], fa[2]);
+        } else {
+            elem = get_elem_for_fa(fa,lval->const_val);
+            elem->refcount++;
+            immedlit(elem->litlab,0);
+            nl();
+            callrts("dload");
+        }
     }
 }

@@ -232,8 +232,17 @@ void getmem(SYMBOL* sym)
 
 #endif
     } else if (sym->ctype->kind == KIND_DOUBLE) {
-        address(sym);
-        callrts("dload");
+        if ( c_ieee_math == 0 ) {
+            address(sym);
+            callrts("dload");
+        } else {
+            ot("ld\thl,(");
+            outname(sym->name, dopref(sym));
+            outstr(")\n");
+            ot("ld\tde,(");
+            outname(sym->name, dopref(sym));
+            outstr("+2)\n");
+        }
     } else if (sym->ctype->kind == KIND_LONG) {
         ot("ld\thl,(");
         outname(sym->name, dopref(sym));
@@ -271,8 +280,17 @@ int getloc(SYMBOL* sym, int off)
 void putmem(SYMBOL* sym)
 {
     if (sym->ctype->kind == KIND_DOUBLE) {
-        address(sym);
-        callrts("dstore");
+        if ( c_ieee_math == 0 ) {
+            address(sym);
+            callrts("dstore");
+        } else {
+            ot("ld\t(");
+            outname(sym->name, dopref(sym));
+            outstr("),hl\n");
+            ot("ld\t(");
+            outname(sym->name, dopref(sym));
+            outstr("+2),de\n");
+        }
     } else {
         if (sym->ctype->kind == KIND_CHAR) {
             LoadAccum();
@@ -426,8 +444,13 @@ void putstk(LVALUE *lval)
 
     switch (typeobj) {
     case KIND_DOUBLE:
-        mainpop();
-        callrts("dstore");
+        if ( c_ieee_math == 0 ) {
+            mainpop();
+            callrts("dstore");
+        } else {
+            zpopbc();
+            callrts("dstore");
+        }
         break;
     case KIND_CPTR:
         zpopbc();
@@ -658,7 +681,7 @@ void zpush(void)
 void dpush(void)
 {
     callrts("dpush");
-    Zsp -= 6;
+    Zsp -= c_ieee_math ? 4 : 6;
 }
 
 /* Push the primary floating point register, preserving
@@ -671,7 +694,7 @@ void dpush_under(int val_type)
     } else {
         callrts("dpush2");
     }
-    Zsp -= 6;
+    Zsp -= c_ieee_math ? 4 : 6;
 }
 
 /* Pop the top of the stack into the primary register */
@@ -1081,17 +1104,22 @@ void scale(Kind type, Type *tag)
     switch (type) {
     case KIND_INT:
     case KIND_PTR:
-        ol("add\thl,hl");;
+        ol("add\thl,hl");
         break;
     case KIND_CPTR:
         threereg();
         break;
     case KIND_LONG:
-        ol("add\thl,hl");;
-        ol("add\thl,hl");;
+        ol("add\thl,hl");
+        ol("add\thl,hl");
         break;
     case KIND_DOUBLE:
-        sixreg();
+        if ( c_ieee_math ) {
+            ol("add\thl,hl");
+            ol("add\thl,hl");
+        } else {
+            sixreg();
+        }
         break;
     case KIND_STRUCT:
         /* try to avoid multiplying if possible */
@@ -1342,7 +1370,7 @@ void zadd(LVALUE* lval)
         break;
     case KIND_DOUBLE:
         callrts("dadd");
-        Zsp += 6;
+        Zsp += ( c_ieee_math ? 4 : 6);
         break;
     default:
         ol("add\thl,de");	// 11T
@@ -1493,7 +1521,7 @@ void zsub(LVALUE* lval)
         break;
     case KIND_DOUBLE:
         callrts("dsub");
-        Zsp += 6;
+        Zsp += ( c_ieee_math ? 4 : 6);
         break;
     default:
         if ( c_speed_optimisation & OPT_SUB16 ) {
@@ -1518,7 +1546,7 @@ void mult(LVALUE* lval)
         break;
     case KIND_DOUBLE:
         callrts("dmul");
-        Zsp += 6;
+        Zsp += (c_ieee_math ? 4 : 6);
         break;
     case KIND_CHAR:
         if ( lval->ltype->isunsigned ) {
@@ -1571,7 +1599,7 @@ void zdiv(LVALUE* lval)
         break;
     case KIND_DOUBLE:
         callrts("ddiv");
-        Zsp += 6;
+        Zsp += (c_ieee_math ? 4 : 6);
         break;
     default:
         if (utype(lval))
@@ -2592,7 +2620,7 @@ void inc(LVALUE* lval)
         vlongconst(1);
         convSlong2doub();
         callrts("dadd");
-        Zsp += 6;
+        Zsp += ( c_ieee_math ? 4 : 6);
         break;
     case KIND_LONG:
     case KIND_CPTR:
@@ -2616,7 +2644,7 @@ void dec(LVALUE* lval)
         vlongconst(-1);
         convSlong2doub();
         callrts("dadd");
-        Zsp += 6;
+        Zsp += (c_ieee_math ? 4 : 6);
         break;
     case KIND_LONG:
     case KIND_CPTR:
@@ -2756,7 +2784,7 @@ void zeq(LVALUE* lval)
     case KIND_DOUBLE:
         set_int(lval);
         callrts("deq");
-        Zsp += 6;
+        Zsp += (c_ieee_math ? 4 : 6);
         break;
     case KIND_CHAR:
         if (c_speed_optimisation & OPT_INT_COMPARE ) {
@@ -2873,7 +2901,7 @@ void zne(LVALUE* lval)
     case KIND_DOUBLE:
         callrts("dne");
         set_int(lval);            
-        Zsp += 6;
+        Zsp += (c_ieee_math ? 4 : 6);
         break;
     case KIND_CHAR:
         if (c_speed_optimisation & OPT_INT_COMPARE ) {
@@ -3001,7 +3029,7 @@ void zlt(LVALUE* lval)
     case KIND_DOUBLE:
         callrts("dlt");
         set_int(lval);            
-        Zsp += 6;
+        Zsp += (c_ieee_math ? 4 : 6);
         break;
     case KIND_CHAR:
         if (c_speed_optimisation & OPT_INT_COMPARE ) {
@@ -3101,7 +3129,7 @@ void zle(LVALUE* lval)
     case KIND_DOUBLE:
         callrts("dleq");
         set_int(lval);            
-        Zsp += 6;
+        Zsp += (c_ieee_math ? 4 : 6);
         break;
     case KIND_CHAR:
         if (c_speed_optimisation & OPT_INT_COMPARE ) {
@@ -3198,7 +3226,7 @@ void zgt(LVALUE* lval)
         break;
     case KIND_DOUBLE:
         callrts("dgt");
-        Zsp += 6;
+        Zsp += (c_ieee_math ? 4 : 6);
         set_int(lval);
         break;
     case KIND_CHAR:
@@ -3308,7 +3336,7 @@ void zge(LVALUE* lval)
     case KIND_DOUBLE:
         callrts("dge");
         set_int(lval);
-        Zsp += 6;
+        Zsp += (c_ieee_math ? 4 : 6);
         break;
     case KIND_CHAR:
         if (c_speed_optimisation & OPT_INT_COMPARE ) {
