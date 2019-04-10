@@ -24,7 +24,7 @@ Basic floating point functions - these are computed from first principles
  deg(x) - degrees in x radians
  rad(x) - radians in x degrees
 
-Derivitive floating point functions (derrived from combinations of basic functions)
+Derivitive floating point functions (derived from combinations of basic functions)
 
  pow10(x)- 10 to the x power
  acsc(x) - arc cosecant of x

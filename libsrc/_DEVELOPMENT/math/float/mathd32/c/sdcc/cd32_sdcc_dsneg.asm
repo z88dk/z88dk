@@ -1,5 +1,5 @@
 
-; float __fsneg (float a1)
+; float __fsneg (float number)
 
 SECTION code_clib
 SECTION code_math
@@ -12,9 +12,9 @@ EXTERN cd32_sdcc_dread1, md32_fsneg, cd32_sdcc_dret
 
     ; negate sdcc floats
     ;
-    ; enter : stack = sdcc_float a1, ret
+    ; enter : stack = sdcc_float number, ret
     ;
-    ; exit  : DEHL = sdcc_float(-a1)
+    ; exit  : DEHL = sdcc_float(-number)
     ;
     ; uses  : af, bc, de, hl
 

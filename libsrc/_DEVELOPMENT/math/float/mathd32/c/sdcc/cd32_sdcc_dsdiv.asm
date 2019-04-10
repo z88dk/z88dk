@@ -1,26 +1,26 @@
 
-; float __fsmul (float left, float right)
+; float __fsdiv (float left, float right)
 
 SECTION code_clib
 SECTION code_math
 
-PUBLIC cd32_sdcc_dsmul
+PUBLIC cd32_sdcc_dsdiv
 
-EXTERN cd32_sdcc_dread2, md32_fsmul, cd32_sdcc_dret
+EXTERN cd32_sdcc_dread2, md32_fsdiv, cd32_sdcc_dret
 
-.cd32_sdcc_dsmul
+.cd32_sdcc_dsdiv
 
-    ; multiply two sdcc floats
+    ; divide sdcc float by sdcc float
     ;
     ; enter : stack = sdcc_float right, sdcc_float left, ret
     ;
-    ; exit  : DEHL = sdcc_float(left*right)
+    ; exit  : DEHL = sdcc_float(left/right)
     ;
     ; uses  : af, bc, de, hl
 
     call cd32_sdcc_dread2
 
-    call md32_fsmul         ; enter stack = sdcc_float right, sdcc_float left, ret, d32_float left
+    call md32_fsdiv         ; enter stack = sdcc_float right, sdcc_float left, ret, d32_float left
                             ;        BCDE = d32_float right
                             ; return BCDE = d32_float
 

@@ -31,7 +31,7 @@ Basic floating point functions - these are computed from first principles
  floor(x) - largest integer less than or equal to x
  fmod(x,&n) - integer and fractional parts
 
-Derrivitive floating point functions (derrived from combinations of basic functions)
+Derivative floating point functions (derrived from combinations of basic functions)
 
  acos(x) - arc cosine of x
  asin(x) - arc sine of x
