@@ -680,8 +680,13 @@ void zpush(void)
 
 void dpush(void)
 {
-    callrts("dpush");
-    Zsp -= c_ieee_math ? 4 : 6;
+    if ( c_ieee_math ) {
+        zpushde();
+        zpush();
+    } else {
+        callrts("dpush");
+        Zsp -= 6;
+    }
 }
 
 /* Push the primary floating point register, preserving
@@ -2617,8 +2622,12 @@ void inc(LVALUE* lval)
     case KIND_DOUBLE:
         // FA = value to be incremented
         dpush();
-        vlongconst(1);
-        convSlong2doub();
+        if ( c_ieee_math ) {
+            vlongconst(0x3f800000); // +1.0
+        } else {
+            vlongconst(1);
+            convSlong2doub();
+        }
         callrts("dadd");
         Zsp += ( c_ieee_math ? 4 : 6);
         break;
@@ -2641,8 +2650,12 @@ void dec(LVALUE* lval)
     case KIND_DOUBLE:
         // FA = value to be incremented
         dpush();
-        vlongconst(-1);
-        convSlong2doub();
+        if ( c_ieee_math ) {
+            vlongconst(0xbf800000); // +1.0
+        } else {
+            vlongconst(-1);
+            convSlong2doub();
+        }
         callrts("dadd");
         Zsp += (c_ieee_math ? 4 : 6);
         break;
