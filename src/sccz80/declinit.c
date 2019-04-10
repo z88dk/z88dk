@@ -271,9 +271,8 @@ constdecl:
                         output_double_string_load(value);
                     } else {
                         dofloat(value, fa);
-                        // TODO: IEEE
                         defbyte();
-                        for ( i = 0; i < c_ieee_math ? 4 : 6; i++ ) {
+                        for ( i = 0; i < (c_ieee_math ? 4 : 6); i++ ) {
                             if ( i ) outbyte(',');
                             outdec(fa[i]);
                         }
@@ -319,7 +318,7 @@ constdecl:
                         output_double_string_load(value);
                     } else {
                         dofloat(value, fa);
-                        for ( i = 0; i < c_ieee_math ? 4 : 6 + 1; i++ ) {
+                        for ( i = 0; i < (c_ieee_math ? 4 : 6); i++ ) {
                             stowlit(fa[i], 1);
                         }
                     }

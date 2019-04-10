@@ -846,7 +846,7 @@ void load_double_into_fa(LVALUE *lval)
         dofloat(lval->const_val, fa);
         
         if ( c_ieee_math ) {
-            outfmt("\tld\thl,$%02x%02x\n", fa[1], fa[0]);
+            outfmt("\tld\thl,$%02x%02x\t;const\n", fa[1], fa[0]);
             outfmt("\tld\tde,$%02x%02x\n", fa[3], fa[2]);
         } else {
             elem = get_elem_for_fa(fa,lval->const_val);

@@ -2651,7 +2651,7 @@ void dec(LVALUE* lval)
         // FA = value to be incremented
         dpush();
         if ( c_ieee_math ) {
-            vlongconst(0xbf800000); // +1.0
+            vlongconst(0xbf800000); // -1.0
         } else {
             vlongconst(-1);
             convSlong2doub();

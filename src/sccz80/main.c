@@ -232,7 +232,7 @@ int main(int argc, char** argv)
     }
 
     if ( c_ieee_math ) {
-        type_double = &(Type){ KIND_DOUBLE, 4, 0, .len=1 }; // TODO
+        type_double = &(Type){ KIND_DOUBLE, 4, 0, .len=1 }; 
     }
 
 

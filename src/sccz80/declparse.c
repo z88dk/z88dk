@@ -13,7 +13,7 @@ Type   *type_int = &(Type){ KIND_INT, 2, 0, .len=1 };
 Type   *type_uint = &(Type){ KIND_INT, 2, 1, .len=1 };
 Type   *type_long = &(Type){ KIND_LONG, 4, 0, .len=1 };
 Type   *type_ulong = &(Type){ KIND_LONG, 4, 1, .len=1 };
-Type   *type_double = &(Type){ KIND_DOUBLE, 6, 0, .len=1 }; // TODO
+Type   *type_double = &(Type){ KIND_DOUBLE, 6, 0, .len=1 }; 
 
 static int32_t needsub(void)
 {
