@@ -52,6 +52,8 @@ struct _mapping {
     char     *sccz80_name;
     char     *sdcc_name;
 } mappings[] = {
+        { "dload","dload","l_glong"  },
+        { "dstore","dstore","l_plong"  },
 	{ "fadd", "dadd", "___fsadd" },
 	{ "fsub", "dsub", "___fssub" },
 	{ "fmul", "dmul", "___fsmul" },
@@ -2637,7 +2639,13 @@ void neg(LVALUE* lval)
         callrts("l_long_neg");
         break;
     case KIND_DOUBLE:
-        callrts("minusfa");
+        if ( c_ieee_math ) {
+           ol("ld\ta,d");
+           ol("xor\t128");
+           ol("ld\td,a");
+        } else {
+            callrts("minusfa");
+        }
         break;
     default:
         callrts("l_neg");

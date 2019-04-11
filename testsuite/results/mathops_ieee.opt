@@ -1,0 +1,322 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._assign
+	ld	hl,0	;const
+	ld	de,16416
+	push	de
+	push	hl
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._assign2
+	push	bc
+	push	bc
+	ld	hl,0	;const
+	add	hl,sp
+	ld	(hl),+(0 % 256)
+	inc	hl
+	ld	(hl),+(0 / 256)
+	inc	hl
+	ld	(hl),+(16416 % 256)
+	inc	hl
+	ld	(hl),+(16416 / 256)
+	ld	hl,0	;const
+	add	hl,sp
+	call	l_glong
+	push	de
+	push	hl
+	call	_func
+	pop	bc
+	pop	bc
+	ld	hl,0	;const
+	add	hl,sp
+	call	l_glong
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._assign_via_pointer
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,0	;const
+	ld	de,16672
+	pop	bc
+	call	l_plong
+	ret
+
+
+
+._funccall
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	push	de
+	push	hl
+	call	_func
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._funcptr
+	ld	hl,_func2
+	push	hl
+	push	hl
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	ex	de,hl
+	ex	(sp),hl
+	push	de
+	push	hl
+	ld	hl,0	;const
+	ld	de,16256
+	ex	de,hl
+	ex	(sp),hl
+	push	de
+	call	l_jphl
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._add
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	call	___fsadd
+	ret
+
+
+
+._sub
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	call	___fssub
+	ret
+
+
+
+._mul
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	call	___fsmul
+	ret
+
+
+
+._div
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	call	___fsdiv
+	ret
+
+
+
+._eq
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	call	___fseq
+	ret
+
+
+
+._ne
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	call	___fsne
+	ret
+
+
+
+._lt
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	call	___fslt
+	ret
+
+
+
+._le
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	call	_islessequal
+	ret
+
+
+
+._gt
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	call	___fsgt
+	ret
+
+
+
+._ge
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	call	_isgreaterequal
+	ret
+
+
+
+._neg
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	ld	a,d
+	xor	128
+	ld	d,a
+	ret
+
+
+
+._cschar
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_gchar
+	call	___schar2fs
+	ret
+
+
+
+._cuchar
+	ld	hl,2	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+	call	___uchar2fs
+	ret
+
+
+
+._csint
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	call	___sint2fs
+	ret
+
+
+
+._cuint
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	call	___uint2fs
+	ret
+
+
+
+._cslong
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	call	___slong2fs
+	ret
+
+
+
+._culong
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	call	___ulong2fs
+	ret
+
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_func
+	GLOBAL	_func2
+	GLOBAL	_assign
+	GLOBAL	_assign2
+	GLOBAL	_assign_via_pointer
+	GLOBAL	_funccall
+	GLOBAL	_funcptr
+	GLOBAL	_add
+	GLOBAL	_sub
+	GLOBAL	_mul
+	GLOBAL	_div
+	GLOBAL	_eq
+	GLOBAL	_ne
+	GLOBAL	_lt
+	GLOBAL	_le
+	GLOBAL	_gt
+	GLOBAL	_ge
+	GLOBAL	_neg
+	GLOBAL	_cschar
+	GLOBAL	_cuchar
+	GLOBAL	_csint
+	GLOBAL	_cuint
+	GLOBAL	_cslong
+	GLOBAL	_culong
+
+
+
+
