@@ -46,6 +46,51 @@ static void loada(int n);
 static int    donelibheader;
 static char  *current_section = ""; /**< Name of the current section */
 
+/* Mappings between default library names - allows use of sdcc maths library with sccz80 */
+struct _mapping {
+    char     *opname;
+    char     *sccz80_name;
+    char     *sdcc_name;
+} mappings[] = {
+	{ "fadd", "dadd", "___fsadd" },
+	{ "fsub", "dsub", "___fssub" },
+	{ "fmul", "dmul", "___fsmul" },
+	{ "fdiv", "ddiv", "___fsdiv" },
+	{ "fle",  "dleq",  "_islessequal" },
+	{ "flt",  "dlt",  "___fslt" },
+	{ "fge",  "dge",  "_isgreaterequal" },
+	{ "fgt",  "dgt",  "___fsgt" },
+	{ "feq",  "deq",  "___fseq" },
+	{ "fne",  "dne",  "___fsne" },
+	{ "schar2f", "l_int2long_s_float","___schar2fs" },
+	{ "uchar2f", "l_int2long_u_float","___uchar2fs" },
+	{ "sint2f", "l_int2long_s_float","___sint2fs" },
+	{ "uint2f", "l_int2long_u_float","___uint2fs" },
+	{ "slong2f", "float", "___slong2fs" },
+	{ "ulong2f", "ufloat","___ulong2fs" },
+        { "f2sint",  "ifix",  "___fs2sint" },
+        { "f2uint",  "ifix",  "___fs2uint" },
+        { "f2slong", "ifix",  "___fs2slong" },
+        { "f2ulong", "ifix",  "___fs2ulong" },
+        { NULL }
+};
+
+static const char *map_library_routine(const char *wanted)
+{
+    struct _mapping *map = &mappings[0];
+
+    while ( map->opname != NULL ) {
+        if ( strcmp(wanted, map->opname) == 0) {
+            if ( c_ieee_math ) {
+                return map->sdcc_name;
+            }
+            return map->sccz80_name;
+        }
+        map++;
+    }
+    return wanted;
+}
+
 /* Begin a comment line for the assembler */
 
 void comment(void)
@@ -782,8 +827,9 @@ char dopref(SYMBOL* sym)
 /* Call a run-time library routine */
 void callrts(char* sname)
 {
+    const char *func_name = map_library_routine(sname);
     ot("call\t");
-    outstr(sname);
+    outstr(func_name);
     nl();
 }
 
@@ -824,7 +870,7 @@ void callstk(Type *type, int n, int isfarptr, int last_argument_size)
              ol("pop\taf");
              outstr("\tld\tbc,"); printlabel(label);  nl();	// bc = return address
              // Next 3 lines aren't strictly necessary for a fastcall function
-             // but lets handle a non-fastcall pointer being assigned to
+             // but lets hanfle a non-fastcall pointer being assigned to
              // a fastcall function pointer
 #if 0
              ol("push\tde");
@@ -1374,7 +1420,7 @@ void zadd(LVALUE* lval)
         Zsp += 4;
         break;
     case KIND_DOUBLE:
-        callrts("dadd");
+        callrts("fadd");
         Zsp += ( c_ieee_math ? 4 : 6);
         break;
     default:
@@ -1525,7 +1571,7 @@ void zsub(LVALUE* lval)
         Zsp += 4;
         break;
     case KIND_DOUBLE:
-        callrts("dsub");
+        callrts("fsub");
         Zsp += ( c_ieee_math ? 4 : 6);
         break;
     default:
@@ -1550,7 +1596,7 @@ void mult(LVALUE* lval)
         Zsp += 4;
         break;
     case KIND_DOUBLE:
-        callrts("dmul");
+        callrts("fmul");
         Zsp += (c_ieee_math ? 4 : 6);
         break;
     case KIND_CHAR:
@@ -1603,7 +1649,7 @@ void zdiv(LVALUE* lval)
         Zsp += 4;
         break;
     case KIND_DOUBLE:
-        callrts("ddiv");
+        callrts("fdiv");
         Zsp += (c_ieee_math ? 4 : 6);
         break;
     default:
@@ -2575,7 +2621,7 @@ void lneg(LVALUE* lval)
         ol("ccf");
         break;
     case KIND_DOUBLE:
-        convdoub2int();
+        zconvert_from_double(KIND_INT, 0);
     default:
         set_int(lval);
         callrts("l_lneg");
@@ -2625,10 +2671,10 @@ void inc(LVALUE* lval)
         if ( c_ieee_math ) {
             vlongconst(0x3f800000); // +1.0
         } else {
-            vlongconst(1);
-            convSlong2doub();
+            vconst(1);
+            zconvert_to_double(KIND_INT, 1);
         }
-        callrts("dadd");
+        callrts("fadd");
         Zsp += ( c_ieee_math ? 4 : 6);
         break;
     case KIND_LONG:
@@ -2654,9 +2700,9 @@ void dec(LVALUE* lval)
             vlongconst(0xbf800000); // -1.0
         } else {
             vlongconst(-1);
-            convSlong2doub();
+            zconvert_to_double(KIND_LONG, 0);
         }
-        callrts("dadd");
+        callrts("fadd");
         Zsp += (c_ieee_math ? 4 : 6);
         break;
     case KIND_LONG:
@@ -2796,7 +2842,7 @@ void zeq(LVALUE* lval)
         break;
     case KIND_DOUBLE:
         set_int(lval);
-        callrts("deq");
+        callrts("feq");
         Zsp += (c_ieee_math ? 4 : 6);
         break;
     case KIND_CHAR:
@@ -2912,7 +2958,7 @@ void zne(LVALUE* lval)
         Zsp += 4;
         break;
     case KIND_DOUBLE:
-        callrts("dne");
+        callrts("fne");
         set_int(lval);            
         Zsp += (c_ieee_math ? 4 : 6);
         break;
@@ -3040,7 +3086,7 @@ void zlt(LVALUE* lval)
         set_int(lval);        
         break;
     case KIND_DOUBLE:
-        callrts("dlt");
+        callrts("flt");
         set_int(lval);            
         Zsp += (c_ieee_math ? 4 : 6);
         break;
@@ -3140,7 +3186,7 @@ void zle(LVALUE* lval)
         Zsp += 4;
         break;
     case KIND_DOUBLE:
-        callrts("dleq");
+        callrts("fle");
         set_int(lval);            
         Zsp += (c_ieee_math ? 4 : 6);
         break;
@@ -3238,7 +3284,7 @@ void zgt(LVALUE* lval)
         Zsp += 4;
         break;
     case KIND_DOUBLE:
-        callrts("dgt");
+        callrts("fgt");
         Zsp += (c_ieee_math ? 4 : 6);
         set_int(lval);
         break;
@@ -3347,7 +3393,7 @@ void zge(LVALUE* lval)
         set_int(lval);        
         break;
     case KIND_DOUBLE:
-        callrts("dge");
+        callrts("fge");
         set_int(lval);
         Zsp += (c_ieee_math ? 4 : 6);
         break;
@@ -3432,39 +3478,9 @@ void convSint2long(void)
     callrts("l_int2long_s");
 }
 
-/* signed Int to doub */
-void convSint2doub(void)
-{
-    callrts("float");
-}
 
-/* unsigned int to double */
-
-void convUint2doub(void)
-{
-    callrts("ufloat");
-}
-
-/* signed long to double */
-void convSlong2doub(void)
-{
-    convSint2doub();
-}
-
-/* unsigned long to double */
-void convUlong2doub(void)
-{
-    convUint2doub();
-}
-
-/* double to integerl/long */
-void convdoub2int(void)
-{
-    callrts("ifix");
-}
 
 /* Swap double positions on stack */
-
 void DoubSwap(void)
 {
     callrts("dswap");
@@ -3632,7 +3648,7 @@ void printlabel(int label)
 void col()
 {
     if (!ISASM(ASM_Z80ASM))
-        outbyte(58);
+        outstr(":");
 }
 
 void function_appendix(SYMBOL* func)
@@ -3984,6 +4000,36 @@ void push_char_sdcc_style(void)
     Zsp--;
 }
 
+
+void zconvert_from_double(Kind type, unsigned char isunsigned)
+{
+    if ( type == KIND_LONG || type == KIND_CPTR ) {
+        if ( isunsigned ) callrts("f2ulong");
+        else callrts("f2slong");
+    } else if ( isunsigned ) {
+        callrts("f2uint");
+    } else {
+        callrts("f2sint");
+    }
+}
+
+void zconvert_to_double(Kind type, unsigned char isunsigned)
+{
+   if ( type == KIND_LONG || type == KIND_CPTR ) {
+       if ( isunsigned ) callrts("ulong2f");
+       else callrts("slong2f");
+       return;
+   } else if ( type == KIND_CHAR ) {
+       if ( isunsigned ) callrts("uchar2f");
+       else callrts("schar2f");
+       return;
+   } else if ( type == KIND_CARRY ) {
+       zcarryconv();
+       isunsigned = 1;
+   }
+   if ( isunsigned ) callrts("uint2f");
+   else callrts("sint2f");
+}
 
 /*
  * Local Variables:

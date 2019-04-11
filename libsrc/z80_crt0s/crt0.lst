@@ -62,6 +62,7 @@ crt0/l_xor
 crt0_long/htonl
 crt0_long/int2long_s
 crt0_long/int2long_s_float
+crt0_long/int2long_u_float
 crt0_long/l_declong
 crt0_long/l_inclong
 crt0_long/l_long_add

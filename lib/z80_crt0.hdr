@@ -103,6 +103,7 @@
 	EXTERN     lpush2		;Push a long under the stack
 	EXTERN     l_int2long_s	;Int->long signed conversion
 	EXTERN     l_int2long_s_float	;Int->long->float signed conversion (optimizer: use -O3)
+	EXTERN     l_int2long_u_float	;uInt->ulong->float signed conversion 
 	EXTERN     l_long2int_s	;Long->int signed conversion
 	EXTERN     l_glong		;Get long
 	EXTERN     l_glonghlp		;Get pointer, then get long
@@ -162,9 +163,9 @@
 	EXTERN	minusfa		;FA=-FA
 
 	EXTERN	dswap		;Exchange FA with top of stack
-	EXTERN   	float		;Convert int to float
-	EXTERN   	ufloat		;unsigned int to float
-	EXTERN   	ifix		;Convert float to int
+	EXTERN  float		;Convert int to float
+	EXTERN  ufloat		;unsigned int to float
+	EXTERN  ifix		;Convert float to int
 
 	EXTERN	dstore		;FA->(de)
 	EXTERN	dload		;FA<-(hl)
@@ -174,9 +175,31 @@
 	EXTERN	dpush3		;FA->(stack under,long)
 
 	EXTERN	fa		;may not be needed in this file
-	EXTERN	extra		;dittot
-	EXTERN  	__atof2		;string->fa convsersion
+	EXTERN	extra		;ditto
+	EXTERN  __atof2		;string->fa conversion
 
+
+	; SDCC float API
+	EXTERN	___fsadd
+	EXTERN	___fssub
+	EXTERN	___fsmul
+	EXTERN	___fsdiv
+	EXTERN	_islessequal
+	EXTERN	___fslt
+	EXTERN	_isgreaterequal
+	EXTERN	___fsgt
+	EXTERN	___fseq
+	EXTERN	___fsne
+	EXTERN	___schar2fs
+	EXTERN	___uchar2fs
+	EXTERN	___sint2fs
+	EXTERN	___uint2fs
+	EXTERN	___slong2fs
+	EXTERN	___ulong2fs
+	EXTERN	___f2sint
+	EXTERN	___f2uint
+	EXTERN	___f2slong
+	EXTERN	___f2ulong
 
 ;--------------------------------------------------
 ; Routines for picking up variables from far memory

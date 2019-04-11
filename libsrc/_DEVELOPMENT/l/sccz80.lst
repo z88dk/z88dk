@@ -59,6 +59,7 @@ l/sccz80/crt0/l_ult
 l/sccz80/crt0/l_xor
 l/sccz80/crt0_long/int2long_s
 l/sccz80/crt0_long/int2long_s_float
+l/sccz80/crt0_long/int2long_u_float
 l/sccz80/crt0_long/l_declong
 l/sccz80/crt0_long/l_inclong
 l/sccz80/crt0_long/l_long_add

@@ -149,7 +149,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 
         if ( lval->val_type == KIND_DOUBLE && lval2->is_const == 0 ) {
             if ( lval2->val_type != KIND_DOUBLE ) {
-                convert_int_to_double(lval2->val_type, lval2->ltype->isunsigned);
+                zconvert_to_double(lval2->val_type, lval2->ltype->isunsigned);
                 lval2->val_type = KIND_DOUBLE;
                 lval2->ltype = type_double;
             }
@@ -162,11 +162,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             /* On stack we've got the double, load the constant as a double */
             dpush();
             vlongconst(lval->const_val);
-            if ( lval->ltype->isunsigned ) {
-                convUlong2doub();
-            } else {
-                convSlong2doub();
-            }
+            zconvert_to_double(KIND_LONG, lval->ltype->isunsigned);
             lval->val_type = KIND_DOUBLE;
             lval->ltype = type_double;
             /* division isn't commutative so we need to swap over' */
@@ -449,7 +445,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         
         if ( lval->val_type == KIND_DOUBLE && lval2->is_const == 0 ) {
             if ( lval2->val_type != KIND_DOUBLE ) {
-                convert_int_to_double(lval2->val_type, lval2->ltype->isunsigned);
+                zconvert_to_double(lval2->val_type, lval2->ltype->isunsigned);
                 lval2->val_type = KIND_DOUBLE;
                 lval2->ltype = type_double;
             }
@@ -468,11 +464,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             } else {
                 /* On stack we've got the double, load the constant as a double */
                 vlongconst(val);
-                if ( lval->ltype->isunsigned ) {
-                    convUlong2doub();
-                } else {
-                    convSlong2doub();
-                }
+                zconvert_to_double(KIND_LONG, lval->ltype->isunsigned);
                 lval->val_type = KIND_DOUBLE;
                 lval->ltype = type_double;
             }
@@ -551,11 +543,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                     load_double_into_fa(lval2);
                 } else {
                     vlongconst(val);
-                    if ( lval2->ltype->isunsigned ) {
-                        convUlong2doub();
-                    } else {
-                        convSlong2doub();
-                    }
+                    zconvert_to_double(KIND_LONG, lval2->ltype->isunsigned);
                 }
                 (*oper)(lval);
             } else {
