@@ -74,6 +74,8 @@ struct _mapping {
         { "f2uint",  "ifix",  "l_f32_f2uint" },
         { "f2slong", "ifix",  "l_f32_f2slong" },
         { "f2ulong", "ifix",  "l_f32_f2ulong" },
+        { "dpush_under_long", "dpush3", NULL }, // Inlined
+        { "dpush_under_int", "dpush2", NULL }, // Inlined
         { NULL }
 };
 
@@ -741,12 +743,29 @@ void dpush(void)
 
 void dpush_under(int val_type)
 {
-    if ( val_type == KIND_LONG ) {
-        callrts("dpush3");
+    if ( val_type == KIND_LONG || val_type == KIND_CPTR ) {
+        if ( c_fp_size == 4 ) {
+            ol("pop\tbc");	// addr2 -> bc
+            swap(); /* MSW -> hl */
+            swapstk(); /* MSW -> stack, addr1 -> hl */
+            zpushde(); /* LSW -> stack, addr1 = hl */
+            zpush();   // addr -> stack
+            ol("push\tbc"); // addr2 -> stack
+        } else {
+           callrts("dpush_under_long");
+           Zsp -= c_fp_size;
+        }
     } else {
-        callrts("dpush2");
+        if ( c_fp_size == 4 ) {
+            swap(); /* MSW -> hl */
+            swapstk(); /* MSW -> stack, addr -> hl */
+            zpushde(); /* LSW -> stack, addr = hl */
+            zpush();
+        } else {
+            callrts("dpush_under_int");
+            Zsp -= c_fp_size;
+        }
     }
-    Zsp -= c_fp_size;
 }
 
 /* Pop the top of the stack into the primary register */
