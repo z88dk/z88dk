@@ -640,12 +640,49 @@ void dofloat(double raw, unsigned char fa[])
     }
 }
 
+static void ieee_pack(uint32_t val, unsigned char fa[]) 
+{
+    fa[0] = val & 0xff;
+    fa[1] = (val >> 8) & 0xff;
+    fa[2] = (val >> 16) & 0xff;
+    fa[3] = (val >> 24) & 0xff;
+}
+
 static void dofloat_ieee(double raw, unsigned char fa[])
 {
-    // TOOD: ENDIAN + do this a lot better
-    float f = raw;
+    if ( isnan(raw)) {
+        // quiet nan: 7FC00000
+        // signalling nan: 7F800001
+        ieee_pack(0x7fc00000, fa);
+        fa[0] = 0x00;
+        fa[1] = 0x00;
+        fa[2] = 0xc0;
+        fa[3] = 0x7f;
+    } else if ( isinf(raw) && raw > 0 ) {
+        // positive infinity: 7F800000
+        ieee_pack(0x7f800000, fa);
+        fa[0] = 0x00;
+        fa[1] = 0x00;
+        fa[2] = 0x80;
+        fa[3] = 0x7f;
+    } else if ( isinf(raw) && raw < 0 ) {
+        // negative infinity: FF800000
+        ieee_pack(0xff800000, fa);
+    } else {
+        uint32_t fp_value = 0;
 
-    memcpy(fa, &f, 4);
+        dofloat_z80(raw, fa);
+
+        // Bundle up mantissa
+        fp_value = ( ( (uint32_t)fa[2]) | ( ((uint32_t)fa[3]) << 8) | (((uint32_t)fa[4]) << 16))  & 0x007fffff;
+
+        // And now the exponent
+        fp_value |= (((uint32_t)fa[5]) << 23);
+
+        // And the sign bit
+        fp_value |= ((fa[0] & 0x80) ? 0x80000000 : 0x00000000);
+        ieee_pack(fp_value, fa);
+    }
 }
 
 
@@ -845,7 +882,7 @@ void load_double_into_fa(LVALUE *lval)
     } else {
         dofloat(lval->const_val, fa);
         
-        if ( c_ieee_math ) {
+        if ( c_fp_size == 4 ) {
             vconst(fa[1] << 8 | fa[0]);
             const2(fa[3] << 8 | fa[2]);
         } else {

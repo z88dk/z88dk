@@ -272,7 +272,7 @@ constdecl:
                     } else {
                         dofloat(value, fa);
                         defbyte();
-                        for ( i = 0; i < (c_ieee_math ? 4 : 6); i++ ) {
+                        for ( i = 0; i < c_fp_size; i++ ) {
                             if ( i ) outbyte(',');
                             outdec(fa[i]);
                         }
@@ -318,7 +318,7 @@ constdecl:
                         output_double_string_load(value);
                     } else {
                         dofloat(value, fa);
-                        for ( i = 0; i < (c_ieee_math ? 4 : 6); i++ ) {
+                        for ( i = 0; i < c_fp_size; i++ ) {
                             stowlit(fa[i], 1);
                         }
                     }

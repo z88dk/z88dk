@@ -27,9 +27,9 @@ int ge(double a, double b) { return a >= b; }
 
 double neg(double a) { return -a; }
 
-double cschar(signed char c) { return (double) c; };
-double cuchar(unsigned char c) { return (double) c; };
-double csint(signed int i) { return (double) i; };
-double cuint(unsigned int i) { return (double) i; };
-double cslong(signed long i) { return (double) i; };
-double culong(unsigned long i) { return (double) i; };
+double cschar(signed char c) { return (double) c; }
+double cuchar(unsigned char c) { return (double) c; }
+double csint(signed int i) { return (double) i; }
+double cuint(unsigned int i) { return (double) i; }
+double cslong(signed long i) { return (double) i; }
+double culong(unsigned long i) { return (double) i; }

@@ -37,6 +37,7 @@ int c_cpu = CPU_Z80;
 /* Settings for genmath + math48 */
 int c_fp_mantissa_bytes = 5;
 int c_fp_exponent_bias = 128;
+int c_fp_size = 6;
 
 int c_ieee_math = 0;
 
@@ -232,7 +233,10 @@ int main(int argc, char** argv)
     }
 
     if ( c_ieee_math ) {
+        c_fp_size = 4;
         type_double = &(Type){ KIND_DOUBLE, 4, 0, .len=1 }; 
+        c_fp_exponent_bias = 126;
+        c_fp_mantissa_bytes = 3;
     }
 
 

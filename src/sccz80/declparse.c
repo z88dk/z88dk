@@ -464,7 +464,7 @@ static Type *parse_type(void)
         type->size = 4;
     } else if ( amatch("float") || amatch("double")) {
         type->kind = KIND_DOUBLE;
-        type->size = c_ieee_math ? 4 : 6;
+        type->size = c_fp_size;
     } else if ( amatch("void")) {
         type->kind = KIND_VOID;
         type->size = 1;
@@ -1027,7 +1027,7 @@ Type *make_type(Kind kind, Type *tag)
         type->size = 4;
         break;
     case KIND_DOUBLE:
-        type->size = c_ieee_math ? 4 : 6;
+        type->size =  c_fp_size;
         break;
     case KIND_STRUCT:
         type->size = tag->size;

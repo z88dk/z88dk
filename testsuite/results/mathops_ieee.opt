@@ -105,7 +105,7 @@
 	ld	hl,6	;const
 	add	hl,sp
 	call	l_glong
-	call	___fsadd
+	call	l_f32_add
 	ret
 
 
@@ -117,7 +117,7 @@
 	ld	hl,6	;const
 	add	hl,sp
 	call	l_glong
-	call	___fssub
+	call	l_f32_sub
 	ret
 
 
@@ -129,7 +129,7 @@
 	ld	hl,6	;const
 	add	hl,sp
 	call	l_glong
-	call	___fsmul
+	call	l_f32_mul
 	ret
 
 
@@ -141,7 +141,7 @@
 	ld	hl,6	;const
 	add	hl,sp
 	call	l_glong
-	call	___fsdiv
+	call	l_f32_div
 	ret
 
 
@@ -153,7 +153,7 @@
 	ld	hl,6	;const
 	add	hl,sp
 	call	l_glong
-	call	___fseq
+	call	l_f32_eq
 	ret
 
 
@@ -165,7 +165,7 @@
 	ld	hl,6	;const
 	add	hl,sp
 	call	l_glong
-	call	___fsne
+	call	l_f32_ne
 	ret
 
 
@@ -177,7 +177,7 @@
 	ld	hl,6	;const
 	add	hl,sp
 	call	l_glong
-	call	___fslt
+	call	l_f32_lt
 	ret
 
 
@@ -189,7 +189,7 @@
 	ld	hl,6	;const
 	add	hl,sp
 	call	l_glong
-	call	_islessequal
+	call	l_f32_le
 	ret
 
 
@@ -201,7 +201,7 @@
 	ld	hl,6	;const
 	add	hl,sp
 	call	l_glong
-	call	___fsgt
+	call	l_f32_gt
 	ret
 
 
@@ -213,7 +213,7 @@
 	ld	hl,6	;const
 	add	hl,sp
 	call	l_glong
-	call	_isgreaterequal
+	call	l_f32_ge
 	ret
 
 
@@ -233,7 +233,7 @@
 	ld	hl,2	;const
 	add	hl,sp
 	call	l_gchar
-	call	___schar2fs
+	call	l_f32_schar2f
 	ret
 
 
@@ -243,7 +243,7 @@
 	add	hl,sp
 	ld	l,(hl)
 	ld	h,0
-	call	___uchar2fs
+	call	l_f32_uchar2f
 	ret
 
 
@@ -253,7 +253,7 @@
 	pop	hl
 	push	hl
 	push	bc
-	call	___sint2fs
+	call	l_f32_sint2f
 	ret
 
 
@@ -263,7 +263,7 @@
 	pop	hl
 	push	hl
 	push	bc
-	call	___uint2fs
+	call	l_f32_uint2f
 	ret
 
 
@@ -272,7 +272,7 @@
 	ld	hl,2	;const
 	add	hl,sp
 	call	l_glong
-	call	___slong2fs
+	call	l_f32_slong2f
 	ret
 
 
@@ -281,7 +281,7 @@
 	ld	hl,2	;const
 	add	hl,sp
 	call	l_glong
-	call	___ulong2fs
+	call	l_f32_ulong2f
 	ret
 
 
