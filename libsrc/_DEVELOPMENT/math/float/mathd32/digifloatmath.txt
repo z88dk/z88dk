@@ -340,7 +340,7 @@ Exceptions - range errors
 ;-------------------------------------------------------------------------
 ; r = x/y
 ;
-; We calculate division of two floating point number by refining an
+; We calculate division of two floating point numbers by refining an
 ; estimate of the reciprocal of y using newton iterations.  Each iteration
 ; gives us just less than twice previous precision in binary bits (2n-2).
 ;
