@@ -22,8 +22,6 @@ SECTION code_math
 PUBLIC m32_mulu_32_16x16
 
 .m32_mulu_32_16x16
-    push de                     ; preserve de
-
     ld h,b                      ; xh
     ld l,d                      ; yh
     push hl                     ; xh yh
@@ -66,8 +64,6 @@ PUBLIC m32_mulu_32_16x16
 
     ld b,d
     ld c,e                      ; hlbc = final result
-
-    pop de                      ; restore de
 
     ret
 

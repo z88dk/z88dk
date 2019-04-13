@@ -24,8 +24,6 @@ EXTERN l_mulu_32_16x16
 PUBLIC m32_mulu_32_16x16
 
 .m32_mulu_32_16x16
-    push de             ; preserve de
-
     ex de,hl    
     ld d,b
     ld e,c
@@ -37,8 +35,6 @@ PUBLIC m32_mulu_32_16x16
     ex de,hl
     ld b,d
     ld c,e
-
-    pop de              ; restore de
 
     ret
 

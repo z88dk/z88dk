@@ -135,7 +135,7 @@ rounding error.
 
 ******** Math Library Discussion *******
 
-Functions included in math libaries
+Functions included in math libraries
 
 Basic floating point functions - these are computed from first principles
 
@@ -149,24 +149,6 @@ Derivative floating point functions (derived from combinations of basic function
  acsc(x) - arc cosecant of x
  asec(x) - arc secant of x
  acot(x) - arc cotangent of x
-
-Discussion of Accuracy
-
- Generally the basic functions are accurate within 1-3 counts of the floating mantissa. However, in
- certain ranges of certain functions the relative accuracy is much less do to the intrinsic properties of
- floating point math. Accuracy expressed in counts of the floating mantissa is relative acccuracy -
- i.e. relative to the size of the number. Absolute accuracy is the absolute size of the error - e.g.
- .00001. The derivative functions, computed as combinations of the basic functions, typically
- have larger error because the errors of 2 or more basic functions are added together in some fashion.
-
- If the value of the function depends on the value of the difference of 2 floating point numbers that are
- close to each other in value, the relative error generally becomes large, although the absolute error
- may remain well bounded. Examples are the logs of numbers near 1 and the sine of numbers near pi.
- For example, if the argument of the sine function is a floating point number is close to pi, say
- 5 counts of the mantissa away from pi and it is subtracted from pi the result will be a number with
- only 3 significent bits. The relative error in the sine result will be very large, but the absolute
- error will still be very small. Functions with steep slopes, such as the exponent of larger numbers
- will show a large relative error, since the relative error in the argument is magnified by the slope.
 
 Basic floating point functions - these are computed from first principles
 
@@ -196,11 +178,11 @@ Derivative floating point functions (derived from combinations of basic function
  log10(x) - logarithm of x base 10
  pow(x,y) - x to y power
 
-Discussion of Accuracy
+Discussion of accuracy
 
  Generally the basic functions are accurate within 1-3 counts of the floating mantissa. However, in
  certain ranges of certain functions the relative accuracy is much less do to the intrinsic properties of
- floating point math. Accuracy expressed in counts of the floating mantissa is relative acccuracy -
+ floating point math. Accuracy expressed in counts of the floating mantissa is relative accuracy -
  i.e. relative to the size of the number. Absolute accuracy is the absolute size of the error - e.g.
  .00001. The derivative functions, computed as combinations of the basic functions, typically
  have larger error because the errors of 2 or more basic functions are added together in some fashion.
@@ -210,7 +192,7 @@ Discussion of Accuracy
  may remain well bounded. Examples are the logs of numbers near 1 and the sine of numbers near pi.
  For example, if the argument of the sine function is a floating point number is close to pi, say
  5 counts of the mantissa away from pi and it is subtracted from pi the result will be a number with
- only 3 significent bits. The relative error in the sine result will be very large, but the absolute
+ only 3 significant bits. The relative error in the sine result will be very large, but the absolute
  error will still be very small. Functions with steep slopes, such as the exponent of larger numbers
  will show a large relative error, since the relative error in the argument is magnified by the slope.
 
