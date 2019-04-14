@@ -575,6 +575,8 @@ void indirect(LVALUE* lval)
     case KIND_DOUBLE:
         callrts("dload");
         break;
+    case KIND_STRUCT:
+        break;
     default:
         ot("call\tl_gint\t;");
 #ifdef USEFRAME
@@ -668,6 +670,53 @@ void dpush(void)
 {
     callrts("dpush");
     Zsp -= 6;
+}
+
+/* Push an argument for a function pointer call: regular or far pointer */
+int push_function_argument(Kind expr, Type *type, int push_sdccchar)
+{
+    if (expr == KIND_DOUBLE) {
+        dpush();
+        return type_double->size;
+    } else if (expr == KIND_LONG || expr == KIND_CPTR) {
+        lpush();
+        return 4;
+    } else if ( expr == KIND_CHAR && push_sdccchar ) {
+        ol("ld\tb,l");
+        ol("push\tbc");
+        ol("inc\tsp");
+        Zsp--;
+        return 1;
+    } else if (expr == KIND_STRUCT) {
+        swap();             /* de = stack address */
+        vconst(-type->size);
+        ol("add\thl,sp");
+        ol("ld\tsp,hl");
+        Zsp -= type->size;
+        swap();
+        outfmt("\tld\tbc,%d\n",type->size);
+        ol("ldir");
+        return type->size;
+    } 
+    // Default push the word
+    zpush();
+    return 2;
+}
+
+
+
+
+/* Push structure onto stack - address located in hl */
+void push_struct(Type *type)
+{
+    swap();		/* de = stack address */
+    vconst(-type->size);
+    ol("add\thl,sp");
+    ol("ld\tsp,hl");
+    Zsp -= type->size;
+    swap();
+    outfmt("\tld\tbc,%d\n",type->size);
+    ol("ldir");
 }
 
 /* Push the primary floating point register, preserving

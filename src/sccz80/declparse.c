@@ -35,13 +35,22 @@ static int32_t needsub(void)
 }
 
 
-static void swallow_bitfield(void)
+static void swallow_bitfield(Type *type)
 {
     double val;
     Kind   valtype;
     if (cmatch(':')) {
-        constexpr(&val, &valtype, 1);
-        warningfmt("unsupported-feature","Bitfields not supported by compiler");
+        if ( !kind_is_integer(type->kind) ) {
+           errorfmt("Cannot define a bitfield on non-integer type",1);
+        } else {
+           constexpr(&val, &valtype, 1);
+           if ( val > 16 ) {
+               errorfmt("Cannot define a bitfield on non-integer type",1);
+           } else {
+               type->bit_size = val;
+           }
+           warningfmt("unsupported-feature","Bitfields not supported by compiler");
+        }
     }
 }
 
@@ -356,7 +365,7 @@ Type *parse_struct(Type *type, char isstruct)
                 break;
             }
             // Swallow bitfields
-            swallow_bitfield();
+            swallow_bitfield(elem);
 
             // It was a flexible member, this needs to be last in the sturct
             if ( elem->size <= 0 ) {
