@@ -504,7 +504,8 @@ static void parse_trailing_modifiers(Type *type)
             if( type->parameters && array_len(type->parameters) != 1 ) {
                 warningfmt("sdcc-compat", "SDCC only supports a single parameter for __z88dk_fastcall\n");
             }
-            if( type->parameters && ((Type *)array_get_byindex(type->parameters, array_len(type->parameters) - 1))->kind == KIND_STRUCT ) {
+            if( type->parameters && array_len(type->parameters) && 
+               ((Type *)array_get_byindex(type->parameters, array_len(type->parameters) - 1))->kind == KIND_STRUCT ) {
                 errorfmt("__z88dk_fastcall doesn't support struct as only parameter\n",1);
                 continue;
             }
