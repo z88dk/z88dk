@@ -504,6 +504,10 @@ static void parse_trailing_modifiers(Type *type)
             if( type->parameters && array_len(type->parameters) != 1 ) {
                 warningfmt("sdcc-compat", "SDCC only supports a single parameter for __z88dk_fastcall\n");
             }
+            if( type->parameters && ((Type *)array_get_byindex(type->parameters, array_len(type->parameters) - 1))->kind == KIND_STRUCT ) {
+                errorfmt("__z88dk_fastcall doesn't support struct as only parameter\n",1);
+                continue;
+            }
             type->flags |= FASTCALL;
             type->flags &= ~FLOATINGDECL;
         } else if (amatch("__z88dk_callee") || amatch("__CALLEE__")) {
@@ -652,12 +656,14 @@ Type *parse_parameter_list(Type *return_type)
             strcpy(ptr->name, param->name);
             param = ptr;
         }
+#if 0
         if ( param->kind == KIND_STRUCT ) {
             Type *ptr = make_pointer(param);            
             warningfmt("conversion","Cannot pass a struct by value, converting to pointer to struct");
             strcpy(ptr->name, param->name);
             param = ptr;        
         }
+#endif
         if ( param->kind == KIND_ELLIPSES) {
             if ( array_len(func->parameters)  ) {
                 array_add(func->parameters, param);    
