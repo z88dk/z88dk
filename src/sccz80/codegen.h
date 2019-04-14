@@ -136,4 +136,5 @@ extern void zentercritical(void);
 extern void zleavecritical(void);
 extern int zcriticaloffset(void);
 extern int push_function_argument(Kind expr, Type *type, int push_sdccchar);
+extern int push_function_argument_fnptr(Kind expr, Type *type, int push_sdccchar, int is_last_argument);
 

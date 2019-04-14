@@ -703,25 +703,45 @@ int push_function_argument(Kind expr, Type *type, int push_sdccchar)
     return 2;
 }
 
-
-
-
-/* Push structure onto stack - address located in hl */
-void push_struct(Type *type)
+/* Push an argument for a function pointer call */
+int push_function_argument_fnptr(Kind expr, Type *type, int push_sdccchar, int is_last_argument)
 {
-    swap();		/* de = stack address */
-    vconst(-type->size);
-    ol("add\thl,sp");
-    ol("ld\tsp,hl");
-    Zsp -= type->size;
-    swap();
-    outfmt("\tld\tbc,%d\n",type->size);
-    ol("ldir");
+    if (expr == KIND_LONG || expr == KIND_CPTR) {
+        if ( !is_last_argument ) {
+            swap(); /* MSW -> hl */
+            swapstk(); /* MSW -> stack, addr -> hl */
+            zpushde(); /* LSW -> stack, addr = hl */
+        }
+        return 4;
+    } else if (expr == KIND_DOUBLE) {
+        dpush_under(KIND_INT);
+        mainpop();
+        return 6;
+    } else if (expr == KIND_STRUCT ) {
+        // 13 bytes
+        swap();    // de = address of struct
+        ol("pop\tbc");	// return address
+        vconst(-type->size);
+        ol("add\thl,sp");
+        ol("ld\tsp,hl");
+        ol("push\tbc");
+        Zsp -= type->size;
+        swap();
+        outfmt("\tld\tbc,%d\n",type->size);
+        ol("ldir");
+        mainpop();
+        return type->size;
+    } 
+    if ( !is_last_argument ) {
+        swapstk();
+    }
+    return 2;
 }
+
+
 
 /* Push the primary floating point register, preserving
         the top value  */
-
 void dpush_under(int val_type)
 {
     if ( val_type == KIND_LONG ) {
@@ -845,7 +865,7 @@ void callstk(Type *type, int n, int isfarptr, int last_argument_size)
         }
         loadargc(n);
         callrts("l_farcall");
-    } else if ( type->flags & FASTCALL && last_argument_size != 6 ) {
+    } else if ( type->flags & FASTCALL && last_argument_size < 6 ) {
          int label = getlabel();		  
          // TOS = address, dehl = parameter
          // More than one argument, TOS = last parameter, hl = function

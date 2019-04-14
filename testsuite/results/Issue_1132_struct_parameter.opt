@@ -47,10 +47,29 @@
 	ld	hl,10	;const
 	push	hl
 	call	_func
-	ld	hl,16	;const
+	ld	hl,30	;const
 	add	hl,sp
 	ld	sp,hl
-	ld	hl,14	;const
+	ret
+
+
+
+._func_fptr
+	ld	hl,65522	;const
+	add	hl,sp
+	ld	sp,hl
+	ex	de,hl
+	ld	bc,(_fnptr)
+	ld	hl,65522	;const
+	add	hl,sp
+	ld	sp,hl
+	push	bc
+	ex	de,hl
+	ld	bc,14
+	ldir
+	pop	hl
+	call	l_jphl
+	ld	hl,28	;const
 	add	hl,sp
 	ld	sp,hl
 	ret
@@ -59,6 +78,7 @@
 
 
 	SECTION	bss_compiler
+._fnptr	defs	2
 	SECTION	code_compiler
 
 
@@ -66,6 +86,7 @@
 	GLOBAL	_func
 	GLOBAL	_func_callee
 	GLOBAL	_func_calling
+	GLOBAL	_func_fptr
 
 
 

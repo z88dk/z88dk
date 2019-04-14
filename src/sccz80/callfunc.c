@@ -288,27 +288,8 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             if ( function_pointer_call == 0 ||  fnptr_type->kind == KIND_CPTR ) {
                 nargs += push_function_argument(expr, type, functype->flags & SDCCDECL && argnumber <= array_len(functype->parameters));
             } else {
-                // Regular function pointer
-                if (expr == KIND_LONG || expr == KIND_CPTR) {
-                    if ( tmpfiles[argnumber+1] != NULL ) {
-                        swap(); /* MSW -> hl */
-                        swapstk(); /* MSW -> stack, addr -> hl */
-                        zpushde(); /* LSW -> stack, addr = hl */
-                    }
-                    nargs += 4;
-                    last_argument_size = 4;
-                } else if (expr == KIND_DOUBLE) {
-                    dpush_under(KIND_INT);
-                    nargs += 6;
-                    last_argument_size = 6;
-                    mainpop();
-                } else {
-                    if ( tmpfiles[argnumber+1] != NULL ) {
-                        swapstk();
-                    }
-                    nargs += 2;
-                    last_argument_size = 2;
-                }
+                last_argument_size = push_function_argument_fnptr(expr, type, functype->flags & SDCCDECL && argnumber <= array_len(functype->parameters), tmpfiles[argnumber+1] == NULL);
+                nargs += last_argument_size;
             }
         }
         restore_input();
