@@ -78,11 +78,11 @@ PUBLIC md32_fsdiv, md32_fsinv
     
     push hl                     ; for w[2], y msw on stack
 
-    push hl                     ; for w[1], y msb
+    push hl                     ; for w[1], y msw on stack
 
                                 ; calculate w[0] - 5 bits
 
-    rra                         ; calculate w[0] table offset for 32 Byte table >>2
+    rra                         ; calculate w[0] table offset for 32 Byte table
     rra                         ; a = 001mmmmm
     and    0x1f                 ; a = 000mmmmm
 
@@ -91,25 +91,29 @@ PUBLIC md32_fsdiv, md32_fsinv
     ld c,a
     add hl,bc
 
-    ld a,(hl)                   ; w[0] with 5 bits accuracy in a
+    ld b,(hl)
+                                ; w[0] with 5 bits accuracy in b
 
                                 ; calculate w[1] - 8 bits
 
-    ld d,a                      ; w[0] with 5 bits accuracy in d, e
-    ld e,a
-    add a,a                     ; w[0]+w[0] in a, carry is 0
+    ld c,0
+    ld d,b                      ; w[0] with 5 bits accuracy in de
+    ld e,c
+    ld h,b                      ; w[0] with 5 bits accuracy in hl
+    ld l,c
 
-    mlt de                      ; w[0]^2 in de
+    ex (sp),hl                  ; w[0] on stack, y msw in hl
+    push hl                     ; y msw on stack
+
+    call m32_mulu_32_16x16      ; bc*de => hlbc, uses af, w[0]^2 in hlbc
+    ex de,hl
+
     pop bc                      ; y msb in bc
-
-    push af                     ; w[0]+w[0] on stack
-    call m32_mulu_32_16x16      ; bc*de => hlbc, uses af, w[1]^2*y in hlbc
+    call m32_mulu_32_16x16      ; bc*de => hlbc, uses af, w[0]^2*y in hlbc
     ex de,hl                    ; w[1]^2*y in de   
 
-    pop hl                      ; w[0]*2 in h
-
-    xor a
-    ld l,a
+    pop hl                      ; w[0] in hl
+    add hl,hl
 
     sbc hl,de                   ; w[0]*2 - w[0]*w[0]*y
                                 ; w[1] with 8 bits accuracy in hl
@@ -121,20 +125,21 @@ PUBLIC md32_fsdiv, md32_fsinv
     ld d,h                      ; w[1] in de
     ld e,l
     
-    add hl,hl                   ; w[1]+w[1] in hl
-    ex (sp),hl                  ; y msw in hl, w[1]*2 on stack
+    ex (sp),hl                  ; w[1] on stack, y msw in hl
     push hl                     ; y msw on stack
 
     call m32_mulu_32_16x16      ; bc*de => hlbc, uses af, w[1]^2 in hlbc
     ex de,hl
+
     pop bc
     call m32_mulu_32_16x16      ; bc*de => hlbc, uses af, w[1]^2*y in hlbc
     ex de,hl
 
-    pop hl                      ; w[1]*2 in hl, w[1]^2*y msw in de
+    pop hl                     ; w[1] in hl
+    add hl,hl
 
-    xor a
     sbc hl,de                   ; w[1]*2 - w[1]^2*y
+
                                 ; w[2] with 14 bits accuracy in hl
     ld de,0     ; FIXME
                                 ; calculate w[3] - 26 bits - hlde
@@ -245,6 +250,8 @@ PUBLIC md32_fsdiv, md32_fsinv
 
 ;   pop hl                      ; w[2]*2 msw
 ;   sbc hl,bc                   ; w[3] with 26 bits accuracy in hlde
+
+    ld de,0     ; FIXME remove this
 
     ex de,hl                    ; dehl  = 32-bit product
 
