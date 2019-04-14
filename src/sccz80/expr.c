@@ -56,8 +56,10 @@ int heir1(LVALUE* lval)
     if (cmatch('=')) {
         char *start1, *before1;
         if (k == 0) {
-            needlval();
-            return 0;
+            if ( lval->ltype->kind != KIND_STRUCT ) {
+                needlval();
+                return 0;
+            }
         }
         if (lval->indirect_kind)
             smartpush(lval, before);
@@ -115,7 +117,9 @@ int heir1(LVALUE* lval)
                 }
             }
         } else if ( lval->ltype->kind == KIND_STRUCT ) {
-            errorfmt("Cannot assign to aggregate",0);
+            if ( lval2.ltype->kind != KIND_STRUCT ) {
+                errorfmt("Cannot assign to aggregate",0);
+            }
         } 
         if ( lval2.ltype->kind == KIND_VOID ) {
             warningfmt("void","Assigning from a void expression");

@@ -418,6 +418,8 @@ void putstk(LVALUE *lval)
         case KIND_CHAR:
             callrts("lp_pchar");
             break;
+        case KIND_STRUCT:
+            warningfmt("incompatible-pointer-types","Cannot assign a __far struct");
         default:
             callrts("lp_pint");
         }
@@ -441,6 +443,11 @@ void putstk(LVALUE *lval)
         zpop();
         LoadAccum();
         ol("ld\t(de),a");
+        break;
+    case KIND_STRUCT:
+        zpop();
+        outfmt("\tld\tbc,%d\n",lval->ltype->size);
+        ol("ldir");
         break;
     default:
         zpop();
@@ -537,6 +544,8 @@ void indirect(LVALUE* lval)
         case KIND_DOUBLE:
             callrts("lp_gdoub");
             break;
+        case KIND_STRUCT:
+            warningfmt("incompatible-pointer-types","Cannot retrieve a struct via __far");
         default:
             callrts("lp_gint");
         }
