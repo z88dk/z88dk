@@ -418,6 +418,8 @@ void putstk(LVALUE *lval)
         case KIND_CHAR:
             callrts("lp_pchar");
             break;
+        case KIND_STRUCT:
+            warningfmt("incompatible-pointer-types","Cannot assign a __far struct");
         default:
             callrts("lp_pint");
         }
@@ -441,6 +443,11 @@ void putstk(LVALUE *lval)
         zpop();
         LoadAccum();
         ol("ld\t(de),a");
+        break;
+    case KIND_STRUCT:
+        zpop();
+        outfmt("\tld\tbc,%d\n",lval->ltype->size);
+        ol("ldir");
         break;
     default:
         zpop();
@@ -537,6 +544,8 @@ void indirect(LVALUE* lval)
         case KIND_DOUBLE:
             callrts("lp_gdoub");
             break;
+        case KIND_STRUCT:
+            warningfmt("incompatible-pointer-types","Cannot retrieve a struct via __far");
         default:
             callrts("lp_gint");
         }
@@ -565,6 +574,8 @@ void indirect(LVALUE* lval)
         break;
     case KIND_DOUBLE:
         callrts("dload");
+        break;
+    case KIND_STRUCT:
         break;
     default:
         ot("call\tl_gint\t;");
@@ -661,9 +672,76 @@ void dpush(void)
     Zsp -= 6;
 }
 
+/* Push an argument for a function pointer call: regular or far pointer */
+int push_function_argument(Kind expr, Type *type, int push_sdccchar)
+{
+    if (expr == KIND_DOUBLE) {
+        dpush();
+        return type_double->size;
+    } else if (expr == KIND_LONG || expr == KIND_CPTR) {
+        lpush();
+        return 4;
+    } else if ( expr == KIND_CHAR && push_sdccchar ) {
+        ol("ld\tb,l");
+        ol("push\tbc");
+        ol("inc\tsp");
+        Zsp--;
+        return 1;
+    } else if (expr == KIND_STRUCT) {
+        swap();             /* de = stack address */
+        vconst(-type->size);
+        ol("add\thl,sp");
+        ol("ld\tsp,hl");
+        Zsp -= type->size;
+        swap();
+        outfmt("\tld\tbc,%d\n",type->size);
+        ol("ldir");
+        return type->size;
+    } 
+    // Default push the word
+    zpush();
+    return 2;
+}
+
+/* Push an argument for a function pointer call */
+int push_function_argument_fnptr(Kind expr, Type *type, int push_sdccchar, int is_last_argument)
+{
+    if (expr == KIND_LONG || expr == KIND_CPTR) {
+        if ( !is_last_argument ) {
+            swap(); /* MSW -> hl */
+            swapstk(); /* MSW -> stack, addr -> hl */
+            zpushde(); /* LSW -> stack, addr = hl */
+        }
+        return 4;
+    } else if (expr == KIND_DOUBLE) {
+        dpush_under(KIND_INT);
+        mainpop();
+        return 6;
+    } else if (expr == KIND_STRUCT ) {
+        // 13 bytes
+        swap();    // de = address of struct
+        ol("pop\tbc");	// return address
+        vconst(-type->size);
+        ol("add\thl,sp");
+        ol("ld\tsp,hl");
+        ol("push\tbc");
+        Zsp -= type->size;
+        swap();
+        outfmt("\tld\tbc,%d\n",type->size);
+        ol("ldir");
+        mainpop();
+        return type->size;
+    } 
+    if ( !is_last_argument ) {
+        swapstk();
+    }
+    return 2;
+}
+
+
+
 /* Push the primary floating point register, preserving
         the top value  */
-
 void dpush_under(int val_type)
 {
     if ( val_type == KIND_LONG ) {
@@ -787,7 +865,7 @@ void callstk(Type *type, int n, int isfarptr, int last_argument_size)
         }
         loadargc(n);
         callrts("l_farcall");
-    } else if ( type->flags & FASTCALL && last_argument_size != 6 ) {
+    } else if ( type->flags & FASTCALL && last_argument_size < 6 ) {
          int label = getlabel();		  
          // TOS = address, dehl = parameter
          // More than one argument, TOS = last parameter, hl = function
