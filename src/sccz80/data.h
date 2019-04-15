@@ -72,4 +72,4 @@ extern char *c_rodata_section;
 extern int c_disable_builtins;
 extern uint32_t c_speed_optimisation;
 extern int c_fp_size;
-extern int c_ieee_math;
+extern enum maths_mode c_maths_mode;

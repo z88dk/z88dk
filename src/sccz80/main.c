@@ -39,8 +39,7 @@ int c_fp_mantissa_bytes = 5;
 int c_fp_exponent_bias = 128;
 int c_fp_size = 6;
 
-int c_ieee_math = 0;
-
+enum maths_mode c_maths_mode = MATHS_Z80;
 
 uint32_t c_speed_optimisation = OPT_RSHIFT32|OPT_LSHIFT32;
 
@@ -108,7 +107,10 @@ static option  sccz80_opts[] = {
     { 0, "math-z88", OPT_FUNCTION|OPT_BOOL, "(deprecated) Make FP constants match z88", &set_math_z88_parameters, 0 },
     { 0, "fp-exponent-bias", OPT_INT, "=<num> FP exponent bias (default: 128)", &c_fp_exponent_bias, 0 },
     { 0, "fp-mantissa-size", OPT_INT, "=<num> FP mantissa size (default: 5 bytes)", &c_fp_mantissa_bytes, 0 },
-    { 0, "fp-ieee", OPT_BOOL, "Use IEEE754 maths", &c_ieee_math, 0 },
+    { 0, "fp-mode=z80", OPT_ASSIGN|OPT_INT, "Use 48 bit doubles", &c_maths_mode, MATHS_Z80 },
+    { 0, "fp-mode=ieee", OPT_ASSIGN|OPT_INT, "Use 32 bit IEEE doubles", &c_maths_mode, MATHS_IEEE },
+    { 0, "fp-mode=mbf", OPT_ASSIGN|OPT_INT, "Use 32 bit Microsoft Binary format", &c_maths_mode, MATHS_MBFS },
+    { 0, "fp-mode=z88", OPT_FUNCTION|OPT_BOOL, "Use 40 bit z88 duoubles", &set_math_z88_parameters, 0 },
     
     { 0, "noaltreg", OPT_BOOL, "Try not to use the alternative register set", &c_notaltreg, 0 },
     { 0, "standard-escape-chars", OPT_BOOL, "Use standard mappings for \\r and \\n", &c_standard_escapecodes, 0},
@@ -232,10 +234,15 @@ int main(int argc, char** argv)
         exit(1);
     }
 
-    if ( c_ieee_math ) {
+    if ( c_maths_mode == MATHS_IEEE ) {
         c_fp_size = 4;
         type_double = &(Type){ KIND_DOUBLE, 4, 0, .len=1 }; 
         c_fp_exponent_bias = 126;
+        c_fp_mantissa_bytes = 3;
+    } else if ( c_maths_mode == MATHS_MBFS ) {
+        c_fp_size = 4;
+        type_double = &(Type){ KIND_DOUBLE, 4, 0, .len=1 }; 
+        c_fp_exponent_bias = 128;
         c_fp_mantissa_bytes = 3;
     }
 

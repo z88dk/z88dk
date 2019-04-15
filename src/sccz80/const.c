@@ -43,6 +43,7 @@ static elem_t    *double_queue = NULL;
 
 static void dofloat_ieee(double raw, unsigned char fa[]);
 static void dofloat_z80(double raw, unsigned char fa[]);
+static void dofloat_mbfs(double raw, unsigned char fa[]);
 
 
 /* Modified slightly to sort have two pools - one for strings and one
@@ -633,14 +634,20 @@ static Type *get_member(Type *tag)
 
 void dofloat(double raw, unsigned char fa[])
 {
-    if ( c_ieee_math ) {
-        dofloat_ieee(raw, fa);
-    } else {
-        dofloat_z80(raw, fa);
+    switch ( c_maths_mode ) {
+        case MATHS_IEEE:
+            dofloat_ieee(raw, fa);
+            break;
+        case MATHS_MBFS:
+            dofloat_mbfs(raw, fa);
+            break;
+        default:
+            dofloat_z80(raw, fa);
+            break;  
     }
 }
 
-static void ieee_pack(uint32_t val, unsigned char fa[]) 
+static void pack32bit_float(uint32_t val, unsigned char fa[]) 
 {
     fa[0] = val & 0xff;
     fa[1] = (val >> 8) & 0xff;
@@ -653,21 +660,21 @@ static void dofloat_ieee(double raw, unsigned char fa[])
     if ( isnan(raw)) {
         // quiet nan: 7FC00000
         // signalling nan: 7F800001
-        ieee_pack(0x7fc00000, fa);
+        pack32bit_float(0x7fc00000, fa);
         fa[0] = 0x00;
         fa[1] = 0x00;
         fa[2] = 0xc0;
         fa[3] = 0x7f;
     } else if ( isinf(raw) && raw > 0 ) {
         // positive infinity: 7F800000
-        ieee_pack(0x7f800000, fa);
+        pack32bit_float(0x7f800000, fa);
         fa[0] = 0x00;
         fa[1] = 0x00;
         fa[2] = 0x80;
         fa[3] = 0x7f;
     } else if ( isinf(raw) && raw < 0 ) {
         // negative infinity: FF800000
-        ieee_pack(0xff800000, fa);
+        pack32bit_float(0xff800000, fa);
     } else {
         uint32_t fp_value = 0;
 
@@ -681,8 +688,25 @@ static void dofloat_ieee(double raw, unsigned char fa[])
 
         // And the sign bit
         fp_value |= ((fa[0] & 0x80) ? 0x80000000 : 0x00000000);
-        ieee_pack(fp_value, fa);
+        pack32bit_float(fp_value, fa);
     }
+}
+
+static void dofloat_mbfs(double raw, unsigned char fa[])
+{
+    uint32_t fp_value = 0;
+
+    dofloat_z80(raw, fa);
+
+    // Bundle up mantissa
+    fp_value = ( ( (uint32_t)fa[2]) | ( ((uint32_t)fa[3]) << 8) | (((uint32_t)fa[4]) << 16))  & 0x007fffff;
+
+    // And now the exponent
+    fp_value |= (((uint32_t)fa[5]) << 24);
+
+    // And the sign bit
+    fp_value |= ((fa[0] & 0x80) ? 0x00800000 : 0x00000000);
+    pack32bit_float(fp_value, fa);
 }
 
 

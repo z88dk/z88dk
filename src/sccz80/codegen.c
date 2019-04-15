@@ -2658,11 +2658,18 @@ void neg(LVALUE* lval)
         callrts("l_long_neg");
         break;
     case KIND_DOUBLE:
-        if ( c_ieee_math ) {
+        switch ( c_maths_mode ) {
+        case MATHS_IEEE:
            ol("ld\ta,d");
            ol("xor\t128");
            ol("ld\td,a");
-        } else {
+           break;
+        case MATHS_MBFS:
+           ol("ld\ta,e");
+           ol("xor\t128");
+           ol("ld\te,a");
+           break;
+        default:
             callrts("minusfa");
         }
         break;
@@ -2695,9 +2702,14 @@ void inc(LVALUE* lval)
     case KIND_DOUBLE:
         // FA = value to be incremented
         dpush();
-        if ( c_ieee_math ) {
+        switch ( c_maths_mode ) {
+        case MATHS_IEEE:
             vlongconst(0x3f800000); // +1.0
-        } else {
+            break;
+        case MATHS_MBFS:
+            vlongconst(0x81000000); // +1.0
+            break;
+        default:
             vconst(1);
             zconvert_to_double(KIND_INT, 1);
         }
@@ -2723,9 +2735,14 @@ void dec(LVALUE* lval)
     case KIND_DOUBLE:
         // FA = value to be incremented
         dpush();
-        if ( c_ieee_math ) {
+        switch ( c_maths_mode ) {
+        case MATHS_IEEE:
             vlongconst(0xbf800000); // -1.0
-        } else {
+            break;
+        case MATHS_MBFS:
+            vlongconst(0x81800000); // -1.0
+            break;
+        default:
             vlongconst(-1);
             zconvert_to_double(KIND_LONG, 0);
         }

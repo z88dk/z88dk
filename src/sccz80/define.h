@@ -389,6 +389,13 @@ enum optimisation {
         OPT_UCHAR_MULT     = (1 << 7)
 };
 
+enum maths_mode {
+    MATHS_Z80,  // Classic z80 mode
+    MATHS_IEEE, // 32 bit ieee
+    MATHS_MBFS  // 32 bit Microsoft single precision
+};
+
+
 
 #define dump_type(type) do { \
         UT_string *output; \
