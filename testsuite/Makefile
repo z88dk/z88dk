@@ -26,7 +26,7 @@ rabbit/%.opt: rabbit/%.c
 	mv -f tmp1.opt $@
 
 %_ieee.opt:	%_ieee.c
-	zcc +test -fp-ieee -vn -a $^ -o tmp1.opt
+	zcc +test -fp-mode=ieee -vn -a $^ -o tmp1.opt
 	@cat tmp1.opt | grep -v '^;'  | grep -v MODULE> tmp2.opt
 	diff -w tmp2.opt results/$@
 	mv -f tmp1.opt $@

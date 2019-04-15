@@ -99,6 +99,10 @@ struct type_s {
     int       len;   // Length of the array
     
     int32_t   value; // For enum, goto position, short call value
+
+    // bitfields
+    int       bit_offset;
+    int       bit_size;
     
     // Structures
     Type   *tag;     // Reference to the structure type

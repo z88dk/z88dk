@@ -516,15 +516,6 @@
 =
 	pop	de
 
-	pop	bc
-	ld	hl,%1	;const
-	add	hl,sp
-	ld	sp,hl
-=
-	ld	hl,%eval(%1 2 +)	;const
-	add	hl,sp
-	ld	sp,hl
-
 	exx
 	ld	hl,%1	;const
 	add	hl,sp
@@ -4056,3 +4047,26 @@
 	ld	de,0
 	ld	a,h
 	or	l
+
+	ld	hl,%1
+	push	hl
+	ld	hl,%2	;const
+	add	hl,sp
+	ex	de,hl
+	pop	bc
+=
+	ld	hl,%eval(%2 2 -)	;const
+	add	hl,sp
+	ex	de,hl
+	ld	bc,%1
+
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	sp,hl
+	ld	hl,%2	;const
+	add	hl,sp
+	ld	sp,hl
+=
+	ld	hl,%eval(65536 %1 %2 + %)	;const
+	add	hl,sp
+	ld	sp,hl

@@ -35,13 +35,22 @@ static int32_t needsub(void)
 }
 
 
-static void swallow_bitfield(void)
+static void swallow_bitfield(Type *type)
 {
     double val;
     Kind   valtype;
     if (cmatch(':')) {
-        constexpr(&val, &valtype, 1);
-        warningfmt("unsupported-feature","Bitfields not supported by compiler");
+        if ( !kind_is_integer(type->kind) ) {
+           errorfmt("Cannot define a bitfield on non-integer type",1);
+        } else {
+           constexpr(&val, &valtype, 1);
+           if ( val > 16 ) {
+               errorfmt("Cannot define a bitfield on non-integer type",1);
+           } else {
+               type->bit_size = val;
+           }
+           warningfmt("unsupported-feature","Bitfields not supported by compiler");
+        }
     }
 }
 
@@ -356,7 +365,7 @@ Type *parse_struct(Type *type, char isstruct)
                 break;
             }
             // Swallow bitfields
-            swallow_bitfield();
+            swallow_bitfield(elem);
 
             // It was a flexible member, this needs to be last in the sturct
             if ( elem->size <= 0 ) {
@@ -494,6 +503,11 @@ static void parse_trailing_modifiers(Type *type)
         if (amatch("__z88dk_fastcall") || amatch("__FASTCALL__")) {
             if( type->parameters && array_len(type->parameters) != 1 ) {
                 warningfmt("sdcc-compat", "SDCC only supports a single parameter for __z88dk_fastcall\n");
+            }
+            if( type->parameters && array_len(type->parameters) && 
+               ((Type *)array_get_byindex(type->parameters, array_len(type->parameters) - 1))->kind == KIND_STRUCT ) {
+                errorfmt("__z88dk_fastcall doesn't support struct as only parameter\n",1);
+                continue;
             }
             type->flags |= FASTCALL;
             type->flags &= ~FLOATINGDECL;
@@ -642,12 +656,6 @@ Type *parse_parameter_list(Type *return_type)
             Type *ptr = make_pointer(param->ptr);
             strcpy(ptr->name, param->name);
             param = ptr;
-        }
-        if ( param->kind == KIND_STRUCT ) {
-            Type *ptr = make_pointer(param);            
-            warningfmt("conversion","Cannot pass a struct by value, converting to pointer to struct");
-            strcpy(ptr->name, param->name);
-            param = ptr;        
         }
         if ( param->kind == KIND_ELLIPSES) {
             if ( array_len(func->parameters)  ) {

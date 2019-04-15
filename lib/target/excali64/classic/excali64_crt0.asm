@@ -1,13 +1,13 @@
-;       Startup for Excalibut 64
+;       Startup for Excalibur 64
 ;
 ;       Stefano Bodrato - 2019
 ;
-;       $Id: excalibur_crt0.asm $
+;       $Id: excali64_crt0.asm $
 ;
 
 
 
-                MODULE  excalibur_crt0
+                MODULE  excali64_crt0
 
 ;--------
 ; Include zcc_opt.def to find out some info
@@ -30,14 +30,11 @@
 			defc    CRT_ORG_CODE  = $4100	; BASIC startup mode
 		ENDIF
 
-        defc    CONSOLE_ROWS = 80
-        defc    CONSOLE_COLUMNS = 24
-
 ; Now, getting to the real stuff now!
 
 	defc	TAR__no_ansifont = 1
         defc    TAR__clib_exit_stack_size = 32
-        defc    TAR__register_sp = -1
+        defc    TAR__register_sp = $fc00
 	defc	__CPU_CLOCK = 4000000
         INCLUDE "crt/classic/crt_rules.inc"
 
@@ -88,5 +85,4 @@ l_dcal:
 
 
 	SECTION	code_crt_init
-
 
