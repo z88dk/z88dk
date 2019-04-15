@@ -657,14 +657,6 @@ Type *parse_parameter_list(Type *return_type)
             strcpy(ptr->name, param->name);
             param = ptr;
         }
-#if 0
-        if ( param->kind == KIND_STRUCT ) {
-            Type *ptr = make_pointer(param);            
-            warningfmt("conversion","Cannot pass a struct by value, converting to pointer to struct");
-            strcpy(ptr->name, param->name);
-            param = ptr;        
-        }
-#endif
         if ( param->kind == KIND_ELLIPSES) {
             if ( array_len(func->parameters)  ) {
                 array_add(func->parameters, param);    
