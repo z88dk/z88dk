@@ -12,6 +12,7 @@
    EXTERN   ftoe
    EXTERN   strlen
    EXTERN   __convert_sdccf2reg
+   EXTERN   CLIB_32BIT_FLOATS
 
 __printf_handle_e:
         set   5,(ix-4)
@@ -42,6 +43,27 @@ __printf_handle_f:
         jr rejoin
 ; If we've got %f then lets assume we've got sccz80 rather than sdcc
 is_sccz80:
+        ld      a,CLIB_32BIT_FLOATS
+        and     a
+        jr      z,is_sccz80_48bit_float
+        push    ix    ;save callers
+        ex      de,hl
+        ld      e,(hl)          ;MSW
+        inc     hl
+        ld      d,(hl)
+        dec     hl
+        dec     hl
+        ld      b,(hl)          ;LSW
+        dec     hl
+        ld      c,(hl)
+        dec     hl
+        dec     hl
+        push    hl              ;Save ap for next time
+        push    de		;MSW
+        push    hl		;LSW
+        push    hl		;Padding (unused)
+        jr      rejoin
+is_sccz80_48bit_float:
         dec     de
         dec     de
         dec     de
@@ -53,7 +75,6 @@ is_sccz80:
         inc     de
 
         push    ix              ;save ix - ftoa will corrupt it
-
         ld      hl,-6
         add     hl,sp
         ld      sp,hl
