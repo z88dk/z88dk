@@ -1181,7 +1181,7 @@ void save_sprite_file( const char *file )
 void load_sprite_file( const char *file )
 {
 	gzFile f = NULL;
-	int x,y,i,b;
+	int x,y,i;
 
 	f = gzopen( file, "rb" );
 	if (!f) {
@@ -1908,6 +1908,7 @@ int main()
 	//Setup graphics
 
 	al_set_new_display_flags(ALLEGRO_WINDOWED);
+	al_set_new_window_position(50, 50);
 	display = al_create_display(720, 520);
 	if ( display == NULL )
 		exit( -1 );
