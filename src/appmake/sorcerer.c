@@ -1,6 +1,6 @@
 
 /*
- *      Sorcerer Exidy and MicroBee audio cassette formats
+ *      Sorcerer Exidy, MicroBee and Excalibur 64 audio cassette formats
  *      Kansas City Standard (DGOS variants)
  *      
  *      $Id: sorcerer.c $
@@ -74,8 +74,13 @@ void sorcerer_bit(FILE* fpout, unsigned char bit)
     }
 
 	if (excalibur) {
-		period1 = 9;
-		period0 = 18;
+		if (fast) {
+			period1 = 7;
+			period0 = 16;
+		} else {
+			period1 = 9;
+			period0 = 18;
+		}
 	}
 
     /* phase inversion (Sorcerer only) */
