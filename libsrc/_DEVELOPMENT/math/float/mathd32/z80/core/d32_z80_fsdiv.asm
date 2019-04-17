@@ -39,7 +39,7 @@
 SECTION code_clib
 SECTION code_math
 
-EXTERN md32_fsmul, m32_mulu_32_16x16
+EXTERN md32_fsmul, m32_mulu_32_16x16, l0_z180_mulu_32_32x32
 
 PUBLIC md32_fsdiv, md32_fsinv
 
@@ -87,16 +87,11 @@ PUBLIC md32_fsdiv, md32_fsinv
     rr d
     rr e
                                 ; a = 1mmmmmmm hlde = 001mmmmm mmmmmmmm mmmmmmmm mm------
-IF 0
-    push hl                     ; for w[3] msw, y msw on stack 1
-                                ; for w[3] cross product, y msw on stack
-    ld b,l
-    ld c,d
-    push bc                     ; for w[3] cross product, y lsw on stack 2
-ENDIF
-    
-    push hl                     ; for w[2], y msw on stack
-    push hl                     ; for w[1], y msw on stack
+    push hl                     ; y msw on stack for w[3]
+    push de                     ; y lsw on stack for w[3]
+    push hl                     ; y msw on stack for w[2]
+    push de                     ; y lsw on stack for w[2]
+    push hl                     ; y msw on stack for w[1]
 
                                 ; calculate w[0] - 5 bits
 
@@ -120,165 +115,170 @@ ENDIF
     ld h,b                      ; w[0] with 5 bits accuracy in hl
     ld l,c
 
-    ex (sp),hl                  ; w[0] on stack, y msw in hl
+    add hl,hl                   ; w[0]*2
+
+    ex (sp),hl                  ; w[0]*2 on stack, y msw in hl
     push hl                     ; y msw on stack
 
     call m32_mulu_32_16x16      ; bc*de => hlbc, uses af, w[0]^2 in hlbc
-    add hl,hl
-    add hl,hl
+    sla b
+    adc hl,hl
+    sla b
+    adc hl,hl
+
     ex de,hl
+    pop bc                      ; y msw in bc
 
-    pop bc                      ; y msb in bc
     call m32_mulu_32_16x16      ; bc*de => hlbc, uses af, w[0]^2*y in hlbc
-    add hl,hl
-    add hl,hl
+    sla b
+    adc hl,hl
+    sla b
+    adc hl,hl
+
     ex de,hl                    ; w[0]^2*y in de
+    pop hl                      ; w[0]*2 in hl
 
-    pop hl                      ; w[0] in hl
-    add hl,hl
-
+    xor a
     sbc hl,de                   ; w[0] + w[0] - w[0]*w[0]*y
                                 ; w[1] with 8 bits accuracy in hl
     
-                                ; calculate w[2] - 14 bits
+                                ; calculate w[2] in hlde - 14 bits
 
-    ld b,h                      ; w[1] in bc
-    ld c,l
-
-    ld d,h                      ; w[1] in de
+    ld d,h                      ; w[1] msw in de
     ld e,l
     
-    ex (sp),hl                  ; w[1] on stack, y msw in hl
+    add hl,hl                   ; w[1]*2
+
+    pop af                      ; y lsw in af
+    ex (sp),hl                  ; w[1]*2 msw on stack, y msw in hl
     push hl                     ; y msw on stack
+    push af                     ; y lsw on stack
+    
+    ld b,d                      ; w[1] msw in bc
+    ld c,e
 
     call m32_mulu_32_16x16      ; bc*de => hlbc, uses af, w[1]^2 in hlbc
+    sla c
+    rl b
+    adc hl,hl
+    sla c
+    rl b
+    adc hl,hl                    ; w[1]^2 in hlbc
+
+    push bc
+    exx
+    pop de                      ; w[1]^2 lsw in de'
+    pop bc                      ; y lsw in bc'
+    exx
+    pop bc                      ; y msw in bc
+    ex de,hl                    ; w[1]^2 msw in de
+      
+    call l0_z180_mulu_32_32x32  ; bcbc'*dede' => dehl, w[1]^2*y in dehl
     add hl,hl
+    rl e
+    rl d
     add hl,hl
+    rl e
+    rl d                        ; w[1]^2*y in dehl
+
+    ld b,d                      ; w[1]^2*y in bchl
+    ld c,e
+
+    xor a
+    ld d,a                      ; w[1]*2 lsw = 0 in de
+    ld e,a
+
+    ex de,hl
+    sbc hl,de                   ; w[1]*2 lsw - w[1]^2*y lsw
+
     ex de,hl
 
-    pop bc
-    call m32_mulu_32_16x16      ; bc*de => hlbc, uses af, w[1]^2*y in hlbc
-    add hl,hl
-    add hl,hl
-    ex de,hl                    ; w[1]^2*y in de
-
-    pop hl                     ; w[1] in hl
-    add hl,hl
-
-    sbc hl,de                   ; w[1] + w[1] - w[1]^2*y
-                                ; w[2] with 14 bits accuracy in hl
-
-IF 0
-                                ; calculate w[3] - 26 bits - hlde
-
-    ld b,h                      ; w[2] in bc
-    ld c,l
-
-    ld d,h                      ; w[2] in de
-    ld e,l
+    pop hl                      ; w[1]*2 msw in hl
+    sbc hl,bc                   ; w[1]*2 msw - w[1]^2*y msw
     
-    push hl                     ; w[2] on stack (until we finish w[2]^2*y) stack 3
+                                ; w[2] with 14 bits accuracy in hlde
 
-    call m32_mulu_32_16x16      ; bc*de => hlbc, uses af, w[2]^2 in hlbc
-    ld c,b                      ; w[2]^2 lsw in bc (only use 24 bits)
-    ld b,l
+                                ; calculate w[3] in hlde - 26 bits
             
-                                ; start 32_24*24 multiply to get mantissa
-                                ;
-                                ; abc * def
-                                ;
-                                ; = ab*de*2^16 +
-                                ;   ab*f*2^8 + c*de*2^8 +
-                                ;   c*f (ignore this final term)
-                                ;:
-                                ; y msw on stack 1
-                                ; y lsw on stack 2
-                                ; w[2] on stack 3
-                                ;
-                                ; w[2]^2 msw in hl, w[2]^2 lsw in bc
-
-    pop de                      ; w[2] in de, stack 3
-    pop af                      ; y lsw in af, stack 2
-    ex de,hl                    ; w[2]^2 msw in de, w[2] in hl
-    ex (sp),hl                  ; w[2] on stack, y msw in hl, stack 1
-    push hl                     ; y msw on stack 2
-    push de                     ; w[2]^2 msw on stack 3
-    push bc                     ; w[2]^2 lsw on stack 4
-    push hl                     ; y msw on stack 5
-    ld c,a                      ; y lsw in bc
-    ld b,0
-
-   call m32_mulu_32_16x16      ; 0c*de => hlbc, uses af, w[2]^2h*yl in hlbc
-
-    pop de                      ; y msw in de, stack 5
-    ex (sp),hl                  ; w[2]^2h*yl msw on stack, w[2]^2 lsw in hl, stack 4
-    push bc                     ; w[2]^2h*yl lsw on stack 5
-
-    ld c,h                      ; w[2]^2 lsb in bc
-    ld b,0
-
-    call m32_mulu_32_16x16      ; 0c*de => hlbc, uses af, w[2]^2l*yh in hlbc
-
-    xor a                       ; clear a
-
-    ex (sp),hl                  ; w[2]^2l*yh msw on stack, w[2]^2h*yl lsw in hl, stack 5
-    add hl,bc                   ; w[2]^2h*yl lsw + w[2]^2l*yh lsw
-    ex de,hl                    ; w[2]^2h*yl lsw + w[2]^2l*yh lsw in de
-
-    pop hl                      ; w[2]^2l*yh msw in hl, stack 4
-    pop bc                      ; w[2]^2h*yl msw msw on stack in bc, stack 3
-
-    adc hl,bc                   ; w[2]^2l*yh msw + w[2]^2h*yl msw + lsw C
-
-    adc a,a                     ; save w[2]^2l*yh msw + w[2]^2h*yl msw carry in a
-
-    pop bc                      ; w[2]^2 msw in bc, stack 3
-    ex (sp),hl                  ; w[2]^2l*yh msw + w[2]^2h*yl msw + lsw C on stack, y msw in hl, stack 2
-    ex de,hl                    ; w[2]^2h*yl lsw + w[2]^2l*yh lsw in hl, y msw in de
-
-    push af                     ; w[2]^2l*yh msw + w[2]^2h*yl msw carry on stack, stack 3
-    push hl                     ; w[2]^2h*yl lsw + w[2]^2l*yh lsw on stack, stack 4
-
-    call m32_mulu_32_16x16      ; ab*de => hlbc, uses af,w[2]^2h*yh in hlbc
-
-    pop de                      ; w[2]^2h*yl lsw + w[2]^2l*yh lsw in de, stack 4
-    pop af                      ; w[2]^2l*yh msw + w[2]^2h*yl msw carry in a, stack 3
-    ld e,a                      ; save w[2]^2l*yh msw + w[2]^2h*yl msw carry in e
-
-    ld a,c                      ; start adding the products with 8 bit offset
-    add a,d                     ; ab*f lswh + de*c lswh + ab*de lswl
-    ld d,a
-
-    ld a,b
-    pop bc                      ; ab*f msw + de*c msw + lsw C in BC, stack 2
-    adc a,c                     ; ab*f mswl + de*c mswl
-    ld c,a
-
-    ld a,l                      ; ab*de mswl
-    adc a,b                     ; ab*f mswh + de*c mswh
-    ld l,a
-
-    ld a,h                      ; ab*de mswh
-    adc a,e                     ; ab*f msw + de*c msw carry
-    ld h,a
-
-    ld e,d
-    ld d,c                      ; hlde  = 32-bit product
-
-    ld b,h                      ; bcde = 32-bit product
+    ld b,h                      ; w[2] msw in bc
     ld c,l
 
-    ld hl,0                     ; w[2]*2 lsw
-    sbc hl,de                   ; w[2] lsw - w[2]^2*y lsw
-    ex de, hl
+    pop af                      ; y lsw in af
+    ex (sp),hl                  ; w[2] msw on stack, y msw in hl
+    push de                     ; w[2] lsw on stack
+    push hl                     ; y msw on stack
+    push af                     ; y lsw on stack
 
-    pop hl                      ; w[2] msw, stack 1
-    sla l                       ; w[2]*2 msw
-    rl h
-    sbc hl,bc                   ; w[3] with 26 bits accuracy in hlde
-ELSE
-    ld de,0     ; FIXME remove this
-ENDIF
+    push de                     ; w[2] lsw on stack
+    push de                     ; w[2] lsw on stack
+    exx
+    pop de                      ; w[2] lsw in de'
+    pop bc                      ; w[2] lsw in bc'
+    exx
+
+    ld d,b                      ; w[2] msw in de
+    ld e,c
+
+    call l0_z180_mulu_32_32x32  ; bcbc'*dede' => dehl, w[2]^2 in dehl
+    add hl,hl
+    rl e
+    rl d
+    add hl,hl
+    rl e
+    rl d                        ; w[2]^2 in dehl
+
+    push hl
+    exx
+    pop de                      ; w[2]^2 lsw in de'
+    pop bc                      ; y lsw in bc'
+    exx
+    pop bc                      ; y msw in bc
+
+    call l0_z180_mulu_32_32x32  ; bcbc'*dede' => dehl, w[2]^2*y in dehl
+    add hl,hl
+    rl e
+    rl d
+    add hl,hl
+    rl e
+    rl d                        ; w[2]^2*y in dehl
+
+    ld b,d                      ; w[2]^2*y in bchl
+    ld c,e
+
+    exx
+    pop hl
+    pop de
+    add hl,hl
+    ex de,hl
+    adc hl,hl
+    push hl
+    push de
+    exx                         ; w[2]*2 in dehl' and stack
+
+    pop de
+    ex de,hl
+    sbc hl,de                   ; w[2]*2 lsw - w[2]^2*y lsw
+
+    ex de,hl
+
+    pop hl                      ; w[2]*2 msw in hl
+    sbc hl,bc                   ; w[2]*2 msw - w[2]^2*y msw
+
+                                ; w[3] with 26 bits accuracy in hlde
+;   XXX debug
+    push af
+    push hl
+    push de
+    call asm_phexwd
+    ex de, hl
+    call asm_phexwd
+    ld l,'_'
+    call asm_pchar
+    pop de
+    pop hl
+    pop af
+;   XXX end debug
+
     ex de,hl                    ; dehl  = 32-bit product
 
     add hl,hl                   ; rescale y mantissa 1<=y<=2
