@@ -2,11 +2,13 @@
         SECTION code_fp_mbfs
 
         PUBLIC  exp
-        EXTERN  fp_setup_expgle
-        EXTERN  EXP
-        EXTERN  fp_return
+        EXTERN  ___mbfs_setup_expgle
+        EXTERN  ___mbfs_EXP
+        EXTERN  ___mbfs_return
+	EXTERN	msbios
 
 exp:
-	call	fp_setup_expgle
-	call	EXP
-	jp	fp_return
+	call	___mbfs_setup_expgle
+	ld	ix,___mbfs_EXP
+	call	msbios
+	jp	___mbfs_return

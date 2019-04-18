@@ -2,11 +2,13 @@
         SECTION code_fp_mbfs
 
         PUBLIC  tan
-        EXTERN  fp_setup_tangle
-        EXTERN  TAN
-        EXTERN  fp_return
+        EXTERN  ___mbfs_setup_single
+        EXTERN  ___mbfs_TAN
+        EXTERN  ___mbfs_return
+	EXTERN	msbios
 
 tan:
-	call	fp_setup_tangle
-	call	TAN
-	jp	fp_return
+	call	___mbfs_setup_single
+	ld	ix,___mbfs_TAN
+	call	msbios
+	jp	___mbfs_return

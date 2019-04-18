@@ -2,11 +2,13 @@
         SECTION code_fp_mbfs
 
         PUBLIC  atan
-        EXTERN  fp_setup_atangle
-        EXTERN  ATN
-        EXTERN  fp_return
+        EXTERN  ___mbfs_setup_single
+        EXTERN  ___mbfs_ATN
+        EXTERN  ___mbfs_return
+	EXTERN	msbios
 
 atan:
-	call	fp_setup_atangle
-	call	ATN
-	jp	fp_return
+	call	___mbfs_setup_single
+	ld	ix,___mbfs_ATN
+	call	msbios
+	jp	___mbfs_return

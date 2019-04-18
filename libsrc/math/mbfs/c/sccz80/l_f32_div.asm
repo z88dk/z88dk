@@ -2,13 +2,15 @@
 	SECTION	code_fp_mbfs
 
 	PUBLIC	l_f32_div
-	EXTERN	fp_setup_arith
-	EXTERN	DVBCDE
-	EXTERN	fp_return
+	EXTERN	___mbfs_setup_arith
+	EXTERN	___mbfs_DVBCDE
+	EXTERN	___mbfs_return
+	EXTERN	msbios
 
 l_f32_div:
-	call	fp_setup_arith
-	call	DVBCDE
-	jp	fp_return
+	call	___mbfs_setup_arith
+	ld	ix,___mbfs_DVBCDE
+	call	msbios
+	jp	___mbfs_return
 
 

@@ -2,11 +2,13 @@
         SECTION code_fp_mbfs
 
         PUBLIC  cos
-        EXTERN  fp_setup_single
-        EXTERN  COS
-        EXTERN  fp_return
+        EXTERN  ___mbfs_setup_single
+        EXTERN  ___mbfs_COS
+        EXTERN  ___mbfs_return
+	EXTERN	msbios
 
 cos:
-	call	fp_setup_single
-	call	COS
-	jp	fp_return
+	call	___mbfs_setup_single
+	ld	ix,___mbfs_COS
+	call	msbios
+	jp	___mbfs_return

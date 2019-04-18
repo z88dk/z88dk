@@ -2,11 +2,13 @@
         SECTION code_fp_mbfs
 
         PUBLIC  sqrt
-        EXTERN  fp_setup_sqrtgle
-        EXTERN  SQR
-        EXTERN  fp_return
+        EXTERN  ___mbfs_setup_single
+        EXTERN  ___mbfs_SQR
+        EXTERN  ___mbfs_return
+	EXTERN	msbios
 
 sqrt:
-	call	fp_setup_sqrtgle
-	call	SQR
-	jp	fp_return
+	call	___mbfs_setup_single
+	ld	ix,___mbfs_SQR
+	call	msbios
+	jp	___mbfs_return
