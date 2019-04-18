@@ -24,7 +24,7 @@
 #define YES             1
 
 /* Maximum size of the mantissa, write_double_queue() doesn't respect this yet */
-#define MAX_MANTISSA_SIZE  5    
+#define MAX_MANTISSA_SIZE  7 
 
 /*      System wide name size (for symbols)     */
 
@@ -396,7 +396,10 @@ enum optimisation {
 enum maths_mode {
     MATHS_Z80,  // Classic z80 mode
     MATHS_IEEE, // 32 bit ieee
-    MATHS_MBFS  // 32 bit Microsoft single precision
+    MATHS_MBFS,  // 32 bit Microsoft single precision
+    MATHS_MBF40, // 40 bit Microsoft 
+    MATHS_MBF64, // 64 bit Microsoft double precision
+    MATHS_Z88,   // Special handling for z88 (subtype of MATHS_Z80)
 };
 
 

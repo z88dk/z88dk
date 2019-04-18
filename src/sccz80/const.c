@@ -37,6 +37,11 @@ typedef struct elem_s {
     char           str[60];    /* A raw string version */
 } elem_t;
 
+struct fp_decomposed {
+    uint8_t   exponent;
+    uint8_t   sign;
+    uint8_t   mantissa[MAX_MANTISSA_SIZE];
+};
 
 static elem_t    *double_queue = NULL;
 
@@ -44,6 +49,9 @@ static elem_t    *double_queue = NULL;
 static void dofloat_ieee(double raw, unsigned char fa[]);
 static void dofloat_z80(double raw, unsigned char fa[]);
 static void dofloat_mbfs(double raw, unsigned char fa[]);
+static void dofloat_mbf40(double raw, unsigned char fa[]);
+static void dofloat_mbf64(double raw, unsigned char fa[]);
+static void decompose_float(double raw, struct fp_decomposed *fs);
 
 
 /* Modified slightly to sort have two pools - one for strings and one
@@ -632,14 +640,24 @@ static Type *get_member(Type *tag)
     return NULL;
 }
 
+
+
+
 void dofloat(double raw, unsigned char fa[])
 {
+
     switch ( c_maths_mode ) {
         case MATHS_IEEE:
             dofloat_ieee(raw, fa);
             break;
         case MATHS_MBFS:
             dofloat_mbfs(raw, fa);
+            break;
+        case MATHS_MBF40:
+            dofloat_mbf40(raw, fa);
+            break;
+        case MATHS_MBF64:
+            dofloat_mbf64(raw, fa);
             break;
         default:
             dofloat_z80(raw, fa);
@@ -676,41 +694,83 @@ static void dofloat_ieee(double raw, unsigned char fa[])
         // negative infinity: FF800000
         pack32bit_float(0xff800000, fa);
     } else {
+        struct fp_decomposed fs = {0};
         uint32_t fp_value = 0;
 
-        dofloat_z80(raw, fa);
-
+        decompose_float(raw, &fs);
+        
         // Bundle up mantissa
-        fp_value = ( ( (uint32_t)fa[2]) | ( ((uint32_t)fa[3]) << 8) | (((uint32_t)fa[4]) << 16))  & 0x007fffff;
+        fp_value = ( ( (uint32_t)fs.mantissa[4]) | ( ((uint32_t)fs.mantissa[5]) << 8) | (((uint32_t)fs.mantissa[6]) << 16))  & 0x007fffff;
 
         // And now the exponent
-        fp_value |= (((uint32_t)fa[5]) << 23);
+        fp_value |= (((uint32_t)fs.exponent) << 23);
 
         // And the sign bit
-        fp_value |= ((fa[0] & 0x80) ? 0x80000000 : 0x00000000);
+        fp_value |= fs.sign ? 0x80000000 : 0x00000000;
         pack32bit_float(fp_value, fa);
     }
 }
 
 static void dofloat_mbfs(double raw, unsigned char fa[])
 {
+    struct fp_decomposed fs = {0};
     uint32_t fp_value = 0;
 
-    dofloat_z80(raw, fa);
+    decompose_float(raw, &fs);
 
     // Bundle up mantissa
-    fp_value = ( ( (uint32_t)fa[2]) | ( ((uint32_t)fa[3]) << 8) | (((uint32_t)fa[4]) << 16))  & 0x007fffff;
+    fp_value = ( ( (uint32_t)fs.mantissa[4]) | ( ((uint32_t)fs.mantissa[5]) << 8) | (((uint32_t)fs.mantissa[6]) << 16))  & 0x007fffff;
 
     // And now the exponent
-    fp_value |= (((uint32_t)fa[5]) << 24);
+    fp_value |= (((uint32_t)fs.exponent) << 24);
 
     // And the sign bit
-    fp_value |= ((fa[0] & 0x80) ? 0x00800000 : 0x00000000);
+    fp_value |= fs.sign ? 0x00800000 : 0x00000000;
     pack32bit_float(fp_value, fa);
 }
 
 
+static void dofloat_mbf64(double raw, unsigned char fa[])
+{
+    struct fp_decomposed fs = {0};
+
+    decompose_float(raw, &fs);
+
+    memcpy(fa, fs.mantissa, 7);
+    fa[6] |= fs.sign ? 0x80 : 00;
+    fa[7] = fs.exponent;
+}
+
+
+static void dofloat_mbf40(double raw, unsigned char fa[])
+{
+    struct fp_decomposed fs = {0};
+
+    decompose_float(raw, &fs);
+
+    memcpy(fa, fs.mantissa + 3, 4);
+    fa[3] |= fs.sign ? 0x80 : 00;
+    fa[4] = fs.exponent;
+}
+
 static void dofloat_z80(double raw, unsigned char fa[])
+{
+    struct fp_decomposed fs = {0};
+    int      offs = MAX_MANTISSA_SIZE - c_fp_mantissa_bytes;
+    int      i;
+
+    decompose_float(raw, &fs);
+
+
+    for ( i = offs; i < MAX_MANTISSA_SIZE ; i++ ) {
+        fa[i - offs + c_fp_fudge_offset] = fs.mantissa[i];
+    }
+    fa[i - offs -1 + c_fp_fudge_offset] |= fs.sign ? 0x80 : 0;
+    fa[i - offs + c_fp_fudge_offset] = fs.exponent;
+}
+
+
+static void decompose_float(double raw, struct fp_decomposed *fs)
 {
     double norm;
     double x = fabs(raw);
@@ -719,12 +779,15 @@ static void dofloat_z80(double raw, unsigned char fa[])
     int mant_bytes = c_fp_mantissa_bytes;
     int exp_bias = c_fp_exponent_bias;
 
+    fs->sign = 0;
+    fs->exponent = 0;
+
     if (mant_bytes > MAX_MANTISSA_SIZE ) {
         mant_bytes = MAX_MANTISSA_SIZE;
     }
 
     if (x == 0.0) {
-        memset(fa, 0, MAX_MANTISSA_SIZE + 1);
+        memset(fs->mantissa, 0, MAX_MANTISSA_SIZE + 1);
         return;
     }
 
@@ -736,7 +799,7 @@ static void dofloat_z80(double raw, unsigned char fa[])
 
     norm = x / pow(2, exp);
 
-    fa[5] = (int)exp + exp_bias;
+    fs->exponent = (int)exp + exp_bias;
     for (i = 0; i < (mant_bytes * 2) + 1; i++) {
         double mult = norm * 16.;
         double res = floor(mult);
@@ -747,24 +810,24 @@ static void dofloat_z80(double raw, unsigned char fa[])
         if (i == mant_bytes * 2) {
             if (bit > 7) {
                 int carry = 1;
-                for (i = 5 - mant_bytes; i < 5; i++) {
-                    int res = fa[i] + carry;
+                for (i = MAX_MANTISSA_SIZE - mant_bytes; i < MAX_MANTISSA_SIZE; i++) {
+                    int res = fs->mantissa[i] + carry;
 
-                    fa[i] = res % 256;
+                    fs->mantissa[i] = res % 256;
                     carry = res / 256;
                 }
             }
             break;
         }
         if (i % 2 == 0) {
-            fa[4 - i / 2] = (bit << 4);
+            fs->mantissa[(MAX_MANTISSA_SIZE-1) - i / 2] = (bit << 4);
         } else {
-            fa[4 - i / 2] |= (bit & 0x0f);
+            fs->mantissa[(MAX_MANTISSA_SIZE-1) - i / 2] |= (bit & 0x0f);
         }
         norm = mult - res;
     }
     if ( raw < 0 ) {
-       fa[0] |= 0x80;
+        fs->sign = 1;
     }
 }
 
@@ -783,7 +846,7 @@ elem_t *get_elem_for_fa(unsigned char fa[], double value)
     elem->litlab = getlabel();
     elem->value = value;
     elem->written = 0;
-    memcpy(elem->fa, fa, 6);
+    memcpy(elem->fa, fa, MAX_MANTISSA_SIZE+1);
     LL_APPEND(double_queue, elem);
     return elem;
 }
@@ -835,9 +898,15 @@ void write_double_queue(void)
                 defmesg(); outstr(elem->str); outstr("\"\n");
                 defbyte(); outdec(0); nl();
             } else {
+                char   buf[128];
+                int    i, offs;
+
+                for ( i = 0, offs = 0; i < c_fp_size; i++) {
+                    offs += snprintf(buf + offs, sizeof(buf) - offs,"%s0x%02x", i != 0 ? "," : "", elem->fa[i]);
+                }
                 //outfmt("\t;%lf ref: %d written: %d\n",elem->value,elem->refcount, elem->written);
                 outfmt("\t;%lf\n",elem->value);
-                outfmt("\tdefb\t%d,%d,%d,%d,%d,%d\n", elem->fa[0], elem->fa[1], elem->fa[2], elem->fa[3], elem->fa[4], elem->fa[5]);
+                outfmt("\tdefb\t%s\n", buf);
             }
         }
     }
