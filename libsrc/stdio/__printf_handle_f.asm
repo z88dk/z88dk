@@ -46,7 +46,6 @@ is_sccz80:
         ld      a,CLIB_32BIT_FLOATS
         and     a
         jr      z,is_sccz80_48bit_float
-        push    ix    ;save callers
         ex      de,hl
         ld      e,(hl)          ;MSW
         inc     hl
@@ -59,9 +58,10 @@ is_sccz80:
         dec     hl
         dec     hl
         push    hl              ;Save ap for next time
+        push    ix    ;save callers
+        push    de		;(padding, unused)
         push    de		;MSW
-        push    hl		;LSW
-        push    hl		;Padding (unused)
+        push    bc		;LSW
         jr      rejoin
 is_sccz80_48bit_float:
         dec     de

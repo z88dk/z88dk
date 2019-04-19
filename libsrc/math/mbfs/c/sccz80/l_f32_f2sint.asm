@@ -9,6 +9,7 @@
 	EXTERN	___mbfs_return
 	EXTERN	___mbfs_FPINT
 	EXTERN	___mbfs_FPREG
+	EXTERN	___mbfs_FPEXP
 	EXTERN	msbios
 
 
@@ -19,6 +20,7 @@ l_f32_f2ulong:
 	call	___mbfs_setup_single_reg
 	ld	a,(___mbfs_FPREG + 2)
 	push	af
+	ld	a,(___mbfs_FPEXP)
 	ld	ix,___mbfs_FPINT
 	call	msbios
 	pop	ix

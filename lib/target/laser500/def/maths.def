@@ -17,7 +17,11 @@
 	PUBLIC	___mbfs_FPINT
 	PUBLIC	___mbfs_POWER
 	PUBLIC	___mbfs_FPREG
+	PUBLIC	___mbfs_FPEXP
+	PUBLIC	___mbfs_FPSIGN
 	PUBLIC	___mbfs_VALTYP
+	PUBLIC	___mbfs_BNORM
+	PUBLIC	___mbfs_POW
 
 	defc	___mbfs_FPADD	= $399c
 	defc	___mbfs_SUBCDE	= $3999
@@ -25,6 +29,7 @@
 	defc	___mbfs_DVBCDE  = $3b66 + 2
 
 	defc	___mbfs_CMPNUM	= $3cf1
+	defc	___mbfs_BNORM	= $39eb	; normalise bcde and place in FPREG (b must have reg)
 
 	defc	___mbfs_COS	= $4ba9
 	defc	___mbfs_SIN	= $4baf
@@ -35,11 +40,13 @@
 
 	defc	___mbfs_SQR	= $49fe
 
-	defc	___mbfs_POWER	= $4a0c
+	defc	___mbfs_POW	= $4a0c + 2
 	defc	___mbfs_FPINT	= $3e24
 
 
 	defc	___mbfs_FPREG	= $852b
+	defc	___mbfs_FPEXP	= $852e
+	defc	___mbfs_FPSIGN	= $852f
 	defc	___mbfs_VALTYP 	= $838e
 
 	EXTERN	l_jpix
