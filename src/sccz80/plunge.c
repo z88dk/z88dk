@@ -156,7 +156,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             dpush();
             load_double_into_fa(lval);
             if ( oper == zdiv || oper == zmod || (operator_is_comparison(oper) && oper != zeq && oper != zne)) {
-                callrts("dswap");
+                DoubSwap();
             }
         } else if ( lval2->val_type == KIND_DOUBLE && lval2->is_const == 0 ) { 
             /* On stack we've got the double, load the constant as a double */
@@ -167,7 +167,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             lval->ltype = type_double;
             /* division isn't commutative so we need to swap over' */
             if ( oper == zdiv || oper == zmod || (operator_is_comparison(oper) && oper != zeq && oper != zne)) {
-                callrts("dswap");
+                DoubSwap();
             }
         } else if (lval->val_type == KIND_LONG) {
             widenlong(lval, lval2);
@@ -453,7 +453,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             dpush();
             load_double_into_fa(lval); // LHS 
             if ( oper == zsub ) {
-                callrts("dswap");
+                DoubSwap();
             }
         } else if ( lval2->val_type == KIND_DOUBLE && lval2->is_const == 0 ) { 
             doconst_oper = 0; // No const operator for double
@@ -470,7 +470,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             }
             /* Subtraction isn't commutative so we need to swap over' */
             if ( oper == zsub ) {
-                callrts("dswap");
+                DoubSwap();
             }
             
         } else if (lval->val_type == KIND_LONG) {

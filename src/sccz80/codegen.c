@@ -76,6 +76,7 @@ struct _mapping {
         { "f2ulong", "ifix",  "l_f32_f2ulong" },
         { "dpush_under_long", "dpush3", NULL }, // Inlined
         { "dpush_under_int", "dpush2", NULL }, // Inlined
+        { "fswap", "dswap", "l_f32_swap" },
         { NULL }
 };
 
@@ -3605,7 +3606,7 @@ void convSint2long(void)
 /* Swap double positions on stack */
 void DoubSwap(void)
 {
-    callrts("dswap");
+    callrts("fswap");
 }
 
 void vlongconst(uint32_t val)
