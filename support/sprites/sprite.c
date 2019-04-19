@@ -742,7 +742,7 @@ void import_from_geos( const char *file )
 
 					b=b>>(7-(i%8));
 					sprite[ on_sprite + spcount ].p[ x+1 ][ y+1 ] = ((b&1) != 0);
-					/* **HACK** - Estra row on top of GEOS font */
+					/* **HACK** - Extra row on top of GEOS font */
 					//sprite[ on_sprite + spcount ].p[ x+1 ][ y+2 ] = ((b&1) != 0);
 					i++;
 				}
@@ -1197,6 +1197,9 @@ void load_sprite_file( const char *file )
 		for ( x = 0; x < MAX_SIZE_X; x++ )
 			for ( y = 0; y < MAX_SIZE_Y; y++ ) {
 				sprite[ i ].p[ x ][ y ] = gzgetc (f);
+				/* **HACK** - Force the font size on open */
+				//sprite[ i ].size_x=4;
+				//sprite[ i ].size_y=7;
 			}
 			
 		/* **HACK** - auto-adjust height on open */
