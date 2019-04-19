@@ -17,10 +17,16 @@ l_f32_f2uint:
 l_f32_f2slong:
 l_f32_f2ulong:
 	call	___mbfs_setup_single_reg
+	ld	a,(___mbfs_FPREG + 2)
+	push	af
 	ld	ix,___mbfs_FPINT
 	call	msbios
 	pop	ix
 	ex	de,hl
-	ld	d,b
 	ld	e,c
+	ld	d,0
+	pop	af	;Get sign bit back
+	rlca
+	ret	nc	;Wasn't negative, set MSB to 0
+	dec	d	;It was, so to 0xff
 	ret
