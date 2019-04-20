@@ -51,32 +51,34 @@ struct _mapping {
     char     *opname;
     char     *fp_48bit;
     char     *fp_32bit;
+    char     *fp_64bit;
 } mappings[] = {
-        { "dload","dload","l_glong"  },
-        { "dstore","dstore","l_plong"  },
-        { "fadd", "dadd", "l_f32_add" },
-        { "fsub", "dsub", "l_f32_sub" },
-        { "fmul", "dmul", "l_f32_mul" },
-        { "fdiv", "ddiv", "l_f32_div" },
-        { "fle",  "dleq", "l_f32_le" },
-        { "flt",  "dlt",  "l_f32_lt" },
-        { "fge",  "dge",  "l_f32_ge" },
-        { "fgt",  "dgt",  "l_f32_gt" },
-        { "feq",  "deq",  "l_f32_eq" },
-        { "fne",  "dne",  "l_f32_ne" },
-        { "schar2f", "l_int2long_s_float","l_f32_schar2f" },
-        { "uchar2f", "l_int2long_u_float","l_f32_uchar2f" },
-        { "sint2f", "l_int2long_s_float","l_f32_sint2f" },
-        { "uint2f", "l_int2long_u_float","l_f32_uint2f" },
-        { "slong2f", "float", "l_f32_slong2f" },
-        { "ulong2f", "ufloat","l_f32_ulong2f" },
-        { "f2sint",  "ifix",  "l_f32_f2sint" },
-        { "f2uint",  "ifix",  "l_f32_f2uint" },
-        { "f2slong", "ifix",  "l_f32_f2slong" },
-        { "f2ulong", "ifix",  "l_f32_f2ulong" },
-        { "dpush_under_long", "dpush3", NULL }, // Inlined
-        { "dpush_under_int", "dpush2", NULL }, // Inlined
-        { "fswap", "dswap", "l_f32_swap" },
+        { "dload","dload","l_glong"  , "l_f64_load"  },
+        { "dstore","dstore","l_plong", "l_f64_store" },
+        { "fadd", "dadd", "l_f32_add", "l_f64_add" },
+        { "fsub", "dsub", "l_f32_sub", "l_f64_sub" },
+        { "fmul", "dmul", "l_f32_mul", "l_f64_mul" },
+        { "fdiv", "ddiv", "l_f32_div", "l_f64_div" },
+        { "fle",  "dleq", "l_f32_le",  "l_f64_le" },
+        { "flt",  "dlt",  "l_f32_lt",  "l_f64_lt" },
+        { "fge",  "dge",  "l_f32_ge",  "l_f64_ge" },
+        { "fgt",  "dgt",  "l_f32_gt",  "l_f64_gt" },
+        { "feq",  "deq",  "l_f32_eq",  "l_f64_eq" },
+        { "fne",  "dne",  "l_f32_ne",  "l_f64_ne" },
+        { "schar2f", "l_int2long_s_float","l_f32_schar2f", "l_f64_schar2f" },
+        { "uchar2f", "l_int2long_u_float","l_f32_uchar2f", "l_f64_uchar2f" },
+        { "sint2f", "l_int2long_s_float","l_f32_sint2f",   "l_f64_sint2f" },
+        { "uint2f", "l_int2long_u_float","l_f32_uint2f",   "l_f64_uint2f" },
+        { "slong2f", "float", "l_f32_slong2f", "l_f64_slong2f" },
+        { "ulong2f", "ufloat","l_f32_ulong2f", "l_f64_ulong2f" },
+        { "f2sint",  "ifix",  "l_f32_f2sint",  "l_f64_f2sint" },
+        { "f2uint",  "ifix",  "l_f32_f2uint",  "l_f64_f2uint" },
+        { "f2slong", "ifix",  "l_f32_f2slong", "l_f64_f2slong" },
+        { "f2ulong", "ifix",  "l_f32_f2ulong", "l_f64_f2ulong" },
+        { "fpush",   "dpush", NULL, "l_f64_dpush" },
+        { "dpush_under_long", "dpush3", NULL, "l_f64_dpush3" }, // Inlined
+        { "dpush_under_int", "dpush2", NULL, "l_f64_dpush2" }, // Inlined
+        { "fswap", "dswap", "l_f32_swap", "l_f64_swap" },
         { NULL }
 };
 
@@ -88,6 +90,8 @@ static const char *map_library_routine(const char *wanted)
         if ( strcmp(wanted, map->opname) == 0) {
             if ( c_fp_size == 4 ) {
                 return map->fp_32bit;
+            } else if ( c_fp_size == 8 ) {
+                return map->fp_64bit;
             }
             return map->fp_48bit;
         }
@@ -745,7 +749,7 @@ void dpush(void)
         zpushde();
         zpush();
     } else {
-        callrts("dpush");
+        callrts("fpush");
         Zsp -= 6;
     }
 }
