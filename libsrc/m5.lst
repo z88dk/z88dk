@@ -12,6 +12,7 @@ graphics/getsprite
 @video/tms9918/video_tms9918.lst
 @gfxbase.lst
 games/m5/joystick
+games/m5/keys_joystick
 psg/sn76489/bit_open
 @games/games.lst
 psg/sn76489/psg_tone
