@@ -16,8 +16,7 @@
 	push	hl
 	call	dldpsh
 	ld	hl,1	;const
-	ld	de,0
-	call	float
+	call	l_int2long_u_float
 	call	dadd
 	pop	hl
 	call	dstore
@@ -50,8 +49,7 @@
 	push	hl
 	call	dldpsh
 	ld	hl,1	;const
-	ld	de,0
-	call	float
+	call	l_int2long_u_float
 	call	dadd
 	pop	hl
 	call	dstore
@@ -80,8 +78,7 @@
 	push	hl
 	call	dldpsh
 	ld	hl,1	;const
-	ld	de,0
-	call	float
+	call	l_int2long_u_float
 	call	dadd
 	pop	hl
 	call	dstore
@@ -109,8 +106,7 @@
 	push	hl
 	call	dldpsh
 	ld	hl,1	;const
-	ld	de,0
-	call	float
+	call	l_int2long_u_float
 	call	dadd
 	pop	hl
 	call	dstore
@@ -141,8 +137,7 @@
 	call	dstore
 	call	dpush
 	ld	hl,1	;const
-	ld	de,0
-	call	float
+	call	l_int2long_u_float
 	call	dadd
 	ld	hl,0	;const
 	add	hl,sp
@@ -175,8 +170,7 @@
 	call	dstore
 	call	dpush
 	ld	hl,1	;const
-	ld	de,0
-	call	float
+	call	l_int2long_u_float
 	call	dadd
 	pop	hl
 	call	dstore
@@ -246,7 +240,7 @@
 	SECTION	rodata_compiler
 .i_2
 	;3.000000
-	defb	0,0,0,0,64,130
+	defb	0x00,0x00,0x00,0x00,0x40,0x82
 
 
 	SECTION	bss_compiler

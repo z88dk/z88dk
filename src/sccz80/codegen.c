@@ -46,6 +46,60 @@ static void loada(int n);
 static int    donelibheader;
 static char  *current_section = ""; /**< Name of the current section */
 
+/* Mappings between default library names - allows use of sdcc maths library with sccz80 */
+struct _mapping {
+    char     *opname;
+    char     *fp_48bit;
+    char     *fp_32bit;
+    char     *fp_64bit;
+} mappings[] = {
+        { "dload","dload","l_glong"  , "l_f64_load"  },
+        { "dstore","dstore","l_plong", "l_f64_store" },
+        { "fadd", "dadd", "l_f32_add", "l_f64_add" },
+        { "fsub", "dsub", "l_f32_sub", "l_f64_sub" },
+        { "fmul", "dmul", "l_f32_mul", "l_f64_mul" },
+        { "fdiv", "ddiv", "l_f32_div", "l_f64_div" },
+        { "fle",  "dleq", "l_f32_le",  "l_f64_le" },
+        { "flt",  "dlt",  "l_f32_lt",  "l_f64_lt" },
+        { "fge",  "dge",  "l_f32_ge",  "l_f64_ge" },
+        { "fgt",  "dgt",  "l_f32_gt",  "l_f64_gt" },
+        { "feq",  "deq",  "l_f32_eq",  "l_f64_eq" },
+        { "fne",  "dne",  "l_f32_ne",  "l_f64_ne" },
+        { "schar2f", "l_int2long_s_float","l_f32_schar2f", "l_f64_schar2f" },
+        { "uchar2f", "l_int2long_u_float","l_f32_uchar2f", "l_f64_uchar2f" },
+        { "sint2f", "l_int2long_s_float","l_f32_sint2f",   "l_f64_sint2f" },
+        { "uint2f", "l_int2long_u_float","l_f32_uint2f",   "l_f64_uint2f" },
+        { "slong2f", "float", "l_f32_slong2f", "l_f64_slong2f" },
+        { "ulong2f", "ufloat","l_f32_ulong2f", "l_f64_ulong2f" },
+        { "f2sint",  "ifix",  "l_f32_f2sint",  "l_f64_f2sint" },
+        { "f2uint",  "ifix",  "l_f32_f2uint",  "l_f64_f2uint" },
+        { "f2slong", "ifix",  "l_f32_f2slong", "l_f64_f2slong" },
+        { "f2ulong", "ifix",  "l_f32_f2ulong", "l_f64_f2ulong" },
+        { "fpush",   "dpush", NULL, "l_f64_dpush" },
+        { "dpush_under_long", "dpush3", NULL, "l_f64_dpush3" }, // Inlined
+        { "dpush_under_int", "dpush2", NULL, "l_f64_dpush2" }, // Inlined
+        { "fswap", "dswap", "l_f32_swap", "l_f64_swap" },
+        { NULL }
+};
+
+static const char *map_library_routine(const char *wanted)
+{
+    struct _mapping *map = &mappings[0];
+
+    while ( map->opname != NULL ) {
+        if ( strcmp(wanted, map->opname) == 0) {
+            if ( c_fp_size == 4 ) {
+                return map->fp_32bit;
+            } else if ( c_fp_size == 8 ) {
+                return map->fp_64bit;
+            }
+            return map->fp_48bit;
+        }
+        map++;
+    }
+    return wanted;
+}
+
 /* Begin a comment line for the assembler */
 
 void comment(void)
@@ -232,8 +286,17 @@ void getmem(SYMBOL* sym)
 
 #endif
     } else if (sym->ctype->kind == KIND_DOUBLE) {
-        address(sym);
-        callrts("dload");
+        if ( c_fp_size == 6 ) {
+            address(sym);
+            callrts("dload");
+        } else {
+            ot("ld\thl,(");
+            outname(sym->name, dopref(sym));
+            outstr(")\n");
+            ot("ld\tde,(");
+            outname(sym->name, dopref(sym));
+            outstr("+2)\n");
+        }
     } else if (sym->ctype->kind == KIND_LONG) {
         ot("ld\thl,(");
         outname(sym->name, dopref(sym));
@@ -271,8 +334,17 @@ int getloc(SYMBOL* sym, int off)
 void putmem(SYMBOL* sym)
 {
     if (sym->ctype->kind == KIND_DOUBLE) {
-        address(sym);
-        callrts("dstore");
+        if ( c_fp_size == 6 ) {
+            address(sym);
+            callrts("dstore");
+        } else {
+            ot("ld\t(");
+            outname(sym->name, dopref(sym));
+            outstr("),hl\n");
+            ot("ld\t(");
+            outname(sym->name, dopref(sym));
+            outstr("+2),de\n");
+        }
     } else {
         if (sym->ctype->kind == KIND_CHAR) {
             LoadAccum();
@@ -428,8 +500,13 @@ void putstk(LVALUE *lval)
 
     switch (typeobj) {
     case KIND_DOUBLE:
-        mainpop();
-        callrts("dstore");
+        if ( c_fp_size == 6 ) {
+            mainpop();
+            callrts("dstore");
+        } else {
+            zpopbc();
+            callrts("dstore");
+        }
         break;
     case KIND_CPTR:
         zpopbc();
@@ -668,8 +745,13 @@ void zpush(void)
 
 void dpush(void)
 {
-    callrts("dpush");
-    Zsp -= 6;
+    if ( c_fp_size == 4 ) {
+        zpushde();
+        zpush();
+    } else {
+        callrts("fpush");
+        Zsp -= 6;
+    }
 }
 
 /* Push an argument for a function pointer call: regular or far pointer */
@@ -706,7 +788,7 @@ int push_function_argument(Kind expr, Type *type, int push_sdccchar)
 /* Push an argument for a function pointer call */
 int push_function_argument_fnptr(Kind expr, Type *type, int push_sdccchar, int is_last_argument)
 {
-    if (expr == KIND_LONG || expr == KIND_CPTR) {
+    if (expr == KIND_LONG || expr == KIND_CPTR || ( c_fp_size == 4 && expr == KIND_DOUBLE)) {
         if ( !is_last_argument ) {
             swap(); /* MSW -> hl */
             swapstk(); /* MSW -> stack, addr -> hl */
@@ -744,12 +826,29 @@ int push_function_argument_fnptr(Kind expr, Type *type, int push_sdccchar, int i
         the top value  */
 void dpush_under(int val_type)
 {
-    if ( val_type == KIND_LONG ) {
-        callrts("dpush3");
+    if ( val_type == KIND_LONG || val_type == KIND_CPTR ) {
+        if ( c_fp_size == 4 ) {
+            ol("pop\tbc");	// addr2 -> bc
+            swap(); /* MSW -> hl */
+            swapstk(); /* MSW -> stack, addr1 -> hl */
+            zpushde(); /* LSW -> stack, addr1 = hl */
+            zpush();   // addr -> stack
+            ol("push\tbc"); // addr2 -> stack
+        } else {
+           callrts("dpush_under_long");
+           Zsp -= c_fp_size;
+        }
     } else {
-        callrts("dpush2");
+        if ( c_fp_size == 4 ) {
+            swap(); /* MSW -> hl */
+            swapstk(); /* MSW -> stack, addr -> hl */
+            zpushde(); /* LSW -> stack, addr = hl */
+            zpush();
+        } else {
+            callrts("dpush_under_int");
+            Zsp -= c_fp_size;
+        }
     }
-    Zsp -= 6;
 }
 
 /* Pop the top of the stack into the primary register */
@@ -832,8 +931,9 @@ char dopref(SYMBOL* sym)
 /* Call a run-time library routine */
 void callrts(char* sname)
 {
+    const char *func_name = map_library_routine(sname);
     ot("call\t");
-    outstr(sname);
+    outstr(func_name);
     nl();
 }
 
@@ -874,7 +974,7 @@ void callstk(Type *type, int n, int isfarptr, int last_argument_size)
              ol("pop\taf");
              outstr("\tld\tbc,"); printlabel(label);  nl();	// bc = return address
              // Next 3 lines aren't strictly necessary for a fastcall function
-             // but lets handle a non-fastcall pointer being assigned to
+             // but lets hanfle a non-fastcall pointer being assigned to
              // a fastcall function pointer
 #if 0
              ol("push\tde");
@@ -1159,17 +1259,22 @@ void scale(Kind type, Type *tag)
     switch (type) {
     case KIND_INT:
     case KIND_PTR:
-        ol("add\thl,hl");;
+        ol("add\thl,hl");
         break;
     case KIND_CPTR:
         threereg();
         break;
     case KIND_LONG:
-        ol("add\thl,hl");;
-        ol("add\thl,hl");;
+        ol("add\thl,hl");
+        ol("add\thl,hl");
         break;
     case KIND_DOUBLE:
-        sixreg();
+        if ( c_fp_size == 4 ) {
+            ol("add\thl,hl");
+            ol("add\thl,hl");
+        } else {
+            sixreg();
+        }
         break;
     case KIND_STRUCT:
         /* try to avoid multiplying if possible */
@@ -1419,8 +1524,8 @@ void zadd(LVALUE* lval)
         Zsp += 4;
         break;
     case KIND_DOUBLE:
-        callrts("dadd");
-        Zsp += 6;
+        callrts("fadd");
+        Zsp += c_fp_size;
         break;
     default:
         ol("add\thl,de");	// 11T
@@ -1570,8 +1675,8 @@ void zsub(LVALUE* lval)
         Zsp += 4;
         break;
     case KIND_DOUBLE:
-        callrts("dsub");
-        Zsp += 6;
+        callrts("fsub");
+        Zsp += c_fp_size;
         break;
     default:
         if ( c_speed_optimisation & OPT_SUB16 ) {
@@ -1595,8 +1700,8 @@ void mult(LVALUE* lval)
         Zsp += 4;
         break;
     case KIND_DOUBLE:
-        callrts("dmul");
-        Zsp += 6;
+        callrts("fmul");
+        Zsp += c_fp_size;
         break;
     case KIND_CHAR:
         if ( lval->ltype->isunsigned ) {
@@ -1648,8 +1753,8 @@ void zdiv(LVALUE* lval)
         Zsp += 4;
         break;
     case KIND_DOUBLE:
-        callrts("ddiv");
-        Zsp += 6;
+        callrts("fdiv");
+        Zsp += c_fp_size;
         break;
     default:
         if (utype(lval))
@@ -2620,7 +2725,7 @@ void lneg(LVALUE* lval)
         ol("ccf");
         break;
     case KIND_DOUBLE:
-        convdoub2int();
+        zconvert_from_double(KIND_INT, 0);
     default:
         set_int(lval);
         callrts("l_lneg");
@@ -2636,7 +2741,20 @@ void neg(LVALUE* lval)
         callrts("l_long_neg");
         break;
     case KIND_DOUBLE:
-        callrts("minusfa");
+        switch ( c_maths_mode ) {
+        case MATHS_IEEE:
+           ol("ld\ta,d");
+           ol("xor\t128");
+           ol("ld\td,a");
+           break;
+        case MATHS_MBFS:
+           ol("ld\ta,e");
+           ol("xor\t128");
+           ol("ld\te,a");
+           break;
+        default:
+            callrts("minusfa");
+        }
         break;
     default:
         callrts("l_neg");
@@ -2667,10 +2785,19 @@ void inc(LVALUE* lval)
     case KIND_DOUBLE:
         // FA = value to be incremented
         dpush();
-        vlongconst(1);
-        convSlong2doub();
-        callrts("dadd");
-        Zsp += 6;
+        switch ( c_maths_mode ) {
+        case MATHS_IEEE:
+            vlongconst(0x3f800000); // +1.0
+            break;
+        case MATHS_MBFS:
+            vlongconst(0x81000000); // +1.0
+            break;
+        default:
+            vconst(1);
+            zconvert_to_double(KIND_INT, 1);
+        }
+        callrts("fadd");
+        Zsp += c_fp_size;
         break;
     case KIND_LONG:
     case KIND_CPTR:
@@ -2691,10 +2818,19 @@ void dec(LVALUE* lval)
     case KIND_DOUBLE:
         // FA = value to be incremented
         dpush();
-        vlongconst(-1);
-        convSlong2doub();
-        callrts("dadd");
-        Zsp += 6;
+        switch ( c_maths_mode ) {
+        case MATHS_IEEE:
+            vlongconst(0xbf800000); // -1.0
+            break;
+        case MATHS_MBFS:
+            vlongconst(0x81800000); // -1.0
+            break;
+        default:
+            vlongconst(-1);
+            zconvert_to_double(KIND_LONG, 0);
+        }
+        callrts("fadd");
+        Zsp += c_fp_size;
         break;
     case KIND_LONG:
     case KIND_CPTR:
@@ -2833,8 +2969,8 @@ void zeq(LVALUE* lval)
         break;
     case KIND_DOUBLE:
         set_int(lval);
-        callrts("deq");
-        Zsp += 6;
+        callrts("feq");
+        Zsp += c_fp_size;
         break;
     case KIND_CHAR:
         if (c_speed_optimisation & OPT_INT_COMPARE ) {
@@ -2949,9 +3085,9 @@ void zne(LVALUE* lval)
         Zsp += 4;
         break;
     case KIND_DOUBLE:
-        callrts("dne");
+        callrts("fne");
         set_int(lval);            
-        Zsp += 6;
+        Zsp += c_fp_size;
         break;
     case KIND_CHAR:
         if (c_speed_optimisation & OPT_INT_COMPARE ) {
@@ -3077,9 +3213,9 @@ void zlt(LVALUE* lval)
         set_int(lval);        
         break;
     case KIND_DOUBLE:
-        callrts("dlt");
+        callrts("flt");
         set_int(lval);            
-        Zsp += 6;
+        Zsp += c_fp_size;
         break;
     case KIND_CHAR:
         if (c_speed_optimisation & OPT_INT_COMPARE ) {
@@ -3177,9 +3313,9 @@ void zle(LVALUE* lval)
         Zsp += 4;
         break;
     case KIND_DOUBLE:
-        callrts("dleq");
+        callrts("fle");
         set_int(lval);            
-        Zsp += 6;
+        Zsp += c_fp_size;
         break;
     case KIND_CHAR:
         if (c_speed_optimisation & OPT_INT_COMPARE ) {
@@ -3275,8 +3411,8 @@ void zgt(LVALUE* lval)
         Zsp += 4;
         break;
     case KIND_DOUBLE:
-        callrts("dgt");
-        Zsp += 6;
+        callrts("fgt");
+        Zsp += c_fp_size;
         set_int(lval);
         break;
     case KIND_CHAR:
@@ -3384,9 +3520,9 @@ void zge(LVALUE* lval)
         set_int(lval);        
         break;
     case KIND_DOUBLE:
-        callrts("dge");
+        callrts("fge");
         set_int(lval);
-        Zsp += 6;
+        Zsp += c_fp_size;
         break;
     case KIND_CHAR:
         if (c_speed_optimisation & OPT_INT_COMPARE ) {
@@ -3469,42 +3605,12 @@ void convSint2long(void)
     callrts("l_int2long_s");
 }
 
-/* signed Int to doub */
-void convSint2doub(void)
-{
-    callrts("float");
-}
 
-/* unsigned int to double */
-
-void convUint2doub(void)
-{
-    callrts("ufloat");
-}
-
-/* signed long to double */
-void convSlong2doub(void)
-{
-    convSint2doub();
-}
-
-/* unsigned long to double */
-void convUlong2doub(void)
-{
-    convUint2doub();
-}
-
-/* double to integerl/long */
-void convdoub2int(void)
-{
-    callrts("ifix");
-}
 
 /* Swap double positions on stack */
-
 void DoubSwap(void)
 {
-    callrts("dswap");
+    callrts("fswap");
 }
 
 void vlongconst(uint32_t val)
@@ -3669,7 +3775,7 @@ void printlabel(int label)
 void col()
 {
     if (!ISASM(ASM_Z80ASM))
-        outbyte(58);
+        outstr(":");
 }
 
 void function_appendix(SYMBOL* func)
@@ -4021,6 +4127,36 @@ void push_char_sdcc_style(void)
     Zsp--;
 }
 
+
+void zconvert_from_double(Kind type, unsigned char isunsigned)
+{
+    if ( type == KIND_LONG || type == KIND_CPTR ) {
+        if ( isunsigned ) callrts("f2ulong");
+        else callrts("f2slong");
+    } else if ( isunsigned ) {
+        callrts("f2uint");
+    } else {
+        callrts("f2sint");
+    }
+}
+
+void zconvert_to_double(Kind type, unsigned char isunsigned)
+{
+   if ( type == KIND_LONG || type == KIND_CPTR ) {
+       if ( isunsigned ) callrts("ulong2f");
+       else callrts("slong2f");
+       return;
+   } else if ( type == KIND_CHAR ) {
+       if ( isunsigned ) callrts("uchar2f");
+       else callrts("schar2f");
+       return;
+   } else if ( type == KIND_CARRY ) {
+       zcarryconv();
+       isunsigned = 1;
+   }
+   if ( isunsigned ) callrts("uint2f");
+   else callrts("sint2f");
+}
 
 /*
  * Local Variables:

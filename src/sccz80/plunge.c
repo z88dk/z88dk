@@ -149,29 +149,25 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 
         if ( lval->val_type == KIND_DOUBLE && lval2->is_const == 0 ) {
             if ( lval2->val_type != KIND_DOUBLE ) {
-                convert_int_to_double(lval2->val_type, lval2->ltype->isunsigned);
+                zconvert_to_double(lval2->val_type, lval2->ltype->isunsigned);
                 lval2->val_type = KIND_DOUBLE;
                 lval2->ltype = type_double;
             }
             dpush();
             load_double_into_fa(lval);
             if ( oper == zdiv || oper == zmod || (operator_is_comparison(oper) && oper != zeq && oper != zne)) {
-                callrts("dswap");
+                DoubSwap();
             }
         } else if ( lval2->val_type == KIND_DOUBLE && lval2->is_const == 0 ) { 
             /* On stack we've got the double, load the constant as a double */
             dpush();
             vlongconst(lval->const_val);
-            if ( lval->ltype->isunsigned ) {
-                convUlong2doub();
-            } else {
-                convSlong2doub();
-            }
+            zconvert_to_double(KIND_LONG, lval->ltype->isunsigned);
             lval->val_type = KIND_DOUBLE;
             lval->ltype = type_double;
             /* division isn't commutative so we need to swap over' */
             if ( oper == zdiv || oper == zmod || (operator_is_comparison(oper) && oper != zeq && oper != zne)) {
-                callrts("dswap");
+                DoubSwap();
             }
         } else if (lval->val_type == KIND_LONG) {
             widenlong(lval, lval2);
@@ -449,7 +445,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         
         if ( lval->val_type == KIND_DOUBLE && lval2->is_const == 0 ) {
             if ( lval2->val_type != KIND_DOUBLE ) {
-                convert_int_to_double(lval2->val_type, lval2->ltype->isunsigned);
+                zconvert_to_double(lval2->val_type, lval2->ltype->isunsigned);
                 lval2->val_type = KIND_DOUBLE;
                 lval2->ltype = type_double;
             }
@@ -457,7 +453,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             dpush();
             load_double_into_fa(lval); // LHS 
             if ( oper == zsub ) {
-                callrts("dswap");
+                DoubSwap();
             }
         } else if ( lval2->val_type == KIND_DOUBLE && lval2->is_const == 0 ) { 
             doconst_oper = 0; // No const operator for double
@@ -468,17 +464,13 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             } else {
                 /* On stack we've got the double, load the constant as a double */
                 vlongconst(val);
-                if ( lval->ltype->isunsigned ) {
-                    convUlong2doub();
-                } else {
-                    convSlong2doub();
-                }
+                zconvert_to_double(KIND_LONG, lval->ltype->isunsigned);
                 lval->val_type = KIND_DOUBLE;
                 lval->ltype = type_double;
             }
             /* Subtraction isn't commutative so we need to swap over' */
             if ( oper == zsub ) {
-                callrts("dswap");
+                DoubSwap();
             }
             
         } else if (lval->val_type == KIND_LONG) {
@@ -551,11 +543,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                     load_double_into_fa(lval2);
                 } else {
                     vlongconst(val);
-                    if ( lval2->ltype->isunsigned ) {
-                        convUlong2doub();
-                    } else {
-                        convSlong2doub();
-                    }
+                    zconvert_to_double(KIND_LONG, lval2->ltype->isunsigned);
                 }
                 (*oper)(lval);
             } else {
@@ -632,7 +620,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         } else if (lval->ptr_type == KIND_LONG && lval2->ptr_type == KIND_LONG) {
             zdiv_const(lval,4); /* div by 4 */
         } else if (lval->ptr_type == KIND_DOUBLE && lval2->ptr_type == KIND_DOUBLE) {
-            zdiv_const(lval,6); /* div by 6 */
+            zdiv_const(lval,c_fp_size); /* div by 6 */
         } else if (lval->ptr_type == KIND_STRUCT && lval2->ptr_type == KIND_STRUCT) {
             zdiv_const(lval, lval->ltype->ptr->tag->size);
         } else if ( lval->ptr_type == KIND_CHAR && lval->ptr_type == KIND_CHAR ) {

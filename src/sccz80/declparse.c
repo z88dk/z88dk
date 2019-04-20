@@ -13,7 +13,7 @@ Type   *type_int = &(Type){ KIND_INT, 2, 0, .len=1 };
 Type   *type_uint = &(Type){ KIND_INT, 2, 1, .len=1 };
 Type   *type_long = &(Type){ KIND_LONG, 4, 0, .len=1 };
 Type   *type_ulong = &(Type){ KIND_LONG, 4, 1, .len=1 };
-Type   *type_double = &(Type){ KIND_DOUBLE, 6, 0, .len=1 };
+Type   *type_double = &(Type){ KIND_DOUBLE, 6, 0, .len=1 }; 
 
 static int32_t needsub(void)
 {
@@ -473,7 +473,7 @@ static Type *parse_type(void)
         type->size = 4;
     } else if ( amatch("float") || amatch("double")) {
         type->kind = KIND_DOUBLE;
-        type->size = 6;
+        type->size = c_fp_size;
     } else if ( amatch("void")) {
         type->kind = KIND_VOID;
         type->size = 1;
@@ -1035,7 +1035,7 @@ Type *make_type(Kind kind, Type *tag)
         type->size = 4;
         break;
     case KIND_DOUBLE:
-        type->size = 6;
+        type->size =  c_fp_size;
         break;
     case KIND_STRUCT:
         type->size = tag->size;
@@ -1608,10 +1608,10 @@ static void declfunc(Type *type, enum storage_type storage)
 
         if ( type->size == 2 || type->size == 1) 
             zpush();
+        else if ( type->kind == KIND_DOUBLE )
+            dpush();     
         else if ( type->size == 4 || type->size == 3)
             lpush();
-        else if ( type->kind == KIND_DOUBLE )
-            dpush();
         else
             adjust = 0;
 

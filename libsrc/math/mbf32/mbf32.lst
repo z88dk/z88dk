@@ -1,0 +1,6 @@
+obj/${TYPE}/**/*.o
+z80/*
+dzerr.asm
+fcerr.asm
+fcerr.sam
+overr.asm

@@ -277,11 +277,11 @@ void force(Kind t1, Kind t2, char isunsigned1, char isunsigned2, int isconst)
 
     if (t1 == KIND_DOUBLE) {
         if (t2 != KIND_DOUBLE) {
-            convert_int_to_double(t2, isunsigned2);
+            zconvert_to_double(t2, isunsigned2);
         }
     } else {
         if (t2 == KIND_DOUBLE) {
-            convdoub2int();
+            zconvert_from_double(t1, isunsigned1);
             return;
         }
     }
@@ -332,7 +332,7 @@ int widen(LVALUE* lval, LVALUE* lval2)
             mainpop();
             if (lval->val_type == KIND_LONG)
                 zpop();
-            convert_int_to_double(lval->val_type, lval->ltype->isunsigned);
+            zconvert_to_double(lval->val_type, lval->ltype->isunsigned);
             DoubSwap();
             lval->val_type = KIND_DOUBLE; /* type of result */
             lval->ltype = type_double;
@@ -340,7 +340,7 @@ int widen(LVALUE* lval, LVALUE* lval2)
         return (1);
     } else {
         if (lval->val_type == KIND_DOUBLE) {
-            convert_int_to_double(lval2->val_type, lval2->ltype->isunsigned);
+            zconvert_to_double(lval2->val_type, lval2->ltype->isunsigned);
             lval2->val_type = KIND_DOUBLE;
             lval2->ltype = type_double;
             return (1);
@@ -481,7 +481,7 @@ void prestep(
         //intcheck(lval, lval);
         switch (lval->ptr_type) {
         case KIND_DOUBLE:
-            zadd_const(lval, (n * 6));
+            zadd_const(lval, n * c_fp_size);
             break;
         case KIND_STRUCT:
             zadd_const(lval, n * lval->ltype->ptr->tag->size);
@@ -524,7 +524,7 @@ void poststep(
         rvalue(lval);
         switch (lval->ptr_type) {
         case KIND_DOUBLE:
-            nstep(lval, n * 6, unstep);
+            nstep(lval, n * c_fp_size, unstep);
             break;
         case KIND_STRUCT:
             nstep(lval, n * lval->ltype->ptr->tag->size, unstep);
@@ -880,17 +880,3 @@ int check_lastop_was_comparison(LVALUE* lval)
     return (1);
 }
 
-/* Generate Code to Turn integer type of signed to double, Generic now does longs */
-void convert_int_to_double(char type, char zunsign)
-{
-    if (type == KIND_INT || type == KIND_CHAR) {
-        if (zunsign)
-            convUint2long();
-        else
-            convSint2long();
-    }
-    if (zunsign)
-        convUlong2doub();
-    else
-        convSlong2doub();
-}

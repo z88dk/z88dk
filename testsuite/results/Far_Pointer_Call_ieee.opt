@@ -1,0 +1,91 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._func
+	ld	hl,(_funcptr)
+	ld	de,(_funcptr+2)
+	ld	d,0
+	push	de
+	push	hl
+	ld	hl,0	;const
+	ld	de,16256
+	push	de
+	push	hl
+	ld	hl,2	;const
+	push	hl
+	ld	hl,6
+	add	hl,de
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	inc	hl
+	ld	l,(hl)
+	ex	de,hl
+	ld	a,3
+	call	l_farcall
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	call	l_gchar
+	ret
+
+
+
+._func2
+	ld	hl,(_funcptr2)
+	ld	de,(_funcptr2+2)
+	ld	d,0
+	push	de
+	push	hl
+	ld	hl,0	;const
+	ld	de,16256
+	push	de
+	push	hl
+	ld	hl,2	;const
+	push	hl
+	ld	hl,6
+	add	hl,de
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	inc	hl
+	ld	l,(hl)
+	ex	de,hl
+	ld	a,3
+	call	l_farcall
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	call	lp_gchar
+	call	l_sxt
+	ret
+
+
+
+
+	SECTION	bss_compiler
+._funcptr	defs	3
+._funcptr2	defs	3
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_funcptr
+	GLOBAL	_funcptr2
+	GLOBAL	_func
+	GLOBAL	_func2
+
+
+
+
