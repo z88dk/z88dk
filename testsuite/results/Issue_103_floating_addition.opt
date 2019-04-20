@@ -287,9 +287,9 @@
 	add	hl,sp
 	push	hl
 	call	dldpsh
-	ld	hl,i_3+0
+	ld	hl,i_4+0
 	call	dload
-	call	ddiv
+	call	dmul
 	pop	hl
 	call	dstore
 	ld	hl,0	;const
@@ -309,9 +309,9 @@
 	add	hl,sp
 	push	hl
 	call	dldpsh
-	ld	hl,i_3+0
+	ld	hl,i_4+0
 	call	dload
-	call	ddiv
+	call	dmul
 	pop	hl
 	call	dstore
 	ld	hl,0	;const
@@ -331,9 +331,9 @@
 	add	hl,sp
 	push	hl
 	call	dldpsh
-	ld	hl,i_3+0
+	ld	hl,i_4+0
 	call	dload
-	call	ddiv
+	call	dmul
 	pop	hl
 	call	dstore
 	ld	hl,0	;const
@@ -638,6 +638,9 @@
 .i_3
 	;2.000000
 	defb	0x00,0x00,0x00,0x00,0x00,0x82
+.i_4
+	;0.500000
+	defb	0x00,0x00,0x00,0x00,0x00,0x80
 
 
 	SECTION	bss_compiler

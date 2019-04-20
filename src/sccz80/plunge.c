@@ -217,6 +217,11 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 
             /* djm, load double reg for long operators */
             if ( lval2->val_type == KIND_DOUBLE || lval->val_type == KIND_DOUBLE ) {
+                 // Multiplication is cheaper than division, so invert the constant
+                 if ( doper == zdiv ) {
+                     doper = mult;
+                     lval2->const_val = 1. / lval2->const_val;
+                 }
                  load_double_into_fa(lval2);
                  lval2->val_type = KIND_DOUBLE;
                  lval2->ltype = type_double;
@@ -285,6 +290,9 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             return;
         }
         if (widen(lval, lval2)) {
+            if ( doper == zmod ) {
+                errorfmt("Cannot apply operator %% to floating point",1);
+            }
             (*doper)(lval);
             /* result of comparison is int */
             if (doper != mult && doper != zdiv) {
