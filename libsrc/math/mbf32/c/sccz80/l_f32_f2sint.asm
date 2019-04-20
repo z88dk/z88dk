@@ -1,15 +1,15 @@
 
-	SECTION	code_fp_mbfs
+	SECTION	code_fp_mbf32
 
 	PUBLIC	l_f32_f2sint
 	PUBLIC	l_f32_f2uint
 	PUBLIC	l_f32_f2ulong
 	PUBLIC	l_f32_f2slong
-	EXTERN	___mbfs_setup_single_reg
-	EXTERN	___mbfs_return
-	EXTERN	___mbfs_FPINT
-	EXTERN	___mbfs_FPREG
-	EXTERN	___mbfs_FPEXP
+	EXTERN	___mbf32_setup_single_reg
+	EXTERN	___mbf32_return
+	EXTERN	___mbf32_FPINT
+	EXTERN	___mbf32_FPREG
+	EXTERN	___mbf32_FPEXP
 	EXTERN	msbios
 
 
@@ -17,11 +17,11 @@ l_f32_f2sint:
 l_f32_f2uint:
 l_f32_f2slong:
 l_f32_f2ulong:
-	call	___mbfs_setup_single_reg
-	ld	a,(___mbfs_FPREG + 2)
+	call	___mbf32_setup_single_reg
+	ld	a,(___mbf32_FPREG + 2)
 	push	af
-	ld	a,(___mbfs_FPEXP)
-	ld	ix,___mbfs_FPINT
+	ld	a,(___mbf32_FPEXP)
+	ld	ix,___mbf32_FPINT
 	call	msbios
 	pop	ix
 	ex	de,hl

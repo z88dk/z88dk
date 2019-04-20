@@ -1,14 +1,14 @@
 
-        SECTION code_fp_mbfs
+        SECTION code_fp_mbf32
 
         PUBLIC  sqrt
-        EXTERN  ___mbfs_setup_single
-        EXTERN  ___mbfs_SQR
-        EXTERN  ___mbfs_return
+        EXTERN  ___mbf32_setup_single
+        EXTERN  ___mbf32_SQR
+        EXTERN  ___mbf32_return
 	EXTERN	msbios
 
 sqrt:
-	call	___mbfs_setup_single
-	ld	ix,___mbfs_SQR
+	call	___mbf32_setup_single
+	ld	ix,___mbf32_SQR
 	call	msbios
-	jp	___mbfs_return
+	jp	___mbf32_return

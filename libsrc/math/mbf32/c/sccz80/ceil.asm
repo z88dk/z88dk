@@ -1,25 +1,25 @@
 
 
-        SECTION         code_fp_mbfs
+        SECTION         code_fp_mbf32
 
         PUBLIC          ceil
 	EXTERN		msbios
 	EXTERN		l_long_neg
 	EXTERN		l_f32_slong2f
-	EXTERN		___mbfs_setup_single
-	EXTERN		___mbfs_return
-        EXTERN          ___mbfs_FPINT
-        EXTERN          ___mbfs_FPREG
+	EXTERN		___mbf32_setup_single
+	EXTERN		___mbf32_return
+        EXTERN          ___mbf32_FPINT
+        EXTERN          ___mbf32_FPREG
 
 
 ceil:
-	call	___mbfs_setup_single
-	ld	hl,___mbfs_FPREG+2
+	call	___mbf32_setup_single
+	ld	hl,___mbf32_FPREG+2
 	ld	a,(hl)
 	xor	$80
 	ld	(hl),a
 	push	af
-        ld      ix,___mbfs_FPINT
+        ld      ix,___mbf32_FPINT
 	call	msbios
 	; bcde = integer
 	; Now normalise it again

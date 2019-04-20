@@ -1,6 +1,6 @@
 
 
-	SECTION	code_fp_mbfs
+	SECTION	code_fp_mbf32
 
 	PUBLIC	l_f32_no
 

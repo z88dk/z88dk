@@ -1,10 +1,10 @@
 
 
-	SECTION		code_fp_mbfs
+	SECTION		code_fp_mbf32
 
-	PUBLIC		___mbfs_setup_single_reg
-	EXTERN		___mbfs_FPREG
-	EXTERN		___mbfs_VALTYP
+	PUBLIC		___mbf32_setup_single_reg
+	EXTERN		___mbf32_FPREG
+	EXTERN		___mbf32_VALTYP
 
 
 ; Used for the routines which accept single_reg precision
@@ -14,11 +14,11 @@
 ;        defw callee return address
 ;        defw left hand LSW
 ;        defw left hand MSW
-___mbfs_setup_single_reg:
+___mbf32_setup_single_reg:
 	ld	a,4
-	ld	(___mbfs_VALTYP),a
-        ld      (___mbfs_FPREG + 0),hl
-        ld      (___mbfs_FPREG + 2),de
+	ld	(___mbf32_VALTYP),a
+        ld      (___mbf32_FPREG + 0),hl
+        ld      (___mbf32_FPREG + 2),de
 	pop	hl
 	push	ix
 	push	hl

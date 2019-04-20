@@ -1,14 +1,14 @@
 
-        SECTION code_fp_mbfs
+        SECTION code_fp_mbf32
 
         PUBLIC  atan
-        EXTERN  ___mbfs_setup_single
-        EXTERN  ___mbfs_ATN
-        EXTERN  ___mbfs_return
+        EXTERN  ___mbf32_setup_single
+        EXTERN  ___mbf32_ATN
+        EXTERN  ___mbf32_return
 	EXTERN	msbios
 
 atan:
-	call	___mbfs_setup_single
-	ld	ix,___mbfs_ATN
+	call	___mbf32_setup_single
+	ld	ix,___mbf32_ATN
 	call	msbios
-	jp	___mbfs_return
+	jp	___mbf32_return

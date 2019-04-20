@@ -1,10 +1,10 @@
 
 
-	SECTION		code_fp_mbfs
+	SECTION		code_fp_mbf32
 
-	PUBLIC		___mbfs_setup_arith
-	EXTERN		___mbfs_FPREG
-	EXTERN		___mbfs_VALTYP
+	PUBLIC		___mbf32_setup_arith
+	EXTERN		___mbf32_FPREG
+	EXTERN		___mbf32_VALTYP
 
 
 ; Put the two arguments into the required places
@@ -17,12 +17,12 @@
 ;        defw callee return address
 ;        defw left hand LSW
 ;        defw left hand MSW
-___mbfs_setup_arith:
+___mbf32_setup_arith:
 	ld	a,4
-	ld	(___mbfs_VALTYP),a
+	ld	(___mbf32_VALTYP),a
 	; The right value needs to go into FPREG
-	ld	(___mbfs_FPREG + 0),hl
-	ld	(___mbfs_FPREG + 2),de
+	ld	(___mbf32_FPREG + 0),hl
+	ld	(___mbf32_FPREG + 2),de
 	pop	af		;Return address
 	pop	hl		;Caller return address
 	pop	de		;Left LSW

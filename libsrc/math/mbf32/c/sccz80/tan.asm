@@ -1,14 +1,14 @@
 
-        SECTION code_fp_mbfs
+        SECTION code_fp_mbf32
 
         PUBLIC  tan
-        EXTERN  ___mbfs_setup_single
-        EXTERN  ___mbfs_TAN
-        EXTERN  ___mbfs_return
+        EXTERN  ___mbf32_setup_single
+        EXTERN  ___mbf32_TAN
+        EXTERN  ___mbf32_return
 	EXTERN	msbios
 
 tan:
-	call	___mbfs_setup_single
-	ld	ix,___mbfs_TAN
+	call	___mbf32_setup_single
+	ld	ix,___mbf32_TAN
 	call	msbios
-	jp	___mbfs_return
+	jp	___mbf32_return

@@ -1,14 +1,14 @@
 
-        SECTION code_fp_mbfs
+        SECTION code_fp_mbf32
 
         PUBLIC  log
-        EXTERN  ___mbfs_setup_single
-        EXTERN  ___mbfs_LOG
-        EXTERN  ___mbfs_return
+        EXTERN  ___mbf32_setup_single
+        EXTERN  ___mbf32_LOG
+        EXTERN  ___mbf32_return
 	EXTERN	msbios
 
 log:
-	call	___mbfs_setup_single
-	ld	ix,___mbfs_LOG
+	call	___mbf32_setup_single
+	ld	ix,___mbf32_LOG
 	call	msbios
-	jp	___mbfs_return
+	jp	___mbf32_return

@@ -1,14 +1,14 @@
 
-        SECTION code_fp_mbfs
+        SECTION code_fp_mbf32
 
         PUBLIC  cos
-        EXTERN  ___mbfs_setup_single
-        EXTERN  ___mbfs_COS
-        EXTERN  ___mbfs_return
+        EXTERN  ___mbf32_setup_single
+        EXTERN  ___mbf32_COS
+        EXTERN  ___mbf32_return
 	EXTERN	msbios
 
 cos:
-	call	___mbfs_setup_single
-	ld	ix,___mbfs_COS
+	call	___mbf32_setup_single
+	ld	ix,___mbf32_COS
 	call	msbios
-	jp	___mbfs_return
+	jp	___mbf32_return

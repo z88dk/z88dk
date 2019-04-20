@@ -1,17 +1,17 @@
 
-	SECTION	code_fp_mbfs
+	SECTION	code_fp_mbf32
 
 	PUBLIC	l_f32_mul
-	EXTERN	___mbfs_setup_arith
-	EXTERN	___mbfs_FPMULT
-	EXTERN	___mbfs_return
+	EXTERN	___mbf32_setup_arith
+	EXTERN	___mbf32_FPMULT
+	EXTERN	___mbf32_return
 	EXTERN	msbios
 
 
 l_f32_mul:
-	call	___mbfs_setup_arith
-	ld	ix,___mbfs_FPMULT
+	call	___mbf32_setup_arith
+	ld	ix,___mbf32_FPMULT
 	call	msbios
-	jp	___mbfs_return
+	jp	___mbf32_return
 
 

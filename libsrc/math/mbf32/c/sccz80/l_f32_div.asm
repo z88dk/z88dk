@@ -1,16 +1,16 @@
 
-	SECTION	code_fp_mbfs
+	SECTION	code_fp_mbf32
 
 	PUBLIC	l_f32_div
-	EXTERN	___mbfs_setup_arith
-	EXTERN	___mbfs_DVBCDE
-	EXTERN	___mbfs_return
+	EXTERN	___mbf32_setup_arith
+	EXTERN	___mbf32_DVBCDE
+	EXTERN	___mbf32_return
 	EXTERN	msbios
 
 l_f32_div:
-	call	___mbfs_setup_arith
-	ld	ix,___mbfs_DVBCDE
+	call	___mbf32_setup_arith
+	ld	ix,___mbf32_DVBCDE
 	call	msbios
-	jp	___mbfs_return
+	jp	___mbf32_return
 
 

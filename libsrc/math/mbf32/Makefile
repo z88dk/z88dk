@@ -6,7 +6,7 @@ AFILES  = $(wildcard c/sccz80/*.asm)
 CFILES  = $(wildcard *.c)
 OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
 
-CFLAGS += -fp-mode=mbfs
+CFLAGS += -fp-mode=mbf32
 
 all: dirs $(OUTPUT_DIRECTORY)/mbf32.lib $(OUTPUT_DIRECTORY)/mbf32_iy.lib 
 

@@ -1,14 +1,14 @@
 
 
-        SECTION         code_fp_mbfs
+        SECTION         code_fp_mbf32
 
-	PUBLIC		___mbfs_return
+	PUBLIC		___mbf32_return
 
-	EXTERN		___mbfs_FPREG
+	EXTERN		___mbf32_FPREG
 
 ; Return the value that's in the DAC
-___mbfs_return:
-	ld	hl,(___mbfs_FPREG)
-	ld	de,(___mbfs_FPREG+2)
+___mbf32_return:
+	ld	hl,(___mbf32_FPREG)
+	ld	de,(___mbf32_FPREG+2)
 	pop	ix
 	ret

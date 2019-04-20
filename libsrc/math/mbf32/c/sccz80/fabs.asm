@@ -1,14 +1,14 @@
 
-        SECTION code_fp_mbfs
+        SECTION code_fp_mbf32
 
         PUBLIC  fabs
-        EXTERN  ___mbfs_setup_single
-        EXTERN  ___mbfs_ABS
-        EXTERN  ___mbfs_return
+        EXTERN  ___mbf32_setup_single
+        EXTERN  ___mbf32_ABS
+        EXTERN  ___mbf32_return
 	EXTERN	msbios
 
 fabs:
-	call	___mbfs_setup_single
-	ld	ix,___mbfs_ABS
+	call	___mbf32_setup_single
+	ld	ix,___mbf32_ABS
 	call	msbios
-	jp	___mbfs_return
+	jp	___mbf32_return

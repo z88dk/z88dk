@@ -1,11 +1,11 @@
 
 
-	SECTION		code_fp_mbfs
+	SECTION		code_fp_mbf32
 
-	PUBLIC		___mbfs_setup_comparison
-	EXTERN		___mbfs_FPREG
-	EXTERN		___mbfs_VALTYP
-	EXTERN		___mbfs_CMPNUM
+	PUBLIC		___mbf32_setup_comparison
+	EXTERN		___mbf32_FPREG
+	EXTERN		___mbf32_VALTYP
+	EXTERN		___mbf32_CMPNUM
 	EXTERN		msbios
 
 
@@ -20,12 +20,12 @@
 ;        defw callee return address
 ;        defw left hand LSW
 ;        defw left hand MSW
-___mbfs_setup_comparison:
+___mbf32_setup_comparison:
 	ld	a,4
-	ld	(___mbfs_VALTYP),a
+	ld	(___mbf32_VALTYP),a
 	; The right value needs to go into FPREG
-	ld	(___mbfs_FPREG + 0),hl
-	ld	(___mbfs_FPREG + 2),de
+	ld	(___mbf32_FPREG + 0),hl
+	ld	(___mbf32_FPREG + 2),de
 	pop	af		;Return address
 	pop	hl		;Caller return address
 	pop	de		;Left LSW
@@ -33,7 +33,7 @@ ___mbfs_setup_comparison:
 	push	hl
 	push	af		;Our return address
 	push	ix
-	ld	ix,___mbfs_CMPNUM
+	ld	ix,___mbf32_CMPNUM
 	call	msbios
 	pop	ix
 	ret
