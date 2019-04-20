@@ -26,10 +26,10 @@
 ; get 8, 14, and 26. At this point the number is rounded then multiplied
 ; by x using F_mul.
 ;
-; Do the work in fixed point with 2 places to left of decimal point.
-; 2.6 2.14 2.22 and 2.30, as we move through the calculations.
+; Do the work in signed fixed point with 2 places to left of decimal point.
+; 2.5 2.13 2.21 and 2.29, as we move through the calculations.
 ;
-; The initial w[0] table is shifted once to fixed1.7, and then shifted again
+; The initial w[0] table is shifted once to fixed 2.6, and then shifted again
 ; to create the initial guess w[0] = 48/17 - 32/17 * y where 0.5 <= y <= 1.0
 ;
 ;-------------------------------------------------------------------------
@@ -39,7 +39,8 @@
 SECTION code_clib
 SECTION code_math
 
-EXTERN md32_fsmul, m32_mulu_32_16x16, l0_z180_mulu_32_32x32
+EXTERN md32_fsmul, m32_mulu_32_16x16, l_z180_mulu_64_32x32
+
 
 PUBLIC md32_fsdiv, md32_fsinv
 
@@ -62,7 +63,8 @@ PUBLIC md32_fsdiv, md32_fsinv
 
     add hl,hl                   ; sign in C
     ld a,h
-    ex af,af                    ; save exponent and sign in C in af'
+;   ex af,af                    ; save exponent and sign in C in af'
+    push af                     ; XXX remove when af' recovered from mulu_64_32x32
 
     ld a,h
     or a                        ; divide by zero?
@@ -75,9 +77,10 @@ PUBLIC md32_fsdiv, md32_fsinv
     ld h,l                      ; mantissa of y in hlde
     ld l,d
     ld d,e
+    ld e,0
 
 
-    srl h                       ; shift mantissa right one place for 2.n fixed point
+    srl h                       ; shift mantissa right one place for 2.n signed fixed point
     rr l
     rr d
     rr e
@@ -86,6 +89,7 @@ PUBLIC md32_fsdiv, md32_fsinv
     rr l
     rr d
     rr e
+
                                 ; a = 1mmmmmmm hlde = 001mmmmm mmmmmmmm mmmmmmmm mm------
     push hl                     ; y msw on stack for w[3]
     push de                     ; y lsw on stack for w[3]
@@ -104,7 +108,7 @@ PUBLIC md32_fsdiv, md32_fsinv
     ld c,a
     add hl,bc
 
-    ld b,(hl)                   ; w[0] fixed 2.6 with 5 bits accuracy in bc
+    ld b,(hl)                   ; w[0]*2 signed fixed 2.5 with 5 bits accuracy in bc
     ld c,0    
 
                                 ; calculate w[1] - 8 bits
@@ -115,7 +119,7 @@ PUBLIC md32_fsdiv, md32_fsinv
     ld h,b                      ; w[0] with 5 bits accuracy in hl
     ld l,c
 
-    add hl,hl                   ; w[0]*2
+;   add hl,hl                   ; w[0]*2 in hl
 
     ex (sp),hl                  ; w[0]*2 on stack, y msw in hl
     push hl                     ; y msw on stack
@@ -130,10 +134,12 @@ PUBLIC md32_fsdiv, md32_fsinv
     pop bc                      ; y msw in bc
 
     call m32_mulu_32_16x16      ; bc*de => hlbc, uses af, w[0]^2*y in hlbc
-    sla b
-    adc hl,hl
-    sla b
-    adc hl,hl
+;   sla c
+;   rl b
+;   adc hl,hl
+;   sla c
+;   rl b
+;   adc hl,hl
 
     ex de,hl                    ; w[0]^2*y in de
     pop hl                      ; w[0]*2 in hl
@@ -144,42 +150,46 @@ PUBLIC md32_fsdiv, md32_fsinv
     
                                 ; calculate w[2] in hlde - 14 bits
 
-    ld d,h                      ; w[1] msw in de
-    ld e,l
     
-    add hl,hl                   ; w[1]*2
+    ld b,h                      ; w[1] msw in bc
+    ld c,l
+
+;   add hl,hl                   ; w[1]*2 msw in hl
 
     pop af                      ; y lsw in af
     ex (sp),hl                  ; w[1]*2 msw on stack, y msw in hl
     push hl                     ; y msw on stack
     push af                     ; y lsw on stack
     
-    ld b,d                      ; w[1] msw in bc
-    ld c,e
+    ld d,b                      ; w[1] msw in de
+    ld e,c
 
     call m32_mulu_32_16x16      ; bc*de => hlbc, uses af, w[1]^2 in hlbc
-    sla c
-    rl b
-    adc hl,hl
-    sla c
-    rl b
-    adc hl,hl                    ; w[1]^2 in hlbc
+;   sla c
+;   rl b
+;   adc hl,hl
+;   sla c
+;   rl b
+;   adc hl,hl                    ; w[1]^2 in hlbc
 
-    push bc
+
+    ld d,b
+    ld e,c
+    ex de,hl                    ; w[1]^2 in dehl
+
     exx
-    pop de                      ; w[1]^2 lsw in de'
-    pop bc                      ; y lsw in bc'
+    pop hl                      ; y lsw in hl'
+    pop de                      ; y msw in de'
     exx
-    pop bc                      ; y msw in bc
-    ex de,hl                    ; w[1]^2 msw in de
       
-    call l0_z180_mulu_32_32x32  ; bcbc'*dede' => dehl, w[1]^2*y in dehl
-    add hl,hl
-    rl e
-    rl d
-    add hl,hl
-    rl e
-    rl d                        ; w[1]^2*y in dehl
+    call l_z180_mulu_64_32x32  ; dehl*dehl' => dehl, w[1]^2*y in dehl
+;   add hl,hl
+;   rl e
+;   rl d
+;   add hl,hl
+;   rl e
+;   rl d                        ; w[1]^2*y in dehl
+
 
     ld b,d                      ; w[1]^2*y in bchl
     ld c,e
@@ -194,13 +204,13 @@ PUBLIC md32_fsdiv, md32_fsinv
     ex de,hl
 
     pop hl                      ; w[1]*2 msw in hl
-    sbc hl,bc                   ; w[1]*2 msw - w[1]^2*y msw
+    sbc hl,bc                   ; w[1]*2 msw - w[1]^2*y msw - C
     
                                 ; w[2] with 14 bits accuracy in hlde
 
                                 ; calculate w[3] in hlde - 26 bits
-            
-    ld b,h                      ; w[2] msw in bc
+
+    ld b,h
     ld c,l
 
     pop af                      ; y lsw in af
@@ -209,52 +219,53 @@ PUBLIC md32_fsdiv, md32_fsinv
     push hl                     ; y msw on stack
     push af                     ; y lsw on stack
 
-    push de                     ; w[2] lsw on stack
-    push de                     ; w[2] lsw on stack
-    exx
-    pop de                      ; w[2] lsw in de'
-    pop bc                      ; w[2] lsw in bc'
-    exx
+    ld h,b
+    ld l,c
+    ex de,hl                    ; w[2] msw in de, w[2] msw in de
 
-    ld d,b                      ; w[2] msw in de
-    ld e,c
-
-    call l0_z180_mulu_32_32x32  ; bcbc'*dede' => dehl, w[2]^2 in dehl
-    add hl,hl
-    rl e
-    rl d
-    add hl,hl
-    rl e
-    rl d                        ; w[2]^2 in dehl
-
+    push de
     push hl
     exx
-    pop de                      ; w[2]^2 lsw in de'
-    pop bc                      ; y lsw in bc'
+    pop hl
+    pop de
     exx
-    pop bc                      ; y msw in bc
 
-    call l0_z180_mulu_32_32x32  ; bcbc'*dede' => dehl, w[2]^2*y in dehl
-    add hl,hl
-    rl e
-    rl d
-    add hl,hl
-    rl e
-    rl d                        ; w[2]^2*y in dehl
+    call l_z180_mulu_64_32x32  ; dehl*dehl' => dehl, w[2]^2 in dehl
+;   add hl,hl
+;   rl e
+;   rl d
+;   add hl,hl
+;   rl e
+;   rl d                        ; w[2]^2 in dehl
+
+
+    exx
+    pop hl                      ; y lsw in hl'
+    pop de                      ; y msw in de'
+    exx
+
+    call l_z180_mulu_64_32x32  ; dehl*dehl' => dehl, w[2]^2*y in dehl
+;   add hl,hl
+;   rl e
+;   rl d
+;   add hl,hl
+;   rl e
+;   rl d                        ; w[2]^2*y in dehl
 
     ld b,d                      ; w[2]^2*y in bchl
     ld c,e
 
-    exx
-    pop hl
-    pop de
-    add hl,hl
-    ex de,hl
-    adc hl,hl
-    push hl
-    push de
-    exx                         ; w[2]*2 in dehl' and stack
+;   exx
+;   pop hl
+;   pop de
+;   add hl,hl
+;   ex de,hl
+;   adc hl,hl
+;   push hl
+;   push de
+;   exx
 
+    xor a
     pop de
     ex de,hl
     sbc hl,de                   ; w[2]*2 lsw - w[2]^2*y lsw
@@ -262,22 +273,9 @@ PUBLIC md32_fsdiv, md32_fsinv
     ex de,hl
 
     pop hl                      ; w[2]*2 msw in hl
-    sbc hl,bc                   ; w[2]*2 msw - w[2]^2*y msw
+    sbc hl,bc                   ; w[2]*2 msw - w[2]^2*y msw - C
 
                                 ; w[3] with 26 bits accuracy in hlde
-;   XXX debug
-    push af
-    push hl
-    push de
-    call asm_phexwd
-    ex de, hl
-    call asm_phexwd
-    ld l,'_'
-    call asm_pchar
-    pop de
-    pop hl
-    pop af
-;   XXX end debug
 
     ex de,hl                    ; dehl  = 32-bit product
 
@@ -295,7 +293,8 @@ PUBLIC md32_fsdiv, md32_fsinv
     set 0,h
 
 .fd4
-    ex af,af                    ; recover y exponent and sign in C from af' 
+;   ex af,af                    ; recover y exponent and sign in C from af'
+    pop af                      ; XXX remove
     rr b                        ; save sign in b
     sub a,0x7f                  ; calculate new exponent for 1/y
     neg
@@ -313,64 +312,13 @@ PUBLIC md32_fsdiv, md32_fsinv
     res 7,c                     ; clear exponent lsb if it is 0
     
 .fd5
-;   XXX debug
-    push af
-    push hl
-    push de
-    push bc
-    ld h,b
-    ld l,c
-    call asm_phexwd
-    ex de,hl
-    call asm_phexwd
-    ld l,' '
-    call asm_pchar
-    pop bc
-    pop de
-    pop hl
-    pop af
-;   XXX end debug
     ret
 
 SECTION rodata_clib
 
 ._divtable
-IF 0
   DEFB 0x7f, 0x7b, 0x78, 0x74, 0x71, 0x6e, 0x6b, 0x68
   DEFB 0x66, 0x63, 0x61, 0x5e, 0x5c, 0x5a, 0x58, 0x56
   DEFB 0x55, 0x53, 0x51, 0x50, 0x4e, 0x4d, 0x4b, 0x4a
   DEFB 0x48, 0x47, 0x46, 0x45, 0x44, 0x43, 0x41, 0x40
-ENDIF
 
-    DEFB 0x3C
-    DEFB 0x3B
-    DEFB 0x3B
-    DEFB 0x39
-    DEFB 0x39
-    DEFB 0x37
-    DEFB 0x37
-    DEFB 0x35
-    DEFB 0x35
-    DEFB 0x33
-    DEFB 0x33
-    DEFB 0x31
-    DEFB 0x31
-    DEFB 0x30
-    DEFB 0x2F
-    DEFB 0x2E
-    DEFB 0x2D
-    DEFB 0x2C
-    DEFB 0x2B
-    DEFB 0x2B
-    DEFB 0x29
-    DEFB 0x28
-    DEFB 0x27
-    DEFB 0x26
-    DEFB 0x25
-    DEFB 0x25
-    DEFB 0x23
-    DEFB 0x23
-    DEFB 0x21
-    DEFB 0x21
-    DEFB 0x20
-    DEFB 0x3E
