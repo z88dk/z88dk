@@ -77,20 +77,8 @@ PUBLIC md32_fsdiv, md32_fsinv
     ld h,l                      ; mantissa of y in hlde
     ld l,d
     ld d,e
-    ld e,0
+    ld e,0                      ; a = 1mmmmmmm hlde = 001mmmmm mmmmmmmm mmmmmmmm mm------
 
-
-    srl h                       ; shift mantissa right one place for 2.n signed fixed point
-    rr l
-    rr d
-    rr e
-    
-    srl h                       ; shift mantissa one place to scale y 0.5<=y<=1.0
-    rr l
-    rr d
-    rr e
-
-                                ; a = 1mmmmmmm hlde = 001mmmmm mmmmmmmm mmmmmmmm mm------
     push hl                     ; y msw on stack for w[3]
     push de                     ; y lsw on stack for w[3]
     push hl                     ; y msw on stack for w[2]
@@ -98,9 +86,9 @@ PUBLIC md32_fsdiv, md32_fsinv
     push hl                     ; y msw on stack for w[1]
 
                                 ; calculate w[0] - 5 bits
-
-                                ; calculate w[0] table offset for 32 Byte table
-    ld a,h                      ; a = 001mmmmm
+    ld a,h
+	rra                         ; calculate w[0] table offset for 32 Byte table
+	rra
     and    0x1f                 ; a = 000mmmmm
 
     ld hl,_divtable
@@ -119,27 +107,21 @@ PUBLIC md32_fsdiv, md32_fsinv
     ld h,b                      ; w[0] with 5 bits accuracy in hl
     ld l,c
 
-;   add hl,hl                   ; w[0]*2 in hl
+    add hl,hl                   ; w[0]*2 in hl
 
     ex (sp),hl                  ; w[0]*2 on stack, y msw in hl
     push hl                     ; y msw on stack
 
     call m32_mulu_32_16x16      ; bc*de => hlbc, uses af, w[0]^2 in hlbc
-    sla b
-    adc hl,hl
-    sla b
-    adc hl,hl
+    add hl,hl
 
     ex de,hl
     pop bc                      ; y msw in bc
 
     call m32_mulu_32_16x16      ; bc*de => hlbc, uses af, w[0]^2*y in hlbc
-;   sla c
-;   rl b
-;   adc hl,hl
-;   sla c
-;   rl b
-;   adc hl,hl
+    sla c
+    rl b
+    adc hl,hl
 
     ex de,hl                    ; w[0]^2*y in de
     pop hl                      ; w[0]*2 in hl
@@ -154,7 +136,7 @@ PUBLIC md32_fsdiv, md32_fsinv
     ld b,h                      ; w[1] msw in bc
     ld c,l
 
-;   add hl,hl                   ; w[1]*2 msw in hl
+    add hl,hl                   ; w[1]*2 msw in hl
 
     pop af                      ; y lsw in af
     ex (sp),hl                  ; w[1]*2 msw on stack, y msw in hl
@@ -165,12 +147,9 @@ PUBLIC md32_fsdiv, md32_fsinv
     ld e,c
 
     call m32_mulu_32_16x16      ; bc*de => hlbc, uses af, w[1]^2 in hlbc
-;   sla c
-;   rl b
-;   adc hl,hl
-;   sla c
-;   rl b
-;   adc hl,hl                    ; w[1]^2 in hlbc
+    sla c
+    rl b
+    adc hl,hl                    ; w[1]^2 in hlbc
 
 
     ld d,b
@@ -183,25 +162,22 @@ PUBLIC md32_fsdiv, md32_fsinv
     exx
       
     call l_z180_mulu_64_32x32  ; dehl*dehl' => dehl, w[1]^2*y in dehl
-;   add hl,hl
-;   rl e
-;   rl d
-;   add hl,hl
-;   rl e
-;   rl d                        ; w[1]^2*y in dehl
+    add hl,hl
+    rl e
+    rl d                        ; w[1]^2*y in dehl
 
 
-    ld b,d                      ; w[1]^2*y in bchl
-    ld c,e
+    ex de,hl                    ; w[1]^2*y in hlde
 
-    xor a
-    ld d,a                      ; w[1]*2 lsw = 0 in de
+    ld b,h                      ; w[1]^2*y in bcde
+    ld c,l
+
+    xor a                       ; w[1]*2 lsw (zero) - w[1]^2*y lsw
+    sub a,e
     ld e,a
-
-    ex de,hl
-    sbc hl,de                   ; w[1]*2 lsw - w[1]^2*y lsw
-
-    ex de,hl
+    sbc a,a
+    sub a,d
+    ld d,a
 
     pop hl                      ; w[1]*2 msw in hl
     sbc hl,bc                   ; w[1]*2 msw - w[1]^2*y msw - C
@@ -212,9 +188,11 @@ PUBLIC md32_fsdiv, md32_fsinv
 
     ld b,h
     ld c,l
+            
+    add hl,hl                   ; w[2]*2 msw in hl
 
     pop af                      ; y lsw in af
-    ex (sp),hl                  ; w[2] msw on stack, y msw in hl
+    ex (sp),hl                  ; w[2]*2 msw on stack, y msw in hl
     push de                     ; w[2] lsw on stack
     push hl                     ; y msw on stack
     push af                     ; y lsw on stack
@@ -231,12 +209,13 @@ PUBLIC md32_fsdiv, md32_fsinv
     exx
 
     call l_z180_mulu_64_32x32  ; dehl*dehl' => dehl, w[2]^2 in dehl
-;   add hl,hl
-;   rl e
-;   rl d
-;   add hl,hl
-;   rl e
-;   rl d                        ; w[2]^2 in dehl
+    exx
+    ld a,d
+    exx
+    add a,a
+    adc hl,hl
+    rl e
+    rl d                        ; w[2]^2 in dehl
 
 
     exx
@@ -245,31 +224,26 @@ PUBLIC md32_fsdiv, md32_fsinv
     exx
 
     call l_z180_mulu_64_32x32  ; dehl*dehl' => dehl, w[2]^2*y in dehl
-;   add hl,hl
-;   rl e
-;   rl d
-;   add hl,hl
-;   rl e
-;   rl d                        ; w[2]^2*y in dehl
+    exx
+    ld a,d
+    exx
+    add a,a
+    adc hl,hl
+    rl e
+    rl d                        ; w[2]^2*y in dehl
 
-    ld b,d                      ; w[2]^2*y in bchl
-    ld c,e
 
-;   exx
-;   pop hl
-;   pop de
-;   add hl,hl
-;   ex de,hl
-;   adc hl,hl
-;   push hl
-;   push de
-;   exx
+    ex de,hl                    ; w[2]^2*y in hlde
+
+    ld b,h                      ; w[2]^2*y in bcde
+    ld c,l
+
+    pop hl
+    add hl,hl                   ; w[2]*2 lsw
+    ex de,hl
 
     xor a
-    pop de
-    ex de,hl
     sbc hl,de                   ; w[2]*2 lsw - w[2]^2*y lsw
-
     ex de,hl
 
     pop hl                      ; w[2]*2 msw in hl
@@ -278,10 +252,6 @@ PUBLIC md32_fsdiv, md32_fsinv
                                 ; w[3] with 26 bits accuracy in hlde
 
     ex de,hl                    ; dehl  = 32-bit product
-
-    add hl,hl                   ; rescale y mantissa 1<=y<=2
-    rl e
-    rl d
 
     add hl,hl                   ; shift mantissa dehl into position <<1
     rl e
