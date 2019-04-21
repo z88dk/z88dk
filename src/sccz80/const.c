@@ -40,7 +40,7 @@ typedef struct elem_s {
 struct fp_decomposed {
     uint8_t   exponent;
     uint8_t   sign;
-    uint8_t   mantissa[MAX_MANTISSA_SIZE];
+    uint8_t   mantissa[MAX_MANTISSA_SIZE + 1];
 };
 
 static elem_t    *double_queue = NULL;
