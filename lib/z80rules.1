@@ -201,6 +201,11 @@
 =
 	call	dldpsh
 
+	call	l_f64_load
+	call	l_f64_dpush
+=
+	call	l_f64_dldpsh
+
 	jp	nz,%1
 	jp	%2
 .%1
