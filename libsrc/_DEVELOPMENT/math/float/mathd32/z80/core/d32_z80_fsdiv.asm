@@ -89,34 +89,49 @@ PUBLIC md32_fsdiv, md32_fsinv
     and    0x1f                 ; a = 000mmmmm
 
     ld hl,_divtable
-    ld b,0
-    ld c,a
-    add hl,bc
+    ld d,0
+    ld e,a
+    add hl,de
 
-    ld b,(hl)                   ; w[0]*2 fixed 1.7 with 5 bits accuracy in bc
-    ld c,0    
+    ld d,(hl)                   ; w[0] fixed 1.7 with 5 bits accuracy in d, e
+    ld e,d
 
                                 ; calculate w[1] - 8 bits
 
-    ld d,b                      ; w[0] with 5 bits accuracy in de
-    ld e,c
-
-    ld h,b                      ; w[0] with 5 bits accuracy in hl
-    ld l,c
+    ld h,d                      ; w[0] with 5 bits accuracy in hl
+    ld l,0
 
     add hl,hl                   ; w[0]*2 in hl
 
     ex (sp),hl                  ; w[0]*2 on stack, y msw in hl
     push hl                     ; y msw on stack
 
-    call m32_mulu_32_16x16      ; bc*de => hlbc, uses af, w[0]^2 in hlbc
+IF __CPU_Z180__
+    mlt de                      ; d*e => de, w[0]^2 in de
+    ex de,hl
+ELSE
+
+IF __CPU_Z80_ZXN__
+    mul de                      ; d*e => de, w[0]^2 in de
+    ex de,hl
+ELSE
+
+    EXTERN l_mulu_16_16x8
+    ld l,d
+    ld d,0
+    call l_mulu_16_16x8
+
+ENDIF
+ENDIF
+
     add hl,hl
 
     ex de,hl
     pop bc                      ; y msw in bc
 
     call m32_mulu_32_16x16      ; bc*de => hlbc, uses af, w[0]^2*y in hlbc
-    sla b
+    sla c
+    rl b
     adc hl,hl
 
     ex de,hl                    ; w[0]^2*y in de

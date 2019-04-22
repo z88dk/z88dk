@@ -72,7 +72,7 @@ defc m32_mulu_32h_32x32 = l_z80_zxn_mulu_32h_32x32
     ld h,d
     push hl                     ; x1 y1
 
-    ; save material for the byte p3 = x3*y0 + x2*y1 + x1*y2 + x0*y3 + p2 carry
+    ; save material for the byte p3 = x3*y0 + x2*y1 + x1*y2 + x0*y3
     push bc                     ; y1 y0
     exx                         ;'
     push de                     ;'x3 x2
