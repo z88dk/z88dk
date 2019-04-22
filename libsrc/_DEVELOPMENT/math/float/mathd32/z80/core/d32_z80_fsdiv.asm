@@ -179,7 +179,7 @@ PUBLIC md32_fsdiv, md32_fsinv
 
     pop hl                      ; w[1]*2 msw in hl
     sbc hl,bc                   ; w[1]*2 msw - w[1]^2*y msw - C
-    
+
                                 ; w[2] with 14 bits accuracy in hlde
 
                                 ; calculate w[3] in hlde - 26 bits
