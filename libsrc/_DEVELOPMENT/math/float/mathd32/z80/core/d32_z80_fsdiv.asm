@@ -63,10 +63,8 @@ PUBLIC md32_fsdiv, md32_fsinv
 
     add hl,hl                   ; sign in C
     ld a,h
-;   ex af,af                    ; save exponent and sign in C in af'
-    push af                     ; XXX remove when af' recovered from mulu_64_32x32
+    push af                     ; save exponent and sign in C
 
-    ld a,h
     or a                        ; divide by zero?
     jr Z,fdbyzero
 
@@ -253,8 +251,7 @@ PUBLIC md32_fsdiv, md32_fsinv
     set 0,h
 
 .fd4
-;   ex af,af                    ; recover y exponent and sign in C from af'
-    pop af                      ; XXX remove
+    pop af                      ; recover y exponent and sign in C
     rr b                        ; save sign in b
     sub a,0x7f                  ; calculate new exponent for 1/y
     neg
