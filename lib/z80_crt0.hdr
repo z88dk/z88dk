@@ -205,7 +205,6 @@
 
 	; 64 bit float ABI
 	EXTERN	l_f64_load
-	EXTERN	l_f64_store
 	EXTERN	l_f64_add
 	EXTERN	l_f64_sub
 	EXTERN	l_f64_mul
