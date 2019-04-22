@@ -16,7 +16,7 @@
 ;        defw callee return address
 ;        defb 8,left hand	; -> FPARG
 ;	   FA = right hand	; -> FPREG
-fp_setup_arith:
+___mbf64_setup_arith:
 	ld	hl,___mbf64_FA
 	ld	de,___mbf64_FPARG
 	ld	bc,8

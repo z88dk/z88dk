@@ -14,24 +14,10 @@
 	EXTERN		___mbf64_FPDIV			;DBL_DIV
 	EXTERN		___mbf64_FPCOMPARE		;DECCOMP
 
-	; Single argument C lib functions
-	EXTERN		___mbf64_FPSIN
-	EXTERN		___mbf64_FPCOS
-	EXTERN		___mbf64_FPTAN
-	EXTERN		___mbf64_FPATN
-	EXTERN		___mbf64_FPATN
-	EXTERN		___mbf64_FPEXP
-	EXTERN		___mbf64_FPLOG		;LOG2
-	EXTERN		___mbf64_FPABS
-	EXTERN		___mbf64_FPSQRT
-
-	; Multi argument C lib functinos
-	EXTERN		___mbf64_FPPOWER
-
-
 	; Internal routines
-	EXTERN		fp_setup_single
-	EXTERN		fp_setup_arith
-	EXTERN		fp_setup_comparison
-	EXTERN		fp_return
+	EXTERN		___mbf64_setup_single
+	EXTERN		___mbf64_setup_arith
+	EXTERN		___mbf64_setup_comparison
+	EXTERN		___mbf64_return
+	EXTERN		___mbf64_return_single
 	EXTERN		msbios

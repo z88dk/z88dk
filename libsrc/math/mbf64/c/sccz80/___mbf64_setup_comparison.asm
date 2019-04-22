@@ -2,7 +2,7 @@
 
 	SECTION		code_fp_mbf64
 
-	PUBLIC		fp_setup_comparison
+	PUBLIC		___mbf64_setup_comparison
 
 	INCLUDE		"mbf64.def"
 
@@ -16,7 +16,7 @@
 ;        defw callee return address
 ;        defb 8,left hand	; -> FPREG
 ;	   FA = right hand	; -> FPARG
-fp_setup_comparison:
+___mbf64_setup_comparison:
         ld      hl,___mbf64_FA
         ld      de,___mbf64_FPREG
         ld      bc,8

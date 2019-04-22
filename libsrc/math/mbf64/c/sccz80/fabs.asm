@@ -1,12 +1,13 @@
 
-        SECTION code_fp_mbfs
+
+        SECTION code_fp_mbf64
 
         PUBLIC  fabs
-        EXTERN  fp_setup_fabsgle
-        EXTERN  ABS
-        EXTERN  fp_return
+
+	EXTERN	___mbf64_FA
+
 
 fabs:
-	call	fp_setup_fabsgle
-	call	ABS
-	jp	fp_return
+	ld	hl,___mbf64_FA + 6
+	res	7,(hl)		;Turn off sign bit
+	ret
