@@ -334,7 +334,7 @@ int getloc(SYMBOL* sym, int off)
 void putmem(SYMBOL* sym)
 {
     if (sym->ctype->kind == KIND_DOUBLE) {
-        if ( c_fp_size == 6 ) {
+        if ( c_fp_size > 4 ) {
             address(sym);
             callrts("dstore");
         } else {
@@ -500,7 +500,7 @@ void putstk(LVALUE *lval)
 
     switch (typeobj) {
     case KIND_DOUBLE:
-        if ( c_fp_size == 6 ) {
+        if ( c_fp_size > 4) {
             mainpop();
             callrts("dstore");
         } else {
@@ -750,7 +750,7 @@ void dpush(void)
         zpush();
     } else {
         callrts("fpush");
-        Zsp -= 6;
+        Zsp -= c_fp_size;
     }
 }
 
@@ -798,7 +798,7 @@ int push_function_argument_fnptr(Kind expr, Type *type, int push_sdccchar, int i
     } else if (expr == KIND_DOUBLE) {
         dpush_under(KIND_INT);
         mainpop();
-        return 6;
+        return c_fp_size;
     } else if (expr == KIND_STRUCT ) {
         // 13 bytes
         swap();    // de = address of struct

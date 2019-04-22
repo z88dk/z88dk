@@ -21,6 +21,6 @@
 	defc	___mbf64_FPARG	= $8534
 	defc	___mbf64_VALTYP = $838e
 
-	EXTERN	l_jpix
-	PUBLIC	msbios
-	defc	msbios = l_jpix
+;	EXTERN	l_jpix
+	;PUBLIC	msbios
+;;	defc	msbios = l_jpix

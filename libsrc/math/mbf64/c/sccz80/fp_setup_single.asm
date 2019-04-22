@@ -15,7 +15,7 @@ fp_setup_single:
 	ld	hl,___mbf64_FA
 	ld	de,___mbf64_FPREG
 	ld	bc,8
-	ld	a,c
+	ld	a,5
 	ld	(___mbf64_VALTYP),a
 	ldir
 	pop	hl	;return

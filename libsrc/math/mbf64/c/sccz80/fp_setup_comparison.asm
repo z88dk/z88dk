@@ -2,6 +2,8 @@
 
 	SECTION		code_fp_mbf64
 
+	PUBLIC		fp_setup_comparison
+
 	INCLUDE		"mbf64.def"
 
 	EXTERN		___mbf64_FA
@@ -9,15 +11,12 @@
 
 ; Put the two arguments into the required places
 ;
-; This is for singlemetic routines, where we need to use 
-; double precision values (so pad them out)
-;
 ; Entry: dehl = right hand operand
 ; Stack: defw return address
 ;        defw callee return address
 ;        defb 8,left hand	; -> FPREG
 ;	   FA = right hand	; -> FPARG
-fp_setup_single:
+fp_setup_comparison:
         ld      hl,___mbf64_FA
         ld      de,___mbf64_FPREG
         ld      bc,8
@@ -26,7 +25,7 @@ fp_setup_single:
         add     hl,sp
         ld      de,___mbf64_FPARG
         ld      bc,8
-	ld	a,c
+	ld	a,5
 	ld	(___mbf64_VALTYP),a
         ldir
 	pop	bc	;ret

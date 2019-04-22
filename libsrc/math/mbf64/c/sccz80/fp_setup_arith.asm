@@ -14,18 +14,18 @@
 ; Entry: dehl = right hand operand
 ; Stack: defw return address
 ;        defw callee return address
-;        defb 8,left hand	; -> FPREG
-;	   FA = right hand	; -> FPARG
+;        defb 8,left hand	; -> FPARG
+;	   FA = right hand	; -> FPREG
 fp_setup_arith:
 	ld	hl,___mbf64_FA
-	ld	de,___mbf64_FPREG
+	ld	de,___mbf64_FPARG
 	ld	bc,8
 	ldir
 	ld	hl,4
 	add	hl,sp
-	ld	de,___mbf64_FPARG
+	ld	de,___mbf64_FPREG
 	ld	bc,8
-	ld	a,c
+	ld	a,5
 	ld	(___mbf64_VALTYP),a
 	ldir
 	pop	bc	;ret

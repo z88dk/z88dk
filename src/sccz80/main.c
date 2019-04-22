@@ -257,6 +257,7 @@ int main(int argc, char** argv)
         type_double = &(Type){ KIND_DOUBLE, 8, 0, .len=1 }; 
         c_fp_exponent_bias = 128;
         c_fp_mantissa_bytes = 7;
+        WriteDefined("CLIB_64BIT_FLOATS", 1);
     } else if ( c_maths_mode == MATHS_Z88 ) {
         c_fp_exponent_bias = 127;
         c_fp_mantissa_bytes = 4;
@@ -600,6 +601,10 @@ void dumplits(
             } else if ( size == 6 ) {
                 defbyte();
                 j = 6;
+                size = 1;
+            } else if ( size == 8 ) {
+                defbyte();
+                j = 8;
                 size = 1;
             } else
                 defword();
