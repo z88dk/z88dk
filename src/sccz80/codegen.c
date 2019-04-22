@@ -79,6 +79,7 @@ struct _mapping {
         { "dpush_under_long", "dpush3", NULL, "l_f64_dpush3" }, // Inlined
         { "dpush_under_int", "dpush2", NULL, "l_f64_dpush2" }, // Inlined
         { "fswap", "dswap", "l_f32_swap", "l_f64_swap" },
+        { "fnegate", "minusfa", NULL, "l_f64_negate" },
         { NULL }
 };
 
@@ -2753,7 +2754,7 @@ void neg(LVALUE* lval)
            ol("ld\te,a");
            break;
         default:
-            callrts("minusfa");
+            callrts("fnegate");
         }
         break;
     default:
