@@ -3,13 +3,13 @@
         PUBLIC  atan
 	INCLUDE	"mbf64.def"
 
-        EXTERN  fp_setup_single
+        EXTERN  ___mbf64_setup_single
         EXTERN  ___mbf32_ATN
         EXTERN  ___mbf64_return_single
         EXTERN  msbios
 
 atan:
-        call    fp_setup_single
+        call    ___mbf64_setup_single
         ld      ix,___mbf32_ATN
         call    msbios
         jp      ___mbf64_return_single

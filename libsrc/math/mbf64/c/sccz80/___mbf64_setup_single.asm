@@ -11,7 +11,7 @@
 ; Used for the routines which accept single precision
 ;
 ; Entry: FA = operand
-fp_setup_single:
+___mbf64_setup_single:
 	ld	hl,___mbf64_FA
 	ld	de,___mbf64_FPREG
 	ld	bc,8

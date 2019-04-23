@@ -9,9 +9,9 @@
 ; Return the value that's in the the FPREG
 ; We're in 64 bit mode so we have to copy to FA
 ___mbf64_return_single:
-	ld	hl,___mbf64_FPREG
-	ld	de,___mbf64_FA + 4
-	ld	bc,4
+	ld	hl,___mbf64_FPREG 
+	ld	de,___mbf64_FA 
+	ld	bc,8
 	ldir
 	; Clear the least significant digits
 	ld	hl,0
