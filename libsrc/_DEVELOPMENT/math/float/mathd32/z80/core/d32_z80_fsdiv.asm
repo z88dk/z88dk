@@ -84,7 +84,7 @@ PUBLIC md32_fsdiv, md32_fsinv
 
                                 ; calculate w[0] - 5 bits
     ld a,h
-	rra                         ; calculate w[0] table offset for 32 Byte table
+    rra                         ; calculate w[0] table index for 32 Byte table
 	rra
     and    0x1f                 ; a = 000mmmmm
 
@@ -118,8 +118,8 @@ ELSE
 
     EXTERN l_mulu_16_16x8
     ld l,d
-    ld d,0
-    call l_mulu_16_16x8
+    ld h,0
+    call l_mulu_16_16x8         ; hl*e => hl, w[0]^2 in hl
 
 ENDIF
 ENDIF

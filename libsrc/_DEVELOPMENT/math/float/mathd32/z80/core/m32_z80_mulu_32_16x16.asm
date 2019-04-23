@@ -24,9 +24,8 @@ EXTERN l_mulu_32_16x16
 PUBLIC m32_mulu_32_16x16
 
 .m32_mulu_32_16x16
-    ex de,hl    
-    ld d,b
-    ld e,c
+    ld h,b
+    ld l,c
 
     ; compute:  dehl = hl * de
     ; alters :  af, bc, de, hl

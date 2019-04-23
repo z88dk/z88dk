@@ -14,7 +14,7 @@
 ;
 ; exit  : dehl = 32-bit product
 ;
-; uses  : af, bc, de, hl, bc', de', hl'
+; uses  : af, bc, de, hl, af', bc', de', hl'
 
 SECTION code_clib
 SECTION code_math
