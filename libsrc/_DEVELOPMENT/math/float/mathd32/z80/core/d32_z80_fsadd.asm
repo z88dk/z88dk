@@ -59,6 +59,8 @@ PUBLIC md32_fsnormalize
 
 ; enter here for floating add, x+y, x on stack, y in bcde, result in bcde
 .md32_fsadd
+
+IF 0
     ld h,b
     ld l,c
 
@@ -589,4 +591,8 @@ PUBLIC md32_fsnormalize
    ld a,-18
    ld e,d
    jp normdone1                 ; worst case S8H
+
+ENDIF
+
+    ret
 
