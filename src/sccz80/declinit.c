@@ -264,7 +264,7 @@ constdecl:
             if (dump) {
                 /* struct member or array of pointer to char */
                 if ( type->kind == KIND_DOUBLE ) {
-                    unsigned char  fa[6];
+                    unsigned char  fa[MAX_MANTISSA_SIZE+1];
                     int      i;
                     /* It was a float, lets parse the float and then dump it */
                     if ( c_double_strings ) { 
