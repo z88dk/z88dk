@@ -16,7 +16,7 @@ EXTERN cd32_sdcc_dread2, md32_fsmul, cd32_sdcc_dret
     ;
     ; exit  : DEHL = sdcc_float(left*right)
     ;
-    ; uses  : af, bc, de, hl
+    ; uses  : af, bc, de, hl, af', bc', de', hl'
 
     call cd32_sdcc_dread2
 

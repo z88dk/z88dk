@@ -1,0 +1,9 @@
+math/float/mathd32/c/sccz80/cd32_sccz80_dload
+math/float/mathd32/c/sccz80/cd32_sccz80_dread
+math/float/mathd32/c/sccz80/cd32_sccz80_dret
+math/float/mathd32/c/sccz80/cd32_sccz80_dsneg
+math/float/mathd32/c/sccz80/cd32_sccz80_dsadd
+math/float/mathd32/c/sccz80/cd32_sccz80_dsmul
+math/float/mathd32/c/sccz80/cd32_sccz80_dsinv
+math/float/mathd32/c/sccz80/cd32_sccz80_dsdiv
+

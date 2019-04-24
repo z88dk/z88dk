@@ -44,7 +44,7 @@
 ;   = 24 bits significant + 1 bit shift + 7 bits rounding
 ;
 ;-------------------------------------------------------------------------
-; worst case run time FIXME clocks
+; FIXME clocks
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
@@ -65,7 +65,7 @@ PUBLIC md32_fsmul
 
     exx                         ; first h' = eeeeeeee, lde' = 1mmmmmmm mmmmmmmm mmmmmmmm
 
-    ld hl,0x02                  ; get second operand off of the stack
+    ld hl,002h                  ; get second operand off of the stack
     add hl,sp
     ld e,(hl)
     inc hl
@@ -89,7 +89,7 @@ PUBLIC md32_fsmul
     or a                        ; second exponent zero then result is zero
     jp Z,fmzero
 
-    sub a,0x7f                  ; subtract out bias, so when exponents are added only one bias present
+    sub a,07fh                  ; subtract out bias, so when exponents are added only one bias present
     jr C,fmchkuf
 
     exx
@@ -253,7 +253,7 @@ PUBLIC md32_fsmul
     ret                         ; done
 
 .fmzero
-    ld b,0x00
+    ld b,0
     ld c,b
     ld d,b
     ld e,b
@@ -261,9 +261,9 @@ PUBLIC md32_fsmul
 
 .mulovl
     ex af,af                    ; get sign
-    and a,0x7f                  ; set INF
+    and a,07fh                  ; set INF
     ld b,a
-    ld c,0x80
-    ld de,0x0000
+    ld c,080h
+    ld de,0
     ret                         ; done overflow
 

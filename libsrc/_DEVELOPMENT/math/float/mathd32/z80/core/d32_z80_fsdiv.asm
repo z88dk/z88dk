@@ -33,14 +33,13 @@
 ; to create the initial guess w[0] = 48/17 - 32/17 * y where 0.5 <= y <= 1.0
 ;
 ;-------------------------------------------------------------------------
-; FIXME clocks worst case (close to average case)
+; FIXME clocks
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_math
 
 EXTERN md32_fsmul, m32_mulu_32_16x16, m32_mulu_32h_32x32
-
 
 PUBLIC md32_fsdiv, md32_fsinv
 
@@ -85,8 +84,8 @@ PUBLIC md32_fsdiv, md32_fsinv
                                 ; calculate w[0] - 5 bits
     ld a,h
     rra                         ; calculate w[0] table index for 32 Byte table
-	rra
-    and    0x1f                 ; a = 000mmmmm
+    rra
+    and 01fh                    ; a = 000mmmmm
 
     ld hl,_divtable
     ld d,0
@@ -95,7 +94,6 @@ PUBLIC md32_fsdiv, md32_fsinv
 
     ld d,(hl)                   ; w[0] fixed 1.7 with 5 bits accuracy in d, e
     ld e,d
-
                                 ; calculate w[1] - 8 bits
 
     ld h,d                      ; w[0] with 5 bits accuracy in hl
@@ -140,10 +138,9 @@ ENDIF
     xor a
     sbc hl,de                   ; w[0] + w[0] - w[0]*w[0]*y
                                 ; w[1] with 8 bits accuracy in hl
-    
+
                                 ; calculate w[2] in hlde - 14 bits
 
-    
     ld b,h                      ; w[1] msw in bc
     ld c,l
 
@@ -192,11 +189,9 @@ ENDIF
 
     pop hl                      ; w[1]*2 msw in hl
     sbc hl,bc                   ; w[1]*2 msw - w[1]^2*y msw - C
-
                                 ; w[2] with 14 bits accuracy in hlde
 
                                 ; calculate w[3] in hlde - 26 bits
-
     ld b,h
     ld c,l
             
@@ -251,7 +246,6 @@ ENDIF
 
     pop hl                      ; w[2]*2 msw in hl
     sbc hl,bc                   ; w[2]*2 msw - w[2]^2*y msw - C
-
                                 ; w[3] with 26 bits accuracy in hlde
 
     ex de,hl                    ; 1/y mantissa in dehl
@@ -260,7 +254,7 @@ ENDIF
     rl e
     rl d
 
-    ld a,l                      ; round number using norm's method
+    ld a,l                      ; round number using digi norm's method
     or a
     jr Z,fd4
     set 0,h
@@ -268,13 +262,13 @@ ENDIF
 .fd4
     pop af                      ; recover y exponent and sign in C
     rr b                        ; save sign in b
-    sub a,0x7f                  ; calculate new exponent for 1/y
+    sub a,07fh                  ; calculate new exponent for 1/y
     neg
-    add a,0x7e
+    add a,07eh
 
     rl b                        ; recover sign from b
 
-    rra                         ; pack result
+    rra                         ; pack 1/y result into bcde
     ld b,a
     ld c,d
     ld d,e

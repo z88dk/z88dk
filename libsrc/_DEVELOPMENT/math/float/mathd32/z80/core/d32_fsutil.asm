@@ -14,13 +14,14 @@ PUBLIC md32_fszero
 PUBLIC md32_fsmin
 PUBLIC md32_fsmax
 
+; here to negate a number in bcde
 .md32_fsneg
     ld a,b
     xor 080h
     ld b,a
     ret
 
-; here to out a legal zero
+; here to return a legal zero in bcde
 .md32_fszero
     ld bc,0
     ld d,c
@@ -33,7 +34,7 @@ PUBLIC md32_fsmax
     call md32_fszero
     jr eexit
 
-; here to change overflow to floating infinity of sign in B
+; here to change overflow to floating infinity of sign b in bcde
 .md32_fsmax
     ld a,b
     or 07fh                 ; max exponent

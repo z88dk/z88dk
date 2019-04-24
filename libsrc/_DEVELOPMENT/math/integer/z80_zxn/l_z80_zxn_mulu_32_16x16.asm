@@ -1,5 +1,4 @@
-
-INCLUDE "config_private.inc"
+; 2018 July feilipu
 
 SECTION code_clib
 SECTION code_math

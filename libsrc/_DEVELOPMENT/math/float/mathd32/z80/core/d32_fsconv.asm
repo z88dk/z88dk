@@ -29,7 +29,7 @@ EXTERN md32_normalize
 ; now convert long in bcde to float in bcde
 .md32_Bl_Bf
    bit 	7,b 					; test sign, neg if neg
-   jr 	z,.blbf2
+   jr 	Z,blbf2
    bool 	hl
    rr 	hl
    or 	a  					; clc
@@ -38,7 +38,7 @@ EXTERN md32_normalize
    ld 	hl,0
    sbc 	hl,bc
 ;   jp 	novf,.blbf1
-   jp   po,.blbf1
+   jp   PO,blbf1
 ;---
 ; here negation of 0x80000000 = -2^31 = 0xcf000000
    ld 	bc,0cf00h
@@ -49,7 +49,7 @@ EXTERN md32_normalize
 .md32_Bg_Bf   				; convert unsigned long in bcde to float in bcde
    ld 	h,b					; put working copy of unsigned MSB into h
    res	7,b					; ensure unsigned long's "sign" bit is reset
-   jr	.bgbf0				; continue, with unsigned long number in hcde
+   jr	bgbf0				; continue, with unsigned long number in hcde
 
 .md32_Hc_Bf 				; convert character in l to float in bcde
    ld 	h,0
@@ -65,14 +65,14 @@ EXTERN md32_normalize
    ld 	c,150 				; exponent if no shift
    ld 	a,h
    or 	a
-   jr 	nz,.blbfright		; go shift right
+   jr 	NZ,blbfright		; go shift right
 ; exponent in c, sign in b
    ex 	af,af'				; set carry off
    jp 	md32_normalize  	; piggy back on existing code
 ; must shift right
 .blbfright
 ;  jp 	novf,.blbf4  		; shift right  1-4
-   jp   po,.blbf4
+   jp   PO,blbf4
 ;---
 ; here shift right 4-8
    rr 	hl
@@ -91,25 +91,25 @@ EXTERN md32_normalize
 .blbf4
    ld 	a,h
    or 	a
-   jr 	z,.blbf8 				; done right
+   jr 	Z,blbf8 				; done right
    rr 	hl
    rr 	de
    inc 	c
    ld 	a,h
    or 	a
-   jr 	z,.blbf8
+   jr 	Z,blbf8
    rr 	hl
    rr 	de
    inc 	c
    ld 	a,h
    or 	a
-   jr 	z,.blbf8
+   jr 	Z,blbf8
    rr 	hl
    rr 	de
    inc 	c
    ld 	a,h
    or 	a
-   jr 	z,.blbf8
+   jr 	Z,blbf8
    rr 	hl
    rr 	de
    inc 	c

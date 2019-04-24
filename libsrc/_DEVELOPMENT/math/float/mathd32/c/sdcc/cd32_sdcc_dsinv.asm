@@ -14,9 +14,9 @@ EXTERN cd32_sdcc_dread1, md32_fsinv, cd32_sdcc_dret
     ;
     ; enter : stack = sdcc_float number, ret
     ;
-    ; exit  : DEHL = sdcc_float(-number)
+    ; exit  : DEHL = sdcc_float(1/number)
     ;
-    ; uses  : af, bc, de, hl
+    ; uses  : af, bc, de, hl, af', bc', de', hl'
 
     call cd32_sdcc_dread1
 
