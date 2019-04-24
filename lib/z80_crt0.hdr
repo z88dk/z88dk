@@ -215,6 +215,7 @@
 	EXTERN	l_f64_gt
 	EXTERN	l_f64_eq
 	EXTERN	l_f64_ne
+	EXTERN	l_f64_negate
 	EXTERN	l_f64_swap
 	EXTERN	l_f64_store
 	EXTERN	l_f64_dpush
