@@ -3,6 +3,7 @@
 
 	PUBLIC		___mbf64_discard_fraction
 
+	EXTERN		___mbf64_set_zero
 	EXTERN		___mbf64_FA
 
 ; Discard the fractional part of a floating point number
@@ -13,7 +14,7 @@
 ___mbf64_discard_fraction:
         ld      a,(___mbf64_FA + 7)
 	sub	$81
-	jr	c,return_zero
+	jp	c,___mbf64_set_zero
 	cp	56
 	ret	nc		;No shifts needed, all integer
 	ld	b,a
@@ -42,15 +43,3 @@ calc_mask:
 	and	(hl)
 	ld	(hl),a
 	ret
-
-return_zero:
-	ld	b,8	
-	ld	hl,___mbf64_FA
-zero_1:
-	ld	(hl),0
-	inc	hl
-	djnz	zero_1
-	ret
-
-
-
