@@ -18,7 +18,7 @@
 @locale/locale.lst
 @math/math_integer.lst
 @math/math_integer_z180.lst
-@math/math_float_sdcc_iy.lst
+@math/math_float_sdcc_iy_z180.lst
 @network/network_sdcc_iy.lst
 @setjmp/setjmp_sdcc_iy.lst
 @stdio/stdio_sdcc_iy.lst

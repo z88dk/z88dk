@@ -49,7 +49,7 @@ SECTION code_math
 
 PUBLIC md32_fssub
 PUBLIC md32_fsadd
-PUBLIC md32_fsnormalize
+;PUBLIC md32_fsnormalize
 
 ; enter here for floating subtract, x-y x on stack, y in bcde
 .md32_fssub
@@ -61,6 +61,7 @@ PUBLIC md32_fsnormalize
 .md32_fsadd
 
 IF 0
+
     ld h,b
     ld l,c
 
@@ -593,6 +594,4 @@ IF 0
    jp normdone1                 ; worst case S8H
 
 ENDIF
-
     ret
-

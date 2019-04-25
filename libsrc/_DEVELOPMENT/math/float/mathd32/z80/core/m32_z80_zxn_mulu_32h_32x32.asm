@@ -7,7 +7,10 @@
 ;
 ;------------------------------------------------------------------------------
 ;
-; multiplication of two 32-bit numbers into a 32-bit product
+; multiplication of two 32-bit numbers into the high bytes of 64-bit product
+;
+; NOTE THIS IS NOT A TRUE MULTIPLY.
+; Carry in from low bytes is not calculated.
 ;
 ; enter : dehl  = 32-bit multiplier   = x
 ;         dehl' = 32-bit multiplicand = y

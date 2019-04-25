@@ -6,7 +6,7 @@ SECTION code_math
 
 PUBLIC cd32_sccz80_dsadd
 
-EXTERN cd32_sccz80_dread, md32_fsadd, cd32_sccz80_dret
+EXTERN cd32_sccz80_dread, cd32_sccz80_dload, md32_fsadd, cd32_sccz80_dret
 
 .cd32_sccz80_dsadd
 
