@@ -10,13 +10,16 @@ PUBLIC cd32_sccz80_dload
     ;
     ; Convert stack from sccz80_float format to d32_float.
     ;
+    ; MUST be called with the alternate registers set,
+    ; so sccz80_float right is preserved in primary registers.
+    ;
     ; enter : stack = sccz80_float left, ret
     ; enter : DEHL = sccz80_float right
     ;
     ; enter : stack = sccz80_float left, ret, d32_float left
     ; exit  : DEHL = sccz80_float right
     ; 
-    ; uses  : af, bc, de, hl
+    ; uses  : af, bc', de', hl'
 
     pop hl                  ; ret from here
     pop af                  ; ret

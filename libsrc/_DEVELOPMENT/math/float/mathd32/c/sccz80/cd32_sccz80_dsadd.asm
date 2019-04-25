@@ -13,7 +13,7 @@ EXTERN cd32_sccz80_dread, cd32_sccz80_dload, md32_fsadd, cd32_sccz80_dret
     ; add two sccz80 floats
     ;
     ; enter : stack = sccz80_float left, ret
-    ;          BCDE = sccz80_float right
+    ;          DEHL = sccz80_float right
     ;
     ; exit  :  DEHL = sccz80_float(left+right)
     ;
