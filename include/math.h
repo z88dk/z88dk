@@ -24,6 +24,7 @@ extern double_t __LIB__ sinh(double_t);  /* hyperbolic sine */
 extern double_t __LIB__ sqrt(double_t);  /* square root */
 extern double_t __LIB__ tan(double_t);   /* tangent */
 extern double_t __LIB__ tanh(double_t);  /* hyperbolic tangent */
+extern double_t __LIB__ modf(double_t, double_t) __smallc; /* Modulus */
 #define log2(a) (log(a)/M_LN2)
 
 #ifndef _HAVE_ATOF_
