@@ -205,7 +205,7 @@ PUBLIC md32_fsmul
     ld a,h                      ; ab*de mswh
     adc a,e                     ; ab*f msw + de*c msw carry
     ld h,a
-    
+
     ld e,d
     ld d,c                      ; exit  : HLDE  = 32-bit product
 
