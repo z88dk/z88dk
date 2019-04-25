@@ -789,6 +789,8 @@ void import_from_bitmap( const char *file )
 	char c;
 	char xsz[10];
 	char ysz[10];
+	char pos[10];
+	int maxy;
 	int pixel;
 	char row[1000];
 	char foo[10];
@@ -875,6 +877,7 @@ void import_from_bitmap( const char *file )
 		}
 		
 		fseek(fpin,0L,SEEK_SET);
+		maxy=0;
 		
 		fscanf(fpin,"%s",row);
 		if ((!strcmp(row,"STARTFONT"))||(!strncmp(row,"COMMENT",8))) {
@@ -892,12 +895,14 @@ void import_from_bitmap( const char *file )
 						fgets(row,sizeof(row),fpin);
 						if (!strncmp(row, "ENDFONT",7)) exitflag=1;
 					}
-					sscanf(row,"%s %s %s",foo,xsz,ysz);
+					sscanf(row,"%s %s %s %s %s",foo,xsz,ysz,foo,pos);
 					sprite[ on_sprite + spcount ].size_x = g = atoi(xsz);
 					sprite[ on_sprite + spcount ].size_y = atoi(ysz);
 					if (g%8) {g=g/8+1;}
 					else g=g/8;
 				}
+				
+				if (maxy < sprite[ on_sprite + spcount ].size_y)  maxy = sprite[ on_sprite + spcount ].size_y;
 				
 				if (!exitflag) {
 					while (strncmp(row, "BITMAP",3) && (!feof(fpin)))
@@ -914,13 +919,21 @@ void import_from_bitmap( const char *file )
 						}
 					}
 				}
+				
+				/* **HACK** (BDF font import), remove this code to exclude vertical shifting */
+				for (b=sprite[ on_sprite + spcount ].size_y; b<(maxy-atoi(pos)); b++) {
+					sprite[ on_sprite + spcount ].size_y++;
+					for ( y = sprite[ on_sprite + spcount ].size_y; y > 0 ; y-- )
+						for ( x = 1; x <= sprite[ on_sprite + spcount ].size_x; x++ )
+							sprite[ on_sprite + spcount ].p[ x ][ y ] = sprite[ on_sprite + spcount ].p[ x ][ y - 1 ];
+				}
 
 				/* **HACK** (BDF font import), remove this code for fixed height font */
 				/* Adjust font height */
 				b=0;
-				sprite[ on_sprite  + spcount ].size_y++;
+				sprite[ on_sprite + spcount ].size_y++;
 				while (b == 0) {
-					sprite[ on_sprite  + spcount ].size_y--;
+					sprite[ on_sprite + spcount ].size_y--;
 					for ( x = sprite[ on_sprite + spcount ].size_x; x > 0 ; x-- )
 						if (sprite[ on_sprite + spcount ].p[ x ][ sprite[ on_sprite + spcount ].size_y ] != 0) b=1;
 					if (sprite[ on_sprite + spcount ].size_y <= 1) b=1;
