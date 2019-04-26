@@ -6,9 +6,7 @@ SECTION code_math
 
 PUBLIC cd32_sccz80_dsmul
 
-EXTERN cd32_sccz80_dread, cd32_sccz80_dload, md32_fsmul, cd32_sccz80_dret
-
-.cd32_sccz80_dsmul
+EXTERN md32_fsmul
 
     ; multiply two sccz80 floats
     ;
@@ -19,17 +17,6 @@ EXTERN cd32_sccz80_dread, cd32_sccz80_dload, md32_fsmul, cd32_sccz80_dret
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-    call cd32_sccz80_dread
-
-    exx
-    call cd32_sccz80_dload
-    exx
-
-    call md32_fsmul         ; enter stack = d32_float left
-                            ;        BCDE = d32_float right
-                            ; return BCDE = d32_float
-    pop af
-    pop af
-
-    jp cd32_sccz80_dret     ; return DEHL = sccz80_float
-
+DEFC  cd32_sccz80_dsmul = md32_fsmul    ; enter stack = d32_float left
+                                        ;        DEHL = d32_float right
+                                        ; return DEHL = d32_float

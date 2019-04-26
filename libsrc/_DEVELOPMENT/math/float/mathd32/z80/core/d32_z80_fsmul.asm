@@ -55,10 +55,9 @@ EXTERN m32_mulu_32_16x16
 PUBLIC md32_fsmul
 
 .md32_fsmul
-    ld h,b                      ; BCDE -> HLDE
-    ld l,c
-    ld a,h                      ; put sign bit into A
+    ex de,hl                    ; DEHL -> HLDE
 
+    ld a,h                      ; put sign bit into A
     add hl,hl                   ; shift exponent into H
     scf                         ; set implicit bit
     rr l                        ; shift msb into mantissa
@@ -239,31 +238,31 @@ PUBLIC md32_fsmul
 .fm3c
     ex af,af
 
-    ld e,d                      ; put mantissa in place into CDE
-    ld d,l
-    ld c,h
+    ld e,h                      ; put 24 bit mantissa in place, HLD into EHL
+    ld h,l
+    ld l,d
 
     rra                         ; adjust the sign and exponent
     jr C,fm4
-    res 7,c                     ; clear the implicit bit when doesn't match lsb of exp
+    res 7,e                     ; clear the implicit bit when doesn't match lsb of exp
 
 .fm4
     or b
-    ld b,a                      ; put sign and 7 msbs into place
-    ret                         ; done
+    ld d,a                      ; put sign and 7 msbs into place in D
+    ret                         ; return DEHL
 
 .fmzero
-    ld b,0
-    ld c,b
-    ld d,b
-    ld e,b
+    ld d,0
+    ld e,d
+    ld h,d
+    ld l,d
     ret                         ; done zero
 
 .mulovl
     ex af,af                    ; get sign
     and a,07fh                  ; set INF
-    ld b,a
-    ld c,080h
-    ld de,0
+    ld d,a
+    ld e,080h
+    ld hl,0
     ret                         ; done overflow
 

@@ -50,17 +50,16 @@ PUBLIC md32_fsdiv, md32_fsinv
 
 
 .fdbyzero
-    ld  bc,0xff80               ; divide by zero -> INF
-    ld  de,0x0000
-    rr  b
+    ld  de,0xff80               ; divide by zero -> INF
+    ld  hl,0x0000
+    rr  d
     ret
 
 
 .md32_fsinv
-    ld  h,b
-    ld  l,c
+    ex de,hl                    ; DEHL -> HLDE
 
-    add hl,hl                   ; sign in C
+    add hl,hl                   ; sign into C
     ld a,h
     push af                     ; save exponent and sign in C
 
@@ -268,15 +267,15 @@ ENDIF
 
     rl b                        ; recover sign from b
 
-    rra                         ; pack 1/y result into bcde
-    ld b,a
-    ld c,d
-    ld d,e
-    ld e,h
+    rra                         ; pack 1/y result from a-deh into dehl
+    ld l,h
+    ld h,e
+    ld e,d
+    ld d,a
 
     ret C
-    res 7,c                     ; clear exponent lsb if it is 0
-    ret
+    res 7,e                     ; clear exponent lsb if it is 0
+    ret                         ; return DEHL
 
 SECTION rodata_clib
 

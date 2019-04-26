@@ -9,22 +9,22 @@
 ;-------------------------------------------------------------------------
 ; F_add - Rabbit floating point add
 ;-------------------------------------------------------------------------
-; 1) first section: unpack from F_add: to sort: 78 clocks
+; 1) first section: unpack from F_add: to sort:
 ;    one unpacked number in hldebc the other in hl'de'bc'
 ;    unpacked format: h==0; mantissa= lde, sign in b, exponent in c
 ;         in addition af' holds  b xor b' used to test if add or sub needed
 ;
 ; 2) second section: sort from sort to align, sets up smaller number in hldebc and larger in hl'de'bc'
 ;    This section sorts out the special cases:
-;       to alignzero - if no alignment (right) shift needed (11 clocks)
+;       to alignzero - if no alignment (right) shift needed
 ;           alignzero has properties: up to 23 normalize shifts needed if signs differ
 ;                                     not know which mantissa is larger for different signs until sub performed
 ;                                     no alignment shifts needed
-;       to alignone  - if one alignment shift needed (31 clocks)
+;       to alignone  - if one alignment shift needed
 ;           alignone has properties: up to 23 normalize shifts needed if signs differ
 ;                                    mantissa aligned is always smaller than other mantissa
 ;                                    one alignment shift needed
-;       to align     - 2 to 23 alignment shifts needed (40 clocks)
+;       to align     - 2 to 23 alignment shifts needed
 ;           numbers aligned 2-23 have properties: max of 1 normalize shift needed
 ;                                                 mantissa aligned always smaller
 ;                                                 2-23 alignment shifts needed
@@ -33,12 +33,12 @@
 ; 3) third section alignment - aligns smaller number mantissa with larger mantissa
 ;    This section does the right shift. Lost bits shifted off, are tested. Up to 8 lost bits
 ;    are used for the test. If any are non-zero a one is or'ed into remaining mantissa bit 0.
-;      align 2-23 - worst case 101 clocks (right shift by 7 with lost bits)
+;      align 2-23 - worst case right shift by 7 with lost bits
 ; 4) 4th section add or subtract
 ;
-; 5) 5th section post normalize - worst case 76 clocks for 7 left
+; 5) 5th section post normalize
 ;
-; 6) 6th section pack up - 41 clocks
+; 6) 6th section pack up
 ;
 ;-------------------------------------------------------------------------
 ; FIXME clocks
@@ -51,16 +51,16 @@ PUBLIC md32_fssub
 PUBLIC md32_fsadd
 PUBLIC md32_fsnormalize
 
-; enter here for floating subtract, x-y x on stack, y in bcde
+; enter here for floating subtract, x-y x on stack, y in dehl
 .md32_fssub
-    ld a,b                      ; toggle the sign bit for subtraction
+    ld a,d                      ; toggle the sign bit for subtraction
     xor 080h
-    ld b,a
+    ld d,a
 
 ; enter here for floating add, x+y, x on stack, y in bcde, result in bcde
 .md32_fsadd
-    ld h,b
-    ld l,c
+    ex de,hl                    ; DEHL -> HLDE
+    ld b,h                      ; place op1.s in b[7]
 
     add hl,hl                   ; unpack op1
     ld c,h                      ; save op1.e in c
@@ -72,8 +72,7 @@ PUBLIC md32_fsnormalize
 
 .faunp1
     rr l                        ; rotate in op1.m's implicit bit
-
-    ld a,b                      ; place op1.e in a
+    ld a,b                      ; place op1.s in a[7]
 
     exx
 
@@ -114,7 +113,7 @@ PUBLIC md32_fsnormalize
     exx
     cp a,c                      ; nc if a>=c
     jp Z,alignzero              ; no alignment mantissas equal
-    jr NC,sort2                 ; if a larger then c
+    jr NC,sort2                 ; if a larger than c
     ld a,c
     exx
 .sort2
@@ -144,7 +143,7 @@ PUBLIC md32_fsnormalize
     rr l
     rr d
     rr e
-    srl h
+    rr h
     rr l
     rr d
     rr e
@@ -155,15 +154,15 @@ PUBLIC md32_fsnormalize
     rr l
     rr d
     rr e
-    srl h
+    rr h
     rr l
     rr d
     rr e
-    srl h
+    rr h
     rr l
     rr d
     rr e
-    srl h
+    rr h
     rr l
     rr d
     rr e
@@ -189,10 +188,11 @@ PUBLIC md32_fsnormalize
 ; toss lost bits in a which are remote for 16 shift
 ; consider only lost bits in d and h
     ld e,l
-    ld a,d
+    ld a,d                        ; lost bits
     ld d,0
-    ld hl,0                     ; hl zero
-    or a                        ; NZ if any lost bits
+    or a,h
+    ld h,d                      ; hl zero
+    ld l,d
     jr Z,aldone
     set 0,e                     ; lost bits
     jr aldone
@@ -271,23 +271,22 @@ PUBLIC md32_fsnormalize
     rl b
     rr h
     rr l
-    ld b,h
-    ld c,l
-    ret                         ; lret
+    ex de,hl                    ; return DEHL
+    ret
 
 .foverflow
     ld a,b
     and 080h
     or 07fh
-    ld b,a
-    ld c,0ffh
-    ld de,0ffffh                ; max number
+    ld d,a
+    ld e,0ffh
+    ld hl,0ffffh                ; max number
     scf                         ; error
     ret
 
 ; here one alignment needed
 .alignone                       ; from fadd
-    srl h
+    rr h
     rr l
     rr d
     rr e
@@ -353,23 +352,17 @@ PUBLIC md32_fsnormalize
     xor a
     or l
     jr Z,fa8a
-;   jp novf,S24L
-    jp PO,S24L                  ; shift 24 bits, most significant in low nibble
-;---     
+    jp PO,S24L                  ; shift 24 bits, most significant in low nibble   
     jr S24H                     ; shift 24 bits in high
 .fa8a
     or d
     jr Z,fa8b
-;   jp novf,S16L                ; shift 16 bits in low nibble
-    jp PO,S16L
-;---
+    jp PO,S16L                  ; shift 16 bits in low nibble
     jp S16H                     ; shift 16 bits in high
 .fa8b
     or e
     jp Z,normzero               ;  all zeros
-;   jp novf,S8L
     jp PO,S8L
-;---
     jp S8H
 
 .S24H                           ; shift 24 bits 0 to 3 left, count in c
@@ -422,10 +415,9 @@ PUBLIC md32_fsnormalize
     rla
     sla e
     rl d
-    rl a                         ; different shift, 4 clocks, sets flags
-;   jp novf,S24L4more
+    rl a                         ; different shift (not rla) sets flags
     jp PO,S24L4more              ; if still no bits in high nibble, total of 7 shifts
-;---
+
     sla e
     rl d
     rla
@@ -490,29 +482,26 @@ PUBLIC md32_fsnormalize
     rra
     rr l
     ld h,a                      ; exponent
-    ld b,h
-    ld c,l
+    ex de,hl                    ; return DEHL
     ex af,af
     ret
 
 .normzero                       ; return zero
     ld hl,0
-    ex de,hl
-    ld b,d
-    ld c,e
+    ld d,h
+    ld e,l
     ex af,af
     ret
 
 ; all bits in lower 4 bits of e (bits 0-3 of mantissa)
 ; shift 8 bits 4-7 bits left
 ; a has e, l, d=zero
-.S8L                            ; 30  - worst 76 clocks to get past this section
+.S8L
     rla
     rla
     rl a                        ; different shift rr a not rra, sets novf flag if upper 4 bits zero
-;   jp novf,S8L4more
     jp PO,S8L4more              ; if total is 7
-;---
+
     rla                         ; guaranteed
     rla                         ; 5th shift
     jr C,S8Lover1               ; if overshift
@@ -548,7 +537,6 @@ PUBLIC md32_fsnormalize
     ld a,-23
     jr normdone1
 
-; worst 73 clocks to get past this section
 ; shift 16 bit fraction by 4-7
 ; d is copied to a, l is zero, number in de
 .S16L
@@ -558,9 +546,8 @@ PUBLIC md32_fsnormalize
     rl d
     sla e
     rl d                        ; 3 shifts
-;   jp novf,S16L4more
     jp PO,S16L4more             ; if still not bits n upper after 3
-;---
+
     sla e
     rl d                        ; guaranteed shift 4
     jp M,S16L4                  ; complete at 4
@@ -580,7 +567,7 @@ PUBLIC md32_fsnormalize
     ld l,d
     ld d,e
     ld e,0
-    jp   normdone1
+    jp normdone1
 
 .S16L5                          ; for total of 5 shifts left
     ld a,-13
@@ -646,7 +633,7 @@ PUBLIC md32_fsnormalize
     ld e,0
     jp normdone1
 ;
-; shift 8 left 0-3  worst case 71 clocks to get past this section
+; shift 8 left 0-3
 ; number in a,e, l, d==zero
 .S8H
     rla

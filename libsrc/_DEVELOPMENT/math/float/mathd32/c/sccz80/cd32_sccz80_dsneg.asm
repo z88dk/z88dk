@@ -4,11 +4,9 @@
 SECTION code_clib
 SECTION code_math
 
-PUBLIC cd32_sccz80_fsneg
+PUBLIC cd32_sccz80_dsneg
 
-EXTERN cd32_sccz80_dread, md32_fsneg, cd32_sccz80_dret
-
-.cd32_sccz80_fsneg
+EXTERN md32_fsneg
 
     ; negate sccz80 floats
     ;
@@ -19,11 +17,6 @@ EXTERN cd32_sccz80_dread, md32_fsneg, cd32_sccz80_dret
     ;
     ; uses  : af, bc, de, hl
 
-    call cd32_sccz80_dread
-
-    call md32_fsneg         ; enter stack = ret
-                            ;        BCDE = d32_float
-                            ; return BCDE = d32_float
-   
-
-    jp cd32_sccz80_dret     ; return DEHL = sccz80_float
+DEFC  cd32_sccz80_dsneg = md32_fsneg    ; enter stack = ret
+                                        ;        DEHL = d32_float
+                                        ; return DEHL = d32_float

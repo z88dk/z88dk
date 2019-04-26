@@ -6,7 +6,7 @@ SECTION code_math
 
 PUBLIC cd32_sdcc_dssub
 
-EXTERN cd32_sdcc_dread2, md32_fssub, cd32_sdcc_dret
+EXTERN cd32_sdcc_dreadr, md32_fssub, cd32_sdcc_dret
 
 .cd32_sdcc_dssub
 
@@ -18,14 +18,9 @@ EXTERN cd32_sdcc_dread2, md32_fssub, cd32_sdcc_dret
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-    call cd32_sdcc_dread2
+    call cd32_sdcc_dreadr
 
-    call md32_fssub         ; enter stack = sdcc_float right, sdcc_float left, ret, d32_float left
-                            ;        BCDE = d32_float right
-                            ; return BCDE = d32_float
-
-    pop af                  ; discard d32_float left
-    pop af
-
-    jp cd32_sdcc_dret       ; return DEHL = sdcc_float
+    jp md32_fssub           ; enter stack = sdcc_float right, sdcc_float left, ret
+                            ;        DEHL = sdcc_float right
+                            ; return DEHL = sdcc_float
 
