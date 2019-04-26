@@ -417,7 +417,6 @@ PUBLIC md32_fsnormalize
     rl d
     rl a                         ; different shift (not rla) sets flags
     jp PO,S24L4more              ; if still no bits in high nibble, total of 7 shifts
-
     sla e
     rl d
     rla
@@ -547,7 +546,6 @@ PUBLIC md32_fsnormalize
     sla e
     rl d                        ; 3 shifts
     jp PO,S16L4more             ; if still not bits n upper after 3
-
     sla e
     rl d                        ; guaranteed shift 4
     jp M,S16L4                  ; complete at 4
@@ -609,10 +607,11 @@ PUBLIC md32_fsnormalize
     ld d,e
     ld e,0
     ld a,-11
-    jp   normdone1
+    jp normdone1
 
 .S16H1                          ; overshift
     rr d
+    rr e
     ld l,d
     ld d,e
     ld a,-8
@@ -632,7 +631,7 @@ PUBLIC md32_fsnormalize
     ld a,-10
     ld e,0
     jp normdone1
-;
+
 ; shift 8 left 0-3
 ; number in a,e, l, d==zero
 .S8H
