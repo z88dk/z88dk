@@ -6,7 +6,7 @@ SECTION code_math
 
 PUBLIC cd32_sdcc_dsneg
 
-EXTERN cd32_sdcc_dreadl, md32_fsneg, cd32_sdcc_dret
+EXTERN cd32_sdcc_dreadl, md32_fsneg
 
 .cd32_sdcc_dsneg
 

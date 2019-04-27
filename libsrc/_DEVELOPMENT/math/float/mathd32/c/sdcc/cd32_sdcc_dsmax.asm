@@ -1,25 +1,25 @@
 
-; float __fsinv (float number)
+; float __fsmax (float number)
 
 SECTION code_clib
 SECTION code_math
 
-PUBLIC cd32_sdcc_dsinv
+PUBLIC cd32_sdcc_dsmax
 
-EXTERN cd32_sdcc_dreadl, md32_fsinv
+EXTERN cd32_sdcc_dreadl, md32_fsmax
 
-.cd32_sdcc_dsinv
+.cd32_sdcc_dsmax
 
-    ; negate sdcc floats
+    ; convert sdcc float to infinity with correct sign
     ;
     ; enter : stack = sdcc_float number, ret
     ;
-    ; exit  : DEHL = sdcc_float(1/number)
+    ; exit  : DEHL = sdcc_float(infinity)
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
     call cd32_sdcc_dreadl
 
-    jp md32_fsinv           ; enter stack = sdcc_float, ret
+    jp md32_fsmax           ; enter stack = sdcc_float, ret
                             ;        DEHL = sdcc_float
                             ; return DEHL = sdcc_float

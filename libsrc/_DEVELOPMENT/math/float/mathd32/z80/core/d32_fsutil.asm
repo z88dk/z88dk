@@ -14,18 +14,18 @@ PUBLIC md32_fszero
 PUBLIC md32_fsmin
 PUBLIC md32_fsmax
 
-; here to negate a number in bcde
+; here to negate a number in dehl
 .md32_fsneg
-    ld a,b
+    ld a,d
     xor 080h
-    ld b,a
+    ld d,a
     ret
 
-; here to return a legal zero in bcde
+; here to return a legal zero in dehl
 .md32_fszero
-    ld bc,0
-    ld d,c
-    ld e,c
+    ld de,0
+    ld h,d
+    ld l,d
     or a
     ret
 
@@ -34,13 +34,13 @@ PUBLIC md32_fsmax
     call md32_fszero
     jr eexit
 
-; here to change overflow to floating infinity of sign b in bcde
+; here to change overflow to floating infinity of sign d in dehl
 .md32_fsmax
-    ld a,b
+    ld a,d
     or 07fh                 ; max exponent
-    ld b,a
-    ld c,080h               ;floating infinity
-    ld de,0
+    ld d,a
+    ld e,080h               ;floating infinity
+    ld hl,0
 
 .eexit
     scf                     ; C for error

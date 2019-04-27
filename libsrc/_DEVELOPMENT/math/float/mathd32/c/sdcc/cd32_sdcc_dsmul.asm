@@ -6,7 +6,7 @@ SECTION code_math
 
 PUBLIC cd32_sdcc_dsmul
 
-EXTERN cd32_sdcc_dreadr, md32_fsmul, cd32_sdcc_dret
+EXTERN cd32_sdcc_dreadr, md32_fsmul
 
 .cd32_sdcc_dsmul
 

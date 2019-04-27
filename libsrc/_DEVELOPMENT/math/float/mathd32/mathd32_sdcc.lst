@@ -1,6 +1,11 @@
 math/float/mathd32/c/sdcc/cd32_sdcc_dload
 math/float/mathd32/c/sdcc/cd32_sdcc_dread
+
 math/float/mathd32/c/sdcc/cd32_sdcc_dsneg
+math/float/mathd32/c/sdcc/cd32_sdcc_dsmin
+math/float/mathd32/c/sdcc/cd32_sdcc_dsmax
+math/float/mathd32/c/sdcc/cd32_sdcc_dszero
+
 math/float/mathd32/c/sdcc/cd32_sdcc_dsadd
 math/float/mathd32/c/sdcc/cd32_sdcc_dssub
 math/float/mathd32/c/sdcc/cd32_sdcc_dsmul

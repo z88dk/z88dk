@@ -6,7 +6,7 @@ SECTION code_math
 
 PUBLIC cd32_sdcc_dssub
 
-EXTERN cd32_sdcc_dreadr, md32_fssub, cd32_sdcc_dret
+EXTERN cd32_sdcc_dreadr, md32_fssub
 
 .cd32_sdcc_dssub
 
