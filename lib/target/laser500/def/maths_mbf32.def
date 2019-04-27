@@ -14,6 +14,7 @@
 	PUBLIC	___mbf32_LOG
 	PUBLIC	___mbf32_ABS
 	PUBLIC	___mbf32_SQR
+	PUBLIC	___mbf32_EXP
 	PUBLIC	___mbf32_FPINT
 	PUBLIC	___mbf32_FPREG
 	PUBLIC	___mbf32_FPEXP
@@ -36,6 +37,7 @@
 	defc	___mbf32_ATN	= $4c61
 	defc	___mbf32_LOG     = $3ac0
 	defc	___mbf32_ABS	= $3c57
+	defc	___mbf32_EXP	= $4a63
 
 	defc	___mbf32_SQR	= $49fe
 
