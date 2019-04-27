@@ -7,7 +7,6 @@ target/multi8/gencon/generic_console_vpeek
 target/multi8/gencon/conio_vars
 target/multi8/gencon/conio_map_colour
 target/multi8/gencon/CRT_FONT
-target/multi8/maths_mbf32
 @font/font_8x8/font_8x8.lst
 target/multi8/tape_load
 target/multi8/asm_tape_load

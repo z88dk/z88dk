@@ -26,7 +26,7 @@
 	defc	___mbf32_FPADD	= $0716
 	defc	___mbf32_SUBCDE	= $0713
 	defc	___mbf32_FPMULT	= $0847
-	defc	___mbf32_DVBCDE  = $08a2 + 2
+	defc	___mbf32_DVBCDE  = $08a2
 
 	defc	___mbf32_CMPNUM	= $0a0c
 	defc	___mbf32_BNORM	= $0765	; normalise bcde and place in FPREG (b must have reg)
@@ -35,7 +35,7 @@
 	defc	___mbf32_SIN	= $1547
 	defc	___mbf32_TAN	= $15a8
 	defc	___mbf32_ATN	= $15bd
-	defc	___mbf32_LOG     = $0809
+	defc	___mbf32_LOG    = $0809
 	defc	___mbf32_ABS	= $0977
 	defc	___mbf32_EXP	= $1439
 
@@ -48,7 +48,7 @@
 	defc	___mbf32_FPREG	= $4121
 	defc	___mbf32_FPEXP	= $4124
 	defc	___mbf32_FPSIGN	= $4125
-	defc	___mbf32_VALTYP 	= $838e
+	defc	___mbf32_VALTYP	= $40af	
 
 	EXTERN	l_jpix
 	PUBLIC	msbios

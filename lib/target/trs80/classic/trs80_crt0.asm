@@ -59,7 +59,7 @@ ENDIF
         defc    TAR__clib_exit_stack_size = 32
 	INCLUDE	"crt/classic/crt_rules.inc"
 
-	INCLUDE	"target/trs80/def/maths_mbf32.def"
+	INCLUDE	"target/trs80/def/maths_mbf.def"
 
 	org     CRT_ORG_CODE
 

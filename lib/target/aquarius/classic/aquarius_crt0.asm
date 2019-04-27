@@ -34,7 +34,7 @@
 
 
 	IF startup = 1 
-		INCLUDE "target/aquarius/def/maths_mbf32.def"
+		INCLUDE "target/aquarius/def/maths_mbf.def"
 		INCLUDE	"target/aquarius/classic/ram.asm"
         ELSE
 		INCLUDE	"target/aquarius/classic/rom.asm"

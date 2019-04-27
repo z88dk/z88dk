@@ -9,8 +9,6 @@ target/laser500/gencon/fputc_cons
 target/laser500/gencon/conio_map_colour
 target/laser500/gencon/bordercolour
 target/laser500/gencon/CRT_FONT
-target/laser500/maths_mbf32
-target/laser500/maths_mbf64
 @stdio/stdio.lst
 @font/font_8x8/font_8x8.lst
 @input/input_keyboard.lst

@@ -33,6 +33,7 @@
 IF startup = 2
 	INCLUDE	"target/laser500/classic/rom.asm"
 ELSE
+	INCLIDE	"target/laser500/def/maths_mbf.def"
 	INCLUDE	"target/laser500/classic/ram.asm"
 ENDIF
 
