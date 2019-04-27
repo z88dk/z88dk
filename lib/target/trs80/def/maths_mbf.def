@@ -55,4 +55,22 @@
 	defc	msbios = l_jpix
 
 
+; Double precision entry points
+        PUBLIC  ___mbf64_FPADD
+        PUBLIC  ___mbf64_FPSUB
+        PUBLIC  ___mbf64_FPMUL
+        PUBLIC  ___mbf64_FPDIV
+        PUBLIC  ___mbf64_FPCOMPARE
+        PUBLIC  ___mbf64_FPREG
+        PUBLIC  ___mbf64_FPARG
+        PUBLIC  ___mbf64_VALTYP
 
+        defc    ___mbf64_FPADD  = $0c77
+        defc    ___mbf64_FPSUB  = $0c70
+        defc    ___mbf64_FPMUL  = $0da1
+        defc    ___mbf64_FPDIV  = $0de5
+        defc    ___mbf64_FPCOMPARE = $0a78
+
+        defc    ___mbf64_FPREG  = ___mbf32_FPREG - 4
+        defc    ___mbf64_FPARG  = $4127
+        defc    ___mbf64_VALTYP = ___mbf32_VALTYP
