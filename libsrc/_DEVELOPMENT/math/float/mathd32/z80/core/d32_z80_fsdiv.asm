@@ -1,5 +1,5 @@
 ;
-;  2019 April feilipu
+;  feilipu, 2019 April
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -39,7 +39,7 @@
 SECTION code_clib
 SECTION code_math
 
-EXTERN md32_fsmul, m32_mulu_32_16x16, m32_mulu_32h_32x32
+EXTERN md32_fsmax, md32_fsmul, m32_mulu_32_16x16, m32_mulu_32h_32x32
 
 PUBLIC md32_fsdiv, md32_fsinv
 
@@ -47,13 +47,6 @@ PUBLIC md32_fsdiv, md32_fsinv
 .md32_fsdiv
     call md32_fsinv
     jp md32_fsmul
-
-
-.fdbyzero
-    ld  de,0xff80               ; divide by zero -> INF
-    ld  hl,0x0000
-    rr  d
-    ret
 
 
 .md32_fsinv
@@ -64,7 +57,7 @@ PUBLIC md32_fsdiv, md32_fsinv
     push af                     ; save exponent and sign in C
 
     or a                        ; divide by zero?
-    jr Z,fdbyzero
+    jp Z,md32_fsmax
 
     scf                         ; restore implicit bit
     rr l                        ; h = eeeeeeee, lde = 1mmmmmmm mmmmmmmm mmmmmmmm
@@ -255,10 +248,10 @@ ENDIF
 
     ld a,l                      ; round number using digi norm's method
     or a
-    jr Z,fd4
+    jr Z,fd0
     set 0,h
 
-.fd4
+.fd0
     pop af                      ; recover y exponent and sign in C
     rr b                        ; save sign in b
     sub a,07fh                  ; calculate new exponent for 1/y

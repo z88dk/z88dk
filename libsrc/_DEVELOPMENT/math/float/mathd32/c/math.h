@@ -1,98 +1,122 @@
-/*
-   Copyright (c) 2015 Digi International Inc.
+/*-------------------------------------------------------------------------
+   math.h: Floating point math function declarations
 
-   This Source Code Form is subject to the terms of the Mozilla Public
-   License, v. 2.0. If a copy of the MPL was not distributed with this
-   file, You can obtain one at http://mozilla.org/MPL/2.0/.
-*/
+   Copyright (C) 2001, Jesus Calvino-Fraga, jesusc@ieee.org
 
-/*
-	C90 - 7.5 Mathematics
-*/
+   This library is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
 
-#ifndef __MATH_H
-#define __MATH_H
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
 
-	#define HUGE_VAL    		(float)3.00e38
+   You should have received a copy of the GNU General Public License
+   along with this library; see the file COPYING. If not, write to the
+   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
 
-	// Support functions used as a basis for other functions in math.h
-	double pow2(double x);
-	double log2(double x);
+   As a special exception, if you link this library with other files,
+   some of which are compiled with SDCC, to produce an executable,
+   this library does not by itself cause the resulting executable to
+   be covered by the GNU General Public License. This exception does
+   not however invalidate any other reasons why the executable file
+   might be covered by the GNU General Public License.
+-------------------------------------------------------------------------*/
 
-	// Non-ANSI macros used by Dynamic C
-	#define BADTAN          (float)1.560796327
-	#define EXPLARGE        (float)89.80081863
-	#define INF             (float)3.00e38
-	#define IPIby180        (float)57.29577951
-	#define LNof10          (float)2.302585093
-	#define LOG2            (float)0.30102999567
-	#define LOGE            (float)0.43429448190
-	#define PI              (float)3.14159265359
-	#define PIby180         (float)0.0174532925
-	#define PIbyTWO         (float)1.570796326795
-	#define POW10INF        (float)38.0
-	#define SQR10           (float)3.162277660168
-	#define TWObyPI         (float)0.63661977
+/* Version 1.0 - Initial release */
 
-	// C90 - 7.5.2 Trigonometric functions
-	double acos(double x);
-	double asin(double x);
-	double atan(double x);
-	double atan2(double y, double x);
-	double cos(double x);
-	double sin(double x);
-	double tan(double x);
+#ifndef _INC_MATH
+#define _INC_MATH
 
-	// C90 - 7.5.3 Hyperbolic functions
-	double cosh(double x);
-	double sinh(double x);
-	double tanh(double x);
+#define CHAR_BIT    8    /* bits in a char */
+#define SCHAR_MAX   127
+#define SCHAR_MIN  -128
+#define UCHAR_MAX   0xff
 
-	// C90 - 7.5.4 Exponential and logarithmic functions
-	double exp(double x);
-	double frexp(double value, int *exp);
-	double ldexp(double x, int exp);
-	double log(double x);
-	double log10(double x);
-	double modf(double value, double *iptr);
+#define INT_MIN     (-32767 - 1)
+#define INT_MAX     32767
+#define SHRT_MAX    INT_MAX
+#define SHRT_MIN    INT_MIN
+#define UINT_MAX    0xffff
+#define UINT_MIN    0
+#define USHRT_MAX   UINT_MAX
+#define USHRT_MIN   UINT_MIN
+#define LONG_MIN    (-2147483647L-1)
+#define LONG_MAX    2147483647L
+#define ULONG_MAX   0xffffffff
+#define ULONG_MIN   0
 
-	// C90 - 7.5.5 Power functions
-	double pow(double x, double y);
-	double sqrt(double x);
+#define LLONG_MIN   (-9223372036854775807LL-1)
+#define LLONG_MAX   9223372036854775807LL
+#define ULLONG_MAX  18446744073709551615ULL
 
-	// C90 - 7.5.6 Nearest integer, absolute value, and remainder functions
-	double ceil(double x);
-	double fabs(double x);
-	double floor(double x);
-	double fmod(double x, double y);
+#define HUGE_VALF   3.402823466e+38
 
-	// C99 - float equivalents to all C90 functions in math.lib
-	float acosf(float x);
-	float asinf(float x);
-	float atanf(float x);
-	float atan2f(float y, float x);
-	float cosf(float x);
-	float sinf(float x);
-	float tanf(float x);
-	float coshf(float x);
-	float sinhf(float x);
-	float tanhf(float x);
-	float expf(float x);
-	float frexpf(float value, int *exp);
-	float ldexpf(float x, int exp);
-	float logf(float x);
-	float log10f(float x);
-	float modff(float value, float *iptr);
-	float powf(float x, float y);
-	float sqrtf(float x);
-	float ceilf(float x);
-	float fabsf(float x);
-	float floorf(float x);
-	float fmodf(float x, float y);
+#define PI          3.1415926536
+#define TWO_PI      6.2831853071
+#define HALF_PI     1.5707963268
+#define QUART_PI    0.7853981634
+#define iPI         0.3183098862
+#define iTWO_PI     0.1591549431
+#define TWO_O_PI    0.6366197724
 
-	// Note that Dynamic C does not support the "long double" type, so there
-	// is no need to declare long double versions of each function.
+// Non-ANSI macros
+#define BADTAN          (float)1.560796327
+#define EXPLARGE        (float)89.80081863
+#define INF             (float)3.00e38
+#define IPIby180        (float)57.29577951
+#define LNof10          (float)2.302585093
+#define LOG2            (float)0.30102999567
+#define LOGE            (float)0.43429448190
+#define PI              (float)3.14159265359
+#define PIby180         (float)0.0174532925
+#define PIbyTWO         (float)1.570796326795
+#define POW10INF        (float)38.0
+#define SQR10           (float)3.162277660168
+#define TWObyPI         (float)0.63661977
 
-	#use "math.c"
+union float_long
+{
+    float f;
+    long l;
+};
 
-#endif
+/**********************************************
+ * Prototypes for float ANSI C math functions *
+ **********************************************/
+
+/* Trigonometric functions */
+float sinf(float x);
+float cosf(float x);
+float tanf(float x);
+float cotf(float x);
+float asinf(float x);
+float acosf(float x);
+float atanf(float x);
+float atan2f(float x, float y);
+
+/* Hyperbolic functions */
+float sinhf(float x);
+float coshf(float x);
+float tanhf(float x);
+
+/* Exponential, logarithmic and power functions */
+float expf(float x);
+float logf(float x);
+float log10f(float x);
+float powf(float x, float y);
+float sqrtf(float a);
+
+/* Nearest integer, absolute value, and remainder functions */
+float fabsf(float x);
+float frexpf(float x, int *pw2);
+float ldexpf(float x, int pw2);
+float ceilf(float x);
+float floorf(float x);
+float modff(float x, float * y);
+float fmodf(float x, float y);
+
+#endif  /* _INC_MATH */

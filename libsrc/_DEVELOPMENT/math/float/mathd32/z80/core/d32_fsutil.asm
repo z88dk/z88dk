@@ -43,6 +43,6 @@ PUBLIC md32_fsmax
     ld hl,0
 
 .eexit
-    scf                     ; C for error
+    scf                     ; C set for error
     ret
 

@@ -8,6 +8,14 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 Rabbit Semiconductor Rabbit Floating Point Package (ZFPP)
 -------------------------------------------------------------------------
 
+            MODIFIED TO USE SCCZ80 CALLING CONVENTION
+            
+               LHS STACK - RHS DEHL -> RETURN DEHL
+
+
+feilipu, April 2019
+-------------------------------------------------------------------------
+
 Floating point format (compatible with Intel/ IEEE, etc.) is as follows:
 
     seeeeeee emmmmmmm mmmmmmmm mmmmmmmm (s-sign, e-exponent, m-mantissa)
@@ -36,55 +44,55 @@ examples of numbers:
 Calling Sequences for floating point numbers
 
 example X=Y*Z;
-    ld    de,(Y)   least part
-    ld    bc,(Y+2) most part
-    push  bc
+    ld    hl,(Y)   least part
+    ld    de,(Y+2) most part
     push  de
-    ld    de,(Z)
-    ld    bc,(Z+2)
+    push  hl
+    ld    hl,(Z)
+    ld    de,(Z+2)
     call  F_mul
-    ld    (X),de
-    ld    (X+2),bc
+    ld    (X),hl
+    ld    (X+2),de
 
 example X=Y/Z;
-    ld    de,(Y)
-    ld    bc,(Y+2)
-    push  bc
+    ld    hl,(Y)
+    ld    de,(Y+2)
     push  de
-    ld    de,(Z)
-    ld    bc,(Z+2)
+    push  hl
+    ld    hl,(Z)
+    ld    de,(Z+2)
     call  F_div
-    ld    (X),de
-    ld    (X+2),bc
+    ld    (X),hl
+    ld    (X+2),de
 
 example X=Y+Z;
-    ld    de,(Y)
-    ld    bc,(Y+2)
-    push  bc
+    ld    hl,(Y)
+    ld    de,(Y+2)
     push  de
-    ld    de,(Z)
-    ld    bc,(Z+2)
+    push  hl
+    ld    hl,(Z)
+    ld    de,(Z+2)
     call  F_add
-    ld    (X),de
-    ld    (X+2),bc
+    ld    (X),hl
+    ld    (X+2),de
 
 example X=Y-Z;
-    ld    de,(Y)
-    ld    bc,(Y+2)
-    push  bc
+    ld    hl,(Y)
+    ld    de,(Y+2)
     push  de
-    ld    de,(Z)
-    ld    bc,(Z+2)
+    push  hl
+    ld    hl,(Z)
+    ld    de,(Z+2)
     call  F_sub
-    ld    (X),de
-    ld    (X+2),bc
+    ld    (X),hl
+    ld    (X+2),de
 
 example  X=-Z;
-    ld    de,(Z)
-    ld    bc,(Z+2)
+    ld    hl,(Z)
+    ld    de,(Z+2)
      call  F_neg
-    ld    (X),de
-    ld    (X+2),bc
+    ld    (X),hl
+    ld    (X+2),de
 
 The Rabbit Semiconductor floating point package is loosely based on IEEE 754. We
 maintain the packed format, but we do not support denormal numbers or
@@ -217,22 +225,22 @@ Exceptions - range errors
 ;-------------------------------------------------------------------------
 ; F_add - Rabbit floating point add
 ;-------------------------------------------------------------------------
-; 1) first section: unpack from F_add: to sort: 78 clocks
+; 1) first section: unpack from F_add: to sort:
 ;    one unpacked number in hldebc the other in hl'de'bc'
 ;    unpacked format: h==0; mantissa= lde, sign in b, exponent in c
 ;         in addition af' holds  b xor b' used to test if add or sub needed
 ;
 ; 2) second section: sort from sort to align, sets up smaller number in hldebc and larger in hl'de'bc'
 ;    This section sorts out the special cases:
-;       to alignzero - if no alignment (right) shift needed (11 clocks)
+;       to alignzero - if no alignment (right) shift needed
 ;           alignzero has properties: up to 23 normalize shifts needed if signs differ
 ;                                     not know which mantissa is larger for different signs until sub performed
 ;                                     no alignment shifts needed
-;       to alignone  - if one alignment shift needed (31 clocks)
+;       to alignone  - if one alignment shift needed
 ;           alignone has properties: up to 23 normalize shifts needed if signs differ
 ;                                    mantissa aligned is always smaller than other mantissa
 ;                                    one alignment shift needed
-;       to align     - 2 to 23 alignment shifts needed (40 clocks)
+;       to align     - 2 to 23 alignment shifts needed
 ;           numbers aligned 2-23 have properties: max of 1 normalize shift needed
 ;                                                 mantissa aligned always smaller
 ;                                                 2-23 alignment shifts needed
@@ -241,16 +249,15 @@ Exceptions - range errors
 ; 3) third section alignment - aligns smaller number mantissa with larger mantissa
 ;    This section does the right shift. Lost bits shifted off, are tested. Up to 8 lost bits
 ;    are used for the test. If any are non-zero a one is or'ed into remaining mantissa bit 0.
-;      align 2-23 - worst case 101 clocks (right shift by 7 with lost bits)
+;      align 2-23 - worst case right shift by 7 with lost bits.
 ; 4) 4th section add or subtract
 ;
-; 5) 5th section post normalize - worst case 76 clocks for 7 left
+; 5) 5th section post normalize - worst case 7 left
 ;
-; 6) 6th section pack up - 41 clocks
+; 6) 6th section pack up
 ;
 ;-------------------------------------------------------------------------
-; sub small number: unpack (78)+sort(40) + align 7 right (101)+ subtract & norm 1(36  ) + packup (35)=290
-; sub 2 near equal with same exp: unpack(78)+sort(11)+sub(54)+norm(76)+pack(41)=260
+;
 ;-------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------
@@ -332,7 +339,7 @@ Exceptions - range errors
 ; 0 0x80 0xa2ca2d -> 0x4022ca2d
 ;
 ;-------------------------------------------------------------------------
-; worst case run time 315 clocks, about 12.6us at 25mhz
+;
 ;-------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------
@@ -351,7 +358,7 @@ Exceptions - range errors
 ; get 8, 14, and 26. At this point the number is rounded then multiplied
 ; by x using F_mul.
 ;-------------------------------------------------------------------------
-; 845 clocks worst case (close to average case)
+;
 ;-------------------------------------------------------------------------
 
 

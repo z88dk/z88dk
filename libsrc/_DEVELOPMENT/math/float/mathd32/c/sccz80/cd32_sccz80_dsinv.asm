@@ -15,7 +15,7 @@ EXTERN md32_fsinv
     ;
     ; exit  :  DEHL = sccz80_float(1/number)
     ;
-    ; uses  : af, bc, de, hl
+    ; uses  : af, bc, de, hl, af', bc', de', hl'
 
 DEFC  cd32_sccz80_dsinv = md32_fsinv    ; enter stack = ret
                                         ;        DEHL = d32_float
