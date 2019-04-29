@@ -119,6 +119,7 @@ IF __crt_model > 0
 		org	-1
 		defb	0		; control name of data binary
 		SECTION smc_clib
+		SECTION smc_fp
 		SECTION smc_user
 		SECTION data_clib
 		SECTION data_crt
