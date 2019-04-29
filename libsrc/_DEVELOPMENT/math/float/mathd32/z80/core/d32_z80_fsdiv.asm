@@ -151,7 +151,6 @@ ENDIF
     rl b
     adc hl,hl                    ; w[1]^2 in hlbc
 
-
     ld d,b
     ld e,c
     ex de,hl                    ; w[1]^2 in dehl
@@ -165,7 +164,6 @@ ENDIF
     add hl,hl
     rl e
     rl d                        ; w[1]^2*y in dehl
-
 
     ex de,hl                    ; w[1]^2*y in hlde
 
@@ -211,7 +209,6 @@ ENDIF
     rl e
     rl d                        ; w[2]^2 in dehl
 
-
     exx
     pop hl                      ; y lsw in hl'
     pop de                      ; y msw in de'
@@ -221,7 +218,6 @@ ENDIF
     add hl,hl
     rl e
     rl d                        ; w[2]^2*y in dehl
-
 
     ex de,hl                    ; w[2]^2*y in hlde
 

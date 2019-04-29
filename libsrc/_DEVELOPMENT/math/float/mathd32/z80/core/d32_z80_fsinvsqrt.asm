@@ -9,11 +9,11 @@
 ; F_invsqrt - floating point inverse square root
 ;-------------------------------------------------------------------------
 ;
-; Searching for 1/x being the inverse square root of y.
+; Searching for 1/x^0.5 being the inverse square root of y.
 ;
-; x = 1/y^0.5 where 1/y^.5 can be calculated by:
+; x = 1/y^0.5 where 1/y^0.5 can be calculated by:
 ;
-; w[i+1] = w[i]*1.5 - w[i]*w[i]*y/2  where w[0] is approx 1/y^2
+; w[i+1] = w[i]*(1.5 - w[i]*w[i]*y/2) where w[0] is approx 1/y^0.5
 ;
 ;   float InvSqrt(float x)
 ;   {
@@ -52,7 +52,7 @@ PUBLIC md32_fsinvsqrt
     jp Z,md32_fsmax    
     and 080h                    ; negative number?
     jp NZ,md32_fsmax
-    
+
     ld b,d                     ; save original y exponent & mantissa msb
     ld c,e
     
@@ -61,13 +61,15 @@ PUBLIC md32_fsinvsqrt
     scf                         ; restore implicit bit
     rr e                        ; d = eeeeeeee, ehl = 1mmmmmmm mmmmmmmm mmmmmmmm
 
+    ld a,d
+    
     ld d,e                      ; mantissa of y in dehl
     ld e,h
     ld h,l
     ld l,0                      ; dehl = 1mmmmmmm mmmmmmmm mmmmmmmm --------
 
-    push de                     ; y msw on stack for w[1]
-    push hl                     ; y lsw on stack for w[1]
+    push de                     ; y mantissa msw on stack for w[1]
+    push hl                     ; y mantissa lsw on stack for w[1]
 
     ld l,h                      ; original y in bceh
     ld h,e
@@ -99,20 +101,20 @@ PUBLIC md32_fsinvsqrt
     ld e,0                      ; a = eeeeeeee hlde = 1mmmmmmm mmmmmmmm mmmmmmmm --------
 
     ex af,af
-    pop af                      ; y lsw in af'
+    pop af                      ; y mantissa lsw in af'
     ex af,af
 
-    pop bc                      ; y msw in bc
+    pop bc                      ; y mantissa msw in bc
     push af                     ; w[0] exponent on stack
-    push hl                     ; w[0] msw on stack
-    push de                     ; w[0] lsw on stack
-    push bc                     ; y msw on stack
+    push hl                     ; w[0] mantissa msw on stack
+    push de                     ; w[0] mantissa lsw on stack
+    push bc                     ; y mantissa msw on stack
 
     ex af,af
-    push af                     ; y lsw on stack
+    push af                     ; y mantissa lsw on stack
     ex af,af
     
-    ex de,hl                    ; w[0] msw in de, w[0] lsw in hl
+    ex de,hl                    ; w[0].m msw in de, w[0].m lsw in hl
 
     push de
     push hl
@@ -121,67 +123,60 @@ PUBLIC md32_fsinvsqrt
     pop de
     exx
 
-    call m32_mulu_32h_32x32     ; dehl*dehl' => dehl, w[0]^2 in dehl, 1.n * 1.n => 2.n
+    call m32_mulu_32h_32x32     ; dehl*dehl' => dehl, w[0]^2 in dehl
 
     exx
-    pop hl                      ; y lsw in hl'
-    pop de                      ; y msw in de'
+    pop hl                      ; y.m lsw in hl'
+    pop de                      ; y.m msw in de'
+
     exx
 
-    call m32_mulu_32h_32x32     ; dehl*dehl' => dehl, w[0]^2*y in dehl, 2.n * 0.n => 2.n
+    call m32_mulu_32h_32x32     ; dehl*dehl' => dehl, w[0]^2*y in dehl
 
-    ex de,hl                    ; w[0]^2*y/2 in hlde
+    srl d                       ; w[0]^2*y in dehl
+    rr e
+    rr h
+    rr l
 
-    ld b,h                      ; w[0]^2*y/2 in bcde
+    ex de,hl                    ; w[0]^2*y in hlde
+
+    ld b,h                      ; w[0]^2*y in bcde
     ld c,l
 
     xor a
-    ld hl,0                     ; ld hl,0
+    ld h,a
+    ld l,a
     sbc hl,de
     ex de,hl
     
-    ld hl,060h                  ; 1.5 2.n
+    ld h,0c0h                   ; 3.0
+    ld l,a
     sbc hl,bc
-    ex de,hl                    ; 1.5 - w[1]^2*y/2 in dehl, 2.n - 2.n
+    ex de,hl                    ;  3.0 - w[0]^2*y in dehl
+                                ; (3.0 - w[0]^2*y)/2 in dehl
 
     exx
     pop hl                      ; w[0] lsw in hl'
     pop de                      ; w[0] msw in de'
     exx
 
-    call m32_mulu_32h_32x32     ; dehl*dehl' => dehl, w[0]^2*y in dehl 2.n * 1.n => 3.n
+    call m32_mulu_32h_32x32     ; dehl*dehl' => dehl, w[0]*(3 - w[0]^2*y)/2 in dehl
+
+    add hl,hl
+    rl e
+    rl d
+    add hl,hl
+    rl e
+    rl d
+
+    ld a,l                      ; round number using digi norm's method
+    or a
+    jr Z,fis1
+    set 0,h
+.fis1
 
     pop af                      ; recover w[0] exponent
-    inc a                       ; adjust for 3.n => 2.n
 
-    bit 7,d                     ; normalise mantissa
-    jr NZ,fis0
-    dec a
-    add hl,hl
-    rl e
-    rl d
-    bit 7,d
-    jr NZ,fis0
-    dec a
-    add hl,hl
-    rl e
-    rl d
-    bit 7,d
-    jr NZ,fis0
-    dec a
-    add hl,hl
-    rl e
-    rl d
-    bit 7,d
-    jr NZ,fis0
-    dec a
-    add hl,hl
-    rl e
-    rl d
-
-.fis0
-
-    ld b,l
     ld l,h                      ; pack 1/y^0.5 result from a-deh into dehl
     ld h,e
     ld e,d
@@ -189,12 +184,6 @@ PUBLIC md32_fsinvsqrt
     srl a
     rr e
     ld d,a
-
-    ld a,b                      ; round number using digi norm's method
-    or a
-    jr Z,fis1
-    set 0,l
-.fis1
 
     ret                         ; return DEHL
 
