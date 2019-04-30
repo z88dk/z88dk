@@ -52,7 +52,24 @@ SECTION code_math
 
 EXTERN m32_mulu_32_16x16
 
-PUBLIC md32_fsmul
+PUBLIC md32_fsmul, md32_fsmul_callee
+
+.md32_fsmul_callee
+    ex de,hl                    ; DEHL -> HLDE
+
+    ld a,h                      ; put sign bit into A
+    add hl,hl                   ; shift exponent into H
+    scf                         ; set implicit bit
+    rr l                        ; shift msb into mantissa
+
+    exx                         ; first h' = eeeeeeee, lde' = 1mmmmmmm mmmmmmmm mmmmmmmm
+
+    pop bc                      ; pop return address
+    pop de                      ; get second operand off of the stack
+    pop hl                      ; hlde = seeeeeee emmmmmmm mmmmmmmm mmmmmmmm
+    push bc                     ; return address on stack
+    jr fmrejoin
+
 
 .md32_fsmul
     ex de,hl                    ; DEHL -> HLDE
@@ -75,6 +92,7 @@ PUBLIC md32_fsmul
     ld h,(hl)
     ld l,c                      ; hlde = seeeeeee emmmmmmm mmmmmmmm mmmmmmmm
 
+.fmrejoin
     xor a,h                     ; xor exponents
     ex af,af                    ; save sign flag in a7' and f' reg
 

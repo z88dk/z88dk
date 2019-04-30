@@ -39,17 +39,23 @@
 SECTION code_clib
 SECTION code_math
 
-EXTERN md32_fsmax, md32_fsmul, m32_mulu_32_16x16, m32_mulu_32h_32x32
+EXTERN md32_fsmul, md32_fsmul_callee
+EXTERN md32_fsmax_fastcall, m32_mulu_32_16x16, m32_mulu_32h_32x32
 
-PUBLIC md32_fsdiv, md32_fsinv
+PUBLIC md32_fsdiv, md32_fsdiv_callee
+PUBLIC md32_fsinv_fastcall
 
 
 .md32_fsdiv
-    call md32_fsinv
+    call md32_fsinv_fastcall
     jp md32_fsmul
 
 
-.md32_fsinv
+.md32_fsdiv_callee
+    call md32_fsinv_fastcall
+    jp md32_fsmul_callee
+
+.md32_fsinv_fastcall
     ex de,hl                    ; DEHL -> HLDE
 
     add hl,hl                   ; sign into C
@@ -57,7 +63,7 @@ PUBLIC md32_fsdiv, md32_fsinv
     push af                     ; save exponent and sign in C
 
     or a                        ; divide by zero?
-    jp Z,md32_fsmax
+    jp Z,md32_fsmax_fastcall
 
     scf                         ; restore implicit bit
     rr l                        ; h = eeeeeeee, lde = 1mmmmmmm mmmmmmmm mmmmmmmm

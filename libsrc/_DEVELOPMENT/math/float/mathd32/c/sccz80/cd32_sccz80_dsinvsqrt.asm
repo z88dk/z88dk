@@ -6,7 +6,7 @@ SECTION code_math
 
 PUBLIC cd32_sccz80_dsinvsqrt
 
-EXTERN md32_fsinvsqrt
+EXTERN md32_fsinvsqrt_fastcall
 
     ; negate sccz80 floats
     ;
@@ -17,6 +17,6 @@ EXTERN md32_fsinvsqrt
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-DEFC  cd32_sccz80_dsinvsqrt = md32_fsinvsqrt    ; enter stack = ret
-                                                ;        DEHL = d32_float
-                                                ; return DEHL = d32_float
+DEFC  cd32_sccz80_dsinvsqrt = md32_fsinvsqrt_fastcall   ; enter stack = ret
+                                                        ;        DEHL = d32_float
+                                                        ; return DEHL = d32_float

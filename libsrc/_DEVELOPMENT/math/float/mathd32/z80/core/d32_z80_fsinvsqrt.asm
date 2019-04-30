@@ -68,6 +68,26 @@ PUBLIC md32_fsinvsqrt
     ld h,l
     ld l,0                      ; dehl = 1mmmmmmm mmmmmmmm mmmmmmmm --------
 
+;   XXX debug
+if 1
+    push af
+    push hl
+    push de
+    push bc
+    push hl   
+    ex de,hl
+    call asm_phexwd
+    pop hl
+    call asm_phexwd
+    ld l,':'
+    call asm_pchar
+    pop bc
+    pop de
+    pop hl
+    pop af
+endif
+;   XXX end debug
+
     push de                     ; y mantissa msw on stack for w[1]
     push hl                     ; y mantissa lsw on stack for w[1]
 
@@ -88,6 +108,24 @@ PUBLIC md32_fsinvsqrt
     ld hl,05f37h
     sbc hl,bc                   ; (float) w[0] in hlde
 
+;   XXX debug
+if 1
+    push af
+    push hl
+    push de
+    push bc
+    call asm_phexwd
+    ex de,hl
+    call asm_phexwd
+    ld l,CHAR_CR
+    call asm_pchar
+    pop bc
+    pop de
+    pop hl
+    pop af
+endif
+;   XXX end debug
+
                                 ; calculate w[1] in hlde - 26 bits
     sla l
     rl h
@@ -99,6 +137,31 @@ PUBLIC md32_fsinvsqrt
     ld l,d
     ld d,e
     ld e,0                      ; a = eeeeeeee hlde = 1mmmmmmm mmmmmmmm mmmmmmmm --------
+
+;   XXX debug
+if 1
+    push af
+    push hl
+    push de
+    push bc
+    push de
+    push hl
+    ld l,a
+    call asm_phex
+    ld l,'.'
+    call asm_pchar
+    pop hl
+    call asm_phexwd
+    pop hl
+    call asm_phexwd
+    ld l,'>'
+    call asm_pchar
+    pop bc
+    pop de
+    pop hl
+    pop af
+endif
+;   XXX end debug
 
     ex af,af
     pop af                      ; y mantissa lsw in af'
@@ -116,6 +179,26 @@ PUBLIC md32_fsinvsqrt
     
     ex de,hl                    ; w[0].m msw in de, w[0].m lsw in hl
 
+;   XXX debug
+if 1
+    push af
+    push hl
+    push de
+    push bc
+    push hl
+    ex de,hl
+    call asm_phexwd
+    pop hl
+    call asm_phexwd
+    ld l,CHAR_CR
+    call asm_pchar
+    pop bc
+    pop de
+    pop hl
+    pop af
+endif
+;   XXX end debug
+
     push de
     push hl
     exx
@@ -125,9 +208,49 @@ PUBLIC md32_fsinvsqrt
 
     call m32_mulu_32h_32x32     ; dehl*dehl' => dehl, w[0]^2 in dehl
 
+;   XXX debug
+if 1
+    push af
+    push hl
+    push de
+    push bc
+    push hl   
+    ex de,hl
+    call asm_phexwd
+    pop hl
+    call asm_phexwd
+    ld l,'*'
+    call asm_pchar
+    pop bc
+    pop de
+    pop hl
+    pop af
+endif
+;   XXX end debug
+
     exx
     pop hl                      ; y.m lsw in hl'
     pop de                      ; y.m msw in de'
+
+;   XXX debug
+if 1
+    push af
+    push hl
+    push de
+    push bc
+    push hl
+    ex de,hl
+    call asm_phexwd
+    pop hl
+    call asm_phexwd
+    ld l,'='
+    call asm_pchar
+    pop bc
+    pop de
+    pop hl
+    pop af
+endif
+;   XXX end debug
 
     exx
 
@@ -137,6 +260,26 @@ PUBLIC md32_fsinvsqrt
     rr e
     rr h
     rr l
+
+;   XXX debug
+if 1
+    push af
+    push hl
+    push de
+    push bc
+    push hl   
+    ex de,hl
+    call asm_phexwd
+    pop hl
+    call asm_phexwd
+    ld l,'-'
+    call asm_pchar
+    pop bc
+    pop de
+    pop hl
+    pop af
+endif
+;   XXX end debug
 
     ex de,hl                    ; w[0]^2*y in hlde
 
@@ -155,6 +298,28 @@ PUBLIC md32_fsinvsqrt
     ex de,hl                    ;  3.0 - w[0]^2*y in dehl
                                 ; (3.0 - w[0]^2*y)/2 in dehl
 
+;   XXX debug
+if 1
+    push af
+    push hl
+    push de
+    push bc
+    push hl   
+    ex de,hl
+    call asm_phexwd
+    pop hl
+    call asm_phexwd
+    ld l,'*'
+    call asm_pchar
+    ld l,'='
+    call asm_pchar
+    pop bc
+    pop de
+    pop hl
+    pop af
+endif
+;   XXX end debug
+
     exx
     pop hl                      ; w[0] lsw in hl'
     pop de                      ; w[0] msw in de'
@@ -162,12 +327,52 @@ PUBLIC md32_fsinvsqrt
 
     call m32_mulu_32h_32x32     ; dehl*dehl' => dehl, w[0]*(3 - w[0]^2*y)/2 in dehl
 
+;   XXX debug
+if 1
+    push af
+    push hl
+    push de
+    push bc
+    push hl   
+    ex de,hl
+    call asm_phexwd
+    pop hl
+    call asm_phexwd
+    ld l,':'
+    call asm_pchar
+    pop bc
+    pop de
+    pop hl
+    pop af
+endif
+;   XXX end debug
+
     add hl,hl
     rl e
     rl d
     add hl,hl
     rl e
     rl d
+
+;   XXX debug
+if 1
+    push af
+    push hl
+    push de
+    push bc
+    push hl   
+    ex de,hl
+    call asm_phexwd
+    pop hl
+    call asm_phexwd
+    ld l,CHAR_CR
+    call asm_pchar
+    pop bc
+    pop de
+    pop hl
+    pop af
+endif
+;   XXX end debug
 
     ld a,l                      ; round number using digi norm's method
     or a
@@ -177,6 +382,34 @@ PUBLIC md32_fsinvsqrt
 
     pop af                      ; recover w[0] exponent
 
+;   XXX debug
+if 1
+    push af
+
+    ld l,0
+
+    push hl
+    push de
+    push bc
+    push hl
+    push de
+    ld l,a
+    call asm_phex
+    ld l,'.'
+    call asm_pchar
+    pop hl
+    call asm_phexwd
+    pop hl
+    call asm_phexwd
+    ld l,'>'
+    call asm_pchar
+    pop bc
+    pop de
+    pop hl
+    pop af
+endif
+;   XXX end debug
+
     ld l,h                      ; pack 1/y^0.5 result from a-deh into dehl
     ld h,e
     ld e,d
@@ -184,6 +417,26 @@ PUBLIC md32_fsinvsqrt
     srl a
     rr e
     ld d,a
+
+;   XXX debug
+if 1
+    push af
+    push hl
+    push de
+    push bc
+    push hl   
+    ex de,hl
+    call asm_phexwd
+    pop hl
+    call asm_phexwd
+    ld l,CHAR_CR
+    call asm_pchar
+    pop bc
+    pop de
+    pop hl
+    pop af
+endif
+;   XXX end debug
 
     ret                         ; return DEHL
 

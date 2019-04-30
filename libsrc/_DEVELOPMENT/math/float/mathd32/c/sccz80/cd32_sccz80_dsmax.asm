@@ -6,7 +6,7 @@ SECTION code_math
 
 PUBLIC cd32_sccz80_dsmax
 
-EXTERN md32_fsmax
+EXTERN md32_fsmax_fastcall
 
     ; convert sdcc float to infinity with correct sign
     ;
@@ -17,6 +17,6 @@ EXTERN md32_fsmax
     ;
     ; uses  : af, bc, de, hl
 
-DEFC  cd32_sccz80_dsmax = md32_fsmax    ; enter stack = ret
-                                        ;        DEHL = d32_float
-                                        ; return DEHL = d32_float
+DEFC  cd32_sccz80_dsmax = md32_fsmax_fastcall   ; enter stack = ret
+                                                ;        DEHL = d32_float
+                                                ; return DEHL = d32_float

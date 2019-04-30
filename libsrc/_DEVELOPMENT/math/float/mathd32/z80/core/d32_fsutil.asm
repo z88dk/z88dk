@@ -9,20 +9,20 @@
 SECTION code_clib
 SECTION code_math
 
-PUBLIC md32_fsneg
-PUBLIC md32_fszero
-PUBLIC md32_fsmin
-PUBLIC md32_fsmax
+PUBLIC md32_fsneg_fastcall
+PUBLIC md32_fszero_fastcall
+PUBLIC md32_fsmin_fastcall
+PUBLIC md32_fsmax_fastcall
 
 ; here to negate a number in dehl
-.md32_fsneg
+.md32_fsneg_fastcall
     ld a,d
     xor 080h
     ld d,a
     ret
 
 ; here to return a legal zero in dehl
-.md32_fszero
+.md32_fszero_fastcall
     ld de,0
     ld h,d
     ld l,d
@@ -30,19 +30,19 @@ PUBLIC md32_fsmax
     ret
 
 ; here to change underflow to a error floating zero
-.md32_fsmin
-    call md32_fszero
-    jr eexit
+.md32_fsmin_fastcall
+    call md32_fszero_fastcall
+    jr md32_fseexit
 
 ; here to change overflow to floating infinity of sign d in dehl
-.md32_fsmax
+.md32_fsmax_fastcall
     ld a,d
     or 07fh                 ; max exponent
     ld d,a
     ld e,080h               ;floating infinity
     ld hl,0
 
-.eexit
+.md32_fseexit
     scf                     ; C set for error
     ret
 

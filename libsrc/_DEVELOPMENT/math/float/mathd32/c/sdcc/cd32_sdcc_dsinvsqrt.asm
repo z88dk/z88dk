@@ -6,7 +6,7 @@ SECTION code_math
 
 PUBLIC cd32_sdcc_dsinvsqrt
 
-EXTERN cd32_sdcc_dreadl, md32_fsinvsqrt
+EXTERN cd32_sdcc_dreadl, md32_fsinvsqrt_fastcall
 
 .cd32_sdcc_dsinvsqrt
 
@@ -20,6 +20,6 @@ EXTERN cd32_sdcc_dreadl, md32_fsinvsqrt
 
     call cd32_sdcc_dreadl
 
-    jp md32_fsinvsqrt       ; enter stack = sdcc_float, ret
-                            ;        DEHL = sdcc_float
-                            ; return DEHL = sdcc_float
+    jp md32_fsinvsqrt_fastcall  ; enter DEHL = sdcc_float
+                                ;
+                                ; return DEHL = sdcc_float

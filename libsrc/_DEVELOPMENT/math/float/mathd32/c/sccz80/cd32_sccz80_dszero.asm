@@ -6,7 +6,7 @@ SECTION code_math
 
 PUBLIC cd32_sccz80_dszero
 
-EXTERN md32_fszero
+EXTERN md32_fszero_fastcall
 
     ; return a legal zero
     ;
@@ -17,6 +17,6 @@ EXTERN md32_fszero
     ;
     ; uses  : af, bc, de, hl
 
-DEFC  cd32_sccz80_dszero = md32_fszero  ; enter stack = ret
-                                        ;        DEHL = d32_float
-                                        ; return DEHL = d32_float
+DEFC  cd32_sccz80_dszero = md32_fszero_fastcall ; enter stack = ret
+                                                ;        DEHL = d32_float
+                                                ; return DEHL = d32_float

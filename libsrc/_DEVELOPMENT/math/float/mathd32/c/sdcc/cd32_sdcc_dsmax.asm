@@ -6,7 +6,7 @@ SECTION code_math
 
 PUBLIC cd32_sdcc_dsmax
 
-EXTERN cd32_sdcc_dreadl, md32_fsmax
+EXTERN cd32_sdcc_dreadl, md32_fsmax_fastcall
 
 .cd32_sdcc_dsmax
 
@@ -20,6 +20,6 @@ EXTERN cd32_sdcc_dreadl, md32_fsmax
 
     call cd32_sdcc_dreadl
 
-    jp md32_fsmax           ; enter stack = sdcc_float, ret
+    jp md32_fsmax_fastcall  ; enter stack = sdcc_float, ret
                             ;        DEHL = sdcc_float
                             ; return DEHL = sdcc_float

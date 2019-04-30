@@ -49,9 +49,42 @@
 SECTION code_clib
 SECTION code_math
 
-PUBLIC md32_fssub
-PUBLIC md32_fsadd
+PUBLIC md32_fssub, md32_fssub_callee
+PUBLIC md32_fsadd, md32_fsadd_callee
 PUBLIC md32_fsnormalize
+
+
+; enter here for floating subtract callee, x-y x on stack, y in dehl
+.md32_fssub_callee
+    ld a,d                      ; toggle the sign bit for subtraction
+    xor 080h
+    ld d,a
+
+; enter here for floating add callee, x+y, x on stack, y in bcde, result in bcde
+.md32_fsadd_callee
+    ex de,hl                    ; DEHL -> HLDE
+    ld b,h                      ; place op1.s in b[7]
+
+    add hl,hl                   ; unpack op1
+    ld c,h                      ; save op1.e in c
+
+    ld a,h
+    or a
+    jr Z,faunp1_callee          ; add implicit bit if op1.e!=0
+    scf
+
+.faunp1_callee
+    rr l                        ; rotate in op1.m's implicit bit
+    ld a,b                      ; place op1.s in a[7]
+
+    exx
+
+    pop bc                      ; pop return address
+    pop de                      ; get second operand off of the stack
+    pop hl                      ; hlde = seeeeeee emmmmmmm mmmmmmmm mmmmmmmm
+    push bc                     ; return address on stack
+    jp farejoin
+
 
 ; enter here for floating subtract, x-y x on stack, y in dehl
 .md32_fssub
@@ -89,6 +122,7 @@ PUBLIC md32_fsnormalize
     ld h,(hl)
     ld l,c                      ; hlde = seeeeeee emmmmmmm mmmmmmmm mmmmmmmm
 
+.farejoin
     ld b,h                      ; save op2.s in b[7]
 
     add hl,hl                   ; unpack op2

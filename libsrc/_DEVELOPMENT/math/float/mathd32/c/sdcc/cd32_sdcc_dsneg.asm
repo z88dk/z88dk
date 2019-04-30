@@ -6,7 +6,7 @@ SECTION code_math
 
 PUBLIC cd32_sdcc_dsneg
 
-EXTERN cd32_sdcc_dreadl, md32_fsneg
+EXTERN cd32_sdcc_dreadl, md32_fsneg_fastcall
 
 .cd32_sdcc_dsneg
 
@@ -20,6 +20,6 @@ EXTERN cd32_sdcc_dreadl, md32_fsneg
 
     call cd32_sdcc_dreadl
 
-    jp md32_fsneg           ; enter stack = sdcc_float, ret
+    jp md32_fsneg_fastcall  ; enter stack = sdcc_float, ret
                             ;        DEHL = sdcc_float
                             ; return DEHL = sdcc_float
