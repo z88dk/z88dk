@@ -5,6 +5,8 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
+;  feilipu, 2019 April
+;  adapted for z80, z180, and z80-zxn
 ;
 ;-------------------------------------------------------------------------
 ; F_add - Rabbit floating point add
@@ -350,120 +352,119 @@ PUBLIC md32_fsnormalize
 .md32_fsnormalize
 ; now begin normalize
     xor a
-    or l
+    or a,l
     jr Z,fa8a
-    jp PO,S24L                  ; shift 24 bits, most significant in low nibble   
+    and 0f0h
+    jp Z,S24L                   ; shift 24 bits, most significant in low nibble   
     jr S24H                     ; shift 24 bits in high
 .fa8a
-    or d
+    xor a
+    or a,d
     jr Z,fa8b
-    jp PO,S16L                  ; shift 16 bits in low nibble
+    and 0f0h
+    jp Z,S16L                   ; shift 16 bits, most significant in low nibble
     jp S16H                     ; shift 16 bits in high
 .fa8b
-    or e
+    xor a
+    or a,e
     jp Z,normzero               ;  all zeros
-    jp PO,S8L
-    jp S8H
+    and 0f0h
+    jp Z,S8L                    ; shift 8 bits, most significant in low nibble 
+    jp S8H                      ; shift 8 bits in high
 
 .S24H                           ; shift 24 bits 0 to 3 left, count in c
     sla e
     rl d
-    rla
-    jr c,S24H1
+    rl l
+    jr C,S24H1
     sla e
     rl d
-    rla
-    jr c,S24H2
+    rl l
+    jr C,S24H2
     sla e
     rl d
-    rla
-    jr c,S24H3
-    ld l,a                      ; most
+    rl l
+    jr C,S24H3
     ld a,-3                     ; count
     jr normdone1                ; from normalize
 
 .S24H1
-    rra
+    rr l
     rr d
-    rr e                       ; reverse overshift
-    ld l,a
+    rr e                        ; reverse overshift
     ld a,c                      ; zero adjust
     jr normdone1_a
 
 .S24H2
-    rra
+    rr l
     rr d
     rr e
-    ld l,a
     ld a,-1
     jr normdone1
 
 .S24H3
-    rra
+    rr l
     rr d
     rr e
-    ld l,a
     ld a,-2
     jr normdone1
 
 .S24L                           ; shift 24 bits 4-7 left, count in C
     sla e
     rl d
-    rla
+    rl l
     sla e
     rl d
-    rla
+    rl l
     sla e
     rl d
-    rl a                         ; different shift (not rla) sets flags
-    jp PO,S24L4more              ; if still no bits in high nibble, total of 7 shifts
+    rl l                         ; different shift (not rla) sets flags
+    ld a,l
+    and 0f0h
+    jp Z,S24L4more               ; FIXME if still no bits in high nibble, total of 7 shifts
     sla e
     rl d
-    rla
+    rl l
 ; 0, 1 or 2 shifts possible here
     sla e
     rl d
-    rla
+    rl l
     jr C,S24Lover1
     sla e
     rl d
-    rla
-    jr c,S24Lover2
+    rl l
+    jr C,S24Lover2
 ; 6 shift case
-    ld l,a
     ld a,-6
     jr normdone1
 
 .S24L4more
     sla e
     rl d
-    rla
+    rl l
     sla e
     rl d
-    rla
+    rl l
     sla e
     rl d
-    rla
+    rl l
     sla e
     rl d
-    rla
-    ld l,a
+    rl l
     ld a,-7
     jr normdone1
 
 .S24Lover1                      ; total of 4 shifts
-    rra
+    rr l
     rr d
     rr e                        ; correct overshift
-    ld l,a
     ld a,-4
     jr normdone1
 
 .S24Lover2                      ; total of 5 shifts
-    rra
+    rr l
     rr d
     rr e
-    ld l,a
     ld a,-5                     ; this is the very worst case, drop through to .normdone1
 
 ; enter here to continue after normalize
@@ -494,50 +495,51 @@ PUBLIC md32_fsnormalize
 
 ; all bits in lower 4 bits of e (bits 0-3 of mantissa)
 ; shift 8 bits 4-7 bits left
-; a has e, l, d=zero
+; e, l, d=zero
 .S8L
-    rla
-    rla
-    rl a                        ; different shift rr a not rra, sets novf flag if upper 4 bits zero
-    jp PO,S8L4more              ; if total is 7
-
-    rla                         ; guaranteed
-    rla                         ; 5th shift
+    sla e
+    sla e
+    sla e
+    ld a,e
+    and 0f0h
+    jp Z,S8L4more               ; if total is 7
+    sla e                       ; guaranteed
+    sla e                       ; 5th shift
     jr C,S8Lover1               ; if overshift
-    rla                         ; the shift
+    sla e                       ; the shift
     jr C,S8Lover2
 ; total of 6, case 7 already handled
-    ld l,a
+    ld l,e
     ld e,d                      ; zero
     ld a,-22
     jr normdone1
 
 .S8Lover1                       ; total of 4
-    rra
-    ld l,a
+    rr e
+    ld l,e
     ld e,d                      ; zero
     ld a,-20
     jr normdone1
 
 .S8Lover2                       ; total of 5
-    rra
-    ld l,a
+    rr e
+    ld l,e
     ld e,d                      ; zero
     ld a,-21
     jr normdone1
 
 .S8L4more
-    rla
-    rla
-    rla
-    rla
-    ld l,a
+    sla e
+    sla e
+    sla e
+    sla e
+    ld l,e
     ld e,d                      ; zero
     ld a,-23
     jr normdone1
 
 ; shift 16 bit fraction by 4-7
-; d is copied to a, l is zero, number in de
+; l is zero, 16 bits number in de
 .S16L
     sla e
     rl d
@@ -545,7 +547,9 @@ PUBLIC md32_fsnormalize
     rl d
     sla e
     rl d                        ; 3 shifts
-    jp PO,S16L4more             ; if still not bits n upper after 3
+    ld a,d
+    and 0f0h
+    jp Z,S16L4more              ; FIXME if still not bits n upper after 3
     sla e
     rl d                        ; guaranteed shift 4
     jp M,S16L4                  ; complete at 4
@@ -590,7 +594,7 @@ PUBLIC md32_fsnormalize
     jp normdone1
 ;
 ; worst case 68 to get past this section
-; shift 0-3, a is d, l is zero , 16 bits in de
+; shift 0-3, l is zero , 16 bits in de
 ;
 .S16H
     sla e
@@ -633,37 +637,37 @@ PUBLIC md32_fsnormalize
     jp normdone1
 
 ; shift 8 left 0-3
-; number in a,e, l, d==zero
+; number in e, l, d==zero
 .S8H
-    rla
+    sla e
     jr C,S8H1                   ; jump if bit found in data
-    rla
+    sla e
     jr C,S8H2
-    rla
+    sla e
     jr C,S8H3
 ; 3 good shifts, number in a shifted left 3 ok
-    ld l,a
+    ld l,e
     ld e,d                      ; zero
     ld a,-19
     jp normdone1
 
 .S8H1
-    rra                         ; correct overshift
-    ld l,a
-    ld a,-16
-    ld e,d                      ; zero shifts
+    rr e                        ; correct overshift
+    ld l,e
+    ld e,d
+    ld a,-16                    ; zero shifts
     jp normdone1
 
 .S8H2
-    rra                         ; correct overshift
-    ld l,a
+    rr e                        ; correct overshift
+    ld l,e
     ld e,d
     ld a,-17                    ; one shift
     jp normdone1
 
 .S8H3
-    rra                         ; correct overshift
-    ld l,a
+    rr e                        ; correct overshift
+    ld l,e
+    ld e,d    
     ld a,-18
-    ld e,d
     jp normdone1                ; worst case S8H
