@@ -55,6 +55,7 @@ PUBLIC md32_fsinv_fastcall
     call md32_fsinv_fastcall
     jp md32_fsmul_callee
 
+
 .md32_fsinv_fastcall
     ex de,hl                    ; DEHL -> HLDE
 

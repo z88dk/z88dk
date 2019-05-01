@@ -21,7 +21,8 @@
 ;       int i = *(int*)&x;
 ;       i = 0x5f375a86 - (i>>1);
 ;       x = *(float*)&i;
-;       x = x*(1.5f-xhalf*x*x);
+;       x = x*(1.5f-xhalf*x*x); // 1st Newton-Raphson Iteration
+;       x = x*(1.5f-xhalf*x*x); // 2nd Newton-Raphson Iteration
 ;       return x;
 ;   }
 ;
@@ -39,62 +40,29 @@
 SECTION code_clib
 SECTION code_math
 
-EXTERN md32_fsmax, m32_mulu_32_16x16, m32_mulu_32h_32x32
+EXTERN md32_fsmax_fastcall, md32_fsmul_callee, md32_fssub_callee
+EXTERN m32_mulu_32_16x16, m32_mulu_32h_32x32
 
 EXTERN asm_phexwd, asm_phex, asm_pchar, CHAR_CR
 
-PUBLIC md32_fsinvsqrt
+PUBLIC md32_fsinvsqrt_fastcall
 
-.md32_fsinvsqrt                 ; DEHL
+.md32_fsinvsqrt_fastcall        ; DEHL
     
     ld a,d
     or a                        ; divide by zero?
-    jp Z,md32_fsmax    
+    jp Z,md32_fsmax_fastcall    
     and 080h                    ; negative number?
-    jp NZ,md32_fsmax
+    jp NZ,md32_fsmax_fastcall
 
-    ld b,d                     ; save original y exponent & mantissa msb
-    ld c,e
-    
-    sla e
-    rl d
-    scf                         ; restore implicit bit
-    rr e                        ; d = eeeeeeee, ehl = 1mmmmmmm mmmmmmmm mmmmmmmm
+    push de                     ; y msw on stack for w[2]
+    push hl                     ; y lsw on stack for w[2]
+    push de                     ; y msw on stack for w[1]
+    push hl                     ; y lsw on stack for w[1]
 
-    ld a,d
-    
-    ld d,e                      ; mantissa of y in dehl
-    ld e,h
-    ld h,l
-    ld l,0                      ; dehl = 1mmmmmmm mmmmmmmm mmmmmmmm --------
-
-;   XXX debug
-if 1
-    push af
-    push hl
-    push de
-    push bc
-    push hl   
-    ex de,hl
-    call asm_phexwd
-    pop hl
-    call asm_phexwd
-    ld l,':'
-    call asm_pchar
-    pop bc
-    pop de
-    pop hl
-    pop af
-endif
-;   XXX end debug
-
-    push de                     ; y mantissa msw on stack for w[1]
-    push hl                     ; y mantissa lsw on stack for w[1]
-
-    ld l,h                      ; original y in bceh
-    ld h,e
-    ex de,hl                    ; original y in bcde
-
+    ex de,hl                    ; original y in hlde
+    ld b,h                      ; original y in bcde
+    ld c,l
                                 ; now calculate w[0]
     srl b                       
     rr c                        ; y>>1
@@ -108,335 +76,69 @@ endif
     ld hl,05f37h
     sbc hl,bc                   ; (float) w[0] in hlde
 
-;   XXX debug
-if 1
-    push af
-    push hl
-    push de
-    push bc
-    call asm_phexwd
-    ex de,hl
-    call asm_phexwd
-    ld l,CHAR_CR
-    call asm_pchar
-    pop bc
-    pop de
-    pop hl
-    pop af
-endif
-;   XXX end debug
-
-                                ; calculate w[1] in hlde - 26 bits
-    sla l
-    rl h
-    scf                         ; restore implicit bit on w[0]
-    rr l                        ; h = eeeeeeee, lde = 1mmmmmmm mmmmmmmm mmmmmmmm
-
-    ld a,h                      ; exponent of w[0] in a = eeeeeeee
-    ld h,l                      ; mantissa of w[0] in hlde
-    ld l,d
-    ld d,e
-    ld e,0                      ; a = eeeeeeee hlde = 1mmmmmmm mmmmmmmm mmmmmmmm --------
-
-;   XXX debug
-if 1
-    push af
-    push hl
-    push de
-    push bc
-    push de
-    push hl
-    ld l,a
-    call asm_phex
-    ld l,'.'
-    call asm_pchar
-    pop hl
-    call asm_phexwd
-    pop hl
-    call asm_phexwd
-    ld l,'>'
-    call asm_pchar
-    pop bc
-    pop de
-    pop hl
-    pop af
-endif
-;   XXX end debug
-
-    ex af,af
-    pop af                      ; y mantissa lsw in af'
-    ex af,af
-
-    pop bc                      ; y mantissa msw in bc
-    push af                     ; w[0] exponent on stack
-    push hl                     ; w[0] mantissa msw on stack
-    push de                     ; w[0] mantissa lsw on stack
-    push bc                     ; y mantissa msw on stack
-
-    ex af,af
-    push af                     ; y mantissa lsw on stack
-    ex af,af
-    
-    ex de,hl                    ; w[0].m msw in de, w[0].m lsw in hl
-
-;   XXX debug
-if 1
-    push af
-    push hl
-    push de
-    push bc
-    push hl
-    ex de,hl
-    call asm_phexwd
-    pop hl
-    call asm_phexwd
-    ld l,CHAR_CR
-    call asm_pchar
-    pop bc
-    pop de
-    pop hl
-    pop af
-endif
-;   XXX end debug
-
-    push de
-    push hl
-    exx
-    pop hl
-    pop de
-    exx
-
-    call m32_mulu_32h_32x32     ; dehl*dehl' => dehl, w[0]^2 in dehl
-
-;   XXX debug
-if 1
-    push af
-    push hl
-    push de
-    push bc
-    push hl   
-    ex de,hl
-    call asm_phexwd
-    pop hl
-    call asm_phexwd
-    ld l,'*'
-    call asm_pchar
-    pop bc
-    pop de
-    pop hl
-    pop af
-endif
-;   XXX end debug
-
-    exx
-    pop hl                      ; y.m lsw in hl'
-    pop de                      ; y.m msw in de'
-
-;   XXX debug
-if 1
-    push af
-    push hl
-    push de
-    push bc
-    push hl
-    ex de,hl
-    call asm_phexwd
-    pop hl
-    call asm_phexwd
-    ld l,'='
-    call asm_pchar
-    pop bc
-    pop de
-    pop hl
-    pop af
-endif
-;   XXX end debug
-
-    exx
-
-    call m32_mulu_32h_32x32     ; dehl*dehl' => dehl, w[0]^2*y in dehl
-
-    srl d                       ; w[0]^2*y in dehl
-    rr e
-    rr h
-    rr l
-
-;   XXX debug
-if 1
-    push af
-    push hl
-    push de
-    push bc
-    push hl   
-    ex de,hl
-    call asm_phexwd
-    pop hl
-    call asm_phexwd
-    ld l,'-'
-    call asm_pchar
-    pop bc
-    pop de
-    pop hl
-    pop af
-endif
-;   XXX end debug
-
-    ex de,hl                    ; w[0]^2*y in hlde
-
-    ld b,h                      ; w[0]^2*y in bcde
+    ld b,h                      ; (float) w[0] in hlde and bcde
     ld c,l
 
-    xor a
-    ld h,a
-    ld l,a
-    sbc hl,de
-    ex de,hl
-    
-    ld h,0c0h                   ; 3.0
-    ld l,a
-    sbc hl,bc
-    ex de,hl                    ;  3.0 - w[0]^2*y in dehl
-                                ; (3.0 - w[0]^2*y)/2 in dehl
-
-;   XXX debug
-if 1
-    push af
-    push hl
-    push de
+    pop af                      ; y lsw
+    ex (sp),hl                  ; y msw, w[0] msw on stack
+    push de                     ; w[0] lsw on stack
+    push hl                     ; y msw on stack
+    push af                     ; y lsw on stack
     push bc
-    push hl   
-    ex de,hl
-    call asm_phexwd
-    pop hl
-    call asm_phexwd
-    ld l,'*'
-    call asm_pchar
-    ld l,'='
-    call asm_pchar
-    pop bc
-    pop de
-    pop hl
-    pop af
-endif
-;   XXX end debug
-
-    exx
-    pop hl                      ; w[0] lsw in hl'
-    pop de                      ; w[0] msw in de'
-    exx
-
-    call m32_mulu_32h_32x32     ; dehl*dehl' => dehl, w[0]*(3 - w[0]^2*y)/2 in dehl
-
-;   XXX debug
-if 1
-    push af
-    push hl
     push de
-    push bc
-    push hl   
-    ex de,hl
-    call asm_phexwd
-    pop hl
-    call asm_phexwd
-    ld l,':'
-    call asm_pchar
-    pop bc
-    pop de
-    pop hl
-    pop af
-endif
-;   XXX end debug
 
-    add hl,hl
-    rl e
+    ld h,b
+    ld l,c
+    ex de,hl                    ; (float) w[0] in dehl
+
+    call md32_fsmul_callee      ; (float) w[0]*w[0]
+    call md32_fsmul_callee      ; (float) w[0]*w[0]*y
+
+    ld bc,04040h                ; (float) 3 = 0x40400000
+    push bc
+    ld bc,0
+    push bc
+    call md32_fssub_callee      ; (float) (3 - w[0]*w[0]*y)
+
+    sla e                       ; unpack exponent (can only be positive)
     rl d
-    add hl,hl
-    rl e
-    rl d
-
-;   XXX debug
-if 1
-    push af
-    push hl
-    push de
-    push bc
-    push hl   
-    ex de,hl
-    call asm_phexwd
-    pop hl
-    call asm_phexwd
-    ld l,CHAR_CR
-    call asm_pchar
-    pop bc
-    pop de
-    pop hl
-    pop af
-endif
-;   XXX end debug
-
-    ld a,l                      ; round number using digi norm's method
-    or a
-    jr Z,fis1
-    set 0,h
-.fis1
-
-    pop af                      ; recover w[0] exponent
-
-;   XXX debug
-if 1
-    push af
-
-    ld l,0
-
-    push hl
-    push de
-    push bc
-    push hl
-    push de
-    ld l,a
-    call asm_phex
-    ld l,'.'
-    call asm_pchar
-    pop hl
-    call asm_phexwd
-    pop hl
-    call asm_phexwd
-    ld l,'>'
-    call asm_pchar
-    pop bc
-    pop de
-    pop hl
-    pop af
-endif
-;   XXX end debug
-
-    ld l,h                      ; pack 1/y^0.5 result from a-deh into dehl
-    ld h,e
-    ld e,d
-    sla e
-    srl a
+    dec d                       ; (float) (3 - w[0]*w[0]*y) / 2
+    sra d
     rr e
-    ld d,a
 
-;   XXX debug
-if 1
-    push af
-    push hl
-    push de
+    call md32_fsmul_callee      ; w[1] = (float) w[0]*(3 - w[0]*w[0]*y)/2
+
+    ex de,hl                    ; (float) w[1] in hlde and bcde
+    ld b,h
+    ld c,l
+
+    pop af                      ; y lsw
+    ex (sp),hl                  ; y msw, w[1] msw on stack
+    push de                     ; w[1] lsw on stack
+    push hl                     ; y msw on stack
+    push af                     ; y lsw on stack
     push bc
-    push hl   
-    ex de,hl
-    call asm_phexwd
-    pop hl
-    call asm_phexwd
-    ld l,CHAR_CR
-    call asm_pchar
-    pop bc
-    pop de
-    pop hl
-    pop af
-endif
-;   XXX end debug
+    push de
 
-    ret                         ; return DEHL
+    ld h,b
+    ld l,c
+    ex de,hl                    ; (float) w[1] in dehl
+
+    call md32_fsmul_callee      ; (float) w[1]*w[1]
+    call md32_fsmul_callee      ; (float) w[1]*w[1]*y
+
+    ld bc,04040h                ; (float) 3 = 0x40400000
+    push bc
+    ld bc,0
+    push bc
+    call md32_fssub_callee      ; (float) (3 - w[1]*w[1]*y)
+
+    sla e                       ; unpack exponent (can only be positive)
+    rl d
+    dec d                       ; (float) (3 - w[1]*w[1]*y) / 2
+    sra d
+    rr e
+
+    call md32_fsmul_callee      ; w[2] = (float) w[1]*(3 - w[1]*w[1]*y)/2
+    ret                         ; needs a return for the callee function
 

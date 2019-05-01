@@ -54,43 +54,12 @@ PUBLIC md32_fsadd, md32_fsadd_callee
 PUBLIC md32_fsnormalize
 
 
-; enter here for floating subtract callee, x-y x on stack, y in dehl
-.md32_fssub_callee
-    ld a,d                      ; toggle the sign bit for subtraction
-    xor 080h
-    ld d,a
-
-; enter here for floating add callee, x+y, x on stack, y in bcde, result in bcde
-.md32_fsadd_callee
-    ex de,hl                    ; DEHL -> HLDE
-    ld b,h                      ; place op1.s in b[7]
-
-    add hl,hl                   ; unpack op1
-    ld c,h                      ; save op1.e in c
-
-    ld a,h
-    or a
-    jr Z,faunp1_callee          ; add implicit bit if op1.e!=0
-    scf
-
-.faunp1_callee
-    rr l                        ; rotate in op1.m's implicit bit
-    ld a,b                      ; place op1.s in a[7]
-
-    exx
-
-    pop bc                      ; pop return address
-    pop de                      ; get second operand off of the stack
-    pop hl                      ; hlde = seeeeeee emmmmmmm mmmmmmmm mmmmmmmm
-    push bc                     ; return address on stack
-    jp farejoin
-
-
 ; enter here for floating subtract, x-y x on stack, y in dehl
 .md32_fssub
     ld a,d                      ; toggle the sign bit for subtraction
     xor 080h
     ld d,a
+
 
 ; enter here for floating add, x+y, x on stack, y in bcde, result in bcde
 .md32_fsadd
@@ -121,6 +90,39 @@ PUBLIC md32_fsnormalize
     inc hl
     ld h,(hl)
     ld l,c                      ; hlde = seeeeeee emmmmmmm mmmmmmmm mmmmmmmm
+    jp farejoin
+
+
+; enter here for floating subtract callee, x-y x on stack, y in dehl
+.md32_fssub_callee
+    ld a,d                      ; toggle the sign bit for subtraction
+    xor 080h
+    ld d,a
+
+
+; enter here for floating add callee, x+y, x on stack, y in bcde, result in bcde
+.md32_fsadd_callee
+    ex de,hl                    ; DEHL -> HLDE
+    ld b,h                      ; place op1.s in b[7]
+
+    add hl,hl                   ; unpack op1
+    ld c,h                      ; save op1.e in c
+
+    ld a,h
+    or a
+    jr Z,faunp1_callee          ; add implicit bit if op1.e!=0
+    scf
+
+.faunp1_callee
+    rr l                        ; rotate in op1.m's implicit bit
+    ld a,b                      ; place op1.s in a[7]
+
+    exx
+
+    pop bc                      ; pop return address
+    pop de                      ; get second operand off of the stack
+    pop hl                      ; hlde = seeeeeee emmmmmmm mmmmmmmm mmmmmmmm
+    push bc                     ; return address on stack
 
 .farejoin
     ld b,h                      ; save op2.s in b[7]
@@ -452,10 +454,10 @@ PUBLIC md32_fsnormalize
     rl l
     sla e
     rl d
-    rl l                         ; different shift (not rla) sets flags
-    ld a,l
-    and 0f0h
-    jp Z,S24L4more               ; FIXME if still no bits in high nibble, total of 7 shifts
+    rl l
+    ld a,0f0h
+    and a,l
+    jp Z,S24L4more               ; if still no bits in high nibble, total of 7 shifts
     sla e
     rl d
     rl l
@@ -534,8 +536,8 @@ PUBLIC md32_fsnormalize
     sla e
     sla e
     sla e
-    ld a,e
-    and 0f0h
+    ld a,0f0h
+    and a,e
     jp Z,S8L4more               ; if total is 7
     sla e                       ; guaranteed
     sla e                       ; 5th shift
@@ -581,9 +583,9 @@ PUBLIC md32_fsnormalize
     rl d
     sla e
     rl d                        ; 3 shifts
-    ld a,d
-    and 0f0h
-    jp Z,S16L4more              ; FIXME if still not bits n upper after 3
+    ld a,0f0h
+    and a,d
+    jp Z,S16L4more              ; if still not bits n upper after 3
     sla e
     rl d                        ; guaranteed shift 4
     jp M,S16L4                  ; complete at 4
