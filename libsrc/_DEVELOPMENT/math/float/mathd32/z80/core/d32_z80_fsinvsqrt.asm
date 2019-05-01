@@ -40,15 +40,28 @@
 SECTION code_clib
 SECTION code_math
 
-EXTERN md32_fsmax_fastcall, md32_fsmul_callee, md32_fssub_callee
+EXTERN md32_fsmax_fastcall, md32_fsmul, md32_fsmul_callee, md32_fssub_callee
 EXTERN m32_mulu_32_16x16, m32_mulu_32h_32x32
 
-EXTERN asm_phexwd, asm_phex, asm_pchar, CHAR_CR
+PUBLIC md32_fssqrt, md32_fssqrt_fastcall, md32_fsinvsqrt_fastcall
 
-PUBLIC md32_fsinvsqrt_fastcall
+
+.md32_fssqrt
+    call md32_fsinvsqrt_fastcall
+    jp md32_fsmul
+
+
+.md32_fssqrt_fastcall
+    pop bc                      ; pop return address
+    push de                     ; y msw on stack
+    push hl                     ; y lsw on stack
+    push bc                     ; put return back
+    
+    call md32_fsinvsqrt_fastcall
+    jp md32_fsmul_callee
+
 
 .md32_fsinvsqrt_fastcall        ; DEHL
-    
     ld a,d
     or a                        ; divide by zero?
     jp Z,md32_fsmax_fastcall    
@@ -103,7 +116,7 @@ PUBLIC md32_fsinvsqrt_fastcall
     sla e                       ; unpack exponent (can only be positive)
     rl d
     dec d                       ; (float) (3 - w[0]*w[0]*y) / 2
-    sra d
+    srl d
     rr e
 
     call md32_fsmul_callee      ; w[1] = (float) w[0]*(3 - w[0]*w[0]*y)/2
@@ -136,7 +149,7 @@ PUBLIC md32_fsinvsqrt_fastcall
     sla e                       ; unpack exponent (can only be positive)
     rl d
     dec d                       ; (float) (3 - w[1]*w[1]*y) / 2
-    sra d
+    srl d
     rr e
 
     call md32_fsmul_callee      ; w[2] = (float) w[1]*(3 - w[1]*w[1]*y)/2
