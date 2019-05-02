@@ -384,7 +384,7 @@ PUBLIC md32_fsnormalize
     ex af,af                    ; if no C an alternate exit is taken
 
 
-; enter here with af' carry clear for float function Bl_Bf, Bg_Bf
+; enter here with af' carry clear for float functions md32_float32, md32_float32u
 .md32_fsnormalize
 ; now begin normalize
     xor a

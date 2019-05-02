@@ -5,72 +5,80 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
+;  feilipu, 2019 April
+;  adapted for z80, z180, and z80-zxn
+;
+;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_math
 
-PUBLIC md32_Hi_Bf
-PUBLIC md32_Bl_Bf
-PUBLIC md32_Hc_Bf
-PUBLIC md32_Hu_Bf
-PUBLIC md32_Bg_Bf
+PUBLIC md32_float16
+PUBLIC md32_float32
+
+PUBLIC md32_float8u
+PUBLIC md32_float16u
+PUBLIC md32_float32u
 
 EXTERN md32_normalize
 
-; convert integer in hl to float in bcde
-.md32_Hi_Bf
-    ex de,hl                    ; least to de
+; convert integer in hl to float in dehl
+.md32_float16
+    ex de,hl                    ; integer to de
     ld a,d                      ; sign
-    rla                         ; get sign to c
+    rla                         ; get sign to C
     sbc hl,hl                   ; sign extension, all 1's if neg
-    ld b,h
-    ld c,l
+    ex de,hl                    ; dehl
 
-; now convert long in bcde to float in bcde
-.md32_Bl_Bf
-    bit 7,b                     ; test sign, neg if neg
-    jr Z,blbf2
+; now convert long in dehl to float in dehl
+.md32_float32
+    ex de,hl                    ; hlde
+    bit 7,h                     ; test sign, negate if negative
+    jr Z,dldf0
+    ld b,h                      ; to hold the sign, put copy of MSB into b
+    ld c,l
     ld hl,0
     or a                        ; clear C
     sbc hl,de                   ; least
     ex de,hl
     ld hl,0
     sbc hl,bc
-    jp PO,blbf1                 ;   jp novf,.blbf1
-;---
-; here negation of 0x80000000 = -2^31 = 0xcf000000
-    ld bc,0cf00h
-    ld de,0
-    ret
-;
-; other entries
-.md32_Bg_Bf                     ; convert unsigned long in bcde to float in bcde
-    ld h,b                      ; put working copy of unsigned MSB into h
-    res 7,b                     ; ensure unsigned long's "sign" bit is reset
-    jr bgbf0                    ; continue, with unsigned long number in hcde
+    jp PO,dldf0                 ; number in hlde, sign in b
 
-.md32_Hc_Bf                     ; convert character in l to float in bcde
+; here negation of 0x80000000 = -2^31 = 0xcf000000
+    ld de,0cf00h
+    ld hl,0
+    ret
+
+; convert character in l to float in dehl
+.md32_float8u
     ld h,0
-.md32_Hu_Bf                     ; convert unsigned in hl to float in bcde
-    ex de,hl
-    ld bc,0
-.blbf2
-    ld h,b
-.bgbf0
-    ld l,c
-.blbf1
-; number in hlde
+
+; convert unsigned in hl to float in dehl
+.md32_float16u                  
+    ld de,0
+
+; convert unsigned long in dehl to float in dehl
+.md32_float32u                  
+    res 7,d                     ; ensure unsigned long's "sign" bit is reset
+    ld b,d                      ; to hold the sign, put copy of MSB into b
+                                ; continue, with unsigned long number in dehl
+.dldf0
+; number in hlde, sign in b
     ld c,150                    ; exponent if no shift
     ld a,h
     or a
-    jr NZ,blbfright             ; go shift right
+    jr NZ,dldfright             ; go shift right
 ; exponent in c, sign in b
     ex af,af                    ; set carry off
-    jp md32_normalize           ; piggy back on existing code
-; must shift right
-.blbfright
-    jp PO,blbf4                 ; shift right  1-4
-;---
+    jp md32_normalize           ; piggy back on existing code in _fsadd
+
+; must shift right to make h = 0 and mantissa in lde
+.dldfright
+    ld a,h
+    and 0f0h
+    jr Z,dldf4                  ; shift right only 1-4 bits
+
 ; here shift right 4-8
     srl h
     rr l
@@ -90,10 +98,10 @@ EXTERN md32_normalize
     rr e                        ; 4 for sure
     ld c,154                    ; exponent for no more shifts
 ; here shift right 1-4 more
-.blbf4
+.dldf4
     ld a,h
     or a
-    jr Z,blbf8                  ; done right
+    jr Z,dldf8                  ; done right
     srl h
     rr l
     rr d
@@ -101,7 +109,7 @@ EXTERN md32_normalize
     inc c
     ld a,h
     or a
-    jr Z,blbf8
+    jr Z,dldf8
     srl h
     rr l
     rr d
@@ -109,7 +117,7 @@ EXTERN md32_normalize
     inc c
     ld a,h
     or a
-    jr Z,blbf8
+    jr Z,dldf8
     srl h
     rr l
     rr d
@@ -117,19 +125,18 @@ EXTERN md32_normalize
     inc c
     ld a,h
     or a
-    jr Z,blbf8
+    jr Z,dldf8
     srl h
     rr l
     rr d
     rr e
     inc c
-.blbf8
-    add hl,hl
-    ld a,c
-    rl b                        ; get sign (if unsigned long input, was forced 0)
-    rra
+.dldf8                          ; pack up the floating point mantissa in lde, exponent in c, sign in b
+    sla l
+    rl b                        ; get sign (if unsigned input, it was forced 0)
+    rr c
     rr l
-    ld b,a
-    ld c,l                      ; result in bcde
-    ret                         ; lret
+    ld h,c                      ; result in hlde
+    ex de,hl 
+    ret                         ; result in dehl
 
