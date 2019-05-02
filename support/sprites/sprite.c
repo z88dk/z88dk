@@ -948,6 +948,30 @@ void import_from_bitmap( const char *file )
 		}
 		
 		fseek(fpin,0L,SEEK_SET);
+		
+		// **HACK** PrintShop clipart libraries
+		/*
+		if (((len%572)==0)||(((len-10)%572)==0)) {
+			spcount=0;
+			if (((len-10)%572)==0)
+				for ( x = 1; x <= 10; x++ ) fgetc(fpin);
+			while (!feof(fpin)) {
+			//for ( x = 1; x <= 10; x++ ) fgetc(fpin);
+			sprite[ on_sprite+spcount ].size_x = 88;
+			sprite[ on_sprite+spcount ].size_y = 52;
+			for ( y = 1; y <= sprite[ on_sprite+spcount ].size_y; y++ )
+				for ( x = 1; x <= sprite[ on_sprite+spcount ].size_x; x+=8 ) {
+					b=getc(fpin);
+					for ( i = 0; i < 8; i++ ) {
+					sprite[ on_sprite+spcount ].p[ x+i ][y] = ((b&128) != 0);
+					b<<=1;
+					}
+				}
+			spcount++;
+			}
+		}
+		fseek(fpin,0L,SEEK_SET);
+		*/
 
 		// ZX Spectrum Screen dump
 		if ((len==6144)||(len==6912)) {
