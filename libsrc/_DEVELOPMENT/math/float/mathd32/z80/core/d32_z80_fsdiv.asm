@@ -40,7 +40,7 @@ SECTION code_clib
 SECTION code_math
 
 EXTERN md32_fsmul, md32_fsmul_callee
-EXTERN md32_fsmax_fastcall, m32_mulu_32_16x16, m32_mulu_32h_32x32
+EXTERN md32_fsmax_fastcall, m32_mulu_32_16x16
 
 PUBLIC md32_fsdiv, md32_fsdiv_callee
 PUBLIC md32_fsinv_fastcall
@@ -86,7 +86,7 @@ PUBLIC md32_fsinv_fastcall
     rra
     and 01fh                    ; a = 000mmmmm
 
-    ld hl,_divtable
+    ld hl,_invtable
     ld d,0
     ld e,a
     add hl,de
@@ -166,8 +166,25 @@ ENDIF
     pop hl                      ; y lsw in hl'
     pop de                      ; y msw in de'
     exx
-      
+
+IF __CPU_Z80__
+
+    EXTERN l_mulu_64_32x32
+
+    call l_mulu_64_32x32        ; dehl*dehl' => dehl, w[1]^2*y in dehld'e'h'l'
+    exx
+    ld a,d
+    exx
+    or a
+    jr Z,fd0
+    set 0,l
+.fd0
+
+ELSE
+    EXTERN  m32_mulu_32h_32x32
     call m32_mulu_32h_32x32     ; dehl*dehl' => dehl, w[1]^2*y in dehl
+ENDIF
+
     add hl,hl
     rl e
     rl d                        ; w[1]^2*y in dehl
@@ -211,7 +228,24 @@ ENDIF
     pop de
     exx
 
+IF __CPU_Z80__
+
+    EXTERN l_mulu_64_32x32
+
+    call l_mulu_64_32x32    ; dehl*dehl' => dehl, w[2]^2 in dehld'e'h'l'
+    exx
+    ld a,d
+    exx
+    or a
+    jr Z,fd1
+    set 0,l
+.fd1
+
+ELSE
+    EXTERN  m32_mulu_32h_32x32
     call m32_mulu_32h_32x32     ; dehl*dehl' => dehl, w[2]^2 in dehl
+ENDIF
+
     add hl,hl
     rl e
     rl d                        ; w[2]^2 in dehl
@@ -221,7 +255,24 @@ ENDIF
     pop de                      ; y msw in de'
     exx
 
+IF __CPU_Z80__
+
+    EXTERN l_mulu_64_32x32
+
+    call l_mulu_64_32x32        ; dehl*dehl' => dehl, w[2]^2*y in dehld'e'h'l'
+    exx
+    ld a,d
+    exx
+    or a
+    jr Z,fd2                    ; round number using digi norm's method
+    set 0,l
+.fd2
+
+ELSE
+    EXTERN  m32_mulu_32h_32x32
     call m32_mulu_32h_32x32     ; dehl*dehl' => dehl, w[2]^2*y in dehl
+ENDIF
+
     add hl,hl
     rl e
     rl d                        ; w[2]^2*y in dehl
@@ -251,10 +302,10 @@ ENDIF
 
     ld a,l                      ; round number using digi norm's method
     or a
-    jr Z,fd0
+    jr Z,fd3
     set 0,h
 
-.fd0
+.fd3
     pop af                      ; recover y exponent and sign in C
     rr b                        ; save sign in b
     sub a,07fh                  ; calculate new exponent for 1/y
@@ -275,7 +326,7 @@ ENDIF
 
 SECTION rodata_clib
 
-._divtable
+._invtable
   DEFB 0x7f, 0x7b, 0x78, 0x74, 0x71, 0x6e, 0x6b, 0x68
   DEFB 0x66, 0x63, 0x61, 0x5e, 0x5c, 0x5a, 0x58, 0x56
   DEFB 0x55, 0x53, 0x51, 0x50, 0x4e, 0x4d, 0x4b, 0x4a

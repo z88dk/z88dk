@@ -116,6 +116,10 @@ defc m32_mulu_32h_32x32 = l_z180_mulu_32h_32x32
     add hl,bc                   ; p4 p3
     adc a,0                     ; p5
 
+    ex af,af
+    ld a,l                      ; preserve p3 byte for rounding
+    ex af,af
+
     ld l,h                      ; prepare HL for next cycle
     ld h,a                      ; promote HL p5 p4
 
@@ -144,6 +148,13 @@ defc m32_mulu_32h_32x32 = l_z180_mulu_32h_32x32
     ld e,l                      ; final p4 byte in E
     ld l,h                      ; prepare HL for next cycle
     ld h,a                      ; promote HL p6 p5
+
+    ex af,af
+    or a
+    jr Z,mlt0                   ; use p3 to round p4
+    set 0,e
+
+.mlt0
 
     ; start doing the p5 byte
 
