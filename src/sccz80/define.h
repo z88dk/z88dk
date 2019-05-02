@@ -94,6 +94,7 @@ struct type_s {
     char      isconst;
     char      isfar;  // Valid for pointers/array
     char      name[NAMESIZE]; 
+    char     *namespace; // Which namespace is this object in
     
     Type     *ptr;   // For array, or pointer
     int       len;   // Length of the array
@@ -202,6 +203,15 @@ struct symbol_s {
         int level;           /* Compound level that this variable is declared at */
         UT_hash_handle  hh;
 
+};
+
+
+typedef struct namespace_s namespace;
+
+struct namespace_s {
+    char        *name;
+    char        *bank_function;
+    namespace   *next;       
 };
 
 

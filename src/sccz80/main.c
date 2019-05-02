@@ -316,6 +316,8 @@ void parse()
             dodeclare(TYPDEF);
         } else if (dodeclare(STATIK)) {
             ;
+        } else if ( amatch("__addressmod")) {
+            parse_addressmod();
         } else if (ch() == '#') {
             if (match("#asm")) {
                 doasm();

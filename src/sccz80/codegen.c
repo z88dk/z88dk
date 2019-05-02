@@ -45,6 +45,7 @@ static void loada(int n);
 
 static int    donelibheader;
 static char  *current_section = ""; /**< Name of the current section */
+static char  *current_nspace = NULL;
 
 /* Mappings between default library names - allows use of sdcc maths library with sccz80 */
 struct _mapping {
@@ -245,6 +246,25 @@ void outname(const char* sname, char pref)
     outstr(sname);
 }
 
+static void switch_namespace(char *name)
+{
+    namespace *ns;
+
+    if ( name == current_nspace || name == NULL ) {
+        return;
+    }
+    current_nspace = name;
+
+    if ( name != NULL ) {
+        ns = get_namespace(name);
+
+        if ( ns != NULL ) {
+            outfmt("\tcall\t_%s\n",ns->bank_function);
+        }
+    }
+
+}
+
 /* Fetch a static memory cell into the primary register */
 /* Can only have directly accessible things here...so should be
  * able to just check for far to see if we need to pick up second
@@ -252,6 +272,8 @@ void outname(const char* sname, char pref)
  */
 void getmem(SYMBOL* sym)
 {
+    printf("Getmem: ");dump_type(sym->ctype);
+    switch_namespace(sym->ctype->namespace);
     if (sym->ctype->kind == KIND_CHAR) {
         if ( (sym->ctype->isunsigned) == 0 )  {
 #ifdef PREAPR00
@@ -334,6 +356,7 @@ int getloc(SYMBOL* sym, int off)
 /*      static memory cell */
 void putmem(SYMBOL* sym)
 {
+    switch_namespace(sym->ctype->namespace);
     if (sym->ctype->kind == KIND_DOUBLE) {
         if ( c_fp_size > 4 ) {
             address(sym);
@@ -421,9 +444,10 @@ void StoreTOS(char typeobj)
 
 void PutFrame(char typeobj, int offset)
 {
-    SYMBOL* ptr;
+    Type* ctype;
     char flags;
-    ptr = retrstk(&flags); /* Not needed but.. */
+
+    ctype = retrstk(&flags); /* Not needed but.. */
     switch (typeobj) {
     case KIND_CHAR:
         ot("ld\t");
@@ -464,13 +488,16 @@ void PutFrame(char typeobj, int offset)
 void putstk(LVALUE *lval)
 {
     char flags = 0;
-    SYMBOL *ptr;
+    Type *ctype;
     Kind typeobj = lval->indirect_kind;
 
 
     //outfmt("; %s type=%d val_type=%d indirect=%d\n", lval->ltype->name, lval->type, lval->val_type, lval->indirect_kind);
     /* Store via long pointer... */
-    ptr = retrstk(&flags);
+    ctype = retrstk(&flags);
+    if ( ctype != NULL ) {
+        switch_namespace(ctype->namespace);
+    }
     //outfmt(";Restore %p flags %02d\n",ptr, flags);
     if (flags & FARACC) {
         /* exx pop hl, pop de, exx */

@@ -1,6 +1,7 @@
  
 #include "ccdefs.h"
 #include "define.h" 
+#include "utlist.h"
 
 static void declfunc(Type *type, enum storage_type storage);
 static void handle_kr_type_parameters(Type *func);
@@ -14,6 +15,11 @@ Type   *type_uint = &(Type){ KIND_INT, 2, 1, .len=1 };
 Type   *type_long = &(Type){ KIND_LONG, 4, 0, .len=1 };
 Type   *type_ulong = &(Type){ KIND_LONG, 4, 1, .len=1 };
 Type   *type_double = &(Type){ KIND_DOUBLE, 6, 0, .len=1 }; 
+
+static namespace  *namespaces = NULL;
+
+
+static void parse_namespace(Type *type);
 
 static int32_t needsub(void)
 {
@@ -33,6 +39,8 @@ static int32_t needsub(void)
     needchar(']'); /* force single dimension */
     return (val); /* and return size */
 }
+
+
 
 
 static void swallow_bitfield(Type *type)
@@ -423,8 +431,12 @@ static Type *parse_type(void)
     int   typed = 0;
 
 
+    // Determine namespace
+    parse_namespace(type);
+
     swallow("register");
     swallow("auto");
+
     type->len = 1;
     if ( swallow("const")) {
         type->isconst = 1;
@@ -654,6 +666,7 @@ Type *parse_parameter_list(Type *return_type)
         /* An array parameter becomes a pointer as function argument */
         if ( param->kind == KIND_ARRAY ) {
             Type *ptr = make_pointer(param->ptr);
+            ptr->namespace = param->namespace;
             strcpy(ptr->name, param->name);
             param = ptr;
         }
@@ -765,6 +778,7 @@ Type *parse_decl(char name[], Type *base_type)
     }
 
     if ( rcmatch('*')) {
+        Type *ptr;
         needchar('*');
         if ( base_type == NULL ) {
             errorfmt("Pointer to what exactly?",1);
@@ -773,7 +787,10 @@ Type *parse_decl(char name[], Type *base_type)
         }
         if ( amatch("__far"))
             base_type->isfar = 1;
-        return parse_decl(name, make_pointer(base_type));
+        ptr = make_pointer(base_type);
+        ptr->namespace = base_type->namespace;
+        parse_namespace(ptr->ptr);
+        return parse_decl(name, ptr);
     }
 
     if ( symname(name) ) {
@@ -1311,8 +1328,13 @@ void type_describe(Type *type, UT_string *output)
     int  i;
 
     tail[0] = 0;
+
     if ( type->ptr )
         type_describe(type->ptr,output);
+
+    if ( type->namespace ) {
+        utstring_printf(output,"%s ", type->namespace);
+    }
    
     switch ( type->kind ) {
     case KIND_NONE:
@@ -1655,3 +1677,55 @@ static void declfunc(Type *type, enum storage_type storage)
     Zsp = 0;
     infunc = 0; /* not in fn. any more */
 }
+
+
+void parse_addressmod(void)
+{
+    namespace *ns;
+
+    char setter[NAMESIZE+1];
+    char nsname[NAMESIZE+1];
+    
+    if ( symname(setter) == 0 ) {
+        junk();
+        errorfmt("Cannot parse __addressmod line - can't find a bank function", 1);
+        return;
+    }
+
+    if ( symname(nsname) == 0 ) {
+        junk();
+        errorfmt("Cannot parse __addressmod line - can't find a namespace name", 1);
+        return;
+    }
+
+    ns = CALLOC(1,sizeof(*ns));
+    ns->name = STRDUP(nsname);
+    ns->bank_function = STRDUP(setter);
+
+    LL_APPEND(namespaces, ns);
+}
+
+namespace *get_namespace(const char *name)
+{
+    namespace *ns;
+
+    LL_FOREACH(namespaces, ns) {
+        if ( strcmp(ns->name, name) == 0 ) {
+            return ns;
+        }
+    }
+    return NULL;
+}
+
+static void parse_namespace(Type *type)
+{
+    namespace *ns;
+    LL_FOREACH(namespaces, ns) {
+        if (amatch(ns->name)) {
+            printf("Found namespace %s\n",ns->name);
+            type->namespace = ns->name;
+            return;
+        }
+    }
+}
+
