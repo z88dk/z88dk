@@ -5,9 +5,8 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
-;
 ;-------------------------------------------------------------------------
-; md32_mul - z180 floating point multiply
+; md32_fsmul - z180 floating point multiply
 ;-------------------------------------------------------------------------
 ;
 ; since the z180 only has support for 8x8bit multiply,

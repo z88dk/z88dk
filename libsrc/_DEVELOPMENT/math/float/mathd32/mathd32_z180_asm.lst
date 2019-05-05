@@ -6,3 +6,10 @@ math/float/mathd32/z80/core/d32_z80_fsinvsqrt
 math/float/mathd32/z80/core/d32_z80_fsmul
 math/float/mathd32/z80/core/m32_z180_mulu_32_16x16
 math/float/mathd32/z80/core/m32_z180_mulu_32h_32x32
+
+math/float/mathd32/z80/h32_fspoly
+math/float/mathd32/z80/h32_coeff_atan
+math/float/mathd32/z80/h32_coeff_exp
+math/float/mathd32/z80/h32_coeff_log
+math/float/mathd32/z80/h32_coeff_sin
+

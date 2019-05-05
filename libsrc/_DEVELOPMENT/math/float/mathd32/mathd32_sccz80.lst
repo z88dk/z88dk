@@ -20,3 +20,6 @@ math/float/mathd32/c/sccz80/cd32_sccz80_dssub
 math/float/mathd32/c/sccz80/cd32_sccz80_dssub_callee
 math/float/mathd32/c/sccz80/cd32_sccz80_dszero
 math/float/mathd32/c/sccz80/cd32_sccz80_dszero_callee
+
+math/float/mathd32/c/sccz80/cd32_sccz80_hspoly
+math/float/mathd32/c/sccz80/cd32_sccz80_hspoly_callee

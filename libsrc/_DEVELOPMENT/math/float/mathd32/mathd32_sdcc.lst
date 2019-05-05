@@ -23,3 +23,6 @@ math/float/mathd32/c/sdcc/cd32_sdcc_dssub
 math/float/mathd32/c/sdcc/cd32_sdcc_dssub_callee
 math/float/mathd32/c/sdcc/cd32_sdcc_dszero
 math/float/mathd32/c/sdcc/cd32_sdcc_dszero_fastcall
+
+math/float/mathd32/c/sdcc/cd32_sdcc_hspoly
+math/float/mathd32/c/sdcc/cd32_sdcc_hspoly_callee

@@ -6,7 +6,7 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-; F_div - floating point divide
+; md32_fsdiv - floating point divide
 ;-------------------------------------------------------------------------
 ; r = x/y = x * 1/y
 ;
@@ -17,7 +17,7 @@
 ; Division is then done by multiplying by the reciprocal of the divisor.
 ;
 ;-------------------------------------------------------------------------
-; F_inv - floating point inversion (reciprocal)
+; md32_fsinv - floating point inversion (reciprocal)
 ;-------------------------------------------------------------------------
 ; 1/y can be calculated by:
 ; w[i+1] = w[i]*2 - w[i]*w[i]*y  where w[0] is approx 1/y

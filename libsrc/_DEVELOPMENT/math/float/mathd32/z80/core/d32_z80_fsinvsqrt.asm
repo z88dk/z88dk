@@ -4,9 +4,9 @@
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
-;;
+;
 ;-------------------------------------------------------------------------
-; F_invsqrt - floating point inverse square root
+; md32_fsinvsqrt - floating point inverse square root
 ;-------------------------------------------------------------------------
 ;
 ; Searching for 1/x^0.5 being the inverse square root of y.
@@ -25,13 +25,6 @@
 ;       x = x*(1.5f-xhalf*x*x); // 2nd Newton-Raphson Iteration
 ;       return x;
 ;   }
-;
-; The initial magic number lookup gets us 8 bits of precision.
-; The next iterations 14, and 26.
-; At this point the number is rounded then multiplied by y using F_mul.
-;
-; Do the work in fixed point with 1 place to left of decimal point.
-; 1.7 1.15 1.23 and 1.31, as we move through the calculations.
 ;
 ;-------------------------------------------------------------------------
 ; FIXME clocks

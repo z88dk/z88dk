@@ -5,6 +5,10 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
+;  feilipu, 2019 April
+;  adapted for z80, z180, and z80-zxn
+;
+;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_math
