@@ -26,8 +26,8 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#ifndef __FLOAT_H
-#define __FLOAT_H
+#ifndef _INC_FLOAT_H
+#define _INC_FLOAT_H
 
 #define FLT_RADIX       2
 #define FLT_MANT_DIG    24
@@ -70,7 +70,8 @@ float __fsmul (float, float);
 float __fsdiv (float, float);
 
 char __fslt (float, float);
-char __fseq (float, float);
 char __fsgt (float, float);
+char __fseq (float, float);
+char __fsneq (float, float);
 
-#endif	/* __FLOAT_H */
+#endif	/* _INC_FLOAT_H */

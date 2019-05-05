@@ -26,6 +26,8 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
+/* Version 1.0 - Initial release */
+
 #ifndef _INC_MATH
 #define _INC_MATH
 
@@ -79,7 +81,7 @@
 union float_long
 {
     float f;
-    long l;
+    int32_t l;
 };
 
     /****************************************
@@ -87,39 +89,40 @@ union float_long
      ****************************************/
 
 /* Trigonometric functions */
-float sin(float x);
-float cos(float x);
-float tan(float x);
-float cot(float x);
-float asin(float x);
-float acos(float x);
-float atan(float x);
-float atan2(float x, float y);
+float sinf(float x) __z88dk_fastcall;
+float cosf(float x) __z88dk_fastcall;
+float tanf(float x) __z88dk_fastcall;
+float asinf(float x) __z88dk_fastcall;
+float acosf(float x) __z88dk_fastcall;
+float atanf(float x) __z88dk_fastcall;
+float atan2f(float x, float y)__z88dk_callee;
 
 /* Hyperbolic functions */
-float sinh(float x);
-float cosh(float x);
-float tanh(float x);
+float sinhf(float x) __z88dk_fastcall;
+float coshf(float x) __z88dk_fastcall;
+float tanhf(float x) __z88dk_fastcall;
 
 /* Exponential, logarithmic and power functions */
-float exp(float x);
-float log(float x);
-float log10(float x);
-float pow(float x, float y);
-float sqrt(float a);
+float sqrtf(float a) __z88dk_fastcall;
+float expf(float x) __z88dk_fastcall;
+float logf(float x) __z88dk_fastcall;
+float log10f(float x) __z88dk_fastcall;
+float powf(float x, float y)__z88dk_callee;
+// float hypotf(float x, float y)__z88dk_callee; // // FIXME - I need to be written
 
 /* Nearest integer, absolute value, and remainder functions */
-float fabs(float x);
-float frexp(float x, int *pw2);
-float ldexp(float x, int pw2);
-float ceil(float x);
-float floor(float x);
-float modf(float x, float * y);
-float fmod(float x, float y);
+float fabsf(float x) __z88dk_fastcall;
+float frexpf(float x, int *pw2) __z88dk_callee;
+float ldexpf(float x, int pw2) __z88dk_callee;
+float ceilf(float x) __z88dk_fastcall;
+float floorf(float x) __z88dk_fastcall;
+float modff(float x, float * y) __z88dk_callee;
+float fmodf(float x, float y) __z88dk_callee;
 
 /* Intrinsic functions */
-float inv(float a);
-float invsqrt(float a);
-float poly(const float x, const float d[], uint16_t n);
+// float sqrf(float a); // FIXME - I need to be written
+float invf(float a) __z88dk_fastcall; **
+float invsqrtf(float a) __z88dk_fastcall; **
+float polyf(const float x, const float d[], uint16_t n) __z88dk_callee; **
 
 #endif  /* _INC_MATH */
