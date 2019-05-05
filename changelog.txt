@@ -18,10 +18,15 @@ z88dk vx.x.x - xx.xx.xxxx
 - [classic] +cpm: -subtype=excali64 Excalibur 64 support
 - [classic] +g800: ANSI terminal and graphics improvements
 - [classic] +ts2068: gencon supports hires and multicolour modes
+- [classic] +aquarius: Microsoft 32 bit floating point support
+- [classic] +mc1000: Microsoft 32 bit floating point support
 - [classic] +laser500: Microsoft 32 and 64 bit floating point support
+- [classic] +trs80: Microsoft 32 and 64 bit floating point support
 - [sccz80] #1102: Trailing comma support in struct initialisation
 - [sccz80] Optimisation rule fixes and improvements
 - [sccz80] Support added for 32 and 64 bit floating point numbers
+- [sccz80] #1132: Struct assignment and parameter passing supported
+- [sccz80] #1141: Support for named address spaces
 - [zsdcc] Upgraded to 3.8.5 r10892
 
 z88dk v1.99C - 19.01.2019
