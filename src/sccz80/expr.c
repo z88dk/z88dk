@@ -124,6 +124,8 @@ int heir1(LVALUE* lval)
         if ( lval2.ltype->kind == KIND_VOID ) {
             warningfmt("void","Assigning from a void expression");
         }
+        check_pointer_namespace(lval->ltype, lval2.ltype);
+
         force(lval->val_type, lval2.val_type, lval->ltype->isunsigned, lval2.ltype->isunsigned, 0); /* 27.6.01 lval2.is_const); */
         smartstore(lval);
         return 0;

@@ -97,6 +97,7 @@ extern void       type_describe(Type *type, UT_string *output);
 extern int        type_matches(Type *t1, Type *t2);
 extern void       parse_addressmod(void);
 extern namespace *get_namespace(const char *name);
+extern void       check_pointer_namespace(Type *lhs, Type *rhs);
 
 /* error.c */
 extern int        endst(void);

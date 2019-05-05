@@ -878,6 +878,8 @@ int declare_local(int local_static)
                     if ( expr_type->kind == KIND_VOID ) {
                         warningfmt("void","Assigning from a void expression");
                     }
+
+                    check_pointer_namespace(type, expr_type);
                     
                     if ( vconst && expr != type->kind ) {
                         // It's a constant that doesn't match the right type
@@ -1736,3 +1738,27 @@ static void parse_namespace(Type *type)
     }
 }
 
+void check_pointer_namespace(Type *lhs, Type *rhs)
+{
+    if ( ispointer(lhs) && ispointer(rhs) ) {
+        Type *ctype2 = rhs;
+        Type *ctype1 = lhs;
+        do {
+            if ( ctype1->namespace != ctype2->namespace ) {  // The string is shared
+                UT_string *output;
+
+                utstring_new(output);
+                utstring_printf(output,"Cannot assign pointers with different namespaces: <");
+                type_describe(lhs, output);
+                utstring_printf(output,"> from <");
+                type_describe(rhs, output);
+                utstring_printf(output,">");
+                errorfmt("%s",0,utstring_body(output));
+                utstring_free(output);
+                break;
+            }
+            ctype1 = ctype1->ptr;
+            ctype2 = ctype2->ptr;
+        } while ( ctype1 && ctype2 );          
+    }
+}
