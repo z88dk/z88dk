@@ -313,6 +313,7 @@ int align_struct(Type *str)
         if ( elem->bit_size == 0 ) {
             if ( bitoffs ) {
                 offset += prevbitsize;
+                bitoffs = 0;
             }
             if ( elem->size != -1 ) {
                 elem->offset = offset;
@@ -438,7 +439,9 @@ Type *parse_struct(Type *type, char isstruct)
             needchar(',');
         } while ( 1 );
         needchar('}');
-        size = align_struct(str);
+        if ( isstruct ) {
+            size = align_struct(str);
+        }
         str->size = size;  // It's now defined
         str->weak = 0;
     }
