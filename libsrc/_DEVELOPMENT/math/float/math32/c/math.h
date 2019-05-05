@@ -121,8 +121,8 @@ float fmodf(float x, float y) __z88dk_callee;
 
 /* Intrinsic functions */
 // float sqrf(float a); // FIXME - I need to be written
-float invf(float a) __z88dk_fastcall; **
-float invsqrtf(float a) __z88dk_fastcall; **
-float polyf(const float x, const float d[], uint16_t n) __z88dk_callee; **
+float invf(float a) __z88dk_fastcall;
+float invsqrtf(float a) __z88dk_fastcall;
+float polyf(const float x, const float d[], uint16_t n) __z88dk_callee;
 
 #endif  /* _INC_MATH */
