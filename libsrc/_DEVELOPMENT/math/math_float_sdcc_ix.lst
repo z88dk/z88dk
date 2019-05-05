@@ -1,3 +1,3 @@
 @math/float/math48/math48_sdcc_ix.lst
-@math/float/mathd32/mathd32_sdcc.lst
-@math/float/mathd32/mathd32_z80_asm.lst
+@math/float/math32/math32_sdcc.lst
+@math/float/math32/math32_z80_asm.lst
