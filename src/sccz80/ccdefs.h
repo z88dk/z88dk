@@ -210,6 +210,7 @@ extern void     convert_int_to_double(char type, char zunsign);
 extern int      utype(LVALUE *lval);
 extern int      check_lastop_was_testjump(LVALUE *lval);
 extern int      check_range(LVALUE *lval, int32_t min_value, int32_t max_value) ;
+extern void     check_assign_range(LVALUE *lval, double const_value);
 
 /* stmt.c */
 extern int      statement(void);

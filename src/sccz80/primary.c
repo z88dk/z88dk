@@ -709,6 +709,27 @@ int check_range(LVALUE *lval, int32_t min_value, int32_t max_value)
     return always;
 }
 
+#define CHECK(v, min, max) do { \
+        if ( v < min || v > max ) warningfmt("limited-range","Value is out of range for assignment"); \
+    } while (0)
+
+void check_assign_range(LVALUE *lval, double const_value)
+{
+    Kind lhs_val_type = lval->ltype->kind;
+    int  factor = lval->ltype->bit_size ? ((1 << lval->ltype->bit_size) - 1) : 0xffff;
+
+    if ( lhs_val_type == KIND_INT && !utype(lval) ) {
+        CHECK(const_value, -(32768 & factor), (65535 & factor));
+    } else if ( lhs_val_type == KIND_INT && utype(lval) ) {
+        CHECK(const_value, 0, (65535 & factor));
+    } else if ( lhs_val_type == KIND_CHAR && !utype(lval) ) {
+        CHECK(const_value, -(128 & factor), (255 & factor));
+    } else if ( lhs_val_type == KIND_CHAR && utype(lval) ) {
+        CHECK(const_value, 0, (255 & factor));
+    }
+}
+#undef CHECK
+
 /** 
  * \retval 1 - If constant true
  * \retval 0 - If constant false

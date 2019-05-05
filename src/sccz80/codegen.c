@@ -280,7 +280,6 @@ static void switch_namespace(char *name)
 void getmem(SYMBOL* sym)
 {
     switch_namespace(sym->ctype->namespace);
-    printf("getmem: Bitfield offset %d size %d\n",sym->ctype->bit_offset, sym->ctype->bit_size);
     if (sym->ctype->kind == KIND_CHAR) {
         if ( (sym->ctype->isunsigned) == 0 )  {
 #ifdef PREAPR00
@@ -691,7 +690,6 @@ void indirect(LVALUE* lval)
     flags = lval->flags;
 
     sign = lval->ltype->isunsigned;
-    printf("indirect: Bitfield offset %d size %d\n",lval->ltype->bit_offset, lval->ltype->bit_size);
     
     /* Fetch from far pointer */
     if (flags & FARACC) { /* Access via far method */
