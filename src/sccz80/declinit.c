@@ -22,9 +22,9 @@ int initials(const char *dropname, Type *type)
     if ( (type->isconst && !c_double_strings) ||
         ( (ispointer(type) || type->kind == KIND_ARRAY) && 
 		(type->ptr->isconst || ((ispointer(type->ptr) || type->ptr->kind == KIND_ARRAY) && type->ptr->ptr->isconst) ) ) ) {
-        output_section(c_rodata_section);
+        output_section(get_section_name(type->namespace,c_rodata_section));
     } else {
-        output_section(c_data_section);
+        output_section(get_section_name(type->namespace,c_data_section));
     }
     prefix();
     outname(dropname, YES);

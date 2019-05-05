@@ -62,3 +62,15 @@ int addstk(LVALUE* lval)
     flgstk[stkcount] = lval->flags;
     return (stkcount++);
 }
+
+const char *get_section_name(const char *namespace, const char *section)
+{
+    static char   buf[LINEMAX+1];
+
+    if ( namespace == NULL ) 
+        return section;
+
+    snprintf(buf,sizeof(buf),"%s_%s",namespace, section);
+
+    return buf;
+}
