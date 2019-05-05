@@ -1,6 +1,7 @@
  
 #include "ccdefs.h"
 #include "define.h" 
+#include "utlist.h"
 
 static void declfunc(Type *type, enum storage_type storage);
 static void handle_kr_type_parameters(Type *func);
@@ -14,6 +15,11 @@ Type   *type_uint = &(Type){ KIND_INT, 2, 1, .len=1 };
 Type   *type_long = &(Type){ KIND_LONG, 4, 0, .len=1 };
 Type   *type_ulong = &(Type){ KIND_LONG, 4, 1, .len=1 };
 Type   *type_double = &(Type){ KIND_DOUBLE, 6, 0, .len=1 }; 
+
+static namespace  *namespaces = NULL;
+
+
+static void parse_namespace(Type *type);
 
 static int32_t needsub(void)
 {
@@ -33,6 +39,8 @@ static int32_t needsub(void)
     needchar(']'); /* force single dimension */
     return (val); /* and return size */
 }
+
+
 
 
 static void swallow_bitfield(Type *type)
@@ -423,8 +431,12 @@ static Type *parse_type(void)
     int   typed = 0;
 
 
+    // Determine namespace
+    parse_namespace(type);
+
     swallow("register");
     swallow("auto");
+
     type->len = 1;
     if ( swallow("const")) {
         type->isconst = 1;
@@ -654,6 +666,7 @@ Type *parse_parameter_list(Type *return_type)
         /* An array parameter becomes a pointer as function argument */
         if ( param->kind == KIND_ARRAY ) {
             Type *ptr = make_pointer(param->ptr);
+            ptr->namespace = param->namespace;
             strcpy(ptr->name, param->name);
             param = ptr;
         }
@@ -765,6 +778,7 @@ Type *parse_decl(char name[], Type *base_type)
     }
 
     if ( rcmatch('*')) {
+        Type *ptr;
         needchar('*');
         if ( base_type == NULL ) {
             errorfmt("Pointer to what exactly?",1);
@@ -773,7 +787,9 @@ Type *parse_decl(char name[], Type *base_type)
         }
         if ( amatch("__far"))
             base_type->isfar = 1;
-        return parse_decl(name, make_pointer(base_type));
+        ptr = make_pointer(base_type);
+        parse_namespace(ptr);
+        return parse_decl(name, ptr);
     }
 
     if ( symname(name) ) {
@@ -818,7 +834,7 @@ int declare_local(int local_static)
                 sym->initialised = 1;
                 initials(namebuf, type);                
             } else {
-                sym->bss_section = strdup(c_bss_section);
+                sym->bss_section = strdup(get_section_name(sym->ctype->namespace, c_bss_section));
             }
         } else {
             int size = type->size;
@@ -862,6 +878,8 @@ int declare_local(int local_static)
                     if ( expr_type->kind == KIND_VOID ) {
                         warningfmt("void","Assigning from a void expression");
                     }
+
+                    check_pointer_namespace(type, expr_type);
                     
                     if ( vconst && expr != type->kind ) {
                         // It's a constant that doesn't match the right type
@@ -982,11 +1000,10 @@ Type *dodeclare(enum storage_type storage)
 
          if ( cmatch(';')) {
              // Maybe not right
-            sym->bss_section = strdup(c_bss_section);
-
+            sym->bss_section = strdup(get_section_name(sym->ctype->namespace, c_bss_section));
             return type;
         } else if ( cmatch(',')) {
-            sym->bss_section = strdup(c_bss_section);
+            sym->bss_section = strdup(get_section_name(sym->ctype->namespace, c_bss_section));
             continue;
         } 
 
@@ -1311,8 +1328,13 @@ void type_describe(Type *type, UT_string *output)
     int  i;
 
     tail[0] = 0;
+
     if ( type->ptr )
         type_describe(type->ptr,output);
+
+    if ( type->namespace ) {
+        utstring_printf(output,"%s ", type->namespace);
+    }
    
     switch ( type->kind ) {
     case KIND_NONE:
@@ -1596,6 +1618,7 @@ static void declfunc(Type *type, enum storage_type storage)
         col();
     }
     nl();
+    reset_namespace();
         
     
     if ( (type->flags & CRITICAL) == CRITICAL ) {
@@ -1654,4 +1677,88 @@ static void declfunc(Type *type, enum storage_type storage)
 #endif
     Zsp = 0;
     infunc = 0; /* not in fn. any more */
+}
+
+
+void parse_addressmod(void)
+{
+    SYMBOL    *sym;
+    namespace *ns;
+
+    char setter[NAMESIZE+1];
+    char nsname[NAMESIZE+1];
+    
+    if ( symname(setter) == 0 ) {
+        junk();
+        errorfmt("Cannot parse __addressmod line - can't find a bank function", 1);
+        return;
+    }
+
+    if ( symname(nsname) == 0 ) {
+        junk();
+        errorfmt("Cannot parse __addressmod line - can't find a namespace name", 1);
+        return;
+    }
+
+    sym = findglb(setter);
+
+    if ( sym == NULL || sym->ctype->kind != KIND_FUNC) {
+        junk();
+        errorfmt("Cannot find setter function <%s> for namespace <%s>",1, setter,nsname);
+        return;
+    }
+
+    ns = CALLOC(1,sizeof(*ns));
+    ns->name = STRDUP(nsname);
+    ns->bank_function = sym;
+
+    LL_APPEND(namespaces, ns);
+}
+
+namespace *get_namespace(const char *name)
+{
+    namespace *ns;
+
+    LL_FOREACH(namespaces, ns) {
+        if ( strcmp(ns->name, name) == 0 ) {
+            return ns;
+        }
+    }
+    return NULL;
+}
+
+static void parse_namespace(Type *type)
+{
+    namespace *ns;
+    LL_FOREACH(namespaces, ns) {
+        if (amatch(ns->name)) {
+            type->namespace = ns->name;
+            return;
+        }
+    }
+}
+
+void check_pointer_namespace(Type *lhs, Type *rhs)
+{
+    if ( ispointer(lhs) && ispointer(rhs) ) {
+        Type *ctype2 = rhs;
+        Type *ctype1 = lhs;
+        do {
+            if ( ctype1->namespace != ctype2->namespace ) {  // The string is shared
+                UT_string *output;
+
+                utstring_new(output);
+                utstring_printf(output,"Cannot assign pointers with different namespaces: <");
+                type_describe(lhs, output);
+                utstring_printf(output,"> from <");
+                type_describe(rhs, output);
+                utstring_printf(output,">");
+                errorfmt("%s",0,utstring_body(output));
+                utstring_free(output);
+                break;
+            }
+            ctype1 = ctype1->ptr;
+            ctype2 = ctype2->ptr;
+        } while ( ctype1 && ctype2 );          
+    }
 }
