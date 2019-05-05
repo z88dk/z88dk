@@ -259,7 +259,8 @@ static void switch_namespace(char *name)
         ns = get_namespace(name);
 
         if ( ns != NULL ) {
-            outfmt("\tcall\t_%s\n",ns->bank_function);
+            zcallop();
+            outname(ns->bank_function->name, dopref(ns->bank_function)); nl();
         }
     }
 
@@ -272,7 +273,6 @@ static void switch_namespace(char *name)
  */
 void getmem(SYMBOL* sym)
 {
-    printf("Getmem: ");dump_type(sym->ctype);
     switch_namespace(sym->ctype->namespace);
     if (sym->ctype->kind == KIND_CHAR) {
         if ( (sym->ctype->isunsigned) == 0 )  {

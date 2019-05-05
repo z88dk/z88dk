@@ -210,7 +210,7 @@ typedef struct namespace_s namespace;
 
 struct namespace_s {
     char        *name;
-    char        *bank_function;
+    SYMBOL      *bank_function;
     namespace   *next;       
 };
 

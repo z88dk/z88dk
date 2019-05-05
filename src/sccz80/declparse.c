@@ -1680,6 +1680,7 @@ static void declfunc(Type *type, enum storage_type storage)
 
 void parse_addressmod(void)
 {
+    SYMBOL    *sym;
     namespace *ns;
 
     char setter[NAMESIZE+1];
@@ -1697,9 +1698,17 @@ void parse_addressmod(void)
         return;
     }
 
+    sym = findglb(setter);
+
+    if ( sym == NULL || sym->ctype->kind != KIND_FUNC) {
+        junk();
+        errorfmt("Cannot find setter function <%s> for namespace <%s>",1, setter,nsname);
+        return;
+    }
+
     ns = CALLOC(1,sizeof(*ns));
     ns->name = STRDUP(nsname);
-    ns->bank_function = STRDUP(setter);
+    ns->bank_function = sym;
 
     LL_APPEND(namespaces, ns);
 }
@@ -1721,7 +1730,6 @@ static void parse_namespace(Type *type)
     namespace *ns;
     LL_FOREACH(namespaces, ns) {
         if (amatch(ns->name)) {
-            printf("Found namespace %s\n",ns->name);
             type->namespace = ns->name;
             return;
         }

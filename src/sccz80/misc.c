@@ -48,7 +48,6 @@ Type* retrstk(char* flags)
         return (laststk = NULL);
     ptr = laststk = stkptr[--stkcount];
     *flags = flgstk[stkcount];
-    printf("Retrieve stack: "); dump_type(ptr);
 
     return (ptr);
 }
@@ -57,7 +56,6 @@ Type* retrstk(char* flags)
 
 int addstk(LVALUE* lval)
 {
-    printf("Add stack: "); dump_type(lval->ltype);
     if ((stkcount + 1) >= 99)
         return (0);
     stkptr[stkcount] = lval->ltype;
