@@ -1616,6 +1616,7 @@ static void declfunc(Type *type, enum storage_type storage)
         col();
     }
     nl();
+    reset_namespace();
         
     
     if ( (type->flags & CRITICAL) == CRITICAL ) {

@@ -246,6 +246,12 @@ void outname(const char* sname, char pref)
     outstr(sname);
 }
 
+
+void reset_namespace()
+{
+    current_nspace = NULL;
+}
+
 static void switch_namespace(char *name)
 {
     namespace *ns;
@@ -490,6 +496,7 @@ void putstk(LVALUE *lval)
     char flags = 0;
     Type *ctype;
     Kind typeobj = lval->indirect_kind;
+
 
 
     //outfmt("; %s type=%d val_type=%d indirect=%d\n", lval->ltype->name, lval->type, lval->val_type, lval->indirect_kind);
