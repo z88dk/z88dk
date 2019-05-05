@@ -280,6 +280,7 @@ static void switch_namespace(char *name)
 void getmem(SYMBOL* sym)
 {
     switch_namespace(sym->ctype->namespace);
+    printf("getmem: Bitfield offset %d size %d\n",sym->ctype->bit_offset, sym->ctype->bit_size);
     if (sym->ctype->kind == KIND_CHAR) {
         if ( (sym->ctype->isunsigned) == 0 )  {
 #ifdef PREAPR00
@@ -533,6 +534,59 @@ void putstk(LVALUE *lval)
         return;
     }
 
+    if ( ctype->bit_size ) {
+        int bit_offset = lval->ltype->bit_offset;
+        int doinc = 0;
+
+        if ( bit_offset >= 8 ) {
+            bit_offset -= 8;
+            doinc = 1;
+        }
+
+        if ( lval->ltype->bit_size + bit_offset <= 8 ) {
+            int i;
+
+            zpop();  // de address
+            if ( doinc ) {
+                ol("inc\tde");
+            }
+
+            ol("ld\ta,l");
+            // TODO: Shift left as necessary
+            if ( bit_offset >= 4) {
+                for ( i = 0; i < (8 - bit_offset); i++ ) {
+                    ol("rlca");
+                }
+            } else {
+                for ( i = 0; i < bit_offset; i++ ) {
+                    ol("rlca");
+                }
+            }
+            outfmt("\tand\t%d\n",((1 << lval->ltype->bit_size) - 1) << bit_offset);
+            ol("ld\tl,a");
+            ol("ld\ta,(de)");
+            outfmt("\tand\t%d\n",0xff - (((1 << lval->ltype->bit_size) - 1) << bit_offset));
+            ol("or\tl");
+            ol("ld\t(de),a");
+        } else {
+            // hl = value, lets shift into the right place
+            asl_const(lval, lval->ltype->bit_offset);
+            zand_const(lval,((1 << lval->ltype->bit_size) - 1) << bit_offset);
+            zpop();  // de = destination address
+            ol("ld\ta,(de)");
+            outfmt("\tand\t%d\n",(0xffff - (((1 << lval->ltype->bit_size) - 1) << bit_offset)) % 256);
+            ol("or\tl");
+            ol("ld\t(de),a");
+            ol("inc\tde");
+            ol("ld\ta,(de)");
+            outfmt("\tand\t%d\n",(0xffff - (((1 << lval->ltype->bit_size) - 1) << bit_offset)) / 256);
+            ol("or\th");
+            ol("ld\t(de),a");
+        }
+        return;
+    }
+
+
     switch (typeobj) {
     case KIND_DOUBLE:
         if ( c_fp_size > 4) {
@@ -637,6 +691,7 @@ void indirect(LVALUE* lval)
     flags = lval->flags;
 
     sign = lval->ltype->isunsigned;
+    printf("indirect: Bitfield offset %d size %d\n",lval->ltype->bit_offset, lval->ltype->bit_size);
     
     /* Fetch from far pointer */
     if (flags & FARACC) { /* Access via far method */
@@ -660,6 +715,39 @@ void indirect(LVALUE* lval)
             warningfmt("incompatible-pointer-types","Cannot retrieve a struct via __far");
         default:
             callrts("lp_gint");
+        }
+        return;
+    }
+
+    if ( lval->ltype->bit_size ) {
+        int bit_offset = lval->ltype->bit_offset;
+
+        if ( bit_offset >= 8 ) {
+            bit_offset -= 8;
+            ol("inc\thl");
+        }
+
+        if ( lval->ltype->bit_size + bit_offset <= 8 ) {
+            int i;
+            ol("ld\ta,(hl)");
+            // TODO: Shift left as necessary
+            if ( bit_offset >= 4) {
+                for ( i = 0; i < (8 - bit_offset); i++ ) {
+                    ol("rlca");
+                }
+            } else {
+                for ( i = 0; i < bit_offset; i++ ) {
+                    ol("rrca");
+                }
+            }
+            outfmt("\tand\t%d\n",(1 << lval->ltype->bit_size) - 1);
+            ol("ld\tl,a");
+            ol("ld\th,0");
+        } else {
+            // It's an int
+            callrts("l_gint");
+            asr_const(lval, lval->ltype->bit_offset);
+            zand_const(lval,(1 << lval->ltype->bit_size) - 1);
         }
         return;
     }

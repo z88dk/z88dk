@@ -299,6 +299,48 @@ static Type *parse_enum(Type *type)
     return ptr;
 }
 
+int align_struct(Type *str)
+{
+    int   i;
+    int   bitoffs = 0;  // How much within an int we've consumed
+    int   offset = 0;   // Offset from start of struct
+    int   prevbitsize = 0;
+    // Go through the members in a struct and align bitfields
+
+    for ( i = 0; i < array_len(str->fields); i++ ) {
+        Type *elem = array_get_byindex(str->fields, i);
+
+        if ( elem->bit_size == 0 ) {
+            if ( bitoffs ) {
+                offset += prevbitsize;
+            }
+            if ( elem->size != -1 ) {
+                elem->offset = offset;
+                offset += elem->size;
+            }
+        } else {
+            // It's a bitfield...
+            // TODO: sdcc rolls over into the next element if we'd straddle LSB + MSB, but naturally we'd fit in LSB
+            // TODO: Avoid padding the MSB
+            int rem = (elem->size * 8) - bitoffs;
+
+            if ( elem->bit_size > rem ) {
+                bitoffs = 0;
+                offset += prevbitsize;
+            }
+            elem->isunsigned = 1;   // This just makes everything easier
+            prevbitsize = elem->size;
+            elem->offset = offset;
+            elem->bit_offset = bitoffs;
+            bitoffs += elem->bit_size;
+        }
+    }
+    if ( bitoffs ) {
+        offset += prevbitsize;
+    }
+    return offset;
+}
+
 Type *parse_struct(Type *type, char isstruct)
 {
     char    sname[NAMESIZE];
@@ -396,6 +438,7 @@ Type *parse_struct(Type *type, char isstruct)
             needchar(',');
         } while ( 1 );
         needchar('}');
+        size = align_struct(str);
         str->size = size;  // It's now defined
         str->weak = 0;
     }
