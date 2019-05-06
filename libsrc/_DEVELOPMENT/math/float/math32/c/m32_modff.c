@@ -30,7 +30,7 @@
 
 #include <math.h>
 
-float modff(float x, float * y) __z88dk_callee
+float modff (float x, float * y) __z88dk_callee
 {
     *y = (long)x;
     return (x-*y);

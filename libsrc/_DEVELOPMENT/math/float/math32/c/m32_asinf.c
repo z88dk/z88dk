@@ -1,7 +1,7 @@
 
 #include <math.h>
 
-float asinf(float x) __z88dk_fastcall
+float asinf (float x) __z88dk_fastcall
 {
     float y;
 

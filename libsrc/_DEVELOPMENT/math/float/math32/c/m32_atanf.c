@@ -1,7 +1,7 @@
 
 #include <math.h>
 
-float atanf(float f) __z88dk_fastcall
+float atanf (float f) __z88dk_fastcall
 {
     int16_t recip;
     float val, val_squared;

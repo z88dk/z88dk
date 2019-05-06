@@ -1,10 +1,10 @@
 
-; float __fsneg (float number)
+; float __fsneg (float number) __z88dk_fastcall
 
 SECTION code_clib
 SECTION code_math
 
-PUBLIC cm32_sccz80_fsneg
+PUBLIC asm_fsneg
 
 EXTERN m32_fsneg_fastcall
 
@@ -17,6 +17,6 @@ EXTERN m32_fsneg_fastcall
     ;
     ; uses  : af, bc, de, hl
 
-DEFC  cm32_sccz80_fsneg = m32_fsneg_fastcall    ; enter stack = ret
+DEFC  asm_fsneg = m32_fsneg_fastcall            ; enter stack = ret
                                                 ;        DEHL = d32_float
                                                 ; return DEHL = d32_float

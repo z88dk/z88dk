@@ -1,22 +1,22 @@
 
-; float __fsneg (float number)
+; float __fsmin (float number) __z88dk_fastcall
 
 SECTION code_clib
 SECTION code_math
 
-PUBLIC cm32_sccz80_fsneg
+PUBLIC asm_fsmin
 
-EXTERN m32_fsneg_fastcall
+EXTERN m32_fsmin_fastcall
 
-    ; negate sccz80 floats
+    ; change underflow to a error floating zero as sdcc float
     ;
     ; enter : stack = ret
     ;          DEHL = sccz80_float number
     ;
-    ; exit  :  DEHL = sccz80_float(-number)
+    ; exit  :  DEHL = sccz80_float(0)
     ;
     ; uses  : af, bc, de, hl
 
-DEFC  cm32_sccz80_fsneg = m32_fsneg_fastcall    ; enter stack = ret
+DEFC  asm_fsmin = m32_fsmin_fastcall            ; enter stack = ret
                                                 ;        DEHL = d32_float
                                                 ; return DEHL = d32_float

@@ -1,7 +1,7 @@
 
 #include	<math.h>
 
-float sinf(float f) __z88dk_fastcall
+float sinf (float f) __z88dk_fastcall
 {
 	float	y, y_squared;
 	int16_t	sect, e;

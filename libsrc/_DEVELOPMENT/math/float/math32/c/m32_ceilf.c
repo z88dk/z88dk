@@ -31,7 +31,7 @@
 #include <math.h>
 #include <float.h>
 
-float ceilf(float x) __z88dk_fastcall
+float ceilf (float x) __z88dk_fastcall
 {
     long r;
     r = (long)x;

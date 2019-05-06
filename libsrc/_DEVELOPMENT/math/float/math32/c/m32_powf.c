@@ -32,7 +32,7 @@
 #include <math.h>
 #include <errno.h>
 
-float powf(float x, float y) __z88dk_callee
+float powf (float x, float y) __z88dk_callee
 {
     if(x <  0.0) return 0.0;
     if(x == 0.0) return 0.0;

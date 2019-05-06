@@ -30,7 +30,7 @@
 
 #include <math.h>
 
-float fabsf(float x) __z88dk_fastcall
+float fabsf (float x) __z88dk_fastcall
 {
     union float_long fl;
 

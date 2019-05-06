@@ -1,22 +1,22 @@
 
-; float __fsneg (float number)
+; float __fszero (float number) __z88dk_fastcall
 
 SECTION code_clib
 SECTION code_math
 
-PUBLIC cm32_sccz80_fsneg
+PUBLIC asm_fszero
 
-EXTERN m32_fsneg_fastcall
+EXTERN m32_fszero_fastcall
 
-    ; negate sccz80 floats
+    ; return a legal zero
     ;
     ; enter : stack = ret
     ;          DEHL = sccz80_float number
     ;
-    ; exit  :  DEHL = sccz80_float(-number)
+    ; exit  :  DEHL = sccz80_float(0)
     ;
     ; uses  : af, bc, de, hl
 
-DEFC  cm32_sccz80_fsneg = m32_fsneg_fastcall    ; enter stack = ret
+DEFC  asm_fszero = m32_fszero_fastcall          ; enter stack = ret
                                                 ;        DEHL = d32_float
                                                 ; return DEHL = d32_float

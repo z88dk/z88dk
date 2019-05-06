@@ -1,7 +1,7 @@
 
 #include <math.h>
 
-float expf(float x) __z88dk_fastcall
+float expf (float x) __z88dk_fastcall
 {
     int16_t exp;
     uint8_t sign;

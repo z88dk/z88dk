@@ -1,7 +1,7 @@
 
 #include <math.h>
 
-float coshf(const float x) __z88dk_fastcall
+float coshf (const float x) __z88dk_fastcall
 {
 	float y;
 
