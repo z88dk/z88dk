@@ -326,7 +326,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             outname(funcname, dopref(ptr)); nl();
         }
     } else {
-        callstk(functype, nargs, fnptr_type->kind == KIND_CPTR, last_argument_size);
+        nargs += callstk(functype, nargs, fnptr_type->kind == KIND_CPTR, last_argument_size);
     }
 
     if (functype->flags & CALLEE ) {
