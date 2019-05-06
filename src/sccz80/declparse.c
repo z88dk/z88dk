@@ -48,8 +48,8 @@ static void swallow_bitfield(Type *type)
     double val;
     Kind   valtype;
     if (cmatch(':')) {
-        if ( !kind_is_integer(type->kind) ) {
-           errorfmt("Cannot define a bitfield on non-integer type",1);
+        if ( !kind_is_integer(type->kind) || type->kind == KIND_LONG ) {
+           errorfmt("Cannot define a bitfield on non-integer (or long) type",1);
         } else {
            constexpr(&val, &valtype, 1);
            if ( val > 16 ) {
@@ -304,15 +304,14 @@ int align_struct(Type *str)
     int   i;
     int   bitoffs = 0;  // How much within an int we've consumed
     int   offset = 0;   // Offset from start of struct
-    int   prevbitsize = 0;
-    // Go through the members in a struct and align bitfields
 
+    // Go through the members in a struct and align bitfields
     for ( i = 0; i < array_len(str->fields); i++ ) {
         Type *elem = array_get_byindex(str->fields, i);
 
         if ( elem->bit_size == 0 ) {
             if ( bitoffs ) {
-                offset += prevbitsize;
+                offset += (bitoffs / 8) + 1;
                 bitoffs = 0;
             }
             if ( elem->size != -1 ) {
@@ -325,19 +324,19 @@ int align_struct(Type *str)
             // TODO: Avoid padding the MSB
             int rem = (elem->size * 8) - bitoffs;
 
-            if ( elem->bit_size > rem ) {
+            if ( bitoffs != 8 && (elem->bit_size > rem || (bitoffs + elem->bit_size) > 8) ) {
+                offset += (bitoffs / 8) + 1;
                 bitoffs = 0;
-                offset += prevbitsize;
             }
-            elem->isunsigned = 1;   // This just makes everything easier
-            prevbitsize = elem->size;
+            elem->isunsigned = elem->explicitly_signed ? 0 : 1;  // Default unsigned, signed if explicitly so
             elem->offset = offset;
             elem->bit_offset = bitoffs;
+            printf("%s %d +%d @%d, %d\n",elem->name, elem->isunsigned, elem->offset, elem->bit_offset, elem->bit_size);
             bitoffs += elem->bit_size;
         }
     }
     if ( bitoffs ) {
-        offset += prevbitsize;
+        offset += (bitoffs / 8) + 1;;
     }
     return offset;
 }
@@ -508,6 +507,7 @@ static Type *parse_type(void)
 
     if ( amatch("signed")) {
         type->isunsigned = 0;
+        type->explicitly_signed = 1;
         type->kind = KIND_INT;
         type->size = 2;
         typed = 1;

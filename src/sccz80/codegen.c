@@ -739,13 +739,36 @@ void indirect(LVALUE* lval)
                 }
             }
             outfmt("\tand\t%d\n",(1 << lval->ltype->bit_size) - 1);
-            ol("ld\tl,a");
-            ol("ld\th,0");
+            if ( lval->ltype->isunsigned == 0 ) {
+                // We need to do some bit extension here
+                outfmt("\tbit\t%d,a\n",lval->ltype->bit_size - 1);
+                ol("jr\tz,ASMPC+4");
+                outfmt("\tor\t%d\n",0xff - ((1 << lval->ltype->bit_size) - 1));
+                ol("ld\tl,a");
+                ol("rlca");
+                ol("sbc\ta,a");
+                ol("ld\th,a");
+            } else {
+                ol("ld\tl,a");
+                ol("ld\th,0");
+            }
         } else {
-            // It's an int
-            callrts("l_gint");
-            asr_const(lval, lval->ltype->bit_offset);
-            zand_const(lval,(1 << lval->ltype->bit_size) - 1);
+            // It's an int > 8 bits
+            ol("ld\te,(hl)");
+            ol("inc\thl");
+            ol("ld\ta,(hl)");
+            outfmt("\tand\t%d\n",(1 << (lval->ltype->bit_size - 8)) - 1);
+            outfmt("\tbit\t%d,a\n",(lval->ltype->bit_size - 8) - 1);
+            ol("jr\tz,ASMPC+4");
+            outfmt("\tor\t%d\n",0xff - ((1 << (lval->ltype->bit_size - 8)) - 1));
+            ol("ld\th,a");
+            ol("ld\tl,e");
+
+
+            // callrts("l_gint");
+            // asr_const(lval, lval->ltype->bit_offset);
+            // zand_const(lval,(1 << lval->ltype->bit_size) - 1);
+            // TODO: Sign extension
         }
         return;
     }
@@ -1070,7 +1093,7 @@ void zret(void)
  * Perform subroutine call to value on top of stack
  * Put arg count in A in case subroutine needs it
  */
-void callstk(Type *type, int n, int isfarptr, int last_argument_size)
+int callstk(Type *type, int n, int isfarptr, int last_argument_size)
 {
     if ( isfarptr ) {
         // The function address is on the stack at +n
@@ -1088,33 +1111,27 @@ void callstk(Type *type, int n, int isfarptr, int last_argument_size)
         callrts("l_farcall");
     } else if ( type->flags & FASTCALL && last_argument_size < 6 ) {
          int label = getlabel();		  
+         int  ret = -2;
          // TOS = address, dehl = parameter
          // More than one argument, TOS = last parameter, hl = function
 	 // For long sp+0 = LSW, sp +2 = MSW, hl = function
          if ( last_argument_size != 2 ) {
              ol("pop\taf");
              outstr("\tld\tbc,"); printlabel(label);  nl();	// bc = return address
-             // Next 3 lines aren't strictly necessary for a fastcall function
-             // but lets hanfle a non-fastcall pointer being assigned to
-             // a fastcall function pointer
-#if 0
-             ol("push\tde");
-             ol("push\thl");
-             Zsp -= 2;
-#endif
              ol("push\tbc");
              ol("push\taf");
-             Zsp += 4;
+             Zsp += 2;
+             ret = -4;
          } else {
              ol("pop\taf");
              outstr("\tld\tbc,"); printlabel(label);  nl();	// bc = return address
-     //        ol("push\thl"); // See note above
              ol("push\tbc"); /* Return address */		
              ol("push\taf");		
              Zsp += 2;
          }
          ol("ret");		
          postlabel(label);
+         return ret;
     } else {
         if (last_argument_size == 2) {
             /* At this point, TOS = function, hl = argument */
@@ -1131,6 +1148,7 @@ void callstk(Type *type, int n, int isfarptr, int last_argument_size)
 
         callrts("l_jphl");
     }
+    return 0;
 }
 
 
