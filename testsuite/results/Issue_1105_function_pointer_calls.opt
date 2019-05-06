@@ -274,9 +274,6 @@
 	pop	bc
 	pop	bc
 	pop	bc
-	pop	bc
-	push	bc
-	push	bc
 	ret
 
 

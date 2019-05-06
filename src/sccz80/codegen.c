@@ -1092,6 +1092,8 @@ void zret(void)
 /*
  * Perform subroutine call to value on top of stack
  * Put arg count in A in case subroutine needs it
+ * 
+ * Returns an "nargs" adjustment to handle fastcall
  */
 int callstk(Type *type, int n, int isfarptr, int last_argument_size)
 {
@@ -1110,24 +1112,24 @@ int callstk(Type *type, int n, int isfarptr, int last_argument_size)
         loadargc(n);
         callrts("l_farcall");
     } else if ( type->flags & FASTCALL && last_argument_size < 6 ) {
-         int label = getlabel();		  
-         int  ret = -2;
-         // TOS = address, dehl = parameter
-         // More than one argument, TOS = last parameter, hl = function
-	 // For long sp+0 = LSW, sp +2 = MSW, hl = function
-         if ( last_argument_size != 2 ) {
-             ol("pop\taf");
-             outstr("\tld\tbc,"); printlabel(label);  nl();	// bc = return address
-             ol("push\tbc");
-             ol("push\taf");
-             Zsp += 2;
-             ret = -4;
+        int ret = -2;
+        int label = getlabel();		  
+        // TOS = address, dehl = parameter
+        // More than one argument, TOS = last parameter, hl = function
+        // For long sp+0 = LSW, sp +2 = MSW, hl = function
+        if ( last_argument_size != 2 ) {
+            ol("pop\taf");
+            outstr("\tld\tbc,"); printlabel(label);  nl();	// bc = return address
+            ol("push\tbc");
+            ol("push\taf");
+            Zsp += 2;
+            ret = -4;
          } else {
-             ol("pop\taf");
-             outstr("\tld\tbc,"); printlabel(label);  nl();	// bc = return address
-             ol("push\tbc"); /* Return address */		
-             ol("push\taf");		
-             Zsp += 2;
+            ol("pop\taf");
+            outstr("\tld\tbc,"); printlabel(label);  nl();	// bc = return address
+            ol("push\tbc"); /* Return address */		
+            ol("push\taf");		
+            Zsp += 2;
          }
          ol("ret");		
          postlabel(label);
