@@ -43,7 +43,7 @@ static int32_t needsub(void)
 
 
 
-static void swallow_bitfield(Type *type)
+static void parse_bitfield(Type *type)
 {
     double val;
     Kind   valtype;
@@ -57,7 +57,6 @@ static void swallow_bitfield(Type *type)
            } else {
                type->bit_size = val;
            }
-           warningfmt("unsupported-feature","Bitfields not supported by compiler");
         }
     }
 }
@@ -331,7 +330,6 @@ int align_struct(Type *str)
             elem->isunsigned = elem->explicitly_signed ? 0 : 1;  // Default unsigned, signed if explicitly so
             elem->offset = offset;
             elem->bit_offset = bitoffs;
-            printf("%s %d +%d @%d, %d\n",elem->name, elem->isunsigned, elem->offset, elem->bit_offset, elem->bit_size);
             bitoffs += elem->bit_size;
         }
     }
@@ -394,7 +392,12 @@ Type *parse_struct(Type *type, char isstruct)
             
             if ( elem != NULL ) {
                 if ( strlen(elem->name) == 0 && elem->kind != KIND_STRUCT ) {
-                    errorfmt("Member variables must be named",1);
+                    if ( !rcmatch(':')) {
+                        errorfmt("Member variables must be named",1);
+                    } else {
+                        // It's a padding bitfield
+                        snprintf(elem->name,sizeof(elem->name),"%d_bitfield_padding", array_len(str->fields));
+                    }
                 }
                 elem->offset = offset;
                 if ( isstruct ) {
@@ -414,8 +417,8 @@ Type *parse_struct(Type *type, char isstruct)
             } else {
                 break;
             }
-            // Swallow bitfields
-            swallow_bitfield(elem);
+            // Parse out bitfields
+            parse_bitfield(elem);
 
             // It was a flexible member, this needs to be last in the sturct
             if ( elem->size <= 0 ) {
