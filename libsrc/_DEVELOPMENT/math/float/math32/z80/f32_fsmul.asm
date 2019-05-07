@@ -22,12 +22,12 @@
 ;
 ; = a*d*2^32 + a*e*2^24 + b*d*2^24 + b*e*2^16 + 
 ;   a*f*2^16 + b*f*2^8 +
-;   c*e*2^16 + c*e*2^8 +
+;   c*d*2^16 + c*e*2^8 +
 ;   c*f
 ;
 ; = a*d*2^32 +
 ;   a*e*2^24 + b*d*2^24 +
-;   b*e*2^16 + a*f*2^16 + c*e*2^16 +
+;   b*e*2^16 + a*f*2^16 + c*d*2^16 +
 ;   b*f*2^8  + c*e*2^8  +
 ;   c*f
 ;
@@ -49,6 +49,7 @@
 SECTION code_clib
 SECTION code_math
 
+EXTERN m32_fszero_fastcall
 EXTERN m32_mulu_32_16x16
 
 PUBLIC m32_fsmul, m32_fsmul_callee
@@ -104,7 +105,7 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 
     ld a,h                      ; calculate the exponent
     or a                        ; second exponent zero then result is zero
-    jp Z,fmzero
+    jp Z,m32_fszero_fastcall
 
     sub a,07fh                  ; subtract out bias, so when exponents are added only one bias present
     jr C,fmchkuf
@@ -129,7 +130,7 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 
     ld a,b                      ; check sum of exponents for zero
     or a
-    jp Z,fmzero
+    jp Z,m32_fszero_fastcall
 
                                 ; a' = sum of exponents, f' = Sign of result
                                 ; first  h  = eeeeeeee, lde  = 1mmmmmmm mmmmmmmm mmmmmmmm
@@ -140,8 +141,11 @@ PUBLIC m32_fsmul, m32_fsmul_callee
                                 ;
                                 ; = a*d*2^32 +
                                 ;   a*e*2^24 + b*d*2^24 +
-                                ;   b*e*2^16 + a*f*2^16 + c*e*2^16 +
-                                ;   b*f*2^8  + c*e*2^8
+                                ;   b*e*2^16 + a*f*2^16 + c*d*2^16 +
+                                ;   b*f*2^8  + c*e*2^8 +
+                                ;   c*f
+                                ;
+                                ; 9 8*8 multiplies in total
                                 ;
                                 ; enter : abc = lde  = 24-bit multiplier   = x
                                 ;         def = lde' = 24-bit multiplicand = y
