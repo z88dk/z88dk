@@ -1,0 +1,71 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	data_compiler
+._x
+	defw	0x1fff
+	defb	0xf
+	defw	i_1+0
+	SECTION	code_compiler
+
+._main
+	push	bc
+	ld	de,_x
+	ld	hl,2047
+	ld	a,l
+	ld	(de),a
+	inc	de
+	ld	a,(de)
+	and	248
+	or	h
+	ld	(de),a
+	ld	hl,_x + 1
+	ld	a,(hl)
+	and	199
+	or	16
+	ld	(hl),a
+	ld	hl,_x+1+1
+	ld	a,(hl)
+	and	224
+	or	3
+	ld	(hl),a
+	ld	hl,5	;const
+	pop	bc
+	push	hl
+	ld	hl,_x
+	ld	e,(hl)
+	inc	hl
+	ld	a,(hl)
+	and	7
+	bit	2,a
+	jr	z,ASMPC+4
+	or	248
+	ld	h,a
+	ld	l,e
+	pop	bc
+	ret
+
+
+	SECTION	rodata_compiler
+.i_1
+	defm	"hello"
+	defb	0
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_x
+	GLOBAL	_main
+
+
+
+
