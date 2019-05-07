@@ -50,7 +50,6 @@ SECTION code_clib
 SECTION code_math
 
 EXTERN m32_fszero_fastcall
-EXTERN m32_mulu_32_16x16
 
 PUBLIC m32_fsmul, m32_fsmul_callee
 
@@ -151,84 +150,180 @@ PUBLIC m32_fsmul, m32_fsmul_callee
                                 ;         def = lde' = 24-bit multiplicand = y
                                 ;
                                 ; exit  : hlde  = 32-bit product
-    ld h,l
-    ld l,d
-    push hl                     ; ab on stack
-    push de                     ; bc on stack
 
+    ld h,l                      ; ab:bc
+    ld l,d
+    ld a,h                      ; a in a             
+    
     exx
-
-    ld h,l
+    ld h,a
+    push hl                     ; ad on stack
+    ld h,l                      ; de:ef
     ld l,d
-    ld b,l
-    ld c,d
-    ex (sp),hl                  ; de on stack, bc in HL
-    push bc                     ; de on stack (again)
-    push hl                     ; bc on stack
+    push hl                     ; de on stack
     push de                     ; ef on stack
+    ld a,h                      ; d in a
 
     exx
-
+    ld d,a                      ; dc in de
     ld b,h
-    ld c,l                      ; ab in BC
-    pop de                      ; ef in DE
-    ld d,0                      ; 0f in DE
-    call m32_mulu_32_16x16      ; ab*f => HLBC
-
-    pop de                      ; bc in DE
-    ex (sp),hl                  ; de in HL, ab*f msw on stack
-    push bc                     ; ab*f lsw on stack
-    
-    ex de,hl                    ; de in DE
     ld c,l
-    ld b,0                      ; 0c in BC
-    call m32_mulu_32_16x16      ; de*c => HLBC
+    ex (sp),hl                  ; ab on stack, ef in HL
+    push de                     ; dc on stack
+    push bc                     ; ab on stack (again)
+    push hl                     ; ef on stack
+
+    exx
+    push de                     ; ef on stack
+    ld a,e                      ; f in a
     
-    xor a                       ; clear A
-    
-    ex (sp),hl                  ; de*c msw on stack, ab*f lsw in HL
-    add hl,bc                   ; ab*f lsw + de*c lsw
-    ex de,hl                    ; ab*f lsw + de*c lsw in DE
-    
-    pop hl                      ; de*c msw in HL
-    pop bc                      ; ab*f msw in DE
-    
-    adc hl,bc                   ; ab*f msw + de*c msw
+    exx
+    ld d,l
+    push de                     ; bc on stack
+    ld d,a                      ; fc in de
 
-    adc a,a                     ; save ab*f msw + de*c msw carry in A
+IF __CPU_Z180__
+    mlt de                      ; c*f 2^0
+ELSE
+IF __CPU_Z80_ZXN__
+    mul de                      ; c*f 2^0
+ELSE
+    EXTERN m32_z80_mulu_de
+    call m32_z80_mulu_de        ; c*f 2^0
+ENDIF
+ENDIF
 
-    pop bc                      ; de in BC
-    ex (sp),hl                  ; ab*f msw + de*c msw + lsw C on stack, ab in HL
-    ex de,hl                    ; ab*f lsw + de*c lsw in HL, ab in DE
+    ld c,d                      ; put 2^0 in bc
+    ld b,0
 
-    push af                     ; ab*f msw + de*c msw carry on stack
-    push hl                     ; ab*f lsw + de*c lsw on stack
+    pop de                      ; bc
+    pop hl                      ; ef
+    ld a,h
+    ld h,e
+    ld e,a
 
-    call m32_mulu_32_16x16      ; ab*de => HLBC
+IF __CPU_Z180__
+    mlt hl                      ; b*e 2^8
+    mlt de                      ; c*f 2^8
+ELSE
+IF __CPU_Z80_ZXN__
+    mul de                      ; b*e 2^8
+    ex de,hl
+    mul de                      ; c*f 2^8
+ELSE
+    call m32_z80_mulu_de        ; b*e 2^8
+    ex de,hl
+    call m32_z80_mulu_de        ; c*f 2^8
+ENDIF
+ENDIF
 
-    pop de                      ; ab*f lsw + de*c lsw in DE
-    pop af                      ; ab*f msw + de*c msw carry in A
-    ld e,a                      ; save ab*f msw + de*c msw carry in E
+    xor a
+    add hl,bc
+    adc a,a
+    add hl,de
+    adc a,0
 
-    ld a,c                      ; start adding the products with 8 bit offset
-    add a,d                     ; ab*f lswh + de*c lswh + ab*de lswl
-    ld d,a
+    ld c,h                      ; put 2^8 in bc
+    ld b,a
 
-    ld a,b
-    pop bc                      ; ab*f msw + de*c msw + lsw C in BC
-    adc a,c                     ; ab*f mswl + de*c mswl
-    ld c,a
-
-    ld a,l                      ; ab*de mswl
-    adc a,b                     ; ab*f mswh + de*c mswh
-    ld l,a
-
-    ld a,h                      ; ab*de mswh
-    adc a,e                     ; ab*f msw + de*c msw carry
+    pop de                      ; ef
+    pop hl                      ; ab
+    ld a,d
+    ld d,h
     ld h,a
 
-    ld e,d
-    ld d,c                      ; exit  : HLDE  = 32-bit product
+IF __CPU_Z180__
+    mlt hl                      ; a*f 2^16
+    mlt de                      ; e*b 2^16
+ELSE
+IF __CPU_Z80_ZXN__
+    mul de                      ; a*f 2^16
+    ex de,hl
+    mul de                      ; e*b 2^16
+ELSE
+    call m32_z80_mulu_de        ; a*f 2^16
+    ex de,hl
+    call m32_z80_mulu_de        ; e*b 2^16
+ENDIF
+ENDIF
+
+    xor a
+    add hl,bc
+    adc a,a
+    add hl,de
+    adc a,0
+
+    pop de                      ; dc
+
+IF __CPU_Z180__
+    mlt de                      ; d*c 2^16
+ELSE
+IF __CPU_Z80_ZXN__
+    mul de                      ; d*c 2^16
+ELSE
+    call m32_z80_mulu_de        ; d*c 2^16
+ENDIF
+ENDIF
+
+    add hl,de
+    adc a,0
+
+    ld c,h                      ; put 2^16 in bca
+    ld b,a
+    ld a,l
+
+    pop de                      ; ab
+    pop hl                      ; de
+
+    push af                     ; l on stack
+
+    ld a,d
+    ld d,h
+    ld h,a
+
+IF __CPU_Z180__
+    mlt hl                      ; d*b 2^24
+    mlt de                      ; a*e 2^24
+ELSE
+IF __CPU_Z80_ZXN__
+    mul de                      ; d*b 2^24
+    ex de,hl
+    mul de                      ; a*e 2^24
+ELSE
+    call m32_z80_mulu_de        ; d*b 2^24
+    ex de,hl
+    call m32_z80_mulu_de        ; a*e 2^24
+ENDIF
+ENDIF
+
+    xor a
+    add hl,bc
+    adc a,a
+    add hl,de
+    adc a,0
+
+    pop bc                     ; l in b
+    ld c,b
+    ld b,l
+    ld l,h
+    ld h,a
+
+    pop de                      ; ad
+
+IF __CPU_Z180__
+    mlt de                      ; a*d 2^32
+ELSE
+IF __CPU_Z80_ZXN__
+    mul de                      ; a*d 2^32
+ELSE
+    call m32_z80_mulu_de        ; a*d 2^32
+ENDIF
+ENDIF
+
+    add hl,de
+
+    ld d,b
+    ld e,c                      ; exit  : HLDE  = 32-bit product
 
 .fm1
     ex af,af                    ; retrieve sign and exponent from af'
@@ -252,7 +347,7 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 
 .fm3b
     ex af,af
-    ld a,e                      ; round result
+    ld a,e                      ; round using digi norm's method
     or a
     jr Z,fm3c
     set 0,d
