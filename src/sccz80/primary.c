@@ -710,7 +710,6 @@ int check_range(LVALUE *lval, int32_t min_value, int32_t max_value)
 }
 
 #define CHECK(v, min, max) do { \
-	printf("%d %d %d\n",(int)v,min,max); \
         if ( v < min || v > max ) warningfmt("limited-range","Value is out of range for assignment"); \
     } while (0)
 
