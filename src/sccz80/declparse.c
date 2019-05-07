@@ -101,6 +101,25 @@ void *array_get_byindex(array *arr, int index)
     return arr->elems[index];
 }
 
+void array_del_byindex(array *arr, int index)
+{
+    int i;
+
+    if ( index < 0 || index >= arr->size ) {
+        return;
+    }
+
+    // Destroy element
+    if ( arr->destructor ) {
+        arr->destructor(arr->elems[index]);
+    }
+
+    for ( i = index; i < arr->size - 1; i++ ) {
+        arr->elems[i] = arr->elems[i+1];
+    }
+    arr->size--;
+}
+
 
 
 
@@ -310,7 +329,7 @@ int align_struct(Type *str)
 
         if ( elem->bit_size == 0 ) {
             if ( bitoffs ) {
-                offset += (bitoffs / 8) + 1;
+                offset += ((bitoffs - 1)/ 8) + 1;
                 bitoffs = 0;
             }
             if ( elem->size != -1 ) {
@@ -319,12 +338,9 @@ int align_struct(Type *str)
             }
         } else {
             // It's a bitfield...
-            // TODO: sdcc rolls over into the next element if we'd straddle LSB + MSB, but naturally we'd fit in LSB
-            // TODO: Avoid padding the MSB
             int rem = (elem->size * 8) - bitoffs;
 
-
-            if ( bitoffs != 8 && (elem->bit_size > rem || (bitoffs && bitoffs + elem->bit_size) > 8) ) {
+            if ((bitoffs % 8) && elem->bit_size > rem ) {
                 offset += (bitoffs / 8) + 1;
                 bitoffs = 0;
             }
@@ -388,6 +404,8 @@ Type *parse_struct(Type *type, char isstruct)
         Type *base_type = NULL;        
         needchar('{');
         do {
+            int padding = 0;
+
             // Read each field now */
             blanks();
             elem = dodeclare2(&base_type, MODE_NONE);
@@ -398,7 +416,7 @@ Type *parse_struct(Type *type, char isstruct)
                         errorfmt("Member variables must be named",1);
                     } else {
                         // It's a padding bitfield
-                        snprintf(elem->name,sizeof(elem->name),"%d_bitfield_padding", array_len(str->fields));
+                        padding = 1;
                     }
                 }
                 elem->offset = offset;
@@ -415,7 +433,9 @@ Type *parse_struct(Type *type, char isstruct)
                 } else { 
                     if ( elem->size > size ) size = elem->size;
                 }
-                array_add(str->fields, elem);
+                if ( !padding ) {
+                    array_add(str->fields, elem);
+                }
             } else {
                 break;
             }
@@ -1811,4 +1831,12 @@ void check_pointer_namespace(Type *lhs, Type *rhs)
             ctype2 = ctype2->ptr;
         } while ( ctype1 && ctype2 );          
     }
+}
+
+
+int isutype(Type *type)
+{
+    if (type->isunsigned || ispointer(type)) 
+        return (1);
+    return (0);
 }

@@ -98,6 +98,7 @@ extern int        type_matches(Type *t1, Type *t2);
 extern void       parse_addressmod(void);
 extern namespace *get_namespace(const char *name);
 extern void       check_pointer_namespace(Type *lhs, Type *rhs);
+extern int        isutype(Type *type);
 
 /* error.c */
 extern int        endst(void);
@@ -207,10 +208,10 @@ extern int      constexpr(double *val, Kind *valtype, int flag);
 extern void     cscale(Type *type, int *val);
 extern int      docast(LVALUE *lval,LVALUE *dest_lval);
 extern void     convert_int_to_double(char type, char zunsign);
-extern int      utype(LVALUE *lval);
+extern int      ulvalue(LVALUE *lval);
 extern int      check_lastop_was_testjump(LVALUE *lval);
 extern int      check_range(LVALUE *lval, int32_t min_value, int32_t max_value) ;
-extern void     check_assign_range(LVALUE *lval, double const_value);
+extern void     check_assign_range(Type *type, double const_value);
 
 /* stmt.c */
 extern int      statement(void);

@@ -713,18 +713,18 @@ int check_range(LVALUE *lval, int32_t min_value, int32_t max_value)
         if ( v < min || v > max ) warningfmt("limited-range","Value is out of range for assignment"); \
     } while (0)
 
-void check_assign_range(LVALUE *lval, double const_value)
+void check_assign_range(Type *type, double const_value)
 {
-    Kind lhs_val_type = lval->ltype->kind;
-    int  factor = lval->ltype->bit_size ? ((1 << lval->ltype->bit_size) - 1) : 0xffff;
+    Kind lhs_val_type = type->kind;
+    int  factor = type->bit_size ? ((1 << type->bit_size) - 1) : 0xffff;
 
-    if ( lhs_val_type == KIND_INT && !utype(lval) ) {
+    if ( lhs_val_type == KIND_INT && !isutype(type) ) {
         CHECK(const_value, -(32767 & factor), (65535 & factor));
-    } else if ( lhs_val_type == KIND_INT && utype(lval) ) {
+    } else if ( lhs_val_type == KIND_INT && isutype(type) ) {
         CHECK(const_value, 0, (65535 & factor));
-    } else if ( lhs_val_type == KIND_CHAR && !utype(lval) ) {
+    } else if ( lhs_val_type == KIND_CHAR && !isutype(type) ) {
         CHECK(const_value, -(127 & factor), (255 & factor));
-    } else if ( lhs_val_type == KIND_CHAR && utype(lval) ) {
+    } else if ( lhs_val_type == KIND_CHAR && isutype(type) ) {
         CHECK(const_value, 0, (255 & factor));
     }
 }
@@ -858,12 +858,11 @@ int docast(LVALUE* lval, LVALUE *dest_lval)
  * Check whether a type is unsigned..
  */
 
-int utype(LVALUE* lval)
+int ulvalue(LVALUE* lval)
 {
-    if (lval->ltype->isunsigned || ispointer(lval->ltype)) 
-        return (1);
-    return (0);
+    return isutype(lval->ltype);
 }
+
 
 /*
  * Check to see whether an operation should be testjumped or not

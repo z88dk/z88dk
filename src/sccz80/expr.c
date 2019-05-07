@@ -127,7 +127,7 @@ int heir1(LVALUE* lval)
         check_pointer_namespace(lval->ltype, lval2.ltype);
 
         if ( lval2.is_const) {
-            check_assign_range(lval, lval2.const_val);
+            check_assign_range(lval->ltype, lval2.const_val);
         }
 
         force(lval->val_type, lval2.val_type, lval->ltype->isunsigned, lval2.ltype->isunsigned, 0); /* 27.6.01 lval2.is_const); */

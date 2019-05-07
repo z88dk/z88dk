@@ -58,6 +58,7 @@ static void add_bitfield(Type *bitfield, int *value)
 
     if (constexpr(&cvalue, &valtype, 1)) {
         int ival = ((int)cvalue & (( 1 << bitfield->bit_size) - 1)) << bitfield->bit_offset;
+        check_assign_range(bitfield, cvalue);
         *value |= ival;
     } else {
         errorfmt("Expected a constant value for bitfield assignment", 1);
@@ -78,21 +79,13 @@ int str_init(Type *tag)
     int     num_fields = tag->isstruct ? array_len(tag->fields) : 1;
     int     bitfield_value = 0;
     int     had_bitfield = 0;
-    int     needcomma = 0;
 
     for ( i = 0; i < num_fields; i++ ) {
         if ( rcmatch('}')) {
             break;
         }
-        if ( needcomma) needchar(',');
+        if ( i != 0 ) needchar(',');
         ptr = array_get_byindex(tag->fields,i);
-
-        // Terrible way to skip over padding in structures. They just shouldn't be there
-        if ( isdigit(ptr->name[0])) {
-            needcomma = 0;
-            continue;
-        }
-        needcomma = 1;
 
         if ( ptr->offset == last_offset ) {
             add_bitfield(ptr, &bitfield_value);
@@ -309,6 +302,7 @@ static int init(Type *type, int dump)
             return 0;
         } else if (constexpr(&value, &valtype, 1)) {
 constdecl:
+            check_assign_range(type, value);
             if (dump) {
                 /* struct member or array of pointer to char */
                 if ( type->kind == KIND_DOUBLE ) {
