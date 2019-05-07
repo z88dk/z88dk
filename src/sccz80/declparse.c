@@ -340,19 +340,23 @@ int align_struct(Type *str)
             // It's a bitfield...
             int rem = (elem->size * 8) - bitoffs;
 
-            if ((bitoffs % 8) && elem->bit_size > rem ) {
-                offset += (bitoffs / 8) + 1;
+            if ( elem->bit_size > rem ) {
+                offset += ((bitoffs-1) / 8) + 1;
                 bitoffs = 0;
             }
             elem->isunsigned = elem->explicitly_signed ? 0 : 1;  // Default unsigned, signed if explicitly so
             elem->offset = offset;
             elem->bit_offset = bitoffs;
-           // printf("%s %d +%d @%d, %d\n",elem->name, elem->isunsigned, elem->offset, elem->bit_offset, elem->bit_size);
+            //printf("i=%d: %s %d +%d @%d, %d\n",i,elem->name, elem->isunsigned, elem->offset, elem->bit_offset, elem->bit_size);
             bitoffs += elem->bit_size;
+            if  ( strlen(elem->name) == 0) {
+                array_del_byindex(str->fields, i);
+                i--;
+            }
         }
     }
     if ( bitoffs ) {
-        offset += (bitoffs / 8) + 1;;
+        offset += ((bitoffs -1) / 8) + 1;
     }
     return offset;
 }
@@ -404,8 +408,6 @@ Type *parse_struct(Type *type, char isstruct)
         Type *base_type = NULL;        
         needchar('{');
         do {
-            int padding = 0;
-
             // Read each field now */
             blanks();
             elem = dodeclare2(&base_type, MODE_NONE);
@@ -416,7 +418,6 @@ Type *parse_struct(Type *type, char isstruct)
                         errorfmt("Member variables must be named",1);
                     } else {
                         // It's a padding bitfield
-                        padding = 1;
                     }
                 }
                 elem->offset = offset;
@@ -433,9 +434,7 @@ Type *parse_struct(Type *type, char isstruct)
                 } else { 
                     if ( elem->size > size ) size = elem->size;
                 }
-                if ( !padding ) {
-                    array_add(str->fields, elem);
-                }
+                array_add(str->fields, elem);
             } else {
                 break;
             }

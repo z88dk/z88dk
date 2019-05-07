@@ -15,15 +15,13 @@
 
 ._main
 	push	bc
-	ld	de,_x
-	ld	hl,2047
-	ld	a,l
-	ld	(de),a
-	inc	de
-	ld	a,(de)
+	ld	hl,_x
+	ld	(hl),255
+	inc	hl
+	ld	a,(hl)
 	and	248
-	or	h
-	ld	(de),a
+	or	7
+	ld	(hl),a
 	ld	hl,_x + 1
 	ld	a,(hl)
 	and	199
@@ -51,6 +49,15 @@
 	ret
 
 
+
+._func2
+	ld	hl,_y
+	ld	(hl),#(1 % 256)
+	ld	l,(hl)
+	ld	h,0
+	ret
+
+
 	SECTION	rodata_compiler
 .i_1
 	defm	"hello"
@@ -59,12 +66,15 @@
 
 
 	SECTION	bss_compiler
+._y	defs	1
 	SECTION	code_compiler
 
 
 
 	GLOBAL	_x
+	GLOBAL	_y
 	GLOBAL	_main
+	GLOBAL	_func2
 
 
 

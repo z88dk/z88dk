@@ -4148,3 +4148,46 @@
 =
 	ld	a,l
 	ld	(de),a
+
+	ld	a,(de)
+	and	0
+	or	h
+	ld	(de),a
+=
+	ld	a,h
+	ld	(de),a
+
+%check 0 <= %1 <= 65535
+	ld	de,%2
+	ld	hl,%1
+	ld	a,l
+	ld	(de),a
+	inc	de
+	ld	a,(de)
+	and	%3
+	or	h
+	ld	(de),a
+	ld	hl,%4
+=
+	ld	hl,%2
+	ld	(hl),%eval(%1 256 %%)
+	inc	hl
+	ld	a,(hl)
+	and	%3
+	or	%eval(%1 256 /)
+	ld	(hl),a
+	ld	hl,%4
+
+	ld	hl,%1	;const
+	ld	(%2),hl
+	ld	hl,%1
+=
+	ld	hl,%1	;const
+	ld	(%2),hl
+
+	ld	a,l
+	and	255
+	ld	l,a
+=
+
+

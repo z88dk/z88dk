@@ -6,6 +6,10 @@ struct {
         char    *ptr;
 } x = { -1, 3, 15, "hello" };
 
+struct {
+	int	a:8;
+} y;
+
 
 int main()  {
         int     z;
@@ -16,4 +20,8 @@ int main()  {
         z = sizeof(x);
         z = x.a;
         return z;
+}
+
+int func2() {
+	y.a = 1;
 }
