@@ -4140,3 +4140,11 @@
 	call	l_or
 =
 	ld	hl,%eval(%1 %2 |)
+
+	ld	a,(de)
+	and	0
+	or	l
+	ld	(de),a
+=
+	ld	a,l
+	ld	(de),a
