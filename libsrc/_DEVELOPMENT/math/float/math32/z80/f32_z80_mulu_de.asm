@@ -4,9 +4,9 @@ INCLUDE "config_private.inc"
 SECTION code_clib
 SECTION code_math
 
-PUBLIC l_mulu_de
+PUBLIC m32_z80_mulu_de
 
-.l_mulu_de
+.m32_z80_mulu_de
 
    ; unsigned multiplication of two 8-bit
    ; multiplicands into a sixteen bit product
@@ -19,19 +19,19 @@ PUBLIC l_mulu_de
    ;
    ; uses  : f, de
 
+   inc d
+   dec d
+   jr Z,zero                ; multiply by 0
+
+   inc e
+   dec e
+   jr Z,zero                ; multiply by 0
+
    push hl
    ex de,hl
 
    ld e,h
    ld d,0
-
-   inc h
-   dec h
-   jr Z,zero                ; multiply by 0
-
-   inc l
-   dec l
-   jr Z,zero                ; multiply by 0
 
    ; eliminate leading zero bits
 
@@ -99,9 +99,9 @@ PUBLIC l_mulu_de
 .exit
    ex de,hl
    pop hl
-   ccf
+   or a
    ret
 
 .zero
-   ld hl,0
-   jr exit
+   ld de,0
+   ret

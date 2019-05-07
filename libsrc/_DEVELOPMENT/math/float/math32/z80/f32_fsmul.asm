@@ -120,7 +120,7 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     exx
 
     add a,h                     ; add the exponents
-    jp NC,fmzero
+    jp NC,m32_fszero_fastcall
 
 .fmnouf
     ld b,a
@@ -272,13 +272,6 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     or b
     ld d,a                      ; put sign and 7 msbs into place in D
     ret                         ; return DEHL
-
-.fmzero
-    ld d,0
-    ld e,d
-    ld h,d
-    ld l,d
-    ret                         ; done zero
 
 .mulovl
     ex af,af                    ; get sign
