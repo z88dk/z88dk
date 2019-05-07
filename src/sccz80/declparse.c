@@ -323,13 +323,15 @@ int align_struct(Type *str)
             // TODO: Avoid padding the MSB
             int rem = (elem->size * 8) - bitoffs;
 
-            if ( bitoffs != 8 && (elem->bit_size > rem || (bitoffs + elem->bit_size) > 8) ) {
+
+            if ( bitoffs != 8 && (elem->bit_size > rem || (bitoffs && bitoffs + elem->bit_size) > 8) ) {
                 offset += (bitoffs / 8) + 1;
                 bitoffs = 0;
             }
             elem->isunsigned = elem->explicitly_signed ? 0 : 1;  // Default unsigned, signed if explicitly so
             elem->offset = offset;
             elem->bit_offset = bitoffs;
+           // printf("%s %d +%d @%d, %d\n",elem->name, elem->isunsigned, elem->offset, elem->bit_offset, elem->bit_size);
             bitoffs += elem->bit_size;
         }
     }
@@ -1064,7 +1066,6 @@ Type *dodeclare(enum storage_type storage)
 
         needchar('=');
         sym->initialised = 1;
-
         alloc_size = initials(drop_name, type);
 
         if ( sym->storage == EXTERNP ) {

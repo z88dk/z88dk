@@ -51,6 +51,19 @@ int initials(const char *dropname, Type *type)
     return (desize);
 }
 
+static void add_bitfield(Type *bitfield, int *value)
+{
+    Kind valtype;
+    double cvalue;
+
+    if (constexpr(&cvalue, &valtype, 1)) {
+        int ival = ((int)cvalue & (( 1 << bitfield->bit_size) - 1)) << bitfield->bit_offset;
+        *value |= ival;
+    } else {
+        errorfmt("Expected a constant value for bitfield assignment", 1);
+    }
+}
+
 /*
  * initialise structure (also called by init())
  * 
@@ -61,14 +74,46 @@ int str_init(Type *tag)
     int sz = 0;
     Type   *ptr;
     int     i;
+    int     last_offset = -1;
     int     num_fields = tag->isstruct ? array_len(tag->fields) : 1;
+    int     bitfield_value = 0;
+    int     had_bitfield = 0;
+    int     needcomma = 0;
 
     for ( i = 0; i < num_fields; i++ ) {
         if ( rcmatch('}')) {
             break;
         }
-        if ( i != 0 ) needchar(',');
+        if ( needcomma) needchar(',');
         ptr = array_get_byindex(tag->fields,i);
+
+        // Terrible way to skip over padding in structures. They just shouldn't be there
+        if ( isdigit(ptr->name[0])) {
+            needcomma = 0;
+            continue;
+        }
+        needcomma = 1;
+
+        if ( ptr->offset == last_offset ) {
+            add_bitfield(ptr, &bitfield_value);
+            continue;
+        } else if ( had_bitfield ) {
+            // We've finished a byte/word of bitfield, we should dump it
+            outfmt("\t%s\t0x%x\n", ptr->offset -last_offset == 1 ? "defb" : "defw", bitfield_value);
+            had_bitfield = 0;
+            bitfield_value = 0;
+        }
+
+        if ( ptr->bit_size ) {
+            sz += ptr->offset - last_offset;
+            last_offset = ptr->offset;
+            had_bitfield = 1;
+            add_bitfield(ptr, &bitfield_value);
+            continue;
+        }
+
+        last_offset = ptr->offset;
+
         sz += ptr->size;
         if ( ptr->kind == KIND_STRUCT ) {
             needchar('{');
@@ -91,6 +136,9 @@ int str_init(Type *tag)
         }
     }
     swallow(",");
+
+    // And output 
+
     // Pad out the union
     if ( sz < tag->size) {
         defstorage();

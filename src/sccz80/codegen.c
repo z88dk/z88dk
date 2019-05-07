@@ -44,8 +44,8 @@ static void loada(int n);
  */
 
 static int    donelibheader;
-static char  *current_section = ""; /**< Name of the current section */
-static char  *current_nspace = NULL;
+static const char  *current_section = ""; /**< Name of the current section */
+static const char  *current_nspace = NULL;
 
 /* Mappings between default library names - allows use of sdcc maths library with sccz80 */
 struct _mapping {
@@ -3932,7 +3932,7 @@ void function_appendix(SYMBOL* func)
     }
 }
 
-void output_section(char* section_name)
+void output_section(const char* section_name)
 {
     /* If the same section don't do anything */
     if (strcmp(section_name, current_section) == 0) {
