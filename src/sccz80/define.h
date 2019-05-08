@@ -91,6 +91,7 @@ struct type_s {
     Kind      kind;
     int       size;
     char      isunsigned;
+    char      explicitly_signed;  // Set if "signed" in type definition
     char      isconst;
     char      isfar;  // Valid for pointers/array
     char      name[NAMESIZE]; 

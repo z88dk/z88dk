@@ -51,6 +51,20 @@ int initials(const char *dropname, Type *type)
     return (desize);
 }
 
+static void add_bitfield(Type *bitfield, int *value)
+{
+    Kind valtype;
+    double cvalue;
+
+    if (constexpr(&cvalue, &valtype, 1)) {
+        int ival = ((int)cvalue & (( 1 << bitfield->bit_size) - 1)) << bitfield->bit_offset;
+        check_assign_range(bitfield, cvalue);
+        *value |= ival;
+    } else {
+        errorfmt("Expected a constant value for bitfield assignment", 1);
+    }
+}
+
 /*
  * initialise structure (also called by init())
  * 
@@ -61,14 +75,42 @@ int str_init(Type *tag)
     int sz = 0;
     Type   *ptr;
     int     i;
+    int     last_offset = -1;
     int     num_fields = tag->isstruct ? array_len(tag->fields) : 1;
+    int     bitfield_value = 0;
+    int     had_bitfield = 0;
 
     for ( i = 0; i < num_fields; i++ ) {
+        ptr = array_get_byindex(tag->fields,i);
+
         if ( rcmatch('}')) {
             break;
         }
         if ( i != 0 ) needchar(',');
-        ptr = array_get_byindex(tag->fields,i);
+
+
+        if ( ptr->offset == last_offset ) {
+            add_bitfield(ptr, &bitfield_value);
+            had_bitfield += ptr->bit_size;
+            continue;
+        } else if ( had_bitfield ) {
+            sz = ptr->offset;
+            // We've finished a byte/word of bitfield, we should dump it
+            outfmt("\t%s\t0x%x\n", had_bitfield <= 8 ? "defb" : "defw", bitfield_value);
+            had_bitfield = 0;
+            bitfield_value = 0;
+        }
+
+        if ( ptr->bit_size ) {
+            sz = ptr->offset;
+            last_offset = ptr->offset;
+            had_bitfield = ptr->bit_size;
+            add_bitfield(ptr, &bitfield_value);
+            continue;
+        }
+
+        last_offset = ptr->offset;
+
         sz += ptr->size;
         if ( ptr->kind == KIND_STRUCT ) {
             needchar('{');
@@ -91,6 +133,14 @@ int str_init(Type *tag)
         }
     }
     swallow(",");
+
+    // And output 
+    if ( had_bitfield ) {
+        // We've finished a struct initialisation with a bitfield
+        outfmt("\t%s\t0x%x\n", had_bitfield <= 8 ? "defb" : "defw", bitfield_value);
+        sz += ((had_bitfield-1) / 8) + 1;
+    }
+
     // Pad out the union
     if ( sz < tag->size) {
         defstorage();
@@ -261,6 +311,7 @@ static int init(Type *type, int dump)
             return 0;
         } else if (constexpr(&value, &valtype, 1)) {
 constdecl:
+            check_assign_range(type, value);
             if (dump) {
                 /* struct member or array of pointer to char */
                 if ( type->kind == KIND_DOUBLE ) {

@@ -4084,3 +4084,157 @@
 	ld	hl,%eval(65536 %1 %2 + %)	;const
 	add	hl,sp
 	ld	sp,hl
+
+	ld	de,%1	;const
+	ex	de,hl
+	ld	a,l
+	rlca
+=
+	ld	de,%eval(%1 1 <)	;const
+	ex	de,hl
+	ld	a,l
+
+	ld	hl,%1
+	ld	de,%2	;const
+	ex	de,hl
+	ld	a,l
+	and	%3
+	ld	l,a
+	ld	a,(de)
+	and	%4
+	or	l
+	ld	(de),a
+	ld	hl,%5
+=
+	ld	hl,%1
+	ld	a,(hl)
+	and	%4
+	or	%eval( %2 256 %% %3 &)
+	ld	(hl),a
+	ld	hl,%5
+
+	ld	hl,_%1
+	ld	de,%2
+	ex	de,hl
+	inc	de
+=
+	ld	hl,_%1 + 1
+	ld	de,%2
+	ex	de,hl
+
+	ld	hl,%1	;const
+	add	hl,hl
+=
+	ld	hl,%eval(%1 2 *)	;const
+
+%check 0 <= %2 <= 65535
+	ld	hl,%1	;const
+	ld	de,%2
+	call	l_and
+=
+	ld	hl,%eval(%1 %2 &)
+
+%check 0 <= %2 <= 65535
+	ld	hl,%1	;const
+	ld	de,%2
+	call	l_or
+=
+	ld	hl,%eval(%1 %2 |)
+
+	ld	a,(de)
+	and	0
+	or	l
+	ld	(de),a
+=
+	ld	a,l
+	ld	(de),a
+
+	ld	a,(de)
+	and	0
+	or	h
+	ld	(de),a
+=
+	ld	a,h
+	ld	(de),a
+
+%check 0 <= %1 <= 65535
+	ld	de,%2
+	ld	hl,%1
+	ld	a,l
+	ld	(de),a
+	inc	de
+	ld	a,(de)
+	and	%3
+	or	h
+	ld	(de),a
+	ld	hl,%4
+=
+	ld	hl,%2
+	ld	(hl),%eval(%1 256 %%)
+	inc	hl
+	ld	a,(hl)
+	and	%3
+	or	%eval(%1 256 /)
+	ld	(hl),a
+	ld	hl,%4
+
+	ld	hl,%1	;const
+	ld	(%2),hl
+	ld	hl,%1
+=
+	ld	hl,%1	;const
+	ld	(%2),hl
+
+	ld	a,l
+	and	255
+	ld	l,a
+=
+
+
+	ld	hl,%1
+	ld	de,%4	;const
+	ex	de,hl
+	ld	a,l
+	and	%2
+	ld	l,a
+	ld	a,(de)
+	and	%3
+	or	l
+	ld	(de),a
+=
+	ld	hl,%1
+	ld	a,(hl)
+	and	%3
+	or	%eval(%4 256 %% %2 &)
+	ld	(hl),a
+	ld	hl,%4
+
+	ld	hl,%1
+	ld	hl,_%2
+=
+	ld	hl,_%2
+
+	or	0
+=
+
+
+	and	255
+=
+
+
+	ld	a,l
+	ld	l,a
+	ld	a,l
+=
+	ld	a,l
+
+	ld	e,(hl)
+	inc	hl
+	ld	a,(hl)
+	ld	h,a
+	ld	l,e
+=
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
