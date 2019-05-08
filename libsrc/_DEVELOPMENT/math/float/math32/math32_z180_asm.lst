@@ -7,6 +7,7 @@ math/float/math32/z80/f32_fsinvsqrt
 math/float/math32/z80/f32_fsmul
 math/float/math32/z80/f32_fspoly
 
+math/float/math32/z80/f32_z80_mulu_32h_24x24
 math/float/math32/z80/f32_z180_mulu_32_16x16
 math/float/math32/z80/f32_z180_mulu_32h_32x32
 

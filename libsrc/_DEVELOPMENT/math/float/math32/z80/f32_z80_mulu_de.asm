@@ -1,23 +1,33 @@
-
-INCLUDE "config_private.inc"
-
+;
+;  feilipu, 2019 May
+;
+;  This Source Code Form is subject to the terms of the Mozilla Public
+;  License, v. 2.0. If a copy of the MPL was not distributed with this
+;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+;
+;-------------------------------------------------------------------------
+;
+; REPLICATION for Z80 of:
+; Z180 MLT DE and Z80-ZXN MUL DE
+;
+; unsigned multiplication of two 8-bit
+; multiplicands into a sixteen bit product
+;
+; enter : d = 8-bit multiplicand
+;         e = 8-bit multiplicand
+;
+; exit  : de = 16-bit product
+;         carry reset
+;
+; uses  : f, de
+   
 SECTION code_clib
 SECTION code_math
 
 PUBLIC m32_z80_mulu_de
 
-.m32_z80_mulu_de
 
-   ; unsigned multiplication of two 8-bit
-   ; multiplicands into a sixteen bit product
-   ;
-   ; enter : d = 8-bit multiplicand
-   ;         e = 8-bit multiplicand
-   ;
-   ; exit  : de = 16-bit product
-   ;         carry reset
-   ;
-   ; uses  : f, de
+.m32_z80_mulu_de
 
    inc d
    dec d
@@ -30,8 +40,8 @@ PUBLIC m32_z80_mulu_de
    push hl
    ex de,hl
 
-   ld d,0
    ld e,l
+   ld d,0
 
    ; eliminate leading zero bits
 
@@ -57,7 +67,7 @@ PUBLIC m32_z80_mulu_de
    jr C,branch_17
 
    sla h
-   jr exit
+   jr exit                ; multiply by 1
    
    ; multiplication tree
 
