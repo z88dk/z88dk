@@ -541,7 +541,7 @@ void putstk(LVALUE *lval)
             bit_offset -= 8;
             doinc = 1;
         }
-        
+
         if ( lval->ltype->bit_size + bit_offset <= 8 ) {
             int i;
             zpop();  // de address
@@ -737,12 +737,16 @@ void indirect(LVALUE* lval)
                     ol("rrca");
                 }
             }
-            outfmt("\tand\t%d\n",(1 << lval->ltype->bit_size) - 1);
+            if ( lval->ltype->bit_size % 8 ) { 
+                outfmt("\tand\t%d\n",(1 << lval->ltype->bit_size) - 1);
+            }
             if ( lval->ltype->isunsigned == 0 ) {
                 // We need to do some bit extension here
-                outfmt("\tbit\t%d,a\n",lval->ltype->bit_size - 1);
-                ol("jr\tz,ASMPC+4");
-                outfmt("\tor\t%d\n",0xff - ((1 << lval->ltype->bit_size) - 1));
+                if ( lval->ltype->bit_size % 8 ) {
+                    outfmt("\tbit\t%d,a\n",lval->ltype->bit_size - 1);
+                    ol("jr\tz,ASMPC+4");
+                    outfmt("\tor\t%d\n",0xff - ((1 << lval->ltype->bit_size) - 1));
+                }
                 ol("ld\tl,a");
                 ol("rlca");
                 ol("sbc\ta,a");
@@ -756,18 +760,16 @@ void indirect(LVALUE* lval)
             ol("ld\te,(hl)");
             ol("inc\thl");
             ol("ld\ta,(hl)");
-            outfmt("\tand\t%d\n",(1 << (lval->ltype->bit_size - 8)) - 1);
-            outfmt("\tbit\t%d,a\n",(lval->ltype->bit_size - 8) - 1);
-            ol("jr\tz,ASMPC+4");
-            outfmt("\tor\t%d\n",0xff - ((1 << (lval->ltype->bit_size - 8)) - 1));
+            if ( lval->ltype->bit_size % 8 ) { 
+                outfmt("\tand\t%d\n",(1 << (lval->ltype->bit_size - 8)) - 1);
+                if ( lval->ltype->isunsigned == 0 ) {
+                    outfmt("\tbit\t%d,a\n",(lval->ltype->bit_size - 8) - 1);
+                    ol("jr\tz,ASMPC+4");
+                    outfmt("\tor\t%d\n",0xff - ((1 << (lval->ltype->bit_size - 8)) - 1));
+                }
+            }
             ol("ld\th,a");
             ol("ld\tl,e");
-
-
-            // callrts("l_gint");
-            // asr_const(lval, lval->ltype->bit_offset);
-            // zand_const(lval,(1 << lval->ltype->bit_size) - 1);
-            // TODO: Sign extension
         }
         return;
     }

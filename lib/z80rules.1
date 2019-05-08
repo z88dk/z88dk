@@ -4217,3 +4217,24 @@
 	or	0
 =
 
+
+	and	255
+=
+
+
+	ld	a,l
+	ld	l,a
+	ld	a,l
+=
+	ld	a,l
+
+	ld	e,(hl)
+	inc	hl
+	ld	a,(hl)
+	ld	h,a
+	ld	l,e
+=
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a

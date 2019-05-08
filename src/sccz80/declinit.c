@@ -81,17 +81,20 @@ int str_init(Type *tag)
     int     had_bitfield = 0;
 
     for ( i = 0; i < num_fields; i++ ) {
+        ptr = array_get_byindex(tag->fields,i);
+
         if ( rcmatch('}')) {
             break;
         }
         if ( i != 0 ) needchar(',');
-        ptr = array_get_byindex(tag->fields,i);
+
 
         if ( ptr->offset == last_offset ) {
             add_bitfield(ptr, &bitfield_value);
             had_bitfield += ptr->bit_size;
             continue;
         } else if ( had_bitfield ) {
+            sz = ptr->offset;
             // We've finished a byte/word of bitfield, we should dump it
             outfmt("\t%s\t0x%x\n", had_bitfield <= 8 ? "defb" : "defw", bitfield_value);
             had_bitfield = 0;
@@ -99,7 +102,7 @@ int str_init(Type *tag)
         }
 
         if ( ptr->bit_size ) {
-            sz += ptr->offset - last_offset;
+            sz = ptr->offset;
             last_offset = ptr->offset;
             had_bitfield = ptr->bit_size;
             add_bitfield(ptr, &bitfield_value);
