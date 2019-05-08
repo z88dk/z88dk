@@ -8,8 +8,8 @@
 
 	SECTION	data_compiler
 ._x
-	defw	0x1fff
-	defb	0xf
+	defw	0x7ff
+	defb	0x7b
 	defw	i_1+0
 	SECTION	code_compiler
 
@@ -22,15 +22,15 @@
 	and	248
 	or	7
 	ld	(hl),a
-	ld	hl,_x + 1
+	ld	hl,_x+1+1
 	ld	a,(hl)
-	and	199
-	or	16
+	and	248
+	or	2
 	ld	(hl),a
 	ld	hl,_x+1+1
 	ld	a,(hl)
-	and	224
-	or	3
+	and	7
+	or	24
 	ld	(hl),a
 	ld	hl,5	;const
 	pop	bc
