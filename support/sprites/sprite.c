@@ -1041,6 +1041,12 @@ void import_from_printmaster( const char *file )
 	if (!fpin)
 		return;
 
+	/* **HACK** - Eat leading bytes to import Newsmaster/Printmaster fonts */
+	/*
+	for ( y = 1; y < 0xb7; y++ )
+		fgetc(fpin);
+	*/
+
 	spcount = 0;	
 	while ((fgetc(fpin) != 0x1a) && !feof(fpin) && ((on_sprite+spcount)<150)) {
 
