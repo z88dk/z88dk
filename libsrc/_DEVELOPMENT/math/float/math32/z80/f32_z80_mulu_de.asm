@@ -30,8 +30,8 @@ PUBLIC m32_z80_mulu_de
    push hl
    ex de,hl
 
-   ld e,h
    ld d,0
+   ld e,l
 
    ; eliminate leading zero bits
 
