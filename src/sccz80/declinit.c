@@ -89,10 +89,11 @@ int str_init(Type *tag)
 
         if ( ptr->offset == last_offset ) {
             add_bitfield(ptr, &bitfield_value);
+            had_bitfield += ptr->bit_size;
             continue;
         } else if ( had_bitfield ) {
             // We've finished a byte/word of bitfield, we should dump it
-            outfmt("\t%s\t0x%x\n", ptr->offset -last_offset == 1 ? "defb" : "defw", bitfield_value);
+            outfmt("\t%s\t0x%x\n", had_bitfield <= 8 ? "defb" : "defw", bitfield_value);
             had_bitfield = 0;
             bitfield_value = 0;
         }
@@ -100,7 +101,7 @@ int str_init(Type *tag)
         if ( ptr->bit_size ) {
             sz += ptr->offset - last_offset;
             last_offset = ptr->offset;
-            had_bitfield = 1;
+            had_bitfield = ptr->bit_size;
             add_bitfield(ptr, &bitfield_value);
             continue;
         }
@@ -131,6 +132,11 @@ int str_init(Type *tag)
     swallow(",");
 
     // And output 
+    if ( had_bitfield ) {
+        // We've finished a struct initialisation with a bitfield
+        outfmt("\t%s\t0x%x\n", had_bitfield <= 8 ? "defb" : "defw", bitfield_value);
+        sz += ((had_bitfield-1) / 8) + 1;
+    }
 
     // Pad out the union
     if ( sz < tag->size) {

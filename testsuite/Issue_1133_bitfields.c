@@ -25,3 +25,23 @@ int main()  {
 int func2() {
 	y.a = 1;
 }
+
+struct {
+	int	a:16;
+} z = { 32768};
+
+int func3() {
+	z.a = 3;
+	return sizeof(z);
+}
+
+struct {
+	int	a:2;
+	signed int b:3;
+} t4 = { 2, 3 };
+
+int func4() {
+	t4.a = 2;
+	t4.b = 2;
+	return sizeof(t4);
+}

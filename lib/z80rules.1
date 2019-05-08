@@ -4191,3 +4191,29 @@
 =
 
 
+	ld	hl,%1
+	ld	de,%4	;const
+	ex	de,hl
+	ld	a,l
+	and	%2
+	ld	l,a
+	ld	a,(de)
+	and	%3
+	or	l
+	ld	(de),a
+=
+	ld	hl,%1
+	ld	a,(hl)
+	and	%3
+	or	%eval(%4 256 %% %2 &)
+	ld	(hl),a
+	ld	hl,%4
+
+	ld	hl,%1
+	ld	hl,_%2
+=
+	ld	hl,_%2
+
+	or	0
+=
+

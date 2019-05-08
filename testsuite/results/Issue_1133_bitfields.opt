@@ -58,6 +58,38 @@
 	ret
 
 
+	SECTION	data_compiler
+._z
+	defw	0x8000
+	SECTION	code_compiler
+
+._func3
+	ld	hl,3	;const
+	ld	(_z),hl
+	ld	hl,2	;const
+	ret
+
+
+	SECTION	data_compiler
+._t4
+	defb	0xe
+	SECTION	code_compiler
+
+._func4
+	ld	hl,_t4
+	ld	a,(hl)
+	and	252
+	or	2
+	ld	(hl),a
+	ld	hl,_t4
+	ld	a,(hl)
+	and	227
+	or	8
+	ld	(hl),a
+	ld	hl,1	;const
+	ret
+
+
 	SECTION	rodata_compiler
 .i_1
 	defm	"hello"
@@ -75,6 +107,10 @@
 	GLOBAL	_y
 	GLOBAL	_main
 	GLOBAL	_func2
+	GLOBAL	_z
+	GLOBAL	_func3
+	GLOBAL	_t4
+	GLOBAL	_func4
 
 
 
