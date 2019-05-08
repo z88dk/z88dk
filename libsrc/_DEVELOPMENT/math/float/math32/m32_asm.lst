@@ -11,3 +11,4 @@ math/float/math32/lm32/z80/asm_invf
 math/float/math32/lm32/z80/asm_invsqrtf
 math/float/math32/lm32/z80/asm_polyf
 math/float/math32/lm32/z80/asm_sqrtf
+math/float/math32/lm32/z80/asm_sqrf
