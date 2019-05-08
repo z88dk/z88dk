@@ -46,11 +46,11 @@ generic_console_ioctl:
 	ld	bc,$1950
 	cp	10
 	jr	z,set_mode
-	ld	bc,$1820
-	and	a
-	jr	z,set_mode
-	scf
-	ret
+	xor	a
+	ld	(__einstein_mode),a
+	ld	a,IOCTL_GENCON_SET_MODE
+	ex	de,hl
+	jp	__tms9918_console_ioctl
 
 set_mode:
 	ld	(__einstein_mode),a
