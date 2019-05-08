@@ -187,11 +187,14 @@ clear_loop:
 	SECTION	code_crt_init
 
 	EXTERN	asm_set_cursor_state
+	EXTERN	msx_set_mode
 	ld	hl,$fb45
 	res	0,(hl)		;DOS80 disable cursor
 	res	2,(hl)		;XTAL 80 column cursor flag
 	ld	l,$20
 	call	asm_set_cursor_state
+        ld      hl,2
+        call    msx_set_mode
 
 	SECTION		bss_clib
 
