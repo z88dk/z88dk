@@ -24,6 +24,6 @@ float sinf (float f) __z88dk_fastcall
 		y = 1.0 - y;
 	if(sect & 2)
 		y = -y;
-	y_squared = y * y;
+	y_squared = sqrf(y);
 	return y * polyf(y_squared, m32_coeff_sin_a, 4) / polyf(y_squared, m32_coeff_sin_b, 4);
 }
