@@ -35,10 +35,11 @@ PUBLIC m32_fshypot, m32_fshypot_callee
 
     ; evaluation of a polynomial function
     ;
-    ; enter : stack = float y, ret
-    ;         dehb  = float x
+    ; enter : stack = float x, ret
+    ;         dehl  = float y
     ;
-    ; exit  : dehl  = 32-bit product
+    ; exit  : stack = float x, ret
+    ;         dehl  = 32-bit product
     ;         carry reset
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
@@ -60,8 +61,8 @@ PUBLIC m32_fshypot, m32_fshypot_callee
 
     ; evaluation of a polynomial function
     ;
-    ; enter : stack = float y, ret
-    ;         dehb  = float x
+    ; enter : stack = float x, ret
+    ;         dehl  = float y
     ;
     ; exit  : dehl  = 32-bit product
     ;         carry reset
