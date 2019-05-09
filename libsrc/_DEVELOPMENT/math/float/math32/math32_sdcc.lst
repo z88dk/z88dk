@@ -8,6 +8,8 @@ math/float/math32/c/sdcc/cm32_sdcc_fsinvsqrt
 math/float/math32/c/sdcc/cm32_sdcc_fsinvsqrt_fastcall
 math/float/math32/c/sdcc/cm32_sdcc_fssqr
 math/float/math32/c/sdcc/cm32_sdcc_fssqr_fastcall
+math/float/math32/c/sdcc/cm32_sdcc_fshypot
+math/float/math32/c/sdcc/cm32_sdcc_fshypot_callee
 math/float/math32/c/sdcc/cm32_sdcc_fsload
 math/float/math32/c/sdcc/cm32_sdcc_fsmax
 math/float/math32/c/sdcc/cm32_sdcc_fsmax_fastcall

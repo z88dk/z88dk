@@ -15,7 +15,7 @@
 ;
 ; w[i+1] = w[i]*(1.5 - w[i]*w[i]*y/2) where w[0] is approx 1/y^0.5
 ;
-;   float InvSqrt(float x)
+;   float invsqrtf(float x)
 ;   {
 ;       float xhalf = 0.5f*x;
 ;       int i = *(int*)&x;

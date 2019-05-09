@@ -23,7 +23,7 @@
 ; to Joseph-Louis Lagrange but it can be traced back many hundreds of
 ; years to Chinese and Persian mathematicians
 ; 
-; float poly(const float x, const float d[], uint16_t n)
+; float polyf(const float x, const float d[], uint16_t n)
 ; {
 ;   float res = d[n];
 ;

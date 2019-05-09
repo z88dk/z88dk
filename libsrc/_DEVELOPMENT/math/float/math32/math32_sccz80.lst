@@ -8,6 +8,8 @@ math/float/math32/c/sccz80/cm32_sccz80_fsinvsqrt
 math/float/math32/c/sccz80/cm32_sccz80_fsinvsqrt_callee
 math/float/math32/c/sccz80/cm32_sccz80_fssqr
 math/float/math32/c/sccz80/cm32_sccz80_fssqr_callee
+math/float/math32/c/sccz80/cm32_sccz80_fshypot
+math/float/math32/c/sccz80/cm32_sccz80_fshypot_callee
 math/float/math32/c/sccz80/cm32_sccz80_fsmax
 math/float/math32/c/sccz80/cm32_sccz80_fsmax_callee
 math/float/math32/c/sccz80/cm32_sccz80_fsmin
