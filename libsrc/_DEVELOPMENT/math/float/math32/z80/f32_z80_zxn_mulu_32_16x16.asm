@@ -27,11 +27,11 @@ PUBLIC m32_mulu_32_16x16
     push hl                     ; xh yh
     
     ld l,e                      ; yl
-    ld b,e                      ; yl
     ld e,c                      ; xl
+    ld b,l                      ; yl
 
-    ; bc = xl yl
-    ; de = xl yh
+    ; bc = yl xl 
+    ; de = yh xl
     ; hl = xh yl
     ; stack = xh yh
 
@@ -60,11 +60,9 @@ PUBLIC m32_mulu_32_16x16
 
     ex de,hl                    ; de = final LSW
     adc hl,bc                   ; hl = final MSW
-    ex de,hl
 
     ld b,d
     ld c,e                      ; hlbc = final result
 
     ret
-
 

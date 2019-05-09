@@ -39,8 +39,8 @@
 SECTION code_clib
 SECTION code_math
 
-EXTERN m32_fsmul, m32_fsmul_callee
-EXTERN m32_fsmax_fastcall, m32_mulu_32_16x16
+EXTERN m32_fsmul, m32_fsmul_callee, m32_fsmax_fastcall
+EXTERN m32_mulu_32_16x16, m32_mulu_32h_32x32
 
 PUBLIC m32_fsdiv, m32_fsdiv_callee
 PUBLIC m32_fsinv_fastcall
@@ -105,22 +105,16 @@ PUBLIC m32_fsinv_fastcall
 
 IF __CPU_Z180__
     mlt de                      ; d*e => de, w[0]^2 in de
-    ex de,hl
 ELSE
-
 IF __CPU_Z80_ZXN__
     mul de                      ; d*e => de, w[0]^2 in de
-    ex de,hl
 ELSE
-
-    EXTERN l_mulu_16_16x8
-    ld l,d
-    ld h,0
-    call l_mulu_16_16x8         ; hl*e => hl, w[0]^2 in hl
-
+    EXTERN m32_z80_mulu_de
+    call m32_z80_mulu_de        ; d*e => de, w[0]^2 in de
 ENDIF
 ENDIF
 
+    ex de,hl
     add hl,hl
 
     ex de,hl
@@ -167,24 +161,7 @@ ENDIF
     pop de                      ; y msw in de'
     exx
 
-IF __CPU_Z80__
-
-    EXTERN l_mulu_64_32x32
-
-    call l_mulu_64_32x32        ; dehl*dehl' => dehl, w[1]^2*y in dehld'e'h'l'
-    exx
-    ld a,d
-    exx
-    or a
-    jr Z,fd0
-    set 0,l
-.fd0
-
-ELSE
-    EXTERN  m32_mulu_32h_32x32
     call m32_mulu_32h_32x32     ; dehl*dehl' => dehl, w[1]^2*y in dehl
-ENDIF
-
     add hl,hl
     rl e
     rl d                        ; w[1]^2*y in dehl
@@ -219,7 +196,7 @@ ENDIF
 
     ld h,b
     ld l,c
-    ex de,hl                    ; w[2] msw in de, w[2] msw in de
+    ex de,hl                    ; w[2] msw in de, w[2] lsw in hl
 
     push de
     push hl
@@ -228,24 +205,7 @@ ENDIF
     pop de
     exx
 
-IF __CPU_Z80__
-
-    EXTERN l_mulu_64_32x32
-
-    call l_mulu_64_32x32    ; dehl*dehl' => dehl, w[2]^2 in dehld'e'h'l'
-    exx
-    ld a,d
-    exx
-    or a
-    jr Z,fd1
-    set 0,l
-.fd1
-
-ELSE
-    EXTERN  m32_mulu_32h_32x32
     call m32_mulu_32h_32x32     ; dehl*dehl' => dehl, w[2]^2 in dehl
-ENDIF
-
     add hl,hl
     rl e
     rl d                        ; w[2]^2 in dehl
@@ -255,24 +215,7 @@ ENDIF
     pop de                      ; y msw in de'
     exx
 
-IF __CPU_Z80__
-
-    EXTERN l_mulu_64_32x32
-
-    call l_mulu_64_32x32        ; dehl*dehl' => dehl, w[2]^2*y in dehld'e'h'l'
-    exx
-    ld a,d
-    exx
-    or a
-    jr Z,fd2                    ; round number using digi norm's method
-    set 0,l
-.fd2
-
-ELSE
-    EXTERN  m32_mulu_32h_32x32
     call m32_mulu_32h_32x32     ; dehl*dehl' => dehl, w[2]^2*y in dehl
-ENDIF
-
     add hl,hl
     rl e
     rl d                        ; w[2]^2*y in dehl
@@ -312,16 +255,16 @@ ENDIF
     neg
     add a,07eh
 
-    rl b                        ; recover sign from b
-
-    rra                         ; pack 1/y result from a-deh into dehl
-    ld l,h
+    ld l,h                      ; pack 1/y result from a-deh into dehl
     ld h,e
     ld e,d
+
+    sla e
+    sla b                       ; recover sign from b
+    rra
+    rr e
     ld d,a
 
-    ret C
-    res 7,e                     ; clear exponent lsb if it is 0
     ret                         ; return DEHL
 
 SECTION rodata_clib

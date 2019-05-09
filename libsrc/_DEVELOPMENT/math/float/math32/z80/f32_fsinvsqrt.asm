@@ -33,8 +33,8 @@
 SECTION code_clib
 SECTION code_math
 
-EXTERN m32_fsmax_fastcall, m32_fsmul, m32_fsmul_callee, m32_fssub_callee
-EXTERN m32_mulu_32_16x16, m32_mulu_32h_32x32
+EXTERN m32_fsmul, m32_fsmul_callee, m32_fsmax_fastcall
+EXTERN m32_fsmin_fastcall, m32_fssqr_fastcall, m32_fssub_callee
 
 PUBLIC m32_fssqrt, m32_fssqrt_fastcall, m32_fsinvsqrt_fastcall
 
@@ -54,10 +54,10 @@ PUBLIC m32_fssqrt, m32_fssqrt_fastcall, m32_fsinvsqrt_fastcall
     jp m32_fsmul_callee
 
 
-.m32_fsinvsqrt_fastcall        ; DEHL
+.m32_fsinvsqrt_fastcall         ; DEHL
     ld a,d
     or a                        ; divide by zero?
-    jp Z,m32_fsmax_fastcall    
+    jp Z,m32_fsmin_fastcall    
     and 080h                    ; negative number?
     jp NZ,m32_fsmax_fastcall
 
@@ -90,14 +90,12 @@ PUBLIC m32_fssqrt, m32_fssqrt_fastcall, m32_fsinvsqrt_fastcall
     push de                     ; w[0] lsw on stack
     push hl                     ; y msw on stack
     push af                     ; y lsw on stack
-    push bc
-    push de
 
     ld h,b
     ld l,c
     ex de,hl                    ; (float) w[0] in dehl
 
-    call m32_fsmul_callee       ; (float) w[0]*w[0]
+    call m32_fssqr_fastcall     ; (float) w[0]*w[0]
     call m32_fsmul_callee       ; (float) w[0]*w[0]*y
 
     ld bc,04040h                ; (float) 3 = 0x40400000
@@ -114,7 +112,7 @@ PUBLIC m32_fssqrt, m32_fssqrt_fastcall, m32_fsinvsqrt_fastcall
 
     call m32_fsmul_callee       ; w[1] = (float) w[0]*(3 - w[0]*w[0]*y)/2
 
-;----------- snip ----------    for 1 iteration
+;----------- snip ----------    ; remove for 1 iteration
 
     ex de,hl                    ; (float) w[1] in hlde and bcde
     ld b,h
@@ -125,14 +123,12 @@ PUBLIC m32_fssqrt, m32_fssqrt_fastcall, m32_fsinvsqrt_fastcall
     push de                     ; w[1] lsw on stack
     push hl                     ; y msw on stack
     push af                     ; y lsw on stack
-    push bc
-    push de
 
     ld h,b
     ld l,c
     ex de,hl                    ; (float) w[1] in dehl
 
-    call m32_fsmul_callee       ; (float) w[1]*w[1]
+    call m32_fssqr_fastcall     ; (float) w[1]*w[1]
     call m32_fsmul_callee       ; (float) w[1]*w[1]*y
 
     ld bc,04040h                ; (float) 3 = 0x40400000
@@ -146,7 +142,8 @@ PUBLIC m32_fssqrt, m32_fssqrt_fastcall, m32_fsinvsqrt_fastcall
     dec d                       ; (float) (3 - w[1]*w[1]*y) / 2
     srl d
     rr e
-
+                                ; need to provide a return for the m32_fsmul_callee stack
     call m32_fsmul_callee       ; w[2] = (float) w[1]*(3 - w[1]*w[1]*y)/2
 ;----------- snip ----------
-    ret                         ; needs a return for the callee function
+
+    ret

@@ -60,17 +60,17 @@ PUBLIC m32_fssqr_fastcall
     jp Z,m32_fszero_fastcall
 
     sub a,07fh                  ; subtract out bias, so when exponents are added only one bias present
-    jr C,fmchkuf
+    jr C,fschkuf
 
     add a,h
     jp C,mulovl
-    jr fmnouf
+    jr fsnouf
 
-.fmchkuf
+.fschkuf
     add a,h                     ; add the exponents
     jp NC,m32_fszero_fastcall
 
-.fmnouf
+.fsnouf
     or a
     jp Z,m32_fszero_fastcall
     ld b,a
@@ -91,39 +91,36 @@ PUBLIC m32_fssqr_fastcall
 
     call m32_sqr_32h_24x24      ; exit  : HLDE  = 32-bit product
 
-.fm1
     ex af,af                    ; retrieve exponent from af'
 
     bit 7,h                     ; need to shift result left if msb!=1
-    jr NZ,fm3a
+    jr NZ,fs1
     sla e
     rl d
     adc hl,hl
-    jr fm3b
+    jr fs2
 
-.fm3a
+.fs1
     inc a
     jr C,mulovl
 
-.fm3b
+.fs2
     ex af,af
     ld a,e                      ; round using digi norm's method
     or a
-    jr Z,fm3c
+    jr Z,fs3
     set 0,d
 
-.fm3c
+.fs3
     ex af,af
 
     ld e,h                      ; put 24 bit mantissa in place, HLD into EHL
     ld h,l
     ld l,d
 
-    srl a                       ; adjust the sign (+ve) and exponent
-    jr C,fm4
-    res 7,e                     ; clear the implicit bit when doesn't match lsb of exp
-
-.fm4
+    sla e                       ; adjust the sign (+ve) and exponent
+    srl a
+    rr e
     ld d,a                      ; put sign and 7 msbs into place in D
     ret                         ; return DEHL
 

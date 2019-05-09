@@ -143,47 +143,44 @@ PUBLIC m32_fsmul, m32_fsmul_callee
                                 ; multiplication of two 24-bit numbers into a 32-bit product
     call m32_mulu_32h_24x24     ; exit  : HLDE  = 32-bit product
 
-.fm1
     ex af,af                    ; retrieve sign and exponent from af'
-    jp P,fm2
+    jp P,fm1
     scf
 
-.fm2
+.fm1
     ld b,0                      ; put sign bit in B
     rr b
 
     bit 7,h                     ; need to shift result left if msb!=1
-    jr NZ,fm3a
+    jr NZ,fm2
     sla e
     rl d
     adc hl,hl
-    jr fm3b
+    jr fm3
 
-.fm3a
+.fm2
     inc a
     jr C,mulovl
 
-.fm3b
+.fm3
     ex af,af
     ld a,e                      ; round using digi norm's method
     or a
-    jr Z,fm3c
+    jr Z,fm4
     set 0,d
 
-.fm3c
+.fm4
     ex af,af
 
     ld e,h                      ; put 24 bit mantissa in place, HLD into EHL
     ld h,l
     ld l,d
 
-    rra                         ; adjust the sign and exponent
-    jr C,fm4
-    res 7,e                     ; clear the implicit bit when doesn't match lsb of exp
-
-.fm4
-    or b
-    ld d,a                      ; put sign and 7 msbs into place in D
+    sla e                       ; adjust mantissa for exponent
+    sla b                       ; put sign in C
+    rra                         ; put sign and 7 exp bits into place
+    rr e                        ; put last exp bit into place
+    ld d,a                      ; put sign and exponent in D
     ret                         ; return DEHL
 
 .mulovl
