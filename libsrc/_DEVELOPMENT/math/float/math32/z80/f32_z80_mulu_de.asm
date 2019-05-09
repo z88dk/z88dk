@@ -31,11 +31,11 @@ PUBLIC m32_z80_mulu_de
 
    inc d
    dec d
-   jr Z,zero                ; multiply by 0
+   jr Z,zerod               ; multiply by 0
 
    inc e
    dec e
-   jr Z,zero                ; multiply by 0
+   jr Z,zeroe               ; multiply by 0
 
    push hl
    ex de,hl
@@ -66,9 +66,16 @@ PUBLIC m32_z80_mulu_de
    sla h
    jr C,branch_17
 
-   sla h
-   jr exit                ; multiply by 1
+   jr exit1                ; multiply by 1
    
+.zerod
+   ld e,d
+   ret
+   
+.zeroe
+   ld d,e
+   ret
+
    ; multiplication tree
 
 .branch_11
@@ -108,10 +115,6 @@ PUBLIC m32_z80_mulu_de
 
 .exit
    ex de,hl
+.exit1
    pop hl
-   or a
-   ret
-
-.zero
-   ld de,0
    ret
