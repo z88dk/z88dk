@@ -6,8 +6,8 @@ EXTERN	l_f32_compare
 
 l_f32_le:
 	call	l_f32_compare
+	ccf
 	ret	c
-	scf
 	ret	z
 	ccf
 	dec	hl

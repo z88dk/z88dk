@@ -8,7 +8,7 @@ l_f32_gt:
 	call	l_f32_compare
 	jr	z,gt1
 	ccf
-	ret	c
+	ret	nc
 gt1:
 	dec	hl
 	ret

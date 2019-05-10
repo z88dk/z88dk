@@ -1,4 +1,5 @@
-
+	SECTION	code_fp_math32
+	PUBLIC	l_f32_compare
 
 ;       Entry: dehl=secondary
 ;              onstack (under two return addresses) = primary
