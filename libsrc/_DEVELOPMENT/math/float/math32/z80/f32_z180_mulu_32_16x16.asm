@@ -52,6 +52,5 @@ PUBLIC m32_mulu_32_16x16
     pop hl
     mlt hl                      ; xh*yh
     adc hl,de                   ; hl = final MSW
-
     ret
 

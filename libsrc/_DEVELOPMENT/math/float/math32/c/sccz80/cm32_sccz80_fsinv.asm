@@ -8,7 +8,7 @@ PUBLIC cm32_sccz80_fsinv
 
 EXTERN m32_fsinv_fastcall
 
-    ; negate sccz80 floats
+    ; invert sccz80 float
     ;
     ; enter : stack = ret
     ;          DEHL = sccz80_float number

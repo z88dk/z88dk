@@ -67,6 +67,5 @@ PUBLIC m32_mulu_32_16x16
 
     ld b,d
     ld c,e                      ; hlbc = final result
-
     ret
 

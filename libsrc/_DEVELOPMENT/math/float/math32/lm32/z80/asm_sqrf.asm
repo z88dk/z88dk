@@ -8,7 +8,7 @@ PUBLIC asm_sqrf
 
 EXTERN m32_fssqr_fastcall
 
-    ; square (^2) sccz80 floats
+    ; square (^2) sccz80 float
     ;
     ; enter : stack = ret
     ;          DEHL = sccz80_float number

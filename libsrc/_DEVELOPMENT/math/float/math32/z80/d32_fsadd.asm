@@ -9,8 +9,8 @@
 ;  adapted for z80, z180, and z80-zxn
 ;
 ;-------------------------------------------------------------------------
-; m32_fsadd - Rabbit floating point add
-; m32_fssub - Rabbit floating point subtract
+; m32_fsadd - z80, z180, z80-zxn floating point add
+; m32_fssub - z80, z180, z80-zxn floating point subtract
 ;-------------------------------------------------------------------------
 ; 1) first section: unpack from F_add: to sort:
 ;    one unpacked number in hldebc the other in hl'de'bc'

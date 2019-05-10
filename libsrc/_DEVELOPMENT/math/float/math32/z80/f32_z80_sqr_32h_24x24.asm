@@ -159,9 +159,7 @@ ENDIF
 ENDIF
 
     add hl,de
-
     ld d,b
     ld e,c                      ; exit  : HLDE  = 32-bit product
-    xor a
     ret
 

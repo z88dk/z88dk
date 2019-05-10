@@ -95,7 +95,7 @@ float tanf(float x) __z88dk_fastcall;
 float asinf(float x) __z88dk_fastcall;
 float acosf(float x) __z88dk_fastcall;
 float atanf(float x) __z88dk_fastcall;
-float atan2f(float x, float y)__z88dk_callee;
+float atan2f(float x, float y) __z88dk_callee;
 
 /* Hyperbolic functions */
 float sinhf(float x) __z88dk_fastcall;
@@ -107,8 +107,8 @@ float sqrtf(float a) __z88dk_fastcall;
 float expf(float x) __z88dk_fastcall;
 float logf(float x) __z88dk_fastcall;
 float log10f(float x) __z88dk_fastcall;
-float powf(float x, float y)__z88dk_callee;
-// float hypotf(float x, float y)__z88dk_callee; // // FIXME - I need to be written
+float powf(float x, float y) __z88dk_callee;
+float hypotf(float x, float y) __z88dk_callee;
 
 /* Nearest integer, absolute value, and remainder functions */
 float fabsf(float x) __z88dk_fastcall;
@@ -120,7 +120,7 @@ float modff(float x, float * y) __z88dk_callee;
 float fmodf(float x, float y) __z88dk_callee;
 
 /* Intrinsic functions */
-// float sqrf(float a); // FIXME - I need to be written
+float sqrf(float a) __z88dk_fastcall;
 float invf(float a) __z88dk_fastcall;
 float invsqrtf(float a) __z88dk_fastcall;
 float polyf(const float x, const float d[], uint16_t n) __z88dk_callee;

@@ -8,7 +8,7 @@ PUBLIC cm32_sccz80_fsmin
 
 EXTERN m32_fsmin_fastcall
 
-    ; change underflow to a error floating zero as sdcc float
+    ; change underflow to a error floating zero as sccz80 float
     ;
     ; enter : stack = ret
     ;          DEHL = sccz80_float number

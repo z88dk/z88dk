@@ -10,7 +10,7 @@ EXTERN cm32_sdcc_fsreadl, m32_fsinv_fastcall
 
 .cm32_sdcc_fsinv
 
-    ; negate sdcc floats
+    ; invert sdcc float
     ;
     ; enter : stack = sdcc_float number, ret
     ;

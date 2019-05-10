@@ -10,7 +10,7 @@ EXTERN cm32_sdcc_fsreadl, m32_fssqrt
 
 .cm32_sdcc_fssqrt
 
-    ; square root of sdcc float
+    ; square root sdcc float
     ;
     ; enter : stack = sdcc_float number, ret
     ;

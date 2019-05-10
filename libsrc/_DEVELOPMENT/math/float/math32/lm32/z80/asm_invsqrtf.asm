@@ -8,12 +8,12 @@ PUBLIC asm_invsqrtf
 
 EXTERN m32_fsinvsqrt_fastcall
 
-    ; negate sccz80 floats
+    ; inverse square root sccz80 float
     ;
     ; enter : stack = ret
     ;          DEHL = sccz80_float number
     ;
-    ; exit  :  DEHL = sccz80_float(1/number)
+    ; exit  :  DEHL = sccz80_float(1/number^0.5)
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 

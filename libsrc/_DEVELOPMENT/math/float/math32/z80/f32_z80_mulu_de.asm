@@ -32,7 +32,6 @@ PUBLIC m32_z80_mulu_de
    inc d
    dec d
    jr Z,zerod               ; multiply by 0
-
    inc e
    dec e
    jr Z,zeroe               ; multiply by 0
@@ -47,25 +46,18 @@ PUBLIC m32_z80_mulu_de
 
    sla h
    jr C,branch_11
-
    sla h
    jr C,branch_12
-
    sla h
    jr C,branch_13
-
    sla h
    jr C,branch_14
-
    sla h
    jr C,branch_15
-
    sla h
    jr C,branch_16
-
    sla h
    jr C,branch_17
-
    jr exit1                ; multiply by 1
    
 .zerod

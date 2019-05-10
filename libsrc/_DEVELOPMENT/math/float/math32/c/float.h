@@ -41,37 +41,37 @@
 #define FLT_MAX_10_EXP  (+38)
 
 /* the following deal with IEEE single-precision numbers */
-#define EXCESS		126
-#define SIGNBIT		((unsigned long)0x80000000)
-#define __INFINITY	((unsigned long)0x7F800000)
-#define HIDDEN		(unsigned long)(1ul << 23)
-#define SIGN(fp)	(((unsigned long)(fp) >> (8*sizeof(fp)-1)) & 1)
-#define EXP(fp)		(((unsigned long)(fp) >> 23) & (unsigned int) 0x00FF)
-#define MANT(fp)	(((fp) & (unsigned long)0x007FFFFF) | HIDDEN)
+#define EXCESS          126
+#define SIGNBIT         ((unsigned long)0x80000000)
+#define __INFINITY      ((unsigned long)0x7F800000)
+#define HIDDEN          (unsigned long)(1ul << 23)
+#define SIGN(fp)        (((unsigned long)(fp) >> (8*sizeof(fp)-1)) & 1)
+#define EXP(fp)         (((unsigned long)(fp) >> 23) & (unsigned int) 0x00FF)
+#define MANT(fp)        (((fp) & (unsigned long)0x007FFFFF) | HIDDEN)
 #define NORM            0xff000000
-#define PACK(s,e,m)	((s) | ((unsigned long)(e) << 23) | (m))
+#define PACK(s,e,m)     ((s) | ((unsigned long)(e) << 23) | (m))
 
-float __uchar2fs (unsigned char);
-float __schar2fs (signed char);
-float __uint2fs (unsigned int);
-float __sint2fs (signed int);
-float __ulong2fs (unsigned long);
-float __slong2fs (signed long);
-unsigned char __fs2uchar (float);
-signed char __fs2schar (float);
-unsigned int __fs2uint (float);
-signed int __fs2sint (float);
-unsigned long __fs2ulong (float);
-signed long __fs2slong (float);
+float __uchar2fs (unsigned char) __z88dk_fastcall;
+float __schar2fs (signed char) __z88dk_fastcall;
+float __uint2fs (unsigned int) __z88dk_fastcall;
+float __sint2fs (signed int) __z88dk_fastcall;
+float __ulong2fs (unsigned long) __z88dk_fastcall;
+float __slong2fs (signed long) __z88dk_fastcall;
+unsigned char __fs2uchar (float) __z88dk_fastcall;
+signed char __fs2schar (float) __z88dk_fastcall;
+unsigned int __fs2uint (float) __z88dk_fastcall;
+signed int __fs2sint (float) __z88dk_fastcall;
+unsigned long __fs2ulong (float) __z88dk_fastcall;
+signed long __fs2slong (float) __z88dk_fastcall;
 
-float __fsadd (float, float);
-float __fssub (float, float);
-float __fsmul (float, float);
-float __fsdiv (float, float);
+float __fsadd (float, float) __z88dk_callee;
+float __fssub (float, float) __z88dk_callee;
+float __fsmul (float, float) __z88dk_callee;
+float __fsdiv (float, float) __z88dk_callee;
 
-char __fslt (float, float);
-char __fsgt (float, float);
-char __fseq (float, float);
-char __fsneq (float, float);
+char __fslt (float, float) __z88dk_callee;
+char __fsgt (float, float) __z88dk_callee;
+char __fseq (float, float) __z88dk_callee;
+char __fsneq (float, float) __z88dk_callee;
 
-#endif	/* _INC_FLOAT_H */
+#endif    /* _INC_FLOAT_H */

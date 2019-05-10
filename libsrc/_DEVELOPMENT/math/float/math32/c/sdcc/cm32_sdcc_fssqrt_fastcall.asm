@@ -8,7 +8,7 @@ PUBLIC cm32_sdcc_fssqrt_fastcall
 
 EXTERN m32_fssqrt_fastcall
 
-    ; square root of sdcc float
+    ; square root sdcc float
     ;
     ; enter : stack = sdcc_float number, ret
     ;

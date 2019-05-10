@@ -6,7 +6,7 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-; m32_fsinvsqrt - floating point inverse square root
+; m32_fsinvsqrt - z80, z180, z80-zxn floating point inverse square root
 ;-------------------------------------------------------------------------
 ;
 ; Searching for 1/x^0.5 being the inverse square root of y.

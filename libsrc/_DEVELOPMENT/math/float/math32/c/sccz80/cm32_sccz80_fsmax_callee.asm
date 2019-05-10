@@ -8,7 +8,7 @@ PUBLIC cm32_sccz80_fsmax_callee
 
 EXTERN m32_fsmax_fastcall
 
-    ; convert sdcc float to infinity with correct sign
+    ; convert sccz80 float to infinity with correct sign
     ;
     ; enter : stack = ret
     ;          DEHL = sccz80_float number

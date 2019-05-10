@@ -10,11 +10,11 @@ EXTERN cm32_sdcc_fsreadl, m32_fsinvsqrt_fastcall
 
 .cm32_sdcc_fsinvsqrt
 
-    ; square root of sdcc float
+    ; inverse square root of sdcc float
     ;
     ; enter : stack = sdcc_float number, ret
     ;
-    ; exit  : DEHL = sdcc_float(number^0.5)
+    ; exit  : DEHL = sdcc_float(1/number^0.5)
     ;
     ; uses  : af, bc, de, hl
 

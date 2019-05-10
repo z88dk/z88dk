@@ -182,7 +182,5 @@ defc m32_mulu_32h_32x32 = l_z180_mulu_32h_32x32
 
     add hl,bc                   ; p7 p6
     ex de,hl                    ; p7 p6 <-> p5 p4
-
-    xor a                       ; carry reset
     ret                         ; exit  : DEHL = 32-bit product
 

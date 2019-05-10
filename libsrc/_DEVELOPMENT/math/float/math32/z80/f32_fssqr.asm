@@ -6,7 +6,7 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-; m32_fssqr - z80 floating point square
+; m32_fssqr - z80, z180, z80-zxn floating point square
 ;-------------------------------------------------------------------------
 ;
 ; since the z180, and z80-zxn only have support for 8x8bit multiply,
