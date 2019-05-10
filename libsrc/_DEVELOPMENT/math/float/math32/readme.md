@@ -203,7 +203,7 @@ The `mulu_32_16x16` function is used for Newton-Raphson iteration in the `_fsdiv
 
 The `mulu_32h_32x32` provides just the high order bytes from a 32-bit multiply calculation for the `_fsdiv` Newton-Raphson iteration. In this iteration calculation it is important to have access to the full 32-bits (rather than just 24-bits for normal mantissa calculations).
 
-The implementation of the `mulu_32h_32x32` is not a "correct" multiplication as the lower order bytes are not included in the carry calculation, for efficiency reasons. The calculation begins at the 3rd byte (of 8), and this byte provides carry bits into the 4th bit. Further rounding from the third byte is applied to the 4th byte.
+The implementation of the `mulu_32h_32x32` is not a "correct" multiplication as the lower order bytes are not included in the carry calculation, for efficiency reasons. The calculation begins at the 3rd byte (of 8), and this byte provides carry bits into the 4th byte. Further rounding from the third byte is applied to the 4th byte.
 
 By calculating 3rd through to 7th bytes, and returning only byte 4 through 7, there is only maximally a small error in the least significant nibble of the 32-bit mantissa, which is discarded after rounding to 24-bit precision anyway. Doing this avoids calculating the 0th through 2nd bytes, which saves 6 8x8 multiply operations, and the respective word push and pop baggage.
 
@@ -253,7 +253,7 @@ All of the higher functions are implemented based on Horner's Method for polynom
 
 This function reads a table of coefficients stored in "ROM" and iterates the specified number of iterations to produce the result desired.
 
-It is a general function. Any coefficient table can be used, as desired. The coefficients are provided in packed floating point format, with the coefficients stored in the correct order. The 0th coefficient is stored first in the table. For examples see in the library for `sinf(), `tanf()`, and `expf()`.
+It is a general function. Any coefficient table can be used, as desired. The coefficients are provided in packed floating point format, with the coefficients stored in the correct order. The 0th coefficient is stored first in the table. For examples see in the library for `sinf()`, `tanf()`, and `expf()`.
 
 #### _fshypot
 
