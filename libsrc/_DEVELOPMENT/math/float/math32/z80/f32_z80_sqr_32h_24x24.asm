@@ -32,7 +32,7 @@
 ; uses  : af, bc, de, hl
 
 SECTION code_clib
-SECTION code_math
+SECTION code_fp_math32
 
 PUBLIC m32_sqr_32h_24x24
 

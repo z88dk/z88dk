@@ -40,7 +40,7 @@
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
-SECTION code_math
+SECTION code_fp_math32
 
 EXTERN m32_fsmul_callee, m32_fsadd_callee, m32_fsmin_fastcall
 

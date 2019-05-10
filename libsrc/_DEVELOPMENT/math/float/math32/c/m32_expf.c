@@ -1,6 +1,8 @@
 
 #include <math.h>
 
+extern float m32_coeff_exp[];
+
 float expf (float x) __z88dk_fastcall
 {
     int16_t exp;

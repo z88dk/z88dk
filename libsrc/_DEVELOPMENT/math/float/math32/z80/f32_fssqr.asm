@@ -40,7 +40,7 @@
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
-SECTION code_math
+SECTION code_fp_math32
 
 EXTERN m32_fszero_fastcall
 EXTERN m32_sqr_32h_24x24

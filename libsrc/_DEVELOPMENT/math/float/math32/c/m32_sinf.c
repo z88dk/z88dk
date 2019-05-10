@@ -1,6 +1,9 @@
 
 #include    <math.h>
 
+extern float m32_coeff_sin_a[];
+extern float m32_coeff_sin_b[];
+
 float sinf (float f) __z88dk_fastcall
 {
     float    y, y_squared;

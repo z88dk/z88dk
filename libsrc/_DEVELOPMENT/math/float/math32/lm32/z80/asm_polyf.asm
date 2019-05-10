@@ -2,7 +2,7 @@
 ; float _polyf (const float x, const float d[], uint16_t n) __z88dk_callee
 
 SECTION code_clib
-SECTION code_math
+SECTION code_fp_math32
 
 PUBLIC asm_polyf
 

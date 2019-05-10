@@ -37,7 +37,7 @@
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
-SECTION code_math
+SECTION code_fp_math32
 
 EXTERN m32_fsmul, m32_fsmul_callee, m32_fsmax_fastcall
 EXTERN m32_mulu_32_16x16, m32_mulu_32h_32x32
@@ -266,7 +266,7 @@ ENDIF
     ld d,a
     ret                         ; return DEHL
 
-SECTION rodata_clib
+SECTION rodata_fp_math32
 
 ._invtable
   DEFB 0x7f, 0x7b, 0x78, 0x74, 0x71, 0x6e, 0x6b, 0x68

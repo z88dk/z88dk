@@ -1,6 +1,9 @@
 
 #include <math.h>
 
+extern float m32_coeff_atan_a[];
+extern float m32_coeff_atan_b[];
+
 float atanf (float f) __z88dk_fastcall
 {
     int16_t recip;

@@ -31,6 +31,8 @@
 #ifndef _INC_MATH
 #define _INC_MATH
 
+#include <stdint.h>
+
 #define CHAR_BIT    8    /* bits in a char */
 #define SCHAR_MAX   127
 #define SCHAR_MIN  -128
@@ -71,7 +73,7 @@
 #define LNof10          (float)2.302585093
 #define LOG2            (float)0.30102999567
 #define LOGE            (float)0.43429448190
-#define PI              (float)3.14159265359
+//#define PI              (float)3.14159265359
 #define PIby180         (float)0.0174532925
 #define PIbyTWO         (float)1.570796326795
 #define POW10INF        (float)38.0

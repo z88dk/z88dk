@@ -2,9 +2,9 @@
 ; float _sqrtf (float number) __z88dk_fastcall
 
 SECTION code_clib
-SECTION code_math
+SECTION code_fp_math32
 
-PUBLIC asm_sqrt
+PUBLIC asm_sqrtf
 
 EXTERN m32_fssqrt_fastcall
 

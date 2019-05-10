@@ -1,6 +1,8 @@
 
 #include <math.h>
 
+extern float m32_coeff_log[];
+
 float logf(float x) __z88dk_fastcall
 {
     int exp;

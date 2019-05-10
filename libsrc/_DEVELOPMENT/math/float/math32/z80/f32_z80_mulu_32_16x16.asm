@@ -17,7 +17,7 @@
 ; uses  : af, bc, de, hl
 
 SECTION code_clib
-SECTION code_math
+SECTION code_fp_math32
 
 EXTERN m32_z80_mulu_de
 

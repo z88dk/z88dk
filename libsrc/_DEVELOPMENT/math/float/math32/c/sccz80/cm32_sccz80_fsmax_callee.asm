@@ -2,7 +2,7 @@
 ; float __fsmax_callee (float number)
 
 SECTION code_clib
-SECTION code_math
+SECTION code_fp_math32
 
 PUBLIC cm32_sccz80_fsmax_callee
 

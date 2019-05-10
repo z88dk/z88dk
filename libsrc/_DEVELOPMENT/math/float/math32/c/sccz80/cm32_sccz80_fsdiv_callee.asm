@@ -2,7 +2,7 @@
 ; float __fsdiv_callee (float left, float right)
 
 SECTION code_clib
-SECTION code_math
+SECTION code_fp_math32
 
 PUBLIC cm32_sccz80_fsdiv_callee
 
