@@ -33,7 +33,7 @@ Where not written by me, the functions were sourced from:
 
   *  Power and trigonometric functions' accuracy and speed can be traded by managing their polynomial series coefficient tables. More iterations provides higher accuracy at the expense of performance. The default Hi-Tech C library coefficients are provided by default. Alternative coefficient tables can be tested without impacting the code.
 
-  *  The square root (inverse square root) function is seeded using the Quake magic number method, with two Neutralising iterations for accuracy. Again, accuracy and speed can be traded depending on application, by removing one iteration for game usage (for example).
+  *  The square root (inverse square root) function is seeded using the Quake magic number method, with two Newton-Raphson iterations for accuracy. Again, accuracy and speed can be traded depending on application, by removing one iteration for game usage (for example).
 
 ## IEEE Floating Point Format
 
