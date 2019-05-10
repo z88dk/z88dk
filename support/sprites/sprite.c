@@ -973,6 +973,40 @@ void import_from_bitmap( const char *file )
 		fseek(fpin,0L,SEEK_SET);
 		*/
 
+		// Psion PIC files
+		while (!feof(fpin) && fgetc(fpin)=='P' && fgetc(fpin)=='I' && fgetc(fpin)=='C' && fgetc(fpin)==0xdc) {
+			getc(fpin); getc(fpin); 	// skip version
+			c = getc(fpin)+256*getc(fpin);
+			for (spcount=0; spcount<=c; spcount++) {
+				getc(fpin); getc(fpin); 	// skip crc
+				sprite[ on_sprite+spcount ].size_x = getc(fpin)+256*getc(fpin);
+				sprite[ on_sprite+spcount ].size_y = getc(fpin)+256*getc(fpin);
+				for ( b = 0; b<18; b++ ) getc(fpin); // skip extra pic related stuff
+				for ( y = 1; y <= sprite[ on_sprite+spcount ].size_y; y++ )
+					for ( x = 1; x <= sprite[ on_sprite+spcount ].size_x; x+=8 ) {
+						b=getc(fpin);
+						for ( i = 0; i < 8; i++ ) {
+						sprite[ on_sprite+spcount ].p[ x+i ][y] = ((b&1) != 0);
+						b>>=1;
+						}
+					}
+				/* mask */
+				spcount++;
+				sprite[ on_sprite+spcount ].size_x = sprite[ on_sprite+spcount-1 ].size_x;
+				sprite[ on_sprite+spcount ].size_y = sprite[ on_sprite+spcount-1 ].size_y;
+				for ( y = 1; y <= sprite[ on_sprite+spcount ].size_y; y++ )
+					for ( x = 1; x <= sprite[ on_sprite+spcount ].size_x; x+=8 ) {
+						b=getc(fpin);
+						for ( i = 0; i < 8; i++ ) {
+						sprite[ on_sprite+spcount ].p[ x+i ][y] = ((b&1) != 0);
+						b>>=1;
+						}
+					}
+			}
+		}
+
+		fseek(fpin,0L,SEEK_SET);
+		
 		// ZX Spectrum Screen dump
 		if ((len==6144)||(len==6912)) {
 			sprite[ on_sprite ].size_x = 255;
