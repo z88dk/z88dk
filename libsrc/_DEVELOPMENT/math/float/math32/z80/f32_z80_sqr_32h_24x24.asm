@@ -114,7 +114,7 @@ ENDIF
     add hl,hl                   ; 2*a*c 2^16
     adc a,a
     add hl,de
-    adc a,a
+    adc a,0
     add hl,bc
     adc a,0
 
