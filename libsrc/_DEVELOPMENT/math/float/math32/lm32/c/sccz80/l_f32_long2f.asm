@@ -8,8 +8,7 @@
 	EXTERN	l_f32_zero
 
 
-; Convert signed char/int in l to floating point value in FA
-; TODO: Optimise the char case
+; Convert (un)signed long in dehl to floating point value in dehl
 l_f32_ulong2f:
         ld      c,0
         jr      not_negative
@@ -25,7 +24,7 @@ not_negative:
 	or	e
 	or	d
 	jp	z,l_f32_zero
-	ld	b,$80 + 32
+	ld	b,$7f + 31
 loop:
 	bit	7,d
 	jr	nz,rotate_done

@@ -10,7 +10,7 @@
         EXTERN  l_neg_hl
 
 
-; Convert signed char/int in l to floating point value in FA
+; Convert (un)signed char/int in hl to floating point value in dehl
 l_f32_uchar2f:
 l_f32_uint2f:
         ld      d,0
@@ -23,7 +23,7 @@ l_f32_sint2f:
         call    l_neg_hl
 	ld	d,128
 not_negative:
-	ld	b,$80 + 16
+	ld	b,$7f + 15
 	ld	a,h
 	or	l
 	jp	z,l_f32_zero

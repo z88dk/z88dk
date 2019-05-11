@@ -20,8 +20,8 @@ l_f32_f2ulong:
         rla                     ;a = Exponent
         and     a
 	jp	z,l_f32_zero	;Expontent was 0, return 0
-        cp      $80 + 24
-        ret     nc              ;Number too large
+        cp      $7e + 24
+	jp	nc,l_f32_zero	;Number too large
 	; e register is rotated by bit, restore the hidden bit and rotate back
 	scf
 	rr	e
@@ -30,7 +30,7 @@ loop:
 	rr	h
 	rr	l
 	inc	a
-	cp	$80 + 24
+	cp	$7e + 24
 	jr	nz,loop
 	rl	d		;Check sign bit
 	ld	d,0
