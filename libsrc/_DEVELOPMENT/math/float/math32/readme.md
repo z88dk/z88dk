@@ -305,6 +305,16 @@ Generally the basic functions are accurate within 1-3 counts of the floating man
 
 If the value of the function depends on the value of the difference of 2 floating point numbers that are close to each other in value, the relative error generally becomes large, although the absolute error may remain well bounded. Examples are the logs of numbers near 1 and the sine of numbers near pi. For example, if the argument of the sine function is a floating point number is close to pi, say 5 counts of the mantissa away from pi and it is subtracted from pi the result will be a number with only 3 significant bits. The relative error in the sine result will be very large, but the absolute error will still be very small. Functions with steep slopes, such as the exponent of larger numbers will show a large relative error, since the relative error in the argument is magnified by the slope.
 
+The multiplication process should be "correct" and in fact more correct than the digi international method. Every carry term is calculated and brought into the result. Digi international code ignores the `c*f` term of the 24-bit mantissa calculation of `abc*cdf`, because they determined it wasn't needed. m32 doesn't take that short cut and calculates all the terms. This also applies to the squaring process, which should also be "correct".
+
+The division process relies on N-R estimation, and it follows exactly the same process as digi international do. There are some notes about the number of significant bits of calculation required to derive a correct IEEE 24-bit mantissa, and I believe that using the `32h_32x32` calculations this is achieved. I was seeing outcomes close to, and mostly the same as the m48 package. But both of these are not rounding to whole numbers (ever). 2.0 is always seen as 1.99999xx, and never as 2.00001xx.
+
+The addition / subtraction process should be "correct", and this result should be identical to m48 within the significant digits of IEEE 754.
+
+The square root calculation relies on N-R and is an estimate only. With 2 iterations currently implemented I think the estimate is pretty usable. 1 iteration is good for games and nothing else. It is easy (at the expense of ticks) to make 3 iterations, which should be pretty damn good (as a technical outcome).
+
+The rest of the derived power and trigonometric functions rely on the polynomial expansion process and will only be as accurate as the coefficients that are fed into the process. I've used those coefficients found in the Hi-Tech C library code. I guess they got them right, but their code is not known for accuracy. Someone with a mathematical background might be interested to calculate better coefficients at some stage.
+
 ### Execution speed
 
 Floating add, subtract and multiply require approximately xxx clocks worst case on the z80 processor. Divide and square root require approximately xxx clocks. Sine and pow2, pow10 or exp require about xxx clocks. Log, log2, log (base e), and atan need about xxx clocks. Functions derived from these functions often require xxx or more clocks.
