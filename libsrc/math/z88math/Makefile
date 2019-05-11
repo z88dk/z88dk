@@ -1,30 +1,25 @@
 #
-# Wahey, a messed up makefile for building libraries!
-#
 
 include ../../Make.config
 
-CFILES = \
-	cosh.c \
-	sinh.c \
-	tanh.c 
+vpath %.c ../cimpl/
 
-AFILES  = $(wildcard *.asm)
-OBJECTS = $(CFILES:.c=.o) $(AFILES:.asm=.o)
+AFILES  = $(wildcard c/sccz80/*.asm)
+CFILES  = cosh.c sinh.c tanh.c modf.c
+OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
+
+CFLAGS +=  -math-z88 -D__Z88__ -D__NATIVE_MATH__
+
+all: dirs $(OUTPUT_DIRECTORY)/z88_math.lib
 
 
-all: $(OUTPUT_DIRECTORY)/z88_math.lib
+$(OUTPUT_DIRECTORY)/z88_math.lib: $(addprefix obj/z80/, $(OBJECTS))
+	TYPE=z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/z88_math @z88math.lst
 
-
-$(OUTPUT_DIRECTORY)/z88_math.lib: $(OBJECTS)
-	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/z88_math @z88list
-
-%.o: %.c
-	$(ZCC) +z88 $(CFLAGS) -math-z88 -D__Z88__ -D__NATIVE_MATH__ $^
-
-%.o: %.asm
-	$(ZCC) +z88 $(CFLAGS) -math-z88 -D__Z88__ -D__NATIVE_MATH__ $^
-
+dirs:
+	@mkdir -p obj/z80/c/sccz80 obj/ixiy/c/sccz80
 
 clean:
-	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i 
+	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i *.opt
+	$(RM) -fr obj
+

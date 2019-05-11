@@ -32,7 +32,9 @@
 	defc __CPU_CLOCK = 4000000
 
 
+
 	IF startup = 1 
+		INCLUDE "target/aquarius/def/maths_mbf.def"
 		INCLUDE	"target/aquarius/classic/ram.asm"
         ELSE
 		INCLUDE	"target/aquarius/classic/rom.asm"

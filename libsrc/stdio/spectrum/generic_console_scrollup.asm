@@ -6,14 +6,14 @@
 ; the second display
 ;
 
-		MODULE	generic_console_scrollup
-		SECTION	code_clib
-		PUBLIC	generic_console_scrollup
-		EXTERN	call_rom3
-		
-		EXTERN	__ts2068_hrgmode
+	MODULE	generic_console_scrollup
 
-		EXTERN	__zx_console_attr
+	SECTION	code_clib
+	PUBLIC	generic_console_scrollup
+	EXTERN	call_rom3
+	EXTERN	__ts2068_hrgmode
+
+	EXTERN	__zx_console_attr
         EXTERN  zx_rowtab
 
 		
@@ -67,24 +67,25 @@ IF NOROMCALLS
         dec     a
         jr      nz,clear_loop
 		
-		ld      hl,$4000+6880
-		ld      de,$4000+6881
-		ld      bc,31
-		ld      a,(__zx_console_attr)
-		ld      (hl),a
-		ldir
+	ld      hl,$4000+6880
+	ld      de,$4000+6881
+	ld      bc,31
+	ld      a,(__zx_console_attr)
+	ld      (hl),a
+	ldir
 		
         pop     ix
         pop     hl
         ret
-
-
 ELSE
-
   IF FORts2068
         ld      a,(__ts2068_hrgmode)
-        and     a
-        jr      nz,hrgscroll
+	cp	6	;Hires
+	jr	z,hrgscroll
+	cp	2	;High colour
+	jr	z,hrgscroll
+	cp	1	;Screen 1
+	jr	z,hrgscroll
   ENDIF
         ld      a,($dff)
         cp      $17
@@ -114,26 +115,33 @@ IF FORts2068
 .outer_loop
         push    af
         push    ix
-        ld      a,23
+	ld	a,(__ts2068_hrgmode)
+        ld      b,23
 .inner_loop
+	push	bc
         ld      e,(ix+16)
         ld      d,(ix+17)
         ex      de,hl
         ld      e,(ix+0)
         ld      d,(ix+1)
+	cp	1
+	jr	z,just_screen_1
+	push	de
+	push	hl
         ld      bc,32
         ldir
-; second display
-        dec     de
-        dec     hl
+	pop	hl
+	pop	de
+just_screen_1:
         set     5,d
         set     5,h
         ld      bc,32
-        lddr
+        ldir
         ld      bc,16
         add     ix,bc
-        dec     a
-        jr      nz,inner_loop
+	pop	bc
+	djnz	inner_loop
+
         pop     ix
         pop     af
         inc     ix
@@ -142,31 +150,45 @@ IF FORts2068
         jr      nz,outer_loop
 ; clear
         ld      ix,zx_rowtab + (192 - 8) * 2
-        ld      a,8
+	ld	a,(__ts2068_hrgmode)
+        ld      b,8
 .clear_loop
+	push	bc
         push    ix
         ld      e,(ix+0)
         ld      d,(ix+1)
         ld      h,d
         ld      l,e
-        ld      (hl),0
         inc     de
+	push	de
+	push	hl
+	cp	1
+	jr	z,clear_screen1_only
+        ld      (hl),0
         ld      bc,31
         ldir
 ; second display
-        dec hl
-        dec de
+clear_screen1_only:
+	pop	hl
+	pop	de
         set     5,d
         set     5,h
-        ex      de,hl
-        ld      (hl),0
+	cp	4
+	ex	af,af
+	ld	a,(__zx_console_attr)
+	ld	c,a
+	ex	af,af
+	jr	z,clear_hires2
+	ld	c,0
+clear_hires2:
+        ld      (hl),c
         ld      bc,31
-        lddr
+	ldir
         pop     ix
         inc     ix
         inc     ix
-        dec     a
-        jr      nz,clear_loop
+	pop	bc
+	djnz	clear_loop
         pop     ix
         pop     hl
         ret

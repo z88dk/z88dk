@@ -742,7 +742,7 @@ void import_from_geos( const char *file )
 
 					b=b>>(7-(i%8));
 					sprite[ on_sprite + spcount ].p[ x+1 ][ y+1 ] = ((b&1) != 0);
-					/* **HACK** - Estra row on top of GEOS font */
+					/* **HACK** - Extra row on top of GEOS font */
 					//sprite[ on_sprite + spcount ].p[ x+1 ][ y+2 ] = ((b&1) != 0);
 					i++;
 				}
@@ -789,6 +789,8 @@ void import_from_bitmap( const char *file )
 	char c;
 	char xsz[10];
 	char ysz[10];
+	char pos[10];
+	int maxy;
 	int pixel;
 	char row[1000];
 	char foo[10];
@@ -875,6 +877,7 @@ void import_from_bitmap( const char *file )
 		}
 		
 		fseek(fpin,0L,SEEK_SET);
+		maxy=0;
 		
 		fscanf(fpin,"%s",row);
 		if ((!strcmp(row,"STARTFONT"))||(!strncmp(row,"COMMENT",8))) {
@@ -892,12 +895,14 @@ void import_from_bitmap( const char *file )
 						fgets(row,sizeof(row),fpin);
 						if (!strncmp(row, "ENDFONT",7)) exitflag=1;
 					}
-					sscanf(row,"%s %s %s",foo,xsz,ysz);
+					sscanf(row,"%s %s %s %s %s",foo,xsz,ysz,foo,pos);
 					sprite[ on_sprite + spcount ].size_x = g = atoi(xsz);
 					sprite[ on_sprite + spcount ].size_y = atoi(ysz);
 					if (g%8) {g=g/8+1;}
 					else g=g/8;
 				}
+				
+				if (maxy < sprite[ on_sprite + spcount ].size_y)  maxy = sprite[ on_sprite + spcount ].size_y;
 				
 				if (!exitflag) {
 					while (strncmp(row, "BITMAP",3) && (!feof(fpin)))
@@ -914,13 +919,21 @@ void import_from_bitmap( const char *file )
 						}
 					}
 				}
+				
+				/* **HACK** (BDF font import), remove this code to exclude vertical shifting */
+				for (b=sprite[ on_sprite + spcount ].size_y; b<(maxy-atoi(pos)); b++) {
+					sprite[ on_sprite + spcount ].size_y++;
+					for ( y = sprite[ on_sprite + spcount ].size_y; y > 0 ; y-- )
+						for ( x = 1; x <= sprite[ on_sprite + spcount ].size_x; x++ )
+							sprite[ on_sprite + spcount ].p[ x ][ y ] = sprite[ on_sprite + spcount ].p[ x ][ y - 1 ];
+				}
 
 				/* **HACK** (BDF font import), remove this code for fixed height font */
 				/* Adjust font height */
 				b=0;
-				sprite[ on_sprite  + spcount ].size_y++;
+				sprite[ on_sprite + spcount ].size_y++;
 				while (b == 0) {
-					sprite[ on_sprite  + spcount ].size_y--;
+					sprite[ on_sprite + spcount ].size_y--;
 					for ( x = sprite[ on_sprite + spcount ].size_x; x > 0 ; x-- )
 						if (sprite[ on_sprite + spcount ].p[ x ][ sprite[ on_sprite + spcount ].size_y ] != 0) b=1;
 					if (sprite[ on_sprite + spcount ].size_y <= 1) b=1;
@@ -935,7 +948,65 @@ void import_from_bitmap( const char *file )
 		}
 		
 		fseek(fpin,0L,SEEK_SET);
+		
+		// **HACK** PrintShop clipart libraries
+		/*
+		if (((len%572)==0)||(((len-10)%572)==0)) {
+			spcount=0;
+			if (((len-10)%572)==0)
+				for ( x = 1; x <= 10; x++ ) fgetc(fpin);
+			while (!feof(fpin)) {
+			//for ( x = 1; x <= 10; x++ ) fgetc(fpin);
+			sprite[ on_sprite+spcount ].size_x = 88;
+			sprite[ on_sprite+spcount ].size_y = 52;
+			for ( y = 1; y <= sprite[ on_sprite+spcount ].size_y; y++ )
+				for ( x = 1; x <= sprite[ on_sprite+spcount ].size_x; x+=8 ) {
+					b=getc(fpin);
+					for ( i = 0; i < 8; i++ ) {
+					sprite[ on_sprite+spcount ].p[ x+i ][y] = ((b&128) != 0);
+					b<<=1;
+					}
+				}
+			spcount++;
+			}
+		}
+		fseek(fpin,0L,SEEK_SET);
+		*/
 
+		// Psion PIC files
+		while (!feof(fpin) && fgetc(fpin)=='P' && fgetc(fpin)=='I' && fgetc(fpin)=='C' && fgetc(fpin)==0xdc) {
+			getc(fpin); getc(fpin); 	// skip version
+			c = getc(fpin)+256*getc(fpin);
+			for (spcount=0; spcount<=c; spcount++) {
+				getc(fpin); getc(fpin); 	// skip crc
+				sprite[ on_sprite+spcount ].size_x = getc(fpin)+256*getc(fpin);
+				sprite[ on_sprite+spcount ].size_y = getc(fpin)+256*getc(fpin);
+				for ( b = 0; b<18; b++ ) getc(fpin); // skip extra pic related stuff
+				for ( y = 1; y <= sprite[ on_sprite+spcount ].size_y; y++ )
+					for ( x = 1; x <= sprite[ on_sprite+spcount ].size_x; x+=8 ) {
+						b=getc(fpin);
+						for ( i = 0; i < 8; i++ ) {
+						sprite[ on_sprite+spcount ].p[ x+i ][y] = ((b&1) != 0);
+						b>>=1;
+						}
+					}
+				/* mask */
+				spcount++;
+				sprite[ on_sprite+spcount ].size_x = sprite[ on_sprite+spcount-1 ].size_x;
+				sprite[ on_sprite+spcount ].size_y = sprite[ on_sprite+spcount-1 ].size_y;
+				for ( y = 1; y <= sprite[ on_sprite+spcount ].size_y; y++ )
+					for ( x = 1; x <= sprite[ on_sprite+spcount ].size_x; x+=8 ) {
+						b=getc(fpin);
+						for ( i = 0; i < 8; i++ ) {
+						sprite[ on_sprite+spcount ].p[ x+i ][y] = ((b&1) != 0);
+						b>>=1;
+						}
+					}
+			}
+		}
+
+		fseek(fpin,0L,SEEK_SET);
+		
 		// ZX Spectrum Screen dump
 		if ((len==6144)||(len==6912)) {
 			sprite[ on_sprite ].size_x = 255;
@@ -1003,6 +1074,12 @@ void import_from_printmaster( const char *file )
 	fpin = fopen( file, "rb" );
 	if (!fpin)
 		return;
+
+	/* **HACK** - Eat leading bytes to import Newsmaster/Printmaster fonts */
+	/*
+	for ( y = 1; y < 0xb7; y++ )
+		fgetc(fpin);
+	*/
 
 	spcount = 0;	
 	while ((fgetc(fpin) != 0x1a) && !feof(fpin) && ((on_sprite+spcount)<150)) {
@@ -1181,7 +1258,7 @@ void save_sprite_file( const char *file )
 void load_sprite_file( const char *file )
 {
 	gzFile f = NULL;
-	int x,y,i,b;
+	int x,y,i;
 
 	f = gzopen( file, "rb" );
 	if (!f) {
@@ -1197,6 +1274,9 @@ void load_sprite_file( const char *file )
 		for ( x = 0; x < MAX_SIZE_X; x++ )
 			for ( y = 0; y < MAX_SIZE_Y; y++ ) {
 				sprite[ i ].p[ x ][ y ] = gzgetc (f);
+				/* **HACK** - Force the font size on open */
+				//sprite[ i ].size_x=4;
+				//sprite[ i ].size_y=7;
 			}
 			
 		/* **HACK** - auto-adjust height on open */
@@ -1908,6 +1988,7 @@ int main()
 	//Setup graphics
 
 	al_set_new_display_flags(ALLEGRO_WINDOWED);
+	al_set_new_window_position(50, 50);
 	display = al_create_display(720, 520);
 	if ( display == NULL )
 		exit( -1 );

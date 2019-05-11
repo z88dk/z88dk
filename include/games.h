@@ -267,7 +267,7 @@ extern const unsigned char *joystick_type[];
 
 #ifdef __ZX81__
 #ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = {"Kempston","ZXpand","QAOP-MN","Cursor"};
+	const unsigned char *joystick_type[] = {"kempston","zxpand","qaop-mn","cursor"};
 #endif
 	#define GAME_DEVICES 4
 #endif

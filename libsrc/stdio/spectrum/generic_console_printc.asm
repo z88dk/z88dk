@@ -14,6 +14,7 @@
 	EXTERN	__zx_64col_font
 	EXTERN	__console_w
 	EXTERN	generic_console_flags
+	EXTERN	__ts2068_hrgmode
 
 ; Entry:
 ;  a = charcter
@@ -60,12 +61,20 @@ set_switch:
 	res	4,(hl)
 	ld	hl,print32
 	cp	64
-	ld	a,32
+	ld	de,$4020
 	jr	nz,set_switch1
 	ld	hl,print64
-	ld	a,64
+	ld	de,$8040
 set_switch1:
 	ld	(print_routine),hl
+IF FORts2068
+	ld	a,(__ts2068_hrgmode)
+	cp	6
+	ld	a,d
+	jr	z,set_width
+ENDIF
+	ld	a,e
+set_width:
 	ld	(__console_w),a
 	ret
 
@@ -135,10 +144,32 @@ print32_loop:
 	djnz	print32_loop
 handle_attributes:
 	dec	d
+	call	get_attribute_address
+	ret	z		;No attributes
+	ld	a,(__zx_console_attr)
+	ld	(de),a
+	ret
+
+
+get_attribute_address:
 IF FORts2068
+	ld	a,d
+	and	@0100000
+	ld	l,a
 	ld	a,(__ts2068_hrgmode)
-	and	a
-	ret	nz
+	cp	6
+	ret	z
+	cp	2
+	jr	nz,not_hi_colour
+	set	5,d
+	ld	a,(__zx_console_attr)
+	ld	b,7
+hires_set_attr:
+	ld	(de),a
+	dec	d
+	djnz	hires_set_attr
+	ret
+not_hi_colour:
 ENDIF
 	ld	a,d
 	rrca
@@ -146,9 +177,10 @@ ENDIF
 	rrca
 	and	3
 	or	88
+IF FORts2068
+	or	l		;Add in screen 1 bit
+ENDIF
 	ld	d,a
-	ld	a,(__zx_console_attr)
-	ld	(de),a
 	ret
 
 print64:
@@ -203,11 +235,11 @@ print64_noinverse:
 ; Exit: hl = screen address
 generic_console_calc_screen_addr:
 IF FORts2068
-        bit     0,c             ;if set then we need to use alt screen
+	bit	0,c
         push    af
 	ld	a,(__ts2068_hrgmode)
-	and	a
-	jr	z,not_hrgmode
+	cp	6
+	jr	nz,not_hrgmode
 	srl	c
 not_hrgmode:
 ENDIF
@@ -223,14 +255,26 @@ ENDIF
 	or	0x40
 	ld	h,a
 IF FORts2068
-        pop     af
-        ret     z
         ld      a,(__ts2068_hrgmode)
-        and     $20
-        add     h
-        ld      h,a
+	and	a
+	jr	z,dont_use_screen_1
+	cp	1		;screen 1
+	jr	z,use_screen_1
+	cp	2		;high colour
+	jr	z,dont_use_screen_1
+	; So we're in hires mode
+	pop	af
+	ret	z		;Even column no need for it
+calc_screen1_offset:
+	set	5,h
+	ret
+use_screen_1:
+	pop	af
+	jr	calc_screen1_offset
+dont_use_screen_1:
+	pop	af
 ENDIF
-        ret
+	ret
 
 	SECTION bss_clib
 

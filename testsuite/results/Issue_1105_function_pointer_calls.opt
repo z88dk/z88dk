@@ -274,9 +274,6 @@
 	pop	bc
 	pop	bc
 	pop	bc
-	pop	bc
-	push	bc
-	push	bc
 	ret
 
 
@@ -388,10 +385,10 @@
 
 .i_3
 	;20.000000
-	defb	0,0,0,0,32,133
+	defb	0x00,0x00,0x00,0x00,0x20,0x85
 .i_4
 	;1.000000
-	defb	0,0,0,0,0,129
+	defb	0x00,0x00,0x00,0x00,0x00,0x81
 
 
 	SECTION	bss_compiler

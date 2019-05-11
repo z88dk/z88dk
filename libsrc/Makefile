@@ -29,9 +29,10 @@ all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	pv1000_clib.lib pv2000_clib.lib coleco_clib.lib multi8_clib.lib alphatro_clib.lib  spc1000_clib.lib \
 	laser500_clib.lib super80_clib.lib super80_vduem_clib.lib \
 	adam.lib z80tvgame_clib.lib smc777.lib pasopia7_clib.lib sv8000_clib.lib \
+	excali64_clib.lib \
 	preempt.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib 
 
-genlibs: z80_crt0.lib math48.lib gen_math.lib gendos.lib ndos.lib  \
+genlibs: z80_crt0.lib math48.lib gen_math.lib mbf32.lib mbf64.lib gendos.lib ndos.lib  \
 	 lib3d.lib x11.lib fastmath.lib
 
 c128libs: c128ansi_clib.lib gfx128.lib gfx128hr.lib gfx128hr480.lib 
@@ -134,6 +135,19 @@ gen_math.lib:
 	@echo ''
 	$(MAKE) -C math/genmath
 
+mbf32.lib:
+	@echo ''
+	@echo '--- Building Microsoft Single Precision Maths Library ---'
+	@echo ''
+	$(MAKE) -C math/mbf32
+
+mbf64.lib:
+	@echo ''
+	@echo '--- Building Microsoft Double Precision Maths Library ---'
+	@echo ''
+	$(MAKE) -C math/mbf64
+
+
 fastmath.lib:
 	@echo ''
 	@echo '--- Building fast integer maths library ---'
@@ -235,6 +249,7 @@ ts2068_clib.lib:
 	$(call buildgeneric,zx)
 	$(MAKE) -C target/zx
 	$(MAKE) -C games TARGET=zx
+	$(RM) -f stdio/zx/*.o
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORzx -DFORts2068 -DA80COL -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(LISTFILE_DIRECTORY)/ts2068.lst
 
 # TS2068 HRG graphics lib - Stefano
@@ -259,7 +274,7 @@ zxrom.lib:
 	@echo '--- Building ZXROM Library ---'
 	@echo ''
 	$(RM) stdio/spectrum/generic_console_scrollup.o
-	$(LIBLINKER) -DFORzx -DNOROMCALLS -x$(OUTPUT_DIRECTORY)/zxrom @$(LISTFILE_DIRECTORY)/zxrom.lst
+	$(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS -DNOROMCALLS -x$(OUTPUT_DIRECTORY)/zxrom @$(LISTFILE_DIRECTORY)/zxrom.lst
 	$(RM) stdio/spectrum/generic_console_scrollup.o
 
 # ZXVGS - yarek
@@ -827,6 +842,15 @@ einstein.lib:
 	$(MAKE) -C video/tms9918 TARGET=cpm SUBTYPE=einstein
 	$(MAKE) -C psg
 	TARGET=einstein TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFOReinstein -x$(OUTPUT_DIRECTORY)/einstein @$(LISTFILE_DIRECTORY)/einstein.lst
+
+excali64_clib.lib:
+	@echo ''
+	@echo '--- Building Excalibur 64 Library ---'
+	$(MAKE) gfxdeps
+	@$(RM) -f video/mc6845/*.o
+	$(call buildgeneric,excali64)
+	TARGET=excali64 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORexcali64 -x$(OUTPUT_DIRECTORY)/excali64_clib @$(LISTFILE_DIRECTORY)/excali64_clib.lst
+	TARGET=excali64 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORexcali64 -x$(OUTPUT_DIRECTORY)/excali64 @$(LISTFILE_DIRECTORY)/excali64.lst
 
 # SMC-777 library 
 smc777.lib:

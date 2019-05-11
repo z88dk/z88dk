@@ -12,6 +12,7 @@
 	EXTERN	__zx_32col_udgs
 	EXTERN	__zx_32col_font
 	EXTERN	__zx_64col_font
+	EXTERN	__ts2068_hrgmode
 
 
 
@@ -19,9 +20,20 @@ generic_console_vpeek:
 	ld	hl,-8
 	add	hl,sp		;de = screen, hl = buffer, bc = coords
 	ld	sp,hl
+IF FORts2068
+	ld	a,(__ts2068_hrgmode)
+	cp	6
+	jr	nz,standard_screen
+	ld	a,(__console_w)
+	cp	128
+	jr	z,handle_64col
+	jr	continue
+standard_screen:
+ENDIF
 	ld	a,(__console_w)
 	cp	32
 	jr	nz,handle_64col
+continue:
 	push	hl		;Save buffer
 	ex	de,hl		;get it into de
 	call	generic_console_calc_screen_addr

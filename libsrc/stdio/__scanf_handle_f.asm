@@ -13,6 +13,7 @@
 	EXTERN  l_cmp
 	EXTERN  asm_isdigit
 	EXTERN  dstore
+	EXTERN	CLIB_32BIT_FLOATS
 
 
 ; Floating point
@@ -85,8 +86,24 @@ handle_f_fmt_finished_reading:
 	call	atof
 	pop	bc
 	pop	ix		;get our framepointer back
+	ld	a,CLIB_32BIT_FLOATS
+	and	a
+	jr	z,store_48bit_float
+	push	hl		;LSW
+	pop	bc		;LSW
+	pop	hl		;destination
+	ld	(hl),c		;Store LSW
+	inc	hl
+	ld	(hl),b
+	inc	hl
+	ld	(hl),e		;Store MSW
+	inc	hl
+	ld	(hl),d
+	jr	store_rejoin
+store_48bit_float:
 	pop	hl		;destination
 	call	dstore		;and put it there
+store_rejoin:
 	inc	(ix-1)		;increase number of conversions
 	jp	scanf_loop
 handle_f_fmt_error:

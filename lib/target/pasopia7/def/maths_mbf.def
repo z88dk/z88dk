@@ -1,0 +1,60 @@
+
+; Pasopia 7 - BASIC ROM entry points for Microsoft Single Precision maths (mbf32)
+
+
+	PUBLIC	___mbf32_FPADD
+	PUBLIC	___mbf32_SUBCDE
+	PUBLIC	___mbf32_FPMULT
+	PUBLIC	___mbf32_DVBCDE
+	PUBLIC	___mbf32_CMPNUM
+	PUBLIC	___mbf32_COS
+	PUBLIC	___mbf32_SIN
+	PUBLIC	___mbf32_TAN
+	PUBLIC	___mbf32_ATN
+	PUBLIC	___mbf32_LOG
+	PUBLIC	___mbf32_ABS
+	PUBLIC	___mbf32_SQR
+	PUBLIC	___mbf32_EXP
+	PUBLIC	___mbf32_FPINT
+	PUBLIC	___mbf32_FPREG
+	PUBLIC	___mbf32_FPEXP
+	PUBLIC	___mbf32_FPSIGN
+	PUBLIC	___mbf32_VALTYP
+	PUBLIC	___mbf32_BNORM
+	PUBLIC	___mbf32_POW
+
+	defc	___mbf32_FPADD	= $6672
+	defc	___mbf32_SUBCDE	= $666f
+	defc	___mbf32_FPMULT	= $67d9
+
+	defc	___mbf32_DVBCDE  = $6838 + 2
+
+	defc	___mbf32_CMPNUM	= $69b0
+
+	defc	___mbf32_BNORM	= $66c1 ; normalise bcde and place in FPREG (b must have reg)
+
+	defc	___mbf32_COS	= $78b8
+	defc	___mbf32_SIN	= $78be
+
+	defc	___mbf32_TAN	= $7959
+	defc	___mbf32_ATN	= $796e
+
+	defc	___mbf32_LOG     = $6796
+
+	defc	___mbf32_ABS	= $6925
+
+	defc	___mbf32_SQR	= $7694
+	defc	___mbf32_EXP	= $774a
+	defc	___mbf32_POW	= $76a2 + 2
+	defc	___mbf32_FPINT	= $6adc
+
+
+	defc	___mbf32_FPREG	= $f8f5
+	defc	___mbf32_FPEXP	= $f8f8
+	defc	___mbf32_FPSIGN	= $f8f9
+
+	defc	___mbf32_VALTYP 	= $f76d
+
+	EXTERN	l_jpix
+	PUBLIC	msbios
+	defc	msbios = l_jpix

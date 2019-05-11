@@ -21,10 +21,16 @@ PUBLIC    l_glongsp
    inc hl
    ld d,(hl)
    inc hl
+   
+IF EZ80
+	defb	0xed, 0x27	;ld hl,(hl)
+ELSE
    ld a,(hl)
    inc hl
    ld h,(hl)
    ld l,a
+ENDIF
+
    ex de,hl
    pop bc
    push de

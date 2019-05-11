@@ -1,6 +1,7 @@
  
 #include "ccdefs.h"
 #include "define.h" 
+#include "utlist.h"
 
 static void declfunc(Type *type, enum storage_type storage);
 static void handle_kr_type_parameters(Type *func);
@@ -13,7 +14,12 @@ Type   *type_int = &(Type){ KIND_INT, 2, 0, .len=1 };
 Type   *type_uint = &(Type){ KIND_INT, 2, 1, .len=1 };
 Type   *type_long = &(Type){ KIND_LONG, 4, 0, .len=1 };
 Type   *type_ulong = &(Type){ KIND_LONG, 4, 1, .len=1 };
-Type   *type_double = &(Type){ KIND_DOUBLE, 6, 0, .len=1 };
+Type   *type_double = &(Type){ KIND_DOUBLE, 6, 0, .len=1 }; 
+
+static namespace  *namespaces = NULL;
+
+
+static void parse_namespace(Type *type);
 
 static int32_t needsub(void)
 {
@@ -35,13 +41,23 @@ static int32_t needsub(void)
 }
 
 
-static void swallow_bitfield(void)
+
+
+static void parse_bitfield(Type *type)
 {
     double val;
     Kind   valtype;
     if (cmatch(':')) {
-        constexpr(&val, &valtype, 1);
-        warningfmt("unsupported-feature","Bitfields not supported by compiler");
+        if ( !kind_is_integer(type->kind) || type->kind == KIND_LONG ) {
+           errorfmt("Cannot define a bitfield on non-integer (or long) type",1);
+        } else {
+           constexpr(&val, &valtype, 1);
+           if ( val > 16 ) {
+               errorfmt("Cannot define a bitfield on non-integer type",1);
+           } else {
+               type->bit_size = val;
+           }
+        }
     }
 }
 
@@ -83,6 +99,25 @@ void *array_get_byindex(array *arr, int index)
         return NULL;
     }
     return arr->elems[index];
+}
+
+void array_del_byindex(array *arr, int index)
+{
+    int i;
+
+    if ( index < 0 || index >= arr->size ) {
+        return;
+    }
+
+    // Destroy element
+    if ( arr->destructor ) {
+        arr->destructor(arr->elems[index]);
+    }
+
+    for ( i = index; i < arr->size - 1; i++ ) {
+        arr->elems[i] = arr->elems[i+1];
+    }
+    arr->size--;
 }
 
 
@@ -282,6 +317,50 @@ static Type *parse_enum(Type *type)
     return ptr;
 }
 
+int align_struct(Type *str)
+{
+    int   i;
+    int   bitoffs = 0;  // How much within an int we've consumed
+    int   offset = 0;   // Offset from start of struct
+
+    // Go through the members in a struct and align bitfields
+    for ( i = 0; i < array_len(str->fields); i++ ) {
+        Type *elem = array_get_byindex(str->fields, i);
+
+        if ( elem->bit_size == 0 ) {
+            if ( bitoffs ) {
+                offset += ((bitoffs - 1)/ 8) + 1;
+                bitoffs = 0;
+            }
+            if ( elem->size != -1 ) {
+                elem->offset = offset;
+                offset += elem->size;
+            }
+        } else {
+            // It's a bitfield...
+            int rem = (elem->size * 8) - bitoffs;
+
+            if ( elem->bit_size > rem ) {
+                offset += ((bitoffs-1) / 8) + 1;
+                bitoffs = 0;
+            }
+            elem->isunsigned = elem->explicitly_signed ? 0 : 1;  // Default unsigned, signed if explicitly so
+            elem->offset = offset;
+            elem->bit_offset = bitoffs;
+            //printf("i=%d: %s %d +%d @%d, %d\n",i,elem->name, elem->isunsigned, elem->offset, elem->bit_offset, elem->bit_size);
+            bitoffs += elem->bit_size;
+            if  ( strlen(elem->name) == 0) {
+                array_del_byindex(str->fields, i);
+                i--;
+            }
+        }
+    }
+    if ( bitoffs ) {
+        offset += ((bitoffs -1) / 8) + 1;
+    }
+    return offset;
+}
+
 Type *parse_struct(Type *type, char isstruct)
 {
     char    sname[NAMESIZE];
@@ -335,7 +414,11 @@ Type *parse_struct(Type *type, char isstruct)
             
             if ( elem != NULL ) {
                 if ( strlen(elem->name) == 0 && elem->kind != KIND_STRUCT ) {
-                    errorfmt("Member variables must be named",1);
+                    if ( !rcmatch(':')) {
+                        errorfmt("Member variables must be named",1);
+                    } else {
+                        // It's a padding bitfield
+                    }
                 }
                 elem->offset = offset;
                 if ( isstruct ) {
@@ -355,8 +438,8 @@ Type *parse_struct(Type *type, char isstruct)
             } else {
                 break;
             }
-            // Swallow bitfields
-            swallow_bitfield();
+            // Parse out bitfields
+            parse_bitfield(elem);
 
             // It was a flexible member, this needs to be last in the sturct
             if ( elem->size <= 0 ) {
@@ -379,6 +462,9 @@ Type *parse_struct(Type *type, char isstruct)
             needchar(',');
         } while ( 1 );
         needchar('}');
+        if ( isstruct ) {
+            size = align_struct(str);
+        }
         str->size = size;  // It's now defined
         str->weak = 0;
     }
@@ -414,8 +500,12 @@ static Type *parse_type(void)
     int   typed = 0;
 
 
+    // Determine namespace
+    parse_namespace(type);
+
     swallow("register");
     swallow("auto");
+
     type->len = 1;
     if ( swallow("const")) {
         type->isconst = 1;
@@ -441,6 +531,7 @@ static Type *parse_type(void)
 
     if ( amatch("signed")) {
         type->isunsigned = 0;
+        type->explicitly_signed = 1;
         type->kind = KIND_INT;
         type->size = 2;
         typed = 1;
@@ -464,7 +555,7 @@ static Type *parse_type(void)
         type->size = 4;
     } else if ( amatch("float") || amatch("double")) {
         type->kind = KIND_DOUBLE;
-        type->size = 6;
+        type->size = c_fp_size;
     } else if ( amatch("void")) {
         type->kind = KIND_VOID;
         type->size = 1;
@@ -494,6 +585,11 @@ static void parse_trailing_modifiers(Type *type)
         if (amatch("__z88dk_fastcall") || amatch("__FASTCALL__")) {
             if( type->parameters && array_len(type->parameters) != 1 ) {
                 warningfmt("sdcc-compat", "SDCC only supports a single parameter for __z88dk_fastcall\n");
+            }
+            if( type->parameters && array_len(type->parameters) && 
+               ((Type *)array_get_byindex(type->parameters, array_len(type->parameters) - 1))->kind == KIND_STRUCT ) {
+                errorfmt("__z88dk_fastcall doesn't support struct as only parameter\n",1);
+                continue;
             }
             type->flags |= FASTCALL;
             type->flags &= ~FLOATINGDECL;
@@ -640,14 +736,9 @@ Type *parse_parameter_list(Type *return_type)
         /* An array parameter becomes a pointer as function argument */
         if ( param->kind == KIND_ARRAY ) {
             Type *ptr = make_pointer(param->ptr);
+            ptr->namespace = param->namespace;
             strcpy(ptr->name, param->name);
             param = ptr;
-        }
-        if ( param->kind == KIND_STRUCT ) {
-            Type *ptr = make_pointer(param);            
-            warningfmt("conversion","Cannot pass a struct by value, converting to pointer to struct");
-            strcpy(ptr->name, param->name);
-            param = ptr;        
         }
         if ( param->kind == KIND_ELLIPSES) {
             if ( array_len(func->parameters)  ) {
@@ -757,6 +848,7 @@ Type *parse_decl(char name[], Type *base_type)
     }
 
     if ( rcmatch('*')) {
+        Type *ptr;
         needchar('*');
         if ( base_type == NULL ) {
             errorfmt("Pointer to what exactly?",1);
@@ -765,7 +857,9 @@ Type *parse_decl(char name[], Type *base_type)
         }
         if ( amatch("__far"))
             base_type->isfar = 1;
-        return parse_decl(name, make_pointer(base_type));
+        ptr = make_pointer(base_type);
+        parse_namespace(ptr);
+        return parse_decl(name, ptr);
     }
 
     if ( symname(name) ) {
@@ -810,7 +904,7 @@ int declare_local(int local_static)
                 sym->initialised = 1;
                 initials(namebuf, type);                
             } else {
-                sym->bss_section = strdup(c_bss_section);
+                sym->bss_section = strdup(get_section_name(sym->ctype->namespace, c_bss_section));
             }
         } else {
             int size = type->size;
@@ -854,6 +948,8 @@ int declare_local(int local_static)
                     if ( expr_type->kind == KIND_VOID ) {
                         warningfmt("void","Assigning from a void expression");
                     }
+
+                    check_pointer_namespace(type, expr_type);
                     
                     if ( vconst && expr != type->kind ) {
                         // It's a constant that doesn't match the right type
@@ -974,11 +1070,10 @@ Type *dodeclare(enum storage_type storage)
 
          if ( cmatch(';')) {
              // Maybe not right
-            sym->bss_section = strdup(c_bss_section);
-
+            sym->bss_section = strdup(get_section_name(sym->ctype->namespace, c_bss_section));
             return type;
         } else if ( cmatch(',')) {
-            sym->bss_section = strdup(c_bss_section);
+            sym->bss_section = strdup(get_section_name(sym->ctype->namespace, c_bss_section));
             continue;
         } 
 
@@ -990,7 +1085,6 @@ Type *dodeclare(enum storage_type storage)
 
         needchar('=');
         sym->initialised = 1;
-
         alloc_size = initials(drop_name, type);
 
         if ( sym->storage == EXTERNP ) {
@@ -1027,7 +1121,7 @@ Type *make_type(Kind kind, Type *tag)
         type->size = 4;
         break;
     case KIND_DOUBLE:
-        type->size = 6;
+        type->size =  c_fp_size;
         break;
     case KIND_STRUCT:
         type->size = tag->size;
@@ -1303,8 +1397,13 @@ void type_describe(Type *type, UT_string *output)
     int  i;
 
     tail[0] = 0;
+
     if ( type->ptr )
         type_describe(type->ptr,output);
+
+    if ( type->namespace ) {
+        utstring_printf(output,"%s ", type->namespace);
+    }
    
     switch ( type->kind ) {
     case KIND_NONE:
@@ -1588,6 +1687,7 @@ static void declfunc(Type *type, enum storage_type storage)
         col();
     }
     nl();
+    reset_namespace();
         
     
     if ( (type->flags & CRITICAL) == CRITICAL ) {
@@ -1600,10 +1700,10 @@ static void declfunc(Type *type, enum storage_type storage)
 
         if ( type->size == 2 || type->size == 1) 
             zpush();
+        else if ( type->kind == KIND_DOUBLE )
+            dpush();     
         else if ( type->size == 4 || type->size == 3)
             lpush();
-        else if ( type->kind == KIND_DOUBLE )
-            dpush();
         else
             adjust = 0;
 
@@ -1646,4 +1746,96 @@ static void declfunc(Type *type, enum storage_type storage)
 #endif
     Zsp = 0;
     infunc = 0; /* not in fn. any more */
+}
+
+
+void parse_addressmod(void)
+{
+    SYMBOL    *sym;
+    namespace *ns;
+
+    char setter[NAMESIZE+1];
+    char nsname[NAMESIZE+1];
+    
+    if ( symname(setter) == 0 ) {
+        junk();
+        errorfmt("Cannot parse __addressmod line - can't find a bank function", 1);
+        return;
+    }
+
+    if ( symname(nsname) == 0 ) {
+        junk();
+        errorfmt("Cannot parse __addressmod line - can't find a namespace name", 1);
+        return;
+    }
+
+    sym = findglb(setter);
+
+    if ( sym == NULL || sym->ctype->kind != KIND_FUNC) {
+        junk();
+        errorfmt("Cannot find setter function <%s> for namespace <%s>",1, setter,nsname);
+        return;
+    }
+
+    ns = CALLOC(1,sizeof(*ns));
+    ns->name = STRDUP(nsname);
+    ns->bank_function = sym;
+
+    LL_APPEND(namespaces, ns);
+}
+
+namespace *get_namespace(const char *name)
+{
+    namespace *ns;
+
+    LL_FOREACH(namespaces, ns) {
+        if ( strcmp(ns->name, name) == 0 ) {
+            return ns;
+        }
+    }
+    return NULL;
+}
+
+static void parse_namespace(Type *type)
+{
+    namespace *ns;
+    LL_FOREACH(namespaces, ns) {
+        if (amatch(ns->name)) {
+            type->namespace = ns->name;
+            return;
+        }
+    }
+}
+
+void check_pointer_namespace(Type *lhs, Type *rhs)
+{
+    if ( ispointer(lhs) && ispointer(rhs) ) {
+        Type *ctype2 = rhs;
+        Type *ctype1 = lhs;
+        do {
+            if ( ctype1->namespace != ctype2->namespace ) {  // The string is shared
+                UT_string *output;
+
+                utstring_new(output);
+                utstring_printf(output,"Cannot assign pointers with different namespaces: <");
+                type_describe(lhs, output);
+                utstring_printf(output,"> from <");
+                type_describe(rhs, output);
+                utstring_printf(output,">");
+                errorfmt("%s",0,utstring_body(output));
+                utstring_free(output);
+                break;
+            }
+            ctype1 = ctype1->ptr;
+            ctype2 = ctype2->ptr;
+        } while ( ctype1 && ctype2 );          
+    }
+}
+
+
+int isutype(Type *type)
+{
+    if (type->isunsigned || ispointer(type)) 
+        return (1);
+    return (0);
 }

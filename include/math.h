@@ -17,19 +17,17 @@ extern double_t __LIB__ cosh(double_t);  /* hyperbolic cosine */
 extern double_t __LIB__ exp(double_t);   /* exponential */
 extern double_t __LIB__ log(double_t);   /* natural logarithm */
 extern double_t __LIB__ log10(double_t); /* log base 10 */
-extern double_t __LIB__ pi();          /* greek pi */
+extern double_t __LIB__ halfpi();        /* pi / 2 */
+extern double_t __LIB__ pi();            /* pi */
 extern double_t __LIB__ pow(double_t,double_t) __smallc;   /* pow(x,y) = x**y */
 extern double_t __LIB__ sin(double_t);   /* sine */
 extern double_t __LIB__ sinh(double_t);  /* hyperbolic sine */
 extern double_t __LIB__ sqrt(double_t);  /* square root */
 extern double_t __LIB__ tan(double_t);   /* tangent */
 extern double_t __LIB__ tanh(double_t);  /* hyperbolic tangent */
+extern double_t __LIB__ modf(double_t, double_t *) __smallc; /* Modulus */
 #define log2(a) (log(a)/M_LN2)
 
-#ifndef _HAVE_ATOF_
-#define _HAVE_ATOF_
-extern double_t __LIB__ atof(char *);
-#endif
 
 /* Some additional CPC only routines now */
 #if __CPC__ && __NATIVE_MATH__
@@ -38,9 +36,46 @@ extern double_t __LIB__ atof(char *);
   extern void __LIB__ rad();
 #else
   #define pow10(x) pow(10.,x)
-  #define deg(x) (x*180./pi())
-  #define rad(x) (x*pi()/180.)
+  #define deg(x) (x*180./M_PI)
+  #define rad(x) (x*M_PI/180.)
 #endif
+
+extern double_t __LIB__ fmod(double_t,double_t) __smallc;
+extern double_t __LIB__ amax(double_t,double_t) __smallc;
+extern double_t __LIB__ fabs(double_t) __smallc;
+extern double_t __LIB__ amin(double_t,double_t) __smallc;
+extern double_t __LIB__ floor(double_t) __smallc;
+extern double_t __LIB__ ceil(double_t) __smallc;
+
+
+
+#define fmax(x,y) amax(x,y)
+#define fmin(x,y) amix(x,y)
+
+#define rint(a) ceil(a)
+
+#define trunc(a) (a>0.?floor(a):ceil(a))
+#define round(a) (a>0.?floor(a+0.5):ceil(a-0.5))
+
+#define remainder(x,y) (x-(fabs(y)*round(x/fabs(y))))
+
+
+
+/* Random numbers - not all libraries implement */
+extern double_t __LIB__ fprand(void) __smallc; /* Generic only */
+extern int __LIB__ fpseed(double_t) __smallc;    /* Seed random number */
+
+extern double_t __LIB__ atof(char *) __smallc;
+
+
+/*
+ * Some support routines for floating point printf
+ */
+extern void __LIB__ ftoa(double_t, int, char *) __smallc;
+extern void __LIB__ ftoe(double_t, int, char *) __smallc;
+
+
+
 
 
 /* More (unoptimized) functions */

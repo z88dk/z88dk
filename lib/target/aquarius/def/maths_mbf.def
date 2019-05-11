@@ -1,0 +1,55 @@
+
+
+
+; Single precision entry points
+	PUBLIC	___mbf32_FPADD
+	PUBLIC	___mbf32_SUBCDE
+	PUBLIC	___mbf32_FPMULT
+	PUBLIC	___mbf32_DVBCDE
+	PUBLIC	___mbf32_CMPNUM
+	PUBLIC	___mbf32_COS
+	PUBLIC	___mbf32_SIN
+	PUBLIC	___mbf32_TAN
+	PUBLIC	___mbf32_ATN
+	PUBLIC	___mbf32_LOG
+	PUBLIC	___mbf32_ABS
+	PUBLIC	___mbf32_SQR
+	PUBLIC	___mbf32_EXP
+	PUBLIC	___mbf32_FPINT
+	PUBLIC	___mbf32_FPREG
+	PUBLIC	___mbf32_FPEXP
+	PUBLIC	___mbf32_FPSIGN
+	PUBLIC	___mbf32_VALTYP
+	PUBLIC	___mbf32_BNORM
+	PUBLIC	___mbf32_POW
+
+	defc	___mbf32_FPADD	= $1261
+	defc	___mbf32_SUBCDE	= $125e
+	defc	___mbf32_FPMULT	= $13cb
+	defc	___mbf32_DVBCDE  = $142d + 2
+
+	defc	___mbf32_CMPNUM	= $155b
+	defc	___mbf32_BNORM	= $12b0	; normalise bcde and place in FPREG (b must have reg)
+
+	defc	___mbf32_COS	= $18d7
+	defc	___mbf32_SIN	= $18dd
+	defc	___mbf32_TAN	= $1970
+	defc	___mbf32_ATN	= $1985
+	defc	___mbf32_LOG    = $1385
+	defc	___mbf32_ABS	= $1509
+
+	defc	___mbf32_SQR	= $1775
+	defc	___mbf32_EXP	= $17ca
+
+	defc	___mbf32_POW	= $177e + 2
+	defc	___mbf32_FPINT	= $1586
+
+
+	defc	___mbf32_FPREG	= $38e4
+	defc	___mbf32_FPEXP	= $38e7
+	defc	___mbf32_FPSIGN	= $38e8		;SGNRES
+	defc	___mbf32_VALTYP 	= $0000	;UNUSED on Aquarius
+
+	EXTERN	l_jpix
+	PUBLIC	msbios
+	defc	msbios = l_jpix

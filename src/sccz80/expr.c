@@ -56,8 +56,10 @@ int heir1(LVALUE* lval)
     if (cmatch('=')) {
         char *start1, *before1;
         if (k == 0) {
-            needlval();
-            return 0;
+            if ( lval->ltype->kind != KIND_STRUCT ) {
+                needlval();
+                return 0;
+            }
         }
         if (lval->indirect_kind)
             smartpush(lval, before);
@@ -115,11 +117,19 @@ int heir1(LVALUE* lval)
                 }
             }
         } else if ( lval->ltype->kind == KIND_STRUCT ) {
-            errorfmt("Cannot assign to aggregate",0);
+            if ( lval2.ltype->kind != KIND_STRUCT ) {
+                errorfmt("Cannot assign to aggregate",0);
+            }
         } 
         if ( lval2.ltype->kind == KIND_VOID ) {
             warningfmt("void","Assigning from a void expression");
         }
+        check_pointer_namespace(lval->ltype, lval2.ltype);
+
+        if ( lval2.is_const) {
+            check_assign_range(lval->ltype, lval2.const_val);
+        }
+
         force(lval->val_type, lval2.val_type, lval->ltype->isunsigned, lval2.ltype->isunsigned, 0); /* 27.6.01 lval2.is_const); */
         smartstore(lval);
         return 0;
@@ -231,12 +241,12 @@ int heir1a(LVALUE* lval)
             rvalue(lval);
         /* check types of expressions and widen if necessary */
         if (lval2.val_type == KIND_DOUBLE && lval->val_type != KIND_DOUBLE) {
-            convert_int_to_double(lval->val_type, lval->ltype->isunsigned);
+            zconvert_to_double(lval->val_type, lval->ltype->isunsigned);
             postlabel(endlab);
         } else if (lval2.val_type != KIND_DOUBLE && lval->val_type == KIND_DOUBLE) {
             jump(skiplab = getlabel());
             postlabel(endlab);
-            convert_int_to_double(lval2.val_type, lval2.ltype->isunsigned);
+            zconvert_to_double(lval2.val_type, lval2.ltype->isunsigned);
             postlabel(skiplab);
         } else if (lval2.val_type == KIND_LONG && lval->val_type != KIND_LONG) {
             widenlong(&lval2, lval);

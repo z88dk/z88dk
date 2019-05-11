@@ -327,9 +327,11 @@ static char **c_subtype_array = NULL;
 static int    c_subtype_array_num = 0;
 static char **c_clib_array = NULL;
 static int    c_clib_array_num = 0;
+static char **c_aliases_array = NULL;
+static int    c_aliases_array_num = 0;
 
-static char **c_aliases = NULL;
-static int    c_aliases_num = 0;
+static char **aliases = NULL;
+static int    aliases_num = 0;
 
 static char   c_help = 0;
 
@@ -388,6 +390,7 @@ static arg_t  config[] = {
     { "GENMATHLIB", 0, SetStringConfig, &c_genmathlib, NULL, "" },
     { "SUBTYPE",  0, AddArray, &c_subtype_array, &c_subtype_array_num, "Add a sub-type alias and config" },
     { "CLIB",  0, AddArray, &c_clib_array, &c_clib_array_num, "Add a clib variant config" },
+    { "ALIAS",  0, AddArray, &c_aliases_array, &c_aliases_array_num, "Add an alias and options" },
     { "", 0, NULL, NULL }
 };
 
@@ -876,6 +879,20 @@ int main(int argc, char **argv)
     /* Now, parse the default options list */
     if (c_options != NULL) {
         parse_option(muststrdup(c_options));
+    }
+
+    /* Add in any aliases defined by the config file */
+    for ( i = 0; i < c_aliases_array_num; i++ ) {
+        char buf[LINEMAX+1];
+        char *ptr = c_aliases_array[i];
+        char *dest = buf;
+        while ( *ptr && !isspace(*ptr)) {
+            *dest++ = *ptr++;
+        }
+        *dest = 0;
+        aliases = realloc(aliases, (aliases_num + 2) * sizeof(aliases[0]));
+        aliases[aliases_num++] = strdup(buf);
+        aliases[aliases_num++] = strdup(++ptr);
     }
 
     /* Now, let's parse the command line arguments */
@@ -2395,8 +2412,8 @@ void print_help_text(const char *program)
     }
 
     fprintf(stderr,"\nArgument Aliases:\n\n");
-    for ( i = 0; i < c_aliases_num; i+=2 ) {
-        fprintf(stderr,"%-20s %s\n", c_aliases[i],c_aliases[i+1]);
+    for ( i = 0; i < aliases_num; i+=2 ) {
+        fprintf(stderr,"%-20s %s\n", aliases[i],aliases[i+1]);
     }
 
     if ( c_clib_array_num ) {
@@ -2452,10 +2469,9 @@ void parse_cmdline_arg(char *arg)
         }
         pargs++;
     }
-    for ( i = 0; i < c_aliases_num; i+=2 ) {
-        if ( strcmp(arg, c_aliases[i]) == 0 ) {
-            parse_cmdline_arg(c_aliases[i+1]);
-            return;
+    for ( i = 0; i < aliases_num; i+=2 ) {
+        if ( strcmp(arg, aliases[i]) == 0 ) {
+            parse_option(muststrdup(aliases[i+1]));
         }
     }
     add_option_to_compiler(arg);
@@ -2657,9 +2673,9 @@ void Alias(arg_t *arg, char *val)
        ++ptr;
     if ((eql = strchr(ptr, '=')) != NULL) {
         *eql = 0;
-        c_aliases = realloc(c_aliases, (c_aliases_num  +  2) * sizeof(c_aliases[0]));
-        c_aliases[c_aliases_num++] = strdup(ptr);
-        c_aliases[c_aliases_num++] = strdup(eql+1);
+        aliases = realloc(aliases, (aliases_num + 2) * sizeof(aliases[0]));
+        aliases[aliases_num++] = strdup(ptr);
+        aliases[aliases_num++] = strdup(eql+1);
     }
 }
 

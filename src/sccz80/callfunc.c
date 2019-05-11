@@ -237,8 +237,6 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             zcarryconv();
             expr = KIND_INT;
             type = type_int;
-        } else if ( expr == KIND_STRUCT ) {
-            errorfmt("Cannot pass structure as function parameter (argument number %d)",0, argnumber);
         }
         if ( functype->funcattrs.oldstyle == 0 && argnumber <= array_len(functype->parameters)) {       
             int proto_argnumber;
@@ -285,41 +283,11 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
                     printf_format_option |= format_option;
                 }
             }
-            if ( function_pointer_call == 0 || ( fnptr_type->kind == KIND_CPTR ) ) {
-                if (expr == KIND_DOUBLE) {
-                    dpush();
-                    nargs += 6;
-                } else if (expr == KIND_LONG || expr == KIND_CPTR) {
-                    lpush();
-                    nargs += 4;
-                } else if ( expr == KIND_CHAR && functype->flags & SDCCDECL && argnumber <= array_len(functype->parameters ) ) {
-                    push_char_sdcc_style();
-                    nargs += 1;
-                } else {
-                    zpush();
-                    nargs += 2;
-                }
+            if ( function_pointer_call == 0 ||  fnptr_type->kind == KIND_CPTR ) {
+                nargs += push_function_argument(expr, type, functype->flags & SDCCDECL && argnumber <= array_len(functype->parameters));
             } else {
-                if (expr == KIND_LONG || expr == KIND_CPTR) {
-                    if ( tmpfiles[argnumber+1] != NULL ) {
-                        swap(); /* MSW -> hl */
-                        swapstk(); /* MSW -> stack, addr -> hl */
-                        zpushde(); /* LSW -> stack, addr = hl */
-                    }
-                    nargs += 4;
-                    last_argument_size = 4;
-                } else if (expr == KIND_DOUBLE) {
-                    dpush_under(KIND_INT);
-                    nargs += 6;
-                    last_argument_size = 6;
-                    mainpop();
-                } else {
-                    if ( tmpfiles[argnumber+1] != NULL ) {
-                        swapstk();
-                    }
-                    nargs += 2;
-                    last_argument_size = 2;
-                }
+                last_argument_size = push_function_argument_fnptr(expr, type, functype->flags & SDCCDECL && argnumber <= array_len(functype->parameters), tmpfiles[argnumber+1] == NULL);
+                nargs += last_argument_size;
             }
         }
         restore_input();
@@ -358,14 +326,14 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             outname(funcname, dopref(ptr)); nl();
         }
     } else {
-        callstk(functype, nargs, fnptr_type->kind == KIND_CPTR, last_argument_size);
+        nargs += callstk(functype, nargs, fnptr_type->kind == KIND_CPTR, last_argument_size);
     }
 
     if (functype->flags & CALLEE ) {
         Zsp += nargs;
         // IF we called a far pointer and we had arguments, pop the address off the stack
         if ( function_pointer_call && fnptr_type->kind == KIND_CPTR && nargs ) {
-            Zsp = modstk(Zsp + 4, functype->return_type->kind != KIND_DOUBLE, preserve); 
+            Zsp = modstk(Zsp + 4, functype->return_type->kind != KIND_DOUBLE || c_fp_size == 4, preserve); 
         }
     } else {
         /* If we have a frame pointer then ix holds it */
@@ -379,7 +347,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             Zsp += nargs;
         } else
 #endif
-            Zsp = modstk(Zsp + nargs, functype->return_type->kind != KIND_DOUBLE, preserve); /* clean up arguments - we know what type is MOOK */
+            Zsp = modstk(Zsp + nargs, functype->return_type->kind != KIND_DOUBLE || c_fp_size == 4, preserve);  /* clean up arguments - we know what type is MOOK */
     }
 }
 

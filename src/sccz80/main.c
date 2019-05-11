@@ -37,7 +37,10 @@ int c_cpu = CPU_Z80;
 /* Settings for genmath + math48 */
 int c_fp_mantissa_bytes = 5;
 int c_fp_exponent_bias = 128;
+int c_fp_fudge_offset = 0;    // Fudge offset for z88math - it starts pickup from FA+1
+int c_fp_size = 6;
 
+enum maths_mode c_maths_mode = MATHS_Z80;
 
 uint32_t c_speed_optimisation = OPT_RSHIFT32|OPT_LSHIFT32;
 
@@ -83,7 +86,6 @@ static void SetWarning(option *arg, char* val);
 static void SetDefine(option *arg, char *val);
 static void SetUndefine(option *arg, char *val);
 static void DispInfo(option *arg, char *val);
-static void set_math_z88_parameters(option *opt, char *arg);
 static void opt_code_speed(option *arg, char* val);
 static void atexit_deallocate(void);
 
@@ -102,9 +104,16 @@ static option  sccz80_opts[] = {
     { 0, "unsigned", OPT_BOOL, "Make all types unsigned", &c_default_unsigned, 0 },
     { 0, "disable-builtins", OPT_BOOL, "Disable builtin functions",&c_disable_builtins, 0},
     { 0, "doublestr", OPT_BOOL, "Store FP constants as strings", &c_double_strings, 0 },
-    { 0, "math-z88", OPT_FUNCTION|OPT_BOOL, "(deprecated) Make FP constants match z88", &set_math_z88_parameters, 0 },
+    { 0, "math-z88", OPT_ASSIGN|OPT_INT, "(deprecated) Make FP constants match z88", &c_maths_mode, MATHS_Z88 },
+
     { 0, "fp-exponent-bias", OPT_INT, "=<num> FP exponent bias (default: 128)", &c_fp_exponent_bias, 0 },
     { 0, "fp-mantissa-size", OPT_INT, "=<num> FP mantissa size (default: 5 bytes)", &c_fp_mantissa_bytes, 0 },
+    { 0, "fp-mode=z80", OPT_ASSIGN|OPT_INT, "Use 48 bit doubles", &c_maths_mode, MATHS_Z80 },
+    { 0, "fp-mode=ieee", OPT_ASSIGN|OPT_INT, "Use 32 bit IEEE doubles", &c_maths_mode, MATHS_IEEE },
+    { 0, "fp-mode=mbf32", OPT_ASSIGN|OPT_INT, "Use 32 bit Microsoft Binary format", &c_maths_mode, MATHS_MBFS },
+    { 0, "fp-mode=mbf40", OPT_ASSIGN|OPT_INT, "Use 40 bit Microsoft binary format", &c_maths_mode, MATHS_MBF40 },
+    { 0, "fp-mode=mbf64", OPT_ASSIGN|OPT_INT, "Use 64 bit Microsoft binary format", &c_maths_mode, MATHS_MBF64 },
+    { 0, "fp-mode=z88", OPT_ASSIGN|OPT_INT, "Use 40 bit z88 doubles", &c_maths_mode, MATHS_Z88 },
     
     { 0, "noaltreg", OPT_BOOL, "Try not to use the alternative register set", &c_notaltreg, 0 },
     { 0, "standard-escape-chars", OPT_BOOL, "Use standard mappings for \\r and \\n", &c_standard_escapecodes, 0},
@@ -227,6 +236,35 @@ int main(int argc, char** argv)
         info();
         exit(1);
     }
+
+    if ( c_maths_mode == MATHS_IEEE ) {
+        c_fp_size = 4;
+        type_double = &(Type){ KIND_DOUBLE, 4, 0, .len=1 }; 
+        c_fp_exponent_bias = 126;
+        c_fp_mantissa_bytes = 3;
+        WriteDefined("CLIB_32BIT_FLOATS", 1);
+    } else if ( c_maths_mode == MATHS_MBFS ) {
+        c_fp_size = 4;
+        type_double = &(Type){ KIND_DOUBLE, 4, 0, .len=1 }; 
+        c_fp_exponent_bias = 128;
+        c_fp_mantissa_bytes = 3;
+        WriteDefined("CLIB_32BIT_FLOATS", 1);
+    } else if ( c_maths_mode == MATHS_MBF40 ) {
+        c_fp_exponent_bias = 128;
+        c_fp_mantissa_bytes = 4;
+    } else if ( c_maths_mode == MATHS_MBF64 ) {
+        c_fp_size = 8;
+        type_double = &(Type){ KIND_DOUBLE, 8, 0, .len=1 }; 
+        c_fp_exponent_bias = 128;
+        c_fp_mantissa_bytes = 7;
+        WriteDefined("CLIB_64BIT_FLOATS", 1);
+    } else if ( c_maths_mode == MATHS_Z88 ) {
+        c_fp_exponent_bias = 127;
+        c_fp_mantissa_bytes = 4;
+        c_fp_fudge_offset = 1;
+    }
+
+
     litlab = getlabel(); /* Get labels for function lits*/
     openout(); /* get the output file */
     openin(); /* and initial input file */
@@ -278,6 +316,8 @@ void parse()
             dodeclare(TYPDEF);
         } else if (dodeclare(STATIK)) {
             ;
+        } else if ( amatch("__addressmod")) {
+            parse_addressmod();
         } else if (ch() == '#') {
             if (match("#asm")) {
                 doasm();
@@ -563,6 +603,10 @@ void dumplits(
             } else if ( size == 6 ) {
                 defbyte();
                 j = 6;
+                size = 1;
+            } else if ( size == 8 ) {
+                defbyte();
+                j = 8;
                 size = 1;
             } else
                 defword();
@@ -899,14 +943,6 @@ static void opt_code_speed(option *arg, char* val)
         }
     } while ( (ptr = strchr(ptr, ',')) != NULL );
 }
-
-static void set_math_z88_parameters(option *opt, char *arg)
-{
-    c_fp_exponent_bias = 127;
-    c_fp_mantissa_bytes = 4;
-}
-
-
 
 
 

@@ -34,6 +34,7 @@
 IF startup = 2
         INCLUDE "target/multi8/classic/64k.asm"
 ELSE
+	INCLUDE	"target/multi8/def/maths_mbf.def"
         INCLUDE "target/multi8/classic/16k.asm"
 ENDIF
 l_dcal:	jp	(hl)		;Used for function pointer calls

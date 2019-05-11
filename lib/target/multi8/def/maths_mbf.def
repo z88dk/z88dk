@@ -1,0 +1,60 @@
+
+; Mitsubishi Multi8- BASIC ROM entry points for Microsoft Single Precision maths (mbf32)
+
+
+	PUBLIC	___mbf32_FPADD
+	PUBLIC	___mbf32_SUBCDE
+	PUBLIC	___mbf32_FPMULT
+	PUBLIC	___mbf32_DVBCDE
+	PUBLIC	___mbf32_CMPNUM
+	PUBLIC	___mbf32_COS
+	PUBLIC	___mbf32_SIN
+	PUBLIC	___mbf32_TAN
+	PUBLIC	___mbf32_ATN
+	PUBLIC	___mbf32_LOG
+	PUBLIC	___mbf32_ABS
+	PUBLIC	___mbf32_SQR
+	PUBLIC	___mbf32_EXP
+	PUBLIC	___mbf32_FPINT
+	PUBLIC	___mbf32_FPREG
+	PUBLIC	___mbf32_FPEXP
+	PUBLIC	___mbf32_FPSIGN
+	PUBLIC	___mbf32_VALTYP
+	PUBLIC	___mbf32_BNORM
+	PUBLIC	___mbf32_POW
+
+	defc	___mbf32_FPADD	= $3086
+	defc	___mbf32_SUBCDE	= $3083
+	defc	___mbf32_FPMULT	= $31b5
+
+	defc	___mbf32_DVBCDE  = $3210
+
+	defc	___mbf32_CMPNUM	= $3380
+
+	defc	___mbf32_BNORM	= $30d5	; normalise bcde and place in FPREG (b must have reg)
+
+	defc	___mbf32_COS	= $3fc2
+	defc	___mbf32_SIN	= $3fc8
+
+	defc	___mbf32_TAN	= $4029
+	defc	___mbf32_ATN	= $403e
+
+	defc	___mbf32_LOG     = $3177
+
+	defc	___mbf32_ABS	= $32e5
+
+	defc	___mbf32_SQR	= $3e56
+	defc	___mbf32_EXP	= $3ea8
+	defc	___mbf32_POW	= $3e66
+	defc	___mbf32_FPINT	= $34b6
+
+
+	defc	___mbf32_FPREG	= $f821
+	defc	___mbf32_FPEXP	= $f824
+	defc	___mbf32_FPSIGN	= $f825
+
+	defc	___mbf32_VALTYP 	= $f6be
+
+	EXTERN	l_jpix
+	PUBLIC	msbios
+	defc	msbios = l_jpix

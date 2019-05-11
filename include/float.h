@@ -6,40 +6,6 @@
 
 
 /*
- *	Some more floating point routines..I can't remember
- *	why these are separated out..
- *
- *	$Id: float.h,v 1.13 2016-07-16 22:00:08 dom Exp $
- */
-
-
-
-extern double_t __LIB__ fmod(double_t,double_t) __smallc;
-extern double_t __LIB__ amax(double_t,double_t) __smallc;
-extern double_t __LIB__ fabs(double_t) __smallc;
-extern double_t __LIB__ amin(double_t,double_t) __smallc;
-extern double_t __LIB__ floor(double_t) __smallc;
-extern double_t __LIB__ ceil(double_t) __smallc;
-extern double_t __LIB__ fprand(void) __smallc; /* Generic only */
-extern double_t __LIB__  zfloat(int);
-extern int __LIB__ fpseed(double_t) __smallc;    /* Seed random number */
-
-
-#define fmax(x,y) amax(x,y)
-#define fmin(x,y) amix(x,y)
-
-#define rint(a) ceil(a)
-
-#define trunc(a) (a>0.?floor(a):ceil(a))
-#define round(a) (a>0.?floor(a+0.5):ceil(a-0.5))
-
-//#define fmod(x,y) (x-(fabs(y)*trunc(x/fabs(y))))
-#define remainder(x,y) (x-(fabs(y)*round(x/fabs(y))))
-
-extern double_t __LIB__ atof(char *) __smallc;
-
-
-/*
  * Some support routines for floating point printf
  */
 extern void __LIB__ ftoa(double_t, int, char *) __smallc;

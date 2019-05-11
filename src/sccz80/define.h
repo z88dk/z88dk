@@ -24,7 +24,7 @@
 #define YES             1
 
 /* Maximum size of the mantissa, write_double_queue() doesn't respect this yet */
-#define MAX_MANTISSA_SIZE  5    
+#define MAX_MANTISSA_SIZE  7 
 
 /*      System wide name size (for symbols)     */
 
@@ -91,14 +91,20 @@ struct type_s {
     Kind      kind;
     int       size;
     char      isunsigned;
+    char      explicitly_signed;  // Set if "signed" in type definition
     char      isconst;
     char      isfar;  // Valid for pointers/array
     char      name[NAMESIZE]; 
+    char     *namespace; // Which namespace is this object in
     
     Type     *ptr;   // For array, or pointer
     int       len;   // Length of the array
     
     int32_t   value; // For enum, goto position, short call value
+
+    // bitfields
+    int       bit_offset;
+    int       bit_size;
     
     // Structures
     Type   *tag;     // Reference to the structure type
@@ -198,6 +204,15 @@ struct symbol_s {
         int level;           /* Compound level that this variable is declared at */
         UT_hash_handle  hh;
 
+};
+
+
+typedef struct namespace_s namespace;
+
+struct namespace_s {
+    char        *name;
+    SYMBOL      *bank_function;
+    namespace   *next;       
 };
 
 
@@ -388,6 +403,16 @@ enum optimisation {
         OPT_LONG_COMPARE   = (1 << 6),
         OPT_UCHAR_MULT     = (1 << 7)
 };
+
+enum maths_mode {
+    MATHS_Z80,  // Classic z80 mode
+    MATHS_IEEE, // 32 bit ieee
+    MATHS_MBFS,  // 32 bit Microsoft single precision
+    MATHS_MBF40, // 40 bit Microsoft 
+    MATHS_MBF64, // 64 bit Microsoft double precision
+    MATHS_Z88,   // Special handling for z88 (subtype of MATHS_Z80)
+};
+
 
 
 #define dump_type(type) do { \

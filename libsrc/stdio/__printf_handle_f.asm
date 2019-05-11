@@ -12,6 +12,8 @@
    EXTERN   ftoe
    EXTERN   strlen
    EXTERN   __convert_sdccf2reg
+   EXTERN   CLIB_32BIT_FLOATS
+   EXTERN   CLIB_64BIT_FLOATS
 
 __printf_handle_e:
         set   5,(ix-4)
@@ -35,13 +37,60 @@ __printf_handle_f:
 
         push  ix    ;save callers
         call  __convert_sdccf2reg  
-        push  hl ;get it on the stack in 6 byte format
+	push  hl ;padding (need to go to 8 byte format)
+        push  hl ;the float
         push  de
-        ld hl,0
+        ld    hl,0
         push  hl
         jr rejoin
 ; If we've got %f then lets assume we've got sccz80 rather than sdcc
 is_sccz80:
+	ld	a,CLIB_64BIT_FLOATS
+	and	a
+	jr	z,try_sccz80_32bit_float
+        dec     de
+        dec     de
+        dec     de
+        dec     de              ;long starts here
+        dec     de
+        dec     de
+	dec	de
+	dec	de
+        push    de              ;save ap next
+        inc     de
+        inc     de
+
+        push    ix              ;save ix - ftoa will corrupt it
+        ld      hl,-8
+        add     hl,sp
+        ld      sp,hl
+        ex      de,hl           ;hl=address of parameter, de=slot on stack
+        ld      bc,8
+        ldir                    ;stack parameter
+	jr	rejoin
+try_sccz80_32bit_float:
+        ld      a,CLIB_32BIT_FLOATS
+        and     a
+        jr      z,is_sccz80_48bit_float
+        ex      de,hl
+        ld      e,(hl)          ;MSW
+        inc     hl
+        ld      d,(hl)
+        dec     hl
+        dec     hl
+        ld      b,(hl)          ;LSW
+        dec     hl
+        ld      c,(hl)
+        dec     hl
+        dec     hl
+        push    hl              ;Save ap for next time
+        push    ix    ;save callers
+        push    de		;(padding, unused)
+        push    de		;(padding, unused)
+        push    de		;MSW
+        push    bc		;LSW
+        jr      rejoin
+is_sccz80_48bit_float:
         dec     de
         dec     de
         dec     de
@@ -53,8 +102,7 @@ is_sccz80:
         inc     de
 
         push    ix              ;save ix - ftoa will corrupt it
-
-        ld      hl,-6
+        ld      hl,-8
         add     hl,sp
         ld      sp,hl
         ex      de,hl           ;hl=address of parameter, de=slot on stack
@@ -82,6 +130,7 @@ call_fp_converter:
         call    l_jphl
         pop     bc              ;the buffer
         pop     bc      ;prec
+        pop     bc      ;flt
         pop     bc      ;flt
         pop     bc      ;flt
         pop     bc      ;flt

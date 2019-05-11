@@ -32,6 +32,8 @@
 		SECTION code_esxdos
 		SECTION code_fp
 		SECTION code_fp_math48
+		SECTION code_fp_mbf32
+		SECTION code_fp_mbf64
 		SECTION code_math
 		SECTION code_error
 		SECTION code_stdlib
@@ -64,6 +66,8 @@ IF !__crt_org_graphics
 ENDIF
 		SECTION code_user
 		SECTION rodata_fp
+		SECTION rodata_fp_mbf32
+		SECTION rodata_fp_mbf64
 		SECTION rodata_compiler
 		SECTION rodata_clib
 		SECTION rodata_user
@@ -91,6 +95,8 @@ IF __crt_org_bss
 		defb 0   ; control name of bss binary
 ENDIF
 		SECTION bss_fp
+		SECTION bss_fp_mbf32
+		SECTION bss_fp_mbf64
 		SECTION bss_error
 		SECTION bss_crt
 		SECTION bss_fardata
@@ -113,6 +119,7 @@ IF __crt_model > 0
 		org	-1
 		defb	0		; control name of data binary
 		SECTION smc_clib
+		SECTION smc_fp
 		SECTION smc_user
 		SECTION data_clib
 		SECTION data_crt
