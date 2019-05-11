@@ -3,8 +3,9 @@
 include ../../Make.config
 
 vpath %.c ../../_DEVELOPMENT/math/float/math32/c
+vpath %.c ../cimpl
 
-CFILES  = $(notdir $(wildcard ../../_DEVELOPMENT/math/float/math32/c/*.c))
+CFILES  = $(notdir $(wildcard ../../_DEVELOPMENT/math/float/math32/c/*.c)) atof.c ftoa.c ftoe.c
 OBJECTS = $(CFILES:.c=.o)
 
 CFLAGS += -fp-mode=ieee -I../../_DEVELOPMENT/math/float/math32/c/
