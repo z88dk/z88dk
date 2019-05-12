@@ -45,13 +45,12 @@ PUBLIC m32_fssqrt, m32_fssqrt_fastcall, m32_fsinvsqrt_fastcall
 
 
 .m32_fssqrt_fastcall
-    pop bc                      ; pop return address
     push de                     ; y msw on stack
     push hl                     ; y lsw on stack
-    push bc                     ; put return back
     
     call m32_fsinvsqrt_fastcall
-    jp m32_fsmul_callee
+    call m32_fsmul_callee
+    ret
 
 
 .m32_fsinvsqrt_fastcall         ; DEHL
@@ -61,6 +60,8 @@ PUBLIC m32_fssqrt, m32_fssqrt_fastcall, m32_fsinvsqrt_fastcall
     and 080h                    ; negative number?
     jp NZ,m32_fsmax_fastcall
 
+    push de                     ; y msw on stack for w[3] - remove for 2 iterations
+    push hl                     ; y lsw on stack for w[3] - remove for 2 iterations
     push de                     ; y msw on stack for w[2] - remove for 1 iteration
     push hl                     ; y lsw on stack for w[2] - remove for 1 iteration
     push de                     ; y msw on stack for w[1]
@@ -144,6 +145,40 @@ PUBLIC m32_fssqrt, m32_fssqrt_fastcall, m32_fsinvsqrt_fastcall
     rr e
                                 ; need to provide a return for the m32_fsmul_callee stack
     call m32_fsmul_callee       ; w[2] = (float) w[1]*(3 - w[1]*w[1]*y)/2
+;----------- snip ----------
+
+;----------- snip ----------    ; remove for 2 iterations
+
+    ex de,hl                    ; (float) w[2] in hlde and bcde
+    ld b,h
+    ld c,l
+
+    pop af                      ; y lsw
+    ex (sp),hl                  ; y msw, w[2] msw on stack
+    push de                     ; w[2] lsw on stack
+    push hl                     ; y msw on stack
+    push af                     ; y lsw on stack
+
+    ld h,b
+    ld l,c
+    ex de,hl                    ; (float) w[2] in dehl
+
+    call m32_fssqr_fastcall     ; (float) w[2]*w[2]
+    call m32_fsmul_callee       ; (float) w[2]*w[2]*y
+
+    ld bc,04040h                ; (float) 3 = 0x40400000
+    push bc
+    ld bc,0
+    push bc
+    call m32_fssub_callee       ; (float) (3 - w[2]*w[2]*y)
+
+    sla e                       ; unpack exponent (can only be positive)
+    rl d
+    dec d                       ; (float) (3 - w[2]*w[2]*y) / 2
+    srl d
+    rr e
+                                ; need to provide a return for the m32_fsmul_callee stack
+    call m32_fsmul_callee       ; w[2] = (float) w[2]*(3 - w[2]*w[2]*y)/2
 ;----------- snip ----------
 
     ret
