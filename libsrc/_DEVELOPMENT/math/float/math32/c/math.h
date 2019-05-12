@@ -97,7 +97,7 @@ float tanf(float x) __z88dk_fastcall;
 float asinf(float x) __z88dk_fastcall;
 float acosf(float x) __z88dk_fastcall;
 float atanf(float x) __z88dk_fastcall;
-float atan2f(float x, float y) __z88dk_callee;
+float atan2f(float x, float y);
 
 /* Hyperbolic functions */
 float sinhf(float x) __z88dk_fastcall;
@@ -109,17 +109,17 @@ float sqrtf(float a) __z88dk_fastcall;
 float expf(float x) __z88dk_fastcall;
 float logf(float x) __z88dk_fastcall;
 float log10f(float x) __z88dk_fastcall;
-float powf(float x, float y) __z88dk_callee;
+float powf(float x, float y);
 float hypotf(float x, float y) __z88dk_callee;
 
 /* Nearest integer, absolute value, and remainder functions */
 float fabsf(float x) __z88dk_fastcall;
-float frexpf(float x, int *pw2) __z88dk_callee;
-float ldexpf(float x, int pw2) __z88dk_callee;
+float frexpf(float x, int *pw2);
+float ldexpf(float x, int pw2);
 float ceilf(float x) __z88dk_fastcall;
 float floorf(float x) __z88dk_fastcall;
-float modff(float x, float * y) __z88dk_callee;
-float fmodf(float x, float y) __z88dk_callee;
+float modff(float x, float * y);
+float fmodf(float x, float y);
 
 /* Intrinsic functions */
 float sqrf(float a) __z88dk_fastcall;

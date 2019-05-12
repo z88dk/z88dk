@@ -8,7 +8,7 @@
 
 #include <math.h>
 
-float fmodf(float x, float y) __z88dk_callee
+float fmodf(float x, float y)
 {
     long k;
     float d;

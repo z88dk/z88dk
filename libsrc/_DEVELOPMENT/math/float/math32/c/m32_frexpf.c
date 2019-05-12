@@ -30,7 +30,7 @@
 
 #include <math.h>
 
-float frexpf(float x, int *pw2) __z88dk_callee
+float frexpf(float x, int *pw2)
 {
     union float_long fl;
     int32_t i;

@@ -1,7 +1,7 @@
 
 #include <math.h>
 
-float atan2f (float x, float y) __z88dk_fastcall
+float atan2f (float x, float y) 
 {
     float v;
 

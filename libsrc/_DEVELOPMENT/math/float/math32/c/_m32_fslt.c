@@ -19,7 +19,7 @@
 #include <math.h>
 
 /* compare two floats */
-char __fslt (float a1, float a2) __z88dk_callee
+char __fslt (float a1, float a2) 
 {
   volatile union float_long fl1, fl2;
 

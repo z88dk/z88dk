@@ -5,10 +5,12 @@ include ../../Make.config
 vpath %.c ../../_DEVELOPMENT/math/float/math32/c
 vpath %.c ../cimpl
 
+
 CFILES  = $(notdir $(wildcard ../../_DEVELOPMENT/math/float/math32/c/*.c)) atof.c ftoa.c ftoe.c
+CFILES  = atof.c ftoa.c ftoe.c
 OBJECTS = $(CFILES:.c=.o)
 
-CFLAGS += -fp-mode=ieee -I../../_DEVELOPMENT/math/float/math32/c/
+CFLAGS += -fp-mode=ieee 
 
 all: dirs $(OUTPUT_DIRECTORY)/math32.lib $(OUTPUT_DIRECTORY)/math32_zxn.lib $(OUTPUT_DIRECTORY)/math32_z180.lib
 

@@ -3,6 +3,7 @@
 
 #include <sys/compiler.h>
 #include <sys/types.h>
+#include <limits.h>
 #include <float.h>
 
 /* $Id: math.h,v 1.18 2016-07-16 22:00:08 dom Exp $ */
