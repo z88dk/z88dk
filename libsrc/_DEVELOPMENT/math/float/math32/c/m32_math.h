@@ -32,28 +32,7 @@
 #define _INC_MATH
 
 #include <stdint.h>
-
-#define CHAR_BIT    8    /* bits in a char */
-#define SCHAR_MAX   127
-#define SCHAR_MIN  -128
-#define UCHAR_MAX   0xff
-
-#define INT_MIN     (-32767 - 1)
-#define INT_MAX     32767
-#define SHRT_MAX    INT_MAX
-#define SHRT_MIN    INT_MIN
-#define UINT_MAX    0xffff
-#define UINT_MIN    0
-#define USHRT_MAX   UINT_MAX
-#define USHRT_MIN   UINT_MIN
-#define LONG_MIN    (-2147483647L-1)
-#define LONG_MAX    2147483647L
-#define ULONG_MAX   0xffffffff
-#define ULONG_MIN   0
-
-#define LLONG_MIN   (-9223372036854775807LL-1)
-#define LLONG_MAX   9223372036854775807LL
-#define ULLONG_MAX  18446744073709551615ULL
+#include <limits.h>
 
 #define HUGE_VALF   3.402823466e+38
 
@@ -91,40 +70,40 @@ union float_long
      ****************************************/
 
 /* Trigonometric functions */
-float sinf(float x) __z88dk_fastcall;
-float cosf(float x) __z88dk_fastcall;
-float tanf(float x) __z88dk_fastcall;
-float asinf(float x) __z88dk_fastcall;
-float acosf(float x) __z88dk_fastcall;
-float atanf(float x) __z88dk_fastcall;
-float atan2f(float x, float y);
+float m32_sinf(float x) __z88dk_fastcall;
+float m32_cosf(float x) __z88dk_fastcall;
+float m32_tanf(float x) __z88dk_fastcall;
+float m32_asinf(float x) __z88dk_fastcall;
+float m32_acosf(float x) __z88dk_fastcall;
+float m32_atanf(float x) __z88dk_fastcall;
+float m32_atan2f(float x, float y);
 
 /* Hyperbolic functions */
-float sinhf(float x) __z88dk_fastcall;
-float coshf(float x) __z88dk_fastcall;
-float tanhf(float x) __z88dk_fastcall;
+float m32_sinhf(float x) __z88dk_fastcall;
+float m32_coshf(float x) __z88dk_fastcall;
+float m32_tanhf(float x) __z88dk_fastcall;
 
 /* Exponential, logarithmic and power functions */
-float sqrtf(float a) __z88dk_fastcall;
-float expf(float x) __z88dk_fastcall;
-float logf(float x) __z88dk_fastcall;
-float log10f(float x) __z88dk_fastcall;
-float powf(float x, float y);
-float hypotf(float x, float y) __z88dk_callee;
+float m32_sqrtf(float a) __z88dk_fastcall;
+float m32_expf(float x) __z88dk_fastcall;
+float m32_logf(float x) __z88dk_fastcall;
+float m32_log10f(float x) __z88dk_fastcall;
+float m32_powf(float x, float y);
+float m32_hypotf(float x, float y) __z88dk_callee;
 
 /* Nearest integer, absolute value, and remainder functions */
-float fabsf(float x) __z88dk_fastcall;
-float frexpf(float x, int *pw2);
-float ldexpf(float x, int pw2);
-float ceilf(float x) __z88dk_fastcall;
-float floorf(float x) __z88dk_fastcall;
-float modff(float x, float * y);
-float fmodf(float x, float y);
+float m32_fabsf(float x) __z88dk_fastcall;
+float m32_frexpf(float x, int *pw2);
+float m32_ldexpf(float x, int pw2);
+float m32_ceilf(float x) __z88dk_fastcall;
+float m32_floorf(float x) __z88dk_fastcall;
+float m32_modff(float x, float * y);
+float m32_fmodf(float x, float y);
 
 /* Intrinsic functions */
-float sqrf(float a) __z88dk_fastcall;
-float invf(float a) __z88dk_fastcall;
-float invsqrtf(float a) __z88dk_fastcall;
-float polyf(const float x, const float d[], uint16_t n) __z88dk_callee;
+float m32_sqrf(float a) __z88dk_fastcall;
+float m32_invf(float a) __z88dk_fastcall;
+float m32_invsqrtf(float a) __z88dk_fastcall;
+float m32_polyf(const float x, const float d[], uint16_t n) __z88dk_callee;
 
 #endif  /* _INC_MATH */

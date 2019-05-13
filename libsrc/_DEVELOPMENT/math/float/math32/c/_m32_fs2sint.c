@@ -1,6 +1,6 @@
 
-#include <math.h>
-#include <float.h>
+#include "m32_math.h"
+#include "m32_float.h"
 
 /* convert float to signed int */
 signed int __fs2sint (float f) __z88dk_fastcall

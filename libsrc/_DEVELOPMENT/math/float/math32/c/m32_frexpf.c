@@ -28,9 +28,9 @@
 
 /* Version 1.0 - Initial release */
 
-#include <math.h>
+#include "m32_math.h"
 
-float frexpf(float x, int *pw2)
+float m32_frexpf(float x, int *pw2)
 {
     union float_long fl;
     int32_t i;

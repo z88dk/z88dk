@@ -16,8 +16,8 @@
 
 /* (c)2000/2001: hacked a little by johan.knol@iduna.nl for sdcc */
 
-#include <math.h>
-#include <float.h>
+#include "m32_math.h"
+#include "m32_float.h"
 
 /* convert float to unsigned long */
 unsigned long __fs2ulong (float a1) __z88dk_fastcall

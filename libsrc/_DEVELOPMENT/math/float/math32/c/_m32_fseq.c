@@ -16,7 +16,7 @@
 
 /* (c)2000/2001: hacked a little by johan.knol@iduna.nl for sdcc */
 
-#include <math.h>
+#include "m32_math.h"
 
 /* compare two floats */
 char __fseq (float a1, float a2) 

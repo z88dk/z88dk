@@ -1,8 +1,8 @@
 
-#include <math.h>
+#include "m32_math.h"
 
-float tanf (float x) __z88dk_fastcall
+float m32_tanf (float x) __z88dk_fastcall
 {
-    return sinf(x)/cosf(x);
+    return m32_sinf(x)/m32_cosf(x);
 }
 

@@ -1,11 +1,11 @@
 
-#include <math.h>
+#include "m32_math.h"
 
-float acosf (float x) __z88dk_fastcall
+float m32_acosf (float x) __z88dk_fastcall
 {
     float y;
 
-    y = sqrtf(1 - sqrf(x));
-    return atanf(y/x);
+    y = m32_sqrtf(1 - m32_sqrf(x));
+    return m32_atanf(y/x);
 }
 
