@@ -2,9 +2,9 @@
 
 CFILES = $(wildcard *.c)
 AFILES = $(CFILES:.c=.asm)
-CFLAGS += -I../../../../../../include/_DEVELOPMENT/sdcc/ -I.
+CFLAGS += -I. 
 
 all: $(addprefix asm/,$(AFILES))
 
 asm/%.asm: %.c
-	zcc +z80 -compiler=sdcc $(CFLAGS) -S $^ -o $@
+	zcc +z80 -clib=sdcc_ix $(CFLAGS) -a $^ -o $@

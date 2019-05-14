@@ -1,11 +1,11 @@
 
 SECTION	code_fp_math32
 PUBLIC	l_f32_eq
-EXTERN	l_f32_compare
+EXTERN	m32_compare_callee
 
 
 l_f32_eq:
-	call	l_f32_compare
+	call	m32_compare_callee
 	scf
 	ret	z
 	ccf

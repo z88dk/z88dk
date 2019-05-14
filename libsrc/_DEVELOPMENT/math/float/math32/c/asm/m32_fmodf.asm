@@ -204,13 +204,13 @@
 ;--------------------------------------------------------
 ; Externals used
 ;--------------------------------------------------------
-	GLOBAL _m32_polyf
+	GLOBAL _m32_poly
 	GLOBAL _m32_invsqrtf
 	GLOBAL _m32_invf
-	GLOBAL _m32_sqrf
+	GLOBAL _m32_sqr
 	GLOBAL _m32_modff
-	GLOBAL _m32_floorf
-	GLOBAL _m32_ceilf
+	GLOBAL _m32_floor
+	GLOBAL _m32_ceil
 	GLOBAL _m32_ldexpf
 	GLOBAL _m32_frexpf
 	GLOBAL _m32_fabsf
@@ -315,8 +315,9 @@ l_m32_fmodf_00102:
 	push	de
 	push	bc
 	call	___fsmul_callee
-	push	de
+	ex	de, hl
 	push	hl
+	push	de
 	ld	l,(ix+6)
 	ld	h,(ix+7)
 	push	hl

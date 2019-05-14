@@ -204,14 +204,14 @@
 ;--------------------------------------------------------
 ; Externals used
 ;--------------------------------------------------------
-	GLOBAL _m32_polyf
+	GLOBAL _m32_poly
 	GLOBAL _m32_invsqrtf
 	GLOBAL _m32_invf
-	GLOBAL _m32_sqrf
+	GLOBAL _m32_sqr
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
-	GLOBAL _m32_floorf
-	GLOBAL _m32_ceilf
+	GLOBAL _m32_floor
+	GLOBAL _m32_ceil
 	GLOBAL _m32_ldexpf
 	GLOBAL _m32_frexpf
 	GLOBAL _m32_fabsf
@@ -270,8 +270,9 @@ ENDIF
 ; ---------------------------------
 _m32_log10f:
 	call	_m32_logf
-	push	de
+	ex	de, hl
 	push	hl
+	push	de
 	ld	hl,0x3ede
 	push	hl
 	ld	hl,0x5bd9

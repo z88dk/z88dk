@@ -204,14 +204,14 @@
 ;--------------------------------------------------------
 ; Externals used
 ;--------------------------------------------------------
-	GLOBAL _m32_polyf
+	GLOBAL _m32_poly
 	GLOBAL _m32_invsqrtf
 	GLOBAL _m32_invf
-	GLOBAL _m32_sqrf
+	GLOBAL _m32_sqr
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
-	GLOBAL _m32_floorf
-	GLOBAL _m32_ceilf
+	GLOBAL _m32_floor
+	GLOBAL _m32_ceil
 	GLOBAL _m32_ldexpf
 	GLOBAL _m32_frexpf
 	GLOBAL _m32_fabsf
@@ -274,12 +274,8 @@ _m32_tanf:
 	add	ix,sp
 	push	af
 	push	af
-	ld	c, l
-	ld	b, h
-	push	bc
+	push	hl
 	push	de
-	ld	l, c
-	ld	h, b
 	call	_m32_sinf
 	ld	(ix-1),d
 	ld	(ix-2),e
@@ -288,8 +284,9 @@ _m32_tanf:
 	pop	de
 	pop	hl
 	call	_m32_cosf
-	push	de
+	ex	de, hl
 	push	hl
+	push	de
 	ld	l,(ix-2)
 	ld	h,(ix-1)
 	push	hl

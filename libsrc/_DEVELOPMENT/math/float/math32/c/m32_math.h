@@ -95,15 +95,15 @@ float m32_hypotf(float x, float y) __z88dk_callee;
 float m32_fabsf(float x) __z88dk_fastcall;
 float m32_frexpf(float x, int *pw2);
 float m32_ldexpf(float x, int pw2);
-float m32_ceilf(float x) __z88dk_fastcall;
-float m32_floorf(float x) __z88dk_fastcall;
+float m32_ceil(float x) __z88dk_fastcall;
+float m32_floor(float x) __z88dk_fastcall;
 float m32_modff(float x, float * y);
 float m32_fmodf(float x, float y);
 
 /* Intrinsic functions */
-float m32_sqrf(float a) __z88dk_fastcall;
+float m32_sqr(float a) __z88dk_fastcall;
 float m32_invf(float a) __z88dk_fastcall;
 float m32_invsqrtf(float a) __z88dk_fastcall;
-float m32_polyf(const float x, const float d[], uint16_t n) __z88dk_callee;
+float m32_poly(const float x, const float d[], uint16_t n) __z88dk_callee;
 
 #endif  /* _INC_MATH */

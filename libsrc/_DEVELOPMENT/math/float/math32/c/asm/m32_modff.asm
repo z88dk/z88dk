@@ -204,13 +204,13 @@
 ;--------------------------------------------------------
 ; Externals used
 ;--------------------------------------------------------
-	GLOBAL _m32_polyf
+	GLOBAL _m32_poly
 	GLOBAL _m32_invsqrtf
 	GLOBAL _m32_invf
-	GLOBAL _m32_sqrf
+	GLOBAL _m32_sqr
 	GLOBAL _m32_fmodf
-	GLOBAL _m32_floorf
-	GLOBAL _m32_ceilf
+	GLOBAL _m32_floor
+	GLOBAL _m32_ceil
 	GLOBAL _m32_ldexpf
 	GLOBAL _m32_frexpf
 	GLOBAL _m32_fabsf
@@ -272,11 +272,9 @@ _m32_modff:
 	push	ix
 	ld	ix,0
 	add	ix,sp
-	push	af
-	ld	a,(ix+8)
-	ld	(ix-2),a
-	ld	a,(ix+9)
-	ld	(ix-1),a
+	ld	l,(ix+8)
+	ld	h,(ix+9)
+	push	hl
 	ld	l,(ix+6)
 	ld	h,(ix+7)
 	push	hl
@@ -290,7 +288,6 @@ _m32_modff:
 	ld	c, l
 	ld	b, h
 	pop	hl
-	push	hl
 	ld	(hl), c
 	inc	hl
 	ld	(hl), b
@@ -306,8 +303,7 @@ _m32_modff:
 	ld	l,(ix+4)
 	ld	h,(ix+5)
 	push	hl
-	call	___fssub
-	ld	sp,ix
+	call	___fssub_callee
 	pop	ix
 	ret
 	SECTION IGNORE

@@ -1,11 +1,11 @@
 
 SECTION	code_fp_math32
 PUBLIC	l_f32_gt
-EXTERN	l_f32_compare
+EXTERN	m32_compare_callee
 
 
 l_f32_gt:
-	call	l_f32_compare
+	call	m32_compare_callee
 	jr	z,gt1
 	ccf
 	ret	nc

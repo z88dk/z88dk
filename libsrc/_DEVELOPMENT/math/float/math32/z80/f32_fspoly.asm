@@ -45,9 +45,11 @@ SECTION code_fp_math32
 EXTERN m32_fsmul_callee, m32_fsadd_callee, m32_fsmin_fastcall
 
 PUBLIC m32_fspoly_callee
+PUBLIC _m32_poly
 
 
 .m32_fspoly_callee
+._m32_poly
 
     ; evaluation of a polynomial function
     ;

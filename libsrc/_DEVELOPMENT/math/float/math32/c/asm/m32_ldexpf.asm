@@ -204,14 +204,14 @@
 ;--------------------------------------------------------
 ; Externals used
 ;--------------------------------------------------------
-	GLOBAL _m32_polyf
+	GLOBAL _m32_poly
 	GLOBAL _m32_invsqrtf
 	GLOBAL _m32_invf
-	GLOBAL _m32_sqrf
+	GLOBAL _m32_sqr
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
-	GLOBAL _m32_floorf
-	GLOBAL _m32_ceilf
+	GLOBAL _m32_floor
+	GLOBAL _m32_ceil
 	GLOBAL _m32_frexpf
 	GLOBAL _m32_fabsf
 	GLOBAL _m32_hypotf
@@ -272,94 +272,91 @@ _m32_ldexpf:
 	push	ix
 	ld	ix,0
 	add	ix,sp
-	ld	hl, -14
+	ld	hl, -12
 	add	hl, sp
 	ld	sp, hl
 	ld	hl,0x0000
 	add	hl, sp
 	ex	de,hl
-	ld	hl,0x0012
+	ld	hl,0x0010
 	add	hl, sp
 	ld	bc,0x0004
 	ldir
 	ld	hl,0x0000
 	add	hl, sp
-	ld	(ix-2),l
-	ld	(ix-1),h
 	ex	de,hl
-	ld	hl,0x0008
+	push	de
+	ld	hl,0x0006
 	add	hl, sp
 	ex	de, hl
 	ld	bc,0x0004
 	ldir
-	ld	e,(ix-6)
-	ld	d,(ix-5)
-	ld	l,(ix-4)
-	ld	h,(ix-3)
-	ld	b,0x17
+	pop	de
+	ld	c,(ix-8)
+	ld	b,(ix-7)
+	ld	l,(ix-6)
+	ld	h,(ix-5)
+	ld	a,0x17
 l_m32_ldexpf_00103:
 	sra	h
 	rr	l
-	rr	d
-	rr	e
-	djnz	l_m32_ldexpf_00103
-	ld	(ix-10),e
-	ld	(ix-9),0x00
-	ld	(ix-8),0x00
-	ld	(ix-7),0x00
-	ld	c,(ix+8)
-	ld	b,(ix+9)
+	rr	b
+	rr	c
+	dec	a
+	jr	NZ, l_m32_ldexpf_00103
+	ld	(ix-4),c
+	ld	(ix-3),0x00
+	ld	(ix-2),0x00
+	ld	(ix-1),0x00
+	ld	l,(ix+8)
+	ld	h,(ix+9)
 	ld	a,(ix+9)
 	rla
 	sbc	a, a
-	ld	e, a
-	ld	d, a
-	ld	a,(ix-10)
-	add	a, c
+	ld	c, a
+	ld	b, a
+	ld	a,(ix-4)
+	add	a, l
 	ld	l, a
-	ld	a,(ix-9)
+	ld	a,(ix-3)
+	adc	a, h
+	ld	a,(ix-2)
+	adc	a, c
+	ld	a,(ix-1)
 	adc	a, b
-	ld	a,(ix-8)
-	adc	a, e
-	ld	a,(ix-7)
-	adc	a, d
 	ld	h,0x00
-	ld	de,0x0000
-	ld	b,0x07
+	ld	bc,0x0000
+	ld	a,0x07
 l_m32_ldexpf_00105:
 	add	hl, hl
-	djnz	l_m32_ldexpf_00105
+	dec	a
+	jr	NZ,l_m32_ldexpf_00105
+	ld	a,(ix-8)
+	ld	(ix-4),a
+	ld	a,(ix-7)
+	ld	(ix-3),a
 	ld	a,(ix-6)
-	ld	(ix-10),a
-	ld	a,(ix-5)
-	ld	(ix-9),a
-	ld	a,(ix-4)
 	and	a,0x7f
-	ld	(ix-8),a
-	ld	a,(ix-3)
+	ld	(ix-2),a
+	ld	a,(ix-5)
 	and	a,0x80
-	ld	(ix-7),a
-	ld	a, e
-	or	a,(ix-10)
-	ld	c, a
-	ld	a, d
-	or	a,(ix-9)
-	ld	b, a
-	ld	a, l
-	or	a,(ix-8)
-	ld	e, a
-	ld	a, h
-	or	a,(ix-7)
-	ld	d, a
-	ld	l,(ix-2)
-	ld	h,(ix-1)
-	ld	(hl), c
-	inc	hl
-	ld	(hl), b
-	inc	hl
-	ld	(hl), e
-	inc	hl
-	ld	(hl), d
+	ld	(ix-1),a
+	ld	a,(ix-4)
+	or	a, c
+	ld	(ix-4),a
+	ld	a,(ix-3)
+	or	a, b
+	ld	(ix-3),a
+	ld	a,(ix-2)
+	or	a, l
+	ld	(ix-2),a
+	ld	a,(ix-1)
+	or	a, h
+	ld	(ix-1),a
+	ld	hl,0x0008
+	add	hl, sp
+	ld	bc,0x0004
+	ldir
 	ld	hl,0x0000
 	add	hl, sp
 	ld	c, (hl)

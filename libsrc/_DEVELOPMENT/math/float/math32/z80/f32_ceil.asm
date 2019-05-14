@@ -1,7 +1,7 @@
 
 	SECTION	code_fp_math32
-	PUBLIC	m32_ceil
-	PUBLIC	m32_ceil_fastcall
+	PUBLIC	_m32_ceil
+	PUBLIC	_m32_ceil_fastcall
 
 	EXTERN	m32_f2ulong
 	EXTERN	m32_float32u
@@ -10,7 +10,7 @@
 	EXTERN	m32_fsadd_callee
 
 ; float ceil(float f)
-m32_ceil:
+_m32_ceil:
 	pop	bc
 	pop	hl
 	pop	de
@@ -19,7 +19,7 @@ m32_ceil:
 	push	bc
 
 ; Entry: dehl = floating point number
-m32_ceil_fastcall:
+_m32_ceil_fastcall:
 	bit	7,d
 	push	af			;Save sign flag
 	call	m32_f2ulong		;Exits dehl = number

@@ -204,14 +204,14 @@
 ;--------------------------------------------------------
 ; Externals used
 ;--------------------------------------------------------
-	GLOBAL _m32_polyf
+	GLOBAL _m32_poly
 	GLOBAL _m32_invsqrtf
 	GLOBAL _m32_invf
-	GLOBAL _m32_sqrf
+	GLOBAL _m32_sqr
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
-	GLOBAL _m32_floorf
-	GLOBAL _m32_ceilf
+	GLOBAL _m32_floor
+	GLOBAL _m32_ceil
 	GLOBAL _m32_ldexpf
 	GLOBAL _m32_frexpf
 	GLOBAL _m32_fabsf
@@ -273,7 +273,7 @@ _m32_logf:
 	push	ix
 	ld	ix,0
 	add	ix,sp
-	ld	hl, -8
+	ld	hl, -6
 	add	hl, sp
 	ld	sp, hl
 	ld	c, l
@@ -287,10 +287,9 @@ _m32_logf:
 	push	de
 	push	bc
 	call	___fsgt_callee
-	ld	a, l
 	pop	de
 	pop	bc
-	bit	0, a
+	bit	0, l
 	jr	NZ,l_m32_logf_00102
 	ld	hl,0x0000
 	ld	e,l
@@ -299,10 +298,6 @@ _m32_logf:
 l_m32_logf_00102:
 	ld	hl,0x0000
 	add	hl, sp
-	ld	(ix-6),l
-	ld	(ix-5),h
-	ld	l,(ix-6)
-	ld	h,(ix-5)
 	push	hl
 	push	de
 	push	bc
@@ -310,8 +305,9 @@ l_m32_logf_00102:
 	pop	af
 	pop	af
 	pop	af
-	push	de
+	ex	de, hl
 	push	hl
+	push	de
 	ld	hl,0x4000
 	push	hl
 	ld	hl,0x0000
@@ -338,7 +334,7 @@ l_m32_logf_00102:
 	push	hl
 	push	de
 	push	bc
-	call	_m32_polyf
+	call	_m32_poly
 	ld	(ix-4),l
 	ld	(ix-3),h
 	ld	(ix-2),e
@@ -347,15 +343,17 @@ l_m32_logf_00102:
 	push	hl
 	push	hl
 	call	___sint2fs_callee
-	push	de
+	ex	de, hl
 	push	hl
+	push	de
 	ld	hl,0x3f31
 	push	hl
 	ld	hl,0x7218
 	push	hl
 	call	___fsmul_callee
-	push	de
+	ex	de, hl
 	push	hl
+	push	de
 	ld	l,(ix-2)
 	ld	h,(ix-1)
 	push	hl

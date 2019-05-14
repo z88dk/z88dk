@@ -1,20 +1,16 @@
 	SECTION	code_fp_math32
-	PUBLIC	l_f32_compare
+	PUBLIC	m32_compare_callee
 
+; Compare two IEEE floats. NB. Needs to handle -0 == +0
 ;       Entry: dehl=secondary
-;              onstack (under two return addresses) = primary
+;              onstack (sp+4: under two return addresses) = primary
 ;
 ;       Exit:     z=number is zero
 ;              (nz)=number is non-zero
 ;                 c=number is left > right
 ;                nc=number is right < left
 
-
-; Compare two IEEE floats. NB. Needs to handle -0 == +0
-; Entry: dehl = float right
-;        sp+4 = float left
-
-l_f32_compare:
+m32_compare_callee:
         pop     bc      ;return address from this function
                         ;this leaves return address to real program
                         ;and the primary on the stack

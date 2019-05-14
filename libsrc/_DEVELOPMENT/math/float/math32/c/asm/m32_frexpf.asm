@@ -204,14 +204,14 @@
 ;--------------------------------------------------------
 ; Externals used
 ;--------------------------------------------------------
-	GLOBAL _m32_polyf
+	GLOBAL _m32_poly
 	GLOBAL _m32_invsqrtf
 	GLOBAL _m32_invf
-	GLOBAL _m32_sqrf
+	GLOBAL _m32_sqr
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
-	GLOBAL _m32_floorf
-	GLOBAL _m32_ceilf
+	GLOBAL _m32_floor
+	GLOBAL _m32_ceil
 	GLOBAL _m32_ldexpf
 	GLOBAL _m32_fabsf
 	GLOBAL _m32_hypotf
@@ -272,22 +272,18 @@ _m32_frexpf:
 	push	ix
 	ld	ix,0
 	add	ix,sp
-	ld	hl, -8
-	add	hl, sp
-	ld	sp, hl
+	push	af
+	push	af
 	ld	hl,0x0000
 	add	hl, sp
 	ex	de,hl
-	ld	hl,0x000c
+	ld	hl,0x0008
 	add	hl, sp
 	ld	bc,0x0004
 	ldir
 	ld	hl,0x0000
 	add	hl, sp
-	ld	(ix-4),l
-	ld	(ix-3),h
-	ld	l,(ix-4)
-	ld	h,(ix-3)
+	push	hl
 	ld	c, (hl)
 	inc	hl
 	ld	b, (hl)
@@ -295,6 +291,7 @@ _m32_frexpf:
 	ld	e, (hl)
 	inc	hl
 	ld	d, (hl)
+	pop	hl
 	ld	a,0x17
 l_m32_frexpf_00103:
 	sra	d
@@ -315,17 +312,15 @@ l_m32_frexpf_00103:
 	adc	a,0xff
 	ld	a, d
 	adc	a,0xff
-	ld	a,(ix+8)
-	ld	(ix-2),a
-	ld	a,(ix+9)
-	ld	(ix-1),a
-	ld	l,(ix-2)
-	ld	h,(ix-1)
-	ld	(hl), c
-	inc	hl
-	ld	(hl), b
-	ld	l,(ix-4)
-	ld	h,(ix-3)
+	push	hl
+	ld	l,(ix+8)
+	ld	h,(ix+9)
+	push	hl
+	pop	iy
+	pop	hl
+	ld	(iy+0),c
+	ld	(iy+1),b
+	push	hl
 	ld	c, (hl)
 	inc	hl
 	ld	b, (hl)
@@ -333,12 +328,11 @@ l_m32_frexpf_00103:
 	ld	e, (hl)
 	inc	hl
 	ld	d, (hl)
+	pop	hl
 	res	7, e
 	ld	a, d
 	and	a,0x80
 	ld	d, a
-	ld	l,(ix-4)
-	ld	h,(ix-3)
 	ld	(hl), c
 	inc	hl
 	ld	(hl), b
@@ -346,8 +340,10 @@ l_m32_frexpf_00103:
 	ld	(hl), e
 	inc	hl
 	ld	(hl), d
-	ld	l,(ix-4)
-	ld	h,(ix-3)
+	dec	hl
+	dec	hl
+	dec	hl
+	push	hl
 	ld	a, (hl)
 	inc	hl
 	ld	a, (hl)
@@ -355,11 +351,10 @@ l_m32_frexpf_00103:
 	ld	a, (hl)
 	inc	hl
 	ld	a, (hl)
+	pop	hl
 	ld	a, d
 	or	a,0x3f
 	ld	d, a
-	ld	l,(ix-4)
-	ld	h,(ix-3)
 	ld	(hl), c
 	inc	hl
 	ld	(hl), b

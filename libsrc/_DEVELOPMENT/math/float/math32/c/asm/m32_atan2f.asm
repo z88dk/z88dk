@@ -204,14 +204,14 @@
 ;--------------------------------------------------------
 ; Externals used
 ;--------------------------------------------------------
-	GLOBAL _m32_polyf
+	GLOBAL _m32_poly
 	GLOBAL _m32_invsqrtf
 	GLOBAL _m32_invf
-	GLOBAL _m32_sqrf
+	GLOBAL _m32_sqr
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
-	GLOBAL _m32_floorf
-	GLOBAL _m32_ceilf
+	GLOBAL _m32_floor
+	GLOBAL _m32_ceil
 	GLOBAL _m32_ldexpf
 	GLOBAL _m32_frexpf
 	GLOBAL _m32_fabsf
@@ -349,10 +349,9 @@ _m32_atan2f:
 	ld	h,(ix+5)
 	push	hl
 	call	___fslt_callee
-	ld	a, l
 	pop	de
 	pop	bc
-	bit	0, a
+	bit	0, l
 	jr	NZ,l_m32_atan2f_00102
 	ld	hl,0x4049
 	push	hl
@@ -393,15 +392,13 @@ l_m32_atan2f_00107:
 	push	hl
 	call	___fsdiv_callee
 	call	_m32_atanf
-	ld	c, l
-	ld	b, h
 	ld	a, d
 	xor	a,0x80
-	ld	d, a
-	ld	(ix-9),c
-	ld	(ix-8),b
+	ld	c, a
+	ld	(ix-9),l
+	ld	(ix-8),h
 	ld	(ix-7),e
-	ld	(ix-6),d
+	ld	(ix-6),c
 	ld	a,(ix-5)
 	or	a, a
 	jr	Z,l_m32_atan2f_00109

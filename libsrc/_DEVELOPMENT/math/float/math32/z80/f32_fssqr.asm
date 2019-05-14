@@ -46,8 +46,9 @@ EXTERN m32_fszero_fastcall
 EXTERN m32_sqr_32h_24x24
 
 PUBLIC m32_fssqr_fastcall
+PUBLIC _m32_sqr
 
-
+._m32_sqr
 .m32_fssqr_fastcall
     ex de,hl                    ; DEHL -> HLDE
 

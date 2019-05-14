@@ -204,14 +204,14 @@
 ;--------------------------------------------------------
 ; Externals used
 ;--------------------------------------------------------
-	GLOBAL _m32_polyf
+	GLOBAL _m32_poly
 	GLOBAL _m32_invsqrtf
 	GLOBAL _m32_invf
-	GLOBAL _m32_sqrf
+	GLOBAL _m32_sqr
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
-	GLOBAL _m32_floorf
-	GLOBAL _m32_ceilf
+	GLOBAL _m32_floor
+	GLOBAL _m32_ceil
 	GLOBAL _m32_ldexpf
 	GLOBAL _m32_frexpf
 	GLOBAL _m32_fabsf
@@ -297,10 +297,10 @@ l_m32_expf_00102:
 	push	de
 	push	bc
 	call	___fslt_callee
-	ld	a, l
 	pop	de
 	pop	bc
-	ld	(ix-5),a
+	ld	(ix-1),l
+	ld	a, l
 	or	a, a
 	jr	Z,l_m32_expf_00104
 	ld	a, d
@@ -314,34 +314,33 @@ l_m32_expf_00104:
 	ld	hl,0xaa3b
 	push	hl
 	call	___fsmul_callee
-	ld	(ix-4),l
-	ld	(ix-3),h
-	ld	(ix-2),e
-	ld	(ix-1),d
-	ld	l,(ix-4)
-	ld	h,(ix-3)
-	ld	e,(ix-2)
-	ld	d,(ix-1)
-	call	_m32_floorf
+	ld	(ix-5),l
+	ld	(ix-4),h
+	ld	(ix-3),e
+	ld	(ix-2),d
+	ld	l,(ix-5)
+	ld	h,(ix-4)
+	ld	e,(ix-3)
+	ld	d,(ix-2)
+	call	_m32_floor
 	push	de
 	push	hl
 	call	___fs2uint_callee
-	ld	c, l
-	ld	b, h
 	inc	sp
 	inc	sp
-	push	bc
+	push	hl
 	pop	hl
 	push	hl
 	push	hl
 	call	___sint2fs_callee
+	ex	de, hl
+	push	hl
 	push	de
+	ld	l,(ix-3)
+	ld	h,(ix-2)
 	push	hl
-	ld	l,(ix-2)
-	ld	h,(ix-1)
-	push	hl
-	ld	l,(ix-4)
-	ld	h,(ix-3)
+	ld	l,(ix-5)
+	ld	h,(ix-4)
 	push	hl
 	call	___fssub_callee
 	ld	c, l
@@ -352,30 +351,28 @@ l_m32_expf_00104:
 	push	hl
 	push	de
 	push	bc
-	call	_m32_polyf
-	ld	c, l
-	ld	b, h
-	pop	hl
-	push	hl
-	push	hl
-	push	de
+	call	_m32_poly
+	pop	bc
 	push	bc
+	push	bc
+	push	de
+	push	hl
 	call	_m32_ldexpf
 	pop	af
 	pop	af
 	pop	af
-	ld	(ix-4),l
-	ld	(ix-3),h
-	ld	(ix-2),e
-	ld	(ix-1),d
-	ld	a,(ix-5)
+	ld	(ix-5),l
+	ld	(ix-4),h
+	ld	(ix-3),e
+	ld	(ix-2),d
+	ld	a,(ix-1)
 	or	a, a
 	jr	Z,l_m32_expf_00106
-	ld	l,(ix-2)
-	ld	h,(ix-1)
+	ld	l,(ix-3)
+	ld	h,(ix-2)
 	push	hl
-	ld	l,(ix-4)
-	ld	h,(ix-3)
+	ld	l,(ix-5)
+	ld	h,(ix-4)
 	push	hl
 	ld	hl,0x3f80
 	push	hl
@@ -384,10 +381,10 @@ l_m32_expf_00104:
 	call	___fsdiv_callee
 	jr	l_m32_expf_00107
 l_m32_expf_00106:
-	ld	l,(ix-4)
-	ld	h,(ix-3)
-	ld	e,(ix-2)
-	ld	d,(ix-1)
+	ld	l,(ix-5)
+	ld	h,(ix-4)
+	ld	e,(ix-3)
+	ld	d,(ix-2)
 l_m32_expf_00107:
 	ld	sp, ix
 	pop	ix
