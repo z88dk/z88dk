@@ -26,7 +26,7 @@
 #define LONG_MAX 2147483647L
 #define LONG_MIN (-2147483648L)
 #define ULONG_MAX 4294967295LU
-#deifne ULONG_MIN 0
+#define ULONG_MIN 0
 
 
 

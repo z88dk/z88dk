@@ -24,6 +24,7 @@
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sdcc/___fsdiv.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sdcc/___fs2ulong.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sdcc/___schar2fs.asm
+../../_DEVELOPMENT/math/float/math32//lm32/c/sdcc/log10_fastcall.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sdcc/___ulong2fs.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sdcc/___ulong2fs_callee.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sdcc/sin.asm
@@ -45,6 +46,7 @@
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sdcc/___fsgt_callee.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sdcc/cosh.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sdcc/ceil.asm
+../../_DEVELOPMENT/math/float/math32//lm32/c/sdcc/log10.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sdcc/___fseq_callee.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sdcc/___fsdiv_callee.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sdcc/___fs2uint_callee.asm
@@ -52,6 +54,7 @@
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sdcc/___fs2slong.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sdcc/sinh_fastcall.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sdcc/___uint2fs_callee.asm
+../../_DEVELOPMENT/math/float/math32//lm32/c/sdcc/log.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sdcc/sqrt.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sdcc/___fslt_callee.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sdcc/tanh_fastcall.asm
@@ -59,6 +62,7 @@
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sdcc/___fs2schar.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sdcc/___fsneq_callee.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sdcc/tanh.asm
+../../_DEVELOPMENT/math/float/math32//lm32/c/sdcc/log_fastcall.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sdcc/sinh.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sdcc/pow.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sdcc/exp_fastcall.asm
