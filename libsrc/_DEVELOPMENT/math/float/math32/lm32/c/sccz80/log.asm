@@ -1,14 +1,7 @@
 
 	SECTION	code_fp_math32
 	PUBLIC	log
-	EXTERN	_m32_logf
+	EXTERN	cm32_sccz80_log
 
+	defc	log = cm32_sccz80_log
 
-log:
-	pop	bc
-	pop	hl
-	pop	de
-	push	de
-	push	hl
-	push	bc
-	jp	_m32_logf

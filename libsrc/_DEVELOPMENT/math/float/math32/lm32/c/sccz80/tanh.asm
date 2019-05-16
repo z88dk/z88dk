@@ -1,14 +1,7 @@
 
 	SECTION	code_fp_math32
 	PUBLIC	tanh
-	EXTERN	_m32_tanhf
+	EXTERN	cm32_sccz80_tanh
 
+	defc	tanh = cm32_sccz80_tanh
 
-tanh:
-	pop	bc
-	pop	hl
-	pop	de
-	push	de
-	push	hl
-	push	bc
-	jp	_m32_tanhf
