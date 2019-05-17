@@ -3755,18 +3755,20 @@ void DoubSwap(void)
     callrts("fswap");
 }
 
-void vlongconst(uint32_t val)
+void vlongconst(double val)
 {
-    vconst(val % 65536);
-    const2(val / 65536);
+    uint32_t l = (uint32_t)(int64_t)val;
+    vconst(l % 65536);
+    const2(l / 65536);
 }
 
 
-void vlongconst_tostack(uint32_t val)
+void vlongconst_tostack(double val)
 {
-    constbc(val / 65536);
+    uint32_t l = (uint32_t)(int64_t)val;
+    constbc(l / 65536);
     ol("push\tbc");
-    constbc(val % 65536);
+    constbc(l % 65536);
     ol("push\tbc");
     Zsp -= 4;
 }
