@@ -23,17 +23,19 @@ Where not written by me, the functions were sourced from:
 
   *  Register use is limited to the main set and the exx set (including af'). NO index registers were abused in the process.
 
-  *  Made for the Spectrum Next. The z80-zxn `mul de` instruction and the z180 `mlt nn` instruction are used to full advantage to accelerate all floating point calculations with the available hardware instructions.
+  *  Made for the Spectrum Next. The z80-zxn `mul de` instruction and the z180 `mlt nn` instruction are used to full advantage to accelerate all floating point calculations with the available hardware multiply instructions.
 
   *  The z80 multiply (without a hardware instruction) is implemented with an unrolled equivalent to the z80-zxn `mul de`, which is designed to have no side effect other than resetting the flag register.
 
   *  Mantissa calculations are done with 24-bits and 8-bits for rounding. Rounding is simple, using the Digi International method, but can be if required expanded to the IEEE standard, with a performance penalty.
+  
+  *  Derived functions are calculated with 32-bit internal mantissa calculation path.
 
   *  Higher functions are written in C, for maintainability, and draw upon the intrinsic functions including the square root, square, and polynomial evaluation, as well as the 4 standard arithmetic functions.
 
   *  Power and trigonometric functions' accuracy and speed can be traded by managing their polynomial series coefficient tables. More iterations provides higher accuracy at the expense of performance. The default Hi-Tech C library coefficients are provided by default. Alternative coefficient tables can be tested without impacting the code.
 
-  *  The square root (inverse square root) function is seeded using the Quake magic number method, with two Newton-Raphson iterations for accuracy. Again, accuracy and speed can be traded depending on application, by removing one iteration for game usage (for example).
+  *  The square root (inverse square root) function is seeded using the Quake magic number method, with three Newton-Raphson iterations for accuracy. Again, accuracy and speed can be traded depending on application, by removing one or two iterations for game usage (for example).
 
 ## IEEE Floating Point Format
 
@@ -169,9 +171,6 @@ There are several assembly intrinsic functions.
 float __fsadd (float, float) __z88dk_callee;
 float __fssub (float, float) __z88dk_callee;
 float __fsmul (float, float) __z88dk_callee;
-float __fssqr (float, float) __z88dk_callee;
-float __fsinv (float, float) __z88dk_callee;
-float __fsdiv (float, float) __z88dk_callee;
 ```
 Using these intrinsic functions (and the compact assembly square root and polynomial functions) it is possible to build efficient C language complex functions.
 
@@ -229,11 +228,15 @@ The divide function is implemented by first obtaining the inverse of the divisor
 
 The Newton-Raphson method is used for finding the inverse, using full 32-bit multiplies for accuracy.
 
-### Compact Floating Point Functions
+### Derived Floating Point Functions
 
-These functions are implemented in assembly language but they utilise intrinsic functions to provide their returns. The use of the compact floating point format means that there is a minor overhead in separating exponent from mantissa in each called function, but this is minor in comparison to the advantage in maintainability obtained by having readable functions.
+These functions are implemented in assembly language but they utilise intrinsic functions to provide their returns. The use of the 32-bit mantissa internal floating point format for derived functions means that accuracy is maintained. For che calculated functions there is a minor overhead in separating exponent from mantissa in each called intrinsic or derived function, but this is minor in comparison to the advantage in maintainability obtained by having readable functions.
 
 ```c
+float __fssqr (float, float) __z88dk_fastcall;
+float __fsinv (float, float) __z88dk_fastcall;
+float __fsdiv (float, float) __z88dk_callee;
+
 float sqrtf(float a) __z88dk_fastcall;
 float invsqrtf(float a) __z88dk_fastcall;
 float hypotf(float x, float y) __z88dk_callee;
@@ -245,7 +248,7 @@ Recently, in the Quake video game, a novel method of seeding the Newton-Raphson 
 
 Following this magic number seeding and traditional Newtwon-Raphson iterations, using the `_fssqr` function as appropriate, an accurate inverse square root is produced. The square root `_fssqrt` is then obtained by multiplying the number by its inverse square root.
 
-Two N-R iterations produce 5 or 6 decimal digits of accuracy. Greater accuracy can be easily obtained by increasing the Newton-Raphson iteration cycles to 3 (or more) at the expense of speed. Also, as in the original Quake game, 1 N-R iteration produces a good enough answer for most applications, and is substantially faster.
+Two N-R iterations produce 5 or 6 decimal digits of accuracy. Greater accuracy has been obtained by increasing the Newton-Raphson iterations to 3 cycles at the expense of speed. Also, as in the original Quake game, 1 N-R iteration produces a good enough answer for most applications, and is substantially faster.
 
 #### _fspoly
 
@@ -307,11 +310,11 @@ If the value of the function depends on the value of the difference of 2 floatin
 
 The multiplication process should be "correct" and in fact more correct than the digi international method. Every carry term is calculated and brought into the result. Digi international code ignores the `c*f` term of the 24-bit mantissa calculation of `abc*cdf`, because they determined it wasn't needed. m32 doesn't take that short cut and calculates all the terms. This also applies to the squaring process, which should also be "correct".
 
-The division process relies on N-R estimation, and it follows exactly the same process as digi international do. There are some notes about the number of significant bits of calculation required to derive a correct IEEE 24-bit mantissa, and I believe that using the `32h_32x32` calculations this is achieved. I was seeing outcomes close to, and mostly the same as the m48 package. But both of these are not rounding to whole numbers (ever). 2.0 is always seen as 1.99999xx, and never as 2.00001xx.
-
 The addition / subtraction process should be "correct", and this result should be identical to m48 within the significant digits of IEEE 754.
 
-The square root calculation relies on N-R and is an estimate only. With 2 iterations currently implemented I think the estimate is pretty usable. 1 iteration is good for games and nothing else. It is easy (at the expense of ticks) to make 3 iterations, which should be pretty damn good (as a technical outcome).
+The division process relies on N-R estimation, and it follows exactly the same process as digi international do. There are some notes about the number of significant bits of calculation required to derive a correct IEEE 24-bit mantissa, and I believe that using the `32h_32x32` calculations this outcome is achieved.
+
+The square root calculation relies on N-R and is an estimate only. With 3 iterations currently implemented I think the estimate is pretty usable. 1 iteration is good for games and nothing else.
 
 The rest of the derived power and trigonometric functions rely on the polynomial expansion process and will only be as accurate as the coefficients that are fed into the process. I've used those coefficients found in the Hi-Tech C library code. I guess they got them right, but their code is not known for accuracy. Someone with a mathematical background might be interested to calculate better coefficients at some stage.
 

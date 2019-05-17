@@ -20,7 +20,7 @@ PUBLIC m32_float8u
 PUBLIC m32_float16u
 PUBLIC m32_float32u
 
-EXTERN m32_normalize
+EXTERN m32_fsnormalize
 
 ; convert integer in hl to float in dehl
 .m32_float16
@@ -63,6 +63,7 @@ EXTERN m32_normalize
     res 7,d                     ; ensure unsigned long's "sign" bit is reset
     ld b,d                      ; to hold the sign, put copy of MSB into b
                                 ; continue, with unsigned long number in dehl
+    ex de,hl
 .dldf0
 ; number in hlde, sign in b
     ld c,150                    ; exponent if no shift
@@ -71,7 +72,7 @@ EXTERN m32_normalize
     jr NZ,dldfright             ; go shift right
 ; exponent in c, sign in b
     ex af,af                    ; set carry off
-    jp m32_normalize           ; piggy back on existing code in _fsadd
+    jp m32_fsnormalize          ; piggy back on existing code in _fsnormalize
 
 ; must shift right to make h = 0 and mantissa in lde
 .dldfright
