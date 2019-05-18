@@ -117,16 +117,12 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
     ld a,b
     push af                     ; stack: sum of exponents a', and xor sign of exponents in f'
 
-                                ; a' = sum of exponents, f' = Sign of result
                                 ; first  dehl  = 1mmmmmmm mmmmmmmm mmmmmmmm mmmmmmmm
                                 ; second dehl' = 1mmmmmmm mmmmmmmm mmmmmmmm mmmmmmmm
                                 ; sum of exponents, xor of exponents sign on stack = b,c[7]
                                 ;
                                 ; multiplication of two 32-bit numbers into a 32-bit product
     call m32_mulu_32h_32x32     ; exit  : dehl  = 32-bit product
-
-;   EXTERN l_mulu_64_32x32
-;   call l_mulu_64_32x32
 
     pop bc                      ; retrieve sign and exponent from stack = b,c[7]
 
@@ -135,13 +131,21 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
     add hl,hl    
     rl e
     rl d
-    jr fm1
+    ret                         ; return BC DEHL
 
 .fm0
     inc b
-    jr C,mulovl
-.fm1
-    ret                         ; return BC DEHL
+    ret NC                      ; return BC DEHL
+                                ; othewise overflow
+.mulovl
+    ex af,af                    ; get sign
+    ld c,a
+    ld b,0ffh                   ; set Infinity
+    ld d,0
+    ld e,d
+    ld h,d
+    ld h,d
+    ret                         ; done overflow
 
 .mulzero
     ex af,af                    ; get sign
@@ -153,14 +157,5 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
     ld h,b
     ld l,b
     ret                         ; done zero
-    
-.mulovl
-    ex af,af                    ; get sign
-    ld c,a
-    ld b,0ffh                   ; set Infinity
-    ld d,0
-    ld e,d
-    ld h,d
-    ld h,d
-    ret                         ; done overflow
+
 
