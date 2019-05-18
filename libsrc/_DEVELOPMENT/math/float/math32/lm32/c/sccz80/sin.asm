@@ -5,3 +5,10 @@
 
 	defc	sin = cm32_sccz80_sin
 
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sin
+defc _sin = sin
+ENDIF
+

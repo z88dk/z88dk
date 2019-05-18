@@ -5,3 +5,10 @@
 
 	defc	cosh = cm32_sccz80_cosh
 
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _cosh
+defc _cosh = cosh
+ENDIF
+

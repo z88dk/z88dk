@@ -5,3 +5,10 @@
 
 	defc	modf = cm32_sccz80_modf
 
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _modf
+defc _modf = modf
+ENDIF
+

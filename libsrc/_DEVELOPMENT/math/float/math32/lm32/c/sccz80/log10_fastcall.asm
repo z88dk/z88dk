@@ -4,3 +4,10 @@
 	EXTERN	_m32_log10f
 
 	defc	log10_fastcall = _m32_log10f
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _log10_fastcall
+defc _log10_fastcall = log10_fastcall
+ENDIF
+

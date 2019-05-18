@@ -5,3 +5,10 @@
 
 	defc	tanh = cm32_sccz80_tanh
 
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _tanh
+defc _tanh = tanh
+ENDIF
+

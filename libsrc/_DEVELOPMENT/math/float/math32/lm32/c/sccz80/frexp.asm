@@ -5,3 +5,10 @@
 
 	defc	frexp = cm32_sccz80_frexp
 
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _frexp
+defc _frexp = frexp
+ENDIF
+

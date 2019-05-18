@@ -5,3 +5,10 @@
 
 	defc	cos = cm32_sccz80_cos
 
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _cos
+defc _cos = cos
+ENDIF
+

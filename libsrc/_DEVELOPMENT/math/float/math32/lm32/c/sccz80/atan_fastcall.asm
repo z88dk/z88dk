@@ -4,3 +4,10 @@
 	EXTERN	_m32_atanf
 
 	defc	atan_fastcall = _m32_atanf
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _atan_fastcall
+defc _atan_fastcall = atan_fastcall
+ENDIF
+

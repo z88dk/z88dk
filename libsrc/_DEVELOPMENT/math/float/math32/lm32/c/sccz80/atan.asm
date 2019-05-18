@@ -5,3 +5,10 @@
 
 	defc	atan = cm32_sccz80_atan
 
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _atan
+defc _atan = atan
+ENDIF
+

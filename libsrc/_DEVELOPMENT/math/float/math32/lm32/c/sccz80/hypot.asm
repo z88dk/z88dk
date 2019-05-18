@@ -5,3 +5,10 @@
 
 	defc	hypot = cm32_sccz80_hypot
 
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _hypot
+defc _hypot = hypot
+ENDIF
+

@@ -5,3 +5,10 @@
 
 	defc	asin = cm32_sccz80_asin
 
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _asin
+defc _asin = asin
+ENDIF
+

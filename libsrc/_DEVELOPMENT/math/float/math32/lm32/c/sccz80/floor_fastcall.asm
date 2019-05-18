@@ -4,3 +4,10 @@
 	EXTERN	_m32_floor_fastcall
 
 	defc	floor_fastcall = _m32_floor_fastcall
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _floor_fastcall
+defc _floor_fastcall = floor_fastcall
+ENDIF
+

@@ -4,3 +4,10 @@
 	EXTERN	_m32_acosf
 
 	defc	acos_fastcall = _m32_acosf
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _acos_fastcall
+defc _acos_fastcall = acos_fastcall
+ENDIF
+
