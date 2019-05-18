@@ -1,14 +1,7 @@
 
 	SECTION	code_fp_math32
 	PUBLIC	_sinh
-	EXTERN	_m32_sinhf
+	EXTERN	cm32_sdcc_sinh
 
+	defc	_sinh = cm32_sdcc_sinh
 
-_sinh:
-	pop	bc
-	pop	hl
-	pop	de
-	push	de
-	push	hl
-	push	bc
-	jp	_m32_sinhf
