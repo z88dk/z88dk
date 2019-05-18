@@ -27,10 +27,12 @@ PUBLIC m32_fsmax_fastcall
 
 ; here to return a legal zero in dehl
 .m32_fszero_fastcall
-    ld de,0
-    ld h,d
-    ld l,d
-    or a
+    ld d,a
+    and 080h
+    ld d,a
+    ld e,0
+    ld h,e
+    ld l,e
     ret
 
 ; here to change underflow to a error floating zero

@@ -40,7 +40,6 @@
 SECTION code_clib
 SECTION code_math
 
-EXTERN mulzero
 EXTERN m32_mulu_32h_24x24, m32_mulu_32h_32x32
 
 PUBLIC m32_fsmul24x32, m32_fsmul32x32
@@ -69,7 +68,7 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
     ld a,c                      ; put sign bit into A
 
     exx                         ; first b' = eeeeeeee c' = s-------
-                                ;   hl'de' = 1mmmmmmm mmmmmmmm mmmmmmmm mmmmmmmm
+                                ;   de'hl' = 1mmmmmmm mmmmmmmm mmmmmmmm mmmmmmmm
 
     pop bc                      ; pop return address
     pop de                      ; get second operand off of the stack
@@ -77,17 +76,17 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
     push bc                     ; return address on stack
     
     xor a,h                     ; xor sign flags
-    ex af,af                    ; save sign flag in a7' and f' reg
+    ex af,af                    ; save sign flag in a[7]' and f' reg
 
     add hl,hl                   ; shift exponent into h
     scf                         ; set implicit bit
     rr l                        ; shift msb into mantissa
     
-    ld b,h                      ; b = eeeeeeee
-    ld h,e
+    ld b,h                      ; put exponent into B = eeeeeeee
+    ld h,e                      ; put mantissa from LDE0 into DEHL
     ld e,d
     ld d,l                      ; second b = eeeeeeee c = s-------
-    ld l,0                      ;    dehl = 1mmmmmmm mmmmmmmm mmmmmmmm mmmmmmmm
+    ld l,0                      ;    dehl = 1mmmmmmm mmmmmmmm mmmmmmmm 00000000
 
 .fmrejoin
     ld a,b                      ; calculate the exponent
@@ -116,7 +115,7 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
 
     ex af,af
     ld a,b
-    push af                     ; save sum of exponents a', and xor sign of exponents in f'
+    push af                     ; stack: sum of exponents a', and xor sign of exponents in f'
 
                                 ; a' = sum of exponents, f' = Sign of result
                                 ; first  dehl  = 1mmmmmmm mmmmmmmm mmmmmmmm mmmmmmmm
@@ -125,6 +124,9 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
                                 ;
                                 ; multiplication of two 32-bit numbers into a 32-bit product
     call m32_mulu_32h_32x32     ; exit  : dehl  = 32-bit product
+
+;   EXTERN l_mulu_64_32x32
+;   call l_mulu_64_32x32
 
     pop bc                      ; retrieve sign and exponent from stack = b,c[7]
 
@@ -143,9 +145,9 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
 
 .mulzero
     ex af,af                    ; get sign
-    and a,080h                  ; set ZERO
-    ld b,0
+    and a,080h
     ld c,a
+    ld b,0                      ; set ZERO
     ld d,b
     ld e,b
     ld h,b
@@ -154,8 +156,8 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
     
 .mulovl
     ex af,af                    ; get sign
-    ld b,0ffh
     ld c,a
+    ld b,0ffh                   ; set Infinity
     ld d,0
     ld e,d
     ld h,d
