@@ -139,11 +139,11 @@
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sccz80/acos.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sccz80/cosh_fastcall.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sccz80/asin.asm
-../../_DEVELOPMENT/math/float/math32//z80/m32_compare_callee.asm
 ../../_DEVELOPMENT/math/float/math32//z80/f32_floor.asm
 ../../_DEVELOPMENT/math/float/math32//z80/f32_fshypot.asm
 ../../_DEVELOPMENT/math/float/math32//z80/f32_fsdiv.asm
 ../../_DEVELOPMENT/math/float/math32//z80/f32_fsinvsqrt.asm
+../../_DEVELOPMENT/math/float/math32//z80/f32_compare_callee.asm
 ../../_DEVELOPMENT/math/float/math32//z80/f32_z80_sqr_32h_24x24.asm
 ../../_DEVELOPMENT/math/float/math32//z80/f32_f2long.asm
 ../../_DEVELOPMENT/math/float/math32//z80/d32_fsutil.asm
@@ -152,11 +152,11 @@
 ../../_DEVELOPMENT/math/float/math32//z80/f32_z80_mulu_de.asm
 ../../_DEVELOPMENT/math/float/math32//z80/d32_fsadd.asm
 ../../_DEVELOPMENT/math/float/math32//z80/h32_coeff_exp.asm
+../../_DEVELOPMENT/math/float/math32//z80/f32_fpclassify.asm
 ../../_DEVELOPMENT/math/float/math32//z80/f32_z80_mulu_32h_32x32.asm
 ../../_DEVELOPMENT/math/float/math32//z80/f32_z80_mulu_32_16x16.asm
 ../../_DEVELOPMENT/math/float/math32//z80/f32_unity.asm
 ../../_DEVELOPMENT/math/float/math32//z80/f32_fabs.asm
-../../_DEVELOPMENT/math/float/math32//z80/m32_fpclassify.asm
 ../../_DEVELOPMENT/math/float/math32//z80/f32_ceil.asm
 ../../_DEVELOPMENT/math/float/math32//z80/f32_fssqr.asm
 ../../_DEVELOPMENT/math/float/math32//z80/f32_z80_mulu_32h_24x24.asm
