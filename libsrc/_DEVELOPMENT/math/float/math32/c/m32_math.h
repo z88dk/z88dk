@@ -82,6 +82,9 @@ float m32_atan2f(float x, float y);
 float m32_sinhf(float x) __z88dk_fastcall;
 float m32_coshf(float x) __z88dk_fastcall;
 float m32_tanhf(float x) __z88dk_fastcall;
+float m32_asinhf(float x) __z88dk_fastcall;
+float m32_acoshf(float x) __z88dk_fastcall;
+float m32_atanhf(float x) __z88dk_fastcall;
 
 /* Exponential, logarithmic and power functions */
 float m32_sqrtf(float a) __z88dk_fastcall;
