@@ -72,7 +72,7 @@ EXTERN m32_fsnormalize
     jr NZ,dldfright             ; go shift right
 ; exponent in c, sign in b
     ex af,af                    ; set carry off
-    jp m32_fsnormalize           ; piggy back on existing code in _fsadd
+    jp m32_fsnormalize          ; piggy back on existing code in _fsnormalize
 
 ; must shift right to make h = 0 and mantissa in lde
 .dldfright

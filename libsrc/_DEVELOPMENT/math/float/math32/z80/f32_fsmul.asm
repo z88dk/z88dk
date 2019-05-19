@@ -97,8 +97,8 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     push bc                     ; return address on stack
 
 .fmrejoin
-    xor a,h                     ; xor exponents
-    ex af,af                    ; save sign flag in a7' and f' reg
+    xor a,h                     ; xor sign flags
+    ex af,af                    ; save sign flag in a[7]' and f' reg
 
     add hl,hl                   ; shift exponent into h
     scf                         ; set implicit bit
@@ -127,13 +127,12 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 
 .fmnouf
     ld b,a
+    or a
+    jp Z,m32_fszero_fastcall    ; check sum of exponents for zero
+
     ex af,af
     ld a,b
     ex af,af                    ; save sum of exponents a', and xor sign of exponents in f'
-
-    ld a,b                      ; check sum of exponents for zero
-    or a
-    jp Z,m32_fszero_fastcall
 
                                 ; a' = sum of exponents, f' = Sign of result
                                 ; first  h  = eeeeeeee, lde  = 1mmmmmmm mmmmmmmm mmmmmmmm
