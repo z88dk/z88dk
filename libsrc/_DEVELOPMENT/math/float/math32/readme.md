@@ -85,7 +85,6 @@ IEEE 754 specifies rounding the result by a process of round to even. z88dk m32 
 
 Both results are free of bias with IEEE method having a slight edge with rounding error.
 
-
 ```
 -------------------------------------------------------------------------
 IEEE round to nearest:
@@ -113,6 +112,18 @@ b s  (b=lsbit s=sticky)
 1 1		-.01
 -------------------------------------------------------------------------
 ```
+
+
+## IEEE Floating Point Expanded Mantissa Format
+
+An expanded 32-bit internal mantissa is used to calculate derived functions. This is to provide accuracy increased accuracy for the Newton-Raphson iterations, and the Horner polynomial expansions.
+
+This format is provided for both the multiply and add intrinsic functions, from which all other functions are derived.
+
+```
+;    unpacked floating point format: mantissa in dehl, exponent in b, sign in c[7]
+```
+
 ## Calling Convention
 
 The z88dk m32 library uses the sccz80 standard register and stack calling convention, but with the standard c parameter passing direction. For sccz80 the first or right hand side parameter is passed in DEHL, and the second or LHS parameter is passed on the stack. For sdcc all parameters are passed on the stack, from right to left. For both compilers, where multiple parameters are passed, they will be passed on the stack.
@@ -194,10 +205,6 @@ Of course the other side of the argument is that integers should be handled by t
 
 I guess the only way to find out is to benchmark the library.
 
-#### mulu_32_16x16
-
-The `mulu_32_16x16` function is used for Newton-Raphson iteration in the `_fsdiv` function. It is written to utilise the 8-bit hardware (or equivalent for z80) multiply.
-
 #### mulu_32h_32x32
 
 The `mulu_32h_32x32` provides just the high order bytes from a 32-bit multiply calculation for the `_fsdiv` Newton-Raphson iteration. In this iteration calculation it is important to have access to the full 32-bits (rather than just 24-bits for normal mantissa calculations).
@@ -226,7 +233,7 @@ The square function is related to the multiply function, but is simplified by ig
 
 The divide function is implemented by first obtaining the inverse of the divisor, and then passing this result to the multiply instruction, so the intrinsic function is actually finding the inverse.
 
-The Newton-Raphson method is used for finding the inverse, using full 32-bit multiplies for accuracy.
+The Newton-Raphson method is used for finding the inverse, using full 32-bit expanded mantissa multiplies and adds for accuracy.
 
 ### Derived Floating Point Functions
 
@@ -252,7 +259,7 @@ Two N-R iterations produce 5 or 6 decimal digits of accuracy. Greater accuracy h
 
 #### _fspoly
 
-All of the higher functions are implemented based on Horner's Method for polynomial expansion. Therefore to evaluate these functions efficiently, an optimised `_fspoly` function has been developed.
+All of the higher functions are implemented based on Horner's Method for polynomial expansion. Therefore to evaluate these functions efficiently, an optimised `_fspoly` function has been developed, using full 32-bit expanded mantissa multiplies and adds for accuracy..
 
 This function reads a table of coefficients stored in "ROM" and iterates the specified number of iterations to produce the result desired.
 
@@ -308,13 +315,13 @@ Generally the basic functions are accurate within 1-3 counts of the floating man
 
 If the value of the function depends on the value of the difference of 2 floating point numbers that are close to each other in value, the relative error generally becomes large, although the absolute error may remain well bounded. Examples are the logs of numbers near 1 and the sine of numbers near pi. For example, if the argument of the sine function is a floating point number is close to pi, say 5 counts of the mantissa away from pi and it is subtracted from pi the result will be a number with only 3 significant bits. The relative error in the sine result will be very large, but the absolute error will still be very small. Functions with steep slopes, such as the exponent of larger numbers will show a large relative error, since the relative error in the argument is magnified by the slope.
 
-The multiplication process should be "correct" and in fact more correct than the digi international method. Every carry term is calculated and brought into the result. Digi international code ignores the `c*f` term of the 24-bit mantissa calculation of `abc*cdf`, because they determined it wasn't needed. m32 doesn't take that short cut and calculates all the terms. This also applies to the squaring process, which should also be "correct".
+The multiplication process is "correct" and in fact more correct than the digi international method. Every carry term is calculated and brought into the result. Digi international code ignores the `c*f` term of the 24-bit mantissa calculation of `abc*cdf`, because they determined it wasn't needed. m32 doesn't take that short cut and calculates all the terms. This also applies to the squaring process, which should also be "correct".
 
-The addition / subtraction process should be "correct", and this result should be identical to m48 within the significant digits of IEEE 754.
+The addition / subtraction process is "correct", and this result should be identical to m48 within the significant digits of IEEE 754.
 
 The division process relies on N-R estimation, and it follows exactly the same process as digi international do. There are some notes about the number of significant bits of calculation required to derive a correct IEEE 24-bit mantissa, and I believe that using the `32h_32x32` calculations this outcome is achieved.
 
-The square root calculation relies on N-R and is an estimate only. With 3 iterations currently implemented I think the estimate is pretty usable. 1 iteration is good for games and nothing else.
+The square root calculation relies on N-R and is an estimate only. With 3 iterations currently implemented I think the estimate is pretty usable. 1 iteration is good for games and not much else.
 
 The rest of the derived power and trigonometric functions rely on the polynomial expansion process and will only be as accurate as the coefficients that are fed into the process. I've used those coefficients found in the Hi-Tech C library code. I guess they got them right, but their code is not known for accuracy. Someone with a mathematical background might be interested to calculate better coefficients at some stage.
 
