@@ -8,12 +8,13 @@
 ;-------------------------------------------------------------------------
 ; m32_fsadd32 - z80, z180, z80-zxn floating point add 32-bit mantissa
 ;-------------------------------------------------------------------------
+;
 ; 1) first section: unpack from F_add: to sort:
 ;    one unpacked number in hldebc the other in hl'de'bc'
 ;    unpacked format: mantissa= hlde, exponent in b, sign in c[7]
-;         in addition af' holds b xor b' used to test if add or sub needed
+;         in addition af' holds c xor c' used to test if add or sub needed
 ;
-; 2) second section: sort from sort to align, sets up smaller number in hldebc and larger in hl'de'bc'
+; 2) second section: sort from sort to align, sets up smaller number in bc hlde and larger in bc' hl'de'
 ;    This section sorts out the special cases:
 ;       to alignzero - if no alignment (right) shift needed
 ;           alignzero has properties: up to 23 normalize shifts needed if signs differ
@@ -36,9 +37,7 @@
 ;
 ; 4) 4th section add or subtract
 ;
-; 5) 5th section post normalize in separate file d32_fsnormalize32.asm
-;
-; 6) 6th section pack up in separate file d32_fsnormalize32.asm
+; 5) 5th section normalize in separate file d32_fsnormalize32.asm
 ;
 ;-------------------------------------------------------------------------
 ; FIXME clocks
@@ -178,7 +177,8 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     ld a,e                      ; lost bits, keep only 8
     ld e,d
     ld d,l
-    ld l,h                      ; upper zero
+    ld l,h
+    ld h,0                      ; upper zero
     or a                        ; test lost bits
     jr Z,aldone
     set 0,e                     ; lost bits
@@ -192,10 +192,10 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
 ; toss lost bits in a which are remote for 16 shift
 ; consider only lost bits in d
     ld a,d                      ; lost bits
+    or a,a
     ld e,l
     ld d,h
     ld hl,0                     ; hl zero
-    or a
     jr Z,aldone
     set 0,e                     ; lost bits
     jr aldone
@@ -212,19 +212,21 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     jp P,doadd
 ; here for subtract, smaller shifted right at least 2, so no more than
 ; one step of normalize
+    push hl
     exx
-    push hl                     ; lmsw
-    push de                     ; llsw
-    exx
-    ex (sp),hl                  ; smsw
-    sbc hl,de                   ; llsw-slsw subtract the mantissas
-    ex de,hl                    ; de = llsw-slsw
-    pop hl                      ; smsw
     ex de,hl
-    ex (sp),hl                  ; llsw-slsw
-    sbc hl,de                   ; lmsw-smsw subtract the mantissas
-    pop de                      ; llsw-slsw
-
+    ex (sp),hl
+    ex de,hl
+    exx
+    pop hl                      ; subtract the mantissas
+    sbc hl,de
+    exx
+    sbc hl,de
+    push de
+    exx
+    ex (sp),hl
+    exx
+    pop de
 ; difference larger-smaller in hlde
 ; exponent of result in c sign of result in b
     bit 7,h                     ; check for norm
@@ -237,19 +239,24 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
 
 ; here for do add c has exponent of result (larger) b or b' has sign
 .doadd
+    xor a
+    push hl
     exx
-    push hl                     ; lmsw
-    push de                     ; llsw
-    exx
-    ex (sp),hl                  ; smsw
-    add hl,de                   ; llsw+slsw subtract the mantissas
-    ex de,hl                    ; de = llsw+slsw
-    pop hl                      ; smsw
     ex de,hl
-    ex (sp),hl                  ; llsw-slsw
-    adc hl,de                   ; lmsw+smsw subtract the mantissas
-    pop de                      ; llsw+slsw     
-    jr NC,doadd1                ; see if overflow
+    ex (sp),hl
+    ex de,hl
+    exx
+    pop hl                      ; add the mantissas
+    add hl,de
+    exx
+    adc hl,de
+    adc a,a                     ; see if overflow from h
+    push de
+    exx
+    ex (sp),hl
+    exx
+    pop de                      ; get least of sum
+    jr Z,doadd1                 ; if no overflow
     rr h
     rr l
     rr d
@@ -328,8 +335,7 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
 ; difference larger-smaller in hlde
 ; exponent of result in b sign of result in c
 ; now do normalize
-    scf
-    ex af,af                    ; if no C an alternate exit is taken
+    ex de,hl
 
-    jp m32_fsnormalize32        ; now begin to normalize
+    jp m32_fsnormalize32        ; now begin to normalize with bc dehl
 

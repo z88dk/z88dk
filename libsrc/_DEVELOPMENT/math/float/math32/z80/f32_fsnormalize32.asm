@@ -6,12 +6,12 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-; m32_fsnormalize - z80, z180, z80-zxn normalisation code
+; m32_fsnormalize32 - z80, z180, z80-zxn unpacked normalisation code
 ;-------------------------------------------------------------------------
 ;
-;    enter here with af' carry clear for m32_float32, m32_float32u
-;
 ;    unpacked format: mantissa= dehl, exponent in b, sign in c[7]
+;    return normalized result also in unpacked format
+;
 ;
 ;-------------------------------------------------------------------------
 ; FIXME clocks
@@ -59,14 +59,15 @@ PUBLIC m32_fsnormalize32
     rl d
     jr C,S32H3
     ld a,-3                     ; count
-    jr normdone1                ; from normalize
+    jr normdone                 ; from normalize
 
 .S32H1
     rr d                        ; reverse overshift
     rr e
     rr h
     rr l
-    jr normdone1_a              ; zero adjust
+    xor a                       ; zero adjust
+    jr normdone
 
 .S32H2
     rr d
@@ -74,7 +75,7 @@ PUBLIC m32_fsnormalize32
     rr h
     rr l
     ld a,-1
-    jr normdone1
+    jr normdone
 
 .S32H3
     rr d
@@ -82,7 +83,7 @@ PUBLIC m32_fsnormalize32
     rr h
     rr l
     ld a,-2
-    jr normdone1
+    jr normdone
 
 .S32L                           ; shift 32 bits 4-7 left
     add hl,hl
@@ -111,7 +112,7 @@ PUBLIC m32_fsnormalize32
     jr C,S32Lover2
 ; 6 shift case
     ld a,-6
-    jr normdone1
+    jr normdone
 
 .S32L4more
     add hl,hl
@@ -127,37 +128,36 @@ PUBLIC m32_fsnormalize32
     rl e
     rl d
     ld a,-7
-    jr normdone1
+    jr normdone
 
 .S32Lover1                      ; total of 4 shifts
     rr d
     rr e
     rr h
-    rr l                       ; correct overshift
+    rr l                        ; correct overshift
     ld a,-4
-    jr normdone1
+    jr normdone
 
 .S32Lover2                      ; total of 5 shifts
     rr d
     rr e
     rr h
     rr l
-    ld a,-5                     ; this is the very worst case, drop through to .normdone1
+    ld a,-5                     ; this is the very worst case
+                                ; drop through to .normdone
 
 ; enter here to continue after normalize
 ; this path only on subtraction
 ; a has left shift count, lde has mantissa, b has exponent before shift
 ; b has original sign of larger number
 ;
-.normdone1
+.normdone
     add a,b                     ; exponent of result
     ld b,a
     jr NC,normzero              ; if underflow return zero
-
-.normdone1_a                    ; case of zero shift
     ret                         ; return BC DEHL
 
-.normzero                       ; return signed zero
+.normzero                       ; return zero
     xor a
     ld b,a
     ld d,a
@@ -185,7 +185,7 @@ PUBLIC m32_fsnormalize32
     ld e,l
     ld hl,0                     ; zero
     ld a,-22
-    jr normdone1
+    jr normdone
 
 .S16Lover1                      ; total of 4
     rr h
@@ -194,7 +194,7 @@ PUBLIC m32_fsnormalize32
     ld e,l
     ld hl,0                     ; zero
     ld a,-20
-    jr normdone1
+    jr normdone
 
 .S16Lover2                      ; total of 5
     rr h
@@ -203,7 +203,7 @@ PUBLIC m32_fsnormalize32
     ld e,l
     ld hl,0                     ; zero
     ld a,-21
-    jr normdone1
+    jr normdone
 
 .S16L4more
     add hl,hl
@@ -214,7 +214,7 @@ PUBLIC m32_fsnormalize32
     ld e,l
     ld hl,0                     ; zero
     ld a,-23
-    jr normdone1
+    jr normdone
 
 ; shift 24 bit fraction by 4-7
 ; h is zero, 24 bits number in lde
@@ -241,7 +241,7 @@ PUBLIC m32_fsnormalize32
     ld h,l
     ld l,0
     ld a,-14    
-    jp normdone1
+    jp normdone
 
 .S24L4
     ld d,e
@@ -249,7 +249,7 @@ PUBLIC m32_fsnormalize32
     ld h,l
     ld l,0
     ld a,-12
-    jp normdone1
+    jp normdone
 
 .S24L5                          ; for total of 5 shifts left
     ld d,e
@@ -257,7 +257,7 @@ PUBLIC m32_fsnormalize32
     ld h,l
     ld l,0
     ld a,-13    
-    jp normdone1
+    jp normdone
 
 .S24L4more
     add hl,hl
@@ -273,7 +273,7 @@ PUBLIC m32_fsnormalize32
     ld h,l
     ld l,0
     ld a,-15
-    jp normdone1
+    jp normdone
 ;
 ; worst case 68 to get past this section
 ; shift 0-3, l is zero , 16 bits in de
@@ -294,7 +294,7 @@ PUBLIC m32_fsnormalize32
     ld h,l
     ld l,0
     ld a,-11
-    jp normdone1
+    jp normdone
 
 .S24H1                          ; overshift
     rr e
@@ -305,7 +305,7 @@ PUBLIC m32_fsnormalize32
     ld h,l
     ld l,0
     ld a,-8
-    jp normdone1
+    jp normdone
 
 .S24H2                          ; one shift
     ld d,e
@@ -313,7 +313,7 @@ PUBLIC m32_fsnormalize32
     ld h,l
     ld l,0
     ld a,-9
-    jp normdone1
+    jp normdone
 
 .S24H3
     ld d,e
@@ -321,7 +321,7 @@ PUBLIC m32_fsnormalize32
     ld h,l
     ld l,0
     ld a,-10
-    jp normdone1
+    jp normdone
 
 ; shift 8 left 0-3
 ; number in l
@@ -337,7 +337,7 @@ PUBLIC m32_fsnormalize32
     ld e,l
     ld hl,0                     ; zero
     ld a,-19
-    jp normdone1
+    jp normdone
 
 .S16H1
     rr h
@@ -346,7 +346,7 @@ PUBLIC m32_fsnormalize32
     ld e,l
     ld hl,0                     ; zero
     ld a,-16                    ; zero shifts
-    jp normdone1
+    jp normdone
 
 .S16H2
     rr h
@@ -355,7 +355,7 @@ PUBLIC m32_fsnormalize32
     ld e,l
     ld hl,0                     ; zero
     ld a,-17                    ; one shift
-    jp normdone1
+    jp normdone
 
 .S16H3
     rr h
@@ -364,4 +364,4 @@ PUBLIC m32_fsnormalize32
     ld e,l
     ld hl,0                     ; zero   
     ld a,-18
-    jp normdone1                ; worst case S16H
+    jp normdone                ; worst case S16H

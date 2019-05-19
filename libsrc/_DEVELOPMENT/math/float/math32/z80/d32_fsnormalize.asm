@@ -62,28 +62,28 @@ PUBLIC m32_fsnormalize
     rl l
     jr C,S24H3
     ld a,-3                     ; count
-    jr normdone1                ; from normalize
+    jr normdone                ; from normalize
 
 .S24H1
     rr l
     rr d
     rr e                        ; reverse overshift
-    ld a,c                      ; zero adjust
-    jr normdone1_a
+    xor a                       ; zero adjust
+    jr normdone
 
 .S24H2
     rr l
     rr d
     rr e
     ld a,-1
-    jr normdone1
+    jr normdone
 
 .S24H3
     rr l
     rr d
     rr e
     ld a,-2
-    jr normdone1
+    jr normdone
 
 .S24L                           ; shift 24 bits 4-7 left, count in C
     sla e
@@ -112,7 +112,7 @@ PUBLIC m32_fsnormalize
     jr C,S24Lover2
 ; 6 shift case
     ld a,-6
-    jr normdone1
+    jr normdone
 
 .S24L4more
     sla e
@@ -128,31 +128,30 @@ PUBLIC m32_fsnormalize
     rl d
     rl l
     ld a,-7
-    jr normdone1
+    jr normdone
 
 .S24Lover1                      ; total of 4 shifts
     rr l
     rr d
     rr e                        ; correct overshift
     ld a,-4
-    jr normdone1
+    jr normdone
 
 .S24Lover2                      ; total of 5 shifts
     rr l
     rr d
     rr e
-    ld a,-5                     ; this is the very worst case, drop through to .normdone1
+    ld a,-5                     ; this is the very worst case
+                                ; drop through to .normdone
 
 ; enter here to continue after normalize
 ; this path only on subtraction
 ; a has left shift count, lde has mantissa, c has exponent before shift
 ; b has original sign of larger number
 ;
-.normdone1
+.normdone
     add a,c                     ; exponent of result
     jr NC,normzero              ; if underflow return zero
-
-.normdone1_a                    ; case of zero shift
     rl l
     rl b                        ; sign
     rra
@@ -188,21 +187,21 @@ PUBLIC m32_fsnormalize
     ld l,e
     ld e,d                      ; zero
     ld a,-22
-    jr normdone1
+    jr normdone
 
 .S8Lover1                       ; total of 4
     rr e
     ld l,e
     ld e,d                      ; zero
     ld a,-20
-    jr normdone1
+    jr normdone
 
 .S8Lover2                       ; total of 5
     rr e
     ld l,e
     ld e,d                      ; zero
     ld a,-21
-    jr normdone1
+    jr normdone
 
 .S8L4more
     sla e
@@ -212,7 +211,7 @@ PUBLIC m32_fsnormalize
     ld l,e
     ld e,d                      ; zero
     ld a,-23
-    jr normdone1
+    jr normdone
 
 ; shift 16 bit fraction by 4-7
 ; l is zero, 16 bits number in de
@@ -238,21 +237,21 @@ PUBLIC m32_fsnormalize
     ld d,e
     ld e,0
     ld a,-14
-    jp normdone1
+    jp normdone
 
 .S16L4
     ld l,d
     ld d,e
     ld e,0
     ld a,-12
-    jp normdone1
+    jp normdone
 
 .S16L5                          ; for total of 5 shifts left
     ld l,d
     ld d,e
     ld e,0
     ld a,-13
-    jp normdone1
+    jp normdone
 
 .S16L4more
     sla e
@@ -267,7 +266,7 @@ PUBLIC m32_fsnormalize
     ld d,e
     ld e,0
     ld a,-15
-    jp normdone1
+    jp normdone
 ;
 ; worst case 68 to get past this section
 ; shift 0-3, l is zero , 16 bits in de
@@ -287,7 +286,7 @@ PUBLIC m32_fsnormalize
     ld d,e
     ld e,0
     ld a,-11
-    jp normdone1
+    jp normdone
 
 .S16H1                          ; overshift
     rr d
@@ -296,21 +295,21 @@ PUBLIC m32_fsnormalize
     ld d,e
     ld e,0
     ld a,-8
-    jp normdone1
+    jp normdone
 
 .S16H2                          ; one shift
     ld l,d
     ld d,e
     ld e,0
     ld a,-9
-    jp normdone1
+    jp normdone
 
 .S16H3
     ld l,d
     ld d,e
     ld e,0   
     ld a,-10
-    jp normdone1
+    jp normdone
 
 ; shift 8 left 0-3
 ; number in e, l, d==zero
@@ -325,25 +324,25 @@ PUBLIC m32_fsnormalize
     ld l,e
     ld e,d                      ; zero
     ld a,-19
-    jp normdone1
+    jp normdone
 
 .S8H1
     rr e                        ; correct overshift
     ld l,e
     ld e,d
     ld a,-16                    ; zero shifts
-    jp normdone1
+    jp normdone
 
 .S8H2
     rr e                        ; correct overshift
     ld l,e
     ld e,d
     ld a,-17                    ; one shift
-    jp normdone1
+    jp normdone
 
 .S8H3
     rr e                        ; correct overshift
     ld l,e
     ld e,d    
     ld a,-18
-    jp normdone1                ; worst case S8H
+    jp normdone                ; worst case S8H

@@ -12,6 +12,7 @@
 ; m32_fsadd - z80, z180, z80-zxn floating point add
 ; m32_fssub - z80, z180, z80-zxn floating point subtract
 ;-------------------------------------------------------------------------
+;
 ; 1) first section: unpack from F_add: to sort:
 ;    one unpacked number in hldebc the other in hl'de'bc'
 ;    unpacked format: h==0; mantissa= lde, sign in b, exponent in c
@@ -40,7 +41,7 @@
 ;
 ; 4) 4th section add or subtract
 ;
-; 5) 5th section post normalize in separate file d32_fsnormalize.asm
+; 5) 5th section normalize in separate file d32_fsnormalize.asm
 ;
 ; 6) 6th section pack up in separate file d32_fsnormalize.asm
 ;
@@ -165,7 +166,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     jr C,align                  ; if 23 or fewer shifts
 ; use other side, adding small quantity that can be ignored
     exx
-    jp doadd1                  ; pack result
+    jp doadd1                   ; pack result
 
 ; align begin align count zero
 .align
@@ -226,10 +227,10 @@ PUBLIC m32_fsadd, m32_fsadd_callee
 ; here shift by 16
 ; toss lost bits in a which are remote for 16 shift
 ; consider only lost bits in d and h
-    ld e,l
-    ld a,d                        ; lost bits
-    ld d,0
+    ld a,d                      ; lost bits
     or a,h
+    ld e,l
+    ld d,0
     ld h,d                      ; hl zero
     ld l,d
     jr Z,aldone
@@ -242,6 +243,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld h,0
     jr Z,aldone
     set 0,e
+    
 ; aldone here
 .aldone
     ex af,af                    ; carry clear
