@@ -110,7 +110,6 @@ PUBLIC m32_fspoly_callee
     push de
 
     exx
-
     sla e
     sla d                       ; get full exponent into d
     rr c                        ; put sign in c
