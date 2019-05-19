@@ -25,9 +25,8 @@ SECTION code_math
 
 PUBLIC m32_mulu_32h_32x32
 
-defc m32_mulu_32h_32x32 = l_z180_mulu_32h_32x32
 
-.l_z180_mulu_32h_32x32
+.m32_mulu_32h_32x32
 
     ld c,l
     ld b,h
@@ -37,8 +36,6 @@ defc m32_mulu_32h_32x32 = l_z180_mulu_32h_32x32
     push hl
     exx
     pop de
-
-.l0_z180_mulu_32h_32x32
 
     ; multiplication of two 32-bit numbers into a 32-bit product
     ;
