@@ -7,8 +7,8 @@
 ;
 ;       Exit:     z=number is zero
 ;              (nz)=number is non-zero
-;                 c=number is left > right
-;                nc=number is right < left
+;                 c=number is negative 
+;                nc=number is positive
 
 m32_compare_callee:
         pop     bc      ;return address from this function
@@ -30,29 +30,42 @@ m32_compare_callee:
         exx             ;right
         sbc     a,h
         ld      b,a
+	exx		;left
 	ld	a,e
-        exx             ;left
+	exx		;right
         sbc     a,e
+	exx		;left
 	ld	c,a
-        exx             ;right
         ld      a,d
-        exx             ;left
+        exx             ;right
         sbc     a,d
+	exx		;left
         ld      b,a
 
 	; left dehl = float, bc = highword of result
-	; right dehl = float, bc = low word of result
-
-	; Calculate zero state of result
+	; (exx) right dehl = float, bc = low word of result
 	ld	a,b
 	or	c
+
+	bit	7,b
+	jr	z,consider_positive
+
+	; Calculate zero state of result
 	exx
 	or	b
 	or	c
 	exx
+	ld	hl,1	
+	scf
+	ret
 
-	; If sign is set then left > right
+consider_positive:
+	exx
+	or	b
+	or	c
+	exx
+	scf
+	ccf
 	ld	hl,1
-	rlc	b
 	ret
 	

@@ -11,7 +11,6 @@ EXTERN m32_compare_callee
 cm32_sdcc___fslt_callee:
 	call	cm32_sdcc_fsreadr_callee	;Exit dehl = right
 	call	m32_compare_callee
-        ccf
         ret     c
         dec     hl
         ret

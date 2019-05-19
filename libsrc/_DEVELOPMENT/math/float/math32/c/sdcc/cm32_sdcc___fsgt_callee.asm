@@ -13,7 +13,7 @@ cm32_sdcc___fsgt_callee:
 	call	m32_compare_callee
         jr      z,gt1
         ccf
-        ret     nc
+        ret     c
 gt1:
         dec     hl
         ret
