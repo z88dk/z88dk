@@ -116,7 +116,7 @@ Both results are free of bias with IEEE method having a slight edge with roundin
 
 ## IEEE Floating Point Expanded Mantissa Format
 
-An expanded 32-bit internal mantissa is used to calculate derived functions. This is to provide accuracy increased accuracy for the Newton-Raphson iterations, and the Horner polynomial expansions.
+An expanded 32-bit internal mantissa is used to calculate derived functions. This is to provide increased accuracy for the Newton-Raphson iterations, and the Horner polynomial expansions.
 
 This format is provided for both the multiply and add intrinsic internal 32-bit mantissa functions, from which other functions are derived.
 
