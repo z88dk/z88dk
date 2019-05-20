@@ -26,7 +26,7 @@
 ;
 ; D' := D / 2e+1   // scale between 0.5 and 1
 ; N' := N / 2e+1
-; X := 48/17 − 32/17 × D'   // precompute constants with same precision as D
+; X := 48/17 − 31/17 × D'   // precompute constants with same precision as D
 ;
 ; while
 ;    X := X + X × (1 - D' × X)
@@ -70,12 +70,14 @@ PUBLIC m32_fsinv_fastcall
 
     ld h,0bfh                   ; scale to - 0.5 <= D' < 1.0
     srl l
-    ex de,hl                    ; D' in DEHL
+    ex de,hl                    ; - D' in DEHL
 
-    push de                     ; D' msw on stack for D[2] calculation
-    push hl                     ; D' lsw on stack for D[2] calculation
-    push de                     ; D' msw on stack for D[1] calculation
-    push hl                     ; D' lsw on stack for D[1] calculation
+    push de                     ; - D' msw on stack for D[3] calculation
+    push hl                     ; - D' lsw on stack for D[3] calculation
+    push de                     ; - D' msw on stack for D[2] calculation
+    push hl                     ; - D' lsw on stack for D[2] calculation
+    push de                     ; - D' msw on stack for D[1] calculation
+    push hl                     ; - D' lsw on stack for D[1] calculation
 
     sla e
     sla d                       ; get D' full exponent into d
@@ -88,24 +90,24 @@ PUBLIC m32_fsinv_fastcall
     ld h,l
     ld l,0
 ;-------------------------------;
-                                ; X = 48/17 − 32/17 × D'
+                                ; X = 48/17 − 31/17 × D'
     exx
     ld bc,04034h
     push bc
     ld bc,0B4B5h
     push bc                
-    ld bc,03FF0h
+    ld bc,03FE9h
     push bc
-    ld bc,0F0F1h
+    ld bc,06969h
     push bc
     exx
-    call m32_fsmul24x32         ; (float) 32/17 × D'
-    call m32_fsadd24x32         ; X = 48/17 − 32/17 × D'
+    call m32_fsmul24x32         ; (float) 31/17 × D'
+    call m32_fsadd24x32         ; X = 48/17 − 31/17 × D'
 
 ;-------------------------------;
                                 ; X := X + X × (1 - D' × X)
     exx
-    pop hl                      ; D' for D[1] calculation
+    pop hl                      ; - D' for D[1] calculation
     pop de
     exx
     push bc                     ; X
@@ -119,7 +121,7 @@ PUBLIC m32_fsinv_fastcall
     push bc
     ld bc,0
     push bc
-    push de                      ; D' for D[1] calculation
+    push de                      ; - D' for D[1] calculation
     push hl
     exx
     call m32_fsmul24x32         ; (float) - D' × X
@@ -130,7 +132,7 @@ PUBLIC m32_fsinv_fastcall
 ;-------------------------------;
                                 ; X := X + X × (1 - D' × X)
     exx
-    pop hl                      ; D' for D[2] calculation
+    pop hl                      ; - D' for D[2] calculation
     pop de
     exx
     push bc                     ; X
@@ -144,7 +146,32 @@ PUBLIC m32_fsinv_fastcall
     push bc
     ld bc,0
     push bc
-    push de                      ; D' for D[2] calculation
+    push de                      ; - D' for D[2] calculation
+    push hl
+    exx
+    call m32_fsmul24x32         ; (float) - D' × X
+    call m32_fsadd24x32         ; (float) 1 - D' × X
+    call m32_fsmul32x32         ; (float) X × (1 - D' × X)
+    call m32_fsadd32x32         ; (float) X + X × (1 - D' × X)
+
+;-------------------------------;
+                                ; X := X + X × (1 - D' × X)
+    exx
+    pop hl                      ; - D' for D[3] calculation
+    pop de
+    exx
+    push bc                     ; X
+    push de
+    push hl
+    push bc                     ; X
+    push de
+    push hl
+    exx
+    ld bc,03f80h                ; 1.0
+    push bc
+    ld bc,0
+    push bc
+    push de                      ; - D' for D[3] calculation
     push hl
     exx
     call m32_fsmul24x32         ; (float) - D' × X
@@ -177,4 +204,3 @@ PUBLIC m32_fsinv_fastcall
     rr e
     ld d,a
     ret                         ; return IEEE DEHL
-

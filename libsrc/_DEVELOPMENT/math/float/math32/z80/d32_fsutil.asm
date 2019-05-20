@@ -27,7 +27,7 @@ PUBLIC m32_fsmax_fastcall
 
 ; here to return a legal zero in dehl
 .m32_fszero_fastcall
-    ld d,a
+    ld a,d
     and 080h
     ld d,a
     ld e,0
