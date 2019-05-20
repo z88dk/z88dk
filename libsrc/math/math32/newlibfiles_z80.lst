@@ -56,11 +56,13 @@
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sccz80/atanh_fastcall.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sccz80/fabs.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sccz80/floor_fastcall.asm
+../../_DEVELOPMENT/math/float/math32//lm32/c/sccz80/round.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sccz80/l_f32_ne.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sccz80/log10_fastcall.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sccz80/sin.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sccz80/asinh_fastcall.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sccz80/l_f32_mul.asm
+../../_DEVELOPMENT/math/float/math32//lm32/c/sccz80/round_fastcall.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sccz80/cos.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sccz80/l_f32_f2long.asm
 ../../_DEVELOPMENT/math/float/math32//lm32/c/sccz80/l_f32_zero.asm
@@ -148,6 +150,7 @@
 ../../_DEVELOPMENT/math/float/math32//c/asm/m32_acosf.asm
 ../../_DEVELOPMENT/math/float/math32//c/asm/m32_asinh.asm
 ../../_DEVELOPMENT/math/float/math32//c/asm/m32_atanh.asm
+../../_DEVELOPMENT/math/float/math32//c/asm/m32_roundf.asm
 ../../_DEVELOPMENT/math/float/math32//c/asm/m32_logf.asm
 ../../_DEVELOPMENT/math/float/math32//c/asm/m32_frexpf.asm
 ../../_DEVELOPMENT/math/float/math32//c/asm/m32_atanf.asm
@@ -183,6 +186,7 @@
 ../../_DEVELOPMENT/math/float/math32//c/sdcc/cm32_sdcc_fsinv.asm
 ../../_DEVELOPMENT/math/float/math32//c/sdcc/cm32_sdcc___fslt_callee.asm
 ../../_DEVELOPMENT/math/float/math32//c/sdcc/cm32_sdcc_fsmul.asm
+../../_DEVELOPMENT/math/float/math32//c/sdcc/cm32_sdcc_round.asm
 ../../_DEVELOPMENT/math/float/math32//c/sdcc/cm32_sdcc___fs2uint_callee.asm
 ../../_DEVELOPMENT/math/float/math32//c/sdcc/cm32_sdcc_sin.asm
 ../../_DEVELOPMENT/math/float/math32//c/sdcc/cm32_sdcc_fsread.asm
@@ -278,6 +282,7 @@
 ../../_DEVELOPMENT/math/float/math32//c/sccz80/cm32_sccz80_asin.asm
 ../../_DEVELOPMENT/math/float/math32//c/sccz80/cm32_sccz80_fpclassify.asm
 ../../_DEVELOPMENT/math/float/math32//c/sccz80/cm32_sccz80_acos.asm
+../../_DEVELOPMENT/math/float/math32//c/sccz80/cm32_sccz80_round.asm
 ../../_DEVELOPMENT/math/float/math32//c/sccz80/cm32_sccz80_fsmul.asm
 ../../_DEVELOPMENT/math/float/math32//c/sccz80/cm32_sccz80_fsinv.asm
 ../../_DEVELOPMENT/math/float/math32//c/sccz80/cm32_sccz80_fsadd_callee.asm

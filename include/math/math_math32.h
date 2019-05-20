@@ -90,8 +90,9 @@ extern double_t __LIB__ log10(double_t x);
 /* Nearest integer, absolute value, and remainder functions */
 extern double_t __LIB__ ceil(double_t x);
 extern double_t __LIB__ floor(double_t x);
+extern double_t __LIB__ round(double_t x);
 #define trunc(a) (a>0.?floor(a):ceil(a))
-#define round(a) (a>0.?floor(a+0.5):ceil(a-0.5))
+//#define round(a) (a>0.?floor(a+0.5):ceil(a-0.5))
 #define rint(a) ceil(a)
 
 /* Manipulation */

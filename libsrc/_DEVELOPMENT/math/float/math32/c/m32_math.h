@@ -102,6 +102,7 @@ float m32_ceil(float x) __z88dk_fastcall;
 float m32_floor(float x) __z88dk_fastcall;
 float m32_modff(float x, float * y);
 float m32_fmodf(float x, float y);
+float m32_roundf(float x) __z88dk_fastcall;
 
 /* Intrinsic functions */
 float m32_sqr(float a) __z88dk_fastcall;

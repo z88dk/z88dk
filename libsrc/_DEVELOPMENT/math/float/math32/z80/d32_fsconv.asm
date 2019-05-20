@@ -33,6 +33,7 @@ EXTERN m32_fsnormalize
 ; now convert long in dehl to float in dehl
 .m32_float32
     ex de,hl                    ; hlde
+    ld  b,0			; clear sign
     bit 7,h                     ; test sign, negate if negative
     jr Z,dldf0
     ld b,h                      ; to hold the sign, put copy of MSB into b
