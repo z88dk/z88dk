@@ -72,6 +72,8 @@ PUBLIC m32_fsinv_fastcall
     srl l
     ex de,hl                    ; - D' in DEHL
 
+    push de                     ; - D' msw on stack for D[3] calculation
+    push hl                     ; - D' lsw on stack for D[3] calculation
     push de                     ; - D' msw on stack for D[2] calculation
     push hl                     ; - D' lsw on stack for D[2] calculation
     push de                     ; - D' msw on stack for D[1] calculation
@@ -145,6 +147,31 @@ PUBLIC m32_fsinv_fastcall
     ld bc,0
     push bc
     push de                      ; - D' for D[2] calculation
+    push hl
+    exx
+    call m32_fsmul24x32         ; (float) - D' × X
+    call m32_fsadd24x32         ; (float) 1 - D' × X
+    call m32_fsmul32x32         ; (float) X × (1 - D' × X)
+    call m32_fsadd32x32         ; (float) X + X × (1 - D' × X)
+
+;-------------------------------;
+                                ; X := X + X × (1 - D' × X)
+    exx
+    pop hl                      ; - D' for D[3] calculation
+    pop de
+    exx
+    push bc                     ; X
+    push de
+    push hl
+    push bc                     ; X
+    push de
+    push hl
+    exx
+    ld bc,03f80h                ; 1.0
+    push bc
+    ld bc,0
+    push bc
+    push de                      ; - D' for D[3] calculation
     push hl
     exx
     call m32_fsmul24x32         ; (float) - D' × X
