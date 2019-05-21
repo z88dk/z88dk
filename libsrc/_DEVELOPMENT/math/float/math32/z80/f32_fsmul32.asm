@@ -135,7 +135,7 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
 
 .fm0
     inc b
-    ret NC                      ; return BC DEHL
+    ret NZ                      ; return BC DEHL
                                 ; othewise overflow
 .mulovl
     ex af,af                    ; get sign
