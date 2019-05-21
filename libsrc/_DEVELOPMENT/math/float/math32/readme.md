@@ -27,8 +27,8 @@ Where not written by me, the functions were sourced from:
 
   *  The z80 multiply (without a hardware instruction) is implemented with an unrolled equivalent to the z80-zxn `mul de`, which is designed to have no side effect other than resetting the flag register.
 
-  *  Mantissa calculations are done with 24-bits and 8-bits for rounding. Rounding is simple, using the Digi International method, but can be if required expanded to the IEEE standard, with a performance penalty.
-  
+  *  Mantissa calculations are done with 24-bits and 8-bits for rounding. Rounding is a simple method, but can be if required expanded to the IEEE standard with a performance penalty.
+
   *  Derived functions are calculated with a 32-bit internal mantissa calculation path without rounding, to provide the maximum accuracy when repeated multiplications and additions are required.
 
   *  Higher functions are written in C, for maintainability, and draw upon the intrinsic functions including the square root, square, and polynomial evaluation, as well as the 4 standard arithmetic functions.
@@ -102,10 +102,10 @@ Both results are free of bias with IEEE method having a slight edge with roundin
 
 -------------------------------------------------------------------------
     This z88dk m32 library rounds the number using a single sticky bit
-    which is "ored" to with the lsb of the 32-bit result from
-    any intrinsic calculation:
+    which uses the lsb[7] of the of the 32-bit result from any
+    intrinsic calculation:
 
-    b s  (b=lsbit s=sticky)
+    b s  (b=lsbit[7] s=sticky)
     0 0		exact
     0 1		+.01
     1 0		exact

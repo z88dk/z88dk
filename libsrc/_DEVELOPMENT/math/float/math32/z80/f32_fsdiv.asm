@@ -181,26 +181,35 @@ PUBLIC m32_fsinv_fastcall
 
 ;-------------------------------;
 
-    ld a,l                      ; round using digi norm's method
-    or a
-    jr Z,fd0
-    set 0,h
-
-.fd0
-
-    ld l,h                      ; align 32-bit mantissa to IEEE 24-bit mantissa
-    ld h,e
-    ld e,d
-
     pop af                      ; recover D exponent and sign in C
     rr c                        ; save sign in c
     sub a,07fh                  ; calculate new exponent for 1/D
     neg
     add a,07eh   
+    ld b,a
 
+    ld a,l
+    ld l,h                      ; align 32-bit mantissa to IEEE 24-bit mantissa
+    ld h,e
+    ld e,d
+
+    or a                        ; round using feilipu method
+    jr Z,fd0
+    inc l
+    jr NZ,fd0
+    inc h
+    jr NZ,fd0
+    inc e
+    jr NZ,fd0
+    rr e
+    rr h
+    rr l
+    inc b
+
+.fd0
     sla e
     sla c                       ; recover sign from c
-    rra
+    rr b
     rr e
-    ld d,a
+    ld d,b
     ret                         ; return IEEE DEHL

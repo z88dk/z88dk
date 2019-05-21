@@ -8,7 +8,7 @@ Each subdirectory contains an independent floating point math implementation.
    An independent 48-bit floating point package for all targets.
    
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ;; mathd32
+   ;; math32
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    An independent 32-bit floating point package for all targets.

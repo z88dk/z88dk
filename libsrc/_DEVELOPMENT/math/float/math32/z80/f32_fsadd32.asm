@@ -175,11 +175,11 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     jr NC,al_5
 ; shift by 8 right, no 16 possible
     ld a,e                      ; lost bits, keep only 8
+    or a                        ; test lost bits
     ld e,d
     ld d,l
     ld l,h
     ld h,0                      ; upper zero
-    or a                        ; test lost bits
     jr Z,aldone
     set 0,e                     ; lost bits
     jr aldone
@@ -192,7 +192,7 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
 ; toss lost bits in a which are remote for 16 shift
 ; consider only lost bits in d
     ld a,d                      ; lost bits
-    or a,a
+    or a                        ; test lost bits
     ld e,l
     ld d,h
     ld hl,0                     ; hl zero
@@ -202,7 +202,7 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
 
 ; here no 8 or 16 shift, lost bits in a-reg bits 6,5,4, other bits zero's
 .al_6
-    or a                        ; more lost bits
+    or a                        ; test lost bits
     jr Z,aldone
     set 0,e
     
