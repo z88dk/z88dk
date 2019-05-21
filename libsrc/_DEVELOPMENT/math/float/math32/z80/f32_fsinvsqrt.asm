@@ -194,16 +194,25 @@ PUBLIC m32_fssqrt, m32_fssqrt_fastcall, m32_fsinvsqrt_fastcall
 
 ;----------- snip ----------
 
-    ld a,l                      ; round using digi norm's method
-    or a
-    jr Z,fi0
-    set 0,h
-
-.fi0
+    ld a,l
     ld l,h                      ; align 32-bit mantissa to IEEE 24-bit mantissa
     ld h,e
     ld e,d
 
+    or a                        ; round using feilipu method
+    jr Z,fd0
+    inc l
+    jr NZ,fd0
+    inc h
+    jr NZ,fd0
+    inc e
+    jr NZ,fd0
+    rr e
+    rr h
+    rr l
+    inc b
+
+.fd0
     sla e
     sla c                       ; recover sign from c
     rr b

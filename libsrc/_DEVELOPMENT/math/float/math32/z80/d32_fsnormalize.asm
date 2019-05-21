@@ -267,10 +267,9 @@ PUBLIC m32_fsnormalize
     ld e,0
     ld a,-15
     jp normdone
-;
-; worst case 68 to get past this section
-; shift 0-3, l is zero , 16 bits in de
-;
+
+; shift 0-3, l is zero
+; 16 bits in de
 .S16H
     sla e
     rl d
