@@ -103,7 +103,7 @@ PUBLIC m32_fssqr_fastcall
 
 .fs1
     inc b
-    jr C,mulovl
+    jr Z,mulovl
 
 .fs2
     ld a,e
