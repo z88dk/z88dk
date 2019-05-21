@@ -147,8 +147,7 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     scf
 
 .fm1
-    ld c,0                      ; put sign bit in C
-    rr c
+    rr c                        ; put sign bit in C
     ld b,a                      ; put exponent into B
 
     ex af,af

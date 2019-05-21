@@ -37,7 +37,7 @@ SECTION code_math
 EXTERN m32_fsmul, m32_fsmul_callee
 
 EXTERN m32_fsmul32x32, m32_fsmul24x32, m32_fsadd32x32, m32_fsadd24x32
-EXTERN m32_fsmin_fastcall, m32_fsmax_fastcall
+EXTERN m32_fsmin_fastcall
 
 PUBLIC m32_fssqrt, m32_fssqrt_fastcall, m32_fsinvsqrt_fastcall
 
@@ -61,7 +61,7 @@ PUBLIC m32_fssqrt, m32_fssqrt_fastcall, m32_fsinvsqrt_fastcall
     or a                        ; divide by zero?
     jp Z,m32_fsmin_fastcall    
     and 080h                    ; negative number?
-    jp NZ,m32_fsmax_fastcall
+    jp NZ,m32_fsmin_fastcall
     
     ld b,d                      ; retain original y sign & exponent
     set 7,d                     ; make y negative
@@ -214,7 +214,7 @@ PUBLIC m32_fssqrt, m32_fssqrt_fastcall, m32_fsinvsqrt_fastcall
 
 .fd0
     sla e
-    sla c                       ; recover sign from c
+    xor a                       ; set sign in C positive
     rr b
     rr e
     ld d,b
