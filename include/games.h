@@ -196,9 +196,9 @@ extern const unsigned char *joystick_type[];
 
 #ifdef __SPECTRUM__
 #ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = {"Kempston","Sinclair 1","Sinclair 2","Cursor","Fuller"};
+	const unsigned char *joystick_type[] = {"Kempston","Sinclair 1","Sinclair 2","Cursor","Fuller","QAOP-MN"};
 #endif
-	#define GAME_DEVICES 5
+	#define GAME_DEVICES 6
 #endif
 
 #ifdef __PASOPIA7__
