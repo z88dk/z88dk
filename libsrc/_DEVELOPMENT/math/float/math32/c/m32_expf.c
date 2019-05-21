@@ -1,7 +1,9 @@
 
-#include <math.h>
+#include "m32_math.h"
 
-float expf (float x) __z88dk_fastcall
+extern float m32_coeff_exp[];
+
+float m32_expf (float x) __z88dk_fastcall
 {
     int16_t exp;
     uint8_t sign;
@@ -12,9 +14,9 @@ float expf (float x) __z88dk_fastcall
     if(sign)
         x = -x;
     x *= 1.4426950409;        /* convert to log2 */
-    exp = (uint16_t)floorf(x);
+    exp = (uint16_t)m32_floor(x);
     x -= (float)exp;
-    x = ldexpf(polyf(x, m32_coeff_exp, 9), exp);
+    x = m32_ldexpf(m32_poly(x, m32_coeff_exp, 9), exp);
     if(sign)
         return 1.0/x;
     return x;

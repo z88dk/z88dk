@@ -32,7 +32,7 @@ all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	excali64_clib.lib \
 	preempt.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib 
 
-genlibs: z80_crt0.lib math48.lib gen_math.lib mbf32.lib mbf64.lib gendos.lib ndos.lib  \
+genlibs: z80_crt0.lib math48.lib gen_math.lib mbf32.lib mbf64.lib math32.lib gendos.lib ndos.lib  \
 	 lib3d.lib x11.lib fastmath.lib
 
 c128libs: c128ansi_clib.lib gfx128.lib gfx128hr.lib gfx128hr480.lib 
@@ -140,6 +140,12 @@ mbf32.lib:
 	@echo '--- Building Microsoft Single Precision Maths Library ---'
 	@echo ''
 	$(MAKE) -C math/mbf32
+
+math32.lib:
+	@echo ''
+	@echo '--- Building IEEE Single Precision Maths Library ---'
+	@echo ''
+	$(MAKE) -C math/math32
 
 mbf64.lib:
 	@echo ''

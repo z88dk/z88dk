@@ -36,6 +36,15 @@ __printf_handle_f:
         ld      l,a
 
         push  ix    ;save callers
+        ld      a,CLIB_32BIT_FLOATS
+        and     a
+	jr	z,sdcc_48bit_floats
+	push	hl	;padding
+	push	hl	;padding
+	push	hl	;MSW
+	push	de	;LSW
+	jr	rejoin
+sdcc_48bit_floats:
         call  __convert_sdccf2reg  
 	push  hl ;padding (need to go to 8 byte format)
         push  hl ;the float

@@ -40,15 +40,17 @@
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
-SECTION code_math
+SECTION code_fp_math32
 
 EXTERN m32_fsmul24x32, m32_fsadd24x32
 EXTERN m32_fsmin_fastcall
 
 PUBLIC m32_fspoly_callee
+PUBLIC _m32_poly
 
 
 .m32_fspoly_callee
+._m32_poly
 
     ; evaluation of a polynomial function
     ;

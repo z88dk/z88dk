@@ -2,7 +2,7 @@
 ; float __fsmul (float left, float right)
 
 SECTION code_clib
-SECTION code_math
+SECTION code_fp_math32
 
 PUBLIC asm_fsmul
 

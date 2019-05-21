@@ -28,9 +28,9 @@
 
 /* Version 1.0 - Initial release */
 
-#include <math.h>
+#include "m32_math.h"
 
-float ldexpf(float x, int pw2) __z88dk_callee
+float m32_ldexpf(float x, int pw2) 
 {
     union float_long fl;
     int32_t e;

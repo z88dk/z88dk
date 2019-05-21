@@ -11,7 +11,7 @@
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
-SECTION code_math
+SECTION code_fp_math32
 
 PUBLIC m32_float16
 PUBLIC m32_float32

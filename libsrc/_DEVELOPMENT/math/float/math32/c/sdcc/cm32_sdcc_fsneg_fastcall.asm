@@ -2,7 +2,7 @@
 ; float __fsneg_fastcall (float number)
 
 SECTION code_clib
-SECTION code_math
+SECTION code_fp_math32
 
 PUBLIC cm32_sdcc_fsneg_fastcall
 

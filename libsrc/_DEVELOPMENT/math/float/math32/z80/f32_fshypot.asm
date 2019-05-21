@@ -24,7 +24,7 @@
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
-SECTION code_math
+SECTION code_fp_math32
 
 EXTERN m32_fssqr_fastcall, m32_fssqrt_fastcall, m32_fsadd_callee
 

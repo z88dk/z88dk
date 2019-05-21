@@ -32,7 +32,7 @@
 ; uses  : af, bc, de, hl, bc', de', hl'
 
 SECTION code_clib
-SECTION code_math
+SECTION code_fp_math32
 
 PUBLIC m32_mulu_32h_24x24
 
