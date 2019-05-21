@@ -147,9 +147,10 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     scf
 
 .fm1
-    ld b,0                      ; put sign bit in B
-    rr b
+    rr c                        ; put sign bit in C
+    ld b,a                      ; put exponent into B
 
+    ex af,af
     bit 7,h                     ; need to shift result left if msb!=1
     jr NZ,fm2
     sla e
@@ -158,29 +159,26 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     jr fm3
 
 .fm2
-    inc a
-    jr C,mulovl
+    inc b
+    jr Z,mulovl
 
 .fm3
-    ex af,af
-    ld a,e                      ; round using digi norm's method
-    or a
-    jr Z,fm4
-    set 0,d
-
-.fm4
-    ex af,af
-
+    ld a,e
     ld e,h                      ; put 24 bit mantissa in place, HLD into EHL
     ld h,l
     ld l,d
 
+    and 080h                    ; round using feilipu method
+    jr Z,fm4
+    set 0,l
+
+.fm4
     sla e                       ; adjust mantissa for exponent
-    sla b                       ; put sign in C
-    rra                         ; put sign and 7 exp bits into place
+    sla c                       ; put sign into C
+    rr b                        ; put sign and 7 exp bits into place
     rr e                        ; put last exp bit into place
-    ld d,a                      ; put sign and exponent in D
-    ret                         ; return DEHL
+    ld d,b                      ; put sign and exponent in D
+    ret                         ; return IEEE DEHL
 
 .mulovl
     ex af,af                    ; get sign

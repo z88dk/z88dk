@@ -33,18 +33,17 @@ EXTERN m32_fsnormalize
 ; now convert long in dehl to float in dehl
 .m32_float32
     ex de,hl                    ; hlde
-    ld  b,0			; clear sign
+    ld b,h                      ; to hold the sign, put copy of ULSW into b
     bit 7,h                     ; test sign, negate if negative
     jr Z,dldf0
-    ld b,h                      ; to hold the sign, put copy of MSB into b
-    ld c,l
+    ld c,l                      ; LLSW into c
     ld hl,0
     or a                        ; clear C
     sbc hl,de                   ; least
     ex de,hl
     ld hl,0
     sbc hl,bc
-    jp PO,dldf0                 ; number in hlde, sign in b
+    jp PO,dldf0                 ; number in hlde, sign in b[7]
 
 ; here negation of 0x80000000 = -2^31 = 0xcf000000
     ld de,0cf00h
@@ -65,13 +64,14 @@ EXTERN m32_fsnormalize
     ld b,d                      ; to hold the sign, put copy of MSB into b
                                 ; continue, with unsigned long number in dehl
     ex de,hl
+
 .dldf0
-; number in hlde, sign in b
+; number in hlde, sign in b[7]
     ld c,150                    ; exponent if no shift
     ld a,h
     or a
     jr NZ,dldfright             ; go shift right
-; exponent in c, sign in b
+; exponent in c, sign in b[7]
     ex af,af                    ; set carry off
     jp m32_fsnormalize          ; piggy back on existing code in _fsnormalize
 
@@ -133,7 +133,7 @@ EXTERN m32_fsnormalize
     rr d
     rr e
     inc c
-.dldf8                          ; pack up the floating point mantissa in lde, exponent in c, sign in b
+.dldf8                          ; pack up the floating point mantissa in lde, exponent in c, sign in b[7]
     sla l
     rl b                        ; get sign (if unsigned input, it was forced 0)
     rr c

@@ -93,6 +93,7 @@ PUBLIC _m32_sqr
     call m32_sqr_32h_24x24      ; exit  : HLDE  = 32-bit product
 
     ex af,af                    ; retrieve exponent from af'
+    ld b,a                      ; put exponent into B
 
     bit 7,h                     ; need to shift result left if msb!=1
     jr NZ,fs1
@@ -102,28 +103,26 @@ PUBLIC _m32_sqr
     jr fs2
 
 .fs1
-    inc a
-    jr C,mulovl
+    inc b
+    jr Z,mulovl
 
 .fs2
-    ex af,af
-    ld a,e                      ; round using digi norm's method
-    or a
-    jr Z,fs3
-    set 0,d
-
-.fs3
-    ex af,af
-
+    ld a,e
     ld e,h                      ; put 24 bit mantissa in place, HLD into EHL
     ld h,l
     ld l,d
 
-    sla e                       ; adjust the sign (+ve) and exponent
-    srl a
-    rr e
-    ld d,a                      ; put sign and 7 msbs into place in D
-    ret                         ; return DEHL
+    and 080h                    ; round using feilipu method
+    jr Z,fs3
+    set 0,l
+
+.fs3
+    sla e                       ; adjust mantissa for exponent
+    xor a                       ; set sign in C positive
+    rr b                        ; put sign and 7 exp bits into place
+    rr e                        ; put last exp bit into place
+    ld d,b                      ; put sign and exponent in D
+    ret                         ; return IEEE DEHL
 
 .mulovl
     ld d,07fh                  ; set positive INF

@@ -37,7 +37,7 @@ SECTION code_fp_math32
 EXTERN m32_fsmul, m32_fsmul_callee
 
 EXTERN m32_fsmul32x32, m32_fsmul24x32, m32_fsadd32x32, m32_fsadd24x32
-EXTERN m32_fsmin_fastcall, m32_fsmax_fastcall
+EXTERN m32_fsmin_fastcall
 
 PUBLIC m32_fssqrt, m32_fssqrt_fastcall, m32_fsinvsqrt_fastcall
 
@@ -61,7 +61,7 @@ PUBLIC m32_fssqrt, m32_fssqrt_fastcall, m32_fsinvsqrt_fastcall
     or a                        ; divide by zero?
     jp Z,m32_fsmin_fastcall    
     and 080h                    ; negative number?
-    jp NZ,m32_fsmax_fastcall
+    jp NZ,m32_fsmin_fastcall
     
     ld b,d                      ; retain original y sign & exponent
     set 7,d                     ; make y negative
@@ -194,18 +194,27 @@ PUBLIC m32_fssqrt, m32_fssqrt_fastcall, m32_fsinvsqrt_fastcall
 
 ;----------- snip ----------
 
-    ld a,l                      ; round using digi norm's method
-    or a
-    jr Z,fi0
-    set 0,h
-
-.fi0
+    ld a,l
     ld l,h                      ; align 32-bit mantissa to IEEE 24-bit mantissa
     ld h,e
     ld e,d
 
+    or a                        ; round using feilipu method
+    jr Z,fd0
+    inc l
+    jr NZ,fd0
+    inc h
+    jr NZ,fd0
+    inc e
+    jr NZ,fd0
+    rr e
+    rr h
+    rr l
+    inc b
+
+.fd0
     sla e
-    sla c                       ; recover sign from c
+    xor a                       ; set sign in C positive
     rr b
     rr e
     ld d,b
