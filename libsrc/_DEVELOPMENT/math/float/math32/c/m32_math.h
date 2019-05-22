@@ -76,7 +76,7 @@ float m32_tanf(float x) __z88dk_fastcall;
 float m32_asinf(float x) __z88dk_fastcall;
 float m32_acosf(float x) __z88dk_fastcall;
 float m32_atanf(float x) __z88dk_fastcall;
-float m32_atan2f(float x, float y);
+float m32_atan2f(float x, float y) __z88dk_callee;
 
 /* Hyperbolic functions */
 float m32_sinhf(float x) __z88dk_fastcall;
@@ -91,23 +91,23 @@ float m32_sqrtf(float a) __z88dk_fastcall;
 float m32_expf(float x) __z88dk_fastcall;
 float m32_logf(float x) __z88dk_fastcall;
 float m32_log10f(float x) __z88dk_fastcall;
-float m32_powf(float x, float y);
+float m32_powf(float x, float y) __z88dk_callee;
 float m32_hypotf(float x, float y) __z88dk_callee;
 
 /* Nearest integer, absolute value, and remainder functions */
 float m32_fabsf(float x) __z88dk_fastcall;
-float m32_frexpf(float x, int *pw2);
-float m32_ldexpf(float x, int pw2);
+float m32_frexpf(float x, int *pw2) __z88dk_callee;
+float m32_ldexpf(float x, int pw2) __z88dk_callee;
 float m32_ceil(float x) __z88dk_fastcall;
 float m32_floor(float x) __z88dk_fastcall;
-float m32_modff(float x, float * y);
-float m32_fmodf(float x, float y);
+float m32_modff(float x, float * y) __z88dk_callee;
+float m32_fmodf(float x, float y) __z88dk_callee;
 float m32_roundf(float x) __z88dk_fastcall;
 
 /* Intrinsic functions */
 float m32_sqr(float a) __z88dk_fastcall;
 float m32_invf(float a) __z88dk_fastcall;
 float m32_invsqrtf(float a) __z88dk_fastcall;
-float m32_poly(const float x, const float d[], uint16_t n) __z88dk_callee;
+float m32_poly(const float x, const float d[]) __z88dk_callee;
 
 #endif  /* _INC_MATH */

@@ -8,7 +8,7 @@
 
 #include "m32_math.h"
 
-float m32_fmodf(float x, float y)
+float m32_fmodf(float x, float y) __z88dk_callee
 {
     long k;
     float d;

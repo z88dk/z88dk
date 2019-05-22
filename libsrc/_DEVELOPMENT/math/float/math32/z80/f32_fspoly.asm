@@ -23,7 +23,7 @@
 ; to Joseph-Louis Lagrange but it can be traced back many hundreds of
 ; years to Chinese and Persian mathematicians
 ; 
-; float polyf(const float x, const float d[], uint16_t n)
+; float polyf(const float x, const float d[]) __z88dk_callee
 ; {
 ;   float res = d[n];
 ;
@@ -34,6 +34,7 @@
 ; }
 ;
 ; where n is the maximum coefficient index. Same as the C index.
+; With a maximum of 64 coefficients.
 ;
 ;-------------------------------------------------------------------------
 ; FIXME clocks
@@ -43,7 +44,6 @@ SECTION code_clib
 SECTION code_fp_math32
 
 EXTERN m32_fsmul24x32, m32_fsadd24x32
-EXTERN m32_fsmin_fastcall
 
 PUBLIC m32_fspoly_callee
 PUBLIC _m32_poly
@@ -54,34 +54,32 @@ PUBLIC _m32_poly
 
     ; evaluation of a polynomial function
     ;
-    ; enter : stack = uint16_t n, float d[], float x, ret
+    ; enter : stack = float d[], ret
+    ;         dehl  = float x
     ;
     ; exit  : dehl  = 32-bit product
     ;         carry reset
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-    pop af                      ; return
-    pop hl                      ; (float)x in dehl
-    pop de
-
     exx
-    pop de                      ; address of base of coefficient table (float)d[]
-    pop hl                      ; count n
-    push af                     ; return on stack
+    pop de                      ; return
+    pop hl                      ; address of base of coefficient table (float)d[]
+    push de                     ; return on stack
+    
+    ld a,(hl)                   ; count of coefficient n
+    inc hl                      ; point to 0th coefficient
+    
+    push af                     ; copy of n on stack
+    dec a                       ; count of (float)d[n-1]
 
-    ld a,l                      ; check table has at least 2 elements
-    dec a
-    or h
-    jp Z,m32_fsmin_fastcall
-
-    ld b,l                      ; mask n to uint8_t in b, because that's got to be enough coefficients.
-    push bc                     ; copy of n on stack
-    dec hl                      ; count of (float)d[n-1]
-
-    add hl,hl                   ; point at float relative index
-    add hl,hl
-    add hl,de                   ; create absolute table index from base and relative index
+    add a                       ; point at float relative index (maximum 64 coefficients)
+    add a
+    add a,l                     ; create absolute table index from base and relative index
+    ld l,a
+    jr NC,fep0
+    inc h
+.fep0
 
     exx
     push de                     ; (float)x on stack
@@ -123,7 +121,7 @@ PUBLIC _m32_poly
     ld h,l
     ld l,0                      ; (float)x in bc dehl
 
-.fep0
+.fep1
     call m32_fsmul24x32         ; x * res => dehl
     call m32_fsadd24x32         ; d[--n] + res * x => bc dehl
     
@@ -136,7 +134,7 @@ PUBLIC _m32_poly
     ex af,af
     pop af                      ; current n value in a
     dec a
-    jr Z,fep1                   ; n value == 0 ?
+    jr Z,fep2                   ; n value == 0 ?
 
     push af                     ; current n value on stack
 
@@ -163,19 +161,19 @@ PUBLIC _m32_poly
     push af                     ; x lsw on stack for this iteration
 
     exx
-    jr fep0
-
-.fep1
-    ld a,l                      ; round using digi norm's method
-    or a
-    jr Z,fep2
-    set 0,h
+    jr fep1
 
 .fep2
+    ld a,l
     ld l,h                      ; align 32-bit mantissa to IEEE 24-bit mantissa
     ld h,e
     ld e,d
 
+    and 080h                    ; round using feilipu method
+    jr Z,fep3
+    set 0,l
+
+.fep3
     sla e
     sla c                       ; recover sign from c
     rr b

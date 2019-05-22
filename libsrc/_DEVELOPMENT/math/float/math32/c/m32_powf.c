@@ -31,7 +31,7 @@
 
 #include "m32_math.h"
 
-float m32_powf (float x, float y) 
+float m32_powf (float x, float y) __z88dk_callee
 {
     if(x <  0.0) return 0.0;
     if(x == 0.0) return 0.0;

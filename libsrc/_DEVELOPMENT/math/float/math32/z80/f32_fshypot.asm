@@ -33,7 +33,7 @@ PUBLIC m32_fshypot, m32_fshypot_callee
 
 .m32_fshypot
 
-    ; evaluation of a polynomial function
+    ; evaluation of a hypotenuse function
     ;
     ; enter : stack = float x, ret
     ;         dehl  = float y
@@ -59,7 +59,7 @@ PUBLIC m32_fshypot, m32_fshypot_callee
 
 .m32_fshypot_callee
 
-    ; evaluation of a polynomial function
+    ; evaluation of a hypotenuse function
     ;
     ; enter : stack = float x, ret
     ;         dehl  = float y

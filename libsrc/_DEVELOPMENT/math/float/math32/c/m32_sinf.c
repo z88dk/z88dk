@@ -28,5 +28,5 @@ float m32_sinf (float f) __z88dk_fastcall
     if(sect & 2)
         y = -y;
     y_squared = m32_sqr(y);
-    return y * m32_poly(y_squared, m32_coeff_sin_a, 4) / m32_poly(y_squared, m32_coeff_sin_b, 4);
+    return y * m32_poly(y_squared, m32_coeff_sin_a) / m32_poly(y_squared, m32_coeff_sin_b);
 }

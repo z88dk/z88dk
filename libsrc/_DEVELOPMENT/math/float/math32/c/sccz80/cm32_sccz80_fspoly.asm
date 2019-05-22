@@ -12,7 +12,8 @@ EXTERN m32_fspoly_callee
 
     ; evaluation of a polynomial function
     ;
-    ; enter : stack = uint16_t n, float d[], float x, ret
+    ; enter : stack = float d[], ret
+    ;         dehl  = float x
     ;
     ; exit  : dehl  = 32-bit product
     ;         carry reset
@@ -20,28 +21,13 @@ EXTERN m32_fspoly_callee
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
     pop af                      ; my return
-    pop hl                      ; (float)x
-    pop de
-
-    exx
-    pop hl                      ; (float*)d
-    pop de                      ; (uint16_t)n
-
+    pop bc                      ; (float)d[]
     push af                     ; my return
-    push de                     ; (uint16_t)n
-    push hl                     ; (float*)d
-
-    exx
-    push de                      ; (float)x
-    push hl
+    push bc                     ; (float)d[]
 
     call m32_fspoly_callee
-    
-    pop hl                      ; my return
-    xor a
-    push af
-    push af
-    push af
-    push af  
-    jp (hl)
-
+ 
+    pop bc                      ; my return
+    push bc
+    push bc
+    ret

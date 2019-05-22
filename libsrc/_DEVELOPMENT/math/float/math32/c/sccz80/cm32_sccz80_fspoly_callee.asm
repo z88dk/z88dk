@@ -10,7 +10,8 @@ EXTERN m32_fspoly_callee
 
     ; evaluation of a polynomial function
     ;
-    ; enter : stack = uint16_t n, float d[], float x, ret
+    ; enter : stack = float d[], ret
+    ;         dehl  = float x
     ;
     ; exit  : dehl  = 32-bit product
     ;         carry reset
