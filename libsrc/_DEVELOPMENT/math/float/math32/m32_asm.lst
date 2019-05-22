@@ -1,3 +1,7 @@
+math/float/math32/lm32/z80/asm_ceil
+math/float/math32/lm32/z80/asm_fabs
+math/float/math32/lm32/z80/asm_floor
+math/float/math32/lm32/z80/asm_fpclassify
 math/float/math32/lm32/z80/asm_fsadd
 math/float/math32/lm32/z80/asm_fsdiv
 math/float/math32/lm32/z80/asm_fsmax
@@ -6,10 +10,9 @@ math/float/math32/lm32/z80/asm_fsmul
 math/float/math32/lm32/z80/asm_fsneg
 math/float/math32/lm32/z80/asm_fssub
 math/float/math32/lm32/z80/asm_fszero
-
+math/float/math32/lm32/z80/asm_hypot
 math/float/math32/lm32/z80/asm_invf
 math/float/math32/lm32/z80/asm_invsqrtf
 math/float/math32/lm32/z80/asm_polyf
-math/float/math32/lm32/z80/asm_sqrtf
 math/float/math32/lm32/z80/asm_sqrf
-math/float/math32/lm32/z80/asm_hypot
+math/float/math32/lm32/z80/asm_sqrtf
