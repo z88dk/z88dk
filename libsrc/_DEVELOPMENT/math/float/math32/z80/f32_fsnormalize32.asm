@@ -31,14 +31,12 @@ PUBLIC m32_fsnormalize32
     jp Z,S32L                   ; shift 32 bits, most significant in low nibble   
     jr S32H                     ; shift 32 bits in high
 .fa8a
-    xor a
     or a,e
     jr Z,fa8b
     and 0f0h
     jp Z,S24L                   ; shift 24 bits, most significant in low nibble
     jp S24H                     ; shift 24 bits in high
 .fa8b
-    xor a
     or a,h
     jp Z,normzero               ;  all zeros
     and 0f0h
@@ -66,8 +64,7 @@ PUBLIC m32_fsnormalize32
     rr e
     rr h
     rr l
-    xor a                       ; zero adjust
-    jr normdone
+    ret	                        ; no shift required, return BC DEHL
 
 .S32H2
     rr d
@@ -153,8 +150,8 @@ PUBLIC m32_fsnormalize32
 ;
 .normdone
     add a,b                     ; exponent of result
-    ld b,a
     jr NC,normzero              ; if underflow return zero
+    ld b,a
     ret                         ; return BC DEHL
 
 .normzero                       ; return zero
