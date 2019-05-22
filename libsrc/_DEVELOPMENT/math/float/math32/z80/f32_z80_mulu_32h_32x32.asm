@@ -21,6 +21,8 @@
 ;
 ; uses  : af, bc, de, hl, af', bc', de', hl'
 
+IF __CPU_Z80__
+
 SECTION code_clib
 SECTION code_fp_math32
 
@@ -186,3 +188,4 @@ PUBLIC m32_mulu_32h_32x32
     ld l,c                      ; p4
     ret                         ; exit  : DEHL = 32-bit product
 
+ENDIF
