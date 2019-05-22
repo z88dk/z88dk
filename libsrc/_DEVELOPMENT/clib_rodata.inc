@@ -10,6 +10,7 @@ section rodata_fcntl
 section rodata_font_4x8
 section rodata_font_8x8
 section rodata_font_fzx
+section rodata_fp_math32
 section rodata_input
 section rodata_SMSlib
 section rodata_sound_bit
