@@ -30,7 +30,7 @@
 
 #include "m32_math.h"
 
-float m32_frexpf(float x, int *pw2) __z88dk_callee
+float m32_frexpf(float x, int *pw2)
 {
     union float_long fl;
     int32_t i;

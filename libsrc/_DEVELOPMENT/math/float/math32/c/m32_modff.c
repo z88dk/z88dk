@@ -30,7 +30,7 @@
 
 #include "m32_math.h"
 
-float m32_modff (float x, float * y) __z88dk_callee
+float m32_modff (float x, float * y)
 {
     *y = (long)x;
     return (x-*y);

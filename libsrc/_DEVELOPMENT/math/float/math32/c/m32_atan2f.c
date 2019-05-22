@@ -1,7 +1,7 @@
 
 #include "m32_math.h"
 
-float m32_atan2f (float x, float y) __z88dk_callee
+float m32_atan2f (float x, float y)
 {
     float v;
 
