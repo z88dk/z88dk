@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.6.9 #9958 (Mac OS X i386)
+; Version 3.9.0 #11195 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -208,6 +208,7 @@
 	GLOBAL _m32_invsqrtf
 	GLOBAL _m32_invf
 	GLOBAL _m32_sqr
+	GLOBAL _m32_roundf
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
 	GLOBAL _m32_floor
@@ -289,10 +290,10 @@ _m32_acosh:
 	ld	hl,0x0000
 	push	hl
 	call	___fsmul_callee
-	ld	(ix-1),d
-	ld	(ix-2),e
-	ld	(ix-3),h
 	ld	(ix-4),l
+	ld	(ix-3),h
+	ld	(ix-2),e
+	ld	(ix-1),d
 	ld	l,(ix+6)
 	ld	h,(ix+7)
 	push	hl

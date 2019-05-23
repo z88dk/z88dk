@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.6.9 #9958 (Mac OS X i386)
+; Version 3.9.0 #11195 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -208,6 +208,7 @@
 	GLOBAL _m32_invsqrtf
 	GLOBAL _m32_invf
 	GLOBAL _m32_sqr
+	GLOBAL _m32_roundf
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
 	GLOBAL _m32_floor
@@ -220,6 +221,9 @@
 	GLOBAL _m32_log10f
 	GLOBAL _m32_expf
 	GLOBAL _m32_sqrtf
+	GLOBAL _m32_atanhf
+	GLOBAL _m32_acoshf
+	GLOBAL _m32_asinhf
 	GLOBAL _m32_tanhf
 	GLOBAL _m32_coshf
 	GLOBAL _m32_sinhf
@@ -273,20 +277,20 @@ _m32_logf:
 	push	ix
 	ld	ix,0
 	add	ix,sp
-	ld	hl, -6
-	add	hl, sp
-	ld	sp, hl
+	push	af
+	push	af
+	push	af
 	ld	c, l
 	ld	b, h
 	push	bc
 	push	de
-	ld	hl,0x0000
-	push	hl
-	ld	hl,0x0000
-	push	hl
 	push	de
 	push	bc
-	call	___fsgt_callee
+	ld	hl,0x0000
+	push	hl
+	ld	hl,0x0000
+	push	hl
+	call	___fslt_callee
 	pop	de
 	pop	bc
 	bit	0, l
@@ -296,7 +300,7 @@ _m32_logf:
 	ld	d,h
 	jp	l_m32_logf_00103
 l_m32_logf_00102:
-	ld	hl,0x0000
+	ld	hl,4
 	add	hl, sp
 	push	hl
 	push	de
@@ -324,10 +328,11 @@ l_m32_logf_00102:
 	call	___fssub_callee
 	ld	c, l
 	ld	b, h
-	pop	hl
-	push	hl
+	ld	l,(ix-2)
+	ld	h,(ix-1)
 	dec	hl
-	ex	(sp), hl
+	ld	(ix-2),l
+	ld	(ix-1),h
 	ld	hl,0x0008
 	push	hl
 	ld	hl,_m32_coeff_log
@@ -335,12 +340,12 @@ l_m32_logf_00102:
 	push	de
 	push	bc
 	call	_m32_poly
-	ld	(ix-4),l
-	ld	(ix-3),h
-	ld	(ix-2),e
-	ld	(ix-1),d
-	pop	hl
-	push	hl
+	ld	(ix-6),l
+	ld	(ix-5),h
+	ld	(ix-4),e
+	ld	(ix-3),d
+	ld	l,(ix-2)
+	ld	h,(ix-1)
 	push	hl
 	call	___sint2fs_callee
 	ex	de, hl
@@ -354,11 +359,11 @@ l_m32_logf_00102:
 	ex	de, hl
 	push	hl
 	push	de
-	ld	l,(ix-2)
-	ld	h,(ix-1)
-	push	hl
 	ld	l,(ix-4)
 	ld	h,(ix-3)
+	push	hl
+	ld	l,(ix-6)
+	ld	h,(ix-5)
 	push	hl
 	call	___fsadd_callee
 l_m32_logf_00103:

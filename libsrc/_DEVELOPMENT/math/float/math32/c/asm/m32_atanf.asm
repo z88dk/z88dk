@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.6.9 #9958 (Mac OS X i386)
+; Version 3.9.0 #11195 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -208,6 +208,7 @@
 	GLOBAL _m32_invsqrtf
 	GLOBAL _m32_invf
 	GLOBAL _m32_sqr
+	GLOBAL _m32_roundf
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
 	GLOBAL _m32_floor
@@ -221,6 +222,9 @@
 	GLOBAL _m32_logf
 	GLOBAL _m32_expf
 	GLOBAL _m32_sqrtf
+	GLOBAL _m32_atanhf
+	GLOBAL _m32_acoshf
+	GLOBAL _m32_asinhf
 	GLOBAL _m32_tanhf
 	GLOBAL _m32_coshf
 	GLOBAL _m32_sinhf
@@ -275,26 +279,26 @@ _m32_m32_atanf:
 	push	ix
 	ld	ix,0
 	add	ix,sp
-	ld	hl, -20
-	add	hl, sp
-	ld	sp, hl
+	ld	iy, -14
+	add	iy, sp
+	ld	sp, iy
 	ld	(ix-4),l
 	ld	(ix-3),h
 	ld	(ix-2),e
 	ld	(ix-1),d
-	ld	l,(ix-4)
-	ld	h,(ix-3)
 	ld	e,(ix-2)
 	ld	d,(ix-1)
+	ld	l,(ix-4)
+	ld	h,(ix-3)
 	call	_m32_fabsf
-	ld	(ix-5),d
-	ld	(ix-6),e
-	ld	(ix-7),h
 	ld	(ix-8),l
-	ld	hl,8
+	ld	(ix-7),h
+	ld	(ix-6),e
+	ld	(ix-5),d
+	ld	hl,0
 	add	hl, sp
 	ex	de, hl
-	ld	hl,12
+	ld	hl,6
 	add	hl, sp
 	ld	bc,4
 	ldir
@@ -309,43 +313,45 @@ _m32_m32_atanf:
 	ld	d,h
 	jp	l_m32_m32_atanf_00107
 l_m32_m32_atanf_00102:
+	ld	l,(ix-12)
+	ld	h,(ix-11)
+	push	hl
+	ld	l,(ix-14)
+	ld	h,(ix-13)
+	push	hl
 	ld	hl,0x3f80
 	push	hl
 	ld	hl,0x0000
 	push	hl
-	ld	l,(ix-10)
-	ld	h,(ix-9)
-	push	hl
-	ld	l,(ix-12)
-	ld	h,(ix-11)
-	push	hl
-	call	___fsgt_callee
+	call	___fslt_callee
 	ld	h,0x00
-	ld	(ix-8),l
-	ld	(ix-7),h
+	ld	(ix-10),l
+	ld	(ix-9),h
 	ld	a, h
-	or	a,l
+	or	a, l
 	jr	Z,l_m32_m32_atanf_00104
-	ld	l,(ix-10)
-	ld	h,(ix-9)
-	push	hl
 	ld	l,(ix-12)
 	ld	h,(ix-11)
+	push	hl
+	ld	l,(ix-14)
+	ld	h,(ix-13)
 	push	hl
 	ld	hl,0x3f80
 	push	hl
 	ld	hl,0x0000
 	push	hl
 	call	___fsdiv_callee
-	ld	(ix-12),l
-	ld	(ix-11),h
-	ld	(ix-10),e
-	ld	(ix-9),d
+	ld	(ix-14),l
+	ld	(ix-13),h
+	ld	(ix-12),e
+	ld	(ix-11),d
 l_m32_m32_atanf_00104:
-	ld	l,(ix-12)
-	ld	h,(ix-11)
-	ld	e,(ix-10)
-	ld	d,(ix-9)
+	pop	bc
+	pop	de
+	push	de
+	push	bc
+	pop	hl
+	push	hl
 	call	_m32_sqr
 	ld	c, l
 	ld	b, h
@@ -358,10 +364,10 @@ l_m32_m32_atanf_00104:
 	push	de
 	push	bc
 	call	_m32_poly
-	ld	(ix-13),d
-	ld	(ix-14),e
-	ld	(ix-15),h
-	ld	(ix-16),l
+	ld	(ix-8),l
+	ld	(ix-7),h
+	ld	(ix-6),e
+	ld	(ix-5),d
 	pop	de
 	pop	bc
 	ld	hl,0x0004
@@ -374,45 +380,45 @@ l_m32_m32_atanf_00104:
 	ex	de, hl
 	push	hl
 	push	de
-	ld	l,(ix-14)
-	ld	h,(ix-13)
+	ld	l,(ix-6)
+	ld	h,(ix-5)
 	push	hl
-	ld	l,(ix-16)
-	ld	h,(ix-15)
+	ld	l,(ix-8)
+	ld	h,(ix-7)
 	push	hl
 	call	___fsdiv_callee
 	ex	de, hl
 	push	hl
 	push	de
-	ld	l,(ix-10)
-	ld	h,(ix-9)
-	push	hl
 	ld	l,(ix-12)
 	ld	h,(ix-11)
 	push	hl
-	call	___fsmul_callee
-	ld	(ix-20),l
-	ld	(ix-19),h
-	ld	(ix-18),e
-	ld	(ix-17),d
-	ld	a,(ix-7)
-	or	a,(ix-8)
-	jr	Z,l_m32_m32_atanf_00106
-	ld	l,(ix-18)
-	ld	h,(ix-17)
+	ld	l,(ix-14)
+	ld	h,(ix-13)
 	push	hl
-	ld	l,(ix-20)
-	ld	h,(ix-19)
+	call	___fsmul_callee
+	ld	(ix-8),l
+	ld	(ix-7),h
+	ld	(ix-6),e
+	ld	(ix-5),d
+	ld	a,(ix-9)
+	or	a,(ix-10)
+	jr	Z,l_m32_m32_atanf_00106
+	ld	l,(ix-6)
+	ld	h,(ix-5)
+	push	hl
+	ld	l,(ix-8)
+	ld	h,(ix-7)
 	push	hl
 	ld	hl,0x3fc9
 	push	hl
 	ld	hl,0x0fdb
 	push	hl
 	call	___fssub_callee
-	ld	(ix-20),l
-	ld	(ix-19),h
-	ld	(ix-18),e
-	ld	(ix-17),d
+	ld	(ix-8),l
+	ld	(ix-7),h
+	ld	(ix-6),e
+	ld	(ix-5),d
 l_m32_m32_atanf_00106:
 	ld	hl,0x0000
 	push	hl
@@ -425,33 +431,33 @@ l_m32_m32_atanf_00106:
 	ld	h,(ix-3)
 	push	hl
 	call	___fslt_callee
-	ld	(ix-16),l
+	ld	(ix-9),l
 	ld	a, l
 	or	a, a
 	jr	Z,l_m32_m32_atanf_00109
-	ld	a,(ix-17)
+	ld	a,(ix-5)
 	xor	a,0x80
-	ld	(ix-13),a
-	ld	a,(ix-20)
-	ld	(ix-16),a
-	ld	a,(ix-19)
-	ld	(ix-15),a
-	ld	a,(ix-18)
-	ld	(ix-14),a
+	ld	(ix-9),a
+	ld	a,(ix-8)
+	ld	(ix-12),a
+	ld	a,(ix-7)
+	ld	(ix-11),a
+	ld	a,(ix-6)
+	ld	(ix-10),a
 	jr	l_m32_m32_atanf_00110
 l_m32_m32_atanf_00109:
-	ld	hl,4
+	ld	hl,2
 	add	hl, sp
 	ex	de, hl
-	ld	hl,0
+	ld	hl,6
 	add	hl, sp
 	ld	bc,4
 	ldir
 l_m32_m32_atanf_00110:
-	ld	l,(ix-16)
-	ld	h,(ix-15)
-	ld	e,(ix-14)
-	ld	d,(ix-13)
+	ld	l,(ix-12)
+	ld	h,(ix-11)
+	ld	e,(ix-10)
+	ld	d,(ix-9)
 l_m32_m32_atanf_00107:
 	ld	sp, ix
 	pop	ix

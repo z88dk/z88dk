@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.6.9 #9958 (Mac OS X i386)
+; Version 3.9.0 #11195 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -208,6 +208,7 @@
 	GLOBAL _m32_invsqrtf
 	GLOBAL _m32_invf
 	GLOBAL _m32_sqr
+	GLOBAL _m32_roundf
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
 	GLOBAL _m32_floor
@@ -221,6 +222,9 @@
 	GLOBAL _m32_logf
 	GLOBAL _m32_expf
 	GLOBAL _m32_sqrtf
+	GLOBAL _m32_atanhf
+	GLOBAL _m32_acoshf
+	GLOBAL _m32_asinhf
 	GLOBAL _m32_tanhf
 	GLOBAL _m32_coshf
 	GLOBAL _m32_sinhf
@@ -272,22 +276,22 @@ _m32_atan2f:
 	push	ix
 	ld	ix,0
 	add	ix,sp
-	ld	hl, -9
-	add	hl, sp
-	ld	sp, hl
-	ld	l,(ix+8)
-	ld	h,(ix+9)
+	push	af
+	push	af
+	dec	sp
 	ld	e,(ix+10)
 	ld	d,(ix+11)
+	ld	l,(ix+8)
+	ld	h,(ix+9)
 	call	_m32_fabsf
-	ld	(ix-1),d
-	ld	(ix-2),e
-	ld	(ix-3),h
 	ld	(ix-4),l
-	ld	l,(ix+4)
-	ld	h,(ix+5)
+	ld	(ix-3),h
+	ld	(ix-2),e
+	ld	(ix-1),d
 	ld	e,(ix+6)
 	ld	d,(ix+7)
+	ld	l,(ix+4)
+	ld	h,(ix+5)
 	call	_m32_fabsf
 	push	hl
 	push	de
@@ -395,10 +399,10 @@ l_m32_atan2f_00107:
 	ld	a, d
 	xor	a,0x80
 	ld	c, a
-	ld	(ix-9),l
-	ld	(ix-8),h
-	ld	(ix-7),e
-	ld	(ix-6),c
+	ld	(ix-4),l
+	ld	(ix-3),h
+	ld	(ix-2),e
+	ld	(ix-1),c
 	ld	a,(ix-5)
 	or	a, a
 	jr	Z,l_m32_atan2f_00109
@@ -406,11 +410,11 @@ l_m32_atan2f_00107:
 	push	hl
 	ld	hl,0x0fdb
 	push	hl
-	ld	l,(ix-7)
-	ld	h,(ix-6)
+	ld	l,(ix-2)
+	ld	h,(ix-1)
 	push	hl
-	ld	l,(ix-9)
-	ld	h,(ix-8)
+	ld	l,(ix-4)
+	ld	h,(ix-3)
 	push	hl
 	call	___fssub_callee
 	ld	c, l
@@ -421,11 +425,11 @@ l_m32_atan2f_00109:
 	push	hl
 	ld	hl,0x0fdb
 	push	hl
-	ld	l,(ix-7)
-	ld	h,(ix-6)
+	ld	l,(ix-2)
+	ld	h,(ix-1)
 	push	hl
-	ld	l,(ix-9)
-	ld	h,(ix-8)
+	ld	l,(ix-4)
+	ld	h,(ix-3)
 	push	hl
 	call	___fsadd_callee
 	ld	c, l
