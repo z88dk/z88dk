@@ -106,8 +106,8 @@ float m32_roundf(float x) __z88dk_fastcall;
 
 /* Intrinsic functions */
 float m32_sqr(float a) __z88dk_fastcall;
-float m32_invf(float a) __z88dk_fastcall;
-float m32_invsqrtf(float a) __z88dk_fastcall;
+float m32_inv(float a) __z88dk_fastcall;
+float m32_invsqrt(float a) __z88dk_fastcall;
 float m32_poly(const float x, const float d[], uint16_t n) __z88dk_callee;
 
 #endif  /* _INC_MATH */
