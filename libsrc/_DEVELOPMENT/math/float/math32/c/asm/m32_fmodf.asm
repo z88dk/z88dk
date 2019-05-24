@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.6.9 #9958 (Mac OS X i386)
+; Version 3.6.9 #9958 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -205,9 +205,10 @@
 ; Externals used
 ;--------------------------------------------------------
 	GLOBAL _m32_poly
-	GLOBAL _m32_invsqrtf
-	GLOBAL _m32_invf
+	GLOBAL _m32_invsqrt
+	GLOBAL _m32_inv
 	GLOBAL _m32_sqr
+	GLOBAL _m32_roundf
 	GLOBAL _m32_modff
 	GLOBAL _m32_floor
 	GLOBAL _m32_ceil
@@ -220,6 +221,9 @@
 	GLOBAL _m32_logf
 	GLOBAL _m32_expf
 	GLOBAL _m32_sqrtf
+	GLOBAL _m32_atanhf
+	GLOBAL _m32_acoshf
+	GLOBAL _m32_asinhf
 	GLOBAL _m32_tanhf
 	GLOBAL _m32_coshf
 	GLOBAL _m32_sinhf
@@ -275,7 +279,7 @@ _m32_fmodf:
 	push	af
 	push	af
 	ld	a,(ix+11)
-	res	7, a
+	and	a,0x7f
 	or	a,(ix+10)
 	or	a,(ix+9)
 	or	a,(ix+8)
@@ -305,8 +309,8 @@ l_m32_fmodf_00102:
 	push	hl
 	call	___slong2fs_callee
 	ld	c, l
-	ld	b, h
 	ld	l,(ix+10)
+	ld	b,h
 	ld	h,(ix+11)
 	push	hl
 	ld	l,(ix+8)
@@ -315,9 +319,8 @@ l_m32_fmodf_00102:
 	push	de
 	push	bc
 	call	___fsmul_callee
-	ex	de, hl
-	push	hl
 	push	de
+	push	hl
 	ld	l,(ix+6)
 	ld	h,(ix+7)
 	push	hl
@@ -342,8 +345,7 @@ l_m32_fmodf_00102:
 	ld	h,(ix-3)
 	push	hl
 	call	___fslt_callee
-	ld	c, l
-	bit	0, c
+	bit	0,l
 	jr	NZ,l_m32_fmodf_00105
 	ld	l,(ix+10)
 	ld	h,(ix+11)
@@ -358,17 +360,13 @@ l_m32_fmodf_00102:
 	ld	h,(ix-3)
 	push	hl
 	call	___fssub_callee
-	ld	c, l
-	ld	b, h
 	jr	l_m32_fmodf_00106
 l_m32_fmodf_00105:
-	ld	c,(ix-4)
-	ld	b,(ix-3)
+	ld	l,(ix-4)
+	ld	h,(ix-3)
 	ld	e,(ix-2)
 	ld	d,(ix-1)
 l_m32_fmodf_00106:
-	ld	l, c
-	ld	h, b
 l_m32_fmodf_00103:
 	ld	sp, ix
 	pop	ix

@@ -18,7 +18,7 @@ float m32_expf (float x) __z88dk_fastcall
     x -= (float)exp;
     x = m32_ldexpf(m32_poly(x, m32_coeff_exp, 9), exp);
     if(sign)
-        return 1.0/x;
+        return m32_inv(x);
     return x;
 }
 

@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.6.9 #9958 (Mac OS X i386)
+; Version 3.6.9 #9958 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -205,9 +205,10 @@
 ; Externals used
 ;--------------------------------------------------------
 	GLOBAL _m32_poly
-	GLOBAL _m32_invsqrtf
-	GLOBAL _m32_invf
+	GLOBAL _m32_invsqrt
+	GLOBAL _m32_inv
 	GLOBAL _m32_sqr
+	GLOBAL _m32_roundf
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
 	GLOBAL _m32_floor
@@ -220,6 +221,9 @@
 	GLOBAL _m32_logf
 	GLOBAL _m32_expf
 	GLOBAL _m32_sqrtf
+	GLOBAL _m32_atanhf
+	GLOBAL _m32_acoshf
+	GLOBAL _m32_asinhf
 	GLOBAL _m32_tanhf
 	GLOBAL _m32_coshf
 	GLOBAL _m32_sinhf
@@ -284,18 +288,18 @@ _m32_ldexpf:
 	ldir
 	ld	hl,0x0000
 	add	hl, sp
+	push	hl
 	ex	de,hl
-	push	de
-	ld	hl,0x0006
+	ld	hl,0x000a
 	add	hl, sp
 	ex	de, hl
 	ld	bc,0x0004
 	ldir
 	pop	de
-	ld	c,(ix-8)
-	ld	b,(ix-7)
-	ld	l,(ix-6)
-	ld	h,(ix-5)
+	ld	c,(ix-4)
+	ld	b,(ix-3)
+	ld	l,(ix-2)
+	ld	h,(ix-1)
 	ld	a,0x17
 l_m32_ldexpf_00103:
 	sra	h
@@ -304,56 +308,57 @@ l_m32_ldexpf_00103:
 	rr	c
 	dec	a
 	jr	NZ, l_m32_ldexpf_00103
-	ld	(ix-4),c
-	ld	(ix-3),0x00
-	ld	(ix-2),0x00
-	ld	(ix-1),0x00
+	ld	(ix-8),c
+	ld	a,0x00
+	ld	(ix-7),a
+	ld	(ix-6),a
+	ld	(ix-5),a
 	ld	l,(ix+8)
 	ld	h,(ix+9)
-	ld	a,(ix+9)
+	ld	a,h
 	rla
 	sbc	a, a
 	ld	c, a
 	ld	b, a
-	ld	a,(ix-4)
+	ld	a,(ix-8)
 	add	a, l
 	ld	l, a
-	ld	a,(ix-3)
+	ld	a,(ix-7)
 	adc	a, h
-	ld	a,(ix-2)
+	ld	a,(ix-6)
 	adc	a, c
-	ld	a,(ix-1)
+	ld	a,(ix-5)
 	adc	a, b
-	ld	h,0x00
 	ld	bc,0x0000
+	ld	h,c
 	ld	a,0x07
 l_m32_ldexpf_00105:
 	add	hl, hl
 	dec	a
 	jr	NZ,l_m32_ldexpf_00105
-	ld	a,(ix-8)
-	ld	(ix-4),a
-	ld	a,(ix-7)
-	ld	(ix-3),a
-	ld	a,(ix-6)
-	and	a,0x7f
-	ld	(ix-2),a
-	ld	a,(ix-5)
-	and	a,0x80
-	ld	(ix-1),a
 	ld	a,(ix-4)
-	or	a, c
-	ld	(ix-4),a
+	ld	(ix-8),a
 	ld	a,(ix-3)
-	or	a, b
-	ld	(ix-3),a
+	ld	(ix-7),a
 	ld	a,(ix-2)
-	or	a, l
-	ld	(ix-2),a
+	and	a,0x7f
+	ld	(ix-6),a
 	ld	a,(ix-1)
+	and	a,0x80
+	ld	(ix-5),a
+	ld	a,(ix-8)
+	or	a, c
+	ld	(ix-8),a
+	ld	a,(ix-7)
+	or	a, b
+	ld	(ix-7),a
+	ld	a,(ix-6)
+	or	a, l
+	ld	(ix-6),a
+	ld	a,(ix-5)
 	or	a, h
-	ld	(ix-1),a
-	ld	hl,0x0008
+	ld	(ix-5),a
+	ld	hl,0x0004
 	add	hl, sp
 	ld	bc,0x0004
 	ldir

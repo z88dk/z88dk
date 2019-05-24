@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.6.9 #9958 (Mac OS X i386)
+; Version 3.6.9 #9958 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -205,8 +205,8 @@
 ; Externals used
 ;--------------------------------------------------------
 	GLOBAL _m32_poly
-	GLOBAL _m32_invsqrtf
-	GLOBAL _m32_invf
+	GLOBAL _m32_invsqrt
+	GLOBAL _m32_inv
 	GLOBAL _m32_sqr
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
@@ -276,51 +276,56 @@ _m32_roundf:
 	push	ix
 	ld	ix,0
 	add	ix,sp
-	ld	hl, -20
+	ld	hl, -22
 	add	hl, sp
 	ld	sp, hl
-	ld	(ix-4),l
-	ld	(ix-3),h
-	ld	(ix-2),e
-	ld	(ix-1),d
-	ld	hl,0x0006
+	ld	c, l
+	ld	b, h
+	ld	hl,0x0008
 	add	hl, sp
-	ex	de,hl
-	ld	hl,0x0010
+	ld	(hl), c
+	inc	hl
+	ld	(hl), b
+	inc	hl
+	ld	(hl), e
+	inc	hl
+	ld	(hl), d
+	ld	hl,0x0008
 	add	hl, sp
+	ld	(ix-2),l
+	ld	(ix-1),h
+	push	de
+	push	bc
+	ld	e,(ix-2)
+	ld	d,(ix-1)
+	ld	hl,0x0014
+	add	hl, sp
+	ex	de, hl
 	ld	bc,0x0004
 	ldir
-	ld	hl,0x0006
-	add	hl, sp
-	ld	(ix-6),l
-	ld	(ix-5),h
-	ld	l,(ix-6)
-	ld	h,(ix-5)
-	ld	c, (hl)
-	inc	hl
-	ld	b, (hl)
-	inc	hl
-	ld	e, (hl)
-	inc	hl
-	ld	d, (hl)
-	ld	(ix-10),c
-	ld	(ix-9),b
-	ld	(ix-8),e
-	ld	(ix-7),d
-	ld	a,(ix-8)
+	pop	bc
+	pop	de
+	ld	(ix-10),0x00
+	ld	(ix-9),0x00
+	ld	a,(ix-4)
 	and	a,0x80
-	ld	e, a
-	ld	d,(ix-7)
-	res	7, d
-	ld	b,0x07
+	ld	(ix-8),a
+	ld	a,(ix-3)
+	and	a,0x7f
+	ld	(ix-7),a
+	ld	a,0x17
 l_m32_roundf_00136:
-	srl	d
-	rr	e
-	djnz	l_m32_roundf_00136
-	ld	a, e
+	srl	(ix-7)
+	rr	(ix-8)
+	rr	(ix-9)
+	rr	(ix-10)
+	dec	a
+	jr	NZ, l_m32_roundf_00136
+	ld	h,(ix-9)
+	ld	a,(ix-10)
 	add	a,0x81
 	ld	(ix-20),a
-	ld	a, d
+	ld	a, h
 	adc	a,0xff
 	ld	(ix-19),a
 	ld	a,(ix-20)
@@ -335,7 +340,7 @@ l_m32_roundf_00136:
 	jr	Z,l_m32_roundf_00106
 	ld	bc,0x0000
 	ld	e,0x00
-	ld	a,(ix-7)
+	ld	a,(ix-3)
 	and	a,0x80
 	ld	d, a
 	ld	a,(ix-20)
@@ -345,82 +350,88 @@ l_m32_roundf_00136:
 	inc	a
 	jp	NZ,l_m32_roundf_00113
 	set	7, e
-	ld	a, d
+	ld	a,d
 	or	a,0x3f
 	ld	d, a
 	jp	l_m32_roundf_00113
 l_m32_roundf_00106:
-	ld	b,(ix-20)
-	ld	de,0xffff
-	ld	hl,0x007f
-	inc	b
+	ld	a,(ix-20)
+	ld	(ix-10),0xff
+	ld	(ix-9),0xff
+	ld	(ix-8),0x7f
+	ld	(ix-7),0x00
+	inc	a
 	jr	l_m32_roundf_00141
 l_m32_roundf_00140:
-	sra	h
-	rr	l
-	rr	d
-	rr	e
+	sra	(ix-7)
+	rr	(ix-8)
+	rr	(ix-9)
+	rr	(ix-10)
 l_m32_roundf_00141:
-	djnz	l_m32_roundf_00140
-	ld	c, e
-	ld	b, d
-	ld	hl,0x0000
-	ld	a, c
-	and	a,(ix-10)
-	ld	c, a
-	ld	a, b
-	and	a,(ix-9)
-	ld	b, a
-	ld	a, l
-	and	a,(ix-8)
-	ld	l, a
-	ld	a, h
-	and	a,(ix-7)
-	or	a, l
-	or	a, b
-	or	a,c
+	dec	a
+	jr	NZ, l_m32_roundf_00140
+	ld	a,(ix-10)
+	ld	(ix-22),a
+	ld	a,(ix-9)
+	ld	(ix-21),a
+	ld	a,(ix-22)
+	ld	(ix-10),a
+	ld	a,(ix-21)
+	ld	(ix-9),a
+	ld	(ix-8),0x00
+	ld	(ix-7),0x00
+	ld	a,(ix-10)
+	and	a,(ix-6)
+	ld	(ix-10),a
+	ld	a,(ix-9)
+	and	a,(ix-5)
+	ld	(ix-9),a
+	ld	a,(ix-8)
+	and	a,(ix-4)
+	ld	(ix-8),a
+	ld	a,(ix-7)
+	and	a,(ix-3)
+	ld	(ix-7),a
+	or	a,(ix-8)
+	or	a,(ix-9)
+	or	a,(ix-10)
 	jr	NZ,l_m32_roundf_00104
-	ld	l,(ix-4)
-	ld	h,(ix-3)
-	ld	e,(ix-2)
-	ld	d,(ix-1)
+	ld	l, c
+	ld	h, b
 	jp	l_m32_roundf_00114
 l_m32_roundf_00104:
-	ld	a,(ix-20)
-	push	af
-	ld	bc,0x0000
+	ld	b,(ix-20)
+	ld	de,0x0000
+	inc	b
 	ld	hl,0x0040
-	pop	af
-	inc	a
 	jr	l_m32_roundf_00143
 l_m32_roundf_00142:
 	sra	h
 	rr	l
-	rr	b
-	rr	c
+	rr	d
+	rr	e
 l_m32_roundf_00143:
-	dec	a
-	jr	NZ, l_m32_roundf_00142
-	ld	a,(ix-10)
-	add	a, c
+	djnz	l_m32_roundf_00142
+	ld	a,(ix-6)
+	add	a, e
 	ld	c, a
-	ld	a,(ix-9)
-	adc	a, b
+	ld	a,(ix-5)
+	adc	a, d
 	ld	b, a
-	ld	a,(ix-8)
+	ld	a,(ix-4)
 	adc	a, l
-	ld	l, a
-	ld	a,(ix-7)
+	ld	e, a
+	ld	a,(ix-3)
 	adc	a, h
-	ld	h, a
+	ld	d, a
 	ld	(ix-18),c
 	ld	(ix-17),b
-	ld	(ix-16),l
-	ld	(ix-15),h
-	ld	a, e
+	ld	(ix-16),e
+	ld	(ix-15),d
+	ld	a,(ix-22)
 	cpl
 	ld	c, a
-	ld	a, d
+	ld	a,(ix-21)
 	cpl
 	ld	b, a
 	ld	de,0x0000
@@ -442,36 +453,19 @@ l_m32_roundf_00112:
 	sub	a,0x80
 	or	a,(ix-19)
 	jr	NZ,l_m32_roundf_00109
-	ld	l,(ix-2)
-	ld	h,(ix-1)
-	push	hl
-	ld	l,(ix-4)
-	ld	h,(ix-3)
-	push	hl
-	ld	l,(ix-2)
-	ld	h,(ix-1)
-	push	hl
-	ld	l,(ix-4)
-	ld	h,(ix-3)
-	push	hl
+	push	de
+	push	bc
+	push	de
+	push	bc
 	call	___fsadd_callee
-	ld	(ix-7),d
-	ld	(ix-8),e
-	ld	(ix-9),h
-	ld	(ix-10),l
-	ld	h,(ix-9)
-	ld	e,(ix-8)
-	ld	d,(ix-7)
 	jr	l_m32_roundf_00114
 l_m32_roundf_00109:
-	ld	l,(ix-4)
-	ld	h,(ix-3)
-	ld	e,(ix-2)
-	ld	d,(ix-1)
+	ld	l, c
+	ld	h, b
 	jr	l_m32_roundf_00114
 l_m32_roundf_00113:
-	ld	l,(ix-6)
-	ld	h,(ix-5)
+	ld	l,(ix-2)
+	ld	h,(ix-1)
 	ld	(hl), c
 	inc	hl
 	ld	(hl), b
@@ -479,7 +473,7 @@ l_m32_roundf_00113:
 	ld	(hl), e
 	inc	hl
 	ld	(hl), d
-	ld	hl,0x0006
+	ld	hl,0x0008
 	add	hl, sp
 	ld	c, (hl)
 	inc	hl

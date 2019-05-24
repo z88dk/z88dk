@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.6.9 #9958 (Mac OS X i386)
+; Version 3.6.9 #9958 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -205,9 +205,10 @@
 ; Externals used
 ;--------------------------------------------------------
 	GLOBAL _m32_poly
-	GLOBAL _m32_invsqrtf
-	GLOBAL _m32_invf
+	GLOBAL _m32_invsqrt
+	GLOBAL _m32_inv
 	GLOBAL _m32_sqr
+	GLOBAL _m32_roundf
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
 	GLOBAL _m32_floor
@@ -220,6 +221,9 @@
 	GLOBAL _m32_log10f
 	GLOBAL _m32_logf
 	GLOBAL _m32_sqrtf
+	GLOBAL _m32_atanhf
+	GLOBAL _m32_acoshf
+	GLOBAL _m32_asinhf
 	GLOBAL _m32_tanhf
 	GLOBAL _m32_coshf
 	GLOBAL _m32_sinhf
@@ -276,30 +280,29 @@ _m32_expf:
 	ld	hl, -7
 	add	hl, sp
 	ld	sp, hl
-	ld	c, l
-	ld	b, h
-	ld	a, d
-	res	7, a
-	or	a, e
-	or	a, b
-	or	a,c
+	ld	a,d
+	and	a,0x7f
+	or	a,e
+	or	a,h
+	or	a,l
+	ld	c,l
+	ld	b,h
 	jr	NZ,l_m32_expf_00102
-	ld	hl,0x0000
 	ld	de,0x3f80
+	ld	hl,0x0000
 	jp	l_m32_expf_00107
 l_m32_expf_00102:
 	push	bc
 	push	de
 	ld	hl,0x0000
 	push	hl
-	ld	hl,0x0000
 	push	hl
 	push	de
 	push	bc
 	call	___fslt_callee
 	pop	de
 	pop	bc
-	ld	(ix-1),l
+	ld	(ix-5),l
 	ld	a, l
 	or	a, a
 	jr	Z,l_m32_expf_00104
@@ -314,43 +317,33 @@ l_m32_expf_00104:
 	ld	hl,0xaa3b
 	push	hl
 	call	___fsmul_callee
-	ld	(ix-5),l
-	ld	(ix-4),h
-	ld	(ix-3),e
-	ld	(ix-2),d
-	ld	l,(ix-5)
-	ld	h,(ix-4)
-	ld	e,(ix-3)
-	ld	d,(ix-2)
+	ld	(ix-4),l
+	ld	(ix-3),h
+	ld	(ix-2),e
+	ld	(ix-1),d
 	call	_m32_floor
 	push	de
 	push	hl
 	call	___fs2uint_callee
-	inc	sp
-	inc	sp
-	push	hl
-	pop	hl
+	pop	bc
 	push	hl
 	push	hl
 	call	___sint2fs_callee
-	ex	de, hl
-	push	hl
 	push	de
-	ld	l,(ix-3)
-	ld	h,(ix-2)
 	push	hl
-	ld	l,(ix-5)
-	ld	h,(ix-4)
+	ld	l,(ix-2)
+	ld	h,(ix-1)
+	push	hl
+	ld	l,(ix-4)
+	ld	h,(ix-3)
 	push	hl
 	call	___fssub_callee
-	ld	c, l
-	ld	b, h
-	ld	hl,0x0009
-	push	hl
-	ld	hl,_m32_coeff_exp
-	push	hl
-	push	de
+	ld	bc,0x0009
 	push	bc
+	ld	bc,_m32_coeff_exp
+	push	bc
+	push	de
+	push	hl
 	call	_m32_poly
 	pop	bc
 	push	bc
@@ -361,30 +354,11 @@ l_m32_expf_00104:
 	pop	af
 	pop	af
 	pop	af
-	ld	(ix-5),l
-	ld	(ix-4),h
-	ld	(ix-3),e
-	ld	(ix-2),d
-	ld	a,(ix-1)
+	ld	a,(ix-5)
 	or	a, a
 	jr	Z,l_m32_expf_00106
-	ld	l,(ix-3)
-	ld	h,(ix-2)
-	push	hl
-	ld	l,(ix-5)
-	ld	h,(ix-4)
-	push	hl
-	ld	hl,0x3f80
-	push	hl
-	ld	hl,0x0000
-	push	hl
-	call	___fsdiv_callee
-	jr	l_m32_expf_00107
+	call	_m32_inv
 l_m32_expf_00106:
-	ld	l,(ix-5)
-	ld	h,(ix-4)
-	ld	e,(ix-3)
-	ld	d,(ix-2)
 l_m32_expf_00107:
 	ld	sp, ix
 	pop	ix

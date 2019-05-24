@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.6.9 #9958 (Mac OS X i386)
+; Version 3.6.9 #9958 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -205,9 +205,10 @@
 ; Externals used
 ;--------------------------------------------------------
 	GLOBAL _m32_poly
-	GLOBAL _m32_invsqrtf
-	GLOBAL _m32_invf
+	GLOBAL _m32_invsqrt
+	GLOBAL _m32_inv
 	GLOBAL _m32_sqr
+	GLOBAL _m32_roundf
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
 	GLOBAL _m32_floor
@@ -220,6 +221,9 @@
 	GLOBAL _m32_log10f
 	GLOBAL _m32_expf
 	GLOBAL _m32_sqrtf
+	GLOBAL _m32_atanhf
+	GLOBAL _m32_acoshf
+	GLOBAL _m32_asinhf
 	GLOBAL _m32_tanhf
 	GLOBAL _m32_coshf
 	GLOBAL _m32_sinhf
@@ -276,13 +280,12 @@ _m32_logf:
 	ld	hl, -6
 	add	hl, sp
 	ld	sp, hl
-	ld	c, l
-	ld	b, h
-	push	bc
+	push	hl
+	ld	c,l
+	ld	b,h
 	push	de
 	ld	hl,0x0000
 	push	hl
-	ld	hl,0x0000
 	push	hl
 	push	de
 	push	bc
@@ -305,22 +308,19 @@ l_m32_logf_00102:
 	pop	af
 	pop	af
 	pop	af
-	ex	de, hl
-	push	hl
 	push	de
+	push	hl
 	ld	hl,0x4000
 	push	hl
 	ld	hl,0x0000
 	push	hl
 	call	___fsmul_callee
-	ld	c, l
-	ld	b, h
-	ld	hl,0x3f80
-	push	hl
-	ld	hl,0x0000
-	push	hl
-	push	de
+	ld	bc,0x3f80
 	push	bc
+	ld	bc,0x0000
+	push	bc
+	push	de
+	push	hl
 	call	___fssub_callee
 	ld	c, l
 	ld	b, h
@@ -343,17 +343,15 @@ l_m32_logf_00102:
 	push	hl
 	push	hl
 	call	___sint2fs_callee
-	ex	de, hl
-	push	hl
 	push	de
+	push	hl
 	ld	hl,0x3f31
 	push	hl
 	ld	hl,0x7218
 	push	hl
 	call	___fsmul_callee
-	ex	de, hl
-	push	hl
 	push	de
+	push	hl
 	ld	l,(ix-2)
 	ld	h,(ix-1)
 	push	hl

@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.6.9 #9958 (Mac OS X i386)
+; Version 3.6.9 #9958 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -205,9 +205,10 @@
 ; Externals used
 ;--------------------------------------------------------
 	GLOBAL _m32_poly
-	GLOBAL _m32_invsqrtf
-	GLOBAL _m32_invf
+	GLOBAL _m32_invsqrt
+	GLOBAL _m32_inv
 	GLOBAL _m32_sqr
+	GLOBAL _m32_roundf
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
 	GLOBAL _m32_floor
@@ -221,6 +222,9 @@
 	GLOBAL _m32_logf
 	GLOBAL _m32_expf
 	GLOBAL _m32_sqrtf
+	GLOBAL _m32_atanhf
+	GLOBAL _m32_acoshf
+	GLOBAL _m32_asinhf
 	GLOBAL _m32_tanhf
 	GLOBAL _m32_sinhf
 	GLOBAL _m32_atan2f
@@ -275,17 +279,13 @@ _m32_coshf:
 	push	af
 	push	af
 	call	_m32_expf
-	ld	c, l
-	ld	b, h
-	push	bc
-	push	de
-	push	de
-	push	bc
-	ld	hl,0x3f80
 	push	hl
-	ld	hl,0x0000
-	push	hl
-	call	___fsdiv_callee
+	ld	c,l
+	ld	b,h
+	push	de
+	ld	l, c
+	ld	h, b
+	call	_m32_inv
 	ld	(ix-1),d
 	ld	(ix-2),e
 	ld	(ix-3),h
@@ -301,9 +301,8 @@ _m32_coshf:
 	push	de
 	push	bc
 	call	___fsadd_callee
-	ex	de, hl
-	push	hl
 	push	de
+	push	hl
 	ld	hl,0x3f00
 	push	hl
 	ld	hl,0x0000

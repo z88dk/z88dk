@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.6.9 #9958 (Mac OS X i386)
+; Version 3.6.9 #9958 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -205,9 +205,10 @@
 ; Externals used
 ;--------------------------------------------------------
 	GLOBAL _m32_poly
-	GLOBAL _m32_invsqrtf
-	GLOBAL _m32_invf
+	GLOBAL _m32_invsqrt
+	GLOBAL _m32_inv
 	GLOBAL _m32_sqr
+	GLOBAL _m32_roundf
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
 	GLOBAL _m32_floor
@@ -220,6 +221,9 @@
 	GLOBAL _m32_logf
 	GLOBAL _m32_expf
 	GLOBAL _m32_sqrtf
+	GLOBAL _m32_atanhf
+	GLOBAL _m32_acoshf
+	GLOBAL _m32_asinhf
 	GLOBAL _m32_tanhf
 	GLOBAL _m32_coshf
 	GLOBAL _m32_sinhf
@@ -283,8 +287,8 @@ _m32_frexpf:
 	ldir
 	ld	hl,0x0000
 	add	hl, sp
+	ld	c,(hl)
 	push	hl
-	ld	c, (hl)
 	inc	hl
 	ld	b, (hl)
 	inc	hl
@@ -300,8 +304,8 @@ l_m32_frexpf_00103:
 	rr	c
 	dec	a
 	jr	NZ, l_m32_frexpf_00103
-	ld	b,0x00
 	ld	de,0x0000
+	ld	b,e
 	ld	a, c
 	add	a,0x82
 	ld	c, a
@@ -320,8 +324,8 @@ l_m32_frexpf_00103:
 	pop	hl
 	ld	(iy+0),c
 	ld	(iy+1),b
+	ld	c,(hl)
 	push	hl
-	ld	c, (hl)
 	inc	hl
 	ld	b, (hl)
 	inc	hl
@@ -343,15 +347,6 @@ l_m32_frexpf_00103:
 	dec	hl
 	dec	hl
 	dec	hl
-	push	hl
-	ld	a, (hl)
-	inc	hl
-	ld	a, (hl)
-	inc	hl
-	ld	a, (hl)
-	inc	hl
-	ld	a, (hl)
-	pop	hl
 	ld	a, d
 	or	a,0x3f
 	ld	d, a
