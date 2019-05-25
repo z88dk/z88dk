@@ -204,14 +204,14 @@
 ;--------------------------------------------------------
 ; Externals used
 ;--------------------------------------------------------
-	GLOBAL _m32_poly
-	GLOBAL _m32_invsqrt
-	GLOBAL _m32_inv
-	GLOBAL _m32_sqr
+	GLOBAL _m32_polyf
+	GLOBAL _m32_invsqrtf
+	GLOBAL _m32_invf
+	GLOBAL _m32_sqrf
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
-	GLOBAL _m32_floor
-	GLOBAL _m32_ceil
+	GLOBAL _m32_floorf
+	GLOBAL _m32_ceilf
 	GLOBAL _m32_ldexpf
 	GLOBAL _m32_frexpf
 	GLOBAL _m32_fabsf
@@ -401,22 +401,23 @@ l_m32_roundf_00141:
 	jp	l_m32_roundf_00114
 l_m32_roundf_00104:
 	ld	b,(ix-20)
-	ld	de,0x0000
+	ld	c,0x00
+	ld	e,c
 	inc	b
 	ld	hl,0x0040
 	jr	l_m32_roundf_00143
 l_m32_roundf_00142:
 	sra	h
 	rr	l
-	rr	d
 	rr	e
+	rr	c
 l_m32_roundf_00143:
 	djnz	l_m32_roundf_00142
 	ld	a,(ix-6)
-	add	a, e
+	add	a, c
 	ld	c, a
 	ld	a,(ix-5)
-	adc	a, d
+	adc	a, e
 	ld	b, a
 	ld	a,(ix-4)
 	adc	a, l

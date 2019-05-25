@@ -204,15 +204,15 @@
 ;--------------------------------------------------------
 ; Externals used
 ;--------------------------------------------------------
-	GLOBAL _m32_poly
-	GLOBAL _m32_invsqrt
-	GLOBAL _m32_inv
-	GLOBAL _m32_sqr
+	GLOBAL _m32_polyf
+	GLOBAL _m32_invsqrtf
+	GLOBAL _m32_invf
+	GLOBAL _m32_sqrf
 	GLOBAL _m32_roundf
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
-	GLOBAL _m32_floor
-	GLOBAL _m32_ceil
+	GLOBAL _m32_floorf
+	GLOBAL _m32_ceilf
 	GLOBAL _m32_ldexpf
 	GLOBAL _m32_frexpf
 	GLOBAL _m32_fabsf
@@ -314,8 +314,8 @@ l_m32_m32_atanf_00102:
 	push	hl
 	call	___fsgt_callee
 	ld	c,0x00
-	ld	(ix-10),l
-	ld	(ix-9),c
+	ld	(ix-14),l
+	ld	(ix-13),c
 	ld	a, c
 	or	a,l
 	jr	Z,l_m32_m32_atanf_00104
@@ -323,7 +323,7 @@ l_m32_m32_atanf_00102:
 	ld	h,(ix-7)
 	ld	e,(ix-6)
 	ld	d,(ix-5)
-	call	_m32_inv
+	call	_m32_invf
 	ld	(ix-8),l
 	ld	(ix-7),h
 	ld	(ix-6),e
@@ -333,7 +333,7 @@ l_m32_m32_atanf_00104:
 	ld	h,(ix-7)
 	ld	e,(ix-6)
 	ld	d,(ix-5)
-	call	_m32_sqr
+	call	_m32_sqrf
 	push	hl
 	ld	c,l
 	ld	b,h
@@ -344,11 +344,15 @@ l_m32_m32_atanf_00104:
 	push	hl
 	push	de
 	push	bc
-	call	_m32_poly
-	ld	(ix-11),d
-	ld	(ix-12),e
-	ld	(ix-13),h
-	ld	(ix-14),l
+	call	_m32_polyf
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+	ld	(ix-9),d
+	ld	(ix-10),e
+	ld	(ix-11),h
+	ld	(ix-12),l
 	pop	de
 	pop	bc
 	ld	hl,0x0004
@@ -357,14 +361,18 @@ l_m32_m32_atanf_00104:
 	push	hl
 	push	de
 	push	bc
-	call	_m32_poly
+	call	_m32_polyf
+	pop	af
+	pop	af
+	pop	af
+	pop	af
 	push	de
+	push	hl
+	ld	l,(ix-10)
+	ld	h,(ix-9)
 	push	hl
 	ld	l,(ix-12)
 	ld	h,(ix-11)
-	push	hl
-	ld	l,(ix-14)
-	ld	h,(ix-13)
 	push	hl
 	call	___fsdiv_callee
 	push	de
@@ -376,10 +384,10 @@ l_m32_m32_atanf_00104:
 	ld	h,(ix-7)
 	push	hl
 	call	___fsmul_callee
-	ld	a,(ix-9)
+	ld	a,(ix-13)
 	ld	c,l
 	ld	b,h
-	or	a,(ix-10)
+	or	a,(ix-14)
 	jr	Z,l_m32_m32_atanf_00106
 	push	de
 	push	bc

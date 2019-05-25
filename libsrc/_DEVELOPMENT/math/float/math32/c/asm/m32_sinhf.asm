@@ -204,15 +204,15 @@
 ;--------------------------------------------------------
 ; Externals used
 ;--------------------------------------------------------
-	GLOBAL _m32_poly
-	GLOBAL _m32_invsqrt
-	GLOBAL _m32_inv
-	GLOBAL _m32_sqr
+	GLOBAL _m32_polyf
+	GLOBAL _m32_invsqrtf
+	GLOBAL _m32_invf
+	GLOBAL _m32_sqrf
 	GLOBAL _m32_roundf
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
-	GLOBAL _m32_floor
-	GLOBAL _m32_ceil
+	GLOBAL _m32_floorf
+	GLOBAL _m32_ceilf
 	GLOBAL _m32_ldexpf
 	GLOBAL _m32_frexpf
 	GLOBAL _m32_fabsf
@@ -285,7 +285,7 @@ _m32_sinhf:
 	push	de
 	ld	l, c
 	ld	h, b
-	call	_m32_inv
+	call	_m32_invf
 	ld	(ix-1),d
 	ld	(ix-2),e
 	ld	(ix-3),h

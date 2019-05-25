@@ -204,14 +204,14 @@
 ;--------------------------------------------------------
 ; Externals used
 ;--------------------------------------------------------
-	GLOBAL _m32_poly
-	GLOBAL _m32_invsqrt
-	GLOBAL _m32_inv
-	GLOBAL _m32_sqr
+	GLOBAL _m32_polyf
+	GLOBAL _m32_invsqrtf
+	GLOBAL _m32_invf
+	GLOBAL _m32_sqrf
 	GLOBAL _m32_roundf
 	GLOBAL _m32_modff
-	GLOBAL _m32_floor
-	GLOBAL _m32_ceil
+	GLOBAL _m32_floorf
+	GLOBAL _m32_ceilf
 	GLOBAL _m32_ldexpf
 	GLOBAL _m32_frexpf
 	GLOBAL _m32_fabsf
@@ -276,8 +276,6 @@ _m32_fmodf:
 	push	ix
 	ld	ix,0
 	add	ix,sp
-	push	af
-	push	af
 	ld	a,(ix+11)
 	and	a,0x7f
 	or	a,(ix+10)
@@ -328,24 +326,22 @@ l_m32_fmodf_00102:
 	ld	h,(ix+5)
 	push	hl
 	call	___fssub_callee
-	ld	(ix-4),l
-	ld	(ix-3),h
-	ld	(ix-2),e
-	ld	(ix-1),d
+	push	hl
+	ld	c,l
+	ld	b,h
+	push	de
 	ld	l,(ix+10)
 	ld	h,(ix+11)
 	push	hl
 	ld	l,(ix+8)
 	ld	h,(ix+9)
 	push	hl
-	ld	l,(ix-2)
-	ld	h,(ix-1)
-	push	hl
-	ld	l,(ix-4)
-	ld	h,(ix-3)
-	push	hl
+	push	de
+	push	bc
 	call	___fslt_callee
-	bit	0,l
+	pop	de
+	pop	bc
+	bit	0, l
 	jr	NZ,l_m32_fmodf_00105
 	ld	l,(ix+10)
 	ld	h,(ix+11)
@@ -353,22 +349,16 @@ l_m32_fmodf_00102:
 	ld	l,(ix+8)
 	ld	h,(ix+9)
 	push	hl
-	ld	l,(ix-2)
-	ld	h,(ix-1)
-	push	hl
-	ld	l,(ix-4)
-	ld	h,(ix-3)
-	push	hl
+	push	de
+	push	bc
 	call	___fssub_callee
+	ld	c, l
 	jr	l_m32_fmodf_00106
 l_m32_fmodf_00105:
-	ld	l,(ix-4)
-	ld	h,(ix-3)
-	ld	e,(ix-2)
-	ld	d,(ix-1)
+	ld	h, b
 l_m32_fmodf_00106:
+	ld	l, c
 l_m32_fmodf_00103:
-	ld	sp, ix
 	pop	ix
 	ret
 	SECTION IGNORE

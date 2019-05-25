@@ -30,7 +30,6 @@ EXTERN m32_fssqr_fastcall, m32_fssqrt_fastcall, m32_fsadd_callee
 
 PUBLIC m32_fshypot, m32_fshypot_callee
 
-
 .m32_fshypot
 
     ; evaluation of a polynomial function
@@ -43,7 +42,6 @@ PUBLIC m32_fshypot, m32_fshypot_callee
     ;         carry reset
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
-
 
     call m32_fssqr_fastcall     ; sqrf(y)
 

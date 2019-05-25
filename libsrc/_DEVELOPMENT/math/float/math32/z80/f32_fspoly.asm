@@ -45,12 +45,38 @@ SECTION code_fp_math32
 EXTERN m32_fsmul24x32, m32_fsadd24x32
 
 PUBLIC m32_fspoly_callee
-PUBLIC _m32_poly
+PUBLIC _m32_polyf
+
+
+._m32_polyf
+    pop af                      ; my return
+    pop hl                      ; (float)x
+    pop de
+
+    exx
+    pop hl                      ; (float*)d
+    pop de                      ; (uint16_t)n
+
+    push af                     ; my return
+    push de                     ; (uint16_t)n
+    push hl                     ; (float*)d
+
+    exx
+    push de                      ; (float)x
+    push hl
+
+    call m32_fspoly_callee
+    
+    pop hl                      ; my return
+    xor a
+    push af
+    push af
+    push af
+    push af
+    jp (hl)
 
 
 .m32_fspoly_callee
-._m32_poly
-
     ; evaluation of a polynomial function
     ;
     ; enter : stack = uint16_t n, float d[], float x, ret

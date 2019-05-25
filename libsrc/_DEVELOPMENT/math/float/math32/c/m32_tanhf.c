@@ -6,6 +6,6 @@ float m32_tanhf (const float x) __z88dk_fastcall
     float y;
 
     y = m32_expf(x);
-    return (y - m32_inv(y))/(y + m32_inv(y));
+    return (y - m32_invf(y))/(y + m32_invf(y));
 }
 

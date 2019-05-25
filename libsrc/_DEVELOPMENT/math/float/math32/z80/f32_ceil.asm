@@ -1,6 +1,6 @@
 
 	SECTION	code_fp_math32
-	PUBLIC	_m32_ceil
+	PUBLIC	_m32_ceilf
 	PUBLIC	_m32_ceil_fastcall
 
 	EXTERN	m32_f2ulong
@@ -9,14 +9,8 @@
 	EXTERN	m32_unity
 	EXTERN	m32_fsadd_callee
 
-; float ceil(float f)
-_m32_ceil:
-	pop	bc
-	pop	hl
-	pop	de
-	push	de
-	push	hl
-	push	bc
+; float ceilf(float f) __z88dk_fastcall;
+_m32_ceilf:
 
 ; Entry: dehl = floating point number
 _m32_ceil_fastcall:

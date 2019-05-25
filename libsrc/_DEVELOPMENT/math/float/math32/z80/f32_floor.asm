@@ -1,6 +1,6 @@
 
 	SECTION	code_fp_math32
-	PUBLIC	_m32_floor
+	PUBLIC	_m32_floorf
 	PUBLIC	_m32_floor_fastcall
 
 	EXTERN	m32_f2ulong
@@ -9,14 +9,8 @@
 	EXTERN	m32_unity
 	EXTERN	m32_fssub_callee
 
-; float floor(float f)
-_m32_floor:
-        pop     bc
-        pop     hl
-        pop     de
-        push    de
-        push    hl
-        push    bc
+; float floorf(float f) __z88dk_fastcall;
+_m32_floorf:
 
 ; Entry: dehl = floating point number
 _m32_floor_fastcall:

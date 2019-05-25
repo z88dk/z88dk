@@ -30,7 +30,7 @@
 
 #include "m32_math.h"
 
-float m32_ldexpf(float x, int pw2) 
+float m32_ldexpf (float x, int pw2) 
 {
     union float_long fl;
     int32_t e;

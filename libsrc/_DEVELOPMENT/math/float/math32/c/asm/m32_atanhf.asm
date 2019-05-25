@@ -200,19 +200,19 @@
 ;--------------------------------------------------------
 ; Public variables in this module
 ;--------------------------------------------------------
-	GLOBAL _m32_atanh
+	GLOBAL _m32_atanhf
 ;--------------------------------------------------------
 ; Externals used
 ;--------------------------------------------------------
-	GLOBAL _m32_poly
-	GLOBAL _m32_invsqrt
-	GLOBAL _m32_inv
-	GLOBAL _m32_sqr
+	GLOBAL _m32_polyf
+	GLOBAL _m32_invsqrtf
+	GLOBAL _m32_invf
+	GLOBAL _m32_sqrf
 	GLOBAL _m32_roundf
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
-	GLOBAL _m32_floor
-	GLOBAL _m32_ceil
+	GLOBAL _m32_floorf
+	GLOBAL _m32_ceilf
 	GLOBAL _m32_ldexpf
 	GLOBAL _m32_frexpf
 	GLOBAL _m32_fabsf
@@ -222,7 +222,6 @@
 	GLOBAL _m32_logf
 	GLOBAL _m32_expf
 	GLOBAL _m32_sqrtf
-	GLOBAL _m32_atanhf
 	GLOBAL _m32_acoshf
 	GLOBAL _m32_asinhf
 	GLOBAL _m32_tanhf
@@ -271,9 +270,9 @@ ENDIF
 ;--------------------------------------------------------
 	SECTION code_compiler
 ;	---------------------------------
-; Function m32_atanh
+; Function m32_atanhf
 ; ---------------------------------
-_m32_atanh:
+_m32_atanhf:
 	push	ix
 	ld	ix,0
 	add	ix,sp
