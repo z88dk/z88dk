@@ -70,7 +70,7 @@ PUBLIC _m32_invf
     or a                        ; divide by zero?
     jp Z,m32_fsmax_fastcall
 
-    ld h,0bfh                   ; scale to - 0.5 <= D' < 1.0
+    ld h,0bfh                   ; scale to -0.5 <= D' < -1.0
     srl l
     ex de,hl                    ; - D' in DEHL
 
