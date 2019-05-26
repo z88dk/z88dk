@@ -4,7 +4,7 @@
 extern float m32_coeff_atan_a[];
 extern float m32_coeff_atan_b[];
 
-float m32_m32_atanf (float f) __z88dk_fastcall
+float m32_atanf (float f) __z88dk_fastcall
 {
     int16_t recip;
     float val, val_squared;
