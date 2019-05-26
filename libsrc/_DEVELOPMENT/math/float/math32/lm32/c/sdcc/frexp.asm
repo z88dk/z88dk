@@ -1,6 +1,6 @@
 
 	SECTION	code_fp_math32
 	PUBLIC	_frexp
-	EXTERN	_m32_frexpf
+	EXTERN	cm32_sdcc_frexp
 
-	defc	_frexp = _m32_frexpf
+	defc	_frexp = cm32_sdcc_frexp
