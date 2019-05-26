@@ -277,9 +277,9 @@ _m32_logf:
 	push	ix
 	ld	ix,0
 	add	ix,sp
-	ld	hl, -6
-	add	hl, sp
-	ld	sp, hl
+	push	af
+	push	af
+	dec	sp
 	push	hl
 	ld	c,l
 	ld	b,h
@@ -324,10 +324,7 @@ l_m32_logf_00102:
 	call	___fssub_callee
 	ld	c, l
 	ld	b, h
-	pop	hl
-	push	hl
-	dec	hl
-	ex	(sp), hl
+	dec	(ix-5)
 	ld	hl,0x0008
 	push	hl
 	ld	hl,_m32_coeff_log
@@ -343,10 +340,10 @@ l_m32_logf_00102:
 	ld	(ix-3),h
 	ld	(ix-2),e
 	ld	(ix-1),d
-	pop	hl
-	push	hl
-	push	hl
-	call	___sint2fs_callee
+	ld	a,(ix-5)
+	push	af
+	inc	sp
+	call	___schar2fs_callee
 	push	de
 	push	hl
 	ld	hl,0x3f31

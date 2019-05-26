@@ -96,8 +96,8 @@ float m32_hypotf(float x, float y);
 
 /* Nearest integer, absolute value, and remainder functions */
 float m32_fabsf(float x) __z88dk_fastcall;
-float m32_frexpf(float x, int *pw2);
-float m32_ldexpf(float x, int pw2);
+float m32_frexpf(float x, int8_t *pw2);
+float m32_ldexpf(float x, int16_t pw2);
 float m32_ceilf(float x) __z88dk_fastcall;
 float m32_floorf(float x) __z88dk_fastcall;
 float m32_modff(float x, float * y);
