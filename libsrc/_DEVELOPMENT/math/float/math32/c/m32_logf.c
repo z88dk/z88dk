@@ -3,9 +3,9 @@
 
 extern float m32_coeff_log[];
 
-float m32_logf(float x) __z88dk_fastcall
+float m32_logf (float x) __z88dk_fastcall
 {
-    int exp;
+    int8_t exp;
 
     /* zero or -ve arguments are not defined */
 
@@ -13,7 +13,7 @@ float m32_logf(float x) __z88dk_fastcall
         return 0.0;
     x = m32_frexpf(x, &exp) * 2.0 - 1.0;
     exp--;
-    x = m32_poly(x, m32_coeff_log, 8);
-    return x + 0.69314718055995 * exp;
+    x = m32_polyf(x, m32_coeff_log, 8);
+    return (x + 0.69314718055995 * (float)exp);
 }
 

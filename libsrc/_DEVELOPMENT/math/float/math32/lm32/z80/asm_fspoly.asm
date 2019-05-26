@@ -4,7 +4,7 @@
 SECTION code_clib
 SECTION code_fp_math32
 
-PUBLIC asm_polyf
+PUBLIC asm_poly
 
 EXTERN m32_fspoly_callee
 
@@ -17,7 +17,7 @@ EXTERN m32_fspoly_callee
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-DEFC  asm_polyf = m32_fspoly_callee              ; enter stack = ret
+DEFC  asm_poly = m32_fspoly_callee              ; enter stack = ret
                                                 ;        DEHL = d32_float
                                                 ; return DEHL = d32_float
 

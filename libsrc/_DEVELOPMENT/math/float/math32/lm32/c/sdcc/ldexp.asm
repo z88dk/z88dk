@@ -1,6 +1,6 @@
 
 	SECTION	code_fp_math32
 	PUBLIC	_ldexp
-	EXTERN	_m32_ldexpf
+	EXTERN	cm32_sdcc_ldexp
 
-	defc	_ldexp = _m32_ldexpf
+	defc	_ldexp = cm32_sdcc_ldexp

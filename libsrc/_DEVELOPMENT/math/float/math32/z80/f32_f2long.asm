@@ -7,7 +7,7 @@
 	PUBLIC		m32_f2sint
 	PUBLIC		m32_f2uint
 
-	EXTERN		l_long_neg
+	EXTERN		l_neg_dehl
 	EXTERN		m32_fszero_fastcall
 
 ; Convert floating point number to long
@@ -34,5 +34,5 @@ loop:
 	jr	nz,loop
 	rl	d		;Check sign bit
 	ld	d,0
-	jp	c,l_long_neg
+	jp	c,l_neg_dehl
 	ret

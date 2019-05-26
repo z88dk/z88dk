@@ -30,7 +30,7 @@
 
 #include "m32_math.h"
 
-float m32_log10f(float x) __z88dk_fastcall
+float m32_log10f (float x) __z88dk_fastcall
 {
     return m32_logf(x)*0.4342944819;
 }

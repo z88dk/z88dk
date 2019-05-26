@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.6.9 #9958 (Mac OS X i386)
+; Version 3.6.9 #9958 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -200,18 +200,19 @@
 ;--------------------------------------------------------
 ; Public variables in this module
 ;--------------------------------------------------------
-	GLOBAL _m32_asinh
+	GLOBAL _m32_asinhf
 ;--------------------------------------------------------
 ; Externals used
 ;--------------------------------------------------------
-	GLOBAL _m32_poly
+	GLOBAL _m32_polyf
 	GLOBAL _m32_invsqrtf
 	GLOBAL _m32_invf
-	GLOBAL _m32_sqr
+	GLOBAL _m32_sqrf
+	GLOBAL _m32_roundf
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
-	GLOBAL _m32_floor
-	GLOBAL _m32_ceil
+	GLOBAL _m32_floorf
+	GLOBAL _m32_ceilf
 	GLOBAL _m32_ldexpf
 	GLOBAL _m32_frexpf
 	GLOBAL _m32_fabsf
@@ -223,7 +224,6 @@
 	GLOBAL _m32_sqrtf
 	GLOBAL _m32_atanhf
 	GLOBAL _m32_acoshf
-	GLOBAL _m32_asinhf
 	GLOBAL _m32_tanhf
 	GLOBAL _m32_coshf
 	GLOBAL _m32_sinhf
@@ -270,90 +270,70 @@ ENDIF
 ;--------------------------------------------------------
 	SECTION code_compiler
 ;	---------------------------------
-; Function m32_asinh
+; Function m32_asinhf
 ; ---------------------------------
-_m32_asinh:
+_m32_asinhf:
 	push	ix
 	ld	ix,0
 	add	ix,sp
-	ld	hl, -8
+	ld	hl, -12
 	add	hl, sp
 	ld	sp, hl
-	ld	l,(ix+4)
-	ld	h,(ix+5)
-	ld	e,(ix+6)
-	ld	d,(ix+7)
+	ld	(ix-4),l
+	ld	(ix-3),h
+	ld	(ix-2),e
+	ld	(ix-1),d
 	call	_m32_fabsf
-	ex	de, hl
-	push	hl
 	push	de
+	push	hl
 	ld	hl,0x4000
 	push	hl
 	ld	hl,0x0000
 	push	hl
 	call	___fsmul_callee
+	ld	(ix-9),d
+	ld	(ix-10),e
+	ld	(ix-11),h
+	ld	(ix-12),l
+	ld	l,(ix-4)
+	ld	h,(ix-3)
+	ld	e,(ix-2)
+	ld	d,(ix-1)
+	call	_m32_sqrf
+	ld	bc,0x3f80
+	push	bc
+	ld	bc,0x0000
+	push	bc
+	push	de
+	push	hl
+	call	___fsadd_callee
+	call	_m32_sqrtf
 	ld	(ix-5),d
 	ld	(ix-6),e
 	ld	(ix-7),h
 	ld	(ix-8),l
-	ld	l,(ix+6)
-	ld	h,(ix+7)
-	push	hl
-	ld	l,(ix+4)
-	ld	h,(ix+5)
-	push	hl
-	ld	l,(ix+6)
-	ld	h,(ix+7)
-	push	hl
-	ld	l,(ix+4)
-	ld	h,(ix+5)
-	push	hl
-	call	___fsmul_callee
-	ld	c, l
-	ld	b, h
-	ld	hl,0x3f80
-	push	hl
-	ld	hl,0x0000
-	push	hl
-	push	de
-	push	bc
-	call	___fsadd_callee
-	call	_m32_sqrtf
-	ld	(ix-1),d
-	ld	(ix-2),e
-	ld	(ix-3),h
-	ld	(ix-4),l
-	ld	l,(ix+4)
-	ld	h,(ix+5)
-	ld	e,(ix+6)
-	ld	d,(ix+7)
-	call	_m32_fabsf
-	ex	de, hl
-	push	hl
-	push	de
-	ld	l,(ix-2)
-	ld	h,(ix-1)
-	push	hl
 	ld	l,(ix-4)
 	ld	h,(ix-3)
-	push	hl
-	call	___fsadd_callee
-	ex	de, hl
-	push	hl
+	ld	e,(ix-2)
+	ld	d,(ix-1)
+	call	_m32_fabsf
 	push	de
-	ld	hl,0x3f80
 	push	hl
-	ld	hl,0x0000
-	push	hl
-	call	___fsdiv_callee
-	ex	de, hl
-	push	hl
-	push	de
 	ld	l,(ix-6)
 	ld	h,(ix-5)
 	push	hl
 	ld	l,(ix-8)
 	ld	h,(ix-7)
+	push	hl
+	call	___fsadd_callee
+	call	_m32_invf
+	push	de
+	push	hl
+	ld	l,(ix-10)
+	ld	h,(ix-9)
+	push	hl
+	ld	l,(ix-12)
+	ld	h,(ix-11)
 	push	hl
 	call	___fsadd_callee
 	call	_m32_logf

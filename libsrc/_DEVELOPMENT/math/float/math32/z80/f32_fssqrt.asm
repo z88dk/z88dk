@@ -40,6 +40,7 @@ EXTERN m32_fsmul32x32, m32_fsmul24x32, m32_fsadd32x32, m32_fsadd24x32
 EXTERN m32_fsmin_fastcall
 
 PUBLIC m32_fssqrt, m32_fssqrt_fastcall, m32_fsinvsqrt_fastcall
+PUBLIC _m32_sqrtf, _m32_invsqrtf
 
 
 .m32_fssqrt
@@ -47,6 +48,7 @@ PUBLIC m32_fssqrt, m32_fssqrt_fastcall, m32_fsinvsqrt_fastcall
     jp m32_fsmul
 
 
+._m32_sqrtf
 .m32_fssqrt_fastcall
     push de                     ; y msw on stack
     push hl                     ; y lsw on stack
@@ -56,6 +58,7 @@ PUBLIC m32_fssqrt, m32_fssqrt_fastcall, m32_fsinvsqrt_fastcall
     ret
 
 
+._m32_invsqrtf
 .m32_fsinvsqrt_fastcall         ; DEHL
     ld a,d
     or a                        ; divide by zero?

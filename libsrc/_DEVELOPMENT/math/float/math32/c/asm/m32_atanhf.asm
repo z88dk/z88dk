@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.6.9 #9958 (Mac OS X i386)
+; Version 3.6.9 #9958 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -200,19 +200,21 @@
 ;--------------------------------------------------------
 ; Public variables in this module
 ;--------------------------------------------------------
-	GLOBAL _m32_frexpf
+	GLOBAL _m32_atanhf
 ;--------------------------------------------------------
 ; Externals used
 ;--------------------------------------------------------
-	GLOBAL _m32_poly
+	GLOBAL _m32_polyf
 	GLOBAL _m32_invsqrtf
 	GLOBAL _m32_invf
-	GLOBAL _m32_sqr
+	GLOBAL _m32_sqrf
+	GLOBAL _m32_roundf
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
-	GLOBAL _m32_floor
-	GLOBAL _m32_ceil
+	GLOBAL _m32_floorf
+	GLOBAL _m32_ceilf
 	GLOBAL _m32_ldexpf
+	GLOBAL _m32_frexpf
 	GLOBAL _m32_fabsf
 	GLOBAL _m32_hypotf
 	GLOBAL _m32_powf
@@ -220,6 +222,8 @@
 	GLOBAL _m32_logf
 	GLOBAL _m32_expf
 	GLOBAL _m32_sqrtf
+	GLOBAL _m32_acoshf
+	GLOBAL _m32_asinhf
 	GLOBAL _m32_tanhf
 	GLOBAL _m32_coshf
 	GLOBAL _m32_sinhf
@@ -266,114 +270,56 @@ ENDIF
 ;--------------------------------------------------------
 	SECTION code_compiler
 ;	---------------------------------
-; Function m32_frexpf
+; Function m32_atanhf
 ; ---------------------------------
-_m32_frexpf:
+_m32_atanhf:
 	push	ix
 	ld	ix,0
 	add	ix,sp
 	push	af
 	push	af
+	push	hl
+	ld	c,l
+	ld	b,h
+	push	de
+	ld	hl,0x3f80
+	push	hl
 	ld	hl,0x0000
-	add	hl, sp
-	ex	de,hl
-	ld	hl,0x0008
-	add	hl, sp
-	ld	bc,0x0004
-	ldir
+	push	hl
+	push	de
+	push	bc
+	call	___fsadd_callee
+	ld	(ix-1),d
+	ld	(ix-2),e
+	ld	(ix-3),h
+	ld	(ix-4),l
+	pop	de
+	pop	bc
+	push	de
+	push	bc
+	ld	hl,0x3f80
+	push	hl
 	ld	hl,0x0000
-	add	hl, sp
 	push	hl
-	ld	c, (hl)
-	inc	hl
-	ld	b, (hl)
-	inc	hl
-	ld	e, (hl)
-	inc	hl
-	ld	d, (hl)
-	pop	hl
-	ld	a,0x17
-l_m32_frexpf_00103:
-	sra	d
-	rr	e
-	rr	b
-	rr	c
-	dec	a
-	jr	NZ, l_m32_frexpf_00103
-	ld	b,0x00
-	ld	de,0x0000
-	ld	a, c
-	add	a,0x82
-	ld	c, a
-	ld	a, b
-	adc	a,0xff
-	ld	b, a
-	ld	a, e
-	adc	a,0xff
-	ld	a, d
-	adc	a,0xff
+	call	___fssub_callee
+	push	de
 	push	hl
-	ld	l,(ix+8)
-	ld	h,(ix+9)
+	ld	l,(ix-2)
+	ld	h,(ix-1)
 	push	hl
-	pop	iy
-	pop	hl
-	ld	(iy+0),c
-	ld	(iy+1),b
+	ld	l,(ix-4)
+	ld	h,(ix-3)
 	push	hl
-	ld	c, (hl)
-	inc	hl
-	ld	b, (hl)
-	inc	hl
-	ld	e, (hl)
-	inc	hl
-	ld	d, (hl)
-	pop	hl
-	res	7, e
-	ld	a, d
-	and	a,0x80
-	ld	d, a
-	ld	(hl), c
-	inc	hl
-	ld	(hl), b
-	inc	hl
-	ld	(hl), e
-	inc	hl
-	ld	(hl), d
-	dec	hl
-	dec	hl
-	dec	hl
+	call	___fsdiv_callee
+	call	_m32_logf
+	push	de
 	push	hl
-	ld	a, (hl)
-	inc	hl
-	ld	a, (hl)
-	inc	hl
-	ld	a, (hl)
-	inc	hl
-	ld	a, (hl)
-	pop	hl
-	ld	a, d
-	or	a,0x3f
-	ld	d, a
-	ld	(hl), c
-	inc	hl
-	ld	(hl), b
-	inc	hl
-	ld	(hl), e
-	inc	hl
-	ld	(hl), d
+	ld	hl,0x3f00
+	push	hl
 	ld	hl,0x0000
-	add	hl, sp
-	ld	c, (hl)
-	inc	hl
-	ld	b, (hl)
-	inc	hl
-	ld	e, (hl)
-	inc	hl
-	ld	d, (hl)
-	ld	l, c
-	ld	h, b
-	ld	sp, ix
+	push	hl
+	call	___fsmul
+	ld	sp,ix
 	pop	ix
 	ret
 	SECTION IGNORE

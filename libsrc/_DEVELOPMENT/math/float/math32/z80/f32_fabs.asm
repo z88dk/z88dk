@@ -2,7 +2,6 @@
 SECTION code_fp_math32
 PUBLIC  m32_fabs
 
-
 m32_fabs:
 	pop	bc
 	pop	hl

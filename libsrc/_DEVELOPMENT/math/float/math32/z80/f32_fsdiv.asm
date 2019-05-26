@@ -46,6 +46,7 @@ EXTERN m32_fsmin_fastcall, m32_fsmax_fastcall
 
 PUBLIC m32_fsdiv, m32_fsdiv_callee
 PUBLIC m32_fsinv_fastcall
+PUBLIC _m32_invf
 
 
 .m32_fsdiv
@@ -58,6 +59,7 @@ PUBLIC m32_fsinv_fastcall
     jp m32_fsmul_callee
 
 
+._m32_invf
 .m32_fsinv_fastcall
     ex de,hl                    ; DEHL -> HLDE
 
@@ -68,7 +70,7 @@ PUBLIC m32_fsinv_fastcall
     or a                        ; divide by zero?
     jp Z,m32_fsmax_fastcall
 
-    ld h,0bfh                   ; scale to - 0.5 <= D' < 1.0
+    ld h,0bfh                   ; scale to -0.5 <= D' < -1.0
     srl l
     ex de,hl                    ; - D' in DEHL
 

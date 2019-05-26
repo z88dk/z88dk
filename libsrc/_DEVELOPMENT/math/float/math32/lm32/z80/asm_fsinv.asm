@@ -1,14 +1,14 @@
 
-; float _sqrtf (float number) __z88dk_fastcall
+; float _invf (float number) __z88dk_fastcall
 
 SECTION code_clib
 SECTION code_fp_math32
 
-PUBLIC asm_sqrtf
+PUBLIC asm_inv
 
-EXTERN m32_fssqrt_fastcall
+EXTERN m32_fsinv_fastcall
 
-    ; square root sccz80 float
+    ; invert sccz80 float
     ;
     ; enter : stack = ret
     ;          DEHL = sccz80_float number
@@ -17,6 +17,6 @@ EXTERN m32_fssqrt_fastcall
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-DEFC  asm_sqrtf = m32_fssqrt_fastcall           ; enter stack = ret
+DEFC  asm_inv = m32_fsinv_fastcall              ; enter stack = ret
                                                 ;        DEHL = d32_float
                                                 ; return DEHL = d32_float

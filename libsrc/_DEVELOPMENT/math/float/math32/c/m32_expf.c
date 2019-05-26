@@ -14,11 +14,11 @@ float m32_expf (float x) __z88dk_fastcall
     if(sign)
         x = -x;
     x *= 1.4426950409;        /* convert to log2 */
-    exp = (uint16_t)m32_floor(x);
+    exp = (uint16_t)m32_floorf(x);
     x -= (float)exp;
-    x = m32_ldexpf(m32_poly(x, m32_coeff_exp, 9), exp);
+    x = m32_ldexpf(m32_polyf(x, m32_coeff_exp, 9), exp);
     if(sign)
-        return 1.0/x;
+        return m32_invf(x);
     return x;
 }
 

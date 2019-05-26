@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.6.9 #9958 (Mac OS X i386)
+; Version 3.6.9 #9958 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -204,14 +204,15 @@
 ;--------------------------------------------------------
 ; Externals used
 ;--------------------------------------------------------
-	GLOBAL _m32_poly
+	GLOBAL _m32_polyf
 	GLOBAL _m32_invsqrtf
 	GLOBAL _m32_invf
-	GLOBAL _m32_sqr
+	GLOBAL _m32_sqrf
+	GLOBAL _m32_roundf
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
-	GLOBAL _m32_floor
-	GLOBAL _m32_ceil
+	GLOBAL _m32_floorf
+	GLOBAL _m32_ceilf
 	GLOBAL _m32_ldexpf
 	GLOBAL _m32_frexpf
 	GLOBAL _m32_fabsf
@@ -221,6 +222,9 @@
 	GLOBAL _m32_logf
 	GLOBAL _m32_expf
 	GLOBAL _m32_sqrtf
+	GLOBAL _m32_atanhf
+	GLOBAL _m32_acoshf
+	GLOBAL _m32_asinhf
 	GLOBAL _m32_tanhf
 	GLOBAL _m32_coshf
 	GLOBAL _m32_sinhf
@@ -277,13 +281,12 @@ _m32_sinf:
 	ld	hl, -14
 	add	hl, sp
 	ld	sp, hl
-	ld	c, l
-	ld	b, h
-	push	bc
+	push	hl
+	ld	c,l
+	ld	b,h
 	push	de
 	ld	hl,0x0000
 	push	hl
-	ld	hl,0x0000
 	push	hl
 	push	de
 	push	bc
@@ -339,18 +342,16 @@ l_m32_sinf_00103:
 	ld	h,(ix-3)
 	push	hl
 	call	___fsdiv_callee
-	call	_m32_floor
-	ex	de, hl
-	push	hl
+	call	_m32_floorf
 	push	de
+	push	hl
 	ld	hl,0x4080
 	push	hl
 	ld	hl,0x0000
 	push	hl
 	call	___fsmul_callee
-	ex	de, hl
-	push	hl
 	push	de
+	push	hl
 	ld	l,(ix-2)
 	ld	h,(ix-1)
 	push	hl
@@ -409,9 +410,8 @@ l_m32_sinf_00107:
 	push	hl
 	push	hl
 	call	___sint2fs_callee
-	ex	de, hl
-	push	hl
 	push	de
+	push	hl
 	ld	l,(ix-2)
 	ld	h,(ix-1)
 	push	hl
@@ -463,10 +463,10 @@ l_m32_sinf_00111:
 	ld	h,(ix-13)
 	ld	e,(ix-12)
 	ld	d,(ix-11)
-	call	_m32_sqr
-	ld	c, l
-	ld	b, h
-	push	bc
+	call	_m32_sqrf
+	push	hl
+	ld	c,l
+	ld	b,h
 	push	de
 	ld	hl,0x0004
 	push	hl
@@ -474,16 +474,16 @@ l_m32_sinf_00111:
 	push	hl
 	push	de
 	push	bc
-	call	_m32_poly
+	call	_m32_polyf
+	pop	af
+	pop	af
+	pop	af
+	pop	af
 	ld	(ix-7),d
 	ld	(ix-8),e
 	ld	(ix-9),h
 	ld	(ix-10),l
-	ld	l,(ix-8)
-	ld	h,(ix-7)
-	push	hl
-	ld	l,(ix-10)
-	ld	h,(ix-9)
+	push	de
 	push	hl
 	ld	l,(ix-12)
 	ld	h,(ix-11)
@@ -504,10 +504,13 @@ l_m32_sinf_00111:
 	push	hl
 	push	de
 	push	bc
-	call	_m32_poly
-	ex	de, hl
-	push	hl
+	call	_m32_polyf
+	pop	af
+	pop	af
+	pop	af
+	pop	af
 	push	de
+	push	hl
 	ld	l,(ix-8)
 	ld	h,(ix-7)
 	push	hl

@@ -12,7 +12,7 @@
 #include "m32_math.h"
 
 
-float m32_roundf(float x) __z88dk_fastcall
+float m32_roundf (float x) __z88dk_fastcall
 {
   int signbit;
   union float_long fl;
