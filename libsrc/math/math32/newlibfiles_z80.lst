@@ -117,7 +117,7 @@
 ../../_DEVELOPMENT/math/float/math32/z80/f32_fshypot.asm
 ../../_DEVELOPMENT/math/float/math32/z80/f32_fsadd32.asm
 ../../_DEVELOPMENT/math/float/math32/z80/f32_fsdiv.asm
-../../_DEVELOPMENT/math/float/math32/z80/f32_fsinvsqrt.asm
+../../_DEVELOPMENT/math/float/math32/z80/f32_fssqrt.asm
 ../../_DEVELOPMENT/math/float/math32/z80/f32_compare_callee.asm
 ../../_DEVELOPMENT/math/float/math32/z80/f32_z80_sqr_32h_24x24.asm
 ../../_DEVELOPMENT/math/float/math32/z80/f32_f2long.asm
@@ -141,6 +141,8 @@
 ../../_DEVELOPMENT/math/float/math32/z80/f32_fsmul32.asm
 ../../_DEVELOPMENT/math/float/math32/z80/h32_coeff_atan.asm
 ../../_DEVELOPMENT/math/float/math32/z80/d32_fsconv.asm
+../../_DEVELOPMENT/math/float/math32/z80/f32_fsfrexp.asm
+../../_DEVELOPMENT/math/float/math32/z80/f32_fsldexp.asm
 ../../_DEVELOPMENT/math/float/math32/z80/f32_fspoly.asm
 ../../_DEVELOPMENT/math/float/math32/c/asm/m32_sinhf.asm
 ../../_DEVELOPMENT/math/float/math32/c/asm/m32_tanf.asm
@@ -152,7 +154,6 @@
 ../../_DEVELOPMENT/math/float/math32/c/asm/m32_atanhf.asm
 ../../_DEVELOPMENT/math/float/math32/c/asm/m32_roundf.asm
 ../../_DEVELOPMENT/math/float/math32/c/asm/m32_logf.asm
-../../_DEVELOPMENT/math/float/math32/c/asm/m32_frexpf.asm
 ../../_DEVELOPMENT/math/float/math32/c/asm/m32_atanf.asm
 ../../_DEVELOPMENT/math/float/math32/c/asm/m32_coshf.asm
 ../../_DEVELOPMENT/math/float/math32/c/asm/m32_asinf.asm
@@ -160,7 +161,6 @@
 ../../_DEVELOPMENT/math/float/math32/c/asm/m32_powf.asm
 ../../_DEVELOPMENT/math/float/math32/c/asm/m32_expf.asm
 ../../_DEVELOPMENT/math/float/math32/c/asm/m32_acoshf.asm
-../../_DEVELOPMENT/math/float/math32/c/asm/m32_ldexpf.asm
 ../../_DEVELOPMENT/math/float/math32/c/asm/m32_tanhf.asm
 ../../_DEVELOPMENT/math/float/math32/c/asm/m32_cosf.asm
 ../../_DEVELOPMENT/math/float/math32/c/asm/m32_log10f.asm
