@@ -45,11 +45,12 @@ PUBLIC _m32_ldexpf
     push de                     ; (float)x
     push hl
     call m32_fsldexp_callee
-    pop hl                      ; my return
+    pop bc                      ; my return
     push af
     push af
     push af
-    jp (hl)
+    push bc
+    ret
 
 
 .m32_fsldexp_callee
