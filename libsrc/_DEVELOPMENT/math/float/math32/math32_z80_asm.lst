@@ -12,14 +12,14 @@ math/float/math32/z80/f32_fpclassify
 math/float/math32/z80/f32_fsadd32
 math/float/math32/z80/f32_fsdiv
 math/float/math32/z80/f32_fshypot
-math/float/math32/z80/f32_fssqrt
+math/float/math32/z80/f32_fsldexp
 math/float/math32/z80/f32_fsmul
 math/float/math32/z80/f32_fsmul32
 math/float/math32/z80/f32_fsnormalize32
 math/float/math32/z80/f32_fsfrexp
-math/float/math32/z80/f32_fsldexp
 math/float/math32/z80/f32_fspoly
 math/float/math32/z80/f32_fssqr
+math/float/math32/z80/f32_fssqrt
 math/float/math32/z80/f32_unity
 
 math/float/math32/z80/f32_z80_mulu_32h_24x24

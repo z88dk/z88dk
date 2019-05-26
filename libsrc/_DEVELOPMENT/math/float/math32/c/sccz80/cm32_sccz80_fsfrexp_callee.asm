@@ -1,12 +1,12 @@
 
 SECTION code_fp_math32
 
-PUBLIC cm32_sccz80_frexp
+PUBLIC cm32_sccz80_frexp_callee
 
-EXTERN _m32_frexpf
+EXTERN m32_fsfrexp_callee
 
-; float frexpf(float x, int *pw2);
-cm32_sccz80_frexp:
+; float frexpf(float x, int8_t *pw2);
+cm32_sccz80_frexp_callee:
 	; Entry:
 	; Stack: float left, ptr right, ret
 
@@ -19,4 +19,4 @@ cm32_sccz80_frexp:
 	push	de	;float
 	push	hl
 	push	af	;ret
-	jp	_m32_frexpf
+	jp  m32_fsfrexp_callee
