@@ -292,37 +292,37 @@ _m32_roundf:
 	ld	(hl), d
 	ld	hl,0x0008
 	add	hl, sp
-	ld	(ix-2),l
-	ld	(ix-1),h
+	ld	(ix-10),l
+	ld	(ix-9),h
 	push	de
 	push	bc
-	ld	e,(ix-2)
-	ld	d,(ix-1)
-	ld	hl,0x0014
+	ld	e,(ix-10)
+	ld	d,(ix-9)
+	ld	hl,0x0016
 	add	hl, sp
 	ex	de, hl
 	ld	bc,0x0004
 	ldir
 	pop	bc
 	pop	de
-	ld	(ix-10),0x00
-	ld	(ix-9),0x00
-	ld	a,(ix-4)
+	ld	(ix-8),0x00
+	ld	(ix-7),0x00
+	ld	a,(ix-2)
 	and	a,0x80
-	ld	(ix-8),a
-	ld	a,(ix-3)
+	ld	(ix-6),a
+	ld	a,(ix-1)
 	and	a,0x7f
-	ld	(ix-7),a
+	ld	(ix-5),a
 	ld	a,0x17
 l_m32_roundf_00136:
-	srl	(ix-7)
+	srl	(ix-5)
+	rr	(ix-6)
+	rr	(ix-7)
 	rr	(ix-8)
-	rr	(ix-9)
-	rr	(ix-10)
 	dec	a
 	jr	NZ, l_m32_roundf_00136
-	ld	h,(ix-9)
-	ld	a,(ix-10)
+	ld	h,(ix-7)
+	ld	a,(ix-8)
 	add	a,0x81
 	ld	(ix-20),a
 	ld	a, h
@@ -340,7 +340,7 @@ l_m32_roundf_00136:
 	jr	Z,l_m32_roundf_00106
 	ld	bc,0x0000
 	ld	e,0x00
-	ld	a,(ix-3)
+	ld	a,(ix-1)
 	and	a,0x80
 	ld	d, a
 	ld	a,(ix-20)
@@ -356,45 +356,45 @@ l_m32_roundf_00136:
 	jp	l_m32_roundf_00113
 l_m32_roundf_00106:
 	ld	a,(ix-20)
-	ld	(ix-10),0xff
-	ld	(ix-9),0xff
-	ld	(ix-8),0x7f
-	ld	(ix-7),0x00
+	ld	(ix-8),0xff
+	ld	(ix-7),0xff
+	ld	(ix-6),0x7f
+	ld	(ix-5),0x00
 	inc	a
 	jr	l_m32_roundf_00141
 l_m32_roundf_00140:
-	sra	(ix-7)
+	sra	(ix-5)
+	rr	(ix-6)
+	rr	(ix-7)
 	rr	(ix-8)
-	rr	(ix-9)
-	rr	(ix-10)
 l_m32_roundf_00141:
 	dec	a
 	jr	NZ, l_m32_roundf_00140
-	ld	a,(ix-10)
+	ld	a,(ix-8)
 	ld	(ix-22),a
-	ld	a,(ix-9)
+	ld	a,(ix-7)
 	ld	(ix-21),a
 	ld	a,(ix-22)
-	ld	(ix-10),a
+	ld	(ix-8),a
 	ld	a,(ix-21)
-	ld	(ix-9),a
-	ld	(ix-8),0x00
-	ld	(ix-7),0x00
-	ld	a,(ix-10)
-	and	a,(ix-6)
-	ld	(ix-10),a
-	ld	a,(ix-9)
-	and	a,(ix-5)
-	ld	(ix-9),a
+	ld	(ix-7),a
+	ld	(ix-6),0x00
+	ld	(ix-5),0x00
 	ld	a,(ix-8)
 	and	a,(ix-4)
 	ld	(ix-8),a
 	ld	a,(ix-7)
 	and	a,(ix-3)
 	ld	(ix-7),a
+	ld	a,(ix-6)
+	and	a,(ix-2)
+	ld	(ix-6),a
+	ld	a,(ix-5)
+	and	a,(ix-1)
+	ld	(ix-5),a
+	or	a,(ix-6)
+	or	a,(ix-7)
 	or	a,(ix-8)
-	or	a,(ix-9)
-	or	a,(ix-10)
 	jr	NZ,l_m32_roundf_00104
 	ld	l, c
 	ld	h, b
@@ -413,16 +413,16 @@ l_m32_roundf_00142:
 	rr	c
 l_m32_roundf_00143:
 	djnz	l_m32_roundf_00142
-	ld	a,(ix-6)
+	ld	a,(ix-4)
 	add	a, c
 	ld	c, a
-	ld	a,(ix-5)
+	ld	a,(ix-3)
 	adc	a, e
 	ld	b, a
-	ld	a,(ix-4)
+	ld	a,(ix-2)
 	adc	a, l
 	ld	e, a
-	ld	a,(ix-3)
+	ld	a,(ix-1)
 	adc	a, h
 	ld	d, a
 	ld	(ix-18),c
@@ -465,8 +465,8 @@ l_m32_roundf_00109:
 	ld	h, b
 	jr	l_m32_roundf_00114
 l_m32_roundf_00113:
-	ld	l,(ix-2)
-	ld	h,(ix-1)
+	ld	l,(ix-10)
+	ld	h,(ix-9)
 	ld	(hl), c
 	inc	hl
 	ld	(hl), b

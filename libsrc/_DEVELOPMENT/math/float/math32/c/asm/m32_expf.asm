@@ -324,7 +324,7 @@ l_m32_expf_00104:
 	call	_m32_floorf
 	push	de
 	push	hl
-	call	___fs2uint_callee
+	call	___fs2sint_callee
 	pop	bc
 	push	hl
 	push	hl

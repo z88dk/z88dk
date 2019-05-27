@@ -317,8 +317,8 @@ _m32_atan2f:
 	ld	h,(ix-4)
 	push	hl
 	call	___fslt_callee
-	bit	0,l
-	jp	NZ,l_m32_atan2f_00107
+	bit	0, l
+	jp	NZ, l_m32_atan2f_00107
 	ld	l,(ix+10)
 	ld	h,(ix+11)
 	push	hl
