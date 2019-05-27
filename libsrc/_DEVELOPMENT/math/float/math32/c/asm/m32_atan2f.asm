@@ -284,10 +284,10 @@ _m32_atan2f:
 	ld	e,(ix+10)
 	ld	d,(ix+11)
 	call	_m32_fabsf
-	ld	(ix-2),d
-	ld	(ix-3),e
-	ld	(ix-4),h
-	ld	(ix-5),l
+	ld	(ix-1),d
+	ld	(ix-2),e
+	ld	(ix-3),h
+	ld	(ix-4),l
 	ld	l,(ix+4)
 	ld	h,(ix+5)
 	ld	e,(ix+6)
@@ -305,20 +305,20 @@ _m32_atan2f:
 	ld	h,(ix+9)
 	push	hl
 	call	___fslt_callee
-	ld	(ix-1),l
+	ld	(ix-5),l
 	pop	de
 	pop	bc
 	push	de
 	push	bc
-	ld	l,(ix-3)
-	ld	h,(ix-2)
+	ld	l,(ix-2)
+	ld	h,(ix-1)
 	push	hl
-	ld	l,(ix-5)
-	ld	h,(ix-4)
+	ld	l,(ix-4)
+	ld	h,(ix-3)
 	push	hl
 	call	___fslt_callee
-	bit	0, l
-	jp	NZ, l_m32_atan2f_00107
+	bit	0,l
+	jp	NZ,l_m32_atan2f_00107
 	ld	l,(ix+10)
 	ld	h,(ix+11)
 	push	hl
@@ -333,7 +333,7 @@ _m32_atan2f:
 	push	hl
 	call	___fsdiv_callee
 	call	_m32_atanf
-	ld	a,(ix-1)
+	ld	a,(ix-5)
 	or	a,a
 	ld	c,l
 	ld	b,h
@@ -400,7 +400,7 @@ l_m32_atan2f_00107:
 	ld	(ix-8),h
 	ld	(ix-7),e
 	ld	(ix-6),c
-	ld	a,(ix-1)
+	ld	a,(ix-5)
 	or	a, a
 	jr	Z,l_m32_atan2f_00109
 	ld	hl,0x3fc9

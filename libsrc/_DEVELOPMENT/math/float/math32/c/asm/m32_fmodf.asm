@@ -352,11 +352,12 @@ l_m32_fmodf_00102:
 	push	de
 	push	bc
 	call	___fssub_callee
+	ld	c, l
 	jr	l_m32_fmodf_00106
 l_m32_fmodf_00105:
-	ld	l, c
 	ld	h, b
 l_m32_fmodf_00106:
+	ld	l, c
 l_m32_fmodf_00103:
 	pop	ix
 	ret

@@ -37,11 +37,9 @@ EXTERN m32_fspoly_callee
 
     call m32_fspoly_callee
     
-    pop hl                      ; my return
-    xor a
-    push af
-    push af
-    push af
-    push af  
-    jp (hl)
-
+    pop bc                      ; my return
+    push bc
+    push bc
+    push bc
+    push bc  
+    ret

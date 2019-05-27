@@ -3,21 +3,27 @@ SECTION code_fp_math32
 
 PUBLIC cm32_sccz80_ldexp
 
-EXTERN m32_fsldexp
+EXTERN m32_fsldexp_callee
 
 ; float ldexpf(float x, int16_t pw2);
-cm32_sccz80_ldexp:
+
+.cm32_sccz80_ldexp
 	; Entry:
 	; Stack: float left, int right, ret
 
 	; Reverse the stack
-	pop	af	;ret
-	pop	bc	;int
-	pop	hl	;float
+	pop	af	                    ;my return
+	pop	bc	                    ;int
+	pop	hl	                    ;float
 	pop	de
-	push	bc	;int
-	push	de	;float
+	push	af	                ;my return
+	push	bc	                ;int
+	push	de	                ;float
 	push	hl
-	push	af	;ret
-	jp	m32_fsldexp
-	
+    call m32_fsldexp_callee
+    pop bc                      ;my return
+    push bc
+    push bc
+    push bc
+    push bc
+    ret

@@ -8,8 +8,6 @@ PUBLIC cm32_sdcc_fspoly_callee
 
 EXTERN m32_fspoly_callee
 
-.cm32_sdcc_dpoly
-
     ; evaluation of a polynomial function
     ;
     ; enter : stack = uint16_t n, float d[], float x, ret

@@ -30,29 +30,11 @@
 SECTION code_clib
 SECTION code_fp_math32
 
-PUBLIC m32_fsldexp, m32_fsldexp_callee
+PUBLIC m32_fsldexp_callee
 PUBLIC _m32_ldexpf
 
 
 ._m32_ldexpf
-.m32_fsldexp
-    pop af                      ; my return
-    pop hl                      ; (float)x
-    pop de
-    pop bc                      ; pw2
-    push af                     ; my return   
-    push bc                     ; pw2
-    push de                     ; (float)x
-    push hl
-    call m32_fsldexp_callee
-    pop bc                      ; my return
-    push af
-    push af
-    push af
-    push bc
-    ret
-
-
 .m32_fsldexp_callee
     ; evaluation of fraction and exponent
     ;
