@@ -75,7 +75,7 @@ PUBLIC _m32_frexpf
     rr e                        ; save the sign in e[7]
 
     ld a,d
-    sub 07eh                    ; remove exponent bias
+    sub 07eh                    ; remove exponent excess (bias -1)
     ld (bc),a                   ; and store in pw2
     
     ld d,07eh                   ; mantissa between 0.5 and 1

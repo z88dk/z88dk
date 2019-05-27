@@ -74,7 +74,7 @@ PUBLIC _m32_ldexpf
     rr e                        ; save the sign in e[7]
 
     ld a,c
-    add 07eh                    ; insert exponent bias
+    add 07fh                    ; insert exponent bias
 
     ld d,a                      ; exponent returned
     rl e                        ; get sign back
