@@ -297,7 +297,7 @@ _m32_logf:
 	ld	hl,0x0000
 	ld	e,l
 	ld	d,h
-	jp	l_m32_logf_00103
+	jr	l_m32_logf_00103
 l_m32_logf_00102:
 	ld	hl,0x0000
 	add	hl, sp
@@ -305,9 +305,6 @@ l_m32_logf_00102:
 	push	de
 	push	bc
 	call	_m32_frexpf
-	pop	af
-	pop	af
-	pop	af
 	push	de
 	push	hl
 	ld	hl,0x4000
@@ -332,10 +329,6 @@ l_m32_logf_00102:
 	push	de
 	push	bc
 	call	_m32_polyf
-	pop	af
-	pop	af
-	pop	af
-	pop	af
 	ld	(ix-4),l
 	ld	(ix-3),h
 	ld	(ix-2),e

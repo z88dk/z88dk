@@ -49,33 +49,6 @@ PUBLIC _m32_polyf
 
 
 ._m32_polyf
-    pop af                      ; my return
-    pop hl                      ; (float)x
-    pop de
-
-    exx
-    pop hl                      ; (float*)d
-    pop de                      ; (uint16_t)n
-
-    push af                     ; my return
-    push de                     ; (uint16_t)n
-    push hl                     ; (float*)d
-
-    exx
-    push de                      ; (float)x
-    push hl
-
-    call m32_fspoly_callee
-    
-    pop hl                      ; my return
-    xor a
-    push af
-    push af
-    push af
-    push af
-    jp (hl)
-
-
 .m32_fspoly_callee
     ; evaluation of a polynomial function
     ;

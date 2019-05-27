@@ -345,19 +345,12 @@ l_m32_expf_00104:
 	push	de
 	push	hl
 	call	_m32_polyf
-	pop	af
-	pop	af
-	pop	af
-	pop	af
 	pop	bc
 	push	bc
 	push	bc
 	push	de
 	push	hl
 	call	_m32_ldexpf
-	pop	af
-	pop	af
-	pop	af
 	ld	a,(ix-1)
 	or	a, a
 	jr	Z,l_m32_expf_00106
