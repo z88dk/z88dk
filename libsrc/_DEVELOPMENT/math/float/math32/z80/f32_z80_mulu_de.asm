@@ -29,12 +29,12 @@ PUBLIC m32_z80_mulu_de
 
 .m32_z80_mulu_de
 
-   inc d
-   dec d
-   jr Z,zerod               ; multiply by 0
    inc e
    dec e
    jr Z,zeroe               ; multiply by 0
+   inc d
+   dec d
+   jr Z,zerod               ; multiply by 0
 
    push hl
    ex de,hl
@@ -59,13 +59,13 @@ PUBLIC m32_z80_mulu_de
    sla h
    jr C,branch_17
    jr exit1                ; multiply by 1
-   
-.zerod
-   ld e,d
-   ret
-   
+
 .zeroe
    ld d,e
+   ret
+
+.zerod
+   ld e,d
    ret
 
    ; multiplication tree

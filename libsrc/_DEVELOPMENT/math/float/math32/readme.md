@@ -206,6 +206,8 @@ A lot of integer like numbers have "short" mantissas, when represented in floati
 
 Of course the other side of the argument is that integers should be handled by the integer library, and that calculating a 8 iteration polynomial estimation for `logf()` (for example) will never have zeros in it, so carrying zero detection overhead for short mantissa floats is just wasteful.
 
+When benchmarking the library, using the spectral-norm example, it was found that about 26% of function calls an early exit because of a zero multiplier was achieved. Specifically 4.94 million `zeroe` exits and 4.42 million `zerod` exits, from 34.6 million function entries. This one benchmark is not everything, but it does show the value of zero detection.
+
 #### mulu_32h_32x32
 
 The `mulu_32h_32x32` provides just the high order bytes from a 32-bit multiply calculation for the `_fsdiv` Newton-Raphson iteration. In this iteration calculation it is important to have access to the full 32-bits (rather than just 24-bits for normal mantissa calculations).
@@ -226,7 +228,7 @@ The multiply function is implemented with a `mulu_32h_24x24` mantissa calculatio
 
 The mantissa multiplication is a correct multiply, as all carry bits are passed into the returned bytes. The low order bytes are simply truncated, and the lower 8-bits of the 32-bit return can be used for rounding the 24-bit mantissa.
 
-The Digi International rounding method is used, but a more sophisticated method could be applied as needed.
+The a simple rounding method is used because a full multiply (with all carry bits) is undertaken, but a more sophisticated method could be applied as needed.
 
 The square function is related to the multiply function, but is simplified by ignoring the sign bit, and reducing the number of `16_8x8` multiplies from 9 down to 6. A simplified mantissa calculation function is used for this purpose. As the square is used in the tangent, hypotenuse, and inverse square root calculation, having it available is a good optimisation.
 
@@ -249,15 +251,15 @@ float polyf(const float x, const float d[], uint16_t n) __z88dk_callee;
 
 The divide function is implemented by first obtaining the inverse of the divisor, and then passing this result to the multiply instruction, so the intrinsic function is actually finding the inverse. This can be used to advantage where a function requires only an inverse, this can be returned saving the multiplication associated with the divide.
 
-The Newton-Raphson method is used for finding the inverse, using full 32-bit expanded mantissa multiplies and adds for accuracy.
+The Newton-Raphson method is used for finding the inverse, using full 32-bit expanded mantissa multiplies and adds for accuracy. Three N-R orthogonal iterations provide an accurate result, at the expense of some performance.
 
 #### _fssqrt and _fsinvsqrt
 
-Recently, in the Quake video game, a novel method of seeding the Newton-Raphson iteration for the inverse square root was invented. The process is covered in detail in [Lomont 2003](http://www.lomont.org/Math/Papers/2003/InvSqrt.pdf) on this fancy process, and the better magic number `0x5f375a86` than was used by the original Quake game.
+Recently, in the Quake video game, a novel method of seeding the Newton-Raphson iteration for the inverse square root was invented. The novel and fancy process is covered in detail in [Lomont 2003](http://www.lomont.org/Math/Papers/2003/InvSqrt.pdf), and the better magic number `0x5f375a86` than was used by the original Quake game has been included.
 
 Following this magic number seeding and traditional Newtwon-Raphson iterations, using the `_fssqr` function as appropriate, an accurate inverse square root is produced. The square root `_fssqrt` is then obtained by multiplying the number by its inverse square root.
 
-Two N-R iterations produce 5 or 6 decimal digits of accuracy. Greater accuracy has been obtained by increasing the Newton-Raphson iterations to 3 cycles at the expense of speed. Also, as in the original Quake game, 1 N-R iteration produces a good enough answer for most applications, and is substantially faster.
+Two N-R iterations produce 5 or 6 decimal digits of accuracy. Greater accuracy for this library has been obtained by increasing the Newton-Raphson iterations to 3 cycles at the expense of performance. Also, as in the original Quake game, 1 N-R iteration produces a good enough answer for most applications, and is substantially faster.
 
 #### _fspoly
 
@@ -265,7 +267,7 @@ All of the higher functions are implemented based on Horner's Method for polynom
 
 This function reads a table of coefficients stored in "ROM" and iterates the specified number of iterations to produce the result desired.
 
-It is a general function. Any coefficient table can be used, as desired. The coefficients are provided in packed IEEE floating point format, with the coefficients stored in the correct order. The 0th coefficient is stored first in the table. For examples see in the library for `sinf()`, `tanf()`, and `expf()`.
+It is a general function. Any coefficient table can be used, as desired. The coefficients are provided in packed IEEE floating point format, with the coefficients stored in the correct order. The 0th coefficient is stored first in the table. For examples see in the library for `sinf()`, `tanf()`, `logf()` and `expf()`.
 
 #### _fshypot
 
@@ -287,7 +289,7 @@ float tanf(float x) __z88dk_fastcall;
 float asinf(float x) __z88dk_fastcall;
 float acosf(float x) __z88dk_fastcall;
 float atanf(float x) __z88dk_fastcall;
-float atan2f(float x, float y) __z88dk_callee;
+float atan2f(float x, float y);
 
 /* Hyperbolic functions */
 float sinhf(float x) __z88dk_fastcall;
@@ -298,8 +300,8 @@ float tanhf(float x) __z88dk_fastcall;
 float expf(float x) __z88dk_fastcall;
 float logf(float x) __z88dk_fastcall;
 float log10f(float x) __z88dk_fastcall;
-float powf(float x, float y) __z88dk_callee;
-float hypotf(float x, float y) __z88dk_callee;
+float powf(float x, float y);
+float hypotf(float x, float y);
 
 /* Nearest integer, absolute value, and remainder functions */
 float fabsf(float x) __z88dk_fastcall;
@@ -307,12 +309,12 @@ float frexpf(float x, int *pw2) __z88dk_callee;
 float ldexpf(float x, int pw2) __z88dk_callee;
 float ceilf(float x) __z88dk_fastcall;
 float floorf(float x) __z88dk_fastcall;
-float modff(float x, float * y) __z88dk_callee;
-float fmodf(float x, float y) __z88dk_callee;
+float modff(float x, float * y);
+float fmodf(float x, float y);
 ```
 ### Accuracy
 
-Generally the basic functions are accurate within 1-3 counts of the floating mantissa. However, in certain ranges of certain functions the relative accuracy is much less do to the intrinsic properties of floating point math. Accuracy expressed in counts of the floating mantissa is relative accuracy - i.e. relative to the size of the number. Absolute accuracy is the absolute size of the error - e.g. .00001. The derivative functions, computed as combinations of the basic functions, typically have larger error because the errors of 2 or more basic functions are added together in some fashion.
+Generally the basic functions are accurate within 1-3 counts of the floating mantissa. However, in certain ranges of certain functions the relative accuracy is much less do to the intrinsic properties of floating point math. Accuracy expressed in counts of the floating mantissa is relative accuracy - i.e. relative to the size of the number. Absolute accuracy is the absolute size of the error - e.g. .000001. The derivative functions, computed as combinations of the basic functions, typically have larger error because the errors of 2 or more basic functions are added together in some fashion.
 
 If the value of the function depends on the value of the difference of 2 floating point numbers that are close to each other in value, the relative error generally becomes large, although the absolute error may remain well bounded. Examples are the logs of numbers near 1 and the sine of numbers near pi. For example, if the argument of the sine function is a floating point number is close to pi, say 5 counts of the mantissa away from pi and it is subtracted from pi the result will be a number with only 3 significant bits. The relative error in the sine result will be very large, but the absolute error will still be very small. Functions with steep slopes, such as the exponent of larger numbers will show a large relative error, since the relative error in the argument is magnified by the slope.
 
@@ -322,11 +324,13 @@ The addition / subtraction process is "correct", and this result should be ident
 
 The division process relies on N-R estimation, and it follows exactly the same process as digi international do. There are some notes about the number of significant bits of calculation required to derive a correct IEEE 24-bit mantissa, and I believe that using the 32-bit internal mantissa calculations this outcome is achieved.
 
-The square root calculation relies on N-R and is therefore an estimate only. With the 3 iterations currently implemented the estimate is quite accurate. 1 iteration is good for games and not much else.
+The square root calculation relies on N-R and is therefore an estimate only. With the 3 iterations currently implemented the estimate is accurate. With 1 iteration the result is good for 3D graphics in games and not much else.
 
 The rest of the derived power and trigonometric functions rely on the polynomial expansion process and will only be as accurate as the coefficients that are fed into the process. I've used those coefficients found in the Hi-Tech C library code. I guess they got them mostly right, but their code is not known for accuracy. Someone with a mathematical background might be interested to calculate better coefficients at some stage.
 
 ### Execution speed
+
+Some [benchmarking](https://github.com/z88dk/z88dk/wiki/Classic--Maths-Libraries#benchmarks) has been completed and, as expected, the z180 and z80-zxn "Made for Spectrum NEXT" results show substantial improvements over other floating point libraries. For the z80 some benchmarks are faster than alternatives, but others are worse. More information on this will be added as experience grows.
 
 Floating add, subtract and multiply require approximately xxx clocks worst case on the z80 processor. Divide and square root require approximately xxx clocks. Sine and pow2, pow10 or exp require about xxx clocks. Log, log2, log (base e), and atan need about xxx clocks. Functions derived from these functions often require xxx or more clocks.
 
