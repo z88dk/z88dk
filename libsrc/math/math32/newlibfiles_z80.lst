@@ -185,7 +185,6 @@
 ../../_DEVELOPMENT/math/float/math32/c/sdcc/cm32_sdcc_fsdiv_callee.asm
 ../../_DEVELOPMENT/math/float/math32/c/sdcc/cm32_sdcc___slong2fs.asm
 ../../_DEVELOPMENT/math/float/math32/c/sdcc/cm32_sdcc_fshypot.asm
-../../_DEVELOPMENT/math/float/math32/c/sdcc/cm32_sdcc_fshypot_callee.asm
 ../../_DEVELOPMENT/math/float/math32/c/sdcc/cm32_sdcc___uchar2fs.asm
 ../../_DEVELOPMENT/math/float/math32/c/sdcc/cm32_sdcc_fsinv.asm
 ../../_DEVELOPMENT/math/float/math32/c/sdcc/cm32_sdcc___fslt_callee.asm
@@ -253,7 +252,6 @@
 ../../_DEVELOPMENT/math/float/math32/c/sccz80/cm32_sccz80_log.asm
 ../../_DEVELOPMENT/math/float/math32/c/sccz80/cm32_sccz80_cosh.asm
 ../../_DEVELOPMENT/math/float/math32/c/sccz80/cm32_sccz80_modf.asm
-../../_DEVELOPMENT/math/float/math32/c/sccz80/cm32_sccz80_hypot.asm
 ../../_DEVELOPMENT/math/float/math32/c/sccz80/cm32_sccz80_floor.asm
 ../../_DEVELOPMENT/math/float/math32/c/sccz80/cm32_sccz80_switch_arg.asm
 ../../_DEVELOPMENT/math/float/math32/c/sccz80/cm32_sccz80_fssqrt.asm
