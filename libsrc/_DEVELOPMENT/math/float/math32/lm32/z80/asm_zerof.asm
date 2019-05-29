@@ -1,14 +1,14 @@
 
-; float __fsmin (float number) __z88dk_fastcall
+; float _zerof (float number) __z88dk_fastcall
 
 SECTION code_clib
 SECTION code_fp_math32
 
-PUBLIC asm_fsmin
+PUBLIC asm_zerof
 
-EXTERN m32_fsmin_fastcall
+EXTERN m32_fszero_fastcall
 
-    ; change underflow to a error floating zero as sdcc float
+    ; return a legal zero
     ;
     ; enter : stack = ret
     ;          DEHL = sccz80_float number
@@ -17,6 +17,6 @@ EXTERN m32_fsmin_fastcall
     ;
     ; uses  : af, bc, de, hl
 
-DEFC  asm_fsmin = m32_fsmin_fastcall            ; enter stack = ret
+DEFC  asm_zerof = m32_fszero_fastcall           ; enter stack = ret
                                                 ;        DEHL = d32_float
                                                 ; return DEHL = d32_float

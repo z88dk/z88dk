@@ -45,7 +45,7 @@ PUBLIC cm32_sdcc_fsread1_callee
     ; uses  : af, bc, de, hl
     pop af                      ; my return
     pop bc                      ; ret 1
-    pop hl                      ; sdcc_float left
+    pop hl                      ; sdcc_float
     pop de
     push bc
     push af

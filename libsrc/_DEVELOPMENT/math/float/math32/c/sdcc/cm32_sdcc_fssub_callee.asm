@@ -19,7 +19,6 @@ EXTERN cm32_sdcc_fsreadr_callee, m32_fssub_callee
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
     call cm32_sdcc_fsreadr_callee
-
     jp m32_fssub_callee     ; enter stack = sdcc_float left, ret
                             ;        DEHL = sdcc_float right
                             ; return DEHL = sdcc_float

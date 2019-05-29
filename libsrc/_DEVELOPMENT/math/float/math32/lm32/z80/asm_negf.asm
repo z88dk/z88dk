@@ -1,22 +1,22 @@
 
-; float _invf (float number) __z88dk_fastcall
+; float _negf (float number) __z88dk_fastcall
 
 SECTION code_clib
 SECTION code_fp_math32
 
-PUBLIC asm_inv
+PUBLIC asm_negf
 
-EXTERN m32_fsinv_fastcall
+EXTERN m32_fsneg_fastcall
 
-    ; invert sccz80 float
+    ; negate sccz80 floats
     ;
     ; enter : stack = ret
     ;          DEHL = sccz80_float number
     ;
-    ; exit  :  DEHL = sccz80_float(1/number)
+    ; exit  :  DEHL = sccz80_float(-number)
     ;
-    ; uses  : af, bc, de, hl, af', bc', de', hl'
+    ; uses  : af, bc, de, hl
 
-DEFC  asm_inv = m32_fsinv_fastcall              ; enter stack = ret
+DEFC  asm_negf = m32_fsneg_fastcall             ; enter stack = ret
                                                 ;        DEHL = d32_float
                                                 ; return DEHL = d32_float

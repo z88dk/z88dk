@@ -1,10 +1,10 @@
 
-; float floorf(float number)
-
-SECTION code_clib
 SECTION code_fp_math32
 
-PUBLIC cm32_sdcc_floorf
-EXTERN m32_floorf
+PUBLIC cm32_sdcc_floor
 
-defc cm32_sdcc_floorf = m32_floorf
+EXTERN cm32_sdcc_fsread1, m32_floor_fastcall
+
+cm32_sdcc_floor:
+    call cm32_sdcc_fsread1
+    jp m32_floor_fastcall

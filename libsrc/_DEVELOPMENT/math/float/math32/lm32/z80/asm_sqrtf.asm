@@ -4,7 +4,7 @@
 SECTION code_clib
 SECTION code_fp_math32
 
-PUBLIC asm_sqrt
+PUBLIC asm_sqrtf
 
 EXTERN m32_fssqrt_fastcall
 
@@ -17,6 +17,6 @@ EXTERN m32_fssqrt_fastcall
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-DEFC  asm_sqrt = m32_fssqrt_fastcall            ; enter stack = ret
+DEFC  asm_sqrtf = m32_fssqrt_fastcall           ; enter stack = ret
                                                 ;        DEHL = d32_float
                                                 ; return DEHL = d32_float

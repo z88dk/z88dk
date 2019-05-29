@@ -1,9 +1,11 @@
 
+; float _floorf (float number) __z88dk_fastcall
+
 SECTION code_fp_math32
-PUBLIC  asm_floor
+PUBLIC  asm_floorf
 EXTERN  m32_floor_fastcall
 
-    ; Takes the closest higher integer 
+    ; Takes the closest lower integer 
     ;
     ; enter : stack = ret
     ;          DEHL = sccz80_float number
@@ -12,4 +14,4 @@ EXTERN  m32_floor_fastcall
     ;
     ; uses  : af, bc, de, hl
 
-defc asm_floor = m32_floor_fastcall
+defc asm_floorf = m32_floor_fastcall

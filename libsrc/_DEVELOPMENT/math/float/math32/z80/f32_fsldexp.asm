@@ -34,7 +34,9 @@ PUBLIC m32_fsldexp_callee
 PUBLIC _m32_ldexpf
 
 
+; float ldexpf(float f) __z88dk_fastcall;
 ._m32_ldexpf
+
 .m32_fsldexp_callee
     ; evaluation of fraction and exponent
     ;

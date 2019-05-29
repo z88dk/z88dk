@@ -1,9 +1,9 @@
 
 	SECTION	code_fp_math32
 	PUBLIC	floor
-	EXTERN	_m32_floorf
+	EXTERN	cm32_sccz80_floor
 
-	defc	floor = _m32_floorf
+	defc	floor = cm32_sccz80_floor
 
 ; SDCC bridge for Classic
 IF __CLASSIC

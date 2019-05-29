@@ -6,7 +6,7 @@ SECTION code_fp_math32
 
 PUBLIC cm32_sdcc_fsinv
 
-EXTERN cm32_sdcc_fsreadl, m32_fsinv_fastcall
+EXTERN cm32_sdcc_fsread1, m32_fsinv_fastcall
 
 .cm32_sdcc_fsinv
 
@@ -18,7 +18,7 @@ EXTERN cm32_sdcc_fsreadl, m32_fsinv_fastcall
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-    call cm32_sdcc_fsreadl
+    call cm32_sdcc_fsread1
 
     jp m32_fsinv_fastcall   ; enter  DEHL = sdcc_float
                             ;
