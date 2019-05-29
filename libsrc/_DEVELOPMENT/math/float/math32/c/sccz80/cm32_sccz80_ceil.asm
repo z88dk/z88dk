@@ -1,10 +1,15 @@
 
-; float ceilf(float number)
-
-SECTION code_clib
 SECTION code_fp_math32
 
-PUBLIC cm32_sccz80_ceilf
-EXTERN m32_ceilf
+PUBLIC cm32_sccz80_ceil
+EXTERN m32_ceil_fastcall
 
-defc cm32_sccz80_ceilf = m32_ceilf
+
+cm32_sccz80_ceil:
+        pop     bc
+        pop     hl
+        pop     de
+        push    de
+        push    hl
+        push    bc
+        jp      m32_ceil_fastcall

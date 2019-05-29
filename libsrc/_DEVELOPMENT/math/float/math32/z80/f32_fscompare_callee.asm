@@ -1,5 +1,7 @@
-SECTION    code_fp_math32
-PUBLIC    m32_compare_callee
+SECTION code_clib
+SECTION code_fp_math32
+
+PUBLIC  m32_compare_callee
 
 ; Compare two IEEE floats. NB. Needs to handle -0 == +0
 ;       Entry: dehl=secondary
@@ -10,7 +12,7 @@ PUBLIC    m32_compare_callee
 ;                 c=number is negative 
 ;                nc=number is positive
 
-m32_compare_callee:
+.m32_compare_callee
     pop     bc      ;return address from this function
                     ;this leaves return address to real program
                     ;and the primary on the stack

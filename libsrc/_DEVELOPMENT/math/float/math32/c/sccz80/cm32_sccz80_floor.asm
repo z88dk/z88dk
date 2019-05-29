@@ -1,10 +1,15 @@
 
-; float floorf(float number)
-
-SECTION code_clib
 SECTION code_fp_math32
 
-PUBLIC cm32_sccz80_floorf
-EXTERN m32_floorf
+PUBLIC cm32_sccz80_floor
+EXTERN m32_floor_fastcall
 
-defc cm32_sccz80_floorf = m32_floorf
+
+cm32_sccz80_floor:
+        pop     bc
+        pop     hl
+        pop     de
+        push    de
+        push    hl
+        push    bc
+        jp      m32_floor_fastcall

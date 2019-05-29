@@ -35,7 +35,9 @@ PUBLIC m32_fsfrexp_callee
 PUBLIC _m32_frexpf
 
 
+; float frexpf(float f) __z88dk_fastcall;
 ._m32_frexpf
+
 .m32_fsfrexp_callee
     ; evaluation of fraction and exponent
     ;

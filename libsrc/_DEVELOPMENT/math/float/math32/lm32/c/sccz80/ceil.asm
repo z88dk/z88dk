@@ -1,9 +1,9 @@
 
 	SECTION	code_fp_math32
 	PUBLIC	ceil
-	EXTERN	_m32_ceilf
+	EXTERN	cm32_sccz80_ceil
 
-	defc	ceil = _m32_ceilf
+	defc	ceil = cm32_sccz80_ceil
 
 ; SDCC bridge for Classic
 IF __CLASSIC

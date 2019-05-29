@@ -31,7 +31,7 @@ PUBLIC m32_fsnormalize
     or a,l
     jr Z,fa8a
     and 0f0h
-    jp Z,S24L                   ; shift 24 bits, most significant in low nibble   
+    jr Z,S24L                   ; shift 24 bits, most significant in low nibble   
     jr S24H                     ; shift 24 bits in high
 .fa8a
     or a,d
@@ -67,7 +67,7 @@ PUBLIC m32_fsnormalize
     rr d
     rr e                        ; reverse overshift
     ld a,c                      ; zero adjust
-    jr 	normdone1
+    jr 	normdone0
 
 .S24H2
     rr l
@@ -150,7 +150,7 @@ PUBLIC m32_fsnormalize
 .normdone
     add a,c                     ; exponent of result
     jr NC,normzero              ; if underflow return zero
-.normdone1                      ; case of zero shift
+.normdone0                      ; case of zero shift
     rl l
     rl b                        ; sign
     rra

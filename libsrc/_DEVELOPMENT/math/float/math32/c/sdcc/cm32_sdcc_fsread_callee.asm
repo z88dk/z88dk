@@ -3,7 +3,7 @@ SECTION code_clib
 SECTION code_fp_math32
 
 PUBLIC cm32_sdcc_fsreadr_callee
-PUBLIC cm32_sdcc_fsread1_callee
+PUBLIC cm32_sdcc_fsreadl_callee
 
 .cm32_sdcc_fsreadr_callee
 
@@ -33,7 +33,7 @@ PUBLIC cm32_sdcc_fsread1_callee
     push af                     ; my return
     ret
 
-.cm32_sdcc_fsread1_callee
+.cm32_sdcc_fsreadl_callee
     ; sdcc float primitive
     ; Read a single sdcc float from the stack
     ;

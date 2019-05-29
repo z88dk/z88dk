@@ -28,7 +28,7 @@ PUBLIC m32_fsnormalize32
     or a,d
     jr Z,fa8a
     and 0f0h
-    jp Z,S32L                   ; shift 32 bits, most significant in low nibble   
+    jr Z,S32L                   ; shift 32 bits, most significant in low nibble   
     jr S32H                     ; shift 32 bits in high
 .fa8a
     or a,e

@@ -4,9 +4,9 @@ PUBLIC cm32_sdcc___fs2uint_callee
 PUBLIC cm32_sdcc___fs2uchar_callee
 
 EXTERN m32_f2uint
-EXTERN cm32_sdcc_fsread1_callee
+EXTERN cm32_sdcc_fsreadl_callee
 
 cm32_sdcc___fs2uint_callee:
 cm32_sdcc___fs2uchar_callee:
-	call	cm32_sdcc_fsread1_callee
+	call	cm32_sdcc_fsreadl_callee
 	jp	m32_f2uint
