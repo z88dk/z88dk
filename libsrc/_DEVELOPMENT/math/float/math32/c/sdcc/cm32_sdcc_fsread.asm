@@ -3,7 +3,7 @@ SECTION code_clib
 SECTION code_fp_math32
 
 PUBLIC cm32_sdcc_fsreadr
-PUBLIC cm32_sdcc_fsreadl
+PUBLIC cm32_sdcc_fsread1
 
 EXTERN cm32_sdcc_fsload
 
@@ -27,7 +27,7 @@ EXTERN cm32_sdcc_fsload
     jp cm32_sdcc_fsload         ; return DEHL = sdcc_float right
 
 
-.cm32_sdcc_fsreadl
+.cm32_sdcc_fsread1
 
     ; sdcc float primitive
     ; Read left / single sdcc float from the stack

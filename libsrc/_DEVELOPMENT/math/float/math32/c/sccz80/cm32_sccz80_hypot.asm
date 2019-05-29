@@ -7,5 +7,5 @@ EXTERN cm32_sccz80_switch_arg
 EXTERN _m32_hypotf
 
 cm32_sccz80_hypot:
-	call	cm32_sccz80_switch_arg
-	jp	_m32_hypotf
+    call cm32_sccz80_switch_arg
+    jp _m32_hypotf
