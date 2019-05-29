@@ -91,7 +91,6 @@ float m32_expf(float x) __z88dk_fastcall;
 float m32_logf(float x) __z88dk_fastcall;
 float m32_log10f(float x) __z88dk_fastcall;
 float m32_powf(float x, float y);
-float m32_hypotf(float x, float y);
 
 /* Nearest integer, absolute value, and remainder functions */
 float m32_fabsf(float x) __z88dk_fastcall;
@@ -108,6 +107,7 @@ float m32_sqrf(float a) __z88dk_fastcall;
 float m32_invf(float a) __z88dk_fastcall;
 float m32_sqrtf(float a) __z88dk_fastcall;
 float m32_invsqrtf(float a) __z88dk_fastcall;
+float m32_hypotf(float x, float y) __z88dk_callee;
 float m32_polyf(const float x, const float d[], uint16_t n) __z88dk_callee;
 
 #endif  /* _INC_MATH */

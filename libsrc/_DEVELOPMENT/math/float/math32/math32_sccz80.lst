@@ -45,7 +45,6 @@ math/float/math32/c/sccz80/cm32_sccz80_fssub
 math/float/math32/c/sccz80/cm32_sccz80_fssub_callee
 math/float/math32/c/sccz80/cm32_sccz80_fszero
 math/float/math32/c/sccz80/cm32_sccz80_fszero_callee
-math/float/math32/c/sccz80/cm32_sccz80_hypot
 math/float/math32/c/sccz80/cm32_sccz80_log
 math/float/math32/c/sccz80/cm32_sccz80_log10
 math/float/math32/c/sccz80/cm32_sccz80_modf
