@@ -1,6 +1,7 @@
 
 SECTION code_fp_math32
 PUBLIC  m32_fabs
+PUBLIC  m32_fabs_fastcall
 PUBLIC _m32_fabsf
 
 
@@ -12,6 +13,9 @@ PUBLIC _m32_fabsf
 	push	hl
 	push	bc
 
-._m32_fabsf	
+._m32_fabsf
+.m32_fabs_fastcall
+	res	7,d
+	ret
 	res	7,d
 	ret

@@ -17,8 +17,11 @@ PUBLIC m32_fsneg_fastcall
 PUBLIC m32_fszero_fastcall
 PUBLIC m32_fsmin_fastcall
 PUBLIC m32_fsmax_fastcall
+PUBLIC _m32_neg
+
 
 ; here to negate a number in dehl
+._m32_neg
 .m32_fsneg_fastcall
     ld a,d
     xor 080h

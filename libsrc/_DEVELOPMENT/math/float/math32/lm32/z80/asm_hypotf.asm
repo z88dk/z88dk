@@ -1,14 +1,14 @@
 
-; float __fssub (float left, float right) __z88dk_callee
+; float _hypotf (float left, float right) __z88dk_callee
 
 SECTION code_clib
 SECTION code_fp_math32
 
-PUBLIC asm_fssub
+PUBLIC asm_hypotf
 
-EXTERN m32_fssub_callee
+EXTERN m32_fshypot_callee
 
-    ; subtract sccz80 float from sccz80 float
+    ; find the hypotenuse of two sccz80 floats
     ;
     ; enter : stack = sccz80_float left, ret
     ;          DEHL = sccz80_float right
@@ -17,6 +17,6 @@ EXTERN m32_fssub_callee
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-DEFC  asm_fssub = m32_fssub_callee      ; enter stack = d32_float left
+DEFC  asm_hypotf = m32_fshypot_callee   ; enter stack = d32_float left
                                         ;        DEHL = d32_float right
                                         ; return DEHL = d32_float

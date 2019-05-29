@@ -1,7 +1,6 @@
 
 	SECTION	code_fp_math32
 	PUBLIC	_m32_ceilf
-	PUBLIC	_m32_ceil_fastcall
 
 	EXTERN	m32_f2ulong
 	EXTERN	m32_float32u
@@ -18,7 +17,7 @@ _m32_ceil_fastcall:
 	push	af			;Save sign flag
 	call	m32_f2ulong		;Exits dehl = number
 	pop	af
-	jr	z,was_positive
+	jr	Z,was_positive
 	call	m32_float32
 	ret
 was_positive:
