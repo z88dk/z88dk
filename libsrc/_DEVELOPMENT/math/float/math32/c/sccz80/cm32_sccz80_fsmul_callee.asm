@@ -6,7 +6,6 @@ SECTION code_fp_math32
 
 PUBLIC cm32_sccz80_fsmul_callee
 
-EXTERN cm32_sccz80_fsread1_callee
 EXTERN m32_fsmul_callee
 
     ; multiply two sccz80 floats
@@ -18,8 +17,7 @@ EXTERN m32_fsmul_callee
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-.cm32_sccz80_fsmul_callee
-    call cm32_sccz80_fsread1_callee
-    jp m32_fsmul_callee     ; enter stack = sccz80_float left, ret
+defc cm32_sccz80_fsmul_callee = m32_fsmul_callee
+                            ; enter stack = sccz80_float left, ret
                             ;        DEHL = sccz80_float right
                             ; return DEHL = sccz80_float
