@@ -696,7 +696,12 @@ int heirb(LVALUE* lval)
                     flags = lval->ltype->ptr->flags;
                 } else if ( lval->ltype->kind == KIND_FUNC ) {
                     // Normal function call
-                    callfunction(ptr,NULL);
+                    if ( ptr == NULL ) {
+                        // However, we've turned it into a function pointer call
+                        callfunction(NULL,make_pointer(lval->ltype));
+                    } else {
+                        callfunction(ptr,NULL);
+                    }
                     return_type = lval->ltype->return_type;      
                     flags = lval->ltype->flags;                    
                 } else {
