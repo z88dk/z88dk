@@ -580,7 +580,7 @@ void size_of(LVALUE* lval)
 
                     /* We're a member of a structure */
                     do {
-                        if ( (mptr = get_member(type->tag) ) != NULL ) {
+                        if ( (mptr = get_member(type->kind == KIND_STRUCT ? type->tag : type->ptr->tag) ) != NULL ) {
                             type = mptr;
                             if ( (mptr->kind == KIND_PTR || mptr->kind == KIND_CPTR) && deref ) {
                                 // Do nothing
