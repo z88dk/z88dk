@@ -1,11 +1,11 @@
 
 ## z88dk IEEE Floating Point Package - m32
 
-This is the z88dk 32-bit IEEE (mostly) standard m32 floating point maths package, designed to work with the SCCZ80 and SDCC 32-bit (mostly) IEEE standard interfaces.
+This is the z88dk 32-bit IEEE-754 (mostly) standard m32 floating point maths package, designed to work with the SCCZ80 and SDCC IEEE-754 (mostly) standard 32-bit interfaces.
 
 Where not written by me, the functions were sourced from:
 
-  * the Digi International Rabbit IEEE 754 32-bit library, copyright (c) 2015 Digi International Inc.
+  * the Digi International Rabbit IEEE-754 32-bit library, copyright (c) 2015 Digi International Inc.
   * the Hi-Tech C 32-bit floating point library, copyright (C) 1984-1987 HI-TECH SOFTWARE.
   * the SDCC 32-bit floating point library, copyright (C) 1991 by Pipeline Associates, Inc, and others.
   * various Wikipedia references, especially for Newton-Raphson and Horner's Method.
@@ -27,17 +27,17 @@ Where not written by me, the functions were sourced from:
 
   *  The z80 multiply (without a hardware instruction) is implemented with an unrolled equivalent to the z80-zxn `mul de`, which is designed to have no side effect other than resetting the flag register.
 
-  *  Mantissa calculations are done with 24-bits and 8-bits for rounding. Rounding is a simple method, but can be if required expanded to the IEEE standard with a performance penalty.
+  *  Mantissa calculations are done with 24-bits and 8-bits for rounding. Rounding is a simple method, but can be if required it can be expanded to the IEEE standard with a performance penalty.
 
-  *  Derived functions are calculated with a 32-bit internal mantissa calculation path without rounding, to provide the maximum accuracy when repeated multiplications and additions are required.
+  *  Derived functions are calculated with a 32-bit internal mantissa calculation path, without rounding, to provide the maximum accuracy when repeated multiplications and additions are required. This is equivalent to a fused multiply-add process.
 
   *  Higher functions are written in C, for maintainability, and draw upon the intrinsic functions including the square root, square, and polynomial evaluation, as well as the 4 standard arithmetic functions.
 
   *  Power and trigonometric functions' accuracy and speed can be traded by managing their polynomial series coefficient tables. More coefficients and iterations provides higher accuracy at the expense of performance. The default Hi-Tech C library coefficients are provided by default. Alternative coefficient tables can be implemented without impacting the code.
 
-  *  The square root (through the inverse square root) function is seeded using the Quake magic number method, with three Newton-Raphson iterations for accuracy. Again, accuracy and speed can be traded depending on the application by removing one or two iterations, for example for game usage.
+  *  The square root (through the inverse square root function) is seeded using the Quake magic number method, with three Newton-Raphson iterations for accuracy. Again, accuracy and speed can be traded depending on the application by removing one or two iterations, for example for game usage.
 
-## IEEE Floating Point Format
+## IEEE-754 Floating Point Format
 
 The z88dk floating point format (compatible with Intel/ IEEE, etc.) is as follows:
 
@@ -53,7 +53,7 @@ stored in memory with the 4 bytes reversed from shown above.
 ```
 The mantissa, when the hidden bit is added in, is 24-bits long and has a value in the range of in decimal of 1.000 to 1.9999...
 
-To match the Intel 8087 or IEEE 754 32-bit format we use bias of 127.
+To match the Intel 8087 or IEEE-754 32-bit format we use bias of 127.
 
 Examples of numbers:
 
@@ -67,7 +67,7 @@ Examples of numbers:
     0   11111111 (1) 000... positive infinity
     1   11111111 (1) 000... negative infinity
 ```
-This floating point package is loosely based on IEEE 754. We maintain the packed format, but we do not support denormal numbers or the round to even convention.  Both of these features could be added in the future with some performance penalty.
+This floating point package is loosely based on IEEE-754. We maintain the packed format, but we do not support denormal numbers or the round to even convention.  Both of these features could be added in the future with some performance penalty.
 
 ```
   IEEE floating point format: 	seeeeeee emmmmmmm mmmmmmmm mmmmmmmm
@@ -81,7 +81,7 @@ Where s is the sign, e is the exponent and m is bits 22-0 of the mantissa. z88dk
 
 IEEE assumes bit 23 of the mantissa is 1 except where the exponent is zero.
 
-IEEE 754 specifies rounding the result by a process of round to even. z88dk m32 uses one guard bit and a sticky bit to round a result per the following tables.
+IEEE-754 specifies rounding the result by a process of round to even. z88dk m32 uses one guard bit and a sticky bit to round a result per the following tables.
 
 Both results are free of bias with IEEE method having a slight edge with rounding error.
 
@@ -196,7 +196,7 @@ For the z80 CPU, with no hardware multiply, a replica of the z80-zxn instruction
 
 The `z80_mulu_de` has zero argument detection, leading zero detection, and is unrolled. With the exception of preserving `hl`, for equivalency with z80-zxn `mul de`, it should be the fastest `16_8x8` multiply possible on a z80.
 
-To calculate the 24-bit mantissa a special `mulu_32h_24x24` function has been built using 8 multiplies, the minimum number of `16_8x8` multiply terms. It is much more natural for the z80 to work in `16_8x8` multiplies than the Rabbit's `32_16x16` multiply. It is not a "correct" multiply, in that all terms are calculated and carry forward is considered. The lowest term is not calculated, as it doesn't impact the 32-bit result The lower 16-bits of the result are simply truncated, leaving a further 8-bits for mantissa rounding within the calling function. The resulting `mulu_32h_24x24` could be the fastest way to calculate an IEEE sized mantissa on a z80, z180, & z80-zxn.
+To calculate the 24-bit mantissa a special `mulu_32h_24x24` function has been built using 8 multiplies, the minimum number of `16_8x8` multiply terms. It is much more natural for the z80 to work in `16_8x8` multiplies than the Rabbit's `32_16x16` multiply. It is not a "correct" multiply, in that all terms are calculated and carry forward is considered. The lowest term is not calculated, as it doesn't impact the 32-bit result. The lower 16-bits of the result are simply truncated, leaving a further 8-bits for mantissa rounding within the calling function. The resulting `mulu_32h_24x24` could be the fastest way to calculate an IEEE sized mantissa on a z80, z180, & z80-zxn.
 
 By providing a specific square function, all squaring (found in square root, trigonometric functions) can use the `_fssqr` or the equivalent C version. This means that the inverse `_fsinvsqrt` function uses `_fssqr` 5 multiplies in its `32h_24x24` mantissa calculation, in some situations, instead of 8 multiplies with the normal `_fsmul` function, and also avoids the need to use the alternate register set.
 
@@ -216,7 +216,7 @@ The `mulu_32h_32x32` provides just the high order bytes from a 32-bit multiply c
 
 The implementation of the `mulu_32h_32x32` is not a "correct" multiplication as the lower order bytes are not included in the carry calculation, for efficiency reasons. The calculation begins at the 3rd byte (of 8), and this byte provides carry bits into the 4th byte. Further rounding from the third byte is applied to the 4th byte. There are 11 multiplications required for this function.
 
-By calculating 3rd through to 7th bytes, but returning only byte 4 through 7, there is only maximally a small error in the least significant nibble of the 32-bit mantissa, which is discarded after rounding to 24-bit precision anyway. Doing this avoids calculating the 0th through 2nd bytes, which saves 5 8x8 multiply operations, and the respective word push and pop baggage.
+By calculating 3rd through to 7th bytes, but returning only byte 4 through 7, there is only maximally a small error in the least significant nibble of the 32-bit mantissa, which is discarded after rounding to 24-bit precision anyway. Doing this avoids calculating the 0th through 2nd bytes, which saves 5 `16_8x8` multiply operations, and the respective word push and pop baggage.
 
 #### _fsadd and _fssub
 
@@ -228,7 +228,7 @@ As add and subtract rely heavily on bit shifting across the mantissa, these func
 
 The multiply function is implemented with a `mulu_32h_24x24` mantissa calculation, that optimises (minimises) the number of `16_8x8` multiplies required, using either hardware instructions from the z180 and z80-zxn, or the z80 equivalent function.
 
-The mantissa multiplication is not a "correct" multiply, as all carry bits are passed into the returned bytes. The low order mantissa term is not calculated and the low order bytes are simply truncated. The lower 8-bits of the 32-bit return can be used for rounding the 24-bit mantissa.
+The mantissa multiplication is not a "correct" multiply, as not all carry bits are passed into the returned bytes. The low order mantissa term is not calculated and the low order bytes are simply truncated. The lower 8-bits of the 32-bit return can be used for rounding the 24-bit mantissa. This method minimises the number of `16_8x8` multiplies required to generate a correct 24-bit mantissa.
 
 A simple rounding method is used, but a more sophisticated method IEEE compliant method could be applied as needed.
 
@@ -253,7 +253,7 @@ float polyf(const float x, const float d[], uint16_t n) __z88dk_callee;
 
 The divide function is implemented by first obtaining the inverse of the divisor, and then passing this result to the multiply instruction, so the intrinsic function is actually finding the inverse. This can be used to advantage where a function requires only an inverse, this can be returned saving the multiplication associated with the divide.
 
-The Newton-Raphson method is used for finding the inverse, using full 32-bit expanded mantissa multiplies and adds for accuracy. Three N-R orthogonal iterations provide an accurate result for the IEEE 754 mantissa, at the expense of some performance.
+The Newton-Raphson method is used for finding the inverse, using full 32-bit expanded mantissa multiplies and adds for accuracy. Three N-R orthogonal iterations provide an accurate result for the IEEE-754 mantissa, at the expense of some performance.
 
 #### _fssqrt and _fsinvsqrt
 
@@ -322,7 +322,7 @@ If the value of the function depends on the value of the difference of 2 floatin
 
 The multiplication process is similar to the digi international method. The digi international code ignores the `c*f` term of the 24-bit mantissa calculation of `abc*cdf`, because they determined it wasn't required. m32 also takes this short cut and does not calculate all the terms. This also applies to the squaring process, which uses a similar optimisation.
 
-The addition / subtraction process is "correct", and this result should be identical to m48 within the significant digits of IEEE 754.
+The addition / subtraction process is "correct", and this result should be identical to m48 within the significant digits of IEEE-754.
 
 The division process relies on N-R estimation. There is an analysis of the number iterations, based on the convergence of N-R estimation, required to derive sufficent significant bits for a correct IEEE 24-bit mantissa and I believe that using 3 iterations and the 32-bit internal mantissa calculation this outcome is achieved.
 
