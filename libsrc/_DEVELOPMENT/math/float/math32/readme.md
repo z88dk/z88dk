@@ -53,7 +53,7 @@ stored in memory with the 4 bytes reversed from shown above.
 ```
 The mantissa, when the hidden bit is added in, is 24-bits long and has a value in the range of in decimal of 1.000 to 1.9999...
 
-Too match the Intel 8087 or IEEE 754 32-bit format we use bias of 127.
+To match the Intel 8087 or IEEE 754 32-bit format we use bias of 127.
 
 Examples of numbers:
 
@@ -105,7 +105,7 @@ Both results are free of bias with IEEE method having a slight edge with roundin
     which uses the lsb[7] of the of the 32-bit result from any
     intrinsic calculation:
 
-    b s  (b=lsbit[7] s=sticky)
+    b s  (b=lsb[7] s=sticky)
     0 0		exact
     0 1		+.01
     1 0		exact
@@ -148,6 +148,8 @@ The intrinsic functions, written in assembly, assume the sccz80 calling conventi
 
     ; evaluation of a polynomial function
     ;
+    ; float polyf (float x, float d[], uint16_t n);
+    ;
     ; enter : stack = uint16_t n, float d[], float x, ret
     ;
     ; exit  : dehl  = 32-bit product
@@ -173,7 +175,7 @@ Glue that connects the compilers and standard assembly interface to the math32 l
 
 ## Function Discussion
 
-There are essentially three different grades of functions in this library. Those written in assembly code in the expanded floating point domain, where the sign, exponent, and mantissa are handled separately. Those written in assembly code, in the floating point domain but using intrinsic functions, where floating point numbers are passed as  expanded 6 byte values. And those written in C language.
+There are essentially three different grades of functions in this library. Those written in assembly code in the expanded floating point domain, where the sign, exponent, and mantissa are handled separately. Those written in assembly code, in the floating point domain but using intrinsic functions, where floating point numbers are passed as expanded 6 byte values. And those written in C language.
 
 The expanded floating point domain is a useful tool for creating functions, as complex functions can be written quite efficiently without needing to manage details (which are best left for the intrinsic functions). For a good example of this see the `poly()` function.
 
@@ -194,19 +196,19 @@ For the z80 CPU, with no hardware multiply, a replica of the z80-zxn instruction
 
 The `z80_mulu_de` has zero argument detection, leading zero detection, and is unrolled. With the exception of preserving `hl`, for equivalency with z80-zxn `mul de`, it should be the fastest `16_8x8` multiply possible on a z80.
 
-To calculate the 24-bit mantissa a special `mulu_32h_24x24` function has been built using 9 multiplies, the minimum number of `16_8x8` multiply terms. It is much more natural for the z80 to work in `16_8x8` multiplies than the Rabbit's `32_16x16` multiply. It is a "correct" multiply, in that all terms are calculated and carry forward is considered. The lower 16-bits of the result are simply truncated, leaving a further 8-bits for mantissa rounding within the calling function. The resulting `mulu_32h_24x24` could be the fastest way to calculate an IEEE sized mantissa on a z80, z180, & z80-zxn.
+To calculate the 24-bit mantissa a special `mulu_32h_24x24` function has been built using 8 multiplies, the minimum number of `16_8x8` multiply terms. It is much more natural for the z80 to work in `16_8x8` multiplies than the Rabbit's `32_16x16` multiply. It is not a "correct" multiply, in that all terms are calculated and carry forward is considered. The lowest term is not calculated, as it doesn't impact the 32-bit result The lower 16-bits of the result are simply truncated, leaving a further 8-bits for mantissa rounding within the calling function. The resulting `mulu_32h_24x24` could be the fastest way to calculate an IEEE sized mantissa on a z80, z180, & z80-zxn.
 
-By providing a specific square function, all squaring (found in square root, trigonometric functions) can use the `_fssqr` or the equivalent C version. This means that the inverse `_fsinvsqrt` function uses `_fssqr` 6 multiplies in its `32h_24x24` mantissa calculation, in some situations, instead of 9 multiplies with the normal `_fsmul` function, and also avoids the need to use the alternate register set.
+By providing a specific square function, all squaring (found in square root, trigonometric functions) can use the `_fssqr` or the equivalent C version. This means that the inverse `_fsinvsqrt` function uses `_fssqr` 5 multiplies in its `32h_24x24` mantissa calculation, in some situations, instead of 8 multiplies with the normal `_fsmul` function, and also avoids the need to use the alternate register set.
 
 #### mulu_z80_de and zero detection
 
-Both zero detection and leading zero removal are implemented for the `mulu_z80_de` function. But I would question more generally about whether zero detection in the mantissa calculation is worth it or not?
+Both zero detection and leading zero removal are implemented for the `mulu_z80_de` function. But one could question more generally about whether zero detection in the mantissa calculation is worth it or not?
 
-A lot of integer like numbers have "short" mantissas, when represented in floating point. If we call a 24-bit mantissa made up of three bytes "abc", then quite often the b and c bytes end up being zero. I think this will be a common case. Handling these with zero detection will be a big win, making many multiplies very fast (because the result is zero).
+A lot of "integer like" decimal or their binary equivalent numbers have "short" mantissas, when represented in floating point. If we call a 24-bit mantissa made up of three bytes "abc", then quite often the b and c bytes end up being zero. I think this is a common case. Handling these with zero detection will be a big win, making many `mulu_z80_de` multiplies very fast (because the result is zero).
 
 Of course the other side of the argument is that integers should be handled by the integer library, and that calculating a 8 iteration polynomial estimation for `logf()` (for example) will never have zeros in it, so carrying zero detection overhead for short mantissa floats is just wasteful.
 
-When benchmarking the library, using the spectral-norm example, it was found that about 26% of function calls an early exit because of a zero multiplier was achieved. Specifically 4.94 million `zeroe` exits and 4.42 million `zerod` exits, from 34.6 million function entries. This one benchmark is not everything, but it does show the value of zero detection.
+When benchmarking the library, using the spectral-norm example, it was found that for about 26% of `mulu_z80_de` function calls an early exit was achieved because of a zero multiplier or multiplicand. Specifically 4.94 million `zeroe` exits and 4.42 million `zerod` exits, from 34.6 million function entries. This one benchmark is not everything, but it does show the value of zero detection.
 
 #### mulu_32h_32x32
 
@@ -220,17 +222,17 @@ By calculating 3rd through to 7th bytes, but returning only byte 4 through 7, th
 
 These functions are closely related to the original Digi International functions.
 
-As add and subtract rely heavily on bit shifting across the mantissa, these functions establish a tree of byte and nybble shifting, to provide the best performance. Nybble shifting was intrinsic to the Rabbit processor, but this algorithm also works effectively for the z80 processor with little overhead.
+As add and subtract rely heavily on bit shifting across the mantissa, these functions establish a tree of byte and nybble shifting, to provide the best performance. Nybble shifting is intrinsic to the Rabbit processor, but this nybble based algorithm also works effectively for the z80 processor with little overhead.
 
 #### _fsmul and _fssqr
 
 The multiply function is implemented with a `mulu_32h_24x24` mantissa calculation, that optimises (minimises) the number of `16_8x8` multiplies required, using either hardware instructions from the z180 and z80-zxn, or the z80 equivalent function.
 
-The mantissa multiplication is a correct multiply, as all carry bits are passed into the returned bytes. The low order bytes are simply truncated, and the lower 8-bits of the 32-bit return can be used for rounding the 24-bit mantissa.
+The mantissa multiplication is not a "correct" multiply, as all carry bits are passed into the returned bytes. The low order mantissa term is not calculated and the low order bytes are simply truncated. The lower 8-bits of the 32-bit return can be used for rounding the 24-bit mantissa.
 
-The a simple rounding method is used because a full multiply (with all carry bits) is undertaken, but a more sophisticated method could be applied as needed.
+A simple rounding method is used, but a more sophisticated method IEEE compliant method could be applied as needed.
 
-The square function is related to the multiply function, but is simplified by ignoring the sign bit, and reducing the number of `16_8x8` multiplies from 9 down to 6. A simplified mantissa calculation function is used for this purpose. As the square is used in the tangent, hypotenuse, and inverse square root calculation, having it available is a good optimisation.
+The square function is related to the multiply function, but is simplified by ignoring the sign bit, and reducing the number of `16_8x8` multiplies from 8 down to 5. A simplified mantissa calculation function is used for this purpose. As the square is used in the tangent, hypotenuse, and inverse square root calculation, having it available is a good optimisation.
 
 
 ### Derived Floating Point Functions
@@ -251,11 +253,11 @@ float polyf(const float x, const float d[], uint16_t n) __z88dk_callee;
 
 The divide function is implemented by first obtaining the inverse of the divisor, and then passing this result to the multiply instruction, so the intrinsic function is actually finding the inverse. This can be used to advantage where a function requires only an inverse, this can be returned saving the multiplication associated with the divide.
 
-The Newton-Raphson method is used for finding the inverse, using full 32-bit expanded mantissa multiplies and adds for accuracy. Three N-R orthogonal iterations provide an accurate result, at the expense of some performance.
+The Newton-Raphson method is used for finding the inverse, using full 32-bit expanded mantissa multiplies and adds for accuracy. Three N-R orthogonal iterations provide an accurate result for the IEEE 754 mantissa, at the expense of some performance.
 
 #### _fssqrt and _fsinvsqrt
 
-Recently, in the Quake video game, a novel method of seeding the Newton-Raphson iteration for the inverse square root was invented. The novel and fancy process is covered in detail in [Lomont 2003](http://www.lomont.org/Math/Papers/2003/InvSqrt.pdf), and the better magic number `0x5f375a86` than was used by the original Quake game has been included.
+Recently, in the Quake video game, a novel method of seeding the Newton-Raphson iteration for the inverse square root was invented. This fancy process is covered in detail in [Lomont 2003](http://www.lomont.org/Math/Papers/2003/InvSqrt.pdf) and the suggested magic number `0x5f375a86`, better than was used by the original Quake game, was implemented.
 
 Following this magic number seeding and traditional Newtwon-Raphson iterations, using the `_fssqr` function as appropriate, an accurate inverse square root is produced. The square root `_fssqrt` is then obtained by multiplying the number by its inverse square root.
 
@@ -314,17 +316,17 @@ float fmodf(float x, float y);
 ```
 ### Accuracy
 
-Generally the basic functions are accurate within 1-3 counts of the floating mantissa. However, in certain ranges of certain functions the relative accuracy is much less do to the intrinsic properties of floating point math. Accuracy expressed in counts of the floating mantissa is relative accuracy - i.e. relative to the size of the number. Absolute accuracy is the absolute size of the error - e.g. .000001. The derivative functions, computed as combinations of the basic functions, typically have larger error because the errors of 2 or more basic functions are added together in some fashion.
+Generally the basic functions are accurate within 1-2 counts of the floating mantissa. However, in certain ranges of certain functions the relative accuracy is much less do to the intrinsic properties of floating point math. Accuracy expressed in counts of the floating mantissa is relative accuracy - i.e. relative to the size of the number. Absolute accuracy is the absolute size of the error - e.g. .000001. The derivative functions, computed as combinations of the basic functions, typically have larger error because the errors of 2 or more basic functions are added together in some fashion.
 
 If the value of the function depends on the value of the difference of 2 floating point numbers that are close to each other in value, the relative error generally becomes large, although the absolute error may remain well bounded. Examples are the logs of numbers near 1 and the sine of numbers near pi. For example, if the argument of the sine function is a floating point number is close to pi, say 5 counts of the mantissa away from pi and it is subtracted from pi the result will be a number with only 3 significant bits. The relative error in the sine result will be very large, but the absolute error will still be very small. Functions with steep slopes, such as the exponent of larger numbers will show a large relative error, since the relative error in the argument is magnified by the slope.
 
-The multiplication process is "correct" and in fact more correct than the digi international method. Every carry term is calculated and brought into the result. Digi international code ignores the `c*f` term of the 24-bit mantissa calculation of `abc*cdf`, because they determined it wasn't required. m32 doesn't take that short cut and calculates all the terms. This also applies to the squaring process, which is also "correct".
+The multiplication process is similar to the digi international method. The digi international code ignores the `c*f` term of the 24-bit mantissa calculation of `abc*cdf`, because they determined it wasn't required. m32 also takes this short cut and does not calculate all the terms. This also applies to the squaring process, which uses a similar optimisation.
 
 The addition / subtraction process is "correct", and this result should be identical to m48 within the significant digits of IEEE 754.
 
-The division process relies on N-R estimation, and it follows exactly the same process as digi international do. There are some notes about the number of significant bits of calculation required to derive a correct IEEE 24-bit mantissa, and I believe that using the 32-bit internal mantissa calculations this outcome is achieved.
+The division process relies on N-R estimation. There is an analysis of the number iterations, based on the convergence of N-R estimation, required to derive sufficent significant bits for a correct IEEE 24-bit mantissa and I believe that using 3 iterations and the 32-bit internal mantissa calculation this outcome is achieved.
 
-The square root calculation relies on N-R and is therefore an estimate only. With the 3 iterations currently implemented the estimate is accurate. With 1 iteration the result is good for 3D graphics in games and not much else.
+The square root calculation also relies on N-R and is therefore an estimate. With the 3 iterations currently implemented the estimate is also accurate to the requirement of the IEEE 24-bit mantissa. With 1 iteration the result is good for 3D graphics in games and not much else.
 
 The rest of the derived power and trigonometric functions rely on the polynomial expansion process and will only be as accurate as the coefficients that are fed into the process. I've used those coefficients found in the Hi-Tech C library code. I guess they got them mostly right, but their code is not known for accuracy. Someone with a mathematical background might be interested to calculate better coefficients at some stage.
 

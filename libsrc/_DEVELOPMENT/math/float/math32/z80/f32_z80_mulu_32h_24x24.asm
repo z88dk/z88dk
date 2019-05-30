@@ -9,7 +9,7 @@
 ;
 ; multiplication of two 24-bit numbers into a 32-bit product
 ;
-; result is properly calculated into highest 32-bit result
+; result is calculated for highest 32-bit result
 ; from a 48-bit calculation.
 ;
 ; Lower 8 bits intended to provide rounding information for
@@ -23,9 +23,12 @@
 ;   (a*e + b*d)*2^24 +
 ;   (b*e + a*f + c*d)*2^16 +
 ;   (b*f + c*e)*2^8 +
-;   (c*f)*2^0
+;   (2*b*c)*2^8
 ;
-; 9 8*8 multiplies in total
+;   NOT CALCULATED
+;   (c*c)*2^0
+;
+; 8 8*8 multiplies in total
 ;
 ; exit  : hlde  = 32-bit product
 ;
@@ -60,32 +63,7 @@ PUBLIC m32_mulu_32h_24x24
     push de                     ; dc on stack
     push bc                     ; ab on stack (again)
     push hl                     ; ef on stack
-
-    exx
-    push de                     ; ef on stack
-    ld a,e                      ; f in a
-    
-    exx
     ld d,l
-    push de                     ; bc on stack
-    ld d,a                      ; fc in de
-
-IF __CPU_Z180__
-    mlt de                      ; c*f 2^0
-ELSE
-IF __CPU_Z80_ZXN__
-    mul de                      ; c*f 2^0
-ELSE
-    EXTERN m32_z80_mulu_de
-    call m32_z80_mulu_de        ; c*f 2^0
-ENDIF
-ENDIF
-
-    ld c,d                      ; put 2^0 in bc
-    ld b,0
-
-    pop de                      ; bc
-    pop hl                      ; ef
     ld a,h
     ld h,e
     ld e,a
@@ -99,6 +77,7 @@ IF __CPU_Z80_ZXN__
     ex de,hl
     mul de                      ; c*f 2^8
 ELSE
+EXTERN m32_z80_mulu_de
     call m32_z80_mulu_de        ; b*e 2^8
     ex de,hl
     call m32_z80_mulu_de        ; c*f 2^8
@@ -106,10 +85,8 @@ ENDIF
 ENDIF
 
     xor a
-    add hl,bc
-    adc a,a
     add hl,de
-    adc a,0
+    adc a,a
 
     ld c,h                      ; put 2^8 in bc
     ld b,a
