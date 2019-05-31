@@ -12,6 +12,7 @@ graphics/retrofit/undraw_callee
 graphics/px8/xordraw
 graphics/retrofit/xordraw_callee
 graphics/draw_profile
+graphics/px8/w_stencil_render
 graphics/px8/clg
 graphics/px8/w_putsprite
 graphics/px8/w_plotpixl
