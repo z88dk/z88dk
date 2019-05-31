@@ -88,10 +88,12 @@
 		and	l
 		ld	d,a
 		ld	a,e
+		jr	z,no_shift
 shift:
 		rlca
 		dec d
 		jr nz,shift
+no_shift:
 		
 		; save the pattern byte
 		ex	af,af
@@ -116,6 +118,9 @@ shift:
 			ld	(x1coord+1),a
 			
 			; blank horizontal row to clean the background
+			; The "double pass" draw command is issued basing on the documentation.
+			; The takeda's emulator shows the correct picture even if we avoid to clean the background,
+			; but only a test on the real hardware would confirm it is enough.
 			ld	hl,65535
 			ld	(oper),hl
 			ld	a,1		; 'res' mode
@@ -139,7 +144,7 @@ shift:
 			call subcpu_call
 			
 			
-			jr	yloop
+			jp	yloop
 			
 			
 
