@@ -1,6 +1,14 @@
 
 ;; clib rodata segments ;;;;;;;
 
+section rodata_align_256
+section rodata_align_128
+section rodata_align_64
+section rodata_align_32
+section rodata_align_16
+section rodata_align_8
+section rodata_align_4
+section rodata_align_2
 section rodata_arch
 section rodata_env
 section rodata_error_strings
