@@ -96,8 +96,8 @@ PUBLIC m32_z80_mulu_de
     sbc a,(hl)              ; MSB ((x+y)/2)2 - ((x-y)/2)2 -> a
     ld d,a                  ; MSB ((x+y)/2)2 - ((x-y)/2)2 -> d
 
-    pop bc
     pop hl
+    pop bc
     pop af
     ret
 
