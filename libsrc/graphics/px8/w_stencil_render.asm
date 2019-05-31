@@ -118,7 +118,7 @@ shift:
 			; blank horizontal row to clean the background
 			ld	hl,65535
 			ld	(oper),hl
-			xor	a		; 'res' mode
+			ld	a,1		; 'res' mode
 			ld	(draw_mode),a
 			
 			ld	hl,packet
@@ -174,4 +174,4 @@ oper:
 	defb	255		; draw operation mask (used for dotted lines)
 	defb	255
 draw_mode:
-	defb	0		; 0:res, 2:plot, 3:xor
+	defb	2		; 1:res, 2:plot, 3:xor
