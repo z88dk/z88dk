@@ -36,6 +36,30 @@ section code_lib
 section code_compiler
 section code_user
 
+section rodata_align_256
+align 256
+
+section rodata_align_128
+align 128
+
+section rodata_align_64
+align 64
+
+section rodata_align_32
+align 32
+
+section rodata_align_16
+align 16
+
+section rodata_align_8
+align 8
+
+section rodata_align_4
+align 4
+
+section rodata_align_2
+align 2
+
 section rodata_driver
 section rodata_font
 section rodata_clib
