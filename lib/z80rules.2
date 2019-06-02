@@ -128,7 +128,7 @@
 	ld	(de),a
 =
 	ld	a,(hl)
-	or	#( ( 2 ** %1 ))
+	or	%eval(1 %1 <)
 	ld	(hl),a
 	ld	l,a
 	ld	h,0
@@ -721,7 +721,7 @@
 	ld	bc,%2
 	add	hl,bc
 =
-	ld	bc,%1+(%2)
+	ld	bc,%eval(%1 %2 +)
 	add	hl,bc
 
 	ld	l,(hl)
@@ -1045,7 +1045,7 @@
 	add	hl,bc
 	inc	hl
 =
-	ld	bc,%1+1
+	ld	bc,%eval(%1 1 +)
 	add	hl,bc
 
 	ld	hl,-%1	;const
@@ -1397,3 +1397,21 @@
 	ld	hl,0	;const
 	ld	d,h
 	ld	e,l
+
+	ld	hl,0	;const
+	rl	l
+	ld	h,0
+=
+	ld	hl,0	;const
+	rl	l
+
+	ld	l,(hl)
+	ld	h,0
+	ld	a,l
+	call	l_sxt
+=
+	ld	l,(hl)
+	ld	a,l
+	rla
+	sbc	a
+	ld	h,a

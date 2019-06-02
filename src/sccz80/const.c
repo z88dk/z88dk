@@ -152,7 +152,7 @@ int number(LVALUE *lval)
     char c;
     int minus;
     int32_t k;
-    int isunsigned = c_default_unsigned;
+    int isunsigned = 0;
 
     k = minus = 1;
     while (k) {
