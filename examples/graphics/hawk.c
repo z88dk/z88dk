@@ -19,8 +19,7 @@
  ZX 81 G007, very simple because it is not possible to limit to a single screen slice, add "CLS 4" in the BASIC part before the USR call:
  zcc +zx81 -clib=g007 -create-app -Cz--disable-autorun  hawk.c
  
- TS2068:
- zcc +ts2068 -DSOUND -create-app hawk.c
+ 
  
  */
 
@@ -37,7 +36,7 @@
 #define BKSTRUCT_YPOS_OFFSET  4
 #else
 #define BKSTRUCT_OFFSET  2
-#define BKSTRUCT_XPOS_OFFSET  3
+#define BKSTRUCT_YPOS_OFFSET  3
 #endif
 
 
