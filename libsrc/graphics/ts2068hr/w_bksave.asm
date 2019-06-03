@@ -1,22 +1,27 @@
 ;
 ;	Fast background save
 ;
-;	Generic version (just a bit slow)
+;	TS2068 version
+;	Stefano Bodrato, Spring 2019
 ;
 ;	$Id: w_bksave.asm $
 ;
 
-	SECTION   smc_clib
-	
+	SECTION	  smc_clib
 	PUBLIC    bksave
 	PUBLIC    _bksave
+	EXTERN	w_pixeladdress
 	
-	EXTERN    w_pixeladdress
+		EXTERN     zx_saddrpdown
+
+        EXTERN     swapgfxbk
+        EXTERN    __graphics_end
 
 
 .bksave
 ._bksave
 	push	ix
+	call    swapgfxbk
         ld      hl,4   
         add     hl,sp
         ld      e,(hl)
@@ -44,15 +49,14 @@
 	;ld	(ix+5),d
 	ld		d,0
 
-	ld		(x_coord+1),hl
-	ld		c,e		; y coordinate
-	
-	push	bc
 	call	w_pixeladdress
-	pop	bc
+	ld	h,d
+	ld	l,e
+	ld	(saddr+1),hl
+	;pop	bc
 
-	ld	a,(ix+0)
-	ld	b,(ix+1)
+	ld	a,(ix+0)	; x size
+	ld	b,(ix+1)	; y size
 
 	dec	a
 	srl	a
@@ -68,22 +72,28 @@
 .rbytes
 	ld	b,0
 .rloop
-	ld	a,(de)
+	ld	a,(hl)
 	ld	(ix+6),a
-	inc	de
+	;--- Go to next byte ---
+	 ld     a,h
+	 xor    @00100000
+	 cp     h
+	 ld     h,a
+	 jp     nc,gonehi
+	 inc	hl
+.gonehi
+	;----
 	inc	ix
 	djnz	rloop
 
-	ld	d,0
-	ld	e,c
-	inc e	; y
-.x_coord
-	ld	hl,0
-	call	w_pixeladdress
-	
+;---------
+.saddr	ld hl,0
+		call zx_saddrpdown
+		ld	(saddr+1),hl
+;---------
+
 	pop	bc
-	inc	c	; y
 	
 	djnz	bksaves
-	pop	ix
-	ret
+	
+	jp	__graphics_end

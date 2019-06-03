@@ -366,14 +366,10 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 int     always = -1;
 
                 lval2->binop = oper;
-                if ( lhs_val_type == KIND_INT && !ulvalue(lval) ) {
+                if ( lhs_val_type == KIND_INT ) {
                     always = check_range(lval2, -32768, 65535);
-                } else if ( lhs_val_type == KIND_INT && ulvalue(lval) ) {
-                    always = check_range(lval2, 0, 65535);
-                } else if ( lhs_val_type == KIND_CHAR && !ulvalue(lval) ) {
+                } else if ( lhs_val_type == KIND_CHAR  ) {
                     always = check_range(lval2, -128, 255);
-                } else if ( lhs_val_type == KIND_CHAR && ulvalue(lval) ) {
-                    always = check_range(lval2, 0, 255);
                 }
                 lval2->binop = NULL;
 

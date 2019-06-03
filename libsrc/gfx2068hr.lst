@@ -13,6 +13,8 @@ graphics/lftscrol
 graphics/spectrum/swapgfxbk
 graphics/ts2068hr/w_putsprite
 graphics/ts2068hr/w_stencil_render
+graphics/ts2068hr/w_bksave
+graphics/ts2068hr/w_bkrestore
 graphics/draw_profile
 graphics/w_pointxy
 @gfxbasew.lst
