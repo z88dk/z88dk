@@ -9,6 +9,9 @@
 ;
 ;  Screen row addresses table
 ;  by Enrico Maria Giordano
+;
+;  ** THIS TABLE IS NOT USED ANYMORE **
+;
 
 
 .zx_rowtab
