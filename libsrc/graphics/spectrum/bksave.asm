@@ -10,13 +10,19 @@
 	
 	PUBLIC    bksave
 	PUBLIC    _bksave
-	EXTERN	zx_rowtab
+
+	EXTERN	pixeladdress
+	EXTERN	zx_saddrpdown
+	
+	EXTERN     swapgfxbk
+	EXTERN	__graphics_end
 
 
 
 .bksave
 ._bksave
 	push	ix
+	call	swapgfxbk
         ld      hl,4   
         add     hl,sp
         ld      e,(hl)
@@ -26,34 +32,22 @@
 	pop	ix
 
         inc     hl
-        ld      e,(hl)  
- 	inc	hl
+        ld      e,(hl)
+        inc	hl
         inc     hl
         ld      d,(hl)	; x and y __gfx_coords
 
 	ld	(ix+2),d
 	ld	(ix+3),e
 
-	ld	a,d
-	ld	d,0
-	
-	ld	hl,zx_rowtab
-	add	hl,de
-	add	hl,de
-	ld	(actrow),hl	; save row table position
-	
-	ld	e,(hl)
-	inc	hl
-	ld	h,(hl)
+	ld	h,d
 	ld	l,e
 	
-	ld	e,a
-	srl	e
-	srl	e
-	srl	e
+	call	pixeladdress
 	
-	ld	(actcol),de
-	add	hl,de
+	ld	h,d
+	ld	l,e
+	ld	(rowadr+1),hl
 	
 	ld	a,(ix+0)
 	ld	b,(ix+1)
@@ -79,26 +73,15 @@
 	djnz	rloop
 
 	; ---------
-	ld	hl,(actrow)
-	inc	hl
-	inc	hl
-	ld	(actrow),hl
-	
-	ld	b,(hl)
-	inc	hl
-	ld	h,(hl)
-	ld	l,b
-	
-	ld	bc,(actcol)
-	add	hl,bc
+.rowadr
+	ld	hl,0	; current address
+	call	zx_saddrpdown
+	ld	(rowadr+1),hl
 	; ---------
 
 	pop	bc
 	
 	djnz	bksaves
-	pop	ix
-	ret
+	
+	jp	__graphics_end
 
-	SECTION	bss_clib
-.actrow  defw 0
-.actcol  defw 0
