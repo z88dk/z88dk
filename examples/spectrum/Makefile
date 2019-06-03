@@ -1,5 +1,5 @@
 
-all: rndsphere.tap clisp_speclisp.tap clisp.tap hawk.tap \ 
+all: rndsphere.tap clisp_speclisp.tap clisp.tap hawk.tap \
 	adv_a.tap ansitest.tap enigma.tap fib.tap mm.tap rpn.tap tic.tap \
 	sorter.tap snakes.tap dstar.tap dstar_native.tap microman.tap \
 	othello.tap othello_udg.tap wall.tap gfx.tap save.tap ex10b.tap \
