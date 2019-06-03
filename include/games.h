@@ -18,9 +18,9 @@
  *
  */
 
-/* save the sprite background in another sprite (not yet working with coordinates > 255) */
-extern void __LIB__ bksave(int x, int y, void *sprite) __smallc;
-extern void __LIB__  bkrestore(void *sprite) __z88dk_fastcall;
+/* save the sprite background in another sprite (the 'background' struct and its size is target dependent) */
+extern void __LIB__ bksave(int x, int y, void *background) __smallc;
+extern void __LIB__  bkrestore(void *background) __z88dk_fastcall;
 
 /* pick up a sprite directly from the screen  (not yet working with coordinates > 255) */
 extern void __LIB__ getsprite(int x, int y, void *sprite) __smallc;
