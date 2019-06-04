@@ -186,14 +186,13 @@ int main(int argc, char *argv[]) {
         input_name = argv[i];
         input_size = strlen(input_name);
         if (input_size > 4 && !strcmp(input_name+input_size-4, ".zx7")) {
-			if ((output_name = (char *)malloc(input_size)) == NULL) {
-				fprintf(stderr, "Error: Insufficient memory\n");
-				exit(1);
-			}
-			else {
-				strcpy(output_name, input_name);
-				output_name[input_size-4] = '\0';
-			}
+            if ((output_name = (char *)malloc(input_size)) == NULL) {
+                fprintf(stderr, "Error: Insufficient memory\n");
+                exit(1);
+            } else {
+                strcpy(output_name, input_name);
+                output_name[input_size-4] = '\0';
+            }
         } else {
             fprintf(stderr, "Error: Cannot infer output filename\n");
             exit(1);
@@ -216,16 +215,16 @@ int main(int argc, char *argv[]) {
 
     /* check output file */
     if (!forced_mode && output_name) {
-		if (fopen(output_name, "rb") != NULL) {
-		fprintf(stderr, "Error: Already existing output file %s\n", output_name);
-		exit(1);
-		}
+        if (fopen(output_name, "rb") != NULL) {
+            fprintf(stderr, "Error: Already existing output file %s\n", output_name);
+            exit(1);
+        }
     }
 
     /* create output file */
-	if (output_name) {
-		ofp = fopen(output_name, "wb");
-	}
+    if (output_name) {
+        ofp = fopen(output_name, "wb");
+    }
     if (!ofp) {
         fprintf(stderr, "Error: Cannot create output file %s\n", output_name);
         exit(1);
