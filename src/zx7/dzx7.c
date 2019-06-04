@@ -95,7 +95,7 @@ int read_offset() {
         i = i << 1 | read_bit();
         i = i << 1 | read_bit();
         i = i << 1 | read_bit();
-        return (value & 127 | i << 7) + 128;
+        return ((value & 127) | i << 7) + 128;
     }
 }
 
@@ -186,13 +186,13 @@ int main(int argc, char *argv[]) {
         input_name = argv[i];
         input_size = strlen(input_name);
         if (input_size > 4 && !strcmp(input_name+input_size-4, ".zx7")) {
-			if ((output_name = (char*)malloc(input_size)) == NULL) {
+			if ((output_name = (char *)malloc(input_size)) == NULL) {
 				fprintf(stderr, "Error: Insufficient memory\n");
 				exit(1);
 			}
 			else {
 				strcpy(output_name, input_name);
-				output_name[input_size - 4] = '\0';
+				output_name[input_size-4] = '\0';
 			}
         } else {
             fprintf(stderr, "Error: Cannot infer output filename\n");
