@@ -545,6 +545,9 @@ static Type *parse_type(void)
     if ( amatch("char"))  {
         type->kind = KIND_CHAR;
         type->size = 1;
+        if ( type->explicitly_signed == 0 && c_default_unsigned ) {
+            type->isunsigned = 1;
+        }
     } else if ( amatch("int") || amatch("short")) {
         swallow("int");        
         type->kind = KIND_INT;
