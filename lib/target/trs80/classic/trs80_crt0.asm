@@ -64,6 +64,7 @@ ENDIF
 	org     CRT_ORG_CODE
 
 start:
+	ld	(cmdline+1),hl
         ld      (start1+1),sp   ;Save entry stack
 	INCLUDE	"crt/classic/crt_init_sp.asm"
 	INCLUDE	"crt/classic/crt_init_atexit.asm"
@@ -78,7 +79,32 @@ start:
 	ENDIF
 
 
+	; Push pointers to argv[n] onto the stack now
+	; We must start from the end 
+cmdline:
+	ld	hl,0	; SMC - command line back again
+	ld	bc,0
+	ld	a,(hl)
+	cp	13
+	jr	z,argv_done
+	dec	hl
+find_end:
+	inc	hl
+	inc	c
+	ld	a,(hl)
+	cp	13
+	jr	nz,find_end
+	dec	hl
+
+
+	defc DEFINED_noredir = 1
+	INCLUDE	"crt/classic/crt_command_line.asm"
+
+	push	hl	;argv
+	push	bc	;argc
         call    _main           ;Call user program
+	pop	bc	;kill argv
+	pop	bc	;kill argc
 
 cleanup:
 ;
@@ -96,10 +122,9 @@ start1: ld      sp,0            ;Restore stack to entry value
 l_dcal: jp      (hl)            ;Used for function pointer calls
 
 
-
-        INCLUDE "crt/classic/crt_runtime_selection.asm"
-
+	INCLUDE "crt/classic/crt_runtime_selection.asm"
 	INCLUDE	"crt/classic/crt_section.asm"
+
 
 	SECTION code_crt_init
 IF (startup=2)
@@ -111,4 +136,6 @@ ENDIF
 	ld	(base_graphics),hl
 
 
+	SECTION bss_crt
+end:		defb	0		; null file name
 
