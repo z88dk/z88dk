@@ -1310,6 +1310,10 @@ void declare_func_kr()
         }
     }
     parse_trailing_modifiers(func);
+    // Main is __stdc
+    if ( strcmp(func->name,"main") == 0 ) {
+        func->flags &= ~(SMALLC|FLOATINGDECL|CALLEE|FASTCALL);
+    }
     handle_kr_type_parameters(func);
     // And start the function
     declfunc(func, STATIK);
