@@ -33,12 +33,10 @@
 ;
 ; uses  : af, bc, de, hl, bc', de', hl'
 
-IF __CPU_Z80__
+IF __CPU_Z80_ZXN__
 
 SECTION code_clib
 SECTION code_fp_math32
-
-EXTERN m32_z80_mulu_de
 
 PUBLIC m32_mulu_32h_24x24
 
@@ -71,9 +69,9 @@ PUBLIC m32_mulu_32h_24x24
     ld a,h
     ld h,e
     ld e,a
-    call m32_z80_mulu_de        ; b*e 2^8
+    mul de                      ; b*e 2^8
     ex de,hl
-    call m32_z80_mulu_de        ; c*f 2^8
+    mul de                      ; c*f 2^8
 
     xor a
     add hl,de
@@ -87,9 +85,9 @@ PUBLIC m32_mulu_32h_24x24
     ld a,d
     ld d,h
     ld h,a
-    call m32_z80_mulu_de        ; a*f 2^16
+    mul de                      ; a*f 2^16
     ex de,hl
-    call m32_z80_mulu_de        ; e*b 2^16
+    mul de                      ; e*b 2^16
 
     xor a
     add hl,bc
@@ -98,7 +96,7 @@ PUBLIC m32_mulu_32h_24x24
     adc a,0
 
     pop de                      ; dc
-    call m32_z80_mulu_de        ; d*c 2^16
+    mul de                      ; d*c 2^16
 
     add hl,de
     adc a,0
@@ -115,9 +113,9 @@ PUBLIC m32_mulu_32h_24x24
     ld a,d
     ld d,h
     ld h,a
-    call m32_z80_mulu_de        ; d*b 2^24
+    mul de                      ; d*b 2^24
     ex de,hl
-    call m32_z80_mulu_de        ; a*e 2^24
+    mul de                      ; a*e 2^24
 
     xor a
     add hl,bc
@@ -132,7 +130,7 @@ PUBLIC m32_mulu_32h_24x24
     ld h,a
 
     pop de                      ; ad
-    call m32_z80_mulu_de        ; a*d 2^32
+    mul de                      ; a*d 2^32
 
     add hl,de
 
