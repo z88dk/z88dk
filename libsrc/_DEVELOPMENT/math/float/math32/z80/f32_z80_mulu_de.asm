@@ -18,13 +18,15 @@
 
 
 ;IF __CLIB_OPT_IMATH <= 50
-IF 0
+IF 1
 
 ;-------------------------------------------------------------------------
 ;
 ; Small mulu_16_8x8 using unrolled shift and add
 ;
-; uses  : f, de
+; uses  : f
+;
+; exit : de
 
 SECTION code_fp_math32
 
@@ -117,7 +119,7 @@ PUBLIC m32_z80_mulu_de
 ENDIF
 
 ;IF __CLIB_OPT_IMATH > 50
-IF 1
+IF 0
 
 ;-------------------------------------------------------------------------
 ;
@@ -126,31 +128,26 @@ IF 1
 ; x*y = ((x+y)/2)2 - ((x-y)/2)2           <- if x+y is even 
 ;     = ((x+y-1)/2)2 - ((x-y-1)/2)2 + y   <- if x+y is odd and x>=y
 ;
-; uses  : de
+; uses  : af, bc
+;
+; exit : de
 
 SECTION code_fp_math32
 
 PUBLIC m32_z80_mulu_de
 
 .m32_z80_mulu_de
-    inc e
-    dec e
-    jr Z,lzeroe             ; multiply by 0
-    inc d
-    dec d
-    jr Z,lzerod             ; multiply by 0
-
-    push af
-    push bc
-    push hl
-
-    ld a,d
+    ld a,d                  ; put largest in d
     cp e
     jr NC,lnc
     ld d,e
     ld e,a
 
 .lnc                        ; largest in d
+    xor a
+    or e
+    jr Z,lzeroe             ; multiply by 0
+
     ld b,d                  ; keep larger -> b
     ld c,e                  ; keep smaller -> c
 
@@ -162,6 +159,8 @@ PUBLIC m32_z80_mulu_de
     ld a,b
     add a,c
     rra                     ; check for odd/even
+
+    push hl                 ; preserve hl
 
     ld l,a                  ; (x+y)/2 -> l
     ld h,sqrlo/$100         ; loads sqrlo page
@@ -187,8 +186,6 @@ PUBLIC m32_z80_mulu_de
     ld d,a
 
     pop hl
-    pop bc
-    pop af
     ret
 
 .leven                      ; even tail
@@ -202,17 +199,12 @@ PUBLIC m32_z80_mulu_de
     ld d,a                  ; MSB ((x+y)/2)2 - ((x-y)/2)2 -> d
 
     pop hl
-    pop bc
-    pop af
     ret
 
 .lzeroe
     ld d,e
     ret
 
-.lzerod
-    ld e,d
-    ret
 
 SECTION rodata_align_256
 

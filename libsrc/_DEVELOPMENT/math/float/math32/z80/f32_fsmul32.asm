@@ -115,7 +115,7 @@ PUBLIC m32_fsmul24x32, m32_fsmul32x32
 
     ex af,af
     ld a,b
-    push af                     ; stack: sum of exponents a', and xor sign of exponents in f'
+    push af                     ; stack: sum of exponents a, and xor sign of exponents in f
 
                                 ; first  dehl  = 1mmmmmmm mmmmmmmm mmmmmmmm mmmmmmmm
                                 ; second dehl' = 1mmmmmmm mmmmmmmm mmmmmmmm mmmmmmmm
