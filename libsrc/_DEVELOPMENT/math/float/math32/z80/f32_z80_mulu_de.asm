@@ -17,7 +17,8 @@
 ;         carry reset
 
 
-IF __CLIB_OPT_IMATH <= 50
+;IF __CLIB_OPT_IMATH <= 50
+IF 0
 
 ;-------------------------------------------------------------------------
 ;
@@ -33,10 +34,10 @@ PUBLIC m32_z80_mulu_de
 
    inc e
    dec e
-   jr Z,zeroe               ; multiply by 0
+   jr Z,lzeroe              ; multiply by 0
    inc d
    dec d
-   jr Z,zerod               ; multiply by 0
+   jr Z,lzerod              ; multiply by 0
 
    push hl
    ex de,hl
@@ -62,11 +63,11 @@ PUBLIC m32_z80_mulu_de
    jr C,branch_17
    jr exit1                ; multiply by 1
 
-.zeroe
+.lzeroe
    ld d,e
    ret
 
-.zerod
+.lzerod
    ld e,d
    ret
 
@@ -115,7 +116,8 @@ PUBLIC m32_z80_mulu_de
 
 ENDIF
 
-IF __CLIB_OPT_IMATH > 50
+;IF __CLIB_OPT_IMATH > 50
+IF 1
 
 ;-------------------------------------------------------------------------
 ;
