@@ -15,6 +15,10 @@
 ;
 ; exit  : de = 16-bit product
 ;         carry reset
+;
+;-------------------------------------------------------------------------
+
+INCLUDE "config_private.inc"
 
 IF __CLIB_OPT_IMATH <= 50
 
