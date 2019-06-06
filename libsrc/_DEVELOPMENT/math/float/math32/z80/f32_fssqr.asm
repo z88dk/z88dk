@@ -74,10 +74,8 @@ PUBLIC _m32_sqrf
 .fsnouf
     or a
     jp Z,m32_fszero_fastcall
-    ld b,a
-    ex af,af
-    ld a,b
-    ex af,af                    ; save sum of exponents a'
+
+    push af                     ; stack: sum of exponents a
 
                                 ; square of two 24-bit numbers into a 32-bit product
                                 ;
@@ -92,8 +90,7 @@ PUBLIC _m32_sqrf
 
     call m32_sqr_32h_24x24      ; exit  : HLDE  = 32-bit product
 
-    ex af,af                    ; retrieve exponent from af'
-    ld b,a                      ; put exponent into B
+    pop bc                      ; retrieve exponent from stack
 
     bit 7,h                     ; need to shift result left if msb!=1
     jr NZ,fs1

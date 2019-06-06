@@ -31,14 +31,12 @@
 ;
 ; exit  : hlde  = 32-bit product
 ;
-; uses  : af, bc, de, hl, af', bc', de', hl'
+; uses  : af, bc, de, hl, bc', de', hl'
 
-IF __CPU_Z80__
+IF __CPU_Z180__
 
 SECTION code_clib
 SECTION code_fp_math32
-
-EXTERN m32_z80_mulu_de
 
 PUBLIC m32_mulu_32h_24x24
 
@@ -47,7 +45,7 @@ PUBLIC m32_mulu_32h_24x24
 
     ld h,l                      ; ab:bc
     ld l,d
-    ld a,h                      ; a in a
+    ld a,h                      ; a in a             
     
     exx
     ld h,a
@@ -71,68 +69,54 @@ PUBLIC m32_mulu_32h_24x24
     ld a,h
     ld h,e
     ld e,a
-    call m32_z80_mulu_de        ; b*e 2^8
-    ex de,hl
-    call m32_z80_mulu_de        ; c*f 2^8
+    mlt hl                      ; b*e 2^8
+    mlt de                      ; c*f 2^8
 
     xor a
     add hl,de
     adc a,a
 
-    ld l,h                      ; put 2^8 in hl
-    ld h,a
+    ld c,h                      ; put 2^8 in bc
+    ld b,a
 
     pop de                      ; ef
-    pop bc                      ; ab
+    pop hl                      ; ab
     ld a,d
-    ld d,b
-    ld b,a
-    push bc                     ; eb
-    call m32_z80_mulu_de        ; a*f 2^16
+    ld d,h
+    ld h,a
+    mlt hl                      ; a*f 2^16
+    mlt de                      ; e*b 2^16
 
     xor a
-    add hl,de
+    add hl,bc
     adc a,a
-    ex af,af
-
-    pop de                      ; eb
-    call m32_z80_mulu_de        ; e*b 2^16
-
-    ex af,af
     add hl,de
     adc a,0
-    ex af,af
 
     pop de                      ; dc
-    call m32_z80_mulu_de        ; d*c 2^16
+    mlt de                      ; d*c 2^16
 
-    ex af,af
     add hl,de
     adc a,0
 
-    ld b,l                      ; put 2^16 in hla
-    ld l,h
-    ld h,a
-    ld a,b
+    ld c,h                      ; put 2^16 in bca
+    ld b,a
+    ld a,l
 
     pop de                      ; ab
-    pop bc                      ; de
+    pop hl                      ; de
+
     push af                     ; l on stack
+
     ld a,d
-    ld d,b
-    ld b,a
-    push bc                     ; ae
-    call m32_z80_mulu_de        ; d*b 2^24
+    ld d,h
+    ld h,a
+    mlt hl                      ; d*b 2^24
+    mlt de                      ; a*e 2^24
 
     xor a
-    add hl,de
+    add hl,bc
     adc a,a
-    ex af,af
-
-    pop de                      ; ae
-    call m32_z80_mulu_de        ; a*e 2^24
-
-    ex af,af
     add hl,de
     adc a,0
 
@@ -143,11 +127,12 @@ PUBLIC m32_mulu_32h_24x24
     ld h,a
 
     pop de                      ; ad
-    push bc
-    call m32_z80_mulu_de        ; a*d 2^32
+    mlt de                      ; a*d 2^32
 
     add hl,de
-    pop de                      ; exit  : HLDE  = 32-bit product
+
+    ld d,b
+    ld e,c                      ; exit  : HLDE  = 32-bit product
     ret
 
 ENDIF

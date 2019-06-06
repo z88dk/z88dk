@@ -57,7 +57,7 @@ void test_integer_constant_longform_lhs()
      Assert ( a == 4, "addition: a == 4");
      a = 2 * a;
      Assert ( a == 8, "multiply: a == 8");
-     a = 32. / a;
+     a = 32 / a;
      Assert ( a == 4, "divide: a == 4");
      a = 6 - a;
      Assert ( a == 2, "subtract: a == 2");

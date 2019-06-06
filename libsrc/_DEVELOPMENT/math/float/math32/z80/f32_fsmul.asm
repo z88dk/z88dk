@@ -132,9 +132,8 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 
     ex af,af
     ld a,b
-    ex af,af                    ; save sum of exponents a', and xor sign of exponents in f'
+    push af                     ; stack: sum of exponents a, and xor sign of exponents in f
 
-                                ; a' = sum of exponents, f' = Sign of result
                                 ; first  h  = eeeeeeee, lde  = 1mmmmmmm mmmmmmmm mmmmmmmm
                                 ; second h' = eeeeeeee, lde' = 1mmmmmmm mmmmmmmm mmmmmmmm
                                 ; sum of exponents in a', xor of exponents in sign f'
@@ -142,15 +141,8 @@ PUBLIC m32_fsmul, m32_fsmul_callee
                                 ; multiplication of two 24-bit numbers into a 32-bit product
     call m32_mulu_32h_24x24     ; exit  : HLDE  = 32-bit product
 
-    ex af,af                    ; retrieve sign and exponent from af'
-    jp P,fm1
-    scf
+    pop bc                      ; retrieve sign and exponent from stack = b,c[7]
 
-.fm1
-    rr c                        ; put sign bit in C
-    ld b,a                      ; put exponent into B
-
-    ex af,af
     bit 7,h                     ; need to shift result left if msb!=1
     jr NZ,fm2
     sla e

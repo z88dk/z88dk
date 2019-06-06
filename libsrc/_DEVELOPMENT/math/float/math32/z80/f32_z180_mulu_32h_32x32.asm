@@ -11,6 +11,7 @@
 ;
 ; NOTE THIS IS NOT A TRUE MULTIPLY.
 ; Carry in from low bytes is not calculated.
+; Rounding is done at 2^16.
 ;
 ; enter : dehl  = 32-bit multiplier   = x
 ;         dehl' = 32-bit multiplicand = y
@@ -19,6 +20,8 @@
 ;         carry reset
 ;
 ; uses  : af, bc, de, hl, af', bc', de', hl'
+
+IF __CPU_Z180__
 
 SECTION code_clib
 SECTION code_fp_math32
@@ -181,3 +184,4 @@ PUBLIC m32_mulu_32h_32x32
     ex de,hl                    ; p7 p6 <-> p5 p4
     ret                         ; exit  : DEHL = 32-bit product
 
+ENDIF
