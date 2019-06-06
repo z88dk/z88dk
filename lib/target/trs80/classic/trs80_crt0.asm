@@ -97,7 +97,7 @@ find_end:
 	dec	hl
 
 
-	defc DEFINED_noredir = 1
+	; defc DEFINED_noredir = 1
 	INCLUDE	"crt/classic/crt_command_line.asm"
 
 	push	hl	;argv
@@ -137,5 +137,22 @@ ENDIF
 
 
 	SECTION bss_crt
-end:		defb	0		; null file name
+end:		defb	0		; null file name (used in argv/argc parsing)
+
+;-----------------------
+; Some startup variables
+;-----------------------
+IF !DEFINED_nofileio
+		PUBLIC	__fcb
+__fcb:		defs	380,0	;file control block (10 files) (MAXFILE)*(32 bytes for native FCB + 6 bytes for z88dk)
+ENDIF
+
+
+	SECTION  rodata_clib
+IF !DEFINED_noredir
+IF CRT_ENABLE_STDIO = 1
+redir_fopen_flag:		defb	'w',0
+redir_fopen_flagr:		defb	'r',0
+ENDIF
+ENDIF
 
