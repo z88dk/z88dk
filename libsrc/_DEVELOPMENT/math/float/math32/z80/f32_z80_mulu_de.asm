@@ -5,7 +5,7 @@
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
-;-------------------------------------------------------------------------
+;------------------------------------------------------------------------------
 ;
 ; REPLICATION for Z80 of:
 ; Z180 MLT DE and Z80-ZXN MUL DE
@@ -15,16 +15,28 @@
 ;
 ; exit  : de = 16-bit product
 ;         carry reset
+;
+;------------------------------------------------------------------------------
 
-IF __CLIB_OPT_IMATH <= 50
+IFDEF __CLASSIC
 
-;-------------------------------------------------------------------------
+    DEFC __CLIB_OPT_IMATH = 0
+
+ELSE
+
+    INCLUDE "config_private.inc"
+
+ENDIF
+
+;------------------------------------------------------------------------------
 ;
 ; Small mulu_16_8x8 using unrolled shift and add
 ;
 ; uses  : f
 ;
 ; exit : de
+
+IF __CLIB_OPT_IMATH <= 50
 
 SECTION code_fp_math32
 
@@ -116,9 +128,7 @@ PUBLIC m32_z80_mulu_de
 
 ENDIF
 
-IF __CLIB_OPT_IMATH > 50
-
-;-------------------------------------------------------------------------
+;------------------------------------------------------------------------------
 ;
 ; Fast mulu_16_8x8 using a 512 byte table
 ;
@@ -128,6 +138,8 @@ IF __CLIB_OPT_IMATH > 50
 ; uses  : af, bc
 ;
 ; exit : de
+
+IF __CLIB_OPT_IMATH > 50
 
 SECTION code_fp_math32
 
