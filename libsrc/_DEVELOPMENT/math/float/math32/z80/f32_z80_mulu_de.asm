@@ -16,9 +16,7 @@
 ; exit  : de = 16-bit product
 ;         carry reset
 
-
-;IF __CLIB_OPT_IMATH <= 50
-IF 1
+IF __CLIB_OPT_IMATH <= 50
 
 ;-------------------------------------------------------------------------
 ;
@@ -118,8 +116,7 @@ PUBLIC m32_z80_mulu_de
 
 ENDIF
 
-;IF __CLIB_OPT_IMATH > 50
-IF 0
+IF __CLIB_OPT_IMATH > 50
 
 ;-------------------------------------------------------------------------
 ;
@@ -143,7 +140,7 @@ PUBLIC m32_z80_mulu_de
     ld d,e
     ld e,a
 
-.lnc                        ; largest in d
+.lnc                        ; with largest in d
     xor a
     or e
     jr Z,lzeroe             ; multiply by 0

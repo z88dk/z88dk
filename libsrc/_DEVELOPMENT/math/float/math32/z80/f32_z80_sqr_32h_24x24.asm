@@ -31,7 +31,7 @@
 ;
 ; exit  : hlde  = 32-bit product
 ;
-; uses  : af, bc, de, hl
+; uses  : af, bc, de, hl, af'
 
 IF __CPU_Z80__
 
@@ -63,48 +63,53 @@ PUBLIC m32_sqr_32h_24x24
     add hl,hl                   ; 2*b*c 2^8
     adc a,a
 
-    ld c,h                      ; put 2^8 in bc
-    ld b,a
+    ld l,h                      ; put 2^8 in hl
+    ld h,a
 
     pop de                      ; ac
-    pop hl                      ; bb
     call m32_z80_mulu_de        ; a*c 2^16
-    ex de,hl
-    call m32_z80_mulu_de        ; b*b 2^16
 
     xor a
-    add hl,hl                   ; 2*a*c 2^16
+    add hl,de                   ; 2*a*c 2^16
     adc a,a
     add hl,de
     adc a,0
-    add hl,bc
+    ex af,af
+
+    pop de                      ; bb
+    call m32_z80_mulu_de        ; b*b 2^16
+
+    ex af,af
+    add hl,de
     adc a,0
 
-    ld c,h                      ; put 2^16 in bc
-    ld b,a
+    ld b,l                      ; put 2^16 in hla
+    ld l,h
+    ld h,a
+    ld a,b
 
     pop de                      ; ab
+    push af                     ; l on stack
     call m32_z80_mulu_de        ; a*b 2^24
-
-    ex de,hl                    ; l into e
     
     xor a
-    add hl,hl                   ; 2*a*b 2^24
+    add hl,de                   ; 2*a*b 2^24
     adc a,a
-    add hl,bc
+    add hl,de
     adc a,0
 
-    ld c,e                      ; l into c
+    pop bc                      ; l in b
+    ld c,b                      ; l into c
     ld b,l
     ld l,h
     ld h,a
 
     pop de                      ; aa
+    push bc
     call m32_z80_mulu_de        ; a*a 2^32
 
     add hl,de
-    ld d,b
-    ld e,c                      ; exit  : HLDE  = 32-bit product
+    pop de                      ; exit  : HLDE  = 32-bit product
     ret
 
 ENDIF
