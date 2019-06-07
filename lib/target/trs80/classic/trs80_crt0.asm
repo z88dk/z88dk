@@ -132,6 +132,7 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 	INCLUDE	"crt/classic/crt_section.asm"
 
 
+
 	SECTION code_crt_init
 IF (startup=2)
 	call	$1c9		;CLS
@@ -142,16 +143,10 @@ ENDIF
 	ld	(base_graphics),hl
 
 
+
 	SECTION bss_crt
 end:		defb	0		; null file name (used in argv/argc parsing)
 
-;-----------------------
-; Some startup variables
-;-----------------------
-IF !DEFINED_nofileio
-		PUBLIC	__fcb
-__fcb:		defs	380,0	;file control block (10 files) (MAXFILE)*(32 bytes for native FCB + 6 bytes for z88dk)
-ENDIF
 
 
 	SECTION  rodata_clib
