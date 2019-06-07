@@ -6,6 +6,18 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;------------------------------------------------------------------------------
+
+IFDEF __CLASSIC
+
+    DEFC __CLIB_OPT_IMATH = 100
+
+ELSE
+
+    INCLUDE "config_private.inc"
+
+ENDIF
+
+;------------------------------------------------------------------------------
 ;
 ; multiplication of two 24-bit numbers into a 32-bit product
 ;
@@ -66,6 +78,85 @@ PUBLIC m32_mulu_32h_24x24
     push de                     ; dc on stack
     push bc                     ; ab on stack (again)
     push hl                     ; ef on stack
+
+IF __CLIB_OPT_IMATH <= 50
+
+    ld d,l
+    ld a,h
+    ld h,e
+    ld e,a
+    call m32_z80_mulu_de        ; b*e 2^8
+    ex de,hl
+    call m32_z80_mulu_de        ; c*f 2^8
+
+    xor a
+    add hl,de
+    adc a,a
+
+    ld c,h                      ; put 2^8 in bc
+    ld b,a
+
+    pop de                      ; ef
+    pop hl                      ; ab
+    ld a,d
+    ld d,h
+    ld h,a
+    call m32_z80_mulu_de        ; a*f 2^16
+    ex de,hl
+    call m32_z80_mulu_de        ; e*b 2^16
+
+    xor a
+    add hl,bc
+    adc a,a
+    add hl,de
+    adc a,0
+
+    pop de                      ; dc
+    call m32_z80_mulu_de        ; d*c 2^16
+
+    add hl,de
+    adc a,0
+
+    ld c,h                      ; put 2^16 in bca
+    ld b,a
+    ld a,l
+
+    pop de                      ; ab
+    pop hl                      ; de
+
+    push af                     ; l on stack
+
+    ld a,d
+    ld d,h
+    ld h,a
+    call m32_z80_mulu_de        ; d*b 2^24
+    ex de,hl
+    call m32_z80_mulu_de        ; a*e 2^24
+
+    xor a
+    add hl,bc
+    adc a,a
+    add hl,de
+    adc a,0
+
+    pop bc                     ; l in b
+    ld c,b
+    ld b,l
+    ld l,h
+    ld h,a
+
+    pop de                      ; ad
+    call m32_z80_mulu_de        ; a*d 2^32
+
+    add hl,de
+
+    ld d,b
+    ld e,c                      ; exit  : HLDE  = 32-bit product
+    ret
+
+ENDIF
+
+IF __CLIB_OPT_IMATH > 50
 
     ld d,l
     ld a,h
@@ -150,4 +241,5 @@ PUBLIC m32_mulu_32h_24x24
     pop de                      ; exit  : HLDE  = 32-bit product
     ret
 
+ENDIF
 ENDIF

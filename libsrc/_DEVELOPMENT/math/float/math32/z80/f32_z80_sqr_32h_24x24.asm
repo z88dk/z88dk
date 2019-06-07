@@ -6,6 +6,18 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;------------------------------------------------------------------------------
+
+IFDEF __CLASSIC
+
+    DEFC __CLIB_OPT_IMATH = 100
+
+ELSE
+
+    INCLUDE "config_private.inc"
+
+ENDIF
+
+;------------------------------------------------------------------------------
 ;
 ; square of two 24-bit numbers into a 32-bit product
 ;
@@ -54,6 +66,64 @@ PUBLIC m32_sqr_32h_24x24
     push hl                     ; bb on stack
     push de                     ; ac on stack
     ld l,e                      ; bc:ac
+
+IF __CLIB_OPT_IMATH <= 50
+
+    ex de,hl                    ; ac:bc
+    call m32_z80_mulu_de        ; b*c 2^8
+    ex de,hl
+
+    xor a
+    add hl,hl                   ; 2*b*c 2^8
+    adc a,a
+
+    ld c,h                      ; put 2^8 in bc
+    ld b,a
+
+    pop de                      ; ac
+    pop hl                      ; bb
+    call m32_z80_mulu_de        ; a*c 2^16
+    ex de,hl
+    call m32_z80_mulu_de        ; b*b 2^16
+
+    xor a
+    add hl,hl                   ; 2*a*c 2^16
+    adc a,a
+    add hl,de
+    adc a,0
+    add hl,bc
+    adc a,0
+
+    ld c,h                      ; put 2^16 in bc
+    ld b,a
+
+    pop de                      ; ab
+    call m32_z80_mulu_de        ; a*b 2^24
+
+    ex de,hl                    ; l into e
+    
+    xor a
+    add hl,hl                   ; 2*a*b 2^24
+    adc a,a
+    add hl,bc
+    adc a,0
+
+    ld c,e                      ; l into c
+    ld b,l
+    ld l,h
+    ld h,a
+
+    pop de                      ; aa
+    call m32_z80_mulu_de        ; a*a 2^32
+
+    add hl,de
+    ld d,b
+    ld e,c                      ; exit  : HLDE  = 32-bit product
+    ret
+
+ENDIF
+
+IF __CLIB_OPT_IMATH > 50
 
     ex de,hl                    ; ac:bc
     call m32_z80_mulu_de        ; b*c 2^8
@@ -112,4 +182,5 @@ PUBLIC m32_sqr_32h_24x24
     pop de                      ; exit  : HLDE  = 32-bit product
     ret
 
+ENDIF
 ENDIF
