@@ -92,7 +92,11 @@ cmdline:
 	ld	bc,0
 	ld	a,(hl)
 	cp	13
-	jr	z,argv_done
+	jr	nz,nocr
+	xor a
+	ld	(hl),a
+	jr  argv_done
+nocr:
 	dec	hl
 find_end:
 	inc	hl
@@ -100,6 +104,8 @@ find_end:
 	ld	a,(hl)
 	cp	13
 	jr	nz,find_end
+	xor a
+	ld	(hl),a
 	dec	hl
 
 
