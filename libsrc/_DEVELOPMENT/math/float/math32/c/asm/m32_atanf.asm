@@ -205,7 +205,9 @@
 ; Externals used
 ;--------------------------------------------------------
 	GLOBAL _m32_polyf
+	GLOBAL _m32_hypotf
 	GLOBAL _m32_invsqrtf
+	GLOBAL _m32_sqrtf
 	GLOBAL _m32_invf
 	GLOBAL _m32_sqrf
 	GLOBAL _m32_roundf
@@ -216,12 +218,10 @@
 	GLOBAL _m32_ldexpf
 	GLOBAL _m32_frexpf
 	GLOBAL _m32_fabsf
-	GLOBAL _m32_hypotf
 	GLOBAL _m32_powf
 	GLOBAL _m32_log10f
 	GLOBAL _m32_logf
 	GLOBAL _m32_expf
-	GLOBAL _m32_sqrtf
 	GLOBAL _m32_atanhf
 	GLOBAL _m32_acoshf
 	GLOBAL _m32_asinhf
@@ -286,10 +286,10 @@ _m32_atanf:
 	ld	(ix-2),e
 	ld	(ix-1),d
 	call	_m32_fabsf
-	ld	(ix-12),l
-	ld	(ix-11),h
-	ld	(ix-10),e
-	ld	(ix-9),d
+	ld	(ix-8),l
+	ld	(ix-7),h
+	ld	(ix-6),e
+	ld	(ix-5),d
 	ld	a,d
 	and	a,0x7f
 	or	a,e
@@ -305,33 +305,33 @@ l_m32_atanf_00102:
 	push	hl
 	ld	hl,0x0000
 	push	hl
-	ld	l,(ix-10)
-	ld	h,(ix-9)
+	ld	l,(ix-6)
+	ld	h,(ix-5)
 	push	hl
-	ld	l,(ix-12)
-	ld	h,(ix-11)
+	ld	l,(ix-8)
+	ld	h,(ix-7)
 	push	hl
 	call	___fsgt_callee
 	ld	c,0x00
-	ld	(ix-14),l
-	ld	(ix-13),c
+	ld	(ix-10),l
+	ld	(ix-9),c
 	ld	a, c
 	or	a,l
 	jr	Z,l_m32_atanf_00104
-	ld	l,(ix-12)
-	ld	h,(ix-11)
-	ld	e,(ix-10)
-	ld	d,(ix-9)
+	ld	l,(ix-8)
+	ld	h,(ix-7)
+	ld	e,(ix-6)
+	ld	d,(ix-5)
 	call	_m32_invf
-	ld	(ix-12),l
-	ld	(ix-11),h
-	ld	(ix-10),e
-	ld	(ix-9),d
+	ld	(ix-8),l
+	ld	(ix-7),h
+	ld	(ix-6),e
+	ld	(ix-5),d
 l_m32_atanf_00104:
-	ld	l,(ix-12)
-	ld	h,(ix-11)
-	ld	e,(ix-10)
-	ld	d,(ix-9)
+	ld	l,(ix-8)
+	ld	h,(ix-7)
+	ld	e,(ix-6)
+	ld	d,(ix-5)
 	call	_m32_sqrf
 	push	hl
 	ld	c,l
@@ -344,10 +344,10 @@ l_m32_atanf_00104:
 	push	de
 	push	bc
 	call	_m32_polyf
-	ld	(ix-5),d
-	ld	(ix-6),e
-	ld	(ix-7),h
-	ld	(ix-8),l
+	ld	(ix-11),d
+	ld	(ix-12),e
+	ld	(ix-13),h
+	ld	(ix-14),l
 	pop	de
 	pop	bc
 	ld	hl,0x0004
@@ -359,26 +359,26 @@ l_m32_atanf_00104:
 	call	_m32_polyf
 	push	de
 	push	hl
+	ld	l,(ix-12)
+	ld	h,(ix-11)
+	push	hl
+	ld	l,(ix-14)
+	ld	h,(ix-13)
+	push	hl
+	call	___fsdiv_callee
+	push	de
+	push	hl
 	ld	l,(ix-6)
 	ld	h,(ix-5)
 	push	hl
 	ld	l,(ix-8)
 	ld	h,(ix-7)
 	push	hl
-	call	___fsdiv_callee
-	push	de
-	push	hl
-	ld	l,(ix-10)
-	ld	h,(ix-9)
-	push	hl
-	ld	l,(ix-12)
-	ld	h,(ix-11)
-	push	hl
 	call	___fsmul_callee
-	ld	a,(ix-13)
+	ld	a,(ix-9)
 	ld	c,l
 	ld	b,h
-	or	a,(ix-14)
+	or	a,(ix-10)
 	jr	Z,l_m32_atanf_00106
 	push	de
 	push	bc
