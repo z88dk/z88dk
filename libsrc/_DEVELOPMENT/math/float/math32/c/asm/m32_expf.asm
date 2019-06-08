@@ -205,7 +205,9 @@
 ; Externals used
 ;--------------------------------------------------------
 	GLOBAL _m32_polyf
+	GLOBAL _m32_hypotf
 	GLOBAL _m32_invsqrtf
+	GLOBAL _m32_sqrtf
 	GLOBAL _m32_invf
 	GLOBAL _m32_sqrf
 	GLOBAL _m32_roundf
@@ -216,11 +218,9 @@
 	GLOBAL _m32_ldexpf
 	GLOBAL _m32_frexpf
 	GLOBAL _m32_fabsf
-	GLOBAL _m32_hypotf
 	GLOBAL _m32_powf
 	GLOBAL _m32_log10f
 	GLOBAL _m32_logf
-	GLOBAL _m32_sqrtf
 	GLOBAL _m32_atanhf
 	GLOBAL _m32_acoshf
 	GLOBAL _m32_asinhf
@@ -277,50 +277,27 @@ _m32_expf:
 	push	ix
 	ld	ix,0
 	add	ix,sp
-	ld	hl, -7
+	ld	hl, -14
 	add	hl, sp
 	ld	sp, hl
-	ld	a,d
-	and	a,0x7f
-	or	a,e
-	or	a,h
-	or	a,l
-	ld	c,l
-	ld	b,h
-	jr	NZ,l_m32_expf_00102
-	ld	de,0x3f80
-	ld	hl,0x0000
-	jp	l_m32_expf_00107
-l_m32_expf_00102:
-	push	bc
+	ld	(ix-8),l
+	ld	(ix-7),h
+	ld	(ix-6),e
+	ld	(ix-5),d
 	push	de
-	ld	hl,0x0000
 	push	hl
-	push	hl
-	push	de
-	push	bc
-	call	___fslt_callee
-	pop	de
-	pop	bc
-	ld	(ix-1),l
-	ld	a, l
-	or	a, a
-	jr	Z,l_m32_expf_00104
-	ld	a, d
-	xor	a,0x80
-	ld	d, a
-l_m32_expf_00104:
-	push	de
-	push	bc
 	ld	hl,0x3fb8
 	push	hl
 	ld	hl,0xaa3b
 	push	hl
 	call	___fsmul_callee
-	ld	(ix-5),l
-	ld	(ix-4),h
-	ld	(ix-3),e
-	ld	(ix-2),d
+	ld	bc,0x3f00
+	push	bc
+	ld	bc,0x0000
+	push	bc
+	push	de
+	push	hl
+	call	___fsadd_callee
 	call	_m32_floorf
 	push	de
 	push	hl
@@ -329,34 +306,103 @@ l_m32_expf_00104:
 	push	hl
 	push	hl
 	call	___sint2fs_callee
+	ld	(ix-9),d
+	ld	(ix-10),e
+	ld	(ix-11),h
+	ld	(ix-12),l
 	push	de
 	push	hl
-	ld	l,(ix-3)
-	ld	h,(ix-2)
+	ld	hl,0x3f31
 	push	hl
-	ld	l,(ix-5)
-	ld	h,(ix-4)
+	ld	hl,0x8000
+	push	hl
+	call	___fsmul_callee
+	push	de
+	push	hl
+	ld	l,(ix-6)
+	ld	h,(ix-5)
+	push	hl
+	ld	l,(ix-8)
+	ld	h,(ix-7)
 	push	hl
 	call	___fssub_callee
-	ld	bc,0x0009
+	ld	(ix-4),l
+	ld	(ix-3),h
+	ld	(ix-2),e
+	ld	(ix-1),d
+	ld	l,(ix-10)
+	ld	h,(ix-9)
+	push	hl
+	ld	l,(ix-12)
+	ld	h,(ix-11)
+	push	hl
+	ld	hl,0xb95e
+	push	hl
+	ld	hl,0x8083
+	push	hl
+	call	___fsmul_callee
+	push	de
+	push	hl
+	ld	l,(ix-2)
+	ld	h,(ix-1)
+	push	hl
+	ld	l,(ix-4)
+	ld	h,(ix-3)
+	push	hl
+	call	___fssub_callee
+	ld	(ix-12),l
+	ld	(ix-11),h
+	ld	(ix-10),e
+	ld	(ix-9),d
+	call	_m32_sqrf
+	ld	(ix-5),d
+	ld	(ix-6),e
+	ld	(ix-7),h
+	ld	(ix-8),l
+	ld	hl,0x0005
+	push	hl
+	ld	hl,_m32_coeff_exp
+	push	hl
+	ld	l,(ix-10)
+	ld	h,(ix-9)
+	push	hl
+	ld	l,(ix-12)
+	ld	h,(ix-11)
+	push	hl
+	call	_m32_polyf
+	push	de
+	push	hl
+	ld	l,(ix-6)
+	ld	h,(ix-5)
+	push	hl
+	ld	l,(ix-8)
+	ld	h,(ix-7)
+	push	hl
+	call	___fsmul_callee
+	ld	c, l
+	ld	l,(ix-10)
+	ld	b,h
+	ld	h,(ix-9)
+	push	hl
+	ld	l,(ix-12)
+	ld	h,(ix-11)
+	push	hl
+	push	de
 	push	bc
-	ld	bc,_m32_coeff_exp
+	call	___fsadd_callee
+	ld	bc,0x3f80
+	push	bc
+	ld	bc,0x0000
 	push	bc
 	push	de
 	push	hl
-	call	_m32_polyf
+	call	___fsadd_callee
 	pop	bc
 	push	bc
 	push	bc
 	push	de
 	push	hl
 	call	_m32_ldexpf
-	ld	a,(ix-1)
-	or	a, a
-	jr	Z,l_m32_expf_00106
-	call	_m32_invf
-l_m32_expf_00106:
-l_m32_expf_00107:
 	ld	sp, ix
 	pop	ix
 	ret
