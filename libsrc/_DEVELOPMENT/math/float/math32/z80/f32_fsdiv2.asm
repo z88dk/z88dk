@@ -20,10 +20,10 @@ SECTION code_fp_math32
 EXTERN m32_fsmin_fastcall
 
 PUBLIC m32_fsdiv2_fastcall
-PUBLIC _m32_div2
+PUBLIC _m32_div2f
 
 
-._m32_div2
+._m32_div2f
 .m32_fsdiv2_fastcall
     sla e                       ; get exponent in d
     rl d

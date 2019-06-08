@@ -103,6 +103,8 @@ float m32_fmodf(float x, float y);
 float m32_roundf(float x) __z88dk_fastcall;
 
 /* Intrinsic functions */
+float m32_mul2f(float a) __z88dk_fastcall;
+float m32_div2f(float a) __z88dk_fastcall;
 float m32_sqrf(float a) __z88dk_fastcall;
 float m32_invf(float a) __z88dk_fastcall;
 float m32_sqrtf(float a) __z88dk_fastcall;
