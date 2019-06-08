@@ -210,6 +210,8 @@
 	GLOBAL _m32_sqrtf
 	GLOBAL _m32_invf
 	GLOBAL _m32_sqrf
+	GLOBAL _m32_div2f
+	GLOBAL _m32_mul2f
 	GLOBAL _m32_roundf
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
@@ -311,15 +313,9 @@ _m32_atanhf:
 	ld	h,(ix-3)
 	push	hl
 	call	___fsdiv_callee
+	call	_m32_div2f
 	call	_m32_logf
-	push	de
-	push	hl
-	ld	hl,0x3f00
-	push	hl
-	ld	hl,0x0000
-	push	hl
-	call	___fsmul
-	ld	sp,ix
+	ld	sp, ix
 	pop	ix
 	ret
 	SECTION IGNORE

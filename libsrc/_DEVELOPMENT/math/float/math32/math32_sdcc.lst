@@ -23,6 +23,7 @@ math/float/math32/c/sdcc/cm32_sdcc_fsadd
 math/float/math32/c/sdcc/cm32_sdcc_fsadd_callee
 math/float/math32/c/sdcc/cm32_sdcc_fsdiv
 math/float/math32/c/sdcc/cm32_sdcc_fsdiv_callee
+math/float/math32/c/sdcc/cm32_sdcc_fsdiv2
 math/float/math32/c/sdcc/cm32_sdcc___fseq_callee
 math/float/math32/c/sdcc/cm32_sdcc_fsfrexp
 math/float/math32/c/sdcc/cm32_sdcc_fsfrexp_callee
@@ -39,6 +40,7 @@ math/float/math32/c/sdcc/cm32_sdcc_fsmax
 math/float/math32/c/sdcc/cm32_sdcc_fsmin
 math/float/math32/c/sdcc/cm32_sdcc_fsmul
 math/float/math32/c/sdcc/cm32_sdcc_fsmul_callee
+math/float/math32/c/sdcc/cm32_sdcc_fsmul2
 math/float/math32/c/sdcc/cm32_sdcc_fsneg
 math/float/math32/c/sdcc/cm32_sdcc___fsneq_callee
 math/float/math32/c/sdcc/cm32_sdcc_fspoly

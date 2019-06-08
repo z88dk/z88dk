@@ -64,19 +64,19 @@ float m32_logf (float x) __z88dk_fastcall
     {
         return( MINLOGF );
     }
-     
+
     x = m32_frexpf( x, &e );
-    
+
     if( x < SQRTHF )
     {
         e -= 1;
         x = x + x - 1.0; /*  2x - 1  */
-    }   
+    }
     else
     {
         x = x - 1.0;
     }
-    
+
     z = m32_sqrf(x);
 
     y = m32_polyf(x, m32_coeff_log, 9) * z;
@@ -86,14 +86,14 @@ float m32_logf (float x) __z88dk_fastcall
         floate = (float)e;
         y += -2.12194440e-4 * floate;
     }
-     
-    y +=  -0.5 * z; /* y - 0.5 x^2 */
+
+    y -=  m32_div2f(z); /* y - 0.5 x^2 */
     z = x + y;      /* ... + x  */
-     
+
     if( e != 0)
     {
         z += 0.693359375 * floate;
     }
-     
+
     return( z );
 }

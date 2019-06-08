@@ -210,6 +210,8 @@
 	GLOBAL _m32_sqrtf
 	GLOBAL _m32_invf
 	GLOBAL _m32_sqrf
+	GLOBAL _m32_div2f
+	GLOBAL _m32_mul2f
 	GLOBAL _m32_roundf
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
@@ -283,30 +285,16 @@ _m32_acoshf:
 	ld	(ix-3),h
 	ld	(ix-2),e
 	ld	(ix-1),d
-	push	de
-	push	hl
-	ld	hl,0x4000
-	push	hl
-	ld	hl,0x0000
-	push	hl
-	call	___fsmul_callee
+	call	_m32_mul2f
 	ld	(ix-5),d
 	ld	(ix-6),e
 	ld	(ix-7),h
 	ld	(ix-8),l
-	ld	l,(ix-2)
-	ld	h,(ix-1)
-	push	hl
 	ld	l,(ix-4)
 	ld	h,(ix-3)
-	push	hl
-	ld	l,(ix-2)
-	ld	h,(ix-1)
-	push	hl
-	ld	l,(ix-4)
-	ld	h,(ix-3)
-	push	hl
-	call	___fsmul_callee
+	ld	e,(ix-2)
+	ld	d,(ix-1)
+	call	_m32_sqrf
 	ld	bc,0x3f80
 	push	bc
 	ld	bc,0x0000
