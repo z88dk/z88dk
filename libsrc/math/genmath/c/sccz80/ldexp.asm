@@ -3,7 +3,8 @@
 
 	PUBLIC	ldexp
 
-	EXTERN	FA
+	EXTERN	dload
+	EXTERN	fa
 
 ;
 ; double ldexp (double x, int exp);
@@ -18,7 +19,7 @@ ldexp:
 	ld	hl,2
 	add	hl,sp
 	ld	a,(hl)
-	ld	hl,FA+5
+	ld	hl,fa+5
 	add	(hl)
 	ld	(hl),a
 	ret
