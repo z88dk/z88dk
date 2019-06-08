@@ -1,9 +1,9 @@
 
-; float _fabsf (float number) __z88dk_fastcall
+; float _div2f (float number) __z88dk_fastcall
 
 SECTION code_fp_math32
-PUBLIC  asm_fabsf
-EXTERN  m32_fabs_fastcall
+PUBLIC  asm_div2f
+EXTERN  m32_div2_fastcall
 
     ; Takes the absolute value of a float
     ;
@@ -14,4 +14,4 @@ EXTERN  m32_fabs_fastcall
     ;
     ; uses  : de, hl
 
-defc asm_fabsf = m32_fabs_fastcall
+defc asm_div2f = m32_div2_fastcall

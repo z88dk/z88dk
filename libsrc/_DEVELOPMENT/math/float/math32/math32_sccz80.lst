@@ -17,6 +17,7 @@ math/float/math32/c/sccz80/cm32_sccz80_fsadd
 math/float/math32/c/sccz80/cm32_sccz80_fsadd_callee
 math/float/math32/c/sccz80/cm32_sccz80_fsdiv
 math/float/math32/c/sccz80/cm32_sccz80_fsdiv_callee
+math/float/math32/c/sccz80/cm32_sccz80_fsdiv2
 math/float/math32/c/sccz80/cm32_sccz80_fsfrexp
 math/float/math32/c/sccz80/cm32_sccz80_fsfrexp_callee
 math/float/math32/c/sccz80/cm32_sccz80_fshypot
@@ -33,6 +34,7 @@ math/float/math32/c/sccz80/cm32_sccz80_fsmin
 math/float/math32/c/sccz80/cm32_sccz80_fsmin_callee
 math/float/math32/c/sccz80/cm32_sccz80_fsmul
 math/float/math32/c/sccz80/cm32_sccz80_fsmul_callee
+math/float/math32/c/sccz80/cm32_sccz80_fsmul2
 math/float/math32/c/sccz80/cm32_sccz80_fsneg
 math/float/math32/c/sccz80/cm32_sccz80_fsneg_callee
 math/float/math32/c/sccz80/cm32_sccz80_fspoly

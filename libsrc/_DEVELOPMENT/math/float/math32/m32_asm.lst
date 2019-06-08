@@ -1,6 +1,7 @@
 math/float/math32/lm32/z80/asm_addf
 math/float/math32/lm32/z80/asm_ceilf
 math/float/math32/lm32/z80/asm_divf
+math/float/math32/lm32/z80/asm_div2f
 math/float/math32/lm32/z80/asm_fabsf
 math/float/math32/lm32/z80/asm_floorf
 math/float/math32/lm32/z80/asm_fmaxf
@@ -10,6 +11,7 @@ math/float/math32/lm32/z80/asm_hypotf
 math/float/math32/lm32/z80/asm_invf
 math/float/math32/lm32/z80/asm_invsqrtf
 math/float/math32/lm32/z80/asm_mulf
+math/float/math32/lm32/z80/asm_mul2f
 math/float/math32/lm32/z80/asm_negf
 math/float/math32/lm32/z80/asm_polyf
 math/float/math32/lm32/z80/asm_sqrf
@@ -28,10 +30,12 @@ math/float/math32/z80/f32_fpclassify
 math/float/math32/z80/f32_fsceil
 math/float/math32/z80/f32_fscompare_callee
 math/float/math32/z80/f32_fsdiv
+math/float/math32/z80/f32_fsdiv2
 math/float/math32/z80/f32_fsfrexp
 math/float/math32/z80/f32_fshypot
 math/float/math32/z80/f32_fsldexp
 math/float/math32/z80/f32_fsmul
+math/float/math32/z80/f32_fsmul2
 math/float/math32/z80/f32_fspoly
 math/float/math32/z80/f32_fssqr
 math/float/math32/z80/f32_fssqrt
