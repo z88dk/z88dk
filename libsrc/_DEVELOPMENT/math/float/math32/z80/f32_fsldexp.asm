@@ -9,16 +9,16 @@
 ; m32_ldexp - z80, z180, z80-zxn load exponent
 ;-------------------------------------------------------------------------
 ;
-;   float m32_ldexpf (float x, int16_t pw2) 
+;   float m32_ldexpf (float x, int16_t pw2)
 ;   {
 ;       union float_long fl;
 ;       int32_t e;
 ;
 ;       fl.f = x;
 ;
-;       e=(fl.l >> 23) & 0x000000ff;
-;       e+=pw2;
-;       fl.l= ((e & 0xff) << 23) | (fl.l & 0x807fffff);
+;       e = (fl.l >> 23) & 0x000000ff;
+;       e += pw2;
+;       fl.l = ((e & 0xff) << 23) | (fl.l & 0x807fffff);
 ;
 ;       return(fl.f);
 ;   }
@@ -34,7 +34,7 @@ PUBLIC m32_fsldexp_callee
 PUBLIC _m32_ldexpf
 
 
-; float ldexpf(float f) __z88dk_fastcall;
+; float ldexpf (float x, int16_t pw2);
 ._m32_ldexpf
 
 .m32_fsldexp_callee

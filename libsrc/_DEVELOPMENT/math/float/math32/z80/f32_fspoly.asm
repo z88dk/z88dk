@@ -117,7 +117,7 @@ PUBLIC _m32_polyf
     ld l,0                      ; (float)x in bc dehl
 
 .fep0
-    call m32_fsmul24x32         ; x * res => dehl
+    call m32_fsmul24x32         ; x * res => bc dehl
     call m32_fsadd24x32         ; d[--n] + res * x => bc dehl
     
     exx

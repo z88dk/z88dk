@@ -205,7 +205,9 @@
 ; Externals used
 ;--------------------------------------------------------
 	GLOBAL _m32_polyf
+	GLOBAL _m32_hypotf
 	GLOBAL _m32_invsqrtf
+	GLOBAL _m32_sqrtf
 	GLOBAL _m32_invf
 	GLOBAL _m32_sqrf
 	GLOBAL _m32_roundf
@@ -216,12 +218,10 @@
 	GLOBAL _m32_ldexpf
 	GLOBAL _m32_frexpf
 	GLOBAL _m32_fabsf
-	GLOBAL _m32_hypotf
 	GLOBAL _m32_powf
 	GLOBAL _m32_log10f
 	GLOBAL _m32_logf
 	GLOBAL _m32_expf
-	GLOBAL _m32_sqrtf
 	GLOBAL _m32_atanhf
 	GLOBAL _m32_asinhf
 	GLOBAL _m32_tanhf

@@ -6,7 +6,7 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-; Coefficients for atan()
+; Coefficients for atanf()
 ;-------------------------------------------------------------------------
 ;
 ;   float coeff_a[] =

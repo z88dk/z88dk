@@ -14,7 +14,7 @@
 ;       union float_long fl;
 ;       int8_t i;
 ;
-;       fl.f=x;
+;       fl.f = x;
 ;       /* Find the exponent (power of 2) */
 ;       i  = ( fl.l >> 23) & 0x000000ff;
 ;       i -= 0x7e;
@@ -35,7 +35,7 @@ PUBLIC m32_fsfrexp_callee
 PUBLIC _m32_frexpf
 
 
-; float frexpf(float f) __z88dk_fastcall;
+; float frexpf (float x, int8_t *pw2);
 ._m32_frexpf
 
 .m32_fsfrexp_callee
@@ -51,7 +51,7 @@ PUBLIC _m32_frexpf
     pop af                      ; return
     pop hl                      ; (float)x in dehl
     pop de
-    pop bc                      ; (float*)pw2
+    pop bc                      ; (int8_t*)pw2
     push af                     ; return on stack
 
     sla e                       ; get the exponent
@@ -59,10 +59,10 @@ PUBLIC _m32_frexpf
     rr e                        ; save the sign in e[7]
 
     ld a,d
-    sub 07eh                    ; remove exponent excess (bias -1)
+    ld d,$7e                    ; remove exponent excess (bias-1)
+    sub d                       ; mantissa between 0.5 and 1
     ld (bc),a                   ; and store in pw2
-    
-    ld d,07eh                   ; mantissa between 0.5 and 1
+
     rl e                        ; get sign back
     rr d
     rr e

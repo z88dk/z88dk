@@ -7,8 +7,16 @@
 ;
 ;------------------------------------------------------------------------------
 
+IF __CPU_Z80__
 
-    INCLUDE "config_private.inc"
+INCLUDE "config_private.inc"
+
+SECTION code_clib
+SECTION code_fp_math32
+
+EXTERN m32_z80_mulu_de
+
+PUBLIC m32_mulu_32h_24x24
 
 ;------------------------------------------------------------------------------
 ;
@@ -37,15 +45,6 @@
 ; exit  : hlde  = 32-bit product
 ;
 ; uses  : af, bc, de, hl, af', bc', de', hl'
-
-IF __CPU_Z80__
-
-SECTION code_clib
-SECTION code_fp_math32
-
-EXTERN m32_z80_mulu_de
-
-PUBLIC m32_mulu_32h_24x24
 
 
 .m32_mulu_32h_24x24

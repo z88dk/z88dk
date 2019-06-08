@@ -6,7 +6,7 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-; Coefficients for sin()
+; Coefficients for sinf()
 ;-------------------------------------------------------------------------
 ;
 ;   float coeff_a[] =

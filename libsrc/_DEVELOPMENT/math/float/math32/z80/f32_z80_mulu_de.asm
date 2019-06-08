@@ -10,30 +10,29 @@
 ; REPLICATION for Z80 of:
 ; Z180 MLT DE and Z80-ZXN MUL DE
 ;
-; enter : d = 8-bit multiplicand
-;         e = 8-bit multiplicand
-;
-; exit  : de = 16-bit product
-;         carry reset
-;
 ;------------------------------------------------------------------------------
 
+IF __CPU_Z80__
 
-    INCLUDE "config_private.inc"
+INCLUDE "config_private.inc"
+
+SECTION code_clib
+SECTION code_fp_math32
+
+PUBLIC m32_z80_mulu_de
 
 ;------------------------------------------------------------------------------
 ;
 ; Small mulu_16_8x8 using unrolled shift and add
 ;
-; uses  : f
+; enter : d = 8-bit multiplicand
+;         e = 8-bit multiplicand
 ;
-; exit : de
+; exit  : de = 16-bit product
+;         carry reset
 
 IF __CLIB_OPT_IMATH <= 50
 
-SECTION code_fp_math32
-
-PUBLIC m32_z80_mulu_de
 
 .m32_z80_mulu_de
 
@@ -128,15 +127,15 @@ ENDIF
 ; x*y = ((x+y)/2)2 - ((x-y)/2)2           <- if x+y is even 
 ;     = ((x+y-1)/2)2 - ((x-y-1)/2)2 + y   <- if x+y is odd and x>=y
 ;
+; enter : d = 8-bit multiplicand
+;         e = 8-bit multiplicand
+;
 ; uses  : af, bc
 ;
-; exit : de
+; exit  : de = 16-bit product
 
 IF __CLIB_OPT_IMATH > 50
 
-SECTION code_fp_math32
-
-PUBLIC m32_z80_mulu_de
 
 .m32_z80_mulu_de
     ld a,d                  ; put largest in d
@@ -247,4 +246,5 @@ ALIGN $100
     defb $c4,$c5,$c7,$c9,$cb,$cc,$ce,$d0,$d2,$d4,$d5,$d7,$d9,$db,$dd,$df
     defb $e1,$e2,$e4,$e6,$e8,$ea,$ec,$ee,$f0,$f2,$f4,$f6,$f8,$fa,$fc,$fe
 
+ENDIF
 ENDIF
