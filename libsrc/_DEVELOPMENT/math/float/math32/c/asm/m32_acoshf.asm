@@ -290,19 +290,11 @@ _m32_acoshf:
 	ld	(ix-6),e
 	ld	(ix-7),h
 	ld	(ix-8),l
-	ld	l,(ix-2)
-	ld	h,(ix-1)
-	push	hl
 	ld	l,(ix-4)
 	ld	h,(ix-3)
-	push	hl
-	ld	l,(ix-2)
-	ld	h,(ix-1)
-	push	hl
-	ld	l,(ix-4)
-	ld	h,(ix-3)
-	push	hl
-	call	___fsmul_callee
+	ld	e,(ix-2)
+	ld	d,(ix-1)
+	call	_m32_sqrf
 	ld	bc,0x3f80
 	push	bc
 	ld	bc,0x0000
