@@ -220,6 +220,11 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 
             /* djm, load double reg for long operators */
             if ( lval2->val_type == KIND_DOUBLE || lval->val_type == KIND_DOUBLE ) {
+                 if ( doper == zdiv ) {
+                     doper = mult;
+                     dconstoper = mult_dconst;
+                     lval2->const_val = 1. / lval2->const_val;
+                 }
                  if ( dconstoper != NULL ) {
                      if ( dconstoper(lval, lval2->const_val)) {
                          return;
@@ -227,10 +232,6 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                  }
 
                  // Multiplication is cheaper than division, so invert the constant
-                 if ( doper == zdiv ) {
-                     doper = mult;
-                     lval2->const_val = 1. / lval2->const_val;
-                 }
                  load_double_into_fa(lval2);
                  lval2->val_type = KIND_DOUBLE;
                  lval2->ltype = type_double;
