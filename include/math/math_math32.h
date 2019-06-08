@@ -26,7 +26,7 @@
 #define LNof10          (double_t)2.302585093
 #define LOG2            (double_t)0.30102999567
 #define LOGE            (double_t)0.43429448190
-#define PI              (double_t)3.14159265359
+//#define PI              (double_t)3.14159265359
 #define PIby180         (double_t)0.0174532925
 #define PIbyTWO         (double_t)1.570796326795
 #define POW10INF        (double_t)38.0

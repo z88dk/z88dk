@@ -78,7 +78,7 @@ extern double_t __LIB__ ceil(double_t) __smallc;
 
 /* Manipulation */
 extern double_t __LIB__ modf(double_t, double_t *) __smallc; /* decomposes a number into integer and fractional parts */
-#define ldexp(x,y) (pow(2.,(int)(y))*x)
+extern double_t __LIB__ ldexp(double_t x, int pw2) __smallc;
 #define copysign(a,b) (b<.0?-fabs(a):fabs(a))
 #define signbit(x) (x != fabs(x))
 
