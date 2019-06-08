@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="z88dk-map.c">
+    <ClCompile Include="..\..\src\z88dk-map\z88dk-map.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

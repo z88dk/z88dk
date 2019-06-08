@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\scanner\scanner.c">
+    <ClCompile Include="..\..\src\zpragma\zpragma.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
