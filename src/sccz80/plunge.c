@@ -119,7 +119,9 @@ int operator_is_comparison(void (*oper)(LVALUE *lval))
 /*
  * binary plunge to lower level (not for +/-)
  */
-void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper)(LVALUE *lval), void (*doper)(LVALUE *lval), void (*constoper)(LVALUE *lval, int32_t constval))
+void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper)(LVALUE *lval),
+             void (*doper)(LVALUE *lval), void (*constoper)(LVALUE *lval, int32_t constval),
+             int (*dconstoper)(LVALUE *lval, double))
 {
     char *before, *start;
     char *before_constlval, *start_constlval;
@@ -171,7 +173,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             }
         } else if (lval->val_type == KIND_LONG) {
             widenlong(lval, lval2);
-            lval2->val_type = KIND_LONG; /* Kludge */
+            lval2->val_type = KIND_LONG;
             lval2->ltype = lval2->ltype->isunsigned ? type_ulong : type_long;
             if ( oper == zdiv || oper == zmod || (operator_is_comparison(oper) && oper != zeq && oper != zne)) {
                 vlongconst_tostack(lval->const_val);
@@ -207,6 +209,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         if (plnge1(heir, lval2))
             rvalue(lval2);
         rhs_val_type = lval2->val_type;
+
         if (lval2->is_const) {
             /* constant on right, primary loaded */
           //  if (lval2->const_val == 0) {
@@ -217,6 +220,12 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 
             /* djm, load double reg for long operators */
             if ( lval2->val_type == KIND_DOUBLE || lval->val_type == KIND_DOUBLE ) {
+                 if ( dconstoper != NULL ) {
+                     if ( dconstoper(lval, lval2->const_val)) {
+                         return;
+                     }
+                 }
+
                  // Multiplication is cheaper than division, so invert the constant
                  if ( doper == zdiv ) {
                      doper = mult;
@@ -336,30 +345,16 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         Zsp = savesp;
     } else {
         /* one or both operands not constant */
-
-        // /* djm, if we have a constant and a proper lvalue, then set the flags of
-        //  * const to equal the signedness of the lvalue. This *will* cause 
-        //  * problems if we allow specifiers after numbers
-        //  */
-        // if (lval->is_const)
-        //     lval->flags = (lval->flags & ~UNSIGNED) | (lval2->flags & UNSIGNED);
-        // if (lval2->is_const)
-        //     lval2->flags = (lval2->flags & ~UNSIGNED) | (lval->flags & UNSIGNED);
         if ( lval2->is_const == 0 && lval1_wasconst == 0 &&
             (lval->ltype->isunsigned != lval2->ltype->isunsigned) && (oper == zmod || oper == mult || oper == zdiv)) {
             warningfmt("signedness","Operation on different signedness!");
         }
         
 
-        // Remove any function type decorators
-        //lval->flags &= (FAR);
-
         /* Special case handling for operation by constant */
         if ( constoper != NULL && ( oper == mult || oper == zor || oper == zand || oper == zxor || lval2->is_const) ) {
             int doconstoper = 0;
             int32_t const_val;
-
- 
 
             /* Check for comparisions being out of range, if so, return constant */
             if ( lval2->is_const && operator_is_comparison(oper)) {

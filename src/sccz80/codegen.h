@@ -52,6 +52,7 @@ extern void zadd(LVALUE *);
 extern void zsub(LVALUE *);
 extern void mult(LVALUE *);
 extern void mult_const(LVALUE *lval, int32_t value);
+extern int mult_dconst(LVALUE *lval, double value);
 extern void zdiv(LVALUE *);
 extern void zdiv_const(LVALUE *lval, int32_t value);
 extern void zmod(LVALUE *);

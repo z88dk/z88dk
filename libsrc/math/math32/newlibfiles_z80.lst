@@ -113,6 +113,7 @@
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/cos_fastcall.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/acos_fastcall.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/l_f32_le.asm
+../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/l_f32_ldexp.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/acos.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/cosh_fastcall.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/asin.asm

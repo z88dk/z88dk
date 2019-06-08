@@ -27,6 +27,7 @@
 
 #include "ccdefs.h"
 #include <time.h>
+#include <math.h>
 
 extern int check_lastop_was_comparison(LVALUE* lval);
 
@@ -81,6 +82,7 @@ struct _mapping {
         { "dpush_under_int", "dpush2", NULL, "l_f64_dpush2" }, // Inlined
         { "fswap", "dswap", "l_f32_swap", "l_f64_swap" },
         { "fnegate", "minusfa", NULL, "l_f64_negate" },
+        { "ldexp", "l_f48_ldexp", "l_f32_ldexp", "l_f64_ldexp" },
         { NULL }
 };
 
@@ -1861,11 +1863,10 @@ void mult(LVALUE* lval)
                 ol("ld\td,l");
                 ol("ld\tb,8");
                 postlabel(label1);
-                ol("add\thl,hl");
                 opjumpr("nc,",label2);
-		ol("add\thl,de");
-		postlabel(label2);
-		outfmt("\tdjnz\ti_%d\n",label1);
+                ol("add\thl,de");
+                postlabel(label2);
+                outfmt("\tdjnz\ti_%d\n",label1);
                 break;
             }
         }
@@ -1879,6 +1880,23 @@ void mult_const(LVALUE *lval, int32_t value)
     quikmult(lval->val_type, value, NO);
 }
 
+int mult_dconst(LVALUE *lval, double value)
+{
+    int exp;
+
+    if ( value == 1.0 ) {
+        // We don't need to do anything§
+        return 1;
+    } else if ( frexp(value, &exp) == 0.5 ) {
+        // It's a power of two so we can nobble the exponent
+        loada(exp - 1);
+        callrts("ldexp");
+        Zsp += c_fp_size;
+        return 1;
+    }
+
+    return 0;
+}
 
 
 /* Divide the secondary register by the primary */
