@@ -77,12 +77,16 @@ start:
 	call	crt0_init_bss
         ld      (exitsp),sp
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-	IF DEFINED_USING_amalloc
-		INCLUDE "crt/classic/crt_init_amalloc.asm"
-	ENDIF
+; Optional definition for auto MALLOC init; it takes
+; all the space between the end of the program and UDG
+IF DEFINED_USING_amalloc
+	; Foo value, but better than using SP
+	defc	CRT_MAX_HEAP_ADDRESS = 65535
+	; The correct value for himem could be found looking at:
+	;4049h -> himem ptr on Model I
+	;4411h -> himem ptr on Model III
+	INCLUDE "crt/classic/crt_init_amalloc.asm"
+ENDIF
 
 
 	; Push pointers to argv[n] onto the stack now
