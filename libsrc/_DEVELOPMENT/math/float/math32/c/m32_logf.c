@@ -87,7 +87,7 @@ float m32_logf (float x) __z88dk_fastcall
         y += -2.12194440e-4 * floate;
     }
 
-    y -=  m32_div2(z); /* y - 0.5 x^2 */
+    y -=  m32_div2f(z); /* y - 0.5 x^2 */
     z = x + y;      /* ... + x  */
 
     if( e != 0)

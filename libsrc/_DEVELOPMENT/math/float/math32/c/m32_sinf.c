@@ -16,7 +16,7 @@ float m32_sinf (float f) __z88dk_fastcall
         sect = 0;
     f *= .63661977237;
     if(f > 4.0)
-        f -= m32_mul2( m32_mul2( m32_floorf( m32_div2( m32_div2(f) )) ));
+        f -= m32_mul2f( m32_mul2f( m32_floorf( m32_div2f( m32_div2f(f) )) ));
     if(f > 2.0) {
         f -= 2.0;
         sect = 2 - sect;

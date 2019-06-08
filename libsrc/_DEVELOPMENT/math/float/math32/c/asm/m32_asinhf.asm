@@ -210,6 +210,8 @@
 	GLOBAL _m32_sqrtf
 	GLOBAL _m32_invf
 	GLOBAL _m32_sqrf
+	GLOBAL _m32_div2f
+	GLOBAL _m32_mul2f
 	GLOBAL _m32_roundf
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
@@ -284,17 +286,11 @@ _m32_asinhf:
 	ld	(ix-2),e
 	ld	(ix-1),d
 	call	_m32_fabsf
-	push	de
-	push	hl
-	ld	hl,0x4000
-	push	hl
-	ld	hl,0x0000
-	push	hl
-	call	___fsmul_callee
-	ld	(ix-5),d
-	ld	(ix-6),e
-	ld	(ix-7),h
-	ld	(ix-8),l
+	call	_m32_mul2f
+	ld	(ix-9),d
+	ld	(ix-10),e
+	ld	(ix-11),h
+	ld	(ix-12),l
 	ld	l,(ix-4)
 	ld	h,(ix-3)
 	ld	e,(ix-2)
@@ -308,10 +304,10 @@ _m32_asinhf:
 	push	hl
 	call	___fsadd_callee
 	call	_m32_sqrtf
-	ld	(ix-9),d
-	ld	(ix-10),e
-	ld	(ix-11),h
-	ld	(ix-12),l
+	ld	(ix-5),d
+	ld	(ix-6),e
+	ld	(ix-7),h
+	ld	(ix-8),l
 	ld	l,(ix-4)
 	ld	h,(ix-3)
 	ld	e,(ix-2)
@@ -319,21 +315,21 @@ _m32_asinhf:
 	call	_m32_fabsf
 	push	de
 	push	hl
-	ld	l,(ix-10)
-	ld	h,(ix-9)
-	push	hl
-	ld	l,(ix-12)
-	ld	h,(ix-11)
-	push	hl
-	call	___fsadd_callee
-	call	_m32_invf
-	push	de
-	push	hl
 	ld	l,(ix-6)
 	ld	h,(ix-5)
 	push	hl
 	ld	l,(ix-8)
 	ld	h,(ix-7)
+	push	hl
+	call	___fsadd_callee
+	call	_m32_invf
+	push	de
+	push	hl
+	ld	l,(ix-10)
+	ld	h,(ix-9)
+	push	hl
+	ld	l,(ix-12)
+	ld	h,(ix-11)
 	push	hl
 	call	___fsadd_callee
 	call	_m32_logf

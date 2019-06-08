@@ -210,6 +210,8 @@
 	GLOBAL _m32_sqrtf
 	GLOBAL _m32_invf
 	GLOBAL _m32_sqrf
+	GLOBAL _m32_div2f
+	GLOBAL _m32_mul2f
 	GLOBAL _m32_roundf
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
@@ -299,12 +301,12 @@ _m32_sinf:
 	ld	a, d
 	xor	a,0x80
 	ld	d, a
-	ld	(ix-6),0x02
-	ld	(ix-5),0x00
+	ld	(ix-10),0x02
+	ld	(ix-9),0x00
 	jr	l_m32_sinf_00103
 l_m32_sinf_00102:
-	ld	(ix-6),0x00
-	ld	(ix-5),0x00
+	ld	(ix-10),0x00
+	ld	(ix-9),0x00
 l_m32_sinf_00103:
 	push	de
 	push	bc
@@ -331,25 +333,15 @@ l_m32_sinf_00103:
 	ld	a, l
 	or	a, a
 	jr	Z,l_m32_sinf_00105
-	ld	hl,0x4080
-	push	hl
-	ld	hl,0x0000
-	push	hl
-	ld	l,(ix-2)
-	ld	h,(ix-1)
-	push	hl
 	ld	l,(ix-4)
 	ld	h,(ix-3)
-	push	hl
-	call	___fsdiv_callee
+	ld	e,(ix-2)
+	ld	d,(ix-1)
+	call	_m32_div2f
+	call	_m32_div2f
 	call	_m32_floorf
-	push	de
-	push	hl
-	ld	hl,0x4080
-	push	hl
-	ld	hl,0x0000
-	push	hl
-	call	___fsmul_callee
+	call	_m32_mul2f
+	call	_m32_mul2f
 	push	de
 	push	hl
 	ld	l,(ix-2)
@@ -394,11 +386,11 @@ l_m32_sinf_00105:
 	ld	(ix-2),e
 	ld	(ix-1),d
 	ld	a,0x02
-	sub	a,(ix-6)
-	ld	(ix-6),a
+	sub	a,(ix-10)
+	ld	(ix-10),a
 	ld	a,0x00
-	sbc	a,(ix-5)
-	ld	(ix-5),a
+	sbc	a,(ix-9)
+	ld	(ix-9),a
 l_m32_sinf_00107:
 	ld	l,(ix-2)
 	ld	h,(ix-1)
@@ -424,8 +416,8 @@ l_m32_sinf_00107:
 	ld	(ix-13),h
 	ld	(ix-12),e
 	ld	(ix-11),d
-	ld	l,(ix-6)
-	ld	h,(ix-5)
+	ld	l,(ix-10)
+	ld	h,(ix-9)
 	add	hl, bc
 	ld	bc,0x0004
 	push	bc
@@ -475,10 +467,10 @@ l_m32_sinf_00111:
 	push	de
 	push	bc
 	call	_m32_polyf
-	ld	(ix-7),d
-	ld	(ix-8),e
-	ld	(ix-9),h
-	ld	(ix-10),l
+	ld	(ix-5),d
+	ld	(ix-6),e
+	ld	(ix-7),h
+	ld	(ix-8),l
 	push	de
 	push	hl
 	ld	l,(ix-12)
@@ -488,10 +480,10 @@ l_m32_sinf_00111:
 	ld	h,(ix-13)
 	push	hl
 	call	___fsmul_callee
-	ld	(ix-7),d
-	ld	(ix-8),e
-	ld	(ix-9),h
-	ld	(ix-10),l
+	ld	(ix-5),d
+	ld	(ix-6),e
+	ld	(ix-7),h
+	ld	(ix-8),l
 	pop	de
 	pop	bc
 	ld	hl,0x0004
@@ -503,11 +495,11 @@ l_m32_sinf_00111:
 	call	_m32_polyf
 	push	de
 	push	hl
+	ld	l,(ix-6)
+	ld	h,(ix-5)
+	push	hl
 	ld	l,(ix-8)
 	ld	h,(ix-7)
-	push	hl
-	ld	l,(ix-10)
-	ld	h,(ix-9)
 	push	hl
 	call	___fsdiv
 	ld	sp,ix

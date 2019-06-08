@@ -210,6 +210,8 @@
 	GLOBAL _m32_sqrtf
 	GLOBAL _m32_invf
 	GLOBAL _m32_sqrf
+	GLOBAL _m32_div2f
+	GLOBAL _m32_mul2f
 	GLOBAL _m32_roundf
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
@@ -280,18 +282,18 @@ _m32_logf:
 	ld	hl, -22
 	add	hl, sp
 	ld	sp, hl
-	ld	(ix-9),l
-	ld	(ix-8),h
-	ld	(ix-7),e
-	ld	(ix-6),d
+	ld	(ix-13),l
+	ld	(ix-12),h
+	ld	(ix-11),e
+	ld	(ix-10),d
 	ld	hl,0x0000
 	push	hl
 	push	hl
-	ld	l,(ix-7)
-	ld	h,(ix-6)
+	ld	l,(ix-11)
+	ld	h,(ix-10)
 	push	hl
-	ld	l,(ix-9)
-	ld	h,(ix-8)
+	ld	l,(ix-13)
+	ld	h,(ix-12)
 	push	hl
 	call	___fsgt_callee
 	ld	(ix-5),l
@@ -304,21 +306,21 @@ l_m32_logf_00102:
 	ld	hl,0x0000
 	add	hl, sp
 	push	hl
-	ld	l,(ix-7)
-	ld	h,(ix-6)
+	ld	l,(ix-11)
+	ld	h,(ix-10)
 	push	hl
-	ld	l,(ix-9)
-	ld	h,(ix-8)
+	ld	l,(ix-13)
+	ld	h,(ix-12)
 	push	hl
 	call	_m32_frexpf
-	ld	(ix-6),d
-	ld	(ix-7),e
-	ld	(ix-8),h
-	ld	(ix-9),l
+	ld	(ix-10),d
+	ld	(ix-11),e
+	ld	(ix-12),h
+	ld	(ix-13),l
 	ld	hl,18
 	add	hl, sp
 	ex	de, hl
-	ld	hl,13
+	ld	hl,9
 	add	hl, sp
 	ld	bc,4
 	ldir
@@ -351,25 +353,25 @@ l_m32_logf_00102:
 	ld	h,(ix-3)
 	push	hl
 	call	___fsadd_callee
-	ld	(ix-6),d
-	ld	(ix-7),e
-	ld	(ix-8),h
-	ld	(ix-9),l
+	ld	(ix-10),d
+	ld	(ix-11),e
+	ld	(ix-12),h
+	ld	(ix-13),l
 	ld	hl,0x3f80
 	push	hl
 	ld	hl,0x0000
 	push	hl
-	ld	l,(ix-7)
-	ld	h,(ix-6)
+	ld	l,(ix-11)
+	ld	h,(ix-10)
 	push	hl
-	ld	l,(ix-9)
-	ld	h,(ix-8)
+	ld	l,(ix-13)
+	ld	h,(ix-12)
 	push	hl
 	call	___fssub_callee
-	ld	(ix-6),d
-	ld	(ix-7),e
-	ld	(ix-8),h
-	ld	(ix-9),l
+	ld	(ix-10),d
+	ld	(ix-11),e
+	ld	(ix-12),h
+	ld	(ix-13),l
 	jr	l_m32_logf_00105
 l_m32_logf_00104:
 	ld	hl,0x3f80
@@ -383,53 +385,53 @@ l_m32_logf_00104:
 	ld	h,(ix-3)
 	push	hl
 	call	___fssub_callee
-	ld	(ix-10),d
-	ld	(ix-11),e
-	ld	(ix-12),h
-	ld	(ix-13),l
-	ld	hl,13
+	ld	(ix-14),d
+	ld	(ix-15),e
+	ld	(ix-16),h
+	ld	(ix-17),l
+	ld	hl,9
 	add	hl, sp
 	ex	de, hl
-	ld	hl,9
+	ld	hl,5
 	add	hl, sp
 	ld	bc,4
 	ldir
 l_m32_logf_00105:
-	ld	l,(ix-9)
-	ld	h,(ix-8)
-	ld	e,(ix-7)
-	ld	d,(ix-6)
+	ld	l,(ix-13)
+	ld	h,(ix-12)
+	ld	e,(ix-11)
+	ld	d,(ix-10)
 	call	_m32_sqrf
-	ld	(ix-13),l
-	ld	(ix-12),h
-	ld	(ix-11),e
-	ld	(ix-10),d
+	ld	(ix-17),l
+	ld	(ix-16),h
+	ld	(ix-15),e
+	ld	(ix-14),d
 	ld	hl,0x0009
 	push	hl
 	ld	hl,_m32_coeff_log
 	push	hl
-	ld	l,(ix-7)
-	ld	h,(ix-6)
-	push	hl
-	ld	l,(ix-9)
-	ld	h,(ix-8)
-	push	hl
-	call	_m32_polyf
-	ld	c, l
 	ld	l,(ix-11)
-	ld	b,h
 	ld	h,(ix-10)
 	push	hl
 	ld	l,(ix-13)
 	ld	h,(ix-12)
 	push	hl
+	call	_m32_polyf
+	ld	c, l
+	ld	l,(ix-15)
+	ld	b,h
+	ld	h,(ix-14)
+	push	hl
+	ld	l,(ix-17)
+	ld	h,(ix-16)
+	push	hl
 	push	de
 	push	bc
 	call	___fsmul_callee
-	ld	(ix-17),l
-	ld	(ix-16),h
-	ld	(ix-15),e
-	ld	(ix-14),d
+	ld	(ix-9),l
+	ld	(ix-8),h
+	ld	(ix-7),e
+	ld	(ix-6),d
 	ld	a,(ix-22)
 	or	a, a
 	jr	Z,l_m32_logf_00107
@@ -449,38 +451,23 @@ l_m32_logf_00105:
 	call	___fsmul_callee
 	push	de
 	push	hl
-	ld	l,(ix-15)
-	ld	h,(ix-14)
+	ld	l,(ix-7)
+	ld	h,(ix-6)
 	push	hl
-	ld	l,(ix-17)
-	ld	h,(ix-16)
+	ld	l,(ix-9)
+	ld	h,(ix-8)
 	push	hl
 	call	___fsadd_callee
-	ld	(ix-17),l
-	ld	(ix-16),h
-	ld	(ix-15),e
-	ld	(ix-14),d
+	ld	(ix-9),l
+	ld	(ix-8),h
+	ld	(ix-7),e
+	ld	(ix-6),d
 l_m32_logf_00107:
-	ld	l,(ix-11)
-	ld	h,(ix-10)
-	push	hl
-	ld	l,(ix-13)
-	ld	h,(ix-12)
-	push	hl
-	ld	hl,0xbf00
-	push	hl
-	ld	hl,0x0000
-	push	hl
-	call	___fsmul_callee
-	push	de
-	push	hl
-	ld	l,(ix-15)
-	ld	h,(ix-14)
-	push	hl
 	ld	l,(ix-17)
 	ld	h,(ix-16)
-	push	hl
-	call	___fsadd_callee
+	ld	e,(ix-15)
+	ld	d,(ix-14)
+	call	_m32_div2f
 	push	de
 	push	hl
 	ld	l,(ix-7)
@@ -489,13 +476,22 @@ l_m32_logf_00107:
 	ld	l,(ix-9)
 	ld	h,(ix-8)
 	push	hl
+	call	___fssub_callee
+	push	de
+	push	hl
+	ld	l,(ix-11)
+	ld	h,(ix-10)
+	push	hl
+	ld	l,(ix-13)
+	ld	h,(ix-12)
+	push	hl
 	call	___fsadd_callee
-	ld	(ix-14),d
-	ld	(ix-15),e
-	ld	(ix-16),h
-	ld	(ix-17),l
-	ld	e,(ix-15)
-	ld	d,(ix-14)
+	ld	(ix-6),d
+	ld	(ix-7),e
+	ld	(ix-8),h
+	ld	(ix-9),l
+	ld	e,(ix-7)
+	ld	d,(ix-6)
 	ld	a,(ix-22)
 	or	a,a
 	ld	c,l
@@ -514,17 +510,17 @@ l_m32_logf_00107:
 	ld	hl,0x8000
 	push	hl
 	call	___fsmul_callee
-	ld	(ix-14),d
-	ld	(ix-15),e
-	ld	(ix-16),h
-	ld	(ix-17),l
+	ld	(ix-6),d
+	ld	(ix-7),e
+	ld	(ix-8),h
+	ld	(ix-9),l
 	pop	de
 	pop	bc
-	ld	l,(ix-15)
-	ld	h,(ix-14)
+	ld	l,(ix-7)
+	ld	h,(ix-6)
 	push	hl
-	ld	l,(ix-17)
-	ld	h,(ix-16)
+	ld	l,(ix-9)
+	ld	h,(ix-8)
 	push	hl
 	push	de
 	push	bc
