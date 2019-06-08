@@ -5,7 +5,7 @@ SECTION code_fp_math32
 PUBLIC  asm_div2f
 EXTERN  m32_div2_fastcall
 
-    ; Takes the absolute value of a float
+    ; Divide a float by 2
     ;
     ; enter : stack = ret
     ;          DEHL = sccz80_float number

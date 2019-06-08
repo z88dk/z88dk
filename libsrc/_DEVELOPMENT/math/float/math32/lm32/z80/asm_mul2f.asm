@@ -5,7 +5,7 @@ SECTION code_fp_math32
 PUBLIC  asm_mul2f
 EXTERN  m32_mul2_fastcall
 
-    ; Takes the absolute value of a float
+    ; Multiply a float by 2
     ;
     ; enter : stack = ret
     ;          DEHL = sccz80_float number
