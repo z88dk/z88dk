@@ -263,10 +263,8 @@
 	add	hl,sp
 	push	hl
 	call	dldpsh
-	ld	hl,2	;const
-	ld	de,0
-	call	float
-	call	dmul
+	ld	a,1
+	call	l_f48_ldexp
 	pop	hl
 	call	dstore
 	ld	hl,0	;const

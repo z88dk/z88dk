@@ -436,7 +436,7 @@ int heir9(LVALUE* lval)
         if (cmatch('*')) {
             plnge2a(heira, lval, &lval2, mult, mult, mult_const, mult_dconst);
         } else if (cmatch('/')) {
-            plnge2a(heira, lval, &lval2, zdiv, zdiv, zdiv_const, NULL);
+            plnge2a(heira, lval, &lval2, zdiv, zdiv, zdiv_const, zdiv_dconst);
         } else if (cmatch('%')) {
             plnge2a(heira, lval, &lval2, zmod, zmod, zmod_const, NULL);
         } else

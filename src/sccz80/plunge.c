@@ -121,7 +121,7 @@ int operator_is_comparison(void (*oper)(LVALUE *lval))
  */
 void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper)(LVALUE *lval),
              void (*doper)(LVALUE *lval), void (*constoper)(LVALUE *lval, int32_t constval),
-             int (*dconstoper)(LVALUE *lval, double))
+             int (*dconstoper)(LVALUE *lval, double constval, int isrhs))
 {
     char *before, *start;
     char *before_constlval, *start_constlval;
@@ -143,12 +143,8 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         rhs_val_type = lval2->val_type;
         setstage(&before_constlval, &start_constlval);
 
-
-     //   if (lval->const_val == 0) {
-            lval->stage_add = stagenext;
-            lval->stage_add_ltype = lval2->ltype;
-     //   }
-
+        lval->stage_add = stagenext;
+        lval->stage_add_ltype = lval2->ltype;
         if ( lval->val_type == KIND_DOUBLE && lval2->is_const == 0 ) {
             if ( lval2->val_type != KIND_DOUBLE ) {
                 zconvert_to_double(lval2->val_type, lval2->ltype->isunsigned);
@@ -156,6 +152,12 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 lval2->ltype = type_double;
             }
             dpush();
+            if ( dconstoper != NULL ) {
+                if ( dconstoper(lval, lval->const_val, 0)) {
+                    lval->is_const = 0;
+                    return;
+                }
+            }
             load_double_into_fa(lval);
             if ( oper == zdiv || oper == zmod || (operator_is_comparison(oper) && oper != zeq && oper != zne)) {
                 DoubSwap();
@@ -163,6 +165,13 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         } else if ( lval2->val_type == KIND_DOUBLE && lval2->is_const == 0 ) { 
             /* On stack we've got the double, load the constant as a double */
             dpush();
+            if ( dconstoper != NULL ) {
+                if ( dconstoper(lval, lval->const_val, 0)) {
+                    lval->is_const = 0;
+                    return;
+                }
+            }
+
             vlongconst(lval->const_val);
             zconvert_to_double(KIND_LONG, lval->ltype->isunsigned);
             lval->val_type = KIND_DOUBLE;
@@ -226,7 +235,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                      lval2->const_val = 1. / lval2->const_val;
                  }
                  if ( dconstoper != NULL ) {
-                     if ( dconstoper(lval, lval2->const_val)) {
+                     if ( dconstoper(lval, lval2->const_val, 1)) {
                          return;
                      }
                  }
@@ -550,7 +559,6 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 if (dbltest(lval, lval2)) {
                     int ival = val;
                     /* are adding lval2 to pointer, adjust size */
-			ol("cscale");
                     cscale(lval->ltype->ptr, &ival);
                     val = ival;
                 }

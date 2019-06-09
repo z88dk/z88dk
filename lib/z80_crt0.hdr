@@ -204,6 +204,7 @@
 	EXTERN	l_f32_f2slong
 	EXTERN	l_f32_f2ulong
         EXTERN  l_f32_ldexp
+        EXTERN  l_f32_invf	; Only for math32
 
 	; 64 bit float ABI
 	EXTERN	l_f64_load

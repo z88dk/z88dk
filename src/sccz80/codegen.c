@@ -83,6 +83,7 @@ struct _mapping {
         { "fswap", "dswap", "l_f32_swap", "l_f64_swap" },
         { "fnegate", "minusfa", NULL, "l_f64_negate" },
         { "ldexp", "l_f48_ldexp", "l_f32_ldexp", "l_f64_ldexp" },
+        { "inversef", NULL, "l_f32_invf", NULL }, // Called only for IEEE mode
         { NULL }
 };
 
@@ -1880,18 +1881,22 @@ void mult_const(LVALUE *lval, int32_t value)
     quikmult(lval->val_type, value, NO);
 }
 
-int mult_dconst(LVALUE *lval, double value)
+int mult_dconst(LVALUE *lval, double value, int isrhs)
 {
     int exp;
 
     if ( value == 1.0 ) {
-        // We don't need to do anything§
+        // We don't need to do anything
+        lval->ltype = type_double;
+        lval->val_type = KIND_DOUBLE;
         return 1;
     } else if ( frexp(value, &exp) == 0.5 ) {
         // It's a power of two so we can nobble the exponent
         loada(exp - 1);
         callrts("ldexp");
         Zsp += c_fp_size;
+        lval->ltype = type_double;
+        lval->val_type = KIND_DOUBLE;
         return 1;
     }
 
@@ -2023,6 +2028,19 @@ void zdiv_const(LVALUE *lval, int32_t value)
             zdiv(lval);
     }
 }
+
+int zdiv_dconst(LVALUE *lval, double value, int isrhs)
+{
+    if ( isrhs == 0.0 && value == 1.0 && c_maths_mode == MATHS_IEEE) {
+        callrts("inversef");
+        lval->ltype = type_double;
+        lval->val_type = KIND_DOUBLE;
+        Zsp += c_fp_size;
+        return 1;
+    }
+    return 0;
+}
+
 
 /* Compute remainder (mod) of secondary register divided
  *      by the primary
