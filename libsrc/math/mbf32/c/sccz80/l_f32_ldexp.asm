@@ -11,10 +11,6 @@
 ; Exit: dehl = adjusted float
 
 l_f32_ldexp:
-        pop     bc      ;ret
-        pop     hl      ;float
-        pop     de
-        push    bc
 	add	d
 	ld	d,a
 	ret

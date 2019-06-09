@@ -14,17 +14,8 @@
 ; Stack:     float value, ret
 ; Registers: a = amount to adjust exponent
 l_f48_ldexp:
-	ld	hl,2
-	add	hl,sp
-	ex	af,af
-	call	dload
-	ex	af,af
 	exx             ;switch to AC
 	add	l
 	ld	l,a
 	exx
-	pop	hl	;return address
-	pop	bc	;Junk passed in flaot
-	pop	bc
-	pop	bc
-	jp	(hl)
+	ret

@@ -241,7 +241,7 @@
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
-	call	dldpsh
+	call	dload
 	ld	a,1
 	call	l_f48_ldexp
 	pop	hl
@@ -262,7 +262,7 @@
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
-	call	dldpsh
+	call	dload
 	ld	a,1
 	call	l_f48_ldexp
 	pop	hl
@@ -283,7 +283,7 @@
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
-	call	dldpsh
+	call	dload
 	ld	a,-1
 	call	l_f48_ldexp
 	pop	hl
@@ -304,7 +304,7 @@
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
-	call	dldpsh
+	call	dload
 	ld	a,-1
 	call	l_f48_ldexp
 	pop	hl
@@ -325,7 +325,7 @@
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
-	call	dldpsh
+	call	dload
 	ld	a,-1
 	call	l_f48_ldexp
 	pop	hl

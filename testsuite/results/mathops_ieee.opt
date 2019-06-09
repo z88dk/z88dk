@@ -233,8 +233,6 @@
 	ld	hl,2	;const
 	add	hl,sp
 	call	l_glong
-	push	de
-	push	hl
 	call	l_f32_invf
 	ret
 

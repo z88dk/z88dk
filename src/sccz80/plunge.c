@@ -151,27 +151,30 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 lval2->val_type = KIND_DOUBLE;
                 lval2->ltype = type_double;
             }
-            dpush();
-            if ( dconstoper != NULL ) {
+
+
+             if ( dconstoper != NULL ) {
                 if ( dconstoper(lval, lval->const_val, 0)) {
                     lval->is_const = 0;
                     return;
                 }
             }
+            dpush();
+
+
             load_double_into_fa(lval);
             if ( oper == zdiv || oper == zmod || (operator_is_comparison(oper) && oper != zeq && oper != zne)) {
                 DoubSwap();
             }
         } else if ( lval2->val_type == KIND_DOUBLE && lval2->is_const == 0 ) { 
             /* On stack we've got the double, load the constant as a double */
-            dpush();
             if ( dconstoper != NULL ) {
                 if ( dconstoper(lval, lval->const_val, 0)) {
                     lval->is_const = 0;
                     return;
                 }
             }
-
+            dpush();
             vlongconst(lval->const_val);
             zconvert_to_double(KIND_LONG, lval->ltype->isunsigned);
             lval->val_type = KIND_DOUBLE;
@@ -201,6 +204,8 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         }
     } else {
         /* non-constant on left */
+        int  beforesp = Zsp;
+        setstage(&before_constlval, &start_constlval);
         if (lval->val_type == KIND_DOUBLE) {
             dpush();
         } else if (lval->val_type == KIND_CARRY) {
@@ -220,6 +225,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         rhs_val_type = lval2->val_type;
 
         if (lval2->is_const) {
+            
             /* constant on right, primary loaded */
           //  if (lval2->const_val == 0) {
                 lval->stage_add = start;
@@ -229,6 +235,8 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 
             /* djm, load double reg for long operators */
             if ( lval2->val_type == KIND_DOUBLE || lval->val_type == KIND_DOUBLE ) {
+                 clearstage(before_constlval, NULL);
+                 Zsp = beforesp;
                  if ( doper == zdiv ) {
                      doper = mult;
                      dconstoper = mult_dconst;
@@ -239,7 +247,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                          return;
                      }
                  }
-
+                dpush();
                  // Multiplication is cheaper than division, so invert the constant
                  load_double_into_fa(lval2);
                  lval2->val_type = KIND_DOUBLE;

@@ -11,10 +11,6 @@
 ; Exit: dehl = adjusted float
 
 l_f32_ldexp:
-        pop     bc      ;ret
-        pop     hl      ;float
-        pop     de
-        push    bc
         sla     e       ; get the exponent
         rl      d
         rr      e       ; save the sign in e[7]

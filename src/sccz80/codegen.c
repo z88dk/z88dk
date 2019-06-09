@@ -1894,7 +1894,6 @@ int mult_dconst(LVALUE *lval, double value, int isrhs)
         // It's a power of two so we can nobble the exponent
         loada(exp - 1);
         callrts("ldexp");
-        Zsp += c_fp_size;
         lval->ltype = type_double;
         lval->val_type = KIND_DOUBLE;
         return 1;
@@ -2035,7 +2034,6 @@ int zdiv_dconst(LVALUE *lval, double value, int isrhs)
         callrts("inversef");
         lval->ltype = type_double;
         lval->val_type = KIND_DOUBLE;
-        Zsp += c_fp_size;
         return 1;
     }
     return 0;
