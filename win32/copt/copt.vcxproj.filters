@@ -38,6 +38,9 @@
     <ClInclude Include="..\..\src\copt\regex\cname.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\copt\regex\engine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\src\copt\regex\regcomp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
