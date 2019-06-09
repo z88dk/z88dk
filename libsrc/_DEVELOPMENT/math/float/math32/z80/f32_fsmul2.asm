@@ -28,9 +28,9 @@ PUBLIC _m32_mul2f
     sla e                       ; get exponent in d
     rl d
     inc d                       ; multiply by 2
-    jp Z,m32_fsmax_fastcall     ; capture overflow
-    inc d
     jp Z,m32_fsmax_fastcall     ; capture NaN
+    inc d
+    jp Z,m32_fsmax_fastcall     ; capture overflow
     dec d
     rr d                        ; return exponent
     rr e
