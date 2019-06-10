@@ -59,7 +59,7 @@ PUBLIC m32_sqr_32h_24x24
     push de                     ; ac on stack
     ld l,e                      ; bc:ac
 
-IF __CLIB_OPT_IMATH <= 50
+IF __CLIB_OPT_FMATH <= 50
 
     ex de,hl                    ; ac:bc
     call m32_z80_mulu_de        ; b*c 2^8
@@ -115,7 +115,7 @@ IF __CLIB_OPT_IMATH <= 50
 
 ENDIF
 
-IF __CLIB_OPT_IMATH > 50
+IF __CLIB_OPT_FMATH > 50
 
     ex de,hl                    ; ac:bc
     call m32_z80_mulu_de        ; b*c 2^8

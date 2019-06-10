@@ -31,7 +31,7 @@ PUBLIC m32_z80_mulu_de
 ; exit  : de = 16-bit product
 ;         carry reset
 
-IF __CLIB_OPT_IMATH <= 50
+IF __CLIB_OPT_FMATH <= 50
 
 
 .m32_z80_mulu_de
@@ -134,7 +134,7 @@ ENDIF
 ;
 ; exit  : de = 16-bit product
 
-IF __CLIB_OPT_IMATH > 50
+IF __CLIB_OPT_FMATH > 50
 
 
 .m32_z80_mulu_de

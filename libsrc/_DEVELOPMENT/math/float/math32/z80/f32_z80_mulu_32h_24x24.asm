@@ -71,7 +71,7 @@ PUBLIC m32_mulu_32h_24x24
     push bc                     ; ab on stack (again)
     push hl                     ; ef on stack
 
-IF __CLIB_OPT_IMATH <= 50
+IF __CLIB_OPT_FMATH <= 50
 
     ld d,l
     ld a,h
@@ -148,7 +148,7 @@ IF __CLIB_OPT_IMATH <= 50
 
 ENDIF
 
-IF __CLIB_OPT_IMATH > 50
+IF __CLIB_OPT_FMATH > 50
 
     ld d,l
     ld a,h
