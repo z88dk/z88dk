@@ -80,7 +80,7 @@ start:
 ; Optional definition for auto MALLOC init; it takes
 ; all the space between the end of the program and UDG
 IF DEFINED_USING_amalloc
-	; Foo value, but better than using SP
+	; Foo value, but better than using SP (which is at a low position)
 	defc	CRT_MAX_HEAP_ADDRESS = 65535
 	; The correct value for himem could be found looking at:
 	;4049h -> himem ptr on Model I
