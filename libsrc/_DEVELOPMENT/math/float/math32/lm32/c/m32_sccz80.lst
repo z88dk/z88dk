@@ -60,6 +60,7 @@ math/float/math32/lm32/c/sccz80/sin_fastcall
 math/float/math32/lm32/c/sccz80/sinh
 math/float/math32/lm32/c/sccz80/sinh_fastcall
 math/float/math32/lm32/c/sccz80/sqrt
+math/float/math32/lm32/c/sccz80/sqrt_fastcall
 math/float/math32/lm32/c/sccz80/tan
 math/float/math32/lm32/c/sccz80/tan_fastcall
 math/float/math32/lm32/c/sccz80/tanh

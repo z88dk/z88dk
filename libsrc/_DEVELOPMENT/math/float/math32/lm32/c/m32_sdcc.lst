@@ -76,6 +76,7 @@ math/float/math32/lm32/c/sdcc/___sint2fs_callee
 math/float/math32/lm32/c/sdcc/___slong2fs
 math/float/math32/lm32/c/sdcc/___slong2fs_callee
 math/float/math32/lm32/c/sdcc/sqrt
+math/float/math32/lm32/c/sdcc/sqrt_fastcall
 math/float/math32/lm32/c/sdcc/tan
 math/float/math32/lm32/c/sdcc/tan_fastcall
 math/float/math32/lm32/c/sdcc/tanh
