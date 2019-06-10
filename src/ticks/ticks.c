@@ -888,7 +888,8 @@ int main (int argc, char **argv){
         (void)fread(&im, 1, 1, fh),
         (void)fread(&mp, 2, 1, fh);
       else {
-        for ( int l = 0; l < size; l++ ) {
+        int l;
+        for ( l = 0; l < size; l++ ) {
           *get_memory_addr(load_address+l) = fgetc(fh);
         }
       }
