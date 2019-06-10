@@ -780,8 +780,8 @@ void raw2wav(char *wavfile)
 {
     char    rawfilename[FILENAME_MAX+1];
     FILE    *fpin, *fpout;
-    int		c;
-    long	i, len;
+    int      c;
+    long     i, len;
 
     strcpy(rawfilename,wavfile);
 
