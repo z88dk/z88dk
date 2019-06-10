@@ -168,6 +168,7 @@
     <ClCompile Include="..\..\src\ticks\disassembler_alg.c" />
     <ClCompile Include="..\..\src\ticks\hook.c" />
     <ClCompile Include="..\..\src\ticks\hook_console.c" />
+    <ClCompile Include="..\..\src\ticks\hook_cpm.c" />
     <ClCompile Include="..\..\src\ticks\hook_io.c" />
     <ClCompile Include="..\..\src\ticks\hook_misc.c" />
     <ClCompile Include="..\..\src\ticks\linenoise.c" />

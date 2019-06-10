@@ -119,6 +119,7 @@ extern void      hook_init(void);
 extern void      hook_io_init(hook_command *cmds);
 extern void      hook_io_set_ide_device(int unit, const char *file);
 extern void      hook_misc_init(hook_command *cmds);
+extern void      hook_cpm(void);
 extern void      hook_console_init(hook_command *cmds);
 extern void      debugger_init();
 extern void      debugger();
