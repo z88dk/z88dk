@@ -17,27 +17,27 @@ all: dirs $(OUTPUT_DIRECTORY)/math32.lib $(OUTPUT_DIRECTORY)/math32_fast.lib \
 
 
 $(OUTPUT_DIRECTORY)/math32.lib: $(addprefix obj/z80/, $(OBJECTS))
-	@echo "DEFC __CLIB_OPT_IMATH = 50" > config_private.inc
+	@echo "DEFC __CLIB_OPT_FMATH = 50" > config_private.inc
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/z80/x/x  -I.. -mz80 -D__CLASSIC @newlibfiles_z80.lst
 	TYPE=z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/math32 @math32.lst
 
 $(OUTPUT_DIRECTORY)/math32_fast.lib: $(addprefix obj/z80-fast/, $(OBJECTS))
-	@echo "DEFC __CLIB_OPT_IMATH = 100" > config_private.inc
+	@echo "DEFC __CLIB_OPT_FMATH = 100" > config_private.inc
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/z80-fast/x/x -I.. -mz80 -D__CLASSIC  @newlibfiles_z80.lst
 	TYPE=z80-fast $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/math32_fast @math32.lst
 
 $(OUTPUT_DIRECTORY)/math32_ixiy.lib: $(addprefix obj/ixiy/, $(OBJECTS))
-	@echo "DEFC __CLIB_OPT_IMATH = 50" > config_private.inc
+	@echo "DEFC __CLIB_OPT_FMATH = 50" > config_private.inc
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/ixiy/x/x -I.. --IXIY -mz80 -D__CLASSIC @newlibfiles_z80.lst
 	TYPE=ixiy $(LIBLINKER) --IXIY -x$(OUTPUT_DIRECTORY)/math32_ixiy @math32.lst
 
 $(OUTPUT_DIRECTORY)/math32_zxn.lib: $(addprefix obj/z80-zxn/, $(OBJECTS))
-	@echo "DEFC __CLIB_OPT_IMATH = 50" > config_private.inc
+	@echo "DEFC __CLIB_OPT_FMATH = 50" > config_private.inc
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/z80-zxn/x/x -I.. -mz80-zxn -D__CLASSIC @newlibfiles_zxn.lst
 	TYPE=z80-zxn $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/math32_zxn @math32.lst
 
 $(OUTPUT_DIRECTORY)/math32_z180.lib: $(addprefix obj/z180/, $(OBJECTS))
-	@echo "DEFC __CLIB_OPT_IMATH = 50" > config_private.inc
+	@echo "DEFC __CLIB_OPT_FMATH = 50" > config_private.inc
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/z180/x/x -I.. -mz180 -D__CLASSIC @newlibfiles_z180.lst
 	TYPE=z180 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/math32_z180 @math32.lst
 

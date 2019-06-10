@@ -2,7 +2,7 @@
 Z80ASM = $(EXEC_PREFIX)z80asm
 ZX7 = z88dk-zx7
 
-TARGET ?= z80 cpm m rc2014 sms vgl yaz180 z180 zx zxn
+TARGET ?= z80 cpm m m32 m32_z180 m32_zxn rc2014 sms vgl yaz180 z180 zx zxn
 
 jobs := $(foreach target,$(TARGET),job-$(target))
 cleans := $(foreach target,$(TARGET),clean-$(target))
@@ -21,7 +21,13 @@ ${jobs}: job-%:
 			[ "$(target)" = "yaz180" ]; then \
 			echo "-mz180"; \
 		elif \
+			[ "$(target)" = "m32_z180" ]; then \
+			echo "-mz180"; \
+		elif \
 			[ "$(target)" = "zxn" ]; then \
+			echo "-mz80-zxn"; \
+		elif \
+			[ "$(target)" = "m32_zxn" ]; then \
 			echo "-mz80-zxn"; \
 		else \
 			echo "";  \

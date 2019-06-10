@@ -89,7 +89,7 @@ PUBLIC m32_mulu_32h_32x32
     exx                         ;
 ;   push de                     ; x1 x0
 
-IF __CLIB_OPT_IMATH <= 50
+IF __CLIB_OPT_FMATH <= 50
 
     ; start doing the p3 byte
 
@@ -196,7 +196,7 @@ IF __CLIB_OPT_IMATH <= 50
 
 ENDIF
 
-IF __CLIB_OPT_IMATH > 50
+IF __CLIB_OPT_FMATH > 50
 
     ; start doing the p3 byte
 
