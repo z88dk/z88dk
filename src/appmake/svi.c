@@ -123,7 +123,6 @@ int svi_exec(char* target)
     int i;
     int pos;
     int len;
-    char gothdr;
 
     if (help)
         return -1;
@@ -272,8 +271,6 @@ int svi_exec(char* target)
         for (i = 0; (i < 17); i++)
             c = getc(fpin);
         len -= 17;
-
-        gothdr = 0;
 
         /* Copy the header */
         if (dumb)

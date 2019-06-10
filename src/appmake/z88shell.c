@@ -128,12 +128,12 @@ void save_block(long filesize, char* base, char* ext)
     suffix_change(name, ext);
 
     if ((fp = fopen(name, "wb")) == NULL) {
-        sprintf(buffer, "Can't open output file %s\n", name);
+        snprintf(buffer,sizeof(buffer), "Can't open output file %s\n", name);
         myexit(buffer, 1);
     }
 
     if (fwrite(memory, 1, filesize, fp) != filesize) {
-        sprintf(buffer, "Can't write to output file %s\n", name);
+        snprintf(buffer,sizeof(buffer), "Can't write to output file %s\n", name);
         myexit(buffer, 1);
     }
     fclose(fp);

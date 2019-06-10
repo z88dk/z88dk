@@ -94,10 +94,10 @@ int zxvgs_exec(char* target)
     suffix_change(name, ".V00");
 
     if ((fp = fopen(name, "wb")) == NULL) {
-        sprintf(buffer, "Can't open output file %s\n", name);
+        snprintf(buffer, sizeof(buffer), "Can't open output file %s\n", name);
         myexit(buffer, 1);
     }
-    sprintf(buffer, "Can't write to output file %s\n", name);
+    snprintf(buffer, sizeof(buffer),"Can't write to output file %s\n", name);
     header[0] = 1;
     header[1] = zorg / 256;
     header[2] = zorg % 256;

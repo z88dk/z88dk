@@ -141,7 +141,7 @@ int residos_exec(char* target)
 void save_block(long filesize, char* base, char* ext)
 {
     char name[FILENAME_MAX + 1];
-    char buffer[LINEMAX + 1];
+    char buffer[FILENAME_MAX + 1];
     FILE* fp;
 
     strcpy(name, base);

@@ -26,13 +26,11 @@ option_t spc1000_options[] = {
 int spc1000_exec(char* target)
 {
     char filename[FILENAME_MAX + 1];
-    char name[11];
     FILE *fpin, *fpout;
     long pos;
     int c;
     int i;
-    int len, blocklen;
-    int cksum;
+    int len;
 
     if (help)
         return -1;
