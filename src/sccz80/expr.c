@@ -596,6 +596,7 @@ int heirb(LVALUE* lval)
     char sname[NAMESIZE];
     double dval;
     int val, con, direct, k;
+    Kind valtype;
     char flags;
     SYMBOL* ptr = NULL;
 
