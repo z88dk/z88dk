@@ -27,6 +27,8 @@ int ge(double a, double b) { return a >= b; }
 
 double neg(double a) { return -a; }
 
+double inverse(double a) { return 1/a; }
+
 double cschar(signed char c) { return (double) c; }
 double cuchar(unsigned char c) { return (double) c; }
 double csint(signed int i) { return (double) i; }

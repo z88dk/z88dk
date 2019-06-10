@@ -241,10 +241,9 @@
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
-	call	dldpsh
-	ld	hl,i_3+0
 	call	dload
-	call	dmul
+	ld	a,1
+	call	l_f48_ldexp
 	pop	hl
 	call	dstore
 	ld	hl,0	;const
@@ -263,11 +262,9 @@
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
-	call	dldpsh
-	ld	hl,2	;const
-	ld	de,0
-	call	float
-	call	dmul
+	call	dload
+	ld	a,1
+	call	l_f48_ldexp
 	pop	hl
 	call	dstore
 	ld	hl,0	;const
@@ -286,10 +283,9 @@
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
-	call	dldpsh
-	ld	hl,i_4+0
 	call	dload
-	call	dmul
+	ld	a,-1
+	call	l_f48_ldexp
 	pop	hl
 	call	dstore
 	ld	hl,0	;const
@@ -308,10 +304,9 @@
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
-	call	dldpsh
-	ld	hl,i_4+0
 	call	dload
-	call	dmul
+	ld	a,-1
+	call	l_f48_ldexp
 	pop	hl
 	call	dstore
 	ld	hl,0	;const
@@ -330,10 +325,9 @@
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
-	call	dldpsh
-	ld	hl,i_4+0
 	call	dload
-	call	dmul
+	ld	a,-1
+	call	l_f48_ldexp
 	pop	hl
 	call	dstore
 	ld	hl,0	;const
@@ -638,9 +632,6 @@
 .i_3
 	;2.000000
 	defb	0x00,0x00,0x00,0x00,0x00,0x82
-.i_4
-	;0.500000
-	defb	0x00,0x00,0x00,0x00,0x00,0x80
 
 
 	SECTION	bss_compiler
