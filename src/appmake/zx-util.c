@@ -513,10 +513,10 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt)
                             writebyte_p(':', fpout, &zxt->parity);
                             writebyte_p(0xf4, fpout, &zxt->parity);   /* POKE */
                             writebyte_p(0xb0, fpout, &zxt->parity);       /* VAL */
-                            sprintf(mybuf, "\"23739\",", (int)pos);        
+                            sprintf(mybuf, "\"23739\",");
                             writestring_p(mybuf, fpout, &zxt->parity);
                             writebyte_p(0xb0, fpout, &zxt->parity);       /* VAL */
-                            sprintf(mybuf, "\"111\":", (int)pos);        
+                            sprintf(mybuf, "\"111\":");
                             writestring_p(mybuf, fpout, &zxt->parity);
                         }
                         writebyte_p(0xef, fpout, &zxt->parity);       /* LOAD */

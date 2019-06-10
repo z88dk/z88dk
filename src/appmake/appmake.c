@@ -48,7 +48,9 @@ static void         cleanup_temporary_files(void);
 
 static int          num_temp_files = 0;
 static char       **temp_files = NULL;
+#ifdef WIN32
 static char         tmpnambuf[] = "apmXXXX";
+#endif
 
 
 int main(int argc, char *argv[])
@@ -1463,8 +1465,10 @@ int mb_user_remove_bank(struct banked_memory *memory, char *bankname)
     return 0;
 }
 
-int mb_compare_aligned(const struct section_aligned *a, const struct section_aligned *b)
+int mb_compare_aligned(const void *va, const void *vb)
 {
+    const struct section_aligned *a = va;
+    const struct section_aligned *b = vb;
     return strcmp(a->section_name, b->section_name);
 }
 
@@ -1487,8 +1491,10 @@ int mb_check_alignment(struct aligned_data *aligned)
     return errors;
 }
 
-int mb_compare_banks(const struct section_bin *a, const struct section_bin *b)
+int mb_compare_banks(const void *va, const void *vb)
 {
+    const struct section_bin *a = va;
+    const struct section_bin *b = vb;
     return a->org - b->org;
 }
 
@@ -1553,7 +1559,6 @@ int mb_sort_banks(struct banked_memory *memory)
 
         for (j = 0; j < MAXBANKS; ++j)
         {
-            struct memory_bank *mb = &bs->membank[j];
             errors += mb_sort_banks_check(&bs->membank[j], bs->org, bs->size);
         }
     }
