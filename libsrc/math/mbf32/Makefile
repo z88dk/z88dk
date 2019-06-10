@@ -4,11 +4,11 @@ include ../../Make.config
 
 vpath %.c ../cimpl/
 
-AFILES  = $(wildcard c/sccz80/*.asm)
-CFILES  = amin.c amax.c fmod.c acos.c asin.c	atan2.c	atof.c cosh.c ftoa.c ftoe.c sinh.c tanh.c acosh.c asinh.c atanh.c
+AFILES  = $(wildcard c/sccz80/*.asm) $(wildcard c/asm/*.asm)
+CFILES  = amin.c amax.c fmod.c acos.c asin.c	atan2.c	atof.c cosh.c ftoa.c ftoe.c sinh.c tanh.c acosh.c asinh.c atanh.c 
 OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
 
-CFLAGS += -fp-mode=mbf32 -D__MATH_MBF32
+CFLAGS += -fp-mode=mbf32 -D__MATH_MBF32  
 
 all: dirs $(OUTPUT_DIRECTORY)/mbf32.lib $(OUTPUT_DIRECTORY)/mbf32_iy.lib 
 
@@ -20,7 +20,7 @@ $(OUTPUT_DIRECTORY)/mbf32_iy.lib: $(addprefix obj/ixiy/, $(OBJECTS))
 	TYPE=ixiy $(LIBLINKER) --IXIY -x$(OUTPUT_DIRECTORY)/mbf32_iy @mbf32.lst
 
 dirs:
-	@mkdir -p obj/z80/c/sccz80 obj/ixiy/c/sccz80
+	@mkdir -p obj/z80/c/sccz80 obj/ixiy/c/sccz80 obj/z80/c/asm obj/ixiy/c/asm
 
 clean:
 	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i *.opt
