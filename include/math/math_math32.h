@@ -97,6 +97,7 @@ extern double_t __LIB__ round(double_t x);
 
 /* Manipulation */
 extern double_t __LIB__ ldexp(double_t x, int pw2) __smallc;
+#define scalbn(x,pw2) ldexp(x,pw2)
 extern double_t __LIB__ modf(double_t x, double_t * y) __smallc;
 extern double_t __LIB__ frexp(double_t x, int *pw2) __smallc;
 
