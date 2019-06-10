@@ -631,7 +631,7 @@ void setf(int a){
 
 
 int main (int argc, char **argv){
-  int size= 0, start= 0, end= 0, intr= 0, tap= 0, alarmtime = 0;
+  int size= 0, start= 0, end= 0, intr= 0, tap= 0, alarmtime = 0, load_address = 0;
   char * output= NULL;
   char  *memory_model = "standard";
   FILE * fh;
@@ -653,7 +653,8 @@ int main (int argc, char **argv){
     printf("  -int X         X in decimal are number of cycles for periodic interrupts\n"),
     printf("  -w X           Maximum amount of running time (400000000 cycles per unit)\n"),
     printf("  -d             Enable debugger\n"),
-    printf("  -b <model>     Memory model (zxn/64k)\n"),
+    printf("  -l X           Load file to address\n"),
+    printf("  -b <model>     Memory model (zxn/zx)\n"),
     printf("  -mz80          Emulate a z80\n"),
     printf("  -mz180         Emulate a z180\n"),
     printf("  -mr2k          Emulate a Rabbit 2000\n"),
@@ -693,6 +694,9 @@ int main (int argc, char **argv){
           } else {
             intr= strtol(argv[1], NULL, 10);
           }
+          break;
+        case 'l':
+          load_address = pc = strtol(argv[1], NULL, 0);
           break;
         case 'c':
           sscanf(argv[1], "%llu", &counter);
@@ -883,8 +887,11 @@ int main (int argc, char **argv){
         (void)fread(&iff, 1, 1, fh),
         (void)fread(&im, 1, 1, fh),
         (void)fread(&mp, 2, 1, fh);
-      else
-        (void)fread(get_memory_addr(0), 1, size, fh);
+      else {
+        for ( int l = 0; l < size; l++ ) {
+          *get_memory_addr(load_address+l) = fgetc(fh);
+        }
+      }
     }
     ++argv;
     --argc;

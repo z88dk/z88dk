@@ -130,9 +130,13 @@ extern symbol   *find_symbol_byname(const char *name);
 extern int symbol_resolve(char *name);
 extern char **parse_words(char *line, int *argc);
 
-extern void memory_init(const char *model);
+extern void memory_init(char *model);
 extern void memory_handle_paging(int port, int value);
 extern void memory_reset_paging();
+
+
+extern void        out(int port, int value);
+
 
 extern uint8_t    *get_memory_addr(int pc);
 extern uint8_t     get_memory(int pc);
