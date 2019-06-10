@@ -9,7 +9,7 @@
 ; m32_frexp - z80, z180, z80-zxn fraction and exponent
 ;-------------------------------------------------------------------------
 ;
-;   float m32_frexpf (float x, int8_t *pw2)
+;   float m32_frexpf (float x, int *pw2)
 ;   {
 ;       union float_long fl;
 ;       int8_t i;
@@ -35,7 +35,7 @@ PUBLIC m32_fsfrexp_callee
 PUBLIC _m32_frexpf
 
 
-; float frexpf (float x, int8_t *pw2);
+; float frexpf (float x, int *pw2);
 ._m32_frexpf
 
 .m32_fsfrexp_callee
@@ -59,9 +59,17 @@ PUBLIC _m32_frexpf
     rr e                        ; save the sign in e[7]
 
     ld a,d
+    ld d,0
+    and a
+    jr  z,zero
     ld d,$7e                    ; remove exponent excess (bias-1)
     sub d                       ; mantissa between 0.5 and 1
+zero:
     ld (bc),a                   ; and store in pw2
+    inc bc
+    rlca
+    sbc  a
+    ld  (bc),a
 
     rl e                        ; get sign back
     rr d

@@ -14,6 +14,8 @@
 #include <math/math_mbf32.h>
 #elif __MATH_ZX
 #include <math/math_zx.h>
+#elif __MATH_CPC
+#include <math/math_cpc.h>
 #else
 #include <math/math_genmath.h>
 #endif

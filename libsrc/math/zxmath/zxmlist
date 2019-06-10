@@ -45,3 +45,5 @@ pi
 init_floatpack
 ldexp
 l_f48_ldexp
+frexp
+fpclassify

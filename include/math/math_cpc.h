@@ -1,5 +1,5 @@
-#ifndef __MATH_GENMATH_H__
-#define __MATH_GENMATH_H__
+#ifndef __MATH_ZXMATH_H__
+#define __MATH_ZXMATH_H__
 
 #include <sys/compiler.h>
 #include <sys/types.h>
@@ -8,28 +8,29 @@
 #define FLT_ROUNDS 1
 #define FLT_RADIX  2
 
-#define FLT_MANT_DIG 39
-#define DBL_MANT_DIG 39
-#define FLT_DIG      9
-#define DBL_DIG      9
+#define FLT_MANT_DIG 31
+#define DBL_MANT_DIG 31
+#define FLT_DIG      7
+#define DBL_DIG      7
 
-#define FLT_EPSILON  0.000000000001
-#define DBL_EPSILON  0.000000000001
-#define MAXFLOAT     9.995e37
-#define HUGE_VAL     9.990e37
-#define INFINITY     9.999e37
-#define FLT_MAX      9.995e37
-#define DBL_MAX      9.995e37
+#define FLT_EPSILON  0.000000001
+#define DBL_EPSILON  0.000000001
+#define MAXFLOAT     1.5e32
+#define HUGE_VAL     1.0e32
+#define INFINITY     1.7e32
+#define FLT_MAX      1.5e32
+#define DBL_MAX      1.5e32
 #define FLT_MIN      1.0e-38
 #define DBL_MIN      1.0e-38
 #define FLT_MIN_EXP    -38
 #define DBL_MIN_EXP    -38
 #define FLT_MIN_10_EXP -38
 #define DBL_MIN_10_EXP -38
-#define FLT_MAX_EXP     37
-#define DBL_MAX_EXP     37
-#define FLT_MAX_10_EXP  36
-#define DBL_MAX_10_EXP  36
+#define FLT_MAX_EXP     32
+#define DBL_MAX_EXP     32
+#define FLT_MAX_10_EXP  31
+#define DBL_MAX_10_EXP  31
+
 
 
 #define M_E        2.718282
@@ -69,9 +70,9 @@ extern double_t __LIB__ atan2(double_t,double_t) __smallc; /* atan2(a,b) = arc t
 extern double_t __LIB__ cosh(double_t);  /* hyperbolic cosine */
 extern double_t __LIB__ sinh(double_t);  /* hyperbolic sine */
 extern double_t __LIB__ tanh(double_t);  /* hyperbolic tangent */
-extern double_t __LIB__ asinh(double_t); /* arc hyberbolic sine */
-extern double_t __LIB__ acosh(double_t); /* arc hyberbolic cosine */
-extern double_t __LIB__ atanh(double_t); /* arc hyberbolic tangent */
+#define asinh(x) log(2.*fabs(x)+1./(sqrt(x*x+1.)+fabs(x)))
+#define acosh(x) log(2.*x-1./(x+sqrt(x*x-1.)))
+#define atanh(x) (log((1.+x)/(1.-x))*.5)
 
 /* Power functions */
 extern double_t __LIB__ pow(double_t,double_t) __smallc;   /* pow(x,y) = x**y */
@@ -96,7 +97,6 @@ extern double_t __LIB__ ceil(double_t) __smallc;
 #define rint(a) ceil(a)
 
 /* Manipulation */
-extern double_t __LIB__ modf(double_t, double_t *) __smallc; /* decomposes a number into integer and fractional parts */
 extern double_t __LIB__ ldexp(double_t x, int pw2) __smallc;
 #define scalbn(x,pw2) ldexp(x,pw2)
 extern double_t __LIB__ frexp(double_t x, int *pw2) __smallc;
@@ -125,10 +125,10 @@ extern double_t __LIB__ atof(char *) __smallc;
 extern void __LIB__ ftoa(double_t, int, char *) __smallc;
 extern void __LIB__ ftoe(double_t, int, char *) __smallc;
 
-/* Random numbers */
-extern double_t __LIB__ fprand(void); /* Generic only */
-extern int __LIB__ fpseed(double_t);  /* Seed random number */
-
+/* CPC Only function */
+extern double_t __LIB__ pow10(int x);         /* pow(10,x) - CPC only */
+extern void __LIB__ deg();
+extern void __LIB__ rad();
 
 /* Classification */
 #define isinf(x) 0
@@ -150,4 +150,4 @@ extern int __LIB__ fpclassify(double_t );
 #define fma(x,y,z) (x*y+z)
 
 
-#endif /* _MATH_GENMATH_H */
+#endif /* _MATH_ZXMATH_H */
