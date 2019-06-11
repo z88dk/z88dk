@@ -42,7 +42,6 @@ int kc_exec(char* target)
     FILE* fpin;
     FILE* fpout;
     long pos;
-    char name[17];
     int len, namelen;
     int c, i;
     int nflag;

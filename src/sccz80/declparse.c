@@ -759,7 +759,7 @@ Type *parse_parameter_list(Type *return_type)
         // The caller will check if it needs to have a name i.e. we're in function definition context
         // Function pointers set their name inside the call
         if ( strlen(param->name) == 0  && symname(param->name) == 0 ) {
-            snprintf(param->name, sizeof(param->name),"0__parameter_%lu",array_len(func->parameters));
+            snprintf(param->name, sizeof(param->name),"0__parameter_%d",(int)array_len(func->parameters));
             param->name[0] = 0;
         }
         if ( check_existing_parameter(func, param) == 0 )            

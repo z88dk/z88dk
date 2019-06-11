@@ -28,12 +28,11 @@ option_t multi8_options[] = {
 int multi8_exec(char *target)
 {
     char    filename[FILENAME_MAX+1];
-    char    name[11];
     FILE    *fpin, *fpout;
     long    pos;
     int     c;
     int     i;
-    int     len, blocklen;
+    int     len;
     int     cksum;
 
     if ( help )

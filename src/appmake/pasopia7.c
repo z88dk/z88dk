@@ -50,7 +50,6 @@ int pasopia7_exec(char *target)
     FILE    *fpin, *bootstrap_fp;
     disc_handle *h;
     long    pos, bootlen;
-    int     cksum;
     int     t,s,w;
 
     if ( help )

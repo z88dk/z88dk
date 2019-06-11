@@ -43,7 +43,6 @@ int fp1100_exec(char *target)
     FILE    *fpin, *bootstrap_fp;
     disc_handle *h;
     long    pos, bootlen;
-    int     cksum;
     int     t,s,w,head = 0;
 
     if ( help )

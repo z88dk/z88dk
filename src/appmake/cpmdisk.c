@@ -57,8 +57,6 @@ disc_handle *disc_create(disc_spec* spec)
 {
     disc_handle* h = calloc(1, sizeof(*h));
     size_t len;
-    int directory_extents;
-    int i;
 
     h->spec = *spec;
     len = spec->tracks * spec->sectors_per_track * spec->sector_size * spec->sides;
@@ -244,8 +242,6 @@ int disc_write_raw(disc_handle* h, const char* filename)
 
     for (i = 0; i < h->spec.tracks; i++) {
         for (s = 0; s < h->spec.sides; s++) {
-            uint8_t* ptr;
-
             if ( h->spec.alternate_sides == 0 ) {
                 offs = track_length * i + (s * track_length * h->spec.tracks);
             } else {
@@ -446,8 +442,6 @@ int disc_write_d88(disc_handle* h, const char* filename)
 
 int disc_write_anadisk(disc_handle* h, const char* filename)
 {
-    char    title[18];
-    uint8_t *ptr;
     size_t offs;
     FILE* fp;
     int i, j, s;
