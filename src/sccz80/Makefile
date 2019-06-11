@@ -37,7 +37,7 @@ DEPENDS := $(OBJS:.o=.d)
 
 all: sccz80$(EXESUFFIX)
 
-CFLAGS += -MMD -Wall -I../../ext/uthash/src/ -g -pedantic -std=c99
+CFLAGS += -MMD -Wall -I../../ext/uthash/src/ -g -pedantic -std=gnu99
 
 sccz80$(EXESUFFIX): $(OBJS)
 	$(CC) $(LDFLAGS) -o sccz80$(EXESUFFIX) $(OBJS) -lm
