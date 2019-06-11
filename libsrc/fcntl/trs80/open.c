@@ -48,7 +48,7 @@ struct TRSDOS_FILE *trs80_file;
 				}
 		}
 
-		if (flags & O_WRONLY) {
+		if (flags == O_WRONLY) {
 			/* Delete file (if existing and not device name.. thus ignore errors), then open */
 				// if ( name[0] != '*'  ) // << is this necessary ?
 				trsdos_tst(DOS_OPEN_EX, 0, trs80_file->fcb);
@@ -56,11 +56,13 @@ struct TRSDOS_FILE *trs80_file;
 				//};
 		}
 
-		if ( (flags & O_WRONLY) || (flags & O_APPEND) ) {
+		if ( ((flags & O_WRONLY) != 0) || ((flags & O_APPEND) != 0) ) {
 			/* Open existing file for writing, otherwise create a new one */
 				trsdos_tst(DOS_FSPEC, name, trs80_file->fcb); // << is this necessary ?
-				if ( !trsdos_tst(DOS_OPEN_NEW, trs80_file->buffer, trs80_file->fcb) )
+				if ( !trsdos_tst(DOS_OPEN_NEW, trs80_file->buffer, trs80_file->fcb) ) {
+					if (flags & O_APPEND) while (trsdos_get(trs80_file->fcb)!=-1) {}
 					return (trs80_file);
+				}
 		}
 	}
 		
