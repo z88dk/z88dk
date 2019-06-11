@@ -63,6 +63,7 @@ math/float/math32/lm32/c/sdcc/log10_fastcall
 math/float/math32/lm32/c/sdcc/log_fastcall
 math/float/math32/lm32/c/sdcc/modf
 math/float/math32/lm32/c/sdcc/pow
+math/float/math32/lm32/c/sdcc/pow_callee
 math/float/math32/lm32/c/sdcc/round
 math/float/math32/lm32/c/sdcc/round_fastcall
 math/float/math32/lm32/c/sdcc/___schar2fs

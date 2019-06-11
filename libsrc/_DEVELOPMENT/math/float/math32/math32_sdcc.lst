@@ -54,6 +54,7 @@ math/float/math32/c/sdcc/cm32_sdcc_fssub_callee
 math/float/math32/c/sdcc/cm32_sdcc_fszero
 math/float/math32/c/sdcc/cm32_sdcc_log
 math/float/math32/c/sdcc/cm32_sdcc_log10
+math/float/math32/c/sdcc/cm32_sdcc_pow_callee
 math/float/math32/c/sdcc/cm32_sdcc_round
 math/float/math32/c/sdcc/cm32_sdcc___schar2fs
 math/float/math32/c/sdcc/cm32_sdcc___schar2fs_callee

@@ -53,6 +53,7 @@ math/float/math32/lm32/c/sccz80/log10_fastcall
 math/float/math32/lm32/c/sccz80/log_fastcall
 math/float/math32/lm32/c/sccz80/modf
 math/float/math32/lm32/c/sccz80/pow
+math/float/math32/lm32/c/sccz80/pow_callee
 math/float/math32/lm32/c/sccz80/round
 math/float/math32/lm32/c/sccz80/round_fastcall
 math/float/math32/lm32/c/sccz80/sin
