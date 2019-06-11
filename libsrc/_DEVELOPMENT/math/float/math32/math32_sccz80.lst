@@ -51,6 +51,7 @@ math/float/math32/c/sccz80/cm32_sccz80_log
 math/float/math32/c/sccz80/cm32_sccz80_log10
 math/float/math32/c/sccz80/cm32_sccz80_modf
 math/float/math32/c/sccz80/cm32_sccz80_pow
+math/float/math32/c/sccz80/cm32_sccz80_pow_callee
 math/float/math32/c/sccz80/cm32_sccz80_round
 math/float/math32/c/sccz80/cm32_sccz80_sin
 math/float/math32/c/sccz80/cm32_sccz80_sinh

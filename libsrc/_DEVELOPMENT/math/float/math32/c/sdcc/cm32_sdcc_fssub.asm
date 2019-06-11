@@ -1,5 +1,5 @@
 
-; float __fsadd (float left, float right)
+; float __fssub (float left, float right)
 
 SECTION code_clib
 SECTION code_fp_math32
