@@ -907,7 +907,7 @@ int declare_local(int local_static)
                 sym->initialised = 1;
                 initials(namebuf, type);                
             } else {
-                sym->bss_section = strdup(get_section_name(sym->ctype->namespace, c_bss_section));
+                sym->bss_section = STRDUP(get_section_name(sym->ctype->namespace, c_bss_section));
             }
         } else {
             int size = type->size;
@@ -1073,10 +1073,10 @@ Type *dodeclare(enum storage_type storage)
 
          if ( cmatch(';')) {
              // Maybe not right
-            sym->bss_section = strdup(get_section_name(sym->ctype->namespace, c_bss_section));
+            sym->bss_section = STRDUP(get_section_name(sym->ctype->namespace, c_bss_section));
             return type;
         } else if ( cmatch(',')) {
-            sym->bss_section = strdup(get_section_name(sym->ctype->namespace, c_bss_section));
+            sym->bss_section = STRDUP(get_section_name(sym->ctype->namespace, c_bss_section));
             continue;
         } 
 
