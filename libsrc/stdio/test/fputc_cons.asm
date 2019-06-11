@@ -19,6 +19,6 @@
 	ld	l,(hl)
 	ld	h,0
 	ld	a,CMD_PRINTCHAR
-	rst	16
+	call	SYSCALL
 	ret
 

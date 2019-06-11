@@ -25,4 +25,6 @@ lstoff
 
         defc    CMD_MKDIR = 40
         defc    CMD_RMDIR = 41
+
+	EXTERN  SYSCALL
 lston
