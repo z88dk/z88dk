@@ -85,7 +85,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     int   save_fps_num;
     int   function_pointer_call = ptr == NULL ? YES : NO;
     int   savesp;
-    int   last_argument_size;
+    int   last_argument_size = 0;
     enum symbol_flags builtin_flags = 0;
     char   *funcname = "(unknown)";
     Type   *functype = ptr ? ptr->ctype: fnptr_type->ptr;

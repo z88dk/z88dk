@@ -1121,7 +1121,7 @@ int callstk(Type *type, int n, int isfarptr, int last_argument_size)
         // TOS = address, dehl = parameter
         // More than one argument, TOS = last parameter, hl = function
         // For long sp+0 = LSW, sp +2 = MSW, hl = function
-        if ( last_argument_size != 2 ) {
+        if ( last_argument_size == 2 ) {
             ol("pop\taf");
             outstr("\tld\tbc,"); printlabel(label);  nl();	// bc = return address
             ol("push\tbc");
@@ -1134,7 +1134,7 @@ int callstk(Type *type, int n, int isfarptr, int last_argument_size)
             ol("push\tbc"); /* Return address */		
             ol("push\taf");		
             Zsp += 2;
-         }
+         } 
          ol("ret");		
          postlabel(label);
          return ret;
