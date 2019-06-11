@@ -22,8 +22,8 @@ static char              fast         = 0;
 static char              loud         = 0;
 static char              dumb         = 0;
 
-static char              x07_h_lvl;
-static char              x07_l_lvl;
+static uint8_t           x07_h_lvl;
+static uint8_t           x07_l_lvl;
 
 
 /* Options that are available for this module */

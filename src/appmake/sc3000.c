@@ -110,7 +110,7 @@ int sc3000_exec(char* target)
     char wavfile[FILENAME_MAX + 1];
     char name[17];
     FILE *fpin, *fpout;
-    long pos, blocklen;
+    long pos=0, blocklen;
     int c, i, len;
 
     if (help)

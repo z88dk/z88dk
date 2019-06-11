@@ -564,14 +564,11 @@ static void cpm_write_file(disc_handle* h, char *filename, void* data, size_t le
     size_t num_extents = (len / h->spec.extent_size) + 1;
     size_t directory_offset;
     size_t offset;
-    uint8_t* dir_ptr;
     uint8_t direntry[32];
-    uint8_t* ptr;
     int i, j, current_extent;
     int extents_per_entry = h->spec.byte_size_extents ? 16 : 8;
 
     directory_offset = find_first_free_directory_entry(h);
-    dir_ptr = h->image + directory_offset;
     // Now, write the directory entry, we can start from extent 1
     current_extent = first_free_extent(h);
     // We need to turn that extent into an offset into the disc
@@ -599,7 +596,6 @@ static void cpm_write_file(disc_handle* h, char *filename, void* data, size_t le
             direntry[15] = ((len % (extents_per_entry * h->spec.extent_size)) / 128) + 1;
             extents_to_write = (num_extents - (i * extents_per_entry));
         }
-        ptr = &direntry[16];
         for (j = 0; j < extents_per_entry; j++) {
             if (j < extents_to_write) {
                 h->extents[current_extent] = 1;
@@ -645,7 +641,7 @@ disc_handle *fat_create(disc_spec* spec)
 
 static void fat_write_file(disc_handle* h, char *filename, void* data, size_t len)
 {
-    FIL file={0};
+    FIL file={{0}};
     UINT written;
 
     if ( f_open(&file, filename, FA_WRITE|FA_CREATE_ALWAYS) != FR_OK ) {

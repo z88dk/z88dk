@@ -41,7 +41,7 @@ int check_retval(int retval, const char *file, const char *source_file, int line
 }
 
 int xglob(const char * pattern, int flags, 
-	const int(*errfunc)(const char *epath, int eerrno), glob_t * pglob)
+	int(*errfunc)(const char *epath, int eerrno), glob_t * pglob)
 {
 	int ret = glob(pattern, flags, errfunc, pglob);
 	if (ret != GLOB_NOMATCH && ret != 0)

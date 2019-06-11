@@ -60,33 +60,33 @@ int z88shell_exec(char* target)
 
     header_start = parameter_search(crtfile, ".map", "header_start");
     if (header_start == -1)
-        myexit("Could not find parameter header_start (not a Shell Compile?)\n", 1);
+        exit_log(1, "Could not find parameter header_start (not a Shell Compile?)\n");
     shell_length = parameter_search(crtfile, ".map", "shell_length");
     if (shell_length == -1)
-        myexit("Could not find parameter shell_length (not a Shell Compile?)\n", 1);
+        exit_log(1,"Could not find parameter shell_length (not a Shell Compile?)\n");
 
     start = parameter_search(crtfile, ".map", "start");
     if (shell_length == -1)
-        myexit("Could not find parameter start (not a Shell Compile?)\n", 1);
+        exit_log(1,"Could not find parameter start (not a Shell Compile?)\n");
 
     /* allocate some memory */
     memory = calloc(65536 - header_start, 1);
     if (memory == NULL)
-        myexit("Can't allocate memory\n", 1);
+        exit_log(1,"Can't allocate memory\n");
 
     binfile = fopen_bin(binname, crtfile);
     if (binfile == NULL)
-        myexit("Can't open binary file\n", 1);
+        exit_log(1,"Can't open binary file\n");
 
     if (fseek(binfile, 0, SEEK_END)) {
         fclose(binfile);
-        myexit("Couldn't determine the size of the file\n", 1);
+        exit_log(1,"Couldn't determine the size of the file\n", 1);
     }
 
     filesize = ftell(binfile);
     if (filesize > 65536L) {
         fclose(binfile);
-        myexit("The source binary is over 65,536 bytes in length.\n", 1);
+        exit_log(1,"The source binary is over 65,536 bytes in length.\n");
     }
 
     fseek(binfile, 0, SEEK_SET);
@@ -95,7 +95,7 @@ int z88shell_exec(char* target)
 
     if (filesize != readlen) {
         fclose(binfile);
-        myexit("Couldn't read in binary file\n", 1);
+        exit_log(1,"Couldn't read in binary file\n");
     }
 
     fclose(binfile);
@@ -121,20 +121,17 @@ int z88shell_exec(char* target)
 void save_block(long filesize, char* base, char* ext)
 {
     char name[FILENAME_MAX + 1];
-    char buffer[LINEMAX + 1];
     FILE* fp;
 
     strcpy(name, base);
     suffix_change(name, ext);
 
     if ((fp = fopen(name, "wb")) == NULL) {
-        snprintf(buffer,sizeof(buffer), "Can't open output file %s\n", name);
-        myexit(buffer, 1);
+        exit_log(1,"Can't open output file %s\n", name);
     }
 
     if (fwrite(memory, 1, filesize, fp) != filesize) {
-        snprintf(buffer,sizeof(buffer), "Can't write to output file %s\n", name);
-        myexit(buffer, 1);
+        exit_log(1,"Can't write to output file %s\n", name);
     }
     fclose(fp);
 }

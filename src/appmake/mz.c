@@ -511,10 +511,11 @@ void mz_patch (unsigned char *image, unsigned int *src_table, unsigned int *dst_
 			
 			if ( !patched && (call_location < org_location) && (call_location != 0) ) {
 					printf("\nWarning: Location %x, opcode '%x', unknown address $%x", org_location + i - 0x80, image[i], call_location);
-					if (foopatch)
+					if (foopatch) {
 						printf(" -> BEEP");
 						image[i+1]=dst_table[0]%256;
 						image[i+2]=dst_table[0]/256;
+                                        }
 				}
 
 		}

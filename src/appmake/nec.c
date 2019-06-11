@@ -215,7 +215,7 @@ int nec_exec(char* target)
 
     unsigned char* prefix;
     int prefix_length;
-    int codeseg;
+    int codeseg = 0;
 
     if (binname == NULL) {
         return -1;

@@ -41,7 +41,7 @@ int x1_exec(char* target)
     char name[14];
     FILE* fpin;
     FILE* fpout;
-    int len, namelen;
+    int len;
     int i, c;
     long l;
 
@@ -63,7 +63,6 @@ int x1_exec(char* target)
 
     suffix_change(filename, ".2D");
 
-    namelen = strlen(filename) - 1;
 
     if (strcmp(binname, filename) == 0) {
         fprintf(stderr, "Input and output file names must be different\n");

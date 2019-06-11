@@ -33,7 +33,7 @@ int multi8_exec(char *target)
     int     c;
     int     i;
     int     len;
-    int     cksum;
+    int     cksum = 0;
 
     if ( help )
         return -1;
