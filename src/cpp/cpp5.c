@@ -603,7 +603,7 @@ nogood:	unget();
 }
 
 FILE_LOCAL int
-bittest(value)
+bittest(int value)
 /*
  * TRUE if value is zero or exactly one bit is set in value.
  */

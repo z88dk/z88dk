@@ -224,8 +224,7 @@ int check(char* pat, char** vars)
 int check_eval(char* pat, char** vars)
 {
     char expr[1024];
-    int expected, result, x;
-    char v1, v2;
+    int expected,  x;
 
     x = sscanf(pat, "%d = %[^\n]s", &expected, expr);
     if (x != 2) {
@@ -378,7 +377,6 @@ char* subst_imp(char* pat, char** vars)
         } else if (pat[0] == '%' && strncmp(pat,"%eval(", 6) == 0 ) {
             char expr[1024];
             int  x = 0;
-            int  r;
             pat += 6;
             while (*pat != ')') {
                 expr[x++] = *pat++;
@@ -681,7 +679,6 @@ int rpn_eval(const char* expr, char** vars)
 {
     const char* ptr = expr;
     char* endptr;
-    int type;
     int op2;
     int n;
 
