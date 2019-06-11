@@ -31,7 +31,6 @@ option_t cpm2_options[] = {
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
-static struct formats   *get_format(const char *name);
 static void              dump_formats();
 static void              bic_write_system_file(disc_handle *h);
 

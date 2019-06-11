@@ -48,7 +48,7 @@ void zxn_construct_page_contents(unsigned char *mem, struct memory_bank *mb, int
 {
     FILE *fin;
     int   j;
-    int   first, last, gap;
+    int   first = 0 , last = 0, gap;
 
     if ((mbsz != 0x2000) && (mbsz != 0x4000))
         exit_log(1, "Error: Page construction for a size that is not 8k or 16k: %u\n", mbsz);
@@ -205,8 +205,8 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt)
     char    name[11];
     char    mybuf[20];
     FILE    *fpin, *fpout, *fpmerge;
-    long    pos;
-    int     c, d;
+    long    pos = 0;
+    int     c = 0, d;
     int     warping;
     int     i, j, blocklen;
     int     len, mlen;
@@ -743,7 +743,7 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt)
                 for (i = 0; (i < blocklen); i++)		/* Skip the block we're excluding */
                     c = getc(fpin);
 
-            if ((zxt->turbo && (blockcount == 4) || (blockcount == 6)) || (zxt->turbo && zxt->dumb)) {
+            if ((zxt->turbo && (blockcount == 4 || blockcount == 6)) || (zxt->turbo && zxt->dumb)) {
                 //zx_rawout(fpout,1,fast);
                 zx_rawbit(fpout, tperiod0);
                 zx_rawbit(fpout, 75);
@@ -925,11 +925,11 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
     int user_handle;
     int z_alt_filename;
 
-    int dotn_last_page, actual_last_page;
-    int dotn_last_div, actual_last_div;
+    int dotn_last_page = 0, actual_last_page;
+    int dotn_last_div = 0, actual_last_div;
     int dotn_num_extra;
-    int dotn_main_overlay_mask;
-    int dotn_main_absolute_mask;
+    int dotn_main_overlay_mask = 0;
+    int dotn_main_absolute_mask = 0;
 
     unsigned char mem[64 * 1024];
 
@@ -1745,7 +1745,7 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
     z_sna_filename = parameter_search(zxc->crtfile, ".map", "__z_sna_filename");
 
     if (z_sna_filename >= 0x4000)
-        sprintf(&mem128[z_sna_filename - 0x4000], "%.12s", filename);
+        sprintf((char *)&mem128[z_sna_filename - 0x4000], "%.12s", filename);
 
     // create sna file
 
@@ -2104,7 +2104,6 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
 uint8_t *zx3_layout_file(uint8_t *inbuf, size_t filelen, int start_address, int file_type, size_t *total_len_ptr)
 {
      uint8_t *buf = must_malloc(filelen + 128);
-     uint8_t *ptr = buf;
      int      cksum, i;
      size_t   total_len = 0;
 
@@ -2123,8 +2122,6 @@ uint8_t *zx3_layout_file(uint8_t *inbuf, size_t filelen, int start_address, int 
      // | CODE or SCREEN$   3	file length	load address	xxx	xxx	|
      // +-----------------------------------------------------------------------+
      // 127 = checksum (sum of 0..126 mod 256)
-     ptr = buf + 128;
-
      while ( total_len < filelen ) {
          buf[128 + total_len] = inbuf[total_len];
          total_len++;

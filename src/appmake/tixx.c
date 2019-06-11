@@ -147,7 +147,7 @@ int tixx_exec(char *target)
     FILE *fp;
     char *buf, str[256];
     char *suffix;
-    int i, n, ext, n2;
+    int i, n, ext = E_83P, n2;
     unsigned short chk;
 
     if ( help || binname == NULL ) {
@@ -173,6 +173,8 @@ int tixx_exec(char *target)
     } else if (!stricmp(target, "ti86s")) {
         ext = E_86S;
         suffix = ".86s";
+    } else {
+        exit_log(1,"Unknown target <%s>\n",target);
     }
 
     if ( outfile == NULL ) {
