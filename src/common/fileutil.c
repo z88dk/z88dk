@@ -10,6 +10,9 @@
 #include <ctype.h>
 #include <string.h>
 #include <dirent.h>
+#ifndef WIN32
+#include <unistd.h>
+#endif
 
 //-----------------------------------------------------------------------------
 // pathname manipulation 
