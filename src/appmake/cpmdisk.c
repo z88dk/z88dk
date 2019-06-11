@@ -564,13 +564,11 @@ static void cpm_write_file(disc_handle* h, char *filename, void* data, size_t le
     size_t num_extents = (len / h->spec.extent_size) + 1;
     size_t directory_offset;
     size_t offset;
-    uint8_t* dir_ptr;
     uint8_t direntry[32];
     int i, j, current_extent;
     int extents_per_entry = h->spec.byte_size_extents ? 16 : 8;
 
     directory_offset = find_first_free_directory_entry(h);
-    dir_ptr = h->image + directory_offset;
     // Now, write the directory entry, we can start from extent 1
     current_extent = first_free_extent(h);
     // We need to turn that extent into an offset into the disc

@@ -21,8 +21,8 @@ static char              dumb         = 0;
 static char              loud         = 0;
 static char              help         = 0;
 
-static char              mtx_h_lvl;
-static char              mtx_l_lvl;
+static uint8_t           mtx_h_lvl;
+static uint8_t           mtx_l_lvl;
 
 
 /* Options that are available for this module */

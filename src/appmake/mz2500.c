@@ -62,7 +62,7 @@ int mz2500_exec(char* target)
 {
     char filename[FILENAME_MAX + 1];
     FILE* fpin;
-    int len, namelen;
+    int len;
     int i;
     int track, sector, head, written;
     disc_handle *h;
@@ -83,7 +83,6 @@ int mz2500_exec(char* target)
 
     suffix_change(filename, ".dsk");
 
-    namelen = strlen(filename) - 1;
 
     if (strcmp(binname, filename) == 0) {
         fprintf(stderr, "Input and output file names must be different\n");

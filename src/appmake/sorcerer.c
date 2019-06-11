@@ -27,10 +27,10 @@ static char              loud         = 0;
 static char              help         = 0;
 
 static char              bit_state    = 0;
-static char              h_lvl;
-static char              l_lvl;
-static char              sorcerer_h_lvl;
-static char              sorcerer_l_lvl;
+static uint8_t           h_lvl;
+static uint8_t           l_lvl;
+static uint8_t           sorcerer_h_lvl;
+static uint8_t           sorcerer_l_lvl;
 
 static unsigned char     parity;
 

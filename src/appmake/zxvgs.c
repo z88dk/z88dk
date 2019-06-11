@@ -44,7 +44,6 @@ int zxvgs_exec(char* target)
     int readlen; /* Amount read in */
     unsigned int chunk; /* chunk size */
     char name[FILENAME_MAX + 1];
-    char buffer[LINEMAX + 1];
     char header[5]; /* header to save */
     unsigned char* position;
 
@@ -94,24 +93,22 @@ int zxvgs_exec(char* target)
     suffix_change(name, ".V00");
 
     if ((fp = fopen(name, "wb")) == NULL) {
-        snprintf(buffer, sizeof(buffer), "Can't open output file %s\n", name);
-        myexit(buffer, 1);
+        exit_log(1,"Can't open output file %s\n", name);
     }
-    snprintf(buffer, sizeof(buffer),"Can't write to output file %s\n", name);
     header[0] = 1;
     header[1] = zorg / 256;
     header[2] = zorg % 256;
     if (fwrite(&header, 1, 3, fp) != 3)
-        myexit(buffer, 1);
+        exit_log(1, "Can't write to output file %s\n", name);
     position = memory;
     while (filesize > 0) { /* Writing chunk with no compression */
         chunk = (filesize > MAX_CHUNK) ? MAX_CHUNK : filesize;
         header[0] = 0xC0 + chunk / 256;
         header[1] = chunk % 256;
         if (fwrite(&header, 1, 2, fp) != 2)
-            myexit(buffer, 1);
+            exit_log(1, "Can't write to output file %s\n", name);
         if (fwrite(position, 1, chunk, fp) != chunk)
-            myexit(buffer, 1);
+            exit_log(1, "Can't write to output file %s\n", name);
         position += chunk;
         filesize -= chunk;
     }
@@ -119,7 +116,7 @@ int zxvgs_exec(char* target)
     header[1] = zorg / 256;
     header[2] = zorg % 256;
     if (fwrite(&header, 1, 3, fp) != 3)
-        myexit(buffer, 1);
+        exit_log(1, "Can't write to output file %s\n", name);
     fclose(fp);
 
     return 0;
