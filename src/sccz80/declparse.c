@@ -1302,6 +1302,14 @@ void declare_func_kr()
                 junk();
             }
         }
+
+        if ( param->kind == KIND_ARRAY ) {
+            Type *ptr = make_pointer(param->ptr);
+            ptr->namespace = param->namespace;
+            strcpy(ptr->name, param->name);
+            param = ptr;
+        }
+
         if ( check_existing_parameter(func, param) == 0 ) 
             array_add(func->parameters, param);
     
@@ -1332,6 +1340,7 @@ static void handle_kr_type_parameters(Type *func)
         }
         if ( param->kind == KIND_ARRAY ) {
             Type *ptr = make_pointer(param->ptr);
+            ptr->namespace = param->namespace;
             strcpy(ptr->name, param->name);
             param = ptr;
         }
