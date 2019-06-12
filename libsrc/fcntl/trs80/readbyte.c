@@ -12,7 +12,7 @@
 //#include <fcntl.h>
 
 // "stdio.h" contains definition for EOF
-//#include <stdio.h>
+#include <stdio.h>
 #include <trsdos.h>
 
 int readbyte(int handle)
