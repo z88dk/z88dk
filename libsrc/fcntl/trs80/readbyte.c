@@ -9,7 +9,7 @@
  *	$Id: readbyte.c $
 */
 
-//#include <fcntl.h>
+#include <fcntl.h>
 
 // "stdio.h" contains definition for EOF
 #include <stdio.h>
