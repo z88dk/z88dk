@@ -1561,29 +1561,29 @@ static int get_parameter_size(Type *functype, Type *type)
 }
 
 
-static void declfunc(Type *type, enum storage_type storage)
+static void declfunc(Type *functype, enum storage_type storage)
 {
     int where;
 
 
-    currfn = findglb(type->name);
+    currfn = findglb(functype->name);
     
     if ( currfn != NULL ) {
         if ( currfn->func_defined ) {
-            errorfmt("Function '%s' was already defined at %s", 1, type->name, currfn->declared_location);
+            errorfmt("Function '%s' was already defined at %s", 1, functype->name, currfn->declared_location);
             junk();
             return;
         }
         if ( storage == LSTATIC && currfn->storage != LSTATIC) {
-            errorfmt("Static declaration of '%s' follows non-static declaration at %s",1,type->name, currfn->declared_location);
+            errorfmt("Static declaration of '%s' follows non-static declaration at %s",1,functype->name, currfn->declared_location);
         }
-        if ( type_matches(currfn->ctype, type) == 0 ) {
+        if ( type_matches(currfn->ctype, functype) == 0 ) {
             UT_string *output;
 
             utstring_new(output);
 
-            utstring_printf(output,"Definition of '%s': ", type->name);
-            type_describe(type, output);
+            utstring_printf(output,"Definition of '%s': ", functype->name);
+            type_describe(functype, output);
             utstring_printf(output," - does not match declaration at %s : ",currfn->declared_location);
             type_describe(currfn->ctype, output);            
             errorfmt("%s",0,utstring_body(output));
@@ -1594,13 +1594,13 @@ static void declfunc(Type *type, enum storage_type storage)
             }
         }
         // Take the prototype flags
-        type->flags = (type->flags & ~(SMALLC)) | currfn->ctype->flags;
+        functype->flags = (functype->flags & ~(SMALLC)) | currfn->ctype->flags;
         if ( currfn->ctype->funcattrs.params_offset ) 
-            type->funcattrs.params_offset = currfn->ctype->funcattrs.params_offset;
-        type->funcattrs.shortcall_rst = currfn->ctype->funcattrs.shortcall_rst;
-        type->funcattrs.shortcall_value = currfn->ctype->funcattrs.shortcall_value;
+            functype->funcattrs.params_offset = currfn->ctype->funcattrs.params_offset;
+        functype->funcattrs.shortcall_rst = currfn->ctype->funcattrs.shortcall_rst;
+        functype->funcattrs.shortcall_value = currfn->ctype->funcattrs.shortcall_value;
     } else {
-        currfn = addglb(type->name, type, ID_VARIABLE, type->kind, 0, storage);
+        currfn = addglb(functype->name, functype, ID_VARIABLE, functype->kind, 0, storage);
     }
     currfn->func_defined = 1; 
     
@@ -1619,10 +1619,10 @@ static void declfunc(Type *type, enum storage_type storage)
     /* If we use frame pointer we preserve previous framepointer on entry
         * to each function
         */
-    if (c_framepointer_is_ix != -1 || (type->flags & (SAVEFRAME|NAKED)) == SAVEFRAME )
+    if (c_framepointer_is_ix != -1 || (functype->flags & (SAVEFRAME|NAKED)) == SAVEFRAME )
         where += 2;
 
-    if ( (type->flags & (CRITICAL|NAKED)) == CRITICAL ) {
+    if ( (functype->flags & (CRITICAL|NAKED)) == CRITICAL ) {
         where += zcriticaloffset();
     }
 
@@ -1633,22 +1633,22 @@ static void declfunc(Type *type, enum storage_type storage)
         UT_string *str;
 
         utstring_new(str);
-        flags_describe(type, type->flags, str);
+        flags_describe(functype, functype->flags, str);
         
-        outfmt("; Function %s flags 0x%08x %s\n",type->name,type->flags, utstring_body(str));
+        outfmt("; Function %s flags 0x%08x %s\n",functype->name,functype->flags, utstring_body(str));
         utstring_renew(str);
-        type_describe(type, str);        
+        type_describe(functype, str);        
         outfmt("; %s\n", utstring_body(str));
         utstring_free(str);
     }
     /* For SMALLC we need to start counting from the last argument */
-    if ( (type->flags & SMALLC) == SMALLC ) {
+    if ( (functype->flags & SMALLC) == SMALLC ) {
         int i;
 
-        for ( i = array_len(type->parameters) - 1; i >= 0; i-- ) {
+        for ( i = array_len(functype->parameters) - 1; i >= 0; i-- ) {
             SYMBOL     *ptr;
             UT_string  *str;            
-            Type       *ptype = array_get_byindex(type->parameters, i);
+            Type       *ptype = array_get_byindex(functype->parameters, i);
 
             utstring_new(str);
 
@@ -1664,14 +1664,14 @@ static void declfunc(Type *type, enum storage_type storage)
             outfmt("; parameter '%s' at %d size(%d)\n",utstring_body(str),where, ptype->size);
             utstring_free(str);
             ptr->isassigned = 1;
-            where += get_parameter_size(type,ptype);
+            where += get_parameter_size(functype,ptype);
         }
     } else {
         int i;
-        for ( i = 0; i < array_len(type->parameters); i++ ) {
+        for ( i = 0; i < array_len(functype->parameters); i++ ) {
             SYMBOL    *ptr;
             UT_string *str;            
-            Type      *ptype = array_get_byindex(type->parameters, i);
+            Type      *ptype = array_get_byindex(functype->parameters, i);
 
             utstring_new(str);
             
@@ -1688,7 +1688,7 @@ static void declfunc(Type *type, enum storage_type storage)
             outfmt("; parameter '%s' at %d size(%d)\n", utstring_body(str),where, ptype->size);  
             utstring_free(str);            
             ptr->isassigned = 1;            
-            where += get_parameter_size(type, ptype);
+            where += get_parameter_size(functype, ptype);
         }
     }
 
@@ -1706,38 +1706,41 @@ static void declfunc(Type *type, enum storage_type storage)
     reset_namespace();
         
     
-    if ( (type->flags & CRITICAL) == CRITICAL ) {
+    if ( (functype->flags & CRITICAL) == CRITICAL ) {
         zentercritical();
     }
     pushframe();
-    if (array_len(currfn->ctype->parameters) && (type->flags & (FASTCALL|NAKED)) == FASTCALL ) {
-        Type *type = array_get_byindex(currfn->ctype->parameters,array_len(currfn->ctype->parameters) - 1);
+
+    if (array_len(functype->parameters) && (functype->flags & (FASTCALL|NAKED)) == FASTCALL ) {
+        Type *fastarg = array_get_byindex(functype->parameters,array_len(functype->parameters) - 1);
         int   adjust = 1;
 
-        if ( type->size == 2 || type->size == 1) 
+        if ( fastarg->size == 2 || fastarg->size == 1) 
             zpush();
-        else if ( type->kind == KIND_DOUBLE )
+        else if ( fastarg->kind == KIND_DOUBLE )
             dpush();     
-        else if ( type->size == 4 || type->size == 3)
+        else if ( fastarg->size == 4 || fastarg->size == 3)
             lpush();
         else
             adjust = 0;
 
         if ( adjust ) {
-            SYMBOL *ptr = findloc(type->name);
+            SYMBOL *ptr = findloc(fastarg->name);
             int     i;
 
             if ( ptr ) {
-                ptr->offset.i -= (get_parameter_size(currfn->ctype,type) + 2);
+                ptr->offset.i -= (get_parameter_size(functype,fastarg) + 2);
                 where = 2;
+            } else {
+                errorfmt("Something has gone very wrong, can't find parameter <%s>\n",1,fastarg->name);
             }
 
-            if ( currfn->ctype->flags & SMALLC ) {
-                for ( i = 0; i < array_len(currfn->ctype->parameters) - 1; i++ ) {
-                    Type *arg = array_get_byindex(currfn->ctype->parameters, i);
+            if ( functype->flags & SMALLC ) {
+                for ( i = 0; i < array_len(functype->parameters) - 1; i++ ) {
+                    Type *arg = array_get_byindex(functype->parameters, i);
                     ptr = findloc(arg->name);
                     if ( ptr ) {
-                        ptr->offset.i -= get_parameter_size(currfn->ctype,type);
+                        ptr->offset.i -= get_parameter_size(functype,fastarg);
                     }
                 }
             }
@@ -1746,8 +1749,8 @@ static void declfunc(Type *type, enum storage_type storage)
     
     stackargs = where;
     lastst = STEXP;
-    if (statement() != STRETURN && (type->flags & NAKED) == 0 ) {
-        if ( type->return_type->kind != KIND_VOID && lastst != STASM) {
+    if (statement() != STRETURN && (functype->flags & NAKED) == 0 ) {
+        if ( functype->return_type->kind != KIND_VOID && lastst != STASM) {
             warningfmt("return-type","Control reaches end of non-void function");
         }
         /* do a statement, but if it's a return, skip */
