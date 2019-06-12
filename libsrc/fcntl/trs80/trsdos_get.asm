@@ -10,11 +10,10 @@
 .trsdos_get
 ._trsdos_get
 	; _FASTCALL
-	ld	d,h
-	ld	e,l
+	ex de,hl
 	call $13	; get byte
-	ld	h,0
-	ld	l,a
-	ret z
 	ld	hl,-1	; EOF
+	ret nz
+	inc hl
+	ld	l,a
 	ret
