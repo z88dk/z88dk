@@ -9,5 +9,7 @@ obj/close
 obj/creat
 obj/readbyte
 obj/writebyte
+obj/read
+obj/write
 obj/remove
 obj/lseek
