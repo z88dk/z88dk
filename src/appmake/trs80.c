@@ -128,8 +128,8 @@ int trs80_exec(char* target)
     int i;
     int len;
     int pos;
-    unsigned char cksum;
-    char ckflag;
+    unsigned char cksum = 0;
+    char ckflag = 0;
 
     if (help || binname == NULL || (!dumb && (crtfile == NULL))) {
         return -1;

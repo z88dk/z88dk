@@ -137,13 +137,12 @@ int x07_exec(char* target)
             pos = origin;
         } else {
             if ((pos = get_org_addr(crtfile)) == -1) {
-                myexit("Could not find parameter ZORG (not z88dk compiled?)\n", 1);
+                exit_log(1,"Could not find parameter ZORG (not z88dk compiled?)\n");
             }
         }
 
         if ((fpin = fopen_bin(binname, crtfile)) == NULL) {
-            fprintf(stderr, "Can't open input file %s\n", binname);
-            myexit(NULL, 1);
+            exit_log(1, "Can't open input file %s\n", binname);
         }
 
         /*
@@ -152,15 +151,14 @@ int x07_exec(char* target)
 	 */
         if (fseek(fpin, 0, SEEK_END)) {
             fclose(fpin);
-            myexit("Couldn't determine size of file\n", 1);
+            exit_log(1,"Couldn't determine size of file\n");
         }
 
         len = ftell(fpin);
         fseek(fpin, 0, SEEK_SET);
 
         if ((fpout = fopen(filename, "wb")) == NULL) {
-            fprintf(stderr, "Can't open output file %s\n", filename);
-            myexit(NULL, 1);
+            exit_log(1,"Can't open output file %s\n", filename);
         }
 
         /* Code generation section */
@@ -287,8 +285,7 @@ int x07_exec(char* target)
             suffix_change(filename2, "_2.cas");
 
             if ((fpout = fopen(filename2, "wb")) == NULL) {
-                fprintf(stderr, "Can't open output file %s\n", filename2);
-                myexit(NULL, 1);
+                exit_log(1, "Can't open output file %s\n", filename2);
             }
 
             /* just make a copy of the bin file */
