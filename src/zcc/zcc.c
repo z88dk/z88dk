@@ -2472,6 +2472,7 @@ void parse_cmdline_arg(char *arg)
     for ( i = 0; i < aliases_num; i+=2 ) {
         if ( strcmp(arg, aliases[i]) == 0 ) {
             parse_option(muststrdup(aliases[i+1]));
+            return;
         }
     }
     add_option_to_compiler(arg);
