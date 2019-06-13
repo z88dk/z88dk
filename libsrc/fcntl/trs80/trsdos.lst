@@ -10,3 +10,4 @@ obj/creat
 obj/readbyte
 obj/writebyte
 obj/remove
+obj/lseek
