@@ -15,13 +15,13 @@
 #include <stdio.h>
 #include <trsdos.h>
 
-int readbyte(int handle)
+int readbyte(int fd)
 {
 
 	struct TRSDOS_FILE *trs80_file;
 	int buffer;
 
-	trs80_file = (void *) handle;
+	trs80_file = (void *) fd;
 	
 	buffer = (trsdos_get(&trs80_file->fcb));
 
