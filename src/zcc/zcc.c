@@ -840,10 +840,12 @@ int main(int argc, char **argv)
     add_option_to_compiler("");
 
     // Add an alias for gencon
-    snprintf(buffer,sizeof(buffer),"-alias=--generic-console=-pragma-redirect:fputc_cons=fputc_cons_generic");
-    parse_cmdline_arg(buffer);
-    snprintf(buffer,sizeof(buffer),"-alias=--hardware-keyboard=-pragma-redirect:fgetc_cons=fgetc_cons_inkey");
-    parse_cmdline_arg(buffer);
+    snprintf(buffer,sizeof(buffer),"ALIAS --generic-console -pragma-redirect:fputc_cons=fputc_cons_generic");
+    parse_configfile_line(buffer);
+    snprintf(buffer,sizeof(buffer),"ALIAS --hardware-keyboard -pragma-redirect:fgetc_cons=fgetc_cons_inkey");
+    parse_configfile_line(buffer);
+    snprintf(buffer,sizeof(buffer),"ALIAS --math32 -Cs-fp-mode=ieee -lmath32");
+    parse_configfile_line(buffer);
 
     gc = 1;            /* Set for the first argument to scan for */
     if (argc == 1) {
@@ -890,9 +892,11 @@ int main(int argc, char **argv)
             *dest++ = *ptr++;
         }
         *dest = 0;
+        while ( isspace(*ptr) )
+           ptr++;
         aliases = realloc(aliases, (aliases_num + 2) * sizeof(aliases[0]));
         aliases[aliases_num++] = strdup(buf);
-        aliases[aliases_num++] = strdup(++ptr);
+        aliases[aliases_num++] = strdup(ptr);
     }
 
     /* Now, let's parse the command line arguments */
