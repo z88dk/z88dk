@@ -3,7 +3,7 @@
  *  FCNTL library for the TRS-80
  *	Stefano Bodrato - 2019
  *
- *	int close(int handle)
+ *	int close(int file_descriptor)
  *	closes file and frees memory
  *
  *	$Id: close.c $
@@ -17,19 +17,19 @@
 
 
 
-int close(int handle)
+int close(int fd)
 {
 
 	struct TRSDOS_FILE *trs80_file;
 
 
-	trs80_file = (void *) handle;
+	trs80_file = (void *) fd;
 
 	/* Let's close the file only if TRSDOS thinks it is open */
 	if (trs80_file->fcb->type & 0x80) {
 		trsdos(DOS_CLOSE, 0, trs80_file->fcb);
 	}
-	free(handle);
+	free(fd);
 
 	return 0;
 
