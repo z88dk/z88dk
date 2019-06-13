@@ -3,15 +3,15 @@
  *	Stefano Bodrato - 2019
  *
  *	Internal use only
- *  At the moment this extra function is almost useless, the tested versions of TRSDOS accept \0 in place of CR as filename termination.
- *  By the way having a funtion to deal with filename formatting is a good idea to easily add extra formatting, filename conversion, etc..
- *
+ *  The tested versions of TRSDOS/NEWDOS accept \0 in place of CR as filename termination,
+ *  but we change it according to some of the existing docs.
  *
  *	$Id: initdcb.c $
  */
 
 #include <trsdos.h>
 
+#include <ctype.h>
 #include <string.h>
 #include <malloc.h>
 
