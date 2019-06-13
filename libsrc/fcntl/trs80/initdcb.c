@@ -26,7 +26,7 @@ int initdcb(char *filespec, struct TRSDOS_FCB *fcb)
 	
 	strcpy (_trs80_dcb_fname,filespec);
 	
-	for (x=0; x<strlen(_trs80_dcb_fname); x++) {
+	for (x=0; x<33; x++) {
 		_trs80_dcb_fname[x] = toupper(_trs80_dcb_fname[x]);
 		if (_trs80_dcb_fname[x]==0) _trs80_dcb_fname[x]=13;
 		//if (_trs80_dcb_fname[x]=='.') _trs80_dcb_fname[x]='/';
