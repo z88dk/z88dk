@@ -8,6 +8,8 @@ CFILES = \
 	close.c  \
 	readbyte.c  \
 	writebyte.c  \
+	read.c  \
+	write.c  \
 	lseek.c  \
 	creat.c  \
 	remove.c
