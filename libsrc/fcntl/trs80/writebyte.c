@@ -4,7 +4,7 @@
  *
  *	Not user callable - internal LIB routine
  *
- *	Enter with de = filehandle
+ *	Enter with de = file descriptor
  *
  *	$Id: writebyte.c $
 */
@@ -16,13 +16,13 @@
 #include <trsdos.h>
 
 
-int writebyte(int handle, int byte)
+int writebyte(int fd, int byte)
 {
 	
 	struct TRSDOS_FILE *trs80_file;
 
 
-	trs80_file = (void *) handle;
+	trs80_file = (void *) fd;
 	
 	if (!trsdos_tst(DOS_PUT_BYTE, byte, trs80_file->fcb))
 		return (0);
