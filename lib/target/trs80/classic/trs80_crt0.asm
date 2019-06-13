@@ -78,14 +78,40 @@ start:
         ld      (exitsp),sp
 
 ; Optional definition for auto MALLOC init; it takes
-; all the space between the end of the program and UDG
+; all the space between the end of the program and himem
+; on TRS-80 the stack is defined elsewhere
 IF DEFINED_USING_amalloc
-	; Foo value, but better than using SP (which is at a low position)
-	defc	CRT_MAX_HEAP_ADDRESS = 65535
-	; The correct value for himem could be found looking at:
-	;4049h -> himem ptr on Model I
-	;4411h -> himem ptr on Model III
-	INCLUDE "crt/classic/crt_init_amalloc.asm"
+	ld	a,($54)					; Get byte from ROM
+	dec	a						; Determine if Mod 1 or 3
+	ld	hl,($4411)				; himem ptr on Model III
+	jr	nz,set_max_heap_addr	; Go if Model III
+	ld	hl,($4049)				; himem ptr on Model I
+
+set_max_heap_addr:
+	push hl
+
+	ld	hl,_heap
+	ld	c,(hl)
+	inc	hl
+	ld	b,(hl)
+	inc bc
+	; compact way to do "mallinit()"
+	xor	a
+	ld	(hl),a
+	dec hl
+	ld	(hl),a
+
+	pop hl	; sp
+	sbc hl,bc	; hl = total free memory
+
+	push bc ; main address for malloc area
+	push hl	; area size
+	EXTERN sbrk_callee
+	call	sbrk_callee
+
+;	Possible static declaration assuming we have 16K
+;	defc	CRT_MAX_HEAP_ADDRESS = 32768
+;	INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
 
 
