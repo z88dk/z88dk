@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.6.9 #9958 (Linux)
+; Version 3.9.1 #11276 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -210,6 +210,8 @@
 	GLOBAL _m32_sqrtf
 	GLOBAL _m32_invf
 	GLOBAL _m32_sqrf
+	GLOBAL _m32_div2f
+	GLOBAL _m32_mul2f
 	GLOBAL _m32_roundf
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
@@ -276,22 +278,22 @@ _m32_atan2f:
 	push	ix
 	ld	ix,0
 	add	ix,sp
-	ld	hl, -9
-	add	hl, sp
-	ld	sp, hl
-	ld	l,(ix+8)
-	ld	h,(ix+9)
+	push	af
+	push	af
+	dec	sp
 	ld	e,(ix+10)
 	ld	d,(ix+11)
+	ld	l,(ix+8)
+	ld	h,(ix+9)
 	call	_m32_fabsf
-	ld	(ix-1),d
-	ld	(ix-2),e
-	ld	(ix-3),h
 	ld	(ix-4),l
-	ld	l,(ix+4)
-	ld	h,(ix+5)
+	ld	(ix-3),h
+	ld	(ix-2),e
+	ld	(ix-1),d
 	ld	e,(ix+6)
 	ld	d,(ix+7)
+	ld	l,(ix+4)
+	ld	h,(ix+5)
 	call	_m32_fabsf
 	push	hl
 	push	de
@@ -318,7 +320,7 @@ _m32_atan2f:
 	push	hl
 	call	___fslt_callee
 	bit	0,l
-	jp	NZ,l_m32_atan2f_00107
+	jp	NZ, l_m32_atan2f_00107
 	ld	l,(ix+10)
 	ld	h,(ix+11)
 	push	hl
@@ -352,7 +354,7 @@ _m32_atan2f:
 	call	___fslt_callee
 	pop	de
 	pop	bc
-	bit	0, l
+	bit	0,l
 	jr	NZ,l_m32_atan2f_00102
 	ld	hl,0x4049
 	push	hl
@@ -377,7 +379,7 @@ l_m32_atan2f_00102:
 l_m32_atan2f_00105:
 	ld	l, c
 	ld	h, b
-	jr	l_m32_atan2f_00111
+	jp	l_m32_atan2f_00111
 l_m32_atan2f_00107:
 	ld	l,(ix+6)
 	ld	h,(ix+7)
@@ -393,13 +395,13 @@ l_m32_atan2f_00107:
 	push	hl
 	call	___fsdiv_callee
 	call	_m32_atanf
-	ld	a, d
+	ld	a,d
 	xor	a,0x80
-	ld	c, a
-	ld	(ix-9),l
-	ld	(ix-8),h
-	ld	(ix-7),e
-	ld	(ix-6),c
+	ld	d,a
+	ld	(ix-4),l
+	ld	(ix-3),h
+	ld	(ix-2),e
+	ld	(ix-1),d
 	ld	a,(ix-5)
 	or	a, a
 	jr	Z,l_m32_atan2f_00109
@@ -407,27 +409,33 @@ l_m32_atan2f_00107:
 	push	hl
 	ld	hl,0x0fdb
 	push	hl
-	ld	l,(ix-7)
-	ld	h,(ix-6)
+	ld	l,(ix-2)
+	ld	h,(ix-1)
 	push	hl
-	ld	l,(ix-9)
-	ld	h,(ix-8)
+	ld	l,(ix-4)
+	ld	h,(ix-3)
 	push	hl
 	call	___fssub_callee
+	ld	c, l
+	ld	b, h
 	jr	l_m32_atan2f_00110
 l_m32_atan2f_00109:
 	ld	hl,0x3fc9
 	push	hl
 	ld	hl,0x0fdb
 	push	hl
-	ld	l,(ix-7)
-	ld	h,(ix-6)
+	ld	l,(ix-2)
+	ld	h,(ix-1)
 	push	hl
-	ld	l,(ix-9)
-	ld	h,(ix-8)
+	ld	l,(ix-4)
+	ld	h,(ix-3)
 	push	hl
 	call	___fsadd_callee
+	ld	c, l
+	ld	b, h
 l_m32_atan2f_00110:
+	ld	l, c
+	ld	h, b
 l_m32_atan2f_00111:
 	ld	sp, ix
 	pop	ix

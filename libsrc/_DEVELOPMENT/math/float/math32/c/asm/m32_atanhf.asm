@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.6.9 #9958 (Linux)
+; Version 3.9.1 #11276 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -291,10 +291,10 @@ _m32_atanhf:
 	push	de
 	push	bc
 	call	___fsadd_callee
-	ld	(ix-1),d
-	ld	(ix-2),e
-	ld	(ix-3),h
 	ld	(ix-4),l
+	ld	(ix-3),h
+	ld	(ix-2),e
+	ld	(ix-1),d
 	pop	de
 	pop	bc
 	push	de

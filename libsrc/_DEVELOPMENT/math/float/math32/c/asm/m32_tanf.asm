@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.6.9 #9958 (Linux)
+; Version 3.9.1 #11276 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -205,9 +205,13 @@
 ; Externals used
 ;--------------------------------------------------------
 	GLOBAL _m32_polyf
+	GLOBAL _m32_hypotf
 	GLOBAL _m32_invsqrtf
+	GLOBAL _m32_sqrtf
 	GLOBAL _m32_invf
 	GLOBAL _m32_sqrf
+	GLOBAL _m32_div2f
+	GLOBAL _m32_mul2f
 	GLOBAL _m32_roundf
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
@@ -216,12 +220,10 @@
 	GLOBAL _m32_ldexpf
 	GLOBAL _m32_frexpf
 	GLOBAL _m32_fabsf
-	GLOBAL _m32_hypotf
 	GLOBAL _m32_powf
 	GLOBAL _m32_log10f
 	GLOBAL _m32_logf
 	GLOBAL _m32_expf
-	GLOBAL _m32_sqrtf
 	GLOBAL _m32_atanhf
 	GLOBAL _m32_acoshf
 	GLOBAL _m32_asinhf
@@ -278,23 +280,31 @@ _m32_tanf:
 	add	ix,sp
 	push	af
 	push	af
-	push	hl
-	push	de
-	call	_m32_sinf
-	ld	(ix-1),d
-	ld	(ix-2),e
-	ld	(ix-3),h
+	push	af
+	push	af
 	ld	(ix-4),l
-	pop	de
-	pop	hl
+	ld	(ix-3),h
+	ld	(ix-2),e
+	ld	(ix-1),d
+	ld	l,(ix-4)
+	ld	h,(ix-3)
+	call	_m32_sinf
+	ld	(ix-8),l
+	ld	(ix-7),h
+	ld	(ix-6),e
+	ld	(ix-5),d
+	ld	e,(ix-2)
+	ld	d,(ix-1)
+	ld	l,(ix-4)
+	ld	h,(ix-3)
 	call	_m32_cosf
 	push	de
 	push	hl
-	ld	l,(ix-2)
-	ld	h,(ix-1)
+	ld	l,(ix-6)
+	ld	h,(ix-5)
 	push	hl
-	ld	l,(ix-4)
-	ld	h,(ix-3)
+	ld	l,(ix-8)
+	ld	h,(ix-7)
 	push	hl
 	call	___fsdiv
 	ld	sp,ix

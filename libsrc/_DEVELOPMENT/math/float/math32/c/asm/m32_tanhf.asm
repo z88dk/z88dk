@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.6.9 #9958 (Linux)
+; Version 3.9.1 #11276 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -210,6 +210,8 @@
 	GLOBAL _m32_sqrtf
 	GLOBAL _m32_invf
 	GLOBAL _m32_sqrf
+	GLOBAL _m32_div2f
+	GLOBAL _m32_mul2f
 	GLOBAL _m32_roundf
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
@@ -276,14 +278,21 @@ _m32_tanhf:
 	push	ix
 	ld	ix,0
 	add	ix,sp
-	ld	hl, -8
-	add	hl, sp
-	ld	sp, hl
+	push	af
+	push	af
+	push	af
+	push	af
 	call	_m32_expf
 	ld	(ix-8),l
 	ld	(ix-7),h
 	ld	(ix-6),e
 	ld	(ix-5),d
+	pop	bc
+	pop	de
+	push	de
+	ld	l,c
+	ld	h,b
+	push	hl
 	call	_m32_invf
 	push	de
 	push	hl
@@ -294,14 +303,16 @@ _m32_tanhf:
 	ld	h,(ix-7)
 	push	hl
 	call	___fssub_callee
-	ld	(ix-1),d
-	ld	(ix-2),e
-	ld	(ix-3),h
 	ld	(ix-4),l
-	ld	l,(ix-8)
-	ld	h,(ix-7)
-	ld	e,(ix-6)
-	ld	d,(ix-5)
+	ld	(ix-3),h
+	ld	(ix-2),e
+	ld	(ix-1),d
+	pop	bc
+	pop	de
+	push	de
+	ld	l,c
+	ld	h,b
+	push	hl
 	call	_m32_invf
 	push	de
 	push	hl

@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.6.9 #9958 (Linux)
+; Version 3.9.1 #11276 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -210,6 +210,8 @@
 	GLOBAL _m32_sqrtf
 	GLOBAL _m32_invf
 	GLOBAL _m32_sqrf
+	GLOBAL _m32_div2f
+	GLOBAL _m32_mul2f
 	GLOBAL _m32_roundf
 	GLOBAL _m32_modff
 	GLOBAL _m32_floorf
@@ -341,7 +343,7 @@ l_m32_fmodf_00102:
 	call	___fslt_callee
 	pop	de
 	pop	bc
-	bit	0, l
+	bit	0,l
 	jr	NZ,l_m32_fmodf_00105
 	ld	l,(ix+10)
 	ld	h,(ix+11)
@@ -353,11 +355,10 @@ l_m32_fmodf_00102:
 	push	bc
 	call	___fssub_callee
 	ld	c, l
-	jr	l_m32_fmodf_00106
+	ld	b, h
 l_m32_fmodf_00105:
-	ld	h, b
-l_m32_fmodf_00106:
 	ld	l, c
+	ld	h, b
 l_m32_fmodf_00103:
 	pop	ix
 	ret

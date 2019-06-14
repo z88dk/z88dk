@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.6.9 #9958 (Linux)
+; Version 3.9.1 #11276 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -279,151 +279,117 @@ _m32_logf:
 	push	ix
 	ld	ix,0
 	add	ix,sp
-	ld	hl, -22
+	ld	c, l
+	ld	b, h
+	ld	hl, -17
 	add	hl, sp
 	ld	sp, hl
-	ld	(ix-13),l
-	ld	(ix-12),h
-	ld	(ix-11),e
-	ld	(ix-10),d
+	ld	(ix-5),c
+	ld	(ix-4),b
+	ld	(ix-3),e
+	ld	l, e
+	ld	(ix-2),d
+	ld	h,d
+	push	hl
+	ld	l,(ix-5)
+	ld	h,(ix-4)
+	push	hl
 	ld	hl,0x0000
 	push	hl
 	push	hl
-	ld	l,(ix-11)
-	ld	h,(ix-10)
-	push	hl
-	ld	l,(ix-13)
-	ld	h,(ix-12)
-	push	hl
-	call	___fsgt_callee
-	ld	(ix-5),l
+	call	___fslt_callee
 	bit	0,l
 	jr	NZ,l_m32_logf_00102
 	ld	de,0xc2b1
 	ld	hl,0x7218
 	jp	l_m32_logf_00110
 l_m32_logf_00102:
-	ld	hl,0x0000
+	ld	hl,16
 	add	hl, sp
 	push	hl
-	ld	l,(ix-11)
-	ld	h,(ix-10)
+	ld	l,(ix-3)
+	ld	h,(ix-2)
 	push	hl
-	ld	l,(ix-13)
-	ld	h,(ix-12)
+	ld	l,(ix-5)
+	ld	h,(ix-4)
 	push	hl
 	call	_m32_frexpf
-	ld	(ix-10),d
-	ld	(ix-11),e
-	ld	(ix-12),h
-	ld	(ix-13),l
-	ld	hl,18
-	add	hl, sp
-	ex	de, hl
-	ld	hl,9
-	add	hl, sp
-	ld	bc,4
-	ldir
+	push	hl
+	ld	c,l
+	ld	b,h
+	push	de
 	ld	hl,0x3f35
 	push	hl
 	ld	hl,0x04f3
 	push	hl
-	ld	l,(ix-2)
-	ld	h,(ix-1)
-	push	hl
-	ld	l,(ix-4)
-	ld	h,(ix-3)
-	push	hl
+	push	de
+	push	bc
 	call	___fslt_callee
-	ld	(ix-5),l
-	ld	a, l
+	pop	de
+	pop	bc
+	ld	a,l
 	or	a, a
 	jr	Z,l_m32_logf_00104
-	dec	(ix-22)
-	ld	l,(ix-2)
-	ld	h,(ix-1)
-	push	hl
-	ld	l,(ix-4)
-	ld	h,(ix-3)
-	push	hl
-	ld	l,(ix-2)
-	ld	h,(ix-1)
-	push	hl
-	ld	l,(ix-4)
-	ld	h,(ix-3)
-	push	hl
+	dec	(ix-1)
+	push	de
+	push	bc
+	push	de
+	push	bc
 	call	___fsadd_callee
-	ld	(ix-10),d
-	ld	(ix-11),e
-	ld	(ix-12),h
-	ld	(ix-13),l
-	ld	hl,0x3f80
-	push	hl
-	ld	hl,0x0000
-	push	hl
-	ld	l,(ix-11)
-	ld	h,(ix-10)
-	push	hl
-	ld	l,(ix-13)
-	ld	h,(ix-12)
+	ld	bc,0x3f80
+	push	bc
+	ld	bc,0x0000
+	push	bc
+	push	de
 	push	hl
 	call	___fssub_callee
-	ld	(ix-10),d
-	ld	(ix-11),e
-	ld	(ix-12),h
-	ld	(ix-13),l
+	ld	(ix-17),l
+	ld	(ix-16),h
+	ld	(ix-15),e
+	ld	(ix-14),d
 	jr	l_m32_logf_00105
 l_m32_logf_00104:
 	ld	hl,0x3f80
 	push	hl
 	ld	hl,0x0000
 	push	hl
-	ld	l,(ix-2)
-	ld	h,(ix-1)
-	push	hl
-	ld	l,(ix-4)
-	ld	h,(ix-3)
-	push	hl
+	push	de
+	push	bc
 	call	___fssub_callee
-	ld	(ix-14),d
-	ld	(ix-15),e
-	ld	(ix-16),h
 	ld	(ix-17),l
-	ld	hl,9
-	add	hl, sp
-	ex	de, hl
-	ld	hl,5
-	add	hl, sp
-	ld	bc,4
-	ldir
+	ld	(ix-16),h
+	ld	(ix-15),e
+	ld	(ix-14),d
 l_m32_logf_00105:
-	ld	l,(ix-13)
-	ld	h,(ix-12)
-	ld	e,(ix-11)
-	ld	d,(ix-10)
+	pop	bc
+	pop	de
+	push	de
+	ld	l,c
+	ld	h,b
+	push	hl
 	call	_m32_sqrf
-	ld	(ix-17),l
-	ld	(ix-16),h
-	ld	(ix-15),e
-	ld	(ix-14),d
+	ld	(ix-13),l
+	ld	(ix-12),h
+	ld	(ix-11),e
+	ld	(ix-10),d
 	ld	hl,0x0009
 	push	hl
 	ld	hl,_m32_coeff_log
 	push	hl
-	ld	l,(ix-11)
-	ld	h,(ix-10)
-	push	hl
-	ld	l,(ix-13)
-	ld	h,(ix-12)
-	push	hl
-	call	_m32_polyf
-	ld	c, l
 	ld	l,(ix-15)
-	ld	b,h
 	ld	h,(ix-14)
 	push	hl
 	ld	l,(ix-17)
 	ld	h,(ix-16)
+	push	hl
+	call	_m32_polyf
+	ld	c, l
+	ld	l,(ix-11)
+	ld	b,h
+	ld	h,(ix-10)
+	push	hl
+	ld	l,(ix-13)
+	ld	h,(ix-12)
 	push	hl
 	push	de
 	push	bc
@@ -432,17 +398,21 @@ l_m32_logf_00105:
 	ld	(ix-8),h
 	ld	(ix-7),e
 	ld	(ix-6),d
-	ld	a,(ix-22)
+	ld	a,(ix-1)
 	or	a, a
 	jr	Z,l_m32_logf_00107
 	push	af
 	inc	sp
 	call	___schar2fs_callee
-	ld	(ix-21),l
-	ld	(ix-20),h
-	ld	(ix-19),e
-	ld	(ix-18),d
-	push	de
+	ld	(ix-5),l
+	ld	(ix-4),h
+	ld	(ix-3),e
+	ld	l, e
+	ld	(ix-2),d
+	ld	h,d
+	push	hl
+	ld	l,(ix-5)
+	ld	h,(ix-4)
 	push	hl
 	ld	hl,0xb95e
 	push	hl
@@ -463,10 +433,10 @@ l_m32_logf_00105:
 	ld	(ix-7),e
 	ld	(ix-6),d
 l_m32_logf_00107:
-	ld	l,(ix-17)
-	ld	h,(ix-16)
-	ld	e,(ix-15)
-	ld	d,(ix-14)
+	ld	e,(ix-11)
+	ld	d,(ix-10)
+	ld	l,(ix-13)
+	ld	h,(ix-12)
 	call	_m32_div2f
 	push	de
 	push	hl
@@ -479,48 +449,42 @@ l_m32_logf_00107:
 	call	___fssub_callee
 	push	de
 	push	hl
-	ld	l,(ix-11)
-	ld	h,(ix-10)
+	ld	l,(ix-15)
+	ld	h,(ix-14)
 	push	hl
-	ld	l,(ix-13)
-	ld	h,(ix-12)
+	ld	l,(ix-17)
+	ld	h,(ix-16)
 	push	hl
 	call	___fsadd_callee
-	ld	(ix-6),d
-	ld	(ix-7),e
-	ld	(ix-8),h
-	ld	(ix-9),l
-	ld	e,(ix-7)
-	ld	d,(ix-6)
-	ld	a,(ix-22)
+	ld	a,(ix-1)
 	or	a,a
 	ld	c,l
 	ld	b,h
 	jr	Z,l_m32_logf_00109
 	push	bc
 	push	de
-	ld	l,(ix-19)
-	ld	h,(ix-18)
+	ld	l,(ix-3)
+	ld	h,(ix-2)
 	push	hl
-	ld	l,(ix-21)
-	ld	h,(ix-20)
+	ld	l,(ix-5)
+	ld	h,(ix-4)
 	push	hl
 	ld	hl,0x3f31
 	push	hl
 	ld	hl,0x8000
 	push	hl
 	call	___fsmul_callee
-	ld	(ix-6),d
-	ld	(ix-7),e
-	ld	(ix-8),h
-	ld	(ix-9),l
+	ld	(ix-5),l
+	ld	(ix-4),h
+	ld	(ix-3),e
+	ld	(ix-2),d
 	pop	de
 	pop	bc
-	ld	l,(ix-7)
-	ld	h,(ix-6)
+	ld	l,(ix-3)
+	ld	h,(ix-2)
 	push	hl
-	ld	l,(ix-9)
-	ld	h,(ix-8)
+	ld	l,(ix-5)
+	ld	h,(ix-4)
 	push	hl
 	push	de
 	push	bc

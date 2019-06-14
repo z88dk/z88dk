@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.6.9 #9958 (Linux)
+; Version 3.9.1 #11276 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -210,6 +210,8 @@
 	GLOBAL _m32_sqrtf
 	GLOBAL _m32_invf
 	GLOBAL _m32_sqrf
+	GLOBAL _m32_div2f
+	GLOBAL _m32_mul2f
 	GLOBAL _m32_roundf
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
@@ -278,18 +280,22 @@ _m32_atanf:
 	push	ix
 	ld	ix,0
 	add	ix,sp
+	ld	c, l
+	ld	b, h
 	ld	hl, -14
 	add	hl, sp
 	ld	sp, hl
-	ld	(ix-4),l
-	ld	(ix-3),h
+	ld	(ix-4),c
+	ld	(ix-3),b
 	ld	(ix-2),e
 	ld	(ix-1),d
+	ld	l,(ix-4)
+	ld	h,(ix-3)
 	call	_m32_fabsf
-	ld	(ix-8),l
-	ld	(ix-7),h
-	ld	(ix-6),e
-	ld	(ix-5),d
+	ld	(ix-14),l
+	ld	(ix-13),h
+	ld	(ix-12),e
+	ld	(ix-11),d
 	ld	a,d
 	and	a,0x7f
 	or	a,e
@@ -301,37 +307,42 @@ _m32_atanf:
 	ld	d,h
 	jp	l_m32_atanf_00107
 l_m32_atanf_00102:
+	ld	l,(ix-12)
+	ld	h,(ix-11)
+	push	hl
+	ld	l,(ix-14)
+	ld	h,(ix-13)
+	push	hl
 	ld	hl,0x3f80
 	push	hl
 	ld	hl,0x0000
 	push	hl
-	ld	l,(ix-6)
-	ld	h,(ix-5)
-	push	hl
-	ld	l,(ix-8)
-	ld	h,(ix-7)
-	push	hl
-	call	___fsgt_callee
-	ld	c,0x00
-	ld	(ix-10),l
-	ld	(ix-9),c
-	ld	a, c
-	or	a,l
+	call	___fslt_callee
+	ld	c, l
+	ld	b,0x00
+	ld	(ix-10),c
+	ld	(ix-9),b
+	ld	a, b
+	or	a, c
 	jr	Z,l_m32_atanf_00104
-	ld	l,(ix-8)
-	ld	h,(ix-7)
-	ld	e,(ix-6)
-	ld	d,(ix-5)
+	pop	bc
+	pop	de
+	push	de
+	ld	l,c
+	ld	h,b
+	push	hl
 	call	_m32_invf
-	ld	(ix-8),l
-	ld	(ix-7),h
-	ld	(ix-6),e
-	ld	(ix-5),d
+	ld	(ix-14),l
+	ld	(ix-13),h
+	ld	(ix-12),e
+	ld	(ix-11),d
 l_m32_atanf_00104:
-	ld	l,(ix-8)
-	ld	h,(ix-7)
-	ld	e,(ix-6)
-	ld	d,(ix-5)
+	pop	bc
+	pop	de
+	push	de
+	ld	l,c
+	ld	h,b
+	push	hl
 	call	_m32_sqrf
 	push	hl
 	ld	c,l
@@ -344,10 +355,10 @@ l_m32_atanf_00104:
 	push	de
 	push	bc
 	call	_m32_polyf
-	ld	(ix-11),d
-	ld	(ix-12),e
-	ld	(ix-13),h
-	ld	(ix-14),l
+	ld	(ix-8),l
+	ld	(ix-7),h
+	ld	(ix-6),e
+	ld	(ix-5),d
 	pop	de
 	pop	bc
 	ld	hl,0x0004
@@ -359,20 +370,20 @@ l_m32_atanf_00104:
 	call	_m32_polyf
 	push	de
 	push	hl
-	ld	l,(ix-12)
-	ld	h,(ix-11)
-	push	hl
-	ld	l,(ix-14)
-	ld	h,(ix-13)
-	push	hl
-	call	___fsdiv_callee
-	push	de
-	push	hl
 	ld	l,(ix-6)
 	ld	h,(ix-5)
 	push	hl
 	ld	l,(ix-8)
 	ld	h,(ix-7)
+	push	hl
+	call	___fsdiv_callee
+	push	de
+	push	hl
+	ld	l,(ix-12)
+	ld	h,(ix-11)
+	push	hl
+	ld	l,(ix-14)
+	ld	h,(ix-13)
 	push	hl
 	call	___fsmul_callee
 	ld	a,(ix-9)
@@ -404,7 +415,7 @@ l_m32_atanf_00106:
 	call	___fslt_callee
 	pop	de
 	pop	bc
-	ld	a, l
+	ld	a,l
 	or	a, a
 	jr	Z,l_m32_atanf_00109
 	ld	a, d
