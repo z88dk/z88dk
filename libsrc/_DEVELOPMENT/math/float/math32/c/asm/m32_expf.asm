@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.6.9 #9958 (Linux)
+; Version 3.9.1 #11276 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -210,6 +210,8 @@
 	GLOBAL _m32_sqrtf
 	GLOBAL _m32_invf
 	GLOBAL _m32_sqrf
+	GLOBAL _m32_div2f
+	GLOBAL _m32_mul2f
 	GLOBAL _m32_roundf
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
@@ -277,14 +279,20 @@ _m32_expf:
 	push	ix
 	ld	ix,0
 	add	ix,sp
+	ld	c, l
+	ld	b, h
 	ld	hl, -14
 	add	hl, sp
 	ld	sp, hl
-	ld	(ix-8),l
-	ld	(ix-7),h
-	ld	(ix-6),e
-	ld	(ix-5),d
-	push	de
+	ld	(ix-12),c
+	ld	(ix-11),b
+	ld	(ix-10),e
+	ld	l, e
+	ld	(ix-9),d
+	ld	h,d
+	push	hl
+	ld	l,(ix-12)
+	ld	h,(ix-11)
 	push	hl
 	ld	hl,0x3fb8
 	push	hl
@@ -302,14 +310,14 @@ _m32_expf:
 	push	de
 	push	hl
 	call	___fs2sint_callee
-	pop	bc
+	pop	de
 	push	hl
 	push	hl
 	call	___sint2fs_callee
-	ld	(ix-9),d
-	ld	(ix-10),e
-	ld	(ix-11),h
-	ld	(ix-12),l
+	ld	(ix-8),l
+	ld	(ix-7),h
+	ld	(ix-6),e
+	ld	(ix-5),d
 	push	de
 	push	hl
 	ld	hl,0x3f31
@@ -319,22 +327,22 @@ _m32_expf:
 	call	___fsmul_callee
 	push	de
 	push	hl
-	ld	l,(ix-6)
-	ld	h,(ix-5)
+	ld	l,(ix-10)
+	ld	h,(ix-9)
 	push	hl
-	ld	l,(ix-8)
-	ld	h,(ix-7)
+	ld	l,(ix-12)
+	ld	h,(ix-11)
 	push	hl
 	call	___fssub_callee
 	ld	(ix-4),l
 	ld	(ix-3),h
 	ld	(ix-2),e
 	ld	(ix-1),d
-	ld	l,(ix-10)
-	ld	h,(ix-9)
+	ld	l,(ix-6)
+	ld	h,(ix-5)
 	push	hl
-	ld	l,(ix-12)
-	ld	h,(ix-11)
+	ld	l,(ix-8)
+	ld	h,(ix-7)
 	push	hl
 	ld	hl,0xb95e
 	push	hl
@@ -354,11 +362,15 @@ _m32_expf:
 	ld	(ix-11),h
 	ld	(ix-10),e
 	ld	(ix-9),d
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
 	call	_m32_sqrf
-	ld	(ix-5),d
-	ld	(ix-6),e
-	ld	(ix-7),h
 	ld	(ix-8),l
+	ld	(ix-7),h
+	ld	(ix-6),e
+	ld	(ix-5),d
 	ld	hl,0x0005
 	push	hl
 	ld	hl,_m32_coeff_exp
@@ -397,11 +409,13 @@ _m32_expf:
 	push	de
 	push	hl
 	call	___fsadd_callee
-	pop	bc
-	push	bc
-	push	bc
-	push	de
+	ld	c, l
+	ld	b, h
+	pop	hl
 	push	hl
+	push	hl
+	push	de
+	push	bc
 	call	_m32_ldexpf
 	ld	sp, ix
 	pop	ix

@@ -7,4 +7,4 @@ CFLAGS += -I.
 all: $(addprefix asm/,$(AFILES))
 
 asm/%.asm: %.c
-	zcc +z80 -clib=sdcc_ix --max-allocs-per-node200000 -SO3 $(CFLAGS) -a $^ -o $@
+	zcc +z80 -clib=sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 -SO3 $(CFLAGS) -a $^ -o $@

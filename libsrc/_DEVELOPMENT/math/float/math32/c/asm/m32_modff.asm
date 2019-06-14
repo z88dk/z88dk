@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.6.9 #9958 (Linux)
+; Version 3.9.1 #11276 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -205,9 +205,13 @@
 ; Externals used
 ;--------------------------------------------------------
 	GLOBAL _m32_polyf
+	GLOBAL _m32_hypotf
 	GLOBAL _m32_invsqrtf
+	GLOBAL _m32_sqrtf
 	GLOBAL _m32_invf
 	GLOBAL _m32_sqrf
+	GLOBAL _m32_div2f
+	GLOBAL _m32_mul2f
 	GLOBAL _m32_roundf
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_floorf
@@ -215,12 +219,10 @@
 	GLOBAL _m32_ldexpf
 	GLOBAL _m32_frexpf
 	GLOBAL _m32_fabsf
-	GLOBAL _m32_hypotf
 	GLOBAL _m32_powf
 	GLOBAL _m32_log10f
 	GLOBAL _m32_logf
 	GLOBAL _m32_expf
-	GLOBAL _m32_sqrtf
 	GLOBAL _m32_atanhf
 	GLOBAL _m32_acoshf
 	GLOBAL _m32_asinhf
@@ -292,6 +294,7 @@ _m32_modff:
 	ld	c, l
 	ld	b, h
 	pop	hl
+	push	hl
 	ld	(hl), c
 	inc	hl
 	ld	(hl), b
@@ -307,7 +310,8 @@ _m32_modff:
 	ld	l,(ix+4)
 	ld	h,(ix+5)
 	push	hl
-	call	___fssub_callee
+	call	___fssub
+	ld	sp,ix
 	pop	ix
 	ret
 	SECTION IGNORE

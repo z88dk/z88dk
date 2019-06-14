@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.6.9 #9958 (Linux)
+; Version 3.9.1 #11276 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -210,6 +210,8 @@
 	GLOBAL _m32_sqrtf
 	GLOBAL _m32_invf
 	GLOBAL _m32_sqrf
+	GLOBAL _m32_div2f
+	GLOBAL _m32_mul2f
 	GLOBAL _m32_roundf
 	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
