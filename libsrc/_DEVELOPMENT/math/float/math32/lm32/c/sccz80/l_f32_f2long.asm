@@ -15,24 +15,30 @@ l_f32_f2sint:
 l_f32_f2uint:
 l_f32_f2slong:
 l_f32_f2ulong:
+	ld	b,d
         ld      a,d		;Holds sign + 7bits of exponent
         rl	e
         rla                     ;a = Exponent
         and     a
-	jp	z,l_f32_zero	;Expontent was 0, return 0
-        cp      $7e + 24
+	jp	z,l_f32_zero	;Exponent was 0, return 0
+        cp      $7e + 32
 	jp	nc,l_f32_zero	;Number too large
 	; e register is rotated by bit, restore the hidden bit and rotate back
 	scf
 	rr	e
+	ld	d,e
+	ld	e,h
+	ld	h,l
+	ld	l,0
 loop:
-	srl	e		;Fill with 0
+	srl	d		;Fill with 0
+	rr	e
 	rr	h
 	rr	l
+	rr	c
 	inc	a
-	cp	$7e + 24
+	cp	$7e + 32
 	jr	nz,loop
-	rl	d		;Check sign bit
-	ld	d,0
-	jp	c,l_long_neg
+	rl	b		;Check sign bit
+	call	c,l_long_neg
 	ret
