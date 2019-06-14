@@ -50,7 +50,7 @@
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
-SECTION code_math
+SECTION code_fp_math32
 
 EXTERN m32_fszero_fastcall
 EXTERN m32_mulu_32h_24x24
@@ -97,8 +97,8 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     push bc                     ; return address on stack
 
 .fmrejoin
-    xor a,h                     ; xor exponents
-    ex af,af                    ; save sign flag in a7' and f' reg
+    xor a,h                     ; xor sign flags
+    ex af,af                    ; save sign flag in a[7]' and f' reg
 
     add hl,hl                   ; shift exponent into h
     scf                         ; set implicit bit
@@ -127,15 +127,13 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 
 .fmnouf
     ld b,a
+    or a
+    jp Z,m32_fszero_fastcall    ; check sum of exponents for zero
+
     ex af,af
     ld a,b
-    ex af,af                    ; save sum of exponents a', and xor sign of exponents in f'
+    push af                     ; stack: sum of exponents a, and xor sign of exponents in f
 
-    ld a,b                      ; check sum of exponents for zero
-    or a
-    jp Z,m32_fszero_fastcall
-
-                                ; a' = sum of exponents, f' = Sign of result
                                 ; first  h  = eeeeeeee, lde  = 1mmmmmmm mmmmmmmm mmmmmmmm
                                 ; second h' = eeeeeeee, lde' = 1mmmmmmm mmmmmmmm mmmmmmmm
                                 ; sum of exponents in a', xor of exponents in sign f'
@@ -143,13 +141,7 @@ PUBLIC m32_fsmul, m32_fsmul_callee
                                 ; multiplication of two 24-bit numbers into a 32-bit product
     call m32_mulu_32h_24x24     ; exit  : HLDE  = 32-bit product
 
-    ex af,af                    ; retrieve sign and exponent from af'
-    jp P,fm1
-    scf
-
-.fm1
-    ld b,0                      ; put sign bit in B
-    rr b
+    pop bc                      ; retrieve sign and exponent from stack = b,c[7]
 
     bit 7,h                     ; need to shift result left if msb!=1
     jr NZ,fm2
@@ -159,29 +151,26 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     jr fm3
 
 .fm2
-    inc a
-    jr C,mulovl
+    inc b
+    jr Z,mulovl
 
 .fm3
-    ex af,af
-    ld a,e                      ; round using digi norm's method
-    or a
-    jr Z,fm4
-    set 0,d
-
-.fm4
-    ex af,af
-
+    ld a,e
     ld e,h                      ; put 24 bit mantissa in place, HLD into EHL
     ld h,l
     ld l,d
 
+    and 080h                    ; round using feilipu method
+    jr Z,fm4
+    set 0,l
+
+.fm4
     sla e                       ; adjust mantissa for exponent
-    sla b                       ; put sign in C
-    rra                         ; put sign and 7 exp bits into place
+    sla c                       ; put sign into C
+    rr b                        ; put sign and 7 exp bits into place
     rr e                        ; put last exp bit into place
-    ld d,a                      ; put sign and exponent in D
-    ret                         ; return DEHL
+    ld d,b                      ; put sign and exponent in D
+    ret                         ; return IEEE DEHL
 
 .mulovl
     ex af,af                    ; get sign

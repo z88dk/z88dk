@@ -27,6 +27,7 @@
 
 #include "ccdefs.h"
 #include <time.h>
+#include <math.h>
 
 extern int check_lastop_was_comparison(LVALUE* lval);
 
@@ -81,6 +82,8 @@ struct _mapping {
         { "dpush_under_int", "dpush2", NULL, "l_f64_dpush2" }, // Inlined
         { "fswap", "dswap", "l_f32_swap", "l_f64_swap" },
         { "fnegate", "minusfa", NULL, "l_f64_negate" },
+        { "ldexp", "l_f48_ldexp", "l_f32_ldexp", "l_f64_ldexp" },
+        { "inversef", NULL, "l_f32_invf", NULL }, // Called only for IEEE mode
         { NULL }
 };
 
@@ -1118,7 +1121,7 @@ int callstk(Type *type, int n, int isfarptr, int last_argument_size)
         // TOS = address, dehl = parameter
         // More than one argument, TOS = last parameter, hl = function
         // For long sp+0 = LSW, sp +2 = MSW, hl = function
-        if ( last_argument_size != 2 ) {
+        if ( last_argument_size == 2 ) {
             ol("pop\taf");
             outstr("\tld\tbc,"); printlabel(label);  nl();	// bc = return address
             ol("push\tbc");
@@ -1131,7 +1134,7 @@ int callstk(Type *type, int n, int isfarptr, int last_argument_size)
             ol("push\tbc"); /* Return address */		
             ol("push\taf");		
             Zsp += 2;
-         }
+         } 
          ol("ret");		
          postlabel(label);
          return ret;
@@ -1861,11 +1864,10 @@ void mult(LVALUE* lval)
                 ol("ld\td,l");
                 ol("ld\tb,8");
                 postlabel(label1);
-                ol("add\thl,hl");
                 opjumpr("nc,",label2);
-		ol("add\thl,de");
-		postlabel(label2);
-		outfmt("\tdjnz\ti_%d\n",label1);
+                ol("add\thl,de");
+                postlabel(label2);
+                outfmt("\tdjnz\ti_%d\n",label1);
                 break;
             }
         }
@@ -1879,6 +1881,26 @@ void mult_const(LVALUE *lval, int32_t value)
     quikmult(lval->val_type, value, NO);
 }
 
+int mult_dconst(LVALUE *lval, double value, int isrhs)
+{
+    int exp;
+
+    if ( value == 1.0 ) {
+        // We don't need to do anything
+        lval->ltype = type_double;
+        lval->val_type = KIND_DOUBLE;
+        return 1;
+    } else if ( frexp(value, &exp) == 0.5 ) {
+        // It's a power of two so we can nobble the exponent
+        loada(exp - 1);
+        callrts("ldexp");
+        lval->ltype = type_double;
+        lval->val_type = KIND_DOUBLE;
+        return 1;
+    }
+
+    return 0;
+}
 
 
 /* Divide the secondary register by the primary */
@@ -2005,6 +2027,18 @@ void zdiv_const(LVALUE *lval, int32_t value)
             zdiv(lval);
     }
 }
+
+int zdiv_dconst(LVALUE *lval, double value, int isrhs)
+{
+    if ( isrhs == 0.0 && value == 1.0 && c_maths_mode == MATHS_IEEE) {
+        callrts("inversef");
+        lval->ltype = type_double;
+        lval->val_type = KIND_DOUBLE;
+        return 1;
+    }
+    return 0;
+}
+
 
 /* Compute remainder (mod) of secondary register divided
  *      by the primary
@@ -3755,18 +3789,20 @@ void DoubSwap(void)
     callrts("fswap");
 }
 
-void vlongconst(uint32_t val)
+void vlongconst(double val)
 {
-    vconst(val % 65536);
-    const2(val / 65536);
+    uint32_t l = (uint32_t)(int64_t)val;
+    vconst(l % 65536);
+    const2(l / 65536);
 }
 
 
-void vlongconst_tostack(uint32_t val)
+void vlongconst_tostack(double val)
 {
-    constbc(val / 65536);
+    uint32_t l = (uint32_t)(int64_t)val;
+    constbc(l / 65536);
     ol("push\tbc");
-    constbc(val % 65536);
+    constbc(l % 65536);
     ol("push\tbc");
     Zsp -= 4;
 }

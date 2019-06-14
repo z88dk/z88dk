@@ -46,11 +46,12 @@ char nch()
 char gch()
 {
     int i;
-    if (ch())
+    if (ch()) {
         for ( i = 0; i < buffer_fps_num; i++ )  {
             fprintf(buffer_fps[i],"%c", line[lptr]);
         }
         return line[lptr++];
+    }
     return 0;
 }
 

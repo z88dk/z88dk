@@ -229,6 +229,15 @@
 
 
 
+._inverse
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	call	l_f32_invf
+	ret
+
+
+
 ._cschar
 	ld	hl,2	;const
 	add	hl,sp
@@ -310,6 +319,7 @@
 	GLOBAL	_gt
 	GLOBAL	_ge
 	GLOBAL	_neg
+	GLOBAL	_inverse
 	GLOBAL	_cschar
 	GLOBAL	_cuchar
 	GLOBAL	_csint

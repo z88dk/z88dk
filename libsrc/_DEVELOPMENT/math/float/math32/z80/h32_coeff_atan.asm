@@ -6,7 +6,7 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-; Coefficients for atan()
+; Coefficients for atanf()
 ;-------------------------------------------------------------------------
 ;
 ;   float coeff_a[] =
@@ -30,7 +30,7 @@
 ;
 ;-------------------------------------------------------------------------
 
-SECTION rodata_clib
+SECTION rodata_fp_math32
 
 PUBLIC _m32_coeff_atan_a, _m32_coeff_atan_b
 

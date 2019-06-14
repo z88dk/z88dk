@@ -57,7 +57,7 @@ void test_integer_constant_longform_lhs()
      Assert ( a == 4, "addition: a == 4");
      a = 2 * a;
      Assert ( a == 8, "multiply: a == 8");
-     a = 32. / a;
+     a = 32 / a;
      Assert ( a == 4, "divide: a == 4");
      a = 6 - a;
      Assert ( a == 2, "subtract: a == 2");
@@ -89,7 +89,11 @@ void test_post_incdecrement()
 
 static int approx_equal(double a, double b)
 {
+#ifdef MATH32
+   if ( fabs(b-a) < 0.0001) {
+#else
    if ( fabs(b-a) < 0.00000001 ) {
+#endif
        return 1;
    }
    return 0;
@@ -144,7 +148,13 @@ void test_approx_equal()
     Assert( approx_equal(1.0,1.0) == 1, " 1 == 1");
     //                   0.00000001
     Assert( approx_equal(1.23456789,1.23456789) == 1, " 1.23456789 == 1.23456789");
+#ifdef MATH32
+    //                   0.0001
+    Assert( approx_equal(1.2345,1.2344) == 0, " 1.2345 != 1.2344");
+#else
+    //                   0.00000001
     Assert( approx_equal(1.23456789,1.23456788) == 0, " 1.23456789 != 1.23456788");
+#endif
 }
 
 int suite_genmath()
@@ -160,7 +170,9 @@ int suite_genmath()
     suite_add_test(test_pre_incdecrement);
     suite_add_test(test_approx_equal);
     suite_add_test(test_sqrt);
+#ifndef MATH32
     suite_add_test(test_pow);
+#endif
 
     return suite_run();
 }

@@ -40,15 +40,16 @@
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
-SECTION code_math
+SECTION code_fp_math32
 
-EXTERN m32_fsmul_callee, m32_fsadd_callee, m32_fsmin_fastcall
+EXTERN m32_fsmul24x32, m32_fsadd24x32
 
 PUBLIC m32_fspoly_callee
+PUBLIC _m32_polyf
 
 
+._m32_polyf
 .m32_fspoly_callee
-
     ; evaluation of a polynomial function
     ;
     ; enter : stack = uint16_t n, float d[], float x, ret
@@ -67,20 +68,15 @@ PUBLIC m32_fspoly_callee
     pop hl                      ; count n
     push af                     ; return on stack
 
-    ld a,l                      ; check table has at least 2 elements
-    dec a
-    or h
-    jp Z,m32_fsmin_fastcall
-
     ld b,l                      ; mask n to uint8_t in b, because that's got to be enough coefficients.
-    push bc                     ; copy of n on stack in b
+    push bc                     ; copy of n on stack
     dec hl                      ; count of (float)d[n-1]
 
     add hl,hl                   ; point at float relative index
     add hl,hl
     add hl,de                   ; create absolute table index from base and relative index
 
-    exx                      
+    exx
     push de                     ; (float)x on stack
     push hl
 
@@ -109,45 +105,73 @@ PUBLIC m32_fspoly_callee
     push de
 
     exx
+    sla e
+    sla d                       ; get full exponent into d
+    rr c                        ; put sign in c
+    scf
+    rr e                        ; put implicit bit for mantissa in ehl
+    ld b,d                      ; unpack IEEE to expanded float 32-bit mantissa
+    ld d,e
+    ld e,h
+    ld h,l
+    ld l,0                      ; (float)x in bc dehl
 
 .fep0
-    call m32_fsmul_callee       ; x * res => dehl
-    call m32_fsadd_callee       ; d[--n] + res * x => dehl
+    call m32_fsmul24x32         ; x * res => bc dehl
+    call m32_fsadd24x32         ; d[--n] + res * x => bc dehl
     
     exx
     pop hl                      ; current absolute table index
     pop af                      ; (float)x lsw from stack
+    pop bc                      ; (float)x msw from stack
 
     exx
     ex af,af
-    pop bc                      ; (float)x msw from stack
     pop af                      ; current n value in a
     dec a
-    ret Z                       ; n value == 0 ?
+    jr Z,fep1                   ; n value == 0 ?
 
     push af                     ; current n value on stack
-    push bc                     ; x msw on stack preserved for next iteration
 
     exx
     ex af,af
+    push bc                     ; x msw on stack preserved for next iteration
     push af                     ; x lsw on stack preserved for next iteration
 
     dec hl
-    ld b,(hl)
+    ld d,(hl)
     dec hl
-    ld c,(hl)
+    ld e,(hl)
+    push de                     ; push d[--n] msw to stack
     dec hl
     ld d,(hl)
     dec hl
-    ld e,(hl)                   ; sdcc_float d[--n] in bcde
+    ld e,(hl)                   ; sdcc_float d[--n] lsw
 
-    push hl                     ; next absolute table index
+    ex (sp),hl                  ; next absolute table index to stack
+    push hl                     ; push d[--n] msw to stack
+    push de                     ; push d[--n] lsw to stack
 
-    push bc                     ; push d[--n] to stack
-    push de
-
-    exx
     push bc                     ; x msw on stack for this iteration
     push af                     ; x lsw on stack for this iteration
+
+    exx
     jr fep0
 
+.fep1
+    ld a,l
+    ld l,h                      ; align 32-bit mantissa to IEEE 24-bit mantissa
+    ld h,e
+    ld e,d
+
+    and 080h                    ; round using feilipu method
+    jr Z,fep2
+    set 0,l
+
+.fep2
+    sla e
+    sla c                       ; recover sign from c
+    rr b
+    rr e
+    ld d,b
+    ret                         ; return IEEE DEHL

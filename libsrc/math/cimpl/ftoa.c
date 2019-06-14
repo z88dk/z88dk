@@ -4,14 +4,12 @@
 #include <math.h>
 #include <stdio.h>
 
-
-
 /*
  * These two functions are already listed in z80_crt0.hdr so we
  * have to do a nasty kludge around them
  */
 
-
+extern int ftoa_fudgeit(double x, double scale);
 
 
 void ftoa(x,f,str)
@@ -43,13 +41,16 @@ char *str;      /* output string */
 	    *str++ = '0';
 
         while ( i-- ) {
-		float z;
                 /* output digits before decimal */
+	        x = fabs(x);
                 scale = floor(0.5 + scale * 0.1 ) ;
-                d = ( x / scale ) ;
+#ifdef MUST_ROUND
+                d = ftoa_fudgeit(x, scale);
+#else
+                d = x /scale;
+#endif
                 *str++ = d + '0' ;
-		z = (double)d * scale;
-                x = x - z;
+                x = x - ((double)d *scale);
         }
         if ( f <= 0 ) {
                 *str = 0;

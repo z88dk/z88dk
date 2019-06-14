@@ -66,7 +66,7 @@ typedef enum {
     KIND_ARRAY,
     KIND_PTR,
     KIND_CPTR,
-    KIND_STRUCT, // 11
+    KIND_STRUCT, /* 11 */
     KIND_FUNC,
     KIND_ELLIPSES,
     KIND_PORT8,
@@ -135,7 +135,7 @@ enum ident_type {
         ID_VARIABLE = 1,
         ID_MACRO,
         ID_GOTOLABEL,
-        ID_ENUM,
+        ID_ENUM
     };
 
 
@@ -145,7 +145,7 @@ enum storage_type {
     EXTERNAL,      /* External to this file */
     EXTERNP,       /* Extern @ */
     LSTATIC,       /* Static to this file */
-    TYPDEF,
+    TYPDEF
 };
 
 
@@ -410,7 +410,7 @@ enum maths_mode {
     MATHS_MBFS,  // 32 bit Microsoft single precision
     MATHS_MBF40, // 40 bit Microsoft 
     MATHS_MBF64, // 64 bit Microsoft double precision
-    MATHS_Z88,   // Special handling for z88 (subtype of MATHS_Z80)
+    MATHS_Z88    // Special handling for z88 (subtype of MATHS_Z80)
 };
 
 

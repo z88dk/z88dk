@@ -1,5 +1,5 @@
 ;
-;  feilipu, 2019 April
+;  feilipu, 2019 May
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -8,7 +8,7 @@
 ;-------------------------------------------------------------------------
 ; m32_fsdiv - z80, z180, z80-zxn floating point divide
 ;-------------------------------------------------------------------------
-; r = x/y = x * 1/y
+; R = N/D = N * 1/D
 ;
 ; We calculate division of two floating point number by refining an
 ; estimate of the reciprocal of y using newton iterations.  Each iteration
@@ -19,31 +19,34 @@
 ;-------------------------------------------------------------------------
 ; m32_fsinv - z80, z180, z80-zxn floating point inversion (reciprocal)
 ;-------------------------------------------------------------------------
-; 1/y can be calculated by:
-; w[i+1] = w[i]*2 - w[i]*w[i]*y  where w[0] is approx 1/y
 ;
-; The initial table lookup gets us 5 bits of precision.  The next iterations
-; get 8, 14, and 26. At this point the number is rounded then multiplied
-; by x using F_mul.
+; Computes R the quotient of N and D
 ;
-; Do the work in fixed point with 1 place to left of decimal point.
-; 1.7 1.15 1.23 and 1.31, as we move through the calculations.
+; Express D as M × 2e where 1 ≤ M < 2 (standard floating point representation)
 ;
-; The initial w[0] table is shifted once to fixed 1.7, and then shifted again
-; to create the initial guess w[0] = 48/17 - 32/17 * y where 0.5 <= y <= 1.0
+; D' := D / 2e+1   // scale between 0.5 and 1
+; N' := N / 2e+1
+; X := 48/17 − 31/17 × D'   // precompute constants with same precision as D
+;
+; while
+;    X := X + X × (1 - D' × X)
+; return N' × X
 ;
 ;-------------------------------------------------------------------------
 ; FIXME clocks
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
-SECTION code_math
+SECTION code_fp_math32
 
-EXTERN m32_fsmul, m32_fsmul_callee, m32_fsmax_fastcall
-EXTERN m32_mulu_32_16x16, m32_mulu_32h_32x32
+EXTERN m32_fsmul, m32_fsmul_callee
+
+EXTERN m32_fsmul32x32, m32_fsmul24x32, m32_fsadd32x32, m32_fsadd24x32
+EXTERN m32_fsmin_fastcall, m32_fsmax_fastcall
 
 PUBLIC m32_fsdiv, m32_fsdiv_callee
 PUBLIC m32_fsinv_fastcall
+PUBLIC _m32_invf
 
 
 .m32_fsdiv
@@ -56,6 +59,7 @@ PUBLIC m32_fsinv_fastcall
     jp m32_fsmul_callee
 
 
+._m32_invf
 .m32_fsinv_fastcall
     ex de,hl                    ; DEHL -> HLDE
 
@@ -64,213 +68,150 @@ PUBLIC m32_fsinv_fastcall
     push af                     ; save exponent and sign in C
 
     or a                        ; divide by zero?
-    jp Z,m32_fsmax_fastcall
+    jp Z,m32_fsmax_fastcall - 1	; We want one pop 
 
-    scf                         ; restore implicit bit
-    rr l                        ; h = eeeeeeee, lde = 1mmmmmmm mmmmmmmm mmmmmmmm
+    ld h,0bfh                   ; scale to -0.5 <= D' < -1.0
+    srl l
+    ex de,hl                    ; - D' in DEHL
 
-    ld h,l                      ; mantissa of y in hlde
-    ld l,d
+    push de                     ; - D' msw on stack for D[3] calculation
+    push hl                     ; - D' lsw on stack for D[3] calculation
+    push de                     ; - D' msw on stack for D[2] calculation
+    push hl                     ; - D' lsw on stack for D[2] calculation
+    push de                     ; - D' msw on stack for D[1] calculation
+    push hl                     ; - D' lsw on stack for D[1] calculation
+
+    sla e
+    sla d                       ; get D' full exponent into d
+    rr c                        ; put sign in c
+    scf
+    rr e                        ; put implicit bit for mantissa in ehl
+    ld b,d                      ; unpack IEEE to expanded float 32-bit mantissa
     ld d,e
-    ld e,0                      ; a = 1mmmmmmm hlde = 1mmmmmmm mmmmmmmm mmmmmmmm --------
-
-    push hl                     ; y msw on stack for w[3]
-    push de                     ; y lsw on stack for w[3]
-    push hl                     ; y msw on stack for w[2]
-    push de                     ; y lsw on stack for w[2]
-    push hl                     ; y msw on stack for w[1]
-
-                                ; calculate w[0] - 5 bits
-    ld a,h
-    rra                         ; calculate w[0] table index for 32 Byte table
-    rra
-    and 01fh                    ; a = 000mmmmm
-
-    ld hl,_invtable
-    ld d,0
-    ld e,a
-    add hl,de
-
-    ld d,(hl)                   ; w[0] fixed 1.7 with 5 bits accuracy in d, e
-    ld e,d
-                                ; calculate w[1] - 8 bits
-
-    ld h,d                      ; w[0] with 5 bits accuracy in hl
+    ld e,h
+    ld h,l
     ld l,0
-
-    add hl,hl                   ; w[0]*2 in hl
-
-    ex (sp),hl                  ; w[0]*2 on stack, y msw in hl
-    push hl                     ; y msw on stack
-
-IF __CPU_Z180__
-    mlt de                      ; d*e => de, w[0]^2 in de
-ELSE
-IF __CPU_Z80_ZXN__
-    mul de                      ; d*e => de, w[0]^2 in de
-ELSE
-    EXTERN m32_z80_mulu_de
-    call m32_z80_mulu_de        ; d*e => de, w[0]^2 in de
-ENDIF
-ENDIF
-
-    ex de,hl
-    add hl,hl
-
-    ex de,hl
-    pop bc                      ; y msw in bc
-
-    call m32_mulu_32_16x16      ; bc*de => hlbc, uses af, w[0]^2*y in hlbc
-    sla c
-    rl b
-    adc hl,hl
-
-    ex de,hl                    ; w[0]^2*y in de
-    pop hl                      ; w[0]*2 in hl
-
-    xor a
-    sbc hl,de                   ; w[0] + w[0] - w[0]*w[0]*y
-                                ; w[1] with 8 bits accuracy in hl
-
-                                ; calculate w[2] in hlde - 14 bits
-
-    ld b,h                      ; w[1] msw in bc
-    ld c,l
-
-    add hl,hl                   ; w[1]*2 msw in hl
-
-    pop af                      ; y lsw in af
-    ex (sp),hl                  ; w[1]*2 msw on stack, y msw in hl
-    push hl                     ; y msw on stack
-    push af                     ; y lsw on stack
-    
-    ld d,b                      ; w[1] msw in de
-    ld e,c
-
-    call m32_mulu_32_16x16      ; bc*de => hlbc, uses af, w[1]^2 in hlbc
-    sla c
-    rl b
-    adc hl,hl                    ; w[1]^2 in hlbc
-
-    ld d,b
-    ld e,c
-    ex de,hl                    ; w[1]^2 in dehl
-
+;-------------------------------;
+                                ; X = 48/17 − 31/17 × D'
     exx
-    pop hl                      ; y lsw in hl'
-    pop de                      ; y msw in de'
+    ld bc,04034h
+    push bc
+    ld bc,0B4B5h
+    push bc                
+    ld bc,03FE9h
+    push bc
+    ld bc,06969h
+    push bc
     exx
+    call m32_fsmul24x32         ; (float) 31/17 × D'
+    call m32_fsadd24x32         ; X = 48/17 − 31/17 × D'
 
-    call m32_mulu_32h_32x32     ; dehl*dehl' => dehl, w[1]^2*y in dehl
-    add hl,hl
-    rl e
-    rl d                        ; w[1]^2*y in dehl
-
-    ex de,hl                    ; w[1]^2*y in hlde
-
-    ld b,h                      ; w[1]^2*y in bcde
-    ld c,l
-
-    xor a                       ; w[1]*2 lsw (zero) - w[1]^2*y lsw
-    sub a,e
-    ld e,a
-    sbc a,a
-    sub a,d
-    ld d,a
-
-    pop hl                      ; w[1]*2 msw in hl
-    sbc hl,bc                   ; w[1]*2 msw - w[1]^2*y msw - C
-                                ; w[2] with 14 bits accuracy in hlde
-
-                                ; calculate w[3] in hlde - 26 bits
-    ld b,h
-    ld c,l
-            
-    add hl,hl                   ; w[2]*2 msw in hl
-
-    pop af                      ; y lsw in af
-    ex (sp),hl                  ; w[2]*2 msw on stack, y msw in hl
-    push de                     ; w[2] lsw on stack
-    push hl                     ; y msw on stack
-    push af                     ; y lsw on stack
-
-    ld h,b
-    ld l,c
-    ex de,hl                    ; w[2] msw in de, w[2] lsw in hl
-
+;-------------------------------;
+                                ; X := X + X × (1 - D' × X)
+    exx
+    pop hl                      ; - D' for D[1] calculation
+    pop de
+    exx
+    push bc                     ; X
+    push de
+    push hl
+    push bc                     ; X
     push de
     push hl
     exx
-    pop hl
+    ld bc,03f80h                ; 1.0
+    push bc
+    ld bc,0
+    push bc
+    push de                      ; - D' for D[1] calculation
+    push hl
+    exx
+    call m32_fsmul24x32         ; (float) - D' × X
+    call m32_fsadd24x32         ; (float) 1 - D' × X
+    call m32_fsmul32x32         ; (float) X × (1 - D' × X)
+    call m32_fsadd32x32         ; (float) X + X × (1 - D' × X)
+
+;-------------------------------;
+                                ; X := X + X × (1 - D' × X)
+    exx
+    pop hl                      ; - D' for D[2] calculation
     pop de
     exx
-
-    call m32_mulu_32h_32x32     ; dehl*dehl' => dehl, w[2]^2 in dehl
-    add hl,hl
-    rl e
-    rl d                        ; w[2]^2 in dehl
-
+    push bc                     ; X
+    push de
+    push hl
+    push bc                     ; X
+    push de
+    push hl
     exx
-    pop hl                      ; y lsw in hl'
-    pop de                      ; y msw in de'
+    ld bc,03f80h                ; 1.0
+    push bc
+    ld bc,0
+    push bc
+    push de                      ; - D' for D[2] calculation
+    push hl
     exx
+    call m32_fsmul24x32         ; (float) - D' × X
+    call m32_fsadd24x32         ; (float) 1 - D' × X
+    call m32_fsmul32x32         ; (float) X × (1 - D' × X)
+    call m32_fsadd32x32         ; (float) X + X × (1 - D' × X)
 
-    call m32_mulu_32h_32x32     ; dehl*dehl' => dehl, w[2]^2*y in dehl
-    add hl,hl
-    rl e
-    rl d                        ; w[2]^2*y in dehl
+;-------------------------------;
+                                ; X := X + X × (1 - D' × X)
+    exx
+    pop hl                      ; - D' for D[3] calculation
+    pop de
+    exx
+    push bc                     ; X
+    push de
+    push hl
+    push bc                     ; X
+    push de
+    push hl
+    exx
+    ld bc,03f80h                ; 1.0
+    push bc
+    ld bc,0
+    push bc
+    push de                      ; - D' for D[3] calculation
+    push hl
+    exx
+    call m32_fsmul24x32         ; (float) - D' × X
+    call m32_fsadd24x32         ; (float) 1 - D' × X
+    call m32_fsmul32x32         ; (float) X × (1 - D' × X)
+    call m32_fsadd32x32         ; (float) X + X × (1 - D' × X)
 
-    ex de,hl                    ; w[2]^2*y in hlde
+;-------------------------------;
 
-    ld b,h                      ; w[2]^2*y in bcde
-    ld c,l
-
-    pop hl
-    add hl,hl                   ; w[2]*2 lsw
-    ex de,hl
-
-    xor a
-    sbc hl,de                   ; w[2]*2 lsw - w[2]^2*y lsw
-    ex de,hl
-
-    pop hl                      ; w[2]*2 msw in hl
-    sbc hl,bc                   ; w[2]*2 msw - w[2]^2*y msw - C
-                                ; w[3] with 26 bits accuracy in hlde
-
-    ex de,hl                    ; 1/y mantissa in dehl
-
-    add hl,hl                   ; shift 1/y mantissa dehl into position <<1
-    rl e
-    rl d
-
-    ld a,l                      ; round number using digi norm's method
-    or a
-    jr Z,fd3
-    set 0,h
-
-.fd3
-    pop af                      ; recover y exponent and sign in C
-    rr b                        ; save sign in b
-    sub a,07fh                  ; calculate new exponent for 1/y
+    pop af                      ; recover D exponent and sign in C
+    rr c                        ; save sign in c
+    sub a,07fh                  ; calculate new exponent for 1/D
     neg
-    add a,07eh
+    add a,07eh   
+    ld b,a
 
-    ld l,h                      ; pack 1/y result from a-deh into dehl
+    ld a,l
+    ld l,h                      ; align 32-bit mantissa to IEEE 24-bit mantissa
     ld h,e
     ld e,d
 
-    sla e
-    sla b                       ; recover sign from b
-    rra
+    or a                        ; round using feilipu method
+    jr Z,fd0
+    inc l
+    jr NZ,fd0
+    inc h
+    jr NZ,fd0
+    inc e
+    jr NZ,fd0
     rr e
-    ld d,a
-    ret                         ; return DEHL
+    rr h
+    rr l
+    inc b
 
-SECTION rodata_clib
-
-._invtable
-  DEFB 0x7f, 0x7b, 0x78, 0x74, 0x71, 0x6e, 0x6b, 0x68
-  DEFB 0x66, 0x63, 0x61, 0x5e, 0x5c, 0x5a, 0x58, 0x56
-  DEFB 0x55, 0x53, 0x51, 0x50, 0x4e, 0x4d, 0x4b, 0x4a
-  DEFB 0x48, 0x47, 0x46, 0x45, 0x44, 0x43, 0x41, 0x40
-
+.fd0
+    sla e
+    sla c                       ; recover sign from c
+    rr b
+    rr e
+    ld d,b
+    ret                         ; return IEEE DEHL

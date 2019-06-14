@@ -6,10 +6,23 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;------------------------------------------------------------------------------
+
+IF __CPU_Z80__
+
+INCLUDE "config_private.inc"
+
+SECTION code_clib
+SECTION code_fp_math32
+
+EXTERN m32_z80_mulu_de
+
+PUBLIC m32_sqr_32h_24x24
+
+;------------------------------------------------------------------------------
 ;
 ; square of two 24-bit numbers into a 32-bit product
 ;
-; result is properly calculated into highest 32-bit result
+; result is calculated for highest 32-bit result
 ; from a 48-bit calculation.
 ;
 ; Lower 8 bits intended to provide rounding information for
@@ -22,19 +35,16 @@
 ; = (a*a)*2^32 +
 ;   (2*a*b)*2^24 +
 ;   (b*b + 2*a*c)*2^16 +
-;   (2*b*c)*2^8 +
+;   (2*b*c)*2^8
+;
+;   NOT CALCULATED
 ;   (c*c)*2^0
 ;
-; 6 8*8 multiplies in total
+; 5 8*8 multiplies in total
 ;
 ; exit  : hlde  = 32-bit product
 ;
-; uses  : af, bc, de, hl
-
-SECTION code_clib
-SECTION code_math
-
-PUBLIC m32_sqr_32h_24x24
+; uses  : af, bc, de, hl, af'
 
 
 .m32_sqr_32h_24x24
@@ -47,68 +57,26 @@ PUBLIC m32_sqr_32h_24x24
     ld h,l                      ; bb:ac
     push hl                     ; bb on stack
     push de                     ; ac on stack
-    ld d,e                      ; bc:ac
-    push hl                     ; bc on stack
-    ld d,e                      ; bc:cc
+    ld l,e                      ; bc:ac
 
-IF __CPU_Z180__
-    mlt de                      ; c*c 2^0
-ELSE
-IF __CPU_Z80_ZXN__
-    mul de                      ; c*c 2^0
-ELSE
-    EXTERN m32_z80_mulu_de
-    call m32_z80_mulu_de        ; c*c 2^0
-ENDIF
-ENDIF
+IF __CLIB_OPT_FMATH <= 50
 
-    ld c,d                      ; put 2^0 in bc
-    ld b,0
-
-IF __CPU_Z180__
-    pop hl                      ; bc
-    mlt hl                      ; b*c 2^8
-ELSE
-IF __CPU_Z80_ZXN__
-    pop de                      ; bc
-    mul de                      ; b*c 2^8
-    ex de,hl
-ELSE
-    pop de                      ; bc
+    ex de,hl                    ; ac:bc
     call m32_z80_mulu_de        ; b*c 2^8
     ex de,hl
-ENDIF
-ENDIF
 
     xor a
     add hl,hl                   ; 2*b*c 2^8
     adc a,a
-    add hl,bc
-    adc a,0
 
     ld c,h                      ; put 2^8 in bc
     ld b,a
 
-IF __CPU_Z180__
-    pop hl                      ; ac
-    pop de                      ; bb
-    mlt hl                      ; a*c 2^16
-    mlt de                      ; b*b 2^16
-ELSE
-IF __CPU_Z80_ZXN__
-    pop de                      ; ac
-    pop hl                      ; bb
-    mul de                      ; a*c 2^16
-    ex de,hl
-    mul de                      ; b*b 2^16
-ELSE
     pop de                      ; ac
     pop hl                      ; bb
     call m32_z80_mulu_de        ; a*c 2^16
     ex de,hl
     call m32_z80_mulu_de        ; b*b 2^16
-ENDIF
-ENDIF
 
     xor a
     add hl,hl                   ; 2*a*c 2^16
@@ -122,16 +90,7 @@ ENDIF
     ld b,a
 
     pop de                      ; ab
-
-IF __CPU_Z180__
-    mlt de                      ; a*b 2^24
-ELSE
-IF __CPU_Z80_ZXN__
-    mul de                      ; a*b 2^24
-ELSE
     call m32_z80_mulu_de        ; a*b 2^24
-ENDIF
-ENDIF
 
     ex de,hl                    ; l into e
     
@@ -147,19 +106,73 @@ ENDIF
     ld h,a
 
     pop de                      ; aa
-
-IF __CPU_Z180__
-    mlt de                      ; a*a 2^32
-ELSE
-IF __CPU_Z80_ZXN__
-    mul de                      ; a*a 2^32
-ELSE
     call m32_z80_mulu_de        ; a*a 2^32
-ENDIF
-ENDIF
 
     add hl,de
     ld d,b
     ld e,c                      ; exit  : HLDE  = 32-bit product
     ret
 
+ENDIF
+
+IF __CLIB_OPT_FMATH > 50
+
+    ex de,hl                    ; ac:bc
+    call m32_z80_mulu_de        ; b*c 2^8
+    ex de,hl
+
+    xor a
+    add hl,hl                   ; 2*b*c 2^8
+    adc a,a
+
+    ld l,h                      ; put 2^8 in hl
+    ld h,a
+
+    pop de                      ; ac
+    call m32_z80_mulu_de        ; a*c 2^16
+
+    xor a
+    add hl,de                   ; 2*a*c 2^16
+    adc a,a
+    add hl,de
+    adc a,0
+    ex af,af
+
+    pop de                      ; bb
+    call m32_z80_mulu_de        ; b*b 2^16
+
+    ex af,af
+    add hl,de
+    adc a,0
+
+    ld b,l                      ; put 2^16 in hla
+    ld l,h
+    ld h,a
+    ld a,b
+
+    pop de                      ; ab
+    push af                     ; l on stack
+    call m32_z80_mulu_de        ; a*b 2^24
+    
+    xor a
+    add hl,de                   ; 2*a*b 2^24
+    adc a,a
+    add hl,de
+    adc a,0
+
+    pop bc                      ; l in b
+    ld c,b                      ; l into c
+    ld b,l
+    ld l,h
+    ld h,a
+
+    pop de                      ; aa
+    push bc
+    call m32_z80_mulu_de        ; a*a 2^32
+
+    add hl,de
+    pop de                      ; exit  : HLDE  = 32-bit product
+    ret
+
+ENDIF
+ENDIF

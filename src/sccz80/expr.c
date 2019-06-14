@@ -185,7 +185,7 @@ int heir1(LVALUE* lval)
     if (oper == zadd || oper == zsub)
         plnge2b(heir1, lval, &lval2, oper);
     else
-        plnge2a(heir1, lval, &lval2, oper, doper, constoper);
+        plnge2a(heir1, lval, &lval2, oper, doper, constoper, NULL);
 
     force(lval3.val_type, lval->val_type, lval3.ltype->isunsigned, lval->ltype->isunsigned, lval->is_const);
     smartstore(&lval3);
@@ -215,7 +215,7 @@ int heir1a(LVALUE* lval)
         /* test condition, jump to false expression evaluation if necessary */
         if (check_lastop_was_testjump(lval)) {
             // Always evaluated as an integer, so fake it temporarily
-            force(KIND_INT, lval->val_type, c_default_unsigned, lval->ltype->isunsigned, 0);
+            force(KIND_INT, lval->val_type, 0, lval->ltype->isunsigned, 0);
             temptype = lval->val_type;
             templtype = lval->ltype;
             lval->val_type = KIND_INT; /* Force to integer */
@@ -293,7 +293,7 @@ int heir234(LVALUE* lval, int (*heir)(LVALUE *lval), char opch, void (*oper)(LVA
     while (1) {
         if ((ch() == opch) && (nch() != '=') && (nch() != opch)) {
             inbyte();
-            plnge2a(heir, lval, &lval2, oper, NULL, constoper);
+            plnge2a(heir, lval, &lval2, oper, NULL, constoper, NULL);
         } else
             return 0;
     }
@@ -327,9 +327,9 @@ int heir5(LVALUE* lval)
         rvalue(lval);
     while (1) {
         if (match("==")) {
-            plnge2a(heir6, lval, &lval2, zeq, zeq, zeq_const);
+            plnge2a(heir6, lval, &lval2, zeq, zeq, zeq_const, NULL);
         } else if (match("!=")) {
-            plnge2a(heir6, lval, &lval2, zne, zne, zne_const);
+            plnge2a(heir6, lval, &lval2, zne, zne, zne_const, NULL);
         } else
             return 0;
     }
@@ -352,15 +352,15 @@ int heir6(LVALUE* lval)
         rvalue(lval);
     while (1) {
         if (match("<=")) {
-            plnge2a(heir7, lval, &lval2, zle, zle, zle_const);
+            plnge2a(heir7, lval, &lval2, zle, zle, zle_const, NULL);
         } else if (match(">=")) {
-            plnge2a(heir7, lval, &lval2, zge, zge, zge_const);
+            plnge2a(heir7, lval, &lval2, zge, zge, zge_const, NULL);
         } else if (ch() == '<' && nch() != '<') {
             inbyte();
-            plnge2a(heir7, lval, &lval2, zlt, zlt, zlt_const);
+            plnge2a(heir7, lval, &lval2, zlt, zlt, zlt_const, NULL);
         } else if (ch() == '>' && nch() != '>') {
             inbyte();
-            plnge2a(heir7, lval, &lval2, zgt, zgt, zgt_const);
+            plnge2a(heir7, lval, &lval2, zgt, zgt, zgt_const, NULL);
         } else
             return 0;
     }
@@ -385,11 +385,11 @@ int heir7(LVALUE* lval)
         if ((streq(line + lptr, ">>") == 2) && (streq(line + lptr, ">>=") == 0)) {
             inbyte();
             inbyte();
-            plnge2a(heir8, lval, &lval2, asr, NULL, asr_const);
+            plnge2a(heir8, lval, &lval2, asr, NULL, asr_const, NULL);
         } else if ((streq(line + lptr, "<<") == 2) && (streq(line + lptr, "<<=") == 0)) {
             inbyte();
             inbyte();
-            plnge2a(heir8, lval, &lval2, asl, NULL, asl_const);
+            plnge2a(heir8, lval, &lval2, asl, NULL, asl_const, NULL);
         } else
             return 0;
     }
@@ -434,11 +434,11 @@ int heir9(LVALUE* lval)
         rvalue(lval);
     while (1) {
         if (cmatch('*')) {
-            plnge2a(heira, lval, &lval2, mult, mult, mult_const);
+            plnge2a(heira, lval, &lval2, mult, mult, mult_const, mult_dconst);
         } else if (cmatch('/')) {
-            plnge2a(heira, lval, &lval2, zdiv, zdiv, zdiv_const);
+            plnge2a(heira, lval, &lval2, zdiv, zdiv, zdiv_const, zdiv_dconst);
         } else if (cmatch('%')) {
-            plnge2a(heira, lval, &lval2, zmod, zmod, zmod_const);
+            plnge2a(heira, lval, &lval2, zmod, zmod, zmod_const, NULL);
         } else
             return 0;
     }
@@ -595,7 +595,8 @@ int heirb(LVALUE* lval)
     char *before1, *start1;
     char sname[NAMESIZE];
     double dval;
-    int val, con, direct, k, valtype;
+    int val, con, direct, k;
+    Kind valtype;
     char flags;
     SYMBOL* ptr = NULL;
 
@@ -696,7 +697,12 @@ int heirb(LVALUE* lval)
                     flags = lval->ltype->ptr->flags;
                 } else if ( lval->ltype->kind == KIND_FUNC ) {
                     // Normal function call
-                    callfunction(ptr,NULL);
+                    if ( ptr == NULL ) {
+                        // However, we've turned it into a function pointer call
+                        callfunction(NULL,make_pointer(lval->ltype));
+                    } else {
+                        callfunction(ptr,NULL);
+                    }
                     return_type = lval->ltype->return_type;      
                     flags = lval->ltype->flags;                    
                 } else {

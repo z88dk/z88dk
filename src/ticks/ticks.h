@@ -119,6 +119,7 @@ extern void      hook_init(void);
 extern void      hook_io_init(hook_command *cmds);
 extern void      hook_io_set_ide_device(int unit, const char *file);
 extern void      hook_misc_init(hook_command *cmds);
+extern void      hook_cpm(void);
 extern void      hook_console_init(hook_command *cmds);
 extern void      debugger_init();
 extern void      debugger();
@@ -130,9 +131,13 @@ extern symbol   *find_symbol_byname(const char *name);
 extern int symbol_resolve(char *name);
 extern char **parse_words(char *line, int *argc);
 
-extern void memory_init(const char *model);
+extern void memory_init(char *model);
 extern void memory_handle_paging(int port, int value);
 extern void memory_reset_paging();
+
+
+extern void        out(int port, int value);
+
 
 extern uint8_t    *get_memory_addr(int pc);
 extern uint8_t     get_memory(int pc);

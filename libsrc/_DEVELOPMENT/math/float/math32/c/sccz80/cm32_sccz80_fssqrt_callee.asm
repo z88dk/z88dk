@@ -2,11 +2,11 @@
 ; float __fssqrt_callee (float number)
 
 SECTION code_clib
-SECTION code_math
+SECTION code_fp_math32
 
 PUBLIC cm32_sccz80_fssqrt_callee
 
-EXTERN m32_fssqrt_fastcall
+EXTERN cm32_sccz80_fsread1_callee, m32_fssqrt_fastcall
 
     ; square root sccz80 float
     ;
@@ -16,7 +16,7 @@ EXTERN m32_fssqrt_fastcall
     ; exit  :  DEHL = sccz80_float(number^0.5)
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
-
-DEFC  cm32_sccz80_fssqrt_callee = m32_fssqrt_fastcall           ; enter stack = ret
-                                                                ;        DEHL = d32_float
-                                                                ; return DEHL = d32_float
+    
+cm32_sccz80_fssqrt_callee:
+    call cm32_sccz80_fsread1_callee
+    jp m32_fssqrt_fastcall

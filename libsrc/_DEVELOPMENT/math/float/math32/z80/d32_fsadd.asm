@@ -12,10 +12,11 @@
 ; m32_fsadd - z80, z180, z80-zxn floating point add
 ; m32_fssub - z80, z180, z80-zxn floating point subtract
 ;-------------------------------------------------------------------------
+;
 ; 1) first section: unpack from F_add: to sort:
 ;    one unpacked number in hldebc the other in hl'de'bc'
 ;    unpacked format: h==0; mantissa= lde, sign in b, exponent in c
-;         in addition af' holds  b xor b' used to test if add or sub needed
+;         in addition af' holds b xor b' used to test if add or sub needed
 ;
 ; 2) second section: sort from sort to align, sets up smaller number in hldebc and larger in hl'de'bc'
 ;    This section sorts out the special cases:
@@ -37,22 +38,24 @@
 ;    This section does the right shift. Lost bits shifted off, are tested. Up to 8 lost bits
 ;    are used for the test. If any are non-zero a one is or'ed into remaining mantissa bit 0.
 ;      align 2-23 - worst case right shift by 7 with lost bits
+;
 ; 4) 4th section add or subtract
 ;
-; 5) 5th section post normalize
+; 5) 5th section normalize in separate file d32_fsnormalize.asm
 ;
-; 6) 6th section pack up
+; 6) 6th section pack up in separate file d32_fsnormalize.asm
 ;
 ;-------------------------------------------------------------------------
 ; FIXME clocks
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
-SECTION code_math
+SECTION code_fp_math32
+
+EXTERN m32_fsnormalize
 
 PUBLIC m32_fssub, m32_fssub_callee
 PUBLIC m32_fsadd, m32_fsadd_callee
-PUBLIC m32_fsnormalize
 
 
 ; enter here for floating subtract, x-y x on stack, y in dehl
@@ -147,15 +150,14 @@ PUBLIC m32_fsnormalize
     ld h,a                      ; op1 mantissa: h = 00000000, lde = 1mmmmmmm mmmmmmmm mmmmmmmm
 
 ; sort larger from smaller and compute exponent difference
-.sort
     ld a,c
     exx
     cp a,c                      ; nc if a>=c
-    jp Z,alignzero              ; no alignment mantissas equal
-    jr NC,sort2                 ; if a larger than c
+    jp Z,alignzero              ; no alignment needed, mantissas equal
+    jr NC,sort                  ; if a larger than c
     ld a,c
     exx
-.sort2
+.sort
     sub a,c                     ; positive difference in a
     cp  a,1                     ; if one difference, special case
     jp Z,alignone               ; smaller mantissa on top
@@ -164,12 +166,11 @@ PUBLIC m32_fsnormalize
     jr C,align                  ; if 23 or fewer shifts
 ; use other side, adding small quantity that can be ignored
     exx
-    jp doadd1                  ; pack result
+    jp doadd1                   ; pack result
 
 ; align begin align count zero
 .align
-    or a
-    rra
+    srl a                       ; clear carry flag
     jr NC,al_2
     srl h
     rr l
@@ -211,10 +212,10 @@ PUBLIC m32_fsnormalize
     jr NC,al_5
 ; shift by 8 right, no 16 possible
     ld a,e                      ; lost bits, keep only 8
+    or a                        ; test lost bits
     ld e,d
     ld d,l
     ld hl,0                     ; upper zero
-    or a                        ; test lost bits
     jr Z,aldone
     set 0,e                     ; lost bits
     jr aldone
@@ -226,10 +227,10 @@ PUBLIC m32_fsnormalize
 ; here shift by 16
 ; toss lost bits in a which are remote for 16 shift
 ; consider only lost bits in d and h
+    ld a,d                      ; lost bits
+    or a,h                      ; test lost bits
     ld e,l
-    ld a,d                        ; lost bits
     ld d,0
-    or a,h
     ld h,d                      ; hl zero
     ld l,d
     jr Z,aldone
@@ -238,10 +239,11 @@ PUBLIC m32_fsnormalize
 
 ; here no 8 or 16 shift, lost bits in a-reg bits 6,5,4, other bits zero's
 .al_6
-    or a,h                      ; more lost bits
+    or a,h                      ; test lost bits
     ld h,0
     jr Z,aldone
     set 0,e
+    
 ; aldone here
 .aldone
     ex af,af                    ; carry clear
@@ -267,7 +269,6 @@ PUBLIC m32_fsnormalize
 ; exponent of result in c sign of result in b
     bit 7,l                     ; check for norm
     jr NZ,doadd1                ; no normalize step, pack it up
-    or a
     sla e
     rl d
     adc hl,hl
@@ -325,7 +326,7 @@ PUBLIC m32_fsnormalize
 
 ; here one alignment needed
 .alignone                       ; from fadd
-    rr h
+    srl h
     rr l
     rr d
     rr e
@@ -384,327 +385,5 @@ PUBLIC m32_fsnormalize
     scf
     ex af,af                    ; if no C an alternate exit is taken
 
+    jp m32_fsnormalize          ; now begin to normalize
 
-; enter here with af' carry clear for float functions m32_float32, m32_float32u
-.m32_fsnormalize
-; now begin normalize
-    xor a
-    or a,l
-    jr Z,fa8a
-    and 0f0h
-    jp Z,S24L                   ; shift 24 bits, most significant in low nibble   
-    jr S24H                     ; shift 24 bits in high
-.fa8a
-    xor a
-    or a,d
-    jr Z,fa8b
-    and 0f0h
-    jp Z,S16L                   ; shift 16 bits, most significant in low nibble
-    jp S16H                     ; shift 16 bits in high
-.fa8b
-    xor a
-    or a,e
-    jp Z,normzero               ;  all zeros
-    and 0f0h
-    jp Z,S8L                    ; shift 8 bits, most significant in low nibble 
-    jp S8H                      ; shift 8 bits in high
-
-.S24H                           ; shift 24 bits 0 to 3 left, count in c
-    sla e
-    rl d
-    rl l
-    jr C,S24H1
-    sla e
-    rl d
-    rl l
-    jr C,S24H2
-    sla e
-    rl d
-    rl l
-    jr C,S24H3
-    ld a,-3                     ; count
-    jr normdone1                ; from normalize
-
-.S24H1
-    rr l
-    rr d
-    rr e                        ; reverse overshift
-    ld a,c                      ; zero adjust
-    jr normdone1_a
-
-.S24H2
-    rr l
-    rr d
-    rr e
-    ld a,-1
-    jr normdone1
-
-.S24H3
-    rr l
-    rr d
-    rr e
-    ld a,-2
-    jr normdone1
-
-.S24L                           ; shift 24 bits 4-7 left, count in C
-    sla e
-    rl d
-    rl l
-    sla e
-    rl d
-    rl l
-    sla e
-    rl d
-    rl l
-    ld a,0f0h
-    and a,l
-    jp Z,S24L4more               ; if still no bits in high nibble, total of 7 shifts
-    sla e
-    rl d
-    rl l
-; 0, 1 or 2 shifts possible here
-    sla e
-    rl d
-    rl l
-    jr C,S24Lover1
-    sla e
-    rl d
-    rl l
-    jr C,S24Lover2
-; 6 shift case
-    ld a,-6
-    jr normdone1
-
-.S24L4more
-    sla e
-    rl d
-    rl l
-    sla e
-    rl d
-    rl l
-    sla e
-    rl d
-    rl l
-    sla e
-    rl d
-    rl l
-    ld a,-7
-    jr normdone1
-
-.S24Lover1                      ; total of 4 shifts
-    rr l
-    rr d
-    rr e                        ; correct overshift
-    ld a,-4
-    jr normdone1
-
-.S24Lover2                      ; total of 5 shifts
-    rr l
-    rr d
-    rr e
-    ld a,-5                     ; this is the very worst case, drop through to .normdone1
-
-; enter here to continue after normalize
-; this path only on subtraction
-; a has left shift count, lde has mantissa, c has exponent before shift
-; b has original sign of larger number
-;
-.normdone1                      ; worst case from align to here
-    add a,c                     ; exponent of result
-    jr NC,normzero              ; if underflow return zero
-
-.normdone1_a                    ; case of zero shift
-    rl l
-    rl b                        ; sign
-    rra
-    rr l
-    ld h,a                      ; exponent
-    ex de,hl                    ; return DEHL
-    ex af,af
-    ret
-
-.normzero                       ; return zero
-    ld hl,0
-    ld d,h
-    ld e,l
-    ex af,af
-    ret
-
-; all bits in lower 4 bits of e (bits 0-3 of mantissa)
-; shift 8 bits 4-7 bits left
-; e, l, d=zero
-.S8L
-    sla e
-    sla e
-    sla e
-    ld a,0f0h
-    and a,e
-    jp Z,S8L4more               ; if total is 7
-    sla e                       ; guaranteed
-    sla e                       ; 5th shift
-    jr C,S8Lover1               ; if overshift
-    sla e                       ; the shift
-    jr C,S8Lover2
-; total of 6, case 7 already handled
-    ld l,e
-    ld e,d                      ; zero
-    ld a,-22
-    jr normdone1
-
-.S8Lover1                       ; total of 4
-    rr e
-    ld l,e
-    ld e,d                      ; zero
-    ld a,-20
-    jr normdone1
-
-.S8Lover2                       ; total of 5
-    rr e
-    ld l,e
-    ld e,d                      ; zero
-    ld a,-21
-    jr normdone1
-
-.S8L4more
-    sla e
-    sla e
-    sla e
-    sla e
-    ld l,e
-    ld e,d                      ; zero
-    ld a,-23
-    jr normdone1
-
-; shift 16 bit fraction by 4-7
-; l is zero, 16 bits number in de
-.S16L
-    sla e
-    rl d
-    sla e
-    rl d
-    sla e
-    rl d                        ; 3 shifts
-    ld a,0f0h
-    and a,d
-    jp Z,S16L4more              ; if still not bits n upper after 3
-    sla e
-    rl d                        ; guaranteed shift 4
-    jp M,S16L4                  ; complete at 4
-    sla e
-    rl d
-    jp M,S16L5                  ; complete at 5
-    sla e
-    rl d                        ; 6 shifts, case of 7 already taken care of must be good
-    ld a,-14
-    ld l,d
-    ld d,e
-    ld e,0
-    jp normdone1
-
-.S16L4
-    ld a,-12
-    ld l,d
-    ld d,e
-    ld e,0
-    jp normdone1
-
-.S16L5                          ; for total of 5 shifts left
-    ld a,-13
-    ld l,d
-    ld d,e
-    ld e,0
-    jp normdone1
-
-.S16L4more
-    sla e
-    rl d
-    sla e
-    rl d
-    sla e
-    rl d
-    sla e
-    rl d
-    ld l,d
-    ld d,e
-    ld e,0
-    ld a,-15
-    jp normdone1
-;
-; worst case 68 to get past this section
-; shift 0-3, l is zero , 16 bits in de
-;
-.S16H
-    sla e
-    rl d
-    jr C,S16H1                   ; if zero
-    jp M,S16H2                   ; if 1 shift
-    sla e
-    rl d
-    jp M,S16H3                   ; if 2 ok
-; must be 3
-    sla e
-    rl d
-    ld l,d
-    ld d,e
-    ld e,0
-    ld a,-11
-    jp normdone1
-
-.S16H1                          ; overshift
-    rr d
-    rr e
-    ld l,d
-    ld d,e
-    ld a,-8
-    ld e,0
-    jp normdone1
-
-.S16H2                          ; one shift
-    ld l,d
-    ld d,e
-    ld a,-9
-    ld e,0
-    jp normdone1
-
-.S16H3
-    ld l,d
-    ld d,e
-    ld a,-10
-    ld e,0
-    jp normdone1
-
-; shift 8 left 0-3
-; number in e, l, d==zero
-.S8H
-    sla e
-    jr C,S8H1                   ; jump if bit found in data
-    sla e
-    jr C,S8H2
-    sla e
-    jr C,S8H3
-; 3 good shifts, number in a shifted left 3 ok
-    ld l,e
-    ld e,d                      ; zero
-    ld a,-19
-    jp normdone1
-
-.S8H1
-    rr e                        ; correct overshift
-    ld l,e
-    ld e,d
-    ld a,-16                    ; zero shifts
-    jp normdone1
-
-.S8H2
-    rr e                        ; correct overshift
-    ld l,e
-    ld e,d
-    ld a,-17                    ; one shift
-    jp normdone1
-
-.S8H3
-    rr e                        ; correct overshift
-    ld l,e
-    ld e,d    
-    ld a,-18
-    jp normdone1                ; worst case S8H

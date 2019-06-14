@@ -1,11 +1,11 @@
 
-#include <math.h>
+#include "m32_math.h"
 
-float asinf (float x) __z88dk_fastcall
+float m32_asinf (float x) __z88dk_fastcall
 {
     float y;
 
-    y = sqrtf(1 - sqrf(x));
-    return atanf(x/y);
+    y = m32_sqrtf(1.0 - m32_sqrf(x));
+    return m32_atanf(x/y);
 }
 

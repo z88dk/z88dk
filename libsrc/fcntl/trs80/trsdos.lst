@@ -1,0 +1,15 @@
+trsdos
+trsdos_callee
+trsdos_tst
+trsdos_tst_callee
+trsdos_get
+obj/initdcb
+obj/open
+obj/close
+obj/creat
+obj/readbyte
+obj/writebyte
+obj/read
+obj/write
+obj/remove
+obj/lseek

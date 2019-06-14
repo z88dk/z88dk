@@ -1,0 +1,10 @@
+# Helper makefile to generate the checked in .asm files
+
+CFILES = $(wildcard *.c)
+AFILES = $(CFILES:.c=.asm)
+CFLAGS += -I. 
+
+all: $(addprefix asm/,$(AFILES))
+
+asm/%.asm: %.c
+	zcc +z80 -clib=sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 -SO3 $(CFLAGS) -a $^ -o $@

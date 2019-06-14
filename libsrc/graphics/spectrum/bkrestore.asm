@@ -10,7 +10,12 @@
 	  
 	PUBLIC    bkrestore
 	PUBLIC    _bkrestore
-	EXTERN	zx_rowtab
+
+	EXTERN	pixeladdress
+	EXTERN	zx_saddrpdown
+	
+	EXTERN     swapgfxbk
+	EXTERN	__graphics_end
 
 
 .bkrestore
@@ -18,34 +23,21 @@
 
 ; __FASTCALL__ : sprite ptr in HL
 	push	ix
+	call	swapgfxbk
 	push	hl
 	pop	ix
 	
 	ld	d,(ix+2)
 	ld	e,(ix+3)
 	
-	ld	a,d
-	ld	d,0
-	
-	ld	hl,zx_rowtab
-	add	hl,de
-	add	hl,de
-	ld	(actrow+1),hl	; save row table position
-	
-	ld	e,(hl)
-	inc	hl
-	ld	h,(hl)
+	ld	h,d
 	ld	l,e
 	
-	push	af
-	srl	a
-	srl	a
-	srl	a
-	ld	(actcol+1),a
-	ld	e,a
-	pop	af
-
-	add	hl,de
+	call	pixeladdress
+	
+	ld	h,d
+	ld	l,e
+	ld	(rowadr+1),hl
 	
 	ld	a,(ix+0)
 	ld	b,(ix+1)
@@ -57,7 +49,7 @@
 	inc	a
 	inc	a		; INT ((Xsize-1)/8+2)
 	ld	(rbytes+1),a
-	di
+	;di
 
 .bkrestores
 	push	bc
@@ -72,23 +64,13 @@
 	djnz	rloop
 
 	; ---------
-.actrow
-	ld	hl,0
-	inc	hl
-	inc	hl
-	ld	(actrow+1),hl
-	
-	ld	b,(hl)
-	inc	hl
-	ld	h,(hl)
-	ld	l,b
-.actcol
-	ld	bc,0
-	add	hl,bc
-	; ---------
+.rowadr
+	ld	hl,0	; current address
+	call	zx_saddrpdown
+	ld	(rowadr+1),hl
 
 	pop	bc
 	djnz	bkrestores
-	ei
-	pop	ix
-	ret
+	
+	;ei
+	jp	__graphics_end

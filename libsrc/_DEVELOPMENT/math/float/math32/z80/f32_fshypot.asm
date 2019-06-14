@@ -24,16 +24,15 @@
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
-SECTION code_math
+SECTION code_fp_math32
 
 EXTERN m32_fssqr_fastcall, m32_fssqrt_fastcall, m32_fsadd_callee
 
 PUBLIC m32_fshypot, m32_fshypot_callee
 
-
 .m32_fshypot
 
-    ; evaluation of a polynomial function
+    ; evaluation of a hypotenuse function
     ;
     ; enter : stack = float x, ret
     ;         dehl  = float y
@@ -43,7 +42,6 @@ PUBLIC m32_fshypot, m32_fshypot_callee
     ;         carry reset
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
-
 
     call m32_fssqr_fastcall     ; sqrf(y)
 
@@ -59,7 +57,7 @@ PUBLIC m32_fshypot, m32_fshypot_callee
 
 .m32_fshypot_callee
 
-    ; evaluation of a polynomial function
+    ; evaluation of a hypotenuse function
     ;
     ; enter : stack = float x, ret
     ;         dehl  = float y

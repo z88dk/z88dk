@@ -2,7 +2,7 @@
 ; float _invsqrtf (float number) __z88dk_fastcall
 
 SECTION code_clib
-SECTION code_math
+SECTION code_fp_math32
 
 PUBLIC asm_invsqrtf
 

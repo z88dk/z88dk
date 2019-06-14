@@ -29,10 +29,9 @@
 
 /* Version 1.0 - Initial release */
 
-#include <math.h>
-#include <errno.h>
+#include "m32_math.h"
 
-float powf (float x, float y) __z88dk_callee
+float m32_powf (float x, float y) 
 {
     if(x <  0.0) return 0.0;
     if(x == 0.0) return 0.0;
@@ -40,5 +39,5 @@ float powf (float x, float y) __z88dk_callee
     if(y == 0.0) return 1.0;
     if(y == 1.0) return x;
 
-    return expf(logf(x) * y);
+    return m32_expf(m32_logf(x) * y);
 }

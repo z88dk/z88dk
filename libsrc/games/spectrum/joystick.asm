@@ -22,7 +22,7 @@
 .j_no1
 	cp	2	 ; Sinclair 1
 	jr	nz,j_no2
-	ld	bc,61438
+	ld	bc,61438  ; $EFFE
 	in	a,(c)
 	xor	@00011111
 	ld	l,a
@@ -38,11 +38,11 @@
 	rla
 	rl	l
 	rla
-	jr	j_done
+	jp	j_done
 .j_no2
 	cp	3	 ; Sinclair 2
 	jr	nz,j_no3
-	ld	bc,63486
+	ld	bc,63486	; $F7FE
 	in	a,(c)
 	xor	@00011111
 	ld	l,a
@@ -86,7 +86,7 @@
 	rla
 	jr	j_done
 .j_no4
-	cp	5	 ; Fuller (untested!)
+	cp	5	 ; Fuller
 	jr	nz,j_no5
 	in	a,(127)
 	ld	l,0
@@ -103,7 +103,52 @@
 	or	l
 	jr	j_done
 .j_no5
+	cp	6	 ; QAOP-MN
+	jr	nz,j_no6
+	
+;      #FEFE  SHIFT, Z, X, C, V            #EFFE  0, 9, 8, 7, 6
+;      #FDFE  A, S, D, F, G                #DFFE  P, O, I, U, Y
+;      #FBFE  Q, W, E, R, T                #BFFE  ENTER, L, K, J, H
+;      #F7FE  1, 2, 3, 4, 5                #7FFE  SPACE, SYM SHFT, M, N, B
+
+;00NMQAOP
+	;ld	bc,$DFFE
+	;in	a,(c)
+	;cpl
+	;and 3
+	;jr j_done
+	
+	ld	bc,$7FFE
+	in	a,(c)
+	rra
+	ld e,0
+	rra		; N
+	rl e
+	rra		; M
+	rl e
+	ld	b,$FB
+	in  a,(c)
+	rra		; Q
+	rl	e
+	ld	b,$FD
+	in  a,(c)
+	rra		; A
+	rl	e
+	scf
+	rl	e
+	scf
+	rl	e
+	ld	b,$DF
+	in  a,(c)
+	or 252	; 11111100
+	and e
+	cpl
+	and 63
+	jr	j_done
+
+.j_no6
 	xor	a
+	
 .j_done
 	ld	h,0
 	ld	l,a

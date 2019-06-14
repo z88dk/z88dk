@@ -21,5 +21,5 @@
 	push	bc
 	push	af
 	ld	a,CMD_OPENF
-	rst	16
+	call	SYSCALL
 	ret

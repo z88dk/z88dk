@@ -1,0 +1,4 @@
+SECTION code_fp_mbf32
+PUBLIC ___mbf32_FPSIGN
+EXTERN FPSIGN
+defc ___mbf32_FPSIGN = FPSIGN

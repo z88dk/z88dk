@@ -765,8 +765,8 @@ void move_ghost()
   g[a].direction = 1<< b ;
 
 // exit if ghost can go in that direction
-  if (collision(g[a].x, g[a].y, g[a].direction));
-    return;
+/*  if (collision(g[a].x, g[a].y, g[a].direction))
+    return; */
  }
 }
 
@@ -779,7 +779,7 @@ void move_ghost()
   *************************
   *************************/
 
-void main ()
+int main ()
 {
 
  /****  JOYSTICK CHOICE  ****/
@@ -823,7 +823,7 @@ draw_board:
         b=0;
         if (--a > 6) b=SIZE*2*(a&1)-SIZE;
         
-        c=&bar[SIZE*a];
+        c=(unsigned int)bar+(SIZE*a);
         putsprite (spr_or, i*SIZE2, j*SIZE2, c);
         putsprite (spr_or, (18-i)*SIZE2, j*SIZE2, c+b);
       }
@@ -1180,7 +1180,7 @@ do_game:
         else 
           move_ghost();
         break;
-      cycle3++;
+      //cycle3++;
       }
       
       // Ghosts position handling for tunnel

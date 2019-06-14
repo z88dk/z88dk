@@ -22,5 +22,5 @@
         push    af
         ld      b,c
         ld      a,CMD_WRITEBLOCK
-        rst     16
+	call	SYSCALL
         ret

@@ -2,11 +2,11 @@
 ; float __fssqrt (float number)
 
 SECTION code_clib
-SECTION code_math
+SECTION code_fp_math32
 
 PUBLIC cm32_sdcc_fssqrt
 
-EXTERN cm32_sdcc_fsreadl, m32_fssqrt
+EXTERN cm32_sdcc_fsread1, m32_fssqrt
 
 .cm32_sdcc_fssqrt
 
@@ -18,7 +18,7 @@ EXTERN cm32_sdcc_fsreadl, m32_fssqrt
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-    call cm32_sdcc_fsreadl
+    call cm32_sdcc_fsread1
 
     jp m32_fssqrt           ; enter stack = sdcc_float, ret
                             ;

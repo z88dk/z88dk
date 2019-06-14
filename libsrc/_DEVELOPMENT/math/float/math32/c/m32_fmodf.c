@@ -6,9 +6,9 @@
    file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-#include <math.h>
+#include "m32_math.h"
 
-float fmodf(float x, float y) __z88dk_callee
+float m32_fmodf (float x, float y)
 {
     long k;
     float d;

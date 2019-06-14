@@ -24,7 +24,7 @@ all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	pc6001_clib.lib pc88_clib.lib pps_clib.lib px4.lib px8.lib \
 	rex_clib.lib rx78_clib.lib sc3000_clib.lib sms_clib.lib lynx_clib.lib \
 	svi_clib.lib sam_clib.lib  sorcerer_clib.lib  sos_clib.lib tiki100.lib \
-	trs80_clib.lib vg5k_clib.lib vz_clib.lib  x07_clib.lib \
+	trs80_clib.lib trsdos.lib vg5k_clib.lib vz_clib.lib  x07_clib.lib \
 	embedded_clib.lib test_clib.lib testrcm_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
 	pv1000_clib.lib pv2000_clib.lib coleco_clib.lib multi8_clib.lib alphatro_clib.lib  spc1000_clib.lib \
 	laser500_clib.lib super80_clib.lib super80_vduem_clib.lib \
@@ -32,7 +32,7 @@ all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	excali64_clib.lib \
 	preempt.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib 
 
-genlibs: z80_crt0.lib math48.lib gen_math.lib mbf32.lib mbf64.lib gendos.lib ndos.lib  \
+genlibs: z80_crt0.lib math48.lib gen_math.lib mbf32.lib mbf64.lib math32.lib gendos.lib ndos.lib  \
 	 lib3d.lib x11.lib fastmath.lib
 
 c128libs: c128ansi_clib.lib gfx128.lib gfx128hr.lib gfx128hr480.lib 
@@ -140,6 +140,12 @@ mbf32.lib:
 	@echo '--- Building Microsoft Single Precision Maths Library ---'
 	@echo ''
 	$(MAKE) -C math/mbf32
+
+math32.lib:
+	@echo ''
+	@echo '--- Building IEEE Single Precision Maths Library ---'
+	@echo ''
+	$(MAKE) -C math/math32
 
 mbf64.lib:
 	@echo ''
@@ -1314,6 +1320,9 @@ trs80_clib.lib:
 	$(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/gfxtrs80 @$(LISTFILE_DIRECTORY)/gfxtrs80.lst
 	$(MAKE) gfxdeps
 	$(LIBLINKER) -DFOReg2000 -x$(OUTPUT_DIRECTORY)/gfxeg2000 @$(LISTFILE_DIRECTORY)/gfxeg2000.lst
+
+trsdos.lib:
+	$(MAKE) -C fcntl/trs80
 
 # Canon X-07 lib - Stefano
 x07_clib.lib:

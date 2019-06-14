@@ -11,21 +11,21 @@
  *	$Id: readbyte.c,v 1.2 2005-03-01 17:50:37 stefano Exp $
 */
 
-//#include <fcntl.h>
+#include <fcntl.h>
 
 // "stdio.h" contains definition for EOF
 #include <stdio.h>
 #include <zxinterface1.h>
 
 
-int __FASTCALL__ readbyte(int handle)
+int readbyte(int fd)
 {
 	struct M_CHAN *if1_file;
 	int 	if1_filestatus;
 	//unsigned char	mychar;
 	
-	if1_file = (void *) handle;
-	//printf ("-- reading '%s' - %u --",if1_getname( (char *) if1_file->hdname ), handle);
+	if1_file = (void *) fd;
+	//printf ("-- reading '%s' - %u --",if1_getname( (char *) if1_file->hdname ), fd);
 
 	if ( (int) (if1_file->position / 512) > if1_file->record )
 	{

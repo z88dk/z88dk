@@ -2,7 +2,7 @@
 ; float __fsdiv_callee (float left, float right)
 
 SECTION code_clib
-SECTION code_math
+SECTION code_fp_math32
 
 PUBLIC cm32_sdcc_fsdiv_callee
 
@@ -19,7 +19,6 @@ EXTERN cm32_sdcc_fsreadr_callee, m32_fsdiv_callee
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
     call cm32_sdcc_fsreadr_callee
-
     jp m32_fsdiv_callee     ; enter stack = sdcc_float left, ret
                             ;        DEHL = sdcc_float right
                             ; return DEHL = sdcc_float

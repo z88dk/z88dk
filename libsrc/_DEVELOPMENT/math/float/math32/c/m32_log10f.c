@@ -28,9 +28,9 @@
 
 /* Version 1.0 - Initial release */
 
-#include <math.h>
+#include "m32_math.h"
 
-float log10f(float x) __z88dk_fastcall
+float m32_log10f (float x) __z88dk_fastcall
 {
-    return logf(x)*0.4342944819;
+    return m32_logf(x)*0.4342944819;
 }

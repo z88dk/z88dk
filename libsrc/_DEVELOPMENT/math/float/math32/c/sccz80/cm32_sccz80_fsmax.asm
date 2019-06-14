@@ -1,22 +1,19 @@
 
-; float __fsmax (float number)
 
-SECTION code_clib
-SECTION code_math
+SECTION code_fp_math32
 
 PUBLIC cm32_sccz80_fsmax
 
-EXTERN m32_fsmax_fastcall
+EXTERN cm32_sccz80_fsread1, m32_fsmax_fastcall
 
     ; convert sccz80 float to infinity with correct sign
     ;
-    ; enter : stack = ret
-    ;          DEHL = sccz80_float number
+    ; enter : stack = sccz80_float number, ret
     ;
     ; exit  :  DEHL = sccz80_float(infinity)
     ;
     ; uses  : af, bc, de, hl
 
-DEFC  cm32_sccz80_fsmax = m32_fsmax_fastcall    ; enter stack = ret
-                                                ;        DEHL = d32_float
-                                                ; return DEHL = d32_float
+cm32_sccz80_fsmax:
+    call cm32_sccz80_fsread1
+    jp m32_fsmax_fastcall

@@ -178,6 +178,7 @@
 	EXTERN	fa		;may not be needed in this file
 	EXTERN	extra		;ditto
 	EXTERN  __atof2		;string->fa conversion
+        EXTERN  l_f48_ldexp     ;FA * pow2(N)
 
 
 	; 32 bit float ABI
@@ -202,6 +203,8 @@
 	EXTERN	l_f32_f2uint
 	EXTERN	l_f32_f2slong
 	EXTERN	l_f32_f2ulong
+        EXTERN  l_f32_ldexp
+        EXTERN  l_f32_invf	; Only for math32
 
 	; 64 bit float ABI
 	EXTERN	l_f64_load
@@ -232,10 +235,7 @@
 	EXTERN	l_f64_f2uint
 	EXTERN	l_f64_f2slong
 	EXTERN	l_f64_f2ulong
-
-;--------------------------------------------------
-; Routines for picking up variables from far memory
-;--------------------------------------------------
+        EXTERN  l_f64_ldexp
 
 
 ;--------------------------------------------------

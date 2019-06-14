@@ -152,7 +152,7 @@ int number(LVALUE *lval)
     char c;
     int minus;
     int32_t k;
-    int isunsigned = c_default_unsigned;
+    int isunsigned = 0;
 
     k = minus = 1;
     while (k) {
@@ -571,13 +571,16 @@ void size_of(LVALUE* lval)
             lval->const_val = type->size;
             
             if (type->kind != KIND_FUNC && ptr->ident != ID_MACRO) {
-                if (type->kind != KIND_STRUCT) {
+                if ( type->kind == KIND_PTR && type->ptr->kind == KIND_STRUCT ) {
+                    type = type->ptr;
+                }
+                if (type->kind != KIND_STRUCT ) {
                 } else {
                     Type *mptr;
 
                     /* We're a member of a structure */
                     do {
-                        if ( (mptr = get_member(ptr->ctype->tag) ) != NULL ) {
+                        if ( (mptr = get_member(type->kind == KIND_STRUCT ? type->tag : type->ptr->tag) ) != NULL ) {
                             type = mptr;
                             if ( (mptr->kind == KIND_PTR || mptr->kind == KIND_CPTR) && deref ) {
                                 // Do nothing

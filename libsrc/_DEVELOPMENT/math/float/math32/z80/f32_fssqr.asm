@@ -40,14 +40,15 @@
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
-SECTION code_math
+SECTION code_fp_math32
 
 EXTERN m32_fszero_fastcall
 EXTERN m32_sqr_32h_24x24
 
 PUBLIC m32_fssqr_fastcall
+PUBLIC _m32_sqrf
 
-
+._m32_sqrf
 .m32_fssqr_fastcall
     ex de,hl                    ; DEHL -> HLDE
 
@@ -73,10 +74,8 @@ PUBLIC m32_fssqr_fastcall
 .fsnouf
     or a
     jp Z,m32_fszero_fastcall
-    ld b,a
-    ex af,af
-    ld a,b
-    ex af,af                    ; save sum of exponents a'
+
+    push af                     ; stack: sum of exponents a
 
                                 ; square of two 24-bit numbers into a 32-bit product
                                 ;
@@ -91,7 +90,7 @@ PUBLIC m32_fssqr_fastcall
 
     call m32_sqr_32h_24x24      ; exit  : HLDE  = 32-bit product
 
-    ex af,af                    ; retrieve exponent from af'
+    pop bc                      ; retrieve exponent from stack
 
     bit 7,h                     ; need to shift result left if msb!=1
     jr NZ,fs1
@@ -101,28 +100,26 @@ PUBLIC m32_fssqr_fastcall
     jr fs2
 
 .fs1
-    inc a
-    jr C,mulovl
+    inc b
+    jr Z,mulovl
 
 .fs2
-    ex af,af
-    ld a,e                      ; round using digi norm's method
-    or a
-    jr Z,fs3
-    set 0,d
-
-.fs3
-    ex af,af
-
+    ld a,e
     ld e,h                      ; put 24 bit mantissa in place, HLD into EHL
     ld h,l
     ld l,d
 
-    sla e                       ; adjust the sign (+ve) and exponent
-    srl a
-    rr e
-    ld d,a                      ; put sign and 7 msbs into place in D
-    ret                         ; return DEHL
+    and 080h                    ; round using feilipu method
+    jr Z,fs3
+    set 0,l
+
+.fs3
+    sla e                       ; adjust mantissa for exponent
+    xor a                       ; set sign in C positive
+    rr b                        ; put sign and 7 exp bits into place
+    rr e                        ; put last exp bit into place
+    ld d,b                      ; put sign and exponent in D
+    ret                         ; return IEEE DEHL
 
 .mulovl
     ld d,07fh                  ; set positive INF

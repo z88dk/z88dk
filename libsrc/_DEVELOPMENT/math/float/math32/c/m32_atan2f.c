@@ -1,12 +1,12 @@
 
-#include <math.h>
+#include "m32_math.h"
 
-float atan2f (float x, float y) __z88dk_fastcall
+float m32_atan2f (float x, float y)
 {
     float v;
 
-    if(fabsf(y) >= fabsf(x)) {
-        v = atanf(x/y);
+    if(m32_fabsf(y) >= m32_fabsf(x)) {
+        v = m32_atanf(x/y);
         if( y < 0.0)
             if(x >= 0.0)
                 v += 3.14159265358979;
@@ -14,7 +14,7 @@ float atan2f (float x, float y) __z88dk_fastcall
                 v -= 3.14159265358979;
         return v;
     }
-    v = -atanf(y/x);
+    v = -m32_atanf(y/x);
     if(y < 0.0)
         v -= 1.57079632679489;
     else

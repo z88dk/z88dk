@@ -5,6 +5,12 @@
 ;       $Id: trs80_crt0.asm,v 1.21 2016-07-15 21:03:25 dom Exp $
 ;
 
+; 	There are a couple of #pragma commands which affect this file:
+;
+;	#pragma output nostreams - No stdio disc files
+;	#pragma output nofileio  - No fileio at all, use in conjunction to "-lndos"
+;	#pragma output noredir   - do not insert the file redirection option while parsing the
+;	                           command line arguments (useless if "nostreams" is set)
 
 
 	MODULE  trs80_crt0
@@ -64,21 +70,83 @@ ENDIF
 	org     CRT_ORG_CODE
 
 start:
+	ld	(cmdline+1),hl
         ld      (start1+1),sp   ;Save entry stack
 	INCLUDE	"crt/classic/crt_init_sp.asm"
 	INCLUDE	"crt/classic/crt_init_atexit.asm"
 	call	crt0_init_bss
         ld      (exitsp),sp
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
-	IF DEFINED_USING_amalloc
-		INCLUDE "crt/classic/crt_init_amalloc.asm"
-	ENDIF
+; Optional definition for auto MALLOC init; it takes
+; all the space between the end of the program and himem
+; on TRS-80 the stack is defined elsewhere
+IF DEFINED_USING_amalloc
+	ld	a,($54)					; Get byte from ROM
+	dec	a						; Determine if Mod 1 or 3
+	ld	hl,($4411)				; himem ptr on Model III
+	jr	nz,set_max_heap_addr	; Go if Model III
+	ld	hl,($4049)				; himem ptr on Model I
+
+set_max_heap_addr:
+	push hl
+
+	ld	hl,_heap
+	ld	c,(hl)
+	inc	hl
+	ld	b,(hl)
+	inc bc
+	; compact way to do "mallinit()"
+	xor	a
+	ld	(hl),a
+	dec hl
+	ld	(hl),a
+
+	pop hl	; sp
+	sbc hl,bc	; hl = total free memory
+
+	push bc ; main address for malloc area
+	push hl	; area size
+	EXTERN sbrk_callee
+	call	sbrk_callee
+
+;	Possible static declaration assuming we have 16K
+;	defc	CRT_MAX_HEAP_ADDRESS = 32768
+;	INCLUDE "crt/classic/crt_init_amalloc.asm"
+ENDIF
 
 
+	; Push pointers to argv[n] onto the stack now
+	; We must start from the end 
+cmdline:
+	ld	hl,0	; SMC - command line back again
+	ld	bc,0
+	ld	a,(hl)
+	cp	13
+	jr	nz,nocr
+	xor a
+	ld	(hl),a
+	jr  argv_done
+nocr:
+	dec	hl
+find_end:
+	inc	hl
+	inc	c
+	ld	a,(hl)
+	cp	13
+	jr	nz,find_end
+	xor a
+	ld	(hl),a
+	dec	hl
+
+
+	; defc DEFINED_noredir = 1
+	INCLUDE	"crt/classic/crt_command_line.asm"
+
+	push	hl	;argv
+	push	bc	;argc
         call    _main           ;Call user program
+	pop	bc	;kill argv
+	pop	bc	;kill argc
 
 cleanup:
 ;
@@ -96,10 +164,10 @@ start1: ld      sp,0            ;Restore stack to entry value
 l_dcal: jp      (hl)            ;Used for function pointer calls
 
 
-
-        INCLUDE "crt/classic/crt_runtime_selection.asm"
-
+	INCLUDE "crt/classic/crt_runtime_selection.asm"
 	INCLUDE	"crt/classic/crt_section.asm"
+
+
 
 	SECTION code_crt_init
 IF (startup=2)
@@ -111,4 +179,17 @@ ENDIF
 	ld	(base_graphics),hl
 
 
+
+	SECTION bss_crt
+end:		defb	0		; null file name (used in argv/argc parsing)
+
+
+
+	SECTION  rodata_clib
+IF !DEFINED_noredir
+IF CRT_ENABLE_STDIO = 1
+redir_fopen_flag:		defb	'w',0
+redir_fopen_flagr:		defb	'r',0
+ENDIF
+ENDIF
 

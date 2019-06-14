@@ -95,13 +95,11 @@ int fat_write_file_to_image(const char *disc_format, const char *container, cons
 {
     disc_handle      *h;
     char              dos_filename[20];
-    char              buf[1024];
     struct formats   *f = &formats[0];
     disc_spec        *spec = NULL;
     char              disc_name[FILENAME_MAX+1];
     const char       *extension;
     disc_writer_func  writer = disc_get_writer(container, &extension);
-    int               ret;
     FILE             *binary_fp;
     size_t            binlen;
     void             *filebuf;

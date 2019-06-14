@@ -6,7 +6,7 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-; Coefficients for sin()
+; Coefficients for sinf()
 ;-------------------------------------------------------------------------
 ;
 ;   float coeff_a[] =
@@ -29,7 +29,7 @@
 ;
 ;-------------------------------------------------------------------------
 
-SECTION rodata_clib
+SECTION rodata_fp_math32
 
 PUBLIC _m32_coeff_sin_a, _m32_coeff_sin_b
 

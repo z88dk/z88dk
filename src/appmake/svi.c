@@ -123,7 +123,6 @@ int svi_exec(char* target)
     int i;
     int pos;
     int len;
-    char gothdr;
 
     if (help)
         return -1;
@@ -273,8 +272,6 @@ int svi_exec(char* target)
             c = getc(fpin);
         len -= 17;
 
-        gothdr = 0;
-
         /* Copy the header */
         if (dumb)
             printf("\nInfo: Program Name found in header: ");
@@ -320,20 +317,6 @@ int svi_exec(char* target)
 
     return 0;
 }
-
-static disc_spec spec = {
-    .sectors_per_track = 18,
-    .tracks = 40,
-    .sides = 1,
-    .sector_size = 128,
-    .gap3_length = 0x52,
-    .filler_byte = 0xe5,
-    .boottracks = 3,
-    .directory_entries = 64,
-    .extent_size = 1024,
-    .byte_size_extents = 1,
-    .first_sector_offset = 1,
-};
 
 static uint8_t    sectorbuf[256];
 

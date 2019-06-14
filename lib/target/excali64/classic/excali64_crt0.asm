@@ -4,6 +4,17 @@
 ;
 ;       $Id: excali64_crt0.asm $
 ;
+;
+;
+;	To run at position $6000:
+;
+;	POKE -957,96
+;	POKE -958,0
+;	PRINT USR(0)
+;
+
+;	To change loading speed (CLOADM, ecc..):  01 = 1200 baud 02 = 600 baud  04 = 300 baud
+;	POKE -1053,n
 
 
 
@@ -32,9 +43,12 @@
 
 ; Now, getting to the real stuff now!
 
+        defc    CONSOLE_ROWS = 24
+        defc    CONSOLE_COLUMNS = 80
+		
 	defc	TAR__no_ansifont = 1
         defc    TAR__clib_exit_stack_size = 32
-        defc    TAR__register_sp = $fc00
+        ;defc    TAR__register_sp = $5fff
 	defc	__CPU_CLOCK = 4000000
         INCLUDE "crt/classic/crt_rules.inc"
 
@@ -43,6 +57,7 @@
 	
 
 start:
+
 	ld	(start1+1),sp
         INCLUDE "crt/classic/crt_init_sp.asm"
         INCLUDE "crt/classic/crt_init_atexit.asm"

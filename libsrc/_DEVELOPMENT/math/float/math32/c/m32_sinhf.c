@@ -1,9 +1,11 @@
 
-#include <math.h>
+#include "m32_math.h"
 
-float sinhf (float x) __z88dk_fastcall
+float m32_sinhf (const float x) __z88dk_fastcall
 {
-    x = expf(x);
-    return 0.5*(x-1.0/x);
+    float y;
+
+    y = m32_expf(x);
+    return m32_div2f( y - m32_invf(y) );
 }
 

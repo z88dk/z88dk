@@ -1,22 +1,18 @@
 
-; float __fsinv_callee (float number)
 
-SECTION code_clib
-SECTION code_math
-
+SECTION code_fp_math32
 PUBLIC cm32_sccz80_fsinv_callee
 
-EXTERN m32_fsinv_fastcall
+EXTERN cm32_sccz80_fsread1_callee, m32_fsinv_fastcall
 
     ; invert sccz80 float
     ;
-    ; enter : stack = ret
-    ;          DEHL = sccz80_float number
+    ; enter : stack = sccz80_float number, ret
     ;
     ; exit  :  DEHL = sccz80_float(1/number)
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-DEFC  cm32_sccz80_fsinv_callee = m32_fsinv_fastcall     ; enter stack = ret
-                                                        ;        DEHL = d32_float
-                                                        ; return DEHL = d32_float
+cm32_sccz80_fsinv_callee:
+    call cm32_sccz80_fsread1_callee
+    jp m32_fsinv_fastcall

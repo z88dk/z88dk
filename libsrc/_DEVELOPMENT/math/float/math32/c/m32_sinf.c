@@ -1,7 +1,10 @@
 
-#include    <math.h>
+#include    "m32_math.h"
 
-float sinf (float f) __z88dk_fastcall
+extern float m32_coeff_sin_a[];
+extern float m32_coeff_sin_b[];
+
+float m32_sinf (float f) __z88dk_fastcall
 {
     float    y, y_squared;
     int16_t    sect, e;
@@ -13,7 +16,7 @@ float sinf (float f) __z88dk_fastcall
         sect = 0;
     f *= .63661977237;
     if(f > 4.0)
-        f -= 4.0 * floorf(f/4.0);
+        f -= m32_mul2f( m32_mul2f( m32_floorf( m32_div2f( m32_div2f(f) )) ));
     if(f > 2.0) {
         f -= 2.0;
         sect = 2 - sect;
@@ -24,6 +27,6 @@ float sinf (float f) __z88dk_fastcall
         y = 1.0 - y;
     if(sect & 2)
         y = -y;
-    y_squared = sqrf(y);
-    return y * polyf(y_squared, m32_coeff_sin_a, 4) / polyf(y_squared, m32_coeff_sin_b, 4);
+    y_squared = m32_sqrf(y);
+    return y * m32_polyf(y_squared, m32_coeff_sin_a, 4) / m32_polyf(y_squared, m32_coeff_sin_b, 4);
 }

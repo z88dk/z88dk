@@ -8,10 +8,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 Rabbit Semiconductor Rabbit Floating Point Package (ZFPP)
 -------------------------------------------------------------------------
 
-            MODIFIED TO USE SCCZ80 CALLING CONVENTION
-            
-               LHS STACK - RHS DEHL -> RETURN DEHL
-
+            PROVIDED FOR HISTORICAL REFERENCE ONLY
 
 feilipu, April 2019
 -------------------------------------------------------------------------

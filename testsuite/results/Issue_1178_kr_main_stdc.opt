@@ -1,0 +1,66 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._main
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	push	hl
+	call	_func
+	pop	bc
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	inc	hl
+	inc	hl
+	call	l_gint	;
+	push	hl
+	call	_func2
+	pop	bc
+	ret
+
+
+
+._func3
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	push	hl
+	call	_func
+	pop	bc
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	inc	hl
+	inc	hl
+	call	l_gint	;
+	push	hl
+	call	_func2
+	pop	bc
+	ret
+
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_func
+	GLOBAL	_func2
+	GLOBAL	_main
+	GLOBAL	_func3
+
+
+
+

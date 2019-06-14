@@ -2,11 +2,11 @@
 ; float __fsneg (float number)
 
 SECTION code_clib
-SECTION code_math
+SECTION code_fp_math32
 
 PUBLIC cm32_sdcc_fsneg
 
-EXTERN cm32_sdcc_fsreadl, m32_fsneg_fastcall
+EXTERN cm32_sdcc_fsread1, m32_fsneg_fastcall
 
 .cm32_sdcc_fsneg
 
@@ -18,7 +18,7 @@ EXTERN cm32_sdcc_fsreadl, m32_fsneg_fastcall
     ;
     ; uses  : af, bc, de, hl
 
-    call cm32_sdcc_fsreadl
+    call cm32_sdcc_fsread1
 
     jp m32_fsneg_fastcall   ; enter stack = sdcc_float, ret
                             ;        DEHL = sdcc_float

@@ -27,10 +27,10 @@ static char              loud         = 0;
 static char              help         = 0;
 
 static char              bit_state    = 0;
-static char              h_lvl;
-static char              l_lvl;
-static char              trs_h_lvl;
-static char              trs_l_lvl;
+static uint8_t           h_lvl;
+static uint8_t           l_lvl;
+static uint8_t           trs_h_lvl;
+static uint8_t           trs_l_lvl;
 
 
 /* Options that are available for this module */
@@ -128,8 +128,8 @@ int trs80_exec(char* target)
     int i;
     int len;
     int pos;
-    unsigned char cksum;
-    char ckflag;
+    unsigned char cksum = 0;
+    char ckflag = 0;
 
     if (help || binname == NULL || (!dumb && (crtfile == NULL))) {
         return -1;

@@ -19,5 +19,5 @@
 	push	de
 	ld	b,c
 	ld	a,CMD_WRITEBYTE
-	rst	16
+	call	SYSCALL
 	ret

@@ -1,9 +1,11 @@
 
-#include <math.h>
+#include "m32_math.h"
 
-float tanhf (float x) __z88dk_fastcall
+float m32_tanhf (const float x) __z88dk_fastcall
 {
-    x = expf(x);
-    return (x-1.0/x)/(x+1.0/x);
+    float y;
+
+    y = m32_expf(x);
+    return (y - m32_invf(y))/(y + m32_invf(y));
 }
 

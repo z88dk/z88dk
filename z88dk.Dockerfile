@@ -31,6 +31,7 @@ RUN cd ${Z88DK_PATH} \
     && ./configure --disable-mcs51-port --disable-gbz80-port --disable-avr-port --disable-ds390-port \
                    --disable-ds400-port --disable-hc08-port --disable-pic-port --disable-pic14-port \
                    --disable-pic16-port --disable-stm8-port --disable-tlcs90-port --disable-s08-port \
+                   --disable-pdk13-port --disable-pdk14-port --disable-pdk15-port \
                    --disable-ucsim --disable-device-lib --disable-packihx \
     && make \
     && mv ./bin/sdcc ${Z88DK_PATH}/bin/zsdcc \

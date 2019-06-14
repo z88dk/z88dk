@@ -33,6 +33,10 @@ typedef enum { OPT_NONE, OPT_BOOL, OPT_INT, OPT_STR, OPT_INPUT=128, OPT_OUTPUT=2
 enum { FALSE = 0, TRUE };
 #endif
 
+#if defined(__GNUC__) || defined(__clang__)
+#define __NORETURN __attribute((noreturn))
+#endif
+
 typedef struct {
     char     sopt;
     char    *lopt;
@@ -501,7 +505,7 @@ struct {
 
 
 #define myexit(buf, code) exit_log(code, buf)
-extern void         exit_log(int code, char *fmt, ...);
+extern void         exit_log(int code, char *fmt, ...) __NORETURN;
 extern long         parameter_search(const char *filen,const  char *ext,const char *target);
 extern FILE        *fopen_bin(const char *fname,const  char *crtfile);
 extern long         get_org_addr(char *crtfile);

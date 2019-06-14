@@ -1,22 +1,19 @@
 
-; float __fsneg_callee (float number)
 
-SECTION code_clib
-SECTION code_math
-
+SECTION code_fp_math32
 PUBLIC cm32_sccz80_fsneg_callee
 
-EXTERN m32_fsneg_fastcall
+EXTERN cm32_sccz80_fsread1_callee, m32_fsneg_fastcall
 
     ; negate sccz80 floats
     ;
-    ; enter : stack = ret
-    ;          DEHL = sccz80_float number
+    ; enter : stack = sccz80_float number, ret 
     ;
     ; exit  :  DEHL = sccz80_float(-number)
     ;
     ; uses  : af, bc, de, hl
+    
+cm32_sccz80_fsneg_callee:
+    call cm32_sccz80_fsread1_callee
+    jp m32_fsneg_fastcall
 
-DEFC  cm32_sccz80_fsneg_callee = m32_fsneg_fastcall     ; enter stack = ret
-                                                        ;        DEHL = d32_float
-                                                        ; return DEHL = d32_float

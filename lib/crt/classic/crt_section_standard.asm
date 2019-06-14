@@ -32,6 +32,7 @@
 		SECTION code_esxdos
 		SECTION code_fp
 		SECTION code_fp_math48
+		SECTION code_fp_math32
 		SECTION code_fp_mbf32
 		SECTION code_fp_mbf64
 		SECTION code_math
@@ -66,6 +67,7 @@ IF !__crt_org_graphics
 ENDIF
 		SECTION code_user
 		SECTION rodata_fp
+		SECTION rodata_fp_math32
 		SECTION rodata_fp_mbf32
 		SECTION rodata_fp_mbf64
 		SECTION rodata_compiler
@@ -95,6 +97,7 @@ IF __crt_org_bss
 		defb 0   ; control name of bss binary
 ENDIF
 		SECTION bss_fp
+		SECTION bss_fp_math32
 		SECTION bss_fp_mbf32
 		SECTION bss_fp_mbf64
 		SECTION bss_error

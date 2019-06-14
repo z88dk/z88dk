@@ -42,8 +42,8 @@ int px_exec(char* target)
     char filename[FILENAME_MAX + 1];
     FILE* fpin;
     FILE* fpout;
-    char romimg[32768];
-    int len, len2, namelen;
+    uint8_t romimg[32768];
+    int len, len2;
     int c, i;
     int b, blk;
     char* p,*ptr;
@@ -73,8 +73,6 @@ int px_exec(char* target)
         *p = toupper(*p);
 
     suffix_change(filename, ".ROM");
-
-    namelen = strlen(filename) - 1;
 
     if (strcmp(binname, filename) == 0) {
         fprintf(stderr, "Input and output file names must be different\n");
