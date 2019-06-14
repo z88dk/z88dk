@@ -71,13 +71,15 @@ bin/zsdcc$(EXESUFFIX):
 	svn checkout -r 11214 svn://svn.code.sf.net/p/sdcc/code/trunk/sdcc -q $(SDCC_PATH)
 	cd $(SDCC_PATH) && patch -p0 < $(Z88DK_PATH)/src/zsdcc/sdcc-z88dk.patch
 	cd $(SDCC_PATH) && CC=$(OCC) ./configure --disable-mcs51-port --disable-gbz80-port \
-                       --disable-avr-port --disable-ds390-port \
-                       --disable-ds400-port --disable-hc08-port \
-                       --disable-pic-port --disable-pic14-port \
-                       --disable-pic16-port --disable-stm8-port \
-                       --disable-tlcs90-port --disable-s08-port \
-                       --disable-ucsim --disable-device-lib \
-                       --disable-packihx
+				       --disable-avr-port --disable-ds390-port \
+				       --disable-ds400-port --disable-hc08-port \
+				       --disable-pic-port --disable-pic14-port \
+				       --disable-pic16-port --disable-stm8-port \
+				       --disable-tlcs90-port --disable-s08-port \
+				       --disable-pdk13-port --disable-pdk14-port \
+				       --disable-pdk15-port \
+				       --disable-ucsim --disable-device-lib \
+				       --disable-packihx
 	cd $(SDCC_PATH) && $(MAKE)
 	cd $(SDCC_PATH) && mv ./bin/sdcc  $(Z88DK_PATH)/bin/zsdcc
 	cd $(SDCC_PATH) && mv ./bin/sdcpp $(Z88DK_PATH)/bin/zsdcpp
