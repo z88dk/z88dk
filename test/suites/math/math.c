@@ -170,8 +170,9 @@ int suite_genmath()
     suite_add_test(test_pre_incdecrement);
     suite_add_test(test_approx_equal);
     suite_add_test(test_sqrt);
+#ifndef MATH32
     suite_add_test(test_pow);
-
+#endif
     return suite_run();
 }
 
