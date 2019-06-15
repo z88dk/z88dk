@@ -59,8 +59,11 @@ PUBLIC _m32_ldexpf
     rl d
     rr e                        ; save the sign in e[7]
 
-    ld a,c
-    add d
+    ld a,d
+    or a
+    jp Z,m32_fszero_fastcall    ; return IEEE zero
+
+    add c                       ; pw2
     ld d,a                      ; exponent returned
 
     sla e                       ; restore sign to C
