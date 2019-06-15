@@ -18,6 +18,7 @@
 SECTION code_fp_math32
 
 EXTERN m32_fsmin_fastcall
+EXTERN m32_fszero_fastcall
 
 PUBLIC m32_fsdiv2_fastcall
 PUBLIC _m32_div2f
@@ -27,6 +28,9 @@ PUBLIC _m32_div2f
 .m32_fsdiv2_fastcall
     sla e                       ; get exponent in d
     rl d                        ; put sign in C
+    ld a,d
+    and a
+    jp  z,m32_fszero_fastcall
 
     dec d                       ; divide by 2
     jp Z,m32_fsmin_fastcall     ; capture underflow
