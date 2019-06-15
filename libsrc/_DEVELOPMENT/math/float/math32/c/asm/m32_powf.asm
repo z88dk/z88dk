@@ -206,20 +206,20 @@
 ;--------------------------------------------------------
 	GLOBAL _m32_polyf
 	GLOBAL _m32_hypotf
+	GLOBAL _m32_ldexpf
+	GLOBAL _m32_frexpf
 	GLOBAL _m32_invsqrtf
 	GLOBAL _m32_sqrtf
 	GLOBAL _m32_invf
 	GLOBAL _m32_sqrf
 	GLOBAL _m32_div2f
 	GLOBAL _m32_mul2f
-	GLOBAL _m32_roundf
-	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
+	GLOBAL _m32_fmodf
+	GLOBAL _m32_roundf
 	GLOBAL _m32_floorf
-	GLOBAL _m32_ceilf
-	GLOBAL _m32_ldexpf
-	GLOBAL _m32_frexpf
 	GLOBAL _m32_fabsf
+	GLOBAL _m32_ceilf
 	GLOBAL _m32_log10f
 	GLOBAL _m32_logf
 	GLOBAL _m32_expf
@@ -342,16 +342,14 @@ l_m32_powf_00108:
 	ld	l,(ix+4)
 	ld	h,(ix+5)
 	call	_m32_logf
-	ld	c, l
+	push	de
+	push	hl
 	ld	l,(ix+10)
-	ld	b,h
 	ld	h,(ix+11)
 	push	hl
 	ld	l,(ix+8)
 	ld	h,(ix+9)
 	push	hl
-	push	de
-	push	bc
 	call	___fsmul_callee
 	call	_m32_expf
 l_m32_powf_00109:

@@ -4,9 +4,12 @@
 SECTION code_clib
 SECTION code_fp_math32
 
+PUBLIC _m32_div_callee
 PUBLIC cm32_sdcc_fsdiv_callee
 
 EXTERN cm32_sdcc_fsreadr_callee, m32_fsdiv_callee
+
+DEFC _m32_div_callee = cm32_sdcc_fsdiv_callee
 
 .cm32_sdcc_fsdiv_callee
 

@@ -206,20 +206,20 @@
 ;--------------------------------------------------------
 	GLOBAL _m32_polyf
 	GLOBAL _m32_hypotf
+	GLOBAL _m32_ldexpf
+	GLOBAL _m32_frexpf
 	GLOBAL _m32_invsqrtf
 	GLOBAL _m32_sqrtf
 	GLOBAL _m32_invf
 	GLOBAL _m32_sqrf
 	GLOBAL _m32_div2f
 	GLOBAL _m32_mul2f
-	GLOBAL _m32_roundf
-	GLOBAL _m32_fmodf
 	GLOBAL _m32_modff
+	GLOBAL _m32_fmodf
+	GLOBAL _m32_roundf
 	GLOBAL _m32_floorf
-	GLOBAL _m32_ceilf
-	GLOBAL _m32_ldexpf
-	GLOBAL _m32_frexpf
 	GLOBAL _m32_fabsf
+	GLOBAL _m32_ceilf
 	GLOBAL _m32_powf
 	GLOBAL _m32_log10f
 	GLOBAL _m32_expf
@@ -331,11 +331,9 @@ l_m32_logf_00102:
 	or	a, a
 	jr	Z,l_m32_logf_00104
 	dec	(ix-1)
-	push	de
-	push	bc
-	push	de
-	push	bc
-	call	___fsadd_callee
+	ld	l, c
+	ld	h, b
+	call	_m32_mul2f
 	ld	bc,0x3f80
 	push	bc
 	ld	bc,0x0000

@@ -7,8 +7,9 @@ math/float/math32/lm32/c/sccz80/asin_fastcall
 math/float/math32/lm32/c/sccz80/asinh
 math/float/math32/lm32/c/sccz80/asinh_fastcall
 math/float/math32/lm32/c/sccz80/atan
-math/float/math32/lm32/c/sccz80/atan2
 math/float/math32/lm32/c/sccz80/atan_fastcall
+math/float/math32/lm32/c/sccz80/atan2
+math/float/math32/lm32/c/sccz80/atan2_callee
 math/float/math32/lm32/c/sccz80/atanh
 math/float/math32/lm32/c/sccz80/atanh_fastcall
 math/float/math32/lm32/c/sccz80/ceil

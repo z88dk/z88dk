@@ -31,13 +31,13 @@
 
 #include "m32_math.h"
 
-float m32_powf (float x, float y) 
+float m32_powf (float x, float y)
 {
     if(x <  0.0) return 0.0;
     if(x == 0.0) return 0.0;
-    
+   
     if(y == 0.0) return 1.0;
     if(y == 1.0) return x;
 
-    return m32_expf(m32_logf(x) * y);
+    return m32_expf(y * m32_logf(x));
 }

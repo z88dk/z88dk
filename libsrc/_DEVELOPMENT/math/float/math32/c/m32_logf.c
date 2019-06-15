@@ -70,7 +70,7 @@ float m32_logf (float x) __z88dk_fastcall
     if( x < SQRTHF )
     {
         e -= 1;
-        x = x + x - 1.0; /*  2x - 1  */
+        x = m32_mul2f(x) - 1.0; /*  2x - 1  */
     }
     else
     {
