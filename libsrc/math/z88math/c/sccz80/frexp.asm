@@ -12,7 +12,7 @@ frexp:
         call    dload
         pop     bc      ;Ret
         pop     de      ;pw2
-        pop     de
+        push    de
         push    bc
         ld      hl,fa+5
         ld      a,(hl)

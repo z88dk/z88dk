@@ -7,10 +7,14 @@
 ldexp:
 	ld	hl,2
 	add	hl,sp
-	ld	a,(hl)	;pw2
+	ld	c,(hl)	;pw2
 	ld	hl,7	
 	add	hl,sp	;exponent
-	add	(hl)
+	ld	a,(hl)
+	and	a
+	jr	z,skip
+	add	c
+skip:
 	ld	d,a
 	dec	hl
 	ld	e,(hl)

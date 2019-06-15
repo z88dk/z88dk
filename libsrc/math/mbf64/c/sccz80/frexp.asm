@@ -12,7 +12,7 @@ frexp:
 	call	l_f64_load
 	pop	bc	;Ret
 	pop	de	;pw2
-	pop	de
+	push	de
 	push	bc
 	ld	hl,___mbf64_FA + 7
 	ld	a,(hl)

@@ -18,8 +18,11 @@ ldexp:
 	call	dload
 	ld	hl,2
 	add	hl,sp
-	ld	a,(hl)
+	ld	c,(hl)
 	ld	hl,fa+5
-	add	(hl)
+	ld	a,(hl)
+	and	a
+	ret	z
+	add	c
 	ld	(hl),a
 	ret
