@@ -68,7 +68,7 @@ PUBLIC _m32_invf
     push af                     ; save exponent and sign in C
 
     or a                        ; divide by zero?
-    jp Z,m32_fsmax_fastcall - 1	; We want one pop 
+    jp Z,m32_fsmax_fastcall-1   ; we want one pop at exit
 
     ld h,0bfh                   ; scale to -0.5 <= D' < -1.0
     srl l

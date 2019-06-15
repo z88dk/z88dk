@@ -44,7 +44,7 @@ PUBLIC _m32_neg
     jr m32_fseexit
 
 ; here to change overflow to floating infinity of sign d in dehl
-    pop af		; Entry from divide
+    pop af                  ; Entry from fsdiv
 .m32_fsmax_fastcall
     ld a,d
     or 07fh                 ; max exponent
