@@ -61,10 +61,11 @@ PUBLIC _m32_frexpf
     ld a,d
     ld d,0
     and a
-    jr  z,zero
+    jr Z,zero
     ld d,$7e                    ; remove exponent excess (bias-1)
     sub d                       ; mantissa between 0.5 and 1
-zero:
+
+.zero
     ld (bc),a                   ; and store in pw2
     inc bc
     rlca
