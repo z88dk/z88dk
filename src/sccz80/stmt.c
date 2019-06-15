@@ -607,8 +607,12 @@ void leave(int vartype, char type, int incritical)
     if (vartype == KIND_CPTR) /* they are the same in any case! */
         vartype = KIND_LONG;
     else if ( vartype == KIND_DOUBLE ) {
-        vartype = KIND_NONE;
-        save = NO;
+        if ( c_fp_size == 4 ) {
+            vartype = KIND_LONG;
+        } else {
+            vartype = KIND_NONE;
+            save = NO;
+        }
     }
 
     if ( c_notaltreg && abs(Zsp) >= 12 ) {
