@@ -5,8 +5,10 @@ PUBLIC cm32_sdcc_frexp
 
 EXTERN m32_fsfrexp_callee
 
-; float frexpf(float x, int8_t *pw2);
+; float frexpf(float x, int16_t *pw2);
+
 .cm32_sdcc_frexp
+
     ; Entry:
     ; Stack: ptr right, float left, ret
     
@@ -19,9 +21,10 @@ EXTERN m32_fsfrexp_callee
     push de                     ; (float)x
     push hl
     call m32_fsfrexp_callee
-    pop bc                      ; my return
-    push bc
-    push bc
-    push bc
-    push bc
+
+    pop af                      ; my return
+    push af
+    push af
+    push af
+    push af
     ret

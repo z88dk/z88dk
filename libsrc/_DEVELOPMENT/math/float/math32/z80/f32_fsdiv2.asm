@@ -26,9 +26,11 @@ PUBLIC _m32_div2f
 ._m32_div2f
 .m32_fsdiv2_fastcall
     sla e                       ; get exponent in d
-    rl d
+    rl d                        ; put sign in C
+
     dec d                       ; divide by 2
     jp Z,m32_fsmin_fastcall     ; capture underflow
-    rr d                        ; return exponent
+
+    rr d                        ; return sign and exponent
     rr e
     ret                         ; return IEEE DEHL

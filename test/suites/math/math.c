@@ -173,7 +173,6 @@ int suite_genmath()
 #ifndef MATH32
     suite_add_test(test_pow);
 #endif
-
     return suite_run();
 }
 

@@ -4,6 +4,7 @@ math/float/math32/c/sccz80/cm32_sccz80_asin
 math/float/math32/c/sccz80/cm32_sccz80_asinh
 math/float/math32/c/sccz80/cm32_sccz80_atan
 math/float/math32/c/sccz80/cm32_sccz80_atan2
+math/float/math32/c/sccz80/cm32_sccz80_atan2_callee
 math/float/math32/c/sccz80/cm32_sccz80_atanh
 math/float/math32/c/sccz80/cm32_sccz80_ceil
 math/float/math32/c/sccz80/cm32_sccz80_cos
