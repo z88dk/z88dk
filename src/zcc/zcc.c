@@ -844,7 +844,7 @@ int main(int argc, char **argv)
     parse_configfile_line(buffer);
     snprintf(buffer,sizeof(buffer),"ALIAS --hardware-keyboard -pragma-redirect:fgetc_cons=fgetc_cons_inkey");
     parse_configfile_line(buffer);
-    snprintf(buffer,sizeof(buffer),"ALIAS --math32 -Cc-fp-mode=ieee -lmath32");
+    snprintf(buffer,sizeof(buffer),"ALIAS --math32 -Cc-fp-mode=ieee -lmath32 -pragma-define:CLIB_32BIT_FLOATS=1");
     parse_configfile_line(buffer);
 
     gc = 1;            /* Set for the first argument to scan for */
