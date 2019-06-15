@@ -29,12 +29,12 @@ EXTERN m32_fspoly_callee
     pop de 
 
     exx
-    push af                     ; my return
     push hl                     ; (uint16_t)n
     push de                     ; (float*)d
 
     exx
     push de                     ; (float)x
     push hl
+    push af                     ; my return
 
     jp m32_fspoly_callee
