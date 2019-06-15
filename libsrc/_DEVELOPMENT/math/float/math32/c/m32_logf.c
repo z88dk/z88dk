@@ -58,7 +58,7 @@ extern float m32_coeff_log[];
 float m32_logf (float x) __z88dk_fastcall
 {
     float y, z, floate;
-    int8_t e;
+    int16_t e;
 
     if( x <= 0.0 )
     {
@@ -87,7 +87,7 @@ float m32_logf (float x) __z88dk_fastcall
         y += -2.12194440e-4 * floate;
     }
 
-    y -=  m32_div2f(z); /* y - 0.5 x^2 */
+    y -= m32_div2f(z); /* y - 0.5 x^2 */
     z = x + y;      /* ... + x  */
 
     if( e != 0)

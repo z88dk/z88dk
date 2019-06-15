@@ -26,12 +26,14 @@ PUBLIC _m32_mul2f
 ._m32_mul2f
 .m32_fsmul2_fastcall
     sla e                       ; get exponent in d
-    rl d
+    rl d                        ; put sign in C
+
     inc d                       ; multiply by 2
     jp Z,m32_fsmax_fastcall     ; capture NaN
     inc d
     jp Z,m32_fsmax_fastcall     ; capture overflow
     dec d
-    rr d                        ; return exponent
+
+    rr d                        ; return sign and exponent
     rr e
     ret                         ; return IEEE DEHL

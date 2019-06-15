@@ -5,7 +5,7 @@ PUBLIC cm32_sccz80_frexp_callee
 
 EXTERN m32_fsfrexp_callee
 
-; float frexpf(float x, int8_t *pw2);
+; float frexpf(float x, int16_t *pw2);
 .cm32_sccz80_frexp_callee
     ; Entry:
     ; Stack: float left, ptr right, ret

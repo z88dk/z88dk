@@ -39,5 +39,5 @@ float m32_powf (float x, float y)
     if(y == 0.0) return 1.0;
     if(y == 1.0) return x;
 
-    return m32_expf(y * m32_logf(x));
+    return m32_expf(m32_logf(x) * y);
 }

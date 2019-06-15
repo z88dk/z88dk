@@ -21,9 +21,10 @@ EXTERN m32_fsldexp_callee
 	push	de	                ;float
 	push	hl
     call m32_fsldexp_callee
-    pop bc                      ;my return
-    push bc
-    push bc
-    push bc
-    push bc
+
+    pop af                      ;my return
+    push af
+    push af
+    push af
+    push af
     ret

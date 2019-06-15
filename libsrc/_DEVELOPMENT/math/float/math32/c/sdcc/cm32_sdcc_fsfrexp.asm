@@ -19,9 +19,10 @@ EXTERN m32_fsfrexp_callee
     push de                     ; (float)x
     push hl
     call m32_fsfrexp_callee
-    pop bc                      ; my return
-    push bc
-    push bc
-    push bc
-    push bc
+
+    pop af                      ; my return
+    push af
+    push af
+    push af
+    push af
     ret

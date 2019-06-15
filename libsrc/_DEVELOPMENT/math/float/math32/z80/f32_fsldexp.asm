@@ -61,7 +61,7 @@ PUBLIC _m32_ldexpf
     add d
     ld d,a                      ; exponent returned
 
-    rl e                        ; get sign back
+    sla e                       ; restore sign to C
     rr d
     rr e
     ret                         ; return IEEE DEHL
