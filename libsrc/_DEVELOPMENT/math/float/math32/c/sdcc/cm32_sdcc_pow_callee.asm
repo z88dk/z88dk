@@ -15,7 +15,7 @@ cm32_sdcc_pow_callee:
     push hl     ; RHS
     push af
     push de     ; LHS
-    push bc    
+    push bc
 
     call _m32_powf
     pop af

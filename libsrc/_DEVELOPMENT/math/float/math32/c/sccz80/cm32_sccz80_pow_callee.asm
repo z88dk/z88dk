@@ -13,7 +13,7 @@ cm32_sccz80_pow_callee:
     ex (sp),hl  ; return to stack
 
     push de     ; RHS
-    push bc    
+    push bc
     push hl     ; LHS
     push af
 
