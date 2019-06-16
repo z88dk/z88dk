@@ -17,9 +17,9 @@ for arg in "$@"; do
     -k) set +e					;;	# keep building ignoring errors
     -c) do_clean=1				;;	# clean before building
     -t) do_tests=1				;;	# Run tests as well
-    -e) do_examples=1				;;	# Build examples as well 
+    -e) do_examples=1			;;	# Build examples as well 
     -nb) do_build=0				;;	# Don't build
-    -nl) do_libbuild=0				;;	# Don't build libraries
+    -nl) do_libbuild=0			;;	# Don't build libraries
      *) 
 	echo "Usage: $0 [-e][-k][-c][-t][-nb][-nl]"
 	echo
