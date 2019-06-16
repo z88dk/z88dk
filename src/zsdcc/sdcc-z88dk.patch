@@ -105,7 +105,7 @@ Index: src/SDCCmain.c
 -  fprintf (stream, "published under GNU General Public License (GPL)\n");
 +    " #%s (%s) " __DATE__ "\n\n", getBuildNumber(), getBuildEnvironment());
 +  fprintf(stream, "sdcc website:\nhttps://sourceforge.net/projects/sdcc/\n\n");
-+  fprintf(stream, "patch details:\nhttps://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/sdcc_z88dk_patch.zip\n\n");
++  fprintf(stream, "patch details:\nhttps://github.com/z88dk/z88dk/blob/master/src/zsdcc/sdcc-z88dk.patch\n\n");
 +  fprintf(stream, "published under GNU General Public License (GPL)\n");
  }
  
