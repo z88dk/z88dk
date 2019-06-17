@@ -31,7 +31,7 @@ PUBLIC _m32_div2f
     rr e                        ; save sign in e[7]
 
     xor a
-    and d
+    or d
     jp Z,m32_fszero_fastcall
 
     dec d                       ; divide by 2
