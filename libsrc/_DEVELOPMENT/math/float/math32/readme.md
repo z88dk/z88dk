@@ -5,11 +5,15 @@ This is the z88dk 32-bit IEEE-754 (mostly) standard m32 floating point maths pac
 
 Where not written by me, the functions were sourced from:
 
-  * the Digi International Rabbit IEEE-754 32-bit library, copyright (c) 2015 Digi International Inc.
+  * the Digi International Rabbit IEEE-754 32-bit library, copyright (C) 2015 Digi International Inc.
   * the Hi-Tech C 32-bit floating point library, copyright (C) 1984-1987 HI-TECH SOFTWARE.
   * the SDCC 32-bit floating point library, copyright (C) 1991 by Pipeline Associates, Inc, and others.
+  * the Cephes Math Library Release 2.2, copyright (C) 1984, 1987, 1989 by Stephen L. Moshier.
   * various Wikipedia references, especially for Newton-Raphson and Horner's Method.
 
+This library is designed for z180, and z80-zxn processors. Specifically, it is optimised for the z180 and z80-zxn [ZX Spectrum Next](https://www.specnext.com/) as these processors have a hardware `16_8x8` multiply instruction that can substantially accelerate floating point mantissa calculation.
+
+This library is also designed to be as fast as possible on the z80 processor. For the z80 it is built on the same core `16_8x8` multiply model, using either an optimal unrolled shift+add algorithm or a faster 512 Byte table lookup algorithm.
 
 *@feilipu, May 2019*
 
@@ -25,7 +29,7 @@ Where not written by me, the functions were sourced from:
 
   *  Made for the Spectrum Next. The z80-zxn `mul de` and the z180 `mlt nn` multiply instructions are used to full advantage to accelerate all floating point calculations.
 
-  *  The z80 multiply (without a hardware instruction) is implemented with an unrolled equivalent to the z80-zxn `mul de`, which is designed to have no side effect other than resetting the flag register.
+  *  The z80 multiply (without a hardware instruction) is implemented with an unrolled equivalent to the z80-zxn `mul de`, which is designed to have no side effect other than resetting the flag register. An alternate fast table look-up z80 multiply is also implemented.
 
   *  Mantissa calculations are done with 24-bits and 8-bits for rounding. Rounding is a simple method, but can be if required it can be expanded to the IEEE standard with a performance penalty.
 
@@ -33,7 +37,7 @@ Where not written by me, the functions were sourced from:
 
   *  Higher functions are written in C, for maintainability, and draw upon the intrinsic functions including the square root, square, and polynomial evaluation, as well as the 4 standard arithmetic functions.
 
-  *  Power and trigonometric functions' accuracy and speed can be traded by managing their polynomial series coefficient tables. More coefficients and iterations provides higher accuracy at the expense of performance. The default Hi-Tech C library coefficients are provided by default. Alternative coefficient tables can be implemented without impacting the code.
+  *  Power and trigonometric functions' accuracy and speed can be traded by managing their polynomial series coefficient tables and algorithms. More coefficients and iterations provides higher accuracy at the expense of performance. A combination of the Cephes Math library, and the Hi-Tech C library coefficients are provided by default. Alternative coefficient tables can be implemented without impacting the code.
 
   *  The square root (through the inverse square root function) is seeded using the Quake magic number method, with three Newton-Raphson iterations for accuracy. Again, accuracy and speed can be traded depending on the application by removing one or two iterations, for example for game usage.
 
@@ -171,7 +175,7 @@ Contains the sdcc and the sccz80 C compiler interface and is implemented using t
 
 ### lm32
 
-Glue that connects the compilers and standard assembly interface to the math32 library.  The purpose is to define aliases that connect the standard names to the math32 specific names.  These functions make up the z88dk m32 maths library that is linked against on the compile line (as in `-lm32`).
+Glue that connects the compilers and standard assembly interface to the math32 library.  The purpose is to define aliases that connect the standard names to the math32 specific names.  These functions make up the z88dk m32 maths library that is linked against on the compile line (as in `-lmath32` or `-lmath32_fast`).
 
 ## Function Discussion
 
@@ -194,7 +198,9 @@ Although some algorithms from the Digi International functions remain in these i
 
 For the z80 CPU, with no hardware multiply, a replica of the z80-zxn instruction `mul de` was created. Although the existing z88dk integer multiply routines could have been used, it is believed that since this routine is the heart of the entire library, it was worth optimising it for speed and to provide functional equivalence to the z80-zxn hardware multiply instruction to simplify code maintenance.
 
-The `z80_mulu_de` has zero argument detection, leading zero detection, and is unrolled. With the exception of preserving `hl`, for equivalency with z80-zxn `mul de`, it should be the fastest `16_8x8` multiply possible on a z80.
+The `z80_mulu_de` has zero argument detection, leading zero detection, and is unrolled. With the exception of preserving `hl`, for equivalency with z80-zxn `mul de`, it should be the fastest `16_8x8` linear multiply possible on a z80.
+
+In the search for performance, an alternate table driven `16_8x8` multiply function was created. This function uses a 512 Byte table containing the 16-bit square of 8-bit numbers, to substantially improve the multiply z80 performance. Alternate mantissa routines were written to suit this fast multiply function, and they are used where necessary.
 
 To calculate the 24-bit mantissa a special `mulu_32h_24x24` function has been built using 8 multiplies, the minimum number of `16_8x8` multiply terms. It is much more natural for the z80 to work in `16_8x8` multiplies than the Rabbit's `32_16x16` multiply. It is not a "correct" multiply, in that all terms are calculated and carry forward is considered. The lowest term is not calculated, as it doesn't impact the 32-bit result. The lower 16-bits of the result are simply truncated, leaving a further 8-bits for mantissa rounding within the calling function. The resulting `mulu_32h_24x24` could be the fastest way to calculate an IEEE sized mantissa on a z80, z180, & z80-zxn.
 
@@ -202,7 +208,7 @@ By providing a specific square function, all squaring (found in square root, tri
 
 #### mulu_z80_de and zero detection
 
-Both zero detection and leading zero removal are implemented for the `mulu_z80_de` function. But one could question more generally about whether zero detection in the mantissa calculation is worth it or not?
+Zero detection is used in both the unrolled shift+add and the table driven `mulu_z80_de` options, and leading zero removal is implemented for the unrolled shift+add `mulu_z80_de` function. But one could question more generally about whether zero detection in the mantissa calculation is worth it or not?
 
 A lot of "integer like" decimal or their binary equivalent numbers have "short" mantissas, when represented in floating point. If we call a 24-bit mantissa made up of three bytes "abc", then quite often the b and c bytes end up being zero. I think this is a common case. Handling these with zero detection will be a big win, making many `mulu_z80_de` multiplies very fast (because the result is zero).
 
@@ -244,8 +250,14 @@ float __fssqr (float, float) __z88dk_fastcall;
 float __fsinv (float, float) __z88dk_fastcall;
 float __fsdiv (float, float) __z88dk_callee;
 
+float sqrf(float a) __z88dk_fastcall;
 float sqrtf(float a) __z88dk_fastcall;
 float invsqrtf(float a) __z88dk_fastcall;
+
+float fabsf(float x) __z88dk_fastcall;
+float frexpf(float x, int *pw2) __z88dk_callee;
+float ldexpf(float x, int pw2) __z88dk_callee;
+
 float hypotf(float x, float y) __z88dk_callee;
 float polyf(const float x, const float d[], uint16_t n) __z88dk_callee;
 ```
@@ -255,23 +267,29 @@ The divide function is implemented by first obtaining the inverse of the divisor
 
 The Newton-Raphson method is used for finding the inverse, using full 32-bit expanded mantissa multiplies and adds for accuracy. Three N-R orthogonal iterations provide an accurate result for the IEEE-754 mantissa, at the expense of some performance.
 
-#### _fssqrt and _fsinvsqrt
+#### sqrtf() and invsqrt()
 
 Recently, in the Quake video game, a novel method of seeding the Newton-Raphson iteration for the inverse square root was invented. This fancy process is covered in detail in [Lomont 2003](http://www.lomont.org/Math/Papers/2003/InvSqrt.pdf) and the suggested magic number `0x5f375a86`, better than was used by the original Quake game, was implemented.
 
-Following this magic number seeding and traditional Newtwon-Raphson iterations, using the `_fssqr` function as appropriate, an accurate inverse square root is produced. The square root `_fssqrt` is then obtained by multiplying the number by its inverse square root.
+Following this magic number seeding and traditional Newtwon-Raphson iterations, using the `sqrf()` function as appropriate, an accurate inverse square root is produced. The square root `sqrtf()` is then obtained by multiplying the number by its inverse square root.
 
 Two N-R iterations produce 5 or 6 decimal digits of accuracy. Greater accuracy for this library has been obtained by increasing the Newton-Raphson iterations to 3 cycles at the expense of performance. Also, as in the original Quake game, 1 N-R iteration produces a good enough answer for most applications, and is substantially faster.
 
-#### _fspoly
+#### fabsf(), frexpf() and ldexpf()
 
-All of the higher functions are implemented based on Horner's Method for polynomial expansion. Therefore to evaluate these functions efficiently, an optimised `_fspoly` function has been developed, using full 32-bit expanded mantissa multiplies and adds for accuracy.
+For some functions it is easiest to work with IEEE floating point numbers in assembly. For these three functions simple assembly code produces the result required effectively.
+
+The sccz80 compiler has been upgraded to issue `ldexpf()` instructions where power of 2 multiplies (or divides) are required. This means that for example `X/2` is calculated as a decrement of the exponent byte rather than calculating a full divide, saving hundreds of cycles. For other compilers there are `mul2f()` and `div2f` functions available to handle simple power of two issues.
+
+#### polyf()
+
+All of the higher functions are implemented based on Horner's Method for polynomial expansion. Therefore to evaluate these functions efficiently, an optimised `poly()` function has been developed, using full 32-bit expanded mantissa multiplies and adds for accuracy.
 
 This function reads a table of coefficients stored in "ROM" and iterates the specified number of iterations to produce the result desired.
 
 It is a general function. Any coefficient table can be used, as desired. The coefficients are provided in packed IEEE floating point format, with the coefficients stored in the correct order. The 0th coefficient is stored first in the table. For examples see in the library for `sinf()`, `tanf()`, `logf()` and `expf()`.
 
-#### _fshypot
+#### hypotf()
 
 The hypotenuse function is provided as it is part of the standard maths library. The main use is to further demonstrate how effectively (simply) complex routines can be written using the compact floating point format.
 
@@ -306,9 +324,6 @@ float powf(float x, float y);
 float hypotf(float x, float y);
 
 /* Nearest integer, absolute value, and remainder functions */
-float fabsf(float x) __z88dk_fastcall;
-float frexpf(float x, int *pw2) __z88dk_callee;
-float ldexpf(float x, int pw2) __z88dk_callee;
 float ceilf(float x) __z88dk_fastcall;
 float floorf(float x) __z88dk_fastcall;
 float modff(float x, float * y);
@@ -316,11 +331,9 @@ float fmodf(float x, float y);
 ```
 ### Accuracy
 
-Generally the basic functions are accurate within 1-2 counts of the floating mantissa. However, in certain ranges of certain functions the relative accuracy is much less do to the intrinsic properties of floating point math. Accuracy expressed in counts of the floating mantissa is relative accuracy - i.e. relative to the size of the number. Absolute accuracy is the absolute size of the error - e.g. .000001. The derivative functions, computed as combinations of the basic functions, typically have larger error because the errors of 2 or more basic functions are added together in some fashion.
+Generally the intrinsic functions are accurate within 1-2 counts of the floating mantissa. However, in certain ranges of certain functions the relative accuracy is much less do to the intrinsic properties of floating point math. Accuracy expressed in counts of the floating mantissa is relative accuracy - i.e. relative to the size of the number. Absolute accuracy is the absolute size of the error - e.g. .000001. The derivative functions, computed as combinations of the basic functions, typically have larger error because the errors of 2 or more basic functions are added together in some fashion.
 
 If the value of the function depends on the value of the difference of 2 floating point numbers that are close to each other in value, the relative error generally becomes large, although the absolute error may remain well bounded. Examples are the logs of numbers near 1 and the sine of numbers near pi. For example, if the argument of the sine function is a floating point number is close to pi, say 5 counts of the mantissa away from pi and it is subtracted from pi the result will be a number with only 3 significant bits. The relative error in the sine result will be very large, but the absolute error will still be very small. Functions with steep slopes, such as the exponent of larger numbers will show a large relative error, since the relative error in the argument is magnified by the slope.
-
-The multiplication process is similar to the digi international method. The digi international code ignores the `c*f` term of the 24-bit mantissa calculation of `abc*cdf`, because they determined it wasn't required. m32 also takes this short cut and does not calculate all the terms. This also applies to the squaring process, which uses a similar optimisation.
 
 The addition / subtraction process is "correct", and this result should be identical to m48 within the significant digits of IEEE-754.
 
@@ -328,7 +341,7 @@ The division process relies on N-R estimation. There is an analysis of the numbe
 
 The square root calculation also relies on N-R and is therefore an estimate. With the 3 iterations currently implemented the estimate is also accurate to the requirement of the IEEE 24-bit mantissa. With 1 iteration the result is good for 3D graphics in games and not much else.
 
-The rest of the derived power and trigonometric functions rely on the polynomial expansion process and will only be as accurate as the coefficients that are fed into the process. I've used those coefficients found in the Hi-Tech C library code. I guess they got them mostly right, but their code is not known for accuracy. Someone with a mathematical background might be interested to calculate better coefficients at some stage.
+The rest of the derived power and trigonometric functions rely on the polynomial expansion process and will only be as accurate as the algorithms and coefficients that are fed into the process. I've used those algorithms and coefficients found in the Hi-Tech C library and the Cephes Math library. I guess they got them mostly right. Someone with a mathematical background might be interested to calculate better coefficients at some stage.
 
 ### Execution speed
 

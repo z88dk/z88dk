@@ -40,6 +40,8 @@ math/float/math32/lm32/c/sccz80/l_f32_eq
 math/float/math32/lm32/c/sccz80/l_f32_f2long
 math/float/math32/lm32/c/sccz80/l_f32_ge
 math/float/math32/lm32/c/sccz80/l_f32_gt
+math/float/math32/lm32/c/sccz80/l_f32_invf
+math/float/math32/lm32/c/sccz80/l_f32_ldexp
 math/float/math32/lm32/c/sccz80/l_f32_le
 math/float/math32/lm32/c/sccz80/l_f32_lt
 math/float/math32/lm32/c/sccz80/l_f32_mul
