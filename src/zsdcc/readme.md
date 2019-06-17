@@ -16,6 +16,10 @@ to install z88dk.
 
 ### Patch Information
 
+`sdcc-z88dk.patch` is the current default standard patch.
+
+`sdcc-11288-z88dk.patch` is the current zsdcc patch, retained for comparison and building against sdcc r11288.
+
 `sdcc-9958-z88dk.patch` is the previous zsdcc standard patch, retained for comparison and building against sdcc r9958.
 
 `sdcc-10892-z88dk-peep.patch` has been submitted as sdcc [feature request # 289](https://sourceforge.net/p/sdcc/patches/289/) for review, test, and integrate from that end. This file is retained for the record. z88dk does not normally use the sdcc peephole optimiser, so these patches remain optional.
