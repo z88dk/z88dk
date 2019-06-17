@@ -31,6 +31,7 @@ SECTION code_clib
 SECTION code_fp_math32
 
 EXTERN m32_fszero_fastcall
+EXTERN m32_fsmin_fastcall
 
 PUBLIC m32_fsldexp_callee
 PUBLIC _m32_ldexpf
@@ -72,4 +73,4 @@ PUBLIC _m32_ldexpf
 
     and a                       ; check for zero exponent
     ret NZ                      ; return IEEE DEHL
-    jp m32_fszero_fastcall      ; otherwise return IEEE zero 
+    jp m32_fsmin_fastcall       ; otherwise return IEEE underflow zero 
