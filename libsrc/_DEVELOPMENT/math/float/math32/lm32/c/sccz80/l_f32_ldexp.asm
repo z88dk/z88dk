@@ -24,7 +24,6 @@ l_f32_ldexp:
         and a                       ; check for zero exponent
         ret NZ                      ; return IEEE in DEHL
 
-        ld a,d
         ld e,0
         ld h,e
         ld l,e
