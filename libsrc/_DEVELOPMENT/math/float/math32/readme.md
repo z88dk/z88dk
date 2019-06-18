@@ -1,7 +1,7 @@
 
-## z88dk IEEE Floating Point Package - m32
+## z88dk IEEE Floating Point Package - `math32`
 
-This is the z88dk 32-bit IEEE-754 (mostly) standard m32 floating point maths package, designed to work with the SCCZ80 and SDCC IEEE-754 (mostly) standard 32-bit interfaces.
+This is the z88dk 32-bit IEEE-754 (mostly) standard m32 floating point maths package, designed to work with the SCCZ80 and ZSDCC IEEE-754 (mostly) standard 32-bit interfaces.
 
 Where not written by me, the functions were sourced from:
 
@@ -133,7 +133,7 @@ This format is provided for both the multiply and add intrinsic internal 32-bit 
 
 ## Calling Convention
 
-The z88dk m32 library uses the sccz80 standard register and stack calling convention, but with the standard c parameter passing direction. For sccz80 the first or right hand side parameter is passed in DEHL, and the second or LHS parameter is passed on the stack. For sdcc all parameters are passed on the stack, from right to left. For both compilers, where multiple parameters are passed, they will be passed on the stack.
+The z88dk m32 library uses the sccz80 standard register and stack calling convention, but with the standard c parameter passing direction. For sccz80 the first or right hand side parameter is passed in DEHL, and the second or LHS parameter is passed on the stack. For zsdcc all parameters are passed on the stack, from right to left. For both compilers, where multiple parameters are passed, they will be passed on the stack.
 
 The intrinsic functions, written in assembly, assume the sccz80 calling convention, and are by default `__z88dk_callee`, which means that they will consume values passed on the stack, returning with the value in DEHL.
 
@@ -167,15 +167,19 @@ The library is laid out in these directories.
 
 ### z80
 
-Contains the assembly language interface to the maths library.  This includes the maths functions expected by the C11 standard and various low level functions necessary to implement a complete float package accessible from assembly language.  These functions are the intrinsic math32 functions.
+Contains the assembly language implementation of the maths library.  This includes the maths functions expected by the C11 standard and various low level functions necessary to implement a complete float package accessible from assembly language.  These functions are the intrinsic `math32` functions.
 
-### sdcc/sccz80
+### c
 
-Contains the sdcc and the sccz80 C compiler interface and is implemented using the assembly language interface in the z80 directory. Float conversion between the math32 format and the format expected by sdcc and sccz80 occurs here.
+Contains the trigonometric, logarithmic, power and other functions implemented in C. Currently, compiled versions of these functions are prepared and saved in `c/asm` to be assembled and built as required.
+
+### c/sdcc and c/sccz80
+
+Contains the zsdcc and the sccz80 C compiler interface and is implemented using the assembly language interface in the z80 directory. Float conversion between the math32 IEEE-754 format and the format expected by zsdcc and sccz80 occurs here.
 
 ### lm32
 
-Glue that connects the compilers and standard assembly interface to the math32 library.  The purpose is to define aliases that connect the standard names to the math32 specific names.  These functions make up the z88dk m32 maths library that is linked against on the compile line (as in `-lmath32` or `-lmath32_fast`).
+Glue that connects the compilers and standard assembly interface to the `math32` library.  The purpose is to define aliases that connect the standard names to the math32 specific names.  These functions make up the complete z88dk `math32` maths library that is linked against on the compile line (as in `-lmath32` or `-lmath32_fast`) or for the z180 and z80-zxn (`-lmath32_z180` or `-lmath32_zxn`).
 
 ## Function Discussion
 
