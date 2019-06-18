@@ -30,20 +30,29 @@ int open(char *name, int flags, mode_t mode)
 
 struct TRSDOS_FILE *trs80_file;
 
-
-	trs80_file = malloc(sizeof(struct TRSDOS_FILE));
-	if (trs80_file == 0) return (-1);
-	
-	//trs80_file->pos = 0L;
 	if (stricmp(name,"*DO") == 0) {
+		if (flags == O_RDONLY)
+			return (-1);
 		/* Fake TRSDOS_FILE structure, no buffer, point to an already open FCB (the video DCB) */
 		return (TRSDOS_DO);
 	}
 
 	if (stricmp(name,"*PR") == 0) {
-		/* Fake TRSDOS_FILE structure, no buffer, point to an already open FCB (the video DCB) */
+		if (flags == O_RDONLY)
+			return (-1);
+		/* Fake TRSDOS_FILE structure, no buffer, point to an already open FCB (the printer DCB) */
 		return (TRSDOS_PR);
 	}
+
+	if (stricmp(name,"*KI") == 0) {
+		if (flags != O_RDONLY)
+			return (-1);
+		/* Fake TRSDOS_FILE structure, no buffer, point to an already open FCB (the keyboard DCB) */
+		return (TRSDOS_KI);
+	}
+	
+	trs80_file = malloc(sizeof(struct TRSDOS_FILE));
+	if (trs80_file == 0) return (-1);
 
 	/* Prepare FCB */
 	//if (!trsdos_tst(DOS_FSPEC, name, trs80_file->fcb)) {
