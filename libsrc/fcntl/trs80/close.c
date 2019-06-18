@@ -24,6 +24,9 @@ int close(int fd)
 
 
 	trs80_file = (void *) fd;
+	
+	if ((trs80_file == TRSDOS_DO) || (trs80_file == TRSDOS_PR))
+		return 0;
 
 	/* Let's close the file only if TRSDOS thinks it is open */
 	if (trs80_file->fcb->type & 0x80) {
