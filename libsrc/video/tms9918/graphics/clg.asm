@@ -13,6 +13,7 @@
 	EXTERN	__tms9918_cls
 	EXTERN	__tms9918_screen_mode
 	EXTERN	msx_set_mode
+	EXTERN	__tms9918_attribute
 
 clg:
 _clg:
@@ -21,6 +22,8 @@ _clg:
 	jr    nz,notext
 	
 	; Enter in GFX mode 2 by default if in text mode
+	ld	a,$1E	; BLACK INK, GRAY (dim white) PAPER
+	ld	(__tms9918_attribute),a
 	ld    hl,2
 	call  msx_set_mode
 	
