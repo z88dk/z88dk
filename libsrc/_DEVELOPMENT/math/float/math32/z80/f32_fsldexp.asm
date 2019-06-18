@@ -58,12 +58,10 @@ PUBLIC _m32_ldexpf
 
     sla e                       ; get the exponent
     rl d
+    jp Z,m32_fszero_fastcall    ; return IEEE zero
     rr e                        ; save the sign in e[7]
 
     ld a,d
-    or a
-    jp Z,m32_fszero_fastcall    ; return IEEE zero
-
     add c                       ; pw2
     ld d,a                      ; exponent returned
 
