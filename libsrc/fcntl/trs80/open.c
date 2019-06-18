@@ -20,6 +20,7 @@
 
 //#include <stdio.h>
 #include <malloc.h>
+#include <string.h>
 
 
 
@@ -34,7 +35,15 @@ struct TRSDOS_FILE *trs80_file;
 	if (trs80_file == 0) return (-1);
 	
 	//trs80_file->pos = 0L;
+	if (stricmp(name,"*DO") == 0) {
+		/* Fake TRSDOS_FILE structure, no buffer, point to an already open FCB (the video DCB) */
+		return (TRSDOS_DO);
+	}
 
+	if (stricmp(name,"*PR") == 0) {
+		/* Fake TRSDOS_FILE structure, no buffer, point to an already open FCB (the video DCB) */
+		return (TRSDOS_PR);
+	}
 
 	/* Prepare FCB */
 	//if (!trsdos_tst(DOS_FSPEC, name, trs80_file->fcb)) {
@@ -63,6 +72,7 @@ struct TRSDOS_FILE *trs80_file;
 					return (trs80_file);
 				}
 		}
+		
 	}
 		
 	/* catch-all error exit code */
