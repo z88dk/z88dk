@@ -29,8 +29,6 @@ PUBLIC _m32_div2f
     sla e                       ; get exponent in d
     rl d                        ; put sign in C
 
-    inc d
-    dec d
     jp Z,m32_fszero_fastcall
 
     dec d                       ; divide by 2
