@@ -19,11 +19,17 @@
 #define SECSIZE  256
 
 
-/* Falgs for fcp->use */
+/* Flags for fcp->use */
 #define U_READ  1               /* file open for reading */
 #define U_WRITE 2               /* file open for writing */
 #define U_RDWR  3               /* open for read and write */
 #define U_CON   4               /* device is console */
+
+
+/* TRSDOS preset devices */
+#define TRSDOS_KI  0x4015	/* Keyboard DCB (*KI) */
+#define TRSDOS_DO  0x401D	/* Video DCB (*DO) */
+#define TRSDOS_PR  0x4025	/* Printer DCB (*PR) */
 
 
 //#define __STDIO_EOFMARKER  -1   /* End of file marker (^Z) */
