@@ -17,8 +17,6 @@
 
 SECTION code_fp_math32
 
-EXTERN m32_fsmax_fastcall
-
 PUBLIC m32_fsmul2_fastcall
 PUBLIC _m32_mul2f
 
@@ -27,13 +25,31 @@ PUBLIC _m32_mul2f
 .m32_fsmul2_fastcall
     sla e                       ; get exponent in d
     rl d                        ; put sign in C
+    jr Z,zero_legal             ; return IEEE zero
 
     inc d                       ; multiply by 2
-    jp Z,m32_fsmax_fastcall     ; capture NaN
+    jr Z,infinity               ; capture NaN
     inc d
-    jp Z,m32_fsmax_fastcall     ; capture overflow
+    jr Z,infinity               ; capture overflow
     dec d
 
     rr d                        ; return sign and exponent
     rr e
     ret                         ; return IEEE DEHL
+
+.zero_legal
+    ld e,d                      ; use 0
+    ld h,d
+    ld l,d        
+    rr d                        ; restore the sign
+    ret                         ; return IEEE signed ZERO in DEHL
+
+.infinity
+    ld e,d                      ; use 0
+    ld h,d
+    ld l,d
+    dec d                       ; 0xff
+    rr d                        ; restore the sign
+    rr e
+    scf
+    ret                         ; return IEEE signed ZERO in DEHL

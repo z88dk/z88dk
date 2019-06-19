@@ -37,7 +37,6 @@ PUBLIC _m32_frexpf
 
 ; float frexpf (float x, int *pw2);
 ._m32_frexpf
-
 .m32_fsfrexp_callee
     ; evaluation of fraction and exponent
     ;

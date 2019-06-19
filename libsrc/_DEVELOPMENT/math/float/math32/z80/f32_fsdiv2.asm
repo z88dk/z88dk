@@ -17,9 +17,6 @@
 
 SECTION code_fp_math32
 
-EXTERN m32_fszero_fastcall
-EXTERN m32_fsmin_fastcall
-
 PUBLIC m32_fsdiv2_fastcall
 PUBLIC _m32_div2f
 
@@ -28,12 +25,26 @@ PUBLIC _m32_div2f
 .m32_fsdiv2_fastcall
     sla e                       ; get exponent in d
     rl d                        ; put sign in C
-
-    jp Z,m32_fszero_fastcall
+    jr Z,zero_legal             ; return IEEE zero
 
     dec d                       ; divide by 2
-    jp Z,m32_fsmin_fastcall     ; capture underflow
+    jr Z,zero_underflow         ; capture underflow zero
 
     rr d                        ; return sign and exponent
     rr e
     ret                         ; return IEEE DEHL
+
+.zero_legal
+    ld e,d                      ; use 0
+    ld h,d
+    ld l,d        
+    rr d                        ; restore the sign
+    ret                         ; return IEEE signed ZERO in DEHL
+
+.zero_underflow
+    ld e,d                      ; use 0
+    ld h,d
+    ld l,d
+    rr d                        ; restore the sign
+    scf
+    ret                         ; return IEEE signed ZERO in DEHL
