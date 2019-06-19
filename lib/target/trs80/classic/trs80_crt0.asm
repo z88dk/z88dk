@@ -1,16 +1,20 @@
+;
 ;       TRS 80  Program boot
 ;
 ;       Stefano Bodrato 2008
 ;
-;       $Id: trs80_crt0.asm,v 1.21 2016-07-15 21:03:25 dom Exp $
+;       $Id: trs80_crt0.asm $
 ;
 
+;
 ; 	There are a couple of #pragma commands which affect this file:
 ;
 ;	#pragma output nostreams - No stdio disc files
 ;	#pragma output nofileio  - No fileio at all, use in conjunction to "-lndos"
 ;	#pragma output noredir   - do not insert the file redirection option while parsing the
 ;	                           command line arguments (useless if "nostreams" is set)
+;	#pragma output doscmd    - TRSDOS mode console output
+;
 
 
 	MODULE  trs80_crt0
@@ -40,12 +44,12 @@
 IF      !DEFINED_CRT_ORG_CODE
 	IF (startup=2)
 		defc	EG2000_ENABLED = 1
-                defc    CRT_ORG_CODE  = 22500
-		defc	CLIB_KEYBOARD_ADDRESS = 0xf800
+                defc    CRT_ORG_CODE  = $57E4
+		defc	CLIB_KEYBOARD_ADDRESS = $f800
 	ELSE
 		defc	EG2000_ENABLED = 0
                 defc    CRT_ORG_CODE  = $5200
-		defc	CLIB_KEYBOARD_ADDRESS = 0x3800
+		defc	CLIB_KEYBOARD_ADDRESS = $3800
 	ENDIF
 ENDIF
 
@@ -142,8 +146,37 @@ find_end:
 	; defc DEFINED_noredir = 1
 	INCLUDE	"crt/classic/crt_command_line.asm"
 
-	push	hl	;argv
+	push	hl	;argv for "main"
 	push	bc	;argc
+	
+IF CRT_ENABLE_STDIO = 1
+IF DEFINED_doscmd
+IF !DEFINED_noredir
+	; if (fchkstd(stdout) == 1) freopen("*do","w",stdout);
+	EXTERN fchkstd
+	ld	hl,__sgoioblk+10		; file struct for stdout
+	push hl
+	call fchkstd
+	pop  de
+	ld	a,l
+	dec a
+	jr  nz,crt_no_reopen
+ENDIF
+	EXTERN freopen
+	ld		hl,crt_do_fname
+	push	hl					; file name ptr
+	ld		de,redir_fopen_flag
+	push	de
+	ld	de,__sgoioblk+10		; file struct for stdout
+	push	de
+	call	freopen
+	pop	de
+	pop	de
+	pop	de
+crt_no_reopen:
+ENDIF
+ENDIF
+
         call    _main           ;Call user program
 	pop	bc	;kill argv
 	pop	bc	;kill argc
@@ -186,10 +219,16 @@ end:		defb	0		; null file name (used in argv/argc parsing)
 
 
 	SECTION  rodata_clib
-IF !DEFINED_noredir
 IF CRT_ENABLE_STDIO = 1
+IF !DEFINED_noredir
 redir_fopen_flag:		defb	'w',0
 redir_fopen_flagr:		defb	'r',0
+ENDIF
+IF DEFINED_doscmd
+crt_do_fname:		defb	'*','D','O',0
+IF DEFINED_noredir
+redir_fopen_flag:		defb	'w',0
+ENDIF
 ENDIF
 ENDIF
 
