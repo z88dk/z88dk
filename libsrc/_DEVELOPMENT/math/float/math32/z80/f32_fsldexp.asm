@@ -30,7 +30,6 @@
 SECTION code_clib
 SECTION code_fp_math32
 
-EXTERN m32_fszero_fastcall
 EXTERN m32_fsmin_fastcall
 
 PUBLIC m32_fsldexp_callee
@@ -39,7 +38,6 @@ PUBLIC _m32_ldexpf
 
 ; float ldexpf (float x, int16_t pw2);
 ._m32_ldexpf
-
 .m32_fsldexp_callee
     ; evaluation of fraction and exponent
     ;
@@ -58,7 +56,7 @@ PUBLIC _m32_ldexpf
 
     sla e                       ; get the exponent
     rl d
-    jp Z,m32_fszero_fastcall    ; return IEEE zero
+    jr Z,zero_legal             ; return IEEE zero
     rr e                        ; save the sign in e[7]
 
     ld a,d
@@ -71,4 +69,11 @@ PUBLIC _m32_ldexpf
 
     and a                       ; check for zero exponent
     ret NZ                      ; return IEEE DEHL
-    jp m32_fsmin_fastcall       ; otherwise return IEEE underflow zero 
+    jp m32_fsmin_fastcall       ; otherwise return IEEE underflow zero
+
+.zero_legal
+    ld e,d                      ; use 0
+    ld h,d
+    ld l,d
+    rr d                        ; restore the sign
+    ret                         ; return IEEE signed ZERO in DEHL
