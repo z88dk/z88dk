@@ -4,6 +4,8 @@ trsdos_tst
 trsdos_tst_callee
 trsdos_get
 obj/initdcb
+obj/genspec
+obj/addext
 obj/open
 obj/close
 obj/creat
