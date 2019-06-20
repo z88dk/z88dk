@@ -171,6 +171,15 @@ ENDIF
 	push	de
 	call	freopen
 	pop	de
+	
+	; Simplidied redirection of STDERR.
+	; If STDOUT was already redirected, the eventual STDERR output
+	; will be on top of the screen rather than gracefully appended at the console output.
+	ld	de,__sgoioblk+20		; file struct for stderr
+	push	de
+	call	freopen
+	pop	de
+	
 	pop	de
 	pop	de
 crt_no_reopen:
