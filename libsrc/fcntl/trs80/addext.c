@@ -29,6 +29,6 @@ char *addext(char *filespec, char *ext)
 		if ((filespec[x]=='/') && isalnum(filespec[x+1]))
 			return (filespec);
 
-	return (strcat(filespec, ext));
+	return (strcat(strcat(filespec,"/"),ext));
 }
 
