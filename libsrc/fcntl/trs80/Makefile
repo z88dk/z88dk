@@ -4,6 +4,8 @@ include ../../Make.config
 
 CFILES = \
 	initdcb.c   \
+	addext.c   \
+	genspec.c   \
 	open.c   \
 	close.c  \
 	readbyte.c  \
