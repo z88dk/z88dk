@@ -185,5 +185,9 @@ extern int __LIB__  trsdos_get(int fcb) __smallc __z88dk_fastcall;
 extern int __LIB__ initdcb(char *name, struct TRSDOS_FCB *fcb) __smallc;
 
 
+/* Miosys C compatibility */
+extern char __LIB__ *addext(char *filespec, char *ext) __smallc;
+extern char __LIB__ *genspec( char *inspec, char *partspec, char *extn) __smallc;
+
 
 #endif
