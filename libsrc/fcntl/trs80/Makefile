@@ -3,6 +3,7 @@
 include ../../Make.config
 
 CFILES = \
+	syserrlist.c   \
 	initdcb.c   \
 	addext.c   \
 	genspec.c   \
