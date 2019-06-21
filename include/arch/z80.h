@@ -21,12 +21,14 @@
 // to the routine invoked by AsmCall, DosCall, BiosCall
 // and UnapiCall.
 
-typedef enum {
+typedef unsigned char register_usage;
+
+enum {
 	REGS_NONE = 0,	//No registers at all
 	REGS_AF = 1,	//AF only
 	REGS_MAIN = 2,	//AF, BC, DE, HL
 	REGS_ALL = 3	//AF, BC, DE, HL, IX, IY
-} register_usage;
+};
 
 
 /* ---  Structure representing the Z80 registers  ---
