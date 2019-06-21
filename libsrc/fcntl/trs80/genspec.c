@@ -30,13 +30,12 @@
 #include <trsdos.h>
 
 #include <ctype.h>
-#include <stdio.h>
 #include <string.h>
 
 
 char *genspec( char *inspec, char *partspec, char *extn)
 {
-	int x,y;
+	char *x;
 	char name[9];
 	char ext[4];
 	char drive[3];
@@ -49,33 +48,33 @@ char *genspec( char *inspec, char *partspec, char *extn)
 	
 	x=strchr(inspec,':');
 	if (x>0) {
-		strncpy(drive,inspec+x,2);
-		inspec[x]=0;
+		strncpy(drive,x,2);
+		x[0]=0;
 	}
 	
 	x=strchr(partspec,':');
-	if (x>0) {
-		strncpy(drive,partspec+x,2);
-		partspec[x]=0;
+	if ((x>0)||(partspec[0]==':')) {
+		strncpy(drive,x,2);
+		x[0]=0;
 	}
 	
-	strcpy(ext,extn);
-
 	x=strchr(inspec,'/');
 	if (x>0) {
-		strncpy(ext,inspec+x+1,3);
-		inspec[x]=0;
+		strncpy(ext,x+1,3);
+		x[0]=0;
 		strcpy(name,inspec);
 	}
 	
 	x=strchr(partspec,'/');
-	if (x>0) {
-		strncpy(ext,partspec+x+1,3);
-		partspec[x]=0;
-		strcpy(name,partspec);
+	if ((x>0)||(partspec[0]=='/')) {
+		strncpy(ext,x+1,3);
+		x[0]=0;
+		if (partspec[0]>0)
+			strcpy(name,partspec);
 	}
+
+	if (ext[0]!=0) strcpy(ext,extn);
 	
-	sprintf(partspec,"%s/%s%s",name,ext,drive);
-	
-	return(partspec);
+	strcpy(partspec,name);
+	return(strcat(strcat(strcat(partspec,"/"),ext),drive));
 }
