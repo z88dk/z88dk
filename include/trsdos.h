@@ -76,6 +76,10 @@ struct TRSDOS_FILE {
 };
 
 
+extern int __LIB__ errno;
+
+/* convert errno to short text */
+extern char __LIB__  *syserrlist(int errno) __smallc __z88dk_fastcall;
 
 /* Error codes */
 
