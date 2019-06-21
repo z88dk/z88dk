@@ -15,6 +15,8 @@
 	PUBLIC	trsdos_tst_callee
 	PUBLIC	_trsdos_tst_callee
 
+	EXTERN	errno
+
 	PUBLIC	ASMDISP_TRSDOS_TST_CALLEE
 
 ; int (unsigned int fn, char *hl_reg, char *de_reg);
@@ -41,6 +43,7 @@ centry:
 	JP	(IX)
 	
 retaddr:
+	ld	(errno),a
 	ld	hl,0
 	ret z
 	dec hl	; -1 if NZ
