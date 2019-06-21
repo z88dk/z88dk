@@ -15,6 +15,8 @@
 	PUBLIC	trsdos_callee
 	PUBLIC	_trsdos_callee
 
+	EXTERN	errno
+
 	PUBLIC	ASMDISP_TRSDOS_CALLEE
 
 ; int (unsigned int fn, char *hl_reg, char *de_reg);
@@ -42,6 +44,7 @@ centry:
 	
 retaddr:
 	ld	l,a		; Error code
+	ld	(errno),a
 	ld	h,0
 	
 	ret
