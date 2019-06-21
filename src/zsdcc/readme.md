@@ -18,7 +18,7 @@ to install z88dk.
 
 `sdcc-z88dk.patch` is the current default standard patch.
 
-`sdcc-11288-z88dk.patch` is the current zsdcc patch, retained for comparison and building against sdcc r11288.
+`sdcc-11292-z88dk.patch` is the current zsdcc patch, retained for comparison and building against sdcc r11292.
 
 `sdcc-9958-z88dk.patch` is the previous zsdcc standard patch, retained for comparison and building against sdcc r9958.
 
