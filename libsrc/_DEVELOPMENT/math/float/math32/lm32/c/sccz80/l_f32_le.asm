@@ -6,9 +6,9 @@ EXTERN	m32_compare_callee
 
 l_f32_le:
 	call	m32_compare_callee
-	ret	c
+	ret	C
 	scf
-	ret	z
+	ret	Z
 	ccf
 	dec	hl
 	ret

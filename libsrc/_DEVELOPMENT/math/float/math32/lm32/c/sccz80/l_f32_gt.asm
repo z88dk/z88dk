@@ -6,9 +6,9 @@ EXTERN	m32_compare_callee
 
 l_f32_gt:
 	call	m32_compare_callee
-	jr	z,gt1
+	jr	Z,gt1
 	ccf
-	ret	c
+	ret	C
 gt1:
 	dec	hl
 	ret

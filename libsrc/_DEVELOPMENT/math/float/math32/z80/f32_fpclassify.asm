@@ -8,8 +8,8 @@ m32_fpclassify:
 	;
 	; exit  :  a = 0 if number
 	;            = 1 if zero
-	;            = 2 if nan (not applicable for math48)
-	;            = 3 if inf (not applicable for math48)
+	;            = 2 if nan
+	;            = 3 if inf
 	;
 	; uses  : af
 
