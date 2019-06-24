@@ -1,6 +1,6 @@
 Index: src/SDCCasm.c
 ===================================================================
---- src/SDCCasm.c	(revision 11292)
+--- src/SDCCasm.c	(revision 11293)
 +++ src/SDCCasm.c	(working copy)
 @@ -403,8 +403,8 @@
  static const ASM_MAPPING _asxxxx_mapping[] = {
@@ -23,7 +23,7 @@ Index: src/SDCCasm.c
     "; ---------------------------------\n"
 Index: src/SDCCglue.c
 ===================================================================
---- src/SDCCglue.c	(revision 11292)
+--- src/SDCCglue.c	(revision 11293)
 +++ src/SDCCglue.c	(working copy)
 @@ -189,7 +189,7 @@
             (sym->_isparm && !IS_REGPARM (sym->etype) && !IS_STATIC (sym->localof->etype))) &&
@@ -84,7 +84,7 @@ Index: src/SDCCglue.c
  
 Index: src/SDCCmain.c
 ===================================================================
---- src/SDCCmain.c	(revision 11292)
+--- src/SDCCmain.c	(revision 11293)
 +++ src/SDCCmain.c	(working copy)
 @@ -499,16 +499,15 @@
  {
@@ -105,14 +105,14 @@ Index: src/SDCCmain.c
 -  fprintf (stream, "published under GNU General Public License (GPL)\n");
 +    " #%s (%s) " __DATE__ "\n\n", getBuildNumber(), getBuildEnvironment());
 +  fprintf(stream, "sdcc website:\nhttps://sourceforge.net/projects/sdcc/\n\n");
-+  fprintf(stream, "patch details:\nhttps://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/sdcc_z88dk_patch.zip\n\n");
++  fprintf(stream, "patch details:\nhttps://github.com/z88dk/z88dk/blob/master/src/zsdcc/sdcc-z88dk.patch\n\n");
 +  fprintf(stream, "published under GNU General Public License (GPL)\n");
  }
  
  static void
 Index: src/SDCCopt.c
 ===================================================================
---- src/SDCCopt.c	(revision 11292)
+--- src/SDCCopt.c	(revision 11293)
 +++ src/SDCCopt.c	(working copy)
 @@ -1004,7 +1004,7 @@
        /* TODO: Eliminate it, convert any SEND of volatile into DUMMY_READ_VOLATILE. */
@@ -176,7 +176,7 @@ Index: src/SDCCopt.c
                  continue;
 Index: src/z80/peep.c
 ===================================================================
---- src/z80/peep.c	(revision 11292)
+--- src/z80/peep.c	(revision 11293)
 +++ src/z80/peep.c	(working copy)
 @@ -218,6 +218,88 @@
    return(arg[0] == '#') ? FALSE : StrStr(arg, what) != NULL;
