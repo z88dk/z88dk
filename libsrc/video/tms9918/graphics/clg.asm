@@ -22,7 +22,7 @@ _clg:
 	jr    nz,notext
 	
 	; Enter in GFX mode 2 by default if in text mode
-	ld	a,$1E	; BLACK INK, GRAY (dim white) PAPER
+	ld	a,$1F	; BLACK INK, WHITE PAPER
 	ld	(__tms9918_attribute),a
 	ld    hl,2
 	call  msx_set_mode
