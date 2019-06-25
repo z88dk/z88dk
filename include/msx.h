@@ -162,6 +162,7 @@ extern void __LIB__ msx_noblank();
 
 // Change the MSX color attributes
 extern int __LIB__ msx_color(int foreground, int background, int border) __smallc;
+extern int __LIB__ msx_set_border(int border) __z88dk_fastcall;
 
 #define INK_TRANSPARENT    0x00
 #undef INK_BLACK
