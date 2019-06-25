@@ -26,26 +26,22 @@ _msx_vpeek:
         ; enter vdp address pointer
         ld      a,l
         call    l_tms9918_disable_interrupts
+		
 IF VDP_CMD < 0
-        ld      (-VDP_CMD),a
+	ld	a,l
+	ld	(-VDP_CMD),a
+	ld	a,h
+	and	@00111111
+	ld	(-VDP_CMD),a
+	ld	a,(-VDP_DATAIN)
 ELSE
         ld      bc,VDP_CMD
+        out     (c),l           ;LSB of video memory ptr
+        ld      a,h		; MSB of video mem ptr
+        and     @00111111	; masked with "write command" bits
         out     (c),a
-ENDIF
-        ld      a,h
-        and     @00111111
-IF VDP_CMD < 0
-        ld      (-VDP_CMD),a
-        out     (c),a
-ENDIF
-        ; read data
-IF VDP_DATAIN < 0
-        ld      a,(-VDP_DATAIN)
-ELSE
-    IF VDP_DATAIN > 255
-            ld        a,+(VDP_DATAIN / 256)
-    ENDIF
-        in      a,(VDP_DATAIN % 256)
+        ld      bc,VDP_DATAIN
+        in      a,(c)
 ENDIF
         
         ld      h,0
