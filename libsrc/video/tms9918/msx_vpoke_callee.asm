@@ -34,33 +34,31 @@ _msx_vpoke_callee:
 .asmentry
         ld        a,e
 msx_vpoke_direct:
+        ex		af,af
         call    l_tms9918_disable_interrupts
         ; enter vdp address pointer
-        push    af
-        ld      a,l
+		
 IF VDP_CMD < 0
-        ld      (-VDP_CMD),a
+	ld	a,l
+	ld	(-VDP_CMD),a
+	ld	a,h
+	and	@00111111
+	or	@01000000
+	ld	(-VDP_CMD),a
+	ex	af,af
+	ld	(-VDP_DATA),a
 ELSE
         ld      bc,VDP_CMD
-        out     (c),a
-ENDIF
-        ld      a,h
-        and     @00111111
+        out     (c),l           ;LSB of video memory ptr
+        ld      a,h		; MSB of video mem ptr
+        and     @00111111	; masked with "write command" bits
         or      @01000000
-IF VDP_CMD < 0
-        ld      (-VDP_CMD),a
-ELSE
         out     (c),a
-ENDIF
-
-        ; enter data
-        pop     af                        ; "ld a,e" could be too fast, better to keep the POP instruction
-IF VDP_DATA < 0
-        ld      (-VDP_DATA),a
-ELSE
+        ex      af,af
         ld      bc,VDP_DATA
         out     (c),a
 ENDIF
+
         call    l_tms9918_enable_interrupts
         ret
         
