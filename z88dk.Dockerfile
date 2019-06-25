@@ -25,7 +25,7 @@ RUN apk add --no-cache build-base libxml2 m4 \
 RUN cd ${Z88DK_PATH} \
     && chmod 777 build.sh \
     && ./build.sh \
-    && svn checkout -r 11293 svn://svn.code.sf.net/p/sdcc/code/trunk/sdcc ${SDCC_PATH} \
+    && svn checkout -r 11295 svn://svn.code.sf.net/p/sdcc/code/trunk/sdcc ${SDCC_PATH} \
     && cd ${SDCC_PATH} \
     && patch -p0 < ${Z88DK_PATH}/src/zsdcc/sdcc-z88dk.patch \
     && ./configure \
