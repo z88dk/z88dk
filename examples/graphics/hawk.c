@@ -19,7 +19,9 @@
  ZX 81 G007, very simple because it is not possible to limit to a single screen slice, add "CLS 4" in the BASIC part before the USR call:
  zcc +zx81 -clib=g007 -create-app -Cz--disable-autorun  hawk.c
  
- 
+ MSX,SVI:
+ zcc +msx -create-app -lndos -lmsxbios hawk.c
+ zcc +svi -create-app -lndos -lsvibios hawk.c
  
  */
 
