@@ -19,6 +19,7 @@
 	EXTERN	msxbios
 	EXTERN	msx_set_mode
 	EXTERN	__tms9918_attribute
+	EXTERN	__tms9918_screen_mode
 
 IF FORmsx
 	INCLUDE	"target/msx/def/msxbios.def"
@@ -37,6 +38,8 @@ _clg:
 
 	ld    ix,INIGRP
     call  msxbios
+	ld	a,2
+	ld	(__tms9918_screen_mode),a
 	
 	ld    a,$1F   	; black on white attributes
 	ld    (__tms9918_attribute),a
@@ -59,6 +62,6 @@ _clg:
 	call  msxbios
 	LD A,$01	; black
 	LD (FORCLR),A
-
+	
 	pop	ix
 	ret
