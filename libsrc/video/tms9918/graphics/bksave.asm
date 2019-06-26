@@ -13,6 +13,8 @@
         PUBLIC  bkpixeladdress
         EXTERN  l_tms9918_disable_interrupts
         EXTERN  l_tms9918_enable_interrupts
+        EXTERN  swapgfxbk
+        EXTERN  __graphics_end
 
         INCLUDE "video/tms9918/vdp.inc"
 
@@ -20,7 +22,8 @@
 .bksave
 ._bksave
         push    ix        ;save callers
-        ld      hl,2   
+        call    swapgfxbk
+        ld      hl,4
         add     hl,sp
         ld      e,(hl)
         inc     hl
@@ -53,14 +56,13 @@
 
 .bksaves
         push    bc
-
-        push    hl
         call    bkpixeladdress
-        pop     hl
-        
+		
 .rbytes
-        ld      a,0
-.rloop  ex      af,af
+        ld      a,0	; <-SMC!
+
+.rloop
+        ex      af,af
 ;-------
         call    l_tms9918_disable_interrupts
 IF VDP_CMD < 0
@@ -70,7 +72,6 @@ IF VDP_CMD < 0
         and     @00111111        ; masked with "read command" bits
         ld      (-VDP_CMD),a
         ld      a,(-VDP_DATAIN)
-        ld      (ix+4),a
 ELSE
         ld      bc,VDP_CMD
         out     (c),e
@@ -79,22 +80,24 @@ ELSE
         out     (c),a
         ld      bc,VDP_DATAIN
         in      a,(c)
-        ld      (ix+4),a
 ENDIF
+        ld      (ix+4),a
         call    l_tms9918_enable_interrupts
         ex      de,hl
         ld      bc,8
         add     hl,bc
         ex      de,hl
         inc     ix
+		
         ex      af,af
         dec     a
         jr      nz,rloop
+		
         inc     l
         pop     bc
         djnz    bksaves
-        pop     ix                ;restore callers
-        ret
+		
+        jp      __graphics_end
 
 
 .bkpixeladdress
@@ -117,4 +120,3 @@ ENDIF
         ex      de,hl
         pop     hl
         ret
-
