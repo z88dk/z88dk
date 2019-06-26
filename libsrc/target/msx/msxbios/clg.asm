@@ -35,6 +35,13 @@ clg:
 _clg:
 	push ix
 	
+	LD A,$0F	; white
+	LD (BAKCLR),A
+	LD (BDRCLR),A
+	;ld    ix,SETBORDER
+	;call  msxbios
+	LD A,$01	; black
+	LD (FORCLR),A
 
 	ld    ix,INIGRP
     call  msxbios
@@ -54,14 +61,6 @@ _clg:
     ld    l,a
 	ld    ix,FILVRM
     call  msxbios
-	
-	LD A,$0F	; white
-	LD (BAKCLR),A
-	LD (BDRCLR),A
-	ld    ix,SETBORDER
-	call  msxbios
-	LD A,$01	; black
-	LD (FORCLR),A
 	
 	pop	ix
 	ret
