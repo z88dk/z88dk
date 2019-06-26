@@ -6,13 +6,14 @@
 ;
 ;	Change the MSX color attributes
 ;
-;	$Id: msx_color.asm,v 1.6 2016-06-16 19:30:25 dom Exp $
+;	$Id: msx_color.asm $
 ;
 
         SECTION code_clib
 	PUBLIC	msx_color
 	PUBLIC	_msx_color
 	EXTERN	msxbios
+	EXTERN	__tms9918_attribute
 	
 IF FORmsx
         INCLUDE "target/msx/def/msxbios.def"
@@ -37,5 +38,7 @@ _msx_color:
 	ld	a,(0FCAFh)	;SCRMOD
 	ld	ix,CHGCLR
 	call	msxbios
+	ld	a,(ATRBYT)
+	ld	(__tms9918_attribute),a
 	pop	ix
 	ret
