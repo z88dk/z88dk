@@ -1,6 +1,6 @@
 
 		SECTION	code_clib
-		PUBLIC	xorpixl
+		PUBLIC	xorpixel
 
 		EXTERN	xor_MODE0
 		EXTERN	xor_MODE1
@@ -11,7 +11,7 @@
 		INCLUDE	"target/spc1000/def/spc1000.def"
 
 
-xorpixl:
+xorpixel:
 		ld	a,(__spc1000_mode)
 		cp	1
 		jp	z,xor_MODE1
