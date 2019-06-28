@@ -5,7 +5,7 @@
 		EXTERN	xor_MODE0
 		EXTERN	xor_MODE1
 		EXTERN	xor_MODE2
-                EXTERN  __tms9918_xorpixl
+                EXTERN  __tms9918_xorpixel
 
 		EXTERN	__spc1000_mode
 		INCLUDE	"target/spc1000/def/spc1000.def"
@@ -18,7 +18,7 @@ xorpixel:
 		cp	2
 		jp	z,xor_MODE2
                 cp      10
-                jp      nc,__tms9918_xorpixl
+                jp      nc,__tms9918_xorpixel
 		and	a
 		ret	nz
 		jp	xor_MODE0
