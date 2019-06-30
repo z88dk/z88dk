@@ -76,7 +76,8 @@ bin/zsdcc$(EXESUFFIX):
 		--disable-pic-port --disable-pic14-port --disable-pic16-port \
 		--disable-gbz80-port --disable-tlcs90-port \
 		--disable-xa51-port --disable-stm8-port \
-		--disable-pdk13-port --disable-pdk14-port --disable-pdk15-port \
+		--disable-pdk13-port --disable-pdk14-port \
+		--disable-pdk15-port --disable-pdk16-port \
 		--disable-ucsim --disable-device-lib --disable-packihx
 	cd $(SDCC_PATH) && $(MAKE)
 	cd $(SDCC_PATH) && mv ./bin/sdcc  $(Z88DK_PATH)/bin/zsdcc
