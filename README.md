@@ -51,15 +51,15 @@ There are three ways to install z88dk.
 The z88dk repository uses git submodules, these are not automatically downloaded by git by default so you will have to either adjust your clone line, or retrieve them manually. To clone with submodules use `git clone --recursive https://github.com/z88dk/z88dk.git`. To add the submodules to an already existing clone use `git submodule update --init --recursive`
 
 
-1. **Installing the Z88DK Binaries**   
-	  * **Mac OSX** Download the nightly build for osx and copy the z88dk/bin directory to the same place in your z88dk tree.  If you would like to try building the binaries yourself, follow the Other instructions below.   
-	  * **Windows** Download the nightly build for win32 and copy the z88dk/bin directory to the same place in your z88dk tree.  You can also build the z88dk binaries yourself using the VS2015 solution found in z88dk/win32 however you should copy the nightly build initially so that various required dlls and some non-z88dk binaries are present.   
+1. **Installing the Z88DK Binaries**
+	  * **Mac OSX** Download the nightly build for osx and copy the z88dk/bin directory to the same place in your z88dk tree.  If you would like to try building the binaries yourself, follow the Other instructions below.
+	  * **Windows** Download the nightly build for win32 and copy the z88dk/bin directory to the same place in your z88dk tree.  You can also build the z88dk binaries yourself using the VS2015 solution found in z88dk/win32 however you should copy the nightly build initially so that various required dlls and some non-z88dk binaries are present.
 	  * **Other** Build the binaries yourself by following these [instructions](https://www.z88dk.org/wiki/doku.php?id=temp:front#linux_unix).
-2. **Installing the Classic Lib Z80 Libraries**  If you installed the z88dk binaries following the Other instructions in (I) you should have also built the classic z80 libraries.  You can confirm this by checking that z88dk/lib/clibs contains about 138 .lib files.  Otherwise you can following one of these two methods:   
-	  * **Copy the classic lib library files** from any nightly build by copying the z88dk/lib/clibs directory to the same place in your z88dk tree.   
+2. **Installing the Classic Lib Z80 Libraries**  If you installed the z88dk binaries following the Other instructions in (I) you should have also built the classic z80 libraries.  You can confirm this by checking that z88dk/lib/clibs contains about 138 .lib files.  Otherwise you can following one of these two methods:
+	  * **Copy the classic lib library files** from any nightly build by copying the z88dk/lib/clibs directory to the same place in your z88dk tree.
 	  * **Build the classic lib library from source**  Building the classic lib from source requires unix-like tools so windows users will need to use msys or cygwin.  Aside from that the process is simple.  After setting the environment variables as detailed below, open a shell, cd to z88dk/libsrc and enter "make -i" then "make install" followed by "make clean".
-3. **Installing the New Lib Z80 Libraries**  If you installed the z88dk binaries following the Other instructions in (I) you should have also built the new z80 libraries.  You can confirm this by checking that z88dk/libsrc/_DEVELOPMENT/lib contains six .lib files in each of the subdirectories.  Otherwise you can following one of these two methods:   
-	  * **Copy the new lib library files** from any nightly build by copying the z88dk/libsrc/_DEVELOPMENT/lib tree to the same place in your z88dk tree.   
+3. **Installing the New Lib Z80 Libraries**  If you installed the z88dk binaries following the Other instructions in (I) you should have also built the new z80 libraries.  You can confirm this by checking that z88dk/libsrc/_DEVELOPMENT/lib contains six .lib files in each of the subdirectories.  Otherwise you can following one of these two methods:
+	  * **Copy the new lib library files** from any nightly build by copying the z88dk/libsrc/_DEVELOPMENT/lib tree to the same place in your z88dk tree.
 	  * **Build the new lib library files from source**  After setting the environment variables as detailed below, open a command prompt, cd to z88dk/libsrc/_DEVELOPMENT and enter "Winmake all" for windows or "make" for other platforms.
 
 We do not maintain the zsdcc or zsdcpp source code in the repository.  Instead zsdcc is built separately from a [patched sdcc](https://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/sdcc_z88dk_patch.zip).  We supply the zsdcc and zsdcpp binaries for win32 and osx in the nightly build so if you are using win32 or osx and you copied z88dk/bin, you will already have zsdcc and zsdcpp installed.  Other users will have to build the zsdcc binary by following these [instructions](https://www.z88dk.org/wiki/doku.php?id=temp:front#sdcc1).
@@ -86,22 +86,22 @@ The new c library is z88dk's rewrite aiming for a large subset of C11 conformanc
 
 ## QUICK LINKS
 
-[Z88DK Home Page](https://www.z88dk.org/forum/)   
+[Z88DK Home Page](https://www.z88dk.org/forum/)
 Includes a link to the nightly builds where you can get an up-to-date package.
 
 [Install Instructions](https://github.com/z88dk/z88dk/wiki/installation)
 
 [Forum for Questions](https://www.z88dk.org/forum/forums.php)
 
-[Bug Reporting](https://github.com/z88dk/z88dk/issues)   
+[Bug Reporting](https://github.com/z88dk/z88dk/issues)
 (old bugs in the forum)
 
-[Introduction to Compiling Using the Classic C Library](https://github.com/z88dk/z88dk/wiki)   
+[Introduction to Compiling Using the Classic C Library](https://github.com/z88dk/z88dk/wiki)
 Examples in [z88dk/examples](https://github.com/z88dk/z88dk/tree/master/examples)
 
 [Introduction to Compiling Using the New C Library](https://www.z88dk.org/wiki/doku.php?id=temp:front)   
 Examples in [z88dk/libsrc/_DEVELOPMENT/EXAMPLES](https://github.com/z88dk/z88dk/tree/master/libsrc/_DEVELOPMENT/EXAMPLES)
 
-[Compiling for Generic z80 Embedded Systems Using the New C Library](https://www.z88dk.org/wiki/doku.php?id=libnew:target_embedded)   
+[Compiling for Generic z80 Embedded Systems Using the New C Library](https://www.z88dk.org/wiki/doku.php?id=libnew:target_embedded)
 For any z80 computer, embedded or not.
 
