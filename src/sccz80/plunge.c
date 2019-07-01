@@ -205,6 +205,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
     } else {
         /* non-constant on left */
         int  beforesp = Zsp;
+        int savestkcount = stkcount;
         setstage(&before_constlval, &start_constlval);
         if (lval->val_type == KIND_DOUBLE) {
             dpush();
@@ -234,9 +235,16 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 //            }
 
             /* djm, load double reg for long operators */
-            if ( lval2->val_type == KIND_DOUBLE || lval->val_type == KIND_DOUBLE ) {
+            if (  lval2->val_type == KIND_DOUBLE || lval->val_type == KIND_DOUBLE ) {
                  clearstage(before_constlval, NULL);
                  Zsp = beforesp;
+                 stkcount = savestkcount;
+                 // Convert to a float
+                 if ( lval->val_type != KIND_DOUBLE ) {
+                     zconvert_to_double(lval->val_type, lval->ltype->isunsigned);
+                     lval->val_type = KIND_DOUBLE;
+                     lval->ltype = type_double;
+                 }
                  if ( doper == zdiv ) {
                      doper = mult;
                      dconstoper = mult_dconst;
@@ -248,7 +256,6 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                      }
                  }
                 dpush();
-                 // Multiplication is cheaper than division, so invert the constant
                  load_double_into_fa(lval2);
                  lval2->val_type = KIND_DOUBLE;
                  lval2->ltype = type_double;
