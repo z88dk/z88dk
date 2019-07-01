@@ -296,6 +296,7 @@ static int cmd_continue(int argc, char **argv)
 static int parse_number(char *str, char **end)
 {
     int   base = 0;
+    int   ret;
 
     if ( *str == '$' ) {
         base = 16;
@@ -313,6 +314,12 @@ static int cmd_disassemble(int argc, char **argv)
     if ( argc == 2 ) {
         char *end;
         where = parse_number(argv[1], &end);
+        if ( end == argv[1] ) {
+            where = symbol_resolve(argv[1]);
+            if ( where == -1 ) {
+                where = pc;
+            }
+        }
     }
 
     while ( i < 10 ) {
@@ -429,7 +436,7 @@ static int cmd_break(int argc, char **argv)
             breakpoint *elem = malloc(sizeof(*elem));
             elem->type = BREAK_CHECK8;
             elem->lcheck_ptr = get_memory_addr(value);
-            elem->lvalue = atoi(argv[4]);
+            elem->lvalue = parse_number(argv[4], &end);
             elem->enabled = 1;
             elem->text = strdup(argv[2]);
             LL_APPEND(breakpoints, elem);
@@ -444,7 +451,7 @@ static int cmd_break(int argc, char **argv)
         }
        
         if ( addr != -1 ) {
-            int value = atoi(argv[4]);
+            int value = parse_number(argv[4],&end);
             breakpoint *elem = malloc(sizeof(*elem));
             elem->type = BREAK_CHECK16;
             elem->lcheck_ptr = get_memory_addr(addr);
@@ -506,7 +513,10 @@ static int cmd_examine(int argc, char **argv)
     if ( argc == 2 ) {
         char *end;
         int addr = parse_number(argv[1], &end);
-        if ( end != argv[1] ) {
+        if ( end == argv[1] ) {
+            addr =  symbol_resolve(argv[1]);
+        }
+        if ( addr != -1  ) {
             char  buf[100];
             char  abuf[17];
             size_t offs;
