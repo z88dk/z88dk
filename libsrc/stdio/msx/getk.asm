@@ -29,5 +29,6 @@ ENDIF
 	ld	ix,CHSNS
 	call	msxbios
 	pop	ix
+        ld      hl,0
 	ret	z		; exit if no key in buffer
 	jp	fgetc_cons
