@@ -324,6 +324,13 @@ enum stick_direction {
 // 5: SVI-328 MKII
 extern int __LIB__ msx_type();
 
+// MSX2 version number
+// 0 = MSX 1
+// 1 = MSX 2
+// 2 = MSX 2+
+// 3 = MSX turbo R
+extern unsigned char MSX2_SUBTYPE @0x002d;
+
 // Detect the VRAM size (in KB)
 extern int __LIB__ msx_vram();
 
