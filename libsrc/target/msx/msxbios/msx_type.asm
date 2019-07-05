@@ -21,7 +21,7 @@ _msx_type:
 	ld	hl,1
 	ret	z			; yes
 
-	ld	h,3
+	;ld	h,3
 	ld	a,($7d63)		; BASIC SubVersion string
 	sub	45
 	ld	l,a
