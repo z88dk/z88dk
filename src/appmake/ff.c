@@ -5918,7 +5918,7 @@ FRESULT f_mkfs (
 				st_dword(buf + 4, 0xFFFFFFFF);	/* Entry 1 */
 				st_dword(buf + 8, 0x0FFFFFFF);	/* Entry 2 (root directory) */
 			} else {
-				st_dword(buf + 0, (fmt == FS_FAT12) ? 0xFFFFF8 : 0xFFFFFFF8);	/* Entry 0 and 1 */
+				st_dword(buf + 0, (fmt == FS_FAT12) ? 0xFFFFF9 : 0xFFFFFFF8);	/* Entry 0 and 1 */
 			}
 			nsect = sz_fat;		/* Number of FAT sectors */
 			do {	/* Fill FAT sectors */

@@ -27,7 +27,24 @@ option_t fat_options[] = {
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
-static disc_spec msxdos_fat12 = {
+static disc_spec msxdos_bluemsx_fat12 = {
+    .name = "MSXDOS-F12",
+    .sectors_per_track = 9,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 0,
+    .directory_entries = 112,
+    .number_of_fats = 2,
+    .cluster_size = 1024,
+    .fat_format_flags = FM_FAT|FM_SFD,
+    .alternate_sides = 0,
+    .first_sector_offset = 1	// Required for .dsk
+};
+
+static disc_spec msxdos_takeda_fat12 = {
     .name = "MSXDOS-F12",
     .sectors_per_track = 9,
     .tracks = 80,
@@ -45,6 +62,7 @@ static disc_spec msxdos_fat12 = {
 };
 
 
+
 static struct formats {
      const char    *name;
      const char    *description;
@@ -53,8 +71,9 @@ static struct formats {
      void          *bootsector;
      char           force_com_extension;
 } formats[] = {
-    { "msxdos",    "MSXDOS DSDD",        &msxdos_fat12, 0, NULL, 1 },
-    { "msxbasic",  "MSXDOS DSDD (BASIC)",&msxdos_fat12, 0, NULL, 0 },
+    { "msxdos",    "MSXDOS DSDD",         &msxdos_bluemsx_fat12, 0, NULL, 1 },
+    { "msxdos-tak","MSXDOS DSDD (takeda)",&msxdos_takeda_fat12, 0, NULL, 1 },
+    { "msxbasic",  "MSXDOS DSDD (BASIC)", &msxdos_bluemsx_fat12, 0, NULL, 0 },
     { NULL, NULL }
 };
 
