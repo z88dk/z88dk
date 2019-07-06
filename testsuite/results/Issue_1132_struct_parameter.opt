@@ -9,7 +9,7 @@
 	SECTION	code_compiler
 
 ._func
-	ld	hl,4+10	;const
+	ld	hl,14	;const
 	add	hl,sp
 	ld	de,10	;const
 	ex	de,hl
@@ -19,7 +19,7 @@
 
 
 ._func_callee
-	ld	hl,4+10	;const
+	ld	hl,14	;const
 	add	hl,sp
 	ld	de,10	;const
 	ex	de,hl
