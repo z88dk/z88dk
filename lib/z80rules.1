@@ -531,7 +531,7 @@
 	ld	sp,hl
 =
 	exx
-	ld	hl,%1+%2	;const
+	ld	hl,%eval(%1 %2 +)	;const
 	add	hl,sp
 	ld	sp,hl
 	exx
@@ -551,12 +551,13 @@
 =
 	jp	i_%1
 
+%check 0 <= %2 <= 65535
 	ld	hl,%1	;const
 	add	hl,sp
 	ld	bc,%2
 	add	hl,bc
 =
-	ld	hl,%1+%2	;const
+	ld	hl,%eval(%1 %2 +)	;const
 	add	hl,sp
 
 	call	l_inclong
@@ -4430,3 +4431,18 @@
 	and	#%1
 	ld	l,a
 	ld	h,0
+
+	inc	hl
+	inc	hl
+	ld	(_%1),hl
+	dec	hl
+	dec	hl
+	ld	(hl),%2
+	inc	hl
+	ld	(hl),%3
+=
+	ld	(hl),%2
+	inc	hl
+	ld	(hl),%3
+	inc	hl
+	ld	(_%1),hl
