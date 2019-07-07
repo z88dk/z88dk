@@ -1,5 +1,6 @@
 
 	EXTERN pixeladdress
+	EXTERN __gfx_coords
 
 	INCLUDE	"graphics/grafix.inc"
 
@@ -14,6 +15,7 @@
 	ld	a,l
 	cp	192
 	ret	nc
+	ld	(__gfx_coords),hl
 	push	bc	;Save callers value
 	call	pixeladdress		;hl = address, a = pixel number
 	ld	b,h

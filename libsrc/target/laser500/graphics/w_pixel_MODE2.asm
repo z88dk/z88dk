@@ -5,6 +5,7 @@
 	EXTERN	getmaxx
 	EXTERN	l_cmp
 	EXTERN	__laser500_attr
+	EXTERN	__gfx_coords
 
 	INCLUDE	"target/laser500/def/laser500.def"
 
@@ -27,6 +28,8 @@
 	pop	hl
 	ret	nc
 	ex	de,hl
+	ld	(__gfx_coords),hl	;x
+	ld	(__gfx_coords+2),de	;y
 	push	bc
 	call	w_pixeladdress
 	ld	b,a

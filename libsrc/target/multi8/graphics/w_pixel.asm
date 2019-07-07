@@ -4,6 +4,7 @@
 	EXTERN	getmaxy
 	EXTERN	getmaxx
 	EXTERN	l_cmp
+	EXTERN	__gfx_coords
 
 	EXTERN	__vram_in
 	EXTERN	__vram_out
@@ -26,6 +27,8 @@
 	pop	hl
 	ret	nc
 	ex	de,hl
+	ld	(__gfx_coords),hl	;x
+	ld	(__gfx_coords+2),de	;y
 	push	bc
 	call	w_pixeladdress
 	ld	b,a
