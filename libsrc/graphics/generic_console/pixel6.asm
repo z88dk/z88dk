@@ -14,6 +14,7 @@
 	EXTERN	generic_console_pointxy
 	EXTERN	__console_w
 	EXTERN	__console_h
+	EXTERN	__gfx_coords
 
 
         ld      a,(__console_w)
@@ -30,7 +31,7 @@
         cp      l
         ret     c
 
-		
+	ld	(__gfx_coords),hl
 	push	ix
 	push	bc		;Save entry bc
 	ld	ix,-4		;ix + 0 = orig x

@@ -8,6 +8,7 @@
 	EXTERN	textpixl
 	EXTERN	__console_w
 	EXTERN	__console_h
+	EXTERN	__gfx_coords
 
 
 		ld	a,(__console_w)
@@ -22,6 +23,7 @@
 		cp	l
 		ret	c
 
+		ld	(__gfx_coords),hl
 		push	bc		;save entry bc	
 		ld	c,h
 		ld	b,l
