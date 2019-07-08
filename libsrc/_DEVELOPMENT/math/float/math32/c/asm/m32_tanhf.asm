@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.9.1 #11292 (Linux)
+; Version 3.9.1 #11310 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -283,53 +283,63 @@ _m32_tanhf:
 	push	af
 	push	af
 	call	_m32_expf
-	ld	(ix-8),l
-	ld	(ix-7),h
-	ld	(ix-6),e
-	ld	(ix-5),d
-	pop	bc
-	pop	de
-	push	de
-	ld	l,c
-	ld	h,b
 	push	hl
+	ld	c,l
+	ld	b,h
+	push	de
+	ld	l, c
+	ld	h, b
 	call	_m32_invf
-	push	de
-	push	hl
-	ld	l,(ix-6)
-	ld	h,(ix-5)
-	push	hl
-	ld	l,(ix-8)
-	ld	h,(ix-7)
-	push	hl
-	call	___fssub_callee
 	ld	(ix-4),l
 	ld	(ix-3),h
 	ld	(ix-2),e
 	ld	(ix-1),d
-	pop	bc
 	pop	de
+	pop	bc
+	push	bc
 	push	de
-	ld	l,c
-	ld	h,b
-	push	hl
-	call	_m32_invf
-	push	de
-	push	hl
-	ld	l,(ix-6)
-	ld	h,(ix-5)
-	push	hl
-	ld	l,(ix-8)
-	ld	h,(ix-7)
-	push	hl
-	call	___fsadd_callee
-	push	de
-	push	hl
 	ld	l,(ix-2)
 	ld	h,(ix-1)
 	push	hl
 	ld	l,(ix-4)
 	ld	h,(ix-3)
+	push	hl
+	push	de
+	push	bc
+	call	___fssub_callee
+	ld	(ix-8),l
+	ld	(ix-7),h
+	ld	(ix-6),e
+	ld	(ix-5),d
+	pop	de
+	pop	bc
+	push	bc
+	push	de
+	ld	l, c
+	ld	h, b
+	call	_m32_invf
+	ld	(ix-4),l
+	ld	(ix-3),h
+	ld	(ix-2),e
+	ld	(ix-1),d
+	pop	de
+	pop	bc
+	ld	l,(ix-2)
+	ld	h,(ix-1)
+	push	hl
+	ld	l,(ix-4)
+	ld	h,(ix-3)
+	push	hl
+	push	de
+	push	bc
+	call	___fsadd_callee
+	push	de
+	push	hl
+	ld	l,(ix-6)
+	ld	h,(ix-5)
+	push	hl
+	ld	l,(ix-8)
+	ld	h,(ix-7)
 	push	hl
 	call	___fsdiv
 	ld	sp,ix
