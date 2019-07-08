@@ -82,7 +82,7 @@ PUBLIC _m32_invf
     push hl                     ; - D' lsw on stack for D[1] calculation
 
     sla e
-    sla d                       ; get D' full exponent into d
+    rl d                        ; get D' full exponent into d
     rr c                        ; put sign in c
     scf
     rr e                        ; put implicit bit for mantissa in ehl
@@ -97,7 +97,7 @@ PUBLIC _m32_invf
     ld bc,04034h
     push bc
     ld bc,0B4B5h
-    push bc                
+    push bc
     ld bc,03FE9h
     push bc
     ld bc,06969h
