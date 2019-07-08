@@ -20,6 +20,8 @@ graphics/px8/w_respixl
 graphics/px8/w_xorpixl
 graphics/px8/w_pixeladdress
 graphics/px8/w_pointxy
+graphics/px8/w_bksave
+graphics/px8/w_bkrestore
 graphics/swapgfxbk_foo.asm
 @gfxbasew.lst
 @stdio/ansicore.lst
