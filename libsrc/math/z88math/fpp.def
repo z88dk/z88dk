@@ -1,0 +1,52 @@
+lstoff
+
+; BBC BASIC maths library opcodes
+
+		EXTERN	FPP
+
+; function codes:
+		DEFC	FP_AND = $00		; bitwise	AND
+		DEFC	FP_IDV = $01		; integer	division
+		DEFC	FP_EOR = $02		; bitwise	XOR
+		DEFC	FP_MOD = $03		; integer	remainder
+		DEFC	FP_OR  = $04		; bitwise	OR
+		DEFC	FP_LEQ = $05		; less than or	equal to
+		DEFC	FP_NEQ = $06		; not equal to
+		DEFC	FP_GEQ = $07		; greater	than	or equal to
+		DEFC	FP_LT  = $08		; less than
+		DEFC	FP_EQ  = $09		; equal
+		DEFC	FP_MUL = $0a		; multiply
+		DEFC	FP_ADD = $0b		; add
+		DEFC	FP_GT  = $0c		; greater	than
+		DEFC	FP_SUB = $0d		; subtract
+		DEFC	FP_PWR = $0e		; raise to the	power
+		DEFC	FP_DIV = $0f		; divide
+		DEFC	FP_ABS = $10		; absolute value
+		DEFC	FP_ACS = $11		; arc cosine
+		DEFC	FP_ASN = $12		; arc sine
+		DEFC	FP_ATN = $13		; arc tangent
+		DEFC	FP_COS = $14		; cosine
+		DEFC	FP_DEG = $15		; radians	to degrees
+		DEFC	FP_EXP = $16		; exponential
+		DEFC	FP_INT = $17		; integer	value
+		DEFC	FP_LN  = $18		; base e (natural) logarithm
+		DEFC	FP_LOG = $19		; base 10	(common) logarithmn
+		DEFC	FP_NOT = $1a		; bitwise	NOT
+		DEFC	FP_RAD = $1b		; degrees	to radians
+		DEFC	FP_SGN = $1c		; sign
+		DEFC	FP_SIN = $1d		; sinus
+		DEFC	FP_SQR = $1e		; square root
+		DEFC	FP_TAN = $1f		; tangent
+		DEFC	FP_ZER = $20		; zero
+		DEFC	FP_ONE = $21		; one
+		DEFC	FP_TRU = $22		; true (-1)
+		DEFC	FP_PI  = $23		; PI
+		DEFC	FP_VAL = $24		; numeric	value of string
+		DEFC	FP_STR = $25		; string value	of a	number
+		DEFC	FP_FIX = $26		; truncate a float to an	integer
+		DEFC	FP_FLT = $27		; integer	to float conversion
+		DEFC	FP_TST = $28		; test number for zero and sign
+		DEFC	FP_CMP = $29		; compare	two numbers
+		DEFC	FP_NEG = $2a		; negate (z88dk extra)
+
+lston

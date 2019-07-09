@@ -10,10 +10,19 @@
 		EXTERN	fsetup
 		EXTERN	stkequ
 
+IF FORz88
 		INCLUDE	"target/z88/def/fpp.def"
+ELSE
+		INCLUDE "fpp.def"
+ENDIF
 
 .dmul
 	call	fsetup
+IF FORz88
 	fpp(FP_MUL)
+ELSE
+	ld	a,+(FP_MUL)
+	call	FPP
+ENDIF
 	jp	stkequ
 

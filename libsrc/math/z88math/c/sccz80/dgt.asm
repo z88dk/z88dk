@@ -10,11 +10,20 @@
 		EXTERN	fsetup
 		EXTERN	stkequcmp
 
+IF FORz88
 		INCLUDE	"target/z88/def/fpp.def"
+ELSE
+		INCLUDE "fpp.def"
+ENDIF
 
 ; TOS >= FA?
 .dgt
 	call	fsetup
+IF FORz88
 	fpp(FP_GT)
+ELSE
+	ld	a,+(FP_GT)
+	call	FPP
+ENDIF
 	jp	stkequcmp
 

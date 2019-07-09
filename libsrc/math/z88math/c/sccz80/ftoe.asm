@@ -10,7 +10,11 @@
                 SECTION  code_fp
 		PUBLIC	ftoe
 
+IF FORz88
 		INCLUDE	"target/z88/def/fpp.def"
+ELSE
+		INCLUDE "fpp.def"
+ENDIF
 
 .ftoe
 	ld	ix,0
@@ -27,7 +31,12 @@
 	ld	c,(ix+6+5)	;number
 	ld	e,(ix+2)	;buffer
 	ld	d,(ix+3)
+IF FORz88
 	fpp(FP_STR)
+ELSE
+	ld	a,+(FP_STR)
+	call	FPP
+ENDIF
 	ret
 
 	
