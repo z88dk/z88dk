@@ -130,7 +130,7 @@ FTABLE: DEFW    ABS             ;ABS
 ;
         DEFW    FTEST           ;TEST
         DEFW    FCOMP           ;COMPARE
-	DEFW	NEGATE		;NEGATE (z88dk added)
+	DEFW	FNEGATE		;NEGATE (z88dk added)
 ;
 RTABLE: DEFW    FAND            ;AND (FLOATING-POINT)
         DEFW    FBDIV           ;DIV
@@ -1618,6 +1618,17 @@ NEG:    EXX
         LD      C,L
         POP     HL
         JR      NEG0
+
+FNEGATE:
+        dec     c
+        inc     c
+        jp      z, NEGATE
+        ld      a, h
+        xor     $80
+        ld      h, a
+        ret
+
+
 ;
 ;SCALE - Trig scaling.
 ;MOD48 - 48-bit floating-point "modulus" (remainder).

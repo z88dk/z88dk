@@ -19,11 +19,11 @@ ENDIF
 
                 PUBLIC    minusfa
 
-                EXTERN	fsetup
+                EXTERN	fsetup2
                 EXTERN	stkequ2
 
 .minusfa
-        call    fsetup
+        call    fsetup2
 IF FORz88
         fpp(FP_NEG)
 ELSE
