@@ -25,7 +25,12 @@ IF FORz88
 	ld	d,2		;Fixed format
 	ld	e,(ix+4)	;digits of d.p. may work who knows?
 ELSE
-	ld	(ix+5),2
+	ld	e,2		;fixed format
+	ld	d,1		;use format
+	push	de
+	ld	e,(ix+4)	;digits of d.p., map to zone width
+	ld	d,e		;number of digits
+	push	de
 ENDIF
 	ld	l,(ix+6+1)
 	ld	h,(ix+6+2)
@@ -38,14 +43,14 @@ ENDIF
 IF FORz88
 	fpp(FP_STR)
 ELSE
-	inc	ix		;Point to ix+4
-	inc	ix
-	inc	ix
-	inc	ix
+	ld	ix,0
+	add	ix,sp
 	ld	a,+(FP_STR)
 	call	FPP
 	xor	a
 	ld	(de),a
+	pop	af	;discard stack
+	pop	af
 ENDIF
 	ret
 
