@@ -1,7 +1,7 @@
 ;
 ;	Fast background save for the PX8
 ;
-;	Space for background data needs be 1 byte bigger than on the TS2068
+;	Space for background data needs to be 8 bytes bigger than on the TS2068
 ;
 ;	$Id: w_bksave.asm $
 ;
@@ -9,45 +9,46 @@
 	SECTION	  code_graphics
 	PUBLIC    bksave
 	PUBLIC    _bksave
-
+	
 	EXTERN    subcpu_call
 	;EXTERN    __graphics_end
 
 
 .bksave
 ._bksave
-	push	ix
+	;push	ix
 	
-	ld      hl,4
+	ld      hl,2
 	add     hl,sp
 	ld      e,(hl)
 	inc     hl
-	ld      d,(hl)  ; sprite address
+	ld      d,(hl)
 
-	push	de
+	ld		a,(de)
+	ld		c,a		; Xsize
+	inc		de
+	ld		a,(de)
+	ld		b,a		; Ysize
+	inc		de
 
-	push	de
-	pop	ix
+	push	de  ; sprite address
+
 
 	inc     hl
-	ld      a,(hl)  
-	ld	(ix+4),a	; store y
+	ld      a,(hl)	; Y (lsb)
+	;ld	(ix+4),a	; store y
 	ld	(ycoord),a
+	ld	(ycoord_wr),a
 	inc     hl
-	;ld      d,(hl)  ; y
+	;ld      d,(hl)  ; Y (msb)
 	;ld	(ix+5),d
 	
 	inc     hl
-	ld      a,(hl)
+	ld      a,(hl)  ; X (lsb)
 	inc     hl
-	ld      h,(hl)
-;	ld		l,a		; x
+	ld      h,(hl)  ; X (msb)
 
-;	ld	h,d	; current x coordinate
-;	ld	l,e	; current y coordinate
 
-	ld	(ix+2),a	; store x
-	ld	(ix+3),h
 	srl     h               ;hl = x / 8
 	rra
 	srl     h
@@ -55,9 +56,13 @@
 	srl     h
 	rra
 	ld		(xcoord),a
+	ld		(xcoord_wr),a
 	
-	ld		a,(ix+0)	; Xsize
-	ld		b,(ix+1)	; Ysize
+	;ld		a,(ix+0)	; Xsize
+	ld		a,c	; Xsize
+	;ld		b,(ix+1)	; Ysize
+	ld		hl,height
+	ld		(hl),b
 
 	dec		a
 	srl		a
@@ -66,17 +71,42 @@
 	inc		a
 	inc		a		; INT ((Xsize-1)/8+2)
 
-	pop		de		; pick sprite struct now to keep the stack balanced
 	
 	ld		(count),a
+	dec		hl		; width
+	ld		(hl),a
 	ld		h,0
 	ld		l,a
+	push	hl	; keep for data size
+	
+	ld		l,h		; hl=0
+	ld		d,h
+	ld		e,b
+.multiply
+	add		hl,de
+	dec		a
+	jr		nz,multiply
+	ld		e,6
+	add		hl,de
+	ld		(bk_packet_sz),hl
+	
+	
+	pop		hl
+	pop		de		; pick sprite struct now to keep the stack balanced
+	
 	push	hl		; data size
 	inc		hl		; packet size = packet data + 1 for return code (space for background data must be 1 byte bigger)
 	ld		(packet_sz),hl
+
+
+	push	bc
+	ld		hl,bk_packet_sz
+	ld		bc,8	; copy the packet leader just built with background coordinates and sizes
+	ldir
+	ex		de,hl	; hl=sprite data addr
+	pop		bc
 	
-	ld		hl,6	; jump over size/coordinates struct
-	add		hl,de	; point to background data
+
 	pop		de		; data size
 	
 .bksaves
@@ -105,7 +135,7 @@
 	djnz	bksaves
 
 	;jp		__graphics_end
-	pop		ix
+	;pop		ix
 	ret
 
 
@@ -130,4 +160,23 @@ ycoord:
 	defb	0
 count:
 	defb	0
+
+
+;----------------------
+bk_packet_sz:
+	defw	0
+;----------------------
+;-  -  -  -  -  -  -  -
+sndpkt_wr:
+	defb	$25		; slave CPU command to write to the graphics memory ($25 = write)
+xcoord_wr:
+	defb	0
+ycoord_wr:
+	defb	0
+width:
+	defb	1
+height:
+	defb	1
+	defb	0		; Operation (0=simply copy data)
+;-  -  -  -  -  -  -  -
 
