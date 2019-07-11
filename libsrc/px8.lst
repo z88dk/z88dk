@@ -7,9 +7,12 @@ target/px8/px8_break
 graphics/w_dcircle_square.asm
 graphics/px8/draw
 graphics/retrofit/draw_callee
+graphics/px8/drawr_callee
 graphics/px8/undraw
 graphics/retrofit/undraw_callee
+graphics/px8/undrawr_callee
 graphics/px8/xordraw
+graphics/px8/xordrawr_callee
 graphics/retrofit/xordraw_callee
 graphics/draw_profile
 graphics/px8/w_stencil_render
