@@ -30,6 +30,10 @@ math/float/math32/lm32/c/sccz80/frexp
 math/float/math32/lm32/c/sccz80/frexp_callee
 math/float/math32/lm32/c/sccz80/hypot
 math/float/math32/lm32/c/sccz80/hypot_callee
+math/float/math32/lm32/c/sccz80/inv
+math/float/math32/lm32/c/sccz80/inv_fastcall
+math/float/math32/lm32/c/sccz80/invsqrt
+math/float/math32/lm32/c/sccz80/invsqrt_fastcall
 math/float/math32/lm32/c/sccz80/ldexp
 math/float/math32/lm32/c/sccz80/ldexp_callee
 math/float/math32/lm32/c/sccz80/l_f32_add
@@ -63,6 +67,8 @@ math/float/math32/lm32/c/sccz80/sin
 math/float/math32/lm32/c/sccz80/sin_fastcall
 math/float/math32/lm32/c/sccz80/sinh
 math/float/math32/lm32/c/sccz80/sinh_fastcall
+math/float/math32/lm32/c/sccz80/sqr
+math/float/math32/lm32/c/sccz80/sqr_fastcall
 math/float/math32/lm32/c/sccz80/sqrt
 math/float/math32/lm32/c/sccz80/sqrt_fastcall
 math/float/math32/lm32/c/sccz80/tan

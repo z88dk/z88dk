@@ -63,7 +63,7 @@ extern double_t __LIB__ tan(double_t x);
 extern double_t __LIB__ asin(double_t x);
 extern double_t __LIB__ acos(double_t x);
 extern double_t __LIB__ atan(double_t x);
-extern double_t __LIB__ atan2(double_t x, double_t y);
+extern double_t __LIB__ atan2(double_t x, double_t y) __smallc;
 
 /* Hyperbolic functions */
 extern double_t __LIB__ sinh(double_t x);
@@ -75,7 +75,6 @@ extern double_t __LIB__ atanh(double_t x);
 
 /* Power functions */
 extern double_t __LIB__ pow(double_t x, double_t y) __smallc;
-extern double_t __LIB__ hypot(double_t x, double_t y) __smallc;
 extern double_t __LIB__ sqrt(double_t a);
 
 /* Exponential */
@@ -101,10 +100,15 @@ extern double_t __LIB__ ldexp(double_t x, int pw2) __smallc;
 extern double_t __LIB__ modf(double_t x, double_t * y) __smallc;
 extern double_t __LIB__ frexp(double_t x, int *pw2) __smallc;
 
+/* Intrinsic functions */
+extern double_t __LIB__ sqr(double_t a);
+extern double_t __LIB__ inv(double_t a);
+extern double_t __LIB__ invsqrt(double_t a);
+
 /* General */
 extern double_t __LIB__ fabs(double_t x);
 extern double_t __LIB__ fmod(double_t x, double_t y) __smallc;
-
+extern double_t __LIB__ hypot(double_t x, double_t y) __smallc;
 
 /* Helper functions */
 extern double_t __LIB__ atof(char *) __smallc;

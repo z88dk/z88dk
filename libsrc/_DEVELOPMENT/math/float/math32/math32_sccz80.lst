@@ -24,9 +24,7 @@ math/float/math32/c/sccz80/cm32_sccz80_fsfrexp_callee
 math/float/math32/c/sccz80/cm32_sccz80_fshypot
 math/float/math32/c/sccz80/cm32_sccz80_fshypot_callee
 math/float/math32/c/sccz80/cm32_sccz80_fsinv
-math/float/math32/c/sccz80/cm32_sccz80_fsinv_callee
 math/float/math32/c/sccz80/cm32_sccz80_fsinvsqrt
-math/float/math32/c/sccz80/cm32_sccz80_fsinvsqrt_callee
 math/float/math32/c/sccz80/cm32_sccz80_fsldexp
 math/float/math32/c/sccz80/cm32_sccz80_fsldexp_callee
 math/float/math32/c/sccz80/cm32_sccz80_fsmax
@@ -37,17 +35,13 @@ math/float/math32/c/sccz80/cm32_sccz80_fsmul
 math/float/math32/c/sccz80/cm32_sccz80_fsmul_callee
 math/float/math32/c/sccz80/cm32_sccz80_fsmul2
 math/float/math32/c/sccz80/cm32_sccz80_fsneg
-math/float/math32/c/sccz80/cm32_sccz80_fsneg_callee
 math/float/math32/c/sccz80/cm32_sccz80_fspoly
 math/float/math32/c/sccz80/cm32_sccz80_fspoly_callee
 math/float/math32/c/sccz80/cm32_sccz80_fssqr
-math/float/math32/c/sccz80/cm32_sccz80_fssqr_callee
 math/float/math32/c/sccz80/cm32_sccz80_fssqrt
-math/float/math32/c/sccz80/cm32_sccz80_fssqrt_callee
 math/float/math32/c/sccz80/cm32_sccz80_fssub
 math/float/math32/c/sccz80/cm32_sccz80_fssub_callee
 math/float/math32/c/sccz80/cm32_sccz80_fszero
-math/float/math32/c/sccz80/cm32_sccz80_fszero_callee
 math/float/math32/c/sccz80/cm32_sccz80_log
 math/float/math32/c/sccz80/cm32_sccz80_log10
 math/float/math32/c/sccz80/cm32_sccz80_modf
