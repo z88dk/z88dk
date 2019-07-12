@@ -98,24 +98,21 @@ no_shift:
 		; save the pattern byte
 		ex	af,af
 
-			ld	a,b
-			ld	(y0coord),a
-			ld	(y1coord),a
 			ld	a,c
-			ld	(y0coord+1),a
-			ld	(y1coord+1),a
+			ld	(y0coord+1),a	; we skip the MSB (useless on the Y coordinate)
+			ld	(y1coord+1),a	; we skip the MSB (useless on the Y coordinate)
 
 			ld	a,h
-			ld	(x0coord),a
-			ld	a,l
-			ld	(x0coord+1),a
+			ld	h,l
+			ld	l,a
+			ld	(x0coord),hl
 
 			pop hl
 			
 			ld	a,h
-			ld	(x1coord),a
-			ld	a,l
-			ld	(x1coord+1),a
+			ld	h,l
+			ld	l,a
+			ld	(x1coord),hl
 			
 			; blank horizontal row to clean the background
 			; The "double pass" draw command is issued basing on the documentation.
