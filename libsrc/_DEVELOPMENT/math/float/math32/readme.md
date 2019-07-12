@@ -275,9 +275,9 @@ The Newton-Raphson method is used for finding the inverse, using full 32-bit exp
 
 Recently, in the Quake video game, a novel method of seeding the Newton-Raphson iteration for the inverse square root was invented. This fancy process is covered in detail in [Lomont 2003](http://www.lomont.org/Math/Papers/2003/InvSqrt.pdf) and the suggested magic number `0x5f375a86`, better than was used by the original Quake game, was implemented.
 
-Following this magic number seeding and traditional Newtwon-Raphson iterations, using the `sqrf()` function as appropriate, an accurate inverse square root is produced. The square root `sqrtf()` is then obtained by multiplying the number by its inverse square root.
+Following this magic number seeding and traditional Newtwon-Raphson iterations, using the `sqrf()` function as appropriate, an accurate inverse square root `infsqrtf()` is produced. The square root `sqrtf()` is then obtained by multiplying the number by its inverse square root.
 
-Two N-R iterations produce 5 or 6 decimal digits of accuracy. Greater accuracy for this library has been obtained by increasing the Newton-Raphson iterations to 3 cycles at the expense of performance. Also, as in the original Quake game, 1 N-R iteration produces a good enough answer for most applications, and is substantially faster.
+Two N-R iterations produce 5 or 6 significant digits of accuracy. Greater accuracy, approaching 7 significant digits for this library, has been obtained by increasing the Newton-Raphson iterations to 3 cycles at the expense of performance. Also, as in the original Quake game, 1 N-R iteration produces a good enough answer for most applications, and is substantially faster.
 
 #### fabsf(), frexpf() and ldexpf()
 
@@ -352,5 +352,27 @@ The rest of the derived power and trigonometric functions rely on the polynomial
 Some [benchmarking](https://github.com/z88dk/z88dk/wiki/Classic--Maths-Libraries#benchmarks) has been completed and, as expected, the z180 and z80-zxn "Made for Spectrum NEXT" results show substantial improvements over other floating point libraries. For the z80 some benchmarks are faster than alternatives, but others are worse. More information on this will be added as experience grows.
 
 Floating add, subtract and multiply require approximately xxx clocks worst case on the z80 processor. Divide and square root require approximately xxx clocks. Sine and pow2, pow10 or exp require about xxx clocks. Log, log2, log (base e), and atan need about xxx clocks. Functions derived from these functions often require xxx or more clocks.
+
+Careful use of the intrinsic functions can result in significant performance improvement. For example, the n-body benchmark can be optimised by the use of intrinsic math32 functions of `invsqrt()` and `sqr()`, to produce a significant improvement.
+
+```C
+#ifdef __MATH_MATH32
+      inv_distance = invsqrt(sqr(dx) + sqr(dy) + sqr(dz));
+#else
+      inv_distance = 1.0/sqrt(dx * dx + dy * dy + dz * dz);
+#endif
+```
+And we get about a __25% improvement__ for the n-body benchmark.
+Most of this gain is created by directly using the `invsqrt()` function. The optimisation effectively provides `y=invsqrt(x)`, instead of indirectly calculating `y=l_f32_inv(x*invsqrt(x))` in the normal situation.
+
+Library          | Compiler | Value 1       | Value 2       | Ticks
+-|-|-|-|-
+correct values   | -->      | -0.169075164  | -0.169087605
+math48           | sccz80   | -0.169075164  | -0.169087605  | 2_402_023_498
+mbf32            | sccz80   | -0.169916810  | -0.169916810  | 1_939_334_701
+math32           | sccz80   | -0.169075264  | -0.169086709  | 1_400_110_112
+math32 (opt)     | sccz80   | -0.169075264  | -0.169086709  | __1_040_434_814__
+math32_fast      | sccz80   | -0.169075264  | -0.169086709  | 1_199_895_142
+math32_fast (opt)| sccz80   | -0.169075264  | -0.169086709  | __0_891_891_922__
 
 ---
