@@ -1,4 +1,12 @@
 IF !FORz88
+
+	SECTION		bss_fp_bbc
+
+
+
+; Stores the stack for the exit condition
+stackstore:	defw	0
+
 	SECTION 	code_fp_bbc
 
 	PUBLIC		FPP
@@ -39,18 +47,23 @@ EXPRNG  EQU     24              ;Exp range
 ;
 ;Call entry and despatch code:
 ;
-FPP:    PUSH    IY              ;Save IY
-        LD      IY,0
-        ADD     IY,SP           ;Save SP in IY
+FPP:
+         ld     (stackstore),sp
+;        PUSH    IY              ;Save IY
+;        LD      IY,0
+;        ADD     IY,SP           ;Save SP in IY
         CALL    OP              ;Perform operation
         CP      A               ;Good return (Z, NC)
-EXIT:   POP     IY              ;Restore IY
+EXIT:   
+	;POP     IY              ;Restore IY
         ret                     ;Return to caller
 ;
 ;Error exit:
 ;
 BAD:    LD      A,BADOP         ;"Bad operation code"
-ERROR:  LD      SP,IY           ;Restore SP from IY
+ERROR:  
+        ld      sp,(stackstore)
+	;LD      SP,IY           ;Restore SP from IY
         OR      A               ;Set NZ
         SCF                     ;Set C
         JR      EXIT
@@ -1384,7 +1397,7 @@ STR4:   POP     AF
 STR40:  INC     C
         LD      C,L
         JR      NZ,STR44
-        LD      (HL),'E'        ;EXPONENT
+        LD      (HL),'e'        ;EXPONENT
         INC     HL
         LD      A,B
         DEC     A
