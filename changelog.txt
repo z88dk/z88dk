@@ -10,6 +10,7 @@ z88dk vx.x.x - xx.xx.xxxx
 - [classic] +pasopia7 Toshiba Pasopia 7 support added
 - [classic] +sv8000 Bandai Supervision 8000 support added
 - [classic] +msx: MSXDOS2 library available via -subtype=msxdos2
+- [classic] +msx: UNAPI support is now available
 - [classic] TMS9918 platforms now support Modes 0 and 1 for gencon
 - [classic] +spc1000: Graphics are now supported on the TMS9928
 - [classic] +cpm: Many new disc formats supported
@@ -22,6 +23,9 @@ z88dk vx.x.x - xx.xx.xxxx
 - [classic] +mc1000: Microsoft 32 bit floating point support
 - [classic] +laser500: Microsoft 32 and 64 bit floating point support
 - [classic] +trs80: Microsoft 32 and 64 bit floating point support
+- [classic] +trs80: TRSDOS support
+- [classic] all: IEEE 32 bit maths library
+- [classic] all: BBC BASIC 40 bit maths library
 - [sccz80] #1102: Trailing comma support in struct initialisation
 - [sccz80] Optimisation rule fixes and improvements
 - [sccz80] Support added for 32 and 64 bit floating point numbers
