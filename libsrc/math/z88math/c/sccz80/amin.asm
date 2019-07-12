@@ -14,7 +14,11 @@
 ;returns the smaller of x and y
 
                 SECTION  code_fp
+IF FORz88
                 INCLUDE  "target/z88/def/fpp.def"
+ELSE
+		INCLUDE "fpp.def"
+ENDIF
 
                 PUBLIC    amin
 
@@ -37,7 +41,12 @@
         ld      a,(fa+5)
         ld      b,a
         push    ix
+IF FORz88
         fpp(FP_CMP)     ;sets: de=y hl=x
+ELSE
+	ld	a,+(FP_CMP)
+	call	FPP
+ENDIF
         pop     ix
         jp      p,amin2
         ret             ;hl is bigger than de, de on stack so okay...

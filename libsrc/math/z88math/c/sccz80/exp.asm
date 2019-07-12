@@ -11,7 +11,11 @@
 ;Number in FA..
 
                 SECTION  code_fp
+IF FORz88
                 INCLUDE  "target/z88/def/fpp.def"
+ELSE
+		INCLUDE "fpp.def"
+ENDIF
 
                 PUBLIC    exp
 
@@ -20,7 +24,12 @@
 
 .exp
         call    fsetup
+IF FORz88
         fpp(FP_EXP)
+ELSE
+	ld	a,+(FP_EXP)
+	call	FPP
+ENDIF
         jp      stkequ2
 
 

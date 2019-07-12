@@ -12,7 +12,11 @@
 ;x is on the stack +8 (+2=y) 
 
                 SECTION  code_fp
+IF FORz88
                 INCLUDE  "target/z88/def/fpp.def"
+ELSE
+		INCLUDE "fpp.def"
+ENDIF
 
                 PUBLIC    pow
 
@@ -34,6 +38,11 @@
         ld      de,(fa+3)
         ld      a,(fa+5)
         ld      b,a
+IF FORz88
         fpp(FP_PWR)
+ELSE
+	ld	a,+(FP_PWR)
+	call	FPP
+ENDIF
         jp      stkequ2
 
