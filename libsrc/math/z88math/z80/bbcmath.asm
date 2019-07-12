@@ -1,3 +1,17 @@
+; This is a slightly modified version of the original source code from
+; from: https://github.com/davidgiven/cpmish/tree/master/third_party/bbcbasic
+;
+; For compatibility with z80asm the following changes were made:
+; * TITLE and PAGE directives were commented out
+;
+; For compatbility with the z88math library the following chnage was made:
+; * Implement FNEGATE in function table + code
+;
+; For compatbility with machines reserving one register the following change
+; was made:
+; * Use a static word to store the sp to be restored on error
+;
+
 IF !FORz88
 
 	SECTION		bss_fp_bbc
@@ -48,7 +62,7 @@ EXPRNG  EQU     24              ;Exp range
 ;Call entry and despatch code:
 ;
 FPP:
-         ld     (stackstore),sp
+         ld     (stackstore),sp  ;z88dk
 ;        PUSH    IY              ;Save IY
 ;        LD      IY,0
 ;        ADD     IY,SP           ;Save SP in IY
@@ -62,7 +76,7 @@ EXIT:
 ;
 BAD:    LD      A,BADOP         ;"Bad operation code"
 ERROR:  
-        ld      sp,(stackstore)
+        ld      sp,(stackstore)  ;z88dk
 	;LD      SP,IY           ;Restore SP from IY
         OR      A               ;Set NZ
         SCF                     ;Set C
@@ -1632,14 +1646,15 @@ NEG:    EXX
         POP     HL
         JR      NEG0
 
-FNEGATE:
-        dec     c
-        inc     c
-        jp      z, NEGATE
-        ld      a, h
-        xor     $80
-        ld      h, a
-        ret
+; FNEGATE: z88dk added
+FNEGATE:                                ;z88dk
+        dec     c                       ;z88dk
+        inc     c                       ;z88dk
+        jp      z, NEGATE               ;z88dk
+        ld      a, h                    ;z88dk
+        xor     $80                     ;z88dk
+        ld      h, a                    ;z88dk
+        ret                             ;z88dk
 
 
 ;
