@@ -205,6 +205,7 @@ static char           *c_clib = NULL;
 static int             c_startup = -2;
 static int             c_startupoffset = -1;
 static int             c_nostdlib = 0;
+static int             m8080 = 0;
 static int             mz180 = 0;
 static int             mr2k = 0;
 static int             mr3k = 0;
@@ -407,6 +408,7 @@ static arg_t     myargs[] = {
     { "create-app", AF_BOOL_TRUE, SetBoolean, &createapp, NULL, "Run appmake on the resulting binary to create emulator usable file" },
     { "specs", AF_BOOL_TRUE, SetBoolean, &c_print_specs, NULL, "Print out compiler specs" },
     { "compiler", AF_MORE, SetString, &c_compiler_type, NULL, "Set the compiler type from the command line (sccz80, sdcc)" },
+    { "m8080", AF_BOOL_TRUE, SetBoolean, &m8080, NULL, "Target the 8080 cpu" },
     { "mz80-zxn", AF_BOOL_TRUE, SetBoolean, &mz80_zxn, NULL, "Target the zx next z80 cpu" },
     { "mz180", AF_BOOL_TRUE, SetBoolean, &mz180, NULL, "Target the z180 cpu" },
     { "mr2k", AF_BOOL_TRUE, SetBoolean, &mr2k, NULL, "Target the Rabbit 2000 cpu" },
@@ -498,6 +500,7 @@ enum {
     CPU_TYPE_Z180,
     CPU_TYPE_R2K,
     CPU_TYPE_R3K,
+    CPU_TYPE_8080,
     CPU_TYPE_SIZE
 };
 
@@ -507,6 +510,7 @@ cpu_map_t cpu_map[CPU_TYPE_SIZE] = {
     { "-mz180",    "-mz180", "-mz180 -portmode=z180" },     // CPU_TYPE_Z180    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
     { "-mr2k",     "-mr2k",  "-mr2k" },                     // CPU_TYPE_R2K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
     { "-mr3k",     "-mr3k",  "-mr3ka" },                    // CPU_TYPE_R3K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
+    { "-mz80",     "-m8080" , "-mz80" },                    // CPU_TYPE_8080     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
 };
 
 char *select_cpu(int n)
@@ -522,6 +526,10 @@ char *select_cpu(int n)
 
     if (mz80_zxn)
         return cpu_map[CPU_TYPE_Z80_ZXN].tool[n];
+
+    if (m8080)
+        return cpu_map[CPU_TYPE_8080].tool[n];
+
 
     return cpu_map[CPU_TYPE_Z80].tool[n];
 }

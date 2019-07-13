@@ -351,8 +351,11 @@ struct gototab_s {
 #define CPU_R2K      4
 #define CPU_R3K      8
 #define CPU_Z80ZXN   16
+#define CPU_8080     32
 
 #define CPU_RABBIT (CPU_R2K|CPU_R3K)
+
+#define IS_8080() (c_cpu == CPU_8080)
 
 
 

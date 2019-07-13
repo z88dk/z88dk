@@ -95,6 +95,7 @@ static option  sccz80_opts[] = {
     { 'h', "help", OPT_FUNCTION|OPT_BOOL, "Show this help page", DispInfo, 0 },
     { 'o', "output", OPT_STRING, "Set the output filename", &c_output_file, 0 },
     { 0, "", OPT_HEADER, "CPU Targetting:", NULL, 0 },
+    { 0, "m8080", OPT_ASSIGN|OPT_INT, "Generate output for the i8080", &c_cpu, CPU_8080 },
     { 0, "mz80-zxn", OPT_ASSIGN|OPT_INT, "Generate output for the z80-zxn", &c_cpu, CPU_Z80ZXN },
     { 0, "mz80", OPT_ASSIGN|OPT_INT, "Generate output for the z80", &c_cpu, CPU_Z80 },
     { 0, "mz180", OPT_ASSIGN|OPT_INT, "Generate output for the z180", &c_cpu, CPU_Z180 },
@@ -262,6 +263,11 @@ int main(int argc, char** argv)
         c_fp_exponent_bias = 127;
         c_fp_mantissa_bytes = 4;
         c_fp_fudge_offset = 1;
+    }
+
+    if ( c_cpu == CPU_8080 ) {
+        c_notaltreg = 1;
+        WriteDefined("CPU_8080", 1);
     }
 
 

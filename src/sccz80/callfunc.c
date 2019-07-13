@@ -333,7 +333,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
         Zsp += nargs;
         // IF we called a far pointer and we had arguments, pop the address off the stack
         if ( function_pointer_call && fnptr_type->kind == KIND_CPTR && nargs ) {
-            Zsp = modstk(Zsp + 4, functype->return_type->kind != KIND_DOUBLE || c_fp_size == 4, preserve); 
+            Zsp = modstk(Zsp + 4, functype->return_type->kind != KIND_DOUBLE || c_fp_size == 4, preserve,YES); 
         }
     } else {
         /* If we have a frame pointer then ix holds it */
@@ -347,7 +347,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             Zsp += nargs;
         } else
 #endif
-            Zsp = modstk(Zsp + nargs, functype->return_type->kind != KIND_DOUBLE || c_fp_size == 4, preserve);  /* clean up arguments - we know what type is MOOK */
+            Zsp = modstk(Zsp + nargs, functype->return_type->kind != KIND_DOUBLE || c_fp_size == 4, preserve, YES);  /* clean up arguments - we know what type is MOOK */
     }
 }
 

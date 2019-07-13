@@ -216,7 +216,7 @@ extern void     check_assign_range(Type *type, double const_value);
 
 /* stmt.c */
 extern int      statement(void);
-extern void     leave(int save,char type, int incritical);
+extern void     leave(Kind save,char type, int incritical);
 extern void     doasm(void);
 extern void     dopragma(void);
 extern void     doasmfunc(char wantbr);
