@@ -306,17 +306,17 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
                 loadargc(nargs);
             }
         }
-        if ( strcmp(funcname,"__builtin_strcpy") == 0) {
+        if ( strcmp(funcname,"__builtin_strcpy") == 0 && !IS_8080() ) {
             gen_builtin_strcpy();
             nargs = 0;
             Zsp += 2;
-        } else if ( strcmp(funcname,"__builtin_strchr") == 0) {
+        } else if ( strcmp(funcname,"__builtin_strchr") == 0 && !IS_8080() ) {
             gen_builtin_strchr(isconstarg[2] ? constargval[2] : -1);
             nargs = 0;
-        } else if ( strcmp(funcname, "__builtin_memset") == 0 ) {
+        } else if ( strcmp(funcname, "__builtin_memset") == 0 && !IS_8080() ) {
             gen_builtin_memset(isconstarg[2] ? constargval[2] : -1,  constargval[3]);
             nargs = 0;
-        } else if ( strcmp(funcname, "__builtin_memcpy") == 0 ) {
+        } else if ( strcmp(funcname, "__builtin_memcpy") == 0 && !IS_8080() ) {
             gen_builtin_memcpy(isconstarg[2] ? constargval[2] : -1,  constargval[3]);
             nargs = 0;
         } else if ( functype->flags & SHORTCALL ) {

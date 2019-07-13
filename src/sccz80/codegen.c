@@ -751,7 +751,11 @@ void indirect(LVALUE* lval)
                 // We need to do some bit extension here
                 if ( lval->ltype->bit_size % 8 ) {
                     outfmt("\tbit\t%d,a\n",lval->ltype->bit_size - 1);
-                    ol("jr\tz,ASMPC+4");
+                    if ( IS_8080() ) {
+                        ol("jp\tz,ASMPC+5");
+                    } else {
+                        ol("jr\tz,ASMPC+4");
+                    }
                     outfmt("\tor\t%d\n",0xff - ((1 << lval->ltype->bit_size) - 1));
                 }
                 ol("ld\tl,a");
@@ -771,7 +775,11 @@ void indirect(LVALUE* lval)
                 outfmt("\tand\t%d\n",(1 << (lval->ltype->bit_size - 8)) - 1);
                 if ( lval->ltype->isunsigned == 0 ) {
                     outfmt("\tbit\t%d,a\n",(lval->ltype->bit_size - 8) - 1);
-                    ol("jr\tz,ASMPC+4");
+                    if ( IS_8080() ) {
+                        ol("jp\tz,ASMPC+5");
+                    } else {
+                        ol("jr\tz,ASMPC+4");
+                    }
                     outfmt("\tor\t%d\n",0xff - ((1 << (lval->ltype->bit_size - 8)) - 1));
                 }
             }
@@ -1847,7 +1855,11 @@ void zadd_const(LVALUE *lval, int32_t value)
                 ol("ld\ta,h");    // 1, 4
                 ol("or\tl");      // 1, 4
                 ol("dec\thl");    // 1, 6    
-                ol("jr\tnz,ASMPC+3"); // 2, 12/7
+                if ( IS_8080() ) {
+                    ol("jp\tnz,ASMPC+4");
+                } else {
+                    ol("jr\tnz,ASMPC+3"); // 2, 12/7
+                }
                 ol("dec\tde");    // 1, 6
                 return;
             }
@@ -1871,7 +1883,11 @@ void zadd_const(LVALUE *lval, int32_t value)
                 ol("inc\thl");    // 1, 6    
                 ol("ld\ta,h");    // 1, 4
                 ol("or\tl");      // 1, 4
-                ol("jr\tnz,ASMPC+3"); // 2, 12/7
+                if ( IS_8080() ) {
+                    ol("jp\tnz,ASMPC+4");
+                } else {
+                    ol("jr\tnz,ASMPC+3"); // 2, 12/7
+                }
                 ol("inc\tde");    // 1, 6
                 return;
             }
@@ -1895,18 +1911,31 @@ void zadd_const(LVALUE *lval, int32_t value)
         constbc(((uint32_t)value) % 65536);   // 3, 10
         ol("add\thl,bc");                     // 1, 11
         if ( value >= 0 && value < 65536 ) {
-            ol("jr\tnc,ASMPC+3");             // 2, 12/7
+            if ( IS_8080() ) {
+                ol("jp\tnc,ASMPC+4");
+            } else {
+                ol("jr\tnc,ASMPC+3"); // 2, 12/7
+            }
             ol("inc\tde");                    // 1, 6
         } else if ( highword <= 4 ) {
-            ol("jr\tnc,ASMPC+3");             // 2, 12/7
+            if ( IS_8080() ) {
+                ol("jp\tnc,ASMPC+4");
+            } else {
+                ol("jr\tnc,ASMPC+3"); // 2, 12/7
+            }
             ol("inc\tde");                    // 1, 6
 	        add_to_high_word(value);          // it will be < 7 bytes, 33T
         } else if ( highword >= 65532 && highword <= 65535  ) {
             // Jump into the block of dec de that we produce
-            ol("jr\tc,ASMPC+3");              // 2, 12/7
-	        add_to_high_word(value);          // it will be < 7 bytes, 33T
+            if ( IS_8080() ) {
+                ol("jp\tc,ASMPC+4");
+            } else {
+                ol("jr\tc,ASMPC+3"); // 2, 12/7
+            }
+	    add_to_high_word(value);          // it will be < 7 bytes, 33T
         } else {
             ol("ex\tde,hl");                      // 1, 4
+		// TODO: 8080
             constbc(((uint32_t)value) / 65536);   // 3, 10
             ol("adc\thl,bc");                     // 2, 15
             ol("ex\tde,hl");                      // 1, 4
@@ -3239,7 +3268,11 @@ void zeq_const(LVALUE *lval, int32_t value)
             }
             ol("or\th");
             ol("or\tl");
-            ol("jr\tnz,ASMPC+3");
+            if ( IS_8080() ) {
+                ol("jp\tnz,ASMPC+4");
+            } else {
+                ol("jr\tnz,ASMPC+3"); // 2, 12/7
+            }
             ol("scf");
             set_carry(lval);
         } else if ( c_speed_optimisation & OPT_LONG_COMPARE && !IS_8080() ) {
@@ -3247,19 +3280,19 @@ void zeq_const(LVALUE *lval, int32_t value)
             ol("and\ta");
             ol("sbc\thl,bc");
             if ( value / 65536 == 0 ) {
-                ol("jr\tnz,ASMPC+7"); // into and a
+                ol("jr\tnz,ASMPC+7"); 
                 ol("ld\ta,d");
                 ol("or\te");
                 ol("scf");
-                ol("jr\tz,ASMPC+3");
+                ol("jr\tz,ASMPC+3"); 
                 ol("and\ta");
             } else {
-                ol("jr\tnz,ASMPC+11"); // into and a
+                ol("jr\tnz,ASMPC+11"); 
                 ol("ex\tde,hl");
                 constbc(value / 65536);
                 ol("sbc\thl,bc");
                 ol("scf");
-                ol("jr\tz,ASMPC+3");
+                ol("jr\tz,ASMPC+3"); 
                 ol("and\ta");
             }
             set_carry(lval);
@@ -3272,13 +3305,21 @@ void zeq_const(LVALUE *lval, int32_t value)
         if ( value == 0 ) {
             ol("ld\ta,l");  // 5 bytes
             ol("and\ta");
-            ol("jr\tnz,ASMPC+3");
+            if ( IS_8080() ) {
+                ol("jp\tnz,ASMPC+4");
+            } else {
+                ol("jr\tnz,ASMPC+3"); 
+            }
             ol("scf");
         } else {
             ol("ld\ta,l");  // 7 bytes
             outfmt("\tcp\t%d\n", (value % 256));
             ol("scf");
-            ol("jr\tz,ASMPC+3");
+            if ( IS_8080() ) {
+                ol("jp\tz,ASMPC+4");
+            } else {
+                ol("jr\tz,ASMPC+3"); 
+            }
             ol("ccf");
         }
         set_carry(lval);
@@ -3286,7 +3327,11 @@ void zeq_const(LVALUE *lval, int32_t value)
         if ( value == 0 ) {
             ol("ld\ta,h");
             ol("or\tl");
-            ol("jr\tnz,ASMPC+3");
+            if ( IS_8080() ) {
+                ol("jp\tnz,ASMPC+4");
+            } else {
+                ol("jr\tnz,ASMPC+3"); 
+            }
             ol("scf");
             set_carry(lval);
         } else if ( IS_8080() ) {
@@ -3298,7 +3343,7 @@ void zeq_const(LVALUE *lval, int32_t value)
             ol("and\ta");
             ol("sbc\thl,de");
             ol("scf");
-            ol("jr\tz,ASMPC+3");
+            ol("jr\tz,ASMPC+3"); 
             ol("ccf");
             set_carry(lval);
         }
@@ -3328,7 +3373,11 @@ void zeq(LVALUE* lval)
             ol("ld\ta,l");
             ol("sub\te");
             ol("and\ta");
-            ol("jr\tnz,ASMPC+3");
+            if ( IS_8080() ) {
+                ol("jp\tnz,ASMPC+4");
+            } else {
+                ol("jr\tnz,ASMPC+3"); 
+            }
             ol("scf");
             break;
         }
@@ -3337,7 +3386,7 @@ void zeq(LVALUE* lval)
             ol("and\ta");
             ol("sbc\thl,de");
             ol("scf");
-            ol("jr\tz,ASMPC+3");
+            ol("jr\tz,ASMPC+3"); 
             ol("ccf");
             set_carry(lval);
         } else {
@@ -3359,7 +3408,11 @@ void zne_const(LVALUE *lval, int32_t value)
             }
             ol("or\th");
             ol("or\tl");
-            ol("jr\tz,ASMPC+3");
+            if ( IS_8080() ) {
+                ol("jp\tz,ASMPC+4");
+            } else {
+                ol("jr\tz,ASMPC+3"); 
+            }
             ol("scf");
             set_carry(lval);
         } else {
@@ -3368,20 +3421,20 @@ void zne_const(LVALUE *lval, int32_t value)
                 constbc(value % 65536);
                 ol("sbc\thl,bc");
                 if ( value / 65536 == 0 ) {
-                    ol("jr\tnz,ASMPC+4"); // into scf
+                    ol("jr\tnz,ASMPC+4");  // into scf
                     ol("ld\ta,d");
                     ol("or\te");
                     ol("scf");
                     ol("jr\tnz,ASMPC+3");
                     ol("and\ta");
                 } else {
-                    ol("jr\tnz,ASMPC+8"); // into scf
+                    ol("jr\tnz,ASMPC+8");  // into scf
                     // Carry should still be reset if zero
                     swap();
                     constbc(value / 65536);
                     ol("sbc\thl,bc");
                     ol("scf");
-                    ol("jr\tnz,ASMPC+3");
+                    ol("jr\tnz,ASMPC+3");  // into scf§
                     ol("and\ta");   // Reset carry
                     set_carry(lval);
                 }
@@ -3395,12 +3448,20 @@ void zne_const(LVALUE *lval, int32_t value)
          if ( value == 0 ) {
             ol("ld\ta,l");  // 5 bytes
             ol("and\ta");
-            ol("jr\tz,ASMPC+3");
+            if ( IS_8080() ) {
+                ol("jp\tz,ASMPC+4");
+            } else {
+                ol("jr\tz,ASMPC+3"); 
+            }
             ol("scf");
         } else {
             ol("ld\ta,l");  // 6 bytes
             outfmt("\tcp\t%d\n", (value % 256));  /* z = 1, c = 0 */
-            ol("jr\tz,ASMPC+3");
+            if ( IS_8080() ) {
+                ol("jp\tz,ASMPC+4");
+            } else {
+                ol("jr\tz,ASMPC+3"); 
+            }
             ol("scf");
         }
         set_carry(lval);
@@ -3408,7 +3469,11 @@ void zne_const(LVALUE *lval, int32_t value)
         if ( value == 0 ) {
             ol("ld\ta,h");
             ol("or\tl");
-            ol("jr\tz,ASMPC+3");
+            if ( IS_8080() ) {
+                ol("jp\tz,ASMPC+4");
+            } else {
+                ol("jr\tz,ASMPC+3"); 
+            }
             ol("scf");
         } else if ( IS_8080() ) {
             const2(value & 0xffff);
@@ -3419,7 +3484,7 @@ void zne_const(LVALUE *lval, int32_t value)
             ol("and\ta");
             ol("sbc\thl,de");
             ol("scf");
-            ol("jr\tnz,ASMPC+3");
+            ol("jr\tnz,ASMPC+3"); 
             ol("ccf");
         }
         set_carry(lval);
@@ -3449,10 +3514,10 @@ void zne(LVALUE* lval)
             ol("ld\ta,l");
             ol("sub\te");
             ol("and\ta");
-            if (ISASM(ASM_Z80ASM)) {
-                ol("jr\tz,ASMPC+3");
+            if ( IS_8080() ) {
+                ol("jp\tz,ASMPC+4");
             } else {
-                ol("jr\tz,$+3");
+                ol("jr\tz,ASMPC+3"); 
             }
             ol("scf");
             break;
@@ -3462,7 +3527,7 @@ void zne(LVALUE* lval)
             ol("and\ta"); // 7 bytes
             ol("sbc\thl,de");
             ol("scf");
-            ol("jr\tnz,ASMPC+3");
+            ol("jr\tnz,ASMPC+3"); 
             ol("ccf");
             set_carry(lval);
         } else {
@@ -3633,7 +3698,7 @@ void zlt(LVALUE* lval)
 void zle_const(LVALUE *lval, int32_t value)
 {
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
-       if ( value ==  0 ) {
+       if ( value ==  0 && !IS_8080() ) {
             if ( lval->val_type == KIND_CPTR) {
                 ol("ld\ta,e");
             } else {
@@ -3660,7 +3725,7 @@ void zle_const(LVALUE *lval, int32_t value)
         ol("ccf");
         set_carry(lval);
     } else {
-        if ( value ==  0 ) {
+        if ( value ==  0 && !IS_8080() ) {
             ol("ld\ta,h"); // 8 bytes
             ol("rla");
             ol("jr\tc,ASMPC+6");
@@ -3697,15 +3762,11 @@ void zle(LVALUE* lval)
         Zsp += c_fp_size;
         break;
     case KIND_CHAR:
-        if (c_speed_optimisation & OPT_INT_COMPARE ) {
+        if (c_speed_optimisation & OPT_INT_COMPARE && !IS_8080() ) {
             if (ulvalue(lval)) { /* unsigned */
                 ol("ld\ta,e");
                 ol("sub\tl"); /* If l < e then carry set */
-                if (ISASM(ASM_Z80ASM)) {
-                    ol("jr\tnz,ASMPC+3"); /* If zero, then set carry */
-                } else {
-                    ol("jr\tnz,$+3"); /* If zero, then set carry */
-                }
+                ol("jr\tnz,ASMPC+3"); /* If zero, then set carry */
                 ol("scf");
             } else {
                 int label = getlabel();
@@ -3749,7 +3810,7 @@ void zle(LVALUE* lval)
 void zgt_const(LVALUE *lval, int32_t value)
 {
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
-        if ( value == 0 && ulvalue(lval) ) {
+        if ( value == 0 && ulvalue(lval) && !IS_8080() ) {
             if ( lval->val_type == KIND_CPTR ) {
                 ol("ld\ta,e");
             } else {
@@ -3922,7 +3983,7 @@ void zge(LVALUE* lval)
         Zsp += c_fp_size;
         break;
     case KIND_CHAR:
-        if (c_speed_optimisation & OPT_INT_COMPARE ) {
+        if (c_speed_optimisation & OPT_INT_COMPARE && !IS_8080()  ) {
             if (ulvalue(lval)) {
                 ol("ld\ta,l");
                 ol("sub\te"); /* If l > e, carry set */

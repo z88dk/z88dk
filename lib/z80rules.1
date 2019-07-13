@@ -2794,6 +2794,7 @@
 .i%1
 	ld	hl,%2
 
+%notcpu 8080
 	add	hl,hl
 	add	hl,hl
 	add	hl,hl
@@ -2808,6 +2809,7 @@
 	ld	h,l
 	ld	l,0
 
+%notcpu 8080
 	ld	h,0
 	srl	l
 	add	hl,hl
@@ -2816,6 +2818,7 @@
 	ld	h,0
 	add	hl,hl
 
+%notcpu 8080
 	ld	h,0
 	srl	h
 	rr	l
@@ -2823,6 +2826,7 @@
 	ld	h,0
 	srl	l
 
+%notcpu 8080
 	ld	h,0
 	srl	l
 	srl	h
@@ -2859,6 +2863,7 @@
 	ld	l,a
 	ld	h,0
 
+%notcpu 8080
 	ld	e,(hl)
 	ld	d,0
 	ld	hl,2
@@ -2906,6 +2911,7 @@
 	or	e
 	ld	l,a
 
+%notcpu 8080
 	ld	l,0
 	ld	a,1
 	call	l_long_aslo
@@ -3479,6 +3485,7 @@
 	ld	l,a
 	ex	de,hl
 
+%notcpu 8080
 	push	hl
 	ld	l,(hl)
 	ld	h,0
@@ -3595,6 +3602,7 @@
 	add	hl,sp
 
 %check 0 <= %1 <= 7
+%notcpu 8080
 	ld	e,(hl)
 	inc	hl
 	ld	d,(hl)

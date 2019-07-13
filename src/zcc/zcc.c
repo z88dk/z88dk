@@ -485,6 +485,7 @@ enum {
     CPU_MAP_TOOL_Z80ASM = 0,
     CPU_MAP_TOOL_SCCZ80,
     CPU_MAP_TOOL_ZSDCC,
+    CPU_MAP_TOOL_COPT,
     CPU_MAP_TOOL_SIZE
 };
 
@@ -505,12 +506,12 @@ enum {
 };
 
 cpu_map_t cpu_map[CPU_TYPE_SIZE] = {
-    { "-mz80",     "-mz80" , "-mz80" },                     // CPU_TYPE_Z80     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
-    { "-mz80-zxn", "-mz80",  "-mz80" },                     // CPU_TYPE_Z80_ZXN : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
-    { "-mz180",    "-mz180", "-mz180 -portmode=z180" },     // CPU_TYPE_Z180    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
-    { "-mr2k",     "-mr2k",  "-mr2k" },                     // CPU_TYPE_R2K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
-    { "-mr3k",     "-mr3k",  "-mr3ka" },                    // CPU_TYPE_R3K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
-    { "-mz80",     "-m8080" , "-mz80" },                    // CPU_TYPE_8080     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
+    { "-mz80",     "-mz80" , "-mz80", "" },                     // CPU_TYPE_Z80     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
+    { "-mz80-zxn", "-mz80",  "-mz80", "" },                     // CPU_TYPE_Z80_ZXN : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
+    { "-mz180",    "-mz180", "-mz180 -portmode=z180" },     // CPU_TYPE_Z180    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
+    { "-mr2k",     "-mr2k",  "-mr2k", "" },                     // CPU_TYPE_R2K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
+    { "-mr3k",     "-mr3k",  "-mr3ka", "" },                    // CPU_TYPE_R3K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
+    { "-mz80",     "-m8080" , "-mz80", "-m8080" },                    // CPU_TYPE_8080     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
 };
 
 char *select_cpu(int n)
@@ -1552,6 +1553,7 @@ int main(int argc, char **argv)
 
 static void apply_copt_rules(int filenumber, int num, char **rules, char *ext1, char *ext2, char *ext)
 {
+    char   argbuf[FILENAME_MAX+1];
     int    i;
     char  *input_ext;
     char  *output_ext;
@@ -1568,8 +1570,8 @@ static void apply_copt_rules(int filenumber, int num, char **rules, char *ext1, 
         if ( i == (num-1) ) {
             output_ext = ext;
         }
-
-        if (process(input_ext, output_ext, c_copt_exe, rules[i], filter, filenumber, YES, NO))
+        snprintf(argbuf,sizeof(argbuf),"%s %s", select_cpu(CPU_MAP_TOOL_COPT), rules[i]);
+        if (process(input_ext, output_ext, c_copt_exe, argbuf, filter, filenumber, YES, NO))
             exit(1);
     }
 }
