@@ -41,9 +41,5 @@ PUBLIC l_long_asl
    ld  d,a
    dec b
    jp  nz,loop
-   
-   ld e,a
-
-.done
    ret
 
