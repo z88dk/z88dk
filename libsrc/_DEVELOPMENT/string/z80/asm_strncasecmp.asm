@@ -44,7 +44,7 @@ loop:
    ld a,(hl)
    call asm_tolower
 
-IF __CPU_Z180__ | __CPU_R2K__ | __CPU_R3K__
+IF __CPU_Z180__ | __CPU_R2K__ | __CPU_R3K__ | __CPU_8080__
 
    push hl
    
@@ -87,7 +87,7 @@ equal:                       ; both strings ended same time
    
 different:
 
-IF __CPU_Z180__ | __CPU_R2K__ | __CPU_R3K__
+IF __CPU_Z180__ | __CPU_R2K__ | __CPU_R3K__ | __CPU_8080__
 
    sub l
    pop hl

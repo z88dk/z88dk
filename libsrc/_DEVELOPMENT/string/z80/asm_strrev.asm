@@ -9,6 +9,7 @@
 ;
 ; ===============================================================
 
+IF !__CPU_8080__
 SECTION code_clib
 SECTION code_string
 
@@ -61,3 +62,4 @@ exit:
 
    pop hl                      ; hl = char *s
    ret
+ENDIF

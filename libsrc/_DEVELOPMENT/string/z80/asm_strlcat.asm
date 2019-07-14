@@ -75,11 +75,29 @@ szexceeded1:
    dec hl                      ; hl = end of char *s2 (pointing at NUL)
    
    pop bc
+IF __CPU_8080__
+   ld  a,l
+   sub c
+   ld  l,a
+   ld  a,h
+   sbc b
+   ld  h,a
+ELSE
    sbc hl,bc
+ENDIF
    ex de,hl                    ; de = strlen(s2 remnant)
    
    pop bc
+IF __CPU_8080__
+   ld  a,l
+   sub c
+   ld  l,a
+   ld  a,h
+   sbc b
+   ld  h,a
+ELSE
    sbc hl,bc                   ; hl = strlen(result s1)
+ENDIF
    
    add hl,de                   ; return strlen(s1)+strlen(s2)
    scf                         ; not enough space
@@ -113,5 +131,14 @@ success:
    ; stack = char *s1
 
    pop bc
+IF __CPU_8080__
+   ld  a,l
+   sub c
+   ld  l,a
+   ld  a,h
+   sbc b
+   ld  h,a
+ELSE
    sbc hl,bc                   ; hl = strlen(final s1)
+ENDIF
    ret

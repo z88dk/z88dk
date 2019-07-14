@@ -44,5 +44,14 @@ asm_strnlen:
 
 notend:
 
+IF __CPU_8080__
+   ld  a,l
+   sub e
+   ld  l,a
+   ld  a,h
+   sbc d
+   ld  h,a
+ELSE
    sbc hl,de                   ; hl = min(strlen, maxlen)
+ENDIF
    ret
