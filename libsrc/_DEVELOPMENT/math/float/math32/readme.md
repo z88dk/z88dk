@@ -11,7 +11,7 @@ Where not written by me, the functions were sourced from:
   * the Cephes Math Library Release 2.2, copyright (C) 1984, 1987, 1989 by Stephen L. Moshier.
   * various Wikipedia references, especially for Newton-Raphson and Horner's Method.
 
-This library is designed for z180, and z80-zxn processors. Specifically, it is optimised for the z180 and z80-zxn [ZX Spectrum Next](https://www.specnext.com/) as these processors have a hardware `16_8x8` multiply instruction that can substantially accelerate floating point mantissa calculation.
+This library is designed for z180, and z80n processors. Specifically, it is optimised for the z180 and [ZX Spectrum Next](https://www.specnext.com/) z80n as these processors have a hardware `16_8x8` multiply instruction that can substantially accelerate floating point mantissa calculation.
 
 This library is also designed to be as fast as possible on the z80 processor. For the z80 it is built on the same core `16_8x8` multiply model, using either an optimal unrolled shift+add algorithm or a faster 512 Byte table lookup algorithm.
 
@@ -27,9 +27,9 @@ This library is also designed to be as fast as possible on the z80 processor. Fo
 
   *  Register use is limited to the main and alternate set (including af'). NO index registers were abused in the process.
 
-  *  Made for the Spectrum Next. The z80-zxn `mul de` and the z180 `mlt nn` multiply instructions are used to full advantage to accelerate all floating point calculations.
+  *  Made for the Spectrum Next. The z80n `mul de` and the z180 `mlt nn` multiply instructions are used to full advantage to accelerate all floating point calculations.
 
-  *  The z80 multiply (without a hardware instruction) is implemented with an unrolled equivalent to the z80-zxn `mul de`, which is designed to have no side effect other than resetting the flag register. An alternate fast table look-up z80 multiply is also implemented.
+  *  The z80 multiply (without a hardware instruction) is implemented with an unrolled equivalent to the z80n `mul de`, which is designed to have no side effect other than resetting the flag register. An alternate fast table look-up z80 multiply is also implemented.
 
   *  Mantissa calculations are done with 24-bits and 8-bits for rounding. Rounding is a simple method, but can be if required it can be expanded to the IEEE standard with a performance penalty.
 
@@ -179,7 +179,7 @@ Contains the zsdcc and the sccz80 C compiler interface and is implemented using 
 
 ### lm32
 
-Glue that connects the compilers and standard assembly interface to the `math32` library.  The purpose is to define aliases that connect the standard names to the math32 specific names.  These functions make up the complete z88dk `math32` maths library that is linked against on the compile line (as in `-lmath32` or `-lmath32_fast`) or for the z180 and z80-zxn (`-lmath32_z180` or `-lmath32_zxn`).
+Glue that connects the compilers and standard assembly interface to the `math32` library.  The purpose is to define aliases that connect the standard names to the math32 specific names.  These functions make up the complete z88dk `math32` maths library that is linked against on the compile line (as in `-lmath32` or `-lmath32_fast`) or for the z180 and z80n (`-lmath32_z180` or `-lmath32_z80n`).
 
 ## Function Discussion
 
@@ -198,15 +198,15 @@ float __fsmul (float, float) __z88dk_callee;
 ```
 Using these intrinsic functions (and the compact assembly square root and polynomial functions) it is possible to build efficient C language complex functions.
 
-Although some algorithms from the Digi International functions remain in these intrinsic functions, they have been rewritten to exploit the z80, z180, z80-zxn 8-bit multiply hardware capabilities, rather than the 16-bit capabilities of Rabbit processors. Hence the relationship is only of descent, like "West Side Story" is derived from "Romeo and Juliet".
+Although some algorithms from the Digi International functions remain in these intrinsic functions, they have been rewritten to exploit the z180 and z80n 8-bit multiply hardware capabilities, rather than the 16-bit capabilities of Rabbit processors. Hence the relationship is only of descent, like "West Side Story" is derived from "Romeo and Juliet".
 
-For the z80 CPU, with no hardware multiply, a replica of the z80-zxn instruction `mul de` was created. Although the existing z88dk integer multiply routines could have been used, it is believed that since this routine is the heart of the entire library, it was worth optimising it for speed and to provide functional equivalence to the z80-zxn hardware multiply instruction to simplify code maintenance.
+For the z80 CPU, with no hardware multiply, a replica of the z80n instruction `mul de` was created. Although the existing z88dk integer multiply routines could have been used, it is believed that since this routine is the heart of the entire library, it was worth optimising it for speed and to provide functional equivalence to the z80n hardware multiply instruction to simplify code maintenance.
 
-The `z80_mulu_de` has zero argument detection, leading zero detection, and is unrolled. With the exception of preserving `hl`, for equivalency with z80-zxn `mul de`, it should be the fastest `16_8x8` linear multiply possible on a z80.
+The `z80_mulu_de` has zero argument detection, leading zero detection, and is unrolled. With the exception of preserving `hl`, for equivalency with z80n `mul de`, it should be the fastest `16_8x8` linear multiply possible on a z80.
 
 In the search for performance, an alternate table driven `16_8x8` multiply function was created. This function uses a 512 Byte table containing the 16-bit square of 8-bit numbers, to substantially improve the multiply z80 performance. Alternate mantissa routines were written to suit this fast multiply function, and they are used where necessary.
 
-To calculate the 24-bit mantissa a special `mulu_32h_24x24` function has been built using 8 multiplies, the minimum number of `16_8x8` multiply terms. It is much more natural for the z80 to work in `16_8x8` multiplies than the Rabbit's `32_16x16` multiply. It is not a "correct" multiply, in that all terms are calculated and carry forward is considered. The lowest term is not calculated, as it doesn't impact the 32-bit result. The lower 16-bits of the result are simply truncated, leaving a further 8-bits for mantissa rounding within the calling function. The resulting `mulu_32h_24x24` could be the fastest way to calculate an IEEE sized mantissa on a z80, z180, & z80-zxn.
+To calculate the 24-bit mantissa a special `mulu_32h_24x24` function has been built using 8 multiplies, the minimum number of `16_8x8` multiply terms. It is much more natural for the z80 to work in `16_8x8` multiplies than the Rabbit's `32_16x16` multiply. It is not a "correct" multiply, in that all terms are calculated and carry forward is considered. The lowest term is not calculated, as it doesn't impact the 32-bit result. The lower 16-bits of the result are simply truncated, leaving a further 8-bits for mantissa rounding within the calling function. The resulting `mulu_32h_24x24` could be the fastest way to calculate an IEEE sized mantissa on a z80, z180, & z80n.
 
 By providing a specific square function, all squaring (found in square root, trigonometric functions) can use the `_fssqr` or the equivalent C version. This means that the inverse `_fsinvsqrt` function uses `_fssqr` 5 multiplies in its `32h_24x24` mantissa calculation, in some situations, instead of 8 multiplies with the normal `_fsmul` function, and also avoids the need to use the alternate register set.
 
@@ -236,7 +236,7 @@ As add and subtract rely heavily on bit shifting across the mantissa, these func
 
 #### _fsmul and _fssqr
 
-The multiply function is implemented with a `mulu_32h_24x24` mantissa calculation, that optimises (minimises) the number of `16_8x8` multiplies required, using either hardware instructions from the z180 and z80-zxn, or the z80 equivalent function.
+The multiply function is implemented with a `mulu_32h_24x24` mantissa calculation, that optimises (minimises) the number of `16_8x8` multiplies required, using either hardware instructions from the z180 and z80n, or the z80 equivalent function.
 
 The mantissa multiplication is not a "correct" multiply, as not all carry bits are passed into the returned bytes. The low order mantissa term is not calculated and the low order bytes are simply truncated. The lower 8-bits of the 32-bit return can be used for rounding the 24-bit mantissa. This method minimises the number of `16_8x8` multiplies required to generate a correct 24-bit mantissa.
 
@@ -349,11 +349,9 @@ The rest of the derived power and trigonometric functions rely on the polynomial
 
 ### Execution speed
 
-Some [benchmarking](https://github.com/z88dk/z88dk/wiki/Classic--Maths-Libraries#benchmarks) has been completed and, as expected, the z180 and z80-zxn "Made for Spectrum NEXT" results show substantial improvements over other floating point libraries. For the z80 some benchmarks are faster than alternatives, but others are worse. More information on this will be added as experience grows.
+Some [benchmarking](https://github.com/z88dk/z88dk/wiki/Classic--Maths-Libraries#benchmarks) has been completed and, as expected, the z180 and z80n "Spectrum NEXT" results show substantial improvements over other floating point libraries. For the z80 some benchmarks are faster than alternatives, but others are worse. More information on this will be added as experience grows.
 
-Floating add, subtract and multiply require approximately xxx clocks worst case on the z80 processor. Divide and square root require approximately xxx clocks. Sine and pow2, pow10 or exp require about xxx clocks. Log, log2, log (base e), and atan need about xxx clocks. Functions derived from these functions often require xxx or more clocks.
-
-Careful use of the intrinsic functions can result in significant performance improvement. For example, the n-body benchmark can be optimised by the use of intrinsic math32 functions of `invsqrt()` and `sqr()`, to produce a significant improvement.
+Careful use of the intrinsic functions can result in significant performance improvement. For example, the n-body benchmark can be optimised by the use of intrinsic math32 functions of `invsqrt()` and `sqr()`, to produce a significant improvement. See `(opt)` results below.
 
 ```C
 #ifdef __MATH_MATH32
@@ -377,8 +375,8 @@ math32_fast      | sccz80   | -0.169075264  | -0.169086709  | _1_199_895_142_
 math32_fast (opt)| sccz80   | -0.169075264  | -0.169086709  | __0_891_891_922__
 math32_z180      | sccz80   | -0.169075264  | -0.169086709  | _0_562_947_777_
 math32_z180 (opt)| sccz80   | -0.169075264  | -0.169086709  | __0_428_653_933__
-math32_zxn       | sccz80   | -0.169075264  | -0.169086709  | _0_578_058_768_
-math32_zxn (opt) | sccz80   | -0.169075264  | -0.169086709  | __0_442_608_201__
+math32_z80n      | sccz80   | -0.169075264  | -0.169086709  | _0_578_058_768_
+math32_z80n (opt)| sccz80   | -0.169075264  | -0.169086709  | __0_442_608_201__
 
 
 ---

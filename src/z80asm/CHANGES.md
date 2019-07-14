@@ -1589,7 +1589,7 @@ CALL_PKG hard coded macro implemented for Garry Lancaster's Package system.
 - 1999-06-06, V1.0.12 (gbs):  
 MAXCODESIZE define moved to "config.h" where it also is defined for specific platforms.
 For MSDOS the value is 65532 due to max heap size allocation per malloc() call.
-(MSDOS BorlandC limitation reported by Dennis Gr\F6ning <dennisgr@algonet.se>)  
+(MSDOS BorlandC limitation reported by Dennis Groening <dennisgr@algonet.se>)  
 DEFB, DEFW, DEFL & DEFM now implemented with proper MAXCODESIZE checking.
 ReportError() now displays to stderr the actual MAXCODESIZE limit if it has been reached.
 
