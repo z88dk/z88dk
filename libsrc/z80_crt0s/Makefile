@@ -39,13 +39,9 @@ $(OUTPUT_DIRECTORY)/z80s183_crt0.lib:
 
 
 clean:
-	@$(RM) crt0/*.o* crt0/*.sym crt0/*.map 
-	@$(RM) crt0_fp/*.o* crt0_fp/*.sym crt0_fp/*.map 
-	@$(RM) crt0_rcm/*.o* crt0_rcm/*.sym crt0_rcm/*.map 
-	@$(RM) crt0_long/*.o* crt0_long/*.sym crt0_long/*.map 
-	@$(RM) z80_emu/*.o* z80_emu/*.sym z80_emu/*.map 
-	@$(RM) crt0_sdcc/*.o* crt0_sdcc/*.sym crt0_sdcc/*.map 
-	@$(RM) crt0_z180/*.o* crt0_z180/*.sym crt0_z180/*.map 
+	@$(RM) z80/sccz80/*.o z80/sdcc/*.o
+	@$(RM) z180/sccz80/*.o r2k/sccz80/*.o
+	@$(RM) 8080/sccz80/*.o 
 	@$(RM) ../_DEVELOPMENT/z80/z80/*.o
 	@$(RM) ../_DEVELOPMENT/l/z80/*.o
 	@$(RM) ../_DEVELOPMENT/l/sdcc/*.o

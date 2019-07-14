@@ -1,4 +1,4 @@
-crt0_8080/*.asm
+8080/sccz80/*.asm
 @newlib-z80.lst
 @crt0.lst
 
