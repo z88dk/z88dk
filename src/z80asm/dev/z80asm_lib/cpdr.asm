@@ -14,7 +14,13 @@ PUBLIC __z80asm__cpdr
 ; scf clears N and H - must set carry the hard way
    push af
    ex (sp),hl
+IF __CPU_8080__
+   ld  a,l
+   or  @00000001
+   ld  l,a
+ELSE
    set 0,l 			; set carry
+eNDIF
    jr retflags
 
 .loop
@@ -43,8 +49,14 @@ PUBLIC __z80asm__cpdr
 .joinbc0
  
    ex (sp),hl
+IF __CPU_8080__
+   ld a,l
+   and @11111010
+   ld  l,a
+ELSE
    res 0,l 			; clear carry
    res 2,l			; clear P/V -> BC == 0
+ENDIF
    jr retflags
 
 .match
@@ -57,8 +69,15 @@ PUBLIC __z80asm__cpdr
    jr z, joinbc0
   
    ex (sp),hl
+IF __CPU_8080__
+   ld a,l
+   and @11111110
+   or  @00000100
+   ld  l,a
+ELSE
    res 0,l 			; clear carry
    set 2,l			; set P/V -> BC != 0
+ENDIF
 
 .retflags
    ex (sp),hl

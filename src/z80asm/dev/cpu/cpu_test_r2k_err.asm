@@ -324,6 +324,12 @@
  dec iyh                        ; Error
  dec iyl                        ; Error
  di                             ; Error
+ djnz -32768                    ; Error
+ djnz 32767                     ; Error
+ djnz 65535                     ; Error
+ djnz b, -32768                 ; Error
+ djnz b, 32767                  ; Error
+ djnz b, 65535                  ; Error
  ei                             ; Error
  halt                           ; Error
  idet                           ; Error
@@ -622,6 +628,21 @@
  ipset 4                        ; Error
  ipset 4                        ; Error
  jp (c)                         ; Error
+ jr -32768                      ; Error
+ jr 32767                       ; Error
+ jr 65535                       ; Error
+ jr c, -32768                   ; Error
+ jr c, 32767                    ; Error
+ jr c, 65535                    ; Error
+ jr nc, -32768                  ; Error
+ jr nc, 32767                   ; Error
+ jr nc, 65535                   ; Error
+ jr nz, -32768                  ; Error
+ jr nz, 32767                   ; Error
+ jr nz, 65535                   ; Error
+ jr z, -32768                   ; Error
+ jr z, 32767                    ; Error
+ jr z, 65535                    ; Error
  ld a, i                        ; Error
  ld a, ixh                      ; Error
  ld a, ixl                      ; Error

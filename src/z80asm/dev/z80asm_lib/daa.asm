@@ -8,6 +8,9 @@
 ; Repository: https://github.com/z88dk/z88dk
 ;------------------------------------------------------------------------------
 
+
+IF !__CPU_8080__
+
 SECTION code_crt0_sccz80
 PUBLIC __z80asm__daa
 
@@ -115,3 +118,4 @@ positive:
 		pop		af
 		pop		bc
 		ret
+ENDIF
