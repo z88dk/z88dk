@@ -696,6 +696,7 @@ for my $cpu (@CPUS) {
 for my $asm (sort keys %Tests) {
 	my $asmf = sprintf(" %-31s", $asm);
 	for my $cpu (@CPUS) {
+        	next if $cpu eq "8080";
 		if (exists $Tests{$asm}{$cpu}) {
 			for my $ixiy ('', '_ixiy') {
 				my $asm1 = $asm;
@@ -754,7 +755,7 @@ sub add_opc_1 {
 	# expand (ix+%d)
 	return if $asm =~ /^(ldp|jp)/;
 	
-	if ($asm =~ /\(hl\)/ && $cpu != "8080" ) {
+	if ($asm =~ /\(hl\)/ && $cpu ne "8080" ) {
 		(my $asm1 = $asm) =~ s/\(hl\)/(ix+%d)/g;
 		add_opc_2($cpu, $asm1, $V{ix}, $bin[0], '%d', @bin[1..$#bin]);
 		(   $asm1 = $asm) =~ s/\(hl\)/(iy+%d)/g;
@@ -1154,7 +1155,12 @@ sub add_tests {
 		add_tests($cpu, replace($asm, '%M',-32768), replace($bin, '%M %M', 0x80." ".0x00));
 	}
 	elsif ($asm =~ /%j/) {
-		add_tests($cpu, replace($asm, '%j', "ASMPC"), replace($bin, '%j', 0xFE));
+		if ( $cpu eq "8080" ) {
+			# Bit of a hack for the relative jump replacement on the 8080
+			# I can't figure out how to add a test that will only affect 8080, not all cpus
+		} else {
+			add_tests($cpu, replace($asm, '%j', "ASMPC"), replace($bin, '%j', 0xFE));
+		}
 	}
 	elsif ($asm =~ /^rst %c/) {		# special case
 		for my $div (1, 8) {
