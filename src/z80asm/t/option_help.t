@@ -49,6 +49,7 @@ Help Options:
 Code Generation Options:
   --cpu=z80-zxn          Assemble for the Z80 variant of ZX Next
   --cpu=z80              Assemble for the Z80
+  --cpu=8080             Assemble for the 8080 (using z80 mnemonics)
   --cpu=z180             Assemble for the Z180
   --cpu=r2k              Assemble for the Rabbit 2000
   --cpu=r3k              Assemble for the Rabbit 3000
