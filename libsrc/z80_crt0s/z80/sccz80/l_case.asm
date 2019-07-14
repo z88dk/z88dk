@@ -18,15 +18,27 @@
         inc hl
         ld a,b
         or c
+IF CPU_8080
+        jp z,swend              ;default or continuation code
+ELSE
         jr z,swend              ;default or continuation code
+ENDIF
         ld a,(hl)
         inc hl
         cp e
         ld a,(hl)
         inc hl
+IF CPU_8080
+        jp nz,swloop
+ELSE
         jr nz,swloop
+ENDIF
         cp d
+IF CPU_8080
+        jp nz,swloop
+ELSE
         jr nz,swloop
+ENDIF
         ld h,b                  ;cases matched
         ld l,c
 .swend

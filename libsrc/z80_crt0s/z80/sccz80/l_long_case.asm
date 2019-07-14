@@ -23,32 +23,52 @@ loop:
    inc hl
    or (hl)
    inc hl
-   
+ 
+IF CPU_8080
+   jp z, end                   ; if end of table
+ELSE  
    jr z, end                   ; if end of table
+ENDIF
    
    ld a,(hl)
    inc hl
    
    cp c
+IF CPU_8080
+   jp nz, loop_3
+ELSE
    jr nz, loop_3
+ENDIF
    
    ld a,(hl)
    inc hl
    
    cp b
+IF CPU_8080
+   jp nz, loop_2
+ELSE
    jr nz, loop_2
+ENDIF
    
    ld a,(hl)
    inc hl
    
    cp e
+IF CPU_8080
+   jp nz, loop_1
+ELSE
    jr nz, loop_1
+ENDIF
    
    ld a,(hl)
    inc hl
    
    cp d
+IF CPU_8080
+   jp nz, loop
+ELSE
    jr nz, loop
+ENDIF
 
    ; match
    
@@ -75,4 +95,8 @@ loop_2:
 loop_1:
 
    inc hl
+IF CPU_8080
+   jp loop
+ELSE
    jr loop
+ENDIF
