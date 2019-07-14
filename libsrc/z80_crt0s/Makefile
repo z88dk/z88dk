@@ -13,7 +13,7 @@ $(OUTPUT_DIRECTORY)/z80_crt0.lib:
 
 $(OUTPUT_DIRECTORY)/8080_crt0.lib:
 	@$(MAKE) clean
-	$(LIBLINKER) -I.. -x$@ -DCPU_8080 @crt0_8080.lst
+	$(LIBLINKER) -I.. -x$@ -DCPU_8080 -m8080 @crt0_8080.lst
 
 $(OUTPUT_DIRECTORY)/z180_crt0.lib:
 	@$(MAKE) clean

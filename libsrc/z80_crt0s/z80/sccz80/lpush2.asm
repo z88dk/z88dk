@@ -18,14 +18,23 @@ PUBLIC    lpush2
 
 .lpush2
 
+IF __CPU_8080__
+   pop af
+ELSE
    pop ix
+ENDIF
    
    pop bc
    push de
    push hl
    push bc
    
+IF __CPU_8080__
+   push af
+   ret
+ELSE
    jp (ix)
+ENDIF
 
 ;        exx
 ;        pop     hl      ;save return address

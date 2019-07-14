@@ -9,8 +9,14 @@
 
 .l_int2long_s
         ld      de,0
+IF __CPU_8080__
+	ld	a,h
+	rla
+	ret	nc
+ELSE
         bit     7,h
         ret     z
+ENDIF
         dec     de
         ret
 

@@ -13,7 +13,13 @@
 
 __convert_sdccf2reg:
 	add	hl,hl	;shift right, sign into carry
+IF __CPU_8080__
+        ld      a,l
+        rra
+        ld      l,a
+ELSE
 	rr	l	;get sign into right place after shift
+ENDIF
 	inc	h	;fix exponent bias
 	inc	h
         ; h = exponent

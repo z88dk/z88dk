@@ -10,7 +10,13 @@
 
 .l_int2long_s_float
         ld      de,0
+IF __CPU_8080__
+        ld      a,h
+        rla
+        jp      nc,float
+ELSE
         bit     7,h
         jp		z,float
+ENDIF
         dec     de
         jp		float

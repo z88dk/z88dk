@@ -1,4 +1,5 @@
         
+IF !__CPU_8080__
 	SECTION	  code_crt0_sccz80
         PUBLIC    dpush3
 	EXTERN	  fa
@@ -23,3 +24,4 @@ dpush3: exx
 	push	hl
 	exx
 	ret
+ENDIF
