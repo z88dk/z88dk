@@ -14,7 +14,7 @@ z180/%.opt: z180/%.c
 	mv -f tmp1.opt $@
 
 z80n/%.opt: z80n/%.c
-	zcc +test -mz80n -custom-copt-rules=../lib/z80n_rules.1 -vn -a $^ -o tmp1.opt
+	zcc +test -custom-copt-rules=../lib/z80n_rules.1 -vn -a $^ -o tmp1.opt
 	@cat tmp1.opt | grep -v '^;'  | grep -v MODULE> tmp2.opt
 	diff -w tmp2.opt results/$@
 	mv -f tmp1.opt $@
