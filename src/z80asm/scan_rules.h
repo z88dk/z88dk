@@ -5510,7 +5510,7 @@ _eof_trans:
 	break;
 	case 322:
 	{te = p;p--;{
-	if (opts.cpu & CPU_Z80_ZXN) {
+	if (opts.cpu & CPU_Z80N) {
 		sym.tok = TK_X;
 	}
 	else {
@@ -6420,7 +6420,7 @@ _eof_trans:
 	break;
 	case 65:
 	{{p = ((te))-1;}
-	if (opts.cpu & CPU_Z80_ZXN) {
+	if (opts.cpu & CPU_Z80N) {
 		sym.tok = TK_X;
 	}
 	else {

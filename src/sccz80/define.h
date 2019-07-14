@@ -332,7 +332,7 @@ struct gototab_s {
 #define DBG_GOTO  14
 
 #define DBG_FAR1  21
-#define DBG_ALL  99
+#define DBG_ALL   99
 
 #define Z80ASM_PREFIX "_"
 
@@ -350,7 +350,7 @@ struct gototab_s {
 #define CPU_Z180     2
 #define CPU_R2K      4
 #define CPU_R3K      8
-#define CPU_Z80ZXN   16
+#define CPU_Z80N     16
 
 #define CPU_RABBIT (CPU_R2K|CPU_R3K)
 

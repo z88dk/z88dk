@@ -13,7 +13,7 @@ use v5.10;
 use Test::More;
 require '../../t/testlib.pl';
 
-# CPUs not supported by ticks: z80-zxn z180 r3k
+# CPUs not supported by ticks: z80n z180 r3k
 my @CPUS = (qw( z80 r2k ));
 my $test_nr;
 

@@ -47,7 +47,7 @@ Help Options:
   -v, --verbose          Be verbose
 
 Code Generation Options:
-  --cpu=z80-zxn          Assemble for the Z80 variant of ZX Next
+  --cpu=z80n             Assemble for the Z80 variant of ZX Next
   --cpu=z80              Assemble for the Z80
   --cpu=z180             Assemble for the Z180
   --cpu=r2k              Assemble for the Rabbit 2000

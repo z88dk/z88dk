@@ -19,8 +19,8 @@
 @libgen/libgen_sdcc.lst
 @locale/locale.lst
 @math/math_integer.lst
-@math/math_integer_z80_zxn.lst
-@math/math_float_sdcc_ix_z80_zxn.lst
+@math/math_integer_z80n.lst
+@math/math_float_sdcc_ix_z80n.lst
 @network/network_sdcc_ix.lst
 @setjmp/setjmp_sdcc_ix.lst
 @sound/sound_sdcc_ix.lst

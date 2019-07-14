@@ -24,7 +24,7 @@ z88dk vx.x.x - xx.xx.xxxx
 - [classic] +laser500: Microsoft 32 and 64 bit floating point support
 - [classic] +trs80: Microsoft 32 and 64 bit floating point support
 - [classic] +trs80: TRSDOS support
-- [classic] all: IEEE 32 bit maths library
+- [classic] all: IEEE 754 32 bit maths library
 - [classic] all: BBC BASIC 40 bit maths library
 - [sccz80] #1102: Trailing comma support in struct initialisation
 - [sccz80] Optimisation rule fixes and improvements
@@ -33,6 +33,7 @@ z88dk vx.x.x - xx.xx.xxxx
 - [sccz80] #1141: Support for named address spaces
 - [sccz80] #1133: Support for bitfields
 - [zsdcc] Upgraded to SDCC 3.9.1 r11311
+- [newlib] +zxn: ZX Spectrum Next architecture renamed z80n
 
 z88dk v1.99C - 19.01.2019
 

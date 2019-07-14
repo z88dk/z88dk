@@ -493,7 +493,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen)
                                         else BUF_PRINTF("%-8siy,(hl)","ld");
                                     }
                                     else BUF_PRINTF("nop");
-                                } else if ( c_cpu & CPU_Z80_ZXN ) {
+                                } else if ( c_cpu & CPU_Z80N ) {
                                     if ( b == 0x23 ) BUF_PRINTF("swapnib");
                                     else if ( b == 0x24 ) BUF_PRINTF("mirror  a");
                                     else if ( b == 0x27 ) BUF_PRINTF("test    %s",handle_immed8(state, opbuf1, sizeof(opbuf1)));                                    
@@ -595,7 +595,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen)
                                 } else if ( isz180() && z == 3 && y < 4 ) {
                                     char *instr[] = { "otim", "otdm", "otimr", "otdmr"};
                                     BUF_PRINTF("%s", instr[y]);
-                                } else if ( c_cpu & CPU_Z80_ZXN ) {
+                                } else if ( c_cpu & CPU_Z80N ) {
                                     if ( b == 0x8a ) BUF_PRINTF("push    %s", handle_immed16_be(state, opbuf1, sizeof(opbuf1)));
                                     else if ( b == 0x90 ) BUF_PRINTF("outinb  ");
                                     else if ( b == 0x91 ) BUF_PRINTF("nextreg %s,%s",handle_immed8(state, opbuf1, sizeof(opbuf1)), handle_immed8(state, opbuf2, sizeof(opbuf2)));

@@ -1,6 +1,10 @@
 Z88DK Z80 Module Assembler Change Log
 =====================================
 
+2019
+----
+- 2019-07-14 Convert Spectrum Next CPU to (--cpu=z80n)
+
 2018
 ----
 - 2018-01-03 Fix #563 consolidated object file erroneously eliminates globally exported defc
@@ -9,7 +13,6 @@ Z88DK Z80 Module Assembler Change Log
 
 2017
 ----
-
 - 2017-01-30 Fix #49 implement z180 as a target
 - 2017-01-26 Fix #47 accept more that one MODULE directive
 - 2017-02-08 Fix #53 public constants not being listed in global .def file
@@ -1440,7 +1443,7 @@ Define keywords for special symbols ASMSIZE, ASMTAIL
          Simple asm program: "org 0 \n jp NN \n jp NN \n NN: \n",
          compile with "z80asm -t4 -b test.asm"
          fails with: "File 'test.asm', Module 'TEST', Syntax error in expression \n
-                      Error in expression +¦+²+-;¾?.¹Ò¦Ò²Ù+vÝFÝVÝ^Ýx¦ Ý@ÝHÝPÝ".
+                      Error in expression +\A6+\B2+-;\BE?.\B9Ò¦Ò²\D9+v\DDF\DDV\DD^\DDx\A6 \DD@\DDH\DDP\DD".
 
          Problem cause: lexer GetSym() is not prepared to read '\0' bytes.
          When the expression is read from the OBJ file at the link phase,
@@ -1586,7 +1589,7 @@ CALL_PKG hard coded macro implemented for Garry Lancaster's Package system.
 - 1999-06-06, V1.0.12 (gbs):  
 MAXCODESIZE define moved to "config.h" where it also is defined for specific platforms.
 For MSDOS the value is 65532 due to max heap size allocation per malloc() call.
-(MSDOS BorlandC limitation reported by Dennis Gröning <dennisgr@algonet.se>)  
+(MSDOS BorlandC limitation reported by Dennis Groening <dennisgr@algonet.se>)  
 DEFB, DEFW, DEFL & DEFM now implemented with proper MAXCODESIZE checking.
 ReportError() now displays to stderr the actual MAXCODESIZE limit if it has been reached.
 

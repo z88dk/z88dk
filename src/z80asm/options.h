@@ -14,21 +14,21 @@
 *   CPU type
 *----------------------------------------------------------------------------*/
 #define CPU_Z80     (1 << 0)
-#define CPU_Z80_ZXN	(1 << 1)
+#define CPU_Z80N	(1 << 1)
 #define CPU_Z180    (1 << 2)
 #define CPU_R2K		(1 << 3)
 #define CPU_R3K		(1 << 4)
 
 #define CPU_Z80_NAME		"z80"
-#define CPU_Z80_ZXN_NAME	"z80_zxn"
+#define CPU_Z80N_NAME		"z80n"
 #define CPU_Z180_NAME		"z180"
 #define CPU_R2K_NAME		"r2k"
 #define CPU_R3K_NAME		"r3k"
 
-#define CPU_ZILOG	(CPU_Z80 | CPU_Z80_ZXN| CPU_Z180)
+#define CPU_ZILOG	(CPU_Z80 | CPU_Z80N| CPU_Z180)
 #define CPU_RABBIT	(CPU_R2K | CPU_R3K)
 #define CPU_ALL		(CPU_ZILOG | CPU_RABBIT)
-#define CPU_NOT_Z80	(CPU_ALL & ~(CPU_Z80 | CPU_Z80_ZXN))
+#define CPU_NOT_Z80	(CPU_ALL & ~(CPU_Z80 | CPU_Z80N))
 
 /*-----------------------------------------------------------------------------
 *   Assembler standard library

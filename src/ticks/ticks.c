@@ -658,7 +658,7 @@ int main (int argc, char **argv){
     printf("  -mz80          Emulate a z80\n"),
     printf("  -mz180         Emulate a z180\n"),
     printf("  -mr2k          Emulate a Rabbit 2000\n"),
-    printf("  -mz80-zxn      Emulate a Spectrum Next Z80\n"),
+    printf("  -mz80n         Emulate a Spectrum Next z80n\n"),
     printf("  -mez80         Emulate an ez80 (z80 mode) \n"),
     printf("  -x <file>      Symbol file to read\n"),
     printf("  -ide0 <file>   Set file to be ide device 0\n"),
@@ -715,8 +715,8 @@ int main (int argc, char **argv){
             c_cpu = CPU_Z80;
           } else if ( strcmp(&argv[0][1],"mz180") == 0 ) {
             c_cpu = CPU_Z180;
-          } else if ( strcmp(&argv[0][1],"mz80-zxn") == 0 ) {
-            c_cpu = CPU_Z80_ZXN;
+          } else if ( strcmp(&argv[0][1],"mz80n") == 0 ) {
+            c_cpu = CPU_Z80N;
             memory_model = "zxn";
           } else if ( strcmp(&argv[0][1],"mr2k") == 0 ) {
             c_cpu = CPU_R2K;
@@ -3376,7 +3376,7 @@ int main (int argc, char **argv){
           case 0x23:    // (EZ80) LEA HL,IY+d, (ZXN) swapnib
             if ( isez80() ) {
                 LEA(h, l, yh, yl, 3);
-            } else if ( c_cpu == CPU_Z80_ZXN ) {
+            } else if ( c_cpu == CPU_Z80N ) {
               a = (( a & 0xf0) >> 4) | (( a & 0x0f) << 4);
               st += 8;
             } else {
@@ -3386,7 +3386,7 @@ int main (int argc, char **argv){
           case 0x24:    // (Z180) TST A,D
             if ( canz180() ) {
               TEST(h, isez80() ? 2 : 7);
-            } else if ( c_cpu == CPU_Z80_ZXN ) {   // (ZXN) mirror a
+            } else if ( c_cpu == CPU_Z80N ) {   // (ZXN) mirror a
               a = mirror_table[a & 0x0f] << 4 | mirror_table[(a & 0xf0) >> 4];
               st += 8;
             } else {
@@ -3394,7 +3394,7 @@ int main (int argc, char **argv){
             }
             break;
           case 0x28:    // (ZXN) bsla de,b
-            if ( c_cpu == CPU_Z80_ZXN ) {
+            if ( c_cpu == CPU_Z80N ) {
                 int count;
                 for ( count  = 0 ; count < (b & 0x0f); count++ ) {
                     SLA(e);
@@ -3406,7 +3406,7 @@ int main (int argc, char **argv){
             }
             break;
           case 0x29:    // (ZXN) bsra de,b
-            if ( c_cpu == CPU_Z80_ZXN ) {
+            if ( c_cpu == CPU_Z80N ) {
                 int count;
                 for ( count  = 0 ; count < (b & 0x0f); count++ ) {
                     SRA(d);
@@ -3418,7 +3418,7 @@ int main (int argc, char **argv){
             }
             break;
           case 0x2a:    // (ZXN) bsrl de,b
-            if ( c_cpu == CPU_Z80_ZXN ) {
+            if ( c_cpu == CPU_Z80N ) {
                 int count;
                 for ( count  = 0 ; count < (b & 0x0f); count++ ) {
                     SRL(d);
@@ -3430,7 +3430,7 @@ int main (int argc, char **argv){
             }
             break;
           case 0x2b:    // (ZXN) bsrf de,b
-            if ( c_cpu == CPU_Z80_ZXN ) {
+            if ( c_cpu == CPU_Z80N ) {
                 int count;
                 for ( count  = 0 ; count < (b & 0x0f); count++ ) {
                     RR(d);
@@ -3445,7 +3445,7 @@ int main (int argc, char **argv){
           case 0x2c:    // (Z180) TST A,E (ZXN) brlc de,b
             if ( canz180() ) {
               TEST(l, isez80() ? 2 : 7);
-            } else if ( c_cpu == CPU_Z80_ZXN ) {
+            } else if ( c_cpu == CPU_Z80N ) {
                 int count;
                 for ( count  = 0 ; count < (b & 0x07); count++ ) {
                     ff |= ( d & 128) ? 256 : 0;
@@ -3470,7 +3470,7 @@ int main (int argc, char **argv){
           case 0x32:    // (EZ80) LEA IX,IX+d, (ZXN) add de,a
             if ( isez80() ) {
                 LEA(xh, xl, xh, xl, 3);
-            } else if ( c_cpu == CPU_Z80_ZXN ) {
+            } else if ( c_cpu == CPU_Z80N ) {
               int16_t result = (( d * 256 ) + e) + a;
               d  = (result >> 8 ) & 0xff;
               e = result & 0xff;
@@ -3482,7 +3482,7 @@ int main (int argc, char **argv){
           case 0x33:    // (EZ80) LEA IY,IY+d, (ZXN) add bc,a
             if ( isez80() ) {
                 LEA(yh, yl, yh, yl, 3);
-            } else if ( c_cpu == CPU_Z80_ZXN ) {
+            } else if ( c_cpu == CPU_Z80N ) {
               int16_t result = (( b * 256 ) + c) + a;
               b  = (result >> 8 ) & 0xff;
               c = result & 0xff;
@@ -3520,7 +3520,7 @@ int main (int argc, char **argv){
             }
             break;
           case 0x91:
-            if ( c_cpu == CPU_Z80_ZXN ) {
+            if ( c_cpu == CPU_Z80N ) {
               uint8_t v = get_memory(pc++);
               uint8_t r = get_memory(pc++);
               out(0x243b, v);
@@ -3531,7 +3531,7 @@ int main (int argc, char **argv){
             }
             break;
           case 0x92:
-            if ( c_cpu == CPU_Z80_ZXN ) {
+            if ( c_cpu == CPU_Z80N ) {
               uint8_t v = get_memory(pc++);
               out(0x243b, v);
               out(0x253b, a);
@@ -3581,7 +3581,7 @@ int main (int argc, char **argv){
           case 0xfc: case 0xfd: case 0xff:
             st+= 8; break;
           case 0x26:                                         // (ZXN) mirror de
-            if ( c_cpu != CPU_Z80_ZXN) { st += 8; break; }
+            if ( c_cpu != CPU_Z80N) { st += 8; break; }
 #if 0
             t = (mirror_table[e & 0x0f] << 4) | mirror_table[(e & 0xf0) >> 4];
             e = d;
@@ -3591,7 +3591,7 @@ int main (int argc, char **argv){
             st += 8;
             break;
           case 0x30:                                         // (ZXN) mul d,e
-            if ( c_cpu == CPU_Z80_ZXN ) {
+            if ( c_cpu == CPU_Z80N ) {
               int16_t result = d * e;
               d  = (result >> 8 ) & 0xff;
               e = result & 0xff;
@@ -3601,7 +3601,7 @@ int main (int argc, char **argv){
             }
             break;
           case 0x31:                                         // (ZXN) add hl,a
-            if ( c_cpu == CPU_Z80_ZXN ) {
+            if ( c_cpu == CPU_Z80N ) {
               int16_t result = (( h * 256 ) + l) + a;
               h  = (result >> 8 ) & 0xff;
               l = result & 0xff;
@@ -3611,7 +3611,7 @@ int main (int argc, char **argv){
             }
             break;
           case 0x34:                                         // (ZXN) add hl,$xxxx
-            if ( c_cpu == CPU_Z80_ZXN ) {
+            if ( c_cpu == CPU_Z80N ) {
               uint8_t lsb = get_memory(pc++);
               uint8_t msb = get_memory(pc++);
               int16_t result = (( h * 256 ) + l) + ( lsb + msb * 256);
@@ -3626,7 +3626,7 @@ int main (int argc, char **argv){
             }
             break;
           case 0x35:                                         // (ZXN) add de,$xxxx
-            if ( c_cpu == CPU_Z80_ZXN ) {
+            if ( c_cpu == CPU_Z80N ) {
               uint8_t lsb = get_memory(pc++);
               uint8_t msb = get_memory(pc++);
               int16_t result = (( d * 256 ) + e) + ( lsb + msb * 256);
@@ -3642,7 +3642,7 @@ int main (int argc, char **argv){
               st += 4;
               yl = get_memory((l|h<<8));
               yh = get_memory((l|h<<8) + 1);
-            } else if ( c_cpu == CPU_Z80_ZXN ) {
+            } else if ( c_cpu == CPU_Z80N ) {
               uint8_t lsb = get_memory(pc++);
               uint8_t msb = get_memory(pc++);
               int16_t result = (( b * 256 ) + c) + ( lsb + msb * 256);
@@ -3688,7 +3688,7 @@ int main (int argc, char **argv){
             st += 8;
             break;
           case 0x8a:                                         // (ZXN) push $xxxx
-            if ( c_cpu == CPU_Z80_ZXN ) {
+            if ( c_cpu == CPU_Z80N ) {
               uint8_t lsb = get_memory(pc++);
               uint8_t msb = get_memory(pc++);
               PUSH(msb,lsb);
@@ -3707,7 +3707,7 @@ int main (int argc, char **argv){
               tl = get_memory((l|h<<8));
               h = get_memory((l|h<<8) + 1);
               l = tl;
-            } else if ( c_cpu == CPU_Z80_ZXN ) {
+            } else if ( c_cpu == CPU_Z80N ) {
               uint8_t v = get_memory(pc++);
               TEST(v, 7);
               st += 11;
@@ -3716,7 +3716,7 @@ int main (int argc, char **argv){
             }
             break;
           case 0xa4:                                        // (ZXN) ldix
-            if ( c_cpu != CPU_Z80_ZXN ) { st+= 8; break; }
+            if ( c_cpu != CPU_Z80N ) { st+= 8; break; }
             st += 16;
             t = get_memory(l | h<<8);
             if ( t != a ) {
@@ -3734,7 +3734,7 @@ int main (int argc, char **argv){
             b|c && (st += 5, fa= 128);
             fb= fa; break;
           case 0xac:                                       // (ZXN) lddx
-            if ( c_cpu != CPU_Z80_ZXN ) { st+= 8; break; }
+            if ( c_cpu != CPU_Z80N ) { st+= 8; break; }
             t = get_memory(l | h<<8);
             st += 16;
             if ( t != a ) {
@@ -3752,7 +3752,7 @@ int main (int argc, char **argv){
             b|c && (st += 5, fa= 128);
             fb= fa; break;
           case 0xb4:                                        // (ZXN) ldirx
-            if ( c_cpu != CPU_Z80_ZXN ) { st+= 8; break; }
+            if ( c_cpu != CPU_Z80N ) { st+= 8; break; }
             t = get_memory(l | h<<8);
             st += 16;
             if ( t != a ) {
@@ -3775,7 +3775,7 @@ int main (int argc, char **argv){
           case 0xb5:                                         // (ZXN) fillde
             st += 8; break;
           case 0xbc:                                         // (ZXN) LDDRX
-            if ( c_cpu != CPU_Z80_ZXN ) { st+= 8; break; }
+            if ( c_cpu != CPU_Z80N ) { st+= 8; break; }
             t = get_memory(l | h<<8);
             st += 16;
             if ( t != a ) {

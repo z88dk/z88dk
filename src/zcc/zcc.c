@@ -208,7 +208,7 @@ static int             c_nostdlib = 0;
 static int             mz180 = 0;
 static int             mr2k = 0;
 static int             mr3k = 0;
-static int             mz80_zxn = 0;
+static int             mz80n = 0;
 static int             c_nocrt = 0;
 static char           *c_crt_incpath = NULL;
 static int             processing_user_command_line_arg = 0;
@@ -407,7 +407,7 @@ static arg_t     myargs[] = {
     { "create-app", AF_BOOL_TRUE, SetBoolean, &createapp, NULL, "Run appmake on the resulting binary to create emulator usable file" },
     { "specs", AF_BOOL_TRUE, SetBoolean, &c_print_specs, NULL, "Print out compiler specs" },
     { "compiler", AF_MORE, SetString, &c_compiler_type, NULL, "Set the compiler type from the command line (sccz80, sdcc)" },
-    { "mz80-zxn", AF_BOOL_TRUE, SetBoolean, &mz80_zxn, NULL, "Target the zx next z80 cpu" },
+    { "mz80n", AF_BOOL_TRUE, SetBoolean, &mz80n, NULL, "Target the ZX Next z80n cpu" },
     { "mz180", AF_BOOL_TRUE, SetBoolean, &mz180, NULL, "Target the z180 cpu" },
     { "mr2k", AF_BOOL_TRUE, SetBoolean, &mr2k, NULL, "Target the Rabbit 2000 cpu" },
     { "mr3k", AF_BOOL_TRUE, SetBoolean, &mr3k, NULL, "Target the Rabbit 3000 cpu" },
@@ -494,7 +494,7 @@ typedef struct cpu_map_s cpu_map_t;
 
 enum {
     CPU_TYPE_Z80 = 0,
-    CPU_TYPE_Z80_ZXN,
+    CPU_TYPE_Z80N,
     CPU_TYPE_Z180,
     CPU_TYPE_R2K,
     CPU_TYPE_R3K,
@@ -503,7 +503,7 @@ enum {
 
 cpu_map_t cpu_map[CPU_TYPE_SIZE] = {
     { "-mz80",     "-mz80" , "-mz80" },                     // CPU_TYPE_Z80     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
-    { "-mz80-zxn", "-mz80",  "-mz80" },                     // CPU_TYPE_Z80_ZXN : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
+    { "-mz80n",    "-mz80n", "-mz80" },                     // CPU_TYPE_Z80N    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
     { "-mz180",    "-mz180", "-mz180 -portmode=z180" },     // CPU_TYPE_Z180    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
     { "-mr2k",     "-mr2k",  "-mr2k" },                     // CPU_TYPE_R2K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
     { "-mr3k",     "-mr3k",  "-mr3ka" },                    // CPU_TYPE_R3K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
@@ -520,8 +520,8 @@ char *select_cpu(int n)
     if (mr2k)
         return cpu_map[CPU_TYPE_R2K].tool[n];
 
-    if (mz80_zxn)
-        return cpu_map[CPU_TYPE_Z80_ZXN].tool[n];
+    if (mz80n)
+        return cpu_map[CPU_TYPE_Z80N].tool[n];
 
     return cpu_map[CPU_TYPE_Z80].tool[n];
 }

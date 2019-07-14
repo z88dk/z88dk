@@ -44,7 +44,7 @@ for %%t in (%targets%) do (
             set cpu="-mz180"
          ) else (
             if "%%t" == "zxn" (
-               set cpu="-mz80-zxn"
+               set cpu="-mz80n"
             )
          )
       )

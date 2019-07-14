@@ -1,0 +1,1 @@
+DEFC __CLIB_OPT_FMATH = 50

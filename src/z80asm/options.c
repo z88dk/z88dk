@@ -59,7 +59,7 @@ static void option_define(const char *symbol );
 static void option_make_lib(const char *library );
 static void option_use_lib(const char *library );
 static void option_cpu_z80(void);
-static void option_cpu_z80_zxn(void);
+static void option_cpu_z80n(void);
 static void option_cpu_z180(void);
 static void option_cpu_r2k(void);
 static void option_cpu_r3k(void);
@@ -212,8 +212,8 @@ static void process_opt( int *parg, int argc, char *argv[] )
 	const char *opt_arg_ptr;
 
 	/* search options that are exceptions to the look-up table */
-	if (strcmp(argv[II], "-mz80-zxn") == 0 || strcmp(argv[II], "-m=z80-zxn") == 0) {
-		option_cpu_z80_zxn();
+	if (strcmp(argv[II], "-mz80n") == 0 || strcmp(argv[II], "-m=z80n") == 0) {
+		option_cpu_z80n();
 		return;
 	}
 	else if (strcmp(argv[II], "-mz80") == 0 || strcmp(argv[II], "-m=z80") == 0) {
@@ -734,10 +734,10 @@ static void option_cpu_z80(void)
 	opts.cpu_name = CPU_Z80_NAME;
 }
 
-static void option_cpu_z80_zxn(void)
+static void option_cpu_z80n(void)
 {
-	opts.cpu = CPU_Z80_ZXN;
-	opts.cpu_name = CPU_Z80_ZXN_NAME;
+	opts.cpu = CPU_Z80N;
+	opts.cpu_name = CPU_Z80N_NAME;
 }
 
 static void option_cpu_z180(void)
@@ -776,8 +776,8 @@ static void define_assembly_defines()
 	case CPU_Z80:
 	    define_static_def_sym("__CPU_Z80__", 1);
 		break;
-	case CPU_Z80_ZXN:
-	    define_static_def_sym("__CPU_Z80_ZXN__", 1);
+	case CPU_Z80N:
+	    define_static_def_sym("__CPU_Z80N__", 1);
 		break;
 	case CPU_Z180:
 	    define_static_def_sym("__CPU_Z180__", 1);
