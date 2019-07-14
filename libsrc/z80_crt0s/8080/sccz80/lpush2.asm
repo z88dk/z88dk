@@ -11,11 +11,12 @@
 
                 SECTION   code_crt0_sccz80
                 PUBLIC lpush2
+		EXTERN	__retloc
 
-.lpush2 pop	bc
-	ld	(retloc+1),bc
+.lpush2 pop	af
         pop     bc      ;save next item on stack
         push    de      ;dump our long
         push    hl
         push    bc      ;store back "next item on stack"
-.retloc jp	0
+	push	af
+	ret

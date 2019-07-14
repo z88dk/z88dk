@@ -5,44 +5,46 @@
 ;
 
                 SECTION   code_crt0_sccz80
-                PUBLIC	l_long_or
+                PUBLIC l_long_xor
+		EXTERN	__retloc
 
 ;Logical routines for long functions    dehl
 ;first opr on stack
 
 
-; "or" deHL' and dehl into HLde'
-.l_long_or   
+; "xor" deHL' and dehl into HLde'
+.l_long_xor   
 	ex	(sp),hl
-	ld	(retloc+1),hl
+	ld	(__retloc),hl
 	pop	bc
         
         ld      hl,0
         add     hl,sp   ;points to hl on stack
 
         ld      a,c
-        or      (hl)
+        xor     (hl)
         inc     hl
         ld      c,a
 
         ld      a,b
-        or      (hl)
+        xor     (hl)
         inc     hl
         ld      b,a
 
         ld      a,e
-        or      (hl)
+        xor     (hl)
         inc     hl
         ld      e,a
 
         ld      a,d
-        or      (hl)
+        xor     (hl)
 	inc	hl
         ld      d,a
 
 	ld	sp,hl
+	ld	hl,(__retloc)
+	push	hl
 	
         ld      l,c     ;get the lower 16 back into hl
         ld      h,b
-
-.retloc	jp	0
+	ret

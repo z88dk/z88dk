@@ -7,6 +7,7 @@
 
                 SECTION   code_crt0_sccz80
                 PUBLIC l_long_ucmp
+		EXTERN __retloc
 
 ; Unsigned compare of dehl (stack) and dehl (registers)
 ;
@@ -22,7 +23,7 @@
 
 .l_long_ucmp
 	ex	(sp),hl
-	ld	(retloc+1),hl
+	ld	(__retloc),hl
 	pop	bc
         
         ld      hl,0
@@ -73,5 +74,9 @@
         or      e
         scf
         ld      hl,1    ; Saves some mem in comparision unfunctions
-.retloc	jp	0
+.retloc	ex	de,hl
+	ld	hl,(__retloc)
+	push	hl
+	ex	de,hl
+	ret
 
