@@ -2653,7 +2653,7 @@ void asr_const(LVALUE *lval, int32_t value)
                 ol("sbc\ta");
                 ol("ld\th,a");
             }
-        } else if ( value == 15 && ulvalue(lval) && c_cpu != CPU_Z80ZXN ) {
+        } else if ( value == 15 && ulvalue(lval) && c_cpu != CPU_Z80N ) {
             ol("rl\th");   /* 7 bytes, 26T */
             vconst(0);
             ol("rl\tl");
@@ -2661,7 +2661,7 @@ void asr_const(LVALUE *lval, int32_t value)
             asr_const(lval, 1);
             asr_const(lval, 1);
         } else if ( value != 0 ) {
-            if ( c_cpu == CPU_Z80ZXN ) {   // 6 bytes, 22T
+            if ( c_cpu == CPU_Z80N ) {   // 6 bytes, 22T
                 ol("ex\tde,hl");   // 1, 4T
                 outfmt("\tld\tb,%d\n", value & 15); // 2, 7T
                 if ( ulvalue(lval) ) {   // 2, 8T
@@ -2703,7 +2703,7 @@ void asl_16bit_const(LVALUE *lval, int value)
         case 0:
             return;
         case 10:  // 7 bytes, 8 + 8 + 4 + 7 = 27T
-            if ( c_cpu == CPU_Z80ZXN ) {  // 6 bytes, 23T
+            if ( c_cpu == CPU_Z80N ) {  // 6 bytes, 23T
                 ol("ex\tde,hl");   // 1, 4T
                 ol("ld\tb,10");    // 2, 7T
                 ol("bsla\tde,b");  // 2, 8T
@@ -2725,7 +2725,7 @@ void asl_16bit_const(LVALUE *lval, int value)
             ol("ld\tl,0");
         break;
         case 7:
-            if ( c_cpu == CPU_Z80ZXN ) {  // 6 bytes, 23T
+            if ( c_cpu == CPU_Z80N ) {  // 6 bytes, 23T
                 ol("ex\tde,hl");   // 1, 4T
                 ol("ld\tb,7");     // 2, 7T
                 ol("bsla\tde,b");  // 2, 8T
@@ -2741,7 +2741,7 @@ void asl_16bit_const(LVALUE *lval, int value)
             }
             ol("add\thl,hl");  // 77T
         case 6:
-            if ( c_cpu == CPU_Z80ZXN ) {  // 6 bytes, 23T
+            if ( c_cpu == CPU_Z80N ) {  // 6 bytes, 23T
                 ol("ex\tde,hl");   // 1, 4T
                 ol("ld\tb,6");     // 2, 7T
                 ol("bsla\tde,b");  // 2, 8T
@@ -2751,7 +2751,7 @@ void asl_16bit_const(LVALUE *lval, int value)
             ol("add\thl,hl");  // 66T
             // Fall through
         case 5:  // 5 bytes, 55T
-            if ( c_cpu == CPU_Z80ZXN ) {  // 6 bytes, 23T
+            if ( c_cpu == CPU_Z80N ) {  // 6 bytes, 23T
                 ol("ex\tde,hl");   // 1, 4T
                 ol("ld\tb,5");     // 2, 7T
                 ol("bsla\tde,b");  // 2, 8T
@@ -2760,7 +2760,7 @@ void asl_16bit_const(LVALUE *lval, int value)
             }
             ol("add\thl,hl");  // 55T
         case 4:   // 4 bytes, 44T
-            if ( c_cpu == CPU_Z80ZXN ) {  // 6 bytes, 23T
+            if ( c_cpu == CPU_Z80N ) {  // 6 bytes, 23T
                 ol("ex\tde,hl");   // 1, 4T
                 ol("ld\tb,4");     // 2, 7T
                 ol("bsla\tde,b");  // 2, 8T
@@ -2779,7 +2779,7 @@ void asl_16bit_const(LVALUE *lval, int value)
             if ( value >= 16 ) {
                 warningfmt("overflow","Left shifting by more than the size of the object");
                 vconst(0);
-            } else if ( c_cpu == CPU_Z80ZXN ) {  // 6 bytes, 23T
+            } else if ( c_cpu == CPU_Z80N ) {  // 6 bytes, 23T
                 ol("ex\tde,hl");   // 1, 4T
                 outfmt("\tld\tb,%d\n", value & 15); // 2, 7T
                 ol("bsla\tde,b");  // 2, 8T
@@ -3843,7 +3843,7 @@ void constbc(int32_t val)
 
 void addbchl(int val)
 {
-    if ( c_cpu == CPU_Z80ZXN ) {
+    if ( c_cpu == CPU_Z80N ) {
         ot("add\thl,");
         outdec(val); nl();
     } else {
