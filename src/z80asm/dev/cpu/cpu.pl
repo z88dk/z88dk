@@ -417,7 +417,7 @@ for my $cpu (@CPUS) {
 	
 	# Jump group
         if ( $i8080 ) {
-		add_opc($cpu, "jr %m", 0xC3, '%m', '%m');
+		add_opc($cpu, "jr %j", 0xC3, '%m', '%m');
         } else {
 		add_opc($cpu, "jr %j", 0x18, '%j') if !$i8080;
         }
@@ -426,8 +426,8 @@ for my $cpu (@CPUS) {
 	# TODO: check that address is corretly computed in DJNZ B', LABEL - 76 10 FE or 76 10 FD
         if ( $i8080 ) {
 		# Emulate it on 8080
-		add_opc($cpu, "djnz %m", 0x05, 0xC2, '%m', '%m') ;
-		add_opc($cpu, "djnz b, %m", 0x05, 0xC2, '%m', '%m');
+		add_opc($cpu, "djnz %j", 0x05, 0xC2, '%m', '%m') ;
+		add_opc($cpu, "djnz b, %j", 0x05, 0xC2, '%m', '%m');
         } else {
 		add_opc($cpu, "djnz %j", 0x10, '%j') if !$i8080;
 		add_opc($cpu, "djnz b, %j", 0x10, '%j') if !$i8080;
@@ -441,7 +441,7 @@ for my $cpu (@CPUS) {
 		}
 		elsif ($f =~ /^(nz|z|nc|c)$/) {
 			if ( $i8080 ) {
-				add_opc($cpu, "jr $f, %m", 0xC2 + $V{$_f}*8, '%m', '%m');
+				add_opc($cpu, "jr $f, %j", 0xC2 + $V{$_f}*8, '%m', '%m');
 			} else {
 				add_opc($cpu, "jr $f, %j", 0x20 + $V{$_f}*8, '%j') if !$i8080;
 			}

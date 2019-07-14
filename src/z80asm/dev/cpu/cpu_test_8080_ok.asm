@@ -144,12 +144,8 @@
  dec l                          ; 2D
  dec sp                         ; 3B
  di                             ; F3
- djnz -32768                    ; 05 C2 00 80
- djnz 32767                     ; 05 C2 FF 7F
- djnz 65535                     ; 05 C2 FF FF
- djnz b, -32768                 ; 05 C2 00 80
- djnz b, 32767                  ; 05 C2 FF 7F
- djnz b, 65535                  ; 05 C2 FF FF
+ djnz ASMPC                     ; 05 C2 %m %m
+ djnz b, ASMPC                  ; 05 C2 %m %m
  ei                             ; FB
  ex (sp), hl                    ; E3
  ex de, hl                      ; EB
@@ -199,21 +195,11 @@
  jp z, -32768                   ; CA 00 80
  jp z, 32767                    ; CA FF 7F
  jp z, 65535                    ; CA FF FF
- jr -32768                      ; C3 00 80
- jr 32767                       ; C3 FF 7F
- jr 65535                       ; C3 FF FF
- jr c, -32768                   ; DA 00 80
- jr c, 32767                    ; DA FF 7F
- jr c, 65535                    ; DA FF FF
- jr nc, -32768                  ; D2 00 80
- jr nc, 32767                   ; D2 FF 7F
- jr nc, 65535                   ; D2 FF FF
- jr nz, -32768                  ; C2 00 80
- jr nz, 32767                   ; C2 FF 7F
- jr nz, 65535                   ; C2 FF FF
- jr z, -32768                   ; CA 00 80
- jr z, 32767                    ; CA FF 7F
- jr z, 65535                    ; CA FF FF
+ jr ASMPC                       ; C3 %m %m
+ jr c, ASMPC                    ; DA %m %m
+ jr nc, ASMPC                   ; D2 %m %m
+ jr nz, ASMPC                   ; C2 %m %m
+ jr z, ASMPC                    ; CA %m %m
  ld (-32768), a                 ; 32 00 80
  ld (-32768), hl                ; 22 00 80
  ld (32767), a                  ; 32 FF 7F

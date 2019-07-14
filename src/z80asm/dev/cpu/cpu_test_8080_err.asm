@@ -2039,9 +2039,7 @@
  dec iyh                        ; Error
  dec iyl                        ; Error
  dec l'                         ; Error
- djnz ASMPC                     ; Error
  djnz b', ASMPC                 ; Error
- djnz b, ASMPC                  ; Error
  ex (sp), hl'                   ; Error
  ex (sp), ix                    ; Error
  ex (sp), iy                    ; Error
@@ -4287,11 +4285,6 @@
  jp lz, -32768                  ; Error
  jp lz, 32767                   ; Error
  jp lz, 65535                   ; Error
- jr ASMPC                       ; Error
- jr c, ASMPC                    ; Error
- jr nc, ASMPC                   ; Error
- jr nz, ASMPC                   ; Error
- jr z, ASMPC                    ; Error
  ld (-32768), bc                ; Error
  ld (-32768), de                ; Error
  ld (-32768), ix                ; Error
