@@ -54,7 +54,7 @@
 ; ATP we have done the comparision and are left with dehl = result of
 ; primary - secondary, if we have a carry then secondary > primary
 
-        jr      c,l_long_ucmp1  ;
+        jp      c,l_long_ucmp1  ;
 
 ; Primary was larger, return nc
         ld      a,h
@@ -64,7 +64,7 @@
         ld      hl,1    ; Saves some mem in comparison functions
         scf             ; Replace with and a?
         ccf
-        jr	retloc
+        jp	retloc
 
 ; Secondary was larger, return c
 .l_long_ucmp1
