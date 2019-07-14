@@ -19,7 +19,7 @@ obj/newlib-z80:
 	@$(ASSEMBLER) -d -O=obj/z80/x -I$(NEWLIB_DIRECTORY) -I../.. -mz80 -D__CLASSIC $(NEWLIBGLOBS)
 
 dirs:
-	@mkdir -p obj/z80 obj/z80-zxn obj/ixiy obj/r2k
+	@mkdir -p obj/z80 obj/z80n obj/ixiy obj/r2k
 
 
 clean:

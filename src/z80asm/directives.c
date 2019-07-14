@@ -763,7 +763,7 @@ static void asm_DMA_command_1(int cmd, UT_array *exprs)
 
 void asm_DMA_command(int cmd, UT_array *exprs)
 {
-	if (opts.cpu != CPU_Z80_ZXN) {
+	if (opts.cpu != CPU_Z80N) {
 		error_illegal_ident();
 		return;
 	}

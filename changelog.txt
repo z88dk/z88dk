@@ -33,6 +33,7 @@ z88dk vx.x.x - xx.xx.xxxx
 - [sccz80] #1141: Support for named address spaces
 - [sccz80] #1133: Support for bitfields
 - [zsdcc] Upgraded to SDCC 3.9.1 r11311
+- [newlib] ZX Spectrum Next architecture renamed z80n
 
 z88dk v1.99C - 19.01.2019
 

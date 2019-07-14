@@ -19,7 +19,7 @@ l_mulu_16_8x8:
 
 ELSE
 
-IF __CPU_Z80_ZXN__ && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
+IF __CPU_Z80N__ && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
 
 l_mulu_16_8x8:
 

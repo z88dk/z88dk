@@ -19,8 +19,8 @@
 @libgen/libgen_sccz80.lst
 @locale/locale.lst
 @math/math_integer.lst
-@math/math_integer_z80_zxn.lst
-@math/math_float_sccz80_z80_zxn.lst
+@math/math_integer_z80n.lst
+@math/math_float_sccz80_z80n.lst
 @network/network_sccz80.lst
 @setjmp/setjmp_sccz80.lst
 @sound/sound_sccz80.lst

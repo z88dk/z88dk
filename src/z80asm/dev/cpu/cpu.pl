@@ -24,7 +24,7 @@ use Modern::Perl;
 #	%t	temp jump label
 #	@label	unsigned word with given global label address
 #------------------------------------------------------------------------------
-my @CPUS = qw( z80 z80_zxn z180 r2k r3k );
+my @CPUS = qw( z80 z80n z180 r2k r3k );
 
 my @R8	= qw( b c d e h l      a );
 my @R8I	= qw( b c d e h l (hl) a );
@@ -79,7 +79,7 @@ for my $cpu (@CPUS) {
 	my $rabbit	= ($cpu =~ /^r/);
 	my $r3k		= ($cpu =~ /^r3k/);
 	my $z80 	= ($cpu =~ /^z80/);
-	my $z80_zxn	= ($cpu =~ /^z80_zxn/);
+	my $z80n	= ($cpu =~ /^z80n/);
 	my $z180 	= ($cpu =~ /^z180/);
 	my $zilog	= ($cpu =~ /^z/);
 	
@@ -119,7 +119,7 @@ for my $cpu (@CPUS) {
 					add_opc($cpu, "$op $a$r",  0xED, 0x04 + $V{$r}*8);
 					add_opc($cpu, "$op $a%n",  0xED, 0x64, '%n');
 				}
-				elsif ($z80_zxn) {
+				elsif ($z80n) {
 					add_opc($cpu, "$op $a%n",  0xED, 0x27, '%n');
 				}
 			}
@@ -312,7 +312,7 @@ for my $cpu (@CPUS) {
 			add_opc($cpu, "mlt $r", 0xED, 0x4C + $V{$r}*16);
 		}
 	}
-	elsif ($z80_zxn) {
+	elsif ($z80n) {
 		add_opc($cpu, "mul d, e", 0xED, 0x30);
 		add_opc($cpu, "mul de",   0xED, 0x30);
 		add_opc($cpu, "mlt de",   0xED, 0x30);
@@ -543,8 +543,8 @@ for my $cpu (@CPUS) {
 		}
 	}
 	
-	# Z80-ZXN opcodes for ZX Next
-	if ($z80_zxn) {
+	# Z80N opcodes for ZX Next
+	if ($z80n) {
 		add_opc($cpu, "swapnib", 		0xED, 0x23);
 		add_opc($cpu, "mirror a", 		0xED, 0x24);
 		add_opc($cpu, "bsla de,b",		0xED, 0x28);

@@ -63,10 +63,10 @@ extern void add_copper_unit_stop();
 extern void add_copper_unit_nop();
 
 /* assert we are on a Z80 */
-#define _Z80_ONLY(x)		(!(opts.cpu & (CPU_Z80|CPU_Z80_ZXN)) ? \
+#define _Z80_ONLY(x)		(!(opts.cpu & (CPU_Z80|CPU_Z80N)) ? \
 								(error_illegal_ident(), 0) : \
 								(x))
-#define _EXCEPT_Z80(x)		((opts.cpu & (CPU_Z80|CPU_Z80_ZXN)) ? \
+#define _EXCEPT_Z80(x)		((opts.cpu & (CPU_Z80|CPU_Z80N)) ? \
 								(error_illegal_ident(), 0) : \
 								(x))
 #define _Z180_ONLY(x)		(!(opts.cpu & CPU_Z180) ? \
