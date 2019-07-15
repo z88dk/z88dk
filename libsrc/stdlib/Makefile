@@ -49,7 +49,7 @@ obj/$(TARGET)/%.o: %.asm
 
 
 dirs:
-	@mkdir -p obj/z80 obj/z80-zxn obj/ixiy obj/r2k -p obj/$(TARGET) obj/newlib-8080
+	@mkdir -p obj/z80 obj/z80-zxn obj/ixiy obj/r2k -p obj/$(TARGET) obj/newlib-8080 obj/8080
 
 
 clean:
