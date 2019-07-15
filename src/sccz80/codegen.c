@@ -329,17 +329,33 @@ void getmem(SYMBOL* sym)
             ot("ld\thl,(");
             outname(sym->name, dopref(sym));
             outstr(")\n");
-            ot("ld\tde,(");
-            outname(sym->name, dopref(sym));
-            outstr("+2)\n");
+            if ( !IS_8080() ) {
+                ot("ld\t(");
+                outname(sym->name, dopref(sym));
+                outstr("+2),de\n");
+            } else {
+                swap();
+                ot("ld\t(");
+                outname(sym->name, dopref(sym));
+                outstr("+2),hl\n");
+                swap();
+            }
         }
     } else if (sym->ctype->kind == KIND_LONG) {
         ot("ld\thl,(");
         outname(sym->name, dopref(sym));
         outstr(")\n");
-        ot("ld\tde,(");
-        outname(sym->name, dopref(sym));
-        outstr("+2)\n");
+        if ( !IS_8080() ) {
+            ot("ld\tde,(");
+            outname(sym->name, dopref(sym));
+            outstr("+2)\n");
+        } else {
+            swap();
+            ot("ld\thl,(");
+            outname(sym->name, dopref(sym));
+            outstr("+2)\n");
+            swap();
+        }
     } else {
         /* this is for KIND_INT and get pointer..will need to change! */
         ot("ld\thl,(");
@@ -347,9 +363,18 @@ void getmem(SYMBOL* sym)
         outstr(")\n");
         /* For long pointers...load de with name+2, then d,0 */
         if (sym->ctype->kind == KIND_CPTR) {
-            ot("ld\tde,(");
-            outname(sym->name, dopref(sym));
-            outstr("+2)\n\tld\td,0\n");
+            if ( !IS_8080() ) {
+                ot("ld\tde,(");
+                outname(sym->name, dopref(sym));
+                outstr("+2)\n");
+            } else {
+                swap();
+                ot("ld\thl,(");
+                outname(sym->name, dopref(sym));
+                outstr("+2)\n");
+                swap();
+            }
+            ol("ld\td,0");
         }
     }
 }
@@ -378,9 +403,17 @@ void putmem(SYMBOL* sym)
             ot("ld\t(");
             outname(sym->name, dopref(sym));
             outstr("),hl\n");
-            ot("ld\t(");
-            outname(sym->name, dopref(sym));
-            outstr("+2),de\n");
+            if ( !IS_8080() ) {
+                ot("ld\t(");
+                outname(sym->name, dopref(sym));
+                outstr("+2),de\n");
+            } else {
+                swap();
+                ot("ld\t(");
+                outname(sym->name, dopref(sym));
+                outstr("+2),hl\n");
+                swap();
+            }
         }
     } else {
         if (sym->ctype->kind == KIND_CHAR) {
@@ -392,9 +425,17 @@ void putmem(SYMBOL* sym)
             ot("ld\t(");
             outname(sym->name, dopref(sym));
             outstr("),hl\n");
-            ot("ld\t(");
-            outname(sym->name, dopref(sym));
-            outstr("+2),de\n");
+            if ( !IS_8080() ) {
+                ot("ld\t(");
+                outname(sym->name, dopref(sym));
+                outstr("+2),de\n");
+            } else {
+                swap();
+                ot("ld\t(");
+                outname(sym->name, dopref(sym));
+                outstr("+2),hl\n");
+                swap();
+            }
         } else if (sym->ctype->kind == KIND_CPTR) {
             ot("ld\t(");
             outname(sym->name, dopref(sym));
@@ -2351,6 +2392,7 @@ int zor_handle_pow2(int32_t value)
             c++;
         case 0x01:
             c++;
+            if ( IS_8080() ) return 0;
             outfmt("\tset\t%d,l\n",c-1);
             break;
         case 0x8000:
@@ -2369,6 +2411,7 @@ int zor_handle_pow2(int32_t value)
             c++;
         case 0x100:
             c++;
+            if ( IS_8080() ) return 0;
             outfmt("\tset\t%d,h\n",c-1);
             break;
         case 0x800000:
@@ -2387,6 +2430,7 @@ int zor_handle_pow2(int32_t value)
             c++;
         case 0x10000:
             c++;
+            if ( IS_8080() ) return 0;
             outfmt("\tset\t%d,e\n",c-1);
             break;
         case 0x80000000:
@@ -2405,6 +2449,7 @@ int zor_handle_pow2(int32_t value)
             c++;
         case 0x1000000:
             c++;
+            if ( IS_8080() ) return 0;
             outfmt("\tset\t%d,d\n",c-1);
             break;           
     }
@@ -2603,7 +2648,13 @@ void zand_const(LVALUE *lval, int32_t value)
         } else if ( value == (uint16_t)0xffff ) {
             // Do nothing
         } else if ( val == 0xfffe ) {
-            ol("res\t0,l");
+            if ( IS_8080() ) {
+                ol("ld\ta,l");
+                ol("and\t254");
+                ol("ld\tl,a");
+            } else {
+                ol("res\t0,l");
+            }
         } else {
             const2(value & 0xffff);
             zand(lval);
@@ -3885,7 +3936,7 @@ void zgt(LVALUE* lval)
         if (ulvalue(lval)) {
             if ( IS_8080() ) {
                 outfmt("\tld\ta,e\n");
-                ol("ld\ta,l);");
+                ol("ld\ta,l");
                 ol("sub\te");
                 ol("ld\ta,h");
                 ol("sbc\td");
@@ -4343,18 +4394,22 @@ void FrameP(void)
 void pushframe(void)
 {
     if (c_framepointer_is_ix != -1 || (currfn->ctype->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
-        ot("push\t");
-        FrameP();
-        nl();
+        if ( !IS_8080() ) {
+            ot("push\t");
+            FrameP();
+            nl();
+        }
     }
 }
 
 void popframe(void)
 {
     if (c_framepointer_is_ix != -1 || (currfn->ctype->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
-        ot("pop\t");
-        FrameP();
-        nl();
+        if ( !IS_8080() ) {
+            ot("pop\t");
+            FrameP();
+            nl();
+        }
     }
 }
 

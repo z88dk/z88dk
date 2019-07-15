@@ -1378,6 +1378,7 @@
 	add	hl,sp
 	call	l_gint	;%9
 
+%notcpu 8080
 	ld	hl,%1
 	ex	de,hl
 	ld	hl,%2
@@ -3837,6 +3838,7 @@
 	and	a
 	jp	%2z,%1
 
+%notcpu 8080
 	push	hl
 	call	l_gint	;
 	res	%1,l

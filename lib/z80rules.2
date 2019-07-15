@@ -874,6 +874,7 @@
 =
 	ld	(%1),hl
 
+#notcpu 8080
 	ld	(%1),hl
 	ld	(%1+2),de
 	ld	hl,(%1)
@@ -1206,6 +1207,7 @@
 	ld	sp,hl
 	exx
 
+%notcpu 8080
 	call	l_sub
 =
 	ex	de,hl

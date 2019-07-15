@@ -222,6 +222,7 @@
 =
 	call	l_gchar
 
+%notcpu 8080
 	ld	hl,%1	;const
 	call	l_gint
 	ld	h,0
@@ -357,6 +358,7 @@
 	ld	l,a
 	ld	h,0
 
+%notcpu 8080
 	ld	hl,(%1)
 	ld	h,0
 	ex	de,hl
