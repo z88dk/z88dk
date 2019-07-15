@@ -2166,6 +2166,7 @@
 	ld	d,h
 	ld	e,l
 
+%notcpu 8080
 	push	hl
 	call	l_gint	;
 	inc	hl
@@ -2180,6 +2181,7 @@
 	ld	h,(hl)
 	ld	l,a
 
+%notcpu 8080
 	push	hl
 	call	l_gint	;
 	dec	hl

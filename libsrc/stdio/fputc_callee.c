@@ -19,7 +19,7 @@
 
 
 
-static void wrapper() __naked
+static void wrapper_fputc_callee() __naked
 {
 //#ifdef Z80
 #asm
@@ -152,7 +152,7 @@ ENDIF
 #endasm
 }
 
-static void wrapper_8080() __naked
+static void wrapper_fputc_callee_8080() __naked
 {
 //#ifdef Z80
 #asm
@@ -161,11 +161,7 @@ IF __CPU_8080__
 ; 		bc = character to print
 ; Exit:		hl = byte written
 asm_fputc_callee:
-        pop     hl
-        pop     de      ;fp
-        pop     bc      ;c
-        push    hl
-
+	ex	de,hl
         ld      hl,-1   ;EOF
         inc     de
         inc     de      ;fp_flags

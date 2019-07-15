@@ -86,7 +86,11 @@ endif
 if (ASMPC<>$0038)
         defs    CODE_ALIGNMENT_ERROR
 endif
+IF !__CPU_8080__
 	jp	asm_im1_handler
+ELSE
+	ret
+ENDIF
 
 ; Restart routines, nothing sorted yet
 restart08:

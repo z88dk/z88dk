@@ -231,9 +231,11 @@ int suite_rshift()
 {
     suite_setup("Right shift Tests");
 
+#ifndef __8080__
     suite_add_test(test_rshift32_const);
     suite_add_test(test_rshift32_const_unsigned);
     suite_add_test(test_rshift32_var);
+#endif
     suite_add_test(test_rshift16_const);
     suite_add_test(test_rshift16_var);
 

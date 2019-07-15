@@ -190,8 +190,10 @@ int suite_lshift()
 {
     suite_setup("Left shift Tests");
 
+#ifndef __8080__
     suite_add_test(test_lshift32_const);
     suite_add_test(test_lshift32_var);
+#endif
     suite_add_test(test_lshift16_const);
     suite_add_test(test_lshift16_var);
 

@@ -3885,7 +3885,11 @@ void zgt_const(LVALUE *lval, int32_t value)
     } else if ( value == 0 && lval->val_type == KIND_INT && ulvalue(lval)) {
         ol("ld\ta,h");
         ol("or\tl");
-        ol("jr\tz,ASMPC+3");
+        if ( IS_8080() ) {
+            ol("jp\tz,ASMPC+4");
+        } else {
+            ol("jr\tz,ASMPC+3");
+        }
         ol("scf");
         set_carry(lval);
     } else {
@@ -4078,7 +4082,13 @@ void zge(LVALUE* lval)
 void zcarryconv(void)
 {
     vconst(0);
-    ol("rl\tl");
+    if ( !IS_8080() ) {
+        ol("rl\tl");
+    } else {
+        ol("ld\ta,0");
+        ol("rla");
+        ol("ld\tl,a");
+    }
 }
 
 /*

@@ -8,10 +8,31 @@
  * nevermind...
  */
 
+// int vfprintf_mini(FILE *fp, unsigned char *fmt,void *ap)
+
 int printf(char *fmt,...)
 {
-        int  *ct;
-        ct= (getarg()*2)+&fmt-4;
+#asm
+	EXTERN	vfprintf
+	EXTERN	__sgoioblk
+	ld	l,a
+	ld	h,0
+	add	hl,hl
+	add	hl,sp
 
-        return (vfprintf(stdout,(unsigned char *)(*ct),ct-1));
+	ld	bc,__sgoioblk+10
+	push	bc
+	ld	e,(hl)	;fmt
+	inc	hl
+	ld	d,(hl)
+	dec	hl
+	dec	hl
+	dec	hl
+	push	de
+	push	hl
+	call	vfprintf
+	pop	bc
+	pop	bc
+	pop	bc	
+#endasm
 }

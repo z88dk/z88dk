@@ -63,7 +63,6 @@ ENDIF
 IF __CPU_8080__
 	pop	bc
 ENDIF
-	push	bc
 	pop	de	;get s back
 	ld	a,l	;test for EOF returned
 	and	h

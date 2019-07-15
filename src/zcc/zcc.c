@@ -511,7 +511,7 @@ cpu_map_t cpu_map[CPU_TYPE_SIZE] = {
     { "-mz180",    "-mz180", "-mz180 -portmode=z180", "" },     // CPU_TYPE_Z180    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
     { "-mr2k",     "-mr2k",  "-mr2k", "" },                     // CPU_TYPE_R2K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
     { "-mr3k",     "-mr3k",  "-mr3ka", "" },                    // CPU_TYPE_R3K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
-    { "-mz80",     "-m8080" , "-mz80", "-m8080" },                    // CPU_TYPE_8080     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
+    { "-m8080",    "-m8080" , "-mz80", "-m8080" },                    // CPU_TYPE_8080     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
 };
 
 char *select_cpu(int n)
