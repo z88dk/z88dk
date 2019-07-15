@@ -1,3 +1,2 @@
 stdlib/obj/${TYPE}/**/*.o
 stdlib/obj/${TARGET}/**/*.o
-stdlib/obj/${TYPE}/x/**/*.o
