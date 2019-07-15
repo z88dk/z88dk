@@ -23,6 +23,10 @@ DEFVARS 0 {
 
 funopen:
 _funopen:
+IF __CPU_8080__
+	ld	hl,0
+	ret
+ELSE
 	; Allocate some memory first of all
 	push	ix		;save callers ix
 
@@ -228,6 +232,7 @@ handle_seek:
 	pop	bc
 	pop	bc
         ret
+ENDIF
 
 
 			

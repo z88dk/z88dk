@@ -25,6 +25,7 @@ ELSE
 	push	hl
 	push	bc
 ENDIF
+IF !__CPU_8080__
 	ld	e,(hl)
 	inc	hl
 	ld	d,(hl)
@@ -55,6 +56,7 @@ ELSE
 	ld	hl,0
 ENDIF
 	ret
+ENDIF
 .fflush_error
 	ld	hl,-1	; EOF
 #endasm

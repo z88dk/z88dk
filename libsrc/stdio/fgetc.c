@@ -27,6 +27,81 @@
 int fgetc(FILE *fp)
 {
 #asm
+IF __CPU_8080__
+	pop	bc
+	pop	de	;fp
+	push	de
+	push	bc
+	ld	hl,-1	;EOF
+	inc	de	
+	inc	de
+	ld	a,(de)	;de = &fp_flags get flags
+	and	a
+	ret	z
+	and	_IOWRITE | _IOEOF	;check we`re not write/EOF
+	ret	nz
+	inc	de	;de=&fp_ungetc
+	ld	a,(de)	;check for ungot char
+	and	a
+	jr	z,no_ungetc
+	ex	de,hl
+	ld	e,a
+	ld	d,0
+	ld	(hl),d	;set no ungetc character
+	ex	de,hl
+	ret
+.no_ungetc
+; Now do strings
+	dec	de	;de=&fp_flags
+	ld	a,(de)
+	and	_IOSTRING
+	jr	z,no_string	;not a string
+	ex	de,hl
+	dec	hl		;fp_desc+1
+	ld	d,(hl)
+	dec	hl		;fp_desc
+	ld	e,(hl)
+	ld	a,(de)
+	inc	de
+	ld	(hl),e		
+	inc	hl		;fp_desc+1
+	ld	(hl),d
+	ex	de,hl
+	ld	hl,-1	;EOF
+	and	a	;test for zero
+	ret	z	;return EOF if so
+	ld	l,a	;else return character
+	ld	h,0
+	ret
+.no_string
+	dec	de	;fp_desc+1
+	dec	de	;fp_desc
+	push	de	;preserve fp
+	call	fchkstd	;check for stdin (stdout/err have failed already)
+	pop	de	;ix back
+	jr	c,no_stdin
+	call	fgetc_cons	;get from console
+	ret			;always succeeds - never EOF
+.no_stdin
+	ex	de,hl
+	ld	e,(hl)
+	inc	hl		;fp_desc+1
+	ld	d,(hl)
+	dec	hl		;fp_desc
+	ex	de,hl
+	push	de
+	call	readbyte	;readbyte sorts out stack (fastcall)
+	pop	de		;get fp back
+	ret	nc		;no error so return (make sure other
+				;implementations respect this!)
+.seteof
+	inc	de	
+	inc	de		;fp_flags
+	ld	a,(de)
+	or	_IOEOF
+	ld	(de),a	;set EOF, return with EOF
+ELSE
+
 IF __CPU_R2K__ | __CPU_R3K__
 	ld	hl,(sp + 2)
 	push	ix		;save callers ix
@@ -163,5 +238,6 @@ ENDIF
 	ld	(ix+fp_flags),a	;set EOF, return with EOF
 .fgetc_end
 	pop	 ix
+ENDIF
 #endasm
 }

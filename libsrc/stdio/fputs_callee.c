@@ -20,25 +20,26 @@ int fputs_callee(const char *s,FILE *fp)
 //#ifdef Z80
 #asm
 
-	pop	bc	;ret
-	pop	hl	;fp
+	pop	hl	;ret
+	pop	bc	;fp
 	pop	de	;s
 
-	push 	bc	;ret address
-	push	ix	;save callers ix
-IF __CPU_R2K__ | __CPU_R3K__
-	ld	ix,hl
-ELSE
-	push	hl
+	push 	hl	;ret address
+IF !__CPU_8080__
+	push	ix
+	push	bc
 	pop	ix
 ENDIF
 	call	asm_fputs_callee
+IF !__CPU_8080__
 	pop	ix
+ENDIF
 	ret
 
 	EXTERN	asm_fputc_callee
 	PUBLIC	asm_fputs_callee
-; Entry:	ix = fp
+; Entry:	bc = fp 
+;		ix = fp on non-8080 platforms
 ;		de = s
 ; Exit: 	hl != 0 (success)
 ;		hl = -1 (failure)
@@ -49,11 +50,20 @@ ENDIF
 	ld	a,(de)	;*s
 	and	a
 	ret	z	;end of string
-	ld	c,a
-	ld	b,0
 	inc	de	;s++
 	push	de	;keep s
+IF __CPU_8080__
+	push	bc
+	ld	l,c
+	ld	h,b
+ENDIF
+	ld	c,a
+	ld	b,0
 	call	asm_fputc_callee
+IF __CPU_8080__
+	pop	bc
+ENDIF
+	push	bc
 	pop	de	;get s back
 	ld	a,l	;test for EOF returned
 	and	h

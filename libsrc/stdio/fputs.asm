@@ -7,17 +7,20 @@ EXTERN asm_fputs_callee
 
 .fputs
 
-	pop	bc	;ret
-	pop	hl	;fp
+	pop	hl	;ret
+	pop	bc	;fp
 	pop	de	;s
 	push	de
-	push	hl
 	push	bc
-
+	push	hl
+IF __CPU_8080__
+	call	asm_fputs_callee
+ELSE
         push    ix  ; callers ix
-        push    hl
+        push    bc
         pop     ix
    	call	asm_fputs_callee
 	pop	ix	
+ENDIF
 	ret
 

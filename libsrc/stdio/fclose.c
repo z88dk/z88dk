@@ -43,6 +43,7 @@ fclose_inuse:
 	ld	a,(hl)
 	and	_IOSTRING
 	jr	nz,fclose_success
+IF !__CPU_8080__
 	ld	a,(hl)
 	and	_IOEXTRA
 	jr	z,fclose_no_net
@@ -63,6 +64,7 @@ ENDIF
 	call	l_jphl
 	pop	ix	;restore callers ix
 	jr	fclose_check_success
+ENDIF
 fclose_no_net:
 	ld	a,(hl)
 	and	_IOSYSTEM
