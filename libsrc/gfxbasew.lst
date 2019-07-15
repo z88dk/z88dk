@@ -11,6 +11,7 @@ graphics/w_uncircle_callee
 graphics/w_xorcircle
 graphics/w_xorcircle_callee
 graphics/w_dcircle
+graphics/w_fill
 graphics/w_clga
 graphics/w_clga_callee
 graphics/w_xorclga
