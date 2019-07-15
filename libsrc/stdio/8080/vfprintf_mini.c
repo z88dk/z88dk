@@ -32,6 +32,10 @@ static void miniprintn(int number, FILE *fil, unsigned char flag);
 
 int vfprintf_mini(FILE *fp, unsigned char *fmt,void *ap)
 {
+#asm
+	PUBLIC vfprintf
+	defc	vfprintf = _vfprintf_mini
+#endasm
         unsigned char c;
         unsigned char k;
         unsigned char   *s;

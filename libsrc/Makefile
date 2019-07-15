@@ -25,7 +25,7 @@ all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	rex_clib.lib rx78_clib.lib sc3000_clib.lib sms_clib.lib lynx_clib.lib \
 	svi_clib.lib sam_clib.lib  sorcerer_clib.lib  sos_clib.lib tiki100.lib \
 	trs80_clib.lib trsdos.lib vg5k_clib.lib vz_clib.lib  x07_clib.lib \
-	embedded_clib.lib test_clib.lib testrcm_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
+	embedded_clib.lib test_clib.lib test8080_clib.lib testrcm_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
 	pv1000_clib.lib pv2000_clib.lib coleco_clib.lib multi8_clib.lib alphatro_clib.lib  spc1000_clib.lib \
 	laser500_clib.lib super80_clib.lib super80_vduem_clib.lib \
 	adam.lib z80tvgame_clib.lib smc777.lib pasopia7_clib.lib sv8000_clib.lib \
@@ -1298,10 +1298,17 @@ test_clib.lib:
 
 testrcm_clib.lib:
 	@echo ''
-	@echo '--- Building Test System Library ---'
+	@echo '--- Building Test System Library (Rabbit) ---'
 	@echo ''
 	$(call buildgeneric,test)
 	TARGET=test TYPE=r2k $(LIBLINKER) -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testrcm_clib @$(LISTFILE_DIRECTORY)/testrcm.lst
+
+test8080_clib.lib:
+	@echo ''
+	@echo '--- Building Test System Library (8080) ---'
+	@echo ''
+	$(call buildgeneric,test)
+	TARGET=test TYPE=8080 $(LIBLINKER) -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/test8080_clib @$(LISTFILE_DIRECTORY)/test8080.lst
 
 
 # TRS 80 - stefano

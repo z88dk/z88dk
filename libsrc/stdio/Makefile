@@ -7,7 +7,8 @@ ZSFILES = $(wildcard zsock/*.c)
 AFILES = $(filter-out asm_printf_core.asm, $(wildcard *.asm))
 A8080FILES = $(filter-out $(wildcard get_16bit_ap_parameter.asm *printk*.asm *printf*.asm *scanf*.asm), $(wildcard *.asm))
 OFILES = $(CFILES:.c=.o) $(AFILES:.asm=.o)
-O8080FILES = $(CFILES:.c=.o) $(A8080FILES:.asm=.o)
+C8080FILES= $(wildcard 8080/*.c)
+O8080FILES = $(CFILES:.c=.o) $(C8080FILES:.c=.o)  $(A8080FILES:.asm=.o)
 
 
 all: dirs $(addprefix  obj/,$(OFILES)) $(addprefix obj/ixiy/,$(OFILES)) $(addprefix obj/net/,$(ZSFILES:.c=.o)) $(addprefix obj/binary/,$(OFILES)) $(addprefix obj/stdesc/,$(OFILES)) $(addprefix obj/r2k/,$(OFILES)) $(addprefix obj/8080/,$(O8080FILES))
@@ -47,7 +48,7 @@ obj/stdesc/%.o: %.c
 
 .PHONY: dirs
 dirs:
-	@mkdir -p obj obj/net obj/net/zsock obj/ixiy obj/binary obj/stdesc obj/r2k obj/8080
+	@mkdir -p obj obj/net obj/net/zsock obj/ixiy obj/binary obj/stdesc obj/r2k obj/8080 obj/8080/8080
 
 
 
@@ -58,4 +59,3 @@ clean:  ansi-clean
 	$(RM) *.o* *.sym *.map zcc_opt.def *.i */*.o
 	$(RM) -fr obj zcc_opt.def
 	$(MAKE) -C zsock clean
-	$(MAKE) -C 8080 clean

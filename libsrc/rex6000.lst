@@ -44,6 +44,6 @@ target/rex/graphics/DsGetPixelAddr
 target/rex/graphics/DsSetPixel
 target/rex/graphics/DsDisplayCircle
 target/rex/graphics/DsDisplayEllipse
-setjmp/l_longjmp
-setjmp/l_setjmp
+setjmp/obj/z80/l_longjmp
+setjmp/obj/z80/l_setjmp
 
