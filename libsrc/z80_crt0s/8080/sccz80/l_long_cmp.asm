@@ -2,15 +2,15 @@
 ;       Long support functions
 ;	"8080" mode
 ;	Stefano - 30/4/2002
-;	$Id: l_long_ucmp.asm,v 1.2 2016-06-16 20:31:05 dom Exp $
+;	$Id: l_long_cmp.asm,v 1.2 2016-06-16 20:31:05 dom Exp $
 ;
 
                 SECTION   code_crt0_sccz80
-                PUBLIC l_long_ucmp
+                PUBLIC l_long_cmp
 		EXTERN __retloc
 		EXTERN __retloc2
 
-; Unsigned compare of dehl (stack) and dehl (registers)
+; Signed compare of dehl (stack) and dehl (registers)
 ;
 ; Entry:  primary  = (under two return addresses on stack)
 ;         secondary= dehl
@@ -22,7 +22,7 @@
 ; Code takes secondary from primary
 
 
-.l_long_ucmp
+.l_long_cmp
 	ex	(sp),hl
 	ld	(__retloc),hl	;first return
 	pop	bc		;low word
@@ -57,26 +57,26 @@
 
 ; ATP we have done the comparision and are left with dehl = result of
 ; primary - secondary, if we have a carry then secondary > primary
+	rla		;Test sign
+	jp	c,l_long_cmp1
 
-        jp      c,l_long_ucmp1  ;
-
-; Primary was larger, return nc
-        ld      a,c
-        or      b
-        or      d
-        or      e
-        ld      hl,1    ; Saves some mem in comparison functions
-        scf             ; Replace with and a?
-        ccf
-        jp	retloc
+; Negative number
+	ld	a,c
+	or	b
+	or	d
+	or	e
+	ld	hl,1
+	scf
+	jp	retloc
 
 ; Secondary was larger, return c
-.l_long_ucmp1
+.l_long_cmp1
         ld      a,c
         or      b
         or      d
         or      e
         scf
+	ccf
         ld      hl,1    ; Saves some mem in comparision unfunctions
 .retloc	ex	de,hl
 	ld	hl,(__retloc2)
