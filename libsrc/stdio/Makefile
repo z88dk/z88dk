@@ -5,13 +5,13 @@ include ../Make.config
 CFILES = $(wildcard *.c)
 ZSFILES = $(wildcard zsock/*.c) 
 AFILES = $(filter-out asm_printf_core.asm, $(wildcard *.asm))
-A8080FILES = $(filter-out $(wildcard get_16bit_ap_parameter.asm *printk*.asm *printf*.asm *scanf*.asm), $(wildcard *.asm))
+AFILES_8080 = $(filter-out $(wildcard get_16bit_ap_parameter.asm *printk*.asm *printf*.asm *scanf*.asm), $(wildcard *.asm))
 OFILES = $(CFILES:.c=.o) $(AFILES:.asm=.o)
-C8080FILES= $(wildcard 8080/*.c)
-O8080FILES = $(CFILES:.c=.o) $(C8080FILES:.c=.o)  $(A8080FILES:.asm=.o)
+CFILES_8080= $(wildcard 8080/*.c)
+OFILES_8080 = $(CFILES:.c=.o) $(CFILES_8080:.c=.o)  $(AFILES_8080:.asm=.o)
 
 
-all: dirs $(addprefix  obj/,$(OFILES)) $(addprefix obj/ixiy/,$(OFILES)) $(addprefix obj/net/,$(ZSFILES:.c=.o)) $(addprefix obj/binary/,$(OFILES)) $(addprefix obj/stdesc/,$(OFILES)) $(addprefix obj/r2k/,$(OFILES)) $(addprefix obj/8080/,$(O8080FILES))
+all: dirs $(addprefix  obj/,$(OFILES)) $(addprefix obj/ixiy/,$(OFILES)) $(addprefix obj/net/,$(ZSFILES:.c=.o)) $(addprefix obj/binary/,$(OFILES)) $(addprefix obj/stdesc/,$(OFILES)) $(addprefix obj/r2k/,$(OFILES)) $(addprefix obj/8080/,$(OFILES_8080))
 
 obj/net/%.o: %.asm
 	$(ZCC) +z88 $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -Ca-I../ -c -o $@ $^

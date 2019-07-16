@@ -12,8 +12,30 @@
 
 int fprintf(FILE *fp, char *fmt,...)
 {
-        int  *ct;
-        ct= (getarg()*2)+&fmt-4;
+#asm
+        EXTERN  vfprintf
+        EXTERN  __sgoioblk
+        ld      l,a
+        ld      h,0
+        add     hl,hl
+        add     hl,sp	;points to fp
 
-        return (vfprintf((FILE *)(*ct),(unsigned char *)(*(ct-1)),ct-2));
+	ld	c,(hl)
+	inc	hl
+	ld	b,(hl)
+	dec	hl
+	dec	hl
+        push    bc
+        ld      d,(hl)  ;fmt
+        dec	hl
+        ld      e,(hl)
+	push	de
+        dec     hl
+        dec     hl	;points to ap
+        push    hl
+        call    vfprintf
+        pop     bc
+        pop     bc
+        pop     bc
+#endasm
 }

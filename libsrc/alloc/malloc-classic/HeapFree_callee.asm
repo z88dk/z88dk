@@ -79,8 +79,16 @@ ELSE
 ENDIF
    jr z, mergeontop
    jr nc, insertbefore
-   
+IF __CPU_8080__
+   ld a,l
+   adc c
+   ld l,a
+   ld a,h
+   adc b
+   ld  h,a
+ELSE   
    adc hl,bc
+ENDIF
    inc hl                    ; hl = & next block->next
    pop de                    ; junk lagger
    

@@ -153,7 +153,15 @@ ENDIF
    inc de                    ; de = & block->next + 1b
    pop hl                    ; hl = & lagger->next + 1b
    ex de,hl
+IF __CPU_8080__
+   ld a,(hl)
+   ld (de),a
+   inc hl
+   inc de
+   dec bc
+ELSE
    ldd                       ; write next block after this one into lagger's pointer
+ENDIF
    ld a,(hl)                 ; hl = & allocated memory block = & block->next
    ld (de),a
    scf                       ; indicate success

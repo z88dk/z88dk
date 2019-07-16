@@ -58,7 +58,7 @@
 ; ATP we have done the comparision and are left with dehl = result of
 ; primary - secondary, if we have a carry then secondary > primary
 	rla		;Test sign
-	jp	c,l_long_cmp1
+	jp	nc,l_long_cmp1
 
 ; Negative number
 	ld	a,c

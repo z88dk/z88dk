@@ -116,7 +116,19 @@ ENDIF
    pop hl
    push hl
    push de
+IF __CPU_8080__
+ldir_loop:
+   ld a,(hl)
+   ld (de),a
+   inc hl
+   inc de
+   dec bc
+   ld a,b
+   or c
+   jp nz,ldir_loop
+ELSE
    ldir                      ; copy old data block to new data block
+ENDIF
    
    ; stack = & heap, & old block (+2), & new block (+2)
    

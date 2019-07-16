@@ -10,6 +10,7 @@ TARGET ?= test
 GENOBJECTS = unbcd.o wcmatch.o getopt.o
 CUSTOBJECTS = sleep.o 
 ASMFILES = $(wildcard *.asm)
+ASMFILES_8080 = $(filter-out $(wildcard *sqrt*.asm *inp*.asm *outp*.asm *extract*.asm *search*.asm *sort*.asm) , $(wildcard *.asm))
 
 
 NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/stdlib/z80/*.asm" "$(NEWLIB_DIRECTORY)/stdlib/z80/random/*.asm"
@@ -19,7 +20,8 @@ space :=
 space +=
 
 OBJECTS = $(GENOBJECTS) $(ASMFILES:.asm=.o)
-CLASSIC_OBJECTS = $(addprefix obj/z80/, $(OBJECTS)) $(addprefix obj/r2k/,$(OBJECTS)) $(addprefix obj/ixiy/,$(OBJECTS))  $(addprefix obj/$(TARGET)/,$(CUSTOBJECTS))  $(addprefix obj/z80-zxn/,$(OBJECTS)) $(addprefix obj/8080/,$(OBJECTS))
+OBJECTS_8080 = $(GENOBJECTS) $(ASMFILES_8080:.asm=.o)
+CLASSIC_OBJECTS = $(addprefix obj/z80/, $(OBJECTS)) $(addprefix obj/r2k/,$(OBJECTS)) $(addprefix obj/ixiy/,$(OBJECTS))  $(addprefix obj/$(TARGET)/,$(CUSTOBJECTS))  $(addprefix obj/z80-zxn/,$(OBJECTS)) $(addprefix obj/8080/,$(OBJECTS_8080))
 
 
 .PHONY: dirs  $(NEWLIB_TARGETS)
