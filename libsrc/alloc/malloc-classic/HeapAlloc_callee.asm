@@ -79,8 +79,16 @@ PUBLIC ASMDISP_HEAPALLOC_CALLEE
    inc hl
    ld d,(hl)
    ex de,hl                  ; hl = block's size, de = & block + 1b
-
+IF __CPU_8080__
+   ld a,l
+   sub c
+   ld l,a
+   ld a,h
+   sbc b
+   ld  h,a
+ELSE
    sbc hl,bc                 ; is block size at least as big as requested?
+ENDIF
    jr nc, foundblk           ; if so branch to foundblk
    
    pop hl                    ; junk lagger on stack
@@ -97,7 +105,16 @@ PUBLIC ASMDISP_HEAPALLOC_CALLEE
    
    push bc
    ld bc,4
+IF __CPU_8080__
+   ld a,l
+   sub c
+   ld l,a
+   ld a,h
+   sbc b
+   ld  h,a
+ELSE
    sbc hl,bc
+ENDIF
    pop bc
    jr c, usewholeblk         ; if too small to split, use whole block
 

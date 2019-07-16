@@ -14,7 +14,7 @@
 argv_loop_1:
 	ld	a,(hl)
 	cp	' '
-IF CPU_8080
+IF __CPU_8080__
 	jp	nz,argv_loop_2
 ELSE
 	jr	nz,argv_loop_2
@@ -22,7 +22,7 @@ ENDIF
 	ld	(hl),0
 	dec	hl
 	dec	c
-IF CPU_8080
+IF __CPU_8080__
 	jp	nz,argv_loop_1
 ELSE
 	jr	nz,argv_loop_1
@@ -31,7 +31,7 @@ ENDIF
 argv_loop_2:
 	ld	a,(hl)
 	cp	' '
-IF CPU_8080
+IF __CPU_8080__
 	jp	nz,argv_loop_3
 ELSE
 	jr	nz,argv_loop_3
@@ -45,14 +45,14 @@ IF !DEFINED_nostreams
 	EXTERN freopen
 	xor	a
 	add	b
-IF CPU_8080
+IF __CPU_8080__
 	jp	nz,no_redir_stdout
 ELSE
 	jr	nz,no_redir_stdout
 ENDIF
 	ld	a,(hl)
 	cp	'>'
-IF CPU_8080
+IF __CPU_8080__
 	jp	nz,no_redir_stdout
 ELSE
 	jr	nz,no_redir_stdout
@@ -62,7 +62,7 @@ ENDIF
 	cp	(hl)
 	dec	hl
 	ld	de,redir_fopen_flag	; "a" or "w"
-IF CPU_8080
+IF __CPU_8080__
 	jp	nz,noappendb
 ELSE
 	jr	nz,noappendb
@@ -87,7 +87,7 @@ noappendb:
 	pop	hl
 		
 	dec	hl
-IF CPU_8080
+IF __CPU_8080__
 	jp	argv_zloop
 ELSE
 	jr	argv_zloop
@@ -96,7 +96,7 @@ no_redir_stdout:
 
 	ld	a,(hl)
 	cp	'<'
-IF CPU_8080
+IF __CPU_8080__
 	jp	nz,no_redir_stdin
 ELSE
 	jr	nz,no_redir_stdin
@@ -119,7 +119,7 @@ ENDIF
 	pop	hl
 		
 	dec	hl
-IF CPU_8080
+IF __CPU_8080__
 	jp	argv_zloop
 ELSE
 	jr	argv_zloop
@@ -137,7 +137,7 @@ ENDIF
 argv_zloop:
 	ld	(hl),0
 	dec	c
-IF CPU_8080
+IF __CPU_8080__
 	jp	z,argv_done
 ELSE
 	jr	z,argv_done
@@ -145,7 +145,7 @@ ENDIF
 	dec	hl
 	ld	a,(hl)
 	cp	' '
-IF CPU_8080
+IF __CPU_8080__
 	jp	z,argv_zloop
 ELSE
 	jr	z,argv_zloop
@@ -156,7 +156,7 @@ ENDIF
 argv_loop_3:
 	dec	hl
 	dec	c
-IF CPU_8080
+IF __CPU_8080__
 	jp	nz,argv_loop_2
 ELSE
 	jr	nz,argv_loop_2

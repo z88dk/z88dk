@@ -1,4 +1,5 @@
 @assert/assert.lst
+@alloc/alloc_8080.lst
 @ctype/ctype.lst
 setjmp/obj/8080/l_longjmp
 setjmp/obj/8080/l_setjmp

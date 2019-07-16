@@ -91,8 +91,17 @@ EXTERN ASMDISP_HEAPALLOC_CALLEE, ASMDISP_HEAPFREE_CALLEE
    ld l,(hl)
    ld h,a                    ; hl = size of old block
    
+IF __CPU_8080__
+   ld a,l
+   sub c
+   ld l,a
+   ld a,h
+   sbc b
+   ld  h,a
+ELSE
    or a
    sbc hl,bc                 ; old size - new size
+ENDIF
    jr nc, usenewsize
    add hl,bc
    ld c,l
