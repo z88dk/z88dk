@@ -4408,6 +4408,8 @@ void pushframe(void)
             ot("push\t");
             FrameP();
             nl();
+        } else {
+            ol("push\taf");
         }
     }
 }
@@ -4419,6 +4421,8 @@ void popframe(void)
             ot("pop\t");
             FrameP();
             nl();
+        } else {
+            ol("pop\taf");
         }
     }
 }
