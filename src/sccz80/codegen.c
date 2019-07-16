@@ -3724,10 +3724,10 @@ void zlt(LVALUE* lval)
     default:
         if (ulvalue(lval)) {
             if ( IS_8080() ) {
-                ol("ld\ta,l");
-                ol("sub\te");
-                ol("ld\ta,h");
-                ol("sbc\td");
+                ol("ld\ta,e");
+                ol("sub\tl");
+                ol("ld\ta,d");
+                ol("sbc\th");
                 set_carry(lval);
             } else {
            // callrts("l_ult");
@@ -3840,7 +3840,7 @@ void zle(LVALUE* lval)
                 ol("ld\ta,l");
                 ol("sub\te");
                 ol("ld\ta,h");
-                ol("sbc\te");
+                ol("sbc\td");
                 ol("ccf");
                 set_carry(lval);
             } else {

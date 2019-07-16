@@ -1,5 +1,5 @@
 
-
+#ifndef __8080__
 
 
 
@@ -37,3 +37,4 @@ int test_strlcpy()
 
     return suite_run();
 }
+#endif

@@ -3,5 +3,6 @@ cpdr.asm
 cpi.asm
 cpir.asm
 daa.asm
+ldir.asm
 rld.asm
 rrd.asm

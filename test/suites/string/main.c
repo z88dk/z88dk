@@ -1,4 +1,4 @@
-
+ 
 
 #include "string_tests.h"
 
@@ -12,9 +12,11 @@ int main(int argc, char *argv[])
     res += test_strncmp();
     res += test_strstr();
     res += test_strrstr();
+#ifndef __8080__
     res += test_strlcpy();
     res += test_strlcat();
     res += test_strrev();
+#endif
 
     return res;
 }

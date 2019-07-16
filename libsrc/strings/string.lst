@@ -1,6 +1,1 @@
-strings/obj/${TYPE}/memopd
-strings/obj/${TYPE}/memopd_callee
-strings/obj/${TYPE}/memopi
-strings/obj/${TYPE}/memopi_callee
-strings/obj/${TYPE}/memops
-strings/obj/${TYPE}/**/*
+strings/obj/${TYPE}/**/*.o

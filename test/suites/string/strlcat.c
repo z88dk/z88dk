@@ -1,4 +1,4 @@
-
+#ifndef __8080__
 
 
 
@@ -51,3 +51,5 @@ int test_strlcat()
 
     return suite_run();
 }
+
+#endif
