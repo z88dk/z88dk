@@ -24,7 +24,7 @@
 	cp	12	; FF (CLS) ?
 	jr	z,docls
 IF STANDARDESCAPECHARS
-	cp	10	; CR ?
+	cp	10	; LF ?
 	jr	nz,nocrlf
 	ld	c,2
 	call	5
