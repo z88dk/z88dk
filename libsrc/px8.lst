@@ -26,6 +26,10 @@ graphics/px8/w_pointxy
 graphics/px8/w_bksave
 graphics/px8/w_bkrestore
 graphics/swapgfxbk_foo.asm
+graphics/px8/w_clga_callee
+graphics/px8/w_fillb_callee
+graphics/px8/w_xorclga_callee
+graphics/px8/w_area
 @gfxbasew.lst
 @stdio/ansicore.lst
 stdio/ansi/px8/f_ansi_attr

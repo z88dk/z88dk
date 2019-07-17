@@ -29,4 +29,6 @@ graphics/g800/respixel
 graphics/g800/xorpixel
 graphics/putsprite3
 graphics/stencil_render2
+graphics/g800/bksave
+graphics/g800/bkrestore
 @gfxbase.lst

@@ -5,7 +5,7 @@ include(__link__.m4)
 
 // Z80
 
-#if __Z80 || __Z80_ZXN
+#if __Z80 || __Z80N
 
 #include <z80.h>
 

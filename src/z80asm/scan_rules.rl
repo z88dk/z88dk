@@ -59,7 +59,7 @@ ragel, to expand token definition from token_def.h.
 #define TOKEN_ZXN1(opcode, string)	 \
 	string <CAT> i										<NL> \
 	{													<NL> \
-		<TAB>		if (opts.cpu & CPU_Z80_ZXN) {		<NL> \
+		<TAB>		if (opts.cpu & CPU_Z80N) {			<NL> \
 		<TAB><TAB>		sym.tok        = TK_##opcode;	<NL> \
 		<TAB>		}									<NL> \
 		<TAB>		else {								<NL> \

@@ -1,0 +1,12 @@
+math/integer/z80n/l_z80n_muls_16_16x8
+math/integer/z80n/l_z80n_muls_16_16x16
+math/integer/z80n/l_z80n_muls_32_16x16
+math/integer/z80n/l_z80n_mulu_16_16x8
+math/integer/z80n/l_z80n_mulu_16_16x16
+math/integer/z80n/l_z80n_mulu_24_16x8
+math/integer/z80n/l_z80n_mulu_32_16x16
+math/integer/z80n/l_z80n_mulu_32_32x32
+math/integer/z80n/l_z80n_mulu_40_32x8
+math/integer/z80n/l_z80n_mulu_64_32x32
+math/integer/z80n/l_z80n_mulu_64_64x64
+math/integer/z80n/l_z80n_mulu_72_64x8

@@ -13,16 +13,10 @@
 	PUBLIC	getk
 	PUBLIC	_getk
 
-	EXTERN key_to_asc
-	
 .getk
 ._getk
-	call $Be53
-	ld hl,0
-	ret c
-	
-	; PC-G850
-	call $bcc4
+	call $BE53	; ket key code (if no key, A=0 and CY=0)
+	call $BE56	; convert key code to value
 	
 IF STANDARDESCAPECHARS
 	cp	13

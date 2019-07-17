@@ -14,14 +14,15 @@ ASMFILES_8080 = $(filter-out $(wildcard *sqrt*.asm *inp*.asm *outp*.asm *extract
 
 
 NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/stdlib/z80/*.asm" "$(NEWLIB_DIRECTORY)/stdlib/z80/random/*.asm"
-NEWLIB_TARGETS := obj/newlib-z80 obj/newlib-z80-zxn obj/newlib-r2k obj/newlib-ixiy  
+NEWLIBGLOBS_8080 := "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*rand*.asm" "$(NEWLIB_DIRECTORY)/stdlib/z80/*rand*.asm" "$(NEWLIB_DIRECTORY)/stdlib/z80/random/*.asm"  $(NEWLIB_DIRECTORY)/stdlib/z80/__stdlib_seed.asm
+NEWLIB_TARGETS := obj/newlib-z80 obj/newlib-z80n obj/newlib-r2k obj/newlib-ixiy   obj/newlib-8080
 
 space :=
 space +=
 
 OBJECTS = $(GENOBJECTS) $(ASMFILES:.asm=.o)
 OBJECTS_8080 = $(GENOBJECTS) $(ASMFILES_8080:.asm=.o)
-CLASSIC_OBJECTS = $(addprefix obj/z80/, $(OBJECTS)) $(addprefix obj/r2k/,$(OBJECTS)) $(addprefix obj/ixiy/,$(OBJECTS))  $(addprefix obj/$(TARGET)/,$(CUSTOBJECTS))  $(addprefix obj/z80-zxn/,$(OBJECTS)) $(addprefix obj/8080/,$(OBJECTS_8080))
+CLASSIC_OBJECTS = $(addprefix obj/z80/, $(OBJECTS)) $(addprefix obj/r2k/,$(OBJECTS)) $(addprefix obj/ixiy/,$(OBJECTS))  $(addprefix obj/$(TARGET)/,$(CUSTOBJECTS))  $(addprefix obj/z80n/,$(OBJECTS)) $(addprefix obj/8080/,$(OBJECTS_8080))
 
 
 .PHONY: dirs  $(NEWLIB_TARGETS)
@@ -34,14 +35,14 @@ obj/newlib-z80:
 obj/newlib-r2k:  
 	@$(ASSEMBLER) -d -O=obj/r2k/x -I.. -mr2k -D__CLASSIC $(NEWLIBGLOBS)
 
-obj/newlib-z80-zxn:  
-	@$(ASSEMBLER) -d -O=obj/z80-zxn/x -I.. -mz80-zxn -D__CLASSIC $(NEWLIBGLOBS)
+obj/newlib-z80n:  
+	@$(ASSEMBLER) -d -O=obj/z80n/x -I.. -mz80n -D__CLASSIC $(NEWLIBGLOBS)
 
 obj/newlib-ixiy:  
 	@$(ASSEMBLER) -d -O=obj/ixiy/x -I.. -mz80 --IXIY -D__CLASSIC $(NEWLIBGLOBS)
 
 obj/newlib-8080:  
-	@$(ASSEMBLER) -d -O=obj/8080/x -I.. -m8080 -D__CLASSIC $(NEWLIBGLOBS)
+	@$(ASSEMBLER) -d -O=obj/8080/x -I.. -m8080 -D__CLASSIC $(NEWLIBGLOBS_8080)
 
 obj/$(TARGET)/%.o: %.c
 	$(ZCC) +$(TARGET) $(CFLAGS) -o $@  $^
@@ -51,7 +52,7 @@ obj/$(TARGET)/%.o: %.asm
 
 
 dirs:
-	@mkdir -p obj/z80 obj/z80-zxn obj/ixiy obj/r2k -p obj/$(TARGET) obj/newlib-8080 obj/8080
+	@mkdir -p obj/z80 obj/z80n obj/ixiy obj/r2k -p obj/$(TARGET) obj/newlib-8080 obj/8080
 
 
 clean:

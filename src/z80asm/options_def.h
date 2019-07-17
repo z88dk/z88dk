@@ -70,7 +70,7 @@ OPT(OptCall, exit_help, "-h", "--help", "Show help options", "")
 OPT(OptSet, &opts.verbose, "-v", "--verbose", "Be verbose", "")
 
 OPT_TITLE("Code Generation Options:")
-OPT(OptCall, option_cpu_z80_zxn, "", "--cpu=z80-zxn", "Assemble for the Z80 variant of ZX Next", "")
+OPT(OptCall, option_cpu_z80n, "", "--cpu=z80n", "Assemble for the Z80 variant of ZX Next", "")
 OPT(OptCall, option_cpu_z80, "", "--cpu=z80", "Assemble for the Z80", "")
 OPT(OptCall, option_cpu_8080, "", "--cpu=8080", "Assemble for the 8080 (using z80 mnemonics)", "")
 OPT(OptCall, option_cpu_z180, "", "--cpu=z180", "Assemble for the Z180", "")

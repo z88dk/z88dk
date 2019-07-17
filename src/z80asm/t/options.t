@@ -400,12 +400,12 @@ t_z80asm_ok(0, "halt", "\x76", "-mz80");
 t_z80asm_ok(0, "halt", "\x76", "-m=z80");
 
 #------------------------------------------------------------------------------
-# --cpu=z80-zxn
+# --cpu=z80n
 #------------------------------------------------------------------------------
 
-t_z80asm_ok(0, "swapnib", "\xED\x23", "--cpu=z80-zxn");
-t_z80asm_ok(0, "swapnib", "\xED\x23", "-mz80-zxn");
-t_z80asm_ok(0, "swapnib", "\xED\x23", "-m=z80-zxn");
+t_z80asm_ok(0, "swapnib", "\xED\x23", "--cpu=z80n");
+t_z80asm_ok(0, "swapnib", "\xED\x23", "-mz80n");
+t_z80asm_ok(0, "swapnib", "\xED\x23", "-m=z80n");
 
 #------------------------------------------------------------------------------
 # --cpu=z180
@@ -885,7 +885,7 @@ write_file("test.asm", <<END);
 	if __CPU_Z80__
 	defb 1
 	else 
-	if __CPU_Z80_ZXN__
+	if __CPU_Z80N__
 	defb 2
 	else
 	if __CPU_Z180__
@@ -914,7 +914,7 @@ t_z80asm_capture('-mz80 -b test.asm', "", "", 0);
 t_binary(read_binfile("test.bin"), "\1");
 
 unlink "test.bin";
-t_z80asm_capture('-mz80-zxn -b test.asm', "", "", 0);
+t_z80asm_capture('-mz80n -b test.asm', "", "", 0);
 t_binary(read_binfile("test.bin"), "\2");
 
 unlink "test.bin";
