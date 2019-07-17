@@ -51,12 +51,30 @@ asm_obstack_free:
    ex de,hl                    ; hl = ob->fence, de = & ob->fence + 1
    
    scf
+IF __CPU_8080__
+   ld a,l
+   sbc c
+   ld l,a
+   ld a,h
+   sbc b
+   ld d,a
+ELSE
    sbc hl,bc                   ; fence > object otherwise invalid
+ENDIF
    jp c, error_zc
    
    ld hl,4
    add hl,de                   ; hl = & ob->mem - 1
+IF __CPU_8080__
+   ld a,l
+   sbc c
+   ld l,a
+   ld a,h
+   sbc b
+   ld d,a
+ELSE
    sbc hl,bc                   ; object >= ob->mem otherwise invalid
+ENDIF
    jp nc, error_zc
       
    ex de,hl
