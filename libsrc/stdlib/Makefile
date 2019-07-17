@@ -10,18 +10,27 @@ TARGET ?= test
 GENOBJECTS = unbcd.o wcmatch.o getopt.o
 CUSTOBJECTS = sleep.o 
 ASMFILES = $(wildcard *.asm)
-ASMFILES_8080 = $(filter-out $(wildcard *sqrt*.asm *inp*.asm *outp*.asm *extract*.asm *search*.asm *sort*.asm) , $(wildcard *.asm))
+ASMFILES_8080 = $(filter-out $(wildcard *sqrt*.asm *inp*.asm *outp*.asm *extract*.asm *search*.asm *sort*.asm) , $(wildcard *.asm)) $(wildcard 8080/*.asm)
 
 
 NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/stdlib/z80/*.asm" "$(NEWLIB_DIRECTORY)/stdlib/z80/random/*.asm"
-NEWLIBGLOBS_8080 := "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*rand*.asm" "$(NEWLIB_DIRECTORY)/stdlib/z80/*rand*.asm" "$(NEWLIB_DIRECTORY)/stdlib/z80/random/*.asm"  $(NEWLIB_DIRECTORY)/stdlib/z80/__stdlib_seed.asm
+
+NEWLIBGLOBS_8080 := "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*rand*.asm" \
+	"$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*abs.asm" \
+	"$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/atoi.asm" \
+	"$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/atol.asm" \
+	"$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/itoa*.asm" \
+	"$(NEWLIB_DIRECTORY)/stdlib/z80/*rand*.asm" \
+	"$(NEWLIB_DIRECTORY)/stdlib/z80/*abs*.asm" \
+	"$(NEWLIB_DIRECTORY)/stdlib/z80/random/*.asm" \
+	 $(NEWLIB_DIRECTORY)/stdlib/z80/__stdlib_seed.asm
 NEWLIB_TARGETS := obj/newlib-z80 obj/newlib-z80n obj/newlib-r2k obj/newlib-ixiy   obj/newlib-8080
 
 space :=
 space +=
 
 OBJECTS = $(GENOBJECTS) $(ASMFILES:.asm=.o)
-OBJECTS_8080 = $(GENOBJECTS) $(ASMFILES_8080:.asm=.o)
+OBJECTS_8080 = $(GENOBJECTS) $(ASMFILES_8080:.asm=.o) 
 CLASSIC_OBJECTS = $(addprefix obj/z80/, $(OBJECTS)) $(addprefix obj/r2k/,$(OBJECTS)) $(addprefix obj/ixiy/,$(OBJECTS))  $(addprefix obj/$(TARGET)/,$(CUSTOBJECTS))  $(addprefix obj/z80n/,$(OBJECTS)) $(addprefix obj/8080/,$(OBJECTS_8080))
 
 
@@ -52,7 +61,7 @@ obj/$(TARGET)/%.o: %.asm
 
 
 dirs:
-	@mkdir -p obj/z80 obj/z80n obj/ixiy obj/r2k -p obj/$(TARGET) obj/newlib-8080 obj/8080
+	@mkdir -p obj/z80 obj/z80n obj/ixiy obj/r2k -p obj/$(TARGET) obj/newlib-8080 obj/8080 obj/8080/8080
 
 
 clean:

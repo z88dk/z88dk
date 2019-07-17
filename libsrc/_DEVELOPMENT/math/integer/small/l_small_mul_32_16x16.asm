@@ -31,9 +31,19 @@ loop_0:
     ;  a = iterations
 
     add hl,hl
-
+IF __CPU_8080__
+    push af
+    ld a,e
+    rla
+    ld e,a
+    ld a,d
+    rla
+    ld d,a
+    pop af
+ELSE
     rl e
     rl d
+ENDIF
 
     jr NC,loop_1
     add hl,bc
