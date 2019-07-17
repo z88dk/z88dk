@@ -26,9 +26,10 @@
 IF STANDARDESCAPECHARS
 	cp	10	; LF ?
 	jr	nz,nocrlf
+	ld	de,13
 	ld	c,2
 	call	5
-	ld	de,13
+	ld	de,10
 ELSE
         cp      13      ; CR ?
         jr      nz,nocrlf
