@@ -2484,6 +2484,27 @@
 	ld	bc,%1
 	push	bc
 
+	ld	hl,_%1
+	pop	de
+	push	de
+	push	hl
+	ex	de,hl
+=
+	pop	hl
+	push	hl
+	ld	bc,_%1
+	push	bc
+
+	ld	h,a
+	ld	l,0
+	ld	a,h
+	or	l
+	jp	%1,%2
+=
+	ld	h,a
+	ld	l,0
+	and	a
+
 	ld	h,a
 	ld	l,0
 	ld	a,h
