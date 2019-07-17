@@ -18,9 +18,10 @@ l_f32_ulong2f:
 	ld	a,128
 	jr	not_negative
 l_f32_slong2f:
+	ld	a,d
 	ld	a,128
-	bit	7,d
-	jr	z,not_negative
+	rla
+	jp	nc,not_negative
 	call	l_long_neg
 	xor	a
 not_negative:
@@ -30,8 +31,12 @@ not_negative:
 	ld	a,24 + 128
 	ld	(___mbf32_FPEXP),a
 	ld	b,0
+IF __CPU_8080__
+	call	___mbf32_BNORM
+ELSE
 	push	ix
 	ld	ix,___mbf32_BNORM
 	call	msbios
+ENDIF
 	jp	___mbf32_return
 

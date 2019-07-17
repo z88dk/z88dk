@@ -15,8 +15,12 @@ floor:
 	call	___mbf32_setup_single
 	ld	a,(___mbf32_FPREG+2)
 	push	af
+IF __CPU_8080__
+        call	___mbf32_FPINT
+ELSE
         ld      ix,___mbf32_FPINT
 	call	msbios
+ENDIF
 	; bcde = integer
 	; Now normalise it again
 	ex	de,hl
@@ -27,5 +31,7 @@ floor:
 	jr	nc,not_negative
 	dec	d
 not_negative:
+IF !__CPU_8080__
 	pop	ix
+ENDIF
 	jp	l_f32_slong2f

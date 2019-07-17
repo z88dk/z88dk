@@ -22,9 +22,10 @@ l_f32_uint2f:
 	jr	not_negative
 l_f32_schar2f:
 l_f32_sint2f:
+	ld	a,h
+	rla
 	ld	a,128
-	bit	7,h
-	jr	z,not_negative
+	jr	nc,not_negative
 	call	l_neg_hl
 	xor	a
 not_negative:
@@ -34,8 +35,12 @@ not_negative:
 	ld	a,24 + 128
 	ld	(___mbf32_FPEXP),a
 	ld	b,0
+IF __CPU_8080__
+	call	___mbf32_BNORM
+ELSE
 	push	ix
 	ld	ix,___mbf32_BNORM
 	call	msbios
+ENDIF
 	jp	___mbf32_return
 

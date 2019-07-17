@@ -10,8 +10,12 @@
 
 l_f32_mul:
 	call	___mbf32_setup_arith
+IF __CPU_8080__
+	call	___mbf32_FPMULT
+ELSE
 	ld	ix,___mbf32_FPMULT
 	call	msbios
+ENDIF
 	jp	___mbf32_return
 
 

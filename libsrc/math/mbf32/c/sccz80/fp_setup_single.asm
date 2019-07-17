@@ -22,7 +22,9 @@ ___mbf32_setup_single:
 	ld	de,___mbf32_FPREG		;Store the right hand
 	ld	bc,4
 	ldir
+IF !__CPU_8080__
 	pop	hl
 	push	ix
 	push	hl
+ENDIF
 	ret

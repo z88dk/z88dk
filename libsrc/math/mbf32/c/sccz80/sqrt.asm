@@ -9,6 +9,10 @@
 
 sqrt:
 	call	___mbf32_setup_single
+IF __CPU_8080__
+	call	___mbf32_SQR
+ELSE
 	ld	ix,___mbf32_SQR
 	call	msbios
+ENDIF
 	jp	___mbf32_return

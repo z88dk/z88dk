@@ -10,8 +10,12 @@
 
 l_f32_sub:
 	call	___mbf32_setup_arith
+IF __CPU_8080__
+	call	___mbf32_SUBCDE
+ELSE
 	ld	ix,___mbf32_SUBCDE
 	call	msbios
+ENDIF
 	jp	___mbf32_return
 
 

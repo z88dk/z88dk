@@ -16,8 +16,14 @@ modf:
 	ld	hl,4
 	add	hl,sp
 	call	l_glong
+IF __CPU_8080__
+	ld	a,e
+	rra
+	jp	c,isnegative
+ELSE
 	bit	7,e
 	jr	nz,isnegative
+ENDIF
 	push	de
 	push	hl	
 	call	floor
@@ -47,8 +53,16 @@ rejoin:
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d
+IF __CPU_8080__
+	ex	de,hl
+	ld	(___mbf32_FPREG+2),hl
+	ld	l,c
+	ld	h,b
+	ld	(___mbf32_FPREG),hl
+ELSE
 	ld	(___mbf32_FPREG),bc
 	ld	(___mbf32_FPREG+2),de
+ENDIF
 	ld	hl,4
 	add	hl,sp	
 	ld	e,(hl)
@@ -58,12 +72,19 @@ rejoin:
 	ld	c,(hl)
 	inc	hl
 	ld	b,(hl)
+IF __CPU_8080__
+	call	___mbf32_SUBCDE
+        ld      hl,(___mbf32_FPREG+2)
+	ex	de,hl
+        ld      hl,(___mbf32_FPREG)
+ELSE
 	push	ix
 	ld	ix,___mbf32_SUBCDE
 	call	msbios
 	pop	ix
         ld      hl,(___mbf32_FPREG)
         ld      de,(___mbf32_FPREG+2)
+ENDIF
 	; Now flip the sign
 	ld	a,e
 	xor	$80

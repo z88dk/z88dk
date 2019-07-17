@@ -21,9 +21,13 @@ l_f32_f2ulong:
 	ld	a,(___mbf32_FPREG + 2)
 	push	af
 	ld	a,(___mbf32_FPEXP)
+IF __CPU_8080__
+	call	___mbf32_FPINT
+ELSE
 	ld	ix,___mbf32_FPINT
 	call	msbios
 	pop	ix
+ENDIF
 	ex	de,hl
 	ld	e,c
 	ld	d,0

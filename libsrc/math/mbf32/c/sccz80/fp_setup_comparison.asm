@@ -25,15 +25,24 @@ ___mbf32_setup_comparison:
 	ld	(___mbf32_VALTYP),a
 	; The right value needs to go into FPREG
 	ld	(___mbf32_FPREG + 0),hl
+IF __CPU_8080__
+	ex	de,hl
+	ld	(___mbf32_FPREG + 2),hl
+ELSE
 	ld	(___mbf32_FPREG + 2),de
+ENDIF
 	pop	af		;Return address
 	pop	hl		;Caller return address
 	pop	de		;Left LSW
 	pop	bc		;Left MSW
 	push	hl
 	push	af		;Our return address
+IF __CPU_8080__
+	call	___mbf32_CMPNUM
+ELSE
 	push	ix
 	ld	ix,___mbf32_CMPNUM
 	call	msbios
 	pop	ix
+ENDIF
 	ret

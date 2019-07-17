@@ -10,8 +10,12 @@
 
 l_f32_add:
 	call	___mbf32_setup_arith
+IF __CPU_8080__
+	call	___mbf32_FPADD
+ELSE
 	ld	ix,___mbf32_FPADD
 	call	msbios
+ENDIF
 	jp	___mbf32_return
 
 

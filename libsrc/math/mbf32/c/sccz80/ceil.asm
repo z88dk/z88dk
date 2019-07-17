@@ -19,8 +19,12 @@ ceil:
 	xor	$80
 	ld	(hl),a
 	push	af
+IF __CPU_8080__
+        call	___mbf32_FPINT
+ELSE
         ld      ix,___mbf32_FPINT
 	call	msbios
+ENDIF
 	; bcde = integer
 	; Now normalise it again
 	ex	de,hl
@@ -32,5 +36,7 @@ ceil:
 	dec	d
 not_negative:
 	call	l_long_neg
+IF !__CPU_8080__
 	pop	ix
+ENDIF
 	jp	l_f32_slong2f
