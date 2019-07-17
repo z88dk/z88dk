@@ -1,0 +1,9 @@
+stdio/cpm/fgetc_cons
+stdio/cpm/getk
+stdio/cpm/fputc_cons
+cpm/cpm_platform_init
+@stdio/stdio_8080.lst
+@time/time.lst
+@fcntl/cpm/fcntl.lst
+games/joystick
+@8080.lst

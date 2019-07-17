@@ -655,6 +655,7 @@ int main (int argc, char **argv){
     printf("  -d             Enable debugger\n"),
     printf("  -l X           Load file to address\n"),
     printf("  -b <model>     Memory model (zxn/zx)\n"),
+    printf("  -m8080         Emulate an 8080\n"),
     printf("  -mz80          Emulate a z80\n"),
     printf("  -mz180         Emulate a z180\n"),
     printf("  -mr2k          Emulate a Rabbit 2000\n"),
@@ -713,6 +714,8 @@ int main (int argc, char **argv){
         case 'm':
           if ( strcmp(&argv[0][1],"mz80") == 0 ) {
             c_cpu = CPU_Z80;
+          } else if ( strcmp(&argv[0][1],"m8080") == 0 ) {
+            c_cpu = CPU_8080;
           } else if ( strcmp(&argv[0][1],"mz180") == 0 ) {
             c_cpu = CPU_Z180;
           } else if ( strcmp(&argv[0][1],"mz80n") == 0 ) {
@@ -1424,19 +1427,43 @@ int main (int argc, char **argv){
         mp= pc+= (get_memory(pc)^128)-127;
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x20: // JR NZ,s8
+        if ( is8080() ) {
+          printf("%04x: ILLEGAL 8080 opcode JR NZ\n",pc-1);
+          st+=4;
+          break;
+        }
         JRCI(fr);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x28: // JR Z,s8
+        if ( is8080() ) {
+          printf("%04x: ILLEGAL 8080 opcode JR Z\n",pc-1);
+          st+=4;
+          break;
+        }
         JRC(fr);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x30: // JR NC,s8
+        if ( is8080() ) {
+          printf("%04x: ILLEGAL 8080 opcode JR NC\n",pc-1);
+          st+=4;
+          break;
+        }
         JRC(ff&256);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x38: // JR C,s8
+        if ( is8080() ) {
+          printf("%04x: ILLEGAL 8080 opcode JR C\n",pc-1);
+          st+=4;
+          break;
+        }
         JRCI(ff&256);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x08: // EX AF,AF'
         st+= 4;
+        if ( is8080()) {
+          printf("%04x: ILLEGAL 8080 opcode EX AF,AF\n",pc-1);
+          break;
+        }
         t  =  a_;
         a_ =  a;
         a  =  t;
@@ -1454,6 +1481,11 @@ int main (int argc, char **argv){
         fb =  t;
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x10: // DJNZ
+        if ( is8080() ) {
+          printf("%04x: ILLEGAL 8080 opcode DJNZ\n",pc-1);
+          st+=4;
+          break;
+        }
         if( ( altd && --b_) || ( altd == 0 && --b) )
           st+= isez80() ? 4 :israbbit() ? 5 : 13,
           mp= pc+= (get_memory(pc)^128)-127;
@@ -2682,6 +2714,12 @@ int main (int argc, char **argv){
         l= t;
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xd9: // EXX
+        if ( is8080() ) {
+          printf("%04x: ILLEGAL 8080 instruction EXX\n",pc-1);         
+          RET(isez80() ? 5 : israbbit() ?  8 : isz180() ? 9 : 10);
+          ih=1;altd=0;ioi=0;ioe=0;
+          break;
+        }
         st+= isez80() ? 1 : israbbit() ? 2 : isz180() ? 3 : 4;
         t = b;
         b = b_;
@@ -2739,15 +2777,44 @@ int main (int argc, char **argv){
           sp= xl | xh<<8;
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xdd: // OP DD
-        st+= isez80() ? 1 : israbbit() ? 2 : isz180() ? 3 : 4;
-        ih= iy= 0;
-        ih=0;break;
+        if ( is8080() ) {
+          printf("%04x: ILLEGAL 8080 prefix 0xDD\n",pc-1);
+          st+= isez80() ? 5 : israbbit() ? 12 : isz180() ? 16 : 17;
+          t= pc+2;
+          mp= pc= get_memory(pc) | get_memory(pc+1)<<8;
+          put_memory(--sp,t>>8);
+          put_memory(--sp,t);
+          ih=1;altd=0;ioi=0;ioe=0;
+        } else {
+          st+= isez80() ? 1 : israbbit() ? 2 : isz180() ? 3 : 4;
+          ih= iy= 0;
+          ih=0;
+        }
+        break;
       case 0xfd: // OP FD
-        st+= isez80() ? 1 : israbbit() ? 2 : isz180() ? 3 : 4;
-        ih= 0;
-        iy= 1;
-        ih=0;break;
+        if ( is8080() ) {
+          printf("%04x: ILLEGAL 8080 prefix 0xFD\n",pc-1);
+          st+= isez80() ? 5 : israbbit() ? 12 : isz180() ? 16 : 17;
+          t= pc+2;
+          mp= pc= get_memory(pc) | get_memory(pc+1)<<8;
+          put_memory(--sp,t>>8);
+          put_memory(--sp,t);
+          ih=1;altd=0;ioi=0;ioe=0;
+        } else {
+          st+= isez80() ? 1 : israbbit() ? 2 : isz180() ? 3 : 4;
+          ih= 0;
+          iy= 1;
+          ih=0;
+        }
+        break;
       case 0xcb: // OP CB
+        if ( is8080() ) {
+          printf("%04x: ILLEGAL 8080 prefix 0xCB\n",pc-1);
+          st+= isez80() ? 4 : israbbit() ? 3 : israbbit() ? 7 : isz180() ? 9 : 10;
+          mp= pc= get_memory(pc) | get_memory(pc+1)<<8;
+          ih=1;altd=0;ioi=0;ioe=0;break;
+          break;
+        }
         r++;
         if( ih )
           switch( get_memory(pc++) ){
@@ -3272,6 +3339,18 @@ int main (int argc, char **argv){
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xed: // OP ED
+        if ( is8080() ) {
+          if ( get_memory(pc) != 0xfe) {
+            printf("%04x: ILLEGAL 8080 prefix 0xED\n",pc-1);
+            st+= isez80() ? 5 : israbbit() ? 12 : isz180() ? 16 : 17;
+            t= pc+2;
+            mp= pc= get_memory(pc) | get_memory(pc+1)<<8;
+            put_memory(--sp,t>>8);
+            put_memory(--sp,t);
+            ih=1;altd=0;ioi=0;ioe=0;
+            break;
+          }
+        }
         r++;
         switch( get_memory(pc++) ){
           case 0x02:    // (EZ80) LEA BC,IX+d

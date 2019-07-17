@@ -34,23 +34,30 @@ CFILES = \
 
 AFILES = $(CFILES:.c=.asm)
 OFILES = $(CFILES:.c=.o)
-OBJECTS = $(addprefix obj/nodevice/,$(OFILES)) $(addprefix obj/device/,$(OFILES))
+OBJECTS = $(addprefix obj/z80/nodevice/,$(OFILES)) $(addprefix obj/z80/device/,$(OFILES)) $(addprefix obj/8080/nodevice/,$(OFILES)) $(addprefix obj/8080/device/,$(OFILES))
 
 
 all: dirs $(OBJECTS)
 
 # It can't be +cpm, otherwise the bin output filename
 # will be forced to 'a.com' !!
-obj/nodevice/%.o: %.c
+obj/z80/nodevice/%.o: %.c
 	$(ZCC) +cpm $(CFLAGS) $^ -o $@
 
-obj/device/%.o: %.c
+obj/z80/device/%.o: %.c
 	$(ZCC) +cpm $(CFLAGS) -DDEVICES $^ -o $@
+
+obj/8080/nodevice/%.o: %.c
+	$(ZCC) +cpm -clib=8080 $(CFLAGS) $^ -o $@
+
+obj/8080/device/%.o: %.c
+	$(ZCC) +cpm -clib=8080 $(CFLAGS) -DDEVICES $^ -o $@
+
 
 .PHONY:	dirs
 
 dirs:
-	@mkdir -p obj obj/device obj/nodevice
+	@mkdir -p obj obj/z80/device obj/z80/nodevice obj/8080/device obj/8080/nodevice
 
 clean:
 	$(RM) -fr obj zcc_opt.def

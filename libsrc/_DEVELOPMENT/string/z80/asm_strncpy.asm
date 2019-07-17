@@ -41,7 +41,6 @@ asm_strncpy:
    xor a
 
 loop:
-
    cp (hl)
    ldi
    jp po, done                 ; reached max number of chars

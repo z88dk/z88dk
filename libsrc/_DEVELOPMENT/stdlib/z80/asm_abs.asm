@@ -22,9 +22,14 @@ asm_abs:
    ;
    ; exit  : hl = abs(j)
    ;
-   ; uses  : af, hl, carry unaffected
-   
+   ; uses  : af, hl, carry unaffected (not 808x)
+IF __CPU_8080__
+   ld a,h
+   rla
+   ret nc
+ELSE 
    bit 7,h
    ret z
+ENDIF
 
    jp l_neg_hl

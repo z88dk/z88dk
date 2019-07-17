@@ -24,7 +24,7 @@ use Modern::Perl;
 #	%t	temp jump label
 #	@label	unsigned word with given global label address
 #------------------------------------------------------------------------------
-my @CPUS = qw( z80 z80n z180 r2k r3k );
+my @CPUS = qw( z80 z80n z180 r2k r3k 8080 );
 
 my @R8	= qw( b c d e h l      a );
 my @R8I	= qw( b c d e h l (hl) a );
@@ -82,6 +82,7 @@ for my $cpu (@CPUS) {
 	my $z80n	= ($cpu =~ /^z80n/);
 	my $z180 	= ($cpu =~ /^z180/);
 	my $zilog	= ($cpu =~ /^z/);
+	my $i8080	= ($cpu =~ /^8080/);
 	
 	# 8-bit load group
 	for my $r (@R8I) { 
@@ -171,20 +172,22 @@ for my $cpu (@CPUS) {
 			add_opc($cpu, "ld (%m), $r", 0x22, '%m', '%m');
 			
 			for my $x (@X) {
-				add_opc($cpu, "ld $x, %m", $V{$x}, 0x01 + $V{$r}*16, '%m', '%m');
-				add_opc($cpu, "ld $x, (%m)", $V{$x}, 0x2A, '%m', '%m');
-				add_opc($cpu, "ld (%m), $x", $V{$x}, 0x22, '%m', '%m');
+				add_opc($cpu, "ld $x, %m", $V{$x}, 0x01 + $V{$r}*16, '%m', '%m') if !$i8080;
+				add_opc($cpu, "ld $x, (%m)", $V{$x}, 0x2A, '%m', '%m') if !$i8080;
+				add_opc($cpu, "ld (%m), $x", $V{$x}, 0x22, '%m', '%m') if !$i8080;
 			}
 		}
 		else {
-			add_opc($cpu, "ld $r, (%m)", 0xED, 0x4B + $V{$r}*16, '%m', '%m');
-			add_opc($cpu, "ld (%m), $r", 0xED, 0x43 + $V{$r}*16, '%m', '%m');
+			add_opc($cpu, "ld $r, (%m)", 0xED, 0x4B + $V{$r}*16, '%m', '%m') if !$i8080;
+			add_opc($cpu, "ld (%m), $r", 0xED, 0x43 + $V{$r}*16, '%m', '%m') if !$i8080;
 		}
 	}
 	
 	add_opc($cpu, "ld sp, hl", 0xF9);
-	for my $x (@X) {
-		add_opc($cpu, "ld sp, $x", $V{$x}, 0xF9);
+        if ( !$i8080 ) {
+		for my $x (@X) {
+			add_opc($cpu, "ld sp, $x", $V{$x}, 0xF9);
+		}
 	}
 	
 	for my $r (@R16AF) {
@@ -193,8 +196,8 @@ for my $cpu (@CPUS) {
 		
 		if ($r eq 'hl') {
 			for my $x (@X) {
-				add_opc($cpu, "push $x", $V{$x}, 0xC5 + $V{$r}*16);
-				add_opc($cpu, "pop $x", $V{$x}, 0xC1 + $V{$r}*16);
+				add_opc($cpu, "push $x", $V{$x}, 0xC5 + $V{$r}*16) if !$i8080;
+				add_opc($cpu, "pop $x", $V{$x}, 0xC1 + $V{$r}*16) if !$i8080;
 			}
 		}
 	}
@@ -247,12 +250,12 @@ for my $cpu (@CPUS) {
 	}
 	
 	# exchange group
-	add_opc($cpu, "ex af, af'", 0x08);
-	add_opc($cpu, "ex af, af",  0x08);
+	add_opc($cpu, "ex af, af'", 0x08) if !$i8080;
+	add_opc($cpu, "ex af, af",  0x08) if !$i8080;
 	
-	add_opc($cpu, "exx",  0xD9);
+	add_opc($cpu, "exx",  0xD9) if !$i8080;
 	
-	if ($zilog) {
+	if ($zilog || $i8080) {
 		add_opc($cpu, "ex (sp), hl", 0xE3);
 	}
 	elsif ($rabbit) {
@@ -262,8 +265,10 @@ for my $cpu (@CPUS) {
 	}
 	else {}
 	
-	for my $x (@X) {
-		add_opc($cpu, "ex (sp), $x", $V{$x}, 0xE3);
+	if ( !$i8080 ) {
+		for my $x (@X) {
+			add_opc($cpu, "ex (sp), $x", $V{$x}, 0xE3);
+		}
 	}
 	
 	add_opc($cpu, "ex de, hl", 0xEB);
@@ -279,8 +284,8 @@ for my $cpu (@CPUS) {
 	# 16-bit ALU group
 	for my $r (@R16SP) {
 		add_opc($cpu, "add hl, $r", 0x09 + $V{$r}*16);
-		add_opc($cpu, "sbc hl, $r", 0xED, 0x42 + $V{$r}*16);
-		add_opc($cpu, "adc hl, $r", 0xED, 0x4A + $V{$r}*16);
+		add_opc($cpu, "sbc hl, $r", 0xED, 0x42 + $V{$r}*16) if !$i8080;
+		add_opc($cpu, "adc hl, $r", 0xED, 0x4A + $V{$r}*16) if !$i8080;
 		
 		add_opc($cpu, "inc $r", 0x03 + $V{$r}*16);
 		add_opc($cpu, "dec $r", 0x0B + $V{$r}*16);
@@ -288,10 +293,10 @@ for my $cpu (@CPUS) {
 	
 	for my $x (@X) {
 		for my $r (@R16SP) {
-			add_opc($cpu, "add $x, ".replace($r, qr/hl/, $x), $V{$x}, 0x09 + $V{$r}*16);
+			add_opc($cpu, "add $x, ".replace($r, qr/hl/, $x), $V{$x}, 0x09 + $V{$r}*16) if !$i8080;
 		}
-		add_opc($cpu, "inc $x", $V{$x}, 0x03 + 2*16);
-		add_opc($cpu, "dec $x", $V{$x}, 0x0B + 2*16);
+		add_opc($cpu, "inc $x", $V{$x}, 0x03 + 2*16) if !$i8080;
+		add_opc($cpu, "dec $x", $V{$x}, 0x0B + 2*16) if !$i8080;
 	}
 	
 	if ($rabbit) {
@@ -335,7 +340,7 @@ for my $cpu (@CPUS) {
 	for my $op (@ROT) {
 		next if $op =~ /sll|sli/ && !$zilog;
 		for my $r (@R8I) {
-			add_opc($cpu, "$op $r", 0xCB, $V{$op}*8 + $V{$r});
+			add_opc($cpu, "$op $r", 0xCB, $V{$op}*8 + $V{$r}) if !$i8080;
 		}
 	}
 	
@@ -352,7 +357,7 @@ for my $cpu (@CPUS) {
 	# bit set, reset and test group
 	for my $op (@BIT) {
 		for my $r (@R8I) {
-			add_opc($cpu, "$op %c, $r", 0xCB, ($V{$op}*0x40 + $V{$r})."+8*%c(0..7)");
+			add_opc($cpu, "$op %c, $r", 0xCB, ($V{$op}*0x40 + $V{$r})."+8*%c(0..7)") if !$i8080;
 		}
 	}
 	
@@ -390,6 +395,11 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "ld r, a", 0xED, 0x4F);
 		add_opc($cpu, "ld a, r", 0xED, 0x5F);
 	}
+
+        if ($i8080) {
+		add_opc($cpu, "di", 0xF3);
+		add_opc($cpu, "ei", 0xFB);
+        }
 	
 	if ($rabbit) {
 		add_opc($cpu, "ld eir, a", 0xED, 0x47);
@@ -401,17 +411,27 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "ipres", 0xED, 0x5D);
 	}
 
-	add_opc($cpu, "reti", 0xED, 0x4D);
+	add_opc($cpu, "reti", 0xED, 0x4D) if !$i8080;
 	add_opc($cpu, "retn", 0xED, 0x45) if $zilog;
 	add_opc($cpu, "idet", 0x5B) if $r3k;
 	
 	# Jump group
-	add_opc($cpu, "jr %j", 0x18, '%j');
+        if ( $i8080 ) {
+		add_opc($cpu, "jr %j", 0xC3, '%m', '%m');
+        } else {
+		add_opc($cpu, "jr %j", 0x18, '%j') if !$i8080;
+        }
 	add_opc($cpu, "jp %m", 0xC3, '%m', '%m');
 
 	# TODO: check that address is corretly computed in DJNZ B', LABEL - 76 10 FE or 76 10 FD
-	add_opc($cpu, "djnz %j", 0x10, '%j');
-	add_opc($cpu, "djnz b, %j", 0x10, '%j');
+        if ( $i8080 ) {
+		# Emulate it on 8080
+		add_opc($cpu, "djnz %j", 0x05, 0xC2, '%m', '%m') ;
+		add_opc($cpu, "djnz b, %j", 0x05, 0xC2, '%m', '%m');
+        } else {
+		add_opc($cpu, "djnz %j", 0x10, '%j') if !$i8080;
+		add_opc($cpu, "djnz b, %j", 0x10, '%j') if !$i8080;
+        }
 	
 	
 	for my $_f (@FLAGS) {
@@ -420,18 +440,28 @@ for my $cpu (@CPUS) {
 			add_opc($cpu, "jp $f, %m", 0xC2 + $V{$_f}*8, '%m', '%m') if $rabbit;
 		}
 		elsif ($f =~ /^(nz|z|nc|c)$/) {
-			add_opc($cpu, "jr $f, %j", 0x20 + $V{$_f}*8, '%j');
+			if ( $i8080 ) {
+				add_opc($cpu, "jr $f, %j", 0xC2 + $V{$_f}*8, '%m', '%m');
+			} else {
+				add_opc($cpu, "jr $f, %j", 0x20 + $V{$_f}*8, '%j') if !$i8080;
+			}
 			add_opc($cpu, "jp $f, %m", 0xC2 + $V{$_f}*8, '%m', '%m');
 		}
 		else {
 			add_opc($cpu, "jp $f, %m", 0xC2 + $V{$_f}*8, '%m', '%m');
 		}
 	}
-	
-	for ([hl => ()], [ix => 0xDD], [iy => 0xFD]) {
+	for ([hl => ()]) {
 		my($x, @pfx) = @$_;
 		add_opc($cpu, "jp ($x)", @pfx, 0xE9);
 	}
+	
+        if ( !$i8080 ) {
+		for ([ix => 0xDD], [iy => 0xFD]) {
+			my($x, @pfx) = @$_;
+			add_opc($cpu, "jp ($x)", @pfx, 0xE9);
+		}
+	} 
 
 	if ($rabbit) {
 		# TODO: LJP not supported
@@ -476,10 +506,17 @@ for my $cpu (@CPUS) {
 	add_opc($cpu, "rst %c", "0xC7+%c");
 	
 	# Block transfer group
-	add_opc($cpu, "ldi", 	0xED, 0xA0);
-	add_opc($cpu, "ldir", 	0xED, 0xB0);
-	add_opc($cpu, "ldd", 	0xED, 0xA8);
-	add_opc($cpu, "lddr", 	0xED, 0xB8);
+        if ( $i8080 ) {
+		add_opc($cpu, "ldi", 	0xCD, '@__z80asm__ldi');
+		add_opc($cpu, "ldir", 	0xCD, '@__z80asm__ldir');
+		add_opc($cpu, "ldd", 	0xCD, '@__z80asm__ldd');
+		add_opc($cpu, "lddr", 	0xCD, '@__z80asm__lddr');
+	} else {
+		add_opc($cpu, "ldi", 	0xED, 0xA0) if !$i8080;
+		add_opc($cpu, "ldir", 	0xED, 0xB0) if !$i8080;
+		add_opc($cpu, "ldd", 	0xED, 0xA8) if !$i8080;
+		add_opc($cpu, "lddr", 	0xED, 0xB8) if !$i8080;
+	}
 
 	if ($r3k) {
 		add_opc($cpu, "ldisr", 	0xED, 0x90);
@@ -659,6 +696,7 @@ for my $cpu (@CPUS) {
 for my $asm (sort keys %Tests) {
 	my $asmf = sprintf(" %-31s", $asm);
 	for my $cpu (@CPUS) {
+        	next if $cpu eq "8080";
 		if (exists $Tests{$asm}{$cpu}) {
 			for my $ixiy ('', '_ixiy') {
 				my $asm1 = $asm;
@@ -717,7 +755,7 @@ sub add_opc_1 {
 	# expand (ix+%d)
 	return if $asm =~ /^(ldp|jp)/;
 	
-	if ($asm =~ /\(hl\)/) {
+	if ($asm =~ /\(hl\)/ && $cpu ne "8080" ) {
 		(my $asm1 = $asm) =~ s/\(hl\)/(ix+%d)/g;
 		add_opc_2($cpu, $asm1, $V{ix}, $bin[0], '%d', @bin[1..$#bin]);
 		(   $asm1 = $asm) =~ s/\(hl\)/(iy+%d)/g;
@@ -1117,7 +1155,12 @@ sub add_tests {
 		add_tests($cpu, replace($asm, '%M',-32768), replace($bin, '%M %M', 0x80." ".0x00));
 	}
 	elsif ($asm =~ /%j/) {
-		add_tests($cpu, replace($asm, '%j', "ASMPC"), replace($bin, '%j', 0xFE));
+		if ( $cpu eq "8080" ) {
+			# Bit of a hack for the relative jump replacement on the 8080
+			# I can't figure out how to add a test that will only affect 8080, not all cpus
+		} else {
+			add_tests($cpu, replace($asm, '%j', "ASMPC"), replace($bin, '%j', 0xFE));
+		}
 	}
 	elsif ($asm =~ /^rst %c/) {		# special case
 		for my $div (1, 8) {

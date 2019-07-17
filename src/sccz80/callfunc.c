@@ -306,17 +306,17 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
                 loadargc(nargs);
             }
         }
-        if ( strcmp(funcname,"__builtin_strcpy") == 0) {
+        if ( strcmp(funcname,"__builtin_strcpy") == 0 && !IS_8080() ) {
             gen_builtin_strcpy();
             nargs = 0;
             Zsp += 2;
-        } else if ( strcmp(funcname,"__builtin_strchr") == 0) {
+        } else if ( strcmp(funcname,"__builtin_strchr") == 0 && !IS_8080() ) {
             gen_builtin_strchr(isconstarg[2] ? constargval[2] : -1);
             nargs = 0;
-        } else if ( strcmp(funcname, "__builtin_memset") == 0 ) {
+        } else if ( strcmp(funcname, "__builtin_memset") == 0 && !IS_8080() ) {
             gen_builtin_memset(isconstarg[2] ? constargval[2] : -1,  constargval[3]);
             nargs = 0;
-        } else if ( strcmp(funcname, "__builtin_memcpy") == 0 ) {
+        } else if ( strcmp(funcname, "__builtin_memcpy") == 0 && !IS_8080() ) {
             gen_builtin_memcpy(isconstarg[2] ? constargval[2] : -1,  constargval[3]);
             nargs = 0;
         } else if ( functype->flags & SHORTCALL ) {
@@ -333,7 +333,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
         Zsp += nargs;
         // IF we called a far pointer and we had arguments, pop the address off the stack
         if ( function_pointer_call && fnptr_type->kind == KIND_CPTR && nargs ) {
-            Zsp = modstk(Zsp + 4, functype->return_type->kind != KIND_DOUBLE || c_fp_size == 4, preserve); 
+            Zsp = modstk(Zsp + 4, functype->return_type->kind != KIND_DOUBLE || c_fp_size == 4, preserve,YES); 
         }
     } else {
         /* If we have a frame pointer then ix holds it */
@@ -347,7 +347,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             Zsp += nargs;
         } else
 #endif
-            Zsp = modstk(Zsp + nargs, functype->return_type->kind != KIND_DOUBLE || c_fp_size == 4, preserve);  /* clean up arguments - we know what type is MOOK */
+            Zsp = modstk(Zsp + nargs, functype->return_type->kind != KIND_DOUBLE || c_fp_size == 4, preserve, YES);  /* clean up arguments - we know what type is MOOK */
     }
 }
 

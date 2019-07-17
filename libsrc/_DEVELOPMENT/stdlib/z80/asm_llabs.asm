@@ -9,6 +9,8 @@
 ;
 ; ===============================================================
 
+IF !__CPU_8080__
+
 SECTION code_clib
 SECTION code_stdlib
 
@@ -30,3 +32,4 @@ asm_llabs:
    ret z
    
    jp l_neg_64_dehldehl
+ENDIF

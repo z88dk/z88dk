@@ -34,6 +34,8 @@
 ; 17, 32 +n = set paper
 ; 22,y+32,x+32 = Move to position
 
+
+IF !__CPU_8080__
 		defc		SUPPORT_vt52=1
 		; Extra VT52 codes - clear to end of line + clear to end of screen
 		defc		SUPPORT_vt52x=0
@@ -60,14 +62,19 @@
 
 
 
-
 ; extern int __LIB__ fputc_cons(char c);
 fputc_cons_generic:
 _fputc_cons_generic:
 	ld	hl,2
 	add	hl,sp
 	ld	d,(hl)
+IF __CPU_8080__
+	ld	hl,(__console_x)
+	ld	c,l
+	ld	b,h
+ELSE
 	ld	bc,(__console_x)		;coordinates
+ENDIF
 	ld	hl,params_left
 	ld	a,(hl)
 	and	a
@@ -427,3 +434,4 @@ generic_console_flags:		defb	0		; bit 0 = raw mode enabled
 							; bit 6 = vscroll disabled
 							; bit 7 = inverse on
 
+ENDIF

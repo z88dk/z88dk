@@ -66,12 +66,29 @@ PUBLIC ASMDISP_HEAPFREE_CALLEE
 
    or h                      ; if there is no next block...
    jr z, placeatend
-   
+
+IF __CPU_8080__
+   ld a,l
+   sub c
+   ld l,a
+   ld a,h
+   sbc b
+   ld  h,a
+ELSE
    sbc hl,bc                 ; next block - address following block to free
+ENDIF
    jr z, mergeontop
    jr nc, insertbefore
-   
+IF __CPU_8080__
+   ld a,l
+   adc c
+   ld l,a
+   ld a,h
+   adc b
+   ld  h,a
+ELSE   
    adc hl,bc
+ENDIF
    inc hl                    ; hl = & next block->next
    pop de                    ; junk lagger
    
@@ -147,7 +164,16 @@ PUBLIC ASMDISP_HEAPFREE_CALLEE
    ; de = & block to free
    ; stack = & lagger->next
    
+IF __CPU_8080__
+   ld a,l
+   sub e
+   ld l,a
+   ld a,h
+   sbc d
+   ld  h,a
+ELSE
    sbc hl,de                 ; carry must be clear here
+ENDIF
    pop hl
    jr z, mergebelow
    

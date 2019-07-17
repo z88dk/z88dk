@@ -933,7 +933,7 @@ int declare_local(int local_static)
                         sym->offset.i -= (alloc_size -size);
                         sym->size += (alloc_size - size);
                     }
-                    Zsp = modstk(Zsp - declared, NO, NO);
+                    Zsp = modstk(Zsp - declared, KIND_NONE, NO, YES);
                     declared = 0;
                     copy_to_stack(newname, 0, alloc_size);
                 } else {
@@ -943,7 +943,7 @@ int declare_local(int local_static)
                     int   vconst;
                     double val;
 
-                    Zsp = modstk(Zsp - (declared - type->size), NO, NO);
+                    Zsp = modstk(Zsp - (declared - type->size), KIND_NONE, NO, YES);
                     declared = 0;
                     setstage(&before, &start);
                     expr = expression(&vconst, &val, &expr_type);

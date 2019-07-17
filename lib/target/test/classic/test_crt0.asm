@@ -86,7 +86,11 @@ endif
 if (ASMPC<>$0038)
         defs    CODE_ALIGNMENT_ERROR
 endif
+IF !__CPU_8080__
 	jp	asm_im1_handler
+ELSE
+	ret
+ENDIF
 
 ; Restart routines, nothing sorted yet
 restart08:
@@ -103,7 +107,9 @@ program:
         INCLUDE "crt/classic/crt_init_sp.asm"
         INCLUDE "crt/classic/crt_init_atexit.asm"
 	call    crt0_init_bss
-	ld	(exitsp),sp
+	ld	hl,0
+	add	hl,sp
+	ld	(exitsp),hl
 IF !__CPU_R2K__
     	ei
 ENDIF
@@ -115,7 +121,7 @@ IF DEFINED_USING_amalloc
 ENDIF
 	ld	a,(argv_length)
 	and	a
-	jr	z,argv_done
+	jp	z,argv_done
 	ld	c,a
 	ld	b,0
 	ld	hl,argv_start

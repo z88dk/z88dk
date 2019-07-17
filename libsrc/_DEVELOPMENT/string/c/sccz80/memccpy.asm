@@ -10,6 +10,26 @@ EXTERN asm_memccpy
 
 memccpy:
 
+IF __CPU_8080__
+	ld hl,2
+        add hl,sp
+        ld  c,(hl)
+        inc hl
+        ld  b,(hl)
+        inc hl
+        ld  a,(hl)
+        inc hl
+        inc hl
+        ld  e,(hl)
+        inc hl
+        ld  d,(hl)
+        inc hl
+        push de
+        ld  e,(hl)
+        inc hl
+        ld  d,(hl)
+        pop hl
+ELSE
    pop ix
 	pop bc
 	pop de
@@ -22,6 +42,7 @@ memccpy:
 	push de
 	push bc
 	push ix
+ENDIF
 
    jp asm_memccpy
 

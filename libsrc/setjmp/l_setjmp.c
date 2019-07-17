@@ -16,17 +16,24 @@ int l_setjmp(jmp_buf *env)
 #pragma asm
 	pop	bc	;return address
 	pop	hl	;&env
+IF !__CPU_8080__
 	push	iy
 	pop	de	;de=iy, hl=&env
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d
 	inc	hl
+	inc	hl
 	push	ix
 	pop	de	;de=ix, hl=&env
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d
+ELSE
+	inc	hl
+	inc	hl
+	inc	hl
+ENDIF
 	inc	hl
 	ex	de,hl	;de=&env, hl=scratch
 	ld	hl,0

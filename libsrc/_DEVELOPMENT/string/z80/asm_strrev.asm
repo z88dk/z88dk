@@ -35,6 +35,18 @@ asm_strrev:
       
    push de                     ; save char *s
 
+IF __CPU_8080__
+   ld a,b
+   rla
+   ld a,b
+   rra
+   cpl
+   ld b,a
+   ld a,c
+   rra
+   cpl 
+   ld c,a
+ELSE
    ld a,b                      ; bc = ceil(-((-strlen-1)/2)-1)
    sra a                       ;    = ceil((strlen-1)/2)
    rr c                        ; -1 maps to 0 (strlen = 0)
@@ -43,6 +55,7 @@ asm_strrev:
    ld a,c                      ; -4 maps to 1 (strlen = 3)
    cpl                         ; etc, yields number of chars to swap
    ld c,a
+ENDIF
 
    or b
    jr z, exit                  ; if numswaps == 0, exit

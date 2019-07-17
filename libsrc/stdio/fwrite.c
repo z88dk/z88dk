@@ -11,8 +11,12 @@ static int wrapper() __naked
 	GLOBAL _fwrite
 fwrite:
 _fwrite:
+IF __CPU_8080__
+	ld	hl,-1
+	ret
+ELSE
 	push	ix	;save callers
-IF __CPU_R2K__ | __CPU_R3K__
+  IF __CPU_R2K__ | __CPU_R3K__
 	ld	hl,(sp + 8)	; size
 	ld	c,l
 	ld	b,h
@@ -24,7 +28,7 @@ IF __CPU_R2K__ | __CPU_R3K__
 	ld	ix,(sp + 4)	;fp
 	ld	hl,(sp + 10)	;ptr
 	ex	de,hl
-ELSE
+  ELSE
 	ld	ix,0
 	add	ix,sp
 	ld	l,(ix+6)	;nmemb
@@ -43,7 +47,7 @@ ELSE
 	ld	h,(ix+5)
 	push	hl	
 	pop	ix		;ix = fp
-ENDIF
+  ENDIF
 	ld	hl,0		;bytes written
 	; Check that we have a non-system reader thats in use
 	ld	a,(ix + fp_flags)
@@ -60,14 +64,14 @@ fwrite_done:
 	; hl = bytes read
 	; divide and return
 	ex	de,hl
-IF __CPU_R2K__ | __CPU_R3K__
+  IF __CPU_R2K__ | __CPU_R3K__
 	ld	hl,(sp + 8)	;size
-ELSE
+  ELSE
 	ld	ix,0
 	add	ix,sp
 	ld	l,(ix+8)	;size
 	ld	h,(ix+9)
-ENDIF
+  ENDIF
 	call	l_div_u		;hl = de/hl = bytes_written/size
 fwrite_exit:
 	pop	ix		;restore callers
@@ -82,21 +86,21 @@ _fwrite1:
         bit	5,(ix+fp_flags)		;_IOEXTRA
         jr      z,fwrite_direct
         ; Calling via the extra hook
-IF __CPU_R2K__ | __CPU_R3K__
+  IF __CPU_R2K__ | __CPU_R3K__
         ld      hl,(ix+fp_extra)
-ELSE
+  ELSE
         ld      l,(ix+fp_extra)
         ld      h,(ix+fp_extra+1)
-ENDIF
+  ENDIF
         ld      a,__STDIO_MSG_WRITE
         jp      l_jphl
 fwrite_direct:
-IF __CPU_R2K__ | __CPU_R3K__
+  IF __CPU_R2K__ | __CPU_R3K__
         ld      hl,(ix+fp_desc)
-ELSE
+  ELSE
         ld      l,(ix+fp_desc)
         ld      h,(ix+fp_desc+1)
-ENDIF
+  ENDIF
         push    hl
         push    de
         push    bc
@@ -105,5 +109,6 @@ ENDIF
         pop     bc
         pop     bc
         ret
+ENDIF
 #endasm
 }

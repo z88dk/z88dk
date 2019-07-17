@@ -26,7 +26,13 @@ getch:
 _getch:
 	ld	hl,(kbhit_key)
 	ld	de,0
+IF __CPU_8080__
+	ex	de,hl
+	ld	(kbhit_key),hl
+	ex	de,hl
+ELSE
 	ld	(kbhit_key),de
+ENDIF
 	ld	a,h
 	or	l
 	ret	nz		; consume that keypress

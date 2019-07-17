@@ -840,7 +840,7 @@ elem_t *get_elem_for_fa(unsigned char fa[], double value)
     elem_t  *elem;
 
     LL_FOREACH(double_queue, elem ) {
-        if ( memcmp(elem->fa, fa, c_fp_mantissa_bytes + 1) == 0 ) {
+        if ( memcmp(elem->fa, fa, MAX_MANTISSA_SIZE) == 0 ) {
             return elem;
         }
     }

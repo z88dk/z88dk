@@ -2,7 +2,6 @@
 
 
 
-
 #include "string_tests.h"
 
 
@@ -51,3 +50,4 @@ int test_strlcat()
 
     return suite_run();
 }
+

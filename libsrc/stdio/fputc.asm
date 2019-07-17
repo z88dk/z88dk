@@ -15,11 +15,15 @@ EXTERN asm_fputc_callee
         push    hl
         push    de
 
+IF !__CPU_8080__
         push    ix        ;callers ix
         push    hl
         pop     ix
    	call    asm_fputc_callee 
         pop     ix
+ELSE
+	call	asm_fputc_callee
+ENDIF
         ret
    
 

@@ -1,6 +1,7 @@
 ; Substitute for z80 rrd instruction
 ; aralbrec 06.2007
 
+IF !__CPU_8080__
 SECTION code_crt0_sccz80
 PUBLIC __z80asm__rrd
 
@@ -34,3 +35,4 @@ PUBLIC __z80asm__rrd
    
    or a
    ret
+ENDIF

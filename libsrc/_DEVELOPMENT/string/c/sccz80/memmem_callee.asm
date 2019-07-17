@@ -1,6 +1,7 @@
 
 ; void *memmem(const void *big, size_t big_len, const void *little, size_t little_len)
 
+IF !__CPU_8080__
 SECTION code_clib
 SECTION code_string
 
@@ -41,3 +42,4 @@ PUBLIC _memmem_callee
 defc _memmem_callee = memmem_callee
 ENDIF
 
+ENDIF

@@ -11,8 +11,8 @@ stdio/rcmx000/fputc_cons
 @debug/debug.lst
 @stdlib/stdlib.lst
 @strings/string.lst
-setjmp/l_longjmp
-setjmp/l_setjmp
+setjmp/obj/r2k/l_longjmp
+setjmp/obj/r2k/l_setjmp
 @assert/assert.lst
 time/rcmx000/clock
 @rect/rect.lst

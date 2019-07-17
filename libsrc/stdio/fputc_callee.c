@@ -19,7 +19,7 @@
 
 
 
-static void wrapper() __naked
+static void wrapper_fputc_callee() __naked
 {
 //#ifdef Z80
 #asm
@@ -32,21 +32,26 @@ _fputc_callee:
 	pop	bc	;c
 	push 	de
 
+IF !__CPU_8080__
         push	ix
 
-IF __CPU_R2K__ | __CPU_R3K__
+  IF __CPU_R2K__ | __CPU_R3K__
 	ld	ix,hl
-ELSE
+  ELSE
 	push	hl
 	pop	ix
+  ENDIF
 ENDIF
 	call	asm_fputc_callee
 
+IF !__CPU_8080__
 	pop	ix	
+ENDIF
 	ret
 
 	PUBLIC	asm_fputc_callee
 
+IF !__CPU_8080__
 ; Entry:	ix = fp
 ; 		bc = character to print
 ; Exit:		hl = byte written
@@ -143,5 +148,69 @@ ENDIF
 	pop	hl	;discard values
 	pop	bc	; fd
 	ret
+ENDIF
+#endasm
+}
+
+static void wrapper_fputc_callee_8080() __naked
+{
+//#ifdef Z80
+#asm
+IF __CPU_8080__
+; Entry:	hl = fp
+; 		bc = character to print
+; Exit:		hl = byte written
+asm_fputc_callee:
+	ex	de,hl
+        ld      hl,-1   ;EOF
+        inc     de
+        inc     de      ;fp_flags
+        ld      a,(de)
+        and     a       ;no thing
+        ret     z
+        and     _IOREAD
+        ret     nz      ;don`t want reading streams
+        ld      a,(de)
+        and     _IOSTRING
+        jr      z,no_string
+        ex      de,hl
+        dec     hl      ;fp_desc+1
+        ld      d,(hl)
+        dec     hl      ;&fp_desc
+        ld      e,(hl)
+        ld      a,c     ;store character
+        ld      (de),a
+        inc     de      ;inc pointer and store
+        ld      (hl),e
+        inc     hl      ;fp_desc+1
+        ld      (hl),d
+        ld      l,c     ;load char to return
+        ld      h,0
+        ret
+.no_string
+        dec     de
+        dec     de      ;fp_desc
+        push    de
+        call    fchkstd ;preserves bc
+        pop     de
+        jr      c,no_cons
+; Output to console
+        push    bc
+        call    fputc_cons
+        pop     hl
+        ret
+.no_cons
+; Output to file
+        ex      de,hl
+        ld      e,(hl)  ;fp_desc
+        inc     hl
+        ld      d,(hl)
+        push    de      ;fd
+        push    bc      ;c
+        call    writebyte
+        pop     bc      ;discard values
+        pop     bc
+	ret
+ENDIF
 #endasm
 }

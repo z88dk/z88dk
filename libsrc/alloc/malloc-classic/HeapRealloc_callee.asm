@@ -91,8 +91,17 @@ EXTERN ASMDISP_HEAPALLOC_CALLEE, ASMDISP_HEAPFREE_CALLEE
    ld l,(hl)
    ld h,a                    ; hl = size of old block
    
+IF __CPU_8080__
+   ld a,l
+   sub c
+   ld l,a
+   ld a,h
+   sbc b
+   ld  h,a
+ELSE
    or a
    sbc hl,bc                 ; old size - new size
+ENDIF
    jr nc, usenewsize
    add hl,bc
    ld c,l
@@ -107,7 +116,19 @@ EXTERN ASMDISP_HEAPALLOC_CALLEE, ASMDISP_HEAPFREE_CALLEE
    pop hl
    push hl
    push de
+IF __CPU_8080__
+ldir_loop:
+   ld a,(hl)
+   ld (de),a
+   inc hl
+   inc de
+   dec bc
+   ld a,b
+   or c
+   jp nz,ldir_loop
+ELSE
    ldir                      ; copy old data block to new data block
+ENDIF
    
    ; stack = & heap, & old block (+2), & new block (+2)
    

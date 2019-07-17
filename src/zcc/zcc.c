@@ -205,6 +205,7 @@ static char           *c_clib = NULL;
 static int             c_startup = -2;
 static int             c_startupoffset = -1;
 static int             c_nostdlib = 0;
+static int             m8080 = 0;
 static int             mz180 = 0;
 static int             mr2k = 0;
 static int             mr3k = 0;
@@ -407,6 +408,7 @@ static arg_t     myargs[] = {
     { "create-app", AF_BOOL_TRUE, SetBoolean, &createapp, NULL, "Run appmake on the resulting binary to create emulator usable file" },
     { "specs", AF_BOOL_TRUE, SetBoolean, &c_print_specs, NULL, "Print out compiler specs" },
     { "compiler", AF_MORE, SetString, &c_compiler_type, NULL, "Set the compiler type from the command line (sccz80, sdcc)" },
+    { "m8080", AF_BOOL_TRUE, SetBoolean, &m8080, NULL, "Target the 8080 cpu" },
     { "mz80n", AF_BOOL_TRUE, SetBoolean, &mz80n, NULL, "Target the ZX Next z80n cpu" },
     { "mz180", AF_BOOL_TRUE, SetBoolean, &mz180, NULL, "Target the z180 cpu" },
     { "mr2k", AF_BOOL_TRUE, SetBoolean, &mr2k, NULL, "Target the Rabbit 2000 cpu" },
@@ -483,6 +485,7 @@ enum {
     CPU_MAP_TOOL_Z80ASM = 0,
     CPU_MAP_TOOL_SCCZ80,
     CPU_MAP_TOOL_ZSDCC,
+    CPU_MAP_TOOL_COPT,
     CPU_MAP_TOOL_SIZE
 };
 
@@ -498,15 +501,17 @@ enum {
     CPU_TYPE_Z180,
     CPU_TYPE_R2K,
     CPU_TYPE_R3K,
+    CPU_TYPE_8080,
     CPU_TYPE_SIZE
 };
 
 cpu_map_t cpu_map[CPU_TYPE_SIZE] = {
-    { "-mz80",     "-mz80" , "-mz80" },                     // CPU_TYPE_Z80     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
-    { "-mz80n",    "-mz80n", "-mz80" },                     // CPU_TYPE_Z80N    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
-    { "-mz180",    "-mz180", "-mz180 -portmode=z180" },     // CPU_TYPE_Z180    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
-    { "-mr2k",     "-mr2k",  "-mr2k" },                     // CPU_TYPE_R2K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
-    { "-mr3k",     "-mr3k",  "-mr3ka" },                    // CPU_TYPE_R3K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
+    { "-mz80",     "-mz80" , "-mz80", "" },                     // CPU_TYPE_Z80     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
+    { "-mz80n",    "-mz80n", "-mz80", "" },                     // CPU_TYPE_Z80N    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
+    { "-mz180",    "-mz180", "-mz180 -portmode=z180", "" },     // CPU_TYPE_Z180    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
+    { "-mr2k",     "-mr2k",  "-mr2k", "" },                     // CPU_TYPE_R2K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
+    { "-mr3k",     "-mr3k",  "-mr3ka", "" },                    // CPU_TYPE_R3K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
+    { "-m8080",    "-m8080" , "-mz80", "-m8080" },                    // CPU_TYPE_8080     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
 };
 
 char *select_cpu(int n)
@@ -522,6 +527,10 @@ char *select_cpu(int n)
 
     if (mz80n)
         return cpu_map[CPU_TYPE_Z80N].tool[n];
+
+    if (m8080)
+        return cpu_map[CPU_TYPE_8080].tool[n];
+
 
     return cpu_map[CPU_TYPE_Z80].tool[n];
 }
@@ -1544,6 +1553,7 @@ int main(int argc, char **argv)
 
 static void apply_copt_rules(int filenumber, int num, char **rules, char *ext1, char *ext2, char *ext)
 {
+    char   argbuf[FILENAME_MAX+1];
     int    i;
     char  *input_ext;
     char  *output_ext;
@@ -1560,8 +1570,8 @@ static void apply_copt_rules(int filenumber, int num, char **rules, char *ext1, 
         if ( i == (num-1) ) {
             output_ext = ext;
         }
-
-        if (process(input_ext, output_ext, c_copt_exe, rules[i], filter, filenumber, YES, NO))
+        snprintf(argbuf,sizeof(argbuf),"%s %s", select_cpu(CPU_MAP_TOOL_COPT), rules[i]);
+        if (process(input_ext, output_ext, c_copt_exe, argbuf, filter, filenumber, YES, NO))
             exit(1);
     }
 }

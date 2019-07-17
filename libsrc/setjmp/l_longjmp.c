@@ -20,6 +20,7 @@ void l_longjmp(jmp_buf *env, int val)
 	inc	bc	;cant return 0
 .longjmp1
 	pop	hl	;&env
+IF !__CPU_8080__
 	ld	e,(hl)	;ix
 	inc	hl
 	ld	d,(hl)
@@ -29,9 +30,14 @@ void l_longjmp(jmp_buf *env, int val)
 	ld	e,(hl)	;ix
 	inc	hl
 	ld	d,(hl)
-	inc	hl
 	push	de
 	pop	ix
+ELSE
+	inc	hl
+	inc	hl
+	inc	hl
+ENDIF
+	inc	hl
 	ld	e,(hl)	;sp
 	inc	hl
 	ld	d,(hl)	

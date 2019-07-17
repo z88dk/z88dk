@@ -31,8 +31,18 @@ asm_strlen:
    ld b,a
    
    cpir
-   
+
+IF __CPU_8080__
+   ld a,$ff
+   sub c
+   ld  l,a
+   ld  a,$ff
+   sbc b
+   ld  h,a
+   ld  a,0
+ELSE
    ld hl,$ffff
    sbc hl,bc
+ENDIF
 
    ret

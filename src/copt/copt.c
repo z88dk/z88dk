@@ -30,6 +30,7 @@ int rpn_eval(const char* expr, char** vars);
 #define MAX_PASS 16
 
 int debug = 0;
+char *c_cpu = "z80";
 int global_again = 0; /* signalize that rule set has changed */
 #define FIRSTLAB 'L'
 #define LASTLAB 'N'
@@ -504,6 +505,11 @@ struct lnode* opt(struct lnode* r)
             if (strncmp(p->l_text, "%check", 6) == 0) {
                 if (!check(p->l_text + 6, vars))
                     break;
+            } else if ( strncmp(p->l_text, "%notcpu", 7) == 0 ) {
+                char  tbuf[1024];
+                snprintf(tbuf,sizeof(tbuf),"%.*s",(int)strlen(p->l_text + 8)-1,p->l_text + 8);
+                if ( strcmp(tbuf, c_cpu) == 0 )
+                    break;
             } else if ( strncmp(p->l_text, "%eval", 5) == 0 ) {
                 if (!check_eval(p->l_text + 5, vars))
                     break;
@@ -614,6 +620,8 @@ int main(int argc, char** argv)
     for (i = 1; i < argc; i++)
         if (strcasecmp(argv[i], "-D") == 0)
             debug = 1;
+        else if ( strcmp(argv[i], "-m8080") == 0 ) 
+            c_cpu = argv[i] + 2;
         else if ((fp = fopen(argv[i], "r")) == NULL)
             error("copt: can't open patterns file\n");
         else

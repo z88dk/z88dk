@@ -24,11 +24,11 @@
 	ld	de,10	;const
 	ex	de,hl
 	call	l_pint
-	pop	de
+	pop	bc
 	ld	hl,16	;const
 	add	hl,sp
 	ld	sp,hl
-	push	de
+	push	bc
 	ret
 
 

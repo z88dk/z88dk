@@ -26,11 +26,21 @@ crt0_init_bss:
         EXTERN  __BSS_END_tail
 IF CRT_INITIALIZE_BSS = 1
         ld      hl,__BSS_head
-        ld      de,__BSS_head + 1
         ld      bc,__BSS_END_tail - __BSS_head - 1
+  IF !__CPU_8080__
+        ld      de,__BSS_head + 1
         xor     a 
 	ld	(hl),a
         ldir
+  ELSE
+init_8080_1:
+	ld	(hl),0
+	inc	hl
+	dec	bc
+	ld	a,b
+	or	c
+	jp	nz,init_8080_1
+  ENDIF
 ELSE
         xor     a 
 ENDIF
