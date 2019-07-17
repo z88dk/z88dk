@@ -2136,7 +2136,6 @@ static void add_if_negative(LVALUE *lval, int32_t toadd)
             ol("bit\t7,d");
             ot("jr\tz,");
         }
-        ot("jr\tz,");
         printlabel(label);
         nl();     
     } else {
