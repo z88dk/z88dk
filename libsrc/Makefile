@@ -591,9 +591,17 @@ cpm_clib.lib:
 	$(MAKE) -C fcntl/cpm
 	TARGET=cpm TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm_clib @$(LISTFILE_DIRECTORY)/cpm.lst
 	@echo ''
+	@echo '--- Building CP/M Library (8080)---'
+	@echo ''
+	TARGET=cpm TYPE=8080 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm8080_clib @$(LISTFILE_DIRECTORY)/cpm_8080.lst
+	@echo ''
 	@echo '--- Building CP/M Device fnctl Library ---'
 	@echo ''
 	TARGET=cpm TYPE=z80 DEVICE=device $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/cpmdevice @fcntl/cpm/fcntl.lst
+	@echo ''
+	@echo '--- Building CP/M Device fnctl Library (8080) ---'
+	@echo ''
+	TARGET=cpm TYPE=8080 DEVICE=device $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/cpmdevice @fcntl/cpm/fcntl.lst
 	@echo ''
 	@echo '--- Building Kaypro graphics Library ---'
 	@echo ''

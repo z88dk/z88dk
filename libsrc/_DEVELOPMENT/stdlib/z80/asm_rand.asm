@@ -34,7 +34,13 @@ asm_rand:
    ; get current seed
    
    ld hl,(__stdlib_seed)
+IF __CPU_8080__
+   ex de,hl
+   ld hl,(__stdlib_seed + 2)
+   ex de,hl
+ELSE
    ld de,(__stdlib_seed + 2)
+ENDIF
 
    ; generate next prng in sequence
    
@@ -43,7 +49,14 @@ asm_rand:
    ; store new seed
 
    ld (__stdlib_seed),hl
+IF __CPU_8080__
+   ex de,hl
+   ld (__stdlib_seed + 2),hl
+   ex de,hl
+
+ELSE
    ld (__stdlib_seed + 2),de
+ENDIF
    
    ; create a 15-bit result that includes 0
    

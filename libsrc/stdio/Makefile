@@ -25,6 +25,8 @@ obj/binary/%.o: %.asm
 obj/binary/%.o: %.c
 	$(ZCC) +cpm $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -c -o $@ $^
 
+
+
 obj/8080/%.o: %.asm
 	$(ZCC) +cpm -m8080 $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -Ca-I../ -c -o $@ $^
 
@@ -48,7 +50,7 @@ obj/stdesc/%.o: %.c
 
 .PHONY: dirs
 dirs:
-	@mkdir -p obj obj/net obj/net/zsock obj/ixiy obj/binary obj/stdesc obj/r2k obj/8080 obj/8080/8080
+	@mkdir -p obj obj/net obj/net/zsock obj/ixiy obj/binary obj/stdesc obj/r2k obj/8080 obj/8080/8080 obj/binary-8080 obj/binary-8080/8080
 
 
 

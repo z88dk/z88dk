@@ -107,8 +107,12 @@ vstfcu:
 	push de
 	push bc
 
+IF !__CPU_8080__
 	push	hl
 	pop		ix
+ELSE
+	ld	(__fcb_ptr),hl
+ENDIF
 
 
  PUSH	BC	;save BC
@@ -134,7 +138,14 @@ setfc1:
 	RLCA
 	RLCA
 	;; LD	(usrnum),A	;and save
+IF __CPU_8080__
+	ld	hl,(__fcb_ptr)
+	ld	bc,37
+	add	hl,bc
+	ld	(hl),a
+ELSE
 	ld	(ix+37),a
+ENDIF
 	pop	HL	;restore junk
 	pop	BC
 	JP	vsetfcb	;and parse rest of filename
@@ -319,6 +330,12 @@ isdec:
 	CP	'9'+1
 	CCF
 	ret
+
+IF __CPU_8080__
+	SECTION		bss_compiler
+__fcb_ptr:	defw	0
+ENDIF
+
 
 #endasm
 

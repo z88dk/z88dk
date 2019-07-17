@@ -1,5 +1,4 @@
 
-#ifndef __8080__
 #include "string_tests.h"
 
 
@@ -65,4 +64,3 @@ int test_strrev()
 
     return suite_run();
 }
-#endif
