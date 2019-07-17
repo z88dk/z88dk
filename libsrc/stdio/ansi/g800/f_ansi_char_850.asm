@@ -626,6 +626,7 @@ vram_addr_row:
 	ld D, (IX+1)
 	ld E, (IX+0)
 	ret
+
 row_table:
 	defw vram0
 	defw vram1
@@ -891,7 +892,7 @@ ENDIF
 ; AF, BC, HL: Destroyed
 ;
 scroll_up:
-	ld HL, (screen_region)
+	ld HL, 7
 	ld C, 1
 
 ;
@@ -1067,8 +1068,9 @@ refresh_screen_loop:
 
 
 	
+; DATA section required, so we get a pre-initialized, scrollable region
 
-	SECTION  bss_clib
+	SECTION  data_clib
 	
 ; Virtual VRAM
 vram:
