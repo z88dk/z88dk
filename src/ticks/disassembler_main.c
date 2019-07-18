@@ -30,6 +30,7 @@ static void usage(char *program)
     printf("  -mr800         Disassemble R800 code\n");
     printf("  -mgbz80        Disassemble Gameboy z80 code\n");
     printf("  -m8080         Disassemble 8080 code (with z80 mnenomics)\n");
+    printf("  -m8085         Disassemble 8085 code (with z80 mnenomics)\n");
     printf("  -x <file>      Symbol file to read\n");
 
     exit(1);
@@ -93,6 +94,8 @@ int main(int argc, char **argv)
                     c_cpu = CPU_GBZ80;
                 } else if ( strcmp(&argv[0][1],"m8080") == 0 ) {
                     c_cpu = CPU_8080;
+                } else if ( strcmp(&argv[0][1],"m8085") == 0 ) {
+                    c_cpu = CPU_8085;
                 } else if ( strcmp(&argv[0][1],"mez80") == 0 ) {
                     c_cpu = CPU_EZ80;
                 } else {
