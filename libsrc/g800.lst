@@ -8,7 +8,12 @@ stdio/ansi/g800/f_ansi_cls
 stdio/ansi/g800/f_ansi_dline
 stdio/ansi/g800/f_ansi_scrollup
 @stdio/stdio.lst
+games/g800/bit_open
+games/g800/bit_open_di
+games/g800/bit_close
+games/g800/bit_close_ei
 games/joystick
+@games/games.lst
 @z80.lst
 graphics/clg
 graphics/dcircle
