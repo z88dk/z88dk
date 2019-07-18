@@ -2251,7 +2251,10 @@ int zdiv_dconst(LVALUE *lval, double value, int isrhs)
 void zmod(LVALUE* lval)
 {
     if (c_notaltreg && (lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR)) {
-        callrts("l_long_mod2");
+        if (ulvalue(lval))
+            callrts("l_long_mod_u");
+        else
+            callrts("l_long_mod");
     } else {
         zdiv(lval);
         if (lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR)
