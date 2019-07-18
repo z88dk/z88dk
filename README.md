@@ -2,7 +2,7 @@
 
 ![WinXP+](doc/images/windows.png) ![MacOSX](doc/images/mac.png) ![Linux and Other](doc/images/linux.png) [![Build Status](https://travis-ci.org/z88dk/z88dk.svg?branch=master)](https://travis-ci.org/z88dk/z88dk)
 
-Z88DK is a collection of software development tools that targets 8080 and z80 machines.  It allows development of programs in C, assembly language or any mixture of the two.  What makes z88dk unique is its ease of use, built-in support for many z80 machines and its extensive set of assembly language library subroutines implementing the C standard and extensions.
+Z88DK is a collection of software development tools that targets the 8080 and z80 family of machines.  It allows development of programs in C, assembly language or any mixture of the two.  What makes z88dk unique is its ease of use, built-in support for many z80 machines and its extensive set of assembly language library subroutines implementing the C standard and extensions.
 
 ## THE TOOLS
 
@@ -62,7 +62,7 @@ The z88dk repository uses git submodules, these are not automatically downloaded
 	  * **Copy the new lib library files** from any nightly build by copying the z88dk/libsrc/_DEVELOPMENT/lib tree to the same place in your z88dk tree.
 	  * **Build the new lib library files from source**  After setting the environment variables as detailed below, open a command prompt, cd to z88dk/libsrc/_DEVELOPMENT and enter "Winmake all" for windows or "make" for other platforms.
 
-We do not maintain the zsdcc or zsdcpp source code in the repository.  Instead zsdcc is built separately from a [patched sdcc](https://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/sdcc_z88dk_patch.zip).  We supply the zsdcc and zsdcpp binaries for win32 and osx in the nightly build so if you are using win32 or osx and you copied z88dk/bin, you will already have zsdcc and zsdcpp installed.  Other users will have to build the zsdcc binary by following these [instructions](https://www.z88dk.org/wiki/doku.php?id=temp:front#sdcc1).
+We do not maintain the zsdcc or zsdcpp source code in the repository.  Instead zsdcc is built separately from a [patched sdcc](https://github.com/z88dk/z88dk/tree/master/src/zsdcc).  We supply the zsdcc and zsdcpp binaries for win32 and osx in the nightly build so if you are using win32 or osx and you copied z88dk/bin, you will already have zsdcc and zsdcpp installed.  Other users will have to build the zsdcc binary by following these [instructions](https://www.z88dk.org/wiki/doku.php?id=temp:front#sdcc1).
 
 The last step for installation is to set the ZCCCFG environment variable and your PATH appropriately.  You can find that information [here](https://github.com/z88dk/z88dk/wiki/installation).
 
