@@ -9,6 +9,10 @@
 
 pow:
 	call	___mbf32_setup_two
+IF __CPU_8080__
+	call	___mbf32_POW
+ELSE
 	ld	ix,___mbf32_POW
 	call	msbios
+ENDIF
 	jp	___mbf32_return

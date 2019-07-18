@@ -8,7 +8,7 @@ include ../../Make.config
 TARGET ?= test
 
 NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/alloc/obstack/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/alloc/obstack/z80/*.asm"
-NEWLIB_TARGETS := obj/newlib-z80 obj/newlib-z80n obj/newlib-r2k obj/newlib-ixiy
+NEWLIB_TARGETS := obj/newlib-z80 obj/newlib-z80n obj/newlib-r2k obj/newlib-ixiy obj/newlib-8080
 
 space :=
 space +=
@@ -31,8 +31,11 @@ obj/newlib-z80n:
 obj/newlib-ixiy:  
 	@$(ASSEMBLER) -O=obj/ixiy/x -I.. -mz80 --IXIY -D__CLASSIC $(NEWLIBGLOBS)
 
+obj/newlib-8080:  
+	@$(ASSEMBLER) -O=obj/8080/x -I.. -m8080 -D__CLASSIC $(NEWLIBGLOBS)
+
 dirs:
-	@mkdir -p obj/z80 obj/z80n obj/ixiy obj/r2k
+	@mkdir -p obj/z80 obj/z80n obj/ixiy obj/r2k obj/8080
 
 
 clean:

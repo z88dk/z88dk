@@ -9,6 +9,10 @@
 
 exp:
 	call	___mbf32_setup_single
+IF __CPU_8080__
+	call	___mbf32_EXP
+ELSE
 	ld	ix,___mbf32_EXP
 	call	msbios
+eNDIF
 	jp	___mbf32_return

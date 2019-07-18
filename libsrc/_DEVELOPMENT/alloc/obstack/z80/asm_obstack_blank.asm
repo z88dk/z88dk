@@ -42,9 +42,15 @@ asm_obstack_blank:
    ;            hl = 0
    ;
    ; uses  : af, de, hl
-   
+  
+IF __CPU_8080__
+   ld a,b
+   rla
+   jr c,shrink_object
+ELSE 
    bit 7,b
    jr nz, shrink_object
+ENDIF
 
 asm0_obstack_blank:
 grow_object:
@@ -53,7 +59,16 @@ grow_object:
    
    call asm_obstack_room       ; hl = bytes available, de = ob->fence
    
+IF __CPU_8080__
+   ld a,l
+   sub c
+   ld l,a
+   ld a,h
+   sbc b
+   ld d,a
+ELSE
    sbc hl,bc                   ; room for request?
+ENDIF
    jp c, error_zc - 1
    
    pop hl                      ; hl = ob

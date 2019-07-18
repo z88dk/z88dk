@@ -9,8 +9,12 @@
 
 l_f32_div:
 	call	___mbf32_setup_arith
+IF __CPU_8080__
+	call	___mbf32_DVBCDE
+ELSE
 	ld	ix,___mbf32_DVBCDE
 	call	msbios
+ENDIF
 	jp	___mbf32_return
 
 
