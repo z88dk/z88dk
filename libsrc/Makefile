@@ -1257,6 +1257,7 @@ g800_clib.lib:
 	@echo '--- Building Sharp PC-G8xx/E2xx Library ---'
 	@echo ''
 	$(call buildgeneric,g800)
+	$(MAKE) -C games TARGET=g800
 	$(MAKE) gfxdeps
 	TARGET=g800 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORg800 -x$(OUTPUT_DIRECTORY)/g800_clib @$(LISTFILE_DIRECTORY)/g800.lst
 	$(MAKE) gfxdeps
