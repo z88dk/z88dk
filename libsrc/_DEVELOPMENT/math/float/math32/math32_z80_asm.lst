@@ -23,6 +23,10 @@ math/float/math32/z80/f32_fssigdig
 math/float/math32/z80/f32_fssqr
 math/float/math32/z80/f32_fssqrt
 math/float/math32/z80/f32_fsunity
+math/float/math32/z80/f32__dtoa_sgnabs
+math/float/math32/z80/f32__dtoa_base10
+math/float/math32/z80/f32__dtoa_base16
+math/float/math32/z80/f32__dtoa_digits
 
 math/float/math32/z80/f32_z80_mulu_de
 math/float/math32/z80/f32_z80_mulu_32h_24x24
