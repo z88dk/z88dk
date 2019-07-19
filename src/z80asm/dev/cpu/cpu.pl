@@ -4,7 +4,7 @@
 # Z80/Z180/RCM2000/RCM3000 assembly table
 # Generate test code and parsing tables for the cpus defined in cpu.def
 #
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk
 #------------------------------------------------------------------------------
