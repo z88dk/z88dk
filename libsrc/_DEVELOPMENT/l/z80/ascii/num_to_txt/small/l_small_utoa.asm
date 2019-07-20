@@ -85,6 +85,14 @@ divloop:
    inc a
    add hl,bc
    jr c, divloop
-   
+IF __CPU_8080__
+   ld a,l
+   sub c
+   ld l,a
+   ld a,h
+   sbc b
+   ld h,a
+ELSE
    sbc hl,bc
+ENDIF
    ret

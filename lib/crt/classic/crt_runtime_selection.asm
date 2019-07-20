@@ -254,17 +254,23 @@ IF CLIB_OPT_PRINTF & $400
 ENDIF
 
 IF CLIB_OPT_PRINTF & $4000000
+IF !__CPU_8080__
 	defb	'f'
 	defw	__printf_handle_f
 ENDIF
+ENDIF
 
 IF CLIB_OPT_PRINTF  & $1000000
+IF !__CPU_8080__
 	defb	'e'
 	defw	__printf_handle_e
 ENDIF
+ENDIF
 IF CLIB_OPT_PRINTF & $10000000
+IF !__CPU_8080__
 	defb	'g'
 	defw	__printf_handle_f
+ENDIF
 ENDIF
 IF CLIB_OPT_PRINTF_2
 	defb	'l'

@@ -9,9 +9,20 @@
 	EXTERN	l_int2long_s
 	EXTERN	l_long_neg
 	EXTERN	l_long_div_u
+	EXTERN	l_div_u
+	EXTERN	l_neg
 	EXTERN	get_16bit_ap_parameter
 
+	EXTERN	__printf_add_offset
+	EXTERN	__printf_issccz80
+	EXTERN	__printf_get_base
+	EXTERN	__printf_check_long_flag
+	EXTERN	__printf_context
+
+	EXTERN	__math_block2
+
 	defc	handlelong = 1
+
 
 ; Print a number
 ; Entry: hl = fmt (character after format)
@@ -19,9 +30,17 @@
 ;         c = 1 = signed, 0 = unsigned
 __printf_number:
 	push	hl		;save fmt
+IF __CPU_8080__
+	call	__printf_check_long_flag
+ELSE
 	bit	6,(ix-4)
+ENDIF
 	jr	z,printf_number16
+IF __CPU_8080__
+	call	__printf_issccz80
+ELSE
         bit     0,(ix+6)        ;sccz80 flag
+ENDIF
         jr      nz,pickuplong_sccz80
         ; Picking up a long sdcc style
         ex      de,hl           ;hl=where tp pick up from
@@ -92,6 +111,28 @@ printsign:
 
 
 noneg:
+IF __CPU_8080__
+	push	hl
+	ld	hl,(__printf_context)
+	dec	hl
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	c,l
+	ld	b,h
+	pop	hl
+	ld	a,(bc)
+	and	8
+	ld	a,' '
+        jr      nz,printsign
+	ld	a,(bc)
+	and	2
+	ld	a,'+'
+	jr	nz,printsign
+	ld	a,(bc)
+	and	16
+	jr	z,miniprintn_start_process
+ELSE
         ld      a,' '
         bit     3,(ix-4)
         jr      nz,printsign
@@ -100,7 +141,15 @@ noneg:
         jr      nz,printsign
         bit     4,(ix-4)                ;# indicator
         jr      z,miniprintn_start_process
+ENDIF
+IF __CPU_8080__
+	push	hl
+	call	__printf_get_base
+	ld	a,l
+	pop	hl
+ELSE
         ld      a,(ix-9)                ;get base
+ENDIF
         cp      10
         jr      z,miniprintn_start_process
         push    af
@@ -110,7 +159,11 @@ noneg:
         cp      16
         jr      nz,miniprintn_start_process
         ld      a,'x'
+IF __CPU_8080__
+	call	__printf_add_offset
+ELSE
         add     (ix-3)
+ENDIF
         call    __printf_print_to_buf
 
 miniprintn_start_process:
@@ -119,6 +172,17 @@ miniprintn_start_process:
 
 .divloop
 IF handlelong
+  IF __CPU_8080__
+        push    de      ; number MSW
+        push    hl      ; number LSW
+        call    __printf_get_base
+        ld      d,h
+        ld      e,h
+        call    l_long_div_u
+	ld	a,(__math_block2)	;We know that's where the modulus is kept
+	cp	255
+	push	af
+  ELSE
         push    de      ; number MSW
         push    hl      ; number LSW
         ld      l,(ix-9)        ;base
@@ -131,10 +195,15 @@ IF handlelong
         cp      255  ; force flag to non-zero
         push    af      ; save reminder as a digit in stack
         exx
+  ENDIF
 ELSE
-        ld      e,(ix-9)        ;base
-        ld      d,0
         ex      de,hl
+IF __CPU_8080__
+	call	__printf_get_base
+ELSE
+        ld      l,(ix-9)        ;base
+        ld      h,0
+ENDIF
         call    l_div_u         ;hl=de/hl de=de%hl
         ld      a,e
         cp      255  ; force flag to non-zero
@@ -161,7 +230,11 @@ ENDIF
         cp      '9'+1
         jr      c,printloop1
         add     'a' - '9' -1
+IF __CPU_8080__
+	call	__printf_add_offset
+ELSE
         add     (ix-3)
+ENDIF
 printloop1:
         call    __printf_print_to_buf
         jr      printloop

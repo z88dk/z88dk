@@ -8,6 +8,8 @@
 	EXTERN	strlen
         EXTERN  l_uge
 
+	EXTERN	__printf_get_precision
+
 __printf_handle_s:
         push    hl              ;save format string
         call    get_16bit_ap_parameter  ;de=new ap, hl=string to print
@@ -20,8 +22,12 @@ printstr:
         push    hl              ;save string
         call    strlen          ;exits hl=length
         ex      de,hl           ;de=length
+IF __CPU_8080__
+	call	__printf_get_precision
+ELSE
 	ld	l,(ix-8)	;precision
 	ld	h,(ix-7)
+ENDIF
 	push	hl
 	call    l_uge		;disturbs hl, bc
 	pop	hl

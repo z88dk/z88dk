@@ -8,6 +8,9 @@
 
 	EXTERN	__printf_get_flags
 	EXTERN	__printf_doprint
+	EXTERN	__printf_context
+	EXTERN	__printf_res_long_flag
+	EXTERN	__printf_set_long_flag
 
 
 ; Level 1 = %d, %i, %u, %ld, %lu, %c, %s
@@ -20,6 +23,43 @@
 
 ; int vfprintf1(FILE *fp, void __CALLEE__ (*output_fn)(int c,FILE *fp), int sccz80, unsigned char *fmt,void *ap)
 asm_printf:
+IF __CPU_8080__
+	ld	hl,0
+	add	hl,sp
+	ld	(__printf_context),hl
+	ex	de,hl
+	ld	hl,-80
+	add	hl,sp
+	ld	sp,hl
+	ex	de,hl	;hl = ix + 0
+	push	hl	;save for a bit later
+	xor	a
+	dec	hl	;-1
+	ld	(hl),a
+	dec	hl	;-2
+	ld	(hl),a
+	dec	a
+	dec	hl	;-3
+	dec	hl	;-4
+	dec	hl	;-5
+	ld	(hl),a
+	dec	hl	;-6
+	ld	(hl),a
+	dec	hl	;-7
+	ld	(hl),a
+	dec	hl	;-8
+	pop	hl	;+0
+	inc	hl	;+1
+	inc	hl	;+2
+	ld	e,(hl)	;arg pointer
+	inc	hl	;+3
+	ld	d,(hl)
+	inc	hl	;+4
+	ld	a,(hl)
+	inc	hl	;+5
+	ld	h,(hl)
+	ld	l,a
+ELSE
 	ld	ix,0
 	add	ix,sp		;now the frame pointer
 	; Make some stack space
@@ -34,12 +74,12 @@ asm_printf:
 	; -10 = length of buffer
 	;
 	; -80->-11 = buffer (69 bytes)
-IF __CPU_R2K__ | __CPU_R3K__
+  IF __CPU_R2K__ | __CPU_R3K__
 	add	sp,-80
 	ld	hl,(ix+2)
 	ex	de,hl
 	ld	hl,(ix+4)
-ELSE
+  ELSE
 	ld	hl,-80
 	add	hl,sp
 	ld	sp,hl
@@ -47,7 +87,7 @@ ELSE
 	ld	d,(ix+3)
 	ld	l,(ix+4)	;format pointer
 	ld	h,(ix+5)
-ENDIF
+  ENDIF
 	xor	a
 	ld	(ix-1),a
 	ld	(ix-2),a
@@ -56,12 +96,34 @@ ENDIF
 	ld	(ix-6),a
         ld      (ix-7),a	;precision = undefined
         ld      (ix-8),a
+ENDIF
 .__printf_loop
+IF __CPU_8080__
+	push	hl
+	ld	hl,(__printf_context)
+	dec	hl
+	dec	hl
+	dec	hl	;-3
+	xor	a
+	ld	(hl),a	;upper case switch
+	dec	hl	;-4
+	ld	(hl),a	;flags
+	dec	hl	;-5
+	dec	hl	;-6
+	dec	hl	;-7
+	dec	hl	;-8
+	dec	hl	;-9
+	ld	(hl),10	;default base
+	dec	hl	;-10
+	ld	(hl),a	;length of temp buffer
+	pop	hl
+ELSE
 	ld	(ix-9),10		;default base
 	xor	a
 	ld	(ix-3),a		;upper case switch
 	ld	(ix-4),a		;flags
 	ld	(ix-10),a		;length of temp buffer
+ENDIF
  
 	ld	a,(hl)
 	inc	hl
@@ -91,12 +153,20 @@ handle_percent:
 	cp	'%'
 	jr	z,print_format_character
 	call	__printf_get_flags		;level2
+IF __CPU_8080__
+	call	__printf_res_long_flag
+ELSE
 	res	6,(ix-4)
+ENDIF
 	cp	'h'
 	jr	z,get_next_char
 	cp	'l'
 	jr	nz,no_long_qualifier
+IF __CPU_8080__
+	call	__printf_set_long_flag
+ELSE
 	set	6,(ix-4)
+ENDIF
 get_next_char:
 	ld	a,(hl)
 	inc	hl

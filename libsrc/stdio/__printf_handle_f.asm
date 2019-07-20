@@ -1,4 +1,6 @@
 
+; TODO: Rewrite this for 8080
+IF !__CPU_8080__
    MODULE   __printf_handle_f
    PUBLIC   __printf_handle_f
    PUBLIC   __printf_handle_e
@@ -148,3 +150,4 @@ call_fp_converter:
         call    strlen          ;get the length of it
         ld      (ix-10),l
         jp      __printf_print_the_buffer
+ENDIF

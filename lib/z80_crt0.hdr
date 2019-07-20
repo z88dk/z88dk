@@ -140,6 +140,8 @@
 	EXTERN     l_declong	;Decrement long
 	EXTERN     l_long_div
 	EXTERN     l_long_div_u
+	EXTERN     l_long_mod
+	EXTERN     l_long_mod_u
 	EXTERN     l_long_mult
 	EXTERN     l_long_asr_u	;Long unsigned >>
 	EXTERN     l_long_asr_uo	;Long unsigned >> shift in c

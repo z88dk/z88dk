@@ -25,8 +25,9 @@ printf:
 	ld	h,0
         add     hl,hl
 	add	hl,sp
-
+IF !__CPU_8080__
 	push	ix		;save callers
+ENDIF
 	ld	bc,__sgoioblk+10
 	push	bc
 	ld	bc,fputc_callee		;printf_outc
@@ -47,7 +48,9 @@ printf:
 	pop	bc	
 	pop	bc
 	pop	bc
+IF !__CPU_8080__
 	pop	ix
+ENDIF
 	ret
 
 
