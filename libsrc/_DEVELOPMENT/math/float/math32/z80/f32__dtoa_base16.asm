@@ -14,7 +14,7 @@ m32__dtoa_base16:
     ;          D = base 2 exponent e
     ;
     ; uses  : af, c, d, hl, bc', de', hl'
-#if 0
+if 0
     exx
     pop bc
 
@@ -46,4 +46,4 @@ m32__dtoa_base16:
     ld c,6                      ; max 6 hex digits
     ret
 
-#endif
+endif

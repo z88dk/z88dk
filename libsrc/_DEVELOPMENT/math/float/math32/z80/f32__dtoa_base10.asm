@@ -23,7 +23,7 @@ m32__dtoa_base10:
 
    ; x = a * 2^n = b * 10^e
    ; e = n * log(2) = n * 0.301.. = n * 0.01001101...(base 2) = INT((n*77 + 5)/256)
-#if 0
+if 0
    exx
    ld a,l
    exx
@@ -117,4 +117,4 @@ rotation_done:
    ld c,11                     ; max significant digits
    ret
 
-#endif
+endif

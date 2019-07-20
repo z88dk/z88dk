@@ -20,7 +20,7 @@ m32__dtoa_digits:
    ;          carry reset if exhausted significant digits and exit early (C=0, B!=0)
    ;
    ; uses  : af, bc, hl, bc', de', hl'
-#if 0
+if 0
    ld a,c
    or a
    ret z                       ; if no more significant digits
@@ -77,4 +77,4 @@ m32__dtoa_digits:
    scf                         ; indicate all digits output
    ret
 
-#endif
+endif
