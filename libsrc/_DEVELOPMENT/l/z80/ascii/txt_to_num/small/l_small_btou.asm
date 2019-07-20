@@ -39,7 +39,16 @@ loop:
    push hl
    
    rra
+IF __CPU_8080__
+   ld a,l
+   adc l
+   ld l,a
+   ld a,h
+   adc h
+   ld h,a
+ELSE
    adc hl,hl
+ENDIF
    
    jr nc, loop
    

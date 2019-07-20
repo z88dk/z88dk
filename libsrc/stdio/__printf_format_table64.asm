@@ -2,6 +2,8 @@
 ;
 ; These will be used by default when sdcc pulls in printf
 
+IF !__CPU_8080__
+
 	MODULE	__printf_format_table64
 	SECTION rodata_clib
 	PUBLIC	__printf_format_table64
@@ -27,3 +29,4 @@ __printf_format_table64:
 	defb	'B'
 	defw	__printf_handle_llB
 	defb	0
+ENDIF

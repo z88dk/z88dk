@@ -1,5 +1,5 @@
 
-
+IF !__CPU_8080__
 	MODULE	__printf_number64
 	SECTION	code_clib
 	PUBLIC	__printf_number64
@@ -106,4 +106,4 @@ number64_start_process:
 
 
 
-
+ENDIF

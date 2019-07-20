@@ -152,6 +152,10 @@ continue:	DEC b
 	RRA
 	LD HL,__math_block1		; complement quotient if divisor
 	CALL	C,compl		; and dividend have different signs
+	LD  a,b
+	RLA
+	LD HL,__math_block2
+	CALL	C,compl		; negate remainder if dividend was negative
 	ld	hl,(__retloc)
 	push	hl
 	LD HL,(__math_block1+2)		; push quotient
@@ -161,6 +165,10 @@ continue:	DEC b
 
 ; for rmi 4 and rmu 4 only:
 return_modulus:
+	LD  a,b
+	RRA
+	LD HL,__math_block1		; complement quotient if divisor
+	CALL	C,compl		; and dividend have different signs
 	LD  a,b
 	RLA
 	LD HL,__math_block2

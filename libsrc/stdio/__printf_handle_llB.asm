@@ -1,4 +1,5 @@
 
+IF !__CPU_8080__
 	MODULE	__printf_handle_llB
 	SECTION code_clib
 	PUBLIC	__printf_handle_llB
@@ -9,3 +10,4 @@ __printf_handle_llB:
         ld      (ix-9),2
         res     1,(ix-4)        ;disable '+' flag
 	jp	__printf_number64
+ENDIF

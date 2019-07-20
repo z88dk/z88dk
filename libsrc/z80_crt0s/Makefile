@@ -42,9 +42,12 @@ clean:
 	@$(RM) z80/sccz80/*.o z80/sdcc/*.o
 	@$(RM) z180/sccz80/*.o r2k/sccz80/*.o
 	@$(RM) 8080/sccz80/*.o 
-	@$(RM) ../_DEVELOPMENT/z80/z80/*.o
 	@$(RM) ../_DEVELOPMENT/l/z80/*.o
+	@$(RM) ../_DEVELOPMENT/l/z80/*/*.o
+	@$(RM) ../_DEVELOPMENT/l/z80/*/*/*.o
+	@$(RM) ../_DEVELOPMENT/l/z80/*/*/*/*.o
 	@$(RM) ../_DEVELOPMENT/l/sdcc/*.o
+	@$(RM) ../_DEVELOPMENT/error/z80/*.o
 	@$(RM) ../_DEVELOPMENT/math/integer/*.o
 	@$(RM) ../_DEVELOPMENT/math/integer/fast/*.o
 	@$(RM) ../_DEVELOPMENT/math/integer/small/*.o

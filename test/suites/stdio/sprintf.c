@@ -174,7 +174,9 @@ int test_scanf()
     suite_add_test(test_sprintf_int_negative);
     suite_add_test(test_sprintf_long_positive);
 #ifndef __RCMX000__
+#ifndef __8080__
     suite_add_test(test_sprintf_double);
+#endif
 #endif
     suite_add_test(test_sprintf_precision_parameter);
     suite_add_test(test_sprintf_n);

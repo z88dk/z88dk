@@ -22,8 +22,9 @@ _vfprintf:
 	push	de
 	push	hl
 	push	af
-
+IF !__CPU_8080__
 	push	ix
+ENDIF
 	push	hl	;fp
 	ld	hl,fputc_callee
 	push	hl
@@ -37,7 +38,9 @@ _vfprintf:
 	pop	bc	
 	pop	bc
 	pop	bc
+IF !__CPU_8080__
 	pop	ix
+ENDIF
 	ret
 
 

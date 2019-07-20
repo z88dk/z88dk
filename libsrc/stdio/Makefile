@@ -4,10 +4,10 @@ include ../Make.config
 
 CFILES = $(wildcard *.c)
 ZSFILES = $(wildcard zsock/*.c) 
-AFILES = $(filter-out asm_printf_core.asm, $(wildcard *.asm))
-AFILES_8080 = $(filter-out $(wildcard get_16bit_ap_parameter.asm *printk*.asm *printf*.asm *scanf*.asm), $(wildcard *.asm))
+AFILES = $(wildcard *.asm)
+AFILES_8080 = $(filter-out $(wildcard *scanf*.asm), $(wildcard *.asm))
 OFILES = $(CFILES:.c=.o) $(AFILES:.asm=.o)
-CFILES_8080= $(wildcard 8080/*.c)
+CFILES_8080= 
 OFILES_8080 = $(CFILES:.c=.o) $(CFILES_8080:.c=.o)  $(AFILES_8080:.asm=.o)
 
 

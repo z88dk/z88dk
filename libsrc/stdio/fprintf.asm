@@ -25,7 +25,9 @@ fprintf:
 	ld	h,0
         add     hl,hl
 	add	hl,sp		;points to fp
+IF !__CPU_8080__
 	push	ix
+ENDIF
 	ld	c,(hl)
 	inc	hl
 	ld	b,(hl)
@@ -49,7 +51,9 @@ fprintf:
 	pop	bc	
 	pop	bc
 	pop	bc
+IF !__CPU_8080__
 	pop	ix		;restore callers
+ENDIF
 	ret
 
 

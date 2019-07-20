@@ -21,7 +21,9 @@ _cprintf:
 	pop	de	;fmt
 	push	de
 	push	bc
+IF !__CPU_8080__
 	push	ix	;save ix
+ENDIF
 	push	bc		;fp (we don't care about it)
 	ld	bc,printk_outc
 	push	bc
@@ -35,6 +37,8 @@ _cprintf:
 	pop	bc	
 	pop	bc
 	pop	bc
+IF !__CPU_8080__
 	pop	ix	;restore ix
+ENDIF
 	ret
 
