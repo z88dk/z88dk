@@ -48,6 +48,7 @@ IF __CPU_8080__
 	dec	hl	;-7
 	ld	(hl),a
 	dec	hl	;-8
+	ld	(hl),a
 	pop	hl	;+0
 	inc	hl	;+1
 	inc	hl	;+2

@@ -26,6 +26,9 @@ PUBLIC __printf_inc_buffer_length
 PUBLIC __printf_get_buffer_length
 PUBLIC __printf_issccz80
 PUBLIC __printf_check_pad_right
+PUBLIC __printf_set_buffer_length
+PUBLIC __printf_set_ftoe
+PUBLIC __printf_check_ftoe
 
 ; Increment the number of characters written
 ;
@@ -315,6 +318,19 @@ __printf_inc_buffer_length:
 	pop	hl
 	ret
 
+; Set the buffer length
+; Exit: None
+__printf_set_buffer_length:
+	ld	a,l
+	push	de
+	ld	hl,(__printf_context)
+	ld	de,-10
+	add	hl,de
+	ld	(hl),a
+	pop	de
+	ret
+
+
 
 ; Get the length of the temporary buffer
 ; Exit: de = buffer length
@@ -355,7 +371,33 @@ __printf_check_pad_right:
 	pop	hl
 	ret
 
+; Set the ftoe flag
+__printf_set_ftoe:
+	push	hl
+	ld	hl,(__printf_context)
+	dec	hl
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	a,(hl)
+	or	@00100000
+	ld	(hl),a
+	pop	hl
+	ret
 
+; Check the ftoe flag
+; Exit: nz = use ftoe, z=ftoa
+__printf_check_ftoe:
+	push	hl
+	ld	hl,(__printf_context)
+	dec	hl
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	a,(hl)
+	and	@00100000
+	pop	hl
+	ret
 
 
 
@@ -366,18 +408,5 @@ __printf_check_pad_right:
 SECTION bss_clib
 
 PUBLIC __printf_context
-PUBLIC	__printf_written
-PUBLIC	__printf_putchar
-PUBLIC	__printf_fp
-PUBLIC	__printf_width
-PUBLIC	__printf_precision
 
 __printf_context:	defw	0
-
-__printf_written:	defw	0
-__printf_putchar:	defw	0
-__printf_fp:		defw	0
-
-
-__printf_width:		defw	0
-__printf_precision:	defw	0
