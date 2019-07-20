@@ -32,6 +32,8 @@ endef
 #------------------------------------------------------------------------------
 # Call for all variants
 #------------------------------------------------------------------------------
+$(eval $(call MAKE_LIB,	8080-,			-m8080 				))
+$(eval $(call MAKE_LIB,	8080-ixiy,		-m8080 		--IXIY	))
 $(eval $(call MAKE_LIB,	z80-,			-mz80				))
 $(eval $(call MAKE_LIB,	z80-ixiy,		-mz80 		--IXIY	))
 $(eval $(call MAKE_LIB,	z80n-,			-mz80n				))
@@ -42,7 +44,6 @@ $(eval $(call MAKE_LIB,	r2k-,			-mr2k				))
 $(eval $(call MAKE_LIB,	r2k-ixiy,		-mr2k 		--IXIY	))
 $(eval $(call MAKE_LIB,	r3k-,			-mr3k				))
 $(eval $(call MAKE_LIB,	r3k-ixiy,		-mr3k 		--IXIY	))
-$(eval $(call MAKE_LIB,	8080-,			-m8080 			))
 
 $(PROJ)_lib.lst: $(SRC)
 	$(RM) $(PROJ)_lib.lst

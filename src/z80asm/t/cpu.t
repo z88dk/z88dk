@@ -111,7 +111,10 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 		ok -f $file_err, "$file_err exists";
 		local(@ARGV) = $file_err;
 		while (<>) {
-			/^Error .*? line (\d+)/ and $err_lines[$1]++;
+			if (/^Error .*? line (\d+)/ ||
+				/^Warning .* line (\d+): interpreting indirect value as immediate/) {
+				$err_lines[$1]++;
+			}			
 		}
 		for (1..$num_lines) {
 			ok $err_lines[$_], "$file: expected error at line $_";
