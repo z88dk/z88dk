@@ -10,10 +10,12 @@
 ;  [ESC] H - Move the cursor to the upper left corner.
 ;  ![ESC] I - Move the cursor to beginning of line above.
 ;  *[ESC] J - Erase all lines after our current line
-;  *[ESC] K - Clear the current line from the current cursor position.
+;  [ESC] K - Clear the current line from the current cursor position.
 ;  [ESC] Y - row col 'Goto' Coordinate mode - first will change line number, then cursor position (both ASCII - 32)
-;  [ESC] b - Byte after 'b' sets new foreground color (ASCII - 32)
+;  [ESC] b - Byte after 'b' sets new foreground color (ASCII -32)
 ;  [ESC] c - Byte after 'c' sets new background color (ASCII -32)
+;  [ESC] e - Enable cursor
+;  [ESC] f - Disable cursor
 ;  [ESC] p - start inverse video
 ;  [ESC] q - stop inverse video
 ;  [ESC] s - Enable/disable vertical scrolling
@@ -285,8 +287,13 @@ set_inverse_call_generic:
 	scf
 	ret
 
+disable_cursor:
+	res	1,(hl)
+	ret
+enable_cursor:
+	set	1,(hl)
+	ret
 
-IF SUPPORT_vt52x
 ; bc = coordinates
 clear_eol:
 	ld	a,b
@@ -301,6 +308,7 @@ clear_eol_loop:
 	scf
 	ret
 
+IF SUPPORT_vt52x
 ; bc = coordinates
 clear_eos:
 	call	clear_eol		;exit, bc = coordinates
@@ -324,7 +332,7 @@ handle_cr:
 	jr	nz,handle_cr_no_need_to_scroll
 	; Check if scroll is enabled
 	bit	6,(hl)
-	call	nc,generic_console_scrollup
+	call	z,generic_console_scrollup
 
 	ld	a,(__console_h)
 	sub	2
@@ -386,6 +394,12 @@ IF SUPPORT_vt52
 	defb	255, 'H'
 	defb	0
 	defw	move_home
+	defb	255, 'e'
+	defb	0
+	defw	enable_cursor
+	defb	255, 'f'
+	defb	0
+	defw	disable_cursor
 ENDIF
 	defb	4 , 's'
 	defb	1
@@ -409,10 +423,10 @@ IF SUPPORT_vt52
 	defb	0
 	defw	set_inverse_ansi
 ENDIF
-IF SUPPORT_vt52x
 	defb	255, 'K'
 	defb	0
 	defw	clear_eol
+IF SUPPORT_vt52x
 	defb	255,'J'
 	defb	0
 	defw	clear_eos
@@ -431,6 +445,7 @@ parameters:	defb	0		; We only have up-to two parameters
 parameter_processor:	defw	0	; Where we go to when we need to process
 
 generic_console_flags:		defb	0		; bit 0 = raw mode enabled
+							; bit 1 = cursor enabled
 							; bit 6 = vscroll disabled
 							; bit 7 = inverse on
 
