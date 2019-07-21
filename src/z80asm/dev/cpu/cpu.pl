@@ -26,38 +26,40 @@ use Modern::Perl;
 #------------------------------------------------------------------------------
 my @CPUS = qw( z80 z80n z180 r2k r3k 8080 );
 
-my @R8	= qw( b c d e h l      a );
-my @R8I	= qw( b c d e h l (hl) a );
-my @R8F	= qw( b c d e h l f    a );
-my @R16SP = qw( bc de hl sp );
-my @R16AF = qw( bc de hl af );
-my @ALU = qw( add adc sub sbc and xor or cp );
-my @TEST= qw( tst test );
-my @ROTA= qw( rlca rrca rla rra );
-my @ROT = qw( rlc rrc rl rr sla sra sll sli srl );
-my @BIT = qw( bit res set );
-my @FLAGS = qw( _nz _z _nc _c _po _pe _nv _v _lz _lo _p _m );
-my %INV_FLAG = qw( 	_nz	_z 
-					_z 	_nz
-					_nc _c 
-					_c	_nc
-					_po _pe 
-					_pe	_po
-					_nv _v 
-					_v	_nv
-					_lz _lo 
-					_lo	_lz
-					_p 	_m
-					_m	_p );
-my @X	= qw( ix iy );
-my @DIS	= ('0', '%d');
-my @IO	= ('', qw( ioi ioe ));
-my @ALTD= ('', qw( altd ));
-my @A_  = ('a, ', '');
+my @R8			= qw( b c d e h l      a );
+my @R8_INTEL	= qw( b c d e h l m    a );
+my @R8I			= qw( b c d e h l (hl) a );
+my @R8F			= qw( b c d e h l f    a );
+my @R16SP 		= qw( bc de hl sp );
+my @R16AF 		= qw( bc de hl af );
+my @ALU 		= qw( add adc sub sbc and xor or cp );
+my @TEST		= qw( tst test );
+my @ROTA		= qw( rlca rrca rla rra );
+my @ROT 		= qw( rlc rrc rl rr sla sra sll sli srl );
+my @BIT 		= qw( bit res set );
+my @FLAGS 		= qw( _nz _z _nc _c _po _pe _nv _v _lz _lo _p _m );
+my @FLAGS_INTEL	= qw( _nz _z _nc _c _po _pe                _p _m );
+my %INV_FLAG 	= qw( 	_nz	_z 
+						_z 	_nz
+						_nc _c 
+						_c	_nc
+						_po _pe 
+						_pe	_po
+						_nv _v 
+						_v	_nv
+						_lz _lo 
+						_lo	_lz
+						_p 	_m
+						_m	_p );
+my @X			= qw( ix iy );
+my @DIS			= ('0', '%d');
+my @IO			= ('', qw( ioi ioe ));
+my @ALTD		= ('', qw( altd ));
+my @A_  		= ('a, ', '');
 
 my %V = (
 	'' => '',
-	b => 0, c => 1, d => 2, e => 3, h => 4, l => 5, '(hl)' => 6, f => 6, a => 7,
+	b => 0, c => 1, d => 2, e => 3, h => 4, l => 5, '(hl)' => 6, f => 6, m => 6, a => 7,
 	bc => 0, de => 1, hl => 2, sp => 3, af => 3,
 	_nz => 0, _z => 1, _nc => 2, _c => 3, 
 	_po => 4, _pe => 5,
@@ -83,6 +85,7 @@ for my $cpu (@CPUS) {
 	my $z180 	= ($cpu =~ /^z180/);
 	my $zilog	= ($cpu =~ /^z/);
 	my $i8080	= ($cpu =~ /^8080/);
+	my $intel 	= ($cpu =~ /^80/);
 	
 	# 8-bit load group
 	for my $r (@R8I) { 
@@ -127,13 +130,18 @@ for my $cpu (@CPUS) {
 		}
 	}
 	
-	if ($zilog) {
+	if ($intel || $zilog) {
 		add_opc($cpu, "daa", 0x27);
+	}
+	else {
+		add_opc($cpu, "daa", 0xCD, '@__z80asm__daa');
+	}
+	
+	if ($zilog) {
 		add_opc($cpu, "rrd", 0xED, 0x67);
 		add_opc($cpu, "rld", 0xED, 0x6F);
 	}
 	elsif ($rabbit) {
-		add_opc($cpu, "daa", 0xCD, '@__z80asm__daa');
 		add_opc($cpu, "rrd", 0xCD, '@__z80asm__rrd');
 		add_opc($cpu, "rld", 0xCD, '@__z80asm__rld');
 	}
@@ -558,7 +566,11 @@ for my $cpu (@CPUS) {
 	}
 
 	# Input and Output Group
-	if ($zilog) {
+	if ($intel) {
+		add_opc($cpu, "in a, (%n)", 		0xDB, '%n');
+		add_opc($cpu, "out (%n), a", 		0xD3, '%n');
+	}		
+	elsif ($zilog) {
 		add_opc($cpu, "in a, (%n)", 		0xDB, '%n');
 		add_opc($cpu, "in (c)", 			0xED, 0x40 + $V{f}*8);
 		add_opc($cpu, "in0 (%n)", 			0xED, 0x00 + $V{f}*8, '%n') if $z180;
@@ -646,6 +658,98 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "ldpirx",			0xED, 0xB7);
 		add_opc($cpu, "lddrx",			0xED, 0xBC);
 	}
+	
+	# Intel opcodes for the i8080, implement in all CPUs to simplify porting of code
+	for my $d (@R8_INTEL) {
+		for my $s (@R8_INTEL) {
+			if ($d ne 'm' || $s ne 'm') {
+				add_opc($cpu, "mov $d, $s",	
+									0x40 + $V{$d}*8 + $V{$s});
+			}
+		}
+		add_opc($cpu, "mvi $d, %n",	0x06 + $V{$d}*8, '%n');
+	}
+	
+	for my $r (@R8_INTEL) {
+		add_opc($cpu, "add $r",		0x80 + $V{$r});
+		add_opc($cpu, "adc $r",		0x88 + $V{$r});
+		add_opc($cpu, "sub $r",		0x90 + $V{$r});
+		add_opc($cpu, "sbb $r",		0x98 + $V{$r});
+		add_opc($cpu, "inr $r",		0x04 + $V{$r}*8);
+		add_opc($cpu, "dcr $r",		0x05 + $V{$r}*8);
+		add_opc($cpu, "ana $r",		0xA0 + $V{$r});
+		add_opc($cpu, "ora $r",		0xB0 + $V{$r});
+		add_opc($cpu, "xra $r",		0xA8 + $V{$r});
+		add_opc($cpu, "cmp $r",		0xB8 + $V{$r});
+	}
+	
+	add_opc($cpu, "adi %n",			0xC6, '%n');
+	add_opc($cpu, "aci %n",			0xCE, '%n');
+	add_opc($cpu, "sui %n",			0xD6, '%n');
+	add_opc($cpu, "sbi %n",			0xDE, '%n');
+	add_opc($cpu, "ani %n",			0xE6, '%n');
+	add_opc($cpu, "ori %n",			0xF6, '%n');
+	add_opc($cpu, "xri %n",			0xEE, '%n');
+	add_opc($cpu, "cpi %n",			0xFE, '%n');
+	
+	for my $r (@R16SP) {
+		add_opc($cpu, "lxi $r, %m",	0x01 + $V{$r}*16, '%m', '%m');
+		add_opc($cpu, "inx $r",		0x03 + $V{$r}*16);
+		add_opc($cpu, "dcx $r",		0x0B + $V{$r}*16);
+		add_opc($cpu, "dad $r",		0x09 + $V{$r}*16);
+	}
+	
+	for my $r (@R16AF) {
+		add_opc($cpu, "push $r",	0xC5 + $V{$r}*16);
+		add_opc($cpu, "pop $r",		0xC1 + $V{$r}*16);
+	}
+	
+	for my $r (qw( bc de )) {
+		add_opc($cpu, "ldax $r",	0x0A + $V{$r}*16);
+		add_opc($cpu, "stax $r",	0x02 + $V{$r}*16);
+	}
+	
+	add_opc($cpu, "lda %m",			0x3A, '%m', '%m');
+	add_opc($cpu, "sta %m",			0x32, '%m', '%m');
+	add_opc($cpu, "lhld %m",		0x2A, '%m', '%m');
+	add_opc($cpu, "shld %m",		0x22, '%m', '%m');
+	add_opc($cpu, "xchg",			0xEB);
+	add_opc($cpu, "daa",			0x27) if !$rabbit;
+	add_opc($cpu, "rlc",			0x07);
+	add_opc($cpu, "rrc",			0x0F);
+	add_opc($cpu, "ral",			0x17);
+	add_opc($cpu, "rar",			0x1F);
+	add_opc($cpu, "cma",			0x2F);
+	add_opc($cpu, "cmc",			0x3F);
+	add_opc($cpu, "stc",			0x37);
+	
+	for my $_f (@FLAGS_INTEL) {
+		my $f = substr($_f, 1);		# remove leading _
+
+		# create j_m and j_p, as jp is jmp
+		add_opc($cpu, "j$f %m", 	0xC2 + $V{$_f}*8, '%m', '%m') unless $f eq 'p';
+		add_opc($cpu, "j_$f %m", 	0xC2 + $V{$_f}*8, '%m', '%m');
+		
+		if (!$rabbit) {
+			add_opc($cpu, "c$f %m", 	0xC4 + $V{$_f}*8, '%m', '%m') unless $f eq 'p';
+			add_opc($cpu, "c_$f %m", 	0xC4 + $V{$_f}*8, '%m', '%m');
+		}
+		add_opc($cpu, "r$f",	 	0xC0 + $V{$_f}*8);
+		add_opc($cpu, "r_$f",	 	0xC0 + $V{$_f}*8);
+	}
+	add_opc($cpu, "jmp %m",			0xC3, '%m', '%m');
+	add_opc($cpu, "call %m",		0xCD, '%m', '%m');
+	add_opc($cpu, "ret",			0xC9);
+	add_opc($cpu, "pchl",			0xE9);
+	add_opc($cpu, "xthl",			0xE3);
+	add_opc($cpu, "sphl",			0xF9);
+	add_opc($cpu, "in %n",			0xDB, '%n') if !$rabbit;
+	add_opc($cpu, "out %n",			0xD3, '%n') if !$rabbit;
+	add_opc($cpu, "ei",				0xFB) if !$rabbit;
+	add_opc($cpu, "di",				0xF3) if !$rabbit;
+	add_opc($cpu, "hlt",			0x76) if !$rabbit;
+	add_opc($cpu, "nop",			0x00);
+	# rst N*8: already implemented in the generic case
 }
 
 #------------------------------------------------------------------------------

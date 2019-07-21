@@ -6,6 +6,10 @@
 use Modern::Perl;
 use Test::More;
 use File::Basename;
+use Config;
+
+# make sure to use our z80asm
+$ENV{PATH} = ".".$Config{path_sep}.$ENV{PATH};
 
 for my $file (<dev/cpu/cpu_test*.asm>) {
 	# build cpu, ixiy, ok options from file name
@@ -116,9 +120,13 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 				$err_lines[$1]++;
 			}			
 		}
+		
+		my @failed;
 		for (1..$num_lines) {
-			ok $err_lines[$_], "$file: expected error at line $_";
+			if (!$err_lines[$_]) { push @failed, $_; }
 		}
+		ok @failed==0, "all lines output errors";
+		if (@failed) { diag "Failed tests: @failed"; }
 	}
 	
 	if (Test::More->builder->is_passing) {

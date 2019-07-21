@@ -92,6 +92,7 @@
  altd adc hl, hl                ; Error
  altd adc hl, sp                ; Error
  altd adc l                     ; Error
+ altd adc m                     ; Error
  altd add (hl)                  ; Error
  altd add (ix)                  ; Error
  altd add (ix+127)              ; Error
@@ -130,6 +131,7 @@
  altd add hl, hl                ; Error
  altd add hl, sp                ; Error
  altd add l                     ; Error
+ altd add m                     ; Error
  altd and (hl)                  ; Error
  altd and (ix)                  ; Error
  altd and (ix+127)              ; Error
@@ -1635,6 +1637,7 @@
  altd sub e                     ; Error
  altd sub h                     ; Error
  altd sub l                     ; Error
+ altd sub m                     ; Error
  altd xor (hl)                  ; Error
  altd xor (ix)                  ; Error
  altd xor (ix+127)              ; Error

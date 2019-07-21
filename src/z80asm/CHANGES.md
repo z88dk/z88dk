@@ -5,7 +5,8 @@ Z88DK Z80 Module Assembler Change Log
 ----
 - 2019-01-27 New option --opt=speed to convert JR into JP
 - 2019-07-14 Convert Spectrum Next CPU to (--cpu=z80n) (thank you Phillip Stevens)
-- 2019-07-20 Support Intel 8080 (--cpu=8080) (thank you @suborb)
+- 2019-07-20 Support Intel 8080 with Zilog syntax (--cpu=8080) (thank you @suborb)
+- 2019-07-21 Support Intel 8080 with Intel syntax, except Jump Positive (jp conflicts with Zilog jump) and Call Positive (cp conflicts with Zilog compare). Support alternative j_p and c_p for Jump Positive and Call Positive.
 
 2018
 ----
