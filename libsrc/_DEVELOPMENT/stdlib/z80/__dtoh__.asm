@@ -8,7 +8,7 @@ EXTERN __dtoa_preamble, asm_fpclassify, __dtoa_special_form, __dtoa_base16, asm_
 EXTERN __dtoa_remove_zeroes, __dtoa_exp_digit, __dtoa_postamble, l_hex_nibble_hi, l_hex_nibble_lo
 EXTERN __dtoa_adjust_prec
 
-; math library supplies asm_fpclassify, __dtoa_sgnabs, __dtoa_base16
+; math library supplies asm_fpclassify, __dtoa_base16, __dtoa_sgnabs
 
 __dtoh__:
 
@@ -48,14 +48,14 @@ __dtoh__:
    call asm_fpclassify         ; supplied by math library
 
    cp 2
-   jp nc, __dtoa_special_form  ; if inf or nan
+   jp NC, __dtoa_special_form  ; if inf or nan
 
    ex af,af'
    
    call __dtoa_base16          ; supplied by math library
    
    call __dtoa_adjust_prec     ; if precision == 255, set to max sig digits - 1
-   jr nz, p1
+   jr NZ, p1
    dec e
    
 p1:
@@ -85,7 +85,7 @@ p1:
    inc hl
    
    or a
-   jr z, normal_form           ; if not zero
+   jr Z, normal_form           ; if not zero
 
    call __dtoa_special_form    ; write zero string
    
@@ -116,7 +116,7 @@ normal_form:
    inc b
    
    call __dtoh_digits
-   jr c, decimal_point         ; if all precision digits generated
+   jr C, decimal_point         ; if all precision digits generated
    
    dec b
    ld (ix-3),b                 ; add trailing zeroes
@@ -138,8 +138,8 @@ prune_zeroes:
    ld a,d                      ; a = exponent
    sub 4
    
-   jp pe, exponent_minus       ; if negative underflow
-   jp p, exponent_plus
+   jp PE, exponent_minus       ; if negative underflow
+   jp P, exponent_plus
 
 exponent_minus:
 
@@ -151,7 +151,7 @@ exponent_plus:
    inc hl
 
    cp 100
-   jr c, skip_100
+   jr C, skip_100
    
    sub 100
    
@@ -161,7 +161,7 @@ exponent_plus:
 skip_100:
 
    cp 10
-   jr c, skip_10
+   jr C, skip_10
    
    ld de,$0a00 + '0' - 1
    call __dtoa_exp_digit       ; 10s
@@ -211,7 +211,7 @@ __dtoh_digits:
 
 top_nibble:
 
-   ret z
+   ret Z
    
    exx
    ld a,(hl)
@@ -233,7 +233,7 @@ top_nibble:
 
 lower_nibble:
 
-   ret z
+   ret Z
    
    exx
    ld a,(hl)
