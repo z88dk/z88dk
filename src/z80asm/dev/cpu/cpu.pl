@@ -26,38 +26,40 @@ use Modern::Perl;
 #------------------------------------------------------------------------------
 my @CPUS = qw( z80 z80n z180 r2k r3k 8080 );
 
-my @R8	= qw( b c d e h l      a );
-my @R8I	= qw( b c d e h l (hl) a );
-my @R8F	= qw( b c d e h l f    a );
-my @R16SP = qw( bc de hl sp );
-my @R16AF = qw( bc de hl af );
-my @ALU = qw( add adc sub sbc and xor or cp );
-my @TEST= qw( tst test );
-my @ROTA= qw( rlca rrca rla rra );
-my @ROT = qw( rlc rrc rl rr sla sra sll sli srl );
-my @BIT = qw( bit res set );
-my @FLAGS = qw( _nz _z _nc _c _po _pe _nv _v _lz _lo _p _m );
-my %INV_FLAG = qw( 	_nz	_z 
-					_z 	_nz
-					_nc _c 
-					_c	_nc
-					_po _pe 
-					_pe	_po
-					_nv _v 
-					_v	_nv
-					_lz _lo 
-					_lo	_lz
-					_p 	_m
-					_m	_p );
-my @X	= qw( ix iy );
-my @DIS	= ('0', '%d');
-my @IO	= ('', qw( ioi ioe ));
-my @ALTD= ('', qw( altd ));
-my @A_  = ('a, ', '');
+my @R8			= qw( b c d e h l      a );
+my @R8_INTEL	= qw( b c d e h l m    a );
+my @R8I			= qw( b c d e h l (hl) a );
+my @R8F			= qw( b c d e h l f    a );
+my @R16SP 		= qw( bc de hl sp );
+my @R16AF 		= qw( bc de hl af );
+my @ALU 		= qw( add adc sub sbc and xor or cp );
+my @TEST		= qw( tst test );
+my @ROTA		= qw( rlca rrca rla rra );
+my @ROT 		= qw( rlc rrc rl rr sla sra sll sli srl );
+my @BIT 		= qw( bit res set );
+my @FLAGS 		= qw( _nz _z _nc _c _po _pe _nv _v _lz _lo _p _m );
+my @FLAGS_INTEL	= qw( _nz _z _nc _c _po _pe                _p _m );
+my %INV_FLAG 	= qw( 	_nz	_z 
+						_z 	_nz
+						_nc _c 
+						_c	_nc
+						_po _pe 
+						_pe	_po
+						_nv _v 
+						_v	_nv
+						_lz _lo 
+						_lo	_lz
+						_p 	_m
+						_m	_p );
+my @X			= qw( ix iy );
+my @DIS			= ('0', '%d');
+my @IO			= ('', qw( ioi ioe ));
+my @ALTD		= ('', qw( altd ));
+my @A_  		= ('a, ', '');
 
 my %V = (
 	'' => '',
-	b => 0, c => 1, d => 2, e => 3, h => 4, l => 5, '(hl)' => 6, f => 6, a => 7,
+	b => 0, c => 1, d => 2, e => 3, h => 4, l => 5, '(hl)' => 6, f => 6, m => 6, a => 7,
 	bc => 0, de => 1, hl => 2, sp => 3, af => 3,
 	_nz => 0, _z => 1, _nc => 2, _c => 3, 
 	_po => 4, _pe => 5,
@@ -83,6 +85,7 @@ for my $cpu (@CPUS) {
 	my $z180 	= ($cpu =~ /^z180/);
 	my $zilog	= ($cpu =~ /^z/);
 	my $i8080	= ($cpu =~ /^8080/);
+	my $intel 	= ($cpu =~ /^80/);
 	
 	# 8-bit load group
 	for my $r (@R8I) { 
@@ -127,13 +130,18 @@ for my $cpu (@CPUS) {
 		}
 	}
 	
-	if ($zilog) {
+	if ($intel || $zilog) {
 		add_opc($cpu, "daa", 0x27);
+	}
+	else {
+		add_opc($cpu, "daa", 0xCD, '@__z80asm__daa');
+	}
+	
+	if ($zilog) {
 		add_opc($cpu, "rrd", 0xED, 0x67);
 		add_opc($cpu, "rld", 0xED, 0x6F);
 	}
 	elsif ($rabbit) {
-		add_opc($cpu, "daa", 0xCD, '@__z80asm__daa');
 		add_opc($cpu, "rrd", 0xCD, '@__z80asm__rrd');
 		add_opc($cpu, "rld", 0xCD, '@__z80asm__rld');
 	}
@@ -170,21 +178,25 @@ for my $cpu (@CPUS) {
 		if ($r eq 'hl') {
 			add_opc($cpu, "ld $r, (%m)", 0x2A, '%m', '%m');
 			add_opc($cpu, "ld (%m), $r", 0x22, '%m', '%m');
-			
-			for my $x (@X) {
-				add_opc($cpu, "ld $x, %m", $V{$x}, 0x01 + $V{$r}*16, '%m', '%m') if !$i8080;
-				add_opc($cpu, "ld $x, (%m)", $V{$x}, 0x2A, '%m', '%m') if !$i8080;
-				add_opc($cpu, "ld (%m), $x", $V{$x}, 0x22, '%m', '%m') if !$i8080;
+
+			if (!$i8080) {
+				for my $x (@X) {
+					add_opc($cpu, "ld $x, %m", $V{$x}, 0x01 + $V{$r}*16, '%m', '%m');
+					add_opc($cpu, "ld $x, (%m)", $V{$x}, 0x2A, '%m', '%m');
+					add_opc($cpu, "ld (%m), $x", $V{$x}, 0x22, '%m', '%m');
+				}
 			}
 		}
 		else {
-			add_opc($cpu, "ld $r, (%m)", 0xED, 0x4B + $V{$r}*16, '%m', '%m') if !$i8080;
-			add_opc($cpu, "ld (%m), $r", 0xED, 0x43 + $V{$r}*16, '%m', '%m') if !$i8080;
+			if (!$i8080) {
+				add_opc($cpu, "ld $r, (%m)", 0xED, 0x4B + $V{$r}*16, '%m', '%m');
+				add_opc($cpu, "ld (%m), $r", 0xED, 0x43 + $V{$r}*16, '%m', '%m');
+			}
 		}
 	}
 	
 	add_opc($cpu, "ld sp, hl", 0xF9);
-        if ( !$i8080 ) {
+	if ( !$i8080 ) {
 		for my $x (@X) {
 			add_opc($cpu, "ld sp, $x", $V{$x}, 0xF9);
 		}
@@ -194,10 +206,12 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "push $r", 0xC5 + $V{$r}*16);
 		add_opc($cpu, "pop $r", 0xC1 + $V{$r}*16);
 		
-		if ($r eq 'hl') {
-			for my $x (@X) {
-				add_opc($cpu, "push $x", $V{$x}, 0xC5 + $V{$r}*16) if !$i8080;
-				add_opc($cpu, "pop $x", $V{$x}, 0xC1 + $V{$r}*16) if !$i8080;
+		if (!$i8080) {
+			if ($r eq 'hl') {
+				for my $x (@X) {
+					add_opc($cpu, "push $x", $V{$x}, 0xC5 + $V{$r}*16);
+					add_opc($cpu, "pop $x", $V{$x}, 0xC1 + $V{$r}*16);
+				}
 			}
 		}
 	}
@@ -291,12 +305,14 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "dec $r", 0x0B + $V{$r}*16);
 	}
 	
-	for my $x (@X) {
-		for my $r (@R16SP) {
-			add_opc($cpu, "add $x, ".replace($r, qr/hl/, $x), $V{$x}, 0x09 + $V{$r}*16) if !$i8080;
+	if (!$i8080) {
+		for my $x (@X) {
+			for my $r (@R16SP) {
+				add_opc($cpu, "add $x, ".replace($r, qr/hl/, $x), $V{$x}, 0x09 + $V{$r}*16);
+			}
+			add_opc($cpu, "inc $x", $V{$x}, 0x03 + 2*16);
+			add_opc($cpu, "dec $x", $V{$x}, 0x0B + 2*16);
 		}
-		add_opc($cpu, "inc $x", $V{$x}, 0x03 + 2*16) if !$i8080;
-		add_opc($cpu, "dec $x", $V{$x}, 0x0B + 2*16) if !$i8080;
 	}
 	
 	if ($rabbit) {
@@ -337,10 +353,12 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, $op, 0x07 + $V{$op}*8);
 	}
 	
-	for my $op (@ROT) {
-		next if $op =~ /sll|sli/ && !$zilog;
-		for my $r (@R8I) {
-			add_opc($cpu, "$op $r", 0xCB, $V{$op}*8 + $V{$r}) if !$i8080;
+	if (!$i8080) {
+		for my $op (@ROT) {
+			next if $op =~ /sll|sli/ && !$zilog;
+			for my $r (@R8I) {
+				add_opc($cpu, "$op $r", 0xCB, $V{$op}*8 + $V{$r});
+			}
 		}
 	}
 	
@@ -355,9 +373,11 @@ for my $cpu (@CPUS) {
 	}
 	
 	# bit set, reset and test group
-	for my $op (@BIT) {
-		for my $r (@R8I) {
-			add_opc($cpu, "$op %c, $r", 0xCB, ($V{$op}*0x40 + $V{$r})."+8*%c(0..7)") if !$i8080;
+	if (!$i8080) {
+		for my $op (@BIT) {
+			for my $r (@R8I) {
+				add_opc($cpu, "$op %c, $r", 0xCB, ($V{$op}*0x40 + $V{$r})."+8*%c(0..7)");
+			}
 		}
 	}
 	
@@ -396,10 +416,10 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "ld a, r", 0xED, 0x5F);
 	}
 
-        if ($i8080) {
+	if ($i8080) {
 		add_opc($cpu, "di", 0xF3);
 		add_opc($cpu, "ei", 0xFB);
-        }
+	}
 	
 	if ($rabbit) {
 		add_opc($cpu, "ld eir, a", 0xED, 0x47);
@@ -416,22 +436,24 @@ for my $cpu (@CPUS) {
 	add_opc($cpu, "idet", 0x5B) if $r3k;
 	
 	# Jump group
-        if ( $i8080 ) {
-		add_opc($cpu, "jr %j", 0xC3, '%m', '%m');
-        } else {
-		add_opc($cpu, "jr %j", 0x18, '%j') if !$i8080;
-        }
+	if ( $i8080 ) {
+		add_opc($cpu, "jr %m", 0xC3, '%m', '%m');
+	} 
+	else {
+		add_opc($cpu, "jr %j", 0x18, '%j');
+	}
 	add_opc($cpu, "jp %m", 0xC3, '%m', '%m');
 
 	# TODO: check that address is corretly computed in DJNZ B', LABEL - 76 10 FE or 76 10 FD
-        if ( $i8080 ) {
+	if ( $i8080 ) {
 		# Emulate it on 8080
-		add_opc($cpu, "djnz %j", 0x05, 0xC2, '%m', '%m') ;
-		add_opc($cpu, "djnz b, %j", 0x05, 0xC2, '%m', '%m');
-        } else {
-		add_opc($cpu, "djnz %j", 0x10, '%j') if !$i8080;
-		add_opc($cpu, "djnz b, %j", 0x10, '%j') if !$i8080;
-        }
+		add_opc($cpu, "djnz %m", 0x05, 0xC2, '%m', '%m') ;
+		add_opc($cpu, "djnz b, %m", 0x05, 0xC2, '%m', '%m');
+	} 
+	else {
+		add_opc($cpu, "djnz %j", 0x10, '%j');
+		add_opc($cpu, "djnz b, %j", 0x10, '%j');
+	}
 	
 	
 	for my $_f (@FLAGS) {
@@ -441,9 +463,10 @@ for my $cpu (@CPUS) {
 		}
 		elsif ($f =~ /^(nz|z|nc|c)$/) {
 			if ( $i8080 ) {
-				add_opc($cpu, "jr $f, %j", 0xC2 + $V{$_f}*8, '%m', '%m');
-			} else {
-				add_opc($cpu, "jr $f, %j", 0x20 + $V{$_f}*8, '%j') if !$i8080;
+				add_opc($cpu, "jr $f, %m", 0xC2 + $V{$_f}*8, '%m', '%m');
+			} 
+			else {
+				add_opc($cpu, "jr $f, %j", 0x20 + $V{$_f}*8, '%j');
 			}
 			add_opc($cpu, "jp $f, %m", 0xC2 + $V{$_f}*8, '%m', '%m');
 		}
@@ -456,7 +479,7 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "jp ($x)", @pfx, 0xE9);
 	}
 	
-        if ( !$i8080 ) {
+	if ( !$i8080 ) {
 		for ([ix => 0xDD], [iy => 0xFD]) {
 			my($x, @pfx) = @$_;
 			add_opc($cpu, "jp ($x)", @pfx, 0xE9);
@@ -506,16 +529,16 @@ for my $cpu (@CPUS) {
 	add_opc($cpu, "rst %c", "0xC7+%c");
 	
 	# Block transfer group
-        if ( $i8080 ) {
+	if ( $i8080 ) {
 		add_opc($cpu, "ldi", 	0xCD, '@__z80asm__ldi');
 		add_opc($cpu, "ldir", 	0xCD, '@__z80asm__ldir');
 		add_opc($cpu, "ldd", 	0xCD, '@__z80asm__ldd');
 		add_opc($cpu, "lddr", 	0xCD, '@__z80asm__lddr');
 	} else {
-		add_opc($cpu, "ldi", 	0xED, 0xA0) if !$i8080;
-		add_opc($cpu, "ldir", 	0xED, 0xB0) if !$i8080;
-		add_opc($cpu, "ldd", 	0xED, 0xA8) if !$i8080;
-		add_opc($cpu, "lddr", 	0xED, 0xB8) if !$i8080;
+		add_opc($cpu, "ldi", 	0xED, 0xA0);
+		add_opc($cpu, "ldir", 	0xED, 0xB0);
+		add_opc($cpu, "ldd", 	0xED, 0xA8);
+		add_opc($cpu, "lddr", 	0xED, 0xB8);
 	}
 
 	if ($r3k) {
@@ -543,7 +566,11 @@ for my $cpu (@CPUS) {
 	}
 
 	# Input and Output Group
-	if ($zilog) {
+	if ($intel) {
+		add_opc($cpu, "in a, (%n)", 		0xDB, '%n');
+		add_opc($cpu, "out (%n), a", 		0xD3, '%n');
+	}		
+	elsif ($zilog) {
 		add_opc($cpu, "in a, (%n)", 		0xDB, '%n');
 		add_opc($cpu, "in (c)", 			0xED, 0x40 + $V{f}*8);
 		add_opc($cpu, "in0 (%n)", 			0xED, 0x00 + $V{f}*8, '%n') if $z180;
@@ -631,6 +658,98 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "ldpirx",			0xED, 0xB7);
 		add_opc($cpu, "lddrx",			0xED, 0xBC);
 	}
+	
+	# Intel opcodes for the i8080, implement in all CPUs to simplify porting of code
+	for my $d (@R8_INTEL) {
+		for my $s (@R8_INTEL) {
+			if ($d ne 'm' || $s ne 'm') {
+				add_opc($cpu, "mov $d, $s",	
+									0x40 + $V{$d}*8 + $V{$s});
+			}
+		}
+		add_opc($cpu, "mvi $d, %n",	0x06 + $V{$d}*8, '%n');
+	}
+	
+	for my $r (@R8_INTEL) {
+		add_opc($cpu, "add $r",		0x80 + $V{$r});
+		add_opc($cpu, "adc $r",		0x88 + $V{$r});
+		add_opc($cpu, "sub $r",		0x90 + $V{$r});
+		add_opc($cpu, "sbb $r",		0x98 + $V{$r});
+		add_opc($cpu, "inr $r",		0x04 + $V{$r}*8);
+		add_opc($cpu, "dcr $r",		0x05 + $V{$r}*8);
+		add_opc($cpu, "ana $r",		0xA0 + $V{$r});
+		add_opc($cpu, "ora $r",		0xB0 + $V{$r});
+		add_opc($cpu, "xra $r",		0xA8 + $V{$r});
+		add_opc($cpu, "cmp $r",		0xB8 + $V{$r});
+	}
+	
+	add_opc($cpu, "adi %n",			0xC6, '%n');
+	add_opc($cpu, "aci %n",			0xCE, '%n');
+	add_opc($cpu, "sui %n",			0xD6, '%n');
+	add_opc($cpu, "sbi %n",			0xDE, '%n');
+	add_opc($cpu, "ani %n",			0xE6, '%n');
+	add_opc($cpu, "ori %n",			0xF6, '%n');
+	add_opc($cpu, "xri %n",			0xEE, '%n');
+	add_opc($cpu, "cpi %n",			0xFE, '%n');
+	
+	for my $r (@R16SP) {
+		add_opc($cpu, "lxi $r, %m",	0x01 + $V{$r}*16, '%m', '%m');
+		add_opc($cpu, "inx $r",		0x03 + $V{$r}*16);
+		add_opc($cpu, "dcx $r",		0x0B + $V{$r}*16);
+		add_opc($cpu, "dad $r",		0x09 + $V{$r}*16);
+	}
+	
+	for my $r (@R16AF) {
+		add_opc($cpu, "push $r",	0xC5 + $V{$r}*16);
+		add_opc($cpu, "pop $r",		0xC1 + $V{$r}*16);
+	}
+	
+	for my $r (qw( bc de )) {
+		add_opc($cpu, "ldax $r",	0x0A + $V{$r}*16);
+		add_opc($cpu, "stax $r",	0x02 + $V{$r}*16);
+	}
+	
+	add_opc($cpu, "lda %m",			0x3A, '%m', '%m');
+	add_opc($cpu, "sta %m",			0x32, '%m', '%m');
+	add_opc($cpu, "lhld %m",		0x2A, '%m', '%m');
+	add_opc($cpu, "shld %m",		0x22, '%m', '%m');
+	add_opc($cpu, "xchg",			0xEB);
+	add_opc($cpu, "daa",			0x27) if !$rabbit;
+	add_opc($cpu, "rlc",			0x07);
+	add_opc($cpu, "rrc",			0x0F);
+	add_opc($cpu, "ral",			0x17);
+	add_opc($cpu, "rar",			0x1F);
+	add_opc($cpu, "cma",			0x2F);
+	add_opc($cpu, "cmc",			0x3F);
+	add_opc($cpu, "stc",			0x37);
+	
+	for my $_f (@FLAGS_INTEL) {
+		my $f = substr($_f, 1);		# remove leading _
+
+		# create j_m and j_p, as jp is jmp
+		add_opc($cpu, "j$f %m", 	0xC2 + $V{$_f}*8, '%m', '%m') unless $f eq 'p';
+		add_opc($cpu, "j_$f %m", 	0xC2 + $V{$_f}*8, '%m', '%m');
+		
+		if (!$rabbit) {
+			add_opc($cpu, "c$f %m", 	0xC4 + $V{$_f}*8, '%m', '%m') unless $f eq 'p';
+			add_opc($cpu, "c_$f %m", 	0xC4 + $V{$_f}*8, '%m', '%m');
+		}
+		add_opc($cpu, "r$f",	 	0xC0 + $V{$_f}*8);
+		add_opc($cpu, "r_$f",	 	0xC0 + $V{$_f}*8);
+	}
+	add_opc($cpu, "jmp %m",			0xC3, '%m', '%m');
+	add_opc($cpu, "call %m",		0xCD, '%m', '%m');
+	add_opc($cpu, "ret",			0xC9);
+	add_opc($cpu, "pchl",			0xE9);
+	add_opc($cpu, "xthl",			0xE3);
+	add_opc($cpu, "sphl",			0xF9);
+	add_opc($cpu, "in %n",			0xDB, '%n') if !$rabbit;
+	add_opc($cpu, "out %n",			0xD3, '%n') if !$rabbit;
+	add_opc($cpu, "ei",				0xFB) if !$rabbit;
+	add_opc($cpu, "di",				0xF3) if !$rabbit;
+	add_opc($cpu, "hlt",			0x76) if !$rabbit;
+	add_opc($cpu, "nop",			0x00);
+	# rst N*8: already implemented in the generic case
 }
 
 #------------------------------------------------------------------------------
@@ -696,7 +815,6 @@ for my $cpu (@CPUS) {
 for my $asm (sort keys %Tests) {
 	my $asmf = sprintf(" %-31s", $asm);
 	for my $cpu (@CPUS) {
-        	next if $cpu eq "8080";
 		if (exists $Tests{$asm}{$cpu}) {
 			for my $ixiy ('', '_ixiy') {
 				my $asm1 = $asm;
@@ -716,7 +834,17 @@ for my $asm (sort keys %Tests) {
 			}
 		}
 		else {
-			$fh{$cpu}{''}{err}->print($asmf."; Error\n");
+			# special case: 'djnz ASMPC' is translated to 'djnz NN' in i8080
+			my $skip = 0;
+			if ($asm =~ /jr|djnz/) {
+				if ($cpu eq "8080") {
+					$skip = 1 if $asm =~ /ASMPC/;	# DIS
+				}
+				else {
+					$skip = 1 if $asm =~ /\d+/;		# nn
+				}
+			}
+			$fh{$cpu}{''}{err}->print($asmf."; Error\n") unless $skip;
 		}
 	}
 	if (exists $Tests{$asm}{''}) {
@@ -1155,12 +1283,7 @@ sub add_tests {
 		add_tests($cpu, replace($asm, '%M',-32768), replace($bin, '%M %M', 0x80." ".0x00));
 	}
 	elsif ($asm =~ /%j/) {
-		if ( $cpu eq "8080" ) {
-			# Bit of a hack for the relative jump replacement on the 8080
-			# I can't figure out how to add a test that will only affect 8080, not all cpus
-		} else {
-			add_tests($cpu, replace($asm, '%j', "ASMPC"), replace($bin, '%j', 0xFE));
-		}
+		add_tests($cpu, replace($asm, '%j', "ASMPC"), replace($bin, '%j', 0xFE));
 	}
 	elsif ($asm =~ /^rst %c/) {		# special case
 		for my $div (1, 8) {
