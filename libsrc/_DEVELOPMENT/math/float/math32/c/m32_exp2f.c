@@ -79,7 +79,7 @@ float m32_exp2f (float x) __z88dk_fastcall
 
     if( x > 0.5 )
     {
-	    n += 1;
+	    ++n;
 	    x -= 1.0;
     }
 
