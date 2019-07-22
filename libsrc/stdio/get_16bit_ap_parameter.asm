@@ -17,7 +17,7 @@ get_16bit_ap_parameter:
         inc     hl
         ld      d,(hl)
         ex      de,hl           ;de=ap+1 hl=to print
-IF __CPU_8080__
+IF __CPU_INTEL__
 	call	__printf_issccz80
 ELSE
         bit     0,(ix+6)        ;sccz80 flag

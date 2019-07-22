@@ -39,7 +39,7 @@ loop:
    push hl
    
    rra
-IF __CPU_8080__
+IF __CPU_INTEL__
    ld a,l
    adc l
    ld l,a

@@ -16,7 +16,7 @@
 _snprintf:
 	ld	hl,2
 	add	hl,sp	;points to buf
-IF !__CPU_8080__
+IF !__CPU_INTEL__
 	push	ix	;save callers
 ENDIF
 
@@ -51,7 +51,7 @@ ENDIF
 	add	hl,sp
 	ld	sp,hl
 	ex	de,hl
-IF !__CPU_8080__
+IF !__CPU_INTEL__
 	pop	ix	;restore ix
 ENDIF
 	ret

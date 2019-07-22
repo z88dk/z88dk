@@ -13,7 +13,7 @@
 
 __convert_sdccf2reg:
 	add	hl,hl	;shift right, sign into carry
-IF __CPU_8080__
+IF __CPU_INTEL__
         ld      a,l
         rra
         ld      l,a

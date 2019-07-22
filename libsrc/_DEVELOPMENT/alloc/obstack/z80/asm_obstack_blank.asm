@@ -43,7 +43,7 @@ asm_obstack_blank:
    ;
    ; uses  : af, de, hl
   
-IF __CPU_8080__
+IF __CPU_INTEL__
    ld a,b
    rla
    jr c,shrink_object
@@ -59,7 +59,7 @@ grow_object:
    
    call asm_obstack_room       ; hl = bytes available, de = ob->fence
    
-IF __CPU_8080__
+IF __CPU_INTEL__
    ld a,l
    sub c
    ld l,a

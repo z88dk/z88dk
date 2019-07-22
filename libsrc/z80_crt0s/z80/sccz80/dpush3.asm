@@ -1,5 +1,5 @@
         
-IF !__CPU_8080__
+IF !__CPU_INTEL__
 	SECTION	  code_crt0_sccz80
         PUBLIC    dpush3
 	EXTERN	  fa

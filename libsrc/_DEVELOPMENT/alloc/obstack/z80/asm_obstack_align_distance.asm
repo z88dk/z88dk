@@ -55,7 +55,7 @@ asm_obstack_align_distance:
    
    call l_andc_hlbc            ; hl = next aligned address
    
-IF __CPU_8080__
+IF __CPU_INTEL__
    ld a,l
    sub e
    ld l,a

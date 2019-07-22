@@ -10,7 +10,7 @@
 
 l_f32_sub:
 	call	___mbf32_setup_arith
-IF __CPU_8080__
+IF __CPU_INTEL__
 	call	___mbf32_SUBCDE
 ELSE
 	ld	ix,___mbf32_SUBCDE

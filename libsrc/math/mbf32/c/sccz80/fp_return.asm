@@ -8,7 +8,7 @@
 
 ; Return the value that's in the DAC
 ___mbf32_return:
-IF __CPU_8080__
+IF __CPU_INTEL__
 	ld	hl,(___mbf32_FPREG+2)
 	ex	de,hl
 ELSE

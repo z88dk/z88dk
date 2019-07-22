@@ -9,7 +9,7 @@
 
 pow:
 	call	___mbf32_setup_two
-IF __CPU_8080__
+IF __CPU_INTEL__
 	call	___mbf32_POW
 ELSE
 	ld	ix,___mbf32_POW

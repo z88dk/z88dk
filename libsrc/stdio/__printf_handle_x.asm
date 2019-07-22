@@ -11,7 +11,7 @@
 
 __printf_handle_x:
 __printf_handle_p:
-IF __CPU_8080__
+IF __CPU_INTEL__
         ld      c,16
         call    __printf_set_base
         call    __printf_disable_plus_flag

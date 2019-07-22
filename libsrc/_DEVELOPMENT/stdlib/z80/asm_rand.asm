@@ -34,7 +34,7 @@ asm_rand:
    ; get current seed
    
    ld hl,(__stdlib_seed)
-IF __CPU_8080__
+IF __CPU_INTEL__
    ex de,hl
    ld hl,(__stdlib_seed + 2)
    ex de,hl
@@ -49,7 +49,7 @@ ENDIF
    ; store new seed
 
    ld (__stdlib_seed),hl
-IF __CPU_8080__
+IF __CPU_INTEL__
    ex de,hl
    ld (__stdlib_seed + 2),hl
    ex de,hl

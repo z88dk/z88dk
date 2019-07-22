@@ -21,11 +21,11 @@ strncasecmp:
    push af
 
 IF __CLASSIC
-IF !__CPU_8080__
+IF !__CPU_INTEL__
    push ix   
 ENDIF
    call  asm_strncasecmp
-IF !__CPU_8080__
+IF !__CPU_INTEL__
    pop  ix
 ENDIF
    ret

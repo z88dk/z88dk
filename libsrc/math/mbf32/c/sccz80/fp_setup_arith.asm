@@ -22,7 +22,7 @@ ___mbf32_setup_arith:
 	ld	(___mbf32_VALTYP),a
 	; The right value needs to go into FPREG
 	ld	(___mbf32_FPREG + 0),hl
-IF __CPU_8080__
+IF __CPU_INTEL__
 	ex	de,hl
 	ld	(___mbf32_FPREG + 2),hl
 ELSE
@@ -33,7 +33,7 @@ ENDIF
 	pop	de		;Left LSW
 	pop	bc		;Left MSW
 	push	hl
-IF !__CPU_8080__
+IF !__CPU_INTEL__
 	push	ix
 ENDIF
 	push	af		;Our return address

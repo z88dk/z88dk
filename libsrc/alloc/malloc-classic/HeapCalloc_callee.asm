@@ -55,7 +55,7 @@ EXTERN ASMDISP_HEAPALLOC_CALLEE
    ld e,l
    ld d,h
    inc de
-IF __CPU_8080__
+IF __CPU_INTEL__
 ldir_loop:
    ld a,(hl)
    ld (de),a

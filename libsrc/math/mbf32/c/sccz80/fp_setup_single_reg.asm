@@ -18,13 +18,13 @@ ___mbf32_setup_single_reg:
 	ld	a,4
 	ld	(___mbf32_VALTYP),a
         ld      (___mbf32_FPREG + 0),hl
-IF __CPU_8080__
+IF __CPU_INTEL__
 	ex	de,hl
         ld      (___mbf32_FPREG + 2),hl
 ELSE
         ld      (___mbf32_FPREG + 2),de
 ENDIF
-IF !__CPU_8080__
+IF !__CPU_INTEL__
 	pop	hl
 	push	ix
 	push	hl

@@ -25,7 +25,7 @@ cprintf:
 	ld	h,0
         add     hl,hl
 	add	hl,sp		;&fmt
-IF !__CPU_8080__
+IF !__CPU_INTEL__
 	push	ix
 ENDIF
 	push	bc		;fp (we don't care about the fp)
@@ -47,7 +47,7 @@ ENDIF
 	pop	bc	
 	pop	bc
 	pop	bc
-IF !__CPU_8080__
+IF !__CPU_INTEL__
 	pop	ix
 ENDIF
 	ret

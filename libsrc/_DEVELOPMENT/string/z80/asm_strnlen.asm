@@ -44,7 +44,7 @@ asm_strnlen:
 
 notend:
 
-IF __CPU_8080__
+IF __CPU_INTEL__
    ld  a,l
    sub e
    ld  l,a

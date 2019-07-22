@@ -38,13 +38,13 @@ no_flag:
         inc     hl
         djnz    flag_loop
         pop     hl
-IF __CPU_8080__
+IF __CPU_INTEL__
 	call	__printf_set_flags
 ELSE
         ld      (ix-4),c        ;save flags
 ENDIF
 check_width:
-IF __CPU_8080__
+IF __CPU_INTEL__
 	push	de
 	ld	de,0
 	call	__printf_set_width
@@ -78,7 +78,7 @@ check_width_from_format:
                                 ;TODO, check < 0
         ex      de,hl           ;hl=next format
 save_width:
-IF __CPU_8080__
+IF __CPU_INTEL__
 	call	__printf_set_width
 ELSE
         ld      (ix-5),d        ;store width
@@ -88,7 +88,7 @@ ENDIF
         ld      a,(hl)
         inc     hl
 check_precision:
-IF __CPU_8080__
+IF __CPU_INTEL__
 	push	de
 	ld	de,-1
 	call	__printf_set_precision
@@ -118,7 +118,7 @@ check_precision_from_format:
                                 ;TODO, check <0
         ex      de,hl           ;hl=next format acharacter
 save_precision:
-IF __CPU_8080__
+IF __CPU_INTEL__
 	call	__printf_set_precision
 ELSE
         ld      (ix-7),d

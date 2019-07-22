@@ -16,7 +16,7 @@ modf:
 	ld	hl,4
 	add	hl,sp
 	call	l_glong
-IF __CPU_8080__
+IF __CPU_INTEL__
 	ld	a,e
 	rra
 	jp	c,isnegative
@@ -53,7 +53,7 @@ rejoin:
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d
-IF __CPU_8080__
+IF __CPU_INTEL__
 	ex	de,hl
 	ld	(___mbf32_FPREG+2),hl
 	ld	l,c
@@ -72,7 +72,7 @@ ENDIF
 	ld	c,(hl)
 	inc	hl
 	ld	b,(hl)
-IF __CPU_8080__
+IF __CPU_INTEL__
 	call	___mbf32_SUBCDE
         ld      hl,(___mbf32_FPREG+2)
 	ex	de,hl

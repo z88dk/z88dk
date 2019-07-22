@@ -22,7 +22,7 @@ printstr:
         push    hl              ;save string
         call    strlen          ;exits hl=length
         ex      de,hl           ;de=length
-IF __CPU_8080__
+IF __CPU_INTEL__
 	call	__printf_get_precision
 ELSE
 	ld	l,(ix-8)	;precision

@@ -19,7 +19,7 @@ ceil:
 	xor	$80
 	ld	(hl),a
 	push	af
-IF __CPU_8080__
+IF __CPU_INTEL__
         call	___mbf32_FPINT
 ELSE
         ld      ix,___mbf32_FPINT
@@ -36,7 +36,7 @@ ENDIF
 	dec	d
 not_negative:
 	call	l_long_neg
-IF !__CPU_8080__
+IF !__CPU_INTEL__
 	pop	ix
 ENDIF
 	jp	l_f32_slong2f

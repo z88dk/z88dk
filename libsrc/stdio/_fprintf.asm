@@ -21,7 +21,7 @@ _fprintf:
 	push	de
 	push	bc
 	push	af
-IF !__CPU_8080__
+IF !__CPU_INTEL__
 	push	ix	;save ix
 ENDIF
 	push	bc	;fp
@@ -37,7 +37,7 @@ ENDIF
 	pop	bc	
 	pop	bc
 	pop	bc
-IF !__CPU_8080__
+IF !__CPU_INTEL__
 	pop	ix	;restore ix
 ENDIF
 	ret

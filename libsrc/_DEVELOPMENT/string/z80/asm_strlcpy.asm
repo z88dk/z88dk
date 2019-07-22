@@ -69,7 +69,7 @@ szexceeded1:
    dec hl
    
    pop bc
-IF __CPU_8080__
+IF __CPU_INTEL__
    ld  a,l
    sub c
    ld  l,a
@@ -93,7 +93,7 @@ done:
    ; stack = char *src
    
    pop bc                      ; bc = char *src
-IF __CPU_8080__
+IF __CPU_INTEL__
    ld  a,l
    sub c
    ld  l,a
