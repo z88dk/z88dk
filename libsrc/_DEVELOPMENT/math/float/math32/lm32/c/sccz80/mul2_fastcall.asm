@@ -1,5 +1,4 @@
 
-
 	SECTION	code_fp_math32
 	PUBLIC	mul2_fastcall
 	EXTERN	_m32_mul2f

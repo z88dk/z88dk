@@ -1,5 +1,6 @@
+
 	SECTION	code_fp_math32
-	PUBLIC	acos
+	PUBLIC	div2
 	EXTERN	cm32_sccz80_fsdiv2
 
 	defc	div2 = cm32_sccz80_fsdiv2
