@@ -18,6 +18,8 @@ math/float/math32/lm32/c/sccz80/cos
 math/float/math32/lm32/c/sccz80/cos_fastcall
 math/float/math32/lm32/c/sccz80/cosh
 math/float/math32/lm32/c/sccz80/cosh_fastcall
+math/float/math32/lm32/c/sccz80/div2
+math/float/math32/lm32/c/sccz80/div2_fastcall
 math/float/math32/lm32/c/sccz80/exp
 math/float/math32/lm32/c/sccz80/exp_fastcall
 math/float/math32/lm32/c/sccz80/exp2
@@ -43,7 +45,6 @@ math/float/math32/lm32/c/sccz80/ldexp_callee
 math/float/math32/lm32/c/sccz80/l_f32_add
 math/float/math32/lm32/c/sccz80/l_f32_conv
 math/float/math32/lm32/c/sccz80/l_f32_div
-math/float/math32/lm32/c/sccz80/l_f32_div2
 math/float/math32/lm32/c/sccz80/l_f32_eq
 math/float/math32/lm32/c/sccz80/l_f32_f2long
 math/float/math32/lm32/c/sccz80/l_f32_ge
@@ -53,7 +54,6 @@ math/float/math32/lm32/c/sccz80/l_f32_ldexp
 math/float/math32/lm32/c/sccz80/l_f32_le
 math/float/math32/lm32/c/sccz80/l_f32_lt
 math/float/math32/lm32/c/sccz80/l_f32_mul
-math/float/math32/lm32/c/sccz80/l_f32_mul2
 math/float/math32/lm32/c/sccz80/l_f32_ne
 math/float/math32/lm32/c/sccz80/l_f32_sub
 math/float/math32/lm32/c/sccz80/l_f32_swap
@@ -65,6 +65,8 @@ math/float/math32/lm32/c/sccz80/log2_fastcall
 math/float/math32/lm32/c/sccz80/log10
 math/float/math32/lm32/c/sccz80/log10_fastcall
 math/float/math32/lm32/c/sccz80/modf
+math/float/math32/lm32/c/sccz80/mul2
+math/float/math32/lm32/c/sccz80/mul2_fastcall
 math/float/math32/lm32/c/sccz80/pow
 math/float/math32/lm32/c/sccz80/pow_callee
 math/float/math32/lm32/c/sccz80/round
