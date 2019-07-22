@@ -2626,22 +2626,22 @@ void zand_const(LVALUE *lval, int32_t value)
         } else if ( (value & 0xffffff00) == 0xffffff00 ) {
            // Only the bottom 8 bits
            ol("ld\ta,l");
-           outfmt("\tand\t#(%d %% 256)\n",(value & 0xff));
+           outfmt("\tand\t+(%d %% 256)\n",(value & 0xff));
            ol("ld\tl,a");
         } else if ( (value & 0xffff00ff) == 0xffff00ff  ) {
            // Only the bits 15-8
            ol("ld\ta,h");
-           outfmt("\tand\t#(%d %% 256)\n",(value & 0xff00)>>8);
+           outfmt("\tand\t+(%d %% 256)\n",(value & 0xff00)>>8);
            ol("ld\th,a");
         } else if ( (value & 0xff00ffff ) == 0xff00ffff) {
            // Only the bits 23-16
            ol("ld\ta,e");
-           outfmt("\tand\t#(%d %% 256)\n",(value & 0xff0000)>>16);
+           outfmt("\tand\t+(%d %% 256)\n",(value & 0xff0000)>>16);
            ol("ld\te,a");
         } else if ( (value & 0x00ffffff) == 0x00ffffff ) {
            // Only the bits 32-23
            ol("ld\ta,d");
-           outfmt("\tand\t#(%d %% 256)\n",(value & 0xff000000) >> 24);
+           outfmt("\tand\t+(%d %% 256)\n",(value & 0xff000000) >> 24);
            ol("ld\td,a");
         } else if ( (value & 0xffff0000) == 0x00000000 ) {
             LVALUE tval = {0};
@@ -2664,12 +2664,12 @@ void zand_const(LVALUE *lval, int32_t value)
         } else if ( value >= 0 && value < 256 ) {
             // 6 bytes, library call is 6 bytes, this is faster
             ol("ld\ta,l");
-            outfmt("\tand\t#(%d %% 256)\n",value % 256);
+            outfmt("\tand\t+(%d %% 256)\n",value % 256);
             ol("ld\tl,a");
             ol("ld\th,0");
         } else if ( value % 256 == 0 ) {
             ol("ld\ta,h");
-            outfmt("\tand\t#(%d %% 256)\n",(value % 65536) / 256);
+            outfmt("\tand\t+(%d %% 256)\n",(value % 65536) / 256);
             ol("ld\th,a");
             ol("ld\tl,0");            
         } else if ( value == (uint16_t)0xffff ) {
@@ -4234,7 +4234,7 @@ void LoadAccum(void)
 
 void CpCharVal(int val)
 {
-    ot("cp\t#(");
+    ot("cp\t+(");
     outdec(val);
     outstr("% 256)\n");
 }
