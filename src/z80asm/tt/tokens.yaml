@@ -517,6 +517,8 @@ tokens:
   - name    : JM
   - name    : JK
   - name    : JX5
+  - name    : JNK
+  - name    : JNX5
   - name    : J_NC
   - name    : J_C
   - name    : J_NZ
@@ -531,6 +533,8 @@ tokens:
   - name    : J_M
   - name    : J_K
   - name    : J_X5
+  - name    : J_NK
+  - name    : J_NX5
   - name    : CNC
   - name    : CC
   - name    : CNZ

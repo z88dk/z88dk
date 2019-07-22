@@ -24459,9 +24459,27 @@ if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xD2);
 }
 
+| label? _TK_JNK expr _TK_NEWLINE @{
+switch (opts.cpu) {
+case CPU_8085: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xDD);
+break;
+default: error_illegal_ident(); }
+}
+
 | label? _TK_JNV expr _TK_NEWLINE @{
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xE2);
+}
+
+| label? _TK_JNX5 expr _TK_NEWLINE @{
+switch (opts.cpu) {
+case CPU_8085: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xDD);
+break;
+default: error_illegal_ident(); }
 }
 
 | label? _TK_JNZ expr _TK_NEWLINE @{
@@ -24706,9 +24724,27 @@ if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xD2);
 }
 
+| label? _TK_J_NK expr _TK_NEWLINE @{
+switch (opts.cpu) {
+case CPU_8085: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xDD);
+break;
+default: error_illegal_ident(); }
+}
+
 | label? _TK_J_NV expr _TK_NEWLINE @{
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xE2);
+}
+
+| label? _TK_J_NX5 expr _TK_NEWLINE @{
+switch (opts.cpu) {
+case CPU_8085: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_nn(0xDD);
+break;
+default: error_illegal_ident(); }
 }
 
 | label? _TK_J_NZ expr _TK_NEWLINE @{

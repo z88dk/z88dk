@@ -320,9 +320,15 @@
  j_nc -32768                    ; D2 00 80
  j_nc 32767                     ; D2 FF 7F
  j_nc 65535                     ; D2 FF FF
+ j_nk -32768                    ; DD 00 80
+ j_nk 32767                     ; DD FF 7F
+ j_nk 65535                     ; DD FF FF
  j_nv -32768                    ; E2 00 80
  j_nv 32767                     ; E2 FF 7F
  j_nv 65535                     ; E2 FF FF
+ j_nx5 -32768                   ; DD 00 80
+ j_nx5 32767                    ; DD FF 7F
+ j_nx5 65535                    ; DD FF FF
  j_nz -32768                    ; C2 00 80
  j_nz 32767                     ; C2 FF 7F
  j_nz 65535                     ; C2 FF FF
@@ -359,9 +365,15 @@
  jnc -32768                     ; D2 00 80
  jnc 32767                      ; D2 FF 7F
  jnc 65535                      ; D2 FF FF
+ jnk -32768                     ; DD 00 80
+ jnk 32767                      ; DD FF 7F
+ jnk 65535                      ; DD FF FF
  jnv -32768                     ; E2 00 80
  jnv 32767                      ; E2 FF 7F
  jnv 65535                      ; E2 FF FF
+ jnx5 -32768                    ; DD 00 80
+ jnx5 32767                     ; DD FF 7F
+ jnx5 65535                     ; DD FF FF
  jnz -32768                     ; C2 00 80
  jnz 32767                      ; C2 FF 7F
  jnz 65535                      ; C2 FF FF

@@ -345,86 +345,90 @@
 #define _TK_JM	340
 #define _TK_JK	341
 #define _TK_JX5	342
-#define _TK_J_NC	343
-#define _TK_J_C	344
-#define _TK_J_NZ	345
-#define _TK_J_Z	346
-#define _TK_J_PO	347
-#define _TK_J_PE	348
-#define _TK_J_NV	349
-#define _TK_J_V	350
-#define _TK_J_LO	351
-#define _TK_J_LZ	352
-#define _TK_J_P	353
-#define _TK_J_M	354
-#define _TK_J_K	355
-#define _TK_J_X5	356
-#define _TK_CNC	357
-#define _TK_CC	358
-#define _TK_CNZ	359
-#define _TK_CZ	360
-#define _TK_CPO	361
-#define _TK_CPE	362
-#define _TK_CNV	363
-#define _TK_CV	364
-#define _TK_CLO	365
-#define _TK_CLZ	366
-#define _TK_CM	367
-#define _TK_C_NC	368
-#define _TK_C_C	369
-#define _TK_C_NZ	370
-#define _TK_C_Z	371
-#define _TK_C_PO	372
-#define _TK_C_PE	373
-#define _TK_C_NV	374
-#define _TK_C_V	375
-#define _TK_C_LO	376
-#define _TK_C_LZ	377
-#define _TK_C_P	378
-#define _TK_C_M	379
-#define _TK_RNC	380
-#define _TK_RC	381
-#define _TK_RNZ	382
-#define _TK_RZ	383
-#define _TK_RPO	384
-#define _TK_RPE	385
-#define _TK_RNV	386
-#define _TK_RV	387
-#define _TK_RLO	388
-#define _TK_RLZ	389
-#define _TK_RP	390
-#define _TK_RM	391
-#define _TK_R_NC	392
-#define _TK_R_C	393
-#define _TK_R_NZ	394
-#define _TK_R_Z	395
-#define _TK_R_PO	396
-#define _TK_R_PE	397
-#define _TK_R_NV	398
-#define _TK_R_V	399
-#define _TK_R_LO	400
-#define _TK_R_LZ	401
-#define _TK_R_P	402
-#define _TK_R_M	403
-#define _TK_PCHL	404
-#define _TK_XTHL	405
-#define _TK_SPHL	406
-#define _TK_HLT	407
-#define _TK_RIM	408
-#define _TK_SIM	409
-#define _TK_DSUB	410
-#define _TK_ARHL	411
-#define _TK_RRHL	412
-#define _TK_RDEL	413
-#define _TK_RLDE	414
-#define _TK_LDHI	415
-#define _TK_LDSI	416
-#define _TK_RSTV	417
-#define _TK_OVRST8	418
-#define _TK_SHLX	419
-#define _TK_SHLDE	420
-#define _TK_LHLX	421
-#define _TK_LHLDE	422
+#define _TK_JNK	343
+#define _TK_JNX5	344
+#define _TK_J_NC	345
+#define _TK_J_C	346
+#define _TK_J_NZ	347
+#define _TK_J_Z	348
+#define _TK_J_PO	349
+#define _TK_J_PE	350
+#define _TK_J_NV	351
+#define _TK_J_V	352
+#define _TK_J_LO	353
+#define _TK_J_LZ	354
+#define _TK_J_P	355
+#define _TK_J_M	356
+#define _TK_J_K	357
+#define _TK_J_X5	358
+#define _TK_J_NK	359
+#define _TK_J_NX5	360
+#define _TK_CNC	361
+#define _TK_CC	362
+#define _TK_CNZ	363
+#define _TK_CZ	364
+#define _TK_CPO	365
+#define _TK_CPE	366
+#define _TK_CNV	367
+#define _TK_CV	368
+#define _TK_CLO	369
+#define _TK_CLZ	370
+#define _TK_CM	371
+#define _TK_C_NC	372
+#define _TK_C_C	373
+#define _TK_C_NZ	374
+#define _TK_C_Z	375
+#define _TK_C_PO	376
+#define _TK_C_PE	377
+#define _TK_C_NV	378
+#define _TK_C_V	379
+#define _TK_C_LO	380
+#define _TK_C_LZ	381
+#define _TK_C_P	382
+#define _TK_C_M	383
+#define _TK_RNC	384
+#define _TK_RC	385
+#define _TK_RNZ	386
+#define _TK_RZ	387
+#define _TK_RPO	388
+#define _TK_RPE	389
+#define _TK_RNV	390
+#define _TK_RV	391
+#define _TK_RLO	392
+#define _TK_RLZ	393
+#define _TK_RP	394
+#define _TK_RM	395
+#define _TK_R_NC	396
+#define _TK_R_C	397
+#define _TK_R_NZ	398
+#define _TK_R_Z	399
+#define _TK_R_PO	400
+#define _TK_R_PE	401
+#define _TK_R_NV	402
+#define _TK_R_V	403
+#define _TK_R_LO	404
+#define _TK_R_LZ	405
+#define _TK_R_P	406
+#define _TK_R_M	407
+#define _TK_PCHL	408
+#define _TK_XTHL	409
+#define _TK_SPHL	410
+#define _TK_HLT	411
+#define _TK_RIM	412
+#define _TK_SIM	413
+#define _TK_DSUB	414
+#define _TK_ARHL	415
+#define _TK_RRHL	416
+#define _TK_RDEL	417
+#define _TK_RLDE	418
+#define _TK_LDHI	419
+#define _TK_LDSI	420
+#define _TK_RSTV	421
+#define _TK_OVRST8	422
+#define _TK_SHLX	423
+#define _TK_SHLDE	424
+#define _TK_LHLX	425
+#define _TK_LHLDE	426
 
 #ifndef NO_TOKEN_ENUM
 typedef enum tokid_t
@@ -772,85 +776,89 @@ typedef enum tokid_t
 	TK_JM	= 340,
 	TK_JK	= 341,
 	TK_JX5	= 342,
-	TK_J_NC	= 343,
-	TK_J_C	= 344,
-	TK_J_NZ	= 345,
-	TK_J_Z	= 346,
-	TK_J_PO	= 347,
-	TK_J_PE	= 348,
-	TK_J_NV	= 349,
-	TK_J_V	= 350,
-	TK_J_LO	= 351,
-	TK_J_LZ	= 352,
-	TK_J_P	= 353,
-	TK_J_M	= 354,
-	TK_J_K	= 355,
-	TK_J_X5	= 356,
-	TK_CNC	= 357,
-	TK_CC	= 358,
-	TK_CNZ	= 359,
-	TK_CZ	= 360,
-	TK_CPO	= 361,
-	TK_CPE	= 362,
-	TK_CNV	= 363,
-	TK_CV	= 364,
-	TK_CLO	= 365,
-	TK_CLZ	= 366,
-	TK_CM	= 367,
-	TK_C_NC	= 368,
-	TK_C_C	= 369,
-	TK_C_NZ	= 370,
-	TK_C_Z	= 371,
-	TK_C_PO	= 372,
-	TK_C_PE	= 373,
-	TK_C_NV	= 374,
-	TK_C_V	= 375,
-	TK_C_LO	= 376,
-	TK_C_LZ	= 377,
-	TK_C_P	= 378,
-	TK_C_M	= 379,
-	TK_RNC	= 380,
-	TK_RC	= 381,
-	TK_RNZ	= 382,
-	TK_RZ	= 383,
-	TK_RPO	= 384,
-	TK_RPE	= 385,
-	TK_RNV	= 386,
-	TK_RV	= 387,
-	TK_RLO	= 388,
-	TK_RLZ	= 389,
-	TK_RP	= 390,
-	TK_RM	= 391,
-	TK_R_NC	= 392,
-	TK_R_C	= 393,
-	TK_R_NZ	= 394,
-	TK_R_Z	= 395,
-	TK_R_PO	= 396,
-	TK_R_PE	= 397,
-	TK_R_NV	= 398,
-	TK_R_V	= 399,
-	TK_R_LO	= 400,
-	TK_R_LZ	= 401,
-	TK_R_P	= 402,
-	TK_R_M	= 403,
-	TK_PCHL	= 404,
-	TK_XTHL	= 405,
-	TK_SPHL	= 406,
-	TK_HLT	= 407,
-	TK_RIM	= 408,
-	TK_SIM	= 409,
-	TK_DSUB	= 410,
-	TK_ARHL	= 411,
-	TK_RRHL	= 412,
-	TK_RDEL	= 413,
-	TK_RLDE	= 414,
-	TK_LDHI	= 415,
-	TK_LDSI	= 416,
-	TK_RSTV	= 417,
-	TK_OVRST8	= 418,
-	TK_SHLX	= 419,
-	TK_SHLDE	= 420,
-	TK_LHLX	= 421,
-	TK_LHLDE	= 422,
+	TK_JNK	= 343,
+	TK_JNX5	= 344,
+	TK_J_NC	= 345,
+	TK_J_C	= 346,
+	TK_J_NZ	= 347,
+	TK_J_Z	= 348,
+	TK_J_PO	= 349,
+	TK_J_PE	= 350,
+	TK_J_NV	= 351,
+	TK_J_V	= 352,
+	TK_J_LO	= 353,
+	TK_J_LZ	= 354,
+	TK_J_P	= 355,
+	TK_J_M	= 356,
+	TK_J_K	= 357,
+	TK_J_X5	= 358,
+	TK_J_NK	= 359,
+	TK_J_NX5	= 360,
+	TK_CNC	= 361,
+	TK_CC	= 362,
+	TK_CNZ	= 363,
+	TK_CZ	= 364,
+	TK_CPO	= 365,
+	TK_CPE	= 366,
+	TK_CNV	= 367,
+	TK_CV	= 368,
+	TK_CLO	= 369,
+	TK_CLZ	= 370,
+	TK_CM	= 371,
+	TK_C_NC	= 372,
+	TK_C_C	= 373,
+	TK_C_NZ	= 374,
+	TK_C_Z	= 375,
+	TK_C_PO	= 376,
+	TK_C_PE	= 377,
+	TK_C_NV	= 378,
+	TK_C_V	= 379,
+	TK_C_LO	= 380,
+	TK_C_LZ	= 381,
+	TK_C_P	= 382,
+	TK_C_M	= 383,
+	TK_RNC	= 384,
+	TK_RC	= 385,
+	TK_RNZ	= 386,
+	TK_RZ	= 387,
+	TK_RPO	= 388,
+	TK_RPE	= 389,
+	TK_RNV	= 390,
+	TK_RV	= 391,
+	TK_RLO	= 392,
+	TK_RLZ	= 393,
+	TK_RP	= 394,
+	TK_RM	= 395,
+	TK_R_NC	= 396,
+	TK_R_C	= 397,
+	TK_R_NZ	= 398,
+	TK_R_Z	= 399,
+	TK_R_PO	= 400,
+	TK_R_PE	= 401,
+	TK_R_NV	= 402,
+	TK_R_V	= 403,
+	TK_R_LO	= 404,
+	TK_R_LZ	= 405,
+	TK_R_P	= 406,
+	TK_R_M	= 407,
+	TK_PCHL	= 408,
+	TK_XTHL	= 409,
+	TK_SPHL	= 410,
+	TK_HLT	= 411,
+	TK_RIM	= 412,
+	TK_SIM	= 413,
+	TK_DSUB	= 414,
+	TK_ARHL	= 415,
+	TK_RRHL	= 416,
+	TK_RDEL	= 417,
+	TK_RLDE	= 418,
+	TK_LDHI	= 419,
+	TK_LDSI	= 420,
+	TK_RSTV	= 421,
+	TK_OVRST8	= 422,
+	TK_SHLX	= 423,
+	TK_SHLDE	= 424,
+	TK_LHLX	= 425,
+	TK_LHLDE	= 426,
 } tokid_t;
 #endif

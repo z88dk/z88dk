@@ -4313,6 +4313,12 @@
  j_lz -32768                    ; Error
  j_lz 32767                     ; Error
  j_lz 65535                     ; Error
+ j_nk -32768                    ; Error
+ j_nk 32767                     ; Error
+ j_nk 65535                     ; Error
+ j_nx5 -32768                   ; Error
+ j_nx5 32767                    ; Error
+ j_nx5 65535                    ; Error
  j_x5 -32768                    ; Error
  j_x5 32767                     ; Error
  j_x5 65535                     ; Error
@@ -4325,6 +4331,12 @@
  jlz -32768                     ; Error
  jlz 32767                      ; Error
  jlz 65535                      ; Error
+ jnk -32768                     ; Error
+ jnk 32767                      ; Error
+ jnk 65535                      ; Error
+ jnx5 -32768                    ; Error
+ jnx5 32767                     ; Error
+ jnx5 65535                     ; Error
  jp (c)                         ; Error
  jp (ix)                        ; Error
  jp (iy)                        ; Error

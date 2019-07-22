@@ -865,11 +865,16 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "rstv",			0xCB);
 		add_opc($cpu, "ovrst8",			0xCB);
 
-		# Jump if flag X5/K is set
+		# Jump on flag X5/K is set
 		add_opc($cpu, "jx5 %m",			0xFD, '%m', '%m');
 		add_opc($cpu, "j_x5 %m",		0xFD, '%m', '%m');
 		add_opc($cpu, "jk %m",			0xFD, '%m', '%m');
 		add_opc($cpu, "j_k %m",			0xFD, '%m', '%m');
+
+		add_opc($cpu, "jnx5 %m",		0xDD, '%m', '%m');
+		add_opc($cpu, "j_nx5 %m",		0xDD, '%m', '%m');
+		add_opc($cpu, "jnk %m",			0xDD, '%m', '%m');
+		add_opc($cpu, "j_nk %m",		0xDD, '%m', '%m');
 	}
 }
 
