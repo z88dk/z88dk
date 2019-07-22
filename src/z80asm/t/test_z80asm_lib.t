@@ -36,6 +36,7 @@ path('testdir/root/lib/config')->mkpath;
 run("./z80asm -b -v test.asm", 0, <<'END', "");
 Reading library 'z80asm-z80-.lib'
 Predefined constant: __CPU_Z80__ = $0001
+Predefined constant: __CPU_ZILOG__ = $0001
 Assembling 'test.asm' to 'test.o'
 Reading 'test.asm' = 'test.asm'
 Writing object file 'test.o'
@@ -57,6 +58,7 @@ Library 'z80asm-z80-.lib' not found
 Library '/usr/local/share/z88dk/lib/z80asm-z80-.lib' not found
 Reading library 'testdir/root/lib/z80asm-z80-.lib'
 Predefined constant: __CPU_Z80__ = $0001
+Predefined constant: __CPU_ZILOG__ = $0001
 Assembling 'test.asm' to 'test.o'
 Reading 'test.asm' = 'test.asm'
 Writing object file 'test.o'
@@ -76,6 +78,7 @@ Library 'z80asm-z80-.lib' not found
 Library '/usr/local/share/z88dk/lib/z80asm-z80-.lib' not found
 Reading library 'testdir/root/lib/z80asm-z80-.lib'
 Predefined constant: __CPU_Z80__ = $0001
+Predefined constant: __CPU_ZILOG__ = $0001
 Assembling 'test.asm' to 'test.o'
 Reading 'test.asm' = 'test.asm'
 Writing object file 'test.o'
@@ -95,6 +98,7 @@ Library 'z80asm-z80-.lib' not found
 Library '/usr/local/share/z88dk/lib/z80asm-z80-.lib' not found
 Library '/../z80asm-z80-.lib' not found
 Predefined constant: __CPU_Z80__ = $0001
+Predefined constant: __CPU_ZILOG__ = $0001
 Assembling 'test.asm' to 'test.o'
 Reading 'test.asm' = 'test.asm'
 Writing object file 'test.o'
@@ -150,10 +154,14 @@ sub exp_output {
 	my($cpu, $swap_ixiy, $library) = @_;
 	$cpu = uc($cpu);
 	$swap_ixiy = $swap_ixiy ? "\nPredefined constant: __SWAP_IX_IY__ = \$0001" : "";
-
+	my $family = ($cpu =~ /^z/i)  ? "ZILOG" :
+				 ($cpu =~ /^r/i)  ? "RABBIT" :
+				 ($cpu =~ /^80/i) ? "INTEL" : "";
+				 
 	return <<END;
 Reading library '$library'
-Predefined constant: __CPU_${cpu}__ = \$0001$swap_ixiy
+Predefined constant: __CPU_${cpu}__ = \$0001
+Predefined constant: __CPU_${family}__ = \$0001$swap_ixiy
 Assembling 'test.asm' to 'test.o'
 Reading 'test.asm' = 'test.asm'
 Writing object file 'test.o'

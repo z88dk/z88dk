@@ -14,7 +14,7 @@ PUBLIC __z80asm__cpi
    
    push af
    ex (sp),hl
-IF __CPU_8080__
+IF __CPU_8080__ || __CPU_8085__
    ld  a,l
    and @11111110
    ld  l,a
@@ -24,7 +24,7 @@ ENDIF
 
 .rejoin
 
-IF __CPU_8080__
+IF __CPU_8080__ || __CPU_8085__
    ld  a,l
    or  @00000100
    ld  l,a
@@ -35,7 +35,7 @@ ENDIF
    ld a,b
    or c
    jr nz, exitcpi
-IF __CPU_8080__
+IF __CPU_8080__ || __CPU_8085__
    ld  a,l
    and @11111011
    ld  l,a
@@ -57,7 +57,7 @@ ENDIF
    
    push af
    ex (sp),hl
-IF __CPU_8080__
+IF __CPU_8080__ || __CPU_8085__
    ld  a,l
    or  @00000001
    ld  l,a

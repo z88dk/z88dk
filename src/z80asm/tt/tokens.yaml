@@ -209,6 +209,7 @@ tokens:
   - name    : IY
   - name    : AF
   - name    : SP
+  - name    : PSW
   
   - name    : B1
     regexp  : "\"B'\"i"
@@ -469,7 +470,7 @@ tokens:
   - name    : FPP
   - name    : INVOKE
   
-  # Intel 8080 specific opcodes
+  # Intel 8080/8085 specific opcodes
   - name    : MOV
   - name    : MVI
   - name    : LXI
@@ -509,21 +510,37 @@ tokens:
   - name    : JZ
   - name    : JPO
   - name    : JPE
+  - name    : JNV
+  - name    : JV
+  - name    : JLO
+  - name    : JLZ
   - name    : JM
+  - name    : JK
+  - name    : JX5
   - name    : J_NC
   - name    : J_C
   - name    : J_NZ
   - name    : J_Z
   - name    : J_PO
   - name    : J_PE
+  - name    : J_NV
+  - name    : J_V
+  - name    : J_LO
+  - name    : J_LZ
   - name    : J_P
   - name    : J_M
+  - name    : J_K
+  - name    : J_X5
   - name    : CNC
   - name    : CC
   - name    : CNZ
   - name    : CZ
   - name    : CPO
   - name    : CPE
+  - name    : CNV
+  - name    : CV
+  - name    : CLO
+  - name    : CLZ
   - name    : CM
   - name    : C_NC
   - name    : C_C
@@ -531,6 +548,10 @@ tokens:
   - name    : C_Z
   - name    : C_PO
   - name    : C_PE
+  - name    : C_NV
+  - name    : C_V
+  - name    : C_LO
+  - name    : C_LZ
   - name    : C_P
   - name    : C_M
   - name    : RNC
@@ -539,6 +560,10 @@ tokens:
   - name    : RZ
   - name    : RPO
   - name    : RPE
+  - name    : RNV
+  - name    : RV
+  - name    : RLO
+  - name    : RLZ
   - name    : RP
   - name    : RM
   - name    : R_NC
@@ -547,9 +572,28 @@ tokens:
   - name    : R_Z
   - name    : R_PO
   - name    : R_PE
+  - name    : R_NV
+  - name    : R_V
+  - name    : R_LO
+  - name    : R_LZ
   - name    : R_P
   - name    : R_M
   - name    : PCHL
   - name    : XTHL
   - name    : SPHL
   - name    : HLT
+  - name    : RIM
+  - name    : SIM
+  - name    : DSUB
+  - name    : ARHL
+  - name    : RRHL
+  - name    : RDEL
+  - name    : RLDE
+  - name    : LDHI
+  - name    : LDSI
+  - name    : RSTV
+  - name    : OVRST8
+  - name    : SHLX
+  - name    : SHLDE
+  - name    : LHLX
+  - name    : LHLDE
