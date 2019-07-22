@@ -20,10 +20,15 @@ NEWLIBGLOBS_8080 := "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*rand*.asm" \
 	"$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/atoi.asm" \
 	"$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/atol.asm" \
 	"$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/itoa*.asm" \
+	"$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/strtol.asm" \
+	"$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/strtol_callee.asm" \
+	"$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/strtoul.asm" \
+	"$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/strtoul_callee.asm" \
 	"$(NEWLIB_DIRECTORY)/stdlib/z80/*rand*.asm" \
 	"$(NEWLIB_DIRECTORY)/stdlib/z80/*abs*.asm" \
 	"$(NEWLIB_DIRECTORY)/stdlib/z80/random/*.asm" \
-	 $(NEWLIB_DIRECTORY)/stdlib/z80/__stdlib_seed.asm
+	 $(NEWLIB_DIRECTORY)/stdlib/z80/__stdlib_seed.asm 
+
 NEWLIB_TARGETS := obj/newlib-z80 obj/newlib-z80n obj/newlib-r2k obj/newlib-ixiy   obj/newlib-8080
 
 space :=
