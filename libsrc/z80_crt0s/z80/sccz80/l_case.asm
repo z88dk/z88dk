@@ -18,7 +18,7 @@
         inc hl
         ld a,b
         or c
-IF CPU_8080
+IF CPU_INTEL
         jp z,swend              ;default or continuation code
 ELSE
         jr z,swend              ;default or continuation code
@@ -28,13 +28,13 @@ ENDIF
         cp e
         ld a,(hl)
         inc hl
-IF CPU_8080
+IF CPU_INTEL
         jp nz,swloop
 ELSE
         jr nz,swloop
 ENDIF
         cp d
-IF CPU_8080
+IF CPU_INTEL
         jp nz,swloop
 ELSE
         jr nz,swloop

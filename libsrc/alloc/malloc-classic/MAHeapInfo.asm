@@ -34,7 +34,7 @@ PUBLIC MAHeapInfo
    ld h,(hl)
    ld l,a                    ; hl = block size
 
-IF __CPU_8080__
+IF __CPU_INTEL__
    ld a,l
    sub c
    ld l,a

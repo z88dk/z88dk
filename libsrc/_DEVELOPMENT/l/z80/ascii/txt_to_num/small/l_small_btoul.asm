@@ -47,9 +47,28 @@ loop:
    push hl
    
    rra
+IF __CPU_INTEL__
+   push bc
+   ld c,a
+   ld a,l
+   adc l
+   ld l,a
+   ld a,h
+   adc h
+   ld h,a
+   ld a,e
+   rla
+   ld e,a
+   ld a,d
+   rla
+   ld d,a
+   ld a,c
+   pop bc
+ELSE
    adc hl,hl
    rl e
    rl d
+ENDIF
    
    jr nc, loop
    

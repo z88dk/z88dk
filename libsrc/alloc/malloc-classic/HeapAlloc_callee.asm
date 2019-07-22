@@ -79,7 +79,7 @@ PUBLIC ASMDISP_HEAPALLOC_CALLEE
    inc hl
    ld d,(hl)
    ex de,hl                  ; hl = block's size, de = & block + 1b
-IF __CPU_8080__
+IF __CPU_INTEL__
    ld a,l
    sub c
    ld l,a
@@ -105,7 +105,7 @@ ENDIF
    
    push bc
    ld bc,4
-IF __CPU_8080__
+IF __CPU_INTEL__
    ld a,l
    sub c
    ld l,a
@@ -153,7 +153,7 @@ ENDIF
    inc de                    ; de = & block->next + 1b
    pop hl                    ; hl = & lagger->next + 1b
    ex de,hl
-IF __CPU_8080__
+IF __CPU_INTEL__
    ld a,(hl)
    ld (de),a
    inc hl

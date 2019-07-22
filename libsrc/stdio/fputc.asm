@@ -15,7 +15,7 @@ EXTERN asm_fputc_callee
         push    hl
         push    de
 
-IF !__CPU_8080__
+IF !__CPU_INTEL__
         push    ix        ;callers ix
         push    hl
         pop     ix

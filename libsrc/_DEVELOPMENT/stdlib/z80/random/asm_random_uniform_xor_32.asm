@@ -61,7 +61,7 @@ asm_random_uniform_xor_32:
    ld h,a
 
    ld a,d
-IF __CPU_8080__
+IF __CPU_INTEL__
    and a
    rra
 ELSE

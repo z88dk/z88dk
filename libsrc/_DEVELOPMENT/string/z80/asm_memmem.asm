@@ -15,7 +15,7 @@
 ; 
 ; ===============================================================
 
-IF !__CPU_8080__
+IF !__CPU_INTEL__
 SECTION code_clib
 SECTION code_string
 

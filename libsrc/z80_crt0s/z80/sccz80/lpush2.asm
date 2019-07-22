@@ -18,7 +18,7 @@ PUBLIC    lpush2
 
 .lpush2
 
-IF __CPU_8080__
+IF __CPU_INTEL__
    pop af
 ELSE
    pop ix
@@ -29,7 +29,7 @@ ENDIF
    push hl
    push bc
    
-IF __CPU_8080__
+IF __CPU_INTEL__
    push af
    ret
 ELSE

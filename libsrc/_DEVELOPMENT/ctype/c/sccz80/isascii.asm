@@ -14,7 +14,7 @@ isascii:
    dec h
    jp nz, error_znc
 
-IF __CPU_8080__
+IF __CPU_INTEL__
    ld a,l
    rla
    ld l,h

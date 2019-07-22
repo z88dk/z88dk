@@ -61,7 +61,7 @@ asm_obstack_init:
    ld (hl),d                   ; ob->end = & byte following obstack
    
    ex de,hl
-IF __CPU_8080__
+IF __CPU_INTEL__
    ld a,l
    sub c
    ld l,a

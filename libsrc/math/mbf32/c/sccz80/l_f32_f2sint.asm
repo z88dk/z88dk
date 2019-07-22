@@ -21,7 +21,7 @@ l_f32_f2ulong:
 	ld	a,(___mbf32_FPREG + 2)
 	push	af
 	ld	a,(___mbf32_FPEXP)
-IF __CPU_8080__
+IF __CPU_INTEL__
 	call	___mbf32_FPINT
 ELSE
 	ld	ix,___mbf32_FPINT

@@ -36,7 +36,7 @@ asm_obstack_room:
    ld l,a                      ; hl = ob->end
    
    or a
-IF __CPU_8080__
+IF __CPU_INTEL__
    ld a,l
    sub e
    ld l,a

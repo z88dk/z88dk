@@ -57,7 +57,7 @@ EXTERN l_long_neg, asm_isspace
 
    add hl,hl
    ex de,hl
-IF __CPU_8080__
+IF __CPU_INTEL__
    push af
    ld a,l
    adc l
@@ -74,7 +74,7 @@ ENDIF
    push hl                   ; save dehl*2
    add hl,hl
    ex de,hl
-IF __CPU_8080__
+IF __CPU_INTEL__
    push af
    ld a,l
    adc l
@@ -89,7 +89,7 @@ ENDIF
    ex de,hl
    add hl,hl
    ex de,hl
-IF __CPU_8080__
+IF __CPU_INTEL__
    push af
    ld a,l
    adc l
@@ -105,7 +105,7 @@ ENDIF
    add hl,de
    pop de
    ex (sp),hl
-IF __CPU_8080__
+IF __CPU_INTEL__
    push af
    ld a,l
    adc e

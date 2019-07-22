@@ -9,7 +9,7 @@ PUBLIC memccpy_callee
 EXTERN asm_memccpy
 
 memccpy_callee:
-IF __CPU_8080__
+IF __CPU_INTEL__
    ld hl,2
    add hl,sp
    ld  c,(hl)

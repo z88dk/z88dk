@@ -67,7 +67,7 @@ PUBLIC ASMDISP_HEAPFREE_CALLEE
    or h                      ; if there is no next block...
    jr z, placeatend
 
-IF __CPU_8080__
+IF __CPU_INTEL__
    ld a,l
    sub c
    ld l,a
@@ -79,7 +79,7 @@ ELSE
 ENDIF
    jr z, mergeontop
    jr nc, insertbefore
-IF __CPU_8080__
+IF __CPU_INTEL__
    ld a,l
    adc c
    ld l,a
@@ -164,7 +164,7 @@ ENDIF
    ; de = & block to free
    ; stack = & lagger->next
    
-IF __CPU_8080__
+IF __CPU_INTEL__
    ld a,l
    sub e
    ld l,a

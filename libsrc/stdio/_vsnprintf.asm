@@ -16,7 +16,7 @@
 _vsnprintf:
 	ld	hl,2	
 	add	hl,sp		;&buf
-IF !__CPU_8080__
+IF !__CPU_INTEL__
 	push	ix
 ENDIF
         ld      c,(hl)  ;buf
@@ -53,7 +53,7 @@ ENDIF
 	add	hl,sp
 	ld	sp,hl
 	ex	de,hl
-IF !__CPU_8080__
+IF !__CPU_INTEL__
 	pop	ix
 ENDIF
 	ret

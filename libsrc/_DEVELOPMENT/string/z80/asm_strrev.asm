@@ -35,7 +35,7 @@ asm_strrev:
       
    push de                     ; save char *s
 
-IF __CPU_8080__
+IF __CPU_INTEL__
    ld a,b
    rla
    ld a,b

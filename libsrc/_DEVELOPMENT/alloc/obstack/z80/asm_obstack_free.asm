@@ -51,7 +51,7 @@ asm_obstack_free:
    ex de,hl                    ; hl = ob->fence, de = & ob->fence + 1
    
    scf
-IF __CPU_8080__
+IF __CPU_INTEL__
    ld a,l
    sbc c
    ld l,a
@@ -65,7 +65,7 @@ ENDIF
    
    ld hl,4
    add hl,de                   ; hl = & ob->mem - 1
-IF __CPU_8080__
+IF __CPU_INTEL__
    ld a,l
    sbc c
    ld l,a

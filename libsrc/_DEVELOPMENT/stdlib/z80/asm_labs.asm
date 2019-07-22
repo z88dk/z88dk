@@ -24,7 +24,7 @@ asm_labs:
    ;
    ; uses  : af, de, hl, carry unaffected (not 808x)
   
-IF __CPU_8080__
+IF __CPU_INTEL__
    ld a,d
    rla
    ret nc

@@ -35,7 +35,7 @@
 ; 22,y+32,x+32 = Move to position
 
 
-IF !__CPU_8080__
+IF !__CPU_INTEL__
 		defc		SUPPORT_vt52=1
 		; Extra VT52 codes - clear to end of line + clear to end of screen
 		defc		SUPPORT_vt52x=0
@@ -68,7 +68,7 @@ _fputc_cons_generic:
 	ld	hl,2
 	add	hl,sp
 	ld	d,(hl)
-IF __CPU_8080__
+IF __CPU_INTEL__
 	ld	hl,(__console_x)
 	ld	c,l
 	ld	b,h

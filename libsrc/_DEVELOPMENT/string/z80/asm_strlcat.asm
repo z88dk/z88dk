@@ -75,7 +75,7 @@ szexceeded1:
    dec hl                      ; hl = end of char *s2 (pointing at NUL)
    
    pop bc
-IF __CPU_8080__
+IF __CPU_INTEL__
    ld  a,l
    sub c
    ld  l,a
@@ -88,7 +88,7 @@ ENDIF
    ex de,hl                    ; de = strlen(s2 remnant)
    
    pop bc
-IF __CPU_8080__
+IF __CPU_INTEL__
    ld  a,l
    sub c
    ld  l,a
@@ -131,7 +131,7 @@ success:
    ; stack = char *s1
 
    pop bc
-IF __CPU_8080__
+IF __CPU_INTEL__
    ld  a,l
    sub c
    ld  l,a

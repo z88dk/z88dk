@@ -91,7 +91,7 @@ EXTERN ASMDISP_HEAPALLOC_CALLEE, ASMDISP_HEAPFREE_CALLEE
    ld l,(hl)
    ld h,a                    ; hl = size of old block
    
-IF __CPU_8080__
+IF __CPU_INTEL__
    ld a,l
    sub c
    ld l,a
@@ -116,7 +116,7 @@ ENDIF
    pop hl
    push hl
    push de
-IF __CPU_8080__
+IF __CPU_INTEL__
 ldir_loop:
    ld a,(hl)
    ld (de),a

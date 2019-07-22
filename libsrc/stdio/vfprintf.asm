@@ -22,7 +22,7 @@ vfprintf:
 	push	de
 	push	hl
 	push	af
-IF !__CPU_8080__
+IF !__CPU_INTEL__
 	push	ix
 ENDIF
 	push	bc			;fp
@@ -38,7 +38,7 @@ ENDIF
 	pop	bc
 	pop	bc
 	pop	bc	
-IF !__CPU_8080__
+IF !__CPU_INTEL__
 	pop	ix
 ENDIF
 	ret

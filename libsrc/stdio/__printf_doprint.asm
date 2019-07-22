@@ -13,7 +13,7 @@ __printf_doprint:
         push    hl              ;save fmt
         push    de              ;save ap
         push    bc
-IF __CPU_8080__
+IF __CPU_INTEL__
 	call	__printf_increment_chars_written
 ELSE
         push    ix
@@ -25,7 +25,7 @@ ENDIF
         ld      c,a
         ld      b,0
         push    bc              ;character to print
-IF __CPU_8080__
+IF __CPU_INTEL__
 	call	__printf_get_fp
 ELSE
         ld      c,(ix+10)       ;FP
@@ -34,7 +34,7 @@ ENDIF
         push    bc
         ld      bc,doprint_return       ;where we are going to come back to
         push    bc
-IF __CPU_8080__
+IF __CPU_INTEL__
 	call	__printf_get_print_function
 ELSE
         ld      l,(ix+8)        ;output function (this is callee)
@@ -42,7 +42,7 @@ ELSE
 ENDIF
         jp      (hl)
 doprint_return:
-IF !__CPU_8080__
+IF !__CPU_INTEL__
         pop     ix              ;restore registers
 ENDIF
         pop     bc

@@ -9,7 +9,7 @@
 
 .l_int2long_s
         ld      de,0
-IF __CPU_8080__
+IF __CPU_INTEL__
 	ld	a,h
 	rla
 	ret	nc

@@ -23,7 +23,7 @@
 
 ; int vfprintf1(FILE *fp, void __CALLEE__ (*output_fn)(int c,FILE *fp), int sccz80, unsigned char *fmt,void *ap)
 asm_printf:
-IF __CPU_8080__
+IF __CPU_INTEL__
 	ld	hl,0
 	add	hl,sp
 	ld	(__printf_context),hl
@@ -99,7 +99,7 @@ ELSE
         ld      (ix-8),a
 ENDIF
 .__printf_loop
-IF __CPU_8080__
+IF __CPU_INTEL__
 	push	hl
 	ld	hl,(__printf_context)
 	dec	hl
@@ -154,7 +154,7 @@ handle_percent:
 	cp	'%'
 	jr	z,print_format_character
 	call	__printf_get_flags		;level2
-IF __CPU_8080__
+IF __CPU_INTEL__
 	call	__printf_res_long_flag
 ELSE
 	res	6,(ix-4)
@@ -163,7 +163,7 @@ ENDIF
 	jr	z,get_next_char
 	cp	'l'
 	jr	nz,no_long_qualifier
-IF __CPU_8080__
+IF __CPU_INTEL__
 	call	__printf_set_long_flag
 ELSE
 	set	6,(ix-4)
