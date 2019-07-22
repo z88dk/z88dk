@@ -79,7 +79,10 @@ extern double_t __LIB__ sqrt(double_t a);
 
 /* Exponential */
 extern double_t __LIB__ exp(double_t x);
+extern double_t __LIB__ exp2(double_t x);
+extern double_t __LIB__ exp10(double_t x);
 extern double_t __LIB__ log(double_t x);
+extern double_t __LIB__ log2(double_t x);
 extern double_t __LIB__ log10(double_t x);
 #define log1p(x) log(1.+x)
 #define log2(a) (log(a)/M_LN2)

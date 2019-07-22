@@ -62,21 +62,38 @@
 
 #include "m32_math.h"
 
-#define LOG2EF 1.44269504088896341
-#define C1 0.693359375
-#define C2 -2.12194440e-4
+#define MAXLOGF  88.02969187150841
+#define MINLOGF -88.7228391116729996
+#define LOG2EF    1.44269504088896341
 
-extern float m32_coeff_exp[];
+#define C1        0.693359375
+#define C2       -2.12194440e-4
+
+extern float m32_coeff_expf[];
 
 float m32_expf(float x) __z88dk_fastcall
 {
-    int16_t n;
+    float z;
 
-    n = (int16_t)m32_floorf( LOG2EF * x + 0.5 );
+    if( x > MAXLOGF)
+    {
+        return( INF );
+    }
 
-    x -= (float)n * C1;
-    x -= (float)n * C2;
+    if( x < MINLOGF )
+    {
+        return(0.0);
+    }
+
+    /* The following is necessary because range reduction blows up: */
+    if( x == 0 )
+	    return(1.0);
+
+    z = m32_floorf( LOG2EF * x + 0.5 );
+
+    x -= z * C1;
+    x -= z * C2;
 
     /* Theoretical peak relative error in [-0.5, +0.5] is 4.2e-9. */
-    return m32_ldexpf(((m32_sqrf(x) * m32_polyf(x, m32_coeff_exp, 5)) + x + 1.0), n);
+    return m32_ldexpf(((m32_sqrf(x) * m32_polyf(x, m32_coeff_expf, 5)) + x + 1.0), (int16_t)z);
 }

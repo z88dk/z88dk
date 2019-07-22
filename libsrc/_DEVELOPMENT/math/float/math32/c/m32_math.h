@@ -88,7 +88,10 @@ float m32_atanhf (float x) __z88dk_fastcall;
 
 /* Exponential, logarithmic and power functions */
 float m32_expf (float x) __z88dk_fastcall;
+float m32_exp2f (float x) __z88dk_fastcall;
+float m32_exp10f (float x) __z88dk_fastcall;
 float m32_logf (float x) __z88dk_fastcall;
+float m32_log2f (float x) __z88dk_fastcall;
 float m32_log10f (float x) __z88dk_fastcall;
 float m32_powf (float x, float y);
 

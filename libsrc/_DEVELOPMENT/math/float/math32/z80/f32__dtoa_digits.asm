@@ -34,6 +34,9 @@ m32__dtoa_digits:
     ld (hl),a                   ; write decimal digit
     inc hl
 
+    dec c
+    ret Z                       ; if no more significant digits
+
     exx
     add hl,hl                   ; shift one BCD digit
     rl e
@@ -48,10 +51,7 @@ m32__dtoa_digits:
     rl e
     rl d
 
-    exx
-    dec c
-    ret Z                       ; if no more significant digits
-    
+    exx  
     djnz m32__dtoa_digits
 
     scf                         ; indicate all digits output

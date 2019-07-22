@@ -222,6 +222,9 @@
 	GLOBAL _m32_ceilf
 	GLOBAL _m32_powf
 	GLOBAL _m32_log10f
+	GLOBAL _m32_log2f
+	GLOBAL _m32_exp10f
+	GLOBAL _m32_exp2f
 	GLOBAL _m32_expf
 	GLOBAL _m32_atanhf
 	GLOBAL _m32_acoshf
@@ -236,7 +239,7 @@
 	GLOBAL _m32_tanf
 	GLOBAL _m32_cosf
 	GLOBAL _m32_sinf
-	GLOBAL _m32_coeff_log
+	GLOBAL _m32_coeff_logf
 	GLOBAL __MAX_OPEN
 ;--------------------------------------------------------
 ; special function registers
@@ -376,7 +379,7 @@ l_m32_logf_00105:
 	ld	(ix-11),d
 	ld	hl,0x0009
 	push	hl
-	ld	hl,_m32_coeff_log
+	ld	hl,_m32_coeff_logf
 	push	hl
 	ld	l,(ix-16)
 	ld	h,(ix-15)

@@ -41,19 +41,12 @@
  * Direct inquiries to 30 Frost Street, Cambridge, MA 02140
  */
  
-/* Single precision natural logarithm
- * test interval: [sqrt(2)/2, sqrt(2)]
- * trials: 10000
- * peak relative error: 7.1e-8
- * rms relative error: 2.7e-8
- */
- 
 #include "m32_math.h"
 
 #define MINLOGF -88.7228391116729996
-#define SQRTHF 0.707106781186547524
+#define SQRTHF    0.70710678118654752440
 
-extern float m32_coeff_log[];
+extern float m32_coeff_logf[];
 
 float m32_logf (float x) __z88dk_fastcall
 {
@@ -65,21 +58,21 @@ float m32_logf (float x) __z88dk_fastcall
         return( MINLOGF );
     }
 
-    x = m32_frexpf( x, &e );
+    x = m32_frexpf(x, &e);
 
     if( x < SQRTHF )
     {
-        e -= 1;
+        --e;
         x = m32_mul2f(x) - 1.0; /*  2x - 1  */
     }
     else
     {
-        x = x - 1.0;
+        x -= 1.0;
     }
 
     z = m32_sqrf(x);
 
-    y = m32_polyf(x, m32_coeff_log, 9) * z;
+    y = m32_polyf(x, m32_coeff_logf, 9) * z;
  
     if( e != 0)
     {

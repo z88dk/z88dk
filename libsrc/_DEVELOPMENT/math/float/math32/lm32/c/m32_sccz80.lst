@@ -20,6 +20,10 @@ math/float/math32/lm32/c/sccz80/cosh
 math/float/math32/lm32/c/sccz80/cosh_fastcall
 math/float/math32/lm32/c/sccz80/exp
 math/float/math32/lm32/c/sccz80/exp_fastcall
+math/float/math32/lm32/c/sccz80/exp2
+math/float/math32/lm32/c/sccz80/exp2_fastcall
+math/float/math32/lm32/c/sccz80/exp10
+math/float/math32/lm32/c/sccz80/exp10_fastcall
 math/float/math32/lm32/c/sccz80/fabs
 math/float/math32/lm32/c/sccz80/fabs_fastcall
 math/float/math32/lm32/c/sccz80/floor
@@ -55,9 +59,11 @@ math/float/math32/lm32/c/sccz80/l_f32_sub
 math/float/math32/lm32/c/sccz80/l_f32_swap
 math/float/math32/lm32/c/sccz80/l_f32_zero
 math/float/math32/lm32/c/sccz80/log
+math/float/math32/lm32/c/sccz80/log_fastcall
+math/float/math32/lm32/c/sccz80/log2
+math/float/math32/lm32/c/sccz80/log2_fastcall
 math/float/math32/lm32/c/sccz80/log10
 math/float/math32/lm32/c/sccz80/log10_fastcall
-math/float/math32/lm32/c/sccz80/log_fastcall
 math/float/math32/lm32/c/sccz80/modf
 math/float/math32/lm32/c/sccz80/pow
 math/float/math32/lm32/c/sccz80/pow_callee

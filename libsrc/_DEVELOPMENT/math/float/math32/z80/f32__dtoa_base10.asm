@@ -62,7 +62,6 @@ m32__dtoa_base10:
     inc a
 
 .no_correction
-
     push af                     ; save exponent e
 
     exx
@@ -96,7 +95,7 @@ m32__dtoa_base10:
     push bc
     
     exx                         ; move mantissa to DEHL'
-    pop bc                      ; recover exponent and significant digits
+    pop bc                      ; recover decimal exponent and significant digits
     ld d,b
     ret
 

@@ -33,9 +33,11 @@ math/float/math32/z80/f32_z80_mulu_32h_24x24
 math/float/math32/z80/f32_z80_mulu_32h_32x32
 math/float/math32/z80/f32_z80_sqr_32h_24x24
 
-math/float/math32/z80/h32_coeff_atan
-math/float/math32/z80/h32_coeff_exp
-math/float/math32/z80/h32_coeff_log
-math/float/math32/z80/h32_coeff_sin
+math/float/math32/z80/h32_coeff_atanf
+math/float/math32/z80/h32_coeff_expf
+math/float/math32/z80/h32_coeff_exp2f
+math/float/math32/z80/h32_coeff_exp10f
+math/float/math32/z80/h32_coeff_logf
+math/float/math32/z80/h32_coeff_sinf
 
 @math/float/math32/math32_c_asm.lst

@@ -299,7 +299,7 @@ The hypotenuse function is provided as it is part of the standard maths library.
 
 ### C Floating Point Functions
 
-The rest of the maths library is derived from source code obtained from the Hi-Tech C Compiler floating point library, and from the GCC IEEE floating point library.
+The rest of the maths library is derived from source code obtained from the Hi-Tech C Compiler floating point library, the Cephes Math Library Release 2.2, and from the GCC IEEE floating point library.
 
 The Hi-Tech C Compiler floating point library is known for its performance, but not for its accuracy. This may be related to the limited number of coefficients used in the polynomial expansion used for calculating its results.
 
@@ -322,7 +322,10 @@ float tanhf(float x) __z88dk_fastcall;
 
 /* Exponential, logarithmic and power functions */
 float expf(float x) __z88dk_fastcall;
+float exp2f(float x) __z88dk_fastcall;
+float exp10f(float x) __z88dk_fastcall;
 float logf(float x) __z88dk_fastcall;
+float log2f(float x) __z88dk_fastcall;
 float log10f(float x) __z88dk_fastcall;
 float powf(float x, float y);
 float hypotf(float x, float y);
