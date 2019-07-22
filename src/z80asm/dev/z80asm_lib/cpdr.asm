@@ -14,13 +14,13 @@ PUBLIC __z80asm__cpdr
 ; scf clears N and H - must set carry the hard way
    push af
    ex (sp),hl
-IF __CPU_8080__
+IF __CPU_8080__ || __CPU_8085__
    ld  a,l
    or  @00000001
    ld  l,a
 ELSE
    set 0,l 			; set carry
-eNDIF
+ENDIF
    jr retflags
 
 .loop
@@ -49,7 +49,7 @@ eNDIF
 .joinbc0
  
    ex (sp),hl
-IF __CPU_8080__
+IF __CPU_8080__ || __CPU_8085__
    ld a,l
    and @11111010
    ld  l,a
@@ -69,7 +69,7 @@ ENDIF
    jr z, joinbc0
   
    ex (sp),hl
-IF __CPU_8080__
+IF __CPU_8080__ || __CPU_8085__
    ld a,l
    and @11111110
    or  @00000100

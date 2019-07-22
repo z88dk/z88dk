@@ -34,6 +34,8 @@ endef
 #------------------------------------------------------------------------------
 $(eval $(call MAKE_LIB,	8080-,			-m8080 				))
 $(eval $(call MAKE_LIB,	8080-ixiy,		-m8080 		--IXIY	))
+$(eval $(call MAKE_LIB,	8085-,			-m8085 				))
+$(eval $(call MAKE_LIB,	8085-ixiy,		-m8085 		--IXIY	))
 $(eval $(call MAKE_LIB,	z80-,			-mz80				))
 $(eval $(call MAKE_LIB,	z80-ixiy,		-mz80 		--IXIY	))
 $(eval $(call MAKE_LIB,	z80n-,			-mz80n				))
