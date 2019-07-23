@@ -8,14 +8,14 @@ EXTERN __dtoa_preamble, asm_fpclassify, __dtoa_special_form, __dtoa_base10
 EXTERN __dtoa_digits, __dtoa_round, __dtoa_remove_zeroes, __dtoa_postamble
 EXTERN __dtoa_adjust_prec
 
-; math library supplies asm_fpclassify, __dtoa_base10, __dtoa_digits
+; math library supplies asm_fpclassify, __dtoa_base10, __dtoa_digits, __dtoa_sgnabs
 
 __dtoa__:
 
    ; enter :  c = flags (bit 4=#, bits 7 and 0 will be modified)
    ;         de = precision (clipped at 255)
    ;         hl = buffer *
-   ;         exx set contains double
+   ;         exx set contains float
    ;
    ; exit  : if carry reset
    ;

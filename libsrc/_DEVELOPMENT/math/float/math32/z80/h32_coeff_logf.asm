@@ -12,9 +12,9 @@
 
 SECTION rodata_fp_math32
 
-PUBLIC _m32_coeff_log
+PUBLIC _m32_coeff_logf
 
-._m32_coeff_log
+._m32_coeff_logf
 DEFQ 0x00000000         ;  0.0000000000E+0
 DEFQ 0x3EAAAAAA         ; +3.3333331174E-1
 DEFQ 0xBE7FFFFC         ; -2.4999993993E-1

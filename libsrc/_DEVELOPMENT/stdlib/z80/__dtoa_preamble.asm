@@ -13,7 +13,7 @@ __dtoa_preamble:
    ; enter :  c = flags (bit 4=#, bits 7, 1 and 0 will be modified)
    ;         de = precision (clipped at 255)
    ;         hl = buffer *
-   ;         exx set contains double
+   ;         exx set contains float
 
    ld a,c
    and $7e                     ; zero bits 7,0 of flags
