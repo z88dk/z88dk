@@ -92,4 +92,4 @@ PUBLIC ASMDISP_VZ_BRICK_CALLEE
    
    defb 170, 168, 175, 232, 170, 168
 
-DEFC ASMDISP_VZ_BRICK_CALLEE = # asmentry - vz_brick_callee
+DEFC ASMDISP_VZ_BRICK_CALLEE = asmentry - vz_brick_callee

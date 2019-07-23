@@ -638,6 +638,8 @@ Expr *expr_parse( void )
 	Expr *self = OBJ_NEW( Expr );
     bool is_const_expr = false;
 
+#if 0
+	// remove Constant Expression operator
     if ( sym.tok == TK_CONST_EXPR )		/* leading '#' : ignore relocatable address expression */
     {
 		Str_append_n(self->text, sym.tstart, sym.tlen);
@@ -645,6 +647,7 @@ Expr *expr_parse( void )
 		GetSym();               
         is_const_expr = true;
     }
+#endif
 
     if ( Expr_parse_ternary_cond( self ) )
     {

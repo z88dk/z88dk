@@ -24,9 +24,10 @@
 	push	bc
 	ld	hl,0	;const
 	add	hl,sp
-	ld	(hl),+(0 % 256)
+	xor	a
+	ld	(hl),a
 	inc	hl
-	ld	(hl),+(0 / 256)
+	ld	(hl),a
 	inc	hl
 	ld	(hl),+(16416 % 256)
 	inc	hl

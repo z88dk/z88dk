@@ -205,4 +205,4 @@ PUBLIC SP1V_UPDATELISTT
    inc hl
    jp rejoinscrnaddr
 
-DEFC ASMDISP_SP1_INITIALIZE_CALLEE = # asmentry - sp1_Initialize_callee
+DEFC ASMDISP_SP1_INITIALIZE_CALLEE = asmentry - sp1_Initialize_callee

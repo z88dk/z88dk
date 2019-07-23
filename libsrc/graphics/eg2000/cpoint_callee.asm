@@ -78,4 +78,4 @@ PUBLIC ASMDISP_CPOINT_CALLEE
    ret
 
 
-DEFC ASMDISP_CPOINT_CALLEE = # asmentry - cpoint_callee
+DEFC ASMDISP_CPOINT_CALLEE = asmentry - cpoint_callee

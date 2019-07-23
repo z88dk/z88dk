@@ -90,4 +90,4 @@ EXTERN ASMDISP_VZ_SCORE_CALLEE
    
    defb $3f, $33, $3f, $03, $3f
 
-DEFC ASMDISP_VZ_SCORE_CALLEE = # asmentry - vz_score_callee
+DEFC ASMDISP_VZ_SCORE_CALLEE = asmentry - vz_score_callee

@@ -32,4 +32,4 @@ EXTERN p3_peek
    
    ret
 
-DEFC ASMDISP_ZX_ATTR_CALLEE = # asmentry - zx_attr_callee
+DEFC ASMDISP_ZX_ATTR_CALLEE = asmentry - zx_attr_callee

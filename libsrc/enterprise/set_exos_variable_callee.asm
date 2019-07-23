@@ -35,5 +35,5 @@ _set_exos_variable_callee:
 	ret
 
 
-DEFC ASMDISP_SET_EXOS_VARIABLE_CALLEE = # asmentry - set_exos_variable_callee
+DEFC ASMDISP_SET_EXOS_VARIABLE_CALLEE = asmentry - set_exos_variable_callee
  

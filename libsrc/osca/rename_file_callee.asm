@@ -26,4 +26,4 @@ asmentry:
 	call	kjt_rename_file
 	jp   flos_err
 
-DEFC ASMDISP_RENAME_FILE_CALLEE = # asmentry - rename_file_callee
+DEFC ASMDISP_RENAME_FILE_CALLEE = asmentry - rename_file_callee

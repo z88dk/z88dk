@@ -31,13 +31,13 @@
 	call	_engine_gamer_manager_load
 	ld	hl,0	;const
 	add	hl,sp
-	ld	(hl),#(10 % 256 % 256)
+	ld	(hl),+(10 % 256 % 256)
 	ld	a,(_hacker_level)
 	and	a
 	jp	z,i_2
 	ld	hl,0	;const
 	add	hl,sp
-	ld	(hl),#(7 % 256 % 256)
+	ld	(hl),+(7 % 256 % 256)
 .i_2
 	ld	hl,0	;const
 	add	hl,sp
@@ -104,7 +104,7 @@
 ._screen_ready_screen_update
 	dec	sp
 	pop	hl
-	ld	l,#(0 % 256)
+	ld	l,+(0 % 256)
 	push	hl
 	call	_engine_tile_manager_update_middle
 	call	_engine_tile_manager_update_bottom
@@ -170,7 +170,7 @@
 	jp	z,i_4
 	ld	hl,0	;const
 	add	hl,sp
-	ld	(hl),#(1 % 256 % 256)
+	ld	(hl),+(1 % 256 % 256)
 .i_4
 	ld	hl,(_screen_bases_screen_timer)
 	inc	hl
@@ -183,7 +183,7 @@
 	jp	nc,i_11
 	ld	hl,0	;const
 	add	hl,sp
-	ld	(hl),#(1 % 256 % 256)
+	ld	(hl),+(1 % 256 % 256)
 .i_11
 	ld	hl,0	;const
 	add	hl,sp

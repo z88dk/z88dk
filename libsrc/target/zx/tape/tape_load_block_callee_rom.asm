@@ -210,4 +210,4 @@ EXTERN __SYSVAR_BORDCR
         RET      
 
 
-DEFC ASMDISP_TAPE_LOAD_BLOCK_CALLEE = # asmentry - tape_load_block_callee
+DEFC ASMDISP_TAPE_LOAD_BLOCK_CALLEE = asmentry - tape_load_block_callee

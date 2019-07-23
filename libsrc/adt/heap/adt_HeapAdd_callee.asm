@@ -36,4 +36,4 @@ EXTERN ADTHeapAdd, ADThcompare
    pop ix
    ret
 
-DEFC CDISP_ADT_HEAPADD_CALLEE = # centry - adt_HeapAdd_callee
+DEFC CDISP_ADT_HEAPADD_CALLEE = centry - adt_HeapAdd_callee

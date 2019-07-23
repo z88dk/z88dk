@@ -99,4 +99,4 @@ EXTERN SP1V_DISPWIDTH, SP1V_UPDATELISTT
    
    ret
 
-DEFC ASMDISP_SP1_PUTTILESINV_CALLEE = # asmentry - sp1_PutTilesInv_callee
+DEFC ASMDISP_SP1_PUTTILESINV_CALLEE = asmentry - sp1_PutTilesInv_callee

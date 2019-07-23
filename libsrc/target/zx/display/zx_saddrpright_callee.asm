@@ -35,4 +35,4 @@ PUBLIC ASMDISP_ZX_SADDRPRIGHT_CALLEE
    
    ret
 
-DEFC ASMDISP_ZX_SADDRPRIGHT_CALLEE = # asmentry - zx_saddrpright_callee
+DEFC ASMDISP_ZX_SADDRPRIGHT_CALLEE = asmentry - zx_saddrpright_callee

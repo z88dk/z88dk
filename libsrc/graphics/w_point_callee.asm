@@ -49,4 +49,4 @@
                 dec     hl
                 ret
 
-DEFC ASMDISP_POINT_CALLEE = # asmentry - point_callee
+DEFC ASMDISP_POINT_CALLEE = asmentry - point_callee

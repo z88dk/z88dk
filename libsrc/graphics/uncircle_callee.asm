@@ -51,4 +51,4 @@
                 call    draw_circle
                 jp      __graphics_end
 
-DEFC ASMDISP_UNCIRCLE_CALLEE = # asmentry - uncircle_callee
+DEFC ASMDISP_UNCIRCLE_CALLEE = asmentry - uncircle_callee

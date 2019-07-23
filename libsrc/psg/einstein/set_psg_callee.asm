@@ -33,5 +33,5 @@ asmentry:
 	OUT	(3),A
 	ret
 
-DEFC ASMDISP_SET_PSG_CALLEE = # asmentry - set_psg_callee
+DEFC ASMDISP_SET_PSG_CALLEE = asmentry - set_psg_callee
 

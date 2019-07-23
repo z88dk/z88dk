@@ -69,7 +69,7 @@ _SFXcommand:
   cp PSGWait
   jr z,_SFXdone                  ; no additional frames
   jr c,_SFXotherCommands         ; other commands?
-  and #0x07                      ; take only the last 3 bits for skip frames
+  and +0x07                      ; take only the last 3 bits for skip frames
   ld (__PSGlib_SFXSkipFrames),a       ; we got additional frames to skip
 _SFXdone:
   ld (__PSGlib_SFXPointer),hl         ; save current address

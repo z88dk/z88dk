@@ -146,4 +146,4 @@ ENDIF
    scf
    ret
 
-DEFC ASMDISP_HEAPREALLOC_CALLEE = # asmentry - HeapRealloc_callee
+DEFC ASMDISP_HEAPREALLOC_CALLEE = asmentry - HeapRealloc_callee

@@ -37,4 +37,4 @@ test7:
 ;  outp(vdcDataReg,RegVal);                    /* write register */
 ;}
 
-DEFC ASMDISP_OUTVDC_CALLEE = # asmentry - outvdc_callee
+DEFC ASMDISP_OUTVDC_CALLEE = asmentry - outvdc_callee

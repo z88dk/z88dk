@@ -31,4 +31,4 @@ _setcursorpos_callee:
 	ld h,e
 	jp	$201E
 
-DEFC ASMDISP_SETCURSORPOS_CALLEE = # asmentry - setcursorpos_callee
+DEFC ASMDISP_SETCURSORPOS_CALLEE = asmentry - setcursorpos_callee

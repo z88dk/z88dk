@@ -85,4 +85,4 @@ vtstone.cas: ../console/vtstone.c
 
 
 clean:
-	$(RM) *.obj *.sym *.map *.o* *.bin *.msx zcc_opt.def *.reloc *.cas *.COM
+	$(RM) *.obj *.sym *.map *.o* *.bin *.msx zcc_opt.def *.reloc *.cas *.COM *.img ex8

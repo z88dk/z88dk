@@ -146,5 +146,5 @@ store2:
 		
 	ret
  
- DEFC ASMDISP_zx_setfloat_CALLEE = # asmentry - zx_setfloat_callee
+ DEFC ASMDISP_zx_setfloat_CALLEE = asmentry - zx_setfloat_callee
  

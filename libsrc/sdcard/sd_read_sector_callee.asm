@@ -73,4 +73,4 @@ read_end:
 	ret
 
 
-DEFC ASMDISP_SD_READ_SECTOR_CALLEE = # asmentry - sd_read_sector_callee
+DEFC ASMDISP_SD_READ_SECTOR_CALLEE = asmentry - sd_read_sector_callee

@@ -223,4 +223,4 @@ ENDIF
    ld (hl),a
    ret
 
-DEFC ASMDISP_HEAPFREE_CALLEE = # asmentry - HeapFree_callee
+DEFC ASMDISP_HEAPFREE_CALLEE = asmentry - HeapFree_callee

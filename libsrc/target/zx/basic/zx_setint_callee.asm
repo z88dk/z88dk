@@ -124,5 +124,5 @@ store2:
 	
 	ret
  
- DEFC ASMDISP_ZX_SETINT_CALLEE = # asmentry - zx_setint_callee
+ DEFC ASMDISP_ZX_SETINT_CALLEE = asmentry - zx_setint_callee
  

@@ -83,4 +83,4 @@ EXTERN SP1V_ROTTBL
    ex de,hl
    jp (hl)
 
-DEFC ASMDISP_SP1_INITCHARSTRUCT_CALLEE = # asmentry - sp1_InitCharStruct_callee
+DEFC ASMDISP_SP1_INITCHARSTRUCT_CALLEE = asmentry - sp1_InitCharStruct_callee

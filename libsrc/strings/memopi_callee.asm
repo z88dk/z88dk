@@ -144,4 +144,4 @@ ENDIF
    pop hl
    ret
 
-DEFC ASMDISP_MEMOPI_CALLEE = # asmentry - memopi_callee
+DEFC ASMDISP_MEMOPI_CALLEE = asmentry - memopi_callee

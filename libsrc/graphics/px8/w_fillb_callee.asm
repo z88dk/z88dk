@@ -44,4 +44,4 @@
 		ld	a,2
 		jp	w_area
 
-DEFC ASMDISP_FILLB_CALLEE = # asmentry - fillb_callee
+DEFC ASMDISP_FILLB_CALLEE = asmentry - fillb_callee

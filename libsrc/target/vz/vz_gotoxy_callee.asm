@@ -46,4 +46,4 @@ PUBLIC ASMDISP_VZ_GOTOXY_CALLEE
    ld ($7820),hl             ; set cursor position
    ret
 
-DEFC ASMDISP_VZ_GOTOXY_CALLEE = # asmentry - vz_gotoxy_callee
+DEFC ASMDISP_VZ_GOTOXY_CALLEE = asmentry - vz_gotoxy_callee

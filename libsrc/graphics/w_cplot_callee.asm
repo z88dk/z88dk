@@ -30,5 +30,5 @@ PUBLIC ASMDISP_CPLOT_CALLEE
 
 		jp      swapgfxbk1
 
-DEFC ASMDISP_CPLOT_CALLEE = # asmentry - cplot_callee
+DEFC ASMDISP_CPLOT_CALLEE = asmentry - cplot_callee
 

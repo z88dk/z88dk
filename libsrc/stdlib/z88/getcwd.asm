@@ -64,5 +64,5 @@
         dec     bc
         jr      getcwd2
         
- DEFC ASMDISP_GETCWD = # asmentry - getcwd
+ DEFC ASMDISP_GETCWD = asmentry - getcwd
  
