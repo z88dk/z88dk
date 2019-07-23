@@ -2,11 +2,13 @@
 SECTION code_clib
 SECTION code_fp_math32
 
+EXTERN m32_float16, _m32_exp10f, m32_fsmul_callee
+
 PUBLIC m32__dtoa_base10
 
 m32__dtoa_base10:
 
-    ; convert double from standard form "a * 2^n"
+    ; convert float from standard form "a * 2^n"
     ; to a form multiplied by power of 10 "b * 10^e"
     ; where 1 <= b < 10 with b in double format
     ;
@@ -18,22 +20,23 @@ m32__dtoa_base10:
     ;          C   = max number of significant decimal digits (7)
     ;          D   = base 10 exponent e
     ;
-    ; uses  : af, bc, de, hl, iy, bc', de', hl'
+    ; uses  : af, bc, de, hl, bc', de', hl'
 
     ; x = a * 2^n = b * 10^e
     ; e = n * log(2) = n * 0.301.. = n * 0.01001101...(base 2) = INT((n*77 + 5)/256)
 
     exx
-    sla l                       ; move mantissa without leading 1
-    rl h
-    rl e
+    sla e                       ; move mantissa to capture exponent
     rl d
+    xor a                       ; set sign in C positive
     ld a,d                      ; get exponent in a
+    rr d
+    rr e                        ; |x|
 
-    exx
-    ;  A = n (binary exponent)
-    ;  EHL'= x mantissa bits without leading 1.
-    sub $7e                     ; subtract excess (bias - 1)
+    exx                         ;  EHL'= x mantissa bits
+                                ;  A = n (binary exponent)
+
+    sub $7f                     ; subtract bias
     ld l,a
     sbc a,a
     ld h,a                      ; hl = signed n
@@ -62,19 +65,33 @@ m32__dtoa_base10:
     inc a
 
 .no_correction
-    push af                     ; save exponent e
+    push af                     ; save decimal exponent e
+
+    neg                         ; negated exponent e
+    ld l,a
+    add a,a                     ; sign bit of a into C
+    sbc a,a
+    ld h,a                      ; now hl is sign extended a
+    call m32_float16            ; convert hl to float in dehl
+    call _m32_exp10f            ; make 10^-e
+    push de
+    push hl
 
     exx
+    call m32_fsmul_callee       ; mantissa b = a * 2^n * 10^-e
+
+    set 7,e                     ; set implicit 1 for mantissa bits b in ehl
+
     call bin2bcd
-    pop bc                      ; exponent in bc
+
+    pop bc                      ; decimal exponent e in bc
     ld c,7                      ; maximum sigificant digits
 
-.shiftdec
     ld a,d                      ; check for a leading significant digit
     and 0f0h
     jr NZ,finish
-    
-    add hl,hl                   ; shift one BCD digit
+
+    add hl,hl                   ; shift left one BCD digit
     rl e
     rl d
     add hl,hl
@@ -87,27 +104,27 @@ m32__dtoa_base10:
     rl e
     rl d
 
-    dec b                       ; reduce decimal exponent
+    dec b                       ; reduce decimal exponent e
     dec c                       ; reduce significant digits
-    jr shiftdec
 
 .finish
     push bc
-    
-    exx                         ; move mantissa to DEHL'
-    pop bc                      ; recover decimal exponent and significant digits
-    ld d,b
+
+    exx
+    pop de                      ; decimal exponent e in d
+    ld c,e                      ; significant digits in c
     ret
 
 
 ; Routine for converting a 24-bit binary number to decimal
 ; In: E:HL = 24-bit binary number (0-16777215)
 ; Out: DE:HL = 8 digit decimal form (packed BCD)
-; Changes: AF, BC, DE, HL, & IY
+; Changes: AF, BC, DE, HL
 ;
 ; by Alwin Henseler
 
 .bin2bcd
+    push iy                     ; preserve IY
     ld c,e
     push hl
     pop iy                      ; input value in C:IY
@@ -124,6 +141,7 @@ m32__dtoa_base10:
 
 ; all bits 0:
     res 0,l                     ; least significant bit not 1
+    pop iy                      ; restore IY
     ret
 
 .dblloop
@@ -146,8 +164,10 @@ m32__dtoa_base10:
     add iy,iy
     rl c                        ; shift next bit from C:IY into carry
     jr NC,nextbit               ; bit = 0 -> don't add 1 to the number
-    SET 0,L                     ; bit = 1 -> add 1 to the number
+    set 0,l                     ; bit = 1 -> add 1 to the number
 .nextbit
     djnz dblloop
+
+    pop iy                      ; restore IY
     ret
 

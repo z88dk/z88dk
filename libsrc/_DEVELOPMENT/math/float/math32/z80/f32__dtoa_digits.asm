@@ -6,14 +6,14 @@ PUBLIC m32__dtoa_digits
 
 m32__dtoa_digits:
 
-    ; generate decimal digits into buffer
+    ; generate decimal digits into buffer, from up to 8 packed BCD digits
     ;
-    ; enter : EXX = mantissa bits, most sig four bits contain decimal digit
+    ; enter : EXX = mantissa bits, most sig four bits contain a BCD digit
     ;           B = number of digits to generate
     ;           C = remaining significant digits
     ;          HL = buffer * (address of next char to write)
     ;
-    ; exit  :   B = remaining number of digits to generate
+    ; exit  :   B = remaining number of BCD digits to generate
     ;           C = remaining number of significant digits
     ;          HL = buffer * (address of next char to write)
     ;
