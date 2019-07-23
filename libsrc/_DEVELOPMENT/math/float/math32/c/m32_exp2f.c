@@ -48,35 +48,30 @@ Direct inquiries to 30 Frost Street, Cambridge, MA 02140
 
 #include "m32_math.h"
 
-#define MAXL2  127.0
-#define MINL2 -127.0
-
 extern float m32_coeff_exp2f[];
 
 float m32_exp2f (float x) __z88dk_fastcall
 {
     float z;
     int16_t n;
-
-    if( x > MAXL2)
+#if 0
+    if( x > MAXL2F )
     {
-	    return( INF );
+	    return( HUGE_POSF );
     }
 
-    if( x < MINL2 )
+    if( x < MINL2F )
     {
 	    return(0.0);
     }
-
-    /* The following is necessary because range reduction blows up: */
-    if( x == 0 )
-	    return(1.0);
-
+#endif
     /* separate into integer and fractional parts */
     z = m32_floorf(x);
-    n = (int16_t)z;
+
     x -= z;
 
+    n = (int16_t)z;
+    
     if( x > 0.5 )
     {
 	    ++n;

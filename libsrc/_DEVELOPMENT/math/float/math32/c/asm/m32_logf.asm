@@ -303,8 +303,8 @@ _m32_logf:
 	call	___fslt_callee
 	bit	0,l
 	jr	NZ,l_m32_logf_00102
-	ld	de,0xc2b1
-	ld	hl,0x7218
+	ld	de,0xff00
+	ld	hl,0x0000
 	jp	l_m32_logf_00110
 l_m32_logf_00102:
 	ld	hl,16

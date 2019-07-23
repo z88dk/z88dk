@@ -43,8 +43,7 @@
  
 #include "m32_math.h"
 
-#define MINLOGF -88.7228391116729996
-#define SQRTHF    0.70710678118654752440
+#define SQRTHF   ((float)  0.70710678118654752440)
 
 extern float m32_coeff_logf[];
 
@@ -55,7 +54,7 @@ float m32_logf (float x) __z88dk_fastcall
 
     if( x <= 0.0 )
     {
-        return( MINLOGF );
+        return( HUGE_NEGF );
     }
 
     x = m32_frexpf(x, &e);

@@ -34,15 +34,18 @@
 #include <stdint.h>
 #include <limits.h>
 
-#define HUGE_VALF   3.402823466e+38
+#define HUGE_POSF   (float)+3.4028234664E+38
+#define TINY_POSF   (float)+1.1754943508E−38
+#define HUGE_NEGF   (float)-1.7014118346E+38
+#define TINY_NEGF   (float)-1.1754943508E-38
 
-#define PI          3.1415926536
-#define TWO_PI      6.2831853071
-#define HALF_PI     1.5707963268
-#define QUART_PI    0.7853981634
-#define iPI         0.3183098862
-#define iTWO_PI     0.1591549431
-#define TWO_O_PI    0.6366197724
+#define PI          (float)3.1415926536
+#define TWO_PI      (float)6.2831853071
+#define HALF_PI     (float)1.5707963268
+#define QUART_PI    (float)0.7853981634
+#define iPI         (float)0.3183098862
+#define iTWO_PI     (float)0.1591549431
+#define TWO_O_PI    (float)0.6366197724
 
 // Non-ANSI macros
 #define BADTAN          (float)1.560796327
@@ -58,6 +61,13 @@
 #define POW10INF        (float)38.0
 #define SQR10           (float)3.162277660168
 #define TWObyPI         (float)0.63661977
+
+#define MAXL2F          ((float)+127.999999914)
+#define MINL2F          ((float)-126.0)
+#define MAXLOGF         ((float)+88.722839052)
+#define MINLOGF         ((float)−87.336544751)
+#define MAXL10F         ((float)+38.531839419)
+#define MINL10F         ((float)−37.929779454)
 
 union float_long
 {

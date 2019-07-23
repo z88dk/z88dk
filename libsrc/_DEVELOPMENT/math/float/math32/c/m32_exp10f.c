@@ -42,47 +42,42 @@ Direct inquiries to 30 Frost Street, Cambridge, MA 02140
 
 #include "m32_math.h"
 
-#define MAXL10F  38.230809449325611792
-#define MAXLOGF  88.02969187150841
-#define MINLOGF -88.7228391116729996
-#define LOG2EF    1.44269504088896341
-
-#define LOG210    3.32192809488736234787e0
-#define LG102A    3.00781250000000000000E-1
-#define LG102B    2.48745663981195213739E-4
+#define LOG210      ((float)+3.32192809488736234787E0)
+#define LG102A      ((float)+3.00781250000000000000E-1)
+#define LG102B      ((float)+2.48745663981195213739E-4)
 
 extern float m32_coeff_exp10f[];
 
 float m32_exp10f (float x) __z88dk_fastcall
 {
     float z;
-
+    int16_t n;
+#if 0
     if( x > MAXL10F )
     {
-        return( INF );
+        return( HUGE_POSF );
     }
 
-    if( x < -MAXL10F )    /* Would like to use MINLOG but can't */
+    if( x < MINL10F )
     {
         return(0.0);
     }
-
-    /* The following is necessary because range reduction blows up: */
-    if( x == 0 )
-        return(1.0);
-
+#endif
     /* Express 10**x = 10**g 2**n
      *   = 10**g 10**( n log10(2) )
      *   = 10**( g + n log10(2) )
      */
     z = m32_floorf( x * LOG210 + 0.5 );
+
     x -= z * LG102A;
     x -= z * LG102B;
+
+    n = (int16_t)z;   
 
     /* rational approximation for exponential
      * of the fractional part:
      * 10**x - 1  =  2x P(x**2)/( Q(x**2) - P(x**2) )
      * multiply by power of 2 
      */
-    return m32_ldexpf( m32_polyf(x, m32_coeff_exp10f, 5) * x + 1.0, (int16_t)z );
+    return m32_ldexpf( m32_polyf(x, m32_coeff_exp10f, 5) * x + 1.0, n);
 }

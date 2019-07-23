@@ -43,14 +43,12 @@ Direct inquiries to 30 Frost Street, Cambridge, MA 02140
 
 #include "m32_math.h"
 
-#define MAXL10F  38.230809449325611792
-#define MINL10F -38.230809449325611792
-#define SQRTHF    0.70710678118654752440
+#define SQRTHF      ((float) 0.70710678118654752440)
 
-#define L102A     3.0078125E-1
-#define L102B     2.48745663981195213739E-4
-#define L10EA     4.3359375E-1
-#define L10EB     7.00731903251827651129E-4
+#define L102A       ((float) 3.0078125E-1)
+#define L102B       ((float) 2.48745663981195213739E-4)
+#define L10EA       ((float) 4.3359375E-1)
+#define L10EB       ((float) 7.00731903251827651129E-4)
 
 extern float m32_coeff_logf[];
 
@@ -62,7 +60,7 @@ float m32_log10f (float x) __z88dk_fastcall
     /* Test for domain */
     if( x <= 0.0 )
         {
-            return( MINL10F );
+            return( HUGE_NEGF );
         }
 
     /* separate mantissa from exponent */

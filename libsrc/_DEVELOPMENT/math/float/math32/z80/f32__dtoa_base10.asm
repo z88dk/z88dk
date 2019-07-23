@@ -18,7 +18,7 @@ m32__dtoa_base10:
     ;          C   = max number of significant decimal digits (7)
     ;          D   = base 10 exponent e
     ;
-    ; uses  : af, bc, de, hl, af', bc', de', hl'
+    ; uses  : af, bc, de, hl, iy, bc', de', hl'
 
     ; x = a * 2^n = b * 10^e
     ; e = n * log(2) = n * 0.301.. = n * 0.01001101...(base 2) = INT((n*77 + 5)/256)
@@ -103,30 +103,27 @@ m32__dtoa_base10:
 ; Routine for converting a 24-bit binary number to decimal
 ; In: E:HL = 24-bit binary number (0-16777215)
 ; Out: DE:HL = 8 digit decimal form (packed BCD)
-; Changes: AF, BC, DE, HL & IX
+; Changes: AF, BC, DE, HL, & IY
 ;
 ; by Alwin Henseler
 
 .bin2bcd
-    push ix                     ; preserve IX
-
     ld c,e
     push hl
-    pop ix                      ; input value in C:IX
+    pop iy                      ; input value in C:IY
     ld hl,1
     ld d,h
     ld e,h                      ; start value corresponding with 1st 1-bit
     ld b,24                     ; bitnr. being processed + 1
 
 .find1
-    add ix,ix
-    rl c                        ; shift bit 23-0 from C:IX into carry
+    add iy,iy
+    rl c                        ; shift bit 23-0 from C:IY into carry
     jr C,nextbit
     djnz find1                  ; find highest 1-bit
 
 ; all bits 0:
     res 0,l                     ; least significant bit not 1
-    pop ix
     ret
 
 .dblloop
@@ -146,13 +143,11 @@ m32__dtoa_base10:
     adc a,a
     daa
     ld d,a                      ; double the value found so far
-    add ix,ix
-    rl c                        ; shift next bit from C:IX into carry
+    add iy,iy
+    rl c                        ; shift next bit from C:IY into carry
     jr NC,nextbit               ; bit = 0 -> don't add 1 to the number
     SET 0,L                     ; bit = 1 -> add 1 to the number
 .nextbit
     djnz dblloop
-
-    pop ix
     ret
 

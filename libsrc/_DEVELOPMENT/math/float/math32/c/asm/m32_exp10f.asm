@@ -297,53 +297,6 @@ _m32_exp10f:
 	ld	l,(ix-12)
 	ld	h,(ix-11)
 	push	hl
-	ld	hl,0x4218
-	push	hl
-	ld	hl,0xec59
-	push	hl
-	call	___fslt_callee
-	ld	a, l
-	or	a, a
-	jr	Z,l_m32_exp10f_00102
-	ld	de,0x7f61
-	ld	hl,0xb1e6
-	jp	l_m32_exp10f_00107
-l_m32_exp10f_00102:
-	ld	hl,0xc218
-	push	hl
-	ld	hl,0xec59
-	push	hl
-	ld	l,(ix-10)
-	ld	h,(ix-9)
-	push	hl
-	ld	l,(ix-12)
-	ld	h,(ix-11)
-	push	hl
-	call	___fslt_callee
-	ld	a, l
-	or	a, a
-	jr	Z,l_m32_exp10f_00104
-	ld	hl,0x0000
-	ld	e,l
-	ld	d,h
-	jp	l_m32_exp10f_00107
-l_m32_exp10f_00104:
-	ld	a,(ix-9)
-	and	a,0x7f
-	or	a,(ix-10)
-	or	a,(ix-11)
-	or	a,(ix-12)
-	jr	NZ,l_m32_exp10f_00106
-	ld	de,0x3f80
-	ld	hl,0x0000
-	jp	l_m32_exp10f_00107
-l_m32_exp10f_00106:
-	ld	l,(ix-10)
-	ld	h,(ix-9)
-	push	hl
-	ld	l,(ix-12)
-	ld	h,(ix-11)
-	push	hl
 	ld	hl,0x4054
 	push	hl
 	ld	hl,0x9a78
@@ -414,10 +367,14 @@ l_m32_exp10f_00106:
 	ld	h,(ix-7)
 	push	hl
 	call	___fs2sint_callee
-	ld	(ix-10),l
-	ld	(ix-9),h
+	ld	(ix-6),l
+	ld	(ix-5),h
 	pop	de
 	pop	bc
+	ld	a,(ix-6)
+	ld	(ix-10),a
+	ld	a,(ix-5)
+	ld	(ix-9),a
 	push	bc
 	push	de
 	ld	hl,0x0005
@@ -457,7 +414,6 @@ l_m32_exp10f_00106:
 	push	de
 	push	bc
 	call	_m32_ldexpf
-l_m32_exp10f_00107:
 	ld	sp, ix
 	pop	ix
 	ret

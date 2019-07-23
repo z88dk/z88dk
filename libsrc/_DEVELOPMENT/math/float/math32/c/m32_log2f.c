@@ -46,12 +46,8 @@ Direct inquiries to 30 Frost Street, Cambridge, MA 02140
 
 #include "m32_math.h"
 
-#define MAXLOGF  88.02969187150841
-#define MINLOGF -88.7228391116729996
-#define LOGE2F    0.693147180559945309
-#define SQRTHF    0.70710678118654752440
-
-#define LOG2EA    0.44269504088896340735992
+#define SQRTHF      ((float) 0.70710678118654752440)
+#define LOG2EA      ((float) 0.44269504088896340735992)
 
 extern float m32_coeff_logf[];
 
@@ -64,7 +60,7 @@ float m32_log2f (float x) __z88dk_fastcall
     /* Test for domain */
     if( x <= 0.0 )
         {
-            return( MINLOGF/LOGE2F );
+            return( HUGE_NEGF );
         }
 
     /* separate mantissa from exponent */
