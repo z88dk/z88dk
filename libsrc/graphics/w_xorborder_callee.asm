@@ -143,4 +143,4 @@ PUBLIC ASMDISP_XORBORDER_CALLEE
 		ret
 		
 
-DEFC ASMDISP_XORBORDER_CALLEE = # asmentry - xorborder_callee
+DEFC ASMDISP_XORBORDER_CALLEE = asmentry - xorborder_callee

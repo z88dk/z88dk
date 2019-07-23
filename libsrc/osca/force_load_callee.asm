@@ -38,4 +38,4 @@ asmentry:
 	call	kjt_force_load
 	jp		flos_err
 
-DEFC ASMDISP_FORCE_LOAD_CALLEE = # asmentry - force_load_callee
+DEFC ASMDISP_FORCE_LOAD_CALLEE = asmentry - force_load_callee

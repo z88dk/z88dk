@@ -48,4 +48,4 @@
 	jp	__graphics_end
 
 
-DEFC ASMDISP_UNDRAWTO_CALLEE = # asmentry - undrawto_callee
+DEFC ASMDISP_UNDRAWTO_CALLEE = asmentry - undrawto_callee

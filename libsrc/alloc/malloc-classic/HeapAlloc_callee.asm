@@ -172,4 +172,4 @@ ENDIF
    pop de                    ; junk lagger on stack
    ret
 
-DEFC ASMDISP_HEAPALLOC_CALLEE = # asmentry - HeapAlloc_callee
+DEFC ASMDISP_HEAPALLOC_CALLEE = asmentry - HeapAlloc_callee

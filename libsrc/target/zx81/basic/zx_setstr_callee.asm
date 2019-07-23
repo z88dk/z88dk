@@ -125,4 +125,4 @@ ENDIF
 	ex	de,hl
 	jr	loop
 
-DEFC ASMDISP_ZX_SETSTR_CALLEE = # asmentry - zx_setstr_callee
+DEFC ASMDISP_ZX_SETSTR_CALLEE = asmentry - zx_setstr_callee

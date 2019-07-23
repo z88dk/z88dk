@@ -9,7 +9,7 @@ replace restart {
 } by {
 	nop	; EXTERN __CODE_END_tail
 	nop	; EXTERN __CODE_head
-	ld	hl,#(__CODE_END_tail - __CODE_head)
+	ld	hl,+(__CODE_END_tail - __CODE_head)
 	; peephole z88dk-intrinsic-section-size
 }
 
@@ -18,7 +18,7 @@ replace restart {
 } by {
 	nop	; EXTERN __DATA_END_tail
 	nop	; EXTERN __DATA_head
-	ld	hl,#(__DATA_END_tail - __DATA_head)
+	ld	hl,+(__DATA_END_tail - __DATA_head)
 	; peephole z88dk-intrinsic-section-size
 }
 
@@ -27,7 +27,7 @@ replace restart {
 } by {
 	nop	; EXTERN __BSS_UNINITIALIZED_head
 	nop	; EXTERN __BSS_head
-	ld	hl,#(__BSS_UNINITIALIZED_head - __BSS_head)
+	ld	hl,+(__BSS_UNINITIALIZED_head - __BSS_head)
 	; peephole z88dk-intrinsic-section-size
 }
 
@@ -35,7 +35,7 @@ replace restart {
 	call	_SECTION_ORG_%1
 } by {
 	nop	; EXTERN __%1_head
-	ld	hl,#__%1_head
+	ld	hl,+__%1_head
 	; peephole z88dk-intrinsic-section-org
 }
 
@@ -43,7 +43,7 @@ replace restart {
 	call	_SECTION_END_%1
 } by {
 	nop	; EXTERN __%1_tail
-	ld	hl,#__%1_tail
+	ld	hl,+__%1_tail
 	; peephole z88dk-intrinsic-section-end
 }
 
@@ -51,7 +51,7 @@ replace restart {
 	call	_SECTION_SIZE_%1
 } by {
 	nop	; EXTERN __%1_size
-	ld	hl,#__%1_size
+	ld	hl,+__%1_size
 	; peephole z88dk-intrinsic-section-size
 }
 
@@ -102,7 +102,7 @@ replace restart {
 replace restart {
 	call	_intrinsic_outi_port_%1
 } by {
-	ld	c,#%1
+	ld	c,+%1
 	; peephole z88dk-intrinsic-outi-port-%1
 }
 
@@ -175,7 +175,7 @@ replace restart {
 replace restart {
 	call	_intrinsic_ini_port_%1
 } by {
-	ld	c,#%1
+	ld	c,+%1
 	; peephole z88dk-intrinsic-ini-port-%1
 }
 
@@ -293,7 +293,7 @@ replace restart {
 replace restart {
 	call	_intrinsic_load16_%1
 } by {
-	ld	hl,(#%1)
+	ld	hl,(+%1)
 	; peephole z88dk-intrinsic-load (%1)
 }
 
@@ -301,8 +301,8 @@ replace restart {
 	call	_intrinsic_store16_address_%1
 	call	_intrinsic_store16_value_%2
 } by {
-	ld	hl,#%2
-	ld	(#%1),hl
+	ld	hl,+%2
+	ld	(+%1),hl
 	; peephole z88dk-intrinsic-store (%1),%2
 } 
 

@@ -877,7 +877,7 @@ void swap(void)
 void immed(void)
 {
     if (ISASM(ASM_ASXX))
-        ot("ld\thl,#");
+        ot("ld\thl,+");
     else
         ot("ld\thl,");
 }
@@ -887,7 +887,7 @@ void immed(void)
 void immed2(void)
 {
     if (ISASM(ASM_ASXX))
-        ot("ld\tde,#");
+        ot("ld\tde,+");
     else
         ot("ld\tde,");
 }

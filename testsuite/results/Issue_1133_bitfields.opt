@@ -90,7 +90,7 @@
 
 ._func2
 	ld	hl,_y
-	ld	(hl),#(1 % 256)
+	ld	(hl),+(1 % 256)
 	ld	l,(hl)
 	ld	h,0
 	ret

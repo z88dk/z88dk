@@ -39,4 +39,4 @@ EXTERN _u_free
    pop hl
    ret
       
-DEFC ASMDISP_ADT_LISTDELETE_CALLEE = # asmentry - adt_ListDelete_callee
+DEFC ASMDISP_ADT_LISTDELETE_CALLEE = asmentry - adt_ListDelete_callee

@@ -31,7 +31,7 @@ void AsmCall(uint16_t address, Z80_registers* regs, register_usage inRegistersDe
 {
     __asm
     push    ix
-    ld      ix,#4
+    ld      ix,+4
     add     ix,sp
 
     ld      l,(ix+0)  ;HL=Routine address

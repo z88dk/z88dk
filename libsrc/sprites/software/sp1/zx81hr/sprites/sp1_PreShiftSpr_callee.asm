@@ -157,4 +157,4 @@ PUBLIC ASMDISP_SP1_PRESHIFTSPR_CALLEE
 .dummy2byte
    defb 255,0
 
-DEFC ASMDISP_SP1_PRESHIFTSPR_CALLEE = # asmentry - sp1_PreShiftSpr_callee
+DEFC ASMDISP_SP1_PRESHIFTSPR_CALLEE = asmentry - sp1_PreShiftSpr_callee

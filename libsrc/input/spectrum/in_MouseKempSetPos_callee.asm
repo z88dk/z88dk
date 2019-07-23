@@ -61,5 +61,5 @@ EXTERN _in_KempcoordX, _in_KempcoordY
 
    ret
 
-DEFC ASMDISP_IN_MOUSEKEMPSETPOS_CALLEE = # asmentry - in_MouseKempSetPos_callee
-DEFC CDISP_IN_MOUSEKEMPSETPOS_CALLEE = # centry - in_MouseKempSetPos_callee
+DEFC ASMDISP_IN_MOUSEKEMPSETPOS_CALLEE = asmentry - in_MouseKempSetPos_callee
+DEFC CDISP_IN_MOUSEKEMPSETPOS_CALLEE = centry - in_MouseKempSetPos_callee

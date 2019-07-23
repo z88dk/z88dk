@@ -9,7 +9,7 @@
 	SECTION	code_compiler
 
 ._func_char
-	ld	hl,#(( (0 % 256) * 256) + (0 % 256))
+	ld	hl,+(( (0 % 256) * 256) + (0 % 256))
 	push	hl
 	ld	hl,1	;const
 	call	l_gcharspsp	;
@@ -24,7 +24,7 @@
 
 
 ._func_char2
-	ld	hl,#(( (0 % 256) * 256) + (0 % 256))
+	ld	hl,+(( (0 % 256) * 256) + (0 % 256))
 	push	hl
 	ld	hl,1	;const
 	call	l_gcharspsp	;

@@ -43,5 +43,5 @@ EXTERN ASMDISP_SP1_GETUPDATESTRUCT_CALLEE
    ld (hl),b
    ret
 
-DEFC ASMDISP_SP1_PRINTAT_CALLEE = # asmentry - sp1_PrintAt_callee
+DEFC ASMDISP_SP1_PRINTAT_CALLEE = asmentry - sp1_PrintAt_callee
 

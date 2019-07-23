@@ -42,4 +42,4 @@ EXTERN SP1AddSprChar
    add hl,de                   ; hl = & sp1_update.slist
    jp SP1AddSprChar
 
-DEFC ASMDISP_SP1_INSERTCHARSTRUCT_CALLEE = # asmentry - sp1_InsertCharStruct_callee
+DEFC ASMDISP_SP1_INSERTCHARSTRUCT_CALLEE = asmentry - sp1_InsertCharStruct_callee

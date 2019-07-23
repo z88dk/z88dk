@@ -476,7 +476,7 @@ z80asm(
 	entry:
 		ret							; 000D ;; C9
 		
-		DEFC L_DIVENTRY = # entry - l_div_u
+		DEFC L_DIVENTRY = entry - l_div_u
 ...
 );
 

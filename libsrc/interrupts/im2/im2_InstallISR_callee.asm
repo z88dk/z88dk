@@ -34,4 +34,4 @@ PUBLIC ASMDISP_IM2_INSTALLISR_CALLEE
    ex de,hl
    ret
 
-DEFC ASMDISP_IM2_INSTALLISR_CALLEE = # asmentry - im2_InstallISR_callee
+DEFC ASMDISP_IM2_INSTALLISR_CALLEE = asmentry - im2_InstallISR_callee

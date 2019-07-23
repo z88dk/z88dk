@@ -40,4 +40,4 @@ PUBLIC ASMDISP_XORDRAWR_CALLEE
 		jp      __graphics_end
 
 
-DEFC ASMDISP_XORDRAWR_CALLEE = # asmentry - xordrawr_callee
+DEFC ASMDISP_XORDRAWR_CALLEE = asmentry - xordrawr_callee

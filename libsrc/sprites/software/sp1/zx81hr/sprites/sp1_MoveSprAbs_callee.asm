@@ -206,4 +206,4 @@ EXTERN SP1AddSprChar, SP1RemoveSprChar
 
    ; jumps to done for exit inside INCLUDE
 
-DEFC ASMDISP_SP1_MOVESPRABS_CALLEE = # asmentry - sp1_MoveSprAbs_callee
+DEFC ASMDISP_SP1_MOVESPRABS_CALLEE = asmentry - sp1_MoveSprAbs_callee

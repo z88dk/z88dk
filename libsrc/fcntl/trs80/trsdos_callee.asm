@@ -50,4 +50,4 @@ retaddr:
 	ret
 
 
-DEFC ASMDISP_TRSDOS_CALLEE = # centry - trsdos_callee
+DEFC ASMDISP_TRSDOS_CALLEE = centry - trsdos_callee

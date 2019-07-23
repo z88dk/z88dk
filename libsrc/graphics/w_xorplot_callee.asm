@@ -39,4 +39,4 @@
                 call    w_xorpixel
                 jp      __graphics_end
 
-DEFC ASMDISP_XORPLOT_CALLEE = # asmentry - xorplot_callee
+DEFC ASMDISP_XORPLOT_CALLEE = asmentry - xorplot_callee

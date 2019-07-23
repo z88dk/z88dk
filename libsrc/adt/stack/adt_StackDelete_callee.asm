@@ -28,4 +28,4 @@ EXTERN _u_free
    pop hl
    ret
 
-DEFC ASMDISP_ADT_STACKDELETE_CALLEE = # asmentry - adt_StackDelete_callee
+DEFC ASMDISP_ADT_STACKDELETE_CALLEE = asmentry - adt_StackDelete_callee

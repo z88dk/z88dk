@@ -152,7 +152,7 @@
 	ld	sp,hl
 	ld	hl,%2
 =
-	add	sp,#(%1 - 65536)
+	add	sp,+(%1 - 65536)
 	ld	hl,%2
 
 	call	l_or

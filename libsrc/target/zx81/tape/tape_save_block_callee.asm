@@ -69,4 +69,4 @@ EXTERN zx_slow
 		ret
 
 
-DEFC ASMDISP_TAPE_SAVE_BLOCK_CALLEE = # asmentry - tape_save_block_callee
+DEFC ASMDISP_TAPE_SAVE_BLOCK_CALLEE = asmentry - tape_save_block_callee

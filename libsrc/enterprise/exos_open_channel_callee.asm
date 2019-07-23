@@ -33,5 +33,5 @@ _exos_open_channel_callee:
 	ret
 
 
-DEFC ASMDISP_EXOS_OPEN_CHANNEL_CALLEE = # asmentry - exos_open_channel_callee
+DEFC ASMDISP_EXOS_OPEN_CHANNEL_CALLEE = asmentry - exos_open_channel_callee
  

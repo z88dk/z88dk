@@ -34,4 +34,4 @@ _screen_callee:
 	ld	l,a
 	ret
 
-DEFC ASMDISP_screen_CALLEE = # asmentry - screen_callee
+DEFC ASMDISP_screen_CALLEE = asmentry - screen_callee

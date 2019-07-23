@@ -62,4 +62,4 @@ ENDIF
         call    l_tms9918_enable_interrupts
         ret
         
-DEFC ASMDISP_MSX_VPOKE_CALLEE = # asmentry - msx_vpoke_callee
+DEFC ASMDISP_MSX_VPOKE_CALLEE = asmentry - msx_vpoke_callee

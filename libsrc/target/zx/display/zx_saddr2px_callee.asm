@@ -38,4 +38,4 @@ PUBLIC ASMDISP_ZX_SADDR2PX_CALLEE
    
    ret
 
-DEFC ASMDISP_ZX_SADDR2PX_CALLEE = # asmentry - zx_saddr2px_callee
+DEFC ASMDISP_ZX_SADDR2PX_CALLEE = asmentry - zx_saddr2px_callee

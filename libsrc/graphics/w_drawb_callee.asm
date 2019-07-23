@@ -47,4 +47,4 @@
 
 		jp      __graphics_end
 
-DEFC ASMDISP_DRAWB_CALLEE = # asmentry - drawb_callee
+DEFC ASMDISP_DRAWB_CALLEE = asmentry - drawb_callee

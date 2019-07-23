@@ -40,4 +40,4 @@ PUBLIC ASMDISP_UNDRAWR_CALLEE
 		jp      __graphics_end
 
 
-DEFC ASMDISP_UNDRAWR_CALLEE = # asmentry - undrawr_callee
+DEFC ASMDISP_UNDRAWR_CALLEE = asmentry - undrawr_callee

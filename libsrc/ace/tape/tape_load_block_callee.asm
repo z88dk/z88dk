@@ -32,4 +32,4 @@ PUBLIC ASMDISP_TAPE_LOAD_BLOCK_CALLEE
 	inc	hl		;okay
 	ret
 
-DEFC ASMDISP_TAPE_LOAD_BLOCK_CALLEE = # asmentry - tape_load_block_callee
+DEFC ASMDISP_TAPE_LOAD_BLOCK_CALLEE = asmentry - tape_load_block_callee
