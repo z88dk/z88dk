@@ -5,8 +5,6 @@
 	$Id: ozserial.h,v 1.2 2016-06-28 17:11:31 dom Exp $
 */
 
-#include <graphics.h>
-
 #ifndef _OZSERIAL_H
 #define _OZSERIAL_H
 
