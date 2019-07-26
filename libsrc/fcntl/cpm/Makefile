@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.15 2016-07-02 15:41:38 dom Exp $
+# $Id: Makefile $
 
 include ../../Make.config
 
@@ -39,8 +39,6 @@ OBJECTS = $(addprefix obj/z80/nodevice/,$(OFILES)) $(addprefix obj/z80/device/,$
 
 all: dirs $(OBJECTS)
 
-# It can't be +cpm, otherwise the bin output filename
-# will be forced to 'a.com' !!
 obj/z80/nodevice/%.o: %.c
 	$(ZCC) +cpm $(CFLAGS) $^ -o $@
 
