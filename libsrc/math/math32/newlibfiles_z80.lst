@@ -18,10 +18,20 @@
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_sqrtf.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_subf.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_zerof.asm
-../../_DEVELOPMENT/math/float/math32/lm32/z80/__dtoa_base10.asm
-../../_DEVELOPMENT/math/float/math32/lm32/z80/__dtoa_base16.asm
-../../_DEVELOPMENT/math/float/math32/lm32/z80/__dtoa_digits.asm
-../../_DEVELOPMENT/math/float/math32/lm32/z80/__dtoa_sgnabs.asm
+../../_DEVELOPMENT/math/float/math32/lm32/z80/asm__dtoa_base10.asm
+../../_DEVELOPMENT/math/float/math32/lm32/z80/asm__dtoa_base16.asm
+../../_DEVELOPMENT/math/float/math32/lm32/z80/asm__dtoa_digits.asm
+../../_DEVELOPMENT/math/float/math32/lm32/z80/asm__dtoa_sgnabs.asm
+../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_derror_zc.asm
+../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_derror_onc.asm
+../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_derror_znc.asm
+../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_derror_nanc.asm
+../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_derror_nannc.asm
+../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_derror_pinfnc.asm
+../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_derror_edom_zc.asm
+../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_derror_edom_infc.asm
+../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_derror_einval_zc.asm
+../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_derror_erange_infc.asm
 
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sdcc/___fs2uchar.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sdcc/___fssub_callee.asm
@@ -153,6 +163,7 @@
 ../../_DEVELOPMENT/math/float/math32/z80/f32_fscompare_callee.asm
 ../../_DEVELOPMENT/math/float/math32/z80/f32_fsdiv.asm
 ../../_DEVELOPMENT/math/float/math32/z80/f32_fsdiv2.asm
+../../_DEVELOPMENT/math/float/math32/z80/f32_fserror.asm
 ../../_DEVELOPMENT/math/float/math32/z80/f32_fsfrexp.asm
 ../../_DEVELOPMENT/math/float/math32/z80/f32_fshypot.asm
 ../../_DEVELOPMENT/math/float/math32/z80/f32_fsldexp.asm

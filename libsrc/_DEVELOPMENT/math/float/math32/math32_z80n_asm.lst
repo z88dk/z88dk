@@ -12,6 +12,7 @@ math/float/math32/z80/f32_fsceil
 math/float/math32/z80/f32_fscompare_callee
 math/float/math32/z80/f32_fsdiv
 math/float/math32/z80/f32_fsdiv2
+math/float/math32/z80/f32_fserror
 math/float/math32/z80/f32_fsfrexp
 math/float/math32/z80/f32_fshypot
 math/float/math32/z80/f32_fsldexp

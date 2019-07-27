@@ -18,7 +18,7 @@ PUBLIC m32_fszero
 PUBLIC m32_fszero_hlde
 PUBLIC m32_fsmin
 PUBLIC m32_fsmax
-
+PUBLIC m32_fsnan
 
 ; here to negate a number in dehl
 .m32_fsneg
@@ -30,6 +30,7 @@ PUBLIC m32_fsmax
 ; here to return a legal zero of sign h in hlde
 .m32_fszero_hlde
     ex de,hl
+
 ; here to return a legal zero of sign d in dehl
 .m32_fszero
     ld a,d
@@ -43,7 +44,10 @@ PUBLIC m32_fsmax
 ; here to change underflow to a error floating zero
 .m32_fsmin
     call m32_fszero
-    jr m32_fseexit
+
+.m32_fseexit
+    scf                     ; C set for error
+    ret
 
 ; here to change overflow to floating infinity of sign d in dehl
 .m32_fsmax
@@ -52,8 +56,16 @@ PUBLIC m32_fsmax
     ld d,a
     ld e,080h               ;floating infinity
     ld hl,0
+    jr m32_fseexit
 
-.m32_fseexit
-    scf                     ; C set for error
-    ret
+
+; here to change error to floating NaN of sign d in dehl
+.m32_fsnan
+    ld a,d
+    or 07fh                 ; max exponent
+    ld d,a
+    ld e,0ffh               ;floating NaN
+    ld h,e
+    ld l,e
+    jr m32_fseexit
 
