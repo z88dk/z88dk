@@ -13,6 +13,7 @@
 SECTION code_clib
 SECTION code_fp_math32
 
+PUBLIC m32_float8
 PUBLIC m32_float16
 PUBLIC m32_float32
 
@@ -21,6 +22,13 @@ PUBLIC m32_float16u
 PUBLIC m32_float32u
 
 EXTERN m32_fsnormalize
+
+; convert char in l to float in dehl
+.m32_float8
+    ld a,l
+    rla                         ; sign bit of a into C
+    sbc a,a
+    ld h,a                      ; now hl is sign extended
 
 ; convert integer in hl to float in dehl
 .m32_float16

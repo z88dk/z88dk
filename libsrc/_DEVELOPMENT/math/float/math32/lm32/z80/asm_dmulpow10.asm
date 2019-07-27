@@ -4,7 +4,7 @@ SECTION code_fp_math32
 
 PUBLIC asm_dmulpow10
 
-EXTERN m32_float16, m32_fsmul_callee
+EXTERN m32_float8, m32_fsmul_callee
 EXTERN _m32_exp10f
 
    ; multiply DEHL' by a power of ten
@@ -30,10 +30,7 @@ EXTERN _m32_exp10f
 
 .asm_dmulpow10
     ld l,a
-    add a,a                     ; sign bit of a into C
-    sbc a,a
-    ld h,a                      ; now hl is sign extended a
-    call m32_float16            ; convert hl to float in dehl
+    call m32_float8             ; convert l to float in dehl
     call _m32_exp10f            ; make 10^A
     push de
     push hl
