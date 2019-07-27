@@ -9,7 +9,7 @@
 ; m32_fsmul32x32 - z80 floating point multiply 32-bit mantissa
 ;-------------------------------------------------------------------------
 ;
-; since the z180, and z80-zxn only have support for 8x8bit multiply,
+; since the z180, and z80n only have support for 8x8bit multiply,
 ; the multiplication of the mantissas needs to be broken
 ; into stages and accumulated at the end.
 ;
@@ -23,7 +23,7 @@
 ; m32_fsmul24x32 - z80 floating point multiply 32-bit mantissa
 ;-------------------------------------------------------------------------
 ;
-; since the z180, and z80-zxn only have support for 8x8bit multiply,
+; since the z180, and z80n only have support for 8x8bit multiply,
 ; the multiplication of the mantissas needs to be broken
 ; into stages and accumulated at the end.
 ;

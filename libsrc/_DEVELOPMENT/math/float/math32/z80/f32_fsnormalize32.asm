@@ -6,7 +6,7 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-; m32_fsnormalize32 - z80, z180, z80-zxn unpacked normalisation code
+; m32_fsnormalize32 - z80, z180, z80n unpacked normalisation code
 ;-------------------------------------------------------------------------
 ;
 ;    unpacked format: mantissa= dehl, exponent in b, sign in c[7]

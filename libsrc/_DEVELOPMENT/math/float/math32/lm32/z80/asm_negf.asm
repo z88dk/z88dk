@@ -6,7 +6,7 @@ SECTION code_fp_math32
 
 PUBLIC asm_negf, asm_dneg
 
-EXTERN m32_fsneg_fastcall
+EXTERN m32_fsneg
 
     ; negate sccz80 floats
     ;
@@ -17,10 +17,10 @@ EXTERN m32_fsneg_fastcall
     ;
     ; uses  : af, bc, de, hl
 
-DEFC  asm_negf = m32_fsneg_fastcall             ; enter stack = ret
+DEFC  asm_negf = m32_fsneg                      ; enter stack = ret
                                                 ;        DEHL = d32_float
                                                 ; return DEHL = d32_float
 
-DEFC  asm_dneg = m32_fsneg_fastcall             ; enter stack = ret
+DEFC  asm_dneg = m32_fsneg                      ; enter stack = ret
                                                 ;        DEHL = d32_float
                                                 ; return DEHL = d32_float

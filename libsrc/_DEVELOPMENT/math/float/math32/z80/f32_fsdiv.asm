@@ -6,7 +6,7 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-; m32_fsdiv - z80, z180, z80-zxn floating point divide
+; m32_fsdiv - z80, z180, z80n floating point divide
 ;-------------------------------------------------------------------------
 ; R = N/D = N * 1/D
 ;
@@ -17,7 +17,7 @@
 ; Division is then done by multiplying by the reciprocal of the divisor.
 ;
 ;-------------------------------------------------------------------------
-; m32_fsinv - z80, z180, z80-zxn floating point inversion (reciprocal)
+; m32_fsinv - z80, z180, z80n floating point inversion (reciprocal)
 ;-------------------------------------------------------------------------
 ;
 ; Computes R the quotient of N and D
@@ -42,7 +42,7 @@ SECTION code_fp_math32
 EXTERN m32_fsmul, m32_fsmul_callee
 
 EXTERN m32_fsmul32x32, m32_fsmul24x32, m32_fsadd32x32, m32_fsadd24x32
-EXTERN m32_fsmin_fastcall, m32_fsmax_fastcall
+EXTERN m32_fsconst_ninf, m32_fsconst_pinf
 
 PUBLIC m32_fsdiv, m32_fsdiv_callee
 PUBLIC m32_fsinv_fastcall
@@ -59,6 +59,12 @@ PUBLIC _m32_invf
     jp m32_fsmul_callee
 
 
+.divovl
+    pop af                      ; get sign
+    jp C,m32_fsconst_ninf
+    jp m32_fsconst_pinf         ; done overflow
+
+
 ._m32_invf
 .m32_fsinv_fastcall
     ex de,hl                    ; DEHL -> HLDE
@@ -68,7 +74,7 @@ PUBLIC _m32_invf
     push af                     ; save exponent and sign in C
 
     or a                        ; divide by zero?
-    jp Z,m32_fsmax_fastcall-1   ; we want one pop at exit
+    jr Z,divovl                 ; we want one pop for sign at exit
 
     ld h,0bfh                   ; scale to -0.5 <= D' < -1.0
     srl l

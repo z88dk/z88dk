@@ -6,7 +6,7 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-; m32_fsadd32 - z80, z180, z80-zxn floating point add 32-bit mantissa
+; m32_fsadd32 - z80, z180, z80n floating point add 32-bit mantissa
 ;-------------------------------------------------------------------------
 ;
 ; 1) first section: unpack from F_add: to sort:

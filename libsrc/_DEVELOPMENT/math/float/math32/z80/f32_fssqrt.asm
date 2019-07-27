@@ -6,7 +6,7 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-; m32_fsinvsqrt - z80, z180, z80-zxn floating point inverse square root
+; m32_fsinvsqrt - z80, z180, z80n floating point inverse square root
 ;-------------------------------------------------------------------------
 ;
 ; Searching for 1/x^0.5 being the inverse square root of y.
@@ -35,37 +35,45 @@ SECTION code_clib
 SECTION code_fp_math32
 
 EXTERN m32_fsmul, m32_fsmul_callee
-
 EXTERN m32_fsmul32x32, m32_fsmul24x32, m32_fsadd32x32, m32_fsadd24x32
-EXTERN m32_fsmin_fastcall
+EXTERN m32_fsconst_nnan, m32_fsconst_pzero
 
 PUBLIC m32_fssqrt, m32_fssqrt_fastcall, m32_fsinvsqrt_fastcall
 PUBLIC _m32_sqrtf, _m32_invsqrtf
 
 
 .m32_fssqrt
+    rl d
+    jp C,m32_fsconst_nnan       ; negative number?
+    rr d
     call m32_fsinvsqrt_fastcall
     jp m32_fsmul
 
 
 ._m32_sqrtf
 .m32_fssqrt_fastcall
+    rl d
+    jp C,m32_fsconst_nnan       ; negative number?
+    rr d
     push de                     ; y msw on stack
     push hl                     ; y lsw on stack
-    
     call m32_fsinvsqrt_fastcall
     call m32_fsmul_callee
     ret
 
 
 ._m32_invsqrtf
+    rl d
+    jp C,m32_fsconst_nnan       ; negative number?
+    rr d
+
 .m32_fsinvsqrt_fastcall         ; DEHL
-    ld a,d
-    or a                        ; divide by zero?
-    jp Z,m32_fsmin_fastcall    
-    and 080h                    ; negative number?
-    jp NZ,m32_fsmin_fastcall
-    
+    sla e
+    rl d
+    jp Z,m32_fsconst_pzero      ; zero exponent? zero result
+    rr d
+    rr e
+
     ld b,d                      ; retain original y sign & exponent
     set 7,d                     ; make y negative
 

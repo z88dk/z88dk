@@ -6,7 +6,7 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-; m32_ldexp - z80, z180, z80-zxn load exponent
+; m32_ldexp - z80, z180, z80n load exponent
 ;-------------------------------------------------------------------------
 ;
 ;   float m32_ldexpf (float x, int16_t pw2)
@@ -30,11 +30,39 @@
 SECTION code_clib
 SECTION code_fp_math32
 
-EXTERN m32_fsmin_fastcall
+EXTERN m32_fsmin
+
+PUBLIC m32_dmulpow2
+
+   ; multiply DEHL' by a power of two
+   ; DEHL' *= 2^(HL)
+   ;
+   ; enter : DEHL'= float x
+   ;         HL = signed integer
+   ;
+   ; exit  : success
+   ;
+   ;            DEHL'= x * 2^(HL)
+   ;            carry reset
+   ;
+   ;         fail if overflow
+   ;
+   ;            AC'= +-inf
+   ;            carry set, errno set
+   ;
+   ; uses  : af, bc', de', hl'
+   
+.m32_dmulpow2
+    push hl                     ; power 2 on stack
+    exx
+    pop bc                      ; power 2 in bc
+    call pow2
+    exx
+    ret
+
 
 PUBLIC m32_fsldexp_callee
 PUBLIC _m32_ldexpf
-
 
 ; float ldexpf (float x, int16_t pw2);
 ._m32_ldexpf
@@ -54,9 +82,10 @@ PUBLIC _m32_ldexpf
     pop bc                      ; pw2 maximum int8_t actually
     push af                     ; return on stack
 
+.pow2
     sla e                       ; get the exponent
     rl d
-    jr Z,zero_legal             ; return IEEE zero
+    jr Z,zero_legal             ; return IEEE signed zero
     rr e                        ; save the sign in e[7]
 
     ld a,d
@@ -69,7 +98,7 @@ PUBLIC _m32_ldexpf
 
     and a                       ; check for zero exponent
     ret NZ                      ; return IEEE DEHL
-    jp m32_fsmin_fastcall       ; otherwise return IEEE underflow zero
+    jp m32_fsmin                ; otherwise return IEEE underflow zero
 
 .zero_legal
     ld e,d                      ; use 0

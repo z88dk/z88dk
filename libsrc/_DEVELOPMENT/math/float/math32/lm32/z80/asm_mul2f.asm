@@ -1,8 +1,11 @@
 
 ; float _mul2f (float number) __z88dk_fastcall
 
+SECTION code_clib
 SECTION code_fp_math32
+
 PUBLIC  asm_mul2f
+
 EXTERN  m32_mul2_fastcall
 
     ; Multiply a float by 2

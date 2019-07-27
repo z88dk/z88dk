@@ -4,7 +4,7 @@ SECTION code_fp_math32
 
 PUBLIC cm32_sccz80_fsmin_callee
 
-EXTERN cm32_sccz80_fsread1_callee, m32_fsmin_fastcall
+EXTERN cm32_sccz80_fsread1_callee, m32_fsmin
 
     ; change underflow to a error floating zero as sccz80 float
     ;
@@ -16,4 +16,4 @@ EXTERN cm32_sccz80_fsread1_callee, m32_fsmin_fastcall
 
 cm32_sccz80_fsmin_callee:
     call cm32_sccz80_fsread1_callee
-    jp m32_fsmin_fastcall
+    jp m32_fsmin

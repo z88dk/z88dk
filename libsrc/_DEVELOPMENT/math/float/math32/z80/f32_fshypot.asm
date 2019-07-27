@@ -6,7 +6,7 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-; m32_hypot - z80, z180, z80-zxn hypotenuse evaluation
+; m32_hypot - z80, z180, z80n hypotenuse evaluation
 ;-------------------------------------------------------------------------
 ;
 ; The hypotenuse is the longest side of a right-angled triangle.

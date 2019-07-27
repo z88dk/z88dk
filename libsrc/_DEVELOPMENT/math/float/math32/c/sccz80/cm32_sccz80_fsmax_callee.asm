@@ -4,7 +4,7 @@ SECTION code_fp_math32
 
 PUBLIC cm32_sccz80_fsmax_callee
 
-EXTERN cm32_sccz80_fsread1_callee, m32_fsmax_fastcall
+EXTERN cm32_sccz80_fsread1_callee, m32_fsmax
 
     ; convert sccz80 float to infinity with correct sign
     ;
@@ -16,4 +16,4 @@ EXTERN cm32_sccz80_fsread1_callee, m32_fsmax_fastcall
 
 cm32_sccz80_fsmax_callee:
     call cm32_sccz80_fsread1_callee
-    jp m32_fsmax_fastcall
+    jp m32_fsmax

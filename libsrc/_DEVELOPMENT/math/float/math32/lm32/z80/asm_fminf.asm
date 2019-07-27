@@ -6,7 +6,7 @@ SECTION code_fp_math32
 
 PUBLIC asm_fminf
 
-EXTERN m32_fsmin_fastcall
+EXTERN m32_fsmin
 
     ; change underflow to a error floating zero as sdcc float
     ;
@@ -17,6 +17,6 @@ EXTERN m32_fsmin_fastcall
     ;
     ; uses  : af, bc, de, hl
 
-DEFC  asm_fminf = m32_fsmin_fastcall            ; enter stack = ret
+DEFC  asm_fminf = m32_fsmin                     ; enter stack = ret
                                                 ;        DEHL = d32_float
                                                 ; return DEHL = d32_float
