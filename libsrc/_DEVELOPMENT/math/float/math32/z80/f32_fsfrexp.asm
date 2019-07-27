@@ -6,7 +6,7 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-; m32_frexp - z80, z180, z80-zxn fraction and exponent
+; m32_frexp - z80, z180, z80n fraction and exponent
 ;-------------------------------------------------------------------------
 ;
 ;   float m32_frexpf (float x, int *pw2)

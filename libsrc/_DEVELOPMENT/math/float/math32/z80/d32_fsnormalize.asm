@@ -6,10 +6,10 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;  feilipu, 2019 April
-;  adapted for z80, z180, and z80-zxn
+;  adapted for z80, z180, and z80n
 ;
 ;-------------------------------------------------------------------------
-; m32_fsnormalize - z80, z180, z80-zxn normalisation code
+; m32_fsnormalize - z80, z180, z80n normalisation code
 ;-------------------------------------------------------------------------
 ;
 ;    enter here with af' carry clear for m32_float32, m32_float32u

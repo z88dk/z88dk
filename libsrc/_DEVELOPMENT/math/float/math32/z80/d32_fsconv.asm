@@ -6,7 +6,7 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;  feilipu, 2019 April
-;  adapted for z80, z180, and z80-zxn
+;  adapted for z80, z180, and z80n
 ;
 ;-------------------------------------------------------------------------
 

@@ -6,30 +6,32 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;  feilipu, 2019 April
-;  adapted for z80, z180, and z80-zxn
+;  adapted for z80, z180, and z80n
 ;
 ;-------------------------------------------------------------------------
 
-SECTION code_clib
 SECTION code_fp_math32
 
-PUBLIC m32_fsneg_fastcall
-PUBLIC m32_fszero_fastcall
-PUBLIC m32_fsmin_fastcall
-PUBLIC m32_fsmax_fastcall
-PUBLIC _m32_neg
+PUBLIC m32_fseexit
+PUBLIC m32_fsneg
+PUBLIC m32_fszero
+PUBLIC m32_fszero_hlde
+PUBLIC m32_fsmin
+PUBLIC m32_fsmax
 
 
 ; here to negate a number in dehl
-._m32_neg
-.m32_fsneg_fastcall
+.m32_fsneg
     ld a,d
     xor 080h
     ld d,a
     ret
 
-; here to return a legal zero in dehl
-.m32_fszero_fastcall
+; here to return a legal zero of sign h in hlde
+.m32_fszero_hlde
+    ex de,hl
+; here to return a legal zero of sign d in dehl
+.m32_fszero
     ld a,d
     and 080h
     ld d,a
@@ -39,13 +41,12 @@ PUBLIC _m32_neg
     ret
 
 ; here to change underflow to a error floating zero
-.m32_fsmin_fastcall
-    call m32_fszero_fastcall
+.m32_fsmin
+    call m32_fszero
     jr m32_fseexit
 
 ; here to change overflow to floating infinity of sign d in dehl
-    pop af                  ; Entry from fsdiv
-.m32_fsmax_fastcall
+.m32_fsmax
     ld a,d
     or 07fh                 ; max exponent
     ld d,a

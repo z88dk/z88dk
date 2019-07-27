@@ -9,7 +9,7 @@
 ; m32_fsmul - z80 floating point multiply
 ;-------------------------------------------------------------------------
 ;
-; since the z180, and z80-zxn only have support for 8x8bit multiply,
+; since the z180, and z80n only have support for 8x8bit multiply,
 ; the multiplication of the mantissas needs to be broken
 ; into stages and accumulated at the end.
 ;
@@ -52,7 +52,8 @@
 SECTION code_clib
 SECTION code_fp_math32
 
-EXTERN m32_fszero_fastcall
+EXTERN m32_fsconst_nzero, m32_fsconst_pzero
+EXTERN m32_fsconst_ninf, m32_fsconst_pinf
 EXTERN m32_mulu_32h_24x24
 
 PUBLIC m32_fsmul, m32_fsmul_callee
@@ -108,7 +109,7 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 
     ld a,h                      ; calculate the exponent
     or a                        ; second exponent zero then result is zero
-    jp Z,m32_fszero_fastcall
+    jr Z,mulzero
 
     sub a,07fh                  ; subtract out bias, so when exponents are added only one bias present
     jr C,fmchkuf
@@ -123,12 +124,12 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     exx
 
     add a,h                     ; add the exponents
-    jp NC,m32_fszero_fastcall
+    jr NC,mulzero
 
 .fmnouf
     ld b,a
     or a
-    jp Z,m32_fszero_fastcall    ; check sum of exponents for zero
+    jr Z,mulzero                ; check sum of exponents for zero
 
     ex af,af
     ld a,b
@@ -174,9 +175,13 @@ PUBLIC m32_fsmul, m32_fsmul_callee
 
 .mulovl
     ex af,af                    ; get sign
-    and a,07fh                  ; set INF
-    ld d,a
-    ld e,080h
-    ld hl,0
-    ret                         ; done overflow
+    rla
+    jp C,m32_fsconst_ninf
+    jp m32_fsconst_pinf         ; done overflow
+
+.mulzero
+    ex af,af                    ; get sign
+    rla
+    jp C,m32_fsconst_nzero
+    jp m32_fsconst_pzero        ; done underflow
 

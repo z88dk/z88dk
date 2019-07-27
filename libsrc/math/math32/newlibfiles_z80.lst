@@ -140,6 +140,7 @@
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/asin.asm
 
 ../../_DEVELOPMENT/math/float/math32/z80/d32_fsadd.asm
+../../_DEVELOPMENT/math/float/math32/z80/f32_fsconst.asm
 ../../_DEVELOPMENT/math/float/math32/z80/d32_fsconv.asm
 ../../_DEVELOPMENT/math/float/math32/z80/d32_fsnormalize.asm
 ../../_DEVELOPMENT/math/float/math32/z80/d32_fsutil.asm
@@ -162,7 +163,6 @@
 ../../_DEVELOPMENT/math/float/math32/z80/f32_fspoly.asm
 ../../_DEVELOPMENT/math/float/math32/z80/f32_fssqr.asm
 ../../_DEVELOPMENT/math/float/math32/z80/f32_fssqrt.asm
-../../_DEVELOPMENT/math/float/math32/z80/f32_fsunity.asm
 ../../_DEVELOPMENT/math/float/math32/z80/f32_z80_mulu_de.asm
 ../../_DEVELOPMENT/math/float/math32/z80/f32_z80_mulu_32h_24x24.asm
 ../../_DEVELOPMENT/math/float/math32/z80/f32_z80_mulu_32h_32x32.asm
