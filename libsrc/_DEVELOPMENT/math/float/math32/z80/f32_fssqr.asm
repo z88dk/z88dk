@@ -42,7 +42,7 @@
 SECTION code_clib
 SECTION code_fp_math32
 
-EXTERN m32_fsconst_pzero, m32_fsconst_pinf, m32_fsconst_pnan, m32_fszero_hlde
+EXTERN m32_fsconst_pzero, m32_fsconst_pinf, m32_fsconst_pnan
 EXTERN m32_sqr_32h_24x24
 
 PUBLIC m32_fssqr_fastcall
@@ -52,10 +52,6 @@ PUBLIC _m32_sqrf
 .m32_fssqr_fastcall
     ex de,hl                    ; DEHL -> HLDE
 
-    ld a,h                      ; calculate the exponent
-    or a                        ; exponent zero then result is zero
-    jp Z,m32_fszero_hlde
-    
     add hl,hl                   ; shift exponent into H, ignore sign bit
     scf                         ; set implicit bit
     rr l                        ; shift msb into mantissa
