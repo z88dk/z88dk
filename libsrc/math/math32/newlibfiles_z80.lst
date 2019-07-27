@@ -18,6 +18,14 @@
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_sqrtf.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_subf.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_zerof.asm
+../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_dadd.asm
+../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_dmul.asm
+../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_dmul10a.asm
+../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_dmulpow2.asm
+../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_dmulpow10.asm
+../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_double8u.asm
+../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_double16u.asm
+../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_double32u.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm__dtoa_base10.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm__dtoa_base16.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm__dtoa_digits.asm
@@ -169,6 +177,7 @@
 ../../_DEVELOPMENT/math/float/math32/z80/f32_fsldexp.asm
 ../../_DEVELOPMENT/math/float/math32/z80/f32_fsmul.asm
 ../../_DEVELOPMENT/math/float/math32/z80/f32_fsmul2.asm
+../../_DEVELOPMENT/math/float/math32/z80/f32_fsmul10a.asm
 ../../_DEVELOPMENT/math/float/math32/z80/f32_fsmul32.asm
 ../../_DEVELOPMENT/math/float/math32/z80/f32_fsnormalize32.asm
 ../../_DEVELOPMENT/math/float/math32/z80/f32_fspoly.asm

@@ -1,8 +1,11 @@
 
 ; float _floorf (float number) __z88dk_fastcall
 
+SECTION code_clib
 SECTION code_fp_math32
+
 PUBLIC  asm_floorf
+
 EXTERN  m32_floor_fastcall
 
     ; Takes the closest lower integer 

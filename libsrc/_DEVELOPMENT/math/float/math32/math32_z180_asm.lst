@@ -18,6 +18,7 @@ math/float/math32/z80/f32_fshypot
 math/float/math32/z80/f32_fsldexp
 math/float/math32/z80/f32_fsmul
 math/float/math32/z80/f32_fsmul2
+math/float/math32/z80/f32_fsmul10a
 math/float/math32/z80/f32_fsmul32
 math/float/math32/z80/f32_fsnormalize32
 math/float/math32/z80/f32_fspoly
