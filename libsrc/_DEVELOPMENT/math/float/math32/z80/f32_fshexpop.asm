@@ -36,6 +36,8 @@ m32_dhexpop:
     rl e
 
     dec a
+    jr Z,m32_fsmin              ; safety net, in case something is borked
+
     jr normmant
 
 .normdone
