@@ -2,7 +2,7 @@
 SECTION code_clib
 SECTION code_fp_math32
 
-EXTERN m32_float16, _m32_exp10f, m32_fsmul_callee
+EXTERN m32_float8, _m32_exp10f, m32_fsmul_callee
 
 PUBLIC m32__dtoa_base10
 
@@ -69,10 +69,7 @@ m32__dtoa_base10:
 
     neg                         ; negated exponent e
     ld l,a
-    add a,a                     ; sign bit of a into C
-    sbc a,a
-    ld h,a                      ; now hl is sign extended a
-    call m32_float16            ; convert hl to float in dehl
+    call m32_float8             ; convert l to float in dehl
     call _m32_exp10f            ; make 10^-e
     push de
     push hl
