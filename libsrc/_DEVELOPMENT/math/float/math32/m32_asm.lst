@@ -19,6 +19,7 @@ math/float/math32/lm32/z80/asm_sqrf
 math/float/math32/lm32/z80/asm_sqrtf
 math/float/math32/lm32/z80/asm_subf
 math/float/math32/lm32/z80/asm_zerof
+math/float/math32/lm32/z80/asm_dneg
 math/float/math32/lm32/z80/asm_dadd
 math/float/math32/lm32/z80/asm_dmul
 math/float/math32/lm32/z80/asm_dmul10a

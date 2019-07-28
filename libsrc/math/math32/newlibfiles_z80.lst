@@ -18,6 +18,7 @@
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_sqrtf.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_subf.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_zerof.asm
+../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_dneg.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_dadd.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_dmul.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_dmul10a.asm
