@@ -18,6 +18,7 @@
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_sqrtf.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_subf.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_zerof.asm
+../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_nan_b.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_dneg.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_dadd.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_dmul.asm
@@ -194,6 +195,7 @@
 ../../_DEVELOPMENT/math/float/math32/z80/h32_coeff_exp10f.asm
 ../../_DEVELOPMENT/math/float/math32/z80/h32_coeff_logf.asm
 ../../_DEVELOPMENT/math/float/math32/z80/h32_coeff_sinf.asm
+../../_DEVELOPMENT/math/float/math32/z80/f32_nan_b.asm
 
 ../../_DEVELOPMENT/math/float/math32/c/asm/m32_acosf.asm
 ../../_DEVELOPMENT/math/float/math32/c/asm/m32_acoshf.asm

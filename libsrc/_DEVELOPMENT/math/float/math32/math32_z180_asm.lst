@@ -25,6 +25,7 @@ math/float/math32/z80/f32_fspoly
 math/float/math32/z80/f32_fssigdig
 math/float/math32/z80/f32_fssqr
 math/float/math32/z80/f32_fssqrt
+math/float/math32/z80/f32_nan_b
 math/float/math32/z80/f32__dtoa_sgnabs
 math/float/math32/z80/f32__dtoa_base10
 math/float/math32/z80/f32__dtoa_base16
