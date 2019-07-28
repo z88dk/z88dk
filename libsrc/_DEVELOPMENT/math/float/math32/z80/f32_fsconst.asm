@@ -50,11 +50,13 @@ PUBLIC m32_fsconst_nnan
 
 .m32_fsconst_pnan
     ld de,$7fff
-    ld hl,$ffff
+    ld h,e
+    ld l,e
     ret
 
 .m32_fsconst_nnan
     ld de,$ffff
-    ld hl,$ffff
+    ld h,e
+    ld l,e
     ret
 
