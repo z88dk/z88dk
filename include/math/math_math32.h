@@ -26,7 +26,6 @@
 #define LNof10          (double_t)2.302585093
 #define LOG2            (double_t)0.30102999567
 #define LOGE            (double_t)0.43429448190
-//#define PI              (double_t)3.14159265359
 #define PIby180         (double_t)0.0174532925
 #define PIbyTWO         (double_t)1.570796326795
 #define POW10INF        (double_t)38.0
@@ -85,8 +84,6 @@ extern double_t __LIB__ log(double_t x);
 extern double_t __LIB__ log2(double_t x);
 extern double_t __LIB__ log10(double_t x);
 #define log1p(x) log(1.+x)
-#define log2(a) (log(a)/M_LN2)
-#define exp2(x)  pow(2.,x)
 #define expm1(x) (exp(x)-1.)
 
 /* Nearest integer, absolute value, and remainder functions */
