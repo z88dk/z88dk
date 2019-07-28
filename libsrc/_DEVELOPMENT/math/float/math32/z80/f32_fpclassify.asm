@@ -4,16 +4,15 @@ SECTION code_fp_math32
 PUBLIC m32_fpclassify
 
 m32_fpclassify:
-    ; enter : dehl' = float x
+    ; enter : dehl  = float x
     ;
-    ; exit  : dehl' = float x
+    ; exit  : dehl  = float x
     ;            a  = 0 if number
     ;               = 1 if zero
     ;               = 2 if nan
     ;               = 3 if inf
     ;
     ; uses  : af
-    exx
     sla e
     rl d
     ld a,d
@@ -45,8 +44,6 @@ m32_fpclassify:
     rla
     or h
     or l
-
-    exx
     ld a,3      ;Infinity
     ret Z
 
@@ -54,12 +51,10 @@ m32_fpclassify:
     ret
 
 number:
-    exx
     xor    a
     ret
 
 zero:
-    exx
     inc    a
     ret
 
