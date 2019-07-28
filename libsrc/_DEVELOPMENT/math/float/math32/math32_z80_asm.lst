@@ -14,6 +14,7 @@ math/float/math32/z80/f32_fsdiv
 math/float/math32/z80/f32_fsdiv2
 math/float/math32/z80/f32_fserror
 math/float/math32/z80/f32_fsfrexp
+math/float/math32/z80/f32_fshexpop
 math/float/math32/z80/f32_fshypot
 math/float/math32/z80/f32_fsldexp
 math/float/math32/z80/f32_fsmul

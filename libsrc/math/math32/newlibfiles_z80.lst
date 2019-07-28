@@ -28,6 +28,7 @@
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_double8u.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_double16u.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_double32u.asm
+../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_dhexpop.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm__dtoa_base10.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm__dtoa_base16.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm__dtoa_digits.asm
@@ -175,6 +176,7 @@
 ../../_DEVELOPMENT/math/float/math32/z80/f32_fsdiv2.asm
 ../../_DEVELOPMENT/math/float/math32/z80/f32_fserror.asm
 ../../_DEVELOPMENT/math/float/math32/z80/f32_fsfrexp.asm
+../../_DEVELOPMENT/math/float/math32/z80/f32_fshexpop.asm
 ../../_DEVELOPMENT/math/float/math32/z80/f32_fshypot.asm
 ../../_DEVELOPMENT/math/float/math32/z80/f32_fsldexp.asm
 ../../_DEVELOPMENT/math/float/math32/z80/f32_fsmul.asm
