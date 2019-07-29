@@ -1,0 +1,10 @@
+MTX-512 serial routines obtained from tschak909 with the following comment:
+
+These are from Andy Key and are in M80 macro assembler format.
+
+They work on either the Memotech MTX-512 RS-232-C expansion, or the REMEMOrizer 
+expansion.
+
+At present the following isn't implemented:
+
+- Setting bit/parity
