@@ -57,6 +57,12 @@ IF !__CPU_8080__
 		EXTERN		generic_console_set_ink
 		EXTERN		generic_console_set_paper
 		EXTERN		generic_console_set_inverse
+		EXTERN		generic_console_set_inverse
+
+		; Toggle the cursor state
+		; Enter: hl = flags, bit 1,(hl) = cursor state
+		EXTERN		generic_console_toggle_cursor
+		EXTERN		generic_console_draw_cursor
 		EXTERN		__console_x
 		EXTERN		__console_y
 		EXTERN		__console_w
@@ -226,6 +232,11 @@ left:	ld	a,c
 left_1: dec	c
 store_coords:
 	ld	(__console_x),bc
+	push	bc
+	ld	hl,generic_console_flags
+	bit	1,(hl)
+	call	nz,generic_console_draw_cursor
+	pop	bc
 	scf
 	ret
 
@@ -287,13 +298,6 @@ set_inverse_call_generic:
 	scf
 	ret
 
-disable_cursor:
-	res	1,(hl)
-	ret
-enable_cursor:
-	set	1,(hl)
-	ret
-
 ; bc = coordinates
 clear_eol:
 	ld	a,b
@@ -342,6 +346,16 @@ handle_cr_no_need_to_scroll:
 	ld	c,0
 	jr	store_coords
 
+
+disable_cursor:
+	res	1,(hl)
+cursor_dispatch:
+	call	generic_console_toggle_cursor
+	scf
+	ret
+enable_cursor:
+	set	1,(hl)
+	jr	cursor_dispatch
 
 
 

@@ -30,6 +30,8 @@
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
+                PUBLIC          generic_console_toggle_cursor
+                PUBLIC          generic_console_draw_cursor
 
 		EXTERN		generic_console_flags
 		EXTERN		conio_map_colour
@@ -37,9 +39,29 @@
 		EXTERN		CONSOLE_ROWS
 		EXTERN		__super80_attr
 		EXTERN		PORT_F0_COPY
+		EXTERN		asm_set_cursor_state
+		EXTERN		asm_set_cursor_location
 
 		defc		DISPLAY = $f000
 		defc		COLOUR_MAP = $f000
+
+
+generic_console_toggle_cursor:
+	bit	1,(hl)
+        ld      hl,0x0c48  ;fast blink, rows 4->12
+        jr      nz,skipover
+        ld      hl,0x20  ;off
+skipover:
+        jp      asm_set_cursor_state
+
+; Entry: bc = coordinates
+generic_console_draw_cursor:
+	ld	hl,0
+	call	xypos2
+	jp	asm_set_cursor_location
+
+
+
 
 generic_console_ioctl:
 	scf
@@ -183,6 +205,7 @@ no_custom_font:
 
 xypos:
         ld      hl,DISPLAY
+xypos2:
         ld      de,80
         ld      d,0
         and     a
@@ -282,9 +305,8 @@ __super80_custom_font:
 
         EXTERN  copy_font_8x8
         EXTERN  CRT_FONT
-	EXTERN	asm_set_cursor_state
 
-	ld	l,20
+	ld	l,0x20
 	call	asm_set_cursor_state
 
         ld      hl,$f800 + (32 * 16)            ;PCG area
