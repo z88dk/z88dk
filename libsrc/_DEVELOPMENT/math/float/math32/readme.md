@@ -356,6 +356,8 @@ Some [benchmarking](https://github.com/z88dk/z88dk/wiki/Classic--Maths-Libraries
 
 Careful use of the intrinsic functions can result in significant performance improvement. For example, the n-body benchmark can be optimised by the use of intrinsic math32 functions of `invsqrt()` and `sqr()`, to produce a significant improvement. See `(opt)` results below.
 
+#### n-body
+
 ```C
 #ifdef __MATH_MATH32
       inv_distance = invsqrt(sqr(dx) + sqr(dy) + sqr(dz));
@@ -363,7 +365,7 @@ Careful use of the intrinsic functions can result in significant performance imp
       inv_distance = 1.0/sqrt(dx * dx + dy * dy + dz * dz);
 #endif
 ```
-And we get about a __25% improvement__ for the n-body benchmark.
+And we get about a __25%__ improvement for the n-body benchmark.
 Most of this gain is created by directly using the `invsqrt()` function. The optimisation effectively provides `y=invsqrt(x)`, instead of indirectly calculating `y=l_f32_inv(x*invsqrt(x))` in the normal situation.
 
 Library          | Compiler | Value 1       | Value 2       | Ticks
@@ -373,7 +375,7 @@ math48           | sccz80   | -0.169075164  | -0.169087605  | 2_402_023_498
 mbf32            | sccz80   | -0.169916810  | -0.169916810  | 1_939_334_701
 bbcmath          | sccz80   | -0.169075164  | -0.169087604  | 1_655_789_776
 math32           | sccz80   | -0.169075264  | -0.169086709  | _1_400_110_112_
-math32 (opt)     | sccz80   | -0.169075264  | -0.169086709  | __1_040_434_814__
+math32      (opt)| sccz80   | -0.169075264  | -0.169086709  | __1_040_434_814__
 math32_fast      | sccz80   | -0.169075264  | -0.169086709  | _1_199_895_142_
 math32_fast (opt)| sccz80   | -0.169075264  | -0.169086709  | __0_891_891_922__
 math32_z180      | sccz80   | -0.169075264  | -0.169086709  | _0_562_947_777_
@@ -381,5 +383,43 @@ math32_z180 (opt)| sccz80   | -0.169075264  | -0.169086709  | __0_428_653_933__
 math32_z80n      | sccz80   | -0.169075264  | -0.169086709  | _0_578_058_768_
 math32_z80n (opt)| sccz80   | -0.169075264  | -0.169086709  | __0_442_608_201__
 
+
+#### mandelbrot
+
+```C
+#ifdef __MATH_MATH32
+            for (i=0;i<iter && (Tr+Ti <= sqr(limit));++i)
+            {
+                Zi = 2.0*Zr*Zi + Ci;
+                Zr = Tr - Ti + Cr;
+                Tr = sqr(Zr);
+                Ti = sqr(Zi);
+            }
+#else
+            for (i=0;i<iter && (Tr+Ti <= limit*limit);++i)
+            {
+                Zi = 2.0*Zr*Zi + Ci;
+                Zr = Tr - Ti + Cr;
+                Tr = Zr * Zr;
+                Ti = Zi * Zi;
+            }
+#endif
+```
+And we get nearly a __10%__ improvement for the mandelbrot benchmark. This gain is achieved because the `sqr()` function optimises the mantissa calculation to 5 `16_8x8` multiplies, rather than 8 `16_8x8` multiplies required for full multiply.
+
+Library          | Compiler | Ticks
+-|-|-
+genmath          | sccz80   | 3_631_967_381
+math48           | sccz80   | 3_365_259_708
+math48           | zsdcc    | 3_205_062_412
+math32           | zsdcc    | 1_662_144_349
+math32           | sccz80   | _1_644_065_225_
+math32      (opt)| sccz80   | __1_423_758_284__
+math32_fast      | sccz80   | _1_486_085_986_
+math32_fast (opt)| sccz80   | __1_296_731_027__
+math32_z80n      | sccz80   | _0_913_110_917_
+math32_z80n (opt)| sccz80   | __0_851_491_652__
+math32_z180      | sccz80   | _0_883_966_576_
+math32_z180 (opt)| sccz80   | __0_816_798_393__
 
 ---
