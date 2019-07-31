@@ -375,6 +375,7 @@ static void spool_deinit(void)
 	spool_t *elem, *tmp;
 	HASH_ITER(hh, spool, elem, tmp) {
 		HASH_DEL(spool, elem);
+		xfree(elem->str);
 		xfree(elem);
 	}
 }
