@@ -860,6 +860,7 @@ Type *parse_decl(char name[], Type *base_type)
         }
         if ( amatch("__far"))
             base_type->isfar = 1;
+        swallow("const");
         ptr = make_pointer(base_type);
         parse_namespace(ptr);
         return parse_decl(name, ptr);
