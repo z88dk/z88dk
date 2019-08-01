@@ -69,33 +69,30 @@ PUBLIC  m32_compare_callee
     sbc a,d
 
     exx                 ;left
-    ld b,a
-
-    ; left dehl = float, bc = highword of result
-    ; (exx) right dehl = float, bc = low word of result
-    ld a,b
-    or c
-    bit 7,b
+    ; dehl  =  left float, ac  = high word of result
+    ; dehl' = right float, bc' =  low word of result
+    bit 7,a
     jr Z,consider_positive
 
-    ; Calculate whether result is zero (equal)
 .consider_negative
+    ; Calculate whether result is zero (equal)
+    or c
     exx
     or b
     or c
-
-    exx
-    ld hl,1    
+.return_negative
+    ld hl,1
     scf
     ret
 
 .consider_positive
+    ; Calculate whether result is zero (equal)
+    or c
     exx
     or b
     or c
-
-    exx
-    ld hl,1    
+.return_positive
+    ld hl,1
     scf
     ccf
     ret
@@ -106,13 +103,9 @@ PUBLIC  m32_compare_callee
     exx
     sla e
     rl d
-    jr Z,comp_positive  ;right is zero
-    jr C,comp_positive  ;sign of right is negative
-
-.comp_negative
-    ld hl,1
-    scf
-    ret
+    jr Z,return_positive    ;right is zero
+    jr C,return_positive    ;sign of right is negative
+    jr return_negative
 
 .zero_right
     ; left dehl' = float
@@ -120,11 +113,6 @@ PUBLIC  m32_compare_callee
     exx
     sla e
     rl d
-    jr C,comp_negative  ;sign of left is negative
-
-.comp_positive
-    ld hl,1
-    scf
-    ccf
-    ret
+    jr C,return_negative    ;sign of left is negative
+    jr return_positive
 
