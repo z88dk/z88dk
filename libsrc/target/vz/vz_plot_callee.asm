@@ -76,4 +76,4 @@ EXTERN base_graphics
    
    ret
 
-DEFC ASMDISP_VZ_PLOT_CALLEE = # asmentry - vz_plot_callee
+DEFC ASMDISP_VZ_PLOT_CALLEE = asmentry - vz_plot_callee

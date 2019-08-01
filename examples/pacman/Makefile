@@ -15,7 +15,7 @@ test: all
 
 clean:
 	rm -f $(MAME_FILES:%=$(MAME_DIR)/%)
-	rm -f rom.o rom*.bin *.o
+	rm -f rom.o rom*.bin *.o rom.rom
 	rm -f zcc_opt.def
 
 $(MAME_DIR)/namcopac.6e: rom.bin

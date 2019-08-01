@@ -153,5 +153,5 @@ EXTERN _u_free
    pop hl
    ret
 
-DEFC ASMDISP_ADT_LISTCONCAT_CALLEE = # asmentry - adt_ListConcat_callee
+DEFC ASMDISP_ADT_LISTCONCAT_CALLEE = asmentry - adt_ListConcat_callee
 

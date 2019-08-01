@@ -262,9 +262,9 @@
 	ld	hl,%2
 
 	ld	hl,_udata%1
-	ld	(hl),#(%2 % 256)
+	ld	(hl),+(%2 % 256)
 	inc	hl
-	ld	(hl),#(%2 / 256)
+	ld	(hl),+(%2 / 256)
 	ld	hl,%3
 =
 	ld	hl,%2
@@ -301,7 +301,7 @@
 	ld	hl,%3
 =
 	ld	hl,%1
-	ld	a,#(%2 %% 256)	;const
+	ld	a,+(%2 %% 256)	;const
 	or	(hl)
 	ld	(hl),a
 	ld	hl,%3
@@ -626,9 +626,9 @@
 	ld	hl,%4
 
 	ld	hl,%1	;const
-	ld	(hl),#(%2 %% 256)
+	ld	(hl),+(%2 %% 256)
 	inc	hl
-	ld	(hl),#(%2 / 256)
+	ld	(hl),+(%2 / 256)
 	ld	hl,%3
 =
 	ld	hl,%2
@@ -636,9 +636,9 @@
 	ld	hl,%3
 
 	ld	hl,%1
-	ld	(hl),#(%2 %% 256)
+	ld	(hl),+(%2 %% 256)
 	inc	hl
-	ld	(hl),#(%2 / 256)
+	ld	(hl),+(%2 / 256)
 	ld	hl,%3
 =
 	ld	hl,%2

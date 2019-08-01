@@ -72,4 +72,4 @@ add HL,BC
 jp ciclo0
 
 	
-DEFC ASMDISP_CPC_RLI_CALLEE = # asmentry - cpc_RLI_callee
+DEFC ASMDISP_CPC_RLI_CALLEE = asmentry - cpc_RLI_callee

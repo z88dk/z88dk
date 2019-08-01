@@ -80,4 +80,4 @@ ENDIF
 
    ret
 
-DEFC ASMDISP_ADT_QUEUEDELETES_CALLEE = # asmentry - adt_QueueDeleteS_callee
+DEFC ASMDISP_ADT_QUEUEDELETES_CALLEE = asmentry - adt_QueueDeleteS_callee

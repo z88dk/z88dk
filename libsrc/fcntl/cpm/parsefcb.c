@@ -28,7 +28,7 @@ void parsefcb(struct fcb *fc, unsigned char *name)
     while ( isdigit(*ptr) )  /* Find the end of the user number */
 	ptr++;
 
-    if ( name != ptr && *ptr == ':' ) {  /* uid has to end in colon */
+    if ( name != ptr && *ptr == '/' ) {  /* uid has to end with a 'slash' (was a colon) */
 	fc->uid = atoi(name);
 	name = ++ptr;
     }
@@ -96,7 +96,9 @@ void parsefcb(struct fcb *fc, unsigned char *name)
 ; 	in the name is a decimal digit and the first non-decimal-digit
 ;	character in the name is a slash (/).
 ;
-; z88dk related note: usrnum is now (IX+37)
+; **** z88dk related note: usrnum is now (IX+41)
+;
+
 
 vstfcu:
 
@@ -107,12 +109,8 @@ vstfcu:
 	push de
 	push bc
 
-IF !__CPU_8080__
-	push	hl
-	pop		ix
-ELSE
-	ld	(__fcb_ptr),hl
-ENDIF
+	;push	hl
+	;pop		ix
 
 
  PUSH	BC	;save BC
@@ -138,15 +136,14 @@ setfc1:
 	RLCA
 	RLCA
 	;; LD	(usrnum),A	;and save
-IF __CPU_8080__
-	ld	hl,(__fcb_ptr)
-	ld	bc,37
-	add	hl,bc
+	;;ld	(ix+41),a
+	push de		; preserve text pointer
+	ld	de,41	; offset for UID
+	add	hl,de
+	pop de
 	ld	(hl),a
-ELSE
-	ld	(ix+37),a
-ENDIF
-	pop	HL	;restore junk
+	
+	pop	HL	;restore junk (previously saved text ptr is not needed, we moved after UID position)
 	pop	BC
 	JP	vsetfcb	;and parse rest of filename
 
@@ -330,12 +327,6 @@ isdec:
 	CP	'9'+1
 	CCF
 	ret
-
-IF __CPU_8080__
-	SECTION		bss_compiler
-__fcb_ptr:	defw	0
-ENDIF
-
 
 #endasm
 

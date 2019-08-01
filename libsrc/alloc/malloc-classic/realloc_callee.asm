@@ -24,4 +24,4 @@ EXTERN _heap, ASMDISP_HEAPREALLOC_CALLEE
    ld de,_heap
    jp HeapRealloc_callee + ASMDISP_HEAPREALLOC_CALLEE
 
-DEFC ASMDISP_REALLOC_CALLEE = # asmentry - realloc_callee
+DEFC ASMDISP_REALLOC_CALLEE = asmentry - realloc_callee

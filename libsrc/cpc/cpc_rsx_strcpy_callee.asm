@@ -57,4 +57,4 @@
 
         ret
 
-DEFC ASMDISP_CPC_RSX_STRCPY_CALLEE = # asmentry - cpc_rsx_strcpy_callee
+DEFC ASMDISP_CPC_RSX_STRCPY_CALLEE = asmentry - cpc_rsx_strcpy_callee

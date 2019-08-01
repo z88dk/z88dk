@@ -51,5 +51,5 @@
 	ld	b,h
 	ret	
 
-DEFC ASMDISP_SLEEP = # asmentry - sleep
+DEFC ASMDISP_SLEEP = asmentry - sleep
 

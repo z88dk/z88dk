@@ -105,4 +105,4 @@ write_end:
 	ret
 
 
-DEFC ASMDISP_SD_WRITE_SECTOR_CALLEE = # asmentry - sd_write_sector_callee
+DEFC ASMDISP_SD_WRITE_SECTOR_CALLEE = asmentry - sd_write_sector_callee

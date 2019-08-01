@@ -32,7 +32,7 @@ asm_strlen:
    
    cpir
 
-IF __CPU_8080__
+IF __CPU_INTEL__
    ld a,$ff
    sub c
    ld  l,a

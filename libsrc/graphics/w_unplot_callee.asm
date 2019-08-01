@@ -39,4 +39,4 @@
                 call    w_respixel
                 jp      __graphics_end
 
-DEFC ASMDISP_UNPLOT_CALLEE = # asmentry - unplot_callee
+DEFC ASMDISP_UNPLOT_CALLEE = asmentry - unplot_callee

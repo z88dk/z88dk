@@ -25,7 +25,7 @@ printf:
 	ld	h,0
         add     hl,hl
 	add	hl,sp
-IF !__CPU_8080__
+IF !__CPU_INTEL__
 	push	ix		;save callers
 ENDIF
 	ld	bc,__sgoioblk+10
@@ -48,7 +48,7 @@ ENDIF
 	pop	bc	
 	pop	bc
 	pop	bc
-IF !__CPU_8080__
+IF !__CPU_INTEL__
 	pop	ix
 ENDIF
 	ret

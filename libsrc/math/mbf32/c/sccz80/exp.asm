@@ -9,7 +9,7 @@
 
 exp:
 	call	___mbf32_setup_single
-IF __CPU_8080__
+IF __CPU_INTEL__
 	call	___mbf32_EXP
 ELSE
 	ld	ix,___mbf32_EXP

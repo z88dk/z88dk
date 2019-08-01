@@ -1,5 +1,5 @@
 
-IF !__CPU_8080__
+IF !__CPU_INTEL__
 	MODULE	__printf_handle_ll
 	SECTION code_clib
 	PUBLIC	__printf_handle_ll

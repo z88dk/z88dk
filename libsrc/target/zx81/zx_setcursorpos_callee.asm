@@ -43,4 +43,4 @@ _zx_setcursorpos_callee:
 	jp zx_dfile_addr
 
 
-DEFC ASMDISP_ZX_SETCURSORPOS_CALLEE = # asmentry - zx_setcursorpos_callee
+DEFC ASMDISP_ZX_SETCURSORPOS_CALLEE = asmentry - zx_setcursorpos_callee

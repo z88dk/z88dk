@@ -10,7 +10,7 @@ EXTERN asm_memccpy
 
 memccpy:
 
-IF __CPU_8080__
+IF __CPU_INTEL__
 	ld hl,2
         add hl,sp
         ld  c,(hl)

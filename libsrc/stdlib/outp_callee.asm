@@ -35,4 +35,4 @@ ENDIF
 
    ret
 
-DEFC ASMDISP_OUTP_CALLEE = # asmentry - outp_callee
+DEFC ASMDISP_OUTP_CALLEE = asmentry - outp_callee

@@ -45,4 +45,4 @@ opus_getsect_asmentry:
 	ld		hl,0
 	ret
 
-;DEFC ASMDISP_OPUS_GETSECT_CALLEE = # opus_getsect_asmentry - opus_getsect_callee
+;DEFC ASMDISP_OPUS_GETSECT_CALLEE = opus_getsect_asmentry - opus_getsect_callee

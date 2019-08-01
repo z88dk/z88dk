@@ -3,13 +3,23 @@ Z88DK Z80 Module Assembler Change Log
 
 2019
 ----
-- 2019-07-14 Convert Spectrum Next CPU to (--cpu=z80n)
+- 2019-01-27 New option --opt=speed to convert JR into JP
+- 2019-07-14 Convert Spectrum Next CPU to (--cpu=z80n) (thank you Phillip Stevens)
+- 2019-07-20 Support Intel 8080 with Zilog syntax (--cpu=8080) (thank you @suborb)
+- 2019-07-22 Support Intel 8080/8085 with Intel syntax, except Jump Positive (jp conflicts with Zilog jump) and Call Positive (cp conflicts with Zilog compare). Support alternative j_p and c_p for Jump Positive and Call Positive.
 
 2018
 ----
-- 2018-01-03 Fix #563 consolidated object file erroneously eliminates globally exported defc
-- 2018-01-21 Fix #577: lz and lo not accepted as symbols
-- 2018-01-25 Fix #578: allow a label in INCLUDE and BINARY
+- 2018-01-25 Allow a label in INCLUDE and BINARY
+- 2018-03-18 Support #define macros without arguments and #undef 
+- 2018-03-29 Suport EQU and '=' as synonyms to DEFC 
+- 2018-05-22 Support file-globbing '*' and '**' wildcards
+- 2018-07-10 Add directive to store 16-bit words in big-endian format
+- 2018-07-17 ELIF assembly directive
+- 2018-07-26 Allow "jr $+offset" to parse code for other assemblers
+- 2018-08-12 Support both --IXIY and -IXIY
+- 2018-10-25 Add -mCPU as synonym to --cpu=CPU
+- 2018-11-29 Allow dot-name and name-colon in EQU
 
 2017
 ----
@@ -19,7 +29,7 @@ Z88DK Z80 Module Assembler Change Log
 - 2017-02-09 Fix #54 overflow errors in calculated constants at linking stage
 - 2017-02-12 Fix #65 separate BSS section not generated from object file if BSS org was -1 at assembly time
 - 2017-04-12 Fix #159 allow environment variables ${VAR} in the command line options and arguments 
-             and list files (contribution from dom@suborbital.org.uk)
+             and list files (thank you @suborb)
 - 2017-04-25 Fix #194 wrong assembly of DDCB with no index
 - 2017-04-30 Fix #209 add a --cpu=z80 option
 - 2017-04-30 Fix #216 replace --RCMX000 by --cpu=r2k and --cpu=r3k
@@ -66,7 +76,6 @@ Z88DK Z80 Module Assembler Change Log
 - 2017-11-17 Fix #524 Remove colon from windows absolute path when appending to -O
 - 2017-11-18 Fix #52: Needs double-star to expand directories
 
-
 2016
 ----
 
@@ -74,25 +83,25 @@ Z88DK Z80 Module Assembler Change Log
 
   Summary of 2016 changes:
 
-[z80asm] Handle input files more predictably: link .o files; assemble any other extension; append a .asm or .o option to the file name to allow just the basename
-[z80asm] Make a consolidated object file with -o and not -b: all the object modules are merged, the module local symbols are renamed <module>_<symbol>
-[z80asm] Link the library modules in the command line sequence (it was depth-first)
-[z80asm] Add directory of assembled file to the end the include path to allow includes relative to source location
-[z80asm] Remove all generated files at start fo assembly to remove files from previous runs
-[z80asm] Remove deprecated directives: XREF and LIB (replaced by EXTERN), XDEF and XLIB (replaced by PUBLIC), OZ (keep CALL_OZ)
-[z80asm] Rename DEFL to DEFQ to reserve DEFL for macro variables; rename DS.L by DS.Q
-[z80asm] Constants for section sizes: prune empty sections, rename ASMHEAD, ASMTAIL and ASMSIZE to __head, __tail and __size respectively, rename ASM<HEAD|TAIL|SIZE>_<section_name> to __<section_name>_<head|tail|size> 
-[z80asm] Environment variables no longer used: Z80_OZFILES, Z80_STDLIB
-[z80asm] Command line option -r, --origin: accept origin in decimal or hexadecimal with '0x' or '$' prefix
-[z80asm] Command line options: -i, -x: require a library name
-[z80asm] Command line options: remove -RCMX000, keep only --RCMX000
-[z80asm] Command line options: remove -plus, keep only --ti83plus
-[z80asm] Command line options: remove -IXIY and --swap-ix-iy, keep --IXIY
-[z80asm] Command line options: remove --sdcc, -nm, --no-map, -ng, --no-globaldef, -ns, --no-symtable, -nv, --no-verbose, -nl, --no-list, -nb, --no-make-bin, -nd, --no-date-stamp, -a, --make-updated-bin, -e, --asm-ext, -M, --obj-ext, -t
-[z80asm] Make symbol files, map files and reloc files optional; do not merge symbols in the list file; do not paginate and cross-reference symbols in list file; rename list file to file.lis (@file.lst is used as project list)
-[z80asm] Unify format used in map files, symbol files and global define files, output list of symbols only once
-[z80asm] Include symbols computed at link time in the global define file
-[z80asm] Simplify output of --verbose
+[z80asm] Handle input files more predictably: link .o files; assemble any other extension; append a .asm or .o option to the file name to allow just the basename  
+[z80asm] Make a consolidated object file with -o and not -b: all the object modules are merged, the module local symbols are renamed <module>_<symbol>  
+[z80asm] Link the library modules in the command line sequence (it was depth-first)  
+[z80asm] Add directory of assembled file to the end the include path to allow includes relative to source location  
+[z80asm] Remove all generated files at start fo assembly to remove files from previous runs  
+[z80asm] Remove deprecated directives: XREF and LIB (replaced by EXTERN), XDEF and XLIB (replaced by PUBLIC), OZ (keep CALL_OZ)  
+[z80asm] Rename DEFL to DEFQ to reserve DEFL for macro variables; rename DS.L by DS.Q  
+[z80asm] Constants for section sizes: prune empty sections, rename ASMHEAD, ASMTAIL and ASMSIZE to __head, __tail   and __size respectively, rename ASM<HEAD|TAIL|SIZE>_<section_name> to __<section_name>_<head|tail|size>   
+[z80asm] Environment variables no longer used: Z80_OZFILES, Z80_STDLIB  
+[z80asm] Command line option -r, --origin: accept origin in decimal or hexadecimal with '0x' or '$' prefix  
+[z80asm] Command line options: -i, -x: require a library name  
+[z80asm] Command line options: remove -RCMX000, keep only --RCMX000  
+[z80asm] Command line options: remove -plus, keep only --ti83plus  
+[z80asm] Command line options: remove -IXIY and --swap-ix-iy, keep --IXIY  
+[z80asm] Command line options: remove --sdcc, -nm, --no-map, -ng, --no-globaldef, -ns, --no-symtable, -nv, --no-verbose, -nl, --no-list, -nb, --no-make-bin, -nd, --no-date-stamp, -a, --make-updated-bin, -e, --asm-ext, -M, --obj-ext, -t  
+[z80asm] Make symbol files, map files and reloc files optional; do not merge symbols in the list file; do not paginate and cross-reference symbols in list file; rename list file to file.lis (@file.lst is used as project list)   
+[z80asm] Unify format used in map files, symbol files and global define files, output list of symbols only once  
+[z80asm] Include symbols computed at link time in the global define file  
+[z80asm] Simplify output of --verbose  
 
 - 2016-10-16
 

@@ -814,6 +814,7 @@ mtx_clib.lib:
 	$(call buildgeneric,mtx)
 	$(MAKE) -C games TARGET=mtx
 	$(MAKE) -C video/tms9918 TARGET=mtx
+	$(MAKE) -C rs232/mtx
 	TARGET=mtx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmtx -x$(OUTPUT_DIRECTORY)/mtx_clib @$(LISTFILE_DIRECTORY)/mtx.lst
 
 # Enterprise library - Stefano

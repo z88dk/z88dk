@@ -51,6 +51,7 @@
 #define NORM            0xff000000
 #define PACK(s,e,m)     ((s) | ((unsigned long)(e) << 23) | (m))
 
+
 float __uchar2fs (unsigned char) __z88dk_fastcall;
 float __schar2fs (signed char) __z88dk_fastcall;
 float __uint2fs (unsigned int) __z88dk_fastcall;

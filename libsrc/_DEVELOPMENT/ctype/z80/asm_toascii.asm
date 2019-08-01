@@ -11,7 +11,7 @@ asm_toascii:
    ; enter : a = 8-bit char
    ; exit  : a = 7-bit char
    ; uses  : a
-IF __CPU_8080__
+IF __CPU_INTEL__
    and 127
 ELSE 
    res 7,a                     ; let's not clobber flags

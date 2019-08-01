@@ -27,4 +27,4 @@ EXTERN __console_y
 
    ret
 
-DEFC ASMDISP_GOTOXY_CALLEE = # asmentry - gotoxy_callee
+DEFC ASMDISP_GOTOXY_CALLEE = asmentry - gotoxy_callee

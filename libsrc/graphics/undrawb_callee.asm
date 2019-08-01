@@ -41,4 +41,4 @@
                 call    drawbox
                 jp      __graphics_end
 
-DEFC ASMDISP_UNDRAWB_CALLEE = # asmentry - undrawb_callee
+DEFC ASMDISP_UNDRAWB_CALLEE = asmentry - undrawb_callee

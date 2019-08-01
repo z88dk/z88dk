@@ -11,7 +11,7 @@
 
 log10:
 	call	___mbf32_setup_single
-IF __CPU_8080__
+IF __CPU_INTEL__
 	call	___mbf32_LOG
 	ld	hl,(___mbf32_FPREG)
 	ex	de,hl
@@ -28,7 +28,7 @@ ENDIF
 	ld	(___mbf32_FPREG),hl
 	ld	hl,0x8213
 	ld	(___mbf32_FPREG + 2),hl
-IF __CPU_8080__
+IF __CPU_INTEL__
 	call	___mbf32_DVBCDE
 ELSE
 	ld	ix,___mbf32_DVBCDE

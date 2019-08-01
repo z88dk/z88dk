@@ -221,7 +221,10 @@
 	GLOBAL _m32_ceilf
 	GLOBAL _m32_powf
 	GLOBAL _m32_log10f
+	GLOBAL _m32_log2f
 	GLOBAL _m32_logf
+	GLOBAL _m32_exp10f
+	GLOBAL _m32_exp2f
 	GLOBAL _m32_expf
 	GLOBAL _m32_atanhf
 	GLOBAL _m32_acoshf

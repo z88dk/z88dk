@@ -44,4 +44,4 @@
 		ld	a,3
 		jp	w_area
 
-DEFC ASMDISP_XORCLGA_CALLEE = # asmentry - xorclga_callee
+DEFC ASMDISP_XORCLGA_CALLEE = asmentry - xorclga_callee

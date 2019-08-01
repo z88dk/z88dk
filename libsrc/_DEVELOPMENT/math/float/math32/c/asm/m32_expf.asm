@@ -222,7 +222,10 @@
 	GLOBAL _m32_ceilf
 	GLOBAL _m32_powf
 	GLOBAL _m32_log10f
+	GLOBAL _m32_log2f
 	GLOBAL _m32_logf
+	GLOBAL _m32_exp10f
+	GLOBAL _m32_exp2f
 	GLOBAL _m32_atanhf
 	GLOBAL _m32_acoshf
 	GLOBAL _m32_asinhf
@@ -236,7 +239,7 @@
 	GLOBAL _m32_tanf
 	GLOBAL _m32_cosf
 	GLOBAL _m32_sinf
-	GLOBAL _m32_coeff_exp
+	GLOBAL _m32_coeff_expf
 	GLOBAL __MAX_OPEN
 ;--------------------------------------------------------
 ; special function registers
@@ -307,18 +310,15 @@ _m32_expf:
 	push	hl
 	call	___fsadd_callee
 	call	_m32_floorf
-	push	de
-	push	hl
-	call	___fs2sint_callee
-	pop	de
-	push	hl
-	push	hl
-	call	___sint2fs_callee
 	ld	(ix-8),l
 	ld	(ix-7),h
 	ld	(ix-6),e
+	ld	l, e
 	ld	(ix-5),d
-	push	de
+	ld	h,d
+	push	hl
+	ld	l,(ix-8)
+	ld	h,(ix-7)
 	push	hl
 	ld	hl,0x3f31
 	push	hl
@@ -358,30 +358,41 @@ _m32_expf:
 	ld	h,(ix-3)
 	push	hl
 	call	___fssub_callee
-	ld	(ix-12),l
-	ld	(ix-11),h
-	ld	(ix-10),e
-	ld	(ix-9),d
-	pop	bc
-	pop	hl
+	ld	(ix-14),l
+	ld	(ix-13),h
+	ld	(ix-12),e
+	ld	(ix-11),d
+	ld	l,(ix-6)
+	ld	h,(ix-5)
 	push	hl
-	push	bc
-	call	_m32_sqrf
-	ld	(ix-8),l
-	ld	(ix-7),h
-	ld	(ix-6),e
-	ld	(ix-5),d
+	ld	l,(ix-8)
+	ld	h,(ix-7)
+	push	hl
+	call	___fs2sint_callee
+	ld	(ix-10),l
+	ld	(ix-9),h
 	ld	hl,0x0005
 	push	hl
-	ld	hl,_m32_coeff_exp
-	push	hl
-	ld	l,(ix-10)
-	ld	h,(ix-9)
+	ld	hl,_m32_coeff_expf
 	push	hl
 	ld	l,(ix-12)
 	ld	h,(ix-11)
 	push	hl
+	ld	l,(ix-14)
+	ld	h,(ix-13)
+	push	hl
 	call	_m32_polyf
+	ld	(ix-8),l
+	ld	(ix-7),h
+	ld	(ix-6),e
+	ld	(ix-5),d
+	pop	bc
+	pop	de
+	push	de
+	ld	l,c
+	ld	h,b
+	push	hl
+	call	_m32_sqrf
 	push	de
 	push	hl
 	ld	l,(ix-6)
@@ -392,12 +403,12 @@ _m32_expf:
 	push	hl
 	call	___fsmul_callee
 	ld	c, l
-	ld	l,(ix-10)
-	ld	b,h
-	ld	h,(ix-9)
-	push	hl
 	ld	l,(ix-12)
+	ld	b,h
 	ld	h,(ix-11)
+	push	hl
+	ld	l,(ix-14)
+	ld	h,(ix-13)
 	push	hl
 	push	de
 	push	bc
@@ -410,9 +421,9 @@ _m32_expf:
 	push	hl
 	call	___fsadd_callee
 	ld	c, l
-	ld	b, h
-	pop	hl
-	push	hl
+	ld	l,(ix-10)
+	ld	b,h
+	ld	h,(ix-9)
 	push	hl
 	push	de
 	push	bc

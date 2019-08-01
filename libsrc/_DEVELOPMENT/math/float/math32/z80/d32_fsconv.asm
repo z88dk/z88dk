@@ -6,13 +6,14 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;  feilipu, 2019 April
-;  adapted for z80, z180, and z80-zxn
+;  adapted for z80, z180, and z80n
 ;
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32
 
+PUBLIC m32_float8
 PUBLIC m32_float16
 PUBLIC m32_float32
 
@@ -21,6 +22,13 @@ PUBLIC m32_float16u
 PUBLIC m32_float32u
 
 EXTERN m32_fsnormalize
+
+; convert char in l to float in dehl
+.m32_float8
+    ld a,l
+    rla                         ; sign bit of a into C
+    sbc a,a
+    ld h,a                      ; now hl is sign extended
 
 ; convert integer in hl to float in dehl
 .m32_float16

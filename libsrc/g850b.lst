@@ -1,3 +1,7 @@
+target/g800/invlcd
+target/g800/lcd_contrast
+target/g800/lcd_on
+target/g800/lcd_off
 stdio/g800/fgetc_cons_850
 stdio/g800/getk_850
 graphics/clg

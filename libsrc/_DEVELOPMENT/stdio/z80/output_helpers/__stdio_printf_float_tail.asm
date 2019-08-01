@@ -50,7 +50,7 @@ __stdio_printf_float_tail:
    ex af,af'                   ; indicate special form
    
    ld hl,float_max_s
-   ld bc,#(float_max_s_end - float_max_s)
+   ld bc,+(float_max_s_end - float_max_s)
    
    ld e,c
    ld d,b

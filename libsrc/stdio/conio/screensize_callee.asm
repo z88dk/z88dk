@@ -34,4 +34,4 @@ EXTERN	__console_h
 
    ret
 
-DEFC ASMDISP_SCREENSIZE_CALLEE = # asmentry - screensize_callee
+DEFC ASMDISP_SCREENSIZE_CALLEE = asmentry - screensize_callee

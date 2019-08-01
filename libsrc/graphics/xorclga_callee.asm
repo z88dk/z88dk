@@ -42,4 +42,4 @@
 		jp      __graphics_end
 
 
-DEFC ASMDISP_XORCLGA_CALLEE = # asmentry - xorclga_callee
+DEFC ASMDISP_XORCLGA_CALLEE = asmentry - xorclga_callee

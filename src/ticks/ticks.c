@@ -1453,7 +1453,7 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x28: // JR Z,s8
         if ( is8085() ) {  // (8085) ld de,hl+nn (LDHI)
-          ushort val =(l | h<<8) + get_memory(pc++);
+          uint16_t val =(l | h<<8) + get_memory(pc++);
           d = val / 256; 
           e = val % 256;
           st += 10;
@@ -1478,7 +1478,7 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x38: // JR C,s8
         if ( is8085() ) { // (8085) LD DE,SP+nn (LDSI)
-          ushort val = sp + get_memory(pc++);
+          uint16_t val = sp + get_memory(pc++);
           d = val / 256; 
           e = val % 256;
           st += 10;

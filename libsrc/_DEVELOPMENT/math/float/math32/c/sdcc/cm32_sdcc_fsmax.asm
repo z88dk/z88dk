@@ -6,7 +6,7 @@ SECTION code_fp_math32
 
 PUBLIC cm32_sdcc_fsmax
 
-EXTERN cm32_sdcc_fsread1, m32_fsmax_fastcall
+EXTERN cm32_sdcc_fsread1, m32_fsmax
 
 .cm32_sdcc_fsmax
 
@@ -20,6 +20,6 @@ EXTERN cm32_sdcc_fsread1, m32_fsmax_fastcall
 
     call cm32_sdcc_fsread1
 
-    jp m32_fsmax_fastcall   ; enter stack = sdcc_float, ret
+    jp m32_fsmax            ; enter stack = sdcc_float, ret
                             ;        DEHL = sdcc_float
                             ; return DEHL = sdcc_float

@@ -26,7 +26,7 @@ getch:
 _getch:
 	ld	hl,(kbhit_key)
 	ld	de,0
-IF __CPU_8080__
+IF __CPU_INTEL__
 	ex	de,hl
 	ld	(kbhit_key),hl
 	ex	de,hl

@@ -31,7 +31,7 @@ not_negative:
 	ld	a,24 + 128
 	ld	(___mbf32_FPEXP),a
 	ld	b,0
-IF __CPU_8080__
+IF __CPU_INTEL__
 	call	___mbf32_BNORM
 ELSE
 	push	ix

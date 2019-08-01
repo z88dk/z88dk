@@ -40,7 +40,7 @@ asm_itoa:
 
    ld b,0                    ; num chars output = 0
 
-IF __CPU_8080__
+IF __CPU_INTEL__
    ld a,d
    rra
    jp nc,notneg

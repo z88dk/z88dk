@@ -1,11 +1,11 @@
+ldi.asm
+rld.asm
 cpd.asm
+ldir.asm
+rrd.asm
 cpdr.asm
-cpi.asm
+ldd.asm
 cpir.asm
 daa.asm
-ldd.asm
 lddr.asm
-ldi.asm
-ldir.asm
-rld.asm
-rrd.asm
+cpi.asm

@@ -108,8 +108,8 @@ label_2: ld   a,3                       ;; 3E 03
 
         defw label_1, label_2           ;; 6D 01 6F 01
         defw ZERO+label_1               ;; 6D 01
-        defb #label_2-label_1           ;; 02
-        defb #ZERO+label_2-label_1      ;; 02
+        defb +label_2-label_1           ;; 02
+        defb +ZERO+label_2-label_1      ;; 02
 
         defb 255,128,0,-128             ;; FF 80 00 80
         defb ZERO+255,ZERO-128          ;; FF 80
@@ -2432,8 +2432,8 @@ label_2: ld   a,3                       ;; 3E 03
 
         defw label_1, label_2           ;; 6D 01 6F 01
         defw ZERO+label_1               ;; 6D 01
-        defb #label_2-label_1           ;; 02
-        defb #ZERO+label_2-label_1      ;; 02
+        defb +label_2-label_1           ;; 02
+        defb +ZERO+label_2-label_1      ;; 02
 
         defb 255,128,0,-128             ;; FF 80 00 80
         defb ZERO+255,ZERO-128          ;; FF 80

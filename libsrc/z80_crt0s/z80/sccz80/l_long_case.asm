@@ -24,7 +24,7 @@ loop:
    or (hl)
    inc hl
  
-IF CPU_8080
+IF CPU_INTEL
    jp z, end                   ; if end of table
 ELSE  
    jr z, end                   ; if end of table
@@ -34,7 +34,7 @@ ENDIF
    inc hl
    
    cp c
-IF CPU_8080
+IF CPU_INTEL
    jp nz, loop_3
 ELSE
    jr nz, loop_3
@@ -44,7 +44,7 @@ ENDIF
    inc hl
    
    cp b
-IF CPU_8080
+IF CPU_INTEL
    jp nz, loop_2
 ELSE
    jr nz, loop_2
@@ -54,7 +54,7 @@ ENDIF
    inc hl
    
    cp e
-IF CPU_8080
+IF CPU_INTEL
    jp nz, loop_1
 ELSE
    jr nz, loop_1
@@ -64,7 +64,7 @@ ENDIF
    inc hl
    
    cp d
-IF CPU_8080
+IF CPU_INTEL
    jp nz, loop
 ELSE
    jr nz, loop
@@ -95,7 +95,7 @@ loop_2:
 loop_1:
 
    inc hl
-IF CPU_8080
+IF CPU_INTEL
    jp loop
 ELSE
    jr loop

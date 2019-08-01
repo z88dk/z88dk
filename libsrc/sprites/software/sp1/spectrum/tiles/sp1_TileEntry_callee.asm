@@ -38,4 +38,4 @@ EXTERN SP1V_TILEARRAY
 
    ret
 
-DEFC ASMDISP_SP1_TILEENTRY_CALLEE = # asmentry - sp1_TileEntry_callee
+DEFC ASMDISP_SP1_TILEENTRY_CALLEE = asmentry - sp1_TileEntry_callee

@@ -32,4 +32,4 @@
 	jp      do_drawr
 
 
-DEFC ASMDISP_DRAWR_CALLEE = # asmentry - drawr_callee
+DEFC ASMDISP_DRAWR_CALLEE = asmentry - drawr_callee

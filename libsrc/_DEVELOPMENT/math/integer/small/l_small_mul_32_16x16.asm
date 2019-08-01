@@ -31,7 +31,7 @@ loop_0:
     ;  a = iterations
 
     add hl,hl
-IF __CPU_8080__
+IF __CPU_INTEL__
     push af
     ld a,e
     rla

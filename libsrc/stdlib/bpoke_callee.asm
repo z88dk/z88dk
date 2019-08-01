@@ -18,4 +18,4 @@ PUBLIC ASMDISP_BPOKE_CALLEE
    ld (hl),e
    ret
 
-DEFC ASMDISP_BPOKE_CALLEE = # asmentry - bpoke_callee
+DEFC ASMDISP_BPOKE_CALLEE = asmentry - bpoke_callee

@@ -34,5 +34,5 @@ _exos_write_character_callee:
 	ret
 
 
-DEFC ASMDISP_EXOS_WRITE_CHARACTER_CALLEE = # asmentry - exos_write_character_callee
+DEFC ASMDISP_EXOS_WRITE_CHARACTER_CALLEE = asmentry - exos_write_character_callee
  

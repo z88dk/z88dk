@@ -3,7 +3,7 @@
 SECTION code_fp_math32
 PUBLIC cm32_sccz80_fsneg
 
-EXTERN cm32_sccz80_fsread1, m32_fsneg_fastcall
+EXTERN cm32_sccz80_fsread1, m32_fsneg
 
     ; negate sccz80 floats
     ;
@@ -15,4 +15,4 @@ EXTERN cm32_sccz80_fsread1, m32_fsneg_fastcall
 
 cm32_sccz80_fsneg:
     call cm32_sccz80_fsread1
-    jp m32_fsneg_fastcall
+    jp m32_fsneg

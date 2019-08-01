@@ -6,7 +6,7 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-; m32_fsmul2 - z80, z180, z80-zxn floating point multiply by 2
+; m32_fsmul2 - z80, z180, z80n floating point multiply by 2
 ;-------------------------------------------------------------------------
 ; 
 ; Multiplication by 2 is incrementing the exponent. An easy optimisation.

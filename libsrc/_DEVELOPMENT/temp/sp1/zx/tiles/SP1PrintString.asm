@@ -669,11 +669,11 @@ EXTERN asm_sp1_GetUpdateStruct, l_jpix
 .inybounds
 
    exx
-   ld a,#(-SP1V_DISPWIDTH*10) & 0xff
+   ld a,+(-SP1V_DISPWIDTH*10) & 0xff
    add a,e
    ld e,a
-   ld a,#(-SP1V_DISPWIDTH*10) / 256
-;   ld a,#(((SP1V_DISPWIDTH*10):$ffff)+1)/256
+   ld a,+(-SP1V_DISPWIDTH*10) / 256
+;   ld a,+(((SP1V_DISPWIDTH*10):$ffff)+1)/256
    adc a,d
    ld d,a
    exx

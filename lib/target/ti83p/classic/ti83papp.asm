@@ -221,7 +221,7 @@ cpygraph:
 ENDIF				;  plus this is safe for possible
 				;  Ti83+ Silver Edition at 15MHz
 
-defc intuse = # IntProcEnd-IntProcStart
+defc intuse = IntProcEnd-IntProcStart
 
 DEFVARS $8A3A		; statVars (531 bytes of free space) See graylib83p.asm
 {			;  for more info on free space in this memory area.

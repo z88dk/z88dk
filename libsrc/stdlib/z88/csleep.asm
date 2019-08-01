@@ -44,5 +44,5 @@
         ld      hl,0
         ret
 
-DEFC ASMDISP_CSLEEP = # asmentry - csleep
+DEFC ASMDISP_CSLEEP = asmentry - csleep
 

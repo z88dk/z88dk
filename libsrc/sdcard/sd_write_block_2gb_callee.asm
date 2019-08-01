@@ -113,4 +113,4 @@ write_end:
 	ret
 
 
-DEFC ASMDISP_SD_WRITE_BLOCK_2GB_CALLEE = # asmentry - sd_write_block_2gb_callee
+DEFC ASMDISP_SD_WRITE_BLOCK_2GB_CALLEE = asmentry - sd_write_block_2gb_callee

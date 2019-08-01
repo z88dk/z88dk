@@ -83,6 +83,6 @@ ISRStub_end:
 ;ISRStub_loc equ 0fff4h - ISRStub_len
 ;r_ozisrpointer equ ISRStub_loc + (ozisrpointer-ISRStub_begin)
 
-defc	ISRStub_len = # ISRStub_end-ISRStub_begin
-defc	ISRStub_loc = # 0fff4h - ISRStub_len
-defc	r_ozisrpointer = # ISRStub_loc + (ozisrpointer+1-ISRStub_begin)
+defc	ISRStub_len = ISRStub_end-ISRStub_begin
+defc	ISRStub_loc = 0fff4h - ISRStub_len
+defc	r_ozisrpointer = ISRStub_loc + (ozisrpointer+1-ISRStub_begin)

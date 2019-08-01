@@ -69,11 +69,14 @@ clean:
 	$(RM) spectrum/sprites/draw/*.o
 	$(RM) spectrum/tiles/*.o
 	$(RM) spectrum/updater/*.o
+	$(RM) spectrum/sp1.lib
 	$(RM) ts2068hr/sprites/*.o
 	$(RM) ts2068hr/sprites/draw/*.o
 	$(RM) ts2068hr/tiles/*.o
 	$(RM) ts2068hr/updater/*.o
+	$(RM) ts2068hr/sp1.lib
 	$(RM) zx81hr/sprites/*.o
 	$(RM) zx81hr/sprites/draw/*.o
 	$(RM) zx81hr/tiles/*.o
 	$(RM) zx81hr/updater/*.o
+	$(RM) zx81hr/sp1.lib

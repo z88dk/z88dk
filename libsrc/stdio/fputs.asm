@@ -13,7 +13,7 @@ EXTERN asm_fputs_callee
 	push	de
 	push	bc
 	push	hl
-IF __CPU_8080__
+IF __CPU_INTEL__
 	call	asm_fputs_callee
 ELSE
         push    ix  ; callers ix

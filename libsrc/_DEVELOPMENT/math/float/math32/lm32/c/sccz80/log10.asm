@@ -5,7 +5,6 @@
 
 	defc	log10 = cm32_sccz80_log10
 
-
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _log10

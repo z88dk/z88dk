@@ -39,4 +39,4 @@
 	defw scr_set_ink 
 	ret
 
-DEFC ASMDISP_CPC_SET_PALETTE_CALLEE = # asmentry - cpc_set_palette_callee
+DEFC ASMDISP_CPC_SET_PALETTE_CALLEE = asmentry - cpc_set_palette_callee

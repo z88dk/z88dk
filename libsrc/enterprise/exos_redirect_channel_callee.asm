@@ -34,4 +34,4 @@ _exos_redirect_channel_callee:
 	ret
 
 
-DEFC ASMDISP_EXOS_REDIRECT_CHANNEL_CALLEE = # asmentry - exos_redirect_channel_callee
+DEFC ASMDISP_EXOS_REDIRECT_CHANNEL_CALLEE = asmentry - exos_redirect_channel_callee

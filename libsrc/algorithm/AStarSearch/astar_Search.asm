@@ -355,5 +355,5 @@ EXTERN _astar_startNode, _astar_destNode
    ccf                       ; correct sense of carry flag for min heap
    ret
 
-DEFC ASMDISP_ASTAR_SEARCH_RESUME_SUCCESS = # getnextpath - astar_Search
-DEFC ASMDISP_ASTAR_SEARCH_RESUME_FAIL = # resumefail - astar_Search
+DEFC ASMDISP_ASTAR_SEARCH_RESUME_SUCCESS = getnextpath - astar_Search
+DEFC ASMDISP_ASTAR_SEARCH_RESUME_FAIL = resumefail - astar_Search

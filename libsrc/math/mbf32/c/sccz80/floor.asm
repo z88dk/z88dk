@@ -15,7 +15,7 @@ floor:
 	call	___mbf32_setup_single
 	ld	a,(___mbf32_FPREG+2)
 	push	af
-IF __CPU_8080__
+IF __CPU_INTEL__
         call	___mbf32_FPINT
 ELSE
         ld      ix,___mbf32_FPINT
@@ -31,7 +31,7 @@ ENDIF
 	jr	nc,not_negative
 	dec	d
 not_negative:
-IF !__CPU_8080__
+IF !__CPU_INTEL__
 	pop	ix
 ENDIF
 	jp	l_f32_slong2f

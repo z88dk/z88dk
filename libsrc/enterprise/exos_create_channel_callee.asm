@@ -33,5 +33,5 @@ _exos_create_channel_callee:
 	ret
 
 
-DEFC ASMDISP_EXOS_CREATE_CHANNEL_CALLEE = # asmentry - exos_create_channel_callee
+DEFC ASMDISP_EXOS_CREATE_CHANNEL_CALLEE = asmentry - exos_create_channel_callee
  

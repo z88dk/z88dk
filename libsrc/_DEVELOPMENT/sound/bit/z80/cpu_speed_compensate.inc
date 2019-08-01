@@ -26,7 +26,7 @@ IF (TARGET_T > NOMINAL_T)
    IF (TARGET_T >= 36) & (TARGET_T < 214) 
    
       push bc
-      ld b,#(TARGET_T - 23) / 13
+      ld b,+(TARGET_T - 23) / 13
       djnz ASMPC - 2
       pop bc
       

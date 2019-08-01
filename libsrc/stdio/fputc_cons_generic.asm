@@ -37,7 +37,7 @@
 ; 22,y+32,x+32 = Move to position
 
 
-IF !__CPU_8080__
+IF !__CPU_INTEL__
 		; About 50 bytes
 		defc		SUPPORT_vt52=1
 		; Extra VT52 codes - clear to end of screen (22 bytes)
@@ -81,7 +81,7 @@ _fputc_cons_generic:
 	ld	hl,2
 	add	hl,sp
 	ld	d,(hl)
-IF __CPU_8080__
+IF __CPU_INTEL__
 	ld	hl,(__console_x)
 	ld	c,l
 	ld	b,h
@@ -365,11 +365,7 @@ handle_cr:
 handle_cr_no_need_to_scroll:
 	inc	b
 	ld	c,0
-IF __CPU_RABBIT__
 	jp	store_coords
-ELSE
-	jr	store_coords
-ENDIF
 
 
 IF SUPPORT_cursor

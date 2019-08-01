@@ -6,7 +6,7 @@ SECTION code_fp_math32
 
 PUBLIC asm_fmaxf
 
-EXTERN m32_fsmax_fastcall
+EXTERN m32_fsmax
 
     ; convert sdcc float to error infinity with correct sign
     ;
@@ -17,6 +17,6 @@ EXTERN m32_fsmax_fastcall
     ;
     ; uses  : af, bc, de, hl
 
-DEFC  asm_fmaxf = m32_fsmax_fastcall            ; enter stack = ret
+DEFC  asm_fmaxf = m32_fsmax                     ; enter stack = ret
                                                 ;        DEHL = d32_float
                                                 ; return DEHL = d32_float

@@ -10,7 +10,7 @@
 ; Exit:  hl = address
 ; Uses:  bc
 __printf_get_buffer_address:
-IF __CPU_8080__
+IF __CPU_INTEL__
 	ld	hl,(__printf_context)
 ELSE
         push    ix

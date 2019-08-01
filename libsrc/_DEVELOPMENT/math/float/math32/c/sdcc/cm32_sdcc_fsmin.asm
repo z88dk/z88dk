@@ -6,7 +6,7 @@ SECTION code_fp_math32
 
 PUBLIC cm32_sdcc_fsmin
 
-EXTERN cm32_sdcc_fsread1, m32_fsmin_fastcall
+EXTERN cm32_sdcc_fsread1, m32_fsmin
 
 .cm32_sdcc_fsmin
 
@@ -20,6 +20,6 @@ EXTERN cm32_sdcc_fsread1, m32_fsmin_fastcall
 
     call cm32_sdcc_fsread1
 
-    jp m32_fsmin_fastcall   ; enter DEHL = sdcc_float
+    jp m32_fsmin            ; enter DEHL = sdcc_float
                             ;
                             ; return DEHL = sdcc_float

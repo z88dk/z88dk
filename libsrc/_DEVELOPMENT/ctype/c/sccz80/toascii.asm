@@ -9,7 +9,7 @@ PUBLIC toascii
 toascii:
 
    ld h,0
-IF __CPU_8080__
+IF __CPU_INTEL__
    ld  a,l
    and 127
    ld  l,a

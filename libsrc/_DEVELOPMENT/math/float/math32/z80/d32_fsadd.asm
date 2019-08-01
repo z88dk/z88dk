@@ -6,11 +6,11 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;  feilipu, 2019 April
-;  adapted for z80, z180, and z80-zxn
+;  adapted for z80, z180, and z80n
 ;
 ;-------------------------------------------------------------------------
-; m32_fsadd - z80, z180, z80-zxn floating point add
-; m32_fssub - z80, z180, z80-zxn floating point subtract
+; m32_fsadd - z80, z180, z80n floating point add
+; m32_fssub - z80, z180, z80n floating point subtract
 ;-------------------------------------------------------------------------
 ;
 ; 1) first section: unpack from F_add: to sort:
