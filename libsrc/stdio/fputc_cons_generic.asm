@@ -38,10 +38,14 @@
 
 
 IF !__CPU_8080__
+		; About 50 bytes
 		defc		SUPPORT_vt52=1
-		; Extra VT52 codes - clear to end of line + clear to end of screen
+		; Extra VT52 codes - clear to end of screen (22 bytes)
 		defc		SUPPORT_vt52x=0
+		; Support ZX codes (5 bytes)
 		defc		SUPPORT_zxcodes=1
+		; About 44 bytes
+		defc		SUPPORT_cursor=1
 
 
 		SECTION		code_clib
@@ -63,6 +67,7 @@ IF !__CPU_8080__
 		; Enter: hl = flags, bit 1,(hl) = cursor state
 		EXTERN		generic_console_toggle_cursor
 		EXTERN		generic_console_draw_cursor
+		EXTERN		generic_console_undraw_cursor
 		EXTERN		__console_x
 		EXTERN		__console_y
 		EXTERN		__console_w
@@ -118,15 +123,21 @@ handle_character:
 handle_character_no_scroll:
 	ld	a,d
 	push	bc		;save coordinates
+IF SUPPORT_cursor
+	bit	1,(hl)
+	call	nz,generic_console_undraw_cursor
+ENDIF
+	push	hl
 	call	generic_console_printc
+	pop	hl		;hl = flags
 	pop	bc	
 	inc	c
 	ld	a,(__console_w)
 	cp	c
-	jr	nz,store_coords
+	jr	nz,store_coords_skip_undraw_cursor
 	ld	c,0
 	inc	b
-	jr	store_coords
+	jr	store_coords_skip_undraw_cursor
 
 
 ; Entry: hl = flags
@@ -231,12 +242,22 @@ left:	ld	a,c
 	jr	up
 left_1: dec	c
 store_coords:
-	ld	(__console_x),bc
-	push	bc
 	ld	hl,generic_console_flags
+IF SUPPORT_cursor
+	push	bc
+	ld	bc,(__console_x)
+	bit	1,(hl)
+	call	nz,generic_console_undraw_cursor
+	pop	bc
+ENDIF
+store_coords_skip_undraw_cursor:
+	ld	(__console_x),bc
+IF SUPPORT_cursor
+	push	bc
 	bit	1,(hl)
 	call	nz,generic_console_draw_cursor
 	pop	bc
+ENDIF
 	scf
 	ret
 
@@ -347,6 +368,7 @@ handle_cr_no_need_to_scroll:
 	jr	store_coords
 
 
+IF SUPPORT_cursor
 disable_cursor:
 	res	1,(hl)
 cursor_dispatch:
@@ -356,6 +378,7 @@ cursor_dispatch:
 enable_cursor:
 	set	1,(hl)
 	jr	cursor_dispatch
+ENDIF
 
 
 
@@ -408,12 +431,14 @@ IF SUPPORT_vt52
 	defb	255, 'H'
 	defb	0
 	defw	move_home
+IF SUPPORT_cursor
 	defb	255, 'e'
 	defb	0
 	defw	enable_cursor
 	defb	255, 'f'
 	defb	0
 	defw	disable_cursor
+ENDIF
 ENDIF
 	defb	4 , 's'
 	defb	1
@@ -458,9 +483,9 @@ params_left:	defb	0		; Number of parameters left to read
 parameters:	defb	0		; We only have up-to two parameters
 parameter_processor:	defw	0	; Where we go to when we need to process
 
-generic_console_flags:		defb	0		; bit 0 = raw mode enabled
-							; bit 1 = cursor enabled
-							; bit 6 = vscroll disabled
-							; bit 7 = inverse on
+generic_console_flags:	defb	0	; bit 0 = raw mode enabled
+					; bit 1 = cursor enabled
+					; bit 6 = vscroll disabled
+					; bit 7 = inverse on
 
 ENDIF

@@ -19,3 +19,4 @@ stdio/conio/vpeek_noop
 stdio/conio/vpeek_screendollar
 stdio/conio/generic_console_toggle_cursor
 stdio/conio/generic_console_draw_cursor
+stdio/conio/generic_console_undraw_cursor
