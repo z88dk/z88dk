@@ -36,7 +36,7 @@ RUN cd ${Z88DK_PATH} \
         --disable-xa51-port --disable-stm8-port \
         --disable-pdk13-port --disable-pdk14-port \
         --disable-pdk15-port --disable-pdk16-port \
-        --disable-ucsim --disable-device-lib --disable-packihx
+        --disable-ucsim --disable-device-lib --disable-packihx \
     && make \
     && mv ./bin/sdcc ${Z88DK_PATH}/bin/zsdcc \
     && mv ./bin/sdcpp ${Z88DK_PATH}/bin/zsdcpp \
