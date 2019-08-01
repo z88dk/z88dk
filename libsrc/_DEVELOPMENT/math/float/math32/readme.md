@@ -1,7 +1,7 @@
 
 ## z88dk IEEE Floating Point Package - `math32`
 
-This is the z88dk 32-bit IEEE-754 (mostly) standard m32 floating point maths package, designed to work with the SCCZ80 and ZSDCC IEEE-754 (mostly) standard 32-bit interfaces.
+This is the z88dk 32-bit IEEE-754 (mostly) standard math32 floating point maths package, designed to work with the SCCZ80 and ZSDCC IEEE-754 (mostly) standard 32-bit interfaces.
 
 Where not written by me, the functions were sourced from:
 
@@ -11,7 +11,7 @@ Where not written by me, the functions were sourced from:
   * the Cephes Math Library Release 2.2, copyright (C) 1984, 1987, 1989 by Stephen L. Moshier.
   * various Wikipedia references, especially for Newton-Raphson and Horner's Method.
 
-This library is designed for z180, and z80n processors. Specifically, it is optimised for the z180 and [ZX Spectrum Next](https://www.specnext.com/) z80n as these processors have a hardware `16_8x8` multiply instruction that can substantially accelerate floating point mantissa calculation.
+This library is designed for z180, and z80n processors. Specifically, it is optimised for the z180 and [ZX Spectrum Next](https://www.specnext.com/) z80n as these processors have a hardware `16_8x8` multiply instruction that can substantially accelerate the floating point mantissa calculation.
 
 This library is also designed to be as fast as possible on the z80 processor. For the z80 it is built on the same core `16_8x8` multiply model, using either an optimal unrolled shift+add algorithm or a faster 512 Byte table lookup algorithm.
 
@@ -29,7 +29,7 @@ This library is also designed to be as fast as possible on the z80 processor. Fo
 
   *  Made for the Spectrum Next. The z80n `mul de` and the z180 `mlt nn` multiply instructions are used to full advantage to accelerate all floating point calculations.
 
-  *  The z80 multiply (without a hardware instruction) is implemented with an unrolled equivalent to the z80n `mul de`, which is designed to have no side effect other than resetting the flag register. An alternate fast table look-up z80 multiply is also implemented.
+  *  The z80 multiply (without a hardware instruction) is implemented with an unrolled equivalent to the z80n `mul de`, which is designed to have no side effect other than resetting the flag register. An alternate fast table look-up z80 multiply is also implemented, and used when the library is linked as `math32_fast`.
 
   *  Mantissa calculations are done with 24-bits and 8-bits for rounding. Rounding is a simple method, but can be if required it can be expanded to the IEEE standard with a performance penalty.
 
@@ -67,9 +67,9 @@ Examples of numbers:
     0   01111111 (1) 10000....    1.5 * 2 ^ ( 0 )=  1.50
     1   10000000 (1) 10000....   -1.5 * 2 ^ ( 1 )= -3.00
     0   10000110 (1) 01100100010..               =178.25
-    x   00000000     000... zero (plus or minus)
-    0   11111111 (1) 000... positive infinity
-    1   11111111 (1) 000... negative infinity
+    x   00000000     xxx... zero (sign positive or negative, mantissa not relevant)
+    x   11111111     000... infinity  (sign positive or negative, mantissa zero)
+    x   11111111     xxx... not a number (sign positive or negative, mantissa non zero)
 ```
 This floating point package is loosely based on IEEE-754. We maintain the packed format, but we do not support denormal numbers or the round to even convention.  Both of these features could be added in the future with some performance penalty.
 
@@ -81,11 +81,11 @@ This floating point package is loosely based on IEEE-754. We maintain the packed
               e=0xff & m=0    -> (-1)^s * INF
               e=0xff & m!=0   -> (-1)^s NAN
 ```
-Where s is the sign, e is the exponent and m is bits 22-0 of the mantissa. z88dk m32 assumes any number with a zero exponent is zero.
+Where s is the sign, e is the exponent and m is bits 22-0 of the mantissa. z88dk math32 assumes any number with a zero exponent is positive or negative zero.
 
-IEEE assumes bit 23 of the mantissa is 1 except where the exponent is zero.
+IEEE-754 assumes bit 23 of the mantissa is 1 except where the exponent is zero.
 
-IEEE-754 specifies rounding the result by a process of round to even. z88dk m32 uses one guard bit and a sticky bit to round a result per the following tables.
+IEEE-754 specifies rounding the result by a process of round to even. z88dk math32 uses one guard bit and a sticky bit to round a result per the following tables.
 
 Both results are free of bias with IEEE method having a slight edge with rounding error.
 
@@ -105,7 +105,7 @@ Both results are free of bias with IEEE method having a slight edge with roundin
 -------------------------------------------------------------------------
 
 -------------------------------------------------------------------------
-    This z88dk m32 library rounds the number using a single sticky bit
+    This z88dk math32 library rounds the number using a single sticky bit
     which uses the lsb[7] of the of the 32-bit result from any
     intrinsic calculation:
 
@@ -133,9 +133,9 @@ This format is provided for both the multiply and add intrinsic internal 32-bit 
 
 ## Calling Convention
 
-The z88dk m32 library uses the sccz80 standard register and stack calling convention, but with the standard c parameter passing direction. For sccz80 the first or right hand side parameter is passed in DEHL, and the second or LHS parameter is passed on the stack. For zsdcc all parameters are passed on the stack, from right to left. For both compilers, where multiple parameters are passed, they will be passed on the stack.
+The z88dk math32 library uses the sccz80 standard register and stack calling convention, but with the standard c parameter passing direction. For sccz80 the first or the right hand side parameter is passed in DEHL, and the second or LHS parameter is passed on the stack. For zsdcc all parameters are passed on the stack, from right to left. For both compilers, where multiple parameters are passed, they will be passed on the stack.
 
-The intrinsic functions, written in assembly, assume the sccz80 calling convention, and are by default `__z88dk_callee`, which means that they will consume values passed on the stack, returning with the value in DEHL.
+The intrinsic functions, written in assembly, assume the sccz80 calling convention, and are by default `__z88dk_fastcall` or `__z88dk_callee`, which means that they will consume values passed on the stack, returning with the value in DEHL.
 
 ```
      LHS STACK - RHS DEHL -> RETURN DEHL
@@ -352,9 +352,9 @@ The rest of the derived power and trigonometric functions rely on the polynomial
 
 ### Execution speed
 
-Some [benchmarking](https://github.com/z88dk/z88dk/wiki/Classic--Maths-Libraries#benchmarks) has been completed and, as expected, the z180 and z80n "Spectrum NEXT" results show substantial improvements over other floating point libraries. For the z80 some benchmarks are faster than alternatives, but others are worse. More information on this will be added as experience grows.
+Some [benchmarking](https://github.com/z88dk/z88dk/wiki/Classic--Maths-Libraries#benchmarks) has been completed and, as expected, the z180 and z80n "Spectrum NEXT" results show substantial improvements over other floating point libraries. For the z80 most benchmarks are faster than alternatives, but others are worse. More information on this will be added as experience grows.
 
-Careful use of the intrinsic functions can result in significant performance improvement. For example, the n-body benchmark can be optimised by the use of intrinsic math32 functions of `invsqrt()` and `sqr()`, to produce a significant improvement. See `(opt)` results below.
+Careful use of the intrinsic functions can result in significant performance improvement. For example, the n-body benchmark can be optimised by the use of intrinsic math32 functions of `invsqrt()` and `sqr()`, to produce a significant improvement. See `(opt)` results in the tables below.
 
 #### n-body
 
