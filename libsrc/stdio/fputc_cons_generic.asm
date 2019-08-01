@@ -365,7 +365,11 @@ handle_cr:
 handle_cr_no_need_to_scroll:
 	inc	b
 	ld	c,0
+IF __CPU_RABBIT__
+	jp	store_coords
+ELSE
 	jr	store_coords
+ENDIF
 
 
 IF SUPPORT_cursor
