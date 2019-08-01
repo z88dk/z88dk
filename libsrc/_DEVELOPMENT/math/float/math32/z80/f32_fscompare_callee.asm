@@ -7,6 +7,11 @@ PUBLIC  m32_compare_callee
 ;
 ; IEEE float is considered zero if exponent is zero.
 ;
+; To compare our floating point numbers, we define the following rules:
+;       Always flip the sign bit.
+;       If the sign bit was set (negative), flip the other bits too.
+;       http://stereopsis.com/radix.html
+;
 ;       Entry: dehl  = right
 ;              stack = left, ret, ret
 ;
@@ -32,19 +37,53 @@ PUBLIC  m32_compare_callee
 
     sla e
     rl d
-    jr Z,zero_left      ;left is zero (exponent is zero)
+    jr Z,zero           ;left is zero (exponent is zero)
+    ccf
+    jr C,positive_left
+    ld a,l
+    cpl
+    ld l,a
+    ld a,h
+    cpl
+    ld h,a
+    ld a,e
+    cpl
+    ld e,a
+    ld a,d
+    cpl
+    ld d,a
+
+.positive_left
     rr d
     rr e
-
-    ld a,l
 
     exx                 ;right
     sla e
     rl d
-    jr Z,zero_right     ;right is zero (exponent is zero)
+    jr Z,zero           ;right is zero (exponent is zero)
+    ccf
+    jr C,positive_right
+    ld a,l
+    cpl
+    ld l,a
+    ld a,h
+    cpl
+    ld h,a
+    ld a,e
+    cpl
+    ld e,a
+    ld a,d
+    cpl
+    ld d,a
+
+.positive_right
     rr d
     rr e
 
+    exx                 ;left
+    ld a,l
+
+    exx                 ;right
     sub l
     ld c,a
 
@@ -71,19 +110,7 @@ PUBLIC  m32_compare_callee
     exx                 ;left
     ; dehl  =  left float, ac  = high word of result
     ; dehl' = right float, bc' =  low word of result
-    bit 7,a
-    jr Z,consider_positive
-
-.consider_negative
-    ; Calculate whether result is zero (equal)
-    or c
-    exx
-    or b
-    or c
-.return_negative
-    ld hl,1
-    scf
-    ret
+    jr C,consider_negative
 
 .consider_positive
     ; Calculate whether result is zero (equal)
@@ -97,22 +124,28 @@ PUBLIC  m32_compare_callee
     ccf
     ret
 
-.zero_left
-    ; left dehl = 0
-    ; right dehl' = float
+.consider_negative
+    ; Calculate whether result is zero (equal)
+    or c
     exx
-    sla e
-    rl d
-    jr Z,return_positive    ;right is zero
-    jr C,return_positive    ;sign of right is negative
-    jr return_negative
+    or b
+    or c
+.return_negative
+    ld hl,1
+    scf
+    ret
 
-.zero_right
-    ; left dehl' = float
-    ; right dehl = 0
+.zero
+    ; Enter with
+    ;   left dehl = 0
+    ;   right dehl' = float
+    ; or
+    ;   left dehl' = -float
+    ;   right dehl = 0    
     exx
     sla e
     rl d
-    jr C,return_negative    ;sign of left is negative
-    jr return_positive
+    jr Z,return_positive    ; both right and left are zero
+    jr C,return_positive
+    jr return_negative
 
