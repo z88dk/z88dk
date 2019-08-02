@@ -9,7 +9,7 @@
 void test_comparison()
 {
      double a = 10.0;
-     double b = 2.0;
+     double b = -2.0;
 
      Assert( a > b, "a > b");
      Assert( a >= b, "a >= b");
@@ -157,7 +157,7 @@ void test_approx_equal()
 #endif
 }
 
-int suite_genmath()
+int suite_math()
 {
     suite_setup(MATH_LIBRARY " Tests");
 
@@ -179,7 +179,7 @@ int main(int argc, char *argv[])
 {
     int  res = 0;
 
-    res += suite_genmath();
+    res += suite_math();
 
     exit(res);
 }

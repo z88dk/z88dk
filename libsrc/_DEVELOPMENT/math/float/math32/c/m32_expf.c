@@ -71,7 +71,6 @@ extern float m32_coeff_expf[];
 float m32_expf(float x) __z88dk_fastcall
 {
     float z;
-    int16_t n;
 #if 0
     if( x > MAXLOGF)
     {
@@ -88,8 +87,7 @@ float m32_expf(float x) __z88dk_fastcall
     x -= z * C1;
     x -= z * C2;
 
-    n = (int16_t)z;
-
     /* Theoretical peak relative error in [-0.5, +0.5] is 4.2e-9. */
-    return m32_ldexpf( m32_polyf(x, m32_coeff_expf, 5) * m32_sqrf(x) + x + 1.0, n);
+
+    return m32_ldexpf( m32_polyf(x, m32_coeff_expf, 5) * m32_sqrf(x) + x + 1.0, (int16_t)z);
 }

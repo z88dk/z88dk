@@ -372,12 +372,14 @@ l_m32_exp2f_00102:
 	ld	h,(ix-5)
 	push	hl
 	call	___fsmul_callee
-	ld	bc,0x3f80
-	push	bc
-	ld	bc,0x0000
-	push	bc
-	push	de
+	ld	c, l
+	ld	b, h
+	ld	hl,0x3f80
 	push	hl
+	ld	hl,0x0000
+	push	hl
+	push	de
+	push	bc
 	call	___fsadd_callee
 	ld	c, l
 	ld	l,(ix-2)

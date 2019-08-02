@@ -292,6 +292,7 @@ _m32_sinf:
 	push	de
 	ld	hl,0x0000
 	push	hl
+	ld	hl,0x0000
 	push	hl
 	push	de
 	push	bc

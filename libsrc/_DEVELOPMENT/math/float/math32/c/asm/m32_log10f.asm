@@ -299,12 +299,15 @@ _m32_log10f:
 	push	hl
 	ld	hl,0x0000
 	push	hl
+	ld	hl,0x0000
 	push	hl
 	call	___fslt_callee
 	bit	0,l
 	jr	NZ,l_m32_log10f_00102
-	ld	de,0xff00
-	ld	hl,0x0000
+	ld	l,0x00
+	ld	h,0x00
+	ld	e,0x00
+	ld	d,0xff
 	jp	l_m32_log10f_00106
 l_m32_log10f_00102:
 	ld	hl,12
@@ -341,12 +344,14 @@ l_m32_log10f_00102:
 	ld	l, c
 	ld	h, b
 	call	_m32_mul2f
-	ld	bc,0x3f80
-	push	bc
-	ld	bc,0x0000
-	push	bc
-	push	de
+	ld	c, l
+	ld	b, h
+	ld	hl,0x3f80
 	push	hl
+	ld	hl,0x0000
+	push	hl
+	push	de
+	push	bc
 	call	___fssub_callee
 	ld	(ix-6),l
 	ld	(ix-5),h

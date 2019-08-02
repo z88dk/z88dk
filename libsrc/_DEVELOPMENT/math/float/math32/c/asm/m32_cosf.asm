@@ -278,12 +278,14 @@ ENDIF
 ; Function m32_cosf
 ; ---------------------------------
 _m32_cosf:
-	ld	bc,0x3fc9
-	push	bc
-	ld	bc,0x0fdb
-	push	bc
-	push	de
+	ld	c, l
+	ld	b, h
+	ld	hl,0x3fc9
 	push	hl
+	ld	hl,0x0fdb
+	push	hl
+	push	de
+	push	bc
 	call	___fsadd_callee
 	jp  _m32_sinf
 	SECTION IGNORE

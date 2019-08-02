@@ -51,7 +51,6 @@ extern float m32_coeff_exp10f[];
 float m32_exp10f (float x) __z88dk_fastcall
 {
     float z;
-    int16_t n;
 #if 0
     if( x > MAXL10F )
     {
@@ -70,14 +69,13 @@ float m32_exp10f (float x) __z88dk_fastcall
     z = m32_floorf( x * LOG210 + 0.5 );
 
     x -= z * LG102A;
-    x -= z * LG102B;
-
-    n = (int16_t)z;   
+    x -= z * LG102B;  
 
     /* rational approximation for exponential
      * of the fractional part:
      * 10**x - 1  =  2x P(x**2)/( Q(x**2) - P(x**2) )
      * multiply by power of 2 
      */
-    return m32_ldexpf( m32_polyf(x, m32_coeff_exp10f, 5) * x + 1.0, n);
+
+    return m32_ldexpf( m32_polyf(x, m32_coeff_exp10f, 5) * x + 1.0, (int16_t)z);
 }

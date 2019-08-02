@@ -59,9 +59,9 @@ float m32_log2f (float x) __z88dk_fastcall
 
     /* Test for domain */
     if( x <= 0.0 )
-        {
-            return( HUGE_NEGF );
-        }
+    {
+        return( HUGE_NEGF );
+    }
 
     /* separate mantissa from exponent */
     
@@ -70,14 +70,14 @@ float m32_log2f (float x) __z88dk_fastcall
     /* logarithm using log(1+x) = x - .5x**2 + x**3 P(x)/Q(x) */
 
     if( x < SQRTHF )
-        {
-            --e;
-            x = m32_mul2f(x) - 1.0; /*  2x - 1  */
-        }
+    {
+        --e;
+        x = m32_mul2f(x) - 1.0; /*  2x - 1  */
+    }
     else
-        {
-            x -= 1.0;
-        }
+    {
+        x -= 1.0;
+    }
 
     z = m32_sqrf(x);
     

@@ -302,6 +302,7 @@ _m32_atan2f:
 	push	de
 	ld	hl,0x0000
 	push	hl
+	ld	hl,0x0000
 	push	hl
 	ld	l,(ix+10)
 	ld	h,(ix+11)
@@ -347,6 +348,7 @@ _m32_atan2f:
 	push	de
 	ld	hl,0x0000
 	push	hl
+	ld	hl,0x0000
 	push	hl
 	ld	l,(ix+6)
 	ld	h,(ix+7)

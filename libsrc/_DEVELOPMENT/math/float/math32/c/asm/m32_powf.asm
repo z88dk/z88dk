@@ -283,6 +283,7 @@ _m32_powf:
 	add	ix,sp
 	ld	hl,0x0000
 	push	hl
+	ld	hl,0x0000
 	push	hl
 	ld	l,(ix+6)
 	ld	h,(ix+7)
@@ -294,9 +295,10 @@ _m32_powf:
 	ld	a, l
 	or	a, a
 	jr	Z,l_m32_powf_00102
-	ld	hl,0x0000
-	ld	e,l
-	ld	d,h
+	ld	l,0x00
+	ld	h,0x00
+	ld	e,0x00
+	ld	d,0x00
 	jp	l_m32_powf_00109
 l_m32_powf_00102:
 	ld	a,(ix+7)
@@ -305,9 +307,10 @@ l_m32_powf_00102:
 	or	a,(ix+5)
 	or	a,(ix+4)
 	jr	NZ,l_m32_powf_00104
-	ld	hl,0x0000
-	ld	e,l
-	ld	d,h
+	ld	l,0x00
+	ld	h,0x00
+	ld	e,0x00
+	ld	d,0x00
 	jr	l_m32_powf_00109
 l_m32_powf_00104:
 	ld	a,(ix+11)
@@ -316,8 +319,10 @@ l_m32_powf_00104:
 	or	a,(ix+9)
 	or	a,(ix+8)
 	jr	NZ,l_m32_powf_00106
-	ld	de,0x3f80
-	ld	hl,0x0000
+	ld	l,0x00
+	ld	h,0x00
+	ld	e,0x80
+	ld	d,0x3f
 	jr	l_m32_powf_00109
 l_m32_powf_00106:
 	ld	hl,0x3f80

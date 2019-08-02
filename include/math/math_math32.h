@@ -7,7 +7,13 @@
 
 
 
-#define HUGE_VALF   3.402823466e+38
+#define HUGE_VALF   (float)+3.402823466e+38
+#define HUGE_POSF   (float)+3.4028234664E+38
+#define TINY_POSF   (float)+1.1754943508E−38
+#define HUGE_NEGF   (float)-1.7014118346E+38
+#define TINY_NEGF   (float)-1.1754943508E-38
+#define INFINITY_POSF   ((unsigned long)0x7F800000)
+#define INFINITY_NEGF   ((unsigned long)0xFF800000)
 
 #define PI          3.1415926536
 #define TWO_PI      6.2831853071

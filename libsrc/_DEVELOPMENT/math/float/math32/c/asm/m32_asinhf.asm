@@ -303,12 +303,14 @@ _m32_asinhf:
 	ld	l,(ix-4)
 	ld	h,(ix-3)
 	call	_m32_sqrf
-	ld	bc,0x3f80
-	push	bc
-	ld	bc,0x0000
-	push	bc
-	push	de
+	ld	c, l
+	ld	b, h
+	ld	hl,0x3f80
 	push	hl
+	ld	hl,0x0000
+	push	hl
+	push	de
+	push	bc
 	call	___fsadd_callee
 	call	_m32_sqrtf
 	ld	(ix-8),l

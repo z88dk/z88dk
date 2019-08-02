@@ -302,12 +302,14 @@ _m32_exp10f:
 	ld	hl,0x9a78
 	push	hl
 	call	___fsmul_callee
-	ld	bc,0x3f00
-	push	bc
-	ld	bc,0x0000
-	push	bc
-	push	de
+	ld	c, l
+	ld	b, h
+	ld	hl,0x3f00
 	push	hl
+	ld	hl,0x0000
+	push	hl
+	push	de
+	push	bc
 	call	___fsadd_callee
 	call	_m32_floorf
 	ld	(ix-8),l
@@ -367,14 +369,10 @@ _m32_exp10f:
 	ld	h,(ix-7)
 	push	hl
 	call	___fs2sint_callee
-	ld	(ix-6),l
-	ld	(ix-5),h
+	ld	(ix-10),l
+	ld	(ix-9),h
 	pop	de
 	pop	bc
-	ld	a,(ix-6)
-	ld	(ix-10),a
-	ld	a,(ix-5)
-	ld	(ix-9),a
 	push	bc
 	push	de
 	ld	hl,0x0005
@@ -399,12 +397,14 @@ _m32_exp10f:
 	ld	h,(ix-7)
 	push	hl
 	call	___fsmul_callee
-	ld	bc,0x3f80
-	push	bc
-	ld	bc,0x0000
-	push	bc
-	push	de
+	ld	c, l
+	ld	b, h
+	ld	hl,0x3f80
 	push	hl
+	ld	hl,0x0000
+	push	hl
+	push	de
+	push	bc
 	call	___fsadd_callee
 	ld	c, l
 	ld	l,(ix-10)

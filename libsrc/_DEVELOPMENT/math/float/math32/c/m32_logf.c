@@ -52,6 +52,7 @@ float m32_logf (float x) __z88dk_fastcall
     float y, z, floate;
     int16_t e;
 
+    /* Test for domain */
     if( x <= 0.0 )
     {
         return( HUGE_NEGF );
@@ -73,19 +74,12 @@ float m32_logf (float x) __z88dk_fastcall
 
     y = m32_polyf(x, m32_coeff_logf, 9) * z;
  
-    if( e != 0)
-    {
-        floate = (float)e;
-        y += -2.12194440e-4 * floate;
-    }
+    floate = (float)e;
+    y += -2.12194440e-4 * floate;
 
     y -= m32_div2f(z); /* y - 0.5 x^2 */
     z = x + y;      /* ... + x  */
-
-    if( e != 0)
-    {
-        z += 0.693359375 * floate;
-    }
+    z += 0.693359375 * floate;
 
     return( z );
 }

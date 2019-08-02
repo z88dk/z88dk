@@ -287,9 +287,10 @@ _m32_fmodf:
 	or	a,(ix+9)
 	or	a,(ix+8)
 	jr	NZ,l_m32_fmodf_00102
-	ld	hl,0x0000
-	ld	e,l
-	ld	d,h
+	ld	l,0x00
+	ld	h,0x00
+	ld	e,0x00
+	ld	d,0x00
 	jp	l_m32_fmodf_00103
 l_m32_fmodf_00102:
 	ld	l,(ix+10)

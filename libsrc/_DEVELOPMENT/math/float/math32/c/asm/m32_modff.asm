@@ -281,9 +281,11 @@ _m32_modff:
 	push	ix
 	ld	ix,0
 	add	ix,sp
-	ld	l,(ix+8)
-	ld	h,(ix+9)
-	push	hl
+	push	af
+	ld	a,(ix+8)
+	ld	(ix-2),a
+	ld	a,(ix+9)
+	ld	(ix-1),a
 	ld	l,(ix+6)
 	ld	h,(ix+7)
 	push	hl

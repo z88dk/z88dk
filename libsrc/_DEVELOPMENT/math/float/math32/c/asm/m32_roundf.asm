@@ -353,7 +353,8 @@ l_m32_roundf_00141:
 	jp	NC, l_m32_roundf_00112
 	bit	7,(ix-11)
 	jr	Z,l_m32_roundf_00106
-	ld	bc,0x0000
+	ld	c,0x00
+	ld	b,0x00
 	ld	e,0x00
 	ld	a,(ix-13)
 	and	a,0x80
@@ -417,9 +418,10 @@ l_m32_roundf_00146:
 l_m32_roundf_00104:
 	ld	b,(ix-12)
 	ld	c,0x00
-	ld	e,c
+	ld	e,0x00
+	ld	l,0x40
+	ld	h,0x00
 	inc	b
-	ld	hl,0x0040
 	jr	l_m32_roundf_00148
 l_m32_roundf_00147:
 	sra	h
@@ -450,7 +452,8 @@ l_m32_roundf_00148:
 	ld	a,(ix-9)
 	cpl
 	ld	b, a
-	ld	de,0x0000
+	ld	e,0x00
+	ld	d,0x00
 	ld	a, c
 	and	a,(ix-4)
 	ld	c, a

@@ -9,15 +9,18 @@ float m32_sinf (float f) __z88dk_fastcall
     float    y, y_squared;
     int16_t    sect, e;
 
-    if(f < 0.0) {
+    if(f < 0.0)
+    {
         f = -f;
         sect = 2;
-    } else
+    }
+    else
         sect = 0;
     f *= .63661977237;
     if(f > 4.0)
         f -= m32_mul2f( m32_mul2f( m32_floorf( m32_div2f( m32_div2f(f) )) ));
-    if(f > 2.0) {
+    if(f > 2.0)
+    {
         f -= 2.0;
         sect = 2 - sect;
     }
