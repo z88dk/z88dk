@@ -37,7 +37,7 @@ PUBLIC  m32_compare_callee
 
     sla e
     rl d
-    jr Z,zero           ;left is zero (exponent is zero)
+    jr Z,zero_left      ;left is zero (exponent is zero)
     ccf
     jr C,positive_left
     ld a,l
@@ -60,7 +60,7 @@ PUBLIC  m32_compare_callee
     exx                 ;right
     sla e
     rl d
-    jr Z,zero           ;right is zero (exponent is zero)
+    jr Z,zero_right     ;right is zero (exponent is zero)
     ccf
     jr C,positive_right
     ld a,l
@@ -135,17 +135,24 @@ PUBLIC  m32_compare_callee
     scf
     ret
 
-.zero
-    ; Enter with
+.zero_left
     ;   left dehl = 0
     ;   right dehl' = float
-    ; or
+    exx
+    sla e
+    rl d
+    jr C,return_positive
+    jr Z,return_positive    ;both right and left are zero
+    jr return_negative
+
+.zero_right
     ;   left dehl' = -float
     ;   right dehl = 0    
     exx
     sla e
     rl d
-    jr Z,return_positive    ; both right and left are zero
     jr C,return_positive
+    inc d                   ;reverse cpl on left exponent
+    jr Z,return_positive    ;both right and left are zero
     jr return_negative
 
