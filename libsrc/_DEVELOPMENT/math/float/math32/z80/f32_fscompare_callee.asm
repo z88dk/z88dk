@@ -7,10 +7,11 @@ PUBLIC  m32_compare_callee
 ;
 ; IEEE float is considered zero if exponent is zero.
 ;
-; To compare our floating point numbers, we define the following rules:
-;       Always flip the sign bit.
-;       If the sign bit was set (negative), flip the other bits too.
-;       http://stereopsis.com/radix.html
+; To compare our floating point numbers across whole number range,
+; we define the following rules:
+;       - Always flip the sign bit.
+;       - If the sign bit was set (negative), flip the other bits too.
+;       http://stereopsis.com/radix.html, et al.
 ;
 ;       Entry: dehl  = right
 ;              stack = left, ret, ret
@@ -23,39 +24,13 @@ PUBLIC  m32_compare_callee
 ;       Uses: af, bc, de, hl, bc', de', hl'
 
 .m32_compare_callee
-                        ;right
-    pop af              ;return address from this function
-                        ;return address to real program
-                        ;and the primary on the stack
-
     exx                 ;left
-    pop bc
-    pop hl
+    pop af              ;return address from this function
+    pop bc              ;return address to real program
+    pop hl              ;and the left (primary) on the stack
     pop de
-    push bc             ;return address to program
-    push af             ;return address from this function
-
-    sla e
-    rl d
-    jr Z,zero_left      ;left is zero (exponent is zero)
-    ccf
-    jr C,positive_left
-    ld a,l
-    cpl
-    ld l,a
-    ld a,h
-    cpl
-    ld h,a
-    ld a,e
-    cpl
-    ld e,a
-    ld a,d
-    cpl
-    ld d,a
-
-.positive_left
-    rr d
-    rr e
+    push bc
+    push af
 
     exx                 ;right
     sla e
@@ -75,12 +50,32 @@ PUBLIC  m32_compare_callee
     ld a,d
     cpl
     ld d,a
-
 .positive_right
     rr d
     rr e
 
     exx                 ;left
+    sla e
+    rl d
+    jr Z,zero_left      ;left is zero (exponent is zero)
+    ccf
+    jr C,positive_left
+    ld a,l
+    cpl
+    ld l,a
+    ld a,h
+    cpl
+    ld h,a
+    ld a,e
+    cpl
+    ld e,a
+    ld a,d
+    cpl
+    ld d,a
+.positive_left
+    rr d
+    rr e
+
     ld a,l
 
     exx                 ;right
@@ -107,16 +102,15 @@ PUBLIC  m32_compare_callee
     exx                 ;right
     sbc a,d
 
-    exx                 ;left
-    ; dehl  =  left float, ac  = high word of result
-    ; dehl' = right float, bc' =  low word of result
+    ; dehl  = right float, bc   =  low word of result
+    ; dehl' =  left float, a,c' = high word of result
     jr C,consider_negative
 
 .consider_positive
     ; Calculate whether result is zero (equal)
     or c
-    exx
     or b
+    exx                 ;left
     or c
 .return_positive
     ld hl,1
@@ -127,32 +121,30 @@ PUBLIC  m32_compare_callee
 .consider_negative
     ; Calculate whether result is zero (equal)
     or c
-    exx
     or b
+    exx                 ;left
     or c
 .return_negative
     ld hl,1
     scf
     ret
 
-.zero_left
-    ;   left dehl = 0
-    ;   right dehl' = float
-    exx
+.zero_right
+    ;   right dehl = 0    
+    ;   left dehl' = float
+    exx                 ;left
     sla e
     rl d
-    jr C,return_positive
-    jr Z,return_positive    ;both right and left are zero
+    jr NC,return_positive
+    jr Z,return_positive    ;both left and right are zero
     jr return_negative
 
-.zero_right
-    ;   left dehl' = -float
-    ;   right dehl = 0    
-    exx
+.zero_left
+    ;   left dehl = 0
+    ;   right dehl' = (cpl if negative)float non-zero
+    exx                 ;right
     sla e
     rl d
-    jr C,return_positive
-    inc d                   ;reverse cpl on left exponent
-    jr Z,return_positive    ;both right and left are zero
+    jr NC,return_positive
     jr return_negative
 
