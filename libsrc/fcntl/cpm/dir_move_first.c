@@ -24,5 +24,6 @@ int dir_move_first()
 	bdos(CPM_SDMA,fc_dirbuf);
 	parsefcb(&fc_dir,"*.*");
 	fc_dirpos=bdos(CPM_FFST,&fc_dir);
+	fc_dirbuf[133]=0;
 	return (fc_dirpos==-1?0x24:0);	// Not knowing what to pass for non-zero, let's simulate FLOS error code $24 (= Reached end of directory)
 }
