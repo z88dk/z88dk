@@ -83,6 +83,7 @@ IF !__CPU_8080__
   ENDIF
 	ld	a,__STDIO_MSG_SEEK
 	call	l_jphl
+	pop	ix
 ENDIF
 #endasm
 #else

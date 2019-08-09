@@ -240,15 +240,15 @@ extern int __LIB__ puts(const char *);
 #endif
 
 /* Routines for file positioning */
-extern fpos_t __LIB__ __SAVEFRAME__ ftell(FILE *fp);
+extern fpos_t __LIB__ ftell(FILE *fp);
 extern int __LIB__ __SAVEFRAME__ fgetpos(FILE *fp, fpos_t *pos) __smallc;
 #define fsetpos(fp,pos) fseek(fp,pos,SEEK_SET)
 #define rewind(fp) fseek(fp,0L,SEEK_SET)
 extern int __LIB__ __SAVEFRAME__ fseek(FILE *fp, fpos_t offset, int whence) __smallc;
 
 /* Block read/writing */
-extern int __LIB__ __SAVEFRAME__ fread(void *ptr, size_t size, size_t num, FILE *) __smallc;
-extern int __LIB__ __SAVEFRAME__ fwrite(const void *ptr, size_t size, size_t num, FILE *) __smallc;
+extern int __LIB__  fread(void *ptr, size_t size, size_t num, FILE *) __smallc;
+extern int __LIB__  fwrite(const void *ptr, size_t size, size_t num, FILE *) __smallc;
 
 
 /* You shouldn't use gets. z88 gets() is limited to 255 characters */
