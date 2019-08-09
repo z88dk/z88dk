@@ -520,7 +520,7 @@ int heira(LVALUE *lval)
             rvalue(lval);
         intcheck(lval, lval);
         com(lval);
-        lval->const_val = ~(uint32_t)lval->const_val;
+        lval->const_val = (int32_t)~(uint32_t)lval->const_val;
         lval->stage_add = NULL;
         return 0;
     } else if (cmatch('!')) {
