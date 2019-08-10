@@ -1388,6 +1388,9 @@ void leave(Kind vartype, char type, int incritical)
             bcused = 1;
         }
 
+        if ( Zsp > 0 ) {
+            errorfmt("Internal error: Cannot cleanup function by lowering sp: Zsp=%d",1,Zsp);
+        }
         modstk(0, save, NO, !bcused);
 
         if ( bcused ) {
