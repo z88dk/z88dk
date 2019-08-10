@@ -704,7 +704,11 @@ int rpn_eval(const char* expr, char** vars)
         case '7':
         case '8':
         case '9':
-            n = strtoll(ptr - 1, &endptr, 10);
+            n = strtol(ptr - 1, &endptr, 0);
+            if ( endptr == ptr - 1 ) {
+                fprintf(stderr,"Optimiser error, cannot parse number: %s\n",ptr-1);
+                exit(1);
+            }
             ptr = endptr;
             push(n);
             break;
@@ -745,7 +749,14 @@ int rpn_eval(const char* expr, char** vars)
             if ( isdigit(*ptr) ) {
                 // It's a variable
                 char v = *ptr++;
-                push(atoi(vars[v - '0']));
+                char *endptr;
+                char *val = vars[v-'0'];
+                n = strtol(val, &endptr, 0);
+                if ( endptr == val ) {
+                    fprintf(stderr,"Optimiser error, cannot parse variable: %s\n",val);
+                    exit(1);
+                }
+                push(n);
             } else if ( *ptr++ == '%' ) {
                 op2 = pop();
                 if (op2 != 0) {
