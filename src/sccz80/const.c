@@ -785,6 +785,10 @@ static void decompose_float(double raw, struct fp_decomposed *fs)
     fs->sign = 0;
     fs->exponent = 0;
 
+    for ( i = 0; i < MAX_MANTISSA_SIZE; i++ ) {
+       fs->mantissa[i] = 0;
+    }
+
     if (mant_bytes > MAX_MANTISSA_SIZE ) {
         mant_bytes = MAX_MANTISSA_SIZE;
     }
@@ -927,7 +931,7 @@ void decrement_double_ref_direct(double value)
 
 void decrement_double_ref(LVALUE *lval)
 {   
-    unsigned char    fa[MAX_MANTISSA_SIZE+1];
+    unsigned char    fa[MAX_MANTISSA_SIZE+1] = {0};
     elem_t          *elem;
     if ( c_double_strings ) {
         char  buf[40];
@@ -943,7 +947,7 @@ void decrement_double_ref(LVALUE *lval)
 
 void increment_double_ref(LVALUE *lval)
 {   
-    unsigned char    fa[MAX_MANTISSA_SIZE+1];
+    unsigned char    fa[MAX_MANTISSA_SIZE+1] = {0};
     elem_t          *elem;
     if ( c_double_strings ) {
         char  buf[40];
@@ -962,7 +966,7 @@ void increment_double_ref(LVALUE *lval)
 
 void load_double_into_fa(LVALUE *lval)
 {            
-    unsigned char    fa[MAX_MANTISSA_SIZE+1];
+    unsigned char    fa[MAX_MANTISSA_SIZE+1] = {0};
     elem_t          *elem;
     memset(fa, 0, sizeof(fa));
     
