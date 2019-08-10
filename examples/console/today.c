@@ -1,6 +1,13 @@
 /*
  This program was found in a retro archive related to DEC machines publishing ancient tape dumps.  
- The tape header timestamp says 1982 but probably the program is older
+ The tape header timestamp says 1982 but probably the program is older.
+ 
+ This is a good example on how to use SCCZ80 to recover old K&R program and port them into newer systems.
+ This file is an almost identical copy of the original archive, only a minimal adjustment to the time 
+ functions was necessary.   SCCZ80 accept both K&R and recent function definitions, so the program can 
+ be progressively changed and checked.
+ After that this program will probably hit the Y2K bug, which will require more tuning on the target system OS,
+ on the libraries or on the program itself, but the z88dk flexibility makes it less hard.
  
  z88dk is able to build a runnable program for many targets, but only few of them have a full clock hardware.
  E.g. in CP/M we provide support for a restricted range of machines:
