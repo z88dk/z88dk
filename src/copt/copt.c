@@ -713,7 +713,12 @@ int rpn_eval(const char* expr, char** vars)
             push(n);
             break;
         case '+':
-            push(pop() + pop());
+            {
+                int a = pop();
+                int b = pop();
+                fprintf(stderr, "RPN adding %d + %d\n",a,b);
+                push(a + b);
+            }
             break;
         case '*':
             push(pop() * pop());
