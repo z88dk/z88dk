@@ -377,14 +377,16 @@ char* subst_imp(char* pat, char** vars)
             pat += 2;
         } else if (pat[0] == '%' && strncmp(pat,"%eval(", 6) == 0 ) {
             char expr[1024];
-            int  x = 0;
+            int  x = 0, r;
             pat += 6;
             while (*pat != ')') {
                 expr[x++] = *pat++;
             }
             expr[x] = 0;
             pat++;
-            sprintf(expr, "%d", rpn_eval(expr, vars));
+            r = rpn_eval(expr, vars);
+            fprintf(stderr, "RPN evaluation resulted in: %d\n",r);
+            sprintf(expr, "%d", r);
             for ( s = expr; i <MAXLINE && *s; i++ )
                 lin[i] = *s++;
         } else if (pat[0] == '%' && isdigit(pat[1])) {
