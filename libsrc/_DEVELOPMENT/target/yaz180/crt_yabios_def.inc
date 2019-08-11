@@ -3,6 +3,33 @@
 ;; yabios provided labels found in common area 1 ;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+PUBLIC z180_int_int1
+DEFC z180_int_int1                   = $FFE0
+
+PUBLIC z180_int_int2
+DEFC z180_int_int2                   = $FFE2
+
+PUBLIC z180_int_prt0
+DEFC z180_int_prt0                   = $FFE4
+
+PUBLIC z180_int_prt1
+DEFC z180_int_prt1                   = $FFE6
+
+PUBLIC z180_int_dma0
+DEFC z180_int_dma0                   = $FFE8
+
+PUBLIC z180_int_dma1
+DEFC z180_int_dma1                   = $FFEA
+
+PUBLIC z180_int_csio
+DEFC z180_int_csio                   = $FFEC
+
+PUBLIC z180_int_asci0
+DEFC z180_int_asci0                  = $FFEE
+
+PUBLIC z180_int_asci1
+DEFC z180_int_asci1                  = $FFF0
+
 PUBLIC _bios_sp
 DEFC _bios_sp                        = $FFDE
 
@@ -32,9 +59,6 @@ DEFC _csioLock                       = $F515
 
 PUBLIC APULock
 DEFC APULock                         = $F527
-
-PUBLIC _bios_ioByte
-DEFC _bios_ioByte                    = $F528
 
 PUBLIC asci0RxLock
 DEFC asci0RxLock                     = $F52E
@@ -66,14 +90,8 @@ DEFC _memcpy_far                     = $F713
 PUBLIC _load_hex_fastcall
 DEFC _load_hex_fastcall              = $F7AF
 
-PUBLIC _bank_get_rel
-DEFC _bank_get_rel                   = $F860
-
 PUBLIC _bank_get_rel_fastcall
 DEFC _bank_get_rel_fastcall          = $F864
-
-PUBLIC _bank_get_abs
-DEFC _bank_get_abs                   = $F872
 
 PUBLIC _bank_get_abs_fastcall
 DEFC _bank_get_abs_fastcall          = $F876
@@ -110,54 +128,6 @@ DEFC asm_am9511a_opp                 = $FA1C
 
 PUBLIC asm_am9511a_cmd
 DEFC asm_am9511a_cmd                 = $FA58
-
-PUBLIC asm_asci0_init
-DEFC asm_asci0_init                  = $FACC
-
-PUBLIC asm_asci0_flush_Rx_di
-DEFC asm_asci0_flush_Rx_di           = $FAE6
-
-PUBLIC asm_asci0_flush_Tx_di
-DEFC asm_asci0_flush_Tx_di           = $FAFE
-
-PUBLIC asm_asci0_reset
-DEFC asm_asci0_reset                 = $FB16
-
-PUBLIC asm_asci0_getc
-DEFC asm_asci0_getc                  = $FB20
-
-PUBLIC asm_asci0_peekc
-DEFC asm_asci0_peekc                 = $FB36
-
-PUBLIC asm_asci0_pollc
-DEFC asm_asci0_pollc                 = $FB42
-
-PUBLIC asm_asci0_putc
-DEFC asm_asci0_putc                  = $FB4A
-
-PUBLIC asm_asci1_init
-DEFC asm_asci1_init                  = $FBE9
-
-PUBLIC asm_asci1_flush_Rx_di
-DEFC asm_asci1_flush_Rx_di           = $FC03
-
-PUBLIC asm_asci1_flush_Tx_di
-DEFC asm_asci1_flush_Tx_di           = $FC1B
-
-PUBLIC asm_asci1_reset
-DEFC asm_asci1_reset                 = $FC33
-
-PUBLIC asm_asci1_getc
-DEFC asm_asci1_getc                  = $FC3D
-
-PUBLIC asm_asci1_peekc
-DEFC asm_asci1_peekc                 = $FC53
-
-PUBLIC asm_asci1_pollc
-DEFC asm_asci1_pollc                 = $FC5F
-
-PUBLIC asm_asci1_putc
-DEFC asm_asci1_putc                  = $FC67
 
 PUBLIC ide_read_sector
 DEFC ide_read_sector                 = $FDAD

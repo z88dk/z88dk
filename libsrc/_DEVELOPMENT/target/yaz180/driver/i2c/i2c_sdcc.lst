@@ -1,0 +1,8 @@
+
+target/yaz180/driver/i2c/c/sdcc/i2c_initialise
+target/yaz180/driver/i2c/c/sdcc/i2c_interrupt_attach
+target/yaz180/driver/i2c/c/sdcc/i2c_interrupt_disable
+target/yaz180/driver/i2c/c/sdcc/i2c_interrupt_enable
+target/yaz180/driver/i2c/c/sdcc/i2c_reset
+
+@target/yaz180/driver/i2c/i2c_asm.lst

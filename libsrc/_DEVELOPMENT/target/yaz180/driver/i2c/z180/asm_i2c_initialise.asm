@@ -15,35 +15,30 @@
 
     SECTION code_driver
 
-    PUBLIC __i2c_reset
+    PUBLIC asm_i2c_initialise
 
-    EXTERN pca9665_write_indirect
+    EXTERN __i2c1ControlEcho
 
-    ;Reset a PCA9665 device
+    EXTERN pca9665_write_direct
+
+    ;Initialise a PCA9665 device
     ;input A  =  device address, __IO_I2C1_PORT_MSB or __IO_I2C2_PORT_MSB
-    ;write a $A5 followed by $5A to the IPRESET register
 
-__i2c_reset:
+.asm_i2c_initialise
     cp __IO_I2C2_PORT_MSB
-    jr Z, i2c_reset2
+    jr Z,i2c_init2
     cp __IO_I2C1_PORT_MSB
     ret NZ                      ;no device address match, so exit
-    
-i2c_reset2:
-    push af                     ;preserve device address
+
+.i2c_init2
     push bc
-    or __IO_I2C_PORT_IPRESET    ;prepare device and indirect register address
-    ld c, a
-    ld a, $A5                   ;reset the PCA9665 device, stage 1
-    call pca9665_write_indirect
-    ld a, $5A                   ;reset the PCA9665 device, stage 2
-    call pca9665_write_indirect
-    ld b, $00
-i2c_reset_delay_loop:           ;550us delay after reset
-    ex (sp), hl
-    ex (sp), hl
-    djnz i2c_reset_delay_loop
+    or __IO_I2C_PORT_CON        ;prepare device and register address
+    ld c,a                      ;in C
+    ld a,__IO_I2C_CON_ENSIO     ;enable the PCA9665 device
+    call pca9665_write_direct
+    ld a,__IO_I2C_CON_ECHO_BUS_STOPPED
+    ld (__i2c1ControlEcho),a    ;store stopped in the control echo
     pop bc
-    pop af
+    xor a
     ret
 

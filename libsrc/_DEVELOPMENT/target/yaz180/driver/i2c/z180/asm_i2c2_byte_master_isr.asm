@@ -15,23 +15,23 @@
 
     SECTION code_driver
 
-    PUBLIC __i2c1_byte_master_isr
+    PUBLIC _i2c2_byte_master_isr
 
-    EXTERN __i2c1RxInPtr, __i2c1RxBufUsed
-    EXTERN __i2c1TxOutPtr, __i2c1TxBufUsed
-    EXTERN __i2c1ControlEcho, __i2c1SlaveAddr, __i2c1SentenceLgth
+    EXTERN __i2c2RxInPtr, __i2c2RxBufUsed
+    EXTERN __i2c2TxOutPtr, __i2c2TxBufUsed
+    EXTERN __i2c2ControlEcho, __i2c2SlaveAddr, __i2c2SentenceLgth
 
-    EXTERN __i2c_reset
+    EXTERN asm_i2c_reset
     EXTERN pca9665_read_direct
     EXTERN pca9665_write_direct
 
-__i2c1_byte_master_isr:
+._i2c2_byte_master_isr
     push af
     push bc
     push de
     push hl
     
-    ld c, __IO_I2C1_PORT_MSB|__IO_I2C_PORT_STA
+    ld c, __IO_I2C2_PORT_MSB|__IO_I2C_PORT_STA
     call pca9665_read_direct    ;we need the status
     srl a                       ;get the status from status register for switch
     srl a                       ;shift right to make word offset case addresses
@@ -40,7 +40,7 @@ __i2c1_byte_master_isr:
     ld de, i2c_int_switch
     add hl, de                  ;get create the address for the switch
     
-    ld de, i2c1_byte_master_end
+    ld de, i2c2_byte_master_end
     push de                     ;prepare a return address for the switch
 
     ld a, (hl)                  ;load the address for our switch case
@@ -49,7 +49,7 @@ __i2c1_byte_master_isr:
     ld l, a
     jp (hl)                     ;make the switch
 
-i2c1_byte_master_end:
+i2c2_byte_master_end:
     pop hl                      ;return here to clean up afterwards
     pop de
     pop bc
@@ -60,105 +60,105 @@ i2c1_byte_master_end:
 
 _MASTER_START_TX:
 _MASTER_RESTART_TX:
-    ld c, __IO_I2C1_PORT_MSB|__IO_I2C_PORT_DAT
-    ld a, (__i2c1SlaveAddr)     ; get address of slave we're writing, Bit 0:[R=1,W=0]
+    ld c, __IO_I2C2_PORT_MSB|__IO_I2C_PORT_DAT
+    ld a, (__i2c2SlaveAddr)     ; get address of slave we're writing, Bit 0:[R=1,W=0]
     call pca9665_write_direct
 
-    ld c, __IO_I2C1_PORT_MSB|__IO_I2C_PORT_CON
+    ld c, __IO_I2C2_PORT_MSB|__IO_I2C_PORT_CON
     ld a, __IO_I2C_CON_ENSIO    ;clear the interrupt & continue
     jp pca9665_write_direct
 
 ;---------------------------------------
 
 _MASTER_DATA_W_ACK:             ;data transmitted
-    ld hl, __i2c1SentenceLgth   ;decrement the remaining sentence length
+    ld hl, __i2c2SentenceLgth   ;decrement the remaining sentence length
     dec (hl)
 
 _MASTER_SLA_W_ACK:              ;SLA+W transmitted
-    ld a, (__i2c1SentenceLgth)
+    ld a, (__i2c2SentenceLgth)
     or a
     jr NZ, _MASTER_SLA_W_ACK2
 
     ld a, __IO_I2C_CON_ECHO_BUS_STOPPED ;sentence complete, we're done    
-    ld (__i2c1ControlEcho), a
+    ld (__i2c2ControlEcho), a
 
-    ld c, __IO_I2C1_PORT_MSB|__IO_I2C_PORT_CON   
+    ld c, __IO_I2C2_PORT_MSB|__IO_I2C_PORT_CON   
     ld a, __IO_I2C_CON_ENSIO|__IO_I2C_CON_STO   ;set the interface to STOP
     jp pca9665_write_direct
 
 _MASTER_SLA_W_ACK2:
-    ld hl, (__i2c1TxOutPtr)             ;get the address to where we pop 
+    ld hl, (__i2c2TxOutPtr)             ;get the address to where we pop 
     ld a, (hl)
     inc l                               ;move the Tx pointer low byte along
-    ld (__i2c1TxOutPtr), hl
+    ld (__i2c2TxOutPtr), hl
 
-    ld hl, __i2c1TxBufUsed              ;atomically decrement the Tx buffer count
+    ld hl, __i2c2TxBufUsed              ;atomically decrement the Tx buffer count
     dec (hl)
     
-    ld c, __IO_I2C1_PORT_MSB|__IO_I2C_PORT_DAT
+    ld c, __IO_I2C2_PORT_MSB|__IO_I2C_PORT_DAT
     call pca9665_write_direct           ;write the byte
 
-    ld c, __IO_I2C1_PORT_MSB|__IO_I2C_PORT_CON
+    ld c, __IO_I2C2_PORT_MSB|__IO_I2C_PORT_CON
     ld a, __IO_I2C_CON_ENSIO            ;clear the interrupt & continue
     jp pca9665_write_direct
 
 _MASTER_SLA_W_NAK:
 _MASTER_DATA_W_NAK:
     ld a, __IO_I2C_CON_ECHO_BUS_STOPPED ;sentence complete, we're done    
-    ld (__i2c1ControlEcho), a
+    ld (__i2c2ControlEcho), a
 
-    ld c, __IO_I2C1_PORT_MSB|__IO_I2C_PORT_CON   
+    ld c, __IO_I2C2_PORT_MSB|__IO_I2C_PORT_CON   
     ld a, __IO_I2C_CON_ENSIO|__IO_I2C_CON_STO   ;set the interface to STOP
     jp pca9665_write_direct
 
 ;---------------------------------------
 
 _MASTER_DATA_R_NAK:                     ;last byte we're receiving 
-                                        ;__i2c1SentenceLgth should be 1
+                                        ;__i2c2SentenceLgth should be 1
 _MASTER_DATA_R_ACK:                     ;data received
-    ld c, __IO_I2C1_PORT_MSB|__IO_I2C_PORT_DAT
+    ld c, __IO_I2C2_PORT_MSB|__IO_I2C_PORT_DAT
     call pca9665_read_direct            ;get the byte
-    ld hl, (__i2c1RxInPtr)                ;get the address to where we poke                
-    ld (hl), a                          ;write the Rx byte to the __i2c1RxInPtr target
+    ld hl, (__i2c2RxInPtr)                ;get the address to where we poke                
+    ld (hl), a                          ;write the Rx byte to the __i2c2RxInPtr target
     inc l                               ;move the Rx pointer low byte along
-    ld (__i2c1RxInPtr), hl              ;write where the next byte should be poked
+    ld (__i2c2RxInPtr), hl              ;write where the next byte should be poked
 
-    ld hl, __i2c1RxBufUsed
+    ld hl, __i2c2RxBufUsed
     inc (hl)                            ;atomically increment Rx buffer count
     
-    ld hl, __i2c1SentenceLgth           ;decrement the remaining sentence length
+    ld hl, __i2c2SentenceLgth           ;decrement the remaining sentence length
     dec (hl)
 
 _MASTER_SLA_R_ACK:                      ;SLA+R transmitted
-    ld a, (__i2c1SentenceLgth)
+    ld a, (__i2c2SentenceLgth)
     cp 1                                ;is there 1 byte to receive?
     jr Z, _MASTER_SLA_R_ACK2
     or a                                ;is there 0 byte to receive?
     jr Z, _MASTER_SLA_R_ACK3 
                                         ;so there are multiple bytes to receive
-    ld c, __IO_I2C1_PORT_MSB|__IO_I2C_PORT_CON
+    ld c, __IO_I2C2_PORT_MSB|__IO_I2C_PORT_CON
     ld a, __IO_I2C_CON_AA|__IO_I2C_CON_ENSIO    ;clear the interrupt & ACK
     jp pca9665_write_direct
     
 _MASTER_SLA_R_ACK2:
-    ld c, __IO_I2C1_PORT_MSB|__IO_I2C_PORT_CON
+    ld c, __IO_I2C2_PORT_MSB|__IO_I2C_PORT_CON
     ld a, __IO_I2C_CON_ENSIO            ;clear the interrupt & NAK
     jp pca9665_write_direct
 
 _MASTER_SLA_R_ACK3:
     ld a, __IO_I2C_CON_ECHO_BUS_STOPPED ;sentence complete, we're done    
-    ld (__i2c1ControlEcho), a
+    ld (__i2c2ControlEcho), a
 
-    ld c, __IO_I2C1_PORT_MSB|__IO_I2C_PORT_CON
+    ld c, __IO_I2C2_PORT_MSB|__IO_I2C_PORT_CON
     ld a, __IO_I2C_CON_ENSIO|__IO_I2C_CON_STO   ;set the interface to STOP
     jp pca9665_write_direct
 
 _MASTER_SLA_R_NAK:
     ld a, __IO_I2C_CON_ECHO_BUS_STOPPED ;sentence complete, we're done    
-    ld (__i2c1ControlEcho), a
+    ld (__i2c2ControlEcho), a
     
     ld a, __IO_I2C_CON_ENSIO|__IO_I2C_CON_STO   ;set the interface to STOP
-    ld c, __IO_I2C1_PORT_MSB|__IO_I2C_PORT_CON   
+    ld c, __IO_I2C2_PORT_MSB|__IO_I2C_PORT_CON   
     jp pca9665_write_direct
 
 
@@ -179,15 +179,15 @@ _SLAVE_GC_RX_ACK:
 _SLAVE_GC_RX_NAK:
 _ILGL_ICOUNT:
     ld a, __IO_I2C_CON_ECHO_BUS_ILLEGAL  ;unexpected bus status or error    
-    ld (__i2c1ControlEcho), a
+    ld (__i2c2ControlEcho), a
     ret
 
 _ILGL_START_STOP:
 _SDA_STUCK:
 _SCL_STUCK:
     ld a, __IO_I2C_CON_ECHO_BUS_RESTART  ;unexpected bus status or error    
-    ld (__i2c1ControlEcho), a
-    jp __i2c_reset
+    ld (__i2c2ControlEcho), a
+    jp asm_i2c_reset
 
 i2c_int_switch:
    DEFW _ILGL_START_STOP
