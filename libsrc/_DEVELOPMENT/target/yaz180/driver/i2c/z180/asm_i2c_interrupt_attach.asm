@@ -39,6 +39,11 @@
     ret
 
     EXTERN asm_i2c1_needRx, asm_i2c1_needTx
-    DEFC NEEDRX = asm_i2c1_needRx
-    DEFC NEEDTX = asm_i2c1_needTx
+    EXTERN asm_i2c2_needRx, asm_i2c2_needTx
+
+    DEFC NEEDRX1 = asm_i2c1_needRx
+    DEFC NEEDTX1 = asm_i2c1_needTx
+
+    DEFC NEEDRX2 = asm_i2c2_needRx
+    DEFC NEEDTX2 = asm_i2c2_needTx
 

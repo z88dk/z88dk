@@ -39,6 +39,6 @@
     ld a,__IO_I2C_CON_ECHO_BUS_STOPPED
     ld (__i2c1ControlEcho),a    ;store stopped in the control echo
     pop bc
-    xor a
+    xor a                       ;success return 0
     ret
 
