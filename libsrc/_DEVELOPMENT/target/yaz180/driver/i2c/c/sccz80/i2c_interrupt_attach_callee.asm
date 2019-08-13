@@ -2,7 +2,7 @@ SECTION code_driver
 
 EXTERN asm_i2c_interrupt_attach
 
-PUBLIC _i2c_interrupt_attach
+PUBLIC _i2c_interrupt_attach_callee
 
 ;------------------------------------------------------------------------------
 ; Attach a PCA9665 device interrupt
@@ -13,7 +13,7 @@ PUBLIC _i2c_interrupt_attach
 ;
 ; uint8_t i2c_interrupt_attach( uint8_t device, uint8_t *isr ) __z88dk_callee
 
-._i2c_interrupt_attach
+._i2c_interrupt_attach_callee
     pop bc                              ;ret
     dec sp
     pop af                              ;device address

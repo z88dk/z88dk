@@ -37,7 +37,6 @@
 
 .i2c_int_dis1
     out0 (ITC),a                ;disable external interrupt
-    xor a
     ret
 
 

@@ -4,7 +4,7 @@ INCLUDE "config_private.inc"
 
 EXTERN asm_i2c1_write_byte, asm_i2c2_write_byte
 
-PUBLIC _i2c_write_byte
+PUBLIC _i2c_write_byte_callee
 
 ;------------------------------------------------------------------------------
 ;   Write to the I2C Interface, using Byte Mode transmission
@@ -17,15 +17,15 @@ PUBLIC _i2c_write_byte
 ;   C  = address of slave device, uint8_t addr, Bit 0:[R=1,W=0]
 
 
-._i2c_write_byte
+._i2c_write_byte_callee
     pop af                              ;ret
-    pop de                              ;slave addr,device address
+    pop de                              ;length
     pop hl                              ;*dp
-    pop bc                              ;length
-    inc sp
+    pop bc                              ;slave address
+    ld b,e                              ;length
+    pop de                              ;device
     push af                             ;ret
 
-    ld c,d                              ;slave address
     ld a,e                              ;device address
     cp __IO_I2C2_PORT_MSB
     jp Z,asm_i2c2_write_byte

@@ -30,12 +30,10 @@
     ret NZ                      ;no device address match, so exit
 
     ld (z180_int_int1),hl       ;load the address of the PCA9665 INT1 routine
-    xor a
     ret
 
 .i2c_int_at2
     ld (z180_int_int2),hl       ;load the address of the PCA9665 INT2 routine
-    xor a
     ret
 
     EXTERN asm_i2c1_needRx, asm_i2c1_needTx

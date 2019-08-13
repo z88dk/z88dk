@@ -30,7 +30,6 @@
     ret NZ                      ;no device address match, so exit
 
 .i2c_reset2
-    push bc
     or __IO_I2C_PORT_IPRESET    ;prepare device and indirect register address
     ld b,a                      ;preserve device and indirect register address in B
     ld c,b
@@ -44,7 +43,5 @@
     ex (sp),hl
     ex (sp),hl
     djnz i2c_reset_delay_loop
-    pop bc
-    xor a
     ret
 

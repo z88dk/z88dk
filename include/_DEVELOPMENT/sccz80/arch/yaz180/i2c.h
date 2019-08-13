@@ -31,44 +31,50 @@
 // Functions
 
 // uint8_t i2c_reset( uint8_t device ) __z88dk_fastcall
-extern uint8_t __LIB__ i2c_reset(uint8_t device) __smallc __z88dk_fastcall;
+extern void __LIB__ i2c_reset(uint8_t device) __smallc __z88dk_fastcall;
 
 
 
 // uint8_t i2c_initialise( uint8_t device ) __z88dk_fastcall
-extern uint8_t __LIB__ i2c_initialise(uint8_t device) __smallc __z88dk_fastcall;
+extern void __LIB__ i2c_initialise(uint8_t device) __smallc __z88dk_fastcall;
 
 
 
 // uint8_t i2c_interrupt_enable( uint8_t device ) __z88dk_fastcall
-extern uint8_t __LIB__ i2c_interrupt_enable(uint8_t device) __smallc __z88dk_fastcall;
+extern void __LIB__ i2c_interrupt_enable(uint8_t device) __smallc __z88dk_fastcall;
 
 
 
 // uint8_t i2c_interrupt_disable( uint8_t device ) __z88dk_fastcall
-extern uint8_t __LIB__ i2c_interrupt_disable(uint8_t device) __smallc __z88dk_fastcall;
+extern void __LIB__ i2c_interrupt_disable(uint8_t device) __smallc __z88dk_fastcall;
 
 
 
 // uint8_t i2c_interrupt_attach( uint8_t device, uint8_t *isr ) __z88dk_callee
-extern uint8_t __LIB__ i2c_interrupt_attach(uint8_t device,uint8_t *isr) __smallc;
-extern uint8_t __LIB__ i2c_interrupt_attach_callee(uint8_t device,uint8_t *isr) __smallc __z88dk_callee;
+extern void __LIB__ i2c_interrupt_attach(uint8_t device,uint8_t *isr) __smallc;
+extern void __LIB__ i2c_interrupt_attach_callee(uint8_t device,uint8_t *isr) __smallc __z88dk_callee;
 #define i2c_interrupt_attach(a,b) i2c_interrupt_attach_callee(a,b)
 
 
 
 // uint8_t i2c_write_byte( uint8_t device, uint8_t addr, uint8_t *dp, uint8_t length );
 extern void __LIB__ i2c_write_byte(uint8_t device,uint8_t addr,uint8_t *dp,uint8_t length) __smallc;
+extern void __LIB__ i2c_write_byte_callee(uint8_t device,uint8_t addr,uint8_t *dp,uint8_t length) __smallc __z88dk_callee;
+#define i2c_write_byte(a,b,c,d) i2c_write_byte_callee(a,b,c,d)
 
 
 
 // uint8_t i2c_read_byte_set( uint8_t device, uint8_t addr, uint8_t length );
 extern void __LIB__ i2c_read_byte_set(uint8_t device,uint8_t addr,uint8_t length) __smallc;
+extern void __LIB__ i2c_read_byte_set_callee(uint8_t device,uint8_t addr,uint8_t length) __smallc __z88dk_callee;
+#define i2c_read_byte_set(a,b,c) i2c_read_byte_set_callee(a,b,c)
 
 
 
 // uint8_t i2c_read_byte_get( uint8_t device, uint8_t addr, uint8_t *dp, uint8_t length );
 extern void __LIB__ i2c_read_byte_get(uint8_t device,uint8_t addr,uint8_t *dp,uint8_t length) __smallc;
+extern void __LIB__ i2c_read_byte_get_callee(uint8_t device,uint8_t addr,uint8_t *dp,uint8_t length) __smallc __z88dk_callee;
+#define i2c_read_byte_get(a,b,c,d) i2c_read_byte_get_callee(a,b,c,d)
 
 
 

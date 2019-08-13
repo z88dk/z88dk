@@ -31,27 +31,27 @@
 // Functions
 
 // uint8_t i2c_reset( uint8_t device ) __z88dk_fastcall
-extern uint8_t i2c_reset(uint8_t device);
+extern void i2c_reset(uint8_t device);
 
 
 
 // uint8_t i2c_initialise( uint8_t device ) __z88dk_fastcall
-extern uint8_t i2c_initialise(uint8_t device);
+extern void i2c_initialise(uint8_t device);
 
 
 
 // uint8_t i2c_interrupt_enable( uint8_t device ) __z88dk_fastcall
-extern uint8_t i2c_interrupt_enable(uint8_t device);
+extern void i2c_interrupt_enable(uint8_t device);
 
 
 
 // uint8_t i2c_interrupt_disable( uint8_t device ) __z88dk_fastcall
-extern uint8_t i2c_interrupt_disable(uint8_t device);
+extern void i2c_interrupt_disable(uint8_t device);
 
 
 
 // uint8_t i2c_interrupt_attach( uint8_t device, uint8_t *isr ) __z88dk_callee
-extern uint8_t i2c_interrupt_attach(uint8_t device,uint8_t *isr);
+extern void i2c_interrupt_attach(uint8_t device,uint8_t *isr);
 
 
 
