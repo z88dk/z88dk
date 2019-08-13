@@ -1,0 +1,196 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._land_test1
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	ld	a,h
+	and	+(112 % 256)
+	ld	h,a
+	ld	l,0
+	ld	de,0
+	ret
+
+
+
+._land_test2
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	ld	a,l
+	and	112
+	ld	l,a
+	ld	h,0
+	ld	de,0
+	ret
+
+
+
+._land_test3
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,0	;const
+	ld	de,112
+	call	l_long_and
+	ret
+
+
+
+._land_test4
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,0	;const
+	ld	de,28672
+	call	l_long_and
+	ret
+
+
+
+._iand_test1
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	a,h
+	and	+(112 % 256)
+	ld	h,a
+	ld	l,0
+	ret
+
+
+
+._iand_test2
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	a,l
+	and	+(112 % 256)
+	ld	l,a
+	ld	h,0
+	ret
+
+
+
+._lor_test1
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	ld	a,h
+	or	112
+	ld	h,a
+	ret
+
+
+
+._lor_test2
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	ld	a,l
+	or	112
+	ld	l,a
+	ret
+
+
+
+._lor_test3
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	ld	a,e
+	or	112
+	ld	e,a
+	ret
+
+
+
+._lor_test4
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	ld	a,d
+	or	112
+	ld	d,a
+	ret
+
+
+
+._lxor_test1
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	ld	a,h
+	xor	112
+	ld	h,a
+	ret
+
+
+
+._lxor_test2
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	ld	a,l
+	xor	112
+	ld	l,a
+	ret
+
+
+
+._lxor_test3
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	ld	a,e
+	xor	112
+	ld	e,a
+	ret
+
+
+
+._lxor_test4
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	ld	a,d
+	xor	112
+	ld	d,a
+	ret
+
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_land_test1
+	GLOBAL	_land_test2
+	GLOBAL	_land_test3
+	GLOBAL	_land_test4
+	GLOBAL	_iand_test1
+	GLOBAL	_iand_test2
+	GLOBAL	_lor_test1
+	GLOBAL	_lor_test2
+	GLOBAL	_lor_test3
+	GLOBAL	_lor_test4
+	GLOBAL	_lxor_test1
+	GLOBAL	_lxor_test2
+	GLOBAL	_lxor_test3
+	GLOBAL	_lxor_test4
+
+
+
+
