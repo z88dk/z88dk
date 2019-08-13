@@ -18,6 +18,7 @@ math/float/math32/lm32/c/sdcc/cos
 math/float/math32/lm32/c/sdcc/cos_fastcall
 math/float/math32/lm32/c/sdcc/cosh
 math/float/math32/lm32/c/sdcc/cosh_fastcall
+math/float/math32/lm32/c/sdcc/dload
 math/float/math32/lm32/c/sdcc/exp
 math/float/math32/lm32/c/sdcc/exp_fastcall
 math/float/math32/lm32/c/sdcc/exp2

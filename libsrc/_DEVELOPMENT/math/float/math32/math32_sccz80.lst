@@ -25,6 +25,7 @@ math/float/math32/c/sccz80/cm32_sccz80_fshypot
 math/float/math32/c/sccz80/cm32_sccz80_fshypot_callee
 math/float/math32/c/sccz80/cm32_sccz80_fsinv
 math/float/math32/c/sccz80/cm32_sccz80_fsinvsqrt
+math/float/math32/c/sccz80/cm32_sccz80_fsload
 math/float/math32/c/sccz80/cm32_sccz80_fsldexp
 math/float/math32/c/sccz80/cm32_sccz80_fsldexp_callee
 math/float/math32/c/sccz80/cm32_sccz80_fsmax
