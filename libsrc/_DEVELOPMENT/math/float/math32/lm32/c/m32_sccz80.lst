@@ -20,6 +20,7 @@ math/float/math32/lm32/c/sccz80/cosh
 math/float/math32/lm32/c/sccz80/cosh_fastcall
 math/float/math32/lm32/c/sccz80/div2
 math/float/math32/lm32/c/sccz80/div2_fastcall
+math/float/math32/lm32/c/sccz80/dload
 math/float/math32/lm32/c/sccz80/exp
 math/float/math32/lm32/c/sccz80/exp_fastcall
 math/float/math32/lm32/c/sccz80/exp2

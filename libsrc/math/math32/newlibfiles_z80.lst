@@ -106,6 +106,7 @@
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/asin_fastcall.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/modf.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/cosh.asm
+../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/dload.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/fpclassify.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/ceil.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/l_f32_ge.asm

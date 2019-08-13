@@ -7,11 +7,12 @@ PUBLIC cm32_sdcc_fsload
 .cm32_sdcc_fsload
 
     ; sdcc float primitive
-    ; Load float pointed to by HL into DEHL
+    ; Load float pointed to by HL into DEHL'
     ;
     ; enter : HL = float* (sdcc_float)
     ;
-    ; exit  : DEHL = float (sdcc_float)
+    ; exit  : DEHL' = float (sdcc_float)
+    ;         (exx set is swapped)
     ;
     ; uses  : f, bc, de, hl
 
@@ -26,4 +27,5 @@ PUBLIC cm32_sdcc_fsload
     ld l,c
     ld h,b
 
-    ret                         ; DEHL = sdcc_float
+    exx
+    ret                         ; DEHL' = sdcc_float

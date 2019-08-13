@@ -33,9 +33,9 @@ math/float/math32/c/sdcc/cm32_sdcc_fshypot
 math/float/math32/c/sdcc/cm32_sdcc_fshypot_callee
 math/float/math32/c/sdcc/cm32_sdcc_fsinv
 math/float/math32/c/sdcc/cm32_sdcc_fsinvsqrt
+math/float/math32/c/sdcc/cm32_sdcc_fsload
 math/float/math32/c/sdcc/cm32_sdcc_fsldexp
 math/float/math32/c/sdcc/cm32_sdcc_fsldexp_callee
-math/float/math32/c/sdcc/cm32_sdcc_fsload
 math/float/math32/c/sdcc/cm32_sdcc___fslt_callee
 math/float/math32/c/sdcc/cm32_sdcc_fsmax
 math/float/math32/c/sdcc/cm32_sdcc_fsmin
