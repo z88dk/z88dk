@@ -230,6 +230,7 @@ zx_clib.lib:
 	@echo ''
 	@echo '--- Building ZX Spectrum Library ---'
 	@echo ''
+	$(RM) stdio/spectrum/*.o
 	$(MAKE) gfxdeps
 	$(call buildgeneric,zx)
 	$(MAKE) -C target/zx
@@ -251,6 +252,7 @@ ts2068_clib.lib:
 	@echo ''
 	@echo '--- Building TS2068 (Spectrum clone) Library ---'
 	@echo ''
+	$(RM) stdio/spectrum/*.o
 	$(MAKE) gfxdeps
 	$(call buildgeneric,zx)
 	$(MAKE) -C target/zx
