@@ -15,7 +15,7 @@
 
     SECTION code_driver
 
-    PUBLIC __i2c_initialise
+    PUBLIC asm_i2c_initialise
 
     EXTERN __i2c1ControlEcho
 
@@ -24,26 +24,18 @@
     ;Initialise a PCA9665 device
     ;input A  =  device address, __IO_I2C1_PORT_MSB or __IO_I2C2_PORT_MSB
 
-__i2c_initialise:
-
+.asm_i2c_initialise
     cp __IO_I2C2_PORT_MSB
-    jr Z, i2c_init2
+    jr Z,i2c_init2
     cp __IO_I2C1_PORT_MSB
     ret NZ                      ;no device address match, so exit
-    
-i2c_init2:
-    push af                     ;preserve device address
-    push bc
+
+.i2c_init2
     or __IO_I2C_PORT_CON        ;prepare device and register address
-    ld c, a                     ;in C
-    ld a, __IO_I2C_CON_ENSIO    ;enable the PCA9665 device
+    ld c,a                      ;in C
+    ld a,__IO_I2C_CON_ENSIO     ;enable the PCA9665 device
     call pca9665_write_direct
-    
-    ld a, __IO_I2C_CON_ECHO_BUS_STOPPED
-    ld (__i2c1ControlEcho), a   ;store stopped in the control echo
-
-    pop bc
-    pop af
+    ld a,__IO_I2C_CON_ECHO_BUS_STOPPED
+    ld (__i2c1ControlEcho),a    ;store stopped in the control echo
     ret
-
 

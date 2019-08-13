@@ -3,6 +3,33 @@
 ;; yabios provided labels found in common area 1 ;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+PUBLIC z180_int_int1
+DEFC z180_int_int1                   = $FFE0
+
+PUBLIC z180_int_int2
+DEFC z180_int_int2                   = $FFE2
+
+PUBLIC z180_int_prt0
+DEFC z180_int_prt0                   = $FFE4
+
+PUBLIC z180_int_prt1
+DEFC z180_int_prt1                   = $FFE6
+
+PUBLIC z180_int_dma0
+DEFC z180_int_dma0                   = $FFE8
+
+PUBLIC z180_int_dma1
+DEFC z180_int_dma1                   = $FFEA
+
+PUBLIC z180_int_csio
+DEFC z180_int_csio                   = $FFEC
+
+PUBLIC z180_int_asci0
+DEFC z180_int_asci0                  = $FFEE
+
+PUBLIC z180_int_asci1
+DEFC z180_int_asci1                  = $FFF0
+
 PUBLIC _bios_sp
 DEFC _bios_sp                        = $FFDE
 
@@ -32,9 +59,6 @@ DEFC _csioLock                       = $F515
 
 PUBLIC APULock
 DEFC APULock                         = $F527
-
-PUBLIC _bios_ioByte
-DEFC _bios_ioByte                    = $F528
 
 PUBLIC asci0RxLock
 DEFC asci0RxLock                     = $F52E

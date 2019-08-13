@@ -15,31 +15,37 @@
 
     SECTION code_driver
 
-    PUBLIC __i2c_interrupt_disable
+    PUBLIC asm_i2c_interrupt_disable
 
     ;Disable the I2C interrupt for each PCA9665 device
     ;Configuring the interrupt is done in the i2c_interrupt_attach function
     ;input A  =  device address, __IO_I2C1_PORT_MSB or __IO_I2C2_PORT_MSB
 
-__i2c_interrupt_disable:
-    push af             ;preserve device address
+.asm_i2c_interrupt_disable
     cp __IO_I2C2_PORT_MSB
-    jr Z, i2c_int_dis2
+    jr Z,i2c_int_dis2
     cp __IO_I2C1_PORT_MSB
-    jr NZ, i2c_int_exit ;no device address match, so exit
+    ret NZ                      ;no device address match, so exit
 
-    in0 a, (ITC)        ;get INT/TRAP Control Register (ITC)
-    and ~ITC_ITE1       ;mask out INT1
+    in0 a,(ITC)                 ;get INT/TRAP Control Register (ITC)
+    and ~ITC_ITE1               ;mask out INT1
     jr i2c_int_dis1
 
-i2c_int_dis2:
-    in0 a, (ITC)        ;get INT/TRAP Control Register (ITC)
-    and  ~ITC_ITE2      ;mask out INT2
+.i2c_int_dis2
+    in0 a,(ITC)                 ;get INT/TRAP Control Register (ITC)
+    and ~ITC_ITE2               ;mask out INT2
 
-i2c_int_dis1:
-    out0 (ITC), a       ;disable external interrupt
-
-i2c_int_exit:
-    pop af
+.i2c_int_dis1
+    out0 (ITC),a                ;disable external interrupt
     ret
+
+
+    EXTERN asm_i2c1_needRx, asm_i2c1_needTx
+    EXTERN asm_i2c2_needRx, asm_i2c2_needTx
+
+    DEFC NEEDRX1 = asm_i2c1_needRx
+    DEFC NEEDTX1 = asm_i2c1_needTx
+
+    DEFC NEEDRX2 = asm_i2c2_needRx
+    DEFC NEEDTX2 = asm_i2c2_needTx
 

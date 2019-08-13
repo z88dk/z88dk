@@ -55,21 +55,21 @@ extern uint16_t *bank_cpm_bdos_addr;    // CPM/ BDOS entry address
 
 #ifdef __CLANG
 
-extern unsigned char io_break;
+extern uint16_t io_break;
 
-extern unsigned char io_pio_port_a;
-extern unsigned char io_pio_port_b;
-extern unsigned char io_pio_port_b;
-extern unsigned char io_pio_control;
+extern uint16_t io_pio_port_a;
+extern uint16_t io_pio_port_b;
+extern uint16_t io_pio_port_b;
+extern uint16_t io_pio_control;
 
-extern unsigned char io_pio_ide_lsb;
-extern unsigned char io_pio_ide_msb;
-extern unsigned char io_pio_ide_ctl;
-extern unsigned char io_pio_ide_config;
+extern uint16_t io_pio_ide_lsb;
+extern uint16_t io_pio_ide_msb;
+extern uint16_t io_pio_ide_ctl;
+extern uint16_t io_pio_ide_config;
 
-extern unsigned char io_apu_port_data;
-extern unsigned char io_apu_port_control;
-extern unsigned char io_apu_port_status;
+extern uint16_t io_apu_port_data;
+extern uint16_t io_apu_port_control;
+extern uint16_t io_apu_port_status;
 
 #else
 

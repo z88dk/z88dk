@@ -1674,8 +1674,8 @@ PUBLIC __IO_I2C_IMODE_MASK
 
 
 
-defc __IO_I2C_RX_SIZE = 68
-defc __IO_I2C_TX_SIZE = 68
+defc __IO_I2C_RX_SIZE = 256
+defc __IO_I2C_TX_SIZE = 256
 
 defc __IO_I2C1_PORT_MSB = 0xa0
 defc __IO_I2C2_PORT_MSB = 0x80

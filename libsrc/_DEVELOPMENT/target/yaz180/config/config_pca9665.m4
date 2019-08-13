@@ -6,8 +6,8 @@ divert(-1)
 
 # PCA9665 I2C I/O Buffer Definitions
 
-define(`__IO_I2C_RX_SIZE', 68)          # Size of the Rx Buffer, 68 Bytes
-define(`__IO_I2C_TX_SIZE', 68)          # Size of the Tx Buffer, 68 Bytes
+define(`__IO_I2C_RX_SIZE', 256)         # Size of the Rx Buffer, 256 Bytes
+define(`__IO_I2C_TX_SIZE', 256)         # Size of the Tx Buffer, 256 Bytes
                                         # PCA9665 has 68 Byte Tx/Rx hardware buffer
 
 # PCA9665 I2C I/O Register MSB addressing

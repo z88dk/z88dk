@@ -15,7 +15,7 @@
 
     SECTION code_driver
 
-    PUBLIC __i2c_reset
+    PUBLIC asm_i2c_reset
 
     EXTERN pca9665_write_indirect
 
@@ -23,27 +23,25 @@
     ;input A  =  device address, __IO_I2C1_PORT_MSB or __IO_I2C2_PORT_MSB
     ;write a $A5 followed by $5A to the IPRESET register
 
-__i2c_reset:
+.asm_i2c_reset
     cp __IO_I2C2_PORT_MSB
-    jr Z, i2c_reset2
+    jr Z,i2c_reset2
     cp __IO_I2C1_PORT_MSB
     ret NZ                      ;no device address match, so exit
-    
-i2c_reset2:
-    push af                     ;preserve device address
-    push bc
+
+.i2c_reset2
     or __IO_I2C_PORT_IPRESET    ;prepare device and indirect register address
-    ld c, a
-    ld a, $A5                   ;reset the PCA9665 device, stage 1
+    ld b,a                      ;preserve device and indirect register address in B
+    ld c,b
+    ld a,$A5                    ;reset the PCA9665 device, stage 1
     call pca9665_write_indirect
-    ld a, $5A                   ;reset the PCA9665 device, stage 2
+    ld c,b
+    ld a,$5A                    ;reset the PCA9665 device, stage 2
     call pca9665_write_indirect
-    ld b, $00
-i2c_reset_delay_loop:           ;550us delay after reset
-    ex (sp), hl
-    ex (sp), hl
+    ld b,$00
+.i2c_reset_delay_loop           ;550us delay after reset
+    ex (sp),hl
+    ex (sp),hl
     djnz i2c_reset_delay_loop
-    pop bc
-    pop af
     ret
 

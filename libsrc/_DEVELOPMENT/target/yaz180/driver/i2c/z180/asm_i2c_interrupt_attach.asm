@@ -15,7 +15,7 @@
 
     SECTION code_driver
 
-    PUBLIC __i2c_interrupt_attach
+    PUBLIC asm_i2c_interrupt_attach
     
     EXTERN z180_int_int1, z180_int_int2
 
@@ -23,16 +23,25 @@
     ;input HL = address of the interrupt service routine
     ;input A  = device address, __IO_I2C1_PORT_MSB or __IO_I2C2_PORT_MSB
 
-__i2c_interrupt_attach:
+.asm_i2c_interrupt_attach
     cp __IO_I2C2_PORT_MSB
-    jr Z, i2c_int_at2
+    jr Z,i2c_int_at2
     cp __IO_I2C1_PORT_MSB
-    ret NZ                  ;no device address match, so exit
+    ret NZ                      ;no device address match, so exit
 
-    ld (z180_int_int1), hl  ;load the address of the PCA9665 INT1 routine
+    ld (z180_int_int1),hl       ;load the address of the PCA9665 INT1 routine
     ret
-    
-i2c_int_at2:
-    ld (z180_int_int2), hl  ;load the address of the PCA9665 INT2 routine
+
+.i2c_int_at2
+    ld (z180_int_int2),hl       ;load the address of the PCA9665 INT2 routine
     ret
+
+    EXTERN asm_i2c1_needRx, asm_i2c1_needTx
+    EXTERN asm_i2c2_needRx, asm_i2c2_needTx
+
+    DEFC NEEDRX1 = asm_i2c1_needRx
+    DEFC NEEDTX1 = asm_i2c1_needTx
+
+    DEFC NEEDRX2 = asm_i2c2_needRx
+    DEFC NEEDTX2 = asm_i2c2_needTx
 

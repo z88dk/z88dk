@@ -1,0 +1,12 @@
+
+target/yaz180/driver/i2c/c/sdcc/i2c_reset_fastcall
+target/yaz180/driver/i2c/c/sdcc/i2c_initialise_fastcall
+target/yaz180/driver/i2c/c/sdcc/i2c_interrupt_disable_fastcall
+target/yaz180/driver/i2c/c/sdcc/i2c_interrupt_enable_fastcall
+
+target/yaz180/driver/i2c/c/sdcc/i2c_interrupt_attach_callee
+target/yaz180/driver/i2c/c/sdcc/i2c_read_byte_get_callee
+target/yaz180/driver/i2c/c/sdcc/i2c_read_byte_set_callee
+target/yaz180/driver/i2c/c/sdcc/i2c_write_byte_callee
+
+@target/yaz180/driver/i2c/i2c_asm.lst
