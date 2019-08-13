@@ -7,12 +7,11 @@ PUBLIC cm32_sccz80_fsload
 .cm32_sccz80_fsload
 
     ; sccz80 float primitive
-    ; Load float pointed to by HL into DEHL'
+    ; Load float pointed to by HL into DEHL
     ;
     ; enter : HL = float* (sccz80_float)
     ;
-    ; exit  : DEHL' = float (sccz80_float)
-    ;         (exx set is swapped)
+    ; exit  : DEHL = float (sccz80_float)
     ;
     ; uses  : f, bc, de, hl
 
@@ -27,5 +26,4 @@ PUBLIC cm32_sccz80_fsload
     ld l,c
     ld h,b
 
-    exx
-    ret                         ; DEHL' = sccz80_float
+    ret                         ; DEHL = sccz80_float
