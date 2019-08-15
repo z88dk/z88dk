@@ -31,10 +31,10 @@
     ret NZ                      ;no device address match, so exit
 
 .i2c_init2
-    or __IO_I2C_PORT_CON        ;prepare device and register address
-    ld c,a                      ;in C
+    ld b,a                      ;prepare device address in B
+    ld c,__IO_I2C_PORT_CON      ;prepare register address in C
     ld a,__IO_I2C_CON_ENSIO     ;enable the PCA9665 device
-    call pca9665_write_direct
+    out (c),a                   ;write to the direct registers
     ld a,__IO_I2C_CON_ECHO_BUS_STOPPED
     ld (__i2c1ControlEcho),a    ;store stopped in the control echo
     ret

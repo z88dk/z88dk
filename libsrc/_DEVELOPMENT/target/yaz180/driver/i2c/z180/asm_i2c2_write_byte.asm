@@ -20,8 +20,6 @@
     EXTERN __i2c2TxInPtr, __i2c2TxBufUsed
     EXTERN __i2c2ControlEcho, __i2c2SlaveAddr, __i2c2SentenceLgth
 
-    EXTERN pca9665_write_direct
-
 ;   Write to the I2C Interface, using Byte Mode transmission
 ;   int i2c_write_byte_mode( char addr, char *dp, char length );
 ;   parameters passed in registers
@@ -69,7 +67,8 @@
     ld a,__IO_I2C_CON_ENSIO
     ld (__i2c2ControlEcho),a    ;store enabled in the control echo
 
-    ld c,__IO_I2C2_PORT_MSB|__IO_I2C_PORT_CON
+    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_CON
     ld a,__IO_I2C_CON_ENSIO|__IO_I2C_CON_STA
-    jp pca9665_write_direct     ;set the interface enable and STA bit
+    out (c),a                   ;set the interface enable and STA bit
+    ret
 

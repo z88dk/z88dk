@@ -4,11 +4,12 @@
     PUBLIC pca9665_write_direct
 
     ;Do a write to the direct registers
-    ;input  C =  device addr | direct register address (ddd000rr)
+    ;input  BC =  device addr | direct register address (ddd.....:......rr)
     ;input  A =  byte to write
+    ;
+    ;UNUSED, as it is too easy to just use a single out instruction.
 
 .pca9665_write_direct
-    ld b,c              ;prepare device and register address
                         ;lower address bits (0x1F) of B irrelevant
                         ;upper address bits (0xFC) of C not evaluated
     out (c),a

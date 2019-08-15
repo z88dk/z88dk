@@ -69,7 +69,8 @@
     ld a,__IO_I2C_CON_ENSIO
     ld (__i2c1ControlEcho),a    ;store enabled in the control echo
 
-    ld c,__IO_I2C1_PORT_MSB|__IO_I2C_PORT_CON
+    ld bc,__IO_I2C1_PORT_BASE|__IO_I2C_PORT_CON
     ld a,__IO_I2C_CON_ENSIO|__IO_I2C_CON_STA
-    jp pca9665_write_direct     ;set the interface enable and STA bit
+    out (c),a                   ;set the interface enable and STA bit
+    ret
 

@@ -6,12 +6,11 @@
     PUBLIC pca9665_write_indirect
 
     ;Do a write to the indirect registers
-    ;input C  =  device addr | direct register address (ddd000rr)
+    ;input  BC =  device addr | direct register address (ddd.....:......rr)
     ;input A  =  byte to write
 
 .pca9665_write_indirect
     push af             ;preserve the byte to write
-    ld b,c              ;prepare device and register address
                         ;lower address bits (0x1F) of B irrelevant
     ld a,c              ;prepare indirect address in A
     and $07             ;ensure upper bits are zero

@@ -30,12 +30,11 @@
     ret NZ                      ;no device address match, so exit
 
 .i2c_reset2
-    or __IO_I2C_PORT_IPRESET    ;prepare device and indirect register address
-    ld b,a                      ;preserve device and indirect register address in B
-    ld c,b
+    ld b,a                      ;preserve device address in B
+    ld c,__IO_I2C_PORT_IPRESET  ;prepare indirect register address in C
     ld a,$A5                    ;reset the PCA9665 device, stage 1
     call pca9665_write_indirect
-    ld c,b
+    ld c,__IO_I2C_PORT_IPRESET  ;prepare indirect register address in C
     ld a,$5A                    ;reset the PCA9665 device, stage 2
     call pca9665_write_indirect
     ld b,$00

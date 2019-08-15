@@ -20,8 +20,6 @@
     EXTERN __i2c2RxOutPtr, __i2c2RxBufUsed
     EXTERN __i2c2ControlEcho, __i2c2SlaveAddr, __i2c2SentenceLgth
 
-    EXTERN pca9665_write_direct
-
 ;   Read from the I2C Interface, using Byte Mode transmission
 ;   int i2c_read_byte_mode( char addr, char *dp, char length );
 ;   parameters passed in registers

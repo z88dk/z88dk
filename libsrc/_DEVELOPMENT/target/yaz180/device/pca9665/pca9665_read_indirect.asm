@@ -6,11 +6,10 @@
     PUBLIC pca9665_read_indirect
 
     ;Do a read from the indirect registers
-    ;input C  =  device addr | indirect register address (ddd000rr)
+    ;input  BC =  device addr | direct register address (ddd.....:......rr)
     ;output A =  byte read
 
 .pca9665_read_indirect
-    ld b,c              ;prepare device and register address
                         ;lower address bits (0x1F) of B irrelevant
     ld a,c              ;prepare indirect address in A
     and $07             ;ensure upper bits are zero when writing to IPTR

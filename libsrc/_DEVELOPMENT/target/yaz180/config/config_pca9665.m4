@@ -10,6 +10,11 @@ define(`__IO_I2C_RX_SIZE', 256)         # Size of the Rx Buffer, 256 Bytes
 define(`__IO_I2C_TX_SIZE', 256)         # Size of the Tx Buffer, 256 Bytes
                                         # PCA9665 has 68 Byte Tx/Rx hardware buffer
 
+# PCA9665 I2C I/O Register addressing
+
+define(`__IO_I2C1_PORT_BASE', 0x`'eval(__IO_PCA9665_1_PORT_BASE&0xE000,16))         # distinguish the device address, with MSB
+define(`__IO_I2C2_PORT_BASE', 0x`'eval(__IO_PCA9665_2_PORT_BASE&0xE000,16))         # yaz180 - only 3 MSB bits are H/W decoded 0xE000
+
 # PCA9665 I2C I/O Register MSB addressing
 
 define(`__IO_I2C1_PORT_MSB', 0x`'eval((__IO_PCA9665_1_PORT_BASE/0x0100)&0xE0,16))   # distinguish the device address, with MSB
@@ -115,6 +120,9 @@ ifdef(`CFG_ASM_PUB',
 PUBLIC `__IO_I2C_RX_SIZE'
 PUBLIC `__IO_I2C_TX_SIZE'
 
+PUBLIC `__IO_I2C1_PORT_BASE'
+PUBLIC `__IO_I2C2_PORT_BASE'
+
 PUBLIC `__IO_I2C1_PORT_MSB'
 PUBLIC `__IO_I2C2_PORT_MSB'
 
@@ -193,6 +201,9 @@ ifdef(`CFG_ASM_DEF',
 `
 defc `__IO_I2C_RX_SIZE' = __IO_I2C_RX_SIZE
 defc `__IO_I2C_TX_SIZE' = __IO_I2C_TX_SIZE
+
+defc `__IO_I2C1_PORT_BASE' = __IO_I2C1_PORT_BASE
+defc `__IO_I2C2_PORT_BASE' = __IO_I2C2_PORT_BASE
 
 defc `__IO_I2C1_PORT_MSB' = __IO_I2C1_PORT_MSB
 defc `__IO_I2C2_PORT_MSB' = __IO_I2C2_PORT_MSB
@@ -273,8 +284,8 @@ ifdef(`CFG_C_DEF',
 `#define' `__IO_I2C_RX_SIZE'  __IO_I2C_RX_SIZE
 `#define' `__IO_I2C_TX_SIZE'  __IO_I2C_TX_SIZE
 
-`#define' `__IO_PCA9665_1_PORT_BASE'  __IO_PCA9665_1_PORT_BASE
-`#define' `__IO_PCA9665_2_PORT_BASE'  __IO_PCA9665_2_PORT_BASE
+`#define' `__IO_I2C1_PORT_BASE'  __IO_I2C1_PORT_BASE
+`#define' `__IO_I2C2_PORT_BASE'  __IO_I2C2_PORT_BASE
 
 `#define' `__IO_I2C1_PORT_MSB'  __IO_I2C1_PORT_MSB
 `#define' `__IO_I2C2_PORT_MSB'  __IO_I2C2_PORT_MSB
