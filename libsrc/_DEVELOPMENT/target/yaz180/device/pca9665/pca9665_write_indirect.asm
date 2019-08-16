@@ -6,7 +6,7 @@
     PUBLIC pca9665_write_indirect
 
     ;Do a write to the indirect registers
-    ;input  BC =  device addr | direct register address (ddd.....:......rr)
+    ;input  BC =  device addr | indirect register address (ddd.....:......rr)
     ;input A  =  byte to write
 
 .pca9665_write_indirect

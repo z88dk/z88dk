@@ -4,19 +4,19 @@ INCLUDE "config_private.inc"
 
 EXTERN asm_i2c1_read_byte_set, asm_i2c2_read_byte_set
 
-PUBLIC _i2c_read_byte_set_callee
+PUBLIC i2c_read_byte_set_callee
 
 ;------------------------------------------------------------------------------
 ;   Read from the I2C Interface, using Byte Mode transmission
 ;
-;   uint8_t i2c_read_byte_set( uint8_t device, uint8_t addr, uint8_t length );
+;   extern void __LIB__ i2c_read_byte_set_callee(uint8_t device,uint8_t addr,uint8_t length) __smallc __z88dk_callee;
 ;
 ;   parameters passed in registers
 ;   B  = length of data sentence expected, uint8_t length
 ;   C  = address of slave device, uint8_t addr, Bit 0:[R=1,W=0]
 
 
-._i2c_read_byte_set_callee
+.i2c_read_byte_set_callee
     pop af                              ;ret
     pop de                              ;length
     pop bc                              ;slave address

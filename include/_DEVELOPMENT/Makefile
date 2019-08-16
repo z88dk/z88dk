@@ -31,7 +31,7 @@ sdcc/%README: proto/%README
 clang/%README: proto/%README
 	cp $^ $@
 
-# Copy files for clasisc up
+# Copy files for classic up
 classic:
 	cp -r sccz80/adt ../
 	cp -r sccz80/alloc ../

@@ -6,7 +6,7 @@
     PUBLIC pca9665_read_indirect
 
     ;Do a read from the indirect registers
-    ;input  BC =  device addr | direct register address (ddd.....:......rr)
+    ;input  BC =  device addr | indirect register address (ddd.....:......rr)
     ;output A =  byte read
 
 .pca9665_read_indirect

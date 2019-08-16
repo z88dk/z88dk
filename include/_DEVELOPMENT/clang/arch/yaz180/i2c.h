@@ -11,9 +11,8 @@
 
 // Defines
 
-#define I2C1_PORT_MSB   __IO_I2C1_PORT_MSB
-#define I2C2_PORT_MSB   __IO_I2C2_PORT_MSB
-
+#define I2C1_PORT   __IO_I2C1_PORT_MSB
+#define I2C2_PORT   __IO_I2C2_PORT_MSB
 
 #define I2C_CON_ECHO_BUS_STOPPED    __IO_I2C_CON_ECHO_BUS_STOPPED
 #define I2C_CON_ECHO_BUS_RESTART    __IO_I2C_CON_ECHO_BUS_RESTART
@@ -27,8 +26,19 @@
 
 // Data Structures
 
-
 // Functions
+
+// Interrupt routines for the I2C interfaces: Byte Mode
+extern void i2c1_byte_master_isr(void);
+extern void i2c2_byte_master_isr(void);
+extern void i2c1_byte_slave_isr(void);      // TODO
+extern void i2c2_byte_slave_isr(void);      // TODO
+
+// Interrupt routines for the I2C interfaces: Buffer Mode
+extern void i2c1_buffer_master_isr(void);   // TODO
+extern void i2c2_buffer_master_isr(void);   // TODO
+extern void i2c1_buffer_slave_isr(void);    // TODO
+extern void i2c2_buffer_slave_isr(void);    // TODO
 
 // uint8_t i2c_reset( uint8_t device ) __z88dk_fastcall
 extern void i2c_reset(uint8_t device);
@@ -50,8 +60,8 @@ extern void i2c_interrupt_disable(uint8_t device);
 
 
 
-// uint8_t i2c_interrupt_attach( uint8_t device, uint8_t *isr ) __z88dk_callee
-extern void i2c_interrupt_attach(uint8_t device,uint8_t *isr);
+// uint8_t i2c_interrupt_attach( uint8_t device, void *isr ) __z88dk_callee
+extern void i2c_interrupt_attach(uint8_t device,void *isr);
 
 
 
