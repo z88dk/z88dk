@@ -718,7 +718,7 @@ int rpn_eval(const char* expr, char** vars)
             {
                 int a = pop();
                 int b = pop();
-                //fprintf(stderr, "RPN adding %d + %d\n",a,b);
+                fprintf(stderr, "RPN adding %d + %d\n",a,b);
                 push(a + b);
             }
             break;
