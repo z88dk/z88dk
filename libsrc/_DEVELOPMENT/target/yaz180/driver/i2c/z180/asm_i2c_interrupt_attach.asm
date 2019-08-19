@@ -36,12 +36,9 @@
     ld (z180_int_int2),hl       ;load the address of the PCA9665 INT2 routine
     ret
 
-    EXTERN asm_i2c1_needRx, asm_i2c1_needTx
-    EXTERN asm_i2c2_needRx, asm_i2c2_needTx
+    EXTERN asm_i2c1_need
+    EXTERN asm_i2c2_need
 
-    DEFC NEEDRX1 = asm_i2c1_needRx
-    DEFC NEEDTX1 = asm_i2c1_needTx
-
-    DEFC NEEDRX2 = asm_i2c2_needRx
-    DEFC NEEDTX2 = asm_i2c2_needTx
+    DEFC NEED1 = asm_i2c1_need
+    DEFC NEED2 = asm_i2c2_need
 

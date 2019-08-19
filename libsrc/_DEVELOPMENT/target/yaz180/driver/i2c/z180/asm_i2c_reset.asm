@@ -44,3 +44,9 @@
     djnz i2c_reset_delay_loop
     ret
 
+    EXTERN asm_i2c1_need
+    EXTERN asm_i2c2_need
+
+    DEFC NEED1 = asm_i2c1_need
+    DEFC NEED2 = asm_i2c2_need
+

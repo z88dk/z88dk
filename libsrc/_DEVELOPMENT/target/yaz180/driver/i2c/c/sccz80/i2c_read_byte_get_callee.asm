@@ -9,7 +9,7 @@ PUBLIC i2c_read_byte_get_callee
 ;------------------------------------------------------------------------------
 ;   Read from the I2C Interface, using Byte Mode transmission
 ;
-;   extern void __LIB__ i2c_read_byte_get_callee(uint8_t device,uint8_t addr,uint8_t *dp,uint8_t length) __smallc __z88dk_callee;
+;   extern void __LIB__ i2c_read_byte_get_callee(uint8_t device,uint8_t addr,uint8_t length) __smallc __z88dk_callee;
 ;
 ;   parameters passed in registers
 ;   HL = pointer to location to store data, uint8_t *dp
@@ -20,7 +20,6 @@ PUBLIC i2c_read_byte_get_callee
 .i2c_read_byte_get_callee
     pop af                              ;ret
     pop de                              ;length
-    pop hl                              ;*dp
     pop bc                              ;slave address
     ld b,e                              ;length
     pop de                              ;device

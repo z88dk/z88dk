@@ -29,23 +29,18 @@
 
     in0 a,(ITC)                 ;get INT/TRAP Control Register (ITC)
     and ~ITC_ITE1               ;mask out INT1
-    jr i2c_int_dis1
+    out0 (ITC),a                ;disable external interrupt
+    ret
 
 .i2c_int_dis2
     in0 a,(ITC)                 ;get INT/TRAP Control Register (ITC)
     and ~ITC_ITE2               ;mask out INT2
-
-.i2c_int_dis1
     out0 (ITC),a                ;disable external interrupt
     ret
 
+    EXTERN asm_i2c1_need
+    EXTERN asm_i2c2_need
 
-    EXTERN asm_i2c1_needRx, asm_i2c1_needTx
-    EXTERN asm_i2c2_needRx, asm_i2c2_needTx
-
-    DEFC NEEDRX1 = asm_i2c1_needRx
-    DEFC NEEDTX1 = asm_i2c1_needTx
-
-    DEFC NEEDRX2 = asm_i2c2_needRx
-    DEFC NEEDTX2 = asm_i2c2_needTx
+    DEFC NEED1 = asm_i2c1_need
+    DEFC NEED2 = asm_i2c2_need
 

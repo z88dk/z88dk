@@ -17,12 +17,13 @@
 
     PUBLIC asm_i2c2_read_byte_set
 
-    EXTERN __i2c2RxOutPtr, __i2c2RxBufUsed
+    EXTERN __i2c2RxPtr
     EXTERN __i2c2ControlEcho, __i2c2SlaveAddr, __i2c2SentenceLgth
 
 ;   Read from the I2C Interface, using Byte Mode transmission
-;   int i2c_read_byte_mode( char addr, char *dp, char length );
+;   uint8_t i2c_read_byte_set( char addr, char *dp, char length );
 ;   parameters passed in registers
+;   HL = pointer to receive buffer, uint8_t *dp
 ;   B  = length of data sentence expected, uint8_t _i2c2SentenceLgth
 ;   C  = address of slave device, uint8_t _i2c2SlaveAddr, Bit 0:[R=1,W=0]
 
@@ -35,14 +36,16 @@
     ret Z                       ;return if the I2C interface is busy
 
     ld a,b                      ;check the sentence expected for zero
-    and a
+    or a
     ret Z                       ;return if the sentence is 0 length
 
-    ld (__i2c2SentenceLgth),a   ;store the sentence length 
+    ld (__i2c2SentenceLgth),a   ;store the sentence length
 
     ld a,c                      ;store the slave address
     set 0,a                     ;ensure we're reading Bit 0:[R=1]
     ld (__i2c2SlaveAddr),a
+
+    ld (__i2c2RxPtr),hl         ;store the buffer pointer
 
     ld a,__IO_I2C_CON_ENSIO
     ld (__i2c2ControlEcho),a    ;store enabled in the control echo    

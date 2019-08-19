@@ -15,29 +15,28 @@
 
     SECTION code_driver
 
-    PUBLIC _i2c1_byte_master_isr
+    PUBLIC _i2c2_byte_isr
 
-    EXTERN __i2c1RxInPtr, __i2c1RxBufUsed
-    EXTERN __i2c1TxOutPtr, __i2c1TxBufUsed
-    EXTERN __i2c1ControlEcho, __i2c1SlaveAddr, __i2c1SentenceLgth
+    EXTERN __i2c2RxPtr, __i2c2TxPtr
+    EXTERN __i2c2ControlEcho, __i2c2SlaveAddr, __i2c2SentenceLgth
 
     EXTERN asm_i2c_reset
 
-._i2c1_byte_master_isr
+._i2c2_byte_isr
     push af
     push bc
     push hl
     
-    ld bc,__IO_I2C1_PORT_BASE|__IO_I2C_PORT_STA
+    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_STA
     in a,(c)                            ;get the status from status register for switch
-    srl a                               ;shift right to make word offset case addresses
-    srl a
-    res 0,a                             ;reset low bit to ensure word addresses
-    ld bc,i2c_int_switch_table
+    rrca                                ;rotate right to make word offset case addresses
+    rrca
+    and a,$3E                           ;reset low bit to ensure word addresses, clear upper 2 bits
+    ld bc,i2c2_int_switch_table
     ld l,a                              ;create the address for the switch
     ld h,0
     add hl,bc
-    ld bc,i2c1_byte_master_end
+    ld bc,i2c2_byte_end
     push bc                             ;prepare a return address for the switch
 
     ld a,(hl)                           ;load the address for our switch case
@@ -46,123 +45,118 @@
     ld l,a
     jp (hl)                             ;make the switch
 
-.i2c1_byte_master_end
+.i2c2_byte_end
     pop hl                              ;return here to clean up afterwards
     pop bc
     pop af
-    ret
+    ei
+    reti
 
 ;---------------------------------------
 
 ._MASTER_START_TX
 ._MASTER_RESTART_TX
-    ld a,(__i2c1SlaveAddr)              ;get address of slave we're writing, Bit 0:[R=1,W=0]
-    ld bc,__IO_I2C1_PORT_BASE|__IO_I2C_PORT_DAT
+    ld a,(__i2c2SlaveAddr)              ;get address of slave we're writing, Bit 0:[R=1,W=0]
+    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_DAT
     out (c),a
 
     ld a,__IO_I2C_CON_ENSIO             ;clear the interrupt & continue
-    ld bc,__IO_I2C1_PORT_BASE|__IO_I2C_PORT_CON
+    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_CON
     out (c),a
     ret
 
 ;---------------------------------------
 
 ._MASTER_DATA_W_ACK                     ;data transmitted
-    ld hl,__i2c1SentenceLgth            ;decrement the remaining sentence length
+    ld hl,__i2c2SentenceLgth            ;decrement the remaining sentence length
     dec (hl)
 
 ._MASTER_SLA_W_ACK                      ;SLA+W transmitted
-    ld a,(__i2c1SentenceLgth)
+    ld a,(__i2c2SentenceLgth)
     or a
     jr NZ,_MASTER_SLA_W_ACK2
 
     ld a,__IO_I2C_CON_ECHO_BUS_STOPPED  ;sentence complete, we're done    
-    ld (__i2c1ControlEcho),a
+    ld (__i2c2ControlEcho),a
 
     ld a,__IO_I2C_CON_ENSIO|__IO_I2C_CON_STO    ;set the interface to STOP
-    ld bc,__IO_I2C1_PORT_BASE|__IO_I2C_PORT_CON   
+    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_CON   
     out (c),a
     ret
 
 ._MASTER_SLA_W_ACK2
-    ld hl,(__i2c1TxOutPtr)              ;get the address to where we pop 
+    ld hl,(__i2c2TxPtr)                 ;get the address to where we pop 
     ld a,(hl)
-    inc l                               ;move the Tx pointer low byte along
-    ld (__i2c1TxOutPtr),hl
+    inc hl                              ;move the Tx pointer along
+    ld (__i2c2TxPtr),hl
 
-    ld hl,__i2c1TxBufUsed               ;atomically decrement the Tx buffer count
-    dec (hl)
-
-    ld bc,__IO_I2C1_PORT_BASE|__IO_I2C_PORT_DAT
+    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_DAT
     out (c),a                           ;write the byte
 
     ld a,__IO_I2C_CON_ENSIO             ;clear the interrupt & continue
-    ld bc,__IO_I2C1_PORT_BASE|__IO_I2C_PORT_CON
+    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_CON
     out (c),a
     ret
 
 ._MASTER_SLA_W_NAK
 ._MASTER_DATA_W_NAK
     ld a,__IO_I2C_CON_ECHO_BUS_STOPPED  ;sentence complete, we're done    
-    ld (__i2c1ControlEcho),a
+    ld (__i2c2ControlEcho),a
 
     ld a,__IO_I2C_CON_ENSIO|__IO_I2C_CON_STO    ;set the interface to STOP
-    ld bc,__IO_I2C1_PORT_BASE|__IO_I2C_PORT_CON
+    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_CON
     out (c),a
     ret
 
 ;---------------------------------------
 
 ._MASTER_DATA_R_NAK                     ;last byte we're receiving 
-                                        ;__i2c1SentenceLgth should be 1
+                                        ;__i2c2SentenceLgth should be 1
 ._MASTER_DATA_R_ACK                     ;data received
-    ld bc,__IO_I2C1_PORT_BASE|__IO_I2C_PORT_DAT
+    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_DAT
     in a,(c)                            ;get the byte
 
-    ld hl,(__i2c1RxInPtr)               ;get the address to where we poke                
-    ld (hl),a                           ;write the Rx byte to the __i2c1RxInPtr target
-    inc l                               ;move the Rx pointer low byte along
-    ld (__i2c1RxInPtr),hl               ;write where the next byte should be poked
+    ld hl,(__i2c2RxPtr)                 ;get the address to where we poke                
+    ld (hl),a                           ;write the Rx byte to the __i2c2RxPtr target
+    inc hl                              ;move the Rx pointer along
+    ld (__i2c2RxPtr),hl                 ;write where the next byte should be poked
 
-    ld hl,__i2c1RxBufUsed
-    inc (hl)                            ;atomically increment Rx buffer count
-
-    ld hl,__i2c1SentenceLgth            ;decrement the remaining sentence length
+    ld hl,__i2c2SentenceLgth            ;decrement the remaining sentence length
     dec (hl)
 
 ._MASTER_SLA_R_ACK                      ;SLA+R transmitted
-    ld a,(__i2c1SentenceLgth)
+    ld a,(__i2c2SentenceLgth)
     cp 1                                ;is there 1 byte to receive?
     jr Z,_MASTER_SLA_R_ACK2
     or a                                ;is there 0 byte to receive?
     jr Z,_MASTER_SLA_R_ACK3 
                                         ;so there are multiple bytes to receive
     ld a,__IO_I2C_CON_AA|__IO_I2C_CON_ENSIO ;clear the interrupt & ACK                                      
-    ld bc,__IO_I2C1_PORT_BASE|__IO_I2C_PORT_CON
+    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_CON
     out (c),a
     ret
 
 ._MASTER_SLA_R_ACK2
     ld a,__IO_I2C_CON_ENSIO             ;clear the interrupt & NAK
-    ld bc,__IO_I2C1_PORT_BASE|__IO_I2C_PORT_CON
+    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_CON
     out (c),a
     ret
 
 ._MASTER_SLA_R_ACK3
     ld a,__IO_I2C_CON_ECHO_BUS_STOPPED  ;sentence complete, we're done    
-    ld (__i2c1ControlEcho),a
+    ld (__i2c2ControlEcho),a
 
     ld a,__IO_I2C_CON_ENSIO|__IO_I2C_CON_STO    ;set the interface to STOP
-    ld bc,__IO_I2C1_PORT_BASE|__IO_I2C_PORT_CON
+    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_CON
     out (c),a
     ret
 
 ._MASTER_SLA_R_NAK
     ld a,__IO_I2C_CON_ECHO_BUS_STOPPED  ;sentence complete, we're done    
-    ld (__i2c1ControlEcho),a
+    ld (__i2c2ControlEcho),a
 
     ld a,__IO_I2C_CON_ENSIO|__IO_I2C_CON_STO    ;set the interface to STOP
-    ld bc,__IO_I2C1_PORT_BASE|__IO_I2C_PORT_CON   
+    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_CON   
     out (c),a
     ret
 
@@ -183,7 +177,7 @@
 ._SLAVE_GC_RX_NAK
 ._ILGL_ICOUNT
     ld a,__IO_I2C_CON_ECHO_BUS_ILLEGAL  ;unexpected bus status or error    
-    ld (__i2c1ControlEcho),a
+    ld (__i2c2ControlEcho),a
     ret
 
 ._ILGL_START_STOP
@@ -193,14 +187,14 @@
 ._UNUSED_0x98
 ._UNUSED_0xF0
     ld a,__IO_I2C_CON_ECHO_BUS_RESTART  ;unexpected bus status or error    
-    ld (__i2c1ControlEcho),a
-    ld a,__IO_I2C1_PORT_MSB
+    ld (__i2c2ControlEcho),a
+    ld a,__IO_I2C2_PORT_MSB
     jp asm_i2c_reset
 
 
     SECTION rodata_driver
 
-.i2c_int_switch_table
+.i2c2_int_switch_table
     DEFW _ILGL_START_STOP
     DEFW _MASTER_START_TX
     DEFW _MASTER_RESTART_TX

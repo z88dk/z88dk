@@ -17,13 +17,11 @@
 
     PUBLIC asm_i2c1_write_byte
 
-    EXTERN __i2c1TxInPtr, __i2c1TxBufUsed
+    EXTERN __i2c1TxPtr
     EXTERN __i2c1ControlEcho, __i2c1SlaveAddr, __i2c1SentenceLgth
 
-    EXTERN pca9665_write_direct
-
 ;   Write to the I2C Interface, using Byte Mode transmission
-;   int i2c_write_byte_mode( char addr, char *dp, char length );
+;   uint8_t i2c_write_byte( char addr, char *dp, char length );
 ;   parameters passed in registers
 ;   HL = pointer to data to transmit, uint8_t *dp
 ;   B  = length of data sentence, uint8_t _i2c1SentenceLgth
@@ -37,34 +35,17 @@
     and __IO_I2C_CON_ECHO_BUS_STOPPED
     ret Z                       ;return if the I2C interface is busy
 
-    ld a,b                      ;check the sentence provided for zero length
-    and a
+    ld a,b
+    or a                        ;check the sentence provided for zero length
     ret Z                       ;return if the sentence is 0 length
 
-    ld a,(__i2c1TxBufUsed)      ;check our ring buffer fullness
-    add a,b
-    ret C                       ;ring buffer would overflow, return
-    ld (__i2c1TxBufUsed),a      ;store the new buffer fullness
-
-    ld a,b                      ;store the sentence length 
-    ld (__i2c1SentenceLgth),a  
+    ld (__i2c1SentenceLgth),a   ;store the sentence length
 
     ld a,c                      ;store the slave address
     res 0,a                     ;ensure we're writing Bit 0:[W=0]
     ld (__i2c1SlaveAddr),a
 
-    push de
-    ex de,hl                    ;move the data pointer to de
-    ld hl,(__i2c1TxInPtr)       ;get the ring buffer pointer address
-.i2c1_write_byte2
-    ld a,(de)                   ;copy input sentence
-    ld (hl),a                   ;to the ring buffer
-    inc de                      ;increment the input pointer
-    inc l                       ;increment low byte of ring buffer
-    djnz i2c1_write_byte2       ;repeat for the length of sentence
-
-    ld (__i2c1TxInPtr),hl       ;store the final ring buffer pointer
-    pop de
+    ld (__i2c1TxPtr),hl         ;store the buffer pointer
 
     ld a,__IO_I2C_CON_ENSIO
     ld (__i2c1ControlEcho),a    ;store enabled in the control echo

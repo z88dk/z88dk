@@ -12,8 +12,8 @@ define(`__IO_I2C_TX_SIZE', 256)         # Size of the Tx Buffer, 256 Bytes
 
 # PCA9665 I2C I/O Register addressing
 
-define(`__IO_I2C1_PORT_BASE', 0x`'eval(__IO_PCA9665_1_PORT_BASE&0xE000,16))         # distinguish the device address, with MSB
-define(`__IO_I2C2_PORT_BASE', 0x`'eval(__IO_PCA9665_2_PORT_BASE&0xE000,16))         # yaz180 - only 3 MSB bits are H/W decoded 0xE000
+define(`__IO_I2C1_PORT_BASE', __IO_PCA9665_1_PORT_BASE) # distinguish the device address
+define(`__IO_I2C2_PORT_BASE', __IO_PCA9665_2_PORT_BASE) # yaz180 - only 3 MSB bits are H/W decoded 0xE000
 
 # PCA9665 I2C I/O Register MSB addressing
 

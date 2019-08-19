@@ -29,46 +29,42 @@
 // Functions
 
 // Interrupt routines for the I2C interfaces: Byte Mode
-extern void i2c1_byte_master_isr(void);
-extern void i2c2_byte_master_isr(void);
-extern void i2c1_byte_slave_isr(void);      // TODO
-extern void i2c2_byte_slave_isr(void);      // TODO
+extern void i2c1_byte_isr(void);
+extern void i2c2_byte_isr(void);
 
 // Interrupt routines for the I2C interfaces: Buffer Mode
-extern void i2c1_buffer_master_isr(void);   // TODO
-extern void i2c2_buffer_master_isr(void);   // TODO
-extern void i2c1_buffer_slave_isr(void);    // TODO
-extern void i2c2_buffer_slave_isr(void);    // TODO
+extern void i2c1_buffer_isr(void);   // TODO
+extern void i2c2_buffer_isr(void);   // TODO
 
-// uint8_t i2c_reset( uint8_t device ) __z88dk_fastcall
+// void i2c_reset( uint8_t device ) __z88dk_fastcall
 extern void i2c_reset(uint8_t device) __preserves_regs(d,e,h,l,iyh,iyl);
 extern void i2c_reset_fastcall(uint8_t device) __preserves_regs(d,e,h,l,iyh,iyl) __z88dk_fastcall;
 #define i2c_reset(a) i2c_reset_fastcall(a)
 
 
 
-// uint8_t i2c_initialise( uint8_t device ) __z88dk_fastcall
+// void i2c_initialise( uint8_t device ) __z88dk_fastcall
 extern void i2c_initialise(uint8_t device) __preserves_regs(d,e,h,l,iyh,iyl);
 extern void i2c_initialise_fastcall(uint8_t device) __preserves_regs(d,e,h,l,iyh,iyl) __z88dk_fastcall;
 #define i2c_initialise(a) i2c_initialise_fastcall(a)
 
 
 
-// uint8_t i2c_interrupt_enable( uint8_t device ) __z88dk_fastcall
+// void i2c_interrupt_enable( uint8_t device ) __z88dk_fastcall
 extern void i2c_interrupt_enable(uint8_t device) __preserves_regs(b,c,d,e,h,l,iyh,iyl);
 extern void i2c_interrupt_enable_fastcall(uint8_t device) __preserves_regs(b,c,d,e,h,l,iyh,iyl) __z88dk_fastcall;
 #define i2c_interrupt_enable(a) i2c_interrupt_enable_fastcall(a)
 
 
 
-// uint8_t i2c_interrupt_disable( uint8_t device ) __z88dk_fastcall
+// void i2c_interrupt_disable( uint8_t device ) __z88dk_fastcall
 extern void i2c_interrupt_disable(uint8_t device) __preserves_regs(b,c,d,e,h,l,iyh,iyl);
 extern void i2c_interrupt_disable_fastcall(uint8_t device) __preserves_regs(b,c,d,e,h,l,iyh,iyl) __z88dk_fastcall;
 #define i2c_interrupt_disable(a) i2c_interrupt_disable_fastcall(a)
 
 
 
-// uint8_t i2c_interrupt_attach( uint8_t device, void *isr ) __z88dk_callee
+// void i2c_interrupt_attach( uint8_t device, void *isr ) __z88dk_callee
 extern void i2c_interrupt_attach(uint8_t device,void *isr) __preserves_regs(b,c,d,e,iyh,iyl);
 extern void i2c_interrupt_attach_callee(uint8_t device,void *isr) __preserves_regs(b,c,d,e,iyh,iyl) __z88dk_callee;
 #define i2c_interrupt_attach(a,b) i2c_interrupt_attach_callee(a,b)
@@ -82,17 +78,17 @@ extern void i2c_write_byte_callee(uint8_t device,uint8_t addr,uint8_t *dp,uint8_
 
 
 
-// uint8_t i2c_read_byte_set( uint8_t device, uint8_t addr, uint8_t length );
-extern void i2c_read_byte_set(uint8_t device,uint8_t addr,uint8_t length) __preserves_regs(iyh,iyl);
-extern void i2c_read_byte_set_callee(uint8_t device,uint8_t addr,uint8_t length) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define i2c_read_byte_set(a,b,c) i2c_read_byte_set_callee(a,b,c)
+// uint8_t i2c_read_byte_set( uint8_t device, uint8_t addr, uint8_t *dp, uint8_t length );
+extern void i2c_read_byte_set(uint8_t device,uint8_t addr,uint8_t *dp,uint8_t length) __preserves_regs(iyh,iyl);
+extern void i2c_read_byte_set_callee(uint8_t device,uint8_t addr,uint8_t *dp,uint8_t length) __preserves_regs(iyh,iyl) __z88dk_callee;
+#define i2c_read_byte_set(a,b,c,d) i2c_read_byte_set_callee(a,b,c,d)
 
 
 
-// uint8_t i2c_read_byte_get( uint8_t device, uint8_t addr, uint8_t *dp, uint8_t length );
-extern void i2c_read_byte_get(uint8_t device,uint8_t addr,uint8_t *dp,uint8_t length) __preserves_regs(iyh,iyl);
-extern void i2c_read_byte_get_callee(uint8_t device,uint8_t addr,uint8_t *dp,uint8_t length) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define i2c_read_byte_get(a,b,c,d) i2c_read_byte_get_callee(a,b,c,d)
+// uint8_t i2c_read_byte_get( uint8_t device, uint8_t addr, uint8_t length );
+extern void i2c_read_byte_get(uint8_t device,uint8_t addr,uint8_t length) __preserves_regs(iyh,iyl);
+extern void i2c_read_byte_get_callee(uint8_t device,uint8_t addr,uint8_t length) __preserves_regs(iyh,iyl) __z88dk_callee;
+#define i2c_read_byte_get(a,b,c) i2c_read_byte_get_callee(a,b,c)
 
 
 
