@@ -18,9 +18,9 @@ PUBLIC _i2c_read_byte_get_callee
 
 ._i2c_read_byte_get_callee
     pop af                              ;ret
-    pop de                              ;slave addr,device address
+    pop de                              ;slave addr,device address in D,E
     dec sp    
-    pop bc                              ;length
+    pop bc                              ;length in B
     push af                             ;ret
 
     ld c,d                              ;slave addr
@@ -29,6 +29,6 @@ PUBLIC _i2c_read_byte_get_callee
     jp Z,asm_i2c2_read_byte_get
     cp __IO_I2C1_PORT_MSB
     jp Z,asm_i2c1_read_byte_get
-    xor a
+    ld l,b                              ;return length in L
     ret                                 ;no device address match, so exit
 

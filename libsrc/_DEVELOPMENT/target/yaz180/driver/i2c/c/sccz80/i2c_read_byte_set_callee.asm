@@ -31,6 +31,5 @@ PUBLIC i2c_read_byte_set_callee
     jp Z,asm_i2c2_read_byte_set
     cp __IO_I2C1_PORT_MSB
     jp Z,asm_i2c1_read_byte_set
-    xor a
     ret                                 ;no device address match, so exit
 

@@ -9,7 +9,7 @@ PUBLIC _i2c_write_byte_callee
 ;------------------------------------------------------------------------------
 ;   Write to the I2C Interface, using Byte Mode transmission
 ;
-;   uint8_t i2c_write_byte( uint8_t device, uint8_t addr, uint8_t *dp, uint8_t length );
+;   void i2c_write_byte( uint8_t device, uint8_t addr, uint8_t *dp, uint8_t length );
 ;
 ;   parameters passed in registers to asm functions
 ;   HL = pointer to data to transmit, uint8_t *dp
@@ -31,6 +31,5 @@ PUBLIC _i2c_write_byte_callee
     jp Z,asm_i2c2_write_byte
     cp __IO_I2C1_PORT_MSB
     jp Z,asm_i2c1_write_byte
-    xor a
     ret                                 ;no device address match, so exit
 

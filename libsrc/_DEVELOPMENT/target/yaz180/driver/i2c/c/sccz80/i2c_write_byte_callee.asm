@@ -31,6 +31,5 @@ PUBLIC i2c_write_byte_callee
     jp Z,asm_i2c2_write_byte
     cp __IO_I2C1_PORT_MSB
     jp Z,asm_i2c1_write_byte
-    xor a
     ret                                 ;no device address match, so exit
 

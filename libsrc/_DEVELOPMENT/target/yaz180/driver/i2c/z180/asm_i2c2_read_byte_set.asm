@@ -21,7 +21,7 @@
     EXTERN __i2c2ControlEcho, __i2c2SlaveAddr, __i2c2SentenceLgth
 
 ;   Read from the I2C Interface, using Byte Mode transmission
-;   uint8_t i2c_read_byte_set( char addr, char *dp, char length );
+;   void i2c_read_byte_set( char addr, char *dp, char length );
 ;   parameters passed in registers
 ;   HL = pointer to receive buffer, uint8_t *dp
 ;   B  = length of data sentence expected, uint8_t _i2c2SentenceLgth

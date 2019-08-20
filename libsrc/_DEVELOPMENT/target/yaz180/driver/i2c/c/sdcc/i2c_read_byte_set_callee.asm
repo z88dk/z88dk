@@ -9,7 +9,7 @@ PUBLIC _i2c_read_byte_set_callee
 ;------------------------------------------------------------------------------
 ;   Read from the I2C Interface, using Byte Mode transmission
 ;
-;   uint8_t i2c_read_byte_set( uint8_t device, uint8_t addr, uint8_t *dp, uint8_t length );
+;   void i2c_read_byte_set( uint8_t device, uint8_t addr, uint8_t *dp, uint8_t length );
 ;
 ;   parameters passed in registers
 ;   HL = pointer to location to store data, uint8_t *dp
@@ -30,6 +30,5 @@ PUBLIC _i2c_read_byte_set_callee
     jp Z,asm_i2c2_read_byte_set
     cp __IO_I2C1_PORT_MSB
     jp Z,asm_i2c1_read_byte_set
-    xor a
     ret                                 ;no device address match, so exit
 

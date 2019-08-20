@@ -21,7 +21,7 @@
     EXTERN __i2c2ControlEcho, __i2c2SlaveAddr, __i2c2SentenceLgth
 
 ;   Write to the I2C Interface, using Byte Mode transmission
-;   uint8_t i2c_write_byte( char addr, char *dp, char length );
+;   void i2c_write_byte( char addr, char *dp, char length );
 ;   parameters passed in registers
 ;   HL = pointer to data to transmit, uint8_t *dp
 ;   B  = length of data sentence, uint8_t _i2c2SentenceLgth

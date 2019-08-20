@@ -61,18 +61,18 @@ extern void i2c_interrupt_attach(uint8_t device,void *isr);
 
 
 
-// uint8_t i2c_write_byte( uint8_t device, uint8_t addr, uint8_t *dp, uint8_t length );
+// void i2c_write_byte( uint8_t device, uint8_t addr, uint8_t *dp, uint8_t length );
 extern void i2c_write_byte(uint8_t device,uint8_t addr,uint8_t *dp,uint8_t length);
 
 
 
-// uint8_t i2c_read_byte_set( uint8_t device, uint8_t addr, uint8_t *dp, uint8_t length );
+// void i2c_read_byte_set( uint8_t device, uint8_t addr, uint8_t *dp, uint8_t length );
 extern void i2c_read_byte_set(uint8_t device,uint8_t addr,uint8_t *dp,uint8_t length);
 
 
 
 // uint8_t i2c_read_byte_get( uint8_t device, uint8_t addr, uint8_t length );
-extern void i2c_read_byte_get(uint8_t device,uint8_t addr,uint8_t length);
+extern uint8_t i2c_read_byte_get(uint8_t device,uint8_t addr,uint8_t length);
 
 
 
