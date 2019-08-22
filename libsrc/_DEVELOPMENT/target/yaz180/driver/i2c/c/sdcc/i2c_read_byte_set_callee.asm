@@ -21,10 +21,11 @@ PUBLIC _i2c_read_byte_set_callee
     pop af                              ;ret
     pop de                              ;slave addr,device address
     pop hl                              ;*dp
+    dec sp   
     pop bc                              ;length
-    inc sp
     push af                             ;ret
 
+    ld c,d                              ;slave address
     ld a,e                              ;device address
     cp __IO_I2C2_PORT_MSB
     jp Z,asm_i2c2_read_byte_set

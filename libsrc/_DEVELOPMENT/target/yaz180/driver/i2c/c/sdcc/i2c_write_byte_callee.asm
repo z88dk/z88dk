@@ -21,8 +21,8 @@ PUBLIC _i2c_write_byte_callee
     pop af                              ;ret
     pop de                              ;slave addr,device address
     pop hl                              ;*dp
+    dec sp
     pop bc                              ;length
-    inc sp
     push af                             ;ret
 
     ld c,d                              ;slave address

@@ -13,14 +13,11 @@
 
     SECTION bss_driver
 
-    PUBLIC __i2c2RxInPtr, __i2c2RxOutPtr
-    PUBLIC __i2c2TxInPtr, __i2c2TxOutPtr
+    PUBLIC __i2c2RxPtr, __i2c2TxPtr
     PUBLIC __i2c2ControlEcho, __i2c2SlaveAddr, __i2c2SentenceLgth
 
-    __i2c2RxInPtr:      DEFW    0
-    __i2c2RxOutPtr:     DEFW    0
-    __i2c2TxInPtr:      DEFW    0
-    __i2c2TxOutPtr:     DEFW    0
+    __i2c2RxPtr:        DEFW    0
+    __i2c2TxPtr:        DEFW    0
 
     __i2c2ControlEcho:  DEFB    0
     __i2c2SlaveAddr:    DEFB    0
