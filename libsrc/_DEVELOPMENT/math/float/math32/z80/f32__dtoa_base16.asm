@@ -4,7 +4,7 @@ SECTION code_fp_math32
 
 PUBLIC m32__dtoa_base16
 
-m32__dtoa_base16:
+.m32__dtoa_base16
 
     ; enter : DEHL'= float x, x positive
     ;
@@ -23,7 +23,7 @@ m32__dtoa_base16:
     ld a,d
 
     scf
-    srl e
+    rr e
 
     push de                     ; push mantissa onto the stack
     push hl

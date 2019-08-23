@@ -6,7 +6,7 @@ EXTERN m32_float8, _m32_exp10f, m32_fsmul_callee
 
 PUBLIC m32__dtoa_base10
 
-m32__dtoa_base10:
+.m32__dtoa_base10
 
     ; convert float from standard form "a * 2^n"
     ; to a form multiplied by power of 10 "b * 10^e"
@@ -28,7 +28,6 @@ m32__dtoa_base10:
     exx
     sla e                       ; move mantissa to capture exponent
     rl d
-    xor a                       ; set sign in C positive
     ld a,d                      ; get exponent in a
     rr d
     rr e                        ; |x|
@@ -36,7 +35,7 @@ m32__dtoa_base10:
     exx                         ;  EHL'= x mantissa bits
                                 ;  A = n (binary exponent)
 
-    sub $7f                     ; subtract bias
+    sub $7e                     ; subtract (bias - 1)
     ld l,a
     sbc a,a
     ld h,a                      ; hl = signed n
@@ -55,16 +54,11 @@ m32__dtoa_base10:
     pop bc
     add hl,bc
     pop bc
-    add hl,bc                  ; hl = 77*n
+    add hl,bc                   ; hl = 77*n
     ld bc,5
-    add hl,bc                  ; rounding fudge factor
+    add hl,bc                   ; rounding fudge factor
 
-    ld a,h                     ; a = INT((77*n+5)/256)
-    cp -39
-    jr nz, no_correction
-    inc a
-
-.no_correction
+    ld a,h                      ; a = INT((77*n+5)/256)
     push af                     ; save decimal exponent e
 
     neg                         ; negated exponent e

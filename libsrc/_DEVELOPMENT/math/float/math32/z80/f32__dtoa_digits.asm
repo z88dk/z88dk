@@ -4,7 +4,7 @@ SECTION code_fp_math32
 
 PUBLIC m32__dtoa_digits
 
-m32__dtoa_digits:
+.m32__dtoa_digits
 
     ; generate decimal digits into buffer, from up to 8 packed BCD digits
     ;

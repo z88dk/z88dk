@@ -23,7 +23,7 @@ PUBLIC m32_float32u
 
 EXTERN m32_fsnormalize
 
-; convert char in l to float in dehl
+; convert signed char in l to float in dehl
 .m32_float8
     ld a,l
     rla                         ; sign bit of a into C
