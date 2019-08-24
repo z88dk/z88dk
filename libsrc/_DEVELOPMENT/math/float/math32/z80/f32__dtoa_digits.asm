@@ -6,14 +6,14 @@ PUBLIC m32__dtoa_digits
 
 .m32__dtoa_digits
 
-    ; generate decimal digits into buffer, from up to 8 packed BCD digits
+    ; generate decimal digits into buffer
     ;
-    ; enter : EXX = mantissa bits, most sig four bits contain a BCD digit
+    ; enter : EXX = mantissa bits, most sig four bits contain decimal digit
     ;           B = number of digits to generate
     ;           C = remaining significant digits
     ;          HL = buffer * (address of next char to write)
     ;
-    ; exit  :   B = remaining number of BCD digits to generate
+    ; exit  :   B = remaining number of digits to generate
     ;           C = remaining number of significant digits
     ;          HL = buffer * (address of next char to write)
     ;
@@ -21,37 +21,53 @@ PUBLIC m32__dtoa_digits
     ;
     ; uses  : af, bc, hl, bc', de', hl'
 
+    ld a,c
+    or a
+    ret Z                       ; if no more significant digits
+
     exx
     ld a,d
     rra
     rra
     rra
     rra
-    and 0fh
+    and $0f
     add a,'0'                   ; a = decimal digit
 
     exx
     ld (hl),a                   ; write decimal digit
     inc hl
 
-    dec c
-    ret Z                       ; if no more significant digits
+    exx
+    ld a,d
+    and $0f
+    ld d,a
+                                ; 10*a = 2*(4*a + a)     
+    push de                     ; DEHL *= 10
+    push hl
+    sla l
+    rl h
+    rl e
+    rl d
+    sla l
+    rl h
+    rl e
+    rl d
+    ex de,hl
+    ex (sp),hl
+    add hl,de
+    pop de
+    ex (sp),hl
+    adc hl,de
+    ex de,hl
+    pop hl
+    sla l
+    rl h
+    rl e
+    rl d
 
     exx
-    add hl,hl                   ; shift one BCD digit
-    rl e
-    rl d
-    add hl,hl
-    rl e
-    rl d
-    add hl,hl
-    rl e
-    rl d
-    add hl,hl
-    rl e
-    rl d
-
-    exx  
+    dec c                       ; significant digits --
     djnz m32__dtoa_digits
 
     scf                         ; indicate all digits output

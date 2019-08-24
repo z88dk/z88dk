@@ -2,9 +2,9 @@
 SECTION code_clib
 SECTION code_fp_math32
 
-PUBLIC asm_dmul10a
+PUBLIC asm_dmul10u
 
-EXTERN m32_fsmul10a_fastcall
+EXTERN m32_fsmul10u_fastcall
 
    ; multiply DEHL' by 10 and make positive
    ; 
@@ -22,13 +22,13 @@ EXTERN m32_fsmul10a_fastcall
    ;
    ; uses  : af, af', bc', de', hl'
 
-.asm_dmul10a
+.asm_dmul10u
     push bc
     push de
     push hl
 
     exx
-    call m32_fsmul10a_fastcall
+    call m32_fsmul10u_fastcall
 
     exx
     pop hl

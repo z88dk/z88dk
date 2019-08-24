@@ -2,7 +2,7 @@
 SECTION code_clib
 SECTION code_fp_math32
 
-EXTERN m32_float8, _m32_exp10f, m32_fsmul_callee
+EXTERN m32_float8, _m32_exp10f, m32_fsmul_callee, m32_fsmul10u_fastcall
 
 PUBLIC m32__dtoa_base10
 
@@ -12,7 +12,7 @@ PUBLIC m32__dtoa_base10
     ; to a form multiplied by power of 10 "b * 10^e"
     ; where 1 <= b < 10 with b in double format
     ;
-    ; rewritten from math48 code and code by Alwin Henseler
+    ; rewritten from math48 code
     ;
     ; enter : DEHL'= double x, x positive
     ;
@@ -28,14 +28,15 @@ PUBLIC m32__dtoa_base10
     exx
     sla e                       ; move mantissa to capture exponent
     rl d
-    ld a,d                      ; get exponent in a
+    ld a,d                      ; get exponent in A
     rr d
-    rr e                        ; |x|
+    rr e
 
-    exx                         ;  EHL'= x mantissa bits
-                                ;  A = n (binary exponent)
+    exx
+    ; A = n (binary exponent)
+    ; DEHL'= x
 
-    sub $7e                     ; subtract (bias - 1)
+    sub $7e                     ; remove excess (bias-1)
     ld l,a
     sbc a,a
     ld h,a                      ; hl = signed n
@@ -50,115 +51,75 @@ PUBLIC m32__dtoa_base10
     add hl,hl
     add hl,hl
     add hl,hl                   ; hl = 64*n
-    add hl,bc
+    add hl,bc                   ; hl = 72*n
     pop bc
-    add hl,bc
+    add hl,bc                   ; hl = 76*n
     pop bc
     add hl,bc                   ; hl = 77*n
     ld bc,5
-    add hl,bc                   ; rounding fudge factor
+    add hl,bc                   ; rounding fudge factor +5
 
     ld a,h                      ; a = INT((77*n+5)/256)
-    push af                     ; save decimal exponent e
+    push af                     ; save exponent e
+    neg                         ; -e
 
-    neg                         ; negated exponent e
-    ld l,a
-    call m32_float8             ; convert l to float in dehl
+    exx
+    push de                     ; push x for fsmul
+    push hl 
+
+    ld l,a                      ; -e
+    call m32_float8             ; convert L to float in DEHL
     call _m32_exp10f            ; make 10^-e
-    push de
-    push hl
+    call m32_fsmul_callee       ; x *= 10^-e
 
+    ; DEHL = b
+
+    sla e                       ; move mantissa to capture exponent
+    rl d
+    ld a,d                      ; get exponent in A
+    rr d
+    rr e
+
+    cp $7e+1                    ; remaining fraction part < 1 ?
+    jr NC,aligned_digit         ; if no
+
+    pop af
+    dec a                       ; e--
+    push af
+                                ; DEHL = b
+    call m32_fsmul10u_fastcall  ; b *= 10
+
+.aligned_digit
+    ; DEHL = b, 1 < b < 10
+
+    ; there is one decimal digit in four bits of EHL
+    ; align these bits so they are the first four in register D
+
+    sla e                       ; move mantissa to capture exponent
+    rl d                        ; get exponent in D
+    scf                         ; restore mantissa bit
+    rr e
+
+    ld a,$7e+4
+    sub d
+
+    ld d,e                      ; move mantissa into DEH+L
+    ld e,h
+    ld h,l
+    ld l,0
+    jr Z,rotation_done          ; if exponent is 4
+
+.digit_loop
+    srl d                       ; shift mantissa bits right
+    rr e
+    rr h 
+    rr l
+    dec a
+    jr NZ,digit_loop
+
+.rotation_done
     exx
-    call m32_fsmul_callee       ; mantissa b = a * 2^n * 10^-e
-
-    set 7,e                     ; set implicit 1 for mantissa bits b in ehl
-
-    call bin2bcd
-
-    pop bc                      ; decimal exponent e in bc
-    ld c,7                      ; maximum sigificant digits
-
-    ld a,d                      ; check for a leading significant digit
-    and 0f0h
-    jr NZ,finish
-
-    add hl,hl                   ; shift left one BCD digit
-    rl e
-    rl d
-    add hl,hl
-    rl e
-    rl d
-    add hl,hl
-    rl e
-    rl d
-    add hl,hl
-    rl e
-    rl d
-
-    dec b                       ; reduce decimal exponent e
-    dec c                       ; reduce significant digits
-
-.finish
-    push bc
-
-    exx
-    pop de                      ; decimal exponent e in d
-    ld c,e                      ; significant digits in c
-    ret
-
-
-; Routine for converting a 24-bit binary number to decimal
-; In: E:HL = 24-bit binary number (0-16777215)
-; Out: DE:HL = 8 digit decimal form (packed BCD)
-; Changes: AF, BC, DE, HL
-;
-; by Alwin Henseler
-
-.bin2bcd
-    push iy                     ; preserve IY
-    ld c,e
-    push hl
-    pop iy                      ; input value in C:IY
-    ld hl,1
-    ld d,h
-    ld e,h                      ; start value corresponding with 1st 1-bit
-    ld b,24                     ; bitnr. being processed + 1
-
-.find1
-    add iy,iy
-    rl c                        ; shift bit 23-0 from C:IY into carry
-    jr C,nextbit
-    djnz find1                  ; find highest 1-bit
-
-; all bits 0:
-    res 0,l                     ; least significant bit not 1
-    pop iy                      ; restore IY
-    ret
-
-.dblloop
-    ld a,l
-    add a,a
-    daa
-    ld l,a
-    ld a,h
-    adc a,a
-    daa
-    ld h,a
-    ld a,e
-    adc a,a
-    daa
-    ld e,a
-    ld a,d
-    adc a,a
-    daa
-    ld d,a                      ; double the value found so far
-    add iy,iy
-    rl c                        ; shift next bit from C:IY into carry
-    jr NC,nextbit               ; bit = 0 -> don't add 1 to the number
-    set 0,l                     ; bit = 1 -> add 1 to the number
-.nextbit
-    djnz dblloop
-
-    pop iy                      ; restore IY
+    pop de                      ; e
+    ld c,7                      ; max significant digits
     ret
 

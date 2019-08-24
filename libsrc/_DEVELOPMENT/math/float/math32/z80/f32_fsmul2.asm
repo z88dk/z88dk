@@ -52,4 +52,4 @@ PUBLIC _m32_mul2f
     rr d                        ; restore the sign
     rr e
     scf
-    ret                         ; return IEEE signed ZERO in DEHL
+    ret                         ; return IEEE signed INFINITY in DEHL
