@@ -7,8 +7,8 @@ Where not written by me, the functions were sourced from:
 
   * the Digi International Rabbit IEEE-754 32-bit library, copyright (C) 2015 Digi International Inc.
   * the Hi-Tech C 32-bit floating point library, copyright (C) 1984-1987 HI-TECH SOFTWARE.
-  * the SDCC 32-bit floating point library, copyright (C) 1991 by Pipeline Associates, Inc, and others.
   * the Cephes Math Library Release 2.2, copyright (C) 1984, 1987, 1989 by Stephen L. Moshier.
+  * the SDCC 32-bit floating point library, copyright (C) 1991 by Pipeline Associates, Inc, and others.
   * various Wikipedia references, especially for Newton-Raphson and Horner's Method.
 
 This library is designed for z180, and z80n processors. Specifically, it is optimised for the z180 and [ZX Spectrum Next](https://www.specnext.com/) z80n as these processors have a hardware `16_8x8` multiply instruction that can substantially accelerate the floating point mantissa calculation.
@@ -283,7 +283,9 @@ Two N-R iterations produce 5 or 6 significant digits of accuracy. Greater accura
 
 For some functions it is easiest to work with IEEE floating point numbers in assembly. For these three functions simple assembly code produces the result required effectively.
 
-The sccz80 compiler has been upgraded to issue `ldexpf()` instructions where power of 2 multiplies (or divides) are required. This means that for example `X/2` is calculated as a decrement of the exponent byte rather than calculating a full divide, saving hundreds of cycles. For other compilers there are `mul2f()` and `div2f` functions available to handle simple power of two issues.
+The sccz80 compiler has been upgraded to issue `ldexpf()` instructions where power of 2 multiplies (or divides) are required. This means that for example `X/2` is calculated as a decrement of the exponent byte rather than calculating a full divide, saving hundreds of cycles.
+
+For sdcc and in assembly there are `mul2f()` and `div2f` functions available to handle simple power of two issues, as well as `ldexpf()`. Also, a `mul10u()` function provides a fast `y = 10 * |x|` result.
 
 #### polyf()
 
