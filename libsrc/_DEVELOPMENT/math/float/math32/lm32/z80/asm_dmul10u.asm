@@ -20,19 +20,12 @@ EXTERN m32_fsmul10u_fastcall
    ;            DEHL'= +inf
    ;            carry set, errno set
    ;
-   ; uses  : af, af', bc', de', hl'
+   ; uses  : af, bc', de', hl'
 
 .asm_dmul10u
-    push bc
-    push de
-    push hl
 
     exx
     call m32_fsmul10u_fastcall
 
     exx
-    pop hl
-    pop de
-    pop bc
     ret
-
