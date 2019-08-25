@@ -27,7 +27,7 @@
  *
  *   message         condition      value returned
  * exp10 underflow    x < -MAXL10F        0.0
- * exp10 overflow     x > MAXL10F       MAXNUM
+ * exp10 overflow     x >  MAXL10F      MAXNUM
  *
  * IEEE single arithmetic: MAXL10F = 38.230809449325611792.
  *
@@ -42,7 +42,7 @@ Direct inquiries to 30 Frost Street, Cambridge, MA 02140
 
 #include "m32_math.h"
 
-#define LOG210      ((float)+3.32192809488736234787E0)
+#define LOG210      ((float)+3.32192809488736234787E+0)
 #define LG102A      ((float)+3.00781250000000000000E-1)
 #define LG102B      ((float)+2.48745663981195213739E-4)
 
@@ -51,6 +51,7 @@ extern float m32_coeff_exp10f[];
 float m32_exp10f (float x) __z88dk_fastcall
 {
     float z;
+
 #if 0
     if( x > MAXL10F )
     {
@@ -62,6 +63,7 @@ float m32_exp10f (float x) __z88dk_fastcall
         return(0.0);
     }
 #endif
+
     /* Express 10**x = 10**g 2**n
      *   = 10**g 10**( n log10(2) )
      *   = 10**( g + n log10(2) )
@@ -70,12 +72,6 @@ float m32_exp10f (float x) __z88dk_fastcall
 
     x -= z * LG102A;
     x -= z * LG102B;  
-
-    /* rational approximation for exponential
-     * of the fractional part:
-     * 10**x - 1  =  2x P(x**2)/( Q(x**2) - P(x**2) )
-     * multiply by power of 2 
-     */
 
     return m32_ldexpf( m32_polyf(x, m32_coeff_exp10f, 5) * x + 1.0, (int16_t)z);
 }

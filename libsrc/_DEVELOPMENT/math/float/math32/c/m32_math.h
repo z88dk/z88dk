@@ -68,7 +68,7 @@
 #define MINL2F          ((float)-126.0)
 #define MAXLOGF         ((float)+88.722839052)
 #define MINLOGF         ((float)−87.336544751)
-#define MAXL10F         ((float)+38.531839419)
+#define MAXL10F         ((float)+38.230809449)
 #define MINL10F         ((float)−37.929779454)
 
 union float_long
