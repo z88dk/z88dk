@@ -22,9 +22,8 @@ cm32_sccz80_dloadb:
     dec hl
     ld b,(hl)
     dec hl
-    ld c,(hl)
+    ld l,(hl)
     ld h,b
-    ld c,l
 
     exx
     ret
