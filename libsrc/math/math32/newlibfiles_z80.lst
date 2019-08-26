@@ -48,7 +48,6 @@
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sdcc/___fs2uchar.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sdcc/___fssub_callee.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sdcc/___fsdiv.asm
-../../_DEVELOPMENT/math/float/math32/lm32/c/sdcc/___fsdiv2.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sdcc/___fs2ulong.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sdcc/___schar2fs.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sdcc/___ulong2fs.asm
@@ -76,8 +75,6 @@
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sdcc/___fs2schar.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sdcc/___fsneq_callee.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sdcc/___fsmul.asm
-../../_DEVELOPMENT/math/float/math32/lm32/c/sdcc/___fsmul2.asm
-../../_DEVELOPMENT/math/float/math32/lm32/c/sdcc/___fsmul10u.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sdcc/___fs2uint.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sdcc/___sint2fs.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sdcc/___fsmul_callee.asm
