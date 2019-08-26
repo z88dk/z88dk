@@ -302,6 +302,29 @@ extern int isunordered(double_t x,double_t y);
 
 
 
+#ifdef __MATH_MATH32
+
+extern double_t inv(double_t x);
+
+
+extern double_t invsqrt(double_t x);
+
+
+extern double_t div2(double_t x);
+
+
+extern double_t mul2(double_t x);
+
+
+extern double_t mul10u(double_t x);
+
+
+extern double_t exp10(double_t x);
+
+
+
+#endif
+
 // NO DISTINCTION BETWEEN FLOAT AND DOUBLE
 
 #define acosf        acos

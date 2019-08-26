@@ -424,6 +424,41 @@ extern int isunordered_callee(double_t x,double_t y) __z88dk_callee;
 
 
 
+#ifdef __MATH_MATH32
+
+extern double_t inv(double_t x);
+extern double_t inv_fastcall(double_t x) __z88dk_fastcall;
+#define inv(a) inv_fastcall(a)
+
+
+extern double_t invsqrt(double_t x);
+extern double_t invsqrt_fastcall(double_t x) __z88dk_fastcall;
+#define invsqrt(a) invsqrt_fastcall(a)
+
+
+extern double_t div2(double_t x);
+extern double_t div2_fastcall(double_t x) __z88dk_fastcall;
+#define div2(a) div2_fastcall(a)
+
+
+extern double_t mul2(double_t x);
+extern double_t mul2_fastcall(double_t x) __z88dk_fastcall;
+#define mul2(a) mul2_fastcall(a)
+
+
+extern double_t mul10u(double_t x);
+extern double_t mul10u_fastcall(double_t x) __z88dk_fastcall;
+#define mul10u(a) mul10u_fastcall(a)
+
+
+extern double_t exp10(double_t x);
+extern double_t exp10_fastcall(double_t x) __z88dk_fastcall;
+#define exp10(a) exp10_fastcall(a)
+
+
+
+#endif
+
 // NO DISTINCTION BETWEEN FLOAT AND DOUBLE
 
 #define acosf        acos

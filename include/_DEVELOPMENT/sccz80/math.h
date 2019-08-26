@@ -350,6 +350,29 @@ extern int __LIB__ isunordered_callee(double_t x,double_t y) __smallc __z88dk_ca
 
 
 
+#ifdef __MATH_MATH32
+
+extern double_t __LIB__ inv(double_t x) __smallc __z88dk_fastcall;
+
+
+extern double_t __LIB__ invsqrt(double_t x) __smallc __z88dk_fastcall;
+
+
+extern double_t __LIB__ div2(double_t x) __smallc __z88dk_fastcall;
+
+
+extern double_t __LIB__ mul2(double_t x) __smallc __z88dk_fastcall;
+
+
+extern double_t __LIB__ mul10u(double_t x) __smallc __z88dk_fastcall;
+
+
+extern double_t __LIB__ exp10(double_t x) __smallc __z88dk_fastcall;
+
+
+
+#endif
+
 // NO DISTINCTION BETWEEN FLOAT AND DOUBLE
 
 #define acosf        acos

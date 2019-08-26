@@ -178,6 +178,17 @@ __DPROTO(,,int,,islessequal,double_t x,double_t y)
 __DPROTO(,,int,,islessgreater,double_t x,double_t y)
 __DPROTO(,,int,,isunordered,double_t x,double_t y)
 
+#ifdef __MATH_MATH32
+
+__DPROTO(,,double_t,,inv,double_t x)
+__DPROTO(,,double_t,,invsqrt,double_t x)
+__DPROTO(,,double_t,,div2,double_t x)
+__DPROTO(,,double_t,,mul2,double_t x)
+__DPROTO(,,double_t,,mul10u,double_t x)
+__DPROTO(,,double_t,,exp10,double_t x)
+
+#endif
+
 // NO DISTINCTION BETWEEN FLOAT AND DOUBLE
 
 #define acosf        acos
