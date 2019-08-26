@@ -13,7 +13,7 @@ EXTERN  m32_mul2_fastcall
     ; enter : stack = ret
     ;          DEHL = sccz80_float number
     ;
-    ; exit  :  DEHL = |sccz80_float|
+    ; exit  :  DEHL = 2 * sccz80_float
     ;
     ; uses  : de, hl
 

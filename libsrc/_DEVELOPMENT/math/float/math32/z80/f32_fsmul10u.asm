@@ -17,12 +17,6 @@ PUBLIC _m32_mul10uf
 
 
 ._m32_mul10uf
-    exx
-    call m32_fsmul10u_fastcall
-
-    exx
-    ret
-
 .m32_fsmul10u_fastcall
     sla e                       ; get exponent into d
     rl d

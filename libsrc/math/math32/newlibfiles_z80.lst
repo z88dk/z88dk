@@ -12,6 +12,7 @@
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_invsqrtf.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_mulf.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_mul2f.asm
+../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_mul10uf.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_negf.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_polyf.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/z80/asm_sqrf.asm
@@ -76,6 +77,7 @@
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sdcc/___fsneq_callee.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sdcc/___fsmul.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sdcc/___fsmul2.asm
+../../_DEVELOPMENT/math/float/math32/lm32/c/sdcc/___fsmul10u.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sdcc/___fs2uint.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sdcc/___sint2fs.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sdcc/___fsmul_callee.asm
@@ -93,6 +95,9 @@
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/asinh_fastcall.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/l_f32_mul.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/mul2.asm
+../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/mul2_fastcall.asm
+../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/mul10u.asm
+../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/mul10u_fastcall.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/round_fastcall.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/cos.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/l_f32_f2long.asm
@@ -246,6 +251,7 @@
 ../../_DEVELOPMENT/math/float/math32/c/sdcc/cm32_sdcc___fslt_callee.asm
 ../../_DEVELOPMENT/math/float/math32/c/sdcc/cm32_sdcc_fsmul.asm
 ../../_DEVELOPMENT/math/float/math32/c/sdcc/cm32_sdcc_fsmul2.asm
+../../_DEVELOPMENT/math/float/math32/c/sdcc/cm32_sdcc_fsmul10u.asm
 ../../_DEVELOPMENT/math/float/math32/c/sdcc/cm32_sdcc_round.asm
 ../../_DEVELOPMENT/math/float/math32/c/sdcc/cm32_sdcc___fs2uint_callee.asm
 ../../_DEVELOPMENT/math/float/math32/c/sdcc/cm32_sdcc_sin.asm
@@ -353,6 +359,7 @@
 ../../_DEVELOPMENT/math/float/math32/c/sccz80/cm32_sccz80_round.asm
 ../../_DEVELOPMENT/math/float/math32/c/sccz80/cm32_sccz80_fsmul.asm
 ../../_DEVELOPMENT/math/float/math32/c/sccz80/cm32_sccz80_fsmul2.asm
+../../_DEVELOPMENT/math/float/math32/c/sccz80/cm32_sccz80_fsmul10u.asm
 ../../_DEVELOPMENT/math/float/math32/c/sccz80/cm32_sccz80_fsinv.asm
 ../../_DEVELOPMENT/math/float/math32/c/sccz80/cm32_sccz80_fsadd_callee.asm
 ../../_DEVELOPMENT/math/float/math32/c/sccz80/cm32_sccz80_fsmax.asm

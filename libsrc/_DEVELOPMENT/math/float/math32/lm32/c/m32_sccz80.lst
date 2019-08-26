@@ -69,6 +69,8 @@ math/float/math32/lm32/c/sccz80/log10_fastcall
 math/float/math32/lm32/c/sccz80/modf
 math/float/math32/lm32/c/sccz80/mul2
 math/float/math32/lm32/c/sccz80/mul2_fastcall
+math/float/math32/lm32/c/sccz80/mul10u
+math/float/math32/lm32/c/sccz80/mul10u_fastcall
 math/float/math32/lm32/c/sccz80/pow
 math/float/math32/lm32/c/sccz80/pow_callee
 math/float/math32/lm32/c/sccz80/round

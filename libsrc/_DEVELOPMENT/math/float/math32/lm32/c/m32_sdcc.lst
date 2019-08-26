@@ -55,6 +55,7 @@ math/float/math32/lm32/c/sdcc/___fsgt_callee
 math/float/math32/lm32/c/sdcc/___fslt_callee
 math/float/math32/lm32/c/sdcc/___fsmul
 math/float/math32/lm32/c/sdcc/___fsmul2
+math/float/math32/lm32/c/sdcc/___fsmul10u
 math/float/math32/lm32/c/sdcc/___fsmul_callee
 math/float/math32/lm32/c/sdcc/___fsneq_callee
 math/float/math32/lm32/c/sdcc/___fssub

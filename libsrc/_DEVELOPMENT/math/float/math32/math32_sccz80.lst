@@ -36,6 +36,7 @@ math/float/math32/c/sccz80/cm32_sccz80_fsmin_callee
 math/float/math32/c/sccz80/cm32_sccz80_fsmul
 math/float/math32/c/sccz80/cm32_sccz80_fsmul_callee
 math/float/math32/c/sccz80/cm32_sccz80_fsmul2
+math/float/math32/c/sccz80/cm32_sccz80_fsmul10u
 math/float/math32/c/sccz80/cm32_sccz80_fsneg
 math/float/math32/c/sccz80/cm32_sccz80_fspoly
 math/float/math32/c/sccz80/cm32_sccz80_fspoly_callee
