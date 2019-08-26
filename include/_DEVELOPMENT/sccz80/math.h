@@ -101,6 +101,20 @@
 
 #endif
 
+#ifdef __MATH_MATH32
+
+#define HUGE_POSF              (float)+3.4028234664E+38
+#define TINY_POSF              (float)+1.1754943508E−38
+#define HUGE_NEGF              (float)-1.7014118346E+38
+#define TINY_NEGF              (float)-1.1754943508E-38
+
+#define MAXL2F                 ((float)+127.999999914)
+#define MINL2F                 ((float)-126.0)
+#define MAXL10F                ((float)+38.230809449)
+#define MINL10F                ((float)−37.929779454)
+
+#endif
+
 extern double_t __LIB__ acos(double_t x) __smallc __z88dk_fastcall;
 
 
@@ -448,5 +462,16 @@ extern double_t __LIB__ exp10(double_t x) __smallc __z88dk_fastcall;
 #define fminf        fmin
 
 #define fmaf         fma
+
+#ifdef __MATH_MATH32
+
+#define invf         inv
+#define invsqrtf     insqrt
+#define div2f        div2
+#define mul2f        mul2
+#define mul10uf      mul10u
+#define exp10f       exp10
+
+#endif
 
 #endif
