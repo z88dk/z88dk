@@ -74,7 +74,7 @@ timegot:
 noleapsmc:
 		ld		b,l			; 1 byte is enough (max year count is 99)
 		ld		de,365
-		ld		hl,8035		; Days between [01/01/2000] and [01/01/1978]
+		ld		hl,8035-30		; Days between [01/01/2000] and [01/01/1978]  - 1 month shift fix (see below)
 yrloop:
 		ld		a,b
 		and		3			; leap year ?
