@@ -440,6 +440,11 @@ extern int isunordered_callee(double_t x,double_t y) __z88dk_callee;
 
 #ifdef __MATH_MATH32
 
+extern double_t sqr(double_t x);
+extern double_t sqr_fastcall(double_t x) __z88dk_fastcall;
+#define sqr(a) sqr_fastcall(a)
+
+
 extern double_t inv(double_t x);
 extern double_t inv_fastcall(double_t x) __z88dk_fastcall;
 #define inv(a) inv_fastcall(a)
@@ -551,6 +556,7 @@ extern double_t exp10_fastcall(double_t x) __z88dk_fastcall;
 
 #ifdef __MATH_MATH32
 
+#define sqrf         sqr
 #define invf         inv
 #define invsqrtf     insqrt
 #define div2f        div2

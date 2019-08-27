@@ -318,6 +318,9 @@ extern int isunordered(double_t x,double_t y);
 
 #ifdef __MATH_MATH32
 
+extern double_t sqr(double_t x);
+
+
 extern double_t inv(double_t x);
 
 
@@ -417,6 +420,7 @@ extern double_t exp10(double_t x);
 
 #ifdef __MATH_MATH32
 
+#define sqrf         sqr
 #define invf         inv
 #define invsqrtf     insqrt
 #define div2f        div2

@@ -366,6 +366,9 @@ extern int __LIB__ isunordered_callee(double_t x,double_t y) __smallc __z88dk_ca
 
 #ifdef __MATH_MATH32
 
+extern double_t __LIB__ sqr(double_t x) __smallc __z88dk_fastcall;
+
+
 extern double_t __LIB__ inv(double_t x) __smallc __z88dk_fastcall;
 
 
@@ -465,6 +468,7 @@ extern double_t __LIB__ exp10(double_t x) __smallc __z88dk_fastcall;
 
 #ifdef __MATH_MATH32
 
+#define sqrf         sqr
 #define invf         inv
 #define invsqrtf     insqrt
 #define div2f        div2
