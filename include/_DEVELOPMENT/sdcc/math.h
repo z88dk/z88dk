@@ -475,8 +475,8 @@ extern double_t exp10_fastcall(double_t x) __z88dk_fastcall;
 #define exp10(a) exp10_fastcall(a)
 
 
-extern double_t poly(const float x,const float d[],uint16_t n);
-extern double_t poly_callee(const float x,const float d[],uint16_t n) __z88dk_callee;
+extern double_t poly(const float x,const float d[],unsigned int n);
+extern double_t poly_callee(const float x,const float d[],unsigned int n) __z88dk_callee;
 #define poly(a,b,c) poly_callee(a,b,c)
 
 

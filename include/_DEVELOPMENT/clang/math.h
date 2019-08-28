@@ -339,7 +339,7 @@ extern double_t mul10u(double_t x);
 extern double_t exp10(double_t x);
 
 
-extern double_t poly(const float x,const float d[],uint16_t n);
+extern double_t poly(const float x,const float d[],unsigned int n);
 
 
 

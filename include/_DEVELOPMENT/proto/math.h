@@ -201,7 +201,7 @@ __DPROTO(,,double_t,,div2,double_t x)
 __DPROTO(,,double_t,,mul2,double_t x)
 __DPROTO(,,double_t,,mul10u,double_t x)
 __DPROTO(,,double_t,,exp10,double_t x)
-__DPROTO(,,double_t,,poly, const float x, const float d[], uint16_t n)
+__DPROTO(,,double_t,,poly, const float x, const float d[], unsigned int n)
 
 #endif
 

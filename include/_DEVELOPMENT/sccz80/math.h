@@ -387,8 +387,8 @@ extern double_t __LIB__ mul10u(double_t x) __smallc __z88dk_fastcall;
 extern double_t __LIB__ exp10(double_t x) __smallc __z88dk_fastcall;
 
 
-extern double_t __LIB__ poly(const float x,const float d[],uint16_t n) __smallc;
-extern double_t __LIB__ poly_callee(const float x,const float d[],uint16_t n) __smallc __z88dk_callee;
+extern double_t __LIB__ poly(const float x,const float d[],unsigned int n) __smallc;
+extern double_t __LIB__ poly_callee(const float x,const float d[],unsigned int n) __smallc __z88dk_callee;
 #define poly(a,b,c) poly_callee(a,b,c)
 
 
