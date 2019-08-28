@@ -268,13 +268,14 @@ float invsqrt (float x);
 ```
 Recently, in the Quake video game, a novel method of seeding the Newton-Raphson iteration for the inverse square root was invented. This fancy process is covered in detail in [Lomont 2003](http://www.lomont.org/Math/Papers/2003/InvSqrt.pdf) and the suggested magic number `0x5f375a86`, better than was used by the original Quake game, was implemented.
 
-Following this magic number seeding and traditional Newtwon-Raphson iterations, using the `sqr()` function as appropriate, an accurate inverse square root `infsqrt()` is produced. The square root `sqrt()` is then obtained by multiplying the number by its inverse square root.
+Following this magic number seeding and traditional Newtwon-Raphson iterations, using the `sqr()` function as appropriate, an accurate inverse square root `invsqrt()` is produced. The square root `sqrt()` is then obtained by multiplying the number by its inverse square root.
 
 Two N-R iterations produce 5 or 6 significant digits of accuracy. Greater accuracy, approaching 7 significant digits for this library, has been obtained by increasing the Newton-Raphson iterations to 3 cycles at the expense of performance. Also, as in the original Quake game, 1 N-R iteration produces a good enough answer for most applications, and is substantially faster.
 
 #### _abs()_, _frexp()_ and _ldexp()_
 
 ```C
+float abs (float x);
 float frexp (float x, int *pw2);
 float ldexp (float x, int pw2);
 ```
@@ -282,14 +283,14 @@ For some functions it is easiest to work with IEEE floating point numbers in ass
 
 The sccz80 compiler has been upgraded to issue `ldexp()` instructions where power of 2 multiplies (or divides) are required. This means that for example `x/2` is calculated as a decrement of the exponent byte rather than calculating a full divide, saving hundreds of cycles.
 
-#### special functions
+#### Special Functions
 
 ```C
 float div2 (float x);
 float mul2 (float x);
 float mul10u (float x);
 ```
-For sccz80, sdcc and in assembly there are `mul2()` and `div2()` functions available to handle simple power of two issues, as well as `ldexp()`. Also, a `mul10u()` function provides a fast `y = 10 * |x|` result.
+For sccz80, sdcc and in assembly there are `mul2()` and `div2()` functions available to handle simple power of two multiplication and division, as well as `ldexp()`. Also, a `mul10u()` function provides a fast `y = 10 * |x|` result. These functions are substantially faster than a full multiply equivalent, and combinations can be used to advantage. For example using `div2( mul10u( mul10u( x )))` is substantially faster than `y = 50.0 * x` on any CPU type.
 
 #### _poly()_
 
