@@ -98,7 +98,7 @@ Both results are free of bias with IEEE method having a slight edge with roundin
     0 0 1  -.001
     0 1 0  -.01
     0 1 1  +.001
-    1 0 0	exact
+    1 0 0  exact
     1 0 1  -.001
     1 1 0  +.01
     1 1 1  +.001
@@ -152,7 +152,7 @@ The intrinsic functions, written in assembly, assume the sccz80 calling conventi
 
     ; evaluation of a polynomial function
     ;
-    ; float polyf (float x, float d[], uint16_t n);
+    ; float poly (float x, float d[], uint16_t n);
     ;
     ; enter : stack = uint16_t n, float d[], float x, ret
     ;
@@ -181,6 +181,8 @@ Contains the zsdcc and the sccz80 C compiler interface and is implemented using 
 
 Glue that connects the compilers and standard assembly interface to the `math32` library.  The purpose is to define aliases that connect the standard names to the math32 specific names.  These functions make up the complete z88dk `math32` maths library that is linked against on the compile line (as in `-lmath32` or `-lmath32_fast`) or for the z180 and z80n (`-lmath32_z180` or `-lmath32_z80n`).
 
+Aliases are provided to simplify usage of the library. `--math32`, `--math32_z180`, and `--math32_z80n` provide all the required linkages and definitions, as a simple alternative.
+
 ## Function Discussion
 
 There are essentially three different grades of functions in this library. Those written in assembly code in the expanded floating point domain, where the sign, exponent, and mantissa are handled separately. Those written in assembly code, in the floating point domain but using intrinsic functions, where floating point numbers are passed as expanded 6 byte values. And those written in C language.
@@ -191,10 +193,10 @@ The expanded floating point domain is a useful tool for creating functions, as c
 
 There are several assembly intrinsic functions.
 
-```c
-float __fsadd (float, float) __z88dk_callee;
-float __fssub (float, float) __z88dk_callee;
-float __fsmul (float, float) __z88dk_callee;
+```C
+float add (float x, float y);
+float sub (float x, float y);
+float mul (float x, float y);
 ```
 Using these intrinsic functions (and the compact assembly square root and polynomial functions) it is possible to build efficient C language complex functions.
 
@@ -208,7 +210,7 @@ In the search for performance, an alternate table driven `16_8x8` multiply funct
 
 To calculate the 24-bit mantissa a special `mulu_32h_24x24` function has been built using 8 multiplies, the minimum number of `16_8x8` multiply terms. It is much more natural for the z80 to work in `16_8x8` multiplies than the Rabbit's `32_16x16` multiply. It is not a "correct" multiply, in that all terms are calculated and carry forward is considered. The lowest term is not calculated, as it doesn't impact the 32-bit result. The lower 16-bits of the result are simply truncated, leaving a further 8-bits for mantissa rounding within the calling function. The resulting `mulu_32h_24x24` could be the fastest way to calculate an IEEE sized mantissa on a z80, z180, & z80n.
 
-By providing a specific square function, all squaring (found in square root, trigonometric functions) can use the `_fssqr` or the equivalent C version. This means that the inverse `_fsinvsqrt` function uses `_fssqr` 5 multiplies in its `32h_24x24` mantissa calculation, in some situations, instead of 8 multiplies with the normal `_fsmul` function, and also avoids the need to use the alternate register set.
+By providing a specific square function, all squaring (found in square root, trigonometric functions) can use the `_fssqr` or the equivalent C version `sqr()`. This means that the inverse `_fsinvsqrt` function uses `_fssqr` for 5 multiplies in its `32h_24x24` mantissa calculation, in some situations, instead of 8 multiplies with the normal `_fsmul` function, and also avoids the need to use the alternate register set.
 
 #### mulu_z80_de and zero detection
 
@@ -216,7 +218,7 @@ Zero detection is used in both the unrolled shift+add and the table driven `mulu
 
 A lot of "integer like" decimal or their binary equivalent numbers have "short" mantissas, when represented in floating point. If we call a 24-bit mantissa made up of three bytes "abc", then quite often the b and c bytes end up being zero. I think this is a common case. Handling these with zero detection will be a big win, making many `mulu_z80_de` multiplies very fast (because the result is zero).
 
-Of course the other side of the argument is that integers should be handled by the integer library, and that calculating a 8 iteration polynomial estimation for `logf()` (for example) will never have zeros in it, so carrying zero detection overhead for short mantissa floats is just wasteful.
+Of course the other side of the argument is that integers should be handled by the integer library, and that calculating a 8 iteration polynomial estimation for `log()` (for example) will never have zeros in it, so carrying zero detection overhead for short mantissa floats is just wasteful.
 
 When benchmarking the library, using the spectral-norm example, it was found that for about 26% of `mulu_z80_de` function calls an early exit was achieved because of a zero multiplier or multiplicand. Specifically 4.94 million `zeroe` exits and 4.42 million `zerod` exits, from 34.6 million function entries. This one benchmark is not everything, but it does show the value of zero detection.
 
@@ -228,13 +230,13 @@ The implementation of the `mulu_32h_32x32` is not a "correct" multiplication as 
 
 By calculating 3rd through to 7th bytes, but returning only byte 4 through 7, there is only maximally a small error in the least significant nibble of the 32-bit mantissa, which is discarded after rounding to 24-bit precision anyway. Doing this avoids calculating the 0th through 2nd bytes, which saves 5 `16_8x8` multiply operations, and the respective word push and pop baggage.
 
-#### _fsadd and _fssub
+#### _add()_ and _sub()_
 
 These functions are closely related to the original Digi International functions.
 
 As add and subtract rely heavily on bit shifting across the mantissa, these functions establish a tree of byte and nybble shifting, to provide the best performance. Nybble shifting is intrinsic to the Rabbit processor, but this nybble based algorithm also works effectively for the z80 processor with little overhead.
 
-#### _fsmul and _fssqr
+#### _mul()_ and _sqr()_
 
 The multiply function is implemented with a `mulu_32h_24x24` mantissa calculation, that optimises (minimises) the number of `16_8x8` multiplies required, using either hardware instructions from the z180 and z80n, or the z80 equivalent function.
 
@@ -244,60 +246,68 @@ A simple rounding method is used, but a more sophisticated method IEEE compliant
 
 The square function is related to the multiply function, but is simplified by ignoring the sign bit, and reducing the number of `16_8x8` multiplies from 8 down to 5. A simplified mantissa calculation function is used for this purpose. As the square is used in the tangent, hypotenuse, and inverse square root calculation, having it available is a good optimisation.
 
-
 ### Derived Floating Point Functions
 
 These functions are implemented in assembly language but they utilise the intrinsic assembly language functions to provide their returns. The use of the 32-bit mantissa expanded floating point format functions to implement the derived functions means that their accuracy is maintained.
 
-```c
-float __fssqr (float, float) __z88dk_fastcall;
-float __fsinv (float, float) __z88dk_fastcall;
-float __fsdiv (float, float) __z88dk_callee;
+#### _div()_ and _inv()_
 
-float sqrf(float a) __z88dk_fastcall;
-float sqrtf(float a) __z88dk_fastcall;
-float invsqrtf(float a) __z88dk_fastcall;
-
-float fabsf(float x) __z88dk_fastcall;
-float frexpf(float x, int *pw2) __z88dk_callee;
-float ldexpf(float x, int pw2) __z88dk_callee;
-
-float hypotf(float x, float y) __z88dk_callee;
-float polyf(const float x, const float d[], uint16_t n) __z88dk_callee;
+```C
+float inv (float x);
+float div (float x, float y);
 ```
-#### _fsdiv and _fsinv
-
 The divide function is implemented by first obtaining the inverse of the divisor, and then passing this result to the multiply instruction, so the intrinsic function is actually finding the inverse. This can be used to advantage where a function requires only an inverse, this can be returned saving the multiplication associated with the divide.
 
 The Newton-Raphson method is used for finding the inverse, using full 32-bit expanded mantissa multiplies and adds for accuracy. Three N-R orthogonal iterations provide an accurate result for the IEEE-754 mantissa, at the expense of some performance.
 
-#### sqrtf() and invsqrt()
+#### _sqrt()_ and _invsqrt()_
 
+```C
+float sqrt (float x);
+float invsqrt (float x);
+```
 Recently, in the Quake video game, a novel method of seeding the Newton-Raphson iteration for the inverse square root was invented. This fancy process is covered in detail in [Lomont 2003](http://www.lomont.org/Math/Papers/2003/InvSqrt.pdf) and the suggested magic number `0x5f375a86`, better than was used by the original Quake game, was implemented.
 
-Following this magic number seeding and traditional Newtwon-Raphson iterations, using the `sqrf()` function as appropriate, an accurate inverse square root `infsqrtf()` is produced. The square root `sqrtf()` is then obtained by multiplying the number by its inverse square root.
+Following this magic number seeding and traditional Newtwon-Raphson iterations, using the `sqr()` function as appropriate, an accurate inverse square root `infsqrt()` is produced. The square root `sqrt()` is then obtained by multiplying the number by its inverse square root.
 
 Two N-R iterations produce 5 or 6 significant digits of accuracy. Greater accuracy, approaching 7 significant digits for this library, has been obtained by increasing the Newton-Raphson iterations to 3 cycles at the expense of performance. Also, as in the original Quake game, 1 N-R iteration produces a good enough answer for most applications, and is substantially faster.
 
-#### fabsf(), frexpf() and ldexpf()
+#### _abs()_, _frexp()_ and _ldexp()_
 
+```C
+float frexp (float x, int *pw2);
+float ldexp (float x, int pw2);
+```
 For some functions it is easiest to work with IEEE floating point numbers in assembly. For these three functions simple assembly code produces the result required effectively.
 
-The sccz80 compiler has been upgraded to issue `ldexpf()` instructions where power of 2 multiplies (or divides) are required. This means that for example `X/2` is calculated as a decrement of the exponent byte rather than calculating a full divide, saving hundreds of cycles.
+The sccz80 compiler has been upgraded to issue `ldexp()` instructions where power of 2 multiplies (or divides) are required. This means that for example `x/2` is calculated as a decrement of the exponent byte rather than calculating a full divide, saving hundreds of cycles.
 
-For sdcc and in assembly there are `mul2f()` and `div2f` functions available to handle simple power of two issues, as well as `ldexpf()`. Also, a `mul10u()` function provides a fast `y = 10 * |x|` result.
+#### special functions
 
-#### polyf()
+```C
+float div2 (float x);
+float mul2 (float x);
+float mul10u (float x);
+```
+For sccz80, sdcc and in assembly there are `mul2()` and `div2()` functions available to handle simple power of two issues, as well as `ldexp()`. Also, a `mul10u()` function provides a fast `y = 10 * |x|` result.
 
+#### _poly()_
+
+```C
+float poly (const float x, const float d[], uint16_t n);
+```
 All of the higher functions are implemented based on Horner's Method for polynomial expansion. Therefore to evaluate these functions efficiently, an optimised `poly()` function has been developed, using full 32-bit expanded mantissa multiplies and adds for accuracy.
 
 This function reads a table of coefficients stored in "ROM" and iterates the specified number of iterations to produce the result desired.
 
-It is a general function. Any coefficient table can be used, as desired. The coefficients are provided in packed IEEE floating point format, with the coefficients stored in the correct order. The 0th coefficient is stored first in the table. For examples see in the library for `sinf()`, `tanf()`, `logf()` and `expf()`.
+It is a general function. Any coefficient table can be used, as desired. The coefficients are provided in packed IEEE floating point format, with the coefficients stored in the correct order. The 0th coefficient is stored first in the table. For examples see in the library for `sin()`, `tan()`, `log()` and `exp()`.
 
-#### hypotf()
+#### _hypot()_
 
-The hypotenuse function is provided as it is part of the standard maths library. The main use is to further demonstrate how effectively (simply) complex routines can be written using the compact floating point format.
+```C
+float hypot (float x, float y);
+```
+The hypotenuse function `hypot()` is provided as it is part of the standard maths library. The main use is to further demonstrate how effectively (simply) complex routines can be written using the compact floating point format.
 
 ### C Floating Point Functions
 
@@ -309,34 +319,33 @@ If desired, alternative and extended coefficient matrices can be tested for accu
 
 ```c
 /* Trigonometric functions */
-float sinf(float x) __z88dk_fastcall;
-float cosf(float x) __z88dk_fastcall;
-float tanf(float x) __z88dk_fastcall;
-float asinf(float x) __z88dk_fastcall;
-float acosf(float x) __z88dk_fastcall;
-float atanf(float x) __z88dk_fastcall;
-float atan2f(float x, float y);
+float sin (float x);
+float cos (float x);
+float tan (float x);
+float asin (float x);
+float acos (float x);
+float atan (float x);
+float atan2 (float x, float y);
 
 /* Hyperbolic functions */
-float sinhf(float x) __z88dk_fastcall;
-float coshf(float x) __z88dk_fastcall;
-float tanhf(float x) __z88dk_fastcall;
+float sinh (float x);
+float cosh (float x);
+float tanh (float x);
 
 /* Exponential, logarithmic and power functions */
-float expf(float x) __z88dk_fastcall;
-float exp2f(float x) __z88dk_fastcall;
-float exp10f(float x) __z88dk_fastcall;
-float logf(float x) __z88dk_fastcall;
-float log2f(float x) __z88dk_fastcall;
-float log10f(float x) __z88dk_fastcall;
-float powf(float x, float y);
-float hypotf(float x, float y);
+float exp (float x);
+float exp2 (float x);
+float exp10 (float x);
+float log (float x);
+float log2 (float x);
+float log10 (float x);
+float pow (float x, float y);
 
 /* Nearest integer, absolute value, and remainder functions */
-float ceilf(float x) __z88dk_fastcall;
-float floorf(float x) __z88dk_fastcall;
-float modff(float x, float * y);
-float fmodf(float x, float y);
+float ceil (float x);
+float floor (float x);
+float modf (float x, float *y);
+float fmod (float x, float y);
 ```
 ### Accuracy
 
