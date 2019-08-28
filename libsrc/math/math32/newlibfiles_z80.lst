@@ -134,6 +134,8 @@
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/sinh.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/frexp.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/l_f32_swap.asm
+../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/poly.asm
+../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/poly_callee.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/pow.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/pow_callee.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/exp_fastcall.asm

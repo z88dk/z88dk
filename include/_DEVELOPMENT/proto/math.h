@@ -201,6 +201,7 @@ __DPROTO(,,double_t,,div2,double_t x)
 __DPROTO(,,double_t,,mul2,double_t x)
 __DPROTO(,,double_t,,mul10u,double_t x)
 __DPROTO(,,double_t,,exp10,double_t x)
+__DPROTO(,,double_t,,poly, const float x, const float d[], uint16_t n)
 
 #endif
 
@@ -289,6 +290,7 @@ __DPROTO(,,double_t,,exp10,double_t x)
 #define mul2f        mul2
 #define mul10uf      mul10u
 #define exp10f       exp10
+#define polyf        poly
 
 #endif
 

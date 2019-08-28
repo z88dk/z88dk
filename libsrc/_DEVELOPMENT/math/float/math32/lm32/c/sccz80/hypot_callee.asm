@@ -1,9 +1,9 @@
 
 	SECTION	code_fp_math32
 	PUBLIC	hypot_callee
-	EXTERN	cm32_sccz80_hypot_callee
+	EXTERN	cm32_sccz80_fshypot_callee
 
-	defc	hypot_callee = cm32_sccz80_hypot_callee
+	defc	hypot_callee = cm32_sccz80_fshypot_callee
 
 
 ; SDCC bridge for Classic
