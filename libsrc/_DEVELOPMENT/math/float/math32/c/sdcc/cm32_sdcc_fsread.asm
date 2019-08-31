@@ -19,7 +19,7 @@ EXTERN cm32_sdcc_fsload
     ; exit  : stack = sdcc_float right, sdcc_float left, ret1
     ;          DEHL = sdcc_float right
     ; 
-    ; uses  : af, bc, de, hl
+    ; uses  : f, bc, de, hl
 
     ld hl,8                     ; stack sdcc_float right
     add hl,sp
