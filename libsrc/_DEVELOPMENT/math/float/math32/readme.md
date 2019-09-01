@@ -332,6 +332,9 @@ float atan2 (float x, float y);
 float sinh (float x);
 float cosh (float x);
 float tanh (float x);
+float asinh (float x);
+float acosh (float x);
+float atanh (float x);
 
 /* Exponential, logarithmic and power functions */
 float exp (float x);
