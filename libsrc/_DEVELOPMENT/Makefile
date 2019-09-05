@@ -2,7 +2,7 @@
 Z80ASM = $(EXEC_PREFIX)z80asm
 ZX7 = z88dk-zx7
 
-TARGET ?= z80 cpm m math32 math32_z180 math32_z80n rc2014 sms vgl yaz180 z180 zx zxn
+TARGET ?= z80 cpm m math32 math32_fast math32_z180 math32_z80n rc2014 sms vgl yaz180 z180 zx zxn
 
 jobs := $(foreach target,$(TARGET),job-$(target))
 cleans := $(foreach target,$(TARGET),clean-$(target))
