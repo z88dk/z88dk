@@ -34,13 +34,12 @@ EXTERN ASMDISP_DRAW_CALLEE
 		exx			; w_plotpixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
 		pop hl
 		pop de
-		
+		exx		
 		push de
 		push hl
 		exx
 		push hl
 		push de
-		;exx
 		
 		;push bc		
 		push af		; ret addr
