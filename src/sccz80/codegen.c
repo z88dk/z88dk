@@ -335,14 +335,14 @@ void getmem(SYMBOL* sym)
             outname(sym->name, dopref(sym));    
             outstr(")\n");
             if ( !IS_8080() ) { 
-                ot("ld\t(");
+                ot("ld\tde,(");
                 outname(sym->name, dopref(sym));
-                outstr("+2),de\n");
+                outstr("+2)\n");
             } else { 
                 swap();
-                ot("ld\t(");
+                ot("ld\thl,(");
                 outname(sym->name, dopref(sym));
-                outstr("+2),hl\n");
+                outstr("+2)\n");
                 swap(); 
             }
         }
