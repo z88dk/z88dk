@@ -101,6 +101,7 @@ static option  sccz80_opts[] = {
     { 0, "mz180", OPT_ASSIGN|OPT_INT, "Generate output for the z180", &c_cpu, CPU_Z180 },
     { 0, "mr2k", OPT_ASSIGN|OPT_INT, "Generate output for the Rabbit 2000", &c_cpu, CPU_R2K },
     { 0, "mr3k", OPT_ASSIGN|OPT_INT, "Generate output for the Rabbit 3000", &c_cpu, CPU_R3K },
+    { 0, "mgbz80", OPT_ASSIGN|OPT_INT, "Generate output for the Gameboy Z80", &c_cpu, CPU_GBZ80 },
     { 0, "", OPT_HEADER, "Code generation options", NULL, 0 },
     { 0, "unsigned", OPT_BOOL, "Make all types unsigned", &c_default_unsigned, 0 },
     { 0, "disable-builtins", OPT_BOOL, "Disable builtin functions",&c_disable_builtins, 0},
@@ -268,6 +269,11 @@ int main(int argc, char** argv)
     if ( c_cpu == CPU_8080 ) {
         c_notaltreg = 1;
         WriteDefined("CPU_8080", 1);
+    }
+
+    if ( c_cpu == CPU_GBZ80 ) {
+        c_notaltreg = 1;
+        WriteDefined("CPU_GBZ80", 1);
     }
 
 
