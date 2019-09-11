@@ -9,43 +9,36 @@
 ; Coefficients for atanf()
 ;-------------------------------------------------------------------------
 ;
-;   float coeff_a[] =
-;   {
-;       33.05861847399,
-;       58.655751569,
-;       32.3907948562,
-;       5.853195211263,
-;       0.1952374193623,
-;       -.002434603300441
-;   };
+;  Approximation of f(x) = atan(x)
+;  with weight function g(x) = atan(x)
+;  on interval [ 0, 1 ]
+;  with a polynomial of degree 7.
 ;
-;   float coeff_b[] =
-;   {
-;       33.05861847399,
-;       69.67529105952,
-;       49.00434821822,
-;       12.97557886271,
-;       1.0
-;   };
+; float f(float x)
+; {
+;    float u = +5.3387679e-2f;
+;    u = u * x + -2.2568632e-1f;
+;    u = u * x + +3.2087456e-1f;
+;    u = u * x + -3.4700353e-2f;
+;    u = u * x + -3.2812673e-1f;
+;    u = u * x + -3.5815786e-4f;
+;    u = u * x + +1.0000081e+0f;
+;    return u * x + 4.2012834e-19f;
+; }
 ;
 ;-------------------------------------------------------------------------
 
 SECTION rodata_fp_math32
 
-PUBLIC _m32_coeff_atan_a, _m32_coeff_atan_b
+PUBLIC _m32_coeff_atan
 
-._m32_coeff_atan_a
-DEFQ 0x42043C06;       33.05861847399
-DEFQ 0x426A9F7D;       58.655751569
-DEFQ 0x4201902D;       32.3907948562
-DEFQ 0x40BB4D60;       5.853195211263
-DEFQ 0x3E47EC51;       0.1952374193623
-DEFQ 0xBB1F8DDE;       -.002434603300441
-
-._m32_coeff_atan_b
-DEFQ 0x42043C06;       33.05861847399
-DEFQ 0x428B59C0;       69.67529105952
-DEFQ 0x42440474;       49.00434821822
-DEFQ 0x414F9BF9;       12.97557886271
-DEFQ 0x3F800000;       1.0
+._m32_coeff_atan
+DEFQ 0x20F80000;       +4.2012834e-19
+DEFQ 0x3F800044;       +1.0000081e+0
+DEFQ 0xB9BBC722;       -3.5815786e-4
+DEFQ 0xBEA8003A;       -3.2812673e-1
+DEFQ 0xBD0E21F5;       -3.4700353e-2
+DEFQ 0x3EA449AC;       +3.2087456e-1
+DEFQ 0xBE671A51;       -2.2568632e-1
+DEFQ 0x3D5AAD0A;       +5.3387679e-2
 

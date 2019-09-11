@@ -57,12 +57,9 @@
 #define LNof10          (float)2.302585093
 #define LOG2            (float)0.30102999567
 #define LOGE            (float)0.43429448190
-//#define PI            (float)3.14159265359
 #define PIby180         (float)0.0174532925
-#define PIbyTWO         (float)1.570796326795
 #define POW10INF        (float)38.0
 #define SQR10           (float)3.162277660168
-#define TWObyPI         (float)0.63661977
 
 #define MAXL2F          ((float)+127.999999914)
 #define MINL2F          ((float)-126.0)
