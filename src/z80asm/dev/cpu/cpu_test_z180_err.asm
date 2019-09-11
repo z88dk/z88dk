@@ -4114,10 +4114,15 @@
  jx5 -32768                     ; Error
  jx5 32767                      ; Error
  jx5 65535                      ; Error
+ ld (c), a                      ; Error
  ld (de), hl                    ; Error
  ld (hl), hl                    ; Error
+ ld (hl+), a                    ; Error
  ld (hl+127), hl                ; Error
+ ld (hl-), a                    ; Error
  ld (hl-128), hl                ; Error
+ ld (hld), a                    ; Error
+ ld (hli), a                    ; Error
  ld (ix), hl                    ; Error
  ld (ix+127), hl                ; Error
  ld (ix-128), hl                ; Error
@@ -4158,6 +4163,11 @@
  ld a', iir                     ; Error
  ld a', l                       ; Error
  ld a', xpc                     ; Error
+ ld a, (c)                      ; Error
+ ld a, (hl+)                    ; Error
+ ld a, (hl-)                    ; Error
+ ld a, (hld)                    ; Error
+ ld a, (hli)                    ; Error
  ld a, eir                      ; Error
  ld a, iir                      ; Error
  ld a, ixh                      ; Error
@@ -4326,6 +4336,8 @@
  ld hl, (sp+255)                ; Error
  ld hl, ix                      ; Error
  ld hl, iy                      ; Error
+ ld hl, sp+-128                 ; Error
+ ld hl, sp+127                  ; Error
  ld iir, a                      ; Error
  ld ix, (sp)                    ; Error
  ld ix, (sp+0)                  ; Error
@@ -4393,12 +4405,26 @@
  ld l', h                       ; Error
  ld l', l                       ; Error
  ld xpc, a                      ; Error
+ ldd (hl), a                    ; Error
+ ldd a, (hl)                    ; Error
  lddrx                          ; Error
  lddsr                          ; Error
  lddx                           ; Error
+ ldh (-128), a                  ; Error
+ ldh (127), a                   ; Error
+ ldh (255), a                   ; Error
+ ldh (c), a                     ; Error
+ ldh a, (-128)                  ; Error
+ ldh a, (127)                   ; Error
+ ldh a, (255)                   ; Error
+ ldh a, (c)                     ; Error
  ldhi -128                      ; Error
  ldhi 127                       ; Error
  ldhi 255                       ; Error
+ ldhl sp, -128                  ; Error
+ ldhl sp, 127                   ; Error
+ ldi (hl), a                    ; Error
+ ldi a, (hl)                    ; Error
  ldirx                          ; Error
  ldisr                          ; Error
  ldix                           ; Error
@@ -5667,6 +5693,7 @@
  srl iyh                        ; Error
  srl iyl                        ; Error
  srl l'                         ; Error
+ stop                           ; Error
  sub a', (hl)                   ; Error
  sub a', (ix)                   ; Error
  sub a', (ix+127)               ; Error
@@ -5694,6 +5721,14 @@
  sub iyh                        ; Error
  sub iyl                        ; Error
  sures                          ; Error
+ swap (hl)                      ; Error
+ swap a                         ; Error
+ swap b                         ; Error
+ swap c                         ; Error
+ swap d                         ; Error
+ swap e                         ; Error
+ swap h                         ; Error
+ swap l                         ; Error
  swapnib                        ; Error
  syscall                        ; Error
  uma                            ; Error

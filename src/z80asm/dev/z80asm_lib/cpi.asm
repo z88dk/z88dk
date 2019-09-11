@@ -1,6 +1,7 @@
 ; Substitute for z80 cpi instruction
 ; aralbrec 06.2007
 
+IF !__CPU_GBZ80__
 SECTION code_crt0_sccz80
 PUBLIC __z80asm__cpi
 
@@ -65,3 +66,4 @@ ELSE
    set 0,l 			; set carry
 ENDIF
    jr rejoin
+ENDIF

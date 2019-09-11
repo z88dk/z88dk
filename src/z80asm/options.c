@@ -61,6 +61,7 @@ static void option_use_lib(const char *library );
 static void option_cpu_z80(void);
 static void option_cpu_z80n(void);
 static void option_cpu_z180(void);
+static void option_cpu_gbz80(void);
 static void option_cpu_8080(void);
 static void option_cpu_8085(void);
 static void option_cpu_r2k(void);
@@ -220,6 +221,10 @@ static void process_opt( int *parg, int argc, char *argv[] )
 	}
 	else if (strcmp(argv[II], "-mz80") == 0 || strcmp(argv[II], "-m=z80") == 0) {
 		option_cpu_z80();
+		return;
+	}
+	else if (strcmp(argv[II], "-mgbz80") == 0 || strcmp(argv[II], "-m=gbz80") == 0) {
+		option_cpu_gbz80();
 		return;
 	}
 	else if (strcmp(argv[II], "-m8080") == 0 || strcmp(argv[II], "-m=8080") == 0) {
@@ -750,6 +755,12 @@ static void option_cpu_z80n(void)
 	opts.cpu_name = CPU_Z80N_NAME;
 }
 
+static void option_cpu_gbz80(void)
+{
+	opts.cpu = CPU_GBZ80;
+	opts.cpu_name = CPU_GBZ80_NAME;
+}
+
 static void option_cpu_8080(void)
 {
 	opts.cpu = CPU_8080;
@@ -822,6 +833,9 @@ static void define_assembly_defines()
 	case CPU_8085:
 	    define_static_def_sym("__CPU_8085__", 1);
 	    define_static_def_sym("__CPU_INTEL__", 1);
+		break;
+	case CPU_GBZ80:
+		define_static_def_sym("__CPU_GBZ80__", 1);
 		break;
 	default:
 		xassert(0);
