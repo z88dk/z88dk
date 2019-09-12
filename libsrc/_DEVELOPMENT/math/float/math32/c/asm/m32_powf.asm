@@ -281,50 +281,37 @@ _m32_powf:
 	push	ix
 	ld	ix,0
 	add	ix,sp
-	ld	hl,0x0000
-	push	hl
-	ld	hl,0x0000
-	push	hl
 	ld	l,(ix+6)
 	ld	h,(ix+7)
 	push	hl
 	ld	l,(ix+4)
 	ld	h,(ix+5)
 	push	hl
+	ld	hl,0x0000
+	push	hl
+	ld	hl,0x0000
+	push	hl
 	call	___fslt_callee
-	ld	a, l
-	or	a, a
-	jr	Z,l_m32_powf_00102
+	bit	0,l
+	jr	NZ,l_m32_powf_00102
 	ld	l,0x00
 	ld	h,0x00
 	ld	e,0x00
 	ld	d,0x00
-	jp	l_m32_powf_00109
+	jr	l_m32_powf_00107
 l_m32_powf_00102:
-	ld	a,(ix+7)
-	and	a,0x7f
-	or	a,(ix+6)
-	or	a,(ix+5)
-	or	a,(ix+4)
-	jr	NZ,l_m32_powf_00104
-	ld	l,0x00
-	ld	h,0x00
-	ld	e,0x00
-	ld	d,0x00
-	jr	l_m32_powf_00109
-l_m32_powf_00104:
 	ld	a,(ix+11)
 	and	a,0x7f
 	or	a,(ix+10)
 	or	a,(ix+9)
 	or	a,(ix+8)
-	jr	NZ,l_m32_powf_00106
+	jr	NZ,l_m32_powf_00104
 	ld	l,0x00
 	ld	h,0x00
 	ld	e,0x80
 	ld	d,0x3f
-	jr	l_m32_powf_00109
-l_m32_powf_00106:
+	jr	l_m32_powf_00107
+l_m32_powf_00104:
 	ld	hl,0x3f80
 	push	hl
 	ld	hl,0x0000
@@ -338,13 +325,13 @@ l_m32_powf_00106:
 	call	___fseq_callee
 	ld	a, l
 	or	a, a
-	jr	Z,l_m32_powf_00108
+	jr	Z,l_m32_powf_00106
 	ld	l,(ix+4)
 	ld	h,(ix+5)
 	ld	e,(ix+6)
 	ld	d,(ix+7)
-	jr	l_m32_powf_00109
-l_m32_powf_00108:
+	jr	l_m32_powf_00107
+l_m32_powf_00106:
 	ld	e,(ix+6)
 	ld	d,(ix+7)
 	ld	l,(ix+4)
@@ -362,7 +349,7 @@ l_m32_powf_00108:
 	push	bc
 	call	___fsmul_callee
 	call	_m32_expf
-l_m32_powf_00109:
+l_m32_powf_00107:
 	pop	ix
 	ret
 	SECTION IGNORE
