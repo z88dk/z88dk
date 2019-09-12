@@ -8,8 +8,10 @@
 ;       shifts are faster than doubling and ex with de/hl
 
 
-                SECTION   code_crt0_sccz80
-PUBLIC l_long_asl
+	SECTION   code_crt0_sccz80
+	PUBLIC l_long_asl
+	PUBLIC l_long_aslo
+
 
 
 ; Shift primary left by secondary
@@ -17,16 +19,19 @@ PUBLIC l_long_asl
 ; Primary is on the stack, and is 32 bits long therefore we need only
 ; concern ourselves with l (secondary) as our counter
 
+; Entry: hl = shift
 .l_long_asl
-
-   pop ix
-   
+   pop bc
    ld a,l         ; counter
    pop hl
    pop de
- 
+   push bc
+
+; Entry: dehl = long
+;          a  = shift
+.l_long_aslo
    and 31 
-   jr z, done
+   ret z
    
    ld b,a
    ld a,e         ; primary = dahl
@@ -39,7 +44,4 @@ PUBLIC l_long_asl
    djnz loop
    
    ld e,a
-
-.done
-
-   jp (ix)
+   ret
