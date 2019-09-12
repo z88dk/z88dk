@@ -281,6 +281,7 @@
 	ret	z
 .%1
 
+%notcpu gbz80
 	push	hl
 	ld	hl,%1	;const
 	pop	de
@@ -433,17 +434,20 @@
 =
 	ld	hl,_%1+1
 
+%notcpu gbz80
 	ld	hl,_%1
 	call	l_gint	;%9
 =
 	ld	hl,(_%1)
 
+%notcpu gbz80
 	ld	hl,_%1
 	call	l_glong
 =
 	ld	hl,(_%1)
 	ld	de,(_%1+2)
 
+%notcpu gbz80
 	ld	hl,_%1
 	ld	l,(hl)
 	ld	h,0
@@ -908,12 +912,14 @@
 	pop	hl
 	call	l_long_aslo
 
+%notcpu gbz80
 	ld	a,+(16 % 256)
 	call	l_long_aslo
 =
 	ex	de,hl
 	ld	hl,0	;const
 
+%notcpu gbz80
 	push	hl
 	ld	hl,(_%1
 	pop	de
@@ -1126,6 +1132,7 @@
 	jp	nz,%2
 	ld	hl,%3
 
+%notcpu gbz80
 	push	hl
 	ld	hl,(%1)
 	ld	h,0
@@ -1162,6 +1169,7 @@
 	or	l
 	jp	nz,%1
 
+%notcpu gbz80
 	push	hl
 	pop	bc
 	pop	hl
@@ -1367,6 +1375,7 @@
 	push	bc
 	ld	hl,%1	;const
 
+%notcpu gbz80
 	push	hl
 	ld	hl,%1	;const
 	add	hl,sp
@@ -1379,6 +1388,7 @@
 	call	l_gint	;%9
 
 %notcpu 8080
+%notcpu gbz80
 	ld	hl,%1
 	ex	de,hl
 	ld	hl,%2
@@ -1548,6 +1558,7 @@
 	or	l
 	jp	%1
 
+%notcpu gbz80
 	push	hl
 	ld	hl,%1
 	pop	de
@@ -1913,6 +1924,7 @@
 	ld	l,(hl)
 	ld	h,0
 
+%notcpu gbz80
 	push	hl
 	ld	hl,%1	;const
 	add	hl,sp
@@ -2426,6 +2438,7 @@
 =
 	ld	hl,%1	;const
 
+%notcpu gbz80
 	push	hl
 	ld	hl,%1
 	pop	de
@@ -2450,6 +2463,7 @@
 =
 	call	l_ne
 
+%notcpu gbz80
 	push	hl
 	pop	bc
 	pop	hl
@@ -2460,6 +2474,19 @@
 	push	de
 	push	hl
 	ex	de,hl
+
+%cpu gbz80
+	push	hl
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	pop	de
+=
+	ld	d,h
+	ld	e,l
+	pop	hl
+	push	hl
 
 %notcpu 8080
 	ld	hl,(%1)
@@ -2565,6 +2592,7 @@
 	ld	hl,0	;const
 	ld	de,0
 
+%notcpu gbz80
 	ld	h,(hl)
 	ld	l,0
 	pop	de
@@ -2603,6 +2631,7 @@
 	ld	h,0
 	ld	de,0
 
+%notcpu gbz80
 	call	l_glong
 	ld	l,h
 	ld	h,e
@@ -3768,6 +3797,7 @@
 	ld	(de),a
 	ld	hl,%2
 
+%notcpu gbz80
 	push	de
 	ld	l,e
 	ld	h,d
