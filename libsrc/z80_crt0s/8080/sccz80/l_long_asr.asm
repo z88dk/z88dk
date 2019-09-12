@@ -5,6 +5,7 @@
 
                 SECTION   code_crt0_sccz80
 		PUBLIC    l_long_asr
+		PUBLIC    l_long_asro
 
 
 ; Entry:	dehl = long
