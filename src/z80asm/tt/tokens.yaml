@@ -153,14 +153,6 @@ tokens:
     regexp  : '"(" hspace "HL"i index_reg_suffix'
     lexcode : 'p--; te--;'
 
-  - name    : IND_HLI
-    regexp  : '"(" hspace "HLI"i index_reg_suffix'
-    lexcode : 'p--; te--;'
-
-  - name    : IND_HLD
-    regexp  : '"(" hspace "HLD"i index_reg_suffix'
-    lexcode : 'p--; te--;'
-
   - name    : IND_SP
     regexp  : '"(" hspace "SP"i index_reg_suffix'
     lexcode : 'p--; te--;'
@@ -254,10 +246,6 @@ tokens:
   
   - name    : AF1
     regexp  : "\"AF'\"i"
-  
-  # 32-bit registers
-  - name    : A32
-  - name    : DEHL
   
   # Assembly directives
   - name    : ALIGN

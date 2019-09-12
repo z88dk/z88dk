@@ -201,15 +201,7 @@ TOKEN_RE(TK_IND_IY, "(IY", "(" hspace "IY"i index_reg_suffix, p--; te--)
 TOKEN_RE(TK_IND_HL, "(HL", "(" hspace "HL"i index_reg_suffix, p--; te--)
 TOKEN_RE(TK_IND_SP, "(SP", "(" hspace "SP"i index_reg_suffix, p--; te--)
 
-/* gbz80 */
-TOKEN_RE(TK_IND_HLI, "(HLI", "(" hspace "HLI"i index_reg_suffix, p--; te--)
-TOKEN_RE(TK_IND_HLD, "(HLD", "(" hspace "HLD"i index_reg_suffix, p--; te--)
-
 TOKEN_RE(TK_IND_C,  "(C",  "(" hspace "C"i  index_reg_suffix, p--; te--)
-
-/* 32-bit registers */
-TOKEN_KW(A32, )
-TOKEN_KW(DEHL, )
 
 /* assembly directives */
 TOKEN_OPCODE(ALIGN		)

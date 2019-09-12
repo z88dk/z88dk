@@ -739,15 +739,7 @@
  jx5 65535                      ; Error
  ld (c), a                      ; Error
  ld (de), hl                    ; Error
- ld (hl+), a                    ; Error
- ld (hl-), a                    ; Error
- ld (hld), a                    ; Error
- ld (hli), a                    ; Error
  ld a, (c)                      ; Error
- ld a, (hl+)                    ; Error
- ld a, (hl-)                    ; Error
- ld a, (hld)                    ; Error
- ld a, (hli)                    ; Error
  ld a, i                        ; Error
  ld a, ixh                      ; Error
  ld a, ixl                      ; Error
@@ -766,7 +758,6 @@
  ld d, ixl                      ; Error
  ld d, iyh                      ; Error
  ld d, iyl                      ; Error
- ld de, hl                      ; Error
  ld de, hl+0                    ; Error
  ld de, hl+255                  ; Error
  ld de, sp                      ; Error
@@ -821,8 +812,6 @@
  ld iyl, iyh                    ; Error
  ld iyl, iyl                    ; Error
  ld r, a                        ; Error
- ldd (hl), a                    ; Error
- ldd a, (hl)                    ; Error
  lddrx                          ; Error
  lddsr                          ; Error
  lddx                           ; Error
@@ -839,8 +828,6 @@
  ldhi 255                       ; Error
  ldhl sp, -128                  ; Error
  ldhl sp, 127                   ; Error
- ldi (hl), a                    ; Error
- ldi a, (hl)                    ; Error
  ldirx                          ; Error
  ldisr                          ; Error
  ldix                           ; Error
@@ -2034,3 +2021,4 @@
  xra ixl                        ; Error
  xra iyh                        ; Error
  xra iyl                        ; Error
+ xthl                           ; Error
