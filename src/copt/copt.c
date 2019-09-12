@@ -718,9 +718,10 @@ int rpn_eval(const char* expr, char** vars)
             {
                 int a = pop();
                 int b = pop();
+                int c = a + b;
 		// This line prevents incorrect results, stdin is intentional
-                fprintf(stdin, "RPN adding %d + %d\n",a,b);
-                push(a + b);
+                fprintf(stderr, "RPN adding %d + %d = %d\n",a,b,c);
+                push(c);
             }
             break;
         case '*':
