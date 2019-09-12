@@ -385,7 +385,7 @@ char* subst_imp(char* pat, char** vars)
             expr[x] = 0;
             pat++;
             r = rpn_eval(expr, vars);
-            //fprintf(stderr, "RPN evaluation resulted in: %d\n",r);
+            fprintf(stderr, "RPN evaluation resulted in: %d\n",r);
             sprintf(expr, "%d", r);
             for ( s = expr; i <MAXLINE && *s; i++ )
                 lin[i] = *s++;
@@ -512,6 +512,11 @@ struct lnode* opt(struct lnode* r)
                 snprintf(tbuf,sizeof(tbuf),"%.*s",(int)strlen(p->l_text + 8)-1,p->l_text + 8);
                 if ( strcmp(tbuf, c_cpu) == 0 )
                     break;
+            } else if ( strncmp(p->l_text, "%cpu", 4) == 0 ) {
+                char  tbuf[1024];
+                snprintf(tbuf,sizeof(tbuf),"%.*s",(int)strlen(p->l_text + 5)-1,p->l_text + 5);
+                if ( strcmp(tbuf, c_cpu) )
+                    break;
             } else if ( strncmp(p->l_text, "%eval", 5) == 0 ) {
                 if (!check_eval(p->l_text + 5, vars))
                     break;
@@ -622,7 +627,7 @@ int main(int argc, char** argv)
     for (i = 1; i < argc; i++)
         if (strcasecmp(argv[i], "-D") == 0)
             debug = 1;
-        else if ( strcmp(argv[i], "-m8080") == 0 ) 
+        else if ( strncmp(argv[i], "-m",2) == 0 )
             c_cpu = argv[i] + 2;
         else if ((fp = fopen(argv[i], "r")) == NULL)
             error("copt: can't open patterns file\n");
