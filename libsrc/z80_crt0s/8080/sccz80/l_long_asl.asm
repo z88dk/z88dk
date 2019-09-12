@@ -27,7 +27,7 @@
    push bc
  
 ; Optimised version enters with dehl=long, count = a
-.l_long_aslo:   
+.l_long_aslo
    and 31 
    ret z
 
