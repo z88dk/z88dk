@@ -4,6 +4,7 @@
 
                 SECTION   code_crt0_sccz80
 		PUBLIC    l_long_asr_u
+		PUBLIC    l_long_asr_uo
 
 ; Entry: dehl = long
 ;           c = shift
