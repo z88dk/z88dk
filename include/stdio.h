@@ -4,7 +4,7 @@
 #include <sys/compiler.h>
 #include <stdint.h>
 
-/* $Id: stdio.h,v 1.41 2016-11-11 07:55:37 stefano Exp $ */
+/* $Id: stdio.h */
 
 #undef __STDIO_BINARY      /* By default don't consider binary/text file differences */
 #undef __STDIO_CRLF        /* By default don't insert automatic linefeed in text mode */
@@ -199,6 +199,7 @@ extern int __LIB__ fgetc(FILE *fp);
 #define getc(f) fgetc(f)
 extern int __LIB__ ungetc(int c, FILE *) __smallc;
 extern int __LIB__ feof(FILE *fp) __z88dk_fastcall;
+#define ferror(f) feof(f)
 extern int __LIB__ puts(char *s);
 
 /* Some standard macros */
@@ -225,6 +226,7 @@ extern int __LIB__ fgetc(FILE *fp);
 #define getc(f) fgetc(f)
 extern int __LIB__ ungetc(int c, FILE *) __smallc;
 extern int __LIB__ feof(FILE *fp) __z88dk_fastcall;
+#define ferror(f) feof(f)
 extern int __LIB__ puts(const char *);
 
 #define fputs(a,b)   fputs_callee(a,b)
