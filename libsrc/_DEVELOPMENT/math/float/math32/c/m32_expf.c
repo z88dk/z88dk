@@ -23,11 +23,6 @@
  *
  * ACCURACY:
  *
- *                      Relative error:
- * arithmetic   domain     # trials      peak         rms
- *    IEEE      +- MAXLOG   100000      1.7e-7      2.8e-8
- *
- *
  * Error amplification in the exponential function can be
  * a serious matter.  The error propagation involves
  * exp( X(1+delta) ) = exp(X) ( 1 + X*delta + ... ),
@@ -51,13 +46,6 @@
  Cephes Math Library Release 2.2:  June, 1992
  Copyright 1984, 1987, 1989 by Stephen L. Moshier
  Direct inquiries to 30 Frost Street, Cambridge, MA 02140
- */
- 
-/* Single precision exponential function.
- * test interval: [-0.5, +0.5]
- * trials: 80000
- * peak relative error: 7.6e-8
- * rms relative error: 2.8e-8
  */
 
 #include "m32_math.h"
@@ -87,7 +75,7 @@ float m32_expf(float x) __z88dk_fastcall
     x -= z * C1;
     x -= z * C2;
 
-    /* Theoretical peak relative error in [-0.5, +0.5] is 4.2e-9. */
+    /* Theoretical peak relative error in [-0.5, +0.5] is 5.23e-13 */
 
-    return m32_ldexpf( m32_polyf(x, m32_coeff_expf, 5) * m32_sqrf(x) + x + 1.0, (int16_t)z);
+    return m32_ldexpf( m32_polyf(x, m32_coeff_expf, 9), (int16_t)z);
 }
