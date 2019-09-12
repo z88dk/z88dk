@@ -2280,11 +2280,19 @@ void zmod(LVALUE* lval)
         else
             callrts("l_long_mod");
     } else {
-        zdiv(lval);
-        if (lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR)
-            doexx();
-        else
-            swap();
+        if ( IS_GBZ80() ) {
+            // TODO: This or just load registers?
+            if (ulvalue(lval))
+                callrts("l_mod_u");
+            else
+                callrts("l_mod");
+        } else {
+            zdiv(lval);
+            if (lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR)
+                doexx();
+            else
+                swap();
+        }
     }
 }
 

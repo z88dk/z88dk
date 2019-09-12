@@ -18,11 +18,26 @@
 ; Exit:           z = numbers the same
 ;                nz = numbers different
 ;              c/nc = sign of difference [set if secondary > primary]
+;		 hl = 1
 ;
 ; Code takes secondary from primary
 
 
 .l_long_cmp
+IF __CPU_GBZ80__
+	pop	bc		;Return address
+	ld	a,c
+	ld	(__retloc),a
+	ld	a,b
+	ld	(__retloc+1),a
+	pop	bc		;Second return value
+	ld	a,c
+	ld	(__retloc2+0),a
+	ld	a,b
+	ld	(__retloc2+1),a
+	ld	c,l		;Get low word into bc
+	ld	hl,sp+0
+ELSE
 	ex	(sp),hl
 	ld	(__retloc),hl	;first return
 	pop	bc		;low word
@@ -31,6 +46,7 @@
         
         ld      hl,0
         add     hl,sp   ;points to hl on stack
+ENDIF
 	
         ld      a,(hl)
         sub     c
@@ -65,7 +81,6 @@
 	or	b
 	or	d
 	or	e
-	ld	hl,1
 	scf
 	jp	retloc
 
@@ -77,12 +92,25 @@
         or      e
         scf
 	ccf
-        ld      hl,1    ; Saves some mem in comparision unfunctions
-.retloc	ex	de,hl
+.retloc
+	; We need to preserve flags
+IF __CPU_GBZ80__
+	ld	hl,__retloc2
+	ld	a,(hl+)
+	ld	b,(hl)
+	ld	c,a
+	push	bc
+	ld	hl,__retloc
+	ld	a,(hl+)
+	ld	b,(hl)
+	ld	c,a
+	push	bc
+ELSE
 	ld	hl,(__retloc2)
 	push	hl
 	ld	hl,(__retloc)
 	push	hl
-	ex	de,hl
+ENDIF
+        ld      hl,1    ; Saves some mem in comparision unfunctions
 	ret
 
