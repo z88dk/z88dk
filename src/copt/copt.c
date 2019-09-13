@@ -782,5 +782,12 @@ int rpn_eval(const char* expr, char** vars)
             break;
         }
     }
+    if ( sp != 1 ) {
+        int i;
+        fprintf(stderr,"Exiting with a stack level of %d\n",sp);
+        for ( i = 0; i < sp; i++ ) { 
+            fprintf(stderr,"Stack level %d -> %d\n",i, stack[i]);
+        }
+    }
     return top();
 }
