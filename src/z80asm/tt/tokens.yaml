@@ -247,10 +247,6 @@ tokens:
   - name    : AF1
     regexp  : "\"AF'\"i"
   
-  # 32-bit registers
-  - name    : A32
-  - name    : DEHL
-  
   # Assembly directives
   - name    : ALIGN
   - name    : BINARY
@@ -336,6 +332,8 @@ tokens:
   - name    : JP
   - name    : JR
   - name    : LD
+  - name    : LDH
+  - name    : LDHL
   - name    : LDD
   - name    : LDDR
   - name    : LDI
@@ -378,6 +376,7 @@ tokens:
   - name    : SLI
   - name    : SRA
   - name    : SRL
+  - name    : STOP
   - name    : SUB
   - name    : XOR 
 

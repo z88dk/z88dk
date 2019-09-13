@@ -1,7 +1,7 @@
 ; Substitute for the z80 ldd instruction
 ; Doesn't emulate the flags correctly
 
-
+IF !__CPU_GBZ80__
 SECTION code_crt0_sccz80
 PUBLIC __z80asm__ldd
 
@@ -28,4 +28,4 @@ set_pv:
 	ex	(sp),hl		;Get hl back
 	pop	af		;And restore our modified af
 	ret
-
+ENDIF

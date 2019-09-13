@@ -20,6 +20,7 @@
 #define CPU_R3K		(1 << 4)
 #define CPU_8080	(1 << 5)
 #define CPU_8085	(1 << 6)
+#define CPU_GBZ80	(1 << 7)
 
 #define CPU_Z80_NAME		"z80"
 #define CPU_Z80N_NAME		"z80n"
@@ -28,6 +29,7 @@
 #define CPU_R3K_NAME		"r3k"
 #define CPU_8080_NAME		"8080"
 #define CPU_8085_NAME		"8085"
+#define CPU_GBZ80_NAME		"gbz80"
 
 #define CPU_ZILOG	(CPU_Z80 | CPU_Z80N| CPU_Z180)
 #define CPU_RABBIT	(CPU_R2K | CPU_R3K)

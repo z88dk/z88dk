@@ -203,10 +203,6 @@ TOKEN_RE(TK_IND_SP, "(SP", "(" hspace "SP"i index_reg_suffix, p--; te--)
 
 TOKEN_RE(TK_IND_C,  "(C",  "(" hspace "C"i  index_reg_suffix, p--; te--)
 
-/* 32-bit registers */
-TOKEN_KW(A32, )
-TOKEN_KW(DEHL, )
-
 /* assembly directives */
 TOKEN_OPCODE(ALIGN		)
 TOKEN_OPCODE(BINARY		)
@@ -387,6 +383,12 @@ TOKEN_OPCODE(OUT0)
 TOKEN_OPCODE(SLP)
 TOKEN_OPCODE(TST)
 TOKEN_OPCODE(TSTIO)
+
+/* GBZ80 opcodes */
+TOKEN_OPCODE(LDH)
+TOKEN_OPCODE(LDHL)
+TOKEN_OPCODE(STOP)
+TOKEN_OPCODE(SWAP)
 
 /* Rabbit opcodes */
 TOKEN_OPCODE(ALTD)

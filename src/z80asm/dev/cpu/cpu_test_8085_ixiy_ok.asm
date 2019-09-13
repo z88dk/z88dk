@@ -448,8 +448,12 @@
  ld (65535), a                  ; 32 FF FF
  ld (65535), hl                 ; 22 FF FF
  ld (bc), a                     ; 02
+ ld (bc+), a                    ; 02 03
+ ld (bc-), a                    ; 02 0B
  ld (de), a                     ; 12
  ld (de), hl                    ; D9
+ ld (de+), a                    ; 12 13
+ ld (de-), a                    ; 12 1B
  ld (hl), -128                  ; 36 80
  ld (hl), 127                   ; 36 7F
  ld (hl), 255                   ; 36 FF
@@ -460,12 +464,20 @@
  ld (hl), e                     ; 73
  ld (hl), h                     ; 74
  ld (hl), l                     ; 75
+ ld (hl+), a                    ; 77 23
+ ld (hl-), a                    ; 77 2B
  ld a, (-32768)                 ; 3A 00 80
  ld a, (32767)                  ; 3A FF 7F
  ld a, (65535)                  ; 3A FF FF
  ld a, (bc)                     ; 0A
+ ld a, (bc+)                    ; 0A 03
+ ld a, (bc-)                    ; 0A 0B
  ld a, (de)                     ; 1A
+ ld a, (de+)                    ; 1A 13
+ ld a, (de-)                    ; 1A 1B
  ld a, (hl)                     ; 7E
+ ld a, (hl+)                    ; 7E 23
+ ld a, (hl-)                    ; 7E 2B
  ld a, -128                     ; 3E 80
  ld a, 127                      ; 3E 7F
  ld a, 255                      ; 3E FF
@@ -490,6 +502,8 @@
  ld bc, -32768                  ; 01 00 80
  ld bc, 32767                   ; 01 FF 7F
  ld bc, 65535                   ; 01 FF FF
+ ld bc, de                      ; 42 4B
+ ld bc, hl                      ; 44 4D
  ld c, (hl)                     ; 4E
  ld c, -128                     ; 0E 80
  ld c, 127                      ; 0E 7F
@@ -515,6 +529,7 @@
  ld de, -32768                  ; 11 00 80
  ld de, 32767                   ; 11 FF 7F
  ld de, 65535                   ; 11 FF FF
+ ld de, bc                      ; 50 59
  ld de, hl                      ; 28 00
  ld de, hl+0                    ; 28 00
  ld de, hl+255                  ; 28 FF
@@ -550,6 +565,8 @@
  ld hl, -32768                  ; 21 00 80
  ld hl, 32767                   ; 21 FF 7F
  ld hl, 65535                   ; 21 FF FF
+ ld hl, bc                      ; 60 69
+ ld hl, de                      ; 62 6B
  ld l, (hl)                     ; 6E
  ld l, -128                     ; 2E 80
  ld l, 127                      ; 2E 7F
@@ -573,11 +590,23 @@
  ldax d                         ; 1A
  ldax de                        ; 1A
  ldd                            ; CD @__z80asm__ldd
+ ldd (bc), a                    ; 02 0B
+ ldd (de), a                    ; 12 1B
+ ldd (hl), a                    ; 77 2B
+ ldd a, (bc)                    ; 0A 0B
+ ldd a, (de)                    ; 1A 1B
+ ldd a, (hl)                    ; 7E 2B
  lddr                           ; CD @__z80asm__lddr
  ldhi -128                      ; 28 80
  ldhi 127                       ; 28 7F
  ldhi 255                       ; 28 FF
  ldi                            ; CD @__z80asm__ldi
+ ldi (bc), a                    ; 02 03
+ ldi (de), a                    ; 12 13
+ ldi (hl), a                    ; 77 23
+ ldi a, (bc)                    ; 0A 03
+ ldi a, (de)                    ; 1A 13
+ ldi a, (hl)                    ; 7E 23
  ldir                           ; CD @__z80asm__ldir
  ldsi -128                      ; 38 80
  ldsi 127                       ; 38 7F

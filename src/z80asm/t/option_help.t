@@ -49,6 +49,7 @@ Help Options:
 Code Generation Options:
   --cpu=z80n             Assemble for the Z80 variant of ZX Next
   --cpu=z80              Assemble for the Z80
+  --cpu=gbz80            Assemble for the GameBoy Z80
   --cpu=8080             Assemble for the 8080 (with Zilog or Intel mnemonics)
   --cpu=8085             Assemble for the 8085 (with Zilog or Intel mnemonics)
   --cpu=z180             Assemble for the Z180

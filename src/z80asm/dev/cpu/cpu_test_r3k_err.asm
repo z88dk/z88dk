@@ -724,7 +724,9 @@
  jx5 -32768                     ; Error
  jx5 32767                      ; Error
  jx5 65535                      ; Error
+ ld (c), a                      ; Error
  ld (de), hl                    ; Error
+ ld a, (c)                      ; Error
  ld a, i                        ; Error
  ld a, ixh                      ; Error
  ld a, ixl                      ; Error
@@ -743,7 +745,6 @@
  ld d, ixl                      ; Error
  ld d, iyh                      ; Error
  ld d, iyl                      ; Error
- ld de, hl                      ; Error
  ld de, hl+0                    ; Error
  ld de, hl+255                  ; Error
  ld de, sp                      ; Error
@@ -754,6 +755,8 @@
  ld e, iyh                      ; Error
  ld e, iyl                      ; Error
  ld hl, (de)                    ; Error
+ ld hl, sp+-128                 ; Error
+ ld hl, sp+127                  ; Error
  ld i, a                        ; Error
  ld ixh, -128                   ; Error
  ld ixh, 127                    ; Error
@@ -798,9 +801,19 @@
  ld r, a                        ; Error
  lddrx                          ; Error
  lddx                           ; Error
+ ldh (-128), a                  ; Error
+ ldh (127), a                   ; Error
+ ldh (255), a                   ; Error
+ ldh (c), a                     ; Error
+ ldh a, (-128)                  ; Error
+ ldh a, (127)                   ; Error
+ ldh a, (255)                   ; Error
+ ldh a, (c)                     ; Error
  ldhi -128                      ; Error
  ldhi 127                       ; Error
  ldhi 255                       ; Error
+ ldhl sp, -128                  ; Error
+ ldhl sp, 127                   ; Error
  ldirx                          ; Error
  ldix                           ; Error
  ldpirx                         ; Error
@@ -1879,6 +1892,7 @@
  srl ixl                        ; Error
  srl iyh                        ; Error
  srl iyl                        ; Error
+ stop                           ; Error
  sub a, ixh                     ; Error
  sub a, ixl                     ; Error
  sub a, iyh                     ; Error
@@ -1888,6 +1902,14 @@
  sub ixl                        ; Error
  sub iyh                        ; Error
  sub iyl                        ; Error
+ swap (hl)                      ; Error
+ swap a                         ; Error
+ swap b                         ; Error
+ swap c                         ; Error
+ swap d                         ; Error
+ swap e                         ; Error
+ swap h                         ; Error
+ swap l                         ; Error
  swapnib                        ; Error
  test (hl)                      ; Error
  test (ix)                      ; Error
@@ -1972,3 +1994,4 @@
  xra ixl                        ; Error
  xra iyh                        ; Error
  xra iyl                        ; Error
+ xthl                           ; Error
