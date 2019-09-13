@@ -14,7 +14,7 @@
 ;enter with secondary, primary on stack
 
 .l_long_sub
-IF __CPU_GBZ80
+IF __CPU_GBZ80__
 	pop	bc	;Return address
 	push	hl	;Low word
 	ld	hl,__retloc

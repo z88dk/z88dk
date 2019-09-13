@@ -14,7 +14,7 @@
 
 ; "xor" deHL' and dehl into HLde'
 .l_long_xor   
-IF __CPU_GBZ80
+IF __CPU_GBZ80__
 	pop	bc	;Return address
 	push	hl	;Low word
 	ld	hl,__retloc

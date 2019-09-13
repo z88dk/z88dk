@@ -95,5 +95,4 @@ l/sccz80/crt0_long/l_long_ugt
 l/sccz80/crt0_long/l_long_ule
 l/sccz80/crt0_long/l_long_ult
 l/sccz80/crt0_long/l_long_xor
-l/sccz80/crt0_long/long2int_s
 l/sccz80/crt0_long/lpush2

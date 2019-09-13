@@ -9,8 +9,13 @@
 ; Load FA from (hl) and push FA onto stack
 ;-----------------------------------------
 dldpsh: ld      de,fa
-        ld      bc,6
-        ldir
+        ld      b,6
+loop:
+        ld      a,(hl+)
+        ld      (de),a
+        inc     de
+        dec     b
+        jr      nz,loop
 ;------------------------------------------
 ; Push FA onto stack (under return address)
 ;------------------------------------------

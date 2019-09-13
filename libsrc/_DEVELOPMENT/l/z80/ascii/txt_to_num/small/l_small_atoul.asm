@@ -46,7 +46,7 @@ loop:
    push de
    push hl
 
-IF __CPU_INTEL__
+IF __CPU_INTEL__ 
    push bc
    ld   c,a
    ld a,l
@@ -126,8 +126,7 @@ ENDIF
    add hl,de
    pop de
    ex (sp),hl
-IF __CPU_INTEL__
-   push af
+IF __CPU_INTEL__ | __CPU_GBZ80__
    ld a,l
    adc e
    ld l,a

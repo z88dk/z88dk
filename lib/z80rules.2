@@ -1290,6 +1290,7 @@
 	call	l_gcharspsp	;
 	ld	hl,%2	;const
 
+%notcpu gbz80
 	ld	hl,%1	;const
 	call	l_gintspsp	;
 	ld	hl,%1	;const
@@ -1298,6 +1299,7 @@
 	ld	hl,%1	;const
 	call	l_g2intspsp	;
 
+%notcpu gbz80
 	ld	hl,%1	;const
 	call	l_gcharspsp	;
 	ld	hl,%1	;const

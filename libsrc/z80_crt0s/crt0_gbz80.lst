@@ -34,14 +34,12 @@ z80/sccz80/l_div
 z80/sccz80/l_div_u
 z80/sccz80/l_gchar
 z80/sccz80/l_gcharsp
-z80/sccz80/l_g2charspsp
 z80/sccz80/l_ge
 z80/sccz80/l_gint
 z80/sccz80/l_gint7de
 z80/sccz80/l_gintsp
 z80/sccz80/l_gintspchar
 z80/sccz80/l_gintspsp
-z80/sccz80/l_g2intspsp
 z80/sccz80/l_gint_eq
 z80/sccz80/l_ghtonsint
 z80/sccz80/l_gt
@@ -86,7 +84,6 @@ z80/sccz80/l_long_uge
 z80/sccz80/l_long_ugt
 z80/sccz80/l_long_ule
 z80/sccz80/l_long_ult
-z80/sccz80/long2int_s
 z80/sccz80/lpush2
 z80/sccz80/__atof2
 z80/sccz80/dload

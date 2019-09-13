@@ -104,7 +104,6 @@
 	EXTERN     l_int2long_s	;Int->long signed conversion
 	EXTERN     l_int2long_s_float	;Int->long->float signed conversion (optimizer: use -O3)
 	EXTERN     l_int2long_u_float	;uInt->ulong->float signed conversion 
-	EXTERN     l_long2int_s	;Long->int signed conversion
 	EXTERN     l_glong		;Get long
 	EXTERN     l_glongsp	;Get long (peephole opt)
 	EXTERN     l_glonghlp	;Get pointer, then get long

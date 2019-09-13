@@ -11,8 +11,14 @@
 .l_cm_de
 
    ld a,d
+IF __CPU_GBZ80__
+   rla
+   ret nc
+   ld a,d
+ELSE
    or a
    ret p
+ENDIF
    cpl
    ld d,a
    ld a,e
@@ -21,8 +27,3 @@
    inc de
    ret
    
-;        ld a,d
-;        or a
-;        ret p
-;        call    l_deneg
-;        ret
