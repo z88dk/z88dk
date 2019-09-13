@@ -2470,8 +2470,8 @@
 =
 	pop	hl
 	push	hl
-	ld	bc,%1
-	push	bc
+	ld	de,(%1)
+	push	de
 
 	ld	hl,%1	;const
 	pop	de
