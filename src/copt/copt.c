@@ -385,7 +385,6 @@ char* subst_imp(char* pat, char** vars)
             expr[x] = 0;
             pat++;
             r = rpn_eval(expr, vars);
-            fprintf(stderr, "RPN evaluation resulted in: %d\n",r);
             sprintf(expr, "%d", r);
             for ( s = expr; i <MAXLINE && *s; i++ )
                 lin[i] = *s++;
@@ -724,8 +723,6 @@ int rpn_eval(const char* expr, char** vars)
                 int a = pop();
                 int b = pop();
                 int c = a + b;
-		// This line prevents incorrect results, stdin is intentional
-                fprintf(stderr, "RPN adding %d + %d = %d\n",a,b,c);
                 push(c);
             }
             break;
