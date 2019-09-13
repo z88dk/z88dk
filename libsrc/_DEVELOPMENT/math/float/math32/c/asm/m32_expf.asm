@@ -284,7 +284,7 @@ _m32_expf:
 	add	ix,sp
 	ld	c, l
 	ld	b, h
-	ld	hl, -14
+	ld	hl, -12
 	add	hl, sp
 	ld	sp, hl
 	ld	(ix-12),c
@@ -360,10 +360,8 @@ _m32_expf:
 	ld	h,(ix-3)
 	push	hl
 	call	___fssub_callee
-	ld	(ix-14),l
-	ld	(ix-13),h
-	ld	(ix-12),e
-	ld	(ix-11),d
+	push	hl
+	push	de
 	ld	l,(ix-6)
 	ld	h,(ix-5)
 	push	hl
@@ -371,63 +369,21 @@ _m32_expf:
 	ld	h,(ix-7)
 	push	hl
 	call	___fs2sint_callee
-	ld	(ix-10),l
-	ld	(ix-9),h
-	ld	hl,0x0005
+	ld	(ix-6),l
+	ld	(ix-5),h
+	pop	de
+	pop	bc
+	ld	hl,0x0009
 	push	hl
 	ld	hl,_m32_coeff_expf
 	push	hl
-	ld	l,(ix-12)
-	ld	h,(ix-11)
-	push	hl
-	ld	l,(ix-14)
-	ld	h,(ix-13)
-	push	hl
+	push	de
+	push	bc
 	call	_m32_polyf
-	ld	(ix-8),l
-	ld	(ix-7),h
-	ld	(ix-6),e
-	ld	(ix-5),d
-	pop	bc
-	pop	de
-	push	de
-	ld	l,c
-	ld	h,b
-	push	hl
-	call	_m32_sqrf
-	push	de
-	push	hl
+	ld	c, l
 	ld	l,(ix-6)
+	ld	b,h
 	ld	h,(ix-5)
-	push	hl
-	ld	l,(ix-8)
-	ld	h,(ix-7)
-	push	hl
-	call	___fsmul_callee
-	ld	c, l
-	ld	l,(ix-12)
-	ld	b,h
-	ld	h,(ix-11)
-	push	hl
-	ld	l,(ix-14)
-	ld	h,(ix-13)
-	push	hl
-	push	de
-	push	bc
-	call	___fsadd_callee
-	ld	c, l
-	ld	b, h
-	ld	hl,0x3f80
-	push	hl
-	ld	hl,0x0000
-	push	hl
-	push	de
-	push	bc
-	call	___fsadd_callee
-	ld	c, l
-	ld	l,(ix-10)
-	ld	b,h
-	ld	h,(ix-9)
 	push	hl
 	push	de
 	push	bc

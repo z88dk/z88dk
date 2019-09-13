@@ -2497,8 +2497,8 @@
 =
 	pop	hl
 	push	hl
-	ld	bc,%1
-	push	bc
+	ld	de,(%1)
+	push	de
 
 	ld	hl,%1	;const
 	pop	de
@@ -4147,7 +4147,7 @@
 	add	hl,sp
 	ld	sp,hl
 =
-	ld	hl,%eval(65536 %1 %2 + %)	;const
+	ld	hl,%eval(%1 %2 + 65536 %%)	;const
 	add	hl,sp
 	ld	sp,hl
 

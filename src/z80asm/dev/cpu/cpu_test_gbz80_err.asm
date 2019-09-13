@@ -104,8 +104,6 @@
  add iy, sp                     ; Error
  add iyh                        ; Error
  add iyl                        ; Error
- add sp, -128                   ; Error
- add sp, 127                    ; Error
  adi hl, -128                   ; Error
  adi hl, 127                    ; Error
  adi hl, 255                    ; Error
@@ -454,6 +452,8 @@
  altd dec h                     ; Error
  altd dec hl                    ; Error
  altd dec l                     ; Error
+ altd djnz ASMPC                ; Error
+ altd djnz b, ASMPC             ; Error
  altd ex (sp), hl               ; Error
  altd ex de', hl                ; Error
  altd ex de, hl                 ; Error
@@ -1831,150 +1831,86 @@
  bit -1, iyl                    ; Error
  bit -1, l                      ; Error
  bit -1, l                      ; Error
- bit 0, (hl)                    ; Error
  bit 0, (ix)                    ; Error
  bit 0, (ix+127)                ; Error
  bit 0, (ix-128)                ; Error
  bit 0, (iy)                    ; Error
  bit 0, (iy+127)                ; Error
  bit 0, (iy-128)                ; Error
- bit 0, a                       ; Error
- bit 0, b                       ; Error
- bit 0, c                       ; Error
- bit 0, d                       ; Error
- bit 0, e                       ; Error
- bit 0, h                       ; Error
  bit 0, ixh                     ; Error
  bit 0, ixl                     ; Error
  bit 0, iyh                     ; Error
  bit 0, iyl                     ; Error
- bit 0, l                       ; Error
- bit 1, (hl)                    ; Error
  bit 1, (ix)                    ; Error
  bit 1, (ix+127)                ; Error
  bit 1, (ix-128)                ; Error
  bit 1, (iy)                    ; Error
  bit 1, (iy+127)                ; Error
  bit 1, (iy-128)                ; Error
- bit 1, a                       ; Error
- bit 1, b                       ; Error
- bit 1, c                       ; Error
- bit 1, d                       ; Error
- bit 1, e                       ; Error
- bit 1, h                       ; Error
  bit 1, ixh                     ; Error
  bit 1, ixl                     ; Error
  bit 1, iyh                     ; Error
  bit 1, iyl                     ; Error
- bit 1, l                       ; Error
- bit 2, (hl)                    ; Error
  bit 2, (ix)                    ; Error
  bit 2, (ix+127)                ; Error
  bit 2, (ix-128)                ; Error
  bit 2, (iy)                    ; Error
  bit 2, (iy+127)                ; Error
  bit 2, (iy-128)                ; Error
- bit 2, a                       ; Error
- bit 2, b                       ; Error
- bit 2, c                       ; Error
- bit 2, d                       ; Error
- bit 2, e                       ; Error
- bit 2, h                       ; Error
  bit 2, ixh                     ; Error
  bit 2, ixl                     ; Error
  bit 2, iyh                     ; Error
  bit 2, iyl                     ; Error
- bit 2, l                       ; Error
- bit 3, (hl)                    ; Error
  bit 3, (ix)                    ; Error
  bit 3, (ix+127)                ; Error
  bit 3, (ix-128)                ; Error
  bit 3, (iy)                    ; Error
  bit 3, (iy+127)                ; Error
  bit 3, (iy-128)                ; Error
- bit 3, a                       ; Error
- bit 3, b                       ; Error
- bit 3, c                       ; Error
- bit 3, d                       ; Error
- bit 3, e                       ; Error
- bit 3, h                       ; Error
  bit 3, ixh                     ; Error
  bit 3, ixl                     ; Error
  bit 3, iyh                     ; Error
  bit 3, iyl                     ; Error
- bit 3, l                       ; Error
- bit 4, (hl)                    ; Error
  bit 4, (ix)                    ; Error
  bit 4, (ix+127)                ; Error
  bit 4, (ix-128)                ; Error
  bit 4, (iy)                    ; Error
  bit 4, (iy+127)                ; Error
  bit 4, (iy-128)                ; Error
- bit 4, a                       ; Error
- bit 4, b                       ; Error
- bit 4, c                       ; Error
- bit 4, d                       ; Error
- bit 4, e                       ; Error
- bit 4, h                       ; Error
  bit 4, ixh                     ; Error
  bit 4, ixl                     ; Error
  bit 4, iyh                     ; Error
  bit 4, iyl                     ; Error
- bit 4, l                       ; Error
- bit 5, (hl)                    ; Error
  bit 5, (ix)                    ; Error
  bit 5, (ix+127)                ; Error
  bit 5, (ix-128)                ; Error
  bit 5, (iy)                    ; Error
  bit 5, (iy+127)                ; Error
  bit 5, (iy-128)                ; Error
- bit 5, a                       ; Error
- bit 5, b                       ; Error
- bit 5, c                       ; Error
- bit 5, d                       ; Error
- bit 5, e                       ; Error
- bit 5, h                       ; Error
  bit 5, ixh                     ; Error
  bit 5, ixl                     ; Error
  bit 5, iyh                     ; Error
  bit 5, iyl                     ; Error
- bit 5, l                       ; Error
- bit 6, (hl)                    ; Error
  bit 6, (ix)                    ; Error
  bit 6, (ix+127)                ; Error
  bit 6, (ix-128)                ; Error
  bit 6, (iy)                    ; Error
  bit 6, (iy+127)                ; Error
  bit 6, (iy-128)                ; Error
- bit 6, a                       ; Error
- bit 6, b                       ; Error
- bit 6, c                       ; Error
- bit 6, d                       ; Error
- bit 6, e                       ; Error
- bit 6, h                       ; Error
  bit 6, ixh                     ; Error
  bit 6, ixl                     ; Error
  bit 6, iyh                     ; Error
  bit 6, iyl                     ; Error
- bit 6, l                       ; Error
- bit 7, (hl)                    ; Error
  bit 7, (ix)                    ; Error
  bit 7, (ix+127)                ; Error
  bit 7, (ix-128)                ; Error
  bit 7, (iy)                    ; Error
  bit 7, (iy+127)                ; Error
  bit 7, (iy-128)                ; Error
- bit 7, a                       ; Error
- bit 7, b                       ; Error
- bit 7, c                       ; Error
- bit 7, d                       ; Error
- bit 7, e                       ; Error
- bit 7, h                       ; Error
  bit 7, ixh                     ; Error
  bit 7, ixl                     ; Error
  bit 7, iyh                     ; Error
  bit 7, iyl                     ; Error
- bit 7, l                       ; Error
  bit 8, (hl)                    ; Error
  bit 8, (hl)                    ; Error
  bit 8, (ix)                    ; Error
@@ -2020,18 +1956,60 @@
  bsra de,b                      ; Error
  bsrf de,b                      ; Error
  bsrl de,b                      ; Error
+ c_m -32768                     ; Error
+ c_m 32767                      ; Error
+ c_m 65535                      ; Error
+ c_nv -32768                    ; Error
+ c_nv 32767                     ; Error
+ c_nv 65535                     ; Error
+ c_p -32768                     ; Error
+ c_p 32767                      ; Error
+ c_p 65535                      ; Error
+ c_pe -32768                    ; Error
+ c_pe 32767                     ; Error
+ c_pe 65535                     ; Error
+ c_po -32768                    ; Error
+ c_po 32767                     ; Error
+ c_po 65535                     ; Error
+ c_v -32768                     ; Error
+ c_v 32767                      ; Error
+ c_v 65535                      ; Error
  call lo, -32768                ; Error
  call lo, 32767                 ; Error
  call lo, 65535                 ; Error
  call lz, -32768                ; Error
  call lz, 32767                 ; Error
  call lz, 65535                 ; Error
+ call m, -32768                 ; Error
+ call m, 32767                  ; Error
+ call m, 65535                  ; Error
+ call nv, -32768                ; Error
+ call nv, 32767                 ; Error
+ call nv, 65535                 ; Error
+ call p, -32768                 ; Error
+ call p, 32767                  ; Error
+ call p, 65535                  ; Error
+ call pe, -32768                ; Error
+ call pe, 32767                 ; Error
+ call pe, 65535                 ; Error
+ call po, -32768                ; Error
+ call po, 32767                 ; Error
+ call po, 65535                 ; Error
+ call v, -32768                 ; Error
+ call v, 32767                  ; Error
+ call v, 65535                  ; Error
  ccf f'                         ; Error
  ccf'                           ; Error
+ cm -32768                      ; Error
+ cm 32767                       ; Error
+ cm 65535                       ; Error
  cmp ixh                        ; Error
  cmp ixl                        ; Error
  cmp iyh                        ; Error
  cmp iyl                        ; Error
+ cnv -32768                     ; Error
+ cnv 32767                      ; Error
+ cnv 65535                      ; Error
  cp (ix)                        ; Error
  cp (ix+127)                    ; Error
  cp (ix-128)                    ; Error
@@ -2052,7 +2030,20 @@
  cp ixl                         ; Error
  cp iyh                         ; Error
  cp iyl                         ; Error
+ cpd                            ; Error
+ cpdr                           ; Error
+ cpe -32768                     ; Error
+ cpe 32767                      ; Error
+ cpe 65535                      ; Error
+ cpi                            ; Error
+ cpir                           ; Error
  cpl a'                         ; Error
+ cpo -32768                     ; Error
+ cpo 32767                      ; Error
+ cpo 65535                      ; Error
+ cv -32768                      ; Error
+ cv 32767                       ; Error
+ cv 65535                       ; Error
  dad ixh                        ; Error
  dad iyh                        ; Error
  dcr ixh                        ; Error
@@ -2083,7 +2074,9 @@
  dec iyh                        ; Error
  dec iyl                        ; Error
  dec l'                         ; Error
+ djnz b', ASMPC                 ; Error
  dsub                           ; Error
+ ex (sp), hl                    ; Error
  ex (sp), hl'                   ; Error
  ex (sp), ix                    ; Error
  ex (sp), iy                    ; Error
@@ -2102,6 +2095,12 @@
  im 3                           ; Error
  im 3                           ; Error
  in (c)                         ; Error
+ in -128                        ; Error
+ in 127                         ; Error
+ in 255                         ; Error
+ in a, (-128)                   ; Error
+ in a, (127)                    ; Error
+ in a, (255)                    ; Error
  in a, (c)                      ; Error
  in b, (c)                      ; Error
  in c, (c)                      ; Error
@@ -4403,12 +4402,30 @@
  j_lz -32768                    ; Error
  j_lz 32767                     ; Error
  j_lz 65535                     ; Error
+ j_m -32768                     ; Error
+ j_m 32767                      ; Error
+ j_m 65535                      ; Error
  j_nk -32768                    ; Error
  j_nk 32767                     ; Error
  j_nk 65535                     ; Error
+ j_nv -32768                    ; Error
+ j_nv 32767                     ; Error
+ j_nv 65535                     ; Error
  j_nx5 -32768                   ; Error
  j_nx5 32767                    ; Error
  j_nx5 65535                    ; Error
+ j_p -32768                     ; Error
+ j_p 32767                      ; Error
+ j_p 65535                      ; Error
+ j_pe -32768                    ; Error
+ j_pe 32767                     ; Error
+ j_pe 65535                     ; Error
+ j_po -32768                    ; Error
+ j_po 32767                     ; Error
+ j_po 65535                     ; Error
+ j_v -32768                     ; Error
+ j_v 32767                      ; Error
+ j_v 65535                      ; Error
  j_x5 -32768                    ; Error
  j_x5 32767                     ; Error
  j_x5 65535                     ; Error
@@ -4421,9 +4438,15 @@
  jlz -32768                     ; Error
  jlz 32767                      ; Error
  jlz 65535                      ; Error
+ jm -32768                      ; Error
+ jm 32767                       ; Error
+ jm 65535                       ; Error
  jnk -32768                     ; Error
  jnk 32767                      ; Error
  jnk 65535                      ; Error
+ jnv -32768                     ; Error
+ jnv 32767                      ; Error
+ jnv 65535                      ; Error
  jnx5 -32768                    ; Error
  jnx5 32767                     ; Error
  jnx5 65535                     ; Error
@@ -4436,25 +4459,51 @@
  jp lz, -32768                  ; Error
  jp lz, 32767                   ; Error
  jp lz, 65535                   ; Error
+ jp m, -32768                   ; Error
+ jp m, 32767                    ; Error
+ jp m, 65535                    ; Error
+ jp nv, -32768                  ; Error
+ jp nv, 32767                   ; Error
+ jp nv, 65535                   ; Error
+ jp p, -32768                   ; Error
+ jp p, 32767                    ; Error
+ jp p, 65535                    ; Error
+ jp pe, -32768                  ; Error
+ jp pe, 32767                   ; Error
+ jp pe, 65535                   ; Error
+ jp po, -32768                  ; Error
+ jp po, 32767                   ; Error
+ jp po, 65535                   ; Error
+ jp v, -32768                   ; Error
+ jp v, 32767                    ; Error
+ jp v, 65535                    ; Error
+ jpe -32768                     ; Error
+ jpe 32767                      ; Error
+ jpe 65535                      ; Error
+ jpo -32768                     ; Error
+ jpo 32767                      ; Error
+ jpo 65535                      ; Error
+ jv -32768                      ; Error
+ jv 32767                       ; Error
+ jv 65535                       ; Error
  jx5 -32768                     ; Error
  jx5 32767                      ; Error
  jx5 65535                      ; Error
  ld (-32768), bc                ; Error
  ld (-32768), de                ; Error
+ ld (-32768), hl                ; Error
  ld (-32768), ix                ; Error
  ld (-32768), iy                ; Error
- ld (-32768), sp                ; Error
  ld (32767), bc                 ; Error
  ld (32767), de                 ; Error
+ ld (32767), hl                 ; Error
  ld (32767), ix                 ; Error
  ld (32767), iy                 ; Error
- ld (32767), sp                 ; Error
  ld (65535), bc                 ; Error
  ld (65535), de                 ; Error
+ ld (65535), hl                 ; Error
  ld (65535), ix                 ; Error
  ld (65535), iy                 ; Error
- ld (65535), sp                 ; Error
- ld (c), a                      ; Error
  ld (de), hl                    ; Error
  ld (hl), hl                    ; Error
  ld (hl+127), hl                ; Error
@@ -4565,7 +4614,6 @@
  ld a', iir                     ; Error
  ld a', l                       ; Error
  ld a', xpc                     ; Error
- ld a, (c)                      ; Error
  ld a, (ix)                     ; Error
  ld a, (ix+127)                 ; Error
  ld a, (ix-128)                 ; Error
@@ -4762,6 +4810,9 @@
  ld hl', de                     ; Error
  ld hl', ix                     ; Error
  ld hl', iy                     ; Error
+ ld hl, (-32768)                ; Error
+ ld hl, (32767)                 ; Error
+ ld hl, (65535)                 ; Error
  ld hl, (de)                    ; Error
  ld hl, (hl)                    ; Error
  ld hl, (hl+127)                ; Error
@@ -4777,8 +4828,6 @@
  ld hl, (sp+255)                ; Error
  ld hl, ix                      ; Error
  ld hl, iy                      ; Error
- ld hl, sp+-128                 ; Error
- ld hl, sp+127                  ; Error
  ld i, a                        ; Error
  ld iir, a                      ; Error
  ld ix, (-32768)                ; Error
@@ -4787,9 +4836,6 @@
  ld ix, (sp)                    ; Error
  ld ix, (sp+0)                  ; Error
  ld ix, (sp+255)                ; Error
- ld ix, -32768                  ; Error
- ld ix, 32767                   ; Error
- ld ix, 65535                   ; Error
  ld ix, hl                      ; Error
  ld ixh, -128                   ; Error
  ld ixh, 127                    ; Error
@@ -4817,9 +4863,6 @@
  ld iy, (sp)                    ; Error
  ld iy, (sp+0)                  ; Error
  ld iy, (sp+255)                ; Error
- ld iy, -32768                  ; Error
- ld iy, 32767                   ; Error
- ld iy, 65535                   ; Error
  ld iy, hl                      ; Error
  ld iyh, -128                   ; Error
  ld iyh, 127                    ; Error
@@ -4871,22 +4914,16 @@
  ld sp, ix                      ; Error
  ld sp, iy                      ; Error
  ld xpc, a                      ; Error
+ ldd                            ; Error
+ lddr                           ; Error
  lddrx                          ; Error
  lddsr                          ; Error
  lddx                           ; Error
- ldh (-128), a                  ; Error
- ldh (127), a                   ; Error
- ldh (255), a                   ; Error
- ldh (c), a                     ; Error
- ldh a, (-128)                  ; Error
- ldh a, (127)                   ; Error
- ldh a, (255)                   ; Error
- ldh a, (c)                     ; Error
  ldhi -128                      ; Error
  ldhi 127                       ; Error
  ldhi 255                       ; Error
- ldhl sp, -128                  ; Error
- ldhl sp, 127                   ; Error
+ ldi                            ; Error
+ ldir                           ; Error
  ldirx                          ; Error
  ldisr                          ; Error
  ldix                           ; Error
@@ -4919,6 +4956,9 @@
  ldsi 127                       ; Error
  ldsi 255                       ; Error
  ldws                           ; Error
+ lhld -32768                    ; Error
+ lhld 32767                     ; Error
+ lhld 65535                     ; Error
  lhlde                          ; Error
  lhlx                           ; Error
  lsddr                          ; Error
@@ -5147,6 +5187,9 @@
  otim                           ; Error
  otimr                          ; Error
  otir                           ; Error
+ out (-128), a                  ; Error
+ out (127), a                   ; Error
+ out (255), a                   ; Error
  out (c), -1                    ; Error
  out (c), -1                    ; Error
  out (c), 0                     ; Error
@@ -5159,6 +5202,9 @@
  out (c), e                     ; Error
  out (c), h                     ; Error
  out (c), l                     ; Error
+ out -128                       ; Error
+ out 127                        ; Error
+ out 255                        ; Error
  out0 (-128), a                 ; Error
  out0 (-128), b                 ; Error
  out0 (-128), c                 ; Error
@@ -5210,6 +5256,12 @@
  push su                        ; Error
  r_lo                           ; Error
  r_lz                           ; Error
+ r_m                            ; Error
+ r_nv                           ; Error
+ r_p                            ; Error
+ r_pe                           ; Error
+ r_po                           ; Error
+ r_v                            ; Error
  rdel                           ; Error
  rdmode                         ; Error
  res -1, (hl)                   ; Error
@@ -5262,205 +5314,141 @@
  res -1, l                      ; Error
  res -1, l'                     ; Error
  res -1, l'                     ; Error
- res 0, (hl)                    ; Error
  res 0, (ix)                    ; Error
  res 0, (ix+127)                ; Error
  res 0, (ix-128)                ; Error
  res 0, (iy)                    ; Error
  res 0, (iy+127)                ; Error
  res 0, (iy-128)                ; Error
- res 0, a                       ; Error
  res 0, a'                      ; Error
- res 0, b                       ; Error
  res 0, b'                      ; Error
- res 0, c                       ; Error
  res 0, c'                      ; Error
- res 0, d                       ; Error
  res 0, d'                      ; Error
- res 0, e                       ; Error
  res 0, e'                      ; Error
- res 0, h                       ; Error
  res 0, h'                      ; Error
  res 0, ixh                     ; Error
  res 0, ixl                     ; Error
  res 0, iyh                     ; Error
  res 0, iyl                     ; Error
- res 0, l                       ; Error
  res 0, l'                      ; Error
- res 1, (hl)                    ; Error
  res 1, (ix)                    ; Error
  res 1, (ix+127)                ; Error
  res 1, (ix-128)                ; Error
  res 1, (iy)                    ; Error
  res 1, (iy+127)                ; Error
  res 1, (iy-128)                ; Error
- res 1, a                       ; Error
  res 1, a'                      ; Error
- res 1, b                       ; Error
  res 1, b'                      ; Error
- res 1, c                       ; Error
  res 1, c'                      ; Error
- res 1, d                       ; Error
  res 1, d'                      ; Error
- res 1, e                       ; Error
  res 1, e'                      ; Error
- res 1, h                       ; Error
  res 1, h'                      ; Error
  res 1, ixh                     ; Error
  res 1, ixl                     ; Error
  res 1, iyh                     ; Error
  res 1, iyl                     ; Error
- res 1, l                       ; Error
  res 1, l'                      ; Error
- res 2, (hl)                    ; Error
  res 2, (ix)                    ; Error
  res 2, (ix+127)                ; Error
  res 2, (ix-128)                ; Error
  res 2, (iy)                    ; Error
  res 2, (iy+127)                ; Error
  res 2, (iy-128)                ; Error
- res 2, a                       ; Error
  res 2, a'                      ; Error
- res 2, b                       ; Error
  res 2, b'                      ; Error
- res 2, c                       ; Error
  res 2, c'                      ; Error
- res 2, d                       ; Error
  res 2, d'                      ; Error
- res 2, e                       ; Error
  res 2, e'                      ; Error
- res 2, h                       ; Error
  res 2, h'                      ; Error
  res 2, ixh                     ; Error
  res 2, ixl                     ; Error
  res 2, iyh                     ; Error
  res 2, iyl                     ; Error
- res 2, l                       ; Error
  res 2, l'                      ; Error
- res 3, (hl)                    ; Error
  res 3, (ix)                    ; Error
  res 3, (ix+127)                ; Error
  res 3, (ix-128)                ; Error
  res 3, (iy)                    ; Error
  res 3, (iy+127)                ; Error
  res 3, (iy-128)                ; Error
- res 3, a                       ; Error
  res 3, a'                      ; Error
- res 3, b                       ; Error
  res 3, b'                      ; Error
- res 3, c                       ; Error
  res 3, c'                      ; Error
- res 3, d                       ; Error
  res 3, d'                      ; Error
- res 3, e                       ; Error
  res 3, e'                      ; Error
- res 3, h                       ; Error
  res 3, h'                      ; Error
  res 3, ixh                     ; Error
  res 3, ixl                     ; Error
  res 3, iyh                     ; Error
  res 3, iyl                     ; Error
- res 3, l                       ; Error
  res 3, l'                      ; Error
- res 4, (hl)                    ; Error
  res 4, (ix)                    ; Error
  res 4, (ix+127)                ; Error
  res 4, (ix-128)                ; Error
  res 4, (iy)                    ; Error
  res 4, (iy+127)                ; Error
  res 4, (iy-128)                ; Error
- res 4, a                       ; Error
  res 4, a'                      ; Error
- res 4, b                       ; Error
  res 4, b'                      ; Error
- res 4, c                       ; Error
  res 4, c'                      ; Error
- res 4, d                       ; Error
  res 4, d'                      ; Error
- res 4, e                       ; Error
  res 4, e'                      ; Error
- res 4, h                       ; Error
  res 4, h'                      ; Error
  res 4, ixh                     ; Error
  res 4, ixl                     ; Error
  res 4, iyh                     ; Error
  res 4, iyl                     ; Error
- res 4, l                       ; Error
  res 4, l'                      ; Error
- res 5, (hl)                    ; Error
  res 5, (ix)                    ; Error
  res 5, (ix+127)                ; Error
  res 5, (ix-128)                ; Error
  res 5, (iy)                    ; Error
  res 5, (iy+127)                ; Error
  res 5, (iy-128)                ; Error
- res 5, a                       ; Error
  res 5, a'                      ; Error
- res 5, b                       ; Error
  res 5, b'                      ; Error
- res 5, c                       ; Error
  res 5, c'                      ; Error
- res 5, d                       ; Error
  res 5, d'                      ; Error
- res 5, e                       ; Error
  res 5, e'                      ; Error
- res 5, h                       ; Error
  res 5, h'                      ; Error
  res 5, ixh                     ; Error
  res 5, ixl                     ; Error
  res 5, iyh                     ; Error
  res 5, iyl                     ; Error
- res 5, l                       ; Error
  res 5, l'                      ; Error
- res 6, (hl)                    ; Error
  res 6, (ix)                    ; Error
  res 6, (ix+127)                ; Error
  res 6, (ix-128)                ; Error
  res 6, (iy)                    ; Error
  res 6, (iy+127)                ; Error
  res 6, (iy-128)                ; Error
- res 6, a                       ; Error
  res 6, a'                      ; Error
- res 6, b                       ; Error
  res 6, b'                      ; Error
- res 6, c                       ; Error
  res 6, c'                      ; Error
- res 6, d                       ; Error
  res 6, d'                      ; Error
- res 6, e                       ; Error
  res 6, e'                      ; Error
- res 6, h                       ; Error
  res 6, h'                      ; Error
  res 6, ixh                     ; Error
  res 6, ixl                     ; Error
  res 6, iyh                     ; Error
  res 6, iyl                     ; Error
- res 6, l                       ; Error
  res 6, l'                      ; Error
- res 7, (hl)                    ; Error
  res 7, (ix)                    ; Error
  res 7, (ix+127)                ; Error
  res 7, (ix-128)                ; Error
  res 7, (iy)                    ; Error
  res 7, (iy+127)                ; Error
  res 7, (iy-128)                ; Error
- res 7, a                       ; Error
  res 7, a'                      ; Error
- res 7, b                       ; Error
  res 7, b'                      ; Error
- res 7, c                       ; Error
  res 7, c'                      ; Error
- res 7, d                       ; Error
  res 7, d'                      ; Error
- res 7, e                       ; Error
  res 7, e'                      ; Error
- res 7, h                       ; Error
  res 7, h'                      ; Error
  res 7, ixh                     ; Error
  res 7, ixl                     ; Error
  res 7, iyh                     ; Error
  res 7, iyl                     ; Error
- res 7, l                       ; Error
  res 7, l'                      ; Error
  res 8, (hl)                    ; Error
  res 8, (hl)                    ; Error
@@ -5514,10 +5502,14 @@
  res 8, l'                      ; Error
  ret lo                         ; Error
  ret lz                         ; Error
- reti                           ; Error
+ ret m                          ; Error
+ ret nv                         ; Error
+ ret p                          ; Error
+ ret pe                         ; Error
+ ret po                         ; Error
+ ret v                          ; Error
  retn                           ; Error
  rim                            ; Error
- rl (hl)                        ; Error
  rl (ix)                        ; Error
  rl (ix), a                     ; Error
  rl (ix), b                     ; Error
@@ -5566,28 +5558,20 @@
  rl (iy-128), e                 ; Error
  rl (iy-128), h                 ; Error
  rl (iy-128), l                 ; Error
- rl a                           ; Error
  rl a'                          ; Error
- rl b                           ; Error
  rl b'                          ; Error
- rl c                           ; Error
  rl c'                          ; Error
- rl d                           ; Error
  rl d'                          ; Error
  rl de                          ; Error
  rl de'                         ; Error
- rl e                           ; Error
  rl e'                          ; Error
- rl h                           ; Error
  rl h'                          ; Error
  rl ixh                         ; Error
  rl ixl                         ; Error
  rl iyh                         ; Error
  rl iyl                         ; Error
- rl l                           ; Error
  rl l'                          ; Error
  rla'                           ; Error
- rlc (hl)                       ; Error
  rlc (ix)                       ; Error
  rlc (ix), a                    ; Error
  rlc (ix), b                    ; Error
@@ -5636,30 +5620,27 @@
  rlc (iy-128), e                ; Error
  rlc (iy-128), h                ; Error
  rlc (iy-128), l                ; Error
- rlc a                          ; Error
  rlc a'                         ; Error
- rlc b                          ; Error
  rlc b'                         ; Error
- rlc c                          ; Error
  rlc c'                         ; Error
- rlc d                          ; Error
  rlc d'                         ; Error
- rlc e                          ; Error
  rlc e'                         ; Error
- rlc h                          ; Error
  rlc h'                         ; Error
  rlc ixh                        ; Error
  rlc ixl                        ; Error
  rlc iyh                        ; Error
  rlc iyl                        ; Error
- rlc l                          ; Error
  rlc l'                         ; Error
  rlca'                          ; Error
  rld                            ; Error
  rlde                           ; Error
  rlo                            ; Error
  rlz                            ; Error
- rr (hl)                        ; Error
+ rm                             ; Error
+ rnv                            ; Error
+ rp                             ; Error
+ rpe                            ; Error
+ rpo                            ; Error
  rr (ix)                        ; Error
  rr (ix), a                     ; Error
  rr (ix), b                     ; Error
@@ -5708,19 +5689,13 @@
  rr (iy-128), e                 ; Error
  rr (iy-128), h                 ; Error
  rr (iy-128), l                 ; Error
- rr a                           ; Error
  rr a'                          ; Error
- rr b                           ; Error
  rr b'                          ; Error
- rr c                           ; Error
  rr c'                          ; Error
- rr d                           ; Error
  rr d'                          ; Error
  rr de                          ; Error
  rr de'                         ; Error
- rr e                           ; Error
  rr e'                          ; Error
- rr h                           ; Error
  rr h'                          ; Error
  rr hl                          ; Error
  rr hl'                         ; Error
@@ -5730,10 +5705,8 @@
  rr iy                          ; Error
  rr iyh                         ; Error
  rr iyl                         ; Error
- rr l                           ; Error
  rr l'                          ; Error
  rra'                           ; Error
- rrc (hl)                       ; Error
  rrc (ix)                       ; Error
  rrc (ix), a                    ; Error
  rrc (ix), b                    ; Error
@@ -5782,23 +5755,16 @@
  rrc (iy-128), e                ; Error
  rrc (iy-128), h                ; Error
  rrc (iy-128), l                ; Error
- rrc a                          ; Error
  rrc a'                         ; Error
- rrc b                          ; Error
  rrc b'                         ; Error
- rrc c                          ; Error
  rrc c'                         ; Error
- rrc d                          ; Error
  rrc d'                         ; Error
- rrc e                          ; Error
  rrc e'                         ; Error
- rrc h                          ; Error
  rrc h'                         ; Error
  rrc ixh                        ; Error
  rrc ixl                        ; Error
  rrc iyh                        ; Error
  rrc iyl                        ; Error
- rrc l                          ; Error
  rrc l'                         ; Error
  rrca'                          ; Error
  rrd                            ; Error
@@ -5906,6 +5872,7 @@
  rst 9                          ; Error
  rst 9                          ; Error
  rstv                           ; Error
+ rv                             ; Error
  sbb ixh                        ; Error
  sbb ixl                        ; Error
  sbb iyh                        ; Error
@@ -6007,205 +5974,141 @@
  set -1, l                      ; Error
  set -1, l'                     ; Error
  set -1, l'                     ; Error
- set 0, (hl)                    ; Error
  set 0, (ix)                    ; Error
  set 0, (ix+127)                ; Error
  set 0, (ix-128)                ; Error
  set 0, (iy)                    ; Error
  set 0, (iy+127)                ; Error
  set 0, (iy-128)                ; Error
- set 0, a                       ; Error
  set 0, a'                      ; Error
- set 0, b                       ; Error
  set 0, b'                      ; Error
- set 0, c                       ; Error
  set 0, c'                      ; Error
- set 0, d                       ; Error
  set 0, d'                      ; Error
- set 0, e                       ; Error
  set 0, e'                      ; Error
- set 0, h                       ; Error
  set 0, h'                      ; Error
  set 0, ixh                     ; Error
  set 0, ixl                     ; Error
  set 0, iyh                     ; Error
  set 0, iyl                     ; Error
- set 0, l                       ; Error
  set 0, l'                      ; Error
- set 1, (hl)                    ; Error
  set 1, (ix)                    ; Error
  set 1, (ix+127)                ; Error
  set 1, (ix-128)                ; Error
  set 1, (iy)                    ; Error
  set 1, (iy+127)                ; Error
  set 1, (iy-128)                ; Error
- set 1, a                       ; Error
  set 1, a'                      ; Error
- set 1, b                       ; Error
  set 1, b'                      ; Error
- set 1, c                       ; Error
  set 1, c'                      ; Error
- set 1, d                       ; Error
  set 1, d'                      ; Error
- set 1, e                       ; Error
  set 1, e'                      ; Error
- set 1, h                       ; Error
  set 1, h'                      ; Error
  set 1, ixh                     ; Error
  set 1, ixl                     ; Error
  set 1, iyh                     ; Error
  set 1, iyl                     ; Error
- set 1, l                       ; Error
  set 1, l'                      ; Error
- set 2, (hl)                    ; Error
  set 2, (ix)                    ; Error
  set 2, (ix+127)                ; Error
  set 2, (ix-128)                ; Error
  set 2, (iy)                    ; Error
  set 2, (iy+127)                ; Error
  set 2, (iy-128)                ; Error
- set 2, a                       ; Error
  set 2, a'                      ; Error
- set 2, b                       ; Error
  set 2, b'                      ; Error
- set 2, c                       ; Error
  set 2, c'                      ; Error
- set 2, d                       ; Error
  set 2, d'                      ; Error
- set 2, e                       ; Error
  set 2, e'                      ; Error
- set 2, h                       ; Error
  set 2, h'                      ; Error
  set 2, ixh                     ; Error
  set 2, ixl                     ; Error
  set 2, iyh                     ; Error
  set 2, iyl                     ; Error
- set 2, l                       ; Error
  set 2, l'                      ; Error
- set 3, (hl)                    ; Error
  set 3, (ix)                    ; Error
  set 3, (ix+127)                ; Error
  set 3, (ix-128)                ; Error
  set 3, (iy)                    ; Error
  set 3, (iy+127)                ; Error
  set 3, (iy-128)                ; Error
- set 3, a                       ; Error
  set 3, a'                      ; Error
- set 3, b                       ; Error
  set 3, b'                      ; Error
- set 3, c                       ; Error
  set 3, c'                      ; Error
- set 3, d                       ; Error
  set 3, d'                      ; Error
- set 3, e                       ; Error
  set 3, e'                      ; Error
- set 3, h                       ; Error
  set 3, h'                      ; Error
  set 3, ixh                     ; Error
  set 3, ixl                     ; Error
  set 3, iyh                     ; Error
  set 3, iyl                     ; Error
- set 3, l                       ; Error
  set 3, l'                      ; Error
- set 4, (hl)                    ; Error
  set 4, (ix)                    ; Error
  set 4, (ix+127)                ; Error
  set 4, (ix-128)                ; Error
  set 4, (iy)                    ; Error
  set 4, (iy+127)                ; Error
  set 4, (iy-128)                ; Error
- set 4, a                       ; Error
  set 4, a'                      ; Error
- set 4, b                       ; Error
  set 4, b'                      ; Error
- set 4, c                       ; Error
  set 4, c'                      ; Error
- set 4, d                       ; Error
  set 4, d'                      ; Error
- set 4, e                       ; Error
  set 4, e'                      ; Error
- set 4, h                       ; Error
  set 4, h'                      ; Error
  set 4, ixh                     ; Error
  set 4, ixl                     ; Error
  set 4, iyh                     ; Error
  set 4, iyl                     ; Error
- set 4, l                       ; Error
  set 4, l'                      ; Error
- set 5, (hl)                    ; Error
  set 5, (ix)                    ; Error
  set 5, (ix+127)                ; Error
  set 5, (ix-128)                ; Error
  set 5, (iy)                    ; Error
  set 5, (iy+127)                ; Error
  set 5, (iy-128)                ; Error
- set 5, a                       ; Error
  set 5, a'                      ; Error
- set 5, b                       ; Error
  set 5, b'                      ; Error
- set 5, c                       ; Error
  set 5, c'                      ; Error
- set 5, d                       ; Error
  set 5, d'                      ; Error
- set 5, e                       ; Error
  set 5, e'                      ; Error
- set 5, h                       ; Error
  set 5, h'                      ; Error
  set 5, ixh                     ; Error
  set 5, ixl                     ; Error
  set 5, iyh                     ; Error
  set 5, iyl                     ; Error
- set 5, l                       ; Error
  set 5, l'                      ; Error
- set 6, (hl)                    ; Error
  set 6, (ix)                    ; Error
  set 6, (ix+127)                ; Error
  set 6, (ix-128)                ; Error
  set 6, (iy)                    ; Error
  set 6, (iy+127)                ; Error
  set 6, (iy-128)                ; Error
- set 6, a                       ; Error
  set 6, a'                      ; Error
- set 6, b                       ; Error
  set 6, b'                      ; Error
- set 6, c                       ; Error
  set 6, c'                      ; Error
- set 6, d                       ; Error
  set 6, d'                      ; Error
- set 6, e                       ; Error
  set 6, e'                      ; Error
- set 6, h                       ; Error
  set 6, h'                      ; Error
  set 6, ixh                     ; Error
  set 6, ixl                     ; Error
  set 6, iyh                     ; Error
  set 6, iyl                     ; Error
- set 6, l                       ; Error
  set 6, l'                      ; Error
- set 7, (hl)                    ; Error
  set 7, (ix)                    ; Error
  set 7, (ix+127)                ; Error
  set 7, (ix-128)                ; Error
  set 7, (iy)                    ; Error
  set 7, (iy+127)                ; Error
  set 7, (iy-128)                ; Error
- set 7, a                       ; Error
  set 7, a'                      ; Error
- set 7, b                       ; Error
  set 7, b'                      ; Error
- set 7, c                       ; Error
  set 7, c'                      ; Error
- set 7, d                       ; Error
  set 7, d'                      ; Error
- set 7, e                       ; Error
  set 7, e'                      ; Error
- set 7, h                       ; Error
  set 7, h'                      ; Error
  set 7, ixh                     ; Error
  set 7, ixl                     ; Error
  set 7, iyh                     ; Error
  set 7, iyl                     ; Error
- set 7, l                       ; Error
  set 7, l'                      ; Error
  set 8, (hl)                    ; Error
  set 8, (hl)                    ; Error
@@ -6259,10 +6162,12 @@
  set 8, l'                      ; Error
  setae                          ; Error
  setusr                         ; Error
+ shld -32768                    ; Error
+ shld 32767                     ; Error
+ shld 65535                     ; Error
  shlde                          ; Error
  shlx                           ; Error
  sim                            ; Error
- sla (hl)                       ; Error
  sla (ix)                       ; Error
  sla (ix), a                    ; Error
  sla (ix), b                    ; Error
@@ -6311,23 +6216,16 @@
  sla (iy-128), e                ; Error
  sla (iy-128), h                ; Error
  sla (iy-128), l                ; Error
- sla a                          ; Error
  sla a'                         ; Error
- sla b                          ; Error
  sla b'                         ; Error
- sla c                          ; Error
  sla c'                         ; Error
- sla d                          ; Error
  sla d'                         ; Error
- sla e                          ; Error
  sla e'                         ; Error
- sla h                          ; Error
  sla h'                         ; Error
  sla ixh                        ; Error
  sla ixl                        ; Error
  sla iyh                        ; Error
  sla iyl                        ; Error
- sla l                          ; Error
  sla l'                         ; Error
  sli (hl)                       ; Error
  sli (ix)                       ; Error
@@ -6450,7 +6348,7 @@
  sll iyl                        ; Error
  sll l                          ; Error
  slp                            ; Error
- sra (hl)                       ; Error
+ sphl                           ; Error
  sra (ix)                       ; Error
  sra (ix), a                    ; Error
  sra (ix), b                    ; Error
@@ -6499,26 +6397,18 @@
  sra (iy-128), e                ; Error
  sra (iy-128), h                ; Error
  sra (iy-128), l                ; Error
- sra a                          ; Error
  sra a'                         ; Error
- sra b                          ; Error
  sra b'                         ; Error
- sra c                          ; Error
  sra c'                         ; Error
- sra d                          ; Error
  sra d'                         ; Error
- sra e                          ; Error
  sra e'                         ; Error
- sra h                          ; Error
  sra h'                         ; Error
  sra hl                         ; Error
  sra ixh                        ; Error
  sra ixl                        ; Error
  sra iyh                        ; Error
  sra iyl                        ; Error
- sra l                          ; Error
  sra l'                         ; Error
- srl (hl)                       ; Error
  srl (ix)                       ; Error
  srl (ix), a                    ; Error
  srl (ix), b                    ; Error
@@ -6567,25 +6457,17 @@
  srl (iy-128), e                ; Error
  srl (iy-128), h                ; Error
  srl (iy-128), l                ; Error
- srl a                          ; Error
  srl a'                         ; Error
- srl b                          ; Error
  srl b'                         ; Error
- srl c                          ; Error
  srl c'                         ; Error
- srl d                          ; Error
  srl d'                         ; Error
- srl e                          ; Error
  srl e'                         ; Error
- srl h                          ; Error
  srl h'                         ; Error
  srl ixh                        ; Error
  srl ixl                        ; Error
  srl iyh                        ; Error
  srl iyl                        ; Error
- srl l                          ; Error
  srl l'                         ; Error
- stop                           ; Error
  sub (ix)                       ; Error
  sub (ix+127)                   ; Error
  sub (ix-128)                   ; Error
@@ -6625,14 +6507,6 @@
  sub iyh                        ; Error
  sub iyl                        ; Error
  sures                          ; Error
- swap (hl)                      ; Error
- swap a                         ; Error
- swap b                         ; Error
- swap c                         ; Error
- swap d                         ; Error
- swap e                         ; Error
- swap h                         ; Error
- swap l                         ; Error
  swapnib                        ; Error
  syscall                        ; Error
  test (hl)                      ; Error
@@ -6708,6 +6582,7 @@
  tstio 255                      ; Error
  uma                            ; Error
  ums                            ; Error
+ xchg                           ; Error
  xor (ix)                       ; Error
  xor (ix+127)                   ; Error
  xor (ix-128)                   ; Error
@@ -6749,3 +6624,4 @@
  xra ixl                        ; Error
  xra iyh                        ; Error
  xra iyl                        ; Error
+ xthl                           ; Error

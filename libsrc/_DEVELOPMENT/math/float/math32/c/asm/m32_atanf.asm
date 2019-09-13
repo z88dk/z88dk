@@ -239,8 +239,7 @@
 	GLOBAL _m32_tanf
 	GLOBAL _m32_cosf
 	GLOBAL _m32_sinf
-	GLOBAL _m32_coeff_atan_b
-	GLOBAL _m32_coeff_atan_a
+	GLOBAL _m32_coeff_atan
 	GLOBAL __MAX_OPEN
 ;--------------------------------------------------------
 ; special function registers
@@ -285,7 +284,7 @@ _m32_atanf:
 	add	ix,sp
 	ld	c, l
 	ld	b, h
-	ld	hl, -14
+	ld	hl, -9
 	add	hl, sp
 	ld	sp, hl
 	ld	(ix-4),c
@@ -295,10 +294,10 @@ _m32_atanf:
 	ld	l,(ix-4)
 	ld	h,(ix-3)
 	call	_m32_fabsf
-	ld	(ix-14),l
-	ld	(ix-13),h
-	ld	(ix-12),e
-	ld	(ix-11),d
+	ld	(ix-9),l
+	ld	(ix-8),h
+	ld	(ix-7),e
+	ld	(ix-6),d
 	ld	a,d
 	and	a,0x7f
 	or	a,e
@@ -311,23 +310,20 @@ _m32_atanf:
 	ld	d,0x00
 	jp	l_m32_atanf_00107
 l_m32_atanf_00102:
-	ld	l,(ix-12)
-	ld	h,(ix-11)
+	ld	l,(ix-7)
+	ld	h,(ix-6)
 	push	hl
-	ld	l,(ix-14)
-	ld	h,(ix-13)
+	ld	l,(ix-9)
+	ld	h,(ix-8)
 	push	hl
 	ld	hl,0x3f80
 	push	hl
 	ld	hl,0x0000
 	push	hl
 	call	___fslt_callee
-	ld	c, l
-	ld	b,0x00
-	ld	(ix-10),c
-	ld	(ix-9),b
-	ld	a, b
-	or	a, c
+	ld	(ix-5),l
+	ld	a,l
+	or	a, a
 	jr	Z,l_m32_atanf_00104
 	pop	bc
 	pop	de
@@ -336,64 +332,26 @@ l_m32_atanf_00102:
 	ld	h,b
 	push	hl
 	call	_m32_invf
-	ld	(ix-14),l
-	ld	(ix-13),h
-	ld	(ix-12),e
-	ld	(ix-11),d
+	ld	(ix-9),l
+	ld	(ix-8),h
+	ld	(ix-7),e
+	ld	(ix-6),d
 l_m32_atanf_00104:
-	pop	bc
-	pop	de
-	push	de
-	ld	l,c
-	ld	h,b
+	ld	hl,0x0007
 	push	hl
-	call	_m32_sqrf
+	ld	hl,_m32_coeff_atan
 	push	hl
+	ld	l,(ix-7)
+	ld	h,(ix-6)
+	push	hl
+	ld	l,(ix-9)
+	ld	h,(ix-8)
+	push	hl
+	call	_m32_polyf
+	ld	a,(ix-5)
+	or	a,a
 	ld	c,l
 	ld	b,h
-	push	de
-	ld	hl,0x0005
-	push	hl
-	ld	hl,_m32_coeff_atan_a
-	push	hl
-	push	de
-	push	bc
-	call	_m32_polyf
-	ld	(ix-8),l
-	ld	(ix-7),h
-	ld	(ix-6),e
-	ld	(ix-5),d
-	pop	de
-	pop	bc
-	ld	hl,0x0004
-	push	hl
-	ld	hl,_m32_coeff_atan_b
-	push	hl
-	push	de
-	push	bc
-	call	_m32_polyf
-	push	de
-	push	hl
-	ld	l,(ix-6)
-	ld	h,(ix-5)
-	push	hl
-	ld	l,(ix-8)
-	ld	h,(ix-7)
-	push	hl
-	call	___fsdiv_callee
-	push	de
-	push	hl
-	ld	l,(ix-12)
-	ld	h,(ix-11)
-	push	hl
-	ld	l,(ix-14)
-	ld	h,(ix-13)
-	push	hl
-	call	___fsmul_callee
-	ld	a,(ix-9)
-	ld	c,l
-	ld	b,h
-	or	a,(ix-10)
 	jr	Z,l_m32_atanf_00106
 	push	de
 	push	bc

@@ -1,22 +1,37 @@
 
 #include "m32_math.h"
 
-extern float m32_coeff_atan_a[];
-extern float m32_coeff_atan_b[];
+//  Approximation of f(x) = atan(x)
+//  with weight function g(x) = atan(x)
+//  on interval [ 0, 1 ]
+//  with a polynomial of degree 7.
+//
+//  float f(float x)
+//  {
+//    float u = +5.3387679e-2f;
+//    u = u * x + -2.2568632e-1f;
+//    u = u * x + +3.2087456e-1f;
+//    u = u * x + -3.4700353e-2f;
+//    u = u * x + -3.2812673e-1f;
+//    u = u * x + -3.5815786e-4f;
+//    u = u * x + +1.0000081f;
+//    return u * x + 4.2012834e-19f;
+//  }
+
+extern float m32_coeff_atan[];
 
 float m32_atanf (float f) __z88dk_fastcall
 {
-    int16_t recip;
-    float val, val_squared;
+    uint8_t recip;
+    float val;
 
     if((val = m32_fabsf(f)) == 0.0)
         return 0.0;
     if(recip = (val > 1.0))
         val = m32_invf(val);
-    val_squared = m32_sqrf(val);
-    val *= m32_polyf(val_squared, m32_coeff_atan_a, 5)/m32_polyf(val_squared, m32_coeff_atan_b, 4);
+    val = m32_polyf(val, m32_coeff_atan, 7);
     if(recip)
-        val = 1.570796326795 - val;
+        val = HALF_PI - val;
     return f < 0.0 ? -val : val;
 }
 

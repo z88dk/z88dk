@@ -74,7 +74,7 @@ timegot:
 noleapsmc:
 		ld		b,l			; 1 byte is enough (max year count is 99)
 		ld		de,365
-		ld		hl,8035-30		; Days between [01/01/2000] and [01/01/1978]  - 1 month shift fix (see below)
+		ld		hl,8035+1		; Days between [01/01/2000] and [01/01/1978]  +1 day to compensate the leap year in 2000
 yrloop:
 		ld		a,b
 		and		3			; leap year ?
@@ -85,20 +85,14 @@ noleap:
 		djnz    yrloop
 		push	hl
 		; months
-		; TODO:  1 month shift compared to the correct Unix epoch !
-		;  I cant understand why..
 		ld		a,(jdate)		; Month
 		call    unbcd
 		dec		a
 		jr		z,month_done
-		dec		a
-		jr		nz,month_next
-		ld		l,31
-		jr		month_done
-month_next:
 		ld		de,mdays
+		ld		h,0
 		ld		l,a
-		add		hl,hl
+		add		hl,hl	; words
 		add		hl,de
 		ld		a,(hl)
 		inc		hl
@@ -231,7 +225,7 @@ jdatepx2: defs 6			; safety margin
 
 	SECTION rodata_clib
 
-mdays: defw 31+29, 31+29+31, 31+29+31+30, 31+29+31+30+31
+mdays: defw 0, 31, 31+29, 31+29+31, 31+29+31+30, 31+29+31+30+31
        defw 31+29+31+30+31+30, 31+29+31+30+31+30+31, 31+29+31+30+31+30+31+31
 	   defw 31+29+31+30+31+30+31+31+30, 31+29+31+30+31+30+31+31+30+31
 	   defw 31+29+31+30+31+30+31+31+30+31+30
