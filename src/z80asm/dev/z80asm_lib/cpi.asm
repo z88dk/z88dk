@@ -1,9 +1,9 @@
 ; Substitute for z80 cpi instruction
 ; aralbrec 06.2007
 
-IF !__CPU_GBZ80__
 SECTION code_crt0_sccz80
 PUBLIC __z80asm__cpi
+EXTERN __z80asm__exsphl
 
 .__z80asm__cpi
 
@@ -14,7 +14,11 @@ PUBLIC __z80asm__cpi
    dec bc
    
    push af
+IF __CPU_GBZ80__
+   call __z80asm__exsphl
+ELSE
    ex (sp),hl
+ENDIF
 IF __CPU_8080__ || __CPU_8085__
    ld  a,l
    and @11111110
@@ -46,7 +50,11 @@ ENDIF
 
 .exitcpi
 
+IF __CPU_GBZ80__
+   call __z80asm__exsphl
+ELSE
    ex (sp),hl
+ENDIF
    pop af
    ret
 
@@ -57,7 +65,11 @@ ENDIF
    dec bc
    
    push af
+IF __CPU_GBZ80__
+   call __z80asm__exsphl
+ELSE
    ex (sp),hl
+ENDIF
 IF __CPU_8080__ || __CPU_8085__
    ld  a,l
    or  @00000001
@@ -66,4 +78,3 @@ ELSE
    set 0,l 			; set carry
 ENDIF
    jr rejoin
-ENDIF
