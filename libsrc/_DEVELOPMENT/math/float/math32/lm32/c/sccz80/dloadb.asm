@@ -4,4 +4,3 @@
 	EXTERN	cm32_sccz80_dloadb
 
 	defc	dloadb = cm32_sccz80_dloadb
-

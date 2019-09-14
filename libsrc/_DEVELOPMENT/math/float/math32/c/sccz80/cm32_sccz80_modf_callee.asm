@@ -1,12 +1,12 @@
 
 SECTION code_fp_math32
 
-PUBLIC cm32_sccz80_modf
+PUBLIC cm32_sccz80_modf_callee
 
 EXTERN _m32_modff
 
 ; float modff(float x, float * y)
-.cm32_sccz80_modf
+.cm32_sccz80_modf_callee
     ; Entry:
     ; Stack: float left, ptr right, ret
 
@@ -15,8 +15,12 @@ EXTERN _m32_modff
     pop bc      ;ptr
     pop hl      ;float
     pop de
+    push af     ;ret
     push bc     ;ptr
     push de     ;float
     push hl
-    push af     ;ret
-    jp _m32_modff
+    call _m32_modff
+    pop af
+    pop af
+    pop af
+    ret

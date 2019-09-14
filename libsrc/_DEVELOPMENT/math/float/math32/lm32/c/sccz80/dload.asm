@@ -4,4 +4,3 @@
 	EXTERN	cm32_sccz80_dload
 
 	defc	dload = cm32_sccz80_dload
-

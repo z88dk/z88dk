@@ -1,14 +1,15 @@
 
-	SECTION	code_fp_math32
-	PUBLIC	cosh
-	EXTERN	cm32_sccz80_cosh
+    SECTION code_fp_math32
+    PUBLIC  cosh
 
-	defc	cosh = cm32_sccz80_cosh
-
-
-; SDCC bridge for Classic
 IF __CLASSIC
-PUBLIC _cosh
-defc _cosh = cosh
-ENDIF
+    EXTERN  cm32_sccz80_cosh
+    defc    cosh = cm32_sccz80_cosh
 
+    ; SDCC bridge for Classic
+    PUBLIC  _cosh
+    defc    _cosh = cosh
+ELSE
+    EXTERN  _m32_coshf
+    defc    cosh = _m32_coshf
+ENDIF

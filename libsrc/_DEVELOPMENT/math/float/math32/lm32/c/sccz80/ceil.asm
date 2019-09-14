@@ -1,13 +1,15 @@
 
-	SECTION	code_fp_math32
-	PUBLIC	ceil
-	EXTERN	cm32_sccz80_ceil
+    SECTION code_fp_math32
+    PUBLIC  ceil
 
-	defc	ceil = cm32_sccz80_ceil
-
-; SDCC bridge for Classic
 IF __CLASSIC
-PUBLIC _ceil
-defc _ceil = ceil
-ENDIF
+    EXTERN  cm32_sccz80_ceil
+    defc    ceil = cm32_sccz80_ceil
 
+    ; SDCC bridge for Classic
+    PUBLIC  _ceil
+    defc    _ceil = ceil
+ELSE
+    EXTERN  m32_ceil_fastcall
+    defc    ceil = m32_ceil_fastcall
+ENDIF
