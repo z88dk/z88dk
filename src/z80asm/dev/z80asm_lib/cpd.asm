@@ -3,6 +3,7 @@
 
 SECTION code_crt0_sccz80
 PUBLIC __z80asm__cpd
+EXTERN __z80asm__exsphl
 
 .__z80asm__cpd
 
@@ -13,7 +14,11 @@ PUBLIC __z80asm__cpd
    dec bc
    
    push af
+IF __CPU_GBZ80__
+   call __z80asm__exsphl
+ELSE
    ex (sp),hl
+ENDIF
 IF __CPU_8080__ || __CPU_8085__
    ld  a,l
    and @11111110
@@ -45,7 +50,11 @@ ENDIF
 
 .exitcpd
 
+IF __CPU_GBZ80__
+   call __z80asm__exsphl
+ELSE
    ex (sp),hl
+ENDIF
    pop af
    ret
 
@@ -56,7 +65,11 @@ ENDIF
    dec bc
    
    push af
+IF __CPU_GBZ80__
+   call __z80asm__exsphl
+ELSE
    ex (sp),hl
+ENDIF
 IF __CPU_8080__ || __CPU_8085__
    ld a,l
    or @00000001
