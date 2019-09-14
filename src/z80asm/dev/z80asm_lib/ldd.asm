@@ -1,7 +1,6 @@
 ; Substitute for the z80 ldd instruction
 ; Doesn't emulate the flags correctly
 
-IF !__CPU_GBZ80__
 SECTION code_crt0_sccz80
 PUBLIC __z80asm__ldd
 
@@ -12,6 +11,8 @@ PUBLIC __z80asm__ldd
 	dec	hl
 	dec	de
 	dec	bc
+IF !__CPU_GBZ80__
+	; No point emualting pv on gbz80 since flag doesn't exist
 	ex	(sp),hl		;incoming af in hl, outgoing hl on stack
 	push	bc		;Save bc, we need a temporary
 	ld	a,b
@@ -26,6 +27,6 @@ set_pv:
 	ld	l,a
 	pop	bc
 	ex	(sp),hl		;Get hl back
+ENDIF
 	pop	af		;And restore our modified af
 	ret
-ENDIF
