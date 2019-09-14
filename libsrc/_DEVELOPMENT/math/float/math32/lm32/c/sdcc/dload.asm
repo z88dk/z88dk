@@ -4,4 +4,3 @@
 	EXTERN	cm32_sdcc_dload
 
 	defc	dload = cm32_sdcc_dload
-

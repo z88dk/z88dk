@@ -4,4 +4,3 @@
 	EXTERN	cm32_sdcc_fpclassify
 
 	defc	_fpclassify = cm32_sdcc_fpclassify
-

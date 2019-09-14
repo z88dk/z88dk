@@ -11,7 +11,6 @@
 ;
 ; Exit:  dehl = adjusted float
 
-
 .l_f32_ldexp
         sla e                       ; get the exponent
         rl d

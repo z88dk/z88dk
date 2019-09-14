@@ -4,4 +4,3 @@
 	EXTERN	cm32_sdcc_asinh
 
 	defc	_asinh = cm32_sdcc_asinh
-

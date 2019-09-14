@@ -4,4 +4,3 @@
 	EXTERN	cm32_sdcc_acosh
 
 	defc	_acosh = cm32_sdcc_acosh
-
