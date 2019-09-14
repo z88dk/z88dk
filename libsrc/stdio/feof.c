@@ -23,7 +23,7 @@ _feof:
 	inc	hl	;flags
 	ld	a,(hl)
 	ld	hl,1
-IF __CPU_8080__
+IF __CPU_INTEL__
 	and	@00001000
 ELSE
 	bit	3,a	;_IOEOF

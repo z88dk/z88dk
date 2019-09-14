@@ -40,7 +40,23 @@ EXTERN _heap, ASMDISP_HEAPALLOC_CALLEE
    
    ex de,hl
    push de
+IF __CPU_INTEL__ || __CPU_GBZ80__
+loop:
+ IF __CPU_GBZ80__
+   ld a,(hl+)
+ ELSE
+   ld a,(hl)
+   inc hl
+ ENDIF
+   ld (de),a
+   inc de
+   dec bc
+   ld a,b
+   or c
+   jr nz,loop
+ELSE
    ldir
+ENDIF
    pop hl
    ret
 

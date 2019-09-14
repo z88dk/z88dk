@@ -95,6 +95,8 @@
 	EXTERN    l_mult		;Integer *
 	EXTERN    l_div		;Integer signed /
 	EXTERN    l_div_u		;Integer unsigned /
+	EXTERN    l_mod			;Integer % (for gbz80)
+	EXTERN    l_mod_u		;Integer unsigned % (for gbz80)
 
 ;------------------
 ;Long functions now

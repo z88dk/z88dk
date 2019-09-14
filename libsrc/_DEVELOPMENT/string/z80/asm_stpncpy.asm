@@ -42,7 +42,29 @@ asm_stpncpy:
    xor a
    
 loop:
-
+IF __CPU_INTEL__ || __CPU_GBZ80__
+   ld a,(hl)
+   inc hl
+   ld (de),a
+   inc de
+   dec bc
+   and a
+   jr z,copied
+   ld a,b
+   or c
+   jr nz,loop
+copied:
+   push hl
+zeroloop:
+   xor a
+   ld (de),a
+   inc de
+   dec bc
+   ld a,b
+   or c
+   jr nz,zeroloop
+   pop hl
+ELSE
    cp (hl)
    ldi
    jp po, done                 ; reached max number of chars
@@ -57,6 +79,7 @@ loop:
    push hl                    ; save addr of first NUL in s1
    ldir
    pop hl
+ENDIF
    
    ret
 

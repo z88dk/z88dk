@@ -10,9 +10,16 @@ EXTERN asm_strndup
 
 strndup_callee:
 
+IF __CPU_GBZ80__
+   pop af
+   pop bc
+   pop hl
+   push af
+ELSE
    pop hl
    pop bc
    ex (sp),hl
+ENDIF
    
    jp asm_strndup
 

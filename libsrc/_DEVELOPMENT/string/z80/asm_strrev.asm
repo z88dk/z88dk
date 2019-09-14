@@ -63,12 +63,22 @@ ENDIF
 loop:
 
    ld a,(de)                   ; char at front of s
+IF __CPU_GBZ80__
+   EXTERN __z80asm_ldi
+   call __z80asm_ldi
+ELSE
    ldi                         ; char at rear written to front of s
+ENDIF
    dec hl
    ld (hl),a                   ; char from front written to rear of s 
    dec hl
-   
+IF __CPU_GBZ80__
+   ld  a,b
+   or  c
+   jp  nz,loop
+ELSE   
    jp pe, loop
+ENDIF
    
 exit:
 

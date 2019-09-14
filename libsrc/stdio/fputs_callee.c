@@ -25,13 +25,13 @@ int fputs_callee(const char *s,FILE *fp)
 	pop	de	;s
 
 	push 	hl	;ret address
-IF !__CPU_8080__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	push	ix
 	push	bc
 	pop	ix
 ENDIF
 	call	asm_fputs_callee
-IF !__CPU_8080__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	pop	ix
 ENDIF
 	ret
@@ -52,7 +52,7 @@ ENDIF
 	ret	z	;end of string
 	inc	de	;s++
 	push	de	;keep s
-IF __CPU_8080__
+IF __CPU_INTEL__
 	push	bc
 	ld	l,c
 	ld	h,b
@@ -60,7 +60,7 @@ ENDIF
 	ld	c,a
 	ld	b,0
 	call	asm_fputc_callee
-IF __CPU_8080__
+IF __CPU_INTEL__
 	pop	bc
 ENDIF
 	pop	de	;get s back

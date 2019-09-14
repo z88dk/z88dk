@@ -38,8 +38,16 @@ loop:
    call asm_tolower
    ld (hl),a
    
+IF __CPU_GBZ80__
+   inc hl
+   dec bc
+   ld a,b
+   or c
+   jp nz,loop
+ELSE
    cpi                         ; hl++, bc--
    jp pe, loop
+ENDIF
 
    pop hl
    ret

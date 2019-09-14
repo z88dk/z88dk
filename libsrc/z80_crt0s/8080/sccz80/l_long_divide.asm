@@ -48,32 +48,89 @@ EXTERN __retloc, __math_block1, __math_block3, __math_block2
 ; Returns: dehl = result (modulus or quotient)
 
 divide_zero:
+IF __CPU_GBZ80__
+	ld	hl,__retloc
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+ELSE
 	ld	hl,(__retloc)
+ENDIF
 	push	hl
 	ld	hl,0
 	ld	de,0
 	jp	error_divide_by_zero_mc
 
 l_long_divide:
+	ld	(__div32_mode),A
+IF __CPU_GBZ80__
+	ld	b,h
+	ld	a,l
+	ld	hl,__math_block3
+	ld	(hl+),a
+	ld	a,b
+	ld	(hl+),a
+	ld	a,e
+	ld	(hl+),a
+	ld	a,d
+	ld	(hl+),a
+ELSE
 	ld	(__math_block3),hl
 	ex	de,hl
 	ld	(__math_block3+2),hl
-	pop	hl
+ENDIF
+IF __CPU_GBZ80__
+	pop	de
+	ld	hl,__retloc
+	ld	a,e
+	ld	(hl+),a
+	ld	a,d
+	ld	(hl+),a
+	pop	de		;store divisor
+	ld	hl,__math_block1
+	ld	a,e
+	ld	(hl+),a
+	ld	a,d
+	ld	(hl+),a
+	pop	de
+	ld	a,e
+	ld	(hl+),a
+	ld	a,d
+	ld	(hl+),a
+ELSE
+	pop	hl		;return address
 	ld	(__retloc),hl
-	ld	(__div32_mode),A
 	POP HL			; store divisor
 	LD (__math_block1),HL
 	EX	DE,HL
 	POP HL
 	LD (__math_block1+2),HL
-	ld	a,d
-	or	e
-	or	h
-	or	l
+ENDIF
+        ld	hl,__math_block3
+IF __CPU_GBZ80__
+	ld	a,(hl+)
+ELSE
+        ld	a,(hl)
+        inc	hl
+ENDIF
+        or	(hl)
+	inc	hl
+	or	(hl)
+	inc	hl
+	or	(hl)
 	jp	z,divide_zero
+IF __CPU_GBZ80__
+	ld	hl,__math_block2
+	xor	a
+	ld	(hl+),a
+	ld	(hl+),a
+	ld	(hl+),a
+	ld	(hl+),a
+ELSE
 	LD	HL,0			; store initial value of remainder
 	LD	(__math_block2),HL
 	LD	(__math_block2+2),HL
+ENDIF
 
 	LD  b,0
 	LD A,(__div32_mode)
@@ -156,11 +213,27 @@ continue:	DEC b
 	RLA
 	LD HL,__math_block2
 	CALL	C,compl		; negate remainder if dividend was negative
+IF __CPU_GBZ80__
+	ld	hl,__retloc
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	push	hl
+	ld	hl,__math_block1+3
+	ld	a,(hl-)
+	ld	d,a
+	ld	a,(hl-)
+	ld	e,a
+	ld	a,(hl-)
+	ld	l,(hl)
+	ld	h,a
+ELSE
 	ld	hl,(__retloc)
 	push	hl
 	LD HL,(__math_block1+2)		; push quotient
 	ex de,hl
 	LD HL,(__math_block1)
+ENDIF
 	ret
 
 ; for rmi 4 and rmu 4 only:
@@ -173,11 +246,27 @@ return_modulus:
 	RLA
 	LD HL,__math_block2
 	CALL	C,compl		; negate remainder if dividend was negative
+IF __CPU_GBZ80__
+	ld	hl,__retloc
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	push	hl
+	ld	hl,__math_block2+3
+	ld	a,(hl-)
+	ld	d,a
+	ld	a,(hl-)
+	ld	e,a
+	ld	a,(hl-)
+	ld	l,(hl)
+	ld	h,a
+ELSE
 	ld	hl,(__retloc)
 	push	hl
 	LD HL,(__math_block2+2)
 	ex	de,hl
 	LD HL,(__math_block2)
+ENDIF
 	ret
 
 ; make 2's complement of 4 bytes pointed to by hl.

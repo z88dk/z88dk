@@ -36,7 +36,16 @@ PUBLIC __printf_check_ftoe
 __printf_increment_chars_written:
 	push	de
 	push	hl
+IF __CPU_GBZ80__
+	push	af
+	ld	hl,__printf_context
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	pop	af
+ELSE
 	ld	hl,(__printf_context)
+ENDIF
 	dec	hl		;-1
 	ld	d,(hl)
 	dec	hl
@@ -55,7 +64,16 @@ __printf_increment_chars_written:
 __printf_write_chars_written:
 	push	de
 	ex	de,hl
+IF __CPU_GBZ80__
+	push	af
+	ld	hl,__printf_context
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	pop	af
+ELSE
 	ld	hl,(__printf_context)
+ENDIF
 	dec	hl
 	dec	hl
 	ld	a,(hl)
@@ -74,7 +92,16 @@ __printf_write_chars_written:
 __printf_is_padding_zero:
 	push	hl
 	push	bc
+IF __CPU_GBZ80__
+	push	af
+	ld	hl,__printf_context
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	pop	af
+ELSE
 	ld	hl,(__printf_context)
+ENDIF
 	ld	bc,-4
 	add	hl,bc
 	ld	a,(hl)
@@ -91,7 +118,16 @@ __printf_is_padding_zero:
 ; Uses: f
 __printf_get_fp:
 	push	hl
+IF __CPU_GBZ80__
+	push	af
+	ld	hl,__printf_context
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	pop	af
+ELSE
 	ld	hl,(__printf_context)
+ENDIF
 	ld	bc,10
 	add	hl,bc
 	ld	c,(hl)
@@ -106,7 +142,16 @@ __printf_get_fp:
 ; Uses: f
 __printf_get_print_function:
 	push	de
+IF __CPU_GBZ80__
+	push	af
+	ld	hl,__printf_context
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	pop	af
+ELSE
 	ld	hl,(__printf_context)
+ENDIF
 	ld	de,8
 	add	hl,de
 	ld	e,(hl)
@@ -121,7 +166,16 @@ __printf_get_print_function:
 __printf_set_flags:
 	push	hl
 	push	de
+IF __CPU_GBZ80__
+	push	af
+	ld	hl,__printf_context
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	pop	af
+ELSE
 	ld	hl,(__printf_context)
+ENDIF
 	ld	de,-4
 	add	hl,de
 	ld	(hl),c
@@ -134,7 +188,16 @@ __printf_set_flags:
 __printf_set_width:
 	push	hl
 	push	bc
+IF __CPU_GBZ80__
+	push	af
+	ld	hl,__printf_context
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	pop	af
+ELSE
 	ld	hl,(__printf_context)
+ENDIF
 	ld	bc,-5
 	add	hl,bc
 	ld	(hl),d
@@ -149,7 +212,16 @@ __printf_set_width:
 ; Exit: hl = base
 __printf_get_base:
 	push	de
+IF __CPU_GBZ80__
+	push	af
+	ld	hl,__printf_context
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	pop	af
+ELSE
 	ld	hl,(__printf_context)
+ENDIF
 	ld	de,-9
 	add	hl,de
 	ld	l,(hl)
@@ -164,7 +236,16 @@ __printf_get_base:
 __printf_set_base:
 	push	hl
 	push	de
+IF __CPU_GBZ80__
+	push	af
+	ld	hl,__printf_context
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	pop	af
+ELSE
 	ld	hl,(__printf_context)
+ENDIF
 	ld	de,-9
 	add	hl,de
 	ld	(hl),c
@@ -176,7 +257,16 @@ __printf_set_base:
 ; Entry: c = ascii offset
 __printf_set_upper:
 	push	hl
+IF __CPU_GBZ80__
+	push	af
+	ld	hl,__printf_context
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	pop	af
+ELSE
 	ld	hl,(__printf_context)
+ENDIF
 	dec	hl
 	dec	hl
 	dec	hl
@@ -189,7 +279,16 @@ __printf_set_upper:
 ; Exit:  a = shifted character
 __printf_add_offset:
 	push	hl
+IF __CPU_GBZ80__
+	push	af
+	ld	hl,__printf_context
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	pop	af
+ELSE
 	ld	hl,(__printf_context)
+ENDIF
 	dec	hl
 	dec	hl
 	dec	hl
@@ -206,7 +305,14 @@ __printf_disable_plus_flag:
 	push	hl
 	push	de
 	push	af
+IF __CPU_GBZ80__
+	ld	hl,__printf_context
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+ELSE
 	ld	hl,(__printf_context)
+ENDIF
 	ld	de,-4
 	add	hl,de
 	ld	a,(hl)
@@ -222,7 +328,16 @@ __printf_disable_plus_flag:
 ; Exit: hl = precision
 __printf_get_precision:
 	push	de
+IF __CPU_GBZ80__
+	push	af
+	ld	hl,__printf_context
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	pop	af
+ELSE
 	ld	hl,(__printf_context)
+ENDIF
 	ld	de,-7
 	add	hl,de
 	ld	d,(hl)
@@ -238,7 +353,16 @@ __printf_get_precision:
 __printf_set_precision:
 	push	hl
 	push	bc
+IF __CPU_GBZ80__
+	push	af
+	ld	hl,__printf_context
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	pop	af
+ELSE
 	ld	hl,(__printf_context)
+ENDIF
 	ld	bc,-7
 	add	hl,bc
 	ld	(hl),d
@@ -251,7 +375,14 @@ __printf_set_precision:
 __printf_check_long_flag:
 	push	hl
 	push	bc
+IF __CPU_GBZ80__
+	ld	hl,__printf_context
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+ELSE
 	ld	hl,(__printf_context)
+ENDIF
 	ld	bc,-4
 	add	hl,bc
 	ld	a,(hl)
@@ -265,7 +396,14 @@ __printf_set_long_flag:
 	push	hl
 	push	bc
 	push	af
+IF __CPU_GBZ80__
+	ld	hl,__printf_context
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+ELSE
 	ld	hl,(__printf_context)
+ENDIF
 	ld	bc,-4
 	add	hl,bc
 	ld	a,(hl)
@@ -280,7 +418,14 @@ __printf_res_long_flag:
 	push	hl
 	push	bc
 	push	af
+IF __CPU_GBZ80__
+	ld	hl,__printf_context
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+ELSE
 	ld	hl,(__printf_context)
+ENDIF
 	ld	bc,-4
 	add	hl,bc
 	ld	a,(hl)
@@ -295,7 +440,16 @@ __printf_res_long_flag:
 ; Exit: hl = width
 __printf_get_width:
 	push	de
+IF __CPU_GBZ80__
+	push	af
+	ld	hl,__printf_context
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	pop	af
+ELSE
 	ld	hl,(__printf_context)
+ENDIF
 	ld	de,-5
 	add	hl,de
 	ld	d,(hl)
@@ -310,7 +464,16 @@ __printf_get_width:
 __printf_inc_buffer_length:
 	push	hl
 	push	de
+IF __CPU_GBZ80__
+	push	af
+	ld	hl,__printf_context
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	pop	af
+ELSE
 	ld	hl,(__printf_context)
+ENDIF
 	ld	de,-10
 	add	hl,de
 	inc	(hl)
@@ -323,7 +486,16 @@ __printf_inc_buffer_length:
 __printf_set_buffer_length:
 	ld	a,l
 	push	de
+IF __CPU_GBZ80__
+	push	af
+	ld	hl,__printf_context
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	pop	af
+ELSE
 	ld	hl,(__printf_context)
+ENDIF
 	ld	de,-10
 	add	hl,de
 	ld	(hl),a
@@ -336,7 +508,16 @@ __printf_set_buffer_length:
 ; Exit: de = buffer length
 __printf_get_buffer_length:
 	push	hl
+IF __CPU_GBZ80__
+	push	af
+	ld	hl,__printf_context
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	pop	af
+ELSE
 	ld	hl,(__printf_context)
+ENDIF
 	ld	de,-10
 	add	hl,de
 	ld	e,(hl)
@@ -350,7 +531,14 @@ __printf_get_buffer_length:
 __printf_issccz80:
 	push	hl
 	push	de
+IF __CPU_GBZ80__
+	ld	hl,__printf_context
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+ELSE
 	ld	hl,(__printf_context)
+ENDIF
 	ld	de,6
 	add	hl,de
 	ld	a,(hl)		
@@ -361,7 +549,14 @@ __printf_issccz80:
 
 __printf_check_pad_right:
 	push	hl
+IF __CPU_GBZ80__
+	ld	hl,__printf_context
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+ELSE
 	ld	hl,(__printf_context)
+ENDIF
 	dec	hl
 	dec	hl
 	dec	hl
@@ -374,7 +569,14 @@ __printf_check_pad_right:
 ; Set the ftoe flag
 __printf_set_ftoe:
 	push	hl
+IF __CPU_GBZ80__
+	ld	hl,__printf_context
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+ELSE
 	ld	hl,(__printf_context)
+ENDIF
 	dec	hl
 	dec	hl
 	dec	hl
@@ -389,7 +591,14 @@ __printf_set_ftoe:
 ; Exit: nz = use ftoe, z=ftoa
 __printf_check_ftoe:
 	push	hl
+IF __CPU_GBZ80__
+	ld	hl,__printf_context
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+ELSE
 	ld	hl,(__printf_context)
+ENDIF
 	dec	hl
 	dec	hl
 	dec	hl

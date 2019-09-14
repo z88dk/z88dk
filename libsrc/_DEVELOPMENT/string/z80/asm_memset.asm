@@ -78,8 +78,23 @@ ELSE
    ret z
 
    push hl
-   
+IF __CPU_GBZ80__ || __CPU_INTEL__
+loop:
+ IF __CPU_GBZ80__
+   ld a,(hl+)
+ ELSE
+   ld a,(hl)
+   inc hl
+ ENDIF
+   ld (de),a
+   inc de
+   dec bc
+   ld a,b
+   or c
+   jr nz,loop
+ELSE 
    ldir
+ENDIF
    
    pop hl
    ret

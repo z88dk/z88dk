@@ -17,6 +17,9 @@ gbz80/sccz80/*.asm
 8080/sccz80/l_long_xor
 8080/sccz80/l_ne
 8080/sccz80/l_sub
+8080/sccz80/l_long_div
+8080/sccz80/l_long_div_u
+8080/sccz80/l_long_divide
 
 
 z80/sccz80/getarg

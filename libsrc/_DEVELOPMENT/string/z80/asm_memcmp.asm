@@ -39,11 +39,23 @@ asm0_memcmp:
 loop:
 
    ld a,(de)                   ; a = *s1
+IF __CPU_GBZ80__ || __CPU_INTEL__
+   cp (hl)
+   inc hl
+   dec bc
+ELSE
    cpi                         ; *s1 - *s2
+ENDIF
    jr nz, different
    
    inc de
+IF __CPU_GBZ80__ || __CPU_INTEL__
+   ld a,b
+   or c
+   jp nz,loop
+ELSE
    jp pe, loop
+ENDIF
    
 equal:
 

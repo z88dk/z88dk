@@ -3500,8 +3500,10 @@ int main (int argc, char **argv){
             break;
           }
         } else if ( isgbz80() ) {
-          printf("%04x: ILLEGAL GBZ80 prefix 0xED\n",pc-1);
-          break;
+          if ( get_memory(pc) != 0xfe) {
+              printf("%04x: ILLEGAL GBZ80 prefix 0xED\n",pc-1);
+              break;
+          }
         }
         r++;
         switch( get_memory(pc++) ){

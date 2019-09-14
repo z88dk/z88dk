@@ -35,12 +35,24 @@ asm__memstrcpy:
    xor a
 
 loop:
-
+IF __CPU_GBZ80__
+   xor a
+ENDIF
    cp (hl)
    ret z                       ; if '\0' met
-   
+  
+IF __CPU_GBZ80__
+   ld a,(hl+)
+   ld (de),a
+   inc de
+   dec bc
+   ld a,b
+   or c
+   jr nz,loop
+ELSE 
    ldi
    jp pe, loop
+ENDIF
 
    or a
    ret

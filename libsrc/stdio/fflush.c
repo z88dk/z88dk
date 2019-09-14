@@ -25,7 +25,7 @@ ELSE
 	push	hl
 	push	bc
 ENDIF
-IF !__CPU_8080__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !_CPU_GBZ80__
 	ld	e,(hl)
 	inc	hl
 	ld	d,(hl)

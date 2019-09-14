@@ -20,7 +20,7 @@ _printf:
 	pop	de	;fmt
 	push	de
 	push	bc
-IF !__CPU_INTEL__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	push	ix	;save ix
 ENDIF
 	ld	bc,__sgoioblk+10	;file
@@ -37,7 +37,7 @@ ENDIF
 	pop	bc	
 	pop	bc
 	pop	bc
-IF !__CPU_INTEL__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	pop	ix	;restore ix
 ENDIF
 	ret

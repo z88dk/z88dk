@@ -9,9 +9,16 @@ EXTERN asm_strrstr
 
 strrstr_callee:
 
+IF __CPU_GBZ80__
+   pop af
+   pop de
+   pop hl
+   push af
+ELSE
    pop hl
    pop de
    ex (sp),hl
+ENDIF
    
    jp asm_strrstr
 

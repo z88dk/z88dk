@@ -86,7 +86,7 @@ endif
 if (ASMPC<>$0038)
         defs    CODE_ALIGNMENT_ERROR
 endif
-IF !__CPU_8080__
+IF !__CPU_8080__ && !__CPU_GBZ80__
 	jp	asm_im1_handler
 ELSE
 	ret
@@ -107,9 +107,20 @@ program:
         INCLUDE "crt/classic/crt_init_sp.asm"
         INCLUDE "crt/classic/crt_init_atexit.asm"
 	call    crt0_init_bss
+IF __CPU_GBZ80__
+	ld	hl,sp+0
+	ld	d,h
+	ld	e,l
+	ld	hl,exitsp
+	ld	a,l
+	ld	(hl+),a
+	ld	a,h
+	ld	(hl+),a
+ELSE
 	ld	hl,0
 	add	hl,sp
 	ld	(exitsp),hl
+ENDIF
 IF !__CPU_R2K__
     	ei
 ENDIF

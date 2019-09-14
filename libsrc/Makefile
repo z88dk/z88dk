@@ -1322,6 +1322,13 @@ test8080_clib.lib:
 	$(call buildgeneric,test)
 	TARGET=test TYPE=8080 $(LIBLINKER) -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/test8080_clib @$(LISTFILE_DIRECTORY)/test8080.lst
 
+testgbz80_clib.lib:
+	@echo ''
+	@echo '--- Building Test System Library (gbz80) ---'
+	@echo ''
+	$(call buildgeneric,test)
+	TARGET=test TYPE=gbz80 $(LIBLINKER) -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/testgbz80_clib @$(LISTFILE_DIRECTORY)/testgbz80.lst
+
 
 # TRS 80 - stefano
 trs80_clib.lib:

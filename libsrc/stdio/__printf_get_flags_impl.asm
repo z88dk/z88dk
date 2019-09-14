@@ -38,13 +38,13 @@ no_flag:
         inc     hl
         djnz    flag_loop
         pop     hl
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 	call	__printf_set_flags
 ELSE
         ld      (ix-4),c        ;save flags
 ENDIF
 check_width:
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 	push	de
 	ld	de,0
 	call	__printf_set_width
@@ -60,7 +60,12 @@ starred_width:
         push    hl      ;save format (points to '*'+1)
         call    get_16bit_ap_parameter  ;de=next ap pointer, hl=value
         ex      de,hl                   ;de=value, hl=ap
+IF __CPU_GBZ80__
+	EXTERN	__z80asm__exsphl
+	call	__z80asm__exsphl
+ELSE
         ex      (sp),hl                 ;ap on stack, hl=fmt
+ENDIF
         ;de = value, hl=format
         jr      save_width
 
@@ -78,7 +83,7 @@ check_width_from_format:
                                 ;TODO, check < 0
         ex      de,hl           ;hl=next format
 save_width:
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 	call	__printf_set_width
 ELSE
         ld      (ix-5),d        ;store width
@@ -88,7 +93,7 @@ ENDIF
         ld      a,(hl)
         inc     hl
 check_precision:
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 	push	de
 	ld	de,-1
 	call	__printf_set_precision
@@ -107,7 +112,11 @@ ENDIF
         push    hl      ;save format
         call    get_16bit_ap_parameter  ;de=next ap pointer, hl=value
         ex      de,hl
+IF __CPU_GBZ80__
+	call	__z80asm__exsphl
+ELSE
         ex      (sp),hl
+ENDIF
         ;de = value, hl=format
         jr      save_precision
 
@@ -118,7 +127,7 @@ check_precision_from_format:
                                 ;TODO, check <0
         ex      de,hl           ;hl=next format acharacter
 save_precision:
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 	call	__printf_set_precision
 ELSE
         ld      (ix-7),d

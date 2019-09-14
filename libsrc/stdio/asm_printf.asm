@@ -23,7 +23,9 @@
 
 ; int vfprintf1(FILE *fp, void __CALLEE__ (*output_fn)(int c,FILE *fp), int sccz80, unsigned char *fmt,void *ap)
 asm_printf:
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
+
+    IF __CPU_INTEL__
 	ld	hl,0
 	add	hl,sp
 	ld	(__printf_context),hl
@@ -32,6 +34,19 @@ IF __CPU_INTEL__
 	add	hl,sp
 	ld	sp,hl
 	ex	de,hl	;hl = ix + 0
+    ELIF __CPU_GBZ80__
+	ld	hl,sp+0
+	ld	d,h
+	ld	e,l
+	ld	hl,__printf_context
+	ld	a,e
+	ld	(hl+),a
+	ld	a,d
+	ld	(hl+),a
+	add	sp,-80
+        ld      l,e
+        ld      h,d
+    ENDIF
 	push	hl	;save for a bit later
 	xor	a
 	dec	hl	;-1
@@ -99,9 +114,16 @@ ELSE
         ld      (ix-8),a
 ENDIF
 .__printf_loop
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 	push	hl
+  IF __CPU_INTEL__
 	ld	hl,(__printf_context)
+  ELIF __CPU_GBZ80__
+	ld	hl,__printf_context
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+  ENDIF
 	dec	hl
 	dec	hl
 	dec	hl	;-3
@@ -130,7 +152,7 @@ ENDIF
 	inc	hl
 	and	a
 	jr	nz,cont
-IF __CPU_R2K__ | __CPU_R3K__
+IF __CPU_R2K__ | __CPU_R3K__ | __CPU_GBZ80__
 	add	sp,78
 ELSE
 	ld	hl,78		;adjust the stack
@@ -154,7 +176,7 @@ handle_percent:
 	cp	'%'
 	jr	z,print_format_character
 	call	__printf_get_flags		;level2
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 	call	__printf_res_long_flag
 ELSE
 	res	6,(ix-4)
@@ -163,7 +185,7 @@ ENDIF
 	jr	z,get_next_char
 	cp	'l'
 	jr	nz,no_long_qualifier
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 	call	__printf_set_long_flag
 ELSE
 	set	6,(ix-4)

@@ -10,9 +10,16 @@ EXTERN asm_strcspn
 
 strcspn_callee:
 
+IF __CPU_GBZ80__
+   pop de
+   pop bc
+   pop hl
+   push de
+ELSE
    pop hl
    pop de
    ex (sp),hl
+ENDIF
    
    jp asm_strcspn
 

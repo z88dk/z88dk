@@ -12,6 +12,11 @@
 __printf_get_buffer_address:
 IF __CPU_INTEL__
 	ld	hl,(__printf_context)
+ELIF __CPU_GBZ80__
+	ld	hl,__printf_context
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
 ELSE
         push    ix
         pop     hl

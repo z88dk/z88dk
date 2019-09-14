@@ -12,7 +12,7 @@
 
 __printf_print_the_buffer:
         ; On stack: ap, fmt
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 	call	__printf_get_buffer_length
 ELSE
         ld      d,0
