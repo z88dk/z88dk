@@ -64,8 +64,8 @@ loop:
 
    ld a,(de)                   ; char at front of s
 IF __CPU_GBZ80__
-   EXTERN __z80asm_ldi
-   call __z80asm_ldi
+   EXTERN __z80asm__ldi
+   call __z80asm__ldi
 ELSE
    ldi                         ; char at rear written to front of s
 ENDIF

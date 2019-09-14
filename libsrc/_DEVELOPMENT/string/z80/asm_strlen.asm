@@ -33,13 +33,13 @@ asm_strlen:
 IF __CPU_INTEL__ || __CPU_GBZ80__
 loop:
    ld a,(hl)
+   inc hl
+   dec bc
    and a
    jr z,matched
-   dec bc
-   inc hl
    ld a,b
    or c
-   jr z,loop
+   jr nz,loop
 matched:
    push af
    ld a,$ff
