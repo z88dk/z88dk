@@ -19,6 +19,23 @@
  *
  * A polynomial approximates 2**x in the basic range [-0.5, 0.5].
  *
+ * Approximation of f(x) = 2**x
+ * with weight function g(x) = 2**x
+ * on interval [ -0.5, 0.5 ]
+ * with a polynomial of degree 9.
+ * double f(double x)
+ * {
+ *   double u = 1.0150336705309648e-7;
+ *   u = u * x + 1.3259405609345135e-6;
+ *   u = u * x + 1.5252984838653427e-5;
+ *   u = u * x + 1.540343494807179e-4;
+ *   u = u * x + 1.3333557617604443e-3;
+ *   u = u * x + 9.6181291920672461e-3;
+ *   u = u * x + 5.5504108668685612e-2;
+ *   u = u * x + 2.4022650695649653e-1;
+ *   u = u * x + 6.9314718055987097e-1;
+ *   return u * x + 1.0000000000000128;
+ * }
  *
  * ACCURACY:
  *
@@ -83,5 +100,5 @@ float m32_exp2f (float x) __z88dk_fastcall
      * scale by power of 2
      */
 
-    return m32_ldexpf( m32_polyf(x, m32_coeff_exp2f, 5) * x + 1.0, n);
+    return m32_ldexpf( m32_polyf(x, m32_coeff_exp2f, 9), n);
 }

@@ -284,7 +284,6 @@ _m32_exp2f:
 	add	ix,sp
 	push	af
 	push	af
-	push	af
 	push	hl
 	ld	c,l
 	ld	b,h
@@ -348,39 +347,13 @@ l_m32_exp2f_00110:
 	ld	c, l
 	ld	b, h
 l_m32_exp2f_00102:
-	push	bc
-	push	de
-	ld	hl,0x0005
+	ld	hl,0x0009
 	push	hl
 	ld	hl,_m32_coeff_exp2f
 	push	hl
 	push	de
 	push	bc
 	call	_m32_polyf
-	ld	(ix-6),l
-	ld	(ix-5),h
-	ld	(ix-4),e
-	ld	(ix-3),d
-	pop	de
-	pop	bc
-	push	de
-	push	bc
-	ld	l,(ix-4)
-	ld	h,(ix-3)
-	push	hl
-	ld	l,(ix-6)
-	ld	h,(ix-5)
-	push	hl
-	call	___fsmul_callee
-	ld	c, l
-	ld	b, h
-	ld	hl,0x3f80
-	push	hl
-	ld	hl,0x0000
-	push	hl
-	push	de
-	push	bc
-	call	___fsadd_callee
 	ld	c, l
 	ld	l,(ix-2)
 	ld	b,h
