@@ -16,7 +16,7 @@ int l_setjmp(jmp_buf *env)
 #pragma asm
 	pop	bc	;return address
 	pop	hl	;&env
-IF !__CPU_8080__ && !__GPU_GBZ80__
+IF !__CPU_8080__ && !__CPU_GBZ80__
 	push	iy
 	pop	de	;de=iy, hl=&env
 	ld	(hl),e
