@@ -1,11 +1,11 @@
 
 SECTION code_fp_math32
 
-PUBLIC cm32_sccz80_fmod
+PUBLIC cm32_sccz80_fmod_callee
 
 EXTERN _m32_fmodf
 
-.cm32_sccz80_fmod
+.cm32_sccz80_fmod_callee
     ; Entry:
     ; Stack: float left, float right, ret
     ; Reverse the stack
