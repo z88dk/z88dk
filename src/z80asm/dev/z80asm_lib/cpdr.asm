@@ -4,7 +4,6 @@
 
 SECTION code_crt0_sccz80
 PUBLIC __z80asm__cpdr
-EXTERN __z80asm__exsphl
 
 .__z80asm__cpdr
  
@@ -14,11 +13,7 @@ EXTERN __z80asm__exsphl
    
 ; scf clears N and H - must set carry the hard way
    push af
-IF __CPU_GBZ80__
-   call __z80asm__exsphl
-ELSE
    ex (sp),hl
-ENDIF
 IF __CPU_8080__ || __CPU_8085__
    ld  a,l
    or  @00000001
@@ -53,11 +48,7 @@ ENDIF
  
 .joinbc0
  
-IF __CPU_GBZ80__
-   call __z80asm__exsphl
-ELSE
    ex (sp),hl
-ENDIF
 IF __CPU_8080__ || __CPU_8085__
    ld a,l
    and @11111010
@@ -77,11 +68,7 @@ ENDIF
    or c
    jr z, joinbc0
   
-IF __CPU_GBZ80__
-   call __z80asm__exsphl
-ELSE
    ex (sp),hl
-ENDIF
 IF __CPU_8080__ || __CPU_8085__
    ld a,l
    and @11111110
@@ -93,10 +80,6 @@ ELSE
 ENDIF
 
 .retflags
-IF __CPU_GBZ80__
-   call __z80asm__exsphl
-ELSE
    ex (sp),hl
-ENDIF
    pop af
    ret
