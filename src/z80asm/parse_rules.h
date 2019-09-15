@@ -57293,6 +57293,10 @@ default: error_illegal_ident(); }
 	case 1452:
 	{
 switch (opts.cpu) {
+case CPU_GBZ80:
+asm_cond_LABEL(stmt_label);
+add_call_emul_func("__z80asm__exsphl");
+break;
 case CPU_8080: case CPU_8085: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE3); } while(0);
 break;
@@ -75354,7 +75358,7 @@ default: error_illegal_ident(); }
 	case 3093:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085:
+case CPU_8080: case CPU_8085: case CPU_GBZ80:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__ldd");
 break;
@@ -75367,7 +75371,7 @@ default: error_illegal_ident(); }
 	case 3094:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085:
+case CPU_8080: case CPU_8085: case CPU_GBZ80:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__lddr");
 break;
@@ -75509,7 +75513,7 @@ default: error_illegal_ident(); }
 	case 3110:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085:
+case CPU_8080: case CPU_8085: case CPU_GBZ80:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__ldi");
 break;
@@ -75522,7 +75526,7 @@ default: error_illegal_ident(); }
 	case 3111:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085:
+case CPU_8080: case CPU_8085: case CPU_GBZ80:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__ldir");
 break;

@@ -12390,6 +12390,10 @@ default: error_illegal_ident(); }
 
 | label? _TK_EX _TK_IND_SP _TK_RPAREN _TK_COMMA _TK_HL _TK_NEWLINE @{
 switch (opts.cpu) {
+case CPU_GBZ80: 
+DO_STMT_LABEL();
+add_call_emul_func("__z80asm__exsphl");
+break;
 case CPU_8080: case CPU_8085: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 DO_stmt(0xE3);
 break;
@@ -28810,7 +28814,7 @@ default: error_illegal_ident(); }
 
 | label? _TK_LDD _TK_NEWLINE @{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: 
+case CPU_8080: case CPU_8085: case CPU_GBZ80: 
 DO_STMT_LABEL();
 add_call_emul_func("__z80asm__ldd");
 break;
@@ -28822,7 +28826,7 @@ default: error_illegal_ident(); }
 
 | label? _TK_LDDR _TK_NEWLINE @{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: 
+case CPU_8080: case CPU_8085: case CPU_GBZ80: 
 DO_STMT_LABEL();
 add_call_emul_func("__z80asm__lddr");
 break;
@@ -28948,7 +28952,7 @@ default: error_illegal_ident(); }
 
 | label? _TK_LDI _TK_NEWLINE @{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: 
+case CPU_8080: case CPU_8085: case CPU_GBZ80: 
 DO_STMT_LABEL();
 add_call_emul_func("__z80asm__ldi");
 break;
@@ -28960,7 +28964,7 @@ default: error_illegal_ident(); }
 
 | label? _TK_LDIR _TK_NEWLINE @{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: 
+case CPU_8080: case CPU_8085: case CPU_GBZ80: 
 DO_STMT_LABEL();
 add_call_emul_func("__z80asm__ldir");
 break;

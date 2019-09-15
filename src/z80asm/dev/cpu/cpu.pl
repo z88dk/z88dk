@@ -1,14 +1,24 @@
+#!/usr/bin/perl
+
 #------------------------------------------------------------------------------
-# Z88DK Z80 Macro Assembler
-#
-# Z80/Z180/RCM2000/RCM3000 assembly table
-# Generate test code and parsing tables for the cpus defined in cpu.def
-#
+# z80asm assembler
+# Generate test code and parsing tables for the cpus supported by z80asm
 # Copyright (C) Paulo Custodio, 2011-2019
-# License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+# License: http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk
 #------------------------------------------------------------------------------
+
 use Modern::Perl;
+use Text::Table;
+
+# %Opcodes: $Opcodes{$asm}{$cpu} = [@bin]
+my %Opcodes;
+
+# %Parser: $Parser{$tokens}{$cpu}{$parens}{ixiy|iyix} = [$asm, @bin]
+my %Parser;
+
+# %Tests: $Tests{$asm}{$cpu} = $bin
+my %Tests;
 
 #------------------------------------------------------------------------------
 # Programatic opcode generator
@@ -77,7 +87,6 @@ my %V = (
 #------------------------------------------------------------------------------
 # build %Opcodes
 #------------------------------------------------------------------------------
-my %Opcodes = ();
 for my $cpu (@CPUS) {
 	my $rabbit	= ($cpu =~ /^r/);
 	my $r3k		= ($cpu =~ /^r3k/);
@@ -488,7 +497,9 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "ex (sp), hl'", $V{altd}, 0xED, 0x54);
 		add_opc($cpu, "altd ex (sp), hl", $V{altd}, 0xED, 0x54);
 	}
-	else {}
+	else {
+		add_opc($cpu, "ex (sp), hl", 0xCD, '@__z80asm__exsphl');
+	}
 	
 	if (!$intel && !$gameboy) {
 		for my $x (@X) {
@@ -783,14 +794,12 @@ for my $cpu (@CPUS) {
 	}
 	
 	# Block transfer group
-	if ($intel) {
+	if ($intel || $gameboy) {
 		add_opc($cpu, "ldi", 	0xCD, '@__z80asm__ldi');
 		add_opc($cpu, "ldir", 	0xCD, '@__z80asm__ldir');
 		add_opc($cpu, "ldd", 	0xCD, '@__z80asm__ldd');
 		add_opc($cpu, "lddr", 	0xCD, '@__z80asm__lddr');
 	} 
-	elsif ($gameboy) {
-	}
 	else {
 		add_opc($cpu, "ldi", 	0xED, 0xA0);
 		add_opc($cpu, "ldir", 	0xED, 0xB0);
@@ -982,11 +991,94 @@ for my $cpu (@CPUS) {
 	}
 }
 
+
+#------------------------------------------------------------------------------
+# build cpu tables
+#------------------------------------------------------------------------------
+
+# get column numbers for cpus
+my %cpu_column;
+my $column;
+for my $cpu (sort @CPUS) {
+	$cpu_column{$cpu} = ++$column;
+}
+
+# build table with assembly  per cpu
+my %by_opcode;
+
+my @title = (\"|", "", \"|");
+for (sort @CPUS) { push @title, $_, \"|"; }
+my $tb = Text::Table->new(@title);
+for my $asm (sort keys %Opcodes) {
+	my @c_range = (1);
+	if ($asm =~ /rst %c/) {		# special case
+		@c_range = map {$_ * 8} (0..7);
+	} elsif ($asm =~ /%c/) {	# has %c in $asm and %c(1..7) in $bin
+		my $cpu = (keys %{$Opcodes{$asm}})[0];
+		my $bin = (grep {/%c/} @{$Opcodes{$asm}{$cpu}})[0];
+		$bin =~ / %c \( (\d+) (?: \.\. (\d+) )? \) /x or die "$bin";
+		if ($2) {
+			@c_range = ($1 .. $2);
+		} else {
+			@c_range = ($1);
+		}
+	}
+	for my $c (@c_range) {
+		(my $asm1 = $asm) =~ s/%c/$c/;
+		my @row = ($asm1, ("") x scalar(@CPUS));
+		for my $cpu (keys %{$Opcodes{$asm}}) {
+			$column = $cpu_column{$cpu};
+			my @bin = @{$Opcodes{$asm}{$cpu}};
+			for (@bin) { 
+				if (s/ %c (?: \( \d+ (?: \.\. \d+ )? \) )? /$c/gx) {
+					$_ = eval($_);
+					$@ and die "$asm: eval error: $@";
+				}
+				s/\@__z80asm__/\@/;
+			}
+			if ($asm =~ /^rst / && $cpu =~ /^r/ && ($c == 0 || $c == 0x08 || $c == 0x30)) {
+				@bin = (0xCD, $c, 0);
+			}
+			my $bin = fmthex(@bin);
+			
+			# save for later
+			$by_opcode{$bin}{$cpu} .= "\n" if $by_opcode{$bin}{$cpu};
+			$by_opcode{$bin}{$cpu} .= $asm1;
+			
+			@bin = split(' ', $bin);
+			$row[$column] = "";
+			while (@bin) {
+				my @row_bin = splice(@bin, 0, 4);
+				$row[$column] .= "\n" if $row[$column];
+				$row[$column] .= "@row_bin";
+			}
+		}
+		$tb->add(span_cells(@row));
+		say "@row";
+	}
+}
+
+(my $asm_file = $0) =~ s/\.pl$/_asm.txt/i;
+write_table($tb, $asm_file);
+
+# build table with opcodes per CPU
+$tb = Text::Table->new(@title);
+for my $opcode (sort keys %by_opcode) {
+	my @row = ($opcode, ("") x scalar(@CPUS));
+	for my $cpu (keys %{$by_opcode{$opcode}}) {
+		$column = $cpu_column{$cpu};
+		$row[$column] = $by_opcode{$opcode}{$cpu};
+	}
+	$tb->add(span_cells(@row));
+	say "@row";
+}
+
+(my $opcode_file = $0) =~ s/\.pl$/_opcodes.txt/i;
+write_table($tb, $opcode_file);
+
 #------------------------------------------------------------------------------
 # build %Parser
 #------------------------------------------------------------------------------
-my %Parser = ();
-
 for my $asm (sort keys %Opcodes) {
 	my $tokens = parser_tokens($asm);
 	
@@ -1018,8 +1110,6 @@ for my $tokens (sort keys %Parser) {
 #------------------------------------------------------------------------------
 # build %Tests
 #------------------------------------------------------------------------------
-my %Tests = ();
-
 for my $asm (sort keys %Opcodes) {
 	for my $cpu (sort keys %{$Opcodes{$asm}}) {
 		my $bin = join(' ', @{$Opcodes{$asm}{$cpu}});
@@ -1577,3 +1667,31 @@ sub replace {
 	return $text;
 }
 
+sub span_cells {
+	my(@row) = @_;
+	
+	for my $i (1 .. $#row - 1) {
+		for my $j ($i + 1 .. $#row) {
+			last if $row[$i] =~ /^\s*$/;
+			last if $row[$i] ne $row[$j];
+			$row[$j] = "==";
+		}
+	}
+
+	return @row;
+}
+
+sub write_table {
+	my($tb, $file) = @_;
+	
+	open(my $fh, ">", $file) or die "open $file: $!\n";
+	my $BY_ROWS = 50000;
+	for (my $row = 1; $row < $tb->height; $row += $BY_ROWS) {
+		print $fh $tb->rule('-', '+'), 
+				  $tb->title, 
+				  $tb->rule('-', '+'), 
+				  $tb->table($row, $BY_ROWS);
+	}
+	print $fh $tb->rule('-', '+');
+	close $fh;
+}
