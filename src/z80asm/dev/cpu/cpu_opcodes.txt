@@ -2386,10 +2386,10 @@
 |CD @cpir         |cpir       |==          |            |cpir                   |==       |               |              |              |
 |CD @daa          |           |            |            |daa                    |==       |               |              |              |
 |CD @exsphl       |           |            |ex (sp), hl |                       |         |               |              |              |
-|CD @ldd          |ldd        |==          |            |                       |         |               |              |              |
-|CD @lddr         |lddr       |==          |            |                       |         |               |              |              |
-|CD @ldi          |ldi        |==          |            |                       |         |               |              |              |
-|CD @ldir         |ldir       |==          |            |                       |         |               |              |              |
+|CD @ldd          |ldd        |==          |==          |                       |         |               |              |              |
+|CD @lddr         |lddr       |==          |==          |                       |         |               |              |              |
+|CD @ldi          |ldi        |==          |==          |                       |         |               |              |              |
+|CD @ldir         |ldir       |==          |==          |                       |         |               |              |              |
 |CD @rld          |           |            |            |rld                    |==       |               |              |              |
 |CD @rrd          |           |            |            |rrd                    |==       |               |              |              |
 |CE %n            |aci %n     |==          |==          |==                     |==       |==             |==            |==            |

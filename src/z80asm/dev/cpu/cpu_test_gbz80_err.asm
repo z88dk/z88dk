@@ -4913,16 +4913,12 @@
  ld sp, ix                      ; Error
  ld sp, iy                      ; Error
  ld xpc, a                      ; Error
- ldd                            ; Error
- lddr                           ; Error
  lddrx                          ; Error
  lddsr                          ; Error
  lddx                           ; Error
  ldhi -128                      ; Error
  ldhi 127                       ; Error
  ldhi 255                       ; Error
- ldi                            ; Error
- ldir                           ; Error
  ldirx                          ; Error
  ldisr                          ; Error
  ldix                           ; Error

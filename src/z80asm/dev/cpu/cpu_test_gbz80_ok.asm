@@ -497,12 +497,14 @@
  ldax bc                        ; 0A
  ldax d                         ; 1A
  ldax de                        ; 1A
+ ldd                            ; CD @__z80asm__ldd
  ldd (bc), a                    ; 02 0B
  ldd (de), a                    ; 12 1B
  ldd (hl), a                    ; 32
  ldd a, (bc)                    ; 0A 0B
  ldd a, (de)                    ; 1A 1B
  ldd a, (hl)                    ; 3A
+ lddr                           ; CD @__z80asm__lddr
  ldh (-128), a                  ; E0 80
  ldh (127), a                   ; E0 7F
  ldh (255), a                   ; E0 FF
@@ -513,12 +515,14 @@
  ldh a, (c)                     ; F2
  ldhl sp, -128                  ; F8 80
  ldhl sp, 127                   ; F8 7F
+ ldi                            ; CD @__z80asm__ldi
  ldi (bc), a                    ; 02 03
  ldi (de), a                    ; 12 13
  ldi (hl), a                    ; 22
  ldi a, (bc)                    ; 0A 03
  ldi a, (de)                    ; 1A 13
  ldi a, (hl)                    ; 2A
+ ldir                           ; CD @__z80asm__ldir
  lxi b, -32768                  ; 01 00 80
  lxi b, 32767                   ; 01 FF 7F
  lxi b, 65535                   ; 01 FF FF

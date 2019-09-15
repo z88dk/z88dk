@@ -794,14 +794,12 @@ for my $cpu (@CPUS) {
 	}
 	
 	# Block transfer group
-	if ($intel) {
+	if ($intel || $gameboy) {
 		add_opc($cpu, "ldi", 	0xCD, '@__z80asm__ldi');
 		add_opc($cpu, "ldir", 	0xCD, '@__z80asm__ldir');
 		add_opc($cpu, "ldd", 	0xCD, '@__z80asm__ldd');
 		add_opc($cpu, "lddr", 	0xCD, '@__z80asm__lddr');
 	} 
-	elsif ($gameboy) {
-	}
 	else {
 		add_opc($cpu, "ldi", 	0xED, 0xA0);
 		add_opc($cpu, "ldir", 	0xED, 0xB0);
