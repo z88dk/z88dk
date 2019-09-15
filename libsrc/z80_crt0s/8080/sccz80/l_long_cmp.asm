@@ -36,6 +36,7 @@ IF __CPU_GBZ80__
 	ld	a,b
 	ld	(__retloc2+1),a
 	ld	c,l		;Get low word into bc
+        ld      b,h
 	ld	hl,sp+0
 ELSE
 	ex	(sp),hl

@@ -12,7 +12,7 @@ PUBLIC __z80asm__exsphl
         push    de              ;16
         ld      d,h             ;4
         ld      e,l             ;4
-        ld      hl,sp+8         ;12, (sp)
+        ld      hl,sp+6         ;12, (sp)
         ld      a,(hl)          ;8
         ld      (hl),e          ;8
         ld      e,a             ;4

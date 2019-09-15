@@ -1010,7 +1010,14 @@ int push_function_argument_fnptr(Kind expr, Type *type, int push_sdccchar, int i
         return type->size;
     } 
     if ( !is_last_argument ) {
-        swapstk();
+        if ( IS_GBZ80() ) {
+            ol("ld\td,h");
+            ol("ld\te,l");
+            ol("pop\thl");
+            ol("push\tde");
+        } else {
+            swapstk();
+        }
     }
     return 2;
 }
@@ -1188,7 +1195,14 @@ int callstk(Type *type, int n, int isfarptr, int last_argument_size)
     } else {
         if (last_argument_size == 2) {
             /* At this point, TOS = function, hl = argument */
-            swapstk();
+            if ( IS_GBZ80() ) {
+                ol("ld\td,h");
+                ol("ld\te,l");
+                ol("pop\thl");
+                ol("push\tde");
+            } else {
+                swapstk();
+            }
         } else if ( last_argument_size == 4) {
             /* At this point, TOS = function, dehl = argument */
             swap(); /* MSW -> hl */
@@ -4518,14 +4532,25 @@ void gen_builtin_strcpy()
     // hl holds src on entry, on stack= dest
     ol("pop\tde");
     ol("push\tde");
-    ol("xor\ta");
     label = getlabel();
-    postlabel(label);
-    ol("cp\t(hl)");
-    ol("ldi");
-    outstr("\tjr\tnz,");
-    printlabel(label);
-    nl();
+    if ( IS_GBZ80() ) {
+        postlabel(label);
+        ol("ld\ta,(hl+)");
+        ol("ld\t(de),a");
+        ol("inc\tde");
+        ol("and\ta");
+        outstr("\tjr\tnz,");
+        printlabel(label);
+        nl();
+    } else {
+        ol("xor\ta");
+        postlabel(label);
+        ol("cp\t(hl)");
+        ol("ldi");
+        outstr("\tjr\tnz,");
+        printlabel(label);
+        nl();
+    }
     ol("pop\thl");
 }
 

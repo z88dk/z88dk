@@ -20,11 +20,11 @@ __str_locate_nul:
    ld b,a
 IF __CPU_GBZ80__
 loop:
+   dec bc
    ld a,(hl)
    and a
    ret z
    inc hl
-   dec bc
    ld a,b
    or c
    jr nz,loop
