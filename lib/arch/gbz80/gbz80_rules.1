@@ -1,4 +1,4 @@
-	call	l_gint%1
+	call	l_gint	;
 =
 	ld	a,(hl+)
 	ld	h,(hl)
@@ -35,3 +35,27 @@
 	ld	d,(hl)
 	ld	e,a
 	pop	hl
+
+	ld	hl,%1	;const
+	call	l_gintspsp	;
+=
+	ld	hl,sp+%1
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	push	hl
+
+
+%check 0 <= %1 <= 127
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	sp,hl
+	ret
+=
+	add	sp,%1
+	ret
+
+	add	sp,%1
+	add	sp,%2
+=
+	add	sp,%eval(%1 %2 +)

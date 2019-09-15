@@ -9,12 +9,13 @@
         ld      h,d
         ld      e,a
 .l_asr_hl_by_e
-        ld      a,e
+        ld      d,0
 .l_asr1
+        ld      a,e
         and     15
         ret     z
         sra     h
         rr      l
-        dec     a
+        dec     e
         jp      l_asr1
 

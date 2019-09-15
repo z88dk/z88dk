@@ -7,15 +7,16 @@
         ld      a,l
         ld      l,e
         ld      h,d
-        ld      e,a
+	ld	e,a
 .l_asr_u_hl_by_e
-        ld      a,e
+	ld	d,0
 .l_asr_u_1
+	ld	a,e
         and     15
         ret     z
 	srl	h
         rr      l
-        dec     a
+        dec     e
         jp      l_asr_u_1
 
 

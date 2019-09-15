@@ -15,9 +15,12 @@
         ld a,l
         ld l,e
         ld h,d
+	ld e,a
+        ld d,0
 .l_asl1   
+        ld    a,e
         and   15
         ret   z
         add   hl,hl
-        dec   a
+        dec   e
         jp    l_asl1
