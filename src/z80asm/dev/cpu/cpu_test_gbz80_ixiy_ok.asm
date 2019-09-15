@@ -270,6 +270,7 @@
  djnz ASMPC                     ; 05 20 FE
  djnz b, ASMPC                  ; 05 20 FE
  ei                             ; FB
+ ex (sp), hl                    ; CD @__z80asm__exsphl
  ex de, hl                      ; E5 D5 E1 D1
  halt                           ; 76
  hlt                            ; 76

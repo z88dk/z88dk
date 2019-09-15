@@ -2076,7 +2076,6 @@
  dec l'                         ; Error
  djnz b', ASMPC                 ; Error
  dsub                           ; Error
- ex (sp), hl                    ; Error
  ex (sp), hl'                   ; Error
  ex (sp), ix                    ; Error
  ex (sp), iy                    ; Error
