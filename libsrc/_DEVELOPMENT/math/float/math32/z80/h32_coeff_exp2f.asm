@@ -5,6 +5,9 @@
 ; and related items of interest to scientists and engineers.
 ; https://fossies.org/
 ;
+; Coefficients from lolremez, to make use of additional accuracy in
+; calculation from 32-bit mantissa poly() function.
+;
 ;  Approximation of f(x) = 2**x
 ;  with weight function g(x) = 2**x
 ;  on interval [ -0.5, 0.5 ]

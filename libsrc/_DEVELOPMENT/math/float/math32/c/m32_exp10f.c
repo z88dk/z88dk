@@ -38,6 +38,9 @@
  * arithmetic   domain     # trials      peak         rms
  *    IEEE      -38,+38     100000      9.8e-8      2.8e-8
  *
+ *
+ * See m32_expf.c for comments on error amplification.
+ *
  * ERROR MESSAGES:
  *
  *   message         condition      value returned
@@ -78,6 +81,8 @@ float m32_exp10f (float x) __z88dk_fastcall
         return(0.0);
     }
 #endif
+	if( x == 0.0 )
+		return 1.0;
 
     /* Express 10**x = 10**g 2**n
      *   = 10**g 10**( n log10(2) )

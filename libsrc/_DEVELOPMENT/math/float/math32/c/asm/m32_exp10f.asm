@@ -290,9 +290,21 @@ _m32_exp10f:
 	ld	(ix-12),c
 	ld	(ix-11),b
 	ld	(ix-10),e
-	ld	l, e
 	ld	(ix-9),d
-	ld	h,d
+	ld	a, d
+	and	a,0x7f
+	or	a,(ix-10)
+	or	a,(ix-11)
+	or	a,(ix-12)
+	jr	NZ,l_m32_exp10f_00102
+	ld	l,0x00
+	ld	h,0x00
+	ld	e,0x80
+	ld	d,0x3f
+	jp	l_m32_exp10f_00103
+l_m32_exp10f_00102:
+	ld	l,(ix-10)
+	ld	h,(ix-9)
 	push	hl
 	ld	l,(ix-12)
 	ld	h,(ix-11)
@@ -388,6 +400,7 @@ _m32_exp10f:
 	push	de
 	push	bc
 	call	_m32_ldexpf
+l_m32_exp10f_00103:
 	ld	sp, ix
 	pop	ix
 	ret

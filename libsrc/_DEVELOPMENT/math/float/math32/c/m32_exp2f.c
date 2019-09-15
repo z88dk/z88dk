@@ -70,7 +70,6 @@ extern float m32_coeff_exp2f[];
 float m32_exp2f (float x) __z88dk_fastcall
 {
     float z;
-    int16_t n;
 #if 0
     if( x > MAXL2F )
     {
@@ -82,23 +81,18 @@ float m32_exp2f (float x) __z88dk_fastcall
 	    return(0.0);
     }
 #endif
+	if( x == 0.0 )
+		return 1.0;
+
     /* separate into integer and fractional parts */
-    z = m32_floorf(x);
+    z = m32_floorf(x + 0.5);
 
     x -= z;
-
-    n = (int16_t)z;
-    
-    if( x > 0.5 )
-    {
-	    ++n;
-	    x -= 1.0;
-    }
 
     /* rational approximation
      * exp2(x) = 1.0 +  xP(x)
      * scale by power of 2
      */
 
-    return m32_ldexpf( m32_polyf(x, m32_coeff_exp2f, 9), n);
+    return m32_ldexpf( m32_polyf(x, m32_coeff_exp2f, 9), (int16_t)z);
 }
