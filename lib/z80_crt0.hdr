@@ -55,6 +55,7 @@
 	EXTERN    l_gintspchar	;Get int,char (peephole opt)
 	EXTERN    l_gintspsp	;Get int and push (peephole opt)
 	EXTERN    l_g2intspsp	;Get 2 int and push (peephole opt)
+	EXTERN    l_gintsp2de	;Get int, multiply by 2 and add from SP by de
 	EXTERN    l_gint7de	;Get int, multiply by 7 and add from SP by de
 	EXTERN    l_gint_eq	;Get int and test == 0
 	EXTERN    l_ghtonsint	;Get reverse order int
