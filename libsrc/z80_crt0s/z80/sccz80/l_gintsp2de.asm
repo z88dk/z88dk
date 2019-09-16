@@ -6,6 +6,8 @@
 PUBLIC l_gintsp2de
 .l_gintsp2de
 
+extern l_gint
+
 	ex	de,hl
 	pop	hl
 	ex	(sp),hl
@@ -26,4 +28,5 @@ ENDIF
 	add	hl,hl		;*2
 	add	hl,de
 	
-	ret
+	jp	l_gint	;
+
