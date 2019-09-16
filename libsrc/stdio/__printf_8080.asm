@@ -63,7 +63,12 @@ ENDIF
 ; Exit:  hl = hl + 1
 __printf_write_chars_written:
 	push	de
+IF __CPU_GBZ80__
+	ld	e,l
+	ld	d,h
+ELSE
 	ex	de,hl
+ENDIF
 IF __CPU_GBZ80__
 	push	af
 	ld	hl,__printf_context
@@ -82,7 +87,12 @@ ENDIF
 	inc	de
 	ld	a,(hl)
 	ld	(de),a
+IF __CPU_GBZ80__
+	ld	l,e
+	ld	h,d
+ELSE
 	ex	de,hl
+ENDIF
 	pop	de
 	ret
 
@@ -157,7 +167,12 @@ ENDIF
 	ld	e,(hl)
 	inc	hl
 	ld	d,(hl)
+IF __CPU_GBZ80__
+	ld	l,e
+	ld	h,d
+ELSE
 	ex	de,hl
+ENDIF
 	pop	de
 	ret
 
@@ -343,7 +358,12 @@ ENDIF
 	ld	d,(hl)
 	dec	hl
 	ld	e,(hl)
+IF __CPU_GBZ80__
+	ld	l,e
+	ld	h,d
+ELSE
 	ex	de,hl
+ENDIF
 	pop	de
 	ret
 
@@ -455,7 +475,12 @@ ENDIF
 	ld	d,(hl)
 	dec	hl
 	ld	e,(hl)
+IF __CPU_GBZ80__
+	ld	l,e
+	ld	h,d
+ELSE
 	ex	de,hl
+ENDIF
 	pop	de
 	ret
 

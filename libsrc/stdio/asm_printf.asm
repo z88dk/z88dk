@@ -50,19 +50,30 @@ IF __CPU_INTEL__ | __CPU_GBZ80__
 	push	hl	;save for a bit later
 	xor	a
 	dec	hl	;-1
+IF __CPU_GBZ80__
+	ld	(hl-),a
+	ld	(hl-),a
+ELSE
 	ld	(hl),a
 	dec	hl	;-2
 	ld	(hl),a
-	dec	a
 	dec	hl	;-3
+ENDIF
+	dec	a
 	dec	hl	;-4
 	dec	hl	;-5
+IF __CPU_GBZ80__
+	ld	(hl-),a
+	ld	(hl-),a
+	ld	(hl-),a
+ELSE
 	ld	(hl),a
 	dec	hl	;-6
 	ld	(hl),a
 	dec	hl	;-7
 	ld	(hl),a
 	dec	hl	;-8
+ENDIF
 	ld	(hl),a
 	pop	hl	;+0
 	inc	hl	;+1
@@ -71,8 +82,12 @@ IF __CPU_INTEL__ | __CPU_GBZ80__
 	inc	hl	;+3
 	ld	d,(hl)
 	inc	hl	;+4
+IF __CPU_GBZ80__
+	ld	a,(hl+)
+ELSE
 	ld	a,(hl)
 	inc	hl	;+5
+ENDIF
 	ld	h,(hl)
 	ld	l,a
 ELSE
@@ -128,10 +143,15 @@ IF __CPU_INTEL__ | __CPU_GBZ80__
 	dec	hl
 	dec	hl	;-3
 	xor	a
+IF __CPU_GBZ80__
+	ld	(hl-),a
+	ld	(hl-),a
+ELSE
 	ld	(hl),a	;upper case switch
 	dec	hl	;-4
 	ld	(hl),a	;flags
 	dec	hl	;-5
+ENDIF
 	dec	hl	;-6
 	dec	hl	;-7
 	dec	hl	;-8
@@ -147,9 +167,12 @@ ELSE
 	ld	(ix-4),a		;flags
 	ld	(ix-10),a		;length of temp buffer
 ENDIF
- 
+IF __CPU_GBZ80__
+	ld	a,(hl+)
+ELSE 
 	ld	a,(hl)
 	inc	hl
+ENDIF
 	and	a
 	jr	nz,cont
 IF __CPU_R2K__ | __CPU_R3K__ | __CPU_GBZ80__
@@ -171,8 +194,12 @@ print_format_character:
 	jr	__printf_loop	
 
 handle_percent:
+IF __CPU_GBZ80__
+	ld	a,(hl+)
+ELSE
 	ld	a,(hl)
 	inc	hl
+ENDIF
 	cp	'%'
 	jr	z,print_format_character
 	call	__printf_get_flags		;level2
@@ -191,8 +218,12 @@ ELSE
 	set	6,(ix-4)
 ENDIF
 get_next_char:
+IF __CPU_GBZ80__
+	ld	a,(hl+)
+ELSE
 	ld	a,(hl)
 	inc	hl
+ENDIF
 no_long_qualifier:
 	push	hl	;save fmt
 ; Loop the loop

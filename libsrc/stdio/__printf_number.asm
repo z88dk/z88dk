@@ -48,8 +48,12 @@ ENDIF
         inc     hl
         ld      d,(hl)
         inc     hl
+IF __CPU_GBZ80__
+	ld	a,(hl+)
+ELSE
         ld      a,(hl)
         inc     hl
+ENDIF
         ld      b,(hl)
         inc     hl
         push    hl              ; save ap
@@ -68,8 +72,12 @@ pickuplong_sccz80:
         dec     hl
         ld      b,(hl)          ;LSW
         dec     hl
+IF __CPU_GBZ80__
+	ld	a,(hl-)
+ELSE
         ld      a,(hl)
         dec     hl
+ENDIF
         dec     hl
         push    hl              ;Save ap for next time
         ld      h,b

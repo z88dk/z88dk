@@ -36,7 +36,12 @@ flags:
         defb    '0', 0x04
 no_flag:
         inc     hl
+IF __CPU_GBZ80__
+	dec	b
+	jr	nz,flag_loop
+ELSE
         djnz    flag_loop
+ENDIF
         pop     hl
 IF __CPU_INTEL__ | __CPU_GBZ80__
 	call	__printf_set_flags
@@ -60,12 +65,7 @@ starred_width:
         push    hl      ;save format (points to '*'+1)
         call    get_16bit_ap_parameter  ;de=next ap pointer, hl=value
         ex      de,hl                   ;de=value, hl=ap
-IF __CPU_GBZ80__
-	EXTERN	__z80asm__exsphl
-	call	__z80asm__exsphl
-ELSE
         ex      (sp),hl                 ;ap on stack, hl=fmt
-ENDIF
         ;de = value, hl=format
         jr      save_width
 
@@ -112,11 +112,7 @@ ENDIF
         push    hl      ;save format
         call    get_16bit_ap_parameter  ;de=next ap pointer, hl=value
         ex      de,hl
-IF __CPU_GBZ80__
-	call	__z80asm__exsphl
-ELSE
         ex      (sp),hl
-ENDIF
         ;de = value, hl=format
         jr      save_precision
 

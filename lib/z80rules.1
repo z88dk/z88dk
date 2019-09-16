@@ -4518,3 +4518,14 @@
 =
 	ld	l,(hl)
 	ld	h,0
+
+%cpu gbz80
+	ld	hl,_%1
+	push	hl
+	ld	hl,_%2
+	pop	de
+	push	de
+=
+	ld	de,_%1
+	ld	hl,_%2
+	push	de

@@ -23,6 +23,11 @@
 #define __DISABLE_BUILTIN 
 #endif
 
+#if __SDCC && __GBZ80__
+#define __DISABLE_BUILTIN 
+#endif
+
+
 #define __CHAR_LF '\n'
 #define __CHAR_CR '\r'
 
