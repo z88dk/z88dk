@@ -4512,3 +4512,9 @@
 	ld	(hl),%3
 	inc	hl
 	ld	(_%1),hl
+
+	call	l_gchar
+	ld	h,0
+=
+	ld	l,(hl)
+	ld	h,0

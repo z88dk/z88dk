@@ -59,3 +59,66 @@
 	add	sp,%2
 =
 	add	sp,%eval(%1 %2 +)
+
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	ld	de,%1
+	call	l_pint
+	ld	hl,%2
+=
+	ld	a,(hl+)
+	ld	d,(hl)
+	ld	e,a
+	ld	hl,%1
+	ld	(hl+),a
+	ld	(hl),d
+	ld	hl,%2
+
+	ld	hl,%1	;const
+	ld	de,%2
+	call	l_pint
+	ld	hl,%3
+=
+	ld	de,%1
+	ld	hl,%2
+	ld	a,e
+	ld	(hl+),a
+	ld	(hl),d
+	ld	hl,%3
+
+	push	hl
+	ld	hl,%1	;const
+	pop	de
+=
+	ld	d,h
+	ld	e,l
+	ld	hl,%1	;const
+
+	ld	a,(hl)
+	inc	hl
+=
+	ld	a,(hl+)
+
+	ld	a,(hl)
+	dec	hl
+=
+	ld	a,(hl-)
+
+	call	l_gint
+	ld	de,%1
+	push	hl
+	ld	l,e
+	ld	h,d
+	pop	de
+=
+	ld	a,(hl+)
+	ld	d,(hl)
+	ld	e,a
+	ld	hl,%1
+
+	call	l_gint
+=
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a

@@ -12,8 +12,8 @@ strnchr_callee:
 
 IF __CPU_GBZ80__
    pop af
-   pop bc
    pop de
+   pop bc
    pop hl
    push af
 ELSE

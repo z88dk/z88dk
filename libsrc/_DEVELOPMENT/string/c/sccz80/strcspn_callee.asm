@@ -11,10 +11,10 @@ EXTERN asm_strcspn
 strcspn_callee:
 
 IF __CPU_GBZ80__
-   pop de
    pop bc
+   pop de
    pop hl
-   push de
+   push bc
 ELSE
    pop hl
    pop de
