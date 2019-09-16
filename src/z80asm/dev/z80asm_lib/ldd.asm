@@ -6,9 +6,13 @@ PUBLIC __z80asm__ldd
 
 .__z80asm__ldd
 	push	af		;Save incoming flags
+IF __CPU_GBZ80__
+	ld	a,(hl-)
+ELSE
 	ld	a,(hl)
-	ld	(de),a
 	dec	hl
+ENDIF
+	ld	(de),a
 	dec	de
 	dec	bc
 IF !__CPU_GBZ80__
