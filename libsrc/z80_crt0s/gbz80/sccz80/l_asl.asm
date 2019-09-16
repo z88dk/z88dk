@@ -18,9 +18,9 @@
 	ld e,a
         ld d,0
 .l_asl1   
+	dec   e
         ld    a,e
-        and   15
+	inc   a
         ret   z
         add   hl,hl
-        dec   e
         jp    l_asl1

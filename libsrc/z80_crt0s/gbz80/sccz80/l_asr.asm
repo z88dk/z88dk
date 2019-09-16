@@ -11,11 +11,11 @@
 .l_asr_hl_by_e
         ld      d,0
 .l_asr1
+	dec	e
         ld      a,e
-        and     15
+	inc	a
         ret     z
         sra     h
         rr      l
-        dec     e
         jp      l_asr1
 
