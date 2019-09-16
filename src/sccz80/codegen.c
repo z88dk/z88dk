@@ -1435,7 +1435,7 @@ int modstk(int newsp, Kind save, int saveaf, int usebc)
 
     if (k == 0)
         return newsp;
-    if ( (c_cpu & CPU_RABBIT) && abs(k) > 1 && abs(k) <= 127 ) {
+    if ( (c_cpu & (CPU_GBZ80|CPU_RABBIT)) && abs(k) > 1 && abs(k) <= 127 ) {
         outstr("\tadd\tsp,"); outdec(k); nl();
         return newsp;
     }
