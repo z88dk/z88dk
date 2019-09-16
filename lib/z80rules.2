@@ -1297,6 +1297,14 @@
 	ld	hl,%1	;const
 	call	l_g2intspsp	;
 
+	add	hl,sp
+	call	l_gint	;
+	add	hl,hl
+	pop	de
+	add	hl,de
+=
+	call	l_gintsp2de	;
+
 	ld	hl,%1	;const
 	call	l_gcharspsp	;
 	ld	hl,%1	;const
