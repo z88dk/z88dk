@@ -4526,6 +4526,7 @@ void popframe(void)
     }
 }
 
+
 void gen_builtin_strcpy()
 {
     int label;
@@ -4560,7 +4561,12 @@ void gen_builtin_strchr(int32_t c)
     int startlabel, endlabel;
     if ( c == -1 ) {
         /* hl = c, stack = buffer */
-        ol("ex\tde,hl");
+        if ( IS_GBZ80() ) {
+            ol("ld\td,h");
+            ol("ld\te,l");
+        } else {
+            ol("ex\tde,hl");
+        }
         ol("pop\thl");
         Zsp += 2;
     } else {
@@ -4587,7 +4593,12 @@ void gen_builtin_memset(int32_t c, int32_t s)
 {
     if ( c == -1 ) {
         /* Entry hl = c, on stack = buffer */
-        ol("ex\tde,hl");  /* c */
+        if ( IS_GBZ80() ) {
+            ol("ld\td,h");
+            ol("ld\te,l");
+        } else {
+            ol("ex\tde,hl");  /* c */
+        }
         ol("pop\thl");  /* buffer */
         Zsp += 2;
     } else {
@@ -4628,7 +4639,7 @@ void gen_builtin_memset(int32_t c, int32_t s)
         ol("ld\te,l");
         ol("inc\tde");
         outstr("\tld\tbc,"); outdec((s % 65536) - 1); nl();
-        ol("ldir");
+	ol("ldir");
     }
     ol("pop\thl");
 }
@@ -4641,17 +4652,18 @@ void gen_builtin_memcpy(int32_t src, int32_t n)
         ol("push\tde");
         Zsp += 2;
         outstr("\tld\tbc,"); outdec(n % 65536); nl();
-        ol("ldir");
+	ol("ldir");
     } else {
         /* hl is dst */
         ol("push\thl");
         ol("ex\tde,hl");
         outstr("\tld\thl,"); outdec(src % 65536); nl();
         outstr("\tld\tbc,"); outdec(n % 65536); nl();
-        ol("ldir");
+	ol("ldir");
     }
     ol("pop\thl");
 }
+
 
 void copy_to_stack(char *label, int stack_offset,  int size)
 {
@@ -4689,6 +4701,11 @@ void intrinsic_in(SYMBOL *sym)
             ol("nop"); // Rabbit bug workaround
         }
         return;
+    } else if ( IS_GBZ80() ) {
+        outstr("\tldh\ta,("); outname(sym->name, 1); outstr(")"); nl();
+        ol("ld\tl,a");
+        ol("ld\th,0");
+        return;
     }
     if (sym->type == KIND_PORT8 ) {
         if ( c_cpu == CPU_Z180 ) {
@@ -4715,6 +4732,10 @@ void intrinsic_out(SYMBOL *sym)
         if ( c_cpu == CPU_R2K ) {
             ol("nop"); // Rabbit bug workaround
         }
+        return;
+    } else if ( IS_GBZ80() ) {
+        ol("ld\ta,l");
+        outstr("\tldh\t("); outname(sym->name, 1); outstr("),a"); nl();
         return;
     }
     if (sym->type == KIND_PORT8 ) {
