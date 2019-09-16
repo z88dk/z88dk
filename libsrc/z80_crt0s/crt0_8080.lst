@@ -23,6 +23,7 @@ z80/sccz80/l_getptr
 z80/sccz80/l_gint
 z80/sccz80/l_gint7de
 z80/sccz80/l_gintsp
+z80/sccz80/l_gintsp2de
 z80/sccz80/l_gintspchar
 z80/sccz80/l_gintspsp
 z80/sccz80/l_g2intspsp
