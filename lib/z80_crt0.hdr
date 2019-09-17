@@ -39,6 +39,10 @@
 	EXTERN     l_ini_512
 
 
+	; Used for banked calls for __banked for sccz80 + sdcc
+	EXTERN     banked_call
+
+
 ;------------------------------------
 ; Scopes for integer library routines
 ;------------------------------------

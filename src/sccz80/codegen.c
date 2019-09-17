@@ -331,7 +331,6 @@ void getmem(SYMBOL* sym)
             outstr("\n");
             callrts("l_glong");
         } else {
-            ot("ld\thl,(");
             outname(sym->name, dopref(sym));    
             outstr(")\n");
             if ( !IS_8080() ) { 
@@ -1116,6 +1115,13 @@ void zshortcall(int rst, int value)
 {
     outfmt("\trst\t%d\n",rst);
     outfmt("\t%s\t%d\n", value < 0x100 ? "defb" : "defw", value);
+}
+
+void zbankedcall(SYMBOL *sym)
+{
+    ol("call\tbanked_call");
+    ot("defw\t"); outname(sym->name, dopref(sym)); nl();
+    ol("defw\t0");
 }
 
 /* djm (move this!) Decide whether to print a prefix or not 

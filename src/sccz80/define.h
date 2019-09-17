@@ -164,7 +164,8 @@ enum symbol_flags {
         NAKED = 0x800,      /* Function is naked - don't generate any code */
         CRITICAL = 0x1000,    /* Disable interrupts around the function */
         SDCCDECL = 0x2000,   /* Function uses sdcc convention for chars */
-        SHORTCALL = 0x4000   /* Function uses short call (via rst) */
+        SHORTCALL = 0x4000,   /* Function uses short call (via rst) */
+        BANKED = 0x8000      /* Call via the banked_call function */
 };
 
 

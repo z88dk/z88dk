@@ -612,6 +612,10 @@ static void parse_trailing_modifiers(Type *type)
         } else if ( amatch("__critical")) {
             type->flags |= CRITICAL;
             continue;
+        } else if ( amatch("__banked")) {
+            type->flags |= BANKED;
+        } else if ( amatch("__nonbanked")) {
+            type->flags &= ~BANKED;
         } else if ( amatch("__z88dk_sdccdecl")) {
             type->flags |= SDCCDECL;
             type->flags &= ~(SMALLC|FLOATINGDECL);
