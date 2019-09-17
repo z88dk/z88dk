@@ -331,6 +331,7 @@ void getmem(SYMBOL* sym)
             outstr("\n");
             callrts("l_glong");
         } else {
+            ot("ld\thl,(");
             outname(sym->name, dopref(sym));    
             outstr(")\n");
             if ( !IS_8080() ) { 
