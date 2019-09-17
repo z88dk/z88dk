@@ -26,7 +26,7 @@
 
 	
 ; Draw a spiral of squares
-(defun rotare (a,n,c)
+(defun rotate (a,n,c)
   (while (> n 0)
     (right a)
     (square n)
