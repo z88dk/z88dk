@@ -1279,6 +1279,21 @@
 	call	l_gintspsp	;
 	ld	hl,%2	;const
 
+	ld	hl,%1
+	push	hl
+	ld	hl,%2
+	add	hl,sp
+	call	l_gint	;
+	add	hl,hl
+	pop	de
+	add	hl,de
+	call	l_gint	;
+=
+	ld	hl,%1
+	push	hl
+	ld	hl,%2
+	call	l_gintsp2de	;
+
 	ld	hl,%1	;const
 	add	hl,sp
 	call	l_gchar
@@ -1296,16 +1311,6 @@
 =
 	ld	hl,%1	;const
 	call	l_g2intspsp	;
-
-REMOVE THIS LINE FOR IT TO FIRE
-	add	hl,sp
-	call	l_gint	;
-	add	hl,hl
-	pop	de
-	add	hl,de
-	call	l_gint	;
-=
-	call	l_gintsp2de	;
 
 	ld	hl,%1	;const
 	call	l_gcharspsp	;
