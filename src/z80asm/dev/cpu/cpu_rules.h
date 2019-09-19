@@ -12279,7 +12279,10 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_GBZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_jr(0x0520);
+DO_stmt(0x05);
+Expr *expr = pop_expr(ctx);
+expr->asmpc++;
+add_opcode_jr(0x20, expr);
 break;
 case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -12306,7 +12309,10 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_GBZ80: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_jr(0x0520);
+DO_stmt(0x05);
+Expr *expr = pop_expr(ctx);
+expr->asmpc++;
+add_opcode_jr(0x20, expr);
 break;
 case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();

@@ -84,6 +84,9 @@ my %V = (
 	altd => 0x76, ioi => 0xD3, ioe => 0xDB,
 );
 
+sub inc_r { my($r) = @_; return 0x04 + $V{$r}*8; }
+sub dec_r { my($r) = @_; return 0x05 + $V{$r}*8; }
+
 #------------------------------------------------------------------------------
 # build %Opcodes
 #------------------------------------------------------------------------------
@@ -326,12 +329,12 @@ for my $cpu (@CPUS) {
 	add_opc($cpu, "cpi %n",			0xFE, '%n');
 
 	for my $r (@R8I) { 
-		add_opc($cpu, "inc $r", 	0x04 + $V{$r}*8);
-		add_opc($cpu, "dec $r", 	0x05 + $V{$r}*8);
+		add_opc($cpu, "inc $r", 	inc_r($r));
+		add_opc($cpu, "dec $r", 	dec_r($r));
 	}
 	for my $r (@R8_INTEL) {
-		add_opc($cpu, "inr $r",		0x04 + $V{$r}*8);
-		add_opc($cpu, "dcr $r",		0x05 + $V{$r}*8);
+		add_opc($cpu, "inr $r",		inc_r($r));
+		add_opc($cpu, "dcr $r",		dec_r($r));
 	}
 	
 	for my $r (@R8I) { 
@@ -706,16 +709,16 @@ for my $cpu (@CPUS) {
 	# TODO: check that address is corretly computed in DJNZ B', LABEL - 76 10 FE or 76 10 FD
 	if ($intel) {
 		# Emulate with "DEB B / JP NZ, nn" on 8080/8085
-		add_opc($cpu, "djnz %m", 0x05, 0xC2, '%m', '%m') ;
-		add_opc($cpu, "djnz b, %m", 0x05, 0xC2, '%m', '%m');
+		add_opc($cpu, "djnz %m", 	dec_r('b'), 0xC2, '%m', '%m') ;
+		add_opc($cpu, "djnz b, %m", dec_r('b'), 0xC2, '%m', '%m');
 	} 
 	elsif ($gameboy) {
 		# Emulate with "DEB B / NR NZ, nn" on 8080/8085
-		add_opc($cpu, "djnz %j", 0x05, 0x20, '%j') ;
-		add_opc($cpu, "djnz b, %j", 0x05, 0x20, '%j');
+		add_opc($cpu, "djnz %j", 	dec_r('b'), 0x20, '%j') ;
+		add_opc($cpu, "djnz b, %j", dec_r('b'), 0x20, '%j');
 	} 
 	else {
-		add_opc($cpu, "djnz %j", 0x10, '%j');
+		add_opc($cpu, "djnz %j", 	0x10, '%j');
 		add_opc($cpu, "djnz b, %j", 0x10, '%j');
 	}
 	
@@ -1420,7 +1423,20 @@ sub parse_code {
 		$stmt = "DO_stmt_NN";
 	}
 	elsif ($bin =~ s/ %j$//) {
-		$stmt = "DO_stmt_jr";
+		if ($bin[0] == dec_r('b') && $bin[1] =~ /^\d+$/) {	# special dec b:jr nz,%j
+			my $opc0 = "0x".fmthex($bin[0]);
+			my $opc1 = "0x".fmthex($bin[1]);
+			push @code,
+				"DO_stmt($opc0);",
+				"Expr *expr = pop_expr(ctx);",
+				"expr->asmpc++;",						# compensate for extra byte
+				"add_opcode_jr($opc1, expr);";
+			my $code = join("\n", @code);
+			return $code;
+		}
+		else {
+			$stmt = "DO_stmt_jr";
+		}
 	}
 	elsif ($bin =~ s/%c\((.*?)\)/expr_value/) {
 		my @values = eval($1); die "$cpu, $asm, @bin, $1" if $@;
