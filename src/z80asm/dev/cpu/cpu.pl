@@ -367,13 +367,15 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "rld", 0xCD, '@__z80asm__rld');
 	}
 	
-	add_opc($cpu, "cpl", 		0x2F);
-	add_opc($cpu, "cma",		0x2F);
-	add_opc($cpu, "cpl a", 		0x2F);
-
-	add_opc($cpu, "cpl a'", 	$V{altd}, 0x2F) if $rabbit;
-	add_opc($cpu, "altd cpl",	$V{altd}, 0x2F) if $rabbit;
-	add_opc($cpu, "altd cpl a",	$V{altd}, 0x2F) if $rabbit;
+	# cpl
+	add_opc($cpu, "cpl", 			0x2F);
+	add_opc($cpu, "cma",			0x2F);
+	add_opc($cpu, "cpl a", 			0x2F);
+	if ($rabbit) {
+		add_opc($cpu, "cpl a'", 	$V{altd}, 0x2F);
+		add_opc($cpu, "altd cpl",	$V{altd}, 0x2F);
+		add_opc($cpu, "altd cpl a",	$V{altd}, 0x2F);
+	}
 	
 	add_opc($cpu, "neg", 		0xED, 0x44) if !$intel && !$gameboy;
 	add_opc($cpu, "neg a", 		0xED, 0x44) if !$intel && !$gameboy;
@@ -1224,7 +1226,7 @@ sub add_opc_2 {
 
 	add_opc_3($cpu, $asm, @bin);
 }
-	
+
 sub add_opc_3 {
 	my($cpu, $asm, @bin) = @_;
 
@@ -1244,7 +1246,7 @@ sub add_opc_3 {
 	# expand altd
 	if ($asm =~ /^ (?| ( (?:ld|inc|dec|pop|bool|rlc|rrc|rl|rr|sla|sra|sll|sli|srl|djnz) \s+ 
 									(?:a|b|c|d|e|h|l|af|bc|de|hl)) ( $ | \b [^'] .*)
-					 | ( (?:add|adc|sub|sbc|and|xor|or|cpl|neg) \s+ (?:a|hl) )(,.*)
+					 | ( (?:add|adc|sub|sbc|and|xor|or|neg) \s+ (?:a|hl) )(,.*)
 					 | ( (?:ccf|scf) \s+ f)(,.*)
 					 | ( (?:rlca|rrca|rla|rra)) (.*)
 					 | ( (?:res|set) \s+ %c \s* , \s* (?:a|b|c|d|e|h|l)) ( $ | \b [^'] .*)
@@ -1270,7 +1272,7 @@ sub add_opc_3 {
 						| ( (?:and|or) \s+ (ix|iy) \s* , .* )
 						| ( (?:inc|dec) \s+ \( .* )
 						| ( (?:bool|rr) \s+ (ix|iy) .* )
-					    | ( (?:cp|cpl|bit|djnz) \s+ .*) 
+					    | ( (?:cp|bit|djnz) \s+ .*) 
 						| ( (?:rlc|rrc|rl|rr|sla|sra|sll|sli|srl) \s+ \( .*)
 					  ) $/x) {
 		if ($has_io) {

@@ -436,7 +436,6 @@
  altd cp l                      ; Error
  altd cpl                       ; Error
  altd cpl a                     ; Error
- altd cpl a'                    ; Error
  altd dec (hl)                  ; Error
  altd dec (ix)                  ; Error
  altd dec (ix+127)              ; Error

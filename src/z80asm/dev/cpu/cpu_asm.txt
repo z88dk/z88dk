@@ -384,7 +384,6 @@
 |altd cp l              |           |        |           |76 BD      |==      |           |           |           |
 |altd cpl               |           |        |           |76 2F      |==      |           |           |           |
 |altd cpl a             |           |        |           |76 2F      |==      |           |           |           |
-|altd cpl a'            |           |        |           |76 76 2F   |==      |           |           |           |
 |altd dec (hl)          |           |        |           |76 35      |==      |           |           |           |
 |altd dec (ix)          |           |        |           |76 DD 35 00|==      |           |           |           |
 |altd dec (ix+%d)       |           |        |           |76 DD 35 %d|==      |           |           |           |

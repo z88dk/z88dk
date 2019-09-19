@@ -2313,16 +2313,6 @@ break;
 default: error_illegal_ident(); }
 }
 
-| label? _TK_ALTD _TK_CPL _TK_A1 _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: 
-DO_stmt(0x76);
-DO_stmt(0x76);
-DO_stmt(0x2F);
-break;
-default: error_illegal_ident(); }
-}
-
 | label? _TK_ALTD _TK_CPL _TK_NEWLINE @{
 switch (opts.cpu) {
 case CPU_R2K: case CPU_R3K: 
