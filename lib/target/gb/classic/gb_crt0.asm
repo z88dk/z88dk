@@ -291,28 +291,9 @@ cleanup:
 	jr	cleanup
 
 
-	defs	0x01E0 - ASMPC
-if (ASMPC<>0x01E0)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-MODE_TABLE:
-	;; Jump table for modes
-	ret
 
 	;; Code that needs to be in home
 
-        ;; Call the initialization function for the mode specified in hl
-set_mode:
-        ld      a,l
-        ld      (mode),a
-
-        ;; AND to get rid of the extra flags
-        and     0x03
-        ld      l,a
-        ld      bc,MODE_TABLE
-        sla     l               ; Multiply mode by 4
-        sla     l
-        add     hl,bc
 l_dcal:
         jp      (hl)            ; Jump to initialization routine
 
@@ -415,6 +396,7 @@ vbl_1:
         ret
 
         ;; Wait for VBL interrupt to be finished
+wait_vbl_done:
 _wait_vbl_done:
         ;; Check if the screen is on
         ldh     a,(LCDC)
@@ -502,17 +484,6 @@ not_sending:
         ldh     (SC),a         ; Enable transfer with external clock
         ret
 
-_mode:
-        ld      hl,sp+2         ; Skip return address
-        ld      l,(hl)
-        ld      h,0x00
-        call    set_mode
-        ret
-
-_get_mode:
-        ld      hl,mode
-        ld      e,(hl)
-        ret
 
 _enable_interrupts:
         ei
@@ -649,42 +620,6 @@ _clock:
 __printTStates:
         ret
 
-        ;; Performs a long call.
-        ;; Basically:
-        ;;   call banked_call
-        ;;   .dw low
-        ;;   .dw bank
-        ;;   remainder of the code
-        ;; Total m-cycles:
-        ;;      3+4+4 + 2+2+2+2+2+2 + 4+4+ 3+4+1+1+1
-        ;;      = 41 for the call
-        ;;      3+3+4+4+1
-        ;;      = 15 for the ret
-banked_call:
-        pop     hl              ; Get the return address
-        ld      a,(__current_bank)
-        push    af              ; Push the current bank onto the stack
-        ld      e,(hl)          ; Fetch the call address
-        inc     hl
-        ld      d,(hl)
-        inc     hl
-        ld      a,(hl+)         ; ...and page
-        inc     hl              ; Yes this should be here
-        push    hl              ; Push the real return address
-        ld      (__current_bank),a
-        ld      (MBC1_ROM_PAGE),a      ; Perform the switch
-        ld      hl,banked_ret  ; Push the fake return address
-        push    hl
-        ld      l,e
-        ld      h,d
-        jp      (hl)
-
-banked_ret:
-        pop     hl              ; Get the return address
-        pop     af              ; Pop the old bank
-        ld      (MBC1_ROM_PAGE),a
-        ld      (__current_bank),a
-        jp      (hl)
 
 
 	INCLUDE "crt/classic/crt_runtime_selection.asm" 
@@ -694,9 +629,10 @@ banked_ret:
 	SECTION	bss_crt
 
 	GLOBAL	banked_call
-	GLOBAL	set_mode
 	GLOBAL	_reset
 	GLOBAL	_display_off
+	GLOBAL	display_off
+	GLOBAL	wait_vbl_done
 	GLOBAL	_wait_vbl_done
 	GLOBAL	_add_VBL
 	GLOBAL	_add_LCD
@@ -712,15 +648,29 @@ banked_ret:
 
 
 __cpu:		defb    0            ; GB type (GB, PGB, CGB)
-mode:		defb    0            ; Current mode
 __io_out:	defb	0            ; Byte to send
 __io_in:	defb	0            ; Received byte
 __io_status:	defb	0            ; Status of serial IO
 vbl_done:	defb	0            ; Is VBL interrupt finished?
-__current_bank:	defb	0            ; Current MBC1 style bank.
 _sys_time:	defw	0            ; System time in VBL units
 int_0x40:	defs	16
 int_0x48:	defs	16
 int_0x50:	defs	16
 int_0x58:	defs	16
 int_0x60:	defs	16
+
+	SECTION	code_driver
+
+	GLOBAL	tmode
+	GLOBAL	tmode_out
+	GLOBAL	gmode
+	GLOBAL	tmode_inout
+MODE_TABLE:
+	jp	tmode_out
+	nop
+	jp	gmode
+	defb	0
+	jp	tmode		;MODE 2 = text
+	nop
+	jp	tmode_inout	;MODE 3 = text/input
+	nop

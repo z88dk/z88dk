@@ -108,3 +108,5 @@ defc	refresh_OAM = 0xFF80
 
 defc	init = 0x000
 
+defc	BANKOV = 6
+
