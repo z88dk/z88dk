@@ -27,6 +27,8 @@
 #define __DISABLE_BUILTIN 
 #endif
 
+#define NONBANKED __nonbanked
+#define BANKED __banked
 
 #define __CHAR_LF '\n'
 #define __CHAR_CR '\r'
