@@ -10,6 +10,7 @@ fcntl/cpm/obj/${TYPE}/${DEVICE}/dir_get_entry_name
 fcntl/cpm/obj/${TYPE}/${DEVICE}/dir_get_entry_size
 fcntl/cpm/obj/${TYPE}/${DEVICE}/get_current_volume
 fcntl/cpm/obj/${TYPE}/${DEVICE}/get_dir_name
+fcntl/cpm/obj/${TYPE}/${DEVICE}/fdgetpos
 fcntl/cpm/obj/${TYPE}/${DEVICE}/fdtell
 fcntl/cpm/obj/${TYPE}/${DEVICE}/getfcb
 fcntl/cpm/obj/${TYPE}/${DEVICE}/lseek
