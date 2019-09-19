@@ -57172,9 +57172,7 @@ switch (opts.cpu) {
 case CPU_GBZ80:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x05); } while(0);
-Expr *expr = pop_expr(ctx);
-expr->asmpc++;
-add_opcode_jr(0x20, expr);
+add_opcode_jr_n(0x20, pop_expr(ctx), 1);
 break;
 case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
@@ -57204,9 +57202,7 @@ switch (opts.cpu) {
 case CPU_GBZ80:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x05); } while(0);
-Expr *expr = pop_expr(ctx);
-expr->asmpc++;
-add_opcode_jr(0x20, expr);
+add_opcode_jr_n(0x20, pop_expr(ctx), 1);
 break;
 case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();

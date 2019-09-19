@@ -1423,14 +1423,14 @@ sub parse_code {
 		$stmt = "DO_stmt_NN";
 	}
 	elsif ($bin =~ s/ %j$//) {
-		if ($bin[0] == dec_r('b') && $bin[1] =~ /^\d+$/) {	# special dec b:jr nz,%j
+		if (@bin == 3 &&
+		    $bin[0] == dec_r('b') && $bin[1] =~ /^\d+$/ &&
+		    $bin[2] eq '%j') {									# special dec b:jr nz,%j
 			my $opc0 = "0x".fmthex($bin[0]);
 			my $opc1 = "0x".fmthex($bin[1]);
 			push @code,
 				"DO_stmt($opc0);",
-				"Expr *expr = pop_expr(ctx);",
-				"expr->asmpc++;",						# compensate for extra byte
-				"add_opcode_jr($opc1, expr);";
+				"add_opcode_jr_n($opc1, pop_expr(ctx), 1);";	# compensate for extra byte
 			my $code = join("\n", @code);
 			return $code;
 		}

@@ -50,6 +50,13 @@ void add_opcode(int opcode)
 /* add opcode followed by jump relative offset expression */
 void add_opcode_jr(int opcode, Expr *expr)
 {
+	add_opcode_jr_n(opcode, expr, 0);
+}
+
+void add_opcode_jr_n(int opcode, struct Expr* expr, int asmpc_offset)
+{
+	expr->asmpc += asmpc_offset;		// expr is assumed to be at asmpc+1; add offset if this is not true
+
 	if (opts.opt_speed) {
 		switch (opcode) {
 		case Z80_JR:
