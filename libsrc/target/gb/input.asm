@@ -5,6 +5,8 @@
 	;; Note that while gets uses a pointer, the pointer had better
 	;; be in non-banked RAM else bad things will happen.
 	;; BANKED:	checked, imperfect
+
+	PUBLIC	tmode_inout
 	
 	GLOBAL	copy_vram
 	GLOBAL	set_xy_wtt
@@ -12,7 +14,7 @@
 	GLOBAL	set_sprite_prop
 	GLOBAL	set_sprite_tile
 	GLOBAL	__jpad
-	GLOBAL	padup
+	GLOBAL	waitpadup
 
 	EXTERN	__mode
 	EXTERN	display_off
@@ -197,7 +199,7 @@ getstr_1:
 	LD	A,D
 	AND	START		; Is START pressed ?
 	JR	Z,getstr_1
-	CALL	padup		; Wait for button to be depressed
+	CALL	waitpadup		; Wait for button to be depressed
 
 	LD	A,CR
 	CALL	put_char
@@ -242,7 +244,7 @@ getstr_12:
 	CALL	put_char	; Print it
 	CALL	show_bkg	; Ensure the text is not hidden
 getstr_13:
-	CALL	padup		; Wait for button to be depressed
+	CALL	waitpadup		; Wait for button to be depressed
 	JP	getstr_1
 
 getstr_20:
@@ -255,14 +257,14 @@ getstr_20:
 	DEC	HL
 	CALL	del_char
 getstr_21:
-	CALL	padup		; Wait for button to be depressed
+	CALL	waitpadup		; Wait for button to be depressed
 	JP	getstr_1
 
 getstr_30:
 	CALL	hide_mouse
 	CALL	hide_bkg
 	CALL	hide_kbd
-	CALL	padup		; Wait for button to be depressed
+	CALL	waitpadup		; Wait for button to be depressed
 	CALL	show_kbd
 	CALL	show_bkg
 	CALL	show_mouse

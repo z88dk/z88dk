@@ -22,6 +22,9 @@
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
+	PUBLIC	add_VBL
+	PUBLIC	add_LCD
+
 
         defc    TAR__clib_exit_stack_size = 0
         defc    TAR__register_sp = 0xE000
@@ -331,6 +334,7 @@ add_JOY:
         ;; Remove interrupt BC from interrupt list hl if it exists
         ;; Abort if a 0000 is found (end of list)
         ;; Will only remove last int on list
+	GLOBAL	remove_int
 remove_int:
         ld      a,(hl+)
         ld      e,a
@@ -382,6 +386,7 @@ add_int_doit:
         ret
 
         ;; VBlank interrupt
+	GLOBAL	vbl
 vbl:
         ld      hl,_sys_time
         inc     (hl)
@@ -419,6 +424,7 @@ wait_1:
         ret
 
 _display_off:
+display_off:
         ;; Check if the screen is on
         ldh     a,(LCDC)
         add     a
@@ -484,12 +490,18 @@ not_sending:
         ldh     (SC),a         ; Enable transfer with external clock
         ret
 
-
+	GLOBAL	enable_interrupts
+	GLOBAL	_enable_interrupts
 _enable_interrupts:
+enable_interrupts:
         ei
         ret
 
+	GLOBAL	disable_interrupts
+	GLOBAL	_disable_interrupts
+
 _disable_interrupts:
+disable_interrupts:
         di
         ret
 
@@ -622,7 +634,7 @@ __printTStates:
 
 
 
-	INCLUDE "crt/classic/crt_runtime_selection.asm" 
+;	INCLUDE "crt/classic/crt_runtime_selection.asm" 
 	
 	INCLUDE	"crt/classic/crt_section.asm"
 
@@ -645,6 +657,11 @@ __printTStates:
 	GLOBAL	__io_in
 	GLOBAL	__io_status
 
+	GLOBAL	int_0x40
+	GLOBAL	int_0x48
+	GLOBAL	int_0x50
+	GLOBAL	int_0x58
+	GLOBAL	int_0x60
 
 
 __cpu:		defb    0            ; GB type (GB, PGB, CGB)
@@ -661,6 +678,7 @@ int_0x60:	defs	16
 
 	SECTION	code_driver
 
+	GLOBAL  MODE_TABLE
 	GLOBAL	tmode
 	GLOBAL	tmode_out
 	GLOBAL	gmode

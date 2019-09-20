@@ -5,6 +5,7 @@
         PUBLIC  _get_data
         PUBLIC  set_data
         PUBLIC  _set_data
+	GLOBAL	copy_vram
 
         SECTION code_driver
 

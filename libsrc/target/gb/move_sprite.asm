@@ -6,6 +6,8 @@
         PUBLIC  move_sprite
         PUBLIC  _move_sprite
 
+	PUBLIC	mv_sprite
+
 
         SECTION code_driver
 

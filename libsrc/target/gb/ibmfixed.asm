@@ -5,6 +5,7 @@
 
 	PUBLIC	_font_load_ibm_fixed
 	PUBLIC	_font_ibm_fixed
+	PUBLIC	_font_ibm_fixed_tiles
 
 	;; Perform tricks with banking to shift this font out of
 	;; bank 0.  Doesnt currently work as the encoding table

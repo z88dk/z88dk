@@ -10,6 +10,9 @@
 
 	PUBLIC	font_load
 	PUBLIC	tmode_out
+	PUBLIC	tmode
+	PUBLIC	del_char
+	PUBLIC	put_char
 
 	GLOBAL	cr_curs
 	GLOBAL	adv_curs

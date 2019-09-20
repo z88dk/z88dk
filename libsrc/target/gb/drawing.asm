@@ -9,12 +9,15 @@
 
         INCLUDE "target/gb/def/gb_globals.def"
 
+	PUBLIC	gmode
+
 	GLOBAL  init_vram
 	GLOBAL  copy_vram
 	GLOBAL	__mode
 	GLOBAL display_off
 	GLOBAL	add_VBL
 	GLOBAL	add_LCD
+	GLOBAL	lcd
 
 	defc M_SOLID	=	0x00
 	defc M_OR	=	0x01
@@ -36,12 +39,8 @@
 
 	;; Data
 	SECTION	bss_driver
-	;; Foreground drawing colour
-fg_colour:	
-	defs	1
-	;; Background drawing colour
-bg_colour:	
-	defs	1
+	GLOBAL	fg_colour
+	GLOBAL	bg_colour
 	;; Drawing mode (SOILD etc)
 draw_mode:
 	defs	1
@@ -158,17 +157,6 @@ vbl:
 
 	RET
 
-	;; Is the STAT check required, as we are already in the HBL?
-lcd:
-	LDH	A,(STAT)
-	BIT	1,A
-	JR	NZ,lcd
-
-	LDH	A,(LCDC)
-	AND	@11101111	; Set BG Chr to 0x8800
-	LDH	(LCDC),A
-
-	RET
 
 	;; Draw a full-screen image at (BC)
 __draw_image:

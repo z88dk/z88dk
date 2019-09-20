@@ -6,9 +6,18 @@
 
 #include <sys/types.h>
 #include <sys/compiler.h>
+#include <stdint.h>
 #include <gb/hardware.h>
 #include <gb/sgb.h>
 #include <gb/cgb.h>
+
+typedef union _fixed {
+  struct {
+    uint8_t l;
+    uint8_t h;
+  } b;
+  uint16_t w;
+} fixed;
 
 /** Joypad bits.
     A logical OR of these is used in the wait_pad and joypad
@@ -103,7 +112,7 @@ typedef void (*int_handler)(void) NONBANKED;
 */
 void __LIB__ remove_VBL(int_handler h) NONBANKED;
 
-void__LIB__  remove_LCD(int_handler h) NONBANKED;
+void __LIB__  remove_LCD(int_handler h) NONBANKED;
 
 void __LIB__ remove_TIM(int_handler h) NONBANKED;
 
@@ -456,7 +465,7 @@ void __LIB__ move_bkg(uint8_t x, uint8_t y) __smallc NONBANKED;
 
     @see move_bkg
 */
-void __LIB__ scroll_bkg(INT8 x, INT8 y) __smallc NONBANKED;
+void __LIB__ scroll_bkg(int8_t x, int8_t y) __smallc NONBANKED;
 
 /* ************************************************************ */
 
@@ -511,7 +520,7 @@ void __LIB__ move_win(uint8_t x, uint8_t y) __smallc NONBANKED;
 /** Move the window relative to its current position.
     @see move_win
 */
-void __LIB__ scroll_win(INT8 x, INT8 y) __smallc NONBANKED;
+void __LIB__ scroll_win(int8_t x, int8_t y) __smallc NONBANKED;
 
 /* ************************************************************ */
 
@@ -572,7 +581,7 @@ void __LIB__ move_sprite(uint8_t nb, uint8_t x, uint8_t y) __smallc NONBANKED;
 
 /** Moves the given sprite relative to its current position.
  */
-void __LIB__ scroll_sprite(INT8 nb, INT8 x, INT8 y) __smallc  NONBANKED;
+void __LIB__ scroll_sprite(int8_t nb, int8_t x, int8_t y) __smallc  NONBANKED;
 
 /* ************************************************************ */
 
