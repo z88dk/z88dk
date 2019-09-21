@@ -48,9 +48,9 @@
 |adc hl', de            |           |        |           |76 ED 5A   |==      |           |           |           |
 |adc hl', hl            |           |        |           |76 ED 6A   |==      |           |           |           |
 |adc hl', sp            |           |        |           |76 ED 7A   |==      |           |           |           |
-|adc hl, bc             |           |        |           |ED 4A      |==      |==         |==         |==         |
-|adc hl, de             |           |        |           |ED 5A      |==      |==         |==         |==         |
-|adc hl, hl             |           |        |           |ED 6A      |==      |==         |==         |==         |
+|adc hl, bc             |CD @adchlbc|==      |==         |ED 4A      |==      |==         |==         |==         |
+|adc hl, de             |CD @adchlde|==      |==         |ED 5A      |==      |==         |==         |==         |
+|adc hl, hl             |CD @adchlhl|==      |==         |ED 6A      |==      |==         |==         |==         |
 |adc hl, sp             |           |        |           |ED 7A      |==      |==         |==         |==         |
 |adc ixh                |           |        |           |           |        |           |DD 8C      |==         |
 |adc ixl                |           |        |           |           |        |           |DD 8D      |==         |

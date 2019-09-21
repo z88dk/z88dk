@@ -256,6 +256,10 @@ DO_stmt(0x8C);
 
 | label? _TK_ADC _TK_HL _TK_COMMA _TK_BC _TK_NEWLINE @{
 switch (opts.cpu) {
+case CPU_8080: case CPU_8085: case CPU_GBZ80: 
+DO_STMT_LABEL();
+add_call_emul_func("__z80asm__adchlbc");
+break;
 case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 DO_stmt(0xED4A);
 break;
@@ -264,6 +268,10 @@ default: error_illegal_ident(); }
 
 | label? _TK_ADC _TK_HL _TK_COMMA _TK_DE _TK_NEWLINE @{
 switch (opts.cpu) {
+case CPU_8080: case CPU_8085: case CPU_GBZ80: 
+DO_STMT_LABEL();
+add_call_emul_func("__z80asm__adchlde");
+break;
 case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 DO_stmt(0xED5A);
 break;
@@ -272,6 +280,10 @@ default: error_illegal_ident(); }
 
 | label? _TK_ADC _TK_HL _TK_COMMA _TK_HL _TK_NEWLINE @{
 switch (opts.cpu) {
+case CPU_8080: case CPU_8085: case CPU_GBZ80: 
+DO_STMT_LABEL();
+add_call_emul_func("__z80asm__adchlhl");
+break;
 case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 DO_stmt(0xED6A);
 break;
@@ -12267,6 +12279,11 @@ default: error_illegal_ident(); }
 
 | label? _TK_DJNZ _TK_B _TK_COMMA expr _TK_NEWLINE @{
 switch (opts.cpu) {
+case CPU_8080: case CPU_8085: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x05);
+DO_stmt_nn(0xC2);
+break;
 case CPU_GBZ80: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt(0x05);
@@ -12275,10 +12292,6 @@ break;
 case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_jr(0x10);
-break;
-case CPU_8080: case CPU_8085: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0x05C2);
 break;
 default: error_illegal_ident(); }
 }
@@ -12295,6 +12308,11 @@ default: error_illegal_ident(); }
 
 | label? _TK_DJNZ expr _TK_NEWLINE @{
 switch (opts.cpu) {
+case CPU_8080: case CPU_8085: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x05);
+DO_stmt_nn(0xC2);
+break;
 case CPU_GBZ80: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt(0x05);
@@ -12303,10 +12321,6 @@ break;
 case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_jr(0x10);
-break;
-case CPU_8080: case CPU_8085: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0x05C2);
 break;
 default: error_illegal_ident(); }
 }

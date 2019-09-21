@@ -1,9 +1,12 @@
+adchlhl.asm
 exsphl.asm
+adchlde.asm
 ldi.asm
 rld.asm
 cpd.asm
 ldir.asm
 rrd.asm
+adchlbc.asm
 cpdr.asm
 ldd.asm
 cpir.asm

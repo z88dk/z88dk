@@ -43916,6 +43916,10 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x8C); } while(0);
 	case 212:
 	{
 switch (opts.cpu) {
+case CPU_8080: case CPU_8085: case CPU_GBZ80:
+asm_cond_LABEL(stmt_label);
+add_call_emul_func("__z80asm__adchlbc");
+break;
 case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED4A); } while(0);
 break;
@@ -43925,6 +43929,10 @@ default: error_illegal_ident(); }
 	case 213:
 	{
 switch (opts.cpu) {
+case CPU_8080: case CPU_8085: case CPU_GBZ80:
+asm_cond_LABEL(stmt_label);
+add_call_emul_func("__z80asm__adchlde");
+break;
 case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED5A); } while(0);
 break;
@@ -43934,6 +43942,10 @@ default: error_illegal_ident(); }
 	case 214:
 	{
 switch (opts.cpu) {
+case CPU_8080: case CPU_8085: case CPU_GBZ80:
+asm_cond_LABEL(stmt_label);
+add_call_emul_func("__z80asm__adchlhl");
+break;
 case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED6A); } while(0);
 break;
@@ -57155,6 +57167,11 @@ default: error_illegal_ident(); }
 	case 1440:
 	{
 switch (opts.cpu) {
+case CPU_8080: case CPU_8085:
+if (expr_in_parens) warn_expr_in_parens();
+do { asm_cond_LABEL(stmt_label); add_opcode(0x05); } while(0);
+do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xC2), expr); } while(0);
+break;
 case CPU_GBZ80:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x05); } while(0);
@@ -57163,10 +57180,6 @@ break;
 case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_jr((0x10), expr); } while(0);
-break;
-case CPU_8080: case CPU_8085:
-if (expr_in_parens) warn_expr_in_parens();
-do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x05C2), expr); } while(0);
 break;
 default: error_illegal_ident(); }
 }
@@ -57185,6 +57198,11 @@ default: error_illegal_ident(); }
 	case 1442:
 	{
 switch (opts.cpu) {
+case CPU_8080: case CPU_8085:
+if (expr_in_parens) warn_expr_in_parens();
+do { asm_cond_LABEL(stmt_label); add_opcode(0x05); } while(0);
+do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xC2), expr); } while(0);
+break;
 case CPU_GBZ80:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x05); } while(0);
@@ -57193,10 +57211,6 @@ break;
 case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_jr((0x10), expr); } while(0);
-break;
-case CPU_8080: case CPU_8085:
-if (expr_in_parens) warn_expr_in_parens();
-do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x05C2), expr); } while(0);
 break;
 default: error_illegal_ident(); }
 }

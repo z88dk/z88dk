@@ -36,18 +36,6 @@ my %Tests;
 #------------------------------------------------------------------------------
 my @CPUS = qw( z80 z80n z180 r2k r3k 8080 8085 gbz80 );
 
-my @R8			= qw( b c d e h l      a );
-my @R8_INTEL	= qw( b c d e h l m    a );
-my @R8I			= qw( b c d e h l (hl) a );
-my @R8F			= qw( b c d e h l f    a );
-my @R16SP 		= qw( bc de hl sp );
-my @R16AF 		= qw( bc de hl af );
-my @ALU 		= qw( add adc sub sbc and xor or cp );
-my @TEST		= qw( tst test );
-my @ROTA		= qw( rlca rrca rla rra );
-my @ROT 		= qw( rlc rrc rl rr sla sra sll sli srl );
-my @BIT 		= qw( bit res set );
-my @FLAGS 		= qw( _nz _z _nc _c _po _pe _nv _v _lz _lo _p _m );
 my %INV_FLAG 	= qw( 	_nz	_z 
 						_z 	_nz
 						_nc _c 
@@ -60,12 +48,6 @@ my %INV_FLAG 	= qw( 	_nz	_z
 						_lo	_lz
 						_p 	_m
 						_m	_p );
-my @X			= qw( ix iy );
-my @DIS			= ('0', '%d');
-my @IO			= ('', qw( ioi ioe ));
-my @ALTD		= ('', qw( altd ));
-my @A_  		= ('a, ', '');
-
 my %V = (
 	'' => '',
 	b => 0, c => 1, d => 2, e => 3, h => 4, l => 5, '(hl)' => 6, f => 6, m => 6, a => 7,
@@ -87,6 +69,14 @@ my %V = (
 sub inc_r { my($r) = @_; return 0x04 + $V{$r}*8; }
 sub dec_r { my($r) = @_; return 0x05 + $V{$r}*8; }
 
+# help decode instructions
+my @DECODE;		# bytes per instruction
+
+for my $r (qw( b c d e h l (hl) a )) { 
+	$DECODE[inc_r($r)] = 1;
+	$DECODE[dec_r($r)] = 1;
+}
+
 #------------------------------------------------------------------------------
 # build %Opcodes
 #------------------------------------------------------------------------------
@@ -106,15 +96,15 @@ for my $cpu (@CPUS) {
 	# implement Intel opcodes for the 8080 in all CPUs to simplify porting of code
 	
 	# LD r, r / LD r, (hl) / LD (hl), r
-	for my $d (@R8I) { 
-		for my $s (@R8I) {
+	for my $d (qw(     b c d e h l (hl) a )) { 
+		for my $s (qw( b c d e h l (hl) a )) {
 			if ($d ne '(hl)' || $s ne '(hl)') {
 				add_opc($cpu, "ld $d, $s", 0x40 + $V{$d}*8 + $V{$s});
 			}
 		}
 	}
-	for my $d (@R8_INTEL) {
-		for my $s (@R8_INTEL) {
+	for my $d (qw(     b c d e h l m a )) {
+		for my $s (qw( b c d e h l m a )) {
 			if ($d ne 'm' || $s ne 'm') {
 				add_opc($cpu, "mov $d, $s",	0x40 + $V{$d}*8 + $V{$s});
 			}
@@ -122,10 +112,10 @@ for my $cpu (@CPUS) {
 	}
 	
 	# LD r, N
-	for my $r (@R8I) { 
+	for my $r (qw( b c d e h l (hl) a )) { 
 		add_opc($cpu, "ld $r, %n", 0x06 + $V{$r}*8, '%n');
 	}	
-	for my $d (@R8_INTEL) {
+	for my $d (qw( b c d e h l m a )) {
 		add_opc($cpu, "mvi $d, %n", 0x06 + $V{$d}*8, '%n');
 	}
 
@@ -215,7 +205,7 @@ for my $cpu (@CPUS) {
 	}
 	
 	# LD dd, NN
-	for my $r (@R16SP) {
+	for my $r (qw( bc de hl sp )) {
 		my $alt_r = ($r eq 'sp') ? $r : substr($r,0,1);		# B, D, H
 
 		add_opc($cpu, "ld $r, %m", 		0x01 + $V{$r}*16, '%m', '%m');
@@ -224,7 +214,7 @@ for my $cpu (@CPUS) {
 		
 		if ($r eq 'hl') {
 			if (!$intel) {
-				for my $x (@X) {
+				for my $x (qw( ix iy )) {
 					add_opc($cpu, "ld $x, %m", $V{$x}, 0x01 + $V{$r}*16, '%m', '%m');
 				}
 			}
@@ -233,7 +223,7 @@ for my $cpu (@CPUS) {
 	
 	# LD dd, (NN) / LD (NN), dd
 	if (!$gameboy) {
-		for my $r (@R16SP) {
+		for my $r (qw( bc de hl sp )) {
 			if ($r eq 'hl') {
 				add_opc($cpu, "ld (%m), $r", 	0x22, '%m', '%m');
 				add_opc($cpu, "shld %m",		0x22, '%m', '%m');
@@ -242,7 +232,7 @@ for my $cpu (@CPUS) {
 				add_opc($cpu, "lhld %m",		0x2A, '%m', '%m');
 				
 				if (!$intel) {
-					for my $x (@X) {
+					for my $x (qw( ix iy )) {
 						add_opc($cpu, "ld $x, (%m)", $V{$x}, 0x2A, '%m', '%m');
 						add_opc($cpu, "ld (%m), $x", $V{$x}, 0x22, '%m', '%m');
 					}
@@ -295,18 +285,18 @@ for my $cpu (@CPUS) {
 	}
 	
 	# 8-bit ALU group
-	for my $op (@ALU) {
-		for my $r (@R8I) {
-			for my $a (@A_) {
+	for my $op (qw( add adc sub sbc and xor or cp )) {
+		for my $r (qw( b c d e h l (hl) a )) {
+			for my $a ('a, ', '') {
 				add_opc($cpu, "$op $a$r", 0x80 + $V{$op}*8 + $V{$r});
 			}
 		}
-		for my $a (@A_) {
+		for my $a ('a, ', '') {
 			add_opc($cpu, "$op $a%n", 0xC6 + $V{$op}*8, '%n');
 		}
 	}
 
-	for my $r (@R8_INTEL) {
+	for my $r (qw( b c d e h l m a )) {
 		add_opc($cpu, "add $r",		0x80 + $V{$r});
 		add_opc($cpu, "adc $r",		0x88 + $V{$r});
 		add_opc($cpu, "sub $r",		0x90 + $V{$r});
@@ -328,18 +318,18 @@ for my $cpu (@CPUS) {
 	add_opc($cpu, "xri %n",			0xEE, '%n');
 	add_opc($cpu, "cpi %n",			0xFE, '%n');
 
-	for my $r (@R8I) { 
+	for my $r (qw( b c d e h l (hl) a )) { 
 		add_opc($cpu, "inc $r", 	inc_r($r));
 		add_opc($cpu, "dec $r", 	dec_r($r));
 	}
-	for my $r (@R8_INTEL) {
+	for my $r (qw( b c d e h l m a )) {
 		add_opc($cpu, "inr $r",		inc_r($r));
 		add_opc($cpu, "dcr $r",		dec_r($r));
 	}
 	
-	for my $r (@R8I) { 
-		for my $op (@TEST) {
-			for my $a (@A_) {
+	for my $r (qw( b c d e h l (hl) a )) { 
+		for my $op (qw( tst test )) {
+			for my $a ('a, ', '') {
 				if ($z180) {
 					add_opc($cpu, "$op $a$r",  0xED, 0x04 + $V{$r}*8);
 					add_opc($cpu, "$op $a%n",  0xED, 0x64, '%n');
@@ -407,7 +397,7 @@ for my $cpu (@CPUS) {
 	add_opc($cpu, "sphl",			0xF9) if !$gameboy;
 
 	if (!$intel && !$gameboy) {
-		for my $x (@X) {
+		for my $x (qw( ix iy )) {
 			add_opc($cpu, "ld sp, $x", $V{$x}, 0xF9);
 		}
 	}
@@ -421,7 +411,7 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "ld (%m), sp", 0x08, '%m', '%m');
 	}
 
-	for my $r (@R16AF) {
+	for my $r (qw( bc de hl af )) {
 		my $alt_r = ($r eq 'af') ? 'psw' : substr($r,0,1);		# B, D, H, PSW
 
 		add_opc($cpu, "push $r",		0xC5 + $V{$r}*16);
@@ -432,7 +422,7 @@ for my $cpu (@CPUS) {
 		
 		if (!$intel && !$gameboy) {
 			if ($r eq 'hl') {
-				for my $x (@X) {
+				for my $x (qw( ix iy )) {
 					add_opc($cpu, "push $x", $V{$x}, 0xC5 + $V{$r}*16);
 					add_opc($cpu, "pop $x", $V{$x}, 0xC1 + $V{$r}*16);
 				}
@@ -451,7 +441,7 @@ for my $cpu (@CPUS) {
 	}
 	
 	if ($rabbit) {
-		for my $x (@X) {
+		for my $x (qw( ix iy )) {
 			add_opc($cpu, "ld hl, $x", $V{$x}, 0x7C);
 			add_opc($cpu, "ld $x, hl", $V{$x}, 0x7D);
 		}
@@ -507,14 +497,30 @@ for my $cpu (@CPUS) {
 	}
 	
 	if (!$intel && !$gameboy) {
-		for my $x (@X) {
+		for my $x (qw( ix iy )) {
 			add_opc($cpu, "ex (sp), $x", $V{$x}, 0xE3);
 		}
 	}
 	
 	# 16-bit ALU group
-	for my $r (@R16SP) {
+	for my $r (qw( bc de hl sp )) {
+		my $alt_r = ($r eq 'sp') ? $r : substr($r,0,1);		# B, D, H
+		
 		add_opc($cpu, "add hl, $r", 0x09 + $V{$r}*16);
+		add_opc($cpu, "dad $r",		0x09 + $V{$r}*16);
+		add_opc($cpu, "dad $alt_r",	0x09 + $V{$r}*16);
+		
+		if ($intel || $gameboy) {
+			if ($r ne 'sp') {
+				add_opc($cpu, "adc hl, $r",	0xCD, '@__z80asm__adchl'.$r);
+			}
+		}
+		else {
+			add_opc($cpu, "adc hl, $r", 	0xED, 0x4A + $V{$r}*16);
+		}		
+	}	
+	
+	for my $r (qw( bc de hl sp )) {
 		add_opc($cpu, "sbc hl, $r", 0xED, 0x42 + $V{$r}*16) if !$intel && !$gameboy;
 		add_opc($cpu, "adc hl, $r", 0xED, 0x4A + $V{$r}*16) if !$intel && !$gameboy;
 		
@@ -522,7 +528,7 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "dec $r", 0x0B + $V{$r}*16);
 	}
 
-	for my $r (@R16SP) {
+	for my $r (qw( bc de hl sp )) {
 		my $alt_r = ($r eq 'sp') ? $r : substr($r,0,1);		# B, D, H
 		add_opc($cpu, "inx $r",		0x03 + $V{$r}*16);
 		add_opc($cpu, "inx $alt_r",	0x03 + $V{$r}*16);
@@ -530,15 +536,9 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "dcx $alt_r",	0x0B + $V{$r}*16);
 	}
 
-	for my $r (@R16SP) {
-		my $alt_r = ($r eq 'sp') ? $r : substr($r,0,1);		# B, D, H
-		add_opc($cpu, "dad $r",		0x09 + $V{$r}*16);
-		add_opc($cpu, "dad $alt_r",	0x09 + $V{$r}*16);
-	}
-	
 	if (!$intel && !$gameboy) {
-		for my $x (@X) {
-			for my $r (@R16SP) {
+		for my $x (qw( ix iy )) {
+			for my $r (qw( bc de hl sp )) {
 				add_opc($cpu, "add $x, ".replace($r, qr/hl/, $x), $V{$x}, 0x09 + $V{$r}*16);
 			}
 			add_opc($cpu, "inc $x", $V{$x}, 0x03 + 2*16);
@@ -560,7 +560,7 @@ for my $cpu (@CPUS) {
 	
 	# Multiply
 	if ($z180) {
-		for my $r (@R16SP) {
+		for my $r (qw( bc de hl sp )) {
 			add_opc($cpu, "mlt $r", 0xED, 0x4C + $V{$r}*16);
 		}
 	}
@@ -580,7 +580,7 @@ for my $cpu (@CPUS) {
 	}
 	
 	# 8-bit rotate and shift group
-	for my $op (@ROTA) {
+	for my $op (qw( rlca rrca rla rra )) {
 		add_opc($cpu, $op, 0x07 + $V{$op}*8);
 	}
 
@@ -590,22 +590,20 @@ for my $cpu (@CPUS) {
 	add_opc($cpu, "rar",	0x1F);
 	
 	if (!$intel) {
-		for my $op (@ROT) {
-			if ($op =~ /sll|sli/) {
-				if ($gameboy) { $op = 'swap'; }
-				elsif (!$zilog) { next; }
-				else {}
-			}
-			for my $r (@R8I) {
+		for (qw( rlc rrc rl rr sla sra sll sli srl )) {
+			my $op = (/sll|sli/ && $gameboy) ? 'swap' : $_;
+			next if $op =~ /sll|sli/ && !$zilog;
+
+			for my $r (qw( b c d e h l (hl) a )) {
 				add_opc($cpu, "$op $r", 0xCB, $V{$op}*8 + $V{$r});
 			}
 		}
 	}
 	
 	if ($z80) {
-		for my $op (@ROT) {
-			for my $x (@X) {
-				for my $r (@R8) {
+		for my $op (qw( rlc rrc rl rr sla sra sll sli srl )) {
+			for my $x (qw( ix iy )) {
+				for my $r (qw( b c d e h l a )) {
 					add_opc($cpu, "$op ($x+%d), $r", $V{$x}, 0xCB, '%d', $V{$op}*8 + $V{$r});
 				}
 			}
@@ -614,8 +612,8 @@ for my $cpu (@CPUS) {
 	
 	# bit set, reset and test group
 	if (!$intel) {
-		for my $op (@BIT) {
-			for my $r (@R8I) {
+		for my $op (qw( bit res set )) {
+			for my $r (qw( b c d e h l (hl) a )) {
 				add_opc($cpu, "$op %c, $r", 0xCB, ($V{$op}*0x40 + $V{$r})."+8*%c(0..7)");
 			}
 		}
@@ -724,7 +722,7 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "djnz b, %j", 0x10, '%j');
 	}
 	
-	for my $_f (@FLAGS) {
+	for my $_f (qw( _nz _z _nc _c _po _pe _nv _v _lz _lo _p _m )) {
 		my $f = substr($_f, 1);					# remove leading _
 		my $_inv_f = $INV_FLAG{$_f};			# inverted flag
 		my $inv_f = substr($_inv_f, 1);			# remove leading _
@@ -847,7 +845,7 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "in a, (%n)", 		0xDB, '%n');
 		add_opc($cpu, "in (c)", 			0xED, 0x40 + $V{f}*8);
 		add_opc($cpu, "in0 (%n)", 			0xED, 0x00 + $V{f}*8, '%n') if $z180;
-		for my $r (@R8F) {
+		for my $r (qw( b c d e h l f a )) {
 			add_opc($cpu, "in $r, (c)", 	0xED, 0x40 + $V{$r}*8);
 			add_opc($cpu, "in0 $r, (%n)", 	0xED, 0x00 + $V{$r}*8, '%n') if $z180;
 		}
@@ -855,7 +853,7 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "out (%n), a", 		0xD3, '%n');
 		add_opc($cpu, "out (c), %c", 		0xED, '0x41+%c(0)+6*8');
 
-		for my $r (@R8) {
+		for my $r (qw( b c d e h l a )) {
 			add_opc($cpu, "out (c), $r", 	0xED, 0x41 + $V{$r}*8);
 			add_opc($cpu, "out0 (%n), $r", 	0xED, 0x01 + $V{$r}*8, '%n') if $z180;
 		}
@@ -1332,9 +1330,10 @@ sub parser_tokens {
 
 sub parse_code {
 	my($cpu, $asm, @bin) = @_;
+	my @bin0 = @bin;
 	my @code;
 	
-	# store prefixes
+	# store rabbit prefixes
 	if ($cpu =~ /^r/) {
 		while (@bin && $bin[0] =~ /^\d+$/ &&
 				($bin[0] == $V{altd} ||
@@ -1344,6 +1343,20 @@ sub parse_code {
 		}
 	}
 	
+	# store separate instructions
+	while (@bin && $bin[0] =~ /^\d+$/) {
+		my $num_bytes = $DECODE[$bin[0]];
+		if ($num_bytes && @bin > $num_bytes) {
+			my @sub_bin = splice(@bin, 0, $num_bytes);
+			my $sub_code = parse_code($cpu, '', @sub_bin);
+			push @code, split(/\n/, $sub_code);
+			@bin==0 and return;
+		}
+		else {
+			last;
+		}
+	}	
+		
 	# check for argument type
 	my($stmt, $extra_arg) = ("", "");
 	my $bin = join(' ', @bin);
@@ -1425,14 +1438,11 @@ sub parse_code {
 		$stmt = "DO_stmt_NN";
 	}
 	elsif ($bin =~ s/ %j$//) {
-		if (@bin == 3 &&
-		    $bin[0] == dec_r('b') && $bin[1] =~ /^\d+$/ &&
-		    $bin[2] eq '%j') {									# special dec b:jr nz,%j
-			my $opc0 = "0x".fmthex($bin[0]);
-			my $opc1 = "0x".fmthex($bin[1]);
-			push @code,
-				"DO_stmt($opc0);",
-				"add_opcode_jr_n($opc1, pop_expr(ctx), 1);";	# compensate for extra byte
+		if (@bin0 == 3 &&
+		    $bin0[0] == dec_r('b') && $bin0[1] =~ /^\d+$/ &&
+		    $bin0[2] eq '%j') {									# special dec b:jr nz,%j
+			my $opc = "0x".fmthex($bin[0]);
+			push @code, "add_opcode_jr_n($opc, pop_expr(ctx), 1);";	# compensate for extra byte
 			my $code = join("\n", @code);
 			return $code;
 		}

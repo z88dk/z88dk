@@ -35,9 +35,6 @@
  adc hl', de                    ; Error
  adc hl', hl                    ; Error
  adc hl', sp                    ; Error
- adc hl, bc                     ; Error
- adc hl, de                     ; Error
- adc hl, hl                     ; Error
  adc hl, sp                     ; Error
  adc ixh                        ; Error
  adc ixl                        ; Error
