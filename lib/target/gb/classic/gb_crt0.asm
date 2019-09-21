@@ -26,6 +26,12 @@
 	PUBLIC	add_LCD
 
 
+	defc	CRT_INITIALIZE_BSS = 0
+        defc CRT_ORG_BSS =  $c000 ; Static variables are kept in RAM above max VRAM
+        defc DEFINED_CRT_ORG_BSS = 1
+	defc __crt_model = 1
+        defc    __crt_org_bss = CRT_ORG_BSS
+
         defc    TAR__clib_exit_stack_size = 0
         defc    TAR__register_sp = 0xE000
 	defc	CRT_KEY_DEL = 127
@@ -56,6 +62,7 @@ if (ASMPC<>$0040)
         defs    CODE_ALIGNMENT_ERROR
 endif
 	; VBL
+	push	hl
 	ld	hl,int_0x40
 	jp	int
 
@@ -64,6 +71,7 @@ if (ASMPC<>$0048)
         defs    CODE_ALIGNMENT_ERROR
 endif
 	; LCD
+	push	hl
 	ld	hl,int_0x48
 	jp	int
 
@@ -72,6 +80,7 @@ if (ASMPC<>$0050)
         defs    CODE_ALIGNMENT_ERROR
 endif
 	; TIM 
+	push	hl
 	ld	hl,int_0x50
 	jp	int
 
@@ -80,6 +89,7 @@ if (ASMPC<>$0058)
         defs    CODE_ALIGNMENT_ERROR
 endif
 	; SIO
+	push	hl
 	ld	hl,int_0x58
 	jp	int
 
@@ -100,8 +110,9 @@ int1:
 	ld	a,(hl+)
 	or	(hl)
 	jr	z,int2
+	push	hl
 	ld	a,(hl-)
-	ld	l,a
+	ld	l,(hl)
 	ld	h,a
 	call	l_dcal
 	pop	hl
@@ -211,6 +222,7 @@ clear3:
 	ld	a,7
 	ldh	(WX),a
 
+	call    crt0_init_bss
 
 	; Copy refresh_OAM routine to high ram
         ld      bc,refresh_OAM
@@ -266,7 +278,6 @@ copy1:
         ld      A,0x80
         ldh     (SC),a         ; Use external clock
 
-	call    crt0_init_bss
 IF 0
 	ld	hl,sp+0
 	ld	d,h
@@ -291,6 +302,7 @@ ENDIF
 	defw	1		;Bank
 cleanup:
 	halt
+	nop
 	jr	cleanup
 
 
@@ -634,7 +646,7 @@ __printTStates:
 
 
 
-;	INCLUDE "crt/classic/crt_runtime_selection.asm" 
+	INCLUDE "crt/classic/crt_runtime_selection.asm" 
 	
 	INCLUDE	"crt/classic/crt_section.asm"
 

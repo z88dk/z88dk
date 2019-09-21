@@ -29,7 +29,7 @@ all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	pv1000_clib.lib pv2000_clib.lib coleco_clib.lib multi8_clib.lib alphatro_clib.lib  spc1000_clib.lib \
 	laser500_clib.lib super80_clib.lib super80_vduem_clib.lib \
 	adam.lib z80tvgame_clib.lib smc777.lib pasopia7_clib.lib sv8000_clib.lib \
-	excali64_clib.lib \
+	excali64_clib.lib gb_clib.lib \
 	preempt.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib 
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib mbf32.lib mbf64.lib math32.lib gendos.lib ndos.lib  \
@@ -1299,6 +1299,15 @@ sc3000_clib.lib:
 	$(call buildgeneric,sc3000)
 	$(MAKE) -C video/tms9918 TARGET=sc3000
 	TARGET=sc3000 TYPE=z80 $(LIBLINKER) -DFORsc3000 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sc3000_clib @$(LISTFILE_DIRECTORY)/sc3000.lst
+
+# Gameboy - dom
+gb_clib.lib:
+	@echo ''
+	@echo '--- Building Gameboy Library ---'
+	@echo ''
+	$(call buildgeneric,gb)
+	TARGET=test TYPE=gbz80 $(LIBLINKER) -mgbz80 -DFORgb -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/gb_clib @$(LISTFILE_DIRECTORY)/gb.lst
+
 
 # Test platform - dom
 test_clib.lib:
