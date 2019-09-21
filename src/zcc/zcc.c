@@ -1061,7 +1061,7 @@ int main(int argc, char **argv)
 
 
     /* Peephole optimization level for sdcc */
-    if (compiler_type == CC_SDCC)
+    if (compiler_type == CC_SDCC && !mgbz80)
     {
         switch (sdccpeepopt)
         {
