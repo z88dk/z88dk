@@ -11,10 +11,10 @@ EXTERN asm_strnlen
 strnlen_callee:
 
 IF __CPU_GBZ80__
-   pop af
+   pop de
    pop bc
    pop hl
-   push af
+   push de
 ELSE
    pop hl
    pop bc

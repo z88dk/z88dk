@@ -10,13 +10,13 @@ EXTERN asm_strspn
 
 strspn:
 
-   pop af
+   pop bc
    pop de
    pop hl
    
    push hl
    push de
-   push af
+   push bc
    
    jp asm_strspn
 

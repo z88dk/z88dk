@@ -10,13 +10,13 @@ EXTERN asm_strcasecmp
 
 strcasecmp:
 
-   pop af
+   pop bc
    pop hl
    pop de
    
    push de
    push hl
-   push af
+   push bc
    
    jp asm_strcasecmp
 

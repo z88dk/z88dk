@@ -9,6 +9,25 @@ PUBLIC strlcpy
 EXTERN asm_strlcpy
 
 strlcpy:
+IF __CPU_GBZ80__
+   ld hl,sp+2
+   ld c,(hl)
+   inc hl
+   ld b,(hl)
+   inc hl
+   ld e,(hl)
+   inc hl
+   ld d,(hl)
+   inc hl
+   ld a,(hl+)
+   ld h,(hl)
+   ld l,e
+   ld e,l
+   ld a,h
+   ld h,d
+   ld d,a
+ELSE
+
 
    pop af
    pop bc
@@ -19,6 +38,7 @@ strlcpy:
    push hl
    push bc
    push af
+ENDIF
    
    jp asm_strlcpy
 

@@ -18,6 +18,7 @@
 	GLOBAL	add_VBL
 	GLOBAL	add_LCD
 	GLOBAL	lcd
+	GLOBAL	y_table
 
 	defc M_SOLID	=	0x00
 	defc M_OR	=	0x01
@@ -64,10 +65,6 @@ dinc1:
 	defs	2
 dinc2:	
 	defs	2
-tx:	
-	defs	1
-ty:	
-	defs	1
 	
 
 	SECTION	code_driver
@@ -158,78 +155,7 @@ vbl:
 	RET
 
 
-	;; Draw a full-screen image at (BC)
-__draw_image:
-	LD      HL,0x8000+0x10*0x10
-	LD      DE,0x1680
-	CALL    copy_vram      ; Move the charset
-	RET
 
-	;; Replace tile data at (B,C) with data at DE and store old value at HL
-__switch_data:
-	PUSH    DE              ; Save src
-	PUSH    HL              ; Save dst
-	LD      L,B
-	SLA     L
-	SLA     L
-	SLA     L
-	LD      H,0x00
-	ADD     HL,HL
-	LD      D,H
-	LD      E,L
-
-	LD      HL,y_table
-	SLA     C
-	SLA     C
-	SLA     C
-	LD      B,0x00
-	ADD     HL,BC
-	ADD     HL,BC
-	LD      B,(HL)
-	INC     HL
-	LD      H,(HL)
-	LD      L,B
-	ADD     HL,DE
-
-	LD      B,H             ; BC = src
-	LD      C,L
-	POP     HL              ; HL = dst
-	PUSH    BC              ; Save dst
-	LD      A,H
-	OR      L
-	JR      Z,switch_1
-	LD      DE,0x10
-	CALL    copy_vram
-switch_1:
-	POP     HL              ; HL = dst
-	POP     BC              ; BC = src
-	LD      DE,0x10
-	CALL    copy_vram
-
-	RET
-
-	;; Advance the cursor
-adv_gcurs:
-	PUSH	HL
-	LD	HL,tx	; X coordinate
-	LD	A,MAXCURSPOSX
-	CP	(HL)
-	JR	Z,adv_1
-	INC	(HL)
-	JR	adv_99
-adv_1:
-	LD	(HL),0x00
-	LD	HL,ty	; Y coordinate
-	LD	A,MAXCURSPOSY
-	CP	(HL)
-	JR	Z,adv_2
-	INC	(HL)
-	JR	adv_99
-adv_2:
-	LD	(HL),0x00
-adv_99:
-	POP	HL
-	RET
 
 	;; Draw a circle from (B,C) with radius D
 __circle:
@@ -1456,156 +1382,8 @@ npix:	LD	A,E
 end:	LD	E,B
 	RET
 
-	;; Write character C
-__wrtchr:
-	LD	HL,y_table
-	LD	D,0x00
-	LD	A,(ty)
-	RLCA
-	RLCA
-	RLCA
-	LD	E,A
-	ADD	HL,DE
-	ADD	HL,DE
-	LD	B,(HL)
-	INC	HL
-	LD	H,(HL)
-	LD	L,B
 
-	LD	A,(tx)
-	RLCA
-	RLCA
-	RLCA
-	LD	E,A
-	ADD	HL,DE
-	ADD	HL,DE
 
-	LD	A,C
-	LD	B,H
-	LD	C,L
-
-	LD	H,D
-	LD	L,A
-	ADD	HL,HL
-	ADD	HL,HL
-	ADD	HL,HL
-
-	if	0
-	LD	DE,tp1
-	else
-	GLOBAL	_font_ibm_fixed_tiles
-
-	LD	DE,_font_ibm_fixed_tiles
-	endif
-	
-	ADD	HL,DE
-
-	LD	D,H
-	LD	E,L
-	LD	H,B
-	LD	L,C
-
-	if	0
-	LD	A,(mod_col)
-	LD	C,A
-	else
-	LD	A,(fg_colour)
-	LD	C,A
-	endif
-chrloop:
-	LD	A,(DE)
-	INC	DE
-	PUSH	DE
-
-	if	1
-	PUSH	HL
-	LD	HL,bg_colour
-	LD	L,(HL)
-	endif
-
-	LD	B,A
-	XOR	A
-	if	0
-	BIT	0,C
-	else
-	BIT	0,L
-	endif
-	JR	Z,a0
-	CPL
-a0:	OR	B
-	if	0
-	BIT	2,C
-	else
-	BIT	0,C
-	endif
-	JR	NZ,a1
-	XOR	B
-a1:	LD	D,A
-	XOR	A
-	if	0
-	BIT	1,C
-	else
-	BIT	1,L
-	endif
-	JR	Z,b0
-	CPL
-b0:	OR	B
-	if	0
-	BIT	3,C
-	else
-	BIT	1,C
-	endif
-	JR	NZ,b1
-	XOR	B
-b1:	
-	LD	E,A
-	if	1
-	POP	HL
-	endif
-chrwait:
-	LDH	A,(STAT)
-	BIT	1,A
-	JR	NZ,chrwait
-
-	LD	A,D
-	LD	(HL+),A
-	LD	A,E
-	LD	(HL+),A
-	POP	DE
-	LD	A,L
-	AND	0x0F
-	JR	NZ,chrloop
-	RET
-
-; void __LIB__ gotogxy(uint8_t x, uint8_t y) __smallc;
-gotogxy:
-_gotogxy:			
-	LD 	HL,sp+4
-	LD	A,(HL)		; A = x
-	LD	(tx),A
-	ld	hl,sp+2
-	LD	A,(HL)		; A = y
-	LD	(ty),A
-
-	RET
-
-; void __LIB__    wrtchr(char chr);
-wrtchr:
-_wrtchr:			; Banked
-	PUSH    BC
-
-	LD	A,(__mode)
-	CP	G_MODE
-	CALL	NZ,gmode
-
-	LD 	HL,sp+4
-	LD	C,(HL)
-
-	CALL	__wrtchr
-	CALL	adv_gcurs
-
-	POP	BC
-	RET
 
 ; uint8_t __LIB__ getpix(uint8_t x, uint8_t y) __smallc;
 getpix:
@@ -1758,73 +1536,4 @@ _plot:				; Banked
 	POP	BC
 	RET
 
-; void __LIB__ switch_data(uint8_t x, uint8_t y, unsigned char *src, unsigned char *dst) __smallc NONBANKED;
-	PUBLIC	_switch_data
-	PUBLIC	switch_data
-_switch_data:			; Non Banked as pointer
-switch_data:			; Non Banked as pointer
-	PUSH    BC
 
-	LD	A,(__mode)
-	CP	G_MODE
-	CALL	NZ,gmode
-
-	LD 	HL,sp+10	; Skip return address and registers
-	LD	A,(HL-)	; B = x
-	LD	B,A
-	DEC	HL
-	LD	C,(HL)	; C = y
-	ld	hl,sp+7	
-	LD	A,(HL-)	; DE = src
-	LD	D,A
-	LD	A,(HL-)
-	LD	E,A
-	LD	A,(HL-)	; HL = dst
-	LD	L,(HL)
-	LD	H,A
-
-	CALL   __switch_data
-
-	POP     BC
-	RET
-
-
-; void __LIB__ draw_image(unsigned char *data) NONBANKED;
-draw_image:			; Non banked as pointer
-_draw_image:			; Non banked as pointer
-	PUSH    BC
-
-	LD	A,(__mode)
-	CP	G_MODE
-	CALL	NZ,gmode
-
-	LD 	HL,sp+4		; Skip return address and registers
-	LD	A,(HL+)	; HL = data
-	LD	C,A
-	LD	B,(HL)
-
-	CALL	__draw_image
-
-	POP	BC
-	RET
-
-	SECTION	rodata_driver
-y_table:
-	defw   0x8100,0x8102,0x8104,0x8106,0x8108,0x810A,0x810C,0x810E
-	defw   0x8240,0x8242,0x8244,0x8246,0x8248,0x824A,0x824C,0x824E
-	defw   0x8380,0x8382,0x8384,0x8386,0x8388,0x838A,0x838C,0x838E
-	defw   0x84C0,0x84C2,0x84C4,0x84C6,0x84C8,0x84CA,0x84CC,0x84CE
-	defw   0x8600,0x8602,0x8604,0x8606,0x8608,0x860A,0x860C,0x860E
-	defw   0x8740,0x8742,0x8744,0x8746,0x8748,0x874A,0x874C,0x874E
-	defw   0x8880,0x8882,0x8884,0x8886,0x8888,0x888A,0x888C,0x888E
-	defw   0x89C0,0x89C2,0x89C4,0x89C6,0x89C8,0x89CA,0x89CC,0x89CE
-	defw   0x8B00,0x8B02,0x8B04,0x8B06,0x8B08,0x8B0A,0x8B0C,0x8B0E
-	defw   0x8C40,0x8C42,0x8C44,0x8C46,0x8C48,0x8C4A,0x8C4C,0x8C4E
-	defw   0x8D80,0x8D82,0x8D84,0x8D86,0x8D88,0x8D8A,0x8D8C,0x8D8E
-	defw   0x8EC0,0x8EC2,0x8EC4,0x8EC6,0x8EC8,0x8ECA,0x8ECC,0x8ECE
-	defw   0x9000,0x9002,0x9004,0x9006,0x9008,0x900A,0x900C,0x900E
-	defw   0x9140,0x9142,0x9144,0x9146,0x9148,0x914A,0x914C,0x914E
-	defw   0x9280,0x9282,0x9284,0x9286,0x9288,0x928A,0x928C,0x928E
-	defw   0x93C0,0x93C2,0x93C4,0x93C6,0x93C8,0x93CA,0x93CC,0x93CE
-	defw   0x9500,0x9502,0x9504,0x9506,0x9508,0x950A,0x950C,0x950E
-	defw   0x9640,0x9642,0x9644,0x9646,0x9648,0x964A,0x964C,0x964E

@@ -7,6 +7,9 @@
 ;
 	;; BANKED:	checked, imperfect
 	SECTION	rodata_driver
+
+	PUBLIC	_font_min
+
 _font_min:
 	defb	1+4		; 128 character encoding
 	defb	37		; Tiles required

@@ -6,8 +6,12 @@
 	PUBLIC	getk
 	PUBLIC	_getk
 
+
 fputc_cons_native:
 _fputc_cons_native:
+	GLOBAL	wrtchr
+	jp	wrtchr
+
 getk:
 _getk:
 	ret

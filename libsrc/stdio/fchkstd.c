@@ -27,6 +27,11 @@ int fchkstd(FILE *fp)
 IF __CPU_R2K__ | __CPU_R3K__
 	ld	hl,(sp + 2)
 	ex	de,hl
+ELIF __CPU_GBZ80__
+	ld	hl,sp+2
+	ld	d,(hl)
+	inc	hl
+	ld	d,(hl)
 ELSE
 	pop	af
 	pop	de

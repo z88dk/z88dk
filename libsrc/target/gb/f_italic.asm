@@ -2,6 +2,9 @@
 	;; BANKED:	checked,imperfect
 
 	SECTION rodata_driver
+
+	PUBLIC	_font_italic
+
 _font_italic:
 	defb	1+4	; 128 char encoding, compressed
 	defb	93	; Number of tiles

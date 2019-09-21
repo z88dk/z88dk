@@ -10,10 +10,10 @@ EXTERN asm_strsep
 
 strsep_callee:
 
-   pop af
+   pop hl
    pop de
    pop bc
-   push af
+   push hl
    
    jp asm_strsep
 

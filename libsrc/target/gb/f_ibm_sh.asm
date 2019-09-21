@@ -2,6 +2,8 @@
 	;; BANKED:	checked, imperfect
 	SECTION	rodata_driver
 
+	PUBLIC	_font_ibm
+
 	; 898defbs giving ' '-'0'-'@'-'A'-'Z'-'???'-'a'-'z'-127
 _font_ibm:
 	defb	1+4		; 128 character encoding
