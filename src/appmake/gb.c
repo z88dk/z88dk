@@ -59,62 +59,89 @@ option_t gb_options[] = {
 };
 
 
-static unsigned char memory[0x8000];
+static unsigned char *memory;
 
 
 int gb_exec(char *target)
 {
-    time_t t;
     struct stat st_file;
     char filename[FILENAME_MAX+1];
     FILE *fpin, *fpout;
-    int len, i, c, count,mbc_type = 0, ram_banks = 0, rom_banks = 2,chk;
+    int len, i, c, count,mbc_type = 0, ram_banks = 0, rom_banks = 2,chk, main_length;
 
     if ((help) || (binname == NULL))
         return -1;
 
-    // output filename
-
-    if (outfile == NULL)
-    {
-        strcpy(filename, binname);
-        suffix_change(filename, ".gb");
-    }
-    else
-        strcpy(filename, outfile);
-
     // gather header info
-    if (crtfile != NULL)
-    {
+    if (crtfile != NULL) {
         if ((i = parameter_search(crtfile, ".sym", "GB_MBC_TYPE")) >= 0)
             mbc_type = i;
         if ((i = parameter_search(crtfile, ".sym", "GB_RAM_BANKS")) >= 0)
             ram_banks = i;
-        if ((i = parameter_search(crtfile, ".sym", "GB_ROM_BANKS")) >= 0)
-            rom_banks = i;
     }
 
-    // create 32k/48k portion of output binary
+    memory = must_malloc(0x8000);
+
 
     if ((fpin = fopen_bin(binname, crtfile)) == NULL)
         exit_log(1, "Can't open input file %s\n", binname);
-    else if (fseek(fpin, 0, SEEK_END))
-    {
+    else if (fseek(fpin, 0, SEEK_END)) {
         fclose(fpin);
         exit_log(1, "Couldn't determine size of file %s\n", binname);
     }
 
-    if ((len = ftell(fpin)) > 0x8000)
-    {
+    if ((main_length = ftell(fpin)) > 0x8000) {
         fclose(fpin);
-        exit_log(1, "Main output binary exceeds 32k by %d bytes\n", len - 0x8000);
+        exit_log(1, "Main output binary exceeds 32k by %d bytes\n", main_length - 0x8000);
     }
     rewind(fpin);
 
-    memset(memory, romfill, sizeof(memory));
-    fread(memory, sizeof(memory[0]), len, fpin);
-
+    memset(memory, romfill, 0x8000);
+    fread(memory, sizeof(memory[0]), main_length, fpin);
     fclose(fpin);
+
+    len = 0x8000;
+    // Lets read in the banks now
+    count = 0;
+    for (i = 0x02; i <= 0x1f; i++) {
+        sprintf(filename, "%s_BANK_%02X.bin", binname, i);
+
+        if ((stat(filename, &st_file) < 0) || (st_file.st_size == 0) || ((fpin = fopen(filename, "rb")) == NULL)) {
+            break;
+        } else {
+            memory = must_realloc(memory, len + (i * 0x4000));
+            memset(memory + (i * 0x4000), romfill, 0x4000);
+
+            fprintf(stderr, "Adding bank 0x%02X", i);
+            fread(memory + (i * 0x4000), 0x4000, 1, fpin);
+
+            if (!feof(fpin)) {
+                fseek(fpin, 0, SEEK_END);
+                count = ftell(fpin);
+                fprintf(stderr, " (error truncating %d bytes from %s)", count - 0x4000, filename);
+            }
+
+            count = 0;
+            fputc('\n', stderr);
+
+            fclose(fpin);
+        }
+    }
+
+    len = (0x4000 * i);
+
+    // Calculate correct power of two for ROM banks
+    rom_banks = 1;
+    while ( rom_banks < i ) {
+        rom_banks *= 2;
+    }
+
+    if ( rom_banks > 128 ) {
+        exit_log(1, "ROM size (%d banks) exceeds maximum size of 128 banks\n", rom_banks);
+    }
+
+    fprintf(stderr, "Program requires cartridge with %d ROM banks\n",rom_banks);
+
 
     // Perform the checksuns
     // Make sure the Nintendo logo is there
@@ -161,7 +188,7 @@ int gb_exec(char *target)
      * $52 - 9Mbit = 1.1MByte = 72 banks
      * $53 - 10Mbit = 1.2MByte = 80 banks
      * $54 - 12Mbit = 1.5MByte = 96 banks
-     */
+     */    
     switch (rom_banks) {
     case 2:
         memory[0x148] = 0;
@@ -204,8 +231,7 @@ int gb_exec(char *target)
      * 3 - 256kBit = 32kB = 4 banks
      * 4 - 1MBit =128kB =16 banks
      */
-    switch (ram_banks)
-    {
+    switch (ram_banks) {
     case 0:
         memory[0x149] = 0;
         break;
@@ -235,24 +261,15 @@ int gb_exec(char *target)
     chk = 0;
     memory[0x14e] = 0;
     memory[0x14f] = 0;
-    for (i = 0; i < 0x8000; ++i)
+    for (i = 0; i < len; ++i)
         chk += memory[i];
     memory[0x14e] = (unsigned char) ((chk >> 8) & 0xff);
     memory[0x14f] = (unsigned char) (chk & 0xff);
 
-    // write first 32k/48k of output file
-    if ((fpout = fopen(filename, "wb")) == NULL)
-        exit_log(1, "Can't create output file %s\n", filename);
 
-    fwrite(memory, sizeof(memory[0]),  0x8000, fpout);
-
-    // check available ram space
-
-    if ((c = parameter_search(crtfile, ".map", "__BSS_END_tail")) >= 0)
-    {
-        if ((i = parameter_search(crtfile, ".map", "__DATA_head")) >= 0)
-        {
-            c -= i - 8;
+    if ((c = parameter_search(crtfile, ".map", "__BSS_END_tail")) >= 0) {
+        if ((i = parameter_search(crtfile, ".map", "__BSS_head")) >= 0) {
+            c -= i;
             if (c <= 0x2000)
                 fprintf(stderr, "Notice: Available RAM space is %d bytes ignoring the stack\n", 0x2000 - c);
             else
@@ -260,46 +277,27 @@ int gb_exec(char *target)
         }
     }
 
-    // look for and append memory banks
-    fprintf(stderr, "Adding main banks 0x00,0x01 (%d bytes free)\n", 0x8000 - len);
-    
-    count = 0;
-    for (i = 0x02 + (len > 0x8000); i <= 0x1f; ++i)
-    {
-        sprintf(filename, "%s_BANK_%02X.bin", binname, i);
+    // output filename
 
-        if ((stat(filename, &st_file) < 0) || (st_file.st_size == 0) || ((fpin = fopen(filename, "rb")) == NULL))
-            count += 0x4000;
-        else
-        {
-            fprintf(stderr, "Adding bank 0x%02X", i);
-
-            while (count--)
-                fputc(romfill, fpout);
-
-            for (count = 0; ((c = fgetc(fpin)) != EOF) && (count < 0x4000); ++count)
-                fputc(c, fpout);
-
-            if (count < 0x4000)
-                fprintf(stderr, " (%d bytes free)", 0x4000 - count);
-
-            while (count++ < 0x4000)
-                fputc(romfill, fpout);
-
-            if (!feof(fpin))
-            {
-                fseek(fpin, 0, SEEK_END);
-                count = ftell(fpin);
-                fprintf(stderr, " (error truncating %d bytes from %s)", count - 0x4000, filename);
-            }
-
-            count = 0;
-            fputc('\n', stderr);
-
-            fclose(fpin);
-        }
+    if (outfile == NULL) {
+        strcpy(filename, binname);
+        suffix_change(filename, ".gb");
+    } else {
+        strcpy(filename, outfile);
     }
 
+    // write first 32k/48k of output file
+    if ((fpout = fopen(filename, "wb")) == NULL)
+        exit_log(1, "Can't create output file %s\n", filename);
+
+    // look for and append memory banks
+    fprintf(stderr, "Adding main banks 0x00,0x01 (%d bytes free)\n", 0x8000 - main_length);
+    
+    fwrite(memory,len,1,fpout);
+    // And pad out to the correct number of ROM banks
+    for ( i = 0; i < (rom_banks * 0x4000) - len; i++ ) {
+        fputc(romfill, fpout);
+    }
     fclose(fpout);
     return 0;
 }
