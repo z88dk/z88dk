@@ -844,6 +844,7 @@
 	push	de
 	ld	hl,%1
 
+%notcpu gbz80
 	ld	hl,_%1
 	ld	de,%2
 	ex	de,hl
@@ -1187,6 +1188,7 @@
 =
 	ld	(%1),hl
 
+%notcpu gbz80
 	ld	l,(hl)
 	ld	h,0
 	ex	de,hl
@@ -1196,6 +1198,7 @@
 	ld	d,0
 	ld	hl,%1
 
+%notcpu gbz80
 	ld	hl,_%1
 	ex	de,hl
 	pop	hl
@@ -2511,6 +2514,7 @@
 	ld	bc,%1
 	push	bc
 
+%notcpu gbz80
 	ld	hl,_%1
 	pop	de
 	push	de
@@ -2533,6 +2537,7 @@
 	and	a
 	jp	%1,%2
 
+%notcpu gbz80
 	ld	hl,_%1
 	ld	(hl),+(%2 % 256)
 	inc	hl
