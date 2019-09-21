@@ -52,13 +52,13 @@ void __LIB__ gprint(char *str) NONBANKED;
 /** Print the long number 'number' in radix 'radix'.  signed_value should
    be set to SIGNED or UNSIGNED depending on whether the number is signed
    or not */
-void __LIB__ gprintln(INT16 number, INT8 radix, INT8 signed_value) __smallc;
+void __LIB__ gprintln(int16_t number, int8_t radix, int8_t signed_value) __smallc;
 
 /** Print the number 'number' as in 'gprintln' */
-void __LIB__	gprintn(INT8 number, INT8 radix, INT8 signed_value) __smallc;
+void __LIB__	gprintn(int8_t number, int8_t radix, int8_t signed_value) __smallc;
 
 /** Print the formatted string 'fmt' with arguments '...' */
-INT8 __LIB__	gprintf(char *fmt,...) NONBANKED;
+int8_t __LIB__	gprintf(char *fmt,...) NONBANKED;
 
 /** Old style plot - try plot_point() */
 void __LIB__ plot(uint8_t x, uint8_t y, uint8_t colour, uint8_t mode) __smallc;

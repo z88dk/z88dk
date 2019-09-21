@@ -11,6 +11,15 @@
 #include <gb/sgb.h>
 #include <gb/cgb.h>
 
+typedef uint8_t UBYTE;
+typedef uint8_t UINT8;
+typedef int8_t INT8;
+typedef uint16_t UWORD;
+typedef int16_t WORD;
+#ifndef NULL
+#define NULL (void *)0
+#endif
+
 typedef union _fixed {
   struct {
     uint8_t l;
