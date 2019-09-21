@@ -453,7 +453,6 @@ SYMBOL *deref(LVALUE* lval, char isaddr)
     Type *old_type = lval->ltype;
 
 
-
     lval->symbol = NULL;
     if ( ispointer(lval->ltype) && lval->ltype->ptr->kind == KIND_FUNC ) {
         return lval->symbol;
@@ -681,7 +680,7 @@ int heirb(LVALUE* lval)
                     //    if (lval->flags&FARPTR) zpop();
                 }
                 ptr = deref(lval, YES);
-                k = 1;
+		k = lval->ltype->kind == KIND_ARRAY ? 0 : 1;
             } else if (cmatch('(')) {
                 Type *return_type = type_void;
                 int   flags = 0;
