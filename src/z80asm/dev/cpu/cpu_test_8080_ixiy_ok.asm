@@ -22,9 +22,9 @@
  adc d                          ; 8A
  adc e                          ; 8B
  adc h                          ; 8C
- adc hl, bc                     ; CD @__z80asm__adchlbc
- adc hl, de                     ; CD @__z80asm__adchlde
- adc hl, hl                     ; CD @__z80asm__adchlhl
+ adc hl, bc                     ; CD @__z80asm__adc_hl_bc
+ adc hl, de                     ; CD @__z80asm__adc_hl_de
+ adc hl, hl                     ; CD @__z80asm__adc_hl_hl
  adc l                          ; 8D
  adc m                          ; 8E
  add (hl)                       ; 86

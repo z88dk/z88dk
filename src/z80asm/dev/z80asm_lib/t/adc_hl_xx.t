@@ -18,8 +18,8 @@ my $test_nr;
 for my $cpu (@CPUS) {
 	for my $reg (qw( bc de hl )) {
 		for my $carry (0, 1) {
-			for my $base (0) {
-				for my $add (1) {
+			for my $base (0, 32767) {
+				for my $add (1, 255, 256, 32767) {
 					$test_nr++;
 					note "Test $test_nr: cpu:$cpu reg:$reg carry:$carry base:$base add:$add";
 
@@ -35,8 +35,8 @@ for my $cpu (@CPUS) {
 END
 					my $sum = $base1 + $add + $carry;
 					
-					is $r->{F_C}, $sum > 65535 ? 1 : 0;
-					is $r->{HL}, $sum & 65535;
+					is $r->{F_C}, $sum > 65535 ? 1 : 0, "carry";
+					is $r->{HL}, $sum & 65535,			"result";
 							
 					(Test::More->builder->is_passing) or die;
 				}
