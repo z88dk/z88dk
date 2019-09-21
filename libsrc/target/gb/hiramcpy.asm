@@ -22,8 +22,8 @@ hiramcpy:
         LD      B,(HL)          ; B = n
         LD      HL,sp+6
         LD      A,(HL+)         ; HL = src
-        LD      L,(HL)
-        LD      H,A
+        LD      H,(HL)
+        LD      L,A
         CALL    asm_hiramcpy
         POP     BC
         RET

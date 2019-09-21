@@ -424,7 +424,7 @@ stat_4:
 
 _putchar:			; Banked
 	PUSH	BC
-	LD      HL,sp + 2 + BANKOV ; Skip return address
+	LD      HL,sp + 4  ; Skip return address
 	LD      A,(HL)          ; A = c
 	CALL    put_char
 	POP	BC
@@ -432,7 +432,7 @@ _putchar:			; Banked
 
 _setchar:			; Banked
 	PUSH	BC
-	LD      HL,sp + 2 + BANKOV ; Skip return address
+	LD      HL,sp + 4 ; Skip return address
 	LD      A,(HL)          ; A = c
 	CALL    set_char
 	POP	BC

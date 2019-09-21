@@ -29,8 +29,8 @@ get_data:
 	LD	b,(HL)
 	INC	HL
 	LD	A,(HL+)		; HL = dst
-	LD	L,(HL)
-	LD	H,A
+	LD	H,(HL)
+	LD	L,A
 
 	CALL	copy_vram
 

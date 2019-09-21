@@ -16,7 +16,7 @@ set_bkg_palette_entry:        ; Banked
         PUSH    BC
         PUSH    DE
 
-        LD      HL,sp+BANKOV+4; Skip return address and registers
+        LD      HL,sp+6; Skip return address and registers
         LD      C,(HL)          ; BC = rgb_data
         INC     HL
         LD      B,(HL)

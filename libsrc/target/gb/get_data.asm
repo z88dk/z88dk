@@ -32,7 +32,6 @@ _get_win_data:
 	ld	hl,sp+4
 	LD	C,(HL)		; BC = data
 	INC	HL
-	INC	HL
 	LD	B,(HL)
 	INC	HL
 	LD	E,(HL)		; E = nb_tiles

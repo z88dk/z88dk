@@ -1599,8 +1599,7 @@ _wrtchr:			; Banked
 	CALL	NZ,gmode
 
 	LD 	HL,sp+4
-	LD	A,(HL)
-	LD	C,A	; C = Char to print
+	LD	C,(HL)
 
 	CALL	__wrtchr
 	CALL	adv_gcurs
@@ -1733,6 +1732,8 @@ plot_point:			; Banked
 
 	;; Old, compatible version of plot()
 ;void __LIB__ plot(uint8_t x, uint8_t y, uint8_t colour, uint8_t mode) __smallc;
+	PUBLIC	plot
+	PUBLIC	_plot
 plot:
 _plot:				; Banked
 	PUSH    BC
@@ -1758,6 +1759,8 @@ _plot:				; Banked
 	RET
 
 ; void __LIB__ switch_data(uint8_t x, uint8_t y, unsigned char *src, unsigned char *dst) __smallc NONBANKED;
+	PUBLIC	_switch_data
+	PUBLIC	switch_data
 _switch_data:			; Non Banked as pointer
 switch_data:			; Non Banked as pointer
 	PUSH    BC
@@ -1770,13 +1773,12 @@ switch_data:			; Non Banked as pointer
 	LD	A,(HL-)	; B = x
 	LD	B,A
 	DEC	HL
-	LD	A,(HL+)	; C = y
-	LD	C,A
+	LD	C,(HL)	; C = y
 	ld	hl,sp+7	
 	LD	A,(HL-)	; DE = src
-	LD	E,A
-	LD	A,(HL-)
 	LD	D,A
+	LD	A,(HL-)
+	LD	E,A
 	LD	A,(HL-)	; HL = dst
 	LD	L,(HL)
 	LD	H,A

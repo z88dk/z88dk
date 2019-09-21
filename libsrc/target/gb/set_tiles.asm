@@ -18,9 +18,9 @@ _set_tiles:
         PUSH    BC
 
 	ld	hl,sp+4
-        LD      B,(HL)          ; BC = src
+        LD      C,(HL)          ; BC = src
         INC     HL
-        LD      C,(HL)
+        LD      B,(HL)
         INC     HL
         LD      E,(HL)          ; DE = dst
         DEC     HL
