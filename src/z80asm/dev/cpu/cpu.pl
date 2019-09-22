@@ -326,7 +326,7 @@ for my $cpu (@CPUS) {
 	}
 	
 	# 8-bit ALU group
-	for my $op (qw( add adc sub sbc and xor or cp )) {
+	for my $op (qw( add adc sub sbc and xor or cp cmp )) {
 		for my $r (qw( b c d e h l (hl) a )) {
 			for my $a ('a, ', '') {
 				add_opc($cpu, "$op $a$r", alu_r($op, $r));
@@ -765,10 +765,32 @@ for my $cpu (@CPUS) {
 	}
 	
 	# bit set, reset and test group
-	if (!$intel) {
-		for my $op (qw( bit res set )) {
-			for my $r (qw( b c d e h l (hl) a )) {
-				add_opc($cpu, "$op %c, $r", 0xCB, ($V{$op}*0x40 + $V{$r})."+8*%c(0..7)");
+	for my $r (qw( b c d e h l (hl) a )) {
+		if ($intel) {
+			if ($r eq 'a') {
+				add_opc($cpu, "bit.a %c, $r", 	alu_n('and'), '1<<%c(0..7)');	# and 1|2|4|...
+
+				add_opc($cpu, "res.a %c, $r", 	alu_n('and'), '(~(1<<%c(0..7)))&0xFF');	# and ~(1|2|4|...)
+				
+				add_opc($cpu, "set.a %c, $r", 	alu_n('or'), '1<<%c(0..7)');	# or 1|2|4|...
+			}
+			else {
+				add_opc($cpu, "bit.a %c, $r", 	ld_r_r('a', $r),		# ld a, reg
+												alu_n('and'), '1<<%c(0..7)');	# and 1|2|4|...
+
+				add_opc($cpu, "res.a %c, $r", 	ld_r_r('a', $r),		# ld a, reg
+												alu_n('and'), '(~(1<<%c(0..7)))&0xFF',	# and ~(1|2|4|...)
+												ld_r_r($r, 'a'));		# ld reg, a
+												
+				add_opc($cpu, "set.a %c, $r", 	ld_r_r('a', $r),		# ld a, reg
+												alu_n('or'), '1<<%c(0..7)',		# or 1|2|4|...
+												ld_r_r($r, 'a'));		# ld reg, a
+			}
+		}
+		else {
+			for my $op (qw( bit res set )) {
+				add_opc($cpu, "$op %c, $r", 	0xCB, ($V{$op}*0x40 + $V{$r})."+8*%c(0..7)");
+				add_opc($cpu, "$op.a %c, $r", 	0xCB, ($V{$op}*0x40 + $V{$r})."+8*%c(0..7)");
 			}
 		}
 	}
@@ -1624,7 +1646,7 @@ sub parse_code {
 	@bin = split(' ', $bin);
 	my @expr;
 	for (@bin) {
-		if (/[+*?]/) {
+		if (/[+*?<>]/) {
 			my $offset = 0;
 			if (s/^(\d+)\+//) {
 				$offset = $1;
@@ -1809,7 +1831,7 @@ sub add_tests {
 		for (@values) {
 			my @bin = split(' ', replace($bin, '%c', $_));
 			for (@bin) {
-				$_ = eval($_) if /[+*?]/; die $@ if $@;
+				$_ = eval($_) if /[+*?<>]/; die $@ if $@;
 			}
 			add_tests($cpu, replace($asm, '%c', $_), join(' ', @bin));
 			$min = $_ if $_ < $min;
