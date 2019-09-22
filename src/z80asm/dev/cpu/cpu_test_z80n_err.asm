@@ -1707,6 +1707,8 @@
  and hl, de                     ; Error
  and ix, de                     ; Error
  and iy, de                     ; Error
+ and.a ix, de                   ; Error
+ and.a iy, de                   ; Error
  arhl                           ; Error
  bit -1, (hl)                   ; Error
  bit -1, (hl)                   ; Error

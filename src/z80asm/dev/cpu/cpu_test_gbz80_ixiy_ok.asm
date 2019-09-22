@@ -103,6 +103,8 @@
  and e                          ; A3
  and h                          ; A4
  and l                          ; A5
+ and.a hl, bc                   ; 7C A0 67 7D A1 6F
+ and.a hl, de                   ; 7C A2 67 7D A3 6F
  ani -128                       ; E6 80
  ani 127                        ; E6 7F
  ani 255                        ; E6 FF

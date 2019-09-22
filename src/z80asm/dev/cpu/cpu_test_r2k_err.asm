@@ -191,10 +191,6 @@
  altd set 8, h                  ; Error
  altd set 8, l                  ; Error
  altd set 8, l                  ; Error
- ana ixh                        ; Error
- ana ixl                        ; Error
- ana iyh                        ; Error
- ana iyl                        ; Error
  and a, ixh                     ; Error
  and a, ixl                     ; Error
  and a, iyh                     ; Error

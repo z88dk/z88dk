@@ -126,10 +126,6 @@
  ana d                          ; A2
  ana e                          ; A3
  ana h                          ; A4
- ana ixh                        ; FD A4
- ana ixl                        ; FD A5
- ana iyh                        ; DD A4
- ana iyl                        ; DD A5
  ana l                          ; A5
  ana m                          ; A6
  and (hl)                       ; A6
@@ -174,6 +170,8 @@
  and iyh                        ; DD A4
  and iyl                        ; DD A5
  and l                          ; A5
+ and.a hl, bc                   ; 7C A0 67 7D A1 6F
+ and.a hl, de                   ; 7C A2 67 7D A3 6F
  ani -128                       ; E6 80
  ani 127                        ; E6 7F
  ani 255                        ; E6 FF

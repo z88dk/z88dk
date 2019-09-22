@@ -1736,10 +1736,6 @@
  altd xor e                     ; Error
  altd xor h                     ; Error
  altd xor l                     ; Error
- ana ixh                        ; Error
- ana ixl                        ; Error
- ana iyh                        ; Error
- ana iyl                        ; Error
  and (ix)                       ; Error
  and (ix+127)                   ; Error
  and (ix-128)                   ; Error
@@ -1781,6 +1777,8 @@
  and iy, de                     ; Error
  and iyh                        ; Error
  and iyl                        ; Error
+ and.a ix, de                   ; Error
+ and.a iy, de                   ; Error
  arhl                           ; Error
  bit -1, (hl)                   ; Error
  bit -1, (hl)                   ; Error

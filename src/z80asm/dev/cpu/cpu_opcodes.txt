@@ -1894,6 +1894,8 @@
 |                             |mov a, e    |            |            |                       |         |               |              |              |
 |7C                           |ld a, h     |==          |==          |==                     |==       |==             |==            |==            |
 |                             |mov a, h    |            |            |                       |         |               |              |              |
+|7C A0 67 7D A1 6F            |and.a hl, bc|==          |==          |==                     |==       |==             |==            |==            |
+|7C A2 67 7D A3 6F            |and.a hl, de|==          |==          |                       |         |and.a hl, de   |==            |==            |
 |7D                           |ld a, l     |==          |==          |==                     |==       |==             |==            |==            |
 |                             |mov a, l    |            |            |                       |         |               |              |              |
 |7E                           |ld a, (hl)  |==          |==          |==                     |==       |==             |==            |==            |
@@ -3818,6 +3820,7 @@
 |DB FD F4 %d                  |            |            |            |ioe ld (iy+%d), hl     |==       |               |              |              |
 |DB FD F4 00                  |            |            |            |ioe ld (iy), hl        |==       |               |              |              |
 |DC                           |            |            |            |and hl, de             |==       |               |              |              |
+|                             |            |            |            |and.a hl, de           |         |               |              |              |
 |DC %m %m                     |c_c %m      |==          |==          |                       |         |c_c %m         |==            |==            |
 |                             |call c, %m  |            |            |                       |         |call c, %m     |              |              |
 |                             |cc %m       |            |            |                       |         |cc %m          |              |              |
@@ -3971,11 +3974,9 @@
 |                             |            |            |            |sbc a, (ix+%d)         |         |               |              |              |
 |DD 9E 00                     |            |            |            |sbc (ix)               |==       |==             |==            |==            |
 |                             |            |            |            |sbc a, (ix)            |         |               |              |              |
-|DD A4                        |            |            |            |                       |         |               |ana ixh       |==            |
-|                             |            |            |            |                       |         |               |and a, ixh    |              |
+|DD A4                        |            |            |            |                       |         |               |and a, ixh    |==            |
 |                             |            |            |            |                       |         |               |and ixh       |              |
-|DD A5                        |            |            |            |                       |         |               |ana ixl       |==            |
-|                             |            |            |            |                       |         |               |and a, ixl    |              |
+|DD A5                        |            |            |            |                       |         |               |and a, ixl    |==            |
 |                             |            |            |            |                       |         |               |and ixl       |              |
 |DD A6 %d                     |            |            |            |and (ix+%d)            |==       |==             |==            |==            |
 |                             |            |            |            |and a, (ix+%d)         |         |               |              |              |
@@ -4275,6 +4276,7 @@
 |DD D4 %u                     |            |            |            |ld (sp+%u), ix         |==       |               |              |              |
 |DD D4 00                     |            |            |            |ld (sp), ix            |==       |               |              |              |
 |DD DC                        |            |            |            |and ix, de             |==       |               |              |              |
+|                             |            |            |            |and.a ix, de           |         |               |              |              |
 |DD E1                        |            |            |            |pop ix                 |==       |==             |pop ix        |==            |
 |                             |            |            |            |                       |         |               |pop ixh       |              |
 |DD E3                        |            |            |            |ex (sp), ix            |==       |==             |==            |==            |
@@ -4789,11 +4791,9 @@
 |                             |            |            |            |sbc a, (iy+%d)         |         |               |              |              |
 |FD 9E 00                     |            |            |            |sbc (iy)               |==       |==             |==            |==            |
 |                             |            |            |            |sbc a, (iy)            |         |               |              |              |
-|FD A4                        |            |            |            |                       |         |               |ana iyh       |==            |
-|                             |            |            |            |                       |         |               |and a, iyh    |              |
+|FD A4                        |            |            |            |                       |         |               |and a, iyh    |==            |
 |                             |            |            |            |                       |         |               |and iyh       |              |
-|FD A5                        |            |            |            |                       |         |               |ana iyl       |==            |
-|                             |            |            |            |                       |         |               |and a, iyl    |              |
+|FD A5                        |            |            |            |                       |         |               |and a, iyl    |==            |
 |                             |            |            |            |                       |         |               |and iyl       |              |
 |FD A6 %d                     |            |            |            |and (iy+%d)            |==       |==             |==            |==            |
 |                             |            |            |            |and a, (iy+%d)         |         |               |              |              |
@@ -5093,6 +5093,7 @@
 |FD D4 %u                     |            |            |            |ld (sp+%u), iy         |==       |               |              |              |
 |FD D4 00                     |            |            |            |ld (sp), iy            |==       |               |              |              |
 |FD DC                        |            |            |            |and iy, de             |==       |               |              |              |
+|                             |            |            |            |and.a iy, de           |         |               |              |              |
 |FD E1                        |            |            |            |pop iy                 |==       |==             |pop iy        |==            |
 |                             |            |            |            |                       |         |               |pop iyh       |              |
 |FD E3                        |            |            |            |ex (sp), iy            |==       |==             |==            |==            |

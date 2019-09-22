@@ -10519,38 +10519,6 @@ DO_stmt(0xA3);
 DO_stmt(0xA4);
 }
 
-| label? _TK_ANA _TK_IXH _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_Z80: case CPU_Z80N: 
-if (!opts.swap_ix_iy) { DO_stmt(0xDDA4); } else { DO_stmt(0xFDA4); }
-break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_ANA _TK_IXL _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_Z80: case CPU_Z80N: 
-if (!opts.swap_ix_iy) { DO_stmt(0xDDA5); } else { DO_stmt(0xFDA5); }
-break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_ANA _TK_IYH _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_Z80: case CPU_Z80N: 
-if (!opts.swap_ix_iy) { DO_stmt(0xFDA4); } else { DO_stmt(0xDDA4); }
-break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_ANA _TK_IYL _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_Z80: case CPU_Z80N: 
-if (!opts.swap_ix_iy) { DO_stmt(0xFDA5); } else { DO_stmt(0xDDA5); }
-break;
-default: error_illegal_ident(); }
-}
-
 | label? _TK_ANA _TK_L _TK_NEWLINE @{
 DO_stmt(0xA5);
 }
@@ -10800,6 +10768,47 @@ DO_stmt(0xA1);
 
 | label? _TK_AND _TK_D _TK_NEWLINE @{
 DO_stmt(0xA2);
+}
+
+| label? _TK_AND _TK_DOT _TK_A _TK_HL _TK_COMMA _TK_BC _TK_NEWLINE @{
+DO_stmt(0x7C);
+DO_stmt(0xA0);
+DO_stmt(0x67);
+DO_stmt(0x7D);
+DO_stmt(0xA1);
+DO_stmt(0x6F);
+}
+
+| label? _TK_AND _TK_DOT _TK_A _TK_HL _TK_COMMA _TK_DE _TK_NEWLINE @{
+switch (opts.cpu) {
+case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+DO_stmt(0x7C);
+DO_stmt(0xA2);
+DO_stmt(0x67);
+DO_stmt(0x7D);
+DO_stmt(0xA3);
+DO_stmt(0x6F);
+break;
+case CPU_R2K: case CPU_R3K: 
+DO_stmt(0xDC);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_AND _TK_DOT _TK_A _TK_IX _TK_COMMA _TK_DE _TK_NEWLINE @{
+switch (opts.cpu) {
+case CPU_R2K: case CPU_R3K: 
+if (!opts.swap_ix_iy) { DO_stmt(0xDDDC); } else { DO_stmt(0xFDDC); }
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_AND _TK_DOT _TK_A _TK_IY _TK_COMMA _TK_DE _TK_NEWLINE @{
+switch (opts.cpu) {
+case CPU_R2K: case CPU_R3K: 
+if (!opts.swap_ix_iy) { DO_stmt(0xFDDC); } else { DO_stmt(0xDDDC); }
+break;
+default: error_illegal_ident(); }
 }
 
 | label? _TK_AND _TK_E _TK_NEWLINE @{
