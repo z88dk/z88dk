@@ -31,7 +31,7 @@
 ;OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 ;EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-SECTION code_crt_sccz80
+SECTION code_crt0_sccz80
 PUBLIC l_long_divide
 EXTERN	error_divide_by_zero_mc
 EXTERN __retloc, __math_block1, __math_block3, __math_block2

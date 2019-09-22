@@ -7,7 +7,7 @@
         PUBLIC  _waitpad
 
 
-	GLOBAL	__jpad
+	GLOBAL	asm_jpad
 
         SECTION code_driver
 
@@ -27,7 +27,7 @@ _waitpad:
         RET
 
 wait_pad:
-        CALL    __jpad           ; Read pad
+        CALL    asm_jpad           ; Read pad
         AND     B               ; Compare with mask?
         JR      Z,wait_pad            ; Loop if no intersection
         RET

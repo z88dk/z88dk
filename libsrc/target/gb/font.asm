@@ -8,6 +8,7 @@
 
         INCLUDE "target/gb/def/gb_globals.def"
 
+
 	PUBLIC	font_load
 	PUBLIC	tmode_out
 	PUBLIC	tmode
@@ -657,6 +658,7 @@ cury:
 	defs	0x01
 
 
+	SECTION	code_driver
 	GLOBAL	vbl
 	GLOBAL	lcd
 	GLOBAL	int_0x40

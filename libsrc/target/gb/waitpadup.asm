@@ -6,7 +6,7 @@
         PUBLIC  waitpadup
         PUBLIC  _waitpadup
 
-	GLOBAL	__jpad
+	GLOBAL	asm_jpad
 
         SECTION code_driver
 
@@ -20,7 +20,7 @@ _waitpadup:
 wait_1:
         LD      B,0xFF
 wait_2:
-        CALL    __jpad
+        CALL    asm_jpad
         OR      A               ; Have all buttons been released?
         JR      NZ,wait_1       ; Not yet
 

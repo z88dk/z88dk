@@ -6,7 +6,7 @@
         PUBLIC  joypad
         PUBLIC  _joypad
 
-	GLOBAL	__jpad
+	GLOBAL	asm_jpad
 
         SECTION code_driver
 
@@ -14,7 +14,7 @@
 
 joypad:
 _joypad:
-	call	__jpad
+	call	asm_jpad
 	ld	e,a
 	ld	l,a
 	ld	h,0

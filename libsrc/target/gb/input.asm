@@ -13,7 +13,7 @@
 	GLOBAL	mv_sprite
 	GLOBAL	set_sprite_prop
 	GLOBAL	set_sprite_tile
-	GLOBAL	__jpad
+	GLOBAL	asm_jpad
 	GLOBAL	waitpadup
 
 	EXTERN	__mode
@@ -130,7 +130,8 @@ tmode_inout:
 	RET
 
 	;; Prompt the user for a char and return it in A
-get_char:
+	PUBLIC	asm_getchar
+asm_getchar:
 	PUSH	BC
 	PUSH	DE
 	PUSH	HL
@@ -139,9 +140,9 @@ get_char:
 get_1:
 	CALL	track_mouse
 	CALL	update_mouse
-	CALL	__jpad
+	CALL	asm_jpad
 	LD	D,A
-	AND	A		; Is A pressed ?
+	AND	BUT_A		; Is A pressed ?
 	JP	Z,get_1
 
 	LD	A,(msy)	; Look for char under the mouse
@@ -174,7 +175,8 @@ get_12:
 	RET
 
 	;; Prompt the user for a string and store it in (HL)
-get_string:
+	PUBLIC	asm_getstring
+asm_getstring:
 	PUSH	BC
 	PUSH	DE
 	PUSH	HL
@@ -186,12 +188,12 @@ get_string:
 getstr_1:
 	CALL	track_mouse
 	CALL	update_mouse
-	CALL	__jpad
+	CALL	asm_jpad
 	LD	D,A
-	AND	A		; Is A pressed ?
+	AND	BUT_A		; Is A pressed ?
 	JP	NZ,getstr_10
 	LD	A,D
-	AND	B		; Is B pressed ?
+	AND	BUT_B		; Is B pressed ?
 	JP	NZ,getstr_20
 	LD	A,D
 	AND	SELECT	; Is SELECT pressed ?
@@ -345,8 +347,7 @@ show_2:
 	INC	A
 	LDH	(SCY),A
 	DEC	C
-	JR	Z,show_99
-	JR	show_1
+	JR	nz,show_1
 show_99:
 	POP	DE
 	POP	BC
@@ -397,7 +398,7 @@ track_mouse:
 	PUSH	HL
 	XOR	A
 	LD	(mschanged),A	; Default to no change
-	CALL	__jpad
+	CALL	asm_jpad
 	LD	D,A
 
 	LD	HL,msstate
@@ -519,40 +520,7 @@ set_mouse:
 	POP	BC
 	RET
 
-getchar:
-_getchar:			; Banked
-	LD	A,(__mode)
-	CP	T_MODE_INOUT
-	JR	Z,getchar_1
-	PUSH	BC
-	CALL	tmode_inout
-	POP	BC
-getchar_1:
-	CALL	get_char
-	LD	E,A
-	ld	l,a
-	ld	h,0
-	RET
 
-gets:
-_gets:			
-	LD	A,(__mode)
-	CP	T_MODE_INOUT
-	JR	Z,gets_1
-	PUSH	BC
-	CALL	tmode_inout
-	POP	BC
-gets_1:
-	LD 	HL,sp+2		;Removed banking
-	LD	A,(HL+)
-	LD	H,(HL)		; HL = s
-	LD	L,A
-	PUSH	HL
-	CALL	get_string
-	POP	DE
-	ld	h,d
-	ld	l,e
-	RET
 
 	;; PENDING: this is unfortunate.  Refed from .tmode_inout
 	SECTION	rodata_driver

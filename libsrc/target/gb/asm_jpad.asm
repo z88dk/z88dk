@@ -1,7 +1,7 @@
 
         MODULE  jpad
 
-        PUBLIC  __jpad
+        PUBLIC  asm_jpad
 
 
         SECTION code_driver
@@ -14,7 +14,7 @@
         ;;   0x40 - Select  0x04 - Up
         ;;   0x20 - B       0x02 - Left
         ;;   0x10 - A       0x01 - Right
-__jpad:
+asm_jpad:
         PUSH    BC              ; Save modified registers
         LD      A,0x20
         LDH     (P1),A         ; Turn on P15
