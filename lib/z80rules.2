@@ -1208,6 +1208,7 @@
 	exx
 
 %notcpu 8080
+%notcpu gbz80
 	call	l_sub
 =
 	ex	de,hl
@@ -1305,6 +1306,7 @@ REMOVE THIS LINE FOR IT TO FIRE
 	call	l_gcharspsp	;
 	ld	hl,%2	;const
 
+%notcpu gbz80
 	ld	hl,%1	;const
 	call	l_gintspsp	;
 	ld	hl,%1	;const
@@ -1313,6 +1315,7 @@ REMOVE THIS LINE FOR IT TO FIRE
 	ld	hl,%1	;const
 	call	l_g2intspsp	;
 
+%notcpu gbz80
 	ld	hl,%1	;const
 	call	l_gcharspsp	;
 	ld	hl,%1	;const

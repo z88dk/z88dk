@@ -13,7 +13,7 @@ __printf_print_to_buf:
         push    hl
         push    bc
         call    __printf_get_buffer_address
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 	push	de
 	call	__printf_get_buffer_length
 	ld	c,e
@@ -23,7 +23,7 @@ ELSE
 ENDIF
         ld      b,0
         add     hl,bc
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 	call	__printf_inc_buffer_length
 ELSE
         inc     (ix-10)

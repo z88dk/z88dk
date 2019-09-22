@@ -4,7 +4,7 @@
 	PUBLIC  sprintf_outc	
 	EXTERN	fputc_cons
 
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 sprintf_outc:
 	pop	bc
 	pop	hl	;fp

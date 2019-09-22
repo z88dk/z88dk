@@ -11,7 +11,7 @@
 __printf_handle_n:
         push    hl              ;save format
         call    get_16bit_ap_parameter  ; de = ap, hl = value
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 	call	__printf_write_chars_written
 ELSE
         ld      a,(ix-2)

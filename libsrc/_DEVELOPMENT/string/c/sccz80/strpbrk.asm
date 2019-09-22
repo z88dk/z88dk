@@ -10,13 +10,13 @@ EXTERN asm_strpbrk
 
 strpbrk:
 
-   pop af
+   pop de
    pop de
    pop hl
    
    push hl
    push de
-   push af
+   push de
    
    jp asm_strpbrk
 

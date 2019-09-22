@@ -34,7 +34,7 @@ success:
 
 set_raw:
 	ld	hl,generic_console_flags
-IF __CPU_8080__
+IF __CPU_INTEL__
 	ld	a,(hl)
 	and	@11111110
 	ld	(hl),a
@@ -44,7 +44,7 @@ ENDIF
 	ld	a,(de)
 	and	a	
 	jr	z,success
-IF __CPU_8080__
+IF __CPU_INTEL__
 	ld	a,(hl)
 	or	@00000001
 	ld	(hl),a

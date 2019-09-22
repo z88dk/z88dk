@@ -32,7 +32,7 @@ _fputc_callee:
 	pop	bc	;c
 	push 	de
 
-IF !__CPU_8080__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
         push	ix
 
   IF __CPU_R2K__ | __CPU_R3K__
@@ -44,14 +44,14 @@ IF !__CPU_8080__
 ENDIF
 	call	asm_fputc_callee
 
-IF !__CPU_8080__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	pop	ix	
 ENDIF
 	ret
 
 	PUBLIC	asm_fputc_callee
 
-IF !__CPU_8080__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 ; Entry:	ix = fp
 ; 		bc = character to print
 ; Exit:		hl = byte written
@@ -156,7 +156,7 @@ static void wrapper_fputc_callee_8080() __naked
 {
 //#ifdef Z80
 #asm
-IF __CPU_8080__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 ; Entry:	hl = fp
 ; 		bc = character to print
 ; Exit:		hl = byte written

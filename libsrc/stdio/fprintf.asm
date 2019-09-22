@@ -25,7 +25,7 @@ fprintf:
 	ld	h,0
         add     hl,hl
 	add	hl,sp		;points to fp
-IF !__CPU_INTEL__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	push	ix
 ENDIF
 	ld	c,(hl)
@@ -51,7 +51,7 @@ ENDIF
 	pop	bc	
 	pop	bc
 	pop	bc
-IF !__CPU_INTEL__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	pop	ix		;restore callers
 ENDIF
 	ret

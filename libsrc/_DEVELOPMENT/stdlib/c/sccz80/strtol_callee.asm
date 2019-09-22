@@ -9,11 +9,18 @@ PUBLIC strtol_callee
 EXTERN asm_strtol
 
 strtol_callee:
-
+IF __CPU_GBZ80__
+   pop af	;return
+   pop bc	;radix
+   pop de	;endptr
+   pop hl	;nptr
+   push af
+ELSE
    pop hl
    pop bc
    pop de
    ex (sp),hl
+ENDIF
    
    jp asm_strtol
 

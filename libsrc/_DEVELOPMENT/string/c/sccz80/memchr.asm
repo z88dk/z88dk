@@ -9,6 +9,20 @@ PUBLIC memchr
 EXTERN l0_memchr_callee
 
 memchr:
+IF __CPU_GBZ80__
+   ld hl,sp+2
+   ld c,(hl)
+   inc hl
+   ld b,(hl)
+   inc hl
+   ld e,(hl)
+   inc hl
+   ld d,(hl)
+   inc hl
+   ld a,(hl+)
+   ld h,(hl)
+   ld l,a
+ELSE
 
    pop af
    pop bc
@@ -19,6 +33,7 @@ memchr:
    push de
    push bc
    push af
+ENDIF
 
    jp l0_memchr_callee
 

@@ -57,7 +57,7 @@ loop:
 end_string:
 
    pop bc
-IF __CPU_INTEL__
+IF __CPU_INTEL__ || __CPU_GBZ80__
    ld a,l
    sub c
    ld l,a
@@ -74,7 +74,7 @@ ENDIF
 done:
 
    pop bc
-IF __CPU_INTEL__
+IF __CPU_INTEL__ || __CPU_GBZ80__
    ld a,l
    sub c
    ld l,a

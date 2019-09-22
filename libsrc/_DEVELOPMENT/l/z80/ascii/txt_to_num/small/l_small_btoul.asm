@@ -47,7 +47,7 @@ loop:
    push hl
    
    rra
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
    push bc
    ld c,a
    ld a,l

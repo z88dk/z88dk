@@ -35,7 +35,7 @@
 ; 22,y+32,x+32 = Move to position
 
 
-IF !__CPU_INTEL__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 		defc		SUPPORT_vt52=1
 		; Extra VT52 codes - clear to end of line + clear to end of screen
 		defc		SUPPORT_vt52x=0

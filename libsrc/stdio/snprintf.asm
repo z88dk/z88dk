@@ -24,7 +24,7 @@ snprintf:
 	ld	h,0
         add     hl,hl
 	add	hl,sp		;points to buf
-IF !__CPU_INTEL__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	push	ix		;save callers
 ENDIF
 	ld	c,(hl)		;buf
@@ -60,7 +60,7 @@ ENDIF
 	add	hl,sp
 	ld	sp,hl
 	ex	de,hl
-IF !__CPU_INTEL__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	pop	ix
 ENDIF
 	ret

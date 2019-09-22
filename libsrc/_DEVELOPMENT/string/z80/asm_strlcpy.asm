@@ -14,6 +14,7 @@
 ;
 ; ===============================================================
 
+IF !__CPU_GBZ80__
 SECTION code_clib
 SECTION code_string
 
@@ -104,3 +105,6 @@ ELSE
    sbc hl,bc                   ; hl = strlen(s2)
 ENDIF
    ret
+
+ENDIF
+

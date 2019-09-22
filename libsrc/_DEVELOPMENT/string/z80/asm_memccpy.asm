@@ -46,13 +46,28 @@ asm_memccpy:
    inc c
    dec c
    jr z, test0
+IF __CPU_GBZ80__
+   ld (__memccpy_value),a
+ENDIF
 
 loop:
-
+IF __CPU_GBZ80__
+   ld a,(__memccpy_value)
+ENDIF
    cp (hl)
+IF __CPU_GBZ80__ || __CPU_INTEL__
+   inc hl
+   inc de
+   dec bc
+   jr z,match
+   ld a,b
+   or c
+   jr nz,loop
+ELSE
    ldi
    jr z, match
    jp pe, loop
+ENDIF
 
 nomatch:
 
@@ -70,3 +85,9 @@ test0:
    djnz loop
    
    jr nomatch
+
+IF __CPU_GBZ80__
+SECTION bss_clib
+SECTION bss_string
+__memccpy_value:	defb	0
+ENDIF

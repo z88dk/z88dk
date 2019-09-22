@@ -56,6 +56,18 @@ asm0_strdup:
    
    push hl                     ; save char *str (dup)
 
+IF __CPU_GBZ80__
+loop:
+   ld a,(de)
+   ld (hl+),a
+   inc de
+   dec bc
+   ld a,b
+   or c
+   jr nz,loop
+   ld (hl+),a	;write terminating zero
+ELSE
+
    ex de,hl
    ldir
    
@@ -64,6 +76,7 @@ asm0_strdup:
    dec de
    xor a
    ld (de),a
+ENDIF
    
    pop hl
    ret

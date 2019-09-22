@@ -10,13 +10,13 @@ EXTERN asm_strsep
 
 strsep:
 
-   pop af
+   pop hl
    pop de
    pop bc
    
    push bc
    push de
-   push af
+   push hl
    
    jp asm_strsep
 

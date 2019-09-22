@@ -41,7 +41,12 @@ asm_strrchr:
    call l_neg_bc               ; bc = strlen + 1
    
    ld a,e                      ; a = char
+IF __CPU_GBZ80__
+   EXTERN __z80asm__cpdr
+   call __z80asm__cpdr
+ELSE
    cpdr                        ; search backwards
+ENDIF
    jp nz, error_zc
 
 found_char:

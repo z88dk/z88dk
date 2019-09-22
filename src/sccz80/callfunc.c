@@ -321,6 +321,8 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             nargs = 0;
         } else if ( functype->flags & SHORTCALL ) {
             zshortcall(functype->funcattrs.shortcall_rst, functype->funcattrs.shortcall_value);
+        } else if ( functype->flags & BANKED ) {
+            zbankedcall(ptr);
         } else {
             zcallop();
             outname(funcname, dopref(ptr)); nl();

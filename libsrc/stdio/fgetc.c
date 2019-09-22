@@ -27,7 +27,7 @@
 int fgetc(FILE *fp)
 {
 #asm
-IF __CPU_8080__
+IF __CPU_INTEL__ || __CPU_GBZ80__
 	pop	bc
 	pop	de	;fp
 	push	de

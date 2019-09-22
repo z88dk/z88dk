@@ -43,7 +43,7 @@ fclose_inuse:
 	ld	a,(hl)
 	and	_IOSTRING
 	jr	nz,fclose_success
-IF !__CPU_8080__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_GBZ80__
 	ld	a,(hl)
 	and	_IOEXTRA
 	jr	z,fclose_no_net

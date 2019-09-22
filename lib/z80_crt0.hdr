@@ -39,6 +39,10 @@
 	EXTERN     l_ini_512
 
 
+	; Used for banked calls for __banked for sccz80 + sdcc
+	EXTERN     banked_call
+
+
 ;------------------------------------
 ; Scopes for integer library routines
 ;------------------------------------
@@ -96,6 +100,8 @@
 	EXTERN    l_mult		;Integer *
 	EXTERN    l_div		;Integer signed /
 	EXTERN    l_div_u		;Integer unsigned /
+	EXTERN    l_mod			;Integer % (for gbz80)
+	EXTERN    l_mod_u		;Integer unsigned % (for gbz80)
 
 ;------------------
 ;Long functions now
@@ -105,7 +111,6 @@
 	EXTERN     l_int2long_s	;Int->long signed conversion
 	EXTERN     l_int2long_s_float	;Int->long->float signed conversion (optimizer: use -O3)
 	EXTERN     l_int2long_u_float	;uInt->ulong->float signed conversion 
-	EXTERN     l_long2int_s	;Long->int signed conversion
 	EXTERN     l_glong		;Get long
 	EXTERN     l_glongsp	;Get long (peephole opt)
 	EXTERN     l_glonghlp	;Get pointer, then get long

@@ -27,7 +27,7 @@ crt0_init_bss:
 IF CRT_INITIALIZE_BSS = 1
         ld      hl,__BSS_head
         ld      bc,__BSS_END_tail - __BSS_head - 1
-  IF !__CPU_8080__
+  IF !__CPU_8080__ && !__CPU_GBZ80__
         ld      de,__BSS_head + 1
         xor     a 
 	ld	(hl),a
