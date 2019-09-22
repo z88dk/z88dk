@@ -471,8 +471,6 @@
  dad de                         ; 19
  dad h                          ; 29
  dad hl                         ; 29
- dad ixh                        ; FD 29
- dad iyh                        ; DD 29
  dad sp                         ; 39
  dcr a                          ; 3D
  dcr b                          ; 05

@@ -391,8 +391,6 @@
  cz -32768                      ; Error
  cz 32767                       ; Error
  cz 65535                       ; Error
- dad ixh                        ; Error
- dad iyh                        ; Error
  dcr ixh                        ; Error
  dcr ixl                        ; Error
  dcr iyh                        ; Error

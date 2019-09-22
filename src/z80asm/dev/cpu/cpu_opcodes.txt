@@ -3833,8 +3833,7 @@
 |                 |           |            |            |                       |         |               |dec ixh       |              |
 |DD 26 %n         |           |            |            |                       |         |               |ld ixh, %n    |==            |
 |                 |           |            |            |                       |         |               |mvi ixh, %n   |              |
-|DD 29            |           |            |            |add ix, ix             |==       |==             |add ix, ix    |==            |
-|                 |           |            |            |                       |         |               |dad ixh       |              |
+|DD 29            |           |            |            |add ix, ix             |==       |==             |==            |==            |
 |DD 2A %m %m      |           |            |            |ld ix, (%m)            |==       |==             |==            |==            |
 |DD 2B            |           |            |            |dec ix                 |==       |==             |dcx ixh       |==            |
 |                 |           |            |            |                       |         |               |dec ix        |              |
@@ -4645,8 +4644,7 @@
 |                 |           |            |            |                       |         |               |dec iyh       |              |
 |FD 26 %n         |           |            |            |                       |         |               |ld iyh, %n    |==            |
 |                 |           |            |            |                       |         |               |mvi iyh, %n   |              |
-|FD 29            |           |            |            |add iy, iy             |==       |==             |add iy, iy    |==            |
-|                 |           |            |            |                       |         |               |dad iyh       |              |
+|FD 29            |           |            |            |add iy, iy             |==       |==             |==            |==            |
 |FD 2A %m %m      |           |            |            |ld iy, (%m)            |==       |==             |==            |==            |
 |FD 2B            |           |            |            |dec iy                 |==       |==             |dcx iyh       |==            |
 |                 |           |            |            |                       |         |               |dec iy        |              |

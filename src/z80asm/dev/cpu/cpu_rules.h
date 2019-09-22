@@ -11923,22 +11923,6 @@ DO_stmt(0x29);
 DO_stmt(0x29);
 }
 
-| label? _TK_DAD _TK_IXH _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_Z80: case CPU_Z80N: 
-if (!opts.swap_ix_iy) { DO_stmt(0xDD29); } else { DO_stmt(0xFD29); }
-break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_DAD _TK_IYH _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_Z80: case CPU_Z80N: 
-if (!opts.swap_ix_iy) { DO_stmt(0xFD29); } else { DO_stmt(0xDD29); }
-break;
-default: error_illegal_ident(); }
-}
-
 | label? _TK_DAD _TK_SP _TK_NEWLINE @{
 DO_stmt(0x39);
 }

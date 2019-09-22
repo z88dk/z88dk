@@ -2040,8 +2040,6 @@
  cv -32768                      ; Error
  cv 32767                       ; Error
  cv 65535                       ; Error
- dad ixh                        ; Error
- dad iyh                        ; Error
  dcr ixh                        ; Error
  dcr ixl                        ; Error
  dcr iyh                        ; Error
