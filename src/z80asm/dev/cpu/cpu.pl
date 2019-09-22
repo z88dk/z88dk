@@ -73,8 +73,11 @@ sub dec_r 	{ my($r) = @_; 		return 0x05 + $V{$r}*8; }
 sub inc_r 	{ my($r) = @_; 		return 0x04 + $V{$r}*8; }
 sub ld_d_m 	{ my($d) = @_; 		return 0x01 + $V{$d}*16; }
 sub ld_r_r 	{ my($d, $s) = @_; 	return 0x40 + $V{$d}*8 + $V{$s}; }
-sub pop_d	{ my($d) = @_; 		0xC1 + $V{$d}*16; }
-sub push_d	{ my($d) = @_; 		0xC5 + $V{$d}*16; }
+sub ld_r_n 	{ my($r) = @_; 		return 0x06 + $V{$r}*8; }
+sub pop_d	{ my($d) = @_; 		return 0xC1 + $V{$d}*16; }
+sub push_d	{ my($d) = @_; 		return 0xC5 + $V{$d}*16; }
+sub rot_a	{ my($op) = @_;		return 0x07 + $V{$op}*8; }
+sub ld_sp_hl{					return 0xF9; }
 
 # help decode instructions
 my @DECODE;		# bytes per instruction
@@ -82,6 +85,7 @@ my @DECODE;		# bytes per instruction
 for my $r (qw( b c d e h l (hl) a )) { 
 	$DECODE[inc_r($r)] = 1;
 	$DECODE[dec_r($r)] = 1;
+	$DECODE[ld_r_n($r)] = 2;
 }
 
 for my $op (qw( add adc sub sbc and xor or cp )) {
@@ -89,6 +93,10 @@ for my $op (qw( add adc sub sbc and xor or cp )) {
 		$DECODE[alu_r($op, $r)] = 1;
 	}
 	$DECODE[alu_n($op)] = 2;
+}
+
+for my $op (qw( rlca rrca rla rra )) {
+	$DECODE[rot_a($op)] = 1;
 }
 
 for my $d (qw( b c d e h l (hl) a )) { 
@@ -105,6 +113,8 @@ for my $d (qw( bc de hl af )) {
 	$DECODE[add_hl_d($d)] = 1;
 	$DECODE[ld_d_m($d)] = 3;
 }
+
+$DECODE[ld_sp_hl()] = 1;
 
 #------------------------------------------------------------------------------
 # build %Opcodes
@@ -142,10 +152,10 @@ for my $cpu (@CPUS) {
 	
 	# LD r, N
 	for my $r (qw( b c d e h l (hl) a )) { 
-		add_opc($cpu, "ld $r, %n", 0x06 + $V{$r}*8, '%n');
+		add_opc($cpu, "ld $r, %n", ld_r_n($r), '%n');
 	}	
-	for my $d (qw( b c d e h l m a )) {
-		add_opc($cpu, "mvi $d, %n", 0x06 + $V{$d}*8, '%n');
+	for my $r (qw( b c d e h l m a )) {
+		add_opc($cpu, "mvi $r, %n", ld_r_n($r), '%n');
 	}
 
 	# LD r, (NN) / ld (NN), r
@@ -423,12 +433,12 @@ for my $cpu (@CPUS) {
 	
 	
 	# 16-bit load group
-	add_opc($cpu, "ld sp, hl", 		0xF9);
-	add_opc($cpu, "sphl",			0xF9) if !$gameboy;
+	add_opc($cpu, "ld sp, hl", 		ld_sp_hl());
+	add_opc($cpu, "sphl",			ld_sp_hl()) if !$gameboy;
 
 	if (!$intel && !$gameboy) {
 		for my $x (qw( ix iy )) {
-			add_opc($cpu, "ld sp, $x", $V{$x}, 0xF9);
+			add_opc($cpu, "ld sp, $x", $V{$x}, ld_sp_hl());
 		}
 	}
 	
@@ -599,6 +609,26 @@ for my $cpu (@CPUS) {
 											ld_r_r('c', 'l'),
 											pop_d('hl'));				# pop hl
 	}
+
+	if ($rabbit) {
+		add_opc($cpu, "add sp, %s", 		0x27, '%s');
+		add_opc($cpu, "add.a sp, %s", 		0x27, '%s');
+	}
+	elsif ($gameboy) {
+		add_opc($cpu, "add sp, %s", 		0xE8, '%s');
+		add_opc($cpu, "add.a sp, %s", 		0xE8, '%s');
+	}
+	else {
+		add_opc($cpu, "add.a sp, %s",		push_d('hl'),				# push hl
+											ld_r_n('a'), '%s',			# ld a, %s
+											ld_r_r('l', 'a'),			# ld l, a	 											
+											rot_a('rla'),				# rla
+											alu_r('sbc', 'a'),			# sbc a, a
+											ld_r_r('h', 'a'),			# ld h, a	; sign extend										
+											add_hl_d('sp'),				# add hl, sp
+											ld_sp_hl(),					# ld sp, hl
+											pop_d('hl'));				# pop hl
+	}
 	
 	# ADC
 	for my $r (qw( bc de hl sp )) {
@@ -639,8 +669,6 @@ for my $cpu (@CPUS) {
 	}
 	
 	if ($rabbit) {
-		add_opc($cpu, "add sp, %s", 0x27, '%s');
-		
 		for ([hl => ()], [ix => 0xDD], [iy => 0xFD]) {
 			my($r, @pfx) = @$_;
 			
@@ -673,7 +701,7 @@ for my $cpu (@CPUS) {
 	
 	# 8-bit rotate and shift group
 	for my $op (qw( rlca rrca rla rra )) {
-		add_opc($cpu, $op, 0x07 + $V{$op}*8);
+		add_opc($cpu, $op, rot_a($op));
 	}
 
 	add_opc($cpu, "rlc",	0x07);

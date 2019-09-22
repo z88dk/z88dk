@@ -755,6 +755,31 @@ break;
 default: error_illegal_ident(); }
 }
 
+| label? _TK_ADD _TK_DOT _TK_A _TK_SP _TK_COMMA expr _TK_NEWLINE @{
+switch (opts.cpu) {
+case CPU_8080: case CPU_8085: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0xE5);
+DO_stmt_d(0x3E);
+DO_stmt(0x6F);
+DO_stmt(0x17);
+DO_stmt(0x9F);
+DO_stmt(0x67);
+DO_stmt(0x39);
+DO_stmt(0xF9);
+DO_stmt(0xE1);
+break;
+case CPU_R2K: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_d(0x27);
+break;
+case CPU_GBZ80: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt_d(0xE8);
+break;
+default: error_illegal_ident(); }
+}
+
 | label? _TK_ADD _TK_E _TK_NEWLINE @{
 DO_stmt(0x83);
 }
