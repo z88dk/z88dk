@@ -27,15 +27,19 @@
     cp __IO_I2C1_PORT_MSB
     ret NZ                      ;no device address match, so exit
 
+    di
     in0 a,(ITC)                 ;get INT/TRAP Control Register (ITC)
     and ~ITC_ITE1               ;mask out INT1
     out0 (ITC),a                ;disable external interrupt
+    ei
     ret
 
 .i2c_int_dis2
+    di
     in0 a,(ITC)                 ;get INT/TRAP Control Register (ITC)
     and ~ITC_ITE2               ;mask out INT2
     out0 (ITC),a                ;disable external interrupt
+    ei
     ret
 
     EXTERN asm_i2c1_need

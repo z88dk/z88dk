@@ -25,7 +25,7 @@
 ;   parameters passed in registers
 ;   HL = pointer to receive buffer, uint8_t *dp
 ;   B  = length of data sentence expected, uint8_t _i2c1SentenceLgth
-;   C  = address of slave device, uint8_t _i2c1SlaveAddr, Bit 0:[R=1,W=0]
+;   C  = 7 bit address of slave device, uint8_t _i2c1SlaveAddr
 
 .asm_i2c1_read_byte_set
     ld a,(__i2c1ControlEcho)
@@ -36,13 +36,14 @@
     ret Z                       ;return if the I2C interface is busy
 
     ld a,b
-    or a                        ;check the sentence expected for zero
+    or a                        ;check the sentence expected for zero length
     ret Z                       ;return if the sentence is 0 length
 
-    ld (__i2c1SentenceLgth),a   ;store the sentence length 
+    ld (__i2c1SentenceLgth),a   ;store the sentence length
 
-    ld a,c                      ;store the slave address
-    set 0,a                     ;ensure we're reading Bit 0:[R=1]
+    ld a,c                      ;store the 7 bit slave address
+    scf
+    rla                         ;ensure we're reading Bit 0:[R=1]
     ld (__i2c1SlaveAddr),a
 
     ld (__i2c1RxPtr),hl         ;store the buffer pointer

@@ -14,7 +14,7 @@ PUBLIC _i2c_write_byte_callee
 ;   parameters passed in registers to asm functions
 ;   HL = pointer to data to transmit, uint8_t *dp
 ;   B  = length of data sentence, uint8_t length
-;   C  = address of slave device, uint8_t addr, Bit 0:[R=1,W=0]
+;   C  = 7 bit address of slave device, uint8_t addr
 
 
 ._i2c_write_byte_callee

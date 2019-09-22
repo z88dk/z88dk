@@ -14,7 +14,7 @@ PUBLIC i2c_read_byte_set_callee
 ;   parameters passed in registers
 ;   HL = pointer to location to store data, uint8_t *dp
 ;   B  = length of data sentence expected, uint8_t length
-;   C  = address of slave device, uint8_t addr, Bit 0:[R=1,W=0]
+;   C  = 7 bit address of slave device, uint8_t addr
 
 
 .i2c_read_byte_set_callee

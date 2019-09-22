@@ -32,13 +32,17 @@
     rrca                                ;rotate right to make word offset case addresses
     rrca
     and a,$3E                           ;reset low bit to ensure word addresses, clear upper 2 bits
-    ld bc,i2c2_int_switch_table
-    ld l,a                              ;create the address for the switch
-    ld h,0
-    add hl,bc
-    ld bc,i2c2_byte_end
-    push bc                             ;prepare a return address for the switch
 
+    ld hl,i2c2_byte_end
+    push hl                             ;prepare a return address for the switch
+
+    ld hl,i2c2_int_switch_table
+    add a,l                             ;create the address for the switch
+    ld l,a
+    jr NC,i2c2_nc
+    inc h
+
+.i2c2_nc
     ld a,(hl)                           ;load the address for our switch case
     inc hl
     ld h,(hl)

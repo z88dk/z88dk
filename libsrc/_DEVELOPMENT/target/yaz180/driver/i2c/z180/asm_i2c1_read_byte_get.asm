@@ -24,14 +24,15 @@
 ;   uint8_t i2c_read_byte_get( char addr, char length );
 ;   parameters passed in registers
 ;   B  = length of data sentence expected, uint8_t _i2c1SentenceLgth
-;   C  = address of slave device, uint8_t _i2c1SlaveAddr, Bit 0:[R=1,W=0]
+;   C  = 7 bit address of slave device, uint8_t _i2c1SlaveAddr
 
 .asm_i2c1_read_byte_get
-    ld a,b                      ;check the sentence expected for zero
+    ld a,b                      ;check the sentence expected for zero length
     and a
     ret Z                       ;return if the expected sentence is 0 length
 
-    ld a,(__i2c1SlaveAddr)      ;check the slave address
+    ld a,(__i2c1SlaveAddr)      ;check the 7 bit slave address
+    rra
     cp c
     ret NZ                      ;return if the slave address is mismatched
 
