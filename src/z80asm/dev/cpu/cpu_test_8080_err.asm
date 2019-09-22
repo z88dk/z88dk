@@ -73,21 +73,12 @@
  add a, ixl                     ; Error
  add a, iyh                     ; Error
  add a, iyl                     ; Error
- add bc, -32768                 ; Error
- add bc, 32767                  ; Error
- add bc, 65535                  ; Error
  add bc, a                      ; Error
- add de, -32768                 ; Error
- add de, 32767                  ; Error
- add de, 65535                  ; Error
  add de, a                      ; Error
  add hl', bc                    ; Error
  add hl', de                    ; Error
  add hl', hl                    ; Error
  add hl', sp                    ; Error
- add hl, -32768                 ; Error
- add hl, 32767                  ; Error
- add hl, 65535                  ; Error
  add hl, a                      ; Error
  add ix, bc                     ; Error
  add ix, de                     ; Error

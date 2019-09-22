@@ -44,16 +44,28 @@
  add a, h                       ; 84
  add a, l                       ; 85
  add b                          ; 80
+ add bc, -32768                 ; E5 21 00 80 09 44 4D E1
+ add bc, 32767                  ; E5 21 FF 7F 09 44 4D E1
+ add bc, 65535                  ; E5 21 FF FF 09 44 4D E1
  add c                          ; 81
  add d                          ; 82
+ add de, -32768                 ; E5 21 00 80 19 54 5D E1
+ add de, 32767                  ; E5 21 FF 7F 19 54 5D E1
+ add de, 65535                  ; E5 21 FF FF 19 54 5D E1
  add e                          ; 83
  add h                          ; 84
+ add hl, -32768                 ; D5 11 00 80 19 D1
+ add hl, 32767                  ; D5 11 FF 7F 19 D1
+ add hl, 65535                  ; D5 11 FF FF 19 D1
  add hl, bc                     ; 09
  add hl, de                     ; 19
  add hl, hl                     ; 29
  add hl, sp                     ; 39
  add l                          ; 85
  add m                          ; 86
+ add.a bc, a                    ; 81 4F 78 CE 00 47
+ add.a de, a                    ; 83 5F 7A CE 00 57
+ add.a hl, a                    ; 85 6F 7C CE 00 67
  adi -128                       ; C6 80
  adi 127                        ; C6 7F
  adi 255                        ; C6 FF

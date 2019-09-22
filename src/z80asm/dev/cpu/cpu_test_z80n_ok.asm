@@ -115,6 +115,9 @@
  add iyl                        ; FD 85
  add l                          ; 85
  add m                          ; 86
+ add.a bc, a                    ; ED 33
+ add.a de, a                    ; ED 32
+ add.a hl, a                    ; ED 31
  adi -128                       ; C6 80
  adi 127                        ; C6 7F
  adi 255                        ; C6 FF

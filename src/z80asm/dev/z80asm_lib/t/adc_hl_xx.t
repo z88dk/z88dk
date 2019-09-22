@@ -18,8 +18,8 @@ my $test_nr;
 for my $cpu (@CPUS) {
 	for my $reg (qw( bc de hl )) {
 		for my $carry (0, 1) {
-			for my $base (0, 32767) {
-				for my $add (1, 255, 256, 32767) {
+			for my $base (0, 32768, 32769) {
+				for my $add (255, 256, 32767) {
 					$test_nr++;
 					note "Test $test_nr: cpu:$cpu reg:$reg carry:$carry base:$base add:$add";
 
