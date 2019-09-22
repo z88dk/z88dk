@@ -523,7 +523,7 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "altd ex (sp), hl", $V{altd}, 0xED, 0x54);
 	}
 	else {
-		add_opc($cpu, "ex (sp), hl", 0xCD, '@__z80asm__ex_sp_hl');
+		add_opc($cpu, "ex (sp), hl", 0xCD, '@__z80asm__exsphl');
 	}
 	
 	if (!$intel && !$gameboy) {
@@ -604,7 +604,7 @@ for my $cpu (@CPUS) {
 	for my $r (qw( bc de hl sp )) {
 		if ($intel || $gameboy) {
 			if ($r ne 'sp') {
-				add_opc($cpu, "adc hl, $r",	0xCD, '@__z80asm__adc_hl_'.$r);
+				add_opc($cpu, "adc hl, $r",	0xCD, '@__z80asm__adchl'.$r);
 			}
 		}
 		else {

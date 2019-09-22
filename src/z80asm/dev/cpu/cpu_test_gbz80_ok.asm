@@ -22,9 +22,9 @@
  adc d                          ; 8A
  adc e                          ; 8B
  adc h                          ; 8C
- adc hl, bc                     ; CD @__z80asm__adc_hl_bc
- adc hl, de                     ; CD @__z80asm__adc_hl_de
- adc hl, hl                     ; CD @__z80asm__adc_hl_hl
+ adc hl, bc                     ; CD @__z80asm__adchlbc
+ adc hl, de                     ; CD @__z80asm__adchlde
+ adc hl, hl                     ; CD @__z80asm__adchlhl
  adc l                          ; 8D
  adc m                          ; 8E
  add (hl)                       ; 86
@@ -285,7 +285,7 @@
  djnz ASMPC                     ; 05 20 FE
  djnz b, ASMPC                  ; 05 20 FE
  ei                             ; FB
- ex (sp), hl                    ; CD @__z80asm__ex_sp_hl
+ ex (sp), hl                    ; CD @__z80asm__exsphl
  ex de, hl                      ; E5 D5 E1 D1
  halt                           ; 76
  hlt                            ; 76

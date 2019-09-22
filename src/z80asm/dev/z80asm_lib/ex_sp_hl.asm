@@ -3,11 +3,11 @@
 
 IF __CPU_GBZ80__
 SECTION code_crt0_sccz80
-PUBLIC __z80asm__ex_sp_hl
+PUBLIC __z80asm__exsphl
 
 
 
-.__z80asm__ex_sp_hl
+.__z80asm__exsphl
         push    af              ;16
         push    de              ;16
         ld      d,h             ;4			DE = HL0

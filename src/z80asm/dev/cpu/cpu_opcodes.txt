@@ -2382,15 +2382,15 @@
 |CD 00 00               |           |            |            |rst 0                  |==       |               |              |              |
 |CD 08 00               |           |            |            |rst 8                  |==       |               |              |              |
 |CD 30 00               |           |            |            |rst 48                 |==       |               |              |              |
-|CD @adc_hl_bc          |adc hl, bc |==          |==          |                       |         |               |              |              |
-|CD @adc_hl_de          |adc hl, de |==          |==          |                       |         |               |              |              |
-|CD @adc_hl_hl          |adc hl, hl |==          |==          |                       |         |               |              |              |
+|CD @adchlbc            |adc hl, bc |==          |==          |                       |         |               |              |              |
+|CD @adchlde            |adc hl, de |==          |==          |                       |         |               |              |              |
+|CD @adchlhl            |adc hl, hl |==          |==          |                       |         |               |              |              |
 |CD @cpd                |cpd        |==          |            |cpd                    |==       |               |              |              |
 |CD @cpdr               |cpdr       |==          |            |cpdr                   |==       |               |              |              |
 |CD @cpi                |cpi        |==          |            |cpi                    |==       |               |              |              |
 |CD @cpir               |cpir       |==          |            |cpir                   |==       |               |              |              |
 |CD @daa                |           |            |            |daa                    |==       |               |              |              |
-|CD @ex_sp_hl           |           |            |ex (sp), hl |                       |         |               |              |              |
+|CD @exsphl             |           |            |ex (sp), hl |                       |         |               |              |              |
 |CD @ldd                |ldd        |==          |==          |                       |         |               |              |              |
 |CD @lddr               |lddr       |==          |==          |                       |         |               |              |              |
 |CD @ldi                |ldi        |==          |==          |                       |         |               |              |              |

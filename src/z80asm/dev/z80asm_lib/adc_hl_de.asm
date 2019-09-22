@@ -1,9 +1,9 @@
 ; Substitute for the z80 adc hl,de instruction
 
 SECTION code_crt0_sccz80
-PUBLIC __z80asm__adc_hl_de
+PUBLIC __z80asm__adchlde
 
-.__z80asm__adc_hl_de
+.__z80asm__adchlde
 		push 	af
 		ld 		a, l
 		adc 	a, 0
