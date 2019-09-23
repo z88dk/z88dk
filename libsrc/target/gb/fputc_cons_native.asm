@@ -9,8 +9,8 @@
 
 fputc_cons_native:
 _fputc_cons_native:
-	GLOBAL	wrtchr
-	jp	wrtchr
+	GLOBAL	_putchar
+	jp	_putchar
 
 getk:
 _getk:

@@ -423,6 +423,9 @@ stat_4:
 	POP     BC
 	RET
 
+	GLOBAL	putchar
+	GLOBAL	_putchar
+putchar:
 _putchar:			; Banked
 	PUSH	BC
 	LD      HL,sp + 4  ; Skip return address
@@ -678,12 +681,13 @@ tmode:
 	CALL	display_off
 
 	;; Remove any interrupts setup by the drawing routine
-	LD	BC,vbl
-	LD	HL,int_0x40
-	CALL	remove_int
-	LD	BC,lcd
-	LD	HL,int_0x48
-	CALL	remove_int
+
+;	LD	BC,vbl
+;	LD	HL,int_0x40
+;	CALL	remove_int
+;	LD	BC,lcd
+;	LD	HL,int_0x48
+;	CALL	remove_int
 tmode_1:
 
 	CALL	tmode_out
