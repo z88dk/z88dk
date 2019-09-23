@@ -17,6 +17,7 @@
 static void wrapper() __naked
 {
 #asm
+	GLOBAL	_feof
 feof:
 _feof:
 	inc	hl
