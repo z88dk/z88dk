@@ -90,6 +90,7 @@ commands may be typed:
 
 
 /* z88dk specific opt */
+#pragma printf = "%c %u"
 #ifdef SCCZ80
 int cntbrd(char b[64], char p) __smallc __z88dk_callee;
 void prtbrd(char b[64]) __z88dk_fastcall;
@@ -618,8 +619,8 @@ int prtscr(char b[64])
 char getmov(int *i, int *j)
 {
 	char a,c;
-	int n;
-	char *p;
+	//int n;
+	//char *p;
 	/* char skipbl(); */
 	//shift_right();
 	if (selfplay == 'G') {
@@ -659,10 +660,10 @@ char getmov(int *i, int *j)
 		}
 }
 
-char ask(char *s)
+char ask()
 {
 	char a,c;
-	printf ("%s ",s);
+	printf ("Another game? ");
 	a=skipbl();
 	while (c != '\n' && c != 4) c= getchar();
 	return a;
@@ -971,10 +972,10 @@ int main()
 		if (i=='Q') continue;
 		printf("\n");
 		i = prtscr(b);
-		if (i>0) printf(" You won by %d\n",i);
-		else if (i<0) printf(" You lost by %d\n",-i);
+		if (i>0) printf(" You won by %u\n",i);
+		else if (i<0) printf(" You lost by %u\n",-i);
 		else printf(" A draw\n");
-	} while (ask((char *)"Another game? ")=='Y');
+	} while (ask()=='Y');
 }
 
 
