@@ -54,8 +54,19 @@ ENDIF
 	jr	success
 
 get_console_size:
+IF __CPU_GBZ80__
+	ld	hl,__console_w
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,e
+	ld	e,a
+	ld	a,h
+	ld	h,d
+	ld	d,a
+ELSE
 	ld	hl,(__console_w)
 	ex	de,hl		;hl = arg
+ENDIF
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d

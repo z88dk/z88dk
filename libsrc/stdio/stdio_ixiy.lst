@@ -102,4 +102,4 @@ stdio/obj/ixiy/__printf_handle_llx
 stdio/obj/ixiy/kbhit
 stdio/obj/ixiy/fputc_cons_generic
 stdio/obj/ixiy/fputc_cons_generic_ioctl
-@stdio/conio.lst
+stdio/obj/ixiy/conio/**
