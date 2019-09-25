@@ -413,42 +413,6 @@
  bsra de,b                      ; Error
  bsrf de,b                      ; Error
  bsrl de,b                      ; Error
- c_c -32768                     ; Error
- c_c 32767                      ; Error
- c_c 65535                      ; Error
- c_m -32768                     ; Error
- c_m 32767                      ; Error
- c_m 65535                      ; Error
- c_nc -32768                    ; Error
- c_nc 32767                     ; Error
- c_nc 65535                     ; Error
- c_nv -32768                    ; Error
- c_nv 32767                     ; Error
- c_nv 65535                     ; Error
- c_nz -32768                    ; Error
- c_nz 32767                     ; Error
- c_nz 65535                     ; Error
- c_p -32768                     ; Error
- c_p 32767                      ; Error
- c_p 65535                      ; Error
- c_pe -32768                    ; Error
- c_pe 32767                     ; Error
- c_pe 65535                     ; Error
- c_po -32768                    ; Error
- c_po 32767                     ; Error
- c_po 65535                     ; Error
- c_v -32768                     ; Error
- c_v 32767                      ; Error
- c_v 65535                      ; Error
- c_z -32768                     ; Error
- c_z 32767                      ; Error
- c_z 65535                      ; Error
- cc -32768                      ; Error
- cc 32767                       ; Error
- cc 65535                       ; Error
- cm -32768                      ; Error
- cm 32767                       ; Error
- cm 65535                       ; Error
  cmp a, ixh                     ; Error
  cmp a, ixl                     ; Error
  cmp a, iyh                     ; Error
@@ -457,15 +421,6 @@
  cmp ixl                        ; Error
  cmp iyh                        ; Error
  cmp iyl                        ; Error
- cnc -32768                     ; Error
- cnc 32767                      ; Error
- cnc 65535                      ; Error
- cnv -32768                     ; Error
- cnv 32767                      ; Error
- cnv 65535                      ; Error
- cnz -32768                     ; Error
- cnz 32767                      ; Error
- cnz 65535                      ; Error
  cp a, ixh                      ; Error
  cp a, ixl                      ; Error
  cp a, iyh                      ; Error
@@ -474,18 +429,6 @@
  cp ixl                         ; Error
  cp iyh                         ; Error
  cp iyl                         ; Error
- cpe -32768                     ; Error
- cpe 32767                      ; Error
- cpe 65535                      ; Error
- cpo -32768                     ; Error
- cpo 32767                      ; Error
- cpo 65535                      ; Error
- cv -32768                      ; Error
- cv 32767                       ; Error
- cv 65535                       ; Error
- cz -32768                      ; Error
- cz 32767                       ; Error
- cz 65535                       ; Error
  dcr ixh                        ; Error
  dcr ixl                        ; Error
  dcr iyh                        ; Error

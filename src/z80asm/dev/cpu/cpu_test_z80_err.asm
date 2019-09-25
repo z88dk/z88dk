@@ -1866,6 +1866,12 @@
  bsra de,b                      ; Error
  bsrf de,b                      ; Error
  bsrl de,b                      ; Error
+ c_lo -32768                    ; Error
+ c_lo 32767                     ; Error
+ c_lo 65535                     ; Error
+ c_lz -32768                    ; Error
+ c_lz 32767                     ; Error
+ c_lz 65535                     ; Error
  call lo, -32768                ; Error
  call lo, 32767                 ; Error
  call lo, 65535                 ; Error
@@ -1874,6 +1880,12 @@
  call lz, 65535                 ; Error
  ccf f'                         ; Error
  ccf'                           ; Error
+ clo -32768                     ; Error
+ clo 32767                      ; Error
+ clo 65535                      ; Error
+ clz -32768                     ; Error
+ clz 32767                      ; Error
+ clz 65535                      ; Error
  cpl a'                         ; Error
  dec a'                         ; Error
  dec b'                         ; Error

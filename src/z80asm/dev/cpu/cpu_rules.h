@@ -11578,7 +11578,8 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_R2K: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0x3003CD);
+DO_stmt(0x3003);
+DO_stmt_nn(0xCD);
 break;
 case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -11640,7 +11641,8 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_R2K: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0x3803CD);
+DO_stmt(0x3803);
+DO_stmt_nn(0xCD);
 break;
 case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -11672,7 +11674,8 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_R2K: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0x2803CD);
+DO_stmt(0x2803);
+DO_stmt_nn(0xCD);
 break;
 case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -11761,7 +11764,8 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_R2K: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_nn(0x2003CD);
+DO_stmt(0x2003);
+DO_stmt_nn(0xCD);
 break;
 case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
@@ -11777,6 +11781,11 @@ DO_stmt_nn(0xCD);
 
 | label? _TK_CC expr _TK_NEWLINE @{
 switch (opts.cpu) {
+case CPU_R2K: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x3003);
+DO_stmt_nn(0xCD);
+break;
 case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xDC);
@@ -11810,8 +11819,48 @@ break;
 default: error_illegal_ident(); }
 }
 
+| label? _TK_CLO expr _TK_NEWLINE @{
+switch (opts.cpu) {
+case CPU_R2K: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_STMT_LABEL();
+Expr *target_expr = pop_expr(ctx);
+const char *end_label = autolabel();
+Expr *end_label_expr = parse_expr(end_label);
+add_opcode_nn(0xE2, end_label_expr);
+add_opcode_nn(0xCD, target_expr);
+asm_LABEL_offset(end_label, 6);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_CLZ expr _TK_NEWLINE @{
+switch (opts.cpu) {
+case CPU_R2K: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_STMT_LABEL();
+Expr *target_expr = pop_expr(ctx);
+const char *end_label = autolabel();
+Expr *end_label_expr = parse_expr(end_label);
+add_opcode_nn(0xEA, end_label_expr);
+add_opcode_nn(0xCD, target_expr);
+asm_LABEL_offset(end_label, 6);
+break;
+default: error_illegal_ident(); }
+}
+
 | label? _TK_CM expr _TK_NEWLINE @{
 switch (opts.cpu) {
+case CPU_R2K: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_STMT_LABEL();
+Expr *target_expr = pop_expr(ctx);
+const char *end_label = autolabel();
+Expr *end_label_expr = parse_expr(end_label);
+add_opcode_nn(0xF2, end_label_expr);
+add_opcode_nn(0xCD, target_expr);
+asm_LABEL_offset(end_label, 6);
+break;
 case CPU_8080: case CPU_8085: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xFC);
@@ -12035,6 +12084,11 @@ DO_stmt_n(0xFE);
 
 | label? _TK_CNC expr _TK_NEWLINE @{
 switch (opts.cpu) {
+case CPU_R2K: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x3803);
+DO_stmt_nn(0xCD);
+break;
 case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xD4);
@@ -12044,6 +12098,16 @@ default: error_illegal_ident(); }
 
 | label? _TK_CNV expr _TK_NEWLINE @{
 switch (opts.cpu) {
+case CPU_R2K: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_STMT_LABEL();
+Expr *target_expr = pop_expr(ctx);
+const char *end_label = autolabel();
+Expr *end_label_expr = parse_expr(end_label);
+add_opcode_nn(0xEA, end_label_expr);
+add_opcode_nn(0xCD, target_expr);
+asm_LABEL_offset(end_label, 6);
+break;
 case CPU_8080: case CPU_8085: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xE4);
@@ -12053,6 +12117,11 @@ default: error_illegal_ident(); }
 
 | label? _TK_CNZ expr _TK_NEWLINE @{
 switch (opts.cpu) {
+case CPU_R2K: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x2803);
+DO_stmt_nn(0xCD);
+break;
 case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xC4);
@@ -12288,6 +12357,16 @@ default: error_illegal_ident(); }
 
 | label? _TK_CPE expr _TK_NEWLINE @{
 switch (opts.cpu) {
+case CPU_R2K: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_STMT_LABEL();
+Expr *target_expr = pop_expr(ctx);
+const char *end_label = autolabel();
+Expr *end_label_expr = parse_expr(end_label);
+add_opcode_nn(0xE2, end_label_expr);
+add_opcode_nn(0xCD, target_expr);
+asm_LABEL_offset(end_label, 6);
+break;
 case CPU_8080: case CPU_8085: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xEC);
@@ -12343,6 +12422,16 @@ DO_stmt(0x2F);
 
 | label? _TK_CPO expr _TK_NEWLINE @{
 switch (opts.cpu) {
+case CPU_R2K: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_STMT_LABEL();
+Expr *target_expr = pop_expr(ctx);
+const char *end_label = autolabel();
+Expr *end_label_expr = parse_expr(end_label);
+add_opcode_nn(0xEA, end_label_expr);
+add_opcode_nn(0xCD, target_expr);
+asm_LABEL_offset(end_label, 6);
+break;
 case CPU_8080: case CPU_8085: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xE4);
@@ -12352,6 +12441,16 @@ default: error_illegal_ident(); }
 
 | label? _TK_CV expr _TK_NEWLINE @{
 switch (opts.cpu) {
+case CPU_R2K: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_STMT_LABEL();
+Expr *target_expr = pop_expr(ctx);
+const char *end_label = autolabel();
+Expr *end_label_expr = parse_expr(end_label);
+add_opcode_nn(0xE2, end_label_expr);
+add_opcode_nn(0xCD, target_expr);
+asm_LABEL_offset(end_label, 6);
+break;
 case CPU_8080: case CPU_8085: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xEC);
@@ -12361,6 +12460,11 @@ default: error_illegal_ident(); }
 
 | label? _TK_CZ expr _TK_NEWLINE @{
 switch (opts.cpu) {
+case CPU_R2K: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x2003);
+DO_stmt_nn(0xCD);
+break;
 case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xCC);
@@ -12370,6 +12474,11 @@ default: error_illegal_ident(); }
 
 | label? _TK_C_C expr _TK_NEWLINE @{
 switch (opts.cpu) {
+case CPU_R2K: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x3003);
+DO_stmt_nn(0xCD);
+break;
 case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xDC);
@@ -12377,8 +12486,48 @@ break;
 default: error_illegal_ident(); }
 }
 
+| label? _TK_C_LO expr _TK_NEWLINE @{
+switch (opts.cpu) {
+case CPU_R2K: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_STMT_LABEL();
+Expr *target_expr = pop_expr(ctx);
+const char *end_label = autolabel();
+Expr *end_label_expr = parse_expr(end_label);
+add_opcode_nn(0xE2, end_label_expr);
+add_opcode_nn(0xCD, target_expr);
+asm_LABEL_offset(end_label, 6);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_C_LZ expr _TK_NEWLINE @{
+switch (opts.cpu) {
+case CPU_R2K: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_STMT_LABEL();
+Expr *target_expr = pop_expr(ctx);
+const char *end_label = autolabel();
+Expr *end_label_expr = parse_expr(end_label);
+add_opcode_nn(0xEA, end_label_expr);
+add_opcode_nn(0xCD, target_expr);
+asm_LABEL_offset(end_label, 6);
+break;
+default: error_illegal_ident(); }
+}
+
 | label? _TK_C_M expr _TK_NEWLINE @{
 switch (opts.cpu) {
+case CPU_R2K: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_STMT_LABEL();
+Expr *target_expr = pop_expr(ctx);
+const char *end_label = autolabel();
+Expr *end_label_expr = parse_expr(end_label);
+add_opcode_nn(0xF2, end_label_expr);
+add_opcode_nn(0xCD, target_expr);
+asm_LABEL_offset(end_label, 6);
+break;
 case CPU_8080: case CPU_8085: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xFC);
@@ -12388,6 +12537,11 @@ default: error_illegal_ident(); }
 
 | label? _TK_C_NC expr _TK_NEWLINE @{
 switch (opts.cpu) {
+case CPU_R2K: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x3803);
+DO_stmt_nn(0xCD);
+break;
 case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xD4);
@@ -12397,6 +12551,16 @@ default: error_illegal_ident(); }
 
 | label? _TK_C_NV expr _TK_NEWLINE @{
 switch (opts.cpu) {
+case CPU_R2K: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_STMT_LABEL();
+Expr *target_expr = pop_expr(ctx);
+const char *end_label = autolabel();
+Expr *end_label_expr = parse_expr(end_label);
+add_opcode_nn(0xEA, end_label_expr);
+add_opcode_nn(0xCD, target_expr);
+asm_LABEL_offset(end_label, 6);
+break;
 case CPU_8080: case CPU_8085: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xE4);
@@ -12406,6 +12570,11 @@ default: error_illegal_ident(); }
 
 | label? _TK_C_NZ expr _TK_NEWLINE @{
 switch (opts.cpu) {
+case CPU_R2K: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x2803);
+DO_stmt_nn(0xCD);
+break;
 case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xC4);
@@ -12415,6 +12584,16 @@ default: error_illegal_ident(); }
 
 | label? _TK_C_P expr _TK_NEWLINE @{
 switch (opts.cpu) {
+case CPU_R2K: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_STMT_LABEL();
+Expr *target_expr = pop_expr(ctx);
+const char *end_label = autolabel();
+Expr *end_label_expr = parse_expr(end_label);
+add_opcode_nn(0xFA, end_label_expr);
+add_opcode_nn(0xCD, target_expr);
+asm_LABEL_offset(end_label, 6);
+break;
 case CPU_8080: case CPU_8085: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xF4);
@@ -12424,6 +12603,16 @@ default: error_illegal_ident(); }
 
 | label? _TK_C_PE expr _TK_NEWLINE @{
 switch (opts.cpu) {
+case CPU_R2K: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_STMT_LABEL();
+Expr *target_expr = pop_expr(ctx);
+const char *end_label = autolabel();
+Expr *end_label_expr = parse_expr(end_label);
+add_opcode_nn(0xE2, end_label_expr);
+add_opcode_nn(0xCD, target_expr);
+asm_LABEL_offset(end_label, 6);
+break;
 case CPU_8080: case CPU_8085: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xEC);
@@ -12433,6 +12622,16 @@ default: error_illegal_ident(); }
 
 | label? _TK_C_PO expr _TK_NEWLINE @{
 switch (opts.cpu) {
+case CPU_R2K: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_STMT_LABEL();
+Expr *target_expr = pop_expr(ctx);
+const char *end_label = autolabel();
+Expr *end_label_expr = parse_expr(end_label);
+add_opcode_nn(0xEA, end_label_expr);
+add_opcode_nn(0xCD, target_expr);
+asm_LABEL_offset(end_label, 6);
+break;
 case CPU_8080: case CPU_8085: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xE4);
@@ -12442,6 +12641,16 @@ default: error_illegal_ident(); }
 
 | label? _TK_C_V expr _TK_NEWLINE @{
 switch (opts.cpu) {
+case CPU_R2K: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_STMT_LABEL();
+Expr *target_expr = pop_expr(ctx);
+const char *end_label = autolabel();
+Expr *end_label_expr = parse_expr(end_label);
+add_opcode_nn(0xE2, end_label_expr);
+add_opcode_nn(0xCD, target_expr);
+asm_LABEL_offset(end_label, 6);
+break;
 case CPU_8080: case CPU_8085: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xEC);
@@ -12451,6 +12660,11 @@ default: error_illegal_ident(); }
 
 | label? _TK_C_Z expr _TK_NEWLINE @{
 switch (opts.cpu) {
+case CPU_R2K: case CPU_R3K: 
+if (expr_in_parens) warn_expr_in_parens();
+DO_stmt(0x2003);
+DO_stmt_nn(0xCD);
+break;
 case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xCC);
