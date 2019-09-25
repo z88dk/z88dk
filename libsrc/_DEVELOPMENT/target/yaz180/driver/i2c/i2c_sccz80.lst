@@ -1,4 +1,5 @@
 
+target/yaz180/driver/i2c/c/sccz80/i2c_stop_fastcall
 target/yaz180/driver/i2c/c/sccz80/i2c_reset_fastcall
 target/yaz180/driver/i2c/c/sccz80/i2c_initialise_fastcall
 target/yaz180/driver/i2c/c/sccz80/i2c_interrupt_disable_fastcall

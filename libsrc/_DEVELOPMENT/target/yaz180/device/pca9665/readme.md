@@ -117,6 +117,8 @@ The seven indirect registers require that the INDPTR (indirect register pointer,
     __IO_I2C_STA_SCL_STUCK               $78
     __IO_I2C_STA_SLAVE_DATA_RX_ACK       $80
     __IO_I2C_STA_SLAVE_DATA_RX_NAK       $88
+      UNUSED_0x90                        $90
+      UNUSED_0x98                        $98
     __IO_I2C_STA_SLAVE_STOP_OR_RESTART   $A0
     __IO_I2C_STA_SLAVE_AD_R              $A8
     __IO_I2C_STA_SLAVE_AL_AD_R           $B0
@@ -131,7 +133,7 @@ The seven indirect registers require that the INDPTR (indirect register pointer,
     __IO_I2C_STA_ILLEGAL_ICOUNT          $FC _ILLEGAL_ICOUNT can be $F8 case
 
     Bit Defines in CON Echo (i2c1ControlEcho, i2c2ControlEcho), for CPU control
-    Bit 2:1 in CON are reserved, and are therefore used for CPU control
+    Bit 2:1 in CON register are reserved, and are therefore used for CPU control
 
     __IO_I2C_CON_ECHO_BUS_STOP           $10 We are finished the sentence
     __IO_I2C_CON_ECHO_SI                 $08 Serial Interrupt Received

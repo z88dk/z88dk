@@ -60,7 +60,7 @@
 
 ._MASTER_START_TX
 ._MASTER_RESTART_TX
-    ld a,(__i2c2SlaveAddr)              ;get address of slave we're writing, Bit 0:[R=1,W=0]
+    ld a,(__i2c2SlaveAddr)              ;get address of slave we're reading or writing, Bit 0:[R=1,W=0]
     ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_DAT
     out (c),a
 
@@ -78,17 +78,8 @@
 ._MASTER_SLA_W_ACK                      ;SLA+W transmitted
     ld a,(__i2c2SentenceLgth)
     or a
-    jr NZ,_MASTER_SLA_W_ACK2
+    jr Z,_MASTER_SLA_W_NAK
 
-    ld a,__IO_I2C_CON_ECHO_BUS_STOPPED  ;sentence complete, we're done    
-    ld (__i2c2ControlEcho),a
-
-    ld a,__IO_I2C_CON_ENSIO|__IO_I2C_CON_STO    ;set the interface to STOP
-    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_CON   
-    out (c),a
-    ret
-
-._MASTER_SLA_W_ACK2
     ld hl,(__i2c2TxPtr)                 ;get the address to where we pop 
     ld a,(hl)
     inc hl                              ;move the Tx pointer along
@@ -106,10 +97,6 @@
 ._MASTER_DATA_W_NAK
     ld a,__IO_I2C_CON_ECHO_BUS_STOPPED  ;sentence complete, we're done    
     ld (__i2c2ControlEcho),a
-
-    ld a,__IO_I2C_CON_ENSIO|__IO_I2C_CON_STO    ;set the interface to STOP
-    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_CON
-    out (c),a
     ret
 
 ;---------------------------------------
@@ -133,7 +120,7 @@
     cp 1                                ;is there 1 byte to receive?
     jr Z,_MASTER_SLA_R_ACK2
     or a                                ;is there 0 byte to receive?
-    jr Z,_MASTER_SLA_R_ACK3 
+    jr Z,_MASTER_SLA_R_NAK 
                                         ;so there are multiple bytes to receive
     ld a,__IO_I2C_CON_AA|__IO_I2C_CON_ENSIO ;clear the interrupt & ACK                                      
     ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_CON
@@ -141,16 +128,7 @@
     ret
 
 ._MASTER_SLA_R_ACK2
-    ld a,__IO_I2C_CON_ENSIO             ;clear the interrupt & NAK
-    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_CON
-    out (c),a
-    ret
-
-._MASTER_SLA_R_ACK3
-    ld a,__IO_I2C_CON_ECHO_BUS_STOPPED  ;sentence complete, we're done    
-    ld (__i2c2ControlEcho),a
-
-    ld a,__IO_I2C_CON_ENSIO|__IO_I2C_CON_STO    ;set the interface to STOP
+    ld a,__IO_I2C_CON_ENSIO             ;clear the interrupt & generate NAK
     ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_CON
     out (c),a
     ret
@@ -158,10 +136,6 @@
 ._MASTER_SLA_R_NAK
     ld a,__IO_I2C_CON_ECHO_BUS_STOPPED  ;sentence complete, we're done    
     ld (__i2c2ControlEcho),a
-
-    ld a,__IO_I2C_CON_ENSIO|__IO_I2C_CON_STO    ;set the interface to STOP
-    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_CON   
-    out (c),a
     ret
 
 ._MASTER_ARB_LOST

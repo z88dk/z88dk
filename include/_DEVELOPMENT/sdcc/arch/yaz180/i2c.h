@@ -92,4 +92,11 @@ extern uint8_t i2c_read_byte_get_callee(uint8_t device,uint8_t addr,uint8_t leng
 
 
 
+// void i2c_stop( uint8_t device ) __z88dk_fastcall
+extern void i2c_stop(uint8_t device) __preserves_regs(d,e,h,l,iyh,iyl);
+extern void i2c_stop_fastcall(uint8_t device) __preserves_regs(d,e,h,l,iyh,iyl) __z88dk_fastcall;
+#define i2c_stop(a) i2c_stop_fastcall(a)
+
+
+
 #endif

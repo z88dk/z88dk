@@ -84,4 +84,9 @@ extern uint8_t __LIB__ i2c_read_byte_get_callee(uint8_t device,uint8_t addr,uint
 
 
 
+// void i2c_stop( uint8_t device ) __z88dk_fastcall
+extern void __LIB__ i2c_stop(uint8_t device) __smallc __z88dk_fastcall;
+
+
+
 #endif

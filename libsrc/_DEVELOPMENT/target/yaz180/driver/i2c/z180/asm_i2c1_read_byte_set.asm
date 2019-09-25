@@ -33,7 +33,7 @@
     ret NZ                      ;just exit if a fault
 
     and __IO_I2C_CON_ECHO_BUS_STOPPED
-    ret Z                       ;return if the I2C interface is busy
+    jr Z,asm_i2c1_read_byte_set ;if the bus is not stopped, then wait till it is
 
     ld a,b
     or a                        ;check the sentence expected for zero length

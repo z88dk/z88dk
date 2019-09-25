@@ -76,4 +76,9 @@ extern uint8_t i2c_read_byte_get(uint8_t device,uint8_t addr,uint8_t length);
 
 
 
+// void i2c_stop( uint8_t device ) __z88dk_fastcall
+extern void i2c_stop(uint8_t device);
+
+
+
 #endif
