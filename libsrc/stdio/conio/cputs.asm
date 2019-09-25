@@ -22,7 +22,9 @@
 	pop	hl
 	push	hl
 	push	bc
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 	push    ix
+ENDIF
 .puts0
 	ld	a,(hl)
 	and	a
@@ -36,6 +38,8 @@
 	inc	hl
 	jr	puts0
 .puts1
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 	pop	ix
+ENDIF
 	ret
 

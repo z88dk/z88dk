@@ -26,6 +26,9 @@
 	PUBLIC	add_LCD
 
 
+        defc    CONSOLE_COLUMNS = 20
+        defc    CONSOLE_ROWS = 18
+
 	defc	CRT_INITIALIZE_BSS = 0
         defc CRT_ORG_BSS =  $c000 ; Static variables are kept in RAM above max VRAM
         defc DEFINED_CRT_ORG_BSS = 1

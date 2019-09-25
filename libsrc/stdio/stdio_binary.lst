@@ -101,4 +101,4 @@ stdio/obj/binary/__printf_handle_llx
 stdio/obj/binary/kbhit
 stdio/obj/binary/fputc_cons_generic
 stdio/obj/binary/fputc_cons_generic_ioctl
-@stdio/conio.lst
+stdio/obj/binary/conio/**

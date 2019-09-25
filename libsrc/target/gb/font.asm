@@ -13,12 +13,15 @@
 	PUBLIC	tmode_out
 	PUBLIC	tmode
 	PUBLIC	del_char
-	PUBLIC	put_char
+	PUBLIC	asm_putchar
+	PUBLIC	asm_setchar
+	PUBLIC	cls
+	PUBLIC	scroll
 
-	GLOBAL	cr_curs
-	GLOBAL	adv_curs
-	GLOBAL	cury, curx
 	GLOBAL	display_off
+
+
+	GLOBAL	__console_y, __console_x
 
 	EXTERN	__mode
 	EXTERN	banked_call
@@ -318,29 +321,31 @@ font_set:
 	ret
 	
 	;; Print a character with interpretation
-put_char:
-	; See if it's a special char
-	cp	CR
-	jr	nz,put_char_1
-
-	; Now see if were checking special chars
+asm_putchar:
 	push	af
-	ld	a,(__mode)
-	and	M_NO_INTERP
-	jr	nz,put_char_2
+        ld      a,(__mode)
+        and     M_NO_INTERP
+	jr	nz,asm_putchar_2
+	pop	af
+	cp	CR
+	jr	nz,check_BS
 	call	cr_curs
-	pop	af
 	ret
-put_char_2:
+check_BS:
+	cp	8
+	jr	nz,asm_putchar_1
+	call	del_char
+	ret
+asm_putchar_2:
 	pop	af
-put_char_1:
-	CALL    set_char
+asm_putchar_1:
+	CALL    asm_setchar
 	CALL    adv_curs
 	RET
 
 	;; Print a character without interpretation
 out_char:
-	CALL	set_char
+	CALL	asm_setchar
 	CALL	adv_curs
 	RET
 
@@ -348,16 +353,16 @@ out_char:
 del_char:
 	CALL	rew_curs
 	LD	A,SPACE
-	CALL	set_char
+	CALL	asm_setchar
 	RET
 
 	;; Print the character in A
-set_char:
+asm_setchar:
 	push	af
 	ld	a,(font_current+2)
 	; Must be non-zero if the font system is setup (cant have a font in page zero)
 	or	a
-	jr	nz,set_char_3
+	jr	nz,asm_setchar_3
 
 	; Font system is not yet setup - init it and copy in the ibm font
 	; Kind of a compatibility mode
@@ -371,7 +376,7 @@ set_char:
 	call	banked_call
 	defw	_font_load_ibm_fixed
 	defw	0
-set_char_3:
+asm_setchar_3:
 	pop	af
 	push	bc
 	push	de
@@ -385,19 +390,19 @@ set_char_3:
 	ld	a,(hl+)
 	and	3
 	cp	FONT_NOENCODING
-	jr	z,set_char_no_encoding
+	jr	z,asm_setchar_no_encoding
 	inc	hl
 				; Now at the base of the encoding table
 				; E is set above
 	ld	d,0
 	add	hl,de
 	ld	e,(hl)		; That's the tile!
-set_char_no_encoding:
+asm_setchar_no_encoding:
 	ld	a,(font_current+0)
 	add	a,e
 	ld	e,a
 
-	LD      A,(cury)       ; Y coordinate
+	LD      A,(__console_y)       ; Y coordinate
 	LD      L,A
 	LD      H,0x00
 	ADD     HL,HL
@@ -405,7 +410,7 @@ set_char_no_encoding:
 	ADD     HL,HL
 	ADD     HL,HL
 	ADD     HL,HL
-	LD      A,(curx)       ; X coordinate
+	LD      A,(__console_x)       ; X coordinate
 	LD      C,A
 	LD      B,0x00
 	ADD     HL,BC
@@ -421,25 +426,6 @@ stat_4:
 	POP     HL
 	POP     DE
 	POP     BC
-	RET
-
-	GLOBAL	putchar
-	GLOBAL	_putchar
-putchar:
-_putchar:			; Banked
-	PUSH	BC
-	LD      HL,sp + 4  ; Skip return address
-	LD      A,(HL)          ; A = c
-	CALL    put_char
-	POP	BC
-	RET
-
-_setchar:			; Banked
-	PUSH	BC
-	LD      HL,sp + 4 ; Skip return address
-	LD      A,(HL)          ; A = c
-	CALL    set_char
-	POP	BC
 	RET
 
 _font_load:
@@ -514,44 +500,10 @@ cls_2:
 	POP	DE
 	RET
 
-	; Support routines
-_gotoxy:			; Banked
-	ld 	hl,sp + BANKOV
-	ld	a,(hl+)
-	ld	(curx),a
-	inc	hl
-	ld	a,(hl)
-	ld	(cury),a
-	ret
-
-_posx:
-	LD	A,(__mode)	; Banked
-	AND	T_MODE
-	JR	NZ,posx_1
-	PUSH	BC
-	CALL	tmode
-	POP	BC
-posx_1:
-	LD	A,(curx)
-	LD	E,A
-	RET
-
-_posy:				; Banked
-	LD	A,(__mode)
-	AND	T_MODE
-	JR	NZ,posy_1
-	PUSH	BC
-	CALL	tmode
-	POP	BC
-posy_1:
-	LD	A,(cury)
-	LD	E,A
-	RET
-
 	;; Rewind the cursor
 rew_curs:
 	PUSH	HL
-	LD	HL,curx	; X coordinate
+	LD	HL,__console_x	; X coordinate
 	XOR	A
 	CP	(HL)
 	jr	z,rew_curs_1
@@ -559,7 +511,7 @@ rew_curs:
 	JR	rew_curs_2
 rew_curs_1:
 	LD	(HL),MAXCURSPOSX
-	LD	HL,cury	; Y coordinate
+	LD	HL,__console_y	; Y coordinate
 	XOR	A
 	CP	(HL)
 	JR	Z,rew_curs_2
@@ -571,8 +523,8 @@ rew_curs_2:
 cr_curs:
 	PUSH	HL
 	XOR	A
-	LD	(curx),A
-	LD	HL,cury	; Y coordinate
+	LD	(__console_x),A
+	LD	HL,__console_y	; Y coordinate
 	LD	A,MAXCURSPOSY
 	CP	(HL)
 	JR	Z,cr_curs_1
@@ -586,7 +538,7 @@ cr_curs_2:
 
 adv_curs:
 	PUSH	HL
-	LD	HL,curx	; X coordinate
+	LD	HL,__console_x	; X coordinate
 	LD	A,MAXCURSPOSX
 	CP	(HL)
 	JR	Z,adv_curs_1
@@ -594,7 +546,7 @@ adv_curs:
 	JR	adv_curs_4
 adv_curs_1:
 	LD	(HL),0x00
-	LD	HL,cury	; Y coordinate
+	LD	HL,__console_y	; Y coordinate
 	LD	A,MAXCURSPOSY
 	CP	(HL)
 	JR	Z,adv_curs_2
@@ -607,8 +559,8 @@ adv_curs_2:
 	JR	Z,adv_curs_3
 	;; Nope - reset the cursor to (0,0)
 	XOR	A
-	LD	(cury),A
-	LD	(curx),A
+	LD	(__console_y),A
+	LD	(__console_x),A
 	JR	adv_curs_4
 adv_curs_3:
 	CALL	scroll
@@ -653,12 +605,6 @@ scroll_3:
 	POP	DE
 	POP	BC
 	RET
-
-	SECTION	bss_driver
-curx:				; Cursor position
-	defs	0x01
-cury:
-	defs	0x01
 
 
 	SECTION	code_driver
@@ -707,8 +653,8 @@ tmode_1:
 	;; Text mode (out only)
 tmode_out:
 	XOR	A
-	LD	(curx),A
-	LD	(cury),A
+	LD	(__console_x),A
+	LD	(__console_y),A
 
 	;; Clear screen
 	CALL	cls

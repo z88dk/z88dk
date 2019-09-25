@@ -39,9 +39,9 @@
 	defc CR	= 0x0A		; Unix
 
 	GLOBAL	tmode_out	; From 'output.s'
-	GLOBAL	put_char
+	GLOBAL	asm_putchar
 	GLOBAL	del_char
-	GLOBAL	cury
+	GLOBAL	__console_y
 
 
 
@@ -204,7 +204,7 @@ getstr_1:
 	CALL	waitpadup		; Wait for button to be depressed
 
 	LD	A,CR
-	CALL	put_char
+	CALL	asm_putchar
 	LD	(HL),0x00
 	CALL	hide_mouse
 	CALL	hide_bkg
@@ -243,7 +243,7 @@ getstr_12:
 	LD	A,(HL)
 	POP	HL
 	LD	(HL+),A		; Add it into input buffer
-	CALL	put_char	; Print it
+	CALL	asm_putchar	; Print it
 	CALL	show_bkg	; Ensure the text is not hidden
 getstr_13:
 	CALL	waitpadup		; Wait for button to be depressed
@@ -325,7 +325,7 @@ show_bkg:
 	PUSH	DE
 	LDH	A,(SCY)
 	LD	D,A
-	LD	A,(cury)
+	LD	A,(__console_y)
 	SUB	KBDWINPOSY-1
 	JR	C,show_99
 	JR	Z,show_99
