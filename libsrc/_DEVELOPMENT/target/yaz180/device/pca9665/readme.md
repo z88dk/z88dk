@@ -129,7 +129,7 @@ The seven indirect registers require that the INDPTR (indirect register pointer,
     __IO_I2C_STA_SLAVE_GC_AL             $D8
     __IO_I2C_STA_SLAVE_GC_RX_ACK         $E0
     __IO_I2C_STA_SLAVE_GC_RX_NAK         $E8
-    __IO_I2C_STA_IDLE                    $F8 _IDLE is unused, so
+    __IO_I2C_STA_IDLE                    $F8 _IDLE generates no interrupt, so
     __IO_I2C_STA_ILLEGAL_ICOUNT          $FC _ILLEGAL_ICOUNT can be $F8 case
 
     Bit Defines in CON Echo (i2c1ControlEcho, i2c2ControlEcho), for CPU control

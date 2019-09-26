@@ -70,7 +70,7 @@ define(`__IO_I2C_STA_SLAVE_GC',  0xD0)
 define(`__IO_I2C_STA_SLAVE_GC_AL',  0xD8)
 define(`__IO_I2C_STA_SLAVE_GC_RX_ACK',  0xE0)
 define(`__IO_I2C_STA_SLAVE_GC_RX_NAK',  0xE8)
-define(`__IO_I2C_STA_IDLE',  0xF8)              # __IO_I2C_STA_IDLE is unused, so
+define(`__IO_I2C_STA_IDLE',  0xF8)              # __IO_I2C_STA_IDLE generates no interrupt, so
 define(`__IO_I2C_STA_ILLEGAL_ICOUNT',  0xFC)    # __IO_I2C_STA_ILLEGAL_ICOUNT can be $F8 case
 
 # Bits in I2C_CON

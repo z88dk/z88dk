@@ -97,6 +97,10 @@
 ._MASTER_DATA_W_NAK
     ld a,__IO_I2C_CON_ECHO_BUS_STOPPED  ;sentence complete, we're done    
     ld (__i2c1ControlEcho),a
+
+    ld a,__IO_I2C_CON_ENSIO             ;clear the interrupt & continue
+    ld bc,__IO_I2C1_PORT_BASE|__IO_I2C_PORT_CON
+    out (c),a
     ret
 
 ;---------------------------------------
@@ -118,7 +122,7 @@
 ._MASTER_SLA_R_ACK                      ;SLA+R transmitted
     ld a,(__i2c1SentenceLgth)
     cp 1                                ;is there 1 byte to receive?
-    jr Z,_MASTER_SLA_R_ACK2
+    jr Z,_MASTER_SLA_R_ACK1
     or a                                ;is there 0 byte to receive?
     jr Z,_MASTER_SLA_R_NAK 
                                         ;so there are multiple bytes to receive
@@ -127,15 +131,14 @@
     out (c),a
     ret
 
-._MASTER_SLA_R_ACK2
-    ld a,__IO_I2C_CON_ENSIO             ;clear the interrupt & generate NAK
-    ld bc,__IO_I2C1_PORT_BASE|__IO_I2C_PORT_CON
-    out (c),a
-    ret
-
 ._MASTER_SLA_R_NAK
     ld a,__IO_I2C_CON_ECHO_BUS_STOPPED  ;sentence complete, we're done    
     ld (__i2c1ControlEcho),a
+
+._MASTER_SLA_R_ACK1
+    ld a,__IO_I2C_CON_ENSIO             ;clear the interrupt & generate NAK
+    ld bc,__IO_I2C1_PORT_BASE|__IO_I2C_PORT_CON
+    out (c),a
     ret
 
 ._MASTER_ARB_LOST

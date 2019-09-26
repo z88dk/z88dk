@@ -51,8 +51,8 @@
     ld a,__IO_I2C_CON_ENSIO
     ld (__i2c2ControlEcho),a    ;store enabled in the control echo
 
-    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_CON
     ld a,__IO_I2C_CON_ENSIO|__IO_I2C_CON_STA
+    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_CON
     out (c),a                   ;set the interface enable and STA bit
     ret
 
