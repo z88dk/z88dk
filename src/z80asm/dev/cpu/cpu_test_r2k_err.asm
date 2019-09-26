@@ -916,18 +916,6 @@
  ipset -1                       ; Error
  ipset 4                        ; Error
  ipset 4                        ; Error
- j_k -32768                     ; Error
- j_k 32767                      ; Error
- j_k 65535                      ; Error
- j_nk -32768                    ; Error
- j_nk 32767                     ; Error
- j_nk 65535                     ; Error
- j_nx5 -32768                   ; Error
- j_nx5 32767                    ; Error
- j_nx5 65535                    ; Error
- j_x5 -32768                    ; Error
- j_x5 32767                     ; Error
- j_x5 65535                     ; Error
  jk -32768                      ; Error
  jk 32767                       ; Error
  jk 65535                       ; Error

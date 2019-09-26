@@ -102,7 +102,7 @@ for my $cpu (@CPUS) {
 		$DECODE{$cpu}[ld_r_n($r)] = 2;
 	}
 
-	for my $op (qw( add adc sub sbc and xor or cp cmp )) {
+	for my $op (qw( add adc sub sbc and xor or cp )) {
 		for my $r (qw( b c d e h l (hl) a )) { 
 			$DECODE{$cpu}[alu_r($op, $r)] = 1;
 		}
@@ -378,7 +378,7 @@ for my $cpu (@CPUS) {
 			}
 		}
 		for my $a ('a, ', '') {
-			add_opc($cpu, "$op $a%n", alu_n($op), '%n');
+			add_opc($cpu, "$op $a%n", alu_n($op), '%n') unless $intel && $op eq 'cp';
 		}
 	}
 
@@ -960,8 +960,8 @@ for my $cpu (@CPUS) {
 	}
 	
 	# JP
-	add_opc($cpu, "jp %m", 				jp(), '%m', '%m');
 	add_opc($cpu, "jmp %m",				jp(), '%m', '%m');
+	add_opc($cpu, "jp %m",				jp(), '%m', '%m') if !$intel;
 
 	for my $_f (qw( _nz _z _nc _c _po _pe _nv _v _lz _lo _p _m )) { 
 		my $f = substr($_f, 1);			# remove leading _
@@ -971,8 +971,7 @@ for my $cpu (@CPUS) {
 		
 		# TODO: Rabbit LJP not supported
 		add_opc($cpu, "jp $f, %m", 		jp_f($_f), '%m', '%m');
-		add_opc($cpu, "j$f %m", 		jp_f($_f), '%m', '%m') unless $f eq 'p';
-		add_opc($cpu, "j_$f %m", 		jp_f($_f), '%m', '%m');
+		add_opc($cpu, "j$f %m", 		jp_f($_f), '%m', '%m') unless $f eq 'p' && !$intel;
 	}
 	
 	for ([hl => ()]) {
@@ -1005,34 +1004,24 @@ for my $cpu (@CPUS) {
 				add_opc($cpu, "call $f, %m", 
 										jr_f($_inv_f), 3,			# jump !flag
 										call(), '%m', '%m');		# call 
-
 				add_opc($cpu, "c$f %m",	jr_f($_inv_f), 3,			# jump !flag
 										call(), '%m', '%m')			# call 
-					unless $f eq 'p';
-
-				add_opc($cpu, "c_$f %m",jr_f($_inv_f), 3,			# jump !flag
-										call(), '%m', '%m');		# call 
+					unless $f eq 'p' && !$intel;
 			}
 			else {
 				add_opc($cpu, "call $f, %m", 
 										jp_f($_inv_f), '%t', '%t',	# jump !flag
 										call(), '%m', '%m');		# call 
-
-				add_opc($cpu, "c$f %m", 
-										jp_f($_inv_f), '%t', '%t',	# jump !flag
+				add_opc($cpu, "c$f %m",	jp_f($_inv_f), '%t', '%t',	# jump !flag
 										call(), '%m', '%m')			# call 
-					unless $f eq 'p';
-
-				add_opc($cpu, "c_$f %m",jp_f($_inv_f), '%t', '%t',	# jump !flag
-										call(), '%m', '%m');		# call 
+					unless $f eq 'p' && !$intel;
 			}			
 		}
 		else {
 			add_opc($cpu, "call $f, %m",call_f($_f), '%m', '%m');
-			add_opc($cpu, "c$f %m", 	call_f($_f), '%m', '%m') unless $f eq 'p';
-			add_opc($cpu, "c_$f %m",	call_f($_f), '%m', '%m');
+			add_opc($cpu, "c$f %m", 	call_f($_f), '%m', '%m') 
+				unless $f eq 'p' && !$intel;
 		}
-		
 	}
 	
 	# RST
@@ -1047,9 +1036,8 @@ for my $cpu (@CPUS) {
 		next if $f =~ /^(lz|lo)$/ && !$rabbit;
 		next if $f !~ /^(nz|z|nc|c)$/ && $gameboy;
 		
-		add_opc($cpu, "ret $f", 		ret_f($_f));
-		add_opc($cpu, "r$f",	 		ret_f($_f));
-		add_opc($cpu, "r_$f",	 		ret_f($_f));			
+		add_opc($cpu, "ret $f",			ret_f($_f));
+		add_opc($cpu, "r$f",			ret_f($_f));
 	}	
 
 	if ($rabbit) {
@@ -1234,14 +1222,10 @@ for my $cpu (@CPUS) {
 
 		# Jump on flag X5/K is set
 		add_opc($cpu, "jx5 %m",			0xFD, '%m', '%m');
-		add_opc($cpu, "j_x5 %m",		0xFD, '%m', '%m');
 		add_opc($cpu, "jk %m",			0xFD, '%m', '%m');
-		add_opc($cpu, "j_k %m",			0xFD, '%m', '%m');
 
 		add_opc($cpu, "jnx5 %m",		0xDD, '%m', '%m');
-		add_opc($cpu, "j_nx5 %m",		0xDD, '%m', '%m');
 		add_opc($cpu, "jnk %m",			0xDD, '%m', '%m');
-		add_opc($cpu, "j_nk %m",		0xDD, '%m', '%m');
 	}
 }
 
@@ -1412,9 +1396,9 @@ for my $asm (sort keys %Tests) {
 			}
 		}
 		else {
-			# special case: 'djnz ASMPC' is translated to 'djnz NN' in 8080/8085
 			my $skip = 0;
-			if ($asm =~ /jr|djnz/) {
+			# special case: 'djnz ASMPC' is translated to 'djnz NN' in 8080/8085
+			if ($asm =~ /^(jr|djnz)/) {
 				if ($cpu =~ /^80/) {
 					$skip = 1 if $asm =~ /ASMPC/;	# DIS
 				}
@@ -1422,6 +1406,11 @@ for my $asm (sort keys %Tests) {
 					$skip = 1 if $asm =~ /\d+/;		# nn
 				}
 			}
+			# special case: 'cp %m' is 'call p' in 8080; 'cp %n' is compare
+			elsif ($asm =~ /^cp \s* (a,)? \s* -? \d+ $/x) {
+				$skip = 1;
+			}
+			
 			$fh{$cpu}{''}{err}->print($asmf."; Error\n") unless $skip;
 		}
 	}

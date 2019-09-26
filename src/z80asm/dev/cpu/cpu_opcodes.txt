@@ -105,8 +105,7 @@
 |                             |rra          |            |             |                       |         |               |              |              |
 |20                           |             |rim         |             |                       |         |               |              |              |
 |20 %j                        |             |            |jr nz, %j    |==                     |==       |==             |==            |==            |
-|20 03 CD %m %m               |             |            |             |c_z %m                 |==       |               |              |              |
-|                             |             |            |             |call z, %m             |         |               |              |              |
+|20 03 CD %m %m               |             |            |             |call z, %m             |==       |               |              |              |
 |                             |             |            |             |cz %m                  |         |               |              |              |
 |21 %m %m                     |ld hl, %m    |==          |==           |==                     |==       |==             |==            |==            |
 |                             |lxi h, %m    |            |             |                       |         |               |              |              |
@@ -132,8 +131,7 @@
 |                             |             |ldhi %n     |             |                       |         |               |              |              |
 |28 %u                        |             |ld de, hl+%u|             |                       |         |               |              |              |
 |28 00                        |             |ld de, hl   |             |                       |         |               |              |              |
-|28 03 CD %m %m               |             |            |             |c_nz %m                |==       |               |              |              |
-|                             |             |            |             |call nz, %m            |         |               |              |              |
+|28 03 CD %m %m               |             |            |             |call nz, %m            |==       |               |              |              |
 |                             |             |            |             |cnz %m                 |         |               |              |              |
 |29                           |add hl, hl   |==          |==           |==                     |==       |==             |==            |==            |
 |                             |dad h        |            |             |                       |         |               |              |              |
@@ -156,8 +154,7 @@
 |                             |cpl a        |            |             |                       |         |               |              |              |
 |30                           |             |sim         |             |                       |         |               |              |              |
 |30 %j                        |             |            |jr nc, %j    |==                     |==       |==             |==            |==            |
-|30 03 CD %m %m               |             |            |             |c_c %m                 |==       |               |              |              |
-|                             |             |            |             |call c, %m             |         |               |              |              |
+|30 03 CD %m %m               |             |            |             |call c, %m             |==       |               |              |              |
 |                             |             |            |             |cc %m                  |         |               |              |              |
 |31 %m %m                     |ld sp, %m    |==          |==           |==                     |==       |==             |==            |==            |
 |                             |lxi sp, %m   |            |             |                       |         |               |              |              |
@@ -181,8 +178,7 @@
 |                             |             |ldsi %n     |             |                       |         |               |              |              |
 |38 %u                        |             |ld de, sp+%u|             |                       |         |               |              |              |
 |38 00                        |             |ld de, sp   |             |                       |         |               |              |              |
-|38 03 CD %m %m               |             |            |             |c_nc %m                |==       |               |              |              |
-|                             |             |            |             |call nc, %m            |         |               |              |              |
+|38 03 CD %m %m               |             |            |             |call nc, %m            |==       |               |              |              |
 |                             |             |            |             |cnc %m                 |         |               |              |              |
 |39                           |add hl, sp   |==          |==           |==                     |==       |==             |==            |==            |
 |                             |dad sp       |            |             |                       |         |               |              |              |
@@ -2265,20 +2261,16 @@
 |                             |cmp a, a     |            |             |                       |         |               |              |              |
 |                             |cp a         |            |             |                       |         |               |              |              |
 |                             |cp a, a      |            |             |                       |         |               |              |              |
-|C0                           |r_nz         |==          |==           |==                     |==       |==             |==            |==            |
-|                             |ret nz       |            |             |                       |         |               |              |              |
+|C0                           |ret nz       |==          |==           |==                     |==       |==             |==            |==            |
 |                             |rnz          |            |             |                       |         |               |              |              |
 |C1                           |pop b        |==          |==           |==                     |==       |==             |==            |==            |
 |                             |pop bc       |            |             |                       |         |               |              |              |
-|C2 %m %m                     |j_nz %m      |==          |j_nz %m      |==                     |==       |==             |==            |==            |
-|                             |jnz %m       |            |jnz %m       |                       |         |               |              |              |
+|C2 %m %m                     |jnz %m       |==          |jnz %m       |==                     |==       |==             |==            |==            |
 |                             |jp nz, %m    |            |jp nz, %m    |                       |         |               |              |              |
 |                             |jr nz, %m    |            |             |                       |         |               |              |              |
 |C3 %m %m                     |jmp %m       |==          |jmp %m       |==                     |==       |==             |==            |==            |
-|                             |jp %m        |            |jp %m        |                       |         |               |              |              |
-|                             |jr %m        |            |             |                       |         |               |              |              |
-|C4 %m %m                     |c_nz %m      |==          |==           |                       |         |c_nz %m        |==            |==            |
-|                             |call nz, %m  |            |             |                       |         |call nz, %m    |              |              |
+|                             |jr %m        |            |jp %m        |                       |         |               |              |              |
+|C4 %m %m                     |call nz, %m  |==          |==           |                       |         |call nz, %m    |==            |==            |
 |                             |cnz %m       |            |             |                       |         |cnz %m         |              |              |
 |C4 %u                        |             |            |             |ld hl, (sp+%u)         |==       |               |              |              |
 |C4 00                        |             |            |             |ld hl, (sp)            |==       |               |              |              |
@@ -2288,12 +2280,10 @@
 |                             |add a, %n    |            |             |                       |         |               |              |              |
 |                             |adi %n       |            |             |                       |         |               |              |              |
 |C7                           |rst 0        |==          |==           |                       |         |rst 0          |==            |==            |
-|C8                           |r_z          |==          |==           |==                     |==       |==             |==            |==            |
-|                             |ret z        |            |             |                       |         |               |              |              |
+|C8                           |ret z        |==          |==           |==                     |==       |==             |==            |==            |
 |                             |rz           |            |             |                       |         |               |              |              |
 |C9                           |ret          |==          |==           |==                     |==       |==             |==            |==            |
-|CA %m %m                     |j_z %m       |==          |j_z %m       |==                     |==       |==             |==            |==            |
-|                             |jp z, %m     |            |jp z, %m     |                       |         |               |              |              |
+|CA %m %m                     |jp z, %m     |==          |jp z, %m     |==                     |==       |==             |==            |==            |
 |                             |jr z, %m     |            |jz %m        |                       |         |               |              |              |
 |                             |jz %m        |            |             |                       |         |               |              |              |
 |CB                           |             |ovrst8      |             |                       |         |               |              |              |
@@ -2755,8 +2745,7 @@
 |CB FF                        |             |            |set 7, a     |==                     |==       |==             |==            |==            |
 |                             |             |            |set.a 7, a   |                       |         |               |              |              |
 |CC                           |             |            |             |bool hl                |==       |               |              |              |
-|CC %m %m                     |c_z %m       |==          |==           |                       |         |c_z %m         |==            |==            |
-|                             |call z, %m   |            |             |                       |         |call z, %m     |              |              |
+|CC %m %m                     |call z, %m   |==          |==           |                       |         |call z, %m     |==            |==            |
 |                             |cz %m        |            |             |                       |         |cz %m          |              |              |
 |CD %m %m                     |call %m      |==          |==           |==                     |==       |==             |==            |==            |
 |CD 00 00                     |             |            |             |rst 0                  |==       |               |              |              |
@@ -2781,13 +2770,11 @@
 |                             |adc %n       |            |             |                       |         |               |              |              |
 |                             |adc a, %n    |            |             |                       |         |               |              |              |
 |CF                           |rst 8        |==          |==           |                       |         |rst 8          |==            |==            |
-|D0                           |r_nc         |==          |==           |==                     |==       |==             |==            |==            |
-|                             |ret nc       |            |             |                       |         |               |              |              |
+|D0                           |ret nc       |==          |==           |==                     |==       |==             |==            |==            |
 |                             |rnc          |            |             |                       |         |               |              |              |
 |D1                           |pop d        |==          |==           |==                     |==       |==             |==            |==            |
 |                             |pop de       |            |             |                       |         |               |              |              |
-|D2 %m %m                     |j_nc %m      |==          |j_nc %m      |==                     |==       |==             |==            |==            |
-|                             |jnc %m       |            |jnc %m       |                       |         |               |              |              |
+|D2 %m %m                     |jnc %m       |==          |jnc %m       |==                     |==       |==             |==            |==            |
 |                             |jp nc, %m    |            |jp nc, %m    |                       |         |               |              |              |
 |                             |jr nc, %m    |            |             |                       |         |               |              |              |
 |D3 %n                        |out %n       |==          |             |                       |         |out %n         |==            |==            |
@@ -3612,8 +3599,7 @@
 |D3 FD E4 00                  |             |            |             |ioi ld hl, (iy)        |==       |               |              |              |
 |D3 FD F4 %d                  |             |            |             |ioi ld (iy+%d), hl     |==       |               |              |              |
 |D3 FD F4 00                  |             |            |             |ioi ld (iy), hl        |==       |               |              |              |
-|D4 %m %m                     |c_nc %m      |==          |==           |                       |         |c_nc %m        |==            |==            |
-|                             |call nc, %m  |            |             |                       |         |call nc, %m    |              |              |
+|D4 %m %m                     |call nc, %m  |==          |==           |                       |         |call nc, %m    |==            |==            |
 |                             |cnc %m       |            |             |                       |         |cnc %m         |              |              |
 |D4 %u                        |             |            |             |ld (sp+%u), hl         |==       |               |              |              |
 |D4 00                        |             |            |             |ld (sp), hl            |==       |               |              |              |
@@ -3624,14 +3610,12 @@
 |                             |sub a, %n    |            |             |                       |         |               |              |              |
 |                             |sui %n       |            |             |                       |         |               |              |              |
 |D7                           |rst 16       |==          |==           |==                     |==       |==             |==            |==            |
-|D8                           |r_c          |==          |==           |==                     |==       |==             |==            |==            |
-|                             |rc           |            |             |                       |         |               |              |              |
+|D8                           |rc           |==          |==           |==                     |==       |==             |==            |==            |
 |                             |ret c        |            |             |                       |         |               |              |              |
 |D9                           |             |ld (de), hl |reti         |exx                    |==       |==             |==            |==            |
 |                             |             |shlde       |             |                       |         |               |              |              |
 |                             |             |shlx        |             |                       |         |               |              |              |
-|DA %m %m                     |j_c %m       |==          |j_c %m       |==                     |==       |==             |==            |==            |
-|                             |jc %m        |            |jc %m        |                       |         |               |              |              |
+|DA %m %m                     |jc %m        |==          |jc %m        |==                     |==       |==             |==            |==            |
 |                             |jp c, %m     |            |jp c, %m     |                       |         |               |              |              |
 |                             |jr c, %m     |            |             |                       |         |               |              |              |
 |DB %n                        |in %n        |==          |             |                       |         |in %n          |==            |==            |
@@ -4458,12 +4442,9 @@
 |DB FD F4 00                  |             |            |             |ioe ld (iy), hl        |==       |               |              |              |
 |DC                           |             |            |             |and hl, de             |==       |               |              |              |
 |                             |             |            |             |and.a hl, de           |         |               |              |              |
-|DC %m %m                     |c_c %m       |==          |==           |                       |         |c_c %m         |==            |==            |
-|                             |call c, %m   |            |             |                       |         |call c, %m     |              |              |
+|DC %m %m                     |call c, %m   |==          |==           |                       |         |call c, %m     |==            |==            |
 |                             |cc %m        |            |             |                       |         |cc %m          |              |              |
-|DD %m %m                     |             |j_nk %m     |             |                       |         |               |              |              |
-|                             |             |j_nx5 %m    |             |                       |         |               |              |              |
-|                             |             |jnk %m      |             |                       |         |               |              |              |
+|DD %m %m                     |             |jnk %m      |             |                       |         |               |              |              |
 |                             |             |jnx5 %m     |             |                       |         |               |              |              |
 |DD 09                        |             |            |             |add ix, bc             |==       |==             |==            |==            |
 |DD 19                        |             |            |             |add ix, de             |==       |==             |==            |==            |
@@ -5041,13 +5022,10 @@
 |                             |sbc a, %n    |            |             |                       |         |               |              |              |
 |                             |sbi %n       |            |             |                       |         |               |              |              |
 |DF                           |rst 24       |==          |==           |==                     |==       |==             |==            |==            |
-|E0                           |r_nv         |==          |             |r_lz                   |==       |r_nv           |==            |==            |
-|                             |r_po         |            |             |r_nv                   |         |r_po           |              |              |
-|                             |ret nv       |            |             |r_po                   |         |ret nv         |              |              |
-|                             |ret po       |            |             |ret lz                 |         |ret po         |              |              |
-|                             |rnv          |            |             |ret nv                 |         |rnv            |              |              |
-|                             |rpo          |            |             |ret po                 |         |rpo            |              |              |
-|                             |             |            |             |rlz                    |         |               |              |              |
+|E0                           |ret nv       |==          |             |ret lz                 |==       |ret nv         |==            |==            |
+|                             |ret po       |            |             |ret nv                 |         |ret po         |              |              |
+|                             |rnv          |            |             |ret po                 |         |rnv            |              |              |
+|                             |rpo          |            |             |rlz                    |         |rpo            |              |              |
 |                             |             |            |             |rnv                    |         |               |              |              |
 |                             |             |            |             |rpo                    |         |               |              |              |
 |E0 %n                        |             |            |ldh (%n), a  |                       |         |               |              |              |
@@ -5055,19 +5033,13 @@
 |                             |pop hl       |            |             |                       |         |               |              |              |
 |E2                           |             |            |ld (c), a    |                       |         |               |              |              |
 |                             |             |            |ldh (c), a   |                       |         |               |              |              |
-|E2 %m %m                     |j_nv %m      |==          |             |j_lz %m                |==       |j_nv %m        |==            |==            |
-|                             |j_po %m      |            |             |j_nv %m                |         |j_po %m        |              |              |
-|                             |jnv %m       |            |             |j_po %m                |         |jnv %m         |              |              |
-|                             |jp nv, %m    |            |             |jlz %m                 |         |jp nv, %m      |              |              |
-|                             |jp po, %m    |            |             |jnv %m                 |         |jp po, %m      |              |              |
-|                             |jpo %m       |            |             |jp lz, %m              |         |jpo %m         |              |              |
-|                             |             |            |             |jp nv, %m              |         |               |              |              |
+|E2 %m %m                     |jnv %m       |==          |             |jlz %m                 |==       |jnv %m         |==            |==            |
+|                             |jp nv, %m    |            |             |jnv %m                 |         |jp nv, %m      |              |              |
+|                             |jp po, %m    |            |             |jp lz, %m              |         |jp po, %m      |              |              |
+|                             |jpo %m       |            |             |jp nv, %m              |         |jpo %m         |              |              |
 |                             |             |            |             |jp po, %m              |         |               |              |              |
 |                             |             |            |             |jpo %m                 |         |               |              |              |
-|E2 %t %t CD %m %m            |             |            |             |c_lo %m                |==       |               |              |              |
-|                             |             |            |             |c_pe %m                |         |               |              |              |
-|                             |             |            |             |c_v %m                 |         |               |              |              |
-|                             |             |            |             |call lo, %m            |         |               |              |              |
+|E2 %t %t CD %m %m            |             |            |             |call lo, %m            |==       |               |              |              |
 |                             |             |            |             |call pe, %m            |         |               |              |              |
 |                             |             |            |             |call v, %m             |         |               |              |              |
 |                             |             |            |             |clo %m                 |         |               |              |              |
@@ -5076,9 +5048,7 @@
 |E3                           |ex (sp), hl  |==          |             |ex de', hl             |==       |ex (sp), hl    |==            |==            |
 |                             |xthl         |            |             |                       |         |xthl           |              |              |
 |E4 %d                        |             |            |             |ld hl, (ix+%d)         |==       |               |              |              |
-|E4 %m %m                     |c_nv %m      |==          |             |                       |         |c_nv %m        |==            |==            |
-|                             |c_po %m      |            |             |                       |         |c_po %m        |              |              |
-|                             |call nv, %m  |            |             |                       |         |call nv, %m    |              |              |
+|E4 %m %m                     |call nv, %m  |==          |             |                       |         |call nv, %m    |==            |==            |
 |                             |call po, %m  |            |             |                       |         |call po, %m    |              |              |
 |                             |cnv %m       |            |             |                       |         |cnv %m         |              |              |
 |                             |cpo %m       |            |             |                       |         |cpo %m         |              |              |
@@ -5109,32 +5079,23 @@
 |E6 FD                        |res.a 1, a   |==          |             |                       |         |               |              |              |
 |E6 FE                        |res.a 0, a   |==          |             |                       |         |               |              |              |
 |E7                           |rst 32       |==          |==           |==                     |==       |==             |==            |==            |
-|E8                           |r_pe         |==          |             |r_lo                   |==       |r_pe           |==            |==            |
-|                             |r_v          |            |             |r_pe                   |         |r_v            |              |              |
-|                             |ret pe       |            |             |r_v                    |         |ret pe         |              |              |
-|                             |ret v        |            |             |ret lo                 |         |ret v          |              |              |
-|                             |rpe          |            |             |ret pe                 |         |rpe            |              |              |
-|                             |rv           |            |             |ret v                  |         |rv             |              |              |
-|                             |             |            |             |rlo                    |         |               |              |              |
+|E8                           |ret pe       |==          |             |ret lo                 |==       |ret pe         |==            |==            |
+|                             |ret v        |            |             |ret pe                 |         |ret v          |              |              |
+|                             |rpe          |            |             |ret v                  |         |rpe            |              |              |
+|                             |rv           |            |             |rlo                    |         |rv             |              |              |
 |                             |             |            |             |rpe                    |         |               |              |              |
 |                             |             |            |             |rv                     |         |               |              |              |
 |E8 %s                        |             |            |add sp, %s   |                       |         |               |              |              |
 |                             |             |            |add.a sp, %s |                       |         |               |              |              |
 |E9                           |jp (hl)      |==          |==           |==                     |==       |==             |==            |==            |
 |                             |pchl         |            |             |                       |         |               |              |              |
-|EA %m %m                     |j_pe %m      |==          |ld (%m), a   |j_lo %m                |==       |j_pe %m        |==            |==            |
-|                             |j_v %m       |            |sta %m       |j_pe %m                |         |j_v %m         |              |              |
-|                             |jp pe, %m    |            |             |j_v %m                 |         |jp pe, %m      |              |              |
-|                             |jp v, %m     |            |             |jlo %m                 |         |jp v, %m       |              |              |
-|                             |jpe %m       |            |             |jp lo, %m              |         |jpe %m         |              |              |
-|                             |jv %m        |            |             |jp pe, %m              |         |jv %m          |              |              |
-|                             |             |            |             |jp v, %m               |         |               |              |              |
+|EA %m %m                     |jp pe, %m    |==          |ld (%m), a   |jlo %m                 |==       |jp pe, %m      |==            |==            |
+|                             |jp v, %m     |            |sta %m       |jp lo, %m              |         |jp v, %m       |              |              |
+|                             |jpe %m       |            |             |jp pe, %m              |         |jpe %m         |              |              |
+|                             |jv %m        |            |             |jp v, %m               |         |jv %m          |              |              |
 |                             |             |            |             |jpe %m                 |         |               |              |              |
 |                             |             |            |             |jv %m                  |         |               |              |              |
-|EA %t %t CD %m %m            |             |            |             |c_lz %m                |==       |               |              |              |
-|                             |             |            |             |c_nv %m                |         |               |              |              |
-|                             |             |            |             |c_po %m                |         |               |              |              |
-|                             |             |            |             |call lz, %m            |         |               |              |              |
+|EA %t %t CD %m %m            |             |            |             |call lz, %m            |==       |               |              |              |
 |                             |             |            |             |call nv, %m            |         |               |              |              |
 |                             |             |            |             |call po, %m            |         |               |              |              |
 |                             |             |            |             |clz %m                 |         |               |              |              |
@@ -5143,9 +5104,7 @@
 |EB                           |ex de, hl    |==          |             |ex de, hl              |==       |==             |==            |==            |
 |                             |xchg         |            |             |xchg                   |         |               |              |              |
 |EC                           |             |            |             |or hl, de              |==       |               |              |              |
-|EC %m %m                     |c_pe %m      |==          |             |                       |         |c_pe %m        |==            |==            |
-|                             |c_v %m       |            |             |                       |         |c_v %m         |              |              |
-|                             |call pe, %m  |            |             |                       |         |call pe, %m    |              |              |
+|EC %m %m                     |call pe, %m  |==          |             |                       |         |call pe, %m    |==            |==            |
 |                             |call v, %m   |            |             |                       |         |call v, %m     |              |              |
 |                             |cpe %m       |            |             |                       |         |cpe %m         |              |              |
 |                             |cv %m        |            |             |                       |         |cv %m          |              |              |
@@ -5369,23 +5328,21 @@
 |                             |xor a, %n    |            |             |                       |         |               |              |              |
 |                             |xri %n       |            |             |                       |         |               |              |              |
 |EF                           |rst 40       |==          |==           |==                     |==       |==             |==            |==            |
-|F0                           |r_p          |==          |             |r_p                    |==       |==             |==            |==            |
-|                             |ret p        |            |             |ret p                  |         |               |              |              |
+|F0                           |ret p        |==          |             |ret p                  |==       |==             |==            |==            |
 |                             |rp           |            |             |rp                     |         |               |              |              |
 |F0 %n                        |             |            |ldh a, (%n)  |                       |         |               |              |              |
 |F1                           |pop af       |==          |==           |==                     |==       |==             |==            |==            |
 |                             |pop psw      |            |             |                       |         |               |              |              |
 |F2                           |             |            |ld a, (c)    |                       |         |               |              |              |
 |                             |             |            |ldh a, (c)   |                       |         |               |              |              |
-|F2 %m %m                     |j_p %m       |==          |             |j_p %m                 |==       |==             |==            |==            |
-|                             |jp p, %m     |            |             |jp p, %m               |         |               |              |              |
-|F2 %t %t CD %m %m            |             |            |             |c_m %m                 |==       |               |              |              |
-|                             |             |            |             |call m, %m             |         |               |              |              |
+|F2 %m %m                     |jp %m        |==          |             |jp p, %m               |==       |==             |==            |==            |
+|                             |jp p, %m     |            |             |                       |         |               |              |              |
+|F2 %t %t CD %m %m            |             |            |             |call m, %m             |==       |               |              |              |
 |                             |             |            |             |cm %m                  |         |               |              |              |
 |F3                           |di           |==          |==           |rl de                  |==       |di             |==            |==            |
 |F4 %d                        |             |            |             |ld (ix+%d), hl         |==       |               |              |              |
-|F4 %m %m                     |c_p %m       |==          |             |                       |         |c_p %m         |==            |==            |
-|                             |call p, %m   |            |             |                       |         |call p, %m     |              |              |
+|F4 %m %m                     |call p, %m   |==          |             |                       |         |call p, %m     |==            |==            |
+|                             |cp %m        |            |             |                       |         |               |              |              |
 |F4 00                        |             |            |             |ld (ix), hl            |==       |               |              |              |
 |F5                           |push af      |==          |==           |==                     |==       |==             |==            |==            |
 |                             |push psw     |            |             |                       |         |               |              |              |
@@ -5401,27 +5358,21 @@
 |F6 40                        |set.a 6, a   |==          |             |                       |         |               |              |              |
 |F6 80                        |set.a 7, a   |==          |             |                       |         |               |              |              |
 |F7                           |rst 48       |==          |==           |mul                    |==       |rst 48         |==            |==            |
-|F8                           |r_m          |==          |             |r_m                    |==       |==             |==            |==            |
-|                             |ret m        |            |             |ret m                  |         |               |              |              |
+|F8                           |ret m        |==          |             |ret m                  |==       |==             |==            |==            |
 |                             |rm           |            |             |rm                     |         |               |              |              |
 |F8 %s                        |             |            |ld hl, sp+%s |                       |         |               |              |              |
 |                             |             |            |ldhl sp, %s  |                       |         |               |              |              |
 |F8 00                        |             |            |ld hl, sp    |                       |         |               |              |              |
 |F9                           |ld sp, hl    |==          |ld sp, hl    |ld sp, hl              |==       |==             |==            |==            |
 |                             |sphl         |            |             |sphl                   |         |               |              |              |
-|FA %m %m                     |j_m %m       |==          |ld a, (%m)   |j_m %m                 |==       |==             |==            |==            |
-|                             |jm %m        |            |lda %m       |jm %m                  |         |               |              |              |
-|                             |jp m, %m     |            |             |jp m, %m               |         |               |              |              |
-|FA %t %t CD %m %m            |             |            |             |c_p %m                 |==       |               |              |              |
-|                             |             |            |             |call p, %m             |         |               |              |              |
+|FA %m %m                     |jm %m        |==          |ld a, (%m)   |jm %m                  |==       |==             |==            |==            |
+|                             |jp m, %m     |            |lda %m       |jp m, %m               |         |               |              |              |
+|FA %t %t CD %m %m            |             |            |             |call p, %m             |==       |               |              |              |
 |FB                           |ei           |==          |==           |rr de                  |==       |ei             |==            |==            |
 |FC                           |             |            |             |rr hl                  |==       |               |              |              |
-|FC %m %m                     |c_m %m       |==          |             |                       |         |c_m %m         |==            |==            |
-|                             |call m, %m   |            |             |                       |         |call m, %m     |              |              |
+|FC %m %m                     |call m, %m   |==          |             |                       |         |call m, %m     |==            |==            |
 |                             |cm %m        |            |             |                       |         |cm %m          |              |              |
-|FD %m %m                     |             |j_k %m      |             |                       |         |               |              |              |
-|                             |             |j_x5 %m     |             |                       |         |               |              |              |
-|                             |             |jk %m       |             |                       |         |               |              |              |
+|FD %m %m                     |             |jk %m       |             |                       |         |               |              |              |
 |                             |             |jx5 %m      |             |                       |         |               |              |              |
 |FD 09                        |             |            |             |add iy, bc             |==       |==             |==            |==            |
 |FD 19                        |             |            |             |add iy, de             |==       |==             |==            |==            |
@@ -5995,10 +5946,10 @@
 |FD F4 00                     |             |            |             |ld (iy), hl            |==       |               |              |              |
 |FD F9                        |             |            |             |ld sp, iy              |==       |==             |==            |==            |
 |FD FC                        |             |            |             |rr iy                  |==       |               |              |              |
-|FE %n                        |cmp %n       |==          |==           |==                     |==       |==             |==            |==            |
-|                             |cmp a, %n    |            |             |                       |         |               |              |              |
-|                             |cp %n        |            |             |                       |         |               |              |              |
-|                             |cp a, %n     |            |             |                       |         |               |              |              |
-|                             |cpi %n       |            |             |                       |         |               |              |              |
+|FE %n                        |cmp %n       |==          |cmp %n       |==                     |==       |==             |==            |==            |
+|                             |cmp a, %n    |            |cmp a, %n    |                       |         |               |              |              |
+|                             |cpi %n       |            |cp %n        |                       |         |               |              |              |
+|                             |             |            |cp a, %n     |                       |         |               |              |              |
+|                             |             |            |cpi %n       |                       |         |               |              |              |
 |FF                           |rst 56       |==          |==           |==                     |==       |==             |==            |==            |
 +-----------------------------+-------------+------------+-------------+-----------------------+---------+---------------+--------------+--------------+

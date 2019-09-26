@@ -435,6 +435,8 @@
  altd dec h                     ; Error
  altd dec hl                    ; Error
  altd dec l                     ; Error
+ altd djnz ASMPC                ; Error
+ altd djnz b, ASMPC             ; Error
  altd ex (sp), hl               ; Error
  altd ex de', hl                ; Error
  altd ex de, hl                 ; Error
@@ -2150,12 +2152,6 @@
  bsra de,b                      ; Error
  bsrf de,b                      ; Error
  bsrl de,b                      ; Error
- c_lo -32768                    ; Error
- c_lo 32767                     ; Error
- c_lo 65535                     ; Error
- c_lz -32768                    ; Error
- c_lz 32767                     ; Error
- c_lz 65535                     ; Error
  call lo, -32768                ; Error
  call lo, 32767                 ; Error
  call lo, 65535                 ; Error
@@ -5081,12 +5077,6 @@
  ipset 3                        ; Error
  ipset 4                        ; Error
  ipset 4                        ; Error
- j_lo -32768                    ; Error
- j_lo 32767                     ; Error
- j_lo 65535                     ; Error
- j_lz -32768                    ; Error
- j_lz 32767                     ; Error
- j_lz 65535                     ; Error
  jlo -32768                     ; Error
  jlo 32767                      ; Error
  jlo 65535                      ; Error
@@ -5856,8 +5846,6 @@
  push iy                        ; Error
  push iyh                       ; Error
  push su                        ; Error
- r_lo                           ; Error
- r_lz                           ; Error
  rdmode                         ; Error
  res -1, (hl)                   ; Error
  res -1, (hl)                   ; Error
