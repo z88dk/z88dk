@@ -15,14 +15,14 @@
 	PUBLIC	del_char
 	PUBLIC	asm_putchar
 	PUBLIC	asm_setchar
-	PUBLIC	cls
-	PUBLIC	scroll
 
 	GLOBAL	display_off
 
 
 	GLOBAL	__console_y, __console_x
 
+	EXTERN	asm_cls
+	EXTERN	asm_scroll
 	EXTERN	__mode
 	EXTERN	banked_call
 
@@ -473,33 +473,10 @@ init_1:
 	ld	a,0
 	ld	(bg_colour),a
 
-	call	cls
+	call	asm_cls
 	pop	bc
 	ret
 	
-_cls:
-cls:	
-	PUSH	DE
-	PUSH	HL
-	LD	HL,0x9800
-	LD	E,0x20		; E = height
-cls_1:
-	LD	D,0x20		; D = width
-cls_2:
-        ldh     a,(STAT)
-        bit     1,a
-        jr      nz,cls_2
-
-	LD	(HL),SPACE	; Always clear
-	INC	HL
-	DEC	D
-	JR	NZ,cls_2
-	DEC	E
-	JR	NZ,cls_1
-	POP	HL
-	POP	DE
-	RET
-
 	;; Rewind the cursor
 rew_curs:
 	PUSH	HL
@@ -531,7 +508,7 @@ cr_curs:
 	INC	(HL)
 	JR	cr_curs_2
 cr_curs_1:
-	CALL	scroll
+	CALL	asm_scroll
 cr_curs_2:
 	POP	HL
 	RET
@@ -563,47 +540,9 @@ adv_curs_2:
 	LD	(__console_x),A
 	JR	adv_curs_4
 adv_curs_3:
-	CALL	scroll
+	CALL	asm_scroll
 adv_curs_4:
 	POP	HL
-	RET
-
-	;; Scroll the whole screen
-scroll:
-	PUSH	BC
-	PUSH	DE
-	PUSH	HL
-	LD	HL,0x9800
-	LD	BC,0x9800+0x20 ; BC = next line
-	LD	E,0x20-0x01	; E = height - 1
-scroll_1:
-	LD	D,0x20		; D = width
-scroll_2:
-	LDH	A,(STAT)
-	AND	0x02
-	JR	NZ,scroll_2
-
-	LD	A,(BC)
-	LD	(HL+),A
-	INC	BC
-	DEC	D
-	JR	NZ,scroll_2
-	DEC	E
-	JR	NZ,scroll_1
-
-	LD	D,0x20
-scroll_3:
-	LDH	A,(STAT)
-	AND	0x02
-	JR	NZ,scroll_3
-
-	LD	A,SPACE
-	LD	(HL+),A
-	DEC	D
-	JR	NZ,scroll_3
-	POP	HL
-	POP	DE
-	POP	BC
 	RET
 
 
@@ -657,7 +596,7 @@ tmode_out:
 	LD	(__console_y),A
 
 	;; Clear screen
-	CALL	cls
+	CALL	asm_cls
 
 	LD	A,T_MODE
 	LD	(__mode),A

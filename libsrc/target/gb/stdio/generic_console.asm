@@ -12,8 +12,8 @@
                 PUBLIC          generic_console_set_inverse
 
 		GLOBAL		asm_setchar
-		GLOBAL		scroll
-		GLOBAL		cls
+		GLOBAL		asm_scroll
+		GLOBAL		asm_cls
 
 		INCLUDE "target/gb/def/gb_globals.def"
 
@@ -29,7 +29,7 @@ generic_console_set_paper:
 
 
 generic_console_cls:
-	jp	cls
+	jp	asm_cls
 
 
 ;Entry: c = x,
@@ -69,10 +69,5 @@ generic_console_printc:
 	jp	asm_setchar
 
 generic_console_scrollup:
-	push	de
-	push	bc
-	call	scroll
-	pop	bc
-	pop	de
-	ret
+	jp	asm_scroll
 
