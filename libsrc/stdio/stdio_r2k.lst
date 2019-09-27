@@ -12,6 +12,7 @@ stdio/obj/r2k/fchkstd
 stdio/obj/r2k/fclose
 stdio/obj/r2k/fdopen
 stdio/obj/r2k/feof
+stdio/obj/r2k/ferror
 stdio/obj/r2k/fflush
 stdio/obj/r2k/fgetc
 stdio/obj/r2k/fgetpos
