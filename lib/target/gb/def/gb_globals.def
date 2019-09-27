@@ -110,3 +110,8 @@ defc	init = 0x000
 
 defc	BANKOV = 6
 
+;; Graphic style values
+defc M_SOLID =	0x00
+defc M_OR    =	0x01
+defc M_XOR   =	0x02
+defc M_AND   =	0x03
