@@ -12,6 +12,7 @@ stdio/obj/ixiy/fchkstd
 stdio/obj/ixiy/fclose
 stdio/obj/ixiy/fdopen
 stdio/obj/ixiy/feof
+stdio/obj/ixiy/ferror
 stdio/obj/ixiy/fflush
 stdio/obj/ixiy/fgetc
 stdio/obj/ixiy/fgetpos
