@@ -1306,7 +1306,8 @@ gb_clib.lib:
 	@echo '--- Building Gameboy Library ---'
 	@echo ''
 	$(call buildgeneric,gb)
-	TARGET=test TYPE=gbz80 $(LIBLINKER) -mgbz80 -DFORgb -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/gb_clib @$(LISTFILE_DIRECTORY)/gb.lst
+	$(MAKE) -C games TARGET=gb
+	TARGET=gb TYPE=gbz80 $(LIBLINKER) -mgbz80 -DFORgb -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/gb_clib @$(LISTFILE_DIRECTORY)/gb.lst
 
 
 # Test platform - dom
