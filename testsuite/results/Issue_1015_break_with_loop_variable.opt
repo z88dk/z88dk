@@ -111,6 +111,7 @@
 	GLOBAL	fgetc
 	GLOBAL	ungetc
 	GLOBAL	feof
+	GLOBAL	ferror
 	GLOBAL	puts
 	GLOBAL	ftell
 	GLOBAL	fgetpos
