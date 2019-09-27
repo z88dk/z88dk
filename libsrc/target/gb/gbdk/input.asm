@@ -40,7 +40,7 @@
 
 	GLOBAL	tmode_out	; From 'output.s'
 	GLOBAL	asm_putchar
-	GLOBAL	del_char
+	GLOBAL	asm_del_char
 	GLOBAL	__console_y
 
 
@@ -257,7 +257,7 @@ getstr_20:
 	DEC	A		; Yes
 	LD	(string_len),A ; Update buffer length
 	DEC	HL
-	CALL	del_char
+	CALL	asm_del_char
 getstr_21:
 	CALL	waitpadup		; Wait for button to be depressed
 	JP	getstr_1

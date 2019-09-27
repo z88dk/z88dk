@@ -6,10 +6,12 @@
 
 	GLOBAL	__mode
 	GLOBAL	asm_wrtchr
+	GLOBAL	asm_adv_curs
 	GLOBAL	gmode
 
-	GLOBAL	tx
-	GLOBAL	ty
+	GLOBAL	generic_console_font32
+	GLOBAL	generic_console_udg32
+	GLOBAL	generic_console_256font
 
         INCLUDE "target/gb/def/gb_globals.def"
 	
@@ -25,35 +27,40 @@ _wrtchr:                        ; Banked
         CALL    NZ,gmode
 
         LD      HL,sp+4
-        LD      C,(HL)
-
+        LD      C,(HL)		;character
+	; We support:
+	; gb_console_256font_32:	- 256 character font
+	; generic_console_font32:	- standard 32-127 font as used elsewhere
+	; generic_consoel_udg32:	- for udgs
+	ld	hl,generic_console_256font
+	ld	a,(hl+)
+	or	(hl)
+	jr	z,try_gencon_fonts
+	ld	a,(hl-)
+	ld	l,(hl)
+	ld	h,a
+	jr	do_print
+try_gencon_fonts:
+	ld	a,c
+	cp	128
+	jr	c,not_udg
+	sub	128
+	ld	c,a
+	ld	hl,generic_console_udg32
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	jr	do_print
+not_udg:
+	ld	hl,generic_console_font32
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	dec	h		;Since font starts from character 32
+do_print:
         CALL    asm_wrtchr
-        CALL    adv_gcurs
+        CALL    asm_adv_curs
 
         POP     BC
-        RET
-
-
-        ;; Advance the cursor
-adv_gcurs:
-        PUSH    HL
-        LD      HL,tx   ; X coordinate
-        LD      A,MAXCURSPOSX
-        CP      (HL)
-        JR      Z,adv_1
-        INC     (HL)
-        JR      adv_99
-adv_1:
-        LD      (HL),0x00
-        LD      HL,ty   ; Y coordinate
-        LD      A,MAXCURSPOSY
-        CP      (HL)
-        JR      Z,adv_2
-        INC     (HL)
-        JR      adv_99
-adv_2:
-        LD      (HL),0x00
-adv_99:
-        POP     HL
         RET
 

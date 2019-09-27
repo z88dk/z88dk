@@ -12,8 +12,6 @@
 	PUBLIC	font_load
 	PUBLIC	tmode_out
 	PUBLIC	tmode
-	PUBLIC	del_char
-	PUBLIC	asm_putchar
 	PUBLIC	asm_setchar
 
 	GLOBAL	display_off
@@ -22,7 +20,7 @@
 	GLOBAL	__console_y, __console_x
 
 	EXTERN	asm_cls
-	EXTERN	asm_scroll
+	EXTERN	asm_adv_curs
 	EXTERN	__mode
 	EXTERN	banked_call
 
@@ -47,8 +45,8 @@
 
 	; Globals from drawing.s
 	; FIXME: Hmmm... check the linkage of these
-	GLOBAL	fg_colour
-	GLOBAL	bg_colour
+	GLOBAL	__fgcolour
+	GLOBAL	__bgcolour
 
 	SECTION	bss_driver
 	; The current font
@@ -115,7 +113,7 @@ fc_2:
 	; font colours
 	; Entry:
 	;	From (BC) to (HL), length (DE) where DE = #cells * 8
-	;	Uses the current fg_colour and bg_colour fiedefs
+	;	Uses the current __fgcolour and __bgcolour fiedefs
 font_copy_compressed:
 	ld	a,d
 	or	e
@@ -135,7 +133,7 @@ font_copy_compressed_loop:
 
 	ld	bc,0
 				; Do the background colour first
-	ld	a,(bg_colour)
+	ld	a,(__bgcolour)
 	bit	0,a
 	jr	z,font_copy_compressed_bg_grey1
 	ld	b,0xFF
@@ -147,7 +145,7 @@ font_copy_compressed_bg_grey2:
 	; BC contains the background colour
 	; Compute what xoring we need to do to get the correct fg colour
 	ld	d,a
-	ld	a,(fg_colour)
+	ld	a,(__fgcolour)
 	xor	d
 	ld	d,a
 
@@ -320,41 +318,13 @@ font_set:
 	ld	(font_current+2),a
 	ret
 	
-	;; Print a character with interpretation
-asm_putchar:
-	push	af
-        ld      a,(__mode)
-        and     M_NO_INTERP
-	jr	nz,asm_putchar_2
-	pop	af
-	cp	CR
-	jr	nz,check_BS
-	call	cr_curs
-	ret
-check_BS:
-	cp	8
-	jr	nz,asm_putchar_1
-	call	del_char
-	ret
-asm_putchar_2:
-	pop	af
-asm_putchar_1:
-	CALL    asm_setchar
-	CALL    adv_curs
-	RET
 
 	;; Print a character without interpretation
 out_char:
 	CALL	asm_setchar
-	CALL	adv_curs
+	CALL	asm_adv_curs
 	RET
 
-	;; Delete a character
-del_char:
-	CALL	rew_curs
-	LD	A,SPACE
-	CALL	asm_setchar
-	RET
 
 	;; Print the character in A
 asm_setchar:
@@ -456,7 +426,6 @@ _font_set:
 _font_init:
 	push	bc
 	call	tmode
-
 	ld	a,0		; We use the first tile as a space _always_
 	ld	(font_first_free_tile),a
 
@@ -469,81 +438,14 @@ init_1:
 	dec	b
 	jr	nz,init_1
 	ld	a,3
-	ld	(fg_colour),a
+	ld	(__fgcolour),a
 	ld	a,0
-	ld	(bg_colour),a
+	ld	(__bgcolour),a
 
 	call	asm_cls
 	pop	bc
 	ret
 	
-	;; Rewind the cursor
-rew_curs:
-	PUSH	HL
-	LD	HL,__console_x	; X coordinate
-	XOR	A
-	CP	(HL)
-	jr	z,rew_curs_1
-	DEC	(HL)
-	JR	rew_curs_2
-rew_curs_1:
-	LD	(HL),MAXCURSPOSX
-	LD	HL,__console_y	; Y coordinate
-	XOR	A
-	CP	(HL)
-	JR	Z,rew_curs_2
-	DEC	(HL)
-rew_curs_2:
-	POP	HL
-	RET
-
-cr_curs:
-	PUSH	HL
-	XOR	A
-	LD	(__console_x),A
-	LD	HL,__console_y	; Y coordinate
-	LD	A,MAXCURSPOSY
-	CP	(HL)
-	JR	Z,cr_curs_1
-	INC	(HL)
-	JR	cr_curs_2
-cr_curs_1:
-	CALL	asm_scroll
-cr_curs_2:
-	POP	HL
-	RET
-
-adv_curs:
-	PUSH	HL
-	LD	HL,__console_x	; X coordinate
-	LD	A,MAXCURSPOSX
-	CP	(HL)
-	JR	Z,adv_curs_1
-	INC	(HL)
-	JR	adv_curs_4
-adv_curs_1:
-	LD	(HL),0x00
-	LD	HL,__console_y	; Y coordinate
-	LD	A,MAXCURSPOSY
-	CP	(HL)
-	JR	Z,adv_curs_2
-	INC	(HL)
-	JR	adv_curs_4
-adv_curs_2:
-	;; See if scrolling is disabled
-	LD	A,(__mode)
-	AND	M_NO_SCROLL
-	JR	Z,adv_curs_3
-	;; Nope - reset the cursor to (0,0)
-	XOR	A
-	LD	(__console_y),A
-	LD	(__console_x),A
-	JR	adv_curs_4
-adv_curs_3:
-	CALL	asm_scroll
-adv_curs_4:
-	POP	HL
-	RET
 
 
 	SECTION	code_driver
@@ -584,9 +486,7 @@ tmode_1:
 	AND	@11100111	; BG Chr	= 0x8800
 				; BG Bank	= 0x9800
 	LDH	(LCDC),A
-
 	EI			; Enable interrupts
-
 	RET
 
 	;; Text mode (out only)

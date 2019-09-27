@@ -5,20 +5,18 @@
 
 	SECTION	bss_driver
 
-	GLOBAL	fg_colour
-	GLOBAL	bg_colour
-	GLOBAL	tx
-	GLOBAL	ty
+	PUBLIC	__fgcolour
+	PUBLIC	__bgcolour
+	PUBLIC	generic_console_256font
+
+	EXTERN	CRT_256FONT
+	
 
         ;; Foreground drawing colour
-fg_colour:
+__fgcolour:
         defs    1
         ;; Background drawing colour
-bg_colour:
+__bgcolour:
         defs    1
 
-
-tx:
-        defs    1
-ty:
-        defs    1
+generic_console_256font:	defw	CRT_256FONT
