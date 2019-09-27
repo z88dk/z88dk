@@ -12,6 +12,7 @@ stdio/obj/binary/fchkstd
 stdio/obj/binary/fclose
 stdio/obj/binary/fdopen
 stdio/obj/binary/feof
+stdio/obj/binary/ferror
 stdio/obj/binary/fflush
 stdio/obj/binary/fgetc
 stdio/obj/binary/fgetpos
