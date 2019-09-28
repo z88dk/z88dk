@@ -4,17 +4,8 @@ SECTION code_crt0_sccz80
 PUBLIC __z80asm__adchlde
 
 .__z80asm__adchlde
-		push 	af
-		ld 		a, l
-		adc 	a, 0
-		ld 		l, a
-		
-		ld  	a, h
-		adc 	a, 0
-		ld 		h, a
-		
-		pop 	af
-		
+		jr		nc, carry0
+		inc 	hl
+.carry0
 		add 	hl, de
-	
 		ret

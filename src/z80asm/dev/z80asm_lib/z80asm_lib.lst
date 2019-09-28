@@ -1,4 +1,5 @@
 adc_hl_hl.asm
+ldd.asm
 adc_hl_bc.asm
 ldi.asm
 rld.asm
@@ -8,11 +9,11 @@ rrd.asm
 ex_sp_hl.asm
 cpdr.asm
 add_de_a.asm
-ldd.asm
-cpir.asm
 daa.asm
+cpir.asm
 add_hl_a.asm
 lddr.asm
 cpi.asm
-add_bc_a.asm
+adc_hl_sp.asm
 adc_hl_de.asm
+add_bc_a.asm
