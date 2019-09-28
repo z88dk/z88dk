@@ -10,9 +10,6 @@
  add a, ixl                     ; Error
  add a, iyh                     ; Error
  add a, iyl                     ; Error
- add bc, a                      ; Error
- add de, a                      ; Error
- add hl, a                      ; Error
  add ixh                        ; Error
  add ixl                        ; Error
  add iyh                        ; Error

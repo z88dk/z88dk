@@ -48,13 +48,10 @@
  add a, ixl                     ; Error
  add a, iyh                     ; Error
  add a, iyl                     ; Error
- add bc, a                      ; Error
- add de, a                      ; Error
  add hl', bc                    ; Error
  add hl', de                    ; Error
  add hl', hl                    ; Error
  add hl', sp                    ; Error
- add hl, a                      ; Error
  add ixh                        ; Error
  add ixl                        ; Error
  add iyh                        ; Error

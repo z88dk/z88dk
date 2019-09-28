@@ -36,13 +36,10 @@
  add a', e                      ; Error
  add a', h                      ; Error
  add a', l                      ; Error
- add bc, a                      ; Error
- add de, a                      ; Error
  add hl', bc                    ; Error
  add hl', de                    ; Error
  add hl', hl                    ; Error
  add hl', sp                    ; Error
- add hl, a                      ; Error
  add sp, -128                   ; Error
  add sp, 127                    ; Error
  adi hl, -128                   ; Error

@@ -115,9 +115,6 @@
  add iyl                        ; FD 85
  add l                          ; 85
  add m                          ; 86
- add.a bc, a                    ; ED 33
- add.a de, a                    ; ED 32
- add.a hl, a                    ; ED 31
  add.a sp, -128                 ; E5 3E 80 6F 17 9F 67 39 F9 E1
  add.a sp, 127                  ; E5 3E 7F 6F 17 9F 67 39 F9 E1
  adi -128                       ; C6 80

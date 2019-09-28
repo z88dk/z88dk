@@ -73,13 +73,10 @@
  add a, ixl                     ; Error
  add a, iyh                     ; Error
  add a, iyl                     ; Error
- add bc, a                      ; Error
- add de, a                      ; Error
  add hl', bc                    ; Error
  add hl', de                    ; Error
  add hl', hl                    ; Error
  add hl', sp                    ; Error
- add hl, a                      ; Error
  add ix, bc                     ; Error
  add ix, de                     ; Error
  add ix, ix                     ; Error

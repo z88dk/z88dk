@@ -26,7 +26,7 @@ for my $cpu (@CPUS) {
 						ld		$reg, $base
 						ld		a, $add
 						
-						add.a 	$reg, a
+						add 	$reg, a
 						
 						push 	$reg
 						pop		hl
@@ -34,10 +34,8 @@ for my $cpu (@CPUS) {
 END
 				my $sum = $base + $add;
 				
-				# z80n does not update carry
-				if ($cpu ne 'z80n') {
-					is $r->{F_C}, $sum > 65535 ? 1 : 0, "carry";
-				}
+				# z80n does not update carry, neither does emulation
+				#is $r->{F_C}, $sum > 65535 ? 1 : 0, "carry";
 				is $r->{HL}, $sum & 65535,			"result";
 						
 				(Test::More->builder->is_passing) or die;

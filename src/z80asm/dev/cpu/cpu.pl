@@ -601,33 +601,13 @@ for my $cpu (@CPUS) {
 
 	if ($z80n) {
 		add_opc($cpu, "add hl, a",			0xED, 0x31);
-		add_opc($cpu, "add.a hl, a",		0xED, 0x31);
-		
 		add_opc($cpu, "add de, a",			0xED, 0x32);
-		add_opc($cpu, "add.a de, a",		0xED, 0x32);
-		
 		add_opc($cpu, "add bc, a",			0xED, 0x33);
-		add_opc($cpu, "add.a bc, a",		0xED, 0x33);
-		
 	}
 	else {
-		add_opc($cpu, "add.a hl, a",		alu_r('add', 'l'),		# add a,l
-											ld_r_r('l', 'a'),		# ld l,a
-											ld_r_r('a', 'h'),		# ld a,h
-											alu_n('adc'), 0,		# adc a, 0
-											ld_r_r('h', 'a'));		# ld h,a
-
-		add_opc($cpu, "add.a de, a",		alu_r('add', 'e'),		# add a,e
-											ld_r_r('e', 'a'),		# ld e,a
-											ld_r_r('a', 'd'),		# ld a,d
-											alu_n('adc'), 0,		# adc a, 0
-											ld_r_r('d', 'a'));		# ld h,a
-
-		add_opc($cpu, "add.a bc, a",		alu_r('add', 'c'),		# add a,c
-											ld_r_r('c', 'a'),		# ld c,a
-											ld_r_r('a', 'b'),		# ld a,b
-											alu_n('adc'), 0,		# adc a, 0
-											ld_r_r('b', 'a'));		# ld b,a
+		add_opc($cpu, "add hl, a",			call(), '@__z80asm__addhla', '');
+		add_opc($cpu, "add de, a",			call(), '@__z80asm__adddea', '');
+		add_opc($cpu, "add bc, a",			call(), '@__z80asm__addbca', '');
 	}
 	
 	if ($z80n) {

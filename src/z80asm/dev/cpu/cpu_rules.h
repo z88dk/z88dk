@@ -652,6 +652,10 @@ DO_stmt(0x80);
 
 | label? _TK_ADD _TK_BC _TK_COMMA _TK_A _TK_NEWLINE @{
 switch (opts.cpu) {
+case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: 
+DO_STMT_LABEL();
+add_call_emul_func("__z80asm__addbca");
+break;
 case CPU_Z80N: 
 DO_stmt(0xED33);
 break;
@@ -686,6 +690,10 @@ DO_stmt(0x82);
 
 | label? _TK_ADD _TK_DE _TK_COMMA _TK_A _TK_NEWLINE @{
 switch (opts.cpu) {
+case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: 
+DO_STMT_LABEL();
+add_call_emul_func("__z80asm__adddea");
+break;
 case CPU_Z80N: 
 DO_stmt(0xED32);
 break;
@@ -706,51 +714,6 @@ break;
 case CPU_Z80N: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xED35);
-break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_ADD _TK_DOT _TK_A _TK_BC _TK_COMMA _TK_A _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: 
-DO_stmt(0x81);
-DO_stmt(0x4F);
-DO_stmt(0x78);
-DO_stmt(0xCE00);
-DO_stmt(0x47);
-break;
-case CPU_Z80N: 
-DO_stmt(0xED33);
-break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_ADD _TK_DOT _TK_A _TK_DE _TK_COMMA _TK_A _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: 
-DO_stmt(0x83);
-DO_stmt(0x5F);
-DO_stmt(0x7A);
-DO_stmt(0xCE00);
-DO_stmt(0x57);
-break;
-case CPU_Z80N: 
-DO_stmt(0xED32);
-break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_ADD _TK_DOT _TK_A _TK_HL _TK_COMMA _TK_A _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: 
-DO_stmt(0x85);
-DO_stmt(0x6F);
-DO_stmt(0x7C);
-DO_stmt(0xCE00);
-DO_stmt(0x67);
-break;
-case CPU_Z80N: 
-DO_stmt(0xED31);
 break;
 default: error_illegal_ident(); }
 }
@@ -790,6 +753,10 @@ DO_stmt(0x84);
 
 | label? _TK_ADD _TK_HL _TK_COMMA _TK_A _TK_NEWLINE @{
 switch (opts.cpu) {
+case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: 
+DO_STMT_LABEL();
+add_call_emul_func("__z80asm__addhla");
+break;
 case CPU_Z80N: 
 DO_stmt(0xED31);
 break;
