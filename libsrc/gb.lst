@@ -1,5 +1,6 @@
-target/gb/fgets_cons
+target/gb/**/*.asm
 @stdio/stdio_gbz80.lst
 @time/time.lst
+@games/games.lst
+@font/font_8x8/font_8x8.lst
 @gbz80.lst
-target/gb/*.asm

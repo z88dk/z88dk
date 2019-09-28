@@ -4,18 +4,21 @@
 	PUBLIC	asm_wrtchr
 
 	GLOBAL	y_table
-	GLOBAL	tx
-	GLOBAL	ty
-	GLOBAL	fg_colour
-	GLOBAL	bg_colour
+	GLOBAL	__console_x
+	GLOBAL	__console_y
+	GLOBAL	__fgcolour
+	GLOBAL	__bgcolour
 
         INCLUDE "target/gb/def/gb_globals.def"
 
         ;; Write character C
+; Entry: C = character
+;       hl = font start
 asm_wrtchr:
+	push	hl		;save font
         LD      HL,y_table
         LD      D,0x00
-        LD      A,(ty)
+        LD      A,(__console_y)
         RLCA
         RLCA
         RLCA
@@ -27,7 +30,7 @@ asm_wrtchr:
         LD      H,(HL)
         LD      L,B
 
-        LD      A,(tx)
+        LD      A,(__console_x)
         RLCA
         RLCA
         RLCA
@@ -44,15 +47,7 @@ asm_wrtchr:
         ADD     HL,HL
         ADD     HL,HL
         ADD     HL,HL
-
-        if      0
-        LD      DE,tp1
-        else
-        GLOBAL  _font_ibm_fixed_tiles
-
-        LD      DE,_font_ibm_fixed_tiles
-        endif
-
+	pop	de		;font back
         ADD     HL,DE
 
         LD      D,H
@@ -64,7 +59,7 @@ asm_wrtchr:
         LD      A,(mod_col)
         LD      C,A
         else
-        LD      A,(fg_colour)
+        LD      A,(__fgcolour)
         LD      C,A
         endif
 chrloop:
@@ -74,7 +69,7 @@ chrloop:
 
         if      1
         PUSH    HL
-        LD      HL,bg_colour
+        LD      HL,__bgcolour
         LD      L,(HL)
         endif
 

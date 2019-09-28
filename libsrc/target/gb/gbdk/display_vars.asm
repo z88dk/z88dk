@@ -5,20 +5,13 @@
 
 	SECTION	bss_driver
 
-	GLOBAL	fg_colour
-	GLOBAL	bg_colour
-	GLOBAL	tx
-	GLOBAL	ty
+	PUBLIC	__fgcolour
+	PUBLIC	__bgcolour
+
 
         ;; Foreground drawing colour
-fg_colour:
+__fgcolour:
         defs    1
         ;; Background drawing colour
-bg_colour:
-        defs    1
-
-
-tx:
-        defs    1
-ty:
+__bgcolour:
         defs    1

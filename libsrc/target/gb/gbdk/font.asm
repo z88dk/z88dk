@@ -12,29 +12,22 @@
 	PUBLIC	font_load
 	PUBLIC	tmode_out
 	PUBLIC	tmode
-	PUBLIC	del_char
-	PUBLIC	asm_putchar
 	PUBLIC	asm_setchar
-	PUBLIC	cls
-	PUBLIC	scroll
 
 	GLOBAL	display_off
 
 
 	GLOBAL	__console_y, __console_x
 
+	EXTERN	asm_cls
+	EXTERN	asm_adv_curs
 	EXTERN	__mode
-	EXTERN	banked_call
+	EXTERN	generic_console_font32
 
 	; Structure offsets
 	defc sfont_handle_sizeof	=	3
 	defc sfont_handle_font	=	1
 	defc sfont_handle_first_tile	=	0
-
-	; Encoding types - lower 2 bits of font
-	defc FONT_256ENCODING	=	0
-	defc FONT_128ENCODING	=	1
-	defc FONT_NOENCODING		=	2
 
 	; Other bits
 	defc FONT_BCOMPRESSED	=	2
@@ -47,13 +40,16 @@
 
 	; Globals from drawing.s
 	; FIXME: Hmmm... check the linkage of these
-	GLOBAL	fg_colour
-	GLOBAL	bg_colour
+	GLOBAL	__fgcolour
+	GLOBAL	__bgcolour
 
 	SECTION	bss_driver
 	; The current font
 font_current:
 	defs	sfont_handle_sizeof
+	; +0 =
+	; +1 = font address low
+	; +2 = font address high
 	; Cached copy of the first free tile
 font_first_free_tile:
 	defs	1
@@ -115,7 +111,7 @@ fc_2:
 	; font colours
 	; Entry:
 	;	From (BC) to (HL), length (DE) where DE = #cells * 8
-	;	Uses the current fg_colour and bg_colour fiedefs
+	;	Uses the current __fgcolour and __bgcolour fiedefs
 font_copy_compressed:
 	ld	a,d
 	or	e
@@ -135,7 +131,7 @@ font_copy_compressed_loop:
 
 	ld	bc,0
 				; Do the background colour first
-	ld	a,(bg_colour)
+	ld	a,(__bgcolour)
 	bit	0,a
 	jr	z,font_copy_compressed_bg_grey1
 	ld	b,0xFF
@@ -147,7 +143,7 @@ font_copy_compressed_bg_grey2:
 	; BC contains the background colour
 	; Compute what xoring we need to do to get the correct fg colour
 	ld	d,a
-	ld	a,(fg_colour)
+	ld	a,(__fgcolour)
 	xor	d
 	ld	d,a
 
@@ -199,7 +195,6 @@ font_load_find_slot:
 	ld	a,(hl)		; Check to see if this entry is free
 	inc	hl		; Free is 0000 for the font pointer
 	or	(hl)
-	cp	0
 	jr	z,font_load_found
 
 	inc	hl
@@ -258,7 +253,7 @@ font_copy_current:
 	ld	hl,font_current+sfont_handle_font
 	ld	a,(hl+)
 	ld	h,(hl)
-	ld	l,a
+	ld	l,a		;hl = font address
 
 	inc	hl		; Points to the 'tiles required' entry
 	ld	e,(hl)
@@ -320,43 +315,16 @@ font_set:
 	ld	(font_current+2),a
 	ret
 	
-	;; Print a character with interpretation
-asm_putchar:
-	push	af
-        ld      a,(__mode)
-        and     M_NO_INTERP
-	jr	nz,asm_putchar_2
-	pop	af
-	cp	CR
-	jr	nz,check_BS
-	call	cr_curs
-	ret
-check_BS:
-	cp	8
-	jr	nz,asm_putchar_1
-	call	del_char
-	ret
-asm_putchar_2:
-	pop	af
-asm_putchar_1:
-	CALL    asm_setchar
-	CALL    adv_curs
-	RET
 
 	;; Print a character without interpretation
 out_char:
 	CALL	asm_setchar
-	CALL	adv_curs
+	CALL	asm_adv_curs
 	RET
 
-	;; Delete a character
-del_char:
-	CALL	rew_curs
-	LD	A,SPACE
-	CALL	asm_setchar
-	RET
 
 	;; Print the character in A
+	; C =x, B=y
 asm_setchar:
 	push	af
 	ld	a,(font_current+2)
@@ -364,7 +332,8 @@ asm_setchar:
 	or	a
 	jr	nz,asm_setchar_3
 
-	; Font system is not yet setup - init it and copy in the ibm font
+	push	bc
+	; Font system is not yet setup - init it and copy in the default font
 	; Kind of a compatibility mode
 	call	_font_init
 	
@@ -372,22 +341,24 @@ asm_setchar:
 	xor	a
 	ld	(font_first_free_tile),a
 
-	GLOBAL	_font_load_ibm_fixed
-	call	banked_call
-	defw	_font_load_ibm_fixed
-	defw	0
+	ld	hl,generic_console_font32
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	call	font_load
+	pop	bc
 asm_setchar_3:
 	pop	af
-	push	bc
 	push	de
 	push	hl
+	push	bc		;Save coordinates
 				; Compute which tile maps to this character
 	ld	e,a
 	ld	hl,font_current+sfont_handle_font
 	ld	a,(hl+)
 	ld	h,(hl)
-	ld	l,a
-	ld	a,(hl+)
+	ld	l,a		;hl = address of font
+	ld	a,(hl+)		;font encoding
 	and	3
 	cp	FONT_NOENCODING
 	jr	z,asm_setchar_no_encoding
@@ -398,21 +369,21 @@ asm_setchar_3:
 	add	hl,de
 	ld	e,(hl)		; That's the tile!
 asm_setchar_no_encoding:
-	ld	a,(font_current+0)
+	ld	a,(font_current+0)	;first tile
 	add	a,e
-	ld	e,a
+	ld	e,a			;e = tile to use
 
-	LD      A,(__console_y)       ; Y coordinate
-	LD      L,A
+	pop	bc			;c = x, b = y
+	push	bc
+
+	LD      L,B
 	LD      H,0x00
 	ADD     HL,HL
 	ADD     HL,HL
 	ADD     HL,HL
 	ADD     HL,HL
 	ADD     HL,HL
-	LD      A,(__console_x)       ; X coordinate
-	LD      C,A
-	LD      B,0x00
+	LD      B,0x00			;Add on x coordinate now
 	ADD     HL,BC
 	LD      BC,0x9800
 	ADD     HL,BC
@@ -423,11 +394,12 @@ stat_4:
         jr      nz,stat_4
 
 	LD      (HL),E
+	POP     BC
 	POP     HL
 	POP     DE
-	POP     BC
 	RET
 
+; font_t __LIB__	font_load( void *font ) NONBANKED;
 _font_load:
 	push	bc
 	ld	hl,sp+4
@@ -435,11 +407,12 @@ _font_load:
 	ld	h,(hl)
 	ld	l,a
 	call    font_load
-	push	hl
-	pop	de		; Return in DE + HL
+	ld	d,h		;Return in de AND hl
+	ld	e,l
 	pop	bc
 	RET
 
+; font_t __LIB__	font_set( font_t font_handle ) NONBANKED;
 _font_set:
 	push	bc
 	ld	hl,sp+4
@@ -456,155 +429,23 @@ _font_set:
 _font_init:
 	push	bc
 	call	tmode
-
-	ld	a,0		; We use the first tile as a space _always_
+	xor	a		; We use the first tile as a space _always_
 	ld	(font_first_free_tile),a
 
 	; Clear the font table
-	xor	a
 	ld	hl,font_table
 	ld	b,sfont_handle_sizeof*MAX_FONTS
 init_1:
 	ld	(hl+),a
 	dec	b
 	jr	nz,init_1
+	ld	(__bgcolour),a	;a = 0
 	ld	a,3
-	ld	(fg_colour),a
-	ld	a,0
-	ld	(bg_colour),a
-
-	call	cls
+	ld	(__fgcolour),a
+	call	asm_cls
 	pop	bc
 	ret
 	
-_cls:
-cls:	
-	PUSH	DE
-	PUSH	HL
-	LD	HL,0x9800
-	LD	E,0x20		; E = height
-cls_1:
-	LD	D,0x20		; D = width
-cls_2:
-        ldh     a,(STAT)
-        bit     1,a
-        jr      nz,cls_2
-
-	LD	(HL),SPACE	; Always clear
-	INC	HL
-	DEC	D
-	JR	NZ,cls_2
-	DEC	E
-	JR	NZ,cls_1
-	POP	HL
-	POP	DE
-	RET
-
-	;; Rewind the cursor
-rew_curs:
-	PUSH	HL
-	LD	HL,__console_x	; X coordinate
-	XOR	A
-	CP	(HL)
-	jr	z,rew_curs_1
-	DEC	(HL)
-	JR	rew_curs_2
-rew_curs_1:
-	LD	(HL),MAXCURSPOSX
-	LD	HL,__console_y	; Y coordinate
-	XOR	A
-	CP	(HL)
-	JR	Z,rew_curs_2
-	DEC	(HL)
-rew_curs_2:
-	POP	HL
-	RET
-
-cr_curs:
-	PUSH	HL
-	XOR	A
-	LD	(__console_x),A
-	LD	HL,__console_y	; Y coordinate
-	LD	A,MAXCURSPOSY
-	CP	(HL)
-	JR	Z,cr_curs_1
-	INC	(HL)
-	JR	cr_curs_2
-cr_curs_1:
-	CALL	scroll
-cr_curs_2:
-	POP	HL
-	RET
-
-adv_curs:
-	PUSH	HL
-	LD	HL,__console_x	; X coordinate
-	LD	A,MAXCURSPOSX
-	CP	(HL)
-	JR	Z,adv_curs_1
-	INC	(HL)
-	JR	adv_curs_4
-adv_curs_1:
-	LD	(HL),0x00
-	LD	HL,__console_y	; Y coordinate
-	LD	A,MAXCURSPOSY
-	CP	(HL)
-	JR	Z,adv_curs_2
-	INC	(HL)
-	JR	adv_curs_4
-adv_curs_2:
-	;; See if scrolling is disabled
-	LD	A,(__mode)
-	AND	M_NO_SCROLL
-	JR	Z,adv_curs_3
-	;; Nope - reset the cursor to (0,0)
-	XOR	A
-	LD	(__console_y),A
-	LD	(__console_x),A
-	JR	adv_curs_4
-adv_curs_3:
-	CALL	scroll
-adv_curs_4:
-	POP	HL
-	RET
-
-	;; Scroll the whole screen
-scroll:
-	PUSH	BC
-	PUSH	DE
-	PUSH	HL
-	LD	HL,0x9800
-	LD	BC,0x9800+0x20 ; BC = next line
-	LD	E,0x20-0x01	; E = height - 1
-scroll_1:
-	LD	D,0x20		; D = width
-scroll_2:
-	LDH	A,(STAT)
-	AND	0x02
-	JR	NZ,scroll_2
-
-	LD	A,(BC)
-	LD	(HL+),A
-	INC	BC
-	DEC	D
-	JR	NZ,scroll_2
-	DEC	E
-	JR	NZ,scroll_1
-
-	LD	D,0x20
-scroll_3:
-	LDH	A,(STAT)
-	AND	0x02
-	JR	NZ,scroll_3
-
-	LD	A,SPACE
-	LD	(HL+),A
-	DEC	D
-	JR	NZ,scroll_3
-	POP	HL
-	POP	DE
-	POP	BC
-	RET
 
 
 	SECTION	code_driver
@@ -645,9 +486,7 @@ tmode_1:
 	AND	@11100111	; BG Chr	= 0x8800
 				; BG Bank	= 0x9800
 	LDH	(LCDC),A
-
 	EI			; Enable interrupts
-
 	RET
 
 	;; Text mode (out only)
@@ -657,9 +496,19 @@ tmode_out:
 	LD	(__console_y),A
 
 	;; Clear screen
-	CALL	cls
+	CALL	asm_cls
 
 	LD	A,T_MODE
 	LD	(__mode),A
 
 	RET
+
+
+
+
+load_z88dk_font:
+	xor	a
+	ld	(font_first_free_tile),a
+
+	; font_current = 0
+	; font_current 
