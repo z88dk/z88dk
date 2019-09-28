@@ -33,7 +33,7 @@
 
     ld a,(__i2c1SlaveAddr)      ;check the 7 bit slave address
     rra
-    cp c
+    xor c
     ret NZ                      ;return if the slave address is mismatched
 
 .i2c1_read_byte_wait            ;busy wait loop

@@ -40,25 +40,16 @@ __DPROTO(`d,e,h,l,iyh,iyl',`d,e,h,l,iyh,iyl',void,,i2c_reset,uint8_t device)
 // void i2c_initialise( uint8_t device ) __z88dk_fastcall
 __DPROTO(`d,e,h,l,iyh,iyl',`d,e,h,l,iyh,iyl',void,,i2c_initialise,uint8_t device)
 
-// void i2c_interrupt_enable( uint8_t device ) __z88dk_fastcall
-__DPROTO(`b,c,d,e,h,l,iyh,iyl',`b,c,d,e,h,l,iyh,iyl',void,,i2c_interrupt_enable,uint8_t device)
-
-// void i2c_interrupt_disable( uint8_t device ) __z88dk_fastcall
-__DPROTO(`b,c,d,e,h,l,iyh,iyl',`b,c,d,e,h,l,iyh,iyl',void,,i2c_interrupt_disable,uint8_t device)
-
 // void i2c_interrupt_attach( uint8_t device, void *isr ) __z88dk_callee
-__DPROTO(`b,c,d,e,iyh,iyl',`b,c,d,e,iyh,iyl',void,,i2c_interrupt_attach,uint8_t device,void *isr)
+__DPROTO(`b,c,d,e,iyh,iyl',`d,e,iyh,iyl',void,,i2c_interrupt_attach,uint8_t device,void *isr)
 
-// void i2c_write_byte( uint8_t device, uint8_t addr, uint8_t *dp, uint8_t length );
-__DPROTO(`iyh,iyl',`iyh,iyl',void,,i2c_write_byte,uint8_t device,uint8_t addr,uint8_t *dp,uint8_t length)
+// void i2c_write_byte( uint8_t device, uint8_t addr, uint8_t *dp, uint8_t length, uint8_t stop );
+__DPROTO(`iyh,iyl',`iyh,iyl',void,,i2c_write_byte,uint8_t device,uint8_t addr,uint8_t *dp,uint8_t length,uint8_t stop)
 
-// void i2c_read_byte_set( uint8_t device, uint8_t addr, uint8_t *dp, uint8_t length );
-__DPROTO(`iyh,iyl',`iyh,iyl',void,,i2c_read_byte_set,uint8_t device,uint8_t addr,uint8_t *dp,uint8_t length)
+// void i2c_read_byte_set( uint8_t device, uint8_t addr, uint8_t *dp, uint8_t length, uint8_t stop );
+__DPROTO(`iyh,iyl',`iyh,iyl',void,,i2c_read_byte_set,uint8_t device,uint8_t addr,uint8_t *dp,uint8_t length,uint8_t stop)
 
 // uint8_t i2c_read_byte_get( uint8_t device, uint8_t addr, uint8_t length );
 __DPROTO(`iyh,iyl',`iyh,iyl',uint8_t,,i2c_read_byte_get,uint8_t device,uint8_t addr,uint8_t length)
-
-// void i2c_stop( uint8_t device ) __z88dk_fastcall
-__DPROTO(`d,e,h,l,iyh,iyl',`d,e,h,l,iyh,iyl',void,,i2c_stop,uint8_t device)
 
 #endif

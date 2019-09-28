@@ -18,7 +18,7 @@
     PUBLIC _i2c1_byte_isr
 
     EXTERN __i2c1RxPtr, __i2c1TxPtr
-    EXTERN __i2c1ControlEcho, __i2c1SlaveAddr, __i2c1SentenceLgth
+    EXTERN __i2c1ControlEcho, __i2c1SlaveAddr, __i2c1SentenceLgth, __i2c1SentenceStop
 
     EXTERN asm_i2c_reset
 
@@ -98,7 +98,15 @@
     ld a,__IO_I2C_CON_ECHO_BUS_STOPPED  ;sentence complete, we're done    
     ld (__i2c1ControlEcho),a
 
-    ld a,__IO_I2C_CON_ENSIO             ;clear the interrupt & continue
+    in0 a,(ITC)                         ;get INT/TRAP Control Register (ITC)
+    and ~ITC_ITE1                       ;mask out INT1
+    out0 (ITC),a                        ;disable external interrupt
+
+    ld a,(__i2c1SentenceStop)
+    or a
+    ret Z
+
+    ld a,__IO_I2C_CON_ENSIO|__IO_I2C_CON_STO    ;clear the interrupt & stop
     ld bc,__IO_I2C1_PORT_BASE|__IO_I2C_PORT_CON
     out (c),a
     ret
@@ -122,7 +130,7 @@
 ._MASTER_SLA_R_ACK                      ;SLA+R transmitted
     ld a,(__i2c1SentenceLgth)
     cp 1                                ;is there 1 byte to receive?
-    jr Z,_MASTER_SLA_R_ACK1
+    jr Z,_MASTER_SLA_R_NACK1
     or a                                ;is there 0 byte to receive?
     jr Z,_MASTER_SLA_R_NAK 
                                         ;so there are multiple bytes to receive
@@ -131,12 +139,25 @@
     out (c),a
     ret
 
+._MASTER_SLA_R_NACK1
+    ld a,__IO_I2C_CON_ENSIO             ;clear the interrupt & generate NAK
+    ld bc,__IO_I2C1_PORT_BASE|__IO_I2C_PORT_CON
+    out (c),a
+    ret
+
 ._MASTER_SLA_R_NAK
     ld a,__IO_I2C_CON_ECHO_BUS_STOPPED  ;sentence complete, we're done    
     ld (__i2c1ControlEcho),a
 
-._MASTER_SLA_R_ACK1
-    ld a,__IO_I2C_CON_ENSIO             ;clear the interrupt & generate NAK
+    in0 a,(ITC)                         ;get INT/TRAP Control Register (ITC)
+    and ~ITC_ITE1                       ;mask out INT1
+    out0 (ITC),a                        ;disable external interrupt
+
+    ld a,(__i2c1SentenceStop)
+    or a
+    ret Z
+
+    ld a,__IO_I2C_CON_ENSIO|__IO_I2C_CON_STO    ;clear the interrupt & stop
     ld bc,__IO_I2C1_PORT_BASE|__IO_I2C_PORT_CON
     out (c),a
     ret
