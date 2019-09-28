@@ -22,17 +22,12 @@
 	EXTERN	asm_cls
 	EXTERN	asm_adv_curs
 	EXTERN	__mode
-	EXTERN	banked_call
+	EXTERN	generic_console_font32
 
 	; Structure offsets
 	defc sfont_handle_sizeof	=	3
 	defc sfont_handle_font	=	1
 	defc sfont_handle_first_tile	=	0
-
-	; Encoding types - lower 2 bits of font
-	defc FONT_256ENCODING	=	0
-	defc FONT_128ENCODING	=	1
-	defc FONT_NOENCODING		=	2
 
 	; Other bits
 	defc FONT_BCOMPRESSED	=	2
@@ -52,6 +47,9 @@
 	; The current font
 font_current:
 	defs	sfont_handle_sizeof
+	; +0 =
+	; +1 = font address low
+	; +2 = font address high
 	; Cached copy of the first free tile
 font_first_free_tile:
 	defs	1
@@ -197,7 +195,6 @@ font_load_find_slot:
 	ld	a,(hl)		; Check to see if this entry is free
 	inc	hl		; Free is 0000 for the font pointer
 	or	(hl)
-	cp	0
 	jr	z,font_load_found
 
 	inc	hl
@@ -256,7 +253,7 @@ font_copy_current:
 	ld	hl,font_current+sfont_handle_font
 	ld	a,(hl+)
 	ld	h,(hl)
-	ld	l,a
+	ld	l,a		;hl = font address
 
 	inc	hl		; Points to the 'tiles required' entry
 	ld	e,(hl)
@@ -336,7 +333,7 @@ asm_setchar:
 	jr	nz,asm_setchar_3
 
 	push	bc
-	; Font system is not yet setup - init it and copy in the ibm font
+	; Font system is not yet setup - init it and copy in the default font
 	; Kind of a compatibility mode
 	call	_font_init
 	
@@ -344,10 +341,11 @@ asm_setchar:
 	xor	a
 	ld	(font_first_free_tile),a
 
-	GLOBAL	_font_load_ibm_fixed
-	call	banked_call
-	defw	_font_load_ibm_fixed
-	defw	0
+	ld	hl,generic_console_font32
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	call	font_load
 	pop	bc
 asm_setchar_3:
 	pop	af
@@ -359,8 +357,8 @@ asm_setchar_3:
 	ld	hl,font_current+sfont_handle_font
 	ld	a,(hl+)
 	ld	h,(hl)
-	ld	l,a
-	ld	a,(hl+)
+	ld	l,a		;hl = address of font
+	ld	a,(hl+)		;font encoding
 	and	3
 	cp	FONT_NOENCODING
 	jr	z,asm_setchar_no_encoding
@@ -371,9 +369,9 @@ asm_setchar_3:
 	add	hl,de
 	ld	e,(hl)		; That's the tile!
 asm_setchar_no_encoding:
-	ld	a,(font_current+0)
+	ld	a,(font_current+0)	;first tile
 	add	a,e
-	ld	e,a
+	ld	e,a			;e = tile to use
 
 	pop	bc			;c = x, b = y
 	push	bc
@@ -401,6 +399,7 @@ stat_4:
 	POP     DE
 	RET
 
+; font_t __LIB__	font_load( void *font ) NONBANKED;
 _font_load:
 	push	bc
 	ld	hl,sp+4
@@ -408,11 +407,12 @@ _font_load:
 	ld	h,(hl)
 	ld	l,a
 	call    font_load
-	push	hl
-	pop	de		; Return in DE + HL
+	ld	d,h		;Return in de AND hl
+	ld	e,l
 	pop	bc
 	RET
 
+; font_t __LIB__	font_set( font_t font_handle ) NONBANKED;
 _font_set:
 	push	bc
 	ld	hl,sp+4
@@ -429,22 +429,19 @@ _font_set:
 _font_init:
 	push	bc
 	call	tmode
-	ld	a,0		; We use the first tile as a space _always_
+	xor	a		; We use the first tile as a space _always_
 	ld	(font_first_free_tile),a
 
 	; Clear the font table
-	xor	a
 	ld	hl,font_table
 	ld	b,sfont_handle_sizeof*MAX_FONTS
 init_1:
 	ld	(hl+),a
 	dec	b
 	jr	nz,init_1
+	ld	(__bgcolour),a	;a = 0
 	ld	a,3
 	ld	(__fgcolour),a
-	ld	a,0
-	ld	(__bgcolour),a
-
 	call	asm_cls
 	pop	bc
 	ret
@@ -505,3 +502,13 @@ tmode_out:
 	LD	(__mode),A
 
 	RET
+
+
+
+
+load_z88dk_font:
+	xor	a
+	ld	(font_first_free_tile),a
+
+	; font_current = 0
+	; font_current 

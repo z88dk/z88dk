@@ -5,7 +5,7 @@
 
 	GLOBAL	y_table
 	GLOBAL	__console_x
-	GLOBAL	ty
+	GLOBAL	__console_y
 	GLOBAL	__fgcolour
 	GLOBAL	__bgcolour
 
@@ -18,7 +18,7 @@ asm_wrtchr:
 	push	hl		;save font
         LD      HL,y_table
         LD      D,0x00
-        LD      A,(ty)
+        LD      A,(__console_y)
         RLCA
         RLCA
         RLCA

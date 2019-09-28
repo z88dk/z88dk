@@ -30,7 +30,7 @@
         defc    CONSOLE_ROWS = 18
 
 	defc	CRT_INITIALIZE_BSS = 0
-        defc CRT_ORG_BSS =  $c000 ; Static variables are kept in RAM above max VRAM
+        defc CRT_ORG_BSS =  $c100 ; Static variables are kept in RAM above max VRAM + OAM copy
         defc DEFINED_CRT_ORG_BSS = 1
 	defc __crt_model = 1
         defc    __crt_org_bss = CRT_ORG_BSS

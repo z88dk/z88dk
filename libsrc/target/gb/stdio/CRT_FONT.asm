@@ -2,4 +2,6 @@
 
                 PUBLIC          CRT_FONT
 
-                defc            CRT_FONT = 0
+		EXTERN		_font_ibm_fixed
+
+                defc            CRT_FONT = _font_ibm_fixed

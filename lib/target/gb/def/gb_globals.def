@@ -115,3 +115,8 @@ defc M_SOLID =	0x00
 defc M_OR    =	0x01
 defc M_XOR   =	0x02
 defc M_AND   =	0x03
+
+; Font Encoding types - lower 2 bits of font
+defc FONT_256ENCODING   =       0
+defc FONT_128ENCODING   =       1
+defc FONT_NOENCODING            =       2

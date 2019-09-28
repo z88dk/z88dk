@@ -27,36 +27,39 @@ _wrtchr:                        ; Banked
         CALL    NZ,gmode
 
         LD      HL,sp+4
-        LD      C,(HL)		;character
+        LD      a,(HL)		;character
 	; We support:
-	; gb_console_256font_32:	- 256 character font
-	; generic_console_font32:	- standard 32-127 font as used elsewhere
+	; generic_console_font32:	- 0 based font
 	; generic_consoel_udg32:	- for udgs
-	ld	hl,generic_console_256font
-	ld	a,(hl+)
-	or	(hl)
-	jr	z,try_gencon_fonts
-	ld	a,(hl-)
-	ld	l,(hl)
-	ld	h,a
-	jr	do_print
 try_gencon_fonts:
-	ld	a,c
 	cp	128
 	jr	c,not_udg
 	sub	128
 	ld	c,a
+	; UDGs are just there with no header
 	ld	hl,generic_console_udg32
 	ld	a,(hl+)
 	ld	h,(hl)
 	ld	l,a
 	jr	do_print
 not_udg:
+	ld	c,a
 	ld	hl,generic_console_font32
 	ld	a,(hl+)
 	ld	h,(hl)
 	ld	l,a
-	dec	h		;Since font starts from character 32
+	ld	a,(hl+)	;Font type
+	inc	hl	;Skips to the start of encoding table if present
+	and	3
+	ld	de,128
+	cp	FONT_128ENCODING
+	jr	z,add_offset
+	ld	de,0
+	cp	FONT_NOENCODING
+	jr	z,add_offset
+	ld	d,1
+add_offset:
+	add	hl,de
 do_print:
         CALL    asm_wrtchr
         CALL    asm_adv_curs

@@ -1,22 +1,11 @@
 ; font: font
 	;; BANKED: checked
 
+	SECTION rodata_driver
 	GLOBAL	font_load
 
-	PUBLIC	_font_load_ibm_fixed
 	PUBLIC	_font_ibm_fixed
-	PUBLIC	_font_ibm_fixed_tiles
 
-	;; Perform tricks with banking to shift this font out of
-	;; bank 0.  Doesnt currently work as the encoding table
-	;; must always be visible.
-	SECTION	code_driver
-_font_load_ibm_fixed:		; Banked
-	ld	hl,_font_ibm_fixed
-	call	font_load
-	ret
-
-	SECTION rodata_driver
 
 _font_ibm_fixed:
 	defb	0+4	; 256 char encoding, compressed
