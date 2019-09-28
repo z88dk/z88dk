@@ -327,6 +327,7 @@ out_char:
 
 
 	;; Print the character in A
+	; C =x, B=y
 asm_setchar:
 	push	af
 	ld	a,(font_current+2)
@@ -334,6 +335,7 @@ asm_setchar:
 	or	a
 	jr	nz,asm_setchar_3
 
+	push	bc
 	; Font system is not yet setup - init it and copy in the ibm font
 	; Kind of a compatibility mode
 	call	_font_init
@@ -346,11 +348,12 @@ asm_setchar:
 	call	banked_call
 	defw	_font_load_ibm_fixed
 	defw	0
+	pop	bc
 asm_setchar_3:
 	pop	af
-	push	bc
 	push	de
 	push	hl
+	push	bc		;Save coordinates
 				; Compute which tile maps to this character
 	ld	e,a
 	ld	hl,font_current+sfont_handle_font
@@ -372,17 +375,17 @@ asm_setchar_no_encoding:
 	add	a,e
 	ld	e,a
 
-	LD      A,(__console_y)       ; Y coordinate
-	LD      L,A
+	pop	bc			;c = x, b = y
+	push	bc
+
+	LD      L,B
 	LD      H,0x00
 	ADD     HL,HL
 	ADD     HL,HL
 	ADD     HL,HL
 	ADD     HL,HL
 	ADD     HL,HL
-	LD      A,(__console_x)       ; X coordinate
-	LD      C,A
-	LD      B,0x00
+	LD      B,0x00			;Add on x coordinate now
 	ADD     HL,BC
 	LD      BC,0x9800
 	ADD     HL,BC
@@ -393,9 +396,9 @@ stat_4:
         jr      nz,stat_4
 
 	LD      (HL),E
+	POP     BC
 	POP     HL
 	POP     DE
-	POP     BC
 	RET
 
 _font_load:

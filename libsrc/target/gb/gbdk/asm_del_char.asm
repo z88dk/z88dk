@@ -13,6 +13,10 @@
 asm_del_char:
         ;; Delete a character
         CALL    rew_curs
+	ld	a,(__console_x)
+	ld	c,a
+	ld	a,(__console_y)
+	ld	b,a
         LD      A,' '
         jp	asm_setchar
 

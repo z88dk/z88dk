@@ -7,6 +7,7 @@
 	GLOBAL		__console_x
 	GLOBAL		__console_y
 	GLOBAL		asm_scroll
+	GLOBAL		asm_cls
 	GLOBAL		asm_del_char
 	GLOBAL		asm_adv_curs
 	GLOBAL		asm_setchar
@@ -26,12 +27,21 @@ asm_putchar:
         ret
 check_BS:
         cp      8
-        jr      nz,asm_putchar_1
+        jr      nz,check_CLS
         call    asm_del_char
         ret
+check_CLS:
+	cp	12
+	jr	nz,asm_putchar_1
+	call	asm_cls
+	ret
 asm_putchar_2:
         pop     af
 asm_putchar_1:
+	ld	hl,__console_x
+	ld	c,(hl)
+	inc	hl
+	ld	b,(hl)
         CALL    asm_setchar
         CALL    asm_adv_curs
         RET

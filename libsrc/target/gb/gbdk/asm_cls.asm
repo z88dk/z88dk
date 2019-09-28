@@ -2,6 +2,7 @@
 	SECTION	code_driver
 
 	PUBLIC	asm_cls
+	GLOBAL	__console_x
 
         INCLUDE "target/gb/def/gb_globals.def"
 
@@ -23,6 +24,11 @@ cls_2:
         JR      NZ,cls_2
         DEC     E
         JR      NZ,cls_1
+	; Reset printing coordinates
+	ld	hl,__console_x
+	xor	a
+	ld	(hl+),a
+	ld	(hl),a
         POP     HL
         POP     DE
         RET
