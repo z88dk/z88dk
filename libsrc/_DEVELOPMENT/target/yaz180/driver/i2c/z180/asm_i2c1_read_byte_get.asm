@@ -44,7 +44,7 @@
     and __IO_I2C_CON_ECHO_BUS_STOPPED
     jr Z,i2c1_read_byte_wait    ;if the bus is still not stopped, then wait till it is
 
-    ld hl,__i2c1SentenceLgth    ;return the remaining sentence length (zero for success)
+    ld hl,__i2c1SentenceLgth    ;return the remaining unobtained sentence length (zero for success)
     ld l,(hl)
     ld h,0
     ret

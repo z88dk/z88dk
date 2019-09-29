@@ -18,13 +18,19 @@
 #define I2C_CON_ECHO_BUS_RESTART    __IO_I2C_CON_ECHO_BUS_RESTART
 #define I2C_CON_ECHO_BUS_ILLEGAL    __IO_I2C_CON_ECHO_BUS_ILLEGAL
 
-#define I2C_IMODE_SET(x)    (x & __IO_I2C_IMODE_MASK)
-#define I2C_IMODE_STD       __IO_I2C_IMODE_STD
-#define I2C_IMODE_FAST      __IO_I2C_IMODE_FAST
-#define I2C_IMODE_FASTP     __IO_I2C_IMODE_FASTP
-#define I2C_IMODE_TURBO     __IO_I2C_IMODE_TURBO
+#define I2C_RESTART_ENABLE          0
+#define I2C_RESTART                 I2C_RESTART_ENABLE
+#define I2C_RESTART_DISABLE         1
+#define I2C_STOP                    I2C_RESTART_DISABLE
 
 // Data Structures
+
+typedef enum {
+    I2C_SPEED_STD           = 0,
+    I2C_SPEED_FAST          = 1,
+    I2C_SPEED_FAST_PLUS     = 2,
+    I2C_SPEED_TURBO         = 3
+} i2c_speed_mode;
 
 // Functions
 
@@ -43,6 +49,11 @@ extern void i2c_reset(uint8_t device);
 
 // void i2c_initialise( uint8_t device ) __z88dk_fastcall
 extern void i2c_initialise(uint8_t device);
+
+
+
+// void i2c_set_speed_mode( uint8_t device, enum i2c_speed_mode ) __z88dk_callee
+extern void i2c_set_speed_mode(uint8_t device,i2c_speed_mode speed_mode);
 
 
 
