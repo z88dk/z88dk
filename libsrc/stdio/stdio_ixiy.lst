@@ -33,6 +33,7 @@ stdio/obj/ixiy/fseek
 stdio/obj/ixiy/ftell
 stdio/obj/ixiy/fwrite
 stdio/obj/ixiy/gets
+stdio/obj/ixiy/perror
 stdio/obj/ixiy/printf
 stdio/obj/ixiy/printk
 stdio/obj/ixiy/printk_outc
