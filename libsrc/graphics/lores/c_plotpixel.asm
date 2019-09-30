@@ -9,7 +9,7 @@
 
 
 .c_plotpixel			
-	INCLUDE "c_pixel.asm"
+	INCLUDE "c_pixel.inc"
 
 
 

@@ -5,4 +5,4 @@
 
 .res_MODE1
         defc    NEEDunplot = 1
-        INCLUDE "graphics/spc1000/pixel_MODE1.asm"
+        INCLUDE "graphics/spc1000/pixel_MODE1.inc"

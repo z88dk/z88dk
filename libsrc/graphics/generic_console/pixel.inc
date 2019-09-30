@@ -23,7 +23,14 @@
 		cp	l
 		ret	c
 
+IF __CPU_GBZ80__
+		ld	a,l
+		ld	(__gfx_coords),a
+		ld	a,h
+		ld	(__gfx_coords+1),a
+ELSE
 		ld	(__gfx_coords),hl
+ENDIF
 		push	bc		;save entry bc	
 		ld	c,h
 		ld	b,l
