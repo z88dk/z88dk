@@ -156,6 +156,7 @@
 	GLOBAL	getk
 	GLOBAL	getk_inkey
 	GLOBAL	printk
+	GLOBAL	perror
 	GLOBAL	_func
 	GLOBAL	_test
 

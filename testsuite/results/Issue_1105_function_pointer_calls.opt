@@ -468,6 +468,7 @@
 	GLOBAL	getk
 	GLOBAL	getk_inkey
 	GLOBAL	printk
+	GLOBAL	perror
 	GLOBAL	_placeholder
 	GLOBAL	_s_fastcall
 	GLOBAL	_test2

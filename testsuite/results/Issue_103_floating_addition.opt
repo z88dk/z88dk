@@ -711,6 +711,7 @@
 	GLOBAL	getk
 	GLOBAL	getk_inkey
 	GLOBAL	printk
+	GLOBAL	perror
 	GLOBAL	_add_int
 	GLOBAL	_add_int_longform
 	GLOBAL	_add_int_longform2
