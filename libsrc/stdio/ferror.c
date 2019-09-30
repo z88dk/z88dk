@@ -14,7 +14,7 @@
 
 #include <stdio.h>
 
-int wrapper(FILE *fp) __naked
+int wrapper2(FILE *fp) __naked
 {
 #asm
 
