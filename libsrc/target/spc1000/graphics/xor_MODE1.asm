@@ -5,4 +5,4 @@
 
 .xor_MODE1
         defc    NEEDxor = 1
-        INCLUDE "graphics/spc1000/pixel_MODE1.inc"
+        INCLUDE "target/spc1000/graphics/pixel_MODE1.inc"

@@ -9,4 +9,4 @@
 	ret	nc
 
         defc    NEEDplot = 1
-        INCLUDE "graphics/spc1000/pixel_MODE2.inc"
+        INCLUDE "target/spc1000/graphics/pixel_MODE2.inc"
