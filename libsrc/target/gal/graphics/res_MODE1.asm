@@ -5,4 +5,4 @@
 
 .res_MODE1
         defc    NEEDunplot = 1
-        INCLUDE "graphics/gal/pixel_MODE1.inc"
+        INCLUDE "target/gal/graphics/pixel_MODE1.inc"

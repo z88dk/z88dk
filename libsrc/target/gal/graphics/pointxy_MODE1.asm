@@ -6,4 +6,4 @@
 .pointxy_MODE1
 
         defc    NEEDpoint = 1
-        INCLUDE "graphics/gal/pixel_MODE1.inc"
+        INCLUDE "target/gal/graphics/pixel_MODE1.inc"
