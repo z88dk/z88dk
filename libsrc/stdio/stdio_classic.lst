@@ -33,6 +33,7 @@ stdio/obj/fseek
 stdio/obj/ftell
 stdio/obj/fwrite
 stdio/obj/gets
+stdio/obj/perror
 stdio/obj/printf
 stdio/obj/printk
 stdio/obj/printk_outc
