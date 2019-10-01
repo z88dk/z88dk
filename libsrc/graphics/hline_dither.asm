@@ -43,7 +43,7 @@
 		ld	a,(ix+2)
 		add	a
 		add	a
-		add	e,a			; 192+40=232 ..we are still inside the byte
+		add	e			; 192+40=232 ..we are still inside the byte
 		ld	d,0
 		ld	hl,_dithpat
 		add	hl,de

@@ -8,4 +8,4 @@
 
 .plot_MODE0
         defc    NEEDplot = 1
-        INCLUDE "graphics/generic_console/pixel.asm"
+        INCLUDE "graphics/generic_console/pixel.inc"

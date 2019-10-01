@@ -46,10 +46,7 @@ generic_console_vpeek:
         add     hl,hl
         add     hl,hl
         add     hl,hl
-        ld      c,a
-        ld      b,0x00
-        add     hl,bc
-        ld      bc,0x9800
+        ld      b,0x98
         add     hl,bc
 vpeek_1:
 	ldh	a,(STAT)
