@@ -20,7 +20,7 @@ Contact the author:
 
 
 /*
-	zcc +msx -create-app -llib3d -lm -lmsxbios ex11.c
+	zcc +msx -create-app -llib3d -lm -lmsxbios -DAMALLOC ex11.c
 */
 
 
@@ -39,8 +39,8 @@ Contact the author:
 //	HEAPSIZE(HPSIZE)
 
 
-	u_char sbuffer[MODE2_MAX];
-	//u_char *sbuffer;
+	//u_char sbuffer[MODE2_MAX];
+	u_char *sbuffer;
 	unsigned char stencil[MODE2_HEIGHT*2];
 
 
@@ -111,7 +111,7 @@ void main() {
 	vector_t *pbuffer;
 
 	// off-screen surface buffer
-	//u_char* sbuffer = (u_char*)malloc(MODE2_MAX);
+	u_char* sbuffer = (u_char*)malloc(MODE2_MAX);
 
 	// our solid :)
 	object_t triangle;
