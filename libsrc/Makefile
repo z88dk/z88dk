@@ -1,4 +1,3 @@
-
 #
 # Ah, that'd be nice, a library makefile!
 #
@@ -1305,8 +1304,10 @@ gb_clib.lib:
 	@echo ''
 	@echo '--- Building Gameboy Library ---'
 	@echo ''
+	$(MAKE) gfxdeps
 	$(call buildgeneric,gb)
 	$(MAKE) -C games TARGET=gb
+	$(MAKE) -C target/gb
 	TARGET=gb TYPE=gbz80 $(LIBLINKER) -mgbz80 -DFORgb -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/gb_clib @$(LISTFILE_DIRECTORY)/gb.lst
 
 

@@ -18,9 +18,8 @@ graphics/dfill
 graphics/getsprite
 graphics/bksave
 graphics/bkrestore
-graphics/spectrum/rowtab
-graphics/z80tvgame/pixladdr
-graphics/z80tvgame/swapgfxbk
-graphics/z80tvgame/clsgraph
+target/z80tvgame/graphics/pixladdr
+target/z80tvgame/graphics/swapgfxbk
+target/z80tvgame/graphics/clsgraph
 @gfxbase.lst
 @z80.lst
