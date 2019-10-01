@@ -18,6 +18,12 @@ Contact the author:
 
 =========================================================================*/
 
+
+/*
+	zcc +msx -create-app -llib3d -lm -lmsxbios -DAMALLOC ex11.c
+*/
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -29,8 +35,8 @@ Contact the author:
 
 // build a pyramid mesh
 
-#define HPSIZE 3000
-	HEAPSIZE(HPSIZE)
+//#define HPSIZE 3000
+//	HEAPSIZE(HPSIZE)
 
 
 	u_char sbuffer[MODE2_MAX];
@@ -110,7 +116,7 @@ void main() {
 	object_t triangle;
 
 
-	heapinit (HPSIZE);
+//	heapinit (HPSIZE);
 	
 	pbuffer = newa(vector_t, 32);
 
