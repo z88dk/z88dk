@@ -20,7 +20,7 @@ Contact the author:
 
 
 /*
-	zcc +msx -create-app -llib3d -lm -lmsxbios -DAMALLOC ex11.c
+	zcc +msx -create-app -llib3d -lm -lmsxbios ex11.c
 */
 
 
@@ -40,6 +40,7 @@ Contact the author:
 
 
 	u_char sbuffer[MODE2_MAX];
+	//u_char *sbuffer;
 	unsigned char stencil[MODE2_HEIGHT*2];
 
 
