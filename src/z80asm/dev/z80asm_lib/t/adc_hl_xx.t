@@ -31,7 +31,7 @@ for my $cpu (@CPUS) {
 							ld		$reg, $add
 							$init_carry 
 							adc 	hl, $reg
-							rst 	0
+							jr	 	0		; need to keep SP
 END
 					my $sum = $base1 + $add + $carry;
 					

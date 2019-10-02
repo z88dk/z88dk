@@ -72,19 +72,19 @@
  add bc, -32768                 ; E5 21 00 80 09 44 4D E1
  add bc, 32767                  ; E5 21 FF 7F 09 44 4D E1
  add bc, 65535                  ; E5 21 FF FF 09 44 4D E1
- add bc, a                      ; CD @__z80asm__addbca
+ add bc, a                      ; CD @__z80asm__add_bc_a
  add c                          ; 81
  add d                          ; 82
  add de, -32768                 ; E5 21 00 80 19 54 5D E1
  add de, 32767                  ; E5 21 FF 7F 19 54 5D E1
  add de, 65535                  ; E5 21 FF FF 19 54 5D E1
- add de, a                      ; CD @__z80asm__adddea
+ add de, a                      ; CD @__z80asm__add_de_a
  add e                          ; 83
  add h                          ; 84
  add hl, -32768                 ; D5 11 00 80 19 D1
  add hl, 32767                  ; D5 11 FF 7F 19 D1
  add hl, 65535                  ; D5 11 FF FF 19 D1
- add hl, a                      ; CD @__z80asm__addhla
+ add hl, a                      ; CD @__z80asm__add_hl_a
  add hl, bc                     ; 09
  add hl, de                     ; 19
  add hl, hl                     ; 29

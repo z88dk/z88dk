@@ -258,7 +258,7 @@ DO_stmt(0x8C);
 switch (opts.cpu) {
 case CPU_8080: case CPU_8085: case CPU_GBZ80: 
 DO_STMT_LABEL();
-add_call_emul_func("__z80asm__adchlbc");
+add_call_emul_func("__z80asm__adc_hl_bc");
 break;
 case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 DO_stmt(0xED4A);
@@ -270,7 +270,7 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_8080: case CPU_8085: case CPU_GBZ80: 
 DO_STMT_LABEL();
-add_call_emul_func("__z80asm__adchlde");
+add_call_emul_func("__z80asm__adc_hl_de");
 break;
 case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 DO_stmt(0xED5A);
@@ -282,7 +282,7 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_8080: case CPU_8085: case CPU_GBZ80: 
 DO_STMT_LABEL();
-add_call_emul_func("__z80asm__adchlhl");
+add_call_emul_func("__z80asm__adc_hl_hl");
 break;
 case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 DO_stmt(0xED6A);
@@ -654,7 +654,7 @@ DO_stmt(0x80);
 switch (opts.cpu) {
 case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: 
 DO_STMT_LABEL();
-add_call_emul_func("__z80asm__addbca");
+add_call_emul_func("__z80asm__add_bc_a");
 break;
 case CPU_Z80N: 
 DO_stmt(0xED33);
@@ -692,7 +692,7 @@ DO_stmt(0x82);
 switch (opts.cpu) {
 case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: 
 DO_STMT_LABEL();
-add_call_emul_func("__z80asm__adddea");
+add_call_emul_func("__z80asm__add_de_a");
 break;
 case CPU_Z80N: 
 DO_stmt(0xED32);
@@ -755,7 +755,7 @@ DO_stmt(0x84);
 switch (opts.cpu) {
 case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: 
 DO_STMT_LABEL();
-add_call_emul_func("__z80asm__addhla");
+add_call_emul_func("__z80asm__add_hl_a");
 break;
 case CPU_Z80N: 
 DO_stmt(0xED31);
@@ -12949,7 +12949,7 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_GBZ80: 
 DO_STMT_LABEL();
-add_call_emul_func("__z80asm__exsphl");
+add_call_emul_func("__z80asm__ex_sp_hl");
 break;
 case CPU_8080: case CPU_8085: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 DO_stmt(0xE3);

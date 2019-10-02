@@ -2748,18 +2748,18 @@
 |CD 00 00                     |             |            |             |rst 0                  |==       |               |              |              |
 |CD 08 00                     |             |            |             |rst 8                  |==       |               |              |              |
 |CD 30 00                     |             |            |             |rst 48                 |==       |               |              |              |
-|CD @adchlbc                  |adc hl, bc   |==          |==           |                       |         |               |              |              |
-|CD @adchlde                  |adc hl, de   |==          |==           |                       |         |               |              |              |
-|CD @adchlhl                  |adc hl, hl   |==          |==           |                       |         |               |              |              |
-|CD @addbca                   |add bc, a    |==          |==           |==                     |==       |==             |==            |              |
-|CD @adddea                   |add de, a    |==          |==           |==                     |==       |==             |==            |              |
-|CD @addhla                   |add hl, a    |==          |==           |==                     |==       |==             |==            |              |
+|CD @adc_hl_bc                |adc hl, bc   |==          |==           |                       |         |               |              |              |
+|CD @adc_hl_de                |adc hl, de   |==          |==           |                       |         |               |              |              |
+|CD @adc_hl_hl                |adc hl, hl   |==          |==           |                       |         |               |              |              |
+|CD @add_bc_a                 |add bc, a    |==          |==           |==                     |==       |==             |==            |              |
+|CD @add_de_a                 |add de, a    |==          |==           |==                     |==       |==             |==            |              |
+|CD @add_hl_a                 |add hl, a    |==          |==           |==                     |==       |==             |==            |              |
 |CD @cpd                      |cpd          |==          |             |cpd                    |==       |               |              |              |
 |CD @cpdr                     |cpdr         |==          |             |cpdr                   |==       |               |              |              |
 |CD @cpi                      |cpi          |==          |             |cpi                    |==       |               |              |              |
 |CD @cpir                     |cpir         |==          |             |cpir                   |==       |               |              |              |
 |CD @daa                      |             |            |             |daa                    |==       |               |              |              |
-|CD @exsphl                   |             |            |ex (sp), hl  |                       |         |               |              |              |
+|CD @ex_sp_hl                 |             |            |ex (sp), hl  |                       |         |               |              |              |
 |CD @ldd                      |ldd          |==          |==           |                       |         |               |              |              |
 |CD @lddr                     |lddr         |==          |==           |                       |         |               |              |              |
 |CD @ldi                      |ldi          |==          |==           |                       |         |               |              |              |

@@ -2,9 +2,9 @@
 ; no flags are affected
 
 SECTION code_crt0_sccz80
-PUBLIC __z80asm__addhla
+PUBLIC __z80asm__add_hl_a
 
-.__z80asm__addhla
+.__z80asm__add_hl_a
 		push 	af
 
 		add 	a, l

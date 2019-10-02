@@ -579,7 +579,7 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "altd ex (sp), hl", 	$V{altd}, 0xED, 0x54);
 	}
 	else {
-		add_opc($cpu, "ex (sp), hl", 		call(), '@__z80asm__exsphl', '');
+		add_opc($cpu, "ex (sp), hl", 		call(), '@__z80asm__ex_sp_hl', '');
 	}
 	
 	if (!$intel && !$gameboy) {
@@ -605,9 +605,9 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "add bc, a",			0xED, 0x33);
 	}
 	else {
-		add_opc($cpu, "add hl, a",			call(), '@__z80asm__addhla', '');
-		add_opc($cpu, "add de, a",			call(), '@__z80asm__adddea', '');
-		add_opc($cpu, "add bc, a",			call(), '@__z80asm__addbca', '');
+		add_opc($cpu, "add hl, a",			call(), '@__z80asm__add_hl_a', '');
+		add_opc($cpu, "add de, a",			call(), '@__z80asm__add_de_a', '');
+		add_opc($cpu, "add bc, a",			call(), '@__z80asm__add_bc_a', '');
 	}
 	
 	if ($z80n) {
@@ -660,7 +660,7 @@ for my $cpu (@CPUS) {
 	for my $r (qw( bc de hl sp )) {
 		if ($intel || $gameboy) {
 			if ($r ne 'sp') {
-				add_opc($cpu, "adc hl, $r",	call(), '@__z80asm__adchl'.$r, '');
+				add_opc($cpu, "adc hl, $r",	call(), '@__z80asm__adc_hl_'.$r, '');
 			}
 		}
 		else {
