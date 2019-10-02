@@ -134,12 +134,7 @@ ENDIF
    
    pop hl
    pop de
-IF __CPU_GBZ80__
-   EXTERN __z80asm__exsphl
-   call __z80asm__exsphl
-ELSE
    ex (sp),hl
-ENDIF
    ex de,hl
    
    ; de = & heap, hl = & old block (+2)
