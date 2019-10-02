@@ -154,7 +154,7 @@ void add_Z88_CALL_OZ(int argument)
 		append_byte(Z80_RST(0x20));
 		append_byte(argument);
 	}
-	else if (argument > 255 && argument <= 65535)
+	else if (argument > 255)
 	{
 		append_byte(Z80_RST(0x20));
 		append_word(argument);
@@ -165,7 +165,7 @@ void add_Z88_CALL_OZ(int argument)
 
 void add_Z88_CALL_PKG(int argument)
 {
-	if (argument >= 0 && argument <= 65535)
+	if (argument >= 0)
 	{
 		append_byte(Z80_RST(0x08));
 		append_word(argument);
@@ -194,7 +194,7 @@ void add_Z88_INVOKE(int argument)
 	else
 		opcode = Z80_CALL;			/* Ti83: CALL */
 
-	if (argument >= 0 && argument <= 65535)
+	if (argument >= 0)
 	{
 		append_byte(opcode);
 		append_word(argument);
