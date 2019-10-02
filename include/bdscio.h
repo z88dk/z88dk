@@ -74,8 +74,8 @@
 
 //#define exit() exit(0)
 
-#define topofmem() asm("ld\thl,-512\nadd\thl,sp\n");
-#define endext() asm("extern\t__BSS_END_tail\nld\thl,__BSS_END_tail\ninc\thl\n");
+#define topofmem() asm("ld\thl,-512\nadd\thl,sp\n")
+#define endext() asm("extern\t__BSS_END_tail\nld\thl,__BSS_END_tail\ninc\thl\n")
 
 
 #define FALSE 0
