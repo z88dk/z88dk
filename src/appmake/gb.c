@@ -90,6 +90,8 @@ int gb_exec(char *target)
         exit_log(1, "Couldn't determine size of file %s\n", binname);
     }
 
+    suffix_change(binname,"");
+
     if ((main_length = ftell(fpin)) > 0x8000) {
         fclose(fpin);
         exit_log(1, "Main output binary exceeds 32k by %d bytes\n", main_length - 0x8000);
@@ -105,7 +107,6 @@ int gb_exec(char *target)
     count = 0;
     for (i = 0x02; i <= 0x1f; i++) {
         sprintf(filename, "%s_BANK_%02X.bin", binname, i);
-
         if ((stat(filename, &st_file) < 0) || (st_file.st_size == 0) || ((fpin = fopen(filename, "rb")) == NULL)) {
             break;
         } else {
