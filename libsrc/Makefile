@@ -208,7 +208,6 @@ z88_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(call buildgeneric,z88)
-	$(MAKE) -C fcntl/z88
 	$(MAKE) -C games TARGET=z88
 	$(MAKE) -C rs232/z88 
 	$(MAKE) -C target/z88 
