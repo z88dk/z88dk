@@ -40,11 +40,12 @@ banked_call:
         jp      (hl)
 
 banked_ret:
-        pop     hl              ; Get the return address
+        pop     bc              ; Get the return address
         pop     af              ; Pop the old bank
         ld      (MBC1_ROM_PAGE),a
         ld      (__current_bank),a
-        jp      (hl)
+	push	bc
+	ret
 
 
 	SECTION	bss_driver
