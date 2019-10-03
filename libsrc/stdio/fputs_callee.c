@@ -59,7 +59,13 @@ IF __CPU_INTEL__
 ENDIF
 	ld	c,a
 	ld	b,0
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
+        push	ix
+ENDIF
 	call	asm_fputc_callee
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
+        pop	ix
+ENDIF
 IF __CPU_INTEL__
 	pop	bc
 ENDIF
