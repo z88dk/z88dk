@@ -33,6 +33,7 @@ static char             *binname      = NULL;
 static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
 static int               romfill      = 255;
+static char             *appname;
 
 
 #define CART_NAME_LEN 16
@@ -55,6 +56,7 @@ option_t gb_options[] = {
     { 'c', "crt0file",  "crt0 used to link binary",         OPT_STR,   &crtfile },
     { 'o', "output",    "Name of output file",              OPT_STR,   &outfile },
     { 'f', "filler",    "Filler byte (default: 0xFF)",      OPT_INT,   &romfill },
+    { 'n', "name",      "Application Name",                 OPT_STR,   &appname },
     {  0,  NULL,        NULL,                               OPT_NONE,  NULL     }
 };
 
@@ -91,6 +93,9 @@ int gb_exec(char *target)
     }
 
     suffix_change(binname,"");
+    if ( appname == NULL ) {
+        appname = binname;
+    }
 
     if ((main_length = ftell(fpin)) > 0x8000) {
         fclose(fpin);
@@ -167,7 +172,7 @@ int gb_exec(char *target)
 
     /* capitalize cartridge name */
     for (i = 0; i < CART_NAME_LEN; ++i) {
-      memory[0x134 + i] = toupper (memory[0x134+i]);
+      memory[0x134+i] = i < strlen(appname) ? toupper(appname[i]) : 0x00;
     }
     /*
      * 0147: Cartridge type:
