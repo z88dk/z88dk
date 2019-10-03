@@ -193,10 +193,8 @@ static long scan_num ( char *text, int length, int base )
 	int digit = 0;
 	char c;
 	int i;
-	bool range_err;
 	
 	value = 0;
-	range_err = false;
 	for ( i = 0 ; i < length ; i++ ) 
 	{
 		c = *text++;					/* read each digit */
@@ -223,20 +221,8 @@ static long scan_num ( char *text, int length, int base )
 		}
 		
 		value = value * base + digit;
-
-		if ( ! range_err && value < 0 )	/* overflow to sign bit */
-		{
-			range_err = true;		
-		}
 	}
 	
-	if ( range_err )
-	{
-#if 0
-		warn_int_range( value );
-#endif
-	}
-		
 	return value;
 }
 
