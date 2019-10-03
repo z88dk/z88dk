@@ -113,7 +113,7 @@ int gb_exec(char *target)
             memory = must_realloc(memory, len + (i * 0x4000));
             memset(memory + (i * 0x4000), romfill, 0x4000);
 
-            fprintf(stderr, "Adding bank 0x%02X", i);
+            fprintf(stderr, "Adding bank 0x%02X ", i);
             fread(memory + (i * 0x4000), 0x4000, 1, fpin);
 
             if (!feof(fpin)) {
@@ -128,14 +128,25 @@ int gb_exec(char *target)
             fclose(fpin);
         }
     }
-
-    len = (0x4000 * i);
+    if ( i > 2 ) {
+        if ( mbc_type == 0 ) {
+            fprintf(stderr, "Forcing use of MBC1 (non specified but need banking)\n");
+            mbc_type = 1;
+        }
+    }
 
     // Calculate correct power of two for ROM banks
     rom_banks = 1;
     while ( rom_banks < i ) {
         rom_banks *= 2;
     }
+
+    memory = must_realloc(memory, rom_banks * 0x4000);
+    len = (0x4000 * i);
+    for ( i = len; i < len; i++ ) {
+        memory[i] = 0xff;
+    }
+    len = rom_banks * 0x4000;
 
     if ( rom_banks > 128 ) {
         exit_log(1, "ROM size (%d banks) exceeds maximum size of 128 banks\n", rom_banks);
@@ -295,10 +306,6 @@ int gb_exec(char *target)
     fprintf(stderr, "Adding main banks 0x00,0x01 (%d bytes free)\n", 0x8000 - main_length);
     
     fwrite(memory,len,1,fpout);
-    // And pad out to the correct number of ROM banks
-    for ( i = 0; i < (rom_banks * 0x4000) - len; i++ ) {
-        fputc(romfill, fpout);
-    }
     fclose(fpout);
     return 0;
 }
