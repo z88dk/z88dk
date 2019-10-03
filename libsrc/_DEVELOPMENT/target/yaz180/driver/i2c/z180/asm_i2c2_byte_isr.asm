@@ -18,7 +18,7 @@
     PUBLIC _i2c2_byte_isr
 
     EXTERN __i2c2RxPtr, __i2c2TxPtr
-    EXTERN __i2c2ControlEcho, __i2c2SlaveAddr, __i2c2SentenceLgth
+    EXTERN __i2c2ControlEcho, __i2c2SlaveAddr, __i2c2SentenceLgth, __i2c2SentenceStop
 
     EXTERN asm_i2c_reset
 
@@ -98,7 +98,15 @@
     ld a,__IO_I2C_CON_ECHO_BUS_STOPPED  ;sentence complete, we're done    
     ld (__i2c2ControlEcho),a
 
-    ld a,__IO_I2C_CON_ENSIO             ;clear the interrupt & continue
+    in0 a,(ITC)                         ;get INT/TRAP Control Register (ITC)
+    and ~ITC_ITE2                       ;mask out INT2
+    out0 (ITC),a                        ;disable external interrupt
+
+    ld a,(__i2c2SentenceStop)
+    or a
+    ret Z
+
+    ld a,__IO_I2C_CON_ENSIO|__IO_I2C_CON_STO    ;clear the interrupt & send stop
     ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_CON
     out (c),a
     ret
@@ -122,7 +130,7 @@
 ._MASTER_SLA_R_ACK                      ;SLA+R transmitted
     ld a,(__i2c2SentenceLgth)
     cp 1                                ;is there 1 byte to receive?
-    jr Z,_MASTER_SLA_R_ACK1
+    jr Z,_MASTER_SLA_R_NACK1
     or a                                ;is there 0 byte to receive?
     jr Z,_MASTER_SLA_R_NAK 
                                         ;so there are multiple bytes to receive
@@ -131,12 +139,25 @@
     out (c),a
     ret
 
+._MASTER_SLA_R_NACK1
+    ld a,__IO_I2C_CON_ENSIO             ;clear the interrupt & generate NAK
+    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_CON
+    out (c),a
+    ret
+
 ._MASTER_SLA_R_NAK
     ld a,__IO_I2C_CON_ECHO_BUS_STOPPED  ;sentence complete, we're done    
     ld (__i2c2ControlEcho),a
 
-._MASTER_SLA_R_ACK1
-    ld a,__IO_I2C_CON_ENSIO             ;clear the interrupt & generate NAK
+    in0 a,(ITC)                         ;get INT/TRAP Control Register (ITC)
+    and ~ITC_ITE2                       ;mask out INT2
+    out0 (ITC),a                        ;disable external interrupt
+
+    ld a,(__i2c2SentenceStop)
+    or a
+    ret Z
+
+    ld a,__IO_I2C_CON_ENSIO|__IO_I2C_CON_STO    ;clear the interrupt & send stop
     ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_CON
     out (c),a
     ret

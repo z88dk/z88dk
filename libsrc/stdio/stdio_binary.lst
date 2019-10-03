@@ -33,6 +33,7 @@ stdio/obj/binary/fseek
 stdio/obj/binary/ftell
 stdio/obj/binary/fwrite
 stdio/obj/binary/gets
+stdio/obj/binary/perror
 stdio/obj/binary/printf
 stdio/obj/binary/printk
 stdio/obj/binary/printk_outc

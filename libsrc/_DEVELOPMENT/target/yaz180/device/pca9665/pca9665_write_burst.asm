@@ -13,8 +13,6 @@
     ;FIXME do this with DMA
     
 .pca9665_write_burst
-                        ;lower address bits (0x1F) of B irrelevant
-                        ;upper address bits (0xFC) of C irrelevant
     outi                ;write the byte (HL++)
     inc b               ;keep b constant
     dec e               ;keep iterative count in E

@@ -335,6 +335,9 @@ extern int __LIB__ getk_inkey();
 /* Print a formatted string directly to the console using the default driver */
 extern int __LIB__ printk(const char *fmt,...) __vasmallc;
 
+/* Error handler (mostly an empty fn) */
+extern void __LIB__ perror(char *msg) __z88dk_fastcall;
+
 
 /*
  *  MICRO C compatibility:  keep at bottom of this file

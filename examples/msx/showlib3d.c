@@ -3,7 +3,7 @@
 
 Demo using standard Wizard 3d and 4d math functions
 
-Copyright© 2002, Mark Hamilton
+CopyrightÂ© 2002, Mark Hamilton
 
 MSX port by Stefano Bodrato - Oct 2003
 
@@ -16,6 +16,7 @@ fire - exits
 #include <lib3d.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <malloc.h>
 //#include "graphics.h"
 #include <msx/gfx.h>
 
@@ -44,9 +45,9 @@ static int zf = 0;
 
 
 // off-screen surface buffer
-//unsigned char* sbuffer = (unsigned char*)malloc(MODE2_MAX);
+unsigned char* sbuffer;
 
-unsigned char sbuffer[MODE2_MAX];
+//unsigned char sbuffer[MODE2_MAX];
 
 
 void main(void)
@@ -55,6 +56,7 @@ void main(void)
 	surface_t surf;
 
 	//buf = (u_char*)malloc(MODE2_MAX);
+	sbuffer = (unsigned char*)malloc(MODE2_MAX);
 	
 	surf.data.ram = sbuffer;
 

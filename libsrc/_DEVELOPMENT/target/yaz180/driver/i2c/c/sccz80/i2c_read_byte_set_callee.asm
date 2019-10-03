@@ -9,24 +9,45 @@ PUBLIC i2c_read_byte_set_callee
 ;------------------------------------------------------------------------------
 ;   Read from the I2C Interface, using Byte Mode transmission
 ;
-;   extern void __LIB__ i2c_read_byte_set_callee(uint8_t device,uint8_t addr,uint8_t *dp,uint8_t length) __smallc __z88dk_callee;
+;   extern void __LIB__ i2c_read_byte_set_callee(uint8_t device,uint8_t addr,uint8_t *dp,uint8_t length,uint8_t stop) __smallc __z88dk_callee;
 ;
-;   parameters passed in registers
-;   HL = pointer to location to store data, uint8_t *dp
-;   B  = length of data sentence expected, uint8_t length
-;   C  = 7 bit address of slave device, uint8_t addr
+;   parameters passed in registers to asm functions
+;   HL = pointer to data to transmit, uint8_t *dp
+;   D  = 7 bit address of slave device, uint8_t addr
+;   C  = length of data sentence, uint8_t length
+;   B  = boolean stop at conclusion [0|1], uint8_t stop
 
 
 .i2c_read_byte_set_callee
     pop af                              ;ret
-    pop de                              ;length
-    pop hl                              ;*dp 
-    pop bc                              ;slave address
-    ld b,e                              ;length
-    pop de                              ;device
-    push af                             ;ret
+    ex af,af
 
-    ld a,e                              ;device address
+    ld hl,0
+    add hl,sp
+    ld b,(hl)                           ;stop
+    inc hl
+    inc hl
+    ld c,(hl)                           ;length
+    inc hl
+    inc hl
+    ld e,(hl)                           ;*dp
+    inc hl
+    ld d,(hl)
+    inc hl
+    ld a,(hl)                           ;slave address
+    inc hl
+    inc hl
+    ld sp,hl                            ;top of the stack -2   
+    ld l,(hl)                           ;device address
+    ld h,a                              ;slave address
+    ex de,hl
+    inc sp
+    inc sp
+
+    ex af,af
+    push af                             ;ret
+    
+    ld a,l                              ;device address
     cp __IO_I2C2_PORT_MSB
     jp Z,asm_i2c2_read_byte_set
     cp __IO_I2C1_PORT_MSB

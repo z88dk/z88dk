@@ -663,7 +663,7 @@ void set_origin_directive(int origin)
 		CURRENTSECTION->origin_found = true;
 		if (origin == -1)					/* signal split section binary file */
 			CURRENTSECTION->section_split = true;
-		else if (origin >= 0 && origin <= 0xFFFF)
+		else if (origin >= 0)
 		{
 			if (CURRENTSECTION->origin_opts && CURRENTSECTION->origin >= 0)
 				; /* ignore ORG, as --origin from command line overrides */
