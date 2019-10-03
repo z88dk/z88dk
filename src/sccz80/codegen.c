@@ -1121,8 +1121,7 @@ void zshortcall(int rst, int value)
 void zbankedcall(SYMBOL *sym)
 {
     ol("call\tbanked_call");
-    ot("defw\t"); outname(sym->name, dopref(sym)); nl();
-    ol("defw\t0");
+    ot("defq\t"); outname(sym->name, dopref(sym)); nl();
 }
 
 /* djm (move this!) Decide whether to print a prefix or not 
