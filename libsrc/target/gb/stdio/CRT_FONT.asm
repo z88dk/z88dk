@@ -1,7 +1,7 @@
-                SECTION         rodata_clib
+        SECTION rodata_clib
 
-                PUBLIC          CRT_FONT
+        PUBLIC  CRT_FONT
 
-		EXTERN		_font_ibm_fixed
+        EXTERN  _font_ibm_fixed
 
-                defc            CRT_FONT = _font_ibm_fixed
+        defc    CRT_FONT = _font_ibm_fixed

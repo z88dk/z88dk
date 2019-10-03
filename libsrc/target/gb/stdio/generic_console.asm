@@ -1,27 +1,24 @@
 
 
-                SECTION         code_driver
+        SECTION         code_driver
 
-                PUBLIC          generic_console_cls
-                PUBLIC          generic_console_vpeek
-                PUBLIC          generic_console_scrollup
-                PUBLIC          generic_console_printc
-                PUBLIC          generic_console_ioctl
-                PUBLIC          generic_console_set_ink
-                PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_inverse
+        PUBLIC          generic_console_cls
+        PUBLIC          generic_console_vpeek
+        PUBLIC          generic_console_scrollup
+        PUBLIC          generic_console_printc
+        PUBLIC          generic_console_set_ink
+        PUBLIC          generic_console_set_paper
+        PUBLIC          generic_console_set_inverse
 
-		GLOBAL		asm_setchar
-		GLOBAL		asm_scroll
-		GLOBAL		asm_cls
+        GLOBAL          asm_setchar
+        GLOBAL          asm_scroll
+        GLOBAL          asm_cls
 
-		INCLUDE "target/gb/def/gb_globals.def"
+        INCLUDE "target/gb/def/gb_globals.def"
 
-		EXTERN		CONSOLE_COLUMNS
-		EXTERN		CONSOLE_ROWS
+        EXTERN          CONSOLE_COLUMNS
+        EXTERN          CONSOLE_ROWS
 
-generic_console_ioctl:
-        scf
 generic_console_set_inverse:
 generic_console_set_ink:
 generic_console_set_paper:

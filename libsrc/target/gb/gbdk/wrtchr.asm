@@ -11,7 +11,6 @@
 
 	GLOBAL	generic_console_font32
 	GLOBAL	generic_console_udg32
-	GLOBAL	generic_console_256font
 
         INCLUDE "target/gb/def/gb_globals.def"
 	

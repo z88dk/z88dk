@@ -31,9 +31,9 @@ adv_curs_1:
 adv_curs_2:
         ;; See if scrolling is disabled
         LD      A,(__mode)
-	cp	G_MODE
-	; In a graphics mode, we just reset to (0,0)
-	jr	z,reset_coords
+        cp      G_MODE
+        ; In a graphics mode, we just reset to (0,0)
+        jr      z,reset_coords
 consider_text_mode:
         AND     M_NO_SCROLL
         JR      Z,adv_curs_3
@@ -42,8 +42,8 @@ reset_coords:
         XOR     A
         LD      (__console_y),A
         LD      (__console_x),A
-	pop	hl
-	ret
+        pop     hl
+        ret
 adv_curs_3:
         CALL    asm_scroll
         POP     HL

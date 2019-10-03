@@ -691,234 +691,216 @@ int_0x50:	defs	16
 int_0x58:	defs	16
 int_0x60:	defs	16
 
-	SECTION	code_driver
-
-	GLOBAL  MODE_TABLE
-	GLOBAL	tmode
-	GLOBAL	tmode_out
-	GLOBAL	gmode
-	GLOBAL	tmode_inout
-MODE_TABLE:
-	jp	tmode_out
-	nop
-	jp	gmode
-	defb	0
-	jp	tmode		;MODE 2 = text
-	nop
-	jp	tmode_inout	;MODE 3 = text/input
-	nop
-
-
 
 ; DEFINE SECTIONS FOR BANKSWITCHING
 ; consistent with appmake and new c library
 
    IFNDEF CRT_ORG_BANK_02
-      defc CRT_ORG_BANK_02 = 0x8000
+      defc CRT_ORG_BANK_02 = 0x4000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_03
-      defc CRT_ORG_BANK_03 = 0x8000
+      defc CRT_ORG_BANK_03 = 0x4000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_04
-      defc CRT_ORG_BANK_04 = 0x8000
+      defc CRT_ORG_BANK_04 = 0x4000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_05
-      defc CRT_ORG_BANK_05 = 0x8000
+      defc CRT_ORG_BANK_05 = 0x4000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_06
-      defc CRT_ORG_BANK_06 = 0x8000
+      defc CRT_ORG_BANK_06 = 0x4000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_07
-      defc CRT_ORG_BANK_07 = 0x8000
+      defc CRT_ORG_BANK_07 = 0x4000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_08
-      defc CRT_ORG_BANK_08 = 0x8000
+      defc CRT_ORG_BANK_08 = 0x4000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_09
-      defc CRT_ORG_BANK_09 = 0x8000
+      defc CRT_ORG_BANK_09 = 0x4000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_0A
-      defc CRT_ORG_BANK_0A = 0x8000
+      defc CRT_ORG_BANK_0A = 0x4000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_0B
-      defc CRT_ORG_BANK_0B = 0x8000
+      defc CRT_ORG_BANK_0B = 0x4000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_0C
-      defc CRT_ORG_BANK_0C = 0x8000
+      defc CRT_ORG_BANK_0C = 0x4000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_0D
-      defc CRT_ORG_BANK_0D = 0x8000
+      defc CRT_ORG_BANK_0D = 0x4000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_0E
-      defc CRT_ORG_BANK_0E = 0x8000
+      defc CRT_ORG_BANK_0E = 0x4000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_0F
-      defc CRT_ORG_BANK_0F = 0x8000
+      defc CRT_ORG_BANK_0F = 0x4000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_10
-      defc CRT_ORG_BANK_10 = 0x8000
+      defc CRT_ORG_BANK_10 = 0x4000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_11
-      defc CRT_ORG_BANK_11 = 0x8000
+      defc CRT_ORG_BANK_11 = 0x4000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_12
-      defc CRT_ORG_BANK_12 = 0x8000
+      defc CRT_ORG_BANK_12 = 0x4000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_13
-      defc CRT_ORG_BANK_13 = 0x8000
+      defc CRT_ORG_BANK_13 = 0x4000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_14
-      defc CRT_ORG_BANK_14 = 0x8000
+      defc CRT_ORG_BANK_14 = 0x4000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_15
-      defc CRT_ORG_BANK_15 = 0x8000
+      defc CRT_ORG_BANK_15 = 0x4000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_16
-      defc CRT_ORG_BANK_16 = 0x8000
+      defc CRT_ORG_BANK_16 = 0x4000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_17
-      defc CRT_ORG_BANK_17 = 0x8000
+      defc CRT_ORG_BANK_17 = 0x4000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_18
-      defc CRT_ORG_BANK_18 = 0x8000
+      defc CRT_ORG_BANK_18 = 0x4000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_19
-      defc CRT_ORG_BANK_19 = 0x8000
+      defc CRT_ORG_BANK_19 = 0x4000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_1A
-      defc CRT_ORG_BANK_1A = 0x8000
+      defc CRT_ORG_BANK_1A = 0x4000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_1B
-      defc CRT_ORG_BANK_1B = 0x8000
+      defc CRT_ORG_BANK_1B = 0x4000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_1C
-      defc CRT_ORG_BANK_1C = 0x8000
+      defc CRT_ORG_BANK_1C = 0x4000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_1D
-      defc CRT_ORG_BANK_1D = 0x8000
+      defc CRT_ORG_BANK_1D = 0x4000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_1E
-      defc CRT_ORG_BANK_1E = 0x8000
+      defc CRT_ORG_BANK_1E = 0x4000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_1F
-      defc CRT_ORG_BANK_1F = 0x8000
+      defc CRT_ORG_BANK_1F = 0x4000
    ENDIF
 
    SECTION BANK_02
-   org CRT_ORG_BANK_02
+   org 0x020000 + CRT_ORG_BANK_02
    
    SECTION BANK_03
-   org CRT_ORG_BANK_03
+   org 0x030000 + CRT_ORG_BANK_03
 
    SECTION BANK_04
-   org CRT_ORG_BANK_04
+   org 0x040000 + CRT_ORG_BANK_04
    
    SECTION BANK_05
-   org CRT_ORG_BANK_05
+   org 0x050000 + CRT_ORG_BANK_05
 
    SECTION BANK_06
-   org CRT_ORG_BANK_06
+   org 0x060000 + CRT_ORG_BANK_06
    
    SECTION BANK_07
-   org CRT_ORG_BANK_07
+   org 0x070000 + CRT_ORG_BANK_07
 
    SECTION BANK_08
-   org CRT_ORG_BANK_08
+   org 0x080000 + CRT_ORG_BANK_08
    
    SECTION BANK_09
-   org CRT_ORG_BANK_09
+   org 0x090000 + CRT_ORG_BANK_09
    
    SECTION BANK_0A
-   org CRT_ORG_BANK_0A
+   org 0x0a0000 + CRT_ORG_BANK_0A
    
    SECTION BANK_0B
-   org CRT_ORG_BANK_0B
+   org 0x0b0000 + CRT_ORG_BANK_0B
 
    SECTION BANK_0C
-   org CRT_ORG_BANK_0C
+   org 0x0c0000 + CRT_ORG_BANK_0C
    
    SECTION BANK_0D
-   org CRT_ORG_BANK_0D
+   org 0x0d0000 + CRT_ORG_BANK_0D
 
    SECTION BANK_0E
-   org CRT_ORG_BANK_0E
+   org 0x0e0000 + CRT_ORG_BANK_0E
    
    SECTION BANK_0F
-   org CRT_ORG_BANK_0F
+   org 0x0f0000 + CRT_ORG_BANK_0F
 
    SECTION BANK_10
-   org CRT_ORG_BANK_10
+   org 0x100000 + CRT_ORG_BANK_10
    
    SECTION BANK_11
-   org CRT_ORG_BANK_11
+   org 0x110000 + CRT_ORG_BANK_11
 
    SECTION BANK_12
-   org CRT_ORG_BANK_12
+   org 0x120000 + CRT_ORG_BANK_12
    
    SECTION BANK_13
-   org CRT_ORG_BANK_13
+   org 0x130000 + CRT_ORG_BANK_13
 
    SECTION BANK_14
-   org CRT_ORG_BANK_14
+   org 0x140000 + CRT_ORG_BANK_14
    
    SECTION BANK_15
-   org CRT_ORG_BANK_15
+   org 0x150000 + CRT_ORG_BANK_15
 
    SECTION BANK_16
-   org CRT_ORG_BANK_16
+   org 0x160000 + CRT_ORG_BANK_16
    
    SECTION BANK_17
-   org CRT_ORG_BANK_17
+   org 0x170000 + CRT_ORG_BANK_17
 
    SECTION BANK_18
-   org CRT_ORG_BANK_18
+   org 0x180000 + CRT_ORG_BANK_18
    
    SECTION BANK_19
-   org CRT_ORG_BANK_19
+   org 0x190000 + CRT_ORG_BANK_19
    
    SECTION BANK_1A
-   org CRT_ORG_BANK_1A
+   org 0x1a0000 + CRT_ORG_BANK_1A
    
    SECTION BANK_1B
-   org CRT_ORG_BANK_1B
+   org 0x1b0000 + CRT_ORG_BANK_1B
 
    SECTION BANK_1C
-   org CRT_ORG_BANK_1C
+   org 0x1c0000 + CRT_ORG_BANK_1C
    
    SECTION BANK_1D
-   org CRT_ORG_BANK_1D
+   org 0x1d0000 + CRT_ORG_BANK_1D
 
    SECTION BANK_1E
-   org CRT_ORG_BANK_1E
+   org 0x1e0000 + CRT_ORG_BANK_1E
    
    SECTION BANK_1F
-   org CRT_ORG_BANK_1F
+   org 0x1f0000 + CRT_ORG_BANK_1F

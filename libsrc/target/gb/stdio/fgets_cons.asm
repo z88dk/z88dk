@@ -1,12 +1,12 @@
 
-	SECTION	code_driver
+        SECTION	code_driver
 
-	PUBLIC	fgets_cons
-	PUBLIC	_fgets_cons
+        PUBLIC	fgets_cons
+        PUBLIC	_fgets_cons
 
-	GLOBAL	__mode
-	GLOBAL	tmode_inout
-	GLOBAL	asm_getstring
+        GLOBAL	__mode
+        GLOBAL	tmode_inout
+        GLOBAL	asm_getstring
 
         INCLUDE "target/gb/def/gb_globals.def"
 
