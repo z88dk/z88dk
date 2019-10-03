@@ -149,7 +149,7 @@ int gb_exec(char *target)
     memory = must_realloc(memory, rom_banks * 0x4000);
     len = (0x4000 * i);
     for ( i = len; i < len; i++ ) {
-        memory[i] = 0xff;
+        memory[i] = romfill;
     }
     len = rom_banks * 0x4000;
 
