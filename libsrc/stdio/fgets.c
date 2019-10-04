@@ -28,6 +28,9 @@ char *fgets(char *s,int n,FILE *f)
         if (k=='\n' || k=='\r') 
             break;
         k=fgetc(f);
+	/* EOF condition also when CTRL-Z is found in files, [Stefano] */
+        if ( k == 26 )
+			k = EOF;
         if( k == EOF ) 
             break;
         *p++=(char)k;
