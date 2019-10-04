@@ -254,11 +254,11 @@ extern int __LIB__  fwrite(const void *ptr, size_t size, size_t num, FILE *) __s
 
 
 /* You shouldn't use gets. z88 gets() is limited to 255 characters */
-#ifdef __STDIO_CRLF
-#define gets(x) fgets_cons(x,255)
-#else
+//#ifdef __STDIO_CRLF
+//#define gets(x) fgets_cons(x,255)
+//#else
 extern char __LIB__ *gets(char *s);
-#endif
+//#endif
 
 extern int __LIB__ printf(const char *fmt,...) __vasmallc;
 extern int __LIB__ fprintf(FILE *f,const char *fmt,...) __vasmallc;
