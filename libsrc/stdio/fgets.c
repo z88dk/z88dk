@@ -4,7 +4,7 @@
  *      djm 4/5/99
  *
  * --------
- * $Id: fgets.c,v 1.4 2014-03-31 22:14:39 aralbrec Exp $
+ * $Id: fgets.c $
  */
 
 #define ANSI_STDIO
@@ -28,9 +28,6 @@ char *fgets(char *s,int n,FILE *f)
         if (k=='\n' || k=='\r') 
             break;
         k=fgetc(f);
-	/* EOF condition also when CTRL-Z is found in files, [Stefano] */
-        if ( k == 26 )
-			k = EOF;
         if( k == EOF ) 
             break;
         *p++=(char)k;
