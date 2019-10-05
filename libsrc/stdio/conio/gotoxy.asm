@@ -9,11 +9,11 @@ EXTERN ASMDISP_GOTOXY_CALLEE
 .gotoxy
 ._gotoxy
 
-   pop af
+   pop hl
    pop de
    pop bc
    push bc
    push de
-   push af
+   push hl
    
    jp gotoxy_callee + ASMDISP_GOTOXY_CALLEE

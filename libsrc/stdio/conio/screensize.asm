@@ -9,11 +9,11 @@ EXTERN ASMDISP_SCREENSIZE_CALLEE
 .screensize
 ._screensize
 
-   pop af
+   pop hl
    pop de
    pop bc
    push bc
    push de
-   push af
+   push hl
    
    jp screensize_callee + ASMDISP_SCREENSIZE_CALLEE
