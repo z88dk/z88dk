@@ -62,7 +62,6 @@ check_mode:
     jr	    z,set_mode
     ld	    hl,tmode	; Otherwise it's text mode...
 set_mode:
-    ld	    (__mode),a
     call    l_jphl		; Initialise the mode
     call    generic_console_cls
     and	a
