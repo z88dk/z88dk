@@ -6,6 +6,7 @@
         PUBLIC          generic_console_vpeek
         PUBLIC          generic_console_scrollup
         PUBLIC          generic_console_printc
+        PUBLIC          generic_console_plotc
         PUBLIC          generic_console_set_ink
         PUBLIC          generic_console_set_paper
         PUBLIC          generic_console_set_inverse
@@ -15,7 +16,7 @@
         GLOBAL          asm_scroll
         GLOBAL          asm_cls
         GLOBAL          asm_clg
-        GLOBAL          asm_vpeek_graphics
+        GLOBAL          vpeek_MODE1
 
         GLOBAL          __fgcolour
         GLOBAL          __bgcolour
@@ -55,7 +56,7 @@ generic_console_cls:
 generic_console_vpeek:
         ld      a,(__mode)
         dec     a
-        jp      z,asm_vpeek_graphics
+        jp      z,vpeek_MODE1
         ld      a,b	      ; Y coordinate
         ld      l,a
         ld      h,0x00
@@ -80,7 +81,9 @@ vpeek_1:
 ; b = y
 ; a = d = character to print
 ; e = raw
+generic_console_plotc:
 generic_console_printc:
+    push    bc
     ld      a,(__mode)
     dec     a
     ld      a,d
@@ -115,6 +118,8 @@ not_udg:
 add_offset:
     add     hl,de
 do_print:
+    ld      a,c
+    pop     bc      ;Get coordinates back out
     jp      asm_wrtchr
 
 

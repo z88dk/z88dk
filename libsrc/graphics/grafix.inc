@@ -527,6 +527,10 @@ IF FORsv8000
 	defc blankch = 32
 ENDIF
 
+IF FORgb
+	defc USEplotc   = 1		; We call generic_console_plotc, not _printc for text mode
+ENDIF
+
 
 ; =============================================
 

@@ -1,23 +1,32 @@
 
         SECTION	code_driver
 
-        PUBLIC	asm_vpeek_graphics
+        PUBLIC	vpeek_MODE1
+        PUBLIC  vpeek_read_screen
 
         GLOBAL	y_table
         GLOBAL  vpeek_screendollar
+        GLOBAL  generic_console_font32
 
         INCLUDE "target/gb/def/gb_globals.def"
+
 
 ;Entry: c = x,
 ;       b = y
 ;Exit:  nc = success
 ;        a = character,
 ;        c = failure
-asm_vpeek_graphics:
+vpeek_MODE1:
         ld      hl,sp + -8
         ld      sp,hl
         push    hl              ;Save buffer
+        call    vpeek_read_screen
+        jp      vpeek_screendollar        
 
+
+
+vpeek_read_screen:
+        push    hl
         LD      HL,y_table
         LD      D,0x00
         LD      A,b
@@ -54,6 +63,8 @@ wait_1:
         ld      (de),a
         inc     de
         djnz    wait_1
-        jp      vpeek_screendollar
+        pop     hl
+        ret
 
+        
 
