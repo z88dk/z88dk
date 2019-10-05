@@ -60,8 +60,7 @@ ELSE
         ex      af,af           ; Save those flags
 ENDIF
 IF __CPU_GBZ80__
-        ld      hl,sp+8
-        ld      sp,hl
+        add     sp,8
 ELSE
         ld      hl,8            ; Dump our temporary buffer
         add     hl,sp

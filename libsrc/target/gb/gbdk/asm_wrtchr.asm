@@ -1,36 +1,36 @@
 
-	SECTION	code_driver
+    SECTION code_driver
 
-	PUBLIC	asm_wrtchr
+    PUBLIC  asm_wrtchr
 
-	GLOBAL	y_table
-	GLOBAL	__console_x
-	GLOBAL	__console_y
-	GLOBAL	__fgcolour
-	GLOBAL	__bgcolour
+    GLOBAL  y_table
+    GLOBAL  __fgcolour
+    GLOBAL  __bgcolour
 
-        INCLUDE "target/gb/def/gb_globals.def"
+    INCLUDE "target/gb/def/gb_globals.def"
 
         ;; Write character C
-; Entry: C = character
+; Entry: a = character
+;        c = x
+;        b = y
 ;       hl = font start
 asm_wrtchr:
-	push	hl		;save font
+        push	hl      ;save font
+        push    af      ;save character
         LD      HL,y_table
         LD      D,0x00
-        LD      A,(__console_y)
+        LD      A,b
         RLCA
         RLCA
         RLCA
         LD      E,A
         ADD     HL,DE
         ADD     HL,DE
-        LD      B,(HL)
-        INC     HL
+        LD      A,(HL+)
         LD      H,(HL)
-        LD      L,B
+        LD      L,A
 
-        LD      A,(__console_x)
+        LD      A,c
         RLCA
         RLCA
         RLCA
@@ -38,7 +38,7 @@ asm_wrtchr:
         ADD     HL,DE
         ADD     HL,DE
 
-        LD      A,C
+        pop     af      ; Get character back
         LD      B,H
         LD      C,L
 
@@ -47,7 +47,7 @@ asm_wrtchr:
         ADD     HL,HL
         ADD     HL,HL
         ADD     HL,HL
-	pop	de		;font back
+        pop     de      ;font back
         ADD     HL,DE
 
         LD      D,H

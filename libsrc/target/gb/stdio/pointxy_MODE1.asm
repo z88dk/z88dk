@@ -42,8 +42,7 @@ add_offset:
         call    screendollar_no_inverse_with_count
         push    af
         pop     bc
-        ld      hl,sp+8
-        ld      sp,hl
+        add     sp,8
         push    bc
         pop     af
         ret
