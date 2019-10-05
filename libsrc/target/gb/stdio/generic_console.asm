@@ -83,11 +83,11 @@ vpeek_1:
 ; e = raw
 generic_console_plotc:
 generic_console_printc:
-    push    bc
     ld      a,(__mode)
     dec     a
     ld      a,d
     jp      nz,asm_setchar          ; Text mode
+    push    bc
     ld      c,a
     cp      128
     jr      c,not_udg
