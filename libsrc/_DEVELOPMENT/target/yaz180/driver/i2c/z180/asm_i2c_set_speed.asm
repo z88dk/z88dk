@@ -13,7 +13,7 @@
 
     SECTION code_driver
 
-    PUBLIC asm_i2c_set_speed_mode
+    PUBLIC asm_i2c_set_speed
     
     EXTERN pca9665_write_indirect
 
@@ -21,13 +21,13 @@
     ;input L = desired speed mode, 0, 1, 2, 3
     ;input A = device address, __IO_I2C1_PORT_MSB or __IO_I2C2_PORT_MSB
 
-.asm_i2c_set_speed_mode
+.asm_i2c_set_speed
     cp __IO_I2C2_PORT_MSB
-    jr Z,i2c_set_speed_mode
+    jr Z,i2c_set_speed
     cp __IO_I2C1_PORT_MSB
     ret NZ                      ;no device address match, so exit
     
-.i2c_set_speed_mode
+.i2c_set_speed
     ld h,0x03                   ;create index for the data table containing 4 x 3 bytes
     mlt hl
     ld bc,i2c_speed_mode_data
@@ -56,12 +56,12 @@
 ;       { 0x00, 0x9D, 0x86 },   // STD
 ;       { 0x01, 0x2C, 0x14 },   // FAST
 ;       { 0x02, 0x11, 0x09 },   // FAST_PLUS
-;       { 0x03, 0x0E, 0x05 }    // TURBO
+;       { 0x03, 0x0E, 0x05 }    // PLAID
 ;   };
 
 .i2c_speed_mode_data
     DEFB 0x00, 0x9D, 0x86       ;STD 100kHz
     DEFB 0x01, 0x2C, 0x14       ;FAST 400kHz
     DEFB 0x02, 0x11, 0x09       ;FAST_PLUS 800kHz
-    DEFB 0x03, 0x0E, 0x05       ;TURBO 1MHz
+    DEFB 0x03, 0x0E, 0x05       ;PLAID 1MHz
 

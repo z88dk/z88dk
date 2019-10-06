@@ -15,14 +15,14 @@
 
     SECTION code_driver
 
-    PUBLIC _i2c1_byte_isr
+    PUBLIC _i2c1_isr
 
     EXTERN __i2c1RxPtr, __i2c1TxPtr
     EXTERN __i2c1ControlEcho, __i2c1SlaveAddr, __i2c1SentenceLgth, __i2c1SentenceStop
 
     EXTERN asm_i2c_reset
 
-._i2c1_byte_isr
+._i2c1_isr
     push af
     push bc
     push hl
@@ -33,7 +33,7 @@
     rrca
     and a,$3E                           ;reset low bit to ensure word addresses, clear upper 2 bits
 
-    ld hl,i2c1_byte_end
+    ld hl,i2c1_end
     push hl                             ;prepare a return address for the switch
 
     ld hl,i2c1_int_switch_table
@@ -49,7 +49,7 @@
     ld l,a
     jp (hl)                             ;make the switch
 
-.i2c1_byte_end
+.i2c1_end
     pop hl                              ;return here to clean up afterwards
     pop bc
     pop af
@@ -103,10 +103,10 @@
     out0 (ITC),a                        ;disable external interrupt
 
     ld a,(__i2c1SentenceStop)
-    or a
+    and a,__IO_I2C_CON_STO
     ret Z
 
-    ld a,__IO_I2C_CON_ENSIO|__IO_I2C_CON_STO    ;clear the interrupt & stop
+    ld a,__IO_I2C_CON_ENSIO|__IO_I2C_CON_STO    ;clear the interrupt & send stop
     ld bc,__IO_I2C1_PORT_BASE|__IO_I2C_PORT_CON
     out (c),a
     ret
@@ -154,10 +154,10 @@
     out0 (ITC),a                        ;disable external interrupt
 
     ld a,(__i2c1SentenceStop)
-    or a
+    and a,__IO_I2C_CON_STO
     ret Z
 
-    ld a,__IO_I2C_CON_ENSIO|__IO_I2C_CON_STO    ;clear the interrupt & stop
+    ld a,__IO_I2C_CON_ENSIO|__IO_I2C_CON_STO    ;clear the interrupt & send stop
     ld bc,__IO_I2C1_PORT_BASE|__IO_I2C_PORT_CON
     out (c),a
     ret

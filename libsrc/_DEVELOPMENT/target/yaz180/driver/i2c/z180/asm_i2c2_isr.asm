@@ -15,14 +15,14 @@
 
     SECTION code_driver
 
-    PUBLIC _i2c2_byte_isr
+    PUBLIC _i2c2_isr
 
     EXTERN __i2c2RxPtr, __i2c2TxPtr
     EXTERN __i2c2ControlEcho, __i2c2SlaveAddr, __i2c2SentenceLgth, __i2c2SentenceStop
 
     EXTERN asm_i2c_reset
 
-._i2c2_byte_isr
+._i2c2_isr
     push af
     push bc
     push hl
@@ -33,7 +33,7 @@
     rrca
     and a,$3E                           ;reset low bit to ensure word addresses, clear upper 2 bits
 
-    ld hl,i2c2_byte_end
+    ld hl,i2c2_end
     push hl                             ;prepare a return address for the switch
 
     ld hl,i2c2_int_switch_table
@@ -49,7 +49,7 @@
     ld l,a
     jp (hl)                             ;make the switch
 
-.i2c2_byte_end
+.i2c2_end
     pop hl                              ;return here to clean up afterwards
     pop bc
     pop af
@@ -103,7 +103,7 @@
     out0 (ITC),a                        ;disable external interrupt
 
     ld a,(__i2c2SentenceStop)
-    or a
+    and a,__IO_I2C_CON_STO
     ret Z
 
     ld a,__IO_I2C_CON_ENSIO|__IO_I2C_CON_STO    ;clear the interrupt & send stop
@@ -154,7 +154,7 @@
     out0 (ITC),a                        ;disable external interrupt
 
     ld a,(__i2c2SentenceStop)
-    or a
+    and a,__IO_I2C_CON_STO
     ret Z
 
     ld a,__IO_I2C_CON_ENSIO|__IO_I2C_CON_STO    ;clear the interrupt & send stop

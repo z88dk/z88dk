@@ -15,51 +15,54 @@
 
     SECTION code_driver
 
-    PUBLIC asm_i2c1_write_byte
+    PUBLIC asm_i2c1_read_set
 
-    EXTERN __i2c1TxPtr
+    EXTERN __i2c1RxPtr
     EXTERN __i2c1ControlEcho, __i2c1SlaveAddr, __i2c1SentenceLgth, __i2c1SentenceStop
 
-;   Write to the I2C Interface, using Byte Mode transmission
-;   void i2c_write_byte( char addr, char *dp, char length, char stop );
+;   Read from the I2C Interface, using Byte Mode transmission
+;   void i2c_read_set( char addr, char *dp, char length, char mode );
 ;   parameters passed in registers
-;   HL = pointer to data to transmit, uint8_t *dp
+;   HL = pointer to receive buffer, uint8_t *dp
 ;   D  = 7 bit address of slave device, uint8_t _i2c1SlaveAddr
-;   C  = length of data sentence, uint8_t _i2c1SentenceLgth
-;   B  = boolean stop at conclusion [1|0], uint8_t _i2c1SentenceStop
+;   C  = length of data sentence expected, uint8_t _i2c1SentenceLgth
+;   B  = mode with buffer/byte [1|0] and boolean stop at conclusion [0x10|0x00], uint8_t _i2c1SentenceStop
 
-.asm_i2c1_write_byte
+.asm_i2c1_read_set
     ld a,(__i2c1ControlEcho)
     tst __IO_I2C_CON_ECHO_BUS_RESTART|__IO_I2C_CON_ECHO_BUS_ILLEGAL
     ret NZ                      ;just exit if a fault
 
     and __IO_I2C_CON_ECHO_BUS_STOPPED
-    jr Z,asm_i2c1_write_byte    ;if the bus is not stopped, then wait till it is
+    jr Z,asm_i2c1_read_set      ;if the bus is not stopped, then wait till it is
 
     ld a,c
-    or a                        ;check the sentence provided for zero length, clear carry
+    or a                        ;check the sentence expected for zero length
     ret Z                       ;return if the sentence is 0 length
 
     ld (__i2c1SentenceLgth),a   ;store the sentence length
 
     ld a,d                      ;store the 7 bit slave address
-    rla                         ;ensure we're writing Bit 0:[W=0]
+    scf
+    rla                         ;ensure we're reading Bit 0:[R=1]
     ld (__i2c1SlaveAddr),a
 
-    ld a,b                      ;store the stop boolean
+    ld (__i2c1RxPtr),hl         ;store the buffer pointer
+
+    ld a,b                      ;store the mode and stop booleans
     ld (__i2c1SentenceStop),a
-
-    ld (__i2c1TxPtr),hl         ;store the buffer pointer
-
-    ld a,__IO_I2C_CON_ENSIO
-    ld (__i2c1ControlEcho),a    ;store enabled in the control echo
 
     di
     in0 a,(ITC)                 ;get INT/TRAP Control Register (ITC)
     or ITC_ITE1                 ;mask in INT1
     out0 (ITC),a                ;enable external interrupt
 
-    ld a,__IO_I2C_CON_ENSIO|__IO_I2C_CON_STA
+    ld a,b
+    and a,__IO_I2C_CON_MODE     ;check whether buffer or byte mode is required
+    or a,__IO_I2C_CON_ENSIO
+    ld (__i2c1ControlEcho),a    ;store enabled in the control echo
+
+    or a,__IO_I2C_CON_STA       ;enable start flag too
     ld bc,__IO_I2C1_PORT_BASE|__IO_I2C_PORT_CON
     out (c),a                   ;set the interface enable and STA bit
     ei
