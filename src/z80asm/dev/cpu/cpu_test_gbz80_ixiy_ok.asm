@@ -467,6 +467,7 @@
  ld hl, 65535                   ; 21 FF FF
  ld hl, bc                      ; 60 69
  ld hl, de                      ; 62 6B
+ ld hl, sp                      ; F8 00
  ld hl, sp+-128                 ; F8 80
  ld hl, sp+127                  ; F8 7F
  ld ix, -32768                  ; FD 21 00 80

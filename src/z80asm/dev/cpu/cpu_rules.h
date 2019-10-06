@@ -27488,7 +27488,15 @@ break;
 default: error_illegal_ident(); }
 }
 
-| label? _TK_LD _TK_HL _TK_COMMA _TK_SP _TK_PLUS expr _TK_NEWLINE @{
+| label? _TK_LD _TK_HL _TK_COMMA _TK_SP _TK_NEWLINE @{
+switch (opts.cpu) {
+case CPU_GBZ80: 
+DO_stmt(0xF800);
+break;
+default: error_illegal_ident(); }
+}
+
+| label? _TK_LD _TK_HL _TK_COMMA _TK_SP expr _TK_NEWLINE @{
 switch (opts.cpu) {
 case CPU_GBZ80: 
 if (expr_in_parens) warn_expr_in_parens();

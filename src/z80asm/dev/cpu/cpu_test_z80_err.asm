@@ -4336,6 +4336,7 @@
  ld hl, (sp+255)                ; Error
  ld hl, ix                      ; Error
  ld hl, iy                      ; Error
+ ld hl, sp                      ; Error
  ld hl, sp+-128                 ; Error
  ld hl, sp+127                  ; Error
  ld iir, a                      ; Error
