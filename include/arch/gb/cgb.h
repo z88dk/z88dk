@@ -40,19 +40,19 @@
 
 /** Set bkg palette(s).
  */
-void __LIB__ set_bkg_palette(uint8_t first_palette, uint8_t nb_palettes, uint16_t *rgb_data) __smallc NONBANKED;
+void __LIB__ set_bkg_palette(uint16_t first_palette, uint16_t nb_palettes, uint16_t *rgb_data) __smallc NONBANKED;
 
 /** Set sprite palette(s).
  */
-void __LIB__ set_sprite_palette(uint8_t first_palette, uint8_t nb_palettes, uint16_t *rgb_data) __smallc NONBANKED;
+void __LIB__ set_sprite_palette(uint16_t first_palette, uint16_t nb_palettes, uint16_t *rgb_data) __smallc NONBANKED;
 
 /** Set a bkg palette entry.
  */
-void __LIB__ set_bkg_palette_entry(uint8_t palette, uint8_t entry, uint16_t rgb_data) __smallc;
+void __LIB__ set_bkg_palette_entry(uint16_t palette, uint16_t entry, uint16_t rgb_data) __smallc;
 
 /** Set a sprite palette entry.
  */
-void __LIB__ set_sprite_palette_entry(uint8_t palette, uint8_t entry, uint16_t rgb_data) __smallc;
+void __LIB__ set_sprite_palette_entry(uint16_t palette, uint16_t entry, uint16_t rgb_data) __smallc;
 
 /** Set CPU speed to slow operation.
     Make sure interrupts are disabled before call.

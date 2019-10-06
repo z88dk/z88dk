@@ -365,7 +365,7 @@ void __LIB__ display_off(void) NONBANKED;
     @param src		Area to copy from
     @param n		Number of bytes to copy.
 */
-void __LIB__ hiramcpy(uint8_t dst, const void *src, uint8_t n) NONBANKED;
+void __LIB__ hiramcpy(uint16_t dst, const void *src, uint16_t n) __smallc NONBANKED;
 
 /* ************************************************************ */
 
@@ -444,7 +444,7 @@ void __LIB__ hiramcpy(uint8_t dst, const void *src, uint8_t n) NONBANKED;
     @param first_tile	Range 0 - 255
     @param nb_tiles	Range 0 - 255
 */
-void __LIB__ set_bkg_data(uint8_t first_tile, uint8_t nb_tiles, unsigned char *data) __smallc NONBANKED;
+void __LIB__ set_bkg_data(uint16_t first_tile, uint16_t nb_tiles, unsigned char *data) __smallc NONBANKED;
 
 /** Sets the tiles in the background tile table.
     Starting at position x,y in tiles and writing across for w tiles
@@ -460,21 +460,21 @@ void __LIB__ set_bkg_data(uint8_t first_tile, uint8_t nb_tiles, unsigned char *d
     @param data		Pointer to an unsigned char. Usually the 
     			first element in an array.
 */
-void __LIB__ set_bkg_tiles(uint8_t x, uint8_t y, uint8_t w, uint8_t h, unsigned char *tiles) __smallc NONBANKED;
+void __LIB__ set_bkg_tiles(uint16_t x, uint16_t y, uint16_t w, uint16_t h, unsigned char *tiles) __smallc NONBANKED;
 
-void __LIB__ get_bkg_tiles(uint8_t x, uint8_t y, uint8_t w, uint8_t h, unsigned char *tiles) __smallc NONBANKED; 
+void __LIB__ get_bkg_tiles(uint16_t x, uint16_t y, uint16_t w, uint16_t h, unsigned char *tiles) __smallc NONBANKED; 
 
 /** Moves the background layer to the position specified in x and y in pixels.
     Where 0,0 is the top left corner of the GB screen. You'll notice the screen
     wraps around in all 4 directions, and is always under the window layer.
 */
-void __LIB__ move_bkg(uint8_t x, uint8_t y) __smallc NONBANKED;
+void __LIB__ move_bkg(uint16_t x, uint16_t y) __smallc NONBANKED;
 
 /** Moves the background relative to it's current position.
 
     @see move_bkg
 */
-void __LIB__ scroll_bkg(int8_t x, int8_t y) __smallc NONBANKED;
+void __LIB__ scroll_bkg(int16_t x, int16_t y) __smallc NONBANKED;
 
 /* ************************************************************ */
 
@@ -483,7 +483,7 @@ void __LIB__ scroll_bkg(int8_t x, int8_t y) __smallc NONBANKED;
     layer share the same Tile Patterns.
     @see set_bkg_data
 */
-void __LIB__ set_win_data(uint8_t first_tile, uint8_t nb_tiles, unsigned char *data) __smallc NONBANKED;
+void __LIB__ set_win_data(uint16_t first_tile, uint16_t nb_tiles, unsigned char *data) __smallc NONBANKED;
 
 /** Sets the tiles in the win tile table. 
     Starting at position x,y in
@@ -515,21 +515,21 @@ void __LIB__ set_win_data(uint8_t first_tile, uint8_t nb_tiles, unsigned char *d
     @param w		Range 0 - 31
     @param h		Range 0 - 31
 */
-void __LIB__ set_win_tiles(uint8_t x, uint8_t y, uint8_t w, uint8_t h, unsigned char *tiles) __smallc NONBANKED;
+void __LIB__ set_win_tiles(uint16_t x, uint16_t y, uint16_t w, uint16_t h, unsigned char *tiles) __smallc NONBANKED;
 
-void __LIB__ get_win_tiles(uint8_t x, uint8_t y, uint8_t w, uint8_t h, unsigned char *tiles) __smallc NONBANKED;
+void __LIB__ get_win_tiles(uint16_t x, uint16_t y, uint16_t w, uint16_t h, unsigned char *tiles) __smallc NONBANKED;
 
 /** Moves the window layer to the position specified in x and y in pixels.
     Where 7,0 is the top left corner of the GB screen. The window is locked to
     the bottom right corner, and is always over the background layer.
     @see SHOW_WIN, HIDE_WIN
 */
-void __LIB__ move_win(uint8_t x, uint8_t y) __smallc NONBANKED;
+void __LIB__ move_win(uint16_t x, uint16_t y) __smallc NONBANKED;
 
 /** Move the window relative to its current position.
     @see move_win
 */
-void __LIB__ scroll_win(int8_t x, int8_t y) __smallc NONBANKED;
+void __LIB__ scroll_win(int16_t x, int16_t y) __smallc NONBANKED;
 
 /* ************************************************************ */
 
@@ -544,18 +544,18 @@ void __LIB__ scroll_win(int8_t x, int8_t y) __smallc NONBANKED;
     patterns are written to. VBK_REG=0 indicates the first bank, and VBK_REG=1
     indicates the second.
 */
-void __LIB__ set_sprite_data(uint8_t first_tile, uint8_t nb_tiles, unsigned char *data) __smallc NONBANKED;
+void __LIB__ set_sprite_data(uint16_t first_tile, uint16_t nb_tiles, unsigned char *data) __smallc NONBANKED;
 
-void __LIB__ get_sprite_data(uint8_t first_tile, uint8_t nb_tiles, unsigned char *data) __smallc NONBANKED;
+void __LIB__ get_sprite_data(uint16_t first_tile, uint16_t nb_tiles, unsigned char *data) __smallc NONBANKED;
 
 /** Sets sprite n to display tile number t, from the sprite tile data. 
     If the GB is in 8x16 sprite mode then it will display the next
     tile, t+1, below the first tile.
     @param nb		Sprite number, range 0 - 39
 */
-void __LIB__ set_sprite_tile(uint8_t nb, uint8_t tile) __smallc NONBANKED;
+void __LIB__ set_sprite_tile(uint16_t nb, uint16_t tile) __smallc NONBANKED;
 
-uint8_t __LIB__ get_sprite_tile(uint8_t nb) NONBANKED;
+uint8_t __LIB__ get_sprite_tile(uint16_t nb) NONBANKED;
 
 /** Sets the property of sprite n to those defined in p.
     Where the bits in p represent:
@@ -576,9 +576,9 @@ uint8_t __LIB__ get_sprite_tile(uint8_t nb) NONBANKED;
     
     @param nb		Sprite number, range 0 - 39
 */
-void __LIB__ set_sprite_prop(uint8_t nb, uint8_t prop) __smallc NONBANKED;
+void __LIB__ set_sprite_prop(uint16_t nb, uint16_t prop) __smallc NONBANKED;
 
-uint8_t __LIB__ get_sprite_prop(uint8_t nb) NONBANKED;
+uint8_t __LIB__ get_sprite_prop(uint16_t nb) NONBANKED;
 
 /** Moves the given sprite to the given position on the
     screen.
@@ -586,11 +586,11 @@ uint8_t __LIB__ get_sprite_prop(uint8_t nb) NONBANKED;
     is at (8,16).  To put sprite 0 at the top left, use
     move_sprite(0, 8, 16);
 */
-void __LIB__ move_sprite(uint8_t nb, uint8_t x, uint8_t y) __smallc NONBANKED;
+void __LIB__ move_sprite(uint16_t nb, uint16_t x, uint16_t y) __smallc NONBANKED;
 
 /** Moves the given sprite relative to its current position.
  */
-void __LIB__ scroll_sprite(int8_t nb, int8_t x, int8_t y) __smallc  NONBANKED;
+void __LIB__ scroll_sprite(int16_t nb, int16_t x, int16_t y) __smallc  NONBANKED;
 
 /* ************************************************************ */
 
@@ -598,8 +598,8 @@ void __LIB__ set_data(unsigned char *vram_addr, unsigned char *data, uint16_t le
 
 void __LIB__ get_data(unsigned char *data, unsigned char *vram_addr, uint16_t len) __smallc NONBANKED; 
 
-void __LIB__ set_tiles(uint8_t x, uint8_t y, uint8_t w, uint8_t h, unsigned char *vram_addr, unsigned char *tiles) __smallc  NONBANKED;
+void __LIB__ set_tiles(uint16_t x, uint16_t y, uint16_t w, uint16_t h, unsigned char *vram_addr, unsigned char *tiles) __smallc  NONBANKED;
 
-void __LIB__ get_tiles(uint8_t x, uint8_t y, uint8_t w, uint8_t h, unsigned char *tiles, unsigned char *vram_addr) __smallc NONBANKED;
+void __LIB__ get_tiles(uint16_t x, uint16_t y, uint16_t w, uint16_t h, unsigned char *tiles, unsigned char *vram_addr) __smallc NONBANKED;
 
 #endif /* _GB_H */
