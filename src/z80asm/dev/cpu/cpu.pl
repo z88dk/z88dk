@@ -270,7 +270,7 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "ld de, hl+%u",	0x28, '%u');
 	}
 	else {	
-		add_opc($cpu, "ld de, hl", 0x54, 0x5D);
+		add_opc($cpu, "ld de, hl", 		0x54, 0x5D);
 	}
 
 	add_opc($cpu, "ld hl, bc", 0x60, 0x69);
@@ -413,8 +413,8 @@ for my $cpu (@CPUS) {
 	if ($gameboy) {
 		add_opc($cpu, "add sp, %s", 0xE8, '%s');
 		
-		add_opc($cpu, "ld hl, sp+%s", 0xF8, '%s');
-		add_opc($cpu, "ldhl sp, %s", 0xF8, '%s');
+		add_opc($cpu, "ld hl, sp+%s", 	0xF8, '%s');
+		add_opc($cpu, "ldhl sp, %s", 	0xF8, '%s');
 		
 		add_opc($cpu, "ld (%m), sp", 0x08, '%m', '%m');
 	}
@@ -1057,7 +1057,7 @@ for my $asm (sort keys %Opcodes) {
 			}
 		}
 		$tb->add(span_cells(@row));
-		say "@row";
+		#say "@row";
 	}
 }
 
@@ -1073,7 +1073,7 @@ for my $opcode (sort keys %by_opcode) {
 		$row[$column] = $by_opcode{$opcode}{$cpu};
 	}
 	$tb->add(span_cells(@row));
-	say "@row";
+	#say "@row";
 }
 
 (my $opcode_file = $0) =~ s/\.pl$/_opcodes.txt/i;
@@ -1216,9 +1216,9 @@ sub add_opc_2 {
 	my($cpu, $asm, @bin) = @_;
 
 	# (ix+%d) -> (ix)
-	if ($asm =~ /\+%[du]/) {
-		(my $asm1 = $asm) =~ s/\+%[du]//;
-		my @bin1 = map {/%[du]/ ? 0 : $_} @bin;
+	if ($asm =~ /\+%[sdu]/) {
+		(my $asm1 = $asm) =~ s/\+%[sdu]//;
+		my @bin1 = map {/%[sdu]/ ? 0 : $_} @bin;
 		add_opc_3($cpu, $asm1, @bin1);
 	}
 
@@ -1297,7 +1297,7 @@ sub add_opc_4 {
 		}
 	}
 	else {
-		say sprintf("%-8s%-24s%s", $cpu, $asm, fmthex(@bin));
+		#say sprintf("%-8s%-24s%s", $cpu, $asm, fmthex(@bin));
 
 		$Opcodes{$asm}{$cpu} = \@bin;
 	}
@@ -1312,12 +1312,12 @@ sub parser_tokens {
 	
 	while (!/\G \z 				/gcx) {
 		if (/\G \s+ 			/gcx) {}
-		elsif (/\G \( (\w+) 	/gcx) { push @tokens, "_TK_IND_".uc($1); }
+		elsif (/\G \( (\w+)		/gcx) { push @tokens, "_TK_IND_".uc($1); }
 		elsif (/\G , 			/gcx) { push @tokens, "_TK_COMMA"; }
 		elsif (/\G \) 			/gcx) { push @tokens, "_TK_RPAREN"; }
 		elsif (/\G \( %[nm] \)	/gcx) { push @tokens, "expr"; }
-		elsif (/\G \+ %[du]		/gcx) { push @tokens, "expr"; }
 		elsif (/\G    %[snmMj]	/gcx) { push @tokens, "expr"; }
+		elsif (/\G \+ %[dsu]	/gcx) { push @tokens, "expr"; }
 		elsif (/\G    %[c]		/gcx) { push @tokens, "const_expr"; }
 		elsif (/\G    (\w+)	'	/gcx) { push @tokens, "_TK_".uc($1)."1"; }
 		elsif (/\G    (\w+)		/gcx) { push @tokens, "_TK_".uc($1); }

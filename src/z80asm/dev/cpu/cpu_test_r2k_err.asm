@@ -768,6 +768,7 @@
  ld e, iyh                      ; Error
  ld e, iyl                      ; Error
  ld hl, (de)                    ; Error
+ ld hl, sp                      ; Error
  ld hl, sp+-128                 ; Error
  ld hl, sp+127                  ; Error
  ld i, a                        ; Error

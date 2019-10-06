@@ -4614,6 +4614,7 @@
 |                 |rm         |            |            |rm                     |         |               |              |              |
 |F8 %s            |           |            |ld hl, sp+%s|                       |         |               |              |              |
 |                 |           |            |ldhl sp, %s |                       |         |               |              |              |
+|F8 00            |           |            |ld hl, sp   |                       |         |               |              |              |
 |F9               |ld sp, hl  |==          |ld sp, hl   |ld sp, hl              |==       |==             |==            |==            |
 |                 |sphl       |            |            |sphl                   |         |               |              |              |
 |FA %m %m         |j_m %m     |==          |ld a, (%m)  |j_m %m                 |==       |==             |==            |==            |

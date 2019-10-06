@@ -108,11 +108,10 @@ static void push_expr(ParseCtx *ctx)
 	STR_DEFINE(expr_text, STR_SIZE);
 	Expr *expr;
 	Sym  *expr_p;
-	bool  last_was_prefix;
 
 	/* build expression text - split constant prefixes from numbers and names */
 	Str_clear(expr_text);
-	last_was_prefix = false;
+	bool last_was_prefix = false;
 	for (expr_p = ctx->expr_start; expr_p < ctx->p; expr_p++)
 	{
 		if (last_was_prefix && expr_p->tlen > 0 &&
