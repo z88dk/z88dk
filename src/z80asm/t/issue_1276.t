@@ -44,5 +44,44 @@ for my $n (-4, 0, 4) {
 			0xD4, $n & 0xFF));
 }
 
+# check warnings
+for my $n (-129, -128, 0, 255, 256) {
+	my $offset = $n > 0 ? "+$n" : $n < 0 ? "$n" : "";
+	my $warning = ($n >= -128 && $n < 256) ? "" : "Warning at file 'test.asm' line 1: integer '$n' out of range\n";
+
+	ok 1, "n=$n";
+	
+	unlink_testfiles();
+	z80asm("ld de, hl$offset",		'-b -m8085', 0, "", $warning); 	
+	check_bin_file("test.bin", pack("C*", 0x28, $n & 0xFF));
+
+	unlink_testfiles();
+	z80asm("ld de, sp$offset",		'-b -m8085', 0, "", $warning); 	
+	check_bin_file("test.bin", pack("C*", 0x38, $n & 0xFF));
+
+	unlink_testfiles();
+	z80asm("ld hl, (sp$offset)",		'-b -mr2k', 0, "", $warning); 	
+	check_bin_file("test.bin", pack("C*", 0xC4, $n & 0xFF));
+
+	unlink_testfiles();
+	z80asm("ld (sp$offset), hl",		'-b -mr2k', 0, "", $warning); 	
+	check_bin_file("test.bin", pack("C*", 0xD4, $n & 0xFF));
+}
+
+for my $n (-129, -128, 0, 127, 128) {
+	my $offset = $n > 0 ? "+$n" : $n < 0 ? "$n" : "";
+	my $warning = ($n >= -128 && $n < 128) ? "" : "Warning at file 'test.asm' line 1: integer '$n' out of range\n";
+
+	ok 1, "n=$n";
+
+ 	unlink_testfiles();
+	z80asm("ld hl, (ix$offset)",		'-b -mr2k', 0, "", $warning); 	
+	check_bin_file("test.bin", pack("C*", 0xE4, $n & 0xFF));
+
+	unlink_testfiles();
+	z80asm("ld (ix$offset), hl",		'-b -mr2k', 0, "", $warning); 	
+	check_bin_file("test.bin", pack("C*", 0xF4, $n & 0xFF));
+}
+
 unlink_testfiles();
 done_testing();
