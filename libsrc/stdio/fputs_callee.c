@@ -31,7 +31,10 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	pop	ix
 ENDIF
 	call	asm_fputs_callee
-IF !__CPU_INTEL__ && !__CPU_GBZ80__
+IF __CPU_GBZ80__
+    ld      d,h
+    ld      e,l
+ELIF !__CPU_INTEL__
 	pop	ix
 ENDIF
 	ret

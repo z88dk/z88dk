@@ -143,15 +143,15 @@ IF __CPU_INTEL__ | __CPU_GBZ80__
 	dec	hl
 	dec	hl	;-3
 	xor	a
-IF __CPU_GBZ80__
+  IF __CPU_GBZ80__
 	ld	(hl-),a
 	ld	(hl-),a
-ELSE
+  ELSE
 	ld	(hl),a	;upper case switch
 	dec	hl	;-4
 	ld	(hl),a	;flags
 	dec	hl	;-5
-ENDIF
+  ENDIF
 	dec	hl	;-6
 	dec	hl	;-7
 	dec	hl	;-8
@@ -183,6 +183,10 @@ ELSE
 	ld	sp,hl
 ENDIF
 	pop	hl		;grab the number of bytes written
+IF __CPU_GBZ80__
+	ld	d,h
+	ld	e,l
+ENDIF
 __printf_get_flags_noop:	
 	ret
 	

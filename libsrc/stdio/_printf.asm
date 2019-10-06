@@ -32,11 +32,15 @@ ENDIF
 	push	de	;fmt
 	push	hl	;argument
 	call	asm_printf
+IF __CPU_GBZ80__
+	add	sp,10
+ELSE
 	pop	bc
 	pop	bc
 	pop	bc	
 	pop	bc
 	pop	bc
+ENDIF
 IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	pop	ix	;restore ix
 ENDIF

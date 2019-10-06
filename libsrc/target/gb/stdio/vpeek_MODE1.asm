@@ -50,7 +50,6 @@ vpeek_read_screen:
 
         ;hl = screen location
         pop     de
-        push    de
 
         ld      b,8
 wait_1:
@@ -63,7 +62,6 @@ wait_1:
         ld      (de),a
         inc     de
         djnz    wait_1
-        pop     hl
         ret
 
         

@@ -29,8 +29,17 @@ IF __CPU_INTEL__
 ELSE
 	bit	3,a	;_IOEOF
 ENDIF
+IF __CPU_GBZ80__
+	jr	nz,feof_assign_ret
+ELSE
 	ret	nz
+ENDIF
 	dec	hl	;hl = 0
+IF __CPU_GBZ80__
+feof_assign_ret:
+	ld	d,h
+	ld	e,l
+ENDIF
 	ret
 #endasm
 //	return (fp->flags&_IOEOF ? 1 : 0 );

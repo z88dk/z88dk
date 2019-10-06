@@ -10,7 +10,11 @@ EXTERN __console_y
 .wherey
 ._wherey
 
-	ld	a,(__console_y)
-	ld	l,a
-	ld	h,0
-	ret
+    ld      a,(__console_y)
+    ld      l,a
+    ld      h,0
+IF __CPU_GBZ80__
+    ld      d,h
+    ld      e,l
+ENDIF
+    ret
