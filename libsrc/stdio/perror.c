@@ -15,6 +15,6 @@
 void perror(const char *s)
 {
 	fputs(s,stderr);
-	fputs(": z88dk error handler\n",stderr);
+	fputs(": error.\n",stderr);
 }
 
