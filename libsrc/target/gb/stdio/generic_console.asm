@@ -4,6 +4,7 @@
 
         PUBLIC          generic_console_cls
         PUBLIC          generic_console_vpeek
+        PUBLIC          generic_console_pointxy
         PUBLIC          generic_console_scrollup
         PUBLIC          generic_console_printc
         PUBLIC          generic_console_plotc
@@ -17,6 +18,7 @@
         GLOBAL          asm_cls
         GLOBAL          asm_clg
         GLOBAL          vpeek_MODE1
+	GLOBAL		pointxy_MODE1
 
         GLOBAL          __fgcolour
         GLOBAL          __bgcolour
@@ -47,6 +49,16 @@ generic_console_cls:
         jp      z,asm_clg
         jp      asm_cls
         
+;Entry: c = x,
+;       b = y
+;Exit:  nc = success
+;        a = character,
+;        c = failure
+generic_console_pointxy:
+        ld      a,(__mode)
+	dec	a
+	jp	z,pointxy_MODE1
+	jr	vpeek_console
 
 ;Entry: c = x,
 ;       b = y
@@ -57,6 +69,7 @@ generic_console_vpeek:
         ld      a,(__mode)
         dec     a
         jp      z,vpeek_MODE1
+vpeek_console:
         ld      l,b           ; Y coordinate
         ld      h,0x00
         add     hl,hl

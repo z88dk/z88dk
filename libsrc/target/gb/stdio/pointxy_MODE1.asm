@@ -1,7 +1,7 @@
 
         SECTION	code_driver
 
-        PUBLIC	generic_console_pointxy
+        PUBLIC	pointxy_MODE1
 
         GLOBAL	vpeek_read_screen
         GLOBAL	generic_console_vpeek
@@ -17,10 +17,7 @@
 ;Exit:  nc = success
 ;        a = character,
 ;        c = failure
-generic_console_pointxy:
-	ld	a,(__mode)
-	dec	a
-	jp	nz,generic_console_vpeek
+pointxy_MODE1:
         ld      hl,sp + -8
         ld      sp,hl
         push    hl              ;Save buffer
