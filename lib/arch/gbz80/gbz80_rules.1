@@ -122,3 +122,49 @@
 	ld	a,(hl+)
 	ld	h,(hl)
 	ld	l,a
+
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	push	hl
+	ld	hl,sp+%1
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	pop	de
+=
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ld	hl,sp+%eval(%1 2 -)
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	ld	de,%1
+	push	hl
+	ld	l,e
+	ld	h,d
+	pop	de
+=
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ld	hl,%1
+
+	ld	de,_%1
+	call	l_pint
+	ld	hl,_%1
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ld	hl,%2
+=
+	ld	de,_%1
+	call	l_pint
+	ld	e,l
+	ld	d,h
+	ld	hl,%2

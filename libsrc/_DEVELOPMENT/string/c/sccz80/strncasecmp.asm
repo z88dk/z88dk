@@ -26,6 +26,10 @@ IF __CPU_GBZ80__
    ld a,d
    ld d,h
    ld h,a
+   call  asm_strncasecmp
+   ld d,h
+   ld e,l
+   ret
 ELSE
    pop af
    pop bc
@@ -36,19 +40,19 @@ ELSE
    push hl
    push bc
    push af
-ENDIF
 
-IF __CLASSIC
-IF !__CPU_INTEL__ && !__CPU_GBZ80__
+ IF __CLASSIC
+  IF !__CPU_INTEL__ 
    push ix   
-ENDIF
+  ENDIF
    call  asm_strncasecmp
-IF !__CPU_INTEL__ && !__CPU_GBZ80__
+  IF !__CPU_INTEL__ 
    pop  ix
-ENDIF
+  ENDIF
    ret
-ELSE
+ ELSE
    jp asm_strncasecmp
+ ENDIF
 ENDIF
 
 ; SDCC bridge for Classic

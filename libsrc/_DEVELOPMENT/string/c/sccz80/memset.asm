@@ -34,8 +34,15 @@ ELSE
    push bc
    push af
 ENDIF
-   
+  
+IF __CLASSIC && __CPU_GBZ80__
+   call asm_memset
+   ld d,h
+   ld e,l
+   ret
+ELSE 
    jp asm_memset
+ENDIF
 
 ; SDCC bridge for Classic
 IF __CLASSIC

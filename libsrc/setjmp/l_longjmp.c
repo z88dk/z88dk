@@ -21,7 +21,7 @@ void l_longjmp(jmp_buf *env, int val)
 .longjmp1
 	pop	hl	;&env
 IF !__CPU_INTEL__ && !__CPU_GBZ80__
-	ld	e,(hl)	;ix
+	ld	e,(hl)	;iy
 	inc	hl
 	ld	d,(hl)
 	inc	hl

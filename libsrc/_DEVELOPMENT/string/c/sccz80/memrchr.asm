@@ -35,7 +35,14 @@ ELSE
    push af
 ENDIF
 
+IF __CLASSIC && __CPU_GBZ80__
+   call l0_memrchr_callee
+   ld d,h
+   ld e,l
+   ret
+ELSE
    jp l0_memrchr_callee
+ENDIF
 
 ; SDCC bridge for Classic
 IF __CLASSIC

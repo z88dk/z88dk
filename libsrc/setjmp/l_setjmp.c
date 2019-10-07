@@ -23,14 +23,12 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	inc	hl
 	ld	(hl),d
 	inc	hl
-	inc	hl
 	push	ix
 	pop	de	;de=ix, hl=&env
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d
 ELSE
-	inc	hl
 	inc	hl
 	inc	hl
 	inc	hl

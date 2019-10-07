@@ -17,8 +17,14 @@ strndup:
    push hl
    push bc
    push de
-   
+IF __CLASSIC && __CPU_GBZ80__
+   call asm_strndup
+   ld d,h
+   ld e,l
+   ret
+ELSE
    jp asm_strndup
+ENDIF
 
 ; SDCC bridge for Classic
 IF __CLASSIC
