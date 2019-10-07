@@ -18,7 +18,7 @@
     PUBLIC asm_i2c2_write
 
     EXTERN __i2c2TxPtr
-    EXTERN __i2c2ControlEcho, __i2c2SlaveAddr, __i2c2SentenceLgth, __i2c2SentenceStop
+    EXTERN __i2c2ControlEcho, __i2c2ControlInput, __i2c2SlaveAddr, __i2c2SentenceLgth
 
 ;   Write to the I2C Interface, using Byte Mode transmission
 ;   void i2c_write( char addr, char *dp, char length, char mode );
@@ -26,7 +26,7 @@
 ;   HL = pointer to data to transmit, uint8_t *dp
 ;   D  = 7 bit address of slave device, uint8_t _i2c2SlaveAddr
 ;   C  = length of data sentence, uint8_t _i2c2SentenceLgth
-;   B  = mode with buffer/byte [1|0] and boolean stop at conclusion [0x10|0x00], uint8_t _i2c2SentenceStop
+;   B  = mode with buffer/byte [1|0] and boolean stop at conclusion [0x10|0x00], uint8_t _i2c2ControlInput
 
 .asm_i2c2_write
     ld a,(__i2c2ControlEcho)
@@ -49,7 +49,7 @@
     ld (__i2c2TxPtr),hl         ;store the buffer pointer
 
     ld a,b                      ;store the mode and stop booleans
-    ld (__i2c2SentenceStop),a
+    ld (__i2c2ControlInput),a
 
     di
     in0 a,(ITC)                 ;get INT/TRAP Control Register (ITC)

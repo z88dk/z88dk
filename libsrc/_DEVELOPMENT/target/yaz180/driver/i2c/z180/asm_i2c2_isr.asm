@@ -18,7 +18,7 @@
     PUBLIC _i2c2_isr
 
     EXTERN __i2c2RxPtr, __i2c2TxPtr
-    EXTERN __i2c2ControlEcho, __i2c2SlaveAddr, __i2c2SentenceLgth, __i2c2SentenceStop
+    EXTERN __i2c2ControlEcho, __i2c2ControlInput, __i2c2SlaveAddr, __i2c2SentenceLgth
 
     EXTERN asm_i2c_reset
 
@@ -102,7 +102,7 @@
     and ~ITC_ITE2                       ;mask out INT2
     out0 (ITC),a                        ;disable external interrupt
 
-    ld a,(__i2c2SentenceStop)
+    ld a,(__i2c2ControlInput)
     and a,__IO_I2C_CON_STO
     ret Z
 
@@ -153,7 +153,7 @@
     and ~ITC_ITE2                       ;mask out INT2
     out0 (ITC),a                        ;disable external interrupt
 
-    ld a,(__i2c2SentenceStop)
+    ld a,(__i2c2ControlInput)
     and a,__IO_I2C_CON_STO
     ret Z
 

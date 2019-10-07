@@ -18,7 +18,7 @@
     PUBLIC asm_i2c1_write
 
     EXTERN __i2c1TxPtr
-    EXTERN __i2c1ControlEcho, __i2c1SlaveAddr, __i2c1SentenceLgth, __i2c1SentenceStop
+    EXTERN __i2c1ControlEcho, __i2c1ControlInput, __i2c1SlaveAddr, __i2c1SentenceLgth
 
 ;   Write to the I2C Interface, using Byte Mode transmission
 ;   void i2c_write( char addr, char *dp, char length, char mode );
@@ -26,7 +26,7 @@
 ;   HL = pointer to data to transmit, uint8_t *dp
 ;   D  = 7 bit address of slave device, uint8_t _i2c1SlaveAddr
 ;   C  = length of data sentence, uint8_t _i2c1SentenceLgth
-;   B  = mode with buffer/byte [1|0] and boolean stop at conclusion [0x10|0x00], uint8_t _i2c1SentenceStop
+;   B  = mode with buffer/byte [1|0] and boolean stop at conclusion [0x10|0x00], uint8_t _i2c1ControlInput
 
 .asm_i2c1_write
     ld a,(__i2c1ControlEcho)
@@ -49,7 +49,7 @@
     ld (__i2c1TxPtr),hl         ;store the buffer pointer
 
     ld a,b                      ;store the mode and stop booleans
-    ld (__i2c1SentenceStop),a
+    ld (__i2c1ControlInput),a
 
     di
     in0 a,(ITC)                 ;get INT/TRAP Control Register (ITC)
@@ -64,6 +64,7 @@
     or a,__IO_I2C_CON_STA       ;enable start flag too
     ld bc,__IO_I2C1_PORT_BASE|__IO_I2C_PORT_CON
     out (c),a                   ;set the interface enable and STA bit
+
     ei
     ret
 
