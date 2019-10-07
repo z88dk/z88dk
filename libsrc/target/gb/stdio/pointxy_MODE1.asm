@@ -4,8 +4,10 @@
         PUBLIC	generic_console_pointxy
 
         GLOBAL	vpeek_read_screen
+        GLOBAL	generic_console_vpeek
         GLOBAL  screendollar_no_inverse_with_count
         GLOBAL  generic_console_font32
+	GLOBAL	__mode
 
         INCLUDE "target/gb/def/gb_globals.def"
 
@@ -16,6 +18,9 @@
 ;        a = character,
 ;        c = failure
 generic_console_pointxy:
+	ld	a,(__mode)
+	dec	a
+	jp	nz,generic_console_vpeek
         ld      hl,sp + -8
         ld      sp,hl
         push    hl              ;Save buffer

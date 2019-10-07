@@ -57,8 +57,7 @@ generic_console_vpeek:
         ld      a,(__mode)
         dec     a
         jp      z,vpeek_MODE1
-        ld      a,b	      ; Y coordinate
-        ld      l,a
+        ld      l,b           ; Y coordinate
         ld      h,0x00
         add     hl,hl
         add     hl,hl
