@@ -243,7 +243,7 @@ extern int __LIB__ puts(const char *);
 
 /* Routines for file positioning */
 extern fpos_t __LIB__ ftell(FILE *fp);
-extern int __LIB__ __SAVEFRAME__ fgetpos(FILE *fp, fpos_t *pos) __smallc;
+extern int __LIB__ fgetpos(FILE *fp, fpos_t *pos) __smallc;
 #define fsetpos(fp,pos) fseek(fp,pos,SEEK_SET)
 #define rewind(fp) fseek(fp,0L,SEEK_SET)
 extern int __LIB__ __SAVEFRAME__ fseek(FILE *fp, fpos_t offset, int whence) __smallc;
