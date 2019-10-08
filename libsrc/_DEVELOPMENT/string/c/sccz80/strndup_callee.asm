@@ -15,13 +15,17 @@ IF __CPU_GBZ80__
    pop bc
    pop hl
    push de
+   call asm_strndup
+   ld d,h
+   ld e,l
+   ret
 ELSE
    pop hl
    pop bc
    ex (sp),hl
+   jp asm_strndup
 ENDIF
    
-   jp asm_strndup
 
 ; SDCC bridge for Classic
 IF __CLASSIC

@@ -4,7 +4,11 @@
 #include <string.h>
 #include "test.h"
 
+#ifndef __GBZ80__
 #pragma output CLIB_OPT_PRINTF=0x7fffffff
+#else
+#pragma output CLIB_OPT_PRINTF=0x40ffffff
+#endif
 
 struct sprintf_test {
     char *pattern;

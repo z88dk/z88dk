@@ -17,8 +17,14 @@ strset:
    push hl
    push de
    push bc
-   
+IF __CLASSIC && __CPU_GBZ80__
+   call asm_strset
+   ld d,h
+   ld e,l
+   ret
+ELSE
    jp asm_strset
+ENDIF
 
 ; SDCC bridge for Classic
 IF __CLASSIC

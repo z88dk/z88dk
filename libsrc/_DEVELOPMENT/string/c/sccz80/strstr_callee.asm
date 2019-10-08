@@ -15,7 +15,14 @@ strstr_callee:
    pop de
    push bc
    
+IF __CLASSIC && __CPU_GBZ80__
+   call asm_strstr
+   ld d,h
+   ld e,l
+   ret
+ELSE
    jp asm_strstr
+ENDIF
 
 ; SDCC bridge for Classic
 IF __CLASSIC

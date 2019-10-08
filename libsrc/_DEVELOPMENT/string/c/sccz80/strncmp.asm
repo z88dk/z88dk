@@ -11,21 +11,25 @@ EXTERN asm_strncmp
 strncmp:
 IF __CPU_GBZ80__
    ld hl,sp+2
-   ld c,(hl)
+   ld c,(hl)	;n
    inc hl
    ld b,(hl)
    inc hl
-   ld e,(hl)
+   ld e,(hl)	;s2
    inc hl
    ld d,(hl)
    inc hl
-   ld a,(hl+)
+   ld a,(hl+)	;s1
    ld h,(hl)
    ld l,e
    ld e,a
    ld a,d
    ld d,h
    ld h,a
+   call asm_strncmp
+   ld d,h
+   ld e,l
+   ret
 ELSE
 
    pop af
@@ -37,9 +41,9 @@ ELSE
    push hl
    push bc
    push af
+   jp asm_strncmp
 ENDIF
    
-   jp asm_strncmp
 
 ; SDCC bridge for Classic
 IF __CLASSIC

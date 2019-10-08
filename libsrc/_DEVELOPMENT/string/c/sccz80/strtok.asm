@@ -17,8 +17,14 @@ strtok:
    push hl
    push de
    push bc
-   
+IF __CLASSIC && __CPU_GBZ80__
+   call asm_strtok
+   ld d,h
+   ld e,l
+   ret
+ELSE
    jp asm_strtok
+ENDIF
 
 ; SDCC bridge for Classic
 IF __CLASSIC

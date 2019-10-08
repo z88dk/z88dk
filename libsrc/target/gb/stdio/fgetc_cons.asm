@@ -21,6 +21,7 @@ _fgetc_cons:
 getchar_1:
         CALL    asm_getchar
         LD      E,A
+        ld      d,0
         ld      l,a
-        ld      h,0
+        ld      h,d
         RET
