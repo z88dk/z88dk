@@ -41,6 +41,10 @@ ELSE
 	push	bc
 	push	af	
 ENDIF
+
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
+        push    ix      ;save callers ix
+ENDIF
 	ld	e,(hl)
 	inc	hl
 	ld	d,(hl)
@@ -55,8 +59,14 @@ ENDIF
 	call	fdgetpos
 	pop	bc
 	pop	bc
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
+        pop     ix
+ENDIF
 	ret
 .fgetpos_abort
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
+        pop     ix
+ENDIF
 	ld	hl,-1
 #endasm
 #else
