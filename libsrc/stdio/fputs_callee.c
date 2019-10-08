@@ -55,7 +55,7 @@ ENDIF
 	ret	z	;end of string
 	inc	de	;s++
 	push	de	;keep s
-IF __CPU_INTEL__
+IF __CPU_INTEL__ || __CPU_GBZ80__
 	push	bc
 	ld	l,c
 	ld	h,b
@@ -69,7 +69,7 @@ ENDIF
 IF !__CPU_INTEL__ && !__CPU_GBZ80__
         pop	ix
 ENDIF
-IF __CPU_INTEL__
+IF __CPU_INTEL__ || __CPU_GBZ80__
 	pop	bc
 ENDIF
 	pop	de	;get s back
