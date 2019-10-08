@@ -37,7 +37,7 @@ PUBLIC i2c_read_set_callee
     ld a,(hl)                           ;slave address
     inc hl
     inc hl
-    ld sp,hl                            ;top of the stack -2   
+    ld sp,hl                            ;top of the stack -2
     ld l,(hl)                           ;device address
     ld h,a                              ;slave address
     ex de,hl

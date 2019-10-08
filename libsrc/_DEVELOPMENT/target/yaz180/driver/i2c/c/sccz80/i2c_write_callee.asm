@@ -37,7 +37,7 @@ PUBLIC i2c_write_callee
     ld a,(hl)                           ;slave address
     inc hl
     inc hl
-    ld sp,hl                            ;top of the stack -2   
+    ld sp,hl                            ;top of the stack -2
     ld l,(hl)                           ;device address
     ld h,a                              ;slave address
     ex de,hl
@@ -47,7 +47,7 @@ PUBLIC i2c_write_callee
     ex af,af
     push af                             ;ret
 
-    ld a,e                              ;device address    
+    ld a,e                              ;device address
     cp __IO_I2C2_PORT_MSB
     jp Z,asm_i2c2_write
     cp __IO_I2C1_PORT_MSB

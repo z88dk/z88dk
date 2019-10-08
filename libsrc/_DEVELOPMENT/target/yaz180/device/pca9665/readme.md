@@ -12,9 +12,9 @@ The PCA9665 has the same footprint as the PCA9564 with additional features:
 
 ### Description
 
-The PCA9665/PCA9665A acts as an interface device between standard high-speed parallel buses and the serial I 2 C-bus. On the I 2 C-bus, it can act either as a master or slave.
+The PCA9665/PCA9665A acts as an interface device between standard high-speed parallel buses and the serial I2C-bus. On the I2C-bus, it can act either as a master or slave.
 
-Bidirectional data transfer between the I 2 C-bus and the parallel-bus microcontroller is carried out on a byte or buffered basis, using either an interrupt or polled handshake.
+Bidirectional data transfer between the I2C-bus and the parallel-bus microcontroller is carried out on a byte or buffered basis, using either an interrupt or polled handshake.
 
 ### PCA9665 Registers
 
@@ -95,7 +95,7 @@ The seven indirect registers require that the INDPTR (indirect register pointer,
     Bits in IMODE
 
     Bit 7:2             reserved, must always be written to zero
-    Bit 1:0 = AC[1:0]   Bus Mode 00b Std 01b Fast 10b Fast+ 11b Turbo
+    Bit 1:0 = AC[1:0]   Bus Mode 00b Std 01b Fast 10b Fast+ 11b Plaid
 
     Bit Defines in STA (Status Codes Returned)
 
@@ -152,8 +152,8 @@ The seven indirect registers require that the INDPTR (indirect register pointer,
 
     __IO_I2C_IMODE_STD                   $00 Standard mode
     __IO_I2C_IMODE_FAST                  $01 Fast mode
-    __IO_I2C_IMODE_FASTP                 $02 Fast Plus mode
-    __IO_I2C_IMODE_TURBO                 $03 Turbo mode
+    __IO_I2C_IMODE_FAST_PLUS             $02 Fast Plus mode
+    __IO_I2C_IMODE_PLAID                 $03 Plaid mode
 
     __IO_I2C_IMODE_CR                    $07 Clock Rate (MASK)
 ```

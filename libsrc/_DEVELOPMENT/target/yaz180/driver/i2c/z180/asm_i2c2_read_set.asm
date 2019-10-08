@@ -37,6 +37,9 @@
     jr Z,asm_i2c2_read_set      ;if the bus is not stopped, then wait till it is
 
     ld a,c
+    cp 68                       ;check the sentence for over length
+    ret NC
+
     or a                        ;check the sentence expected for zero length
     ret Z                       ;return if the sentence is 0 length
 
@@ -52,19 +55,18 @@
     ld a,b                      ;store the mode and stop booleans
     ld (__i2c2ControlInput),a
 
+    and a,__IO_I2C_CON_MODE     ;check whether buffer or byte mode is required
+    or a,__IO_I2C_CON_ENSIO|__IO_I2C_CON_STA
+    ld (__i2c2ControlEcho),a    ;store enabled, start flag, and mode in the control echo
+    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_CON
+
     di
     in0 a,(ITC)                 ;get INT/TRAP Control Register (ITC)
     or ITC_ITE2                 ;mask in INT2
     out0 (ITC),a                ;enable external interrupt
 
-    ld a,b
-    and a,__IO_I2C_CON_MODE     ;check whether buffer or byte mode is required
-    or a,__IO_I2C_CON_ENSIO
-    ld (__i2c2ControlEcho),a    ;store enabled in the control echo
-
-    or a,__IO_I2C_CON_STA       ;enable start flag too
-    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_CON
-    out (c),a                   ;set the interface enable and STA bit
+    ld a,(__i2c2ControlEcho)
+    out (c),a                   ;then set the interface enable, STA bit, and mode bit
     ei
     ret
 
