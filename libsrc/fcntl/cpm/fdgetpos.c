@@ -15,11 +15,10 @@ int fdgetpos(int fd, fpos_t *posn)
 
 	if(fd >= MAXFILE)
 		return -1;
+	
 	fc = &_fcb[fd];
-
-	posn = fc->rwptr;
+	*posn = (fpos_t)fc->rwptr;
 	
 	return 0;
 }
-
 
