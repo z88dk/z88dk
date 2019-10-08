@@ -75,6 +75,18 @@
        defc __crt_org_graphics = CRT_ORG_GRAPHICS
    ENDIF
 
+   ; If 32 bit floats are defined, then we need to indicate to the library
+   ; that they are in use (mainly for printf/scanf)
+   PUBLIC CLIB_32BIT_FLOATS
+   IF !DEFINED_CLIB_32BIT_FLOATS
+       defc CLIB_32BIT_FLOATS = 0
+   ENDIF
+   PUBLIC CLIB_64BIT_FLOATS
+   IF !DEFINED_CLIB_64BIT_FLOATS
+       defc CLIB_64BIT_FLOATS = 0
+   ENDIF
+      
+
    ; Custom memory map
    IF DEFINED_MMAP
        defc __MMAP = MMAP

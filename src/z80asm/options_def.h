@@ -2,9 +2,9 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2017
+Copyright (C) Paulo Custodio, 2011-2019
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-Repository: https://github.com/pauloscustodio/z88dk-z80asm
+Repository: https://github.com/z88dk/z88dk
 
 Define command line options
 */
@@ -70,8 +70,11 @@ OPT(OptCall, exit_help, "-h", "--help", "Show help options", "")
 OPT(OptSet, &opts.verbose, "-v", "--verbose", "Be verbose", "")
 
 OPT_TITLE("Code Generation Options:")
-OPT(OptCall, option_cpu_z80_zxn, "", "--cpu=z80-zxn", "Assemble for the Z80 variant of ZX Next", "")
+OPT(OptCall, option_cpu_z80n, "", "--cpu=z80n", "Assemble for the Z80 variant of ZX Next", "")
 OPT(OptCall, option_cpu_z80, "", "--cpu=z80", "Assemble for the Z80", "")
+OPT(OptCall, option_cpu_gbz80, "", "--cpu=gbz80", "Assemble for the GameBoy Z80", "")
+OPT(OptCall, option_cpu_8080, "", "--cpu=8080", "Assemble for the 8080 (with Zilog or Intel mnemonics)", "")
+OPT(OptCall, option_cpu_8085, "", "--cpu=8085", "Assemble for the 8085 (with Zilog or Intel mnemonics)", "")
 OPT(OptCall, option_cpu_z180, "", "--cpu=z180", "Assemble for the Z180", "")
 OPT(OptCall, option_cpu_r2k, "", "--cpu=r2k", "Assemble for the Rabbit 2000", "")
 OPT(OptCall, option_cpu_r3k, "", "--cpu=r3k", "Assemble for the Rabbit 3000", "")

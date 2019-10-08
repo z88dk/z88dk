@@ -35,6 +35,18 @@ asm_strrev:
       
    push de                     ; save char *s
 
+IF __CPU_INTEL__
+   ld a,b
+   rla
+   ld a,b
+   rra
+   cpl
+   ld b,a
+   ld a,c
+   rra
+   cpl 
+   ld c,a
+ELSE
    ld a,b                      ; bc = ceil(-((-strlen-1)/2)-1)
    sra a                       ;    = ceil((strlen-1)/2)
    rr c                        ; -1 maps to 0 (strlen = 0)
@@ -43,6 +55,7 @@ asm_strrev:
    ld a,c                      ; -4 maps to 1 (strlen = 3)
    cpl                         ; etc, yields number of chars to swap
    ld c,a
+ENDIF
 
    or b
    jr z, exit                  ; if numswaps == 0, exit
@@ -50,12 +63,24 @@ asm_strrev:
 loop:
 
    ld a,(de)                   ; char at front of s
+IF __CPU_GBZ80__
+   push af
+   ld  a,(hl)
+   ld (de),a
+   inc de
+   dec bc
+   pop af
+   ld (hl-),a
+   ld  a,b
+   or  c
+   jp  nz,loop
+ELSE
    ldi                         ; char at rear written to front of s
    dec hl
    ld (hl),a                   ; char from front written to rear of s 
    dec hl
-   
    jp pe, loop
+ENDIF
    
 exit:
 

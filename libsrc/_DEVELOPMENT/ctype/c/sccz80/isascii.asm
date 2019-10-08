@@ -14,10 +14,17 @@ isascii:
    dec h
    jp nz, error_znc
 
+IF __CPU_INTEL__
+   ld a,l
+   rla
+   ld l,h
+   ret c
+ELSE
    bit 7,l
    
    ld l,h
    ret nz
+ENDIF
 
    inc l
    ret

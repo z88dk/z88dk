@@ -4,7 +4,45 @@
 	PUBLIC  sprintf_outc	
 	EXTERN	fputc_cons
 
+IF __CPU_INTEL__ | __CPU_GBZ80__
+sprintf_outc:
+	pop	bc
+	pop	hl	;fp
+	pop	de	;charcter
+	push	bc
 
+	inc	hl	;+1
+	inc	hl	;+2
+	ld	c,(hl)
+	inc	hl	;+3
+	ld	b,(hl)
+	ld	a,b
+	or	c
+	ret	z
+	dec	bc
+	ld	(hl),b
+	dec	hl	;+2
+	ld	(hl),c
+	dec	hl	;+1
+	ld	a,(hl)
+	dec	hl	;+0
+	push	hl	;save fp
+	ld	l,(hl)
+	ld	h,a
+	ld	a,b
+	or	c
+	jr	z,just_terminate
+	ld	(hl),e
+	inc	hl
+just_terminate:
+	ld	(hl),0
+	pop	de
+	ex	de,hl
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
+	ret
+ELSE
 sprintf_outc:
 	pop	bc
 	pop	hl	;fp
@@ -48,3 +86,4 @@ ENDIF
 no_space:
 	pop	ix
 	ret
+ENDIF

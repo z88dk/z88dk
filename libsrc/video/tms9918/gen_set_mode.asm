@@ -129,8 +129,6 @@ ENDIF
     call  VDPreg_Write    ; reg7  -  INK & PAPER-/BACKDROPCOL.
     
 
-
-
     ld    hl,$0
     ld    bc,16384
     xor   a
@@ -250,11 +248,17 @@ ENDIF
     jr    nz,pattern
     dec   e
     jr    nz,pattern
+	
     ld    bc,6144    ; set VRAM attribute area
     ld    a,(__tms9918_attribute)   ; white on black
     ld    hl,8192
+    push  bc
     call  FILVRM
-    ret
+    pop   bc
+    xor   a			; clear graphics page
+    ld    h,a
+    ld    l,a
+    jp    FILVRM
 
     
 ; Switch 2 Video Mode n. 3

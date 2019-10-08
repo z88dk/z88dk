@@ -364,6 +364,7 @@
 ../../_DEVELOPMENT/math/float/math48//lm/c/sccz80/logb.asm
 ../../_DEVELOPMENT/math/float/math48//lm/c/sccz80/lp_gdoub.asm
 ../../_DEVELOPMENT/math/float/math48//lm/c/sccz80/lp_pdoub.asm
+../../_DEVELOPMENT/math/float/math48//lm/c/sccz80/l_f48_ldexp.asm
 ../../_DEVELOPMENT/math/float/math48//lm/c/sccz80/lrint.asm
 ../../_DEVELOPMENT/math/float/math48//lm/c/sccz80/lround.asm
 ../../_DEVELOPMENT/math/float/math48//lm/c/sccz80/minusfa.asm

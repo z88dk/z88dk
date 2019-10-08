@@ -10,10 +10,18 @@ EXTERN asm_strnchr
 
 strnchr_callee:
 
+IF __CPU_GBZ80__
+   pop af
+   pop de
+   pop bc
+   pop hl
+   push af
+ELSE
    pop hl
    pop de
    pop bc
    ex (sp),hl
+ENDIF
    
    jp asm_strnchr
 

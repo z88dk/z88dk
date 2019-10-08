@@ -1,9 +1,5 @@
 /*
- *	CPC Maths Routines
- *
- *  	August 2003 **_|warp6|_** <kbaccam /at/ free.fr>
- *
- *	$Id: ceil.c,v 1.1 2008-07-27 21:44:56 aralbrec Exp $
+ * ceil()
  */
  
 
@@ -13,5 +9,11 @@
 
 float ceil(float x)
 {
-	return (float)((int)x);
+    if ( x < 0 ) {
+        return floor(x) + 1.0;
+    }
+    if ( x > 0 ) {
+        return floor(x) + 1.0;
+    }
+    return 0.0;
 }

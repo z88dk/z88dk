@@ -3,9 +3,9 @@
 # Z88-DK Z80ASM - Z80 Assembler
 #
 # Copyright (C) Gunther Strube, InterLogic 1993-99
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-# Repository: https://github.com/pauloscustodio/z88dk-z80asm
+# Repository: https://github.com/z88dk/z88dk
 #
 # Preprocess file.rl and generate file.h
 # Needed to allow usage of #define macros and #include in ragel input files

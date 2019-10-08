@@ -51,4 +51,4 @@ EXTERN ADTHeapExtract, ADThcompare
    ld hl,0
    ret
 
-DEFC CDISP_ADT_HEAPEXTRACT_CALLEE = # centry - adt_HeapExtract_callee
+DEFC CDISP_ADT_HEAPEXTRACT_CALLEE = centry - adt_HeapExtract_callee

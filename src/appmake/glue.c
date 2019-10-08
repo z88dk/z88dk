@@ -59,7 +59,6 @@ int glue_exec(char *target)
     char crtname[LINELEN];
     FILE *fmap;
     char *s;
-    int error;
 
     if (help) return -1;
 

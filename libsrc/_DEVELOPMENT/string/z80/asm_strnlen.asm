@@ -37,12 +37,26 @@ asm_strnlen:
    jp z, error_znc
    
    xor a
+IF __CPU_GBZ80__
+   EXTERN __z80asm_cpir
+   call __z80asm_cpir
+ELSE
    cpir                        ; find end of s, maxlen chars examined
+ENDIF
 
    jr nz, notend               ; if end of s not reached, skip scf
    scf                         ; end of s reached, need to sub 1 extra
 
 notend:
 
+IF __CPU_INTEL__ | __CPU_GBZ80__
+   ld  a,l
+   sub e
+   ld  l,a
+   ld  a,h
+   sbc d
+   ld  h,a
+ELSE
    sbc hl,de                   ; hl = min(strlen, maxlen)
+ENDIF
    ret

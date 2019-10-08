@@ -1,0 +1,49 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._sendJoinTeam
+	ld	hl,2	;const
+	push	hl
+	call	_zx_border
+	pop	bc
+	ld	hl,_sendbuf
+	ld	(hl),+(201 % 256 % 256)
+	ld	de,_sendbuf+1
+	ld	hl,2	;const
+	add	hl,sp
+	ld	a,(hl)
+	ld	(de),a
+	ld	hl,0	;const
+	push	hl
+	call	_zx_border
+	pop	bc
+	ld	hl,2	;const
+	push	hl
+	call	_sendMsg
+	pop	bc
+	ret
+
+
+
+
+	SECTION	bss_compiler
+._sendbuf	defs	10
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_zx_border
+	GLOBAL	_sendMsg
+	GLOBAL	_sendbuf
+	GLOBAL	_sendJoinTeam
+
+
+
+

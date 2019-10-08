@@ -81,7 +81,7 @@ int statement()
         }        
         /* not a definition */
         if (declared >= 0) {
-            Zsp = modstk(Zsp - declared, NO, NO);
+            Zsp = modstk(Zsp - declared, KIND_NONE, NO, YES);
             declared = 0;
         }
         st = -1;
@@ -235,7 +235,7 @@ void compound()
         statement(); /* do one */
     --ncmp; /* close current level */
     if (lastst != STRETURN) {
-        modstk(stkstor[ncmp], NO, NO); /* delete local variable space */
+        modstk(stkstor[ncmp], KIND_NONE, NO, YES); /* delete local variable space */
     }
     Zsp = stkstor[ncmp];
     locptr = savloc; /* delete local symbols */
@@ -460,7 +460,7 @@ void dofor()
         discardbuffer(buf4);
     }
     --ncmp;
-    modstk(savedsp, NO, NO);
+    modstk(savedsp, KIND_NONE, NO, YES);
     Zsp = savedsp;
     locptr = savedloc;
     declared = 0;
@@ -584,81 +584,7 @@ void doreturn(char type)
     }
 }
 
-/*
- * \brief Generate the leave state for a function
- *
- * \param vartype The type of variable we're leaving with
- * \param type 1=c, 2=nc, 0=no carry state
- * \param incritical - We're in a critical section, restore interrupts 
- *
- * \todo Move this to codegen, it's platform specific
- */
-void leave(int vartype, char type, int incritical)
-{
-    int savesp;
-    int save = vartype;
-    int callee_cleanup = (currfn->ctype->flags & CALLEE) && (stackargs > 2);
-    int hlsaved;
 
-    if ( (currfn->flags & NAKED) == NAKED ) {
-        return;
-    }
-
-    if (vartype == KIND_CPTR) /* they are the same in any case! */
-        vartype = KIND_LONG;
-    else if ( vartype == KIND_DOUBLE ) {
-        vartype = KIND_NONE;
-        save = NO;
-    }
-
-    if ( c_notaltreg && abs(Zsp) >= 12 ) {
-        hlsaved = YES;
-        savehl();
-        save=NO;
-    }
-    modstk(0, save, NO);
-    if ( c_notaltreg && abs(Zsp) >= 12 && callee_cleanup == 0 ) {
-        restorehl();
-    }
-
-    if (callee_cleanup) {
-        int save = vartype;
-        if ( vartype != KIND_NONE ) {
-            save = NO;
-            if ( c_notaltreg ) {
-                if ( vartype == KIND_LONG )
-                    savede();
-                if ( hlsaved == NO ) savehl();
-            } else {
-                doexx();
-            }
-        }
-        savesp = Zsp;
-        zpop(); /* Return address in de */
-        Zsp = -(stackargs - 2);
-        modstk(0, save, NO);
-        zpushde(); /* return address back on stack */
-        Zsp = savesp;
-        if ( vartype ) {
-            if ( c_notaltreg ) {
-                if ( vartype == KIND_LONG )
-                    restorede();
-                restorehl();
-            } else {
-                doexx();
-            }
-        }
-    }
-    popframe(); /* Restore previous frame pointer */
-
-    /* Naked has already returned */
-    if ( (currfn->flags & CRITICAL) == CRITICAL || incritical) {
-        zleavecritical();
-    }
-    if (type)
-        setcond(type);
-    zret(); /* and exit function */
-}
 
 /*
  *      "break" statement
@@ -670,7 +596,7 @@ void dobreak()
     /* see if any "whiles" are open */
     if ((ptr = readwhile(wqptr)) == 0)
         return; /* no */
-    modstk(ptr->sp, NO, NO); /* else clean up stk ptr */
+    modstk(ptr->sp, KIND_NONE, NO, YES); /* else clean up stk ptr */
     jump(ptr->exit); /* jump to exit label */
 }
 
@@ -690,7 +616,7 @@ void docont()
         if (ptr->loop)
             break;
     }
-    modstk(ptr->sp, NO, NO); /* else clean up stk ptr */
+    modstk(ptr->sp, KIND_NONE, NO, YES); /* else clean up stk ptr */
     jump(ptr->loop); /* jump to loop label */
 }
 
@@ -728,6 +654,7 @@ static void docritical(void)
 void doasmfunc(char wantbr)
 {
     char c;
+    int  lastwasLF = 0;
     if (wantbr)
         needchar('(');
 
@@ -738,13 +665,22 @@ void doasmfunc(char wantbr)
             c = litchar();
             if (c == 0)
                 break;
-            outbyte(c);
-            if (c == 10 || c == 13)
-                outstr("\n\t");
+            if ( lastwasLF && c != '\t' ) {
+                outstr("\t");
+            }
+            if (c == '\n' || c == '\r') {
+                lastwasLF = 1;
+                outbyte('\n');
+            } else {
+                lastwasLF = 0;
+                outbyte(c);
+            }
         }
     } while (cmatch('"'));
     needchar(')');
-    outbyte('\n');
+    if ( !lastwasLF ) {
+        outbyte('\n');
+    }
 }
 
 /*

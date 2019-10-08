@@ -81,4 +81,4 @@ read_end:
 	ret
 
 
-DEFC ASMDISP_SD_READ_BLOCK_2GB_CALLEE = # asmentry - sd_read_block_2gb_callee
+DEFC ASMDISP_SD_READ_BLOCK_2GB_CALLEE = asmentry - sd_read_block_2gb_callee

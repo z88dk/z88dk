@@ -209,4 +209,4 @@ EXTERN _u_malloc, _u_free
    pop hl
    jp faillp
 
-DEFC ASMDISP_SP1_CREATESPR_CALLEE = # asmentry - sp1_CreateSpr_callee
+DEFC ASMDISP_SP1_CREATESPR_CALLEE = asmentry - sp1_CreateSpr_callee

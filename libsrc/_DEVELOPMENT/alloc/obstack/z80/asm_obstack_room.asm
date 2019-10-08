@@ -36,5 +36,14 @@ asm_obstack_room:
    ld l,a                      ; hl = ob->end
    
    or a
+IF __CPU_INTEL__
+   ld a,l
+   sub e
+   ld l,a
+   ld a,h
+   sbc d
+   ld d,a
+ELSE
    sbc hl,de
+ENDIF
    ret

@@ -57,8 +57,6 @@ disc_handle *disc_create(disc_spec* spec)
 {
     disc_handle* h = calloc(1, sizeof(*h));
     size_t len;
-    int directory_extents;
-    int i;
 
     h->spec = *spec;
     len = spec->tracks * spec->sectors_per_track * spec->sector_size * spec->sides;
@@ -201,6 +199,7 @@ struct container {
     { "dsk",        ".dsk", "CPC extended .dsk format",    disc_write_edsk },
     { "d88",        ".D88", "d88 format",                  disc_write_d88 },
     { "ana",        ".dump", "Anadisk format",             disc_write_anadisk },
+    { "imd",        ".imd", "IMD (Imagedisk) format",      disc_write_imd },
     { "raw",        ".img", "Raw image",                   disc_write_raw },
     { NULL, NULL, NULL }
 };
@@ -244,8 +243,6 @@ int disc_write_raw(disc_handle* h, const char* filename)
 
     for (i = 0; i < h->spec.tracks; i++) {
         for (s = 0; s < h->spec.sides; s++) {
-            uint8_t* ptr;
-
             if ( h->spec.alternate_sides == 0 ) {
                 offs = track_length * i + (s * track_length * h->spec.tracks);
             } else {
@@ -446,8 +443,6 @@ int disc_write_d88(disc_handle* h, const char* filename)
 
 int disc_write_anadisk(disc_handle* h, const char* filename)
 {
-    char    title[18];
-    uint8_t *ptr;
     size_t offs;
     FILE* fp;
     int i, j, s;
@@ -511,6 +506,76 @@ int disc_write_anadisk(disc_handle* h, const char* filename)
     return 0;
 }
 
+int disc_write_imd(disc_handle* h, const char* filename)
+{
+    size_t offs;
+    FILE* fp;
+    int i, j, s;
+    int sector_size = 0;
+    int track_length = h->spec.sector_size * h->spec.sectors_per_track;
+    uint8_t buffer[80];
+    uint8_t *ptr;
+    time_t tim;
+    struct tm *tm;
+
+
+    if ((fp = fopen(filename, "wb")) == NULL) {
+        return -1;
+    }
+
+    // Write header
+    time(&tim);
+    tm = localtime(&tim);
+    fprintf(fp, "IMD z88dk: %2d/%2d/%4d %02d:%02d:%02d\r\n%s\x1a",
+          tm->tm_mday, tm->tm_mon + 1, tm->tm_year + 1900,
+          tm->tm_hour, tm->tm_min, tm->tm_sec, h->spec.name);
+
+
+    i = h->spec.sector_size;
+    while (i > 128) {
+        sector_size++;
+        i /= 2;
+    }
+
+    for (i = 0; i < h->spec.tracks; i++) {
+        for (s = 0; s < h->spec.sides; s++) {
+            ptr = buffer;
+
+            *ptr++ = 3; // Mode + transfer rate
+            *ptr++ = i; // track
+            *ptr++ = s; // head
+            *ptr++ = h->spec.sectors_per_track; // Sectors per track
+            *ptr++ = sector_size; // Size of sector
+
+            // Write sector map
+            for ( j = 0; j < h->spec.sectors_per_track; j++ ) {
+                *ptr++ = j  +  h->spec.first_sector_offset;
+            }
+            // And write the header
+            fwrite(buffer, ptr - buffer, 1, fp);
+
+            // And now write each sector - we don't do compression and all sectors are good
+            if ( h->spec.alternate_sides == 0 ) {
+                offs = track_length * i + (s * track_length * h->spec.tracks);
+            } else {
+                offs = track_length * ( 2* i + s);
+            }
+            for (j = 0; j < h->spec.sectors_per_track; j++) {
+                int sect = j;
+                if ( h->spec.has_skew && i + (i*h->spec.sides) >= h->spec.skew_track_start ) {
+                    for ( sect = 0; sect < h->spec.sectors_per_track; sect++ ) {
+                        if ( h->spec.skew_tab[sect] == j ) break;
+                    }
+                }
+
+                fputc(1, fp);   // Sector type 1  = has data
+                fwrite(h->image + offs + (sect * h->spec.sector_size), h->spec.sector_size, 1, fp);
+            }
+        }
+    }
+    fclose(fp);
+    return 0;
+}
 
 
 // CP/M routines
@@ -570,14 +635,11 @@ static void cpm_write_file(disc_handle* h, char *filename, void* data, size_t le
     size_t num_extents = (len / h->spec.extent_size) + 1;
     size_t directory_offset;
     size_t offset;
-    uint8_t* dir_ptr;
     uint8_t direntry[32];
-    uint8_t* ptr;
     int i, j, current_extent;
     int extents_per_entry = h->spec.byte_size_extents ? 16 : 8;
 
     directory_offset = find_first_free_directory_entry(h);
-    dir_ptr = h->image + directory_offset;
     // Now, write the directory entry, we can start from extent 1
     current_extent = first_free_extent(h);
     // We need to turn that extent into an offset into the disc
@@ -605,7 +667,6 @@ static void cpm_write_file(disc_handle* h, char *filename, void* data, size_t le
             direntry[15] = ((len % (extents_per_entry * h->spec.extent_size)) / 128) + 1;
             extents_to_write = (num_extents - (i * extents_per_entry));
         }
-        ptr = &direntry[16];
         for (j = 0; j < extents_per_entry; j++) {
             if (j < extents_to_write) {
                 h->extents[current_extent] = 1;
@@ -651,7 +712,7 @@ disc_handle *fat_create(disc_spec* spec)
 
 static void fat_write_file(disc_handle* h, char *filename, void* data, size_t len)
 {
-    FIL file={0};
+    FIL file={{0}};
     UINT written;
 
     if ( f_open(&file, filename, FA_WRITE|FA_CREATE_ALWAYS) != FR_OK ) {

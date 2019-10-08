@@ -38,9 +38,18 @@ loop:
    jr z, exit
    
    ld (hl),e
-   
+
+IF __CPU_GBZ80__
+   EXTERN __z80asm__cpi
+   call __z80asm__cpi
+   ld a,b
+   or c 
+   ld a,0
+   jr nz,loop
+ELSE
    cpi                         ; hl++, bc--
    jp pe, loop
+ENDIF
 
 exit:
 

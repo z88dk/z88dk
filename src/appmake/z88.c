@@ -315,7 +315,6 @@ static void SaveBank(unsigned offset, char *base, char *ext)
 static void SaveBlock(unsigned offset, size_t length, char* base, char* ext)
 {
     char name[FILENAME_MAX + 1];
-    char buffer[LINEMAX + 1];
     FILE* fp;
 
     strcpy(name, base);

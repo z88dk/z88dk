@@ -46,4 +46,4 @@ opus_putsect_asmentry:
 	ld		hl,0
 	ret
 
-;DEFC ASMDISP_OPUS_PUTSECT_CALLEE = # opus_putsect_asmentry - opus_putsect_callee
+;DEFC ASMDISP_OPUS_PUTSECT_CALLEE = opus_putsect_asmentry - opus_putsect_callee

@@ -4,7 +4,7 @@
 # Build and test z80asm-*.lib
 #
 # Copyright (C) Gunther Strube, InterLogic 1993-99
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: http://www.perlfoundation.org/artistic_license_2_0
 #------------------------------------------------------------------------------
 PROJ		:= z80asm
@@ -32,10 +32,16 @@ endef
 #------------------------------------------------------------------------------
 # Call for all variants
 #------------------------------------------------------------------------------
+$(eval $(call MAKE_LIB,	8080-,			-m8080 				))
+$(eval $(call MAKE_LIB,	8080-ixiy,		-m8080 		--IXIY	))
+$(eval $(call MAKE_LIB,	8085-,			-m8085 				))
+$(eval $(call MAKE_LIB,	8085-ixiy,		-m8085 		--IXIY	))
 $(eval $(call MAKE_LIB,	z80-,			-mz80				))
 $(eval $(call MAKE_LIB,	z80-ixiy,		-mz80 		--IXIY	))
-$(eval $(call MAKE_LIB,	z80_zxn-,		-mz80-zxn			))
-$(eval $(call MAKE_LIB,	z80_zxn-ixiy,	-mz80-zxn 	--IXIY	))
+$(eval $(call MAKE_LIB,	gbz80-,			-mgbz80				))
+$(eval $(call MAKE_LIB,	gbz80-ixiy,		-mgbz80		--IXIY	))
+$(eval $(call MAKE_LIB,	z80n-,			-mz80n				))
+$(eval $(call MAKE_LIB,	z80n-ixiy,		-mz80n 		--IXIY	))
 $(eval $(call MAKE_LIB,	z180-,			-mz180				))
 $(eval $(call MAKE_LIB,	z180-ixiy,		-mz180 		--IXIY	))
 $(eval $(call MAKE_LIB,	r2k-,			-mr2k				))

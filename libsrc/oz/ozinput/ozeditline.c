@@ -1,4 +1,4 @@
-#include <oz.h>
+#include <arch/oz.h>
 #include <string.h>
 
 static byte x, y, pos, x0;

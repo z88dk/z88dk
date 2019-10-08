@@ -43,9 +43,8 @@ _msx_vwrite_direct:
 
 	ld	ix,SETWRT
 	call	msxbios
-
-	ld l, (ix+0)	; count
-	ld h, (ix+1)
+	ld	l,c	; count - bc is preserved by bios
+	ld	h,b
 
 IF VDP_DATA >= 0
 	ld	bc,VDP_DATA

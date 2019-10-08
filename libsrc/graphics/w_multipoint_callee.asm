@@ -96,5 +96,5 @@
                 ret
 
 				
-DEFC ASMDISP_MULTIPOINT_CALLEE = # asmentry - multipoint_callee
+DEFC ASMDISP_MULTIPOINT_CALLEE = asmentry - multipoint_callee
 

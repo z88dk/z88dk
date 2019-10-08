@@ -12,7 +12,7 @@
 
 #include <fcntl.h>
 
-int __FASTCALL__ readbyte(int handle)
+int readbyte(int fd)
 {
 #asm
 	INCLUDE	"target/zx/def/p3dos.def"

@@ -27,7 +27,7 @@ void changesuffix(char *name, char *suffix)
  * off of stack, guess 100 is enough to be going on with?
  */
 
-SYMBOL *stkptr[100], *laststk;
+Type *stkptr[100], *laststk;
 int stkcount;
 char flgstk[100];
 
@@ -41,13 +41,14 @@ void initstack()
 
 /* Retrieve last item on the stack */
 
-SYMBOL* retrstk(char* flags)
+Type* retrstk(char* flags)
 {
-    SYMBOL* ptr;
+    Type* ptr;
     if (!stkcount)
         return (laststk = NULL);
     ptr = laststk = stkptr[--stkcount];
     *flags = flgstk[stkcount];
+
     return (ptr);
 }
 
@@ -57,21 +58,19 @@ int addstk(LVALUE* lval)
 {
     if ((stkcount + 1) >= 99)
         return (0);
-    stkptr[stkcount] = lval->symbol;
+    stkptr[stkcount] = lval->ltype;
     flgstk[stkcount] = lval->flags;
     return (stkcount++);
 }
 
-/* Check if last item referenced to is this item, used when loading
- * values - saves a little bit of generated code
- */
-
-int chkstk(SYMBOL* ptr)
+const char *get_section_name(const char *namespace, const char *section)
 {
-    if (!stkcount)
-        return (0);
-    if (laststk == ptr)
-        return (1);
-    else
-        return (0);
+    static char   buf[LINEMAX+1];
+
+    if ( namespace == NULL ) 
+        return section;
+
+    snprintf(buf,sizeof(buf),"%s_%s",namespace, section);
+
+    return buf;
 }

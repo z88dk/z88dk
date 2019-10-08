@@ -1,4 +1,4 @@
-	ld	a,#(0 % 256)
+	ld	a,+(0 % 256)
 =
 	xor	a
 
@@ -7,7 +7,7 @@
 	ld	(%1),a
 	ld	hl,%2
 =
-	ld	a,#(%0 % 256)
+	ld	a,+(%0 % 256)
 	ld	(%1),a
 	ld	hl,%2
 
@@ -17,38 +17,38 @@
 .%0
 
 	ex	de,hl
-	ld	l,#(8 % 256)
+	ld	l,+(8 % 256)
 	call	l_asr_u
 =
 	ld	l,h
 	ld	h,0
 
 	ex	de,hl
-	ld	l,#(8 % 256)
+	ld	l,+(8 % 256)
 	call	l_asr
 =
 	ld	a,h
 	call	l_sxt
 
 	ex	de,hl
-	ld	l,#(0 % 256)
+	ld	l,+(0 % 256)
 	call	l_asr%1
 =
 
 	ex	de,hl
-	ld	l,#(8 % 256)
+	ld	l,+(8 % 256)
 	call	l_asl
 =
 	ld	h,l
 	ld	l,0
 
 	ex	de,hl
-	ld	l,#(0 % 256)
+	ld	l,+(0 % 256)
 	call	l_asl
 =
 
 	ex	de,hl
-	ld	l,#(1 % 256)
+	ld	l,+(1 % 256)
 	call	l_asl
 =
 	add	hl,hl
@@ -201,6 +201,11 @@
 =
 	call	dldpsh
 
+	call	l_f64_load
+	call	l_f64_dpush
+=
+	call	l_f64_dldpsh
+
 	jp	nz,%1
 	jp	%2
 .%1
@@ -276,6 +281,7 @@
 	ret	z
 .%1
 
+%notcpu gbz80
 	push	hl
 	ld	hl,%1	;const
 	pop	de
@@ -295,14 +301,14 @@
 	ld	de,%2
 	add	hl,de
 =
-	ld	hl,%1+%2	;const
+	ld	hl,%eval(%1 %2 +)	;const
 	add	hl,sp
 
 	ld	hl,%1	;const
 	add	hl,sp
 	inc	hl
 =
-	ld	hl,%1+1	;const
+	ld	hl,%eval(%1 1 +)	;const
 	add	hl,sp
 
 	ld	de,0
@@ -315,16 +321,16 @@
 	jp	z,%1
 
 ;;; Fixes up a bug in these rules
-	ld	(hl),#(%1 %% 256)
+	ld	(hl),+(%1 %% 256)
 	ld	l,(hl)
 	ld	h,0
 	inc	de
 	ld	a,h
 	ld	(de),a
 =
-	ld	(hl),#(%1 % 256)
+	ld	(hl),+(%1 % 256)
 	inc	hl
-	ld	(hl),#(%1 / 256)
+	ld	(hl),+(%1 / 256)
 	ld	hl,%1
 
 ;;; This rule causes above bug, can't stop it from firing though
@@ -333,7 +339,7 @@
 	ld	a,l
 	ld	(de),a
 =
-	ld	(hl),#(%1 % 256)
+	ld	(hl),+(%1 % 256)
 	ld	l,(hl)
 	ld	h,0
 
@@ -428,17 +434,20 @@
 =
 	ld	hl,_%1+1
 
+%notcpu gbz80
 	ld	hl,_%1
 	call	l_gint	;%9
 =
 	ld	hl,(_%1)
 
+%notcpu gbz80
 	ld	hl,_%1
 	call	l_glong
 =
 	ld	hl,(_%1)
 	ld	de,(_%1+2)
 
+%notcpu gbz80
 	ld	hl,_%1
 	ld	l,(hl)
 	ld	h,0
@@ -516,15 +525,6 @@
 =
 	pop	de
 
-	pop	bc
-	ld	hl,%1	;const
-	add	hl,sp
-	ld	sp,hl
-=
-	ld	hl,%1+2	;const
-	add	hl,sp
-	ld	sp,hl
-
 	exx
 	ld	hl,%1	;const
 	add	hl,sp
@@ -535,7 +535,7 @@
 	ld	sp,hl
 =
 	exx
-	ld	hl,%1+%2	;const
+	ld	hl,%eval(%1 %2 +)	;const
 	add	hl,sp
 	ld	sp,hl
 	exx
@@ -555,12 +555,13 @@
 =
 	jp	i_%1
 
+%check 0 <= %2 <= 65535
 	ld	hl,%1	;const
 	add	hl,sp
 	ld	bc,%2
 	add	hl,bc
 =
-	ld	hl,%1+%2	;const
+	ld	hl,%eval(%1 %2 +)	;const
 	add	hl,sp
 
 	call	l_inclong
@@ -696,7 +697,7 @@
 	ld	de,%2
 	call	l_long_as%3
 =
-	ld	l,#(%1 % 256)
+	ld	l,+(%1 % 256)
 	call	l_long_as%3
 
 	push	hl
@@ -718,7 +719,7 @@
 	ld	hl,%1	;const
 	call	l_as%2
 =
-	ld	l,#(%1 % 256)
+	ld	l,+(%1 % 256)
 	call	l_as%2
 
 	ld	de,%1	;const
@@ -726,7 +727,7 @@
 	call	l_as%2
 =
 	ex	de,hl
-	ld	l,#(%1 % 256)
+	ld	l,+(%1 % 256)
 	call	l_as%2
 
 	ex	de,hl
@@ -843,6 +844,7 @@
 	push	de
 	ld	hl,%1
 
+%notcpu gbz80
 	ld	hl,_%1
 	ld	de,%2
 	ex	de,hl
@@ -911,12 +913,14 @@
 	pop	hl
 	call	l_long_aslo
 
-	ld	a,#(16 % 256)
+%notcpu gbz80
+	ld	a,+(16 % 256)
 	call	l_long_aslo
 =
 	ex	de,hl
 	ld	hl,0	;const
 
+%notcpu gbz80
 	push	hl
 	ld	hl,(_%1
 	pop	de
@@ -1089,7 +1093,7 @@
 	ld	hl,%3
 =
 	ld	a,(hl)
-	cp	#(%1 % 256)
+	cp	+(%1 % 256)
 	jp	nz,%2
 	ld	hl,%3
 
@@ -1101,7 +1105,7 @@
 	ld	hl,%3
 =
 	ld	a,(hl)
-	cp	#(%1 % 256)
+	cp	+(%1 % 256)
 	jp	z,%2
 	ld	hl,%3
 
@@ -1113,7 +1117,7 @@
 	ld	hl,%3
 =
 	ld	a,(hl)
-	cp	#(%1 % 256)
+	cp	+(%1 % 256)
 	jp	nz,%2
 	ld	hl,%3
 
@@ -1129,6 +1133,7 @@
 	jp	nz,%2
 	ld	hl,%3
 
+%notcpu gbz80
 	push	hl
 	ld	hl,(%1)
 	ld	h,0
@@ -1165,6 +1170,7 @@
 	or	l
 	jp	nz,%1
 
+%notcpu gbz80
 	push	hl
 	pop	bc
 	pop	hl
@@ -1182,6 +1188,7 @@
 =
 	ld	(%1),hl
 
+%notcpu gbz80
 	ld	l,(hl)
 	ld	h,0
 	ex	de,hl
@@ -1191,6 +1198,7 @@
 	ld	d,0
 	ld	hl,%1
 
+%notcpu gbz80
 	ld	hl,_%1
 	ex	de,hl
 	pop	hl
@@ -1370,6 +1378,7 @@
 	push	bc
 	ld	hl,%1	;const
 
+%notcpu gbz80
 	push	hl
 	ld	hl,%1	;const
 	add	hl,sp
@@ -1381,6 +1390,8 @@
 	add	hl,sp
 	call	l_gint	;%9
 
+%notcpu 8080
+%notcpu gbz80
 	ld	hl,%1
 	ex	de,hl
 	ld	hl,%2
@@ -1427,7 +1438,7 @@
 	ld	l,h
 	ld	h,a
 =
-	ld	hl,#( (%1/256) + (%1 % 256 )*256 )
+	ld	hl,+( (%1/256) + (%1 % 256 )*256 )
 
 	ld	hl,0	;const
 	add	hl,sp
@@ -1456,7 +1467,7 @@
 .%1
 	ld	hl,%2
 
-	ld	(hl),#(%1 % 256)
+	ld	(hl),+(%1 % 256)
 	ld	l,(hl)
 	ld	h,0
 	pop	de
@@ -1464,7 +1475,7 @@
 	ld	(de),a
 	ld	hl,%2
 =
-	ld	a,#(%1 % 256)
+	ld	a,+(%1 % 256)
 	ld	(hl),a
 	pop	de
 	ld	(de),a
@@ -1474,10 +1485,10 @@
 	inc	hl
 	push	hl
 	dec	hl
-	ld	(hl),#(%1 % 256)
+	ld	(hl),+(%1 % 256)
 =
 	pop	hl
-	ld	(hl),#(%1 % 256)
+	ld	(hl),+(%1 % 256)
 	inc	hl
 	push	hl
 	dec	hl
@@ -1510,7 +1521,7 @@
 	call	l_and
 =
 	ld	a,(hl)
-	and	#(%1 % 256)
+	and	+(%1 % 256)
 	ld	l,a
 	ld	h,0
 
@@ -1550,6 +1561,7 @@
 	or	l
 	jp	%1
 
+%notcpu gbz80
 	push	hl
 	ld	hl,%1
 	pop	de
@@ -1868,14 +1880,14 @@
 
 	ld	hl,0	;const
 	add	hl,sp
-	add	a,#(%1 % 256)
+	add	a,+(%1 % 256)
 	ld	(hl),a
 	ld	l,a
 	ld	h,0
 =
 	pop	hl
 	ld	a,l
-	add	a,#(%1 % 256)
+	add	a,+(%1 % 256)
 	ld	l,a
 	push	hl
 	ld	h,0
@@ -1908,13 +1920,14 @@
 	ld	e,(hl)
 	inc	hl
 	ld	d,(hl)
-	ld	l,#(8 % 256)
+	ld	l,+(8 % 256)
 	call	l_asr_u
 =
 	inc	hl
 	ld	l,(hl)
 	ld	h,0
 
+%notcpu gbz80
 	push	hl
 	ld	hl,%1	;const
 	add	hl,sp
@@ -1950,7 +1963,7 @@
 	rl	l
 =
 	ld	a,(hl)
-	cp	#( %1 % 256)
+	cp	+( %1 % 256)
 	ld	hl,0	;const
 	jr	nz,ASMPC+3
 	inc	hl
@@ -1964,7 +1977,7 @@
 	ld	hl,%4
 =
 	ld	a,(hl)
-	cp	#(%1 % 256)
+	cp	+(%1 % 256)
 	ld	hl,%2
 	jp	z,%3
 	ld	hl,%4
@@ -2017,7 +2030,7 @@
 	ld	a,l
 	sub	e
 =
-	ld	a,#(%1 % 256)
+	ld	a,+(%1 % 256)
 	sub	(hl)
 
 	ld	e,(hl)
@@ -2027,7 +2040,7 @@
 	sub	l
 =
 	ld	a,(hl)
-	sub	#(%1 % 256)
+	sub	+(%1 % 256)
 
 	call	l_gchar
 	ld	de,%1	;const
@@ -2036,7 +2049,7 @@
 	sub	l
 =
 	ld	a,(hl)
-	sub	#(%1 % 256)
+	sub	+(%1 % 256)
 
 	xor	a
 	sub	(hl)
@@ -2060,7 +2073,7 @@
 	scf
 	jp	nc,%2
 =
-	cp	#(%1 % 256)
+	cp	+(%1 % 256)
 	jp	nz,%2
 
 	ld	l,(hl)
@@ -2069,7 +2082,7 @@
 	ld	hl,%1	;const
 	add	hl,sp
 	ld	a,(hl)
-	%2	#%3
+	%2	+%3
 	ld	l,a
 	ld	h,0
 	pop	de
@@ -2079,7 +2092,7 @@
 	ld	hl,%eval( %1 2 -)	;const
 	add	hl,sp
 	ld	a,(hl)
-	%2	#%3
+	%2	+%3
 	ld	l,a
 	ld	a,e
 
@@ -2168,6 +2181,7 @@
 	ld	d,h
 	ld	e,l
 
+%notcpu 8080
 	push	hl
 	call	l_gint	;
 	inc	hl
@@ -2182,6 +2196,7 @@
 	ld	h,(hl)
 	ld	l,a
 
+%notcpu 8080
 	push	hl
 	call	l_gint	;
 	dec	hl
@@ -2292,7 +2307,7 @@
 =
 	ld	a,d
 	or	e
-	jr	nz,%1
+	jp	nz,%1
 	ld	hl,%2
 
 	ld	hl,%1
@@ -2404,19 +2419,19 @@
 =
 	dec	sp
 	pop	hl
-	ld	l,#(%1 % 256)
+	ld	l,+(%1 % 256)
 	push	hl
 
 	dec	sp
 	pop	hl
-	ld	l,#%1
+	ld	l,+%1
 	push	hl
 	dec	sp
 	pop	hl
-	ld	l,#%2
+	ld	l,+%2
 	push	hl
 =
-	ld	hl,#(( %1 * 256) + %2)
+	ld	hl,+(( %1 * 256) + %2)
 	push	hl
 
 %check 0 <= %1 <= 127
@@ -2426,6 +2441,7 @@
 =
 	ld	hl,%1	;const
 
+%notcpu gbz80
 	push	hl
 	ld	hl,%1
 	pop	de
@@ -2437,7 +2453,7 @@
 	ld	a,l
 	call	l_sxt
 =
-	ld	a,#(%1 % 256)
+	ld	a,+(%1 % 256)
 	call	l_sxt
 
 	ex	de,hl
@@ -2450,6 +2466,7 @@
 =
 	call	l_ne
 
+%notcpu gbz80
 	push	hl
 	pop	bc
 	pop	hl
@@ -2461,7 +2478,32 @@
 	push	hl
 	ex	de,hl
 
-	ld	hl,%1
+%cpu gbz80
+	push	hl
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	pop	de
+=
+	ld	d,h
+	ld	e,l
+	pop	hl
+	push	hl
+
+%notcpu 8080
+	ld	hl,(%1)
+	pop	de
+	push	de
+	push	hl
+	ex	de,hl
+=
+	pop	hl
+	push	hl
+	ld	de,(%1)
+	push	de
+
+	ld	hl,%1	;const
 	pop	de
 	push	de
 	push	hl
@@ -2470,6 +2512,18 @@
 	pop	hl
 	push	hl
 	ld	bc,%1
+	push	bc
+
+%notcpu gbz80
+	ld	hl,_%1
+	pop	de
+	push	de
+	push	hl
+	ex	de,hl
+=
+	pop	hl
+	push	hl
+	ld	bc,_%1
 	push	bc
 
 	ld	h,a
@@ -2483,10 +2537,11 @@
 	and	a
 	jp	%1,%2
 
+%notcpu gbz80
 	ld	hl,_%1
-	ld	(hl),#(%2 % 256)
+	ld	(hl),+(%2 % 256)
 	inc	hl
-	ld	(hl),#(%2 / 256)
+	ld	(hl),+(%2 / 256)
 	ld	hl,%3
 =
 	ld	hl,%2	;const
@@ -2542,6 +2597,7 @@
 	ld	hl,0	;const
 	ld	de,0
 
+%notcpu gbz80
 	ld	h,(hl)
 	ld	l,0
 	pop	de
@@ -2580,6 +2636,7 @@
 	ld	h,0
 	ld	de,0
 
+%notcpu gbz80
 	call	l_glong
 	ld	l,h
 	ld	h,e
@@ -2661,6 +2718,7 @@
 	ld	de,%2
 	call	l_plong
 
+%notcpu gbz80
 	call	l_glong
 	push	de
 	push	hl
@@ -2797,6 +2855,7 @@
 .i%1
 	ld	hl,%2
 
+%notcpu 8080
 	add	hl,hl
 	add	hl,hl
 	add	hl,hl
@@ -2811,6 +2870,7 @@
 	ld	h,l
 	ld	l,0
 
+%notcpu 8080
 	ld	h,0
 	srl	l
 	add	hl,hl
@@ -2819,11 +2879,22 @@
 	ld	h,0
 	add	hl,hl
 
+%notcpu 8080
 	ld	h,0
 	srl	h
 	rr	l
 =
 	ld	h,0
+	srl	l
+
+%notcpu 8080
+	ld	h,0
+	srl	l
+	srl	h
+	rr	l
+=
+	ld	h,0
+	srl	l
 	srl	l
 
 	ld	hl,(_%1)
@@ -2853,6 +2924,7 @@
 	ld	l,a
 	ld	h,0
 
+%notcpu 8080
 	ld	e,(hl)
 	ld	d,0
 	ld	hl,2
@@ -2863,6 +2935,7 @@
 	srl	a
 	ld	l,a
 	ld	h,0
+	ld	de,255
 
 	ld	l,a
 	ld	h,0
@@ -2899,6 +2972,7 @@
 	or	e
 	ld	l,a
 
+%notcpu 8080
 	ld	l,0
 	ld	a,1
 	call	l_long_aslo
@@ -3062,7 +3136,7 @@
 	ld	hl,1	;const
 	add	hl,sp
 	ld	a,(hl)
-	cp	#(%1 %% 256)
+	cp	+(%1 %% 256)
 
 	pop	hl
 	push	hl
@@ -3073,7 +3147,7 @@
 	ld	hl,0	;const
 	add	hl,sp
 	ld	a,(hl)
-	cp	#(%1 %% 256)
+	cp	+(%1 %% 256)
 
 	pop	bc
 	pop	hl
@@ -3243,7 +3317,7 @@
 	ld	hl,(_%1)
 	ld	h,0
 	ld	a,l
-	and	#(128 %% 256)
+	and	+(128 %% 256)
 	jp	z,%2
 	ld	hl,%3
 =
@@ -3472,6 +3546,7 @@
 	ld	l,a
 	ex	de,hl
 
+%notcpu 8080
 	push	hl
 	ld	l,(hl)
 	ld	h,0
@@ -3506,13 +3581,13 @@
 
 	ld	hl,(_%1)
 	ld	h,0
-	ld	a,#%2
+	ld	a,+%2
 	and	l
 	ld	l,a
 	push	hl
 =
 	ld	a,(_%1)
-	and	#%2
+	and	+%2
 	ld	l,a
 	ld	h,0
 	push	hl	
@@ -3568,12 +3643,12 @@
 =
 	pop	bc
 	ld	a,(hl)
-	and	#(%1 %% 256)
+	and	+(%1 %% 256)
 	ld	(bc),a
 	inc	bc
 	inc	hl
 	ld	a,(hl)
-	and	#(%1 / 256)
+	and	+(%1 / 256)
 	ld	(bc),a
 	ld	hl,%2
 
@@ -3588,6 +3663,7 @@
 	add	hl,sp
 
 %check 0 <= %1 <= 7
+%notcpu 8080
 	ld	e,(hl)
 	inc	hl
 	ld	d,(hl)
@@ -3727,6 +3803,7 @@
 	ld	(de),a
 	ld	hl,%2
 
+%notcpu gbz80
 	push	de
 	ld	l,e
 	ld	h,d
@@ -3743,7 +3820,7 @@
 	ld	hl,%2
 =
 	ex	de,hl
-	ld	hl,%1	;const
+	ld	hl,%eval( %1 2 -)	;const
 	add	hl,sp
 	ld	a,(hl)
 	ld	(de),a
@@ -3800,14 +3877,14 @@
 	inc	hl
 	ld	h,(hl)
 	ld	l,a
-	ld	(hl),#(%1 %% 256)
+	ld	(hl),+(%1 %% 256)
 	inc	hl
-	ld	(hl),#(%1 / 256)
+	ld	(hl),+(%1 / 256)
 	ld	hl,%2
 
-	ld	(hl),#(0 % 256)
+	ld	(hl),+(0 % 256)
 	inc	hl
-	ld	(hl),#(0 / 256)
+	ld	(hl),+(0 / 256)
 =
 	xor	a
 	ld	(hl),a
@@ -3822,6 +3899,7 @@
 	and	a
 	jp	%2z,%1
 
+%notcpu 8080
 	push	hl
 	call	l_gint	;
 	res	%1,l
@@ -3939,13 +4017,13 @@
 	ld	de,6
 	call	l_asr_u_hl_by_e
 	ld	a,l
-	and	#(3 %% 256)
+	and	+(3 %% 256)
 	ld	l,a
 =
 	ld	a,(hl)
 	rlca
 	rlca
-	and	#(3 %% 256)
+	and	+(3 %% 256)
 	ld	l,a
 	ld	h,0
 
@@ -3958,3 +4036,501 @@
 	ld	a,(hl)
 	ld	(%1),a
 	ld	hl,%2
+
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ex	de,hl
+	ld	de,0	;
+	ld	h,0
+=
+	ld	l,(hl)
+	ld	h,0
+	ld	de,0
+
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	inc	hl
+	ld	l,(hl)
+	ld	h,0
+	ex	de,hl
+	ld	h,0
+=
+	ld	e,(hl)
+	inc	hl
+	inc	hl
+	ld	l,(hl)
+	ld	h,0
+	ex	de,hl
+	ld	h,0
+
+%check 9 <= %1 <= 15
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ld	hl,%1
+	call	l_asr_u
+=
+	inc	hl
+	ld	e,(hl)
+	ld	d,0
+	ld	hl,%eval(%1 8 -)
+	call	l_asr_u
+
+	ld	de,255
+	inc	e
+=
+	ld	de,0
+
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ex	de,hl
+	ld	de,0
+	ld	h,0
+=
+	ld	l,(hl)
+	ld	h,0
+	ld	de,0
+
+	sbc	hl,de
+	jp	nz,%1
+	ld	hl,0	;const
+=
+	sbc	hl,de
+	jp	nz,%1
+
+	push	hl
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ex	de,hl
+	pop	de
+=
+	ex	de,hl
+	ld	hl,%eval(%1 2 -)	;const
+	add	hl,sp
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+
+	call	l_glong
+	ld	de,%1
+=
+	call	l_gint
+	ld	de,%1
+
+	ld	de,0
+	ld	a,d
+	or	e
+	or	h
+	or	l
+=
+	ld	de,0
+	ld	a,h
+	or	l
+
+	ld	hl,%1
+	push	hl
+	ld	hl,%2	;const
+	add	hl,sp
+	ex	de,hl
+	pop	bc
+=
+	ld	hl,%eval(%2 2 -)	;const
+	add	hl,sp
+	ex	de,hl
+	ld	bc,%1
+
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	sp,hl
+	ld	hl,%2	;const
+	add	hl,sp
+	ld	sp,hl
+=
+	ld	hl,%eval(%1 %2 + 65536 %%)	;const
+	add	hl,sp
+	ld	sp,hl
+
+	ld	de,%1	;const
+	ex	de,hl
+	ld	a,l
+	rlca
+=
+	ld	de,%eval(%1 1 <)	;const
+	ex	de,hl
+	ld	a,l
+
+	ld	hl,%1
+	ld	de,%2	;const
+	ex	de,hl
+	ld	a,l
+	and	%3
+	ld	l,a
+	ld	a,(de)
+	and	%4
+	or	l
+	ld	(de),a
+	ld	hl,%5
+=
+	ld	hl,%1
+	ld	a,(hl)
+	and	%4
+	or	%eval( %2 256 %% %3 &)
+	ld	(hl),a
+	ld	hl,%5
+
+	ld	hl,_%1
+	ld	de,%2
+	ex	de,hl
+	inc	de
+=
+	ld	hl,_%1 + 1
+	ld	de,%2
+	ex	de,hl
+
+	ld	hl,%1	;const
+	add	hl,hl
+=
+	ld	hl,%eval(%1 2 *)	;const
+
+%check 0 <= %2 <= 65535
+	ld	hl,%1	;const
+	ld	de,%2
+	call	l_and
+=
+	ld	hl,%eval(%1 %2 &)
+
+%check 0 <= %2 <= 65535
+	ld	hl,%1	;const
+	ld	de,%2
+	call	l_or
+=
+	ld	hl,%eval(%1 %2 |)
+
+	ld	a,(de)
+	and	0
+	or	l
+	ld	(de),a
+=
+	ld	a,l
+	ld	(de),a
+
+	ld	a,(de)
+	and	0
+	or	h
+	ld	(de),a
+=
+	ld	a,h
+	ld	(de),a
+
+%check 0 <= %1 <= 65535
+	ld	de,%2
+	ld	hl,%1
+	ld	a,l
+	ld	(de),a
+	inc	de
+	ld	a,(de)
+	and	%3
+	or	h
+	ld	(de),a
+	ld	hl,%4
+=
+	ld	hl,%2
+	ld	(hl),%eval(%1 256 %%)
+	inc	hl
+	ld	a,(hl)
+	and	%3
+	or	%eval(%1 256 /)
+	ld	(hl),a
+	ld	hl,%4
+
+	ld	hl,%1	;const
+	ld	(%2),hl
+	ld	hl,%1
+=
+	ld	hl,%1	;const
+	ld	(%2),hl
+
+	ld	a,l
+	and	255
+	ld	l,a
+=
+
+
+	ld	hl,%1
+	ld	de,%4	;const
+	ex	de,hl
+	ld	a,l
+	and	%2
+	ld	l,a
+	ld	a,(de)
+	and	%3
+	or	l
+	ld	(de),a
+=
+	ld	hl,%1
+	ld	a,(hl)
+	and	%3
+	or	%eval(%4 256 %% %2 &)
+	ld	(hl),a
+	ld	hl,%4
+
+	ld	hl,%1
+	ld	hl,_%2
+=
+	ld	hl,_%2
+
+	or	0
+=
+
+
+	and	255
+=
+
+
+	ld	a,l
+	ld	l,a
+	ld	a,l
+=
+	ld	a,l
+
+	ld	e,(hl)
+	inc	hl
+	ld	a,(hl)
+	ld	h,a
+	ld	l,e
+=
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+
+	scf
+	jr	nz,ASMPC+3
+	ccf
+	jr	c,%1
+.%2
+	jp	%3
+.%1
+	ld	hl,%4
+=
+	jr	nz,%1
+.%2
+	jp	%3
+.%1
+	ld	hl,%4
+
+	dec	hl
+.%1
+	ld	hl,%2
+=
+.%1
+	ld	hl,%2
+
+	ld	h,(hl)
+	ld	l,a
+	pop	hl
+=
+	pop	hl
+
+	push	hl
+	ld	a,(hl)
+	cp	%1
+	jp	%2
+	pop	hl
+	push	hl
+	inc	hl
+=
+	push	hl
+	ld	a,(hl)
+	cp	%1
+	jp	%2
+	inc	hl
+
+	push	hl
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
+	pop	bc
+	call	l_plong
+	ld	hl,%1
+	add	hl,sp
+=
+	xor	a
+	ld	(hl),a
+	inc	hl
+	ld	(hl),a
+	inc	hl
+	ld	(hl),a
+	inc	hl
+	ld	(hl),a
+	ld	hl,%1
+	add	hl,sp
+
+	ld	h,(hl)
+	ld	l,a
+.%1
+	ld	hl,%2
+=
+.%1
+	ld	hl,%2
+
+	ld	a,h
+	or	l
+	jp	nz,%1
+	jr	%2
+.%1
+	ld	hl,1	;const
+.%2
+	ld	a,h
+	or	l
+=
+	ld	a,h
+	or	l
+	jr	z,%2
+.%1
+	ld	hl,1	;const
+.%2
+	ld	a,h
+	or	l
+
+	ld	a,+(%1 % 256)
+	call	l_sxt
+=
+	ld	hl,%1
+
+	ld	l,(hl)
+	ld	h,0
+	ld	de,%1
+	call	l_and
+=
+	ld	a,(hl)
+	and	%eval(%1 256 %%)
+	ld	l,a
+	ld	h,0
+
+	ld	l,a
+	ld	h,0
+	ex	de,hl
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+	call	l_or
+	pop	de
+	ld	a,l
+	ld	(de),a
+	ld	hl,%2
+=
+	ld	hl,%1	;const
+	add	hl,sp
+	or	(hl)
+	pop	de
+	ld	(de),a
+	ld	hl,%2
+
+	ld	de,1
+	and	a
+	sbc	hl,de
+	jp	nz,%1
+	ld	hl,%2
+=
+	dec	hl
+	ld	a,h
+	or	l
+	jp	nz,%1
+	ld	hl,%2
+
+	and	%1
+	ld	h,a
+	ld	l,0
+	and	a
+=
+	and	%1
+	ld	h,a
+	ld	l,0
+
+	ld	l,(hl)
+	ld	h,0
+	call	l_lneg
+	jp	%1c,%2
+=
+	ld	a,(hl)
+	and	a
+	jp	%1z,%2
+
+	ld	a,h
+	and	+(255 %% 256)
+	ld	h,a
+=
+
+	ld	a,(hl)
+	or	128
+	ld	(hl),a
+	ld	l,a
+	ld	h,0
+=
+	set	7,(hl)
+	ld	l,(hl)
+	ld	h,0
+
+	ld	l,(hl)
+	ld	h,0
+	ld	a,l
+	and	+%1
+	jp	%2,%3
+	ld	hl,%4
+=
+	ld	a,+%1
+	and	(hl)
+	jp	%2,%3
+	ld	hl,%4
+
+	call	l_gint	;
+	ld	a,l
+	and	+%1
+	ld	l,a
+	ld	h,0
+=
+	ld	a,(hl)
+	and	+%1
+	ld	l,a
+	ld	h,0
+
+	inc	hl
+	inc	hl
+	ld	(_%1),hl
+	dec	hl
+	dec	hl
+	ld	(hl),%2
+	inc	hl
+	ld	(hl),%3
+=
+	ld	(hl),%2
+	inc	hl
+	ld	(hl),%3
+	inc	hl
+	ld	(_%1),hl
+
+	call	l_gchar
+	ld	h,0
+=
+	ld	l,(hl)
+	ld	h,0
+
+%cpu gbz80
+	ld	hl,_%1
+	push	hl
+	ld	hl,_%2
+	pop	de
+	push	de
+=
+	ld	de,_%1
+	ld	hl,_%2
+	push	de

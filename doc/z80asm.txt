@@ -1443,7 +1443,6 @@ implemented: binary AND, OR and XOR.
     | : binary OR, e.g. 128 | 64 (192)
     ^ : binary XOR, e.g. 128 ^ 128 (0)
     ~ : binary NOT, e.g. (~0xAA) & 0xFF (0x55)
-    # : truncate expression as constant (remove relocatable address flag)
 
 Arithmetic operators use the standard operator precedence, shown from highest to
 lowest:
@@ -1452,35 +1451,6 @@ lowest:
     () ** */% +-&|^~
 
 If you want to override the default operator precedence rules, use brackets ().
-
-
-6.3. The # operator
--------------------
-
-This is not a real operator, though. It is only used as the first symbol in an
-expression to identify that this expression evaluates to a constant, i.e.
-containing no relocatable information. This feature may be necessary when you
-have to calculate a distance between two address labels without letting the
-assembler think it is a relocatable address. The assembler thinks that
-expressions containing address labels are relocatable items. In 99% of any
-expression used this is perfectly adequate.
-
-During the linking phase such an expression may have undesirable side effect when
-you want to produce relocatable machine code using the -R option. The relocator
-identifies the expression as an relocatable item and will add a constant to the
-evaluated value of the expression. This is a perfectly correct handling in normal
-address references for relocatable code. However, since the assembler cannot see
-this as a constant expression, you have to force it as one.
-
-    LD BC, end_relocator-relocator  ; the relocator will add an ORG constant
-    LD BC, #end_relocator-relocator ; the relocator sees a constant expression
-
-Normal executable code, compiled for an absolute address, won't conflict with the
-above problem, since no constants are added to expressions. All address
-information is calculated during loading of the address labels in pass 1 of the
-linking process. Pass 2 of the linking process just evaluates expressions
-(thereby using the proper values of labels and other constants) and patches them
-into the corresponding locations of the code.
 
 
 6.4. Relational operators
@@ -2356,8 +2326,6 @@ Index
     6.1. Constant identifiers
 
     6.2. Arithmetic operators
-
-    6.3. The # operator
 
     6.4. Relational operators
 

@@ -48,7 +48,6 @@ int c128_exec(char *target)
     FILE   *fpin;
     FILE   *fpout;
     long    pos;
-    char    mybuf[20];
     int     len,namelen;
     int     c,i;
     char   *p;

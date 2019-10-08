@@ -10,13 +10,13 @@ EXTERN asm__memupr
 
 _memupr_:
 
-   pop af
+   pop de
    pop bc
    pop hl
    
    push hl
    push bc
-   push af
+   push de
    
    jp asm__memupr
 

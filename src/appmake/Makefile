@@ -11,7 +11,7 @@ else
 endif
 
 CC			?= gcc
-CFLAGS		+= -Wall -std=gnu11 -MMD 
+CFLAGS		+= -Wall -std=gnu11 -MMD -pedantic
 
 INSTALL 	?= install
 

@@ -45,23 +45,80 @@ loop:
    
    push de
    push hl
-   
+
+IF __CPU_INTEL__ 
+   push bc
+   ld   c,a
+   ld a,l
+   add l
+   ld l,a
+   ld a,h
+   adc h
+   ld h,a
+   ld a,e
+   rla
+   ld e,a
+   ld a,d
+   rla
+   ld d,a
+   ld a,c
+   pop bc
+ELSE   
    add hl,hl
    rl e
    rl d
    jr c, overflow_0
+ENDIF
    
    push de
    push hl
    
+IF __CPU_INTEL__
+   push bc
+   ld   c,a
+   ld a,l
+   add l
+   ld l,a
+   ld a,h
+   adc h
+   ld h,a
+   ld a,e
+   rla
+   ld e,a
+   ld a,d
+   rla
+   ld d,a
+   ld a,c
+   pop bc
+ELSE   
    add hl,hl
    rl e
    rl d
    jr c, overflow_0
+ENDIF
    
+IF __CPU_INTEL__
+   push bc
+   ld   c,a
+   ld a,l
+   add l
+   ld l,a
+   ld a,h
+   adc h
+   ld h,a
+   ld a,e
+   rla
+   ld e,a
+   ld a,d
+   rla
+   ld d,a
+   ld a,c
+   pop bc
+ELSE   
    add hl,hl
    rl e
    rl d
+ENDIF
    jr c, overflow_0
    
    ex de,hl
@@ -69,7 +126,16 @@ loop:
    add hl,de
    pop de
    ex (sp),hl
+IF __CPU_INTEL__ | __CPU_GBZ80__
+   ld a,l
+   adc e
+   ld l,a
+   ld a,h
+   adc d
+   ld h,a
+ELSE
    adc hl,de
+ENDIF
    ex de,hl
    pop hl
    jr c, overflow_1

@@ -67,4 +67,4 @@
 	ld (hl),b
 	ret
 	
-DEFC ASMDISP_CPC_ASSIGNKEY_CALLEE = # asmentry - cpc_AssignKey_callee
+DEFC ASMDISP_CPC_ASSIGNKEY_CALLEE = asmentry - cpc_AssignKey_callee

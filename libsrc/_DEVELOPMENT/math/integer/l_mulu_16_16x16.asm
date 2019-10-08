@@ -16,10 +16,10 @@ IF __CPU_Z180__ && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
 
 ELSE
 
-IF __CPU_Z80_ZXN__ && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
+IF __CPU_Z80N__ && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
 
-   EXTERN l_z80_zxn_mulu_16_16x16
-   defc l_mulu_16_16x16 = l_z80_zxn_mulu_16_16x16
+   EXTERN l_z80n_mulu_16_16x16
+   defc l_mulu_16_16x16 = l_z80n_mulu_16_16x16
 
 ELSE
 

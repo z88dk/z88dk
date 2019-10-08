@@ -2,7 +2,7 @@
 
 # Z88DK Z80 Macro Assembler
 #
-# Copyright (C) Paulo Custodio, 2011-2018
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk/
 #
@@ -19,7 +19,7 @@ ok $version, "version $version";
 for my $opt (qw( -h --help )) {
 	run("z80asm $opt", 0, <<"END", "");
 Z80 Module Assembler $version
-(c) InterLogic 1993-2009, Paulo Custodio 2011-2018
+(c) InterLogic 1993-2009, Paulo Custodio 2011-2019
 
 Usage:
   z80asm [options] { \@<modulefile> | <filename> }
@@ -47,8 +47,11 @@ Help Options:
   -v, --verbose          Be verbose
 
 Code Generation Options:
-  --cpu=z80-zxn          Assemble for the Z80 variant of ZX Next
+  --cpu=z80n             Assemble for the Z80 variant of ZX Next
   --cpu=z80              Assemble for the Z80
+  --cpu=gbz80            Assemble for the GameBoy Z80
+  --cpu=8080             Assemble for the 8080 (with Zilog or Intel mnemonics)
+  --cpu=8085             Assemble for the 8085 (with Zilog or Intel mnemonics)
   --cpu=z180             Assemble for the Z180
   --cpu=r2k              Assemble for the Rabbit 2000
   --cpu=r3k              Assemble for the Rabbit 3000

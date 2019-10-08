@@ -2,11 +2,10 @@
 
 
 
-
 #include "string_tests.h"
 
 
-
+#ifndef __GBZ80__
 void strlcpy_fits()
 {
     char   buf[20];
@@ -22,7 +21,7 @@ void strlcpy_short()
     Assert(strlcpy(buf, "Last", sizeof(buf)) == 4, "Should be == 4");
     Assert(strcmp(buf, "L") == 0, "Incorrect contents");
 }
-
+#endif
 
 
 
@@ -31,9 +30,10 @@ void strlcpy_short()
 int test_strlcpy()
 {
     suite_setup("Strlcpy Tests");
-
+#ifndef __GBZ80__
     suite_add_test(strlcpy_fits);
     suite_add_test(strlcpy_short);
+#endif
 
     return suite_run();
 }

@@ -83,8 +83,8 @@ int pc88_exec(char* target)
     FILE* fpout;
     int len, len2;
     long pos;
-	unsigned long checksum, ticks;
-    int c, i, j;
+    unsigned long checksum, ticks;
+    int i, j;
 
     if (help)
         return -1;
@@ -317,7 +317,7 @@ int pc88_exec(char* target)
 					i=fgetc(fpin)+256*fgetc(fpin);
 					if (dumb)
 						printf ("TAG length: %d\n",i);
-					for (j=1; j<=10; j++) c=fgetc(fpin);
+					for (j=1; j<=10; j++) fgetc(fpin);
 					j=fgetc(fpin)+256*fgetc(fpin);
 					switch (j) {
 					case 0x00cc:
@@ -341,7 +341,7 @@ int pc88_exec(char* target)
 					i=fgetc(fpin)+256*fgetc(fpin);
 					if (dumb)
 						printf ("TAG len: %X\n",i);
-					for (j=1; j<=i; j++) c=fgetc(fpin);
+					for (j=1; j<=i; j++) fgetc(fpin);
 					break;
 			}
 		}

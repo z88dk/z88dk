@@ -135,4 +135,4 @@ EXTERN ADTemptylistadd
    scf
    ret
 
-DEFC ASMDISP_ADT_LISTADD_CALLEE = # asmentry - adt_ListAdd_callee
+DEFC ASMDISP_ADT_LISTADD_CALLEE = asmentry - adt_ListAdd_callee

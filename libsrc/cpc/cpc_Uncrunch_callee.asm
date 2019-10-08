@@ -303,4 +303,4 @@ exx            ; output the byte n times
 	jp cpc_EnableFirmware
 	
 	
-DEFC ASMDISP_CPC_UNCRUNCH_CALLEE = # asmentry - cpc_Uncrunch_callee
+DEFC ASMDISP_CPC_UNCRUNCH_CALLEE = asmentry - cpc_Uncrunch_callee

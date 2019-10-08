@@ -277,14 +277,22 @@ int disassemble2(int pc, char *bufstart, size_t buflen)
                         else if ( y == 1 ) {
                             if ( canaltreg() ) BUF_PRINTF("%-8saf,af\'","ex");
                             else if (isgbz80() ) BUF_PRINTF("%-8s(%s),sp","ld",handle_addr16(state, opbuf1,sizeof(opbuf1)));
+                            else if (is8085() ) BUF_PRINTF("%-8shl,bc", "sub");
                             else BUF_PRINTF("nop");
                         } else if ( y == 2 ) {
                             if ( isgbz80() )  BUF_PRINTF("%-8s","stop");
                             else if ( is8080() ) BUF_PRINTF("nop");                            
+                            else if ( is8085() ) BUF_PRINTF("%-8shl","sra");                            
                             else BUF_PRINTF("%-8s%s","djnz", handle_rel8(state, opbuf1, sizeof(opbuf1)));                  
                         } else if ( y == 3 ) {
-                            if ( !is8080() ) BUF_PRINTF("%-8s%s", "jr",handle_rel8(state, opbuf1, sizeof(opbuf1)));
+                            if ( is8085() ) BUF_PRINTF("%-8s%s","rl","de");
+                            else if ( !is8080() ) BUF_PRINTF("%-8s%s", "jr",handle_rel8(state, opbuf1, sizeof(opbuf1)));
                             else BUF_PRINTF("nop");
+                        } else if ( is8085() ) {
+                            if ( y == 4 ) BUF_PRINTF("%-8s","rim");
+                            else if ( y == 5 ) BUF_PRINTF("%-8sde,hl+%s","ld", handle_immed8(state, opbuf2, sizeof(opbuf2)));
+                            else if ( y == 6 ) BUF_PRINTF("%-8s","sim");
+                            else if ( y == 7 ) BUF_PRINTF("%-8sde,sp+%s", "ld", handle_immed8(state, opbuf2, sizeof(opbuf2)));
                         } else if ( !is8080() ) BUF_PRINTF("%-8s%s,%s", "jr", cc_table[y-4], handle_rel8(state, opbuf1,  sizeof(opbuf1)));  
                         else BUF_PRINTF("nop");
                         break;
@@ -381,6 +389,8 @@ int disassemble2(int pc, char *bufstart, size_t buflen)
                     if  ( q == 0 ) BUF_PRINTF("%-8s%s","pop", handle_register16_2(state,p, state->index));
                     else if ( q == 1 ) {
                         if ( p == 0 ) { BUF_PRINTF("ret"); dolf=1; }
+                        else if ( p == 1 && is8080() ) BUF_PRINTF("nop");
+                        else if ( p == 1 && is8085() ) BUF_PRINTF("%-8s(de),hl","ld");
                         else if ( p == 1 && !isgbz80() ) BUF_PRINTF("exx");
                         else if ( p == 1 && isgbz80() ) { BUF_PRINTF("reti"); dolf=1; }
                         else if ( p == 2 ) BUF_PRINTF("%-8s(%s)","jp",handle_register16(state, 2, state->index)); 
@@ -396,6 +406,8 @@ int disassemble2(int pc, char *bufstart, size_t buflen)
                     }
                 } else if  ( z == 3 ) {
                     if ( y == 0 ) BUF_PRINTF("%-8s%s", "jp", handle_addr16(state, opbuf1, sizeof(opbuf1)));
+                    else if ( y == 1 && is8085() ) BUF_PRINTF("%-8sv,$0040","rst");
+                    else if ( y == 1 && is8080() ) BUF_PRINTF("nop");
                     else if ( y == 1 ) {
                         state->prefix = 0xcb;
                         if ( state->index ) {
@@ -470,7 +482,9 @@ int disassemble2(int pc, char *bufstart, size_t buflen)
                     if ( q == 0 ) BUF_PRINTF("%-8s%s","push",handle_register16_2(state,p, state->index));
                     else if ( q == 1 ) {
                         if ( p == 0 ) BUF_PRINTF("%-8s%s", "call", handle_addr16(state, opbuf1, sizeof(opbuf1)));
+                        else if ( p == 1 && is8085() ) BUF_PRINTF("%-8snk,%s", "jr",handle_addr16(state, opbuf1, sizeof(opbuf1))    );
                         else if ( p == 1 && canindex() ) { state->index = 1; continue; }
+                        else if ( p == 2 && is8085() ) BUF_PRINTF("%-8shl,(de)","ld");
                         else if ( p == 2 && canindex() ) { // ED page
                             READ_BYTE(state, b);
                             uint8_t x = b >> 6;
@@ -493,7 +507,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen)
                                         else BUF_PRINTF("%-8siy,(hl)","ld");
                                     }
                                     else BUF_PRINTF("nop");
-                                } else if ( c_cpu & CPU_Z80_ZXN ) {
+                                } else if ( c_cpu & CPU_Z80N ) {
                                     if ( b == 0x23 ) BUF_PRINTF("swapnib");
                                     else if ( b == 0x24 ) BUF_PRINTF("mirror  a");
                                     else if ( b == 0x27 ) BUF_PRINTF("test    %s",handle_immed8(state, opbuf1, sizeof(opbuf1)));                                    
@@ -595,7 +609,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen)
                                 } else if ( isz180() && z == 3 && y < 4 ) {
                                     char *instr[] = { "otim", "otdm", "otimr", "otdmr"};
                                     BUF_PRINTF("%s", instr[y]);
-                                } else if ( c_cpu & CPU_Z80_ZXN ) {
+                                } else if ( c_cpu & CPU_Z80N ) {
                                     if ( b == 0x8a ) BUF_PRINTF("push    %s", handle_immed16_be(state, opbuf1, sizeof(opbuf1)));
                                     else if ( b == 0x90 ) BUF_PRINTF("outinb  ");
                                     else if ( b == 0x91 ) BUF_PRINTF("nextreg %s,%s",handle_immed8(state, opbuf1, sizeof(opbuf1)), handle_immed8(state, opbuf2, sizeof(opbuf2)));
@@ -628,6 +642,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen)
                                 else BUF_PRINTF("nop");
                             }
                         } else if ( p == 3 && canindex()  ) { state->index = 2; continue; }
+                        else if ( p == 3 && is8085() ) BUF_PRINTF("%-8sk,%s", "jr",handle_addr16(state, opbuf1, sizeof(opbuf1)));
                         else BUF_PRINTF("nop");                            
                     }
                 } else if ( z == 6 ) {

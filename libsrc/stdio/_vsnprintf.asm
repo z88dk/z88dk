@@ -16,8 +16,9 @@
 _vsnprintf:
 	ld	hl,2	
 	add	hl,sp		;&buf
-
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	push	ix
+ENDIF
         ld      c,(hl)  ;buf
         inc     hl
         ld      b,(hl)
@@ -52,7 +53,9 @@ _vsnprintf:
 	add	hl,sp
 	ld	sp,hl
 	ex	de,hl
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	pop	ix
+ENDIF
 	ret
 
 

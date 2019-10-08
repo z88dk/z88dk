@@ -1,0 +1,230 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	data_compiler
+._x
+	defw	0x7ff
+	defb	0x7b
+	defw	i_1+0
+	SECTION	code_compiler
+
+._func1
+	push	bc
+	ld	hl,_x
+	ld	(hl),255
+	inc	hl
+	ld	a,(hl)
+	and	248
+	or	7
+	ld	(hl),a
+	ld	hl,_x+1+1
+	ld	a,(hl)
+	and	248
+	or	2
+	ld	(hl),a
+	ld	hl,_x+1+1
+	ld	a,(hl)
+	and	7
+	or	24
+	ld	(hl),a
+	ld	hl,5	;const
+	pop	bc
+	push	hl
+	ld	hl,_x
+	ld	e,(hl)
+	inc	hl
+	ld	a,(hl)
+	and	7
+	bit	2,a
+	jr	z,ASMPC+4
+	or	248
+	ld	h,a
+	ld	l,e
+	pop	bc
+	ret
+
+
+
+._func1a
+	ld	hl,_x
+	ld	e,(hl)
+	inc	hl
+	ld	a,(hl)
+	and	7
+	bit	2,a
+	jr	z,ASMPC+4
+	or	248
+	ld	h,a
+	ld	l,e
+	ret
+
+
+
+._func1b
+	ld	hl,_x+1+1
+	ld	a,(hl)
+	and	7
+	ld	l,a
+	ld	h,0
+	ret
+
+
+
+._func1c
+	ld	hl,_x+1+1
+	ld	a,(hl)
+	rrca
+	rrca
+	rrca
+	and	31
+	ld	l,a
+	ld	h,0
+	ret
+
+
+
+._func2
+	ld	hl,_y
+	ld	(hl),+(1 % 256)
+	ld	l,(hl)
+	ld	h,0
+	ret
+
+
+
+._func2a
+	ld	hl,(_y)
+	ld	h,0
+	ret
+
+
+
+._func2b
+	ld	hl,_y+1
+	ld	a,(hl)
+	ld	l,a
+	rlca
+	sbc	a,a
+	ld	h,a
+	ret
+
+
+	SECTION	data_compiler
+._z
+	defw	0x8000
+	defs	2
+	SECTION	code_compiler
+
+._func3
+	ld	hl,3	;const
+	ld	(_z),hl
+	ld	hl,4	;const
+	ret
+
+
+
+._func3a
+	ld	hl,_z
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+	ret
+
+
+
+._func3b
+	ld	hl,_z+1+1
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+	ret
+
+
+	SECTION	data_compiler
+._t4
+	defb	0xe
+	SECTION	code_compiler
+
+._func4
+	ld	hl,_t4
+	ld	a,(hl)
+	and	252
+	or	2
+	ld	(hl),a
+	ld	hl,_t4
+	ld	a,(hl)
+	and	227
+	or	8
+	ld	(hl),a
+	ld	hl,1	;const
+	ret
+
+
+
+._func4a
+	ld	hl,_t4
+	ld	a,(hl)
+	rrca
+	rrca
+	and	7
+	bit	2,a
+	jr	z,ASMPC+4
+	or	248
+	ld	l,a
+	rlca
+	sbc	a,a
+	ld	h,a
+	ret
+
+
+
+._func4b
+	ld	hl,_t4
+	ld	a,(hl)
+	and	3
+	ld	l,a
+	ld	h,0
+	ret
+
+
+	SECTION	rodata_compiler
+.i_1
+	defm	"hello"
+	defb	0
+
+
+
+	SECTION	bss_compiler
+._y	defs	2
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_x
+	GLOBAL	_func1
+	GLOBAL	_func1a
+	GLOBAL	_func1b
+	GLOBAL	_func1c
+	GLOBAL	_y
+	GLOBAL	_func2
+	GLOBAL	_func2a
+	GLOBAL	_func2b
+	GLOBAL	_z
+	GLOBAL	_func3
+	GLOBAL	_func3a
+	GLOBAL	_func3b
+	GLOBAL	_t4
+	GLOBAL	_func4
+	GLOBAL	_func4a
+	GLOBAL	_func4b
+
+
+
+

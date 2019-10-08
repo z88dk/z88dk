@@ -1,8 +1,6 @@
 ; 2017 dom / feilipu
 ; 2017 aralbrec - slightly faster
 
-INCLUDE "config_private.inc"
-
 SECTION code_clib
 SECTION code_math
 

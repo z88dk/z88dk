@@ -1,0 +1,25 @@
+; Definitions for the MTX-512 serial ports
+
+
+	; Export/import these definitions as appropriate
+
+	GLOBAL  CTLRS
+	GLOBAL	DATRS
+	GLOBAL	CTCV
+
+IF DEFINED_CLIB_RS232_PORT_A
+	defc	CTLRS = $0e
+	defc	DATRS = $0c
+	defc	CTCV  = $09
+ENDIF
+
+IF DEFINED_CLIB_RS232_PORT_B
+	defc	CTLRS = $0f
+	defc	DATRS = $0d
+	defc	CTCV = $0a
+ENDIF
+
+
+	defc RSRDYR	= 00000001B               ; RS232 ready to read
+	defc RSRDYW	= 00000100B               ; RS232 ready to write
+	defc TXBUFE	= 00000100B               ; Xmit buffer empty

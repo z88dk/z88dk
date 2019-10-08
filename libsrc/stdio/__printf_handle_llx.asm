@@ -1,4 +1,5 @@
 
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	MODULE	__printf_handle_llx
 	SECTION code_clib
 	PUBLIC	__printf_handle_llx
@@ -9,3 +10,4 @@ __printf_handle_llx:
         ld      (ix-9),16
         res     1,(ix-4)        ;disable '+' flag
 	jp	__printf_number64
+ENDIF

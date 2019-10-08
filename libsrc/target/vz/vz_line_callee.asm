@@ -183,4 +183,4 @@ EXTERN ASMDISP_VZ_PLOT_CALLEE
    add a,e                   ; overflow += dx
    jp lupx1
 
-DEFC ASMDISP_VZ_LINE_CALLEE = # asmentry - vz_line_callee
+DEFC ASMDISP_VZ_LINE_CALLEE = asmentry - vz_line_callee

@@ -1,7 +1,7 @@
-stdio/fp1100/generic_console
-stdio/fp1100/fputc_cons_native
-stdio/fp1100/fgetc_cons
-stdio/fp1100/getk
-stdio/fp1100/conio_map_colour
+target/fp1100/gencon/generic_console
+target/fp1100/gencon/conio_map_colour
+target/fp1100/stdio/fputc_cons_native
+target/fp1100/stdio/fgetc_cons
+target/fp1100/stdio/getk
 @stdio/stdio.lst
 @z80.lst

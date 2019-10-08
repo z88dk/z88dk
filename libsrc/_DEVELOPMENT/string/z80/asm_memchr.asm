@@ -45,8 +45,12 @@ asm_memchr:
 
 asm0_memchr:
 loop:
-
+IF __CPU_GBZ80__
+   EXTERN __z80asm__cpir
+   call __z80asm__cpir
+ELSE
    cpir
+ENDIF
    dec hl
    ret z                       ; char found
 

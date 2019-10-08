@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------
 // Z88DK Z80 Module Assembler
 // Parse command line options
-// Copyright (C) Paulo Custodio, 2011-2018
+// Copyright (C) Paulo Custodio, 2011-2019
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -59,8 +59,11 @@ static void option_define(const char *symbol );
 static void option_make_lib(const char *library );
 static void option_use_lib(const char *library );
 static void option_cpu_z80(void);
-static void option_cpu_z80_zxn(void);
+static void option_cpu_z80n(void);
 static void option_cpu_z180(void);
+static void option_cpu_gbz80(void);
+static void option_cpu_8080(void);
+static void option_cpu_8085(void);
 static void option_cpu_r2k(void);
 static void option_cpu_r3k(void);
 static void option_cpu_ti83(void);
@@ -212,12 +215,24 @@ static void process_opt( int *parg, int argc, char *argv[] )
 	const char *opt_arg_ptr;
 
 	/* search options that are exceptions to the look-up table */
-	if (strcmp(argv[II], "-mz80-zxn") == 0 || strcmp(argv[II], "-m=z80-zxn") == 0) {
-		option_cpu_z80_zxn();
+	if (strcmp(argv[II], "-mz80n") == 0 || strcmp(argv[II], "-m=z80n") == 0) {
+		option_cpu_z80n();
 		return;
 	}
 	else if (strcmp(argv[II], "-mz80") == 0 || strcmp(argv[II], "-m=z80") == 0) {
 		option_cpu_z80();
+		return;
+	}
+	else if (strcmp(argv[II], "-mgbz80") == 0 || strcmp(argv[II], "-m=gbz80") == 0) {
+		option_cpu_gbz80();
+		return;
+	}
+	else if (strcmp(argv[II], "-m8080") == 0 || strcmp(argv[II], "-m=8080") == 0) {
+		option_cpu_8080();
+		return;
+	}
+	else if (strcmp(argv[II], "-m8085") == 0 || strcmp(argv[II], "-m=8085") == 0) {
+		option_cpu_8085();
 		return;
 	}
 	else if (strcmp(argv[II], "-mz180") == 0 || strcmp(argv[II], "-m=z180") == 0) {
@@ -734,10 +749,28 @@ static void option_cpu_z80(void)
 	opts.cpu_name = CPU_Z80_NAME;
 }
 
-static void option_cpu_z80_zxn(void)
+static void option_cpu_z80n(void)
 {
-	opts.cpu = CPU_Z80_ZXN;
-	opts.cpu_name = CPU_Z80_ZXN_NAME;
+	opts.cpu = CPU_Z80N;
+	opts.cpu_name = CPU_Z80N_NAME;
+}
+
+static void option_cpu_gbz80(void)
+{
+	opts.cpu = CPU_GBZ80;
+	opts.cpu_name = CPU_GBZ80_NAME;
+}
+
+static void option_cpu_8080(void)
+{
+	opts.cpu = CPU_8080;
+	opts.cpu_name = CPU_8080_NAME;
+}
+
+static void option_cpu_8085(void)
+{
+	opts.cpu = CPU_8085;
+	opts.cpu_name = CPU_8085_NAME;
 }
 
 static void option_cpu_z180(void)
@@ -775,18 +808,34 @@ static void define_assembly_defines()
 	switch (opts.cpu) {
 	case CPU_Z80:
 	    define_static_def_sym("__CPU_Z80__", 1);
+	    define_static_def_sym("__CPU_ZILOG__", 1);
 		break;
-	case CPU_Z80_ZXN:
-	    define_static_def_sym("__CPU_Z80_ZXN__", 1);
+	case CPU_Z80N:
+	    define_static_def_sym("__CPU_Z80N__", 1);
+	    define_static_def_sym("__CPU_ZILOG__", 1);
 		break;
 	case CPU_Z180:
 	    define_static_def_sym("__CPU_Z180__", 1);
+	    define_static_def_sym("__CPU_ZILOG__", 1);
 		break;
 	case CPU_R2K:
 	    define_static_def_sym("__CPU_R2K__", 1);
+	    define_static_def_sym("__CPU_RABBIT__", 1);
 		break;
 	case CPU_R3K:
 	    define_static_def_sym("__CPU_R3K__", 1);
+	    define_static_def_sym("__CPU_RABBIT__", 1);
+		break;
+	case CPU_8080:
+	    define_static_def_sym("__CPU_8080__", 1);
+	    define_static_def_sym("__CPU_INTEL__", 1);
+		break;
+	case CPU_8085:
+	    define_static_def_sym("__CPU_8085__", 1);
+	    define_static_def_sym("__CPU_INTEL__", 1);
+		break;
+	case CPU_GBZ80:
+		define_static_def_sym("__CPU_GBZ80__", 1);
 		break;
 	default:
 		xassert(0);

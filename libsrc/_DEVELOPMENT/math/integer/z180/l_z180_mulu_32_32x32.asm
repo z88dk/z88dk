@@ -1,7 +1,5 @@
 ; 2018 June feilipu
 
-INCLUDE "config_private.inc"
-
 SECTION code_clib
 SECTION code_math
 

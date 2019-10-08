@@ -13,6 +13,7 @@
 ; This routine shouldn't stay in contended memory locations !!
 ;
 
+IF !__CPU_GBZ80__
           SECTION    smc_clib
           PUBLIC     bit_synth
           PUBLIC     _bit_synth
@@ -143,3 +144,4 @@
           call	bit_close_ei
 
           ret
+ENDIF

@@ -27,6 +27,11 @@ int fchkstd(FILE *fp)
 IF __CPU_R2K__ | __CPU_R3K__
 	ld	hl,(sp + 2)
 	ex	de,hl
+ELIF __CPU_GBZ80__
+	ld	hl,sp+2
+	ld	d,(hl)
+	inc	hl
+	ld	d,(hl)
 ELSE
 	pop	af
 	pop	de
@@ -37,7 +42,7 @@ ENDIF
 	inc	de
 	inc	de	; points to +fp_flags
 	ld	a,(de)
-IF __CPU_Z80_ZXN__ | __CPU_Z180__
+IF __CPU_Z80N__ | __CPU_Z180__
 	tst	_IOSYSTEM
 	scf
 	ret	z

@@ -12,4 +12,4 @@
 
 .pointxy
 	defc	NEEDpoint = 1
-	INCLUDE	"pixel.asm"
+	INCLUDE	"pixel.inc"

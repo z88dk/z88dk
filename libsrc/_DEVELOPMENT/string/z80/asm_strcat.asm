@@ -33,10 +33,22 @@ asm_strcat:
    ex de,hl
       
 loop:                          ; append s2 to s1
-
+IF __CPU_INTEL__ || __CPU_GBZ80__
+  IF __CPU_GBZ80__
+   ld a,(hl+)
+  ELSE
+   ld a,(hl)
+   inc hl
+  ENDIF
+   ld (de),a
+   inc de
+   and a
+   jr nz,loop
+ELSE
    cp (hl)
    ldi
    jr nz, loop
+ENDIF
    
    pop hl                      ; hl = dst
    

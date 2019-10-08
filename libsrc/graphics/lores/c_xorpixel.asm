@@ -11,4 +11,4 @@
 
 
 .c_xorpixel			
-	INCLUDE "c_pixel.asm"
+	INCLUDE "c_pixel.inc"

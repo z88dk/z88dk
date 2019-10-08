@@ -1,0 +1,333 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._assign
+	ld	hl,0	;const
+	ld	de,16416
+	push	de
+	push	hl
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._assign2
+	push	bc
+	push	bc
+	ld	hl,0	;const
+	add	hl,sp
+	xor	a
+	ld	(hl),a
+	inc	hl
+	ld	(hl),a
+	inc	hl
+	ld	(hl),+(16416 % 256)
+	inc	hl
+	ld	(hl),+(16416 / 256)
+	ld	hl,0	;const
+	add	hl,sp
+	call	l_glong
+	push	de
+	push	hl
+	call	_func
+	pop	bc
+	pop	bc
+	ld	hl,0	;const
+	add	hl,sp
+	call	l_glong
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._assign_via_pointer
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,0	;const
+	ld	de,16672
+	pop	bc
+	call	l_plong
+	ret
+
+
+
+._funccall
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	push	de
+	push	hl
+	call	_func
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._funcptr
+	ld	hl,_func2
+	push	hl
+	push	hl
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	ex	de,hl
+	ex	(sp),hl
+	push	de
+	push	hl
+	ld	hl,0	;const
+	ld	de,16256
+	ex	de,hl
+	ex	(sp),hl
+	push	de
+	call	l_jphl
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._add
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	call	l_f32_add
+	ret
+
+
+
+._sub
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	call	l_f32_sub
+	ret
+
+
+
+._mul
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	call	l_f32_mul
+	ret
+
+
+
+._div
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	call	l_f32_div
+	ret
+
+
+
+._eq
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	call	l_f32_eq
+	ret
+
+
+
+._ne
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	call	l_f32_ne
+	ret
+
+
+
+._lt
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	call	l_f32_lt
+	ret
+
+
+
+._le
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	call	l_f32_le
+	ret
+
+
+
+._gt
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	call	l_f32_gt
+	ret
+
+
+
+._ge
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	call	l_f32_ge
+	ret
+
+
+
+._neg
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	ld	a,d
+	xor	128
+	ld	d,a
+	ret
+
+
+
+._inverse
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	call	l_f32_invf
+	ret
+
+
+
+._cschar
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_gchar
+	call	l_f32_schar2f
+	ret
+
+
+
+._cuchar
+	ld	hl,2	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+	call	l_f32_uchar2f
+	ret
+
+
+
+._csint
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	call	l_f32_sint2f
+	ret
+
+
+
+._cuint
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	call	l_f32_uint2f
+	ret
+
+
+
+._cslong
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	call	l_f32_slong2f
+	ret
+
+
+
+._culong
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	call	l_f32_ulong2f
+	ret
+
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_func
+	GLOBAL	_func2
+	GLOBAL	_assign
+	GLOBAL	_assign2
+	GLOBAL	_assign_via_pointer
+	GLOBAL	_funccall
+	GLOBAL	_funcptr
+	GLOBAL	_add
+	GLOBAL	_sub
+	GLOBAL	_mul
+	GLOBAL	_div
+	GLOBAL	_eq
+	GLOBAL	_ne
+	GLOBAL	_lt
+	GLOBAL	_le
+	GLOBAL	_gt
+	GLOBAL	_ge
+	GLOBAL	_neg
+	GLOBAL	_inverse
+	GLOBAL	_cschar
+	GLOBAL	_cuchar
+	GLOBAL	_csint
+	GLOBAL	_cuint
+	GLOBAL	_cslong
+	GLOBAL	_culong
+
+
+
+

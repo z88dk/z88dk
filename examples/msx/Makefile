@@ -9,7 +9,7 @@
 CC = zcc
 
 COMPILER ?= sccz80
-CFLAGS = +msx -vn -llib3d  -lm -lndos -create-app
+CFLAGS = +msx -vn -llib3d  -lm -lndos -create-app -DAMALLOC
 
 
 CFILES = \
@@ -85,4 +85,4 @@ vtstone.cas: ../console/vtstone.c
 
 
 clean:
-	$(RM) *.obj *.sym *.map *.o* *.bin *.msx zcc_opt.def *.reloc *.cas *.COM
+	$(RM) *.obj *.sym *.map *.o* *.bin *.msx zcc_opt.def *.reloc *.cas *.COM *.img ex8

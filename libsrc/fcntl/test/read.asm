@@ -21,5 +21,5 @@
 	push	af
 	ld	b,c
 	ld	a,CMD_READBLOCK
-	rst	16
+	call	SYSCALL
 	ret

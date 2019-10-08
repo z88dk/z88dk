@@ -8,7 +8,7 @@
 ;  [ESC] D - Move the cursor left by one 
 ;  [ESC] E - Clear the screen and place the cursor in the upper left corner.
 ;  [ESC] H - Move the cursor to the upper left corner.
-;  ![ESC] I - Move the cursor to beginning of line above.
+;  // ![ESC] I - Move the cursor to beginning of line above.
 ;  *[ESC] J - Erase all lines after our current line
 ;  *[ESC] K - Clear the current line from the current cursor position.
 ;  [ESC] Y - row col 'Goto' Coordinate mode - first will change line number, then cursor position (both ASCII - 32)
@@ -34,6 +34,8 @@
 ; 17, 32 +n = set paper
 ; 22,y+32,x+32 = Move to position
 
+
+IF !__CPU_INTEL__ 
 		defc		SUPPORT_vt52=1
 		; Extra VT52 codes - clear to end of line + clear to end of screen
 		defc		SUPPORT_vt52x=0
@@ -60,14 +62,24 @@
 
 
 
-
 ; extern int __LIB__ fputc_cons(char c);
 fputc_cons_generic:
 _fputc_cons_generic:
 	ld	hl,2
 	add	hl,sp
 	ld	d,(hl)
+IF __CPU_INTEL__
+	ld	hl,(__console_x)
+	ld	c,l
+	ld	b,h
+ELIF __CPU_GBZ80__
+	ld	hl,__console_x
+	ld	c,(hl)
+	inc	hl
+	ld	b,(hl)
+ELSE
 	ld	bc,(__console_x)		;coordinates
+ENDIF
 	ld	hl,params_left
 	ld	a,(hl)
 	and	a
@@ -77,7 +89,7 @@ _fputc_cons_generic:
 	ld	a,(generic_console_flags)
 	ld	e,1
 	rrca
-	jr	nz,handle_character
+;	jr	nz,handle_character
 	
 	dec	e				;-> e = 0 (look at zxcodes)
 	call	check_parameters		;Leaves e untouched
@@ -99,7 +111,13 @@ handle_character:
 	dec	a
 	ld	b,a
 	ld	c,0
+IF __CPU_GBZ80__
+	ld	(__console_x+1),a		;a holds vlaue of b
+	ld	a,c
+	ld	(__console_x),a
+ELSE
 	ld	(__console_x),bc
+ENDIF
 handle_character_no_scroll:
 	ld	a,d
 	push	bc		;save coordinates
@@ -135,7 +153,14 @@ handle_parameter:
 	ld	(hl),d
 	ret
 parameter_dispatch:
+IF __CPU_GBZ80__
+	ld	hl,parameter_processor
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+ELSE
 	ld	hl,(parameter_processor)
+ENDIF
 	ld	a,d		;Get parameter into a
 do_dispatch:
 	push	hl
@@ -169,7 +194,13 @@ ENDIF
 	inc	hl
 	ld	h,(hl)
 	ld	l,a
+IF __CPU_GBZ80__
+	ld	(parameter_processor),a
+	ld	a,h
+	ld	(parameter_processor+1),a
+ELSE
 	ld	(parameter_processor),hl
+ENDIF
 	ld	a,e
 	and	a		;Immediate action?
 	ld	a,d		;The character
@@ -189,7 +220,14 @@ try_again:
 ;  d = x
 ; (parameter) = y
 set_xypos:
+IF __CPU_GBZ80__
+	ld	hl,__console_w
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+ELSE
 	ld	hl,(__console_w)		;l = width, h = height
+ENDIF
 	ld	a,d
 	sub	32
 	ld	c,a
@@ -216,7 +254,14 @@ left:	ld	a,c
 	jr	up
 left_1: dec	c
 store_coords:
+IF __CPU_GBZ80__
+	ld	a,c
+	ld	(__console_x),a
+	ld	a,b
+	ld	(__console_x+1),a
+ELSE
 	ld	(__console_x),bc
+ENDIF
 	scf
 	ret
 
@@ -427,3 +472,4 @@ generic_console_flags:		defb	0		; bit 0 = raw mode enabled
 							; bit 6 = vscroll disabled
 							; bit 7 = inverse on
 
+ENDIF

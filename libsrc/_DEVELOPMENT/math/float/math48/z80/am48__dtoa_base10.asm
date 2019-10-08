@@ -9,7 +9,7 @@ EXTERN am48_dmulpow10, am48_dmul10a, mm48__right
 am48__dtoa_base10:
 
    ; convert double from standard form "a * 2^n"
-   ; to a form mulitplied by power of 10 "b * 10^e"
+   ; to a form multiplied by power of 10 "b * 10^e"
    ; where 1 <= b < 10 with b in double format
    ;
    ; mainly original math48 code

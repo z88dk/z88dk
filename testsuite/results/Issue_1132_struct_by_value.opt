@@ -1,0 +1,113 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._func_global_assign
+	ld	de,_x
+	ld	hl,_y
+	ld	bc,14
+	ldir
+	ret
+
+
+
+._func_global_assign_to_pointer
+	ld	de,(_z)
+	ld	hl,_y
+	ld	bc,14
+	ldir
+	ret
+
+
+
+._func_global_assign_from_pointer
+	ld	de,_x
+	ld	hl,(_z)
+	ld	bc,14
+	ldir
+	ret
+
+
+
+._func_local_assign
+	ld	hl,65508	;const
+	add	hl,sp
+	ld	sp,hl
+	ld	hl,14	;const
+	add	hl,sp
+	push	hl
+	ld	hl,2	;const
+	add	hl,sp
+	pop	de
+	ld	bc,14
+	ldir
+	ld	hl,28	;const
+	add	hl,sp
+	ld	sp,hl
+	ret
+
+
+
+._func_local_assign_to_pointer
+	ld	hl,65520	;const
+	add	hl,sp
+	ld	sp,hl
+	ld	hl,0	;const
+	call	l_gintspsp	;
+	ld	hl,4	;const
+	add	hl,sp
+	pop	de
+	ld	bc,14
+	ldir
+	ld	hl,16	;const
+	add	hl,sp
+	ld	sp,hl
+	ret
+
+
+
+._func_local_assign_from_pointer
+	ld	hl,65520	;const
+	add	hl,sp
+	ld	sp,hl
+	ld	hl,2	;const
+	add	hl,sp
+	push	hl
+	dec	hl
+	dec	hl
+	call	l_gint	;
+	pop	de
+	ld	bc,14
+	ldir
+	ld	hl,16	;const
+	add	hl,sp
+	ld	sp,hl
+	ret
+
+
+
+
+	SECTION	bss_compiler
+._x	defs	14
+._y	defs	14
+._z	defs	2
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_func_global_assign
+	GLOBAL	_func_global_assign_to_pointer
+	GLOBAL	_func_global_assign_from_pointer
+	GLOBAL	_func_local_assign
+	GLOBAL	_func_local_assign_to_pointer
+	GLOBAL	_func_local_assign_from_pointer
+
+
+
+

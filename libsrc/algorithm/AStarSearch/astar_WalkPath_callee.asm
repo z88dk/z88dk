@@ -76,4 +76,4 @@ PUBLIC ASMDISP_ASTAR_WALKPATH_CALLEE
    ex de,hl
    ret
 
-DEFC ASMDISP_ASTAR_WALKPATH_CALLEE = # asmentry - astar_WalkPath_callee
+DEFC ASMDISP_ASTAR_WALKPATH_CALLEE = asmentry - astar_WalkPath_callee

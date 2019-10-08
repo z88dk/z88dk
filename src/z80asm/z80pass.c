@@ -2,9 +2,9 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2017
+Copyright (C) Paulo Custodio, 2011-2019
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-Repository: https://github.com/pauloscustodio/z88dk-z80asm
+Repository: https://github.com/z88dk/z88dk
 */
 
 #include "limits.h"
@@ -109,23 +109,14 @@ Z80pass2( void )
                 break;
 
 			case RANGE_WORD:
-				if (value < -32768 || value > 65535)
-					warn_int_range(value);
-
 				patch_word(expr->code_pos, (int)value);
 				break;
 
 			case RANGE_WORD_BE:
-				if (value < -32768 || value > 65535)
-					warn_int_range(value);
-
 				patch_word_be(expr->code_pos, (int)value);
 				break;
 
 			case RANGE_DWORD:
-                if ( value < LONG_MIN || value > LONG_MAX )
-                    warn_int_range( value );
-
 				patch_long(expr->code_pos, value);
                 break;
 

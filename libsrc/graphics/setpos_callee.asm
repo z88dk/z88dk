@@ -32,4 +32,4 @@
 	jp	setxy
 
 
-DEFC ASMDISP_SETPOS_CALLEE = # asmentry - setpos_callee
+DEFC ASMDISP_SETPOS_CALLEE = asmentry - setpos_callee

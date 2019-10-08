@@ -1,7 +1,7 @@
 /*
 Z88DK Z80 Module Assembler
 
-Copyright (C) Paulo Custodio, 2011-2018
+Copyright (C) Paulo Custodio, 2011-2019
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -353,7 +353,7 @@ Define rules for a ragel-based parser.
 #foreach <OP> in MODULE, SECTION
 	asm_<OP> = _TK_<OP> name _TK_NEWLINE
 			   @{ asm_<OP>(Str_data(name)); }
-#foreach <KW> in A,A32,AF,B,BC,C,D,DE,DEHL,E,EIR,F,H,HL,I,IIR,IP,IX,IXH,IXL,IY,IYH,IYL,L,M,NC,NV,NZ,P,PE,PO,R,SP,SU,V,XPC,Z
+#foreach <KW> in A,AF,B,BC,C,D,DE,E,EIR,F,H,HL,I,IIR,IP,IX,IXH,IXL,IY,IYH,IYL,L,M,NC,NV,NZ,P,PE,PO,R,SP,SU,V,XPC,Z
 			 | _TK_<OP> _TK_<KW> _TK_NEWLINE
 			   @{ asm_<OP>(sym_text(&ctx->p[-1])); }
 #endfor <KW>

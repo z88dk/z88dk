@@ -79,10 +79,10 @@
 
 .i_2
 	;0.000000
-	defb	0,0,0,0,0,0
+	defb	0x00,0x00,0x00,0x00,0x00,0x00
 .i_6
 	;4.000000
-	defb	0,0,0,0,0,131
+	defb	0x00,0x00,0x00,0x00,0x00,0x83
 
 
 	SECTION	bss_compiler
@@ -127,6 +127,7 @@
 	GLOBAL	fgetc
 	GLOBAL	ungetc
 	GLOBAL	feof
+	GLOBAL	ferror
 	GLOBAL	puts
 	GLOBAL	ftell
 	GLOBAL	fgetpos
@@ -161,6 +162,7 @@
 	GLOBAL	getk
 	GLOBAL	getk_inkey
 	GLOBAL	printk
+	GLOBAL	perror
 	GLOBAL	_main
 
 

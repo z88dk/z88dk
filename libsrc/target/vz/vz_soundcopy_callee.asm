@@ -90,4 +90,4 @@ EXTERN _std_seed
 
    ret
 
-DEFC ASMDISP_VZ_SOUNDCOPY_CALLEE = # asmentry - vz_soundcopy_callee
+DEFC ASMDISP_VZ_SOUNDCOPY_CALLEE = asmentry - vz_soundcopy_callee

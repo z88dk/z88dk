@@ -1,3 +1,7 @@
+target/g800/invlcd
+target/g800/lcd_contrast
+target/g800/lcd_on
+target/g800/lcd_off
 stdio/g800/fgetc_cons_850
 stdio/g800/getk_850
 @stdio/ansicore.lst
@@ -9,7 +13,12 @@ stdio/ansi/g800/f_ansi_cls_850
 stdio/ansi/generic/f_ansi_dline
 stdio/ansi/g800/f_ansi_scrollup_850
 @stdio/stdio.lst
+games/g800/bit_open
+games/g800/bit_open_di
+games/g800/bit_close
+games/g800/bit_close_ei
 games/joystick
+@games/games.lst
 @z80.lst
 graphics/clg
 graphics/dcircle
@@ -29,4 +38,6 @@ graphics/g800/respixel
 graphics/g800/xorpixel
 graphics/putsprite3
 graphics/stencil_render2
+graphics/g800/bksave
+graphics/g800/bkrestore
 @gfxbase.lst

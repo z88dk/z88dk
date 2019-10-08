@@ -1,64 +1,65 @@
 #
-# Wahey, a messed up makefile for building libraries!
-#
 
 include ../../Make.config
 
-CFILES = \
-	amax.c \
-	amin.c \
-	ceil.c \
-	fabs.c \
-	fmod.c \
-	ftoa.c \
-	ftoe.c \
-	cosh.c \
-	sinh.c \
-	tanh.c \
-	atan2.c \
-	atof.c \
-	halfpi.c
+vpath %.c ../cimpl/
+vpath %.asm c/sccz80
+vpath %.asm z80
+
+AFILES  = $(notdir $(wildcard c/sccz80/*.asm)) $(notdir $(wildcard z80/*.asm))
+CFILES  = amax.c amin.c ceil.c fmod.c ftoa.c ftoe.c cosh.c sinh.c tanh.c atan2.c atof.c
+OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
+
+CFLAGS += -D__CPC__ -D__NATIVE_MATH__ -D__MATH_CPC
+
+all: dirs $(OUTPUT_DIRECTORY)/cpc_math.lib $(OUTPUT_DIRECTORY)/464_math.lib $(OUTPUT_DIRECTORY)/664_math.lib $(OUTPUT_DIRECTORY)/6128_math.lib
 
 
-AFILES  = $(CFILES:.c=.asm)
-OBJECTS = $(CFILES:.c=.o)
+$(OUTPUT_DIRECTORY)/cpc_math.lib: $(addprefix obj/cpc/, $(OBJECTS))
+	TYPE=cpc $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/cpc_math @cpcmath.lst
 
+$(OUTPUT_DIRECTORY)/464_math.lib: $(addprefix obj/464/, $(OBJECTS))
+	TYPE=464 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/464_math @cpcmath.lst
 
-all: l464_math l664_math l6128_math lcpc_math
+$(OUTPUT_DIRECTORY)/664_math.lib: $(addprefix obj/664/, $(OBJECTS))
+	TYPE=664 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/664_math @cpcmath.lst
 
+$(OUTPUT_DIRECTORY)/6128_math.lib: $(addprefix obj/6128/, $(OBJECTS))
+	TYPE=6128 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/6128_math @cpcmath.lst
 
-objs:	$(OBJECTS)
+obj/cpc/%.o: %.asm
+	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -mz80 -D__CLASSIC $^
+	@mv $(^:.asm=.o) $@
 
-l464_math: 464_math
+obj/464/%.o: %.asm
+	$(Q)$(ASSEMBLER) -DforCPC464 -I../ -I$(Z88DK_LIB) -mz80 -D__CLASSIC $^
+	@mv $(^:.asm=.o) $@
 
-l664_math: 664_math
+obj/664/%.o: %.asm
+	$(Q)$(ASSEMBLER) -DforCPC664 -I../ -I$(Z88DK_LIB) -mz80 -D__CLASSIC $^
+	@mv $(^:.asm=.o) $@
 
-l6128_math: 6128_math
+obj/6128/%.o: %.asm
+	$(Q)$(ASSEMBLER) -DforCPC6128 -I../ -I$(Z88DK_LIB) -mz80 -D__CLASSIC $^
+	@mv $(^:.asm=.o) $@
 
-lcpc_math: cpc_math
+obj/cpc/%.o: %.c
+	$(ZCC) +test -mz80 $(CFLAGS) -o $@  $^
 
-cpc_math: 
-	$(MAKE) clean
-	$(MAKE) objs
-	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/cpc_math @cpclist
+obj/464/%.o: %.c
+	$(ZCC) +test -mz80 $(CFLAGS) -o $@  $^
 
-464_math: 
-	$(MAKE) clean
-	$(MAKE) objs
-	$(LIBLINKER) -DforCPC464 -x$(OUTPUT_DIRECTORY)/464_math @468list
+obj/664/%.o: %.c
+	$(ZCC) +test -mz80 $(CFLAGS) -o $@  $^
 
-664_math: 
-	$(MAKE) clean
-	$(MAKE) objs
-	$(LIBLINKER) -DforCPC664 -x$(OUTPUT_DIRECTORY)/664_math @468list
+obj/6128/%.o: %.c
+	$(ZCC) +test -mz80 $(CFLAGS) -o $@  $^
 
-6128_math:
-	$(MAKE) clean
-	$(MAKE) objs
-	$(LIBLINKER) -DforCPC6128 -x$(OUTPUT_DIRECTORY)/6128_math @468list
-
-.c.o:
-	$(ZCC) +cpc $(CFLAGS) -D__CPC__ -D__NATIVE_MATH__  $*.c
+dirs:
+	@mkdir -p obj/cpc/c/sccz80 obj/464/c/sccz80 obj/664/c/sccz80 obj/6128/c/sccz80
+	@mkdir -p obj/cpc/z80 obj/464/z80 obj/664/z80 obj/6128/z80
 
 clean:
-	$(RM) *.o* *.sym *.map *.err  zcc_opt.def *.i $(AFILES)
+	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i *.opt
+	$(RM) -fr obj
+

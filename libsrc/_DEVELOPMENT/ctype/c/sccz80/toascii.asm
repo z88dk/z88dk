@@ -9,7 +9,13 @@ PUBLIC toascii
 toascii:
 
    ld h,0
+IF __CPU_INTEL__
+   ld  a,l
+   and 127
+   ld  l,a
+ELSE
    res 7,l
+ENDIF
    
    ret
 

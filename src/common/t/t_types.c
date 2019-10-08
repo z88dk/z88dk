@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // types - common types and macros
-// Copyright (C) Paulo Custodio, 2011-2018
+// Copyright (C) Paulo Custodio, 2011-2019
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 #include "unity.h"

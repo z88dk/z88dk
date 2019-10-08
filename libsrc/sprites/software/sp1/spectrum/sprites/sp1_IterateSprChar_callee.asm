@@ -46,4 +46,4 @@ EXTERN l_jpix
    inc bc
    jp iterloop
 
-DEFC ASMDISP_SP1_ITERATESPRCHAR_CALLEE = # asmentry - sp1_IterateSprChar_callee
+DEFC ASMDISP_SP1_ITERATESPRCHAR_CALLEE = asmentry - sp1_IterateSprChar_callee

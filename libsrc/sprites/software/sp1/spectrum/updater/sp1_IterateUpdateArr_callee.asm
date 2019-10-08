@@ -43,4 +43,4 @@ EXTERN l_jpix
 
    jp SP1IterateUpdateArr
 
-DEFC ASMDISP_SP1_ITERATEUPDATEARR_CALLEE = # asmentry - sp1_IterateUpdateArr_callee
+DEFC ASMDISP_SP1_ITERATEUPDATEARR_CALLEE = asmentry - sp1_IterateUpdateArr_callee

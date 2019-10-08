@@ -14,6 +14,7 @@ static char             *c_disc_format       = NULL;
 static char             *c_output_file      = NULL;
 static char             *c_boot_filename     = NULL;
 static char             *c_disc_container    = "dsk";
+static char             *c_extension         = NULL;
 static char              help         = 0;
 
 
@@ -26,10 +27,10 @@ option_t cpm2_options[] = {
     { 'o', "output",   "Name of output file",        OPT_STR|OPT_OUTPUT,   &c_output_file },
     { 's', "bootfile", "Name of the boot file",      OPT_STR,   &c_boot_filename },
     {  0,  "container", "Type of container (raw,dsk)", OPT_STR, &c_disc_container },
+    {  0,  "extension", "Extension for the output file", OPT_STR, &c_extension},
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
-static struct formats   *get_format(const char *name);
 static void              dump_formats();
 static void              bic_write_system_file(disc_handle *h);
 
@@ -292,6 +293,57 @@ static disc_spec bic_spec = {
 };
 
 
+static disc_spec excali_spec = {
+    .name = "Excalibur64",
+    .sectors_per_track = 5,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 1024,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .alternate_sides = 1,
+    .extent_size = 2048,
+    .byte_size_extents = 0,
+    .first_sector_offset = 1,
+    .has_skew = 1,
+    .skew_tab = { 0, 3, 1, 4, 2 }
+};
+
+
+static disc_spec lynx_spec = {
+    .name = "CampLynx",
+    .sectors_per_track = 10,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+};
+
+static disc_spec rc700_spec = {
+    .name = "RC-700",
+    .sectors_per_track = 9,
+    .tracks = 35,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 4,
+    .alternate_sides = 1,
+    .directory_entries = 112,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 0,
+    .has_skew = 1,
+    .skew_tab = { 0, 2, 4, 6, 8, 1, 3, 5, 7 }
+};
 
 
 
@@ -316,13 +368,16 @@ static struct formats {
     { "col1",      "Coleco ADAM 40T SSDD", &col1_spec, 0, NULL, 1 },
     { "dmv",       "NCR Decision Mate",  &dmv_spec, 16, "\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5NCR F3", 1 },
     { "einstein",  "Tatung Einstein",    &einstein_spec, 0, NULL, 1 },
+    { "excali64",  "Excalibur 64",       &excali_spec, 0, NULL, 1 },
     { "kayproii",  "Kaypro ii",          &kayproii_spec, 0, NULL, 1 },
+    { "lynx",      "Camputers Lynx",     &lynx_spec, 0, NULL, 1 },
     { "microbee-ds80",  "Microbee DS80", &microbee_spec, 0, NULL, 1 },
     { "nascomcpm", "Nascom CPM",         &nascom_spec, 0, NULL, 1 },
     { "mz2500cpm", "Sharp MZ2500 - CPM", &mz2500cpm_spec, 0, NULL, 1 },
     { "osborne1",  "Osborne 1",          &osborne_spec, 0, NULL, 1 },
     { "plus3",     "Spectrum +3 173k",   &plus3_spec, 0, NULL, 1 },
     { "qc10",      "Epson QC-10, QX-10", &qc10_spec, 0, NULL, 1 },
+    { "rc700",     "Regnecentralen RC-700", &rc700_spec, 0, NULL, 1 },
     { "smc777",    "Sony SMC-70/SMC-777",&smc777_spec, 0, NULL, 1 },
     { "svi-40ss",   "SVI 40ss (174k)",   &svi40ss_spec, 0, NULL, 1 },
     { "tiki100-40t","Tiki 100 (200k)",   &tiki100_spec, 0, NULL, 1 },
@@ -414,7 +469,7 @@ int cpm_write_file_to_image(const char *disc_format, const char *container, cons
 
     if (output_file == NULL) {
         strcpy(disc_name, binary_name);
-        suffix_change(disc_name, extension);
+        suffix_change(disc_name, c_extension ? c_extension : extension);
     } else {
         strcpy(disc_name, output_file);
     }

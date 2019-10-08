@@ -7,6 +7,7 @@
 ; Adapted by Stefano Bodrato
 ;
 
+IF !__CPU_GBZ80__
           SECTION    smc_clib
           PUBLIC     bit_fx
           PUBLIC     _bit_fx
@@ -227,3 +228,4 @@
           jp    bit_close
           
           
+ENDIF

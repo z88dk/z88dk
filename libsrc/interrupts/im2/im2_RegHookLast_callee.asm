@@ -43,4 +43,4 @@ EXTERN _im2_hookDisp
    ld (hl),e
    ret
 
-DEFC ASMDISP_IM2_REGHOOKLAST_CALLEE = # asmentry - im2_RegHookLast_callee
+DEFC ASMDISP_IM2_REGHOOKLAST_CALLEE = asmentry - im2_RegHookLast_callee

@@ -81,5 +81,5 @@ notfound:
 	ld	hl,-1
 	ret
 
-DEFC ASMDISP_ZX_GETSTR_CALLEE = # asmentry - zx_getstr_callee
+DEFC ASMDISP_ZX_GETSTR_CALLEE = asmentry - zx_getstr_callee
 

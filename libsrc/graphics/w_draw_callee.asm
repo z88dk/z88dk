@@ -28,15 +28,15 @@ PUBLIC ASMDISP_DRAW_CALLEE
 ._draw_callee
 		pop af
 		;pop bc	; color
-		pop de
+		pop de			;dest
 		pop	hl
 		exx			; w_plotpixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
-		pop hl
+		pop hl		;start
 		pop de
 		
 		push af		; ret addr
 		
-		exx
+;		exx
 		
 .asmentry
 		
@@ -81,4 +81,4 @@ PUBLIC ASMDISP_DRAW_CALLEE
 		jp      __graphics_end
 
 
-DEFC ASMDISP_DRAW_CALLEE = # asmentry - draw_callee
+DEFC ASMDISP_DRAW_CALLEE = asmentry - draw_callee

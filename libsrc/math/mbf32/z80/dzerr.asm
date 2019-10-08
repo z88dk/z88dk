@@ -1,0 +1,4 @@
+
+		PUBLIC	DZERR
+
+DZERR:	ret

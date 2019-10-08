@@ -18,14 +18,15 @@
 #define CMD_SEEK       9    /**< Seek in a file, b=handle, dehl=offset, c=whence, ret dehl=position */
 #define CMD_STAT       10   /**< Stat a file (hl=filename, de=stat buffer) */
 
- /* Directory handling */ 
-#define CMD_MKDIR      40   /**< Make a directory (hl=directory name) */
-#define CMD_RMDIR      41   /**< Remove a directory (hl=directory name) */
 
 /* Opendir, closedir etc */
 
 #define CMD_REMOVE     20    /**< Remove file, hl=filename */
 #define CMD_RENAME     21   /**< Rename file, hl=source, de=dest */
+
+ /* Directory handling */ 
+#define CMD_MKDIR      25   /**< Make a directory (hl=directory name) */
+#define CMD_RMDIR      26   /**< Remove a directory (hl=directory name) */
 
 #define CMD_GETTIME       30    /*< Get unix time (ret=dehl = 32 bit seconds)  */
 

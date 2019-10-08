@@ -21,7 +21,9 @@ _fprintf:
 	push	de
 	push	bc
 	push	af
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	push	ix	;save ix
+ENDIF
 	push	bc	;fp
 	ld	bc,fputc_callee
 	push	bc
@@ -35,6 +37,8 @@ _fprintf:
 	pop	bc	
 	pop	bc
 	pop	bc
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	pop	ix	;restore ix
+ENDIF
 	ret
 

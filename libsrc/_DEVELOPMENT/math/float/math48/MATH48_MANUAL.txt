@@ -24,7 +24,7 @@ http://www.fam-bundgaard.dk/DOWNLOAD/DOWNLOAD.HTM
 
      Math48 contain 25 subroutines with these functions:
 
-       Addition, Subtraktion, Multiplikation, and Division
+       Addition, Subtraction, Multiplication, and Division
        Modulus and Exponentiation
        Square rooth computation
        Trigonometric and inverse trigonometric functions
@@ -34,8 +34,8 @@ http://www.fam-bundgaard.dk/DOWNLOAD/DOWNLOAD.HTM
        convertion from tekststreng to floating point
        Formatted printout in fixed figitpoint or exponential notation.
 
-     Math48 require no other workspace than the system stak,
-     This will make recursive programmering possible, at the same time as
+     Math48 require no other workspace than the system stack,
+     This will make recursive programming possible, at the same time as
      it eases the programming, because a work space assignment to fixed
      addresses is not needed.
 
@@ -108,7 +108,7 @@ http://www.fam-bundgaard.dk/DOWNLOAD/DOWNLOAD.HTM
                      L>0: Exponent+128 (80H).
 
      If a floating point number is zero (ie. if the L register is zero)
-     then it does'nt matter what is in the mantisse as long as the sign
+     then it doesn't matter what is in the mantisse as long as the sign
      bit is zero.
 
      Examples of floating point numbers (BCDEH and L in hexnotation):

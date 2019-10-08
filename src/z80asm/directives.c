@@ -2,9 +2,9 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2017
+Copyright (C) Paulo Custodio, 2011-2019
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-Repository: https://github.com/pauloscustodio/z88dk-z80asm
+Repository: https://github.com/z88dk/z88dk
 
 Assembly directives.
 */
@@ -763,7 +763,7 @@ static void asm_DMA_command_1(int cmd, UT_array *exprs)
 
 void asm_DMA_command(int cmd, UT_array *exprs)
 {
-	if (opts.cpu != CPU_Z80_ZXN) {
+	if (opts.cpu != CPU_Z80N) {
 		error_illegal_ident();
 		return;
 	}

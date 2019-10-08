@@ -17,13 +17,18 @@
 static void wrapper() __naked
 {
 #asm
+	GLOBAL	_feof
 feof:
 _feof:
 	inc	hl
 	inc	hl	;flags
 	ld	a,(hl)
 	ld	hl,1
+IF __CPU_INTEL__
+	and	@00001000
+ELSE
 	bit	3,a	;_IOEOF
+ENDIF
 	ret	nz
 	dec	hl	;hl = 0
 	ret

@@ -44,4 +44,4 @@ EXTERN _im2_hookDisp
    ld e,c               ; de = old hook = new hook to insert
    jp loop
 
-DEFC ASMDISP_IM2_REGHOOKFIRST_CALLEE = # asmentry - im2_RegHookFirst_callee
+DEFC ASMDISP_IM2_REGHOOKFIRST_CALLEE = asmentry - im2_RegHookFirst_callee

@@ -83,4 +83,4 @@ ENDIF
 
    ret
 
-DEFC ASMDISP_ADT_STACKDELETES_CALLEE = # asmentry - adt_StackDeleteS_callee
+DEFC ASMDISP_ADT_STACKDELETES_CALLEE = asmentry - adt_StackDeleteS_callee

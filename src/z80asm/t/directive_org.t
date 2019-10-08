@@ -2,7 +2,7 @@
 
 # Z88DK Z80 Macro Assembler
 #
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk/
 #
@@ -60,11 +60,6 @@ check_bin_file("test.bin", pack("C*", 0xFF));
 unlink_testfiles();
 z80asm("org -2", "", 1, "", <<'ERR');
 Error at file 'test.asm' line 1: integer '-2' out of range
-ERR
-
-unlink_testfiles();
-z80asm("org 65536", "", 1, "", <<'ERR');
-Error at file 'test.asm' line 1: integer '65536' out of range
 ERR
 
 # ORG not constant

@@ -59,7 +59,7 @@ IF (startup=2) | (startup=8)
 	DEFINE Venus
 	DEFINE NOT_DEFAULT_SHELL	; else we would use Ion
 	org	$932C
-	defm	"็9_[?"		; send(9prgm0 (where 0 is theta)
+	defm	"รง9_[?"		; send(9prgm0 (where 0 is theta)
   IF (startup=2)			; 2-Venus
 	defb	$0,$1,$1	; No description nor icon
   ELSE				; 8-Venus Explorer
@@ -114,7 +114,7 @@ IF (startup=3)
 	DEFINE ZES
 	DEFINE NOT_DEFAULT_SHELL
 	org	$931E
-	defm	"็9_ZES"	; Send(9prgmZES
+	defm	"รง9_ZES"	; Send(9prgmZES
 	defb	$3F,$D5,$3F	; :Return
 ENDIF
 
@@ -266,7 +266,7 @@ ENDIF
 ;-------------------------------------
 start:
 IF ZASMLOAD
-	call	_runindicoff	; stop anoing run-indicator
+	call	_runIndicOff	; stop anoing run-indicator
 ENDIF
 	ld	(start1+1),sp
         INCLUDE "crt/classic/crt_init_sp.asm"
@@ -310,7 +310,7 @@ IF !(Ion | SOS | Ti_Explorer | V_Explorer | Anova)
 	call	_homeup		; Set cursor to (0,0)
  ENDIF
 	call	_clrScrnFull	; Clear plotSScreen and LCD
-	res	oninterrupt,(iy+onflags) ; Reset [On]-flag (stops "ERR:Break")
+	res	onInterrupt,(iy+onflags) ; Reset [On]-flag (stops "ERR:Break")
 ENDIF
 	im	1
 tiei:	ei

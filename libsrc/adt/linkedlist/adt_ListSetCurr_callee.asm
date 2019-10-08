@@ -31,4 +31,4 @@ PUBLIC ASMDISP_ADT_LISTSETCURR_CALLEE
    ld (hl),e
    ret
 
-DEFC ASMDISP_ADT_LISTSETCURR_CALLEE = # asmentry - adt_ListSetCurr_callee
+DEFC ASMDISP_ADT_LISTSETCURR_CALLEE = asmentry - adt_ListSetCurr_callee

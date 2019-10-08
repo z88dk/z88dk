@@ -16,7 +16,6 @@
 	pop	hl
 	inc	hl
 	push	hl
-	dec	hl
 .i_4
 	pop	hl
 	push	hl
@@ -112,6 +111,7 @@
 	GLOBAL	fgetc
 	GLOBAL	ungetc
 	GLOBAL	feof
+	GLOBAL	ferror
 	GLOBAL	puts
 	GLOBAL	ftell
 	GLOBAL	fgetpos
@@ -146,6 +146,7 @@
 	GLOBAL	getk
 	GLOBAL	getk_inkey
 	GLOBAL	printk
+	GLOBAL	perror
 	GLOBAL	_main
 
 

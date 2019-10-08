@@ -8,6 +8,7 @@
 	EXTERN	swapgfxbk
 	EXTERN	swapgfxbk1
 	EXTERN	generic_console_get_mode
+	EXTERN	__gfx_coords
 
 	EXTERN	__MODE2_attr
 	EXTERN	__MODE3_attr
@@ -31,6 +32,10 @@
         pop     hl
         ret     nc
         ex      de,hl
+
+	ld	(__gfx_coords),hl
+	ld	(__gfx_coords+2),de
+	
         push    bc
 	call	generic_console_get_mode
 	ld	b,@00000001

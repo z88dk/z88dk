@@ -10,13 +10,13 @@ EXTERN asm_strrchr
 
 strrchr:
 
-   pop af
+   pop de
    pop bc
    pop hl
    
    push hl
    push bc
-   push af
+   push de
    
    jp asm_strrchr
 

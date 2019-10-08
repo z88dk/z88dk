@@ -14,7 +14,12 @@ EXTERN _heap, ASMDISP_HEAPSBRK_CALLEE
 
    pop hl
    pop bc
+IF __CPU_GBZ80__
+   EXTERN __z80asm__exsphl
+   call __z80asm__exsphl
+ELSE
    ex (sp),hl
+ENDIF
 
 .asmentry
    
@@ -24,4 +29,4 @@ EXTERN _heap, ASMDISP_HEAPSBRK_CALLEE
    ld de,_heap
    jp HeapSbrk_callee + ASMDISP_HEAPSBRK_CALLEE
 
-DEFC ASMDISP_SBRK_CALLEE = # asmentry - sbrk_callee
+DEFC ASMDISP_SBRK_CALLEE = asmentry - sbrk_callee

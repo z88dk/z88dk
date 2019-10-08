@@ -6,23 +6,17 @@
     PUBLIC pca9665_write_indirect
 
     ;Do a write to the indirect registers
-    ;input C  =  device addr | direct register address (ddd000rr)
+    ;input  BC =  device addr | indirect register address (ddd.....:......rr)
     ;input A  =  byte to write
-    ;preserves device and register address in BC
 
-pca9665_write_indirect:
-    push bc             ;preserve the device and register address
+.pca9665_write_indirect
     push af             ;preserve the byte to write
-    ld b, c             ;prepare device and register address
-                        ;lower address bits (0x1F) of B irrelevant
-    ld a, c             ;prepare indirect address in A
+    ld a,c              ;prepare indirect address in A
     and $07             ;ensure upper bits are zero
-    ld c, __IO_I2C_PORT_IPTR
-    out (c), a          ;write the indirect address to the __IO_I2C_PORT_IPTR
-    ld c, __IO_I2C_PORT_IDATA   ;prepare device and indirect register address
-                        ;lower address bits (0x1F) of B irrelevant
+    ld c,__IO_I2C_PORT_IPTR
+    out (c),a           ;write the indirect address to the __IO_I2C_PORT_IPTR
     pop af              ;recover the byte to write
-    out (c), a          ;write the byte to the indirect register
-    pop bc
+    ld c,__IO_I2C_PORT_IDATA    ;prepare device and indirect register address
+    out (c),a           ;write the byte to the indirect register
     ret
 

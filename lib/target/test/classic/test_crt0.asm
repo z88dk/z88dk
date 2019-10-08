@@ -5,7 +5,6 @@
 
 
 	module test_crt0
-	org	  0x0000
 
 	INCLUDE	"test_cmds.def"
 
@@ -33,6 +32,13 @@
 	defc	__CPU_CLOCK = 4000000
         INCLUDE "crt/classic/crt_rules.inc"
 
+IF      !DEFINED_CRT_ORG_CODE
+        defc CRT_ORG_CODE = 0x0000
+ENDIF
+
+	org	  CRT_ORG_CODE
+
+IF CRT_ORG_CODE = 0x0000
 
 if (ASMPC<>$0000)
         defs    CODE_ALIGNMENT_ERROR
@@ -80,25 +86,41 @@ endif
 if (ASMPC<>$0038)
         defs    CODE_ALIGNMENT_ERROR
 endif
+IF !__CPU_8080__ && !__CPU_GBZ80__
 	jp	asm_im1_handler
-
-restart10:
-	; a = command to execute
-	defb	$ED, $FE	;trap
+ELSE
 	ret
+ENDIF
+
 ; Restart routines, nothing sorted yet
 restart08:
+restart10:
 restart18:
 restart20:
 restart28:
 restart30:
 	ret
 
+ENDIF
+
 program:
         INCLUDE "crt/classic/crt_init_sp.asm"
         INCLUDE "crt/classic/crt_init_atexit.asm"
 	call    crt0_init_bss
-	ld	(exitsp),sp
+IF __CPU_GBZ80__
+	ld	hl,sp+0
+	ld	d,h
+	ld	e,l
+	ld	hl,exitsp
+	ld	a,l
+	ld	(hl+),a
+	ld	a,h
+	ld	(hl+),a
+ELSE
+	ld	hl,0
+	add	hl,sp
+	ld	(exitsp),hl
+ENDIF
 IF !__CPU_R2K__
     	ei
 ENDIF
@@ -110,7 +132,7 @@ IF DEFINED_USING_amalloc
 ENDIF
 	ld	a,(argv_length)
 	and	a
-	jr	z,argv_done
+	jp	z,argv_done
 	ld	c,a
 	ld	b,0
 	ld	hl,argv_start
@@ -124,8 +146,12 @@ ENDIF
 	pop	bc
 cleanup:
 	ld	a,CMD_EXIT	;exit
-	rst	16
+	; Fall into SYSCALL
 
+SYSCALL:
+	; a = command to execute
+	defb	$ED, $FE	;trap
+	ret
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
 

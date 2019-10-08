@@ -3,9 +3,9 @@
 # Z88DK Z80 Macro Assembler
 #
 # Copyright (C) Gunther Strube, InterLogic 1993-99
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-# Repository: https://github.com/pauloscustodio/z88dk-z80asm
+# Repository: https://github.com/z88dk/z88dk
 #
 # Test https://github.com/z88dk/z88dk/issues/222
 # z80asm: Can I use the assembler to make a .tap image, like pasmo does?
@@ -104,6 +104,7 @@ unlink_testfiles();
 z80asm($asm, "+zx -v", 0, <<'END');
 	Reading library 'z80asm-z80-.lib'
 	Predefined constant: __CPU_Z80__ = $0001
+	Predefined constant: __CPU_ZILOG__ = $0001
 	Assembling 'test.asm' to 'test.o'
 	Reading 'test.asm' = 'test.asm'
 	Writing object file 'test.o'
@@ -242,6 +243,7 @@ unlink_testfiles();
 z80asm($asm, "+zx81 -v", 0, <<'END', "");
 	Reading library 'z80asm-z80-.lib'
 	Predefined constant: __CPU_Z80__ = $0001
+	Predefined constant: __CPU_ZILOG__ = $0001
 	Assembling 'test.asm' to 'test.o'
 	Reading 'test.asm' = 'test.asm'
 	Writing object file 'test.o'

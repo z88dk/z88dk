@@ -51,8 +51,8 @@ ENDIF
 
 IF FORpc6001
 	DEFINE gotgfx
-	defc maxx	= 64		;Text graphics settings
-	defc maxy	= 48
+	defc maxx	= 256
+	defc maxy	= 192
 	defc blankch    = 0
 	defc USEplotc   = 1		; We call generic_console_plotc, not _printc for text mode
 ENDIF
@@ -79,6 +79,12 @@ IF FORvz
 	    defc maxx	= 128
       	    defc maxy	= 64
 	ENDIF
+ENDIF
+
+IF FORg800
+	DEFINE gotgfx
+	defc maxx	= 143	; display size of the PC-G850
+	defc maxy	= 47	; (a different "getmaxy" is provided for G800 and smaller ones)
 ENDIF
 
 IF FORabc80
@@ -498,6 +504,15 @@ IF FORlaser500
 	defc blankch = 32
 ENDIF
 
+IF FORexcali64
+	DEFINE gotgfx
+	defc maxx = 160
+	defc maxy = 72
+	defc blankch = 32
+	defc USEplotc   = 1		; We call generic_console_plotc, not _printc for text mode
+	defc USEindex = 1
+ENDIF
+
 IF FORz80tvgame
 	DEFINE gotgfx
 	defc maxx = 168
@@ -510,6 +525,10 @@ IF FORsv8000
 	defc maxx = 256
 	defc maxy = 96
 	defc blankch = 32
+ENDIF
+
+IF FORgb
+	defc USEplotc   = 1		; We call generic_console_plotc, not _printc for text mode
 ENDIF
 
 

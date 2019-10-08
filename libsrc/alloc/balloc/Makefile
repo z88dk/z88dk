@@ -9,10 +9,10 @@ TARGET ?= test
 
 CLASSIC_ASM = $(wildcard *.asm)
 CLASSIC_OBJ = $(CLASSIC_ASM:.asm=.o)
-CLASSIC_OBJECTS = $(addprefix obj/z80/, $(CLASSIC_OBJ)) $(addprefix obj/z80-zxn/, $(CLASSIC_OBJ)) $(addprefix obj/r2k/, $(CLASSIC_OBJ)) $(addprefix obj/ixiy/, $(CLASSIC_OBJ))
+CLASSIC_OBJECTS = $(addprefix obj/z80/, $(CLASSIC_OBJ)) $(addprefix obj/z80n/, $(CLASSIC_OBJ)) $(addprefix obj/r2k/, $(CLASSIC_OBJ)) $(addprefix obj/ixiy/, $(CLASSIC_OBJ))
 
 NEWLIBASM := $(wildcard $(NEWLIB_DIRECTORY)/alloc/balloc/c/sccz80/*.asm) $(wildcard $(NEWLIB_DIRECTORY)/alloc/balloc/z80/*.asm)
-NEWLIB_TARGETS := obj/newlib-z80 obj/newlib-z80-zxn obj/newlib-r2k obj/newlib-ixiy
+NEWLIB_TARGETS := obj/newlib-z80 obj/newlib-z80n obj/newlib-r2k obj/newlib-ixiy
 
 
 OBJECTS = $(CLASSIC_OBJECTS) $(NEWLIB_TARGETS)
@@ -29,8 +29,8 @@ obj/newlib-r2k: $(NEWLIBASM)
 	@$(ASSEMBLER) -O=obj/r2k/x -I.. -mr2k -D__CLASSIC $^
 	@touch $@
 
-obj/newlib-z80-zxn: $(NEWLIBASM)
-	@$(ASSEMBLER) -O=obj/z80-zxn/x -I.. -mz80-zxn -D__CLASSIC $^
+obj/newlib-z80n: $(NEWLIBASM)
+	@$(ASSEMBLER) -O=obj/z80n/x -I.. -mz80n -D__CLASSIC $^
 	@touch $@
 
 obj/newlib-ixiy: $(NEWLIBASM)
@@ -50,15 +50,15 @@ obj/r2k/%.o: %.asm
 	@$(ASSEMBLER) -I../ -mr2k -D__CLASSIC $^
 	@mv $(^:.asm=.o) $@
 
-obj/z80-zxn/%.o: %.asm
-	@$(ASSEMBLER) -I../ -mz80-zxn -D__CLASSIC $^
+obj/z80n/%.o: %.asm
+	@$(ASSEMBLER) -I../ -mz80n -D__CLASSIC $^
 	@mv $(^:.asm=.o) $@
 
 obj/z80/%.o: %.c
 	$(ZCC) +$(TARGET) $(CFLAGS) -o   $^
 
-obj/z80-zxn/%.o: %.c
-	$(ZCC) +$(TARGET) -mz80-zxn -custom-copt-rules=$(Z88DK_LIB)/zxn_rules.1 $(CFLAGS) -o   $^
+obj/z80n/%.o: %.c
+	$(ZCC) +$(TARGET) -mz80n -custom-copt-rules=$(Z88DK_LIB)/z80n_rules.1 $(CFLAGS) -o   $^
 
 obj/ixiy/%.o: %.c
 	$(ZCC) +$(TARGET) -Ca--IXIY $(CFLAGS) -o $  $^
@@ -67,7 +67,7 @@ obj/r2k/%.o: %.c
 	$(ZCC) +rcmx000 $(CFLAGS) -o $  $^
 
 dirs:
-	@mkdir -p obj/z80 obj/z80-zxn obj/ixiy obj/r2k
+	@mkdir -p obj/z80 obj/z80n obj/ixiy obj/r2k
 
 
 clean:

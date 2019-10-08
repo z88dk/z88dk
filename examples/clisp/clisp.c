@@ -620,8 +620,8 @@ l_read(void)
     return TAG_EOF; 
 
   } else if (ch == ';'){         /* comment */
-    while (gchar() != '\n')
-      ;
+    while (( ch != '\n' ) && ( ch != '\r') )
+      ch = gchar();
     return -1;
   }
 #ifdef ZX81

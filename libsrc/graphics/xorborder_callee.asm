@@ -100,4 +100,4 @@
 		
 		jp	swapgfxbk1
 
-DEFC ASMDISP_XORBORDER_CALLEE = # asmentry - xorborder_callee
+DEFC ASMDISP_XORBORDER_CALLEE = asmentry - xorborder_callee
