@@ -11,11 +11,10 @@
     ;input HL =  starting adddress of input buffer
     ;output HL = finishing address
     ;FIXME do this with DMA
-    
+
 .pca9665_read_burst
     ini                 ;read the byte (HL++)
     inc b               ;keep b constant
     dec a               ;keep iterative count in A
     jr NZ,pca9665_read_burst
     ret
-

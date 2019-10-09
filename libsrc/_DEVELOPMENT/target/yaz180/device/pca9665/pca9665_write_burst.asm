@@ -10,12 +10,10 @@
     ;input BC =  device addr | direct register address (ddd.....:......rr)
     ;input HL =  starting adddress of output buffer
     ;output HL = finishing address
-    ;FIXME do this with DMA
-    
+
 .pca9665_write_burst
     outi                ;write the byte (HL++)
     inc b               ;keep b constant
     dec a               ;keep iterative count in A
     jr NZ,pca9665_write_burst
     ret
-
