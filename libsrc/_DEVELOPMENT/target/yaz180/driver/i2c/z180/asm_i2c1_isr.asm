@@ -140,7 +140,7 @@
 ._MASTER_SLA_W_NAK
 ._MASTER_DATA_W_NAK
     jr C,_MASTER_BUS_RET1               ;buffer mode
-;   jr _MASTER_BUS_STOP
+    jr _MASTER_BUS_STOP
 
 ;---------------------------------------
 
