@@ -30,7 +30,7 @@
 
     in0 a,(DCNTL)
     push af
-    ld a,DCNTL_MWI0                     ; DMA/Wait Control Reg Set I/O Wait States minimum
+    ld a,DCNTL_MWI0                     ;DMA/Wait Control Reg Set I/O Wait States minimum
     out0 (DCNTL),a
 
     ld bc,__IO_I2C1_PORT_BASE|__IO_I2C_PORT_STA
@@ -60,7 +60,7 @@
 
 .i2c1_end
     pop af
-    out0 (DCNTL),a                      ; DMA/Wait Control Reg Set I/O Wait States
+    out0 (DCNTL),a                      ;DMA/Wait Control Reg Set I/O Wait States
 
     pop hl                              ;return here to clean up afterwards
     pop bc
