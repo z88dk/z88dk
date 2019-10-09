@@ -51,6 +51,9 @@ zx81 48K, minimalistic version, graphics support, initial code must be provided 
 
 MicroBee  
   zcc +bee -O3 -create-app -DLARGEMEM=1200 -DGRAPHICS -DNOTIMER -lgfxbee512 -llib3d clisp.c
+  
+Plain CP/M with file support to load programs
+  zcc +cpm -O3 -create-app -DLARGEMEM=2000 -DFILES clisp.c
 
 */
 
@@ -175,7 +178,12 @@ int t_symb_ftype[] @41780+shift;    /* 360 bytes */
 
 #ifdef ZEDIT
 char* text;
-int c;
+int c = 0;
+#endif
+
+#ifdef FILES
+FILE *fpin;
+int c = 0;
 #endif
 
 /* Printable name */
@@ -440,7 +448,14 @@ int cpt;
 char ug=13;
 
 char gchar() {
-	
+
+#ifdef FILES
+	if (c!=0 && c!=EOF)
+		c=fgetc(fpin);
+		if (c!=0 && c!=EOF)
+			return (c);
+#endif
+
 #ifdef ZEDIT
 	if (c!=0 && c!=26)
 		c=text[cpt++];
@@ -448,7 +463,6 @@ char gchar() {
 			return (c);
 #endif
 
-	
 #ifdef ZX81_32K
 	zx_slow();
 #endif
@@ -465,22 +479,41 @@ char gchar() {
 }
 
 void ugchar(char ch) {
+#ifdef FILES
+if (c!=0 && c!=EOF)
+		ungetc(ch,fpin);
+else
     cpt--;
+#else
+    cpt--;
+#endif
 }
+
 #else
 
 char gchar() {
+	
+#ifdef FILES
+	if (c!=0 && c!=EOF)
+		c=fgetc(fpin);
+		if (c!=0 && c!=EOF)
+			return (c);
+#endif
+
     return (fgetc (stdin));
 }
 
 void ugchar(char ch) {
+if (c!=0 && c!=EOF)
+    ungetc(ch,fpin);
+else
     ungetc(ch,stdin);
 }
 
 #endif
 
 void
-main(void)
+main(int argc, char *argv[])
 {
   init();
 #ifdef SCHEME
@@ -493,7 +526,7 @@ main(void)
 #endif
 #endif
 
-#if defined(SHORT)||defined(MINIMALISTIC)||defined(TINYMEM)||defined(LARGEMEM)||defined(GRAPHICS)
+#if defined(SHORT)||defined(MINIMALISTIC)||defined(TINYMEM)||defined(LARGEMEM)||defined(GRAPHICS)||defined(FILES)
 printf("Build opt: [ ");
 #ifdef SHORT
 printf("SHORT ");
@@ -510,9 +543,21 @@ printf("LARGEMEM ");
 #ifdef GRAPHICS
 printf("GRAPHICS ");
 #endif
+#ifdef FILES
+printf("FILES ");
+#endif
 printf("]\n");
 #endif
 
+#ifdef FILES
+if (argc == 2) {
+	fpin = fopen(argv[1],"r");
+	if (fpin == NULL)
+		printf ("File open error: %s\n",argv[1]);
+	else
+		c = 1;
+}
+#endif
 
 #ifdef INITONLY
   printf("\n...memory structures ready.\n");
@@ -566,7 +611,7 @@ init(void)
     t_symb_ftype[i] = funcs[i].ftype;
 #ifndef Z80
     if (i != funcs[i].i){
-      printf("function install error: %s\n", funcs[i].key);
+      printf("Function install error: %s\n", funcs[i].key);
       quit();
     }
 #endif
