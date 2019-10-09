@@ -8,6 +8,7 @@
         EXTERN  generic_console_font32
         EXTERN  generic_console_udg32
         EXTERN  __tms9918_cls
+        EXTERN  __tms9918_set_font
         EXTERN  __console_w
         EXTERN  msx_set_mode
         EXTERN  LDIRVM
@@ -32,7 +33,7 @@ __tms9918_console_ioctl:
         jr      nz,check_set_udg
         ld      (generic_console_font32),bc
 set_font_success:
-        call    set_font
+        call    __tms9918_set_font
 success:
         and     a
         ret
@@ -58,29 +59,10 @@ set_mode:
         ld      (__console_w),a
         ld      l,c
         ld      h,0
-        push    bc
         call    msx_set_mode
-        pop     bc
-        ld      a,c
-        cp      2         ;mode 2 doesn't need a font
-        call    nz,set_font
         call    __tms9918_cls
         jr      success
 failure:
         scf
         ret
 
-; Set the font, required for mode 0 and mode 1
-set_font:
-        ; TODO: First 32 characters aren't set
-        push    ix
-        ld      hl,(generic_console_font32)
-        ld      de, $2000 + 256
-        ld      bc, 768                        ;96 characters
-        call    LDIRVM
-        ld      hl,(generic_console_udg32)
-        ld      de, $2000 + 1024
-        ld      bc, 1024                ;128 characters
-        call    LDIRVM
-        pop     ix
-        ret

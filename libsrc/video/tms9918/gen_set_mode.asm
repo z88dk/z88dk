@@ -20,6 +20,7 @@
     EXTERN   l_tms9918_enable_interrupts
     EXTERN   __tms9918_screen_mode
     EXTERN   __tms9918_attribute
+    EXTERN   __tms9918_set_font
 
 msx_set_mode:
 _msx_set_mode:
@@ -91,6 +92,7 @@ ENDIF
     ld    hl,$1000
     ld    bc,32
     call  FILVRM
+    call  __tms9918_set_font
     ret
 
 ; Switch 2 Video Mode n. 1
@@ -137,6 +139,7 @@ ENDIF
     ld    bc,768
     ld    a,32
     call  FILVRM
+    call  __tms9918_set_font
     ret
     
 ;
