@@ -83,11 +83,11 @@
 ._MASTER_BUFFER_RX
     or a,__IO_I2C_ICOUNT_LB             ;include LB NAK (irrelevant for write)
 
-    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_ICOUNT
+    ld c,__IO_I2C_PORT_ICOUNT
     call pca9665_write_indirect         ;write the length
 
     ld a,(__i2c2SlaveAddr)              ;get address of slave we're reading or writing, Bit 0:[R=1,W=0]
-    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_DAT
+    ld c,__IO_I2C_PORT_DAT
     out (c),a                           ;write the slave address
 
     ld a,(__i2c2SentenceLgth)
@@ -95,17 +95,17 @@
     call pca9665_write_burst            ;write A bytes from HL
 
     ld a,__IO_I2C_CON_ENSIO|__IO_I2C_CON_MODE   ;clear the interrupt & continue in buffer mode
-    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_CON
+    ld c,__IO_I2C_PORT_CON
     out (c),a
     ret
 
 ._MASTER_BYTE_TX
     ld a,(__i2c2SlaveAddr)              ;get address of slave we're reading or writing, Bit 0:[R=1,W=0]
-    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_DAT
+    ld c,__IO_I2C_PORT_DAT
     out (c),a
 
     ld a,__IO_I2C_CON_ENSIO             ;clear the interrupt & continue in byte mode
-    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_CON
+    ld c,__IO_I2C_PORT_CON
     out (c),a
     ret
 
@@ -129,11 +129,11 @@
     inc hl                              ;move the Tx pointer along
     ld (__i2c2TxPtr),hl
 
-    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_DAT
+    ld c,__IO_I2C_PORT_DAT
     out (c),a                           ;write the byte
 
     ld a,__IO_I2C_CON_ENSIO             ;clear the interrupt & continue
-    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_CON
+    ld c,__IO_I2C_PORT_CON
     out (c),a
     ret
 
@@ -155,11 +155,11 @@
 ;   jr _MASTER_BUS_RX_GET
 
 ._MASTER_BUS_RX_GET
-    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_ICOUNT
+    ld c,__IO_I2C_PORT_ICOUNT
     call pca9665_read_indirect
     and 0x7F ;~__IO_I2C_ICOUNT_LB       ;remove LB bit
     ld hl,(__i2c2RxPtr)                 ;get the address to where we poke
-    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_DAT
+    ld c,__IO_I2C_PORT_DAT
     call pca9665_read_burst
 ;   jr _MASTER_BUS_STOP
 
@@ -176,7 +176,7 @@
     ret Z
 
     ld a,__IO_I2C_CON_ENSIO|__IO_I2C_CON_STO    ;clear the interrupt & send stop
-    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_CON
+    ld c,__IO_I2C_PORT_CON
     out (c),a
     ret
 
@@ -185,7 +185,7 @@
 ._MASTER_DATA_R_NAK                     ;last byte we're receiving
     jr NC,_MASTER_DATA_R_ACK1           ;byte mode __i2c2SentenceLgth should be 1
 
-    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_ICOUNT
+    ld c,__IO_I2C_PORT_ICOUNT
     call pca9665_read_indirect
     and 0x7F ;~__IO_I2C_ICOUNT_LB       ;remove LB bit
 
@@ -197,7 +197,7 @@
 ._MASTER_DATA_R_ACK                     ;data received
     jr C,_MASTER_BUS_RET0               ;buffer mode
 ._MASTER_DATA_R_ACK1
-    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_DAT
+    ld c,__IO_I2C_PORT_DAT
     in a,(c)                            ;get the byte
 
     ld hl,(__i2c2RxPtr)                 ;get the address to where we poke
@@ -220,13 +220,13 @@
     jr Z,_MASTER_BUS_STOP 
                                         ;so there are multiple bytes to receive
     ld a,__IO_I2C_CON_AA|__IO_I2C_CON_ENSIO ;clear the interrupt & ACK
-    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_CON
+    ld c,__IO_I2C_PORT_CON
     out (c),a
     ret
 
 ._MASTER_SLA_R_NAK1
     ld a,__IO_I2C_CON_ENSIO             ;clear the interrupt & generate NAK
-    ld bc,__IO_I2C2_PORT_BASE|__IO_I2C_PORT_CON
+    ld c,__IO_I2C_PORT_CON
     out (c),a
     ret
 
