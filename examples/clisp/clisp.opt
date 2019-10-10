@@ -329,3 +329,49 @@
 	ld	a,%1+2
 	call	clisp_opt26
 
+	ld	hl,_t_cons_car
+	push	hl
+	ld	a,14+2
+	call	clisp_opt20
+	call	_D_GET_DATA
+	add	hl,hl
+	pop	de
+	add	hl,de
+	push	hl
+	ld	hl,14	;const
+	call	l_gintsp	;
+	inc	hl
+	inc	hl
+	call	l_gint	;
+	call	l_pint_pop
+	call	l_pint_pop
+	jp	i_253
+.i_264
+=
+	ld	hl,_t_cons_car
+	jr	i_264+8
+.i_264
+
+.i_52
+	ld	hl,40	;const
+	add	hl,sp
+	ld	sp,hl
+	ld	hl,65535	;const
+	ret
+=
+.i_52
+	ld	hl,40	;const
+	add	hl,sp
+	ld	sp,hl		; STICKER
+	ld	hl,65535	;const
+	ret
+
+	ld	hl,40	;const
+	add	hl,sp
+	ld	sp,hl
+	ld	hl,65535	;const
+	ret
+=
+	jp	i_52
+
+
