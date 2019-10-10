@@ -64,8 +64,7 @@
 .clisp_opt11
 	ld	hl,4	;const
 	add	hl,sp
-	call	l_glong
-	ret
+	jp	l_glong
 
 
 .clisp_opt13a
@@ -106,8 +105,7 @@
 	ld	h,0
 	call	l_gintsp	;
 	call	_l_car
-	call	_l_eval
-	ret
+	jp	_l_eval
 
 .clisp_opt16
 	inc	a
@@ -115,8 +113,7 @@
 	ld	l,a
 	ld	h,0
 	call	l_gintsp	;
-	call	_D_GET_TAG
-	ret
+	jp	_D_GET_TAG
 
 .clisp_opt17
 	inc	a
@@ -125,8 +122,7 @@
 	ld	h,0
 	call	l_gintsp	;
 	call	_l_car
-	call	l_pint_pop
-	ret
+	jp	l_pint_pop
 
 .clisp_opt18
 	ld	hl,6	;const
@@ -147,5 +143,67 @@
 	call	_l_cdr	; __opt19__
 	pop af
 	ret
+
+.clisp_opt20
+	ld	h,0
+	ld	l,a
+	call	l_gintsp	;
+	jp	l_gint	;
+
+.clisp_opt21
+	ld	h,0
+	ld	l,a
+	call	l_gintsp	;
+	jp	_l_car	;
+
+.clisp_opt22
+	ld	h,0
+	ld	l,a
+	call	l_gintsp	;
+	jp	_D_GET_TAG
+
+.clisp_opt23
+	push	hl
+	ld	hl,1	;const
+	push	hl
+	ld	hl,18	;const
+	call	l_gintsp	;
+	push	hl
+	call	_err_msg
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+.clisp_opt24
+	ld	hl,65535	;const
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+.clisp_opt25
+	ld	h,0
+	ld	l,a
+	call	l_gintsp	;__opt25__
+	call	_l_car	;
+	jp	_l_eval
+
+
+.clisp_opt26
+	ld	h,0
+	ld	l,a
+	call	l_gintsp	;__opt26__
+	call	_l_cdr
+	call	_l_car
+	jp	_l_eval
+
 
 #endasm
