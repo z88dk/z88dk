@@ -10,6 +10,10 @@
 OPTIONS:
 --------
 
+	-DFILES          For targets with file support, get an optional lisp source file as program parameter
+	                 and evaluates it before leaving control to the user.
+	                 A specific LISP command is also available , e.g.:  (load 'eliza.l)
+	
 	-DSHORT          Reduce the 'lisp atom' size to 16 bit to save memory.
 	                 Be aware that the valid numeric range will be only between -2047 and 2048 !
 	                 (untested: the structure tags may interfere with values, use it only as a last resort)
@@ -31,6 +35,8 @@ OPTIONS:
 	-DNOTIMER        To be used when the target platform misses the clock() function to 'randomize'
 	
 	-DZEDIT          (ZX81 ONLY), initial LISP code MUST be present @32768, 16K for text available, 48K RAM NEEDED
+	                 At startup a source file is searched in memory and eventually evaluated before getting to the
+					 user prompt.
 
 
 z88dk build hints:
@@ -54,6 +60,9 @@ MicroBee
   
 Plain CP/M with file support to load programs
   zcc +cpm -O3 -create-app -DLARGEMEM=2000 -DFILES clisp.c
+  
+For super size optimization, add:
+	 --opt-code-size -pragma-define:CRT_INITIALIZE_BSS=0 -custom-copt-rules clisp.opt -DOPTIMIZE
 
 */
 
@@ -73,6 +82,10 @@ Plain CP/M with file support to load programs
 #ifdef GRAPHICS
 #include <graphics.h>
 #include <lib3d.h>
+#endif
+
+#ifdef OPTIMIZE
+#include <clisp_opt.c>
 #endif
 
 #ifdef ZEDIT
@@ -261,6 +274,9 @@ enum keywords {
    ,KW_CLS,      KW_PENU,     KW_PEND,
     KW_LEFT,   KW_RIGHT,     KW_FWD
 #endif
+#ifdef FILES
+   ,KW_LOAD
+#endif
 };
 struct s_keywords {
   char  *key;
@@ -385,6 +401,10 @@ struct s_keywords funcs[] = {
   { "fwd",      FTYPE(FTYPE_SYS,     1),               KW_FWD      },
 #endif
 
+#ifdef FILES
+  { "load",     FTYPE(FTYPE_SYS,     1),               KW_LOAD     },
+#endif
+
   { NULL,       -1,                                    -1          }
 };
 #endif
@@ -400,38 +420,50 @@ char *errmsg_eof        = "END OF FILE";
 char *errmsg_stack_of   = "STACK OVERFLOW";
 char *errmsg_zero_div   = "DIVISION BY ZERO: ";
 char *errmsg_no_memory  = "\nno memory. abort.\n";
+
+#ifdef Z80
+#define FASTCALL_MODE __z88dk_fastcall;
+#else
+#define FASTCALL_MODE ;
+#endif
+
 /* Function types */
 void  init(void);
 #ifndef INITONLY
 void toplevel(void);
 long  l_read(void);
-long l_eval(long s);
-long l_print(long s);
+long l_eval(long s) FASTCALL_MODE
+long l_print(long s) FASTCALL_MODE
 char  skip_space(void);
-long  int_make_l(long v);
-long  int_get_c(long s);
+long  int_make_l(long v) FASTCALL_MODE
+long  int_get_c(long s) FASTCALL_MODE
 long  eval_args(long func, long a, long av[2], int n);
 long  special(long f, long a);
 long  fcall(long f, long av[2]);  /*, int n*/
 long  apply(long f, long args, int n);
 char  err_msg(char *msg, char f, long s);
 long  l_cons(long car, long cdr);
-long  l_car(long s);
-long  l_cdr(long s);
-int  list_len(long s);
+long  l_car(long s) FASTCALL_MODE
+long  l_cdr(long s) FASTCALL_MODE
+int  list_len(long s) FASTCALL_MODE
 void  rplacd(long s, long cdr);
 void  gcollect(void);
-void  gc_mark(long s);
-char  gc_protect(long s);
-void  gc_unprotect(long s);
+void  gc_mark(long s) FASTCALL_MODE
+char  gc_protect(long s) FASTCALL_MODE
+void  gc_unprotect(long s) FASTCALL_MODE
+#ifdef FILES
+long  l_load(long s) FASTCALL_MODE
+#endif
 #endif
 long  symb_make(char *p);
 void  quit(void);
 
+long D_GET_TAG(long s) FASTCALL_MODE
 long D_GET_TAG(long s) {
         return (s & ~(D_GC_MARK | D_MASK_DATA));
 }
 
+long D_GET_DATA(long s) FASTCALL_MODE
 long D_GET_DATA(long s) {
         return (s & D_MASK_DATA);
 }
@@ -1367,6 +1399,12 @@ fcall(long f, long av[2])  /*, int n*/
     break;
 #endif
 
+#ifdef FILES
+  case KW_LOAD:
+    v = l_load(av[0]);
+    break;
+#endif
+
   }
 
   return v;
@@ -1647,6 +1685,26 @@ symb_make(char *p)
 
   return (TAG_SYMB | s);
 }
+
+
+
+/* Load a LISP source file */ 
+
+#ifdef FILES
+long
+l_load(long s)
+{
+  if (D_GET_TAG(s)!=TAG_SYMB)
+    return err_msg(errmsg_ill_type, 1, s);
+
+  if ((fpin = fopen(t_symb_pname[s & D_MASK_DATA],"r"))==NULL)
+    return TAG_NIL;
+
+  c = 1;
+  return TAG_T;
+}
+#endif
+
 
 /* Quit micro lisp */
 void
