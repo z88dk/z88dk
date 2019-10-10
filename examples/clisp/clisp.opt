@@ -1,0 +1,184 @@
+
+	push	hl
+	ld	hl,1	;const
+	push	hl
+	ld	hl,24	;const
+	call	l_glongsp	;
+	call	_err_msg
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	call	l_int2long_s
+	exx
+	ld	hl,16	;const
+	add	hl,sp
+	ld	sp,hl
+	exx
+	ret
+=
+	jp	clisp_opt3
+
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	call	l_int2long_s
+	exx
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	sp,hl
+	exx
+	ret
+=
+	ld	a,%1
+	jp	clisp_opt3b
+
+	ld	hl,(_errmsg_ill_type)
+	jp	clisp_opt3
+=
+	jp	clisp_opt3a
+
+	add	hl,sp
+	call	l_glong
+	pop	bc
+	call	l_plong
+=
+	call	clisp_opt4
+
+
+	ld	hl,8	;const
+	add	hl,sp
+	xor	a
+	ld	(hl),a
+	inc	hl
+	ld	(hl),a
+	inc	hl
+	ld	(hl),a
+	inc	hl
+	ld	(hl),a
+	ld	hl,12	;const
+	add	hl,sp
+	push	hl
+	ld	hl,20	;const
+	call	clisp_opt4
+=
+	call	clisp_opt4a
+
+
+	call	l_plong
+	jp	i_253
+=
+	jp	i_253-3
+
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+=
+	call	clisp_opt11
+
+
+.i_52
+	ld	hl,65535	;const
+	call	l_int2long_s
+	exx
+	ld	hl,46	;const
+	add	hl,sp
+	ld	sp,hl
+	exx
+	ret
+=
+.i_52
+	ld	hl,65535	;const
+	call	l_int2long_s
+	exx
+	ld	hl,46	;const STICKED
+	add	hl,sp
+	ld	sp,hl
+	exx
+	ret
+
+	ld	hl,65535	;const
+	call	l_int2long_s
+	exx
+	ld	hl,46	;const
+	add	hl,sp
+	ld	sp,hl
+	exx
+	ret
+=
+	jp	i_52
+
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	call	l_int2long_s
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+=
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+.l_int2long_s_ret
+	call	l_int2long_s
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+	ld	hl,65535	;const
+	call	l_int2long_s
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+=
+	ld	hl,65535	;const
+	jp	l_int2long_s_ret
+
+	ld	hl,12	;const
+	call	l_gintspsp	;
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
+	pop	bc
+	call	l_plong
+=
+	call	clisp_opt13a
+
+	add	hl,sp
+	push	hl
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
+	pop	bc
+	call	l_plong
+=
+	call	clisp_opt13b
+
+	ld	hl,65535	;const
+	call	l_int2long_s
+	exx
+	ld	hl,16	;const
+	add	hl,sp
+	ld	sp,hl
+	exx
+	ret
+=
+	call	clisp_opt14
+
+	ld	hl,%1	;const
+	call	l_gintsp	;
+	call	_l_car
+	call	_l_eval
+=
+	ld	a,%1	;const
+	call	clisp_opt15
+
