@@ -1,7 +1,19 @@
+
+#ifndef FILES
 #asm
+.i_52
+	ld	hl,40	;const
+	add	hl,sp
+	ld	sp,hl		; STICKER
+	ld	hl,65535	;const
+	ret
+#endasm
+#endif
 
+#ifndef SHORT
+
+#asm
 ; Repeated pattern are replaced by the following subroutines
-
 
 .clisp_opt3b
 	ld	(clisp_opt3_smc+1),a
@@ -107,43 +119,10 @@
 	call	_l_car
 	jp	_l_eval
 
-.clisp_opt16
-	inc	a
-	inc	a
-	ld	l,a
-	ld	h,0
-	call	l_gintsp	;
-	jp	_D_GET_TAG
+#endasm
+#endif
 
-.clisp_opt17
-	inc	a
-	inc	a
-	ld	l,a
-	ld	h,0
-	call	l_gintsp	;
-	call	_l_car
-	jp	l_pint_pop
-
-.clisp_opt18
-	ld	hl,6	;const
-	call	l_gintsp	;
-	call	_l_car
-	call	_D_GET_TAG	; __opt18__
-	ld	de,8192
-	and	a
-	sbc	hl,de
-	scf
-	ret
-
-.clisp_opt19
-	ld	hl,6	;const
-	add	hl,sp
-	push	hl
-	call	l_gint	;
-	call	_l_cdr	; __opt19__
-	pop af
-	ret
-
+#asm
 .clisp_opt20
 	ld	h,0
 	ld	l,a
@@ -173,15 +152,11 @@
 	pop	bc
 	pop	bc
 	pop	bc
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	bc
-	ret
+	jr	clisp_opt24_sub
 
 .clisp_opt24
 	ld	hl,65535	;const
+.clisp_opt24_sub
 	pop	bc
 	pop	bc
 	pop	bc
@@ -196,7 +171,6 @@
 	call	_l_car	;
 	jp	_l_eval
 
-
 .clisp_opt26
 	ld	h,0
 	ld	l,a
@@ -207,3 +181,5 @@
 
 
 #endasm
+
+
