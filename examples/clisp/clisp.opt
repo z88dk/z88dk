@@ -182,3 +182,150 @@
 	ld	a,%1	;const
 	call	clisp_opt15
 
+
+.i_245
+	ld	hl,(_errmsg_ill_type)
+	push	hl
+	ld	hl,1	;const
+	push	hl
+	ld	hl,16	;const
+	call	l_gintsp	;
+	push	hl
+	call	_err_msg
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+=
+.i_245
+	ld	hl,(_errmsg_ill_type)
+	push	hl
+	ld	hl,1	;const
+	push	hl
+	ld	hl,16	;const
+	call	l_gintsp	;
+	push	hl
+	call	_err_msg	; STICKER
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+	ld	hl,(_errmsg_ill_type)
+	push	hl
+	ld	hl,1	;const
+	push	hl
+	ld	hl,16	;const
+	call	l_gintsp	;
+	push	hl
+	call	_err_msg
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+=
+	jp	i_245
+
+	push	hl
+	ld	hl,1	;const
+	push	hl
+	ld	hl,16	;const
+	call	l_gintsp	;
+	push	hl
+	call	_err_msg
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+=
+	jp	i_245+3
+
+	ld	hl,%1	;const
+	call	l_gintsp	;
+	call	l_gint	;
+=
+	ld	a,%1+2
+	call	clisp_opt20
+
+	ld	hl,%1	;const
+	call	l_gintsp	;
+	call	_l_car
+=
+	ld	a,%1+2
+	call	clisp_opt21
+
+	ld	hl,%1	;const
+	call	l_gintsp	;
+	call	_D_GET_TAG
+=
+	ld	a,%1+2
+	call	clisp_opt22
+
+	ld	hl,(%1)
+	push	hl
+	ld	hl,1	;const
+	push	hl
+	ld	hl,18	;const
+	call	l_gintsp	;
+	push	hl
+	call	_err_msg
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+=
+	ld	hl,(%1)
+	jp	clisp_opt23
+
+	jp	nc,%1
+	ld	hl,65535	;const
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+=
+	jp	c,clisp_opt24
+
+	call	clisp_opt21
+	call	_l_eval
+	call	l_pint_pop
+	ld	a,h
+	rla
+=
+	call	clisp_opt25
+	call	l_pint_pop
+	ld	a,h
+	rla
+
+	ld	hl,%1	;const
+	call	l_gintsp	;
+	call	_l_cdr
+	call	_l_car
+	call	_l_eval
+=
+	ld	a,%1+2
+	call	clisp_opt26
+
