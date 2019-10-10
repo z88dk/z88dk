@@ -124,7 +124,7 @@ extern int __LIB__ bordercolor(int c) __z88dk_fastcall;
 
 
 // CC65 compatibility
-#define cgetc(a) fgetc_cons(a)
+#define cgetc() getch(a)
 #define cputc(a) fputc_cons(a)
 
 
