@@ -3,6 +3,7 @@
 
 	PUBLIC		__tms9918_screen_mode
 	PUBLIC		__tms9918_attribute
+	PUBLIC		__tms9918_border
         PUBLIC  RG0SAV          ;keeping track of VDP register values
         PUBLIC  RG1SAV
         PUBLIC  RG2SAV
@@ -26,3 +27,6 @@ RG7SAV:         defb    0
 	SECTION		data_clib
 
 __tms9918_attribute:	defb	$f1	;white on black
+__tms9918_border:	defb	$01	;black border
+
+	

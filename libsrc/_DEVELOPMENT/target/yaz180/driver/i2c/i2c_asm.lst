@@ -7,6 +7,7 @@ target/yaz180/driver/i2c/z180/asm_i2c_reset
 target/yaz180/driver/i2c/z180/asm_i2c1_isr
 target/yaz180/driver/i2c/z180/asm_i2c1_write
 target/yaz180/driver/i2c/z180/asm_i2c1_read_get
+target/yaz180/driver/i2c/z180/asm_i2c1_read_chk
 target/yaz180/driver/i2c/z180/asm_i2c1_read_set
 
 target/yaz180/driver/i2c/z180/__i2c1_data
@@ -15,6 +16,7 @@ target/yaz180/driver/i2c/z180/__i2c1_need
 target/yaz180/driver/i2c/z180/asm_i2c2_isr
 target/yaz180/driver/i2c/z180/asm_i2c2_write
 target/yaz180/driver/i2c/z180/asm_i2c2_read_get
+target/yaz180/driver/i2c/z180/asm_i2c2_read_chk
 target/yaz180/driver/i2c/z180/asm_i2c2_read_set
 
 target/yaz180/driver/i2c/z180/__i2c2_data

@@ -22,6 +22,10 @@ IF __CPU_GBZ80__
    ld a,(hl+)
    ld h,(hl)
    ld l,a
+   call asm_strtok_r
+   ld d,h
+   ld e,l
+   ret
 ELSE
    pop af
    pop bc
@@ -32,9 +36,9 @@ ELSE
    push de
    push bc
    push af
+   jp asm_strtok_r
 ENDIF
    
-   jp asm_strtok_r
 
 ; SDCC bridge for Classic
 IF __CLASSIC

@@ -4534,3 +4534,17 @@
 	ld	de,_%1
 	ld	hl,_%2
 	push	de
+
+	ld	hl,_%1
+	ld	l,(hl)
+	ld	h,0
+	inc	hl
+	ld	a,l
+	ld	(_%1),a
+	dec	hl
+=
+	ld	hl,_%1
+	inc	(hl)
+	ld	l,(hl)
+	dec	l
+	ld	h,0

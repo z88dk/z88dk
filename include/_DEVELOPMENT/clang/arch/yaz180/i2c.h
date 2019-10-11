@@ -71,6 +71,11 @@ extern void i2c_read_set(uint8_t device,uint8_t addr,uint8_t *dp,uint8_t length,
 
 
 
+// uint8_t i2c_read_chk( uint8_t device, uint8_t addr, uint8_t length );
+extern uint8_t i2c_read_chk(uint8_t device,uint8_t addr,uint8_t length);
+
+
+
 // uint8_t i2c_read_get( uint8_t device, uint8_t addr, uint8_t length );
 extern uint8_t i2c_read_get(uint8_t device,uint8_t addr,uint8_t length);
 

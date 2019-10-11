@@ -54,11 +54,19 @@ IF __CPU_R2K__ | __CPU_R3K__
 	rr	hl
 ELSE
 	ld	hl,0
+  IF __CPU_GBZ80__
+        ld      d,h
+        ld      e,l
+  ENDIF
 ENDIF
 	ret
 ENDIF
 .fflush_error
 	ld	hl,-1	; EOF
+IF __CPU_GBZ80__
+        ld      d,h
+        ld      e,l
+ENDIF
 #endasm
 }
 

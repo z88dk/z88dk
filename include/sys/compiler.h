@@ -25,6 +25,7 @@
 
 #if __SDCC && __GBZ80__
 #define __DISABLE_BUILTIN 
+#define __z88dk_fastcall
 #endif
 
 #define NONBANKED __nonbanked

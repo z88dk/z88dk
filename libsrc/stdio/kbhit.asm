@@ -15,19 +15,22 @@
 kbhit:
 _kbhit:
 IF __CPU_GBZ80__
-	ld	hl,kbhit_key
-	ld	a,(hl+)
-	ld	h,(hl)
-	ld	l,a
-	or	h
-	ret	nz
-	call	getk
-	ld	de,kbhit_key
-	ld	a,l
-	ld	(de),a
-	inc	de
-	ld	a,h
-	ld	(de),a
+    ld      hl,kbhit_key
+    ld      a,(hl+)
+    ld      h,(hl)
+    ld      l,a
+    or      h
+    ret     nz
+    call    getk
+    ld      de,kbhit_key
+    ld      a,l
+    ld      (de),a
+    inc     de
+    ld      a,h
+    ld      (de),a
+    ld      d,h
+    ld      e,l
+    ret
 ELSE
 	ld	hl,(kbhit_key)	; check if we've got a keypress pending
 	ld	a,h

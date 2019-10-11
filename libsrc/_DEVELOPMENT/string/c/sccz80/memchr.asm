@@ -22,6 +22,10 @@ IF __CPU_GBZ80__
    ld a,(hl+)
    ld h,(hl)
    ld l,a
+   call l0_memchr_callee
+   ld d,h
+   ld e,l
+   ret
 ELSE
 
    pop af
@@ -33,9 +37,9 @@ ELSE
    push de
    push bc
    push af
+   jp l0_memchr_callee
 ENDIF
 
-   jp l0_memchr_callee
 
 ; SDCC bridge for Classic
 IF __CLASSIC

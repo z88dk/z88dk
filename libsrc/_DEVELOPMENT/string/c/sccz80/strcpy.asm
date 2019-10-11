@@ -17,8 +17,14 @@ strcpy:
    push de
    push hl
    push bc
-   
+IF __CLASSIC && __CPU_GBZ80__
+   call asm_strcpy
+   ld d,h
+   ld e,l
+   ret
+ELSE   
    jp asm_strcpy
+ENDIF
 
 ; SDCC bridge for Classic
 IF __CLASSIC

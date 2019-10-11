@@ -621,6 +621,11 @@ cpm_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	TARGET=osborne1 TYPE=z80 $(LIBLINKER) -DFORosborne1 -x$(OUTPUT_DIRECTORY)/gfxosborne1 @$(LISTFILE_DIRECTORY)/gfxosborne1.lst
+	@echo ''
+	@echo '--- Building RC-700 Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	TARGET=rc700 TYPE=z80 $(LIBLINKER) -DFORrc700 -x$(OUTPUT_DIRECTORY)/rc700 @$(LISTFILE_DIRECTORY)/target/rc700/rc700.lst
 
 
 # Sorcerer Exidy lib - Stefano

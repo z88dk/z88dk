@@ -31,7 +31,10 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	pop	ix
 ENDIF
 	call	asm_fputs_callee
-IF !__CPU_INTEL__ && !__CPU_GBZ80__
+IF __CPU_GBZ80__
+    ld      d,h
+    ld      e,l
+ELIF !__CPU_INTEL__
 	pop	ix
 ENDIF
 	ret
@@ -52,7 +55,7 @@ ENDIF
 	ret	z	;end of string
 	inc	de	;s++
 	push	de	;keep s
-IF __CPU_INTEL__
+IF __CPU_INTEL__ || __CPU_GBZ80__
 	push	bc
 	ld	l,c
 	ld	h,b
@@ -66,7 +69,7 @@ ENDIF
 IF !__CPU_INTEL__ && !__CPU_GBZ80__
         pop	ix
 ENDIF
-IF __CPU_INTEL__
+IF __CPU_INTEL__ || __CPU_GBZ80__
 	pop	bc
 ENDIF
 	pop	de	;get s back

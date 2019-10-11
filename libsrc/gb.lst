@@ -1,5 +1,5 @@
-target/gb/**/*.asm
 target/gb/graphics/obj/gbz80/*
+target/gb/**/*.asm
 graphics/__gfx_coords
 graphics/generic_console/plotpixl
 graphics/generic_console/respixl

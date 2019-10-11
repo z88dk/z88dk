@@ -13,8 +13,12 @@
 	PUBLIC	_msx_color
 
 	EXTERN	SETWRT
+	EXTERN	FILVRM
 	
 	EXTERN	set_vdp_reg
+        EXTERN  __tms9918_attribute
+        EXTERN  __tms9918_border
+        EXTERN  __tms9918_screen_mode
 	
 	;EXTERN	SCRMOD
 
@@ -26,10 +30,6 @@ _msx_color:
 	ld	ix,2
 	add	ix,sp
 	
-	;ld	a,(SCRMOD)	;SCRMOD
-
-	dec     a
-	push    af
 	ld      a,(ix+6)	;foreground
 	rlca
 	rlca
@@ -37,45 +37,36 @@ _msx_color:
 	rlca
 	and     $F0
 	ld      l,a
+        ld      a,(ix+4)	;background
+	and	15
+	or	l
+	ld	(__tms9918_attribute),a
+	ld	h,a		;background + foreground
+        ld      a,(__tms9918_screen_mode)
+	push	af
+ 	and	a
+	jr	z,set_colour	;in 32x24 graphics mode
 	ld      a,(ix+2)	;border
-	or      l		;value
-
+	and	15
+	ld	(__tms9918_border),a
+	or	l
+	ld	h,a		;foreground + border
+set_colour:
 	ld	bc,7		;register
 	push	bc
-	ld	c,a		;value
+	ld	c,h		;value
 	push	bc
 	call    set_vdp_reg		;; This is wrong
 	pop	af		;dump parameters
 	pop	af
-	pop     af
+	pop	af		;Screen mode 
+	and	a
+	jr	nz,not_mode_0
+	ld	a,(__tms9918_attribute)
+	ld	hl,$2000	;Colour table
+	ld	bc,32
+	call	FILVRM
+not_mode_0:
 	pop	ix		;restore callers
-	;ret     nz
 	ret
 
-	; SCREEN1
-;	ld      a,(ix+6)	;foreground
-;	rlca
-;	rlca
-;	rlca
-;	rlca
-;	and     $F0
-;	ld	a,(ix+4)	;background
-;	or      (hl)
-;	ld      hl,$2000	; VDP table for 32 columns text mode
-;	ld      bc,$0020
-;	push    af
-;	call    SETWRT
-;cclr_lp:
-;	pop     af
-;IF VDP_DATA < 0
-;	ld	(VDP_DATA),a
-;ELSE
-;	out	(VDP_DATA),a
-;ENDIF
-;	push    af
-;	dec     bc
-;	ld      a,b
-;	or      c
-;	jr      nz,cclr_lp
-;	pop     af
-;	ret

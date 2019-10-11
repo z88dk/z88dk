@@ -357,9 +357,8 @@ ENDIF
 
 handle_cr:
 	ld	a,(__console_h)
-	dec	a
 	cp	b
-	jr	nz,handle_cr_no_need_to_scroll
+	jr	c,handle_cr_no_need_to_scroll
 	; Check if scroll is enabled
 	bit	6,(hl)
 	call	nc,generic_console_scrollup

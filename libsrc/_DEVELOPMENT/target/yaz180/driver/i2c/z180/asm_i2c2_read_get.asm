@@ -29,6 +29,8 @@
 ;   C  = 7 bit address of slave device, uint8_t _i2c2SlaveAddr
 
 .asm_i2c2_read_get
+    ld hl,0                     ;prepare zero return
+
     ld a,(__i2c2SlaveAddr)      ;check the 7 bit slave address
     rra
     xor c
