@@ -183,42 +183,6 @@
 	call	clisp_opt15
 
 
-.i_245
-	ld	hl,(_errmsg_ill_type)
-	push	hl
-	ld	hl,1	;const
-	push	hl
-	ld	hl,16	;const
-	call	l_gintsp	;
-	push	hl
-	call	_err_msg
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	bc
-	ret
-=
-.i_245
-	ld	hl,(_errmsg_ill_type)
-	push	hl
-	ld	hl,1	;const
-	push	hl
-	ld	hl,16	;const
-	call	l_gintsp	;
-	push	hl
-	call	_err_msg	; STICKER
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	bc
-	ret
-
 	ld	hl,(_errmsg_ill_type)
 	push	hl
 	ld	hl,1	;const
@@ -373,5 +337,316 @@
 	ret
 =
 	jp	i_52
+
+
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	de,0	;const
+	ex	de,hl
+	call	l_pint
+=
+	ld	a,%1+2	;const
+	call	clisp_opt27
+
+
+
+	ld	hl,%1	;const
+	call	l_gintspsp	;
+	ld	hl,0	;const
+	push	hl
+	call	_l_cons
+	pop	bc
+	pop	bc
+=
+	ld	a,%1+2	;const
+	call	clisp_opt28
+
+
+	call	%1
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+=
+	call	%1
+	jp	pop_ret1
+
+	call	%1
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+=
+	call	%1
+	jp	pop_ret2
+
+.%1
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+=
+.%1
+	jp	pop_ret2
+
+	call	l_case
+	defw	i_255,33
+	defw	i_256,6
+	defw	i_257,10
+	defw	i_258,45
+	defw	i_261,44
+	defw	i_262,3
+	defw	i_263,17
+	defw	i_264,18
+	defw	i_265,4
+	defw	i_266,5
+	defw	i_267,11
+	defw	i_270,12
+	defw	i_273,13
+	defw	i_276,14
+	defw	i_279,24
+	defw	i_280,22
+	defw	i_283,0
+	defw	i_284,1
+	defw	i_285,15
+	defw	i_286,16
+	defw	i_287,2
+	defw	i_288,25
+	defw	i_293,27
+	defw	i_298,26
+	defw	i_309,28
+	defw	i_322,29
+	defw	i_325,32
+	defw	i_327,30
+	defw	i_330,39
+	defw	i_333,35
+	defw	i_336,36
+	defw	i_339,38
+	defw	i_342,40
+	defw	i_343,42
+	defw	i_344,43
+	defw	i_345,41
+	defw	i_347,46
+	defw	0
+=
+	call	l_case_squeezed
+	defw	i_255
+	defb	33
+	defw	i_256
+	defb	6
+	defw	i_257
+	defb	10
+	defw	i_258
+	defb	45
+	defw	i_261
+	defb	44
+	defw	i_262
+	defb	3
+	defw	i_263
+	defb	17
+	defw	i_264
+	defb	18
+	defw	i_265
+	defb	4
+	defw	i_266
+	defb	5
+	defw	i_267
+	defb	11
+	defw	i_270
+	defb	12
+	defw	i_273
+	defb	13
+	defw	i_276
+	defb	14
+	defw	i_279
+	defb	24
+	defw	i_280
+	defb	22
+	defw	i_283
+	defb	0
+	defw	i_284
+	defb	1
+	defw	i_285
+	defb	15
+	defw	i_286
+	defb	16
+	defw	i_287
+	defb	2
+	defw	i_288
+	defb	25
+	defw	i_293
+	defb	27
+	defw	i_298
+	defb	26
+	defw	i_309
+	defb	28
+	defw	i_322
+	defb	29
+	defw	i_325
+	defb	32
+	defw	i_327
+	defb	30
+	defw	i_330
+	defb	39
+	defw	i_333
+	defb	35
+	defw	i_336
+	defb	36
+	defw	i_339
+	defb	38
+	defw	i_342
+	defb	40
+	defw	i_343
+	defb	42
+	defw	i_344
+	defb	43
+	defw	i_345
+	defb	41
+	defw	i_347
+	defb	46
+	defw	0
+
+	call	l_case
+	defw	i_142,0
+	defw	i_143,2
+	defw	i_144,1
+	defw	i_146,3
+	defw	0
+=
+	call	l_case_squeezed
+	defw	i_142
+	defb	0
+	defw	i_143
+	defb	2
+	defw	i_144
+	defb	1
+	defw	i_146
+	defb	3
+	defw	0
+
+	call	l_case
+	defw	i_152,7
+	defw	i_155,9
+	defw	i_158,8
+	defw	i_159,19
+	defw	i_164,34
+	defw	i_173,31
+	defw	i_179,21
+	defw	i_185,20
+	defw	i_197,37
+	defw	i_198,23
+	defw	0
+=
+	call	l_case_squeezed
+	defw	i_152
+	defb	7
+	defw	i_155
+	defb	9
+	defw	i_158
+	defb	8
+	defw	i_159
+	defb	19
+	defw	i_164
+	defb	34
+	defw	i_173
+	defb	31
+	defw	i_179
+	defb	21
+	defw	i_185
+	defb	20
+	defw	i_197
+	defb	37
+	defw	i_198
+	defb	23
+	defw	0
+
+	call	l_case
+	defw	i_234,17
+	defw	i_235,18
+	defw	i_236,4
+	defw	i_237,5
+	defw	i_239,29
+	defw	i_240,30
+	defw	i_241,35
+	defw	i_242,36
+	defw	i_243,41
+	defw	i_247,38
+	defw	i_248,40
+	defw	i_249,42
+	defw	i_250,43
+	defw	0
+=
+	call	l_case_squeezed
+	defw	i_234
+	defb	17
+	defw	i_235
+	defb	18
+	defw	i_236
+	defb	4
+	defw	i_237
+	defb	5
+	defw	i_239
+	defb	29
+	defw	i_240
+	defb	30
+	defw	i_241
+	defb	35
+	defw	i_242
+	defb	36
+	defw	i_243
+	defb	41
+	defw	i_247
+	defb	38
+	defw	i_248
+	defb	40
+	defw	i_249
+	defb	42
+	defw	i_250
+	defb	43
+	defw	0
+
+	call	_D_GET_TAG
+	ld	de,%1
+	and	a
+	sbc	hl,de
+=
+	ld	de,%1
+	call	_D_TEST_TAG
+
+	call	_D_TEST_TAG
+	scf
+	jr	nz,ASMPC+3
+	ccf
+=
+	call	_D_TEST_TAG
+
+	jp	nc,%1
+	jp	%2
+=
+	jr	nc,%1
+	jp	%2
+
+	call	l_pint_pop
+	jp	i_253
+=
+	jp	i_253-3
+
+
+.%1
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+=
+.%1
+	jp	pop_ret3
 
 
