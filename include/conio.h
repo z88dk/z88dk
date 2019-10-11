@@ -123,4 +123,9 @@ extern int __LIB__ bordercolor(int c) __z88dk_fastcall;
 //extern int  __LIB__ gettext (int left, int top, int right, int bottom, void *destin);
 
 
+// CC65 compatibility
+#define cgetc(a) fgetc_cons(a)
+#define cputc(a) fputc_cons(a)
+
+
 #endif /* _CONIO_H */

@@ -1,13 +1,13 @@
-stdio/pv1000/generic_console
-stdio/pv1000/fgetc_cons
-stdio/pv1000/getk
+target/pv1000/gencon/generic_console
+target/pv1000/stdio/fgetc_cons
+target/pv1000/stdio/getk
 @stdio/stdio.lst
 games/pv1000/joystick
 games/obj/pv1000/joystick_type
 graphics/dcircle
 graphics/clg
 graphics/generic_console/clsgraph
-graphics/pv1000/textpixl
+target/pv1000/graphics/textpixl
 graphics/generic_console/plotpixl
 graphics/generic_console/respixl
 graphics/generic_console/xorpixl

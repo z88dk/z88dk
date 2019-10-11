@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # Z88DK Z80 Module Assembler
 #
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk
 #------------------------------------------------------------------------------
@@ -149,9 +149,9 @@ clean::
 test: $(TARGET) z80asm_lib
 	$(MAKE) dev
 	$(MAKE) z80asm_lib
-	#$(MAKE) -C dev\z80asm_lib test
 	$(MAKE) prove_c
 	$(MAKE) prove_perl
+	$(MAKE) -C dev/z80asm_lib test
 
 testlib:
 	$(MAKE) -C lib test

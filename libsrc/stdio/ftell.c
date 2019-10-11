@@ -28,7 +28,9 @@ fpos_t ftell(FILE *fp)
 	pop	hl
 	push	hl
 	push	bc
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
         push    ix      ;save callers ix
+ENDIF
 	ld	e,(hl)	;gets the underlying fp
 	inc	hl
 	ld	d,(hl)
@@ -39,18 +41,23 @@ fpos_t ftell(FILE *fp)
 	ld	a,(hl)
 	and	_IOSYSTEM
 	jr	nz,ftell_abort
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	ld	a,(hl)
 	and	_IOEXTRA
 	jr	nz,ftell_trampoline
+ENDIF
 	push	de
 	call	fdtell
 	pop	bc
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
         pop     ix
+ENDIF
 	ret
 .ftell_abort
 	ld	de,65535	;-1
 	ld	l,e
 	ld	h,d
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
         pop     ix
 	ret
 
@@ -58,24 +65,26 @@ fpos_t ftell(FILE *fp)
 	; Call the seek function via the trampoline
 	dec	hl
 	dec	hl
-IF __CPU_R2K__ | __CPU_R3K__
+  IF __CPU_R2K__ | __CPU_R3K__
 	ld	ix,hl
-ELSE
+  ELSE
 	push	hl
 	pop	ix	;ix = fp
-ENDIF
+  ENDIF
 	ld	de,0	;posn
 	ld	bc,0
 	ld	a,SEEK_CUR
 	ex	af,af
-IF __CPU_R2K__ | __CPU_R3K__
+  IF __CPU_R2K__ | __CPU_R3K__
 	ld	hl,(ix+fp_extra)
-ELSE
+  ELSE
 	ld	l,(ix+fp_extra)
 	ld	h,(ix+fp_extra+1)
-ENDIF
+  ENDIF
 	ld	a,__STDIO_MSG_SEEK
 	call	l_jphl
+	pop	ix
+ENDIF
 #endasm
 #else
 	if ( fp->flags&_IOUSE && fchkstd(fp)== 0 ) {

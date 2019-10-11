@@ -33,4 +33,4 @@ _sos_file_callee:
 	ld	hl,0	; return code, nothing (yet) implemented
 	ret
 
-DEFC ASMDISP_SOS_FILE_CALLEE = # asmentry - sos_file_callee
+DEFC ASMDISP_SOS_FILE_CALLEE = asmentry - sos_file_callee

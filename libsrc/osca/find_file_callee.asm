@@ -80,4 +80,4 @@ err:
 	ld	hl,0	; flag was not zero
 	ret
 
-DEFC ASMDISP_FIND_FILE_CALLEE = # asmentry - find_file_callee
+DEFC ASMDISP_FIND_FILE_CALLEE = asmentry - find_file_callee

@@ -21,6 +21,7 @@
 		SECTION code_crt_init
 		SECTION code_crt_exit
 		SECTION code_driver
+		SECTION rodata_driver		;Keep it in low memoey
 		SECTION code_compiler
 		SECTION code_clib
 		SECTION code_crt0_sccz80
@@ -32,6 +33,9 @@
 		SECTION code_esxdos
 		SECTION code_fp
 		SECTION code_fp_math48
+		SECTION code_fp_math32
+		SECTION code_fp_mbf32
+		SECTION code_fp_mbf64
 		SECTION code_math
 		SECTION code_error
 		SECTION code_stdlib
@@ -64,6 +68,9 @@ IF !__crt_org_graphics
 ENDIF
 		SECTION code_user
 		SECTION rodata_fp
+		SECTION rodata_fp_math32
+		SECTION rodata_fp_mbf32
+		SECTION rodata_fp_mbf64
 		SECTION rodata_compiler
 		SECTION rodata_clib
 		SECTION rodata_user
@@ -91,6 +98,9 @@ IF __crt_org_bss
 		defb 0   ; control name of bss binary
 ENDIF
 		SECTION bss_fp
+		SECTION bss_fp_math32
+		SECTION bss_fp_mbf32
+		SECTION bss_fp_mbf64
 		SECTION bss_error
 		SECTION bss_crt
 		SECTION bss_fardata
@@ -101,6 +111,7 @@ ENDIF
 IF __crt_org_bss_compiler_start
 		org	__crt_org_bss_compiler_start
 ENDIF
+		SECTION bss_driver
 		SECTION bss_clib
 		SECTION bss_string
 		SECTION bss_alloc_balloc
@@ -113,6 +124,7 @@ IF __crt_model > 0
 		org	-1
 		defb	0		; control name of data binary
 		SECTION smc_clib
+		SECTION smc_fp
 		SECTION smc_user
 		SECTION data_clib
 		SECTION data_crt

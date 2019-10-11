@@ -2,7 +2,7 @@
 
 #include <fcntl.h>
 
-int __FASTCALL__ readbyte(int handle) __naked
+int readbyte(int fd) __naked
 {
 #asm
      EXTERN	asm_esxdos_f_read

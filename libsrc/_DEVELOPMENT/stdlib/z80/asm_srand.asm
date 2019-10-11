@@ -29,8 +29,20 @@ asm_srand:
    inc l
 
 seed_ok:
-
+IF __CPU_GBZ80__
+   ld c,l
+   ld b,h 
+   ld hl,__stdlib_seed
+   ld a,c
+   ld (hl+),a
+   ld a,b
+   ld (hl+),a
+   ld a,c
+   ld (hl+),a
+   ld (hl),b
+ELSE
    ld (__stdlib_seed),hl
    ld (__stdlib_seed + 2),hl
+ENDIF
 
    ret

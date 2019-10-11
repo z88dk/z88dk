@@ -2,9 +2,9 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2017
+Copyright (C) Paulo Custodio, 2011-2019
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-Repository: https://github.com/pauloscustodio/z88dk-z80asm
+Repository: https://github.com/z88dk/z88dk
 
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
@@ -638,6 +638,8 @@ Expr *expr_parse( void )
 	Expr *self = OBJ_NEW( Expr );
     bool is_const_expr = false;
 
+#if 0
+	// remove Constant Expression operator
     if ( sym.tok == TK_CONST_EXPR )		/* leading '#' : ignore relocatable address expression */
     {
 		Str_append_n(self->text, sym.tstart, sym.tlen);
@@ -645,6 +647,7 @@ Expr *expr_parse( void )
 		GetSym();               
         is_const_expr = true;
     }
+#endif
 
     if ( Expr_parse_ternary_cond( self ) )
     {

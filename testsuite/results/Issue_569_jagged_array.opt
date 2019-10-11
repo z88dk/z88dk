@@ -27,10 +27,10 @@
 	ld	hl,(_starField+4)
 	ld	bc,20
 	add	hl,bc
-	ld	(hl),#(10 % 256 % 256)
+	ld	(hl),+(10 % 256 % 256)
 	ld	hl,1	;const
 	add	hl,sp
-	ld	(hl),#(0 % 256 % 256)
+	ld	(hl),+(0 % 256 % 256)
 	ld	l,(hl)
 	ld	h,0
 	jp	i_5
@@ -46,7 +46,7 @@
 	jp	z,i_4
 	ld	hl,0	;const
 	add	hl,sp
-	ld	(hl),#(0 % 256 % 256)
+	ld	(hl),+(0 % 256 % 256)
 	ld	l,(hl)
 	ld	h,0
 	jp	i_8
@@ -79,7 +79,7 @@
 	ld	h,0
 	pop	de
 	add	hl,de
-	ld	(hl),#(12 % 256 % 256)
+	ld	(hl),+(12 % 256 % 256)
 	ld	l,(hl)
 	ld	h,0
 	jp	i_6

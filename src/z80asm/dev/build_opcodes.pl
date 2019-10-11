@@ -3,9 +3,9 @@
 # Z88DK Z80 Macro Assembler
 #
 # Copyright (C) Gunther Strube, InterLogic 1993-99
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-# Repository: https://github.com/pauloscustodio/z88dk-z80asm
+# Repository: https://github.com/z88dk/z88dk
 #
 # Build opcodes.t test code, using Udo Munk's z80pack assembler as a reference implementation
 
@@ -55,7 +55,7 @@ my $INPUT = read_file(dirname($0).'/'.basename($0, '.pl').'.asm');
 #------------------------------------------------------------------------------
 # Main
 #------------------------------------------------------------------------------
-for my $cpu ('z80', 'r2k') { #, 'z80-zxn', 'z180', 'r3k') {
+for my $cpu ('z80', 'r2k') { #, 'z80n', 'z180', 'r3k') {
 	my $rabbit = ($cpu =~ /r[23]k/);
 	for my $error (0, 1) {
 		my $iter = 	format_iter(

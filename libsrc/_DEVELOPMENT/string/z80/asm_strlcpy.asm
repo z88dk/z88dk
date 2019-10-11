@@ -14,6 +14,7 @@
 ;
 ; ===============================================================
 
+IF !__CPU_GBZ80__
 SECTION code_clib
 SECTION code_string
 
@@ -69,7 +70,16 @@ szexceeded1:
    dec hl
    
    pop bc
+IF __CPU_INTEL__
+   ld  a,l
+   sub c
+   ld  l,a
+   ld  a,h
+   sbc b
+   ld  h,a
+ELSE
    sbc hl,bc
+ENDIF
    
    scf
    ret
@@ -84,5 +94,17 @@ done:
    ; stack = char *src
    
    pop bc                      ; bc = char *src
+IF __CPU_INTEL__
+   ld  a,l
+   sub c
+   ld  l,a
+   ld  a,h
+   sbc b
+   ld  h,a
+ELSE
    sbc hl,bc                   ; hl = strlen(s2)
+ENDIF
    ret
+
+ENDIF
+

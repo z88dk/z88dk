@@ -49,4 +49,4 @@
                 call    draw_circle
                 jp      __graphics_end
 
-DEFC ASMDISP_XORCIRCLE_CALLEE = # asmentry - xorcircle_callee
+DEFC ASMDISP_XORCIRCLE_CALLEE = asmentry - xorcircle_callee

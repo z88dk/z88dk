@@ -12,7 +12,7 @@
  *	O_WRONLY = 1    Starts afresh?!?!?
  *	O_APPEND = 256
  *
- *	$Id: open.c,v 1.4 2016-06-13 19:55:47 dom Exp $
+ *	$Id: open.c $
  */
 
 #include <fcntl.h>
@@ -35,7 +35,7 @@ if1_file = malloc(sizeof(struct M_CHAN));
 if (if1_file == 0) return (-1);
 if1_filestatus = if1_load_record(1, (char *)name, 0, if1_file);
 
-switch (mode) {
+switch ( flags & 0xff ) {
 	case O_RDONLY:
 		if (if1_filestatus == -1)
 		{

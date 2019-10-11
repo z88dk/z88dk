@@ -10,13 +10,13 @@ EXTERN asm_strcat
 
 strcat:
 
-   pop af
+   pop bc
    pop hl
    pop de
    
    push de
    push hl
-   push af
+   push bc
    
    jp asm_strcat
 

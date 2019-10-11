@@ -35,4 +35,4 @@ PUBLIC ASMDISP_ZX_CYX2SADDR_CALLEE
    
    ret
 
-DEFC ASMDISP_ZX_CYX2SADDR_CALLEE = # asmentry - zx_cyx2saddr_callee
+DEFC ASMDISP_ZX_CYX2SADDR_CALLEE = asmentry - zx_cyx2saddr_callee

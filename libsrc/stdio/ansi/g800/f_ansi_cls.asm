@@ -12,7 +12,7 @@
 	PUBLIC	ansi_cls
 
 .ansi_cls
-	ld A,' '
-	ld b,24*6
-	ld de,0
+	ld	a,' '
+    ld b,24*6
+    ld de,0
 	jp $bfee

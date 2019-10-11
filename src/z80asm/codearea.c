@@ -1,7 +1,7 @@
 /*
 Z88DK Z80 Module Assembler
 
-Copyright (C) Paulo Custodio, 2011-2017
+Copyright (C) Paulo Custodio, 2011-2019
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -663,7 +663,7 @@ void set_origin_directive(int origin)
 		CURRENTSECTION->origin_found = true;
 		if (origin == -1)					/* signal split section binary file */
 			CURRENTSECTION->section_split = true;
-		else if (origin >= 0 && origin <= 0xFFFF)
+		else if (origin >= 0)
 		{
 			if (CURRENTSECTION->origin_opts && CURRENTSECTION->origin >= 0)
 				; /* ignore ORG, as --origin from command line overrides */

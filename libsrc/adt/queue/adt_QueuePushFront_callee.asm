@@ -68,4 +68,4 @@ EXTERN _u_malloc
    ld (hl),d
    ret
 
-DEFC ASMDISP_ADT_QUEUEPUSHFRONT_CALLEE = # asmentry - adt_QueuePushFront_callee
+DEFC ASMDISP_ADT_QUEUEPUSHFRONT_CALLEE = asmentry - adt_QueuePushFront_callee

@@ -178,4 +178,4 @@ dec	d
 defs	156	;tables for bits, baseL, baseH
 
 
-DEFC ASMDISP_CPCUNEXO_CALLEE = # asmentry - cpc_UnExo_callee
+DEFC ASMDISP_CPCUNEXO_CALLEE = asmentry - cpc_UnExo_callee

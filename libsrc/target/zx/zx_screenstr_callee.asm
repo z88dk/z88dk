@@ -90,4 +90,4 @@ EXTERN ASMDISP_ZX_CYX2SADDR_CALLEE
    scf
    ret
 
-DEFC ASMDISP_ZX_SCREENSTR_CALLEE = # asmentry - zx_screenstr_callee
+DEFC ASMDISP_ZX_SCREENSTR_CALLEE = asmentry - zx_screenstr_callee

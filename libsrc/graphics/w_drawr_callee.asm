@@ -44,4 +44,4 @@ PUBLIC ASMDISP_DRAWR_CALLEE
 		jp      __graphics_end
 
 
-DEFC ASMDISP_DRAWR_CALLEE = # asmentry - drawr_callee
+DEFC ASMDISP_DRAWR_CALLEE = asmentry - drawr_callee

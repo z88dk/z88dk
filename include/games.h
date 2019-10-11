@@ -18,9 +18,9 @@
  *
  */
 
-/* save the sprite background in another sprite (not yet working with coordinates > 255) */
-extern void __LIB__ bksave(int x, int y, void *sprite) __smallc;
-extern void __LIB__  bkrestore(void *sprite) __z88dk_fastcall;
+/* save the sprite background in another sprite (the 'background' struct and its size is target dependent) */
+extern void __LIB__ bksave(int x, int y, void *background) __smallc;
+extern void __LIB__  bkrestore(void *background) __z88dk_fastcall;
 
 /* pick up a sprite directly from the screen  (not yet working with coordinates > 255) */
 extern void __LIB__ getsprite(int x, int y, void *sprite) __smallc;
@@ -87,6 +87,13 @@ extern const unsigned char *joystick_type[];
 	const unsigned char *joystick_type[] = {"Arrows and SPACE", "5678-0"};
 #endif
 	#define GAME_DEVICES 2
+#endif
+
+#ifdef __GAMEBOY__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = {"Joypad"};
+#endif
+	#define GAME_DEVICES 1
 #endif
 
 #ifdef __PC6001__
@@ -196,9 +203,9 @@ extern const unsigned char *joystick_type[];
 
 #ifdef __SPECTRUM__
 #ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = {"Kempston","Sinclair 1","Sinclair 2","Cursor","Fuller"};
+	const unsigned char *joystick_type[] = {"Kempston","Sinclair 1","Sinclair 2","Cursor","Fuller","QAOP-MN"};
 #endif
-	#define GAME_DEVICES 5
+	#define GAME_DEVICES 6
 #endif
 
 #ifdef __PASOPIA7__
@@ -267,7 +274,7 @@ extern const unsigned char *joystick_type[];
 
 #ifdef __ZX81__
 #ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = {"Kempston","ZXpand","QAOP-MN","Cursor"};
+	const unsigned char *joystick_type[] = {"kempston","zxpand","qaop-mn","cursor"};
 #endif
 	#define GAME_DEVICES 4
 #endif

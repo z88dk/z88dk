@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // String Utilities - based on UT_string
-// Copyright (C) Paulo Custodio, 2011-2018
+// Copyright (C) Paulo Custodio, 2011-2019
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 #include "strutil.h"
@@ -375,6 +375,7 @@ static void spool_deinit(void)
 	spool_t *elem, *tmp;
 	HASH_ITER(hh, spool, elem, tmp) {
 		HASH_DEL(spool, elem);
+		xfree(elem->str);
 		xfree(elem);
 	}
 }

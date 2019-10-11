@@ -39,4 +39,4 @@
                 call    plotpixel
                 jp      __graphics_end
 
-DEFC ASMDISP_PLOT_CALLEE = # asmentry - plot_callee
+DEFC ASMDISP_PLOT_CALLEE = asmentry - plot_callee

@@ -66,12 +66,29 @@ PUBLIC ASMDISP_HEAPFREE_CALLEE
 
    or h                      ; if there is no next block...
    jr z, placeatend
-   
+
+IF __CPU_INTEL__ || __CPU_GBZ80__
+   ld a,l
+   sub c
+   ld l,a
+   ld a,h
+   sbc b
+   ld  h,a
+ELSE
    sbc hl,bc                 ; next block - address following block to free
+ENDIF
    jr z, mergeontop
    jr nc, insertbefore
-   
+IF __CPU_INTEL__ || __CPU_GBZ80__
+   ld a,l
+   adc c
+   ld l,a
+   ld a,h
+   adc b
+   ld  h,a
+ELSE   
    adc hl,bc
+ENDIF
    inc hl                    ; hl = & next block->next
    pop de                    ; junk lagger
    
@@ -111,7 +128,12 @@ PUBLIC ASMDISP_HEAPFREE_CALLEE
    ld b,(hl)                 ; bc = & next block after merged blocks
    
    pop hl
+IF __CPU_GBZ80__
+   EXTERN __z80asm__exsphl
+   call __z80asm__exsphl
+ELSE
    ex (sp),hl                ; hl = & block to free, stack = & lagger->next + 1b
+ENDIF
    ld a,(hl)                 ; add next block's size to merged block
    add a,e
    ld (hl),a
@@ -120,7 +142,11 @@ PUBLIC ASMDISP_HEAPFREE_CALLEE
    adc a,d
    ld (hl),a
    dec hl
+IF __CPU_GBZ80__
+   call __z80asm__exsphl
+ELSE
    ex (sp),hl
+ENDIF
    
 .checkformergebelow
 
@@ -139,7 +165,11 @@ PUBLIC ASMDISP_HEAPFREE_CALLEE
 
    add hl,de                 ; hl = byte past end of lagger block
    ex de,hl
+IF __CPU_GBZ80__
+   call __z80asm__exsphl
+ELSE
    ex (sp),hl
+ENDIF
    ex de,hl
    
    ; bc = & next block after free
@@ -147,7 +177,16 @@ PUBLIC ASMDISP_HEAPFREE_CALLEE
    ; de = & block to free
    ; stack = & lagger->next
    
+IF __CPU_INTEL__ || __CPU_GBZ80__
+   ld a,l
+   sub e
+   ld l,a
+   ld a,h
+   sbc d
+   ld  h,a
+ELSE
    sbc hl,de                 ; carry must be clear here
+ENDIF
    pop hl
    jr z, mergebelow
    
@@ -197,4 +236,4 @@ PUBLIC ASMDISP_HEAPFREE_CALLEE
    ld (hl),a
    ret
 
-DEFC ASMDISP_HEAPFREE_CALLEE = # asmentry - HeapFree_callee
+DEFC ASMDISP_HEAPFREE_CALLEE = asmentry - HeapFree_callee

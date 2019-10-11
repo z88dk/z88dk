@@ -101,6 +101,20 @@
 
 #endif
 
+#ifdef __MATH_MATH32
+
+#define HUGE_POSF              (float)+3.4028234664E+38
+#define TINY_POSF              (float)+1.1754943508E−38
+#define HUGE_NEGF              (float)-1.7014118346E+38
+#define TINY_NEGF              (float)-1.1754943508E-38
+
+#define MAXL2F                 ((float)+127.999999914)
+#define MINL2F                 ((float)-126.0)
+#define MAXL10F                ((float)+38.230809449)
+#define MINL10F                ((float)−37.929779454)
+
+#endif
+
 extern double_t acos(double_t x);
 extern double_t acos_fastcall(double_t x) __z88dk_fastcall;
 #define acos(a) acos_fastcall(a)
@@ -424,6 +438,51 @@ extern int isunordered_callee(double_t x,double_t y) __z88dk_callee;
 
 
 
+#ifdef __MATH_MATH32
+
+extern double_t sqr(double_t x);
+extern double_t sqr_fastcall(double_t x) __z88dk_fastcall;
+#define sqr(a) sqr_fastcall(a)
+
+
+extern double_t inv(double_t x);
+extern double_t inv_fastcall(double_t x) __z88dk_fastcall;
+#define inv(a) inv_fastcall(a)
+
+
+extern double_t invsqrt(double_t x);
+extern double_t invsqrt_fastcall(double_t x) __z88dk_fastcall;
+#define invsqrt(a) invsqrt_fastcall(a)
+
+
+extern double_t div2(double_t x);
+extern double_t div2_fastcall(double_t x) __z88dk_fastcall;
+#define div2(a) div2_fastcall(a)
+
+
+extern double_t mul2(double_t x);
+extern double_t mul2_fastcall(double_t x) __z88dk_fastcall;
+#define mul2(a) mul2_fastcall(a)
+
+
+extern double_t mul10u(double_t x);
+extern double_t mul10u_fastcall(double_t x) __z88dk_fastcall;
+#define mul10u(a) mul10u_fastcall(a)
+
+
+extern double_t exp10(double_t x);
+extern double_t exp10_fastcall(double_t x) __z88dk_fastcall;
+#define exp10(a) exp10_fastcall(a)
+
+
+extern double_t poly(const float x,const float d[],unsigned int n);
+extern double_t poly_callee(const float x,const float d[],unsigned int n) __z88dk_callee;
+#define poly(a,b,c) poly_callee(a,b,c)
+
+
+
+#endif
+
 // NO DISTINCTION BETWEEN FLOAT AND DOUBLE
 
 #define acosf        acos
@@ -499,5 +558,18 @@ extern int isunordered_callee(double_t x,double_t y) __z88dk_callee;
 #define fminf        fmin
 
 #define fmaf         fma
+
+#ifdef __MATH_MATH32
+
+#define sqrf         sqr
+#define invf         inv
+#define invsqrtf     insqrt
+#define div2f        div2
+#define mul2f        mul2
+#define mul10uf      mul10u
+#define exp10f       exp10
+#define polyf        poly
+
+#endif
 
 #endif

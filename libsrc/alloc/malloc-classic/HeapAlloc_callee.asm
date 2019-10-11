@@ -11,7 +11,12 @@ PUBLIC ASMDISP_HEAPALLOC_CALLEE
 
    pop hl
    pop bc
+IF __CPU_GBZ80__
+   EXTERN __z80asm__exsphl
+   call __z80asm__exsphl
+ELSE
    ex (sp),hl
+ENDIF
 
 .asmentry
 
@@ -79,8 +84,16 @@ PUBLIC ASMDISP_HEAPALLOC_CALLEE
    inc hl
    ld d,(hl)
    ex de,hl                  ; hl = block's size, de = & block + 1b
-
+IF __CPU_INTEL__ || __CPU_GBZ80__
+   ld a,l
+   sub c
+   ld l,a
+   ld a,h
+   sbc b
+   ld  h,a
+ELSE
    sbc hl,bc                 ; is block size at least as big as requested?
+ENDIF
    jr nc, foundblk           ; if so branch to foundblk
    
    pop hl                    ; junk lagger on stack
@@ -97,7 +110,16 @@ PUBLIC ASMDISP_HEAPALLOC_CALLEE
    
    push bc
    ld bc,4
+IF __CPU_INTEL__ || __CPU_GBZ80__
+   ld a,l
+   sub c
+   ld l,a
+   ld a,h
+   sbc b
+   ld  h,a
+ELSE
    sbc hl,bc
+ENDIF
    pop bc
    jr c, usewholeblk         ; if too small to split, use whole block
 
@@ -136,7 +158,15 @@ PUBLIC ASMDISP_HEAPALLOC_CALLEE
    inc de                    ; de = & block->next + 1b
    pop hl                    ; hl = & lagger->next + 1b
    ex de,hl
+IF __CPU_INTEL__ || __CPU_GBZ80__
+   ld a,(hl)
+   ld (de),a
+   inc hl
+   inc de
+   dec bc
+ELSE
    ldd                       ; write next block after this one into lagger's pointer
+ENDIF
    ld a,(hl)                 ; hl = & allocated memory block = & block->next
    ld (de),a
    scf                       ; indicate success
@@ -147,4 +177,4 @@ PUBLIC ASMDISP_HEAPALLOC_CALLEE
    pop de                    ; junk lagger on stack
    ret
 
-DEFC ASMDISP_HEAPALLOC_CALLEE = # asmentry - HeapAlloc_callee
+DEFC ASMDISP_HEAPALLOC_CALLEE = asmentry - HeapAlloc_callee

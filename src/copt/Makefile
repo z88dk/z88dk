@@ -14,6 +14,8 @@ LOCAL_CFLAGS += -DLOCAL_REGEXP
 OBJS = copt.o
 REGEX_OBJS = regex/regcomp.o  regex/regerror.o regex/regexec.o  regex/regfree.o
 
+CFLAGS += -std=gnu99
+
 OBJS += $(REGEX_OBJS)
 
 all: z88dk-copt$(EXESUFFIX)

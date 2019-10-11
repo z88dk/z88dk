@@ -1,4 +1,5 @@
 #include <arch/msx.h>
+#include <string.h>
 
 #define Z80_LD_B 0x06
 #define Z80_LD_A 0x3E
@@ -14,7 +15,6 @@
 
 void UnapiBuildCodeBlock(char* implIdentifier, int implIndex, unapi_code_block* codeBlock)
 {
-	char* arg;
 	uint16_t* codeBlockWords;
 	uint16_t ramHelperAddress;
 
@@ -23,8 +23,7 @@ void UnapiBuildCodeBlock(char* implIdentifier, int implIndex, unapi_code_block* 
 	regs.Words.DE = 0x2222;
 
 	if(implIdentifier != NULL) {	
-		arg=(char*)0xF847;
-		while(*arg++ = *implIdentifier++); //This is just a funny strcpy
+		strcpy(0xf847, implIdentifier);
 	}
 
 	AsmCall(0xFFCA, &regs, REGS_MAIN , REGS_MAIN);

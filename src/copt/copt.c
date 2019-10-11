@@ -30,6 +30,7 @@ int rpn_eval(const char* expr, char** vars);
 #define MAX_PASS 16
 
 int debug = 0;
+char *c_cpu = "z80";
 int global_again = 0; /* signalize that rule set has changed */
 #define FIRSTLAB 'L'
 #define LASTLAB 'N'
@@ -224,8 +225,7 @@ int check(char* pat, char** vars)
 int check_eval(char* pat, char** vars)
 {
     char expr[1024];
-    int expected, result, x;
-    char v1, v2;
+    int expected,  x;
 
     x = sscanf(pat, "%d = %[^\n]s", &expected, expr);
     if (x != 2) {
@@ -377,15 +377,15 @@ char* subst_imp(char* pat, char** vars)
             pat += 2;
         } else if (pat[0] == '%' && strncmp(pat,"%eval(", 6) == 0 ) {
             char expr[1024];
-            int  x = 0;
-            int  r;
+            int  x = 0, r;
             pat += 6;
             while (*pat != ')') {
                 expr[x++] = *pat++;
             }
             expr[x] = 0;
             pat++;
-            sprintf(expr, "%d", rpn_eval(expr, vars));
+            r = rpn_eval(expr, vars);
+            sprintf(expr, "%d", r);
             for ( s = expr; i <MAXLINE && *s; i++ )
                 lin[i] = *s++;
         } else if (pat[0] == '%' && isdigit(pat[1])) {
@@ -506,6 +506,16 @@ struct lnode* opt(struct lnode* r)
             if (strncmp(p->l_text, "%check", 6) == 0) {
                 if (!check(p->l_text + 6, vars))
                     break;
+            } else if ( strncmp(p->l_text, "%notcpu", 7) == 0 ) {
+                char  tbuf[1024];
+                snprintf(tbuf,sizeof(tbuf),"%.*s",(int)strlen(p->l_text + 8)-1,p->l_text + 8);
+                if ( strcmp(tbuf, c_cpu) == 0 )
+                    break;
+            } else if ( strncmp(p->l_text, "%cpu", 4) == 0 ) {
+                char  tbuf[1024];
+                snprintf(tbuf,sizeof(tbuf),"%.*s",(int)strlen(p->l_text + 5)-1,p->l_text + 5);
+                if ( strcmp(tbuf, c_cpu) )
+                    break;
             } else if ( strncmp(p->l_text, "%eval", 5) == 0 ) {
                 if (!check_eval(p->l_text + 5, vars))
                     break;
@@ -616,6 +626,8 @@ int main(int argc, char** argv)
     for (i = 1; i < argc; i++)
         if (strcasecmp(argv[i], "-D") == 0)
             debug = 1;
+        else if ( strncmp(argv[i], "-m",2) == 0 )
+            c_cpu = argv[i] + 2;
         else if ((fp = fopen(argv[i], "r")) == NULL)
             error("copt: can't open patterns file\n");
         else
@@ -681,7 +693,6 @@ int rpn_eval(const char* expr, char** vars)
 {
     const char* ptr = expr;
     char* endptr;
-    int type;
     int op2;
     int n;
 
@@ -699,12 +710,21 @@ int rpn_eval(const char* expr, char** vars)
         case '7':
         case '8':
         case '9':
-            n = strtoll(ptr - 1, &endptr, 10);
+            n = strtol(ptr - 1, &endptr, 0);
+            if ( endptr == ptr - 1 ) {
+                fprintf(stderr,"Optimiser error, cannot parse number: %s\n",ptr-1);
+                exit(1);
+            }
             ptr = endptr;
             push(n);
             break;
         case '+':
-            push(pop() + pop());
+            {
+                int a = pop();
+                int b = pop();
+                int c = a + b;
+                push(c);
+            }
             break;
         case '*':
             push(pop() * pop());
@@ -712,6 +732,22 @@ int rpn_eval(const char* expr, char** vars)
         case '-':
             op2 = pop();
             push(pop() - op2);
+            break;
+        case '|':
+            op2 = pop();
+            push(pop() | op2);
+            break;
+        case '&':
+            op2 = pop();
+            push(pop() & op2);
+            break;
+        case '>':
+            op2 = pop();
+            push(pop() >> op2);
+            break;
+        case '<':
+            op2 = pop();
+            push(pop() << op2);
             break;
         case '/':
             op2 = pop();
@@ -724,7 +760,14 @@ int rpn_eval(const char* expr, char** vars)
             if ( isdigit(*ptr) ) {
                 // It's a variable
                 char v = *ptr++;
-                push(atoi(vars[v - '0']));
+                char *endptr;
+                char *val = vars[v-'0'];
+                n = strtol(val, &endptr, 0);
+                if ( endptr == val ) {
+                    fprintf(stderr,"Optimiser error, cannot parse variable: %s\n",val);
+                    exit(1);
+                }
+                push(n);
             } else if ( *ptr++ == '%' ) {
                 op2 = pop();
                 if (op2 != 0) {
@@ -734,6 +777,13 @@ int rpn_eval(const char* expr, char** vars)
 				}
             }
             break;
+        }
+    }
+    if ( sp != 1 ) {
+        int i;
+        fprintf(stderr,"Exiting with a stack level of %d\n",sp);
+        for ( i = 0; i < sp; i++ ) { 
+            fprintf(stderr,"Stack level %d -> %d\n",i, stack[i]);
         }
     }
     return top();

@@ -35,4 +35,4 @@ PUBLIC ASMDISP_ZX_SADDRPLEFT_CALLEE
    scf 
    ret
 
-DEFC ASMDISP_ZX_SADDRPLEFT_CALLEE = # asmentry - zx_saddrpleft_callee
+DEFC ASMDISP_ZX_SADDRPLEFT_CALLEE = asmentry - zx_saddrpleft_callee

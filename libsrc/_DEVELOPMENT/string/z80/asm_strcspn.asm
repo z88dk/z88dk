@@ -57,7 +57,16 @@ loop:
 end_string:
 
    pop bc
+IF __CPU_INTEL__ || __CPU_GBZ80__
+   ld a,l
+   sub c
+   ld l,a
+   ld a,h
+   sbc b
+   ld h,a
+ELSE
    sbc hl,bc
+ENDIF
    
    scf
    ret
@@ -65,5 +74,14 @@ end_string:
 done:
 
    pop bc
+IF __CPU_INTEL__ || __CPU_GBZ80__
+   ld a,l
+   sub c
+   ld l,a
+   ld a,h
+   sbc b
+   ld h,a
+ELSE
    sbc hl,bc
+ENDIF
    ret

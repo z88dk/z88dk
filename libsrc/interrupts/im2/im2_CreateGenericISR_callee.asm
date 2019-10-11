@@ -94,4 +94,4 @@ EXTERN IM2CreateCommon
 
    jp (hl)
 
-DEFC ASMDISP_IM2_CREATEGENERICISR_CALLEE = # asmentry - im2_CreateGenericISR_callee
+DEFC ASMDISP_IM2_CREATEGENERICISR_CALLEE = asmentry - im2_CreateGenericISR_callee

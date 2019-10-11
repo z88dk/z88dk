@@ -14,6 +14,9 @@
 	PUBLIC  _putsprite
 	EXTERN	__tms9918_pixeladdress
 	EXTERN	__tms9918_pixelbyte
+	EXTERN	l_tms9918_disable_interrupts
+	EXTERN	l_tms9918_enable_interrupts
+
 	EXTERN  swapgfxbk
         EXTERN	__graphics_end
 
@@ -167,7 +170,8 @@
 ._edge
          push     af
 ;**************
-IF VDP_DATA < 0
+	call	l_tms9918_disable_interrupts
+IF VDP_CMD < 0
 	ld	a,l
 	ld	(-VDP_CMD),a
 	ld	a,h
@@ -189,6 +193,7 @@ ELSE
         out     (c),a
         pop     bc
 ENDIF
+	call	l_tms9918_enable_interrupts
 ;**************
          ld       a,8
          add      l
@@ -198,7 +203,8 @@ ENDIF
 ;.nozh
          ;inc      hl                ;Go to next byte
 ;**************
-IF VDP_DATA < 0
+	call	l_tms9918_disable_interrupts
+IF VDP_CMD < 0
 	ld	a,l
 	ld	(-VDP_CMD),a
 	ld	a,h
@@ -217,6 +223,7 @@ ELSE
         pop     bc
 ENDIF
          ld       (__tms9918_pixelbyte),a
+	call	l_tms9918_enable_interrupts
 ;**************
          pop      af
          ret
@@ -224,7 +231,8 @@ ENDIF
 ._row
 	push	af
 ;**************
-IF VDP_DATA < 0
+	call	l_tms9918_disable_interrupts
+IF VDP_CMD < 0
 	ld	a,l
 	ld	(-VDP_CMD),a
 	ld	a,h
@@ -246,6 +254,7 @@ ELSE
         out     (c),a
         pop     bc
 ENDIF
+	call	l_tms9918_enable_interrupts
 ;**************
 	push	de
         ld	hl,(actcoord)

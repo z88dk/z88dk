@@ -19,13 +19,12 @@
 
 msx_breakon:
 _msx_breakon:
-	ld	hl,brksave
+	ld	hl,BASROM
 	ld	a,(hl)
 	cp	1
 	ret	nz	; Already enabled ?
 	
 	; Ok, we have something to restore
-	ld	(BASROM),a
-	ld	a,1	; update the flag
+	ld	a,(brksave)
 	ld	(hl),a
 	ret

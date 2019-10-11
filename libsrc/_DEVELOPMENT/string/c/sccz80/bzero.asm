@@ -11,13 +11,13 @@ EXTERN asm_bzero
 
 bzero:
 
-   pop af
+   pop de
    pop bc
    pop hl
    
    push hl
    push bc
-   push af
+   push de
    
    jp asm_bzero
 

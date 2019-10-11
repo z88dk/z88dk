@@ -12,10 +12,10 @@ EXTERN __console_y
 .gotoxy_callee
 ._gotoxy_callee
 
-   pop af
+   pop hl
    pop de
    pop bc
-   push af
+   push hl
 
 .asmentry
 
@@ -27,4 +27,4 @@ EXTERN __console_y
 
    ret
 
-DEFC ASMDISP_GOTOXY_CALLEE = # asmentry - gotoxy_callee
+DEFC ASMDISP_GOTOXY_CALLEE = asmentry - gotoxy_callee

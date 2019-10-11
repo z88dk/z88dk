@@ -1,24 +1,17 @@
-#
-# Wahey, a messed up makefile for building libraries!
-#
 
 include ../Make.config
 
-CFILES = \
-	l_longjmp.c \
-	l_setjmp.c 
+TARGET ?= test
+GENOBJECTS = l_longjmp.o l_setjmp.o
+ASMFILES = $(wildcard *.asm)
 
-AFILES  = $(CFILES:.c=.asm)
-OBJECTS = $(CFILES:.c=.o)
+OBJECTS = $(GENOBJECTS) $(ASMFILES:.asm=.o)
 
-all: $(OBJECTS)
+all: dirs $(addprefix obj/z80/, $(OBJECTS)) $(addprefix obj/r2k/,$(OBJECTS)) $(addprefix obj/ixiy/,$(OBJECTS))  $(addprefix obj/8080/,$(OBJECTS)) $(addprefix obj/gbz80/,$(OBJECTS))
 
-generic_iy:
-	$(ZCC) +test $(CFLAGS) -Ca--IXIY longjmp.c
-	$(ZCC) +test $(CFLAGS) -Ca--IXIY setjmp.c
 
-.c.o:
-	$(ZCC) +test $(CFLAGS) $*.c
+dirs:
+	@mkdir -p obj/z80 obj/r2k obj/ixiy obj/$(TARGET) obj/8080 obj/gbz80
 
 clean:
-	$(RM) *.o* *.sym *.map *~ *.err zcc_opt.def *.i $(AFILES)
+	$(RM) -fr obj

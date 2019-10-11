@@ -1,0 +1,109 @@
+lstoff
+
+;
+; TRS-DOS related constants
+; Jun - 2019
+;
+;
+; $Id: doscalls.def $
+;
+
+;
+;
+
+
+defc TRS80_VIDRAM    =  3C00H ;This is the beginning of video ram or VIDRAM. It ends at 3FFFH or 16383.
+defc TRS80_BASEND    =  3FCDH ;End of BASIC Program Pointer (LSB,MSB)
+
+; Keyboard DCB structure
+defc KBD_DCB         =  4015H ;One byte device type. = 1
+defc KBD_DRIVER      =  4016H ;Two byte keyboard driver vector.  To Disable The Keyboard, change its content to 2714
+
+defc KBD_R_SHIFT     =  4018H ;Right SHIFT toggle
+defc KBD_CAPS_LOCK   =  4019H ;Caps lock switch (Not 0 = Caps only)
+
+defc CURSOR_BLINK_COUNT  =  401AH ;Cursor blink count
+defc CURSOR_BLINK_STATUS =  401BH ;Cursor blink status
+defc CURSOR_BLINK_SWITCH =  401CH ;Cursor blink switch (0 = blink)
+
+; Video DCB structure
+defc VID_DCB         =  401DH ;One byte device type. = 7
+defc VID_DRIVER      =  401EH ;Two byte video driver vector.
+
+defc CURSOR_POS      =  4020H ;Two byte cursor position.
+defc CURSOR_MODE     =  4022H ;0 = Cursor on, Not 0 = character replaced by cursor.
+defc CURSOR_CHAR     =  4023H ;Cursor Character (in ascii).
+
+defc DOS_FLAG        =  4024H ;FLAG : 0 = Space compression; Not 0 = special character.
+
+; Printer DCB structure
+defc PRN_DCB         =  4025H ;One byte device type. = 6.
+defc PRN_DRIVER      =  4026H ;Two byte printer driver vector.
+
+defc PRN_LINES       =  4028H ;Maximum lines printed per page +1. Default = 67.
+defc PRN_LINE_COUNT  =  4029H ;Number of lines printed +1.
+defc PRN_CHAR_COUNT  =  402AH ;Character counter + 1.
+defc PRN_CHARS       =  402BH ;Line printer maximum line length less two.
+
+defc R_CONSTANT      =  402CH ;"R"
+
+defc DOS_NOERROR     =  402DH ;no error
+defc DOS_DISP_ERROR  =  4030H ;error displayed exit (For all doses except TRSDOS, abnormal return to DOS)
+
+defc KBD_BUFFER      =  4036H ;Keyboard buffer (7 bytes)
+
+
+
+defc DOS_COMMAND     =  4405H ;enter DOS and execute a command
+defc DOS_ERROR       =  4409H ;DOS error exit
+defc DOS_DEBUG       =  440DH ;enter DEBUG
+defc DOS_ENQUEUE     =  4410H ;enqueue user timer interrupt routine
+defc DOS_DEQUEUE     =  4413H ;dequeue user timer interrupt routine
+defc DOS_ROTATE      =  4416H ;Keep drives rotating
+defc DOS_CALL        =  4419H ;dos-call execute a DOS command and return
+defc DOS_EXTRACT     =  441CH ;filename extract
+defc DOS_OPEN_NEW    =  4420H ;open new/exist file
+defc DOS_OPEN_EX     =  4424H ;open existing file
+defc DOS_CLOSE       =  4428H ;close file
+defc DOS_KILL        =  442CH ;kill FCB's associated file
+defc DOS_LOAD        =  4430H ;load a program file
+defc DOS_EXECUTE     =  4433H ;load and commence execution of a program file
+defc DOS_READ_SECT   =  4436H ;read file's record
+defc DOS_WRIT_SECT   =  4439H ;write file's record
+defc DOS_REWIND      =  443FH ;set NEXT to 0/0/0.
+defc DOS_POSIT       =  4442H ;position to relrec
+defc DOS_BACK_RECD   =  4445H ;position back 1 recd
+defc DOS_POS_EOF     =  4448H ;position to END
+defc DOS_ALLOCATE    =  444BH ;allocate file space
+defc DOS_POS_RBA     =  444EH ;position to RBA
+defc DOS_WRITE_EOF   =  4451H ;from fcb to directory
+defc DOS_POWERUP     =  445BH ;Select and power up the specified drive
+defc DOS_TEST_MOUNT  =  445EH ;Test for mounted diskette
+defc DOS_NAME_ENQ    =  4461H ;*name routine enqueue
+defc DOS_NAME_DEQ    =  4464H ;*name routine dequeue
+
+defc MESS_DO         =  4467H 
+defc MESS_PR         =  446AH 
+
+defc DOS_TIME        =  446DH ;convert clock time to HH:MM:SS format
+defc DOS_DATE        =  4470H ;convert date to MM/DD/YY format
+defc DOS_EXTEND      =  4473H ;add deflt extnsn
+
+defc DOS_GET_BYTE    =  0013H ;read byte from file
+defc DOS_PUT_BYTE    =  001BH ;write byte to file
+
+; Dos Errors.
+defc DE_DEV_NA       =  08H 
+defc DE_UNDEF        =  09H 
+defc DE_WRIT_PROT    =  0FH 
+defc DE_DEV_NA_2     =  10H 
+defc DE_NOT_FOUND    =  18H 
+defc DE_DISK_FULL    =  1BH 
+defc DE_EOF          =  1CH 
+defc DE_PAST_EOF     =  1DH 
+defc DE_NOT_OPEN     =  26H 
+defc DE_BAD_PARAM    =  2FH 
+defc DE_BAD_FSPEC    =  30H 
+defc DE_EXISTS       =  35H 
+
+lston

@@ -4,12 +4,20 @@
 
 include ../Make.config
 
-all: $(OUTPUT_DIRECTORY)/z80_crt0.lib $(OUTPUT_DIRECTORY)/rcmx000_crt0.lib $(OUTPUT_DIRECTORY)/z80iy_crt0.lib $(OUTPUT_DIRECTORY)/z80s183_crt0.lib $(OUTPUT_DIRECTORY)/z180_crt0.lib $(OUTPUT_DIRECTORY)/ez80_crt0.lib
+all: $(OUTPUT_DIRECTORY)/z80_crt0.lib $(OUTPUT_DIRECTORY)/rcmx000_crt0.lib $(OUTPUT_DIRECTORY)/z80iy_crt0.lib $(OUTPUT_DIRECTORY)/z80s183_crt0.lib $(OUTPUT_DIRECTORY)/z180_crt0.lib $(OUTPUT_DIRECTORY)/ez80_crt0.lib $(OUTPUT_DIRECTORY)/8080_crt0.lib $(OUTPUT_DIRECTORY)/gbz80_crt0.lib
 
 
 $(OUTPUT_DIRECTORY)/z80_crt0.lib:
 	@$(MAKE) clean
 	$(LIBLINKER) -I.. -x$@ @crt0.lst
+
+$(OUTPUT_DIRECTORY)/8080_crt0.lib:
+	@$(MAKE) clean
+	$(LIBLINKER) -I.. -x$@ -DCPU_8080 -m8080 @crt0_8080.lst
+
+$(OUTPUT_DIRECTORY)/gbz80_crt0.lib:
+	@$(MAKE) clean
+	$(LIBLINKER) -I.. -x$@ -DCPU_GBZ80 -mgbz80 @crt0_gbz80.lst
 
 $(OUTPUT_DIRECTORY)/z180_crt0.lib:
 	@$(MAKE) clean
@@ -35,16 +43,15 @@ $(OUTPUT_DIRECTORY)/z80s183_crt0.lib:
 
 
 clean:
-	@$(RM) crt0/*.o* crt0/*.sym crt0/*.map 
-	@$(RM) crt0_fp/*.o* crt0_fp/*.sym crt0_fp/*.map 
-	@$(RM) crt0_rcm/*.o* crt0_rcm/*.sym crt0_rcm/*.map 
-	@$(RM) crt0_long/*.o* crt0_long/*.sym crt0_long/*.map 
-	@$(RM) z80_emu/*.o* z80_emu/*.sym z80_emu/*.map 
-	@$(RM) crt0_sdcc/*.o* crt0_sdcc/*.sym crt0_sdcc/*.map 
-	@$(RM) crt0_z180/*.o* crt0_z180/*.sym crt0_z180/*.map 
-	@$(RM) ../_DEVELOPMENT/z80/z80/*.o
+	@$(RM) z80/sccz80/*.o z80/sdcc/*.o
+	@$(RM) z180/sccz80/*.o r2k/sccz80/*.o
+	@$(RM) 8080/sccz80/*.o 
 	@$(RM) ../_DEVELOPMENT/l/z80/*.o
+	@$(RM) ../_DEVELOPMENT/l/z80/*/*.o
+	@$(RM) ../_DEVELOPMENT/l/z80/*/*/*.o
+	@$(RM) ../_DEVELOPMENT/l/z80/*/*/*/*.o
 	@$(RM) ../_DEVELOPMENT/l/sdcc/*.o
+	@$(RM) ../_DEVELOPMENT/error/z80/*.o
 	@$(RM) ../_DEVELOPMENT/math/integer/*.o
 	@$(RM) ../_DEVELOPMENT/math/integer/fast/*.o
 	@$(RM) ../_DEVELOPMENT/math/integer/small/*.o

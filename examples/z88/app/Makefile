@@ -24,4 +24,4 @@ dstar.63: dstar.c dstar.h
 clean:
 	$(RM) rpn.bin useless.bin wc.bin view.bin dstar.bin
 	$(RM) *.bin *.reloc
-	$(RM) zcc_opt.def *~ *.op* *.o *i *.asm *.63
+	$(RM) zcc_opt.def *~ *.op* *.o *i *.asm *.63 *.epr

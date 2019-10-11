@@ -34,4 +34,4 @@ ld (hl),a
 ret
 
 
-DEFC ASMDISP_CPC_SET_INKGPHSTRM1_CALLEE = # asmentry - cpc_SetInkGphStrM1_callee
+DEFC ASMDISP_CPC_SET_INKGPHSTRM1_CALLEE = asmentry - cpc_SetInkGphStrM1_callee

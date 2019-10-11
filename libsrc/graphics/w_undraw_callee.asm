@@ -77,4 +77,4 @@ PUBLIC ASMDISP_UNDRAW_CALLEE
 		jp      __graphics_end
 
 
-DEFC ASMDISP_UNDRAW_CALLEE = # asmentry - undraw_callee
+DEFC ASMDISP_UNDRAW_CALLEE = asmentry - undraw_callee

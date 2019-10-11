@@ -1,13 +1,14 @@
 #
-# Wahey, a messed up makefile for building libraries!
-# $Id: Makefile,v 1.4 2016-07-14 13:30:11 pauloscustodio Exp $
-#
 
 include ../../Make.config
 
-AFILES  = $(wildcard *.asm)
-CFILES  = $(wildcard *.c)
+vpath %.c ../cimpl/
+
+AFILES  = $(wildcard c/sccz80/*.asm)
+CFILES  = acos.c asin.c	atan2.c	atof.c cosh.c ftoa.c ftoe.c pow.c sinh.c tanh.c acosh.c asinh.c atanh.c
 OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
+
+CFLAGS += -fp-mode=z80
 
 all: dirs $(OUTPUT_DIRECTORY)/genmath.lib $(OUTPUT_DIRECTORY)/genmath_iy.lib $(OUTPUT_DIRECTORY)/genmath_zx81.lib
 
@@ -22,7 +23,7 @@ $(OUTPUT_DIRECTORY)/genmath_zx81.lib: $(addprefix obj/ixiy/, $(OBJECTS))
 	TYPE=ixiy $(LIBLINKER) --IXIY -x$(OUTPUT_DIRECTORY)/genmath_zx81 @genmathzx81.lst
 
 dirs:
-	@mkdir -p obj/z80 obj/zx81 obj/ixiy
+	@mkdir -p obj/z80/c/sccz80 obj/ixiy/c/sccz80
 
 clean:
 	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i *.opt

@@ -20,4 +20,5 @@ psg/sn76489/psg_envelope
 psg/sn76489/psg_init.asm
 psg/sn76489/set_psg.asm
 psg/sn76489/set_psg_callee.asm
+@rs232/mtx/rs232.lst
 @z80.lst

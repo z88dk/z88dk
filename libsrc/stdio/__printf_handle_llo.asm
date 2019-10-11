@@ -1,4 +1,5 @@
 
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	MODULE	__printf_handle_llo
 	SECTION code_clib
 	PUBLIC	__printf_handle_llo
@@ -8,3 +9,4 @@ __printf_handle_llo:
         ld      c,0             ;unsigned
         ld      (ix-9),8
 	jp	__printf_number64
+ENDIF

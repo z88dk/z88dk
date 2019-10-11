@@ -3,7 +3,7 @@
 # Z88DK Z80 Macro Assembler
 #
 # Copyright (C) Gunther Strube, InterLogic 1993-99
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk/
 #
@@ -36,6 +36,7 @@ path('testdir/root/lib/config')->mkpath;
 run("./z80asm -b -v test.asm", 0, <<'END', "");
 Reading library 'z80asm-z80-.lib'
 Predefined constant: __CPU_Z80__ = $0001
+Predefined constant: __CPU_ZILOG__ = $0001
 Assembling 'test.asm' to 'test.o'
 Reading 'test.asm' = 'test.asm'
 Writing object file 'test.o'
@@ -57,6 +58,7 @@ Library 'z80asm-z80-.lib' not found
 Library '/usr/local/share/z88dk/lib/z80asm-z80-.lib' not found
 Reading library 'testdir/root/lib/z80asm-z80-.lib'
 Predefined constant: __CPU_Z80__ = $0001
+Predefined constant: __CPU_ZILOG__ = $0001
 Assembling 'test.asm' to 'test.o'
 Reading 'test.asm' = 'test.asm'
 Writing object file 'test.o'
@@ -76,6 +78,7 @@ Library 'z80asm-z80-.lib' not found
 Library '/usr/local/share/z88dk/lib/z80asm-z80-.lib' not found
 Reading library 'testdir/root/lib/z80asm-z80-.lib'
 Predefined constant: __CPU_Z80__ = $0001
+Predefined constant: __CPU_ZILOG__ = $0001
 Assembling 'test.asm' to 'test.o'
 Reading 'test.asm' = 'test.asm'
 Writing object file 'test.o'
@@ -95,6 +98,7 @@ Library 'z80asm-z80-.lib' not found
 Library '/usr/local/share/z88dk/lib/z80asm-z80-.lib' not found
 Library '/../z80asm-z80-.lib' not found
 Predefined constant: __CPU_Z80__ = $0001
+Predefined constant: __CPU_ZILOG__ = $0001
 Assembling 'test.asm' to 'test.o'
 Reading 'test.asm' = 'test.asm'
 Writing object file 'test.o'
@@ -117,8 +121,8 @@ run("./z80asm -b -v           --IXIY test.asm", 0, exp_output("z80",	1, "z80asm-
 run("./z80asm -b -v -mz80            test.asm", 0, exp_output("z80",	0, "z80asm-z80-.lib"), "");
 run("./z80asm -b -v -mz80     --IXIY test.asm", 0, exp_output("z80",	1, "z80asm-z80-ixiy.lib"), "");
 
-run("./z80asm -b -v -mz80-zxn        test.asm", 0, exp_output("z80_zxn",0, "z80asm-z80_zxn-.lib"), "");
-run("./z80asm -b -v -mz80-zxn --IXIY test.asm", 0, exp_output("z80_zxn",1, "z80asm-z80_zxn-ixiy.lib"), "");
+run("./z80asm -b -v -mz80n           test.asm", 0, exp_output("z80n",   0, "z80asm-z80n-.lib"), "");
+run("./z80asm -b -v -mz80n    --IXIY test.asm", 0, exp_output("z80n",   1, "z80asm-z80n-ixiy.lib"), "");
 
 run("./z80asm -b -v -mz180           test.asm", 0, exp_output("z180",	0, "z80asm-z180-.lib"), "");
 run("./z80asm -b -v -mz180    --IXIY test.asm", 0, exp_output("z180",	1, "z80asm-z180-ixiy.lib"), "");
@@ -150,10 +154,14 @@ sub exp_output {
 	my($cpu, $swap_ixiy, $library) = @_;
 	$cpu = uc($cpu);
 	$swap_ixiy = $swap_ixiy ? "\nPredefined constant: __SWAP_IX_IY__ = \$0001" : "";
-
+	my $family = ($cpu =~ /^z/i)  ? "ZILOG" :
+				 ($cpu =~ /^r/i)  ? "RABBIT" :
+				 ($cpu =~ /^80/i) ? "INTEL" : "";
+				 
 	return <<END;
 Reading library '$library'
-Predefined constant: __CPU_${cpu}__ = \$0001$swap_ixiy
+Predefined constant: __CPU_${cpu}__ = \$0001
+Predefined constant: __CPU_${family}__ = \$0001$swap_ixiy
 Assembling 'test.asm' to 'test.o'
 Reading 'test.asm' = 'test.asm'
 Writing object file 'test.o'

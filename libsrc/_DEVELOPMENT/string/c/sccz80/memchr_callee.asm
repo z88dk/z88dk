@@ -9,11 +9,18 @@ PUBLIC memchr_callee, l0_memchr_callee
 EXTERN asm_memchr
 
 memchr_callee:
-
+IF __CPU_GBZ80__
+   pop af	;ret
+   pop bc
+   pop de
+   pop hl
+   push af
+ELSE
    pop hl
    pop bc
    pop de
    ex (sp),hl
+ENDIF
 
 l0_memchr_callee:
 

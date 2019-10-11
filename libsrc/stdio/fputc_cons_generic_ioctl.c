@@ -33,17 +33,40 @@ success:
 	ret
 
 set_raw:
-	ld	a,(de)
 	ld	hl,generic_console_flags
+IF __CPU_INTEL__
+	ld	a,(hl)
+	and	@11111110
+	ld	(hl),a
+ELSE
 	res	0,(hl)
+ENDIF
+	ld	a,(de)
 	and	a	
 	jr	z,success
+IF __CPU_INTEL__
+	ld	a,(hl)
+	or	@00000001
+	ld	(hl),a
+ELSE
 	set	0,(hl)
+ENDIF
 	jr	success
 
 get_console_size:
+IF __CPU_GBZ80__
+	ld	hl,__console_w
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,e
+	ld	e,a
+	ld	a,h
+	ld	h,d
+	ld	d,a
+ELSE
 	ld	hl,(__console_w)
 	ex	de,hl		;hl = arg
+ENDIF
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d

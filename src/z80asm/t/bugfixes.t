@@ -3,7 +3,7 @@
 #-----------------------------------------------------------------------------
 # Z88DK Z80 Macro Assembler
 #
-# Copyright (C) Paulo Custodio, 2011-2018
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: http://www.perlfoundation.org/artistic_license_2_0
 #
 # Test bugfixes
@@ -476,7 +476,7 @@ z80asm(
 	entry:
 		ret							; 000D ;; C9
 		
-		DEFC L_DIVENTRY = # entry - l_div_u
+		DEFC L_DIVENTRY = entry - l_div_u
 ...
 );
 

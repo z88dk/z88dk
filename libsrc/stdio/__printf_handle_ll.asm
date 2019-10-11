@@ -1,4 +1,5 @@
 
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	MODULE	__printf_handle_ll
 	SECTION code_clib
 	PUBLIC	__printf_handle_ll
@@ -14,3 +15,4 @@ __printf_handle_ll:
 	push	hl	;save next format
 	ld	hl,__printf_format_table64
 	jp	__printf_format_search_loop
+ENDIF

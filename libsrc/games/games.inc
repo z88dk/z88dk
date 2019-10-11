@@ -5,7 +5,7 @@
 ;       based on the Dominic's sound routines
 ;
 ;
-;       $Id: games.inc,v 1.31 2016-11-15 11:42:34 stefano Exp $
+;       $Id: games.inc $
 ;
 
 IF FORc128
@@ -75,6 +75,12 @@ IF FORenterprise
         defc sndbit_port   = $A8
         defc sndbit_bit    = 5
         defc sndbit_mask   = 32
+ENDIF
+
+IF FORg800
+        defc sndbit_port   = $18
+        defc sndbit_bit    = 7
+        defc sndbit_mask   = 192
 ENDIF
 
 IF FORp2000
@@ -210,6 +216,12 @@ ENDIF
 
 ; Compatibily ones only, the following ports don't have a beeper
 IF FORsv8000
+        defc sndbit_port   = 0
+        defc sndbit_bit    = 0
+        defc sndbit_mask   = 0
+ENDIF
+
+IF FORgb
         defc sndbit_port   = 0
         defc sndbit_bit    = 0
         defc sndbit_mask   = 0

@@ -4,8 +4,8 @@
 # Build z88dk on unix systems
 #
 
-set -e  		# -e: exit on error; -u: exit on undefined variable
-			# -e can be overidden by -k option
+set -e      # -e: exit on error; -u: exit on undefined variable
+            # -e can be overidden by -k option
 
 do_clean=0
 do_tests=0
@@ -14,25 +14,25 @@ do_examples=0
 do_libbuild=1
 for arg in "$@"; do
   case "$arg" in
-    -k) set +e					;;	# keep building ignoring errors
-    -c) do_clean=1				;;	# clean before building
-    -t) do_tests=1				;;	# Run tests as well
-    -e) do_examples=1				;;	# Build examples as well 
-    -nb) do_build=0				;;	# Don't build
-    -nl) do_libbuild=0				;;	# Don't build libraries
+    -k) set +e                  ;;  # keep building ignoring errors
+    -c) do_clean=1              ;;  # clean before building
+    -t) do_tests=1              ;;  # Run tests as well
+    -e) do_examples=1           ;;  # Build examples as well 
+    -nb) do_build=0             ;;  # Don't build
+    -nl) do_libbuild=0          ;;  # Don't build libraries
      *) 
-	echo "Usage: $0 [-e][-k][-c][-t][-nb][-nl]"
-	echo
-	echo "-k\tKeep building ignoring errors"
-	echo "-c\tClean before building"
-	echo "-t\tRun tests"
-	echo "-e\tBuild examples"
-	echo "-nb\tDon't build binaries"
-	echo "-nl\tDon't build libraries"
-	echo ""
-	echo "Default is to build binaries and libraries"
-	exit 1 
-	;;
+    echo "Usage: $0 [-e][-k][-c][-t][-nb][-nl]"
+    echo
+    echo "-k\tKeep building ignoring errors"
+    echo "-c\tClean before building"
+    echo "-t\tRun tests"
+    echo "-e\tBuild examples"
+    echo "-nb\tDon't build binaries"
+    echo "-nl\tDon't build libraries"
+    echo ""
+    echo "Default is to build binaries and libraries"
+    exit 1 
+    ;;
   esac
 done
 
@@ -51,7 +51,7 @@ export ZCCCFG
 
 
 if [ -z "$CFLAGS" ]; then
-   CFLAGS="-g -O2"	
+   CFLAGS="-g -O2"
 fi
 
 export CC

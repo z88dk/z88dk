@@ -3,7 +3,7 @@
 #
 # Test z80asm-*.lib
 #
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk
 #------------------------------------------------------------------------------
@@ -13,7 +13,7 @@ use v5.10;
 use Test::More;
 require '../../t/testlib.pl';
 
-# CPUs not supported by ticks: z80-zxn z180 r3k
+# CPUs not supported by ticks: z80n z180 r3k
 my @CPUS = (qw( z80 r2k ));
 my $test_nr;
 

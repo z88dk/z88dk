@@ -115,7 +115,7 @@ void dogoto()
         label = AddGoto(ptr);
     }
     if (stkmod)
-        modstk(stkmod, NO, NO);
+        modstk(stkmod, KIND_NONE, NO, YES);
     jump(label);
 }
 
@@ -209,7 +209,7 @@ void goto_cleanup(void)
         if (gptr->sym) {
             debug(DBG_GOTO, "Cleaning %s #%d\n", gptr->sym->name, i);
             postlabel(gptr->label);
-            modstk((gptr->sym->offset.i) - (gptr->sp), NO, NO);
+            modstk((gptr->sym->offset.i) - (gptr->sp), KIND_NONE, NO, YES);
             jump(gptr->sym->size); /* label label(!) */
         }
         gptr++;

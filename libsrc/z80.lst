@@ -1,7 +1,7 @@
 @assert/assert.lst
 @ctype/ctype.lst
-setjmp/l_longjmp
-setjmp/l_setjmp
+setjmp/obj/z80/l_longjmp
+setjmp/obj/z80/l_setjmp
 @stdlib/stdlib.lst
 @strings/string.lst
 @regex/regex.lst

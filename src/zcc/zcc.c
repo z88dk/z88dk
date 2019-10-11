@@ -205,10 +205,12 @@ static char           *c_clib = NULL;
 static int             c_startup = -2;
 static int             c_startupoffset = -1;
 static int             c_nostdlib = 0;
+static int             mgbz80 = 0;
+static int             m8080 = 0;
 static int             mz180 = 0;
 static int             mr2k = 0;
 static int             mr3k = 0;
-static int             mz80_zxn = 0;
+static int             mz80n = 0;
 static int             c_nocrt = 0;
 static char           *c_crt_incpath = NULL;
 static int             processing_user_command_line_arg = 0;
@@ -327,9 +329,11 @@ static char **c_subtype_array = NULL;
 static int    c_subtype_array_num = 0;
 static char **c_clib_array = NULL;
 static int    c_clib_array_num = 0;
+static char **c_aliases_array = NULL;
+static int    c_aliases_array_num = 0;
 
-static char **c_aliases = NULL;
-static int    c_aliases_num = 0;
+static char **aliases = NULL;
+static int    aliases_num = 0;
 
 static char   c_help = 0;
 
@@ -388,6 +392,7 @@ static arg_t  config[] = {
     { "GENMATHLIB", 0, SetStringConfig, &c_genmathlib, NULL, "" },
     { "SUBTYPE",  0, AddArray, &c_subtype_array, &c_subtype_array_num, "Add a sub-type alias and config" },
     { "CLIB",  0, AddArray, &c_clib_array, &c_clib_array_num, "Add a clib variant config" },
+    { "ALIAS",  0, AddArray, &c_aliases_array, &c_aliases_array_num, "Add an alias and options" },
     { "", 0, NULL, NULL }
 };
 
@@ -404,8 +409,10 @@ static arg_t     myargs[] = {
     { "create-app", AF_BOOL_TRUE, SetBoolean, &createapp, NULL, "Run appmake on the resulting binary to create emulator usable file" },
     { "specs", AF_BOOL_TRUE, SetBoolean, &c_print_specs, NULL, "Print out compiler specs" },
     { "compiler", AF_MORE, SetString, &c_compiler_type, NULL, "Set the compiler type from the command line (sccz80, sdcc)" },
-    { "mz80-zxn", AF_BOOL_TRUE, SetBoolean, &mz80_zxn, NULL, "Target the zx next z80 cpu" },
+    { "m8080", AF_BOOL_TRUE, SetBoolean, &m8080, NULL, "Target the 8080 cpu" },
+    { "mz80n", AF_BOOL_TRUE, SetBoolean, &mz80n, NULL, "Target the ZX Next z80n cpu" },
     { "mz180", AF_BOOL_TRUE, SetBoolean, &mz180, NULL, "Target the z180 cpu" },
+    { "mgbz80", AF_BOOL_TRUE, SetBoolean, &mgbz80, NULL, "Target the gbz80 cpu" },
     { "mr2k", AF_BOOL_TRUE, SetBoolean, &mr2k, NULL, "Target the Rabbit 2000 cpu" },
     { "mr3k", AF_BOOL_TRUE, SetBoolean, &mr3k, NULL, "Target the Rabbit 3000 cpu" },
     { "crt0", AF_MORE, SetString, &c_crt0, NULL, "Override the crt0 assembler file to use" },
@@ -480,6 +487,7 @@ enum {
     CPU_MAP_TOOL_Z80ASM = 0,
     CPU_MAP_TOOL_SCCZ80,
     CPU_MAP_TOOL_ZSDCC,
+    CPU_MAP_TOOL_COPT,
     CPU_MAP_TOOL_SIZE
 };
 
@@ -491,19 +499,23 @@ typedef struct cpu_map_s cpu_map_t;
 
 enum {
     CPU_TYPE_Z80 = 0,
-    CPU_TYPE_Z80_ZXN,
+    CPU_TYPE_Z80N,
     CPU_TYPE_Z180,
     CPU_TYPE_R2K,
     CPU_TYPE_R3K,
+    CPU_TYPE_8080,
+    CPU_TYPE_GBZ80,
     CPU_TYPE_SIZE
 };
 
 cpu_map_t cpu_map[CPU_TYPE_SIZE] = {
-    { "-mz80",     "-mz80" , "-mz80" },                     // CPU_TYPE_Z80     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
-    { "-mz80-zxn", "-mz80",  "-mz80" },                     // CPU_TYPE_Z80_ZXN : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
-    { "-mz180",    "-mz180", "-mz180 -portmode=z180" },     // CPU_TYPE_Z180    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
-    { "-mr2k",     "-mr2k",  "-mr2k" },                     // CPU_TYPE_R2K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
-    { "-mr3k",     "-mr3k",  "-mr3ka" },                    // CPU_TYPE_R3K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
+    { "-mz80",     "-mz80" , "-mz80", "" },                     // CPU_TYPE_Z80     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
+    { "-mz80n",    "-mz80n", "-mz80", "" },                     // CPU_TYPE_Z80N    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
+    { "-mz180",    "-mz180", "-mz180 -portmode=z180", "" },     // CPU_TYPE_Z180    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
+    { "-mr2k",     "-mr2k",  "-mr2k", "" },                     // CPU_TYPE_R2K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
+    { "-mr3k",     "-mr3k",  "-mr3ka", "" },                    // CPU_TYPE_R3K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
+    { "-m8080",    "-m8080" , "-mz80", "-m8080" },                    // CPU_TYPE_8080     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
+    { "-mgbz80",   "-mgbz80" , "-mgbz80", "-mgbz80" },                    // CPU_TYPE_8080     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
 };
 
 char *select_cpu(int n)
@@ -517,8 +529,14 @@ char *select_cpu(int n)
     if (mr2k)
         return cpu_map[CPU_TYPE_R2K].tool[n];
 
-    if (mz80_zxn)
-        return cpu_map[CPU_TYPE_Z80_ZXN].tool[n];
+    if (mz80n)
+        return cpu_map[CPU_TYPE_Z80N].tool[n];
+
+    if (m8080)
+        return cpu_map[CPU_TYPE_8080].tool[n];
+
+    if (mgbz80)
+        return cpu_map[CPU_TYPE_GBZ80].tool[n];
 
     return cpu_map[CPU_TYPE_Z80].tool[n];
 }
@@ -837,10 +855,12 @@ int main(int argc, char **argv)
     add_option_to_compiler("");
 
     // Add an alias for gencon
-    snprintf(buffer,sizeof(buffer),"-alias=--generic-console=-pragma-redirect:fputc_cons=fputc_cons_generic");
-    parse_cmdline_arg(buffer);
-    snprintf(buffer,sizeof(buffer),"-alias=--hardware-keyboard=-pragma-redirect:fgetc_cons=fgetc_cons_inkey");
-    parse_cmdline_arg(buffer);
+    snprintf(buffer,sizeof(buffer),"ALIAS --generic-console -pragma-redirect:fputc_cons=fputc_cons_generic");
+    parse_configfile_line(buffer);
+    snprintf(buffer,sizeof(buffer),"ALIAS --hardware-keyboard -pragma-redirect:fgetc_cons=fgetc_cons_inkey");
+    parse_configfile_line(buffer);
+    snprintf(buffer,sizeof(buffer),"ALIAS --math32 -Cc-fp-mode=ieee -lmath32 -pragma-define:CLIB_32BIT_FLOATS=1");
+    parse_configfile_line(buffer);
 
     gc = 1;            /* Set for the first argument to scan for */
     if (argc == 1) {
@@ -876,6 +896,22 @@ int main(int argc, char **argv)
     /* Now, parse the default options list */
     if (c_options != NULL) {
         parse_option(muststrdup(c_options));
+    }
+
+    /* Add in any aliases defined by the config file */
+    for ( i = 0; i < c_aliases_array_num; i++ ) {
+        char buf[LINEMAX+1];
+        char *ptr = c_aliases_array[i];
+        char *dest = buf;
+        while ( *ptr && !isspace(*ptr)) {
+            *dest++ = *ptr++;
+        }
+        *dest = 0;
+        while ( isspace(*ptr) )
+           ptr++;
+        aliases = realloc(aliases, (aliases_num + 2) * sizeof(aliases[0]));
+        aliases[aliases_num++] = strdup(buf);
+        aliases[aliases_num++] = strdup(ptr);
     }
 
     /* Now, let's parse the command line arguments */
@@ -1025,7 +1061,7 @@ int main(int argc, char **argv)
 
 
     /* Peephole optimization level for sdcc */
-    if (compiler_type == CC_SDCC)
+    if (compiler_type == CC_SDCC && !mgbz80)
     {
         switch (sdccpeepopt)
         {
@@ -1523,6 +1559,7 @@ int main(int argc, char **argv)
 
 static void apply_copt_rules(int filenumber, int num, char **rules, char *ext1, char *ext2, char *ext)
 {
+    char   argbuf[FILENAME_MAX+1];
     int    i;
     char  *input_ext;
     char  *output_ext;
@@ -1539,8 +1576,8 @@ static void apply_copt_rules(int filenumber, int num, char **rules, char *ext1, 
         if ( i == (num-1) ) {
             output_ext = ext;
         }
-
-        if (process(input_ext, output_ext, c_copt_exe, rules[i], filter, filenumber, YES, NO))
+        snprintf(argbuf,sizeof(argbuf),"%s %s", select_cpu(CPU_MAP_TOOL_COPT), rules[i]);
+        if (process(input_ext, output_ext, c_copt_exe, argbuf, filter, filenumber, YES, NO))
             exit(1);
     }
 }
@@ -2395,8 +2432,8 @@ void print_help_text(const char *program)
     }
 
     fprintf(stderr,"\nArgument Aliases:\n\n");
-    for ( i = 0; i < c_aliases_num; i+=2 ) {
-        fprintf(stderr,"%-20s %s\n", c_aliases[i],c_aliases[i+1]);
+    for ( i = 0; i < aliases_num; i+=2 ) {
+        fprintf(stderr,"%-20s %s\n", aliases[i],aliases[i+1]);
     }
 
     if ( c_clib_array_num ) {
@@ -2452,9 +2489,9 @@ void parse_cmdline_arg(char *arg)
         }
         pargs++;
     }
-    for ( i = 0; i < c_aliases_num; i+=2 ) {
-        if ( strcmp(arg, c_aliases[i]) == 0 ) {
-            parse_cmdline_arg(c_aliases[i+1]);
+    for ( i = 0; i < aliases_num; i+=2 ) {
+        if ( strcmp(arg, aliases[i]) == 0 ) {
+            parse_option(muststrdup(aliases[i+1]));
             return;
         }
     }
@@ -2657,9 +2694,9 @@ void Alias(arg_t *arg, char *val)
        ++ptr;
     if ((eql = strchr(ptr, '=')) != NULL) {
         *eql = 0;
-        c_aliases = realloc(c_aliases, (c_aliases_num  +  2) * sizeof(c_aliases[0]));
-        c_aliases[c_aliases_num++] = strdup(ptr);
-        c_aliases[c_aliases_num++] = strdup(eql+1);
+        aliases = realloc(aliases, (aliases_num + 2) * sizeof(aliases[0]));
+        aliases[aliases_num++] = strdup(ptr);
+        aliases[aliases_num++] = strdup(eql+1);
     }
 }
 

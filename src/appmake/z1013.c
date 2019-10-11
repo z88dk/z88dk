@@ -45,7 +45,7 @@ int z1013_exec(char* target)
     FILE* fpout;
     long pos;
     char name[17];
-    int len, namelen;
+    int len;
     int c, i;
     char* p;
 
@@ -72,7 +72,6 @@ int z1013_exec(char* target)
 
     suffix_change(filename, ".Z80");
 
-    namelen = strlen(filename) - 1;
 
     if (strcmp(binname, filename) == 0) {
         fprintf(stderr, "Input and output file names must be different\n");

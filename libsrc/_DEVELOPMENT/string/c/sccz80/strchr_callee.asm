@@ -9,10 +9,16 @@ PUBLIC strchr_callee
 EXTERN asm_strchr
 
 strchr_callee:
-
+IF __CPU_GBZ80__
+   pop de
+   pop bc
+   pop hl
+   push de
+ELSE
    pop hl
    pop bc
    ex (sp),hl
+ENDIF
    
    jp asm_strchr
 

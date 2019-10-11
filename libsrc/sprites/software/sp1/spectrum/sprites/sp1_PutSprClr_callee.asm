@@ -45,4 +45,4 @@ PUBLIC ASMDISP_SP1_PUTSPRCLR_CALLEE
 
    ret
 
-DEFC ASMDISP_SP1_PUTSPRCLR_CALLEE = # asmentry - sp1_PutSprClr_callee
+DEFC ASMDISP_SP1_PUTSPRCLR_CALLEE = asmentry - sp1_PutSprClr_callee

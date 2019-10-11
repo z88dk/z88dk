@@ -110,7 +110,7 @@ int residos_exec(char* target)
     // Binary blob
     */
 
-    strcpy(memory, "ZXPKG");
+    strcpy((char *)memory, "ZXPKG");
     memory[5] = 0; /* Capabilities */
     memory[6] = package_id;
     memory[7] = 0x23; /* Minimum Residos version is v2.23 */
@@ -141,20 +141,17 @@ int residos_exec(char* target)
 void save_block(long filesize, char* base, char* ext)
 {
     char name[FILENAME_MAX + 1];
-    char buffer[LINEMAX + 1];
     FILE* fp;
 
     strcpy(name, base);
     suffix_change(name, ext);
 
     if ((fp = fopen(name, "wb")) == NULL) {
-        snprintf(buffer, sizeof(buffer), "Can't open output file %s\n", name);
-        myexit(buffer, 1);
+        exit_log(1,"Can't open output file %s\n", name);
     }
 
     if (fwrite(memory, 1, filesize, fp) != filesize) {
-        snprintf(buffer, sizeof(buffer), "Can't write to output file %s\n", name);
-        myexit(buffer, 1);
+        exit_log(1,"Can't write to output file %s\n", name);
     }
     fclose(fp);
 }

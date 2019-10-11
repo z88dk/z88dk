@@ -41,7 +41,7 @@ extern ssize_t __LIB__ read(int fd, void *ptr, size_t len) __smallc;
 extern ssize_t __LIB__ write(int fd, const void *ptr, size_t len) __smallc;
 extern long __LIB__ __SAVEFRAME__ lseek(int fd,long posn, int whence) __smallc;
 
-extern int __LIB__  readbyte(int fd) __smallc __z88dk_fastcall;
+extern int __LIB__ readbyte(int fd) __z88dk_fastcall;
 extern int __LIB__ writebyte(int fd, int c) __smallc;
 
 
@@ -95,7 +95,7 @@ struct RND_FILE {
 /* The following three functions are target specific */
 extern int  __LIB__ rnd_loadblock(char *name, void *loadstart, size_t len) __smallc;
 extern int  __LIB__ rnd_saveblock(char *name, void *loadstart, size_t len) __smallc;
-extern int  __LIB__  rnd_erase(char *name) __smallc __z88dk_fastcall;
+extern int  __LIB__  rnd_erase(char *name) __z88dk_fastcall;
 
 /* ********************************************************* */
 

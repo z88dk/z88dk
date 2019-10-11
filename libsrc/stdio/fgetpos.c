@@ -23,12 +23,28 @@ int fgetpos(FILE *fp, fpos_t *posn)
 {
 #ifdef Z80
 #asm
+IF __CPU_GBZ80__
+	ld	hl,sp+2
+	ld	c,(hl)
+	inc	hl
+	ld	b,(hl)
+	inc	hl
+	ld	a,(hl+)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+ELSE
 	pop	af	;ret
 	pop	bc	;&posn
 	pop	hl	;fp
 	push	hl
 	push	bc
 	push	af	
+ENDIF
+
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
+        push    ix      ;save callers ix
+ENDIF
 	ld	e,(hl)
 	inc	hl
 	ld	d,(hl)
@@ -43,8 +59,14 @@ int fgetpos(FILE *fp, fpos_t *posn)
 	call	fdgetpos
 	pop	bc
 	pop	bc
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
+        pop     ix
+ENDIF
 	ret
 .fgetpos_abort
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
+        pop     ix
+ENDIF
 	ld	hl,-1
 #endasm
 #else

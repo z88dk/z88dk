@@ -54,6 +54,8 @@ ENDIF
 	defc	__CPU_CLOCK = 3579545
         INCLUDE "crt/classic/crt_rules.inc"
 
+	INCLUDE	"target/mc1000/def/maths_mbf.def"
+
 	org     CRT_ORG_CODE
 
 

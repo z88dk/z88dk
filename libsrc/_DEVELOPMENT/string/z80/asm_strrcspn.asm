@@ -57,9 +57,16 @@ asm_strrcspn:
    jr z, empty_cset
 
 loop:
-
+IF __CPU_GBZ80__
+   EXTERN __z80asm__cpd
+   call __z80asm__cpd
+   ld a,b
+   or c
+   jr z,none_in_cset
+ELSE
    cpd                         ; hl--, bc--
    jp po, none_in_cset
+ENDIF
 
    ; hl = & current char in str to check
    ; bc = position of current char in str

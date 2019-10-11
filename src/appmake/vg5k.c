@@ -23,10 +23,10 @@ static char              loud         = 0;
 static char              help         = 0;
 
 static char              bit_state    = 0;
-static char              h_lvl;
-static char              l_lvl;
-static char              vg_h_lvl;
-static char              vg_l_lvl;
+static uint8_t           h_lvl;
+static uint8_t           l_lvl;
+static uint8_t           vg_h_lvl;
+static uint8_t           vg_l_lvl;
 
 
 

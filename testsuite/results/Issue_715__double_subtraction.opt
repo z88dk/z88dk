@@ -73,10 +73,10 @@
 	SECTION	rodata_compiler
 .i_2
 	;3.000000
-	defb	0,0,0,0,64,130
+	defb	0x00,0x00,0x00,0x00,0x40,0x82
 .i_3
 	;2.000000
-	defb	0,0,0,0,0,130
+	defb	0x00,0x00,0x00,0x00,0x00,0x82
 
 
 	SECTION	bss_compiler
@@ -121,6 +121,7 @@
 	GLOBAL	fgetc
 	GLOBAL	ungetc
 	GLOBAL	feof
+	GLOBAL	ferror
 	GLOBAL	puts
 	GLOBAL	ftell
 	GLOBAL	fgetpos
@@ -155,6 +156,7 @@
 	GLOBAL	getk
 	GLOBAL	getk_inkey
 	GLOBAL	printk
+	GLOBAL	perror
 	GLOBAL	_func
 	GLOBAL	_test
 

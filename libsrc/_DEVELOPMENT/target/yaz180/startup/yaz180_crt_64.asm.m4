@@ -264,9 +264,6 @@ SECTION code_crt_return
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-include "../crt_jump_vectors_z180.inc"
-include "crt_interrupt_vectors_z180.inc"
-
 IF (__crt_on_exit & 0x10000) && ((__crt_on_exit & 0x6) || ((__crt_on_exit & 0x8) && (__register_sp = -1)))
 
    SECTION BSS_UNINITIALIZED

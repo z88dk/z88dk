@@ -28,12 +28,12 @@ static char              loud         = 0;
 static char              help         = 0;
 
 static char              bit_state    = 0;
-static char              h_lvl;
-static char              l_lvl;
-static char              msx_h_lvl;
-static char              msx_l_lvl;
+static uint8_t           h_lvl;
+static uint8_t           l_lvl;
+static uint8_t           msx_h_lvl;
+static uint8_t           msx_l_lvl;
 
-static char   blockid[8] = { 0x1F, 0xA6, 0xDE, 0xBA, 0xCC, 0x13, 0x7D, 0x74 };
+static uint8_t blockid[8] = { 0x1F, 0xA6, 0xDE, 0xBA, 0xCC, 0x13, 0x7D, 0x74 };
 
 
 /* Options that are available for this module */

@@ -2,9 +2,9 @@
 
 # Z88DK Z80 Macro Assembler
 #
-# Copyright (C) Paulo Custodio, 2011-2018
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-# Repository: https://github.com/pauloscustodio/z88dk-z80asm
+# Repository: https://github.com/z88dk/z88dk
 #
 # Test options
 
@@ -33,6 +33,7 @@ t_z80asm_capture("", 		$copyrightmsg, 	"", 0);
 my $verbose_text = <<'END';
 Reading library 'z80asm-z80-.lib'
 Predefined constant: __CPU_Z80__ = $0001
+Predefined constant: __CPU_ZILOG__ = $0001
 Assembling 'test.asm' to 'test.o'
 Reading 'test.asm' = 'test.asm'
 Writing object file 'test.o'
@@ -400,12 +401,12 @@ t_z80asm_ok(0, "halt", "\x76", "-mz80");
 t_z80asm_ok(0, "halt", "\x76", "-m=z80");
 
 #------------------------------------------------------------------------------
-# --cpu=z80-zxn
+# --cpu=z80n
 #------------------------------------------------------------------------------
 
-t_z80asm_ok(0, "swapnib", "\xED\x23", "--cpu=z80-zxn");
-t_z80asm_ok(0, "swapnib", "\xED\x23", "-mz80-zxn");
-t_z80asm_ok(0, "swapnib", "\xED\x23", "-m=z80-zxn");
+t_z80asm_ok(0, "swapnib", "\xED\x23", "--cpu=z80n");
+t_z80asm_ok(0, "swapnib", "\xED\x23", "-mz80n");
+t_z80asm_ok(0, "swapnib", "\xED\x23", "-m=z80n");
 
 #------------------------------------------------------------------------------
 # --cpu=z180
@@ -885,7 +886,7 @@ write_file("test.asm", <<END);
 	if __CPU_Z80__
 	defb 1
 	else 
-	if __CPU_Z80_ZXN__
+	if __CPU_Z80N__
 	defb 2
 	else
 	if __CPU_Z180__
@@ -914,7 +915,7 @@ t_z80asm_capture('-mz80 -b test.asm', "", "", 0);
 t_binary(read_binfile("test.bin"), "\1");
 
 unlink "test.bin";
-t_z80asm_capture('-mz80-zxn -b test.asm', "", "", 0);
+t_z80asm_capture('-mz80n -b test.asm', "", "", 0);
 t_binary(read_binfile("test.bin"), "\2");
 
 unlink "test.bin";

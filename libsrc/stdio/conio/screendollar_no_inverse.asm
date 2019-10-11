@@ -5,12 +5,15 @@
 
 	SECTION	code_clib
 	PUBLIC	screendollar_no_inverse
+	PUBLIC	screendollar_no_inverse_with_count
 
 ;
 ; Entry:	de = character to match
 ;		hl = start of font
 screendollar_no_inverse:
 	ld	b,16		; number of characters in font
+screendollar_no_inverse_with_count:
+    ld  c,b
 screendollar_1:
 	push	bc
 	push	de
@@ -26,7 +29,7 @@ screendollar_2:
 	pop	bc
 	pop	bc
 	pop	bc
-	ld	a,16
+	ld	a,c
 	sub	b
 	ret		;a = character, nc
 nomatch:

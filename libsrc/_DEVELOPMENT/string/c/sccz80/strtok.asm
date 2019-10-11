@@ -10,13 +10,13 @@ EXTERN asm_strtok
 
 strtok:
 
-   pop af
+   pop bc
    pop de
    pop hl
    
    push hl
    push de
-   push af
+   push bc
    
    jp asm_strtok
 

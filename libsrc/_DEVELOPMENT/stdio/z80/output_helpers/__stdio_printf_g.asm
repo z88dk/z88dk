@@ -41,7 +41,7 @@ __stdio_printf_g:
    
    push ix
 
-   IF __SDCC | __SDCC_IX | SDCC_IY
+   IF __SDCC | __SDCC_IX | __SDCC_IY
    
       EXTERN dload
       call dload               ; exx set = double x

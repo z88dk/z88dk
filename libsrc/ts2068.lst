@@ -2,7 +2,6 @@
 stdio/spectrum/fgetc_cons
 stdio/spectrum/fputc_cons_rom_rst
 stdio/ts2068/fputc_cons
-stdio/ts2068/generic_console_scrollup
 stdio/spectrum/console_vars
 stdio/spectrum/getk
 stdio/spectrum/CRT_FONT
@@ -10,6 +9,13 @@ stdio/spectrum/CRT_FONT_64
 stdio/spectrum/conio_vars
 stdio/spectrum/bordercolour
 stdio/spectrum/conio_map_colour
+stdio/spectrum/generic_console_scrollup
+stdio/spectrum/generic_console_cls
+stdio/spectrum/generic_console_attrs
+stdio/spectrum/generic_console_printc
+stdio/spectrum/generic_console_ioctl
+stdio/spectrum/generic_console_vpeek
+stdio/spectrum/console_vars
 @stdio/ansicore.lst
 stdio/ansi/ts2068/f_ansi_attr
 stdio/ansi/spectrum/f_ansi_bel

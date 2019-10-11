@@ -19,19 +19,19 @@
          PUBLIC        _stencil_render
          EXTERN        dither_pattern
 
-         ;EXTERN swapgfxbk
+         EXTERN swapgfxbk
          EXTERN __tms9918_pixeladdress
          EXTERN __tms9918_pixelbyte
+         EXTERN	l_tms9918_disable_interrupts
+         EXTERN	l_tms9918_enable_interrupts
          EXTERN leftbitmask, rightbitmask
+         EXTERN __graphics_end
          ;EXTERN swapgfxbk1
 
 ;        
-;        $Id: stencil_render.asm,v 1.9 2016-07-14 17:44:17 pauloscustodio Exp $
+;        $Id: stencil_render.asm $
 ;
 
-.stencil_exit
-                 pop        ix
-                 ret
 
 .stencil_render
 ._stencil_render
@@ -39,13 +39,17 @@
         ld       ix,4
         add      ix,sp
 
-        ;call        swapgfxbk
+        call        swapgfxbk
+		;ld	bc,__graphics_end
+		;push bc
+		
         ld       c,maxy
         push     bc
 .yloop  pop      bc
         dec      c
-        ;jp        z,swapgfxbk1
-        jr       z,stencil_exit
+        jp        z,__graphics_end
+		;ret z
+
         push     bc
                  
         ld       d,0
@@ -67,7 +71,7 @@
         ld       b,a                ; X2
                  
         ld       a,(ix+0)        ; intensity
-        call     dither_pattern
+        call     dither_pattern  ; requires C for Y pos to draw the pattern properly
         ld       (pattern1+1),a
         ld       (pattern2+1),a
                  
@@ -79,7 +83,7 @@
         call     __tms9918_pixeladdress                ; bitpos0 = pixeladdress(x,y)
         call     leftbitmask                ; LeftBitMask(bitpos0)
         pop      bc
-        push     de                        
+        push     de        ; adr0
                          
         ld       h,d        ;;;
         ld       l,e
@@ -164,9 +168,10 @@
 
 ;--- --- --- --- --- --- --- --- --- --- --- --- 
 .store_byte
-         ;ld     (hl),a                        ; (offset) = pattern
+         ; ->   ld (hl),a ... (offset) = pattern
                  
-         push    af
+         ex      af,af
+         call    l_tms9918_disable_interrupts
          ld      a,l                ; LSB of video memory ptr
 IF VDP_CMD < 0
          ld      (-VDP_CMD),a
@@ -174,19 +179,32 @@ IF VDP_CMD < 0
          and     @00111111
          or      @01000000
          ld      (-VDP_CMD),a
-         pop     af
+         ex      af,af
          ld      (-VDP_DATA),a
-
 ELSE
+	;	 out      (VDP_CMD),a
+	;	 ld       a,h		; MSB of video mem ptr
+	;	 and      @00111111	; masked with "write command" bits
+	;	 or       @01000000
+	;	 ;ei
+	;	 out      (VDP_CMD), a
+	;	 ex      af,af
+	;	 ;;;ld       a,(pattern2+1) ; pattern
+	;	 out      (VDP_DATA), a
+         push    bc
          ld      bc,VDP_CMD
          out     (c),a
          ld      a,h                ; MSB of video mem ptr
          and     @00111111        ; masked with "write command" bits
          or      @01000000
          out     (c),a
-         pop     af
+         ex      af,af
          ld      bc,VDP_DATA
          out     (c),a
+         pop     bc
 ENDIF
-         ret
+         ex      af,af
+         call    l_tms9918_enable_interrupts
+         ex      af,af
+		 ret
 ;--- --- --- --- --- --- --- --- --- --- --- --- 

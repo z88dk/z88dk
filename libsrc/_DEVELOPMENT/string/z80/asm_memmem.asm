@@ -15,6 +15,7 @@
 ; 
 ; ===============================================================
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 SECTION code_clib
 SECTION code_string
 
@@ -128,3 +129,4 @@ no_match:
 not_found:
 
    jp error_zc
+ENDIF

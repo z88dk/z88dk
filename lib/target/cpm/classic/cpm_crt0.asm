@@ -107,7 +107,9 @@ ENDIF
 	nop	 ;   Those extra bytes fix the Amstrad NC's ZCN support !!?!
 	nop
 
-	ld      (start1+1),sp	;Save entry stack
+        ld	hl,0
+	add	hl,sp
+	ld      (start1+1),hl	;Save entry stack
 IF (startup=3)
 	; Increase to cover +3 MEM banking
 	defc	__clib_exit_stack_size_t  = __clib_exit_stack_size + 18 + 18
@@ -118,7 +120,9 @@ ENDIF
         INCLUDE "crt/classic/crt_init_atexit.asm"
         call    crt0_init_bss   
 	call	cpm_platform_init	;Any platform specific init
-	ld      (exitsp),sp
+	ld	hl,0
+	add	hl,sp
+	ld      (exitsp),hl
 
 ; Memory banking for Spectrum +3
 IF (startup=3)

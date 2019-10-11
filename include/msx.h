@@ -162,6 +162,7 @@ extern void __LIB__ msx_noblank();
 
 // Change the MSX color attributes
 extern int __LIB__ msx_color(int foreground, int background, int border) __smallc;
+extern int __LIB__ msx_set_border(int border) __z88dk_fastcall;
 
 #define INK_TRANSPARENT    0x00
 #undef INK_BLACK
@@ -322,6 +323,13 @@ enum stick_direction {
 // 4: SVI-328
 // 5: SVI-328 MKII
 extern int __LIB__ msx_type();
+
+// MSX2 version number
+// 0 = MSX 1
+// 1 = MSX 2
+// 2 = MSX 2+
+// 3 = MSX turbo R
+extern unsigned char MSX2_SUBTYPE @0x002d;
 
 // Detect the VRAM size (in KB)
 extern int __LIB__ msx_vram();

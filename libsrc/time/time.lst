@@ -1,3 +1,5 @@
 time/gmtime
 time/localtime
 time/mktime
+time/asctime
+time/ctime

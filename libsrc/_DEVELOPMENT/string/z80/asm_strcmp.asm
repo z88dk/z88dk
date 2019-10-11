@@ -32,7 +32,12 @@ asm_strcmp:
 loop:
 
    ld a,(de)                   ; a = *s1
+IF __CPU_INTEL || __CPU_GBZ80__
+   cp (hl)
+   inc hl
+ELSE
    cpi                         ; *s1 - *s2
+ENDIF
    jr nz, different
    inc de
    

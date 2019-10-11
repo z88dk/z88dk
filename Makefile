@@ -53,31 +53,31 @@ all: 	$(ALL) $(ALL_EXT)
 
 setup:
 	$(shell if [ "${git_count}" != "" ]; then \
-	    echo '#define PREFIX "${prefix_share}"' > src/config.h; \
-	    echo '#define UNIX 1' >> src/config.h; \
-	    echo '#define EXEC_PREFIX "${EXEC_PREFIX}"' >> src/config.h; \
-	    echo '#define Z88DK_VERSION "${git_count}-${git_rev}-${version}"' >> src/config.h; \
+		echo '#define PREFIX "${prefix_share}"' > src/config.h; \
+		echo '#define UNIX 1' >> src/config.h; \
+		echo '#define EXEC_PREFIX "${EXEC_PREFIX}"' >> src/config.h; \
+		echo '#define Z88DK_VERSION "${git_count}-${git_rev}-${version}"' >> src/config.h; \
 	fi)
 	$(shell if [ ! -f src/config.h ]; then \
-	    echo '#define PREFIX "${prefix_share}"' > src/config.h; \
-	    echo '#define UNIX 1' >> src/config.h; \
-	    echo '#define EXEC_PREFIX "${EXEC_PREFIX}"' >> src/config.h; \
-	    echo '#define Z88DK_VERSION "unknown-unknown-${version}"' >> src/config.h; \
-        fi)
+		echo '#define PREFIX "${prefix_share}"' > src/config.h; \
+		echo '#define UNIX 1' >> src/config.h; \
+		echo '#define EXEC_PREFIX "${EXEC_PREFIX}"' >> src/config.h; \
+		echo '#define Z88DK_VERSION "unknown-unknown-${version}"' >> src/config.h; \
+		fi)
 	@mkdir -p bin
 
 
 bin/zsdcc$(EXESUFFIX):
-	svn checkout -r 10892 svn://svn.code.sf.net/p/sdcc/code/trunk/sdcc -q $(SDCC_PATH)
+	svn checkout -r 11311 svn://svn.code.sf.net/p/sdcc/code/trunk/sdcc -q $(SDCC_PATH)
 	cd $(SDCC_PATH) && patch -p0 < $(Z88DK_PATH)/src/zsdcc/sdcc-z88dk.patch
-	cd $(SDCC_PATH) && CC=$(OCC) ./configure --disable-mcs51-port --disable-gbz80-port \
-				       --disable-avr-port --disable-ds390-port \
-				       --disable-ds400-port --disable-hc08-port \
-				       --disable-pic-port --disable-pic14-port \
-                       		       --disable-pic16-port --disable-stm8-port \
-				       --disable-tlcs90-port --disable-s08-port \
-                       		       --disable-ucsim --disable-device-lib \
-				       --disable-packihx
+	cd $(SDCC_PATH) && CC=$(OCC) ./configure \
+		--disable-ds390-port --disable-ds400-port \
+		--disable-hc08-port --disable-s08-port --disable-mcs51-port \
+		--disable-pic-port --disable-pic14-port --disable-pic16-port \
+		--disable-tlcs90-port --disable-xa51-port --disable-stm8-port \
+		--disable-pdk13-port --disable-pdk14-port \
+		--disable-pdk15-port --disable-pdk16-port \
+		--disable-ucsim --disable-device-lib --disable-packihx
 	cd $(SDCC_PATH) && $(MAKE)
 	cd $(SDCC_PATH) && mv ./bin/sdcc  $(Z88DK_PATH)/bin/zsdcc
 	cd $(SDCC_PATH) && mv ./bin/sdcpp $(Z88DK_PATH)/bin/zsdcpp

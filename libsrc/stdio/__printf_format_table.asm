@@ -43,6 +43,8 @@ __printf_format_table:
 	defw	__printf_handle_n
 	defb	'B'
 	defw	__printf_handle_B
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	defb	'l'
 	defw	__printf_handle_ll
+ENDIF
 	defb	0

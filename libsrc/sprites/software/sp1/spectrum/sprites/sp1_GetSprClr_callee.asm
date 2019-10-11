@@ -43,4 +43,4 @@ PUBLIC ASMDISP_SP1_GETSPRCLR_CALLEE
 
    ret
 
-DEFC ASMDISP_SP1_GETSPRCLR_CALLEE = # asmentry - sp1_GetSprClr_callee
+DEFC ASMDISP_SP1_GETSPRCLR_CALLEE = asmentry - sp1_GetSprClr_callee

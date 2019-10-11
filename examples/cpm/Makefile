@@ -40,5 +40,5 @@ othello.com: ../othello.c
 	zcc +cpm -vn  $(CFLAGS) -O3 -create-app ../othello.c -I.. -oothello.bin
 
 clean:
-	$(RM) *.com *.i *.asm *.tap *.op* *.o *~ zcc_opt.def *.COM *.bin
+	$(RM) *.com *.i *.asm *.tap *.op* *.o *~ zcc_opt.def *.COM *.bin *.def
 

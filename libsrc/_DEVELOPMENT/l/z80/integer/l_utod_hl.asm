@@ -13,10 +13,15 @@ l_utod_hl:
    ; exit  : hl = int, maximum $7fff
    ;         carry unaffected
    ;
-   ; uses  : f, hl
-   
+   ; uses  : f, hl + a (8080)
+IF __CPU_INTEL__
+   ld a,h
+   rla
+   ret nc
+ELSE
    bit 7,h
    ret z
+ENDIF
    
    ld hl,$7fff
    ret

@@ -79,5 +79,5 @@ ENDIF
 	ex	de,hl
 	jr	loop
 
-DEFC ASMDISP_ZX_GETSTR_CALLEE = # asmentry - zx_getstr_callee
+DEFC ASMDISP_ZX_GETSTR_CALLEE = asmentry - zx_getstr_callee
 

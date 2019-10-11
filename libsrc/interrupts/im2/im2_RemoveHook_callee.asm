@@ -22,4 +22,4 @@ EXTERN IM2RemoveHook
    inc l
    ret
 
-DEFC ASMDISP_IM2_REMOVEHOOK_CALLEE = # asmentry - im2_RemoveHook_callee
+DEFC ASMDISP_IM2_REMOVEHOOK_CALLEE = asmentry - im2_RemoveHook_callee

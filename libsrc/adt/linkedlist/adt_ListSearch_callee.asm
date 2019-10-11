@@ -50,4 +50,4 @@ EXTERN ADTListSearch, l_jpiy
    scf
    ret
 
-DEFC ASMDISP_ADT_LISTSEARCH_CALLEE = # asmentry - adt_ListSearch_callee
+DEFC ASMDISP_ADT_LISTSEARCH_CALLEE = asmentry - adt_ListSearch_callee

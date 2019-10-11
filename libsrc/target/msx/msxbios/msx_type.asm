@@ -21,12 +21,12 @@ _msx_type:
 	ld	hl,1
 	ret	z			; yes
 
-	ld	h,3
+	ld	l,3
 	ld	a,($7d63)		; BASIC SubVersion string
 	sub	45
-	ld	l,a
 	ret	z			; 3 = SVI-318
 	
+	inc	l
 	ld	a,($7db0)
 	cp	$5d
 	ret	z			; 4 = SVI-328

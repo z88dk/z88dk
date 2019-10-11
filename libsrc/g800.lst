@@ -8,7 +8,12 @@ stdio/ansi/g800/f_ansi_cls
 stdio/ansi/g800/f_ansi_dline
 stdio/ansi/g800/f_ansi_scrollup
 @stdio/stdio.lst
+games/g800/bit_open
+games/g800/bit_open_di
+games/g800/bit_close
+games/g800/bit_close_ei
 games/joystick
+@games/games.lst
 @z80.lst
 graphics/clg
 graphics/dcircle
@@ -28,4 +33,6 @@ graphics/g800/respixel
 graphics/g800/xorpixel
 graphics/putsprite3
 graphics/stencil_render2
+graphics/g800/bksave
+graphics/g800/bkrestore
 @gfxbase.lst

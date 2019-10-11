@@ -10,7 +10,7 @@
 */
 
 #include <math.h>
-#include <oz.h>
+#include <arch/oz.h>
 
 #define isleap(yr) ( yr % 400 == 0 || (yr % 4 == 0 && yr % 100 != 0) )
 

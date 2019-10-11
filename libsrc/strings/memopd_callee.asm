@@ -145,4 +145,4 @@ ENDIF
    pop hl
    ret
 
-DEFC ASMDISP_MEMOPD_CALLEE = # asmentry - memopd_callee
+DEFC ASMDISP_MEMOPD_CALLEE = asmentry - memopd_callee

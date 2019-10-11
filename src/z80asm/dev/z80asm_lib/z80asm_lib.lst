@@ -1,7 +1,12 @@
+exsphl.asm
+ldi.asm
+rld.asm
 cpd.asm
+ldir.asm
+rrd.asm
 cpdr.asm
-cpi.asm
+ldd.asm
 cpir.asm
 daa.asm
-rld.asm
-rrd.asm
+lddr.asm
+cpi.asm
