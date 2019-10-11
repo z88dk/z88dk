@@ -77,12 +77,15 @@
     ld a,(__i2c1SentenceLgth)
     ld hl,__i2c1SlaveAddr               ;check for buffer write, Bit 0:[R=1,W=0]
     bit 0,(hl)
-    jr NZ,_MASTER_BUFFER_RX
+    jr NZ,_MASTER_BUFFER_TX_R
+
     inc a                               ;write: sentence length + address (+1)
+    jr _MASTER_BUFFER_TX_W
 
-._MASTER_BUFFER_RX
-    or a,__IO_I2C_ICOUNT_LB             ;include LB NAK (irrelevant for write)
+._MASTER_BUFFER_TX_R
+    or a,__IO_I2C_ICOUNT_LB             ;read: include LB NAK
 
+._MASTER_BUFFER_TX_W
     ld c,__IO_I2C_PORT_ICOUNT
     call pca9665_write_indirect         ;write the length
 
@@ -90,10 +93,14 @@
     ld c,__IO_I2C_PORT_DAT
     out (c),a                           ;write the slave address
 
+    rrca                                ;check for Bit 0:[R=1,W=0]
+    jr C,_MASTER_BUFFER_RX              ;don't write bytes for RX
+
     ld a,(__i2c1SentenceLgth)
     ld hl,(__i2c1TxPtr)                 ;get the address to where we pop
     call pca9665_write_burst            ;write A bytes from HL
 
+._MASTER_BUFFER_RX
     ld a,__IO_I2C_CON_ENSIO|__IO_I2C_CON_MODE   ;clear the interrupt & continue in buffer mode
     ld c,__IO_I2C_PORT_CON
     out (c),a
@@ -112,13 +119,13 @@
 ;---------------------------------------
 
 ._MASTER_DATA_W_ACK                     ;data transmitted
-    jr C,_MASTER_BUS_RET0               ;buffer mode
+    jr C,_MASTER_BUFFER_RET0            ;buffer mode
 
     ld hl,__i2c1SentenceLgth            ;decrement the remaining sentence length
     dec (hl)
 
 ._MASTER_SLA_W_ACK                      ;SLA+W transmitted
-    jr C,_MASTER_BUS_RET0               ;buffer mode
+    jr C,_MASTER_BUFFER_RET0            ;buffer mode
 
     ld a,(__i2c1SentenceLgth)
     or a
@@ -139,22 +146,22 @@
 
 ._MASTER_SLA_W_NAK
 ._MASTER_DATA_W_NAK
-    jr C,_MASTER_BUS_RET1               ;buffer mode
+    jr C,_MASTER_BUFFER_RET1            ;buffer mode
     jr _MASTER_BUS_STOP
 
 ;---------------------------------------
 
-._MASTER_BUS_RET1
+._MASTER_BUFFER_RET1
     ld a,0x01
     ld (__i2c1SentenceLgth),a           ;return sentence length 1
-    jr _MASTER_BUS_RX_GET
+    jr _MASTER_BUFFER_RX_GET
 
-._MASTER_BUS_RET0
+._MASTER_BUFFER_RET0
     xor a
     ld (__i2c1SentenceLgth),a           ;return sentence length 0
-;   jr _MASTER_BUS_RX_GET
+;   jr _MASTER_BUFFER_RX_GET
 
-._MASTER_BUS_RX_GET
+._MASTER_BUFFER_RX_GET
     ld c,__IO_I2C_PORT_ICOUNT
     call pca9665_read_indirect
     and 0x7F ;~__IO_I2C_ICOUNT_LB       ;remove LB bit
@@ -192,10 +199,10 @@
     ld hl,__i2c1SentenceLgth
     sub a,(hl)
     ld (hl),a                           ;return sentence length - ICOUNT
-    jr _MASTER_BUS_RX_GET
+    jr _MASTER_BUFFER_RX_GET
 
 ._MASTER_DATA_R_ACK                     ;data received
-    jr C,_MASTER_BUS_RET0               ;buffer mode
+    jr C,_MASTER_BUFFER_RET0            ;buffer mode
 ._MASTER_DATA_R_ACK1
     ld c,__IO_I2C_PORT_DAT
     in a,(c)                            ;get the byte
@@ -210,7 +217,7 @@
     jr _MASTER_SLA_R_ACKN
 
 ._MASTER_SLA_R_ACK                      ;SLA+R transmitted
-    jr C,_MASTER_BUS_RET0               ;buffer mode
+    jr C,_MASTER_BUFFER_RET0            ;buffer mode
 
 ._MASTER_SLA_R_ACKN
     ld a,(__i2c1SentenceLgth)
@@ -232,7 +239,7 @@
 
 ._MASTER_SLA_R_NAK
     jr NC,_MASTER_BUS_STOP              ;byte mode
-    jr _MASTER_BUS_RET1                 ;buffer mode, return sentence length 1
+    jr _MASTER_BUFFER_RET1              ;buffer mode, return sentence length 1
 
 
 ._MASTER_ARB_LOST
