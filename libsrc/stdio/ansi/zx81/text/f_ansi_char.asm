@@ -18,9 +18,6 @@
 	
 	EXTERN	asctozx81
 	
-
-	EXTERN	ansi_ROW
-	EXTERN	ansi_COLUMN
 	
 	EXTERN	zx_inverse
 
