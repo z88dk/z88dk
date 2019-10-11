@@ -123,6 +123,85 @@
 #endif
 
 #asm
+
+;  Common optimizations (valid for both SHORT and default options)
+
+.pop_ret1
+	pop	bc
+.pop_ret2
+	pop	bc
+.pop_ret3
+	pop	bc
+	pop	bc
+	pop	bc		; STICKER
+	pop	bc
+	ret
+
+.clisp_opt27
+	ld	h,0
+	ld	l,a
+	add	hl,sp
+	ld	de,0	;const
+	ex	de,hl
+	jp	l_pint
+
+.l_case_squeezed
+        ex de,hl                ;de = switch value
+        pop hl                  ;hl -> switch table
+.swloop
+        ld c,(hl)
+        inc hl
+        ld b,(hl)               ;bc -> case addr, else 0
+        inc hl
+        ld a,b
+        or c
+IF CPU_INTEL
+        jp z,swend              ;default or continuation code
+ELSE
+        jr z,swend              ;default or continuation code
+ENDIF
+        ld a,(hl)
+        inc hl
+        cp e
+        ;ld a,(hl)
+;        inc hl
+IF CPU_INTEL
+        jp nz,swloop
+ELSE
+        jr nz,swloop
+ENDIF
+;        cp d
+;IF CPU_INTEL
+;        jp nz,swloop
+;ELSE
+;        jr nz,swloop
+;ENDIF
+        ld h,b                  ;cases matched
+        ld l,c
+.swend
+        jp (hl)
+
+
+
+#endasm
+
+
+#ifdef SHORT
+
+#asm
+
+._D_TEST_TAG
+	push	hl
+	ld	a,h
+	and	+(112 % 256)
+	ld	h,a
+	ld	l,0
+	and	a
+	sbc	hl,de
+	pop	bc
+	ret
+
+
 .clisp_opt20
 	ld	h,0
 	ld	l,a
@@ -179,6 +258,19 @@
 	call	_l_car
 	jp	_l_eval
 
+
+.clisp_opt28
+	ld	h,0
+	ld	l,a
+	call	l_gintspsp	;
+	ld	hl,0	;const
+	push	hl
+	call	_l_cons
+	pop	bc
+	pop	bc
+	ret
+
+#endif
 
 #endasm
 
