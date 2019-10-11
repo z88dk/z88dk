@@ -16,6 +16,7 @@
 
     EXTERN   SETWRT
     EXTERN   FILVRM
+    EXTERN   RG0SAV
     EXTERN   l_tms9918_disable_interrupts
     EXTERN   l_tms9918_enable_interrupts
     EXTERN   __tms9918_screen_mode
@@ -307,6 +308,13 @@ IF VDP_CMD < 0
 ELSE
     out   (c),a
 ENDIF
+    push  hl
+    ld    a,d
+    ld    hl,RG0SAV
+    ld    d,0
+    add   hl,de
+    ld    (hl),a
+    pop   hl
     inc   e
     call  l_tms9918_enable_interrupts
     ret
