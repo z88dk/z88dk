@@ -3,13 +3,18 @@ include ../../../Make.config
 
 
 ASMFILES = $(wildcard *.asm)
-OBJECTS = $(ASMFILES:.asm=.o) 
+CFILES = $(wildcard *.c)
+OBJECTS = $(ASMFILES:.asm=.o)  $(CFILES:.c=.o)
 
 all: dirs $(addprefix obj/msx/,$(OBJECTS)) $(addprefix obj/svi/,$(OBJECTS))
 
 
 
+obj/msx/%.o: %.c
+	$(ZCC) +msx $(CFLAGS) -o $@  $^
 
+obj/svi/%.o: %.c
+	$(ZCC) +svi $(CFLAGS) -o $@  $^
 
 obj/msx/%.o: %.asm
 	@$(ASSEMBLER) -DFORmsx -I$(Z88DK_LIB) -I$(Z88DK_LIB)/../libsrc  $^

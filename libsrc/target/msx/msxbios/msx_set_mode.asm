@@ -45,6 +45,12 @@ _msx_set_mode:
 	jr	z,set_mode_2
 	ld	hl,INIMLT
 	ld	c,3
+        cp      3
+        jr      z,set_mode
+	; Otherwise, it's a custom firmware call
+	ex	de,hl	;hl = mode
+	ld	de,0 + 32		;width
+	ld	bc,0 + 4		;mode=4 (we don't handle that anywhere)
 set_mode:
         ld      a,c
 	ld	(__tms9918_screen_mode),a
