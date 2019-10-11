@@ -15,23 +15,23 @@
 
     SECTION code_driver
 
-    PUBLIC asm_i2c1_read_get
+    PUBLIC asm_i2c2_read_chk
 
-    EXTERN __i2c1RxPtr
-    EXTERN __i2c1ControlEcho, __i2c1SlaveAddr, __i2c1SentenceLgth
+    EXTERN __i2c2RxPtr
+    EXTERN __i2c2ControlEcho, __i2c2SlaveAddr, __i2c2SentenceLgth
 
     EXTERN pca9665_read_burst
 
 ;   Read from the I2C Interface, using Byte Mode transmission
-;   uint8_t i2c_read_get( char addr, char length );
+;   uint8_t i2c_read_chk( char addr, char length );
 ;   parameters passed in registers
-;   B  = length of data sentence expected, uint8_t _i2c1SentenceLgth
-;   C  = 7 bit address of slave device, uint8_t _i2c1SlaveAddr
+;   B  = length of data sentence expected, uint8_t _i2c2SentenceLgth
+;   C  = 7 bit address of slave device, uint8_t _i2c2SlaveAddr
 
-.asm_i2c1_read_get
+.asm_i2c2_read_chk
     ld hl,0                     ;prepare zero return
 
-    ld a,(__i2c1SlaveAddr)      ;check the 7 bit slave address
+    ld a,(__i2c2SlaveAddr)      ;check the 7 bit slave address
     rra
     xor c
     ret NZ                      ;return if the slave address is mismatched
@@ -40,16 +40,15 @@
     and a
     ret Z                       ;return if the expected sentence is 0 length
 
-.i2c1_read_wait                 ;busy wait loop
-    ld a,(__i2c1ControlEcho)
+    ld a,(__i2c2ControlEcho)
     tst __IO_I2C_CON_ECHO_BUS_RESTART|__IO_I2C_CON_ECHO_BUS_ILLEGAL
     ret NZ                      ;just exit if a fault
 
     and __IO_I2C_CON_ECHO_BUS_STOPPED
-    jr Z,i2c1_read_wait         ;if the bus is still not stopped, then wait till it is
+    ret Z                       ;if the bus is still not stopped
 
     ld a,b                      ;check we have the bytes we require
-    ld hl,__i2c1SentenceLgth
+    ld hl,__i2c2SentenceLgth
     sub a,(hl)                  ;subtract the remaining unobtained sentence length
 
     ld h,0

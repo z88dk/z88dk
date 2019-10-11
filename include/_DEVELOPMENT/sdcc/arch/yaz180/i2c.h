@@ -83,6 +83,13 @@ extern void i2c_read_set_callee(uint8_t device,uint8_t addr,uint8_t *dp,uint8_t 
 
 
 
+// uint8_t i2c_read_chk( uint8_t device, uint8_t addr, uint8_t length );
+extern uint8_t i2c_read_chk(uint8_t device,uint8_t addr,uint8_t length) __preserves_regs(iyh,iyl);
+extern uint8_t i2c_read_chk_callee(uint8_t device,uint8_t addr,uint8_t length) __preserves_regs(iyh,iyl) __z88dk_callee;
+#define i2c_read_chk(a,b,c) i2c_read_chk_callee(a,b,c)
+
+
+
 // uint8_t i2c_read_get( uint8_t device, uint8_t addr, uint8_t length );
 extern uint8_t i2c_read_get(uint8_t device,uint8_t addr,uint8_t length) __preserves_regs(iyh,iyl);
 extern uint8_t i2c_read_get_callee(uint8_t device,uint8_t addr,uint8_t length) __preserves_regs(iyh,iyl) __z88dk_callee;
