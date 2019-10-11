@@ -85,3 +85,15 @@ generic_console_scrollup_3:
 	pop	de
 	ret
 
+
+        SECTION code_crt_init
+
+	defc DSPLC	= $01 ; DISPLAY CONTROL
+	defc DSPLD	= $00	; DISPLAY DATA
+
+; Disable the cursor (push off screen)
+	ld	a,$80
+	out	(DSPLC),a
+	ld	a,255
+	out	(DSPLD),a	;X
+	out	(DSPLD),a	;Y
