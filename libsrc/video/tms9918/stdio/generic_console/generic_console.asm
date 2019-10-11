@@ -11,6 +11,7 @@
         PUBLIC  __tms9918_set_inverse
         EXTERN  __tms9918_attribute
         EXTERN  __tms9918_text_xypos
+	EXTERN	__tms9918_pattern_name
 
         EXTERN  generic_console_font32
         EXTERN  generic_console_udg32
@@ -106,8 +107,9 @@ scroll_rejoin:
 ; Entry: bc = width
 scroll_text:
         push    ix
+	ld	de,(__tms9918_pattern_name)
+	add	hl,de
         push    hl      ;Save width for later
-        ld      de,0    ;destination
 scroll_text_1:
         push    bc
         push    hl      ;Source

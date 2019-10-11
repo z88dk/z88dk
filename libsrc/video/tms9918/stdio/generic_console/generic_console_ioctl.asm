@@ -46,20 +46,16 @@ check_mode:
         cp      IOCTL_GENCON_SET_MODE
         jr      nz,failure
         ld      a,c
-        ld      l,32
         and     a
         jr      z,set_mode
         cp      2
         jr      z,set_mode
-        ld      l,40
         cp      1
         jr      nz,failure
 set_mode:
-        ld      a,l
-        ld      (__console_w),a
         ld      l,c
         ld      h,0
-        call    msx_set_mode
+        call    msx_set_mode	;Sets up __console_w + sets up fonts
         call    __tms9918_cls
         jr      success
 failure:
