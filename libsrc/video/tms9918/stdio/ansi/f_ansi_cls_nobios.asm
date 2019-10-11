@@ -18,6 +18,7 @@
 
         EXTERN	msx_color
         EXTERN	__tms9918_attribute
+        EXTERN	__tms9918_border
 
         EXTERN	FILVRM
 
@@ -31,19 +32,26 @@
 	call  msx_set_mode
 
 	ld a,(__tms9918_attribute)
-	and $0F
-	ld	h,0
-	ld	l,a
-	
-	push hl		; border
-	push hl		; paper
-	ld a,(__tms9918_attribute)
 	rra
 	rra
 	rra
 	rra
 	and $0F
+        ld  l,a
+        ld  h,0
 	push hl	; ink
+
+	ld a,(__tms9918_attribute)
+	and $0F
+	ld	l,a
+	push hl		; paper
+
+	ld a,(__tms9918_border)
+        and 15
+        ld l,a
+        push hl	;border
+
+
 	call msx_color
 	pop hl
 	pop hl

@@ -6,6 +6,7 @@
 
         EXTERN  ansi_cls
 	EXTERN	__tms9918_screen_mode
+	EXTERN	__tms9918_pattern_name
         EXTERN  FILVRM
 
 
@@ -18,7 +19,7 @@ __tms9918_cls:
 
 clear_text:
         ; Lets just clear the maximum size
-        ld      hl,$0000
+        ld      hl,(__tms9918_pattern_name)
         ld      bc,960
         ld      a,32
         call    FILVRM
