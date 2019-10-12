@@ -25,14 +25,19 @@ IF FORlambda
 ELSE
 	call	699
 ENDIF
+
+
+	ld	a,0
+	jr	z,nokey
+	
 	ld	a,h
 	add	a,2
 
 	ld	b,h
 	ld	c,l
 
-	ld	a,0
-	jr	c,nokey
+	;ld	a,0
+	;jr	c,nokey
 IF FORlambda
 	call	6263
 ELSE
