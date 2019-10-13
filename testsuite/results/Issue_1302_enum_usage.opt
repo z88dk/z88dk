@@ -1,0 +1,21 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_func
+	GLOBAL	_func2
+
+
+
+
