@@ -22,5 +22,6 @@ fcntl/cpm/obj/${TYPE}/${DEVICE}/readbyte
 fcntl/cpm/obj/${TYPE}/${DEVICE}/remove
 fcntl/cpm/obj/${TYPE}/${DEVICE}/rename
 fcntl/cpm/obj/${TYPE}/${DEVICE}/setfcb
+fcntl/cpm/obj/${TYPE}/${DEVICE}/stat
 fcntl/cpm/obj/${TYPE}/${DEVICE}/write
 fcntl/cpm/obj/${TYPE}/${DEVICE}/writebyte
