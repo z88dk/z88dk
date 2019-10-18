@@ -30,6 +30,7 @@ CFILES = \
 	remove.c \
 	rename.c \
 	setfcb.c \
+	stat.c \
 	write.c \
 	writebyte.c 
 
