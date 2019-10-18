@@ -13,7 +13,7 @@
  */
 
 struct stat {
-	unsigned int	st_mode;	/* Mode */
+	long	st_mode;	/* Mode */
 	time_t	st_atime;	/* Last access */
 	time_t	st_mtime;	/* Last modification */
 	time_t	st_ctime;	/* Last change?!?! */
@@ -37,7 +37,7 @@ extern int __LIB__  mkdir(char *dirname);
 
 #define S_IFMT		0170000	/* file type mask */
 #define S_IFLNK		0110000	/* symbolic link */
-#define S_IFREG		0000000	/* (often set to 0100000), regular */
+#define S_IFREG		0100000	/* or just 000000, regular */
 #define S_IFBLK 	0060000	/* block special */
 #define S_IFDIR 	0040000	/* directory */
 #define S_IFCHR 	0020000	/* character special */
