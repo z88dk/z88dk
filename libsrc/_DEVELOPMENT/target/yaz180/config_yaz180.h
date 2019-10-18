@@ -879,8 +879,8 @@
 
 
 
-#define __IO_I2C_RX_SIZE  256
-#define __IO_I2C_TX_SIZE  256
+#define __IO_I2C_RX_SIZE  68
+#define __IO_I2C_TX_SIZE  67
 
 #define __IO_I2C1_PORT_BASE  0xA000
 #define __IO_I2C2_PORT_BASE  0x8000

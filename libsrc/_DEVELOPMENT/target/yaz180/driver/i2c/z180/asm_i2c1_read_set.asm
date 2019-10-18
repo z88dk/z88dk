@@ -37,7 +37,7 @@
     jr Z,asm_i2c1_read_set      ;if the bus is not stopped, then wait till it is
 
     ld a,c
-    cp 68                       ;check the sentence for over length
+    cp __IO_I2C_RX_SIZE         ;check the sentence for over length
     ret NC
 
     or a                        ;check the sentence expected for zero length

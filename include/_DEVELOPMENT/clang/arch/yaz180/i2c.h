@@ -26,6 +26,9 @@
 #define I2C_MODE_BYTE               0
 #define I2C_MODE_BUFFER             __IO_I2C_CON_MODE
 
+#define I2C_RX_SENTENCE             __IO_I2C_RX_SIZE
+#define I2C_TX_SENTENCE             __IO_I2C_TX_SIZE
+
 // Data Structures
 
 typedef enum {
