@@ -4,7 +4,6 @@
  *	Return information about a file in CP/M
  *
  *	TODO: file date/time support for CP/M versions > 3.00 (MP/M II, etc)
- *        find a way to determine the file size more precisely
  *
  *
  *	Stefano 2019
@@ -49,7 +48,7 @@ int stat(char *filename, struct stat *buf)
     }
 
 	buf->st_ctime=buf->st_mtime=buf->st_atime=0L;
-	buf->st_mode=0777;	/* rwxrwxrwx */
+	buf->st_mode=0777L;	/* rwxrwxrwx */
 	
 	/* File size and block size, approx. at 128 bytes boundary */
 	buf->st_blksize = 128;		/* Size of a CP/M block */
