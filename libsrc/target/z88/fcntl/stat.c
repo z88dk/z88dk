@@ -47,7 +47,7 @@ int stat(char *filename, struct stat *buf)
 	iferror {
 		buf->st_size=512L;	/* Std dir size(!) */
 		flags+=0040000;
-	}
+	} else flags+=0100000;	/* regular file flag, rwxrwxrwx */
 	buffer[0]=0;
 	readdor(dor,'U',6,buffer);	/* Read Update time */
 	closedor(dor);
