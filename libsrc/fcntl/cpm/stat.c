@@ -48,7 +48,7 @@ int stat(char *filename, struct stat *buf)
     }
 
 	buf->st_ctime=buf->st_mtime=buf->st_atime=0L;
-	buf->st_mode=0777L;	/* rwxrwxrwx */
+	buf->st_mode=0100777;	/* regular file flag, rwxrwxrwx */
 	
 	/* File size and block size, approx. at 128 bytes boundary */
 	buf->st_blksize = 128;		/* Size of a CP/M block */
