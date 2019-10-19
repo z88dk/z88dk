@@ -40,7 +40,7 @@ typedef enum {
 
 // Functions
 
-// Interrupt routines for the I2C interfaces
+// Interrupt routines for the I2C interfaces - Bus Master only
 extern void i2c1_isr(void);
 extern void i2c2_isr(void);
 
@@ -51,6 +51,11 @@ extern void i2c_reset(uint8_t device);
 
 // void i2c_initialise( uint8_t device ) __z88dk_fastcall;
 extern void i2c_initialise(uint8_t device);
+
+
+
+// void i2c_available( uint8_t device ) __z88dk_fastcall;
+extern uint8_t i2c_available(uint8_t device);
 
 
 

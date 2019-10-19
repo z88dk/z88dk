@@ -38,7 +38,7 @@ typedef enum {
 
 // Functions
 
-// Interrupt routines for the I2C interfaces
+// Interrupt routines for the I2C interfaces - Bus Master only
 extern void i2c1_isr(void);
 extern void i2c2_isr(void);
 
@@ -47,6 +47,9 @@ __DPROTO(`d,e,h,l,iyh,iyl',`d,e,h,l,iyh,iyl',void,,i2c_reset,uint8_t device)
 
 // void i2c_initialise( uint8_t device ) __z88dk_fastcall;
 __DPROTO(`d,e,h,l,iyh,iyl',`d,e,h,l,iyh,iyl',void,,i2c_initialise,uint8_t device)
+
+// void i2c_available( uint8_t device ) __z88dk_fastcall;
+__DPROTO(`b,c,d,e,iyh,iyl',`b,c,d,e,iyh,iyl',uint8_t,,i2c_available,uint8_t device)
 
 // void i2c_set_speed( uint8_t device, enum i2c_speed_mode ) __z88dk_callee;
 __DPROTO(`d,e,iyh,iyl',`d,e,iyh,iyl',void,,i2c_set_speed,uint8_t device,i2c_speed_mode speed)
