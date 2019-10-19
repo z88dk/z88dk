@@ -11,6 +11,11 @@
         defc    TAR__clib_exit_stack_size = 0
         defc    TAR__register_sp = 0x4000
 
+	defc	CONSOLE_COLUMNS = 16
+	defc	CONSOLE_ROWS = 4
+
+	INCLUDE	"zcc_opt.def"
+
         INCLUDE "crt/classic/crt_rules.inc"
 
 	org	  CRT_ORG_CODE
@@ -79,7 +84,7 @@ program:
         out     (0x27), a       ; MINT_ENABLE_REG
         INCLUDE "crt/classic/crt_init_sp.asm"
         INCLUDE "crt/classic/crt_init_atexit.asm"
-;	call    crt0_init_bss
+	call    crt0_init_bss
 	ld	(exitsp),sp
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of

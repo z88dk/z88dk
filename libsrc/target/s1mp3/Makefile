@@ -1,15 +1,18 @@
 
 include ../../Make.config
 
-CFILES = $(wildcard */*.c)
+CFILES = $(wildcard */*.c) 
 
-AFILES  = $(CFILES:.c=.opt)
-OBJECTS = $(CFILES:.c=.o)
+AFILES  = $(wildcard */*.asm)
+OBJECTS = $(CFILES:.c=.o) $(AFILES:.asm=.o)
 
 all: dirs $(OBJECTS)
 
 %.o: %.c
-	zcc +s1mp3 -c -o $@ -O0 $^
+	$(ZCC) +s1mp3 -c -o $@  $^
+
+%.o: %.asm
+	$(ZCC) +s1mp3 -c -o $@ $^
 
 dirs:
 	@mkdir -p obj/z80 
