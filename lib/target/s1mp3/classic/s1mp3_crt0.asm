@@ -20,31 +20,27 @@
 
 	org	  CRT_ORG_CODE
 
+header:
+        DEFW    0x0050                          ; header id
+        DEFW    0x4757                          ;
+        DEFW    0x9719                          ;
+        DEFW    0x0003                          ;
+        DEFW    0x0600                          ; text fileoffset (lo)
+        DEFW    0                               ; text fileoffset (hi)
+        DEFW    0                               ; Entry point (will be fixed by conv.exe)
+        DEFW    Application_Start               ; text address
+        DEFW    0                               ; data fileoffset (lo)
+        DEFW    0                               ; data fileoffset (hi)
+        DEFW    0                               ; data length
+        DEFW    0                               ; data address
+        DEFW    0                               ; bss length
+        DEFW    0                               ; bss address
+        DEFW    program                         ; entry point
+        DEFB    0                               ; entry bank
+        DEFB    0                               ; number of banks
 
-if (ASMPC<>$0000)
-        defs    CODE_ALIGNMENT_ERROR
-endif
 
-        jp      program
-
-        defs    $0008-ASMPC
-if (ASMPC<>$0008)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-        jp      restart08
-
-        defs    $0010-ASMPC
-if (ASMPC<>$0010)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-        jp      restart10
-
-        defs    $0018-ASMPC
-if (ASMPC<>$0018)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-        jp      restart18
-
+	; Interrupt vectors are here to improve emulator compatibility
         defs    $0020-ASMPC
 if (ASMPC<>$0020)
         defs    CODE_ALIGNMENT_ERROR
@@ -77,7 +73,12 @@ restart28:
 restart30:
         ret
 
-; In the .AP model there's a header here
+
+        defs    $0600-ASMPC
+if (ASMPC<>$0600)
+        defs    CODE_ALIGNMENT_ERROR
+endif
+Application_Start:
 program:
         di
         xor     a

@@ -4,7 +4,10 @@
 
 extern void __LIB__ FONTS ( void );
 
+
+#ifndef NULL
 #define NULL 0
+#endif
 
 /* select desired fonts. (Simply comment out those not needed) */
 

@@ -2,6 +2,7 @@
 #ifndef __LCD_H__
 #define __LCD_H__
 
+#include <sys/compiler.h>
 
 /* LCD screen and bitmap image array constants */
 #define ARRAY_OFFSET 2

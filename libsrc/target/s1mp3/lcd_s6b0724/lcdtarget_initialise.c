@@ -55,7 +55,7 @@ void LCDTARGET_DisableLCDWrite( void )
 ** the data to output.
 **
 */
-void __FASTCALL__ LCDTARGET_PutControlByte( unsigned int byte )
+void __FASTCALL__ LCDTARGET_PutControlByte( unsigned int byte ) __naked
 {
 #asm
 	in	a, (MFP_GPOA_SELECT_REG)
@@ -64,6 +64,7 @@ void __FASTCALL__ LCDTARGET_PutControlByte( unsigned int byte )
 
 	ld	a, l
 	ld	(0x8000), a
+    ret
 #endasm
 }
 
