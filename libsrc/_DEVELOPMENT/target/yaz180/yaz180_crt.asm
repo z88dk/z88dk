@@ -4,42 +4,58 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
+IF !DEFINED_CLIB_32BIT_FLOAT
+	defc	DEFINED_CLIB_32BIT_FLOAT = 1
+	defc CLIB_32BIT_FLOAT = 1
+	IFNDEF CLIB_32BIT_FLOAT
+	ENDIF
+ENDIF
+
+
 IF !DEFINED_startup
 	defc	DEFINED_startup = 1
-	defc startup = 0
+	defc startup = 16
 	IFNDEF startup
 	ENDIF
 ENDIF
 
 
-IF !DEFINED_REGISTER_SP 
-	defc	DEFINED_REGISTER_SP  = 1
-	defc REGISTER_SP  = 0xffde
-	IFNDEF REGISTER_SP 
+IF !DEFINED_CLIB_OPT_PRINTF
+	defc	DEFINED_CLIB_OPT_PRINTF = 1
+	defc CLIB_OPT_PRINTF = 0x1400060a
+	IFNDEF CLIB_OPT_PRINTF
 	ENDIF
 ENDIF
 
 
-IF !DEFINED_CRT_ENABLE_RST 
-	defc	DEFINED_CRT_ENABLE_RST  = 1
-	defc CRT_ENABLE_RST  = 0xfe
-	IFNDEF CRT_ENABLE_RST 
+IF !DEFINED_CLIB_OPT_PRINTF_2
+	defc	DEFINED_CLIB_OPT_PRINTF_2 = 1
+	defc CLIB_OPT_PRINTF_2 = 0
+	IFNDEF CLIB_OPT_PRINTF_2
 	ENDIF
 ENDIF
 
 
-IF !DEFINED_CRT_ENABLE_TRAP 
-	defc	DEFINED_CRT_ENABLE_TRAP  = 1
-	defc CRT_ENABLE_TRAP  = 0x1
-	IFNDEF CRT_ENABLE_TRAP 
+IF !DEFINED_noprotectmsdos
+	defc	DEFINED_noprotectmsdos = 1
+	defc noprotectmsdos = 0
+	IFNDEF noprotectmsdos
 	ENDIF
 ENDIF
 
 
-IF !DEFINED_CLIB_MALLOC_HEAP_SIZE 
-	defc	DEFINED_CLIB_MALLOC_HEAP_SIZE  = 1
-	defc CLIB_MALLOC_HEAP_SIZE  = 0x2700
-	IFNDEF CLIB_MALLOC_HEAP_SIZE 
+IF !DEFINED_noredir
+	defc	DEFINED_noredir = 1
+	defc noredir = 0
+	IFNDEF noredir
+	ENDIF
+ENDIF
+
+
+IF !DEFINED_nogfxglobals
+	defc	DEFINED_nogfxglobals = 1
+	defc nogfxglobals = 0
+	IFNDEF nogfxglobals
 	ENDIF
 ENDIF
 
@@ -52,7 +68,7 @@ IFNDEF startup
 
    ; startup undefined so select a default
 
-   defc startup = 0
+   defc startup = 16
 
 ENDIF
 
@@ -68,12 +84,18 @@ ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; app drivers;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
    ; yabios asci0 drivers installed on stdin, stdout, stderr
    ; yabios asci1 drivers installed on ttyin, ttyout, ttyerr
 
    IFNDEF __CRTCFG
 
-      defc __CRTCFG = 0
+      defc __CRTCFG = 1
 
    ENDIF
 
@@ -88,8 +110,8 @@ ENDIF
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                   yaz180 ROM target                       ;;
-;; generated from target/yaz180/startup/yaz180_crt_0.asm.m4  ;;
+;;                yaz180 application target                  ;;
+;; generated from target/yaz180/startup/yaz180_crt_16.asm.m4 ;;
 ;;                                                           ;;
 ;;                  flat 64k address space                   ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -105,6 +127,7 @@ include "config_yaz180_public.inc"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../crt_defaults.inc"
+include "crt_yabios_def.inc"
 include "crt_config.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1772,16 +1795,6 @@ IF __crt_include_preamble
 ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; PAGE ZERO ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-IF (__crt_org_code = 0) && !(__page_zero_present)
-
-   include "../crt_page_zero_z180.inc"
-
-ENDIF
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CRT INIT ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -1810,12 +1823,6 @@ __Restart_2:
 
       push hl                  ; argv
       push bc                  ; argc
-
-   ENDIF
-
-   IF __crt_include_preamble
-
-      include "crt_preamble.asm"
 
    ENDIF
 
@@ -1881,9 +1888,6 @@ SECTION code_crt_return
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-include "../crt_jump_vectors_z180.inc"
-include "crt_interrupt_vectors_z180.inc"
-
 IF (__crt_on_exit & 0x10000) && ((__crt_on_exit & 0x6) || ((__crt_on_exit & 0x8) && (__register_sp = -1)))
 
    SECTION BSS_UNINITIALIZED
@@ -1898,12 +1902,6 @@ include "../clib_variables.inc"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../clib_stubs.inc"
-
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; app drivers;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 

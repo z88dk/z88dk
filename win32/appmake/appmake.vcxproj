@@ -179,6 +179,7 @@
     <ClCompile Include="..\..\src\appmake\fp1100.c" />
     <ClCompile Include="..\..\src\appmake\fp1100.c" />
     <ClCompile Include="..\..\src\appmake\galaksija.c" />
+    <ClCompile Include="..\..\src\appmake\gb.c" />
     <ClCompile Include="..\..\src\appmake\glue.c" />
     <ClCompile Include="..\..\src\appmake\hex.c" />
     <ClCompile Include="..\..\src\appmake\inject.c" />

@@ -313,8 +313,11 @@ static Type *parse_enum(Type *type)
             value++;
         } while (cmatch(',') && !rcmatch('}'));
         needchar('}');
+        return ptr;
     } 
-    return ptr;
+    // We're declaring a type that is an enum
+    *type = *ptr;
+    return type;
 }
 
 int align_struct(Type *str)
@@ -686,7 +689,7 @@ static int check_existing_parameter(Type *func, Type *param)
         Type *existing = array_get_byindex(func->parameters,i);
 
         if ( strlen(param->name) && strcmp(existing->name, param->name) == 0 ) {
-            errorfmt("A parameter named %s has already been defined for function",1, param->name);
+            errorfmt("A parameter named %s (argument %d) has already been defined for function",1,  param->name, i+1);
             junk();
             return -1;
         }

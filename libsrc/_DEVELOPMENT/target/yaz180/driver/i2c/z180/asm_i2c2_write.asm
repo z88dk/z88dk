@@ -37,16 +37,16 @@
     jr Z,asm_i2c2_write         ;if the bus is not stopped, then wait till it is
 
     ld a,c
-    cp 67                       ;check the sentence for over length
+    cp __IO_I2C_TX_SIZE         ;check the sentence for over length
     ret NC
 
-    or a                        ;check the sentence provided for zero length, clear carry
+    or a                        ;check the sentence provided for zero length
     ret Z                       ;return if the sentence is 0 length
 
     ld (__i2c2SentenceLgth),a   ;store the sentence length
 
     ld a,d                      ;store the 7 bit slave address
-    rla                         ;ensure we're writing Bit 0:[W=0]
+    sla a                       ;ensure we're writing Bit 0:[W=0]
     ld (__i2c2SlaveAddr),a
 
     ld (__i2c2TxPtr),hl         ;store the buffer pointer

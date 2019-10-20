@@ -25,22 +25,22 @@ IF FORlambda
 ELSE
 	call	699
 ENDIF
-	ld	a,h
-	add	a,2
 
-	ld	b,h
-	ld	c,l
-
-	ld	a,0
-	jr	c,nokey
+        LD      B,H             ;
+        LD      C,L             ;
+        LD      D,C             ;
+        INC     D  
 IF FORlambda
-	call	6263
+	call	nz,6263
 ELSE
-	call	1981
+	call	nz,1981	;exits with e = key
 ENDIF
+	jr	nc,nokey
 
 	call	zx81toasc
-nokey:
 	ld	l,a
 	ld	h,0
+	ret
+nokey:
+	ld	hl,0
 	ret

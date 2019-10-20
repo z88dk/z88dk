@@ -6,8 +6,8 @@ include(__link__.m4)
 #include <arch.h>
 #include <stdint.h>
 
-extern uint32_t _system_time;
-extern uint8_t  _system_time_fraction;
+extern volatile uint32_t _system_time;
+extern volatile uint8_t  _system_time_fraction;
 
 //
 // SYSTEM TIME COMMANDS

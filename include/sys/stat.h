@@ -13,7 +13,7 @@
  */
 
 struct stat {
-	int	st_mode;	/* Mode */
+	unsigned int	st_mode;	/* Mode */
 	time_t	st_atime;	/* Last access */
 	time_t	st_mtime;	/* Last modification */
 	time_t	st_ctime;	/* Last change?!?! */

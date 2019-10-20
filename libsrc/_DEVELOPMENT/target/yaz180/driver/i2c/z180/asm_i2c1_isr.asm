@@ -89,7 +89,7 @@
     ld c,__IO_I2C_PORT_ICOUNT
     call pca9665_write_indirect         ;write the length
 
-    ld a,(__i2c1SlaveAddr)              ;get address of slave we're reading or writing, Bit 0:[R=1,W=0]
+    ld a,(hl)                           ;get address of slave we're reading or writing, Bit 0:[R=1,W=0]
     ld c,__IO_I2C_PORT_DAT
     out (c),a                           ;write the slave address
 

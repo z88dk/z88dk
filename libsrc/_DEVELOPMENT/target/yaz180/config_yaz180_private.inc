@@ -872,8 +872,8 @@ defc __IO_APU_OP_PUPI = 0x1A
 
 
 
-defc __IO_I2C_RX_SIZE = 256
-defc __IO_I2C_TX_SIZE = 256
+defc __IO_I2C_RX_SIZE = 68
+defc __IO_I2C_TX_SIZE = 67
 
 defc __IO_I2C1_PORT_BASE = 0xA000
 defc __IO_I2C2_PORT_BASE = 0x8000
