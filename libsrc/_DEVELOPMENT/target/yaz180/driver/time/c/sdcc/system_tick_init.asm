@@ -1,6 +1,6 @@
 SECTION code_driver
 
-PUBLIC _system_tick_init, system_tick_init
+PUBLIC _system_tick_init
 
 EXTERN asm_system_tick_init
 
@@ -12,5 +12,3 @@ _system_tick_init:
     push hl
     push af
     jp asm_system_tick_init
-
-defc system_tick_init = asm_system_tick_init

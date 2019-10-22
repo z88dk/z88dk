@@ -1,0 +1,13 @@
+SECTION code_driver
+
+PUBLIC clock_settime_callee
+
+EXTERN asm_clock_settime
+
+; get the the system time
+
+.clock_settime_callee
+    pop af
+    pop hl
+    push af
+    jp asm_clock_settime
