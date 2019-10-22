@@ -61,6 +61,7 @@ __upd7220_set_ink:
     ret
 
 __upd7220_cls:
+    di
     ld      hl, 0
     call    CURS2
     ld      de, +(CONSOLE_COLUMNS * CONSOLE_ROWS) - 1
@@ -72,6 +73,7 @@ cls_1:
     ld      a,d
     or      e
     jr      nz,cls_1
+    ei
     ret
 
 ; c = x
@@ -79,6 +81,7 @@ cls_1:
 ; a = character to print
 ; e = raw
 __upd7220_printc:
+    di
     ex      af,af
     call    xypos
     call    CURS2
@@ -86,6 +89,7 @@ __upd7220_printc:
     ld      hl,(__upd7220_attr - 1)
     ld      l,a
     call    WDAT2
+    ei
     ret
 
 ;Entry: c = x,
@@ -94,11 +98,13 @@ __upd7220_printc:
 ;        a = character,
 ;        c = failure
 __upd7220_vpeek:
+    di
     call    xypos
     call    CURS2
     call    RDAT
     ld      a,l
     and     a
+    ei
     ret
 
 xypos:
@@ -124,23 +130,31 @@ __upd7220_scrollup:
 
 ; Output the CURS commnad
 CURS2:
+    call    ckstatus
     ld      a,UPD7220_COMMAND_CURS
 write_2_command:
     out     (UPD_7220_COMMAND_WRITE),a
-    call    ckstatus
     ld      bc,UPD_7220_PARAMETER_WRITE
+    call    ckstatus
     out     (c),l
     call    ckstatus
     out     (c),h
     ret
 
 WDAT2:
+    call    ckstatus
     ld      a,UPD7220_COMMAND_WDAT
     jr      write_2_command
 
 ckstatus:
     in      a,(UPD_7220_STATUS_READ)
-    and     4
+    and     2
+    jr      nz,ckstatus
+    ret
+
+ckread:
+    in      a,(UPD_7220_STATUS_READ)
+    and     1
     jr      z,ckstatus
     ret
 
@@ -148,11 +162,12 @@ RDAT:
     ld      a,UPD7220_COMMAND_FIGS
     ld      hl,$0102
     call    write_2_command
+    call    ckstatus
     ld      a,UPD7220_COMMAND_RDAT
     out     (UPD_7220_COMMAND_WRITE),a
     ld      bc,UPD_7220_FIFO_READ
-    call    ckstatus
+    call    ckread
     in      l,(c)
-    call    ckstatus
+    call    ckread
     in      h,(c)
     ret
