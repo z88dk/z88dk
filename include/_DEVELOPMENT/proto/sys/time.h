@@ -68,33 +68,31 @@ enum clockid_t {
 
 /*
  * Convenience macros for operations on timevals
- * NOTE: `timercmp' does not work for >= or <=
  */
 
 #define    timerisset(tvp)  ((tvp)->tv_sec || (tvp)->tv_nsec)
 #define    timerclear(tvp)  ((tvp)->tv_sec = (tvp)->tv_nsec = 0)
-#define    timercmp(a, b, CMP)                                  \
-  (((a)->tv_sec == (b)->tv_sec) ?                               \
-   ((a)->tv_nsec CMP (b)->tv_nsec) :                            \
-   ((a)->tv_sec CMP (b)->tv_sec))
+
 #define    timeradd(a, b, result)                               \
   do {                                                          \
     (result)->tv_sec = (a)->tv_sec + (b)->tv_sec;               \
     (result)->tv_nsec = (a)->tv_nsec + (b)->tv_nsec;            \
     if ((result)->tv_nsec >= 1000000000)                        \
       {                                                         \
-    ++(result)->tv_sec;                                         \
-    (result)->tv_nsec -= 1000000000;                            \
+        ++(result)->tv_sec;                                     \
+        (result)->tv_nsec -= 1000000000;                        \
       }                                                         \
   } while (0)
+
 #define    timersub(a, b, result)                               \
   do {                                                          \
     (result)->tv_sec = (a)->tv_sec - (b)->tv_sec;               \
     (result)->tv_nsec = (a)->tv_nsec - (b)->tv_nsec;            \
-    if ((a)->tv_nsec < ((b)->tv_nsec) {                         \
-      --(result)->tv_sec;                                       \
-      (result)->tv_nsec += 1000000000;                          \
-    }                                                           \
+    if ((a)->tv_nsec < (b)->tv_nsec)                            \
+      {                                                         \
+        --(result)->tv_sec;                                     \
+        (result)->tv_nsec += 1000000000;                        \
+      }                                                         \
   } while (0)
 
 /*

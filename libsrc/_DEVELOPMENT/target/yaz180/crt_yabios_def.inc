@@ -57,6 +57,12 @@ DEFC _dmac1Lock                      = $F514
 PUBLIC _csioLock
 DEFC _csioLock                       = $F515
 
+PUBLIC __system_time_fraction
+DEFC __system_time_fraction          = $F516
+
+PUBLIC __system_time
+DEFC __system_time                   = $F517
+
 PUBLIC APULock
 DEFC APULock                         = $F527
 
