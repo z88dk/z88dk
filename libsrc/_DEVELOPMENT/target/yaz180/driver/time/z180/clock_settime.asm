@@ -33,16 +33,12 @@
     
     EXTERN  __system_time_fraction, __system_time
     
-    ; HL contains pointer to struct timespec
+    ; HL contains address of struct timespec
     ;   struct  timespec { time_t      tv_sec;     /* seconds */
     ;                   nseconds_t  tv_nsec;}   /* and nanoseconds */
 
 .asm_clock_settime
-    ld  e,(hl)                      ; get the address of the timespec
-    inc hl
-    ld  d,(hl)
-    ld hl,__system_time
-    ex de,hl
+    ld de,__system_time
 
     ld a,i
     push af                         ; preserve interrupt status
@@ -52,7 +48,7 @@
     ldi
     ldi
     ldi
-    ex de,hl                        ; ld hl,__system_time_fraction
+    ld hl,__system_time_fraction
     ld (hl),0                       ; (__system_time_fraction) = 0
 
     pop af                          ; restore interrupts

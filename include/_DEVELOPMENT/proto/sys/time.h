@@ -97,6 +97,13 @@ enum clockid_t {
     }                                                           \
   } while (0)
 
+/*
+ * We are working in nano seconds, so divide by ONE_BILLION
+ */
+ 
+#ifndef ONE_BILLION
+#define ONE_BILLION     ((nseconds_t)1000000000)
+#endif
 
 __DPROTO(,,int,,clock_getres,enum clockid_t clock_id,struct timespec *res)
 __DPROTO(,,int,,clock_gettime,enum clockid_t clock_id,struct timespec *tp)
