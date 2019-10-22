@@ -1,5 +1,5 @@
 ;
-; (c)2017 Phillip Stevens All rights reserved.
+; (c)2019 Phillip Stevens All rights reserved.
 ;
 ; Redistribution and use in source and binary forms, with or without
 ; modification, are permitted provided that the following conditions are
@@ -24,39 +24,35 @@
 ; CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ; ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 ; POSSIBILITY OF SUCH DAMAGE.
-;
-;    HL = address of the z180 prt0 address
-    
+
     INCLUDE "config_private.inc"
 
     SECTION code_driver
+    
+    PUBLIC    asm_clock_settime
+    
+    EXTERN  __system_time_fraction, __system_time
+    
+    ; HL contains address of struct timespec
+    ;   struct  timespec { time_t      tv_sec;     /* seconds */
+    ;                   nseconds_t  tv_nsec;}   /* and nanoseconds */
 
-    PUBLIC	asm_system_tick_init
+.asm_clock_settime
+    ld de,__system_time
 
-    EXTERN  asm_system_tick
+    ld a,i
+    push af                         ; preserve interrupt status
+    di
 
-    asm_system_tick_init:       ; set up system tick timer
-        push af
-        push de
+    ldi                             ; (__system_time) = timespec.tv_sec
+    ldi
+    ldi
+    ldi
+    ld hl,__system_time_fraction
+    ld (hl),0                       ; (__system_time_fraction) = 0
 
-        xor a
-        out0 (TCR), a           ; disable down counting and interrupts for PRT0/PRT1
-
-                                ; remember the interrupt location for PRT0 is in hl
-        ld de, asm_system_tick  ; load our interrupt service routine origin
-                                ; initially there is a RET there
-        ld (hl), e              ; load the address of the PRT0 service routine
-        inc hl
-        ld (hl), d
-
-        ld hl, __CPU_CLOCK/__CPU_TIMER_SCALE/256-1  ; we do 256 ticks per second
-        out0 (RLDR0L), l
-        out0 (RLDR0H), h
-
-        ld a, TCR_TIE0|TCR_TDE0 ; enable down counting and interrupts for PRT0
-        out0 (TCR), a
-
-        pop de
-        pop af
-        ret
+    pop af                          ; restore interrupts
+    ret PO                          ; return if di
+    ei
+    ret
 
