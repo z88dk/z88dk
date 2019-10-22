@@ -5,6 +5,8 @@
  *
  * $Id: types.h,v 1.6 2016-07-16 22:00:08 dom Exp $
  */
+ 
+include(__link__.m4)
 
 #ifndef __SYS_TYPES_H__
 #define __SYS_TYPES_H__
@@ -77,7 +79,6 @@ typedef short wild_t;
 typedef unsigned long fpos_t;
 #endif
 
-
 typedef unsigned char   u8_t;      /* 8 bit type */
 typedef unsigned short u16_t;      /* 16 bit type */
 typedef unsigned long  u32_t;      /* 32 bit type */
@@ -86,24 +87,4 @@ typedef char            i8_t;      /* 8 bit signed type */
 typedef short          i16_t;      /* 16 bit signed type */
 typedef long           i32_t;      /* 32 bit signed type */
 
-/* use of following is deprecated, a stopgap because some libraries use it */
-
-#ifndef _T_UCHAR
-#define _T_UCHAR
-   typedef unsigned char uchar;    /* 8 bit unsigned char */
-#endif
-
-#ifndef _T_UINT
-#define _T_UINT                    /* this is especially wrong, don't use */
-   typedef unsigned int uint;      /* 16 bit unsigned int */
-#endif
-
-/* this makes converting MINIX sources a little bit easier */
-
-#ifndef _PROTOTYPE
-#define _PROTOTYPE(x,y) x y
-#endif
-
-
-
-#endif /* _TYPES_H */
+#endif /* _SYS_TYPES_H */
