@@ -49,7 +49,7 @@
         inc hl
         ld (hl), d
 
-        ld hl, __CPU_CLOCK/__CPU_TIMER_SCALE/256-1  ; we do 256 ticks per second
+        ld hl, __CPU_CLOCK/__CPU_TIMER_SCALE/__CLOCKS_PER_SECOND-1  ; we do 256 ticks per second
         out0 (RLDR0L), l
         out0 (RLDR0H), h
 

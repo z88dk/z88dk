@@ -42,9 +42,6 @@
     inc hl
     ld  d,(hl)
     ld hl,__system_time
-    
-    ld bc,noints                    ; prepare ret for di
-    push bc
 
     ld a,i
     push af                         ; preserve interrupt status
@@ -58,9 +55,8 @@
     ld b,(hl)                       ; (__system_time_fraction)
 
     pop af                          ; restore interrupts
-    ret PO                          ; jr PO,noints -> no interrupts if di 
+    jp PO,noints                    ; jr PO,noints -> no interrupts if di 
     ei
-    pop hl                          ; discard unused jr on stack
 
 .noints
     push de                         ; preserve timespec.tv_nsec

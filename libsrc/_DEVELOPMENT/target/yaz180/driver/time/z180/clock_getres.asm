@@ -36,10 +36,10 @@
     ;                   nseconds_t  tv_nsec;}   /* and nanoseconds */
 
 .asm_clock_getres
-    ld  a,(hl)
+    ld a,(hl)
     inc hl
-    ld  l,(hl)
-    ld h,a                          ; get the address of the timespec
+    ld h,(hl)
+    ld l,a                          ; get the address of the timespec
 
     xor a                           ; yaz180 has 256 ticks per second
     ld (hl),a                       ; tv_sec 0x 00 00 00 00
