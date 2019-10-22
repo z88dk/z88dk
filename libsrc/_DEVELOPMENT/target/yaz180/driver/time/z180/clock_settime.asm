@@ -50,9 +50,9 @@
     ldi
     ld hl,__system_time_fraction
     ld (hl),0                       ; (__system_time_fraction) = 0
+    ld hl,0                         ; return null
 
     pop af                          ; restore interrupts
     ret PO                          ; return if di
     ei
     ret
-
