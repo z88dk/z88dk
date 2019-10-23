@@ -27,6 +27,7 @@ int stat(char *filename, struct stat *buf)
 	int inode;
 
     struct fcb *fc;
+    struct sfcb *sfc;
 
     //unsigned char uid,pad;
 
@@ -47,7 +48,6 @@ int stat(char *filename, struct stat *buf)
         return -1;
     }
 
-	buf->st_ctime=buf->st_mtime=buf->st_atime=0L;
 	buf->st_mode=0100777;	/* regular file flag, rwxrwxrwx */
 	
 	/* File size and block size, approx. at 128 bytes boundary */
@@ -72,6 +72,19 @@ int stat(char *filename, struct stat *buf)
 	
 	/* Links */
 	buf->st_nlink=0;
+
+
+	/* Date/Time */
+	if	(bdos(CPM_VERS,0) >= 0x30) {
+		sfc=fc;
+		bdos(102,sfc); /* read file date stamps and password mode */
+		buf->st_mtime=(long)(sfc->date+2921)*86400L+(long)sfc->hours*3600L+(long)sfc->minutes*60L;
+		buf->st_ctime=buf->st_atime=(long)(sfc->c_date+2921)*86400L+(long)sfc->c_hours*3600L+(long)sfc->c_minutes*60L;
+	} else {
+		buf->st_ctime=buf->st_mtime=buf->st_atime=0L;
+	}
+	
+		
 
 	clearfcb(fc);
 	return 0;
