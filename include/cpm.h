@@ -57,6 +57,21 @@ struct fcb {
     u8_t    uid;            /* user id belonging to this file */
 };
 
+struct sfcb {
+    u8_t    drive;          /* drive code */
+    char    name[8];        /* file name */
+    char    ext[3];         /* file type */
+    u8_t    pwdmode;        /* Password mode (0=no pwd): bit 7-Read, bit 6-Write, bit 4-Delete */
+    char    filler[10];     /* not used */
+	int 	c_date;			/* Create or Access date/time (depends on settings) */
+	u8_t	c_hours;
+	u8_t	c_minutes;
+	int 	date;			/* Update date/time (days since January 1, 1978) */
+	u8_t	hours;
+	u8_t	minutes;
+};
+
+
 extern struct fcb  _fcb[MAXFILE];
 
 
