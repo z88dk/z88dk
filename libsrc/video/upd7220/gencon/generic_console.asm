@@ -13,6 +13,7 @@
         EXTERN      CONSOLE_COLUMNS
         EXTERN      CONSOLE_ROWS
         EXTERN      __upd7220_attr
+        EXTERN      __upd7220_buffer
         EXTERN      __console_w
 
         INCLUDE     "video/upd7220/upd7220.inc"
@@ -121,10 +122,42 @@ generic_console_printc_3:
 
 
 __upd7220_scrollup:
+    di
     push    de
     push    bc
+    ld      b,24
+    ld      hl,(__console_w)    ;We start from row 1
+    ld      h,0
+scroll_1:
+    push    bc
+
+    push    hl      ;Save cursor
+    call    CURS2
+
+    ld      a,(__console_w)
+    ld      b,a
+    ld      de,__upd7220_buffer
+    call    READBLOCK
+    pop     hl
+    push    hl
+    ld      de,(__console_w)
+    ld      d,0
+    and     a
+    sbc     hl,de
+    call    CURS2
+    ld      b,e
+    ld      de,__upd7220_buffer
+    call    WRITEBLOCK
+    pop     hl
+    ld      de,(__console_w)
+    ld      d,0
+    add     hl,de
+    pop     bc
+    djnz    scroll_1
+
     pop     bc
     pop     de
+    ei
     ret
 
 
@@ -135,9 +168,7 @@ CURS2:
 write_2_command:
     out     (UPD_7220_COMMAND_WRITE),a
     ld      bc,UPD_7220_PARAMETER_WRITE
-    call    ckstatus
     out     (c),l
-    call    ckstatus
     out     (c),h
     ret
 
@@ -157,6 +188,46 @@ ckread:
     and     1
     jr      z,ckstatus
     ret
+
+
+; Entry: de = address
+;         b = length
+READBLOCK:
+    call    ckstatus
+    ld      c,UPD_7220_PARAMETER_WRITE
+    ld      a,UPD7220_COMMAND_FIGS
+    out     (UPD_7220_COMMAND_WRITE),a
+    ld      a,2
+    out     (c),a       ;Left to right direction
+    out     (c),b       ;width
+    xor     a
+    out     (c),a
+    call    ckstatus
+    ld      a,UPD7220_COMMAND_RDAT
+    out     (UPD_7220_COMMAND_WRITE),a
+    ex      de,hl
+    ld      c,UPD_7220_FIFO_READ
+    sla     b
+READBLOCK_1:
+    call    ckread
+    ini
+    jr      nz,READBLOCK_1
+    ret
+
+WRITEBLOCK:
+    call    ckstatus
+    ld      a,UPD7220_COMMAND_WDAT
+    out     (UPD_7220_COMMAND_WRITE),a
+    ex      de,hl
+    ld      c,UPD_7220_PARAMETER_WRITE
+    sla     b
+WRITEBLOCK_1:
+    call    ckstatus
+    outi
+    jr      nz,WRITEBLOCK_1
+    ret
+
+
 
 RDAT:
     ld      a,UPD7220_COMMAND_FIGS

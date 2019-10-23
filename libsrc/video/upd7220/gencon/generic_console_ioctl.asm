@@ -56,8 +56,6 @@ check_mode:
 set_mode:
         ld      a,l
         ld      (__console_w),a
-        ld      a,UPD7220_COMMAND_BCTRL ;disable screen
-        out     (UPD_7220_COMMAND_WRITE),a
         ld      a,h
         out     (A5105_SCREEN_MODE),a
         ex      de,hl
@@ -93,30 +91,30 @@ write_command:
     SECTION     rodata_clib
 
 BS80COL:
-	DEFB	UPD7220_COMMAND_SYNC	;40 Zeichen pro Zeile 200 FS-Zeilen
+	DEFB	UPD7220_COMMAND_SYNC
 	DEFB	8
-	DEFB	14H
-	DEFB	26H             ;40 column mode
-	DEFB	0C1H
-	DEFB	13H
-	DEFB	0CH
-	DEFB	29H
+	DEFB	$14
+	DEFB	$4e             ;80 column mode
+	DEFB	$C1
+	DEFB	$13
+	DEFB	$0C
+	DEFB	$29
 	DEFB	$fa     ; 0C8H
 	DEFB	$2c     ; 0A4H
 	DEFB	UPD7220_COMMAND_PITCH
 	DEFB	1
 	DEFB	80
 
-; This recent sequence was lifted from the BIC ROM
+; This reset sequence was lifted from the BIC ROM
 BS40COL:
-	DEFB	UPD7220_COMMAND_SYNC	;40 Zeichen pro Zeile 200 FS-Zeilen
+	DEFB	UPD7220_COMMAND_SYNC
 	DEFB	8
-	DEFB	14H
-	DEFB	4EH             ;80 column mode
-	DEFB	0C1H
-	DEFB	13H
-	DEFB	0CH
-	DEFB	29H
+	DEFB	$14
+	DEFB	$26             ;40 column mode
+	DEFB	$C1
+	DEFB	$13
+	DEFB	$0c
+	DEFB	$29
 	DEFB	$fa     ; 0C8H
 	DEFB	$2c     ; 0A4H
 	DEFB	UPD7220_COMMAND_PITCH
