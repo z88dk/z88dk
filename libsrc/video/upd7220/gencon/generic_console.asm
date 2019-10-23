@@ -154,6 +154,17 @@ scroll_1:
     add     hl,de
     pop     bc
     djnz    scroll_1
+    and     a
+    sbc     hl,de
+    call    CURS2
+    ld      b,e
+scroll_2:
+    push    bc
+    ld      hl,(__upd7220_attr-1)
+    ld      l,' '
+    call    WDAT2
+    pop     bc
+    djnz    scroll_2
 
     pop     bc
     pop     de
