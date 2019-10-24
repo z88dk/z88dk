@@ -18,7 +18,12 @@
 #include <cpm.h>
 #include <stdio.h>
 #include <fcntl.h>
+#include <time.h>
 
+time_t doepoch(int days, int hours, int minutes)
+{
+        return ((long)(days+2921)*86400L+(long)hours*3600L+(long)minutes*60L);
+}
 
 
 int stat(char *filename, struct stat *buf)
@@ -75,16 +80,14 @@ int stat(char *filename, struct stat *buf)
 
 
 	/* Date/Time */
+	buf->st_ctime=buf->st_mtime=buf->st_atime=0L;
 	if	(bdos(CPM_VERS,0) >= 0x30) {
 		sfc=fc;
-		bdos(102,sfc); /* read file date stamps and password mode */
-		buf->st_mtime=(long)(sfc->date+2921)*86400L+(long)sfc->hours*3600L+(long)sfc->minutes*60L;
-		buf->st_ctime=buf->st_atime=(long)(sfc->c_date+2921)*86400L+(long)sfc->c_hours*3600L+(long)sfc->c_minutes*60L;
-	} else {
-		buf->st_ctime=buf->st_mtime=buf->st_atime=0L;
+		if (bdos(102,sfc)!=0) { /* read file date stamps and password mode */
+			buf->st_mtime=doepoch(sfc->date,sfc->hours,sfc->minutes);
+			buf->st_ctime=buf->st_atime=doepoch(sfc->c_date,sfc->c_hours,sfc->c_minutes);
+		}
 	}
-	
-		
 
 	clearfcb(fc);
 	return 0;
