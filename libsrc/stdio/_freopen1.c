@@ -37,6 +37,7 @@ FILE *_freopen1(const char* name, int fd, const char* mode, FILE* fp)
         mode++;
         if (access == O_RDONLY) {
             access = O_RDWR;
+			flags = _IOWRITE | _IOUSE | _IOTEXT;
         } else if (access & O_TRUNC) {  // 'w'
             access = O_RDWR | O_TRUNC | O_CREAT;
         } else {
