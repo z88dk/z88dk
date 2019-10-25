@@ -38,7 +38,9 @@ IF __CPU_INTEL__ || __CPU_GBZ80__
     ld      a,(de)	;de = &fp_flags get flags
     and     a
     ret     z
-    and     _IOWRITE | _IOEOF	;check we`re not write/EOF
+	;	Check removed to allow READ+WRITE streams
+    ;and     _IOWRITE | _IOEOF	;check we`re not write/EOF
+	and     _IOEOF	;check we`re not write/EOF
   IF __CPU_GBZ80__
     jr      nz,fgetc_assign_ret
   ELSE
@@ -142,7 +144,9 @@ ELSE
     ld      a,(ix+fp_flags)	;get flags
     and     a
     jp      z, is_eof
-    and     _IOWRITE | _IOEOF	;check we`re not write/EOF
+	;	Check removed to allow READ+WRITE streams
+    ;and     _IOWRITE | _IOEOF	;check we`re not write/EOF
+	and     _IOEOF	;check we`re not write/EOF
     jp      nz, is_eof
     ld      a,(ix+fp_ungetc)	;check for ungot char
     and     a
