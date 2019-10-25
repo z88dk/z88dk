@@ -5,7 +5,7 @@
  *	1	SEEK_CUR from current position
  *	2	SEEK_END from end of file (always -ve)
  *
- *	$Id: lseek.c,v 1.6 2013-06-06 08:58:32 stefano Exp $
+ *	$Id: lseek.c $
 */
 
 #include <fcntl.h>
@@ -38,10 +38,11 @@ long lseek(int fd,long posn, int whence)
 		pos = fc->rwptr-1;
 		break;
 	}
-	if(pos >= 0L) {
-		fc->rwptr = pos;
-		return fc->rwptr;
-	}
-	return -1;
-}
 
+	if (pos < 0L)
+		return -1;
+	
+	fc->rwptr = pos;
+	return fc->rwptr;
+	
+}
