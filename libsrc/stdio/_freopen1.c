@@ -4,7 +4,7 @@
  * djm 1/4/2000
  *
  * --------
- * $Id: freopen.c,v 1.3 2016-06-13 19:56:40 dom Exp $
+ * $Id: freopen.c $
  */
 
 #define ANSI_STDIO
@@ -37,9 +37,10 @@ FILE *_freopen1(const char* name, int fd, const char* mode, FILE* fp)
         mode++;
         if (access == O_RDONLY) {
             access = O_RDWR;
-			flags = _IOWRITE | _IOUSE | _IOTEXT;
+			flags = _IOREAD | _IOWRITE | _IOUSE | _IOTEXT;
         } else if (access & O_TRUNC) {  // 'w'
             access = O_RDWR | O_TRUNC | O_CREAT;
+			flags = _IOREAD | _IOWRITE | _IOUSE | _IOTEXT;
         } else {
             access = O_RDWR | O_CREAT;
         }
