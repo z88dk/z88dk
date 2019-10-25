@@ -4,7 +4,7 @@
  *      djm 4/5/99
  *
  * --------
- * $Id: fputc_callee.c,v 1.5 2016-03-06 21:36:52 dom Exp $
+ * $Id: fputc_callee.c $
  */
 
 
@@ -67,8 +67,11 @@ asm_fputc_callee:
 	ld	a,(ix+fp_flags)
 	and	a	;no thing
 	ret	z
-	and	_IOREAD
-	ret	nz	;don`t want reading streams
+
+;	Check removed to allow READ+WRITE streams 
+;	and	_IOREAD
+;	ret	nz	;don`t want reading streams
+
 	ld	a,(ix+fp_flags)
 	and	_IOSTRING
 	jr	z,no_string
