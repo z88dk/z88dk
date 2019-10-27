@@ -1532,7 +1532,8 @@ int main (int argc, char **argv){
           long long savest = st;
           ff&=~256;  // Clear carry
           SBCHLRR(b,c);
-          st += 10;
+		  st = savest;
+		  st += 10;
           break;
         } else if ( is8080()) {
           printf("%04x: ILLEGAL 8080 opcode EX AF,AF\n",pc-1);
@@ -2951,7 +2952,10 @@ int main (int argc, char **argv){
         }
         break;
       case 0xcb: // OP CB
-        if ( is808x() ) {
+		if (is8085()) {		// (8085) RSTV, OVRST8
+		  // V flag is bit 1 of flags (not emulated since we don't use it)
+		  st += 6;
+		} else if ( is808x() ) {
           printf("%04x: ILLEGAL 8080 prefix 0xCB\n",pc-1);
           st+= isez80() ? 4 : israbbit() ? 3 : israbbit() ? 7 : isz180() ? 9 : 10;
           mp= pc= get_memory(pc) | get_memory(pc+1)<<8;
