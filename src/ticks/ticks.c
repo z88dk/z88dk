@@ -646,7 +646,7 @@ int main (int argc, char **argv){
   tapbuf= (unsigned char *) malloc (0x20000);
   if( argc==1 )
     printf("Ticks v0.14c beta, a silent Z80 emulator by Antonio Villena, 10 Jan 2013\n\n"),
-    printf("  ticks <input_file> [-pc X] [-start X] [-end X] [-counter X] [-output <file>]\n\n"),
+    printf("  ticks [-pc X] [-start X] [-end X] [-counter X] [-output <file>] <input_file>\n\n"),
     printf("  <input_file>   File between 1 and 65536 bytes with Z80 machine code\n"),
     printf("  -tape <file>   emulates ZX tape in port $FE from a .WAV file\n"),
     printf("  -trace         outputs register values and disassembly while executing\n"),
