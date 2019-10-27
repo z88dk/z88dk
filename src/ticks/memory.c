@@ -52,7 +52,10 @@ uint8_t get_memory(int pc)
 
 uint8_t put_memory(int pc, uint8_t b)
 {
-  return *get_memory_addr(pc) = b;
+  if (pc < rom_size)
+    return *get_memory_addr(pc);
+  else
+    return *get_memory_addr(pc) = b;
 }
 
 uint8_t *get_memory_addr(int pc)

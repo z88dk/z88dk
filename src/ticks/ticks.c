@@ -571,7 +571,7 @@ char   cmd_arguments[255];
 int    cmd_arguments_len = 0;
 
 int    c_cpu = CPU_Z80;
-
+int    rom_size = 0;
 
 static const uint8_t mirror_table[] = {
     0x0, 0x8, 0x4, 0xC,  /*  0-3  */
@@ -670,7 +670,8 @@ int main (int argc, char **argv){
     printf("  -x <file>      Symbol file to read\n"),
     printf("  -ide0 <file>   Set file to be ide device 0\n"),
     printf("  -ide1 <file>   Set file to be ide device 1\n"),
-    printf("  -output <file> dumps the RAM content to a 64K file\n\n"),
+    printf("  -output <file> dumps the RAM content to a 64K file\n"),
+    printf("  -rom X         write-protect memory, X in hexadecimal is first RAM address\n\n"),
     printf("  Default values for -pc, -start and -end are 0000 if ommited. When the program "),
     printf("exits, it'll show the number of cycles between start and end trigger in decimal\n\n"),
     exit(0);
@@ -692,6 +693,9 @@ int main (int argc, char **argv){
           break;
         case 'e':
           end= strtol(argv[1], NULL, 16);
+          break;
+        case 'r':
+          rom_size= strtol(argv[1], NULL, 16);
           break;
         case 'i':
           if ( strcmp(&argv[0][1], "ide0") == 0 ) {
