@@ -23,7 +23,7 @@
         } while (0)
           
 #define LDRIM(r)                \
-          st += isez80() ? 2 : israbbit() ? 2 : isz180() ? 6 : isgbz80() ? 8 :  7, \
+          st += isez80() ? 2 : israbbit() ? 4 : isz180() ? 6 : isgbz80() ? 8 :  7, \
           r= get_memory(pc++)
 
 #define LDRRIM(a, b)            \
@@ -32,7 +32,7 @@
           a= get_memory(pc++)
 
 #define LDRP(a, b, r)           \
-          st += isez80() ? 2 : israbbit() ? (&a == &h) ? 2 : 6 : isgbz80() ? 8 : 7, \
+          st += isez80() ? 2 : israbbit() ? (&a == &h) ? 5 : 6 : isgbz80() ? 8 : isz180() ? 6 : 7, \
           r= get_memory(mp= b|a<<8),   \
           ++mp
 
@@ -53,7 +53,7 @@
           mp= b+1&255 | a<<8
 
 #define LDPRI(a, b, r)          \
-          st += isez80() ? 3 : israbbit() ? 11 : 15, \
+          st += isez80() ? 3 : israbbit() ? 8 : isz180() ? 12 : 15, \
           put_memory(((get_memory(pc++)^128)-128+(b|a<<8))&65535,r)
 
 // ld r,r'
@@ -70,27 +70,27 @@
           put_memory(mp= t+1,a)
 
 #define LDPIN(a, b)             \
-          st+= 15,              \
+          st+= isez80() ? 4 : israbbit() ? 9 : isz180() ? 12 : 15,              \
           t= get_memory(pc++),         \
           put_memory(((t^128)-128+(b|a<<8))&65535, get_memory(pc++))
 
 #define INCW(a, b)              \
-          st +=isez80() ? 1 : israbbit() ? 2 : isgbz80() ? 8 : 6, \
+          st += isez80() ? 1 : israbbit() ? 2 : isgbz80() ? 8 : is8080() ? 5 : 6, \
           ++b || a++
 
 #define DECW(a, b)              \
-          st += isez80() ? 1 : israbbit() ? 2 : isgbz80() ? 8 :  6, \
+          st += isez80() ? 1 : israbbit() ? 2 : isgbz80() ? 8 : is8080() ? 5 : 6, \
           b-- || a--
 
 // TODO: Should affect alternate flags if altd
 #define INC(r)                  \
-          st +=isez80() ? 1 : israbbit() ? 2 : 4, \
+          st +=isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : 4, \
           ff= ff&256            \
             | (fr= r= (fa= r)+(fb= 1))
 
 // TODO: Should affect alternate flags if altd
 #define DEC(r)                  \
-          st +=isez80() ? 1 : israbbit() ? 2 : 4, \
+          st +=isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : 4, \
           ff= ff&256            \
             | (fr= r= (fa= r)+(fb= -1))
 
@@ -155,7 +155,7 @@
           a= get_memory(mp= t+1)
 
 #define ADDISP(a, b)            \
-          st+= isez80() ? 1 : 11,              \
+          st+= isez80() ? 1 : is808x() ? 10 : 11,              \
           v= sp+(b|a<<8),       \
           ff= ff  &128          \
             | v>>8&296,         \
@@ -265,19 +265,19 @@
 
 #define RETC(c)                 \
           if(c)                 \
-            st+= isez80() ? 2 : israbbit() ? 2 : is8085() ? 6 : isgbz80() ? 8 : 5;             \
+            st+= isez80() ? 2 : israbbit() ? 2 : is8080() ?  5 : is8085() ?  6 : isgbz80() ?  8 :  5;             \
           else                  \
-            st+= isez80() ? 6 :  israbbit() ? 8 : is8085() ? 12 : isgbz80() ? 20 : 11,            \
+            st+= isez80() ? 6 : israbbit() ? 8 : is8080() ? 11 : is8085() ? 12 : isgbz80() ? 20 : 11,            \
             mp= get_memory(sp++),      \
             pc= mp|= get_memory(sp++)<<8
 
 #define RETCI(c)                \
           if(c)                 \
-            st+= isez80() ? 6 :israbbit() ? 8 : is8085() ? 12 : isgbz80() ? 20 : 11,            \
+            st+= isez80() ? 6 : israbbit() ? 8 : is8080() ? 11 : is8085() ? 12 : isgbz80() ? 20 : 11,            \
             mp= get_memory(sp++),      \
             pc= mp|= get_memory(sp++)<<8; \
           else                  \
-            st+= isez80() ? 2 : israbbit() ? 2 : is8085() ? 6 : isgbz80() ? 8 : 5
+            st+= isez80() ? 2 : israbbit() ? 2 : is8080() ?  5 : is8085() ?  6 : isgbz80() ?  8 :  5
 
 #define PUSH(a, b)              \
           st+= isez80() ? 3 :israbbit() ? 10 : is8085() ? 12 : isgbz80() ? 16 : 11,              \
@@ -300,7 +300,7 @@
 #define JPCI(c)                 \
           st+= isez80() ? 3 : israbbit() ? 7 : isz180() ? 6 : is8085() ? 7 : isgbz80() ? 12 : 10;              \
           if(c)                 \
-            st += isez80() ? 1 : isz180() ? 3 : is8080() ? 3 : isgbz80() ? 4 : 0,  \
+            st += isez80() ? 1 : isz180() ? 3 : is8085() ? 3 : isgbz80() ? 4 : 0,  \
             pc= get_memory(pc) | get_memory(pc+1)<<8; \
           else                  \
             pc+= 2
@@ -788,7 +788,7 @@ int main (int argc, char **argv){
             exit(-1);
           }
           break;
-        case '-':
+		case '-':
           while ( argc > 1 ) {
             // I think windows is now comformant with snprintf? Either way, we can't grow the arugment buffer...
             cmd_arguments_len += snprintf(cmd_arguments + cmd_arguments_len, sizeof(cmd_arguments) - cmd_arguments_len, "%s%s",cmd_arguments_len > 0 ? " " : "", argv[1]);
@@ -985,14 +985,14 @@ int main (int argc, char **argv){
         if ( altd ) { l_ = l; st += 2; break; }
       case 0x7f: // LD A,A
         if ( altd ) { a_ = a; st += 2; break; }
-        st+= israbbit() ? 2 : 4;
+        st+= israbbit() ? 2 : is8080() ? 5 : 4;
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x76: // HALT
         if ( israbbit()) {
           altd = 1;
           st += 2;
         } else {
-          st+= 4;
+          st+= is8080() ? 7 : is8085() ? 5 : 4;
           halted= 1;
           pc--;
           altd=0;ioi=0;ioe=0;
@@ -1123,7 +1123,7 @@ int main (int argc, char **argv){
           INCW(xh, xl);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x33: // INC SP
-        st+= isez80() ? 1 : isgbz80() ? 8 : 6;
+        st+= isez80() ? 1 : isgbz80() ? 8 : is8080() ? 5 : 6;
         sp++;
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x0b: // DEC BC
@@ -1144,7 +1144,7 @@ int main (int argc, char **argv){
           DECW(xh, xl);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x3b: // DEC SP
-        st+= isez80() ? 1 : isgbz80() ? 8 : 6;
+        st+= isez80() ? 1 : isgbz80() ? 8 : is8080() ? 5 : 6;
         sp--;
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x04: // INC B
@@ -1275,7 +1275,7 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x36: // LD (HL),n // LD (IX+d),n // LD (IY+d),n
         if( ih )
-          st+= israbbit() ? 7 : isgbz80() ? 12 : 10,
+          st+= israbbit() ? 7 : isgbz80() ? 12 : isz180() ? 9 : 10,
           put_memory(l|h<<8,get_memory(pc++));
         else if( iy )
           LDPIN(yh, yl);
@@ -1754,7 +1754,7 @@ int main (int argc, char **argv){
         LDRR(c, d, c_,isez80() ? 1 : israbbit() ? 2 : is8080() ? 5 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x4b: // LD C,E
-        LDRR(c, e,c_, israbbit() ? 2 : 4);
+        LDRR(c, e,c_, israbbit() ? 2 : is8080() ? 5 : 4);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x4c: // LD C,H // LD C,IXh // LD C,IYh
         if( ih )
@@ -2780,7 +2780,7 @@ int main (int argc, char **argv){
           ioi=1;
           st+=2;
         } else {
-          st+= 11;
+          st+= is808x() ? 10 : 11;
           out(mp= get_memory(pc++) | a<<8, a);
           mp= mp&65280
             | ++mp;
@@ -2794,7 +2794,7 @@ int main (int argc, char **argv){
           ioe=1;
           st+=2;
         } else {
-          st+= 11;
+          st+= is808x() ? 10 : 11;
           a= in(mp= get_memory(pc++) | a<<8);
           ++mp;
           ih=1;altd=0;ioi=0;ioe=0;
