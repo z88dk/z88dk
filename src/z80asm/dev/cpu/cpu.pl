@@ -10,6 +10,7 @@
 
 use Modern::Perl;
 use Text::Table;
+use Path::Tiny;
 use warnings FATAL => 'uninitialized'; 
 use Carp (); 
 $SIG{__DIE__} = \&Carp::confess;
@@ -1224,8 +1225,8 @@ for my $cpu (sort @CPUS) {
 # build table with assembly  per cpu
 my %by_opcode;
 
-my @title = (\"|", "", \"|");
-for (sort @CPUS) { push @title, $_, \"|"; }
+my @title = ("; Assembly");
+for (sort @CPUS) { push @title, \"|", $_; }
 my $tb = Text::Table->new(@title);
 for my $asm (sort keys %Opcodes) {
 	my @c_range = (1);
@@ -1276,12 +1277,13 @@ for my $asm (sort keys %Opcodes) {
 			}
 		}
 		$tb->add(span_cells(@row));
+		$tb->add(" " x scalar(@row));
 		#say "@row";
 	}
 }
 
-(my $asm_file = $0) =~ s/\.pl$/_asm.txt/i;
-write_table($tb, $asm_file);
+my $asm_file = path(path($0)->dirname, "opcodes_by_asm.csv");
+$asm_file->spew_raw($tb->table);
 
 # build table with opcodes per CPU
 $tb = Text::Table->new(@title);
@@ -1292,11 +1294,12 @@ for my $opcode (sort keys %by_opcode) {
 		$row[$column] = $by_opcode{$opcode}{$cpu};
 	}
 	$tb->add(span_cells(@row));
+	$tb->add(" " x scalar(@row));
 	#say "@row";
 }
 
-(my $opcode_file = $0) =~ s/\.pl$/_opcodes.txt/i;
-write_table($tb, $opcode_file);
+my $opcode_file = path(path($0)->dirname, "opcodes_by_bytes.csv");
+$opcode_file->spew_raw($tb->table);
 
 #------------------------------------------------------------------------------
 # build %Parser
@@ -1932,24 +1935,9 @@ sub span_cells {
 		for my $j ($i + 1 .. $#row) {
 			last if $row[$i] =~ /^\s*$/;
 			last if $row[$i] ne $row[$j];
-			$row[$j] = "==";
+			$row[$j] = "~";
 		}
 	}
 
 	return @row;
-}
-
-sub write_table {
-	my($tb, $file) = @_;
-	
-	open(my $fh, ">", $file) or die "open $file: $!\n";
-	my $BY_ROWS = 50000;
-	for (my $row = 1; $row < $tb->height; $row += $BY_ROWS) {
-		print $fh $tb->rule('-', '+'), 
-				  $tb->title, 
-				  $tb->rule('-', '+'), 
-				  $tb->table($row, $BY_ROWS);
-	}
-	print $fh $tb->rule('-', '+');
-	close $fh;
 }
