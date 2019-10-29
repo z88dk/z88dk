@@ -68,7 +68,7 @@ setup:
 
 
 bin/zsdcc$(EXESUFFIX):
-	svn checkout -r 11311 svn://svn.code.sf.net/p/sdcc/code/trunk/sdcc -q $(SDCC_PATH)
+	svn checkout -r 11311 https://svn.code.sf.net/p/sdcc/code/trunk/sdcc -q $(SDCC_PATH)
 	cd $(SDCC_PATH) && patch -p0 < $(Z88DK_PATH)/src/zsdcc/sdcc-z88dk.patch
 	cd $(SDCC_PATH) && CC=$(OCC) ./configure \
 		--disable-ds390-port --disable-ds400-port \
