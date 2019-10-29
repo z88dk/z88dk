@@ -55,6 +55,7 @@ struct fcb {
     unsigned long    rwptr;          /* read/write pointer in bytes */
     u8_t    use;            /* use flag */
     u8_t    uid;            /* user id belonging to this file */
+    u8_t    mode;           /* TEXT/BINARY discrimination */
 };
 
 struct sfcb {
