@@ -44,7 +44,7 @@ SECTION code_crt_init
     out0    (BBR),a
 
                             ; we do 256 ticks per second
-    ld      hl,__CPU_CLOCK/__CPU_TIMER_SCALE/256-1 
+    ld      hl,__CPU_CLOCK/__CPU_TIMER_SCALE/__CLOCKS_PER_SECOND-1 
     out0    (RLDR0L),l
     out0    (RLDR0H),h
                             ; enable down counting and interrupts for PRT0

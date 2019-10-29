@@ -628,17 +628,23 @@ push de
         ld      hl,param_buffer
         ld      a,(__console_y)
         add     a,(hl)
-        inc     a
-        ld      hl,__console_h
-        cp      (hl)
-        jp      p,B_ok
+        push    bc
+        push    af
         ld      a,(__console_h)
-.B_ok
+        ld      b,a
+        pop     af
+        inc     b
+        cp      b
+        pop     bc
+        jp      p, no_B_FWD
+        ld      (__console_y),a
+        jp      f_cmd_exit
+.no_B_FWD
+        ld      a,(__console_h)
         dec     a
         ld      (__console_y),a
         jp      f_cmd_exit
 .no_B
-
 
 ;%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ;%% s - j %%%%%%%%%%%%%%%%%%%%

@@ -41,6 +41,8 @@
 
 #define __CPU_CLOCK  36864000
 
+#define __CLOCKS_PER_SECOND 256
+
 #define __IO_BASE_ADDRESS 0x0
 
 #define __BIOS_SP   0xFFDE

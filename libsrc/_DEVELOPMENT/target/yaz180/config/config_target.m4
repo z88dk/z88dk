@@ -14,6 +14,10 @@ define(`__YAZ180', 1)
 
 define(`__CPU_CLOCK', 36864000)
 
+# Frequency of PRT0 if configured as per normal
+
+define(`__CLOCKS_PER_SECOND', 256)
+
 # I/O BASE ADDRESS OF INTERNAL PERIPHERALS
 
 define(`__IO_BASE_ADDRESS', 0x00)
@@ -78,6 +82,8 @@ PUBLIC `__YAZ180'
 
 PUBLIC `__CPU_CLOCK'
 
+PUBLIC `__CLOCKS_PER_SECOND'
+
 PUBLIC `__IO_BASE_ADDRESS'
 
 PUBLIC `__BIOS_SP'
@@ -115,6 +121,8 @@ ifdef(`CFG_ASM_DEF',
 defc `__YAZ180' = __YAZ180
 
 defc `__CPU_CLOCK' = __CPU_CLOCK
+
+defc `__CLOCKS_PER_SECOND' = __CLOCKS_PER_SECOND
 
 defc `__IO_BASE_ADDRESS' = __IO_BASE_ADDRESS
 
@@ -154,6 +162,8 @@ ifdef(`CFG_C_DEF',
 `#define' `__YAZ180'  __YAZ180
 
 `#define' `__CPU_CLOCK'  __CPU_CLOCK
+
+`#define' `__CLOCKS_PER_SECOND' __CLOCKS_PER_SECOND
 
 `#define' `__IO_BASE_ADDRESS' __IO_BASE_ADDRESS
 
