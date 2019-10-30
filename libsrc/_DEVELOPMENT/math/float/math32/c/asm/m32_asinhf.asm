@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.9.1 #11310 (Linux)
+; Version 3.9.4 #11423 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -303,14 +303,12 @@ _m32_asinhf:
 	ld	l,(ix-4)
 	ld	h,(ix-3)
 	call	_m32_sqrf
-	ld	c, l
-	ld	b, h
-	ld	hl,0x3f80
-	push	hl
-	ld	hl,0x0000
-	push	hl
-	push	de
+	ld	bc,0x3f80
 	push	bc
+	ld	bc,0x0000
+	push	bc
+	push	de
+	push	hl
 	call	___fsadd_callee
 	call	_m32_sqrtf
 	ld	(ix-8),l

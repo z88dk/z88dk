@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.9.1 #11310 (Linux)
+; Version 3.9.4 #11423 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -286,7 +286,6 @@ _m32_atan2f:
 	ld	sp, hl
 	ld	hl,0x0000
 	push	hl
-	ld	hl,0x0000
 	push	hl
 	ld	l,(ix+6)
 	ld	h,(ix+7)
@@ -320,7 +319,6 @@ _m32_atan2f:
 	push	de
 	ld	hl,0x0000
 	push	hl
-	ld	hl,0x0000
 	push	hl
 	ld	l,(ix+10)
 	ld	h,(ix+11)
@@ -444,31 +442,25 @@ l_m32_atan2f_00117:
 	push	hl
 	ld	hl,0x0000
 	push	hl
-	ld	hl,0x0000
 	push	hl
 	call	___fslt_callee
 	ld	a, l
 	or	a, a
 	jr	Z,l_m32_atan2f_00114
-	ld	l,0xdb
-	ld	h,0x0f
-	ld	e,0xc9
-	ld	d,0x3f
+	ld	de,0x3fc9
+	ld	hl,0x0fdb
 	jr	l_m32_atan2f_00119
 l_m32_atan2f_00114:
 	ld	a,(ix-6)
 	or	a, a
 	jr	Z,l_m32_atan2f_00118
-	ld	l,0xdb
-	ld	h,0x0f
-	ld	e,0xc9
-	ld	d,0xbf
+	ld	de,0xbfc9
+	ld	hl,0x0fdb
 	jr	l_m32_atan2f_00119
 l_m32_atan2f_00118:
-	ld	l,0x00
-	ld	h,0x00
-	ld	e,0x00
-	ld	d,0x00
+	ld	hl,0x0000
+	ld	e,l
+	ld	d,h
 l_m32_atan2f_00119:
 	ld	sp, ix
 	pop	ix

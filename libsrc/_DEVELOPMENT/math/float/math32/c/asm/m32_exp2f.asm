@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.9.1 #11310 (Linux)
+; Version 3.9.4 #11423 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -296,10 +296,8 @@ _m32_exp2f:
 	or	a,(ix-7)
 	or	a,(ix-8)
 	jr	NZ,l_m32_exp2f_00102
-	ld	l,0x00
-	ld	h,0x00
-	ld	e,0x80
-	ld	d,0x3f
+	ld	de,0x3f80
+	ld	hl,0x0000
 	jp	l_m32_exp2f_00103
 l_m32_exp2f_00102:
 	ld	hl,0x3f00
