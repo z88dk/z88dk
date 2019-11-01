@@ -136,7 +136,7 @@
 
 #define JRCI(c)                 \
           if(c)                 \
-            st+= isez80() ? 3 : 12,            \
+            st+= isez80() ? 3 : isgbz80() ? 8 : 12,            \
             pc+= (get_memory(pc)^128)-127; \
           else                  \
             st+= isez80() ? 2 : isgbz80() ? 8 : 7,             \
@@ -147,7 +147,7 @@
             st+= isez80() ? 2 : isgbz80() ? 8 : 7,             \
             pc++;               \
           else                  \
-            st+= isez80() ? 3 : 12,            \
+            st+= isez80() ? 3 : isgbz80() ? 8 : 12,            \
             pc+= (get_memory(pc)^128)-127
 
 #define LDRRPNN(a, b, n)        \
@@ -157,7 +157,7 @@
           a= get_memory(mp= t+1)
 
 #define ADDISP(a, b)            \
-          st+= isez80() ? 1 : is808x() ? 10 : 11,              \
+          st+= isez80() ? 1 : is808x() ? 10 : isgbz80() ? 8 : 11,              \
           v= sp+(b|a<<8),       \
           ff= ff  &128          \
             | v>>8&296,         \
@@ -261,25 +261,25 @@
           fr&= 255
 
 #define RET(n)                  \
-          st+= n,               \
-          mp= get_memory(sp++),        \
+          st+= (n),             \
+          mp= get_memory(sp++), \
           pc= mp|= get_memory(sp++)<<8
 
 #define RETC(c)                 \
           if(c)                 \
-            st+= isez80() ? 2 : israbbit() ? 2 : is8080() ?  5 : is8085() ?  6 : isgbz80() ?  8 :  5;             \
+            st+= isez80() ? 2 : israbbit() ? 2 : is8080() ?  5 : is8085() ?  6 : isgbz80() ? 8 :  5;             \
           else                  \
-            st+= isez80() ? 6 : israbbit() ? 8 : is8080() ? 11 : is8085() ? 12 : isgbz80() ? 20 : 11,            \
+            st+= isez80() ? 6 : israbbit() ? 8 : is8080() ? 11 : is8085() ? 12 : isgbz80() ? 8 : 11,            \
             mp= get_memory(sp++),      \
             pc= mp|= get_memory(sp++)<<8
 
 #define RETCI(c)                \
           if(c)                 \
-            st+= isez80() ? 6 : israbbit() ? 8 : is8080() ? 11 : is8085() ? 12 : isgbz80() ? 20 : 11,            \
+            st+= isez80() ? 6 : israbbit() ? 8 : is8080() ? 11 : is8085() ? 12 : isgbz80() ? 8 : 11,            \
             mp= get_memory(sp++),      \
             pc= mp|= get_memory(sp++)<<8; \
           else                  \
-            st+= isez80() ? 2 : israbbit() ? 2 : is8080() ?  5 : is8085() ?  6 : isgbz80() ?  8 :  5
+            st+= isez80() ? 2 : israbbit() ? 2 : is8080() ?  5 : is8085() ?  6 : isgbz80() ? 8 :  5
 
 #define PUSH(a, b)              \
           st+= isez80() ? 3 :israbbit() ? 10 : is8085() ? 12 : isgbz80() ? 16 : 11,              \
@@ -296,13 +296,13 @@
           if(c)                 \
             pc+= 2;             \
           else                  \
-            st += isez80() ? 1 : isz180() ? 3 : is8085() ? 3 : isgbz80() ? 4 : 0,  \
+            st += isez80() ? 1 : isz180() ? 3 : is8085() ? 3 : 0,  \
             pc= get_memory(pc) | get_memory(pc+1)<<8
 
 #define JPCI(c)                 \
           st+= isez80() ? 3 : israbbit() ? 7 : isz180() ? 6 : is8085() ? 7 : isgbz80() ? 12 : 10;              \
           if(c)                 \
-            st += isez80() ? 1 : isz180() ? 3 : is8085() ? 3 : isgbz80() ? 4 : 0,  \
+            st += isez80() ? 1 : isz180() ? 3 : is8085() ? 3 : 0,  \
             pc= get_memory(pc) | get_memory(pc+1)<<8; \
           else                  \
             pc+= 2
@@ -312,7 +312,7 @@
             st+= isez80() ? 3 : isz180() ? 6 : is8085() ? 9 : is8080() ? 11 : isgbz80() ? 12 :10,            \
             pc+= 2;             \
           else                  \
-            st+= isez80() ? 6 : isz180() ? 16 : is8085() ? 18 : isgbz80() ? 24 : 17,            \
+            st+= isez80() ? 6 : isz180() ? 16 : is8085() ? 18 : isgbz80() ? 12 : 17,            \
             t= pc+2,            \
             mp= pc= get_memory(pc) | get_memory(pc+1)<<8, \
             put_memory(--sp,t>>8),    \
@@ -320,7 +320,7 @@
 
 #define CALLCI(c)               \
           if(c)                 \
-            st+= isez80() ? 6 : isz180() ? 16 : is8085() ? 18 : isgbz80() ? 24 : 17,            \
+            st+= isez80() ? 6 : isz180() ? 16 : is8085() ? 18 : isgbz80() ? 12 : 17,            \
             t= pc+2,            \
             mp= pc= get_memory(pc) | get_memory(pc+1)<<8, \
             put_memory(--sp,t>>8),    \
@@ -330,7 +330,7 @@
             pc+= 2
 
 #define RST(n)                  \
-          st+= isez80() ? 5 :israbbit() ? 8 : is8085() ? 12 :  11,              \
+          st+= isez80() ? 5 :israbbit() ? 8 : is8085() ? 12 : isgbz80() ? 32 : 11,              \
           put_memory(--sp,pc>>8),     \
           put_memory(--sp,pc),        \
           mp= pc= n
@@ -417,7 +417,7 @@
           fb= 0
 
 #define BITHL(n)                \
-          st += isez80() ? 3 : israbbit() ? 7 : isz180() ? 9 : 12, \
+          st += isez80() ? 3 : israbbit() ? 7 : isz180() ? 9 : isgbz80() ? 16 : 12, \
           t = get_memory(l | h<<8),     \
           ff= ff    & -256      \
             | mp>>8 &   40      \
@@ -1476,7 +1476,7 @@ int main (int argc, char **argv){
           printf("%04x: ILLEGAL 8080 opcode JR\n",pc-1);
           break;
         }
-        st+= isez80() ? 3 :12;
+        st+= isez80() ? 3 : isgbz80() ? 8 : 12;
         mp= pc+= (get_memory(pc)^128)-127;
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x20: // JR NZ,s8
@@ -1487,8 +1487,9 @@ int main (int argc, char **argv){
           printf("%04x: ILLEGAL 8080 opcode JR NZ\n",pc-1);
           st+=4;
           break;
-        }
-        JRCI(fr);
+		} else {
+          JRCI(fr);
+		}
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x28: // JR Z,s8
         if ( is8085() ) {  // (8085) ld de,hl+nn (LDHI)
@@ -1544,7 +1545,7 @@ int main (int argc, char **argv){
         } else if ( isgbz80() ) {  // ld (nn),sp
           mp= get_memory(pc++);
           put_memory(mp|= get_memory(pc++)<<8, sp);
-          put_memory(++mp,sp>>8); break;
+          put_memory(++mp,sp>>8); 
           st += 20;
           break;
         }
@@ -1576,8 +1577,10 @@ int main (int argc, char **argv){
           st += (-16 + 7); 
           break;
         } else if ( isgbz80() ) {  // STOP
+		  t = get_memory(pc++);    // collect and ignore 00 byte
           st += 4;
-          break;
+		  end = pc; // stop simulation
+		  break;
         }
         if( ( altd && --b_) || ( altd == 0 && --b) )
           st+= isez80() ? 4 :israbbit() ? 5 : 13,
@@ -2448,7 +2451,7 @@ int main (int argc, char **argv){
         }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xc9: // RET
-        RET(isez80() ? 5 : israbbit() ?  8 : isz180() ? 9 : isgbz80() ? 16 : 10);
+        RET(isez80() ? 5 : israbbit() ?  8 : isz180() ? 9 : isgbz80() ? 8 : 10);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xc0: // RET NZ
         RETCI(fr);
@@ -2463,7 +2466,13 @@ int main (int argc, char **argv){
         RETCI(ff&256);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xe0: // RET PO
-        RETC(fa&256?38505>>((fr^fr>>4)&15)&1:(fr^fa)&(fr^fb)&128);
+		if (isgbz80()) { // LDH (n),A - I/O
+		  t = get_memory(pc++);
+		  put_memory(0xFF00 + t, a);
+		  st+= 12;
+		} else {
+          RETC(fa&256?38505>>((fr^fr>>4)&15)&1:(fr^fa)&(fr^fb)&128);
+		}
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xe8: // RET PE
         if ( isgbz80()) {  // add sp,d
@@ -2474,11 +2483,17 @@ int main (int argc, char **argv){
         RETCI(fa&256?38505>>((fr^fr>>4)&15)&1:(fr^fa)&(fr^fb)&128);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xf0: // RET P
-        RETC(ff&128);
+  	    if (isgbz80()) { // LDH A, (n) - I/O
+		  t = get_memory(pc++);
+		  a = get_memory(0xFF00 + t);
+		  st+= 12;
+		} else {
+          RETC(ff&128);
+		}
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xf8: // RET M
         if ( isgbz80() ) {  // ld hl,sp+d
-          st += 16;
+          st += 12;
           t = (sp + (get_memory(pc++)^128)-128) & 0xffff;
           h = t / 256;
           l = t % 256;
@@ -2523,7 +2538,7 @@ int main (int argc, char **argv){
         PUSH(a, f());
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xc3: // JP nn
-        st+= isez80() ? 4 : israbbit() ? 3 : israbbit() ? 7 : isz180() ? 9 : 10;
+        st+= isez80() ? 4 : israbbit() ? 3 : israbbit() ? 7 : isz180() ? 9 : isgbz80() ? 12 : 10;
         mp= pc= get_memory(pc) | get_memory(pc+1)<<8;
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xc2: // JP NZ
@@ -2539,7 +2554,12 @@ int main (int argc, char **argv){
         JPCI(ff&256);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xe2: // JP PO
-        JPC(fa&256?38505>>((fr^fr>>4)&15)&1:(fr^fa)&(fr^fb)&128);
+		if (isgbz80()) { // LD (C), A - I/O
+		  put_memory(0xFF00+c,a);
+		  st+= 8;
+		} else {
+          JPC(fa&256?38505>>((fr^fr>>4)&15)&1:(fr^fa)&(fr^fb)&128);
+		}
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xea: // JP PE
         if ( isgbz80() ) {  // ld (nn),a
@@ -2554,8 +2574,13 @@ int main (int argc, char **argv){
         JPCI(fa&256?38505>>((fr^fr>>4)&15)&1:(fr^fa)&(fr^fb)&128);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xf2: // JP P
-        JPC(ff&128);
-        ih=1;altd=0;ioi=0;ioe=0;break;
+		if (isgbz80()) { // LD A, (C), A
+		  a= get_memory(0xFF00+c);
+		  st+= 8;
+		} else {
+          JPC(ff&128);
+        }
+		ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xfa: // JP M
         if (isgbz80()) {  // ld a,(nn)
           st+= 16;
@@ -2568,7 +2593,7 @@ int main (int argc, char **argv){
         JPCI(ff&128);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xcd: // CALL nn
-        st+= isez80() ? 5 : israbbit() ? 12 : isz180() ? 16 : is8085() ? 18 : isgbz80() ? 24 : 17;
+        st+= isez80() ? 5 : israbbit() ? 12 : isz180() ? 16 : is8085() ? 18 : isgbz80() ? 12 : 17;
         t= pc+2;
         mp= pc= get_memory(pc) | get_memory(pc+1)<<8;
         put_memory(--sp,t>>8);
@@ -2658,6 +2683,8 @@ int main (int argc, char **argv){
             h = get_memory(t+(l|h<<8) + 1);
             l = lt;
           }
+		} else if (isgbz80()) {
+		  printf("%04x: ILLEGAL gbz80 instruction E4\n", pc - 1);
         } else {
           CALLC(fa&256?38505>>((fr^fr>>4)&15)&1:(fr^fa)&(fr^fb)&128);
         }
@@ -2675,6 +2702,8 @@ int main (int argc, char **argv){
             OR2(xl, e);
           }
           st += 2;
+		} else if (isgbz80()) {
+		  printf("%04x: ILLEGAL gbz80 instruction EC\n", pc - 1);
         } else {
           CALLCI(fa&256?38505>>((fr^fr>>4)&15)&1:(fr^fa)&(fr^fb)&128);
         }
@@ -2694,6 +2723,8 @@ int main (int argc, char **argv){
             put_memory(addr,l);
             put_memory(addr + 1, h);
           }
+		} else if (isgbz80()) {
+		  printf("%04x: ILLEGAL gbz80 instruction F4\n", pc - 1);
         } else {
           CALLC(ff&128);
         }
@@ -2713,6 +2744,8 @@ int main (int argc, char **argv){
           }
           st = savest;
           st += 2;
+		} else if (isgbz80()) {
+		  printf("%04x: ILLEGAL gbz80 instruction FC\n", pc - 1);
         } else {
           CALLCI(ff&128);
         }
@@ -2850,7 +2883,7 @@ int main (int argc, char **argv){
           ih=1;altd=0;ioi=0;ioe=0;
           break;
         } else if ( isgbz80() ) {  // RETI
-          RET(16); break;
+          RET(isgbz80() ? 8 : 16); break;
         }
         st+= isez80() ? 1 : israbbit() ? 2 : isz180() ? 3 : 4;
         t = b;
@@ -2902,7 +2935,7 @@ int main (int argc, char **argv){
           pc= xl | xh<<8;
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xf9: // LD SP,HL
-        st+= isez80() ? 1 : israbbit() ? 2 : is8085() ? 6  : is8080() ? 5 : 4;
+        st+= isez80() ? 1 : israbbit() ? 2 : is8085() ? 6  : is8080() ? 5 : isgbz80() ? 8 : 4;
         if( ih )
           sp= l | h<<8;
         else if( iy )
