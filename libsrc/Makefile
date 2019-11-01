@@ -140,6 +140,7 @@ mbf32.lib:
 	@echo ''
 	$(MAKE) -C math/mbf32
 
+# math32 build - @feilipu
 math32.lib:
 	@echo ''
 	@echo '--- Building IEEE Single Precision Maths Library ---'
