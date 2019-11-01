@@ -159,6 +159,7 @@
                              |lxi hl, %m   |            |             |                       |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 22                           |             |            |ld (hl+), a  |                       |         |               |              |              
+                             |             |            |ld (hli), a  |                       |         |               |              |              
                              |             |            |ldi (hl), a  |                       |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 22 %m %m                     |ld (%m), hl  |~           |             |ld (%m), hl            |~        |~              |~             |~             
@@ -199,6 +200,7 @@
                              |dad hl       |            |             |                       |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 2A                           |             |            |ld a, (hl+)  |                       |         |               |              |              
+                             |             |            |ld a, (hli)  |                       |         |               |              |              
                              |             |            |ldi a, (hl)  |                       |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 2A %m %m                     |ld hl, (%m)  |~           |             |ld hl, (%m)            |~        |~              |~             |~             
@@ -232,6 +234,7 @@
                              |lxi sp, %m   |            |             |                       |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 32                           |             |            |ld (hl-), a  |                       |         |               |              |              
+                             |             |            |ld (hld), a  |                       |         |               |              |              
                              |             |            |ldd (hl), a  |                       |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 32 %m %m                     |ld (%m), a   |~           |             |ld (%m), a             |~        |~              |~             |~             
@@ -269,6 +272,7 @@
                              |dad sp       |            |             |                       |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 3A                           |             |            |ld a, (hl-)  |                       |         |               |              |              
+                             |             |            |ld a, (hld)  |                       |         |               |              |              
                              |             |            |ldd a, (hl)  |                       |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 3A %m %m                     |ld a, (%m)   |~           |             |ld a, (%m)             |~        |~              |~             |~             
@@ -794,10 +798,14 @@
                              |             |            |             |ld a', (hl)            |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 76 7E 23                     |             |            |             |altd ld a, (hl+)       |~        |               |              |              
+                             |             |            |             |altd ld a, (hli)       |         |               |              |              
                              |             |            |             |ld a', (hl+)           |         |               |              |              
+                             |             |            |             |ld a', (hli)           |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 76 7E 2B                     |             |            |             |altd ld a, (hl-)       |~        |               |              |              
+                             |             |            |             |altd ld a, (hld)       |         |               |              |              
                              |             |            |             |ld a', (hl-)           |         |               |              |              
+                             |             |            |             |ld a', (hld)           |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 76 7F                        |             |            |             |altd ld a, a           |~        |               |              |              
                              |             |            |             |ld a', a               |         |               |              |              
@@ -1740,8 +1748,10 @@
 76 D3 7E                     |             |            |             |altd ioi ld a, (hl)    |~        |               |              |              
                              |             |            |             |                       |         |               |              |              
 76 D3 7E 23                  |             |            |             |altd ioi ld a, (hl+)   |~        |               |              |              
+                             |             |            |             |altd ioi ld a, (hli)   |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 76 D3 7E 2B                  |             |            |             |altd ioi ld a, (hl-)   |~        |               |              |              
+                             |             |            |             |altd ioi ld a, (hld)   |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 76 D3 86                     |             |            |             |altd ioi add (hl)      |~        |               |              |              
                              |             |            |             |altd ioi add a, (hl)   |         |               |              |              
@@ -2140,8 +2150,10 @@
 76 DB 7E                     |             |            |             |altd ioe ld a, (hl)    |~        |               |              |              
                              |             |            |             |                       |         |               |              |              
 76 DB 7E 23                  |             |            |             |altd ioe ld a, (hl+)   |~        |               |              |              
+                             |             |            |             |altd ioe ld a, (hli)   |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 76 DB 7E 2B                  |             |            |             |altd ioe ld a, (hl-)   |~        |               |              |              
+                             |             |            |             |altd ioe ld a, (hld)   |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 76 DB 86                     |             |            |             |altd ioe add (hl)      |~        |               |              |              
                              |             |            |             |altd ioe add a, (hl)   |         |               |              |              
@@ -2983,9 +2995,11 @@
                              |mov m, a     |            |             |                       |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 77 23                        |ld (hl+), a  |~           |             |ld (hl+), a            |~        |~              |~             |~             
+                             |ld (hli), a  |            |             |ld (hli), a            |         |               |              |              
                              |ldi (hl), a  |            |             |ldi (hl), a            |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 77 2B                        |ld (hl-), a  |~           |             |ld (hl-), a            |~        |~              |~             |~             
+                             |ld (hld), a  |            |             |ld (hld), a            |         |               |              |              
                              |ldd (hl), a  |            |             |ldd (hl), a            |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 78                           |ld a, b      |~           |~            |~                      |~        |~              |~             |~             
@@ -3302,9 +3316,11 @@
                              |mov a, m     |            |             |                       |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 7E 23                        |ld a, (hl+)  |~           |             |ld a, (hl+)            |~        |~              |~             |~             
+                             |ld a, (hli)  |            |             |ld a, (hli)            |         |               |              |              
                              |ldi a, (hl)  |            |             |ldi a, (hl)            |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 7E 2B                        |ld a, (hl-)  |~           |             |ld a, (hl-)            |~        |~              |~             |~             
+                             |ld a, (hld)  |            |             |ld a, (hld)            |         |               |              |              
                              |ldd a, (hl)  |            |             |ldd a, (hl)            |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 7E E6 01                     |bit.a 0, (hl)|~           |             |                       |         |               |              |              
@@ -4543,10 +4559,14 @@ D3 76 7E                     |             |            |             |ioi altd 
                              |             |            |             |ioi ld a', (hl)        |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 D3 76 7E 23                  |             |            |             |ioi altd ld a, (hl+)   |~        |               |              |              
+                             |             |            |             |ioi altd ld a, (hli)   |         |               |              |              
                              |             |            |             |ioi ld a', (hl+)       |         |               |              |              
+                             |             |            |             |ioi ld a', (hli)       |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 D3 76 7E 2B                  |             |            |             |ioi altd ld a, (hl-)   |~        |               |              |              
+                             |             |            |             |ioi altd ld a, (hld)   |         |               |              |              
                              |             |            |             |ioi ld a', (hl-)       |         |               |              |              
+                             |             |            |             |ioi ld a', (hld)       |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 D3 76 86                     |             |            |             |ioi add a', (hl)       |~        |               |              |              
                              |             |            |             |ioi altd add (hl)      |         |               |              |              
@@ -4980,17 +5000,21 @@ D3 76 FD E4 00               |             |            |             |ioi altd 
 D3 77                        |             |            |             |ioi ld (hl), a         |~        |               |              |              
                              |             |            |             |                       |         |               |              |              
 D3 77 23                     |             |            |             |ioi ld (hl+), a        |~        |               |              |              
+                             |             |            |             |ioi ld (hli), a        |         |               |              |              
                              |             |            |             |ioi ldi (hl), a        |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 D3 77 2B                     |             |            |             |ioi ld (hl-), a        |~        |               |              |              
+                             |             |            |             |ioi ld (hld), a        |         |               |              |              
                              |             |            |             |ioi ldd (hl), a        |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 D3 7E                        |             |            |             |ioi ld a, (hl)         |~        |               |              |              
                              |             |            |             |                       |         |               |              |              
 D3 7E 23                     |             |            |             |ioi ld a, (hl+)        |~        |               |              |              
+                             |             |            |             |ioi ld a, (hli)        |         |               |              |              
                              |             |            |             |ioi ldi a, (hl)        |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 D3 7E 2B                     |             |            |             |ioi ld a, (hl-)        |~        |               |              |              
+                             |             |            |             |ioi ld a, (hld)        |         |               |              |              
                              |             |            |             |ioi ldd a, (hl)        |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 D3 86                        |             |            |             |ioi add (hl)           |~        |               |              |              
@@ -5905,10 +5929,14 @@ DB 76 7E                     |             |            |             |ioe altd 
                              |             |            |             |ioe ld a', (hl)        |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 DB 76 7E 23                  |             |            |             |ioe altd ld a, (hl+)   |~        |               |              |              
+                             |             |            |             |ioe altd ld a, (hli)   |         |               |              |              
                              |             |            |             |ioe ld a', (hl+)       |         |               |              |              
+                             |             |            |             |ioe ld a', (hli)       |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 DB 76 7E 2B                  |             |            |             |ioe altd ld a, (hl-)   |~        |               |              |              
+                             |             |            |             |ioe altd ld a, (hld)   |         |               |              |              
                              |             |            |             |ioe ld a', (hl-)       |         |               |              |              
+                             |             |            |             |ioe ld a', (hld)       |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 DB 76 86                     |             |            |             |ioe add a', (hl)       |~        |               |              |              
                              |             |            |             |ioe altd add (hl)      |         |               |              |              
@@ -6342,17 +6370,21 @@ DB 76 FD E4 00               |             |            |             |ioe altd 
 DB 77                        |             |            |             |ioe ld (hl), a         |~        |               |              |              
                              |             |            |             |                       |         |               |              |              
 DB 77 23                     |             |            |             |ioe ld (hl+), a        |~        |               |              |              
+                             |             |            |             |ioe ld (hli), a        |         |               |              |              
                              |             |            |             |ioe ldi (hl), a        |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 DB 77 2B                     |             |            |             |ioe ld (hl-), a        |~        |               |              |              
+                             |             |            |             |ioe ld (hld), a        |         |               |              |              
                              |             |            |             |ioe ldd (hl), a        |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 DB 7E                        |             |            |             |ioe ld a, (hl)         |~        |               |              |              
                              |             |            |             |                       |         |               |              |              
 DB 7E 23                     |             |            |             |ioe ld a, (hl+)        |~        |               |              |              
+                             |             |            |             |ioe ld a, (hli)        |         |               |              |              
                              |             |            |             |ioe ldi a, (hl)        |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 DB 7E 2B                     |             |            |             |ioe ld a, (hl-)        |~        |               |              |              
+                             |             |            |             |ioe ld a, (hld)        |         |               |              |              
                              |             |            |             |ioe ldd a, (hl)        |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 DB 86                        |             |            |             |ioe add (hl)           |~        |               |              |              
@@ -8631,8 +8663,8 @@ F8 %s                        |             |            |ld hl, sp+%s |         
                              |             |            |             |                       |         |               |              |              
 F8 00                        |             |            |ld hl, sp    |                       |         |               |              |              
                              |             |            |             |                       |         |               |              |              
-F9                           |ld sp, hl    |~           |ld sp, hl    |ld sp, hl              |~        |~              |~             |~             
-                             |sphl         |            |             |sphl                   |         |               |              |              
+F9                           |ld sp, hl    |~           |~            |~                      |~        |~              |~             |~             
+                             |sphl         |            |             |                       |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 FA %m %m                     |jm %m        |~           |ld a, (%m)   |jm %m                  |~        |~              |~             |~             
                              |jp m, %m     |            |lda %m       |jp m, %m               |         |               |              |              

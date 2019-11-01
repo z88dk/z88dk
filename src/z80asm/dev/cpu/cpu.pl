@@ -265,28 +265,36 @@ for my $cpu (@CPUS) {
 
 	if ($gameboy) {
 		add_opc($cpu, "ld (hl+), a", 0x22);
+		add_opc($cpu, "ld (hli), a", 0x22);
 		add_opc($cpu, "ldi (hl), a", 0x22);
 
 		add_opc($cpu, "ld a, (hl+)", 0x2A);
+		add_opc($cpu, "ld a, (hli)", 0x2A);
 		add_opc($cpu, "ldi a, (hl)", 0x2A);
 		
 		add_opc($cpu, "ld (hl-), a", 0x32);
+		add_opc($cpu, "ld (hld), a", 0x32);
 		add_opc($cpu, "ldd (hl), a", 0x32);
 		
 		add_opc($cpu, "ld a, (hl-)", 0x3A);
+		add_opc($cpu, "ld a, (hld)", 0x3A);
 		add_opc($cpu, "ldd a, (hl)", 0x3A);
 	} 
 	else {
 		add_opc($cpu, "ld (hl+), a", 0x77, 0x23);
+		add_opc($cpu, "ld (hli), a", 0x77, 0x23);
 		add_opc($cpu, "ldi (hl), a", 0x77, 0x23);
 
 		add_opc($cpu, "ld a, (hl+)", 0x7E, 0x23);
+		add_opc($cpu, "ld a, (hli)", 0x7E, 0x23);
 		add_opc($cpu, "ldi a, (hl)", 0x7E, 0x23);
 		
 		add_opc($cpu, "ld (hl-), a", 0x77, 0x2B);
+		add_opc($cpu, "ld (hld), a", 0x77, 0x2B);
 		add_opc($cpu, "ldd (hl), a", 0x77, 0x2B);
 		
 		add_opc($cpu, "ld a, (hl-)", 0x7E, 0x2B);
+		add_opc($cpu, "ld a, (hld)", 0x7E, 0x2B);
 		add_opc($cpu, "ldd a, (hl)", 0x7E, 0x2B);
 	}
 	
@@ -481,7 +489,7 @@ for my $cpu (@CPUS) {
 	
 	# 16-bit load group
 	add_opc($cpu, "ld sp, hl", 		ld_sp_hl());
-	add_opc($cpu, "sphl",			ld_sp_hl()) if !$gameboy;
+	add_opc($cpu, "sphl",			ld_sp_hl());
 
 	if (!$intel && !$gameboy) {
 		for my $x (qw( ix iy )) {

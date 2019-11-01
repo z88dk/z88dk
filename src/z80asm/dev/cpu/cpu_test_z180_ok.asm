@@ -767,6 +767,8 @@
  ld (hl), l                     ; 75
  ld (hl+), a                    ; 77 23
  ld (hl-), a                    ; 77 2B
+ ld (hld), a                    ; 77 2B
+ ld (hli), a                    ; 77 23
  ld (ix), -128                  ; DD 36 00 80
  ld (ix), 127                   ; DD 36 00 7F
  ld (ix), 255                   ; DD 36 00 FF
@@ -839,6 +841,8 @@
  ld a, (hl)                     ; 7E
  ld a, (hl+)                    ; 7E 23
  ld a, (hl-)                    ; 7E 2B
+ ld a, (hld)                    ; 7E 2B
+ ld a, (hli)                    ; 7E 23
  ld a, (ix)                     ; DD 7E 00
  ld a, (ix+127)                 ; DD 7E 7F
  ld a, (ix-128)                 ; DD 7E 80
