@@ -5,7 +5,9 @@
 #include "ticks.h"
 
 #if defined(_WIN32) || defined(WIN32)
+#ifndef strcasecmp
 #define strcasecmp(a,b) stricmp(a,b)
+#endif
 #endif
 
 
