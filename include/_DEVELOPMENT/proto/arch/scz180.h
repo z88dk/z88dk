@@ -31,8 +31,6 @@ extern uint8_t asci0TxLock;     //  mutex for Tx0
 extern uint8_t asci1RxLock;     //  mutex for Rx1
 extern uint8_t asci1TxLock;     //  mutex for Tx1
 
-extern uint8_t APULock;         //  mutex for APU
-
 // provide the simple mutex locks for the BANK (for system usage)
 
 extern uint8_t bankLockBase[];  // base address for 16 BANK locks
@@ -53,39 +51,35 @@ extern uint16_t *bank_cpm_bdos_addr;    // CPM/ BDOS entry address
 
 #ifdef __CLANG
 
-extern uint16_t io_break;
+extern uint8_t io_pio_port_a;
+extern uint8_t io_pio_port_b;
+extern uint8_t io_pio_port_b;
+extern uint8_t io_pio_control;
 
-extern uint16_t io_pio_port_a;
-extern uint16_t io_pio_port_b;
-extern uint16_t io_pio_port_b;
-extern uint16_t io_pio_control;
-
-extern uint16_t io_pio_ide_lsb;
-extern uint16_t io_pio_ide_msb;
-extern uint16_t io_pio_ide_ctl;
-extern uint16_t io_pio_ide_config;
-
-extern uint16_t io_apu_port_data;
-extern uint16_t io_apu_port_control;
-extern uint16_t io_apu_port_status;
+extern uint8_t io_pio_ide_lsb;
+extern uint8_t io_pio_ide_msb;
+extern uint8_t io_pio_ide_ctl;
+extern uint8_t io_pio_ide_config;
 
 #else
 
-__sfr __banked __at __IO_BREAK io_break;
+__sfr __at __IO_DIO_PORT    io_dio_port;
 
-__sfr __banked __at __IO_PIO_PORT_A  io_pio_port_a;
-__sfr __banked __at __IO_PIO_PORT_B  io_pio_port_b;
-__sfr __banked __at __IO_PIO_PORT_C  io_pio_port_c;
-__sfr __banked __at __IO_PIO_CONTROL io_pio_control;
+__sfr __at __IO_SYSTEM      io_system;
+__sfr __at __IO_LED_OUTPUT  io_led_output;
+__sfr __at __IO_LED_STATUS  io_led_status;
 
-__sfr __banked __at __IO_PIO_IDE_LSB    io_pio_ide_lsb;
-__sfr __banked __at __IO_PIO_IDE_MSB    io_pio_ide_msb;
-__sfr __banked __at __IO_PIO_IDE_CTL    io_pio_ide_ctl;
-__sfr __banked __at __IO_PIO_IDE_CONFIG io_pio_ide_config;
+__sfr __at __IO_CF_PORT     io_cf_port;
 
-__sfr __banked __at __IO_APU_DATA    io_apu_data;
-__sfr __banked __at __IO_APU_CONTROL io_apu_control;
-__sfr __banked __at __IO_APU_STATUS  io_apu_status;
+__sfr __at __IO_PIO_PORT_A  io_pio_port_a;
+__sfr __at __IO_PIO_PORT_B  io_pio_port_b;
+__sfr __at __IO_PIO_PORT_C  io_pio_port_c;
+__sfr __at __IO_PIO_CONTROL io_pio_control;
+
+__sfr __at __IO_PIO_IDE_LSB    io_pio_ide_lsb;
+__sfr __at __IO_PIO_IDE_MSB    io_pio_ide_msb;
+__sfr __at __IO_PIO_IDE_CTL    io_pio_ide_ctl;
+__sfr __at __IO_PIO_IDE_CONFIG io_pio_ide_config;
 
 #endif
 
@@ -146,16 +140,6 @@ __OPROTO(`b,c,iyh,iyl',`b,c,iyh,iyl',void,,jp_far,void *str, int8_t bank)
             );                                  \
     }while(0)
 
-#define call_apu(cmd)                           \
-    do{                                         \
-        asm(                                    \
-        "rst 28h    ; call_apu(cmd)         \n" \
-        "defb " #cmd  "                     \n" \
-            );                                  \
-    }while(0)
-
-#endif
-
 #ifdef __SDCC
 
 #define call_error(code)                        \
@@ -180,14 +164,6 @@ __OPROTO(`b,c,iyh,iyl',`b,c,iyh,iyl',void,,jp_far,void *str, int8_t bank)
         __asm                                   \
         rst 20h        ; call_sys(addr)         \
         defw addr                               \
-        __endasm;                               \
-    }while(0)
-
-#define call_apu(cmd)                           \
-    do{                                         \
-        __asm                                   \
-        rst 28h        ; call_apu(cmd)          \
-        defb cmd                                \
         __endasm;                               \
     }while(0)
 
