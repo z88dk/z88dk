@@ -734,13 +734,26 @@ int heirb(LVALUE* lval)
             else if ((direct = cmatch('.')) || match("->")) {
                 Type *str = lval->ltype;
                 Type *member_type;
+                int   name_result;
 
                 // If there's a cast active, then use the cast type
                 if ( lval->cast_type ) {
                     str = lval->cast_type;
                 }
+                name_result = symname(sname);
 
                 if ( str->kind == KIND_PTR || str->kind == KIND_CPTR) {
+                    if ( direct ) {
+                        UT_string *us;
+                        utstring_new(us);
+                        utstring_printf(us,"Member reference to '%s' via '",name_result ? sname : "<unknown>");
+                        type_describe(str,us);
+                        utstring_printf(us,"' is a pointer; did you mean to use '->'?");
+                        errorfmt("%s", 1, utstring_body(us));
+                        utstring_free(us);
+                        direct = 0;
+                        return 0;
+                    } 
                     str = str->ptr->tag;
                 } else {
                     str = str->tag;
@@ -752,7 +765,7 @@ int heirb(LVALUE* lval)
                     junk();
                     return 0;
                 }
-                if (symname(sname) == 0 || (member_type = find_tag_field(str, sname)) == NULL) {
+                if (name_result == 0 || (member_type = find_tag_field(str, sname)) == NULL) {
                     errorfmt("Unknown member: '%s' of struct '%s'", 1, sname, str->name);
                     junk();
                     return 0;
