@@ -37,8 +37,6 @@ PUBLIC __CPU_CLOCK
 
 PUBLIC __CLOCKS_PER_SECOND
 
-PUBLIC __IO_BASE_ADDRESS
-
 PUBLIC __BIOS_SP
 PUBLIC __BANK_SP
 
@@ -52,17 +50,17 @@ PUBLIC __ASCI0_TX_SIZE
 PUBLIC __ASCI1_RX_SIZE
 PUBLIC __ASCI1_TX_SIZE
 
-PUBLIC __IO_BREAK
+PUBLIC __IO_BASE_ADDRESS
+
+PUBLIC __IO_DIO_PORT
+
+PUBLIC __IO_SYSTEM
+PUBLIC __IO_LED_OUTPUT
+PUBLIC __IO_LED_STATUS
+
+PUBLIC __IO_CF_PORT
 
 PUBLIC __IO_PIO_PORT_BASE
-
-PUBLIC __IO_PCA9665_1_PORT_BASE
-PUBLIC __IO_PCA9665_2_PORT_BASE
-
-PUBLIC __APU_CMD_SIZE
-PUBLIC __APU_PTR_SIZE
-
-PUBLIC __IO_APU_PORT_BASE
 
 
 
@@ -73,10 +71,8 @@ defc __CPU_CLOCK = 36864000
 
 defc __CLOCKS_PER_SECOND = 256
 
-defc __IO_BASE_ADDRESS = 0x0
-
 defc __BIOS_SP = 0xFFDE
-defc __BANK_SP = 0x003B
+defc __BANK_SP = 0xEFFE
 
 defc __COMMON_AREA_1_BASE = 0xF000
 defc __COMMON_AREA_1_PHASE_DATA = 0xf000
@@ -88,17 +84,17 @@ defc __ASCI0_TX_SIZE = 0x080
 defc __ASCI1_RX_SIZE = 0x100
 defc __ASCI1_TX_SIZE = 0x080
 
-defc __IO_BREAK = 0x2000
+defc __IO_BASE_ADDRESS = 0xc0
 
-defc __IO_PIO_PORT_BASE = 0x4000
+defc __IO_DIO_PORT = 0x00
 
-defc __IO_PCA9665_1_PORT_BASE = 0xA000
-defc __IO_PCA9665_2_PORT_BASE = 0x8000
+defc __IO_SYSTEM = 0x0C
+defc __IO_LED_OUTPUT = 0x0D
+defc __IO_LED_STATUS = 0x0E
 
-defc __APU_CMD_SIZE = 0x100
-defc __APU_PTR_SIZE = 0x100
+defc __IO_CF_PORT = 0x10
 
-defc __IO_APU_PORT_BASE = 0xC000
+defc __IO_PIO_PORT_BASE = 0x20
 
 
 
@@ -444,70 +440,70 @@ defc __CPU_TIMER_SCALE = 20
 
    ; Z8S180 / Z8L180 CLASS
 
-   defc CNTLA0 = 0x0
-   defc CNTLA1 = 0x1
-   defc CNTLB0 = 0x2
-   defc CNTLB1 = 0x3
-   defc STAT0 = 0x4
-   defc STAT1 = 0x5
-   defc TDR0 = 0x6
-   defc TDR1 = 0x7
-   defc RDR0 = 0x8
-   defc RDR1 = 0x9
-   defc ASEXT0 = 0x12
-   defc ASEXT1 = 0x13
-   defc ASTC0L = 0x1a
-   defc ASTC0H = 0x1b
-   defc ASTC1L = 0x1c
-   defc ASTC1H = 0x1d
+   defc CNTLA0 = 0xc0
+   defc CNTLA1 = 0xc1
+   defc CNTLB0 = 0xc2
+   defc CNTLB1 = 0xc3
+   defc STAT0 = 0xc4
+   defc STAT1 = 0xc5
+   defc TDR0 = 0xc6
+   defc TDR1 = 0xc7
+   defc RDR0 = 0xc8
+   defc RDR1 = 0xc9
+   defc ASEXT0 = 0xd2
+   defc ASEXT1 = 0xd3
+   defc ASTC0L = 0xda
+   defc ASTC0H = 0xdb
+   defc ASTC1L = 0xdc
+   defc ASTC1H = 0xdd
 
-   defc CNTR = 0xa
-   defc TRDR = 0xb
+   defc CNTR = 0xca
+   defc TRDR = 0xcb
 
-   defc TMDR0L = 0xc
-   defc TMDR0H = 0xd
-   defc RLDR0L = 0xe
-   defc RLDR0H = 0xf
-   defc TCR = 0x10
-   defc TMDR1L = 0x14
-   defc TMDR1H = 0x15
-   defc RLDR1L = 0x16
-   defc RLDR1H = 0x17
+   defc TMDR0L = 0xcc
+   defc TMDR0H = 0xcd
+   defc RLDR0L = 0xce
+   defc RLDR0H = 0xcf
+   defc TCR = 0xd0
+   defc TMDR1L = 0xd4
+   defc TMDR1H = 0xd5
+   defc RLDR1L = 0xd6
+   defc RLDR1H = 0xd7
 
-   defc FRC = 0x18
-   defc CMR = 0x1e
-   defc CCR = 0x1f
+   defc FRC = 0xd8
+   defc CMR = 0xde
+   defc CCR = 0xdf
 
-   defc SAR0L = 0x20
-   defc SAR0H = 0x21
-   defc SAR0B = 0x22
-   defc DAR0L = 0x23
-   defc DAR0H = 0x24
-   defc DAR0B = 0x25
-   defc BCR0L = 0x26
-   defc BCR0H = 0x27
-   defc MAR1L = 0x28
-   defc MAR1H = 0x29
-   defc MAR1B = 0x2a
-   defc IAR1L = 0x2b
-   defc IAR1H = 0x2c
-   defc IAR1B = 0x2d
-   defc BCR1L = 0x2e
-   defc BCR1H = 0x2f
-   defc DSTAT = 0x30
-   defc DMODE = 0x31
-   defc DCNTL = 0x32
+   defc SAR0L = 0xe0
+   defc SAR0H = 0xe1
+   defc SAR0B = 0xe2
+   defc DAR0L = 0xe3
+   defc DAR0H = 0xe4
+   defc DAR0B = 0xe5
+   defc BCR0L = 0xe6
+   defc BCR0H = 0xe7
+   defc MAR1L = 0xe8
+   defc MAR1H = 0xe9
+   defc MAR1B = 0xea
+   defc IAR1L = 0xeb
+   defc IAR1H = 0xec
+   defc IAR1B = 0xed
+   defc BCR1L = 0xee
+   defc BCR1H = 0xef
+   defc DSTAT = 0xf0
+   defc DMODE = 0xf1
+   defc DCNTL = 0xf2
 
-   defc IL = 0x33
-   defc ITC = 0x34
+   defc IL = 0xf3
+   defc ITC = 0xf4
 
-   defc RCR = 0x36
+   defc RCR = 0xf6
 
-   defc CBR = 0x38
-   defc BBR = 0x39
-   defc CBAR = 0x3a
+   defc CBR = 0xf8
+   defc BBR = 0xf9
+   defc CBAR = 0xfa
 
-   defc OMCR = 0x3e
+   defc OMCR = 0xfe
    defc ICR = 0x3f
 
    ; I/O REGISTER BIT FIELDS
@@ -1415,10 +1411,10 @@ PUBLIC __IO_PIO_CNTL_15
 
 
 
-defc __IO_PIO_PORT_A = 0x4000
-defc __IO_PIO_PORT_B = 0x4001
-defc __IO_PIO_PORT_C = 0x4002
-defc __IO_PIO_CONTROL = 0x4003
+defc __IO_PIO_PORT_A = 0x20
+defc __IO_PIO_PORT_B = 0x21
+defc __IO_PIO_PORT_C = 0x22
+defc __IO_PIO_CONTROL = 0x23
 
 defc __IO_PIO_CNTL_00 = 0x80
 defc __IO_PIO_CNTL_01 = 0x81
@@ -1495,39 +1491,39 @@ PUBLIC __IDE_CMD_ID
 
 
 
-defc __IO_PIO_IDE_LSB = 0x4000
-defc __IO_PIO_IDE_MSB = 0x4001
-defc __IO_PIO_IDE_CTL = 0x4002
-defc __IO_PIO_IDE_CONFIG = 0x4003
+defc __IO_PIO_IDE_LSB = 0x20
+defc __IO_PIO_IDE_MSB = 0x21
+defc __IO_PIO_IDE_CTL = 0x22
+defc __IO_PIO_IDE_CONFIG = 0x23
 defc __IO_PIO_IDE_RD = 0x92
 defc __IO_PIO_IDE_WR = 0x80
 
-defc __IO_IDE_A0_LINE = 0x10
-defc __IO_IDE_A1_LINE = 0x04
-defc __IO_IDE_A2_LINE = 0x40
+defc __IO_IDE_A0_LINE = 0x01
+defc __IO_IDE_A1_LINE = 0x02
+defc __IO_IDE_A2_LINE = 0x04
 defc __IO_IDE_CS0_LINE = 0x08
-defc __IO_IDE_CS1_LINE = 0x20
-defc __IO_IDE_WR_LINE = 0x01
-defc __IO_IDE_RD_LINE = 0x02
+defc __IO_IDE_CS1_LINE = 0x10
+defc __IO_IDE_WR_LINE = 0x20
+defc __IO_IDE_RD_LINE = 0x40
 defc __IO_IDE_RST_LINE = 0x80
 
 defc __IO_IDE_DATA = 0x08
-defc __IO_IDE_ERROR = 0x18
-defc __IO_IDE_SEC_CNT = 0xc
-defc __IO_IDE_SECTOR = 0x1c
-defc __IO_IDE_CYL_LSB = 0x48
-defc __IO_IDE_CYL_MSB = 0x58
-defc __IO_IDE_HEAD = 0x4c
-defc __IO_IDE_COMMAND = 0x5c
-defc __IO_IDE_STATUS = 0x5c
+defc __IO_IDE_ERROR = 0x9
+defc __IO_IDE_SEC_CNT = 0xa
+defc __IO_IDE_SECTOR = 0xb
+defc __IO_IDE_CYL_LSB = 0xc
+defc __IO_IDE_CYL_MSB = 0xd
+defc __IO_IDE_HEAD = 0xe
+defc __IO_IDE_COMMAND = 0xf
+defc __IO_IDE_STATUS = 0xf
 
-defc __IO_IDE_CONTROL = 0x64
-defc __IO_IDE_ALT_STATUS = 0x64
+defc __IO_IDE_CONTROL = 0x16
+defc __IO_IDE_ALT_STATUS = 0x16
 
-defc __IO_IDE_LBA0 = 0x1c
-defc __IO_IDE_LBA1 = 0x48
-defc __IO_IDE_LBA2 = 0x58
-defc __IO_IDE_LBA3 = 0x4c
+defc __IO_IDE_LBA0 = 0xb
+defc __IO_IDE_LBA1 = 0xc
+defc __IO_IDE_LBA2 = 0xd
+defc __IO_IDE_LBA3 = 0xe
 
 defc __IDE_CMD_READ = 0x20
 defc __IDE_CMD_WRITE = 0x30

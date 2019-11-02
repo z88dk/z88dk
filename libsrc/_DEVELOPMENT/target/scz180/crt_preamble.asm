@@ -2,7 +2,11 @@
 IF !(__page_zero_present)
 
 SECTION code_crt_init
-
+                            ; Internal register definitions begin
+                            ; at __IO_BASE_ADDRESS = 0x00C0
+    ld      a,__IO_BASE_ADDRESS
+    out0    (ICR),a         ; Move the internal register to 0x00C0
+    
     xor     a               ; Zero Accumulator
 
                             ; Clear Refresh Control Reg (RCR)
@@ -15,6 +19,10 @@ SECTION code_crt_init
     ld      a,OMCR_M1E      ; Enable M1 for single step, disable 64180 I/O _RD Mode
     out0    (OMCR),a        ; X80 Mode (M1 Disabled, IOC Disabled)
 
+                            ; DMA/Wait Control Reg Set I/O Wait States
+    ld      a,DCNTL_MWI0|DCNTL_IWI1
+    out0    (DCNTL),a       ; 1 Memory Wait & 3 I/O Wait
+
                             ; Set PHI = CCR x 2 = 36.864MHz
                             ; if using ZS8180 or Z80182 at High-Speed
     ld      a,CMR_X2        ; Set Hi-Speed flag
@@ -25,19 +33,19 @@ SECTION code_crt_init
     ld      a,CCR_XTAL_X2   ; Set Hi-Speed flag
     out0    (CCR),a         ; CPU Control Reg (CCR)
 
-                            ; DMA/Wait Control Reg Set I/O Wait States
-    ld      a,DCNTL_MWI0|DCNTL_IWI1
-    out0    (DCNTL),a       ; 1 Memory Wait & 3 I/O Wait
+                            ; Set Logical RAM Addresses - For Monitor
+                            ; $F000-$FFFF RAM BIOS
+                            ; $E000-$EFFF RAM HEAP    CA1  -> $E.
+                            ; $0000-$DFFF Flash       BANK -> $.0
 
-                            ; Set Logical RAM Addresses
-                            ; $F000-$FFFF RAM   CA1  -> $F.
-                            ; $C000-$EFFF RAM   BANK
-                            ; $0000-$BFFF Flash BANK -> $.0
+                            ; Later, set Logical RAM Addresses for Application
+                            ; $F000-$FFFF RAM BIOS    CA1  -> $F.
+                            ; $0000-$EFFF RAM         BANK -> $.0
 
-    ld      a,$F0           ; Set New Common 1 / Bank Areas for RAM
+    ld      a,$E0           ; Set New Common 1 / Bank Areas for RAM / Flash
     out0    (CBAR),a
 
-    ld      a,$00           ; Set Common 1 Base Physical $0F000 -> $00
+    ld      a,$F0           ; Set Common 1 Base Physical $FE000 -> $F0
     out0    (CBR),a
 
     ld      a,$00           ; Set Bank Base Physical $00000 -> $00
