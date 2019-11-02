@@ -22,7 +22,7 @@ int remove(char *name)
 	return 0;
 
 	uid = getuid();
-	setuid(fc->uid);
+	setuid(fc.uid);
 
     retval = bdos(CPM_DEL,&fc);
 

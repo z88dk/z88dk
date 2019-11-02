@@ -496,7 +496,7 @@ void select_options(paddle_rec *paddles, playfield_rec *playfield) {
 			}
 			draw_score(playfield);
 			setup_paddles(paddles, playfield);
-			draw_paddles(paddles, playfield.actual_paddle_count);
+			draw_paddles(paddles, playfield->actual_paddle_count);
 		}
 
 		col &= 0x03;

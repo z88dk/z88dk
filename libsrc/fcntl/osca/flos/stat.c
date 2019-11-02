@@ -13,6 +13,7 @@
 
 #include <sys/stat.h>
 #include <flos.h>
+#include <string.h>
 
 
 

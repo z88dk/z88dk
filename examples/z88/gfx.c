@@ -9,9 +9,9 @@ void main()
 {
     int j, i;
 
-    mine->graph = 1;
-    mine->width = 255;
-    mine->number = '4';
+    mine.graph = 1;
+    mine.width = 255;
+    mine.number = '4';
 
     /* Open map with width 256 on window #4 */
     window(&mine);
