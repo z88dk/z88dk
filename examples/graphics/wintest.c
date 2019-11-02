@@ -75,11 +75,11 @@ void main()
     //printf("%c",12);		//clear screen
     printf("GUI demo. Press ENTER to close.");
 
-    win->x = 30;
-    win->y = 15;
-    win->flags = WIN_BORDER | WIN_SHADOW;
-    win->height = 20;
-    win->width = 40;
+    win.x = 30;
+    win.y = 15;
+    win.flags = WIN_BORDER | WIN_SHADOW;
+    win.height = 20;
+    win.width = 40;
     win_open(&win);
     x = 40;
     y = 20;
