@@ -8,13 +8,13 @@ void RS232_Putchar( unsigned char c )
 {
     int  temp;
 
-    temp = (port_info->output_insert + 1) & RS232_BUFFERMASK;
+    temp = (port_info.output_insert + 1) & RS232_BUFFERMASK;
 
-    if(temp == port_info->output_remove) /*buffer full */
+    if(temp == port_info.output_remove) /*buffer full */
         return;		/*  so end    */
 
-    port_info->output_buffer[port_info->output_insert] = c;
-    port_info->output_insert = temp;
+    port_info.output_buffer[port_info.output_insert] = c;
+    port_info.output_insert = temp;
 }
 
 
