@@ -112,7 +112,7 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    # I/O
 
    define(`__IO_OMCR', eval(__IO_BASE_ADDRESS + 0x3e))
-   define(`__IO_ICR', eval(__IO_BASE_ADDRESS + 0x3f))
+   define(`__IO_ICR', 0x3f)
 ',
 `
    # Z8S180 / Z8L180 CLASS
@@ -200,7 +200,7 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    # I/O
 
    define(`__IO_OMCR', eval(__IO_BASE_ADDRESS + 0x3e))
-   define(`__IO_ICR', eval(__IO_BASE_ADDRESS + 0x3f))
+   define(`__IO_ICR', 0x3f)
 ')
 
 # I/O REGISTER BIT FIELDS
