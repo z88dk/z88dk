@@ -80,12 +80,14 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     int   isconstarg[5];
     double constargval[5];
     FILE *tmpfiles[100];  // 100 arguments enough I guess */
+    int   tmplinenos[100];
     FILE *save_fps;
     int   i;
     int   save_fps_num;
     int   function_pointer_call = ptr == NULL ? YES : NO;
     int   savesp;
     int   last_argument_size = 0;
+    int   saveline;
     enum symbol_flags builtin_flags = 0;
     char   *funcname = "(unknown)";
     Type   *functype = ptr ? ptr->ctype: fnptr_type->ptr;
@@ -120,6 +122,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
         }
         argnumber++;
         tmpfiles[argnumber] = my_tmpfile();
+        tmplinenos[argnumber] = lineno;
         push_buffer_fp(tmpfiles[argnumber]);
 
         setstage(&before, &start);
@@ -140,6 +143,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     }
     needchar(')'); 
     Zsp = savesp;
+    saveline = lineno;
 
     //  if ( ptr == NULL ) ptr = fnptr;
     if ( functype->funcattrs.oldstyle == 0 && functype->funcattrs.hasva == 0 && array_len(functype->parameters) < argnumber  ) {
@@ -202,8 +206,12 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     if ( ( (ptr == NULL && c_use_r2l_calling_convention == YES ) || (ptr && (functype->flags & SMALLC) == 0) ) && (builtin_flags & SMALLC) == 0)  {
         for ( i = 1; argnumber >= i ; argnumber--, i++) {
             FILE *tmp = tmpfiles[i];
+            int   tmpi;
             tmpfiles[i] = tmpfiles[argnumber];
             tmpfiles[argnumber] = tmp;
+            tmpi = tmplinenos[i];
+            tmplinenos[i] = tmplinenos[argnumber];
+            tmplinenos[argnumber] = tmpi;
         }
     }
     argnumber = 0;
@@ -220,7 +228,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
         argnumber++;
         rewind(tmpfiles[argnumber]);
         set_temporary_input(tmpfiles[argnumber]);
-
+        lineno = tmplinenos[argnumber];
         if ( function_pointer_call ) {
             if ( fnptr_type->kind == KIND_CPTR ) {
                 if ( argnumber == 1 )  {
@@ -296,7 +304,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     memcpy(buffer_fps, save_fps, save_fps_num * sizeof(buffer_fps[0]));
     buffer_fps_num = save_fps_num ;
     FREENULL(save_fps);
-
+    lineno = saveline;
 
 
     if (function_pointer_call == NO ) {
