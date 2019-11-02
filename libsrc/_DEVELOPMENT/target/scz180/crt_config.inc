@@ -46,7 +46,7 @@ IF __CRTCFG = 0
    defc TAR__crt_enable_eidi           = 0x13
    defc TAR__crt_on_exit               = 0x10001
 
-   defc TAR__crt_enable_rst            = 0x0080
+   defc TAR__crt_enable_rst            = 0
    defc TAR__crt_enable_nmi            = 0
    defc TAR__crt_enable_trap           = 0
 
