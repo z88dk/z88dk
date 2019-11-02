@@ -261,14 +261,14 @@ XFontStruct *XLoadQueryFont(Display *display, char *fontname) {
 	//if (myfont == 0) return (NULL);
 	
 	if ( fsize >= 12 )	{
-		Xcommon_myfont->fid = (Font) _Xmidfont;
-		Xcommon_myfont->max_bounds.ascent = 0;
-		Xcommon_myfont->max_bounds.descent = fsize + 3;
+		Xcommon_myfont.fid = (Font) _Xmidfont;
+		Xcommon_myfont.max_bounds.ascent = 0;
+		Xcommon_myfont.max_bounds.descent = fsize + 3;
 	}
 	else {
-		Xcommon_myfont->fid = (Font) _Xsmallfont;
-		Xcommon_myfont->max_bounds.ascent = 0;
-		Xcommon_myfont->max_bounds.descent = fsize + 3;
+		Xcommon_myfont.fid = (Font) _Xsmallfont;
+		Xcommon_myfont.max_bounds.ascent = 0;
+		Xcommon_myfont.max_bounds.descent = fsize + 3;
 	}
 	
 #ifdef _DEBUG_
