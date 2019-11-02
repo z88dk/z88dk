@@ -27,7 +27,7 @@ struct M_CHAN mybuf;
      
   for (blkcount=1; blkcount < 255; blkcount++)
     {
-       if1_setname(newname,&mybuf->recname[0]);
+       if1_setname(newname,&mybuf.recname[0]);
        if (if1_write_sector (1, currblock, &mybuf) == -1) return (-1);
        currblock = if1_load_record (1, oldname, blkcount, &mybuf);
        if (currblock == -1) return 0;
