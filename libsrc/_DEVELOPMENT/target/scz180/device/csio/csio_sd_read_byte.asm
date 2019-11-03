@@ -9,7 +9,7 @@ PUBLIC sd_read_byte
 
     ;Do a read bus cycle to the SD drive, via the CSIO
     ;  
-    ;output A = byte read from SD drive
+    ;output L = byte read from SD drive
 
 .sd_read_byte
     in0 a,(CNTR)

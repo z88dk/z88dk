@@ -9,7 +9,7 @@ PUBLIC sd_write_byte
 
     ;Do a write bus cycle to the SD drive, via the CSIO
     ;
-    ;input A = byte to write to SD drive
+    ;input L = byte to write to SD drive
     
 .sd_write_byte
     ld a,l
