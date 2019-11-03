@@ -8,7 +8,6 @@
 #include <arch.h>
 #include <stdint.h>
 
-
 /*
  * Disk Status Bits DSTATUS (uint8_t)
  *

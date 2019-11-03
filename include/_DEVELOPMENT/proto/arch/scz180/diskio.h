@@ -6,7 +6,6 @@ include(__link__.m4)
 #include <arch.h>
 #include <stdint.h>
 
-
 /*
  * Disk Status Bits DSTATUS (uint8_t)
  *
