@@ -25,7 +25,7 @@
 @stdlib/stdlib_sccz80.lst
 @string/string_sccz80.lst
 @target/scz180/default/default.lst
-@target/scz180/device/device.lst
+@target/scz180/device/device_sccz80.lst
 @target/scz180/driver/driver_sccz80.lst
 @target/cpm/driver/driver.lst
 @threads/threads_sccz80.lst

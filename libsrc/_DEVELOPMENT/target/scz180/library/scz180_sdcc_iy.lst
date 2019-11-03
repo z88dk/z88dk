@@ -25,7 +25,7 @@
 @stdlib/stdlib_sdcc_iy.lst
 @string/string_sdcc_iy.lst
 @target/scz180/default/default.lst
-@target/scz180/device/device.lst
+@target/scz180/device/device_sdcc_iy.lst
 @target/scz180/driver/driver_sdcc_iy.lst
 @target/cpm/driver/driver.lst
 @threads/threads_sdcc_iy.lst

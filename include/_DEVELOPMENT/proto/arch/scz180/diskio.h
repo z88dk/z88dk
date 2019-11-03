@@ -5,7 +5,7 @@ include(__link__.m4)
 
 #include <arch.h>
 #include <stdint.h>
-#include <stddef.h>
+
 
 /*
  * Disk Status Bits DSTATUS (uint8_t)
@@ -91,7 +91,7 @@ typedef enum {
 } DRESULT;
 
 //
-// DISK COMMANDS
+// IDE DISK COMMANDS
 //
 
 __DPROTO(`b,c,d,e,iyh,iyl',`b,c,d,e,iyh,iyl',DSTATUS,,disk_initialize,BYTE pdrv)
@@ -99,5 +99,17 @@ __DPROTO(`d,e,iyh,iyl',`d,e,iyh,iyl',DSTATUS,,disk_status,BYTE pdrv)
 __DPROTO(`iyh,iyl',`iyh,iyl',DRESULT,,disk_read,BYTE pdrv, BYTE* buff, DWORD sector, UINT count)
 __DPROTO(`iyh,iyl',`iyh,iyl',DRESULT,,disk_write,BYTE pdrv, const BYTE* buff, DWORD sector, UINT count)
 __DPROTO(`d,e,iyh,iyl',`d,e,iyh,iyl',DRESULT,,disk_ioctl,BYTE pdrv, BYTE cmd, void* buff)
+
+//
+// CSIO SD COMMANDS
+//
+
+__DPROTO(`b,c,d,e,h,iyh,iyl',`b,c,d,e,h,iyh,iyl',void,,sd_clock,uint8_t)
+__DPROTO(`b,c,d,e,h,l,iyh,iyl',`b,c,d,e,h,l,iyh,iyl',void,,sd_cs_lower,void)
+__DPROTO(`b,c,d,e,h,l,iyh,iyl',`b,c,d,e,h,l,iyh,iyl',void,,sd_cs_raise,void)
+__DPROTO(`b,c,d,e,h,iyh,iyl',`b,c,d,e,h,iyh,iyl',void,,sd_write_byte,uint8_t)
+__DPROTO(`iyh,iyl',`iyh,iyl',void,,sd_write_block,const uint8_t *from)
+__DPROTO(`b,c,d,e,h,iyh,iyl',`b,c,d,e,h,iyh,iyl',uint8_t,,sd_read_byte,void)
+__DPROTO(`iyh,iyl',`iyh,iyl',void,,sd_read_block,uint8_t *to)
 
 #endif

@@ -7,7 +7,7 @@
 
 #include <arch.h>
 #include <stdint.h>
-#include <stddef.h>
+
 
 /*
  * Disk Status Bits DSTATUS (uint8_t)
@@ -93,7 +93,7 @@ typedef enum {
 } DRESULT;
 
 //
-// DISK COMMANDS
+// IDE DISK COMMANDS
 //
 
 extern DSTATUS __LIB__ disk_initialize(BYTE pdrv) __smallc __z88dk_fastcall;
@@ -115,6 +115,32 @@ extern DRESULT __LIB__ disk_write_callee(BYTE pdrv,const BYTE* buff,DWORD sector
 extern DRESULT __LIB__ disk_ioctl(BYTE pdrv,BYTE cmd,void* buff) __smallc;
 extern DRESULT __LIB__ disk_ioctl_callee(BYTE pdrv,BYTE cmd,void* buff) __smallc __z88dk_callee;
 #define disk_ioctl(a,b,c) disk_ioctl_callee(a,b,c)
+
+
+
+//
+// CSIO SD COMMANDS
+//
+
+extern void __LIB__ sd_clock(uint8_t) __smallc __z88dk_fastcall;
+
+
+extern void __LIB__ sd_cs_lower(void) __smallc __z88dk_fastcall;
+
+
+extern void __LIB__ sd_cs_raise(void) __smallc __z88dk_fastcall;
+
+
+extern void __LIB__ sd_write_byte(uint8_t) __smallc __z88dk_fastcall;
+
+
+extern void __LIB__ sd_write_block(const uint8_t *from) __smallc __z88dk_fastcall;
+
+
+extern uint8_t __LIB__ sd_read_byte(void) __smallc __z88dk_fastcall;
+
+
+extern void __LIB__ sd_read_block(uint8_t *to) __smallc __z88dk_fastcall;
 
 
 

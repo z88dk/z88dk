@@ -5,16 +5,16 @@ SECTION code_driver
 
 EXTERN l_reverse
 
-PUBLIC _sd_read_byte
+PUBLIC asm_sd_read_byte
 
     ;Do a read bus cycle to the SD drive, via the CSIO
     ;  
     ;output L = byte read from SD drive
 
-._sd_read_byte
+.asm_sd_read_byte
     in0 a,(CNTR)
     tst CNTR_TE|CNTR_RE     ;check the SD is not enabled
-    jr NZ,_sd_read_byte
+    jr NZ,asm_sd_read_byte
 
     or a,CNTR_RE
     out0(CNTR),a            ;enable reception

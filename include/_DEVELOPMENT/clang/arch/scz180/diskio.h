@@ -7,7 +7,7 @@
 
 #include <arch.h>
 #include <stdint.h>
-#include <stddef.h>
+
 
 /*
  * Disk Status Bits DSTATUS (uint8_t)
@@ -93,7 +93,7 @@ typedef enum {
 } DRESULT;
 
 //
-// DISK COMMANDS
+// IDE DISK COMMANDS
 //
 
 extern DSTATUS disk_initialize(BYTE pdrv);
@@ -109,6 +109,32 @@ extern DRESULT disk_write(BYTE pdrv,const BYTE* buff,DWORD sector,UINT count);
 
 
 extern DRESULT disk_ioctl(BYTE pdrv,BYTE cmd,void* buff);
+
+
+
+//
+// CSIO SD COMMANDS
+//
+
+extern void sd_clock(uint8_t);
+
+
+extern void sd_cs_lower(void);
+
+
+extern void sd_cs_raise(void);
+
+
+extern void sd_write_byte(uint8_t);
+
+
+extern void sd_write_block(const uint8_t *from);
+
+
+extern uint8_t sd_read_byte(void);
+
+
+extern void sd_read_block(uint8_t *to);
 
 
 

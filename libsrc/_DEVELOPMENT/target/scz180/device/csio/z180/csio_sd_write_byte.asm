@@ -5,13 +5,13 @@ SECTION code_driver
 
 EXTERN l_reverse
 
-PUBLIC _sd_write_byte
+PUBLIC asm_sd_write_byte
 
     ;Do a write bus cycle to the SD drive, via the CSIO
     ;
     ;input L = byte to write to SD drive
     
-._sd_write_byte
+.asm_sd_write_byte
     ld a,l
     call l_reverse          ;reverse the bits before we busy wait
 .sd_write_wait

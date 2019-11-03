@@ -5,7 +5,7 @@ SECTION code_driver
 
 EXTERN l_reverse
 
-PUBLIC _sd_read_block
+PUBLIC asm_sd_read_block
 
     ;Read a block of 512 bytes (one sector) from the drive
     ;and store it in memory at (HL++)
@@ -13,10 +13,10 @@ PUBLIC _sd_read_block
     ;input HL = pointer to block
     ;uses AF, BC, DE, HL
 
-._sd_read_block
+.asm_sd_read_block
     in0 a,(CNTR)
     tst CNTR_TE|CNTR_RE     ;check the SD is not enabled
-    jr NZ,_sd_read_block
+    jr NZ,asm_sd_read_block
 
     and ~CNTR_TE            ; mask off TE bit
     or CNTR_RE              ; set RE bit
