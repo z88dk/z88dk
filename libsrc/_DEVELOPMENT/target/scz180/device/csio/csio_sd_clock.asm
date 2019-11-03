@@ -3,7 +3,7 @@ INCLUDE "config_private.inc"
 
 SECTION code_driver
 
-PUBLIC sd_clock
+PUBLIC _sd_clock
 
     ;Set the CSIO clock rate either to maximum or between 400kHz and 100kHz
     ;This will usually be CNTR_SS_DIV_160, which gives 230kHz to 115kHz
@@ -11,7 +11,7 @@ PUBLIC sd_clock
     ;input (H)L = clock divisor (typically CNTR_SS_DIV_160 or CNTR_SS_DIV_20)
     ;Uses AF,L
 
-.sd_clock
+._sd_clock
     ld a,CNTR_SS_MASK
     and l                   ;mask to speed bits
     ld l,a

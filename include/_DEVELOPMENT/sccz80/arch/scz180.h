@@ -158,6 +158,8 @@ extern void __LIB__ jp_far(void *str,int8_t bank) __smallc;
             );                                  \
     }while(0)
 
+#endif
+
 #ifdef __SDCC
 
 #define call_error(code)                        \

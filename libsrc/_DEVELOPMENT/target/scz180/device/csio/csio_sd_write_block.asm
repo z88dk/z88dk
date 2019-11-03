@@ -5,17 +5,17 @@ SECTION code_driver
 
 EXTERN l_reverse
 
-PUBLIC sd_write_block
+PUBLIC _sd_write_block
 
     ;Write a block of 512 bytes (one sector) from (HL++) to the drive
     ;
     ;input HL = pointer to block to write
     ;uses AF, BC, DE, HL
 
-.sd_write_block
+._sd_write_block
     in0 a,(CNTR)
     tst CNTR_TE|CNTR_RE     ;check the SD is not enabled
-    jr NZ,sd_write_block
+    jr NZ,_sd_write_block
 
     and ~CNTR_RE            ; mask off RE bit
     or CNTR_TE              ; set TE bit

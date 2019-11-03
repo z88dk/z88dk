@@ -168,6 +168,8 @@ extern void jp_far(void *str,int8_t bank) __preserves_regs(b,c,iyh,iyl);
             );                                  \
     }while(0)
 
+#endif
+
 #ifdef __SDCC
 
 #define call_error(code)                        \
