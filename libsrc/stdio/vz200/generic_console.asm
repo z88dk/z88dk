@@ -2,7 +2,6 @@
 
     SECTION     code_clib
 
-    PUBLIC      generic_console_cls
     PUBLIC      generic_console_vpeek
     PUBLIC      generic_console_printc
     PUBLIC      generic_console_scrollup
@@ -51,33 +50,19 @@ generic_console_set_ink:
     ret
 
 
-generic_console_cls:
-    ld      a,(__vz200_mode)
-    ld      bc,512
-    and     a
-    ld      a,' '
-    jr      z,cls_1
-    ld      bc,2048
-    xor     a
-cls_1:
-    ld      hl, (base_graphics)
-    ld      d,h
-    ld      e,l
-    inc     de
-    ld      (hl),a
-    ldir
-    ret
 
 ; c = x
 ; b = y
-; a = character to print
+; a = d = character to print
 ; e = raw
 generic_console_plotc:
     inc     e
 generic_console_printc:
+    ld      d,a
     ld      a,(__vz200_mode)
     and     a
     jp      nz,printc_MODE1
+    ld      a,d
     push    de
     call    xypos
     pop     de

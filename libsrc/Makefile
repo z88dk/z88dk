@@ -399,8 +399,6 @@ vz_clib.lib:
 	$(call buildgeneric,vz)
 	$(MAKE) -C games TARGET=vz
 	TARGET=vz TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORvz -x$(OUTPUT_DIRECTORY)/vz_clib @$(LISTFILE_DIRECTORY)/vz200.lst
-	$(MAKE) gfxdeps
-	TARGET=vz TYPE=z80 $(LIBLINKER) -DFORvz -DBLOCKgfx -x$(OUTPUT_DIRECTORY)/gfxvzblock @$(LISTFILE_DIRECTORY)/gfxvzblock.lst
 
 
 # ZX80 lib - Stefano
