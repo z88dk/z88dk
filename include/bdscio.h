@@ -1,6 +1,6 @@
 /*
  * BDS C Compatibility
- * $Id: bdscio.h,v 1.9 2016-05-16 20:08:26 dom Exp $
+ * $Id: bdscio.h $
  */
 
 #ifndef __BDSCIO_H__
@@ -99,6 +99,9 @@
 #define toupper(a) strupr(a)
 
 #define biosh(a,b) bios(a,b,0)
+
+#define getline(a,b) fgets_cons(a,b)
+#define putch(a) fputc_cons(a)
 
 
 /*******   Some console (video) terminal characteristics:   *******/
