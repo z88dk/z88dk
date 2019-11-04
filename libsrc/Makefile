@@ -140,6 +140,7 @@ mbf32.lib:
 	@echo ''
 	$(MAKE) -C math/mbf32
 
+# math32 build - @feilipu
 math32.lib:
 	@echo ''
 	@echo '--- Building IEEE Single Precision Maths Library ---'
@@ -178,17 +179,17 @@ lib3d.lib:
 	@echo ''
 	@echo '--- Building 3D Library ---'
 	@echo ''
-	$(MAKE) -C lib3d 
+	$(MAKE) -C lib3d
 
 # Xlib / X11 and tiny GUI portable library - stefano
 x11.lib:
 	@echo ''
 	@echo '--- Building X11 emulation Library ---'
 	@echo ''
-	$(MAKE) -C graphics lx11 
+	$(MAKE) -C graphics lx11
 
 ndos.lib:
-	$(MAKE) -C fcntl/dummy 
+	$(MAKE) -C fcntl/dummy
 
 gendos.lib:
 	$(MAKE) -C fcntl/gen_rnd
@@ -198,19 +199,18 @@ z80_crt0.lib:
 	@echo ''
 	@echo '--- Building Z80 crt0 Library ---'
 	@echo ''
-	$(MAKE) -C z80_crt0s 
-
+	$(MAKE) -C z80_crt0s
 
 # z88 library - dom
-z88_clib.lib: 
+z88_clib.lib:
 	@echo ''
 	@echo '--- Building Z88 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
 	$(call buildgeneric,z88)
 	$(MAKE) -C games TARGET=z88
-	$(MAKE) -C rs232/z88 
-	$(MAKE) -C target/z88 
+	$(MAKE) -C rs232/z88
+	$(MAKE) -C target/z88
 	TARGET=z88 TYPE=z80 $(LIBLINKER) -I$(Z88DK_LIB)/target/z88/def -DSTANDARDESCAPECHARS -DFORz88 -x$(OUTPUT_DIRECTORY)/z88_clib @$(LISTFILE_DIRECTORY)/z88.lst
 
 # ZX Spectrum fcntl - dom/stefano
@@ -241,7 +241,7 @@ rs232libs:
 	@echo ''
 	@echo '---> Building RS232 libraries <---'
 	@echo ''
-	$(MAKE) -C rs232 
+	$(MAKE) -C rs232
 
 # 64/32 column library for TS2068 - dom/stefano/alvin
 # use -DROMFONT for a tiny 36 columns mode

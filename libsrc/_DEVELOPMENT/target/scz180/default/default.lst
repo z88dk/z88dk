@@ -1,0 +1,11 @@
+target/scz180/default/_asci0_isr
+target/scz180/default/_asci1_isr
+target/scz180/default/_system_tick_isr
+
+target/scz180/default/_z180_trap
+target/scz180/default/_error_handler_rst
+target/scz180/default/_call_far_rst
+target/scz180/default/_jp_far_rst
+target/scz180/default/_system_rst
+target/scz180/default/_user_rst
+

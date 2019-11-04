@@ -132,7 +132,7 @@
    #define __IO_CBAR  58
 
    #define __IO_OMCR  62
-   #define __IO_ICR  63
+   #define __IO_ICR  0x3f
 
 
 

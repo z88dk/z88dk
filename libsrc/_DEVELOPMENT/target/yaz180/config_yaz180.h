@@ -43,8 +43,6 @@
 
 #define __CLOCKS_PER_SECOND 256
 
-#define __IO_BASE_ADDRESS 0x0
-
 #define __BIOS_SP   0xFFDE
 #define __BANK_SP   0x003B
 
@@ -57,6 +55,8 @@
 
 #define __ASCI1_RX_SIZE  0x100
 #define __ASCI1_TX_SIZE  0x080
+
+#define __IO_BASE_ADDRESS 0x0
 
 #define __IO_BREAK  0x2000
 

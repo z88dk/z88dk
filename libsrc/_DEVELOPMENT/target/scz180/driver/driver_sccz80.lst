@@ -1,0 +1,7 @@
+@target/scz180/driver/terminal/rc_01_input_asci0.lst
+@target/scz180/driver/terminal/rc_01_output_asci0.lst
+@target/scz180/driver/terminal/rc_01_input_asci1.lst
+@target/scz180/driver/terminal/rc_01_output_asci1.lst
+@target/scz180/driver/ide/ide.lst
+@target/scz180/driver/diskio/diskio_sccz80.lst
+@target/scz180/driver/time/time_sccz80.lst

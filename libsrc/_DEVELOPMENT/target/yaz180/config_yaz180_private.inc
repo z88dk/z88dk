@@ -38,8 +38,6 @@ defc __CPU_CLOCK = 36864000
 
 defc __CLOCKS_PER_SECOND = 256
 
-defc __IO_BASE_ADDRESS = 0x0
-
 defc __BIOS_SP = 0xFFDE
 defc __BANK_SP = 0x003B
 
@@ -52,6 +50,8 @@ defc __ASCI0_TX_SIZE = 0x080
 
 defc __ASCI1_RX_SIZE = 0x100
 defc __ASCI1_TX_SIZE = 0x080
+
+defc __IO_BASE_ADDRESS = 0x0
 
 defc __IO_BREAK = 0x2000
 
