@@ -387,7 +387,7 @@ for my $cpu (@CPUS) {
 			}
 		}
 		for my $a ('a, ', '') {
-			add_opc($cpu, "$op $a%n", alu_n($op), '%n') unless $intel && $op eq 'cp';
+			add_opc($cpu, "$op $a%n", alu_n($op), '%n'); #1318 do not define jp as jump-positive ( unless $intel && $op eq 'cp'; )
 		}
 	}
 
@@ -950,7 +950,7 @@ for my $cpu (@CPUS) {
 	
 	# JP
 	add_opc($cpu, "jmp %m",				jp(), '%m', '%m');
-	add_opc($cpu, "jp %m",				jp(), '%m', '%m') if !$intel;
+	add_opc($cpu, "jp %m",				jp(), '%m', '%m'); #1318 do not define jp as jump-positive ( if !$intel; )
 
 	for my $_f (qw( _nz _z _nc _c _po _pe _nv _v _lz _lo _p _m )) { 
 		my $f = substr($_f, 1);			# remove leading _
@@ -960,7 +960,8 @@ for my $cpu (@CPUS) {
 		
 		# TODO: Rabbit LJP not supported
 		add_opc($cpu, "jp $f, %m", 		jp_f($_f), '%m', '%m');
-		add_opc($cpu, "j$f %m", 		jp_f($_f), '%m', '%m') unless $f eq 'p' && !$intel;
+		add_opc($cpu, "j$f %m", 		jp_f($_f), '%m', '%m') 
+			unless $f eq 'p'; #1318 do not define jp as jump-positive ( && !$intel; )
 	}
 	
 	for ([hl => ()]) {
@@ -995,7 +996,7 @@ for my $cpu (@CPUS) {
 										call(), '%m', '%m');		# call 
 				add_opc($cpu, "c$f %m",	jr_f($_inv_f), 3,			# jump !flag
 										call(), '%m', '%m')			# call 
-					unless $f eq 'p' && !$intel;
+					unless $f eq 'p'; #1318 do not define cp as call-positive ( && !$intel; )
 			}
 			else {
 				add_opc($cpu, "call $f, %m", 
@@ -1003,13 +1004,13 @@ for my $cpu (@CPUS) {
 										call(), '%m', '%m');		# call 
 				add_opc($cpu, "c$f %m",	jp_f($_inv_f), '%t', '%t',	# jump !flag
 										call(), '%m', '%m')			# call 
-					unless $f eq 'p' && !$intel;
+					unless $f eq 'p'; #1318 do not define cp as call-positive ( && !$intel; )
 			}			
 		}
 		else {
 			add_opc($cpu, "call $f, %m",call_f($_f), '%m', '%m');
 			add_opc($cpu, "c$f %m", 	call_f($_f), '%m', '%m') 
-				unless $f eq 'p' && !$intel;
+				unless $f eq 'p'; #1318 do not define cp as call-positive ( && !$intel; )
 		}
 	}
 	
@@ -1398,9 +1399,9 @@ for my $asm (sort keys %Tests) {
 				}
 			}
 			# special case: 'cp %m' is 'call p' in 8080; 'cp %n' is compare
-			elsif ($asm =~ /^cp \s* (a,)? \s* -? \d+ $/x) {
-				$skip = 1;
-			}
+			#elsif ($asm =~ /^cp \s* (a,)? \s* -? \d+ $/x) {
+			#	$skip = 1;
+			#}
 			
 			$fh{$cpu}{''}{err}->print($asmf."; Error\n") unless $skip;
 		}

@@ -246,11 +246,14 @@
  cnz 32767                      ; C4 FF 7F
  cnz 65535                      ; C4 FF FF
  cp (hl)                        ; BE
- cp -32768                      ; F4 00 80
- cp 32767                       ; F4 FF 7F
- cp 65535                       ; F4 FF FF
+ cp -128                        ; FE 80
+ cp 127                         ; FE 7F
+ cp 255                         ; FE FF
  cp a                           ; BF
  cp a, (hl)                     ; BE
+ cp a, -128                     ; FE 80
+ cp a, 127                      ; FE 7F
+ cp a, 255                      ; FE FF
  cp a, a                        ; BF
  cp a, b                        ; B8
  cp a, c                        ; B9
@@ -384,9 +387,9 @@
  jnz 32767                      ; C2 FF 7F
  jnz 65535                      ; C2 FF FF
  jp (hl)                        ; E9
- jp -32768                      ; F2 00 80
- jp 32767                       ; F2 FF 7F
- jp 65535                       ; F2 FF FF
+ jp -32768                      ; C3 00 80
+ jp 32767                       ; C3 FF 7F
+ jp 65535                       ; C3 FF FF
  jp c, -32768                   ; DA 00 80
  jp c, 32767                    ; DA FF 7F
  jp c, 65535                    ; DA FF FF
