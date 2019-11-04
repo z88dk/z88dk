@@ -2,6 +2,11 @@ stdio/vz200/fgetc_cons
 stdio/vz200/fputc_cons
 stdio/vz200/getk
 stdio/vz200/generic_console
+stdio/vz200/generic_console_ioctl
+stdio/vz200/conio_vars
+stdio/vz200/printc_MODE1
+stdio/vz200/vpeek_MODE1
+stdio/vz200/CRT_FONT
 @stdio/ansicore.lst
 stdio/ansi/vz200/f_ansi_attr
 stdio/ansi/vz200/f_ansi_bel
@@ -10,6 +15,7 @@ stdio/ansi/vz200/f_ansi_cls
 stdio/ansi/vz200/f_ansi_dline
 stdio/ansi/vz200/f_ansi_scrollup
 @stdio/stdio.lst
+@font/font_8x8/font_8x8.lst
 graphics/dcircle
 graphics/clg
 graphics/cclg
