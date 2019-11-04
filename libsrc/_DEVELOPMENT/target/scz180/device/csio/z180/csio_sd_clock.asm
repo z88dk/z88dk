@@ -17,6 +17,6 @@ PUBLIC asm_sd_clock
     ld l,a
     in0 a,(CNTR)            ;get current CNTR 
     and ~CNTR_SS_MASK       ;mask out current speed bits
-    and l                   ;insert new speed bits
+    or l                    ;insert new speed bits
     out0 (CNTR),a           ;write them
     ret

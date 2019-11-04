@@ -103,12 +103,12 @@ __DPROTO(`d,e,iyh,iyl',`d,e,iyh,iyl',DRESULT,,disk_ioctl,BYTE pdrv, BYTE cmd, vo
 // CSIO SD COMMANDS
 //
 
-__DPROTO(`b,c,d,e,h,iyh,iyl',`b,c,d,e,h,iyh,iyl',void,,sd_clock,uint8_t)
+__DPROTO(`b,c,d,e,iyh,iyl',`b,c,d,e,iyh,iyl',void,,sd_clock,uint8_t)
 __DPROTO(`b,c,d,e,h,l,iyh,iyl',`b,c,d,e,h,l,iyh,iyl',void,,sd_cs_lower,void)
 __DPROTO(`b,c,d,e,h,l,iyh,iyl',`b,c,d,e,h,l,iyh,iyl',void,,sd_cs_raise,void)
-__DPROTO(`b,c,d,e,h,iyh,iyl',`b,c,d,e,h,iyh,iyl',void,,sd_write_byte,uint8_t)
+__DPROTO(`b,c,d,e,iyh,iyl',`b,c,d,e,iyh,iyl',void,,sd_write_byte,uint8_t)
 __DPROTO(`iyh,iyl',`iyh,iyl',void,,sd_write_block,const uint8_t *from)
-__DPROTO(`b,c,d,e,h,iyh,iyl',`b,c,d,e,h,iyh,iyl',uint8_t,,sd_read_byte,void)
+__DPROTO(`b,c,d,e,iyh,iyl',`b,c,d,e,iyh,iyl',uint8_t,,sd_read_byte,void)
 __DPROTO(`iyh,iyl',`iyh,iyl',void,,sd_read_block,uint8_t *to)
 
 #endif
