@@ -17,7 +17,8 @@
 	ret	nc
 	ld	(__gfx_coords),hl
 	push	bc	;Save callers value
-	call	pixeladdress		;hl = address, a = pixel number
+	call	pixeladdress		;de = address, a = pixel number
+	ex	de,hl			;hl = address
 	ld	b,a
 	ld	a,(__MODE1_attr)
 	rlca

@@ -13,6 +13,7 @@
 	PUBLIC    putsprite
 	PUBLIC    _putsprite
 	EXTERN	pixeladdress
+        EXTERN    __MODE1_attr
 
 ; __gfx_coords: d,e (vert-horz)
 ; sprite: (ix)
@@ -51,9 +52,18 @@
 	ld	l,e
 
 	call	pixeladdress
-	xor	7
-         ld       hl,offsets_table
-         ld       c,a
+	xor	3
+	ld	b,a
+	ld	c,a
+	ld	a,(__MODE1_attr)  ; pink up ink
+attr_shift:
+	rrca
+	rrca
+	djnz	attr_shift
+	ld	(csmc+1),a	
+	ld	(cwsmc+1),a	
+	rlc	c
+         ld       hl,offsets_table 
          ld       b,0
          add      hl,bc
          ld       a,(hl)
@@ -74,9 +84,12 @@
          ld       b,d               ;Load width
          ld       c,(ix+2)          ;Load one line of image
          inc      ix
+.csmc    ld       a,@11000000       ;colour
+         ex       af,af
 ._smc1   ld       a,1               ;Load pixel mask
 ._iloop  sla      c                 ;Test leftmost pixel
          jr       nc,_noplot        ;See if a plot is needed
+         ex       af,af
          ld       e,a
 
 .ortype
@@ -84,11 +97,17 @@
          nop	; changed into and/or/xor (hl)
          ld       (hl),a
          ld       a,e
+         ex       af,af
 ._noplot rrca
 	 rrca
          jr       nc,_notedge       ;Test if edge of byte reached
          inc      hl                ;Go to next byte
-._notedge djnz     _iloop
+._notedge 
+         ex      af,af		    ;Shift colir mask
+	 rrca
+	 rrca
+         ex      af,af
+         djnz     _iloop
          pop      hl                ;Restore address
          ld       bc,32      ;Go to next line
          add      hl,bc
@@ -108,10 +127,13 @@
          ld       c,(ix+2)          ;Load one line of image
          inc      ix
          ld	d,2
+.cwsmc   ld       a,@11000000       ;colour
+         ex       af,af
 .wsmc1    
 	 ld	a,1
 .wiloop  sla      c                 ;Test leftmost pixel
          jr       nc,wnoplot         ;See if a plot is needed
+	 ex	 af,af
          ld       e,a
 
 .ortype2
@@ -119,11 +141,16 @@
          nop	; changed into and/or/xor (hl)
          ld       (hl),a
          ld       a,e
+	 ex	 af,af
 .wnoplot rrca
 	 rrca
          jr       nc,wnotedge        ;Test if edge of byte reached
          inc      hl                ;Go to next byte
 .wnotedge
+	ex	af,af
+	rrca
+	rrca
+	ex	af,af
 .wsmc2
 	cp       1
 	jr	nz,nowover_1

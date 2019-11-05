@@ -10,7 +10,8 @@
 
 ; Entry  h = x
 ;        l = y
-; Exit: hl = address	
+; Exit: de = address	
+;	hl = undisturbed
 ;	 a = pixel number
 ; Uses: a, bc, de, hl
 	defc pixeladdress = pixeladdress_MODE1
