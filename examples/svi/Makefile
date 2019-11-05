@@ -38,6 +38,9 @@ else
 all: $(EXECFILES) dstar.cas microman.cas othello.cas wall.cas globe.cas snakes.cas vtstone.cas
 endif
 
+ex4.cas: ../msx/ex4.c
+	$(CC) $(CFLAGS) -oex4.bin ../msx/ex4.c -lsvibios
+
 ex6.cas: ../msx/ex6.c
 	$(CC) $(CFLAGS) -oex6.bin ../msx/ex6.c -lsvibios
 
