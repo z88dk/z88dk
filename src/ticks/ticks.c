@@ -3531,6 +3531,7 @@ int main (int argc, char **argv){
            l = get_memory( (e|d<<8));
            h = get_memory( (e|d<<8) + 1);
            st+=10;
+		   break;
         } else if ( is8080() ) {
           if ( get_memory(pc) != 0xfe) {
             printf("%04x: ILLEGAL 8080 prefix 0xED\n",pc-1);
