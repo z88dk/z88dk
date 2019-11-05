@@ -336,7 +336,7 @@
           mp= pc= n
 
 #define EXSPI(a, b)             \
-          st+= isez80() ? 5 : israbbit() ? 13 : isz180() ? 16 : is8080() ? 18 : is8085() ? 16 : isgbz80() ? 16 : 19, \
+          st+= isez80() ? 5 : israbbit() ? 13 : isz180() ? 16 : is8080() ? 18 : is8085() ? 16 : 19, \
           t= get_memory(sp),    \
           put_memory(sp++,b),   \
           b= t,                 \
@@ -2935,7 +2935,7 @@ int main (int argc, char **argv){
           pc= xl | xh<<8;
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xf9: // LD SP,HL
-        st+= isez80() ? 1 : israbbit() ? 2 : is8085() ? 6  : is8080() ? 5 : isgbz80() ? 8 : 4;
+        st+= isez80() ? 1 : israbbit() ? 2 : is8085() ? 6  : is8080() ? 5 : isgbz80() ? 8 : 6;
         if( ih )
           sp= l | h<<8;
         else if( iy )
