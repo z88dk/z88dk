@@ -1,6 +1,6 @@
 
 		SECTION	code_clib
-		PUBLIC	xorpixl
+		PUBLIC	xorpixel
 
 		EXTERN	xor_MODE0
 		EXTERN	xor_MODE1
@@ -8,7 +8,7 @@
 		EXTERN	__vz200_mode
 
 
-xorpixl:
+xorpixel:
 		ld	a,(__vz200_mode)
 		and	a
 		jp	z,xor_MODE0

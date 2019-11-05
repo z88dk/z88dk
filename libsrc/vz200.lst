@@ -24,8 +24,9 @@ graphics/fill
 graphics/dfill
 graphics/getsprite
 graphics/stencil_render2
+graphics/putsprite2
 target/vz/graphics/clsgraph
-target/vz/graphics/putsprite
+#target/vz/graphics/putsprite
 target/vz/graphics/bksave
 target/vz/graphics/bkrestore
 target/vz/graphics/swapgfxbk
