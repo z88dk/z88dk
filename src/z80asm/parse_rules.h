@@ -88544,6 +88544,12 @@ default: error_illegal_ident(); }
 	case 4314:
 	{
 switch (opts.cpu) {
+case CPU_GBZ80:
+do { asm_cond_LABEL(stmt_label); add_opcode(0xE5); } while(0);
+do { asm_cond_LABEL(stmt_label); add_opcode(0xD5); } while(0);
+do { asm_cond_LABEL(stmt_label); add_opcode(0xE1); } while(0);
+do { asm_cond_LABEL(stmt_label); add_opcode(0xD1); } while(0);
+break;
 case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xEB); } while(0);
 break;

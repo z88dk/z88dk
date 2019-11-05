@@ -39531,6 +39531,12 @@ default: error_illegal_ident(); }
 
 | label? _TK_XCHG _TK_NEWLINE @{
 switch (opts.cpu) {
+case CPU_GBZ80: 
+DO_stmt(0xE5);
+DO_stmt(0xD5);
+DO_stmt(0xE1);
+DO_stmt(0xD1);
+break;
 case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 DO_stmt(0xEB);
 break;

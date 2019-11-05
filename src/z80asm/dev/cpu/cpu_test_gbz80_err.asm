@@ -7528,7 +7528,6 @@
  tstio 255                      ; Error
  uma                            ; Error
  ums                            ; Error
- xchg                           ; Error
  xor (ix)                       ; Error
  xor (ix+127)                   ; Error
  xor (ix-128)                   ; Error

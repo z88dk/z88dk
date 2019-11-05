@@ -1185,6 +1185,7 @@
  swap e                         ; CB 33
  swap h                         ; CB 34
  swap l                         ; CB 35
+ xchg                           ; E5 D5 E1 D1
  xor (hl)                       ; AE
  xor -128                       ; EE 80
  xor 127                        ; EE 7F

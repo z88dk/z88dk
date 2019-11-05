@@ -364,6 +364,8 @@ for my $cpu (@CPUS) {
 	if ($gameboy) {
 		add_opc($cpu, "ex de, hl",		push_d('hl'), push_d('de'),
 										pop_d('hl'), pop_d('de'));
+		add_opc($cpu, "xchg",			push_d('hl'), push_d('de'),
+										pop_d('hl'), pop_d('de'));
 	}
 	else {
 		add_opc($cpu, "ex de, hl",	0xEB);
