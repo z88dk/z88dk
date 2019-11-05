@@ -38,12 +38,14 @@ else
 all: $(EXECFILES) EX8.COM ADVA.COM dstar.cas microman.cas othello.cas wall.cas globe.cas snakes.cas vtstone.cas
 endif
 
-
 EX8.COM: ex8.c
 	$(CC) +msx -vn -subtype=msxdos -create-app -oex8 ex8.c -lmsxbios
 
 ADVA.COM: ../console/adv_a.c
 	$(CC) +msx -vn -subtype=msxdos ../console/adv_a.c -I../console -DCOMPUTE_SCORE -DPICS -DDISK -create-app -clib=ansi -oadva.bin
+
+ex4.cas: ex4.c
+	$(CC) $(CFLAGS) -oex4.bin ex4.c -lmsxbios
 
 ex6.cas: ex6.c
 	$(CC) $(CFLAGS) -oex6.bin ex6.c -lmsxbios
