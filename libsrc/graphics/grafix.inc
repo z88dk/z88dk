@@ -74,11 +74,11 @@ IF FORvz
 	IF BLOCKgfx
 	    defc maxx	= 64
       	    defc maxy	= 32
-	    defc USEplotc   = 1		; We call generic_console_plotc, not _printc for text mode
 	ELSE
 	    defc maxx	= 128
       	    defc maxy	= 64
 	ENDIF
+	defc USEplotc   = 1		; We call generic_console_plotc, not _printc for text mode
 ENDIF
 
 IF FORg800

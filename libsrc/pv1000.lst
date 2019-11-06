@@ -12,7 +12,7 @@ graphics/generic_console/plotpixl
 graphics/generic_console/respixl
 graphics/generic_console/xorpixl
 graphics/generic_console/pointxy
-graphics/putsprite3
+graphics/putsprite2
 graphics/stencil_render2
 graphics/text/swapgfxbk
 @gfxbase.lst

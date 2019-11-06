@@ -7,6 +7,8 @@
 	PUBLIC	textbackground
 	PUBLIC	_textbackground
 
+	SECTION	code_clib
+
 	EXTERN	generic_console_set_paper
 
 

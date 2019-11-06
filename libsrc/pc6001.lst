@@ -51,6 +51,7 @@ graphics/clg
 graphics/fill
 graphics/dfill
 graphics/getsprite
+graphics/putsprite2
 graphics/stencil_render2
 @gfxbase.lst
 psg/pc6001/set_psg

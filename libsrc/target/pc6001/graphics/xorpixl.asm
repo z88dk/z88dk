@@ -1,6 +1,6 @@
 
 		SECTION	code_clib
-		PUBLIC	xorpixl
+		PUBLIC	xorpixel
 
 		EXTERN	xor_MODE0
 		EXTERN	xor_MODE1
@@ -10,7 +10,7 @@
 		INCLUDE	"target/pc6001/def/pc6001.def"
 
 
-xorpixl:
+xorpixel:
 		ld	a,(__pc6001_mode)
 		cp	MODE_1
 		jp	z,xor_MODE1
