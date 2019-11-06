@@ -9,4 +9,9 @@ EXTERN asm_sd_read_byte
     ;  
     ;output L = byte read from SD drive
 
-defc _sd_read_byte = asm_sd_read_byte
+._sd_read_byte
+    pop af
+    pop hl
+    push hl
+    push af
+    jp asm_sd_read_byte
