@@ -77,6 +77,9 @@
 36 %n         |ld (hl), %n|~          |~          |   |   |    |ld (hl), %n   |~   
               |mvi m, %n  |           |           |   |   |    |mvi m, %n     |    
               |           |           |           |   |   |    |              |    
+37            |scf        |~          |~          |   |   |    |scf           |~   
+              |stc        |           |           |   |   |    |stc           |    
+              |           |           |           |   |   |    |              |    
 3A            |           |           |ld a, (hl-)|   |   |    |              |    
               |           |           |ld a, (hld)|   |   |    |              |    
               |           |           |ldd a, (hl)|   |   |    |              |    
@@ -86,6 +89,9 @@
               |           |           |           |   |   |    |              |    
 3E %n         |ld a, %n   |~          |~          |   |   |    |ld a, %n      |~   
               |mvi a, %n  |           |           |   |   |    |mvi a, %n     |    
+              |           |           |           |   |   |    |              |    
+3F            |ccf        |~          |~          |   |   |    |ccf           |~   
+              |cmc        |           |           |   |   |    |cmc           |    
               |           |           |           |   |   |    |              |    
 40            |ld b, b    |~          |~          |   |   |    |ld b, b       |~   
               |mov b, b   |           |           |   |   |    |mov b, b      |    
@@ -276,11 +282,258 @@
 7F            |ld a, a    |~          |~          |   |   |    |ld a, a       |~   
               |mov a, a   |           |           |   |   |    |mov a, a      |    
               |           |           |           |   |   |    |              |    
+80            |add a, b   |~          |~          |   |   |    |add a, b      |~   
+              |add b      |           |           |   |   |    |add b         |    
+              |           |           |           |   |   |    |              |    
+81            |add a, c   |~          |~          |   |   |    |add a, c      |~   
+              |add c      |           |           |   |   |    |add c         |    
+              |           |           |           |   |   |    |              |    
+82            |add a, d   |~          |~          |   |   |    |add a, d      |~   
+              |add d      |           |           |   |   |    |add d         |    
+              |           |           |           |   |   |    |              |    
+83            |add a, e   |~          |~          |   |   |    |add a, e      |~   
+              |add e      |           |           |   |   |    |add e         |    
+              |           |           |           |   |   |    |              |    
+84            |add a, h   |~          |~          |   |   |    |add a, h      |~   
+              |add h      |           |           |   |   |    |add h         |    
+              |           |           |           |   |   |    |              |    
+85            |add a, l   |~          |~          |   |   |    |add a, l      |~   
+              |add l      |           |           |   |   |    |add l         |    
+              |           |           |           |   |   |    |              |    
+86            |add (hl)   |~          |~          |   |   |    |add (hl)      |~   
+              |add a, (hl)|           |           |   |   |    |add a, (hl)   |    
+              |add m      |           |           |   |   |    |add m         |    
+              |           |           |           |   |   |    |              |    
+87            |add a      |~          |~          |   |   |    |add a         |~   
+              |add a, a   |           |           |   |   |    |add a, a      |    
+              |           |           |           |   |   |    |              |    
+88            |adc a, b   |~          |~          |   |   |    |adc a, b      |~   
+              |adc b      |           |           |   |   |    |adc b         |    
+              |           |           |           |   |   |    |              |    
+89            |adc a, c   |~          |~          |   |   |    |adc a, c      |~   
+              |adc c      |           |           |   |   |    |adc c         |    
+              |           |           |           |   |   |    |              |    
+8A            |adc a, d   |~          |~          |   |   |    |adc a, d      |~   
+              |adc d      |           |           |   |   |    |adc d         |    
+              |           |           |           |   |   |    |              |    
+8B            |adc a, e   |~          |~          |   |   |    |adc a, e      |~   
+              |adc e      |           |           |   |   |    |adc e         |    
+              |           |           |           |   |   |    |              |    
+8C            |adc a, h   |~          |~          |   |   |    |adc a, h      |~   
+              |adc h      |           |           |   |   |    |adc h         |    
+              |           |           |           |   |   |    |              |    
+8D            |adc a, l   |~          |~          |   |   |    |adc a, l      |~   
+              |adc l      |           |           |   |   |    |adc l         |    
+              |           |           |           |   |   |    |              |    
+8E            |adc (hl)   |~          |~          |   |   |    |adc (hl)      |~   
+              |adc a, (hl)|           |           |   |   |    |adc a, (hl)   |    
+              |adc m      |           |           |   |   |    |adc m         |    
+              |           |           |           |   |   |    |              |    
+8F            |adc a      |~          |~          |   |   |    |adc a         |~   
+              |adc a, a   |           |           |   |   |    |adc a, a      |    
+              |           |           |           |   |   |    |              |    
+90            |sub a, b   |~          |~          |   |   |    |sub a, b      |~   
+              |sub b      |           |           |   |   |    |sub b         |    
+              |           |           |           |   |   |    |              |    
+91            |sub a, c   |~          |~          |   |   |    |sub a, c      |~   
+              |sub c      |           |           |   |   |    |sub c         |    
+              |           |           |           |   |   |    |              |    
+92            |sub a, d   |~          |~          |   |   |    |sub a, d      |~   
+              |sub d      |           |           |   |   |    |sub d         |    
+              |           |           |           |   |   |    |              |    
+93            |sub a, e   |~          |~          |   |   |    |sub a, e      |~   
+              |sub e      |           |           |   |   |    |sub e         |    
+              |           |           |           |   |   |    |              |    
+94            |sub a, h   |~          |~          |   |   |    |sub a, h      |~   
+              |sub h      |           |           |   |   |    |sub h         |    
+              |           |           |           |   |   |    |              |    
+95            |sub a, l   |~          |~          |   |   |    |sub a, l      |~   
+              |sub l      |           |           |   |   |    |sub l         |    
+              |           |           |           |   |   |    |              |    
+96            |sub (hl)   |~          |~          |   |   |    |sub (hl)      |~   
+              |sub a, (hl)|           |           |   |   |    |sub a, (hl)   |    
+              |sub m      |           |           |   |   |    |sub m         |    
+              |           |           |           |   |   |    |              |    
+97            |sub a      |~          |~          |   |   |    |sub a         |~   
+              |sub a, a   |           |           |   |   |    |sub a, a      |    
+              |           |           |           |   |   |    |              |    
+98            |sbb b      |~          |~          |   |   |    |sbb b         |~   
+              |sbc a, b   |           |           |   |   |    |sbc a, b      |    
+              |sbc b      |           |           |   |   |    |sbc b         |    
+              |           |           |           |   |   |    |              |    
+99            |sbb c      |~          |~          |   |   |    |sbb c         |~   
+              |sbc a, c   |           |           |   |   |    |sbc a, c      |    
+              |sbc c      |           |           |   |   |    |sbc c         |    
+              |           |           |           |   |   |    |              |    
+9A            |sbb d      |~          |~          |   |   |    |sbb d         |~   
+              |sbc a, d   |           |           |   |   |    |sbc a, d      |    
+              |sbc d      |           |           |   |   |    |sbc d         |    
+              |           |           |           |   |   |    |              |    
+9B            |sbb e      |~          |~          |   |   |    |sbb e         |~   
+              |sbc a, e   |           |           |   |   |    |sbc a, e      |    
+              |sbc e      |           |           |   |   |    |sbc e         |    
+              |           |           |           |   |   |    |              |    
+9C            |sbb h      |~          |~          |   |   |    |sbb h         |~   
+              |sbc a, h   |           |           |   |   |    |sbc a, h      |    
+              |sbc h      |           |           |   |   |    |sbc h         |    
+              |           |           |           |   |   |    |              |    
+9D            |sbb l      |~          |~          |   |   |    |sbb l         |~   
+              |sbc a, l   |           |           |   |   |    |sbc a, l      |    
+              |sbc l      |           |           |   |   |    |sbc l         |    
+              |           |           |           |   |   |    |              |    
+9E            |sbb m      |~          |~          |   |   |    |sbb m         |~   
+              |sbc (hl)   |           |           |   |   |    |sbc (hl)      |    
+              |sbc a, (hl)|           |           |   |   |    |sbc a, (hl)   |    
+              |           |           |           |   |   |    |              |    
+9F            |sbb a      |~          |~          |   |   |    |sbb a         |~   
+              |sbc a      |           |           |   |   |    |sbc a         |    
+              |sbc a, a   |           |           |   |   |    |sbc a, a      |    
+              |           |           |           |   |   |    |              |    
+A0            |ana b      |~          |~          |   |   |    |ana b         |~   
+              |and a, b   |           |           |   |   |    |and a, b      |    
+              |and b      |           |           |   |   |    |and b         |    
+              |           |           |           |   |   |    |              |    
+A1            |ana c      |~          |~          |   |   |    |ana c         |~   
+              |and a, c   |           |           |   |   |    |and a, c      |    
+              |and c      |           |           |   |   |    |and c         |    
+              |           |           |           |   |   |    |              |    
+A2            |ana d      |~          |~          |   |   |    |ana d         |~   
+              |and a, d   |           |           |   |   |    |and a, d      |    
+              |and d      |           |           |   |   |    |and d         |    
+              |           |           |           |   |   |    |              |    
+A3            |ana e      |~          |~          |   |   |    |ana e         |~   
+              |and a, e   |           |           |   |   |    |and a, e      |    
+              |and e      |           |           |   |   |    |and e         |    
+              |           |           |           |   |   |    |              |    
+A4            |ana h      |~          |~          |   |   |    |ana h         |~   
+              |and a, h   |           |           |   |   |    |and a, h      |    
+              |and h      |           |           |   |   |    |and h         |    
+              |           |           |           |   |   |    |              |    
+A5            |ana l      |~          |~          |   |   |    |ana l         |~   
+              |and a, l   |           |           |   |   |    |and a, l      |    
+              |and l      |           |           |   |   |    |and l         |    
+              |           |           |           |   |   |    |              |    
+A6            |ana m      |~          |~          |   |   |    |ana m         |~   
+              |and (hl)   |           |           |   |   |    |and (hl)      |    
+              |and a, (hl)|           |           |   |   |    |and a, (hl)   |    
+              |           |           |           |   |   |    |              |    
+A7            |ana a      |~          |~          |   |   |    |ana a         |~   
+              |and a      |           |           |   |   |    |and a         |    
+              |and a, a   |           |           |   |   |    |and a, a      |    
+              |           |           |           |   |   |    |              |    
+A8            |xor a, b   |~          |~          |   |   |    |xor a, b      |~   
+              |xor b      |           |           |   |   |    |xor b         |    
+              |xra b      |           |           |   |   |    |xra b         |    
+              |           |           |           |   |   |    |              |    
+A9            |xor a, c   |~          |~          |   |   |    |xor a, c      |~   
+              |xor c      |           |           |   |   |    |xor c         |    
+              |xra c      |           |           |   |   |    |xra c         |    
+              |           |           |           |   |   |    |              |    
+AA            |xor a, d   |~          |~          |   |   |    |xor a, d      |~   
+              |xor d      |           |           |   |   |    |xor d         |    
+              |xra d      |           |           |   |   |    |xra d         |    
+              |           |           |           |   |   |    |              |    
+AB            |xor a, e   |~          |~          |   |   |    |xor a, e      |~   
+              |xor e      |           |           |   |   |    |xor e         |    
+              |xra e      |           |           |   |   |    |xra e         |    
+              |           |           |           |   |   |    |              |    
+AC            |xor a, h   |~          |~          |   |   |    |xor a, h      |~   
+              |xor h      |           |           |   |   |    |xor h         |    
+              |xra h      |           |           |   |   |    |xra h         |    
+              |           |           |           |   |   |    |              |    
+AD            |xor a, l   |~          |~          |   |   |    |xor a, l      |~   
+              |xor l      |           |           |   |   |    |xor l         |    
+              |xra l      |           |           |   |   |    |xra l         |    
+              |           |           |           |   |   |    |              |    
+AE            |xor (hl)   |~          |~          |   |   |    |xor (hl)      |~   
+              |xor a, (hl)|           |           |   |   |    |xor a, (hl)   |    
+              |xra m      |           |           |   |   |    |xra m         |    
+              |           |           |           |   |   |    |              |    
+AF            |xor a      |~          |~          |   |   |    |xor a         |~   
+              |xor a, a   |           |           |   |   |    |xor a, a      |    
+              |xra a      |           |           |   |   |    |xra a         |    
+              |           |           |           |   |   |    |              |    
+B0            |or a, b    |~          |~          |   |   |    |or a, b       |~   
+              |or b       |           |           |   |   |    |or b          |    
+              |ora b      |           |           |   |   |    |ora b         |    
+              |           |           |           |   |   |    |              |    
+B1            |or a, c    |~          |~          |   |   |    |or a, c       |~   
+              |or c       |           |           |   |   |    |or c          |    
+              |ora c      |           |           |   |   |    |ora c         |    
+              |           |           |           |   |   |    |              |    
+B2            |or a, d    |~          |~          |   |   |    |or a, d       |~   
+              |or d       |           |           |   |   |    |or d          |    
+              |ora d      |           |           |   |   |    |ora d         |    
+              |           |           |           |   |   |    |              |    
+B3            |or a, e    |~          |~          |   |   |    |or a, e       |~   
+              |or e       |           |           |   |   |    |or e          |    
+              |ora e      |           |           |   |   |    |ora e         |    
+              |           |           |           |   |   |    |              |    
+B4            |or a, h    |~          |~          |   |   |    |or a, h       |~   
+              |or h       |           |           |   |   |    |or h          |    
+              |ora h      |           |           |   |   |    |ora h         |    
+              |           |           |           |   |   |    |              |    
+B5            |or a, l    |~          |~          |   |   |    |or a, l       |~   
+              |or l       |           |           |   |   |    |or l          |    
+              |ora l      |           |           |   |   |    |ora l         |    
+              |           |           |           |   |   |    |              |    
+B6            |or (hl)    |~          |~          |   |   |    |or (hl)       |~   
+              |or a, (hl) |           |           |   |   |    |or a, (hl)    |    
+              |ora m      |           |           |   |   |    |ora m         |    
+              |           |           |           |   |   |    |              |    
+B7            |or a       |~          |~          |   |   |    |or a          |~   
+              |or a, a    |           |           |   |   |    |or a, a       |    
+              |ora a      |           |           |   |   |    |ora a         |    
+              |           |           |           |   |   |    |              |    
+B8            |cmp b      |~          |cmp b      |   |   |    |cmp b         |~   
+              |           |           |cp a, b    |   |   |    |cp a, b       |    
+              |           |           |cp b       |   |   |    |cp b          |    
+              |           |           |           |   |   |    |              |    
+B9            |cmp c      |~          |cmp c      |   |   |    |cmp c         |~   
+              |           |           |cp a, c    |   |   |    |cp a, c       |    
+              |           |           |cp c       |   |   |    |cp c          |    
+              |           |           |           |   |   |    |              |    
+BA            |cmp d      |~          |cmp d      |   |   |    |cmp d         |~   
+              |           |           |cp a, d    |   |   |    |cp a, d       |    
+              |           |           |cp d       |   |   |    |cp d          |    
+              |           |           |           |   |   |    |              |    
+BB            |cmp e      |~          |cmp e      |   |   |    |cmp e         |~   
+              |           |           |cp a, e    |   |   |    |cp a, e       |    
+              |           |           |cp e       |   |   |    |cp e          |    
+              |           |           |           |   |   |    |              |    
+BC            |cmp h      |~          |cmp h      |   |   |    |cmp h         |~   
+              |           |           |cp a, h    |   |   |    |cp a, h       |    
+              |           |           |cp h       |   |   |    |cp h          |    
+              |           |           |           |   |   |    |              |    
+BD            |cmp l      |~          |cmp l      |   |   |    |cmp l         |~   
+              |           |           |cp a, l    |   |   |    |cp a, l       |    
+              |           |           |cp l       |   |   |    |cp l          |    
+              |           |           |           |   |   |    |              |    
+BE            |cmp m      |~          |cmp m      |   |   |    |cmp m         |~   
+              |           |           |cp (hl)    |   |   |    |cp (hl)       |    
+              |           |           |cp a, (hl) |   |   |    |cp a, (hl)    |    
+              |           |           |           |   |   |    |              |    
+BF            |cmp a      |~          |cmp a      |   |   |    |cmp a         |~   
+              |           |           |cp a       |   |   |    |cp a          |    
+              |           |           |cp a, a    |   |   |    |cp a, a       |    
+              |           |           |           |   |   |    |              |    
 C1            |pop b      |~          |~          |   |   |    |pop b         |~   
               |pop bc     |           |           |   |   |    |pop bc        |    
               |           |           |           |   |   |    |              |    
 C5            |push b     |~          |~          |   |   |    |push b        |~   
               |push bc    |           |           |   |   |    |push bc       |    
+              |           |           |           |   |   |    |              |    
+C6 %n         |add %n     |~          |~          |   |   |    |add %n        |~   
+              |add a, %n  |           |           |   |   |    |add a, %n     |    
+              |adi %n     |           |           |   |   |    |adi %n        |    
+              |           |           |           |   |   |    |              |    
+CD @cpd       |cpd        |~          |~          |   |   |    |              |    
+              |           |           |           |   |   |    |              |    
+CD @cpdr      |cpdr       |~          |~          |   |   |    |              |    
+              |           |           |           |   |   |    |              |    
+CD @cpi       |cpi        |~          |~          |   |   |    |              |    
+              |           |           |           |   |   |    |              |    
+CD @cpir      |cpir       |~          |~          |   |   |    |              |    
               |           |           |           |   |   |    |              |    
 CD @ex_sp_hl  |           |           |ex (sp), hl|   |   |    |              |    
               |           |           |           |   |   |    |              |    
@@ -292,11 +545,19 @@ CD @ldi       |ldi        |~          |~          |   |   |    |              |
               |           |           |           |   |   |    |              |    
 CD @ldir      |ldir       |~          |~          |   |   |    |              |    
               |           |           |           |   |   |    |              |    
+CE %n         |aci %n     |~          |~          |   |   |    |aci %n        |~   
+              |adc %n     |           |           |   |   |    |adc %n        |    
+              |adc a, %n  |           |           |   |   |    |adc a, %n     |    
+              |           |           |           |   |   |    |              |    
 D1            |pop d      |~          |~          |   |   |    |pop d         |~   
               |pop de     |           |           |   |   |    |pop de        |    
               |           |           |           |   |   |    |              |    
 D5            |push d     |~          |~          |   |   |    |push d        |~   
               |push de    |           |           |   |   |    |push de       |    
+              |           |           |           |   |   |    |              |    
+D6 %n         |sub %n     |~          |~          |   |   |    |sub %n        |~   
+              |sub a, %n  |           |           |   |   |    |sub a, %n     |    
+              |sui %n     |           |           |   |   |    |sui %n        |    
               |           |           |           |   |   |    |              |    
 D9            |           |ld (de), hl|           |   |   |    |              |    
               |           |shlde      |           |   |   |    |              |    
@@ -428,6 +689,10 @@ DD E5         |           |           |           |   |   |    |push ix       |~
               |           |           |           |   |   |    |              |    
 DD F9         |           |           |           |   |   |    |ld sp, ix     |~   
               |           |           |           |   |   |    |              |    
+DE %n         |sbc %n     |~          |~          |   |   |    |sbc %n        |~   
+              |sbc a, %n  |           |           |   |   |    |sbc a, %n     |    
+              |sbi %n     |           |           |   |   |    |sbi %n        |    
+              |           |           |           |   |   |    |              |    
 E1            |pop h      |~          |~          |   |   |    |pop h         |~   
               |pop hl     |           |           |   |   |    |pop hl        |    
               |           |           |           |   |   |    |              |    
@@ -439,6 +704,10 @@ E5            |push h     |~          |~          |   |   |    |push h        |~
               |           |           |           |   |   |    |              |    
 E5; D5; E1; D1|           |           |ex de, hl  |   |   |    |              |    
               |           |           |xchg       |   |   |    |              |    
+              |           |           |           |   |   |    |              |    
+E6 %n         |and %n     |~          |~          |   |   |    |and %n        |~   
+              |and a, %n  |           |           |   |   |    |and a, %n     |    
+              |ani %n     |           |           |   |   |    |ani %n        |    
               |           |           |           |   |   |    |              |    
 EA %m %m      |           |           |ld (%m), a |   |   |    |              |    
               |           |           |sta %m     |   |   |    |              |    
@@ -472,17 +741,33 @@ ED 7B %m %m   |           |           |           |   |   |    |ld sp, (%m)   |~
               |           |           |           |   |   |    |              |    
 ED A0         |           |           |           |   |   |    |ldi           |~   
               |           |           |           |   |   |    |              |    
+ED A1         |           |           |           |   |   |    |cpi           |~   
+              |           |           |           |   |   |    |              |    
 ED A8         |           |           |           |   |   |    |ldd           |~   
+              |           |           |           |   |   |    |              |    
+ED A9         |           |           |           |   |   |    |cpd           |~   
               |           |           |           |   |   |    |              |    
 ED B0         |           |           |           |   |   |    |ldir          |~   
               |           |           |           |   |   |    |              |    
+ED B1         |           |           |           |   |   |    |cpir          |~   
+              |           |           |           |   |   |    |              |    
 ED B8         |           |           |           |   |   |    |lddr          |~   
+              |           |           |           |   |   |    |              |    
+ED B9         |           |           |           |   |   |    |cpdr          |~   
+              |           |           |           |   |   |    |              |    
+EE %n         |xor %n     |~          |~          |   |   |    |xor %n        |~   
+              |xor a, %n  |           |           |   |   |    |xor a, %n     |    
+              |xri %n     |           |           |   |   |    |xri %n        |    
               |           |           |           |   |   |    |              |    
 F1            |pop af     |~          |~          |   |   |    |pop af        |~   
               |pop psw    |           |           |   |   |    |pop psw       |    
               |           |           |           |   |   |    |              |    
 F5            |push af    |~          |~          |   |   |    |push af       |~   
               |push psw   |           |           |   |   |    |push psw      |    
+              |           |           |           |   |   |    |              |    
+F6 %n         |or %n      |~          |~          |   |   |    |or %n         |~   
+              |or a, %n   |           |           |   |   |    |or a, %n      |    
+              |ori %n     |           |           |   |   |    |ori %n        |    
               |           |           |           |   |   |    |              |    
 F9            |ld sp, hl  |~          |~          |   |   |    |ld sp, hl     |~   
               |sphl       |           |           |   |   |    |sphl          |    
@@ -615,4 +900,8 @@ FD E3         |           |           |           |   |   |    |ex (sp), iy   |~
 FD E5         |           |           |           |   |   |    |push iy       |~   
               |           |           |           |   |   |    |              |    
 FD F9         |           |           |           |   |   |    |ld sp, iy     |~   
+              |           |           |           |   |   |    |              |    
+FE %n         |cpi %n     |~          |cp %n      |   |   |    |cp %n         |~   
+              |           |           |cp a, %n   |   |   |    |cp a, %n      |    
+              |           |           |cpi %n     |   |   |    |cpi %n        |    
               |           |           |           |   |   |    |              |    

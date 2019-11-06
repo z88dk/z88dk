@@ -309,9 +309,13 @@
  cp e                           ; BB
  cp h                           ; BC
  cp l                           ; BD
+ cpd                            ; CD @__z80asm__cpd
+ cpdr                           ; CD @__z80asm__cpdr
+ cpi                            ; CD @__z80asm__cpi
  cpi -128                       ; FE 80
  cpi 127                        ; FE 7F
  cpi 255                        ; FE FF
+ cpir                           ; CD @__z80asm__cpir
  cpl                            ; 2F
  cpl a                          ; 2F
  cz -32768                      ; CC 00 80

@@ -3837,18 +3837,18 @@ cp iyl                 |             |        |            |           |        
                        |             |        |            |           |        |           |           |           
 cp l                   |BD           |~       |~           |~          |~       |~          |~          |~          
                        |             |        |            |           |        |           |           |           
-cpd                    |CD @cpd      |~       |            |CD @cpd    |~       |ED A9      |~          |~          
+cpd                    |CD @cpd      |~       |~           |~          |~       |ED A9      |~          |~          
                        |             |        |            |           |        |           |           |           
-cpdr                   |CD @cpdr     |~       |            |CD @cpdr   |~       |ED B9      |~          |~          
+cpdr                   |CD @cpdr     |~       |~           |~          |~       |ED B9      |~          |~          
                        |             |        |            |           |        |           |           |           
 cpe %m                 |EC %m %m     |~       |            |E2 %t %t CD|~       |EC %m %m   |~          |~          
                        |             |        |            |%m %m      |        |           |           |           
                        |             |        |            |           |        |           |           |           
-cpi                    |CD @cpi      |~       |            |CD @cpi    |~       |ED A1      |~          |~          
+cpi                    |CD @cpi      |~       |~           |~          |~       |ED A1      |~          |~          
                        |             |        |            |           |        |           |           |           
 cpi %n                 |FE %n        |~       |~           |~          |~       |~          |~          |~          
                        |             |        |            |           |        |           |           |           
-cpir                   |CD @cpir     |~       |            |CD @cpir   |~       |ED B1      |~          |~          
+cpir                   |CD @cpir     |~       |~           |~          |~       |ED B1      |~          |~          
                        |             |        |            |           |        |           |           |           
 cpl                    |2F           |~       |~           |~          |~       |~          |~          |~          
                        |             |        |            |           |        |           |           |           

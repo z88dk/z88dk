@@ -5,6 +5,10 @@
 SECTION code_crt0_sccz80
 PUBLIC __z80asm__cpdr
 
+IF __CPU_GBZ80__
+EXTERN __z80asm__ex_sp_hl
+ENDIF
+
 .__z80asm__cpdr
  
    jr nc, enterloop
@@ -13,8 +17,12 @@ PUBLIC __z80asm__cpdr
    
 ; scf clears N and H - must set carry the hard way
    push af
+IF __CPU_GBZ80__
+   call __z80asm__ex_sp_hl
+ELSE
    ex (sp),hl
-IF __CPU_8080__ || __CPU_8085__
+ENDIF
+IF __CPU_INTEL__
    ld  a,l
    or  @00000001
    ld  l,a
@@ -48,8 +56,12 @@ ENDIF
  
 .joinbc0
  
+IF __CPU_GBZ80__
+   call __z80asm__ex_sp_hl
+ELSE
    ex (sp),hl
-IF __CPU_8080__ || __CPU_8085__
+ENDIF
+IF __CPU_INTEL__
    ld a,l
    and @11111010
    ld  l,a
@@ -68,8 +80,12 @@ ENDIF
    or c
    jr z, joinbc0
   
+IF __CPU_GBZ80__
+   call __z80asm__ex_sp_hl
+ELSE
    ex (sp),hl
-IF __CPU_8080__ || __CPU_8085__
+ENDIF
+IF __CPU_INTEL__
    ld a,l
    and @11111110
    or  @00000100
@@ -80,6 +96,10 @@ ELSE
 ENDIF
 
 .retflags
+IF __CPU_GBZ80__
+   call __z80asm__ex_sp_hl
+ELSE
    ex (sp),hl
+ENDIF
    pop af
    ret

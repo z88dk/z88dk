@@ -4397,13 +4397,13 @@ CD @add_de_a                 |add de, a    |~           |~            |~        
                              |             |            |             |                       |         |               |              |              
 CD @add_hl_a                 |add hl, a    |~           |~            |~                      |~        |~              |~             |              
                              |             |            |             |                       |         |               |              |              
-CD @cpd                      |cpd          |~           |             |cpd                    |~        |               |              |              
+CD @cpd                      |cpd          |~           |~            |~                      |~        |               |              |              
                              |             |            |             |                       |         |               |              |              
-CD @cpdr                     |cpdr         |~           |             |cpdr                   |~        |               |              |              
+CD @cpdr                     |cpdr         |~           |~            |~                      |~        |               |              |              
                              |             |            |             |                       |         |               |              |              
-CD @cpi                      |cpi          |~           |             |cpi                    |~        |               |              |              
+CD @cpi                      |cpi          |~           |~            |~                      |~        |               |              |              
                              |             |            |             |                       |         |               |              |              
-CD @cpir                     |cpir         |~           |             |cpir                   |~        |               |              |              
+CD @cpir                     |cpir         |~           |~            |~                      |~        |               |              |              
                              |             |            |             |                       |         |               |              |              
 CD @daa                      |             |            |             |daa                    |~        |               |              |              
                              |             |            |             |                       |         |               |              |              

@@ -4,6 +4,10 @@
 SECTION code_crt0_sccz80
 PUBLIC __z80asm__cpd
 
+IF __CPU_GBZ80__
+EXTERN __z80asm__ex_sp_hl
+ENDIF
+
 .__z80asm__cpd
 
    jr c, cpdwcarry
@@ -13,8 +17,12 @@ PUBLIC __z80asm__cpd
    dec bc
    
    push af
+IF __CPU_GBZ80__
+   call __z80asm__ex_sp_hl
+ELSE
    ex (sp),hl
-IF __CPU_8080__ || __CPU_8085__
+ENDIF
+IF __CPU_INTEL__
    ld  a,l
    and @11111110
    ld  l,a
@@ -24,7 +32,7 @@ ENDIF
 
 .rejoin
 
-IF __CPU_8080__ || __CPU_8085__
+IF __CPU_INTEL__
    ld  a,l
    or  @00000010
    ld  l,a
@@ -35,7 +43,7 @@ ENDIF
    ld a,b
    or c
    jr nz, exitcpd
-IF __CPU_8080__ || __CPU_8085__
+IF __CPU_INTEL__
    ld  a,l
    and @11111101
    ld  l,a
@@ -45,7 +53,11 @@ ENDIF
 
 .exitcpd
 
+IF __CPU_GBZ80__
+   call __z80asm__ex_sp_hl
+ELSE
    ex (sp),hl
+ENDIF
    pop af
    ret
 
@@ -56,8 +68,12 @@ ENDIF
    dec bc
    
    push af
+IF __CPU_GBZ80__
+   call __z80asm__ex_sp_hl
+ELSE
    ex (sp),hl
-IF __CPU_8080__ || __CPU_8085__
+ENDIF
+IF __CPU_INTEL__
    ld a,l
    or @00000001
    ld l,a

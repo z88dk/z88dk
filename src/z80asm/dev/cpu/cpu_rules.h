@@ -12364,7 +12364,7 @@ DO_stmt_n(0xFE);
 
 | label? _TK_CPD _TK_NEWLINE @{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: 
+case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K: 
 DO_STMT_LABEL();
 add_call_emul_func("__z80asm__cpd");
 break;
@@ -12376,7 +12376,7 @@ default: error_illegal_ident(); }
 
 | label? _TK_CPDR _TK_NEWLINE @{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: 
+case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K: 
 DO_STMT_LABEL();
 add_call_emul_func("__z80asm__cpdr");
 break;
@@ -12407,7 +12407,7 @@ default: error_illegal_ident(); }
 
 | label? _TK_CPI _TK_NEWLINE @{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: 
+case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K: 
 DO_STMT_LABEL();
 add_call_emul_func("__z80asm__cpi");
 break;
@@ -12424,7 +12424,7 @@ DO_stmt_n(0xFE);
 
 | label? _TK_CPIR _TK_NEWLINE @{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: 
+case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K: 
 DO_STMT_LABEL();
 add_call_emul_func("__z80asm__cpir");
 break;

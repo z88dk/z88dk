@@ -1,3 +1,25 @@
+ cp (hl)                        ; Error
+ cp -128                        ; Error
+ cp 127                         ; Error
+ cp 255                         ; Error
+ cp a                           ; Error
+ cp a, (hl)                     ; Error
+ cp a, -128                     ; Error
+ cp a, 127                      ; Error
+ cp a, 255                      ; Error
+ cp a, a                        ; Error
+ cp a, b                        ; Error
+ cp a, c                        ; Error
+ cp a, d                        ; Error
+ cp a, e                        ; Error
+ cp a, h                        ; Error
+ cp a, l                        ; Error
+ cp b                           ; Error
+ cp c                           ; Error
+ cp d                           ; Error
+ cp e                           ; Error
+ cp h                           ; Error
+ cp l                           ; Error
  ex (sp), ix                    ; Error
  ex (sp), iy                    ; Error
  ex af, af                      ; Error

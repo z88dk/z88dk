@@ -1,4 +1,932 @@
 ; Tokens                        |CPU  |Parens|IX/IY|Assembly      |Bytes         |Ticks    
+ACI expr                        |8080 |expr  |-    |aci %n        |CE %n         |      7 T
+ACI expr                        |8080 |expr  |IXIY |aci %n        |CE %n         |      7 T
+ACI expr                        |8085 |expr  |-    |aci %n        |CE %n         |      7 T
+ACI expr                        |8085 |expr  |IXIY |aci %n        |CE %n         |      7 T
+ACI expr                        |gbz80|expr  |-    |aci %n        |CE %n         |      8 T
+ACI expr                        |gbz80|expr  |IXIY |aci %n        |CE %n         |      8 T
+ACI expr                        |z80  |expr  |-    |aci %n        |CE %n         |      7 T
+ACI expr                        |z80  |expr  |IXIY |aci %n        |CE %n         |      7 T
+ACI expr                        |z80n |expr  |-    |aci %n        |CE %n         |      7 T
+ACI expr                        |z80n |expr  |IXIY |aci %n        |CE %n         |      7 T
+ADC A COMMA A                   |8080 |-     |-    |adc a, a      |8F            |      4 T
+ADC A COMMA A                   |8080 |-     |IXIY |adc a, a      |8F            |      4 T
+ADC A COMMA A                   |8085 |-     |-    |adc a, a      |8F            |      4 T
+ADC A COMMA A                   |8085 |-     |IXIY |adc a, a      |8F            |      4 T
+ADC A COMMA A                   |gbz80|-     |-    |adc a, a      |8F            |      4 T
+ADC A COMMA A                   |gbz80|-     |IXIY |adc a, a      |8F            |      4 T
+ADC A COMMA A                   |z80  |-     |-    |adc a, a      |8F            |      4 T
+ADC A COMMA A                   |z80  |-     |IXIY |adc a, a      |8F            |      4 T
+ADC A COMMA A                   |z80n |-     |-    |adc a, a      |8F            |      4 T
+ADC A COMMA A                   |z80n |-     |IXIY |adc a, a      |8F            |      4 T
+ADC A COMMA B                   |8080 |-     |-    |adc a, b      |88            |      4 T
+ADC A COMMA B                   |8080 |-     |IXIY |adc a, b      |88            |      4 T
+ADC A COMMA B                   |8085 |-     |-    |adc a, b      |88            |      4 T
+ADC A COMMA B                   |8085 |-     |IXIY |adc a, b      |88            |      4 T
+ADC A COMMA B                   |gbz80|-     |-    |adc a, b      |88            |      4 T
+ADC A COMMA B                   |gbz80|-     |IXIY |adc a, b      |88            |      4 T
+ADC A COMMA B                   |z80  |-     |-    |adc a, b      |88            |      4 T
+ADC A COMMA B                   |z80  |-     |IXIY |adc a, b      |88            |      4 T
+ADC A COMMA B                   |z80n |-     |-    |adc a, b      |88            |      4 T
+ADC A COMMA B                   |z80n |-     |IXIY |adc a, b      |88            |      4 T
+ADC A COMMA C                   |8080 |-     |-    |adc a, c      |89            |      4 T
+ADC A COMMA C                   |8080 |-     |IXIY |adc a, c      |89            |      4 T
+ADC A COMMA C                   |8085 |-     |-    |adc a, c      |89            |      4 T
+ADC A COMMA C                   |8085 |-     |IXIY |adc a, c      |89            |      4 T
+ADC A COMMA C                   |gbz80|-     |-    |adc a, c      |89            |      4 T
+ADC A COMMA C                   |gbz80|-     |IXIY |adc a, c      |89            |      4 T
+ADC A COMMA C                   |z80  |-     |-    |adc a, c      |89            |      4 T
+ADC A COMMA C                   |z80  |-     |IXIY |adc a, c      |89            |      4 T
+ADC A COMMA C                   |z80n |-     |-    |adc a, c      |89            |      4 T
+ADC A COMMA C                   |z80n |-     |IXIY |adc a, c      |89            |      4 T
+ADC A COMMA D                   |8080 |-     |-    |adc a, d      |8A            |      4 T
+ADC A COMMA D                   |8080 |-     |IXIY |adc a, d      |8A            |      4 T
+ADC A COMMA D                   |8085 |-     |-    |adc a, d      |8A            |      4 T
+ADC A COMMA D                   |8085 |-     |IXIY |adc a, d      |8A            |      4 T
+ADC A COMMA D                   |gbz80|-     |-    |adc a, d      |8A            |      4 T
+ADC A COMMA D                   |gbz80|-     |IXIY |adc a, d      |8A            |      4 T
+ADC A COMMA D                   |z80  |-     |-    |adc a, d      |8A            |      4 T
+ADC A COMMA D                   |z80  |-     |IXIY |adc a, d      |8A            |      4 T
+ADC A COMMA D                   |z80n |-     |-    |adc a, d      |8A            |      4 T
+ADC A COMMA D                   |z80n |-     |IXIY |adc a, d      |8A            |      4 T
+ADC A COMMA E                   |8080 |-     |-    |adc a, e      |8B            |      4 T
+ADC A COMMA E                   |8080 |-     |IXIY |adc a, e      |8B            |      4 T
+ADC A COMMA E                   |8085 |-     |-    |adc a, e      |8B            |      4 T
+ADC A COMMA E                   |8085 |-     |IXIY |adc a, e      |8B            |      4 T
+ADC A COMMA E                   |gbz80|-     |-    |adc a, e      |8B            |      4 T
+ADC A COMMA E                   |gbz80|-     |IXIY |adc a, e      |8B            |      4 T
+ADC A COMMA E                   |z80  |-     |-    |adc a, e      |8B            |      4 T
+ADC A COMMA E                   |z80  |-     |IXIY |adc a, e      |8B            |      4 T
+ADC A COMMA E                   |z80n |-     |-    |adc a, e      |8B            |      4 T
+ADC A COMMA E                   |z80n |-     |IXIY |adc a, e      |8B            |      4 T
+ADC A COMMA H                   |8080 |-     |-    |adc a, h      |8C            |      4 T
+ADC A COMMA H                   |8080 |-     |IXIY |adc a, h      |8C            |      4 T
+ADC A COMMA H                   |8085 |-     |-    |adc a, h      |8C            |      4 T
+ADC A COMMA H                   |8085 |-     |IXIY |adc a, h      |8C            |      4 T
+ADC A COMMA H                   |gbz80|-     |-    |adc a, h      |8C            |      4 T
+ADC A COMMA H                   |gbz80|-     |IXIY |adc a, h      |8C            |      4 T
+ADC A COMMA H                   |z80  |-     |-    |adc a, h      |8C            |      4 T
+ADC A COMMA H                   |z80  |-     |IXIY |adc a, h      |8C            |      4 T
+ADC A COMMA H                   |z80n |-     |-    |adc a, h      |8C            |      4 T
+ADC A COMMA H                   |z80n |-     |IXIY |adc a, h      |8C            |      4 T
+ADC A COMMA IND_HL RPAREN       |8080 |-     |-    |adc a, (hl)   |8E            |      7 T
+ADC A COMMA IND_HL RPAREN       |8080 |-     |IXIY |adc a, (hl)   |8E            |      7 T
+ADC A COMMA IND_HL RPAREN       |8085 |-     |-    |adc a, (hl)   |8E            |      7 T
+ADC A COMMA IND_HL RPAREN       |8085 |-     |IXIY |adc a, (hl)   |8E            |      7 T
+ADC A COMMA IND_HL RPAREN       |gbz80|-     |-    |adc a, (hl)   |8E            |      8 T
+ADC A COMMA IND_HL RPAREN       |gbz80|-     |IXIY |adc a, (hl)   |8E            |      8 T
+ADC A COMMA IND_HL RPAREN       |z80  |-     |-    |adc a, (hl)   |8E            |      7 T
+ADC A COMMA IND_HL RPAREN       |z80  |-     |IXIY |adc a, (hl)   |8E            |      7 T
+ADC A COMMA IND_HL RPAREN       |z80n |-     |-    |adc a, (hl)   |8E            |      7 T
+ADC A COMMA IND_HL RPAREN       |z80n |-     |IXIY |adc a, (hl)   |8E            |      7 T
+ADC A COMMA L                   |8080 |-     |-    |adc a, l      |8D            |      4 T
+ADC A COMMA L                   |8080 |-     |IXIY |adc a, l      |8D            |      4 T
+ADC A COMMA L                   |8085 |-     |-    |adc a, l      |8D            |      4 T
+ADC A COMMA L                   |8085 |-     |IXIY |adc a, l      |8D            |      4 T
+ADC A COMMA L                   |gbz80|-     |-    |adc a, l      |8D            |      4 T
+ADC A COMMA L                   |gbz80|-     |IXIY |adc a, l      |8D            |      4 T
+ADC A COMMA L                   |z80  |-     |-    |adc a, l      |8D            |      4 T
+ADC A COMMA L                   |z80  |-     |IXIY |adc a, l      |8D            |      4 T
+ADC A COMMA L                   |z80n |-     |-    |adc a, l      |8D            |      4 T
+ADC A COMMA L                   |z80n |-     |IXIY |adc a, l      |8D            |      4 T
+ADC A COMMA expr                |8080 |expr  |-    |adc a, %n     |CE %n         |      7 T
+ADC A COMMA expr                |8080 |expr  |IXIY |adc a, %n     |CE %n         |      7 T
+ADC A COMMA expr                |8085 |expr  |-    |adc a, %n     |CE %n         |      7 T
+ADC A COMMA expr                |8085 |expr  |IXIY |adc a, %n     |CE %n         |      7 T
+ADC A COMMA expr                |gbz80|expr  |-    |adc a, %n     |CE %n         |      8 T
+ADC A COMMA expr                |gbz80|expr  |IXIY |adc a, %n     |CE %n         |      8 T
+ADC A COMMA expr                |z80  |expr  |-    |adc a, %n     |CE %n         |      7 T
+ADC A COMMA expr                |z80  |expr  |IXIY |adc a, %n     |CE %n         |      7 T
+ADC A COMMA expr                |z80n |expr  |-    |adc a, %n     |CE %n         |      7 T
+ADC A COMMA expr                |z80n |expr  |IXIY |adc a, %n     |CE %n         |      7 T
+ADC A                           |8080 |-     |-    |adc a         |8F            |      4 T
+ADC A                           |8080 |-     |IXIY |adc a         |8F            |      4 T
+ADC A                           |8085 |-     |-    |adc a         |8F            |      4 T
+ADC A                           |8085 |-     |IXIY |adc a         |8F            |      4 T
+ADC A                           |gbz80|-     |-    |adc a         |8F            |      4 T
+ADC A                           |gbz80|-     |IXIY |adc a         |8F            |      4 T
+ADC A                           |z80  |-     |-    |adc a         |8F            |      4 T
+ADC A                           |z80  |-     |IXIY |adc a         |8F            |      4 T
+ADC A                           |z80n |-     |-    |adc a         |8F            |      4 T
+ADC A                           |z80n |-     |IXIY |adc a         |8F            |      4 T
+ADC B                           |8080 |-     |-    |adc b         |88            |      4 T
+ADC B                           |8080 |-     |IXIY |adc b         |88            |      4 T
+ADC B                           |8085 |-     |-    |adc b         |88            |      4 T
+ADC B                           |8085 |-     |IXIY |adc b         |88            |      4 T
+ADC B                           |gbz80|-     |-    |adc b         |88            |      4 T
+ADC B                           |gbz80|-     |IXIY |adc b         |88            |      4 T
+ADC B                           |z80  |-     |-    |adc b         |88            |      4 T
+ADC B                           |z80  |-     |IXIY |adc b         |88            |      4 T
+ADC B                           |z80n |-     |-    |adc b         |88            |      4 T
+ADC B                           |z80n |-     |IXIY |adc b         |88            |      4 T
+ADC C                           |8080 |-     |-    |adc c         |89            |      4 T
+ADC C                           |8080 |-     |IXIY |adc c         |89            |      4 T
+ADC C                           |8085 |-     |-    |adc c         |89            |      4 T
+ADC C                           |8085 |-     |IXIY |adc c         |89            |      4 T
+ADC C                           |gbz80|-     |-    |adc c         |89            |      4 T
+ADC C                           |gbz80|-     |IXIY |adc c         |89            |      4 T
+ADC C                           |z80  |-     |-    |adc c         |89            |      4 T
+ADC C                           |z80  |-     |IXIY |adc c         |89            |      4 T
+ADC C                           |z80n |-     |-    |adc c         |89            |      4 T
+ADC C                           |z80n |-     |IXIY |adc c         |89            |      4 T
+ADC D                           |8080 |-     |-    |adc d         |8A            |      4 T
+ADC D                           |8080 |-     |IXIY |adc d         |8A            |      4 T
+ADC D                           |8085 |-     |-    |adc d         |8A            |      4 T
+ADC D                           |8085 |-     |IXIY |adc d         |8A            |      4 T
+ADC D                           |gbz80|-     |-    |adc d         |8A            |      4 T
+ADC D                           |gbz80|-     |IXIY |adc d         |8A            |      4 T
+ADC D                           |z80  |-     |-    |adc d         |8A            |      4 T
+ADC D                           |z80  |-     |IXIY |adc d         |8A            |      4 T
+ADC D                           |z80n |-     |-    |adc d         |8A            |      4 T
+ADC D                           |z80n |-     |IXIY |adc d         |8A            |      4 T
+ADC E                           |8080 |-     |-    |adc e         |8B            |      4 T
+ADC E                           |8080 |-     |IXIY |adc e         |8B            |      4 T
+ADC E                           |8085 |-     |-    |adc e         |8B            |      4 T
+ADC E                           |8085 |-     |IXIY |adc e         |8B            |      4 T
+ADC E                           |gbz80|-     |-    |adc e         |8B            |      4 T
+ADC E                           |gbz80|-     |IXIY |adc e         |8B            |      4 T
+ADC E                           |z80  |-     |-    |adc e         |8B            |      4 T
+ADC E                           |z80  |-     |IXIY |adc e         |8B            |      4 T
+ADC E                           |z80n |-     |-    |adc e         |8B            |      4 T
+ADC E                           |z80n |-     |IXIY |adc e         |8B            |      4 T
+ADC H                           |8080 |-     |-    |adc h         |8C            |      4 T
+ADC H                           |8080 |-     |IXIY |adc h         |8C            |      4 T
+ADC H                           |8085 |-     |-    |adc h         |8C            |      4 T
+ADC H                           |8085 |-     |IXIY |adc h         |8C            |      4 T
+ADC H                           |gbz80|-     |-    |adc h         |8C            |      4 T
+ADC H                           |gbz80|-     |IXIY |adc h         |8C            |      4 T
+ADC H                           |z80  |-     |-    |adc h         |8C            |      4 T
+ADC H                           |z80  |-     |IXIY |adc h         |8C            |      4 T
+ADC H                           |z80n |-     |-    |adc h         |8C            |      4 T
+ADC H                           |z80n |-     |IXIY |adc h         |8C            |      4 T
+ADC IND_HL RPAREN               |8080 |-     |-    |adc (hl)      |8E            |      7 T
+ADC IND_HL RPAREN               |8080 |-     |IXIY |adc (hl)      |8E            |      7 T
+ADC IND_HL RPAREN               |8085 |-     |-    |adc (hl)      |8E            |      7 T
+ADC IND_HL RPAREN               |8085 |-     |IXIY |adc (hl)      |8E            |      7 T
+ADC IND_HL RPAREN               |gbz80|-     |-    |adc (hl)      |8E            |      8 T
+ADC IND_HL RPAREN               |gbz80|-     |IXIY |adc (hl)      |8E            |      8 T
+ADC IND_HL RPAREN               |z80  |-     |-    |adc (hl)      |8E            |      7 T
+ADC IND_HL RPAREN               |z80  |-     |IXIY |adc (hl)      |8E            |      7 T
+ADC IND_HL RPAREN               |z80n |-     |-    |adc (hl)      |8E            |      7 T
+ADC IND_HL RPAREN               |z80n |-     |IXIY |adc (hl)      |8E            |      7 T
+ADC L                           |8080 |-     |-    |adc l         |8D            |      4 T
+ADC L                           |8080 |-     |IXIY |adc l         |8D            |      4 T
+ADC L                           |8085 |-     |-    |adc l         |8D            |      4 T
+ADC L                           |8085 |-     |IXIY |adc l         |8D            |      4 T
+ADC L                           |gbz80|-     |-    |adc l         |8D            |      4 T
+ADC L                           |gbz80|-     |IXIY |adc l         |8D            |      4 T
+ADC L                           |z80  |-     |-    |adc l         |8D            |      4 T
+ADC L                           |z80  |-     |IXIY |adc l         |8D            |      4 T
+ADC L                           |z80n |-     |-    |adc l         |8D            |      4 T
+ADC L                           |z80n |-     |IXIY |adc l         |8D            |      4 T
+ADC M                           |8080 |-     |-    |adc m         |8E            |      7 T
+ADC M                           |8080 |-     |IXIY |adc m         |8E            |      7 T
+ADC M                           |8085 |-     |-    |adc m         |8E            |      7 T
+ADC M                           |8085 |-     |IXIY |adc m         |8E            |      7 T
+ADC M                           |gbz80|-     |-    |adc m         |8E            |      8 T
+ADC M                           |gbz80|-     |IXIY |adc m         |8E            |      8 T
+ADC M                           |z80  |-     |-    |adc m         |8E            |      7 T
+ADC M                           |z80  |-     |IXIY |adc m         |8E            |      7 T
+ADC M                           |z80n |-     |-    |adc m         |8E            |      7 T
+ADC M                           |z80n |-     |IXIY |adc m         |8E            |      7 T
+ADC expr                        |8080 |expr  |-    |adc %n        |CE %n         |      7 T
+ADC expr                        |8080 |expr  |IXIY |adc %n        |CE %n         |      7 T
+ADC expr                        |8085 |expr  |-    |adc %n        |CE %n         |      7 T
+ADC expr                        |8085 |expr  |IXIY |adc %n        |CE %n         |      7 T
+ADC expr                        |gbz80|expr  |-    |adc %n        |CE %n         |      8 T
+ADC expr                        |gbz80|expr  |IXIY |adc %n        |CE %n         |      8 T
+ADC expr                        |z80  |expr  |-    |adc %n        |CE %n         |      7 T
+ADC expr                        |z80  |expr  |IXIY |adc %n        |CE %n         |      7 T
+ADC expr                        |z80n |expr  |-    |adc %n        |CE %n         |      7 T
+ADC expr                        |z80n |expr  |IXIY |adc %n        |CE %n         |      7 T
+ADD A COMMA A                   |8080 |-     |-    |add a, a      |87            |      4 T
+ADD A COMMA A                   |8080 |-     |IXIY |add a, a      |87            |      4 T
+ADD A COMMA A                   |8085 |-     |-    |add a, a      |87            |      4 T
+ADD A COMMA A                   |8085 |-     |IXIY |add a, a      |87            |      4 T
+ADD A COMMA A                   |gbz80|-     |-    |add a, a      |87            |      4 T
+ADD A COMMA A                   |gbz80|-     |IXIY |add a, a      |87            |      4 T
+ADD A COMMA A                   |z80  |-     |-    |add a, a      |87            |      4 T
+ADD A COMMA A                   |z80  |-     |IXIY |add a, a      |87            |      4 T
+ADD A COMMA A                   |z80n |-     |-    |add a, a      |87            |      4 T
+ADD A COMMA A                   |z80n |-     |IXIY |add a, a      |87            |      4 T
+ADD A COMMA B                   |8080 |-     |-    |add a, b      |80            |      4 T
+ADD A COMMA B                   |8080 |-     |IXIY |add a, b      |80            |      4 T
+ADD A COMMA B                   |8085 |-     |-    |add a, b      |80            |      4 T
+ADD A COMMA B                   |8085 |-     |IXIY |add a, b      |80            |      4 T
+ADD A COMMA B                   |gbz80|-     |-    |add a, b      |80            |      4 T
+ADD A COMMA B                   |gbz80|-     |IXIY |add a, b      |80            |      4 T
+ADD A COMMA B                   |z80  |-     |-    |add a, b      |80            |      4 T
+ADD A COMMA B                   |z80  |-     |IXIY |add a, b      |80            |      4 T
+ADD A COMMA B                   |z80n |-     |-    |add a, b      |80            |      4 T
+ADD A COMMA B                   |z80n |-     |IXIY |add a, b      |80            |      4 T
+ADD A COMMA C                   |8080 |-     |-    |add a, c      |81            |      4 T
+ADD A COMMA C                   |8080 |-     |IXIY |add a, c      |81            |      4 T
+ADD A COMMA C                   |8085 |-     |-    |add a, c      |81            |      4 T
+ADD A COMMA C                   |8085 |-     |IXIY |add a, c      |81            |      4 T
+ADD A COMMA C                   |gbz80|-     |-    |add a, c      |81            |      4 T
+ADD A COMMA C                   |gbz80|-     |IXIY |add a, c      |81            |      4 T
+ADD A COMMA C                   |z80  |-     |-    |add a, c      |81            |      4 T
+ADD A COMMA C                   |z80  |-     |IXIY |add a, c      |81            |      4 T
+ADD A COMMA C                   |z80n |-     |-    |add a, c      |81            |      4 T
+ADD A COMMA C                   |z80n |-     |IXIY |add a, c      |81            |      4 T
+ADD A COMMA D                   |8080 |-     |-    |add a, d      |82            |      4 T
+ADD A COMMA D                   |8080 |-     |IXIY |add a, d      |82            |      4 T
+ADD A COMMA D                   |8085 |-     |-    |add a, d      |82            |      4 T
+ADD A COMMA D                   |8085 |-     |IXIY |add a, d      |82            |      4 T
+ADD A COMMA D                   |gbz80|-     |-    |add a, d      |82            |      4 T
+ADD A COMMA D                   |gbz80|-     |IXIY |add a, d      |82            |      4 T
+ADD A COMMA D                   |z80  |-     |-    |add a, d      |82            |      4 T
+ADD A COMMA D                   |z80  |-     |IXIY |add a, d      |82            |      4 T
+ADD A COMMA D                   |z80n |-     |-    |add a, d      |82            |      4 T
+ADD A COMMA D                   |z80n |-     |IXIY |add a, d      |82            |      4 T
+ADD A COMMA E                   |8080 |-     |-    |add a, e      |83            |      4 T
+ADD A COMMA E                   |8080 |-     |IXIY |add a, e      |83            |      4 T
+ADD A COMMA E                   |8085 |-     |-    |add a, e      |83            |      4 T
+ADD A COMMA E                   |8085 |-     |IXIY |add a, e      |83            |      4 T
+ADD A COMMA E                   |gbz80|-     |-    |add a, e      |83            |      4 T
+ADD A COMMA E                   |gbz80|-     |IXIY |add a, e      |83            |      4 T
+ADD A COMMA E                   |z80  |-     |-    |add a, e      |83            |      4 T
+ADD A COMMA E                   |z80  |-     |IXIY |add a, e      |83            |      4 T
+ADD A COMMA E                   |z80n |-     |-    |add a, e      |83            |      4 T
+ADD A COMMA E                   |z80n |-     |IXIY |add a, e      |83            |      4 T
+ADD A COMMA H                   |8080 |-     |-    |add a, h      |84            |      4 T
+ADD A COMMA H                   |8080 |-     |IXIY |add a, h      |84            |      4 T
+ADD A COMMA H                   |8085 |-     |-    |add a, h      |84            |      4 T
+ADD A COMMA H                   |8085 |-     |IXIY |add a, h      |84            |      4 T
+ADD A COMMA H                   |gbz80|-     |-    |add a, h      |84            |      4 T
+ADD A COMMA H                   |gbz80|-     |IXIY |add a, h      |84            |      4 T
+ADD A COMMA H                   |z80  |-     |-    |add a, h      |84            |      4 T
+ADD A COMMA H                   |z80  |-     |IXIY |add a, h      |84            |      4 T
+ADD A COMMA H                   |z80n |-     |-    |add a, h      |84            |      4 T
+ADD A COMMA H                   |z80n |-     |IXIY |add a, h      |84            |      4 T
+ADD A COMMA IND_HL RPAREN       |8080 |-     |-    |add a, (hl)   |86            |      7 T
+ADD A COMMA IND_HL RPAREN       |8080 |-     |IXIY |add a, (hl)   |86            |      7 T
+ADD A COMMA IND_HL RPAREN       |8085 |-     |-    |add a, (hl)   |86            |      7 T
+ADD A COMMA IND_HL RPAREN       |8085 |-     |IXIY |add a, (hl)   |86            |      7 T
+ADD A COMMA IND_HL RPAREN       |gbz80|-     |-    |add a, (hl)   |86            |      8 T
+ADD A COMMA IND_HL RPAREN       |gbz80|-     |IXIY |add a, (hl)   |86            |      8 T
+ADD A COMMA IND_HL RPAREN       |z80  |-     |-    |add a, (hl)   |86            |      7 T
+ADD A COMMA IND_HL RPAREN       |z80  |-     |IXIY |add a, (hl)   |86            |      7 T
+ADD A COMMA IND_HL RPAREN       |z80n |-     |-    |add a, (hl)   |86            |      7 T
+ADD A COMMA IND_HL RPAREN       |z80n |-     |IXIY |add a, (hl)   |86            |      7 T
+ADD A COMMA L                   |8080 |-     |-    |add a, l      |85            |      4 T
+ADD A COMMA L                   |8080 |-     |IXIY |add a, l      |85            |      4 T
+ADD A COMMA L                   |8085 |-     |-    |add a, l      |85            |      4 T
+ADD A COMMA L                   |8085 |-     |IXIY |add a, l      |85            |      4 T
+ADD A COMMA L                   |gbz80|-     |-    |add a, l      |85            |      4 T
+ADD A COMMA L                   |gbz80|-     |IXIY |add a, l      |85            |      4 T
+ADD A COMMA L                   |z80  |-     |-    |add a, l      |85            |      4 T
+ADD A COMMA L                   |z80  |-     |IXIY |add a, l      |85            |      4 T
+ADD A COMMA L                   |z80n |-     |-    |add a, l      |85            |      4 T
+ADD A COMMA L                   |z80n |-     |IXIY |add a, l      |85            |      4 T
+ADD A COMMA expr                |8080 |expr  |-    |add a, %n     |C6 %n         |      7 T
+ADD A COMMA expr                |8080 |expr  |IXIY |add a, %n     |C6 %n         |      7 T
+ADD A COMMA expr                |8085 |expr  |-    |add a, %n     |C6 %n         |      7 T
+ADD A COMMA expr                |8085 |expr  |IXIY |add a, %n     |C6 %n         |      7 T
+ADD A COMMA expr                |gbz80|expr  |-    |add a, %n     |C6 %n         |      8 T
+ADD A COMMA expr                |gbz80|expr  |IXIY |add a, %n     |C6 %n         |      8 T
+ADD A COMMA expr                |z80  |expr  |-    |add a, %n     |C6 %n         |      7 T
+ADD A COMMA expr                |z80  |expr  |IXIY |add a, %n     |C6 %n         |      7 T
+ADD A COMMA expr                |z80n |expr  |-    |add a, %n     |C6 %n         |      7 T
+ADD A COMMA expr                |z80n |expr  |IXIY |add a, %n     |C6 %n         |      7 T
+ADD A                           |8080 |-     |-    |add a         |87            |      4 T
+ADD A                           |8080 |-     |IXIY |add a         |87            |      4 T
+ADD A                           |8085 |-     |-    |add a         |87            |      4 T
+ADD A                           |8085 |-     |IXIY |add a         |87            |      4 T
+ADD A                           |gbz80|-     |-    |add a         |87            |      4 T
+ADD A                           |gbz80|-     |IXIY |add a         |87            |      4 T
+ADD A                           |z80  |-     |-    |add a         |87            |      4 T
+ADD A                           |z80  |-     |IXIY |add a         |87            |      4 T
+ADD A                           |z80n |-     |-    |add a         |87            |      4 T
+ADD A                           |z80n |-     |IXIY |add a         |87            |      4 T
+ADD B                           |8080 |-     |-    |add b         |80            |      4 T
+ADD B                           |8080 |-     |IXIY |add b         |80            |      4 T
+ADD B                           |8085 |-     |-    |add b         |80            |      4 T
+ADD B                           |8085 |-     |IXIY |add b         |80            |      4 T
+ADD B                           |gbz80|-     |-    |add b         |80            |      4 T
+ADD B                           |gbz80|-     |IXIY |add b         |80            |      4 T
+ADD B                           |z80  |-     |-    |add b         |80            |      4 T
+ADD B                           |z80  |-     |IXIY |add b         |80            |      4 T
+ADD B                           |z80n |-     |-    |add b         |80            |      4 T
+ADD B                           |z80n |-     |IXIY |add b         |80            |      4 T
+ADD C                           |8080 |-     |-    |add c         |81            |      4 T
+ADD C                           |8080 |-     |IXIY |add c         |81            |      4 T
+ADD C                           |8085 |-     |-    |add c         |81            |      4 T
+ADD C                           |8085 |-     |IXIY |add c         |81            |      4 T
+ADD C                           |gbz80|-     |-    |add c         |81            |      4 T
+ADD C                           |gbz80|-     |IXIY |add c         |81            |      4 T
+ADD C                           |z80  |-     |-    |add c         |81            |      4 T
+ADD C                           |z80  |-     |IXIY |add c         |81            |      4 T
+ADD C                           |z80n |-     |-    |add c         |81            |      4 T
+ADD C                           |z80n |-     |IXIY |add c         |81            |      4 T
+ADD D                           |8080 |-     |-    |add d         |82            |      4 T
+ADD D                           |8080 |-     |IXIY |add d         |82            |      4 T
+ADD D                           |8085 |-     |-    |add d         |82            |      4 T
+ADD D                           |8085 |-     |IXIY |add d         |82            |      4 T
+ADD D                           |gbz80|-     |-    |add d         |82            |      4 T
+ADD D                           |gbz80|-     |IXIY |add d         |82            |      4 T
+ADD D                           |z80  |-     |-    |add d         |82            |      4 T
+ADD D                           |z80  |-     |IXIY |add d         |82            |      4 T
+ADD D                           |z80n |-     |-    |add d         |82            |      4 T
+ADD D                           |z80n |-     |IXIY |add d         |82            |      4 T
+ADD E                           |8080 |-     |-    |add e         |83            |      4 T
+ADD E                           |8080 |-     |IXIY |add e         |83            |      4 T
+ADD E                           |8085 |-     |-    |add e         |83            |      4 T
+ADD E                           |8085 |-     |IXIY |add e         |83            |      4 T
+ADD E                           |gbz80|-     |-    |add e         |83            |      4 T
+ADD E                           |gbz80|-     |IXIY |add e         |83            |      4 T
+ADD E                           |z80  |-     |-    |add e         |83            |      4 T
+ADD E                           |z80  |-     |IXIY |add e         |83            |      4 T
+ADD E                           |z80n |-     |-    |add e         |83            |      4 T
+ADD E                           |z80n |-     |IXIY |add e         |83            |      4 T
+ADD H                           |8080 |-     |-    |add h         |84            |      4 T
+ADD H                           |8080 |-     |IXIY |add h         |84            |      4 T
+ADD H                           |8085 |-     |-    |add h         |84            |      4 T
+ADD H                           |8085 |-     |IXIY |add h         |84            |      4 T
+ADD H                           |gbz80|-     |-    |add h         |84            |      4 T
+ADD H                           |gbz80|-     |IXIY |add h         |84            |      4 T
+ADD H                           |z80  |-     |-    |add h         |84            |      4 T
+ADD H                           |z80  |-     |IXIY |add h         |84            |      4 T
+ADD H                           |z80n |-     |-    |add h         |84            |      4 T
+ADD H                           |z80n |-     |IXIY |add h         |84            |      4 T
+ADD IND_HL RPAREN               |8080 |-     |-    |add (hl)      |86            |      7 T
+ADD IND_HL RPAREN               |8080 |-     |IXIY |add (hl)      |86            |      7 T
+ADD IND_HL RPAREN               |8085 |-     |-    |add (hl)      |86            |      7 T
+ADD IND_HL RPAREN               |8085 |-     |IXIY |add (hl)      |86            |      7 T
+ADD IND_HL RPAREN               |gbz80|-     |-    |add (hl)      |86            |      8 T
+ADD IND_HL RPAREN               |gbz80|-     |IXIY |add (hl)      |86            |      8 T
+ADD IND_HL RPAREN               |z80  |-     |-    |add (hl)      |86            |      7 T
+ADD IND_HL RPAREN               |z80  |-     |IXIY |add (hl)      |86            |      7 T
+ADD IND_HL RPAREN               |z80n |-     |-    |add (hl)      |86            |      7 T
+ADD IND_HL RPAREN               |z80n |-     |IXIY |add (hl)      |86            |      7 T
+ADD L                           |8080 |-     |-    |add l         |85            |      4 T
+ADD L                           |8080 |-     |IXIY |add l         |85            |      4 T
+ADD L                           |8085 |-     |-    |add l         |85            |      4 T
+ADD L                           |8085 |-     |IXIY |add l         |85            |      4 T
+ADD L                           |gbz80|-     |-    |add l         |85            |      4 T
+ADD L                           |gbz80|-     |IXIY |add l         |85            |      4 T
+ADD L                           |z80  |-     |-    |add l         |85            |      4 T
+ADD L                           |z80  |-     |IXIY |add l         |85            |      4 T
+ADD L                           |z80n |-     |-    |add l         |85            |      4 T
+ADD L                           |z80n |-     |IXIY |add l         |85            |      4 T
+ADD M                           |8080 |-     |-    |add m         |86            |      7 T
+ADD M                           |8080 |-     |IXIY |add m         |86            |      7 T
+ADD M                           |8085 |-     |-    |add m         |86            |      7 T
+ADD M                           |8085 |-     |IXIY |add m         |86            |      7 T
+ADD M                           |gbz80|-     |-    |add m         |86            |      8 T
+ADD M                           |gbz80|-     |IXIY |add m         |86            |      8 T
+ADD M                           |z80  |-     |-    |add m         |86            |      7 T
+ADD M                           |z80  |-     |IXIY |add m         |86            |      7 T
+ADD M                           |z80n |-     |-    |add m         |86            |      7 T
+ADD M                           |z80n |-     |IXIY |add m         |86            |      7 T
+ADD expr                        |8080 |expr  |-    |add %n        |C6 %n         |      7 T
+ADD expr                        |8080 |expr  |IXIY |add %n        |C6 %n         |      7 T
+ADD expr                        |8085 |expr  |-    |add %n        |C6 %n         |      7 T
+ADD expr                        |8085 |expr  |IXIY |add %n        |C6 %n         |      7 T
+ADD expr                        |gbz80|expr  |-    |add %n        |C6 %n         |      8 T
+ADD expr                        |gbz80|expr  |IXIY |add %n        |C6 %n         |      8 T
+ADD expr                        |z80  |expr  |-    |add %n        |C6 %n         |      7 T
+ADD expr                        |z80  |expr  |IXIY |add %n        |C6 %n         |      7 T
+ADD expr                        |z80n |expr  |-    |add %n        |C6 %n         |      7 T
+ADD expr                        |z80n |expr  |IXIY |add %n        |C6 %n         |      7 T
+ADI expr                        |8080 |expr  |-    |adi %n        |C6 %n         |      7 T
+ADI expr                        |8080 |expr  |IXIY |adi %n        |C6 %n         |      7 T
+ADI expr                        |8085 |expr  |-    |adi %n        |C6 %n         |      7 T
+ADI expr                        |8085 |expr  |IXIY |adi %n        |C6 %n         |      7 T
+ADI expr                        |gbz80|expr  |-    |adi %n        |C6 %n         |      8 T
+ADI expr                        |gbz80|expr  |IXIY |adi %n        |C6 %n         |      8 T
+ADI expr                        |z80  |expr  |-    |adi %n        |C6 %n         |      7 T
+ADI expr                        |z80  |expr  |IXIY |adi %n        |C6 %n         |      7 T
+ADI expr                        |z80n |expr  |-    |adi %n        |C6 %n         |      7 T
+ADI expr                        |z80n |expr  |IXIY |adi %n        |C6 %n         |      7 T
+ANA A                           |8080 |-     |-    |ana a         |A7            |      4 T
+ANA A                           |8080 |-     |IXIY |ana a         |A7            |      4 T
+ANA A                           |8085 |-     |-    |ana a         |A7            |      4 T
+ANA A                           |8085 |-     |IXIY |ana a         |A7            |      4 T
+ANA A                           |gbz80|-     |-    |ana a         |A7            |      4 T
+ANA A                           |gbz80|-     |IXIY |ana a         |A7            |      4 T
+ANA A                           |z80  |-     |-    |ana a         |A7            |      4 T
+ANA A                           |z80  |-     |IXIY |ana a         |A7            |      4 T
+ANA A                           |z80n |-     |-    |ana a         |A7            |      4 T
+ANA A                           |z80n |-     |IXIY |ana a         |A7            |      4 T
+ANA B                           |8080 |-     |-    |ana b         |A0            |      4 T
+ANA B                           |8080 |-     |IXIY |ana b         |A0            |      4 T
+ANA B                           |8085 |-     |-    |ana b         |A0            |      4 T
+ANA B                           |8085 |-     |IXIY |ana b         |A0            |      4 T
+ANA B                           |gbz80|-     |-    |ana b         |A0            |      4 T
+ANA B                           |gbz80|-     |IXIY |ana b         |A0            |      4 T
+ANA B                           |z80  |-     |-    |ana b         |A0            |      4 T
+ANA B                           |z80  |-     |IXIY |ana b         |A0            |      4 T
+ANA B                           |z80n |-     |-    |ana b         |A0            |      4 T
+ANA B                           |z80n |-     |IXIY |ana b         |A0            |      4 T
+ANA C                           |8080 |-     |-    |ana c         |A1            |      4 T
+ANA C                           |8080 |-     |IXIY |ana c         |A1            |      4 T
+ANA C                           |8085 |-     |-    |ana c         |A1            |      4 T
+ANA C                           |8085 |-     |IXIY |ana c         |A1            |      4 T
+ANA C                           |gbz80|-     |-    |ana c         |A1            |      4 T
+ANA C                           |gbz80|-     |IXIY |ana c         |A1            |      4 T
+ANA C                           |z80  |-     |-    |ana c         |A1            |      4 T
+ANA C                           |z80  |-     |IXIY |ana c         |A1            |      4 T
+ANA C                           |z80n |-     |-    |ana c         |A1            |      4 T
+ANA C                           |z80n |-     |IXIY |ana c         |A1            |      4 T
+ANA D                           |8080 |-     |-    |ana d         |A2            |      4 T
+ANA D                           |8080 |-     |IXIY |ana d         |A2            |      4 T
+ANA D                           |8085 |-     |-    |ana d         |A2            |      4 T
+ANA D                           |8085 |-     |IXIY |ana d         |A2            |      4 T
+ANA D                           |gbz80|-     |-    |ana d         |A2            |      4 T
+ANA D                           |gbz80|-     |IXIY |ana d         |A2            |      4 T
+ANA D                           |z80  |-     |-    |ana d         |A2            |      4 T
+ANA D                           |z80  |-     |IXIY |ana d         |A2            |      4 T
+ANA D                           |z80n |-     |-    |ana d         |A2            |      4 T
+ANA D                           |z80n |-     |IXIY |ana d         |A2            |      4 T
+ANA E                           |8080 |-     |-    |ana e         |A3            |      4 T
+ANA E                           |8080 |-     |IXIY |ana e         |A3            |      4 T
+ANA E                           |8085 |-     |-    |ana e         |A3            |      4 T
+ANA E                           |8085 |-     |IXIY |ana e         |A3            |      4 T
+ANA E                           |gbz80|-     |-    |ana e         |A3            |      4 T
+ANA E                           |gbz80|-     |IXIY |ana e         |A3            |      4 T
+ANA E                           |z80  |-     |-    |ana e         |A3            |      4 T
+ANA E                           |z80  |-     |IXIY |ana e         |A3            |      4 T
+ANA E                           |z80n |-     |-    |ana e         |A3            |      4 T
+ANA E                           |z80n |-     |IXIY |ana e         |A3            |      4 T
+ANA H                           |8080 |-     |-    |ana h         |A4            |      4 T
+ANA H                           |8080 |-     |IXIY |ana h         |A4            |      4 T
+ANA H                           |8085 |-     |-    |ana h         |A4            |      4 T
+ANA H                           |8085 |-     |IXIY |ana h         |A4            |      4 T
+ANA H                           |gbz80|-     |-    |ana h         |A4            |      4 T
+ANA H                           |gbz80|-     |IXIY |ana h         |A4            |      4 T
+ANA H                           |z80  |-     |-    |ana h         |A4            |      4 T
+ANA H                           |z80  |-     |IXIY |ana h         |A4            |      4 T
+ANA H                           |z80n |-     |-    |ana h         |A4            |      4 T
+ANA H                           |z80n |-     |IXIY |ana h         |A4            |      4 T
+ANA L                           |8080 |-     |-    |ana l         |A5            |      4 T
+ANA L                           |8080 |-     |IXIY |ana l         |A5            |      4 T
+ANA L                           |8085 |-     |-    |ana l         |A5            |      4 T
+ANA L                           |8085 |-     |IXIY |ana l         |A5            |      4 T
+ANA L                           |gbz80|-     |-    |ana l         |A5            |      4 T
+ANA L                           |gbz80|-     |IXIY |ana l         |A5            |      4 T
+ANA L                           |z80  |-     |-    |ana l         |A5            |      4 T
+ANA L                           |z80  |-     |IXIY |ana l         |A5            |      4 T
+ANA L                           |z80n |-     |-    |ana l         |A5            |      4 T
+ANA L                           |z80n |-     |IXIY |ana l         |A5            |      4 T
+ANA M                           |8080 |-     |-    |ana m         |A6            |      7 T
+ANA M                           |8080 |-     |IXIY |ana m         |A6            |      7 T
+ANA M                           |8085 |-     |-    |ana m         |A6            |      7 T
+ANA M                           |8085 |-     |IXIY |ana m         |A6            |      7 T
+ANA M                           |gbz80|-     |-    |ana m         |A6            |      8 T
+ANA M                           |gbz80|-     |IXIY |ana m         |A6            |      8 T
+ANA M                           |z80  |-     |-    |ana m         |A6            |      7 T
+ANA M                           |z80  |-     |IXIY |ana m         |A6            |      7 T
+ANA M                           |z80n |-     |-    |ana m         |A6            |      7 T
+ANA M                           |z80n |-     |IXIY |ana m         |A6            |      7 T
+AND A COMMA A                   |8080 |-     |-    |and a, a      |A7            |      4 T
+AND A COMMA A                   |8080 |-     |IXIY |and a, a      |A7            |      4 T
+AND A COMMA A                   |8085 |-     |-    |and a, a      |A7            |      4 T
+AND A COMMA A                   |8085 |-     |IXIY |and a, a      |A7            |      4 T
+AND A COMMA A                   |gbz80|-     |-    |and a, a      |A7            |      4 T
+AND A COMMA A                   |gbz80|-     |IXIY |and a, a      |A7            |      4 T
+AND A COMMA A                   |z80  |-     |-    |and a, a      |A7            |      4 T
+AND A COMMA A                   |z80  |-     |IXIY |and a, a      |A7            |      4 T
+AND A COMMA A                   |z80n |-     |-    |and a, a      |A7            |      4 T
+AND A COMMA A                   |z80n |-     |IXIY |and a, a      |A7            |      4 T
+AND A COMMA B                   |8080 |-     |-    |and a, b      |A0            |      4 T
+AND A COMMA B                   |8080 |-     |IXIY |and a, b      |A0            |      4 T
+AND A COMMA B                   |8085 |-     |-    |and a, b      |A0            |      4 T
+AND A COMMA B                   |8085 |-     |IXIY |and a, b      |A0            |      4 T
+AND A COMMA B                   |gbz80|-     |-    |and a, b      |A0            |      4 T
+AND A COMMA B                   |gbz80|-     |IXIY |and a, b      |A0            |      4 T
+AND A COMMA B                   |z80  |-     |-    |and a, b      |A0            |      4 T
+AND A COMMA B                   |z80  |-     |IXIY |and a, b      |A0            |      4 T
+AND A COMMA B                   |z80n |-     |-    |and a, b      |A0            |      4 T
+AND A COMMA B                   |z80n |-     |IXIY |and a, b      |A0            |      4 T
+AND A COMMA C                   |8080 |-     |-    |and a, c      |A1            |      4 T
+AND A COMMA C                   |8080 |-     |IXIY |and a, c      |A1            |      4 T
+AND A COMMA C                   |8085 |-     |-    |and a, c      |A1            |      4 T
+AND A COMMA C                   |8085 |-     |IXIY |and a, c      |A1            |      4 T
+AND A COMMA C                   |gbz80|-     |-    |and a, c      |A1            |      4 T
+AND A COMMA C                   |gbz80|-     |IXIY |and a, c      |A1            |      4 T
+AND A COMMA C                   |z80  |-     |-    |and a, c      |A1            |      4 T
+AND A COMMA C                   |z80  |-     |IXIY |and a, c      |A1            |      4 T
+AND A COMMA C                   |z80n |-     |-    |and a, c      |A1            |      4 T
+AND A COMMA C                   |z80n |-     |IXIY |and a, c      |A1            |      4 T
+AND A COMMA D                   |8080 |-     |-    |and a, d      |A2            |      4 T
+AND A COMMA D                   |8080 |-     |IXIY |and a, d      |A2            |      4 T
+AND A COMMA D                   |8085 |-     |-    |and a, d      |A2            |      4 T
+AND A COMMA D                   |8085 |-     |IXIY |and a, d      |A2            |      4 T
+AND A COMMA D                   |gbz80|-     |-    |and a, d      |A2            |      4 T
+AND A COMMA D                   |gbz80|-     |IXIY |and a, d      |A2            |      4 T
+AND A COMMA D                   |z80  |-     |-    |and a, d      |A2            |      4 T
+AND A COMMA D                   |z80  |-     |IXIY |and a, d      |A2            |      4 T
+AND A COMMA D                   |z80n |-     |-    |and a, d      |A2            |      4 T
+AND A COMMA D                   |z80n |-     |IXIY |and a, d      |A2            |      4 T
+AND A COMMA E                   |8080 |-     |-    |and a, e      |A3            |      4 T
+AND A COMMA E                   |8080 |-     |IXIY |and a, e      |A3            |      4 T
+AND A COMMA E                   |8085 |-     |-    |and a, e      |A3            |      4 T
+AND A COMMA E                   |8085 |-     |IXIY |and a, e      |A3            |      4 T
+AND A COMMA E                   |gbz80|-     |-    |and a, e      |A3            |      4 T
+AND A COMMA E                   |gbz80|-     |IXIY |and a, e      |A3            |      4 T
+AND A COMMA E                   |z80  |-     |-    |and a, e      |A3            |      4 T
+AND A COMMA E                   |z80  |-     |IXIY |and a, e      |A3            |      4 T
+AND A COMMA E                   |z80n |-     |-    |and a, e      |A3            |      4 T
+AND A COMMA E                   |z80n |-     |IXIY |and a, e      |A3            |      4 T
+AND A COMMA H                   |8080 |-     |-    |and a, h      |A4            |      4 T
+AND A COMMA H                   |8080 |-     |IXIY |and a, h      |A4            |      4 T
+AND A COMMA H                   |8085 |-     |-    |and a, h      |A4            |      4 T
+AND A COMMA H                   |8085 |-     |IXIY |and a, h      |A4            |      4 T
+AND A COMMA H                   |gbz80|-     |-    |and a, h      |A4            |      4 T
+AND A COMMA H                   |gbz80|-     |IXIY |and a, h      |A4            |      4 T
+AND A COMMA H                   |z80  |-     |-    |and a, h      |A4            |      4 T
+AND A COMMA H                   |z80  |-     |IXIY |and a, h      |A4            |      4 T
+AND A COMMA H                   |z80n |-     |-    |and a, h      |A4            |      4 T
+AND A COMMA H                   |z80n |-     |IXIY |and a, h      |A4            |      4 T
+AND A COMMA IND_HL RPAREN       |8080 |-     |-    |and a, (hl)   |A6            |      7 T
+AND A COMMA IND_HL RPAREN       |8080 |-     |IXIY |and a, (hl)   |A6            |      7 T
+AND A COMMA IND_HL RPAREN       |8085 |-     |-    |and a, (hl)   |A6            |      7 T
+AND A COMMA IND_HL RPAREN       |8085 |-     |IXIY |and a, (hl)   |A6            |      7 T
+AND A COMMA IND_HL RPAREN       |gbz80|-     |-    |and a, (hl)   |A6            |      8 T
+AND A COMMA IND_HL RPAREN       |gbz80|-     |IXIY |and a, (hl)   |A6            |      8 T
+AND A COMMA IND_HL RPAREN       |z80  |-     |-    |and a, (hl)   |A6            |      7 T
+AND A COMMA IND_HL RPAREN       |z80  |-     |IXIY |and a, (hl)   |A6            |      7 T
+AND A COMMA IND_HL RPAREN       |z80n |-     |-    |and a, (hl)   |A6            |      7 T
+AND A COMMA IND_HL RPAREN       |z80n |-     |IXIY |and a, (hl)   |A6            |      7 T
+AND A COMMA L                   |8080 |-     |-    |and a, l      |A5            |      4 T
+AND A COMMA L                   |8080 |-     |IXIY |and a, l      |A5            |      4 T
+AND A COMMA L                   |8085 |-     |-    |and a, l      |A5            |      4 T
+AND A COMMA L                   |8085 |-     |IXIY |and a, l      |A5            |      4 T
+AND A COMMA L                   |gbz80|-     |-    |and a, l      |A5            |      4 T
+AND A COMMA L                   |gbz80|-     |IXIY |and a, l      |A5            |      4 T
+AND A COMMA L                   |z80  |-     |-    |and a, l      |A5            |      4 T
+AND A COMMA L                   |z80  |-     |IXIY |and a, l      |A5            |      4 T
+AND A COMMA L                   |z80n |-     |-    |and a, l      |A5            |      4 T
+AND A COMMA L                   |z80n |-     |IXIY |and a, l      |A5            |      4 T
+AND A COMMA expr                |8080 |expr  |-    |and a, %n     |E6 %n         |      7 T
+AND A COMMA expr                |8080 |expr  |IXIY |and a, %n     |E6 %n         |      7 T
+AND A COMMA expr                |8085 |expr  |-    |and a, %n     |E6 %n         |      7 T
+AND A COMMA expr                |8085 |expr  |IXIY |and a, %n     |E6 %n         |      7 T
+AND A COMMA expr                |gbz80|expr  |-    |and a, %n     |E6 %n         |      8 T
+AND A COMMA expr                |gbz80|expr  |IXIY |and a, %n     |E6 %n         |      8 T
+AND A COMMA expr                |z80  |expr  |-    |and a, %n     |E6 %n         |      7 T
+AND A COMMA expr                |z80  |expr  |IXIY |and a, %n     |E6 %n         |      7 T
+AND A COMMA expr                |z80n |expr  |-    |and a, %n     |E6 %n         |      7 T
+AND A COMMA expr                |z80n |expr  |IXIY |and a, %n     |E6 %n         |      7 T
+AND A                           |8080 |-     |-    |and a         |A7            |      4 T
+AND A                           |8080 |-     |IXIY |and a         |A7            |      4 T
+AND A                           |8085 |-     |-    |and a         |A7            |      4 T
+AND A                           |8085 |-     |IXIY |and a         |A7            |      4 T
+AND A                           |gbz80|-     |-    |and a         |A7            |      4 T
+AND A                           |gbz80|-     |IXIY |and a         |A7            |      4 T
+AND A                           |z80  |-     |-    |and a         |A7            |      4 T
+AND A                           |z80  |-     |IXIY |and a         |A7            |      4 T
+AND A                           |z80n |-     |-    |and a         |A7            |      4 T
+AND A                           |z80n |-     |IXIY |and a         |A7            |      4 T
+AND B                           |8080 |-     |-    |and b         |A0            |      4 T
+AND B                           |8080 |-     |IXIY |and b         |A0            |      4 T
+AND B                           |8085 |-     |-    |and b         |A0            |      4 T
+AND B                           |8085 |-     |IXIY |and b         |A0            |      4 T
+AND B                           |gbz80|-     |-    |and b         |A0            |      4 T
+AND B                           |gbz80|-     |IXIY |and b         |A0            |      4 T
+AND B                           |z80  |-     |-    |and b         |A0            |      4 T
+AND B                           |z80  |-     |IXIY |and b         |A0            |      4 T
+AND B                           |z80n |-     |-    |and b         |A0            |      4 T
+AND B                           |z80n |-     |IXIY |and b         |A0            |      4 T
+AND C                           |8080 |-     |-    |and c         |A1            |      4 T
+AND C                           |8080 |-     |IXIY |and c         |A1            |      4 T
+AND C                           |8085 |-     |-    |and c         |A1            |      4 T
+AND C                           |8085 |-     |IXIY |and c         |A1            |      4 T
+AND C                           |gbz80|-     |-    |and c         |A1            |      4 T
+AND C                           |gbz80|-     |IXIY |and c         |A1            |      4 T
+AND C                           |z80  |-     |-    |and c         |A1            |      4 T
+AND C                           |z80  |-     |IXIY |and c         |A1            |      4 T
+AND C                           |z80n |-     |-    |and c         |A1            |      4 T
+AND C                           |z80n |-     |IXIY |and c         |A1            |      4 T
+AND D                           |8080 |-     |-    |and d         |A2            |      4 T
+AND D                           |8080 |-     |IXIY |and d         |A2            |      4 T
+AND D                           |8085 |-     |-    |and d         |A2            |      4 T
+AND D                           |8085 |-     |IXIY |and d         |A2            |      4 T
+AND D                           |gbz80|-     |-    |and d         |A2            |      4 T
+AND D                           |gbz80|-     |IXIY |and d         |A2            |      4 T
+AND D                           |z80  |-     |-    |and d         |A2            |      4 T
+AND D                           |z80  |-     |IXIY |and d         |A2            |      4 T
+AND D                           |z80n |-     |-    |and d         |A2            |      4 T
+AND D                           |z80n |-     |IXIY |and d         |A2            |      4 T
+AND E                           |8080 |-     |-    |and e         |A3            |      4 T
+AND E                           |8080 |-     |IXIY |and e         |A3            |      4 T
+AND E                           |8085 |-     |-    |and e         |A3            |      4 T
+AND E                           |8085 |-     |IXIY |and e         |A3            |      4 T
+AND E                           |gbz80|-     |-    |and e         |A3            |      4 T
+AND E                           |gbz80|-     |IXIY |and e         |A3            |      4 T
+AND E                           |z80  |-     |-    |and e         |A3            |      4 T
+AND E                           |z80  |-     |IXIY |and e         |A3            |      4 T
+AND E                           |z80n |-     |-    |and e         |A3            |      4 T
+AND E                           |z80n |-     |IXIY |and e         |A3            |      4 T
+AND H                           |8080 |-     |-    |and h         |A4            |      4 T
+AND H                           |8080 |-     |IXIY |and h         |A4            |      4 T
+AND H                           |8085 |-     |-    |and h         |A4            |      4 T
+AND H                           |8085 |-     |IXIY |and h         |A4            |      4 T
+AND H                           |gbz80|-     |-    |and h         |A4            |      4 T
+AND H                           |gbz80|-     |IXIY |and h         |A4            |      4 T
+AND H                           |z80  |-     |-    |and h         |A4            |      4 T
+AND H                           |z80  |-     |IXIY |and h         |A4            |      4 T
+AND H                           |z80n |-     |-    |and h         |A4            |      4 T
+AND H                           |z80n |-     |IXIY |and h         |A4            |      4 T
+AND IND_HL RPAREN               |8080 |-     |-    |and (hl)      |A6            |      7 T
+AND IND_HL RPAREN               |8080 |-     |IXIY |and (hl)      |A6            |      7 T
+AND IND_HL RPAREN               |8085 |-     |-    |and (hl)      |A6            |      7 T
+AND IND_HL RPAREN               |8085 |-     |IXIY |and (hl)      |A6            |      7 T
+AND IND_HL RPAREN               |gbz80|-     |-    |and (hl)      |A6            |      8 T
+AND IND_HL RPAREN               |gbz80|-     |IXIY |and (hl)      |A6            |      8 T
+AND IND_HL RPAREN               |z80  |-     |-    |and (hl)      |A6            |      7 T
+AND IND_HL RPAREN               |z80  |-     |IXIY |and (hl)      |A6            |      7 T
+AND IND_HL RPAREN               |z80n |-     |-    |and (hl)      |A6            |      7 T
+AND IND_HL RPAREN               |z80n |-     |IXIY |and (hl)      |A6            |      7 T
+AND L                           |8080 |-     |-    |and l         |A5            |      4 T
+AND L                           |8080 |-     |IXIY |and l         |A5            |      4 T
+AND L                           |8085 |-     |-    |and l         |A5            |      4 T
+AND L                           |8085 |-     |IXIY |and l         |A5            |      4 T
+AND L                           |gbz80|-     |-    |and l         |A5            |      4 T
+AND L                           |gbz80|-     |IXIY |and l         |A5            |      4 T
+AND L                           |z80  |-     |-    |and l         |A5            |      4 T
+AND L                           |z80  |-     |IXIY |and l         |A5            |      4 T
+AND L                           |z80n |-     |-    |and l         |A5            |      4 T
+AND L                           |z80n |-     |IXIY |and l         |A5            |      4 T
+AND expr                        |8080 |expr  |-    |and %n        |E6 %n         |      7 T
+AND expr                        |8080 |expr  |IXIY |and %n        |E6 %n         |      7 T
+AND expr                        |8085 |expr  |-    |and %n        |E6 %n         |      7 T
+AND expr                        |8085 |expr  |IXIY |and %n        |E6 %n         |      7 T
+AND expr                        |gbz80|expr  |-    |and %n        |E6 %n         |      8 T
+AND expr                        |gbz80|expr  |IXIY |and %n        |E6 %n         |      8 T
+AND expr                        |z80  |expr  |-    |and %n        |E6 %n         |      7 T
+AND expr                        |z80  |expr  |IXIY |and %n        |E6 %n         |      7 T
+AND expr                        |z80n |expr  |-    |and %n        |E6 %n         |      7 T
+AND expr                        |z80n |expr  |IXIY |and %n        |E6 %n         |      7 T
+ANI expr                        |8080 |expr  |-    |ani %n        |E6 %n         |      7 T
+ANI expr                        |8080 |expr  |IXIY |ani %n        |E6 %n         |      7 T
+ANI expr                        |8085 |expr  |-    |ani %n        |E6 %n         |      7 T
+ANI expr                        |8085 |expr  |IXIY |ani %n        |E6 %n         |      7 T
+ANI expr                        |gbz80|expr  |-    |ani %n        |E6 %n         |      8 T
+ANI expr                        |gbz80|expr  |IXIY |ani %n        |E6 %n         |      8 T
+ANI expr                        |z80  |expr  |-    |ani %n        |E6 %n         |      7 T
+ANI expr                        |z80  |expr  |IXIY |ani %n        |E6 %n         |      7 T
+ANI expr                        |z80n |expr  |-    |ani %n        |E6 %n         |      7 T
+ANI expr                        |z80n |expr  |IXIY |ani %n        |E6 %n         |      7 T
+CCF                             |8080 |-     |-    |ccf           |3F            |      4 T
+CCF                             |8080 |-     |IXIY |ccf           |3F            |      4 T
+CCF                             |8085 |-     |-    |ccf           |3F            |      4 T
+CCF                             |8085 |-     |IXIY |ccf           |3F            |      4 T
+CCF                             |gbz80|-     |-    |ccf           |3F            |      4 T
+CCF                             |gbz80|-     |IXIY |ccf           |3F            |      4 T
+CCF                             |z80  |-     |-    |ccf           |3F            |      4 T
+CCF                             |z80  |-     |IXIY |ccf           |3F            |      4 T
+CCF                             |z80n |-     |-    |ccf           |3F            |      4 T
+CCF                             |z80n |-     |IXIY |ccf           |3F            |      4 T
+CMC                             |8080 |-     |-    |cmc           |3F            |      4 T
+CMC                             |8080 |-     |IXIY |cmc           |3F            |      4 T
+CMC                             |8085 |-     |-    |cmc           |3F            |      4 T
+CMC                             |8085 |-     |IXIY |cmc           |3F            |      4 T
+CMC                             |gbz80|-     |-    |cmc           |3F            |      4 T
+CMC                             |gbz80|-     |IXIY |cmc           |3F            |      4 T
+CMC                             |z80  |-     |-    |cmc           |3F            |      4 T
+CMC                             |z80  |-     |IXIY |cmc           |3F            |      4 T
+CMC                             |z80n |-     |-    |cmc           |3F            |      4 T
+CMC                             |z80n |-     |IXIY |cmc           |3F            |      4 T
+CMP A                           |8080 |-     |-    |cmp a         |BF            |      4 T
+CMP A                           |8080 |-     |IXIY |cmp a         |BF            |      4 T
+CMP A                           |8085 |-     |-    |cmp a         |BF            |      4 T
+CMP A                           |8085 |-     |IXIY |cmp a         |BF            |      4 T
+CMP A                           |gbz80|-     |-    |cmp a         |BF            |      4 T
+CMP A                           |gbz80|-     |IXIY |cmp a         |BF            |      4 T
+CMP A                           |z80  |-     |-    |cmp a         |BF            |      4 T
+CMP A                           |z80  |-     |IXIY |cmp a         |BF            |      4 T
+CMP A                           |z80n |-     |-    |cmp a         |BF            |      4 T
+CMP A                           |z80n |-     |IXIY |cmp a         |BF            |      4 T
+CMP B                           |8080 |-     |-    |cmp b         |B8            |      4 T
+CMP B                           |8080 |-     |IXIY |cmp b         |B8            |      4 T
+CMP B                           |8085 |-     |-    |cmp b         |B8            |      4 T
+CMP B                           |8085 |-     |IXIY |cmp b         |B8            |      4 T
+CMP B                           |gbz80|-     |-    |cmp b         |B8            |      4 T
+CMP B                           |gbz80|-     |IXIY |cmp b         |B8            |      4 T
+CMP B                           |z80  |-     |-    |cmp b         |B8            |      4 T
+CMP B                           |z80  |-     |IXIY |cmp b         |B8            |      4 T
+CMP B                           |z80n |-     |-    |cmp b         |B8            |      4 T
+CMP B                           |z80n |-     |IXIY |cmp b         |B8            |      4 T
+CMP C                           |8080 |-     |-    |cmp c         |B9            |      4 T
+CMP C                           |8080 |-     |IXIY |cmp c         |B9            |      4 T
+CMP C                           |8085 |-     |-    |cmp c         |B9            |      4 T
+CMP C                           |8085 |-     |IXIY |cmp c         |B9            |      4 T
+CMP C                           |gbz80|-     |-    |cmp c         |B9            |      4 T
+CMP C                           |gbz80|-     |IXIY |cmp c         |B9            |      4 T
+CMP C                           |z80  |-     |-    |cmp c         |B9            |      4 T
+CMP C                           |z80  |-     |IXIY |cmp c         |B9            |      4 T
+CMP C                           |z80n |-     |-    |cmp c         |B9            |      4 T
+CMP C                           |z80n |-     |IXIY |cmp c         |B9            |      4 T
+CMP D                           |8080 |-     |-    |cmp d         |BA            |      4 T
+CMP D                           |8080 |-     |IXIY |cmp d         |BA            |      4 T
+CMP D                           |8085 |-     |-    |cmp d         |BA            |      4 T
+CMP D                           |8085 |-     |IXIY |cmp d         |BA            |      4 T
+CMP D                           |gbz80|-     |-    |cmp d         |BA            |      4 T
+CMP D                           |gbz80|-     |IXIY |cmp d         |BA            |      4 T
+CMP D                           |z80  |-     |-    |cmp d         |BA            |      4 T
+CMP D                           |z80  |-     |IXIY |cmp d         |BA            |      4 T
+CMP D                           |z80n |-     |-    |cmp d         |BA            |      4 T
+CMP D                           |z80n |-     |IXIY |cmp d         |BA            |      4 T
+CMP E                           |8080 |-     |-    |cmp e         |BB            |      4 T
+CMP E                           |8080 |-     |IXIY |cmp e         |BB            |      4 T
+CMP E                           |8085 |-     |-    |cmp e         |BB            |      4 T
+CMP E                           |8085 |-     |IXIY |cmp e         |BB            |      4 T
+CMP E                           |gbz80|-     |-    |cmp e         |BB            |      4 T
+CMP E                           |gbz80|-     |IXIY |cmp e         |BB            |      4 T
+CMP E                           |z80  |-     |-    |cmp e         |BB            |      4 T
+CMP E                           |z80  |-     |IXIY |cmp e         |BB            |      4 T
+CMP E                           |z80n |-     |-    |cmp e         |BB            |      4 T
+CMP E                           |z80n |-     |IXIY |cmp e         |BB            |      4 T
+CMP H                           |8080 |-     |-    |cmp h         |BC            |      4 T
+CMP H                           |8080 |-     |IXIY |cmp h         |BC            |      4 T
+CMP H                           |8085 |-     |-    |cmp h         |BC            |      4 T
+CMP H                           |8085 |-     |IXIY |cmp h         |BC            |      4 T
+CMP H                           |gbz80|-     |-    |cmp h         |BC            |      4 T
+CMP H                           |gbz80|-     |IXIY |cmp h         |BC            |      4 T
+CMP H                           |z80  |-     |-    |cmp h         |BC            |      4 T
+CMP H                           |z80  |-     |IXIY |cmp h         |BC            |      4 T
+CMP H                           |z80n |-     |-    |cmp h         |BC            |      4 T
+CMP H                           |z80n |-     |IXIY |cmp h         |BC            |      4 T
+CMP L                           |8080 |-     |-    |cmp l         |BD            |      4 T
+CMP L                           |8080 |-     |IXIY |cmp l         |BD            |      4 T
+CMP L                           |8085 |-     |-    |cmp l         |BD            |      4 T
+CMP L                           |8085 |-     |IXIY |cmp l         |BD            |      4 T
+CMP L                           |gbz80|-     |-    |cmp l         |BD            |      4 T
+CMP L                           |gbz80|-     |IXIY |cmp l         |BD            |      4 T
+CMP L                           |z80  |-     |-    |cmp l         |BD            |      4 T
+CMP L                           |z80  |-     |IXIY |cmp l         |BD            |      4 T
+CMP L                           |z80n |-     |-    |cmp l         |BD            |      4 T
+CMP L                           |z80n |-     |IXIY |cmp l         |BD            |      4 T
+CMP M                           |8080 |-     |-    |cmp m         |BE            |      7 T
+CMP M                           |8080 |-     |IXIY |cmp m         |BE            |      7 T
+CMP M                           |8085 |-     |-    |cmp m         |BE            |      7 T
+CMP M                           |8085 |-     |IXIY |cmp m         |BE            |      7 T
+CMP M                           |gbz80|-     |-    |cmp m         |BE            |      8 T
+CMP M                           |gbz80|-     |IXIY |cmp m         |BE            |      8 T
+CMP M                           |z80  |-     |-    |cmp m         |BE            |      7 T
+CMP M                           |z80  |-     |IXIY |cmp m         |BE            |      7 T
+CMP M                           |z80n |-     |-    |cmp m         |BE            |      7 T
+CMP M                           |z80n |-     |IXIY |cmp m         |BE            |      7 T
+CP A COMMA A                    |gbz80|-     |-    |cp a, a       |BF            |      4 T
+CP A COMMA A                    |gbz80|-     |IXIY |cp a, a       |BF            |      4 T
+CP A COMMA A                    |z80  |-     |-    |cp a, a       |BF            |      4 T
+CP A COMMA A                    |z80  |-     |IXIY |cp a, a       |BF            |      4 T
+CP A COMMA A                    |z80n |-     |-    |cp a, a       |BF            |      4 T
+CP A COMMA A                    |z80n |-     |IXIY |cp a, a       |BF            |      4 T
+CP A COMMA B                    |gbz80|-     |-    |cp a, b       |B8            |      4 T
+CP A COMMA B                    |gbz80|-     |IXIY |cp a, b       |B8            |      4 T
+CP A COMMA B                    |z80  |-     |-    |cp a, b       |B8            |      4 T
+CP A COMMA B                    |z80  |-     |IXIY |cp a, b       |B8            |      4 T
+CP A COMMA B                    |z80n |-     |-    |cp a, b       |B8            |      4 T
+CP A COMMA B                    |z80n |-     |IXIY |cp a, b       |B8            |      4 T
+CP A COMMA C                    |gbz80|-     |-    |cp a, c       |B9            |      4 T
+CP A COMMA C                    |gbz80|-     |IXIY |cp a, c       |B9            |      4 T
+CP A COMMA C                    |z80  |-     |-    |cp a, c       |B9            |      4 T
+CP A COMMA C                    |z80  |-     |IXIY |cp a, c       |B9            |      4 T
+CP A COMMA C                    |z80n |-     |-    |cp a, c       |B9            |      4 T
+CP A COMMA C                    |z80n |-     |IXIY |cp a, c       |B9            |      4 T
+CP A COMMA D                    |gbz80|-     |-    |cp a, d       |BA            |      4 T
+CP A COMMA D                    |gbz80|-     |IXIY |cp a, d       |BA            |      4 T
+CP A COMMA D                    |z80  |-     |-    |cp a, d       |BA            |      4 T
+CP A COMMA D                    |z80  |-     |IXIY |cp a, d       |BA            |      4 T
+CP A COMMA D                    |z80n |-     |-    |cp a, d       |BA            |      4 T
+CP A COMMA D                    |z80n |-     |IXIY |cp a, d       |BA            |      4 T
+CP A COMMA E                    |gbz80|-     |-    |cp a, e       |BB            |      4 T
+CP A COMMA E                    |gbz80|-     |IXIY |cp a, e       |BB            |      4 T
+CP A COMMA E                    |z80  |-     |-    |cp a, e       |BB            |      4 T
+CP A COMMA E                    |z80  |-     |IXIY |cp a, e       |BB            |      4 T
+CP A COMMA E                    |z80n |-     |-    |cp a, e       |BB            |      4 T
+CP A COMMA E                    |z80n |-     |IXIY |cp a, e       |BB            |      4 T
+CP A COMMA H                    |gbz80|-     |-    |cp a, h       |BC            |      4 T
+CP A COMMA H                    |gbz80|-     |IXIY |cp a, h       |BC            |      4 T
+CP A COMMA H                    |z80  |-     |-    |cp a, h       |BC            |      4 T
+CP A COMMA H                    |z80  |-     |IXIY |cp a, h       |BC            |      4 T
+CP A COMMA H                    |z80n |-     |-    |cp a, h       |BC            |      4 T
+CP A COMMA H                    |z80n |-     |IXIY |cp a, h       |BC            |      4 T
+CP A COMMA IND_HL RPAREN        |gbz80|-     |-    |cp a, (hl)    |BE            |      8 T
+CP A COMMA IND_HL RPAREN        |gbz80|-     |IXIY |cp a, (hl)    |BE            |      8 T
+CP A COMMA IND_HL RPAREN        |z80  |-     |-    |cp a, (hl)    |BE            |      7 T
+CP A COMMA IND_HL RPAREN        |z80  |-     |IXIY |cp a, (hl)    |BE            |      7 T
+CP A COMMA IND_HL RPAREN        |z80n |-     |-    |cp a, (hl)    |BE            |      7 T
+CP A COMMA IND_HL RPAREN        |z80n |-     |IXIY |cp a, (hl)    |BE            |      7 T
+CP A COMMA L                    |gbz80|-     |-    |cp a, l       |BD            |      4 T
+CP A COMMA L                    |gbz80|-     |IXIY |cp a, l       |BD            |      4 T
+CP A COMMA L                    |z80  |-     |-    |cp a, l       |BD            |      4 T
+CP A COMMA L                    |z80  |-     |IXIY |cp a, l       |BD            |      4 T
+CP A COMMA L                    |z80n |-     |-    |cp a, l       |BD            |      4 T
+CP A COMMA L                    |z80n |-     |IXIY |cp a, l       |BD            |      4 T
+CP A COMMA expr                 |gbz80|expr  |-    |cp a, %n      |FE %n         |      8 T
+CP A COMMA expr                 |gbz80|expr  |IXIY |cp a, %n      |FE %n         |      8 T
+CP A COMMA expr                 |z80  |expr  |-    |cp a, %n      |FE %n         |      7 T
+CP A COMMA expr                 |z80  |expr  |IXIY |cp a, %n      |FE %n         |      7 T
+CP A COMMA expr                 |z80n |expr  |-    |cp a, %n      |FE %n         |      7 T
+CP A COMMA expr                 |z80n |expr  |IXIY |cp a, %n      |FE %n         |      7 T
+CP A                            |gbz80|-     |-    |cp a          |BF            |      4 T
+CP A                            |gbz80|-     |IXIY |cp a          |BF            |      4 T
+CP A                            |z80  |-     |-    |cp a          |BF            |      4 T
+CP A                            |z80  |-     |IXIY |cp a          |BF            |      4 T
+CP A                            |z80n |-     |-    |cp a          |BF            |      4 T
+CP A                            |z80n |-     |IXIY |cp a          |BF            |      4 T
+CP B                            |gbz80|-     |-    |cp b          |B8            |      4 T
+CP B                            |gbz80|-     |IXIY |cp b          |B8            |      4 T
+CP B                            |z80  |-     |-    |cp b          |B8            |      4 T
+CP B                            |z80  |-     |IXIY |cp b          |B8            |      4 T
+CP B                            |z80n |-     |-    |cp b          |B8            |      4 T
+CP B                            |z80n |-     |IXIY |cp b          |B8            |      4 T
+CP C                            |gbz80|-     |-    |cp c          |B9            |      4 T
+CP C                            |gbz80|-     |IXIY |cp c          |B9            |      4 T
+CP C                            |z80  |-     |-    |cp c          |B9            |      4 T
+CP C                            |z80  |-     |IXIY |cp c          |B9            |      4 T
+CP C                            |z80n |-     |-    |cp c          |B9            |      4 T
+CP C                            |z80n |-     |IXIY |cp c          |B9            |      4 T
+CP D                            |gbz80|-     |-    |cp d          |BA            |      4 T
+CP D                            |gbz80|-     |IXIY |cp d          |BA            |      4 T
+CP D                            |z80  |-     |-    |cp d          |BA            |      4 T
+CP D                            |z80  |-     |IXIY |cp d          |BA            |      4 T
+CP D                            |z80n |-     |-    |cp d          |BA            |      4 T
+CP D                            |z80n |-     |IXIY |cp d          |BA            |      4 T
+CP E                            |gbz80|-     |-    |cp e          |BB            |      4 T
+CP E                            |gbz80|-     |IXIY |cp e          |BB            |      4 T
+CP E                            |z80  |-     |-    |cp e          |BB            |      4 T
+CP E                            |z80  |-     |IXIY |cp e          |BB            |      4 T
+CP E                            |z80n |-     |-    |cp e          |BB            |      4 T
+CP E                            |z80n |-     |IXIY |cp e          |BB            |      4 T
+CP H                            |gbz80|-     |-    |cp h          |BC            |      4 T
+CP H                            |gbz80|-     |IXIY |cp h          |BC            |      4 T
+CP H                            |z80  |-     |-    |cp h          |BC            |      4 T
+CP H                            |z80  |-     |IXIY |cp h          |BC            |      4 T
+CP H                            |z80n |-     |-    |cp h          |BC            |      4 T
+CP H                            |z80n |-     |IXIY |cp h          |BC            |      4 T
+CP IND_HL RPAREN                |gbz80|-     |-    |cp (hl)       |BE            |      8 T
+CP IND_HL RPAREN                |gbz80|-     |IXIY |cp (hl)       |BE            |      8 T
+CP IND_HL RPAREN                |z80  |-     |-    |cp (hl)       |BE            |      7 T
+CP IND_HL RPAREN                |z80  |-     |IXIY |cp (hl)       |BE            |      7 T
+CP IND_HL RPAREN                |z80n |-     |-    |cp (hl)       |BE            |      7 T
+CP IND_HL RPAREN                |z80n |-     |IXIY |cp (hl)       |BE            |      7 T
+CP L                            |gbz80|-     |-    |cp l          |BD            |      4 T
+CP L                            |gbz80|-     |IXIY |cp l          |BD            |      4 T
+CP L                            |z80  |-     |-    |cp l          |BD            |      4 T
+CP L                            |z80  |-     |IXIY |cp l          |BD            |      4 T
+CP L                            |z80n |-     |-    |cp l          |BD            |      4 T
+CP L                            |z80n |-     |IXIY |cp l          |BD            |      4 T
+CP expr                         |gbz80|expr  |-    |cp %n         |FE %n         |      8 T
+CP expr                         |gbz80|expr  |IXIY |cp %n         |FE %n         |      8 T
+CP expr                         |z80  |expr  |-    |cp %n         |FE %n         |      7 T
+CP expr                         |z80  |expr  |IXIY |cp %n         |FE %n         |      7 T
+CP expr                         |z80n |expr  |-    |cp %n         |FE %n         |      7 T
+CP expr                         |z80n |expr  |IXIY |cp %n         |FE %n         |      7 T
+CPD                             |8080 |-     |-    |cpd           |CD @cpd       |164/191 T
+CPD                             |8080 |-     |IXIY |cpd           |CD @cpd       |164/191 T
+CPD                             |8085 |-     |-    |cpd           |CD @cpd       |156/181 T
+CPD                             |8085 |-     |IXIY |cpd           |CD @cpd       |156/181 T
+CPD                             |gbz80|-     |-    |cpd           |CD @cpd       |408/424 T
+CPD                             |gbz80|-     |IXIY |cpd           |CD @cpd       |408/424 T
+CPD                             |z80  |-     |-    |cpd           |ED A9         |     16 T
+CPD                             |z80  |-     |IXIY |cpd           |ED A9         |     16 T
+CPD                             |z80n |-     |-    |cpd           |ED A9         |     16 T
+CPD                             |z80n |-     |IXIY |cpd           |ED A9         |     16 T
+CPDR                            |8080 |-     |-    |cpdr          |CD @cpdr      |195/353 T
+CPDR                            |8080 |-     |IXIY |cpdr          |CD @cpdr      |195/353 T
+CPDR                            |8085 |-     |-    |cpdr          |CD @cpdr      |180/328 T
+CPDR                            |8085 |-     |IXIY |cpdr          |CD @cpdr      |180/328 T
+CPDR                            |gbz80|-     |-    |cpdr          |CD @cpdr      |448/856 T
+CPDR                            |gbz80|-     |IXIY |cpdr          |CD @cpdr      |448/856 T
+CPDR                            |z80  |-     |-    |cpdr          |ED B9         |  16/37 T
+CPDR                            |z80  |-     |IXIY |cpdr          |ED B9         |  16/37 T
+CPDR                            |z80n |-     |-    |cpdr          |ED B9         |  16/37 T
+CPDR                            |z80n |-     |IXIY |cpdr          |ED B9         |  16/37 T
+CPI                             |8080 |-     |-    |cpi           |CD @cpi       |164/191 T
+CPI                             |8080 |-     |IXIY |cpi           |CD @cpi       |164/191 T
+CPI                             |8085 |-     |-    |cpi           |CD @cpi       |156/181 T
+CPI                             |8085 |-     |IXIY |cpi           |CD @cpi       |156/181 T
+CPI                             |gbz80|-     |-    |cpi           |CD @cpi       |408/424 T
+CPI                             |gbz80|-     |IXIY |cpi           |CD @cpi       |408/424 T
+CPI                             |z80  |-     |-    |cpi           |ED A1         |     16 T
+CPI                             |z80  |-     |IXIY |cpi           |ED A1         |     16 T
+CPI                             |z80n |-     |-    |cpi           |ED A1         |     16 T
+CPI                             |z80n |-     |IXIY |cpi           |ED A1         |     16 T
+CPI expr                        |8080 |expr  |-    |cpi %n        |FE %n         |      7 T
+CPI expr                        |8080 |expr  |IXIY |cpi %n        |FE %n         |      7 T
+CPI expr                        |8085 |expr  |-    |cpi %n        |FE %n         |      7 T
+CPI expr                        |8085 |expr  |IXIY |cpi %n        |FE %n         |      7 T
+CPI expr                        |gbz80|expr  |-    |cpi %n        |FE %n         |      8 T
+CPI expr                        |gbz80|expr  |IXIY |cpi %n        |FE %n         |      8 T
+CPI expr                        |z80  |expr  |-    |cpi %n        |FE %n         |      7 T
+CPI expr                        |z80  |expr  |IXIY |cpi %n        |FE %n         |      7 T
+CPI expr                        |z80n |expr  |-    |cpi %n        |FE %n         |      7 T
+CPI expr                        |z80n |expr  |IXIY |cpi %n        |FE %n         |      7 T
+CPIR                            |8080 |-     |-    |cpir          |CD @cpir      |195/353 T
+CPIR                            |8080 |-     |IXIY |cpir          |CD @cpir      |195/353 T
+CPIR                            |8085 |-     |-    |cpir          |CD @cpir      |180/328 T
+CPIR                            |8085 |-     |IXIY |cpir          |CD @cpir      |180/328 T
+CPIR                            |gbz80|-     |-    |cpir          |CD @cpir      |448/856 T
+CPIR                            |gbz80|-     |IXIY |cpir          |CD @cpir      |448/856 T
+CPIR                            |z80  |-     |-    |cpir          |ED B1         |  16/37 T
+CPIR                            |z80  |-     |IXIY |cpir          |ED B1         |  16/37 T
+CPIR                            |z80n |-     |-    |cpir          |ED B1         |  16/37 T
+CPIR                            |z80n |-     |IXIY |cpir          |ED B1         |  16/37 T
 EX AF COMMA AF                  |z80  |-     |-    |ex af, af     |08            |      4 T
 EX AF COMMA AF                  |z80  |-     |IXIY |ex af, af     |08            |      4 T
 EX AF COMMA AF                  |z80n |-     |-    |ex af, af     |08            |      4 T
@@ -2303,6 +3231,276 @@ MVI M COMMA expr                |z80  |expr  |-    |mvi m, %n     |36 %n        
 MVI M COMMA expr                |z80  |expr  |IXIY |mvi m, %n     |36 %n         |     10 T
 MVI M COMMA expr                |z80n |expr  |-    |mvi m, %n     |36 %n         |     10 T
 MVI M COMMA expr                |z80n |expr  |IXIY |mvi m, %n     |36 %n         |     10 T
+OR A COMMA A                    |8080 |-     |-    |or a, a       |B7            |      4 T
+OR A COMMA A                    |8080 |-     |IXIY |or a, a       |B7            |      4 T
+OR A COMMA A                    |8085 |-     |-    |or a, a       |B7            |      4 T
+OR A COMMA A                    |8085 |-     |IXIY |or a, a       |B7            |      4 T
+OR A COMMA A                    |gbz80|-     |-    |or a, a       |B7            |      4 T
+OR A COMMA A                    |gbz80|-     |IXIY |or a, a       |B7            |      4 T
+OR A COMMA A                    |z80  |-     |-    |or a, a       |B7            |      4 T
+OR A COMMA A                    |z80  |-     |IXIY |or a, a       |B7            |      4 T
+OR A COMMA A                    |z80n |-     |-    |or a, a       |B7            |      4 T
+OR A COMMA A                    |z80n |-     |IXIY |or a, a       |B7            |      4 T
+OR A COMMA B                    |8080 |-     |-    |or a, b       |B0            |      4 T
+OR A COMMA B                    |8080 |-     |IXIY |or a, b       |B0            |      4 T
+OR A COMMA B                    |8085 |-     |-    |or a, b       |B0            |      4 T
+OR A COMMA B                    |8085 |-     |IXIY |or a, b       |B0            |      4 T
+OR A COMMA B                    |gbz80|-     |-    |or a, b       |B0            |      4 T
+OR A COMMA B                    |gbz80|-     |IXIY |or a, b       |B0            |      4 T
+OR A COMMA B                    |z80  |-     |-    |or a, b       |B0            |      4 T
+OR A COMMA B                    |z80  |-     |IXIY |or a, b       |B0            |      4 T
+OR A COMMA B                    |z80n |-     |-    |or a, b       |B0            |      4 T
+OR A COMMA B                    |z80n |-     |IXIY |or a, b       |B0            |      4 T
+OR A COMMA C                    |8080 |-     |-    |or a, c       |B1            |      4 T
+OR A COMMA C                    |8080 |-     |IXIY |or a, c       |B1            |      4 T
+OR A COMMA C                    |8085 |-     |-    |or a, c       |B1            |      4 T
+OR A COMMA C                    |8085 |-     |IXIY |or a, c       |B1            |      4 T
+OR A COMMA C                    |gbz80|-     |-    |or a, c       |B1            |      4 T
+OR A COMMA C                    |gbz80|-     |IXIY |or a, c       |B1            |      4 T
+OR A COMMA C                    |z80  |-     |-    |or a, c       |B1            |      4 T
+OR A COMMA C                    |z80  |-     |IXIY |or a, c       |B1            |      4 T
+OR A COMMA C                    |z80n |-     |-    |or a, c       |B1            |      4 T
+OR A COMMA C                    |z80n |-     |IXIY |or a, c       |B1            |      4 T
+OR A COMMA D                    |8080 |-     |-    |or a, d       |B2            |      4 T
+OR A COMMA D                    |8080 |-     |IXIY |or a, d       |B2            |      4 T
+OR A COMMA D                    |8085 |-     |-    |or a, d       |B2            |      4 T
+OR A COMMA D                    |8085 |-     |IXIY |or a, d       |B2            |      4 T
+OR A COMMA D                    |gbz80|-     |-    |or a, d       |B2            |      4 T
+OR A COMMA D                    |gbz80|-     |IXIY |or a, d       |B2            |      4 T
+OR A COMMA D                    |z80  |-     |-    |or a, d       |B2            |      4 T
+OR A COMMA D                    |z80  |-     |IXIY |or a, d       |B2            |      4 T
+OR A COMMA D                    |z80n |-     |-    |or a, d       |B2            |      4 T
+OR A COMMA D                    |z80n |-     |IXIY |or a, d       |B2            |      4 T
+OR A COMMA E                    |8080 |-     |-    |or a, e       |B3            |      4 T
+OR A COMMA E                    |8080 |-     |IXIY |or a, e       |B3            |      4 T
+OR A COMMA E                    |8085 |-     |-    |or a, e       |B3            |      4 T
+OR A COMMA E                    |8085 |-     |IXIY |or a, e       |B3            |      4 T
+OR A COMMA E                    |gbz80|-     |-    |or a, e       |B3            |      4 T
+OR A COMMA E                    |gbz80|-     |IXIY |or a, e       |B3            |      4 T
+OR A COMMA E                    |z80  |-     |-    |or a, e       |B3            |      4 T
+OR A COMMA E                    |z80  |-     |IXIY |or a, e       |B3            |      4 T
+OR A COMMA E                    |z80n |-     |-    |or a, e       |B3            |      4 T
+OR A COMMA E                    |z80n |-     |IXIY |or a, e       |B3            |      4 T
+OR A COMMA H                    |8080 |-     |-    |or a, h       |B4            |      4 T
+OR A COMMA H                    |8080 |-     |IXIY |or a, h       |B4            |      4 T
+OR A COMMA H                    |8085 |-     |-    |or a, h       |B4            |      4 T
+OR A COMMA H                    |8085 |-     |IXIY |or a, h       |B4            |      4 T
+OR A COMMA H                    |gbz80|-     |-    |or a, h       |B4            |      4 T
+OR A COMMA H                    |gbz80|-     |IXIY |or a, h       |B4            |      4 T
+OR A COMMA H                    |z80  |-     |-    |or a, h       |B4            |      4 T
+OR A COMMA H                    |z80  |-     |IXIY |or a, h       |B4            |      4 T
+OR A COMMA H                    |z80n |-     |-    |or a, h       |B4            |      4 T
+OR A COMMA H                    |z80n |-     |IXIY |or a, h       |B4            |      4 T
+OR A COMMA IND_HL RPAREN        |8080 |-     |-    |or a, (hl)    |B6            |      7 T
+OR A COMMA IND_HL RPAREN        |8080 |-     |IXIY |or a, (hl)    |B6            |      7 T
+OR A COMMA IND_HL RPAREN        |8085 |-     |-    |or a, (hl)    |B6            |      7 T
+OR A COMMA IND_HL RPAREN        |8085 |-     |IXIY |or a, (hl)    |B6            |      7 T
+OR A COMMA IND_HL RPAREN        |gbz80|-     |-    |or a, (hl)    |B6            |      8 T
+OR A COMMA IND_HL RPAREN        |gbz80|-     |IXIY |or a, (hl)    |B6            |      8 T
+OR A COMMA IND_HL RPAREN        |z80  |-     |-    |or a, (hl)    |B6            |      7 T
+OR A COMMA IND_HL RPAREN        |z80  |-     |IXIY |or a, (hl)    |B6            |      7 T
+OR A COMMA IND_HL RPAREN        |z80n |-     |-    |or a, (hl)    |B6            |      7 T
+OR A COMMA IND_HL RPAREN        |z80n |-     |IXIY |or a, (hl)    |B6            |      7 T
+OR A COMMA L                    |8080 |-     |-    |or a, l       |B5            |      4 T
+OR A COMMA L                    |8080 |-     |IXIY |or a, l       |B5            |      4 T
+OR A COMMA L                    |8085 |-     |-    |or a, l       |B5            |      4 T
+OR A COMMA L                    |8085 |-     |IXIY |or a, l       |B5            |      4 T
+OR A COMMA L                    |gbz80|-     |-    |or a, l       |B5            |      4 T
+OR A COMMA L                    |gbz80|-     |IXIY |or a, l       |B5            |      4 T
+OR A COMMA L                    |z80  |-     |-    |or a, l       |B5            |      4 T
+OR A COMMA L                    |z80  |-     |IXIY |or a, l       |B5            |      4 T
+OR A COMMA L                    |z80n |-     |-    |or a, l       |B5            |      4 T
+OR A COMMA L                    |z80n |-     |IXIY |or a, l       |B5            |      4 T
+OR A COMMA expr                 |8080 |expr  |-    |or a, %n      |F6 %n         |      7 T
+OR A COMMA expr                 |8080 |expr  |IXIY |or a, %n      |F6 %n         |      7 T
+OR A COMMA expr                 |8085 |expr  |-    |or a, %n      |F6 %n         |      7 T
+OR A COMMA expr                 |8085 |expr  |IXIY |or a, %n      |F6 %n         |      7 T
+OR A COMMA expr                 |gbz80|expr  |-    |or a, %n      |F6 %n         |      8 T
+OR A COMMA expr                 |gbz80|expr  |IXIY |or a, %n      |F6 %n         |      8 T
+OR A COMMA expr                 |z80  |expr  |-    |or a, %n      |F6 %n         |      7 T
+OR A COMMA expr                 |z80  |expr  |IXIY |or a, %n      |F6 %n         |      7 T
+OR A COMMA expr                 |z80n |expr  |-    |or a, %n      |F6 %n         |      7 T
+OR A COMMA expr                 |z80n |expr  |IXIY |or a, %n      |F6 %n         |      7 T
+OR A                            |8080 |-     |-    |or a          |B7            |      4 T
+OR A                            |8080 |-     |IXIY |or a          |B7            |      4 T
+OR A                            |8085 |-     |-    |or a          |B7            |      4 T
+OR A                            |8085 |-     |IXIY |or a          |B7            |      4 T
+OR A                            |gbz80|-     |-    |or a          |B7            |      4 T
+OR A                            |gbz80|-     |IXIY |or a          |B7            |      4 T
+OR A                            |z80  |-     |-    |or a          |B7            |      4 T
+OR A                            |z80  |-     |IXIY |or a          |B7            |      4 T
+OR A                            |z80n |-     |-    |or a          |B7            |      4 T
+OR A                            |z80n |-     |IXIY |or a          |B7            |      4 T
+OR B                            |8080 |-     |-    |or b          |B0            |      4 T
+OR B                            |8080 |-     |IXIY |or b          |B0            |      4 T
+OR B                            |8085 |-     |-    |or b          |B0            |      4 T
+OR B                            |8085 |-     |IXIY |or b          |B0            |      4 T
+OR B                            |gbz80|-     |-    |or b          |B0            |      4 T
+OR B                            |gbz80|-     |IXIY |or b          |B0            |      4 T
+OR B                            |z80  |-     |-    |or b          |B0            |      4 T
+OR B                            |z80  |-     |IXIY |or b          |B0            |      4 T
+OR B                            |z80n |-     |-    |or b          |B0            |      4 T
+OR B                            |z80n |-     |IXIY |or b          |B0            |      4 T
+OR C                            |8080 |-     |-    |or c          |B1            |      4 T
+OR C                            |8080 |-     |IXIY |or c          |B1            |      4 T
+OR C                            |8085 |-     |-    |or c          |B1            |      4 T
+OR C                            |8085 |-     |IXIY |or c          |B1            |      4 T
+OR C                            |gbz80|-     |-    |or c          |B1            |      4 T
+OR C                            |gbz80|-     |IXIY |or c          |B1            |      4 T
+OR C                            |z80  |-     |-    |or c          |B1            |      4 T
+OR C                            |z80  |-     |IXIY |or c          |B1            |      4 T
+OR C                            |z80n |-     |-    |or c          |B1            |      4 T
+OR C                            |z80n |-     |IXIY |or c          |B1            |      4 T
+OR D                            |8080 |-     |-    |or d          |B2            |      4 T
+OR D                            |8080 |-     |IXIY |or d          |B2            |      4 T
+OR D                            |8085 |-     |-    |or d          |B2            |      4 T
+OR D                            |8085 |-     |IXIY |or d          |B2            |      4 T
+OR D                            |gbz80|-     |-    |or d          |B2            |      4 T
+OR D                            |gbz80|-     |IXIY |or d          |B2            |      4 T
+OR D                            |z80  |-     |-    |or d          |B2            |      4 T
+OR D                            |z80  |-     |IXIY |or d          |B2            |      4 T
+OR D                            |z80n |-     |-    |or d          |B2            |      4 T
+OR D                            |z80n |-     |IXIY |or d          |B2            |      4 T
+OR E                            |8080 |-     |-    |or e          |B3            |      4 T
+OR E                            |8080 |-     |IXIY |or e          |B3            |      4 T
+OR E                            |8085 |-     |-    |or e          |B3            |      4 T
+OR E                            |8085 |-     |IXIY |or e          |B3            |      4 T
+OR E                            |gbz80|-     |-    |or e          |B3            |      4 T
+OR E                            |gbz80|-     |IXIY |or e          |B3            |      4 T
+OR E                            |z80  |-     |-    |or e          |B3            |      4 T
+OR E                            |z80  |-     |IXIY |or e          |B3            |      4 T
+OR E                            |z80n |-     |-    |or e          |B3            |      4 T
+OR E                            |z80n |-     |IXIY |or e          |B3            |      4 T
+OR H                            |8080 |-     |-    |or h          |B4            |      4 T
+OR H                            |8080 |-     |IXIY |or h          |B4            |      4 T
+OR H                            |8085 |-     |-    |or h          |B4            |      4 T
+OR H                            |8085 |-     |IXIY |or h          |B4            |      4 T
+OR H                            |gbz80|-     |-    |or h          |B4            |      4 T
+OR H                            |gbz80|-     |IXIY |or h          |B4            |      4 T
+OR H                            |z80  |-     |-    |or h          |B4            |      4 T
+OR H                            |z80  |-     |IXIY |or h          |B4            |      4 T
+OR H                            |z80n |-     |-    |or h          |B4            |      4 T
+OR H                            |z80n |-     |IXIY |or h          |B4            |      4 T
+OR IND_HL RPAREN                |8080 |-     |-    |or (hl)       |B6            |      7 T
+OR IND_HL RPAREN                |8080 |-     |IXIY |or (hl)       |B6            |      7 T
+OR IND_HL RPAREN                |8085 |-     |-    |or (hl)       |B6            |      7 T
+OR IND_HL RPAREN                |8085 |-     |IXIY |or (hl)       |B6            |      7 T
+OR IND_HL RPAREN                |gbz80|-     |-    |or (hl)       |B6            |      8 T
+OR IND_HL RPAREN                |gbz80|-     |IXIY |or (hl)       |B6            |      8 T
+OR IND_HL RPAREN                |z80  |-     |-    |or (hl)       |B6            |      7 T
+OR IND_HL RPAREN                |z80  |-     |IXIY |or (hl)       |B6            |      7 T
+OR IND_HL RPAREN                |z80n |-     |-    |or (hl)       |B6            |      7 T
+OR IND_HL RPAREN                |z80n |-     |IXIY |or (hl)       |B6            |      7 T
+OR L                            |8080 |-     |-    |or l          |B5            |      4 T
+OR L                            |8080 |-     |IXIY |or l          |B5            |      4 T
+OR L                            |8085 |-     |-    |or l          |B5            |      4 T
+OR L                            |8085 |-     |IXIY |or l          |B5            |      4 T
+OR L                            |gbz80|-     |-    |or l          |B5            |      4 T
+OR L                            |gbz80|-     |IXIY |or l          |B5            |      4 T
+OR L                            |z80  |-     |-    |or l          |B5            |      4 T
+OR L                            |z80  |-     |IXIY |or l          |B5            |      4 T
+OR L                            |z80n |-     |-    |or l          |B5            |      4 T
+OR L                            |z80n |-     |IXIY |or l          |B5            |      4 T
+OR expr                         |8080 |expr  |-    |or %n         |F6 %n         |      7 T
+OR expr                         |8080 |expr  |IXIY |or %n         |F6 %n         |      7 T
+OR expr                         |8085 |expr  |-    |or %n         |F6 %n         |      7 T
+OR expr                         |8085 |expr  |IXIY |or %n         |F6 %n         |      7 T
+OR expr                         |gbz80|expr  |-    |or %n         |F6 %n         |      8 T
+OR expr                         |gbz80|expr  |IXIY |or %n         |F6 %n         |      8 T
+OR expr                         |z80  |expr  |-    |or %n         |F6 %n         |      7 T
+OR expr                         |z80  |expr  |IXIY |or %n         |F6 %n         |      7 T
+OR expr                         |z80n |expr  |-    |or %n         |F6 %n         |      7 T
+OR expr                         |z80n |expr  |IXIY |or %n         |F6 %n         |      7 T
+ORA A                           |8080 |-     |-    |ora a         |B7            |      4 T
+ORA A                           |8080 |-     |IXIY |ora a         |B7            |      4 T
+ORA A                           |8085 |-     |-    |ora a         |B7            |      4 T
+ORA A                           |8085 |-     |IXIY |ora a         |B7            |      4 T
+ORA A                           |gbz80|-     |-    |ora a         |B7            |      4 T
+ORA A                           |gbz80|-     |IXIY |ora a         |B7            |      4 T
+ORA A                           |z80  |-     |-    |ora a         |B7            |      4 T
+ORA A                           |z80  |-     |IXIY |ora a         |B7            |      4 T
+ORA A                           |z80n |-     |-    |ora a         |B7            |      4 T
+ORA A                           |z80n |-     |IXIY |ora a         |B7            |      4 T
+ORA B                           |8080 |-     |-    |ora b         |B0            |      4 T
+ORA B                           |8080 |-     |IXIY |ora b         |B0            |      4 T
+ORA B                           |8085 |-     |-    |ora b         |B0            |      4 T
+ORA B                           |8085 |-     |IXIY |ora b         |B0            |      4 T
+ORA B                           |gbz80|-     |-    |ora b         |B0            |      4 T
+ORA B                           |gbz80|-     |IXIY |ora b         |B0            |      4 T
+ORA B                           |z80  |-     |-    |ora b         |B0            |      4 T
+ORA B                           |z80  |-     |IXIY |ora b         |B0            |      4 T
+ORA B                           |z80n |-     |-    |ora b         |B0            |      4 T
+ORA B                           |z80n |-     |IXIY |ora b         |B0            |      4 T
+ORA C                           |8080 |-     |-    |ora c         |B1            |      4 T
+ORA C                           |8080 |-     |IXIY |ora c         |B1            |      4 T
+ORA C                           |8085 |-     |-    |ora c         |B1            |      4 T
+ORA C                           |8085 |-     |IXIY |ora c         |B1            |      4 T
+ORA C                           |gbz80|-     |-    |ora c         |B1            |      4 T
+ORA C                           |gbz80|-     |IXIY |ora c         |B1            |      4 T
+ORA C                           |z80  |-     |-    |ora c         |B1            |      4 T
+ORA C                           |z80  |-     |IXIY |ora c         |B1            |      4 T
+ORA C                           |z80n |-     |-    |ora c         |B1            |      4 T
+ORA C                           |z80n |-     |IXIY |ora c         |B1            |      4 T
+ORA D                           |8080 |-     |-    |ora d         |B2            |      4 T
+ORA D                           |8080 |-     |IXIY |ora d         |B2            |      4 T
+ORA D                           |8085 |-     |-    |ora d         |B2            |      4 T
+ORA D                           |8085 |-     |IXIY |ora d         |B2            |      4 T
+ORA D                           |gbz80|-     |-    |ora d         |B2            |      4 T
+ORA D                           |gbz80|-     |IXIY |ora d         |B2            |      4 T
+ORA D                           |z80  |-     |-    |ora d         |B2            |      4 T
+ORA D                           |z80  |-     |IXIY |ora d         |B2            |      4 T
+ORA D                           |z80n |-     |-    |ora d         |B2            |      4 T
+ORA D                           |z80n |-     |IXIY |ora d         |B2            |      4 T
+ORA E                           |8080 |-     |-    |ora e         |B3            |      4 T
+ORA E                           |8080 |-     |IXIY |ora e         |B3            |      4 T
+ORA E                           |8085 |-     |-    |ora e         |B3            |      4 T
+ORA E                           |8085 |-     |IXIY |ora e         |B3            |      4 T
+ORA E                           |gbz80|-     |-    |ora e         |B3            |      4 T
+ORA E                           |gbz80|-     |IXIY |ora e         |B3            |      4 T
+ORA E                           |z80  |-     |-    |ora e         |B3            |      4 T
+ORA E                           |z80  |-     |IXIY |ora e         |B3            |      4 T
+ORA E                           |z80n |-     |-    |ora e         |B3            |      4 T
+ORA E                           |z80n |-     |IXIY |ora e         |B3            |      4 T
+ORA H                           |8080 |-     |-    |ora h         |B4            |      4 T
+ORA H                           |8080 |-     |IXIY |ora h         |B4            |      4 T
+ORA H                           |8085 |-     |-    |ora h         |B4            |      4 T
+ORA H                           |8085 |-     |IXIY |ora h         |B4            |      4 T
+ORA H                           |gbz80|-     |-    |ora h         |B4            |      4 T
+ORA H                           |gbz80|-     |IXIY |ora h         |B4            |      4 T
+ORA H                           |z80  |-     |-    |ora h         |B4            |      4 T
+ORA H                           |z80  |-     |IXIY |ora h         |B4            |      4 T
+ORA H                           |z80n |-     |-    |ora h         |B4            |      4 T
+ORA H                           |z80n |-     |IXIY |ora h         |B4            |      4 T
+ORA L                           |8080 |-     |-    |ora l         |B5            |      4 T
+ORA L                           |8080 |-     |IXIY |ora l         |B5            |      4 T
+ORA L                           |8085 |-     |-    |ora l         |B5            |      4 T
+ORA L                           |8085 |-     |IXIY |ora l         |B5            |      4 T
+ORA L                           |gbz80|-     |-    |ora l         |B5            |      4 T
+ORA L                           |gbz80|-     |IXIY |ora l         |B5            |      4 T
+ORA L                           |z80  |-     |-    |ora l         |B5            |      4 T
+ORA L                           |z80  |-     |IXIY |ora l         |B5            |      4 T
+ORA L                           |z80n |-     |-    |ora l         |B5            |      4 T
+ORA L                           |z80n |-     |IXIY |ora l         |B5            |      4 T
+ORA M                           |8080 |-     |-    |ora m         |B6            |      7 T
+ORA M                           |8080 |-     |IXIY |ora m         |B6            |      7 T
+ORA M                           |8085 |-     |-    |ora m         |B6            |      7 T
+ORA M                           |8085 |-     |IXIY |ora m         |B6            |      7 T
+ORA M                           |gbz80|-     |-    |ora m         |B6            |      8 T
+ORA M                           |gbz80|-     |IXIY |ora m         |B6            |      8 T
+ORA M                           |z80  |-     |-    |ora m         |B6            |      7 T
+ORA M                           |z80  |-     |IXIY |ora m         |B6            |      7 T
+ORA M                           |z80n |-     |-    |ora m         |B6            |      7 T
+ORA M                           |z80n |-     |IXIY |ora m         |B6            |      7 T
+ORI expr                        |8080 |expr  |-    |ori %n        |F6 %n         |      7 T
+ORI expr                        |8080 |expr  |IXIY |ori %n        |F6 %n         |      7 T
+ORI expr                        |8085 |expr  |-    |ori %n        |F6 %n         |      7 T
+ORI expr                        |8085 |expr  |IXIY |ori %n        |F6 %n         |      7 T
+ORI expr                        |gbz80|expr  |-    |ori %n        |F6 %n         |      8 T
+ORI expr                        |gbz80|expr  |IXIY |ori %n        |F6 %n         |      8 T
+ORI expr                        |z80  |expr  |-    |ori %n        |F6 %n         |      7 T
+ORI expr                        |z80  |expr  |IXIY |ori %n        |F6 %n         |      7 T
+ORI expr                        |z80n |expr  |-    |ori %n        |F6 %n         |      7 T
+ORI expr                        |z80n |expr  |IXIY |ori %n        |F6 %n         |      7 T
 POP AF                          |8080 |-     |-    |pop af        |F1            |     10 T
 POP AF                          |8080 |-     |IXIY |pop af        |F1            |     10 T
 POP AF                          |8085 |-     |-    |pop af        |F1            |     10 T
@@ -2479,6 +3677,286 @@ PUSH PSW                        |z80  |-     |-    |push psw      |F5           
 PUSH PSW                        |z80  |-     |IXIY |push psw      |F5            |     11 T
 PUSH PSW                        |z80n |-     |-    |push psw      |F5            |     11 T
 PUSH PSW                        |z80n |-     |IXIY |push psw      |F5            |     11 T
+SBB A                           |8080 |-     |-    |sbb a         |9F            |      4 T
+SBB A                           |8080 |-     |IXIY |sbb a         |9F            |      4 T
+SBB A                           |8085 |-     |-    |sbb a         |9F            |      4 T
+SBB A                           |8085 |-     |IXIY |sbb a         |9F            |      4 T
+SBB A                           |gbz80|-     |-    |sbb a         |9F            |      4 T
+SBB A                           |gbz80|-     |IXIY |sbb a         |9F            |      4 T
+SBB A                           |z80  |-     |-    |sbb a         |9F            |      4 T
+SBB A                           |z80  |-     |IXIY |sbb a         |9F            |      4 T
+SBB A                           |z80n |-     |-    |sbb a         |9F            |      4 T
+SBB A                           |z80n |-     |IXIY |sbb a         |9F            |      4 T
+SBB B                           |8080 |-     |-    |sbb b         |98            |      4 T
+SBB B                           |8080 |-     |IXIY |sbb b         |98            |      4 T
+SBB B                           |8085 |-     |-    |sbb b         |98            |      4 T
+SBB B                           |8085 |-     |IXIY |sbb b         |98            |      4 T
+SBB B                           |gbz80|-     |-    |sbb b         |98            |      4 T
+SBB B                           |gbz80|-     |IXIY |sbb b         |98            |      4 T
+SBB B                           |z80  |-     |-    |sbb b         |98            |      4 T
+SBB B                           |z80  |-     |IXIY |sbb b         |98            |      4 T
+SBB B                           |z80n |-     |-    |sbb b         |98            |      4 T
+SBB B                           |z80n |-     |IXIY |sbb b         |98            |      4 T
+SBB C                           |8080 |-     |-    |sbb c         |99            |      4 T
+SBB C                           |8080 |-     |IXIY |sbb c         |99            |      4 T
+SBB C                           |8085 |-     |-    |sbb c         |99            |      4 T
+SBB C                           |8085 |-     |IXIY |sbb c         |99            |      4 T
+SBB C                           |gbz80|-     |-    |sbb c         |99            |      4 T
+SBB C                           |gbz80|-     |IXIY |sbb c         |99            |      4 T
+SBB C                           |z80  |-     |-    |sbb c         |99            |      4 T
+SBB C                           |z80  |-     |IXIY |sbb c         |99            |      4 T
+SBB C                           |z80n |-     |-    |sbb c         |99            |      4 T
+SBB C                           |z80n |-     |IXIY |sbb c         |99            |      4 T
+SBB D                           |8080 |-     |-    |sbb d         |9A            |      4 T
+SBB D                           |8080 |-     |IXIY |sbb d         |9A            |      4 T
+SBB D                           |8085 |-     |-    |sbb d         |9A            |      4 T
+SBB D                           |8085 |-     |IXIY |sbb d         |9A            |      4 T
+SBB D                           |gbz80|-     |-    |sbb d         |9A            |      4 T
+SBB D                           |gbz80|-     |IXIY |sbb d         |9A            |      4 T
+SBB D                           |z80  |-     |-    |sbb d         |9A            |      4 T
+SBB D                           |z80  |-     |IXIY |sbb d         |9A            |      4 T
+SBB D                           |z80n |-     |-    |sbb d         |9A            |      4 T
+SBB D                           |z80n |-     |IXIY |sbb d         |9A            |      4 T
+SBB E                           |8080 |-     |-    |sbb e         |9B            |      4 T
+SBB E                           |8080 |-     |IXIY |sbb e         |9B            |      4 T
+SBB E                           |8085 |-     |-    |sbb e         |9B            |      4 T
+SBB E                           |8085 |-     |IXIY |sbb e         |9B            |      4 T
+SBB E                           |gbz80|-     |-    |sbb e         |9B            |      4 T
+SBB E                           |gbz80|-     |IXIY |sbb e         |9B            |      4 T
+SBB E                           |z80  |-     |-    |sbb e         |9B            |      4 T
+SBB E                           |z80  |-     |IXIY |sbb e         |9B            |      4 T
+SBB E                           |z80n |-     |-    |sbb e         |9B            |      4 T
+SBB E                           |z80n |-     |IXIY |sbb e         |9B            |      4 T
+SBB H                           |8080 |-     |-    |sbb h         |9C            |      4 T
+SBB H                           |8080 |-     |IXIY |sbb h         |9C            |      4 T
+SBB H                           |8085 |-     |-    |sbb h         |9C            |      4 T
+SBB H                           |8085 |-     |IXIY |sbb h         |9C            |      4 T
+SBB H                           |gbz80|-     |-    |sbb h         |9C            |      4 T
+SBB H                           |gbz80|-     |IXIY |sbb h         |9C            |      4 T
+SBB H                           |z80  |-     |-    |sbb h         |9C            |      4 T
+SBB H                           |z80  |-     |IXIY |sbb h         |9C            |      4 T
+SBB H                           |z80n |-     |-    |sbb h         |9C            |      4 T
+SBB H                           |z80n |-     |IXIY |sbb h         |9C            |      4 T
+SBB L                           |8080 |-     |-    |sbb l         |9D            |      4 T
+SBB L                           |8080 |-     |IXIY |sbb l         |9D            |      4 T
+SBB L                           |8085 |-     |-    |sbb l         |9D            |      4 T
+SBB L                           |8085 |-     |IXIY |sbb l         |9D            |      4 T
+SBB L                           |gbz80|-     |-    |sbb l         |9D            |      4 T
+SBB L                           |gbz80|-     |IXIY |sbb l         |9D            |      4 T
+SBB L                           |z80  |-     |-    |sbb l         |9D            |      4 T
+SBB L                           |z80  |-     |IXIY |sbb l         |9D            |      4 T
+SBB L                           |z80n |-     |-    |sbb l         |9D            |      4 T
+SBB L                           |z80n |-     |IXIY |sbb l         |9D            |      4 T
+SBB M                           |8080 |-     |-    |sbb m         |9E            |      7 T
+SBB M                           |8080 |-     |IXIY |sbb m         |9E            |      7 T
+SBB M                           |8085 |-     |-    |sbb m         |9E            |      7 T
+SBB M                           |8085 |-     |IXIY |sbb m         |9E            |      7 T
+SBB M                           |gbz80|-     |-    |sbb m         |9E            |      8 T
+SBB M                           |gbz80|-     |IXIY |sbb m         |9E            |      8 T
+SBB M                           |z80  |-     |-    |sbb m         |9E            |      7 T
+SBB M                           |z80  |-     |IXIY |sbb m         |9E            |      7 T
+SBB M                           |z80n |-     |-    |sbb m         |9E            |      7 T
+SBB M                           |z80n |-     |IXIY |sbb m         |9E            |      7 T
+SBC A COMMA A                   |8080 |-     |-    |sbc a, a      |9F            |      4 T
+SBC A COMMA A                   |8080 |-     |IXIY |sbc a, a      |9F            |      4 T
+SBC A COMMA A                   |8085 |-     |-    |sbc a, a      |9F            |      4 T
+SBC A COMMA A                   |8085 |-     |IXIY |sbc a, a      |9F            |      4 T
+SBC A COMMA A                   |gbz80|-     |-    |sbc a, a      |9F            |      4 T
+SBC A COMMA A                   |gbz80|-     |IXIY |sbc a, a      |9F            |      4 T
+SBC A COMMA A                   |z80  |-     |-    |sbc a, a      |9F            |      4 T
+SBC A COMMA A                   |z80  |-     |IXIY |sbc a, a      |9F            |      4 T
+SBC A COMMA A                   |z80n |-     |-    |sbc a, a      |9F            |      4 T
+SBC A COMMA A                   |z80n |-     |IXIY |sbc a, a      |9F            |      4 T
+SBC A COMMA B                   |8080 |-     |-    |sbc a, b      |98            |      4 T
+SBC A COMMA B                   |8080 |-     |IXIY |sbc a, b      |98            |      4 T
+SBC A COMMA B                   |8085 |-     |-    |sbc a, b      |98            |      4 T
+SBC A COMMA B                   |8085 |-     |IXIY |sbc a, b      |98            |      4 T
+SBC A COMMA B                   |gbz80|-     |-    |sbc a, b      |98            |      4 T
+SBC A COMMA B                   |gbz80|-     |IXIY |sbc a, b      |98            |      4 T
+SBC A COMMA B                   |z80  |-     |-    |sbc a, b      |98            |      4 T
+SBC A COMMA B                   |z80  |-     |IXIY |sbc a, b      |98            |      4 T
+SBC A COMMA B                   |z80n |-     |-    |sbc a, b      |98            |      4 T
+SBC A COMMA B                   |z80n |-     |IXIY |sbc a, b      |98            |      4 T
+SBC A COMMA C                   |8080 |-     |-    |sbc a, c      |99            |      4 T
+SBC A COMMA C                   |8080 |-     |IXIY |sbc a, c      |99            |      4 T
+SBC A COMMA C                   |8085 |-     |-    |sbc a, c      |99            |      4 T
+SBC A COMMA C                   |8085 |-     |IXIY |sbc a, c      |99            |      4 T
+SBC A COMMA C                   |gbz80|-     |-    |sbc a, c      |99            |      4 T
+SBC A COMMA C                   |gbz80|-     |IXIY |sbc a, c      |99            |      4 T
+SBC A COMMA C                   |z80  |-     |-    |sbc a, c      |99            |      4 T
+SBC A COMMA C                   |z80  |-     |IXIY |sbc a, c      |99            |      4 T
+SBC A COMMA C                   |z80n |-     |-    |sbc a, c      |99            |      4 T
+SBC A COMMA C                   |z80n |-     |IXIY |sbc a, c      |99            |      4 T
+SBC A COMMA D                   |8080 |-     |-    |sbc a, d      |9A            |      4 T
+SBC A COMMA D                   |8080 |-     |IXIY |sbc a, d      |9A            |      4 T
+SBC A COMMA D                   |8085 |-     |-    |sbc a, d      |9A            |      4 T
+SBC A COMMA D                   |8085 |-     |IXIY |sbc a, d      |9A            |      4 T
+SBC A COMMA D                   |gbz80|-     |-    |sbc a, d      |9A            |      4 T
+SBC A COMMA D                   |gbz80|-     |IXIY |sbc a, d      |9A            |      4 T
+SBC A COMMA D                   |z80  |-     |-    |sbc a, d      |9A            |      4 T
+SBC A COMMA D                   |z80  |-     |IXIY |sbc a, d      |9A            |      4 T
+SBC A COMMA D                   |z80n |-     |-    |sbc a, d      |9A            |      4 T
+SBC A COMMA D                   |z80n |-     |IXIY |sbc a, d      |9A            |      4 T
+SBC A COMMA E                   |8080 |-     |-    |sbc a, e      |9B            |      4 T
+SBC A COMMA E                   |8080 |-     |IXIY |sbc a, e      |9B            |      4 T
+SBC A COMMA E                   |8085 |-     |-    |sbc a, e      |9B            |      4 T
+SBC A COMMA E                   |8085 |-     |IXIY |sbc a, e      |9B            |      4 T
+SBC A COMMA E                   |gbz80|-     |-    |sbc a, e      |9B            |      4 T
+SBC A COMMA E                   |gbz80|-     |IXIY |sbc a, e      |9B            |      4 T
+SBC A COMMA E                   |z80  |-     |-    |sbc a, e      |9B            |      4 T
+SBC A COMMA E                   |z80  |-     |IXIY |sbc a, e      |9B            |      4 T
+SBC A COMMA E                   |z80n |-     |-    |sbc a, e      |9B            |      4 T
+SBC A COMMA E                   |z80n |-     |IXIY |sbc a, e      |9B            |      4 T
+SBC A COMMA H                   |8080 |-     |-    |sbc a, h      |9C            |      4 T
+SBC A COMMA H                   |8080 |-     |IXIY |sbc a, h      |9C            |      4 T
+SBC A COMMA H                   |8085 |-     |-    |sbc a, h      |9C            |      4 T
+SBC A COMMA H                   |8085 |-     |IXIY |sbc a, h      |9C            |      4 T
+SBC A COMMA H                   |gbz80|-     |-    |sbc a, h      |9C            |      4 T
+SBC A COMMA H                   |gbz80|-     |IXIY |sbc a, h      |9C            |      4 T
+SBC A COMMA H                   |z80  |-     |-    |sbc a, h      |9C            |      4 T
+SBC A COMMA H                   |z80  |-     |IXIY |sbc a, h      |9C            |      4 T
+SBC A COMMA H                   |z80n |-     |-    |sbc a, h      |9C            |      4 T
+SBC A COMMA H                   |z80n |-     |IXIY |sbc a, h      |9C            |      4 T
+SBC A COMMA IND_HL RPAREN       |8080 |-     |-    |sbc a, (hl)   |9E            |      7 T
+SBC A COMMA IND_HL RPAREN       |8080 |-     |IXIY |sbc a, (hl)   |9E            |      7 T
+SBC A COMMA IND_HL RPAREN       |8085 |-     |-    |sbc a, (hl)   |9E            |      7 T
+SBC A COMMA IND_HL RPAREN       |8085 |-     |IXIY |sbc a, (hl)   |9E            |      7 T
+SBC A COMMA IND_HL RPAREN       |gbz80|-     |-    |sbc a, (hl)   |9E            |      8 T
+SBC A COMMA IND_HL RPAREN       |gbz80|-     |IXIY |sbc a, (hl)   |9E            |      8 T
+SBC A COMMA IND_HL RPAREN       |z80  |-     |-    |sbc a, (hl)   |9E            |      7 T
+SBC A COMMA IND_HL RPAREN       |z80  |-     |IXIY |sbc a, (hl)   |9E            |      7 T
+SBC A COMMA IND_HL RPAREN       |z80n |-     |-    |sbc a, (hl)   |9E            |      7 T
+SBC A COMMA IND_HL RPAREN       |z80n |-     |IXIY |sbc a, (hl)   |9E            |      7 T
+SBC A COMMA L                   |8080 |-     |-    |sbc a, l      |9D            |      4 T
+SBC A COMMA L                   |8080 |-     |IXIY |sbc a, l      |9D            |      4 T
+SBC A COMMA L                   |8085 |-     |-    |sbc a, l      |9D            |      4 T
+SBC A COMMA L                   |8085 |-     |IXIY |sbc a, l      |9D            |      4 T
+SBC A COMMA L                   |gbz80|-     |-    |sbc a, l      |9D            |      4 T
+SBC A COMMA L                   |gbz80|-     |IXIY |sbc a, l      |9D            |      4 T
+SBC A COMMA L                   |z80  |-     |-    |sbc a, l      |9D            |      4 T
+SBC A COMMA L                   |z80  |-     |IXIY |sbc a, l      |9D            |      4 T
+SBC A COMMA L                   |z80n |-     |-    |sbc a, l      |9D            |      4 T
+SBC A COMMA L                   |z80n |-     |IXIY |sbc a, l      |9D            |      4 T
+SBC A COMMA expr                |8080 |expr  |-    |sbc a, %n     |DE %n         |      7 T
+SBC A COMMA expr                |8080 |expr  |IXIY |sbc a, %n     |DE %n         |      7 T
+SBC A COMMA expr                |8085 |expr  |-    |sbc a, %n     |DE %n         |      7 T
+SBC A COMMA expr                |8085 |expr  |IXIY |sbc a, %n     |DE %n         |      7 T
+SBC A COMMA expr                |gbz80|expr  |-    |sbc a, %n     |DE %n         |      8 T
+SBC A COMMA expr                |gbz80|expr  |IXIY |sbc a, %n     |DE %n         |      8 T
+SBC A COMMA expr                |z80  |expr  |-    |sbc a, %n     |DE %n         |      7 T
+SBC A COMMA expr                |z80  |expr  |IXIY |sbc a, %n     |DE %n         |      7 T
+SBC A COMMA expr                |z80n |expr  |-    |sbc a, %n     |DE %n         |      7 T
+SBC A COMMA expr                |z80n |expr  |IXIY |sbc a, %n     |DE %n         |      7 T
+SBC A                           |8080 |-     |-    |sbc a         |9F            |      4 T
+SBC A                           |8080 |-     |IXIY |sbc a         |9F            |      4 T
+SBC A                           |8085 |-     |-    |sbc a         |9F            |      4 T
+SBC A                           |8085 |-     |IXIY |sbc a         |9F            |      4 T
+SBC A                           |gbz80|-     |-    |sbc a         |9F            |      4 T
+SBC A                           |gbz80|-     |IXIY |sbc a         |9F            |      4 T
+SBC A                           |z80  |-     |-    |sbc a         |9F            |      4 T
+SBC A                           |z80  |-     |IXIY |sbc a         |9F            |      4 T
+SBC A                           |z80n |-     |-    |sbc a         |9F            |      4 T
+SBC A                           |z80n |-     |IXIY |sbc a         |9F            |      4 T
+SBC B                           |8080 |-     |-    |sbc b         |98            |      4 T
+SBC B                           |8080 |-     |IXIY |sbc b         |98            |      4 T
+SBC B                           |8085 |-     |-    |sbc b         |98            |      4 T
+SBC B                           |8085 |-     |IXIY |sbc b         |98            |      4 T
+SBC B                           |gbz80|-     |-    |sbc b         |98            |      4 T
+SBC B                           |gbz80|-     |IXIY |sbc b         |98            |      4 T
+SBC B                           |z80  |-     |-    |sbc b         |98            |      4 T
+SBC B                           |z80  |-     |IXIY |sbc b         |98            |      4 T
+SBC B                           |z80n |-     |-    |sbc b         |98            |      4 T
+SBC B                           |z80n |-     |IXIY |sbc b         |98            |      4 T
+SBC C                           |8080 |-     |-    |sbc c         |99            |      4 T
+SBC C                           |8080 |-     |IXIY |sbc c         |99            |      4 T
+SBC C                           |8085 |-     |-    |sbc c         |99            |      4 T
+SBC C                           |8085 |-     |IXIY |sbc c         |99            |      4 T
+SBC C                           |gbz80|-     |-    |sbc c         |99            |      4 T
+SBC C                           |gbz80|-     |IXIY |sbc c         |99            |      4 T
+SBC C                           |z80  |-     |-    |sbc c         |99            |      4 T
+SBC C                           |z80  |-     |IXIY |sbc c         |99            |      4 T
+SBC C                           |z80n |-     |-    |sbc c         |99            |      4 T
+SBC C                           |z80n |-     |IXIY |sbc c         |99            |      4 T
+SBC D                           |8080 |-     |-    |sbc d         |9A            |      4 T
+SBC D                           |8080 |-     |IXIY |sbc d         |9A            |      4 T
+SBC D                           |8085 |-     |-    |sbc d         |9A            |      4 T
+SBC D                           |8085 |-     |IXIY |sbc d         |9A            |      4 T
+SBC D                           |gbz80|-     |-    |sbc d         |9A            |      4 T
+SBC D                           |gbz80|-     |IXIY |sbc d         |9A            |      4 T
+SBC D                           |z80  |-     |-    |sbc d         |9A            |      4 T
+SBC D                           |z80  |-     |IXIY |sbc d         |9A            |      4 T
+SBC D                           |z80n |-     |-    |sbc d         |9A            |      4 T
+SBC D                           |z80n |-     |IXIY |sbc d         |9A            |      4 T
+SBC E                           |8080 |-     |-    |sbc e         |9B            |      4 T
+SBC E                           |8080 |-     |IXIY |sbc e         |9B            |      4 T
+SBC E                           |8085 |-     |-    |sbc e         |9B            |      4 T
+SBC E                           |8085 |-     |IXIY |sbc e         |9B            |      4 T
+SBC E                           |gbz80|-     |-    |sbc e         |9B            |      4 T
+SBC E                           |gbz80|-     |IXIY |sbc e         |9B            |      4 T
+SBC E                           |z80  |-     |-    |sbc e         |9B            |      4 T
+SBC E                           |z80  |-     |IXIY |sbc e         |9B            |      4 T
+SBC E                           |z80n |-     |-    |sbc e         |9B            |      4 T
+SBC E                           |z80n |-     |IXIY |sbc e         |9B            |      4 T
+SBC H                           |8080 |-     |-    |sbc h         |9C            |      4 T
+SBC H                           |8080 |-     |IXIY |sbc h         |9C            |      4 T
+SBC H                           |8085 |-     |-    |sbc h         |9C            |      4 T
+SBC H                           |8085 |-     |IXIY |sbc h         |9C            |      4 T
+SBC H                           |gbz80|-     |-    |sbc h         |9C            |      4 T
+SBC H                           |gbz80|-     |IXIY |sbc h         |9C            |      4 T
+SBC H                           |z80  |-     |-    |sbc h         |9C            |      4 T
+SBC H                           |z80  |-     |IXIY |sbc h         |9C            |      4 T
+SBC H                           |z80n |-     |-    |sbc h         |9C            |      4 T
+SBC H                           |z80n |-     |IXIY |sbc h         |9C            |      4 T
+SBC IND_HL RPAREN               |8080 |-     |-    |sbc (hl)      |9E            |      7 T
+SBC IND_HL RPAREN               |8080 |-     |IXIY |sbc (hl)      |9E            |      7 T
+SBC IND_HL RPAREN               |8085 |-     |-    |sbc (hl)      |9E            |      7 T
+SBC IND_HL RPAREN               |8085 |-     |IXIY |sbc (hl)      |9E            |      7 T
+SBC IND_HL RPAREN               |gbz80|-     |-    |sbc (hl)      |9E            |      8 T
+SBC IND_HL RPAREN               |gbz80|-     |IXIY |sbc (hl)      |9E            |      8 T
+SBC IND_HL RPAREN               |z80  |-     |-    |sbc (hl)      |9E            |      7 T
+SBC IND_HL RPAREN               |z80  |-     |IXIY |sbc (hl)      |9E            |      7 T
+SBC IND_HL RPAREN               |z80n |-     |-    |sbc (hl)      |9E            |      7 T
+SBC IND_HL RPAREN               |z80n |-     |IXIY |sbc (hl)      |9E            |      7 T
+SBC L                           |8080 |-     |-    |sbc l         |9D            |      4 T
+SBC L                           |8080 |-     |IXIY |sbc l         |9D            |      4 T
+SBC L                           |8085 |-     |-    |sbc l         |9D            |      4 T
+SBC L                           |8085 |-     |IXIY |sbc l         |9D            |      4 T
+SBC L                           |gbz80|-     |-    |sbc l         |9D            |      4 T
+SBC L                           |gbz80|-     |IXIY |sbc l         |9D            |      4 T
+SBC L                           |z80  |-     |-    |sbc l         |9D            |      4 T
+SBC L                           |z80  |-     |IXIY |sbc l         |9D            |      4 T
+SBC L                           |z80n |-     |-    |sbc l         |9D            |      4 T
+SBC L                           |z80n |-     |IXIY |sbc l         |9D            |      4 T
+SBC expr                        |8080 |expr  |-    |sbc %n        |DE %n         |      7 T
+SBC expr                        |8080 |expr  |IXIY |sbc %n        |DE %n         |      7 T
+SBC expr                        |8085 |expr  |-    |sbc %n        |DE %n         |      7 T
+SBC expr                        |8085 |expr  |IXIY |sbc %n        |DE %n         |      7 T
+SBC expr                        |gbz80|expr  |-    |sbc %n        |DE %n         |      8 T
+SBC expr                        |gbz80|expr  |IXIY |sbc %n        |DE %n         |      8 T
+SBC expr                        |z80  |expr  |-    |sbc %n        |DE %n         |      7 T
+SBC expr                        |z80  |expr  |IXIY |sbc %n        |DE %n         |      7 T
+SBC expr                        |z80n |expr  |-    |sbc %n        |DE %n         |      7 T
+SBC expr                        |z80n |expr  |IXIY |sbc %n        |DE %n         |      7 T
+SBI expr                        |8080 |expr  |-    |sbi %n        |DE %n         |      7 T
+SBI expr                        |8080 |expr  |IXIY |sbi %n        |DE %n         |      7 T
+SBI expr                        |8085 |expr  |-    |sbi %n        |DE %n         |      7 T
+SBI expr                        |8085 |expr  |IXIY |sbi %n        |DE %n         |      7 T
+SBI expr                        |gbz80|expr  |-    |sbi %n        |DE %n         |      8 T
+SBI expr                        |gbz80|expr  |IXIY |sbi %n        |DE %n         |      8 T
+SBI expr                        |z80  |expr  |-    |sbi %n        |DE %n         |      7 T
+SBI expr                        |z80  |expr  |IXIY |sbi %n        |DE %n         |      7 T
+SBI expr                        |z80n |expr  |-    |sbi %n        |DE %n         |      7 T
+SBI expr                        |z80n |expr  |IXIY |sbi %n        |DE %n         |      7 T
+SCF                             |8080 |-     |-    |scf           |37            |      4 T
+SCF                             |8080 |-     |IXIY |scf           |37            |      4 T
+SCF                             |8085 |-     |-    |scf           |37            |      4 T
+SCF                             |8085 |-     |IXIY |scf           |37            |      4 T
+SCF                             |gbz80|-     |-    |scf           |37            |      4 T
+SCF                             |gbz80|-     |IXIY |scf           |37            |      4 T
+SCF                             |z80  |-     |-    |scf           |37            |      4 T
+SCF                             |z80  |-     |IXIY |scf           |37            |      4 T
+SCF                             |z80n |-     |-    |scf           |37            |      4 T
+SCF                             |z80n |-     |IXIY |scf           |37            |      4 T
 SHLD expr                       |8080 |expr  |-    |shld %m       |22 %m %m      |     16 T
 SHLD expr                       |8080 |expr  |IXIY |shld %m       |22 %m %m      |     16 T
 SHLD expr                       |8085 |expr  |-    |shld %m       |22 %m %m      |     16 T
@@ -2551,6 +4029,216 @@ STAX DE                         |z80  |-     |-    |stax de       |12           
 STAX DE                         |z80  |-     |IXIY |stax de       |12            |      7 T
 STAX DE                         |z80n |-     |-    |stax de       |12            |      7 T
 STAX DE                         |z80n |-     |IXIY |stax de       |12            |      7 T
+STC                             |8080 |-     |-    |stc           |37            |      4 T
+STC                             |8080 |-     |IXIY |stc           |37            |      4 T
+STC                             |8085 |-     |-    |stc           |37            |      4 T
+STC                             |8085 |-     |IXIY |stc           |37            |      4 T
+STC                             |gbz80|-     |-    |stc           |37            |      4 T
+STC                             |gbz80|-     |IXIY |stc           |37            |      4 T
+STC                             |z80  |-     |-    |stc           |37            |      4 T
+STC                             |z80  |-     |IXIY |stc           |37            |      4 T
+STC                             |z80n |-     |-    |stc           |37            |      4 T
+STC                             |z80n |-     |IXIY |stc           |37            |      4 T
+SUB A COMMA A                   |8080 |-     |-    |sub a, a      |97            |      4 T
+SUB A COMMA A                   |8080 |-     |IXIY |sub a, a      |97            |      4 T
+SUB A COMMA A                   |8085 |-     |-    |sub a, a      |97            |      4 T
+SUB A COMMA A                   |8085 |-     |IXIY |sub a, a      |97            |      4 T
+SUB A COMMA A                   |gbz80|-     |-    |sub a, a      |97            |      4 T
+SUB A COMMA A                   |gbz80|-     |IXIY |sub a, a      |97            |      4 T
+SUB A COMMA A                   |z80  |-     |-    |sub a, a      |97            |      4 T
+SUB A COMMA A                   |z80  |-     |IXIY |sub a, a      |97            |      4 T
+SUB A COMMA A                   |z80n |-     |-    |sub a, a      |97            |      4 T
+SUB A COMMA A                   |z80n |-     |IXIY |sub a, a      |97            |      4 T
+SUB A COMMA B                   |8080 |-     |-    |sub a, b      |90            |      4 T
+SUB A COMMA B                   |8080 |-     |IXIY |sub a, b      |90            |      4 T
+SUB A COMMA B                   |8085 |-     |-    |sub a, b      |90            |      4 T
+SUB A COMMA B                   |8085 |-     |IXIY |sub a, b      |90            |      4 T
+SUB A COMMA B                   |gbz80|-     |-    |sub a, b      |90            |      4 T
+SUB A COMMA B                   |gbz80|-     |IXIY |sub a, b      |90            |      4 T
+SUB A COMMA B                   |z80  |-     |-    |sub a, b      |90            |      4 T
+SUB A COMMA B                   |z80  |-     |IXIY |sub a, b      |90            |      4 T
+SUB A COMMA B                   |z80n |-     |-    |sub a, b      |90            |      4 T
+SUB A COMMA B                   |z80n |-     |IXIY |sub a, b      |90            |      4 T
+SUB A COMMA C                   |8080 |-     |-    |sub a, c      |91            |      4 T
+SUB A COMMA C                   |8080 |-     |IXIY |sub a, c      |91            |      4 T
+SUB A COMMA C                   |8085 |-     |-    |sub a, c      |91            |      4 T
+SUB A COMMA C                   |8085 |-     |IXIY |sub a, c      |91            |      4 T
+SUB A COMMA C                   |gbz80|-     |-    |sub a, c      |91            |      4 T
+SUB A COMMA C                   |gbz80|-     |IXIY |sub a, c      |91            |      4 T
+SUB A COMMA C                   |z80  |-     |-    |sub a, c      |91            |      4 T
+SUB A COMMA C                   |z80  |-     |IXIY |sub a, c      |91            |      4 T
+SUB A COMMA C                   |z80n |-     |-    |sub a, c      |91            |      4 T
+SUB A COMMA C                   |z80n |-     |IXIY |sub a, c      |91            |      4 T
+SUB A COMMA D                   |8080 |-     |-    |sub a, d      |92            |      4 T
+SUB A COMMA D                   |8080 |-     |IXIY |sub a, d      |92            |      4 T
+SUB A COMMA D                   |8085 |-     |-    |sub a, d      |92            |      4 T
+SUB A COMMA D                   |8085 |-     |IXIY |sub a, d      |92            |      4 T
+SUB A COMMA D                   |gbz80|-     |-    |sub a, d      |92            |      4 T
+SUB A COMMA D                   |gbz80|-     |IXIY |sub a, d      |92            |      4 T
+SUB A COMMA D                   |z80  |-     |-    |sub a, d      |92            |      4 T
+SUB A COMMA D                   |z80  |-     |IXIY |sub a, d      |92            |      4 T
+SUB A COMMA D                   |z80n |-     |-    |sub a, d      |92            |      4 T
+SUB A COMMA D                   |z80n |-     |IXIY |sub a, d      |92            |      4 T
+SUB A COMMA E                   |8080 |-     |-    |sub a, e      |93            |      4 T
+SUB A COMMA E                   |8080 |-     |IXIY |sub a, e      |93            |      4 T
+SUB A COMMA E                   |8085 |-     |-    |sub a, e      |93            |      4 T
+SUB A COMMA E                   |8085 |-     |IXIY |sub a, e      |93            |      4 T
+SUB A COMMA E                   |gbz80|-     |-    |sub a, e      |93            |      4 T
+SUB A COMMA E                   |gbz80|-     |IXIY |sub a, e      |93            |      4 T
+SUB A COMMA E                   |z80  |-     |-    |sub a, e      |93            |      4 T
+SUB A COMMA E                   |z80  |-     |IXIY |sub a, e      |93            |      4 T
+SUB A COMMA E                   |z80n |-     |-    |sub a, e      |93            |      4 T
+SUB A COMMA E                   |z80n |-     |IXIY |sub a, e      |93            |      4 T
+SUB A COMMA H                   |8080 |-     |-    |sub a, h      |94            |      4 T
+SUB A COMMA H                   |8080 |-     |IXIY |sub a, h      |94            |      4 T
+SUB A COMMA H                   |8085 |-     |-    |sub a, h      |94            |      4 T
+SUB A COMMA H                   |8085 |-     |IXIY |sub a, h      |94            |      4 T
+SUB A COMMA H                   |gbz80|-     |-    |sub a, h      |94            |      4 T
+SUB A COMMA H                   |gbz80|-     |IXIY |sub a, h      |94            |      4 T
+SUB A COMMA H                   |z80  |-     |-    |sub a, h      |94            |      4 T
+SUB A COMMA H                   |z80  |-     |IXIY |sub a, h      |94            |      4 T
+SUB A COMMA H                   |z80n |-     |-    |sub a, h      |94            |      4 T
+SUB A COMMA H                   |z80n |-     |IXIY |sub a, h      |94            |      4 T
+SUB A COMMA IND_HL RPAREN       |8080 |-     |-    |sub a, (hl)   |96            |      7 T
+SUB A COMMA IND_HL RPAREN       |8080 |-     |IXIY |sub a, (hl)   |96            |      7 T
+SUB A COMMA IND_HL RPAREN       |8085 |-     |-    |sub a, (hl)   |96            |      7 T
+SUB A COMMA IND_HL RPAREN       |8085 |-     |IXIY |sub a, (hl)   |96            |      7 T
+SUB A COMMA IND_HL RPAREN       |gbz80|-     |-    |sub a, (hl)   |96            |      8 T
+SUB A COMMA IND_HL RPAREN       |gbz80|-     |IXIY |sub a, (hl)   |96            |      8 T
+SUB A COMMA IND_HL RPAREN       |z80  |-     |-    |sub a, (hl)   |96            |      7 T
+SUB A COMMA IND_HL RPAREN       |z80  |-     |IXIY |sub a, (hl)   |96            |      7 T
+SUB A COMMA IND_HL RPAREN       |z80n |-     |-    |sub a, (hl)   |96            |      7 T
+SUB A COMMA IND_HL RPAREN       |z80n |-     |IXIY |sub a, (hl)   |96            |      7 T
+SUB A COMMA L                   |8080 |-     |-    |sub a, l      |95            |      4 T
+SUB A COMMA L                   |8080 |-     |IXIY |sub a, l      |95            |      4 T
+SUB A COMMA L                   |8085 |-     |-    |sub a, l      |95            |      4 T
+SUB A COMMA L                   |8085 |-     |IXIY |sub a, l      |95            |      4 T
+SUB A COMMA L                   |gbz80|-     |-    |sub a, l      |95            |      4 T
+SUB A COMMA L                   |gbz80|-     |IXIY |sub a, l      |95            |      4 T
+SUB A COMMA L                   |z80  |-     |-    |sub a, l      |95            |      4 T
+SUB A COMMA L                   |z80  |-     |IXIY |sub a, l      |95            |      4 T
+SUB A COMMA L                   |z80n |-     |-    |sub a, l      |95            |      4 T
+SUB A COMMA L                   |z80n |-     |IXIY |sub a, l      |95            |      4 T
+SUB A COMMA expr                |8080 |expr  |-    |sub a, %n     |D6 %n         |      7 T
+SUB A COMMA expr                |8080 |expr  |IXIY |sub a, %n     |D6 %n         |      7 T
+SUB A COMMA expr                |8085 |expr  |-    |sub a, %n     |D6 %n         |      7 T
+SUB A COMMA expr                |8085 |expr  |IXIY |sub a, %n     |D6 %n         |      7 T
+SUB A COMMA expr                |gbz80|expr  |-    |sub a, %n     |D6 %n         |      8 T
+SUB A COMMA expr                |gbz80|expr  |IXIY |sub a, %n     |D6 %n         |      8 T
+SUB A COMMA expr                |z80  |expr  |-    |sub a, %n     |D6 %n         |      7 T
+SUB A COMMA expr                |z80  |expr  |IXIY |sub a, %n     |D6 %n         |      7 T
+SUB A COMMA expr                |z80n |expr  |-    |sub a, %n     |D6 %n         |      7 T
+SUB A COMMA expr                |z80n |expr  |IXIY |sub a, %n     |D6 %n         |      7 T
+SUB A                           |8080 |-     |-    |sub a         |97            |      4 T
+SUB A                           |8080 |-     |IXIY |sub a         |97            |      4 T
+SUB A                           |8085 |-     |-    |sub a         |97            |      4 T
+SUB A                           |8085 |-     |IXIY |sub a         |97            |      4 T
+SUB A                           |gbz80|-     |-    |sub a         |97            |      4 T
+SUB A                           |gbz80|-     |IXIY |sub a         |97            |      4 T
+SUB A                           |z80  |-     |-    |sub a         |97            |      4 T
+SUB A                           |z80  |-     |IXIY |sub a         |97            |      4 T
+SUB A                           |z80n |-     |-    |sub a         |97            |      4 T
+SUB A                           |z80n |-     |IXIY |sub a         |97            |      4 T
+SUB B                           |8080 |-     |-    |sub b         |90            |      4 T
+SUB B                           |8080 |-     |IXIY |sub b         |90            |      4 T
+SUB B                           |8085 |-     |-    |sub b         |90            |      4 T
+SUB B                           |8085 |-     |IXIY |sub b         |90            |      4 T
+SUB B                           |gbz80|-     |-    |sub b         |90            |      4 T
+SUB B                           |gbz80|-     |IXIY |sub b         |90            |      4 T
+SUB B                           |z80  |-     |-    |sub b         |90            |      4 T
+SUB B                           |z80  |-     |IXIY |sub b         |90            |      4 T
+SUB B                           |z80n |-     |-    |sub b         |90            |      4 T
+SUB B                           |z80n |-     |IXIY |sub b         |90            |      4 T
+SUB C                           |8080 |-     |-    |sub c         |91            |      4 T
+SUB C                           |8080 |-     |IXIY |sub c         |91            |      4 T
+SUB C                           |8085 |-     |-    |sub c         |91            |      4 T
+SUB C                           |8085 |-     |IXIY |sub c         |91            |      4 T
+SUB C                           |gbz80|-     |-    |sub c         |91            |      4 T
+SUB C                           |gbz80|-     |IXIY |sub c         |91            |      4 T
+SUB C                           |z80  |-     |-    |sub c         |91            |      4 T
+SUB C                           |z80  |-     |IXIY |sub c         |91            |      4 T
+SUB C                           |z80n |-     |-    |sub c         |91            |      4 T
+SUB C                           |z80n |-     |IXIY |sub c         |91            |      4 T
+SUB D                           |8080 |-     |-    |sub d         |92            |      4 T
+SUB D                           |8080 |-     |IXIY |sub d         |92            |      4 T
+SUB D                           |8085 |-     |-    |sub d         |92            |      4 T
+SUB D                           |8085 |-     |IXIY |sub d         |92            |      4 T
+SUB D                           |gbz80|-     |-    |sub d         |92            |      4 T
+SUB D                           |gbz80|-     |IXIY |sub d         |92            |      4 T
+SUB D                           |z80  |-     |-    |sub d         |92            |      4 T
+SUB D                           |z80  |-     |IXIY |sub d         |92            |      4 T
+SUB D                           |z80n |-     |-    |sub d         |92            |      4 T
+SUB D                           |z80n |-     |IXIY |sub d         |92            |      4 T
+SUB E                           |8080 |-     |-    |sub e         |93            |      4 T
+SUB E                           |8080 |-     |IXIY |sub e         |93            |      4 T
+SUB E                           |8085 |-     |-    |sub e         |93            |      4 T
+SUB E                           |8085 |-     |IXIY |sub e         |93            |      4 T
+SUB E                           |gbz80|-     |-    |sub e         |93            |      4 T
+SUB E                           |gbz80|-     |IXIY |sub e         |93            |      4 T
+SUB E                           |z80  |-     |-    |sub e         |93            |      4 T
+SUB E                           |z80  |-     |IXIY |sub e         |93            |      4 T
+SUB E                           |z80n |-     |-    |sub e         |93            |      4 T
+SUB E                           |z80n |-     |IXIY |sub e         |93            |      4 T
+SUB H                           |8080 |-     |-    |sub h         |94            |      4 T
+SUB H                           |8080 |-     |IXIY |sub h         |94            |      4 T
+SUB H                           |8085 |-     |-    |sub h         |94            |      4 T
+SUB H                           |8085 |-     |IXIY |sub h         |94            |      4 T
+SUB H                           |gbz80|-     |-    |sub h         |94            |      4 T
+SUB H                           |gbz80|-     |IXIY |sub h         |94            |      4 T
+SUB H                           |z80  |-     |-    |sub h         |94            |      4 T
+SUB H                           |z80  |-     |IXIY |sub h         |94            |      4 T
+SUB H                           |z80n |-     |-    |sub h         |94            |      4 T
+SUB H                           |z80n |-     |IXIY |sub h         |94            |      4 T
+SUB IND_HL RPAREN               |8080 |-     |-    |sub (hl)      |96            |      7 T
+SUB IND_HL RPAREN               |8080 |-     |IXIY |sub (hl)      |96            |      7 T
+SUB IND_HL RPAREN               |8085 |-     |-    |sub (hl)      |96            |      7 T
+SUB IND_HL RPAREN               |8085 |-     |IXIY |sub (hl)      |96            |      7 T
+SUB IND_HL RPAREN               |gbz80|-     |-    |sub (hl)      |96            |      8 T
+SUB IND_HL RPAREN               |gbz80|-     |IXIY |sub (hl)      |96            |      8 T
+SUB IND_HL RPAREN               |z80  |-     |-    |sub (hl)      |96            |      7 T
+SUB IND_HL RPAREN               |z80  |-     |IXIY |sub (hl)      |96            |      7 T
+SUB IND_HL RPAREN               |z80n |-     |-    |sub (hl)      |96            |      7 T
+SUB IND_HL RPAREN               |z80n |-     |IXIY |sub (hl)      |96            |      7 T
+SUB L                           |8080 |-     |-    |sub l         |95            |      4 T
+SUB L                           |8080 |-     |IXIY |sub l         |95            |      4 T
+SUB L                           |8085 |-     |-    |sub l         |95            |      4 T
+SUB L                           |8085 |-     |IXIY |sub l         |95            |      4 T
+SUB L                           |gbz80|-     |-    |sub l         |95            |      4 T
+SUB L                           |gbz80|-     |IXIY |sub l         |95            |      4 T
+SUB L                           |z80  |-     |-    |sub l         |95            |      4 T
+SUB L                           |z80  |-     |IXIY |sub l         |95            |      4 T
+SUB L                           |z80n |-     |-    |sub l         |95            |      4 T
+SUB L                           |z80n |-     |IXIY |sub l         |95            |      4 T
+SUB M                           |8080 |-     |-    |sub m         |96            |      7 T
+SUB M                           |8080 |-     |IXIY |sub m         |96            |      7 T
+SUB M                           |8085 |-     |-    |sub m         |96            |      7 T
+SUB M                           |8085 |-     |IXIY |sub m         |96            |      7 T
+SUB M                           |gbz80|-     |-    |sub m         |96            |      8 T
+SUB M                           |gbz80|-     |IXIY |sub m         |96            |      8 T
+SUB M                           |z80  |-     |-    |sub m         |96            |      7 T
+SUB M                           |z80  |-     |IXIY |sub m         |96            |      7 T
+SUB M                           |z80n |-     |-    |sub m         |96            |      7 T
+SUB M                           |z80n |-     |IXIY |sub m         |96            |      7 T
+SUB expr                        |8080 |expr  |-    |sub %n        |D6 %n         |      7 T
+SUB expr                        |8080 |expr  |IXIY |sub %n        |D6 %n         |      7 T
+SUB expr                        |8085 |expr  |-    |sub %n        |D6 %n         |      7 T
+SUB expr                        |8085 |expr  |IXIY |sub %n        |D6 %n         |      7 T
+SUB expr                        |gbz80|expr  |-    |sub %n        |D6 %n         |      8 T
+SUB expr                        |gbz80|expr  |IXIY |sub %n        |D6 %n         |      8 T
+SUB expr                        |z80  |expr  |-    |sub %n        |D6 %n         |      7 T
+SUB expr                        |z80  |expr  |IXIY |sub %n        |D6 %n         |      7 T
+SUB expr                        |z80n |expr  |-    |sub %n        |D6 %n         |      7 T
+SUB expr                        |z80n |expr  |IXIY |sub %n        |D6 %n         |      7 T
+SUI expr                        |8080 |expr  |-    |sui %n        |D6 %n         |      7 T
+SUI expr                        |8080 |expr  |IXIY |sui %n        |D6 %n         |      7 T
+SUI expr                        |8085 |expr  |-    |sui %n        |D6 %n         |      7 T
+SUI expr                        |8085 |expr  |IXIY |sui %n        |D6 %n         |      7 T
+SUI expr                        |gbz80|expr  |-    |sui %n        |D6 %n         |      8 T
+SUI expr                        |gbz80|expr  |IXIY |sui %n        |D6 %n         |      8 T
+SUI expr                        |z80  |expr  |-    |sui %n        |D6 %n         |      7 T
+SUI expr                        |z80  |expr  |IXIY |sui %n        |D6 %n         |      7 T
+SUI expr                        |z80n |expr  |-    |sui %n        |D6 %n         |      7 T
+SUI expr                        |z80n |expr  |IXIY |sui %n        |D6 %n         |      7 T
 XCHG                            |8080 |-     |-    |xchg          |EB            |      4 T
 XCHG                            |8080 |-     |IXIY |xchg          |EB            |      4 T
 XCHG                            |8085 |-     |-    |xchg          |EB            |      4 T
@@ -2561,6 +4249,276 @@ XCHG                            |z80  |-     |-    |xchg          |EB           
 XCHG                            |z80  |-     |IXIY |xchg          |EB            |      4 T
 XCHG                            |z80n |-     |-    |xchg          |EB            |      4 T
 XCHG                            |z80n |-     |IXIY |xchg          |EB            |      4 T
+XOR A COMMA A                   |8080 |-     |-    |xor a, a      |AF            |      4 T
+XOR A COMMA A                   |8080 |-     |IXIY |xor a, a      |AF            |      4 T
+XOR A COMMA A                   |8085 |-     |-    |xor a, a      |AF            |      4 T
+XOR A COMMA A                   |8085 |-     |IXIY |xor a, a      |AF            |      4 T
+XOR A COMMA A                   |gbz80|-     |-    |xor a, a      |AF            |      4 T
+XOR A COMMA A                   |gbz80|-     |IXIY |xor a, a      |AF            |      4 T
+XOR A COMMA A                   |z80  |-     |-    |xor a, a      |AF            |      4 T
+XOR A COMMA A                   |z80  |-     |IXIY |xor a, a      |AF            |      4 T
+XOR A COMMA A                   |z80n |-     |-    |xor a, a      |AF            |      4 T
+XOR A COMMA A                   |z80n |-     |IXIY |xor a, a      |AF            |      4 T
+XOR A COMMA B                   |8080 |-     |-    |xor a, b      |A8            |      4 T
+XOR A COMMA B                   |8080 |-     |IXIY |xor a, b      |A8            |      4 T
+XOR A COMMA B                   |8085 |-     |-    |xor a, b      |A8            |      4 T
+XOR A COMMA B                   |8085 |-     |IXIY |xor a, b      |A8            |      4 T
+XOR A COMMA B                   |gbz80|-     |-    |xor a, b      |A8            |      4 T
+XOR A COMMA B                   |gbz80|-     |IXIY |xor a, b      |A8            |      4 T
+XOR A COMMA B                   |z80  |-     |-    |xor a, b      |A8            |      4 T
+XOR A COMMA B                   |z80  |-     |IXIY |xor a, b      |A8            |      4 T
+XOR A COMMA B                   |z80n |-     |-    |xor a, b      |A8            |      4 T
+XOR A COMMA B                   |z80n |-     |IXIY |xor a, b      |A8            |      4 T
+XOR A COMMA C                   |8080 |-     |-    |xor a, c      |A9            |      4 T
+XOR A COMMA C                   |8080 |-     |IXIY |xor a, c      |A9            |      4 T
+XOR A COMMA C                   |8085 |-     |-    |xor a, c      |A9            |      4 T
+XOR A COMMA C                   |8085 |-     |IXIY |xor a, c      |A9            |      4 T
+XOR A COMMA C                   |gbz80|-     |-    |xor a, c      |A9            |      4 T
+XOR A COMMA C                   |gbz80|-     |IXIY |xor a, c      |A9            |      4 T
+XOR A COMMA C                   |z80  |-     |-    |xor a, c      |A9            |      4 T
+XOR A COMMA C                   |z80  |-     |IXIY |xor a, c      |A9            |      4 T
+XOR A COMMA C                   |z80n |-     |-    |xor a, c      |A9            |      4 T
+XOR A COMMA C                   |z80n |-     |IXIY |xor a, c      |A9            |      4 T
+XOR A COMMA D                   |8080 |-     |-    |xor a, d      |AA            |      4 T
+XOR A COMMA D                   |8080 |-     |IXIY |xor a, d      |AA            |      4 T
+XOR A COMMA D                   |8085 |-     |-    |xor a, d      |AA            |      4 T
+XOR A COMMA D                   |8085 |-     |IXIY |xor a, d      |AA            |      4 T
+XOR A COMMA D                   |gbz80|-     |-    |xor a, d      |AA            |      4 T
+XOR A COMMA D                   |gbz80|-     |IXIY |xor a, d      |AA            |      4 T
+XOR A COMMA D                   |z80  |-     |-    |xor a, d      |AA            |      4 T
+XOR A COMMA D                   |z80  |-     |IXIY |xor a, d      |AA            |      4 T
+XOR A COMMA D                   |z80n |-     |-    |xor a, d      |AA            |      4 T
+XOR A COMMA D                   |z80n |-     |IXIY |xor a, d      |AA            |      4 T
+XOR A COMMA E                   |8080 |-     |-    |xor a, e      |AB            |      4 T
+XOR A COMMA E                   |8080 |-     |IXIY |xor a, e      |AB            |      4 T
+XOR A COMMA E                   |8085 |-     |-    |xor a, e      |AB            |      4 T
+XOR A COMMA E                   |8085 |-     |IXIY |xor a, e      |AB            |      4 T
+XOR A COMMA E                   |gbz80|-     |-    |xor a, e      |AB            |      4 T
+XOR A COMMA E                   |gbz80|-     |IXIY |xor a, e      |AB            |      4 T
+XOR A COMMA E                   |z80  |-     |-    |xor a, e      |AB            |      4 T
+XOR A COMMA E                   |z80  |-     |IXIY |xor a, e      |AB            |      4 T
+XOR A COMMA E                   |z80n |-     |-    |xor a, e      |AB            |      4 T
+XOR A COMMA E                   |z80n |-     |IXIY |xor a, e      |AB            |      4 T
+XOR A COMMA H                   |8080 |-     |-    |xor a, h      |AC            |      4 T
+XOR A COMMA H                   |8080 |-     |IXIY |xor a, h      |AC            |      4 T
+XOR A COMMA H                   |8085 |-     |-    |xor a, h      |AC            |      4 T
+XOR A COMMA H                   |8085 |-     |IXIY |xor a, h      |AC            |      4 T
+XOR A COMMA H                   |gbz80|-     |-    |xor a, h      |AC            |      4 T
+XOR A COMMA H                   |gbz80|-     |IXIY |xor a, h      |AC            |      4 T
+XOR A COMMA H                   |z80  |-     |-    |xor a, h      |AC            |      4 T
+XOR A COMMA H                   |z80  |-     |IXIY |xor a, h      |AC            |      4 T
+XOR A COMMA H                   |z80n |-     |-    |xor a, h      |AC            |      4 T
+XOR A COMMA H                   |z80n |-     |IXIY |xor a, h      |AC            |      4 T
+XOR A COMMA IND_HL RPAREN       |8080 |-     |-    |xor a, (hl)   |AE            |      7 T
+XOR A COMMA IND_HL RPAREN       |8080 |-     |IXIY |xor a, (hl)   |AE            |      7 T
+XOR A COMMA IND_HL RPAREN       |8085 |-     |-    |xor a, (hl)   |AE            |      7 T
+XOR A COMMA IND_HL RPAREN       |8085 |-     |IXIY |xor a, (hl)   |AE            |      7 T
+XOR A COMMA IND_HL RPAREN       |gbz80|-     |-    |xor a, (hl)   |AE            |      8 T
+XOR A COMMA IND_HL RPAREN       |gbz80|-     |IXIY |xor a, (hl)   |AE            |      8 T
+XOR A COMMA IND_HL RPAREN       |z80  |-     |-    |xor a, (hl)   |AE            |      7 T
+XOR A COMMA IND_HL RPAREN       |z80  |-     |IXIY |xor a, (hl)   |AE            |      7 T
+XOR A COMMA IND_HL RPAREN       |z80n |-     |-    |xor a, (hl)   |AE            |      7 T
+XOR A COMMA IND_HL RPAREN       |z80n |-     |IXIY |xor a, (hl)   |AE            |      7 T
+XOR A COMMA L                   |8080 |-     |-    |xor a, l      |AD            |      4 T
+XOR A COMMA L                   |8080 |-     |IXIY |xor a, l      |AD            |      4 T
+XOR A COMMA L                   |8085 |-     |-    |xor a, l      |AD            |      4 T
+XOR A COMMA L                   |8085 |-     |IXIY |xor a, l      |AD            |      4 T
+XOR A COMMA L                   |gbz80|-     |-    |xor a, l      |AD            |      4 T
+XOR A COMMA L                   |gbz80|-     |IXIY |xor a, l      |AD            |      4 T
+XOR A COMMA L                   |z80  |-     |-    |xor a, l      |AD            |      4 T
+XOR A COMMA L                   |z80  |-     |IXIY |xor a, l      |AD            |      4 T
+XOR A COMMA L                   |z80n |-     |-    |xor a, l      |AD            |      4 T
+XOR A COMMA L                   |z80n |-     |IXIY |xor a, l      |AD            |      4 T
+XOR A COMMA expr                |8080 |expr  |-    |xor a, %n     |EE %n         |      7 T
+XOR A COMMA expr                |8080 |expr  |IXIY |xor a, %n     |EE %n         |      7 T
+XOR A COMMA expr                |8085 |expr  |-    |xor a, %n     |EE %n         |      7 T
+XOR A COMMA expr                |8085 |expr  |IXIY |xor a, %n     |EE %n         |      7 T
+XOR A COMMA expr                |gbz80|expr  |-    |xor a, %n     |EE %n         |      8 T
+XOR A COMMA expr                |gbz80|expr  |IXIY |xor a, %n     |EE %n         |      8 T
+XOR A COMMA expr                |z80  |expr  |-    |xor a, %n     |EE %n         |      7 T
+XOR A COMMA expr                |z80  |expr  |IXIY |xor a, %n     |EE %n         |      7 T
+XOR A COMMA expr                |z80n |expr  |-    |xor a, %n     |EE %n         |      7 T
+XOR A COMMA expr                |z80n |expr  |IXIY |xor a, %n     |EE %n         |      7 T
+XOR A                           |8080 |-     |-    |xor a         |AF            |      4 T
+XOR A                           |8080 |-     |IXIY |xor a         |AF            |      4 T
+XOR A                           |8085 |-     |-    |xor a         |AF            |      4 T
+XOR A                           |8085 |-     |IXIY |xor a         |AF            |      4 T
+XOR A                           |gbz80|-     |-    |xor a         |AF            |      4 T
+XOR A                           |gbz80|-     |IXIY |xor a         |AF            |      4 T
+XOR A                           |z80  |-     |-    |xor a         |AF            |      4 T
+XOR A                           |z80  |-     |IXIY |xor a         |AF            |      4 T
+XOR A                           |z80n |-     |-    |xor a         |AF            |      4 T
+XOR A                           |z80n |-     |IXIY |xor a         |AF            |      4 T
+XOR B                           |8080 |-     |-    |xor b         |A8            |      4 T
+XOR B                           |8080 |-     |IXIY |xor b         |A8            |      4 T
+XOR B                           |8085 |-     |-    |xor b         |A8            |      4 T
+XOR B                           |8085 |-     |IXIY |xor b         |A8            |      4 T
+XOR B                           |gbz80|-     |-    |xor b         |A8            |      4 T
+XOR B                           |gbz80|-     |IXIY |xor b         |A8            |      4 T
+XOR B                           |z80  |-     |-    |xor b         |A8            |      4 T
+XOR B                           |z80  |-     |IXIY |xor b         |A8            |      4 T
+XOR B                           |z80n |-     |-    |xor b         |A8            |      4 T
+XOR B                           |z80n |-     |IXIY |xor b         |A8            |      4 T
+XOR C                           |8080 |-     |-    |xor c         |A9            |      4 T
+XOR C                           |8080 |-     |IXIY |xor c         |A9            |      4 T
+XOR C                           |8085 |-     |-    |xor c         |A9            |      4 T
+XOR C                           |8085 |-     |IXIY |xor c         |A9            |      4 T
+XOR C                           |gbz80|-     |-    |xor c         |A9            |      4 T
+XOR C                           |gbz80|-     |IXIY |xor c         |A9            |      4 T
+XOR C                           |z80  |-     |-    |xor c         |A9            |      4 T
+XOR C                           |z80  |-     |IXIY |xor c         |A9            |      4 T
+XOR C                           |z80n |-     |-    |xor c         |A9            |      4 T
+XOR C                           |z80n |-     |IXIY |xor c         |A9            |      4 T
+XOR D                           |8080 |-     |-    |xor d         |AA            |      4 T
+XOR D                           |8080 |-     |IXIY |xor d         |AA            |      4 T
+XOR D                           |8085 |-     |-    |xor d         |AA            |      4 T
+XOR D                           |8085 |-     |IXIY |xor d         |AA            |      4 T
+XOR D                           |gbz80|-     |-    |xor d         |AA            |      4 T
+XOR D                           |gbz80|-     |IXIY |xor d         |AA            |      4 T
+XOR D                           |z80  |-     |-    |xor d         |AA            |      4 T
+XOR D                           |z80  |-     |IXIY |xor d         |AA            |      4 T
+XOR D                           |z80n |-     |-    |xor d         |AA            |      4 T
+XOR D                           |z80n |-     |IXIY |xor d         |AA            |      4 T
+XOR E                           |8080 |-     |-    |xor e         |AB            |      4 T
+XOR E                           |8080 |-     |IXIY |xor e         |AB            |      4 T
+XOR E                           |8085 |-     |-    |xor e         |AB            |      4 T
+XOR E                           |8085 |-     |IXIY |xor e         |AB            |      4 T
+XOR E                           |gbz80|-     |-    |xor e         |AB            |      4 T
+XOR E                           |gbz80|-     |IXIY |xor e         |AB            |      4 T
+XOR E                           |z80  |-     |-    |xor e         |AB            |      4 T
+XOR E                           |z80  |-     |IXIY |xor e         |AB            |      4 T
+XOR E                           |z80n |-     |-    |xor e         |AB            |      4 T
+XOR E                           |z80n |-     |IXIY |xor e         |AB            |      4 T
+XOR H                           |8080 |-     |-    |xor h         |AC            |      4 T
+XOR H                           |8080 |-     |IXIY |xor h         |AC            |      4 T
+XOR H                           |8085 |-     |-    |xor h         |AC            |      4 T
+XOR H                           |8085 |-     |IXIY |xor h         |AC            |      4 T
+XOR H                           |gbz80|-     |-    |xor h         |AC            |      4 T
+XOR H                           |gbz80|-     |IXIY |xor h         |AC            |      4 T
+XOR H                           |z80  |-     |-    |xor h         |AC            |      4 T
+XOR H                           |z80  |-     |IXIY |xor h         |AC            |      4 T
+XOR H                           |z80n |-     |-    |xor h         |AC            |      4 T
+XOR H                           |z80n |-     |IXIY |xor h         |AC            |      4 T
+XOR IND_HL RPAREN               |8080 |-     |-    |xor (hl)      |AE            |      7 T
+XOR IND_HL RPAREN               |8080 |-     |IXIY |xor (hl)      |AE            |      7 T
+XOR IND_HL RPAREN               |8085 |-     |-    |xor (hl)      |AE            |      7 T
+XOR IND_HL RPAREN               |8085 |-     |IXIY |xor (hl)      |AE            |      7 T
+XOR IND_HL RPAREN               |gbz80|-     |-    |xor (hl)      |AE            |      8 T
+XOR IND_HL RPAREN               |gbz80|-     |IXIY |xor (hl)      |AE            |      8 T
+XOR IND_HL RPAREN               |z80  |-     |-    |xor (hl)      |AE            |      7 T
+XOR IND_HL RPAREN               |z80  |-     |IXIY |xor (hl)      |AE            |      7 T
+XOR IND_HL RPAREN               |z80n |-     |-    |xor (hl)      |AE            |      7 T
+XOR IND_HL RPAREN               |z80n |-     |IXIY |xor (hl)      |AE            |      7 T
+XOR L                           |8080 |-     |-    |xor l         |AD            |      4 T
+XOR L                           |8080 |-     |IXIY |xor l         |AD            |      4 T
+XOR L                           |8085 |-     |-    |xor l         |AD            |      4 T
+XOR L                           |8085 |-     |IXIY |xor l         |AD            |      4 T
+XOR L                           |gbz80|-     |-    |xor l         |AD            |      4 T
+XOR L                           |gbz80|-     |IXIY |xor l         |AD            |      4 T
+XOR L                           |z80  |-     |-    |xor l         |AD            |      4 T
+XOR L                           |z80  |-     |IXIY |xor l         |AD            |      4 T
+XOR L                           |z80n |-     |-    |xor l         |AD            |      4 T
+XOR L                           |z80n |-     |IXIY |xor l         |AD            |      4 T
+XOR expr                        |8080 |expr  |-    |xor %n        |EE %n         |      7 T
+XOR expr                        |8080 |expr  |IXIY |xor %n        |EE %n         |      7 T
+XOR expr                        |8085 |expr  |-    |xor %n        |EE %n         |      7 T
+XOR expr                        |8085 |expr  |IXIY |xor %n        |EE %n         |      7 T
+XOR expr                        |gbz80|expr  |-    |xor %n        |EE %n         |      8 T
+XOR expr                        |gbz80|expr  |IXIY |xor %n        |EE %n         |      8 T
+XOR expr                        |z80  |expr  |-    |xor %n        |EE %n         |      7 T
+XOR expr                        |z80  |expr  |IXIY |xor %n        |EE %n         |      7 T
+XOR expr                        |z80n |expr  |-    |xor %n        |EE %n         |      7 T
+XOR expr                        |z80n |expr  |IXIY |xor %n        |EE %n         |      7 T
+XRA A                           |8080 |-     |-    |xra a         |AF            |      4 T
+XRA A                           |8080 |-     |IXIY |xra a         |AF            |      4 T
+XRA A                           |8085 |-     |-    |xra a         |AF            |      4 T
+XRA A                           |8085 |-     |IXIY |xra a         |AF            |      4 T
+XRA A                           |gbz80|-     |-    |xra a         |AF            |      4 T
+XRA A                           |gbz80|-     |IXIY |xra a         |AF            |      4 T
+XRA A                           |z80  |-     |-    |xra a         |AF            |      4 T
+XRA A                           |z80  |-     |IXIY |xra a         |AF            |      4 T
+XRA A                           |z80n |-     |-    |xra a         |AF            |      4 T
+XRA A                           |z80n |-     |IXIY |xra a         |AF            |      4 T
+XRA B                           |8080 |-     |-    |xra b         |A8            |      4 T
+XRA B                           |8080 |-     |IXIY |xra b         |A8            |      4 T
+XRA B                           |8085 |-     |-    |xra b         |A8            |      4 T
+XRA B                           |8085 |-     |IXIY |xra b         |A8            |      4 T
+XRA B                           |gbz80|-     |-    |xra b         |A8            |      4 T
+XRA B                           |gbz80|-     |IXIY |xra b         |A8            |      4 T
+XRA B                           |z80  |-     |-    |xra b         |A8            |      4 T
+XRA B                           |z80  |-     |IXIY |xra b         |A8            |      4 T
+XRA B                           |z80n |-     |-    |xra b         |A8            |      4 T
+XRA B                           |z80n |-     |IXIY |xra b         |A8            |      4 T
+XRA C                           |8080 |-     |-    |xra c         |A9            |      4 T
+XRA C                           |8080 |-     |IXIY |xra c         |A9            |      4 T
+XRA C                           |8085 |-     |-    |xra c         |A9            |      4 T
+XRA C                           |8085 |-     |IXIY |xra c         |A9            |      4 T
+XRA C                           |gbz80|-     |-    |xra c         |A9            |      4 T
+XRA C                           |gbz80|-     |IXIY |xra c         |A9            |      4 T
+XRA C                           |z80  |-     |-    |xra c         |A9            |      4 T
+XRA C                           |z80  |-     |IXIY |xra c         |A9            |      4 T
+XRA C                           |z80n |-     |-    |xra c         |A9            |      4 T
+XRA C                           |z80n |-     |IXIY |xra c         |A9            |      4 T
+XRA D                           |8080 |-     |-    |xra d         |AA            |      4 T
+XRA D                           |8080 |-     |IXIY |xra d         |AA            |      4 T
+XRA D                           |8085 |-     |-    |xra d         |AA            |      4 T
+XRA D                           |8085 |-     |IXIY |xra d         |AA            |      4 T
+XRA D                           |gbz80|-     |-    |xra d         |AA            |      4 T
+XRA D                           |gbz80|-     |IXIY |xra d         |AA            |      4 T
+XRA D                           |z80  |-     |-    |xra d         |AA            |      4 T
+XRA D                           |z80  |-     |IXIY |xra d         |AA            |      4 T
+XRA D                           |z80n |-     |-    |xra d         |AA            |      4 T
+XRA D                           |z80n |-     |IXIY |xra d         |AA            |      4 T
+XRA E                           |8080 |-     |-    |xra e         |AB            |      4 T
+XRA E                           |8080 |-     |IXIY |xra e         |AB            |      4 T
+XRA E                           |8085 |-     |-    |xra e         |AB            |      4 T
+XRA E                           |8085 |-     |IXIY |xra e         |AB            |      4 T
+XRA E                           |gbz80|-     |-    |xra e         |AB            |      4 T
+XRA E                           |gbz80|-     |IXIY |xra e         |AB            |      4 T
+XRA E                           |z80  |-     |-    |xra e         |AB            |      4 T
+XRA E                           |z80  |-     |IXIY |xra e         |AB            |      4 T
+XRA E                           |z80n |-     |-    |xra e         |AB            |      4 T
+XRA E                           |z80n |-     |IXIY |xra e         |AB            |      4 T
+XRA H                           |8080 |-     |-    |xra h         |AC            |      4 T
+XRA H                           |8080 |-     |IXIY |xra h         |AC            |      4 T
+XRA H                           |8085 |-     |-    |xra h         |AC            |      4 T
+XRA H                           |8085 |-     |IXIY |xra h         |AC            |      4 T
+XRA H                           |gbz80|-     |-    |xra h         |AC            |      4 T
+XRA H                           |gbz80|-     |IXIY |xra h         |AC            |      4 T
+XRA H                           |z80  |-     |-    |xra h         |AC            |      4 T
+XRA H                           |z80  |-     |IXIY |xra h         |AC            |      4 T
+XRA H                           |z80n |-     |-    |xra h         |AC            |      4 T
+XRA H                           |z80n |-     |IXIY |xra h         |AC            |      4 T
+XRA L                           |8080 |-     |-    |xra l         |AD            |      4 T
+XRA L                           |8080 |-     |IXIY |xra l         |AD            |      4 T
+XRA L                           |8085 |-     |-    |xra l         |AD            |      4 T
+XRA L                           |8085 |-     |IXIY |xra l         |AD            |      4 T
+XRA L                           |gbz80|-     |-    |xra l         |AD            |      4 T
+XRA L                           |gbz80|-     |IXIY |xra l         |AD            |      4 T
+XRA L                           |z80  |-     |-    |xra l         |AD            |      4 T
+XRA L                           |z80  |-     |IXIY |xra l         |AD            |      4 T
+XRA L                           |z80n |-     |-    |xra l         |AD            |      4 T
+XRA L                           |z80n |-     |IXIY |xra l         |AD            |      4 T
+XRA M                           |8080 |-     |-    |xra m         |AE            |      7 T
+XRA M                           |8080 |-     |IXIY |xra m         |AE            |      7 T
+XRA M                           |8085 |-     |-    |xra m         |AE            |      7 T
+XRA M                           |8085 |-     |IXIY |xra m         |AE            |      7 T
+XRA M                           |gbz80|-     |-    |xra m         |AE            |      8 T
+XRA M                           |gbz80|-     |IXIY |xra m         |AE            |      8 T
+XRA M                           |z80  |-     |-    |xra m         |AE            |      7 T
+XRA M                           |z80  |-     |IXIY |xra m         |AE            |      7 T
+XRA M                           |z80n |-     |-    |xra m         |AE            |      7 T
+XRA M                           |z80n |-     |IXIY |xra m         |AE            |      7 T
+XRI expr                        |8080 |expr  |-    |xri %n        |EE %n         |      7 T
+XRI expr                        |8080 |expr  |IXIY |xri %n        |EE %n         |      7 T
+XRI expr                        |8085 |expr  |-    |xri %n        |EE %n         |      7 T
+XRI expr                        |8085 |expr  |IXIY |xri %n        |EE %n         |      7 T
+XRI expr                        |gbz80|expr  |-    |xri %n        |EE %n         |      8 T
+XRI expr                        |gbz80|expr  |IXIY |xri %n        |EE %n         |      8 T
+XRI expr                        |z80  |expr  |-    |xri %n        |EE %n         |      7 T
+XRI expr                        |z80  |expr  |IXIY |xri %n        |EE %n         |      7 T
+XRI expr                        |z80n |expr  |-    |xri %n        |EE %n         |      7 T
+XRI expr                        |z80n |expr  |IXIY |xri %n        |EE %n         |      7 T
 XTHL                            |8080 |-     |-    |xthl          |E3            |     18 T
 XTHL                            |8080 |-     |IXIY |xthl          |E3            |     18 T
 XTHL                            |8085 |-     |-    |xthl          |E3            |     16 T

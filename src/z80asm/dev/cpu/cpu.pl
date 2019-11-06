@@ -1068,8 +1068,6 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "cpd", 	0xED, 0xA9);
 		add_opc($cpu, "cpdr", 	0xED, 0xB9);
 	}
-	elsif ($gameboy) {
-	}
 	else {
 		add_opc($cpu, "cpi", 	call(), '@__z80asm__cpi', '');
 		add_opc($cpu, "cpir", 	call(), '@__z80asm__cpir', '');

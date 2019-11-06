@@ -657,6 +657,66 @@ sub init_opcodes {
 		# Search
 		#----------------------------------------------------------------------
 
+		# ticks for HL=0x1000, A=0xFF, BC=1 and BC=2
+		if (isintel || isgbz80) {
+			add("cpi", 			B(0xCD, '@__z80asm__cpi' ), 
+								is8080 ? T(164,191) : is8085 ? T(156,181) : isgbz80 ? T(408,424) : die);
+			add("cpir", 		B(0xCD, '@__z80asm__cpir'), 
+								is8080 ? T(195,353) : is8085 ? T(180,328) : isgbz80 ? T(448,856) : die);
+			add("cpd", 			B(0xCD, '@__z80asm__cpd' ), 
+								is8080 ? T(164,191) : is8085 ? T(156,181) : isgbz80 ? T(408,424) : die);
+			add("cpdr", 		B(0xCD, '@__z80asm__cpdr'), 
+								is8080 ? T(195,353) : is8085 ? T(180,328) : isgbz80 ? T(448,856) : die);
+		}
+		else {
+			add("cpi", 			B(0xED, 0xA1), (isz80||isz80n) ? T(16)    : die);
+			add("cpir", 		B(0xED, 0xB1), (isz80||isz80n) ? T(16,37) : die);
+			add("cpd", 			B(0xED, 0xA9), (isz80||isz80n) ? T(16)    : die);
+			add("cpdr", 		B(0xED, 0xB9), (isz80||isz80n) ? T(16,37) : die);
+		}
+		
+		#----------------------------------------------------------------------
+		# 8-bit arithmetic
+		#----------------------------------------------------------------------
+		
+		# Zilog
+		for my $op (qw( add adc sub sbc and xor or  cp  )) {
+			next if $op eq 'cp' && isintel;	# CP is Call Positive in Intel
+			for $r (qw( b c d e h l a )) {
+				add("$op a, $r",B(0x80+OP($op)*8+R($r)), 	T(4));
+				add("$op $r", 	B(0x80+OP($op)*8+R($r)), 	T(4));
+			}
+			add("$op a, (hl)", 	B(0x80+OP($op)*8+6), 		isgbz80 ? T(8) : T(7));
+			add("$op (hl)", 	B(0x80+OP($op)*8+6), 		isgbz80 ? T(8) : T(7));
+
+			add("$op a, %n", 	B(0xC6+OP($op)*8, '%n'), 	isgbz80 ? T(8) : T(7));
+			add("$op %n", 		B(0xC6+OP($op)*8, '%n'), 	isgbz80 ? T(8) : T(7));
+		}
+		
+		# Intel
+		for my $op (qw( add adc sub sbb ana xra ora cmp )) {	
+			for $r (qw( b c d e h l a )) {
+				add("$op $r", 	B(0x80+OP($op)*8+R($r)),	T(4))
+					unless $op =~ /add|adc|sub/; # already done in Zilog
+			}
+			add("$op m", 		B(0x80+OP($op)*8+6), 		isgbz80 ? T(8) : T(7));
+		}
+		
+		for my $op (qw( adi aci sui sbi ani xri ori cpi )) {
+			add("$op %n", 		B(0xC6+OP($op)*8, '%n'), 	isgbz80 ? T(8) : T(7));
+		}
+		
+		
+		
+		
+		
+		add("scf",				B(0x37), 					T(4));
+		add("stc",				B(0x37), 					T(4));
+		
+		add("ccf",				B(0x3F), 					T(4));
+		add("cmc",				B(0x3F), 					T(4));
+
+		
 		next unless isintel || isgbz80;
 		next;
 
@@ -676,32 +736,6 @@ sub init_opcodes {
 
 		# data transfer group
 		
-		# Zilog
-		for my $op (qw( add adc sub sbc and xor or  cp  )) {
-			next if $op eq 'cp' && isintel;	# CP is Call Positive in Intel
-			for $r (qw( b c d e h l a )) {
-				add("$op a, $r",0x80+OP($op)*8+R($r), (isintel||isgbz80) ? 4 : die);
-				add("$op $r", 	0x80+OP($op)*8+R($r), (isintel||isgbz80) ? 4 : die);
-			}
-			add("$op a, (hl)", 	0x80+OP($op)*8+6, isintel ? 7 : isgbz80 ? 8 : die);
-			add("$op (hl)", 	0x80+OP($op)*8+6, isintel ? 7 : isgbz80 ? 8 : die);
-
-			add("$op a, %n", 	[0xC6+OP($op)*8, '%n'], isintel ? 7 : isgbz80 ? 8 : die);
-			add("$op %n", 		[0xC6+OP($op)*8, '%n'], isintel ? 7 : isgbz80 ? 8 : die);
-		}
-		
-		# Intel
-		for my $op (qw( add adc sub sbb ana xra ora cmp )) {	
-			for $r (qw( b c d e h l a )) {
-				add("$op $r", 	0x80+OP($op)*8+R($r), (isintel||isgbz80) ? 4 : die) 
-					unless $op =~ /add|adc|sub/; # already done in Zilog
-			}
-			add("$op m", 		0x80+OP($op)*8+6, isintel ? 7 : isgbz80 ? 8 : die);
-		}
-		
-		for my $op (qw( adi aci sui sbi ani xri ori cpi )) {
-			add("$op %n", 		[0xC6+OP($op)*8, '%n'], isintel ? 7 : isgbz80 ? 8 : die);
-		}
 			
 		for $r (qw( b c d e h l a )) {
 			add("inr $r", 		0x04+R($r)*8, is8080 ? 5 : (is8085||isgbz80) ? 4 : die);
@@ -739,11 +773,6 @@ sub init_opcodes {
 		add("cpl",				0x2F, (isintel||isgbz80) ? 4 : die);
 		add("cma",				0x2F, (isintel||isgbz80) ? 4 : die);
 		
-		add("scf",				0x37, (isintel||isgbz80) ? 4 : die);
-		add("stc",				0x37, (isintel||isgbz80) ? 4 : die);
-		
-		add("ccf",				0x3F, (isintel||isgbz80) ? 4 : die);
-		add("cmc",				0x3F, (isintel||isgbz80) ? 4 : die);
 
 		add("pchl",				0xE9, is8080 ? 5 : is8085 ? 6 : isgbz80 ? 4 : die);
 		add("jp (hl)",			0xE9, is8080 ? 5 : is8085 ? 6 : isgbz80 ? 4 : die);
@@ -1807,6 +1836,42 @@ sub run_tests {
 						# BC = 2
 						ok run_test($ixiy, undef, 
 								[" ld bc, 2",	$Opcodes{"ld bc, %m"}{$cpu}->clone(m => 2)],
+								[$test_asm, 	$prog_instance]);
+					}
+					elsif ($asm eq 'cpi' ||
+						   $asm eq 'cpir' ||
+						   $asm eq 'cpd' ||
+						   $asm eq 'cpdr') {
+						# BC = 1, carry cleared
+						ok run_test($ixiy, undef, 
+								[" ld bc, 1",	$Opcodes{"ld bc, %m"}{$cpu}->clone(m => 1)],
+								[" ld hl,1000h",$Opcodes{"ld hl, %m"}{$cpu}->clone(m => 0x1000)],
+								[" ld a, 0FFh",	$Opcodes{"ld a, %n"}{$cpu}->clone(n => 0xFF)],
+								[" and a",		$Opcodes{"and a"}{$cpu}->clone()],
+								[$test_asm, 	$prog_instance]);
+								
+						# BC = 1, carry set
+						ok run_test($ixiy, undef, 
+								[" ld bc, 1",	$Opcodes{"ld bc, %m"}{$cpu}->clone(m => 1)],
+								[" ld hl,1000h",$Opcodes{"ld hl, %m"}{$cpu}->clone(m => 0x1000)],
+								[" ld a, 0FFh",	$Opcodes{"ld a, %n"}{$cpu}->clone(n => 0xFF)],
+								[" scf",		$Opcodes{"scf"}{$cpu}->clone()],
+								[$test_asm, 	$prog_instance]);
+								
+						# BC = 2, carry cleared
+						ok run_test($ixiy, undef, 
+								[" ld bc, 2",	$Opcodes{"ld bc, %m"}{$cpu}->clone(m => 2)],
+								[" ld hl,1000h",$Opcodes{"ld hl, %m"}{$cpu}->clone(m => 0x1000)],
+								[" ld a, 0FFh",	$Opcodes{"ld a, %n"}{$cpu}->clone(n => 0xFF)],
+								[" and a",		$Opcodes{"and a"}{$cpu}->clone()],
+								[$test_asm, 	$prog_instance]);
+								
+						# BC = 2, carry set
+						ok run_test($ixiy, undef, 
+								[" ld bc, 2",	$Opcodes{"ld bc, %m"}{$cpu}->clone(m => 2)],
+								[" ld hl,1000h",$Opcodes{"ld hl, %m"}{$cpu}->clone(m => 0x1000)],
+								[" ld a, 0FFh",	$Opcodes{"ld a, %n"}{$cpu}->clone(n => 0xFF)],
+								[" scf",		$Opcodes{"scf"}{$cpu}->clone()],
 								[$test_asm, 	$prog_instance]);
 					}
 					else {
