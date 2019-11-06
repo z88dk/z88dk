@@ -2122,9 +2122,9 @@ int main (int argc, char **argv){
         if( ih )
           ADD(get_memory(l|h<<8),isez80() ? 2 : israbbit() ? 5 : isgbz80() ? 8 : 7);
         else if( iy )
-          ADD(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535),isez80() ? 3 : 7);
+          ADD(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535),isez80() ? 3 : 15);
         else
-          ADD(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535),isez80() ? 3 : 7);
+          ADD(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535),isez80() ? 3 : 15);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x87: // ADD A,A
         st+= isez80() ? 1 : israbbit() ? 2 : 4;
@@ -2163,9 +2163,9 @@ int main (int argc, char **argv){
         if( ih )
           ADC(get_memory(l|h<<8),isez80() ? 2 : israbbit() ? 5 : isgbz80() ? 8 : 7);
         else if( iy )
-          ADC(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535),isez80() ? 3 : 7);
+          ADC(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535),isez80() ? 3 : 15);
         else
-          ADC(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535),isez80() ? 3 : 7);
+          ADC(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535),isez80() ? 3 : 15);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x8f: // ADC A,A
         st+=isez80() ? 1 : israbbit() ? 2 : 4;
@@ -2204,9 +2204,9 @@ int main (int argc, char **argv){
         if( ih )
           SUB(get_memory(l|h<<8),isez80() ? 2 : israbbit() ? 5 : isgbz80() ? 8 : 7);
         else if( iy )
-          SUB(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535),isez80() ? 3 :  7);
+          SUB(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535),isez80() ? 3 : 15);
         else
-          SUB(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535),isez80() ? 3 :  7);
+          SUB(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535),isez80() ? 3 : 15);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x97: // SUB A
         st+=isez80() ? 1 : israbbit() ? 2 : 4;
@@ -2250,9 +2250,9 @@ int main (int argc, char **argv){
         if( ih )
           SBC(get_memory(l|h<<8),isez80() ? 2 : israbbit() ? 5 : isgbz80() ? 8 : 7);
         else if( iy )
-          SBC(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535), isez80() ? 3 : 7);
+          SBC(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535), isez80() ? 3 : 15);
         else
-          SBC(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535), isez80() ? 3 : 7);
+          SBC(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535), isez80() ? 3 : 15);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0x9f: // SBC A,A
         st+= isez80() ? 1 : israbbit() ? 2 : 4;
@@ -2296,9 +2296,9 @@ int main (int argc, char **argv){
         if( ih )
           AND(get_memory(l|h<<8), isez80() ? 2 : israbbit() ? 5 : isgbz80() ? 8 : 7);
         else if( iy )
-          AND(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535), isez80() ? 3 : 7);
+          AND(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535), isez80() ? 3 : 15);
         else
-          AND(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535), isez80() ? 3 : 7);
+          AND(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535), isez80() ? 3 : 15);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xa7: // AND A
         st+=isez80() ? 1 : israbbit() ? 2 : 4;
@@ -2342,9 +2342,9 @@ int main (int argc, char **argv){
         if( ih )
           XOR(get_memory(l|h<<8),isez80() ? 2 : israbbit() ? 5 : isgbz80() ? 8 : 7);
         else if( iy )
-          XOR(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535),isez80() ? 3 : 7);
+          XOR(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535),isez80() ? 3 : 15);
         else
-          XOR(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535),isez80() ? 3 : 7);
+          XOR(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535),isez80() ? 3 : 15);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xaf: // XOR A
         st+=isez80() ? 1 : israbbit() ? 2 : 4;
@@ -2383,9 +2383,9 @@ int main (int argc, char **argv){
         if( ih )
           OR(get_memory(l|h<<8),isez80() ? 2 : israbbit() ? 5 : isgbz80() ? 8 : 7);
         else if( iy )
-          OR(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535),isez80() ? 3 : 7);
+          OR(get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535),isez80() ? 3 : 15);
         else
-          OR(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535),isez80() ? 3 : 7);
+          OR(get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535),isez80() ? 3 : 15);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xb7: // OR A
         st+=isez80() ? 1 : israbbit() ? 2 : 4;
@@ -2433,10 +2433,10 @@ int main (int argc, char **argv){
           CP(w,isez80() ? 2 : israbbit() ? 5 : isgbz80() ? 8 : 7);
         else if( iy )
           w= get_memory(((get_memory(pc++)^128)-128+(yl|yh<<8))&65535),
-          CP(w,isez80() ? 3 : 7);
+          CP(w,isez80() ? 3 : 15);
         else
           w= get_memory(((get_memory(pc++)^128)-128+(xl|xh<<8))&65535),
-          CP(w,isez80() ? 3 : 7);
+          CP(w,isez80() ? 3 : 15);
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xbf: // CP A
         st+=isez80() ? 1 : israbbit() ? 2 : 4;  
@@ -2961,7 +2961,6 @@ int main (int argc, char **argv){
         } else {
           st+= isez80() ? 1 : israbbit() ? 2 : isz180() ? 3 : 4;
           ih= iy= 0;
-          ih=0;
         }
         break;
       case 0xfd: // OP FD
@@ -2983,7 +2982,6 @@ int main (int argc, char **argv){
           st+= isez80() ? 1 : israbbit() ? 2 : isz180() ? 3 : 4;
           ih= 0;
           iy= 1;
-          ih=0;
         }
         break;
       case 0xcb: // OP CB
