@@ -4,7 +4,7 @@
 
 	SECTION		code_clib
 	PUBLIC		__tms9918_bordercolor
-	EXTERN		conio_map_colour
+	EXTERN		__tms9918_map_colour
 	EXTERN		msx_set_border
 
         INCLUDE "video/tms9918/vdp.inc"
@@ -19,6 +19,6 @@ ENDIF
 
 __tms9918_bordercolor:
 	ld	a,l
-	call	conio_map_colour
+	call	__tms9918_map_colour
 	ld	l,a
 	jp	msx_set_border
