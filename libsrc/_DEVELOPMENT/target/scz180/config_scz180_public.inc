@@ -67,9 +67,9 @@ PUBLIC __IO_PIO_PORT_BASE
 
 defc __SCZ180 = 1
 
-defc __CPU_CLOCK = 36864000
+defc __CPU_CLOCK = 18432000
 
-defc __CLOCKS_PER_SECOND = 256
+defc __CLOCKS_PER_SECOND = 50
 
 defc __BIOS_SP = 0xFFDE
 defc __BANK_SP = 0xEFFE

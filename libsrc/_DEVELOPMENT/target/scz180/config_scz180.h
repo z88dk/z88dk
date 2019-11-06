@@ -39,9 +39,9 @@
 #undef  __SCZ180
 #define __SCZ180  1
 
-#define __CPU_CLOCK  36864000
+#define __CPU_CLOCK  18432000
 
-#define __CLOCKS_PER_SECOND 256
+#define __CLOCKS_PER_SECOND 50
 
 #define __BIOS_SP   0xFFDE
 #define __BANK_SP   0xEFFE

@@ -12,11 +12,11 @@ define(`__SCZ180', 1)
 
 # Clock frequency in Hz
 
-define(`__CPU_CLOCK', 36864000)
+define(`__CPU_CLOCK', 18432000)
 
 # Frequency of PRT0 if configured as per normal
 
-define(`__CLOCKS_PER_SECOND', 256)
+define(`__CLOCKS_PER_SECOND', 50)
 
 # Cache for SP when other banks are running
 

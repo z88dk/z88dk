@@ -214,7 +214,7 @@ defc __IO_BASE_ADDRESS = 0
    defc CBAR = 58
 
    defc OMCR = 62
-   defc ICR = 0x3f
+   defc ICR = 63
 
 
 
