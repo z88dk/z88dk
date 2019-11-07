@@ -13,13 +13,13 @@ PUBLIC asm_sd_write_byte
     
 .asm_sd_write_byte
     ld a,l
-    call l_reverse          ;reverse the bits before we busy wait
+    call l_reverse          ; reverse the bits before we busy wait
 .sd_write_wait
     in0 a,(CNTR)
-    tst CNTR_TE|CNTR_RE     ;check the SD is not enabled
+    tst CNTR_TE|CNTR_RE     ; check the CSIO is not enabled
     jr NZ,sd_write_wait
 
-    out0 (TRDR),l           ;load (reversed) byte to transmit
-    or a,CNTR_TE
-    out0 (CNTR),a           ;enable transmit
+    or a,CNTR_TE            ; set TE bit
+    out0 (TRDR),l           ; load (reversed) byte to transmit
+    out0 (CNTR),a           ; enable transmit
     ret

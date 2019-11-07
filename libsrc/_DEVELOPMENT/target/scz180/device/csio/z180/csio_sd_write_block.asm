@@ -14,10 +14,9 @@ PUBLIC asm_sd_write_block
 
 .asm_sd_write_block
     in0 a,(CNTR)
-    tst CNTR_TE|CNTR_RE     ;check the SD is not enabled
+    tst CNTR_TE|CNTR_RE     ;check the CSIO is not enabled
     jr NZ,asm_sd_write_block
 
-    and ~CNTR_RE            ; mask off RE bit
     or CNTR_TE              ; set TE bit
 
     ex de,hl                ; pointer in DE

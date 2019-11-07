@@ -15,10 +15,9 @@ PUBLIC asm_sd_read_block
 
 .asm_sd_read_block
     in0 a,(CNTR)
-    tst CNTR_TE|CNTR_RE     ;check the SD is not enabled
+    tst CNTR_TE|CNTR_RE     ;check the CSIO is not enabled
     jr NZ,asm_sd_read_block
 
-    and ~CNTR_TE            ; mask off TE bit
     or CNTR_RE              ; set RE bit
     out0 (CNTR),a           ; start receiving first byte
 

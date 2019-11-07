@@ -10,7 +10,7 @@ PUBLIC asm_sd_cs_raise
     ;uses AF
 
 .asm_sd_cs_raise
-    in0 a,(CNTR)            ;check the SD is not enabled
+    in0 a,(CNTR)            ;check the CSIO is not enabled
     tst CNTR_TE|CNTR_RE
     jr NZ,asm_sd_cs_raise
 

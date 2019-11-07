@@ -4,6 +4,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
+IF !DEFINED_CLIB_32BIT_FLOATS
+	defc	DEFINED_CLIB_32BIT_FLOATS = 1
+	defc CLIB_32BIT_FLOATS = 1
+	IFNDEF CLIB_32BIT_FLOATS
+	ENDIF
+ENDIF
+
+
 IF !DEFINED_startup
 	defc	DEFINED_startup = 1
 	defc startup = 64
