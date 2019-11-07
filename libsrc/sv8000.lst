@@ -1,10 +1,10 @@
-stdio/sv8000/generic_console
-stdio/sv8000/generic_console_ioctl
-stdio/sv8000/generic_console_vpeek
-stdio/sv8000/printc_MODE1
-stdio/sv8000/vpeek_MODE1
-stdio/sv8000/conio_vars
-stdio/sv8000/CRT_FONT
+target/sv8000/stdio/generic_console
+target/sv8000/stdio/generic_console_ioctl
+target/sv8000/stdio/generic_console_vpeek
+target/sv8000/stdio/printc_MODE1
+target/sv8000/stdio/vpeek_MODE1
+target/sv8000/stdio/conio_vars
+target/sv8000/stdio/CRT_FONT
 @stdio/stdio.lst
 @font/font_8x8/font_8x8.lst
 target/sv8000/graphics/clsgraph
