@@ -1187,7 +1187,8 @@ sub add_opc {
 	add_opc_1($cpu, $asm, @bin);
 	
 	# expand ixh, ixl, ...
-	if ($cpu =~ /^z80/ && $asm =~ /\b[hl]\b/ && $asm !~ /\b(hl|ix|iy|in|out)\b/) {
+	if ($cpu =~ /^z80/ && $asm =~ /\b[hl]\b/ && 
+		$asm !~ /\b(hl|ix|iy|in|out|dad|ana|bit|res|set)\b/) {
 		(my $asm1 = $asm) =~ s/\b([hl])\b/ix$1/g;
 		add_opc_1($cpu, $asm1, $V{ix}, @bin);
 		(   $asm1 = $asm) =~ s/\b([hl])\b/iy$1/g;
