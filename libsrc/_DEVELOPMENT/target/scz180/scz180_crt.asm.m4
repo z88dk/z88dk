@@ -68,8 +68,8 @@ ifelse(__STARTUP, 0,
 
 ifelse(__STARTUP, 16,
 `
-   ; scm asci0 drivers installed on stdin, stdout, stderr
-   ; scm asci1 drivers installed on ttyin, ttyout, ttyerr
+   ; scm hbios0 drivers installed on stdin, stdout, stderr
+   ; scm hbios1 drivers installed on ttyin, ttyout, ttyerr
 
    IFNDEF __CRTCFG
 
