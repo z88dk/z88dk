@@ -1681,10 +1681,6 @@
 |ana d                  |A2         |==      |==         |==         |==      |==         |==         |==         |
 |ana e                  |A3         |==      |==         |==         |==      |==         |==         |==         |
 |ana h                  |A4         |==      |==         |==         |==      |==         |==         |==         |
-|ana ixh                |           |        |           |           |        |           |DD A4      |==         |
-|ana ixl                |           |        |           |           |        |           |DD A5      |==         |
-|ana iyh                |           |        |           |           |        |           |FD A4      |==         |
-|ana iyl                |           |        |           |           |        |           |FD A5      |==         |
 |ana l                  |A5         |==      |==         |==         |==      |==         |==         |==         |
 |ana m                  |A6         |==      |==         |==         |==      |==         |==         |==         |
 |and %n                 |E6 %n      |==      |==         |==         |==      |==         |==         |==         |
@@ -1828,38 +1824,6 @@
 |bit 5, h               |           |        |CB 6C      |==         |==      |==         |==         |==         |
 |bit 6, h               |           |        |CB 74      |==         |==      |==         |==         |==         |
 |bit 7, h               |           |        |CB 7C      |==         |==      |==         |==         |==         |
-|bit 0, ixh             |           |        |           |           |        |           |DD CB 44   |==         |
-|bit 1, ixh             |           |        |           |           |        |           |DD CB 4C   |==         |
-|bit 2, ixh             |           |        |           |           |        |           |DD CB 54   |==         |
-|bit 3, ixh             |           |        |           |           |        |           |DD CB 5C   |==         |
-|bit 4, ixh             |           |        |           |           |        |           |DD CB 64   |==         |
-|bit 5, ixh             |           |        |           |           |        |           |DD CB 6C   |==         |
-|bit 6, ixh             |           |        |           |           |        |           |DD CB 74   |==         |
-|bit 7, ixh             |           |        |           |           |        |           |DD CB 7C   |==         |
-|bit 0, ixl             |           |        |           |           |        |           |DD CB 45   |==         |
-|bit 1, ixl             |           |        |           |           |        |           |DD CB 4D   |==         |
-|bit 2, ixl             |           |        |           |           |        |           |DD CB 55   |==         |
-|bit 3, ixl             |           |        |           |           |        |           |DD CB 5D   |==         |
-|bit 4, ixl             |           |        |           |           |        |           |DD CB 65   |==         |
-|bit 5, ixl             |           |        |           |           |        |           |DD CB 6D   |==         |
-|bit 6, ixl             |           |        |           |           |        |           |DD CB 75   |==         |
-|bit 7, ixl             |           |        |           |           |        |           |DD CB 7D   |==         |
-|bit 0, iyh             |           |        |           |           |        |           |FD CB 44   |==         |
-|bit 1, iyh             |           |        |           |           |        |           |FD CB 4C   |==         |
-|bit 2, iyh             |           |        |           |           |        |           |FD CB 54   |==         |
-|bit 3, iyh             |           |        |           |           |        |           |FD CB 5C   |==         |
-|bit 4, iyh             |           |        |           |           |        |           |FD CB 64   |==         |
-|bit 5, iyh             |           |        |           |           |        |           |FD CB 6C   |==         |
-|bit 6, iyh             |           |        |           |           |        |           |FD CB 74   |==         |
-|bit 7, iyh             |           |        |           |           |        |           |FD CB 7C   |==         |
-|bit 0, iyl             |           |        |           |           |        |           |FD CB 45   |==         |
-|bit 1, iyl             |           |        |           |           |        |           |FD CB 4D   |==         |
-|bit 2, iyl             |           |        |           |           |        |           |FD CB 55   |==         |
-|bit 3, iyl             |           |        |           |           |        |           |FD CB 5D   |==         |
-|bit 4, iyl             |           |        |           |           |        |           |FD CB 65   |==         |
-|bit 5, iyl             |           |        |           |           |        |           |FD CB 6D   |==         |
-|bit 6, iyl             |           |        |           |           |        |           |FD CB 75   |==         |
-|bit 7, iyl             |           |        |           |           |        |           |FD CB 7D   |==         |
 |bit 0, l               |           |        |CB 45      |==         |==      |==         |==         |==         |
 |bit 1, l               |           |        |CB 4D      |==         |==      |==         |==         |==         |
 |bit 2, l               |           |        |CB 55      |==         |==      |==         |==         |==         |
@@ -1988,8 +1952,6 @@
 |dad de                 |19         |==      |==         |==         |==      |==         |==         |==         |
 |dad h                  |29         |==      |==         |==         |==      |==         |==         |==         |
 |dad hl                 |29         |==      |==         |==         |==      |==         |==         |==         |
-|dad ixh                |           |        |           |           |        |           |DD 29      |==         |
-|dad iyh                |           |        |           |           |        |           |FD 29      |==         |
 |dad sp                 |39         |==      |==         |==         |==      |==         |==         |==         |
 |dcr a                  |3D         |==      |==         |==         |==      |==         |==         |==         |
 |dcr b                  |05         |==      |==         |==         |==      |==         |==         |==         |
@@ -5256,38 +5218,6 @@
 |res 5, h'              |           |        |           |76 CB AC   |==      |           |           |           |
 |res 6, h'              |           |        |           |76 CB B4   |==      |           |           |           |
 |res 7, h'              |           |        |           |76 CB BC   |==      |           |           |           |
-|res 0, ixh             |           |        |           |           |        |           |DD CB 84   |==         |
-|res 1, ixh             |           |        |           |           |        |           |DD CB 8C   |==         |
-|res 2, ixh             |           |        |           |           |        |           |DD CB 94   |==         |
-|res 3, ixh             |           |        |           |           |        |           |DD CB 9C   |==         |
-|res 4, ixh             |           |        |           |           |        |           |DD CB A4   |==         |
-|res 5, ixh             |           |        |           |           |        |           |DD CB AC   |==         |
-|res 6, ixh             |           |        |           |           |        |           |DD CB B4   |==         |
-|res 7, ixh             |           |        |           |           |        |           |DD CB BC   |==         |
-|res 0, ixl             |           |        |           |           |        |           |DD CB 85   |==         |
-|res 1, ixl             |           |        |           |           |        |           |DD CB 8D   |==         |
-|res 2, ixl             |           |        |           |           |        |           |DD CB 95   |==         |
-|res 3, ixl             |           |        |           |           |        |           |DD CB 9D   |==         |
-|res 4, ixl             |           |        |           |           |        |           |DD CB A5   |==         |
-|res 5, ixl             |           |        |           |           |        |           |DD CB AD   |==         |
-|res 6, ixl             |           |        |           |           |        |           |DD CB B5   |==         |
-|res 7, ixl             |           |        |           |           |        |           |DD CB BD   |==         |
-|res 0, iyh             |           |        |           |           |        |           |FD CB 84   |==         |
-|res 1, iyh             |           |        |           |           |        |           |FD CB 8C   |==         |
-|res 2, iyh             |           |        |           |           |        |           |FD CB 94   |==         |
-|res 3, iyh             |           |        |           |           |        |           |FD CB 9C   |==         |
-|res 4, iyh             |           |        |           |           |        |           |FD CB A4   |==         |
-|res 5, iyh             |           |        |           |           |        |           |FD CB AC   |==         |
-|res 6, iyh             |           |        |           |           |        |           |FD CB B4   |==         |
-|res 7, iyh             |           |        |           |           |        |           |FD CB BC   |==         |
-|res 0, iyl             |           |        |           |           |        |           |FD CB 85   |==         |
-|res 1, iyl             |           |        |           |           |        |           |FD CB 8D   |==         |
-|res 2, iyl             |           |        |           |           |        |           |FD CB 95   |==         |
-|res 3, iyl             |           |        |           |           |        |           |FD CB 9D   |==         |
-|res 4, iyl             |           |        |           |           |        |           |FD CB A5   |==         |
-|res 5, iyl             |           |        |           |           |        |           |FD CB AD   |==         |
-|res 6, iyl             |           |        |           |           |        |           |FD CB B5   |==         |
-|res 7, iyl             |           |        |           |           |        |           |FD CB BD   |==         |
 |res 0, l               |           |        |CB 85      |==         |==      |==         |==         |==         |
 |res 1, l               |           |        |CB 8D      |==         |==      |==         |==         |==         |
 |res 2, l               |           |        |CB 95      |==         |==      |==         |==         |==         |
@@ -5774,38 +5704,6 @@
 |set 5, h'              |           |        |           |76 CB EC   |==      |           |           |           |
 |set 6, h'              |           |        |           |76 CB F4   |==      |           |           |           |
 |set 7, h'              |           |        |           |76 CB FC   |==      |           |           |           |
-|set 0, ixh             |           |        |           |           |        |           |DD CB C4   |==         |
-|set 1, ixh             |           |        |           |           |        |           |DD CB CC   |==         |
-|set 2, ixh             |           |        |           |           |        |           |DD CB D4   |==         |
-|set 3, ixh             |           |        |           |           |        |           |DD CB DC   |==         |
-|set 4, ixh             |           |        |           |           |        |           |DD CB E4   |==         |
-|set 5, ixh             |           |        |           |           |        |           |DD CB EC   |==         |
-|set 6, ixh             |           |        |           |           |        |           |DD CB F4   |==         |
-|set 7, ixh             |           |        |           |           |        |           |DD CB FC   |==         |
-|set 0, ixl             |           |        |           |           |        |           |DD CB C5   |==         |
-|set 1, ixl             |           |        |           |           |        |           |DD CB CD   |==         |
-|set 2, ixl             |           |        |           |           |        |           |DD CB D5   |==         |
-|set 3, ixl             |           |        |           |           |        |           |DD CB DD   |==         |
-|set 4, ixl             |           |        |           |           |        |           |DD CB E5   |==         |
-|set 5, ixl             |           |        |           |           |        |           |DD CB ED   |==         |
-|set 6, ixl             |           |        |           |           |        |           |DD CB F5   |==         |
-|set 7, ixl             |           |        |           |           |        |           |DD CB FD   |==         |
-|set 0, iyh             |           |        |           |           |        |           |FD CB C4   |==         |
-|set 1, iyh             |           |        |           |           |        |           |FD CB CC   |==         |
-|set 2, iyh             |           |        |           |           |        |           |FD CB D4   |==         |
-|set 3, iyh             |           |        |           |           |        |           |FD CB DC   |==         |
-|set 4, iyh             |           |        |           |           |        |           |FD CB E4   |==         |
-|set 5, iyh             |           |        |           |           |        |           |FD CB EC   |==         |
-|set 6, iyh             |           |        |           |           |        |           |FD CB F4   |==         |
-|set 7, iyh             |           |        |           |           |        |           |FD CB FC   |==         |
-|set 0, iyl             |           |        |           |           |        |           |FD CB C5   |==         |
-|set 1, iyl             |           |        |           |           |        |           |FD CB CD   |==         |
-|set 2, iyl             |           |        |           |           |        |           |FD CB D5   |==         |
-|set 3, iyl             |           |        |           |           |        |           |FD CB DD   |==         |
-|set 4, iyl             |           |        |           |           |        |           |FD CB E5   |==         |
-|set 5, iyl             |           |        |           |           |        |           |FD CB ED   |==         |
-|set 6, iyl             |           |        |           |           |        |           |FD CB F5   |==         |
-|set 7, iyl             |           |        |           |           |        |           |FD CB FD   |==         |
 |set 0, l               |           |        |CB C5      |==         |==      |==         |==         |==         |
 |set 1, l               |           |        |CB CD      |==         |==      |==         |==         |==         |
 |set 2, l               |           |        |CB D5      |==         |==      |==         |==         |==         |
