@@ -1,0 +1,4 @@
+arch/hbios/z80/asm_hbios
+arch/hbios/z80/asm_hbios_hl
+arch/hbios/z80/asm_hbios_get_offset
+arch/hbios/z80/asm_hbios_set_offset

@@ -1,0 +1,9 @@
+@arch/hbios/hbios_asm.lst
+;arch/hbios/c/sdcc/hbios
+;arch/hbios/c/sdcc/hbios_callee
+;arch/hbios/c/sdcc/hbios_hl
+;arch/hbios/c/sdcc/hbios_hl_callee
+;arch/hbios/c/sdcc/hbios_get_offset
+;arch/hbios/c/sdcc/hbios_get_offset_fastcall
+;arch/hbios/c/sdcc/hbios_set_offset
+;arch/hbios/c/sdcc/hbios_set_offset_callee

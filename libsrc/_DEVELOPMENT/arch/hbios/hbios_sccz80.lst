@@ -1,0 +1,8 @@
+@arch/hbios/hbios_asm.lst
+;arch/hbios/c/sccz80/hbios
+;arch/hbios/c/sccz80/hbios_callee
+;arch/hbios/c/sccz80/hbios_hl
+;arch/hbios/c/sccz80/hbios_hl_callee
+;arch/hbios/c/sccz80/hbios_get_offset
+;arch/hbios/c/sccz80/hbios_set_offset
+;arch/hbios/c/sccz80/hbios_set_offset_callee
