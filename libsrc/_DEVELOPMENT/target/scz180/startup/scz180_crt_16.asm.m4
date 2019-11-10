@@ -1,10 +1,10 @@
 include(`z88dk.m4')
 
 dnl############################################################
-dnl##      SCZ180_CRT_16.ASM.M4 - IO THROUGH YABIOS          ##
+dnl##      SCZ180_CRT_16.ASM.M4 - IO THROUGH ROMWBW          ##
 dnl############################################################
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                scz180 application target                  ;;
+;;            scz180 romwbw application target               ;;
 ;; generated from target/scz180/startup/scz180_crt_16.asm.m4 ;;
 ;;                                                           ;;
 ;;                  flat 64k address space                   ;;
@@ -21,7 +21,7 @@ include "config_scz180_public.inc"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../crt_defaults.inc"
-include "crt_scz180_def.inc"
+include "crt_romwbw_def.inc"
 include "crt_config.inc"
 include(`../crt_rules.inc')
 include(`scz180_rules.inc')
@@ -52,11 +52,11 @@ dnl#include(`driver/terminal/rc_01_output_asci1.m4')
 dnl
 dnl## file dup
 dnl
-dnl#include(`../m4_file_dup.m4')dnl
+dnl#include(`../m4_file_dup.m4')
 dnl
 dnl## empty fd slot
 dnl
-dnl#include(`../m4_file_absent.m4')dnl
+dnl#include(`../m4_file_absent.m4')
 dnl
 dnl############################################################
 dnl## INSTANTIATE DRIVERS #####################################
