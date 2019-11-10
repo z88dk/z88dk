@@ -1,6 +1,7 @@
 @adt/adt_sdcc_iy.lst
 @alloc/alloc_sdcc_iy.lst
 @arch/cpm/cpm_sdcc_iy.lst
+@arch/hbios/hbios_sdcc.lst
 @compress/compress_sdcc_iy.lst
 @ctype/ctype_sdcc_iy.lst
 @drivers/drivers.lst
