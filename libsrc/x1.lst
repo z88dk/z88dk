@@ -2,8 +2,10 @@
 stdio/x1/fgetc_cons
 stdio/x1/getk
 stdio/x1/generic_console
+stdio/x1/generic_console_ioctl
 stdio/x1/conio_vars
 stdio/x1/conio_map_colour
+stdio/x1/CRT_FONT
 @stdio/ansicore.lst
 stdio/ansi/x1/f_ansi_attr
 stdio/ansi/x1/f_ansi_bel
