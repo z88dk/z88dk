@@ -345,6 +345,24 @@ static disc_spec rc700_spec = {
     .skew_tab = { 0, 2, 4, 6, 8, 1, 3, 5, 7 }
 };
 
+static disc_spec sharpx1_spec = {
+    .name = "Sharp-X1",
+    .sectors_per_track = 16,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 4,
+    .alternate_sides = 1,
+    .directory_entries = 64,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+};
+
+
+
 
 
 
@@ -378,6 +396,7 @@ static struct formats {
     { "plus3",     "Spectrum +3 173k",   &plus3_spec, 0, NULL, 1 },
     { "qc10",      "Epson QC-10, QX-10", &qc10_spec, 0, NULL, 1 },
     { "rc700",     "Regnecentralen RC-700", &rc700_spec, 0, NULL, 1 },
+    { "sharpx1",   "Sharp X1",&sharpx1_spec, 0, NULL, 1 },
     { "smc777",    "Sony SMC-70/SMC-777",&smc777_spec, 0, NULL, 1 },
     { "svi-40ss",   "SVI 40ss (174k)",   &svi40ss_spec, 0, NULL, 1 },
     { "tiki100-40t","Tiki 100 (200k)",   &tiki100_spec, 0, NULL, 1 },

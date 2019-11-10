@@ -6,5 +6,8 @@
 		SECTION		data_clib
 
 		PUBLIC		__x1_attr
+		PUBLIC		__x1_mode
 
 .__x1_attr       defb $7	; White on Black
+
+.__x1_mode	defb	0
