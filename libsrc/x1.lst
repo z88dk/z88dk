@@ -1,8 +1,13 @@
 @input/x1.lst
 stdio/x1/fgetc_cons
 stdio/x1/getk
-stdio/x1/generic_console
+stdio/x1/generic_console_cls
 stdio/x1/generic_console_ioctl
+stdio/x1/generic_console_printc
+stdio/x1/generic_console_scrollup
+stdio/x1/generic_console_vpeek
+stdio/x1/generic_console_xypos
+stdio/x1/generic_console
 stdio/x1/conio_vars
 stdio/x1/conio_map_colour
 stdio/x1/CRT_FONT

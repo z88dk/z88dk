@@ -12,7 +12,7 @@
     EXTERN  __console_w
 
     EXTERN  set_crtc_10
-	INCLUDE "target/mc1000/def/mc1000.def"
+    INCLUDE "target/mc1000/def/mc1000.def"
 
 
 ; a = ioctl
@@ -53,15 +53,11 @@ set_mode:
     ld      (__console_w),de
     call    set_crtc_10
     pop     de
-            LD      BC,1A03H
-        LD      A,82H
-        OUT     (C),A
-        DEC     BC
-        out (c),e
-
-;    ld      a,c
-;    ld      bc,$1fd0	;X1Turbo flag - not sure what this value does
-;    out     (c),a
+    ld      bc,$1a03
+    ld      a,$82
+    out     (c),a
+    dec     bc
+    out     (c),e
     call    generic_console_cls
     jr      success
 failure:
@@ -69,7 +65,7 @@ failure:
 dummy_return:
     ret
 
-	SECTION	rodata_clib
+    SECTION	rodata_clib
 
 text40:	defb 37h, 28h, 2Dh, 34h, 1Fh, 02h, 19h, 1Ch, 00h, 07h
 text80:	defb 6Fh, 50h, 59h, 38h, 1Fh, 02h, 19h, 1Ch, 00h, 07h
