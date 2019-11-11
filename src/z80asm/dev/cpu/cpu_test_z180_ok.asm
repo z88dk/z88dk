@@ -412,7 +412,6 @@
  cc 32767                       ; DC FF 7F
  cc 65535                       ; DC FF FF
  ccf                            ; 3F
- ccf f                          ; 3F
  cm -32768                      ; FC 00 80
  cm 32767                       ; FC FF 7F
  cm 65535                       ; FC FF FF
@@ -1638,7 +1637,6 @@
  sbi 127                        ; DE 7F
  sbi 255                        ; DE FF
  scf                            ; 37
- scf f                          ; 37
  set 0, (hl)                    ; CB C6
  set 0, (ix)                    ; DD CB 00 C6
  set 0, (ix+127)                ; DD CB 7F C6

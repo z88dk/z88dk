@@ -84,8 +84,24 @@
  ani 127                        ; E6 7F
  ani 255                        ; E6 FF
  ccf                            ; 3F
+ cma                            ; 2F
  cmc                            ; 3F
+ cmp (hl)                       ; BE
+ cmp -128                       ; FE 80
+ cmp 127                        ; FE 7F
+ cmp 255                        ; FE FF
  cmp a                          ; BF
+ cmp a, (hl)                    ; BE
+ cmp a, -128                    ; FE 80
+ cmp a, 127                     ; FE 7F
+ cmp a, 255                     ; FE FF
+ cmp a, a                       ; BF
+ cmp a, b                       ; B8
+ cmp a, c                       ; B9
+ cmp a, d                       ; BA
+ cmp a, e                       ; BB
+ cmp a, h                       ; BC
+ cmp a, l                       ; BD
  cmp b                          ; B8
  cmp c                          ; B9
  cmp d                          ; BA
@@ -93,6 +109,28 @@
  cmp h                          ; BC
  cmp l                          ; BD
  cmp m                          ; BE
+ cp (hl)                        ; BE
+ cp -128                        ; FE 80
+ cp 127                         ; FE 7F
+ cp 255                         ; FE FF
+ cp a                           ; BF
+ cp a, (hl)                     ; BE
+ cp a, -128                     ; FE 80
+ cp a, 127                      ; FE 7F
+ cp a, 255                      ; FE FF
+ cp a, a                        ; BF
+ cp a, b                        ; B8
+ cp a, c                        ; B9
+ cp a, d                        ; BA
+ cp a, e                        ; BB
+ cp a, h                        ; BC
+ cp a, l                        ; BD
+ cp b                           ; B8
+ cp c                           ; B9
+ cp d                           ; BA
+ cp e                           ; BB
+ cp h                           ; BC
+ cp l                           ; BD
  cpd                            ; CD @cpd
  cpdr                           ; CD @cpdr
  cpi                            ; CD @cpi
@@ -100,8 +138,47 @@
  cpi 127                        ; FE 7F
  cpi 255                        ; FE FF
  cpir                           ; CD @cpir
+ cpl                            ; 2F
+ cpl a                          ; 2F
+ daa                            ; 27
+ dcr a                          ; 3D
+ dcr b                          ; 05
+ dcr c                          ; 0D
+ dcr d                          ; 15
+ dcr e                          ; 1D
+ dcr h                          ; 25
+ dcr l                          ; 2D
+ dcr m                          ; 35
+ dec (hl)                       ; 35
+ dec a                          ; 3D
+ dec b                          ; 05
+ dec c                          ; 0D
+ dec d                          ; 15
+ dec e                          ; 1D
+ dec h                          ; 25
+ dec l                          ; 2D
+ di                             ; F3
+ ei                             ; FB
  ex (sp), hl                    ; E3
  ex de, hl                      ; EB
+ halt                           ; 76
+ hlt                            ; 76
+ inc (hl)                       ; 34
+ inc a                          ; 3C
+ inc b                          ; 04
+ inc c                          ; 0C
+ inc d                          ; 14
+ inc e                          ; 1C
+ inc h                          ; 24
+ inc l                          ; 2C
+ inr a                          ; 3C
+ inr b                          ; 04
+ inr c                          ; 0C
+ inr d                          ; 14
+ inr e                          ; 1C
+ inr h                          ; 24
+ inr l                          ; 2C
+ inr m                          ; 34
  ld (-32768), a                 ; 32 00 80
  ld (-32768), hl                ; 22 00 80
  ld (32767), a                  ; 32 FF 7F
@@ -340,6 +417,9 @@
  mvi m, -128                    ; 36 80
  mvi m, 127                     ; 36 7F
  mvi m, 255                     ; 36 FF
+ neg                            ; 2F; 3C
+ neg a                          ; 2F; 3C
+ nop                            ; 00
  or (hl)                        ; B6
  or -128                        ; F6 80
  or 127                         ; F6 7F
@@ -389,7 +469,23 @@
  push h                         ; E5
  push hl                        ; E5
  push psw                       ; F5
+ rst %c                         ; C7+%c
+ sbb (hl)                       ; 9E
+ sbb -128                       ; DE 80
+ sbb 127                        ; DE 7F
+ sbb 255                        ; DE FF
  sbb a                          ; 9F
+ sbb a, (hl)                    ; 9E
+ sbb a, -128                    ; DE 80
+ sbb a, 127                     ; DE 7F
+ sbb a, 255                     ; DE FF
+ sbb a, a                       ; 9F
+ sbb a, b                       ; 98
+ sbb a, c                       ; 99
+ sbb a, d                       ; 9A
+ sbb a, e                       ; 9B
+ sbb a, h                       ; 9C
+ sbb a, l                       ; 9D
  sbb b                          ; 98
  sbb c                          ; 99
  sbb d                          ; 9A

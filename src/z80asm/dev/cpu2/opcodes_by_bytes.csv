@@ -1,4 +1,6 @@
 ;Bytes        |8080       |8085       |gbz80      |r2k|r3k|z180|z80           |z80n
+00            |nop        |~          |~          |   |   |    |nop           |~   
+              |           |           |           |   |   |    |              |    
 01 %m %m      |ld bc, %m  |~          |~          |   |   |    |ld bc, %m     |~   
               |lxi b, %m  |           |           |   |   |    |lxi b, %m     |    
               |lxi bc, %m |           |           |   |   |    |lxi bc, %m    |    
@@ -6,6 +8,12 @@
 02            |ld (bc), a |~          |~          |   |   |    |ld (bc), a    |~   
               |stax b     |           |           |   |   |    |stax b        |    
               |stax bc    |           |           |   |   |    |stax bc       |    
+              |           |           |           |   |   |    |              |    
+04            |inc b      |~          |~          |   |   |    |inc b         |~   
+              |inr b      |           |           |   |   |    |inr b         |    
+              |           |           |           |   |   |    |              |    
+05            |dcr b      |~          |~          |   |   |    |dcr b         |~   
+              |dec b      |           |           |   |   |    |dec b         |    
               |           |           |           |   |   |    |              |    
 06 %n         |ld b, %n   |~          |~          |   |   |    |ld b, %n      |~   
               |mvi b, %n  |           |           |   |   |    |mvi b, %n     |    
@@ -19,6 +27,12 @@
               |ldax b     |           |           |   |   |    |ldax b        |    
               |ldax bc    |           |           |   |   |    |ldax bc       |    
               |           |           |           |   |   |    |              |    
+0C            |inc c      |~          |~          |   |   |    |inc c         |~   
+              |inr c      |           |           |   |   |    |inr c         |    
+              |           |           |           |   |   |    |              |    
+0D            |dcr c      |~          |~          |   |   |    |dcr c         |~   
+              |dec c      |           |           |   |   |    |dec c         |    
+              |           |           |           |   |   |    |              |    
 0E %n         |ld c, %n   |~          |~          |   |   |    |ld c, %n      |~   
               |mvi c, %n  |           |           |   |   |    |mvi c, %n     |    
               |           |           |           |   |   |    |              |    
@@ -30,12 +44,24 @@
               |stax d     |           |           |   |   |    |stax d        |    
               |stax de    |           |           |   |   |    |stax de       |    
               |           |           |           |   |   |    |              |    
+14            |inc d      |~          |~          |   |   |    |inc d         |~   
+              |inr d      |           |           |   |   |    |inr d         |    
+              |           |           |           |   |   |    |              |    
+15            |dcr d      |~          |~          |   |   |    |dcr d         |~   
+              |dec d      |           |           |   |   |    |dec d         |    
+              |           |           |           |   |   |    |              |    
 16 %n         |ld d, %n   |~          |~          |   |   |    |ld d, %n      |~   
               |mvi d, %n  |           |           |   |   |    |mvi d, %n     |    
               |           |           |           |   |   |    |              |    
 1A            |ld a, (de) |~          |~          |   |   |    |ld a, (de)    |~   
               |ldax d     |           |           |   |   |    |ldax d        |    
               |ldax de    |           |           |   |   |    |ldax de       |    
+              |           |           |           |   |   |    |              |    
+1C            |inc e      |~          |~          |   |   |    |inc e         |~   
+              |inr e      |           |           |   |   |    |inr e         |    
+              |           |           |           |   |   |    |              |    
+1D            |dcr e      |~          |~          |   |   |    |dcr e         |~   
+              |dec e      |           |           |   |   |    |dec e         |    
               |           |           |           |   |   |    |              |    
 1E %n         |ld e, %n   |~          |~          |   |   |    |ld e, %n      |~   
               |mvi e, %n  |           |           |   |   |    |mvi e, %n     |    
@@ -51,8 +77,16 @@
 22 %m %m      |ld (%m), hl|~          |           |   |   |    |ld (%m), hl   |~   
               |shld %m    |           |           |   |   |    |shld %m       |    
               |           |           |           |   |   |    |              |    
+24            |inc h      |~          |~          |   |   |    |inc h         |~   
+              |inr h      |           |           |   |   |    |inr h         |    
+              |           |           |           |   |   |    |              |    
+25            |dcr h      |~          |~          |   |   |    |dcr h         |~   
+              |dec h      |           |           |   |   |    |dec h         |    
+              |           |           |           |   |   |    |              |    
 26 %n         |ld h, %n   |~          |~          |   |   |    |ld h, %n      |~   
               |mvi h, %n  |           |           |   |   |    |mvi h, %n     |    
+              |           |           |           |   |   |    |              |    
+27            |daa        |~          |~          |   |   |    |daa           |~   
               |           |           |           |   |   |    |              |    
 2A            |           |           |ld a, (hl+)|   |   |    |              |    
               |           |           |ld a, (hli)|   |   |    |              |    
@@ -61,8 +95,21 @@
 2A %m %m      |ld hl, (%m)|~          |           |   |   |    |ld hl, (%m)   |~   
               |lhld %m    |           |           |   |   |    |lhld %m       |    
               |           |           |           |   |   |    |              |    
+2C            |inc l      |~          |~          |   |   |    |inc l         |~   
+              |inr l      |           |           |   |   |    |inr l         |    
+              |           |           |           |   |   |    |              |    
+2D            |dcr l      |~          |~          |   |   |    |dcr l         |~   
+              |dec l      |           |           |   |   |    |dec l         |    
+              |           |           |           |   |   |    |              |    
 2E %n         |ld l, %n   |~          |~          |   |   |    |ld l, %n      |~   
               |mvi l, %n  |           |           |   |   |    |mvi l, %n     |    
+              |           |           |           |   |   |    |              |    
+2F            |cma        |~          |~          |   |   |    |cma           |~   
+              |cpl        |           |           |   |   |    |cpl           |    
+              |cpl a      |           |           |   |   |    |cpl a         |    
+              |           |           |           |   |   |    |              |    
+2F; 3C        |neg        |~          |~          |   |   |    |              |    
+              |neg a      |           |           |   |   |    |              |    
               |           |           |           |   |   |    |              |    
 31 %m %m      |ld sp, %m  |~          |~          |   |   |    |ld sp, %m     |~   
               |lxi sp, %m |           |           |   |   |    |lxi sp, %m    |    
@@ -73,6 +120,12 @@
               |           |           |           |   |   |    |              |    
 32 %m %m      |ld (%m), a |~          |           |   |   |    |ld (%m), a    |~   
               |sta %m     |           |           |   |   |    |sta %m        |    
+              |           |           |           |   |   |    |              |    
+34            |inc (hl)   |~          |~          |   |   |    |inc (hl)      |~   
+              |inr m      |           |           |   |   |    |inr m         |    
+              |           |           |           |   |   |    |              |    
+35            |dcr m      |~          |~          |   |   |    |dcr m         |~   
+              |dec (hl)   |           |           |   |   |    |dec (hl)      |    
               |           |           |           |   |   |    |              |    
 36 %n         |ld (hl), %n|~          |~          |   |   |    |ld (hl), %n   |~   
               |mvi m, %n  |           |           |   |   |    |mvi m, %n     |    
@@ -86,6 +139,12 @@
               |           |           |           |   |   |    |              |    
 3A %m %m      |ld a, (%m) |~          |           |   |   |    |ld a, (%m)    |~   
               |lda %m     |           |           |   |   |    |lda %m        |    
+              |           |           |           |   |   |    |              |    
+3C            |inc a      |~          |~          |   |   |    |inc a         |~   
+              |inr a      |           |           |   |   |    |inr a         |    
+              |           |           |           |   |   |    |              |    
+3D            |dcr a      |~          |~          |   |   |    |dcr a         |~   
+              |dec a      |           |           |   |   |    |dec a         |    
               |           |           |           |   |   |    |              |    
 3E %n         |ld a, %n   |~          |~          |   |   |    |ld a, %n      |~   
               |mvi a, %n  |           |           |   |   |    |mvi a, %n     |    
@@ -255,6 +314,9 @@
 75            |ld (hl), l |~          |~          |   |   |    |ld (hl), l    |~   
               |mov m, l   |           |           |   |   |    |mov m, l      |    
               |           |           |           |   |   |    |              |    
+76            |halt       |~          |~          |   |   |    |halt          |~   
+              |hlt        |           |           |   |   |    |hlt           |    
+              |           |           |           |   |   |    |              |    
 77            |ld (hl), a |~          |~          |   |   |    |ld (hl), a    |~   
               |mov m, a   |           |           |   |   |    |mov m, a      |    
               |           |           |           |   |   |    |              |    
@@ -357,35 +419,44 @@
 97            |sub a      |~          |~          |   |   |    |sub a         |~   
               |sub a, a   |           |           |   |   |    |sub a, a      |    
               |           |           |           |   |   |    |              |    
-98            |sbb b      |~          |~          |   |   |    |sbb b         |~   
+98            |sbb a, b   |~          |~          |   |   |    |sbb a, b      |~   
+              |sbb b      |           |           |   |   |    |sbb b         |    
               |sbc a, b   |           |           |   |   |    |sbc a, b      |    
               |sbc b      |           |           |   |   |    |sbc b         |    
               |           |           |           |   |   |    |              |    
-99            |sbb c      |~          |~          |   |   |    |sbb c         |~   
+99            |sbb a, c   |~          |~          |   |   |    |sbb a, c      |~   
+              |sbb c      |           |           |   |   |    |sbb c         |    
               |sbc a, c   |           |           |   |   |    |sbc a, c      |    
               |sbc c      |           |           |   |   |    |sbc c         |    
               |           |           |           |   |   |    |              |    
-9A            |sbb d      |~          |~          |   |   |    |sbb d         |~   
+9A            |sbb a, d   |~          |~          |   |   |    |sbb a, d      |~   
+              |sbb d      |           |           |   |   |    |sbb d         |    
               |sbc a, d   |           |           |   |   |    |sbc a, d      |    
               |sbc d      |           |           |   |   |    |sbc d         |    
               |           |           |           |   |   |    |              |    
-9B            |sbb e      |~          |~          |   |   |    |sbb e         |~   
+9B            |sbb a, e   |~          |~          |   |   |    |sbb a, e      |~   
+              |sbb e      |           |           |   |   |    |sbb e         |    
               |sbc a, e   |           |           |   |   |    |sbc a, e      |    
               |sbc e      |           |           |   |   |    |sbc e         |    
               |           |           |           |   |   |    |              |    
-9C            |sbb h      |~          |~          |   |   |    |sbb h         |~   
+9C            |sbb a, h   |~          |~          |   |   |    |sbb a, h      |~   
+              |sbb h      |           |           |   |   |    |sbb h         |    
               |sbc a, h   |           |           |   |   |    |sbc a, h      |    
               |sbc h      |           |           |   |   |    |sbc h         |    
               |           |           |           |   |   |    |              |    
-9D            |sbb l      |~          |~          |   |   |    |sbb l         |~   
+9D            |sbb a, l   |~          |~          |   |   |    |sbb a, l      |~   
+              |sbb l      |           |           |   |   |    |sbb l         |    
               |sbc a, l   |           |           |   |   |    |sbc a, l      |    
               |sbc l      |           |           |   |   |    |sbc l         |    
               |           |           |           |   |   |    |              |    
-9E            |sbb m      |~          |~          |   |   |    |sbb m         |~   
+9E            |sbb (hl)   |~          |~          |   |   |    |sbb (hl)      |~   
+              |sbb a, (hl)|           |           |   |   |    |sbb a, (hl)   |    
+              |sbb m      |           |           |   |   |    |sbb m         |    
               |sbc (hl)   |           |           |   |   |    |sbc (hl)      |    
               |sbc a, (hl)|           |           |   |   |    |sbc a, (hl)   |    
               |           |           |           |   |   |    |              |    
 9F            |sbb a      |~          |~          |   |   |    |sbb a         |~   
+              |sbb a, a   |           |           |   |   |    |sbb a, a      |    
               |sbc a      |           |           |   |   |    |sbc a         |    
               |sbc a, a   |           |           |   |   |    |sbc a, a      |    
               |           |           |           |   |   |    |              |    
@@ -485,37 +556,46 @@ B7            |or a       |~          |~          |   |   |    |or a          |~
               |or a, a    |           |           |   |   |    |or a, a       |    
               |ora a      |           |           |   |   |    |ora a         |    
               |           |           |           |   |   |    |              |    
-B8            |cmp b      |~          |cmp b      |   |   |    |cmp b         |~   
-              |           |           |cp a, b    |   |   |    |cp a, b       |    
-              |           |           |cp b       |   |   |    |cp b          |    
+B8            |cmp a, b   |~          |~          |   |   |    |cmp a, b      |~   
+              |cmp b      |           |           |   |   |    |cmp b         |    
+              |cp a, b    |           |           |   |   |    |cp a, b       |    
+              |cp b       |           |           |   |   |    |cp b          |    
               |           |           |           |   |   |    |              |    
-B9            |cmp c      |~          |cmp c      |   |   |    |cmp c         |~   
-              |           |           |cp a, c    |   |   |    |cp a, c       |    
-              |           |           |cp c       |   |   |    |cp c          |    
+B9            |cmp a, c   |~          |~          |   |   |    |cmp a, c      |~   
+              |cmp c      |           |           |   |   |    |cmp c         |    
+              |cp a, c    |           |           |   |   |    |cp a, c       |    
+              |cp c       |           |           |   |   |    |cp c          |    
               |           |           |           |   |   |    |              |    
-BA            |cmp d      |~          |cmp d      |   |   |    |cmp d         |~   
-              |           |           |cp a, d    |   |   |    |cp a, d       |    
-              |           |           |cp d       |   |   |    |cp d          |    
+BA            |cmp a, d   |~          |~          |   |   |    |cmp a, d      |~   
+              |cmp d      |           |           |   |   |    |cmp d         |    
+              |cp a, d    |           |           |   |   |    |cp a, d       |    
+              |cp d       |           |           |   |   |    |cp d          |    
               |           |           |           |   |   |    |              |    
-BB            |cmp e      |~          |cmp e      |   |   |    |cmp e         |~   
-              |           |           |cp a, e    |   |   |    |cp a, e       |    
-              |           |           |cp e       |   |   |    |cp e          |    
+BB            |cmp a, e   |~          |~          |   |   |    |cmp a, e      |~   
+              |cmp e      |           |           |   |   |    |cmp e         |    
+              |cp a, e    |           |           |   |   |    |cp a, e       |    
+              |cp e       |           |           |   |   |    |cp e          |    
               |           |           |           |   |   |    |              |    
-BC            |cmp h      |~          |cmp h      |   |   |    |cmp h         |~   
-              |           |           |cp a, h    |   |   |    |cp a, h       |    
-              |           |           |cp h       |   |   |    |cp h          |    
+BC            |cmp a, h   |~          |~          |   |   |    |cmp a, h      |~   
+              |cmp h      |           |           |   |   |    |cmp h         |    
+              |cp a, h    |           |           |   |   |    |cp a, h       |    
+              |cp h       |           |           |   |   |    |cp h          |    
               |           |           |           |   |   |    |              |    
-BD            |cmp l      |~          |cmp l      |   |   |    |cmp l         |~   
-              |           |           |cp a, l    |   |   |    |cp a, l       |    
-              |           |           |cp l       |   |   |    |cp l          |    
+BD            |cmp a, l   |~          |~          |   |   |    |cmp a, l      |~   
+              |cmp l      |           |           |   |   |    |cmp l         |    
+              |cp a, l    |           |           |   |   |    |cp a, l       |    
+              |cp l       |           |           |   |   |    |cp l          |    
               |           |           |           |   |   |    |              |    
-BE            |cmp m      |~          |cmp m      |   |   |    |cmp m         |~   
-              |           |           |cp (hl)    |   |   |    |cp (hl)       |    
-              |           |           |cp a, (hl) |   |   |    |cp a, (hl)    |    
+BE            |cmp (hl)   |~          |~          |   |   |    |cmp (hl)      |~   
+              |cmp a, (hl)|           |           |   |   |    |cmp a, (hl)   |    
+              |cmp m      |           |           |   |   |    |cmp m         |    
+              |cp (hl)    |           |           |   |   |    |cp (hl)       |    
+              |cp a, (hl) |           |           |   |   |    |cp a, (hl)    |    
               |           |           |           |   |   |    |              |    
-BF            |cmp a      |~          |cmp a      |   |   |    |cmp a         |~   
-              |           |           |cp a       |   |   |    |cp a          |    
-              |           |           |cp a, a    |   |   |    |cp a, a       |    
+BF            |cmp a      |~          |~          |   |   |    |cmp a         |~   
+              |cmp a, a   |           |           |   |   |    |cmp a, a      |    
+              |cp a       |           |           |   |   |    |cp a          |    
+              |cp a, a    |           |           |   |   |    |cp a, a       |    
               |           |           |           |   |   |    |              |    
 C1            |pop b      |~          |~          |   |   |    |pop b         |~   
               |pop bc     |           |           |   |   |    |pop bc        |    
@@ -526,6 +606,392 @@ C5            |push b     |~          |~          |   |   |    |push b        |~
 C6 %n         |add %n     |~          |~          |   |   |    |add %n        |~   
               |add a, %n  |           |           |   |   |    |add a, %n     |    
               |adi %n     |           |           |   |   |    |adi %n        |    
+              |           |           |           |   |   |    |              |    
+C7            |rst 0      |~          |~          |   |   |    |rst 0         |~   
+              |           |           |           |   |   |    |              |    
+CB 40         |           |           |bit 0, b   |   |   |    |bit 0, b      |~   
+              |           |           |           |   |   |    |              |    
+CB 41         |           |           |bit 0, c   |   |   |    |bit 0, c      |~   
+              |           |           |           |   |   |    |              |    
+CB 42         |           |           |bit 0, d   |   |   |    |bit 0, d      |~   
+              |           |           |           |   |   |    |              |    
+CB 43         |           |           |bit 0, e   |   |   |    |bit 0, e      |~   
+              |           |           |           |   |   |    |              |    
+CB 44         |           |           |bit 0, h   |   |   |    |bit 0, h      |~   
+              |           |           |           |   |   |    |              |    
+CB 45         |           |           |bit 0, l   |   |   |    |bit 0, l      |~   
+              |           |           |           |   |   |    |              |    
+CB 46         |           |           |bit 0, (hl)|   |   |    |bit 0, (hl)   |~   
+              |           |           |           |   |   |    |              |    
+CB 47         |           |           |bit 0, a   |   |   |    |bit 0, a      |~   
+              |           |           |           |   |   |    |              |    
+CB 48         |           |           |bit 1, b   |   |   |    |bit 1, b      |~   
+              |           |           |           |   |   |    |              |    
+CB 49         |           |           |bit 1, c   |   |   |    |bit 1, c      |~   
+              |           |           |           |   |   |    |              |    
+CB 4A         |           |           |bit 1, d   |   |   |    |bit 1, d      |~   
+              |           |           |           |   |   |    |              |    
+CB 4B         |           |           |bit 1, e   |   |   |    |bit 1, e      |~   
+              |           |           |           |   |   |    |              |    
+CB 4C         |           |           |bit 1, h   |   |   |    |bit 1, h      |~   
+              |           |           |           |   |   |    |              |    
+CB 4D         |           |           |bit 1, l   |   |   |    |bit 1, l      |~   
+              |           |           |           |   |   |    |              |    
+CB 4E         |           |           |bit 1, (hl)|   |   |    |bit 1, (hl)   |~   
+              |           |           |           |   |   |    |              |    
+CB 4F         |           |           |bit 1, a   |   |   |    |bit 1, a      |~   
+              |           |           |           |   |   |    |              |    
+CB 50         |           |           |bit 2, b   |   |   |    |bit 2, b      |~   
+              |           |           |           |   |   |    |              |    
+CB 51         |           |           |bit 2, c   |   |   |    |bit 2, c      |~   
+              |           |           |           |   |   |    |              |    
+CB 52         |           |           |bit 2, d   |   |   |    |bit 2, d      |~   
+              |           |           |           |   |   |    |              |    
+CB 53         |           |           |bit 2, e   |   |   |    |bit 2, e      |~   
+              |           |           |           |   |   |    |              |    
+CB 54         |           |           |bit 2, h   |   |   |    |bit 2, h      |~   
+              |           |           |           |   |   |    |              |    
+CB 55         |           |           |bit 2, l   |   |   |    |bit 2, l      |~   
+              |           |           |           |   |   |    |              |    
+CB 56         |           |           |bit 2, (hl)|   |   |    |bit 2, (hl)   |~   
+              |           |           |           |   |   |    |              |    
+CB 57         |           |           |bit 2, a   |   |   |    |bit 2, a      |~   
+              |           |           |           |   |   |    |              |    
+CB 58         |           |           |bit 3, b   |   |   |    |bit 3, b      |~   
+              |           |           |           |   |   |    |              |    
+CB 59         |           |           |bit 3, c   |   |   |    |bit 3, c      |~   
+              |           |           |           |   |   |    |              |    
+CB 5A         |           |           |bit 3, d   |   |   |    |bit 3, d      |~   
+              |           |           |           |   |   |    |              |    
+CB 5B         |           |           |bit 3, e   |   |   |    |bit 3, e      |~   
+              |           |           |           |   |   |    |              |    
+CB 5C         |           |           |bit 3, h   |   |   |    |bit 3, h      |~   
+              |           |           |           |   |   |    |              |    
+CB 5D         |           |           |bit 3, l   |   |   |    |bit 3, l      |~   
+              |           |           |           |   |   |    |              |    
+CB 5E         |           |           |bit 3, (hl)|   |   |    |bit 3, (hl)   |~   
+              |           |           |           |   |   |    |              |    
+CB 5F         |           |           |bit 3, a   |   |   |    |bit 3, a      |~   
+              |           |           |           |   |   |    |              |    
+CB 60         |           |           |bit 4, b   |   |   |    |bit 4, b      |~   
+              |           |           |           |   |   |    |              |    
+CB 61         |           |           |bit 4, c   |   |   |    |bit 4, c      |~   
+              |           |           |           |   |   |    |              |    
+CB 62         |           |           |bit 4, d   |   |   |    |bit 4, d      |~   
+              |           |           |           |   |   |    |              |    
+CB 63         |           |           |bit 4, e   |   |   |    |bit 4, e      |~   
+              |           |           |           |   |   |    |              |    
+CB 64         |           |           |bit 4, h   |   |   |    |bit 4, h      |~   
+              |           |           |           |   |   |    |              |    
+CB 65         |           |           |bit 4, l   |   |   |    |bit 4, l      |~   
+              |           |           |           |   |   |    |              |    
+CB 66         |           |           |bit 4, (hl)|   |   |    |bit 4, (hl)   |~   
+              |           |           |           |   |   |    |              |    
+CB 67         |           |           |bit 4, a   |   |   |    |bit 4, a      |~   
+              |           |           |           |   |   |    |              |    
+CB 68         |           |           |bit 5, b   |   |   |    |bit 5, b      |~   
+              |           |           |           |   |   |    |              |    
+CB 69         |           |           |bit 5, c   |   |   |    |bit 5, c      |~   
+              |           |           |           |   |   |    |              |    
+CB 6A         |           |           |bit 5, d   |   |   |    |bit 5, d      |~   
+              |           |           |           |   |   |    |              |    
+CB 6B         |           |           |bit 5, e   |   |   |    |bit 5, e      |~   
+              |           |           |           |   |   |    |              |    
+CB 6C         |           |           |bit 5, h   |   |   |    |bit 5, h      |~   
+              |           |           |           |   |   |    |              |    
+CB 6D         |           |           |bit 5, l   |   |   |    |bit 5, l      |~   
+              |           |           |           |   |   |    |              |    
+CB 6E         |           |           |bit 5, (hl)|   |   |    |bit 5, (hl)   |~   
+              |           |           |           |   |   |    |              |    
+CB 6F         |           |           |bit 5, a   |   |   |    |bit 5, a      |~   
+              |           |           |           |   |   |    |              |    
+CB 70         |           |           |bit 6, b   |   |   |    |bit 6, b      |~   
+              |           |           |           |   |   |    |              |    
+CB 71         |           |           |bit 6, c   |   |   |    |bit 6, c      |~   
+              |           |           |           |   |   |    |              |    
+CB 72         |           |           |bit 6, d   |   |   |    |bit 6, d      |~   
+              |           |           |           |   |   |    |              |    
+CB 73         |           |           |bit 6, e   |   |   |    |bit 6, e      |~   
+              |           |           |           |   |   |    |              |    
+CB 74         |           |           |bit 6, h   |   |   |    |bit 6, h      |~   
+              |           |           |           |   |   |    |              |    
+CB 75         |           |           |bit 6, l   |   |   |    |bit 6, l      |~   
+              |           |           |           |   |   |    |              |    
+CB 76         |           |           |bit 6, (hl)|   |   |    |bit 6, (hl)   |~   
+              |           |           |           |   |   |    |              |    
+CB 77         |           |           |bit 6, a   |   |   |    |bit 6, a      |~   
+              |           |           |           |   |   |    |              |    
+CB 78         |           |           |bit 7, b   |   |   |    |bit 7, b      |~   
+              |           |           |           |   |   |    |              |    
+CB 79         |           |           |bit 7, c   |   |   |    |bit 7, c      |~   
+              |           |           |           |   |   |    |              |    
+CB 7A         |           |           |bit 7, d   |   |   |    |bit 7, d      |~   
+              |           |           |           |   |   |    |              |    
+CB 7B         |           |           |bit 7, e   |   |   |    |bit 7, e      |~   
+              |           |           |           |   |   |    |              |    
+CB 7C         |           |           |bit 7, h   |   |   |    |bit 7, h      |~   
+              |           |           |           |   |   |    |              |    
+CB 7D         |           |           |bit 7, l   |   |   |    |bit 7, l      |~   
+              |           |           |           |   |   |    |              |    
+CB 7E         |           |           |bit 7, (hl)|   |   |    |bit 7, (hl)   |~   
+              |           |           |           |   |   |    |              |    
+CB 7F         |           |           |bit 7, a   |   |   |    |bit 7, a      |~   
+              |           |           |           |   |   |    |              |    
+CB 80         |           |           |res 0, b   |   |   |    |res 0, b      |~   
+              |           |           |           |   |   |    |              |    
+CB 81         |           |           |res 0, c   |   |   |    |res 0, c      |~   
+              |           |           |           |   |   |    |              |    
+CB 82         |           |           |res 0, d   |   |   |    |res 0, d      |~   
+              |           |           |           |   |   |    |              |    
+CB 83         |           |           |res 0, e   |   |   |    |res 0, e      |~   
+              |           |           |           |   |   |    |              |    
+CB 84         |           |           |res 0, h   |   |   |    |res 0, h      |~   
+              |           |           |           |   |   |    |              |    
+CB 85         |           |           |res 0, l   |   |   |    |res 0, l      |~   
+              |           |           |           |   |   |    |              |    
+CB 86         |           |           |res 0, (hl)|   |   |    |res 0, (hl)   |~   
+              |           |           |           |   |   |    |              |    
+CB 87         |           |           |res 0, a   |   |   |    |res 0, a      |~   
+              |           |           |           |   |   |    |              |    
+CB 88         |           |           |res 1, b   |   |   |    |res 1, b      |~   
+              |           |           |           |   |   |    |              |    
+CB 89         |           |           |res 1, c   |   |   |    |res 1, c      |~   
+              |           |           |           |   |   |    |              |    
+CB 8A         |           |           |res 1, d   |   |   |    |res 1, d      |~   
+              |           |           |           |   |   |    |              |    
+CB 8B         |           |           |res 1, e   |   |   |    |res 1, e      |~   
+              |           |           |           |   |   |    |              |    
+CB 8C         |           |           |res 1, h   |   |   |    |res 1, h      |~   
+              |           |           |           |   |   |    |              |    
+CB 8D         |           |           |res 1, l   |   |   |    |res 1, l      |~   
+              |           |           |           |   |   |    |              |    
+CB 8E         |           |           |res 1, (hl)|   |   |    |res 1, (hl)   |~   
+              |           |           |           |   |   |    |              |    
+CB 8F         |           |           |res 1, a   |   |   |    |res 1, a      |~   
+              |           |           |           |   |   |    |              |    
+CB 90         |           |           |res 2, b   |   |   |    |res 2, b      |~   
+              |           |           |           |   |   |    |              |    
+CB 91         |           |           |res 2, c   |   |   |    |res 2, c      |~   
+              |           |           |           |   |   |    |              |    
+CB 92         |           |           |res 2, d   |   |   |    |res 2, d      |~   
+              |           |           |           |   |   |    |              |    
+CB 93         |           |           |res 2, e   |   |   |    |res 2, e      |~   
+              |           |           |           |   |   |    |              |    
+CB 94         |           |           |res 2, h   |   |   |    |res 2, h      |~   
+              |           |           |           |   |   |    |              |    
+CB 95         |           |           |res 2, l   |   |   |    |res 2, l      |~   
+              |           |           |           |   |   |    |              |    
+CB 96         |           |           |res 2, (hl)|   |   |    |res 2, (hl)   |~   
+              |           |           |           |   |   |    |              |    
+CB 97         |           |           |res 2, a   |   |   |    |res 2, a      |~   
+              |           |           |           |   |   |    |              |    
+CB 98         |           |           |res 3, b   |   |   |    |res 3, b      |~   
+              |           |           |           |   |   |    |              |    
+CB 99         |           |           |res 3, c   |   |   |    |res 3, c      |~   
+              |           |           |           |   |   |    |              |    
+CB 9A         |           |           |res 3, d   |   |   |    |res 3, d      |~   
+              |           |           |           |   |   |    |              |    
+CB 9B         |           |           |res 3, e   |   |   |    |res 3, e      |~   
+              |           |           |           |   |   |    |              |    
+CB 9C         |           |           |res 3, h   |   |   |    |res 3, h      |~   
+              |           |           |           |   |   |    |              |    
+CB 9D         |           |           |res 3, l   |   |   |    |res 3, l      |~   
+              |           |           |           |   |   |    |              |    
+CB 9E         |           |           |res 3, (hl)|   |   |    |res 3, (hl)   |~   
+              |           |           |           |   |   |    |              |    
+CB 9F         |           |           |res 3, a   |   |   |    |res 3, a      |~   
+              |           |           |           |   |   |    |              |    
+CB A0         |           |           |res 4, b   |   |   |    |res 4, b      |~   
+              |           |           |           |   |   |    |              |    
+CB A1         |           |           |res 4, c   |   |   |    |res 4, c      |~   
+              |           |           |           |   |   |    |              |    
+CB A2         |           |           |res 4, d   |   |   |    |res 4, d      |~   
+              |           |           |           |   |   |    |              |    
+CB A3         |           |           |res 4, e   |   |   |    |res 4, e      |~   
+              |           |           |           |   |   |    |              |    
+CB A4         |           |           |res 4, h   |   |   |    |res 4, h      |~   
+              |           |           |           |   |   |    |              |    
+CB A5         |           |           |res 4, l   |   |   |    |res 4, l      |~   
+              |           |           |           |   |   |    |              |    
+CB A6         |           |           |res 4, (hl)|   |   |    |res 4, (hl)   |~   
+              |           |           |           |   |   |    |              |    
+CB A7         |           |           |res 4, a   |   |   |    |res 4, a      |~   
+              |           |           |           |   |   |    |              |    
+CB A8         |           |           |res 5, b   |   |   |    |res 5, b      |~   
+              |           |           |           |   |   |    |              |    
+CB A9         |           |           |res 5, c   |   |   |    |res 5, c      |~   
+              |           |           |           |   |   |    |              |    
+CB AA         |           |           |res 5, d   |   |   |    |res 5, d      |~   
+              |           |           |           |   |   |    |              |    
+CB AB         |           |           |res 5, e   |   |   |    |res 5, e      |~   
+              |           |           |           |   |   |    |              |    
+CB AC         |           |           |res 5, h   |   |   |    |res 5, h      |~   
+              |           |           |           |   |   |    |              |    
+CB AD         |           |           |res 5, l   |   |   |    |res 5, l      |~   
+              |           |           |           |   |   |    |              |    
+CB AE         |           |           |res 5, (hl)|   |   |    |res 5, (hl)   |~   
+              |           |           |           |   |   |    |              |    
+CB AF         |           |           |res 5, a   |   |   |    |res 5, a      |~   
+              |           |           |           |   |   |    |              |    
+CB B0         |           |           |res 6, b   |   |   |    |res 6, b      |~   
+              |           |           |           |   |   |    |              |    
+CB B1         |           |           |res 6, c   |   |   |    |res 6, c      |~   
+              |           |           |           |   |   |    |              |    
+CB B2         |           |           |res 6, d   |   |   |    |res 6, d      |~   
+              |           |           |           |   |   |    |              |    
+CB B3         |           |           |res 6, e   |   |   |    |res 6, e      |~   
+              |           |           |           |   |   |    |              |    
+CB B4         |           |           |res 6, h   |   |   |    |res 6, h      |~   
+              |           |           |           |   |   |    |              |    
+CB B5         |           |           |res 6, l   |   |   |    |res 6, l      |~   
+              |           |           |           |   |   |    |              |    
+CB B6         |           |           |res 6, (hl)|   |   |    |res 6, (hl)   |~   
+              |           |           |           |   |   |    |              |    
+CB B7         |           |           |res 6, a   |   |   |    |res 6, a      |~   
+              |           |           |           |   |   |    |              |    
+CB B8         |           |           |res 7, b   |   |   |    |res 7, b      |~   
+              |           |           |           |   |   |    |              |    
+CB B9         |           |           |res 7, c   |   |   |    |res 7, c      |~   
+              |           |           |           |   |   |    |              |    
+CB BA         |           |           |res 7, d   |   |   |    |res 7, d      |~   
+              |           |           |           |   |   |    |              |    
+CB BB         |           |           |res 7, e   |   |   |    |res 7, e      |~   
+              |           |           |           |   |   |    |              |    
+CB BC         |           |           |res 7, h   |   |   |    |res 7, h      |~   
+              |           |           |           |   |   |    |              |    
+CB BD         |           |           |res 7, l   |   |   |    |res 7, l      |~   
+              |           |           |           |   |   |    |              |    
+CB BE         |           |           |res 7, (hl)|   |   |    |res 7, (hl)   |~   
+              |           |           |           |   |   |    |              |    
+CB BF         |           |           |res 7, a   |   |   |    |res 7, a      |~   
+              |           |           |           |   |   |    |              |    
+CB C0         |           |           |set 0, b   |   |   |    |set 0, b      |~   
+              |           |           |           |   |   |    |              |    
+CB C1         |           |           |set 0, c   |   |   |    |set 0, c      |~   
+              |           |           |           |   |   |    |              |    
+CB C2         |           |           |set 0, d   |   |   |    |set 0, d      |~   
+              |           |           |           |   |   |    |              |    
+CB C3         |           |           |set 0, e   |   |   |    |set 0, e      |~   
+              |           |           |           |   |   |    |              |    
+CB C4         |           |           |set 0, h   |   |   |    |set 0, h      |~   
+              |           |           |           |   |   |    |              |    
+CB C5         |           |           |set 0, l   |   |   |    |set 0, l      |~   
+              |           |           |           |   |   |    |              |    
+CB C6         |           |           |set 0, (hl)|   |   |    |set 0, (hl)   |~   
+              |           |           |           |   |   |    |              |    
+CB C7         |           |           |set 0, a   |   |   |    |set 0, a      |~   
+              |           |           |           |   |   |    |              |    
+CB C8         |           |           |set 1, b   |   |   |    |set 1, b      |~   
+              |           |           |           |   |   |    |              |    
+CB C9         |           |           |set 1, c   |   |   |    |set 1, c      |~   
+              |           |           |           |   |   |    |              |    
+CB CA         |           |           |set 1, d   |   |   |    |set 1, d      |~   
+              |           |           |           |   |   |    |              |    
+CB CB         |           |           |set 1, e   |   |   |    |set 1, e      |~   
+              |           |           |           |   |   |    |              |    
+CB CC         |           |           |set 1, h   |   |   |    |set 1, h      |~   
+              |           |           |           |   |   |    |              |    
+CB CD         |           |           |set 1, l   |   |   |    |set 1, l      |~   
+              |           |           |           |   |   |    |              |    
+CB CE         |           |           |set 1, (hl)|   |   |    |set 1, (hl)   |~   
+              |           |           |           |   |   |    |              |    
+CB CF         |           |           |set 1, a   |   |   |    |set 1, a      |~   
+              |           |           |           |   |   |    |              |    
+CB D0         |           |           |set 2, b   |   |   |    |set 2, b      |~   
+              |           |           |           |   |   |    |              |    
+CB D1         |           |           |set 2, c   |   |   |    |set 2, c      |~   
+              |           |           |           |   |   |    |              |    
+CB D2         |           |           |set 2, d   |   |   |    |set 2, d      |~   
+              |           |           |           |   |   |    |              |    
+CB D3         |           |           |set 2, e   |   |   |    |set 2, e      |~   
+              |           |           |           |   |   |    |              |    
+CB D4         |           |           |set 2, h   |   |   |    |set 2, h      |~   
+              |           |           |           |   |   |    |              |    
+CB D5         |           |           |set 2, l   |   |   |    |set 2, l      |~   
+              |           |           |           |   |   |    |              |    
+CB D6         |           |           |set 2, (hl)|   |   |    |set 2, (hl)   |~   
+              |           |           |           |   |   |    |              |    
+CB D7         |           |           |set 2, a   |   |   |    |set 2, a      |~   
+              |           |           |           |   |   |    |              |    
+CB D8         |           |           |set 3, b   |   |   |    |set 3, b      |~   
+              |           |           |           |   |   |    |              |    
+CB D9         |           |           |set 3, c   |   |   |    |set 3, c      |~   
+              |           |           |           |   |   |    |              |    
+CB DA         |           |           |set 3, d   |   |   |    |set 3, d      |~   
+              |           |           |           |   |   |    |              |    
+CB DB         |           |           |set 3, e   |   |   |    |set 3, e      |~   
+              |           |           |           |   |   |    |              |    
+CB DC         |           |           |set 3, h   |   |   |    |set 3, h      |~   
+              |           |           |           |   |   |    |              |    
+CB DD         |           |           |set 3, l   |   |   |    |set 3, l      |~   
+              |           |           |           |   |   |    |              |    
+CB DE         |           |           |set 3, (hl)|   |   |    |set 3, (hl)   |~   
+              |           |           |           |   |   |    |              |    
+CB DF         |           |           |set 3, a   |   |   |    |set 3, a      |~   
+              |           |           |           |   |   |    |              |    
+CB E0         |           |           |set 4, b   |   |   |    |set 4, b      |~   
+              |           |           |           |   |   |    |              |    
+CB E1         |           |           |set 4, c   |   |   |    |set 4, c      |~   
+              |           |           |           |   |   |    |              |    
+CB E2         |           |           |set 4, d   |   |   |    |set 4, d      |~   
+              |           |           |           |   |   |    |              |    
+CB E3         |           |           |set 4, e   |   |   |    |set 4, e      |~   
+              |           |           |           |   |   |    |              |    
+CB E4         |           |           |set 4, h   |   |   |    |set 4, h      |~   
+              |           |           |           |   |   |    |              |    
+CB E5         |           |           |set 4, l   |   |   |    |set 4, l      |~   
+              |           |           |           |   |   |    |              |    
+CB E6         |           |           |set 4, (hl)|   |   |    |set 4, (hl)   |~   
+              |           |           |           |   |   |    |              |    
+CB E7         |           |           |set 4, a   |   |   |    |set 4, a      |~   
+              |           |           |           |   |   |    |              |    
+CB E8         |           |           |set 5, b   |   |   |    |set 5, b      |~   
+              |           |           |           |   |   |    |              |    
+CB E9         |           |           |set 5, c   |   |   |    |set 5, c      |~   
+              |           |           |           |   |   |    |              |    
+CB EA         |           |           |set 5, d   |   |   |    |set 5, d      |~   
+              |           |           |           |   |   |    |              |    
+CB EB         |           |           |set 5, e   |   |   |    |set 5, e      |~   
+              |           |           |           |   |   |    |              |    
+CB EC         |           |           |set 5, h   |   |   |    |set 5, h      |~   
+              |           |           |           |   |   |    |              |    
+CB ED         |           |           |set 5, l   |   |   |    |set 5, l      |~   
+              |           |           |           |   |   |    |              |    
+CB EE         |           |           |set 5, (hl)|   |   |    |set 5, (hl)   |~   
+              |           |           |           |   |   |    |              |    
+CB EF         |           |           |set 5, a   |   |   |    |set 5, a      |~   
+              |           |           |           |   |   |    |              |    
+CB F0         |           |           |set 6, b   |   |   |    |set 6, b      |~   
+              |           |           |           |   |   |    |              |    
+CB F1         |           |           |set 6, c   |   |   |    |set 6, c      |~   
+              |           |           |           |   |   |    |              |    
+CB F2         |           |           |set 6, d   |   |   |    |set 6, d      |~   
+              |           |           |           |   |   |    |              |    
+CB F3         |           |           |set 6, e   |   |   |    |set 6, e      |~   
+              |           |           |           |   |   |    |              |    
+CB F4         |           |           |set 6, h   |   |   |    |set 6, h      |~   
+              |           |           |           |   |   |    |              |    
+CB F5         |           |           |set 6, l   |   |   |    |set 6, l      |~   
+              |           |           |           |   |   |    |              |    
+CB F6         |           |           |set 6, (hl)|   |   |    |set 6, (hl)   |~   
+              |           |           |           |   |   |    |              |    
+CB F7         |           |           |set 6, a   |   |   |    |set 6, a      |~   
+              |           |           |           |   |   |    |              |    
+CB F8         |           |           |set 7, b   |   |   |    |set 7, b      |~   
+              |           |           |           |   |   |    |              |    
+CB F9         |           |           |set 7, c   |   |   |    |set 7, c      |~   
+              |           |           |           |   |   |    |              |    
+CB FA         |           |           |set 7, d   |   |   |    |set 7, d      |~   
+              |           |           |           |   |   |    |              |    
+CB FB         |           |           |set 7, e   |   |   |    |set 7, e      |~   
+              |           |           |           |   |   |    |              |    
+CB FC         |           |           |set 7, h   |   |   |    |set 7, h      |~   
+              |           |           |           |   |   |    |              |    
+CB FD         |           |           |set 7, l   |   |   |    |set 7, l      |~   
+              |           |           |           |   |   |    |              |    
+CB FE         |           |           |set 7, (hl)|   |   |    |set 7, (hl)   |~   
+              |           |           |           |   |   |    |              |    
+CB FF         |           |           |set 7, a   |   |   |    |set 7, a      |~   
               |           |           |           |   |   |    |              |    
 CD @cpd       |cpd        |~          |~          |   |   |    |              |    
               |           |           |           |   |   |    |              |    
@@ -549,6 +1015,9 @@ CE %n         |aci %n     |~          |~          |   |   |    |aci %n        |~
               |adc %n     |           |           |   |   |    |adc %n        |    
               |adc a, %n  |           |           |   |   |    |adc a, %n     |    
               |           |           |           |   |   |    |              |    
+CF            |rst 8      |~          |~          |   |   |    |rst 8         |~   
+              |rst 1      |           |           |   |   |    |rst 1         |    
+              |           |           |           |   |   |    |              |    
 D1            |pop d      |~          |~          |   |   |    |pop d         |~   
               |pop de     |           |           |   |   |    |pop de        |    
               |           |           |           |   |   |    |              |    
@@ -558,6 +1027,9 @@ D5            |push d     |~          |~          |   |   |    |push d        |~
 D6 %n         |sub %n     |~          |~          |   |   |    |sub %n        |~   
               |sub a, %n  |           |           |   |   |    |sub a, %n     |    
               |sui %n     |           |           |   |   |    |sui %n        |    
+              |           |           |           |   |   |    |              |    
+D7            |rst 16     |~          |~          |   |   |    |rst 16        |~   
+              |rst 2      |           |           |   |   |    |rst 2         |    
               |           |           |           |   |   |    |              |    
 D9            |           |ld (de), hl|           |   |   |    |              |    
               |           |shlde      |           |   |   |    |              |    
@@ -572,6 +1044,14 @@ DD 26 %n      |           |           |           |   |   |    |ld ixh, %n    |~
 DD 2A %m %m   |           |           |           |   |   |    |ld ix, (%m)   |~   
               |           |           |           |   |   |    |              |    
 DD 2E %n      |           |           |           |   |   |    |ld ixl, %n    |~   
+              |           |           |           |   |   |    |              |    
+DD 34 %d      |           |           |           |   |   |    |inc (ix+%d)   |~   
+              |           |           |           |   |   |    |              |    
+DD 34 00      |           |           |           |   |   |    |inc (ix)      |~   
+              |           |           |           |   |   |    |              |    
+DD 35 %d      |           |           |           |   |   |    |dec (ix+%d)   |~   
+              |           |           |           |   |   |    |              |    
+DD 35 00      |           |           |           |   |   |    |dec (ix)      |~   
               |           |           |           |   |   |    |              |    
 DD 36 %d %n   |           |           |           |   |   |    |ld (ix+%d), %n|~   
               |           |           |           |   |   |    |              |    
@@ -681,6 +1161,62 @@ DD 7E %d      |           |           |           |   |   |    |ld a, (ix+%d) |~
               |           |           |           |   |   |    |              |    
 DD 7E 00      |           |           |           |   |   |    |ld a, (ix)    |~   
               |           |           |           |   |   |    |              |    
+DD 86 %d      |           |           |           |   |   |    |add (ix+%d)   |~   
+              |           |           |           |   |   |    |add a, (ix+%d)|    
+              |           |           |           |   |   |    |              |    
+DD 86 00      |           |           |           |   |   |    |add (ix)      |~   
+              |           |           |           |   |   |    |add a, (ix)   |    
+              |           |           |           |   |   |    |              |    
+DD 8E %d      |           |           |           |   |   |    |adc (ix+%d)   |~   
+              |           |           |           |   |   |    |adc a, (ix+%d)|    
+              |           |           |           |   |   |    |              |    
+DD 8E 00      |           |           |           |   |   |    |adc (ix)      |~   
+              |           |           |           |   |   |    |adc a, (ix)   |    
+              |           |           |           |   |   |    |              |    
+DD 96 %d      |           |           |           |   |   |    |sub (ix+%d)   |~   
+              |           |           |           |   |   |    |sub a, (ix+%d)|    
+              |           |           |           |   |   |    |              |    
+DD 96 00      |           |           |           |   |   |    |sub (ix)      |~   
+              |           |           |           |   |   |    |sub a, (ix)   |    
+              |           |           |           |   |   |    |              |    
+DD 9E %d      |           |           |           |   |   |    |sbb (ix+%d)   |~   
+              |           |           |           |   |   |    |sbb a, (ix+%d)|    
+              |           |           |           |   |   |    |sbc (ix+%d)   |    
+              |           |           |           |   |   |    |sbc a, (ix+%d)|    
+              |           |           |           |   |   |    |              |    
+DD 9E 00      |           |           |           |   |   |    |sbb (ix)      |~   
+              |           |           |           |   |   |    |sbb a, (ix)   |    
+              |           |           |           |   |   |    |sbc (ix)      |    
+              |           |           |           |   |   |    |sbc a, (ix)   |    
+              |           |           |           |   |   |    |              |    
+DD A6 %d      |           |           |           |   |   |    |and (ix+%d)   |~   
+              |           |           |           |   |   |    |and a, (ix+%d)|    
+              |           |           |           |   |   |    |              |    
+DD A6 00      |           |           |           |   |   |    |and (ix)      |~   
+              |           |           |           |   |   |    |and a, (ix)   |    
+              |           |           |           |   |   |    |              |    
+DD AE %d      |           |           |           |   |   |    |xor (ix+%d)   |~   
+              |           |           |           |   |   |    |xor a, (ix+%d)|    
+              |           |           |           |   |   |    |              |    
+DD AE 00      |           |           |           |   |   |    |xor (ix)      |~   
+              |           |           |           |   |   |    |xor a, (ix)   |    
+              |           |           |           |   |   |    |              |    
+DD B6 %d      |           |           |           |   |   |    |or (ix+%d)    |~   
+              |           |           |           |   |   |    |or a, (ix+%d) |    
+              |           |           |           |   |   |    |              |    
+DD B6 00      |           |           |           |   |   |    |or (ix)       |~   
+              |           |           |           |   |   |    |or a, (ix)    |    
+              |           |           |           |   |   |    |              |    
+DD BE %d      |           |           |           |   |   |    |cmp (ix+%d)   |~   
+              |           |           |           |   |   |    |cmp a, (ix+%d)|    
+              |           |           |           |   |   |    |cp (ix+%d)    |    
+              |           |           |           |   |   |    |cp a, (ix+%d) |    
+              |           |           |           |   |   |    |              |    
+DD BE 00      |           |           |           |   |   |    |cmp (ix)      |~   
+              |           |           |           |   |   |    |cmp a, (ix)   |    
+              |           |           |           |   |   |    |cp (ix)       |    
+              |           |           |           |   |   |    |cp a, (ix)    |    
+              |           |           |           |   |   |    |              |    
 DD E1         |           |           |           |   |   |    |pop ix        |~   
               |           |           |           |   |   |    |              |    
 DD E3         |           |           |           |   |   |    |ex (sp), ix   |~   
@@ -689,9 +1225,14 @@ DD E5         |           |           |           |   |   |    |push ix       |~
               |           |           |           |   |   |    |              |    
 DD F9         |           |           |           |   |   |    |ld sp, ix     |~   
               |           |           |           |   |   |    |              |    
-DE %n         |sbc %n     |~          |~          |   |   |    |sbc %n        |~   
+DE %n         |sbb %n     |~          |~          |   |   |    |sbb %n        |~   
+              |sbb a, %n  |           |           |   |   |    |sbb a, %n     |    
+              |sbc %n     |           |           |   |   |    |sbc %n        |    
               |sbc a, %n  |           |           |   |   |    |sbc a, %n     |    
               |sbi %n     |           |           |   |   |    |sbi %n        |    
+              |           |           |           |   |   |    |              |    
+DF            |rst 24     |~          |~          |   |   |    |rst 24        |~   
+              |rst 3      |           |           |   |   |    |rst 3         |    
               |           |           |           |   |   |    |              |    
 E1            |pop h      |~          |~          |   |   |    |pop h         |~   
               |pop hl     |           |           |   |   |    |pop hl        |    
@@ -709,6 +1250,9 @@ E6 %n         |and %n     |~          |~          |   |   |    |and %n        |~
               |and a, %n  |           |           |   |   |    |and a, %n     |    
               |ani %n     |           |           |   |   |    |ani %n        |    
               |           |           |           |   |   |    |              |    
+E7            |rst 32     |~          |~          |   |   |    |rst 32        |~   
+              |rst 4      |           |           |   |   |    |rst 4         |    
+              |           |           |           |   |   |    |              |    
 EA %m %m      |           |           |ld (%m), a |   |   |    |              |    
               |           |           |sta %m     |   |   |    |              |    
               |           |           |           |   |   |    |              |    
@@ -721,6 +1265,11 @@ ED            |           |ld hl, (de)|           |   |   |    |              |
               |           |           |           |   |   |    |              |    
 ED 43 %m %m   |           |           |           |   |   |    |ld (%m), bc   |~   
               |           |           |           |   |   |    |              |    
+ED 44         |           |           |           |   |   |    |neg           |~   
+              |           |           |           |   |   |    |neg a         |    
+              |           |           |           |   |   |    |              |    
+ED 46         |           |           |           |   |   |    |im 0          |~   
+              |           |           |           |   |   |    |              |    
 ED 47         |           |           |           |   |   |    |ld i, a       |~   
               |           |           |           |   |   |    |              |    
 ED 4B %m %m   |           |           |           |   |   |    |ld bc, (%m)   |~   
@@ -729,9 +1278,13 @@ ED 4F         |           |           |           |   |   |    |ld r, a       |~
               |           |           |           |   |   |    |              |    
 ED 53 %m %m   |           |           |           |   |   |    |ld (%m), de   |~   
               |           |           |           |   |   |    |              |    
+ED 56         |           |           |           |   |   |    |im 1          |~   
+              |           |           |           |   |   |    |              |    
 ED 57         |           |           |           |   |   |    |ld a, i       |~   
               |           |           |           |   |   |    |              |    
 ED 5B %m %m   |           |           |           |   |   |    |ld de, (%m)   |~   
+              |           |           |           |   |   |    |              |    
+ED 5E         |           |           |           |   |   |    |im 2          |~   
               |           |           |           |   |   |    |              |    
 ED 5F         |           |           |           |   |   |    |ld a, r       |~   
               |           |           |           |   |   |    |              |    
@@ -759,8 +1312,13 @@ EE %n         |xor %n     |~          |~          |   |   |    |xor %n        |~
               |xor a, %n  |           |           |   |   |    |xor a, %n     |    
               |xri %n     |           |           |   |   |    |xri %n        |    
               |           |           |           |   |   |    |              |    
+EF            |rst 40     |~          |~          |   |   |    |rst 40        |~   
+              |rst 5      |           |           |   |   |    |rst 5         |    
+              |           |           |           |   |   |    |              |    
 F1            |pop af     |~          |~          |   |   |    |pop af        |~   
               |pop psw    |           |           |   |   |    |pop psw       |    
+              |           |           |           |   |   |    |              |    
+F3            |di         |~          |~          |   |   |    |di            |~   
               |           |           |           |   |   |    |              |    
 F5            |push af    |~          |~          |   |   |    |push af       |~   
               |push psw   |           |           |   |   |    |push psw      |    
@@ -769,11 +1327,16 @@ F6 %n         |or %n      |~          |~          |   |   |    |or %n         |~
               |or a, %n   |           |           |   |   |    |or a, %n      |    
               |ori %n     |           |           |   |   |    |ori %n        |    
               |           |           |           |   |   |    |              |    
+F7            |rst 48     |~          |~          |   |   |    |rst 48        |~   
+              |rst 6      |           |           |   |   |    |rst 6         |    
+              |           |           |           |   |   |    |              |    
 F9            |ld sp, hl  |~          |~          |   |   |    |ld sp, hl     |~   
               |sphl       |           |           |   |   |    |sphl          |    
               |           |           |           |   |   |    |              |    
 FA %m %m      |           |           |ld a, (%m) |   |   |    |              |    
               |           |           |lda %m     |   |   |    |              |    
+              |           |           |           |   |   |    |              |    
+FB            |ei         |~          |~          |   |   |    |ei            |~   
               |           |           |           |   |   |    |              |    
 FD 21 %m %m   |           |           |           |   |   |    |ld iy, %m     |~   
               |           |           |           |   |   |    |              |    
@@ -784,6 +1347,14 @@ FD 26 %n      |           |           |           |   |   |    |ld iyh, %n    |~
 FD 2A %m %m   |           |           |           |   |   |    |ld iy, (%m)   |~   
               |           |           |           |   |   |    |              |    
 FD 2E %n      |           |           |           |   |   |    |ld iyl, %n    |~   
+              |           |           |           |   |   |    |              |    
+FD 34 %d      |           |           |           |   |   |    |inc (iy+%d)   |~   
+              |           |           |           |   |   |    |              |    
+FD 34 00      |           |           |           |   |   |    |inc (iy)      |~   
+              |           |           |           |   |   |    |              |    
+FD 35 %d      |           |           |           |   |   |    |dec (iy+%d)   |~   
+              |           |           |           |   |   |    |              |    
+FD 35 00      |           |           |           |   |   |    |dec (iy)      |~   
               |           |           |           |   |   |    |              |    
 FD 36 %d %n   |           |           |           |   |   |    |ld (iy+%d), %n|~   
               |           |           |           |   |   |    |              |    
@@ -893,6 +1464,62 @@ FD 7E %d      |           |           |           |   |   |    |ld a, (iy+%d) |~
               |           |           |           |   |   |    |              |    
 FD 7E 00      |           |           |           |   |   |    |ld a, (iy)    |~   
               |           |           |           |   |   |    |              |    
+FD 86 %d      |           |           |           |   |   |    |add (iy+%d)   |~   
+              |           |           |           |   |   |    |add a, (iy+%d)|    
+              |           |           |           |   |   |    |              |    
+FD 86 00      |           |           |           |   |   |    |add (iy)      |~   
+              |           |           |           |   |   |    |add a, (iy)   |    
+              |           |           |           |   |   |    |              |    
+FD 8E %d      |           |           |           |   |   |    |adc (iy+%d)   |~   
+              |           |           |           |   |   |    |adc a, (iy+%d)|    
+              |           |           |           |   |   |    |              |    
+FD 8E 00      |           |           |           |   |   |    |adc (iy)      |~   
+              |           |           |           |   |   |    |adc a, (iy)   |    
+              |           |           |           |   |   |    |              |    
+FD 96 %d      |           |           |           |   |   |    |sub (iy+%d)   |~   
+              |           |           |           |   |   |    |sub a, (iy+%d)|    
+              |           |           |           |   |   |    |              |    
+FD 96 00      |           |           |           |   |   |    |sub (iy)      |~   
+              |           |           |           |   |   |    |sub a, (iy)   |    
+              |           |           |           |   |   |    |              |    
+FD 9E %d      |           |           |           |   |   |    |sbb (iy+%d)   |~   
+              |           |           |           |   |   |    |sbb a, (iy+%d)|    
+              |           |           |           |   |   |    |sbc (iy+%d)   |    
+              |           |           |           |   |   |    |sbc a, (iy+%d)|    
+              |           |           |           |   |   |    |              |    
+FD 9E 00      |           |           |           |   |   |    |sbb (iy)      |~   
+              |           |           |           |   |   |    |sbb a, (iy)   |    
+              |           |           |           |   |   |    |sbc (iy)      |    
+              |           |           |           |   |   |    |sbc a, (iy)   |    
+              |           |           |           |   |   |    |              |    
+FD A6 %d      |           |           |           |   |   |    |and (iy+%d)   |~   
+              |           |           |           |   |   |    |and a, (iy+%d)|    
+              |           |           |           |   |   |    |              |    
+FD A6 00      |           |           |           |   |   |    |and (iy)      |~   
+              |           |           |           |   |   |    |and a, (iy)   |    
+              |           |           |           |   |   |    |              |    
+FD AE %d      |           |           |           |   |   |    |xor (iy+%d)   |~   
+              |           |           |           |   |   |    |xor a, (iy+%d)|    
+              |           |           |           |   |   |    |              |    
+FD AE 00      |           |           |           |   |   |    |xor (iy)      |~   
+              |           |           |           |   |   |    |xor a, (iy)   |    
+              |           |           |           |   |   |    |              |    
+FD B6 %d      |           |           |           |   |   |    |or (iy+%d)    |~   
+              |           |           |           |   |   |    |or a, (iy+%d) |    
+              |           |           |           |   |   |    |              |    
+FD B6 00      |           |           |           |   |   |    |or (iy)       |~   
+              |           |           |           |   |   |    |or a, (iy)    |    
+              |           |           |           |   |   |    |              |    
+FD BE %d      |           |           |           |   |   |    |cmp (iy+%d)   |~   
+              |           |           |           |   |   |    |cmp a, (iy+%d)|    
+              |           |           |           |   |   |    |cp (iy+%d)    |    
+              |           |           |           |   |   |    |cp a, (iy+%d) |    
+              |           |           |           |   |   |    |              |    
+FD BE 00      |           |           |           |   |   |    |cmp (iy)      |~   
+              |           |           |           |   |   |    |cmp a, (iy)   |    
+              |           |           |           |   |   |    |cp (iy)       |    
+              |           |           |           |   |   |    |cp a, (iy)    |    
+              |           |           |           |   |   |    |              |    
 FD E1         |           |           |           |   |   |    |pop iy        |~   
               |           |           |           |   |   |    |              |    
 FD E3         |           |           |           |   |   |    |ex (sp), iy   |~   
@@ -901,7 +1528,12 @@ FD E5         |           |           |           |   |   |    |push iy       |~
               |           |           |           |   |   |    |              |    
 FD F9         |           |           |           |   |   |    |ld sp, iy     |~   
               |           |           |           |   |   |    |              |    
-FE %n         |cpi %n     |~          |cp %n      |   |   |    |cp %n         |~   
-              |           |           |cp a, %n   |   |   |    |cp a, %n      |    
-              |           |           |cpi %n     |   |   |    |cpi %n        |    
+FE %n         |cmp %n     |~          |~          |   |   |    |cmp %n        |~   
+              |cmp a, %n  |           |           |   |   |    |cmp a, %n     |    
+              |cp %n      |           |           |   |   |    |cp %n         |    
+              |cp a, %n   |           |           |   |   |    |cp a, %n      |    
+              |cpi %n     |           |           |   |   |    |cpi %n        |    
+              |           |           |           |   |   |    |              |    
+FF            |rst 56     |~          |~          |   |   |    |rst 56        |~   
+              |rst 7      |           |           |   |   |    |rst 7         |    
               |           |           |           |   |   |    |              |    

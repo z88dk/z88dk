@@ -92,12 +92,10 @@
 [rabbit]	neg a'				=> 76, ED, 44
 			
 			ccf					=>     3F
-			ccf	f				=>     3F
-[rabbit]	ccf	f'				=> 76, 3F
+[rabbit]	ccf'				=> 76, 3F
 			
 			scf					=>     37
-			scf f				=>     37
-[rabbit]	scf	f'				=> 76, 37
+[rabbit]	scf'				=> 76, 37
 
 ;------------------------------------------------------------------------------
 ; 16-bit load group

@@ -138,133 +138,133 @@
  tst 255                ;; 0680:  ED 64 FF
  tst a, (hl)            ;; 0680:  ED 34
  tst (hl)               ;; 0680:  ED 34
- mlt bc                 ;; 0AAE:  ED 4C
- mlt de                 ;; 0AAE:  ED 5C
- mlt hl                 ;; 0AAE:  ED 6C
- mlt sp                 ;; 0AAE:  ED 7C
- sll b                  ;; 0B39:  CB 30
- sll c                  ;; 0B39:  CB 31
- sll d                  ;; 0B39:  CB 32
- sll e                  ;; 0B39:  CB 33
- sll h                  ;; 0B39:  CB 34
- sll l                  ;; 0B39:  CB 35
- sll (hl)               ;; 0B39:  CB 36
- sll a                  ;; 0B39:  CB 37
- sll (ix+-128)          ;; 0B8D:  DD CB 80 36
- sll (ix)               ;; 0B8D:  DD CB 00 36
- sll (ix+127)           ;; 0B8D:  DD CB 7F 36
- sll (iy+-128)          ;; 0BE1:  FD CB 80 36
- sll (iy)               ;; 0BE1:  FD CB 00 36
- sll (iy+127)           ;; 0BE1:  FD CB 7F 36
- halt                   ;; 1113:  76
- slp                    ;; 1113:  ED 76
- in a, (0)              ;; 1220:  DB 00
- in a, (85)             ;; 1220:  DB 55
- in a, (170)            ;; 1220:  DB AA
- in a, (255)            ;; 1220:  DB FF
- in b, (c)              ;; 1220:  ED 40
- in c, (c)              ;; 1220:  ED 48
- in d, (c)              ;; 1220:  ED 50
- in e, (c)              ;; 1220:  ED 58
- in h, (c)              ;; 1220:  ED 60
- in l, (c)              ;; 1220:  ED 68
- in f, (c)              ;; 1220:  ED 70
- in a, (c)              ;; 1220:  ED 78
- in0 b, (0)             ;; 1220:  ED 00 00
- in0 b, (85)            ;; 1220:  ED 00 55
- in0 b, (170)           ;; 1220:  ED 00 AA
- in0 b, (255)           ;; 1220:  ED 00 FF
- in0 c, (0)             ;; 1220:  ED 08 00
- in0 c, (85)            ;; 1220:  ED 08 55
- in0 c, (170)           ;; 1220:  ED 08 AA
- in0 c, (255)           ;; 1220:  ED 08 FF
- in0 d, (0)             ;; 1220:  ED 10 00
- in0 d, (85)            ;; 1220:  ED 10 55
- in0 d, (170)           ;; 1220:  ED 10 AA
- in0 d, (255)           ;; 1220:  ED 10 FF
- in0 e, (0)             ;; 1220:  ED 18 00
- in0 e, (85)            ;; 1220:  ED 18 55
- in0 e, (170)           ;; 1220:  ED 18 AA
- in0 e, (255)           ;; 1220:  ED 18 FF
- in0 h, (0)             ;; 1220:  ED 20 00
- in0 h, (85)            ;; 1220:  ED 20 55
- in0 h, (170)           ;; 1220:  ED 20 AA
- in0 h, (255)           ;; 1220:  ED 20 FF
- in0 l, (0)             ;; 1220:  ED 28 00
- in0 l, (85)            ;; 1220:  ED 28 55
- in0 l, (170)           ;; 1220:  ED 28 AA
- in0 l, (255)           ;; 1220:  ED 28 FF
- in0 f, (0)             ;; 1220:  ED 30 00
- in0 f, (85)            ;; 1220:  ED 30 55
- in0 f, (170)           ;; 1220:  ED 30 AA
- in0 f, (255)           ;; 1220:  ED 30 FF
- in0 a, (0)             ;; 1220:  ED 38 00
- in0 a, (85)            ;; 1220:  ED 38 55
- in0 a, (170)           ;; 1220:  ED 38 AA
- in0 a, (255)           ;; 1220:  ED 38 FF
- out (0), a             ;; 1220:  D3 00
- out (85), a            ;; 1220:  D3 55
- out (170), a           ;; 1220:  D3 AA
- out (255), a           ;; 1220:  D3 FF
- out (c), b             ;; 1220:  ED 41
- out (c), c             ;; 1220:  ED 49
- out (c), d             ;; 1220:  ED 51
- out (c), e             ;; 1220:  ED 59
- out (c), h             ;; 1220:  ED 61
- out (c), l             ;; 1220:  ED 69
- out (c), 0             ;; 1220:  ED 71
- out (c), a             ;; 1220:  ED 79
- out0 (0), b            ;; 1220:  ED 01 00
- out0 (85), b           ;; 1220:  ED 01 55
- out0 (170), b          ;; 1220:  ED 01 AA
- out0 (255), b          ;; 1220:  ED 01 FF
- out0 (0), c            ;; 1220:  ED 09 00
- out0 (85), c           ;; 1220:  ED 09 55
- out0 (170), c          ;; 1220:  ED 09 AA
- out0 (255), c          ;; 1220:  ED 09 FF
- out0 (0), d            ;; 1220:  ED 11 00
- out0 (85), d           ;; 1220:  ED 11 55
- out0 (170), d          ;; 1220:  ED 11 AA
- out0 (255), d          ;; 1220:  ED 11 FF
- out0 (0), e            ;; 1220:  ED 19 00
- out0 (85), e           ;; 1220:  ED 19 55
- out0 (170), e          ;; 1220:  ED 19 AA
- out0 (255), e          ;; 1220:  ED 19 FF
- out0 (0), h            ;; 1220:  ED 21 00
- out0 (85), h           ;; 1220:  ED 21 55
- out0 (170), h          ;; 1220:  ED 21 AA
- out0 (255), h          ;; 1220:  ED 21 FF
- out0 (0), l            ;; 1220:  ED 29 00
- out0 (85), l           ;; 1220:  ED 29 55
- out0 (170), l          ;; 1220:  ED 29 AA
- out0 (255), l          ;; 1220:  ED 29 FF
- out0 (0), a            ;; 1220:  ED 39 00
- out0 (85), a           ;; 1220:  ED 39 55
- out0 (170), a          ;; 1220:  ED 39 AA
- out0 (255), a          ;; 1220:  ED 39 FF
- tstio 0                ;; 1220:  ED 74 00
- tstio 85               ;; 1220:  ED 74 55
- tstio 170              ;; 1220:  ED 74 AA
- tstio 255              ;; 1220:  ED 74 FF
- ini                    ;; 1220:  ED A2
- inir                   ;; 1220:  ED B2
- ind                    ;; 1220:  ED AA
- indr                   ;; 1220:  ED BA
- outi                   ;; 1220:  ED A3
- otir                   ;; 1220:  ED B3
- outd                   ;; 1220:  ED AB
- otdr                   ;; 1220:  ED BB
- otdm                   ;; 1220:  ED 8B
- otdmr                  ;; 1220:  ED 9B
- otim                   ;; 1220:  ED 83
- otimr                  ;; 1220:  ED 93
- di                     ;; 1220:  F3
- ei                     ;; 1220:  FB
- im 0                   ;; 1220:  ED 46
- im 1                   ;; 1220:  ED 56
- im 2                   ;; 1220:  ED 5E
- ld i, a                ;; 122A:  ED 47
- ld a, i                ;; 122A:  ED 57
- ld r, a                ;; 122A:  ED 4F
- ld a, r                ;; 122A:  ED 5F
- retn                   ;; 123A:  ED 45
+ mlt bc                 ;; 0AAC:  ED 4C
+ mlt de                 ;; 0AAC:  ED 5C
+ mlt hl                 ;; 0AAC:  ED 6C
+ mlt sp                 ;; 0AAC:  ED 7C
+ sll b                  ;; 0B37:  CB 30
+ sll c                  ;; 0B37:  CB 31
+ sll d                  ;; 0B37:  CB 32
+ sll e                  ;; 0B37:  CB 33
+ sll h                  ;; 0B37:  CB 34
+ sll l                  ;; 0B37:  CB 35
+ sll (hl)               ;; 0B37:  CB 36
+ sll a                  ;; 0B37:  CB 37
+ sll (ix+-128)          ;; 0B8B:  DD CB 80 36
+ sll (ix)               ;; 0B8B:  DD CB 00 36
+ sll (ix+127)           ;; 0B8B:  DD CB 7F 36
+ sll (iy+-128)          ;; 0BDF:  FD CB 80 36
+ sll (iy)               ;; 0BDF:  FD CB 00 36
+ sll (iy+127)           ;; 0BDF:  FD CB 7F 36
+ halt                   ;; 1111:  76
+ slp                    ;; 1111:  ED 76
+ in a, (0)              ;; 121E:  DB 00
+ in a, (85)             ;; 121E:  DB 55
+ in a, (170)            ;; 121E:  DB AA
+ in a, (255)            ;; 121E:  DB FF
+ in b, (c)              ;; 121E:  ED 40
+ in c, (c)              ;; 121E:  ED 48
+ in d, (c)              ;; 121E:  ED 50
+ in e, (c)              ;; 121E:  ED 58
+ in h, (c)              ;; 121E:  ED 60
+ in l, (c)              ;; 121E:  ED 68
+ in f, (c)              ;; 121E:  ED 70
+ in a, (c)              ;; 121E:  ED 78
+ in0 b, (0)             ;; 121E:  ED 00 00
+ in0 b, (85)            ;; 121E:  ED 00 55
+ in0 b, (170)           ;; 121E:  ED 00 AA
+ in0 b, (255)           ;; 121E:  ED 00 FF
+ in0 c, (0)             ;; 121E:  ED 08 00
+ in0 c, (85)            ;; 121E:  ED 08 55
+ in0 c, (170)           ;; 121E:  ED 08 AA
+ in0 c, (255)           ;; 121E:  ED 08 FF
+ in0 d, (0)             ;; 121E:  ED 10 00
+ in0 d, (85)            ;; 121E:  ED 10 55
+ in0 d, (170)           ;; 121E:  ED 10 AA
+ in0 d, (255)           ;; 121E:  ED 10 FF
+ in0 e, (0)             ;; 121E:  ED 18 00
+ in0 e, (85)            ;; 121E:  ED 18 55
+ in0 e, (170)           ;; 121E:  ED 18 AA
+ in0 e, (255)           ;; 121E:  ED 18 FF
+ in0 h, (0)             ;; 121E:  ED 20 00
+ in0 h, (85)            ;; 121E:  ED 20 55
+ in0 h, (170)           ;; 121E:  ED 20 AA
+ in0 h, (255)           ;; 121E:  ED 20 FF
+ in0 l, (0)             ;; 121E:  ED 28 00
+ in0 l, (85)            ;; 121E:  ED 28 55
+ in0 l, (170)           ;; 121E:  ED 28 AA
+ in0 l, (255)           ;; 121E:  ED 28 FF
+ in0 f, (0)             ;; 121E:  ED 30 00
+ in0 f, (85)            ;; 121E:  ED 30 55
+ in0 f, (170)           ;; 121E:  ED 30 AA
+ in0 f, (255)           ;; 121E:  ED 30 FF
+ in0 a, (0)             ;; 121E:  ED 38 00
+ in0 a, (85)            ;; 121E:  ED 38 55
+ in0 a, (170)           ;; 121E:  ED 38 AA
+ in0 a, (255)           ;; 121E:  ED 38 FF
+ out (0), a             ;; 121E:  D3 00
+ out (85), a            ;; 121E:  D3 55
+ out (170), a           ;; 121E:  D3 AA
+ out (255), a           ;; 121E:  D3 FF
+ out (c), b             ;; 121E:  ED 41
+ out (c), c             ;; 121E:  ED 49
+ out (c), d             ;; 121E:  ED 51
+ out (c), e             ;; 121E:  ED 59
+ out (c), h             ;; 121E:  ED 61
+ out (c), l             ;; 121E:  ED 69
+ out (c), 0             ;; 121E:  ED 71
+ out (c), a             ;; 121E:  ED 79
+ out0 (0), b            ;; 121E:  ED 01 00
+ out0 (85), b           ;; 121E:  ED 01 55
+ out0 (170), b          ;; 121E:  ED 01 AA
+ out0 (255), b          ;; 121E:  ED 01 FF
+ out0 (0), c            ;; 121E:  ED 09 00
+ out0 (85), c           ;; 121E:  ED 09 55
+ out0 (170), c          ;; 121E:  ED 09 AA
+ out0 (255), c          ;; 121E:  ED 09 FF
+ out0 (0), d            ;; 121E:  ED 11 00
+ out0 (85), d           ;; 121E:  ED 11 55
+ out0 (170), d          ;; 121E:  ED 11 AA
+ out0 (255), d          ;; 121E:  ED 11 FF
+ out0 (0), e            ;; 121E:  ED 19 00
+ out0 (85), e           ;; 121E:  ED 19 55
+ out0 (170), e          ;; 121E:  ED 19 AA
+ out0 (255), e          ;; 121E:  ED 19 FF
+ out0 (0), h            ;; 121E:  ED 21 00
+ out0 (85), h           ;; 121E:  ED 21 55
+ out0 (170), h          ;; 121E:  ED 21 AA
+ out0 (255), h          ;; 121E:  ED 21 FF
+ out0 (0), l            ;; 121E:  ED 29 00
+ out0 (85), l           ;; 121E:  ED 29 55
+ out0 (170), l          ;; 121E:  ED 29 AA
+ out0 (255), l          ;; 121E:  ED 29 FF
+ out0 (0), a            ;; 121E:  ED 39 00
+ out0 (85), a           ;; 121E:  ED 39 55
+ out0 (170), a          ;; 121E:  ED 39 AA
+ out0 (255), a          ;; 121E:  ED 39 FF
+ tstio 0                ;; 121E:  ED 74 00
+ tstio 85               ;; 121E:  ED 74 55
+ tstio 170              ;; 121E:  ED 74 AA
+ tstio 255              ;; 121E:  ED 74 FF
+ ini                    ;; 121E:  ED A2
+ inir                   ;; 121E:  ED B2
+ ind                    ;; 121E:  ED AA
+ indr                   ;; 121E:  ED BA
+ outi                   ;; 121E:  ED A3
+ otir                   ;; 121E:  ED B3
+ outd                   ;; 121E:  ED AB
+ otdr                   ;; 121E:  ED BB
+ otdm                   ;; 121E:  ED 8B
+ otdmr                  ;; 121E:  ED 9B
+ otim                   ;; 121E:  ED 83
+ otimr                  ;; 121E:  ED 93
+ di                     ;; 121E:  F3
+ ei                     ;; 121E:  FB
+ im 0                   ;; 121E:  ED 46
+ im 1                   ;; 121E:  ED 56
+ im 2                   ;; 121E:  ED 5E
+ ld i, a                ;; 1228:  ED 47
+ ld a, i                ;; 1228:  ED 57
+ ld r, a                ;; 1228:  ED 4F
+ ld a, r                ;; 1228:  ED 5F
+ retn                   ;; 1238:  ED 45

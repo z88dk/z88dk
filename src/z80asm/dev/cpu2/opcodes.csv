@@ -14,6 +14,14 @@ adc (hl)      |8085 |8E            |      7 T
 adc (hl)      |gbz80|8E            |      8 T
 adc (hl)      |z80  |8E            |      7 T
 adc (hl)      |z80n |8E            |      7 T
+adc (ix)      |z80  |DD 8E 00      |     19 T
+adc (ix)      |z80n |DD 8E 00      |     19 T
+adc (ix+%d)   |z80  |DD 8E %d      |     19 T
+adc (ix+%d)   |z80n |DD 8E %d      |     19 T
+adc (iy)      |z80  |FD 8E 00      |     19 T
+adc (iy)      |z80n |FD 8E 00      |     19 T
+adc (iy+%d)   |z80  |FD 8E %d      |     19 T
+adc (iy+%d)   |z80n |FD 8E %d      |     19 T
 adc a         |8080 |8F            |      4 T
 adc a         |8085 |8F            |      4 T
 adc a         |gbz80|8F            |      4 T
@@ -29,6 +37,14 @@ adc a, (hl)   |8085 |8E            |      7 T
 adc a, (hl)   |gbz80|8E            |      8 T
 adc a, (hl)   |z80  |8E            |      7 T
 adc a, (hl)   |z80n |8E            |      7 T
+adc a, (ix)   |z80  |DD 8E 00      |     19 T
+adc a, (ix)   |z80n |DD 8E 00      |     19 T
+adc a, (ix+%d)|z80  |DD 8E %d      |     19 T
+adc a, (ix+%d)|z80n |DD 8E %d      |     19 T
+adc a, (iy)   |z80  |FD 8E 00      |     19 T
+adc a, (iy)   |z80n |FD 8E 00      |     19 T
+adc a, (iy+%d)|z80  |FD 8E %d      |     19 T
+adc a, (iy+%d)|z80n |FD 8E %d      |     19 T
 adc a, a      |8080 |8F            |      4 T
 adc a, a      |8085 |8F            |      4 T
 adc a, a      |gbz80|8F            |      4 T
@@ -109,6 +125,14 @@ add (hl)      |8085 |86            |      7 T
 add (hl)      |gbz80|86            |      8 T
 add (hl)      |z80  |86            |      7 T
 add (hl)      |z80n |86            |      7 T
+add (ix)      |z80  |DD 86 00      |     19 T
+add (ix)      |z80n |DD 86 00      |     19 T
+add (ix+%d)   |z80  |DD 86 %d      |     19 T
+add (ix+%d)   |z80n |DD 86 %d      |     19 T
+add (iy)      |z80  |FD 86 00      |     19 T
+add (iy)      |z80n |FD 86 00      |     19 T
+add (iy+%d)   |z80  |FD 86 %d      |     19 T
+add (iy+%d)   |z80n |FD 86 %d      |     19 T
 add a         |8080 |87            |      4 T
 add a         |8085 |87            |      4 T
 add a         |gbz80|87            |      4 T
@@ -124,6 +148,14 @@ add a, (hl)   |8085 |86            |      7 T
 add a, (hl)   |gbz80|86            |      8 T
 add a, (hl)   |z80  |86            |      7 T
 add a, (hl)   |z80n |86            |      7 T
+add a, (ix)   |z80  |DD 86 00      |     19 T
+add a, (ix)   |z80n |DD 86 00      |     19 T
+add a, (ix+%d)|z80  |DD 86 %d      |     19 T
+add a, (ix+%d)|z80n |DD 86 %d      |     19 T
+add a, (iy)   |z80  |FD 86 00      |     19 T
+add a, (iy)   |z80n |FD 86 00      |     19 T
+add a, (iy+%d)|z80  |FD 86 %d      |     19 T
+add a, (iy+%d)|z80n |FD 86 %d      |     19 T
 add a, a      |8080 |87            |      4 T
 add a, a      |8085 |87            |      4 T
 add a, a      |gbz80|87            |      4 T
@@ -249,6 +281,14 @@ and (hl)      |8085 |A6            |      7 T
 and (hl)      |gbz80|A6            |      8 T
 and (hl)      |z80  |A6            |      7 T
 and (hl)      |z80n |A6            |      7 T
+and (ix)      |z80  |DD A6 00      |     19 T
+and (ix)      |z80n |DD A6 00      |     19 T
+and (ix+%d)   |z80  |DD A6 %d      |     19 T
+and (ix+%d)   |z80n |DD A6 %d      |     19 T
+and (iy)      |z80  |FD A6 00      |     19 T
+and (iy)      |z80n |FD A6 00      |     19 T
+and (iy+%d)   |z80  |FD A6 %d      |     19 T
+and (iy+%d)   |z80n |FD A6 %d      |     19 T
 and a         |8080 |A7            |      4 T
 and a         |8085 |A7            |      4 T
 and a         |gbz80|A7            |      4 T
@@ -264,6 +304,14 @@ and a, (hl)   |8085 |A6            |      7 T
 and a, (hl)   |gbz80|A6            |      8 T
 and a, (hl)   |z80  |A6            |      7 T
 and a, (hl)   |z80n |A6            |      7 T
+and a, (ix)   |z80  |DD A6 00      |     19 T
+and a, (ix)   |z80n |DD A6 00      |     19 T
+and a, (ix+%d)|z80  |DD A6 %d      |     19 T
+and a, (ix+%d)|z80n |DD A6 %d      |     19 T
+and a, (iy)   |z80  |FD A6 00      |     19 T
+and a, (iy)   |z80n |FD A6 00      |     19 T
+and a, (iy+%d)|z80  |FD A6 %d      |     19 T
+and a, (iy+%d)|z80n |FD A6 %d      |     19 T
 and a, a      |8080 |A7            |      4 T
 and a, a      |8085 |A7            |      4 T
 and a, a      |gbz80|A7            |      4 T
@@ -334,21 +382,289 @@ ani %n        |8085 |E6 %n         |      7 T
 ani %n        |gbz80|E6 %n         |      8 T
 ani %n        |z80  |E6 %n         |      7 T
 ani %n        |z80n |E6 %n         |      7 T
+bit 0, (hl)   |gbz80|CB 46         |     16 T
+bit 0, (hl)   |z80  |CB 46         |     12 T
+bit 0, (hl)   |z80n |CB 46         |     12 T
+bit 0, a      |gbz80|CB 47         |      8 T
+bit 0, a      |z80  |CB 47         |      8 T
+bit 0, a      |z80n |CB 47         |      8 T
+bit 0, b      |gbz80|CB 40         |      8 T
+bit 0, b      |z80  |CB 40         |      8 T
+bit 0, b      |z80n |CB 40         |      8 T
+bit 0, c      |gbz80|CB 41         |      8 T
+bit 0, c      |z80  |CB 41         |      8 T
+bit 0, c      |z80n |CB 41         |      8 T
+bit 0, d      |gbz80|CB 42         |      8 T
+bit 0, d      |z80  |CB 42         |      8 T
+bit 0, d      |z80n |CB 42         |      8 T
+bit 0, e      |gbz80|CB 43         |      8 T
+bit 0, e      |z80  |CB 43         |      8 T
+bit 0, e      |z80n |CB 43         |      8 T
+bit 0, h      |gbz80|CB 44         |      8 T
+bit 0, h      |z80  |CB 44         |      8 T
+bit 0, h      |z80n |CB 44         |      8 T
+bit 0, l      |gbz80|CB 45         |      8 T
+bit 0, l      |z80  |CB 45         |      8 T
+bit 0, l      |z80n |CB 45         |      8 T
+bit 1, (hl)   |gbz80|CB 4E         |     16 T
+bit 1, (hl)   |z80  |CB 4E         |     12 T
+bit 1, (hl)   |z80n |CB 4E         |     12 T
+bit 1, a      |gbz80|CB 4F         |      8 T
+bit 1, a      |z80  |CB 4F         |      8 T
+bit 1, a      |z80n |CB 4F         |      8 T
+bit 1, b      |gbz80|CB 48         |      8 T
+bit 1, b      |z80  |CB 48         |      8 T
+bit 1, b      |z80n |CB 48         |      8 T
+bit 1, c      |gbz80|CB 49         |      8 T
+bit 1, c      |z80  |CB 49         |      8 T
+bit 1, c      |z80n |CB 49         |      8 T
+bit 1, d      |gbz80|CB 4A         |      8 T
+bit 1, d      |z80  |CB 4A         |      8 T
+bit 1, d      |z80n |CB 4A         |      8 T
+bit 1, e      |gbz80|CB 4B         |      8 T
+bit 1, e      |z80  |CB 4B         |      8 T
+bit 1, e      |z80n |CB 4B         |      8 T
+bit 1, h      |gbz80|CB 4C         |      8 T
+bit 1, h      |z80  |CB 4C         |      8 T
+bit 1, h      |z80n |CB 4C         |      8 T
+bit 1, l      |gbz80|CB 4D         |      8 T
+bit 1, l      |z80  |CB 4D         |      8 T
+bit 1, l      |z80n |CB 4D         |      8 T
+bit 2, (hl)   |gbz80|CB 56         |     16 T
+bit 2, (hl)   |z80  |CB 56         |     12 T
+bit 2, (hl)   |z80n |CB 56         |     12 T
+bit 2, a      |gbz80|CB 57         |      8 T
+bit 2, a      |z80  |CB 57         |      8 T
+bit 2, a      |z80n |CB 57         |      8 T
+bit 2, b      |gbz80|CB 50         |      8 T
+bit 2, b      |z80  |CB 50         |      8 T
+bit 2, b      |z80n |CB 50         |      8 T
+bit 2, c      |gbz80|CB 51         |      8 T
+bit 2, c      |z80  |CB 51         |      8 T
+bit 2, c      |z80n |CB 51         |      8 T
+bit 2, d      |gbz80|CB 52         |      8 T
+bit 2, d      |z80  |CB 52         |      8 T
+bit 2, d      |z80n |CB 52         |      8 T
+bit 2, e      |gbz80|CB 53         |      8 T
+bit 2, e      |z80  |CB 53         |      8 T
+bit 2, e      |z80n |CB 53         |      8 T
+bit 2, h      |gbz80|CB 54         |      8 T
+bit 2, h      |z80  |CB 54         |      8 T
+bit 2, h      |z80n |CB 54         |      8 T
+bit 2, l      |gbz80|CB 55         |      8 T
+bit 2, l      |z80  |CB 55         |      8 T
+bit 2, l      |z80n |CB 55         |      8 T
+bit 3, (hl)   |gbz80|CB 5E         |     16 T
+bit 3, (hl)   |z80  |CB 5E         |     12 T
+bit 3, (hl)   |z80n |CB 5E         |     12 T
+bit 3, a      |gbz80|CB 5F         |      8 T
+bit 3, a      |z80  |CB 5F         |      8 T
+bit 3, a      |z80n |CB 5F         |      8 T
+bit 3, b      |gbz80|CB 58         |      8 T
+bit 3, b      |z80  |CB 58         |      8 T
+bit 3, b      |z80n |CB 58         |      8 T
+bit 3, c      |gbz80|CB 59         |      8 T
+bit 3, c      |z80  |CB 59         |      8 T
+bit 3, c      |z80n |CB 59         |      8 T
+bit 3, d      |gbz80|CB 5A         |      8 T
+bit 3, d      |z80  |CB 5A         |      8 T
+bit 3, d      |z80n |CB 5A         |      8 T
+bit 3, e      |gbz80|CB 5B         |      8 T
+bit 3, e      |z80  |CB 5B         |      8 T
+bit 3, e      |z80n |CB 5B         |      8 T
+bit 3, h      |gbz80|CB 5C         |      8 T
+bit 3, h      |z80  |CB 5C         |      8 T
+bit 3, h      |z80n |CB 5C         |      8 T
+bit 3, l      |gbz80|CB 5D         |      8 T
+bit 3, l      |z80  |CB 5D         |      8 T
+bit 3, l      |z80n |CB 5D         |      8 T
+bit 4, (hl)   |gbz80|CB 66         |     16 T
+bit 4, (hl)   |z80  |CB 66         |     12 T
+bit 4, (hl)   |z80n |CB 66         |     12 T
+bit 4, a      |gbz80|CB 67         |      8 T
+bit 4, a      |z80  |CB 67         |      8 T
+bit 4, a      |z80n |CB 67         |      8 T
+bit 4, b      |gbz80|CB 60         |      8 T
+bit 4, b      |z80  |CB 60         |      8 T
+bit 4, b      |z80n |CB 60         |      8 T
+bit 4, c      |gbz80|CB 61         |      8 T
+bit 4, c      |z80  |CB 61         |      8 T
+bit 4, c      |z80n |CB 61         |      8 T
+bit 4, d      |gbz80|CB 62         |      8 T
+bit 4, d      |z80  |CB 62         |      8 T
+bit 4, d      |z80n |CB 62         |      8 T
+bit 4, e      |gbz80|CB 63         |      8 T
+bit 4, e      |z80  |CB 63         |      8 T
+bit 4, e      |z80n |CB 63         |      8 T
+bit 4, h      |gbz80|CB 64         |      8 T
+bit 4, h      |z80  |CB 64         |      8 T
+bit 4, h      |z80n |CB 64         |      8 T
+bit 4, l      |gbz80|CB 65         |      8 T
+bit 4, l      |z80  |CB 65         |      8 T
+bit 4, l      |z80n |CB 65         |      8 T
+bit 5, (hl)   |gbz80|CB 6E         |     16 T
+bit 5, (hl)   |z80  |CB 6E         |     12 T
+bit 5, (hl)   |z80n |CB 6E         |     12 T
+bit 5, a      |gbz80|CB 6F         |      8 T
+bit 5, a      |z80  |CB 6F         |      8 T
+bit 5, a      |z80n |CB 6F         |      8 T
+bit 5, b      |gbz80|CB 68         |      8 T
+bit 5, b      |z80  |CB 68         |      8 T
+bit 5, b      |z80n |CB 68         |      8 T
+bit 5, c      |gbz80|CB 69         |      8 T
+bit 5, c      |z80  |CB 69         |      8 T
+bit 5, c      |z80n |CB 69         |      8 T
+bit 5, d      |gbz80|CB 6A         |      8 T
+bit 5, d      |z80  |CB 6A         |      8 T
+bit 5, d      |z80n |CB 6A         |      8 T
+bit 5, e      |gbz80|CB 6B         |      8 T
+bit 5, e      |z80  |CB 6B         |      8 T
+bit 5, e      |z80n |CB 6B         |      8 T
+bit 5, h      |gbz80|CB 6C         |      8 T
+bit 5, h      |z80  |CB 6C         |      8 T
+bit 5, h      |z80n |CB 6C         |      8 T
+bit 5, l      |gbz80|CB 6D         |      8 T
+bit 5, l      |z80  |CB 6D         |      8 T
+bit 5, l      |z80n |CB 6D         |      8 T
+bit 6, (hl)   |gbz80|CB 76         |     16 T
+bit 6, (hl)   |z80  |CB 76         |     12 T
+bit 6, (hl)   |z80n |CB 76         |     12 T
+bit 6, a      |gbz80|CB 77         |      8 T
+bit 6, a      |z80  |CB 77         |      8 T
+bit 6, a      |z80n |CB 77         |      8 T
+bit 6, b      |gbz80|CB 70         |      8 T
+bit 6, b      |z80  |CB 70         |      8 T
+bit 6, b      |z80n |CB 70         |      8 T
+bit 6, c      |gbz80|CB 71         |      8 T
+bit 6, c      |z80  |CB 71         |      8 T
+bit 6, c      |z80n |CB 71         |      8 T
+bit 6, d      |gbz80|CB 72         |      8 T
+bit 6, d      |z80  |CB 72         |      8 T
+bit 6, d      |z80n |CB 72         |      8 T
+bit 6, e      |gbz80|CB 73         |      8 T
+bit 6, e      |z80  |CB 73         |      8 T
+bit 6, e      |z80n |CB 73         |      8 T
+bit 6, h      |gbz80|CB 74         |      8 T
+bit 6, h      |z80  |CB 74         |      8 T
+bit 6, h      |z80n |CB 74         |      8 T
+bit 6, l      |gbz80|CB 75         |      8 T
+bit 6, l      |z80  |CB 75         |      8 T
+bit 6, l      |z80n |CB 75         |      8 T
+bit 7, (hl)   |gbz80|CB 7E         |     16 T
+bit 7, (hl)   |z80  |CB 7E         |     12 T
+bit 7, (hl)   |z80n |CB 7E         |     12 T
+bit 7, a      |gbz80|CB 7F         |      8 T
+bit 7, a      |z80  |CB 7F         |      8 T
+bit 7, a      |z80n |CB 7F         |      8 T
+bit 7, b      |gbz80|CB 78         |      8 T
+bit 7, b      |z80  |CB 78         |      8 T
+bit 7, b      |z80n |CB 78         |      8 T
+bit 7, c      |gbz80|CB 79         |      8 T
+bit 7, c      |z80  |CB 79         |      8 T
+bit 7, c      |z80n |CB 79         |      8 T
+bit 7, d      |gbz80|CB 7A         |      8 T
+bit 7, d      |z80  |CB 7A         |      8 T
+bit 7, d      |z80n |CB 7A         |      8 T
+bit 7, e      |gbz80|CB 7B         |      8 T
+bit 7, e      |z80  |CB 7B         |      8 T
+bit 7, e      |z80n |CB 7B         |      8 T
+bit 7, h      |gbz80|CB 7C         |      8 T
+bit 7, h      |z80  |CB 7C         |      8 T
+bit 7, h      |z80n |CB 7C         |      8 T
+bit 7, l      |gbz80|CB 7D         |      8 T
+bit 7, l      |z80  |CB 7D         |      8 T
+bit 7, l      |z80n |CB 7D         |      8 T
 ccf           |8080 |3F            |      4 T
 ccf           |8085 |3F            |      4 T
 ccf           |gbz80|3F            |      4 T
 ccf           |z80  |3F            |      4 T
 ccf           |z80n |3F            |      4 T
+cma           |8080 |2F            |      4 T
+cma           |8085 |2F            |      4 T
+cma           |gbz80|2F            |      4 T
+cma           |z80  |2F            |      4 T
+cma           |z80n |2F            |      4 T
 cmc           |8080 |3F            |      4 T
 cmc           |8085 |3F            |      4 T
 cmc           |gbz80|3F            |      4 T
 cmc           |z80  |3F            |      4 T
 cmc           |z80n |3F            |      4 T
+cmp %n        |8080 |FE %n         |      7 T
+cmp %n        |8085 |FE %n         |      7 T
+cmp %n        |gbz80|FE %n         |      8 T
+cmp %n        |z80  |FE %n         |      7 T
+cmp %n        |z80n |FE %n         |      7 T
+cmp (hl)      |8080 |BE            |      7 T
+cmp (hl)      |8085 |BE            |      7 T
+cmp (hl)      |gbz80|BE            |      8 T
+cmp (hl)      |z80  |BE            |      7 T
+cmp (hl)      |z80n |BE            |      7 T
+cmp (ix)      |z80  |DD BE 00      |     19 T
+cmp (ix)      |z80n |DD BE 00      |     19 T
+cmp (ix+%d)   |z80  |DD BE %d      |     19 T
+cmp (ix+%d)   |z80n |DD BE %d      |     19 T
+cmp (iy)      |z80  |FD BE 00      |     19 T
+cmp (iy)      |z80n |FD BE 00      |     19 T
+cmp (iy+%d)   |z80  |FD BE %d      |     19 T
+cmp (iy+%d)   |z80n |FD BE %d      |     19 T
 cmp a         |8080 |BF            |      4 T
 cmp a         |8085 |BF            |      4 T
 cmp a         |gbz80|BF            |      4 T
 cmp a         |z80  |BF            |      4 T
 cmp a         |z80n |BF            |      4 T
+cmp a, %n     |8080 |FE %n         |      7 T
+cmp a, %n     |8085 |FE %n         |      7 T
+cmp a, %n     |gbz80|FE %n         |      8 T
+cmp a, %n     |z80  |FE %n         |      7 T
+cmp a, %n     |z80n |FE %n         |      7 T
+cmp a, (hl)   |8080 |BE            |      7 T
+cmp a, (hl)   |8085 |BE            |      7 T
+cmp a, (hl)   |gbz80|BE            |      8 T
+cmp a, (hl)   |z80  |BE            |      7 T
+cmp a, (hl)   |z80n |BE            |      7 T
+cmp a, (ix)   |z80  |DD BE 00      |     19 T
+cmp a, (ix)   |z80n |DD BE 00      |     19 T
+cmp a, (ix+%d)|z80  |DD BE %d      |     19 T
+cmp a, (ix+%d)|z80n |DD BE %d      |     19 T
+cmp a, (iy)   |z80  |FD BE 00      |     19 T
+cmp a, (iy)   |z80n |FD BE 00      |     19 T
+cmp a, (iy+%d)|z80  |FD BE %d      |     19 T
+cmp a, (iy+%d)|z80n |FD BE %d      |     19 T
+cmp a, a      |8080 |BF            |      4 T
+cmp a, a      |8085 |BF            |      4 T
+cmp a, a      |gbz80|BF            |      4 T
+cmp a, a      |z80  |BF            |      4 T
+cmp a, a      |z80n |BF            |      4 T
+cmp a, b      |8080 |B8            |      4 T
+cmp a, b      |8085 |B8            |      4 T
+cmp a, b      |gbz80|B8            |      4 T
+cmp a, b      |z80  |B8            |      4 T
+cmp a, b      |z80n |B8            |      4 T
+cmp a, c      |8080 |B9            |      4 T
+cmp a, c      |8085 |B9            |      4 T
+cmp a, c      |gbz80|B9            |      4 T
+cmp a, c      |z80  |B9            |      4 T
+cmp a, c      |z80n |B9            |      4 T
+cmp a, d      |8080 |BA            |      4 T
+cmp a, d      |8085 |BA            |      4 T
+cmp a, d      |gbz80|BA            |      4 T
+cmp a, d      |z80  |BA            |      4 T
+cmp a, d      |z80n |BA            |      4 T
+cmp a, e      |8080 |BB            |      4 T
+cmp a, e      |8085 |BB            |      4 T
+cmp a, e      |gbz80|BB            |      4 T
+cmp a, e      |z80  |BB            |      4 T
+cmp a, e      |z80n |BB            |      4 T
+cmp a, h      |8080 |BC            |      4 T
+cmp a, h      |8085 |BC            |      4 T
+cmp a, h      |gbz80|BC            |      4 T
+cmp a, h      |z80  |BC            |      4 T
+cmp a, h      |z80n |BC            |      4 T
+cmp a, l      |8080 |BD            |      4 T
+cmp a, l      |8085 |BD            |      4 T
+cmp a, l      |gbz80|BD            |      4 T
+cmp a, l      |z80  |BD            |      4 T
+cmp a, l      |z80n |BD            |      4 T
 cmp b         |8080 |B8            |      4 T
 cmp b         |8085 |B8            |      4 T
 cmp b         |gbz80|B8            |      4 T
@@ -384,57 +700,109 @@ cmp m         |8085 |BE            |      7 T
 cmp m         |gbz80|BE            |      8 T
 cmp m         |z80  |BE            |      7 T
 cmp m         |z80n |BE            |      7 T
+cp %n         |8080 |FE %n         |      7 T
+cp %n         |8085 |FE %n         |      7 T
 cp %n         |gbz80|FE %n         |      8 T
 cp %n         |z80  |FE %n         |      7 T
 cp %n         |z80n |FE %n         |      7 T
+cp (hl)       |8080 |BE            |      7 T
+cp (hl)       |8085 |BE            |      7 T
 cp (hl)       |gbz80|BE            |      8 T
 cp (hl)       |z80  |BE            |      7 T
 cp (hl)       |z80n |BE            |      7 T
+cp (ix)       |z80  |DD BE 00      |     19 T
+cp (ix)       |z80n |DD BE 00      |     19 T
+cp (ix+%d)    |z80  |DD BE %d      |     19 T
+cp (ix+%d)    |z80n |DD BE %d      |     19 T
+cp (iy)       |z80  |FD BE 00      |     19 T
+cp (iy)       |z80n |FD BE 00      |     19 T
+cp (iy+%d)    |z80  |FD BE %d      |     19 T
+cp (iy+%d)    |z80n |FD BE %d      |     19 T
+cp a          |8080 |BF            |      4 T
+cp a          |8085 |BF            |      4 T
 cp a          |gbz80|BF            |      4 T
 cp a          |z80  |BF            |      4 T
 cp a          |z80n |BF            |      4 T
+cp a, %n      |8080 |FE %n         |      7 T
+cp a, %n      |8085 |FE %n         |      7 T
 cp a, %n      |gbz80|FE %n         |      8 T
 cp a, %n      |z80  |FE %n         |      7 T
 cp a, %n      |z80n |FE %n         |      7 T
+cp a, (hl)    |8080 |BE            |      7 T
+cp a, (hl)    |8085 |BE            |      7 T
 cp a, (hl)    |gbz80|BE            |      8 T
 cp a, (hl)    |z80  |BE            |      7 T
 cp a, (hl)    |z80n |BE            |      7 T
+cp a, (ix)    |z80  |DD BE 00      |     19 T
+cp a, (ix)    |z80n |DD BE 00      |     19 T
+cp a, (ix+%d) |z80  |DD BE %d      |     19 T
+cp a, (ix+%d) |z80n |DD BE %d      |     19 T
+cp a, (iy)    |z80  |FD BE 00      |     19 T
+cp a, (iy)    |z80n |FD BE 00      |     19 T
+cp a, (iy+%d) |z80  |FD BE %d      |     19 T
+cp a, (iy+%d) |z80n |FD BE %d      |     19 T
+cp a, a       |8080 |BF            |      4 T
+cp a, a       |8085 |BF            |      4 T
 cp a, a       |gbz80|BF            |      4 T
 cp a, a       |z80  |BF            |      4 T
 cp a, a       |z80n |BF            |      4 T
+cp a, b       |8080 |B8            |      4 T
+cp a, b       |8085 |B8            |      4 T
 cp a, b       |gbz80|B8            |      4 T
 cp a, b       |z80  |B8            |      4 T
 cp a, b       |z80n |B8            |      4 T
+cp a, c       |8080 |B9            |      4 T
+cp a, c       |8085 |B9            |      4 T
 cp a, c       |gbz80|B9            |      4 T
 cp a, c       |z80  |B9            |      4 T
 cp a, c       |z80n |B9            |      4 T
+cp a, d       |8080 |BA            |      4 T
+cp a, d       |8085 |BA            |      4 T
 cp a, d       |gbz80|BA            |      4 T
 cp a, d       |z80  |BA            |      4 T
 cp a, d       |z80n |BA            |      4 T
+cp a, e       |8080 |BB            |      4 T
+cp a, e       |8085 |BB            |      4 T
 cp a, e       |gbz80|BB            |      4 T
 cp a, e       |z80  |BB            |      4 T
 cp a, e       |z80n |BB            |      4 T
+cp a, h       |8080 |BC            |      4 T
+cp a, h       |8085 |BC            |      4 T
 cp a, h       |gbz80|BC            |      4 T
 cp a, h       |z80  |BC            |      4 T
 cp a, h       |z80n |BC            |      4 T
+cp a, l       |8080 |BD            |      4 T
+cp a, l       |8085 |BD            |      4 T
 cp a, l       |gbz80|BD            |      4 T
 cp a, l       |z80  |BD            |      4 T
 cp a, l       |z80n |BD            |      4 T
+cp b          |8080 |B8            |      4 T
+cp b          |8085 |B8            |      4 T
 cp b          |gbz80|B8            |      4 T
 cp b          |z80  |B8            |      4 T
 cp b          |z80n |B8            |      4 T
+cp c          |8080 |B9            |      4 T
+cp c          |8085 |B9            |      4 T
 cp c          |gbz80|B9            |      4 T
 cp c          |z80  |B9            |      4 T
 cp c          |z80n |B9            |      4 T
+cp d          |8080 |BA            |      4 T
+cp d          |8085 |BA            |      4 T
 cp d          |gbz80|BA            |      4 T
 cp d          |z80  |BA            |      4 T
 cp d          |z80n |BA            |      4 T
+cp e          |8080 |BB            |      4 T
+cp e          |8085 |BB            |      4 T
 cp e          |gbz80|BB            |      4 T
 cp e          |z80  |BB            |      4 T
 cp e          |z80n |BB            |      4 T
+cp h          |8080 |BC            |      4 T
+cp h          |8085 |BC            |      4 T
 cp h          |gbz80|BC            |      4 T
 cp h          |z80  |BC            |      4 T
 cp h          |z80n |BC            |      4 T
+cp l          |8080 |BD            |      4 T
+cp l          |8085 |BD            |      4 T
 cp l          |gbz80|BD            |      4 T
 cp l          |z80  |BD            |      4 T
 cp l          |z80n |BD            |      4 T
@@ -463,6 +831,119 @@ cpir          |8085 |CD @cpir      |180/328 T
 cpir          |gbz80|CD @cpir      |448/856 T
 cpir          |z80  |ED B1         |  16/37 T
 cpir          |z80n |ED B1         |  16/37 T
+cpl           |8080 |2F            |      4 T
+cpl           |8085 |2F            |      4 T
+cpl           |gbz80|2F            |      4 T
+cpl           |z80  |2F            |      4 T
+cpl           |z80n |2F            |      4 T
+cpl a         |8080 |2F            |      4 T
+cpl a         |8085 |2F            |      4 T
+cpl a         |gbz80|2F            |      4 T
+cpl a         |z80  |2F            |      4 T
+cpl a         |z80n |2F            |      4 T
+daa           |8080 |27            |      4 T
+daa           |8085 |27            |      4 T
+daa           |gbz80|27            |      4 T
+daa           |z80  |27            |      4 T
+daa           |z80n |27            |      4 T
+dcr a         |8080 |3D            |      5 T
+dcr a         |8085 |3D            |      4 T
+dcr a         |gbz80|3D            |      4 T
+dcr a         |z80  |3D            |      4 T
+dcr a         |z80n |3D            |      4 T
+dcr b         |8080 |05            |      5 T
+dcr b         |8085 |05            |      4 T
+dcr b         |gbz80|05            |      4 T
+dcr b         |z80  |05            |      4 T
+dcr b         |z80n |05            |      4 T
+dcr c         |8080 |0D            |      5 T
+dcr c         |8085 |0D            |      4 T
+dcr c         |gbz80|0D            |      4 T
+dcr c         |z80  |0D            |      4 T
+dcr c         |z80n |0D            |      4 T
+dcr d         |8080 |15            |      5 T
+dcr d         |8085 |15            |      4 T
+dcr d         |gbz80|15            |      4 T
+dcr d         |z80  |15            |      4 T
+dcr d         |z80n |15            |      4 T
+dcr e         |8080 |1D            |      5 T
+dcr e         |8085 |1D            |      4 T
+dcr e         |gbz80|1D            |      4 T
+dcr e         |z80  |1D            |      4 T
+dcr e         |z80n |1D            |      4 T
+dcr h         |8080 |25            |      5 T
+dcr h         |8085 |25            |      4 T
+dcr h         |gbz80|25            |      4 T
+dcr h         |z80  |25            |      4 T
+dcr h         |z80n |25            |      4 T
+dcr l         |8080 |2D            |      5 T
+dcr l         |8085 |2D            |      4 T
+dcr l         |gbz80|2D            |      4 T
+dcr l         |z80  |2D            |      4 T
+dcr l         |z80n |2D            |      4 T
+dcr m         |8080 |35            |     10 T
+dcr m         |8085 |35            |     10 T
+dcr m         |gbz80|35            |     12 T
+dcr m         |z80  |35            |     11 T
+dcr m         |z80n |35            |     11 T
+dec (hl)      |8080 |35            |     10 T
+dec (hl)      |8085 |35            |     10 T
+dec (hl)      |gbz80|35            |     12 T
+dec (hl)      |z80  |35            |     11 T
+dec (hl)      |z80n |35            |     11 T
+dec (ix)      |z80  |DD 35 00      |     23 T
+dec (ix)      |z80n |DD 35 00      |     23 T
+dec (ix+%d)   |z80  |DD 35 %d      |     23 T
+dec (ix+%d)   |z80n |DD 35 %d      |     23 T
+dec (iy)      |z80  |FD 35 00      |     23 T
+dec (iy)      |z80n |FD 35 00      |     23 T
+dec (iy+%d)   |z80  |FD 35 %d      |     23 T
+dec (iy+%d)   |z80n |FD 35 %d      |     23 T
+dec a         |8080 |3D            |      5 T
+dec a         |8085 |3D            |      4 T
+dec a         |gbz80|3D            |      4 T
+dec a         |z80  |3D            |      4 T
+dec a         |z80n |3D            |      4 T
+dec b         |8080 |05            |      5 T
+dec b         |8085 |05            |      4 T
+dec b         |gbz80|05            |      4 T
+dec b         |z80  |05            |      4 T
+dec b         |z80n |05            |      4 T
+dec c         |8080 |0D            |      5 T
+dec c         |8085 |0D            |      4 T
+dec c         |gbz80|0D            |      4 T
+dec c         |z80  |0D            |      4 T
+dec c         |z80n |0D            |      4 T
+dec d         |8080 |15            |      5 T
+dec d         |8085 |15            |      4 T
+dec d         |gbz80|15            |      4 T
+dec d         |z80  |15            |      4 T
+dec d         |z80n |15            |      4 T
+dec e         |8080 |1D            |      5 T
+dec e         |8085 |1D            |      4 T
+dec e         |gbz80|1D            |      4 T
+dec e         |z80  |1D            |      4 T
+dec e         |z80n |1D            |      4 T
+dec h         |8080 |25            |      5 T
+dec h         |8085 |25            |      4 T
+dec h         |gbz80|25            |      4 T
+dec h         |z80  |25            |      4 T
+dec h         |z80n |25            |      4 T
+dec l         |8080 |2D            |      5 T
+dec l         |8085 |2D            |      4 T
+dec l         |gbz80|2D            |      4 T
+dec l         |z80  |2D            |      4 T
+dec l         |z80n |2D            |      4 T
+di            |8080 |F3            |      4 T
+di            |8085 |F3            |      4 T
+di            |gbz80|F3            |      4 T
+di            |z80  |F3            |      4 T
+di            |z80n |F3            |      4 T
+ei            |8080 |FB            |      4 T
+ei            |8085 |FB            |      4 T
+ei            |gbz80|FB            |      4 T
+ei            |z80  |FB            |      4 T
+ei            |z80n |FB            |      4 T
 ex (sp), hl   |8080 |E3            |     18 T
 ex (sp), hl   |8085 |E3            |     16 T
 ex (sp), hl   |gbz80|CD @ex_sp_hl  |    148 T
@@ -481,6 +962,110 @@ ex de, hl     |8085 |EB            |      4 T
 ex de, hl     |gbz80|E5; D5; E1; D1|     56 T
 ex de, hl     |z80  |EB            |      4 T
 ex de, hl     |z80n |EB            |      4 T
+halt          |8080 |76            |      7 T
+halt          |8085 |76            |      5 T
+halt          |gbz80|76            |      4 T
+halt          |z80  |76            |      4 T
+halt          |z80n |76            |      4 T
+hlt           |8080 |76            |      7 T
+hlt           |8085 |76            |      5 T
+hlt           |gbz80|76            |      4 T
+hlt           |z80  |76            |      4 T
+hlt           |z80n |76            |      4 T
+im 0          |z80  |ED 46         |      8 T
+im 0          |z80n |ED 46         |      8 T
+im 1          |z80  |ED 56         |      8 T
+im 1          |z80n |ED 56         |      8 T
+im 2          |z80  |ED 5E         |      8 T
+im 2          |z80n |ED 5E         |      8 T
+inc (hl)      |8080 |34            |     10 T
+inc (hl)      |8085 |34            |     10 T
+inc (hl)      |gbz80|34            |     12 T
+inc (hl)      |z80  |34            |     11 T
+inc (hl)      |z80n |34            |     11 T
+inc (ix)      |z80  |DD 34 00      |     23 T
+inc (ix)      |z80n |DD 34 00      |     23 T
+inc (ix+%d)   |z80  |DD 34 %d      |     23 T
+inc (ix+%d)   |z80n |DD 34 %d      |     23 T
+inc (iy)      |z80  |FD 34 00      |     23 T
+inc (iy)      |z80n |FD 34 00      |     23 T
+inc (iy+%d)   |z80  |FD 34 %d      |     23 T
+inc (iy+%d)   |z80n |FD 34 %d      |     23 T
+inc a         |8080 |3C            |      5 T
+inc a         |8085 |3C            |      4 T
+inc a         |gbz80|3C            |      4 T
+inc a         |z80  |3C            |      4 T
+inc a         |z80n |3C            |      4 T
+inc b         |8080 |04            |      5 T
+inc b         |8085 |04            |      4 T
+inc b         |gbz80|04            |      4 T
+inc b         |z80  |04            |      4 T
+inc b         |z80n |04            |      4 T
+inc c         |8080 |0C            |      5 T
+inc c         |8085 |0C            |      4 T
+inc c         |gbz80|0C            |      4 T
+inc c         |z80  |0C            |      4 T
+inc c         |z80n |0C            |      4 T
+inc d         |8080 |14            |      5 T
+inc d         |8085 |14            |      4 T
+inc d         |gbz80|14            |      4 T
+inc d         |z80  |14            |      4 T
+inc d         |z80n |14            |      4 T
+inc e         |8080 |1C            |      5 T
+inc e         |8085 |1C            |      4 T
+inc e         |gbz80|1C            |      4 T
+inc e         |z80  |1C            |      4 T
+inc e         |z80n |1C            |      4 T
+inc h         |8080 |24            |      5 T
+inc h         |8085 |24            |      4 T
+inc h         |gbz80|24            |      4 T
+inc h         |z80  |24            |      4 T
+inc h         |z80n |24            |      4 T
+inc l         |8080 |2C            |      5 T
+inc l         |8085 |2C            |      4 T
+inc l         |gbz80|2C            |      4 T
+inc l         |z80  |2C            |      4 T
+inc l         |z80n |2C            |      4 T
+inr a         |8080 |3C            |      5 T
+inr a         |8085 |3C            |      4 T
+inr a         |gbz80|3C            |      4 T
+inr a         |z80  |3C            |      4 T
+inr a         |z80n |3C            |      4 T
+inr b         |8080 |04            |      5 T
+inr b         |8085 |04            |      4 T
+inr b         |gbz80|04            |      4 T
+inr b         |z80  |04            |      4 T
+inr b         |z80n |04            |      4 T
+inr c         |8080 |0C            |      5 T
+inr c         |8085 |0C            |      4 T
+inr c         |gbz80|0C            |      4 T
+inr c         |z80  |0C            |      4 T
+inr c         |z80n |0C            |      4 T
+inr d         |8080 |14            |      5 T
+inr d         |8085 |14            |      4 T
+inr d         |gbz80|14            |      4 T
+inr d         |z80  |14            |      4 T
+inr d         |z80n |14            |      4 T
+inr e         |8080 |1C            |      5 T
+inr e         |8085 |1C            |      4 T
+inr e         |gbz80|1C            |      4 T
+inr e         |z80  |1C            |      4 T
+inr e         |z80n |1C            |      4 T
+inr h         |8080 |24            |      5 T
+inr h         |8085 |24            |      4 T
+inr h         |gbz80|24            |      4 T
+inr h         |z80  |24            |      4 T
+inr h         |z80n |24            |      4 T
+inr l         |8080 |2C            |      5 T
+inr l         |8085 |2C            |      4 T
+inr l         |gbz80|2C            |      4 T
+inr l         |z80  |2C            |      4 T
+inr l         |z80n |2C            |      4 T
+inr m         |8080 |34            |     10 T
+inr m         |8085 |34            |     10 T
+inr m         |gbz80|34            |     12 T
+inr m         |z80  |34            |     11 T
+inr m         |z80n |34            |     11 T
 ld (%m), a    |8080 |32 %m %m      |     13 T
 ld (%m), a    |8085 |32 %m %m      |     13 T
 ld (%m), a    |gbz80|EA %m %m      |     16 T
@@ -1615,6 +2200,21 @@ mvi m, %n     |8085 |36 %n         |     10 T
 mvi m, %n     |gbz80|36 %n         |     12 T
 mvi m, %n     |z80  |36 %n         |     10 T
 mvi m, %n     |z80n |36 %n         |     10 T
+neg           |8080 |2F; 3C        |      9 T
+neg           |8085 |2F; 3C        |      8 T
+neg           |gbz80|2F; 3C        |      8 T
+neg           |z80  |ED 44         |      8 T
+neg           |z80n |ED 44         |      8 T
+neg a         |8080 |2F; 3C        |      9 T
+neg a         |8085 |2F; 3C        |      8 T
+neg a         |gbz80|2F; 3C        |      8 T
+neg a         |z80  |ED 44         |      8 T
+neg a         |z80n |ED 44         |      8 T
+nop           |8080 |00            |      4 T
+nop           |8085 |00            |      4 T
+nop           |gbz80|00            |      4 T
+nop           |z80  |00            |      4 T
+nop           |z80n |00            |      4 T
 or %n         |8080 |F6 %n         |      7 T
 or %n         |8085 |F6 %n         |      7 T
 or %n         |gbz80|F6 %n         |      8 T
@@ -1625,6 +2225,14 @@ or (hl)       |8085 |B6            |      7 T
 or (hl)       |gbz80|B6            |      8 T
 or (hl)       |z80  |B6            |      7 T
 or (hl)       |z80n |B6            |      7 T
+or (ix)       |z80  |DD B6 00      |     19 T
+or (ix)       |z80n |DD B6 00      |     19 T
+or (ix+%d)    |z80  |DD B6 %d      |     19 T
+or (ix+%d)    |z80n |DD B6 %d      |     19 T
+or (iy)       |z80  |FD B6 00      |     19 T
+or (iy)       |z80n |FD B6 00      |     19 T
+or (iy+%d)    |z80  |FD B6 %d      |     19 T
+or (iy+%d)    |z80n |FD B6 %d      |     19 T
 or a          |8080 |B7            |      4 T
 or a          |8085 |B7            |      4 T
 or a          |gbz80|B7            |      4 T
@@ -1640,6 +2248,14 @@ or a, (hl)    |8085 |B6            |      7 T
 or a, (hl)    |gbz80|B6            |      8 T
 or a, (hl)    |z80  |B6            |      7 T
 or a, (hl)    |z80n |B6            |      7 T
+or a, (ix)    |z80  |DD B6 00      |     19 T
+or a, (ix)    |z80n |DD B6 00      |     19 T
+or a, (ix+%d) |z80  |DD B6 %d      |     19 T
+or a, (ix+%d) |z80n |DD B6 %d      |     19 T
+or a, (iy)    |z80  |FD B6 00      |     19 T
+or a, (iy)    |z80n |FD B6 00      |     19 T
+or a, (iy+%d) |z80  |FD B6 %d      |     19 T
+or a, (iy+%d) |z80n |FD B6 %d      |     19 T
 or a, a       |8080 |B7            |      4 T
 or a, a       |8085 |B7            |      4 T
 or a, a       |gbz80|B7            |      4 T
@@ -1838,11 +2454,349 @@ push psw      |8085 |F5            |     12 T
 push psw      |gbz80|F5            |     16 T
 push psw      |z80  |F5            |     11 T
 push psw      |z80n |F5            |     11 T
+res 0, (hl)   |gbz80|CB 86         |     16 T
+res 0, (hl)   |z80  |CB 86         |     15 T
+res 0, (hl)   |z80n |CB 86         |     15 T
+res 0, a      |gbz80|CB 87         |      8 T
+res 0, a      |z80  |CB 87         |      8 T
+res 0, a      |z80n |CB 87         |      8 T
+res 0, b      |gbz80|CB 80         |      8 T
+res 0, b      |z80  |CB 80         |      8 T
+res 0, b      |z80n |CB 80         |      8 T
+res 0, c      |gbz80|CB 81         |      8 T
+res 0, c      |z80  |CB 81         |      8 T
+res 0, c      |z80n |CB 81         |      8 T
+res 0, d      |gbz80|CB 82         |      8 T
+res 0, d      |z80  |CB 82         |      8 T
+res 0, d      |z80n |CB 82         |      8 T
+res 0, e      |gbz80|CB 83         |      8 T
+res 0, e      |z80  |CB 83         |      8 T
+res 0, e      |z80n |CB 83         |      8 T
+res 0, h      |gbz80|CB 84         |      8 T
+res 0, h      |z80  |CB 84         |      8 T
+res 0, h      |z80n |CB 84         |      8 T
+res 0, l      |gbz80|CB 85         |      8 T
+res 0, l      |z80  |CB 85         |      8 T
+res 0, l      |z80n |CB 85         |      8 T
+res 1, (hl)   |gbz80|CB 8E         |     16 T
+res 1, (hl)   |z80  |CB 8E         |     15 T
+res 1, (hl)   |z80n |CB 8E         |     15 T
+res 1, a      |gbz80|CB 8F         |      8 T
+res 1, a      |z80  |CB 8F         |      8 T
+res 1, a      |z80n |CB 8F         |      8 T
+res 1, b      |gbz80|CB 88         |      8 T
+res 1, b      |z80  |CB 88         |      8 T
+res 1, b      |z80n |CB 88         |      8 T
+res 1, c      |gbz80|CB 89         |      8 T
+res 1, c      |z80  |CB 89         |      8 T
+res 1, c      |z80n |CB 89         |      8 T
+res 1, d      |gbz80|CB 8A         |      8 T
+res 1, d      |z80  |CB 8A         |      8 T
+res 1, d      |z80n |CB 8A         |      8 T
+res 1, e      |gbz80|CB 8B         |      8 T
+res 1, e      |z80  |CB 8B         |      8 T
+res 1, e      |z80n |CB 8B         |      8 T
+res 1, h      |gbz80|CB 8C         |      8 T
+res 1, h      |z80  |CB 8C         |      8 T
+res 1, h      |z80n |CB 8C         |      8 T
+res 1, l      |gbz80|CB 8D         |      8 T
+res 1, l      |z80  |CB 8D         |      8 T
+res 1, l      |z80n |CB 8D         |      8 T
+res 2, (hl)   |gbz80|CB 96         |     16 T
+res 2, (hl)   |z80  |CB 96         |     15 T
+res 2, (hl)   |z80n |CB 96         |     15 T
+res 2, a      |gbz80|CB 97         |      8 T
+res 2, a      |z80  |CB 97         |      8 T
+res 2, a      |z80n |CB 97         |      8 T
+res 2, b      |gbz80|CB 90         |      8 T
+res 2, b      |z80  |CB 90         |      8 T
+res 2, b      |z80n |CB 90         |      8 T
+res 2, c      |gbz80|CB 91         |      8 T
+res 2, c      |z80  |CB 91         |      8 T
+res 2, c      |z80n |CB 91         |      8 T
+res 2, d      |gbz80|CB 92         |      8 T
+res 2, d      |z80  |CB 92         |      8 T
+res 2, d      |z80n |CB 92         |      8 T
+res 2, e      |gbz80|CB 93         |      8 T
+res 2, e      |z80  |CB 93         |      8 T
+res 2, e      |z80n |CB 93         |      8 T
+res 2, h      |gbz80|CB 94         |      8 T
+res 2, h      |z80  |CB 94         |      8 T
+res 2, h      |z80n |CB 94         |      8 T
+res 2, l      |gbz80|CB 95         |      8 T
+res 2, l      |z80  |CB 95         |      8 T
+res 2, l      |z80n |CB 95         |      8 T
+res 3, (hl)   |gbz80|CB 9E         |     16 T
+res 3, (hl)   |z80  |CB 9E         |     15 T
+res 3, (hl)   |z80n |CB 9E         |     15 T
+res 3, a      |gbz80|CB 9F         |      8 T
+res 3, a      |z80  |CB 9F         |      8 T
+res 3, a      |z80n |CB 9F         |      8 T
+res 3, b      |gbz80|CB 98         |      8 T
+res 3, b      |z80  |CB 98         |      8 T
+res 3, b      |z80n |CB 98         |      8 T
+res 3, c      |gbz80|CB 99         |      8 T
+res 3, c      |z80  |CB 99         |      8 T
+res 3, c      |z80n |CB 99         |      8 T
+res 3, d      |gbz80|CB 9A         |      8 T
+res 3, d      |z80  |CB 9A         |      8 T
+res 3, d      |z80n |CB 9A         |      8 T
+res 3, e      |gbz80|CB 9B         |      8 T
+res 3, e      |z80  |CB 9B         |      8 T
+res 3, e      |z80n |CB 9B         |      8 T
+res 3, h      |gbz80|CB 9C         |      8 T
+res 3, h      |z80  |CB 9C         |      8 T
+res 3, h      |z80n |CB 9C         |      8 T
+res 3, l      |gbz80|CB 9D         |      8 T
+res 3, l      |z80  |CB 9D         |      8 T
+res 3, l      |z80n |CB 9D         |      8 T
+res 4, (hl)   |gbz80|CB A6         |     16 T
+res 4, (hl)   |z80  |CB A6         |     15 T
+res 4, (hl)   |z80n |CB A6         |     15 T
+res 4, a      |gbz80|CB A7         |      8 T
+res 4, a      |z80  |CB A7         |      8 T
+res 4, a      |z80n |CB A7         |      8 T
+res 4, b      |gbz80|CB A0         |      8 T
+res 4, b      |z80  |CB A0         |      8 T
+res 4, b      |z80n |CB A0         |      8 T
+res 4, c      |gbz80|CB A1         |      8 T
+res 4, c      |z80  |CB A1         |      8 T
+res 4, c      |z80n |CB A1         |      8 T
+res 4, d      |gbz80|CB A2         |      8 T
+res 4, d      |z80  |CB A2         |      8 T
+res 4, d      |z80n |CB A2         |      8 T
+res 4, e      |gbz80|CB A3         |      8 T
+res 4, e      |z80  |CB A3         |      8 T
+res 4, e      |z80n |CB A3         |      8 T
+res 4, h      |gbz80|CB A4         |      8 T
+res 4, h      |z80  |CB A4         |      8 T
+res 4, h      |z80n |CB A4         |      8 T
+res 4, l      |gbz80|CB A5         |      8 T
+res 4, l      |z80  |CB A5         |      8 T
+res 4, l      |z80n |CB A5         |      8 T
+res 5, (hl)   |gbz80|CB AE         |     16 T
+res 5, (hl)   |z80  |CB AE         |     15 T
+res 5, (hl)   |z80n |CB AE         |     15 T
+res 5, a      |gbz80|CB AF         |      8 T
+res 5, a      |z80  |CB AF         |      8 T
+res 5, a      |z80n |CB AF         |      8 T
+res 5, b      |gbz80|CB A8         |      8 T
+res 5, b      |z80  |CB A8         |      8 T
+res 5, b      |z80n |CB A8         |      8 T
+res 5, c      |gbz80|CB A9         |      8 T
+res 5, c      |z80  |CB A9         |      8 T
+res 5, c      |z80n |CB A9         |      8 T
+res 5, d      |gbz80|CB AA         |      8 T
+res 5, d      |z80  |CB AA         |      8 T
+res 5, d      |z80n |CB AA         |      8 T
+res 5, e      |gbz80|CB AB         |      8 T
+res 5, e      |z80  |CB AB         |      8 T
+res 5, e      |z80n |CB AB         |      8 T
+res 5, h      |gbz80|CB AC         |      8 T
+res 5, h      |z80  |CB AC         |      8 T
+res 5, h      |z80n |CB AC         |      8 T
+res 5, l      |gbz80|CB AD         |      8 T
+res 5, l      |z80  |CB AD         |      8 T
+res 5, l      |z80n |CB AD         |      8 T
+res 6, (hl)   |gbz80|CB B6         |     16 T
+res 6, (hl)   |z80  |CB B6         |     15 T
+res 6, (hl)   |z80n |CB B6         |     15 T
+res 6, a      |gbz80|CB B7         |      8 T
+res 6, a      |z80  |CB B7         |      8 T
+res 6, a      |z80n |CB B7         |      8 T
+res 6, b      |gbz80|CB B0         |      8 T
+res 6, b      |z80  |CB B0         |      8 T
+res 6, b      |z80n |CB B0         |      8 T
+res 6, c      |gbz80|CB B1         |      8 T
+res 6, c      |z80  |CB B1         |      8 T
+res 6, c      |z80n |CB B1         |      8 T
+res 6, d      |gbz80|CB B2         |      8 T
+res 6, d      |z80  |CB B2         |      8 T
+res 6, d      |z80n |CB B2         |      8 T
+res 6, e      |gbz80|CB B3         |      8 T
+res 6, e      |z80  |CB B3         |      8 T
+res 6, e      |z80n |CB B3         |      8 T
+res 6, h      |gbz80|CB B4         |      8 T
+res 6, h      |z80  |CB B4         |      8 T
+res 6, h      |z80n |CB B4         |      8 T
+res 6, l      |gbz80|CB B5         |      8 T
+res 6, l      |z80  |CB B5         |      8 T
+res 6, l      |z80n |CB B5         |      8 T
+res 7, (hl)   |gbz80|CB BE         |     16 T
+res 7, (hl)   |z80  |CB BE         |     15 T
+res 7, (hl)   |z80n |CB BE         |     15 T
+res 7, a      |gbz80|CB BF         |      8 T
+res 7, a      |z80  |CB BF         |      8 T
+res 7, a      |z80n |CB BF         |      8 T
+res 7, b      |gbz80|CB B8         |      8 T
+res 7, b      |z80  |CB B8         |      8 T
+res 7, b      |z80n |CB B8         |      8 T
+res 7, c      |gbz80|CB B9         |      8 T
+res 7, c      |z80  |CB B9         |      8 T
+res 7, c      |z80n |CB B9         |      8 T
+res 7, d      |gbz80|CB BA         |      8 T
+res 7, d      |z80  |CB BA         |      8 T
+res 7, d      |z80n |CB BA         |      8 T
+res 7, e      |gbz80|CB BB         |      8 T
+res 7, e      |z80  |CB BB         |      8 T
+res 7, e      |z80n |CB BB         |      8 T
+res 7, h      |gbz80|CB BC         |      8 T
+res 7, h      |z80  |CB BC         |      8 T
+res 7, h      |z80n |CB BC         |      8 T
+res 7, l      |gbz80|CB BD         |      8 T
+res 7, l      |z80  |CB BD         |      8 T
+res 7, l      |z80n |CB BD         |      8 T
+rst 0         |8080 |C7            |     11 T
+rst 0         |8085 |C7            |     12 T
+rst 0         |gbz80|C7            |     32 T
+rst 0         |z80  |C7            |     11 T
+rst 0         |z80n |C7            |     11 T
+rst 1         |8080 |CF            |     11 T
+rst 1         |8085 |CF            |     12 T
+rst 1         |gbz80|CF            |     32 T
+rst 1         |z80  |CF            |     11 T
+rst 1         |z80n |CF            |     11 T
+rst 16        |8080 |D7            |     11 T
+rst 16        |8085 |D7            |     12 T
+rst 16        |gbz80|D7            |     32 T
+rst 16        |z80  |D7            |     11 T
+rst 16        |z80n |D7            |     11 T
+rst 2         |8080 |D7            |     11 T
+rst 2         |8085 |D7            |     12 T
+rst 2         |gbz80|D7            |     32 T
+rst 2         |z80  |D7            |     11 T
+rst 2         |z80n |D7            |     11 T
+rst 24        |8080 |DF            |     11 T
+rst 24        |8085 |DF            |     12 T
+rst 24        |gbz80|DF            |     32 T
+rst 24        |z80  |DF            |     11 T
+rst 24        |z80n |DF            |     11 T
+rst 3         |8080 |DF            |     11 T
+rst 3         |8085 |DF            |     12 T
+rst 3         |gbz80|DF            |     32 T
+rst 3         |z80  |DF            |     11 T
+rst 3         |z80n |DF            |     11 T
+rst 32        |8080 |E7            |     11 T
+rst 32        |8085 |E7            |     12 T
+rst 32        |gbz80|E7            |     32 T
+rst 32        |z80  |E7            |     11 T
+rst 32        |z80n |E7            |     11 T
+rst 4         |8080 |E7            |     11 T
+rst 4         |8085 |E7            |     12 T
+rst 4         |gbz80|E7            |     32 T
+rst 4         |z80  |E7            |     11 T
+rst 4         |z80n |E7            |     11 T
+rst 40        |8080 |EF            |     11 T
+rst 40        |8085 |EF            |     12 T
+rst 40        |gbz80|EF            |     32 T
+rst 40        |z80  |EF            |     11 T
+rst 40        |z80n |EF            |     11 T
+rst 48        |8080 |F7            |     11 T
+rst 48        |8085 |F7            |     12 T
+rst 48        |gbz80|F7            |     32 T
+rst 48        |z80  |F7            |     11 T
+rst 48        |z80n |F7            |     11 T
+rst 5         |8080 |EF            |     11 T
+rst 5         |8085 |EF            |     12 T
+rst 5         |gbz80|EF            |     32 T
+rst 5         |z80  |EF            |     11 T
+rst 5         |z80n |EF            |     11 T
+rst 56        |8080 |FF            |     11 T
+rst 56        |8085 |FF            |     12 T
+rst 56        |gbz80|FF            |     32 T
+rst 56        |z80  |FF            |     11 T
+rst 56        |z80n |FF            |     11 T
+rst 6         |8080 |F7            |     11 T
+rst 6         |8085 |F7            |     12 T
+rst 6         |gbz80|F7            |     32 T
+rst 6         |z80  |F7            |     11 T
+rst 6         |z80n |F7            |     11 T
+rst 7         |8080 |FF            |     11 T
+rst 7         |8085 |FF            |     12 T
+rst 7         |gbz80|FF            |     32 T
+rst 7         |z80  |FF            |     11 T
+rst 7         |z80n |FF            |     11 T
+rst 8         |8080 |CF            |     11 T
+rst 8         |8085 |CF            |     12 T
+rst 8         |gbz80|CF            |     32 T
+rst 8         |z80  |CF            |     11 T
+rst 8         |z80n |CF            |     11 T
+sbb %n        |8080 |DE %n         |      7 T
+sbb %n        |8085 |DE %n         |      7 T
+sbb %n        |gbz80|DE %n         |      8 T
+sbb %n        |z80  |DE %n         |      7 T
+sbb %n        |z80n |DE %n         |      7 T
+sbb (hl)      |8080 |9E            |      7 T
+sbb (hl)      |8085 |9E            |      7 T
+sbb (hl)      |gbz80|9E            |      8 T
+sbb (hl)      |z80  |9E            |      7 T
+sbb (hl)      |z80n |9E            |      7 T
+sbb (ix)      |z80  |DD 9E 00      |     19 T
+sbb (ix)      |z80n |DD 9E 00      |     19 T
+sbb (ix+%d)   |z80  |DD 9E %d      |     19 T
+sbb (ix+%d)   |z80n |DD 9E %d      |     19 T
+sbb (iy)      |z80  |FD 9E 00      |     19 T
+sbb (iy)      |z80n |FD 9E 00      |     19 T
+sbb (iy+%d)   |z80  |FD 9E %d      |     19 T
+sbb (iy+%d)   |z80n |FD 9E %d      |     19 T
 sbb a         |8080 |9F            |      4 T
 sbb a         |8085 |9F            |      4 T
 sbb a         |gbz80|9F            |      4 T
 sbb a         |z80  |9F            |      4 T
 sbb a         |z80n |9F            |      4 T
+sbb a, %n     |8080 |DE %n         |      7 T
+sbb a, %n     |8085 |DE %n         |      7 T
+sbb a, %n     |gbz80|DE %n         |      8 T
+sbb a, %n     |z80  |DE %n         |      7 T
+sbb a, %n     |z80n |DE %n         |      7 T
+sbb a, (hl)   |8080 |9E            |      7 T
+sbb a, (hl)   |8085 |9E            |      7 T
+sbb a, (hl)   |gbz80|9E            |      8 T
+sbb a, (hl)   |z80  |9E            |      7 T
+sbb a, (hl)   |z80n |9E            |      7 T
+sbb a, (ix)   |z80  |DD 9E 00      |     19 T
+sbb a, (ix)   |z80n |DD 9E 00      |     19 T
+sbb a, (ix+%d)|z80  |DD 9E %d      |     19 T
+sbb a, (ix+%d)|z80n |DD 9E %d      |     19 T
+sbb a, (iy)   |z80  |FD 9E 00      |     19 T
+sbb a, (iy)   |z80n |FD 9E 00      |     19 T
+sbb a, (iy+%d)|z80  |FD 9E %d      |     19 T
+sbb a, (iy+%d)|z80n |FD 9E %d      |     19 T
+sbb a, a      |8080 |9F            |      4 T
+sbb a, a      |8085 |9F            |      4 T
+sbb a, a      |gbz80|9F            |      4 T
+sbb a, a      |z80  |9F            |      4 T
+sbb a, a      |z80n |9F            |      4 T
+sbb a, b      |8080 |98            |      4 T
+sbb a, b      |8085 |98            |      4 T
+sbb a, b      |gbz80|98            |      4 T
+sbb a, b      |z80  |98            |      4 T
+sbb a, b      |z80n |98            |      4 T
+sbb a, c      |8080 |99            |      4 T
+sbb a, c      |8085 |99            |      4 T
+sbb a, c      |gbz80|99            |      4 T
+sbb a, c      |z80  |99            |      4 T
+sbb a, c      |z80n |99            |      4 T
+sbb a, d      |8080 |9A            |      4 T
+sbb a, d      |8085 |9A            |      4 T
+sbb a, d      |gbz80|9A            |      4 T
+sbb a, d      |z80  |9A            |      4 T
+sbb a, d      |z80n |9A            |      4 T
+sbb a, e      |8080 |9B            |      4 T
+sbb a, e      |8085 |9B            |      4 T
+sbb a, e      |gbz80|9B            |      4 T
+sbb a, e      |z80  |9B            |      4 T
+sbb a, e      |z80n |9B            |      4 T
+sbb a, h      |8080 |9C            |      4 T
+sbb a, h      |8085 |9C            |      4 T
+sbb a, h      |gbz80|9C            |      4 T
+sbb a, h      |z80  |9C            |      4 T
+sbb a, h      |z80n |9C            |      4 T
+sbb a, l      |8080 |9D            |      4 T
+sbb a, l      |8085 |9D            |      4 T
+sbb a, l      |gbz80|9D            |      4 T
+sbb a, l      |z80  |9D            |      4 T
+sbb a, l      |z80n |9D            |      4 T
 sbb b         |8080 |98            |      4 T
 sbb b         |8085 |98            |      4 T
 sbb b         |gbz80|98            |      4 T
@@ -1888,6 +2842,14 @@ sbc (hl)      |8085 |9E            |      7 T
 sbc (hl)      |gbz80|9E            |      8 T
 sbc (hl)      |z80  |9E            |      7 T
 sbc (hl)      |z80n |9E            |      7 T
+sbc (ix)      |z80  |DD 9E 00      |     19 T
+sbc (ix)      |z80n |DD 9E 00      |     19 T
+sbc (ix+%d)   |z80  |DD 9E %d      |     19 T
+sbc (ix+%d)   |z80n |DD 9E %d      |     19 T
+sbc (iy)      |z80  |FD 9E 00      |     19 T
+sbc (iy)      |z80n |FD 9E 00      |     19 T
+sbc (iy+%d)   |z80  |FD 9E %d      |     19 T
+sbc (iy+%d)   |z80n |FD 9E %d      |     19 T
 sbc a         |8080 |9F            |      4 T
 sbc a         |8085 |9F            |      4 T
 sbc a         |gbz80|9F            |      4 T
@@ -1903,6 +2865,14 @@ sbc a, (hl)   |8085 |9E            |      7 T
 sbc a, (hl)   |gbz80|9E            |      8 T
 sbc a, (hl)   |z80  |9E            |      7 T
 sbc a, (hl)   |z80n |9E            |      7 T
+sbc a, (ix)   |z80  |DD 9E 00      |     19 T
+sbc a, (ix)   |z80n |DD 9E 00      |     19 T
+sbc a, (ix+%d)|z80  |DD 9E %d      |     19 T
+sbc a, (ix+%d)|z80n |DD 9E %d      |     19 T
+sbc a, (iy)   |z80  |FD 9E 00      |     19 T
+sbc a, (iy)   |z80n |FD 9E 00      |     19 T
+sbc a, (iy+%d)|z80  |FD 9E %d      |     19 T
+sbc a, (iy+%d)|z80n |FD 9E %d      |     19 T
 sbc a, a      |8080 |9F            |      4 T
 sbc a, a      |8085 |9F            |      4 T
 sbc a, a      |gbz80|9F            |      4 T
@@ -1978,6 +2948,198 @@ scf           |8085 |37            |      4 T
 scf           |gbz80|37            |      4 T
 scf           |z80  |37            |      4 T
 scf           |z80n |37            |      4 T
+set 0, (hl)   |gbz80|CB C6         |     16 T
+set 0, (hl)   |z80  |CB C6         |     15 T
+set 0, (hl)   |z80n |CB C6         |     15 T
+set 0, a      |gbz80|CB C7         |      8 T
+set 0, a      |z80  |CB C7         |      8 T
+set 0, a      |z80n |CB C7         |      8 T
+set 0, b      |gbz80|CB C0         |      8 T
+set 0, b      |z80  |CB C0         |      8 T
+set 0, b      |z80n |CB C0         |      8 T
+set 0, c      |gbz80|CB C1         |      8 T
+set 0, c      |z80  |CB C1         |      8 T
+set 0, c      |z80n |CB C1         |      8 T
+set 0, d      |gbz80|CB C2         |      8 T
+set 0, d      |z80  |CB C2         |      8 T
+set 0, d      |z80n |CB C2         |      8 T
+set 0, e      |gbz80|CB C3         |      8 T
+set 0, e      |z80  |CB C3         |      8 T
+set 0, e      |z80n |CB C3         |      8 T
+set 0, h      |gbz80|CB C4         |      8 T
+set 0, h      |z80  |CB C4         |      8 T
+set 0, h      |z80n |CB C4         |      8 T
+set 0, l      |gbz80|CB C5         |      8 T
+set 0, l      |z80  |CB C5         |      8 T
+set 0, l      |z80n |CB C5         |      8 T
+set 1, (hl)   |gbz80|CB CE         |     16 T
+set 1, (hl)   |z80  |CB CE         |     15 T
+set 1, (hl)   |z80n |CB CE         |     15 T
+set 1, a      |gbz80|CB CF         |      8 T
+set 1, a      |z80  |CB CF         |      8 T
+set 1, a      |z80n |CB CF         |      8 T
+set 1, b      |gbz80|CB C8         |      8 T
+set 1, b      |z80  |CB C8         |      8 T
+set 1, b      |z80n |CB C8         |      8 T
+set 1, c      |gbz80|CB C9         |      8 T
+set 1, c      |z80  |CB C9         |      8 T
+set 1, c      |z80n |CB C9         |      8 T
+set 1, d      |gbz80|CB CA         |      8 T
+set 1, d      |z80  |CB CA         |      8 T
+set 1, d      |z80n |CB CA         |      8 T
+set 1, e      |gbz80|CB CB         |      8 T
+set 1, e      |z80  |CB CB         |      8 T
+set 1, e      |z80n |CB CB         |      8 T
+set 1, h      |gbz80|CB CC         |      8 T
+set 1, h      |z80  |CB CC         |      8 T
+set 1, h      |z80n |CB CC         |      8 T
+set 1, l      |gbz80|CB CD         |      8 T
+set 1, l      |z80  |CB CD         |      8 T
+set 1, l      |z80n |CB CD         |      8 T
+set 2, (hl)   |gbz80|CB D6         |     16 T
+set 2, (hl)   |z80  |CB D6         |     15 T
+set 2, (hl)   |z80n |CB D6         |     15 T
+set 2, a      |gbz80|CB D7         |      8 T
+set 2, a      |z80  |CB D7         |      8 T
+set 2, a      |z80n |CB D7         |      8 T
+set 2, b      |gbz80|CB D0         |      8 T
+set 2, b      |z80  |CB D0         |      8 T
+set 2, b      |z80n |CB D0         |      8 T
+set 2, c      |gbz80|CB D1         |      8 T
+set 2, c      |z80  |CB D1         |      8 T
+set 2, c      |z80n |CB D1         |      8 T
+set 2, d      |gbz80|CB D2         |      8 T
+set 2, d      |z80  |CB D2         |      8 T
+set 2, d      |z80n |CB D2         |      8 T
+set 2, e      |gbz80|CB D3         |      8 T
+set 2, e      |z80  |CB D3         |      8 T
+set 2, e      |z80n |CB D3         |      8 T
+set 2, h      |gbz80|CB D4         |      8 T
+set 2, h      |z80  |CB D4         |      8 T
+set 2, h      |z80n |CB D4         |      8 T
+set 2, l      |gbz80|CB D5         |      8 T
+set 2, l      |z80  |CB D5         |      8 T
+set 2, l      |z80n |CB D5         |      8 T
+set 3, (hl)   |gbz80|CB DE         |     16 T
+set 3, (hl)   |z80  |CB DE         |     15 T
+set 3, (hl)   |z80n |CB DE         |     15 T
+set 3, a      |gbz80|CB DF         |      8 T
+set 3, a      |z80  |CB DF         |      8 T
+set 3, a      |z80n |CB DF         |      8 T
+set 3, b      |gbz80|CB D8         |      8 T
+set 3, b      |z80  |CB D8         |      8 T
+set 3, b      |z80n |CB D8         |      8 T
+set 3, c      |gbz80|CB D9         |      8 T
+set 3, c      |z80  |CB D9         |      8 T
+set 3, c      |z80n |CB D9         |      8 T
+set 3, d      |gbz80|CB DA         |      8 T
+set 3, d      |z80  |CB DA         |      8 T
+set 3, d      |z80n |CB DA         |      8 T
+set 3, e      |gbz80|CB DB         |      8 T
+set 3, e      |z80  |CB DB         |      8 T
+set 3, e      |z80n |CB DB         |      8 T
+set 3, h      |gbz80|CB DC         |      8 T
+set 3, h      |z80  |CB DC         |      8 T
+set 3, h      |z80n |CB DC         |      8 T
+set 3, l      |gbz80|CB DD         |      8 T
+set 3, l      |z80  |CB DD         |      8 T
+set 3, l      |z80n |CB DD         |      8 T
+set 4, (hl)   |gbz80|CB E6         |     16 T
+set 4, (hl)   |z80  |CB E6         |     15 T
+set 4, (hl)   |z80n |CB E6         |     15 T
+set 4, a      |gbz80|CB E7         |      8 T
+set 4, a      |z80  |CB E7         |      8 T
+set 4, a      |z80n |CB E7         |      8 T
+set 4, b      |gbz80|CB E0         |      8 T
+set 4, b      |z80  |CB E0         |      8 T
+set 4, b      |z80n |CB E0         |      8 T
+set 4, c      |gbz80|CB E1         |      8 T
+set 4, c      |z80  |CB E1         |      8 T
+set 4, c      |z80n |CB E1         |      8 T
+set 4, d      |gbz80|CB E2         |      8 T
+set 4, d      |z80  |CB E2         |      8 T
+set 4, d      |z80n |CB E2         |      8 T
+set 4, e      |gbz80|CB E3         |      8 T
+set 4, e      |z80  |CB E3         |      8 T
+set 4, e      |z80n |CB E3         |      8 T
+set 4, h      |gbz80|CB E4         |      8 T
+set 4, h      |z80  |CB E4         |      8 T
+set 4, h      |z80n |CB E4         |      8 T
+set 4, l      |gbz80|CB E5         |      8 T
+set 4, l      |z80  |CB E5         |      8 T
+set 4, l      |z80n |CB E5         |      8 T
+set 5, (hl)   |gbz80|CB EE         |     16 T
+set 5, (hl)   |z80  |CB EE         |     15 T
+set 5, (hl)   |z80n |CB EE         |     15 T
+set 5, a      |gbz80|CB EF         |      8 T
+set 5, a      |z80  |CB EF         |      8 T
+set 5, a      |z80n |CB EF         |      8 T
+set 5, b      |gbz80|CB E8         |      8 T
+set 5, b      |z80  |CB E8         |      8 T
+set 5, b      |z80n |CB E8         |      8 T
+set 5, c      |gbz80|CB E9         |      8 T
+set 5, c      |z80  |CB E9         |      8 T
+set 5, c      |z80n |CB E9         |      8 T
+set 5, d      |gbz80|CB EA         |      8 T
+set 5, d      |z80  |CB EA         |      8 T
+set 5, d      |z80n |CB EA         |      8 T
+set 5, e      |gbz80|CB EB         |      8 T
+set 5, e      |z80  |CB EB         |      8 T
+set 5, e      |z80n |CB EB         |      8 T
+set 5, h      |gbz80|CB EC         |      8 T
+set 5, h      |z80  |CB EC         |      8 T
+set 5, h      |z80n |CB EC         |      8 T
+set 5, l      |gbz80|CB ED         |      8 T
+set 5, l      |z80  |CB ED         |      8 T
+set 5, l      |z80n |CB ED         |      8 T
+set 6, (hl)   |gbz80|CB F6         |     16 T
+set 6, (hl)   |z80  |CB F6         |     15 T
+set 6, (hl)   |z80n |CB F6         |     15 T
+set 6, a      |gbz80|CB F7         |      8 T
+set 6, a      |z80  |CB F7         |      8 T
+set 6, a      |z80n |CB F7         |      8 T
+set 6, b      |gbz80|CB F0         |      8 T
+set 6, b      |z80  |CB F0         |      8 T
+set 6, b      |z80n |CB F0         |      8 T
+set 6, c      |gbz80|CB F1         |      8 T
+set 6, c      |z80  |CB F1         |      8 T
+set 6, c      |z80n |CB F1         |      8 T
+set 6, d      |gbz80|CB F2         |      8 T
+set 6, d      |z80  |CB F2         |      8 T
+set 6, d      |z80n |CB F2         |      8 T
+set 6, e      |gbz80|CB F3         |      8 T
+set 6, e      |z80  |CB F3         |      8 T
+set 6, e      |z80n |CB F3         |      8 T
+set 6, h      |gbz80|CB F4         |      8 T
+set 6, h      |z80  |CB F4         |      8 T
+set 6, h      |z80n |CB F4         |      8 T
+set 6, l      |gbz80|CB F5         |      8 T
+set 6, l      |z80  |CB F5         |      8 T
+set 6, l      |z80n |CB F5         |      8 T
+set 7, (hl)   |gbz80|CB FE         |     16 T
+set 7, (hl)   |z80  |CB FE         |     15 T
+set 7, (hl)   |z80n |CB FE         |     15 T
+set 7, a      |gbz80|CB FF         |      8 T
+set 7, a      |z80  |CB FF         |      8 T
+set 7, a      |z80n |CB FF         |      8 T
+set 7, b      |gbz80|CB F8         |      8 T
+set 7, b      |z80  |CB F8         |      8 T
+set 7, b      |z80n |CB F8         |      8 T
+set 7, c      |gbz80|CB F9         |      8 T
+set 7, c      |z80  |CB F9         |      8 T
+set 7, c      |z80n |CB F9         |      8 T
+set 7, d      |gbz80|CB FA         |      8 T
+set 7, d      |z80  |CB FA         |      8 T
+set 7, d      |z80n |CB FA         |      8 T
+set 7, e      |gbz80|CB FB         |      8 T
+set 7, e      |z80  |CB FB         |      8 T
+set 7, e      |z80n |CB FB         |      8 T
+set 7, h      |gbz80|CB FC         |      8 T
+set 7, h      |z80  |CB FC         |      8 T
+set 7, h      |z80n |CB FC         |      8 T
+set 7, l      |gbz80|CB FD         |      8 T
+set 7, l      |z80  |CB FD         |      8 T
+set 7, l      |z80n |CB FD         |      8 T
 shld %m       |8080 |22 %m %m      |     16 T
 shld %m       |8085 |22 %m %m      |     16 T
 shld %m       |z80  |22 %m %m      |     16 T
@@ -2029,6 +3191,14 @@ sub (hl)      |8085 |96            |      7 T
 sub (hl)      |gbz80|96            |      8 T
 sub (hl)      |z80  |96            |      7 T
 sub (hl)      |z80n |96            |      7 T
+sub (ix)      |z80  |DD 96 00      |     19 T
+sub (ix)      |z80n |DD 96 00      |     19 T
+sub (ix+%d)   |z80  |DD 96 %d      |     19 T
+sub (ix+%d)   |z80n |DD 96 %d      |     19 T
+sub (iy)      |z80  |FD 96 00      |     19 T
+sub (iy)      |z80n |FD 96 00      |     19 T
+sub (iy+%d)   |z80  |FD 96 %d      |     19 T
+sub (iy+%d)   |z80n |FD 96 %d      |     19 T
 sub a         |8080 |97            |      4 T
 sub a         |8085 |97            |      4 T
 sub a         |gbz80|97            |      4 T
@@ -2044,6 +3214,14 @@ sub a, (hl)   |8085 |96            |      7 T
 sub a, (hl)   |gbz80|96            |      8 T
 sub a, (hl)   |z80  |96            |      7 T
 sub a, (hl)   |z80n |96            |      7 T
+sub a, (ix)   |z80  |DD 96 00      |     19 T
+sub a, (ix)   |z80n |DD 96 00      |     19 T
+sub a, (ix+%d)|z80  |DD 96 %d      |     19 T
+sub a, (ix+%d)|z80n |DD 96 %d      |     19 T
+sub a, (iy)   |z80  |FD 96 00      |     19 T
+sub a, (iy)   |z80n |FD 96 00      |     19 T
+sub a, (iy+%d)|z80  |FD 96 %d      |     19 T
+sub a, (iy+%d)|z80n |FD 96 %d      |     19 T
 sub a, a      |8080 |97            |      4 T
 sub a, a      |8085 |97            |      4 T
 sub a, a      |gbz80|97            |      4 T
@@ -2134,6 +3312,14 @@ xor (hl)      |8085 |AE            |      7 T
 xor (hl)      |gbz80|AE            |      8 T
 xor (hl)      |z80  |AE            |      7 T
 xor (hl)      |z80n |AE            |      7 T
+xor (ix)      |z80  |DD AE 00      |     19 T
+xor (ix)      |z80n |DD AE 00      |     19 T
+xor (ix+%d)   |z80  |DD AE %d      |     19 T
+xor (ix+%d)   |z80n |DD AE %d      |     19 T
+xor (iy)      |z80  |FD AE 00      |     19 T
+xor (iy)      |z80n |FD AE 00      |     19 T
+xor (iy+%d)   |z80  |FD AE %d      |     19 T
+xor (iy+%d)   |z80n |FD AE %d      |     19 T
 xor a         |8080 |AF            |      4 T
 xor a         |8085 |AF            |      4 T
 xor a         |gbz80|AF            |      4 T
@@ -2149,6 +3335,14 @@ xor a, (hl)   |8085 |AE            |      7 T
 xor a, (hl)   |gbz80|AE            |      8 T
 xor a, (hl)   |z80  |AE            |      7 T
 xor a, (hl)   |z80n |AE            |      7 T
+xor a, (ix)   |z80  |DD AE 00      |     19 T
+xor a, (ix)   |z80n |DD AE 00      |     19 T
+xor a, (ix+%d)|z80  |DD AE %d      |     19 T
+xor a, (ix+%d)|z80n |DD AE %d      |     19 T
+xor a, (iy)   |z80  |FD AE 00      |     19 T
+xor a, (iy)   |z80n |FD AE 00      |     19 T
+xor a, (iy+%d)|z80  |FD AE %d      |     19 T
+xor a, (iy+%d)|z80n |FD AE %d      |     19 T
 xor a, a      |8080 |AF            |      4 T
 xor a, a      |8085 |AF            |      4 T
 xor a, a      |gbz80|AF            |      4 T

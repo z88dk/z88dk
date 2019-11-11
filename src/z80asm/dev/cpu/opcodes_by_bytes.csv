@@ -223,6 +223,9 @@
                              |cpl          |            |             |                       |         |               |              |              
                              |cpl a        |            |             |                       |         |               |              |              
                              |             |            |             |                       |         |               |              |              
+2F 3C                        |neg          |~           |~            |                       |         |               |              |              
+                             |neg a        |            |             |                       |         |               |              |              
+                             |             |            |             |                       |         |               |              |              
 30                           |             |sim         |             |                       |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 30 %j                        |             |            |jr nc, %j    |~                      |~        |~              |~             |~             
@@ -253,7 +256,6 @@
                              |mvi m, %n    |            |             |                       |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 37                           |scf          |~           |~            |~                      |~        |~              |~             |~             
-                             |scf f        |            |             |                       |         |               |              |              
                              |stc          |            |             |                       |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 38 %j                        |             |            |jr c, %j     |~                      |~        |~              |~             |~             
@@ -291,7 +293,6 @@
                              |mvi a, %n    |            |             |                       |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 3F                           |ccf          |~           |~            |~                      |~        |~              |~             |~             
-                             |ccf f        |            |             |                       |         |               |              |              
                              |cmc          |            |             |                       |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 40                           |ld b, b      |~           |~            |~                      |~        |~              |~             |~             
@@ -608,8 +609,6 @@
 76 35                        |             |            |             |altd dec (hl)          |~        |               |              |              
                              |             |            |             |                       |         |               |              |              
 76 37                        |             |            |             |altd scf               |~        |               |              |              
-                             |             |            |             |altd scf f             |         |               |              |              
-                             |             |            |             |scf f'                 |         |               |              |              
                              |             |            |             |scf'                   |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 76 39                        |             |            |             |add hl', sp            |~        |               |              |              
@@ -628,8 +627,6 @@
                              |             |            |             |ld a', %n              |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 76 3F                        |             |            |             |altd ccf               |~        |               |              |              
-                             |             |            |             |altd ccf f             |         |               |              |              
-                             |             |            |             |ccf f'                 |         |               |              |              
                              |             |            |             |ccf'                   |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 76 40                        |             |            |             |altd ld b, b           |~        |               |              |              
@@ -7161,38 +7158,29 @@ DD 09                        |             |            |             |add ix, b
                              |             |            |             |                       |         |               |              |              
 DD 19                        |             |            |             |add ix, de             |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
-DD 21 %m %m                  |             |            |ld ix, %m    |~                      |~        |~              |ld ix, %m     |~             
-                             |             |            |             |                       |         |               |lxi ixh, %m   |              
+DD 21 %m %m                  |             |            |ld ix, %m    |~                      |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 DD 22 %m %m                  |             |            |             |ld (%m), ix            |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
-DD 23                        |             |            |             |inc ix                 |~        |~              |inc ix        |~             
-                             |             |            |             |                       |         |               |inx ixh       |              
+DD 23                        |             |            |             |inc ix                 |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 DD 24                        |             |            |             |                       |         |               |inc ixh       |~             
-                             |             |            |             |                       |         |               |inr ixh       |              
                              |             |            |             |                       |         |               |              |              
-DD 25                        |             |            |             |                       |         |               |dcr ixh       |~             
-                             |             |            |             |                       |         |               |dec ixh       |              
+DD 25                        |             |            |             |                       |         |               |dec ixh       |~             
                              |             |            |             |                       |         |               |              |              
 DD 26 %n                     |             |            |             |                       |         |               |ld ixh, %n    |~             
-                             |             |            |             |                       |         |               |mvi ixh, %n   |              
                              |             |            |             |                       |         |               |              |              
 DD 29                        |             |            |             |add ix, ix             |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 DD 2A %m %m                  |             |            |             |ld ix, (%m)            |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
-DD 2B                        |             |            |             |dec ix                 |~        |~              |dcx ixh       |~             
-                             |             |            |             |                       |         |               |dec ix        |              
+DD 2B                        |             |            |             |dec ix                 |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 DD 2C                        |             |            |             |                       |         |               |inc ixl       |~             
-                             |             |            |             |                       |         |               |inr ixl       |              
                              |             |            |             |                       |         |               |              |              
-DD 2D                        |             |            |             |                       |         |               |dcr ixl       |~             
-                             |             |            |             |                       |         |               |dec ixl       |              
+DD 2D                        |             |            |             |                       |         |               |dec ixl       |~             
                              |             |            |             |                       |         |               |              |              
 DD 2E %n                     |             |            |             |                       |         |               |ld ixl, %n    |~             
-                             |             |            |             |                       |         |               |mvi ixl, %n   |              
                              |             |            |             |                       |         |               |              |              
 DD 34 %d                     |             |            |             |inc (ix+%d)            |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
@@ -7209,102 +7197,76 @@ DD 36 00 %n                  |             |            |             |ld (ix), 
 DD 39                        |             |            |             |add ix, sp             |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 DD 44                        |             |            |             |                       |         |               |ld b, ixh     |~             
-                             |             |            |             |                       |         |               |mov b, ixh    |              
                              |             |            |             |                       |         |               |              |              
 DD 45                        |             |            |             |                       |         |               |ld b, ixl     |~             
-                             |             |            |             |                       |         |               |mov b, ixl    |              
                              |             |            |             |                       |         |               |              |              
 DD 46 %d                     |             |            |             |ld b, (ix+%d)          |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 DD 46 00                     |             |            |             |ld b, (ix)             |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 DD 4C                        |             |            |             |                       |         |               |ld c, ixh     |~             
-                             |             |            |             |                       |         |               |mov c, ixh    |              
                              |             |            |             |                       |         |               |              |              
 DD 4D                        |             |            |             |                       |         |               |ld c, ixl     |~             
-                             |             |            |             |                       |         |               |mov c, ixl    |              
                              |             |            |             |                       |         |               |              |              
 DD 4E %d                     |             |            |             |ld c, (ix+%d)          |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 DD 4E 00                     |             |            |             |ld c, (ix)             |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 DD 54                        |             |            |             |                       |         |               |ld d, ixh     |~             
-                             |             |            |             |                       |         |               |mov d, ixh    |              
                              |             |            |             |                       |         |               |              |              
 DD 55                        |             |            |             |                       |         |               |ld d, ixl     |~             
-                             |             |            |             |                       |         |               |mov d, ixl    |              
                              |             |            |             |                       |         |               |              |              
 DD 56 %d                     |             |            |             |ld d, (ix+%d)          |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 DD 56 00                     |             |            |             |ld d, (ix)             |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 DD 5C                        |             |            |             |                       |         |               |ld e, ixh     |~             
-                             |             |            |             |                       |         |               |mov e, ixh    |              
                              |             |            |             |                       |         |               |              |              
 DD 5D                        |             |            |             |                       |         |               |ld e, ixl     |~             
-                             |             |            |             |                       |         |               |mov e, ixl    |              
                              |             |            |             |                       |         |               |              |              
 DD 5E %d                     |             |            |             |ld e, (ix+%d)          |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 DD 5E 00                     |             |            |             |ld e, (ix)             |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 DD 60                        |             |            |             |                       |         |               |ld ixh, b     |~             
-                             |             |            |             |                       |         |               |mov ixh, b    |              
                              |             |            |             |                       |         |               |              |              
 DD 61                        |             |            |             |                       |         |               |ld ixh, c     |~             
-                             |             |            |             |                       |         |               |mov ixh, c    |              
                              |             |            |             |                       |         |               |              |              
 DD 62                        |             |            |             |                       |         |               |ld ixh, d     |~             
-                             |             |            |             |                       |         |               |mov ixh, d    |              
                              |             |            |             |                       |         |               |              |              
 DD 63                        |             |            |             |                       |         |               |ld ixh, e     |~             
-                             |             |            |             |                       |         |               |mov ixh, e    |              
                              |             |            |             |                       |         |               |              |              
 DD 64                        |             |            |             |ldp (ix), hl           |~        |               |ld ixh, ixh   |~             
-                             |             |            |             |                       |         |               |mov ixh, ixh  |              
                              |             |            |             |                       |         |               |              |              
 DD 65                        |             |            |             |                       |         |               |ld ixh, ixl   |~             
-                             |             |            |             |                       |         |               |mov ixh, ixl  |              
                              |             |            |             |                       |         |               |              |              
 DD 65 %m %m                  |             |            |             |ldp (%m), ix           |~        |               |              |              
-                             |             |            |             |                       |         |               |              |              
-DD 66                        |             |            |             |                       |         |               |mov ixh, m    |~             
                              |             |            |             |                       |         |               |              |              
 DD 66 %d                     |             |            |             |ld h, (ix+%d)          |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 DD 66 00                     |             |            |             |ld h, (ix)             |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 DD 67                        |             |            |             |                       |         |               |ld ixh, a     |~             
-                             |             |            |             |                       |         |               |mov ixh, a    |              
                              |             |            |             |                       |         |               |              |              
 DD 68                        |             |            |             |                       |         |               |ld ixl, b     |~             
-                             |             |            |             |                       |         |               |mov ixl, b    |              
                              |             |            |             |                       |         |               |              |              
 DD 69                        |             |            |             |                       |         |               |ld ixl, c     |~             
-                             |             |            |             |                       |         |               |mov ixl, c    |              
                              |             |            |             |                       |         |               |              |              
 DD 6A                        |             |            |             |                       |         |               |ld ixl, d     |~             
-                             |             |            |             |                       |         |               |mov ixl, d    |              
                              |             |            |             |                       |         |               |              |              
 DD 6B                        |             |            |             |                       |         |               |ld ixl, e     |~             
-                             |             |            |             |                       |         |               |mov ixl, e    |              
                              |             |            |             |                       |         |               |              |              
 DD 6C                        |             |            |             |ldp hl, (ix)           |~        |               |ld ixl, ixh   |~             
-                             |             |            |             |                       |         |               |mov ixl, ixh  |              
                              |             |            |             |                       |         |               |              |              
 DD 6D                        |             |            |             |                       |         |               |ld ixl, ixl   |~             
-                             |             |            |             |                       |         |               |mov ixl, ixl  |              
                              |             |            |             |                       |         |               |              |              
 DD 6D %m %m                  |             |            |             |ldp ix, (%m)           |~        |               |              |              
-                             |             |            |             |                       |         |               |              |              
-DD 6E                        |             |            |             |                       |         |               |mov ixl, m    |~             
                              |             |            |             |                       |         |               |              |              
 DD 6E %d                     |             |            |             |ld l, (ix+%d)          |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 DD 6E 00                     |             |            |             |ld l, (ix)             |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 DD 6F                        |             |            |             |                       |         |               |ld ixl, a     |~             
-                             |             |            |             |                       |         |               |mov ixl, a    |              
                              |             |            |             |                       |         |               |              |              
 DD 70 %d                     |             |            |             |ld (ix+%d), b          |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
@@ -7322,13 +7284,9 @@ DD 73 %d                     |             |            |             |ld (ix+%d
                              |             |            |             |                       |         |               |              |              
 DD 73 00                     |             |            |             |ld (ix), e             |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
-DD 74                        |             |            |             |                       |         |               |mov m, ixh    |~             
-                             |             |            |             |                       |         |               |              |              
 DD 74 %d                     |             |            |             |ld (ix+%d), h          |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 DD 74 00                     |             |            |             |ld (ix), h             |~        |~              |~             |~             
-                             |             |            |             |                       |         |               |              |              
-DD 75                        |             |            |             |                       |         |               |mov m, ixl    |~             
                              |             |            |             |                       |         |               |              |              
 DD 75 %d                     |             |            |             |ld (ix+%d), l          |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
@@ -7339,10 +7297,8 @@ DD 77 %d                     |             |            |             |ld (ix+%d
 DD 77 00                     |             |            |             |ld (ix), a             |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 DD 7C                        |             |            |             |ld hl, ix              |~        |               |ld a, ixh     |~             
-                             |             |            |             |                       |         |               |mov a, ixh    |              
                              |             |            |             |                       |         |               |              |              
 DD 7D                        |             |            |             |ld ix, hl              |~        |               |ld a, ixl     |~             
-                             |             |            |             |                       |         |               |mov a, ixl    |              
                              |             |            |             |                       |         |               |              |              
 DD 7E %d                     |             |            |             |ld a, (ix+%d)          |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
@@ -7384,12 +7340,10 @@ DD 96 %d                     |             |            |             |sub (ix+%
 DD 96 00                     |             |            |             |sub (ix)               |~        |~              |~             |~             
                              |             |            |             |sub a, (ix)            |         |               |              |              
                              |             |            |             |                       |         |               |              |              
-DD 9C                        |             |            |             |                       |         |               |sbb ixh       |~             
-                             |             |            |             |                       |         |               |sbc a, ixh    |              
+DD 9C                        |             |            |             |                       |         |               |sbc a, ixh    |~             
                              |             |            |             |                       |         |               |sbc ixh       |              
                              |             |            |             |                       |         |               |              |              
-DD 9D                        |             |            |             |                       |         |               |sbb ixl       |~             
-                             |             |            |             |                       |         |               |sbc a, ixl    |              
+DD 9D                        |             |            |             |                       |         |               |sbc a, ixl    |~             
                              |             |            |             |                       |         |               |sbc ixl       |              
                              |             |            |             |                       |         |               |              |              
 DD 9E %d                     |             |            |             |sbc (ix+%d)            |~        |~              |~             |~             
@@ -7412,11 +7366,9 @@ DD A6 00                     |             |            |             |and (ix) 
                              |             |            |             |                       |         |               |              |              
 DD AC                        |             |            |             |                       |         |               |xor a, ixh    |~             
                              |             |            |             |                       |         |               |xor ixh       |              
-                             |             |            |             |                       |         |               |xra ixh       |              
                              |             |            |             |                       |         |               |              |              
 DD AD                        |             |            |             |                       |         |               |xor a, ixl    |~             
                              |             |            |             |                       |         |               |xor ixl       |              
-                             |             |            |             |                       |         |               |xra ixl       |              
                              |             |            |             |                       |         |               |              |              
 DD AE %d                     |             |            |             |xor (ix+%d)            |~        |~              |~             |~             
                              |             |            |             |xor a, (ix+%d)         |         |               |              |              
@@ -7426,11 +7378,9 @@ DD AE 00                     |             |            |             |xor (ix) 
                              |             |            |             |                       |         |               |              |              
 DD B4                        |             |            |             |                       |         |               |or a, ixh     |~             
                              |             |            |             |                       |         |               |or ixh        |              
-                             |             |            |             |                       |         |               |ora ixh       |              
                              |             |            |             |                       |         |               |              |              
 DD B5                        |             |            |             |                       |         |               |or a, ixl     |~             
                              |             |            |             |                       |         |               |or ixl        |              
-                             |             |            |             |                       |         |               |ora ixl       |              
                              |             |            |             |                       |         |               |              |              
 DD B6 %d                     |             |            |             |or (ix+%d)             |~        |~              |~             |~             
                              |             |            |             |or a, (ix+%d)          |         |               |              |              
@@ -7878,184 +7828,6 @@ DD CB 00 F6                  |             |            |             |set 6, (i
 DD CB 00 FE                  |             |            |             |set 7, (ix)            |~        |~              |~             |~             
                              |             |            |             |set.a 7, (ix)          |         |               |              |              
                              |             |            |             |                       |         |               |              |              
-DD CB 04                     |             |            |             |                       |         |               |rlc ixh       |~             
-                             |             |            |             |                       |         |               |              |              
-DD CB 05                     |             |            |             |                       |         |               |rlc ixl       |~             
-                             |             |            |             |                       |         |               |              |              
-DD CB 0C                     |             |            |             |                       |         |               |rrc ixh       |~             
-                             |             |            |             |                       |         |               |              |              
-DD CB 0D                     |             |            |             |                       |         |               |rrc ixl       |~             
-                             |             |            |             |                       |         |               |              |              
-DD CB 14                     |             |            |             |                       |         |               |rl ixh        |~             
-                             |             |            |             |                       |         |               |              |              
-DD CB 15                     |             |            |             |                       |         |               |rl ixl        |~             
-                             |             |            |             |                       |         |               |              |              
-DD CB 1C                     |             |            |             |                       |         |               |rr ixh        |~             
-                             |             |            |             |                       |         |               |              |              
-DD CB 1D                     |             |            |             |                       |         |               |rr ixl        |~             
-                             |             |            |             |                       |         |               |              |              
-DD CB 24                     |             |            |             |                       |         |               |sla ixh       |~             
-                             |             |            |             |                       |         |               |              |              
-DD CB 25                     |             |            |             |                       |         |               |sla ixl       |~             
-                             |             |            |             |                       |         |               |              |              
-DD CB 2C                     |             |            |             |                       |         |               |sra ixh       |~             
-                             |             |            |             |                       |         |               |              |              
-DD CB 2D                     |             |            |             |                       |         |               |sra ixl       |~             
-                             |             |            |             |                       |         |               |              |              
-DD CB 34                     |             |            |             |                       |         |               |sli ixh       |~             
-                             |             |            |             |                       |         |               |sll ixh       |              
-                             |             |            |             |                       |         |               |              |              
-DD CB 35                     |             |            |             |                       |         |               |sli ixl       |~             
-                             |             |            |             |                       |         |               |sll ixl       |              
-                             |             |            |             |                       |         |               |              |              
-DD CB 3C                     |             |            |             |                       |         |               |srl ixh       |~             
-                             |             |            |             |                       |         |               |              |              
-DD CB 3D                     |             |            |             |                       |         |               |srl ixl       |~             
-                             |             |            |             |                       |         |               |              |              
-DD CB 44                     |             |            |             |                       |         |               |bit 0, ixh    |~             
-                             |             |            |             |                       |         |               |bit.a 0, ixh  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB 45                     |             |            |             |                       |         |               |bit 0, ixl    |~             
-                             |             |            |             |                       |         |               |bit.a 0, ixl  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB 4C                     |             |            |             |                       |         |               |bit 1, ixh    |~             
-                             |             |            |             |                       |         |               |bit.a 1, ixh  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB 4D                     |             |            |             |                       |         |               |bit 1, ixl    |~             
-                             |             |            |             |                       |         |               |bit.a 1, ixl  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB 54                     |             |            |             |                       |         |               |bit 2, ixh    |~             
-                             |             |            |             |                       |         |               |bit.a 2, ixh  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB 55                     |             |            |             |                       |         |               |bit 2, ixl    |~             
-                             |             |            |             |                       |         |               |bit.a 2, ixl  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB 5C                     |             |            |             |                       |         |               |bit 3, ixh    |~             
-                             |             |            |             |                       |         |               |bit.a 3, ixh  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB 5D                     |             |            |             |                       |         |               |bit 3, ixl    |~             
-                             |             |            |             |                       |         |               |bit.a 3, ixl  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB 64                     |             |            |             |                       |         |               |bit 4, ixh    |~             
-                             |             |            |             |                       |         |               |bit.a 4, ixh  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB 65                     |             |            |             |                       |         |               |bit 4, ixl    |~             
-                             |             |            |             |                       |         |               |bit.a 4, ixl  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB 6C                     |             |            |             |                       |         |               |bit 5, ixh    |~             
-                             |             |            |             |                       |         |               |bit.a 5, ixh  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB 6D                     |             |            |             |                       |         |               |bit 5, ixl    |~             
-                             |             |            |             |                       |         |               |bit.a 5, ixl  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB 74                     |             |            |             |                       |         |               |bit 6, ixh    |~             
-                             |             |            |             |                       |         |               |bit.a 6, ixh  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB 75                     |             |            |             |                       |         |               |bit 6, ixl    |~             
-                             |             |            |             |                       |         |               |bit.a 6, ixl  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB 7C                     |             |            |             |                       |         |               |bit 7, ixh    |~             
-                             |             |            |             |                       |         |               |bit.a 7, ixh  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB 7D                     |             |            |             |                       |         |               |bit 7, ixl    |~             
-                             |             |            |             |                       |         |               |bit.a 7, ixl  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB 84                     |             |            |             |                       |         |               |res 0, ixh    |~             
-                             |             |            |             |                       |         |               |res.a 0, ixh  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB 85                     |             |            |             |                       |         |               |res 0, ixl    |~             
-                             |             |            |             |                       |         |               |res.a 0, ixl  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB 8C                     |             |            |             |                       |         |               |res 1, ixh    |~             
-                             |             |            |             |                       |         |               |res.a 1, ixh  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB 8D                     |             |            |             |                       |         |               |res 1, ixl    |~             
-                             |             |            |             |                       |         |               |res.a 1, ixl  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB 94                     |             |            |             |                       |         |               |res 2, ixh    |~             
-                             |             |            |             |                       |         |               |res.a 2, ixh  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB 95                     |             |            |             |                       |         |               |res 2, ixl    |~             
-                             |             |            |             |                       |         |               |res.a 2, ixl  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB 9C                     |             |            |             |                       |         |               |res 3, ixh    |~             
-                             |             |            |             |                       |         |               |res.a 3, ixh  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB 9D                     |             |            |             |                       |         |               |res 3, ixl    |~             
-                             |             |            |             |                       |         |               |res.a 3, ixl  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB A4                     |             |            |             |                       |         |               |res 4, ixh    |~             
-                             |             |            |             |                       |         |               |res.a 4, ixh  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB A5                     |             |            |             |                       |         |               |res 4, ixl    |~             
-                             |             |            |             |                       |         |               |res.a 4, ixl  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB AC                     |             |            |             |                       |         |               |res 5, ixh    |~             
-                             |             |            |             |                       |         |               |res.a 5, ixh  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB AD                     |             |            |             |                       |         |               |res 5, ixl    |~             
-                             |             |            |             |                       |         |               |res.a 5, ixl  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB B4                     |             |            |             |                       |         |               |res 6, ixh    |~             
-                             |             |            |             |                       |         |               |res.a 6, ixh  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB B5                     |             |            |             |                       |         |               |res 6, ixl    |~             
-                             |             |            |             |                       |         |               |res.a 6, ixl  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB BC                     |             |            |             |                       |         |               |res 7, ixh    |~             
-                             |             |            |             |                       |         |               |res.a 7, ixh  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB BD                     |             |            |             |                       |         |               |res 7, ixl    |~             
-                             |             |            |             |                       |         |               |res.a 7, ixl  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB C4                     |             |            |             |                       |         |               |set 0, ixh    |~             
-                             |             |            |             |                       |         |               |set.a 0, ixh  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB C5                     |             |            |             |                       |         |               |set 0, ixl    |~             
-                             |             |            |             |                       |         |               |set.a 0, ixl  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB CC                     |             |            |             |                       |         |               |set 1, ixh    |~             
-                             |             |            |             |                       |         |               |set.a 1, ixh  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB CD                     |             |            |             |                       |         |               |set 1, ixl    |~             
-                             |             |            |             |                       |         |               |set.a 1, ixl  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB D4                     |             |            |             |                       |         |               |set 2, ixh    |~             
-                             |             |            |             |                       |         |               |set.a 2, ixh  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB D5                     |             |            |             |                       |         |               |set 2, ixl    |~             
-                             |             |            |             |                       |         |               |set.a 2, ixl  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB DC                     |             |            |             |                       |         |               |set 3, ixh    |~             
-                             |             |            |             |                       |         |               |set.a 3, ixh  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB DD                     |             |            |             |                       |         |               |set 3, ixl    |~             
-                             |             |            |             |                       |         |               |set.a 3, ixl  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB E4                     |             |            |             |                       |         |               |set 4, ixh    |~             
-                             |             |            |             |                       |         |               |set.a 4, ixh  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB E5                     |             |            |             |                       |         |               |set 4, ixl    |~             
-                             |             |            |             |                       |         |               |set.a 4, ixl  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB EC                     |             |            |             |                       |         |               |set 5, ixh    |~             
-                             |             |            |             |                       |         |               |set.a 5, ixh  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB ED                     |             |            |             |                       |         |               |set 5, ixl    |~             
-                             |             |            |             |                       |         |               |set.a 5, ixl  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB F4                     |             |            |             |                       |         |               |set 6, ixh    |~             
-                             |             |            |             |                       |         |               |set.a 6, ixh  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB F5                     |             |            |             |                       |         |               |set 6, ixl    |~             
-                             |             |            |             |                       |         |               |set.a 6, ixl  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB FC                     |             |            |             |                       |         |               |set 7, ixh    |~             
-                             |             |            |             |                       |         |               |set.a 7, ixh  |              
-                             |             |            |             |                       |         |               |              |              
-DD CB FD                     |             |            |             |                       |         |               |set 7, ixl    |~             
-                             |             |            |             |                       |         |               |set.a 7, ixl  |              
-                             |             |            |             |                       |         |               |              |              
 DD CC                        |             |            |             |bool ix                |~        |               |              |              
                              |             |            |             |                       |         |               |              |              
 DD D4 %u                     |             |            |             |ld (sp+%u), ix         |~        |               |              |              
@@ -8065,8 +7837,7 @@ DD D4 00                     |             |            |             |ld (sp), 
 DD DC                        |             |            |             |and ix, de             |~        |               |              |              
                              |             |            |             |and.a ix, de           |         |               |              |              
                              |             |            |             |                       |         |               |              |              
-DD E1                        |             |            |             |pop ix                 |~        |~              |pop ix        |~             
-                             |             |            |             |                       |         |               |pop ixh       |              
+DD E1                        |             |            |             |pop ix                 |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 DD E3                        |             |            |             |ex (sp), ix            |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
@@ -8074,8 +7845,7 @@ DD E4 %d                     |             |            |             |ld hl, (h
                              |             |            |             |                       |         |               |              |              
 DD E4 00                     |             |            |             |ld hl, (hl)            |~        |               |              |              
                              |             |            |             |                       |         |               |              |              
-DD E5                        |             |            |             |push ix                |~        |~              |push ix       |~             
-                             |             |            |             |                       |         |               |push ixh      |              
+DD E5                        |             |            |             |push ix                |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 DD E9                        |             |            |             |jp (ix)                |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
@@ -8685,38 +8455,29 @@ FD 09                        |             |            |             |add iy, b
                              |             |            |             |                       |         |               |              |              
 FD 19                        |             |            |             |add iy, de             |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
-FD 21 %m %m                  |             |            |ld iy, %m    |~                      |~        |~              |ld iy, %m     |~             
-                             |             |            |             |                       |         |               |lxi iyh, %m   |              
+FD 21 %m %m                  |             |            |ld iy, %m    |~                      |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 FD 22 %m %m                  |             |            |             |ld (%m), iy            |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
-FD 23                        |             |            |             |inc iy                 |~        |~              |inc iy        |~             
-                             |             |            |             |                       |         |               |inx iyh       |              
+FD 23                        |             |            |             |inc iy                 |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 FD 24                        |             |            |             |                       |         |               |inc iyh       |~             
-                             |             |            |             |                       |         |               |inr iyh       |              
                              |             |            |             |                       |         |               |              |              
-FD 25                        |             |            |             |                       |         |               |dcr iyh       |~             
-                             |             |            |             |                       |         |               |dec iyh       |              
+FD 25                        |             |            |             |                       |         |               |dec iyh       |~             
                              |             |            |             |                       |         |               |              |              
 FD 26 %n                     |             |            |             |                       |         |               |ld iyh, %n    |~             
-                             |             |            |             |                       |         |               |mvi iyh, %n   |              
                              |             |            |             |                       |         |               |              |              
 FD 29                        |             |            |             |add iy, iy             |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 FD 2A %m %m                  |             |            |             |ld iy, (%m)            |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
-FD 2B                        |             |            |             |dec iy                 |~        |~              |dcx iyh       |~             
-                             |             |            |             |                       |         |               |dec iy        |              
+FD 2B                        |             |            |             |dec iy                 |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 FD 2C                        |             |            |             |                       |         |               |inc iyl       |~             
-                             |             |            |             |                       |         |               |inr iyl       |              
                              |             |            |             |                       |         |               |              |              
-FD 2D                        |             |            |             |                       |         |               |dcr iyl       |~             
-                             |             |            |             |                       |         |               |dec iyl       |              
+FD 2D                        |             |            |             |                       |         |               |dec iyl       |~             
                              |             |            |             |                       |         |               |              |              
 FD 2E %n                     |             |            |             |                       |         |               |ld iyl, %n    |~             
-                             |             |            |             |                       |         |               |mvi iyl, %n   |              
                              |             |            |             |                       |         |               |              |              
 FD 34 %d                     |             |            |             |inc (iy+%d)            |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
@@ -8733,102 +8494,76 @@ FD 36 00 %n                  |             |            |             |ld (iy), 
 FD 39                        |             |            |             |add iy, sp             |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 FD 44                        |             |            |             |                       |         |               |ld b, iyh     |~             
-                             |             |            |             |                       |         |               |mov b, iyh    |              
                              |             |            |             |                       |         |               |              |              
 FD 45                        |             |            |             |                       |         |               |ld b, iyl     |~             
-                             |             |            |             |                       |         |               |mov b, iyl    |              
                              |             |            |             |                       |         |               |              |              
 FD 46 %d                     |             |            |             |ld b, (iy+%d)          |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 FD 46 00                     |             |            |             |ld b, (iy)             |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 FD 4C                        |             |            |             |                       |         |               |ld c, iyh     |~             
-                             |             |            |             |                       |         |               |mov c, iyh    |              
                              |             |            |             |                       |         |               |              |              
 FD 4D                        |             |            |             |                       |         |               |ld c, iyl     |~             
-                             |             |            |             |                       |         |               |mov c, iyl    |              
                              |             |            |             |                       |         |               |              |              
 FD 4E %d                     |             |            |             |ld c, (iy+%d)          |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 FD 4E 00                     |             |            |             |ld c, (iy)             |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 FD 54                        |             |            |             |                       |         |               |ld d, iyh     |~             
-                             |             |            |             |                       |         |               |mov d, iyh    |              
                              |             |            |             |                       |         |               |              |              
 FD 55                        |             |            |             |                       |         |               |ld d, iyl     |~             
-                             |             |            |             |                       |         |               |mov d, iyl    |              
                              |             |            |             |                       |         |               |              |              
 FD 56 %d                     |             |            |             |ld d, (iy+%d)          |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 FD 56 00                     |             |            |             |ld d, (iy)             |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 FD 5C                        |             |            |             |                       |         |               |ld e, iyh     |~             
-                             |             |            |             |                       |         |               |mov e, iyh    |              
                              |             |            |             |                       |         |               |              |              
 FD 5D                        |             |            |             |                       |         |               |ld e, iyl     |~             
-                             |             |            |             |                       |         |               |mov e, iyl    |              
                              |             |            |             |                       |         |               |              |              
 FD 5E %d                     |             |            |             |ld e, (iy+%d)          |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 FD 5E 00                     |             |            |             |ld e, (iy)             |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 FD 60                        |             |            |             |                       |         |               |ld iyh, b     |~             
-                             |             |            |             |                       |         |               |mov iyh, b    |              
                              |             |            |             |                       |         |               |              |              
 FD 61                        |             |            |             |                       |         |               |ld iyh, c     |~             
-                             |             |            |             |                       |         |               |mov iyh, c    |              
                              |             |            |             |                       |         |               |              |              
 FD 62                        |             |            |             |                       |         |               |ld iyh, d     |~             
-                             |             |            |             |                       |         |               |mov iyh, d    |              
                              |             |            |             |                       |         |               |              |              
 FD 63                        |             |            |             |                       |         |               |ld iyh, e     |~             
-                             |             |            |             |                       |         |               |mov iyh, e    |              
                              |             |            |             |                       |         |               |              |              
 FD 64                        |             |            |             |ldp (iy), hl           |~        |               |ld iyh, iyh   |~             
-                             |             |            |             |                       |         |               |mov iyh, iyh  |              
                              |             |            |             |                       |         |               |              |              
 FD 65                        |             |            |             |                       |         |               |ld iyh, iyl   |~             
-                             |             |            |             |                       |         |               |mov iyh, iyl  |              
                              |             |            |             |                       |         |               |              |              
 FD 65 %m %m                  |             |            |             |ldp (%m), iy           |~        |               |              |              
-                             |             |            |             |                       |         |               |              |              
-FD 66                        |             |            |             |                       |         |               |mov iyh, m    |~             
                              |             |            |             |                       |         |               |              |              
 FD 66 %d                     |             |            |             |ld h, (iy+%d)          |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 FD 66 00                     |             |            |             |ld h, (iy)             |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 FD 67                        |             |            |             |                       |         |               |ld iyh, a     |~             
-                             |             |            |             |                       |         |               |mov iyh, a    |              
                              |             |            |             |                       |         |               |              |              
 FD 68                        |             |            |             |                       |         |               |ld iyl, b     |~             
-                             |             |            |             |                       |         |               |mov iyl, b    |              
                              |             |            |             |                       |         |               |              |              
 FD 69                        |             |            |             |                       |         |               |ld iyl, c     |~             
-                             |             |            |             |                       |         |               |mov iyl, c    |              
                              |             |            |             |                       |         |               |              |              
 FD 6A                        |             |            |             |                       |         |               |ld iyl, d     |~             
-                             |             |            |             |                       |         |               |mov iyl, d    |              
                              |             |            |             |                       |         |               |              |              
 FD 6B                        |             |            |             |                       |         |               |ld iyl, e     |~             
-                             |             |            |             |                       |         |               |mov iyl, e    |              
                              |             |            |             |                       |         |               |              |              
 FD 6C                        |             |            |             |ldp hl, (iy)           |~        |               |ld iyl, iyh   |~             
-                             |             |            |             |                       |         |               |mov iyl, iyh  |              
                              |             |            |             |                       |         |               |              |              
 FD 6D                        |             |            |             |                       |         |               |ld iyl, iyl   |~             
-                             |             |            |             |                       |         |               |mov iyl, iyl  |              
                              |             |            |             |                       |         |               |              |              
 FD 6D %m %m                  |             |            |             |ldp iy, (%m)           |~        |               |              |              
-                             |             |            |             |                       |         |               |              |              
-FD 6E                        |             |            |             |                       |         |               |mov iyl, m    |~             
                              |             |            |             |                       |         |               |              |              
 FD 6E %d                     |             |            |             |ld l, (iy+%d)          |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 FD 6E 00                     |             |            |             |ld l, (iy)             |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 FD 6F                        |             |            |             |                       |         |               |ld iyl, a     |~             
-                             |             |            |             |                       |         |               |mov iyl, a    |              
                              |             |            |             |                       |         |               |              |              
 FD 70 %d                     |             |            |             |ld (iy+%d), b          |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
@@ -8846,13 +8581,9 @@ FD 73 %d                     |             |            |             |ld (iy+%d
                              |             |            |             |                       |         |               |              |              
 FD 73 00                     |             |            |             |ld (iy), e             |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
-FD 74                        |             |            |             |                       |         |               |mov m, iyh    |~             
-                             |             |            |             |                       |         |               |              |              
 FD 74 %d                     |             |            |             |ld (iy+%d), h          |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 FD 74 00                     |             |            |             |ld (iy), h             |~        |~              |~             |~             
-                             |             |            |             |                       |         |               |              |              
-FD 75                        |             |            |             |                       |         |               |mov m, iyl    |~             
                              |             |            |             |                       |         |               |              |              
 FD 75 %d                     |             |            |             |ld (iy+%d), l          |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
@@ -8863,10 +8594,8 @@ FD 77 %d                     |             |            |             |ld (iy+%d
 FD 77 00                     |             |            |             |ld (iy), a             |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 FD 7C                        |             |            |             |ld hl, iy              |~        |               |ld a, iyh     |~             
-                             |             |            |             |                       |         |               |mov a, iyh    |              
                              |             |            |             |                       |         |               |              |              
 FD 7D                        |             |            |             |ld iy, hl              |~        |               |ld a, iyl     |~             
-                             |             |            |             |                       |         |               |mov a, iyl    |              
                              |             |            |             |                       |         |               |              |              
 FD 7E %d                     |             |            |             |ld a, (iy+%d)          |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
@@ -8908,12 +8637,10 @@ FD 96 %d                     |             |            |             |sub (iy+%
 FD 96 00                     |             |            |             |sub (iy)               |~        |~              |~             |~             
                              |             |            |             |sub a, (iy)            |         |               |              |              
                              |             |            |             |                       |         |               |              |              
-FD 9C                        |             |            |             |                       |         |               |sbb iyh       |~             
-                             |             |            |             |                       |         |               |sbc a, iyh    |              
+FD 9C                        |             |            |             |                       |         |               |sbc a, iyh    |~             
                              |             |            |             |                       |         |               |sbc iyh       |              
                              |             |            |             |                       |         |               |              |              
-FD 9D                        |             |            |             |                       |         |               |sbb iyl       |~             
-                             |             |            |             |                       |         |               |sbc a, iyl    |              
+FD 9D                        |             |            |             |                       |         |               |sbc a, iyl    |~             
                              |             |            |             |                       |         |               |sbc iyl       |              
                              |             |            |             |                       |         |               |              |              
 FD 9E %d                     |             |            |             |sbc (iy+%d)            |~        |~              |~             |~             
@@ -8936,11 +8663,9 @@ FD A6 00                     |             |            |             |and (iy) 
                              |             |            |             |                       |         |               |              |              
 FD AC                        |             |            |             |                       |         |               |xor a, iyh    |~             
                              |             |            |             |                       |         |               |xor iyh       |              
-                             |             |            |             |                       |         |               |xra iyh       |              
                              |             |            |             |                       |         |               |              |              
 FD AD                        |             |            |             |                       |         |               |xor a, iyl    |~             
                              |             |            |             |                       |         |               |xor iyl       |              
-                             |             |            |             |                       |         |               |xra iyl       |              
                              |             |            |             |                       |         |               |              |              
 FD AE %d                     |             |            |             |xor (iy+%d)            |~        |~              |~             |~             
                              |             |            |             |xor a, (iy+%d)         |         |               |              |              
@@ -8950,11 +8675,9 @@ FD AE 00                     |             |            |             |xor (iy) 
                              |             |            |             |                       |         |               |              |              
 FD B4                        |             |            |             |                       |         |               |or a, iyh     |~             
                              |             |            |             |                       |         |               |or iyh        |              
-                             |             |            |             |                       |         |               |ora iyh       |              
                              |             |            |             |                       |         |               |              |              
 FD B5                        |             |            |             |                       |         |               |or a, iyl     |~             
                              |             |            |             |                       |         |               |or iyl        |              
-                             |             |            |             |                       |         |               |ora iyl       |              
                              |             |            |             |                       |         |               |              |              
 FD B6 %d                     |             |            |             |or (iy+%d)             |~        |~              |~             |~             
                              |             |            |             |or a, (iy+%d)          |         |               |              |              
@@ -9402,184 +9125,6 @@ FD CB 00 F6                  |             |            |             |set 6, (i
 FD CB 00 FE                  |             |            |             |set 7, (iy)            |~        |~              |~             |~             
                              |             |            |             |set.a 7, (iy)          |         |               |              |              
                              |             |            |             |                       |         |               |              |              
-FD CB 04                     |             |            |             |                       |         |               |rlc iyh       |~             
-                             |             |            |             |                       |         |               |              |              
-FD CB 05                     |             |            |             |                       |         |               |rlc iyl       |~             
-                             |             |            |             |                       |         |               |              |              
-FD CB 0C                     |             |            |             |                       |         |               |rrc iyh       |~             
-                             |             |            |             |                       |         |               |              |              
-FD CB 0D                     |             |            |             |                       |         |               |rrc iyl       |~             
-                             |             |            |             |                       |         |               |              |              
-FD CB 14                     |             |            |             |                       |         |               |rl iyh        |~             
-                             |             |            |             |                       |         |               |              |              
-FD CB 15                     |             |            |             |                       |         |               |rl iyl        |~             
-                             |             |            |             |                       |         |               |              |              
-FD CB 1C                     |             |            |             |                       |         |               |rr iyh        |~             
-                             |             |            |             |                       |         |               |              |              
-FD CB 1D                     |             |            |             |                       |         |               |rr iyl        |~             
-                             |             |            |             |                       |         |               |              |              
-FD CB 24                     |             |            |             |                       |         |               |sla iyh       |~             
-                             |             |            |             |                       |         |               |              |              
-FD CB 25                     |             |            |             |                       |         |               |sla iyl       |~             
-                             |             |            |             |                       |         |               |              |              
-FD CB 2C                     |             |            |             |                       |         |               |sra iyh       |~             
-                             |             |            |             |                       |         |               |              |              
-FD CB 2D                     |             |            |             |                       |         |               |sra iyl       |~             
-                             |             |            |             |                       |         |               |              |              
-FD CB 34                     |             |            |             |                       |         |               |sli iyh       |~             
-                             |             |            |             |                       |         |               |sll iyh       |              
-                             |             |            |             |                       |         |               |              |              
-FD CB 35                     |             |            |             |                       |         |               |sli iyl       |~             
-                             |             |            |             |                       |         |               |sll iyl       |              
-                             |             |            |             |                       |         |               |              |              
-FD CB 3C                     |             |            |             |                       |         |               |srl iyh       |~             
-                             |             |            |             |                       |         |               |              |              
-FD CB 3D                     |             |            |             |                       |         |               |srl iyl       |~             
-                             |             |            |             |                       |         |               |              |              
-FD CB 44                     |             |            |             |                       |         |               |bit 0, iyh    |~             
-                             |             |            |             |                       |         |               |bit.a 0, iyh  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB 45                     |             |            |             |                       |         |               |bit 0, iyl    |~             
-                             |             |            |             |                       |         |               |bit.a 0, iyl  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB 4C                     |             |            |             |                       |         |               |bit 1, iyh    |~             
-                             |             |            |             |                       |         |               |bit.a 1, iyh  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB 4D                     |             |            |             |                       |         |               |bit 1, iyl    |~             
-                             |             |            |             |                       |         |               |bit.a 1, iyl  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB 54                     |             |            |             |                       |         |               |bit 2, iyh    |~             
-                             |             |            |             |                       |         |               |bit.a 2, iyh  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB 55                     |             |            |             |                       |         |               |bit 2, iyl    |~             
-                             |             |            |             |                       |         |               |bit.a 2, iyl  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB 5C                     |             |            |             |                       |         |               |bit 3, iyh    |~             
-                             |             |            |             |                       |         |               |bit.a 3, iyh  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB 5D                     |             |            |             |                       |         |               |bit 3, iyl    |~             
-                             |             |            |             |                       |         |               |bit.a 3, iyl  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB 64                     |             |            |             |                       |         |               |bit 4, iyh    |~             
-                             |             |            |             |                       |         |               |bit.a 4, iyh  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB 65                     |             |            |             |                       |         |               |bit 4, iyl    |~             
-                             |             |            |             |                       |         |               |bit.a 4, iyl  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB 6C                     |             |            |             |                       |         |               |bit 5, iyh    |~             
-                             |             |            |             |                       |         |               |bit.a 5, iyh  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB 6D                     |             |            |             |                       |         |               |bit 5, iyl    |~             
-                             |             |            |             |                       |         |               |bit.a 5, iyl  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB 74                     |             |            |             |                       |         |               |bit 6, iyh    |~             
-                             |             |            |             |                       |         |               |bit.a 6, iyh  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB 75                     |             |            |             |                       |         |               |bit 6, iyl    |~             
-                             |             |            |             |                       |         |               |bit.a 6, iyl  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB 7C                     |             |            |             |                       |         |               |bit 7, iyh    |~             
-                             |             |            |             |                       |         |               |bit.a 7, iyh  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB 7D                     |             |            |             |                       |         |               |bit 7, iyl    |~             
-                             |             |            |             |                       |         |               |bit.a 7, iyl  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB 84                     |             |            |             |                       |         |               |res 0, iyh    |~             
-                             |             |            |             |                       |         |               |res.a 0, iyh  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB 85                     |             |            |             |                       |         |               |res 0, iyl    |~             
-                             |             |            |             |                       |         |               |res.a 0, iyl  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB 8C                     |             |            |             |                       |         |               |res 1, iyh    |~             
-                             |             |            |             |                       |         |               |res.a 1, iyh  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB 8D                     |             |            |             |                       |         |               |res 1, iyl    |~             
-                             |             |            |             |                       |         |               |res.a 1, iyl  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB 94                     |             |            |             |                       |         |               |res 2, iyh    |~             
-                             |             |            |             |                       |         |               |res.a 2, iyh  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB 95                     |             |            |             |                       |         |               |res 2, iyl    |~             
-                             |             |            |             |                       |         |               |res.a 2, iyl  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB 9C                     |             |            |             |                       |         |               |res 3, iyh    |~             
-                             |             |            |             |                       |         |               |res.a 3, iyh  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB 9D                     |             |            |             |                       |         |               |res 3, iyl    |~             
-                             |             |            |             |                       |         |               |res.a 3, iyl  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB A4                     |             |            |             |                       |         |               |res 4, iyh    |~             
-                             |             |            |             |                       |         |               |res.a 4, iyh  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB A5                     |             |            |             |                       |         |               |res 4, iyl    |~             
-                             |             |            |             |                       |         |               |res.a 4, iyl  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB AC                     |             |            |             |                       |         |               |res 5, iyh    |~             
-                             |             |            |             |                       |         |               |res.a 5, iyh  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB AD                     |             |            |             |                       |         |               |res 5, iyl    |~             
-                             |             |            |             |                       |         |               |res.a 5, iyl  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB B4                     |             |            |             |                       |         |               |res 6, iyh    |~             
-                             |             |            |             |                       |         |               |res.a 6, iyh  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB B5                     |             |            |             |                       |         |               |res 6, iyl    |~             
-                             |             |            |             |                       |         |               |res.a 6, iyl  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB BC                     |             |            |             |                       |         |               |res 7, iyh    |~             
-                             |             |            |             |                       |         |               |res.a 7, iyh  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB BD                     |             |            |             |                       |         |               |res 7, iyl    |~             
-                             |             |            |             |                       |         |               |res.a 7, iyl  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB C4                     |             |            |             |                       |         |               |set 0, iyh    |~             
-                             |             |            |             |                       |         |               |set.a 0, iyh  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB C5                     |             |            |             |                       |         |               |set 0, iyl    |~             
-                             |             |            |             |                       |         |               |set.a 0, iyl  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB CC                     |             |            |             |                       |         |               |set 1, iyh    |~             
-                             |             |            |             |                       |         |               |set.a 1, iyh  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB CD                     |             |            |             |                       |         |               |set 1, iyl    |~             
-                             |             |            |             |                       |         |               |set.a 1, iyl  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB D4                     |             |            |             |                       |         |               |set 2, iyh    |~             
-                             |             |            |             |                       |         |               |set.a 2, iyh  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB D5                     |             |            |             |                       |         |               |set 2, iyl    |~             
-                             |             |            |             |                       |         |               |set.a 2, iyl  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB DC                     |             |            |             |                       |         |               |set 3, iyh    |~             
-                             |             |            |             |                       |         |               |set.a 3, iyh  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB DD                     |             |            |             |                       |         |               |set 3, iyl    |~             
-                             |             |            |             |                       |         |               |set.a 3, iyl  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB E4                     |             |            |             |                       |         |               |set 4, iyh    |~             
-                             |             |            |             |                       |         |               |set.a 4, iyh  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB E5                     |             |            |             |                       |         |               |set 4, iyl    |~             
-                             |             |            |             |                       |         |               |set.a 4, iyl  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB EC                     |             |            |             |                       |         |               |set 5, iyh    |~             
-                             |             |            |             |                       |         |               |set.a 5, iyh  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB ED                     |             |            |             |                       |         |               |set 5, iyl    |~             
-                             |             |            |             |                       |         |               |set.a 5, iyl  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB F4                     |             |            |             |                       |         |               |set 6, iyh    |~             
-                             |             |            |             |                       |         |               |set.a 6, iyh  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB F5                     |             |            |             |                       |         |               |set 6, iyl    |~             
-                             |             |            |             |                       |         |               |set.a 6, iyl  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB FC                     |             |            |             |                       |         |               |set 7, iyh    |~             
-                             |             |            |             |                       |         |               |set.a 7, iyh  |              
-                             |             |            |             |                       |         |               |              |              
-FD CB FD                     |             |            |             |                       |         |               |set 7, iyl    |~             
-                             |             |            |             |                       |         |               |set.a 7, iyl  |              
-                             |             |            |             |                       |         |               |              |              
 FD CC                        |             |            |             |bool iy                |~        |               |              |              
                              |             |            |             |                       |         |               |              |              
 FD D4 %u                     |             |            |             |ld (sp+%u), iy         |~        |               |              |              
@@ -9589,8 +9134,7 @@ FD D4 00                     |             |            |             |ld (sp), 
 FD DC                        |             |            |             |and iy, de             |~        |               |              |              
                              |             |            |             |and.a iy, de           |         |               |              |              
                              |             |            |             |                       |         |               |              |              
-FD E1                        |             |            |             |pop iy                 |~        |~              |pop iy        |~             
-                             |             |            |             |                       |         |               |pop iyh       |              
+FD E1                        |             |            |             |pop iy                 |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 FD E3                        |             |            |             |ex (sp), iy            |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
@@ -9598,8 +9142,7 @@ FD E4 %d                     |             |            |             |ld hl, (i
                              |             |            |             |                       |         |               |              |              
 FD E4 00                     |             |            |             |ld hl, (iy)            |~        |               |              |              
                              |             |            |             |                       |         |               |              |              
-FD E5                        |             |            |             |push iy                |~        |~              |push iy       |~             
-                             |             |            |             |                       |         |               |push iyh      |              
+FD E5                        |             |            |             |push iy                |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 FD E9                        |             |            |             |jp (iy)                |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              

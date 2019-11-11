@@ -188,10 +188,6 @@
  bit 0, d                       ; CB 42
  bit 0, e                       ; CB 43
  bit 0, h                       ; CB 44
- bit 0, ixh                     ; DD CB 44
- bit 0, ixl                     ; DD CB 45
- bit 0, iyh                     ; FD CB 44
- bit 0, iyl                     ; FD CB 45
  bit 0, l                       ; CB 45
  bit 1, (hl)                    ; CB 4E
  bit 1, (ix)                    ; DD CB 00 4E
@@ -206,10 +202,6 @@
  bit 1, d                       ; CB 4A
  bit 1, e                       ; CB 4B
  bit 1, h                       ; CB 4C
- bit 1, ixh                     ; DD CB 4C
- bit 1, ixl                     ; DD CB 4D
- bit 1, iyh                     ; FD CB 4C
- bit 1, iyl                     ; FD CB 4D
  bit 1, l                       ; CB 4D
  bit 2, (hl)                    ; CB 56
  bit 2, (ix)                    ; DD CB 00 56
@@ -224,10 +216,6 @@
  bit 2, d                       ; CB 52
  bit 2, e                       ; CB 53
  bit 2, h                       ; CB 54
- bit 2, ixh                     ; DD CB 54
- bit 2, ixl                     ; DD CB 55
- bit 2, iyh                     ; FD CB 54
- bit 2, iyl                     ; FD CB 55
  bit 2, l                       ; CB 55
  bit 3, (hl)                    ; CB 5E
  bit 3, (ix)                    ; DD CB 00 5E
@@ -242,10 +230,6 @@
  bit 3, d                       ; CB 5A
  bit 3, e                       ; CB 5B
  bit 3, h                       ; CB 5C
- bit 3, ixh                     ; DD CB 5C
- bit 3, ixl                     ; DD CB 5D
- bit 3, iyh                     ; FD CB 5C
- bit 3, iyl                     ; FD CB 5D
  bit 3, l                       ; CB 5D
  bit 4, (hl)                    ; CB 66
  bit 4, (ix)                    ; DD CB 00 66
@@ -260,10 +244,6 @@
  bit 4, d                       ; CB 62
  bit 4, e                       ; CB 63
  bit 4, h                       ; CB 64
- bit 4, ixh                     ; DD CB 64
- bit 4, ixl                     ; DD CB 65
- bit 4, iyh                     ; FD CB 64
- bit 4, iyl                     ; FD CB 65
  bit 4, l                       ; CB 65
  bit 5, (hl)                    ; CB 6E
  bit 5, (ix)                    ; DD CB 00 6E
@@ -278,10 +258,6 @@
  bit 5, d                       ; CB 6A
  bit 5, e                       ; CB 6B
  bit 5, h                       ; CB 6C
- bit 5, ixh                     ; DD CB 6C
- bit 5, ixl                     ; DD CB 6D
- bit 5, iyh                     ; FD CB 6C
- bit 5, iyl                     ; FD CB 6D
  bit 5, l                       ; CB 6D
  bit 6, (hl)                    ; CB 76
  bit 6, (ix)                    ; DD CB 00 76
@@ -296,10 +272,6 @@
  bit 6, d                       ; CB 72
  bit 6, e                       ; CB 73
  bit 6, h                       ; CB 74
- bit 6, ixh                     ; DD CB 74
- bit 6, ixl                     ; DD CB 75
- bit 6, iyh                     ; FD CB 74
- bit 6, iyl                     ; FD CB 75
  bit 6, l                       ; CB 75
  bit 7, (hl)                    ; CB 7E
  bit 7, (ix)                    ; DD CB 00 7E
@@ -314,10 +286,6 @@
  bit 7, d                       ; CB 7A
  bit 7, e                       ; CB 7B
  bit 7, h                       ; CB 7C
- bit 7, ixh                     ; DD CB 7C
- bit 7, ixl                     ; DD CB 7D
- bit 7, iyh                     ; FD CB 7C
- bit 7, iyl                     ; FD CB 7D
  bit 7, l                       ; CB 7D
  bit.a 0, (hl)                  ; CB 46
  bit.a 0, (ix)                  ; DD CB 00 46
@@ -332,10 +300,6 @@
  bit.a 0, d                     ; CB 42
  bit.a 0, e                     ; CB 43
  bit.a 0, h                     ; CB 44
- bit.a 0, ixh                   ; DD CB 44
- bit.a 0, ixl                   ; DD CB 45
- bit.a 0, iyh                   ; FD CB 44
- bit.a 0, iyl                   ; FD CB 45
  bit.a 0, l                     ; CB 45
  bit.a 1, (hl)                  ; CB 4E
  bit.a 1, (ix)                  ; DD CB 00 4E
@@ -350,10 +314,6 @@
  bit.a 1, d                     ; CB 4A
  bit.a 1, e                     ; CB 4B
  bit.a 1, h                     ; CB 4C
- bit.a 1, ixh                   ; DD CB 4C
- bit.a 1, ixl                   ; DD CB 4D
- bit.a 1, iyh                   ; FD CB 4C
- bit.a 1, iyl                   ; FD CB 4D
  bit.a 1, l                     ; CB 4D
  bit.a 2, (hl)                  ; CB 56
  bit.a 2, (ix)                  ; DD CB 00 56
@@ -368,10 +328,6 @@
  bit.a 2, d                     ; CB 52
  bit.a 2, e                     ; CB 53
  bit.a 2, h                     ; CB 54
- bit.a 2, ixh                   ; DD CB 54
- bit.a 2, ixl                   ; DD CB 55
- bit.a 2, iyh                   ; FD CB 54
- bit.a 2, iyl                   ; FD CB 55
  bit.a 2, l                     ; CB 55
  bit.a 3, (hl)                  ; CB 5E
  bit.a 3, (ix)                  ; DD CB 00 5E
@@ -386,10 +342,6 @@
  bit.a 3, d                     ; CB 5A
  bit.a 3, e                     ; CB 5B
  bit.a 3, h                     ; CB 5C
- bit.a 3, ixh                   ; DD CB 5C
- bit.a 3, ixl                   ; DD CB 5D
- bit.a 3, iyh                   ; FD CB 5C
- bit.a 3, iyl                   ; FD CB 5D
  bit.a 3, l                     ; CB 5D
  bit.a 4, (hl)                  ; CB 66
  bit.a 4, (ix)                  ; DD CB 00 66
@@ -404,10 +356,6 @@
  bit.a 4, d                     ; CB 62
  bit.a 4, e                     ; CB 63
  bit.a 4, h                     ; CB 64
- bit.a 4, ixh                   ; DD CB 64
- bit.a 4, ixl                   ; DD CB 65
- bit.a 4, iyh                   ; FD CB 64
- bit.a 4, iyl                   ; FD CB 65
  bit.a 4, l                     ; CB 65
  bit.a 5, (hl)                  ; CB 6E
  bit.a 5, (ix)                  ; DD CB 00 6E
@@ -422,10 +370,6 @@
  bit.a 5, d                     ; CB 6A
  bit.a 5, e                     ; CB 6B
  bit.a 5, h                     ; CB 6C
- bit.a 5, ixh                   ; DD CB 6C
- bit.a 5, ixl                   ; DD CB 6D
- bit.a 5, iyh                   ; FD CB 6C
- bit.a 5, iyl                   ; FD CB 6D
  bit.a 5, l                     ; CB 6D
  bit.a 6, (hl)                  ; CB 76
  bit.a 6, (ix)                  ; DD CB 00 76
@@ -440,10 +384,6 @@
  bit.a 6, d                     ; CB 72
  bit.a 6, e                     ; CB 73
  bit.a 6, h                     ; CB 74
- bit.a 6, ixh                   ; DD CB 74
- bit.a 6, ixl                   ; DD CB 75
- bit.a 6, iyh                   ; FD CB 74
- bit.a 6, iyl                   ; FD CB 75
  bit.a 6, l                     ; CB 75
  bit.a 7, (hl)                  ; CB 7E
  bit.a 7, (ix)                  ; DD CB 00 7E
@@ -458,10 +398,6 @@
  bit.a 7, d                     ; CB 7A
  bit.a 7, e                     ; CB 7B
  bit.a 7, h                     ; CB 7C
- bit.a 7, ixh                   ; DD CB 7C
- bit.a 7, ixl                   ; DD CB 7D
- bit.a 7, iyh                   ; FD CB 7C
- bit.a 7, iyl                   ; FD CB 7D
  bit.a 7, l                     ; CB 7D
  brlc de,b                      ; ED 2C
  bsla de,b                      ; ED 28
@@ -505,7 +441,6 @@
  cc 32767                       ; DC FF 7F
  cc 65535                       ; DC FF FF
  ccf                            ; 3F
- ccf f                          ; 3F
  cm -32768                      ; FC 00 80
  cm 32767                       ; FC FF 7F
  cm 65535                       ; FC FF FF
@@ -640,10 +575,6 @@
  dcr d                          ; 15
  dcr e                          ; 1D
  dcr h                          ; 25
- dcr ixh                        ; DD 25
- dcr ixl                        ; DD 2D
- dcr iyh                        ; FD 25
- dcr iyl                        ; FD 2D
  dcr l                          ; 2D
  dcr m                          ; 35
  dcx b                          ; 0B
@@ -652,8 +583,6 @@
  dcx de                         ; 1B
  dcx h                          ; 2B
  dcx hl                         ; 2B
- dcx ixh                        ; DD 2B
- dcx iyh                        ; FD 2B
  dcx sp                         ; 3B
  dec (hl)                       ; 35
  dec (ix)                       ; DD 35 00
@@ -744,10 +673,6 @@
  inr d                          ; 14
  inr e                          ; 1C
  inr h                          ; 24
- inr ixh                        ; DD 24
- inr ixl                        ; DD 2C
- inr iyh                        ; FD 24
- inr iyl                        ; FD 2C
  inr l                          ; 2C
  inr m                          ; 34
  inx b                          ; 03
@@ -756,8 +681,6 @@
  inx de                         ; 13
  inx h                          ; 23
  inx hl                         ; 23
- inx ixh                        ; DD 23
- inx iyh                        ; FD 23
  inx sp                         ; 33
  jc -32768                      ; DA 00 80
  jc 32767                       ; DA FF 7F
@@ -1223,12 +1146,6 @@
  lxi hl, -32768                 ; 21 00 80
  lxi hl, 32767                  ; 21 FF 7F
  lxi hl, 65535                  ; 21 FF FF
- lxi ixh, -32768                ; DD 21 00 80
- lxi ixh, 32767                 ; DD 21 FF 7F
- lxi ixh, 65535                 ; DD 21 FF FF
- lxi iyh, -32768                ; FD 21 00 80
- lxi iyh, 32767                 ; FD 21 FF 7F
- lxi iyh, 65535                 ; FD 21 FF FF
  lxi sp, -32768                 ; 31 00 80
  lxi sp, 32767                  ; 31 FF 7F
  lxi sp, 65535                  ; 31 FF FF
@@ -1304,10 +1221,6 @@
  mov a, d                       ; 7A
  mov a, e                       ; 7B
  mov a, h                       ; 7C
- mov a, ixh                     ; DD 7C
- mov a, ixl                     ; DD 7D
- mov a, iyh                     ; FD 7C
- mov a, iyl                     ; FD 7D
  mov a, l                       ; 7D
  mov a, m                       ; 7E
  mov b, a                       ; 47
@@ -1316,10 +1229,6 @@
  mov b, d                       ; 42
  mov b, e                       ; 43
  mov b, h                       ; 44
- mov b, ixh                     ; DD 44
- mov b, ixl                     ; DD 45
- mov b, iyh                     ; FD 44
- mov b, iyl                     ; FD 45
  mov b, l                       ; 45
  mov b, m                       ; 46
  mov c, a                       ; 4F
@@ -1328,10 +1237,6 @@
  mov c, d                       ; 4A
  mov c, e                       ; 4B
  mov c, h                       ; 4C
- mov c, ixh                     ; DD 4C
- mov c, ixl                     ; DD 4D
- mov c, iyh                     ; FD 4C
- mov c, iyl                     ; FD 4D
  mov c, l                       ; 4D
  mov c, m                       ; 4E
  mov d, a                       ; 57
@@ -1340,10 +1245,6 @@
  mov d, d                       ; 52
  mov d, e                       ; 53
  mov d, h                       ; 54
- mov d, ixh                     ; DD 54
- mov d, ixl                     ; DD 55
- mov d, iyh                     ; FD 54
- mov d, iyl                     ; FD 55
  mov d, l                       ; 55
  mov d, m                       ; 56
  mov e, a                       ; 5F
@@ -1352,10 +1253,6 @@
  mov e, d                       ; 5A
  mov e, e                       ; 5B
  mov e, h                       ; 5C
- mov e, ixh                     ; DD 5C
- mov e, ixl                     ; DD 5D
- mov e, iyh                     ; FD 5C
- mov e, iyl                     ; FD 5D
  mov e, l                       ; 5D
  mov e, m                       ; 5E
  mov h, a                       ; 67
@@ -1366,38 +1263,6 @@
  mov h, h                       ; 64
  mov h, l                       ; 65
  mov h, m                       ; 66
- mov ixh, a                     ; DD 67
- mov ixh, b                     ; DD 60
- mov ixh, c                     ; DD 61
- mov ixh, d                     ; DD 62
- mov ixh, e                     ; DD 63
- mov ixh, ixh                   ; DD 64
- mov ixh, ixl                   ; DD 65
- mov ixh, m                     ; DD 66
- mov ixl, a                     ; DD 6F
- mov ixl, b                     ; DD 68
- mov ixl, c                     ; DD 69
- mov ixl, d                     ; DD 6A
- mov ixl, e                     ; DD 6B
- mov ixl, ixh                   ; DD 6C
- mov ixl, ixl                   ; DD 6D
- mov ixl, m                     ; DD 6E
- mov iyh, a                     ; FD 67
- mov iyh, b                     ; FD 60
- mov iyh, c                     ; FD 61
- mov iyh, d                     ; FD 62
- mov iyh, e                     ; FD 63
- mov iyh, iyh                   ; FD 64
- mov iyh, iyl                   ; FD 65
- mov iyh, m                     ; FD 66
- mov iyl, a                     ; FD 6F
- mov iyl, b                     ; FD 68
- mov iyl, c                     ; FD 69
- mov iyl, d                     ; FD 6A
- mov iyl, e                     ; FD 6B
- mov iyl, iyh                   ; FD 6C
- mov iyl, iyl                   ; FD 6D
- mov iyl, m                     ; FD 6E
  mov l, a                       ; 6F
  mov l, b                       ; 68
  mov l, c                       ; 69
@@ -1412,10 +1277,6 @@
  mov m, d                       ; 72
  mov m, e                       ; 73
  mov m, h                       ; 74
- mov m, ixh                     ; DD 74
- mov m, ixl                     ; DD 75
- mov m, iyh                     ; FD 74
- mov m, iyl                     ; FD 75
  mov m, l                       ; 75
  mul d, e                       ; ED 30
  mul de                         ; ED 30
@@ -1437,18 +1298,6 @@
  mvi h, -128                    ; 26 80
  mvi h, 127                     ; 26 7F
  mvi h, 255                     ; 26 FF
- mvi ixh, -128                  ; DD 26 80
- mvi ixh, 127                   ; DD 26 7F
- mvi ixh, 255                   ; DD 26 FF
- mvi ixl, -128                  ; DD 2E 80
- mvi ixl, 127                   ; DD 2E 7F
- mvi ixl, 255                   ; DD 2E FF
- mvi iyh, -128                  ; FD 26 80
- mvi iyh, 127                   ; FD 26 7F
- mvi iyh, 255                   ; FD 26 FF
- mvi iyl, -128                  ; FD 2E 80
- mvi iyl, 127                   ; FD 2E 7F
- mvi iyl, 255                   ; FD 2E FF
  mvi l, -128                    ; 2E 80
  mvi l, 127                     ; 2E 7F
  mvi l, 255                     ; 2E FF
@@ -1512,10 +1361,6 @@
  ora d                          ; B2
  ora e                          ; B3
  ora h                          ; B4
- ora ixh                        ; DD B4
- ora ixl                        ; DD B5
- ora iyh                        ; FD B4
- ora iyl                        ; FD B5
  ora l                          ; B5
  ora m                          ; B6
  ori -128                       ; F6 80
@@ -1551,9 +1396,7 @@
  pop h                          ; E1
  pop hl                         ; E1
  pop ix                         ; DD E1
- pop ixh                        ; DD E1
  pop iy                         ; FD E1
- pop iyh                        ; FD E1
  pop psw                        ; F1
  push -32768                    ; ED 8A 80 00
  push 32767                     ; ED 8A 7F FF
@@ -1566,9 +1409,7 @@
  push h                         ; E5
  push hl                        ; E5
  push ix                        ; DD E5
- push ixh                       ; DD E5
  push iy                        ; FD E5
- push iyh                       ; FD E5
  push psw                       ; F5
  ral                            ; 17
  rar                            ; 1F
@@ -1586,10 +1427,6 @@
  res 0, d                       ; CB 82
  res 0, e                       ; CB 83
  res 0, h                       ; CB 84
- res 0, ixh                     ; DD CB 84
- res 0, ixl                     ; DD CB 85
- res 0, iyh                     ; FD CB 84
- res 0, iyl                     ; FD CB 85
  res 0, l                       ; CB 85
  res 1, (hl)                    ; CB 8E
  res 1, (ix)                    ; DD CB 00 8E
@@ -1604,10 +1441,6 @@
  res 1, d                       ; CB 8A
  res 1, e                       ; CB 8B
  res 1, h                       ; CB 8C
- res 1, ixh                     ; DD CB 8C
- res 1, ixl                     ; DD CB 8D
- res 1, iyh                     ; FD CB 8C
- res 1, iyl                     ; FD CB 8D
  res 1, l                       ; CB 8D
  res 2, (hl)                    ; CB 96
  res 2, (ix)                    ; DD CB 00 96
@@ -1622,10 +1455,6 @@
  res 2, d                       ; CB 92
  res 2, e                       ; CB 93
  res 2, h                       ; CB 94
- res 2, ixh                     ; DD CB 94
- res 2, ixl                     ; DD CB 95
- res 2, iyh                     ; FD CB 94
- res 2, iyl                     ; FD CB 95
  res 2, l                       ; CB 95
  res 3, (hl)                    ; CB 9E
  res 3, (ix)                    ; DD CB 00 9E
@@ -1640,10 +1469,6 @@
  res 3, d                       ; CB 9A
  res 3, e                       ; CB 9B
  res 3, h                       ; CB 9C
- res 3, ixh                     ; DD CB 9C
- res 3, ixl                     ; DD CB 9D
- res 3, iyh                     ; FD CB 9C
- res 3, iyl                     ; FD CB 9D
  res 3, l                       ; CB 9D
  res 4, (hl)                    ; CB A6
  res 4, (ix)                    ; DD CB 00 A6
@@ -1658,10 +1483,6 @@
  res 4, d                       ; CB A2
  res 4, e                       ; CB A3
  res 4, h                       ; CB A4
- res 4, ixh                     ; DD CB A4
- res 4, ixl                     ; DD CB A5
- res 4, iyh                     ; FD CB A4
- res 4, iyl                     ; FD CB A5
  res 4, l                       ; CB A5
  res 5, (hl)                    ; CB AE
  res 5, (ix)                    ; DD CB 00 AE
@@ -1676,10 +1497,6 @@
  res 5, d                       ; CB AA
  res 5, e                       ; CB AB
  res 5, h                       ; CB AC
- res 5, ixh                     ; DD CB AC
- res 5, ixl                     ; DD CB AD
- res 5, iyh                     ; FD CB AC
- res 5, iyl                     ; FD CB AD
  res 5, l                       ; CB AD
  res 6, (hl)                    ; CB B6
  res 6, (ix)                    ; DD CB 00 B6
@@ -1694,10 +1511,6 @@
  res 6, d                       ; CB B2
  res 6, e                       ; CB B3
  res 6, h                       ; CB B4
- res 6, ixh                     ; DD CB B4
- res 6, ixl                     ; DD CB B5
- res 6, iyh                     ; FD CB B4
- res 6, iyl                     ; FD CB B5
  res 6, l                       ; CB B5
  res 7, (hl)                    ; CB BE
  res 7, (ix)                    ; DD CB 00 BE
@@ -1712,10 +1525,6 @@
  res 7, d                       ; CB BA
  res 7, e                       ; CB BB
  res 7, h                       ; CB BC
- res 7, ixh                     ; DD CB BC
- res 7, ixl                     ; DD CB BD
- res 7, iyh                     ; FD CB BC
- res 7, iyl                     ; FD CB BD
  res 7, l                       ; CB BD
  res.a 0, (hl)                  ; CB 86
  res.a 0, (ix)                  ; DD CB 00 86
@@ -1730,10 +1539,6 @@
  res.a 0, d                     ; CB 82
  res.a 0, e                     ; CB 83
  res.a 0, h                     ; CB 84
- res.a 0, ixh                   ; DD CB 84
- res.a 0, ixl                   ; DD CB 85
- res.a 0, iyh                   ; FD CB 84
- res.a 0, iyl                   ; FD CB 85
  res.a 0, l                     ; CB 85
  res.a 1, (hl)                  ; CB 8E
  res.a 1, (ix)                  ; DD CB 00 8E
@@ -1748,10 +1553,6 @@
  res.a 1, d                     ; CB 8A
  res.a 1, e                     ; CB 8B
  res.a 1, h                     ; CB 8C
- res.a 1, ixh                   ; DD CB 8C
- res.a 1, ixl                   ; DD CB 8D
- res.a 1, iyh                   ; FD CB 8C
- res.a 1, iyl                   ; FD CB 8D
  res.a 1, l                     ; CB 8D
  res.a 2, (hl)                  ; CB 96
  res.a 2, (ix)                  ; DD CB 00 96
@@ -1766,10 +1567,6 @@
  res.a 2, d                     ; CB 92
  res.a 2, e                     ; CB 93
  res.a 2, h                     ; CB 94
- res.a 2, ixh                   ; DD CB 94
- res.a 2, ixl                   ; DD CB 95
- res.a 2, iyh                   ; FD CB 94
- res.a 2, iyl                   ; FD CB 95
  res.a 2, l                     ; CB 95
  res.a 3, (hl)                  ; CB 9E
  res.a 3, (ix)                  ; DD CB 00 9E
@@ -1784,10 +1581,6 @@
  res.a 3, d                     ; CB 9A
  res.a 3, e                     ; CB 9B
  res.a 3, h                     ; CB 9C
- res.a 3, ixh                   ; DD CB 9C
- res.a 3, ixl                   ; DD CB 9D
- res.a 3, iyh                   ; FD CB 9C
- res.a 3, iyl                   ; FD CB 9D
  res.a 3, l                     ; CB 9D
  res.a 4, (hl)                  ; CB A6
  res.a 4, (ix)                  ; DD CB 00 A6
@@ -1802,10 +1595,6 @@
  res.a 4, d                     ; CB A2
  res.a 4, e                     ; CB A3
  res.a 4, h                     ; CB A4
- res.a 4, ixh                   ; DD CB A4
- res.a 4, ixl                   ; DD CB A5
- res.a 4, iyh                   ; FD CB A4
- res.a 4, iyl                   ; FD CB A5
  res.a 4, l                     ; CB A5
  res.a 5, (hl)                  ; CB AE
  res.a 5, (ix)                  ; DD CB 00 AE
@@ -1820,10 +1609,6 @@
  res.a 5, d                     ; CB AA
  res.a 5, e                     ; CB AB
  res.a 5, h                     ; CB AC
- res.a 5, ixh                   ; DD CB AC
- res.a 5, ixl                   ; DD CB AD
- res.a 5, iyh                   ; FD CB AC
- res.a 5, iyl                   ; FD CB AD
  res.a 5, l                     ; CB AD
  res.a 6, (hl)                  ; CB B6
  res.a 6, (ix)                  ; DD CB 00 B6
@@ -1838,10 +1623,6 @@
  res.a 6, d                     ; CB B2
  res.a 6, e                     ; CB B3
  res.a 6, h                     ; CB B4
- res.a 6, ixh                   ; DD CB B4
- res.a 6, ixl                   ; DD CB B5
- res.a 6, iyh                   ; FD CB B4
- res.a 6, iyl                   ; FD CB B5
  res.a 6, l                     ; CB B5
  res.a 7, (hl)                  ; CB BE
  res.a 7, (ix)                  ; DD CB 00 BE
@@ -1856,10 +1637,6 @@
  res.a 7, d                     ; CB BA
  res.a 7, e                     ; CB BB
  res.a 7, h                     ; CB BC
- res.a 7, ixh                   ; DD CB BC
- res.a 7, ixl                   ; DD CB BD
- res.a 7, iyh                   ; FD CB BC
- res.a 7, iyl                   ; FD CB BD
  res.a 7, l                     ; CB BD
  ret                            ; C9
  ret c                          ; D8
@@ -1929,10 +1706,6 @@
  rl d                           ; CB 12
  rl e                           ; CB 13
  rl h                           ; CB 14
- rl ixh                         ; DD CB 14
- rl ixl                         ; DD CB 15
- rl iyh                         ; FD CB 14
- rl iyl                         ; FD CB 15
  rl l                           ; CB 15
  rla                            ; 17
  rlc                            ; 07
@@ -1991,10 +1764,6 @@
  rlc d                          ; CB 02
  rlc e                          ; CB 03
  rlc h                          ; CB 04
- rlc ixh                        ; DD CB 04
- rlc ixl                        ; DD CB 05
- rlc iyh                        ; FD CB 04
- rlc iyl                        ; FD CB 05
  rlc l                          ; CB 05
  rlca                           ; 07
  rld                            ; ED 6F
@@ -2060,10 +1829,6 @@
  rr d                           ; CB 1A
  rr e                           ; CB 1B
  rr h                           ; CB 1C
- rr ixh                         ; DD CB 1C
- rr ixl                         ; DD CB 1D
- rr iyh                         ; FD CB 1C
- rr iyl                         ; FD CB 1D
  rr l                           ; CB 1D
  rra                            ; 1F
  rrc                            ; 0F
@@ -2122,10 +1887,6 @@
  rrc d                          ; CB 0A
  rrc e                          ; CB 0B
  rrc h                          ; CB 0C
- rrc ixh                        ; DD CB 0C
- rrc ixl                        ; DD CB 0D
- rrc iyh                        ; FD CB 0C
- rrc iyl                        ; FD CB 0D
  rrc l                          ; CB 0D
  rrca                           ; 0F
  rrd                            ; ED 67
@@ -2152,10 +1913,6 @@
  sbb d                          ; 9A
  sbb e                          ; 9B
  sbb h                          ; 9C
- sbb ixh                        ; DD 9C
- sbb ixl                        ; DD 9D
- sbb iyh                        ; FD 9C
- sbb iyl                        ; FD 9D
  sbb l                          ; 9D
  sbb m                          ; 9E
  sbc (hl)                       ; 9E
@@ -2208,7 +1965,6 @@
  sbi 127                        ; DE 7F
  sbi 255                        ; DE FF
  scf                            ; 37
- scf f                          ; 37
  set 0, (hl)                    ; CB C6
  set 0, (ix)                    ; DD CB 00 C6
  set 0, (ix+127)                ; DD CB 7F C6
@@ -2222,10 +1978,6 @@
  set 0, d                       ; CB C2
  set 0, e                       ; CB C3
  set 0, h                       ; CB C4
- set 0, ixh                     ; DD CB C4
- set 0, ixl                     ; DD CB C5
- set 0, iyh                     ; FD CB C4
- set 0, iyl                     ; FD CB C5
  set 0, l                       ; CB C5
  set 1, (hl)                    ; CB CE
  set 1, (ix)                    ; DD CB 00 CE
@@ -2240,10 +1992,6 @@
  set 1, d                       ; CB CA
  set 1, e                       ; CB CB
  set 1, h                       ; CB CC
- set 1, ixh                     ; DD CB CC
- set 1, ixl                     ; DD CB CD
- set 1, iyh                     ; FD CB CC
- set 1, iyl                     ; FD CB CD
  set 1, l                       ; CB CD
  set 2, (hl)                    ; CB D6
  set 2, (ix)                    ; DD CB 00 D6
@@ -2258,10 +2006,6 @@
  set 2, d                       ; CB D2
  set 2, e                       ; CB D3
  set 2, h                       ; CB D4
- set 2, ixh                     ; DD CB D4
- set 2, ixl                     ; DD CB D5
- set 2, iyh                     ; FD CB D4
- set 2, iyl                     ; FD CB D5
  set 2, l                       ; CB D5
  set 3, (hl)                    ; CB DE
  set 3, (ix)                    ; DD CB 00 DE
@@ -2276,10 +2020,6 @@
  set 3, d                       ; CB DA
  set 3, e                       ; CB DB
  set 3, h                       ; CB DC
- set 3, ixh                     ; DD CB DC
- set 3, ixl                     ; DD CB DD
- set 3, iyh                     ; FD CB DC
- set 3, iyl                     ; FD CB DD
  set 3, l                       ; CB DD
  set 4, (hl)                    ; CB E6
  set 4, (ix)                    ; DD CB 00 E6
@@ -2294,10 +2034,6 @@
  set 4, d                       ; CB E2
  set 4, e                       ; CB E3
  set 4, h                       ; CB E4
- set 4, ixh                     ; DD CB E4
- set 4, ixl                     ; DD CB E5
- set 4, iyh                     ; FD CB E4
- set 4, iyl                     ; FD CB E5
  set 4, l                       ; CB E5
  set 5, (hl)                    ; CB EE
  set 5, (ix)                    ; DD CB 00 EE
@@ -2312,10 +2048,6 @@
  set 5, d                       ; CB EA
  set 5, e                       ; CB EB
  set 5, h                       ; CB EC
- set 5, ixh                     ; DD CB EC
- set 5, ixl                     ; DD CB ED
- set 5, iyh                     ; FD CB EC
- set 5, iyl                     ; FD CB ED
  set 5, l                       ; CB ED
  set 6, (hl)                    ; CB F6
  set 6, (ix)                    ; DD CB 00 F6
@@ -2330,10 +2062,6 @@
  set 6, d                       ; CB F2
  set 6, e                       ; CB F3
  set 6, h                       ; CB F4
- set 6, ixh                     ; DD CB F4
- set 6, ixl                     ; DD CB F5
- set 6, iyh                     ; FD CB F4
- set 6, iyl                     ; FD CB F5
  set 6, l                       ; CB F5
  set 7, (hl)                    ; CB FE
  set 7, (ix)                    ; DD CB 00 FE
@@ -2348,10 +2076,6 @@
  set 7, d                       ; CB FA
  set 7, e                       ; CB FB
  set 7, h                       ; CB FC
- set 7, ixh                     ; DD CB FC
- set 7, ixl                     ; DD CB FD
- set 7, iyh                     ; FD CB FC
- set 7, iyl                     ; FD CB FD
  set 7, l                       ; CB FD
  set.a 0, (hl)                  ; CB C6
  set.a 0, (ix)                  ; DD CB 00 C6
@@ -2366,10 +2090,6 @@
  set.a 0, d                     ; CB C2
  set.a 0, e                     ; CB C3
  set.a 0, h                     ; CB C4
- set.a 0, ixh                   ; DD CB C4
- set.a 0, ixl                   ; DD CB C5
- set.a 0, iyh                   ; FD CB C4
- set.a 0, iyl                   ; FD CB C5
  set.a 0, l                     ; CB C5
  set.a 1, (hl)                  ; CB CE
  set.a 1, (ix)                  ; DD CB 00 CE
@@ -2384,10 +2104,6 @@
  set.a 1, d                     ; CB CA
  set.a 1, e                     ; CB CB
  set.a 1, h                     ; CB CC
- set.a 1, ixh                   ; DD CB CC
- set.a 1, ixl                   ; DD CB CD
- set.a 1, iyh                   ; FD CB CC
- set.a 1, iyl                   ; FD CB CD
  set.a 1, l                     ; CB CD
  set.a 2, (hl)                  ; CB D6
  set.a 2, (ix)                  ; DD CB 00 D6
@@ -2402,10 +2118,6 @@
  set.a 2, d                     ; CB D2
  set.a 2, e                     ; CB D3
  set.a 2, h                     ; CB D4
- set.a 2, ixh                   ; DD CB D4
- set.a 2, ixl                   ; DD CB D5
- set.a 2, iyh                   ; FD CB D4
- set.a 2, iyl                   ; FD CB D5
  set.a 2, l                     ; CB D5
  set.a 3, (hl)                  ; CB DE
  set.a 3, (ix)                  ; DD CB 00 DE
@@ -2420,10 +2132,6 @@
  set.a 3, d                     ; CB DA
  set.a 3, e                     ; CB DB
  set.a 3, h                     ; CB DC
- set.a 3, ixh                   ; DD CB DC
- set.a 3, ixl                   ; DD CB DD
- set.a 3, iyh                   ; FD CB DC
- set.a 3, iyl                   ; FD CB DD
  set.a 3, l                     ; CB DD
  set.a 4, (hl)                  ; CB E6
  set.a 4, (ix)                  ; DD CB 00 E6
@@ -2438,10 +2146,6 @@
  set.a 4, d                     ; CB E2
  set.a 4, e                     ; CB E3
  set.a 4, h                     ; CB E4
- set.a 4, ixh                   ; DD CB E4
- set.a 4, ixl                   ; DD CB E5
- set.a 4, iyh                   ; FD CB E4
- set.a 4, iyl                   ; FD CB E5
  set.a 4, l                     ; CB E5
  set.a 5, (hl)                  ; CB EE
  set.a 5, (ix)                  ; DD CB 00 EE
@@ -2456,10 +2160,6 @@
  set.a 5, d                     ; CB EA
  set.a 5, e                     ; CB EB
  set.a 5, h                     ; CB EC
- set.a 5, ixh                   ; DD CB EC
- set.a 5, ixl                   ; DD CB ED
- set.a 5, iyh                   ; FD CB EC
- set.a 5, iyl                   ; FD CB ED
  set.a 5, l                     ; CB ED
  set.a 6, (hl)                  ; CB F6
  set.a 6, (ix)                  ; DD CB 00 F6
@@ -2474,10 +2174,6 @@
  set.a 6, d                     ; CB F2
  set.a 6, e                     ; CB F3
  set.a 6, h                     ; CB F4
- set.a 6, ixh                   ; DD CB F4
- set.a 6, ixl                   ; DD CB F5
- set.a 6, iyh                   ; FD CB F4
- set.a 6, iyl                   ; FD CB F5
  set.a 6, l                     ; CB F5
  set.a 7, (hl)                  ; CB FE
  set.a 7, (ix)                  ; DD CB 00 FE
@@ -2492,10 +2188,6 @@
  set.a 7, d                     ; CB FA
  set.a 7, e                     ; CB FB
  set.a 7, h                     ; CB FC
- set.a 7, ixh                   ; DD CB FC
- set.a 7, ixl                   ; DD CB FD
- set.a 7, iyh                   ; FD CB FC
- set.a 7, iyl                   ; FD CB FD
  set.a 7, l                     ; CB FD
  setae                          ; ED 95
  shld -32768                    ; 22 00 80
@@ -2556,10 +2248,6 @@
  sla d                          ; CB 22
  sla e                          ; CB 23
  sla h                          ; CB 24
- sla ixh                        ; DD CB 24
- sla ixl                        ; DD CB 25
- sla iyh                        ; FD CB 24
- sla iyl                        ; FD CB 25
  sla l                          ; CB 25
  sli (hl)                       ; CB 36
  sli (ix)                       ; DD CB 00 36
@@ -2616,10 +2304,6 @@
  sli d                          ; CB 32
  sli e                          ; CB 33
  sli h                          ; CB 34
- sli ixh                        ; DD CB 34
- sli ixl                        ; DD CB 35
- sli iyh                        ; FD CB 34
- sli iyl                        ; FD CB 35
  sli l                          ; CB 35
  sll (hl)                       ; CB 36
  sll (ix)                       ; DD CB 00 36
@@ -2676,10 +2360,6 @@
  sll d                          ; CB 32
  sll e                          ; CB 33
  sll h                          ; CB 34
- sll ixh                        ; DD CB 34
- sll ixl                        ; DD CB 35
- sll iyh                        ; FD CB 34
- sll iyl                        ; FD CB 35
  sll l                          ; CB 35
  sphl                           ; F9
  sra (hl)                       ; CB 2E
@@ -2737,10 +2417,6 @@
  sra d                          ; CB 2A
  sra e                          ; CB 2B
  sra h                          ; CB 2C
- sra ixh                        ; DD CB 2C
- sra ixl                        ; DD CB 2D
- sra iyh                        ; FD CB 2C
- sra iyl                        ; FD CB 2D
  sra l                          ; CB 2D
  srl (hl)                       ; CB 3E
  srl (ix)                       ; DD CB 00 3E
@@ -2797,10 +2473,6 @@
  srl d                          ; CB 3A
  srl e                          ; CB 3B
  srl h                          ; CB 3C
- srl ixh                        ; DD CB 3C
- srl ixl                        ; DD CB 3D
- srl iyh                        ; FD CB 3C
- srl iyl                        ; FD CB 3D
  srl l                          ; CB 3D
  sta -32768                     ; 32 00 80
  sta 32767                      ; 32 FF 7F
@@ -2918,10 +2590,6 @@
  xra d                          ; AA
  xra e                          ; AB
  xra h                          ; AC
- xra ixh                        ; DD AC
- xra ixl                        ; DD AD
- xra iyh                        ; FD AC
- xra iyl                        ; FD AD
  xra l                          ; AD
  xra m                          ; AE
  xri -128                       ; EE 80

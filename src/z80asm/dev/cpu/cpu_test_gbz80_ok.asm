@@ -255,7 +255,6 @@
  cc 32767                       ; DC FF 7F
  cc 65535                       ; DC FF FF
  ccf                            ; 3F
- ccf f                          ; 3F
  cma                            ; 2F
  cmc                            ; 3F
  cmp (hl)                       ; BE
@@ -714,6 +713,8 @@
  mvi m, -128                    ; 36 80
  mvi m, 127                     ; 36 7F
  mvi m, 255                     ; 36 FF
+ neg                            ; 2F 3C
+ neg a                          ; 2F 3C
  nop                            ; 00
  or (hl)                        ; B6
  or -128                        ; F6 80
@@ -992,7 +993,6 @@
  sbi 127                        ; DE 7F
  sbi 255                        ; DE FF
  scf                            ; 37
- scf f                          ; 37
  set 0, (hl)                    ; CB C6
  set 0, a                       ; CB C7
  set 0, b                       ; CB C0

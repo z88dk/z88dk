@@ -60,7 +60,7 @@ my %V = (
 	_po => 4, _pe => 5,
 	_nv => 4, _v => 5,
 	_lz => 4, _lo => 5, _p => 6, _m => 7,
-	add => 0, adc => 1, sub => 2, sbc => 3, and => 4, xor => 5, or => 6, 
+	add => 0, adc => 1, sub => 2, sbc => 3, sbb => 3, and => 4, xor => 5, or => 6, 
 	cp => 7, cmp => 7,
 	rlca => 0, rrca => 1, rla => 2, rra => 3,
 	rlc => 0, rrc => 1, rl => 2, rr => 3, sla => 4, sra => 5, 
@@ -464,29 +464,30 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "altd cpl a",	$V{altd}, 0x2F);
 	}
 	
-	add_opc($cpu, "neg", 		0xED, 0x44) if !$intel && !$gameboy;
-	add_opc($cpu, "neg a", 		0xED, 0x44) if !$intel && !$gameboy;
+	if (!$intel && !$gameboy) {
+		add_opc($cpu, "neg", 		0xED, 0x44);
+		add_opc($cpu, "neg a", 		0xED, 0x44);
+	}
+	else {
+		add_opc($cpu, "neg", 		0x2F, 0x3C);
+		add_opc($cpu, "neg a", 		0x2F, 0x3C);
+	}
+	
 	add_opc($cpu, "neg a'", 	$V{altd}, 0xED, 0x44) if $rabbit;
 	add_opc($cpu, "altd neg",	$V{altd}, 0xED, 0x44) if $rabbit;
 	add_opc($cpu, "altd neg a",	$V{altd}, 0xED, 0x44) if $rabbit;
 	
 	add_opc($cpu, "ccf", 		0x3F);
 	add_opc($cpu, "cmc",		0x3F);
-	add_opc($cpu, "ccf f", 		0x3F);
 	
 	add_opc($cpu, "ccf'", 		$V{altd}, 0x3F) if $rabbit;
-	add_opc($cpu, "ccf f'", 	$V{altd}, 0x3F) if $rabbit;
 	add_opc($cpu, "altd ccf",	$V{altd}, 0x3F) if $rabbit;
-	add_opc($cpu, "altd ccf f",	$V{altd}, 0x3F) if $rabbit;
 	
 	add_opc($cpu, "scf", 		0x37);
 	add_opc($cpu, "stc",		0x37);
-	add_opc($cpu, "scf f", 		0x37);
 
 	add_opc($cpu, "scf'", 		$V{altd}, 0x37) if $rabbit;
-	add_opc($cpu, "scf f'", 	$V{altd}, 0x37) if $rabbit;
 	add_opc($cpu, "altd scf",	$V{altd}, 0x37) if $rabbit;
-	add_opc($cpu, "altd scf f",	$V{altd}, 0x37) if $rabbit;
 	
 	
 	# 16-bit load group
@@ -1424,7 +1425,7 @@ sub add_opc {
 	
 	# expand ixh, ixl, ...
 	if ($cpu =~ /^z80/ && $asm =~ /\b[hl]\b/ && 
-		$asm !~ /\b(hl|ix|iy|in|out|dad|ana|bit|res|set)\b/) {
+		$asm !~ /\b(hl|ix|iy|in|out|dad|ana|bit|res|set|inr|dcr|dcx|inx|lxi|mov|mvi|sbb|ora|xra|pop|push|rlc|rrc|rl|rr|sla|sra|sll|srl|sli)\b/) {
 		(my $asm1 = $asm) =~ s/\b([hl])\b/ix$1/g;
 		add_opc_1($cpu, $asm1, $V{ix}, @bin);
 		(   $asm1 = $asm) =~ s/\b([hl])\b/iy$1/g;
