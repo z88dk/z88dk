@@ -474,22 +474,7 @@
  push hl                        ; E5
  push psw                       ; F5
  rst %c                         ; C7+%c
- sbb (hl)                       ; 9E
- sbb -128                       ; DE 80
- sbb 127                        ; DE 7F
- sbb 255                        ; DE FF
  sbb a                          ; 9F
- sbb a, (hl)                    ; 9E
- sbb a, -128                    ; DE 80
- sbb a, 127                     ; DE 7F
- sbb a, 255                     ; DE FF
- sbb a, a                       ; 9F
- sbb a, b                       ; 98
- sbb a, c                       ; 99
- sbb a, d                       ; 9A
- sbb a, e                       ; 9B
- sbb a, h                       ; 9C
- sbb a, l                       ; 9D
  sbb b                          ; 98
  sbb c                          ; 99
  sbb d                          ; 9A

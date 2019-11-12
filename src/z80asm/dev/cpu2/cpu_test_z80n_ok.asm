@@ -783,34 +783,7 @@
  res %c, h                      ; CB 84+%c*08
  res %c, l                      ; CB 85+%c*08
  rst %c                         ; C7+%c
- sbb (hl)                       ; 9E
- sbb (ix)                       ; DD 9E 00
- sbb (ix+-128)                  ; DD 9E 80
- sbb (ix+127)                   ; DD 9E 7F
- sbb (iy)                       ; FD 9E 00
- sbb (iy+-128)                  ; FD 9E 80
- sbb (iy+127)                   ; FD 9E 7F
- sbb -128                       ; DE 80
- sbb 127                        ; DE 7F
- sbb 255                        ; DE FF
  sbb a                          ; 9F
- sbb a, (hl)                    ; 9E
- sbb a, (ix)                    ; DD 9E 00
- sbb a, (ix+-128)               ; DD 9E 80
- sbb a, (ix+127)                ; DD 9E 7F
- sbb a, (iy)                    ; FD 9E 00
- sbb a, (iy+-128)               ; FD 9E 80
- sbb a, (iy+127)                ; FD 9E 7F
- sbb a, -128                    ; DE 80
- sbb a, 127                     ; DE 7F
- sbb a, 255                     ; DE FF
- sbb a, a                       ; 9F
- sbb a, b                       ; 98
- sbb a, c                       ; 99
- sbb a, d                       ; 9A
- sbb a, e                       ; 9B
- sbb a, h                       ; 9C
- sbb a, l                       ; 9D
  sbb b                          ; 98
  sbb c                          ; 99
  sbb d                          ; 9A

@@ -323,18 +323,6 @@
  res %c, e                      ; Error
  res %c, h                      ; Error
  res %c, l                      ; Error
- sbb (ix)                       ; Error
- sbb (ix+-128)                  ; Error
- sbb (ix+127)                   ; Error
- sbb (iy)                       ; Error
- sbb (iy+-128)                  ; Error
- sbb (iy+127)                   ; Error
- sbb a, (ix)                    ; Error
- sbb a, (ix+-128)               ; Error
- sbb a, (ix+127)                ; Error
- sbb a, (iy)                    ; Error
- sbb a, (iy+-128)               ; Error
- sbb a, (iy+127)                ; Error
  sbc (ix)                       ; Error
  sbc (ix+-128)                  ; Error
  sbc (ix+127)                   ; Error

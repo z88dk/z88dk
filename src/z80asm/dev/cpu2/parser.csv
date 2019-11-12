@@ -4623,112 +4623,6 @@ RST const_expr                    |z80  |expr  |-    |rst %c        |C7+%c      
 RST const_expr                    |z80  |expr  |IXIY |rst %c        |C7+%c                              |     11 T
 RST const_expr                    |z80n |expr  |-    |rst %c        |C7+%c                              |     11 T
 RST const_expr                    |z80n |expr  |IXIY |rst %c        |C7+%c                              |     11 T
-SBB A COMMA A                     |8080 |-     |-    |sbb a, a      |9F                                 |      4 T
-SBB A COMMA A                     |8080 |-     |IXIY |sbb a, a      |9F                                 |      4 T
-SBB A COMMA A                     |8085 |-     |-    |sbb a, a      |9F                                 |      4 T
-SBB A COMMA A                     |8085 |-     |IXIY |sbb a, a      |9F                                 |      4 T
-SBB A COMMA A                     |gbz80|-     |-    |sbb a, a      |9F                                 |      4 T
-SBB A COMMA A                     |gbz80|-     |IXIY |sbb a, a      |9F                                 |      4 T
-SBB A COMMA A                     |z80  |-     |-    |sbb a, a      |9F                                 |      4 T
-SBB A COMMA A                     |z80  |-     |IXIY |sbb a, a      |9F                                 |      4 T
-SBB A COMMA A                     |z80n |-     |-    |sbb a, a      |9F                                 |      4 T
-SBB A COMMA A                     |z80n |-     |IXIY |sbb a, a      |9F                                 |      4 T
-SBB A COMMA B                     |8080 |-     |-    |sbb a, b      |98                                 |      4 T
-SBB A COMMA B                     |8080 |-     |IXIY |sbb a, b      |98                                 |      4 T
-SBB A COMMA B                     |8085 |-     |-    |sbb a, b      |98                                 |      4 T
-SBB A COMMA B                     |8085 |-     |IXIY |sbb a, b      |98                                 |      4 T
-SBB A COMMA B                     |gbz80|-     |-    |sbb a, b      |98                                 |      4 T
-SBB A COMMA B                     |gbz80|-     |IXIY |sbb a, b      |98                                 |      4 T
-SBB A COMMA B                     |z80  |-     |-    |sbb a, b      |98                                 |      4 T
-SBB A COMMA B                     |z80  |-     |IXIY |sbb a, b      |98                                 |      4 T
-SBB A COMMA B                     |z80n |-     |-    |sbb a, b      |98                                 |      4 T
-SBB A COMMA B                     |z80n |-     |IXIY |sbb a, b      |98                                 |      4 T
-SBB A COMMA C                     |8080 |-     |-    |sbb a, c      |99                                 |      4 T
-SBB A COMMA C                     |8080 |-     |IXIY |sbb a, c      |99                                 |      4 T
-SBB A COMMA C                     |8085 |-     |-    |sbb a, c      |99                                 |      4 T
-SBB A COMMA C                     |8085 |-     |IXIY |sbb a, c      |99                                 |      4 T
-SBB A COMMA C                     |gbz80|-     |-    |sbb a, c      |99                                 |      4 T
-SBB A COMMA C                     |gbz80|-     |IXIY |sbb a, c      |99                                 |      4 T
-SBB A COMMA C                     |z80  |-     |-    |sbb a, c      |99                                 |      4 T
-SBB A COMMA C                     |z80  |-     |IXIY |sbb a, c      |99                                 |      4 T
-SBB A COMMA C                     |z80n |-     |-    |sbb a, c      |99                                 |      4 T
-SBB A COMMA C                     |z80n |-     |IXIY |sbb a, c      |99                                 |      4 T
-SBB A COMMA D                     |8080 |-     |-    |sbb a, d      |9A                                 |      4 T
-SBB A COMMA D                     |8080 |-     |IXIY |sbb a, d      |9A                                 |      4 T
-SBB A COMMA D                     |8085 |-     |-    |sbb a, d      |9A                                 |      4 T
-SBB A COMMA D                     |8085 |-     |IXIY |sbb a, d      |9A                                 |      4 T
-SBB A COMMA D                     |gbz80|-     |-    |sbb a, d      |9A                                 |      4 T
-SBB A COMMA D                     |gbz80|-     |IXIY |sbb a, d      |9A                                 |      4 T
-SBB A COMMA D                     |z80  |-     |-    |sbb a, d      |9A                                 |      4 T
-SBB A COMMA D                     |z80  |-     |IXIY |sbb a, d      |9A                                 |      4 T
-SBB A COMMA D                     |z80n |-     |-    |sbb a, d      |9A                                 |      4 T
-SBB A COMMA D                     |z80n |-     |IXIY |sbb a, d      |9A                                 |      4 T
-SBB A COMMA E                     |8080 |-     |-    |sbb a, e      |9B                                 |      4 T
-SBB A COMMA E                     |8080 |-     |IXIY |sbb a, e      |9B                                 |      4 T
-SBB A COMMA E                     |8085 |-     |-    |sbb a, e      |9B                                 |      4 T
-SBB A COMMA E                     |8085 |-     |IXIY |sbb a, e      |9B                                 |      4 T
-SBB A COMMA E                     |gbz80|-     |-    |sbb a, e      |9B                                 |      4 T
-SBB A COMMA E                     |gbz80|-     |IXIY |sbb a, e      |9B                                 |      4 T
-SBB A COMMA E                     |z80  |-     |-    |sbb a, e      |9B                                 |      4 T
-SBB A COMMA E                     |z80  |-     |IXIY |sbb a, e      |9B                                 |      4 T
-SBB A COMMA E                     |z80n |-     |-    |sbb a, e      |9B                                 |      4 T
-SBB A COMMA E                     |z80n |-     |IXIY |sbb a, e      |9B                                 |      4 T
-SBB A COMMA H                     |8080 |-     |-    |sbb a, h      |9C                                 |      4 T
-SBB A COMMA H                     |8080 |-     |IXIY |sbb a, h      |9C                                 |      4 T
-SBB A COMMA H                     |8085 |-     |-    |sbb a, h      |9C                                 |      4 T
-SBB A COMMA H                     |8085 |-     |IXIY |sbb a, h      |9C                                 |      4 T
-SBB A COMMA H                     |gbz80|-     |-    |sbb a, h      |9C                                 |      4 T
-SBB A COMMA H                     |gbz80|-     |IXIY |sbb a, h      |9C                                 |      4 T
-SBB A COMMA H                     |z80  |-     |-    |sbb a, h      |9C                                 |      4 T
-SBB A COMMA H                     |z80  |-     |IXIY |sbb a, h      |9C                                 |      4 T
-SBB A COMMA H                     |z80n |-     |-    |sbb a, h      |9C                                 |      4 T
-SBB A COMMA H                     |z80n |-     |IXIY |sbb a, h      |9C                                 |      4 T
-SBB A COMMA IND_HL RPAREN         |8080 |-     |-    |sbb a, (hl)   |9E                                 |      7 T
-SBB A COMMA IND_HL RPAREN         |8080 |-     |IXIY |sbb a, (hl)   |9E                                 |      7 T
-SBB A COMMA IND_HL RPAREN         |8085 |-     |-    |sbb a, (hl)   |9E                                 |      7 T
-SBB A COMMA IND_HL RPAREN         |8085 |-     |IXIY |sbb a, (hl)   |9E                                 |      7 T
-SBB A COMMA IND_HL RPAREN         |gbz80|-     |-    |sbb a, (hl)   |9E                                 |      8 T
-SBB A COMMA IND_HL RPAREN         |gbz80|-     |IXIY |sbb a, (hl)   |9E                                 |      8 T
-SBB A COMMA IND_HL RPAREN         |z80  |-     |-    |sbb a, (hl)   |9E                                 |      7 T
-SBB A COMMA IND_HL RPAREN         |z80  |-     |IXIY |sbb a, (hl)   |9E                                 |      7 T
-SBB A COMMA IND_HL RPAREN         |z80n |-     |-    |sbb a, (hl)   |9E                                 |      7 T
-SBB A COMMA IND_HL RPAREN         |z80n |-     |IXIY |sbb a, (hl)   |9E                                 |      7 T
-SBB A COMMA IND_IX RPAREN         |z80  |-     |-    |sbb a, (ix)   |DD 9E 00                           |     19 T
-SBB A COMMA IND_IX RPAREN         |z80  |-     |IXIY |sbb a, (ix)   |FD 9E 00                           |     19 T
-SBB A COMMA IND_IX RPAREN         |z80n |-     |-    |sbb a, (ix)   |DD 9E 00                           |     19 T
-SBB A COMMA IND_IX RPAREN         |z80n |-     |IXIY |sbb a, (ix)   |FD 9E 00                           |     19 T
-SBB A COMMA IND_IX expr RPAREN    |z80  |expr  |-    |sbb a, (ix+%d)|DD 9E %d                           |     19 T
-SBB A COMMA IND_IX expr RPAREN    |z80  |expr  |IXIY |sbb a, (ix+%d)|FD 9E %d                           |     19 T
-SBB A COMMA IND_IX expr RPAREN    |z80n |expr  |-    |sbb a, (ix+%d)|DD 9E %d                           |     19 T
-SBB A COMMA IND_IX expr RPAREN    |z80n |expr  |IXIY |sbb a, (ix+%d)|FD 9E %d                           |     19 T
-SBB A COMMA IND_IY RPAREN         |z80  |-     |-    |sbb a, (iy)   |FD 9E 00                           |     19 T
-SBB A COMMA IND_IY RPAREN         |z80  |-     |IXIY |sbb a, (iy)   |DD 9E 00                           |     19 T
-SBB A COMMA IND_IY RPAREN         |z80n |-     |-    |sbb a, (iy)   |FD 9E 00                           |     19 T
-SBB A COMMA IND_IY RPAREN         |z80n |-     |IXIY |sbb a, (iy)   |DD 9E 00                           |     19 T
-SBB A COMMA IND_IY expr RPAREN    |z80  |expr  |-    |sbb a, (iy+%d)|FD 9E %d                           |     19 T
-SBB A COMMA IND_IY expr RPAREN    |z80  |expr  |IXIY |sbb a, (iy+%d)|DD 9E %d                           |     19 T
-SBB A COMMA IND_IY expr RPAREN    |z80n |expr  |-    |sbb a, (iy+%d)|FD 9E %d                           |     19 T
-SBB A COMMA IND_IY expr RPAREN    |z80n |expr  |IXIY |sbb a, (iy+%d)|DD 9E %d                           |     19 T
-SBB A COMMA L                     |8080 |-     |-    |sbb a, l      |9D                                 |      4 T
-SBB A COMMA L                     |8080 |-     |IXIY |sbb a, l      |9D                                 |      4 T
-SBB A COMMA L                     |8085 |-     |-    |sbb a, l      |9D                                 |      4 T
-SBB A COMMA L                     |8085 |-     |IXIY |sbb a, l      |9D                                 |      4 T
-SBB A COMMA L                     |gbz80|-     |-    |sbb a, l      |9D                                 |      4 T
-SBB A COMMA L                     |gbz80|-     |IXIY |sbb a, l      |9D                                 |      4 T
-SBB A COMMA L                     |z80  |-     |-    |sbb a, l      |9D                                 |      4 T
-SBB A COMMA L                     |z80  |-     |IXIY |sbb a, l      |9D                                 |      4 T
-SBB A COMMA L                     |z80n |-     |-    |sbb a, l      |9D                                 |      4 T
-SBB A COMMA L                     |z80n |-     |IXIY |sbb a, l      |9D                                 |      4 T
-SBB A COMMA expr                  |8080 |expr  |-    |sbb a, %n     |DE %n                              |      7 T
-SBB A COMMA expr                  |8080 |expr  |IXIY |sbb a, %n     |DE %n                              |      7 T
-SBB A COMMA expr                  |8085 |expr  |-    |sbb a, %n     |DE %n                              |      7 T
-SBB A COMMA expr                  |8085 |expr  |IXIY |sbb a, %n     |DE %n                              |      7 T
-SBB A COMMA expr                  |gbz80|expr  |-    |sbb a, %n     |DE %n                              |      8 T
-SBB A COMMA expr                  |gbz80|expr  |IXIY |sbb a, %n     |DE %n                              |      8 T
-SBB A COMMA expr                  |z80  |expr  |-    |sbb a, %n     |DE %n                              |      7 T
-SBB A COMMA expr                  |z80  |expr  |IXIY |sbb a, %n     |DE %n                              |      7 T
-SBB A COMMA expr                  |z80n |expr  |-    |sbb a, %n     |DE %n                              |      7 T
-SBB A COMMA expr                  |z80n |expr  |IXIY |sbb a, %n     |DE %n                              |      7 T
 SBB A                             |8080 |-     |-    |sbb a         |9F                                 |      4 T
 SBB A                             |8080 |-     |IXIY |sbb a         |9F                                 |      4 T
 SBB A                             |8085 |-     |-    |sbb a         |9F                                 |      4 T
@@ -4789,32 +4683,6 @@ SBB H                             |z80  |-     |-    |sbb h         |9C         
 SBB H                             |z80  |-     |IXIY |sbb h         |9C                                 |      4 T
 SBB H                             |z80n |-     |-    |sbb h         |9C                                 |      4 T
 SBB H                             |z80n |-     |IXIY |sbb h         |9C                                 |      4 T
-SBB IND_HL RPAREN                 |8080 |-     |-    |sbb (hl)      |9E                                 |      7 T
-SBB IND_HL RPAREN                 |8080 |-     |IXIY |sbb (hl)      |9E                                 |      7 T
-SBB IND_HL RPAREN                 |8085 |-     |-    |sbb (hl)      |9E                                 |      7 T
-SBB IND_HL RPAREN                 |8085 |-     |IXIY |sbb (hl)      |9E                                 |      7 T
-SBB IND_HL RPAREN                 |gbz80|-     |-    |sbb (hl)      |9E                                 |      8 T
-SBB IND_HL RPAREN                 |gbz80|-     |IXIY |sbb (hl)      |9E                                 |      8 T
-SBB IND_HL RPAREN                 |z80  |-     |-    |sbb (hl)      |9E                                 |      7 T
-SBB IND_HL RPAREN                 |z80  |-     |IXIY |sbb (hl)      |9E                                 |      7 T
-SBB IND_HL RPAREN                 |z80n |-     |-    |sbb (hl)      |9E                                 |      7 T
-SBB IND_HL RPAREN                 |z80n |-     |IXIY |sbb (hl)      |9E                                 |      7 T
-SBB IND_IX RPAREN                 |z80  |-     |-    |sbb (ix)      |DD 9E 00                           |     19 T
-SBB IND_IX RPAREN                 |z80  |-     |IXIY |sbb (ix)      |FD 9E 00                           |     19 T
-SBB IND_IX RPAREN                 |z80n |-     |-    |sbb (ix)      |DD 9E 00                           |     19 T
-SBB IND_IX RPAREN                 |z80n |-     |IXIY |sbb (ix)      |FD 9E 00                           |     19 T
-SBB IND_IX expr RPAREN            |z80  |expr  |-    |sbb (ix+%d)   |DD 9E %d                           |     19 T
-SBB IND_IX expr RPAREN            |z80  |expr  |IXIY |sbb (ix+%d)   |FD 9E %d                           |     19 T
-SBB IND_IX expr RPAREN            |z80n |expr  |-    |sbb (ix+%d)   |DD 9E %d                           |     19 T
-SBB IND_IX expr RPAREN            |z80n |expr  |IXIY |sbb (ix+%d)   |FD 9E %d                           |     19 T
-SBB IND_IY RPAREN                 |z80  |-     |-    |sbb (iy)      |FD 9E 00                           |     19 T
-SBB IND_IY RPAREN                 |z80  |-     |IXIY |sbb (iy)      |DD 9E 00                           |     19 T
-SBB IND_IY RPAREN                 |z80n |-     |-    |sbb (iy)      |FD 9E 00                           |     19 T
-SBB IND_IY RPAREN                 |z80n |-     |IXIY |sbb (iy)      |DD 9E 00                           |     19 T
-SBB IND_IY expr RPAREN            |z80  |expr  |-    |sbb (iy+%d)   |FD 9E %d                           |     19 T
-SBB IND_IY expr RPAREN            |z80  |expr  |IXIY |sbb (iy+%d)   |DD 9E %d                           |     19 T
-SBB IND_IY expr RPAREN            |z80n |expr  |-    |sbb (iy+%d)   |FD 9E %d                           |     19 T
-SBB IND_IY expr RPAREN            |z80n |expr  |IXIY |sbb (iy+%d)   |DD 9E %d                           |     19 T
 SBB L                             |8080 |-     |-    |sbb l         |9D                                 |      4 T
 SBB L                             |8080 |-     |IXIY |sbb l         |9D                                 |      4 T
 SBB L                             |8085 |-     |-    |sbb l         |9D                                 |      4 T
@@ -4835,16 +4703,6 @@ SBB M                             |z80  |-     |-    |sbb m         |9E         
 SBB M                             |z80  |-     |IXIY |sbb m         |9E                                 |      7 T
 SBB M                             |z80n |-     |-    |sbb m         |9E                                 |      7 T
 SBB M                             |z80n |-     |IXIY |sbb m         |9E                                 |      7 T
-SBB expr                          |8080 |expr  |-    |sbb %n        |DE %n                              |      7 T
-SBB expr                          |8080 |expr  |IXIY |sbb %n        |DE %n                              |      7 T
-SBB expr                          |8085 |expr  |-    |sbb %n        |DE %n                              |      7 T
-SBB expr                          |8085 |expr  |IXIY |sbb %n        |DE %n                              |      7 T
-SBB expr                          |gbz80|expr  |-    |sbb %n        |DE %n                              |      8 T
-SBB expr                          |gbz80|expr  |IXIY |sbb %n        |DE %n                              |      8 T
-SBB expr                          |z80  |expr  |-    |sbb %n        |DE %n                              |      7 T
-SBB expr                          |z80  |expr  |IXIY |sbb %n        |DE %n                              |      7 T
-SBB expr                          |z80n |expr  |-    |sbb %n        |DE %n                              |      7 T
-SBB expr                          |z80n |expr  |IXIY |sbb %n        |DE %n                              |      7 T
 SBC A COMMA A                     |8080 |-     |-    |sbc a, a      |9F                                 |      4 T
 SBC A COMMA A                     |8080 |-     |IXIY |sbc a, a      |9F                                 |      4 T
 SBC A COMMA A                     |8085 |-     |-    |sbc a, a      |9F                                 |      4 T

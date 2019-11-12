@@ -5009,113 +5009,6 @@ break;
 default: error_illegal_ident(); }
 }
 
-| label? _TK_SBB _TK_A _TK_COMMA _TK_A _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_Z80: case CPU_Z80N: 
-DO_stmt(0x9F);
-break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_SBB _TK_A _TK_COMMA _TK_B _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_Z80: case CPU_Z80N: 
-DO_stmt(0x98);
-break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_SBB _TK_A _TK_COMMA _TK_C _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_Z80: case CPU_Z80N: 
-DO_stmt(0x99);
-break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_SBB _TK_A _TK_COMMA _TK_D _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_Z80: case CPU_Z80N: 
-DO_stmt(0x9A);
-break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_SBB _TK_A _TK_COMMA _TK_E _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_Z80: case CPU_Z80N: 
-DO_stmt(0x9B);
-break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_SBB _TK_A _TK_COMMA _TK_H _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_Z80: case CPU_Z80N: 
-DO_stmt(0x9C);
-break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_SBB _TK_A _TK_COMMA _TK_IND_HL _TK_RPAREN _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_Z80: case CPU_Z80N: 
-DO_stmt(0x9E);
-break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_SBB _TK_A _TK_COMMA _TK_IND_IX _TK_RPAREN _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_Z80: case CPU_Z80N: 
-if (!opts.swap_ix_iy) { DO_stmt(0xDD9E00); } else { DO_stmt(0xFD9E00); }
-break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_SBB _TK_A _TK_COMMA _TK_IND_IX expr _TK_RPAREN _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_Z80: case CPU_Z80N: 
-if (expr_in_parens) warn_expr_in_parens();
-if (!opts.swap_ix_iy) { DO_stmt_idx(0xDD9E); } else { DO_stmt_idx(0xFD9E); }
-break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_SBB _TK_A _TK_COMMA _TK_IND_IY _TK_RPAREN _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_Z80: case CPU_Z80N: 
-if (!opts.swap_ix_iy) { DO_stmt(0xFD9E00); } else { DO_stmt(0xDD9E00); }
-break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_SBB _TK_A _TK_COMMA _TK_IND_IY expr _TK_RPAREN _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_Z80: case CPU_Z80N: 
-if (expr_in_parens) warn_expr_in_parens();
-if (!opts.swap_ix_iy) { DO_stmt_idx(0xFD9E); } else { DO_stmt_idx(0xDD9E); }
-break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_SBB _TK_A _TK_COMMA _TK_L _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_Z80: case CPU_Z80N: 
-DO_stmt(0x9D);
-break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_SBB _TK_A _TK_COMMA expr _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_Z80: case CPU_Z80N: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_n(0xDE);
-break;
-default: error_illegal_ident(); }
-}
-
 | label? _TK_SBB _TK_A _TK_NEWLINE @{
 switch (opts.cpu) {
 case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_Z80: case CPU_Z80N: 
@@ -5164,48 +5057,6 @@ break;
 default: error_illegal_ident(); }
 }
 
-| label? _TK_SBB _TK_IND_HL _TK_RPAREN _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_Z80: case CPU_Z80N: 
-DO_stmt(0x9E);
-break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_SBB _TK_IND_IX _TK_RPAREN _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_Z80: case CPU_Z80N: 
-if (!opts.swap_ix_iy) { DO_stmt(0xDD9E00); } else { DO_stmt(0xFD9E00); }
-break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_SBB _TK_IND_IX expr _TK_RPAREN _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_Z80: case CPU_Z80N: 
-if (expr_in_parens) warn_expr_in_parens();
-if (!opts.swap_ix_iy) { DO_stmt_idx(0xDD9E); } else { DO_stmt_idx(0xFD9E); }
-break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_SBB _TK_IND_IY _TK_RPAREN _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_Z80: case CPU_Z80N: 
-if (!opts.swap_ix_iy) { DO_stmt(0xFD9E00); } else { DO_stmt(0xDD9E00); }
-break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_SBB _TK_IND_IY expr _TK_RPAREN _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_Z80: case CPU_Z80N: 
-if (expr_in_parens) warn_expr_in_parens();
-if (!opts.swap_ix_iy) { DO_stmt_idx(0xFD9E); } else { DO_stmt_idx(0xDD9E); }
-break;
-default: error_illegal_ident(); }
-}
-
 | label? _TK_SBB _TK_L _TK_NEWLINE @{
 switch (opts.cpu) {
 case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_Z80: case CPU_Z80N: 
@@ -5218,15 +5069,6 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_Z80: case CPU_Z80N: 
 DO_stmt(0x9E);
-break;
-default: error_illegal_ident(); }
-}
-
-| label? _TK_SBB expr _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_Z80: case CPU_Z80N: 
-if (expr_in_parens) warn_expr_in_parens();
-DO_stmt_n(0xDE);
 break;
 default: error_illegal_ident(); }
 }

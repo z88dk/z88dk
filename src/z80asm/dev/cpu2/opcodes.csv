@@ -2721,82 +2721,11 @@ rst 8         |8085 |CF            |     12 T
 rst 8         |gbz80|CF            |     32 T
 rst 8         |z80  |CF            |     11 T
 rst 8         |z80n |CF            |     11 T
-sbb %n        |8080 |DE %n         |      7 T
-sbb %n        |8085 |DE %n         |      7 T
-sbb %n        |gbz80|DE %n         |      8 T
-sbb %n        |z80  |DE %n         |      7 T
-sbb %n        |z80n |DE %n         |      7 T
-sbb (hl)      |8080 |9E            |      7 T
-sbb (hl)      |8085 |9E            |      7 T
-sbb (hl)      |gbz80|9E            |      8 T
-sbb (hl)      |z80  |9E            |      7 T
-sbb (hl)      |z80n |9E            |      7 T
-sbb (ix)      |z80  |DD 9E 00      |     19 T
-sbb (ix)      |z80n |DD 9E 00      |     19 T
-sbb (ix+%d)   |z80  |DD 9E %d      |     19 T
-sbb (ix+%d)   |z80n |DD 9E %d      |     19 T
-sbb (iy)      |z80  |FD 9E 00      |     19 T
-sbb (iy)      |z80n |FD 9E 00      |     19 T
-sbb (iy+%d)   |z80  |FD 9E %d      |     19 T
-sbb (iy+%d)   |z80n |FD 9E %d      |     19 T
 sbb a         |8080 |9F            |      4 T
 sbb a         |8085 |9F            |      4 T
 sbb a         |gbz80|9F            |      4 T
 sbb a         |z80  |9F            |      4 T
 sbb a         |z80n |9F            |      4 T
-sbb a, %n     |8080 |DE %n         |      7 T
-sbb a, %n     |8085 |DE %n         |      7 T
-sbb a, %n     |gbz80|DE %n         |      8 T
-sbb a, %n     |z80  |DE %n         |      7 T
-sbb a, %n     |z80n |DE %n         |      7 T
-sbb a, (hl)   |8080 |9E            |      7 T
-sbb a, (hl)   |8085 |9E            |      7 T
-sbb a, (hl)   |gbz80|9E            |      8 T
-sbb a, (hl)   |z80  |9E            |      7 T
-sbb a, (hl)   |z80n |9E            |      7 T
-sbb a, (ix)   |z80  |DD 9E 00      |     19 T
-sbb a, (ix)   |z80n |DD 9E 00      |     19 T
-sbb a, (ix+%d)|z80  |DD 9E %d      |     19 T
-sbb a, (ix+%d)|z80n |DD 9E %d      |     19 T
-sbb a, (iy)   |z80  |FD 9E 00      |     19 T
-sbb a, (iy)   |z80n |FD 9E 00      |     19 T
-sbb a, (iy+%d)|z80  |FD 9E %d      |     19 T
-sbb a, (iy+%d)|z80n |FD 9E %d      |     19 T
-sbb a, a      |8080 |9F            |      4 T
-sbb a, a      |8085 |9F            |      4 T
-sbb a, a      |gbz80|9F            |      4 T
-sbb a, a      |z80  |9F            |      4 T
-sbb a, a      |z80n |9F            |      4 T
-sbb a, b      |8080 |98            |      4 T
-sbb a, b      |8085 |98            |      4 T
-sbb a, b      |gbz80|98            |      4 T
-sbb a, b      |z80  |98            |      4 T
-sbb a, b      |z80n |98            |      4 T
-sbb a, c      |8080 |99            |      4 T
-sbb a, c      |8085 |99            |      4 T
-sbb a, c      |gbz80|99            |      4 T
-sbb a, c      |z80  |99            |      4 T
-sbb a, c      |z80n |99            |      4 T
-sbb a, d      |8080 |9A            |      4 T
-sbb a, d      |8085 |9A            |      4 T
-sbb a, d      |gbz80|9A            |      4 T
-sbb a, d      |z80  |9A            |      4 T
-sbb a, d      |z80n |9A            |      4 T
-sbb a, e      |8080 |9B            |      4 T
-sbb a, e      |8085 |9B            |      4 T
-sbb a, e      |gbz80|9B            |      4 T
-sbb a, e      |z80  |9B            |      4 T
-sbb a, e      |z80n |9B            |      4 T
-sbb a, h      |8080 |9C            |      4 T
-sbb a, h      |8085 |9C            |      4 T
-sbb a, h      |gbz80|9C            |      4 T
-sbb a, h      |z80  |9C            |      4 T
-sbb a, h      |z80n |9C            |      4 T
-sbb a, l      |8080 |9D            |      4 T
-sbb a, l      |8085 |9D            |      4 T
-sbb a, l      |gbz80|9D            |      4 T
-sbb a, l      |z80  |9D            |      4 T
-sbb a, l      |z80n |9D            |      4 T
 sbb b         |8080 |98            |      4 T
 sbb b         |8085 |98            |      4 T
 sbb b         |gbz80|98            |      4 T

@@ -679,7 +679,7 @@ sub init_opcodes {
 		
 		# add... a, r / add... r
 		for my $op (qw( add adc sub sbc and xor or  cp  
-		                            sbb             cmp )) {
+		                                            cmp )) {
 			for $r (qw( b c d e h l a )) {
 				$B = B(0x80+OP($op)*8+R($r));
 				$T = T(4);
@@ -687,7 +687,7 @@ sub init_opcodes {
 				add("$op    $r",	$B, $T);
 			}
 		}
-		for my $op (qw(                 ana xra ora     )) {	
+		for my $op (qw(             sbb ana xra ora     )) {	
 			for $r (qw( b c d e h l a )) {
 				$B = B(0x80+OP($op)*8+R($r));
 				$T = T(4);
@@ -697,7 +697,7 @@ sub init_opcodes {
 		
 		# add... a, (hl) / add... m
 		for my $op (qw( add adc sub sbc and xor or  cp  
-		                            sbb             cmp )) {
+		                                            cmp )) {
 			$B = B(0x80+OP($op)*8+6);
 			$T = isgbz80 ? T(8) : T(7);
 			add(		"$op a, (hl)", 	$B, $T);
@@ -713,7 +713,7 @@ sub init_opcodes {
 		
 		# add... a, n / add... n
 		for my $op (qw( add adc sub sbc and xor or  cp  
-		                            sbb             cmp )) {
+		                                            cmp )) {
 			$B = B(0xC6+OP($op)*8, '%n');
 			$T = isgbz80 ? T(8) : T(7);
 			add("$op a, %n", 		$B, $T);

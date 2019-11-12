@@ -419,44 +419,35 @@
 97            |sub a      |~          |~          |   |   |    |sub a         |~   
               |sub a, a   |           |           |   |   |    |sub a, a      |    
               |           |           |           |   |   |    |              |    
-98            |sbb a, b   |~          |~          |   |   |    |sbb a, b      |~   
-              |sbb b      |           |           |   |   |    |sbb b         |    
+98            |sbb b      |~          |~          |   |   |    |sbb b         |~   
               |sbc a, b   |           |           |   |   |    |sbc a, b      |    
               |sbc b      |           |           |   |   |    |sbc b         |    
               |           |           |           |   |   |    |              |    
-99            |sbb a, c   |~          |~          |   |   |    |sbb a, c      |~   
-              |sbb c      |           |           |   |   |    |sbb c         |    
+99            |sbb c      |~          |~          |   |   |    |sbb c         |~   
               |sbc a, c   |           |           |   |   |    |sbc a, c      |    
               |sbc c      |           |           |   |   |    |sbc c         |    
               |           |           |           |   |   |    |              |    
-9A            |sbb a, d   |~          |~          |   |   |    |sbb a, d      |~   
-              |sbb d      |           |           |   |   |    |sbb d         |    
+9A            |sbb d      |~          |~          |   |   |    |sbb d         |~   
               |sbc a, d   |           |           |   |   |    |sbc a, d      |    
               |sbc d      |           |           |   |   |    |sbc d         |    
               |           |           |           |   |   |    |              |    
-9B            |sbb a, e   |~          |~          |   |   |    |sbb a, e      |~   
-              |sbb e      |           |           |   |   |    |sbb e         |    
+9B            |sbb e      |~          |~          |   |   |    |sbb e         |~   
               |sbc a, e   |           |           |   |   |    |sbc a, e      |    
               |sbc e      |           |           |   |   |    |sbc e         |    
               |           |           |           |   |   |    |              |    
-9C            |sbb a, h   |~          |~          |   |   |    |sbb a, h      |~   
-              |sbb h      |           |           |   |   |    |sbb h         |    
+9C            |sbb h      |~          |~          |   |   |    |sbb h         |~   
               |sbc a, h   |           |           |   |   |    |sbc a, h      |    
               |sbc h      |           |           |   |   |    |sbc h         |    
               |           |           |           |   |   |    |              |    
-9D            |sbb a, l   |~          |~          |   |   |    |sbb a, l      |~   
-              |sbb l      |           |           |   |   |    |sbb l         |    
+9D            |sbb l      |~          |~          |   |   |    |sbb l         |~   
               |sbc a, l   |           |           |   |   |    |sbc a, l      |    
               |sbc l      |           |           |   |   |    |sbc l         |    
               |           |           |           |   |   |    |              |    
-9E            |sbb (hl)   |~          |~          |   |   |    |sbb (hl)      |~   
-              |sbb a, (hl)|           |           |   |   |    |sbb a, (hl)   |    
-              |sbb m      |           |           |   |   |    |sbb m         |    
+9E            |sbb m      |~          |~          |   |   |    |sbb m         |~   
               |sbc (hl)   |           |           |   |   |    |sbc (hl)      |    
               |sbc a, (hl)|           |           |   |   |    |sbc a, (hl)   |    
               |           |           |           |   |   |    |              |    
 9F            |sbb a      |~          |~          |   |   |    |sbb a         |~   
-              |sbb a, a   |           |           |   |   |    |sbb a, a      |    
               |sbc a      |           |           |   |   |    |sbc a         |    
               |sbc a, a   |           |           |   |   |    |sbc a, a      |    
               |           |           |           |   |   |    |              |    
@@ -1179,14 +1170,10 @@ DD 96 %d      |           |           |           |   |   |    |sub (ix+%d)   |~
 DD 96 00      |           |           |           |   |   |    |sub (ix)      |~   
               |           |           |           |   |   |    |sub a, (ix)   |    
               |           |           |           |   |   |    |              |    
-DD 9E %d      |           |           |           |   |   |    |sbb (ix+%d)   |~   
-              |           |           |           |   |   |    |sbb a, (ix+%d)|    
-              |           |           |           |   |   |    |sbc (ix+%d)   |    
+DD 9E %d      |           |           |           |   |   |    |sbc (ix+%d)   |~   
               |           |           |           |   |   |    |sbc a, (ix+%d)|    
               |           |           |           |   |   |    |              |    
-DD 9E 00      |           |           |           |   |   |    |sbb (ix)      |~   
-              |           |           |           |   |   |    |sbb a, (ix)   |    
-              |           |           |           |   |   |    |sbc (ix)      |    
+DD 9E 00      |           |           |           |   |   |    |sbc (ix)      |~   
               |           |           |           |   |   |    |sbc a, (ix)   |    
               |           |           |           |   |   |    |              |    
 DD A6 %d      |           |           |           |   |   |    |and (ix+%d)   |~   
@@ -1225,9 +1212,7 @@ DD E5         |           |           |           |   |   |    |push ix       |~
               |           |           |           |   |   |    |              |    
 DD F9         |           |           |           |   |   |    |ld sp, ix     |~   
               |           |           |           |   |   |    |              |    
-DE %n         |sbb %n     |~          |~          |   |   |    |sbb %n        |~   
-              |sbb a, %n  |           |           |   |   |    |sbb a, %n     |    
-              |sbc %n     |           |           |   |   |    |sbc %n        |    
+DE %n         |sbc %n     |~          |~          |   |   |    |sbc %n        |~   
               |sbc a, %n  |           |           |   |   |    |sbc a, %n     |    
               |sbi %n     |           |           |   |   |    |sbi %n        |    
               |           |           |           |   |   |    |              |    
@@ -1482,14 +1467,10 @@ FD 96 %d      |           |           |           |   |   |    |sub (iy+%d)   |~
 FD 96 00      |           |           |           |   |   |    |sub (iy)      |~   
               |           |           |           |   |   |    |sub a, (iy)   |    
               |           |           |           |   |   |    |              |    
-FD 9E %d      |           |           |           |   |   |    |sbb (iy+%d)   |~   
-              |           |           |           |   |   |    |sbb a, (iy+%d)|    
-              |           |           |           |   |   |    |sbc (iy+%d)   |    
+FD 9E %d      |           |           |           |   |   |    |sbc (iy+%d)   |~   
               |           |           |           |   |   |    |sbc a, (iy+%d)|    
               |           |           |           |   |   |    |              |    
-FD 9E 00      |           |           |           |   |   |    |sbb (iy)      |~   
-              |           |           |           |   |   |    |sbb a, (iy)   |    
-              |           |           |           |   |   |    |sbc (iy)      |    
+FD 9E 00      |           |           |           |   |   |    |sbc (iy)      |~   
               |           |           |           |   |   |    |sbc a, (iy)   |    
               |           |           |           |   |   |    |              |    
 FD A6 %d      |           |           |           |   |   |    |and (iy+%d)   |~   
