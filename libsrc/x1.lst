@@ -45,6 +45,8 @@ target/x1/x1_set_text_80
 target/x1/x1_set_text_80_hs
 target/x1/x1_set_text_40
 target/x1/x1_set_text_40_hs
+target/x1/asm_set_palette
+target/x1/x1_set_palette
 psg/x1/set_psg
 psg/x1/set_psg_callee
 psg/x1/get_psg

@@ -5,6 +5,9 @@
 
     EXTERN  __console_w
     EXTERN  __x1_attr
+
+    EXTERN  asm_get_palette
+    EXTERN  asm_set_palette
     defc    DISPLAY = $3000
 
 
@@ -24,8 +27,16 @@ cls_1:
     jr      nz,cls_1
     dec     h
     jr      nz,cls_1
-    ;; TODO Set palette
+    call    asm_get_palette
+    push    de
+    push    hl
+    ld      hl,0
+    ld      e,h
+    call    asm_set_palette
     call    gclr
+    pop     hl
+    pop     de
+    call    asm_set_palette
     ret
 
 
@@ -43,6 +54,6 @@ GCLSLP: XOR     A
         OR      C
         JR      NZ,GCLSLP
         DEC     BC
-        IN      A,(C)
+        IN      A,(C)           ;Reset all plane mode
         EI
         RET

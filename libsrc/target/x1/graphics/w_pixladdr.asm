@@ -69,20 +69,3 @@ mode0_xypos:
     add     hl,bc   ;add on column + display base
     ret
 
-
-
-
-    SECTION code_crt_init
-
-
-    ; Set the palette
-    ld  bc,$1000	
-    ld  a,$aa	;bue
-    out (c),a
-    inc  b
-    ld  a,$cc	;red
-    out (c),a
-    inc b
-    ld  a,$f0	;green
-    out (c),a
-
