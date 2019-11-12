@@ -29,7 +29,17 @@ generic_console_set_ink:
     and     @11111000
     or      e
     ld      (__x1_attr),a
+    ret
+
+; Paper is used for plotting hires
 generic_console_set_paper:
+    ; TODO: Map colour
+    and     7
+    ld      e,a
+    ld      a,(__x1_attr+1)
+    and     @11111000
+    or      e
+    ld      (__x1_attr+1),a
     ret
 
 

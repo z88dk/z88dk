@@ -24,4 +24,25 @@ cls_1:
     jr      nz,cls_1
     dec     h
     jr      nz,cls_1
+    ;; TODO Set palette
+    call    gclr
     ret
+
+
+gclr:   DI
+        LD      BC,1A03H        ;Write to all planes
+        LD      A,11
+        OUT     (C),A
+        DEC     A
+        OUT     (C),A
+        LD      BC,4000H
+GCLSLP: XOR     A
+        DEC     BC
+        OUT     (C),A
+        LD      A,B
+        OR      C
+        JR      NZ,GCLSLP
+        DEC     BC
+        IN      A,(C)
+        EI
+        RET

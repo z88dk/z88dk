@@ -1387,6 +1387,7 @@ x1_clib.lib:
 	@echo ''
 	@echo '--- Building Sharp X1 Library ---'
 	@echo ''
+	$(MAKE) gfxdeps
 	$(call buildgeneric,x1)
 	$(MAKE) -C target/x1 
 	TARGET=x1 TYPE=z80 $(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1_clib @$(LISTFILE_DIRECTORY)/x1.lst
