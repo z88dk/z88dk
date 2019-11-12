@@ -34,9 +34,11 @@
     ; HL contains address of struct timespec
     ;   struct  timespec { time_t      tv_sec;     /* seconds */
     ;                   nseconds_t  tv_nsec;}   /* and nanoseconds */
+    ;
+    ; ROMWBW always has 50 ticks per second
 
 .asm_clock_getres
-    xor a                           ; scz180 has 256 ticks per second
+    xor a                           ; scz180 has 50 ticks per second
     ld (hl),a                       ; tv_sec 0x 00 00 00 00
     inc hl
     ld (hl),a
@@ -45,13 +47,13 @@
     inc hl
     ld (hl),a
     inc hl
-    ld (hl),$ca                     ; tv_nsec 0x 00 3B 9A CA
+    ld (hl),a                       ; tv_nsec 0x 01 31 2D 00
     inc hl
-    ld (hl),$9a
+    ld (hl),$2d
     inc hl
-    ld (hl),$3b
+    ld (hl),$31
     inc hl
-    ld (hl),a
+    ld (hl),$01
     ld hl,0                         ; return null
     ret
 

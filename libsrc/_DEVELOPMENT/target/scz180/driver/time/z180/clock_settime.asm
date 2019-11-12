@@ -30,29 +30,29 @@
     SECTION code_driver
     
     PUBLIC    asm_clock_settime
-    
-    EXTERN  __system_time_fraction, __system_time
+
+    EXTERN  BF_SYSSET, BF_SYSSET_SECS
+    EXTERN  asm_hbios
     
     ; HL contains address of struct timespec
     ;   struct  timespec { time_t      tv_sec;     /* seconds */
     ;                   nseconds_t  tv_nsec;}   /* and nanoseconds */
+    ;
+    ; ROMWBW always has 50 ticks per second
 
 .asm_clock_settime
-    ld de,__system_time
+    ld c,(hl)                       ; &timespec
+    inc hl
+    ld b,(hl)
+    inc hl
+    ld e,(hl)
+    inc hl
+    ld d,(hl)
+    ld l,c
+    ld h,b
 
-    ld a,i
-    push af                         ; preserve interrupt status
-    di
+    ld bc,BF_SYSSET<<8|BF_SYSSET_SECS
+    call asm_hbios                  ; set seconds count value from DE:HL
 
-    ldi                             ; (__system_time) = timespec.tv_sec
-    ldi
-    ldi
-    ldi
-    ld hl,__system_time_fraction
-    ld (hl),0                       ; (__system_time_fraction) = 0
     ld hl,0                         ; return null
-
-    pop af                          ; restore interrupts
-    ret PO                          ; return if di
-    ei
     ret

@@ -31,55 +31,60 @@
     
     PUBLIC	asm_clock_gettime
     
-    EXTERN  __system_time_fraction, __system_time
+    EXTERN  BF_SYSGET, BF_SYSGET_SECS
+    EXTERN  asm_hbios
 
     ; HL contains address of struct timespec
     ;   struct  timespec { time_t      tv_sec;     /* seconds */
     ;                   nseconds_t  tv_nsec;}   /* and nanoseconds */
+    ;
+    ; ROMWBW always has 50 ticks per second
 
 .asm_clock_gettime
-    ex de,hl                        ; get the address of the timespec in DE
-    ld hl,__system_time
+    push hl
 
-    ld a,i
-    push af                         ; preserve interrupt status
-    di
+    ld bc,BF_SYSGET<<8|BF_SYSGET_SECS
+    call asm_hbios                  ; current seconds count value in DE:HL, 
 
-    ldi                             ; timespec.tv_sec = (__system_time)
-    ldi
-    ldi
-    ldi
-    ld hl,__system_time_fraction
-    ld b,(hl)                       ; (__system_time_fraction)
+    ld a,c                          ; ticks in A
+    ld c,l                          ; current seconds count value in DE:BC, 
+    ld b,h
 
-    pop af                          ; restore interrupts
-    jp PO,noints                    ; jr PO,noints -> no interrupts if di 
-    ei
+    pop hl                          ; &timespec
 
-.noints
-    push de                         ; preserve timespec.tv_nsec
+    ld (hl),c
+    inc hl
+    ld (hl),b
+    inc hl
+    ld (hl),e
+    inc hl
+    ld (hl),d
+    inc hl
 
-    ld e,$ca                        ; scale result into ns
-    ld d,b
-    mlt de                          ; 00DE
-    ld l,$9a
-    ld h,b
-    mlt hl                          ; 0HL0
-    ld c,$3b
-    mlt bc                          ; BC00
+    push hl                         ; preserve timespec.tv_nsec
+
+    ld e,$2d                        ; scale result by ns $01 13 2d 00
+    ld d,a
+    mlt de
+
+    ld l,$31                        ; $31
+    ld h,a
+    mlt hl
+ 
+    ld b,a                          ; $01
 
     ld a,d                          ; add partials
     add a,l
     ld d,a
 
     ld a,h
-    adc a,c
-    ld c,a
-    
-    jr NC,nocarry
-    inc b                           ; result in BCDE
+    adc a,b
 
-.nocarry
+    ld b,a
+    ld c,d
+    ld d,e
+    ld e,0                          ; result in BCDE
+
     pop hl                          ; recover timespec.tv_nsec
     ld (hl),e                       ; place scaled (__system_time_fraction)
     inc hl

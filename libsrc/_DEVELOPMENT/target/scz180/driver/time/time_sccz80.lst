@@ -4,6 +4,4 @@ target/scz180/driver/time/c/sccz80/clock_gettime
 target/scz180/driver/time/c/sccz80/clock_gettime_callee
 target/scz180/driver/time/c/sccz80/clock_settime
 target/scz180/driver/time/c/sccz80/clock_settime_callee
-target/scz180/driver/time/c/sccz80/system_tick_init
-target/scz180/driver/time/c/sccz80/system_tick_init_fastcall
 @target/scz180/driver/time/time_asm.lst
