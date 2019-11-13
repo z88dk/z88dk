@@ -8,7 +8,9 @@
     EXTERN  generic_console_cls
     EXTERN  generic_console_font32
     EXTERN  generic_console_udg32
+    EXTERN  asm_load_charset
     EXTERN  __x1_mode
+    EXTERN  __x1_pcg_mode
     EXTERN  __console_w
 
     EXTERN  set_crtc_10
@@ -25,6 +27,12 @@ generic_console_ioctl:
     cp      IOCTL_GENCON_SET_FONT32
     jr      nz,check_set_udg
     ld      (generic_console_font32),bc
+    ld      l,c
+    ld      h,b
+    ld      b,96
+    ld      c,32
+    ld      e,1
+    call    set_pcg_chars
 success:
     and     a
     ret
@@ -32,6 +40,12 @@ check_set_udg:
     cp      IOCTL_GENCON_SET_UDGS
     jr      nz,check_mode
     ld      (generic_console_udg32),bc
+    ld      l,c
+    ld      h,b
+    ld      b,128
+    ld      c,128
+    ld      e,2
+    call    set_pcg_chars
     jr      success
 check_mode:
     cp      IOCTL_GENCON_SET_MODE
@@ -64,6 +78,26 @@ failure:
     scf
 dummy_return:
     ret
+
+
+set_pcg_chars:
+    ld      a,h
+    or      l
+    jr      z,clear_mode
+    ld      a,(__x1_pcg_mode)
+    or      e
+    ld      (__x1_pcg_mode),a
+    call    asm_load_charset
+    ret
+clear_mode:
+    ld      a,e
+    cpl
+    ld      hl,__x1_pcg_mode
+    and     (hl)
+    ld      (hl),a
+    ret
+
+
 
     SECTION	rodata_clib
 

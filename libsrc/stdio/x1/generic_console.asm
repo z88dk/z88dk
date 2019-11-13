@@ -9,6 +9,8 @@
         EXTERN      __x1_attr
 
 
+
+
 generic_console_set_inverse:
 generic_console_set_underline:
     ld      a,(__x1_attr)
@@ -41,8 +43,6 @@ generic_console_set_paper:
     or      e
     ld      (__x1_attr+1),a
     ret
-
-
 
 
 

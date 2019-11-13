@@ -12,6 +12,7 @@ stdio/x1/conio_vars
 stdio/x1/conio_map_colour
 stdio/x1/CRT_FONT
 @stdio/ansicore.lst
+@font/font_8x8/font_8x8.lst
 stdio/ansi/x1/f_ansi_attr
 stdio/ansi/x1/f_ansi_bel
 stdio/ansi/x1/f_ansi_char
@@ -47,6 +48,8 @@ target/x1/x1_set_text_40
 target/x1/x1_set_text_40_hs
 target/x1/asm_set_palette
 target/x1/x1_set_palette
+target/x1/x1_load_pcg
+target/x1/asm_load_pcg
 psg/x1/set_psg
 psg/x1/set_psg_callee
 psg/x1/get_psg
