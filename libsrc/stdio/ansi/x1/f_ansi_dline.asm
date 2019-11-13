@@ -12,7 +12,7 @@
 
         SECTION code_clib
 	PUBLIC	ansi_del_line
-	EXTERN	ansicolumns
+	EXTERN	__console_w
 	EXTERN	__x1_attr
 
 
@@ -21,7 +21,7 @@
 	and	a
 	jr	z,isz
 	push af
-	ld	a,ansicolumns
+	ld	a,(__console_w)
 	ld	d,l
 	ld	e,a
 	pop af

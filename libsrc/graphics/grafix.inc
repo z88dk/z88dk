@@ -497,6 +497,12 @@ IF FORlynx
 
 ENDIF
 
+IF FORx1
+	DEFINE gotgfx
+	defc maxx	= 640
+	defc maxy	= 200
+ENDIF
+
 IF FORlaser500
 	DEFINE gotgfx
 	defc maxx = 320

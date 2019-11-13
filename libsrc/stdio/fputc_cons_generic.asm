@@ -2,6 +2,8 @@
 ;
 ; Supported VT52 codes:
 ;
+; * = With VT52x
+;
 ;  [ESC] A - Move the cursor to beginning of line above.
 ;  [ESC] B - Move the cursor to beginning of line below.
 ;  [ESC] C - Move the cursor right by one.
@@ -16,6 +18,8 @@
 ;  [ESC] c - Byte after 'c' sets new background color (ASCII -32)
 ;  [ESC] p - start inverse video
 ;  [ESC] q - stop inverse video
+;  *[ESC] 0 - start underlined
+;  *[ESC] 1 - stop underlined
 ;  [ESC] s - Enable/disable vertical scrolling
 ;  [ESC] r [char] - Print character (raw)
 ;   8      - move cursor left
@@ -37,7 +41,7 @@
 
 IF !__CPU_INTEL__ 
 		defc		SUPPORT_vt52=1
-		; Extra VT52 codes - clear to end of line + clear to end of screen
+		; Extra VT52 codes - clear to end of line + clear to end of screen + underlined
 		defc		SUPPORT_vt52x=0
 		defc		SUPPORT_zxcodes=1
 
@@ -55,6 +59,7 @@ IF !__CPU_INTEL__
 		EXTERN		generic_console_set_ink
 		EXTERN		generic_console_set_paper
 		EXTERN		generic_console_set_inverse
+		EXTERN		generic_console_set_underline
 		EXTERN		__console_x
 		EXTERN		__console_y
 		EXTERN		__console_w
@@ -371,10 +376,24 @@ handle_cr:
 handle_cr_no_need_to_scroll:
 	inc	b
 	ld	c,0
-	jr	store_coords
+	jp	store_coords
 
 
 
+IF SUPPORT_vt52x
+set_underlined_ansi:
+	;'0' = 48 = on, '1' = 49 = off
+	dec	a
+	and	@00001000
+	ld	c,a
+	ld	a,(hl)
+	and	@11110111
+	or	c
+	ld	(hl),a
+	call	generic_console_set_underline
+	ret
+ENDIF
+	
 
 
 
@@ -449,6 +468,12 @@ IF SUPPORT_vt52
 	defw	set_inverse_ansi
 ENDIF
 IF SUPPORT_vt52x
+	defb	255, '0'
+	defb	0
+	defw	set_underlined_ansi
+	defb	255, '1'
+	defb	0
+	defw	set_underlined_ansi
 	defb	255, 'K'
 	defb	0
 	defw	clear_eol
@@ -470,6 +495,7 @@ parameters:	defb	0		; We only have up-to two parameters
 parameter_processor:	defw	0	; Where we go to when we need to process
 
 generic_console_flags:		defb	0		; bit 0 = raw mode enabled
+							; bit 3 = underline
 							; bit 6 = vscroll disabled
 							; bit 7 = inverse on
 
