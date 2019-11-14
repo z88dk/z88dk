@@ -1,30 +1,28 @@
-#
-# Build the X1 target libraries
-#
-# $Id: Makefile,v 1.3 2015-08-05 05:54:01 pauloscustodio Exp $
-#
-
 include ../../Make.config
 
+TARGET = x1
 
-AFILES = \
-	subcpu_command.c \
-	subcpu_reset.c \
-	subcpu_set.c \
-	subcpu_get.c \
-	tape.c \
-	tape_status.c
+SUBDIRS = x1 time 
+CLEANDIRS = $(SUBDIRS:%=clean-%)
+
+all: subdirs-all 
 
 
-AOBJECTS = $(AFILES:.c=.o)
+subdirs-all: $(SUBDIRS)
+
+subdirs-clean: $(SUBDIRS_CLEAN)
 
 
-all:    $(AOBJECTS)
+clean: subdirs-clean
+	$(RM) zcc_opt.def *.err *.o
 
+subdirs-clean: $(CLEANDIRS)
 
-.c.o:
-	$(ZCC) +test $(CFLAGS) $*.c
+.PHONY:	subdirs-all $(SUBDIRS) $(SUBDIRS_CLEAN)
 
-clean:
-	$(RM) *.o* *.sym *.map zcc_opt.def *.i
+$(SUBDIRS):
+	$(MAKE) -C $@ all
+
+$(CLEANDIRS):
+	$(MAKE) -C $(@:clean-%=%) clean
 	$(RM) */*.o
