@@ -27,3 +27,4 @@ all:    $(AOBJECTS)
 
 clean:
 	$(RM) *.o* *.sym *.map zcc_opt.def *.i
+	$(RM) */*.o
