@@ -16,6 +16,7 @@ static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
 static char             *blockname    = NULL;
 static char              help         = 0;
+static int               origin       = -1;
 
 
 /* Options that are available for this module */
@@ -25,6 +26,7 @@ option_t x1_options[] = {
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
     {  0 , "blockname", "Name for the code block",   OPT_STR,   &blockname},
+    {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
 };
 
@@ -103,6 +105,13 @@ int x1_exec(char* target)
     fclose(fpin);
 
 
+    if (origin == -1) {
+        if ((origin = get_org_addr(crtfile)) == -1) {
+            myexit("Could not find parameter CRT_ORG_CODE (not z88dk compiled?)\n", 1);
+        }
+    }
+
+
     h = disc_create(&sharpx1_native_spec);
 
 
@@ -118,10 +127,10 @@ int x1_exec(char* target)
     sector[17] = ' ';
     sector[18] = len % 256;  // file size
     sector[19] = len / 256;
-    sector[20] = 0;          // load address
-    sector[21] = 0;
-    sector[22] = 0;          // execute address
-    sector[23] = 0;
+    sector[20] = origin % 256;          // load address
+    sector[21] = origin / 256;
+    sector[22] = origin % 256;          // execute address
+    sector[23] = origin / 256;
     sector[24] = 0x18;       // Year (2018)
     sector[25] = 0x21;       // Month + day of weel
     sector[26] = 0;          // Hour
@@ -144,10 +153,10 @@ int x1_exec(char* target)
     sector[17] = ' ';
     sector[18] = len % 256;
     sector[19] = len / 256;
-    sector[20] = 0;          // load address
-    sector[21] = 0;
-    sector[22] = 0;          // execute address
-    sector[23] = 0;
+    sector[20] = origin % 256;          // load address
+    sector[21] = origin / 256;
+    sector[22] = origin % 256;          // execute address
+    sector[23] = origin / 256;
     sector[24] = 0x18;       // Year (2018)
     sector[25] = 0x21;       // Month + day of weel
     sector[26] = 0;          // Hour
