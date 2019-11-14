@@ -85,6 +85,14 @@
    IF !DEFINED_CLIB_64BIT_FLOATS
        defc CLIB_64BIT_FLOATS = 0
    ENDIF
+
+   ; Some targets startup in different screen modes depending on the environment:
+   ; eg native = 40columns, CP/M = 80 columns. These should be explicitly defined
+   ; if needed. So default to an unused value if not
+   PUBLIC CLIB_DEFAULT_SCREEN_MODE
+   IF !DEFINED_CLIB_DEFAULT_SCREEN_MODE
+       defc CLIB_DEFAULT_SCREEN_MODE = 0
+   ENDIF
       
 
    ; Custom memory map
