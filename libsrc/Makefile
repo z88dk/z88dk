@@ -624,6 +624,12 @@ cpm_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	TARGET=rc700 TYPE=z80 $(LIBLINKER) -DFORrc700 -x$(OUTPUT_DIRECTORY)/rc700 @$(LISTFILE_DIRECTORY)/target/rc700/rc700.lst
+	@echo ''
+	@echo '--- Building Sharp X1 Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(MAKE) -C target/x1 
+	TARGET=x1 TYPE=z80 $(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1_cpm @$(LISTFILE_DIRECTORY)/target/x1/x1.lst
 
 
 # Sorcerer Exidy lib - Stefano
