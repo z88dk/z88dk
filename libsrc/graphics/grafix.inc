@@ -369,6 +369,13 @@ IF FORc128
 	defc blankch	= 32
 ENDIF
 
+IF FORfp1100
+	DEFINE gotgfx
+	defc maxx	= 80
+	defc maxy	= 24
+	defc blankch	= 32
+ENDIF
+
 IF FORgal
 	DEFINE gotgfx
 	; This size reflects the Gal+ screen mode
