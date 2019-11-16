@@ -344,7 +344,11 @@ for my $cpu (@CPUS) {
 	# LD dd, dd
 	add_opc($cpu, "ld bc, de", 0x42, 0x4B);
 	add_opc($cpu, "ld bc, hl", 0x44, 0x4D);
-
+	if ($cpu =~ /^z80/) {
+		add_opc($cpu, "ld bc, ix", 0xDD, 0x44, 0xDD, 0x4D);
+		add_opc($cpu, "ld bc, iy", 0xFD, 0x44, 0xFD, 0x4D);
+	}
+	
 	add_opc($cpu, "ld de, bc", 0x50, 0x59);
 	
 	if ($i8085) {
@@ -357,8 +361,21 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "ld de, hl", 		0x54, 0x5D);
 	}
 
+	if ($cpu =~ /^z80/) {
+		add_opc($cpu, "ld de, ix", 0xDD, 0x54, 0xDD, 0x5D);
+		add_opc($cpu, "ld de, iy", 0xFD, 0x54, 0xFD, 0x5D);
+	}
+
 	add_opc($cpu, "ld hl, bc", 0x60, 0x69);
 	add_opc($cpu, "ld hl, de", 0x62, 0x6B);
+
+	if ($cpu =~ /^z80/) {
+		add_opc($cpu, "ld ix, bc", 0xDD, 0x60, 0xDD, 0x69);
+		add_opc($cpu, "ld ix, de", 0xDD, 0x62, 0xDD, 0x6B);
+
+		add_opc($cpu, "ld iy, bc", 0xFD, 0x60, 0xFD, 0x69);
+		add_opc($cpu, "ld iy, de", 0xFD, 0x62, 0xFD, 0x6B);
+	}
 
 	# EX DE, HL
 	if ($gameboy) {
