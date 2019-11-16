@@ -1,4 +1,6 @@
 target/fp1100/gencon/generic_console
+target/fp1100/gencon/generic_console_ioctl
+target/fp1100/gencon/CRT_FONT
 target/fp1100/gencon/conio_map_colour
 target/fp1100/stdio/fputc_cons_native
 target/fp1100/stdio/fgetc_cons
@@ -14,4 +16,5 @@ graphics/generic_console/swapgfxbk.asm
 graphics/dcircle2
 graphics/__gfx_coords
 @gfxbase.lst
+@font/font_8x8/font_8x8.lst
 @z80.lst

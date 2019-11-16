@@ -10,7 +10,6 @@
 		PUBLIC		generic_console_vpeek
 		PUBLIC		generic_console_scrollup
 		PUBLIC		generic_console_printc
-		PUBLIC		generic_console_ioctl
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
@@ -19,39 +18,13 @@
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
 		EXTERN		conio_map_colour
+                EXTERN          generic_console_font32
+                EXTERN          generic_console_udg32
 
 		defc		DISPLAY = 0x9000
 
 		INCLUDE		"target/fp1100/def/fp1100.def"
 		INCLUDE		"ioctl.def"
-
-generic_console_ioctl:
-        ex      de,hl
-        ld      c,(hl)  ;bc = where we point to
-        inc     hl
-        ld      b,(hl)
-	cp      IOCTL_GENCON_SET_MODE
-        jr      nz,failure
-	ld	a,c
-	ld	b,2
-	ld	c,40
-	and	a
-	jr	z,setmode
-	ld	b,1
-	ld	c,80
-	dec	a
-	jr	z,setmode
-failure:
-	scf
-	ret
-
-setmode:
-	ld	a,c
-	ld	(__console_w),a
-	ld	a,SUB_SCREENSIZE
-	call	TRNC2
-	and	a
-	ret
 
 generic_console_set_inverse:
 	ld	a,(__inverse)
@@ -154,7 +127,60 @@ set_position:
 	call	TRNC3
 skip_position:
 	pop	af
-	ld	b,a
+	ld	e,a
+	cp	128
+	jr	nc,check_udg
+	ld	hl,(generic_console_font32)
+	ld	a,h
+	or	l	
+	jr	z,print_char
+	dec	h
+print_custom_char:
+	ex	de,hl
+	ld	h,0
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,de
+	ld	de,charbuf
+	push	de
+	; The display is mirrored
+	ld	b,8
+mirror:
+	ld	a,(hl)
+	ld	c,a
+        rlca
+        rlca
+        xor     c
+        and     0xaa
+        xor     c
+        ld      c,a
+        rlca
+        rlca
+        rlca
+        rrc     c
+        xor     c
+        and     0x66
+        xor     c
+	ld	(de),a
+	inc	de
+	inc	hl
+	djnz	mirror
+	pop	hl		;charbuf
+	call	DEFCHR
+	ret
+check_udg:
+	ld	hl,(generic_console_udg32)
+	ld	a,h
+	or	l
+	jr	z,print_char
+	res	7,e
+	jr	print_custom_char
+print_char:
+	push	de
+	call	set_colour
+	pop	de
+	ld	b,e
 	ld	a,SUB_PRINTCHAR
 	call	TRNC2
 	ret
@@ -191,3 +217,4 @@ __attr:		defb	0x07
 	SECTION		bss_clib
 __lastxy:	defw	-1
 __inverse:	defb	0
+charbuf:	defs	8
