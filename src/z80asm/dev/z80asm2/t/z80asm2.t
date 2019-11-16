@@ -88,7 +88,7 @@ sub run_tests {
 		my $mid = int(@ops / 2);
 		return 0 if !run_tests(@ops[0 .. $mid-1]);
 		return 0 if !run_tests(@ops[$mid .. $#ops]);
-		die "failed, both halves pass\n";
+		die "failed";
 	}
 }	
 

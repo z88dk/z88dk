@@ -9,3 +9,6 @@
 #include <stdbool.h>
 
 bool assemble_file(const char* input_filename);
+void error_syntax(void);
+void error_illegal(void);
+void error_range(int n);
