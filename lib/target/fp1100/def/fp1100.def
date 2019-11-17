@@ -4,35 +4,54 @@
 
 
 	; No parameters
-	defc	SUB_SCROLLUP = 6	; 
-	defc	SUB_SCROLLDOWN = 7	;
+	defc	SUB_SCROLLUP = $06	; 
+	defc	SUB_SCROLLDOWN = $07	;
 
-	defc	SUB_CLS = 13
-	defc	SUB_LF = 14
-	defc	SUB_BS = 15
+	; Cursor movements
+	defc	SUB_HOME = $08
+	defc	SUB_RIGHT = $09
+	defc	SUB_LEFT = $0a
+	defc	SUB_UP = $0b
+	defc	SUB_DOWN = $0c
 
-	defc	SUB_BLINKON = 26
-	defc	SUB_BLINKOFF = 27
-	defc	SUB_BEEP = 28
-	defc	SUB_BEEPON = 0x1d
-	defc	SUB_BEEPOFF = 0x1d
+	defc	SUB_CLS = $0d
+	defc	SUB_LF = $0e
+	defc	SUB_BS = $0f
+
+
+	defc	SUB_14 = $14
+	defc	SUB_15 = $15
+
+	defc	SUB_BLINKON = $1a
+	defc	SUB_BLINKOFF = $1b
+	defc	SUB_BEEP = $1c
+	defc	SUB_BEEPON = $1d
+	defc	SUB_BEEPOFF = $1e
+
+	defc	SUB_2F = $2f
 
 	; 1 Parameter
-	defc	SUB_PRINTCHAR = 4		; b = character to print
-	defc	SUB_LPRINTCHAR = 31		; b = character to lprint
-	defc	SUB_SCREENSIZE = 33		; b = 1 = 80, 2 = 40 col
+	defc	SUB_PRINTCHAR = $04		; b = character to print
+	defc	SUB_LPRINTCHAR = $1f		; b = character to lprint
+	defc	SUB_SCREENSIZE = $21		; b = 1 = 80, 2 = 40 col
+	defc	SUB_29 = $29			; Colour related?
+	defc	SUB_17 = $17
 
 	; 2 parameters
-	defc	SUB_SETXY = 18		; b = x, c = y
-	defc	SUB_COLOUR = 19		; ??
+	defc	SUB_SETXY = $12		; b = x, c = y
+	defc	SUB_COLOUR = $13		; c = colour attribtues, b = border?
 
+
+	; Multiple parameters
+	defc	SUB_PLOT = $19
+	defc	SUB_PRUDG = $20		;8 bytes, prints those bytes at current location
 
 	; ROM routines
 	defc	SECRD = 0x356		;Read sector, hl= address, b=sector, c=track, e=0, d=drive
 
 	defc	PRCRT = 0x74F		;Print a to console
 
-	defc	DEFCHR = 0x77e		;Define a UDG, hl = address, which char??
+	defc	DEFCHR = 0x77e		;Prints character to screen hl = address
 
 	; Communicate with SubCPU, a = cmd
 	defc	TRNC1 = 0x0afb		; No parameters
@@ -44,3 +63,19 @@
 ; Notes:
 ; 0x0b85	- keyboard interrupt
 ;
+; 0x0d6b	- action for codes < 32
+;
+; Built in terminal:
+;	1 = scroll down
+;       7 = beep
+;	8 = backspace
+;      11 = home
+;      12 = down
+;      13 = backspace
+;      15 = scroll up
+;      28 =   (code 09)
+;      29 =   (code 0a)
+;      30 =   (code 0b)
+;      31 =   (code 0c) LF
+
+

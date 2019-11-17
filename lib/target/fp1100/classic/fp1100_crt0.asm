@@ -41,6 +41,8 @@
         defc    TAR__register_sp = -1
 	defc	__CPU_CLOCK = 4000000 
         INCLUDE "crt/classic/crt_rules.inc"
+
+	INCLUDE "target/fp1100/def/fp1100.def"
 	
         org     CRT_ORG_CODE
 	jp	start
@@ -60,6 +62,8 @@ start:
 	IF DEFINED_USING_amalloc
 		INCLUDE "crt/classic/crt_init_amalloc.asm"
 	ENDIF
+	ld	a,SUB_BEEPOFF
+	call	TRNC1
 
 
         call    _main           ; Call user program

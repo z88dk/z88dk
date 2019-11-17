@@ -177,9 +177,6 @@ check_udg:
 	res	7,e
 	jr	print_custom_char
 print_char:
-	push	de
-	call	set_colour
-	pop	de
 	ld	b,e
 	ld	a,SUB_PRINTCHAR
 	call	TRNC2
