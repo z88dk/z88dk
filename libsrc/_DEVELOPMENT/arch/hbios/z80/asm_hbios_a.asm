@@ -3,30 +3,28 @@
 ; @feilipu 2019
 ; ===============================================================
 ; 
-; int hbios_hl(unsigned uint func_device, unsigned int arg, void * buffer)
+; uint8_t hbios_a(uint16_t func_device, uint16_t arg, void * buffer)
 ;
 ; ===============================================================
 
 SECTION code_clib
 SECTION code_arch
 
-PUBLIC asm_hbios_hl
+PUBLIC asm_hbios_a
 
 EXTERN HB_INVOKE
 
-.asm_hbios_hl
+.asm_hbios_a
 
     ; enter : bc = hbios function << 8 || hbios device
     ;         de = argument
     ;         hl = void *
     ;
-    ; exit  : hl = sign extended register A (returned by hbios)
+    ; exit  : registers set by hbios
+    ;       : hl = register A (returned by hbios)
 
     call HB_INVOKE
 
+    ld h,0
     ld l,a
-    rla
-    sbc a,a
-    ld h,a
-
     ret

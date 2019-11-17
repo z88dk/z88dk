@@ -3,21 +3,28 @@
 ; @feilipu 2019
 ; ===============================================================
 ; 
-; uint32_t hbios(uint16_t func_device, uint16_t arg, void * buffer)
+; uint8_t hbios_e(uint16_t func_device, uint16_t arg, void * buffer)
 ;
 ; ===============================================================
 
 SECTION code_clib
 SECTION code_arch
 
-PUBLIC asm_hbios
+PUBLIC asm_hbios_e
 
 EXTERN HB_INVOKE
+
+.asm_hbios_e
 
     ; enter : bc = hbios function << 8 || hbios device
     ;         de = argument
     ;         hl = void *
     ;
-    ; exit  : registers set by hbios (DEHL)
+    ; exit  : registers set by hbios
+    ;       : hl = register E (returned by hbios)
 
-defc asm_hbios = HB_INVOKE
+    call HB_INVOKE
+
+    ld h,0
+    ld l,e
+    ret

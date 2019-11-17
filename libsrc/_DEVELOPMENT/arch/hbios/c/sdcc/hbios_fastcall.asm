@@ -1,14 +1,14 @@
 
-; uint32_t hbios(uint16_t func_device) __smallc __z88dk_fastcall
+; uint32_t hbios(uint16_t func_device) __z88dk_fastcall
 
 SECTION code_clib
 SECTION code_arch
 
-PUBLIC hbios
+PUBLIC _hbios_fastcall
 
 EXTERN asm_hbios
 
-.hbios
+._hbios_fastcall
 
     ld b,h
     ld c,l

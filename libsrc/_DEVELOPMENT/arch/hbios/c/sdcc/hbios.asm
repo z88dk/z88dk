@@ -1,5 +1,5 @@
 
-; void hbios(unsigned int func_device, unsigned int arg, void * buffer)
+; uint32_t hbios(uint16_t func_device)
 
 SECTION code_clib
 SECTION code_arch
@@ -11,13 +11,9 @@ EXTERN asm_hbios
 ._hbios
 
     pop af
-    pop hl
-    pop de
     pop bc
 
     push bc
-    push de
-    push hl
     push af
 
     jp asm_hbios
