@@ -396,11 +396,6 @@ static int parse_pos_inc_dec(int rr) {
 	else						return rr;
 }
 
-static void emit_pos_inc_dec(int rr) {
-	if      ((rr & POS_MASK) == POS_INC)	emit(0x03 + (rr << 4));
-	else if ((rr & POS_MASK) == POS_DEC)	emit(0x0b + (rr << 4)); 
-}
-
 static bool parse_ind_BCDE(int* out_dd) {
 	const char* ptr0; blanks(); save_ptr(&ptr0);
 	if (parse_lparen()) {
@@ -510,59 +505,18 @@ static bool parse_flags4(int* out_flags) {
 static bool parse_alu8(int op) {
 	int r, n, x, dis;
 	const char* ptr0; blanks(); save_ptr(&ptr0);
-	if (!(parse_a() && parse_comma())) 		// alu: a, is optional
+	if (!(parse_a() && parse_comma())) 				// alu: a, is optional
 		restore_ptr(&ptr0);
 
 	const char* ptr1; blanks(); save_ptr(&ptr1);
-	if (parse_reg8x(&r) && check_end()) {	// alu B/C/D/E/H/L/A/IXH/IYH/IXL/IYL
-		if ((r & IDX_MASK) == IDX_IX) emit(0xdd); else if ((r & IDX_MASK) == IDX_IY) emit(0xfd);
-		emit(0x80 + (op << 3) + r);
-		return true;
-	}
+	if (parse_reg8x(&r) && check_end())				// alu B/C/D/E/H/L/A/IXH/IYH/IXL/IYL
+		return emit_alu_r(op, r);
 	else if (restore_ptr(&ptr1) &&
-		parse_indHLx(&x, &dis) && check_end()) {	// alu (HL)/(IX+d)/(IY+d)
-		if ((x & IDX_MASK) == IDX_IX) emit(0xdd); else if ((x & IDX_MASK) == IDX_IY) emit(0xfd);
-		emit(0x80 + (op << 3) + R_M);
-		if ((x & IDX_MASK) != IDX_HL) emit(dis); else;
-		emit_pos_inc_dec(x);
-		return true;
-	}
+		parse_indHLx(&x, &dis) && check_end()) 		// alu (HL)/(IX+d)/(IY+d)
+		return emit_alu_indx(op, x, dis);
 	else if (restore_ptr(&ptr1) &&
-		parse_expr(&n) && check_end()) {	// alu n
-		emit(0xc0 + (op << 3) + R_M);
-		emit(n);
-		return true;
-	}
-	else {
-		restore_ptr(&ptr0);
-		return false;
-	}
-}
-
-static bool parse_rot8(int op) {
-	int r, x, dis;
-	const char* ptr0; blanks(); save_ptr(&ptr0);
-	if (parse_reg8(&r) && check_end()) {	// rot B/C/D/E/H/L/A
-		emit(0xcb);
-		emit((op << 3) + r);
-		return true;
-	}
-	else if (restore_ptr(&ptr0) &&
-		parse_indHLx(&x, &dis) && parse_comma() && parse_reg8(&r) && check_end()) {	// rot (HL)/(IX+d)/(IY+d), r
-		if ((x & IDX_MASK) == IDX_IX) emit(0xdd); else if ((x & IDX_MASK) == IDX_IY) emit(0xfd);
-		emit(0xcb);
-		if ((x & IDX_MASK) != IDX_HL) emit(dis); else;
-		emit((op << 3) + r);
-		return true;
-	}
-	else if (restore_ptr(&ptr0) &&
-		parse_indHLx(&x, &dis) && check_end()) {	// rot (HL)/(IX+d)/(IY+d)
-		if ((x & IDX_MASK) == IDX_IX) emit(0xdd); else if ((x & IDX_MASK) == IDX_IY) emit(0xfd);
-		emit(0xcb);
-		if ((x & IDX_MASK) != IDX_HL) emit(dis); else;
-		emit((op << 3) + R_M);
-		return true;
-	}
+		parse_expr(&n) && check_end())				// alu n
+		return emit_alu_n(op, n);
 	else {
 		restore_ptr(&ptr0);
 		return false;
@@ -572,76 +526,110 @@ static bool parse_rot8(int op) {
 static bool parse_alu8intel(int op) {
 	int r;
 	const char* ptr0; blanks(); save_ptr(&ptr0);
-	if (parse_reg8intel(&r) && check_end()) {	// alu B/C/D/E/H/L/M/A
-		emit(0x80 + (op << 3) + r);
-		return true;
+	if (parse_reg8intel(&r) && check_end())			// alu B/C/D/E/H/L/M/A
+		return emit_alu_r(op, r);
+	else {
+		restore_ptr(&ptr0);
+		return false;
 	}
-	restore_ptr(&ptr0);
-	return false;
+}
+
+static bool parse_rot8(int op) {
+	int r, x, dis;
+	const char* ptr0; blanks(); save_ptr(&ptr0);
+	if (parse_reg8(&r) && check_end())				// rot B/C/D/E/H/L/A
+		return emit_rot_r(op, r);
+	else if (restore_ptr(&ptr0) &&
+		parse_indHLx(&x, &dis) && parse_comma() &&
+		parse_reg8(&r) && check_end())				// rot (HL)/(IX+d)/(IY+d), r
+		return emit_rot_indx_r(op, x, dis, r);
+	else if (restore_ptr(&ptr0) &&
+		parse_indHLx(&x, &dis) && check_end())		// rot (HL)/(IX+d)/(IY+d)
+		return emit_rot_indx(op, x, dis);
+	else {
+		restore_ptr(&ptr0);
+		return false;
+	}
 }
 
 static bool parse_bit8(int op) {
 	int r, x, bit, dis;
 	const char* ptr0; blanks(); save_ptr(&ptr0);
 	if (parse_const(&bit) && parse_comma()) {
-		if (bit < 0 || bit > 7) {
-			error_range(bit);
-			return false;
-		}
 		const char* ptr1; blanks(); save_ptr(&ptr1);
-		if (parse_reg8(&r) && check_end()) {	// bit/res/set b, B/C/D/E/H/L/A
-			emit(0xcb);
-			emit(op * 0x40 + (bit << 3) + r);
-			return true;
-		}
+		if (parse_reg8(&r) && check_end())			// bit/res/set b, B/C/D/E/H/L/A
+			return emit_bit_r(op, bit, r);
 		else if (restore_ptr(&ptr1) &&
-			parse_indHLx(&x, &dis) && check_end()) {	// bit/res/set b, (HL)/(IX+d)/(IY+d)
-			if ((x & IDX_MASK) == IDX_IX) emit(0xdd); else if ((x & IDX_MASK) == IDX_IY) emit(0xfd);
-			emit(0xcb);
-			if ((x & IDX_MASK) != IDX_HL) emit(dis); else;
-			emit(op * 0x40 + (bit << 3) + R_M);
-			emit_pos_inc_dec(x);
-			return true;
-		}
+			parse_indHLx(&x, &dis) && parse_comma() &&
+			parse_reg8(&r) && check_end())			// bit/res/set b, (HL)/(IX+d)/(IY+d), r
+			return emit_bit_indx_r(op, bit, x, dis, r);
+		else if (restore_ptr(&ptr1) &&
+			parse_indHLx(&x, &dis) && check_end())	// bit/res/set b, (HL)/(IX+d)/(IY+d)
+			return emit_bit_indx(op, bit, x, dis);
 	}
 	restore_ptr(&ptr0);
 	return false;
 }
 
-static bool parse_jump_call(int uncond_opcode, int cond_opcode) {
-	int nn, flags;
+static bool parse_jp(void) {
+	int f, nn, x;
 	const char* ptr0; blanks(); save_ptr(&ptr0);
-	if (parse_flags8(&flags) && parse_comma() && parse_expr(&nn) && check_end()) {	// call/jp flag, nn
-		emit(cond_opcode + (flags << 3));
-		emitw(nn);
-		return true;
+	if (parse_flags8(&f) && parse_comma() && parse_expr(&nn) && check_end())	// JP f, nn
+		return emit_jp_f_nn(f, nn);
+	else if (restore_ptr(&ptr0) &&
+		parse_expr(&nn) && check_end()) 										// JP nn
+		return emit_jp_nn(nn);
+	else if (restore_ptr(&ptr0) && parse_lparen() && parse_HLx(&x) && parse_rparen() && 
+		check_end())															// JP (HL)/(IX)/(IY)
+		return emit_jp_x(x);
+	else {
+		restore_ptr(&ptr0);
+		return false;
 	}
-	else if (restore_ptr(&ptr0) && parse_expr(&nn) && check_end()) {	// call/jp nn
-		emit(uncond_opcode);
-		emitw(nn);
-		return true;
-	}
-	restore_ptr(&ptr0);
-	return false;
 }
 
-static bool parse_jump_call_intel(int cond_opcode, int flags) {
+static bool parse_jp_intel(int f) {
 	int nn;
 	const char* ptr0; blanks(); save_ptr(&ptr0);
-	if (parse_expr(&nn) && check_end()) {
-		emit(cond_opcode + (flags << 3));
-		emitw(nn);
-		return true;
+	if (parse_expr(&nn) && check_end())
+		return emit_jp_f_nn(f, nn);
+	else {
+		restore_ptr(&ptr0);
+		return false;
 	}
-	restore_ptr(&ptr0);
-	return false;
+}
+
+static bool parse_call(void) {
+	int f, nn;
+	const char* ptr0; blanks(); save_ptr(&ptr0);
+	if (parse_flags8(&f) && parse_comma() && parse_expr(&nn) && check_end())	// CALL f, nn
+		return emit_call_f_nn(f, nn);
+	else if (restore_ptr(&ptr0) &&
+		parse_expr(&nn) && check_end()) 										// CALL nn
+		return emit_call_nn(nn);
+	else {
+		restore_ptr(&ptr0);
+		return false;
+	}
+}
+
+static bool parse_call_intel(int f) {
+	int nn;
+	const char* ptr0; blanks(); save_ptr(&ptr0);
+	if (parse_expr(&nn) && check_end())
+		return emit_call_f_nn(f, nn);
+	else {
+		restore_ptr(&ptr0);
+		return false;
+	}
 }
 
 static bool parse_statement(void) {
-	int n, nn, dis, im, rst, addr, flags, r, r1, r2, x, rr;
+	int n, nn, dis, im, rst, f, r, r1, r2, x, rr;
 	if (parse_end())
 		return true;
 	switch (get_word_hash()) {
+
 	// load
 	case WORD_HASH('L', 'D', ___, ___, ___): {
 		ptr += 2;
@@ -809,256 +797,167 @@ static bool parse_statement(void) {
 		break;
 	}
 
+	// increment and decrement
+	case WORD_HASH('I', 'N', 'C', ___, ___): {
+		ptr += 3;
+		const char* ptr0; blanks(); save_ptr(&ptr0);
+		if (parse_reg16sp(&rr) && check_end()) 				// INC/DEC BC/DE/HL/SP/IX/IY
+			return emit_inc_rr(rr);
+		else if (restore_ptr(&ptr0) &&
+			parse_reg8x(&r) && check_end())					// INC/DEC B/C/D/E/H/L/A/IXH/IYH/IXL/IYL
+			return emit_inc_r(r);
+		else if (restore_ptr(&ptr0) &&
+			parse_indHLx(&x, &dis) && check_end()) 			// INC/DEC (HL)/(IX+d)/(IY+d)
+			return emit_inc_indx(x, dis);
+		restore_ptr(&ptr0);
+		break;
+	}
+	case WORD_HASH('I', 'N', 'R', ___, ___): {				// INR r
+		ptr += 3;
+		if (parse_reg8intel(&r) && check_end())
+			return emit_inc_r(r);
+		break;
+	}
+	case WORD_HASH('I', 'N', 'X', ___, ___): {
+		ptr += 3;
+		if (parse_reg16sp_intel(&rr) && check_end())		// INX rr
+			return emit_inc_rr(rr);
+		break;
+	}
+	case WORD_HASH('D', 'E', 'C', ___, ___): {
+		ptr += 3;
+		const char* ptr0; blanks(); save_ptr(&ptr0);
+		if (parse_reg16sp(&rr) && check_end()) 				// INC/DEC BC/DE/HL/SP/IX/IY
+			return emit_dec_rr(rr);
+		else if (restore_ptr(&ptr0) &&
+			parse_reg8x(&r) && check_end())					// INC/DEC B/C/D/E/H/L/A/IXH/IYH/IXL/IYL
+			return emit_dec_r(r);
+		else if (restore_ptr(&ptr0) &&
+			parse_indHLx(&x, &dis) && check_end()) 			// INC/DEC (HL)/(IX+d)/(IY+d)
+			return emit_dec_indx(x, dis);
+		restore_ptr(&ptr0);
+		break;
+	}
+	case WORD_HASH('D', 'C', 'R', ___, ___): {
+		ptr += 3;
+		if (parse_reg8intel(&r) && check_end())				// DCR r
+			return emit_dec_r(r);
+		break;
+	}
+	case WORD_HASH('D', 'C', 'X', ___, ___): {		
+		ptr += 3;
+		if (parse_reg16sp_intel(&rr) && check_end())		// DCX rr 
+			return emit_dec_rr(rr);
+		break;
+	}
+
 	// exchange
 	case WORD_HASH('E', 'X', ___, ___, ___): {
 		ptr += 2;
 		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_af() && parse_comma() && parse_af() && (parse_tick() || true) && check_end()) {	// EX AF, AF[']
-			emit(0x08);
-			return true;
-		}
+		if (parse_af() && parse_comma() && parse_af() && (parse_tick() || true) && check_end()) // EX AF, AF[']
+			return emit_ex_af_af1();
 		else if (restore_ptr(&ptr0) &&
-			parse_DE() && parse_comma() && parse_HLx(&x) && (x & IDX_MASK) == IDX_HL && check_end()) {	// EX DE, HL
-			emit(0xeb);
-			return true;
-		}
+			parse_DE() && parse_comma() && parse_HLx(&x) && check_end())				// EX DE, HL
+			return emit_ex_de_hl(x);
 		else if (restore_ptr(&ptr0) &&
 			parse_lparen() && parse_SP() && parse_rparen() && parse_comma() &&
-			parse_HLx(&x) && check_end()) {	// EX (SP),HL/IX/IY
-			if ((x & IDX_MASK) == IDX_IX) emit(0xdd); else if ((x & IDX_MASK) == IDX_IY) emit(0xfd);
-			emit(0xe3);
-			return true;
-		}
-		else {
+			parse_HLx(&x) && check_end())												// EX (SP),HL/IX/IY
+			return emit_ex_indsp_hl(x);
+		else 
 			restore_ptr(&ptr0);
-		}
 		break;
 	}
 	case WORD_HASH('E', 'X', 'X', ___, ___): {
 		ptr += 3;
-		if (check_end()) {	// EXX
-			emit(0xd9);
-			return true;
-		}
+		if (check_end())			// EXX
+			return emit_exx();
 		break;
 	}
 	case WORD_HASH('X', 'C', 'H', 'G', ___): {
 		ptr += 4;
-		if (check_end()) {	// XCHG
-			emit(0xeb);
-			return true;
-		}
+		if (check_end())			// XCHG
+			return emit_ex_de_hl(RR_HL);
 		break;
 	}
 	case WORD_HASH('X', 'T', 'H', 'L', ___): {
 		ptr += 4;
-		if (check_end()) {	// XTHL
-			emit(0xe3);
-			return true;
-		}
+		if (check_end())			// XTHL
+			return emit_ex_indsp_hl(RR_HL);
 		break;
 	}
 
-	// block transfer
-	case WORD_HASH('L', 'D', 'I', ___, ___): {
-		ptr += 3;
+	// stack
+	case WORD_HASH('P', 'U', 'S', 'H', ___): {
+		ptr += 4;
 		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_ind_BCDE(&rr) && parse_comma() && parse_a() && check_end()) {	// LDI (BC/DE), A
-			emit(0x02 + (rr << 4));
-			emit(0x03 + (rr << 4));
-			return true;
-		}
+		if (parse_reg16af(&rr) && check_end())			// PUSH BC/DE/HL/AF
+			return emit_push_rr(rr);
 		else if (restore_ptr(&ptr0) &&
-			parse_a() && parse_comma() && parse_ind_BCDE(&rr) && check_end()) {	// LDI A, (BC/DE)
-			emit(0x0a + (rr << 4));
-			emit(0x03 + (rr << 4));
-			return true;
-		}
-		else if (restore_ptr(&ptr0) &&
-			parse_indHL() && parse_comma() && parse_a() && check_end()) {	// LDI (HL), A
-			emit(0x40 + (R_M << 3) + R_A);
-			emit(0x03 + (RR_HL << 4));
-			return true;
-		}
-		else if (restore_ptr(&ptr0) &&
-			parse_a() && parse_comma() && parse_indHL() && check_end()) {	// LDI A, (HL)
-			emit(0x40 + (R_A << 3) + R_M);
-			emit(0x03 + (RR_HL << 4));
-			return true;
-		}
-		else if (restore_ptr(&ptr0) &&
-			check_end()) {	// LDI
-			emit(0xed);
-			emit(0xa0);
-			return true;
-		}
-		else {
+			parse_reg16af_intel(&rr) && check_end()) 	// PUSH B/BC/D/DE/H/HL/PSW
+			return emit_push_rr(rr);
+		else
 			restore_ptr(&ptr0);
-		}
 		break;
 	}
-	case WORD_HASH('L', 'D', 'I', 'R', ___): {
-		ptr += 4;
-		if (check_end()) {	// LDIR
-			emit(0xed);
-			emit(0xb0);
-			return true;
-		}
-		break;
-	}
-	case WORD_HASH('L', 'D', 'D', ___, ___): {
+	case WORD_HASH('P', 'O', 'P', ___, ___): {
 		ptr += 3;
 		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_ind_BCDE(&rr) && parse_comma() && parse_a() && check_end()) {	// LDD (BC/DE), A
-			emit(0x02 + (rr << 4));
-			emit(0x0b + (rr << 4));
-			return true;
-		}
+		if (parse_reg16af(&rr) && check_end())			// POP BC/DE/HL/AF
+			return emit_pop_rr(rr);
 		else if (restore_ptr(&ptr0) &&
-			parse_a() && parse_comma() && parse_ind_BCDE(&rr) && check_end()) {	// LDD A, (BC/DE)
-			emit(0x0a + (rr << 4));
-			emit(0x0b + (rr << 4));
-			return true;
-		}
-		else if (restore_ptr(&ptr0) &&
-			parse_indHL() && parse_comma() && parse_a() && check_end()) {	// LDD (HL), A
-			emit(0x40 + (R_M << 3) + R_A);
-			emit(0x0b + (RR_HL << 4));
-			return true;
-		}
-		else if (restore_ptr(&ptr0) &&
-			parse_a() && parse_comma() && parse_indHL() && check_end()) {	// LDD A, (HL)
-			emit(0x40 + (R_A << 3) + R_M);
-			emit(0x0b + (RR_HL << 4));
-			return true;
-		}
-		else if (restore_ptr(&ptr0) &&
-			check_end()) {	// LDD
-			emit(0xed);
-			emit(0xa8);
-			return true;
-		}
-		else {
+			parse_reg16af_intel(&rr) && check_end()) 	// POP B/BC/D/DE/H/HL/PSW
+			return emit_pop_rr(rr);
+		else
 			restore_ptr(&ptr0);
-		}
-		break;
-	}
-	case WORD_HASH('L', 'D', 'D', 'R', ___): {
-		ptr += 4;
-		if (check_end()) {	// LDDR
-			emit(0xed);
-			emit(0xb8);
-			return true;
-		}
 		break;
 	}
 
-	// search
-	case WORD_HASH('C', 'P', 'I', ___, ___): {
-		ptr += 3;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_expr(&n) && check_end()) {	// CPI n
-			emit(0xfe);
-			emit(n);
-			return true;
-		}
-		else if (restore_ptr(&ptr0) && check_end()) {	// CPI
-			emit(0xed);
-			emit(0xa1);
-			return true;
-		}
-		restore_ptr(&ptr0);
-		break;
-	}
-	case WORD_HASH('C', 'P', 'I', 'R', ___): {
-		ptr += 4;
-		if (check_end()) {	// CPIR
-			emit(0xed);
-			emit(0xb1);
-			return true;
-		}
-		break;
-	}
-	case WORD_HASH('C', 'P', 'D', ___, ___): {
-		ptr += 3;
-		if (check_end()) {	// CPD
-			emit(0xed);
-			emit(0xa9);
-			return true;
-		}
-		break;
-	}
-	case WORD_HASH('C', 'P', 'D', 'R', ___): {
-		ptr += 4;
-		if (check_end()) {	// CPIR
-			emit(0xed);
-			emit(0xb9);
-			return true;
-		}
-		break;
-	}
-
-	// arithmetic
+	// arithmetic and logical
 	case WORD_HASH('A', 'D', 'D', ___, ___): {
 		ptr += 3;
 		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_alu8(0))
+		if (parse_alu8(OP_ADD))
 			return true;
 		else if (restore_ptr(&ptr0) &&
-			parse_M() && check_end()) {	// ADD m
-			emit(0x86);
-			return true;
-		}
+			parse_M() && check_end())												// ADD m
+			return emit_alu_indx(OP_ADD, RR_HL, 0);
 		else if (restore_ptr(&ptr0) &&
-			parse_HLx(&x) && parse_comma() && parse_reg16sp(&rr) && check_end()) {	// ADD HL/IX/IY, BC/DE/HL/SP/IX/IY
-			// TODO: disallow add hl, ix
-			if ((x & IDX_MASK) == IDX_IX) emit(0xdd); else if ((x & IDX_MASK) == IDX_IY) emit(0xfd);
-			emit(0x09 + (rr << 4));
-			return true;
-		}
+			parse_HLx(&x) && parse_comma() && parse_reg16sp(&rr) && check_end())	// ADD HL/IX/IY, BC/DE/HL/SP/IX/IY
+			return emit_add_x_rr(x, rr);
 		else if (restore_ptr(&ptr0) &&
-			parse_BC() && parse_comma() && parse_expr(&nn) && check_end()) {	// ADD BC, nn
-			emit(0xe5);		// push hl
-			emit(0x21);		// ld hl, nn
-			emitw(nn);
-			emit(0x09);		// add hl, bc
-			emit(0x44);		// ld b, h
-			emit(0x4d);		// ld c, l
-			emit(0xe1);		// pop hl
-			return true;
-		}
+			parse_BC() && parse_comma() && parse_expr(&nn) && check_end())			// ADD BC, nn
+			return (
+				emit_push_rr(RR_HL) &&
+				emit_ld_rr_nn(RR_HL, nn) &&
+				emit_add_x_rr(RR_HL, RR_BC) &&
+				emit_ld_r_r(R_B, R_H) &&
+				emit_ld_r_r(R_C, R_L) &&
+				emit_pop_rr(RR_HL));
 		else if (restore_ptr(&ptr0) &&
-			parse_DE() && parse_comma() && parse_expr(&nn) && check_end()) {	// ADD DE, nn
-			emit(0xe5);		// push hl
-			emit(0x21);		// ld hl, nn
-			emitw(nn);
-			emit(0x19);		// add hl, de
-			emit(0x54);		// ld d, h
-			emit(0x5d);		// ld e, l
-			emit(0xe1);		// pop hl
-			return true;
-		}
+			parse_DE() && parse_comma() && parse_expr(&nn) && check_end())			// ADD DE, nn
+			return (
+				emit_push_rr(RR_HL) &&
+				emit_ld_rr_nn(RR_HL, nn) &&
+				emit_add_x_rr(RR_HL, RR_DE) &&
+				emit_ld_r_r(R_D, R_H) &&
+				emit_ld_r_r(R_E, R_L) &&
+				emit_pop_rr(RR_HL));
 		else if (restore_ptr(&ptr0) &&
-			parse_HLx(&x) && parse_comma() && parse_expr(&nn) && check_end()) {	// ADD HL/IX/IY, nn
-			emit(0xd5);		// push de
-			emit(0x11);		// ld de, nn
-			emitw(nn);
-			if ((x & IDX_MASK) == IDX_IX) emit(0xdd); else if ((x & IDX_MASK) == IDX_IY) emit(0xfd);
-			emit(0x19);		// add hl, de
-			emit(0xd1);		// pop de
-			return true;
-		}
-		else {
+			parse_HLx(&x) && parse_comma() && parse_expr(&nn) && check_end())		// ADD HL/IX/IY, nn
+			return (
+				emit_push_rr(RR_DE) &&
+				emit_ld_rr_nn(RR_DE, nn) &&
+				emit_add_x_rr(x, RR_DE) &&
+				emit_pop_rr(RR_DE));
+		else 
 			restore_ptr(&ptr0);
-		}
 		break;
 	}
 	case WORD_HASH('D', 'A', 'D', ___, ___): {
 		ptr += 3;
-		if (parse_reg16sp_intel(&rr) && check_end()) {	// DAD m
-			emit(0x09 + (rr << 4));
-			return true;
-		}
+		if (parse_reg16sp_intel(&rr) && check_end())		// DAD m
+			return emit_add_x_rr(RR_HL, rr);
 		break;
 	}
 	case WORD_HASH('A', 'D', 'I', ___, ___): {
@@ -1073,897 +972,717 @@ static bool parse_statement(void) {
 	case WORD_HASH('A', 'D', 'C', ___, ___): {
 		ptr += 3;
 		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_alu8(1))
+		if (parse_alu8(OP_ADC))
 			return true;
 		else if (restore_ptr(&ptr0) &&
-			parse_M() && check_end()) {	// ADC m
-			emit(0x8e);
-			return true;
-		}
+			parse_M() && check_end())			// ADC m
+			return emit_alu_indx(OP_ADC, RR_HL, 0);
 		else if (restore_ptr(&ptr0) &&
-			parse_HLx(&x) && (x & IDX_MASK) == IDX_HL && parse_comma() && parse_reg16sp(&rr) && check_end()) {	// ADC HL, BC/DE/HL/SP
-			emit(0xed);
-			emit(0x4a + (rr << 4));
-			return true;
-		}
-		else {
+			parse_HLx(&x) && parse_comma() && parse_reg16sp(&rr) && check_end()) 	// ADC HL, BC/DE/HL/SP
+			return emit_adc_x_rr(x, rr);
+		else 
 			restore_ptr(&ptr0);
-		}
 		break;
 	}
 	case WORD_HASH('A', 'C', 'I', ___, ___): {
 		ptr += 3;
-		if (parse_expr(&n) && check_end()) {	// ACI n
-			emit(0xce);
-			emit(n);
-			return true;
-		}
+		if (parse_expr(&n) && check_end()) 		// ACI n
+			return emit_alu_n(OP_ADC, n);
 		break;
 	}
 	case WORD_HASH('S', 'U', 'B', ___, ___): {
 		ptr += 3;
 		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_alu8(2))
+		if (parse_alu8(OP_SUB))
 			return true;
-		else if (restore_ptr(&ptr0) && parse_reg8intel(&r) && check_end()) {	// SUB r
-			emit(0x90 + r);
-			return true;
-		}
-		restore_ptr(&ptr0);
+		else if (restore_ptr(&ptr0) &&
+			parse_reg8intel(&r) && check_end()) // SUB r
+			return emit_alu_r(OP_SUB, r);
+		else
+			restore_ptr(&ptr0);
 		break;
 	}
 	case WORD_HASH('S', 'U', 'I', ___, ___): {
 		ptr += 3;
-		if (parse_expr(&n) && check_end()) {	// SUI n
-			emit(0xd6);
-			emit(n);
-			return true;
-		}
+		const char* ptr0; blanks(); save_ptr(&ptr0);
+		if (parse_expr(&n) && check_end())		// SUI n
+			return emit_alu_n(OP_SUB, n);
+		else
+			restore_ptr(&ptr0);
 		break;
 	}
 	case WORD_HASH('S', 'B', 'C', ___, ___): {
 		ptr += 3;
 		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_alu8(3))
+		if (parse_alu8(OP_SBC))
 			return true;
 		else if (restore_ptr(&ptr0) &&
-			parse_HLx(&x) && (x & IDX_MASK) == IDX_HL && parse_comma() && parse_reg16sp(&rr) && check_end()) {	// SBC HL, BC/DE/HL/SP
-			emit(0xed);
-			emit(0x42 + (rr << 4));
-			return true;
-		}
-		else {
+			parse_HLx(&x) && parse_comma() && parse_reg16sp(&rr) && check_end())	// SBC HL, BC/DE/HL/SP
+			return emit_sbc_x_rr(x, rr);
+		else
 			restore_ptr(&ptr0);
-		}
 		break;
 	}
 	case WORD_HASH('S', 'B', 'B', ___, ___): {
 		ptr += 3;
-		if (parse_alu8intel(3))
+		if (parse_alu8intel(OP_SBC))
 			return true;
 		break;
 	}
 	case WORD_HASH('S', 'B', 'I', ___, ___): {
 		ptr += 3;
-		if (parse_expr(&n) && check_end()) {	// SBI n
-			emit(0xde);
-			emit(n);
-			return true;
-		}
+		const char* ptr0; blanks(); save_ptr(&ptr0);
+		if (parse_expr(&n) && check_end()) 		// SBI n
+			return emit_alu_n(OP_SBC, n);
+		else
+			restore_ptr(&ptr0);
 		break;
 	}
 	case WORD_HASH('C', 'P', ___, ___, ___): {
 		ptr += 2;
-		if (parse_alu8(7))
+		if (parse_alu8(OP_CP))
 			return true;
 		break;
 	}
 	case WORD_HASH('C', 'M', 'P', ___, ___): {
 		ptr += 3;
-		if (parse_alu8(7) || parse_alu8intel(7))
+		if (parse_alu8(OP_CP) || parse_alu8intel(OP_CP))
 			return true;
 		break;
 	}
 	case WORD_HASH('D', 'A', 'A', ___, ___): {
 		ptr += 3;
-		if (check_end()) {	// DAA
-			emit(0x27);
-			return true;
-		}
+		if (check_end()) 							// DAA
+			return emit_daa();
 		break;
 	}
 	case WORD_HASH('C', 'P', 'L', ___, ___): {
 		ptr += 3;
-		if ((parse_a() || true) && check_end()) {	// CPL [A]
-			emit(0x2f);
-			return true;
-		}
+		if ((parse_a() || true) && check_end()) 	// CPL [A]
+			return emit_cpl();
 		break;
 	}
 	case WORD_HASH('C', 'M', 'A', ___, ___): {
 		ptr += 3;
-		if (check_end()) {	// CMA
-			emit(0x2f);
-			return true;
-		}
+		if (check_end())							// CMA
+			return emit_cpl();
 		break;
 	}
 	case WORD_HASH('N', 'E', 'G', ___, ___): {
 		ptr += 3;
-		if ((parse_a() || true) && check_end()) {	// NEG [A]
-			emit(0xed);
-			emit(0x44);
-			return true;
-		}
+		if ((parse_a() || true) && check_end()) 	// NEG [A]
+			return emit_neg();
 		break;
 	}
 	case WORD_HASH('S', 'C', 'F', ___, ___): {
 		ptr += 3;
-		if (check_end()) {	// SCF
-			emit(0x37);
-			return true;
-		}
+		if (check_end())							// SCF
+			return emit_scf();
 		break;
 	}
 	case WORD_HASH('S', 'T', 'C', ___, ___): {
 		ptr += 3;
-		if (check_end()) {	// STC
-			emit(0x37);
-			return true;
-		}
+		if (check_end())							// STC
+			return emit_scf();
 		break;
 	}
 	case WORD_HASH('C', 'C', 'F', ___, ___): {
 		ptr += 3;
-		if (check_end()) {	// CCF
-			emit(0x3f);
-			return true;
-		}
+		if (check_end())							// CCF
+			return emit_ccf();
 		break;
 	}
 	case WORD_HASH('C', 'M', 'C', ___, ___): {
 		ptr += 3;
-		if (check_end()) {	// CMC
-			emit(0x3f);
-			return true;
-		}
-		break;
-	}
-	case WORD_HASH('I', 'N', 'C', ___, ___): {
-		ptr += 3;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_reg16sp(&rr) && check_end()) 	// INC/DEC BC/DE/HL/SP/IX/IY
-			return emit_inc_rr(rr);
-		else if (restore_ptr(&ptr0) &&
-			parse_reg8x(&r) && check_end())		// INC/DEC B/C/D/E/H/L/A/IXH/IYH/IXL/IYL
-			return emit_inc_r(r);
-		else if (restore_ptr(&ptr0) &&
-			parse_indHLx(&x, &dis) && check_end()) 	// INC/DEC (HL)/(IX+d)/(IY+d)
-			return emit_inc_indx(x, dis);
-		restore_ptr(&ptr0);
-		break;
-	}
-	case WORD_HASH('I', 'N', 'R', ___, ___): {
-		ptr += 3;
-		if (parse_reg8intel(&r) && check_end()) {
-			emit(0x04 + (r << 3));
-			return true;
-		}
-		break;
-	}
-	case WORD_HASH('I', 'N', 'X', ___, ___): {
-		ptr += 3;
-		if (parse_reg16sp_intel(&rr) && check_end()) {
-			emit(0x03 + (rr << 4));
-			return true;
-		}
-		break;
-	}
-	case WORD_HASH('D', 'E', 'C', ___, ___): {
-		ptr += 3;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_reg16sp(&rr) && check_end()) 	// INC/DEC BC/DE/HL/SP/IX/IY
-			return emit_dec_rr(rr);
-		else if (restore_ptr(&ptr0) &&
-			parse_reg8x(&r) && check_end())		// INC/DEC B/C/D/E/H/L/A/IXH/IYH/IXL/IYL
-			return emit_dec_r(r);
-		else if (restore_ptr(&ptr0) &&
-			parse_indHLx(&x, &dis) && check_end()) 	// INC/DEC (HL)/(IX+d)/(IY+d)
-			return emit_dec_indx(x, dis);
-		restore_ptr(&ptr0);
-		break;
-	}
-	case WORD_HASH('D', 'C', 'R', ___, ___): {
-		ptr += 3;
-		if (parse_reg8intel(&r) && check_end()) {
-			emit(0x05 + (r << 3));
-			return true;
-		}
-		break;
-	}
-	case WORD_HASH('D', 'C', 'X', ___, ___): {
-		ptr += 3;
-		if (parse_reg16sp_intel(&rr) && check_end()) {
-			emit(0x0b + (rr << 4));
-			return true;
-		}
+		if (check_end())							// CMC
+			return emit_ccf();
 		break;
 	}
 
-	// logical
 	case WORD_HASH('A', 'N', 'D', ___, ___): {
 		ptr += 3;
-		if (parse_alu8(4))
+		if (parse_alu8(OP_AND))
 			return true;
 		break;
 	}
 	case WORD_HASH('A', 'N', 'A', ___, ___): {
 		ptr += 3;
-		if (parse_reg8intel(&r) && check_end()) {	// ANA r
-			emit(0xa0 + r);
-			return true;
-		}
+		if (parse_reg8intel(&r) && check_end()) 	// ANA r
+			return emit_alu_r(OP_AND, r);
 		break;
 	}
 	case WORD_HASH('A', 'N', 'I', ___, ___): {
 		ptr += 3;
-		if (parse_expr(&n) && check_end()) {	// ANI n
-			emit(0xe6);
-			emit(n);
-			return true;
-		}
+		if (parse_expr(&n) && check_end())			// ANI n
+			return emit_alu_n(OP_AND, n);
 		break;
 	}
 	case WORD_HASH('O', 'R', ___, ___, ___): {
 		ptr += 2;
-		if (parse_alu8(6))
+		if (parse_alu8(OP_OR))
 			return true;
 		break;
 	}
 	case WORD_HASH('O', 'R', 'A', ___, ___): {
 		ptr += 3;
-		if (parse_reg8intel(&r) && check_end()) {	// ORA r
-			emit(0xb0 + r);
-			return true;
-		}
+		if (parse_reg8intel(&r) && check_end()) 	// ORA r
+			return emit_alu_r(OP_OR, r);
 		break;
 	}
 	case WORD_HASH('O', 'R', 'I', ___, ___): {
 		ptr += 3;
-		if (parse_expr(&n) && check_end()) {	// ORI n
-			emit(0xf6);
-			emit(n);
-			return true;
-		}
+		if (parse_expr(&n) && check_end())			// ORI n
+			return emit_alu_n(OP_OR, n);
 		break;
 	}
 	case WORD_HASH('X', 'O', 'R', ___, ___): {
 		ptr += 3;
-		if (parse_alu8(5))
+		if (parse_alu8(OP_XOR))
 			return true;
 		break;
 	}
 	case WORD_HASH('X', 'R', 'A', ___, ___): {
 		ptr += 3;
-		if (parse_reg8intel(&r) && check_end()) {	// XRA r
-			emit(0xa8 + r);
-			return true;
-		}
+		if (parse_reg8intel(&r) && check_end()) 	// XRA r
+			return emit_alu_r(OP_XOR, r);
 		break;
 	}
 	case WORD_HASH('X', 'R', 'I', ___, ___): {
 		ptr += 3;
-		if (parse_expr(&n) && check_end()) {	// XRI n
-			emit(0xee);
-			emit(n);
-			return true;
-		}
+		if (parse_expr(&n) && check_end())			// XRI n
+			return emit_alu_n(OP_XOR, n);
 		break;
 	}
 
-	// rotate
+	// rotate and shift
 	case WORD_HASH('R', 'L', 'A', ___, ___): {
 		ptr += 3;
-		if (check_end()) {	// RLA
-			emit(0x17);
-			return true;
-		}
+		if (check_end())			// RLA
+			return emit_rla();
 		break;
 	}
 	case WORD_HASH('R', 'A', 'L', ___, ___): {
 		ptr += 3;
-		if (check_end()) {	// RAL
-			emit(0x17);
-			return true;
-		}
+		if (check_end())			// RAL
+			return emit_rla();
 		break;
 	}
 	case WORD_HASH('R', 'L', 'C', 'A', ___): {
 		ptr += 4;
-		if (check_end()) {	// RLCA
-			emit(0x07);
-			return true;
-		}
+		if (check_end())			// RLCA
+			return emit_rlca();
 		break;
 	}
 	case WORD_HASH('R', 'R', 'A', ___, ___): {
 		ptr += 3;
-		if (check_end()) {	// RRA
-			emit(0x1f);
-			return true;
-		}
+		if (check_end())			// RRA
+			return emit_rra();
 		break;
 	}
 	case WORD_HASH('R', 'A', 'R', ___, ___): {
 		ptr += 3;
-		if (check_end()) {	// RAR
-			emit(0x1f);
-			return true;
-		}
+		if (check_end())			// RAR
+			return emit_rra();
 		break;
 	}
 	case WORD_HASH('R', 'R', 'C', 'A', ___): {
 		ptr += 4;
-		if (check_end()) {	// RRCA
-			emit(0x0f);
-			return true;
-		}
+		if (check_end())			// RRCA
+			return emit_rrca();
 		break;
 	}
 	case WORD_HASH('R', 'L', 'C', ___, ___): {
 		ptr += 3;
 		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_rot8(0))	// RLC r
+		if (parse_rot8(OP_RLC))		// RLC r
 			return true;
-		else if (restore_ptr(&ptr0) && check_end()) {	// RLC
-			emit(0x07);
-			return true;
-		}
-		restore_ptr(&ptr0);
+		else if (restore_ptr(&ptr0) &&
+			check_end())			// RLC
+			return emit_rlca();
+		else
+			restore_ptr(&ptr0);
 		break;
 	}
 	case WORD_HASH('R', 'R', 'C', ___, ___): {
 		ptr += 3;
 		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_rot8(1))	// RRC r
+		if (parse_rot8(OP_RRC))		// RRC r
 			return true;
-		else if (restore_ptr(&ptr0) && check_end()) {	// RRC
-			emit(0x0f);
-			return true;
-		}
-		restore_ptr(&ptr0);
+		else if (restore_ptr(&ptr0) && 
+			check_end())			// RRC
+			return emit_rrca();
+		else
+			restore_ptr(&ptr0);
 		break;
 	}
 	case WORD_HASH('R', 'L', ___, ___, ___): {
 		ptr += 2;
-		if (parse_rot8(2))	// RL r
+		if (parse_rot8(OP_RL))		// RL r
 			return true;
 		break;
 	}
 	case WORD_HASH('R', 'R', ___, ___, ___): {
 		ptr += 2;
-		if (parse_rot8(3))	// RR r
+		if (parse_rot8(OP_RR))		// RR r
 			return true;
 		break;
 	}
 	case WORD_HASH('S', 'L', 'A', ___, ___): {
 		ptr += 3;
-		if (parse_rot8(4))	// SLA r
+		if (parse_rot8(OP_SLA))		// SLA r
 			return true;
 		break;
 	}
 	case WORD_HASH('S', 'R', 'A', ___, ___): {
 		ptr += 3;
-		if (parse_rot8(5))	// SRA r
+		if (parse_rot8(OP_SRA))		// SRA r
 			return true;
 		break;
 	}
 	case WORD_HASH('S', 'L', 'L', ___, ___): {
 		ptr += 3;
-		if (parse_rot8(6))	// SLL r
+		if (parse_rot8(OP_SLL))		// SLL r
 			return true;
 		break;
 	}
 	case WORD_HASH('S', 'L', 'I', ___, ___): {
 		ptr += 3;
-		if (parse_rot8(6))	// SLI r
+		if (parse_rot8(OP_SLI))		// SLI r
 			return true;
 		break;
 	}
 	case WORD_HASH('S', 'R', 'L', ___, ___): {
 		ptr += 3;
-		if (parse_rot8(7))	// SRL r
+		if (parse_rot8(OP_SRL))		// SRL r
 			return true;
 		break;
 	}
 	case WORD_HASH('R', 'R', 'D', ___, ___): {
 		ptr += 3;
-		if (check_end()) {	// RRD
-			emit(0xed);
-			emit(0x67);
-			return true;
-		}
+		if (check_end())			// RRD
+			return emit_rrd();
 		break;
 	}
 	case WORD_HASH('R', 'L', 'D', ___, ___): {
 		ptr += 3;
-		if (check_end()) {	// RLD
-			emit(0xed);
-			emit(0x6f);
-			return true;
-		}
+		if (check_end())			// RLD
+			return emit_rld();
 		break;
 	}
 
 	// bits
 	case WORD_HASH('B', 'I', 'T', ___, ___): {
 		ptr += 3;
-		if (parse_bit8(1))
+		if (parse_bit8(OP_BIT))
 			return true;
 		break;
 	}
 	case WORD_HASH('R', 'E', 'S', ___, ___): {
 		ptr += 3;
-		if (parse_bit8(2))
+		if (parse_bit8(OP_RES))
 			return true;
 		break;
 	}
 	case WORD_HASH('S', 'E', 'T', ___, ___): {
 		ptr += 3;
-		if (parse_bit8(3))
+		if (parse_bit8(OP_SET))
 			return true;
 		break;
 	}
+
+	// block transfer
+	case WORD_HASH('L', 'D', 'I', ___, ___): {
+		ptr += 3;
+		const char* ptr0; blanks(); save_ptr(&ptr0);
+		if (parse_ind_BCDE(&rr) && parse_comma() && parse_a() && check_end()) 	// LDI (BC/DE), A
+			return (
+				emit_ld_indrr_a(rr) &&
+				emit_inc_rr(rr));
+		else if (restore_ptr(&ptr0) &&
+			parse_a() && parse_comma() && parse_ind_BCDE(&rr) && check_end()) 	// LDI A, (BC/DE)
+			return (
+				emit_ld_a_indrr(rr) &&
+				emit_inc_rr(rr));
+		else if (restore_ptr(&ptr0) &&
+			parse_indHL() && parse_comma() && parse_a() && check_end())			// LDI (HL), A
+			return (
+				emit_ld_indx_r(RR_HL, 0, R_A) &&
+				emit_inc_rr(RR_HL));
+		else if (restore_ptr(&ptr0) &&
+			parse_a() && parse_comma() && parse_indHL() && check_end())			// LDI A, (HL)
+			return (
+				emit_ld_r_indx(R_A, RR_HL, 0) &&
+				emit_inc_rr(RR_HL));
+		else if (restore_ptr(&ptr0) &&
+			check_end())			// LDI
+			return emit_ldi();
+		else
+			restore_ptr(&ptr0);
+		break;
+	}
+	case WORD_HASH('L', 'D', 'I', 'R', ___): {
+		ptr += 4;
+		if (check_end())			// LDIR
+			return emit_ldir();
+		break;
+	}
+	case WORD_HASH('L', 'D', 'D', ___, ___): {
+		ptr += 3;
+		const char* ptr0; blanks(); save_ptr(&ptr0);
+		if (parse_ind_BCDE(&rr) && parse_comma() && parse_a() && check_end()) 	// LDD (BC/DE), A
+			return (
+				emit_ld_indrr_a(rr) &&
+				emit_dec_rr(rr));
+		else if (restore_ptr(&ptr0) &&
+			parse_a() && parse_comma() && parse_ind_BCDE(&rr) && check_end()) 	// LDD A, (BC/DE)
+			return (
+				emit_ld_a_indrr(rr) &&
+				emit_dec_rr(rr));
+		else if (restore_ptr(&ptr0) &&
+			parse_indHL() && parse_comma() && parse_a() && check_end())			// LDD (HL), A
+			return (
+				emit_ld_indx_r(RR_HL, 0, R_A) &&
+				emit_dec_rr(RR_HL));
+		else if (restore_ptr(&ptr0) &&
+			parse_a() && parse_comma() && parse_indHL() && check_end())			// LDD A, (HL)
+			return (
+				emit_ld_r_indx(R_A, RR_HL, 0) &&
+				emit_dec_rr(RR_HL));
+		else if (restore_ptr(&ptr0) &&
+			check_end())			// LDD
+			return emit_ldd();
+		else 
+			restore_ptr(&ptr0);
+		break;
+	}
+	case WORD_HASH('L', 'D', 'D', 'R', ___): {
+		ptr += 4;
+		if (check_end())			// LDDR
+			return emit_lddr();
+		break;
+	}
+
+	// search
+	case WORD_HASH('C', 'P', 'I', ___, ___): {
+		ptr += 3;
+		const char* ptr0; blanks(); save_ptr(&ptr0);
+		if (parse_expr(&n) && check_end())	// CPI n
+			return emit_alu_n(OP_CP, n);
+		else if (restore_ptr(&ptr0) &&
+			check_end())					// CPI
+			return emit_cpi();
+		else
+			restore_ptr(&ptr0);
+		break;
+	}
+	case WORD_HASH('C', 'P', 'I', 'R', ___): {
+		ptr += 4;
+		if (check_end())					// CPIR
+			return emit_cpir();
+		break;
+	}
+	case WORD_HASH('C', 'P', 'D', ___, ___): {
+		ptr += 3;
+		if (check_end())					// CPD
+			return emit_cpd();
+		break;
+	}
+	case WORD_HASH('C', 'P', 'D', 'R', ___): {
+		ptr += 4;
+		if (check_end())					// CPDR
+			return emit_cpdr();
+		break;
+	}
+
 
 	// input/output
 	case WORD_HASH('I', 'N', ___, ___, ___): {
 		ptr += 2;
 		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_f() && parse_comma() && parse_indC() && check_end()) {	// IN F, (C)
-			emit(0xed);
-			emit(0x70);
-			return true;
-		}
+		if (parse_f() && parse_comma() && parse_indC() && check_end()) 		// IN F, (C)
+			return emit_in_f_indc();
 		else if (restore_ptr(&ptr0) &&
-			parse_indC() && check_end()) {	// IN (C)
-			emit(0xed);
-			emit(0x70);
-			return true;
-		}
+			parse_indC() && check_end())									// IN (C)
+			return emit_in_f_indc();
 		else if (restore_ptr(&ptr0) &&
-			parse_reg8(&r) && parse_comma() && parse_indC() && check_end()) {	// IN r, (C)
-			emit(0xed);
-			emit(0x40 + (r << 3));
-			return true;
-		}
+			parse_reg8(&r) && parse_comma() && parse_indC() && check_end())	// IN r, (C)
+			return emit_in_r_indc(r);
 		else if (restore_ptr(&ptr0) &&
-			parse_a() && parse_comma() && parse_indexpr(&n) && check_end()) {	// IN A, (n)
-			emit(0xdb);
-			emit(n);
-			return true;
-		}
+			parse_a() && parse_comma() && parse_indexpr(&n) && check_end()) // IN A, (n)
+			return emit_in_a_indn(n);
 		else if (restore_ptr(&ptr0) &&
-			parse_expr(&n) && check_end()) {	// IN n
-			emit(0xdb);
-			emit(n);
-			return true;
-		}
+			parse_expr(&n) && check_end())									// IN n
+			return emit_in_a_indn(n);
+		else
+			restore_ptr(&ptr0);
 		break;
 	}
 	case WORD_HASH('I', 'N', 'I', ___, ___): {
 		ptr += 3;
-		if (check_end()) {	// INI
-			emit(0xed);
-			emit(0xa2);
-			return true;
-		}
+		if (check_end())		// INI
+			return emit_ini();
 		break;
 	}
 	case WORD_HASH('I', 'N', 'I', 'R', ___): {
 		ptr += 4;
-		if (check_end()) {	// INIR
-			emit(0xed);
-			emit(0xb2);
-			return true;
-		}
+		if (check_end())		// INIR
+			return emit_inir();
 		break;
 	}
 	case WORD_HASH('I', 'N', 'D', ___, ___): {
 		ptr += 3;
-		if (check_end()) {	// IND
-			emit(0xed);
-			emit(0xaa);
-			return true;
-		}
+		if (check_end())		// IND
+			return emit_ind();
 		break;
 	}
 	case WORD_HASH('I', 'N', 'D', 'R', ___): {
 		ptr += 4;
-		if (check_end()) {	// INDR
-			emit(0xed);
-			emit(0xba);
-			return true;
-		}
+		if (check_end())		// INDR
+			return emit_indr();
 		break;
 	}
 	case WORD_HASH('O', 'U', 'T', ___, ___): {
 		ptr += 3;
 		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_indC() && parse_comma() && parse_const(&n) && check_end()) {	// OUT (C), 0
-			if (n != 0)
-				error_range(n);
-			else {
-				emit(0xed);
-				emit(0x71);
-				return true;
-			}
-		}
+		if (parse_indC() && parse_comma() && parse_const(&n) && check_end())	// OUT (C), 0
+			return emit_out_indc_n(n);
 		else if (restore_ptr(&ptr0) &&
-			parse_indC() && parse_comma() && parse_reg8(&r) && check_end()) {	// OUT (C), r
-			emit(0xed);
-			emit(0x41 + (r << 3));
-			return true;
-		}
+			parse_indC() && parse_comma() && parse_reg8(&r) && check_end()) 	// OUT (C), r
+			return emit_out_indc_r(r);
 		else if (restore_ptr(&ptr0) &&
-			parse_indexpr(&n) && parse_comma() && parse_a() && check_end()) {	// IN (n), A
-			emit(0xd3);
-			emit(n);
-			return true;
-		}
+			parse_indexpr(&n) && parse_comma() && parse_a() && check_end()) 	// OUT (n), A
+			return emit_out_indn_a(n);
 		else if (restore_ptr(&ptr0) &&
-			parse_expr(&n) && check_end()) {	// OUT n
-			emit(0xd3);
-			emit(n);
-			return true;
-		}
+			parse_expr(&n) && check_end())										// OUT n
+			return emit_out_indn_a(n);
+		else
+			restore_ptr(&ptr0);
 		break;
 	}
 	case WORD_HASH('O', 'U', 'T', 'I', ___): {
 		ptr += 4;
-		if (check_end()) {	// OUTI
-			emit(0xed);
-			emit(0xa3);
-			return true;
-		}
+		if (check_end())		// OUTI
+			return emit_outi();
 		break;
 	}
 	case WORD_HASH('O', 'T', 'I', 'R', ___): {
 		ptr += 4;
-		if (check_end()) {	// OTIR
-			emit(0xed);
-			emit(0xb3);
-			return true;
-		}
+		if (check_end()) 		// OTIR
+			return emit_otir();
 		break;
 	}
 	case WORD_HASH('O', 'U', 'T', 'D', ___): {
 		ptr += 4;
-		if (check_end()) {	// OUTD
-			emit(0xed);
-			emit(0xab);
-			return true;
-		}
+		if (check_end())		// OUTD
+			return emit_outd();
 		break;
 	}
 	case WORD_HASH('O', 'T', 'D', 'R', ___): {
 		ptr += 4;
-		if (check_end()) {	// OTDR
-			emit(0xed);
-			emit(0xbb);
-			return true;
-		}
+		if (check_end())		// OTDR
+			return emit_otdr();
 		break;
 	}
 
 	// cpu control
 	case WORD_HASH('N', 'O', 'P', ___, ___): {
 		ptr += 3;
-		if (check_end()) {	// NOP
-			emit(0x00);
-			return true;
-		}
+		if (check_end())		// NOP
+			return emit_nop();
 		break;
 	}
 	case WORD_HASH('D', 'I', ___, ___, ___): {
 		ptr += 2;
-		if (check_end()) {	// DI
-			emit(0xf3);
-			return true;
-		}
+		if (check_end())		// DI
+			return emit_di();
 		break;
 	}
 	case WORD_HASH('E', 'I', ___, ___, ___): {
 		ptr += 2;
-		if (check_end()) {	// EI
-			emit(0xfb);
-			return true;
-		}
+		if (check_end())		// EI
+			return emit_ei();
 		break;
 	}
 	case WORD_HASH('H', 'A', 'L', 'T', ___): {
 		ptr += 4;
-		if (check_end()) {	// HALT
-			emit(0x76);
-			return true;
-		}
+		if (check_end())		// HALT
+			return emit_halt();
 		break;
 	}
 	case WORD_HASH('H', 'L', 'T', ___, ___): {
 		ptr += 3;
-		if (check_end()) {	// HALT
-			emit(0x76);
-			return true;
-		}
+		if (check_end())		// HALT
+			return emit_halt();
 		break;
 	}
 	case WORD_HASH('I', 'M', ___, ___, ___): {
 		ptr += 2;
-		if (parse_const(&im) && check_end()) {	// IM n
-			switch (im) {
-			case 0: emit(0xed); emit(0x46); return true;
-			case 1: emit(0xed); emit(0x56); return true;
-			case 2: emit(0xed); emit(0x5e); return true;
-			default: error_range(im);
-			}
-		}
-		break;
-	}
-
-	// stack
-	case WORD_HASH('P', 'U', 'S', 'H', ___): {
-		ptr += 4;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_reg16af(&rr) && check_end()) {	// PUSH BC/DE/HL/AF
-			if ((rr & IDX_MASK) == IDX_IX) emit(0xdd); else if ((rr & IDX_MASK) == IDX_IY) emit(0xfd);
-			emit(0xc5 + (rr << 4));
-			return true;
-		}
-		else if (restore_ptr(&ptr0) && parse_reg16af_intel(&rr) && check_end()) {	// PUSH B/BC/D/DE/H/HL/PSW
-			emit(0xc5 + (rr << 4));
-			return true;
-		}
-		restore_ptr(&ptr0);
-		break;
-	}
-	case WORD_HASH('P', 'O', 'P', ___, ___): {
-		ptr += 4;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_reg16af(&rr) && check_end()) {	// POP BC/DE/HL/AF
-			if ((rr & IDX_MASK) == IDX_IX) emit(0xdd); else if ((rr & IDX_MASK) == IDX_IY) emit(0xfd);
-			emit(0xc1 + (rr << 4));
-			return true;
-		}
-		else if (restore_ptr(&ptr0) && parse_reg16af_intel(&rr) && check_end()) {	// POP B/BC/D/DE/H/HL/PSW
-			emit(0xc1 + (rr << 4));
-			return true;
-		}
-		restore_ptr(&ptr0);
+		if (parse_const(&im) && check_end()) 	// IM n
+			return emit_im(im);
 		break;
 	}
 
 	// jump
 	case WORD_HASH('J', 'P', ___, ___, ___): {
 		ptr += 2;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_jump_call(0xc3, 0xc2))	// JP flags, nn/CALL nn
+		if (parse_jp())							// JP
 			return true;
-		else if (restore_ptr(&ptr0) &&
-			parse_lparen() && parse_HLx(&x) && parse_rparen() && check_end()) {	// JP (HL)/(IX)/(IY)
-			if ((x & IDX_MASK) == IDX_IX) emit(0xdd); else if ((x & IDX_MASK) == IDX_IY) emit(0xfd);
-			emit(0xe9);
-			return true;
-		}
-		else {
-			restore_ptr(&ptr0);
-		}
 		break;
 	}
 	case WORD_HASH('J', 'M', 'P', ___, ___): {
 		ptr += 3;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_jump_call(0xc3, 0xc2))	// JP flags, nn/CALL nn
+		if (parse_jp())							// JMP
 			return true;
-		else if (restore_ptr(&ptr0) &&
-			parse_lparen() && parse_HLx(&x) && parse_rparen() && check_end()) {	// JP (HL)/(IX)/(IY)
-			if ((x & IDX_MASK) == IDX_IX) emit(0xdd); else if ((x & IDX_MASK) == IDX_IY) emit(0xfd);
-			emit(0xe9);
-			return true;
-		}
-		else {
-			restore_ptr(&ptr0);
-		}
 		break;
 	}
 	case WORD_HASH('P', 'C', 'H', 'L', ___): {
 		ptr += 4;
-		if (check_end()) {	// PCHL
-			emit(0xe9);
-			return true;
-		}
+		if (check_end())						// PCHL
+			return emit_jp_x(RR_HL);
 		break;
 	}
 	case WORD_HASH('J', 'N', 'Z', ___, ___): {
 		ptr += 3;
-		if (parse_jump_call_intel(0xc2, F_NZ))	// JNZ nn
+		if (parse_jp_intel(F_NZ))				// JNZ nn
 			return true;
 		break;
 	}
 	case WORD_HASH('J', 'Z', ___, ___, ___): {
 		ptr += 2;
-		if (parse_jump_call_intel(0xc2, F_Z))	// JZ nn
+		if (parse_jp_intel(F_Z))				// JZ nn
 			return true;
 		break;
 	}
 	case WORD_HASH('J', 'N', 'C', ___, ___): {
 		ptr += 3;
-		if (parse_jump_call_intel(0xc2, F_NC))	// JNC nn
+		if (parse_jp_intel(F_NC))				// JNC nn
 			return true;
 		break;
 	}
 	case WORD_HASH('J', 'C', ___, ___, ___): {
 		ptr += 2;
-		if (parse_jump_call_intel(0xc2, F_C))	// JC nn
+		if (parse_jp_intel(F_C))				// JC nn
 			return true;
 		break;
 	}
 	case WORD_HASH('J', 'P', 'O', ___, ___): {
 		ptr += 3;
-		if (parse_jump_call_intel(0xc2, F_PO))	// JPO nn
+		if (parse_jp_intel(F_PO))				// JPO nn
 			return true;
 		break;
 	}
 	case WORD_HASH('J', 'P', 'E', ___, ___): {
 		ptr += 3;
-		if (parse_jump_call_intel(0xc2, F_PE))	// JPE nn
+		if (parse_jp_intel(F_PE))				// JPE nn
 			return true;
 		break;
 	}
 	case WORD_HASH('J', 'N', 'V', ___, ___): {
 		ptr += 3;
-		if (parse_jump_call_intel(0xc2, F_NV))	// JNV nn
+		if (parse_jp_intel(F_NV))				// JNV nn
 			return true;
 		break;
 	}
 	case WORD_HASH('J', 'V', ___, ___, ___): {
 		ptr += 2;
-		if (parse_jump_call_intel(0xc2, F_V))	// JV nn
+		if (parse_jp_intel(F_V))				// JV nn
 			return true;
 		break;
 	}
 	case WORD_HASH('J', 'M', ___, ___, ___): {
 		ptr += 2;
-		if (parse_jump_call_intel(0xc2, F_M))	// JM nn
+		if (parse_jp_intel(F_M))				// JM nn
 			return true;
 		break;
 	}
 	case WORD_HASH('D', 'J', 'N', 'Z', ___): {
 		ptr += 4;
 		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (!(parse_B() && parse_comma()))	// b, optional
+		if (!(parse_B() && parse_comma()))		// b, optional
 			restore_ptr(&ptr0);
-		if (parse_expr(&addr) && check_end()) {	// DJNZ nn
-			int pc = get_pc() + 2;	// after this intruction
-			int dist = addr - pc;
-			if (dist < -128 || dist>127) {
-				error_range(dist);
-				return false;
-			}
-			emit(0x10);
-			emit(dist);
-			return true;
-		}
+		if (parse_expr(&nn) && check_end()) 	// DJNZ nn
+			return emit_djnz_nn(nn);
+		else
+			restore_ptr(&ptr0);
 		break;
 	}
 	case WORD_HASH('J', 'R', ___, ___, ___): {
 		ptr += 2;
 		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_flags4(&flags) && parse_comma() && parse_expr(&addr) && check_end()) {	// JR flag, nn
-			int pc = get_pc() + 2;	// after this intruction
-			int dist = addr - pc;
-			if (dist < -128 || dist>127) {
-				error_range(dist);
-				return false;
-			}
-			emit(0x20 + (flags << 3));
-			emit(dist);
-			return true;
-		}
+		if (parse_flags4(&f) && parse_comma() && parse_expr(&nn) && check_end())// JR f, nn
+			return emit_jr_f_nn(f, nn);
 		else if (restore_ptr(&ptr0) &&
-			parse_expr(&addr) && check_end()) {	// JR nn
-			int pc = get_pc() + 2;	// after this intruction
-			int dist = addr - pc;
-			if (dist < -128 || dist>127) {
-				error_range(dist);
-				return false;
-			}
-			emit(0x18);
-			emit(dist);
-			return true;
-		}
-		else {
+			parse_expr(&nn) && check_end())										// JR nn
+			return emit_jr_nn(nn);
+		else
 			restore_ptr(&ptr0);
-		}
 		break;
 	}
 
 	// call
 	case WORD_HASH('C', 'A', 'L', 'L', ___): {
 		ptr += 4;
-		if (parse_jump_call(0xcd, 0xc4))	// CALL flags, nn/CALL nn
+		if (parse_call())						// CALL
 			return true;
 		break;
 	}
 	case WORD_HASH('R', 'S', 'T', ___, ___): {
 		ptr += 3;
-		if (parse_const(&rst) && check_end()) {	// RST n
-			if (rst >= 0 && rst < 8) {
-				emit(0xc7 + (rst << 3));
-				return true;
-			}
-			else {
-				switch (rst) {
-				case 0x00: case 0x08: case 0x10: case 0x18: case 0x20: case 0x28: case 0x30: case 0x38:
-					emit(0xc7 + rst);
-					return true;
-				default:
-					error_range(rst);
-					return false;
-				}
-			}
-		}
+		if (parse_const(&rst) && check_end()) 	// RST n
+			return emit_rst(rst);
 		break;
 	}
 	case WORD_HASH('C', 'N', 'Z', ___, ___): {
 		ptr += 3;
-		if (parse_jump_call_intel(0xc4, F_NZ))	// CNZ nn
+		if (parse_call_intel(F_NZ))				// CNZ nn
 			return true;
 		break;
 	}
 	case WORD_HASH('C', 'Z', ___, ___, ___): {
 		ptr += 2;
-		if (parse_jump_call_intel(0xc4, F_Z))	// CZ nn
+		if (parse_call_intel(F_Z))				// CZ nn
 			return true;
 		break;
 	}
 	case WORD_HASH('C', 'N', 'C', ___, ___): {
-		ptr += 3;
-		if (parse_jump_call_intel(0xc4, F_NC))	// CNC nn
+		ptr += 3;	
+		if (parse_call_intel(F_NC))				// CNC nn
 			return true;
 		break;
 	}
 	case WORD_HASH('C', 'C', ___, ___, ___): {
 		ptr += 2;
-		if (parse_jump_call_intel(0xc4, F_C))	// CC nn
+		if (parse_call_intel(F_C))				// CC nn
 			return true;
 		break;
 	}
 	case WORD_HASH('C', 'P', 'O', ___, ___): {
 		ptr += 3;
-		if (parse_jump_call_intel(0xc4, F_PO))	// CPO nn
+		if (parse_call_intel(F_PO))				// CPO nn
 			return true;
 		break;
 	}
 	case WORD_HASH('C', 'P', 'E', ___, ___): {
 		ptr += 3;
-		if (parse_jump_call_intel(0xc4, F_PE))	// CPE nn
+		if (parse_call_intel(F_PE))				// CPE nn
 			return true;
 		break;
 	}
 	case WORD_HASH('C', 'N', 'V', ___, ___): {
 		ptr += 3;
-		if (parse_jump_call_intel(0xc4, F_NV))	// CNV nn
+		if (parse_call_intel(F_NV))				// CNV nn
 			return true;
 		break;
 	}
 	case WORD_HASH('C', 'V', ___, ___, ___): {
 		ptr += 2;
-		if (parse_jump_call_intel(0xc4, F_V))	// CV nn
+		if (parse_call_intel(F_V))				// CV nn
 			return true;
 		break;
 	}
 	case WORD_HASH('C', 'M', ___, ___, ___): {
 		ptr += 2;
-		if (parse_jump_call_intel(0xc4, F_M))	// CM nn
+		if (parse_call_intel(F_M))				// CM nn
 			return true;
 		break;
 	}
@@ -1972,113 +1691,85 @@ static bool parse_statement(void) {
 	case WORD_HASH('R', 'E', 'T', ___, ___): {
 		ptr += 3;
 		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_flags8(&flags) && check_end()) {	// RET flag
-			emit(0xc0 + (flags << 3));
-			return true;
-		}
-		else if (restore_ptr(&ptr0) && check_end()) {	// RET
-			emit(0xc9);
-			return true;
-		}
-		restore_ptr(&ptr0);
+		if (parse_flags8(&f) && check_end()) 	// RET f
+			return emit_ret_f(f);
+		else if (restore_ptr(&ptr0) && 
+			check_end())						// RET
+			return emit_ret();
+		else
+			restore_ptr(&ptr0);
 		break;
 	}
 	case WORD_HASH('R', 'N', 'Z', ___, ___): {
 		ptr += 3;
-		if (check_end()) {	// RNZ
-			emit(0xc0 + (F_NZ << 3));
-			return true;
-		}
+		if (check_end())						// RNZ
+			return emit_ret_f(F_NZ);
 		break;
 	}
 	case WORD_HASH('R', 'Z', ___, ___, ___): {
 		ptr += 2;
-		if (check_end()) {	// RZ
-			emit(0xc0 + (F_Z << 3));
-			return true;
-		}
+		if (check_end())						// RZ
+			return emit_ret_f(F_Z);
 		break;
 	}
 	case WORD_HASH('R', 'N', 'C', ___, ___): {
 		ptr += 3;
-		if (check_end()) {	// RNC
-			emit(0xc0 + (F_NC << 3));
-			return true;
-		}
+		if (check_end())						// RNC
+			return emit_ret_f(F_NC);
 		break;
 	}
 	case WORD_HASH('R', 'C', ___, ___, ___): {
 		ptr += 2;
-		if (check_end()) {	// RC
-			emit(0xc0 + (F_C << 3));
-			return true;
-		}
+		if (check_end())						// RC
+			return emit_ret_f(F_C);
 		break;
 	}
 	case WORD_HASH('R', 'P', 'O', ___, ___): {
 		ptr += 3;
-		if (check_end()) {	// RPO
-			emit(0xc0 + (F_PO << 3));
-			return true;
-		}
+		if (check_end())						// RPO
+			return emit_ret_f(F_PO);
 		break;
 	}
 	case WORD_HASH('R', 'P', 'E', ___, ___): {
 		ptr += 3;
-		if (check_end()) {	// RPE
-			emit(0xc0 + (F_PE << 3));
-			return true;
-		}
+		if (check_end())						// RPE
+			return emit_ret_f(F_PE);
 		break;
 	}
 	case WORD_HASH('R', 'N', 'V', ___, ___): {
 		ptr += 3;
-		if (check_end()) {	// RNV
-			emit(0xc0 + (F_NV << 3));
-			return true;
-		}
+		if (check_end())						// RNV
+			return emit_ret_f(F_NV);
 		break;
 	}
 	case WORD_HASH('R', 'V', ___, ___, ___): {
 		ptr += 2;
-		if (check_end()) {	// RV
-			emit(0xc0 + (F_V << 3));
-			return true;
-		}
+		if (check_end())						// RV
+			return emit_ret_f(F_V);
 		break;
 	}
 	case WORD_HASH('R', 'P', ___, ___, ___): {
 		ptr += 2;
-		if (check_end()) {	// RP
-			emit(0xc0 + (F_P << 3));
-			return true;
-		}
+		if (check_end())						// RP
+			return emit_ret_f(F_P);
 		break;
 	}
 	case WORD_HASH('R', 'M', ___, ___, ___): {
 		ptr += 2;
-		if (check_end()) {	// RM
-			emit(0xc0 + (F_M << 3));
-			return true;
-		}
+		if (check_end())						// RM
+			return emit_ret_f(F_M);
 		break;
 	}
 	case WORD_HASH('R', 'E', 'T', 'I', ___): {
 		ptr += 4;
-		if (check_end()) {	// RETI
-			emit(0xed);
-			emit(0x4d);
-			return true;
-		}
+		if (check_end())						// RETI
+			return emit_reti();
 		break;
 	}
 	case WORD_HASH('R', 'E', 'T', 'N', ___): {
 		ptr += 4;
-		if (check_end()) {	// RETN
-			emit(0xed);
-			emit(0x45);
-			return true;
-		}
+		if (check_end())						// RETN
+			return emit_retn();
 		break;
 	}
 
