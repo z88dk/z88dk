@@ -371,9 +371,10 @@ ENDIF
 
 IF FORfp1100
 	DEFINE gotgfx
-	defc maxx	= 80
-	defc maxy	= 24
+	defc maxx	= 640
+	defc maxy	= 200
 	defc blankch	= 32
+	defc USEplotc   = 1
 ENDIF
 
 IF FORgal

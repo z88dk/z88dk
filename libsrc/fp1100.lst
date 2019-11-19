@@ -8,6 +8,7 @@ target/fp1100/stdio/fgetc_cons
 target/fp1100/stdio/getk
 @stdio/stdio.lst
 target/fp1100/graphics/clg
+target/fp1100/graphics/textpixl
 target/fp1100/graphics/getmaxx
 target/fp1100/graphics/getmaxy
 target/fp1100/graphics/w_pixladdr
