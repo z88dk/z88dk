@@ -10,16 +10,17 @@
 		PUBLIC		generic_console_vpeek
 		PUBLIC		generic_console_scrollup
 		PUBLIC		generic_console_printc
-                PUBLIC          generic_console_set_ink
-                PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_inverse
+        PUBLIC          generic_console_set_ink
+        PUBLIC          generic_console_set_paper
+        PUBLIC          generic_console_set_inverse
 
 		EXTERN		__console_w
+        EXTERN          __fp1100_attr
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
 		EXTERN		conio_map_colour
-                EXTERN          generic_console_font32
-                EXTERN          generic_console_udg32
+        EXTERN          generic_console_font32
+        EXTERN          generic_console_udg32
 
 		defc		DISPLAY = 0x9000
 
@@ -37,24 +38,24 @@ inverse_off:
 	cp	b
 	ret	z		;No change to inverse
 	ld	(__inverse),a
-	ld	a,(__attr)
+	ld	a,(__fp1100_attr)
 	rrca
 	rrca
 	rrca
 	rrca
-	ld	(__attr),a
+	ld	(__fp1100_attr),a
 	jr	set_colour
 
 generic_console_set_ink:
 	call	conio_map_colour
 	and	7
 	ld	b,a
-	ld	a,(__attr)
+	ld	a,(__fp1100_attr)
 	and	@01110000
 	or	b
-	ld	(__attr),a
+	ld	(__fp1100_attr),a
 set_colour:
-	ld	bc,(__attr)
+	ld	bc,(__fp1100_attr)
 	ld	a,SUB_COLOUR
 	call	TRNC3
 	ret
@@ -67,10 +68,10 @@ generic_console_set_paper:
 	rlca
 	and	@01110000
 	ld	b,a
-	ld	a,(__attr)
+	ld	a,(__fp1100_attr)
 	and	@00000111
 	or	b
-	ld	(__attr),a
+	ld	(__fp1100_attr),a
 	jr	set_colour
 
 generic_console_cls:
@@ -205,11 +206,6 @@ generic_console_printc_3:
         add     hl,bc                   ;hl now points to address in display
         ret
 
-
-	SECTION		data_clib
-
-__attr:		defb	0x07
-		defb	0x00
 
 	SECTION		bss_clib
 __lastxy:	defw	-1
