@@ -20,7 +20,7 @@
 
 
 	defc	SUB_14 = $14
-	defc	SUB_15 = $15
+	defc	SUB_15 = $15		;Called as part of PRINT
 
 	defc	SUB_BLINKON = $1a
 	defc	SUB_BLINKOFF = $1b
@@ -33,9 +33,15 @@
 	; 1 Parameter
 	defc	SUB_PRINTCHAR = $04		; b = character to print
 	defc	SUB_LPRINTCHAR = $1f		; b = character to lprint
-	defc	SUB_SCREENSIZE = $21		; b = 1 = 80, 2 = 40 col
+	defc	SUB_SCREENSIZE = $21		; b = 1 = 80col, 2 = 40col, 0 = 4col b&w
 	defc	SUB_29 = $29			; Colour related?
-	defc	SUB_17 = $17
+	defc	SUB_GATTR = $17			; Graphics attributes b=MC
+	defc	GMODE_PIX_OFF = $00
+	defc	GMODE_PIX_AND = $10
+	defc	GMODE_PIX_OR  = $20
+	defc	GMODE_PIX_XOR = $40
+	defc	GMODE_PIX_NOT = $80
+
 
 	; 2 parameters
 	defc	SUB_SETXY = $12		; b = x, c = y
@@ -43,8 +49,9 @@
 
 
 	; Multiple parameters
-	defc	SUB_PLOT = $19
-	defc	SUB_PRUDG = $20		;8 bytes, prints those bytes at current location
+	defc	SUB_PLOT = $19		;9 bytes:
+	defc	SUB_PRUDG = $20		;8 bytes: 
+	defc	SUB_POINT = $2d		;4 bytes: defw cell, defb bit, defb raster
 
 	; ROM routines
 	defc	SECRD = 0x356		;Read sector, hl= address, b=sector, c=track, e=0, d=drive
@@ -58,10 +65,12 @@
 	defc	TRNC2 = 0x0b00		; 1 Paramter in b
 	defc	TRNC3 = 0x0b09		; Parameter in bc
 	defc	TRNCx = 0x0b16		; b = num params, hl=address
+	defc	READB = 0x0d1c		; Read byte from sub cpu
 
 
 ; Notes:
 ; 0x0b85	- keyboard interrupt
+; 0x0b20	- restore regular interrupt
 ;
 ; 0x0d6b	- action for codes < 32
 ;
