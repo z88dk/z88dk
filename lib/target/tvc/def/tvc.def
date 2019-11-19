@@ -1,0 +1,27 @@
+lstoff
+
+; Enterprise 64/128 related constants
+;
+; March 2011
+;
+; $Id: enterprise.def,v 1.1 2011-03-14 11:36:48 stefano Exp $
+;
+
+
+; Memory segments
+
+; Byte values
+defc P_SAVE         = $0003 ; Save address of PORT 2, the memory mapping port
+
+; Word values
+defc INTINC         = $0B1D   ; Address of the interrupt counter (happens once in each 20.096ms)
+
+; Warnings
+
+; Kernel error codes
+
+; General Device Errors
+
+; Device Specific Errors
+
+lston
