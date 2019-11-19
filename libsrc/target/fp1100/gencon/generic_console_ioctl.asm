@@ -33,11 +33,11 @@ check_set_mode:
         jr      nz,failure
         ld      a,c
         ld      b,0
-        ld      c,40
-        and     a
+        ld      l,40
+        and     1
         jr      z,setmode
         ld      b,1
-        ld      c,80
+        ld      l,80
         dec     a
         jr      z,setmode
 failure:
@@ -45,9 +45,9 @@ failure:
         ret
 
 setmode:
-        ld      a,b
-        ld      (__fp1100_mode),a
         ld      a,c
+        ld      (__fp1100_mode),a
+        ld      a,l
         ld      (__console_w),a
         ld      a,SUB_SCREENSIZE
         call    TRNC2

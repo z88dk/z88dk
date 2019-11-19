@@ -1,13 +1,13 @@
 
-	EXTERN w_pixeladdress
+    EXTERN  w_pixeladdress
 
-	EXTERN	getmaxy
-	EXTERN	getmaxx
-	EXTERN	l_cmp
-	EXTERN	__gfx_coords
-        EXTERN  __fp1100_plot_buffer
+    EXTERN  getmaxy
+    EXTERN  getmaxx
+    EXTERN  l_cmp
+    EXTERN  __gfx_coords
+    EXTERN  __fp1100_plot_buffer
 
-	EXTERN	__fp1100_attr
+    EXTERN  __fp1100_attr
 
     INCLUDE "target/fp1100/def/fp1100.def"
 
