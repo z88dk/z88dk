@@ -6,6 +6,7 @@
     EXTERN  __console_w
     EXTERN  generic_console_font32
     EXTERN  generic_console_udg32
+    EXTERN  __fp1100_mode
     
     INCLUDE "target/fp1100/def/fp1100.def"
     INCLUDE "ioctl.def"
@@ -44,6 +45,8 @@ failure:
         ret
 
 setmode:
+        ld      a,b
+        ld      (__fp1100_mode),a
         ld      a,c
         ld      (__console_w),a
         ld      a,SUB_SCREENSIZE
