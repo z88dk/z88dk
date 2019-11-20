@@ -15,7 +15,7 @@ include Make.config
 all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	abc80_clib.lib abc800_clib.lib ace_clib.lib aquarius_clib.lib \
 	aussie.lib bee_clib.lib microbee.lib c7420_clib.lib \
-	cpm_clib.lib einstein.lib fp1100_clib.lib gal_clib.lib \
+	tvc_clib.lib cpm_clib.lib einstein.lib fp1100_clib.lib gal_clib.lib \
 	g800_clib.lib m5_clib.lib mc1000_clib.lib \
 	msx_clib.lib mtx_clib.lib mz_clib.lib mz2500_clib.lib x1_clib.lib \
 	nascom_clib.lib  newbrain_clib.lib \
@@ -29,7 +29,7 @@ all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	laser500_clib.lib super80_clib.lib super80_vduem_clib.lib \
 	adam.lib z80tvgame_clib.lib smc777.lib pasopia7_clib.lib sv8000_clib.lib \
 	excali64_clib.lib gb_clib.lib s1mp3_clib.lib bic.lib \
-	preempt.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib tvc_clib.lib 
+	preempt.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib 
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib mbf32.lib mbf64.lib math32.lib gendos.lib ndos.lib  \
 	 lib3d.lib x11.lib fastmath.lib
@@ -834,7 +834,6 @@ tvc_clib.lib:
 	$(MAKE) gfxdeps
 	$(call buildgeneric,tvc)
 	$(MAKE) -C games TARGET=tvc
-	$(MAKE) -C tvc 
 	TARGET=tvc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORtvc -x$(OUTPUT_DIRECTORY)/tvc_clib @$(LISTFILE_DIRECTORY)/tvc.lst
 
 

@@ -44,8 +44,9 @@
 		defc __CPU_CLOCK = 3125000
         INCLUDE "crt/classic/crt_rules.inc"
 
+; This is a required value in order to be able to generate .cas file
 IF      !DEFINED_CRT_ORG_CODE
-		defc    CRT_ORG_CODE  = 1a00h
+		defc    CRT_ORG_CODE  = 1a03h
 ENDIF
 		org     CRT_ORG_CODE
 
@@ -56,6 +57,8 @@ ENDIF
 start:
 
         ;di
+        push ix
+        push iy
         ld      (start1+1),sp
 		INCLUDE "crt/classic/crt_init_sp.asm"
 
@@ -85,6 +88,8 @@ ENDIF
 
 start1:
         ld      sp,0
+        pop iy
+        pop ix
         ret
 
 

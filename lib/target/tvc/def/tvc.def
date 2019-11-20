@@ -11,9 +11,11 @@ lstoff
 ; Memory segments
 
 ; Byte values
-defc P_SAVE         = $0003 ; Save address of PORT 2, the memory mapping port
+
 
 ; Word values
+defc P_SAVE         = $0003   ; Save address of PORT 2, the memory mapping port
+defc PORT03         = $0B11   ; Save address of PORT 3, the keyboard row select and IO socket select port 
 defc INTINC         = $0B1D   ; Address of the interrupt counter (happens once in each 20.096ms)
 
 ; Warnings
