@@ -19,6 +19,6 @@
 	ld hl,(INTINC) ; count of 20.096ms from start (can count up to almost 22mins)
     ei
 	ex de,hl
-;    ld d,0
-;    ld e,0
+    ld h,0
+    ld l,h
 	ret
