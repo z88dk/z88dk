@@ -59,6 +59,11 @@ start:
         ;di
         push ix
         push iy
+        exx
+        push bc
+        push hl
+        exx
+        
         ld      (start1+1),sp
 		INCLUDE "crt/classic/crt_init_sp.asm"
 
@@ -88,6 +93,10 @@ ENDIF
 
 start1:
         ld      sp,0
+        exx
+        pop hl
+        pop bc
+        exx        
         pop iy
         pop ix
         ret
