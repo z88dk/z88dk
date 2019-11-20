@@ -1,19 +1,16 @@
 lstoff
 
-; Enterprise 64/128 related constants
+; Videoton TV Computer related constants
 ;
 ; March 2011
 ;
-; $Id: enterprise.def,v 1.1 2011-03-14 11:36:48 stefano Exp $
-;
-
 
 ; Memory segments
 
-; Byte values
+; Function code
+defc ED_CHOUT       = $21     ; Editor character out, char in C
 
-
-; Word values
+; Special addresses
 defc P_SAVE         = $0003   ; Save address of PORT 2, the memory mapping port
 defc PORT03         = $0B11   ; Save address of PORT 3, the keyboard row select and IO socket select port 
 defc INTINC         = $0B1D   ; Address of the interrupt counter (happens once in each 20.096ms)

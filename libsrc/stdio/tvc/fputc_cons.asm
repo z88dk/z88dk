@@ -9,23 +9,20 @@
 ;
 ;	Stefano Bodrato - 2011
 ;
-;
-;	$Id: fputc_cons.asm,v 1.5 2016-05-15 20:15:45 dom Exp $
-;
 
 	SECTION code_clib
 	PUBLIC  fputc_cons_native
-
+    INCLUDE "target/tvc/def/tvc.def"
 
 ;
-; Entry:        hl = points to char
+; Entry:        stack contains a char
 ;
 .fputc_cons_native
-	ld      hl,2
-	add     hl,sp
-	ld      a,(hl)
+    ld      hl,2
+    add     hl,sp
+    ld      a,(hl)
     ld      c,a
     rst     $30
-    defb    $21 ; editor - character out
+    defb    ED_CHOUT ; editor - character out
 	ret
 

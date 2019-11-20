@@ -18,13 +18,7 @@
     di
 	ld hl,(INTINC) ; count of 20.096ms from start (can count up to almost 22mins)
     ei
-	
-    ;              C hours   0 .. 23 (BCD)
-    ;              D minutes 0 .. 59 (BCD)
-    ;              E seconds 0 .. 59 (BCD) 	
-
-	; let's copy the result in dehl
-	; in a quick but wrong way..
-    ld d,0
-	ld e,0
+	ex de,hl
+;    ld d,0
+;    ld e,0
 	ret
