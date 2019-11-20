@@ -6,6 +6,7 @@
     EXTERN  __console_w
     EXTERN  generic_console_font32
     EXTERN  generic_console_udg32
+    EXTERN  __fp1100_mode
     
     INCLUDE "target/fp1100/def/fp1100.def"
     INCLUDE "ioctl.def"
@@ -32,11 +33,11 @@ check_set_mode:
         jr      nz,failure
         ld      a,c
         ld      b,0
-        ld      c,40
-        and     a
+        ld      l,40
+        and     1
         jr      z,setmode
         ld      b,1
-        ld      c,80
+        ld      l,80
         dec     a
         jr      z,setmode
 failure:
@@ -45,6 +46,8 @@ failure:
 
 setmode:
         ld      a,c
+        ld      (__fp1100_mode),a
+        ld      a,l
         ld      (__console_w),a
         ld      a,SUB_SCREENSIZE
         call    TRNC2
