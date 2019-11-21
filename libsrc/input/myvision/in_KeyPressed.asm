@@ -4,6 +4,9 @@ SECTION code_clib
 PUBLIC in_KeyPressed
 PUBLIC _in_KeyPressed
 
+EXTERN l_push_di
+EXTERN l_pop_ei
+
 ; Determines if a key is pressed using the scan code
 ; returned by in_LookupKey.
 
@@ -16,7 +19,7 @@ PUBLIC _in_KeyPressed
 .in_KeyPressed
 ._in_KeyPressed
 	; Write line to port b of the ay
-	di
+	call	l_push_di
 	ld	a,15
 	out	($00),a
 	ld	a,l
@@ -25,7 +28,9 @@ PUBLIC _in_KeyPressed
 	out	($00),a
 	; And we want to read port a of the AY
 	in	a,($02)
-	ei
+	ex	af,af
+	call	l_pop_ei
+	ex	af,af
 	cpl
 	and	h
 	jr	z,fail

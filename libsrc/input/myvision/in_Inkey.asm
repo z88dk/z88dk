@@ -8,6 +8,8 @@ SECTION code_clib
 PUBLIC in_Inkey
 PUBLIC _in_Inkey
 EXTERN in_keytranstbl
+EXTERN l_push_di
+EXTERN l_pop_ei
 
 ; exit : carry set and HL = 0 for no keys registered
 ;        else HL = ASCII character code
@@ -18,9 +20,9 @@ EXTERN in_keytranstbl
 	ld	hl,0
 	ld	c,@01111111
 	ld	b,4
+	call	l_push_di
 loop:
         ; Write line to port b of the ay
-	di
         ld      a,15
         out     ($00),a
         ld      a,c
@@ -29,7 +31,6 @@ loop:
         ld      a,14
         out     ($00),a
         in      a,($02)
-	ei
 	cpl
 	and	@11111000
 	jr	nz,gotkey
@@ -39,11 +40,15 @@ loop:
 	rrc	c
 	djnz	loop
 nokey:
+	call	l_pop_ei
 	ld	hl,0
 	scf
 	ret
 
 gotkey:
+	ex	af,af
+	call	l_pop_ei
+	ex	af,af
     ; a = key pressed
     ; l = offset
 	ld	c,5
