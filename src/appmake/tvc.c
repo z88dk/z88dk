@@ -23,16 +23,14 @@ option_t tvc_options[] = {
 };
 
 /* Executable CAS FILE header
- * 00    filetype    file type, 01h/11h: buffered/unbuffered
- *           
- * 01    copyprotect 
- *           00h is not protected
+ * 00    filetype    file type, 01h/11h: buffered/unbuffered   
+ * 01    copyprotect 00h is not protected
  * 02-03 blocknumber lo/hi 	
- *           A program által elfoglalt 80h méretq blokkok száma
+ *           Number of 80h sized blocks occupied by the program
  * 04    lastblockbytes
  *           Number of useful bytes in the last block (1-128)
  * 05-7F 00h         Always 0x00
- *  *** 16bytes header of buffered files ***
+ *  *** 16bytes header of non-buffered files ***
  * 80    00h         Always 0x00
  * 81    type        01 - program file, 00 - data file
  * 82-83 prgsize     lo/hi Size of the program
@@ -40,7 +38,7 @@ option_t tvc_options[] = {
  * 85-8E 00h         Always 0x00
  * 8F    versionnumber
  *           version (most of the cases it is not used)
- * 90-n  databytes   program adatbájtjai, egészen a fájl végéig.
+ * 90-n  databytes   payload
  */
 
 /*
@@ -104,10 +102,10 @@ int tvc_exec(char *target)
         myexit("Can't open output file\n",1);
     }
     
-    writebyte(0x01,fpout); // buffered file
+    writebyte(0x11,fpout); // buffered file
     writebyte(0x00,fpout); // not protected
-    writeword(((len+0x90 - 1) / 0x80) + 1, fpout); // num of blocks
-    writebyte(((len+0x90-1) % 0x80) + 1, fpout);  // num of valid bytes in the last block
+    writeword(((len - 1) / 0x80) + 1, fpout); // num of blocks
+    writebyte(((len - 1) % 0x80) + 1, fpout);  // num of valid bytes in the last block
     for(int i=0x05; i<0x80; i++) { // padding to 0x7f (inclusive)
 		writebyte(0x00, fpout);
 	}
