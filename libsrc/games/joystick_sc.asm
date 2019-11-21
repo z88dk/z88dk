@@ -45,6 +45,9 @@ continue:
 	pop	hl
 	pop	bc
 	djnz	loop
+	ld	l,d
+	ld	h,0
+	ret
 finished:
 	pop	bc
 	ld	l,d
