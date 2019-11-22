@@ -28,7 +28,7 @@ all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	pv1000_clib.lib pv2000_clib.lib coleco_clib.lib multi8_clib.lib alphatro_clib.lib  spc1000_clib.lib \
 	laser500_clib.lib super80_clib.lib super80_vduem_clib.lib \
 	adam.lib z80tvgame_clib.lib smc777.lib pasopia7_clib.lib sv8000_clib.lib \
-	excali64_clib.lib gb_clib.lib s1mp3_clib.lib bic.lib \
+	excali64_clib.lib gb_clib.lib s1mp3_clib.lib bic.lib myvision_clib.lib \
 	preempt.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib tvc_clib.lib 
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib mbf32.lib mbf64.lib math32.lib gendos.lib ndos.lib  \
@@ -1116,6 +1116,18 @@ pv2000_clib.lib:
 	$(MAKE) -C games TARGET=pv2000
 	$(MAKE) -C video/tms9918 TARGET=pv2000
 	TARGET=pv2000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORpv2000 -x$(OUTPUT_DIRECTORY)/pv2000_clib @$(LISTFILE_DIRECTORY)/pv2000.lst
+
+# Nichibutsu My Vision- dom/stefano
+myvision_clib.lib:
+	@echo ''
+	@echo '--- Building Nichibutsu My Vision Library ---'
+	@echo ''
+	$(MAKE) msxdeps
+	$(MAKE) -C games TARGET=myvision
+	$(call buildgeneric,myvision)
+	$(MAKE) -C games TARGET=myvision
+	$(MAKE) -C video/tms9918 TARGET=myvision
+	TARGET=myvision TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmyvision -x$(OUTPUT_DIRECTORY)/myvision_clib @$(LISTFILE_DIRECTORY)/myvision.lst
 
 # Bandai Supervision 8000 - dom
 sv8000_clib.lib:

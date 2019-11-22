@@ -84,6 +84,16 @@ IF FORpv2000
 	defc VDP_EXPORT_GFX_DIRECT = 1
 ENDIF
 
+IF FORmyvision
+	defc VDP_DATA    = -0xe000
+	defc VDP_DATAIN  = -0xe000
+	defc VDP_CMD     = -0xe002
+	defc VDP_STATUS  = -0xe002
+	defc VRAM_SIZE   = 16
+	defc VDP_EXPORT_DIRECT = 1
+	defc VDP_EXPORT_GFX_DIRECT = 1
+ENDIF
+
 IF FORsg1000
 	defc VDP_DATA    = 0xbe
 	defc VDP_DATAIN  = 0xbe

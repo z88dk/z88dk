@@ -295,6 +295,12 @@ IF FORsmc777
     defc sndbit_mask   = $15
 ENDIF
 
+IF FORmyvision
+    defc sndbit_port	= 0
+    defc sndbit_bit    = 0
+    defc sndbit_mask   = 0
+ENDIF
+
 
 ; ********************************************************
 ;  SN76489 PSG chip definitions
