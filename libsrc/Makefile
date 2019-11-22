@@ -28,7 +28,7 @@ all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	pv1000_clib.lib pv2000_clib.lib coleco_clib.lib multi8_clib.lib alphatro_clib.lib  spc1000_clib.lib \
 	laser500_clib.lib super80_clib.lib super80_vduem_clib.lib \
 	adam.lib z80tvgame_clib.lib smc777.lib pasopia7_clib.lib sv8000_clib.lib \
-	excali64_clib.lib gb_clib.lib s1mp3_clib.lib bic.lib myvision_clib.lib \
+	excali64_clib.lib gb_clib.lib s1mp3_clib.lib bic.lib myvision_clib.lib pencil2_clib.lib \
 	preempt.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib 
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib mbf32.lib mbf64.lib math32.lib gendos.lib ndos.lib  \
@@ -1139,6 +1139,18 @@ coleco_clib.lib:
 	$(MAKE) -C games TARGET=coleco
 	$(MAKE) -C video/tms9918 TARGET=coleco
 	TARGET=coleco TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcoleco -x$(OUTPUT_DIRECTORY)/coleco_clib @$(LISTFILE_DIRECTORY)/coleco.lst
+
+# Pencil II - dom/stefano
+pencil2_clib.lib:
+	@echo ''
+	@echo '--- Building Pencil II Library ---'
+	@echo ''
+	$(MAKE) msxdeps
+	$(MAKE) -C games TARGET=pencil2
+	$(call buildgeneric,pencil2)
+	$(MAKE) -C video/tms9918 TARGET=pencil2
+	TARGET=pencil2 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORpencil2 -x$(OUTPUT_DIRECTORY)/pencil2_clib @$(LISTFILE_DIRECTORY)/pencil2.lst
+
 
 # Untested C lib for NC100 machines - dom
 nc_clib.lib:

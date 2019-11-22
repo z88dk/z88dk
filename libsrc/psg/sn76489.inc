@@ -36,6 +36,10 @@ IF FORcoleco
 	defc psgport	= $E0		; also valid for Coleco Adam and Pencil II
 ENDIF
 
+IF FORpencil2
+	defc psgport	= $E0		; also valid for Coleco Adam and Pencil II
+ENDIF
+
 ; ********************************************************
 ;   This last part refers to NOT YET supported hardware
 ; ********************************************************

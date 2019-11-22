@@ -114,6 +114,16 @@ IF FORcoleco
 	defc VDP_EXPORT_GFX_DIRECT = 1
 ENDIF
 
+IF FORpencil2
+	defc VDP_DATA    = 0xbe
+	defc VDP_DATAIN  = 0xbe
+	defc VDP_CMD     = 0xbf
+	defc VDP_STATUS  = 0xbf
+	defc VRAM_SIZE   = 16
+	defc VDP_EXPORT_DIRECT = 1
+	defc VDP_EXPORT_GFX_DIRECT = 1
+ENDIF
+
 IF FORspc1000
 	defc VDP_DATA    = 0xc800
 	defc VDP_DATAIN  = 0xc800
