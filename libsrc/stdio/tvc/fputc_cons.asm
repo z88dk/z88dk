@@ -20,8 +20,7 @@
 .fputc_cons_native
     ld      hl,2
     add     hl,sp
-    ld      a,(hl)
-    ld      c,a
+    ld      c,(hl)
     rst     $30
     defb    ED_CHOUT ; editor - character out
 	ret
