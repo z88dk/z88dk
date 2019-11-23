@@ -7,1786 +7,1302 @@
 #include "frontend.h"
 #include "backend.h"
 #include "utils.h"
+#include "utarray.h"
+#include "uthash.h"
+#include "utlist.h"
 #include "utstring.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
 
-#define ___ ' '
-#define CHAR_HASH(c)			(((c)-___) & 0x3f)
-#define WORD_HASH(a,b,c,d,e)	((CHAR_HASH(a)<<24) | \
-								 (CHAR_HASH(b)<<18) | \
-								 (CHAR_HASH(c)<<12) | \
-								 (CHAR_HASH(d)<< 6) | \
-								  CHAR_HASH(e))
+// forward declarations
+static void copy_token(void* dst, const void* src);
+static void dtor_token(void* elt);
 
-static FILE* input_file = NULL;
-static char* input_filename = NULL;
-static int line_num = 0;
-static int num_errors = 0;
-static UT_string* input_line = NULL;
-static const char* ptr = NULL;
+// tokens from scanner, in same space as characters
+enum {
+	T_END = 0, T_IDENT = 0x100, T_NUM, T_STR,
+	T_F, T_I, T_R,
+	T_ASMPC,
+};
+
+// bit-flags for keyword_t.flags
+enum {
+	IS_REG8 = 0x0001, IS_REG8_INTEL = 0x0002, IS_REG8_IDX = 0x0004,
+	IS_REG16_AF = 0x0008, IS_REG16_SP = 0x0010, IS_REG16_INTEL = 0x0020, IS_REG16_IDX = 0x0040,
+	IS_REG16_BCDE = 0x0080,
+	IS_FLAG_CZ = 0x0100, IS_FLAG_PM = 0x0200,
+	IS_OPCODE = 0x0400,
+};
+
+// keyword lookup tables
+typedef struct {
+	const char* word;
+	int id;
+	int flags, reg8_value, reg16_value, flag_value;
+	bool (*parse)(int opcode_value);
+	int opcode_value;
+	UT_hash_handle hh;
+} keyword_t;
+
+// scanned token
+typedef struct token_t {
+	int id;					// token id
+	const keyword_t* keyword;	// points to keyword if T_IDENT and found in keyword table
+	char* str;					// copy of T_IDENT or T_STR token
+	int num;					// value of T_NUM token
+} token_t;
+
+UT_icd token_icd = { sizeof(token_t), NULL, copy_token, dtor_token };
+
+// scanner state
+typedef struct scan_t {
+	UT_array* tokens;			// scanned tokens
+
+	struct scan_t* next;		// LL-list of scan states
+} scan_t;
+
+// forward declarations
+static void init_keywords(void);
+static const keyword_t* lookup_keyword(const char* word);
+
+// globals
+static FILE* input_file;
+static char* input_filename;
+static int line_num;
+static int num_errors;
+
+static scan_t* scanner;				// current scanner
+static token_t* yy;					// points to tokens to be analyzed
 
 //-----------------------------------------------------------------------------
 // init
 //-----------------------------------------------------------------------------
 static void init(void) {
-	if (input_file) fclose(input_file);
-	input_file = NULL;
-	free(input_filename);
-	input_filename = NULL;
-	line_num = num_errors = 0;
-	utstring_new(input_line);
-	ptr = utstring_body(input_line);
+	static bool inited = false;
+	if (!inited) {
+		if (input_file) fclose(input_file);
+		input_file = NULL;
+		free(input_filename);
+		input_filename = NULL;
+		line_num = num_errors = 0;
+
+		init_keywords();
+
+		inited = true;
+	}
+}
+
+//-----------------------------------------------------------------------------
+// scanner
+//-----------------------------------------------------------------------------
+static void copy_token(void* dst_, const void* src_) {
+	token_t* dst = dst_;
+	const token_t* src = src_;
+
+	dst->id = src->id;
+	dst->keyword = src->keyword;
+	dst->str = src->str ? safe_strdup(src->str) : NULL;
+	dst->num = src->num;
+}
+
+static void dtor_token(void* elt_) {
+	token_t* elt = elt_;
+	free(elt->str);
+}
+
+// start a new scan state
+static void new_scan(void) {
+	scan_t* newyy = safe_calloc(1, sizeof(scan_t));
+	LL_PREPEND(scanner, newyy);
+	utarray_new(scanner->tokens, &token_icd);
+}
+
+static void delete_scan(void) {
+	scan_t* old = scanner;
+	utarray_free(old->tokens);
+	LL_DELETE(scanner, old);
+	free(old);
+}
+
+static token_t* scan_text(const char* input) {
+	UT_string* str; utstring_new(str);
+	utarray_clear(scanner->tokens);
+
+	// scan all input tokens
+	token_t empty = { T_END };
+	const char* p = input;
+	while (true) {
+		utarray_push_back(scanner->tokens, &empty);		// add token with id=T_END
+		token_t* tok = (token_t*)utarray_back(scanner->tokens);	// point to last token
+
+		while (isspace(*p)) p++;						// skip spaces
+		if (*p == '\0' || *p == ';') break;				// end of line of start of comment
+
+		const char* ts = p;
+		if (*p == '_' || isalpha(*p)) {					// T_IDENT
+			while (*p == '_' || isalnum(*p)) p++;
+			utstring_set_n(str, ts, p - ts);			// identifier
+
+			tok->id = T_IDENT;
+			tok->str = safe_strdup(utstring_body(str));	// make a copy
+
+			utstring_toupper(str);						// convert to upper case to lookup keyword
+			tok->keyword = lookup_keyword(utstring_body(str));
+		}
+		else if (isdigit(*p)) {							// T_NUM
+			tok->id = T_NUM;
+			tok->num = (int)strtol(p, (char**)& p, 0);
+		}
+		else {											// any other
+			tok->id = *p++;
+		}
+	}
+	utstring_free(str);
+
+	return (token_t*)utarray_front(scanner->tokens);
 }
 
 //-----------------------------------------------------------------------------
 // errors
 //-----------------------------------------------------------------------------
-void error_syntax(void) {
-	fprintf(stderr, "Error at %s line %d: Syntax error at: %s", input_filename, line_num, ptr);
-	ptr += strlen(ptr);
+void syntax_error(void) {
+	fprintf(stderr, "Error at %s line %d: Syntax error\n", input_filename, line_num);
 	num_errors++;
+	yy = (token_t*)utarray_back(scanner->tokens);		// skip rest of line
 }
 
-void error_range(int n) {
+void range_error(int n) {
 	fprintf(stderr, "Error at %s line %d: Range error: %d\n", input_filename, line_num, n);
-	ptr += strlen(ptr);
 	num_errors++;
+	yy = (token_t*)utarray_back(scanner->tokens);		// skip rest of line
 }
 
-void error_illegal(void) {
+void illegal_opcode_error(void) {
 	fprintf(stderr, "Error at %s line %d: Illegal instruction\n", input_filename, line_num);
-	ptr += strlen(ptr);
 	num_errors++;
+	yy = (token_t*)utarray_back(scanner->tokens);		// skip rest of line
+}
+
+void reserved_warning(const char* word) {
+	fprintf(stderr, "Warning at %s line %d: Keyword used as symbol: %s\n", input_filename, line_num, word);
 }
 
 //-----------------------------------------------------------------------------
 // parser
 //-----------------------------------------------------------------------------
-static void save_ptr(const char** save) {
-	*save = ptr;
+static const keyword_t* parse_keyword(int mask) {
+	if (yy[0].id == T_IDENT && yy[0].keyword && (yy[0].keyword->flags & mask) != 0) {
+		yy++;
+		return yy[-1].keyword;
+	}
+	else
+		return NULL;
 }
 
-static bool restore_ptr(const char** save) {
-	ptr = *save;
-	return true;
+static bool parse_reg8(int flags, int* out) {
+	const keyword_t* kw = parse_keyword(flags);
+	if (kw) {
+		*out = kw->reg8_value;
+		return true;
+	}
+	else 
+		return false;
 }
 
-static bool isident_start(char c) {
-	return c == '_' || isalpha(c);
+static bool parse_reg16(int flags, int* out) {
+	const keyword_t* kw = parse_keyword(flags);
+	if (kw) {
+		*out = kw->reg16_value;
+		return true;
+	}
+	else 
+		return false;
 }
 
-static bool isident(char c) {
-	return c == '_' || isalnum(c);
+static bool parse_flags(int flags, int* out) {
+	const keyword_t* kw = parse_keyword(flags);
+	if (kw) {
+		*out = kw->flag_value;
+		return true;
+	}
+	else
+		return false;
 }
 
-static void blanks(void) {
-	while (isspace(*ptr)) ptr++;
+static bool FLAGS4(int* out) {
+	return parse_flags(IS_FLAG_CZ, out);
 }
 
-static bool parse_separator(const char* separator) {
-	blanks();
-	for (int i = 0; separator[i]; i++)
-		if (ptr[i] != separator[i])
-			return false;
-	ptr += strlen(separator);
-	return true;
+static bool FLAGS8(int* out) {
+	return parse_flags(IS_FLAG_CZ | IS_FLAG_PM, out);
 }
 
-static bool parse_comma(void) {
-	return parse_separator(",");
-}
-
-static bool parse_tick(void) {
-	return parse_separator("'");
-}
-
-static bool parse_plus(void) {
-	return parse_separator("+");
-}
-
-static bool parse_minus(void) {
-	return parse_separator("-");
-}
-
-static bool parse_lparen(void) {
-	return parse_separator("(");
-}
-
-static bool parse_rparen(void) {
-	return parse_separator(")");
-}
-
-static bool parse_word(const char* word) {
-	blanks();
-	for (int i = 0; word[i]; i++)
-		if (toupper(ptr[i]) != toupper(word[i]))
-			return false;
-	if (isident(ptr[strlen(word)])) return false;
-	ptr += strlen(word);
-	return true;
-}
-
-static bool parse_end(void) {
-	blanks();
-	switch (*ptr) {
+static bool EOS(void) {
+	switch (yy[0].id) {
 	case '\0':	return true;
-	case ':':	ptr++; return true;
-	case '\\':	ptr++; return true;
-	case ';':	ptr += strlen(ptr); return true;
+	case ':':	yy++; return true;
+	case '\\':	yy++; return true;
 	default:	return false;
 	}
 }
 
-static bool check_end(void) {
-	if (!parse_end()) {
-		error_syntax();
-		return false;
+static bool KW(int id) {
+	if (yy[0].id == T_IDENT && yy[0].keyword && yy[0].keyword->id == id) {
+		yy++;
+		return true;
 	}
 	else
-		return true;
+		return false;
 }
 
-static bool parse_ident(UT_string *ident) {
-	blanks();
-	if (!isident_start(*ptr)) return false;
-	const char* start_ident = ptr++;
-	while (isident(*ptr)) ptr++;
+static bool TK(int id) {
+	if (yy[0].id == id) {
+		yy++;
+		return true;
+	}
+	else
+		return false;
+}
 
-	utstring_clear(ident); utstring_bincpy(ident, start_ident, ptr - start_ident);
+static bool LABEL(UT_string* label) {
+	int ident;
+	if (yy[0].id == '.' && yy[1].id == T_IDENT)
+		ident = 1;
+	else if (yy[0].id == T_IDENT && yy[1].id == ':')
+		ident = 0;
+	else
+		return false;
+
+	utstring_set(label, yy[ident].str);		// get label
+	if (yy[ident].keyword)
+		reserved_warning(yy[ident].str);
+	yy += 2;
 	return true;
 }
 
-static unsigned get_word_hash(void) {
-	blanks();
-	if (isident_start(*ptr)) {
-		char a[5] = { ___,___,___,___,___ };
-		for (int i = 0; i < sizeof(a) && isident(ptr[i]); i++) {
-			a[i] = toupper(ptr[i]);
-		}
-		return WORD_HASH(a[0], a[1], a[2], a[3], a[4]);
-	}
-	else {
-		return 0;
+static bool SIGN(int* out) {
+	switch (yy[0].id) {
+	case '-':	*out = -1; yy++; return true;
+	case '+':	*out = 1; yy++; return true;
+	default:	*out = 1; return false;
 	}
 }
 
-static bool parse_const(int* out_value) {	// TODO: parse expressions
-	blanks();
-	if (isdigit(*ptr)) {
-		*out_value = (int)strtol(ptr, (char**)& ptr, 0);
+static bool EXPR(int* out) {	// TODO: parse expressions
+	int sign = 1;
+	SIGN(&sign);
+	switch (yy[0].id) {
+	case '$':
+		*out = sign * get_pc();
+		yy++;
 		return true;
-	}
-	else {
-		*out_value = 0;
-		return false;
-	}
-}
 
-static bool parse_expr(int* out_value) {	// TODO: parse expressions
-	const char* ptr0; blanks(); save_ptr(&ptr0);
-	if (parse_word("ASMPC") || parse_separator("$")) {
-		*out_value = get_pc();
-		return true;
-	}
-	else {
-		restore_ptr(&ptr0);
-		bool negative = parse_minus() ? true : false;
-		blanks();
-		if (isdigit(*ptr)) {
-			*out_value = (int)strtol(ptr, (char**)& ptr, 0);
-			if (negative)* out_value = -*out_value;
+	case T_IDENT:
+		if (yy[0].keyword && yy[0].keyword->id == T_ASMPC) {
+			*out = sign * get_pc();
+			yy++;
 			return true;
 		}
-		else {
-			restore_ptr(&ptr0);
-			*out_value = 0;
+		else
 			return false;
-		}
-	}
-}
 
-static bool parse_indexpr(int* out_value) {
-	const char* ptr0; blanks(); save_ptr(&ptr0);
-	if (parse_lparen() && parse_expr(out_value) && parse_rparen())
+	case T_NUM:
+		*out = sign * yy[0].num;
+		yy++;
 		return true;
-	else {
-		restore_ptr(&ptr0);
-		*out_value = 0;
+
+	default:
 		return false;
 	}
 }
 
-static bool parse_plus_offset(int* out_dis) {
-	const char* ptr0; blanks(); save_ptr(&ptr0);
-	if (parse_rparen()) {
-		*out_dis = 0;
+static bool CONST(int* out) {	// TODO: parse expressions
+	if (yy[0].id == T_NUM) {
+		*out = yy[0].num;
+		yy++;
 		return true;
 	}
-	else if (restore_ptr(&ptr0) &&
-		parse_plus() && parse_expr(out_dis) && parse_rparen()) {
-		return true;
-	}
-	else if (restore_ptr(&ptr0) &&
-		parse_minus() && parse_expr(out_dis) && parse_rparen()) {
-		*out_dis = -*out_dis;
-		return true;
-	}
-	else {
-		restore_ptr(&ptr0);
-		*out_dis = 0;
-		return false;
-	}
+	return false;
 }
 
-static bool parse_dot_label(UT_string* label) {
-	const char* ptr0; blanks(); save_ptr(&ptr0);
-	if (parse_separator(".") && parse_ident(label))
+static bool IND_EXPR(int* out) {
+	token_t* yy0 = yy;
+	if (TK('(') && EXPR(out) && TK(')'))
 		return true;
-	else {
-		restore_ptr(&ptr0);
-		return false;
-	}
+	yy = yy0;
+	return false;
 }
 
-static bool parse_label_colon(UT_string* label) {
-	const char* ptr0; blanks(); save_ptr(&ptr0);
-	if (parse_ident(label) && parse_separator(":"))
+static bool REG8(int* out) {
+	return parse_reg8(IS_REG8, out);
+}
+
+static bool REG8_X(int* out) {
+	return parse_reg8(IS_REG8 | IS_REG8_IDX, out);
+}
+
+static bool REG8_INTEL(int* out) {
+	return parse_reg8(IS_REG8 | IS_REG8_INTEL, out);
+}
+
+static bool A() {
+	int r;
+	if (REG8(&r) && r == R_A)
 		return true;
-	else {
-		restore_ptr(&ptr0);
-		return false;
-	}
+	return false;
 }
 
-static bool parse_label(UT_string* label) {
-	blanks();
-	return parse_dot_label(label) || parse_label_colon(label);
+static bool B() {
+	int r;
+	if (REG8(&r) && r == R_B)
+		return true;
+	return false;
 }
 
-static bool parse_reg8(int* out_r) {
-	blanks();
-	if (isident_start(ptr[0]) && !isident(ptr[1])) {
-		switch (toupper(ptr[0])) {
-		case 'B': ptr++; *out_r = R_B; return true;
-		case 'C': ptr++; *out_r = R_C; return true;
-		case 'D': ptr++; *out_r = R_D; return true;
-		case 'E': ptr++; *out_r = R_E; return true;
-		case 'H': ptr++; *out_r = R_H; return true;
-		case 'L': ptr++; *out_r = R_L; return true;
-		case 'A': ptr++; *out_r = R_A; return true;
-		default: return false;
-		}
-	}
+static bool C() {
+	int r;
+	if (REG8(&r) && r == R_C)
+		return true;
+	return false;
+}
+
+static bool IND_C(void) {
+	token_t* yy0 = yy;
+	if (TK('(') && C() && TK(')'))
+		return true;
+	yy = yy0;
+	return false;
+}
+
+static void OPT_A_COMMA() {
+	token_t* yy0 = yy;
+	if (A() && TK(','))
+		return;
 	else
-		return false;
+		yy = yy0;
 }
 
-static bool parse_reg8x(int* out_r) {
-	switch (get_word_hash()) {
-	case WORD_HASH('B', ___, ___, ___, ___): ptr++;		*out_r = R_B; return true;
-	case WORD_HASH('C', ___, ___, ___, ___): ptr++;		*out_r = R_C; return true;
-	case WORD_HASH('D', ___, ___, ___, ___): ptr++;		*out_r = R_D; return true;
-	case WORD_HASH('E', ___, ___, ___, ___): ptr++;		*out_r = R_E; return true;
-	case WORD_HASH('H', ___, ___, ___, ___): ptr++;		*out_r = R_H; return true;
-	case WORD_HASH('L', ___, ___, ___, ___): ptr++;		*out_r = R_L; return true;
-	case WORD_HASH('A', ___, ___, ___, ___): ptr++;		*out_r = R_A; return true;
-	case WORD_HASH('I', 'X', 'H', ___, ___): ptr += 3;	*out_r = R_H + IDX_IX; return true;
-	case WORD_HASH('I', 'Y', 'H', ___, ___): ptr += 3;	*out_r = R_H + IDX_IY; return true;
-	case WORD_HASH('I', 'X', 'L', ___, ___): ptr += 3;	*out_r = R_L + IDX_IX; return true;
-	case WORD_HASH('I', 'Y', 'L', ___, ___): ptr += 3;	*out_r = R_L + IDX_IY; return true;
-	default: return false;
-	}
+static bool REG16_BCDE(int* out) {
+	return parse_reg16(IS_REG16_BCDE, out);
 }
 
-static bool parse_reg8intel(int* out_r) {
-	blanks();
-	if (isident_start(ptr[0]) && !isident(ptr[1])) {
-		switch (toupper(ptr[0])) {
-		case 'B': ptr++; *out_r = R_B; return true;
-		case 'C': ptr++; *out_r = R_C; return true;
-		case 'D': ptr++; *out_r = R_D; return true;
-		case 'E': ptr++; *out_r = R_E; return true;
-		case 'H': ptr++; *out_r = R_H; return true;
-		case 'L': ptr++; *out_r = R_L; return true;
-		case 'M': ptr++; *out_r = R_M; return true;
-		case 'A': ptr++; *out_r = R_A; return true;
-		default: return false;
-		}
-	}
-	else
-		return false;
+static bool REG16_SPX(int* out) {
+	return parse_reg16(IS_REG16_SP | IS_REG16_IDX, out);
 }
 
-static bool parse_reg16sp(int* out_ss) {
-	switch (get_word_hash()) {
-	case WORD_HASH('B', 'C', ___, ___, ___):	ptr += 2; *out_ss = RR_BC; return true;
-	case WORD_HASH('D', 'E', ___, ___, ___):	ptr += 2; *out_ss = RR_DE; return true;
-	case WORD_HASH('H', 'L', ___, ___, ___):	ptr += 2; *out_ss = RR_HL; return true;
-	case WORD_HASH('I', 'X', ___, ___, ___):	ptr += 2; *out_ss = RR_HL + IDX_IX; return true;
-	case WORD_HASH('I', 'Y', ___, ___, ___):	ptr += 2; *out_ss = RR_HL + IDX_IY; return true;
-	case WORD_HASH('S', 'P', ___, ___, ___):	ptr += 2; *out_ss = RR_SP; return true;
-	default: return false;
-	}
+static bool REG16_AFX(int* out) {
+	return parse_reg16(IS_REG16_AF | IS_REG16_IDX, out);
 }
 
-static bool parse_reg16sp_intel(int* out_ss) {
-	switch (get_word_hash()) {
-	case WORD_HASH('B', ___, ___, ___, ___):	ptr += 1; *out_ss = RR_BC; return true;
-	case WORD_HASH('B', 'C', ___, ___, ___):	ptr += 2; *out_ss = RR_BC; return true;
-	case WORD_HASH('D', ___, ___, ___, ___):	ptr += 1; *out_ss = RR_DE; return true;
-	case WORD_HASH('D', 'E', ___, ___, ___):	ptr += 2; *out_ss = RR_DE; return true;
-	case WORD_HASH('H', ___, ___, ___, ___):	ptr += 1; *out_ss = RR_HL; return true;
-	case WORD_HASH('H', 'L', ___, ___, ___):	ptr += 2; *out_ss = RR_HL; return true;
-	case WORD_HASH('S', 'P', ___, ___, ___):	ptr += 2; *out_ss = RR_SP; return true;
-	default: return false;
-	}
+static bool REG16_AF_INTEL(int* out) {
+	return parse_reg16(IS_REG16_AF | IS_REG16_INTEL, out);
 }
 
-static bool parse_reg16af(int* out_dd) {
-	switch (get_word_hash()) {
-	case WORD_HASH('B', 'C', ___, ___, ___):	ptr += 2; *out_dd = RR_BC; return true;
-	case WORD_HASH('D', 'E', ___, ___, ___):	ptr += 2; *out_dd = RR_DE; return true;
-	case WORD_HASH('H', 'L', ___, ___, ___):	ptr += 2; *out_dd = RR_HL; return true;
-	case WORD_HASH('I', 'X', ___, ___, ___):	ptr += 2; *out_dd = RR_HL + IDX_IX; return true;
-	case WORD_HASH('I', 'Y', ___, ___, ___):	ptr += 2; *out_dd = RR_HL + IDX_IY; return true;
-	case WORD_HASH('A', 'F', ___, ___, ___):	ptr += 2; *out_dd = RR_AF; return true;
-	default: return false;
-	}
+static bool REG16_SP_INTEL(int* out) {
+	return parse_reg16(IS_REG16_SP | IS_REG16_INTEL, out);
 }
 
-static bool parse_reg16af_intel(int* out_dd) {
-	switch (get_word_hash()) {
-	case WORD_HASH('B', ___, ___, ___, ___):	ptr += 1; *out_dd = RR_BC; return true;
-	case WORD_HASH('B', 'C', ___, ___, ___):	ptr += 2; *out_dd = RR_BC; return true;
-	case WORD_HASH('D', ___, ___, ___, ___):	ptr += 1; *out_dd = RR_DE; return true;
-	case WORD_HASH('D', 'E', ___, ___, ___):	ptr += 2; *out_dd = RR_DE; return true;
-	case WORD_HASH('H', ___, ___, ___, ___):	ptr += 1; *out_dd = RR_HL; return true;
-	case WORD_HASH('H', 'L', ___, ___, ___):	ptr += 2; *out_dd = RR_HL; return true;
-	case WORD_HASH('P', 'S', 'W', ___, ___):	ptr += 3; *out_dd = RR_AF; return true;
-	default: return false;
-	}
-}
-
-static bool parse_a(void) {
-	return parse_word("A");
-}
-
-static bool parse_f(void) {
-	return parse_word("F");
-}
-
-static bool parse_af(void) {
-	return parse_word("AF");
-}
-
-static bool parse_i(void) {
-	return parse_word("I");
-}
-
-static bool parse_r(void) {
-	return parse_word("R");
-}
-
-static int parse_pos_inc_dec(int rr) {
-	if      (parse_plus())		return rr + POS_INC;
-	else if (parse_minus())		return rr + POS_DEC;
-	else						return rr;
-}
-
-static bool parse_ind_BCDE(int* out_dd) {
-	const char* ptr0; blanks(); save_ptr(&ptr0);
-	if (parse_lparen()) {
-		switch (get_word_hash()) {
-		case WORD_HASH('B', 'C', ___, ___, ___):	ptr += 2; *out_dd = parse_pos_inc_dec(RR_BC); if (parse_rparen()) return true; else break;
-		case WORD_HASH('D', 'E', ___, ___, ___):	ptr += 2; *out_dd = parse_pos_inc_dec(RR_DE); if (parse_rparen()) return true; else break;
-		}
-	}
-	restore_ptr(&ptr0);
+static bool BC() {
+	int rr;
+	if (REG16_SPX(&rr) && rr == RR_BC)
+		return true;
 	return false;
 }
 
-static bool parse_B(void) {
-	return parse_word("B");
+static bool DE() {
+	int rr;
+	if (REG16_SPX(&rr) && rr == RR_DE)
+		return true;
+	return false;
 }
 
-static bool parse_indC(void) {
-	const char* ptr0; blanks(); save_ptr(&ptr0);
-	if (parse_lparen() && parse_word("C") && parse_rparen()) {
+static bool HL() {
+	int rr;
+	if (REG16_SPX(&rr) && rr == RR_HL)
+		return true;
+	return false;
+}
+
+static bool SP() {
+	int rr;
+	if (REG16_SPX(&rr) && rr == RR_SP)
+		return true;
+	return false;
+}
+
+static bool AF() {
+	int rr;
+	if (REG16_AFX(&rr) && rr == RR_AF)
+		return true;
+	return false;
+}
+
+static bool IND_BCDE(int* out) {			// (BC)/(DE)
+	token_t* yy0 = yy;
+	int inc_dec = 0, sign;
+
+	if (!TK('(')) goto fail;
+
+	if (SIGN(&sign)) {						// pre-increment/pre-decrement
+		if (sign == 1)	inc_dec |= PRE_INC;
+		else			inc_dec |= PRE_DEC;
+	}
+
+	if (!REG16_BCDE(out)) goto fail;		// only BC or DE
+
+	if (SIGN(&sign)) {						// pos-increment/pos-decrement
+		if (sign == 1)	inc_dec |= POS_INC;
+		else			inc_dec |= POS_DEC;
+	}
+
+	if (TK(')')) goto ok;
+
+fail:
+	yy = yy0;
+	return false;
+
+ok:
+	*out |= inc_dec;
+	return true;
+}
+
+static bool IND_HL(void) {
+	token_t* yy0 = yy;
+	if (TK('(') && HL() && TK(')'))
+		return true;
+	yy = yy0;
+	return false;
+}
+
+static bool X(int* out) {
+	return parse_reg16(IS_REG16_IDX, out);
+}
+
+static bool PLUS_DIS_RPAREN(int* out) {
+	int sign = 1;
+	int dis = 0;
+
+	if (TK(')')) {
+		*out = 0;
 		return true;
 	}
-	restore_ptr(&ptr0);
-	return false;
-}
 
-static bool parse_BC(void) {
-	return parse_word("BC");
-}
-
-static bool parse_D(void) {
-	return parse_word("D");
-}
-
-static bool parse_DE(void) {
-	return parse_word("DE");
-}
-
-static bool parse_H(void) {
-	return parse_word("H");
-}
-
-static bool parse_HL(void) {
-	return parse_word("HL");
-}
-
-static bool parse_indHL(void) {
-	const char* ptr0; blanks(); save_ptr(&ptr0);
-	if (parse_lparen() && parse_HL() && parse_rparen())
+	token_t* yy0 = yy;
+	if (SIGN(&sign) && EXPR(&dis) && TK(')')) {
+		*out = sign * dis;
 		return true;
-	restore_ptr(&ptr0);
+	}
+	yy = yy0;
+	*out = 0;
 	return false;
 }
 
-static bool parse_HLx(int* out_idx) {
-	return parse_reg16sp(out_idx) && (*out_idx & RR_MASK) == RR_HL;
-}
+static bool IND_X(int* x, int* dis) {
+	token_t* yy0 = yy;
+	int inc_dec = 0, sign;
+	*dis = 0;
 
-static bool parse_indHLx(int *x, int* out_dis) {
-	const char* ptr0; blanks(); save_ptr(&ptr0);
-	if (parse_lparen()) {
-		switch (get_word_hash()) {
-		case WORD_HASH('H', 'L', ___, ___, ___): ptr += 2; *x = parse_pos_inc_dec(RR_HL); *out_dis = 0; if (parse_rparen()) return true; else break;
-		case WORD_HASH('H', 'L', 'I', ___, ___): ptr += 3; *x = RR_HL + POS_INC; *out_dis = 0; if (parse_rparen()) return true; else break;
-		case WORD_HASH('H', 'L', 'D', ___, ___): ptr += 3; *x = RR_HL + POS_DEC; *out_dis = 0; if (parse_rparen()) return true; else break;
-		case WORD_HASH('I', 'X', ___, ___, ___): ptr += 2; *x = RR_HL + IDX_IX; if (parse_plus_offset(out_dis)) return true; else break;
-		case WORD_HASH('I', 'Y', ___, ___, ___): ptr += 2; *x = RR_HL + IDX_IY; if (parse_plus_offset(out_dis)) return true; else break;
+	if (!TK('(')) goto fail;
+
+	if (SIGN(&sign)) {					// pre-increment/pre-decrement
+		if (sign == 1)	inc_dec |= PRE_INC;
+		else			inc_dec |= PRE_DEC;
+	}
+
+	if (!X(x)) goto fail;
+
+	if ((*x & IDX_MASK) == IDX_HL) {	// HL
+		if ((*x & POS_MASK) == 0) {		// not HLD nor HLI
+			if (SIGN(&sign)) {			// pos-increment/pos-decrement
+				if (sign == 1)	inc_dec |= POS_INC;
+				else			inc_dec |= POS_DEC;
+			}
+			if (TK(')')) goto ok;
+		}
+		else {							// HLD or HLI
+			if (TK(')')) goto ok;
 		}
 	}
-	restore_ptr(&ptr0);
+	else {								// IX/IY
+		if (inc_dec != 0) goto fail;	// cannot pre-increment/decrement IX/IY
+		if (PLUS_DIS_RPAREN(dis)) goto ok;
+	}
+
+fail:
+	yy = yy0;
 	return false;
+
+ok:
+	*x |= inc_dec;
+	return true;
 }
 
-static bool parse_M(void) {
-	return parse_word("M");
-}
-
-static bool parse_SP(void) {
-	return parse_word("SP");
-}
-
-static bool parse_flags8(int* out_flags) {
-	switch (get_word_hash()) {
-	case WORD_HASH('N', 'Z', ___, ___, ___):	ptr += 2; *out_flags = F_NZ; return true;
-	case WORD_HASH('Z', ___, ___, ___, ___):	ptr += 1; *out_flags = F_Z;  return true;
-	case WORD_HASH('N', 'C', ___, ___, ___):	ptr += 2; *out_flags = F_NC; return true;
-	case WORD_HASH('C', ___, ___, ___, ___):	ptr += 1; *out_flags = F_C;  return true;
-	case WORD_HASH('P', 'O', ___, ___, ___):	ptr += 2; *out_flags = F_PO; return true;
-	case WORD_HASH('P', 'E', ___, ___, ___):	ptr += 2; *out_flags = F_PE; return true;
-	case WORD_HASH('P', ___, ___, ___, ___):	ptr += 1; *out_flags = F_P;  return true;
-	case WORD_HASH('M', ___, ___, ___, ___):	ptr += 1; *out_flags = F_M;  return true;
-	case WORD_HASH('N', 'V', ___, ___, ___):	ptr += 2; *out_flags = F_NV; return true;
-	case WORD_HASH('V', ___, ___, ___, ___):	ptr += 1; *out_flags = F_V;  return true;
-	default: return false;
-	}
-}
-
-static bool parse_flags4(int* out_flags) {
-	switch (get_word_hash()) {
-	case WORD_HASH('N', 'Z', ___, ___, ___):	ptr += 2; *out_flags = F_NZ; return true;
-	case WORD_HASH('Z', ___, ___, ___, ___):	ptr += 1; *out_flags = F_Z;  return true;
-	case WORD_HASH('N', 'C', ___, ___, ___):	ptr += 2; *out_flags = F_NC; return true;
-	case WORD_HASH('C', ___, ___, ___, ___):	ptr += 1; *out_flags = F_C;  return true;
-	default: return false;
-	}
+static bool check_alu8(int op) {
+	int r, n, x, dis;
+	OPT_A_COMMA();							// alu: "a," is optional
+	token_t* yy0 = yy;
+	if (REG8_X(&r) && EOS())				// alu B/C/D/E/H/L/A/IXH/IYH/IXL/IYL
+		return emit_alu_r(op, r);
+	yy = yy0;
+	if (IND_X(&x, &dis) && EOS()) 			// alu (HL)/(IX+d)/(IY+d)
+		return emit_alu_indx(op, x, dis);
+	yy = yy0;
+	if (EXPR(&n) && EOS())					// alu n
+		return emit_alu_n(op, n);
+	yy = yy0;
+	return false;
 }
 
 static bool parse_alu8(int op) {
-	int r, n, x, dis;
-	const char* ptr0; blanks(); save_ptr(&ptr0);
-	if (!(parse_a() && parse_comma())) 				// alu: a, is optional
-		restore_ptr(&ptr0);
-
-	const char* ptr1; blanks(); save_ptr(&ptr1);
-	if (parse_reg8x(&r) && check_end())				// alu B/C/D/E/H/L/A/IXH/IYH/IXL/IYL
-		return emit_alu_r(op, r);
-	else if (restore_ptr(&ptr1) &&
-		parse_indHLx(&x, &dis) && check_end()) 		// alu (HL)/(IX+d)/(IY+d)
-		return emit_alu_indx(op, x, dis);
-	else if (restore_ptr(&ptr1) &&
-		parse_expr(&n) && check_end())				// alu n
-		return emit_alu_n(op, n);
-	else {
-		restore_ptr(&ptr0);
-		return false;
-	}
+	if (check_alu8(op))
+		return true;
+	syntax_error();
+	return false;
 }
 
-static bool parse_alu8intel(int op) {
-	int r;
-	const char* ptr0; blanks(); save_ptr(&ptr0);
-	if (parse_reg8intel(&r) && check_end())			// alu B/C/D/E/H/L/M/A
-		return emit_alu_r(op, r);
-	else {
-		restore_ptr(&ptr0);
-		return false;
-	}
+static bool check_rot8(int op) {
+	int r, x, dis;
+	token_t* yy0 = yy;
+	if (REG8(&r) && EOS())									// rot B/C/D/E/H/L/A
+		return emit_rot_r(op, r);
+	yy = yy0;
+	if (IND_X(&x, &dis) && TK(',') && REG8(&r) && EOS())	// rot (HL)/(IX+d)/(IY+d), r
+		return emit_rot_indx_r(op, x, dis, r);
+	yy = yy0;
+	if (IND_X(&x, &dis) && EOS())							// rot (HL)/(IX+d)/(IY+d)
+		return emit_rot_indx(op, x, dis);
+	yy = yy0;
+	return false;
 }
 
 static bool parse_rot8(int op) {
-	int r, x, dis;
-	const char* ptr0; blanks(); save_ptr(&ptr0);
-	if (parse_reg8(&r) && check_end())				// rot B/C/D/E/H/L/A
-		return emit_rot_r(op, r);
-	else if (restore_ptr(&ptr0) &&
-		parse_indHLx(&x, &dis) && parse_comma() &&
-		parse_reg8(&r) && check_end())				// rot (HL)/(IX+d)/(IY+d), r
-		return emit_rot_indx_r(op, x, dis, r);
-	else if (restore_ptr(&ptr0) &&
-		parse_indHLx(&x, &dis) && check_end())		// rot (HL)/(IX+d)/(IY+d)
-		return emit_rot_indx(op, x, dis);
-	else {
-		restore_ptr(&ptr0);
-		return false;
-	}
+	if (check_rot8(op))
+		return true;
+	syntax_error();
+	return false;
 }
 
 static bool parse_bit8(int op) {
 	int r, x, bit, dis;
-	const char* ptr0; blanks(); save_ptr(&ptr0);
-	if (parse_const(&bit) && parse_comma()) {
-		const char* ptr1; blanks(); save_ptr(&ptr1);
-		if (parse_reg8(&r) && check_end())			// bit/res/set b, B/C/D/E/H/L/A
+	if (CONST(&bit) && TK(',')) {
+		token_t* yy0 = yy;
+		if (REG8(&r) && EOS())									// bit/res/set b, B/C/D/E/H/L/A
 			return emit_bit_r(op, bit, r);
-		else if (restore_ptr(&ptr1) &&
-			parse_indHLx(&x, &dis) && parse_comma() &&
-			parse_reg8(&r) && check_end())			// bit/res/set b, (HL)/(IX+d)/(IY+d), r
+		yy = yy0;
+		if (IND_X(&x, &dis) && TK(',') && REG8(&r) && EOS())	// bit/res/set b, (HL)/(IX+d)/(IY+d), r
 			return emit_bit_indx_r(op, bit, x, dis, r);
-		else if (restore_ptr(&ptr1) &&
-			parse_indHLx(&x, &dis) && check_end())	// bit/res/set b, (HL)/(IX+d)/(IY+d)
+		yy = yy0;
+		if (IND_X(&x, &dis) && EOS())							// bit/res/set b, (HL)/(IX+d)/(IY+d)
 			return emit_bit_indx(op, bit, x, dis);
 	}
-	restore_ptr(&ptr0);
+	syntax_error();
 	return false;
 }
 
-static bool parse_jp(void) {
+static bool parse_ld(int dummy) {
+	int r, r1, r2, rr, x, n, nn, dis;
+	token_t* yy0 = yy;
+	if (REG8_X(&r1) && TK(',') && REG8_X(&r2) && EOS())			// LD r, r
+		return emit_ld_r_r(r1, r2);
+	yy = yy0;
+	if (REG8(&r) && TK(',') && IND_X(&x, &dis) && EOS())		// LD r, (HL)/(IX+d)/(IY+d)
+		return emit_ld_r_indx(r, x, dis);
+	yy = yy0;
+	if (IND_X(&x, &dis) && TK(',') && REG8(&r) && EOS())		// LD (HL)/(IX+d)/(IY+d), r
+		return emit_ld_indx_r(x, dis, r);
+	yy = yy0;
+	if (A() && TK(',') && IND_BCDE(&rr) && EOS())				// LD A, (BC/DE)
+		return emit_ld_a_indrr(rr);
+	yy = yy0;
+	if (IND_BCDE(&rr) && TK(',') && A() && EOS())				// LD (BC/DE), A
+		return emit_ld_indrr_a(rr);
+	yy = yy0;
+	if (REG8_X(&r) && TK(',') && EXPR(&n) && EOS())				// LD B/C/D/E/H/L/A/IXH/IXL/IYH/IYL, n
+		return emit_ld_r_n(r, n);
+	yy = yy0;
+	if (IND_X(&x, &dis) && TK(',') && EXPR(&n) && EOS())		// LD (HL)/(IX+d)/(IY+d), n
+		return emit_ld_indx_n(x, dis, n);
+	yy = yy0;
+	if (REG16_SPX(&rr) && TK(',') && EXPR(&nn) && EOS())		// LD BC/DE/HL/SP/IX/IY, nn
+		return emit_ld_rr_nn(rr, nn);
+	yy = yy0;
+	if (REG16_SPX(&rr) && TK(',') && IND_EXPR(&nn) && EOS())	// LD BC/DE/HL/SP/IX/IY, (nn)
+		return emit_ld_rr_indnn(rr, nn);
+	yy = yy0;
+	if (IND_EXPR(&nn) && TK(',') && REG16_SPX(&rr) && EOS())	// LD (nn), BC/DE/HL/SP/IX/IY
+		return emit_ld_indnn_rr(nn, rr);
+	yy = yy0;
+	if (A() && TK(',') && IND_EXPR(&nn) && EOS())				// LD A, (nn)
+		return emit_ld_a_indnn(nn);
+	yy = yy0;
+	if (IND_EXPR(&nn) && TK(',') && A() && EOS())				// LD (nn), A
+		return emit_ld_indnn_a(nn);
+	yy = yy0;
+	if (KW(T_I) && TK(',') && A() && EOS())						// LD I, A
+		return emit_ld_i_a();
+	yy = yy0;
+	if (KW(T_R) && TK(',') && A() && EOS())						// LD R, A
+		return emit_ld_r_a();
+	yy = yy0;
+	if (A() && TK(',') && KW(T_I) && EOS())						// LD A, I
+		return emit_ld_a_i();
+	yy = yy0;
+	if (A() && TK(',') && KW(T_R) && EOS())						// LD A, R
+		return emit_ld_a_r();
+	yy = yy0;
+	if (SP() && TK(',') && X(&x) && EOS())						// LD SP, HL/IX/IY
+		return emit_ld_sp_x(x);
+	yy = yy0;
+	if (BC() && TK(',') && DE() && EOS()) 						// LD BC, DE
+		return (
+			emit_ld_r_r(R_B, R_D) &&
+			emit_ld_r_r(R_C, R_E));
+	yy = yy0;
+	if (BC() && TK(',') && X(&x) && EOS())						// LD BC, HL/IX/IY
+		return (
+			emit_ld_r_r(R_B, R_H | (x & IDX_MASK)) &&
+			emit_ld_r_r(R_C, R_L | (x & IDX_MASK)));
+	yy = yy0;
+	if (DE() && TK(',') && BC() && EOS())						// LD DE, BC
+		return (
+			emit_ld_r_r(R_D, R_B) &&
+			emit_ld_r_r(R_E, R_C));
+	yy = yy0;
+	if (DE() && TK(',') && X(&x) && EOS())						// LD DE, HL/IX/IY
+		return (
+			emit_ld_r_r(R_D, R_H | (x & IDX_MASK)) &&
+			emit_ld_r_r(R_E, R_L | (x & IDX_MASK)));
+	yy = yy0;
+	if (X(&x) && TK(',') && BC() && EOS())						// LD HL/IX/IY, BC
+		return (
+			emit_ld_r_r(R_H | (x & IDX_MASK), R_B) &&
+			emit_ld_r_r(R_L | (x & IDX_MASK), R_C));
+	yy = yy0;
+	if (X(&x) && TK(',') && DE() && EOS())						// LD HL/IX/IY, DE
+		return (
+			emit_ld_r_r(R_H | (x & IDX_MASK), R_D) &&
+			emit_ld_r_r(R_L | (x & IDX_MASK), R_E));
+	syntax_error();
+	return false;
+}
+
+static bool parse_lda_sta(int is_lda) {
+	int nn;
+	if (EXPR(&nn) && EOS())
+		return is_lda ? emit_ld_a_indnn(nn) : emit_ld_indnn_a(nn);
+	syntax_error();
+	return false;
+}
+
+static bool parse_lhld_shld(int is_lhld) {
+	int nn;
+	if (EXPR(&nn) && EOS())
+		return is_lhld ? emit_ld_rr_indnn(RR_HL, nn) : emit_ld_indnn_rr(nn, RR_HL);
+	syntax_error();
+	return false;
+}
+
+static bool parse_ldax_stax(int is_ldax) {
+	int rr;
+	if (REG16_SP_INTEL(&rr) && EOS())
+		return is_ldax ? emit_ld_a_indrr(rr) : emit_ld_indrr_a(rr);
+	syntax_error();
+	return false;
+}
+
+static bool parse_lxi(int dummy) {
+	int rr, nn;
+	if (REG16_SP_INTEL(&rr) && TK(',') && EXPR(&nn) && EOS()) 
+		return emit_ld_rr_nn(rr, nn);
+	syntax_error();
+	return false;
+}
+
+static bool parse_mov(int dummy) {
+	int r1, r2;
+	if (REG8_INTEL(&r1) && TK(',') && REG8_INTEL(&r2) && EOS()) 
+		return emit_ld_r_r(r1, r2);
+	syntax_error();
+	return false;
+}
+
+static bool parse_mvi(int dummy) {
+	int r, n;
+	if (REG8_INTEL(&r) && TK(',') && EXPR(&n) && EOS()) 
+		return emit_ld_r_n(r, n);
+	syntax_error(); 
+	return false; 
+}
+
+static bool parse_sphl(int dummy) {
+	if (EOS()) return 
+		emit_ld_sp_x(RR_HL);
+	syntax_error(); 
+	return false; 
+}
+
+static bool parse_inc_dec(int is_inc) {
+	int r, rr, x, dis;
+	token_t* yy0 = yy;
+	if (REG16_SPX(&rr) && EOS()) 				// INC/DEC BC/DE/HL/SP/IX/IY
+		return is_inc ? emit_inc_rr(rr) : emit_dec_rr(rr);
+	yy = yy0;
+	if (REG8_X(&r) && EOS())					// INC/DEC B/C/D/E/H/L/A/IXH/IYH/IXL/IYL
+		return is_inc ? emit_inc_r(r) : emit_dec_r(r);
+	yy = yy0;
+	if (IND_X(&x, &dis) && EOS()) 				// INC/DEC (HL)/(IX+d)/(IY+d)
+		return is_inc ? emit_inc_indx(x, dis) : emit_dec_indx(x, dis);
+	syntax_error();
+	return false;
+}
+
+static bool parse_inr_dcr(int is_inc) {
+	int r;
+	if (REG8_INTEL(&r) && EOS())
+		return is_inc ? emit_inc_r(r) : emit_dec_r(r);
+	syntax_error();
+	return false;
+}
+
+static bool parse_inx_dcx(int is_inc) {
+	int rr;
+	if (REG16_SP_INTEL(&rr) && EOS())
+		return is_inc ? emit_inc_rr(rr) : emit_dec_rr(rr);
+	syntax_error();
+	return false;
+}
+
+static bool parse_ex(int dummy) {
+	int x;
+	token_t* yy0 = yy;
+	if (AF() && TK(',') && AF() && (TK('\'') || true) && EOS())			// EX AF, AF[']
+		return emit_ex_af_af1();
+	yy = yy0;
+	if (DE() && TK(',') && X(&x) && EOS())								// EX DE, HL
+		return emit_ex_de_hl(x);
+	yy = yy0;
+	if (TK('(') && SP() && TK(')') && TK(',') && X(&x) && EOS())		// EX (SP),HL/IX/IY
+		return emit_ex_indsp_hl(x);
+	syntax_error();
+	return false;
+}
+
+static bool parse_exx(int dummy) {
+	if (EOS())
+		return emit_exx();
+	syntax_error();
+	return false;
+}
+
+static bool parse_xchg(int dummy) {
+	if (EOS())
+		return emit_ex_de_hl(RR_HL);
+	syntax_error();
+	return false;
+}
+
+static bool parse_xthl(int dummy) {
+	if (EOS())
+		return emit_ex_indsp_hl(RR_HL);
+	syntax_error();
+	return false;
+}
+
+static bool parse_push_pop(int is_push) {
+	int rr;
+	token_t* yy0 = yy;
+	if (REG16_AFX(&rr) && EOS())		// PUSH/POP BC/DE/HL/AF/IX/IY
+		return is_push ? emit_push_rr(rr) : emit_pop_rr(rr);
+	yy = yy0;
+	if (REG16_AF_INTEL(&rr) && EOS()) 	// PUSH/POP B/BC/D/DE/H/HL/PSW
+		return is_push ? emit_push_rr(rr) : emit_pop_rr(rr);
+	syntax_error();
+	return false;
+}
+
+static bool parse_add(int dummy) {
+	int r, rr, x, nn;
+	token_t* yy0 = yy;
+	if (check_alu8(OP_ADD))								// Zilog ALU
+		return true;
+	yy = yy0;
+	if (REG8_INTEL(&r) && r == R_M && EOS())			// ADD m
+		return emit_alu_indx(OP_ADD, RR_HL, 0);
+	yy = yy0;
+	if (X(&x) && TK(',') && REG16_SPX(&rr) && EOS())	// ADD HL/IX/IY, BC/DE/HL/SP/IX/IY
+		return emit_add_x_rr(x, rr);
+	yy = yy0;
+	if (BC() && TK(',') && EXPR(&nn) && EOS())			// ADD BC, nn
+		return (
+			emit_push_rr(RR_HL) &&
+			emit_ld_rr_nn(RR_HL, nn) &&
+			emit_add_x_rr(RR_HL, RR_BC) &&
+			emit_ld_r_r(R_B, R_H) &&
+			emit_ld_r_r(R_C, R_L) &&
+			emit_pop_rr(RR_HL));
+	yy = yy0;
+	if (DE() && TK(',') && EXPR(&nn) && EOS())			// ADD DE, nn
+		return (
+			emit_push_rr(RR_HL) &&
+			emit_ld_rr_nn(RR_HL, nn) &&
+			emit_add_x_rr(RR_HL, RR_DE) &&
+			emit_ld_r_r(R_D, R_H) &&
+			emit_ld_r_r(R_E, R_L) &&
+			emit_pop_rr(RR_HL));
+	yy = yy0;
+	if (X(&x) && TK(',') && EXPR(&nn) && EOS())			// ADD HL/IX/IY, nn
+		return (
+			emit_push_rr(RR_DE) &&
+			emit_ld_rr_nn(RR_DE, nn) &&
+			emit_add_x_rr(x, RR_DE) &&
+			emit_pop_rr(RR_DE));
+	syntax_error();
+	return false;
+}
+
+static bool parse_adc(int dummy) {
+	int r, rr, x;
+	token_t* yy0 = yy;
+	if (check_alu8(OP_ADC))								// Zilog ALU
+		return true;
+	yy = yy0;
+	if (REG8_INTEL(&r) && r == R_M && EOS())			// ADC m
+		return emit_alu_indx(OP_ADC, RR_HL, 0);
+	yy = yy0;
+	if (X(&x) && TK(',') && REG16_SPX(&rr) && EOS()) 	// ADC HL, BC/DE/HL/SP
+		return emit_adc_x_rr(x, rr);
+	syntax_error();
+	return false;
+}
+
+static bool parse_dad(int dummy) {
+	int rr;
+	if (REG16_SP_INTEL(&rr) && EOS())					// DAD m
+		return emit_add_x_rr(RR_HL, rr);
+	syntax_error();
+	return false;
+}
+
+static bool parse_sub(int dummy) {
+	int r;
+	token_t* yy0 = yy;
+	if (check_alu8(OP_SUB))								// Zilog ALU
+		return true;
+	yy = yy0;
+	if (REG8_INTEL(&r) && EOS())						// SUB r
+		return emit_alu_r(OP_SUB, r);
+	syntax_error();
+	return false;
+}
+
+static bool parse_sbc(int dummy) {
+	int rr, x;
+	token_t* yy0 = yy;
+	if (check_alu8(OP_SBC))							// Zilog ALU
+		return true;
+	yy = yy0;
+	if (X(&x) && TK(',') && REG16_SPX(&rr) && EOS())// SBC HL, BC/DE/HL/SP
+		return emit_sbc_x_rr(x, rr);
+	syntax_error();
+	return false;
+}
+
+static bool parse_daa(int dummy) {
+	if (EOS())
+		return emit_daa(); 							// DAA
+	syntax_error();
+	return false;
+}
+
+static bool parse_neg(int dummy) {
+	if ((A() || true) && EOS()) 					// NEG [A]
+		return emit_neg();
+	syntax_error();
+	return false;
+}
+
+static bool parse_cpl(int dummy) {
+	if ((A() || true) && EOS())						// CPL [A]
+		return emit_cpl();
+	syntax_error();
+	return false;
+}
+
+static bool parse_cma(int dummy) {
+	if (EOS())
+		return emit_cpl(); 							// CMA
+	syntax_error();
+	return false;
+}
+
+static bool parse_scf(int dummy) {
+	if (EOS()) 										// SCF
+		return emit_scf();
+	syntax_error();
+	return false;
+}
+
+static bool parse_ccf(int dummy) {
+	if (EOS())										// CCF
+		return emit_ccf();
+	syntax_error();
+	return false;
+}
+
+static bool parse_intel_alu_r(int op) {
+	int r;
+	if (REG8_INTEL(&r) && EOS())
+		return emit_alu_r(op, r);
+	syntax_error();
+	return false;
+}
+
+static bool parse_intel_alu_n(int op) {
+	int n;
+	if (EXPR(&n) && EOS())
+		return emit_alu_n(op, n);
+	syntax_error();
+	return false;
+}
+
+static bool parse_cmp(int dummy) {
+	if (check_alu8(OP_CP) || parse_intel_alu_r(OP_CP))
+		return true;
+	syntax_error();
+	return false;
+}
+
+static bool parse_rla_rra(int is_left) {
+	if (EOS()) 										// RLA/RRA
+		return is_left ? emit_rla() : emit_rra();
+	syntax_error();
+	return false;
+}
+
+static bool parse_rlca_rrca(int is_left) {
+	if (EOS()) 										// RLCA/RRCA
+		return is_left ? emit_rlca() : emit_rrca();
+	syntax_error();
+	return false;
+}
+
+static bool parse_rlc_rrc(int is_left) {
+	token_t* yy0 = yy;
+	if (check_rot8(is_left ? OP_RLC : OP_RRC))		// Zilog RLC/RRC r
+		return true;
+	yy = yy0;
+	if (EOS())										// Intel RLC/RRC
+		return is_left ? emit_rlca() : emit_rrca();
+	syntax_error();
+	return false;
+}
+
+static bool parse_rld_rrd(int is_left) {
+	if (EOS())										// RLD/RRD
+		return is_left ? emit_rld() : emit_rrd();
+	syntax_error();
+	return false;
+}
+
+static bool parse_ldi_ldd(int is_inc) {
+	int rr;
+	token_t* yy0 = yy;
+	if (IND_BCDE(&rr) && TK(',') && A() && EOS()) 		// LDI/LDD (BC/DE), A
+		return (
+			emit_ld_indrr_a(rr) &&
+			(is_inc ? emit_inc_rr(rr) : emit_dec_rr(rr)));
+	yy = yy0;
+	if (A() && TK(',') && IND_BCDE(&rr) && EOS()) 		// LDI/LDD A, (BC/DE)
+		return (
+			emit_ld_a_indrr(rr) &&
+			(is_inc ? emit_inc_rr(rr) : emit_dec_rr(rr)));
+	yy = yy0;
+	if (IND_HL() && TK(',') && A() && EOS())			// LDI/LDD (HL), A
+		return (
+			emit_ld_indx_r(RR_HL, 0, R_A) &&
+			(is_inc ? emit_inc_rr(RR_HL) : emit_dec_rr(RR_HL)));
+	yy = yy0;
+	if (A() && TK(',') && IND_HL() && EOS())			// LDI/LDD A, (HL)
+		return (
+			emit_ld_r_indx(R_A, RR_HL, 0) &&
+			(is_inc ? emit_inc_rr(RR_HL) : emit_dec_rr(RR_HL)));
+	yy = yy0;
+	if (EOS())												// LDI/LDD
+		return is_inc ? emit_ldi() : emit_ldd();
+	syntax_error();
+	return false;
+}
+
+static bool parse_ldir_lddr(int is_inc) {
+	if (EOS())												// LDIR/LDDR
+		return is_inc ? emit_ldir() : emit_lddr();
+	syntax_error();
+	return false;
+}
+
+static bool parse_cpi(int dummy) {
+	int n;
+	token_t* yy0 = yy;
+	if (EXPR(&n) && EOS())									// CPI n
+		return emit_alu_n(OP_CP, n);
+	yy = yy0;
+	if (EOS())												// CPI
+		return emit_cpi();
+	syntax_error();
+	return false;
+}
+
+static bool parse_cpd(int dummy) {
+	if (EOS())												// CPD
+		return emit_cpd();
+	syntax_error();
+	return false;
+}
+
+static bool parse_cpir_cpdr(int is_inc) {
+	if (EOS())												// CPIR/CPDR
+		return is_inc ? emit_cpir() : emit_cpdr();
+	syntax_error();
+	return false;
+}
+
+static bool parse_in(int dummy) {
+	int r, n;
+	token_t* yy0 = yy;
+	if (KW(T_F) && TK(',') && IND_C() && EOS()) 			// IN F, (C)
+		return emit_in_f_indc();
+	yy = yy0;
+	if (IND_C() && EOS())									// IN (C)
+		return emit_in_f_indc();
+	yy = yy0;
+	if (REG8(&r) && TK(',') && IND_C() && EOS())			// IN r, (C)
+		return emit_in_r_indc(r);
+	yy = yy0;
+	if (A() && TK(',') && IND_EXPR(&n) && EOS())		// IN A, (n)
+		return emit_in_a_indn(n);
+	yy = yy0;
+	if (EXPR(&n) && EOS())									// IN n
+		return emit_in_a_indn(n);	
+	syntax_error();
+	return false;
+}
+
+static bool parse_ini_ind(int is_inc) {
+	if (EOS())												// INI/IND
+		return is_inc ? emit_ini() : emit_ind();
+	syntax_error();
+	return false;
+}
+
+static bool parse_inir_indr(int is_inc) {
+	if (EOS())												// INIR/INDR
+		return is_inc ? emit_inir() : emit_indr();
+	syntax_error();
+	return false;
+}
+
+static bool parse_out(int dummy) {
+	int r, n;
+	token_t* yy0 = yy;
+	if (IND_C() && TK(',') && CONST(&n) && EOS())			// OUT (C), 0
+		return emit_out_indc_n(n);
+	yy = yy0;
+	if (IND_C() && TK(',') && REG8(&r) && EOS()) 			// OUT (C), r
+		return emit_out_indc_r(r);
+	yy = yy0;
+	if (IND_EXPR(&n) && TK(',') && A() && EOS()) 			// OUT (n), A
+		return emit_out_indn_a(n);
+	if (EXPR(&n) && EOS())									// OUT n
+		return emit_out_indn_a(n);
+	syntax_error();
+	return false;
+}
+
+static bool parse_outi_outd(int is_inc) {
+	if (EOS())												// OUTI/OUTD
+		return is_inc ? emit_outi() : emit_outd();
+	syntax_error();
+	return false;
+}
+
+static bool parse_otir_otdr(int is_inc) {
+	if (EOS())												// OTIR/OTDR
+		return is_inc ? emit_otir() : emit_otdr();
+	syntax_error();
+	return false;
+}
+
+static bool parse_nop(int dummy) {
+	if (EOS())												// NOP
+		return emit_nop();
+	syntax_error();
+	return false;
+}
+
+static bool parse_di(int dummy) {
+	if (EOS())												// DI
+		return emit_di();
+	syntax_error();
+	return false;
+}
+
+static bool parse_ei(int dummy) {
+	if (EOS())												// EI
+		return emit_ei();
+	syntax_error();
+	return false;
+}
+
+static bool parse_halt(int dummy) {
+	if (EOS())												// HALT
+		return emit_halt();
+	syntax_error();
+	return false;
+}
+
+static bool parse_im(int dummy) {
+	int n;
+	if (CONST(&n) && EOS())									// IM n
+		return emit_im(n);
+	syntax_error();
+	return false;
+}
+
+static bool parse_jp(int dummy) {
 	int f, nn, x;
-	const char* ptr0; blanks(); save_ptr(&ptr0);
-	if (parse_flags8(&f) && parse_comma() && parse_expr(&nn) && check_end())	// JP f, nn
+	token_t* yy0 = yy;
+	if (FLAGS8(&f) && TK(',') && EXPR(&nn) && EOS())		// JP f, nn
 		return emit_jp_f_nn(f, nn);
-	else if (restore_ptr(&ptr0) &&
-		parse_expr(&nn) && check_end()) 										// JP nn
+	yy = yy0;
+	if (EXPR(&nn) && EOS()) 								// JP nn
 		return emit_jp_nn(nn);
-	else if (restore_ptr(&ptr0) && parse_lparen() && parse_HLx(&x) && parse_rparen() && 
-		check_end())															// JP (HL)/(IX)/(IY)
+	if (TK('(') && X(&x) && TK(')') && EOS())				// JP (HL)/(IX)/(IY)
 		return emit_jp_x(x);
-	else {
-		restore_ptr(&ptr0);
-		return false;
-	}
+	syntax_error();
+	return false;
 }
 
 static bool parse_jp_intel(int f) {
 	int nn;
-	const char* ptr0; blanks(); save_ptr(&ptr0);
-	if (parse_expr(&nn) && check_end())
+	if (EXPR(&nn) && EOS())
 		return emit_jp_f_nn(f, nn);
-	else {
-		restore_ptr(&ptr0);
-		return false;
-	}
+	syntax_error();
+	return false;
 }
 
-static bool parse_call(void) {
+static bool parse_pchl(int dummy) {
+	if (EOS())												// JP (HL)
+		return emit_jp_x(RR_HL);
+	syntax_error();
+	return false;
+}
+
+static bool parse_djnz(int dummy) {
+	int nn;
+	token_t* yy0 = yy;
+	if (!(B() && TK(',')))									// [b,] optional
+		yy = yy0;
+	if (EXPR(&nn) && EOS())									// DJNZ nn
+		return emit_djnz_nn(nn);
+	syntax_error();
+	return false;
+}
+
+static bool parse_jr(int dummy) {
 	int f, nn;
-	const char* ptr0; blanks(); save_ptr(&ptr0);
-	if (parse_flags8(&f) && parse_comma() && parse_expr(&nn) && check_end())	// CALL f, nn
+	token_t* yy0 = yy;
+	if (FLAGS4(&f) && TK(',') && EXPR(&nn) && EOS())		// JR f, nn
+		return emit_jr_f_nn(f, nn);
+	yy = yy0;
+	if (EXPR(&nn) && EOS())									// JR nn
+		return emit_jr_nn(nn);
+	syntax_error();
+	return false;
+}
+
+static bool parse_call(int dummy) {
+	int f, nn;
+	token_t* yy0 = yy;
+	if (FLAGS8(&f) && TK(',') && EXPR(&nn) && EOS())		// CALL f, nn
 		return emit_call_f_nn(f, nn);
-	else if (restore_ptr(&ptr0) &&
-		parse_expr(&nn) && check_end()) 										// CALL nn
+	yy = yy0;
+	if (EXPR(&nn) && EOS()) 								// CALL nn
 		return emit_call_nn(nn);
-	else {
-		restore_ptr(&ptr0);
-		return false;
-	}
+	syntax_error();
+	return false;
 }
 
 static bool parse_call_intel(int f) {
 	int nn;
-	const char* ptr0; blanks(); save_ptr(&ptr0);
-	if (parse_expr(&nn) && check_end())
+	if (EXPR(&nn) && EOS())
 		return emit_call_f_nn(f, nn);
-	else {
-		restore_ptr(&ptr0);
-		return false;
-	}
+	syntax_error();
+	return false;
+}
+
+static bool parse_rst(int dummy) {
+	int nn;
+	if (CONST(&nn) && EOS()) 								// RST n
+		return emit_rst(nn);
+	syntax_error();
+	return false;
+}
+
+static bool parse_ret(int dummy) {
+	int f;
+	token_t* yy0 = yy;
+	if (FLAGS8(&f) && EOS()) 								// RET f
+		return emit_ret_f(f);
+	yy = yy0;
+	if (EOS())												// RET
+		return emit_ret();
+	syntax_error();
+	return false;
+}
+
+static bool parse_ret_intel(int f) {
+	if (EOS())						
+		return emit_ret_f(f);
+	syntax_error();
+	return false;
+}
+
+static bool parse_reti(int dummy) {
+	if (EOS())												// RETI
+		return emit_reti();
+	syntax_error();
+	return false;
+}
+
+static bool parse_retn(int dummy) {
+	if (EOS())												// RETN
+		return emit_retn();
+	syntax_error();
+	return false;
 }
 
 static bool parse_statement(void) {
-	int n, nn, dis, im, rst, f, r, r1, r2, x, rr;
-	if (parse_end())
+	if (EOS())
 		return true;
-	switch (get_word_hash()) {
-
-	// load
-	case WORD_HASH('L', 'D', ___, ___, ___): {
-		ptr += 2;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_reg8x(&r1) && parse_comma() && parse_reg8x(&r2) && check_end())		// LD r, r
-			return emit_ld_r_r(r1, r2);
-		else if (restore_ptr(&ptr0) &&
-			parse_reg8(&r) && parse_comma() && parse_indHLx(&x, &dis) && check_end())	// LD r, (HL)/(IX+d)/(IY+d)
-			return emit_ld_r_indx(r, x, dis);
-		else if (restore_ptr(&ptr0) &&
-			parse_indHLx(&x, &dis) && parse_comma() && parse_reg8(&r) && check_end())	// LD (HL)/(IX+d)/(IY+d), r
-			return emit_ld_indx_r(x, dis, r);
-		if (restore_ptr(&ptr0) &&
-			parse_a() && parse_comma() && parse_ind_BCDE(&rr) && check_end())			// LD A, (BC/DE)
-			return emit_ld_a_indrr(rr);
-		else if (restore_ptr(&ptr0) &&
-			parse_ind_BCDE(&rr) && parse_comma() && parse_a() && check_end())			// LD (BC/DE), A
-			return emit_ld_indrr_a(rr);
-		else if (restore_ptr(&ptr0) &&
-			parse_reg8x(&r) && parse_comma() && parse_expr(&n) && check_end())			// LD B/C/D/E/H/L/A, n
-			return emit_ld_r_n(r, n);
-		else if (restore_ptr(&ptr0) &&
-			parse_indHLx(&x, &dis) && parse_comma() && parse_expr(&n) && check_end())	// LD (HL)/(IX+d)/(IY+d), n
-			return emit_ld_indx_n(x, dis, n);
-		else if (restore_ptr(&ptr0) &&
-			parse_reg16sp(&rr) && parse_comma() && parse_expr(&nn) && check_end())		// LD BC/DE/HL/SP/IX/IY, nn
-			return emit_ld_rr_nn(rr, nn);
-		else if (restore_ptr(&ptr0) &&
-			parse_reg16sp(&rr) && parse_comma() && parse_indexpr(&nn) && check_end())	// LD BC/DE/HL/SP/IX/IY, (nn)
-			return emit_ld_rr_indnn(rr, nn);
-		else if (restore_ptr(&ptr0) &&
-			parse_indexpr(&nn) && parse_comma() && parse_reg16sp(&rr) && check_end())	// LD (nn), BC/DE/HL/SP/IX/IY
-			return emit_ld_indnn_rr(nn, rr);
-		else if (restore_ptr(&ptr0) &&
-			parse_a() && parse_comma() && parse_indexpr(&nn) && check_end())			// LD A, (nn)
-			return emit_ld_a_indnn(nn);
-		else if (restore_ptr(&ptr0) &&
-			parse_indexpr(&nn) && parse_comma() && parse_a() && check_end())			// LD (nn), A
-			return emit_ld_indnn_a(nn);
-		else if (restore_ptr(&ptr0) &&
-			parse_i() && parse_comma() && parse_a() && check_end())						// LD I, A
-			return emit_ld_i_a();
-		else if (restore_ptr(&ptr0) &&
-			parse_r() && parse_comma() && parse_a() && check_end())						// LD R, A
-			return emit_ld_r_a();
-		else if (restore_ptr(&ptr0) &&
-			parse_a() && parse_comma() && parse_i() && check_end())						// LD A, I
-			return emit_ld_a_i();
-		else if (restore_ptr(&ptr0) &&
-			parse_a() && parse_comma() && parse_r() && check_end())						// LD A, R
-			return emit_ld_a_r();
-		else if (restore_ptr(&ptr0) &&
-			parse_SP() && parse_comma() && parse_HLx(&x) && check_end())				// LD SP, HL/IX/IY
-			return emit_ld_sp_x(x);
-		else if (restore_ptr(&ptr0) &&
-			parse_BC() && parse_comma() && parse_DE() && check_end()) 					// LD BC, DE
-			return (
-				emit_ld_r_r(R_B, R_D) &&
-				emit_ld_r_r(R_C, R_E));
-		else if (restore_ptr(&ptr0) &&
-			parse_BC() && parse_comma() && parse_HLx(&x) && check_end())				// LD BC, HL/IX/IY
-			return (
-				emit_ld_r_r(R_B, R_H | (x & IDX_MASK)) &&
-				emit_ld_r_r(R_C, R_L | (x & IDX_MASK)));
-		else if (restore_ptr(&ptr0) &&
-			parse_DE() && parse_comma() && parse_BC() && check_end())					// LD DE, BC
-			return (
-				emit_ld_r_r(R_D, R_B) &&
-				emit_ld_r_r(R_E, R_C));
-		else if (restore_ptr(&ptr0) &&
-			parse_DE() && parse_comma() && parse_HLx(&x) && check_end())				// LD DE, HL/IX/IY
-			return (
-				emit_ld_r_r(R_D, R_H | (x & IDX_MASK)) &&
-				emit_ld_r_r(R_E, R_L | (x & IDX_MASK)));
-		else if (restore_ptr(&ptr0) &&
-			parse_HLx(&x) && parse_comma() && parse_BC() && check_end())				// LD HL/IX/IY, BC
-			return (
-				emit_ld_r_r(R_H | (x & IDX_MASK), R_B) &&
-				emit_ld_r_r(R_L | (x & IDX_MASK), R_C));
-		else if (restore_ptr(&ptr0) &&
-			parse_HLx(&x) && parse_comma() && parse_DE() && check_end())				// LD HL/IX/IY, DE
-			return (
-				emit_ld_r_r(R_H | (x & IDX_MASK), R_D) &&
-				emit_ld_r_r(R_L | (x & IDX_MASK), R_E));
-		else 
-			restore_ptr(&ptr0);
-		break;
+	const keyword_t* kw = parse_keyword(IS_OPCODE);
+	if (kw && kw->parse)
+		return kw->parse(kw->opcode_value);
+	else {
+		syntax_error();
+		return false;
 	}
-	case WORD_HASH('L', 'D', 'A', ___, ___): {
-		ptr += 3;	
-		if (parse_expr(&nn) && check_end()) 											// LDA
-			return emit_ld_a_indnn(nn);
-		break;
-	}
-	case WORD_HASH('S', 'T', 'A', ___, ___): {
-		ptr += 3;
-		if (parse_expr(&nn) && check_end()) 											// STA
-			return emit_ld_indnn_a(nn);
-		break;
-	}
-	case WORD_HASH('L', 'H', 'L', 'D', ___): {
-		ptr += 4;
-		if (parse_expr(&nn) && check_end()) 											// LHLD nn
-			return emit_ld_rr_indnn(RR_HL, nn);
-		break;
-	}
-	case WORD_HASH('S', 'H', 'L', 'D', ___): {
-		ptr += 4;
-		if (parse_expr(&nn) && check_end()) 											// SHLD nn
-			return emit_ld_indnn_rr(nn, RR_HL);
-		break;
-	}
-	case WORD_HASH('L', 'D', 'A', 'X', ___): {
-		ptr += 4;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if ((parse_B() || parse_BC()) && check_end()) 									// LDAX B/BC
-			return emit_ld_a_indrr(RR_BC);
-		else if (restore_ptr(&ptr0) &&
-			(parse_D() || parse_DE()) && check_end()) 									// LDAX D/DE
-			return emit_ld_a_indrr(RR_DE);
-		break;
-	}
-	case WORD_HASH('S', 'T', 'A', 'X', ___): {
-		ptr += 4;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if ((parse_B() || parse_BC()) && check_end()) 									// STAX B/BC
-			return emit_ld_indrr_a(RR_BC);
-		else if (restore_ptr(&ptr0) &&
-			(parse_D() || parse_DE()) && check_end()) 									// STAX D/DE
-			return emit_ld_indrr_a(RR_DE);
-		break;
-	}
-	case WORD_HASH('L', 'X', 'I', ___, ___): {
-		ptr += 3;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if ((parse_B() || parse_BC()) && parse_comma() && parse_expr(&nn) && check_end())	// LXI B/BC, nn
-			return emit_ld_rr_nn(RR_BC, nn);
-		else if (restore_ptr(&ptr0) &&
-			(parse_D() || parse_DE()) && parse_comma() && parse_expr(&nn) && check_end())	// LXI D/DE, nn
-			return emit_ld_rr_nn(RR_DE, nn);
-		else if (restore_ptr(&ptr0) &&
-			(parse_H() || parse_HL()) && parse_comma() && parse_expr(&nn) && check_end())	// LXI H/HL, nn
-			return emit_ld_rr_nn(RR_HL, nn);
-		else if (restore_ptr(&ptr0) &&
-			parse_SP() && parse_comma() && parse_expr(&nn) && check_end())					// LXI SP, nn
-			return emit_ld_rr_nn(RR_SP, nn);
-		break;
-	}
-	case WORD_HASH('M', 'O', 'V', ___, ___): {
-		ptr += 3;
-		if (parse_reg8intel(&r1) && parse_comma() && parse_reg8intel(&r2) && check_end())	// MOV r, r
-			return emit_ld_r_r(r1, r2);
-		break;
-	}
-	case WORD_HASH('M', 'V', 'I', ___, ___): {
-		ptr += 3;
-		if (parse_reg8intel(&r) && parse_comma() && parse_expr(&n) && check_end())			// MVI r, n
-			return emit_ld_r_n(r, n);
-		break;
-	}
-	case WORD_HASH('S', 'P', 'H', 'L', ___): {
-		ptr += 4;
-		if (check_end())																	// SPHL
-			return emit_ld_sp_x(RR_HL);
-		break;
-	}
-
-	// increment and decrement
-	case WORD_HASH('I', 'N', 'C', ___, ___): {
-		ptr += 3;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_reg16sp(&rr) && check_end()) 				// INC/DEC BC/DE/HL/SP/IX/IY
-			return emit_inc_rr(rr);
-		else if (restore_ptr(&ptr0) &&
-			parse_reg8x(&r) && check_end())					// INC/DEC B/C/D/E/H/L/A/IXH/IYH/IXL/IYL
-			return emit_inc_r(r);
-		else if (restore_ptr(&ptr0) &&
-			parse_indHLx(&x, &dis) && check_end()) 			// INC/DEC (HL)/(IX+d)/(IY+d)
-			return emit_inc_indx(x, dis);
-		restore_ptr(&ptr0);
-		break;
-	}
-	case WORD_HASH('I', 'N', 'R', ___, ___): {				// INR r
-		ptr += 3;
-		if (parse_reg8intel(&r) && check_end())
-			return emit_inc_r(r);
-		break;
-	}
-	case WORD_HASH('I', 'N', 'X', ___, ___): {
-		ptr += 3;
-		if (parse_reg16sp_intel(&rr) && check_end())		// INX rr
-			return emit_inc_rr(rr);
-		break;
-	}
-	case WORD_HASH('D', 'E', 'C', ___, ___): {
-		ptr += 3;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_reg16sp(&rr) && check_end()) 				// INC/DEC BC/DE/HL/SP/IX/IY
-			return emit_dec_rr(rr);
-		else if (restore_ptr(&ptr0) &&
-			parse_reg8x(&r) && check_end())					// INC/DEC B/C/D/E/H/L/A/IXH/IYH/IXL/IYL
-			return emit_dec_r(r);
-		else if (restore_ptr(&ptr0) &&
-			parse_indHLx(&x, &dis) && check_end()) 			// INC/DEC (HL)/(IX+d)/(IY+d)
-			return emit_dec_indx(x, dis);
-		restore_ptr(&ptr0);
-		break;
-	}
-	case WORD_HASH('D', 'C', 'R', ___, ___): {
-		ptr += 3;
-		if (parse_reg8intel(&r) && check_end())				// DCR r
-			return emit_dec_r(r);
-		break;
-	}
-	case WORD_HASH('D', 'C', 'X', ___, ___): {		
-		ptr += 3;
-		if (parse_reg16sp_intel(&rr) && check_end())		// DCX rr 
-			return emit_dec_rr(rr);
-		break;
-	}
-
-	// exchange
-	case WORD_HASH('E', 'X', ___, ___, ___): {
-		ptr += 2;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_af() && parse_comma() && parse_af() && (parse_tick() || true) && check_end()) // EX AF, AF[']
-			return emit_ex_af_af1();
-		else if (restore_ptr(&ptr0) &&
-			parse_DE() && parse_comma() && parse_HLx(&x) && check_end())				// EX DE, HL
-			return emit_ex_de_hl(x);
-		else if (restore_ptr(&ptr0) &&
-			parse_lparen() && parse_SP() && parse_rparen() && parse_comma() &&
-			parse_HLx(&x) && check_end())												// EX (SP),HL/IX/IY
-			return emit_ex_indsp_hl(x);
-		else 
-			restore_ptr(&ptr0);
-		break;
-	}
-	case WORD_HASH('E', 'X', 'X', ___, ___): {
-		ptr += 3;
-		if (check_end())			// EXX
-			return emit_exx();
-		break;
-	}
-	case WORD_HASH('X', 'C', 'H', 'G', ___): {
-		ptr += 4;
-		if (check_end())			// XCHG
-			return emit_ex_de_hl(RR_HL);
-		break;
-	}
-	case WORD_HASH('X', 'T', 'H', 'L', ___): {
-		ptr += 4;
-		if (check_end())			// XTHL
-			return emit_ex_indsp_hl(RR_HL);
-		break;
-	}
-
-	// stack
-	case WORD_HASH('P', 'U', 'S', 'H', ___): {
-		ptr += 4;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_reg16af(&rr) && check_end())			// PUSH BC/DE/HL/AF
-			return emit_push_rr(rr);
-		else if (restore_ptr(&ptr0) &&
-			parse_reg16af_intel(&rr) && check_end()) 	// PUSH B/BC/D/DE/H/HL/PSW
-			return emit_push_rr(rr);
-		else
-			restore_ptr(&ptr0);
-		break;
-	}
-	case WORD_HASH('P', 'O', 'P', ___, ___): {
-		ptr += 3;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_reg16af(&rr) && check_end())			// POP BC/DE/HL/AF
-			return emit_pop_rr(rr);
-		else if (restore_ptr(&ptr0) &&
-			parse_reg16af_intel(&rr) && check_end()) 	// POP B/BC/D/DE/H/HL/PSW
-			return emit_pop_rr(rr);
-		else
-			restore_ptr(&ptr0);
-		break;
-	}
-
-	// arithmetic and logical
-	case WORD_HASH('A', 'D', 'D', ___, ___): {
-		ptr += 3;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_alu8(OP_ADD))
-			return true;
-		else if (restore_ptr(&ptr0) &&
-			parse_M() && check_end())												// ADD m
-			return emit_alu_indx(OP_ADD, RR_HL, 0);
-		else if (restore_ptr(&ptr0) &&
-			parse_HLx(&x) && parse_comma() && parse_reg16sp(&rr) && check_end())	// ADD HL/IX/IY, BC/DE/HL/SP/IX/IY
-			return emit_add_x_rr(x, rr);
-		else if (restore_ptr(&ptr0) &&
-			parse_BC() && parse_comma() && parse_expr(&nn) && check_end())			// ADD BC, nn
-			return (
-				emit_push_rr(RR_HL) &&
-				emit_ld_rr_nn(RR_HL, nn) &&
-				emit_add_x_rr(RR_HL, RR_BC) &&
-				emit_ld_r_r(R_B, R_H) &&
-				emit_ld_r_r(R_C, R_L) &&
-				emit_pop_rr(RR_HL));
-		else if (restore_ptr(&ptr0) &&
-			parse_DE() && parse_comma() && parse_expr(&nn) && check_end())			// ADD DE, nn
-			return (
-				emit_push_rr(RR_HL) &&
-				emit_ld_rr_nn(RR_HL, nn) &&
-				emit_add_x_rr(RR_HL, RR_DE) &&
-				emit_ld_r_r(R_D, R_H) &&
-				emit_ld_r_r(R_E, R_L) &&
-				emit_pop_rr(RR_HL));
-		else if (restore_ptr(&ptr0) &&
-			parse_HLx(&x) && parse_comma() && parse_expr(&nn) && check_end())		// ADD HL/IX/IY, nn
-			return (
-				emit_push_rr(RR_DE) &&
-				emit_ld_rr_nn(RR_DE, nn) &&
-				emit_add_x_rr(x, RR_DE) &&
-				emit_pop_rr(RR_DE));
-		else 
-			restore_ptr(&ptr0);
-		break;
-	}
-	case WORD_HASH('D', 'A', 'D', ___, ___): {
-		ptr += 3;
-		if (parse_reg16sp_intel(&rr) && check_end())		// DAD m
-			return emit_add_x_rr(RR_HL, rr);
-		break;
-	}
-	case WORD_HASH('A', 'D', 'I', ___, ___): {
-		ptr += 3;
-		if (parse_expr(&n) && check_end()) {	// ADI n
-			emit(0xc6);
-			emit(n);
-			return true;
-		}
-		break;
-	}
-	case WORD_HASH('A', 'D', 'C', ___, ___): {
-		ptr += 3;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_alu8(OP_ADC))
-			return true;
-		else if (restore_ptr(&ptr0) &&
-			parse_M() && check_end())			// ADC m
-			return emit_alu_indx(OP_ADC, RR_HL, 0);
-		else if (restore_ptr(&ptr0) &&
-			parse_HLx(&x) && parse_comma() && parse_reg16sp(&rr) && check_end()) 	// ADC HL, BC/DE/HL/SP
-			return emit_adc_x_rr(x, rr);
-		else 
-			restore_ptr(&ptr0);
-		break;
-	}
-	case WORD_HASH('A', 'C', 'I', ___, ___): {
-		ptr += 3;
-		if (parse_expr(&n) && check_end()) 		// ACI n
-			return emit_alu_n(OP_ADC, n);
-		break;
-	}
-	case WORD_HASH('S', 'U', 'B', ___, ___): {
-		ptr += 3;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_alu8(OP_SUB))
-			return true;
-		else if (restore_ptr(&ptr0) &&
-			parse_reg8intel(&r) && check_end()) // SUB r
-			return emit_alu_r(OP_SUB, r);
-		else
-			restore_ptr(&ptr0);
-		break;
-	}
-	case WORD_HASH('S', 'U', 'I', ___, ___): {
-		ptr += 3;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_expr(&n) && check_end())		// SUI n
-			return emit_alu_n(OP_SUB, n);
-		else
-			restore_ptr(&ptr0);
-		break;
-	}
-	case WORD_HASH('S', 'B', 'C', ___, ___): {
-		ptr += 3;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_alu8(OP_SBC))
-			return true;
-		else if (restore_ptr(&ptr0) &&
-			parse_HLx(&x) && parse_comma() && parse_reg16sp(&rr) && check_end())	// SBC HL, BC/DE/HL/SP
-			return emit_sbc_x_rr(x, rr);
-		else
-			restore_ptr(&ptr0);
-		break;
-	}
-	case WORD_HASH('S', 'B', 'B', ___, ___): {
-		ptr += 3;
-		if (parse_alu8intel(OP_SBC))
-			return true;
-		break;
-	}
-	case WORD_HASH('S', 'B', 'I', ___, ___): {
-		ptr += 3;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_expr(&n) && check_end()) 		// SBI n
-			return emit_alu_n(OP_SBC, n);
-		else
-			restore_ptr(&ptr0);
-		break;
-	}
-	case WORD_HASH('C', 'P', ___, ___, ___): {
-		ptr += 2;
-		if (parse_alu8(OP_CP))
-			return true;
-		break;
-	}
-	case WORD_HASH('C', 'M', 'P', ___, ___): {
-		ptr += 3;
-		if (parse_alu8(OP_CP) || parse_alu8intel(OP_CP))
-			return true;
-		break;
-	}
-	case WORD_HASH('D', 'A', 'A', ___, ___): {
-		ptr += 3;
-		if (check_end()) 							// DAA
-			return emit_daa();
-		break;
-	}
-	case WORD_HASH('C', 'P', 'L', ___, ___): {
-		ptr += 3;
-		if ((parse_a() || true) && check_end()) 	// CPL [A]
-			return emit_cpl();
-		break;
-	}
-	case WORD_HASH('C', 'M', 'A', ___, ___): {
-		ptr += 3;
-		if (check_end())							// CMA
-			return emit_cpl();
-		break;
-	}
-	case WORD_HASH('N', 'E', 'G', ___, ___): {
-		ptr += 3;
-		if ((parse_a() || true) && check_end()) 	// NEG [A]
-			return emit_neg();
-		break;
-	}
-	case WORD_HASH('S', 'C', 'F', ___, ___): {
-		ptr += 3;
-		if (check_end())							// SCF
-			return emit_scf();
-		break;
-	}
-	case WORD_HASH('S', 'T', 'C', ___, ___): {
-		ptr += 3;
-		if (check_end())							// STC
-			return emit_scf();
-		break;
-	}
-	case WORD_HASH('C', 'C', 'F', ___, ___): {
-		ptr += 3;
-		if (check_end())							// CCF
-			return emit_ccf();
-		break;
-	}
-	case WORD_HASH('C', 'M', 'C', ___, ___): {
-		ptr += 3;
-		if (check_end())							// CMC
-			return emit_ccf();
-		break;
-	}
-
-	case WORD_HASH('A', 'N', 'D', ___, ___): {
-		ptr += 3;
-		if (parse_alu8(OP_AND))
-			return true;
-		break;
-	}
-	case WORD_HASH('A', 'N', 'A', ___, ___): {
-		ptr += 3;
-		if (parse_reg8intel(&r) && check_end()) 	// ANA r
-			return emit_alu_r(OP_AND, r);
-		break;
-	}
-	case WORD_HASH('A', 'N', 'I', ___, ___): {
-		ptr += 3;
-		if (parse_expr(&n) && check_end())			// ANI n
-			return emit_alu_n(OP_AND, n);
-		break;
-	}
-	case WORD_HASH('O', 'R', ___, ___, ___): {
-		ptr += 2;
-		if (parse_alu8(OP_OR))
-			return true;
-		break;
-	}
-	case WORD_HASH('O', 'R', 'A', ___, ___): {
-		ptr += 3;
-		if (parse_reg8intel(&r) && check_end()) 	// ORA r
-			return emit_alu_r(OP_OR, r);
-		break;
-	}
-	case WORD_HASH('O', 'R', 'I', ___, ___): {
-		ptr += 3;
-		if (parse_expr(&n) && check_end())			// ORI n
-			return emit_alu_n(OP_OR, n);
-		break;
-	}
-	case WORD_HASH('X', 'O', 'R', ___, ___): {
-		ptr += 3;
-		if (parse_alu8(OP_XOR))
-			return true;
-		break;
-	}
-	case WORD_HASH('X', 'R', 'A', ___, ___): {
-		ptr += 3;
-		if (parse_reg8intel(&r) && check_end()) 	// XRA r
-			return emit_alu_r(OP_XOR, r);
-		break;
-	}
-	case WORD_HASH('X', 'R', 'I', ___, ___): {
-		ptr += 3;
-		if (parse_expr(&n) && check_end())			// XRI n
-			return emit_alu_n(OP_XOR, n);
-		break;
-	}
-
-	// rotate and shift
-	case WORD_HASH('R', 'L', 'A', ___, ___): {
-		ptr += 3;
-		if (check_end())			// RLA
-			return emit_rla();
-		break;
-	}
-	case WORD_HASH('R', 'A', 'L', ___, ___): {
-		ptr += 3;
-		if (check_end())			// RAL
-			return emit_rla();
-		break;
-	}
-	case WORD_HASH('R', 'L', 'C', 'A', ___): {
-		ptr += 4;
-		if (check_end())			// RLCA
-			return emit_rlca();
-		break;
-	}
-	case WORD_HASH('R', 'R', 'A', ___, ___): {
-		ptr += 3;
-		if (check_end())			// RRA
-			return emit_rra();
-		break;
-	}
-	case WORD_HASH('R', 'A', 'R', ___, ___): {
-		ptr += 3;
-		if (check_end())			// RAR
-			return emit_rra();
-		break;
-	}
-	case WORD_HASH('R', 'R', 'C', 'A', ___): {
-		ptr += 4;
-		if (check_end())			// RRCA
-			return emit_rrca();
-		break;
-	}
-	case WORD_HASH('R', 'L', 'C', ___, ___): {
-		ptr += 3;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_rot8(OP_RLC))		// RLC r
-			return true;
-		else if (restore_ptr(&ptr0) &&
-			check_end())			// RLC
-			return emit_rlca();
-		else
-			restore_ptr(&ptr0);
-		break;
-	}
-	case WORD_HASH('R', 'R', 'C', ___, ___): {
-		ptr += 3;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_rot8(OP_RRC))		// RRC r
-			return true;
-		else if (restore_ptr(&ptr0) && 
-			check_end())			// RRC
-			return emit_rrca();
-		else
-			restore_ptr(&ptr0);
-		break;
-	}
-	case WORD_HASH('R', 'L', ___, ___, ___): {
-		ptr += 2;
-		if (parse_rot8(OP_RL))		// RL r
-			return true;
-		break;
-	}
-	case WORD_HASH('R', 'R', ___, ___, ___): {
-		ptr += 2;
-		if (parse_rot8(OP_RR))		// RR r
-			return true;
-		break;
-	}
-	case WORD_HASH('S', 'L', 'A', ___, ___): {
-		ptr += 3;
-		if (parse_rot8(OP_SLA))		// SLA r
-			return true;
-		break;
-	}
-	case WORD_HASH('S', 'R', 'A', ___, ___): {
-		ptr += 3;
-		if (parse_rot8(OP_SRA))		// SRA r
-			return true;
-		break;
-	}
-	case WORD_HASH('S', 'L', 'L', ___, ___): {
-		ptr += 3;
-		if (parse_rot8(OP_SLL))		// SLL r
-			return true;
-		break;
-	}
-	case WORD_HASH('S', 'L', 'I', ___, ___): {
-		ptr += 3;
-		if (parse_rot8(OP_SLI))		// SLI r
-			return true;
-		break;
-	}
-	case WORD_HASH('S', 'R', 'L', ___, ___): {
-		ptr += 3;
-		if (parse_rot8(OP_SRL))		// SRL r
-			return true;
-		break;
-	}
-	case WORD_HASH('R', 'R', 'D', ___, ___): {
-		ptr += 3;
-		if (check_end())			// RRD
-			return emit_rrd();
-		break;
-	}
-	case WORD_HASH('R', 'L', 'D', ___, ___): {
-		ptr += 3;
-		if (check_end())			// RLD
-			return emit_rld();
-		break;
-	}
-
-	// bits
-	case WORD_HASH('B', 'I', 'T', ___, ___): {
-		ptr += 3;
-		if (parse_bit8(OP_BIT))
-			return true;
-		break;
-	}
-	case WORD_HASH('R', 'E', 'S', ___, ___): {
-		ptr += 3;
-		if (parse_bit8(OP_RES))
-			return true;
-		break;
-	}
-	case WORD_HASH('S', 'E', 'T', ___, ___): {
-		ptr += 3;
-		if (parse_bit8(OP_SET))
-			return true;
-		break;
-	}
-
-	// block transfer
-	case WORD_HASH('L', 'D', 'I', ___, ___): {
-		ptr += 3;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_ind_BCDE(&rr) && parse_comma() && parse_a() && check_end()) 	// LDI (BC/DE), A
-			return (
-				emit_ld_indrr_a(rr) &&
-				emit_inc_rr(rr));
-		else if (restore_ptr(&ptr0) &&
-			parse_a() && parse_comma() && parse_ind_BCDE(&rr) && check_end()) 	// LDI A, (BC/DE)
-			return (
-				emit_ld_a_indrr(rr) &&
-				emit_inc_rr(rr));
-		else if (restore_ptr(&ptr0) &&
-			parse_indHL() && parse_comma() && parse_a() && check_end())			// LDI (HL), A
-			return (
-				emit_ld_indx_r(RR_HL, 0, R_A) &&
-				emit_inc_rr(RR_HL));
-		else if (restore_ptr(&ptr0) &&
-			parse_a() && parse_comma() && parse_indHL() && check_end())			// LDI A, (HL)
-			return (
-				emit_ld_r_indx(R_A, RR_HL, 0) &&
-				emit_inc_rr(RR_HL));
-		else if (restore_ptr(&ptr0) &&
-			check_end())			// LDI
-			return emit_ldi();
-		else
-			restore_ptr(&ptr0);
-		break;
-	}
-	case WORD_HASH('L', 'D', 'I', 'R', ___): {
-		ptr += 4;
-		if (check_end())			// LDIR
-			return emit_ldir();
-		break;
-	}
-	case WORD_HASH('L', 'D', 'D', ___, ___): {
-		ptr += 3;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_ind_BCDE(&rr) && parse_comma() && parse_a() && check_end()) 	// LDD (BC/DE), A
-			return (
-				emit_ld_indrr_a(rr) &&
-				emit_dec_rr(rr));
-		else if (restore_ptr(&ptr0) &&
-			parse_a() && parse_comma() && parse_ind_BCDE(&rr) && check_end()) 	// LDD A, (BC/DE)
-			return (
-				emit_ld_a_indrr(rr) &&
-				emit_dec_rr(rr));
-		else if (restore_ptr(&ptr0) &&
-			parse_indHL() && parse_comma() && parse_a() && check_end())			// LDD (HL), A
-			return (
-				emit_ld_indx_r(RR_HL, 0, R_A) &&
-				emit_dec_rr(RR_HL));
-		else if (restore_ptr(&ptr0) &&
-			parse_a() && parse_comma() && parse_indHL() && check_end())			// LDD A, (HL)
-			return (
-				emit_ld_r_indx(R_A, RR_HL, 0) &&
-				emit_dec_rr(RR_HL));
-		else if (restore_ptr(&ptr0) &&
-			check_end())			// LDD
-			return emit_ldd();
-		else 
-			restore_ptr(&ptr0);
-		break;
-	}
-	case WORD_HASH('L', 'D', 'D', 'R', ___): {
-		ptr += 4;
-		if (check_end())			// LDDR
-			return emit_lddr();
-		break;
-	}
-
-	// search
-	case WORD_HASH('C', 'P', 'I', ___, ___): {
-		ptr += 3;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_expr(&n) && check_end())	// CPI n
-			return emit_alu_n(OP_CP, n);
-		else if (restore_ptr(&ptr0) &&
-			check_end())					// CPI
-			return emit_cpi();
-		else
-			restore_ptr(&ptr0);
-		break;
-	}
-	case WORD_HASH('C', 'P', 'I', 'R', ___): {
-		ptr += 4;
-		if (check_end())					// CPIR
-			return emit_cpir();
-		break;
-	}
-	case WORD_HASH('C', 'P', 'D', ___, ___): {
-		ptr += 3;
-		if (check_end())					// CPD
-			return emit_cpd();
-		break;
-	}
-	case WORD_HASH('C', 'P', 'D', 'R', ___): {
-		ptr += 4;
-		if (check_end())					// CPDR
-			return emit_cpdr();
-		break;
-	}
-
-
-	// input/output
-	case WORD_HASH('I', 'N', ___, ___, ___): {
-		ptr += 2;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_f() && parse_comma() && parse_indC() && check_end()) 		// IN F, (C)
-			return emit_in_f_indc();
-		else if (restore_ptr(&ptr0) &&
-			parse_indC() && check_end())									// IN (C)
-			return emit_in_f_indc();
-		else if (restore_ptr(&ptr0) &&
-			parse_reg8(&r) && parse_comma() && parse_indC() && check_end())	// IN r, (C)
-			return emit_in_r_indc(r);
-		else if (restore_ptr(&ptr0) &&
-			parse_a() && parse_comma() && parse_indexpr(&n) && check_end()) // IN A, (n)
-			return emit_in_a_indn(n);
-		else if (restore_ptr(&ptr0) &&
-			parse_expr(&n) && check_end())									// IN n
-			return emit_in_a_indn(n);
-		else
-			restore_ptr(&ptr0);
-		break;
-	}
-	case WORD_HASH('I', 'N', 'I', ___, ___): {
-		ptr += 3;
-		if (check_end())		// INI
-			return emit_ini();
-		break;
-	}
-	case WORD_HASH('I', 'N', 'I', 'R', ___): {
-		ptr += 4;
-		if (check_end())		// INIR
-			return emit_inir();
-		break;
-	}
-	case WORD_HASH('I', 'N', 'D', ___, ___): {
-		ptr += 3;
-		if (check_end())		// IND
-			return emit_ind();
-		break;
-	}
-	case WORD_HASH('I', 'N', 'D', 'R', ___): {
-		ptr += 4;
-		if (check_end())		// INDR
-			return emit_indr();
-		break;
-	}
-	case WORD_HASH('O', 'U', 'T', ___, ___): {
-		ptr += 3;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_indC() && parse_comma() && parse_const(&n) && check_end())	// OUT (C), 0
-			return emit_out_indc_n(n);
-		else if (restore_ptr(&ptr0) &&
-			parse_indC() && parse_comma() && parse_reg8(&r) && check_end()) 	// OUT (C), r
-			return emit_out_indc_r(r);
-		else if (restore_ptr(&ptr0) &&
-			parse_indexpr(&n) && parse_comma() && parse_a() && check_end()) 	// OUT (n), A
-			return emit_out_indn_a(n);
-		else if (restore_ptr(&ptr0) &&
-			parse_expr(&n) && check_end())										// OUT n
-			return emit_out_indn_a(n);
-		else
-			restore_ptr(&ptr0);
-		break;
-	}
-	case WORD_HASH('O', 'U', 'T', 'I', ___): {
-		ptr += 4;
-		if (check_end())		// OUTI
-			return emit_outi();
-		break;
-	}
-	case WORD_HASH('O', 'T', 'I', 'R', ___): {
-		ptr += 4;
-		if (check_end()) 		// OTIR
-			return emit_otir();
-		break;
-	}
-	case WORD_HASH('O', 'U', 'T', 'D', ___): {
-		ptr += 4;
-		if (check_end())		// OUTD
-			return emit_outd();
-		break;
-	}
-	case WORD_HASH('O', 'T', 'D', 'R', ___): {
-		ptr += 4;
-		if (check_end())		// OTDR
-			return emit_otdr();
-		break;
-	}
-
-	// cpu control
-	case WORD_HASH('N', 'O', 'P', ___, ___): {
-		ptr += 3;
-		if (check_end())		// NOP
-			return emit_nop();
-		break;
-	}
-	case WORD_HASH('D', 'I', ___, ___, ___): {
-		ptr += 2;
-		if (check_end())		// DI
-			return emit_di();
-		break;
-	}
-	case WORD_HASH('E', 'I', ___, ___, ___): {
-		ptr += 2;
-		if (check_end())		// EI
-			return emit_ei();
-		break;
-	}
-	case WORD_HASH('H', 'A', 'L', 'T', ___): {
-		ptr += 4;
-		if (check_end())		// HALT
-			return emit_halt();
-		break;
-	}
-	case WORD_HASH('H', 'L', 'T', ___, ___): {
-		ptr += 3;
-		if (check_end())		// HALT
-			return emit_halt();
-		break;
-	}
-	case WORD_HASH('I', 'M', ___, ___, ___): {
-		ptr += 2;
-		if (parse_const(&im) && check_end()) 	// IM n
-			return emit_im(im);
-		break;
-	}
-
-	// jump
-	case WORD_HASH('J', 'P', ___, ___, ___): {
-		ptr += 2;
-		if (parse_jp())							// JP
-			return true;
-		break;
-	}
-	case WORD_HASH('J', 'M', 'P', ___, ___): {
-		ptr += 3;
-		if (parse_jp())							// JMP
-			return true;
-		break;
-	}
-	case WORD_HASH('P', 'C', 'H', 'L', ___): {
-		ptr += 4;
-		if (check_end())						// PCHL
-			return emit_jp_x(RR_HL);
-		break;
-	}
-	case WORD_HASH('J', 'N', 'Z', ___, ___): {
-		ptr += 3;
-		if (parse_jp_intel(F_NZ))				// JNZ nn
-			return true;
-		break;
-	}
-	case WORD_HASH('J', 'Z', ___, ___, ___): {
-		ptr += 2;
-		if (parse_jp_intel(F_Z))				// JZ nn
-			return true;
-		break;
-	}
-	case WORD_HASH('J', 'N', 'C', ___, ___): {
-		ptr += 3;
-		if (parse_jp_intel(F_NC))				// JNC nn
-			return true;
-		break;
-	}
-	case WORD_HASH('J', 'C', ___, ___, ___): {
-		ptr += 2;
-		if (parse_jp_intel(F_C))				// JC nn
-			return true;
-		break;
-	}
-	case WORD_HASH('J', 'P', 'O', ___, ___): {
-		ptr += 3;
-		if (parse_jp_intel(F_PO))				// JPO nn
-			return true;
-		break;
-	}
-	case WORD_HASH('J', 'P', 'E', ___, ___): {
-		ptr += 3;
-		if (parse_jp_intel(F_PE))				// JPE nn
-			return true;
-		break;
-	}
-	case WORD_HASH('J', 'N', 'V', ___, ___): {
-		ptr += 3;
-		if (parse_jp_intel(F_NV))				// JNV nn
-			return true;
-		break;
-	}
-	case WORD_HASH('J', 'V', ___, ___, ___): {
-		ptr += 2;
-		if (parse_jp_intel(F_V))				// JV nn
-			return true;
-		break;
-	}
-	case WORD_HASH('J', 'M', ___, ___, ___): {
-		ptr += 2;
-		if (parse_jp_intel(F_M))				// JM nn
-			return true;
-		break;
-	}
-	case WORD_HASH('D', 'J', 'N', 'Z', ___): {
-		ptr += 4;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (!(parse_B() && parse_comma()))		// b, optional
-			restore_ptr(&ptr0);
-		if (parse_expr(&nn) && check_end()) 	// DJNZ nn
-			return emit_djnz_nn(nn);
-		else
-			restore_ptr(&ptr0);
-		break;
-	}
-	case WORD_HASH('J', 'R', ___, ___, ___): {
-		ptr += 2;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_flags4(&f) && parse_comma() && parse_expr(&nn) && check_end())// JR f, nn
-			return emit_jr_f_nn(f, nn);
-		else if (restore_ptr(&ptr0) &&
-			parse_expr(&nn) && check_end())										// JR nn
-			return emit_jr_nn(nn);
-		else
-			restore_ptr(&ptr0);
-		break;
-	}
-
-	// call
-	case WORD_HASH('C', 'A', 'L', 'L', ___): {
-		ptr += 4;
-		if (parse_call())						// CALL
-			return true;
-		break;
-	}
-	case WORD_HASH('R', 'S', 'T', ___, ___): {
-		ptr += 3;
-		if (parse_const(&rst) && check_end()) 	// RST n
-			return emit_rst(rst);
-		break;
-	}
-	case WORD_HASH('C', 'N', 'Z', ___, ___): {
-		ptr += 3;
-		if (parse_call_intel(F_NZ))				// CNZ nn
-			return true;
-		break;
-	}
-	case WORD_HASH('C', 'Z', ___, ___, ___): {
-		ptr += 2;
-		if (parse_call_intel(F_Z))				// CZ nn
-			return true;
-		break;
-	}
-	case WORD_HASH('C', 'N', 'C', ___, ___): {
-		ptr += 3;	
-		if (parse_call_intel(F_NC))				// CNC nn
-			return true;
-		break;
-	}
-	case WORD_HASH('C', 'C', ___, ___, ___): {
-		ptr += 2;
-		if (parse_call_intel(F_C))				// CC nn
-			return true;
-		break;
-	}
-	case WORD_HASH('C', 'P', 'O', ___, ___): {
-		ptr += 3;
-		if (parse_call_intel(F_PO))				// CPO nn
-			return true;
-		break;
-	}
-	case WORD_HASH('C', 'P', 'E', ___, ___): {
-		ptr += 3;
-		if (parse_call_intel(F_PE))				// CPE nn
-			return true;
-		break;
-	}
-	case WORD_HASH('C', 'N', 'V', ___, ___): {
-		ptr += 3;
-		if (parse_call_intel(F_NV))				// CNV nn
-			return true;
-		break;
-	}
-	case WORD_HASH('C', 'V', ___, ___, ___): {
-		ptr += 2;
-		if (parse_call_intel(F_V))				// CV nn
-			return true;
-		break;
-	}
-	case WORD_HASH('C', 'M', ___, ___, ___): {
-		ptr += 2;
-		if (parse_call_intel(F_M))				// CM nn
-			return true;
-		break;
-	}
-
-	// return
-	case WORD_HASH('R', 'E', 'T', ___, ___): {
-		ptr += 3;
-		const char* ptr0; blanks(); save_ptr(&ptr0);
-		if (parse_flags8(&f) && check_end()) 	// RET f
-			return emit_ret_f(f);
-		else if (restore_ptr(&ptr0) && 
-			check_end())						// RET
-			return emit_ret();
-		else
-			restore_ptr(&ptr0);
-		break;
-	}
-	case WORD_HASH('R', 'N', 'Z', ___, ___): {
-		ptr += 3;
-		if (check_end())						// RNZ
-			return emit_ret_f(F_NZ);
-		break;
-	}
-	case WORD_HASH('R', 'Z', ___, ___, ___): {
-		ptr += 2;
-		if (check_end())						// RZ
-			return emit_ret_f(F_Z);
-		break;
-	}
-	case WORD_HASH('R', 'N', 'C', ___, ___): {
-		ptr += 3;
-		if (check_end())						// RNC
-			return emit_ret_f(F_NC);
-		break;
-	}
-	case WORD_HASH('R', 'C', ___, ___, ___): {
-		ptr += 2;
-		if (check_end())						// RC
-			return emit_ret_f(F_C);
-		break;
-	}
-	case WORD_HASH('R', 'P', 'O', ___, ___): {
-		ptr += 3;
-		if (check_end())						// RPO
-			return emit_ret_f(F_PO);
-		break;
-	}
-	case WORD_HASH('R', 'P', 'E', ___, ___): {
-		ptr += 3;
-		if (check_end())						// RPE
-			return emit_ret_f(F_PE);
-		break;
-	}
-	case WORD_HASH('R', 'N', 'V', ___, ___): {
-		ptr += 3;
-		if (check_end())						// RNV
-			return emit_ret_f(F_NV);
-		break;
-	}
-	case WORD_HASH('R', 'V', ___, ___, ___): {
-		ptr += 2;
-		if (check_end())						// RV
-			return emit_ret_f(F_V);
-		break;
-	}
-	case WORD_HASH('R', 'P', ___, ___, ___): {
-		ptr += 2;
-		if (check_end())						// RP
-			return emit_ret_f(F_P);
-		break;
-	}
-	case WORD_HASH('R', 'M', ___, ___, ___): {
-		ptr += 2;
-		if (check_end())						// RM
-			return emit_ret_f(F_M);
-		break;
-	}
-	case WORD_HASH('R', 'E', 'T', 'I', ___): {
-		ptr += 4;
-		if (check_end())						// RETI
-			return emit_reti();
-		break;
-	}
-	case WORD_HASH('R', 'E', 'T', 'N', ___): {
-		ptr += 4;
-		if (check_end())						// RETN
-			return emit_retn();
-		break;
-	}
-
-	default: break;
-	}
-	error_syntax();
-	return false;
 }
 
 static bool parse_line(void) {
 	UT_string* label; utstring_new(label);
 
 	bool ok = true;
-	blanks();
-	if (parse_label(label)) {}
-	blanks();
-	while (*ptr != '\0') {
+	if (LABEL(label)) {
+		printf("Define label: %s\n", utstring_body(label));
+	}
+	while (yy->id != T_END) {
 		if (!parse_statement()) ok = false;
 	}
 	
@@ -1795,12 +1311,16 @@ static bool parse_line(void) {
 }
 
 static bool parse_file_1(void) {
+	UT_string* line; utstring_new(line);
+
 	bool ok = true;
-	while (utstring_fgets(input_line, input_file)) {
-		ptr = utstring_body(input_line);
+	while (utstring_fgets(line, input_file)) {
 		line_num++;
+		yy = scan_text(utstring_body(line));
 		if (!parse_line()) ok = false;
 	}
+
+	utstring_free(line);
 	return ok;
 }
 
@@ -1814,14 +1334,12 @@ static bool parse_file(const char* filename) {
 
 	int save_line_num = line_num; 
 	line_num = 0;
-	
-	char* save_line = safe_strdup(utstring_body(input_line)); 
-	utstring_clear(input_line);
-	
-	size_t save_cursor = ptr - utstring_body(input_line); 
-	ptr = utstring_body(input_line);
+
+	new_scan();
 
 	bool ok = parse_file_1();
+
+	delete_scan();
 
 	fclose(input_file); 
 	input_file = save_input_file;
@@ -1831,12 +1349,6 @@ static bool parse_file(const char* filename) {
 	
 	line_num = save_line_num;
 	
-	utstring_clear(input_line); 
-	utstring_printf(input_line, "%s", save_line); 
-	free(save_line);
-
-	ptr = utstring_body(input_line) + save_cursor;
-
 	return ok;
 }
 
@@ -1855,4 +1367,262 @@ bool assemble_file(const char* input_filename) {
 	bool ok = parse_file(input_filename);
 
 	return ok;
+}
+
+//-----------------------------------------------------------------------------
+// keywords
+//-----------------------------------------------------------------------------
+static keyword_t keywords_table[] = {
+//	word,		id,	flags,			reg8_value,	reg16_value,flag_value,	parse(),		opcode_value
+
+	// 8-bit registers
+	{"B",		0,	IS_REG8|
+					IS_REG8_INTEL|
+					IS_REG16_INTEL,	R_B,		RR_BC,		0,			NULL,			0			},
+	{"C",		0,	IS_REG8|
+					IS_REG8_INTEL|
+					IS_FLAG_CZ,		R_C,		0,			F_C,		NULL,			0			},
+	{"D",		0,	IS_REG8|
+					IS_REG8_INTEL|
+					IS_REG16_INTEL,	R_D,		RR_DE,		0,			NULL,			0			},
+	{"E",		0,	IS_REG8|
+					IS_REG8_INTEL,	R_E,		0,			0,			NULL,			0			},
+	{"H",		0,	IS_REG8|
+					IS_REG8_INTEL|
+					IS_REG16_INTEL,	R_H,		RR_HL,		0,			NULL,			0			},
+	{"L",		0,	IS_REG8|
+					IS_REG8_INTEL,	R_L,		0,			0,			NULL,			0			},
+	{"M",		0,	IS_REG8_INTEL|
+					IS_FLAG_PM,		R_M,		0,			F_M,		NULL,			0			},
+	{"A",		0,	IS_REG8|
+					IS_REG8_INTEL,	R_A,		0,			0,			NULL,			0			},
+	{"IXH",		0,	IS_REG8_IDX,	R_H|IDX_IX,	0,			0,			NULL,			0			},
+	{"IXL",		0,	IS_REG8_IDX,	R_L|IDX_IX,	0,			0,			NULL,			0			},
+	{"IYH",		0,	IS_REG8_IDX,	R_H|IDX_IY,	0,			0,			NULL,			0			},
+	{"IYL",		0,	IS_REG8_IDX,	R_L|IDX_IY,	0,			0,			NULL,			0			},
+	
+	{"I",		T_I,0,				0,			0,			0,			NULL,			0			},
+	{"R",		T_R,0,				0,			0,			0,			NULL,			0			},
+	{"F",		T_F,0,				0,			0,			0,			NULL,			0			},
+
+	// 16-bit registers
+	{"BC",		0,	IS_REG16_AF|
+					IS_REG16_SP|
+					IS_REG16_INTEL|
+					IS_REG16_BCDE,	0, 			RR_BC,		0,			NULL,			0			},
+	{"DE",		0,	IS_REG16_AF|
+					IS_REG16_SP|
+					IS_REG16_INTEL|
+					IS_REG16_BCDE,	0, 			RR_DE,		0,			NULL,			0			},
+	{"HL",		0,	IS_REG16_AF|
+					IS_REG16_SP|
+					IS_REG16_INTEL|
+					IS_REG16_IDX,	0, 			RR_HL,		0,			NULL,			0			},
+	{"SP",		0,	IS_REG16_SP|
+					IS_REG16_INTEL,	0,			RR_SP,		0,			NULL,			0			},
+	{"AF",		0,	IS_REG16_AF,	0,			RR_AF,		0,			NULL,			0			},
+	{"PSW",		0,	IS_REG16_AF|
+					IS_REG16_INTEL,	0,			RR_AF, 		0,			NULL,			0			},
+	{"IX",		0,	IS_REG16_IDX,	0,			RR_HL|IDX_IX,
+															0,			NULL,			0			},
+	{"IY",		0,	IS_REG16_IDX,	0,			RR_HL|IDX_IY,
+															0,			NULL,			0			},
+
+	{"HLD",		0,	IS_REG16_IDX,	0,			RR_HL|POS_DEC,
+															0,			NULL,			0			},
+	{"HLI",		0,	IS_REG16_IDX,	0,			RR_HL|POS_INC,
+															0,			NULL,			0			},
+
+	// flags
+	{"NZ",		0,	IS_FLAG_CZ,		0,			0,			F_NZ,		NULL,			0			},
+	{"Z",		0,	IS_FLAG_CZ,		0,			0,			F_Z,		NULL,			0			},
+	{"NC",		0,	IS_FLAG_CZ,		0,			0,			F_NC,		NULL,			0			},
+	{"PO",		0,	IS_FLAG_PM,		0,			0,			F_PO,		NULL,			0			},
+	{"PE",		0,	IS_FLAG_PM,		0,			0,			F_PE,		NULL,			0			},
+	{"NV",		0,	IS_FLAG_PM,		0,			0,			F_NV,		NULL,			0			},
+	{"V",		0,	IS_FLAG_PM,		0,			0,			F_V,		NULL,			0			},
+	{"P",		0,	IS_FLAG_PM,		0,			0,			F_P,		NULL,			0			},
+
+	// operands
+	{"ASMPC",	T_ASMPC, 0,			0,			0,			0,			NULL,			0			},
+	
+	// load
+	{"LD",		0,	IS_OPCODE,		0,			0,			0,			parse_ld,		0			},
+	{"LDA",		0,	IS_OPCODE,		0,			0,			0,			parse_lda_sta,	1			},
+	{"STA",		0,	IS_OPCODE,		0,			0,			0,			parse_lda_sta,	0			},
+	{"LHLD",	0,	IS_OPCODE,		0,			0,			0,			parse_lhld_shld,1			},
+	{"SHLD",	0,	IS_OPCODE,		0,			0,			0,			parse_lhld_shld,0			},
+	{"LDAX",	0,	IS_OPCODE,		0,			0,			0,			parse_ldax_stax,1			},
+	{"STAX",	0,	IS_OPCODE,		0,			0,			0,			parse_ldax_stax,0			},
+	{"LXI",		0,	IS_OPCODE,		0,			0,			0,			parse_lxi,		0			},
+	{"MOV",		0,	IS_OPCODE,		0,			0,			0,			parse_mov,		0			},
+	{"MVI",		0,	IS_OPCODE,		0,			0,			0,			parse_mvi,		0			},
+	{"SPHL",	0,	IS_OPCODE,		0,			0,			0,			parse_sphl,		0			},
+	
+	// increment and decrement
+	{"INC",		0,	IS_OPCODE,		0,			0,			0,			parse_inc_dec,	1			},
+	{"DEC",		0,	IS_OPCODE,		0,			0,			0,			parse_inc_dec,	0			},
+	{"INR",		0,	IS_OPCODE,		0,			0,			0,			parse_inr_dcr,	1			},
+	{"DCR",		0,	IS_OPCODE,		0,			0,			0,			parse_inr_dcr,	0			},
+	{"INX",		0,	IS_OPCODE,		0,			0,			0,			parse_inx_dcx,	1			},
+	{"DCX",		0,	IS_OPCODE,		0,			0,			0,			parse_inx_dcx,	0			},
+
+	// exchange
+	{"EX",		0,	IS_OPCODE,		0,			0,			0,			parse_ex,		0			},
+	{"EXX",		0,	IS_OPCODE,		0,			0,			0,			parse_exx,		0			},
+	{"XCHG",	0,	IS_OPCODE,		0,			0,			0,			parse_xchg,		0			},
+	{"XTHL",	0,	IS_OPCODE,		0,			0,			0,			parse_xthl,		0			},
+
+	// stack
+	{"PUSH",	0,	IS_OPCODE,		0,			0,			0,			parse_push_pop,	1			},
+	{"POP",		0,	IS_OPCODE,		0,			0,			0,			parse_push_pop,	0			},
+
+	// arithmetic and logical
+	{"ADD",		0,	IS_OPCODE,		0,			0,			0,			parse_add,		0			},
+	{"ADC",		0,	IS_OPCODE,		0,			0,			0,			parse_adc,		0			},
+	{"DAD",		0,	IS_OPCODE,		0,			0,			0,			parse_dad,		0			},
+	{"SUB",		0,	IS_OPCODE,		0,			0,			0,			parse_sub,		0			},
+	{"SBC",		0,	IS_OPCODE,		0,			0,			0,			parse_sbc,		0			},
+	{"CP",		0,	IS_OPCODE,		0,			0,			0,			parse_alu8,		OP_CP		},
+	{"CMP",		0,	IS_OPCODE,		0,			0,			0,			parse_cmp,		OP_CP		},
+	{"AND",		0,	IS_OPCODE,		0,			0,			0,			parse_alu8,		OP_AND		},
+	{"OR",		0,	IS_OPCODE,		0,			0,			0,			parse_alu8,		OP_OR		},
+	{"XOR",		0,	IS_OPCODE,		0,			0,			0,			parse_alu8,		OP_XOR		},
+	{"DAA",		0,	IS_OPCODE,		0,			0,			0,			parse_daa,		0			},
+	{"CPL",		0,	IS_OPCODE,		0,			0,			0,			parse_cpl,		0			},
+	{"CMA",		0,	IS_OPCODE,		0,			0,			0,			parse_cma,		0			},
+	{"SCF",		0,	IS_OPCODE,		0,			0,			0,			parse_scf,		0			},
+	{"STC",		0,	IS_OPCODE,		0,			0,			0,			parse_scf,		0			},
+	{"CCF",		0,	IS_OPCODE,		0,			0,			0,			parse_ccf,		0			},
+	{"CMC",		0,	IS_OPCODE,		0,			0,			0,			parse_ccf,		0			},
+	{"NEG",		0,	IS_OPCODE,		0,			0,			0,			parse_neg,		0			},
+	{"ADI",		0,	IS_OPCODE,		0,			0,			0,			parse_intel_alu_n, OP_ADD	},
+	{"ACI",		0,	IS_OPCODE,		0,			0,			0,			parse_intel_alu_n, OP_ADC	},
+	{"SUI",		0,	IS_OPCODE,		0,			0,			0,			parse_intel_alu_n, OP_SUB	},
+	{"SBI",		0,	IS_OPCODE,		0,			0,			0,			parse_intel_alu_n, OP_SBC	},
+	{"ANI",		0,	IS_OPCODE,		0,			0,			0,			parse_intel_alu_n, OP_AND	},
+	{"ORI",		0,	IS_OPCODE,		0,			0,			0,			parse_intel_alu_n, OP_OR	},
+	{"XRI",		0,	IS_OPCODE,		0,			0,			0,			parse_intel_alu_n, OP_XOR	},
+	{"SBB",		0,	IS_OPCODE,		0,			0,			0,			parse_intel_alu_r, OP_SBC	},
+	{"ANA",		0,	IS_OPCODE,		0,			0,			0,			parse_intel_alu_r, OP_AND	},
+	{"ORA",		0,	IS_OPCODE,		0,			0,			0,			parse_intel_alu_r, OP_OR	},
+	{"XRA",		0,	IS_OPCODE,		0,			0,			0,			parse_intel_alu_r, OP_XOR	},
+		
+	// rotate and shift
+	{"RLA",		0,	IS_OPCODE,		0,			0,			0,			parse_rla_rra,	1			},
+	{"RAL",		0,	IS_OPCODE,		0,			0,			0,			parse_rla_rra,	1			},
+	{"RLCA",	0,	IS_OPCODE,		0,			0,			0,			parse_rlca_rrca,1			},
+	{"RLC",		0,	IS_OPCODE,		0,			0,			0,			parse_rlc_rrc,	1			},
+	{"RL",		0,	IS_OPCODE,		0,			0,			0,			parse_rot8,		OP_RL		},
+	{"SLA",		0,	IS_OPCODE,		0,			0,			0,			parse_rot8,		OP_SLA		},
+	{"SLL",		0,	IS_OPCODE,		0,			0,			0,			parse_rot8,		OP_SLL		},
+	{"SLI",		0,	IS_OPCODE,		0,			0,			0,			parse_rot8,		OP_SLI		},
+	{"RLD",		0,	IS_OPCODE,		0,			0,			0,			parse_rld_rrd,	1			},
+	{"RRA",		0,	IS_OPCODE,		0,			0,			0,			parse_rla_rra,	0			},
+	{"RAR",		0,	IS_OPCODE,		0,			0,			0,			parse_rla_rra,	0			},
+	{"RRCA",	0,	IS_OPCODE,		0,			0,			0,			parse_rlca_rrca,0			},
+	{"RRC",		0,	IS_OPCODE,		0,			0,			0,			parse_rlc_rrc,	0			},
+	{"RR",		0,	IS_OPCODE,		0,			0,			0,			parse_rot8,		OP_RR		},
+	{"SRA",		0,	IS_OPCODE,		0,			0,			0,			parse_rot8,		OP_SRA		},
+	{"SRL",		0,	IS_OPCODE,		0,			0,			0,			parse_rot8,		OP_SRL		},
+	{"RRD",		0,	IS_OPCODE,		0,			0,			0,			parse_rld_rrd,	0			},
+
+	// bit manipulation
+	{"BIT",		0,	IS_OPCODE,		0,			0,			0,			parse_bit8,		OP_BIT		},
+	{"RES",		0,	IS_OPCODE,		0,			0,			0,			parse_bit8,		OP_RES		},
+	{"SET",		0,	IS_OPCODE,		0,			0,			0,			parse_bit8,		OP_SET		},
+
+	// block transfer
+	{"LDI",		0,	IS_OPCODE,		0,			0,			0,			parse_ldi_ldd,	1			},
+	{"LDIR",	0,	IS_OPCODE,		0,			0,			0,			parse_ldir_lddr,1			},
+	{"LDD",		0,	IS_OPCODE,		0,			0,			0,			parse_ldi_ldd,	0			},
+	{"LDDR",	0,	IS_OPCODE,		0,			0,			0,			parse_ldir_lddr,0			},
+
+	// search
+	{"CPI",		0,	IS_OPCODE,		0,			0,			0,			parse_cpi,		0			},
+	{"CPIR",	0,	IS_OPCODE,		0,			0,			0,			parse_cpir_cpdr,1			},
+	{"CPD",		0,	IS_OPCODE,		0,			0,			0,			parse_cpd,		0			},
+	{"CPDR",	0,	IS_OPCODE,		0,			0,			0,			parse_cpir_cpdr,0			},
+
+	// input/output
+	{"IN",		0,	IS_OPCODE,		0,			0,			0,			parse_in,		0			},
+	{"INI",		0,	IS_OPCODE,		0,			0,			0,			parse_ini_ind,	1			},
+	{"INIR",	0,	IS_OPCODE,		0,			0,			0,			parse_inir_indr,1			},
+	{"IND",		0,	IS_OPCODE,		0,			0,			0,			parse_ini_ind,	0			},
+	{"INDR",	0,	IS_OPCODE,		0,			0,			0,			parse_inir_indr,0			},
+	{"OUT",		0,	IS_OPCODE,		0,			0,			0,			parse_out,		0			},
+	{"OUTI",	0,	IS_OPCODE,		0,			0,			0,			parse_outi_outd,1			},
+	{"OTIR",	0,	IS_OPCODE,		0,			0,			0,			parse_otir_otdr,1			},
+	{"OUTD",	0,	IS_OPCODE,		0,			0,			0,			parse_outi_outd,0			},
+	{"OTDR",	0,	IS_OPCODE,		0,			0,			0,			parse_otir_otdr,0			},
+		
+	// cpu control
+	{"NOP",		0,	IS_OPCODE,		0,			0,			0,			parse_nop,		0			},
+	{"DI",		0,	IS_OPCODE,		0,			0,			0,			parse_di,		0			},
+	{"EI",		0,	IS_OPCODE,		0,			0,			0,			parse_ei,		0			},
+	{"HALT",	0,	IS_OPCODE,		0,			0,			0,			parse_halt,		0			},
+	{"HLT",		0,	IS_OPCODE,		0,			0,			0,			parse_halt,		0			},
+	{"IM",		0,	IS_OPCODE,		0,			0,			0,			parse_im,		0			},
+
+	// jump
+	{"JP",		0,	IS_OPCODE,		0,			0,			0,			parse_jp,		0			},
+	{"JR",		0,	IS_OPCODE,		0,			0,			0,			parse_jr,		0			},
+	{"DJNZ",	0,	IS_OPCODE,		0,			0,			0,			parse_djnz,		0			},
+	{"JMP",		0,	IS_OPCODE,		0,			0,			0,			parse_jp,		0			},
+	{"PCHL",	0,	IS_OPCODE,		0,			0,			0,			parse_pchl,		0			},
+	{"JNZ",		0,	IS_OPCODE,		0,			0,			0,			parse_jp_intel,	F_NZ		},
+	{"JZ",		0,	IS_OPCODE,		0,			0,			0,			parse_jp_intel,	F_Z			},
+	{"JNC",		0,	IS_OPCODE,		0,			0,			0,			parse_jp_intel,	F_NC		},
+	{"JC",		0,	IS_OPCODE,		0,			0,			0,			parse_jp_intel,	F_C			},
+	{"JPO",		0,	IS_OPCODE,		0,			0,			0,			parse_jp_intel,	F_PO		},
+	{"JPE",		0,	IS_OPCODE,		0,			0,			0,			parse_jp_intel,	F_PE		},
+	{"JNV",		0,	IS_OPCODE,		0,			0,			0,			parse_jp_intel,	F_NV		},
+	{"JV",		0,	IS_OPCODE,		0,			0,			0,			parse_jp_intel,	F_V			},
+	// Jump if Positive cannot be parsed, same as JumP
+	{"JM",		0,	IS_OPCODE,		0,			0,			0,			parse_jp_intel,	F_M			},
+
+	// call
+	{"CALL",	0,	IS_OPCODE,		0,			0,			0,			parse_call,		0			},
+	{"RST",		0,	IS_OPCODE,		0,			0,			0,			parse_rst,		0			},
+	{"CNZ",		0,	IS_OPCODE,		0,			0,			0,			parse_call_intel, F_NZ		},
+	{"CZ",		0,	IS_OPCODE,		0,			0,			0,			parse_call_intel, F_Z		},
+	{"CNC",		0,	IS_OPCODE,		0,			0,			0,			parse_call_intel, F_NC		},
+	{"CC",		0,	IS_OPCODE,		0,			0,			0,			parse_call_intel, F_C		},
+	{"CPO",		0,	IS_OPCODE,		0,			0,			0,			parse_call_intel, F_PO		},
+	{"CPE",		0,	IS_OPCODE,		0,			0,			0,			parse_call_intel, F_PE		},
+	{"CNV",		0,	IS_OPCODE,		0,			0,			0,			parse_call_intel, F_NV		},
+	{"CV",		0,	IS_OPCODE,		0,			0,			0,			parse_call_intel, F_V		},
+	// Call if Positive cannot be parsed, same as ComPare
+	{"CM",		0,	IS_OPCODE,		0,			0,			0,			parse_call_intel, F_M		},
+
+	// return
+	{"RET",		0,	IS_OPCODE,		0,			0,			0,			parse_ret,		0			},
+	{"RETI",	0,	IS_OPCODE,		0,			0,			0,			parse_reti,		0			},
+	{"RETN",	0,	IS_OPCODE,		0,			0,			0,			parse_retn,		0			},
+	{"RNZ",		0,	IS_OPCODE,		0,			0,			0,			parse_ret_intel,F_NZ		},
+	{"RZ",		0,	IS_OPCODE,		0,			0,			0,			parse_ret_intel,F_Z			},
+	{"RNC",		0,	IS_OPCODE,		0,			0,			0,			parse_ret_intel,F_NC		},
+	{"RC",		0,	IS_OPCODE,		0,			0,			0,			parse_ret_intel,F_C			},
+	{"RPO",		0,	IS_OPCODE,		0,			0,			0,			parse_ret_intel,F_PO		},
+	{"RPE",		0,	IS_OPCODE,		0,			0,			0,			parse_ret_intel,F_PE		},
+	{"RNV",		0,	IS_OPCODE,		0,			0,			0,			parse_ret_intel,F_NV		},
+	{"RV",		0,	IS_OPCODE,		0,			0,			0,			parse_ret_intel,F_V			},
+	{"RP",		0,	IS_OPCODE,		0,			0,			0,			parse_ret_intel,F_P			},
+	{"RM",		0,	IS_OPCODE,		0,			0,			0,			parse_ret_intel,F_M			},
+
+	{ NULL },
+};
+
+static keyword_t* keywords_hash;
+
+static void init_keywords(void) {
+	for (keyword_t* kw = keywords_table; kw->word != NULL; kw++) {
+		HASH_ADD_KEYPTR(hh, keywords_hash, kw->word, strlen(kw->word), kw);
+	}
+}
+
+static const keyword_t* lookup_keyword(const char* word) {
+	keyword_t* kw;
+	HASH_FIND_STR(keywords_hash, word, kw);
+	return kw;
 }

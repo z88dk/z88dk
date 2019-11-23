@@ -31,6 +31,10 @@ char* safe_strdup_n(const char* str, size_t n) {
 	return dst;
 }
 
+void* safe_calloc(size_t number, size_t size) {
+	return check_mem(calloc(number, size));
+}
+
 FILE* safe_fopen(const char* filename, const char* mode) {
 	FILE* fp = fopen(filename, mode);
 	if (!fp) {
@@ -57,9 +61,23 @@ bool utstring_fgets(UT_string* str, FILE* fp) {
 	return utstring_len(str) > 0 ? true : false;
 }
 
+void utstring_set(UT_string* dst, const char* src) {
+	utstring_set_n(dst, src, strlen(src));
+}
+
+void utstring_set_n(UT_string* dst, const char* src, size_t n) {
+	utstring_clear(dst);
+	utstring_bincpy(dst, src, n);
+}
+
+void utstring_toupper(UT_string* str) {
+	for (char* p = utstring_body(str); *p; p++)
+		*p = toupper(*p);
+}
+
 void remove_ext(UT_string* dst, const char* src) {
 	const char* p = src + strlen(src);
 	while (p > src && isalnum(p[-1])) p--;
 	if (p > src && p[-1] == '.') p--;
-	utstring_clear(dst); utstring_bincpy(dst, src, p - src);
+	utstring_set_n(dst, src, p - src);
 }

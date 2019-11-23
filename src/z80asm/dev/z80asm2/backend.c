@@ -88,11 +88,11 @@ static void emit_pos_inc_dec_rr(int rr) {
 
 bool emit_ld_r_r(int r1, int r2) {
 	if ((r1 & R_MASK) == R_M && (r2 & R_MASK) == R_M) {			// move memory to memory
-		error_illegal();
+		illegal_opcode_error();
 		return false;
 	}
 	else if (!check_idx_r(r1,r2)) {								// ix-iy mismath
-		error_illegal();
+		illegal_opcode_error();
 		return false;
 	}
 	else {
@@ -112,7 +112,7 @@ bool emit_ld_r_n(int r, int n)
 
 static bool emit_ld_r_indx_1(int opc, int r, int x, int dis) {
 	if ((r & IDX_MASK) != IDX_HL) {
-		error_illegal();
+		illegal_opcode_error();
 		return false;
 	}
 	else {
@@ -145,11 +145,11 @@ bool emit_ld_indx_n(int x, int dis, int n) {
 
 static bool emit_ld_a_indrr_1(int opc, int rr) {
 	if ((rr & IDX_MASK) != IDX_HL) {
-		error_illegal();
+		illegal_opcode_error();
 		return false;
 	}
 	else if ((rr & RR_MASK) != RR_BC && (rr & RR_MASK) != RR_DE) {
-		error_illegal();
+		illegal_opcode_error();
 		return false;
 	}
 	else {
@@ -197,7 +197,7 @@ static bool emit_ld_rr_indnn_1(int opc_hl, int opc_rr, int rr, int nn) {
 		return true;
 	}
 	if ((rr & IDX_MASK) != IDX_HL) {
-		error_illegal();
+		illegal_opcode_error();
 		return false;
 	}
 	else {
@@ -306,7 +306,7 @@ bool emit_ex_af_af1(void) {
 
 bool emit_ex_de_hl(int x) {
 	if ((x & IDX_MASK) != IDX_HL) {
-		error_illegal();
+		illegal_opcode_error();
 		return false;
 	}
 	else {
@@ -361,7 +361,7 @@ bool emit_alu_n(int op, int n) {
 
 bool emit_add_x_rr(int x, int rr) {
 	if (!check_idx_rr(x, rr)) {
-		error_illegal();
+		illegal_opcode_error();
 		return false;
 	}
 	else {
@@ -373,7 +373,7 @@ bool emit_add_x_rr(int x, int rr) {
 
 bool emit_adc_x_rr(int x, int rr) {
 	if ((x & IDX_MASK) != IDX_HL) {
-		error_illegal();
+		illegal_opcode_error();
 		return false;
 	}
 	else {
@@ -385,7 +385,7 @@ bool emit_adc_x_rr(int x, int rr) {
 
 bool emit_sbc_x_rr(int x, int rr) {
 	if ((x & IDX_MASK) != IDX_HL) {
-		error_illegal();
+		illegal_opcode_error();
 		return false;
 	}
 	else {
@@ -443,7 +443,7 @@ bool emit_rrca(void) {
 
 bool emit_rot_r(int op, int r) {
 	if ((r & IDX_MASK) != IDX_HL) {
-		error_illegal();
+		illegal_opcode_error();
 		return false;
 	}
 	else {
@@ -465,7 +465,7 @@ bool emit_rot_indx(int op, int x, int dis) {
 
 bool emit_rot_indx_r(int op, int x, int dis, int r) {
 	if ((r & IDX_MASK) != IDX_HL) {
-		error_illegal();
+		illegal_opcode_error();
 		return false;
 	}
 	else {
@@ -493,11 +493,11 @@ bool emit_rld(void) {
 
 bool emit_bit_r(int op, int bit, int r) {
 	if (bit < 0 || bit > 7) {
-		error_range(bit);
+		range_error(bit);
 		return false;
 	}
 	else if ((r & IDX_MASK) != IDX_HL) {
-		error_illegal();
+		illegal_opcode_error();
 		return false;
 	}
 	else {
@@ -509,7 +509,7 @@ bool emit_bit_r(int op, int bit, int r) {
 
 bool emit_bit_indx(int op, int bit, int x, int dis) {
 	if (bit < 0 || bit > 7) {
-		error_range(bit);
+		range_error(bit);
 		return false;
 	}
 	else {
@@ -525,11 +525,11 @@ bool emit_bit_indx(int op, int bit, int x, int dis) {
 
 bool emit_bit_indx_r(int op, int bit, int x, int dis, int r) {
 	if (bit < 0 || bit > 7) {
-		error_range(bit);
+		range_error(bit);
 		return false;
 	}
 	else if ((r & IDX_MASK) != IDX_HL) {
-		error_illegal();
+		illegal_opcode_error();
 		return false;
 	}
 	else {
@@ -599,7 +599,7 @@ bool emit_in_f_indc(void) {
 
 bool emit_in_r_indc(int r) {
 	if ((r & IDX_MASK) != IDX_HL) {
-		error_illegal();
+		illegal_opcode_error();
 		return false;
 	}
 	else {
@@ -641,7 +641,7 @@ bool emit_indr(void) {
 
 bool emit_out_indc_n(int n) {
 	if (n != 0) {
-		error_range(n);
+		range_error(n);
 		return false;
 	}
 	else {
@@ -653,7 +653,7 @@ bool emit_out_indc_n(int n) {
 
 bool emit_out_indc_r(int r) {
 	if ((r & IDX_MASK) != IDX_HL) {
-		error_illegal();
+		illegal_opcode_error();
 		return false;
 	}
 	else {
@@ -718,7 +718,7 @@ bool emit_im(int im) {
 	case 0: emit(0xed); emit(0x46); return true;
 	case 1: emit(0xed); emit(0x56); return true;
 	case 2: emit(0xed); emit(0x5e); return true;
-	default: error_range(im); return false;
+	default: range_error(im); return false;
 	}
 }
 
@@ -726,7 +726,7 @@ static bool emit_jr_1(int opc, int addr) {
 	int pc = get_pc() + 2;				// after this intruction
 	int dist = addr - pc;
 	if (dist < -128 || dist > 127) {
-		error_range(dist);
+		range_error(dist);
 		return false;
 	}
 	else {
@@ -741,7 +741,12 @@ bool emit_jr_nn(int nn) {
 }
 
 bool emit_jr_f_nn(int f, int nn) {
-	return emit_jr_1(0x20 + (f << 3), nn);
+	if (f > F_C) {
+		illegal_opcode_error();
+		return false;
+	}
+	else
+		return emit_jr_1(0x20 + (f << 3), nn);
 }
 
 bool emit_djnz_nn(int nn) {
@@ -789,7 +794,7 @@ bool emit_rst(int rst) {
 			emit(0xc7 + rst);
 			return true;
 		default:
-			error_range(rst);
+			range_error(rst);
 			return false;
 		}
 	}
