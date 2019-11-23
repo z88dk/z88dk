@@ -93,11 +93,11 @@ typedef enum {
 // IDE DISK COMMANDS
 //
 
-__DPROTO(`b,c,d,e,iyh,iyl',`b,c,d,e,iyh,iyl',DSTATUS,,disk_initialize,BYTE pdrv)
-__DPROTO(`d,e,iyh,iyl',`d,e,iyh,iyl',DSTATUS,,disk_status,BYTE pdrv)
+__DPROTO(`iyh,iyl',`iyh,iyl',DSTATUS,,disk_initialize,BYTE pdrv)
+__DPROTO(`iyh,iyl',`iyh,iyl',DSTATUS,,disk_status,BYTE pdrv)
 __DPROTO(`iyh,iyl',`iyh,iyl',DRESULT,,disk_read,BYTE pdrv, BYTE* buff, DWORD sector, UINT count)
 __DPROTO(`iyh,iyl',`iyh,iyl',DRESULT,,disk_write,BYTE pdrv, const BYTE* buff, DWORD sector, UINT count)
-__DPROTO(`d,e,iyh,iyl',`d,e,iyh,iyl',DRESULT,,disk_ioctl,BYTE pdrv, BYTE cmd, void* buff)
+__DPROTO(`iyh,iyl',`iyh,iyl',DRESULT,,disk_ioctl,BYTE pdrv, BYTE cmd, void* buff)
 
 //
 // CSIO SD COMMANDS
