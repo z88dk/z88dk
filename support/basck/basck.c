@@ -1254,13 +1254,13 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(prognd_skel2);
 		if (res>0)
-			dlbl("PROGND", res, "BASIC program end ptr (aka VARTAB)");
+			dlbl("PROGND", res, "; BASIC program end ptr (a.k.a. VARTAB, Simple Variables)");
 
 		res=find_skel(varend_skel);
 		if (res<0)
 			res=find_skel(varend_skel2);
 		if (res>0)
-			dlbl("VAREND", res, "End of variables");
+			dlbl("VAREND", res, "End of variables, begin of array aariables");
 
 		res=find_skel(arrend_skel);
 		if (res<0)
@@ -1720,7 +1720,7 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(abs_skel3);
 		if (res>0)
-			clbl("ABS", res+pos+1, "ATN");
+			clbl("ABS", res+pos+1, "ABS");
 		
 		res=find_skel(dblabs_skel);
 		if (res>0)
