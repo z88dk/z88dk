@@ -283,6 +283,12 @@ IF FORpc6001
         defc sndbit_mask   = 0
 ENDIF
 
+IF FORtvc
+        defc sndbit_port   = 0
+        defc sndbit_bit    = 0
+        defc sndbit_mask   = 0
+ENDIF
+
 IF FORsmc777
     defc sndbit_port	= $1d
     defc sndbit_bit    = 4

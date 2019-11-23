@@ -233,6 +233,9 @@ extern option_t  zxvgs_options;
 extern int       zx81_exec(char *target);
 extern option_t  zx81_options;
 
+extern int       tvc_exec(char *target);
+extern option_t  tvc_options;
+
 
 
 struct {
@@ -502,6 +505,10 @@ struct {
       "Creates a zxvgs application file",
       NULL,
       zxvgs_exec,   &zxvgs_options},
+    { "bin2cas",   "tvc",      "(C) 2019 Sandor Vass",
+      "Generate TVC .cas file from the linked binary",
+      NULL,
+      tvc_exec,   &tvc_options },
     { NULL, NULL, NULL, NULL, NULL, NULL }
 };
 #endif
