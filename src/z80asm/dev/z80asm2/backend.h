@@ -42,12 +42,15 @@ bool emit_ld_a_indnn(int nn);
 bool emit_ld_indnn_a(int nn);
 bool emit_ld_rr_nn(int rr, int nn);
 bool emit_ld_rr_indnn(int rr, int nn);
+bool emit_ld_hl_indnn(int nn);
 bool emit_ld_indnn_rr(int nn, int rr);
+bool emit_ld_indnn_hl(int nn);
 bool emit_ld_a_i(void);
 bool emit_ld_a_r(void);
 bool emit_ld_i_a(void);
 bool emit_ld_r_a(void);
 bool emit_ld_sp_x(int x);
+bool emit_ld_sp_hl(void);
 
 // increment and decrement
 bool emit_inc_r(int r);
@@ -59,8 +62,10 @@ bool emit_dec_rr(int rr);
 
 // exchange
 bool emit_ex_af_af1(void);
-bool emit_ex_de_hl(int x);
-bool emit_ex_indsp_hl(int x);
+bool emit_ex_de_x(int x);
+bool emit_ex_de_hl(void);
+bool emit_ex_indsp_x(int x);
+bool emit_ex_indsp_hl(void);
 bool emit_exx(void);
 
 // stack
@@ -138,6 +143,7 @@ bool emit_djnz_nn(int nn);
 bool emit_jp_nn(int nn);
 bool emit_jp_f_nn(int f, int nn);
 bool emit_jp_x(int x);
+bool emit_jp_hl(void);
 
 // call
 bool emit_call_nn(int nn);

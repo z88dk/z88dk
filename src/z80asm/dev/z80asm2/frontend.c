@@ -23,26 +23,40 @@ static void dtor_token(void* elt);
 // tokens from scanner, in same space as characters
 enum {
 	T_END = 0, T_IDENT = 0x100, T_NUM, T_STR,
-	T_F, T_I, T_R,
-	T_ASMPC,
+};
+
+// keywords
+enum {
+	K_B = 1, K_C, K_D, K_E, K_H, K_L, K_M, K_A, K_IXH, K_IXL, K_IYH, K_IYL, K_F, K_I, K_R,
+	K_BC, K_DE, K_HL, K_SP, K_AF, K_PSW, K_IX, K_IY, K_HLI, K_HLD,
+	K_NZ, K_Z, K_NC, K_PO, K_PE, K_NV, K_V, K_P,
+	K_ASMPC,
 };
 
 // bit-flags for keyword_t.flags
 enum {
-	IS_REG8 = 0x0001, IS_REG8_INTEL = 0x0002, IS_REG8_IDX = 0x0004,
-	IS_REG16_AF = 0x0008, IS_REG16_SP = 0x0010, IS_REG16_INTEL = 0x0020, IS_REG16_IDX = 0x0040,
-	IS_REG16_BCDE = 0x0080,
-	IS_FLAG_CZ = 0x0100, IS_FLAG_PM = 0x0200,
-	IS_OPCODE = 0x0400,
+	IS_AF = 0x0001, IS_SP = 0x0002, IS_INTEL = 0x0004, 
+	IS_ANY = ~0,
 };
+
+// keyword Not Applicable value
+enum { NA = -1 };
+
+// parse data
+typedef struct parse_t {
+	int n;
+} parse_t;
 
 // keyword lookup tables
 typedef struct {
 	const char* word;
 	int id;
-	int flags, reg8_value, reg16_value, flag_value;
-	bool (*parse)(int opcode_value);
-	int opcode_value;
+	int flags, reg8, reg16, zflag;
+	bool (*parse_emit)(int arg);	// parse and emit
+	int arg;
+	bool (*parse)(parse_t* data);
+	bool (*emit_void)(void);
+	bool (*emit_arg)(int arg);
 	UT_hash_handle hh;
 } keyword_t;
 
@@ -192,53 +206,6 @@ void reserved_warning(const char* word) {
 //-----------------------------------------------------------------------------
 // parser
 //-----------------------------------------------------------------------------
-static const keyword_t* parse_keyword(int mask) {
-	if (yy[0].id == T_IDENT && yy[0].keyword && (yy[0].keyword->flags & mask) != 0) {
-		yy++;
-		return yy[-1].keyword;
-	}
-	else
-		return NULL;
-}
-
-static bool parse_reg8(int flags, int* out) {
-	const keyword_t* kw = parse_keyword(flags);
-	if (kw) {
-		*out = kw->reg8_value;
-		return true;
-	}
-	else 
-		return false;
-}
-
-static bool parse_reg16(int flags, int* out) {
-	const keyword_t* kw = parse_keyword(flags);
-	if (kw) {
-		*out = kw->reg16_value;
-		return true;
-	}
-	else 
-		return false;
-}
-
-static bool parse_flags(int flags, int* out) {
-	const keyword_t* kw = parse_keyword(flags);
-	if (kw) {
-		*out = kw->flag_value;
-		return true;
-	}
-	else
-		return false;
-}
-
-static bool FLAGS4(int* out) {
-	return parse_flags(IS_FLAG_CZ, out);
-}
-
-static bool FLAGS8(int* out) {
-	return parse_flags(IS_FLAG_CZ | IS_FLAG_PM, out);
-}
-
 static bool EOS(void) {
 	switch (yy[0].id) {
 	case '\0':	return true;
@@ -246,6 +213,15 @@ static bool EOS(void) {
 	case '\\':	yy++; return true;
 	default:	return false;
 	}
+}
+
+static bool TK(int id) {
+	if (yy[0].id == id) {
+		yy++;
+		return true;
+	}
+	else
+		return false;
 }
 
 static bool KW(int id) {
@@ -257,13 +233,133 @@ static bool KW(int id) {
 		return false;
 }
 
-static bool TK(int id) {
-	if (yy[0].id == id) {
+static const keyword_t* parse_keyword(int mask) {
+	if (yy[0].id == T_IDENT && yy[0].keyword && (yy[0].keyword->flags & mask) != 0) {
 		yy++;
+		return yy[-1].keyword;
+	}
+	else
+		return NULL;
+}
+
+static bool parse_reg8(int* out) {
+	token_t* yy0 = yy;
+	const keyword_t* kw = parse_keyword(IS_ANY);
+	if (kw && kw->reg8 != NA) {
+		*out = kw->reg8;
+		return true;
+	}
+	yy = yy0;
+	return false;
+}
+
+static bool REG8(int* out) {
+	token_t* yy0 = yy;
+	if (parse_reg8(out) && (*out & R_MASK) != R_M && (*out & IDX_MASK) == IDX_HL)
+		return true;
+	yy = yy0;
+	return false;
+}
+
+static bool REG8_X(int* out) {
+	token_t* yy0 = yy;
+	if (parse_reg8(out) && (*out & R_MASK) != R_M)
+		return true;
+	yy = yy0;
+	return false;
+}
+
+static bool REG8_INTEL(int* out) {
+	token_t* yy0 = yy;
+	if (parse_reg8(out) && (*out & IDX_MASK) == IDX_HL)
+		return true;
+	yy = yy0;
+	return false;
+}
+
+static bool IND_C(void) {
+    token_t* yy0 = yy;
+    if (TK('(') && KW(K_C) && TK(')'))
+        return true;
+    yy = yy0;
+    return false;
+}
+
+static bool parse_reg16(int mask, int* out) {
+	token_t* yy0 = yy;
+	const keyword_t* kw = parse_keyword(mask);
+	if (kw && kw->reg16 != NA) {
+		*out = kw->reg16;
+		return true;
+	}
+	yy = yy0;
+	return false;
+}
+
+static bool BCDE(int* out) {
+	token_t* yy0 = yy;
+	if (parse_reg16(IS_SP, out) && (*out == RR_BC || *out == RR_DE))
+		return true;
+	yy = yy0;
+	return false;
+}
+
+static bool REG16_SPX(int* out) {
+	token_t* yy0 = yy;
+	if (parse_reg16(IS_SP, out))
+		return true;
+	yy = yy0;
+	return false;
+}
+
+static bool REG16_AFX(int* out) {
+	token_t* yy0 = yy;
+	if (parse_reg16(IS_AF, out))
+		return true;
+	yy = yy0;
+	return false;
+}
+
+static bool REG16_AF_INTEL(int* out) {
+	token_t* yy0 = yy;
+	if (parse_reg16(K_AF | IS_INTEL, out))
+		return true;
+	yy = yy0;
+	return false;
+}
+
+static bool REG16_SP_INTEL(int* out) {
+	token_t* yy0 = yy;
+	if (parse_reg16(K_SP | IS_INTEL, out))
+		return true;
+	yy = yy0;
+	return false;
+}
+
+static bool X(int* out) {
+	token_t* yy0 = yy;
+	if (parse_reg16(K_SP, out) && (*out & RR_MASK) == RR_HL)
+		return true;
+	yy = yy0;
+	return false;
+}
+
+static bool parse_flags(int nflags, int* out) {
+	const keyword_t* kw = parse_keyword(IS_ANY);
+	if (kw && kw->zflag != NA && kw->zflag < nflags) {
+		*out = kw->zflag;
 		return true;
 	}
 	else
 		return false;
+}
+
+static bool FLAGS4(int* out) {
+	return parse_flags(4, out);
+}
+
+static bool FLAGS8(int* out) {
+	return parse_flags(8, out);
 }
 
 static bool LABEL(UT_string* label) {
@@ -300,7 +396,7 @@ static bool EXPR(int* out) {	// TODO: parse expressions
 		return true;
 
 	case T_IDENT:
-		if (yy[0].keyword && yy[0].keyword->id == T_ASMPC) {
+		if (yy[0].keyword && yy[0].keyword->id == K_ASMPC) {
 			*out = sign * get_pc();
 			yy++;
 			return true;
@@ -333,75 +429,6 @@ static bool IND_EXPR(int* out) {
 		return true;
 	yy = yy0;
 	return false;
-}
-
-static bool REG8(int* out) {
-	return parse_reg8(IS_REG8, out);
-}
-
-static bool REG8_X(int* out) {
-	return parse_reg8(IS_REG8 | IS_REG8_IDX, out);
-}
-
-static bool REG8_INTEL(int* out) {
-	return parse_reg8(IS_REG8 | IS_REG8_INTEL, out);
-}
-
-static bool A() {
-	int r;
-	if (REG8(&r) && r == R_A)
-		return true;
-	return false;
-}
-
-static bool B() {
-	int r;
-	if (REG8(&r) && r == R_B)
-		return true;
-	return false;
-}
-
-static bool C() {
-	int r;
-	if (REG8(&r) && r == R_C)
-		return true;
-	return false;
-}
-
-static bool IND_C(void) {
-	token_t* yy0 = yy;
-	if (TK('(') && C() && TK(')'))
-		return true;
-	yy = yy0;
-	return false;
-}
-
-static void OPT_A_COMMA() {
-	token_t* yy0 = yy;
-	if (A() && TK(','))
-		return;
-	else
-		yy = yy0;
-}
-
-static bool REG16_BCDE(int* out) {
-	return parse_reg16(IS_REG16_BCDE, out);
-}
-
-static bool REG16_SPX(int* out) {
-	return parse_reg16(IS_REG16_SP | IS_REG16_IDX, out);
-}
-
-static bool REG16_AFX(int* out) {
-	return parse_reg16(IS_REG16_AF | IS_REG16_IDX, out);
-}
-
-static bool REG16_AF_INTEL(int* out) {
-	return parse_reg16(IS_REG16_AF | IS_REG16_INTEL, out);
-}
-
-static bool REG16_SP_INTEL(int* out) {
-	return parse_reg16(IS_REG16_SP | IS_REG16_INTEL, out);
 }
 
 static bool BC() {
@@ -450,7 +477,7 @@ static bool IND_BCDE(int* out) {			// (BC)/(DE)
 		else			inc_dec |= PRE_DEC;
 	}
 
-	if (!REG16_BCDE(out)) goto fail;		// only BC or DE
+	if (!BCDE(out)) goto fail;				// only BC or DE
 
 	if (SIGN(&sign)) {						// pos-increment/pos-decrement
 		if (sign == 1)	inc_dec |= POS_INC;
@@ -474,10 +501,6 @@ static bool IND_HL(void) {
 		return true;
 	yy = yy0;
 	return false;
-}
-
-static bool X(int* out) {
-	return parse_reg16(IS_REG16_IDX, out);
 }
 
 static bool PLUS_DIS_RPAREN(int* out) {
@@ -539,10 +562,33 @@ ok:
 	return true;
 }
 
+static bool parse_void(parse_t* data) {
+	if (EOS())
+		return true;
+	syntax_error();
+	return false;
+}
+
+static bool parse_const(parse_t* data) {
+	if (CONST(&data->n) && EOS())
+		return true;
+	syntax_error();
+	return false;
+}
+
+static bool parse_expr(parse_t* data) {
+	if (EXPR(&data->n) && EOS())
+		return true;
+	syntax_error();
+	return false;
+}
+
 static bool check_alu8(int op) {
 	int r, n, x, dis;
-	OPT_A_COMMA();							// alu: "a," is optional
 	token_t* yy0 = yy;
+	if (!(KW(K_A) && TK(',')))
+		yy = yy0;
+	yy0 = yy;
 	if (REG8_X(&r) && EOS())				// alu B/C/D/E/H/L/A/IXH/IYH/IXL/IYL
 		return emit_alu_r(op, r);
 	yy = yy0;
@@ -613,10 +659,10 @@ static bool parse_ld(int dummy) {
 	if (IND_X(&x, &dis) && TK(',') && REG8(&r) && EOS())		// LD (HL)/(IX+d)/(IY+d), r
 		return emit_ld_indx_r(x, dis, r);
 	yy = yy0;
-	if (A() && TK(',') && IND_BCDE(&rr) && EOS())				// LD A, (BC/DE)
+	if (KW(K_A) && TK(',') && IND_BCDE(&rr) && EOS())			// LD A, (BC/DE)
 		return emit_ld_a_indrr(rr);
 	yy = yy0;
-	if (IND_BCDE(&rr) && TK(',') && A() && EOS())				// LD (BC/DE), A
+	if (IND_BCDE(&rr) && TK(',') && KW(K_A) && EOS())			// LD (BC/DE), A
 		return emit_ld_indrr_a(rr);
 	yy = yy0;
 	if (REG8_X(&r) && TK(',') && EXPR(&n) && EOS())				// LD B/C/D/E/H/L/A/IXH/IXL/IYH/IYL, n
@@ -634,22 +680,22 @@ static bool parse_ld(int dummy) {
 	if (IND_EXPR(&nn) && TK(',') && REG16_SPX(&rr) && EOS())	// LD (nn), BC/DE/HL/SP/IX/IY
 		return emit_ld_indnn_rr(nn, rr);
 	yy = yy0;
-	if (A() && TK(',') && IND_EXPR(&nn) && EOS())				// LD A, (nn)
+	if (KW(K_A) && TK(',') && IND_EXPR(&nn) && EOS())			// LD A, (nn)
 		return emit_ld_a_indnn(nn);
 	yy = yy0;
-	if (IND_EXPR(&nn) && TK(',') && A() && EOS())				// LD (nn), A
+	if (IND_EXPR(&nn) && TK(',') && KW(K_A) && EOS())			// LD (nn), A
 		return emit_ld_indnn_a(nn);
 	yy = yy0;
-	if (KW(T_I) && TK(',') && A() && EOS())						// LD I, A
+	if (KW(K_I) && TK(',') && KW(K_A) && EOS())					// LD I, A
 		return emit_ld_i_a();
 	yy = yy0;
-	if (KW(T_R) && TK(',') && A() && EOS())						// LD R, A
+	if (KW(K_R) && TK(',') && KW(K_A) && EOS())					// LD R, A
 		return emit_ld_r_a();
 	yy = yy0;
-	if (A() && TK(',') && KW(T_I) && EOS())						// LD A, I
+	if (KW(K_A) && TK(',') && KW(K_I) && EOS())					// LD A, I
 		return emit_ld_a_i();
 	yy = yy0;
-	if (A() && TK(',') && KW(T_R) && EOS())						// LD A, R
+	if (KW(K_A) && TK(',') && KW(K_R) && EOS())					// LD A, R
 		return emit_ld_a_r();
 	yy = yy0;
 	if (SP() && TK(',') && X(&x) && EOS())						// LD SP, HL/IX/IY
@@ -688,22 +734,6 @@ static bool parse_ld(int dummy) {
 	return false;
 }
 
-static bool parse_lda_sta(int is_lda) {
-	int nn;
-	if (EXPR(&nn) && EOS())
-		return is_lda ? emit_ld_a_indnn(nn) : emit_ld_indnn_a(nn);
-	syntax_error();
-	return false;
-}
-
-static bool parse_lhld_shld(int is_lhld) {
-	int nn;
-	if (EXPR(&nn) && EOS())
-		return is_lhld ? emit_ld_rr_indnn(RR_HL, nn) : emit_ld_indnn_rr(nn, RR_HL);
-	syntax_error();
-	return false;
-}
-
 static bool parse_ldax_stax(int is_ldax) {
 	int rr;
 	if (REG16_SP_INTEL(&rr) && EOS())
@@ -732,13 +762,6 @@ static bool parse_mvi(int dummy) {
 	int r, n;
 	if (REG8_INTEL(&r) && TK(',') && EXPR(&n) && EOS()) 
 		return emit_ld_r_n(r, n);
-	syntax_error(); 
-	return false; 
-}
-
-static bool parse_sphl(int dummy) {
-	if (EOS()) return 
-		emit_ld_sp_x(RR_HL);
 	syntax_error(); 
 	return false; 
 }
@@ -781,31 +804,10 @@ static bool parse_ex(int dummy) {
 		return emit_ex_af_af1();
 	yy = yy0;
 	if (DE() && TK(',') && X(&x) && EOS())								// EX DE, HL
-		return emit_ex_de_hl(x);
+		return emit_ex_de_x(x);
 	yy = yy0;
 	if (TK('(') && SP() && TK(')') && TK(',') && X(&x) && EOS())		// EX (SP),HL/IX/IY
-		return emit_ex_indsp_hl(x);
-	syntax_error();
-	return false;
-}
-
-static bool parse_exx(int dummy) {
-	if (EOS())
-		return emit_exx();
-	syntax_error();
-	return false;
-}
-
-static bool parse_xchg(int dummy) {
-	if (EOS())
-		return emit_ex_de_hl(RR_HL);
-	syntax_error();
-	return false;
-}
-
-static bool parse_xthl(int dummy) {
-	if (EOS())
-		return emit_ex_indsp_hl(RR_HL);
+		return emit_ex_indsp_x(x);
 	syntax_error();
 	return false;
 }
@@ -909,44 +911,16 @@ static bool parse_sbc(int dummy) {
 	return false;
 }
 
-static bool parse_daa(int dummy) {
-	if (EOS())
-		return emit_daa(); 							// DAA
-	syntax_error();
-	return false;
-}
-
 static bool parse_neg(int dummy) {
-	if ((A() || true) && EOS()) 					// NEG [A]
+	if ((KW(K_A) || true) && EOS()) 				// NEG [A]
 		return emit_neg();
 	syntax_error();
 	return false;
 }
 
 static bool parse_cpl(int dummy) {
-	if ((A() || true) && EOS())						// CPL [A]
+	if ((KW(K_A) || true) && EOS())						// CPL [A]
 		return emit_cpl();
-	syntax_error();
-	return false;
-}
-
-static bool parse_cma(int dummy) {
-	if (EOS())
-		return emit_cpl(); 							// CMA
-	syntax_error();
-	return false;
-}
-
-static bool parse_scf(int dummy) {
-	if (EOS()) 										// SCF
-		return emit_scf();
-	syntax_error();
-	return false;
-}
-
-static bool parse_ccf(int dummy) {
-	if (EOS())										// CCF
-		return emit_ccf();
 	syntax_error();
 	return false;
 }
@@ -974,20 +948,6 @@ static bool parse_cmp(int dummy) {
 	return false;
 }
 
-static bool parse_rla_rra(int is_left) {
-	if (EOS()) 										// RLA/RRA
-		return is_left ? emit_rla() : emit_rra();
-	syntax_error();
-	return false;
-}
-
-static bool parse_rlca_rrca(int is_left) {
-	if (EOS()) 										// RLCA/RRCA
-		return is_left ? emit_rlca() : emit_rrca();
-	syntax_error();
-	return false;
-}
-
 static bool parse_rlc_rrc(int is_left) {
 	token_t* yy0 = yy;
 	if (check_rot8(is_left ? OP_RLC : OP_RRC))		// Zilog RLC/RRC r
@@ -999,45 +959,31 @@ static bool parse_rlc_rrc(int is_left) {
 	return false;
 }
 
-static bool parse_rld_rrd(int is_left) {
-	if (EOS())										// RLD/RRD
-		return is_left ? emit_rld() : emit_rrd();
-	syntax_error();
-	return false;
-}
-
 static bool parse_ldi_ldd(int is_inc) {
 	int rr;
 	token_t* yy0 = yy;
-	if (IND_BCDE(&rr) && TK(',') && A() && EOS()) 		// LDI/LDD (BC/DE), A
+	if (IND_BCDE(&rr) && TK(',') && KW(K_A) && EOS()) 		// LDI/LDD (BC/DE), A
 		return (
 			emit_ld_indrr_a(rr) &&
 			(is_inc ? emit_inc_rr(rr) : emit_dec_rr(rr)));
 	yy = yy0;
-	if (A() && TK(',') && IND_BCDE(&rr) && EOS()) 		// LDI/LDD A, (BC/DE)
+	if (KW(K_A) && TK(',') && IND_BCDE(&rr) && EOS()) 		// LDI/LDD A, (BC/DE)
 		return (
 			emit_ld_a_indrr(rr) &&
 			(is_inc ? emit_inc_rr(rr) : emit_dec_rr(rr)));
 	yy = yy0;
-	if (IND_HL() && TK(',') && A() && EOS())			// LDI/LDD (HL), A
+	if (IND_HL() && TK(',') && KW(K_A) && EOS())			// LDI/LDD (HL), A
 		return (
 			emit_ld_indx_r(RR_HL, 0, R_A) &&
 			(is_inc ? emit_inc_rr(RR_HL) : emit_dec_rr(RR_HL)));
 	yy = yy0;
-	if (A() && TK(',') && IND_HL() && EOS())			// LDI/LDD A, (HL)
+	if (KW(K_A) && TK(',') && IND_HL() && EOS())			// LDI/LDD A, (HL)
 		return (
 			emit_ld_r_indx(R_A, RR_HL, 0) &&
 			(is_inc ? emit_inc_rr(RR_HL) : emit_dec_rr(RR_HL)));
 	yy = yy0;
 	if (EOS())												// LDI/LDD
 		return is_inc ? emit_ldi() : emit_ldd();
-	syntax_error();
-	return false;
-}
-
-static bool parse_ldir_lddr(int is_inc) {
-	if (EOS())												// LDIR/LDDR
-		return is_inc ? emit_ldir() : emit_lddr();
 	syntax_error();
 	return false;
 }
@@ -1054,51 +1000,23 @@ static bool parse_cpi(int dummy) {
 	return false;
 }
 
-static bool parse_cpd(int dummy) {
-	if (EOS())												// CPD
-		return emit_cpd();
-	syntax_error();
-	return false;
-}
-
-static bool parse_cpir_cpdr(int is_inc) {
-	if (EOS())												// CPIR/CPDR
-		return is_inc ? emit_cpir() : emit_cpdr();
-	syntax_error();
-	return false;
-}
-
 static bool parse_in(int dummy) {
 	int r, n;
 	token_t* yy0 = yy;
-	if (KW(T_F) && TK(',') && IND_C() && EOS()) 			// IN F, (C)
+	if (KW(K_F) && TK(',') && IND_C() && EOS()) 	// IN F, (C)
 		return emit_in_f_indc();
 	yy = yy0;
-	if (IND_C() && EOS())									// IN (C)
+	if (IND_C() && EOS())							// IN (C)
 		return emit_in_f_indc();
 	yy = yy0;
-	if (REG8(&r) && TK(',') && IND_C() && EOS())			// IN r, (C)
+	if (REG8(&r) && TK(',') && IND_C() && EOS())	// IN r, (C)
 		return emit_in_r_indc(r);
 	yy = yy0;
-	if (A() && TK(',') && IND_EXPR(&n) && EOS())		// IN A, (n)
+	if (KW(K_A) && TK(',') && IND_EXPR(&n) && EOS())					// IN A, (n)
 		return emit_in_a_indn(n);
 	yy = yy0;
-	if (EXPR(&n) && EOS())									// IN n
+	if (EXPR(&n) && EOS())												// IN n
 		return emit_in_a_indn(n);	
-	syntax_error();
-	return false;
-}
-
-static bool parse_ini_ind(int is_inc) {
-	if (EOS())												// INI/IND
-		return is_inc ? emit_ini() : emit_ind();
-	syntax_error();
-	return false;
-}
-
-static bool parse_inir_indr(int is_inc) {
-	if (EOS())												// INIR/INDR
-		return is_inc ? emit_inir() : emit_indr();
 	syntax_error();
 	return false;
 }
@@ -1106,66 +1024,16 @@ static bool parse_inir_indr(int is_inc) {
 static bool parse_out(int dummy) {
 	int r, n;
 	token_t* yy0 = yy;
-	if (IND_C() && TK(',') && CONST(&n) && EOS())			// OUT (C), 0
+	if (IND_C() && TK(',') && CONST(&n) && EOS())	// OUT (C), 0
 		return emit_out_indc_n(n);
 	yy = yy0;
-	if (IND_C() && TK(',') && REG8(&r) && EOS()) 			// OUT (C), r
+	if (IND_C() && TK(',') && REG8(&r) && EOS()) 	// OUT (C), r
 		return emit_out_indc_r(r);
 	yy = yy0;
-	if (IND_EXPR(&n) && TK(',') && A() && EOS()) 			// OUT (n), A
+	if (IND_EXPR(&n) && TK(',') && KW(K_A) && EOS()) 					// OUT (n), A
 		return emit_out_indn_a(n);
-	if (EXPR(&n) && EOS())									// OUT n
+	if (EXPR(&n) && EOS())												// OUT n
 		return emit_out_indn_a(n);
-	syntax_error();
-	return false;
-}
-
-static bool parse_outi_outd(int is_inc) {
-	if (EOS())												// OUTI/OUTD
-		return is_inc ? emit_outi() : emit_outd();
-	syntax_error();
-	return false;
-}
-
-static bool parse_otir_otdr(int is_inc) {
-	if (EOS())												// OTIR/OTDR
-		return is_inc ? emit_otir() : emit_otdr();
-	syntax_error();
-	return false;
-}
-
-static bool parse_nop(int dummy) {
-	if (EOS())												// NOP
-		return emit_nop();
-	syntax_error();
-	return false;
-}
-
-static bool parse_di(int dummy) {
-	if (EOS())												// DI
-		return emit_di();
-	syntax_error();
-	return false;
-}
-
-static bool parse_ei(int dummy) {
-	if (EOS())												// EI
-		return emit_ei();
-	syntax_error();
-	return false;
-}
-
-static bool parse_halt(int dummy) {
-	if (EOS())												// HALT
-		return emit_halt();
-	syntax_error();
-	return false;
-}
-
-static bool parse_im(int dummy) {
-	int n;
-	if (CONST(&n) && EOS())									// IM n
-		return emit_im(n);
 	syntax_error();
 	return false;
 }
@@ -1192,17 +1060,10 @@ static bool parse_jp_intel(int f) {
 	return false;
 }
 
-static bool parse_pchl(int dummy) {
-	if (EOS())												// JP (HL)
-		return emit_jp_x(RR_HL);
-	syntax_error();
-	return false;
-}
-
 static bool parse_djnz(int dummy) {
 	int nn;
 	token_t* yy0 = yy;
-	if (!(B() && TK(',')))									// [b,] optional
+	if (!(KW(K_B) && TK(',')))									// [b,] optional
 		yy = yy0;
 	if (EXPR(&nn) && EOS())									// DJNZ nn
 		return emit_djnz_nn(nn);
@@ -1242,14 +1103,6 @@ static bool parse_call_intel(int f) {
 	return false;
 }
 
-static bool parse_rst(int dummy) {
-	int nn;
-	if (CONST(&nn) && EOS()) 								// RST n
-		return emit_rst(nn);
-	syntax_error();
-	return false;
-}
-
 static bool parse_ret(int dummy) {
 	int f;
 	token_t* yy0 = yy;
@@ -1269,30 +1122,25 @@ static bool parse_ret_intel(int f) {
 	return false;
 }
 
-static bool parse_reti(int dummy) {
-	if (EOS())												// RETI
-		return emit_reti();
-	syntax_error();
-	return false;
-}
-
-static bool parse_retn(int dummy) {
-	if (EOS())												// RETN
-		return emit_retn();
-	syntax_error();
-	return false;
-}
-
 static bool parse_statement(void) {
 	if (EOS())
 		return true;
-	const keyword_t* kw = parse_keyword(IS_OPCODE);
-	if (kw && kw->parse)
-		return kw->parse(kw->opcode_value);
-	else {
-		syntax_error();
-		return false;
+	const keyword_t* kw = parse_keyword(IS_ANY);
+	if (kw) {
+		if (kw->parse_emit)
+			return kw->parse_emit(kw->arg);
+		else if (kw->parse) {
+			parse_t data;
+			if (!kw->parse(&data))
+				return false;
+			if (kw->emit_void)
+				return kw->emit_void();
+			else if (kw->emit_arg)
+				return kw->emit_arg(data.n);
+		}
 	}
+	syntax_error();
+	return false;
 }
 
 static bool parse_line(void) {
@@ -1373,244 +1221,216 @@ bool assemble_file(const char* input_filename) {
 // keywords
 //-----------------------------------------------------------------------------
 static keyword_t keywords_table[] = {
-//	word,		id,	flags,			reg8_value,	reg16_value,flag_value,	parse(),		opcode_value
+//word,		id,		flags,			reg8,	reg16,	zflag,		parse(), arg, parse_void(), emit_void(), emit_arg()
 
-	// 8-bit registers
-	{"B",		0,	IS_REG8|
-					IS_REG8_INTEL|
-					IS_REG16_INTEL,	R_B,		RR_BC,		0,			NULL,			0			},
-	{"C",		0,	IS_REG8|
-					IS_REG8_INTEL|
-					IS_FLAG_CZ,		R_C,		0,			F_C,		NULL,			0			},
-	{"D",		0,	IS_REG8|
-					IS_REG8_INTEL|
-					IS_REG16_INTEL,	R_D,		RR_DE,		0,			NULL,			0			},
-	{"E",		0,	IS_REG8|
-					IS_REG8_INTEL,	R_E,		0,			0,			NULL,			0			},
-	{"H",		0,	IS_REG8|
-					IS_REG8_INTEL|
-					IS_REG16_INTEL,	R_H,		RR_HL,		0,			NULL,			0			},
-	{"L",		0,	IS_REG8|
-					IS_REG8_INTEL,	R_L,		0,			0,			NULL,			0			},
-	{"M",		0,	IS_REG8_INTEL|
-					IS_FLAG_PM,		R_M,		0,			F_M,		NULL,			0			},
-	{"A",		0,	IS_REG8|
-					IS_REG8_INTEL,	R_A,		0,			0,			NULL,			0			},
-	{"IXH",		0,	IS_REG8_IDX,	R_H|IDX_IX,	0,			0,			NULL,			0			},
-	{"IXL",		0,	IS_REG8_IDX,	R_L|IDX_IX,	0,			0,			NULL,			0			},
-	{"IYH",		0,	IS_REG8_IDX,	R_H|IDX_IY,	0,			0,			NULL,			0			},
-	{"IYL",		0,	IS_REG8_IDX,	R_L|IDX_IY,	0,			0,			NULL,			0			},
+// 8-bit registers
+{"B",		K_B,	IS_INTEL,		R_B,	RR_BC,	NA,			},
+{"C",		K_C,	IS_ANY,			R_C,	NA,		F_C,		},
+{"D",		K_D,	IS_INTEL,		R_D,	RR_DE,	NA,			},
+{"E",		K_E,	IS_ANY,			R_E,	NA,		NA,			},
+{"H",		K_H,	IS_INTEL,		R_H,	RR_HL,	NA,			},
+{"L",		K_L,	IS_ANY,			R_L,	NA,		NA,			},
+{"M",		K_M,	IS_ANY,			R_M,	NA,		F_M,		},
+{"A",		K_A,	IS_ANY,			R_A,	NA,		NA,			},
+{"IXH",		K_IXH,	IS_ANY,			R_H|IDX_IX,	NA,	NA,			},
+{"IXL",		K_IXL,	IS_ANY,			R_L|IDX_IX,	NA,	NA,			},
+{"IYH",		K_IYH,	IS_ANY,			R_H|IDX_IY,	NA,	NA,			},
+{"IYL",		K_IYL,	IS_ANY,			R_L|IDX_IY,	NA,	NA,			},
+{"I",		K_I,	0,				NA,		NA,		NA,			},
+{"R",		K_R,	0,				NA,		NA,		NA,			},
+{"F",		K_F,	0,				NA,		NA,		NA,			},
+
+// 16-bit registers
+{"BC",		K_BC,	IS_AF|IS_SP|IS_INTEL, NA, RR_BC, NA,		},
+{"DE",		K_DE,	IS_AF|IS_SP|IS_INTEL, NA, RR_DE, NA,		},
+{"HL",		K_HL,	IS_AF|IS_SP|IS_INTEL, NA, RR_HL, NA,		},
+{"SP",		K_SP,	IS_SP|IS_INTEL,	NA,		RR_SP,	NA,			},
+{"AF",		K_AF,	IS_AF,			NA,		RR_AF,	NA,			},
+{"PSW",		K_PSW,	IS_AF|IS_INTEL,	NA,		RR_AF, 	NA,			},
+{"IX",		K_IX,	IS_AF|IS_SP,	NA,		RR_HL|IDX_IX, NA,	},
+{"IY",		K_IY,	IS_AF|IS_SP,	NA,		RR_HL|IDX_IY, NA,	},
+
+{"HLD",		K_HLD,	IS_AF|IS_SP,	NA,		RR_HL|POS_DEC, NA,	},
+{"HLI",		K_HLI,	IS_AF|IS_SP,	NA,		RR_HL|POS_INC, NA,	},
+
+// flags
+{"NZ",		K_NZ,	IS_ANY,			NA,		NA,		F_NZ,		},
+{"Z",		K_Z,	IS_ANY,			NA,		NA,		F_Z,		},
+{"NC",		K_NC,	IS_ANY,			NA,		NA,		F_NC,		},
+{"PO",		K_PO,	IS_ANY,			NA,		NA,		F_PO,		},
+{"PE",		K_PE,	IS_ANY,			NA,		NA,		F_PE,		},
+{"NV",		K_NV,	IS_ANY,			NA,		NA,		F_NV,		},
+{"V",		K_V,	IS_ANY,			NA,		NA,		F_V,		},
+{"P",		K_P,	IS_ANY,			NA,		NA,		F_P,		},
+
+// operands
+{"ASMPC",	K_ASMPC,0,				NA,		NA,		NA,			},
+
+// load
+{"LD",		0,		IS_ANY,			NA,		NA,		NA,			parse_ld,		0			},
+{"LDA",		0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_expr, NULL, emit_ld_a_indnn },
+{"STA",		0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_expr, NULL, emit_ld_indnn_a },
+{"LHLD",	0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_expr, NULL, emit_ld_hl_indnn },
+{"SHLD",	0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_expr, NULL, emit_ld_indnn_hl },
+{"LDAX",	0,		IS_ANY,			NA,		NA,		NA,			parse_ldax_stax,1			},
+{"STAX",	0,		IS_ANY,			NA,		NA,		NA,			parse_ldax_stax,0			},
+{"LXI",		0,		IS_ANY,			NA,		NA,		NA,			parse_lxi,		0			},
+{"MOV",		0,		IS_ANY,			NA,		NA,		NA,			parse_mov,		0			},
+{"MVI",		0,		IS_ANY,			NA,		NA,		NA,			parse_mvi,		0			},
+{"SPHL",	0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_ld_sp_hl },
+
+// increment and decrement
+{"INC",		0,		IS_ANY,			NA,		NA,		NA,			parse_inc_dec,	1			},
+{"DEC",		0,		IS_ANY,			NA,		NA,		NA,			parse_inc_dec,	0			},
+{"INR",		0,		IS_ANY,			NA,		NA,		NA,			parse_inr_dcr,	1			},
+{"DCR",		0,		IS_ANY,			NA,		NA,		NA,			parse_inr_dcr,	0			},
+{"INX",		0,		IS_ANY,			NA,		NA,		NA,			parse_inx_dcx,	1			},
+{"DCX",		0,		IS_ANY,			NA,		NA,		NA,			parse_inx_dcx,	0			},
+
+// exchange
+{"EX",		0,		IS_ANY,			NA,		NA,		NA,			parse_ex,		0			},
+{"EXX",		0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_exx },
+{"XCHG",	0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_ex_de_hl },
+{"XTHL",	0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_ex_indsp_hl },
+
+// stack
+{"PUSH",	0,		IS_ANY,			NA,		NA,		NA,			parse_push_pop,	1			},
+{"POP",		0,		IS_ANY,			NA,		NA,		NA,			parse_push_pop,	0			},
+
+// arithmetic and logical
+{"ADD",		0,		IS_ANY,			NA,		NA,		NA,			parse_add,		0			},
+{"ADC",		0,		IS_ANY,			NA,		NA,		NA,			parse_adc,		0			},
+{"DAD",		0,		IS_ANY,			NA,		NA,		NA,			parse_dad,		0			},
+{"SUB",		0,		IS_ANY,			NA,		NA,		NA,			parse_sub,		0			},
+{"SBC",		0,		IS_ANY,			NA,		NA,		NA,			parse_sbc,		0			},
+{"CP",		0,		IS_ANY,			NA,		NA,		NA,			parse_alu8,		OP_CP		},
+{"CMP",		0,		IS_ANY,			NA,		NA,		NA,			parse_cmp,		OP_CP		},
+{"AND",		0,		IS_ANY,			NA,		NA,		NA,			parse_alu8,		OP_AND		},
+{"OR",		0,		IS_ANY,			NA,		NA,		NA,			parse_alu8,		OP_OR		},
+{"XOR",		0,		IS_ANY,			NA,		NA,		NA,			parse_alu8,		OP_XOR		},
+{"DAA",		0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_daa },
+{"CPL",		0,		IS_ANY,			NA,		NA,		NA,			parse_cpl,		0			},
+{"CMA",		0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_cpl },
+{"SCF",		0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_scf },
+{"STC",		0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_scf },
+{"CCF",		0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_ccf },
+{"CMC",		0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_ccf },
+{"NEG",		0,		IS_ANY,			NA,		NA,		NA,			parse_neg,		0			},
+{"ADI",		0,		IS_ANY,			NA,		NA,		NA,			parse_intel_alu_n, OP_ADD	},
+{"ACI",		0,		IS_ANY,			NA,		NA,		NA,			parse_intel_alu_n, OP_ADC	},
+{"SUI",		0,		IS_ANY,			NA,		NA,		NA,			parse_intel_alu_n, OP_SUB	},
+{"SBI",		0,		IS_ANY,			NA,		NA,		NA,			parse_intel_alu_n, OP_SBC	},
+{"ANI",		0,		IS_ANY,			NA,		NA,		NA,			parse_intel_alu_n, OP_AND	},
+{"ORI",		0,		IS_ANY,			NA,		NA,		NA,			parse_intel_alu_n, OP_OR	},
+{"XRI",		0,		IS_ANY,			NA,		NA,		NA,			parse_intel_alu_n, OP_XOR	},
+{"SBB",		0,		IS_ANY,			NA,		NA,		NA,			parse_intel_alu_r, OP_SBC	},
+{"ANA",		0,		IS_ANY,			NA,		NA,		NA,			parse_intel_alu_r, OP_AND	},
+{"ORA",		0,		IS_ANY,			NA,		NA,		NA,			parse_intel_alu_r, OP_OR	},
+{"XRA",		0,		IS_ANY,			NA,		NA,		NA,			parse_intel_alu_r, OP_XOR	},
 	
-	{"I",		T_I,0,				0,			0,			0,			NULL,			0			},
-	{"R",		T_R,0,				0,			0,			0,			NULL,			0			},
-	{"F",		T_F,0,				0,			0,			0,			NULL,			0			},
+// rotate and shift
+{"RLA",		0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_rla },
+{"RAL",		0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_rla },
+{"RLCA",	0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_rlca },
+{"RLC",		0,		IS_ANY,			NA,		NA,		NA,			parse_rlc_rrc,	1			},
+{"RL",		0,		IS_ANY,			NA,		NA,		NA,			parse_rot8,		OP_RL		},
+{"SLA",		0,		IS_ANY,			NA,		NA,		NA,			parse_rot8,		OP_SLA		},
+{"SLL",		0,		IS_ANY,			NA,		NA,		NA,			parse_rot8,		OP_SLL		},
+{"SLI",		0,		IS_ANY,			NA,		NA,		NA,			parse_rot8,		OP_SLI		},
+{"RLD",		0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_rld },
+{"RRA",		0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_rra },
+{"RAR",		0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_rra },
+{"RRCA",	0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_rrca },
+{"RRC",		0,		IS_ANY,			NA,		NA,		NA,			parse_rlc_rrc,	0			},
+{"RR",		0,		IS_ANY,			NA,		NA,		NA,			parse_rot8,		OP_RR		},
+{"SRA",		0,		IS_ANY,			NA,		NA,		NA,			parse_rot8,		OP_SRA		},
+{"SRL",		0,		IS_ANY,			NA,		NA,		NA,			parse_rot8,		OP_SRL		},
+{"RRD",		0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_rrd },
 
-	// 16-bit registers
-	{"BC",		0,	IS_REG16_AF|
-					IS_REG16_SP|
-					IS_REG16_INTEL|
-					IS_REG16_BCDE,	0, 			RR_BC,		0,			NULL,			0			},
-	{"DE",		0,	IS_REG16_AF|
-					IS_REG16_SP|
-					IS_REG16_INTEL|
-					IS_REG16_BCDE,	0, 			RR_DE,		0,			NULL,			0			},
-	{"HL",		0,	IS_REG16_AF|
-					IS_REG16_SP|
-					IS_REG16_INTEL|
-					IS_REG16_IDX,	0, 			RR_HL,		0,			NULL,			0			},
-	{"SP",		0,	IS_REG16_SP|
-					IS_REG16_INTEL,	0,			RR_SP,		0,			NULL,			0			},
-	{"AF",		0,	IS_REG16_AF,	0,			RR_AF,		0,			NULL,			0			},
-	{"PSW",		0,	IS_REG16_AF|
-					IS_REG16_INTEL,	0,			RR_AF, 		0,			NULL,			0			},
-	{"IX",		0,	IS_REG16_IDX,	0,			RR_HL|IDX_IX,
-															0,			NULL,			0			},
-	{"IY",		0,	IS_REG16_IDX,	0,			RR_HL|IDX_IY,
-															0,			NULL,			0			},
+// bit manipulation
+{"BIT",		0,		IS_ANY,			NA,		NA,		NA,			parse_bit8,		OP_BIT		},
+{"RES",		0,		IS_ANY,			NA,		NA,		NA,			parse_bit8,		OP_RES		},
+{"SET",		0,		IS_ANY,			NA,		NA,		NA,			parse_bit8,		OP_SET		},
 
-	{"HLD",		0,	IS_REG16_IDX,	0,			RR_HL|POS_DEC,
-															0,			NULL,			0			},
-	{"HLI",		0,	IS_REG16_IDX,	0,			RR_HL|POS_INC,
-															0,			NULL,			0			},
+// block transfer
+{"LDIR",	0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_ldir },
+{"LDD",		0,		IS_ANY,			NA,		NA,		NA,			parse_ldi_ldd,	0			},
+{"LDI",		0,		IS_ANY,			NA,		NA,		NA,			parse_ldi_ldd,	1			},
+{"LDDR",	0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_lddr },
 
-	// flags
-	{"NZ",		0,	IS_FLAG_CZ,		0,			0,			F_NZ,		NULL,			0			},
-	{"Z",		0,	IS_FLAG_CZ,		0,			0,			F_Z,		NULL,			0			},
-	{"NC",		0,	IS_FLAG_CZ,		0,			0,			F_NC,		NULL,			0			},
-	{"PO",		0,	IS_FLAG_PM,		0,			0,			F_PO,		NULL,			0			},
-	{"PE",		0,	IS_FLAG_PM,		0,			0,			F_PE,		NULL,			0			},
-	{"NV",		0,	IS_FLAG_PM,		0,			0,			F_NV,		NULL,			0			},
-	{"V",		0,	IS_FLAG_PM,		0,			0,			F_V,		NULL,			0			},
-	{"P",		0,	IS_FLAG_PM,		0,			0,			F_P,		NULL,			0			},
+// search
+{"CPI",		0,		IS_ANY,			NA,		NA,		NA,			parse_cpi,		0			},
+{"CPIR",	0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_cpir },
+{"CPD",		0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_cpd },
+{"CPDR",	0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_cpdr },
 
-	// operands
-	{"ASMPC",	T_ASMPC, 0,			0,			0,			0,			NULL,			0			},
+// input/output
+{"IN",		0,		IS_ANY,			NA,		NA,		NA,			parse_in,		0			},
+{"INI",		0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_ini },
+{"INIR",	0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_inir },
+{"IND",		0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_ind },
+{"INDR",	0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_indr },
+{"OUT",		0,		IS_ANY,			NA,		NA,		NA,			parse_out,		0			},
+{"OUTI",	0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_outi },
+{"OTIR",	0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_otir },
+{"OUTD",	0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_outd },
+{"OTDR",	0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_otdr },
 	
-	// load
-	{"LD",		0,	IS_OPCODE,		0,			0,			0,			parse_ld,		0			},
-	{"LDA",		0,	IS_OPCODE,		0,			0,			0,			parse_lda_sta,	1			},
-	{"STA",		0,	IS_OPCODE,		0,			0,			0,			parse_lda_sta,	0			},
-	{"LHLD",	0,	IS_OPCODE,		0,			0,			0,			parse_lhld_shld,1			},
-	{"SHLD",	0,	IS_OPCODE,		0,			0,			0,			parse_lhld_shld,0			},
-	{"LDAX",	0,	IS_OPCODE,		0,			0,			0,			parse_ldax_stax,1			},
-	{"STAX",	0,	IS_OPCODE,		0,			0,			0,			parse_ldax_stax,0			},
-	{"LXI",		0,	IS_OPCODE,		0,			0,			0,			parse_lxi,		0			},
-	{"MOV",		0,	IS_OPCODE,		0,			0,			0,			parse_mov,		0			},
-	{"MVI",		0,	IS_OPCODE,		0,			0,			0,			parse_mvi,		0			},
-	{"SPHL",	0,	IS_OPCODE,		0,			0,			0,			parse_sphl,		0			},
-	
-	// increment and decrement
-	{"INC",		0,	IS_OPCODE,		0,			0,			0,			parse_inc_dec,	1			},
-	{"DEC",		0,	IS_OPCODE,		0,			0,			0,			parse_inc_dec,	0			},
-	{"INR",		0,	IS_OPCODE,		0,			0,			0,			parse_inr_dcr,	1			},
-	{"DCR",		0,	IS_OPCODE,		0,			0,			0,			parse_inr_dcr,	0			},
-	{"INX",		0,	IS_OPCODE,		0,			0,			0,			parse_inx_dcx,	1			},
-	{"DCX",		0,	IS_OPCODE,		0,			0,			0,			parse_inx_dcx,	0			},
+// cpu control
+{"NOP",		0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_nop },
+{"DI",		0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_di },
+{"EI",		0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_ei },
+{"HALT",	0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_halt },
+{"HLT",		0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_halt },
+{"IM",		0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_const, NULL, emit_im },
 
-	// exchange
-	{"EX",		0,	IS_OPCODE,		0,			0,			0,			parse_ex,		0			},
-	{"EXX",		0,	IS_OPCODE,		0,			0,			0,			parse_exx,		0			},
-	{"XCHG",	0,	IS_OPCODE,		0,			0,			0,			parse_xchg,		0			},
-	{"XTHL",	0,	IS_OPCODE,		0,			0,			0,			parse_xthl,		0			},
+// jump
+{"JP",		0,		IS_ANY,			NA,		NA,		NA,			parse_jp,		0			},
+{"JR",		0,		IS_ANY,			NA,		NA,		NA,			parse_jr,		0			},
+{"DJNZ",	0,		IS_ANY,			NA,		NA,		NA,			parse_djnz,		0			},
+{"JMP",		0,		IS_ANY,			NA,		NA,		NA,			parse_jp,		0			},
+{"PCHL",	0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_jp_hl	},
+{"JNZ",		0,		IS_ANY,			NA,		NA,		NA,			parse_jp_intel,	F_NZ		},
+{"JZ",		0,		IS_ANY,			NA,		NA,		NA,			parse_jp_intel,	F_Z			},
+{"JNC",		0,		IS_ANY,			NA,		NA,		NA,			parse_jp_intel,	F_NC		},
+{"JC",		0,		IS_ANY,			NA,		NA,		NA,			parse_jp_intel,	F_C			},
+{"JPO",		0,		IS_ANY,			NA,		NA,		NA,			parse_jp_intel,	F_PO		},
+{"JPE",		0,		IS_ANY,			NA,		NA,		NA,			parse_jp_intel,	F_PE		},
+{"JNV",		0,		IS_ANY,			NA,		NA,		NA,			parse_jp_intel,	F_NV		},
+{"JV",		0,		IS_ANY,			NA,		NA,		NA,			parse_jp_intel,	F_V			},
+// Jump if Positive cannot be parsed, same as JumP
+{"JM",		0,		IS_ANY,			NA,		NA,		NA,			parse_jp_intel,	F_M			},
 
-	// stack
-	{"PUSH",	0,	IS_OPCODE,		0,			0,			0,			parse_push_pop,	1			},
-	{"POP",		0,	IS_OPCODE,		0,			0,			0,			parse_push_pop,	0			},
+// call
+{"CALL",	0,		IS_ANY,			NA,		NA,		NA,			parse_call,		0			},
+{"RST",		0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_const, NULL, emit_rst },
+{"CNZ",		0,		IS_ANY,			NA,		NA,		NA,			parse_call_intel, F_NZ		},
+{"CZ",		0,		IS_ANY,			NA,		NA,		NA,			parse_call_intel, F_Z		},
+{"CNC",		0,		IS_ANY,			NA,		NA,		NA,			parse_call_intel, F_NC		},
+{"CC",		0,		IS_ANY,			NA,		NA,		NA,			parse_call_intel, F_C		},
+{"CPO",		0,		IS_ANY,			NA,		NA,		NA,			parse_call_intel, F_PO		},
+{"CPE",		0,		IS_ANY,			NA,		NA,		NA,			parse_call_intel, F_PE		},
+{"CNV",		0,		IS_ANY,			NA,		NA,		NA,			parse_call_intel, F_NV		},
+{"CV",		0,		IS_ANY,			NA,		NA,		NA,			parse_call_intel, F_V		},
+// Call if Positive cannot be parsed, same as ComPare
+{"CM",		0,		IS_ANY,			NA,		NA,		NA,			parse_call_intel, F_M		},
 
-	// arithmetic and logical
-	{"ADD",		0,	IS_OPCODE,		0,			0,			0,			parse_add,		0			},
-	{"ADC",		0,	IS_OPCODE,		0,			0,			0,			parse_adc,		0			},
-	{"DAD",		0,	IS_OPCODE,		0,			0,			0,			parse_dad,		0			},
-	{"SUB",		0,	IS_OPCODE,		0,			0,			0,			parse_sub,		0			},
-	{"SBC",		0,	IS_OPCODE,		0,			0,			0,			parse_sbc,		0			},
-	{"CP",		0,	IS_OPCODE,		0,			0,			0,			parse_alu8,		OP_CP		},
-	{"CMP",		0,	IS_OPCODE,		0,			0,			0,			parse_cmp,		OP_CP		},
-	{"AND",		0,	IS_OPCODE,		0,			0,			0,			parse_alu8,		OP_AND		},
-	{"OR",		0,	IS_OPCODE,		0,			0,			0,			parse_alu8,		OP_OR		},
-	{"XOR",		0,	IS_OPCODE,		0,			0,			0,			parse_alu8,		OP_XOR		},
-	{"DAA",		0,	IS_OPCODE,		0,			0,			0,			parse_daa,		0			},
-	{"CPL",		0,	IS_OPCODE,		0,			0,			0,			parse_cpl,		0			},
-	{"CMA",		0,	IS_OPCODE,		0,			0,			0,			parse_cma,		0			},
-	{"SCF",		0,	IS_OPCODE,		0,			0,			0,			parse_scf,		0			},
-	{"STC",		0,	IS_OPCODE,		0,			0,			0,			parse_scf,		0			},
-	{"CCF",		0,	IS_OPCODE,		0,			0,			0,			parse_ccf,		0			},
-	{"CMC",		0,	IS_OPCODE,		0,			0,			0,			parse_ccf,		0			},
-	{"NEG",		0,	IS_OPCODE,		0,			0,			0,			parse_neg,		0			},
-	{"ADI",		0,	IS_OPCODE,		0,			0,			0,			parse_intel_alu_n, OP_ADD	},
-	{"ACI",		0,	IS_OPCODE,		0,			0,			0,			parse_intel_alu_n, OP_ADC	},
-	{"SUI",		0,	IS_OPCODE,		0,			0,			0,			parse_intel_alu_n, OP_SUB	},
-	{"SBI",		0,	IS_OPCODE,		0,			0,			0,			parse_intel_alu_n, OP_SBC	},
-	{"ANI",		0,	IS_OPCODE,		0,			0,			0,			parse_intel_alu_n, OP_AND	},
-	{"ORI",		0,	IS_OPCODE,		0,			0,			0,			parse_intel_alu_n, OP_OR	},
-	{"XRI",		0,	IS_OPCODE,		0,			0,			0,			parse_intel_alu_n, OP_XOR	},
-	{"SBB",		0,	IS_OPCODE,		0,			0,			0,			parse_intel_alu_r, OP_SBC	},
-	{"ANA",		0,	IS_OPCODE,		0,			0,			0,			parse_intel_alu_r, OP_AND	},
-	{"ORA",		0,	IS_OPCODE,		0,			0,			0,			parse_intel_alu_r, OP_OR	},
-	{"XRA",		0,	IS_OPCODE,		0,			0,			0,			parse_intel_alu_r, OP_XOR	},
-		
-	// rotate and shift
-	{"RLA",		0,	IS_OPCODE,		0,			0,			0,			parse_rla_rra,	1			},
-	{"RAL",		0,	IS_OPCODE,		0,			0,			0,			parse_rla_rra,	1			},
-	{"RLCA",	0,	IS_OPCODE,		0,			0,			0,			parse_rlca_rrca,1			},
-	{"RLC",		0,	IS_OPCODE,		0,			0,			0,			parse_rlc_rrc,	1			},
-	{"RL",		0,	IS_OPCODE,		0,			0,			0,			parse_rot8,		OP_RL		},
-	{"SLA",		0,	IS_OPCODE,		0,			0,			0,			parse_rot8,		OP_SLA		},
-	{"SLL",		0,	IS_OPCODE,		0,			0,			0,			parse_rot8,		OP_SLL		},
-	{"SLI",		0,	IS_OPCODE,		0,			0,			0,			parse_rot8,		OP_SLI		},
-	{"RLD",		0,	IS_OPCODE,		0,			0,			0,			parse_rld_rrd,	1			},
-	{"RRA",		0,	IS_OPCODE,		0,			0,			0,			parse_rla_rra,	0			},
-	{"RAR",		0,	IS_OPCODE,		0,			0,			0,			parse_rla_rra,	0			},
-	{"RRCA",	0,	IS_OPCODE,		0,			0,			0,			parse_rlca_rrca,0			},
-	{"RRC",		0,	IS_OPCODE,		0,			0,			0,			parse_rlc_rrc,	0			},
-	{"RR",		0,	IS_OPCODE,		0,			0,			0,			parse_rot8,		OP_RR		},
-	{"SRA",		0,	IS_OPCODE,		0,			0,			0,			parse_rot8,		OP_SRA		},
-	{"SRL",		0,	IS_OPCODE,		0,			0,			0,			parse_rot8,		OP_SRL		},
-	{"RRD",		0,	IS_OPCODE,		0,			0,			0,			parse_rld_rrd,	0			},
+// return
+{"RET",		0,		IS_ANY,			NA,		NA,		NA,			parse_ret,		0			},
+{"RETI",	0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_reti },
+{"RETN",	0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_retn },
+{"RNZ",		0,		IS_ANY,			NA,		NA,		NA,			parse_ret_intel,F_NZ		},
+{"RZ",		0,		IS_ANY,			NA,		NA,		NA,			parse_ret_intel,F_Z			},
+{"RNC",		0,		IS_ANY,			NA,		NA,		NA,			parse_ret_intel,F_NC		},
+{"RC",		0,		IS_ANY,			NA,		NA,		NA,			parse_ret_intel,F_C			},
+{"RPO",		0,		IS_ANY,			NA,		NA,		NA,			parse_ret_intel,F_PO		},
+{"RPE",		0,		IS_ANY,			NA,		NA,		NA,			parse_ret_intel,F_PE		},
+{"RNV",		0,		IS_ANY,			NA,		NA,		NA,			parse_ret_intel,F_NV		},
+{"RV",		0,		IS_ANY,			NA,		NA,		NA,			parse_ret_intel,F_V			},
+{"RP",		0,		IS_ANY,			NA,		NA,		NA,			parse_ret_intel,F_P			},
+{"RM",		0,		IS_ANY,			NA,		NA,		NA,			parse_ret_intel,F_M			},
 
-	// bit manipulation
-	{"BIT",		0,	IS_OPCODE,		0,			0,			0,			parse_bit8,		OP_BIT		},
-	{"RES",		0,	IS_OPCODE,		0,			0,			0,			parse_bit8,		OP_RES		},
-	{"SET",		0,	IS_OPCODE,		0,			0,			0,			parse_bit8,		OP_SET		},
-
-	// block transfer
-	{"LDI",		0,	IS_OPCODE,		0,			0,			0,			parse_ldi_ldd,	1			},
-	{"LDIR",	0,	IS_OPCODE,		0,			0,			0,			parse_ldir_lddr,1			},
-	{"LDD",		0,	IS_OPCODE,		0,			0,			0,			parse_ldi_ldd,	0			},
-	{"LDDR",	0,	IS_OPCODE,		0,			0,			0,			parse_ldir_lddr,0			},
-
-	// search
-	{"CPI",		0,	IS_OPCODE,		0,			0,			0,			parse_cpi,		0			},
-	{"CPIR",	0,	IS_OPCODE,		0,			0,			0,			parse_cpir_cpdr,1			},
-	{"CPD",		0,	IS_OPCODE,		0,			0,			0,			parse_cpd,		0			},
-	{"CPDR",	0,	IS_OPCODE,		0,			0,			0,			parse_cpir_cpdr,0			},
-
-	// input/output
-	{"IN",		0,	IS_OPCODE,		0,			0,			0,			parse_in,		0			},
-	{"INI",		0,	IS_OPCODE,		0,			0,			0,			parse_ini_ind,	1			},
-	{"INIR",	0,	IS_OPCODE,		0,			0,			0,			parse_inir_indr,1			},
-	{"IND",		0,	IS_OPCODE,		0,			0,			0,			parse_ini_ind,	0			},
-	{"INDR",	0,	IS_OPCODE,		0,			0,			0,			parse_inir_indr,0			},
-	{"OUT",		0,	IS_OPCODE,		0,			0,			0,			parse_out,		0			},
-	{"OUTI",	0,	IS_OPCODE,		0,			0,			0,			parse_outi_outd,1			},
-	{"OTIR",	0,	IS_OPCODE,		0,			0,			0,			parse_otir_otdr,1			},
-	{"OUTD",	0,	IS_OPCODE,		0,			0,			0,			parse_outi_outd,0			},
-	{"OTDR",	0,	IS_OPCODE,		0,			0,			0,			parse_otir_otdr,0			},
-		
-	// cpu control
-	{"NOP",		0,	IS_OPCODE,		0,			0,			0,			parse_nop,		0			},
-	{"DI",		0,	IS_OPCODE,		0,			0,			0,			parse_di,		0			},
-	{"EI",		0,	IS_OPCODE,		0,			0,			0,			parse_ei,		0			},
-	{"HALT",	0,	IS_OPCODE,		0,			0,			0,			parse_halt,		0			},
-	{"HLT",		0,	IS_OPCODE,		0,			0,			0,			parse_halt,		0			},
-	{"IM",		0,	IS_OPCODE,		0,			0,			0,			parse_im,		0			},
-
-	// jump
-	{"JP",		0,	IS_OPCODE,		0,			0,			0,			parse_jp,		0			},
-	{"JR",		0,	IS_OPCODE,		0,			0,			0,			parse_jr,		0			},
-	{"DJNZ",	0,	IS_OPCODE,		0,			0,			0,			parse_djnz,		0			},
-	{"JMP",		0,	IS_OPCODE,		0,			0,			0,			parse_jp,		0			},
-	{"PCHL",	0,	IS_OPCODE,		0,			0,			0,			parse_pchl,		0			},
-	{"JNZ",		0,	IS_OPCODE,		0,			0,			0,			parse_jp_intel,	F_NZ		},
-	{"JZ",		0,	IS_OPCODE,		0,			0,			0,			parse_jp_intel,	F_Z			},
-	{"JNC",		0,	IS_OPCODE,		0,			0,			0,			parse_jp_intel,	F_NC		},
-	{"JC",		0,	IS_OPCODE,		0,			0,			0,			parse_jp_intel,	F_C			},
-	{"JPO",		0,	IS_OPCODE,		0,			0,			0,			parse_jp_intel,	F_PO		},
-	{"JPE",		0,	IS_OPCODE,		0,			0,			0,			parse_jp_intel,	F_PE		},
-	{"JNV",		0,	IS_OPCODE,		0,			0,			0,			parse_jp_intel,	F_NV		},
-	{"JV",		0,	IS_OPCODE,		0,			0,			0,			parse_jp_intel,	F_V			},
-	// Jump if Positive cannot be parsed, same as JumP
-	{"JM",		0,	IS_OPCODE,		0,			0,			0,			parse_jp_intel,	F_M			},
-
-	// call
-	{"CALL",	0,	IS_OPCODE,		0,			0,			0,			parse_call,		0			},
-	{"RST",		0,	IS_OPCODE,		0,			0,			0,			parse_rst,		0			},
-	{"CNZ",		0,	IS_OPCODE,		0,			0,			0,			parse_call_intel, F_NZ		},
-	{"CZ",		0,	IS_OPCODE,		0,			0,			0,			parse_call_intel, F_Z		},
-	{"CNC",		0,	IS_OPCODE,		0,			0,			0,			parse_call_intel, F_NC		},
-	{"CC",		0,	IS_OPCODE,		0,			0,			0,			parse_call_intel, F_C		},
-	{"CPO",		0,	IS_OPCODE,		0,			0,			0,			parse_call_intel, F_PO		},
-	{"CPE",		0,	IS_OPCODE,		0,			0,			0,			parse_call_intel, F_PE		},
-	{"CNV",		0,	IS_OPCODE,		0,			0,			0,			parse_call_intel, F_NV		},
-	{"CV",		0,	IS_OPCODE,		0,			0,			0,			parse_call_intel, F_V		},
-	// Call if Positive cannot be parsed, same as ComPare
-	{"CM",		0,	IS_OPCODE,		0,			0,			0,			parse_call_intel, F_M		},
-
-	// return
-	{"RET",		0,	IS_OPCODE,		0,			0,			0,			parse_ret,		0			},
-	{"RETI",	0,	IS_OPCODE,		0,			0,			0,			parse_reti,		0			},
-	{"RETN",	0,	IS_OPCODE,		0,			0,			0,			parse_retn,		0			},
-	{"RNZ",		0,	IS_OPCODE,		0,			0,			0,			parse_ret_intel,F_NZ		},
-	{"RZ",		0,	IS_OPCODE,		0,			0,			0,			parse_ret_intel,F_Z			},
-	{"RNC",		0,	IS_OPCODE,		0,			0,			0,			parse_ret_intel,F_NC		},
-	{"RC",		0,	IS_OPCODE,		0,			0,			0,			parse_ret_intel,F_C			},
-	{"RPO",		0,	IS_OPCODE,		0,			0,			0,			parse_ret_intel,F_PO		},
-	{"RPE",		0,	IS_OPCODE,		0,			0,			0,			parse_ret_intel,F_PE		},
-	{"RNV",		0,	IS_OPCODE,		0,			0,			0,			parse_ret_intel,F_NV		},
-	{"RV",		0,	IS_OPCODE,		0,			0,			0,			parse_ret_intel,F_V			},
-	{"RP",		0,	IS_OPCODE,		0,			0,			0,			parse_ret_intel,F_P			},
-	{"RM",		0,	IS_OPCODE,		0,			0,			0,			parse_ret_intel,F_M			},
-
-	{ NULL },
+{ NULL },
 };
 
 static keyword_t* keywords_hash;

@@ -212,8 +212,16 @@ bool emit_ld_rr_indnn(int rr, int nn) {
 	return emit_ld_rr_indnn_1(0x2a, 0x4b, rr, nn);
 }
 
+bool emit_ld_hl_indnn(int nn) {
+	return emit_ld_rr_indnn(RR_HL, nn);
+}
+
 bool emit_ld_indnn_rr(int nn, int rr) {
 	return emit_ld_rr_indnn_1(0x22, 0x43, rr, nn);
+}
+
+bool emit_ld_indnn_hl(int nn) {
+	return emit_ld_indnn_rr(nn, RR_HL);
 }
 
 bool emit_ld_a_i(void) {
@@ -244,6 +252,10 @@ bool emit_ld_sp_x(int x) {
 	emit_idx_prefix(x);
 	emit(0xf9);
 	return true;
+}
+
+bool emit_ld_sp_hl(void) {
+	return emit_ld_sp_x(RR_HL);
 }
 
 static bool emit_inc_dec_r_1(int opc, int r) {
@@ -304,7 +316,7 @@ bool emit_ex_af_af1(void) {
 	return true;
 }
 
-bool emit_ex_de_hl(int x) {
+bool emit_ex_de_x(int x) {
 	if ((x & IDX_MASK) != IDX_HL) {
 		illegal_opcode_error();
 		return false;
@@ -315,10 +327,18 @@ bool emit_ex_de_hl(int x) {
 	}
 }
 
-bool emit_ex_indsp_hl(int x) {
+bool emit_ex_de_hl(void) {
+	return emit_ex_de_x(RR_HL);
+}
+
+bool emit_ex_indsp_x(int x) {
 	emit_idx_prefix(x);
 	emit(0xe3);
 	return true;
+}
+
+bool emit_ex_indsp_hl(void) {
+	return emit_ex_indsp_x(RR_HL);
 }
 
 bool emit_exx(void) {
@@ -769,6 +789,10 @@ bool emit_jp_x(int x) {
 	emit_idx_prefix(x);
 	emit(0xe9);
 	return true;
+}
+
+bool emit_jp_hl(void) {
+	return emit_jp_x(RR_HL);
 }
 
 bool emit_call_nn(int nn) {
