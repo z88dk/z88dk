@@ -162,22 +162,22 @@ include(__link__.m4)
 // HBIOS FUNCTIONS
 
 // return DEHL, function BC
-__DPROTO(,,uint32_t,,hbios,uint16_t func)
+__DPROTO(`iyh,iyl',`iyh,iyl',uint32_t,,hbios,uint16_t func)
 // return A, function BC
-__DPROTO(,,uint8_t,,hbios_a,uint16_t func)
+__DPROTO(`iyh,iyl',`iyh,iyl',uint8_t,,hbios_a,uint16_t func)
 // return A, function BC, arg DE
-__DPROTO(,,uint8_t,,hbios_a_de,uint16_t func,uint16_t arg)
+__DPROTO(`iyh,iyl',`iyh,iyl',uint8_t,,hbios_a_de,uint16_t func,uint16_t arg)
 // return A, function BC, arg DEHL
-__DPROTO(,,uint8_t,,hbios_a_dehl,uint16_t func,uint32_t arg)
+__DPROTO(`iyh,iyl',`iyh,iyl',uint8_t,,hbios_a_dehl,uint16_t func,uint32_t arg)
 // return A, function BC, arg DE, void * HL
-__DPROTO(,,uint8_t,,hbios_a_de_hl,uint16_t func,uint16_t arg,void * buffer)
+__DPROTO(`iyh,iyl',`iyh,iyl',uint8_t,,hbios_a_de_hl,uint16_t func,uint16_t arg,void * buffer)
 // return E, function BC
-__DPROTO(,,uint8_t,,hbios_e,uint16_t func)
+__DPROTO(`iyh,iyl',`iyh,iyl',uint8_t,,hbios_e,uint16_t func)
 // return E, function BC, arg DE
-__DPROTO(,,uint8_t,,hbios_e_de,uint16_t func,uint16_t arg)
+__DPROTO(`iyh,iyl',`iyh,iyl',uint8_t,,hbios_e_de,uint16_t func,uint16_t arg)
 // return E, function BC, arg DEHL
-__DPROTO(,,uint8_t,,hbios_e_dehl,uint16_t func,uint32_t arg)
+__DPROTO(`iyh,iyl',`iyh,iyl',uint8_t,,hbios_e_dehl,uint16_t func,uint32_t arg)
 // return E, function BC, arg DE, void * HL
-__DPROTO(,,uint8_t,,hbios_e_de_hl,uint16_t func,uint16_t arg,void * buffer)
+__DPROTO(`iyh,iyl',`iyh,iyl',uint8_t,,hbios_e_de_hl,uint16_t func,uint16_t arg,void * buffer)
 
 #endif /* !__ARCH_HBIOS_H__ */

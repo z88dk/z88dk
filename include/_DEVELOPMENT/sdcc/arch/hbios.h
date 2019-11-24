@@ -164,56 +164,56 @@
 // HBIOS FUNCTIONS
 
 // return DEHL, function BC
-extern uint32_t hbios(uint16_t func);
-extern uint32_t hbios_fastcall(uint16_t func) __z88dk_fastcall;
+extern uint32_t hbios(uint16_t func) __preserves_regs(iyh,iyl);
+extern uint32_t hbios_fastcall(uint16_t func) __preserves_regs(iyh,iyl) __z88dk_fastcall;
 #define hbios(a) hbios_fastcall(a)
 
 
 // return A, function BC
-extern uint8_t hbios_a(uint16_t func);
-extern uint8_t hbios_a_fastcall(uint16_t func) __z88dk_fastcall;
+extern uint8_t hbios_a(uint16_t func) __preserves_regs(iyh,iyl);
+extern uint8_t hbios_a_fastcall(uint16_t func) __preserves_regs(iyh,iyl) __z88dk_fastcall;
 #define hbios_a(a) hbios_a_fastcall(a)
 
 
 // return A, function BC, arg DE
-extern uint8_t hbios_a_de(uint16_t func,uint16_t arg);
-extern uint8_t hbios_a_de_callee(uint16_t func,uint16_t arg) __z88dk_callee;
+extern uint8_t hbios_a_de(uint16_t func,uint16_t arg) __preserves_regs(iyh,iyl);
+extern uint8_t hbios_a_de_callee(uint16_t func,uint16_t arg) __preserves_regs(iyh,iyl) __z88dk_callee;
 #define hbios_a_de(a,b) hbios_a_de_callee(a,b)
 
 
 // return A, function BC, arg DEHL
-extern uint8_t hbios_a_dehl(uint16_t func,uint32_t arg);
-extern uint8_t hbios_a_dehl_callee(uint16_t func,uint32_t arg) __z88dk_callee;
+extern uint8_t hbios_a_dehl(uint16_t func,uint32_t arg) __preserves_regs(iyh,iyl);
+extern uint8_t hbios_a_dehl_callee(uint16_t func,uint32_t arg) __preserves_regs(iyh,iyl) __z88dk_callee;
 #define hbios_a_dehl(a,b) hbios_a_dehl_callee(a,b)
 
 
 // return A, function BC, arg DE, void * HL
-extern uint8_t hbios_a_de_hl(uint16_t func,uint16_t arg,void * buffer);
-extern uint8_t hbios_a_de_hl_callee(uint16_t func,uint16_t arg,void * buffer) __z88dk_callee;
+extern uint8_t hbios_a_de_hl(uint16_t func,uint16_t arg,void * buffer) __preserves_regs(iyh,iyl);
+extern uint8_t hbios_a_de_hl_callee(uint16_t func,uint16_t arg,void * buffer) __preserves_regs(iyh,iyl) __z88dk_callee;
 #define hbios_a_de_hl(a,b,c) hbios_a_de_hl_callee(a,b,c)
 
 
 // return E, function BC
-extern uint8_t hbios_e(uint16_t func);
-extern uint8_t hbios_e_fastcall(uint16_t func) __z88dk_fastcall;
+extern uint8_t hbios_e(uint16_t func) __preserves_regs(iyh,iyl);
+extern uint8_t hbios_e_fastcall(uint16_t func) __preserves_regs(iyh,iyl) __z88dk_fastcall;
 #define hbios_e(a) hbios_e_fastcall(a)
 
 
 // return E, function BC, arg DE
-extern uint8_t hbios_e_de(uint16_t func,uint16_t arg);
-extern uint8_t hbios_e_de_callee(uint16_t func,uint16_t arg) __z88dk_callee;
+extern uint8_t hbios_e_de(uint16_t func,uint16_t arg) __preserves_regs(iyh,iyl);
+extern uint8_t hbios_e_de_callee(uint16_t func,uint16_t arg) __preserves_regs(iyh,iyl) __z88dk_callee;
 #define hbios_e_de(a,b) hbios_e_de_callee(a,b)
 
 
 // return E, function BC, arg DEHL
-extern uint8_t hbios_e_dehl(uint16_t func,uint32_t arg);
-extern uint8_t hbios_e_dehl_callee(uint16_t func,uint32_t arg) __z88dk_callee;
+extern uint8_t hbios_e_dehl(uint16_t func,uint32_t arg) __preserves_regs(iyh,iyl);
+extern uint8_t hbios_e_dehl_callee(uint16_t func,uint32_t arg) __preserves_regs(iyh,iyl) __z88dk_callee;
 #define hbios_e_dehl(a,b) hbios_e_dehl_callee(a,b)
 
 
 // return E, function BC, arg DE, void * HL
-extern uint8_t hbios_e_de_hl(uint16_t func,uint16_t arg,void * buffer);
-extern uint8_t hbios_e_de_hl_callee(uint16_t func,uint16_t arg,void * buffer) __z88dk_callee;
+extern uint8_t hbios_e_de_hl(uint16_t func,uint16_t arg,void * buffer) __preserves_regs(iyh,iyl);
+extern uint8_t hbios_e_de_hl_callee(uint16_t func,uint16_t arg,void * buffer) __preserves_regs(iyh,iyl) __z88dk_callee;
 #define hbios_e_de_hl(a,b,c) hbios_e_de_hl_callee(a,b,c)
 
 
