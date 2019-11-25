@@ -47,8 +47,12 @@ loop:
 
    add hl,bc
    dec hl                      ; hl = last byte of block
-   
+IF __CPU_GBZ80__
+   EXTERN __z80asm_cpdr
+   call __z80asm_cpdr
+ELSE   
    cpdr   
+ENDIF
    inc hl
    ret z                       ; char found
 

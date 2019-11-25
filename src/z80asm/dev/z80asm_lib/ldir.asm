@@ -8,13 +8,17 @@ PUBLIC __z80asm__ldir
 .__z80asm__ldir
 	push	af
 loop:
+IF __CPU_GBZ80__
+	ld	a,(hl+)
+ELSE
 	ld	a,(hl)
-	ld	(de),a
 	inc	hl
+ENDIF
+	ld	(de),a
 	inc	de
 	dec	bc
 	ld	a,b
 	or	c
-	jp	nz,loop
+	jr	nz,loop
 	pop	af
 	ret

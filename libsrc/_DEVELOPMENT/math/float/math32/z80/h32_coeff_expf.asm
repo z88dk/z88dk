@@ -5,7 +5,6 @@
 ; and related items of interest to scientists and engineers.
 ; https://fossies.org/
 ;
-;
 ; Coefficients from lolremez, to make use of additional accuracy in
 ; calculation from 32-bit mantissa poly() function.
 ;
@@ -36,7 +35,6 @@ SECTION rodata_fp_math32
 PUBLIC _m32_coeff_expf
 
 ._m32_coeff_expf
-
 DEFQ 0x3F800000         ; 1.0000000e+0
 DEFQ 0x3F800000         ; 1.0000000e+0
 DEFQ 0x3F000000         ; 5.0000000e-1

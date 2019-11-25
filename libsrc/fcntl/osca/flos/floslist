@@ -9,3 +9,4 @@ rename
 fdtell
 write
 writebyte
+stat

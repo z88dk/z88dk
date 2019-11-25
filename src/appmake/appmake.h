@@ -90,6 +90,10 @@ extern option_t  fp1100_options;
 extern int       gal_exec(char *target);
 extern option_t  gal_options;
 
+extern int       gb_exec(char *target);
+extern option_t  gb_options;
+
+
 extern int       hex_exec(char *target);
 extern option_t  hex_options;
 
@@ -229,6 +233,9 @@ extern option_t  zxvgs_options;
 extern int       zx81_exec(char *target);
 extern option_t  zx81_options;
 
+extern int       tvc_exec(char *target);
+extern option_t  tvc_options;
+
 
 
 struct {
@@ -288,6 +295,10 @@ struct {
       "Creates a tape file image for the Galaksija micro",
       NULL,
       gal_exec,   &gal_options },
+    { "makebin",  "gb",      "(C) 2000 - 2019 gbdk + z88dk",
+      "Creates a ROM image for the Gameboy",
+      NULL,
+      gb_exec,   &gb_options },
     { "gluebin", "glue", "(C) 2017 Alvin Albrecht",
       "Glue several output binaries into a single binary representing memory",
        NULL,
@@ -494,6 +505,10 @@ struct {
       "Creates a zxvgs application file",
       NULL,
       zxvgs_exec,   &zxvgs_options},
+    { "bin2cas",   "tvc",      "(C) 2019 Sandor Vass",
+      "Generate TVC .cas file from the linked binary",
+      NULL,
+      tvc_exec,   &tvc_options },
     { NULL, NULL, NULL, NULL, NULL, NULL }
 };
 #endif

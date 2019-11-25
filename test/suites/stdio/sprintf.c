@@ -4,7 +4,11 @@
 #include <string.h>
 #include "test.h"
 
+#ifndef __GBZ80__
 #pragma output CLIB_OPT_PRINTF=0x7fffffff
+#else
+#pragma output CLIB_OPT_PRINTF=0x40ffffff
+#endif
 
 struct sprintf_test {
     char *pattern;
@@ -175,7 +179,9 @@ int test_scanf()
     suite_add_test(test_sprintf_long_positive);
 #ifndef __RCMX000__
 #ifndef __8080__
+#ifndef __GBZ80__
     suite_add_test(test_sprintf_double);
+#endif
 #endif
 #endif
     suite_add_test(test_sprintf_precision_parameter);

@@ -8,6 +8,7 @@
 ; Stefano Bodrato - 2001..2013
 ;
 
+IF !__CPU_GBZ80__
     SECTION    code_clib
     PUBLIC     bit_close_ei
     PUBLIC     _bit_close_ei
@@ -25,3 +26,4 @@
 	ei
 	ret
 
+ENDIF

@@ -14,10 +14,9 @@
         sbc     d
         ld      h,a
         or      l
-        inc     hl
+	ld	hl,1
         scf
         ret     nz
         xor     a
-        ld      l,a
-        ld      h,a
+	dec	l
         ret

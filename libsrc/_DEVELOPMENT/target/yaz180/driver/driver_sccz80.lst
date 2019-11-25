@@ -6,4 +6,4 @@
 @target/yaz180/driver/ide/ide.lst
 @target/yaz180/driver/diskio/diskio_sccz80.lst
 @target/yaz180/driver/apu/apu_sccz80.lst
-@target/yaz180/driver/system_time/system_time_sccz80.lst
+@target/yaz180/driver/time/time_sccz80.lst

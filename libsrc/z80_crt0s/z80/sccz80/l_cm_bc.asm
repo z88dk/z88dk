@@ -10,8 +10,14 @@
 .l_cm_bc
 
    ld a,b
+IF __CPU_GBZ80__
+   rla
+   ret nc
+   ld a,b
+ELSE
    or a
    ret p
+ENDIF
    cpl
    ld b,a
    ld a,c
@@ -20,9 +26,3 @@
    inc bc
    ret
 
-
-;        ld a,b
-;        or a
-;        ret p
-;        call    l_bcneg
-;        ret

@@ -10,15 +10,21 @@ EXTERN asm_strchr
 
 strchr:
 
-   pop af
+   pop de
    pop bc
    pop hl
    
    push hl
    push bc
-   push af
-   
+   push de
+IF __CLASSIC && __CPU_GBZ80__
+   call asm_strchr
+   ld d,h
+   ld e,l
+   ret
+ELSE
    jp asm_strchr
+ENDIF
 
 ; SDCC bridge for Classic
 IF __CLASSIC

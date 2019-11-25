@@ -12,7 +12,7 @@
 ; Entry: bc = buffer to print
 ;        de = length of the buffer
 __printf_print_aligned:
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 	call	__printf_get_width
 ELSE
         ld      l,(ix-6)        ;width
@@ -31,7 +31,7 @@ ENDIF
         jr      width_done
 adjust_width:
         and     a
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 	ld	a,l
 	sub	e
 	ld	l,a
@@ -77,7 +77,7 @@ print_padding_loop:
 
 print_padding:
 	ld	c,' '
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 	call	__printf_is_padding_zero
 ELSE
         bit     2,(ix-4)

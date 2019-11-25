@@ -11,5 +11,5 @@
 
 
 .c_pointxy			
-	INCLUDE "c_pixel.asm"
+	INCLUDE "c_pixel.inc"
 

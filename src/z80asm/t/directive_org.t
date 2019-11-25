@@ -62,11 +62,6 @@ z80asm("org -2", "", 1, "", <<'ERR');
 Error at file 'test.asm' line 1: integer '-2' out of range
 ERR
 
-unlink_testfiles();
-z80asm("org 65536", "", 1, "", <<'ERR');
-Error at file 'test.asm' line 1: integer '65536' out of range
-ERR
-
 # ORG not constant
 unlink_testfiles();
 z80asm("extern start \n org start", "", 1, "", <<'ERR');

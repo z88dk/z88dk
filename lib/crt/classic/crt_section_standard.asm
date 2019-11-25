@@ -21,6 +21,7 @@
 		SECTION code_crt_init
 		SECTION code_crt_exit
 		SECTION code_driver
+		SECTION rodata_driver		;Keep it in low memoey
 		SECTION code_compiler
 		SECTION code_clib
 		SECTION code_crt0_sccz80
@@ -110,6 +111,7 @@ ENDIF
 IF __crt_org_bss_compiler_start
 		org	__crt_org_bss_compiler_start
 ENDIF
+		SECTION bss_driver
 		SECTION bss_clib
 		SECTION bss_string
 		SECTION bss_alloc_balloc

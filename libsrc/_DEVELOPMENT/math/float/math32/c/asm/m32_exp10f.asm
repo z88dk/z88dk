@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.9.1 #11310 (Linux)
+; Version 3.9.4 #11423 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -290,9 +290,19 @@ _m32_exp10f:
 	ld	(ix-12),c
 	ld	(ix-11),b
 	ld	(ix-10),e
-	ld	l, e
 	ld	(ix-9),d
-	ld	h,d
+	ld	a, d
+	and	a,0x7f
+	or	a,(ix-10)
+	or	a,(ix-11)
+	or	a,(ix-12)
+	jr	NZ,l_m32_exp10f_00102
+	ld	de,0x3f80
+	ld	hl,0x0000
+	jp	l_m32_exp10f_00103
+l_m32_exp10f_00102:
+	ld	l,(ix-10)
+	ld	h,(ix-9)
 	push	hl
 	ld	l,(ix-12)
 	ld	h,(ix-11)
@@ -302,14 +312,12 @@ _m32_exp10f:
 	ld	hl,0x9a78
 	push	hl
 	call	___fsmul_callee
-	ld	c, l
-	ld	b, h
-	ld	hl,0x3f00
-	push	hl
-	ld	hl,0x0000
-	push	hl
-	push	de
+	ld	bc,0x3f00
 	push	bc
+	ld	bc,0x0000
+	push	bc
+	push	de
+	push	hl
 	call	___fsadd_callee
 	call	_m32_floorf
 	ld	(ix-8),l
@@ -369,51 +377,26 @@ _m32_exp10f:
 	ld	h,(ix-7)
 	push	hl
 	call	___fs2sint_callee
-	ld	(ix-10),l
-	ld	(ix-9),h
+	ld	(ix-6),l
+	ld	(ix-5),h
 	pop	de
 	pop	bc
-	push	bc
-	push	de
-	ld	hl,0x0005
+	ld	hl,0x0007
 	push	hl
 	ld	hl,_m32_coeff_exp10f
 	push	hl
 	push	de
 	push	bc
 	call	_m32_polyf
-	ld	(ix-8),l
-	ld	(ix-7),h
-	ld	(ix-6),e
-	ld	(ix-5),d
-	pop	de
-	pop	bc
-	push	de
-	push	bc
+	ld	c, l
 	ld	l,(ix-6)
-	ld	h,(ix-5)
-	push	hl
-	ld	l,(ix-8)
-	ld	h,(ix-7)
-	push	hl
-	call	___fsmul_callee
-	ld	c, l
-	ld	b, h
-	ld	hl,0x3f80
-	push	hl
-	ld	hl,0x0000
-	push	hl
-	push	de
-	push	bc
-	call	___fsadd_callee
-	ld	c, l
-	ld	l,(ix-10)
 	ld	b,h
-	ld	h,(ix-9)
+	ld	h,(ix-5)
 	push	hl
 	push	de
 	push	bc
 	call	_m32_ldexpf
+l_m32_exp10f_00103:
 	ld	sp, ix
 	pop	ix
 	ret

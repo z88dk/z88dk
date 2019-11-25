@@ -2,7 +2,6 @@
 ; aralbrec 02.2008
 ; flag-perfect emulation of cpdr
 
-IF !__CPU_GBZ80__
 SECTION code_crt0_sccz80
 PUBLIC __z80asm__cpdr
 
@@ -84,4 +83,3 @@ ENDIF
    ex (sp),hl
    pop af
    ret
-ENDIF

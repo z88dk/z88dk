@@ -4,4 +4,3 @@
 	EXTERN	_m32_fmodf
 
 	defc	_fmod = _m32_fmodf
-

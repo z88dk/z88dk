@@ -1,0 +1,9 @@
+target/yaz180/driver/time/c/sccz80/clock_getres
+target/yaz180/driver/time/c/sccz80/clock_getres_callee
+target/yaz180/driver/time/c/sccz80/clock_gettime
+target/yaz180/driver/time/c/sccz80/clock_gettime_callee
+target/yaz180/driver/time/c/sccz80/clock_settime
+target/yaz180/driver/time/c/sccz80/clock_settime_callee
+target/yaz180/driver/time/c/sccz80/system_tick_init
+target/yaz180/driver/time/c/sccz80/system_tick_init_fastcall
+@target/yaz180/driver/time/time_asm.lst

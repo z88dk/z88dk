@@ -11,7 +11,7 @@ PUBLIC _i2c_interrupt_attach_callee
 ;   input HL = address of the interrupt service routine
 ;   input A  = device address, __IO_I2C1_PORT_MSB or __IO_I2C2_PORT_MSB
 ;
-;   uint8_t i2c_interrupt_attach( uint8_t device, uint8_t *isr ) __z88dk_callee
+;   void i2c_interrupt_attach( uint8_t device, uint8_t *isr ) __z88dk_callee
 
 ._i2c_interrupt_attach_callee
     pop hl                              ;ret

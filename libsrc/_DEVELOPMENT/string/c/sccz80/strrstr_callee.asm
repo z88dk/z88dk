@@ -9,11 +9,22 @@ EXTERN asm_strrstr
 
 strrstr_callee:
 
+IF __CPU_GBZ80__
+   pop bc
+   pop de
+   pop hl
+   push bc
+   call asm_strrstr
+   ld d,h
+   ld e,l
+   ret
+ELSE
    pop hl
    pop de
    ex (sp),hl
-   
    jp asm_strrstr
+ENDIF
+   
 
 ; SDCC bridge for Classic
 IF __CLASSIC

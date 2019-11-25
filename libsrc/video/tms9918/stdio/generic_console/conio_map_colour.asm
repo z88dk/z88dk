@@ -6,11 +6,11 @@
 ;
 
 	MODULE	code_clib
-	PUBLIC	conio_map_colour
+	PUBLIC	__tms9918_map_colour
 
 	EXTERN	__CLIB_CONIO_NATIVE_COLOUR
 
-conio_map_colour:
+__tms9918_map_colour:
         ld      c,__CLIB_CONIO_NATIVE_COLOUR
         rr      c
         ret     c

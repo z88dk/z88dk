@@ -4,4 +4,3 @@
 	EXTERN	cm32_sdcc_cos
 
 	defc	_cos = cm32_sdcc_cos
-

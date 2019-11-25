@@ -1,0 +1,810 @@
+
+	push	hl
+	ld	hl,1	;const
+	push	hl
+	ld	hl,24	;const
+	call	l_glongsp	;
+	call	_err_msg
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	call	l_int2long_s
+	exx
+	ld	hl,16	;const
+	add	hl,sp
+	ld	sp,hl
+	exx
+	ret
+=
+	jp	clisp_opt3
+
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	call	l_int2long_s
+	exx
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	sp,hl
+	exx
+	ret
+=
+	ld	a,%1
+	jp	clisp_opt3b
+
+	ld	hl,(_errmsg_ill_type)
+	jp	clisp_opt3
+=
+	jp	clisp_opt3a
+
+	add	hl,sp
+	call	l_glong
+	pop	bc
+	call	l_plong
+=
+	call	clisp_opt4
+
+
+	ld	hl,8	;const
+	add	hl,sp
+	xor	a
+	ld	(hl),a
+	inc	hl
+	ld	(hl),a
+	inc	hl
+	ld	(hl),a
+	inc	hl
+	ld	(hl),a
+	ld	hl,12	;const
+	add	hl,sp
+	push	hl
+	ld	hl,20	;const
+	call	clisp_opt4
+=
+	call	clisp_opt4a
+
+
+	call	l_plong
+	jp	i_253
+=
+	jp	i_253-3
+
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+=
+	call	clisp_opt11
+
+
+.i_52
+	ld	hl,65535	;const
+	call	l_int2long_s
+	exx
+	ld	hl,46	;const
+	add	hl,sp
+	ld	sp,hl
+	exx
+	ret
+=
+.i_52
+	ld	hl,65535	;const
+	call	l_int2long_s
+	exx
+	ld	hl,46	;const STICKED
+	add	hl,sp
+	ld	sp,hl
+	exx
+	ret
+
+	ld	hl,65535	;const
+	call	l_int2long_s
+	exx
+	ld	hl,46	;const
+	add	hl,sp
+	ld	sp,hl
+	exx
+	ret
+=
+	jp	i_52
+
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	call	l_int2long_s
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+=
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+.l_int2long_s_ret
+	call	l_int2long_s
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+	ld	hl,65535	;const
+	call	l_int2long_s
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+=
+	ld	hl,65535	;const
+	jp	l_int2long_s_ret
+
+	ld	hl,12	;const
+	call	l_gintspsp	;
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
+	pop	bc
+	call	l_plong
+=
+	call	clisp_opt13a
+
+	add	hl,sp
+	push	hl
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
+	pop	bc
+	call	l_plong
+=
+	call	clisp_opt13b
+
+	ld	hl,65535	;const
+	call	l_int2long_s
+	exx
+	ld	hl,16	;const
+	add	hl,sp
+	ld	sp,hl
+	exx
+	ret
+=
+	call	clisp_opt14
+
+	ld	hl,%1	;const
+	call	l_gintsp	;
+	call	_l_car
+	call	_l_eval
+=
+	ld	a,%1	;const
+	call	clisp_opt15
+
+
+	ld	hl,(_errmsg_ill_type)
+	push	hl
+	ld	hl,1	;const
+	push	hl
+	ld	hl,16	;const
+	call	l_gintsp	;
+	push	hl
+	call	_err_msg
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+=
+	jp	i_245
+
+	push	hl
+	ld	hl,1	;const
+	push	hl
+	ld	hl,16	;const
+	call	l_gintsp	;
+	push	hl
+	call	_err_msg
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+=
+	jp	i_245+3
+
+	ld	hl,%1	;const
+	call	l_gintsp	;
+	call	l_gint	;
+=
+	ld	a,%1+2
+	call	clisp_opt20
+
+	ld	hl,%1	;const
+	call	l_gintsp	;
+	call	_l_car
+=
+	ld	a,%1+2
+	call	clisp_opt21
+
+	ld	hl,%1	;const
+	call	l_gintsp	;
+	call	_D_GET_TAG
+=
+	ld	a,%1+2
+	call	clisp_opt22
+
+	ld	hl,(%1)
+	push	hl
+	ld	hl,1	;const
+	push	hl
+	ld	hl,18	;const
+	call	l_gintsp	;
+	push	hl
+	call	_err_msg
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+=
+	ld	hl,(%1)
+	jp	clisp_opt23
+
+	jp	nc,%1
+	ld	hl,65535	;const
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+=
+	jp	c,clisp_opt24
+
+	call	clisp_opt21
+	call	_l_eval
+	call	l_pint_pop
+	ld	a,h
+	rla
+=
+	call	clisp_opt25
+	call	l_pint_pop
+	ld	a,h
+	rla
+
+	ld	hl,%1	;const
+	call	l_gintsp	;
+	call	_l_cdr
+	call	_l_car
+	call	_l_eval
+=
+	ld	a,%1+2
+	call	clisp_opt26
+
+	ld	hl,_t_cons_car
+	push	hl
+	ld	a,14+2
+	call	clisp_opt20
+	call	_D_GET_DATA
+	add	hl,hl
+	pop	de
+	add	hl,de
+	push	hl
+	ld	hl,14	;const
+	call	l_gintsp	;
+	inc	hl
+	inc	hl
+	call	l_gint	;
+	call	l_pint_pop
+	call	l_pint_pop
+	jp	i_253
+.i_264
+=
+	ld	hl,_t_cons_car
+	jr	i_264+8
+.i_264
+
+.i_52
+	ld	hl,40	;const
+	add	hl,sp
+	ld	sp,hl
+	ld	hl,65535	;const
+	ret
+=
+.i_52
+	ld	hl,40	;const
+	add	hl,sp
+	ld	sp,hl		; STICKER
+	ld	hl,65535	;const
+	ret
+
+	ld	hl,40	;const
+	add	hl,sp
+	ld	sp,hl
+	ld	hl,65535	;const
+	ret
+=
+	jp	i_52
+
+
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	de,0	;const
+	ex	de,hl
+	call	l_pint
+=
+	ld	a,%1+2	;const
+	call	clisp_opt27
+
+
+
+	ld	hl,%1	;const
+	call	l_gintspsp	;
+	ld	hl,0	;const
+	push	hl
+	call	_l_cons
+	pop	bc
+	pop	bc
+=
+	ld	a,%1+2	;const
+	call	clisp_opt28
+
+
+	call	%1
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+=
+	call	%1
+	jp	pop_ret1
+
+	call	%1
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+=
+	call	%1
+	jp	pop_ret2
+
+.%1
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+=
+.%1
+	jp	pop_ret2
+
+	call	l_case
+	defw	i_255,33
+	defw	i_256,6
+	defw	i_257,10
+	defw	i_258,45
+	defw	i_261,44
+	defw	i_262,3
+	defw	i_263,17
+	defw	i_264,18
+	defw	i_265,4
+	defw	i_266,5
+	defw	i_267,11
+	defw	i_270,12
+	defw	i_273,13
+	defw	i_276,14
+	defw	i_279,24
+	defw	i_280,22
+	defw	i_283,0
+	defw	i_284,1
+	defw	i_285,15
+	defw	i_286,16
+	defw	i_287,2
+	defw	i_288,25
+	defw	i_293,27
+	defw	i_298,26
+	defw	i_309,28
+	defw	i_322,29
+	defw	i_325,32
+	defw	i_327,30
+	defw	i_330,39
+	defw	i_333,35
+	defw	i_336,36
+	defw	i_339,38
+	defw	i_342,40
+	defw	i_343,42
+	defw	i_344,43
+	defw	i_345,41
+	defw	i_347,46
+	defw	0
+=
+	call	l_case_squeezed
+	defw	i_255
+	defb	33
+	defw	i_256
+	defb	6
+	defw	i_257
+	defb	10
+	defw	i_258
+	defb	45
+	defw	i_261
+	defb	44
+	defw	i_262
+	defb	3
+	defw	i_263
+	defb	17
+	defw	i_264
+	defb	18
+	defw	i_265
+	defb	4
+	defw	i_266
+	defb	5
+	defw	i_267
+	defb	11
+	defw	i_270
+	defb	12
+	defw	i_273
+	defb	13
+	defw	i_276
+	defb	14
+	defw	i_279
+	defb	24
+	defw	i_280
+	defb	22
+	defw	i_283
+	defb	0
+	defw	i_284
+	defb	1
+	defw	i_285
+	defb	15
+	defw	i_286
+	defb	16
+	defw	i_287
+	defb	2
+	defw	i_288
+	defb	25
+	defw	i_293
+	defb	27
+	defw	i_298
+	defb	26
+	defw	i_309
+	defb	28
+	defw	i_322
+	defb	29
+	defw	i_325
+	defb	32
+	defw	i_327
+	defb	30
+	defw	i_330
+	defb	39
+	defw	i_333
+	defb	35
+	defw	i_336
+	defb	36
+	defw	i_339
+	defb	38
+	defw	i_342
+	defb	40
+	defw	i_343
+	defb	42
+	defw	i_344
+	defb	43
+	defw	i_345
+	defb	41
+	defw	i_347
+	defb	46
+	defw	0
+
+	call	l_case
+	defw	i_142,0
+	defw	i_143,2
+	defw	i_144,1
+	defw	i_146,3
+	defw	0
+=
+	call	l_case_squeezed
+	defw	i_142
+	defb	0
+	defw	i_143
+	defb	2
+	defw	i_144
+	defb	1
+	defw	i_146
+	defb	3
+	defw	0
+
+	call	l_case
+	defw	i_152,7
+	defw	i_155,9
+	defw	i_158,8
+	defw	i_159,19
+	defw	i_164,34
+	defw	i_173,31
+	defw	i_179,21
+	defw	i_185,20
+	defw	i_197,37
+	defw	i_198,23
+	defw	0
+=
+	call	l_case_squeezed
+	defw	i_152
+	defb	7
+	defw	i_155
+	defb	9
+	defw	i_158
+	defb	8
+	defw	i_159
+	defb	19
+	defw	i_164
+	defb	34
+	defw	i_173
+	defb	31
+	defw	i_179
+	defb	21
+	defw	i_185
+	defb	20
+	defw	i_197
+	defb	37
+	defw	i_198
+	defb	23
+	defw	0
+
+	call	l_case
+	defw	i_234,17
+	defw	i_235,18
+	defw	i_236,4
+	defw	i_237,5
+	defw	i_239,29
+	defw	i_240,30
+	defw	i_241,35
+	defw	i_242,36
+	defw	i_243,41
+	defw	i_247,38
+	defw	i_248,40
+	defw	i_249,42
+	defw	i_250,43
+	defw	0
+=
+	call	l_case_squeezed
+	defw	i_234
+	defb	17
+	defw	i_235
+	defb	18
+	defw	i_236
+	defb	4
+	defw	i_237
+	defb	5
+	defw	i_239
+	defb	29
+	defw	i_240
+	defb	30
+	defw	i_241
+	defb	35
+	defw	i_242
+	defb	36
+	defw	i_243
+	defb	41
+	defw	i_247
+	defb	38
+	defw	i_248
+	defb	40
+	defw	i_249
+	defb	42
+	defw	i_250
+	defb	43
+	defw	0
+
+	call	_D_GET_TAG
+	ld	de,%1
+	and	a
+	sbc	hl,de
+=
+	ld	de,%1
+	call	_D_TEST_TAG
+
+	call	_D_TEST_TAG
+	scf
+	jr	nz,ASMPC+3
+	ccf
+=
+	call	_D_TEST_TAG
+
+	jp	nc,%1
+	jp	%2
+=
+	jr	nc,%1
+	jp	%2
+
+	call	l_pint_pop
+	jp	i_253
+=
+	jp	i_253-3
+
+
+.%1
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+=
+.%1
+	jp	pop_ret3
+
+
+	call	l_case
+	defw	i_117,0
+	defw	i_118,2
+	defw	i_119,1
+	defw	i_121,3
+	defw	0
+=
+	call	l_case_squeezed
+	defw	i_117
+	defb	0
+	defw	i_118
+	defb	2
+	defw	i_119
+	defb	1
+	defw	i_121
+	defb	3
+	defw	0
+
+	call	l_case
+	defw	i_127,7
+	defw	i_130,9
+	defw	i_133,8
+	defw	i_134,19
+	defw	i_139,21
+	defw	i_145,20
+	defw	i_157,23
+	defw	0
+=
+	call	l_case_squeezed
+	defw	i_127
+	defb	7
+	defw	i_130
+	defb	9
+	defw	i_133
+	defb	8
+	defw	i_134
+	defb	19
+	defw	i_139
+	defb	21
+	defw	i_145
+	defb	20
+	defw	i_157
+	defb	23
+	defw	0
+
+	call	l_case
+	defw	i_193,17
+	defw	i_194,18
+	defw	i_195,4
+	defw	i_196,5
+	defw	i_198,29
+	defw	0
+=
+	call	l_case_squeezed
+	defw	i_193
+	defb	17
+	defw	i_194
+	defb	18
+	defw	i_195
+	defb	4
+	defw	i_196
+	defb	5
+	defw	i_198
+	defb	29
+	defw	0
+
+	call	l_case
+	defw	i_205,6
+	defw	i_206,10
+	defw	i_209,3
+	defw	i_210,17
+	defw	i_211,18
+	defw	i_212,4
+	defw	i_213,5
+	defw	i_214,11
+	defw	i_217,12
+	defw	i_220,13
+	defw	i_223,14
+	defw	i_226,24
+	defw	i_227,22
+	defw	i_230,0
+	defw	i_231,1
+	defw	i_232,15
+	defw	i_233,16
+	defw	i_234,2
+	defw	i_235,25
+	defw	i_240,27
+	defw	i_245,26
+	defw	i_256,28
+	defw	i_269,29
+	defw	i_272,30
+	defw	i_273,31
+	defw	i_274,32
+	defw	i_275,34
+	defw	i_276,33
+	defw	i_277,35
+	defw	0
+=
+	call	l_case_squeezed
+	defw	i_205
+	defb	6
+	defw	i_206
+	defb	10
+	defw	i_209
+	defb	3
+	defw	i_210
+	defb	17
+	defw	i_211
+	defb	18
+	defw	i_212
+	defb	4
+	defw	i_213
+	defb	5
+	defw	i_214
+	defb	11
+	defw	i_217
+	defb	12
+	defw	i_220
+	defb	13
+	defw	i_223
+	defb	14
+	defw	i_226
+	defb	24
+	defw	i_227
+	defb	22
+	defw	i_230
+	defb	0
+	defw	i_231
+	defb	1
+	defw	i_232
+	defb	15
+	defw	i_233
+	defb	16
+	defw	i_234
+	defb	2
+	defw	i_235
+	defb	25
+	defw	i_240
+	defb	27
+	defw	i_245
+	defb	26
+	defw	i_256
+	defb	28
+	defw	i_269
+	defb	29
+	defw	i_272
+	defb	30
+	defw	i_273
+	defb	31
+	defw	i_274
+	defb	32
+	defw	i_275
+	defb	34
+	defw	i_276
+	defb	33
+	defw	i_277
+	defb	35
+	defw	0

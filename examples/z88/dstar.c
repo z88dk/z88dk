@@ -358,26 +358,26 @@ void redrawscreen(void)
 /* Define and open a text window with title and other embellishments
  * strings are at top for clearing, position etc
  */
-        text->number='3';
-        text->x=32+7;
-        text->y=32+1;
-        text->width=32+34;
-        text->depth=32+7;
-        text->type=131;
-        text->graph=0;
+        text.number='3';
+        text.x=32+7;
+        text.y=32+1;
+        text.width=32+34;
+        text.depth=32+7;
+        text.type=131;
+        text.graph=0;
         window(&text);
         fputs(windtitle,stdout);
-        text->x=32+8;
-        text->y=32+3;
-        text->width=32+32;
-        text->depth=32+5;
-        text->type=128;
+        text.x=32+8;
+        text.y=32+3;
+        text.width=32+32;
+        text.depth=32+5;
+        text.type=128;
         window(&text);
         fputs(windclr,stdout);
 /* Now, try to open a map window.. */
-        graphics->graph=1;
-        graphics->width=128;
-        graphics->number='4';
+        graphics.graph=1;
+        graphics.width=128;
+        graphics.number='4';
         if (window(&graphics)) {
                 puts("Sorry, Can't Open Map");
                 sleep(5);

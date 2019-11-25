@@ -11,6 +11,7 @@
 SECTION code_clib
 PUBLIC vz_mode
 PUBLIC _vz_mode
+EXTERN __vz200_mode
 
 .vz_mode
 ._vz_mode
@@ -27,6 +28,8 @@ PUBLIC _vz_mode
    ld (hl),a
    ld ($6800),a
    ld ($783b),a
+   xor a
+   ld (__vz200_mode),a
    jp $01c9                  ; cls
 
 .mode1
@@ -35,6 +38,8 @@ PUBLIC _vz_mode
    ld (hl),a
    ld ($6800),a
    ld ($783b),a
+   ld a,1
+   ld (__vz200_mode),a
    
    ld hl,$7000
    ld de,$7001

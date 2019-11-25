@@ -9,7 +9,7 @@
 CC = zcc
 
 COMPILER ?= sccz80
-CFLAGS = +svi -vn -llib3d  -lm -lndos -create-app
+CFLAGS = +svi -vn -llib3d  -lm -lndos -create-app -DAMALLOC
 
 
 CFILES = \
@@ -35,20 +35,12 @@ ifeq ($(COMPILER),sdcc)
    CFLAGS += -compiler=sdcc  -SO3 --max-allocs-per-node200000 --fsigned-char 
 all: ex1.cas ex1b.cas ex2.cas ex3.cas ex6.cas ex7.cas ex10.cas ex10b.cas vpoke.cas vtstone.cas
 else
-all: $(EXECFILES) dstar.cas microman.cas othello.cas wall.cas globe.cas snakes.cas vtstone.cas
+   CFLAGS += -lsvibios
+all: $(EXECFILES) dstar.cas microman.cas othello.cas wall.cas globe.cas snakes.cas vtstone.cas psgtest.cas
 endif
 
-ex6.cas: ../msx/ex6.c
-	$(CC) $(CFLAGS) -oex6.bin ../msx/ex6.c -lsvibios
-
-ex7.cas: ../msx/ex7.c
-	$(CC) $(CFLAGS) -oex7.bin ../msx/ex7.c -lsvibios
-
-ex11.cas: ../msx/ex11.c
-	$(CC) $(CFLAGS) -oex11.bin ../msx/ex11.c -lsvibios
-
 showlib3d.cas: ../msx/showlib3d.c
-	$(CC) $(CFLAGS) -oshowlib3d.bin ../msx/showlib3d.c -lsvibios
+	$(CC) $(CFLAGS) -oshowlib3d.bin ../msx/showlib3d.c
 
 #ex8.com: ex8.c
 #	$(CC) +cpm -create-app -lsvicpm -oex8 ex8.c
@@ -76,6 +68,9 @@ snakes.cas: ../graphics/snakes.c
 	
 vtstone.cas: ../console/vtstone.c
 	$(CC) $(CFLAGS) ../console/vtstone.c -I../console -clib=ansi -pragma-define:ansicolumns=80 -create-app -ovtstone.bin
+
+psgtest.cas: ../sound/psgtest.c
+	$(CC) $(CFLAGS) ../sound/psgtest.c -DNODELAY -create-app -opsgtest.bin
 
 clean:
 	$(RM) *.obj *.sym *.map *.o* *.bin zcc_opt.def *.reloc *.cas

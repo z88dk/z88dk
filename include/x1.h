@@ -15,6 +15,8 @@
 // Init the PSG (reset sound etc..)
 //extern void __LIB__ x1_initpsg();
 
+// Set the palette to configure the 8 colours
+extern void x1_set_palette(int blue, int red, int green);
 
 // Programmable Character Generator
 // Get the PCG version (1 or 2), depending on the X1 model (or chipset)

@@ -12,7 +12,7 @@ SECTION code_clib
 PUBLIC vz_shape
 PUBLIC _vz_shape
 PUBLIC char_shape
-EXTERN scrbase
+EXTERN base_graphics
 
 ; This one is difficult to ween off the stack so left
 ; as is for another enterprising person to improve
@@ -38,7 +38,7 @@ EXTERN scrbase
         rr      l
 	sra	h
         rr      l
-	ld	de, (scrbase)
+	ld	de, (base_graphics)
 	add	hl, de
 
 	ld	a, (ix+6)	; color

@@ -1,6 +1,7 @@
 #include <graphics.h>
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 int small_delay(){
     int a=0;

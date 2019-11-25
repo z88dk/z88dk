@@ -11,9 +11,6 @@ OBJECTS = $(CFILES:.c=.o)
 
 all: $(OBJECTS)
 
-z88/%.o: z88/%.c
-	@$(ZCC) +z88 $(CFLAGS) $^ -o $@
-
 sprinter/%.o: sprinter/%.c
 	@$(ZCC) +pps $(CFLAGS) $^ -o $@
 

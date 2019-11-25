@@ -11,4 +11,4 @@
 
 .plotpixel
 	defc	NEEDplot = 1
-	INCLUDE	"pixel1.asm"
+	INCLUDE	"pixel1.inc"

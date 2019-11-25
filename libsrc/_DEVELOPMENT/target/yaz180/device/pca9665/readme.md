@@ -12,9 +12,9 @@ The PCA9665 has the same footprint as the PCA9564 with additional features:
 
 ### Description
 
-The PCA9665/PCA9665A acts as an interface device between standard high-speed parallel buses and the serial I 2 C-bus. On the I 2 C-bus, it can act either as a master or slave.
+The PCA9665/PCA9665A acts as an interface device between standard high-speed parallel buses and the serial I2C-bus. On the I2C-bus, it can act either as a master or slave.
 
-Bidirectional data transfer between the I 2 C-bus and the parallel-bus microcontroller is carried out on a byte or buffered basis, using either an interrupt or polled handshake.
+Bidirectional data transfer between the I2C-bus and the parallel-bus microcontroller is carried out on a byte or buffered basis, using either an interrupt or polled handshake.
 
 ### PCA9665 Registers
 
@@ -95,7 +95,7 @@ The seven indirect registers require that the INDPTR (indirect register pointer,
     Bits in IMODE
 
     Bit 7:2             reserved, must always be written to zero
-    Bit 1:0 = AC[1:0]   Bus Mode 00b Std 01b Fast 10b Fast+ 11b Turbo
+    Bit 1:0 = AC[1:0]   Bus Mode 00b Std 01b Fast 10b Fast+ 11b Plaid
 
     Bit Defines in STA (Status Codes Returned)
 
@@ -117,6 +117,8 @@ The seven indirect registers require that the INDPTR (indirect register pointer,
     __IO_I2C_STA_SCL_STUCK               $78
     __IO_I2C_STA_SLAVE_DATA_RX_ACK       $80
     __IO_I2C_STA_SLAVE_DATA_RX_NAK       $88
+      UNUSED_0x90                        $90
+      UNUSED_0x98                        $98
     __IO_I2C_STA_SLAVE_STOP_OR_RESTART   $A0
     __IO_I2C_STA_SLAVE_AD_R              $A8
     __IO_I2C_STA_SLAVE_AL_AD_R           $B0
@@ -127,11 +129,11 @@ The seven indirect registers require that the INDPTR (indirect register pointer,
     __IO_I2C_STA_SLAVE_GC_AL             $D8
     __IO_I2C_STA_SLAVE_GC_RX_ACK         $E0
     __IO_I2C_STA_SLAVE_GC_RX_NAK         $E8
-    __IO_I2C_STA_IDLE                    $F8 _IDLE is unused, so
+    __IO_I2C_STA_IDLE                    $F8 _IDLE generates no interrupt, so
     __IO_I2C_STA_ILLEGAL_ICOUNT          $FC _ILLEGAL_ICOUNT can be $F8 case
 
     Bit Defines in CON Echo (i2c1ControlEcho, i2c2ControlEcho), for CPU control
-    Bit 2:1 in CON are reserved, and are therefore used for CPU control
+    Bit 2:1 in CON register are reserved, and are therefore used for CPU control
 
     __IO_I2C_CON_ECHO_BUS_STOP           $10 We are finished the sentence
     __IO_I2C_CON_ECHO_SI                 $08 Serial Interrupt Received
@@ -150,8 +152,8 @@ The seven indirect registers require that the INDPTR (indirect register pointer,
 
     __IO_I2C_IMODE_STD                   $00 Standard mode
     __IO_I2C_IMODE_FAST                  $01 Fast mode
-    __IO_I2C_IMODE_FASTP                 $02 Fast Plus mode
-    __IO_I2C_IMODE_TURBO                 $03 Turbo mode
+    __IO_I2C_IMODE_FAST_PLUS             $02 Fast Plus mode
+    __IO_I2C_IMODE_PLAID                 $03 Plaid mode
 
     __IO_I2C_IMODE_CR                    $07 Clock Rate (MASK)
 ```

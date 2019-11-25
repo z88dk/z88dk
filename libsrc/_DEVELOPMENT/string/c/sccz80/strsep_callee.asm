@@ -10,12 +10,18 @@ EXTERN asm_strsep
 
 strsep_callee:
 
-   pop af
+   pop hl
    pop de
    pop bc
-   push af
-   
+   push hl
+IF __CLASSIC && __CPU_GBZ80__
+   call asm_strsep
+   ld d,h
+   ld e,l
+   ret
+ELSE
    jp asm_strsep
+ENDIF
 
 ; SDCC bridge for Classic
 IF __CLASSIC

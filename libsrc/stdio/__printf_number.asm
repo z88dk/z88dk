@@ -30,13 +30,13 @@
 ;         c = 1 = signed, 0 = unsigned
 __printf_number:
 	push	hl		;save fmt
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 	call	__printf_check_long_flag
 ELSE
 	bit	6,(ix-4)
 ENDIF
 	jr	z,printf_number16
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 	call	__printf_issccz80
 ELSE
         bit     0,(ix+6)        ;sccz80 flag
@@ -48,8 +48,12 @@ ENDIF
         inc     hl
         ld      d,(hl)
         inc     hl
+IF __CPU_GBZ80__
+	ld	a,(hl+)
+ELSE
         ld      a,(hl)
         inc     hl
+ENDIF
         ld      b,(hl)
         inc     hl
         push    hl              ; save ap
@@ -68,8 +72,12 @@ pickuplong_sccz80:
         dec     hl
         ld      b,(hl)          ;LSW
         dec     hl
+IF __CPU_GBZ80__
+	ld	a,(hl-)
+ELSE
         ld      a,(hl)
         dec     hl
+ENDIF
         dec     hl
         push    hl              ;Save ap for next time
         ld      h,b
@@ -111,9 +119,16 @@ printsign:
 
 
 noneg:
-IF __CPU_INTEL__
+IF __CPU_INTEL__ || __CPU_GBZ80__
 	push	hl
+    IF __CPU_GBZ80__
+	ld	hl,__printf_context
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+    ELSE
 	ld	hl,(__printf_context)
+    ENDIF
 	dec	hl
 	dec	hl
 	dec	hl
@@ -142,7 +157,7 @@ ELSE
         bit     4,(ix-4)                ;# indicator
         jr      z,miniprintn_start_process
 ENDIF
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 	push	hl
 	call	__printf_get_base
 	ld	a,l
@@ -159,7 +174,7 @@ ENDIF
         cp      16
         jr      nz,miniprintn_start_process
         ld      a,'x'
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 	call	__printf_add_offset
 ELSE
         add     (ix-3)
@@ -172,7 +187,7 @@ miniprintn_start_process:
 
 .divloop
 IF handlelong
-  IF __CPU_INTEL__
+  IF __CPU_INTEL__ | __CPU_GBZ80__
         push    de      ; number MSW
         push    hl      ; number LSW
         call    __printf_get_base
@@ -198,12 +213,12 @@ IF handlelong
   ENDIF
 ELSE
         ex      de,hl
-IF __CPU_INTEL__
+  IF __CPU_INTEL__ | __CPU_GBZ80__
 	call	__printf_get_base
-ELSE
+  ELSE
         ld      l,(ix-9)        ;base
         ld      h,0
-ENDIF
+  ENDIF
         call    l_div_u         ;hl=de/hl de=de%hl
         ld      a,e
         cp      255  ; force flag to non-zero
@@ -230,7 +245,7 @@ ENDIF
         cp      '9'+1
         jr      c,printloop1
         add     'a' - '9' -1
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 	call	__printf_add_offset
 ELSE
         add     (ix-3)

@@ -41,6 +41,10 @@ int ungetc(int c, FILE *fp)
 	ld	(hl),c	;store the char
 	ld	l,c			;return it
 	ld	h,0
+IF __CPU_GBZ80__
+    ld      d,h
+    ld      e,l
+ENDIF
 #endasm
 #else
         if (fp == 0 || c == EOF || fp->ungetc || fp->flags&_IOWRITE ) return(EOF);

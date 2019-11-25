@@ -52,11 +52,11 @@ dnl#include(`driver/character/cpm_00_output_punch.m4')
 dnl
 dnl## file dup
 dnl
-dnl#include(`../m4_file_dup.m4')dnl
+dnl#include(`../m4_file_dup.m4')
 dnl
 dnl## empty fd slot
 dnl
-dnl#include(`../m4_file_absent.m4')dnl
+dnl#include(`../m4_file_absent.m4')
 dnl
 dnl############################################################
 dnl## INSTANTIATE DRIVERS #####################################
@@ -73,8 +73,8 @@ ifelse(eval(M4__CRT_INCLUDE_DRIVER_INSTANTIATION == 0), 1,
    include(`driver/terminal/cpm_01_output_dcio.m4')
    m4_cpm_01_output_dcio(_stdout, CRT_OTERM_TERMINAL_FLAGS)
 
-   include(`../m4_file_dup.m4')dnl
-   m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)dnl
+   include(`../m4_file_dup.m4')
+   m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)
 
    include(`driver/character/cpm_00_input_reader.m4')
    m4_cpm_00_input_reader(_stdrdr, 0x0100)

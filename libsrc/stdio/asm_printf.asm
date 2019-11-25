@@ -23,7 +23,9 @@
 
 ; int vfprintf1(FILE *fp, void __CALLEE__ (*output_fn)(int c,FILE *fp), int sccz80, unsigned char *fmt,void *ap)
 asm_printf:
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
+
+    IF __CPU_INTEL__
 	ld	hl,0
 	add	hl,sp
 	ld	(__printf_context),hl
@@ -32,22 +34,46 @@ IF __CPU_INTEL__
 	add	hl,sp
 	ld	sp,hl
 	ex	de,hl	;hl = ix + 0
+    ELIF __CPU_GBZ80__
+	ld	hl,sp+0
+	ld	d,h
+	ld	e,l
+	ld	hl,__printf_context
+	ld	a,e
+	ld	(hl+),a
+	ld	a,d
+	ld	(hl+),a
+	add	sp,-80
+        ld      l,e
+        ld      h,d
+    ENDIF
 	push	hl	;save for a bit later
 	xor	a
 	dec	hl	;-1
+IF __CPU_GBZ80__
+	ld	(hl-),a
+	ld	(hl-),a
+ELSE
 	ld	(hl),a
 	dec	hl	;-2
 	ld	(hl),a
-	dec	a
 	dec	hl	;-3
+ENDIF
+	dec	a
 	dec	hl	;-4
 	dec	hl	;-5
+IF __CPU_GBZ80__
+	ld	(hl-),a
+	ld	(hl-),a
+	ld	(hl-),a
+ELSE
 	ld	(hl),a
 	dec	hl	;-6
 	ld	(hl),a
 	dec	hl	;-7
 	ld	(hl),a
 	dec	hl	;-8
+ENDIF
 	ld	(hl),a
 	pop	hl	;+0
 	inc	hl	;+1
@@ -56,8 +82,12 @@ IF __CPU_INTEL__
 	inc	hl	;+3
 	ld	d,(hl)
 	inc	hl	;+4
+IF __CPU_GBZ80__
+	ld	a,(hl+)
+ELSE
 	ld	a,(hl)
 	inc	hl	;+5
+ENDIF
 	ld	h,(hl)
 	ld	l,a
 ELSE
@@ -99,17 +129,29 @@ ELSE
         ld      (ix-8),a
 ENDIF
 .__printf_loop
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 	push	hl
+  IF __CPU_INTEL__
 	ld	hl,(__printf_context)
+  ELIF __CPU_GBZ80__
+	ld	hl,__printf_context
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+  ENDIF
 	dec	hl
 	dec	hl
 	dec	hl	;-3
 	xor	a
+  IF __CPU_GBZ80__
+	ld	(hl-),a
+	ld	(hl-),a
+  ELSE
 	ld	(hl),a	;upper case switch
 	dec	hl	;-4
 	ld	(hl),a	;flags
 	dec	hl	;-5
+  ENDIF
 	dec	hl	;-6
 	dec	hl	;-7
 	dec	hl	;-8
@@ -125,12 +167,15 @@ ELSE
 	ld	(ix-4),a		;flags
 	ld	(ix-10),a		;length of temp buffer
 ENDIF
- 
+IF __CPU_GBZ80__
+	ld	a,(hl+)
+ELSE 
 	ld	a,(hl)
 	inc	hl
+ENDIF
 	and	a
 	jr	nz,cont
-IF __CPU_R2K__ | __CPU_R3K__
+IF __CPU_R2K__ | __CPU_R3K__ | __CPU_GBZ80__
 	add	sp,78
 ELSE
 	ld	hl,78		;adjust the stack
@@ -138,6 +183,10 @@ ELSE
 	ld	sp,hl
 ENDIF
 	pop	hl		;grab the number of bytes written
+IF __CPU_GBZ80__
+	ld	d,h
+	ld	e,l
+ENDIF
 __printf_get_flags_noop:	
 	ret
 	
@@ -149,12 +198,16 @@ print_format_character:
 	jr	__printf_loop	
 
 handle_percent:
+IF __CPU_GBZ80__
+	ld	a,(hl+)
+ELSE
 	ld	a,(hl)
 	inc	hl
+ENDIF
 	cp	'%'
 	jr	z,print_format_character
 	call	__printf_get_flags		;level2
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 	call	__printf_res_long_flag
 ELSE
 	res	6,(ix-4)
@@ -163,14 +216,18 @@ ENDIF
 	jr	z,get_next_char
 	cp	'l'
 	jr	nz,no_long_qualifier
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 	call	__printf_set_long_flag
 ELSE
 	set	6,(ix-4)
 ENDIF
 get_next_char:
+IF __CPU_GBZ80__
+	ld	a,(hl+)
+ELSE
 	ld	a,(hl)
 	inc	hl
+ENDIF
 no_long_qualifier:
 	push	hl	;save fmt
 ; Loop the loop

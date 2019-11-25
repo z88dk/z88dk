@@ -17,12 +17,25 @@ int _ByteReverse (int mybyte) {
 	pop	hl
 	push	hl
 	push	bc
-
+IF __CPU_INTEL__
+	ld	c,0
+	ld	b,8
+.invloop
+	ld	a,l
+	rra
+	ld	l,a
+	ld	a,c
+	rla
+	ld	c,a
+	djnz	invloop
+ELSE
+	xor	a
 	ld	b,8
 .invloop
 	rr	l
 	rla
 	djnz	invloop
+ENDIF
 	ld	l,a
 	ld	h,0
 	ret

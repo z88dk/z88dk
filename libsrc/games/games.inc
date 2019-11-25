@@ -221,6 +221,12 @@ IF FORsv8000
         defc sndbit_mask   = 0
 ENDIF
 
+IF FORgb
+        defc sndbit_port   = 0
+        defc sndbit_bit    = 0
+        defc sndbit_mask   = 0
+ENDIF
+
 IF FOReinstein
         defc sndbit_port   = 0
         defc sndbit_bit    = 0
@@ -277,10 +283,22 @@ IF FORpc6001
         defc sndbit_mask   = 0
 ENDIF
 
+IF FORtvc
+        defc sndbit_port   = 0
+        defc sndbit_bit    = 0
+        defc sndbit_mask   = 0
+ENDIF
+
 IF FORsmc777
     defc sndbit_port	= $1d
     defc sndbit_bit    = 4
     defc sndbit_mask   = $15
+ENDIF
+
+IF FORmyvision
+    defc sndbit_port	= 0
+    defc sndbit_bit    = 0
+    defc sndbit_mask   = 0
 ENDIF
 
 
@@ -337,6 +355,12 @@ ENDIF
 
 
 IF FORcoleco
+    defc sndbit_port	= $E0		; also valid for Coleco Adam and Pencil II
+    defc sndbit_bit    = 3
+    defc sndbit_mask   = $0F			; $0F for full volume output
+ENDIF
+
+IF FORpencil2
     defc sndbit_port	= $E0		; also valid for Coleco Adam and Pencil II
     defc sndbit_bit    = 3
     defc sndbit_mask   = $0F			; $0F for full volume output

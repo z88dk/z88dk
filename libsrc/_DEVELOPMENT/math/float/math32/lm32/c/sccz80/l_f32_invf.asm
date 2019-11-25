@@ -1,5 +1,5 @@
-	SECTION	code_fp_math32
 
+	SECTION	code_fp_math32
 	PUBLIC	l_f32_invf
 	EXTERN	m32_fsinv_fastcall
 

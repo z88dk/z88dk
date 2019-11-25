@@ -9,6 +9,20 @@ PUBLIC memswap
 EXTERN asm_memswap
 
 memswap:
+IF __CPU_GBZ80__
+   ld hl,sp+2
+   ld c,(hl)
+   inc hl
+   ld b,(hl)
+   inc hl
+   ld e,(hl)
+   inc hl
+   ld d,(hl)
+   inc hl
+   ld a,(hl+)
+   ld h,(hl)
+   ld l,a
+ELSE
 
    pop af
    pop bc
@@ -19,8 +33,16 @@ memswap:
    push de
    push bc
    push af
-   
+ENDIF
+  
+IF __CLASSIC && __CPU_GBZ80__
+   call asm_memswap
+   ld d,h
+   ld e,l
+   ret
+ELSE 
    jp asm_memswap
+ENDIF
 
 ; SDCC bridge for Classic
 IF __CLASSIC

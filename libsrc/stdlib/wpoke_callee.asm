@@ -8,10 +8,16 @@ PUBLIC ASMDISP_WPOKE_CALLEE
 
 .wpoke_callee
 ._wpoke_callee
-
+IF __CPU_GBZ80__
+   pop bc	;ret
+   pop de	;word
+   pop hl	;addr
+   push bc
+ELSE
    pop hl
    pop de
    ex (sp),hl
+ENDIF
 
 .asmentry
 

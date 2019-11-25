@@ -5,7 +5,6 @@ include(__link__.m4)
 
 #include <arch.h>
 #include <stdint.h>
-#include <stddef.h>
 
 /*
  * Disk Status Bits DSTATUS (uint8_t)
@@ -91,7 +90,7 @@ typedef enum {
 } DRESULT;
 
 //
-// DISK COMMANDS
+// IDE DISK COMMANDS
 //
 
 __DPROTO(`b,c,d,e,iyh,iyl',`b,c,d,e,iyh,iyl',DSTATUS,,disk_initialize,BYTE pdrv)

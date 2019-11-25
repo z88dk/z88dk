@@ -297,10 +297,10 @@ typedef struct {
 // Joystick related stuff
 
 // Get state of joystick number \a id
-extern int  __LIB__ msx_get_stick(unsigned int id);
+extern int  __LIB__ msx_get_stick(unsigned int id) __z88dk_fastcall;
 
 // Get state of joystick button (trigger) number \a id, true = pressed
-extern bool_t  __LIB__ msx_get_trigger(unsigned int id);
+extern bool_t  __LIB__ msx_get_trigger(unsigned int id) __z88dk_fastcall;
 
 extern unsigned int st_dir[];
 

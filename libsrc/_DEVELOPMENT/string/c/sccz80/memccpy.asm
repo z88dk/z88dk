@@ -10,41 +10,52 @@ EXTERN asm_memccpy
 
 memccpy:
 
-IF __CPU_INTEL__
-	ld hl,2
-        add hl,sp
-        ld  c,(hl)
-        inc hl
-        ld  b,(hl)
-        inc hl
-        ld  a,(hl)
-        inc hl
-        inc hl
-        ld  e,(hl)
-        inc hl
-        ld  d,(hl)
-        inc hl
-        push de
-        ld  e,(hl)
-        inc hl
-        ld  d,(hl)
-        pop hl
+IF __CPU_INTEL__ | __CPU_GBZ80__
+ IF __CPU_GBZ80__
+   ld hl,sp+2
+ ELSE  
+   ld hl,2
+   add hl,sp
+ ENDIF
+   ld  c,(hl)
+   inc hl
+   ld  b,(hl)
+   inc hl
+   ld  a,(hl)
+   inc hl
+   inc hl
+   ld  e,(hl)
+   inc hl
+   ld  d,(hl)
+   inc hl
+   push de
+   ld  e,(hl)
+   inc hl
+   ld  d,(hl)
+   pop hl
 ELSE
    pop ix
-	pop bc
-	pop de
-	ld a,e
-	pop hl
-	pop de
+   pop bc
+   pop de
+   ld a,e
+   pop hl
+   pop de
 	
-	push de
-	push hl
-	push de
-	push bc
-	push ix
+   push de
+   push hl
+   push de
+   push bc
+   push ix
 ENDIF
 
+IF __CLASSIC && __CPU_GBZ80__
+   call asm_memccpy
+   ld d,h
+   ld e,l
+   ret
+ELSE
    jp asm_memccpy
+ENDIF
 
 ; SDCC bridge for Classic
 IF __CLASSIC

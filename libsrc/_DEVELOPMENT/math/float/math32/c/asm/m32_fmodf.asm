@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.9.1 #11310 (Linux)
+; Version 3.9.4 #11423 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -287,10 +287,9 @@ _m32_fmodf:
 	or	a,(ix+9)
 	or	a,(ix+8)
 	jr	NZ,l_m32_fmodf_00102
-	ld	l,0x00
-	ld	h,0x00
-	ld	e,0x00
-	ld	d,0x00
+	ld	hl,0x0000
+	ld	e,l
+	ld	d,h
 	jp	l_m32_fmodf_00103
 l_m32_fmodf_00102:
 	ld	l,(ix+10)

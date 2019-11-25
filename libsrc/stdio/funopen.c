@@ -23,7 +23,7 @@ DEFVARS 0 {
 
 funopen:
 _funopen:
-IF __CPU_8080__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 	ld	hl,0
 	ret
 ELSE

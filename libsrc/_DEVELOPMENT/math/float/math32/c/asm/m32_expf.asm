@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.9.1 #11310 (Linux)
+; Version 3.9.4 #11423 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -290,9 +290,19 @@ _m32_expf:
 	ld	(ix-12),c
 	ld	(ix-11),b
 	ld	(ix-10),e
-	ld	l, e
 	ld	(ix-9),d
-	ld	h,d
+	ld	a, d
+	and	a,0x7f
+	or	a,(ix-10)
+	or	a,(ix-11)
+	or	a,(ix-12)
+	jr	NZ,l_m32_expf_00102
+	ld	de,0x3f80
+	ld	hl,0x0000
+	jp	l_m32_expf_00103
+l_m32_expf_00102:
+	ld	l,(ix-10)
+	ld	h,(ix-9)
 	push	hl
 	ld	l,(ix-12)
 	ld	h,(ix-11)
@@ -302,14 +312,12 @@ _m32_expf:
 	ld	hl,0xaa3b
 	push	hl
 	call	___fsmul_callee
-	ld	c, l
-	ld	b, h
-	ld	hl,0x3f00
-	push	hl
-	ld	hl,0x0000
-	push	hl
-	push	de
+	ld	bc,0x3f00
 	push	bc
+	ld	bc,0x0000
+	push	bc
+	push	de
+	push	hl
 	call	___fsadd_callee
 	call	_m32_floorf
 	ld	(ix-8),l
@@ -388,6 +396,7 @@ _m32_expf:
 	push	de
 	push	bc
 	call	_m32_ldexpf
+l_m32_expf_00103:
 	ld	sp, ix
 	pop	ix
 	ret

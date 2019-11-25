@@ -23,14 +23,14 @@
    EXTERN   __printf_check_ftoe
 
 __printf_handle_e:
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 	call	__printf_set_ftoe
 ELSE
         set   5,(ix-4)
 ENDIF
 __printf_handle_f:
         push    hl              ;save fmt
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 	call	__printf_issccz80
 ELSE
         bit   0,(ix+6)
@@ -50,7 +50,7 @@ ENDIF
         ld      h,b
         ld      l,a
 
-IF !__CPU_INTEL__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
         push  ix    ;save callers
 ENDIF
         ld      a,CLIB_32BIT_FLOATS
@@ -86,15 +86,30 @@ is_sccz80:
         inc     de
         inc     de
 
-IF !__CPU_INTEL__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
         push    ix              ;save ix - ftoa will corrupt it
 ENDIF
         ld      hl,-8
         add     hl,sp
         ld      sp,hl
         ex      de,hl           ;hl=address of parameter, de=slot on stack
+IF __CPU_INTEL__ || __CPU_GBZ80__
+	ld	b,8
+copy_float:
+IF __CPU_GBZ80__
+	ld	a,(hl+)
+ELSE
+	ld	a,(hl)
+	inc	hl
+ENDIF
+	ld	(de),a
+	inc	de
+	dec	b
+	jp	nz,copy_float
+ELSE
         ld      bc,8
         ldir                    ;stack parameter
+ENDIF
 	jr	rejoin
 try_sccz80_32bit_float:
         ld      a,CLIB_32BIT_FLOATS
@@ -112,7 +127,7 @@ try_sccz80_32bit_float:
         dec     hl
         dec     hl
         push    hl              ;Save ap for next time
-IF !__CPU_INTEL__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
         push    ix    ;save callers
 ENDIF
         push    de		;(padding, unused)
@@ -131,18 +146,33 @@ is_sccz80_48bit_float:
         inc     de
         inc     de
 
-IF !__CPU_INTEL__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
         push    ix              ;save ix - ftoa will corrupt it
 ENDIF
         ld      hl,-8
         add     hl,sp
         ld      sp,hl
         ex      de,hl           ;hl=address of parameter, de=slot on stack
+IF __CPU_INTEL__ || __CPU_GBZ80__
+	ld	b,6
+copy_float2:
+IF __CPU_GBZ80__
+	ld	a,(hl+)
+ELSE
+	ld	a,(hl)
+	inc	hl
+ENDIF
+	ld	(de),a
+	inc	de
+	dec	b
+	jp	nz,copy_float2
+ELSE
         ld      bc,6
         ldir                    ;stack parameter
+ENDIF
 
 rejoin:
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 	push	hl
 	call	__printf_get_precision
 	ld	c,l
@@ -163,7 +193,7 @@ set_prec:
         push    hl
         ;ftoa(double number, int prec, char *buf)
         ld      hl,ftoa
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 	call	__printf_check_ftoe
 ELSE
         bit     5,(ix-4)
@@ -178,12 +208,12 @@ call_fp_converter:
         pop     bc      ;flt
         pop     bc      ;flt
         pop     bc      ;flt
-IF !__CPU_INTEL__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
         pop     ix              ;get ix back
 ENDIF
         call    __printf_get_buffer_address
         call    strlen          ;get the length of it
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 	call	__printf_set_buffer_length
 ELSE
         ld      (ix-10),l

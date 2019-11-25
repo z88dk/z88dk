@@ -13,10 +13,13 @@ CLASSIC_OBJ = $(CLASSIC_ASM:.asm=.o)
 CLASSIC_ASM_8080 = $(wildcard _*.asm)
 CLASSIC_OBJ_8080 = $(CLASSIC_ASM_8080:.asm=.o)
 
-CLASSIC_OBJECTS = $(addprefix obj/z80/, $(CLASSIC_OBJ)) $(addprefix obj/z80n/, $(CLASSIC_OBJ)) $(addprefix obj/r2k/, $(CLASSIC_OBJ)) $(addprefix obj/ixiy/, $(CLASSIC_OBJ)) $(addprefix obj/8080/, $(CLASSIC_OBJ_8080))
+CLASSIC_ASM_GBZ80 = $(wildcard _*.asm)
+CLASSIC_OBJ_GBZ80 = $(CLASSIC_ASM_GB80:.asm=.o)
+
+CLASSIC_OBJECTS = $(addprefix obj/z80/, $(CLASSIC_OBJ)) $(addprefix obj/z80n/, $(CLASSIC_OBJ)) $(addprefix obj/r2k/, $(CLASSIC_OBJ)) $(addprefix obj/ixiy/, $(CLASSIC_OBJ)) $(addprefix obj/8080/, $(CLASSIC_OBJ_8080)) $(addprefix obj/gbz80/, $(CLASSIC_OBJ_GBZ80))
 
 NEWLIBGLOBS :=  "$(NEWLIB_DIRECTORY)/string/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/string/z80/*.asm"
-NEWLIB_PHONY := newlib-z80 newlib-z80n newlib-r2k newlib-ixiy newlib-8080
+NEWLIB_PHONY := newlib-z80 newlib-z80n newlib-r2k newlib-ixiy newlib-8080 newlib-gbz80
 
 
 OBJECTS = $(CLASSIC_OBJECTS) $(NEWLIB_OBJECTS)
@@ -40,9 +43,12 @@ newlib-ixiy:
 newlib-8080: 
 	@$(ASSEMBLER) -d -O=obj/8080/x -I.. -m8080 --IXIY -D__CLASSIC $(NEWLIBGLOBS)
 
+newlib-gbz80: 
+	@$(ASSEMBLER) -d -O=obj/gbz80/x -I.. -mgbz80 -D__CLASSIC $(NEWLIBGLOBS)
+
 
 dirs:
-	@mkdir -p obj/z80 obj/z80n obj/ixiy obj/r2k obj/8080
+	@mkdir -p obj/z80 obj/z80n obj/ixiy obj/r2k obj/8080 obj/gbz80
 
 
 clean:

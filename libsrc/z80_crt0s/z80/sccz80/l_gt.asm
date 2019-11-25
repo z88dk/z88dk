@@ -25,8 +25,3 @@ EXTERN    l_compare_result
    ld a,l
    cp e
    jp l_compare_result
-
-;        ex de,hl
-;        call    l_cmp
-;        ret   c
-;        ret

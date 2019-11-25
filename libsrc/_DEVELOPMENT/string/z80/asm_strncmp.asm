@@ -37,6 +37,19 @@ asm_strncmp:
 loop:
 
    ld a,(de)                   ; a = *s1
+IF __CPU_INTEL__ || __CPU_GBZ80__
+   cp (hl)
+   inc hl
+   dec bc
+   jr  nz,different
+   and a
+   jr z,equal
+   ld a,b
+   or c
+   jr z,equal
+   inc de
+   jr loop
+ELSE
    cpi                         ; *s1 - *s2
    jr nz, different
    jp po, equal
@@ -46,6 +59,7 @@ loop:
    jr nz, loop
    
    dec de
+ENDIF
    
 equal:
 

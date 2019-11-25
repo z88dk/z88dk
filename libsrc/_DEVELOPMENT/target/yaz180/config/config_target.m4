@@ -14,14 +14,14 @@ define(`__YAZ180', 1)
 
 define(`__CPU_CLOCK', 36864000)
 
-# I/O BASE ADDRESS OF INTERNAL PERIPHERALS
+# Frequency of PRT0 if configured as per normal
 
-define(`__IO_BASE_ADDRESS', 0x00)
+define(`__CLOCKS_PER_SECOND', 256)
 
-define(`__IO_BASE_ADDRESS', 0x`'eval(__IO_BASE_ADDRESS&0xc0,16))
+# Cache for SP when other banks are running
 
 define(`__BIOS_SP', 0xFFDE)                         # location of bios SP when other banks running
-define(`__BANK_SP', 0x003B)                         # location of banked SP when not running
+define(`__BANK_SP', 0x003B)                         # location of each bank SP when not running
 
 # All I/O drivers are passed through system buffers
 # This will help when user banking is used, as all I/O is via system RAM
@@ -42,7 +42,13 @@ define(`__ASCI0_TX_SIZE', 0x080)  # Size of the Tx Buffer, must be 2^n >= 8
 define(`__ASCI1_RX_SIZE', 0x100)  # Size of the Rx Buffer, must be 2^n >= 8
 define(`__ASCI1_TX_SIZE', 0x080)  # Size of the Tx Buffer, must be 2^n >= 8
 
-# BREAK for Single Step Mode
+# I/O BASE ADDRESS OF INTERNAL PERIPHERALS
+
+define(`__IO_BASE_ADDRESS', 0x00)
+
+define(`__IO_BASE_ADDRESS', 0x`'eval(__IO_BASE_ADDRESS&0xc0,16))
+
+# I/O BREAK for Single Step Mode
 
 define(`__IO_BREAK', 0x2000)      # Any value written $2000->$3FFF, halts CPU
 
@@ -78,7 +84,7 @@ PUBLIC `__YAZ180'
 
 PUBLIC `__CPU_CLOCK'
 
-PUBLIC `__IO_BASE_ADDRESS'
+PUBLIC `__CLOCKS_PER_SECOND'
 
 PUBLIC `__BIOS_SP'
 PUBLIC `__BANK_SP'
@@ -92,6 +98,8 @@ PUBLIC `__ASCI0_TX_SIZE'
 
 PUBLIC `__ASCI1_RX_SIZE'
 PUBLIC `__ASCI1_TX_SIZE'
+
+PUBLIC `__IO_BASE_ADDRESS'
 
 PUBLIC `__IO_BREAK'
 
@@ -116,7 +124,7 @@ defc `__YAZ180' = __YAZ180
 
 defc `__CPU_CLOCK' = __CPU_CLOCK
 
-defc `__IO_BASE_ADDRESS' = __IO_BASE_ADDRESS
+defc `__CLOCKS_PER_SECOND' = __CLOCKS_PER_SECOND
 
 defc `__BIOS_SP' = __BIOS_SP
 defc `__BANK_SP' = __BANK_SP
@@ -130,6 +138,8 @@ defc `__ASCI0_TX_SIZE' = __ASCI0_TX_SIZE
 
 defc `__ASCI1_RX_SIZE' = __ASCI1_RX_SIZE
 defc `__ASCI1_TX_SIZE' = __ASCI1_TX_SIZE
+
+defc `__IO_BASE_ADDRESS' = __IO_BASE_ADDRESS
 
 defc `__IO_BREAK' = __IO_BREAK
 
@@ -155,7 +165,7 @@ ifdef(`CFG_C_DEF',
 
 `#define' `__CPU_CLOCK'  __CPU_CLOCK
 
-`#define' `__IO_BASE_ADDRESS' __IO_BASE_ADDRESS
+`#define' `__CLOCKS_PER_SECOND' __CLOCKS_PER_SECOND
 
 `#define' `__BIOS_SP'   __BIOS_SP
 `#define' `__BANK_SP'   __BANK_SP
@@ -169,6 +179,8 @@ ifdef(`CFG_C_DEF',
 
 `#define' `__ASCI1_RX_SIZE'  __ASCI1_RX_SIZE
 `#define' `__ASCI1_TX_SIZE'  __ASCI1_TX_SIZE
+
+`#define' `__IO_BASE_ADDRESS' __IO_BASE_ADDRESS
 
 `#define' `__IO_BREAK'  __IO_BREAK
 

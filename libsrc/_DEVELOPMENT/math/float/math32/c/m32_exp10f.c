@@ -16,12 +16,30 @@
  * as 10**x = 2**n 10**f, with |f| < 0.5 log10(2).
  * A polynomial approximates 10**f.
  *
+ * Approximation of f(x) = 10**x
+ * with weight function g(x) = 10**x
+ * on interval [ 0, 0.15051499783 ]
+ * with a polynomial of degree 7.
+ * double f(double x)
+ * {
+ *   double u = 8.090484272600454e-2;
+ *   u = u * x + 2.0380373931544082e-1;
+ *   u = u * x + 5.3978993685198384e-1;
+ *   u = u * x + 1.1712266435079228;
+ *   u = u * x + 2.0346796696616236;
+ *   u = u * x + 2.6509490353631601;
+ *   u = u * x + 2.3025850931327687;
+ *   return u * x + 9.9999999999984258e-1;
+ * }
  *
  * ACCURACY:
  *
  *                      Relative error:
  * arithmetic   domain     # trials      peak         rms
  *    IEEE      -38,+38     100000      9.8e-8      2.8e-8
+ *
+ *
+ * See m32_expf.c for comments on error amplification.
  *
  * ERROR MESSAGES:
  *
@@ -63,6 +81,8 @@ float m32_exp10f (float x) __z88dk_fastcall
         return(0.0);
     }
 #endif
+	if( x == 0.0 )
+		return 1.0;
 
     /* Express 10**x = 10**g 2**n
      *   = 10**g 10**( n log10(2) )
@@ -73,5 +93,5 @@ float m32_exp10f (float x) __z88dk_fastcall
     x -= z * LG102A;
     x -= z * LG102B;  
 
-    return m32_ldexpf( m32_polyf(x, m32_coeff_exp10f, 5) * x + 1.0, (int16_t)z);
+    return m32_ldexpf( m32_polyf(x, m32_coeff_exp10f, 7), (int16_t)z);
 }

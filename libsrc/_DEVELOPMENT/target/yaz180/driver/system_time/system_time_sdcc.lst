@@ -1,3 +1,0 @@
-target/yaz180/driver/system_time/c/system_tick_init
-target/yaz180/driver/system_time/c/system_tick_init_fastcall
-@target/yaz180/driver/system_time/system_time_asm.lst

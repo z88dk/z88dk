@@ -63,12 +63,24 @@ ENDIF
 loop:
 
    ld a,(de)                   ; char at front of s
+IF __CPU_GBZ80__
+   push af
+   ld  a,(hl)
+   ld (de),a
+   inc de
+   dec bc
+   pop af
+   ld (hl-),a
+   ld  a,b
+   or  c
+   jp  nz,loop
+ELSE
    ldi                         ; char at rear written to front of s
    dec hl
    ld (hl),a                   ; char from front written to rear of s 
    dec hl
-   
    jp pe, loop
+ENDIF
    
 exit:
 

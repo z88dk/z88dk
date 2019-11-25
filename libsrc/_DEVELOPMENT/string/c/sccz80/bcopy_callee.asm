@@ -10,11 +10,18 @@ PUBLIC bcopy_callee
 EXTERN asm_bcopy
 
 bcopy_callee:
-
+IF __CPU_GBZ80__
+   pop af	;ret
+   pop bc	;len
+   pop de	;dst
+   pop hl	;src
+   push af
+ELSE
    pop hl
    pop bc
    pop de
    ex (sp),hl
+ENDIF
    
    jp asm_bcopy
 

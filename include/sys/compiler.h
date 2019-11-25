@@ -23,6 +23,14 @@
 #define __DISABLE_BUILTIN 
 #endif
 
+#if __SDCC && __GBZ80__
+#define __DISABLE_BUILTIN 
+#define __z88dk_fastcall
+#endif
+
+#define NONBANKED __nonbanked
+#define BANKED __banked
+
 #define __CHAR_LF '\n'
 #define __CHAR_CR '\r'
 

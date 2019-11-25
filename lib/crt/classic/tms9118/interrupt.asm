@@ -3,10 +3,10 @@
 tms9118_interrupt:
 	push	af
 	push	hl
-	ld	a, +(VDP_STATUS / 256)
+	ld	a, +(VDP_STATUS >> 16)
 	and	a
 	jr	z,read_port
-	ld	a,(VDP_STATUS)
+	ld	a,(-VDP_STATUS)
 	jr	done_read
 read_port:
 	in	a,(VDP_STATUS % 256)

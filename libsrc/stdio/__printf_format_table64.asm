@@ -2,7 +2,7 @@
 ;
 ; These will be used by default when sdcc pulls in printf
 
-IF !__CPU_INTEL__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 
 	MODULE	__printf_format_table64
 	SECTION rodata_clib

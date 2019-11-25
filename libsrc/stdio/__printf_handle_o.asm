@@ -6,7 +6,7 @@
 	EXTERN	__printf_set_base
 
 __printf_handle_o:
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 	ld	c,8
 	call	__printf_set_base
 ELSE

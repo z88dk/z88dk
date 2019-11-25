@@ -16,27 +16,31 @@
 
     EXTERN   SETWRT
     EXTERN   FILVRM
+    EXTERN   RG0SAV
     EXTERN   l_tms9918_disable_interrupts
     EXTERN   l_tms9918_enable_interrupts
     EXTERN   __tms9918_screen_mode
     EXTERN   __tms9918_attribute
+    EXTERN   __tms9918_border
+    EXTERN   __tms9918_set_font
+    EXTERN   __tms9918_pattern_name
+    EXTERN   __tms9918_pattern_generator
+    EXTERN   __console_w
 
 msx_set_mode:
 _msx_set_mode:
     ld    a,l
     ld    hl,__tms9918_screen_mode
     and   a
-    jr    z,init_mode0
-    cp    1
     jr    z,init_mode1
+    cp    1
+    jr    z,init_mode0
     cp    2
     jp    z,init_mode2
     ret
-    ;dec    a
-    ;jr    z,inimlt
 
 
-; Mode 0: 32x24
+; VDP Mode 0: 32x24
 init_mode0:
     ld   (hl),a
 ; MSX:  $00,$F0,$00,$00,$01,$00,$00,$F4
@@ -58,42 +62,45 @@ ENDIF
     ld    a,$E0
     call  VDPreg_Write    ; reg1  - text MODE
     
-    xor   a               ; $0000 (character map, 768 bytes)
+    ld    a,$06           ; $1800 (character map, 768 bytes)
     call  VDPreg_Write    ; reg2  -  NAME TABLE
     
-    ld    a,$40           ; $1000  - Colour table is 32 bytes long
+    ld    a,$80           ; $2000  - Colour table is 32 bytes long
     call  VDPreg_Write    ; reg3  -  COLOUR TABLE
     
-    ld    a,$04           ; $2000  - Where the font will go
+    ld    a,$00           ; $0000  - Where the font will go
     call  VDPreg_Write    ; reg4  -  PT./TXT/MCOL-GEN.TAB.
     
-    ld    a,$76           ; $3b00
+    ld    a,$36           ; $1b00
     call  VDPreg_Write    ; reg5  -  SPRITE ATTR. TAB.
     
     ld    a,$07           ; $3800
     call  VDPreg_Write    ; reg6  -  SPRITE PATTERN GEN. TAB.
     
-    ld    a,$f5 ; (00 ?)
+    ld    a,(__tms9918_border)
+    and   15
     call  VDPreg_Write    ; reg7  -  INK & PAPER-/BACKDROPCOL.
-    
+   
+    ld    a,32
+    ld    (__console_w),a 
+    ld    hl,$1800
+    ld    (__tms9918_pattern_name),hl
+    ld    hl,$0000
+    ld    (__tms9918_pattern_generator),hl
 
-    ld    hl,$0
-    ld    bc,16384
-    xor   a
-    call  FILVRM
-
-    ld    hl,$0
+    ld    hl,$1800	;Clear the name table
     ld    bc,768
     ld    a,32
     call  FILVRM
     ; Set the colour for all characters
     ld    a,(__tms9918_attribute)
-    ld    hl,$1000
+    ld    hl,$2000
     ld    bc,32
     call  FILVRM
+    call  __tms9918_set_font
     ret
 
-; Switch 2 Video Mode n. 1
+; Switch 2 VDP Mode 1
 ; 40x24
 init_mode1:
     ld   (hl),a
@@ -116,7 +123,7 @@ ENDIF
     ld    a,$80           ; Unused (no colour)
     call  VDPreg_Write    ; reg3  -  COLOUR TABLE
     
-    ld    a,$04           ; $2000  - Where the font will go
+    ld    a,$01           ; $800  - Where the font will go
     call  VDPreg_Write    ; reg4  -  PT./TXT/MCOL-GEN.TAB.
     
     ld    a,$76           ; Unused (sprites inactive)
@@ -129,14 +136,16 @@ ENDIF
     call  VDPreg_Write    ; reg7  -  INK & PAPER-/BACKDROPCOL.
     
 
-    ld    hl,$0
-    ld    bc,16384
-    xor   a
-    call  FILVRM
-    ld    hl,$0
-    ld    bc,768
+    ld    a,40
+    ld    (__console_w),a 
+    ld    hl,$800
+    ld    (__tms9918_pattern_generator),hl
+    ld    hl,$0000
+    ld    (__tms9918_pattern_name),hl
+    ld    bc,1024
     ld    a,32
     call  FILVRM
+    call  __tms9918_set_font
     ret
     
 ;
@@ -192,7 +201,7 @@ init_mode2:
     call  VDPreg_Write
     
     ; reg5  -  SPRITE ATTR. TAB.
-    ld    a,$76		;$3b00
+    ld    a,$36		;$1b00
     call  VDPreg_Write
     
     ; reg6  -  SPRITE PATTERN GEN. TAB.
@@ -200,11 +209,8 @@ init_mode2:
     call  VDPreg_Write
     
     ; reg7  -  INK & PAPER-/BACKDROPCOL.
-IF FORm5
-    ld    a,1        ; avoid transparent color (to be confirmed)
-ELSE
-    xor   a
-ENDIF
+    ld    a,(__tms9918_border)
+    and   15
     call  VDPreg_Write
 
     ; reg0  - GRAPH MODE
@@ -248,6 +254,9 @@ ENDIF
     jr    nz,pattern
     dec   e
     jr    nz,pattern
+
+    ld    a,32
+    ld    (__console_w),a 
 	
     ld    bc,6144    ; set VRAM attribute area
     ld    a,(__tms9918_attribute)   ; white on black
@@ -299,6 +308,13 @@ IF VDP_CMD < 0
 ELSE
     out   (c),a
 ENDIF
+    push  hl
+    ld    a,d
+    ld    hl,RG0SAV
+    ld    d,0
+    add   hl,de
+    ld    (hl),a
+    pop   hl
     inc   e
     call  l_tms9918_enable_interrupts
     ret

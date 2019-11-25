@@ -29,7 +29,7 @@ int close(int fd)
 		return 0;
 
 	/* Let's close the file only if TRSDOS thinks it is open */
-	if (trs80_file->fcb->type & 0x80) {
+	if (trs80_file->fcb.type & 0x80) {
 		trsdos(DOS_CLOSE, 0, trs80_file->fcb);
 	}
 	free(fd);

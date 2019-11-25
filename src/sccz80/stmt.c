@@ -654,6 +654,7 @@ static void docritical(void)
 void doasmfunc(char wantbr)
 {
     char c;
+    int  lastwasLF = 0;
     if (wantbr)
         needchar('(');
 
@@ -664,13 +665,22 @@ void doasmfunc(char wantbr)
             c = litchar();
             if (c == 0)
                 break;
-            outbyte(c);
-            if (c == 10 || c == 13)
-                outstr("\n\t");
+            if ( lastwasLF && c != '\t' ) {
+                outstr("\t");
+            }
+            if (c == '\n' || c == '\r') {
+                lastwasLF = 1;
+                outbyte('\n');
+            } else {
+                lastwasLF = 0;
+                outbyte(c);
+            }
         }
     } while (cmatch('"'));
     needchar(')');
-    outbyte('\n');
+    if ( !lastwasLF ) {
+        outbyte('\n');
+    }
 }
 
 /*

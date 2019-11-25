@@ -91,7 +91,7 @@ EXTERN ASMDISP_HEAPALLOC_CALLEE, ASMDISP_HEAPFREE_CALLEE
    ld l,(hl)
    ld h,a                    ; hl = size of old block
    
-IF __CPU_INTEL__
+IF __CPU_INTEL__ || __CPU_GBZ80__
    ld a,l
    sub c
    ld l,a
@@ -116,7 +116,7 @@ ENDIF
    pop hl
    push hl
    push de
-IF __CPU_INTEL__
+IF __CPU_INTEL__ || __CPU_GBZ80__
 ldir_loop:
    ld a,(hl)
    ld (de),a
@@ -134,7 +134,12 @@ ENDIF
    
    pop hl
    pop de
+IF __CPU_GBZ80__
+   EXTERN __z80asm__exsphl
+   call __z80asm__exsphl
+ELSE
    ex (sp),hl
+ENDIF
    ex de,hl
    
    ; de = & heap, hl = & old block (+2)

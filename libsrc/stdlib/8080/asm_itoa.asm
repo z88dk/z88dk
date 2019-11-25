@@ -116,10 +116,17 @@ ENDIF
    ld (hl),e                   ; terminate string
 
    ; now we have a backward string in the buffer so we need to reverse it!
-
+IF __CPU_GBZ80__
+   ; hl = end of string, (sp) = start of string
+   ld d,h		;de = end of string
+   ld e,l
+   pop hl		;hl = start of string
+   push de		
+ELSE
    ex (sp),hl                  ; hl = char *s, stack = end of char *s
-   push bc
-   call strrev
+ENDIF
+   push bc			;Save count
+   call strrev			;__FASTCALL__ takes hl=string to reverse
    pop bc
    pop de
 

@@ -77,10 +77,8 @@ END_ASM
         ld   bc,1                       ;; 01 01 00
         ld   bc,32767                   ;; 01 FF 7F
         ld   bc,65535                   ;; 01 FF FF
-        ld   bc,-32769                  ;; warn 2: integer '-32769' out of range
-                                        ;; 01 FF 7F
-        ld   bc,65536                   ;; warn 2: integer '65536' out of range
-                                        ;; 01 00 00
+        ld   bc,-32769                  ;; 01 FF 7F
+        ld   bc,65536                   ;; 01 00 00
 
 ; 32-bit arithmetic, long range is not tested on a 32bit long
         defq 0xFFFFFFFF                 ;; FF FF FF FF
@@ -92,10 +90,8 @@ END_ASM
         call 0                          ;; CD 00 00
         call 1                          ;; CD 01 00
         call 65535                      ;; CD FF FF
-        call -32769                     ;; warn 2: integer '-32769' out of range
-                                        ;; CD FF 7F
-        call 65536                      ;; warn 2: integer '65536' out of range
-                                        ;; CD 00 00
+        call -32769                     ;; CD FF 7F
+        call 65536                      ;; CD 00 00
 
 ;------------------------------------------------------------------------------
 ; Expressions
@@ -2320,16 +2316,13 @@ IF      !RABBIT
         out  N,a                        ;; error: syntax error
 ENDIF   
         call_oz 0                       ;; error: integer '0' out of range
-        call_oz 65536                   ;; error: integer '65536' out of range
 IF      !RABBIT
         call_pkg -1                     ;; error: integer '-1' out of range
-        call_pkg 65536                  ;; error: integer '65536' out of range
 ENDIF   
         fpp  0                          ;; error: integer '0' out of range
         fpp  255                        ;; error: integer '255' out of range
         fpp  256                        ;; error: integer '256' out of range
         invoke -1                       ;; error: integer '-1' out of range
-        invoke 65536                    ;; error: integer '65536' out of range
 END_ASM
 );
 z80asm(
@@ -2401,10 +2394,8 @@ END_ASM
         ld   bc,1                       ;; 01 01 00
         ld   bc,32767                   ;; 01 FF 7F
         ld   bc,65535                   ;; 01 FF FF
-        ld   bc,-32769                  ;; warn 2: integer '-32769' out of range
-                                        ;; 01 FF 7F
-        ld   bc,65536                   ;; warn 2: integer '65536' out of range
-                                        ;; 01 00 00
+        ld   bc,-32769                  ;; 01 FF 7F
+        ld   bc,65536                   ;; 01 00 00
 
 ; 32-bit arithmetic, long range is not tested on a 32bit long
         defq 0xFFFFFFFF                 ;; FF FF FF FF
@@ -2416,10 +2407,8 @@ END_ASM
         call 0                          ;; CD 00 00
         call 1                          ;; CD 01 00
         call 65535                      ;; CD FF FF
-        call -32769                     ;; warn 2: integer '-32769' out of range
-                                        ;; CD FF 7F
-        call 65536                      ;; warn 2: integer '65536' out of range
-                                        ;; CD 00 00
+        call -32769                     ;; CD FF 7F
+        call 65536                      ;; CD 00 00
 
 ;------------------------------------------------------------------------------
 ; Expressions
@@ -4646,13 +4635,11 @@ ENDIF
 IF      !RABBIT
 ENDIF   
         call_oz 0                       ;; error: integer '0' out of range
-        call_oz 65536                   ;; error: integer '65536' out of range
 IF      !RABBIT
 ENDIF   
         fpp  0                          ;; error: integer '0' out of range
         fpp  255                        ;; error: integer '255' out of range
         fpp  256                        ;; error: integer '256' out of range
         invoke -1                       ;; error: integer '-1' out of range
-        invoke 65536                    ;; error: integer '65536' out of range
 END_ASM
 );

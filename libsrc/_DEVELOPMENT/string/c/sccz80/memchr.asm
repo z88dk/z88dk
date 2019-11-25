@@ -9,6 +9,24 @@ PUBLIC memchr
 EXTERN l0_memchr_callee
 
 memchr:
+IF __CPU_GBZ80__
+   ld hl,sp+2
+   ld c,(hl)
+   inc hl
+   ld b,(hl)
+   inc hl
+   ld e,(hl)
+   inc hl
+   ld d,(hl)
+   inc hl
+   ld a,(hl+)
+   ld h,(hl)
+   ld l,a
+   call l0_memchr_callee
+   ld d,h
+   ld e,l
+   ret
+ELSE
 
    pop af
    pop bc
@@ -19,8 +37,9 @@ memchr:
    push de
    push bc
    push af
-
    jp l0_memchr_callee
+ENDIF
+
 
 ; SDCC bridge for Classic
 IF __CLASSIC

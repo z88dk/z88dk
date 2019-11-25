@@ -15,6 +15,10 @@
 #include <../../../libsrc/_DEVELOPMENT/target/rc2014/config_rc2014.h>
 #endif
 
+#ifdef __SCZ180
+#include <../../../libsrc/_DEVELOPMENT/target/scz180/config_scz180.h>
+#endif
+
 #ifdef __SMS
 #include <../../../libsrc/_DEVELOPMENT/target/sms/config_sms.h>
 #endif

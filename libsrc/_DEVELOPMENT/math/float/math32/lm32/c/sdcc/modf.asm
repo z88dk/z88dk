@@ -4,4 +4,3 @@
 	EXTERN	_m32_modff
 
 	defc	_modf = _m32_modff
-

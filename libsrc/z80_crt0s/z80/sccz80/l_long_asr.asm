@@ -9,27 +9,30 @@
 ;       sped up some more
 
 
-                SECTION   code_crt0_sccz80
-PUBLIC    l_long_asr
+        SECTION   code_crt0_sccz80
+	PUBLIC    l_long_asr
+	PUBLIC    l_long_asro
+
+.l_long_asro
+	ld	a,c
+	jp	entry
 
 ; Shift primary (on stack) right by secondary, 
 ; We can only shift a maximum of 32 bits (or so), so the counter can
 ; go in c
 
 .l_long_asr
-
-        pop ix
-   
+	pop	bc
         ld      a,l     ;temporary store for counter
         pop     hl
         pop     de
-        
+	push	bc
+
+.entry
 	and	31
-        jr z, done
-        
+	ret	z
         ld b,a
         ld a,e          ; primary = dahl
-
 .loop
 
         sra d
@@ -39,7 +42,4 @@ PUBLIC    l_long_asr
         djnz loop
         
         ld e,a
-
-.done
-
-        jp (ix)
+	ret

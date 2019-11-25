@@ -313,8 +313,11 @@ static Type *parse_enum(Type *type)
             value++;
         } while (cmatch(',') && !rcmatch('}'));
         needchar('}');
+        return ptr;
     } 
-    return ptr;
+    // We're declaring a type that is an enum
+    *type = *ptr;
+    return type;
 }
 
 int align_struct(Type *str)
@@ -612,6 +615,10 @@ static void parse_trailing_modifiers(Type *type)
         } else if ( amatch("__critical")) {
             type->flags |= CRITICAL;
             continue;
+        } else if ( amatch("__banked")) {
+            type->flags |= BANKED;
+        } else if ( amatch("__nonbanked")) {
+            type->flags &= ~BANKED;
         } else if ( amatch("__z88dk_sdccdecl")) {
             type->flags |= SDCCDECL;
             type->flags &= ~(SMALLC|FLOATINGDECL);
@@ -682,7 +689,7 @@ static int check_existing_parameter(Type *func, Type *param)
         Type *existing = array_get_byindex(func->parameters,i);
 
         if ( strlen(param->name) && strcmp(existing->name, param->name) == 0 ) {
-            errorfmt("A parameter named %s has already been defined for function",1, param->name);
+            errorfmt("A parameter named %s (argument %d) has already been defined for function",1,  param->name, i+1);
             junk();
             return -1;
         }
@@ -848,6 +855,12 @@ Type *parse_decl(char name[], Type *base_type)
             FREENULL(tail);
             return t;
         }
+    }
+
+    if ( match("const")) {
+        base_type->isconst = 1;
+    } else {
+        swallow("volatile");
     }
 
     if ( rcmatch('*')) {
@@ -1071,7 +1084,8 @@ Type *dodeclare(enum storage_type storage)
             snprintf(drop_name, sizeof(drop_name), "__extern_%s", type->name);                        
         }
 
-         if ( cmatch(';')) {
+        sym->isassigned = 1;
+        if ( cmatch(';')) {
              // Maybe not right
             sym->bss_section = STRDUP(get_section_name(sym->ctype->namespace, c_bss_section));
             return type;
@@ -1419,6 +1433,10 @@ void type_describe(Type *type, UT_string *output)
 
     if ( type->namespace ) {
         utstring_printf(output,"%s ", type->namespace);
+    }
+
+    if ( type->isconst ) {
+        utstring_printf(output,"const ");
     }
    
     switch ( type->kind ) {

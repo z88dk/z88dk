@@ -423,9 +423,6 @@ static void patch_exprs( ExprList *exprs )
                 break;
 
             case RANGE_WORD:
-                if ( value < -32768 || value > 65535 )
-                    warn_int_range( value );
-
 				patch_word(expr->code_pos, value); 
 
 				/* Expression contains relocatable address */
@@ -460,16 +457,10 @@ static void patch_exprs( ExprList *exprs )
                 break;
 
 			case RANGE_WORD_BE:
-				if (value < -32768 || value > 65535)
-					warn_int_range(value);
-
 				patch_word_be(expr->code_pos, value);
 				break;
 
 			case RANGE_DWORD:
-                if ( value < LONG_MIN || value > LONG_MAX )
-                    warn_int_range( value );
-
 				patch_long(expr->code_pos, value);
                 break;
 
