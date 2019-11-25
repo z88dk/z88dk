@@ -76,6 +76,17 @@ parse.o: parse.c
 	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -O0 -c -o $@ $<
 
 #------------------------------------------------------------------------------
+# z80asm2
+#------------------------------------------------------------------------------
+all: z80asm2$(EXESUFFIX)
+
+z80asm2$(EXESUFFIX): dev/z80asm2/z80asm2$(EXESUFFIX)
+	cp dev/z80asm2/z80asm2$(EXESUFFIX) z80asm2$(EXESUFFIX)
+
+dev/z80asm2/z80asm2$(EXESUFFIX): $(wildcard dev/z80asm2/*.c dev/z80asm2/*.h)
+	$(MAKE) -C dev/z80asm2
+
+#------------------------------------------------------------------------------
 # libraries
 #------------------------------------------------------------------------------
 .PHONY: z80asm_lib
@@ -105,7 +116,7 @@ clean::
 	$(MAKE) -C lib clean
 
 #------------------------------------------------------------------------------
-# intall
+# install
 #------------------------------------------------------------------------------
 install: $(TARGET) z80asm_lib
 	$(INSTALL) $(TARGET)     $(PREFIX)/bin/$(EXEC_PREFIX)$(TARGET)
@@ -145,6 +156,9 @@ $(TEST_SRC_MAIN:.c=.o) : t/libtestlib.a
 
 clean::
 	$(RM) t/libtestlib.a t/*.o t/*.out lib/t/*.o lib/t/*.out $(TEST_SRC_MAIN:.c=$(EXESUFFIX))
+
+all:
+	perl dev/cpu2/cpu.pl
 
 test: $(TARGET) z80asm_lib
 	$(MAKE) dev

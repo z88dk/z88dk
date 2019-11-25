@@ -23,6 +23,12 @@ static void dtor_token(void* elt);
 // tokens from scanner, in same space as characters
 enum {
 	T_END = 0, T_IDENT = 0x100, T_NUM, T_STR,
+	T_LOG_AND, T_LOG_OR, T_LOG_XOR, 
+	T_NOT_EQ, T_LESS_EQ, T_GREATER_EQ, 
+	T_POWER, 
+	T_SHIFT_LEFT, T_SHIFT_RIGHT,
+	T_DOUBLE_HASH,
+	T_ASMPC,
 };
 
 // keywords
@@ -126,6 +132,14 @@ static void dtor_token(void* elt_) {
 	free(elt->str);
 }
 
+inline bool isident_start(int c) {
+	return c == '_' || isalpha(c);
+}
+
+inline bool isident(int c) {
+	return c == '_' || isalnum(c);
+}
+
 // start a new scan state
 static void new_scan(void) {
 	scan_t* newyy = safe_calloc(1, sizeof(scan_t));
@@ -140,6 +154,194 @@ static void delete_scan(void) {
 	free(old);
 }
 
+#if 0
+// scan string
+static bool scan_asm_string(const char** pp, token_t* tok) {
+	char quote = **pp; (*pp)++;
+	const char* ts = *pp;
+	while (**pp != '\0' && **pp != quote) (*pp)++;
+	if (**pp != quote) goto fail;
+	tok->id = T_STR;
+	tok->str = safe_strdup_n(ts, *pp - ts);
+	(*pp)++;
+	return true;
+fail:
+	missing_quote_error();
+	return false;
+}
+#endif
+
+// scan numbers
+static int char_digit(int base, char c) {
+	if (base == 2) {
+		switch (c) {
+		case '-': case '0':	return 0;				// binary
+		case '#': case '1': return 1;				// bitmap
+		default:			return -1;				// error
+		}
+	}
+	if (isdigit(c)) return c - '0';					// digits
+	if (isalpha(c)) return 10 + tolower(c) - 'a';	// digits >= 'A'
+	return -1;										// error
+}
+
+static int scan_int_part(const char** pp, int base, int max_digits) {
+	const char* limit;
+	if (max_digits > 0)
+		limit = *pp + max_digits;
+	else
+		limit = *pp + strlen(*pp);
+
+	int value = 0, digit;
+	while (*pp < limit && (digit = char_digit(base, **pp)) >= 0 && digit < base) {
+		value = value * base + digit;
+		(*pp)++;
+	}
+	return value;
+}
+
+static bool scan_int(const char** pp, token_t* tok, int base, char suffix) {
+	const char* ts = *pp;
+	int value = scan_int_part(pp, base, 0);
+	if (*pp == ts)
+		goto fail;				// nothing read
+	if (suffix) {
+		if (**pp != suffix)
+			goto fail;			// suffix not found
+		else
+			(*pp)++;			// skip suffix
+	}
+	if (isident(**pp))
+		goto fail;				// number followed by identifier
+
+	tok->id = T_NUM;
+	tok->num = value;
+	return true;
+fail:
+	invalid_number_error();
+	return false;
+}
+
+static bool scan_num(const char** pp, token_t* tok) {
+	const char* ts = *pp;
+	char quote;
+	int value;
+
+	// check for prefixed number
+	switch (**pp) {
+	case '#': case '$':
+		(*pp)++;
+		return scan_int(pp, tok, 16, '\0');
+	case '%': case '@':
+		(*pp)++;
+		switch (**pp) {
+		case '"': case '\'':
+			quote = **pp; (*pp)++;
+			return scan_int(pp, tok, 2, quote);
+		default:
+			return scan_int(pp, tok, 2, '\0');
+		}
+	case '0':
+		switch (tolower((*pp)[1])) {
+		case 'x':
+			(*pp) += 2;
+			return scan_int(pp, tok, 16, '\0');
+		case 'b':									// 0bxxx binary; 0bxxxh hex
+			value = scan_int_part(pp, 16, 0);
+			if (*pp != ts && tolower(**pp) == 'h') {
+				(*pp)++;
+				goto ok;
+			}
+			else {
+				(*pp) = ts + 2;
+				return scan_int(pp, tok, 2, '\0');
+			}
+		case 'q':
+		case 'o':
+			(*pp) += 2;
+			return scan_int(pp, tok, 8, '\0');
+		}
+	}
+
+	// check for suffixed number - binary?
+	*pp = ts;
+	value = scan_int_part(pp, 2, 0);
+	if (*pp != ts && tolower((*pp)[0]) == 'b' && !isident((*pp)[1])) {
+		(*pp)++;
+		goto ok;
+	}
+
+	// check for suffixed number - octal?
+	*pp = ts;
+	value = scan_int_part(pp, 8, 0);
+	if (*pp != ts && (tolower((*pp)[0]) == 'o' || tolower((*pp)[0]) == 'q') && !isident((*pp)[1])) {
+		(*pp)++;
+		goto ok;
+	}
+
+	// check for suffixed number - decimal?
+	*pp = ts;
+	value = scan_int_part(pp, 10, 0);
+	if (*pp != ts && tolower((*pp)[0]) == 'd' && !isident((*pp)[1])) {
+		(*pp)++;
+		goto ok;
+	}
+
+	// check for suffixed number - hexadecimal?
+	*pp = ts;
+	value = scan_int_part(pp, 16, 0);
+	if (*pp != ts && tolower((*pp)[0]) == 'h' && !isident((*pp)[1])) {
+		(*pp)++;
+		goto ok;
+	}
+
+	// check for non-suffixed decimal
+	*pp = ts;
+	value = scan_int_part(pp, 10, 0);
+	if (*pp != ts && !isident((*pp)[0])) 
+		goto ok;
+
+	invalid_number_error();
+	return false;
+ok:
+	tok->id = T_NUM;
+	tok->num = value;
+	return true;
+}
+
+static bool scan_bin_or_op(const char** pp, token_t* tok) {
+	switch ((*pp)[1]) {
+	case '0': case '1': case '\'': case '"': 
+		return scan_num(pp, tok); 
+	default: 
+		tok->id = **pp; 
+		(*pp)++;
+		return true;
+	}
+}
+
+static bool scan_hex_or_op(const char** pp, token_t* tok) {
+	if (isxdigit((*pp)[1])) {	// differentiate "#define" (hash, identifier) from "#def" (0x0DEF)
+		(*pp)++;
+		const char* ts = *pp;
+		scan_int_part(pp, 16, 0);
+		if (ts == *pp || isident(**pp)) {
+			*pp = ts;
+			tok->id = '#';
+			return true;
+		}
+		else {
+			*pp = ts - 1;
+			return scan_num(pp, tok);
+		}
+	}
+	else {
+		tok->id = **pp;
+		(*pp)++;
+		return true;
+	}
+}
+
 static token_t* scan_text(const char* input) {
 	UT_string* str; utstring_new(str);
 	utarray_clear(scanner->tokens);
@@ -152,51 +354,85 @@ static token_t* scan_text(const char* input) {
 		token_t* tok = (token_t*)utarray_back(scanner->tokens);	// point to last token
 
 		while (isspace(*p)) p++;						// skip spaces
-		if (*p == '\0' || *p == ';') break;				// end of line of start of comment
+		if (*p == '\0' || *p == ';') break;				// end of line or start of comment
 
 		const char* ts = p;
-		if (*p == '_' || isalpha(*p)) {					// T_IDENT
-			while (*p == '_' || isalnum(*p)) p++;
-			utstring_set_n(str, ts, p - ts);			// identifier
+		switch (*p) {
+		case '!': if (p[1] == '=') { tok->id = T_NOT_EQ;  p += 2; } else { tok->id = *p++; } break;
+		case '&': if (p[1] == '&') { tok->id = T_LOG_AND; p += 2; } else { tok->id = *p++; } break;
+		case '|': if (p[1] == '|') { tok->id = T_LOG_OR;  p += 2; } else { tok->id = *p++; } break;
+		case '^': if (p[1] == '^') { tok->id = T_LOG_XOR; p += 2; } else { tok->id = *p++; } break;
+		case '*': if (p[1] == '*') { tok->id = T_POWER;   p += 2; } else { tok->id = *p++; } break;
+		case '%': case '@': if (!scan_bin_or_op(&p, tok)) goto fail; else break;
+		case '=': if (p[1] == '=') { tok->id = '=';  p += 2; } else { tok->id = *p++; } break;
+		case '<': if (p[1] == '>') { tok->id = T_NOT_EQ; p += 2; }
+				  else if (p[1] == '=') { tok->id = T_LESS_EQ; p += 2; }
+				  else if (p[1] == '<') { tok->id = T_SHIFT_LEFT; p += 2; }
+				  else { tok->id = *p++; } break;
+		case '>': if (p[1] == '=') { tok->id = T_GREATER_EQ; p += 2; }
+				  else if (p[1] == '>') { tok->id = T_SHIFT_RIGHT;  p += 2; }
+				  else { tok->id = *p++; } break;
+		case '#': if (p[1] == '#') { tok->id = T_DOUBLE_HASH; p += 2; }
+				  else if (!scan_hex_or_op(&p, tok)) goto fail; else break;
+		case '$': if (isxdigit(p[1])) { if (!scan_num(&p, tok)) goto fail; else break; }
+				  else { tok->id = T_ASMPC; p++; } break;
+		default:
+			if (isident_start (*p)) {						// T_IDENT
+				while (isident(*p)) p++;
+				utstring_set_n(str, ts, p - ts);			// identifier
 
-			tok->id = T_IDENT;
-			tok->str = safe_strdup(utstring_body(str));	// make a copy
+				tok->id = T_IDENT;
+				tok->str = safe_strdup(utstring_body(str));	// make a copy
 
-			utstring_toupper(str);						// convert to upper case to lookup keyword
-			tok->keyword = lookup_keyword(utstring_body(str));
-		}
-		else if (isdigit(*p)) {							// T_NUM
-			tok->id = T_NUM;
-			tok->num = (int)strtol(p, (char**)& p, 0);
-		}
-		else {											// any other
-			tok->id = *p++;
+				utstring_toupper(str);						// convert to upper case to lookup keyword
+				tok->keyword = lookup_keyword(utstring_body(str));
+			}
+			else if (isdigit(*p)) {							// T_NUM
+				if (!scan_num(&p, tok)) goto fail;
+			}
+			else {											// any other
+				tok->id = *p++;
+			}
 		}
 	}
 	utstring_free(str);
-
 	return (token_t*)utarray_front(scanner->tokens);
+fail:
+	utstring_free(str);
+	return NULL;
 }
 
 //-----------------------------------------------------------------------------
 // errors
 //-----------------------------------------------------------------------------
-void syntax_error(void) {
-	fprintf(stderr, "Error at %s line %d: Syntax error\n", input_filename, line_num);
+static void error_common(void) {
 	num_errors++;
 	yy = (token_t*)utarray_back(scanner->tokens);		// skip rest of line
+}
+
+void syntax_error(void) {
+	fprintf(stderr, "Error at %s line %d: Syntax error\n", input_filename, line_num);
+	error_common();
 }
 
 void range_error(int n) {
 	fprintf(stderr, "Error at %s line %d: Range error: %d\n", input_filename, line_num, n);
-	num_errors++;
-	yy = (token_t*)utarray_back(scanner->tokens);		// skip rest of line
+	error_common();
+}
+
+void invalid_number_error(void) {
+	fprintf(stderr, "Error at %s line %d: Invalid number\n", input_filename, line_num);
+	error_common();
+}
+
+void missing_quote_error(void) {
+	fprintf(stderr, "Error at %s line %d: Invalid number\n", input_filename, line_num);
+	error_common();
 }
 
 void illegal_opcode_error(void) {
 	fprintf(stderr, "Error at %s line %d: Illegal instruction\n", input_filename, line_num);
-	num_errors++;
-	yy = (token_t*)utarray_back(scanner->tokens);		// skip rest of line
+	error_common();
 }
 
 void reserved_warning(const char* word) {
@@ -208,7 +444,7 @@ void reserved_warning(const char* word) {
 //-----------------------------------------------------------------------------
 static bool EOS(void) {
 	switch (yy[0].id) {
-	case '\0':	return true;
+	case T_END:	return true;
 	case ':':	yy++; return true;
 	case '\\':	yy++; return true;
 	default:	return false;
@@ -1165,7 +1401,12 @@ static bool parse_file_1(void) {
 	while (utstring_fgets(line, input_file)) {
 		line_num++;
 		yy = scan_text(utstring_body(line));
-		if (!parse_line()) ok = false;
+		if (!yy)
+			ok = false;
+		else {
+			if (!parse_line())
+				ok = false;
+		}
 	}
 
 	utstring_free(line);
@@ -1209,10 +1450,12 @@ bool assemble_file(const char* input_filename) {
 	remove_ext(output_filename, input_filename); 
 	utstring_printf(output_filename, ".bin");
 	
-	init_backend(utstring_body(output_filename));
+	start_backend(utstring_body(output_filename));
 	utstring_free(output_filename);
 
 	bool ok = parse_file(input_filename);
+
+	end_backend(!ok);		// delete object if assembly failed
 
 	return ok;
 }

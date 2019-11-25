@@ -12,10 +12,30 @@
 #include <stdio.h>
 
 static FILE* output_file = NULL;
+static char* output_filename = NULL;
 
-void init_backend(const char* output_filename) {
-	if (output_file) fclose(output_file);
-	output_file = safe_fopen(output_filename, "wb");
+static void close_output_file(bool delete_output) {
+	if (output_file) {
+		fclose(output_file);
+		output_file = NULL;
+	}
+	if (delete_output && output_filename) {
+		remove(output_filename);
+	}
+	if (output_filename) {
+		free(output_filename);
+		output_filename = NULL;
+	}
+}
+
+void start_backend(const char* obj_filename) {
+	close_output_file(false);
+	output_filename = safe_strdup(obj_filename);
+	output_file = safe_fopen(obj_filename, "wb");
+}
+
+void end_backend(bool delete_output) {
+	close_output_file(delete_output);
 }
 
 void emit(int b) {

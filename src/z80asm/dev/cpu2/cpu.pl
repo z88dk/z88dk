@@ -2124,8 +2124,9 @@ sub run_test {
 
 #------------------------------------------------------------------------------
 sub assemble_and_run {
-	my($cpu, $ixiy, $end, @test) = @_;
-
+	my($cpu_, $ixiy, $end, @test) = @_;
+	$cpu = $cpu_;	# set global so that isxxx() work
+	
 	my $ok = 1;
 	return 1 if @test==0;
 	
@@ -2141,7 +2142,7 @@ sub assemble_and_run {
 	path('test.asm')->spew($asm);
 	$ok &&= run("z80asm -m$cpu $ixiy -l -b -m test.asm");
 	$ok or return;
-	
+		
 	# read map file
 	init_symtab();
 	for (path('test.map')->lines) {
@@ -2163,7 +2164,16 @@ sub assemble_and_run {
 	
 	my @ticks = @{$prog->ticks};
 	
+	# use z80asm2 if building for z80 and no library calls
 	my $got_bytes = path('test.bin')->slurp_raw;
+	if (length($got_bytes) == $size+1 && !$ixiy && isz80()) {	# final nop is not counted in $size
+		$ok &&= run("z80asm2 test.asm");
+		$ok or return;
+
+		my $got_bytes2 = path('test.bin')->slurp_raw;
+		$got_bytes2 = substr($got_bytes2, 0, $size);
+		$ok &&= check_bin($got_bytes2, $bytes);
+	}
 	$got_bytes = substr($got_bytes, 0, $size);		# ignore code after bytes - library
 	$ok &&= check_bin($got_bytes, $bytes);
 	

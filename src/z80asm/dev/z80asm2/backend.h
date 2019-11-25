@@ -8,7 +8,9 @@
 
 #include <stdbool.h>
 
-void init_backend(const char* output_filename);
+void start_backend(const char* obj_filename);
+void end_backend(bool delete_output);
+
 void emit(int b);
 void emitw(int w);
 int get_pc(void);

@@ -12,4 +12,6 @@ bool assemble_file(const char* input_filename);
 void syntax_error(void);
 void illegal_opcode_error(void);
 void range_error(int n);
+void invalid_number_error(void);
+void missing_quote_error(void);
 void reserved_warning(const char* word);

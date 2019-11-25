@@ -49,7 +49,6 @@ sub assemble {
 	}
 	
 	path('test.asm')->spew($asm);
-	path('test.exp')->spew_raw($bin);
 
 	unlink 'test.bin';
 	run("z80asm -b -l test.asm");
@@ -65,7 +64,7 @@ sub assemble {
 		return 0;
 	}
 	
-	unlink 'test.asm', 'test.bin', 'test.exp', 'test.o', 'test.lis';
+	unlink 'test.asm', 'test.bin', 'test.o', 'test.lis';
 	return 1;
 }
 
