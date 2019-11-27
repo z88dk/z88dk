@@ -1,13 +1,13 @@
-stdio/smc777/generic_console
-stdio/smc777/generic_console_ioctl
-stdio/smc777/conio_vars
-stdio/smc777/CRT_FONT
-stdio/smc777/copy_font
+target/smc777/stdio/generic_console
+target/smc777/stdio/generic_console_ioctl
+target/smc777/stdio/conio_vars
+target/smc777/stdio/CRT_FONT
+target/smc777/stdio/copy_font
 @font/font_8x8/font_8x8.lst
 graphics/dcircle
 graphics/clg
 graphics/generic_console/clsgraph
-graphics/smc777/textpixl
+target/smc777/graphics/textpixl
 graphics/generic_console/plotpixl
 graphics/generic_console/respixl
 graphics/generic_console/xorpixl
@@ -26,6 +26,6 @@ psg/sn76489/psg_init.asm
 psg/sn76489/set_psg.asm
 psg/sn76489/set_psg_callee.asm
 @psg/psg.lst
-games/smc777/joystick
+target/smc777/games/joystick
 @games/games.lst
 @video/mc6845/mc6845.lst
