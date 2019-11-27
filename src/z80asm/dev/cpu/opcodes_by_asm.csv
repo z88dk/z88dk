@@ -99,7 +99,7 @@ adc hl, de             |CD @adc_hl_de|~       |~           |ED 5A      |~       
                        |             |        |            |           |        |           |           |           
 adc hl, hl             |CD @adc_hl_hl|~       |~           |ED 6A      |~       |~          |~          |~          
                        |             |        |            |           |        |           |           |           
-adc hl, sp             |             |        |            |ED 7A      |~       |~          |~          |~          
+adc hl, sp             |CD @adc_hl_sp|~       |~           |ED 7A      |~       |~          |~          |~          
                        |             |        |            |           |        |           |           |           
 adc ixh                |             |        |            |           |        |           |DD 8C      |~          
                        |             |        |            |           |        |           |           |           

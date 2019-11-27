@@ -21,11 +21,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\src\z80asm\dev\z80asm2\backend.h" />
     <ClInclude Include="..\..\src\z80asm\dev\z80asm2\frontend.h" />
-    <ClInclude Include="..\..\src\z80asm\dev\z80asm2\utarray.h" />
-    <ClInclude Include="..\..\src\z80asm\dev\z80asm2\uthash.h" />
     <ClInclude Include="..\..\src\z80asm\dev\z80asm2\utils.h" />
-    <ClInclude Include="..\..\src\z80asm\dev\z80asm2\utlist.h" />
-    <ClInclude Include="..\..\src\z80asm\dev\z80asm2\utstring.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\z80asm\dev\z80asm2\backend.c" />
@@ -106,6 +102,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>..\..\ext\uthash\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -138,6 +135,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>..\..\ext\uthash\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

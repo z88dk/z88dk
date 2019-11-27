@@ -16,7 +16,7 @@ my @CPUS = (qw( 8080 gbz80 z80 r2k ));
 my $test_nr;
 
 for my $cpu (@CPUS) {
-	for my $reg (qw( bc de hl )) {
+	for my $reg (qw( bc de hl sp )) {
 		for my $carry (0, 1) {
 			for my $base (0, 32768, 32769) {
 				for my $add (255, 256, 32767) {

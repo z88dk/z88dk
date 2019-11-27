@@ -15,4 +15,5 @@ add_hl_a.asm
 lddr.asm
 cpi.asm
 add_bc_a.asm
+adc_hl_sp.asm
 adc_hl_de.asm

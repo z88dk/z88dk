@@ -4388,6 +4388,8 @@ CD @adc_hl_de                |adc hl, de   |~           |~            |         
                              |             |            |             |                       |         |               |              |              
 CD @adc_hl_hl                |adc hl, hl   |~           |~            |                       |         |               |              |              
                              |             |            |             |                       |         |               |              |              
+CD @adc_hl_sp                |adc hl, sp   |~           |~            |                       |         |               |              |              
+                             |             |            |             |                       |         |               |              |              
 CD @add_bc_a                 |add bc, a    |~           |~            |~                      |~        |~              |~             |              
                              |             |            |             |                       |         |               |              |              
 CD @add_de_a                 |add de, a    |~           |~            |~                      |~        |~              |~             |              

@@ -26,7 +26,7 @@ TARGET 			= $(PROJ)$(EXESUFFIX)
 OPT 			= -O3
 
 STD 			= -std=gnu11
-LOCAL_CFLAGS 	+= -MMD -g -Wall $(STD) $(OPT)
+LOCAL_CFLAGS 	+= -I../../../../ext/uthash/src -MMD -g -Wall $(STD) $(OPT)
 
 .PHONY: all
 

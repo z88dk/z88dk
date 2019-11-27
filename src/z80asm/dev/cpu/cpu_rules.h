@@ -292,6 +292,10 @@ default: error_illegal_ident(); }
 
 | label? _TK_ADC _TK_HL _TK_COMMA _TK_SP _TK_NEWLINE @{
 switch (opts.cpu) {
+case CPU_8080: case CPU_8085: case CPU_GBZ80: 
+DO_STMT_LABEL();
+add_call_emul_func("__z80asm__adc_hl_sp");
+break;
 case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 DO_stmt(0xED7A);
 break;

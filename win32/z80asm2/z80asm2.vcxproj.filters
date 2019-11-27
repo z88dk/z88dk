@@ -21,19 +21,7 @@
     <ClInclude Include="..\..\src\z80asm\dev\z80asm2\frontend.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\dev\z80asm2\utarray.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\dev\z80asm2\uthash.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\z80asm\dev\z80asm2\utils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\dev\z80asm2\utlist.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\dev\z80asm2\utstring.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

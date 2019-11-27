@@ -25,6 +25,7 @@
  adc hl, bc                     ; CD @__z80asm__adc_hl_bc
  adc hl, de                     ; CD @__z80asm__adc_hl_de
  adc hl, hl                     ; CD @__z80asm__adc_hl_hl
+ adc hl, sp                     ; CD @__z80asm__adc_hl_sp
  adc l                          ; 8D
  adc m                          ; 8E
  add (hl)                       ; 86
