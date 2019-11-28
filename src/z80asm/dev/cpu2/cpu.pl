@@ -866,16 +866,35 @@ sub init_opcodes {
 			}
 		}
 		
-#		for my $r (qw( bc de hl sp )) {
-#		add_opc($cpu, "sbc hl, $r", 0xED, 0x42 + $V{$r}*16) if !$intel && !$gameboy;
+		# inc ss
+		for $r (qw( bc de hl sp )) {
+			my $r1 = substr($r, 0, 1);
+			$B = B(0x03+RP($r)*16);
+			$T = is8080 ? T(5) : is8085 ? T(6) : isgbz80 ? T(8) : T(6); 
+			add(	"inc $r", 	$B, $T);
+			add_ix(	"inc $r", 	$B, $T+4);
+			
+			add(	"inx $r", 	$B, $T);
+			add(	"inx $r1", 	$B, $T) if $r ne 'sp';
+		}
 		
-#		add_opc($cpu, "inc $r", 0x03 + $V{$r}*16);
-#		add_opc($cpu, "dec $r", 0x0B + $V{$r}*16);
-#	}
+		# dec ss
+		for $r (qw( bc de hl sp )) {
+			my $r1 = substr($r, 0, 1);
+			$B = B(0x0B+RP($r)*16);
+			$T = is8080 ? T(5) : is8085 ? T(6) : isgbz80 ? T(8) : T(6); 
+			add(	"dec $r", 	$B, $T);
+			add_ix(	"dec $r", 	$B, $T+4);
 
+			add(	"dcx $r", 	$B, $T);
+			add(	"dcx $r1", 	$B, $T) if $r ne 'sp';
+		}
 		
-#			add("inc $r",		0x03+RP($r)*16, is8080 ? 5 : is8085 ? 6 : isgbz80 ? 8 : die);
-#			add("dec $r",		0x0B+RP($r)*16, is8080 ? 5 : is8085 ? 6 : isgbz80 ? 8 : die);
+		#----------------------------------------------------------------------
+		# Rotate and Shift Group
+		#----------------------------------------------------------------------
+		
+		
 
 
 		

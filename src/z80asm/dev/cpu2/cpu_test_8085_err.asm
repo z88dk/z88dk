@@ -80,6 +80,8 @@
  dec (iy)                       ; Error
  dec (iy+-128)                  ; Error
  dec (iy+127)                   ; Error
+ dec ix                         ; Error
+ dec iy                         ; Error
  ex (sp), ix                    ; Error
  ex (sp), iy                    ; Error
  ex af, af                      ; Error
@@ -92,6 +94,8 @@
  inc (iy)                       ; Error
  inc (iy+-128)                  ; Error
  inc (iy+127)                   ; Error
+ inc ix                         ; Error
+ inc iy                         ; Error
  ld (-32768), bc                ; Error
  ld (-32768), de                ; Error
  ld (-32768), ix                ; Error

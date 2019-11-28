@@ -1549,6 +1549,76 @@ DCR M                             |z80  |-     |-    |dcr m         |35         
 DCR M                             |z80  |-     |IXIY |dcr m         |35                                 |     11 T
 DCR M                             |z80n |-     |-    |dcr m         |35                                 |     11 T
 DCR M                             |z80n |-     |IXIY |dcr m         |35                                 |     11 T
+DCX B                             |8080 |-     |-    |dcx b         |0B                                 |      5 T
+DCX B                             |8080 |-     |IXIY |dcx b         |0B                                 |      5 T
+DCX B                             |8085 |-     |-    |dcx b         |0B                                 |      6 T
+DCX B                             |8085 |-     |IXIY |dcx b         |0B                                 |      6 T
+DCX B                             |gbz80|-     |-    |dcx b         |0B                                 |      8 T
+DCX B                             |gbz80|-     |IXIY |dcx b         |0B                                 |      8 T
+DCX B                             |z80  |-     |-    |dcx b         |0B                                 |      6 T
+DCX B                             |z80  |-     |IXIY |dcx b         |0B                                 |      6 T
+DCX B                             |z80n |-     |-    |dcx b         |0B                                 |      6 T
+DCX B                             |z80n |-     |IXIY |dcx b         |0B                                 |      6 T
+DCX BC                            |8080 |-     |-    |dcx bc        |0B                                 |      5 T
+DCX BC                            |8080 |-     |IXIY |dcx bc        |0B                                 |      5 T
+DCX BC                            |8085 |-     |-    |dcx bc        |0B                                 |      6 T
+DCX BC                            |8085 |-     |IXIY |dcx bc        |0B                                 |      6 T
+DCX BC                            |gbz80|-     |-    |dcx bc        |0B                                 |      8 T
+DCX BC                            |gbz80|-     |IXIY |dcx bc        |0B                                 |      8 T
+DCX BC                            |z80  |-     |-    |dcx bc        |0B                                 |      6 T
+DCX BC                            |z80  |-     |IXIY |dcx bc        |0B                                 |      6 T
+DCX BC                            |z80n |-     |-    |dcx bc        |0B                                 |      6 T
+DCX BC                            |z80n |-     |IXIY |dcx bc        |0B                                 |      6 T
+DCX D                             |8080 |-     |-    |dcx d         |1B                                 |      5 T
+DCX D                             |8080 |-     |IXIY |dcx d         |1B                                 |      5 T
+DCX D                             |8085 |-     |-    |dcx d         |1B                                 |      6 T
+DCX D                             |8085 |-     |IXIY |dcx d         |1B                                 |      6 T
+DCX D                             |gbz80|-     |-    |dcx d         |1B                                 |      8 T
+DCX D                             |gbz80|-     |IXIY |dcx d         |1B                                 |      8 T
+DCX D                             |z80  |-     |-    |dcx d         |1B                                 |      6 T
+DCX D                             |z80  |-     |IXIY |dcx d         |1B                                 |      6 T
+DCX D                             |z80n |-     |-    |dcx d         |1B                                 |      6 T
+DCX D                             |z80n |-     |IXIY |dcx d         |1B                                 |      6 T
+DCX DE                            |8080 |-     |-    |dcx de        |1B                                 |      5 T
+DCX DE                            |8080 |-     |IXIY |dcx de        |1B                                 |      5 T
+DCX DE                            |8085 |-     |-    |dcx de        |1B                                 |      6 T
+DCX DE                            |8085 |-     |IXIY |dcx de        |1B                                 |      6 T
+DCX DE                            |gbz80|-     |-    |dcx de        |1B                                 |      8 T
+DCX DE                            |gbz80|-     |IXIY |dcx de        |1B                                 |      8 T
+DCX DE                            |z80  |-     |-    |dcx de        |1B                                 |      6 T
+DCX DE                            |z80  |-     |IXIY |dcx de        |1B                                 |      6 T
+DCX DE                            |z80n |-     |-    |dcx de        |1B                                 |      6 T
+DCX DE                            |z80n |-     |IXIY |dcx de        |1B                                 |      6 T
+DCX H                             |8080 |-     |-    |dcx h         |2B                                 |      5 T
+DCX H                             |8080 |-     |IXIY |dcx h         |2B                                 |      5 T
+DCX H                             |8085 |-     |-    |dcx h         |2B                                 |      6 T
+DCX H                             |8085 |-     |IXIY |dcx h         |2B                                 |      6 T
+DCX H                             |gbz80|-     |-    |dcx h         |2B                                 |      8 T
+DCX H                             |gbz80|-     |IXIY |dcx h         |2B                                 |      8 T
+DCX H                             |z80  |-     |-    |dcx h         |2B                                 |      6 T
+DCX H                             |z80  |-     |IXIY |dcx h         |2B                                 |      6 T
+DCX H                             |z80n |-     |-    |dcx h         |2B                                 |      6 T
+DCX H                             |z80n |-     |IXIY |dcx h         |2B                                 |      6 T
+DCX HL                            |8080 |-     |-    |dcx hl        |2B                                 |      5 T
+DCX HL                            |8080 |-     |IXIY |dcx hl        |2B                                 |      5 T
+DCX HL                            |8085 |-     |-    |dcx hl        |2B                                 |      6 T
+DCX HL                            |8085 |-     |IXIY |dcx hl        |2B                                 |      6 T
+DCX HL                            |gbz80|-     |-    |dcx hl        |2B                                 |      8 T
+DCX HL                            |gbz80|-     |IXIY |dcx hl        |2B                                 |      8 T
+DCX HL                            |z80  |-     |-    |dcx hl        |2B                                 |      6 T
+DCX HL                            |z80  |-     |IXIY |dcx hl        |2B                                 |      6 T
+DCX HL                            |z80n |-     |-    |dcx hl        |2B                                 |      6 T
+DCX HL                            |z80n |-     |IXIY |dcx hl        |2B                                 |      6 T
+DCX SP                            |8080 |-     |-    |dcx sp        |3B                                 |      5 T
+DCX SP                            |8080 |-     |IXIY |dcx sp        |3B                                 |      5 T
+DCX SP                            |8085 |-     |-    |dcx sp        |3B                                 |      6 T
+DCX SP                            |8085 |-     |IXIY |dcx sp        |3B                                 |      6 T
+DCX SP                            |gbz80|-     |-    |dcx sp        |3B                                 |      8 T
+DCX SP                            |gbz80|-     |IXIY |dcx sp        |3B                                 |      8 T
+DCX SP                            |z80  |-     |-    |dcx sp        |3B                                 |      6 T
+DCX SP                            |z80  |-     |IXIY |dcx sp        |3B                                 |      6 T
+DCX SP                            |z80n |-     |-    |dcx sp        |3B                                 |      6 T
+DCX SP                            |z80n |-     |IXIY |dcx sp        |3B                                 |      6 T
 DEC A                             |8080 |-     |-    |dec a         |3D                                 |      5 T
 DEC A                             |8080 |-     |IXIY |dec a         |3D                                 |      5 T
 DEC A                             |8085 |-     |-    |dec a         |3D                                 |      4 T
@@ -1569,6 +1639,16 @@ DEC B                             |z80  |-     |-    |dec b         |05         
 DEC B                             |z80  |-     |IXIY |dec b         |05                                 |      4 T
 DEC B                             |z80n |-     |-    |dec b         |05                                 |      4 T
 DEC B                             |z80n |-     |IXIY |dec b         |05                                 |      4 T
+DEC BC                            |8080 |-     |-    |dec bc        |0B                                 |      5 T
+DEC BC                            |8080 |-     |IXIY |dec bc        |0B                                 |      5 T
+DEC BC                            |8085 |-     |-    |dec bc        |0B                                 |      6 T
+DEC BC                            |8085 |-     |IXIY |dec bc        |0B                                 |      6 T
+DEC BC                            |gbz80|-     |-    |dec bc        |0B                                 |      8 T
+DEC BC                            |gbz80|-     |IXIY |dec bc        |0B                                 |      8 T
+DEC BC                            |z80  |-     |-    |dec bc        |0B                                 |      6 T
+DEC BC                            |z80  |-     |IXIY |dec bc        |0B                                 |      6 T
+DEC BC                            |z80n |-     |-    |dec bc        |0B                                 |      6 T
+DEC BC                            |z80n |-     |IXIY |dec bc        |0B                                 |      6 T
 DEC C                             |8080 |-     |-    |dec c         |0D                                 |      5 T
 DEC C                             |8080 |-     |IXIY |dec c         |0D                                 |      5 T
 DEC C                             |8085 |-     |-    |dec c         |0D                                 |      4 T
@@ -1589,6 +1669,16 @@ DEC D                             |z80  |-     |-    |dec d         |15         
 DEC D                             |z80  |-     |IXIY |dec d         |15                                 |      4 T
 DEC D                             |z80n |-     |-    |dec d         |15                                 |      4 T
 DEC D                             |z80n |-     |IXIY |dec d         |15                                 |      4 T
+DEC DE                            |8080 |-     |-    |dec de        |1B                                 |      5 T
+DEC DE                            |8080 |-     |IXIY |dec de        |1B                                 |      5 T
+DEC DE                            |8085 |-     |-    |dec de        |1B                                 |      6 T
+DEC DE                            |8085 |-     |IXIY |dec de        |1B                                 |      6 T
+DEC DE                            |gbz80|-     |-    |dec de        |1B                                 |      8 T
+DEC DE                            |gbz80|-     |IXIY |dec de        |1B                                 |      8 T
+DEC DE                            |z80  |-     |-    |dec de        |1B                                 |      6 T
+DEC DE                            |z80  |-     |IXIY |dec de        |1B                                 |      6 T
+DEC DE                            |z80n |-     |-    |dec de        |1B                                 |      6 T
+DEC DE                            |z80n |-     |IXIY |dec de        |1B                                 |      6 T
 DEC E                             |8080 |-     |-    |dec e         |1D                                 |      5 T
 DEC E                             |8080 |-     |IXIY |dec e         |1D                                 |      5 T
 DEC E                             |8085 |-     |-    |dec e         |1D                                 |      4 T
@@ -1609,6 +1699,16 @@ DEC H                             |z80  |-     |-    |dec h         |25         
 DEC H                             |z80  |-     |IXIY |dec h         |25                                 |      4 T
 DEC H                             |z80n |-     |-    |dec h         |25                                 |      4 T
 DEC H                             |z80n |-     |IXIY |dec h         |25                                 |      4 T
+DEC HL                            |8080 |-     |-    |dec hl        |2B                                 |      5 T
+DEC HL                            |8080 |-     |IXIY |dec hl        |2B                                 |      5 T
+DEC HL                            |8085 |-     |-    |dec hl        |2B                                 |      6 T
+DEC HL                            |8085 |-     |IXIY |dec hl        |2B                                 |      6 T
+DEC HL                            |gbz80|-     |-    |dec hl        |2B                                 |      8 T
+DEC HL                            |gbz80|-     |IXIY |dec hl        |2B                                 |      8 T
+DEC HL                            |z80  |-     |-    |dec hl        |2B                                 |      6 T
+DEC HL                            |z80  |-     |IXIY |dec hl        |2B                                 |      6 T
+DEC HL                            |z80n |-     |-    |dec hl        |2B                                 |      6 T
+DEC HL                            |z80n |-     |IXIY |dec hl        |2B                                 |      6 T
 DEC IND_HL RPAREN                 |8080 |-     |-    |dec (hl)      |35                                 |     10 T
 DEC IND_HL RPAREN                 |8080 |-     |IXIY |dec (hl)      |35                                 |     10 T
 DEC IND_HL RPAREN                 |8085 |-     |-    |dec (hl)      |35                                 |     10 T
@@ -1635,6 +1735,14 @@ DEC IND_IY expr RPAREN            |z80  |expr  |-    |dec (iy+%d)   |FD 35 %d   
 DEC IND_IY expr RPAREN            |z80  |expr  |IXIY |dec (iy+%d)   |DD 35 %d                           |     23 T
 DEC IND_IY expr RPAREN            |z80n |expr  |-    |dec (iy+%d)   |FD 35 %d                           |     23 T
 DEC IND_IY expr RPAREN            |z80n |expr  |IXIY |dec (iy+%d)   |DD 35 %d                           |     23 T
+DEC IX                            |z80  |-     |-    |dec ix        |DD 2B                              |     10 T
+DEC IX                            |z80  |-     |IXIY |dec ix        |FD 2B                              |     10 T
+DEC IX                            |z80n |-     |-    |dec ix        |DD 2B                              |     10 T
+DEC IX                            |z80n |-     |IXIY |dec ix        |FD 2B                              |     10 T
+DEC IY                            |z80  |-     |-    |dec iy        |FD 2B                              |     10 T
+DEC IY                            |z80  |-     |IXIY |dec iy        |DD 2B                              |     10 T
+DEC IY                            |z80n |-     |-    |dec iy        |FD 2B                              |     10 T
+DEC IY                            |z80n |-     |IXIY |dec iy        |DD 2B                              |     10 T
 DEC L                             |8080 |-     |-    |dec l         |2D                                 |      5 T
 DEC L                             |8080 |-     |IXIY |dec l         |2D                                 |      5 T
 DEC L                             |8085 |-     |-    |dec l         |2D                                 |      4 T
@@ -1645,6 +1753,16 @@ DEC L                             |z80  |-     |-    |dec l         |2D         
 DEC L                             |z80  |-     |IXIY |dec l         |2D                                 |      4 T
 DEC L                             |z80n |-     |-    |dec l         |2D                                 |      4 T
 DEC L                             |z80n |-     |IXIY |dec l         |2D                                 |      4 T
+DEC SP                            |8080 |-     |-    |dec sp        |3B                                 |      5 T
+DEC SP                            |8080 |-     |IXIY |dec sp        |3B                                 |      5 T
+DEC SP                            |8085 |-     |-    |dec sp        |3B                                 |      6 T
+DEC SP                            |8085 |-     |IXIY |dec sp        |3B                                 |      6 T
+DEC SP                            |gbz80|-     |-    |dec sp        |3B                                 |      8 T
+DEC SP                            |gbz80|-     |IXIY |dec sp        |3B                                 |      8 T
+DEC SP                            |z80  |-     |-    |dec sp        |3B                                 |      6 T
+DEC SP                            |z80  |-     |IXIY |dec sp        |3B                                 |      6 T
+DEC SP                            |z80n |-     |-    |dec sp        |3B                                 |      6 T
+DEC SP                            |z80n |-     |IXIY |dec sp        |3B                                 |      6 T
 DI                                |8080 |-     |-    |di            |F3                                 |      4 T
 DI                                |8080 |-     |IXIY |di            |F3                                 |      4 T
 DI                                |8085 |-     |-    |di            |F3                                 |      4 T
@@ -1749,6 +1867,16 @@ INC B                             |z80  |-     |-    |inc b         |04         
 INC B                             |z80  |-     |IXIY |inc b         |04                                 |      4 T
 INC B                             |z80n |-     |-    |inc b         |04                                 |      4 T
 INC B                             |z80n |-     |IXIY |inc b         |04                                 |      4 T
+INC BC                            |8080 |-     |-    |inc bc        |03                                 |      5 T
+INC BC                            |8080 |-     |IXIY |inc bc        |03                                 |      5 T
+INC BC                            |8085 |-     |-    |inc bc        |03                                 |      6 T
+INC BC                            |8085 |-     |IXIY |inc bc        |03                                 |      6 T
+INC BC                            |gbz80|-     |-    |inc bc        |03                                 |      8 T
+INC BC                            |gbz80|-     |IXIY |inc bc        |03                                 |      8 T
+INC BC                            |z80  |-     |-    |inc bc        |03                                 |      6 T
+INC BC                            |z80  |-     |IXIY |inc bc        |03                                 |      6 T
+INC BC                            |z80n |-     |-    |inc bc        |03                                 |      6 T
+INC BC                            |z80n |-     |IXIY |inc bc        |03                                 |      6 T
 INC C                             |8080 |-     |-    |inc c         |0C                                 |      5 T
 INC C                             |8080 |-     |IXIY |inc c         |0C                                 |      5 T
 INC C                             |8085 |-     |-    |inc c         |0C                                 |      4 T
@@ -1769,6 +1897,16 @@ INC D                             |z80  |-     |-    |inc d         |14         
 INC D                             |z80  |-     |IXIY |inc d         |14                                 |      4 T
 INC D                             |z80n |-     |-    |inc d         |14                                 |      4 T
 INC D                             |z80n |-     |IXIY |inc d         |14                                 |      4 T
+INC DE                            |8080 |-     |-    |inc de        |13                                 |      5 T
+INC DE                            |8080 |-     |IXIY |inc de        |13                                 |      5 T
+INC DE                            |8085 |-     |-    |inc de        |13                                 |      6 T
+INC DE                            |8085 |-     |IXIY |inc de        |13                                 |      6 T
+INC DE                            |gbz80|-     |-    |inc de        |13                                 |      8 T
+INC DE                            |gbz80|-     |IXIY |inc de        |13                                 |      8 T
+INC DE                            |z80  |-     |-    |inc de        |13                                 |      6 T
+INC DE                            |z80  |-     |IXIY |inc de        |13                                 |      6 T
+INC DE                            |z80n |-     |-    |inc de        |13                                 |      6 T
+INC DE                            |z80n |-     |IXIY |inc de        |13                                 |      6 T
 INC E                             |8080 |-     |-    |inc e         |1C                                 |      5 T
 INC E                             |8080 |-     |IXIY |inc e         |1C                                 |      5 T
 INC E                             |8085 |-     |-    |inc e         |1C                                 |      4 T
@@ -1789,6 +1927,16 @@ INC H                             |z80  |-     |-    |inc h         |24         
 INC H                             |z80  |-     |IXIY |inc h         |24                                 |      4 T
 INC H                             |z80n |-     |-    |inc h         |24                                 |      4 T
 INC H                             |z80n |-     |IXIY |inc h         |24                                 |      4 T
+INC HL                            |8080 |-     |-    |inc hl        |23                                 |      5 T
+INC HL                            |8080 |-     |IXIY |inc hl        |23                                 |      5 T
+INC HL                            |8085 |-     |-    |inc hl        |23                                 |      6 T
+INC HL                            |8085 |-     |IXIY |inc hl        |23                                 |      6 T
+INC HL                            |gbz80|-     |-    |inc hl        |23                                 |      8 T
+INC HL                            |gbz80|-     |IXIY |inc hl        |23                                 |      8 T
+INC HL                            |z80  |-     |-    |inc hl        |23                                 |      6 T
+INC HL                            |z80  |-     |IXIY |inc hl        |23                                 |      6 T
+INC HL                            |z80n |-     |-    |inc hl        |23                                 |      6 T
+INC HL                            |z80n |-     |IXIY |inc hl        |23                                 |      6 T
 INC IND_HL RPAREN                 |8080 |-     |-    |inc (hl)      |34                                 |     10 T
 INC IND_HL RPAREN                 |8080 |-     |IXIY |inc (hl)      |34                                 |     10 T
 INC IND_HL RPAREN                 |8085 |-     |-    |inc (hl)      |34                                 |     10 T
@@ -1815,6 +1963,14 @@ INC IND_IY expr RPAREN            |z80  |expr  |-    |inc (iy+%d)   |FD 34 %d   
 INC IND_IY expr RPAREN            |z80  |expr  |IXIY |inc (iy+%d)   |DD 34 %d                           |     23 T
 INC IND_IY expr RPAREN            |z80n |expr  |-    |inc (iy+%d)   |FD 34 %d                           |     23 T
 INC IND_IY expr RPAREN            |z80n |expr  |IXIY |inc (iy+%d)   |DD 34 %d                           |     23 T
+INC IX                            |z80  |-     |-    |inc ix        |DD 23                              |     10 T
+INC IX                            |z80  |-     |IXIY |inc ix        |FD 23                              |     10 T
+INC IX                            |z80n |-     |-    |inc ix        |DD 23                              |     10 T
+INC IX                            |z80n |-     |IXIY |inc ix        |FD 23                              |     10 T
+INC IY                            |z80  |-     |-    |inc iy        |FD 23                              |     10 T
+INC IY                            |z80  |-     |IXIY |inc iy        |DD 23                              |     10 T
+INC IY                            |z80n |-     |-    |inc iy        |FD 23                              |     10 T
+INC IY                            |z80n |-     |IXIY |inc iy        |DD 23                              |     10 T
 INC L                             |8080 |-     |-    |inc l         |2C                                 |      5 T
 INC L                             |8080 |-     |IXIY |inc l         |2C                                 |      5 T
 INC L                             |8085 |-     |-    |inc l         |2C                                 |      4 T
@@ -1825,6 +1981,16 @@ INC L                             |z80  |-     |-    |inc l         |2C         
 INC L                             |z80  |-     |IXIY |inc l         |2C                                 |      4 T
 INC L                             |z80n |-     |-    |inc l         |2C                                 |      4 T
 INC L                             |z80n |-     |IXIY |inc l         |2C                                 |      4 T
+INC SP                            |8080 |-     |-    |inc sp        |33                                 |      5 T
+INC SP                            |8080 |-     |IXIY |inc sp        |33                                 |      5 T
+INC SP                            |8085 |-     |-    |inc sp        |33                                 |      6 T
+INC SP                            |8085 |-     |IXIY |inc sp        |33                                 |      6 T
+INC SP                            |gbz80|-     |-    |inc sp        |33                                 |      8 T
+INC SP                            |gbz80|-     |IXIY |inc sp        |33                                 |      8 T
+INC SP                            |z80  |-     |-    |inc sp        |33                                 |      6 T
+INC SP                            |z80  |-     |IXIY |inc sp        |33                                 |      6 T
+INC SP                            |z80n |-     |-    |inc sp        |33                                 |      6 T
+INC SP                            |z80n |-     |IXIY |inc sp        |33                                 |      6 T
 INR A                             |8080 |-     |-    |inr a         |3C                                 |      5 T
 INR A                             |8080 |-     |IXIY |inr a         |3C                                 |      5 T
 INR A                             |8085 |-     |-    |inr a         |3C                                 |      4 T
@@ -1905,6 +2071,76 @@ INR M                             |z80  |-     |-    |inr m         |34         
 INR M                             |z80  |-     |IXIY |inr m         |34                                 |     11 T
 INR M                             |z80n |-     |-    |inr m         |34                                 |     11 T
 INR M                             |z80n |-     |IXIY |inr m         |34                                 |     11 T
+INX B                             |8080 |-     |-    |inx b         |03                                 |      5 T
+INX B                             |8080 |-     |IXIY |inx b         |03                                 |      5 T
+INX B                             |8085 |-     |-    |inx b         |03                                 |      6 T
+INX B                             |8085 |-     |IXIY |inx b         |03                                 |      6 T
+INX B                             |gbz80|-     |-    |inx b         |03                                 |      8 T
+INX B                             |gbz80|-     |IXIY |inx b         |03                                 |      8 T
+INX B                             |z80  |-     |-    |inx b         |03                                 |      6 T
+INX B                             |z80  |-     |IXIY |inx b         |03                                 |      6 T
+INX B                             |z80n |-     |-    |inx b         |03                                 |      6 T
+INX B                             |z80n |-     |IXIY |inx b         |03                                 |      6 T
+INX BC                            |8080 |-     |-    |inx bc        |03                                 |      5 T
+INX BC                            |8080 |-     |IXIY |inx bc        |03                                 |      5 T
+INX BC                            |8085 |-     |-    |inx bc        |03                                 |      6 T
+INX BC                            |8085 |-     |IXIY |inx bc        |03                                 |      6 T
+INX BC                            |gbz80|-     |-    |inx bc        |03                                 |      8 T
+INX BC                            |gbz80|-     |IXIY |inx bc        |03                                 |      8 T
+INX BC                            |z80  |-     |-    |inx bc        |03                                 |      6 T
+INX BC                            |z80  |-     |IXIY |inx bc        |03                                 |      6 T
+INX BC                            |z80n |-     |-    |inx bc        |03                                 |      6 T
+INX BC                            |z80n |-     |IXIY |inx bc        |03                                 |      6 T
+INX D                             |8080 |-     |-    |inx d         |13                                 |      5 T
+INX D                             |8080 |-     |IXIY |inx d         |13                                 |      5 T
+INX D                             |8085 |-     |-    |inx d         |13                                 |      6 T
+INX D                             |8085 |-     |IXIY |inx d         |13                                 |      6 T
+INX D                             |gbz80|-     |-    |inx d         |13                                 |      8 T
+INX D                             |gbz80|-     |IXIY |inx d         |13                                 |      8 T
+INX D                             |z80  |-     |-    |inx d         |13                                 |      6 T
+INX D                             |z80  |-     |IXIY |inx d         |13                                 |      6 T
+INX D                             |z80n |-     |-    |inx d         |13                                 |      6 T
+INX D                             |z80n |-     |IXIY |inx d         |13                                 |      6 T
+INX DE                            |8080 |-     |-    |inx de        |13                                 |      5 T
+INX DE                            |8080 |-     |IXIY |inx de        |13                                 |      5 T
+INX DE                            |8085 |-     |-    |inx de        |13                                 |      6 T
+INX DE                            |8085 |-     |IXIY |inx de        |13                                 |      6 T
+INX DE                            |gbz80|-     |-    |inx de        |13                                 |      8 T
+INX DE                            |gbz80|-     |IXIY |inx de        |13                                 |      8 T
+INX DE                            |z80  |-     |-    |inx de        |13                                 |      6 T
+INX DE                            |z80  |-     |IXIY |inx de        |13                                 |      6 T
+INX DE                            |z80n |-     |-    |inx de        |13                                 |      6 T
+INX DE                            |z80n |-     |IXIY |inx de        |13                                 |      6 T
+INX H                             |8080 |-     |-    |inx h         |23                                 |      5 T
+INX H                             |8080 |-     |IXIY |inx h         |23                                 |      5 T
+INX H                             |8085 |-     |-    |inx h         |23                                 |      6 T
+INX H                             |8085 |-     |IXIY |inx h         |23                                 |      6 T
+INX H                             |gbz80|-     |-    |inx h         |23                                 |      8 T
+INX H                             |gbz80|-     |IXIY |inx h         |23                                 |      8 T
+INX H                             |z80  |-     |-    |inx h         |23                                 |      6 T
+INX H                             |z80  |-     |IXIY |inx h         |23                                 |      6 T
+INX H                             |z80n |-     |-    |inx h         |23                                 |      6 T
+INX H                             |z80n |-     |IXIY |inx h         |23                                 |      6 T
+INX HL                            |8080 |-     |-    |inx hl        |23                                 |      5 T
+INX HL                            |8080 |-     |IXIY |inx hl        |23                                 |      5 T
+INX HL                            |8085 |-     |-    |inx hl        |23                                 |      6 T
+INX HL                            |8085 |-     |IXIY |inx hl        |23                                 |      6 T
+INX HL                            |gbz80|-     |-    |inx hl        |23                                 |      8 T
+INX HL                            |gbz80|-     |IXIY |inx hl        |23                                 |      8 T
+INX HL                            |z80  |-     |-    |inx hl        |23                                 |      6 T
+INX HL                            |z80  |-     |IXIY |inx hl        |23                                 |      6 T
+INX HL                            |z80n |-     |-    |inx hl        |23                                 |      6 T
+INX HL                            |z80n |-     |IXIY |inx hl        |23                                 |      6 T
+INX SP                            |8080 |-     |-    |inx sp        |33                                 |      5 T
+INX SP                            |8080 |-     |IXIY |inx sp        |33                                 |      5 T
+INX SP                            |8085 |-     |-    |inx sp        |33                                 |      6 T
+INX SP                            |8085 |-     |IXIY |inx sp        |33                                 |      6 T
+INX SP                            |gbz80|-     |-    |inx sp        |33                                 |      8 T
+INX SP                            |gbz80|-     |IXIY |inx sp        |33                                 |      8 T
+INX SP                            |z80  |-     |-    |inx sp        |33                                 |      6 T
+INX SP                            |z80  |-     |IXIY |inx sp        |33                                 |      6 T
+INX SP                            |z80n |-     |-    |inx sp        |33                                 |      6 T
+INX SP                            |z80n |-     |IXIY |inx sp        |33                                 |      6 T
 LD A COMMA A                      |8080 |-     |-    |ld a, a       |7F                                 |      5 T
 LD A COMMA A                      |8080 |-     |IXIY |ld a, a       |7F                                 |      5 T
 LD A COMMA A                      |8085 |-     |-    |ld a, a       |7F                                 |      4 T

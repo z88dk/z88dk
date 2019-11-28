@@ -165,14 +165,25 @@
  dcr h                          ; 25
  dcr l                          ; 2D
  dcr m                          ; 35
+ dcx b                          ; 0B
+ dcx bc                         ; 0B
+ dcx d                          ; 1B
+ dcx de                         ; 1B
+ dcx h                          ; 2B
+ dcx hl                         ; 2B
+ dcx sp                         ; 3B
  dec (hl)                       ; 35
  dec a                          ; 3D
  dec b                          ; 05
+ dec bc                         ; 0B
  dec c                          ; 0D
  dec d                          ; 15
+ dec de                         ; 1B
  dec e                          ; 1D
  dec h                          ; 25
+ dec hl                         ; 2B
  dec l                          ; 2D
+ dec sp                         ; 3B
  di                             ; F3
  ei                             ; FB
  ex (sp), hl                    ; CD @ex_sp_hl
@@ -182,11 +193,15 @@
  inc (hl)                       ; 34
  inc a                          ; 3C
  inc b                          ; 04
+ inc bc                         ; 03
  inc c                          ; 0C
  inc d                          ; 14
+ inc de                         ; 13
  inc e                          ; 1C
  inc h                          ; 24
+ inc hl                         ; 23
  inc l                          ; 2C
+ inc sp                         ; 33
  inr a                          ; 3C
  inr b                          ; 04
  inr c                          ; 0C
@@ -195,6 +210,13 @@
  inr h                          ; 24
  inr l                          ; 2C
  inr m                          ; 34
+ inx b                          ; 03
+ inx bc                         ; 03
+ inx d                          ; 13
+ inx de                         ; 13
+ inx h                          ; 23
+ inx hl                         ; 23
+ inx sp                         ; 33
  ld (-32768), a                 ; EA 00 80
  ld (-32768), sp                ; 08 00 80
  ld (32767), a                  ; EA FF 7F
