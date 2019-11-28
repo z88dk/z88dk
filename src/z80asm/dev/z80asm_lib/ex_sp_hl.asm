@@ -1,5 +1,12 @@
 ; Substitute for the z80 ex (sp),hl instruction
-
+; CPU   Min T Max T
+; 8080   18    18
+; 8085   16    16
+; gbz80 148   148
+; r2k    15    15
+; z180   16    16
+; z80    19    19
+; z80n   19    19
 
 IF __CPU_GBZ80__
 SECTION code_crt0_sccz80

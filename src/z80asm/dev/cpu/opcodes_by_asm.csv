@@ -10909,13 +10909,13 @@ sbc hl', hl            |             |        |            |76 ED 62   |~       
                        |             |        |            |           |        |           |           |           
 sbc hl', sp            |             |        |            |76 ED 72   |~       |           |           |           
                        |             |        |            |           |        |           |           |           
-sbc hl, bc             |             |        |            |ED 42      |~       |~          |~          |~          
+sbc hl, bc             |CD @sbc_hl_bc|~       |~           |ED 42      |~       |~          |~          |~          
                        |             |        |            |           |        |           |           |           
-sbc hl, de             |             |        |            |ED 52      |~       |~          |~          |~          
+sbc hl, de             |CD @sbc_hl_de|~       |~           |ED 52      |~       |~          |~          |~          
                        |             |        |            |           |        |           |           |           
-sbc hl, hl             |             |        |            |ED 62      |~       |~          |~          |~          
+sbc hl, hl             |CD @sbc_hl_hl|~       |~           |ED 62      |~       |~          |~          |~          
                        |             |        |            |           |        |           |           |           
-sbc hl, sp             |             |        |            |ED 72      |~       |~          |~          |~          
+sbc hl, sp             |CD @sbc_hl_sp|~       |~           |ED 72      |~       |~          |~          |~          
                        |             |        |            |           |        |           |           |           
 sbc ixh                |             |        |            |           |        |           |DD 9C      |~          
                        |             |        |            |           |        |           |           |           

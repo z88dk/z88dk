@@ -34,6 +34,10 @@
  adc d                          ; 8A
  adc e                          ; 8B
  adc h                          ; 8C
+ adc hl, bc                     ; ED 4A
+ adc hl, de                     ; ED 5A
+ adc hl, hl                     ; ED 6A
+ adc hl, sp                     ; ED 7A
  adc l                          ; 8D
  adc m                          ; 8E
  add (hl)                       ; 86
@@ -69,6 +73,18 @@
  add d                          ; 82
  add e                          ; 83
  add h                          ; 84
+ add hl, bc                     ; 09
+ add hl, de                     ; 19
+ add hl, hl                     ; 29
+ add hl, sp                     ; 39
+ add ix, bc                     ; FD 09
+ add ix, de                     ; FD 19
+ add ix, ix                     ; FD 29
+ add ix, sp                     ; FD 39
+ add iy, bc                     ; DD 09
+ add iy, de                     ; DD 19
+ add iy, iy                     ; DD 29
+ add iy, sp                     ; DD 39
  add l                          ; 85
  add m                          ; 86
  adi -128                       ; C6 80
@@ -239,6 +255,7 @@
  ex af, af                      ; 08
  ex af, af'                     ; 08
  ex de, hl                      ; EB
+ exx                            ; D9
  halt                           ; 76
  hlt                            ; 76
  im %c                          ; ED %c==00?00x2E:%c==01?00x38:00x05E
@@ -824,6 +841,10 @@
  sbc d                          ; 9A
  sbc e                          ; 9B
  sbc h                          ; 9C
+ sbc hl, bc                     ; ED 42
+ sbc hl, de                     ; ED 52
+ sbc hl, hl                     ; ED 62
+ sbc hl, sp                     ; ED 72
  sbc l                          ; 9D
  sbi -128                       ; DE 80
  sbi 127                        ; DE 7F

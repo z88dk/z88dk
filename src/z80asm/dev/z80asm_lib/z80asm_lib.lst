@@ -1,6 +1,9 @@
 adc_hl_hl.asm
 adc_hl_bc.asm
 ldi.asm
+sbc_hl_sp.asm
+sbc_hl_de.asm
+sbc_hl_hl.asm
 rld.asm
 cpd.asm
 ldir.asm
@@ -17,3 +20,4 @@ cpi.asm
 add_bc_a.asm
 adc_hl_sp.asm
 adc_hl_de.asm
+sbc_hl_bc.asm

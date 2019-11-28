@@ -629,6 +629,11 @@ sub init_opcodes {
 			add(	"ex (sp), hl",	B(0xCD, '@__z80asm__ex_sp_hl'), T(148));
 		}
 
+		# exx
+		if (!isintel && !isgbz80) {
+			add(	"exx",			B(0xD9), T(4));
+		}
+		
 		#----------------------------------------------------------------------
 		# Block Transfer
 		#----------------------------------------------------------------------
@@ -799,6 +804,81 @@ sub init_opcodes {
 		$T = T(4);
 		add("scf",			$B, $T);
 		add("stc",			$B, $T);
+
+		#----------------------------------------------------------------------
+		# 16-bit arithmetic
+		#----------------------------------------------------------------------
+		
+		# add hl/ix/iy, ss
+		for $r (qw( bc de hl sp )) {
+			$B = B(0x09+RP($r)*16);
+			$T = isintel ? T(10) : isgbz80 ? T(8) : T(11);
+			add(	"add hl, $r",	$B, $T);
+			add_ix(	"add hl, $r",	$B, $T+4);
+		}
+
+		# adc hl, ss
+		for $r (qw( bc de hl sp )) {
+			if (isintel||isgbz80) {
+				$B = B(0xcd, '@__z80asm__adc_hl_'.$r);
+				if ($r eq 'bc' || $r eq 'de') { 
+					$T = is8080 ? T(47,52) : is8085 ? T(48,51) : T(36,44); 
+				} 
+				elsif ($r eq 'hl') { 
+					$T = is8080 ? T(110) : is8085 ? T(111) : T(84); 
+				}
+				elsif ($r eq 'sp') { 
+					$T = is8080 ? T(57,62) : is8085 ? T(60,63) : T(52,60); 
+				} 
+				else {
+					die;
+				}
+				add("adc hl, $r", 	$B, $T);
+			}
+			else {
+				$B = B(0xED, 0x4A+RP($r)*16);
+				$T = T(15);
+				add("adc hl, $r",	$B, $T);
+			}
+		}
+		
+		# sbc hl, ss
+		for $r (qw( bc de hl sp )) {
+			if (isintel||isgbz80) {
+				$B = B(0xcd, '@__z80asm__sbc_hl_'.$r);
+				if ($r eq 'bc' || $r eq 'de') { 
+					$T = is8080 ? T(86) : is8085 ? T(82) : T(80); 
+				} 
+				elsif ($r eq 'hl') { 
+					$T = is8080 ? T(38,47) : is8085 ? T(40,50) : T(32,48); 
+				}
+				elsif ($r eq 'sp') { 
+					$T = is8080 ? T(156) : is8085 ? T(152) : T(232); 
+				} 
+				else {
+					die;
+				}
+				add("sbc hl, $r", 	$B, $T);
+			}
+			else {
+				$B = B(0xED, 0x42+RP($r)*16);
+				$T = T(15);
+				add("sbc hl, $r",	$B, $T);
+			}
+		}
+		
+#		for my $r (qw( bc de hl sp )) {
+#		add_opc($cpu, "sbc hl, $r", 0xED, 0x42 + $V{$r}*16) if !$intel && !$gameboy;
+		
+#		add_opc($cpu, "inc $r", 0x03 + $V{$r}*16);
+#		add_opc($cpu, "dec $r", 0x0B + $V{$r}*16);
+#	}
+
+		
+#			add("inc $r",		0x03+RP($r)*16, is8080 ? 5 : is8085 ? 6 : isgbz80 ? 8 : die);
+#			add("dec $r",		0x0B+RP($r)*16, is8080 ? 5 : is8085 ? 6 : isgbz80 ? 8 : die);
+
+
 		
 		#----------------------------------------------------------------------
 		# General Purpose CPU Control
@@ -883,11 +963,6 @@ sub init_opcodes {
 			add("dad $r",		0x09+RP($r)*16, isintel ? 10 : isgbz80 ? 8 : die);
 		}
 		
-		for $r (qw( bc de hl sp )) {
-			add("inc $r",		0x03+RP($r)*16, is8080 ? 5 : is8085 ? 6 : isgbz80 ? 8 : die);
-			add("dec $r",		0x0B+RP($r)*16, is8080 ? 5 : is8085 ? 6 : isgbz80 ? 8 : die);
-			add("add hl, $r",	0x09+RP($r)*16, isintel ? 10 : isgbz80 ? 8 : die);
-		}
 
 		for my $op (qw( rlca rrca rla  rra
 						rlc  rrc  ral  rar )) {

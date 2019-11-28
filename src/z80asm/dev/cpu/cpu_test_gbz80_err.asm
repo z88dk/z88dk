@@ -6401,10 +6401,6 @@
  sbc hl', de                    ; Error
  sbc hl', hl                    ; Error
  sbc hl', sp                    ; Error
- sbc hl, bc                     ; Error
- sbc hl, de                     ; Error
- sbc hl, hl                     ; Error
- sbc hl, sp                     ; Error
  sbc ixh                        ; Error
  sbc ixl                        ; Error
  sbc iyh                        ; Error

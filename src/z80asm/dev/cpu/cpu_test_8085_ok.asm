@@ -957,6 +957,10 @@
  sbc d                          ; 9A
  sbc e                          ; 9B
  sbc h                          ; 9C
+ sbc hl, bc                     ; CD @__z80asm__sbc_hl_bc
+ sbc hl, de                     ; CD @__z80asm__sbc_hl_de
+ sbc hl, hl                     ; CD @__z80asm__sbc_hl_hl
+ sbc hl, sp                     ; CD @__z80asm__sbc_hl_sp
  sbc l                          ; 9D
  sbi -128                       ; DE 80
  sbi 127                        ; DE 7F

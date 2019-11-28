@@ -22,6 +22,14 @@
  add a, (iy)                    ; Error
  add a, (iy+-128)               ; Error
  add a, (iy+127)                ; Error
+ add ix, bc                     ; Error
+ add ix, de                     ; Error
+ add ix, ix                     ; Error
+ add ix, sp                     ; Error
+ add iy, bc                     ; Error
+ add iy, de                     ; Error
+ add iy, iy                     ; Error
+ add iy, sp                     ; Error
  and (ix)                       ; Error
  and (ix+-128)                  ; Error
  and (ix+127)                   ; Error
@@ -68,6 +76,7 @@
  ex (sp), iy                    ; Error
  ex af, af                      ; Error
  ex af, af'                     ; Error
+ exx                            ; Error
  im %c                          ; Error
  inc (ix)                       ; Error
  inc (ix+-128)                  ; Error

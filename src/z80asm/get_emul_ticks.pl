@@ -6,6 +6,10 @@
 use Modern::Perl;
 use Path::Tiny;
 use Text::Table;
+use Config;
+
+# run z80asm from .
+$ENV{PATH} = ".".$Config{path_sep}.$ENV{PATH};
 
 my $asm = "@ARGV\n"; $asm =~ s/\s*:\s*/\n/g;
 my $tb = Text::Table->new("CPU", "Min T", "Max T");

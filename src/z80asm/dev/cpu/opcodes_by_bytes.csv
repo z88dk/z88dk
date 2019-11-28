@@ -4420,6 +4420,14 @@ CD @rld                      |             |            |             |rld      
                              |             |            |             |                       |         |               |              |              
 CD @rrd                      |             |            |             |rrd                    |~        |               |              |              
                              |             |            |             |                       |         |               |              |              
+CD @sbc_hl_bc                |sbc hl, bc   |~           |~            |                       |         |               |              |              
+                             |             |            |             |                       |         |               |              |              
+CD @sbc_hl_de                |sbc hl, de   |~           |~            |                       |         |               |              |              
+                             |             |            |             |                       |         |               |              |              
+CD @sbc_hl_hl                |sbc hl, hl   |~           |~            |                       |         |               |              |              
+                             |             |            |             |                       |         |               |              |              
+CD @sbc_hl_sp                |sbc hl, sp   |~           |~            |                       |         |               |              |              
+                             |             |            |             |                       |         |               |              |              
 CE %n                        |aci %n       |~           |~            |~                      |~        |~              |~             |~             
                              |adc %n       |            |             |                       |         |               |              |              
                              |adc a, %n    |            |             |                       |         |               |              |              

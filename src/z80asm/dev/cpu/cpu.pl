@@ -688,7 +688,7 @@ for my $cpu (@CPUS) {
 	# ADC
 	for my $r (qw( bc de hl sp )) {
 		if ($intel || $gameboy) {
-			add_opc($cpu, "adc hl, $r",	call(), '@__z80asm__adc_hl_'.$r, '');
+			add_opc($cpu, "adc hl, $r",		call(), '@__z80asm__adc_hl_'.$r, '');
 		}
 		else {
 			add_opc($cpu, "adc hl, $r", 	0xED, 0x4A + $V{$r}*16);
@@ -731,8 +731,12 @@ for my $cpu (@CPUS) {
 	
 	
 	for my $r (qw( bc de hl sp )) {
-		add_opc($cpu, "sbc hl, $r", 0xED, 0x42 + $V{$r}*16) if !$intel && !$gameboy;
-		
+		if ($intel||$gameboy) {
+			add_opc($cpu, "sbc hl, $r", call(), '@__z80asm__sbc_hl_'.$r, '');
+		}
+		else {
+			add_opc($cpu, "sbc hl, $r", 0xED, 0x42 + $V{$r}*16);
+		}
 		add_opc($cpu, "inc $r", 0x03 + $V{$r}*16);
 		add_opc($cpu, "dec $r", 0x0B + $V{$r}*16);
 	}
