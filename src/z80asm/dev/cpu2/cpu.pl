@@ -28,10 +28,9 @@ our %CPU_I; for (0 .. $#CPUS) { $CPU_I{$CPUS[$_]} = $_; }
 our $cpu = 'z80';
 our $ixiy;
 
-our $opcodes_file 			= path(path($0)->dirname, "opcodes.csv");
-our $opcodes_by_asm_file 	= path(path($0)->dirname, "opcodes_by_asm.csv");
-our $opcodes_by_bytes_file 	= path(path($0)->dirname, "opcodes_by_bytes.csv");
-our @opcodes_files 			= ($opcodes_file, $opcodes_by_asm_file, $opcodes_by_bytes_file);
+our $opcodes_asm_file 		= path(path($0)->dirname, "opcodes_asm.csv");
+our $opcodes_bytes_file 	= path(path($0)->dirname, "opcodes_bytes.csv");
+our @opcodes_files 			= ($opcodes_asm_file, $opcodes_bytes_file);
 
 our $cpu_rules_file			= path(path($0)->dirname, "cpu_rules.h");
 our $parser_table_file		= path(path($0)->dirname, "parser.csv");
@@ -1270,35 +1269,61 @@ sub add_compound {
 
 #------------------------------------------------------------------------------
 sub write_opcodes {
-	write_opcodes_table();
-	write_opcodes_by_asm();
-}
-
-#------------------------------------------------------------------------------
-sub write_opcodes_table {
 	# build list
 	my @rows;
 	for my $asm (sort keys %Opcodes) {
-		for $cpu (sort keys %{$Opcodes{$asm}}) {
-			my $prog = $Opcodes{$asm}{$cpu};
-			write_opcodes_line(\@rows, $asm, $cpu, $prog);
+		for $cpu (@CPUS) {
+			if (exists $Opcodes{$asm}{$cpu}) {
+				my $prog = $Opcodes{$asm}{$cpu};
+				write_opcodes_line(\@rows, $asm, $cpu, $prog);
+			}
+			else {
+				write_opcodes_line(\@rows, $asm, $cpu, undef);
+			}
 		}
 	}
 	
-	# sort
-	@rows = sort {$a->[0] cmp $b->[0]} @rows;
+	# by asm
+	my @rows_asm = sort {$a->[0] cmp $b->[0]} @rows;
+	insert_separator_lines(\@rows_asm);
+	my $tb_asm = Text::Table->new("; Assembly", \$table_separator, "CPU", \$table_separator, 
+								  "Bytes", \$table_separator, "T-States");
+	write_table($tb_asm, \@rows_asm, $opcodes_asm_file);
 	
-	# create table
-	my $tb = Text::Table->new("; Assembly", \$table_separator, "CPU", \$table_separator, 
-							  "Bytes", \$table_separator, "T-States");
-	for (@rows) {
+	# by opcodes
+	my @rows_bytes = sort {$a->[0] cmp $b->[0]} 
+					grep {$_->[0] =~ /^\w+/} 
+					map {[ @{$_}[2,1,0,3] ]} @rows;
+	insert_separator_lines(\@rows_bytes);
+	my $tb_bytes = Text::Table->new("; Bytes", \$table_separator, "CPU", \$table_separator, 
+								  "Assembly", \$table_separator, "T-States");
+	write_table($tb_bytes, \@rows_bytes, $opcodes_bytes_file);
+}
+
+#------------------------------------------------------------------------------
+sub insert_separator_lines {
+	my($rows) = @_;
+	my $i = 0;
+	while ($i+1 < @$rows) {
+		if ($rows->[$i][0] ne $rows->[$i+1][0]) {
+			splice(@$rows, $i+1, 0, [(" ") x 4]);
+			$i++;
+		}
+		$i++;
+	}
+}
+
+#------------------------------------------------------------------------------
+sub write_table {
+	my($tb, $rows, $file) = @_;
+	
+	for (@$rows) {
 		$tb->add(@$_);
 	}
 	
-	# write to file
-	say "Write ",$opcodes_file;
-	$opcodes_file->spew_raw($tb->table);
-}
+	say "Write ",$file;
+	$file->spew_raw($tb->table);
+}	
 
 #------------------------------------------------------------------------------
 sub write_opcodes_line {
@@ -1306,138 +1331,32 @@ sub write_opcodes_line {
 	
 	if ($asm =~ /^(bit|res|set) %c/) {
 		for my $c (0..7) {
-			write_opcodes_line($rows, replace($asm, '%c', $c), $cpu, $prog->clone(c => $c));
+			write_opcodes_line($rows, replace($asm, '%c', $c), $cpu, 
+							   defined($prog) ? $prog->clone(c => $c) : undef);
 		}
 	}
 	elsif ($asm =~ /^rst %c/) {
 		$::cpu = $cpu;
 		for my $c (restarts()) {
-			write_opcodes_line($rows, replace($asm, '%c', $c), $cpu, $prog->clone(c => $c));
+			write_opcodes_line($rows, replace($asm, '%c', $c), $cpu, 
+							   defined($prog) ? $prog->clone(c => $c) : undef);
 			if ($c != 0) {
-				write_opcodes_line($rows, replace($asm, '%c', $c/8), $cpu, $prog->clone(c => $c));
+				write_opcodes_line($rows, replace($asm, '%c', $c/8), $cpu, 
+								   defined($prog) ? $prog->clone(c => $c) : undef);
 			}
 		}
 	}
 	elsif ($asm =~ /^im %c/) {
 		for my $c (0..2) {
-			write_opcodes_line($rows, replace($asm, '%c', $c), $cpu, $prog->clone(c => $c));
+			write_opcodes_line($rows, replace($asm, '%c', $c), $cpu, 
+							   defined($prog) ? $prog->clone(c => $c) : undef);
 		}
 	}
 	else {
-		my @row = (format_asm($asm), $cpu, $prog->format_bytes,
-				   $prog->ticks->to_string);			
+		my @row = (format_asm($asm), $cpu, 
+				   defined($prog) ? $prog->format_bytes : "   **",
+				   defined($prog) ? $prog->ticks->to_string : "   **");			
 		push(@$rows, \@row);
-	}
-}
-
-#------------------------------------------------------------------------------
-sub write_opcodes_by_asm {
-	# build table with assembly per cpu
-	my %by_bytes;
-	
-	# build title
-	my %cpu_column;
-	my $column;
-
-	my @title = ("; Assembly");
-	for (@CPUS) { 
-		push @title, \$table_separator, $_;
-	}
-		
-	# build list
-	my @rows;
-	for my $asm (sort keys %Opcodes) {
-		my @progs = ((undef) x (scalar(@CPUS)));
-		for $cpu (sort keys %{$Opcodes{$asm}}) {
-			my $prog = $Opcodes{$asm}{$cpu};
-			$column = $CPU_I{$cpu};
-			$progs[$column] = [$cpu, $prog->clone];
-		}
-		write_opcodes_by_asm_line(\@rows, \%by_bytes, format_asm($asm), @progs);
-	}
-
-	# sort
-	@rows = sort {$a->[0] cmp $b->[0]} @rows;
-	
-	# create table
-	my $tb = Text::Table->new(@title);
-	for (@rows) {
-		my($asm, @progs) = @$_;
-		
-		my @bytes = map {ref($_) ? $_->[1]->format_bytes : " "} @progs;
-		$tb->add($asm, span_cells(@bytes));
-		
-		my @ticks = map {ref($_) ? $_->[1]->ticks->to_string : " "} @progs;
-		$tb->add(" ", span_cells(@ticks));
-		
-		$tb->add((" ") x $tb->n_cols);
-	}
-	
-	# write to file
-	say "Write ",$opcodes_by_asm_file;
-	$opcodes_by_asm_file->spew_raw($tb->table);
-	
-	# build table with opcodes per CPU
-	$title[0] = ";Bytes";
-	$tb = Text::Table->new(@title);
-	for my $bytes (sort keys %by_bytes) {
-		my @row = ($bytes, (" ") x ($tb->n_cols - 1));
-		for $cpu (keys %{$by_bytes{$bytes}}) {
-			$column = 1 + $CPU_I{$cpu};
-			$row[$column] = $by_bytes{$bytes}{$cpu};
-		}
-		$tb->add(span_cells(@row));
-		$tb->add((" ") x $tb->n_cols);
-	}
-	say "Write ",$opcodes_by_bytes_file;
-	$opcodes_by_bytes_file->spew_raw($tb->table);
-}
-
-#------------------------------------------------------------------------------
-sub write_opcodes_by_asm_line {
-	my($rows, $by_bytes, $asm, @progs) = @_;
-	
-	if ($asm =~ /^(bit|res|set) %c/) {
-		for my $c (0..7) {
-			my @progs1 = map {ref($_) ? [$_->[0], $_->[1]->clone(c => $c)] : $_} @progs;
-			write_opcodes_by_asm_line($rows, $by_bytes, replace($asm, '%c', $c), @progs1);
-		}
-	}
-	elsif ($asm =~ /^rst %c/) {
-		for my $c (0..7) {
-			my @progs1 = map {ref($_) ? [$_->[0], $_->[1]->clone(c => $c*8)] : $_} @progs;
-			write_opcodes_by_asm_line($rows, $by_bytes, replace($asm, '%c', $c*8), @progs1);
-			if ($c != 0) {
-				my @progs1 = map {ref($_) ? [$_->[0], $_->[1]->clone(c => $c*8)] : $_} @progs;
-				write_opcodes_by_asm_line($rows, $by_bytes, replace($asm, '%c', $c), @progs1);
-			}
-		}
-	}
-	elsif ($asm =~ /^im %c/) {
-		for my $c (0..2) {
-			my @progs1 = map {ref($_) ? [$_->[0], $_->[1]->clone(c => $c)] : $_} @progs;
-			write_opcodes_by_asm_line($rows, $by_bytes, replace($asm, '%c', $c), @progs1);
-		}
-	}
-	else {
-		my @progs1 = map {ref($_) ? [$_->[0], $_->[1]->clone] : $_} @progs;
-		push(@$rows, [$asm, @progs1]);
-
-		for (@progs1) {
-			next unless ref($_);
-			($cpu, my $prog) = @$_;
-			my $f_bytes = $prog->format_bytes;
-			
-			if ($asm =~ /^rst (\d+)/) {
-				my $target = $1; $target *= 8 if $target < 8;
-				my @restarts = restarts();
-				my %restarts; for (@restarts) { $restarts{$_}=1; }
-				next unless $restarts{$target};
-			}
-
-			$by_bytes->{$f_bytes}{$cpu} .= "\n" if $by_bytes->{$f_bytes}{$cpu};
-			$by_bytes->{$f_bytes}{$cpu} .= $asm;
-		}
 	}
 }
 
