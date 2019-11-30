@@ -20,7 +20,7 @@ IF __CRTCFG = 0
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    defc TAR__crt_org_code              = 0
-   defc TAR__crt_org_data              = 0
+   defc TAR__crt_org_data              = 0x8000
    defc TAR__crt_org_bss               = -1
 
    defc TAR__crt_model                 = 2
@@ -68,14 +68,14 @@ ENDIF
 IF __CRTCFG = 1
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ;;;; application with romwbw driver model ;;;;;;;;;;;;;;;;;;
+   ;;;; application with romwbw hbios driver model ;;;;;;;;;;;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    defc TAR__crt_org_code              = 0x0100
-   defc TAR__crt_org_data              = 0
-   defc TAR__crt_org_bss               = 0x8000
+   defc TAR__crt_org_data              = 0x8000
+   defc TAR__crt_org_bss               = -1
 
-   defc TAR__crt_model                 = 0
+   defc TAR__crt_model                 = 2
 
    defc TAR__register_sp               = 0xF000
    defc TAR__crt_stack_size            = 256
@@ -120,7 +120,7 @@ ENDIF
 IF __CRTCFG = 2
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ;; cp/m ram model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;;;; application with cp/m ram model ;;;;;;;;;;;;;;;;;;;;;;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    defc TAR__crt_org_code              = 0x100
@@ -156,7 +156,7 @@ IF __CRTCFG = 2
    defc TAR__clib_quickexit_stack_size = 0
    
    defc TAR__clib_malloc_heap_size     = -1
-   defc TAR__clib_stdio_heap_size      = 256
+   defc TAR__clib_stdio_heap_size      = 128
    
    defc TAR__clib_balloc_table_size    = 0
    
@@ -168,7 +168,7 @@ ENDIF
 IF __CRTCFG = 3
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ;; no drivers model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;;;; application with no drivers model ;;;;;;;;;;;;;;;;;;;;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    defc TAR__crt_org_code              = 0x0100

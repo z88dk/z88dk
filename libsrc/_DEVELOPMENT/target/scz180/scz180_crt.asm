@@ -14,7 +14,7 @@ ENDIF
 
 IF !DEFINED_startup
 	defc	DEFINED_startup = 1
-	defc startup = 16
+	defc startup = 8
 	IFNDEF startup
 	ENDIF
 ENDIF
@@ -60,7 +60,7 @@ IFNDEF startup
 
    ; startup undefined so select a default
 
-   defc startup = 16
+   defc startup = 8
 
 ENDIF
 
@@ -72,18 +72,18 @@ ENDIF
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; scm drivers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; rom driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; app drivers;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; hbios driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-   ; scm hbios0 drivers installed on stdin, stdout, stderr
-   ; scm hbios1 drivers installed on ttyin, ttyout, ttyerr
+   ; romwbw hbios0 drivers installed on stdin, stdout, stderr
+   ; romwbw hbios1 drivers installed on ttyin, ttyout, ttyerr
 
    IFNDEF __CRTCFG
 
@@ -103,7 +103,7 @@ ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;            scz180 romwbw application target               ;;
-;; generated from target/scz180/startup/scz180_crt_16.asm.m4 ;;
+;; generated from target/scz180/startup/scz180_crt_8.asm.m4  ;;
 ;;                                                           ;;
 ;;                  flat 64k address space                   ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

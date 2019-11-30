@@ -64,10 +64,11 @@ rc_01_output_hbios0_oterm_msg_putc_raw:
 rc_01_output_hbios0_oterm_msg_putc_send:
 
    ; c = char
+
    ld e,c
 
    ld bc,BF_CIOOUT<<8|0x00
-   call asm_hbios               ; block and send character in Rx buffer
+   call asm_hbios               ; block and send character in Tx buffer
 
    or a
    ret
