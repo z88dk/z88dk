@@ -3,4 +3,7 @@ stdio/tvc/fputc_cons
 games/tvc/joystick
 @games/games.lst
 time/tvc/clock
+tvc/asm_tvc_ed_getch
+tvc/asm_tvc_ed_cfix
+tvc/tvc_fgets_cons
 @z80.lst

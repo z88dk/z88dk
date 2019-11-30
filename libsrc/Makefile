@@ -834,6 +834,7 @@ tvc_clib.lib:
 	$(MAKE) gfxdeps
 	$(call buildgeneric,tvc)
 	$(MAKE) -C games TARGET=tvc
+	$(MAKE) -C tvc
 	TARGET=tvc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORtvc -x$(OUTPUT_DIRECTORY)/tvc_clib @$(LISTFILE_DIRECTORY)/tvc.lst
 
 
@@ -1563,6 +1564,8 @@ classic-clean:
 	$(MAKE) -C arch clean
 	$(MAKE) -C target clean
 	$(MAKE) -C video/tms9918 clean
+	$(MAKE) -C tvc clean
+
 	$(RM) *.lib
 
 new-clean:
