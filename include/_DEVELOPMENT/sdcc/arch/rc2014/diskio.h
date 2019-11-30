@@ -77,13 +77,13 @@ typedef enum {
 // IDE DISK COMMANDS
 //
 
-extern DSTATUS disk_initialize(BYTE pdrv) __preserves_regs(b,c,d,e,iyh,iyl);
-extern DSTATUS disk_initialize_fastcall(BYTE pdrv) __preserves_regs(b,c,d,e,iyh,iyl) __z88dk_fastcall;
+extern DSTATUS disk_initialize(BYTE pdrv) __preserves_regs(iyh,iyl);
+extern DSTATUS disk_initialize_fastcall(BYTE pdrv) __preserves_regs(iyh,iyl) __z88dk_fastcall;
 #define disk_initialize(a) disk_initialize_fastcall(a)
 
 
-extern DSTATUS disk_status(BYTE pdrv) __preserves_regs(d,e,iyh,iyl);
-extern DSTATUS disk_status_fastcall(BYTE pdrv) __preserves_regs(d,e,iyh,iyl) __z88dk_fastcall;
+extern DSTATUS disk_status(BYTE pdrv) __preserves_regs(iyh,iyl);
+extern DSTATUS disk_status_fastcall(BYTE pdrv) __preserves_regs(iyh,iyl) __z88dk_fastcall;
 #define disk_status(a) disk_status_fastcall(a)
 
 
@@ -97,8 +97,8 @@ extern DRESULT disk_write_callee(BYTE pdrv,const BYTE* buff,DWORD sector,UINT co
 #define disk_write(a,b,c,d) disk_write_callee(a,b,c,d)
 
 
-extern DRESULT disk_ioctl(BYTE pdrv,BYTE cmd,void* buff) __preserves_regs(d,e,iyh,iyl);
-extern DRESULT disk_ioctl_callee(BYTE pdrv,BYTE cmd,void* buff) __preserves_regs(d,e,iyh,iyl) __z88dk_callee;
+extern DRESULT disk_ioctl(BYTE pdrv,BYTE cmd,void* buff) __preserves_regs(iyh,iyl);
+extern DRESULT disk_ioctl_callee(BYTE pdrv,BYTE cmd,void* buff) __preserves_regs(iyh,iyl) __z88dk_callee;
 #define disk_ioctl(a,b,c) disk_ioctl_callee(a,b,c)
 
 

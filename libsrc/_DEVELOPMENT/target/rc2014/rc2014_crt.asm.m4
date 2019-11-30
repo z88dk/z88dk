@@ -86,6 +86,30 @@ ifelse(__STARTUP, 4,
 ')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; hbios driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ifelse(__STARTUP, 8,
+`
+   ; romwbw hbios0 drivers installed on stdin, stdout, stderr
+   ; romwbw hbios1 drivers installed on ttyin, ttyout, ttyerr
+
+   IFNDEF __CRTCFG
+
+      defc __CRTCFG = 2
+
+   ENDIF
+
+   IFNDEF __MMAP
+
+      defc __MMAP = 0
+
+   ENDIF
+
+   include(`startup/rc2014_crt_8.asm.m4')
+')
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; basic driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -95,7 +119,7 @@ ifelse(__STARTUP, 16,
 
    IFNDEF __CRTCFG
 
-      defc __CRTCFG = 2
+      defc __CRTCFG = 3
 
    ENDIF
 
@@ -124,7 +148,7 @@ ifelse(__STARTUP, 64,
 
    IFNDEF __CRTCFG
 
-      defc __CRTCFG = 3
+      defc __CRTCFG = 4
 
    ENDIF
 
@@ -147,7 +171,7 @@ ifelse(__STARTUP, 256,
 
    IFNDEF __CRTCFG
 
-      defc __CRTCFG = 4
+      defc __CRTCFG = 5
 
    ENDIF
 
