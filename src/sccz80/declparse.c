@@ -857,6 +857,12 @@ Type *parse_decl(char name[], Type *base_type)
         }
     }
 
+    if ( match("const")) {
+        base_type->isconst = 1;
+    } else {
+        swallow("volatile");
+    }
+
     if ( rcmatch('*')) {
         Type *ptr;
         needchar('*');
@@ -1078,7 +1084,8 @@ Type *dodeclare(enum storage_type storage)
             snprintf(drop_name, sizeof(drop_name), "__extern_%s", type->name);                        
         }
 
-         if ( cmatch(';')) {
+        sym->isassigned = 1;
+        if ( cmatch(';')) {
              // Maybe not right
             sym->bss_section = STRDUP(get_section_name(sym->ctype->namespace, c_bss_section));
             return type;
@@ -1426,6 +1433,10 @@ void type_describe(Type *type, UT_string *output)
 
     if ( type->namespace ) {
         utstring_printf(output,"%s ", type->namespace);
+    }
+
+    if ( type->isconst ) {
+        utstring_printf(output,"const ");
     }
    
     switch ( type->kind ) {

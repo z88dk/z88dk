@@ -25,7 +25,7 @@ IF __CRTCFG = 0
 
    defc TAR__crt_model                 = 2
 
-   defc TAR__register_sp               = __BIOS_SP
+   defc TAR__register_sp               = 0
    defc TAR__crt_stack_size            = 256
 
    defc TAR__crt_initialize_bss        = 1
@@ -177,7 +177,7 @@ IF __CRTCFG = 3
 
    defc TAR__crt_model                 = 0
 
-   defc TAR__register_sp               = __BANK_SP
+   defc TAR__register_sp               = -1
    defc TAR__crt_stack_size            = 256
 
    defc TAR__crt_initialize_bss        = 1
@@ -196,7 +196,7 @@ IF __CRTCFG = 3
    defc TAR__crt_enable_close          = 1
 
    defc TAR__crt_enable_eidi           = 0x11
-   defc TAR__crt_on_exit               = _exit_far
+   defc TAR__crt_on_exit               = 0x0000
 
    defc TAR__crt_enable_rst            = 0
    defc TAR__crt_enable_nmi            = 0

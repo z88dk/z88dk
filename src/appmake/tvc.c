@@ -53,7 +53,7 @@ option_t tvc_options[] = {
 19F3   20 55 53 52            DB   " USR"   
 19F7   96 36 36 35 39         DB   96H,"6659"   
 19FC   95 FF 00 00 00 00 00   DB   95H,0FFH,0,0,0,0,0   ; 20 byte program header
- * /
+ */
 
 /*
  * Execution starts here
