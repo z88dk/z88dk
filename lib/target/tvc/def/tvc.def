@@ -10,7 +10,11 @@ lstoff
 ; Function code
 defc ED_CHOUT       = $21     ; Editor character out, char in C
 defc ED_CHIN        = $A1     ; Editor character in
+defc ED_CPOS        = $A3     ; Editor set character position
 defc ED_CFIX        = $A4     ; Editor set starting character position on input 
+
+defc KBD_CHIN       = $91     ; Keyboard character in
+defc KBD_STATUS     = $93     ; Keyboard character in
 
 ; Special addresses
 defc P_SAVE         = $0003   ; Save address of PORT 2, the memory mapping port
