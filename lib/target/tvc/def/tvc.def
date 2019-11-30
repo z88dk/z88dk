@@ -2,13 +2,15 @@ lstoff
 
 ; Videoton TV Computer related constants
 ;
-; March 2011
+;  Sandor Vass - 2019
 ;
 
 ; Memory segments
 
 ; Function code
 defc ED_CHOUT       = $21     ; Editor character out, char in C
+defc ED_CHIN        = $A1     ; Editor character in
+defc ED_CFIX        = $A4     ; Editor set starting character position on input 
 
 ; Special addresses
 defc P_SAVE         = $0003   ; Save address of PORT 2, the memory mapping port
