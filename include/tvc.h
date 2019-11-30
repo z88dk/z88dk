@@ -54,8 +54,8 @@ extern char __LIB__ asm_tvc_ed_cpos(int character);
 // TVC Keyboard functions
 
 /**
- * Get a character from the console. If there is no pressed earlier
- * this call will block (func $A1)
+ * Get a character from the console. If there is no pressed char
+ * earlier this call will block (func $A1)
  */
 #define tvc_kbd_chin     fgetc_cons
 extern int __LIB__ fgetc_cons();
@@ -66,6 +66,14 @@ extern int __LIB__ fgetc_cons();
  */
 #define tvc_keyboard_status asm_tvc_kbd_status
 extern int __LIB__ asm_tvc_kbd_status();
+
+/**
+ * Gets a character from the console. If there is no pressed char
+ * earlier this call returns 0x00.
+ */
+#define tvc_getkey getk
+extern int __LIB__ getk();
+
 
 
 #endif
