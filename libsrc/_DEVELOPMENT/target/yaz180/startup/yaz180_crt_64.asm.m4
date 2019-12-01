@@ -43,13 +43,11 @@ dnl
 dnl## input terminals
 dnl
 dnl#include(`../cpm/driver/terminal/cpm_00_input_cons.m4')
-dnl#include(`../cpm/driver/terminal/cpm_01_input_kbd_dcio.m4')
 dnl#include(`../cpm/driver/character/cpm_00_input_reader.m4')
 dnl
 dnl## output terminals
 dnl
 dnl#include(`../cpm/driver/terminal/cpm_00_output_cons.m4')
-dnl#include(`../cpm/driver/terminal/cpm_01_output_dcio.m4')
 dnl#include(`../cpm/driver/character/cpm_00_output_list.m4')
 dnl#include(`../cpm/driver/character/cpm_00_output_punch.m4')
 dnl
@@ -102,27 +100,7 @@ SECTION CODE
 
 PUBLIC __Start, __Exit
 
-EXTERN _main, asm_cpm_bdos
-
-Qualify:
-
-   ; disqualify 8080
-   
-   sub a
-   jp po, __Continue
-
-   ld c,__CPM_PRST
-   ld de,disqualify_s
-   
-   call asm_cpm_bdos
-   rst 0
-
-disqualify_s:
-
-   defm "z80 only"
-   defb 13,10,'$'
-
-__Continue:
+EXTERN _main
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; USER PREAMBLE ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -1,11 +1,14 @@
 @target/rc2014/driver/terminal/rc_01_input_acia.lst
 @target/rc2014/driver/terminal/rc_01_input_sioa.lst
 @target/rc2014/driver/terminal/rc_01_input_siob.lst
+@target/rc2014/driver/terminal/rc_01_input_hbios0.lst
+@target/rc2014/driver/terminal/rc_01_input_hbios1.lst
 @target/rc2014/driver/terminal/rc_01_input_basic.lst
 @target/rc2014/driver/terminal/rc_01_output_acia.lst
 @target/rc2014/driver/terminal/rc_01_output_sioa.lst
 @target/rc2014/driver/terminal/rc_01_output_siob.lst
+@target/rc2014/driver/terminal/rc_01_output_hbios0.lst
+@target/rc2014/driver/terminal/rc_01_output_hbios1.lst
 @target/rc2014/driver/terminal/rc_01_output_basic.lst
 @target/rc2014/driver/ide/ide.lst
 @target/rc2014/driver/diskio/diskio_sdcc.lst
-
