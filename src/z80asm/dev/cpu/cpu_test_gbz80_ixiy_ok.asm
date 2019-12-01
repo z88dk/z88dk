@@ -923,6 +923,7 @@
  rlc h                          ; CB 04
  rlc l                          ; CB 05
  rlca                           ; 07
+ rld                            ; CD @__z80asm__rld
  rnc                            ; D0
  rnz                            ; C0
  rr (hl)                        ; CB 1E
@@ -944,6 +945,7 @@
  rrc h                          ; CB 0C
  rrc l                          ; CB 0D
  rrca                           ; 0F
+ rrd                            ; CD @__z80asm__rrd
  rst 0                          ; C7
  rst 1                          ; CF
  rst 16                         ; D7

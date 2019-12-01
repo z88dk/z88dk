@@ -16,3 +16,11 @@
  lhlx                           ; Error
  shlde                          ; Error
  shlx                           ; Error
+ swap (hl)                      ; Error
+ swap a                         ; Error
+ swap b                         ; Error
+ swap c                         ; Error
+ swap d                         ; Error
+ swap e                         ; Error
+ swap h                         ; Error
+ swap l                         ; Error

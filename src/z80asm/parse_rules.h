@@ -81280,7 +81280,7 @@ default: error_illegal_ident(); }
 	case 3598:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__rld");
 break;
@@ -82326,7 +82326,7 @@ default: error_illegal_ident(); }
 	case 3714:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__rrd");
 break;

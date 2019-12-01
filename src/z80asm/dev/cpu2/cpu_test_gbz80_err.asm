@@ -318,6 +318,30 @@
  pop iy                         ; Error
  push ix                        ; Error
  push iy                        ; Error
+ rl (ix)                        ; Error
+ rl (ix+-128)                   ; Error
+ rl (ix+127)                    ; Error
+ rl (iy)                        ; Error
+ rl (iy+-128)                   ; Error
+ rl (iy+127)                    ; Error
+ rlc (ix)                       ; Error
+ rlc (ix+-128)                  ; Error
+ rlc (ix+127)                   ; Error
+ rlc (iy)                       ; Error
+ rlc (iy+-128)                  ; Error
+ rlc (iy+127)                   ; Error
+ rr (ix)                        ; Error
+ rr (ix+-128)                   ; Error
+ rr (ix+127)                    ; Error
+ rr (iy)                        ; Error
+ rr (iy+-128)                   ; Error
+ rr (iy+127)                    ; Error
+ rrc (ix)                       ; Error
+ rrc (ix+-128)                  ; Error
+ rrc (ix+127)                   ; Error
+ rrc (iy)                       ; Error
+ rrc (iy+-128)                  ; Error
+ rrc (iy+127)                   ; Error
  sbc (ix)                       ; Error
  sbc (ix+-128)                  ; Error
  sbc (ix+127)                   ; Error
@@ -335,6 +359,52 @@
  shld 65535                     ; Error
  shlde                          ; Error
  shlx                           ; Error
+ sla (ix)                       ; Error
+ sla (ix+-128)                  ; Error
+ sla (ix+127)                   ; Error
+ sla (iy)                       ; Error
+ sla (iy+-128)                  ; Error
+ sla (iy+127)                   ; Error
+ sli (hl)                       ; Error
+ sli (ix)                       ; Error
+ sli (ix+-128)                  ; Error
+ sli (ix+127)                   ; Error
+ sli (iy)                       ; Error
+ sli (iy+-128)                  ; Error
+ sli (iy+127)                   ; Error
+ sli a                          ; Error
+ sli b                          ; Error
+ sli c                          ; Error
+ sli d                          ; Error
+ sli e                          ; Error
+ sli h                          ; Error
+ sli l                          ; Error
+ sll (hl)                       ; Error
+ sll (ix)                       ; Error
+ sll (ix+-128)                  ; Error
+ sll (ix+127)                   ; Error
+ sll (iy)                       ; Error
+ sll (iy+-128)                  ; Error
+ sll (iy+127)                   ; Error
+ sll a                          ; Error
+ sll b                          ; Error
+ sll c                          ; Error
+ sll d                          ; Error
+ sll e                          ; Error
+ sll h                          ; Error
+ sll l                          ; Error
+ sra (ix)                       ; Error
+ sra (ix+-128)                  ; Error
+ sra (ix+127)                   ; Error
+ sra (iy)                       ; Error
+ sra (iy+-128)                  ; Error
+ sra (iy+127)                   ; Error
+ srl (ix)                       ; Error
+ srl (ix+-128)                  ; Error
+ srl (ix+127)                   ; Error
+ srl (iy)                       ; Error
+ srl (iy+-128)                  ; Error
+ srl (iy+127)                   ; Error
  sub (ix)                       ; Error
  sub (ix+-128)                  ; Error
  sub (ix+127)                   ; Error

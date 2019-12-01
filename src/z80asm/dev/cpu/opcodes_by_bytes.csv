@@ -4416,9 +4416,9 @@ CD @ldi                      |ldi          |~           |~            |         
                              |             |            |             |                       |         |               |              |              
 CD @ldir                     |ldir         |~           |~            |                       |         |               |              |              
                              |             |            |             |                       |         |               |              |              
-CD @rld                      |             |            |             |rld                    |~        |               |              |              
+CD @rld                      |rld          |~           |~            |~                      |~        |               |              |              
                              |             |            |             |                       |         |               |              |              
-CD @rrd                      |             |            |             |rrd                    |~        |               |              |              
+CD @rrd                      |rrd          |~           |~            |~                      |~        |               |              |              
                              |             |            |             |                       |         |               |              |              
 CD @sbc_hl_bc                |sbc hl, bc   |~           |~            |                       |         |               |              |              
                              |             |            |             |                       |         |               |              |              

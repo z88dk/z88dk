@@ -898,6 +898,7 @@
  rla                            ; 17
  rlc                            ; 07
  rlca                           ; 07
+ rld                            ; CD @__z80asm__rld
  rlde                           ; 18
  rm                             ; F8
  rnc                            ; D0
@@ -909,6 +910,7 @@
  rra                            ; 1F
  rrc                            ; 0F
  rrca                           ; 0F
+ rrd                            ; CD @__z80asm__rrd
  rrhl                           ; 10
  rst 0                          ; C7
  rst 1                          ; CF

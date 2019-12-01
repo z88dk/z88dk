@@ -466,7 +466,7 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "rrd", 0xED, 0x67);
 		add_opc($cpu, "rld", 0xED, 0x6F);
 	}
-	elsif ($rabbit) {
+	else {
 		add_opc($cpu, "rrd", call(), '@__z80asm__rrd', '');
 		add_opc($cpu, "rld", call(), '@__z80asm__rld', '');
 	}

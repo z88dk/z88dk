@@ -167,7 +167,7 @@ test: $(TARGET) z80asm_lib
 	$(MAKE) prove_perl
 	$(MAKE) -C dev/z80asm_lib test
 	$(MAKE) -C dev/z80asm2 test
-	perl dev/cpu2/cpu.pl run
+	perl dev/cpu2/cpu.pl test
 
 testlib:
 	$(MAKE) -C lib test

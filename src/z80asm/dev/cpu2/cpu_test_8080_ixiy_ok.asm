@@ -499,6 +499,16 @@
  push h                         ; E5
  push hl                        ; E5
  push psw                       ; F5
+ ral                            ; 17
+ rar                            ; 1F
+ rla                            ; 17
+ rlc                            ; 07
+ rlca                           ; 07
+ rld                            ; CD @rld
+ rra                            ; 1F
+ rrc                            ; 0F
+ rrca                           ; 0F
+ rrd                            ; CD @rrd
  rst %c                         ; C7+%c
  sbb a                          ; 9F
  sbb b                          ; 98

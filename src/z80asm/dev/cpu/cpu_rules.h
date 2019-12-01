@@ -33425,7 +33425,7 @@ default: error_illegal_ident(); }
 
 | label? _TK_RLD _TK_NEWLINE @{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: 
+case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K: 
 DO_STMT_LABEL();
 add_call_emul_func("__z80asm__rld");
 break;
@@ -34355,7 +34355,7 @@ default: error_illegal_ident(); }
 
 | label? _TK_RRD _TK_NEWLINE @{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: 
+case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K: 
 DO_STMT_LABEL();
 add_call_emul_func("__z80asm__rrd");
 break;

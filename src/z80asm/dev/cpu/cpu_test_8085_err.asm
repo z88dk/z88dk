@@ -6169,7 +6169,6 @@
  rlc l                          ; Error
  rlc l'                         ; Error
  rlca'                          ; Error
- rld                            ; Error
  rlo                            ; Error
  rlz                            ; Error
  rr (hl)                        ; Error
@@ -6306,7 +6305,6 @@
  rrc l                          ; Error
  rrc l'                         ; Error
  rrca'                          ; Error
- rrd                            ; Error
  rst -1                         ; Error
  rst -1                         ; Error
  rst 10                         ; Error
