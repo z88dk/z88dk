@@ -16,7 +16,7 @@ ENDIF
 IF __CRTCFG = 0
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ;;;; application with acia driver model ;;;;;;;;;;;;;;;;;;;;
+   ;;;; rom with acia driver model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    defc TAR__crt_org_code              = 0
@@ -65,7 +65,7 @@ ENDIF
 IF __CRTCFG = 1
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ;;;; application with sio driver model ;;;;;;;;;;;;;;;;;;;;;
+   ;;;; rom with sio driver model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    defc TAR__crt_org_code              = 0
@@ -276,7 +276,7 @@ IF __CRTCFG = 5
    defc TAR__crt_stack_size            = 256
 
    defc TAR__crt_initialize_bss        = 1
-   
+
    defc TAR__crt_include_preamble      = 0
 
    defc TAR__crt_org_vector_table      = 0
