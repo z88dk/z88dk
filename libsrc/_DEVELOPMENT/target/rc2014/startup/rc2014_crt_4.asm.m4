@@ -21,7 +21,7 @@ include "config_rc2014_public.inc"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../crt_defaults.inc"
-include "../../arch/hbios/crt_romwbw_def.inc"
+include "../../arch/hbios/crt_hbios_def.inc"
 include "crt_config.inc"
 include(`../crt_rules.inc')
 include(`rc2014_rules.inc')
