@@ -3,8 +3,10 @@
  *  Videoton TV Computer C stub
  *  Sandor Vass - 2019
  *
- *  TVC scanf, with built-in TVC editor, flashing cursor, whistles 
+ *  TVC gets, with built-in TVC editor, flashing cursor, whistles 
  *  and bells.
+ *  Upon closing the string with ENTER the last character in the
+ *  string will be a 0x0D character - in sync with the fgets implementations.
  *
  */
 
@@ -20,11 +22,9 @@ char *tvc_fgets_cons(char* str, size_t max) {
         if(c == TVC_CHAR_ESC) {
             str[0] = 0x00;
             break;
-        } else if (c == TVC_CHAR_RETURN) {
-            break;
-        }
+        } 
         str[pos] = c;
         str[++pos] = 0x00;
-    } while (pos<max-1);
+    } while ((c!=TVC_CHAR_RETURN) && (pos<max-1));
     return str;
 }

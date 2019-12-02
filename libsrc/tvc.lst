@@ -5,9 +5,9 @@ stdio/tvc/getk
 games/tvc/joystick
 @games/games.lst
 time/tvc/clock
-tvc/asm_tvc_ed_getch
-tvc/asm_tvc_ed_cfix
-tvc/asm_tvc_ed_cpos
-tvc/asm_tvc_kbd_status
-tvc/tvc_fgets_cons
+target/tvc/asm_tvc_ed_getch
+target/tvc/asm_tvc_ed_cfix
+target/tvc/asm_tvc_ed_cpos
+target/tvc/asm_tvc_kbd_status
+target/tvc/tvc_fgets_cons
 @z80.lst

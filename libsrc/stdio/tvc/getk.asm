@@ -23,7 +23,7 @@
     defb    KBD_STATUS
     ld      a,c
     and     a
-    jr      nz,fgetc_cons
+    jp      nz,fgetc_cons
 
     ld  hl,0
     ret
