@@ -39,13 +39,13 @@ ifelse(__STARTUP, -1,
 ')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; scm drivers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; rom driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ifelse(__STARTUP, 0,
 `
-   ; scm asci0 drivers installed on stdin, stdout, stderr
-   ; scm asci1 drivers installed on ttyin, ttyout, ttyerr
+   ; asci0 drivers installed on stdin, stdout, stderr
+   ; asci1 drivers installed on ttyin, ttyout, ttyerr
 
    IFNDEF __CRTCFG
 
@@ -63,13 +63,13 @@ ifelse(__STARTUP, 0,
 ')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; app drivers;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; hbios driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-ifelse(__STARTUP, 16,
+ifelse(__STARTUP, 8,
 `
-   ; scm hbios0 drivers installed on stdin, stdout, stderr
-   ; scm hbios1 drivers installed on ttyin, ttyout, ttyerr
+   ; romwbw hbios0 drivers installed on stdin, stdout, stderr
+   ; romwbw hbios1 drivers installed on ttyin, ttyout, ttyerr
 
    IFNDEF __CRTCFG
 
@@ -83,7 +83,7 @@ ifelse(__STARTUP, 16,
 
    ENDIF
 
-   include(`startup/scz180_crt_16.asm.m4')
+   include(`startup/scz180_crt_8.asm.m4')
 ')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

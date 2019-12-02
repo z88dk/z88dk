@@ -1,11 +1,11 @@
 include(`z88dk.m4')
 
 dnl############################################################
-dnl##      SCZ180_CRT_16.ASM.M4 - IO THROUGH ROMWBW          ##
+dnl##       SCZ180_CRT_8.ASM.M4 - IO THROUGH ROMWBW          ##
 dnl############################################################
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;            scz180 romwbw application target               ;;
-;; generated from target/scz180/startup/scz180_crt_16.asm.m4 ;;
+;; generated from target/scz180/startup/scz180_crt_8.asm.m4  ;;
 ;;                                                           ;;
 ;;                  flat 64k address space                   ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -21,7 +21,7 @@ include "config_scz180_public.inc"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../crt_defaults.inc"
-include "crt_romwbw_def.inc"
+include "../../arch/hbios/crt_hbios_def.inc"
 include "crt_config.inc"
 include(`../crt_rules.inc')
 include(`scz180_rules.inc')
