@@ -42,6 +42,27 @@
  and a, (iy)                    ; Error
  and a, (iy+-128)               ; Error
  and a, (iy+127)                ; Error
+ call m, -32768                 ; Error
+ call m, 32767                  ; Error
+ call m, 65535                  ; Error
+ call nv, -32768                ; Error
+ call nv, 32767                 ; Error
+ call nv, 65535                 ; Error
+ call p, -32768                 ; Error
+ call p, 32767                  ; Error
+ call p, 65535                  ; Error
+ call pe, -32768                ; Error
+ call pe, 32767                 ; Error
+ call pe, 65535                 ; Error
+ call po, -32768                ; Error
+ call po, 32767                 ; Error
+ call po, 65535                 ; Error
+ call v, -32768                 ; Error
+ call v, 32767                  ; Error
+ call v, 65535                  ; Error
+ cm -32768                      ; Error
+ cm 32767                       ; Error
+ cm 65535                       ; Error
  cmp (ix)                       ; Error
  cmp (ix+-128)                  ; Error
  cmp (ix+127)                   ; Error
@@ -54,6 +75,9 @@
  cmp a, (iy)                    ; Error
  cmp a, (iy+-128)               ; Error
  cmp a, (iy+127)                ; Error
+ cnv -32768                     ; Error
+ cnv 32767                      ; Error
+ cnv 65535                      ; Error
  cp (ix)                        ; Error
  cp (ix+-128)                   ; Error
  cp (ix+127)                    ; Error
@@ -66,6 +90,15 @@
  cp a, (iy)                     ; Error
  cp a, (iy+-128)                ; Error
  cp a, (iy+127)                 ; Error
+ cpe -32768                     ; Error
+ cpe 32767                      ; Error
+ cpe 65535                      ; Error
+ cpo -32768                     ; Error
+ cpo 32767                      ; Error
+ cpo 65535                      ; Error
+ cv -32768                      ; Error
+ cv 32767                       ; Error
+ cv 65535                       ; Error
  dec (ix)                       ; Error
  dec (ix+-128)                  ; Error
  dec (ix+127)                   ; Error
@@ -74,6 +107,12 @@
  dec (iy+127)                   ; Error
  dec ix                         ; Error
  dec iy                         ; Error
+ djnz -32768                    ; Error
+ djnz 32767                     ; Error
+ djnz 65535                     ; Error
+ djnz b, -32768                 ; Error
+ djnz b, 32767                  ; Error
+ djnz b, 65535                  ; Error
  ex (sp), ix                    ; Error
  ex (sp), iy                    ; Error
  ex af, af                      ; Error
@@ -88,6 +127,56 @@
  inc (iy+127)                   ; Error
  inc ix                         ; Error
  inc iy                         ; Error
+ jm -32768                      ; Error
+ jm 32767                       ; Error
+ jm 65535                       ; Error
+ jnv -32768                     ; Error
+ jnv 32767                      ; Error
+ jnv 65535                      ; Error
+ jp (ix)                        ; Error
+ jp (iy)                        ; Error
+ jp m, -32768                   ; Error
+ jp m, 32767                    ; Error
+ jp m, 65535                    ; Error
+ jp nv, -32768                  ; Error
+ jp nv, 32767                   ; Error
+ jp nv, 65535                   ; Error
+ jp p, -32768                   ; Error
+ jp p, 32767                    ; Error
+ jp p, 65535                    ; Error
+ jp pe, -32768                  ; Error
+ jp pe, 32767                   ; Error
+ jp pe, 65535                   ; Error
+ jp po, -32768                  ; Error
+ jp po, 32767                   ; Error
+ jp po, 65535                   ; Error
+ jp v, -32768                   ; Error
+ jp v, 32767                    ; Error
+ jp v, 65535                    ; Error
+ jpe -32768                     ; Error
+ jpe 32767                      ; Error
+ jpe 65535                      ; Error
+ jpo -32768                     ; Error
+ jpo 32767                      ; Error
+ jpo 65535                      ; Error
+ jr -32768                      ; Error
+ jr 32767                       ; Error
+ jr 65535                       ; Error
+ jr c, -32768                   ; Error
+ jr c, 32767                    ; Error
+ jr c, 65535                    ; Error
+ jr nc, -32768                  ; Error
+ jr nc, 32767                   ; Error
+ jr nc, 65535                   ; Error
+ jr nz, -32768                  ; Error
+ jr nz, 32767                   ; Error
+ jr nz, 65535                   ; Error
+ jr z, -32768                   ; Error
+ jr z, 32767                    ; Error
+ jr z, 65535                    ; Error
+ jv -32768                      ; Error
+ jv 32767                       ; Error
+ jv 65535                       ; Error
  ld (-32768), bc                ; Error
  ld (-32768), de                ; Error
  ld (-32768), hl                ; Error
@@ -318,6 +407,13 @@
  pop iy                         ; Error
  push ix                        ; Error
  push iy                        ; Error
+ ret m                          ; Error
+ ret nv                         ; Error
+ ret p                          ; Error
+ ret pe                         ; Error
+ ret po                         ; Error
+ ret v                          ; Error
+ retn                           ; Error
  rl (ix)                        ; Error
  rl (ix+-128)                   ; Error
  rl (ix+127)                    ; Error
@@ -330,6 +426,11 @@
  rlc (iy)                       ; Error
  rlc (iy+-128)                  ; Error
  rlc (iy+127)                   ; Error
+ rm                             ; Error
+ rnv                            ; Error
+ rp                             ; Error
+ rpe                            ; Error
+ rpo                            ; Error
  rr (ix)                        ; Error
  rr (ix+-128)                   ; Error
  rr (ix+127)                    ; Error
@@ -342,6 +443,7 @@
  rrc (iy)                       ; Error
  rrc (iy+-128)                  ; Error
  rrc (iy+127)                   ; Error
+ rv                             ; Error
  sbc (ix)                       ; Error
  sbc (ix+-128)                  ; Error
  sbc (ix+127)                   ; Error

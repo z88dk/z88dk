@@ -1268,6 +1268,7 @@ static bool parse_out(int dummy) {
 	yy = yy0;
 	if (IND_EXPR(&n) && TK(',') && KW(K_A) && EOS()) 					// OUT (n), A
 		return emit_out_indn_a(n);
+	yy = yy0;
 	if (EXPR(&n) && EOS())												// OUT n
 		return emit_out_indn_a(n);
 	syntax_error();
@@ -1275,15 +1276,19 @@ static bool parse_out(int dummy) {
 }
 
 static bool parse_jp(int dummy) {
-	int f, nn, x;
+	int f, nn, x, rr;
 	token_t* yy0 = yy;
 	if (FLAGS8(&f) && TK(',') && EXPR(&nn) && EOS())		// JP f, nn
 		return emit_jp_f_nn(f, nn);
 	yy = yy0;
 	if (EXPR(&nn) && EOS()) 								// JP nn
 		return emit_jp_nn(nn);
+	yy = yy0;
 	if (TK('(') && X(&x) && TK(')') && EOS())				// JP (HL)/(IX)/(IY)
 		return emit_jp_x(x);
+	yy = yy0;
+	if (TK('(') && BCDE(&rr) && TK(')') && EOS())			// JP (BC)/(DE)
+		return emit_push_rr(rr) && emit_ret();
 	syntax_error();
 	return false;
 }

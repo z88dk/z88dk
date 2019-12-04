@@ -82,6 +82,8 @@
  dec (iy+127)                   ; Error
  dec ix                         ; Error
  dec iy                         ; Error
+ djnz %j                        ; Error
+ djnz b, %j                     ; Error
  ex (sp), ix                    ; Error
  ex (sp), iy                    ; Error
  ex af, af                      ; Error
@@ -96,6 +98,13 @@
  inc (iy+127)                   ; Error
  inc ix                         ; Error
  inc iy                         ; Error
+ jp (ix)                        ; Error
+ jp (iy)                        ; Error
+ jr %j                          ; Error
+ jr c, %j                       ; Error
+ jr nc, %j                      ; Error
+ jr nz, %j                      ; Error
+ jr z, %j                       ; Error
  ld (-32768), bc                ; Error
  ld (-32768), de                ; Error
  ld (-32768), ix                ; Error
@@ -336,6 +345,8 @@
  res %c, e                      ; Error
  res %c, h                      ; Error
  res %c, l                      ; Error
+ reti                           ; Error
+ retn                           ; Error
  rl (hl)                        ; Error
  rl (ix)                        ; Error
  rl (ix+-128)                   ; Error

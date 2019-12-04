@@ -991,6 +991,8 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "jp ($x)", @pfx, 0xE9);
 		add_opc($cpu, "pchl",		   0xE9);
 	}
+	add_opc($cpu, "jp (bc)", 0xc5, 0xc9);
+	add_opc($cpu, "jp (de)", 0xd5, 0xc9);
 	
 	if (!$intel && !$gameboy) {
 		for ([ix => 0xDD], [iy => 0xFD]) {

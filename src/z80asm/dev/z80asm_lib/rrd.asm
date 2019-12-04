@@ -1,5 +1,13 @@
 ; Substitute for z80 rrd instruction
 ; aralbrec 06.2007
+; CPU   Min T Max T
+; 8080  229   260
+; 8085  224   253
+; gbz80 136   160
+; r2k    94   111
+; z180   18    18
+; z80    18    18
+; z80n   18    18
 
 SECTION code_crt0_sccz80
 PUBLIC __z80asm__rrd

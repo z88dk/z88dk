@@ -1153,6 +1153,330 @@ bit %c, l         |z80  |-    |CB 45+%c*08                        |      8 T
 bit %c, l         |z80  |IXIY |CB 45+%c*08                        |      8 T
 bit %c, l         |z80n |-    |CB 45+%c*08                        |      8 T
 bit %c, l         |z80n |IXIY |CB 45+%c*08                        |      8 T
+call -32768       |8080 |-    |CD 00 80                           |     17 T
+call -32768       |8080 |IXIY |CD 00 80                           |     17 T
+call -32768       |8085 |-    |CD 00 80                           |     18 T
+call -32768       |8085 |IXIY |CD 00 80                           |     18 T
+call -32768       |gbz80|-    |CD 00 80                           |     12 T
+call -32768       |gbz80|IXIY |CD 00 80                           |     12 T
+call -32768       |z80  |-    |CD 00 80                           |     17 T
+call -32768       |z80  |IXIY |CD 00 80                           |     17 T
+call -32768       |z80n |-    |CD 00 80                           |     17 T
+call -32768       |z80n |IXIY |CD 00 80                           |     17 T
+call 32767        |8080 |-    |CD FF 7F                           |     17 T
+call 32767        |8080 |IXIY |CD FF 7F                           |     17 T
+call 32767        |8085 |-    |CD FF 7F                           |     18 T
+call 32767        |8085 |IXIY |CD FF 7F                           |     18 T
+call 32767        |gbz80|-    |CD FF 7F                           |     12 T
+call 32767        |gbz80|IXIY |CD FF 7F                           |     12 T
+call 32767        |z80  |-    |CD FF 7F                           |     17 T
+call 32767        |z80  |IXIY |CD FF 7F                           |     17 T
+call 32767        |z80n |-    |CD FF 7F                           |     17 T
+call 32767        |z80n |IXIY |CD FF 7F                           |     17 T
+call 65535        |8080 |-    |CD FF FF                           |     17 T
+call 65535        |8080 |IXIY |CD FF FF                           |     17 T
+call 65535        |8085 |-    |CD FF FF                           |     18 T
+call 65535        |8085 |IXIY |CD FF FF                           |     18 T
+call 65535        |gbz80|-    |CD FF FF                           |     12 T
+call 65535        |gbz80|IXIY |CD FF FF                           |     12 T
+call 65535        |z80  |-    |CD FF FF                           |     17 T
+call 65535        |z80  |IXIY |CD FF FF                           |     17 T
+call 65535        |z80n |-    |CD FF FF                           |     17 T
+call 65535        |z80n |IXIY |CD FF FF                           |     17 T
+call c, -32768    |8080 |-    |DC 00 80                           |  11/17 T
+call c, -32768    |8080 |IXIY |DC 00 80                           |  11/17 T
+call c, -32768    |8085 |-    |DC 00 80                           |   9/18 T
+call c, -32768    |8085 |IXIY |DC 00 80                           |   9/18 T
+call c, -32768    |gbz80|-    |DC 00 80                           |     12 T
+call c, -32768    |gbz80|IXIY |DC 00 80                           |     12 T
+call c, -32768    |z80  |-    |DC 00 80                           |  10/17 T
+call c, -32768    |z80  |IXIY |DC 00 80                           |  10/17 T
+call c, -32768    |z80n |-    |DC 00 80                           |  10/17 T
+call c, -32768    |z80n |IXIY |DC 00 80                           |  10/17 T
+call c, 32767     |8080 |-    |DC FF 7F                           |  11/17 T
+call c, 32767     |8080 |IXIY |DC FF 7F                           |  11/17 T
+call c, 32767     |8085 |-    |DC FF 7F                           |   9/18 T
+call c, 32767     |8085 |IXIY |DC FF 7F                           |   9/18 T
+call c, 32767     |gbz80|-    |DC FF 7F                           |     12 T
+call c, 32767     |gbz80|IXIY |DC FF 7F                           |     12 T
+call c, 32767     |z80  |-    |DC FF 7F                           |  10/17 T
+call c, 32767     |z80  |IXIY |DC FF 7F                           |  10/17 T
+call c, 32767     |z80n |-    |DC FF 7F                           |  10/17 T
+call c, 32767     |z80n |IXIY |DC FF 7F                           |  10/17 T
+call c, 65535     |8080 |-    |DC FF FF                           |  11/17 T
+call c, 65535     |8080 |IXIY |DC FF FF                           |  11/17 T
+call c, 65535     |8085 |-    |DC FF FF                           |   9/18 T
+call c, 65535     |8085 |IXIY |DC FF FF                           |   9/18 T
+call c, 65535     |gbz80|-    |DC FF FF                           |     12 T
+call c, 65535     |gbz80|IXIY |DC FF FF                           |     12 T
+call c, 65535     |z80  |-    |DC FF FF                           |  10/17 T
+call c, 65535     |z80  |IXIY |DC FF FF                           |  10/17 T
+call c, 65535     |z80n |-    |DC FF FF                           |  10/17 T
+call c, 65535     |z80n |IXIY |DC FF FF                           |  10/17 T
+call m, -32768    |8080 |-    |FC 00 80                           |  11/17 T
+call m, -32768    |8080 |IXIY |FC 00 80                           |  11/17 T
+call m, -32768    |8085 |-    |FC 00 80                           |   9/18 T
+call m, -32768    |8085 |IXIY |FC 00 80                           |   9/18 T
+call m, -32768    |z80  |-    |FC 00 80                           |  10/17 T
+call m, -32768    |z80  |IXIY |FC 00 80                           |  10/17 T
+call m, -32768    |z80n |-    |FC 00 80                           |  10/17 T
+call m, -32768    |z80n |IXIY |FC 00 80                           |  10/17 T
+call m, 32767     |8080 |-    |FC FF 7F                           |  11/17 T
+call m, 32767     |8080 |IXIY |FC FF 7F                           |  11/17 T
+call m, 32767     |8085 |-    |FC FF 7F                           |   9/18 T
+call m, 32767     |8085 |IXIY |FC FF 7F                           |   9/18 T
+call m, 32767     |z80  |-    |FC FF 7F                           |  10/17 T
+call m, 32767     |z80  |IXIY |FC FF 7F                           |  10/17 T
+call m, 32767     |z80n |-    |FC FF 7F                           |  10/17 T
+call m, 32767     |z80n |IXIY |FC FF 7F                           |  10/17 T
+call m, 65535     |8080 |-    |FC FF FF                           |  11/17 T
+call m, 65535     |8080 |IXIY |FC FF FF                           |  11/17 T
+call m, 65535     |8085 |-    |FC FF FF                           |   9/18 T
+call m, 65535     |8085 |IXIY |FC FF FF                           |   9/18 T
+call m, 65535     |z80  |-    |FC FF FF                           |  10/17 T
+call m, 65535     |z80  |IXIY |FC FF FF                           |  10/17 T
+call m, 65535     |z80n |-    |FC FF FF                           |  10/17 T
+call m, 65535     |z80n |IXIY |FC FF FF                           |  10/17 T
+call nc, -32768   |8080 |-    |D4 00 80                           |  11/17 T
+call nc, -32768   |8080 |IXIY |D4 00 80                           |  11/17 T
+call nc, -32768   |8085 |-    |D4 00 80                           |   9/18 T
+call nc, -32768   |8085 |IXIY |D4 00 80                           |   9/18 T
+call nc, -32768   |gbz80|-    |D4 00 80                           |     12 T
+call nc, -32768   |gbz80|IXIY |D4 00 80                           |     12 T
+call nc, -32768   |z80  |-    |D4 00 80                           |  10/17 T
+call nc, -32768   |z80  |IXIY |D4 00 80                           |  10/17 T
+call nc, -32768   |z80n |-    |D4 00 80                           |  10/17 T
+call nc, -32768   |z80n |IXIY |D4 00 80                           |  10/17 T
+call nc, 32767    |8080 |-    |D4 FF 7F                           |  11/17 T
+call nc, 32767    |8080 |IXIY |D4 FF 7F                           |  11/17 T
+call nc, 32767    |8085 |-    |D4 FF 7F                           |   9/18 T
+call nc, 32767    |8085 |IXIY |D4 FF 7F                           |   9/18 T
+call nc, 32767    |gbz80|-    |D4 FF 7F                           |     12 T
+call nc, 32767    |gbz80|IXIY |D4 FF 7F                           |     12 T
+call nc, 32767    |z80  |-    |D4 FF 7F                           |  10/17 T
+call nc, 32767    |z80  |IXIY |D4 FF 7F                           |  10/17 T
+call nc, 32767    |z80n |-    |D4 FF 7F                           |  10/17 T
+call nc, 32767    |z80n |IXIY |D4 FF 7F                           |  10/17 T
+call nc, 65535    |8080 |-    |D4 FF FF                           |  11/17 T
+call nc, 65535    |8080 |IXIY |D4 FF FF                           |  11/17 T
+call nc, 65535    |8085 |-    |D4 FF FF                           |   9/18 T
+call nc, 65535    |8085 |IXIY |D4 FF FF                           |   9/18 T
+call nc, 65535    |gbz80|-    |D4 FF FF                           |     12 T
+call nc, 65535    |gbz80|IXIY |D4 FF FF                           |     12 T
+call nc, 65535    |z80  |-    |D4 FF FF                           |  10/17 T
+call nc, 65535    |z80  |IXIY |D4 FF FF                           |  10/17 T
+call nc, 65535    |z80n |-    |D4 FF FF                           |  10/17 T
+call nc, 65535    |z80n |IXIY |D4 FF FF                           |  10/17 T
+call nv, -32768   |8080 |-    |E4 00 80                           |  11/17 T
+call nv, -32768   |8080 |IXIY |E4 00 80                           |  11/17 T
+call nv, -32768   |8085 |-    |E4 00 80                           |   9/18 T
+call nv, -32768   |8085 |IXIY |E4 00 80                           |   9/18 T
+call nv, -32768   |z80  |-    |E4 00 80                           |  10/17 T
+call nv, -32768   |z80  |IXIY |E4 00 80                           |  10/17 T
+call nv, -32768   |z80n |-    |E4 00 80                           |  10/17 T
+call nv, -32768   |z80n |IXIY |E4 00 80                           |  10/17 T
+call nv, 32767    |8080 |-    |E4 FF 7F                           |  11/17 T
+call nv, 32767    |8080 |IXIY |E4 FF 7F                           |  11/17 T
+call nv, 32767    |8085 |-    |E4 FF 7F                           |   9/18 T
+call nv, 32767    |8085 |IXIY |E4 FF 7F                           |   9/18 T
+call nv, 32767    |z80  |-    |E4 FF 7F                           |  10/17 T
+call nv, 32767    |z80  |IXIY |E4 FF 7F                           |  10/17 T
+call nv, 32767    |z80n |-    |E4 FF 7F                           |  10/17 T
+call nv, 32767    |z80n |IXIY |E4 FF 7F                           |  10/17 T
+call nv, 65535    |8080 |-    |E4 FF FF                           |  11/17 T
+call nv, 65535    |8080 |IXIY |E4 FF FF                           |  11/17 T
+call nv, 65535    |8085 |-    |E4 FF FF                           |   9/18 T
+call nv, 65535    |8085 |IXIY |E4 FF FF                           |   9/18 T
+call nv, 65535    |z80  |-    |E4 FF FF                           |  10/17 T
+call nv, 65535    |z80  |IXIY |E4 FF FF                           |  10/17 T
+call nv, 65535    |z80n |-    |E4 FF FF                           |  10/17 T
+call nv, 65535    |z80n |IXIY |E4 FF FF                           |  10/17 T
+call nz, -32768   |8080 |-    |C4 00 80                           |  11/17 T
+call nz, -32768   |8080 |IXIY |C4 00 80                           |  11/17 T
+call nz, -32768   |8085 |-    |C4 00 80                           |   9/18 T
+call nz, -32768   |8085 |IXIY |C4 00 80                           |   9/18 T
+call nz, -32768   |gbz80|-    |C4 00 80                           |     12 T
+call nz, -32768   |gbz80|IXIY |C4 00 80                           |     12 T
+call nz, -32768   |z80  |-    |C4 00 80                           |  10/17 T
+call nz, -32768   |z80  |IXIY |C4 00 80                           |  10/17 T
+call nz, -32768   |z80n |-    |C4 00 80                           |  10/17 T
+call nz, -32768   |z80n |IXIY |C4 00 80                           |  10/17 T
+call nz, 32767    |8080 |-    |C4 FF 7F                           |  11/17 T
+call nz, 32767    |8080 |IXIY |C4 FF 7F                           |  11/17 T
+call nz, 32767    |8085 |-    |C4 FF 7F                           |   9/18 T
+call nz, 32767    |8085 |IXIY |C4 FF 7F                           |   9/18 T
+call nz, 32767    |gbz80|-    |C4 FF 7F                           |     12 T
+call nz, 32767    |gbz80|IXIY |C4 FF 7F                           |     12 T
+call nz, 32767    |z80  |-    |C4 FF 7F                           |  10/17 T
+call nz, 32767    |z80  |IXIY |C4 FF 7F                           |  10/17 T
+call nz, 32767    |z80n |-    |C4 FF 7F                           |  10/17 T
+call nz, 32767    |z80n |IXIY |C4 FF 7F                           |  10/17 T
+call nz, 65535    |8080 |-    |C4 FF FF                           |  11/17 T
+call nz, 65535    |8080 |IXIY |C4 FF FF                           |  11/17 T
+call nz, 65535    |8085 |-    |C4 FF FF                           |   9/18 T
+call nz, 65535    |8085 |IXIY |C4 FF FF                           |   9/18 T
+call nz, 65535    |gbz80|-    |C4 FF FF                           |     12 T
+call nz, 65535    |gbz80|IXIY |C4 FF FF                           |     12 T
+call nz, 65535    |z80  |-    |C4 FF FF                           |  10/17 T
+call nz, 65535    |z80  |IXIY |C4 FF FF                           |  10/17 T
+call nz, 65535    |z80n |-    |C4 FF FF                           |  10/17 T
+call nz, 65535    |z80n |IXIY |C4 FF FF                           |  10/17 T
+call p, -32768    |8080 |-    |F4 00 80                           |  11/17 T
+call p, -32768    |8080 |IXIY |F4 00 80                           |  11/17 T
+call p, -32768    |8085 |-    |F4 00 80                           |   9/18 T
+call p, -32768    |8085 |IXIY |F4 00 80                           |   9/18 T
+call p, -32768    |z80  |-    |F4 00 80                           |  10/17 T
+call p, -32768    |z80  |IXIY |F4 00 80                           |  10/17 T
+call p, -32768    |z80n |-    |F4 00 80                           |  10/17 T
+call p, -32768    |z80n |IXIY |F4 00 80                           |  10/17 T
+call p, 32767     |8080 |-    |F4 FF 7F                           |  11/17 T
+call p, 32767     |8080 |IXIY |F4 FF 7F                           |  11/17 T
+call p, 32767     |8085 |-    |F4 FF 7F                           |   9/18 T
+call p, 32767     |8085 |IXIY |F4 FF 7F                           |   9/18 T
+call p, 32767     |z80  |-    |F4 FF 7F                           |  10/17 T
+call p, 32767     |z80  |IXIY |F4 FF 7F                           |  10/17 T
+call p, 32767     |z80n |-    |F4 FF 7F                           |  10/17 T
+call p, 32767     |z80n |IXIY |F4 FF 7F                           |  10/17 T
+call p, 65535     |8080 |-    |F4 FF FF                           |  11/17 T
+call p, 65535     |8080 |IXIY |F4 FF FF                           |  11/17 T
+call p, 65535     |8085 |-    |F4 FF FF                           |   9/18 T
+call p, 65535     |8085 |IXIY |F4 FF FF                           |   9/18 T
+call p, 65535     |z80  |-    |F4 FF FF                           |  10/17 T
+call p, 65535     |z80  |IXIY |F4 FF FF                           |  10/17 T
+call p, 65535     |z80n |-    |F4 FF FF                           |  10/17 T
+call p, 65535     |z80n |IXIY |F4 FF FF                           |  10/17 T
+call pe, -32768   |8080 |-    |EC 00 80                           |  11/17 T
+call pe, -32768   |8080 |IXIY |EC 00 80                           |  11/17 T
+call pe, -32768   |8085 |-    |EC 00 80                           |   9/18 T
+call pe, -32768   |8085 |IXIY |EC 00 80                           |   9/18 T
+call pe, -32768   |z80  |-    |EC 00 80                           |  10/17 T
+call pe, -32768   |z80  |IXIY |EC 00 80                           |  10/17 T
+call pe, -32768   |z80n |-    |EC 00 80                           |  10/17 T
+call pe, -32768   |z80n |IXIY |EC 00 80                           |  10/17 T
+call pe, 32767    |8080 |-    |EC FF 7F                           |  11/17 T
+call pe, 32767    |8080 |IXIY |EC FF 7F                           |  11/17 T
+call pe, 32767    |8085 |-    |EC FF 7F                           |   9/18 T
+call pe, 32767    |8085 |IXIY |EC FF 7F                           |   9/18 T
+call pe, 32767    |z80  |-    |EC FF 7F                           |  10/17 T
+call pe, 32767    |z80  |IXIY |EC FF 7F                           |  10/17 T
+call pe, 32767    |z80n |-    |EC FF 7F                           |  10/17 T
+call pe, 32767    |z80n |IXIY |EC FF 7F                           |  10/17 T
+call pe, 65535    |8080 |-    |EC FF FF                           |  11/17 T
+call pe, 65535    |8080 |IXIY |EC FF FF                           |  11/17 T
+call pe, 65535    |8085 |-    |EC FF FF                           |   9/18 T
+call pe, 65535    |8085 |IXIY |EC FF FF                           |   9/18 T
+call pe, 65535    |z80  |-    |EC FF FF                           |  10/17 T
+call pe, 65535    |z80  |IXIY |EC FF FF                           |  10/17 T
+call pe, 65535    |z80n |-    |EC FF FF                           |  10/17 T
+call pe, 65535    |z80n |IXIY |EC FF FF                           |  10/17 T
+call po, -32768   |8080 |-    |E4 00 80                           |  11/17 T
+call po, -32768   |8080 |IXIY |E4 00 80                           |  11/17 T
+call po, -32768   |8085 |-    |E4 00 80                           |   9/18 T
+call po, -32768   |8085 |IXIY |E4 00 80                           |   9/18 T
+call po, -32768   |z80  |-    |E4 00 80                           |  10/17 T
+call po, -32768   |z80  |IXIY |E4 00 80                           |  10/17 T
+call po, -32768   |z80n |-    |E4 00 80                           |  10/17 T
+call po, -32768   |z80n |IXIY |E4 00 80                           |  10/17 T
+call po, 32767    |8080 |-    |E4 FF 7F                           |  11/17 T
+call po, 32767    |8080 |IXIY |E4 FF 7F                           |  11/17 T
+call po, 32767    |8085 |-    |E4 FF 7F                           |   9/18 T
+call po, 32767    |8085 |IXIY |E4 FF 7F                           |   9/18 T
+call po, 32767    |z80  |-    |E4 FF 7F                           |  10/17 T
+call po, 32767    |z80  |IXIY |E4 FF 7F                           |  10/17 T
+call po, 32767    |z80n |-    |E4 FF 7F                           |  10/17 T
+call po, 32767    |z80n |IXIY |E4 FF 7F                           |  10/17 T
+call po, 65535    |8080 |-    |E4 FF FF                           |  11/17 T
+call po, 65535    |8080 |IXIY |E4 FF FF                           |  11/17 T
+call po, 65535    |8085 |-    |E4 FF FF                           |   9/18 T
+call po, 65535    |8085 |IXIY |E4 FF FF                           |   9/18 T
+call po, 65535    |z80  |-    |E4 FF FF                           |  10/17 T
+call po, 65535    |z80  |IXIY |E4 FF FF                           |  10/17 T
+call po, 65535    |z80n |-    |E4 FF FF                           |  10/17 T
+call po, 65535    |z80n |IXIY |E4 FF FF                           |  10/17 T
+call v, -32768    |8080 |-    |EC 00 80                           |  11/17 T
+call v, -32768    |8080 |IXIY |EC 00 80                           |  11/17 T
+call v, -32768    |8085 |-    |EC 00 80                           |   9/18 T
+call v, -32768    |8085 |IXIY |EC 00 80                           |   9/18 T
+call v, -32768    |z80  |-    |EC 00 80                           |  10/17 T
+call v, -32768    |z80  |IXIY |EC 00 80                           |  10/17 T
+call v, -32768    |z80n |-    |EC 00 80                           |  10/17 T
+call v, -32768    |z80n |IXIY |EC 00 80                           |  10/17 T
+call v, 32767     |8080 |-    |EC FF 7F                           |  11/17 T
+call v, 32767     |8080 |IXIY |EC FF 7F                           |  11/17 T
+call v, 32767     |8085 |-    |EC FF 7F                           |   9/18 T
+call v, 32767     |8085 |IXIY |EC FF 7F                           |   9/18 T
+call v, 32767     |z80  |-    |EC FF 7F                           |  10/17 T
+call v, 32767     |z80  |IXIY |EC FF 7F                           |  10/17 T
+call v, 32767     |z80n |-    |EC FF 7F                           |  10/17 T
+call v, 32767     |z80n |IXIY |EC FF 7F                           |  10/17 T
+call v, 65535     |8080 |-    |EC FF FF                           |  11/17 T
+call v, 65535     |8080 |IXIY |EC FF FF                           |  11/17 T
+call v, 65535     |8085 |-    |EC FF FF                           |   9/18 T
+call v, 65535     |8085 |IXIY |EC FF FF                           |   9/18 T
+call v, 65535     |z80  |-    |EC FF FF                           |  10/17 T
+call v, 65535     |z80  |IXIY |EC FF FF                           |  10/17 T
+call v, 65535     |z80n |-    |EC FF FF                           |  10/17 T
+call v, 65535     |z80n |IXIY |EC FF FF                           |  10/17 T
+call z, -32768    |8080 |-    |CC 00 80                           |  11/17 T
+call z, -32768    |8080 |IXIY |CC 00 80                           |  11/17 T
+call z, -32768    |8085 |-    |CC 00 80                           |   9/18 T
+call z, -32768    |8085 |IXIY |CC 00 80                           |   9/18 T
+call z, -32768    |gbz80|-    |CC 00 80                           |     12 T
+call z, -32768    |gbz80|IXIY |CC 00 80                           |     12 T
+call z, -32768    |z80  |-    |CC 00 80                           |  10/17 T
+call z, -32768    |z80  |IXIY |CC 00 80                           |  10/17 T
+call z, -32768    |z80n |-    |CC 00 80                           |  10/17 T
+call z, -32768    |z80n |IXIY |CC 00 80                           |  10/17 T
+call z, 32767     |8080 |-    |CC FF 7F                           |  11/17 T
+call z, 32767     |8080 |IXIY |CC FF 7F                           |  11/17 T
+call z, 32767     |8085 |-    |CC FF 7F                           |   9/18 T
+call z, 32767     |8085 |IXIY |CC FF 7F                           |   9/18 T
+call z, 32767     |gbz80|-    |CC FF 7F                           |     12 T
+call z, 32767     |gbz80|IXIY |CC FF 7F                           |     12 T
+call z, 32767     |z80  |-    |CC FF 7F                           |  10/17 T
+call z, 32767     |z80  |IXIY |CC FF 7F                           |  10/17 T
+call z, 32767     |z80n |-    |CC FF 7F                           |  10/17 T
+call z, 32767     |z80n |IXIY |CC FF 7F                           |  10/17 T
+call z, 65535     |8080 |-    |CC FF FF                           |  11/17 T
+call z, 65535     |8080 |IXIY |CC FF FF                           |  11/17 T
+call z, 65535     |8085 |-    |CC FF FF                           |   9/18 T
+call z, 65535     |8085 |IXIY |CC FF FF                           |   9/18 T
+call z, 65535     |gbz80|-    |CC FF FF                           |     12 T
+call z, 65535     |gbz80|IXIY |CC FF FF                           |     12 T
+call z, 65535     |z80  |-    |CC FF FF                           |  10/17 T
+call z, 65535     |z80  |IXIY |CC FF FF                           |  10/17 T
+call z, 65535     |z80n |-    |CC FF FF                           |  10/17 T
+call z, 65535     |z80n |IXIY |CC FF FF                           |  10/17 T
+cc -32768         |8080 |-    |DC 00 80                           |  11/17 T
+cc -32768         |8080 |IXIY |DC 00 80                           |  11/17 T
+cc -32768         |8085 |-    |DC 00 80                           |   9/18 T
+cc -32768         |8085 |IXIY |DC 00 80                           |   9/18 T
+cc -32768         |gbz80|-    |DC 00 80                           |     12 T
+cc -32768         |gbz80|IXIY |DC 00 80                           |     12 T
+cc -32768         |z80  |-    |DC 00 80                           |  10/17 T
+cc -32768         |z80  |IXIY |DC 00 80                           |  10/17 T
+cc -32768         |z80n |-    |DC 00 80                           |  10/17 T
+cc -32768         |z80n |IXIY |DC 00 80                           |  10/17 T
+cc 32767          |8080 |-    |DC FF 7F                           |  11/17 T
+cc 32767          |8080 |IXIY |DC FF 7F                           |  11/17 T
+cc 32767          |8085 |-    |DC FF 7F                           |   9/18 T
+cc 32767          |8085 |IXIY |DC FF 7F                           |   9/18 T
+cc 32767          |gbz80|-    |DC FF 7F                           |     12 T
+cc 32767          |gbz80|IXIY |DC FF 7F                           |     12 T
+cc 32767          |z80  |-    |DC FF 7F                           |  10/17 T
+cc 32767          |z80  |IXIY |DC FF 7F                           |  10/17 T
+cc 32767          |z80n |-    |DC FF 7F                           |  10/17 T
+cc 32767          |z80n |IXIY |DC FF 7F                           |  10/17 T
+cc 65535          |8080 |-    |DC FF FF                           |  11/17 T
+cc 65535          |8080 |IXIY |DC FF FF                           |  11/17 T
+cc 65535          |8085 |-    |DC FF FF                           |   9/18 T
+cc 65535          |8085 |IXIY |DC FF FF                           |   9/18 T
+cc 65535          |gbz80|-    |DC FF FF                           |     12 T
+cc 65535          |gbz80|IXIY |DC FF FF                           |     12 T
+cc 65535          |z80  |-    |DC FF FF                           |  10/17 T
+cc 65535          |z80  |IXIY |DC FF FF                           |  10/17 T
+cc 65535          |z80n |-    |DC FF FF                           |  10/17 T
+cc 65535          |z80n |IXIY |DC FF FF                           |  10/17 T
 ccf               |8080 |-    |3F                                 |      4 T
 ccf               |8080 |IXIY |3F                                 |      4 T
 ccf               |8085 |-    |3F                                 |      4 T
@@ -1163,6 +1487,30 @@ ccf               |z80  |-    |3F                                 |      4 T
 ccf               |z80  |IXIY |3F                                 |      4 T
 ccf               |z80n |-    |3F                                 |      4 T
 ccf               |z80n |IXIY |3F                                 |      4 T
+cm -32768         |8080 |-    |FC 00 80                           |  11/17 T
+cm -32768         |8080 |IXIY |FC 00 80                           |  11/17 T
+cm -32768         |8085 |-    |FC 00 80                           |   9/18 T
+cm -32768         |8085 |IXIY |FC 00 80                           |   9/18 T
+cm -32768         |z80  |-    |FC 00 80                           |  10/17 T
+cm -32768         |z80  |IXIY |FC 00 80                           |  10/17 T
+cm -32768         |z80n |-    |FC 00 80                           |  10/17 T
+cm -32768         |z80n |IXIY |FC 00 80                           |  10/17 T
+cm 32767          |8080 |-    |FC FF 7F                           |  11/17 T
+cm 32767          |8080 |IXIY |FC FF 7F                           |  11/17 T
+cm 32767          |8085 |-    |FC FF 7F                           |   9/18 T
+cm 32767          |8085 |IXIY |FC FF 7F                           |   9/18 T
+cm 32767          |z80  |-    |FC FF 7F                           |  10/17 T
+cm 32767          |z80  |IXIY |FC FF 7F                           |  10/17 T
+cm 32767          |z80n |-    |FC FF 7F                           |  10/17 T
+cm 32767          |z80n |IXIY |FC FF 7F                           |  10/17 T
+cm 65535          |8080 |-    |FC FF FF                           |  11/17 T
+cm 65535          |8080 |IXIY |FC FF FF                           |  11/17 T
+cm 65535          |8085 |-    |FC FF FF                           |   9/18 T
+cm 65535          |8085 |IXIY |FC FF FF                           |   9/18 T
+cm 65535          |z80  |-    |FC FF FF                           |  10/17 T
+cm 65535          |z80  |IXIY |FC FF FF                           |  10/17 T
+cm 65535          |z80n |-    |FC FF FF                           |  10/17 T
+cm 65535          |z80n |IXIY |FC FF FF                           |  10/17 T
 cma               |8080 |-    |2F                                 |      4 T
 cma               |8080 |IXIY |2F                                 |      4 T
 cma               |8085 |-    |2F                                 |      4 T
@@ -1461,6 +1809,90 @@ cmp m             |z80  |-    |BE                                 |      7 T
 cmp m             |z80  |IXIY |BE                                 |      7 T
 cmp m             |z80n |-    |BE                                 |      7 T
 cmp m             |z80n |IXIY |BE                                 |      7 T
+cnc -32768        |8080 |-    |D4 00 80                           |  11/17 T
+cnc -32768        |8080 |IXIY |D4 00 80                           |  11/17 T
+cnc -32768        |8085 |-    |D4 00 80                           |   9/18 T
+cnc -32768        |8085 |IXIY |D4 00 80                           |   9/18 T
+cnc -32768        |gbz80|-    |D4 00 80                           |     12 T
+cnc -32768        |gbz80|IXIY |D4 00 80                           |     12 T
+cnc -32768        |z80  |-    |D4 00 80                           |  10/17 T
+cnc -32768        |z80  |IXIY |D4 00 80                           |  10/17 T
+cnc -32768        |z80n |-    |D4 00 80                           |  10/17 T
+cnc -32768        |z80n |IXIY |D4 00 80                           |  10/17 T
+cnc 32767         |8080 |-    |D4 FF 7F                           |  11/17 T
+cnc 32767         |8080 |IXIY |D4 FF 7F                           |  11/17 T
+cnc 32767         |8085 |-    |D4 FF 7F                           |   9/18 T
+cnc 32767         |8085 |IXIY |D4 FF 7F                           |   9/18 T
+cnc 32767         |gbz80|-    |D4 FF 7F                           |     12 T
+cnc 32767         |gbz80|IXIY |D4 FF 7F                           |     12 T
+cnc 32767         |z80  |-    |D4 FF 7F                           |  10/17 T
+cnc 32767         |z80  |IXIY |D4 FF 7F                           |  10/17 T
+cnc 32767         |z80n |-    |D4 FF 7F                           |  10/17 T
+cnc 32767         |z80n |IXIY |D4 FF 7F                           |  10/17 T
+cnc 65535         |8080 |-    |D4 FF FF                           |  11/17 T
+cnc 65535         |8080 |IXIY |D4 FF FF                           |  11/17 T
+cnc 65535         |8085 |-    |D4 FF FF                           |   9/18 T
+cnc 65535         |8085 |IXIY |D4 FF FF                           |   9/18 T
+cnc 65535         |gbz80|-    |D4 FF FF                           |     12 T
+cnc 65535         |gbz80|IXIY |D4 FF FF                           |     12 T
+cnc 65535         |z80  |-    |D4 FF FF                           |  10/17 T
+cnc 65535         |z80  |IXIY |D4 FF FF                           |  10/17 T
+cnc 65535         |z80n |-    |D4 FF FF                           |  10/17 T
+cnc 65535         |z80n |IXIY |D4 FF FF                           |  10/17 T
+cnv -32768        |8080 |-    |E4 00 80                           |  11/17 T
+cnv -32768        |8080 |IXIY |E4 00 80                           |  11/17 T
+cnv -32768        |8085 |-    |E4 00 80                           |   9/18 T
+cnv -32768        |8085 |IXIY |E4 00 80                           |   9/18 T
+cnv -32768        |z80  |-    |E4 00 80                           |  10/17 T
+cnv -32768        |z80  |IXIY |E4 00 80                           |  10/17 T
+cnv -32768        |z80n |-    |E4 00 80                           |  10/17 T
+cnv -32768        |z80n |IXIY |E4 00 80                           |  10/17 T
+cnv 32767         |8080 |-    |E4 FF 7F                           |  11/17 T
+cnv 32767         |8080 |IXIY |E4 FF 7F                           |  11/17 T
+cnv 32767         |8085 |-    |E4 FF 7F                           |   9/18 T
+cnv 32767         |8085 |IXIY |E4 FF 7F                           |   9/18 T
+cnv 32767         |z80  |-    |E4 FF 7F                           |  10/17 T
+cnv 32767         |z80  |IXIY |E4 FF 7F                           |  10/17 T
+cnv 32767         |z80n |-    |E4 FF 7F                           |  10/17 T
+cnv 32767         |z80n |IXIY |E4 FF 7F                           |  10/17 T
+cnv 65535         |8080 |-    |E4 FF FF                           |  11/17 T
+cnv 65535         |8080 |IXIY |E4 FF FF                           |  11/17 T
+cnv 65535         |8085 |-    |E4 FF FF                           |   9/18 T
+cnv 65535         |8085 |IXIY |E4 FF FF                           |   9/18 T
+cnv 65535         |z80  |-    |E4 FF FF                           |  10/17 T
+cnv 65535         |z80  |IXIY |E4 FF FF                           |  10/17 T
+cnv 65535         |z80n |-    |E4 FF FF                           |  10/17 T
+cnv 65535         |z80n |IXIY |E4 FF FF                           |  10/17 T
+cnz -32768        |8080 |-    |C4 00 80                           |  11/17 T
+cnz -32768        |8080 |IXIY |C4 00 80                           |  11/17 T
+cnz -32768        |8085 |-    |C4 00 80                           |   9/18 T
+cnz -32768        |8085 |IXIY |C4 00 80                           |   9/18 T
+cnz -32768        |gbz80|-    |C4 00 80                           |     12 T
+cnz -32768        |gbz80|IXIY |C4 00 80                           |     12 T
+cnz -32768        |z80  |-    |C4 00 80                           |  10/17 T
+cnz -32768        |z80  |IXIY |C4 00 80                           |  10/17 T
+cnz -32768        |z80n |-    |C4 00 80                           |  10/17 T
+cnz -32768        |z80n |IXIY |C4 00 80                           |  10/17 T
+cnz 32767         |8080 |-    |C4 FF 7F                           |  11/17 T
+cnz 32767         |8080 |IXIY |C4 FF 7F                           |  11/17 T
+cnz 32767         |8085 |-    |C4 FF 7F                           |   9/18 T
+cnz 32767         |8085 |IXIY |C4 FF 7F                           |   9/18 T
+cnz 32767         |gbz80|-    |C4 FF 7F                           |     12 T
+cnz 32767         |gbz80|IXIY |C4 FF 7F                           |     12 T
+cnz 32767         |z80  |-    |C4 FF 7F                           |  10/17 T
+cnz 32767         |z80  |IXIY |C4 FF 7F                           |  10/17 T
+cnz 32767         |z80n |-    |C4 FF 7F                           |  10/17 T
+cnz 32767         |z80n |IXIY |C4 FF 7F                           |  10/17 T
+cnz 65535         |8080 |-    |C4 FF FF                           |  11/17 T
+cnz 65535         |8080 |IXIY |C4 FF FF                           |  11/17 T
+cnz 65535         |8085 |-    |C4 FF FF                           |   9/18 T
+cnz 65535         |8085 |IXIY |C4 FF FF                           |   9/18 T
+cnz 65535         |gbz80|-    |C4 FF FF                           |     12 T
+cnz 65535         |gbz80|IXIY |C4 FF FF                           |     12 T
+cnz 65535         |z80  |-    |C4 FF FF                           |  10/17 T
+cnz 65535         |z80  |IXIY |C4 FF FF                           |  10/17 T
+cnz 65535         |z80n |-    |C4 FF FF                           |  10/17 T
+cnz 65535         |z80n |IXIY |C4 FF FF                           |  10/17 T
 cp (hl)           |8080 |-    |BE                                 |      7 T
 cp (hl)           |8080 |IXIY |BE                                 |      7 T
 cp (hl)           |8085 |-    |BE                                 |      7 T
@@ -1749,6 +2181,30 @@ cpdr              |z80  |-    |ED B9                              |  16/37 T
 cpdr              |z80  |IXIY |ED B9                              |  16/37 T
 cpdr              |z80n |-    |ED B9                              |  16/37 T
 cpdr              |z80n |IXIY |ED B9                              |  16/37 T
+cpe -32768        |8080 |-    |EC 00 80                           |  11/17 T
+cpe -32768        |8080 |IXIY |EC 00 80                           |  11/17 T
+cpe -32768        |8085 |-    |EC 00 80                           |   9/18 T
+cpe -32768        |8085 |IXIY |EC 00 80                           |   9/18 T
+cpe -32768        |z80  |-    |EC 00 80                           |  10/17 T
+cpe -32768        |z80  |IXIY |EC 00 80                           |  10/17 T
+cpe -32768        |z80n |-    |EC 00 80                           |  10/17 T
+cpe -32768        |z80n |IXIY |EC 00 80                           |  10/17 T
+cpe 32767         |8080 |-    |EC FF 7F                           |  11/17 T
+cpe 32767         |8080 |IXIY |EC FF 7F                           |  11/17 T
+cpe 32767         |8085 |-    |EC FF 7F                           |   9/18 T
+cpe 32767         |8085 |IXIY |EC FF 7F                           |   9/18 T
+cpe 32767         |z80  |-    |EC FF 7F                           |  10/17 T
+cpe 32767         |z80  |IXIY |EC FF 7F                           |  10/17 T
+cpe 32767         |z80n |-    |EC FF 7F                           |  10/17 T
+cpe 32767         |z80n |IXIY |EC FF 7F                           |  10/17 T
+cpe 65535         |8080 |-    |EC FF FF                           |  11/17 T
+cpe 65535         |8080 |IXIY |EC FF FF                           |  11/17 T
+cpe 65535         |8085 |-    |EC FF FF                           |   9/18 T
+cpe 65535         |8085 |IXIY |EC FF FF                           |   9/18 T
+cpe 65535         |z80  |-    |EC FF FF                           |  10/17 T
+cpe 65535         |z80  |IXIY |EC FF FF                           |  10/17 T
+cpe 65535         |z80n |-    |EC FF FF                           |  10/17 T
+cpe 65535         |z80n |IXIY |EC FF FF                           |  10/17 T
 cpi               |8080 |-    |CD @cpi                            |164/191 T
 cpi               |8080 |IXIY |CD @cpi                            |164/191 T
 cpi               |8085 |-    |CD @cpi                            |156/181 T
@@ -1819,6 +2275,84 @@ cpl a             |z80  |-    |2F                                 |      4 T
 cpl a             |z80  |IXIY |2F                                 |      4 T
 cpl a             |z80n |-    |2F                                 |      4 T
 cpl a             |z80n |IXIY |2F                                 |      4 T
+cpo -32768        |8080 |-    |E4 00 80                           |  11/17 T
+cpo -32768        |8080 |IXIY |E4 00 80                           |  11/17 T
+cpo -32768        |8085 |-    |E4 00 80                           |   9/18 T
+cpo -32768        |8085 |IXIY |E4 00 80                           |   9/18 T
+cpo -32768        |z80  |-    |E4 00 80                           |  10/17 T
+cpo -32768        |z80  |IXIY |E4 00 80                           |  10/17 T
+cpo -32768        |z80n |-    |E4 00 80                           |  10/17 T
+cpo -32768        |z80n |IXIY |E4 00 80                           |  10/17 T
+cpo 32767         |8080 |-    |E4 FF 7F                           |  11/17 T
+cpo 32767         |8080 |IXIY |E4 FF 7F                           |  11/17 T
+cpo 32767         |8085 |-    |E4 FF 7F                           |   9/18 T
+cpo 32767         |8085 |IXIY |E4 FF 7F                           |   9/18 T
+cpo 32767         |z80  |-    |E4 FF 7F                           |  10/17 T
+cpo 32767         |z80  |IXIY |E4 FF 7F                           |  10/17 T
+cpo 32767         |z80n |-    |E4 FF 7F                           |  10/17 T
+cpo 32767         |z80n |IXIY |E4 FF 7F                           |  10/17 T
+cpo 65535         |8080 |-    |E4 FF FF                           |  11/17 T
+cpo 65535         |8080 |IXIY |E4 FF FF                           |  11/17 T
+cpo 65535         |8085 |-    |E4 FF FF                           |   9/18 T
+cpo 65535         |8085 |IXIY |E4 FF FF                           |   9/18 T
+cpo 65535         |z80  |-    |E4 FF FF                           |  10/17 T
+cpo 65535         |z80  |IXIY |E4 FF FF                           |  10/17 T
+cpo 65535         |z80n |-    |E4 FF FF                           |  10/17 T
+cpo 65535         |z80n |IXIY |E4 FF FF                           |  10/17 T
+cv -32768         |8080 |-    |EC 00 80                           |  11/17 T
+cv -32768         |8080 |IXIY |EC 00 80                           |  11/17 T
+cv -32768         |8085 |-    |EC 00 80                           |   9/18 T
+cv -32768         |8085 |IXIY |EC 00 80                           |   9/18 T
+cv -32768         |z80  |-    |EC 00 80                           |  10/17 T
+cv -32768         |z80  |IXIY |EC 00 80                           |  10/17 T
+cv -32768         |z80n |-    |EC 00 80                           |  10/17 T
+cv -32768         |z80n |IXIY |EC 00 80                           |  10/17 T
+cv 32767          |8080 |-    |EC FF 7F                           |  11/17 T
+cv 32767          |8080 |IXIY |EC FF 7F                           |  11/17 T
+cv 32767          |8085 |-    |EC FF 7F                           |   9/18 T
+cv 32767          |8085 |IXIY |EC FF 7F                           |   9/18 T
+cv 32767          |z80  |-    |EC FF 7F                           |  10/17 T
+cv 32767          |z80  |IXIY |EC FF 7F                           |  10/17 T
+cv 32767          |z80n |-    |EC FF 7F                           |  10/17 T
+cv 32767          |z80n |IXIY |EC FF 7F                           |  10/17 T
+cv 65535          |8080 |-    |EC FF FF                           |  11/17 T
+cv 65535          |8080 |IXIY |EC FF FF                           |  11/17 T
+cv 65535          |8085 |-    |EC FF FF                           |   9/18 T
+cv 65535          |8085 |IXIY |EC FF FF                           |   9/18 T
+cv 65535          |z80  |-    |EC FF FF                           |  10/17 T
+cv 65535          |z80  |IXIY |EC FF FF                           |  10/17 T
+cv 65535          |z80n |-    |EC FF FF                           |  10/17 T
+cv 65535          |z80n |IXIY |EC FF FF                           |  10/17 T
+cz -32768         |8080 |-    |CC 00 80                           |  11/17 T
+cz -32768         |8080 |IXIY |CC 00 80                           |  11/17 T
+cz -32768         |8085 |-    |CC 00 80                           |   9/18 T
+cz -32768         |8085 |IXIY |CC 00 80                           |   9/18 T
+cz -32768         |gbz80|-    |CC 00 80                           |     12 T
+cz -32768         |gbz80|IXIY |CC 00 80                           |     12 T
+cz -32768         |z80  |-    |CC 00 80                           |  10/17 T
+cz -32768         |z80  |IXIY |CC 00 80                           |  10/17 T
+cz -32768         |z80n |-    |CC 00 80                           |  10/17 T
+cz -32768         |z80n |IXIY |CC 00 80                           |  10/17 T
+cz 32767          |8080 |-    |CC FF 7F                           |  11/17 T
+cz 32767          |8080 |IXIY |CC FF 7F                           |  11/17 T
+cz 32767          |8085 |-    |CC FF 7F                           |   9/18 T
+cz 32767          |8085 |IXIY |CC FF 7F                           |   9/18 T
+cz 32767          |gbz80|-    |CC FF 7F                           |     12 T
+cz 32767          |gbz80|IXIY |CC FF 7F                           |     12 T
+cz 32767          |z80  |-    |CC FF 7F                           |  10/17 T
+cz 32767          |z80  |IXIY |CC FF 7F                           |  10/17 T
+cz 32767          |z80n |-    |CC FF 7F                           |  10/17 T
+cz 32767          |z80n |IXIY |CC FF 7F                           |  10/17 T
+cz 65535          |8080 |-    |CC FF FF                           |  11/17 T
+cz 65535          |8080 |IXIY |CC FF FF                           |  11/17 T
+cz 65535          |8085 |-    |CC FF FF                           |   9/18 T
+cz 65535          |8085 |IXIY |CC FF FF                           |   9/18 T
+cz 65535          |gbz80|-    |CC FF FF                           |     12 T
+cz 65535          |gbz80|IXIY |CC FF FF                           |     12 T
+cz 65535          |z80  |-    |CC FF FF                           |  10/17 T
+cz 65535          |z80  |IXIY |CC FF FF                           |  10/17 T
+cz 65535          |z80n |-    |CC FF FF                           |  10/17 T
+cz 65535          |z80n |IXIY |CC FF FF                           |  10/17 T
 daa               |8080 |-    |27                                 |      4 T
 daa               |8080 |IXIY |27                                 |      4 T
 daa               |8085 |-    |27                                 |      4 T
@@ -2141,6 +2675,34 @@ di                |z80  |-    |F3                                 |      4 T
 di                |z80  |IXIY |F3                                 |      4 T
 di                |z80n |-    |F3                                 |      4 T
 di                |z80n |IXIY |F3                                 |      4 T
+djnz %j           |gbz80|-    |05; 20 %j                          |     12 T
+djnz %j           |gbz80|IXIY |05; 20 %j                          |     12 T
+djnz -32768       |8080 |-    |05; C2 00 80                       |     15 T
+djnz -32768       |8080 |IXIY |05; C2 00 80                       |     15 T
+djnz -32768       |8085 |-    |05; C2 00 80                       |  11/14 T
+djnz -32768       |8085 |IXIY |05; C2 00 80                       |  11/14 T
+djnz 32767        |8080 |-    |05; C2 FF 7F                       |     15 T
+djnz 32767        |8080 |IXIY |05; C2 FF 7F                       |     15 T
+djnz 32767        |8085 |-    |05; C2 FF 7F                       |  11/14 T
+djnz 32767        |8085 |IXIY |05; C2 FF 7F                       |  11/14 T
+djnz 65535        |8080 |-    |05; C2 FF FF                       |     15 T
+djnz 65535        |8080 |IXIY |05; C2 FF FF                       |     15 T
+djnz 65535        |8085 |-    |05; C2 FF FF                       |  11/14 T
+djnz 65535        |8085 |IXIY |05; C2 FF FF                       |  11/14 T
+djnz b, %j        |gbz80|-    |05; 20 %j                          |     12 T
+djnz b, %j        |gbz80|IXIY |05; 20 %j                          |     12 T
+djnz b, -32768    |8080 |-    |05; C2 00 80                       |     15 T
+djnz b, -32768    |8080 |IXIY |05; C2 00 80                       |     15 T
+djnz b, -32768    |8085 |-    |05; C2 00 80                       |  11/14 T
+djnz b, -32768    |8085 |IXIY |05; C2 00 80                       |  11/14 T
+djnz b, 32767     |8080 |-    |05; C2 FF 7F                       |     15 T
+djnz b, 32767     |8080 |IXIY |05; C2 FF 7F                       |     15 T
+djnz b, 32767     |8085 |-    |05; C2 FF 7F                       |  11/14 T
+djnz b, 32767     |8085 |IXIY |05; C2 FF 7F                       |  11/14 T
+djnz b, 65535     |8080 |-    |05; C2 FF FF                       |     15 T
+djnz b, 65535     |8080 |IXIY |05; C2 FF FF                       |     15 T
+djnz b, 65535     |8085 |-    |05; C2 FF FF                       |  11/14 T
+djnz b, 65535     |8085 |IXIY |05; C2 FF FF                       |  11/14 T
 ei                |8080 |-    |FB                                 |      4 T
 ei                |8080 |IXIY |FB                                 |      4 T
 ei                |8085 |-    |FB                                 |      4 T
@@ -2517,6 +3079,698 @@ inx sp            |z80  |-    |33                                 |      6 T
 inx sp            |z80  |IXIY |33                                 |      6 T
 inx sp            |z80n |-    |33                                 |      6 T
 inx sp            |z80n |IXIY |33                                 |      6 T
+jc -32768         |8080 |-    |DA 00 80                           |     10 T
+jc -32768         |8080 |IXIY |DA 00 80                           |     10 T
+jc -32768         |8085 |-    |DA 00 80                           |   7/10 T
+jc -32768         |8085 |IXIY |DA 00 80                           |   7/10 T
+jc -32768         |gbz80|-    |DA 00 80                           |     12 T
+jc -32768         |gbz80|IXIY |DA 00 80                           |     12 T
+jc -32768         |z80  |-    |DA 00 80                           |     10 T
+jc -32768         |z80  |IXIY |DA 00 80                           |     10 T
+jc -32768         |z80n |-    |DA 00 80                           |     10 T
+jc -32768         |z80n |IXIY |DA 00 80                           |     10 T
+jc 32767          |8080 |-    |DA FF 7F                           |     10 T
+jc 32767          |8080 |IXIY |DA FF 7F                           |     10 T
+jc 32767          |8085 |-    |DA FF 7F                           |   7/10 T
+jc 32767          |8085 |IXIY |DA FF 7F                           |   7/10 T
+jc 32767          |gbz80|-    |DA FF 7F                           |     12 T
+jc 32767          |gbz80|IXIY |DA FF 7F                           |     12 T
+jc 32767          |z80  |-    |DA FF 7F                           |     10 T
+jc 32767          |z80  |IXIY |DA FF 7F                           |     10 T
+jc 32767          |z80n |-    |DA FF 7F                           |     10 T
+jc 32767          |z80n |IXIY |DA FF 7F                           |     10 T
+jc 65535          |8080 |-    |DA FF FF                           |     10 T
+jc 65535          |8080 |IXIY |DA FF FF                           |     10 T
+jc 65535          |8085 |-    |DA FF FF                           |   7/10 T
+jc 65535          |8085 |IXIY |DA FF FF                           |   7/10 T
+jc 65535          |gbz80|-    |DA FF FF                           |     12 T
+jc 65535          |gbz80|IXIY |DA FF FF                           |     12 T
+jc 65535          |z80  |-    |DA FF FF                           |     10 T
+jc 65535          |z80  |IXIY |DA FF FF                           |     10 T
+jc 65535          |z80n |-    |DA FF FF                           |     10 T
+jc 65535          |z80n |IXIY |DA FF FF                           |     10 T
+jm -32768         |8080 |-    |FA 00 80                           |     10 T
+jm -32768         |8080 |IXIY |FA 00 80                           |     10 T
+jm -32768         |8085 |-    |FA 00 80                           |   7/10 T
+jm -32768         |8085 |IXIY |FA 00 80                           |   7/10 T
+jm -32768         |z80  |-    |FA 00 80                           |     10 T
+jm -32768         |z80  |IXIY |FA 00 80                           |     10 T
+jm -32768         |z80n |-    |FA 00 80                           |     10 T
+jm -32768         |z80n |IXIY |FA 00 80                           |     10 T
+jm 32767          |8080 |-    |FA FF 7F                           |     10 T
+jm 32767          |8080 |IXIY |FA FF 7F                           |     10 T
+jm 32767          |8085 |-    |FA FF 7F                           |   7/10 T
+jm 32767          |8085 |IXIY |FA FF 7F                           |   7/10 T
+jm 32767          |z80  |-    |FA FF 7F                           |     10 T
+jm 32767          |z80  |IXIY |FA FF 7F                           |     10 T
+jm 32767          |z80n |-    |FA FF 7F                           |     10 T
+jm 32767          |z80n |IXIY |FA FF 7F                           |     10 T
+jm 65535          |8080 |-    |FA FF FF                           |     10 T
+jm 65535          |8080 |IXIY |FA FF FF                           |     10 T
+jm 65535          |8085 |-    |FA FF FF                           |   7/10 T
+jm 65535          |8085 |IXIY |FA FF FF                           |   7/10 T
+jm 65535          |z80  |-    |FA FF FF                           |     10 T
+jm 65535          |z80  |IXIY |FA FF FF                           |     10 T
+jm 65535          |z80n |-    |FA FF FF                           |     10 T
+jm 65535          |z80n |IXIY |FA FF FF                           |     10 T
+jmp -32768        |8080 |-    |C3 00 80                           |     10 T
+jmp -32768        |8080 |IXIY |C3 00 80                           |     10 T
+jmp -32768        |8085 |-    |C3 00 80                           |     10 T
+jmp -32768        |8085 |IXIY |C3 00 80                           |     10 T
+jmp -32768        |gbz80|-    |C3 00 80                           |     12 T
+jmp -32768        |gbz80|IXIY |C3 00 80                           |     12 T
+jmp -32768        |z80  |-    |C3 00 80                           |     10 T
+jmp -32768        |z80  |IXIY |C3 00 80                           |     10 T
+jmp -32768        |z80n |-    |C3 00 80                           |     10 T
+jmp -32768        |z80n |IXIY |C3 00 80                           |     10 T
+jmp 32767         |8080 |-    |C3 FF 7F                           |     10 T
+jmp 32767         |8080 |IXIY |C3 FF 7F                           |     10 T
+jmp 32767         |8085 |-    |C3 FF 7F                           |     10 T
+jmp 32767         |8085 |IXIY |C3 FF 7F                           |     10 T
+jmp 32767         |gbz80|-    |C3 FF 7F                           |     12 T
+jmp 32767         |gbz80|IXIY |C3 FF 7F                           |     12 T
+jmp 32767         |z80  |-    |C3 FF 7F                           |     10 T
+jmp 32767         |z80  |IXIY |C3 FF 7F                           |     10 T
+jmp 32767         |z80n |-    |C3 FF 7F                           |     10 T
+jmp 32767         |z80n |IXIY |C3 FF 7F                           |     10 T
+jmp 65535         |8080 |-    |C3 FF FF                           |     10 T
+jmp 65535         |8080 |IXIY |C3 FF FF                           |     10 T
+jmp 65535         |8085 |-    |C3 FF FF                           |     10 T
+jmp 65535         |8085 |IXIY |C3 FF FF                           |     10 T
+jmp 65535         |gbz80|-    |C3 FF FF                           |     12 T
+jmp 65535         |gbz80|IXIY |C3 FF FF                           |     12 T
+jmp 65535         |z80  |-    |C3 FF FF                           |     10 T
+jmp 65535         |z80  |IXIY |C3 FF FF                           |     10 T
+jmp 65535         |z80n |-    |C3 FF FF                           |     10 T
+jmp 65535         |z80n |IXIY |C3 FF FF                           |     10 T
+jnc -32768        |8080 |-    |D2 00 80                           |     10 T
+jnc -32768        |8080 |IXIY |D2 00 80                           |     10 T
+jnc -32768        |8085 |-    |D2 00 80                           |   7/10 T
+jnc -32768        |8085 |IXIY |D2 00 80                           |   7/10 T
+jnc -32768        |gbz80|-    |D2 00 80                           |     12 T
+jnc -32768        |gbz80|IXIY |D2 00 80                           |     12 T
+jnc -32768        |z80  |-    |D2 00 80                           |     10 T
+jnc -32768        |z80  |IXIY |D2 00 80                           |     10 T
+jnc -32768        |z80n |-    |D2 00 80                           |     10 T
+jnc -32768        |z80n |IXIY |D2 00 80                           |     10 T
+jnc 32767         |8080 |-    |D2 FF 7F                           |     10 T
+jnc 32767         |8080 |IXIY |D2 FF 7F                           |     10 T
+jnc 32767         |8085 |-    |D2 FF 7F                           |   7/10 T
+jnc 32767         |8085 |IXIY |D2 FF 7F                           |   7/10 T
+jnc 32767         |gbz80|-    |D2 FF 7F                           |     12 T
+jnc 32767         |gbz80|IXIY |D2 FF 7F                           |     12 T
+jnc 32767         |z80  |-    |D2 FF 7F                           |     10 T
+jnc 32767         |z80  |IXIY |D2 FF 7F                           |     10 T
+jnc 32767         |z80n |-    |D2 FF 7F                           |     10 T
+jnc 32767         |z80n |IXIY |D2 FF 7F                           |     10 T
+jnc 65535         |8080 |-    |D2 FF FF                           |     10 T
+jnc 65535         |8080 |IXIY |D2 FF FF                           |     10 T
+jnc 65535         |8085 |-    |D2 FF FF                           |   7/10 T
+jnc 65535         |8085 |IXIY |D2 FF FF                           |   7/10 T
+jnc 65535         |gbz80|-    |D2 FF FF                           |     12 T
+jnc 65535         |gbz80|IXIY |D2 FF FF                           |     12 T
+jnc 65535         |z80  |-    |D2 FF FF                           |     10 T
+jnc 65535         |z80  |IXIY |D2 FF FF                           |     10 T
+jnc 65535         |z80n |-    |D2 FF FF                           |     10 T
+jnc 65535         |z80n |IXIY |D2 FF FF                           |     10 T
+jnv -32768        |8080 |-    |E2 00 80                           |     10 T
+jnv -32768        |8080 |IXIY |E2 00 80                           |     10 T
+jnv -32768        |8085 |-    |E2 00 80                           |   7/10 T
+jnv -32768        |8085 |IXIY |E2 00 80                           |   7/10 T
+jnv -32768        |z80  |-    |E2 00 80                           |     10 T
+jnv -32768        |z80  |IXIY |E2 00 80                           |     10 T
+jnv -32768        |z80n |-    |E2 00 80                           |     10 T
+jnv -32768        |z80n |IXIY |E2 00 80                           |     10 T
+jnv 32767         |8080 |-    |E2 FF 7F                           |     10 T
+jnv 32767         |8080 |IXIY |E2 FF 7F                           |     10 T
+jnv 32767         |8085 |-    |E2 FF 7F                           |   7/10 T
+jnv 32767         |8085 |IXIY |E2 FF 7F                           |   7/10 T
+jnv 32767         |z80  |-    |E2 FF 7F                           |     10 T
+jnv 32767         |z80  |IXIY |E2 FF 7F                           |     10 T
+jnv 32767         |z80n |-    |E2 FF 7F                           |     10 T
+jnv 32767         |z80n |IXIY |E2 FF 7F                           |     10 T
+jnv 65535         |8080 |-    |E2 FF FF                           |     10 T
+jnv 65535         |8080 |IXIY |E2 FF FF                           |     10 T
+jnv 65535         |8085 |-    |E2 FF FF                           |   7/10 T
+jnv 65535         |8085 |IXIY |E2 FF FF                           |   7/10 T
+jnv 65535         |z80  |-    |E2 FF FF                           |     10 T
+jnv 65535         |z80  |IXIY |E2 FF FF                           |     10 T
+jnv 65535         |z80n |-    |E2 FF FF                           |     10 T
+jnv 65535         |z80n |IXIY |E2 FF FF                           |     10 T
+jnz -32768        |8080 |-    |C2 00 80                           |     10 T
+jnz -32768        |8080 |IXIY |C2 00 80                           |     10 T
+jnz -32768        |8085 |-    |C2 00 80                           |   7/10 T
+jnz -32768        |8085 |IXIY |C2 00 80                           |   7/10 T
+jnz -32768        |gbz80|-    |C2 00 80                           |     12 T
+jnz -32768        |gbz80|IXIY |C2 00 80                           |     12 T
+jnz -32768        |z80  |-    |C2 00 80                           |     10 T
+jnz -32768        |z80  |IXIY |C2 00 80                           |     10 T
+jnz -32768        |z80n |-    |C2 00 80                           |     10 T
+jnz -32768        |z80n |IXIY |C2 00 80                           |     10 T
+jnz 32767         |8080 |-    |C2 FF 7F                           |     10 T
+jnz 32767         |8080 |IXIY |C2 FF 7F                           |     10 T
+jnz 32767         |8085 |-    |C2 FF 7F                           |   7/10 T
+jnz 32767         |8085 |IXIY |C2 FF 7F                           |   7/10 T
+jnz 32767         |gbz80|-    |C2 FF 7F                           |     12 T
+jnz 32767         |gbz80|IXIY |C2 FF 7F                           |     12 T
+jnz 32767         |z80  |-    |C2 FF 7F                           |     10 T
+jnz 32767         |z80  |IXIY |C2 FF 7F                           |     10 T
+jnz 32767         |z80n |-    |C2 FF 7F                           |     10 T
+jnz 32767         |z80n |IXIY |C2 FF 7F                           |     10 T
+jnz 65535         |8080 |-    |C2 FF FF                           |     10 T
+jnz 65535         |8080 |IXIY |C2 FF FF                           |     10 T
+jnz 65535         |8085 |-    |C2 FF FF                           |   7/10 T
+jnz 65535         |8085 |IXIY |C2 FF FF                           |   7/10 T
+jnz 65535         |gbz80|-    |C2 FF FF                           |     12 T
+jnz 65535         |gbz80|IXIY |C2 FF FF                           |     12 T
+jnz 65535         |z80  |-    |C2 FF FF                           |     10 T
+jnz 65535         |z80  |IXIY |C2 FF FF                           |     10 T
+jnz 65535         |z80n |-    |C2 FF FF                           |     10 T
+jnz 65535         |z80n |IXIY |C2 FF FF                           |     10 T
+jp (bc)           |8080 |-    |C5; C9                             |     21 T
+jp (bc)           |8080 |IXIY |C5; C9                             |     21 T
+jp (bc)           |8085 |-    |C5; C9                             |     22 T
+jp (bc)           |8085 |IXIY |C5; C9                             |     22 T
+jp (bc)           |gbz80|-    |C5; C9                             |     24 T
+jp (bc)           |gbz80|IXIY |C5; C9                             |     24 T
+jp (bc)           |z80  |-    |C5; C9                             |     21 T
+jp (bc)           |z80  |IXIY |C5; C9                             |     21 T
+jp (bc)           |z80n |-    |C5; C9                             |     21 T
+jp (bc)           |z80n |IXIY |C5; C9                             |     21 T
+jp (de)           |8080 |-    |D5; C9                             |     21 T
+jp (de)           |8080 |IXIY |D5; C9                             |     21 T
+jp (de)           |8085 |-    |D5; C9                             |     22 T
+jp (de)           |8085 |IXIY |D5; C9                             |     22 T
+jp (de)           |gbz80|-    |D5; C9                             |     24 T
+jp (de)           |gbz80|IXIY |D5; C9                             |     24 T
+jp (de)           |z80  |-    |D5; C9                             |     21 T
+jp (de)           |z80  |IXIY |D5; C9                             |     21 T
+jp (de)           |z80n |-    |D5; C9                             |     21 T
+jp (de)           |z80n |IXIY |D5; C9                             |     21 T
+jp (hl)           |8080 |-    |E9                                 |      5 T
+jp (hl)           |8080 |IXIY |E9                                 |      5 T
+jp (hl)           |8085 |-    |E9                                 |      6 T
+jp (hl)           |8085 |IXIY |E9                                 |      6 T
+jp (hl)           |gbz80|-    |E9                                 |      4 T
+jp (hl)           |gbz80|IXIY |E9                                 |      4 T
+jp (hl)           |z80  |-    |E9                                 |      4 T
+jp (hl)           |z80  |IXIY |E9                                 |      4 T
+jp (hl)           |z80n |-    |E9                                 |      4 T
+jp (hl)           |z80n |IXIY |E9                                 |      4 T
+jp (ix)           |z80  |-    |DD E9                              |      8 T
+jp (ix)           |z80  |IXIY |FD E9                              |      8 T
+jp (ix)           |z80n |-    |DD E9                              |      8 T
+jp (ix)           |z80n |IXIY |FD E9                              |      8 T
+jp (iy)           |z80  |-    |FD E9                              |      8 T
+jp (iy)           |z80  |IXIY |DD E9                              |      8 T
+jp (iy)           |z80n |-    |FD E9                              |      8 T
+jp (iy)           |z80n |IXIY |DD E9                              |      8 T
+jp -32768         |8080 |-    |C3 00 80                           |     10 T
+jp -32768         |8080 |IXIY |C3 00 80                           |     10 T
+jp -32768         |8085 |-    |C3 00 80                           |     10 T
+jp -32768         |8085 |IXIY |C3 00 80                           |     10 T
+jp -32768         |gbz80|-    |C3 00 80                           |     12 T
+jp -32768         |gbz80|IXIY |C3 00 80                           |     12 T
+jp -32768         |z80  |-    |C3 00 80                           |     10 T
+jp -32768         |z80  |IXIY |C3 00 80                           |     10 T
+jp -32768         |z80n |-    |C3 00 80                           |     10 T
+jp -32768         |z80n |IXIY |C3 00 80                           |     10 T
+jp 32767          |8080 |-    |C3 FF 7F                           |     10 T
+jp 32767          |8080 |IXIY |C3 FF 7F                           |     10 T
+jp 32767          |8085 |-    |C3 FF 7F                           |     10 T
+jp 32767          |8085 |IXIY |C3 FF 7F                           |     10 T
+jp 32767          |gbz80|-    |C3 FF 7F                           |     12 T
+jp 32767          |gbz80|IXIY |C3 FF 7F                           |     12 T
+jp 32767          |z80  |-    |C3 FF 7F                           |     10 T
+jp 32767          |z80  |IXIY |C3 FF 7F                           |     10 T
+jp 32767          |z80n |-    |C3 FF 7F                           |     10 T
+jp 32767          |z80n |IXIY |C3 FF 7F                           |     10 T
+jp 65535          |8080 |-    |C3 FF FF                           |     10 T
+jp 65535          |8080 |IXIY |C3 FF FF                           |     10 T
+jp 65535          |8085 |-    |C3 FF FF                           |     10 T
+jp 65535          |8085 |IXIY |C3 FF FF                           |     10 T
+jp 65535          |gbz80|-    |C3 FF FF                           |     12 T
+jp 65535          |gbz80|IXIY |C3 FF FF                           |     12 T
+jp 65535          |z80  |-    |C3 FF FF                           |     10 T
+jp 65535          |z80  |IXIY |C3 FF FF                           |     10 T
+jp 65535          |z80n |-    |C3 FF FF                           |     10 T
+jp 65535          |z80n |IXIY |C3 FF FF                           |     10 T
+jp c, -32768      |8080 |-    |DA 00 80                           |     10 T
+jp c, -32768      |8080 |IXIY |DA 00 80                           |     10 T
+jp c, -32768      |8085 |-    |DA 00 80                           |   7/10 T
+jp c, -32768      |8085 |IXIY |DA 00 80                           |   7/10 T
+jp c, -32768      |gbz80|-    |DA 00 80                           |     12 T
+jp c, -32768      |gbz80|IXIY |DA 00 80                           |     12 T
+jp c, -32768      |z80  |-    |DA 00 80                           |     10 T
+jp c, -32768      |z80  |IXIY |DA 00 80                           |     10 T
+jp c, -32768      |z80n |-    |DA 00 80                           |     10 T
+jp c, -32768      |z80n |IXIY |DA 00 80                           |     10 T
+jp c, 32767       |8080 |-    |DA FF 7F                           |     10 T
+jp c, 32767       |8080 |IXIY |DA FF 7F                           |     10 T
+jp c, 32767       |8085 |-    |DA FF 7F                           |   7/10 T
+jp c, 32767       |8085 |IXIY |DA FF 7F                           |   7/10 T
+jp c, 32767       |gbz80|-    |DA FF 7F                           |     12 T
+jp c, 32767       |gbz80|IXIY |DA FF 7F                           |     12 T
+jp c, 32767       |z80  |-    |DA FF 7F                           |     10 T
+jp c, 32767       |z80  |IXIY |DA FF 7F                           |     10 T
+jp c, 32767       |z80n |-    |DA FF 7F                           |     10 T
+jp c, 32767       |z80n |IXIY |DA FF 7F                           |     10 T
+jp c, 65535       |8080 |-    |DA FF FF                           |     10 T
+jp c, 65535       |8080 |IXIY |DA FF FF                           |     10 T
+jp c, 65535       |8085 |-    |DA FF FF                           |   7/10 T
+jp c, 65535       |8085 |IXIY |DA FF FF                           |   7/10 T
+jp c, 65535       |gbz80|-    |DA FF FF                           |     12 T
+jp c, 65535       |gbz80|IXIY |DA FF FF                           |     12 T
+jp c, 65535       |z80  |-    |DA FF FF                           |     10 T
+jp c, 65535       |z80  |IXIY |DA FF FF                           |     10 T
+jp c, 65535       |z80n |-    |DA FF FF                           |     10 T
+jp c, 65535       |z80n |IXIY |DA FF FF                           |     10 T
+jp m, -32768      |8080 |-    |FA 00 80                           |     10 T
+jp m, -32768      |8080 |IXIY |FA 00 80                           |     10 T
+jp m, -32768      |8085 |-    |FA 00 80                           |   7/10 T
+jp m, -32768      |8085 |IXIY |FA 00 80                           |   7/10 T
+jp m, -32768      |z80  |-    |FA 00 80                           |     10 T
+jp m, -32768      |z80  |IXIY |FA 00 80                           |     10 T
+jp m, -32768      |z80n |-    |FA 00 80                           |     10 T
+jp m, -32768      |z80n |IXIY |FA 00 80                           |     10 T
+jp m, 32767       |8080 |-    |FA FF 7F                           |     10 T
+jp m, 32767       |8080 |IXIY |FA FF 7F                           |     10 T
+jp m, 32767       |8085 |-    |FA FF 7F                           |   7/10 T
+jp m, 32767       |8085 |IXIY |FA FF 7F                           |   7/10 T
+jp m, 32767       |z80  |-    |FA FF 7F                           |     10 T
+jp m, 32767       |z80  |IXIY |FA FF 7F                           |     10 T
+jp m, 32767       |z80n |-    |FA FF 7F                           |     10 T
+jp m, 32767       |z80n |IXIY |FA FF 7F                           |     10 T
+jp m, 65535       |8080 |-    |FA FF FF                           |     10 T
+jp m, 65535       |8080 |IXIY |FA FF FF                           |     10 T
+jp m, 65535       |8085 |-    |FA FF FF                           |   7/10 T
+jp m, 65535       |8085 |IXIY |FA FF FF                           |   7/10 T
+jp m, 65535       |z80  |-    |FA FF FF                           |     10 T
+jp m, 65535       |z80  |IXIY |FA FF FF                           |     10 T
+jp m, 65535       |z80n |-    |FA FF FF                           |     10 T
+jp m, 65535       |z80n |IXIY |FA FF FF                           |     10 T
+jp nc, -32768     |8080 |-    |D2 00 80                           |     10 T
+jp nc, -32768     |8080 |IXIY |D2 00 80                           |     10 T
+jp nc, -32768     |8085 |-    |D2 00 80                           |   7/10 T
+jp nc, -32768     |8085 |IXIY |D2 00 80                           |   7/10 T
+jp nc, -32768     |gbz80|-    |D2 00 80                           |     12 T
+jp nc, -32768     |gbz80|IXIY |D2 00 80                           |     12 T
+jp nc, -32768     |z80  |-    |D2 00 80                           |     10 T
+jp nc, -32768     |z80  |IXIY |D2 00 80                           |     10 T
+jp nc, -32768     |z80n |-    |D2 00 80                           |     10 T
+jp nc, -32768     |z80n |IXIY |D2 00 80                           |     10 T
+jp nc, 32767      |8080 |-    |D2 FF 7F                           |     10 T
+jp nc, 32767      |8080 |IXIY |D2 FF 7F                           |     10 T
+jp nc, 32767      |8085 |-    |D2 FF 7F                           |   7/10 T
+jp nc, 32767      |8085 |IXIY |D2 FF 7F                           |   7/10 T
+jp nc, 32767      |gbz80|-    |D2 FF 7F                           |     12 T
+jp nc, 32767      |gbz80|IXIY |D2 FF 7F                           |     12 T
+jp nc, 32767      |z80  |-    |D2 FF 7F                           |     10 T
+jp nc, 32767      |z80  |IXIY |D2 FF 7F                           |     10 T
+jp nc, 32767      |z80n |-    |D2 FF 7F                           |     10 T
+jp nc, 32767      |z80n |IXIY |D2 FF 7F                           |     10 T
+jp nc, 65535      |8080 |-    |D2 FF FF                           |     10 T
+jp nc, 65535      |8080 |IXIY |D2 FF FF                           |     10 T
+jp nc, 65535      |8085 |-    |D2 FF FF                           |   7/10 T
+jp nc, 65535      |8085 |IXIY |D2 FF FF                           |   7/10 T
+jp nc, 65535      |gbz80|-    |D2 FF FF                           |     12 T
+jp nc, 65535      |gbz80|IXIY |D2 FF FF                           |     12 T
+jp nc, 65535      |z80  |-    |D2 FF FF                           |     10 T
+jp nc, 65535      |z80  |IXIY |D2 FF FF                           |     10 T
+jp nc, 65535      |z80n |-    |D2 FF FF                           |     10 T
+jp nc, 65535      |z80n |IXIY |D2 FF FF                           |     10 T
+jp nv, -32768     |8080 |-    |E2 00 80                           |     10 T
+jp nv, -32768     |8080 |IXIY |E2 00 80                           |     10 T
+jp nv, -32768     |8085 |-    |E2 00 80                           |   7/10 T
+jp nv, -32768     |8085 |IXIY |E2 00 80                           |   7/10 T
+jp nv, -32768     |z80  |-    |E2 00 80                           |     10 T
+jp nv, -32768     |z80  |IXIY |E2 00 80                           |     10 T
+jp nv, -32768     |z80n |-    |E2 00 80                           |     10 T
+jp nv, -32768     |z80n |IXIY |E2 00 80                           |     10 T
+jp nv, 32767      |8080 |-    |E2 FF 7F                           |     10 T
+jp nv, 32767      |8080 |IXIY |E2 FF 7F                           |     10 T
+jp nv, 32767      |8085 |-    |E2 FF 7F                           |   7/10 T
+jp nv, 32767      |8085 |IXIY |E2 FF 7F                           |   7/10 T
+jp nv, 32767      |z80  |-    |E2 FF 7F                           |     10 T
+jp nv, 32767      |z80  |IXIY |E2 FF 7F                           |     10 T
+jp nv, 32767      |z80n |-    |E2 FF 7F                           |     10 T
+jp nv, 32767      |z80n |IXIY |E2 FF 7F                           |     10 T
+jp nv, 65535      |8080 |-    |E2 FF FF                           |     10 T
+jp nv, 65535      |8080 |IXIY |E2 FF FF                           |     10 T
+jp nv, 65535      |8085 |-    |E2 FF FF                           |   7/10 T
+jp nv, 65535      |8085 |IXIY |E2 FF FF                           |   7/10 T
+jp nv, 65535      |z80  |-    |E2 FF FF                           |     10 T
+jp nv, 65535      |z80  |IXIY |E2 FF FF                           |     10 T
+jp nv, 65535      |z80n |-    |E2 FF FF                           |     10 T
+jp nv, 65535      |z80n |IXIY |E2 FF FF                           |     10 T
+jp nz, -32768     |8080 |-    |C2 00 80                           |     10 T
+jp nz, -32768     |8080 |IXIY |C2 00 80                           |     10 T
+jp nz, -32768     |8085 |-    |C2 00 80                           |   7/10 T
+jp nz, -32768     |8085 |IXIY |C2 00 80                           |   7/10 T
+jp nz, -32768     |gbz80|-    |C2 00 80                           |     12 T
+jp nz, -32768     |gbz80|IXIY |C2 00 80                           |     12 T
+jp nz, -32768     |z80  |-    |C2 00 80                           |     10 T
+jp nz, -32768     |z80  |IXIY |C2 00 80                           |     10 T
+jp nz, -32768     |z80n |-    |C2 00 80                           |     10 T
+jp nz, -32768     |z80n |IXIY |C2 00 80                           |     10 T
+jp nz, 32767      |8080 |-    |C2 FF 7F                           |     10 T
+jp nz, 32767      |8080 |IXIY |C2 FF 7F                           |     10 T
+jp nz, 32767      |8085 |-    |C2 FF 7F                           |   7/10 T
+jp nz, 32767      |8085 |IXIY |C2 FF 7F                           |   7/10 T
+jp nz, 32767      |gbz80|-    |C2 FF 7F                           |     12 T
+jp nz, 32767      |gbz80|IXIY |C2 FF 7F                           |     12 T
+jp nz, 32767      |z80  |-    |C2 FF 7F                           |     10 T
+jp nz, 32767      |z80  |IXIY |C2 FF 7F                           |     10 T
+jp nz, 32767      |z80n |-    |C2 FF 7F                           |     10 T
+jp nz, 32767      |z80n |IXIY |C2 FF 7F                           |     10 T
+jp nz, 65535      |8080 |-    |C2 FF FF                           |     10 T
+jp nz, 65535      |8080 |IXIY |C2 FF FF                           |     10 T
+jp nz, 65535      |8085 |-    |C2 FF FF                           |   7/10 T
+jp nz, 65535      |8085 |IXIY |C2 FF FF                           |   7/10 T
+jp nz, 65535      |gbz80|-    |C2 FF FF                           |     12 T
+jp nz, 65535      |gbz80|IXIY |C2 FF FF                           |     12 T
+jp nz, 65535      |z80  |-    |C2 FF FF                           |     10 T
+jp nz, 65535      |z80  |IXIY |C2 FF FF                           |     10 T
+jp nz, 65535      |z80n |-    |C2 FF FF                           |     10 T
+jp nz, 65535      |z80n |IXIY |C2 FF FF                           |     10 T
+jp p, -32768      |8080 |-    |F2 00 80                           |     10 T
+jp p, -32768      |8080 |IXIY |F2 00 80                           |     10 T
+jp p, -32768      |8085 |-    |F2 00 80                           |   7/10 T
+jp p, -32768      |8085 |IXIY |F2 00 80                           |   7/10 T
+jp p, -32768      |z80  |-    |F2 00 80                           |     10 T
+jp p, -32768      |z80  |IXIY |F2 00 80                           |     10 T
+jp p, -32768      |z80n |-    |F2 00 80                           |     10 T
+jp p, -32768      |z80n |IXIY |F2 00 80                           |     10 T
+jp p, 32767       |8080 |-    |F2 FF 7F                           |     10 T
+jp p, 32767       |8080 |IXIY |F2 FF 7F                           |     10 T
+jp p, 32767       |8085 |-    |F2 FF 7F                           |   7/10 T
+jp p, 32767       |8085 |IXIY |F2 FF 7F                           |   7/10 T
+jp p, 32767       |z80  |-    |F2 FF 7F                           |     10 T
+jp p, 32767       |z80  |IXIY |F2 FF 7F                           |     10 T
+jp p, 32767       |z80n |-    |F2 FF 7F                           |     10 T
+jp p, 32767       |z80n |IXIY |F2 FF 7F                           |     10 T
+jp p, 65535       |8080 |-    |F2 FF FF                           |     10 T
+jp p, 65535       |8080 |IXIY |F2 FF FF                           |     10 T
+jp p, 65535       |8085 |-    |F2 FF FF                           |   7/10 T
+jp p, 65535       |8085 |IXIY |F2 FF FF                           |   7/10 T
+jp p, 65535       |z80  |-    |F2 FF FF                           |     10 T
+jp p, 65535       |z80  |IXIY |F2 FF FF                           |     10 T
+jp p, 65535       |z80n |-    |F2 FF FF                           |     10 T
+jp p, 65535       |z80n |IXIY |F2 FF FF                           |     10 T
+jp pe, -32768     |8080 |-    |EA 00 80                           |     10 T
+jp pe, -32768     |8080 |IXIY |EA 00 80                           |     10 T
+jp pe, -32768     |8085 |-    |EA 00 80                           |   7/10 T
+jp pe, -32768     |8085 |IXIY |EA 00 80                           |   7/10 T
+jp pe, -32768     |z80  |-    |EA 00 80                           |     10 T
+jp pe, -32768     |z80  |IXIY |EA 00 80                           |     10 T
+jp pe, -32768     |z80n |-    |EA 00 80                           |     10 T
+jp pe, -32768     |z80n |IXIY |EA 00 80                           |     10 T
+jp pe, 32767      |8080 |-    |EA FF 7F                           |     10 T
+jp pe, 32767      |8080 |IXIY |EA FF 7F                           |     10 T
+jp pe, 32767      |8085 |-    |EA FF 7F                           |   7/10 T
+jp pe, 32767      |8085 |IXIY |EA FF 7F                           |   7/10 T
+jp pe, 32767      |z80  |-    |EA FF 7F                           |     10 T
+jp pe, 32767      |z80  |IXIY |EA FF 7F                           |     10 T
+jp pe, 32767      |z80n |-    |EA FF 7F                           |     10 T
+jp pe, 32767      |z80n |IXIY |EA FF 7F                           |     10 T
+jp pe, 65535      |8080 |-    |EA FF FF                           |     10 T
+jp pe, 65535      |8080 |IXIY |EA FF FF                           |     10 T
+jp pe, 65535      |8085 |-    |EA FF FF                           |   7/10 T
+jp pe, 65535      |8085 |IXIY |EA FF FF                           |   7/10 T
+jp pe, 65535      |z80  |-    |EA FF FF                           |     10 T
+jp pe, 65535      |z80  |IXIY |EA FF FF                           |     10 T
+jp pe, 65535      |z80n |-    |EA FF FF                           |     10 T
+jp pe, 65535      |z80n |IXIY |EA FF FF                           |     10 T
+jp po, -32768     |8080 |-    |E2 00 80                           |     10 T
+jp po, -32768     |8080 |IXIY |E2 00 80                           |     10 T
+jp po, -32768     |8085 |-    |E2 00 80                           |   7/10 T
+jp po, -32768     |8085 |IXIY |E2 00 80                           |   7/10 T
+jp po, -32768     |z80  |-    |E2 00 80                           |     10 T
+jp po, -32768     |z80  |IXIY |E2 00 80                           |     10 T
+jp po, -32768     |z80n |-    |E2 00 80                           |     10 T
+jp po, -32768     |z80n |IXIY |E2 00 80                           |     10 T
+jp po, 32767      |8080 |-    |E2 FF 7F                           |     10 T
+jp po, 32767      |8080 |IXIY |E2 FF 7F                           |     10 T
+jp po, 32767      |8085 |-    |E2 FF 7F                           |   7/10 T
+jp po, 32767      |8085 |IXIY |E2 FF 7F                           |   7/10 T
+jp po, 32767      |z80  |-    |E2 FF 7F                           |     10 T
+jp po, 32767      |z80  |IXIY |E2 FF 7F                           |     10 T
+jp po, 32767      |z80n |-    |E2 FF 7F                           |     10 T
+jp po, 32767      |z80n |IXIY |E2 FF 7F                           |     10 T
+jp po, 65535      |8080 |-    |E2 FF FF                           |     10 T
+jp po, 65535      |8080 |IXIY |E2 FF FF                           |     10 T
+jp po, 65535      |8085 |-    |E2 FF FF                           |   7/10 T
+jp po, 65535      |8085 |IXIY |E2 FF FF                           |   7/10 T
+jp po, 65535      |z80  |-    |E2 FF FF                           |     10 T
+jp po, 65535      |z80  |IXIY |E2 FF FF                           |     10 T
+jp po, 65535      |z80n |-    |E2 FF FF                           |     10 T
+jp po, 65535      |z80n |IXIY |E2 FF FF                           |     10 T
+jp v, -32768      |8080 |-    |EA 00 80                           |     10 T
+jp v, -32768      |8080 |IXIY |EA 00 80                           |     10 T
+jp v, -32768      |8085 |-    |EA 00 80                           |   7/10 T
+jp v, -32768      |8085 |IXIY |EA 00 80                           |   7/10 T
+jp v, -32768      |z80  |-    |EA 00 80                           |     10 T
+jp v, -32768      |z80  |IXIY |EA 00 80                           |     10 T
+jp v, -32768      |z80n |-    |EA 00 80                           |     10 T
+jp v, -32768      |z80n |IXIY |EA 00 80                           |     10 T
+jp v, 32767       |8080 |-    |EA FF 7F                           |     10 T
+jp v, 32767       |8080 |IXIY |EA FF 7F                           |     10 T
+jp v, 32767       |8085 |-    |EA FF 7F                           |   7/10 T
+jp v, 32767       |8085 |IXIY |EA FF 7F                           |   7/10 T
+jp v, 32767       |z80  |-    |EA FF 7F                           |     10 T
+jp v, 32767       |z80  |IXIY |EA FF 7F                           |     10 T
+jp v, 32767       |z80n |-    |EA FF 7F                           |     10 T
+jp v, 32767       |z80n |IXIY |EA FF 7F                           |     10 T
+jp v, 65535       |8080 |-    |EA FF FF                           |     10 T
+jp v, 65535       |8080 |IXIY |EA FF FF                           |     10 T
+jp v, 65535       |8085 |-    |EA FF FF                           |   7/10 T
+jp v, 65535       |8085 |IXIY |EA FF FF                           |   7/10 T
+jp v, 65535       |z80  |-    |EA FF FF                           |     10 T
+jp v, 65535       |z80  |IXIY |EA FF FF                           |     10 T
+jp v, 65535       |z80n |-    |EA FF FF                           |     10 T
+jp v, 65535       |z80n |IXIY |EA FF FF                           |     10 T
+jp z, -32768      |8080 |-    |CA 00 80                           |     10 T
+jp z, -32768      |8080 |IXIY |CA 00 80                           |     10 T
+jp z, -32768      |8085 |-    |CA 00 80                           |   7/10 T
+jp z, -32768      |8085 |IXIY |CA 00 80                           |   7/10 T
+jp z, -32768      |gbz80|-    |CA 00 80                           |     12 T
+jp z, -32768      |gbz80|IXIY |CA 00 80                           |     12 T
+jp z, -32768      |z80  |-    |CA 00 80                           |     10 T
+jp z, -32768      |z80  |IXIY |CA 00 80                           |     10 T
+jp z, -32768      |z80n |-    |CA 00 80                           |     10 T
+jp z, -32768      |z80n |IXIY |CA 00 80                           |     10 T
+jp z, 32767       |8080 |-    |CA FF 7F                           |     10 T
+jp z, 32767       |8080 |IXIY |CA FF 7F                           |     10 T
+jp z, 32767       |8085 |-    |CA FF 7F                           |   7/10 T
+jp z, 32767       |8085 |IXIY |CA FF 7F                           |   7/10 T
+jp z, 32767       |gbz80|-    |CA FF 7F                           |     12 T
+jp z, 32767       |gbz80|IXIY |CA FF 7F                           |     12 T
+jp z, 32767       |z80  |-    |CA FF 7F                           |     10 T
+jp z, 32767       |z80  |IXIY |CA FF 7F                           |     10 T
+jp z, 32767       |z80n |-    |CA FF 7F                           |     10 T
+jp z, 32767       |z80n |IXIY |CA FF 7F                           |     10 T
+jp z, 65535       |8080 |-    |CA FF FF                           |     10 T
+jp z, 65535       |8080 |IXIY |CA FF FF                           |     10 T
+jp z, 65535       |8085 |-    |CA FF FF                           |   7/10 T
+jp z, 65535       |8085 |IXIY |CA FF FF                           |   7/10 T
+jp z, 65535       |gbz80|-    |CA FF FF                           |     12 T
+jp z, 65535       |gbz80|IXIY |CA FF FF                           |     12 T
+jp z, 65535       |z80  |-    |CA FF FF                           |     10 T
+jp z, 65535       |z80  |IXIY |CA FF FF                           |     10 T
+jp z, 65535       |z80n |-    |CA FF FF                           |     10 T
+jp z, 65535       |z80n |IXIY |CA FF FF                           |     10 T
+jpe -32768        |8080 |-    |EA 00 80                           |     10 T
+jpe -32768        |8080 |IXIY |EA 00 80                           |     10 T
+jpe -32768        |8085 |-    |EA 00 80                           |   7/10 T
+jpe -32768        |8085 |IXIY |EA 00 80                           |   7/10 T
+jpe -32768        |z80  |-    |EA 00 80                           |     10 T
+jpe -32768        |z80  |IXIY |EA 00 80                           |     10 T
+jpe -32768        |z80n |-    |EA 00 80                           |     10 T
+jpe -32768        |z80n |IXIY |EA 00 80                           |     10 T
+jpe 32767         |8080 |-    |EA FF 7F                           |     10 T
+jpe 32767         |8080 |IXIY |EA FF 7F                           |     10 T
+jpe 32767         |8085 |-    |EA FF 7F                           |   7/10 T
+jpe 32767         |8085 |IXIY |EA FF 7F                           |   7/10 T
+jpe 32767         |z80  |-    |EA FF 7F                           |     10 T
+jpe 32767         |z80  |IXIY |EA FF 7F                           |     10 T
+jpe 32767         |z80n |-    |EA FF 7F                           |     10 T
+jpe 32767         |z80n |IXIY |EA FF 7F                           |     10 T
+jpe 65535         |8080 |-    |EA FF FF                           |     10 T
+jpe 65535         |8080 |IXIY |EA FF FF                           |     10 T
+jpe 65535         |8085 |-    |EA FF FF                           |   7/10 T
+jpe 65535         |8085 |IXIY |EA FF FF                           |   7/10 T
+jpe 65535         |z80  |-    |EA FF FF                           |     10 T
+jpe 65535         |z80  |IXIY |EA FF FF                           |     10 T
+jpe 65535         |z80n |-    |EA FF FF                           |     10 T
+jpe 65535         |z80n |IXIY |EA FF FF                           |     10 T
+jpo -32768        |8080 |-    |E2 00 80                           |     10 T
+jpo -32768        |8080 |IXIY |E2 00 80                           |     10 T
+jpo -32768        |8085 |-    |E2 00 80                           |   7/10 T
+jpo -32768        |8085 |IXIY |E2 00 80                           |   7/10 T
+jpo -32768        |z80  |-    |E2 00 80                           |     10 T
+jpo -32768        |z80  |IXIY |E2 00 80                           |     10 T
+jpo -32768        |z80n |-    |E2 00 80                           |     10 T
+jpo -32768        |z80n |IXIY |E2 00 80                           |     10 T
+jpo 32767         |8080 |-    |E2 FF 7F                           |     10 T
+jpo 32767         |8080 |IXIY |E2 FF 7F                           |     10 T
+jpo 32767         |8085 |-    |E2 FF 7F                           |   7/10 T
+jpo 32767         |8085 |IXIY |E2 FF 7F                           |   7/10 T
+jpo 32767         |z80  |-    |E2 FF 7F                           |     10 T
+jpo 32767         |z80  |IXIY |E2 FF 7F                           |     10 T
+jpo 32767         |z80n |-    |E2 FF 7F                           |     10 T
+jpo 32767         |z80n |IXIY |E2 FF 7F                           |     10 T
+jpo 65535         |8080 |-    |E2 FF FF                           |     10 T
+jpo 65535         |8080 |IXIY |E2 FF FF                           |     10 T
+jpo 65535         |8085 |-    |E2 FF FF                           |   7/10 T
+jpo 65535         |8085 |IXIY |E2 FF FF                           |   7/10 T
+jpo 65535         |z80  |-    |E2 FF FF                           |     10 T
+jpo 65535         |z80  |IXIY |E2 FF FF                           |     10 T
+jpo 65535         |z80n |-    |E2 FF FF                           |     10 T
+jpo 65535         |z80n |IXIY |E2 FF FF                           |     10 T
+jr %j             |gbz80|-    |18 %j                              |      8 T
+jr %j             |gbz80|IXIY |18 %j                              |      8 T
+jr %j             |z80  |-    |18 %j                              |     12 T
+jr %j             |z80  |IXIY |18 %j                              |     12 T
+jr %j             |z80n |-    |18 %j                              |     12 T
+jr %j             |z80n |IXIY |18 %j                              |     12 T
+jr -32768         |8080 |-    |C3 00 80                           |     10 T
+jr -32768         |8080 |IXIY |C3 00 80                           |     10 T
+jr -32768         |8085 |-    |C3 00 80                           |     10 T
+jr -32768         |8085 |IXIY |C3 00 80                           |     10 T
+jr 32767          |8080 |-    |C3 FF 7F                           |     10 T
+jr 32767          |8080 |IXIY |C3 FF 7F                           |     10 T
+jr 32767          |8085 |-    |C3 FF 7F                           |     10 T
+jr 32767          |8085 |IXIY |C3 FF 7F                           |     10 T
+jr 65535          |8080 |-    |C3 FF FF                           |     10 T
+jr 65535          |8080 |IXIY |C3 FF FF                           |     10 T
+jr 65535          |8085 |-    |C3 FF FF                           |     10 T
+jr 65535          |8085 |IXIY |C3 FF FF                           |     10 T
+jr c, %j          |gbz80|-    |38 %j                              |      8 T
+jr c, %j          |gbz80|IXIY |38 %j                              |      8 T
+jr c, %j          |z80  |-    |38 %j                              |   7/12 T
+jr c, %j          |z80  |IXIY |38 %j                              |   7/12 T
+jr c, %j          |z80n |-    |38 %j                              |   7/12 T
+jr c, %j          |z80n |IXIY |38 %j                              |   7/12 T
+jr c, -32768      |8080 |-    |DA 00 80                           |     10 T
+jr c, -32768      |8080 |IXIY |DA 00 80                           |     10 T
+jr c, -32768      |8085 |-    |DA 00 80                           |   7/10 T
+jr c, -32768      |8085 |IXIY |DA 00 80                           |   7/10 T
+jr c, 32767       |8080 |-    |DA FF 7F                           |     10 T
+jr c, 32767       |8080 |IXIY |DA FF 7F                           |     10 T
+jr c, 32767       |8085 |-    |DA FF 7F                           |   7/10 T
+jr c, 32767       |8085 |IXIY |DA FF 7F                           |   7/10 T
+jr c, 65535       |8080 |-    |DA FF FF                           |     10 T
+jr c, 65535       |8080 |IXIY |DA FF FF                           |     10 T
+jr c, 65535       |8085 |-    |DA FF FF                           |   7/10 T
+jr c, 65535       |8085 |IXIY |DA FF FF                           |   7/10 T
+jr nc, %j         |gbz80|-    |30 %j                              |      8 T
+jr nc, %j         |gbz80|IXIY |30 %j                              |      8 T
+jr nc, %j         |z80  |-    |30 %j                              |   7/12 T
+jr nc, %j         |z80  |IXIY |30 %j                              |   7/12 T
+jr nc, %j         |z80n |-    |30 %j                              |   7/12 T
+jr nc, %j         |z80n |IXIY |30 %j                              |   7/12 T
+jr nc, -32768     |8080 |-    |D2 00 80                           |     10 T
+jr nc, -32768     |8080 |IXIY |D2 00 80                           |     10 T
+jr nc, -32768     |8085 |-    |D2 00 80                           |   7/10 T
+jr nc, -32768     |8085 |IXIY |D2 00 80                           |   7/10 T
+jr nc, 32767      |8080 |-    |D2 FF 7F                           |     10 T
+jr nc, 32767      |8080 |IXIY |D2 FF 7F                           |     10 T
+jr nc, 32767      |8085 |-    |D2 FF 7F                           |   7/10 T
+jr nc, 32767      |8085 |IXIY |D2 FF 7F                           |   7/10 T
+jr nc, 65535      |8080 |-    |D2 FF FF                           |     10 T
+jr nc, 65535      |8080 |IXIY |D2 FF FF                           |     10 T
+jr nc, 65535      |8085 |-    |D2 FF FF                           |   7/10 T
+jr nc, 65535      |8085 |IXIY |D2 FF FF                           |   7/10 T
+jr nz, %j         |gbz80|-    |20 %j                              |      8 T
+jr nz, %j         |gbz80|IXIY |20 %j                              |      8 T
+jr nz, %j         |z80  |-    |20 %j                              |   7/12 T
+jr nz, %j         |z80  |IXIY |20 %j                              |   7/12 T
+jr nz, %j         |z80n |-    |20 %j                              |   7/12 T
+jr nz, %j         |z80n |IXIY |20 %j                              |   7/12 T
+jr nz, -32768     |8080 |-    |C2 00 80                           |     10 T
+jr nz, -32768     |8080 |IXIY |C2 00 80                           |     10 T
+jr nz, -32768     |8085 |-    |C2 00 80                           |   7/10 T
+jr nz, -32768     |8085 |IXIY |C2 00 80                           |   7/10 T
+jr nz, 32767      |8080 |-    |C2 FF 7F                           |     10 T
+jr nz, 32767      |8080 |IXIY |C2 FF 7F                           |     10 T
+jr nz, 32767      |8085 |-    |C2 FF 7F                           |   7/10 T
+jr nz, 32767      |8085 |IXIY |C2 FF 7F                           |   7/10 T
+jr nz, 65535      |8080 |-    |C2 FF FF                           |     10 T
+jr nz, 65535      |8080 |IXIY |C2 FF FF                           |     10 T
+jr nz, 65535      |8085 |-    |C2 FF FF                           |   7/10 T
+jr nz, 65535      |8085 |IXIY |C2 FF FF                           |   7/10 T
+jr z, %j          |gbz80|-    |28 %j                              |      8 T
+jr z, %j          |gbz80|IXIY |28 %j                              |      8 T
+jr z, %j          |z80  |-    |28 %j                              |   7/12 T
+jr z, %j          |z80  |IXIY |28 %j                              |   7/12 T
+jr z, %j          |z80n |-    |28 %j                              |   7/12 T
+jr z, %j          |z80n |IXIY |28 %j                              |   7/12 T
+jr z, -32768      |8080 |-    |CA 00 80                           |     10 T
+jr z, -32768      |8080 |IXIY |CA 00 80                           |     10 T
+jr z, -32768      |8085 |-    |CA 00 80                           |   7/10 T
+jr z, -32768      |8085 |IXIY |CA 00 80                           |   7/10 T
+jr z, 32767       |8080 |-    |CA FF 7F                           |     10 T
+jr z, 32767       |8080 |IXIY |CA FF 7F                           |     10 T
+jr z, 32767       |8085 |-    |CA FF 7F                           |   7/10 T
+jr z, 32767       |8085 |IXIY |CA FF 7F                           |   7/10 T
+jr z, 65535       |8080 |-    |CA FF FF                           |     10 T
+jr z, 65535       |8080 |IXIY |CA FF FF                           |     10 T
+jr z, 65535       |8085 |-    |CA FF FF                           |   7/10 T
+jr z, 65535       |8085 |IXIY |CA FF FF                           |   7/10 T
+jv -32768         |8080 |-    |EA 00 80                           |     10 T
+jv -32768         |8080 |IXIY |EA 00 80                           |     10 T
+jv -32768         |8085 |-    |EA 00 80                           |   7/10 T
+jv -32768         |8085 |IXIY |EA 00 80                           |   7/10 T
+jv -32768         |z80  |-    |EA 00 80                           |     10 T
+jv -32768         |z80  |IXIY |EA 00 80                           |     10 T
+jv -32768         |z80n |-    |EA 00 80                           |     10 T
+jv -32768         |z80n |IXIY |EA 00 80                           |     10 T
+jv 32767          |8080 |-    |EA FF 7F                           |     10 T
+jv 32767          |8080 |IXIY |EA FF 7F                           |     10 T
+jv 32767          |8085 |-    |EA FF 7F                           |   7/10 T
+jv 32767          |8085 |IXIY |EA FF 7F                           |   7/10 T
+jv 32767          |z80  |-    |EA FF 7F                           |     10 T
+jv 32767          |z80  |IXIY |EA FF 7F                           |     10 T
+jv 32767          |z80n |-    |EA FF 7F                           |     10 T
+jv 32767          |z80n |IXIY |EA FF 7F                           |     10 T
+jv 65535          |8080 |-    |EA FF FF                           |     10 T
+jv 65535          |8080 |IXIY |EA FF FF                           |     10 T
+jv 65535          |8085 |-    |EA FF FF                           |   7/10 T
+jv 65535          |8085 |IXIY |EA FF FF                           |   7/10 T
+jv 65535          |z80  |-    |EA FF FF                           |     10 T
+jv 65535          |z80  |IXIY |EA FF FF                           |     10 T
+jv 65535          |z80n |-    |EA FF FF                           |     10 T
+jv 65535          |z80n |IXIY |EA FF FF                           |     10 T
+jz -32768         |8080 |-    |CA 00 80                           |     10 T
+jz -32768         |8080 |IXIY |CA 00 80                           |     10 T
+jz -32768         |8085 |-    |CA 00 80                           |   7/10 T
+jz -32768         |8085 |IXIY |CA 00 80                           |   7/10 T
+jz -32768         |gbz80|-    |CA 00 80                           |     12 T
+jz -32768         |gbz80|IXIY |CA 00 80                           |     12 T
+jz -32768         |z80  |-    |CA 00 80                           |     10 T
+jz -32768         |z80  |IXIY |CA 00 80                           |     10 T
+jz -32768         |z80n |-    |CA 00 80                           |     10 T
+jz -32768         |z80n |IXIY |CA 00 80                           |     10 T
+jz 32767          |8080 |-    |CA FF 7F                           |     10 T
+jz 32767          |8080 |IXIY |CA FF 7F                           |     10 T
+jz 32767          |8085 |-    |CA FF 7F                           |   7/10 T
+jz 32767          |8085 |IXIY |CA FF 7F                           |   7/10 T
+jz 32767          |gbz80|-    |CA FF 7F                           |     12 T
+jz 32767          |gbz80|IXIY |CA FF 7F                           |     12 T
+jz 32767          |z80  |-    |CA FF 7F                           |     10 T
+jz 32767          |z80  |IXIY |CA FF 7F                           |     10 T
+jz 32767          |z80n |-    |CA FF 7F                           |     10 T
+jz 32767          |z80n |IXIY |CA FF 7F                           |     10 T
+jz 65535          |8080 |-    |CA FF FF                           |     10 T
+jz 65535          |8080 |IXIY |CA FF FF                           |     10 T
+jz 65535          |8085 |-    |CA FF FF                           |   7/10 T
+jz 65535          |8085 |IXIY |CA FF FF                           |   7/10 T
+jz 65535          |gbz80|-    |CA FF FF                           |     12 T
+jz 65535          |gbz80|IXIY |CA FF FF                           |     12 T
+jz 65535          |z80  |-    |CA FF FF                           |     10 T
+jz 65535          |z80  |IXIY |CA FF FF                           |     10 T
+jz 65535          |z80n |-    |CA FF FF                           |     10 T
+jz 65535          |z80n |IXIY |CA FF FF                           |     10 T
 ld (-32768), a    |8080 |-    |32 00 80                           |     13 T
 ld (-32768), a    |8080 |IXIY |32 00 80                           |     13 T
 ld (-32768), a    |8085 |-    |32 00 80                           |     13 T
@@ -6141,6 +7395,16 @@ ori 255           |z80  |-    |F6 FF                              |      7 T
 ori 255           |z80  |IXIY |F6 FF                              |      7 T
 ori 255           |z80n |-    |F6 FF                              |      7 T
 ori 255           |z80n |IXIY |F6 FF                              |      7 T
+pchl              |8080 |-    |E9                                 |      5 T
+pchl              |8080 |IXIY |E9                                 |      5 T
+pchl              |8085 |-    |E9                                 |      6 T
+pchl              |8085 |IXIY |E9                                 |      6 T
+pchl              |gbz80|-    |E9                                 |      4 T
+pchl              |gbz80|IXIY |E9                                 |      4 T
+pchl              |z80  |-    |E9                                 |      4 T
+pchl              |z80  |IXIY |E9                                 |      4 T
+pchl              |z80n |-    |E9                                 |      4 T
+pchl              |z80n |IXIY |E9                                 |      4 T
 pop af            |8080 |-    |F1                                 |     10 T
 pop af            |8080 |IXIY |F1                                 |     10 T
 pop af            |8085 |-    |F1                                 |     10 T
@@ -6337,6 +7601,16 @@ rar               |z80  |-    |1F                                 |      4 T
 rar               |z80  |IXIY |1F                                 |      4 T
 rar               |z80n |-    |1F                                 |      4 T
 rar               |z80n |IXIY |1F                                 |      4 T
+rc                |8080 |-    |D8                                 |   5/11 T
+rc                |8080 |IXIY |D8                                 |   5/11 T
+rc                |8085 |-    |D8                                 |   6/12 T
+rc                |8085 |IXIY |D8                                 |   6/12 T
+rc                |gbz80|-    |D8                                 |      8 T
+rc                |gbz80|IXIY |D8                                 |      8 T
+rc                |z80  |-    |D8                                 |   5/11 T
+rc                |z80  |IXIY |D8                                 |   5/11 T
+rc                |z80n |-    |D8                                 |   5/11 T
+rc                |z80n |IXIY |D8                                 |   5/11 T
 res %c, (hl)      |gbz80|-    |CB 86+%c*08                        |     16 T
 res %c, (hl)      |gbz80|IXIY |CB 86+%c*08                        |     16 T
 res %c, (hl)      |z80  |-    |CB 86+%c*08                        |     15 T
@@ -6385,6 +7659,114 @@ res %c, l         |z80  |-    |CB 85+%c*08                        |      8 T
 res %c, l         |z80  |IXIY |CB 85+%c*08                        |      8 T
 res %c, l         |z80n |-    |CB 85+%c*08                        |      8 T
 res %c, l         |z80n |IXIY |CB 85+%c*08                        |      8 T
+ret               |8080 |-    |C9                                 |     10 T
+ret               |8080 |IXIY |C9                                 |     10 T
+ret               |8085 |-    |C9                                 |     10 T
+ret               |8085 |IXIY |C9                                 |     10 T
+ret               |gbz80|-    |C9                                 |      8 T
+ret               |gbz80|IXIY |C9                                 |      8 T
+ret               |z80  |-    |C9                                 |     10 T
+ret               |z80  |IXIY |C9                                 |     10 T
+ret               |z80n |-    |C9                                 |     10 T
+ret               |z80n |IXIY |C9                                 |     10 T
+ret c             |8080 |-    |D8                                 |   5/11 T
+ret c             |8080 |IXIY |D8                                 |   5/11 T
+ret c             |8085 |-    |D8                                 |   6/12 T
+ret c             |8085 |IXIY |D8                                 |   6/12 T
+ret c             |gbz80|-    |D8                                 |      8 T
+ret c             |gbz80|IXIY |D8                                 |      8 T
+ret c             |z80  |-    |D8                                 |   5/11 T
+ret c             |z80  |IXIY |D8                                 |   5/11 T
+ret c             |z80n |-    |D8                                 |   5/11 T
+ret c             |z80n |IXIY |D8                                 |   5/11 T
+ret m             |8080 |-    |F8                                 |   5/11 T
+ret m             |8080 |IXIY |F8                                 |   5/11 T
+ret m             |8085 |-    |F8                                 |   6/12 T
+ret m             |8085 |IXIY |F8                                 |   6/12 T
+ret m             |z80  |-    |F8                                 |   5/11 T
+ret m             |z80  |IXIY |F8                                 |   5/11 T
+ret m             |z80n |-    |F8                                 |   5/11 T
+ret m             |z80n |IXIY |F8                                 |   5/11 T
+ret nc            |8080 |-    |D0                                 |   5/11 T
+ret nc            |8080 |IXIY |D0                                 |   5/11 T
+ret nc            |8085 |-    |D0                                 |   6/12 T
+ret nc            |8085 |IXIY |D0                                 |   6/12 T
+ret nc            |gbz80|-    |D0                                 |      8 T
+ret nc            |gbz80|IXIY |D0                                 |      8 T
+ret nc            |z80  |-    |D0                                 |   5/11 T
+ret nc            |z80  |IXIY |D0                                 |   5/11 T
+ret nc            |z80n |-    |D0                                 |   5/11 T
+ret nc            |z80n |IXIY |D0                                 |   5/11 T
+ret nv            |8080 |-    |E0                                 |   5/11 T
+ret nv            |8080 |IXIY |E0                                 |   5/11 T
+ret nv            |8085 |-    |E0                                 |   6/12 T
+ret nv            |8085 |IXIY |E0                                 |   6/12 T
+ret nv            |z80  |-    |E0                                 |   5/11 T
+ret nv            |z80  |IXIY |E0                                 |   5/11 T
+ret nv            |z80n |-    |E0                                 |   5/11 T
+ret nv            |z80n |IXIY |E0                                 |   5/11 T
+ret nz            |8080 |-    |C0                                 |   5/11 T
+ret nz            |8080 |IXIY |C0                                 |   5/11 T
+ret nz            |8085 |-    |C0                                 |   6/12 T
+ret nz            |8085 |IXIY |C0                                 |   6/12 T
+ret nz            |gbz80|-    |C0                                 |      8 T
+ret nz            |gbz80|IXIY |C0                                 |      8 T
+ret nz            |z80  |-    |C0                                 |   5/11 T
+ret nz            |z80  |IXIY |C0                                 |   5/11 T
+ret nz            |z80n |-    |C0                                 |   5/11 T
+ret nz            |z80n |IXIY |C0                                 |   5/11 T
+ret p             |8080 |-    |F0                                 |   5/11 T
+ret p             |8080 |IXIY |F0                                 |   5/11 T
+ret p             |8085 |-    |F0                                 |   6/12 T
+ret p             |8085 |IXIY |F0                                 |   6/12 T
+ret p             |z80  |-    |F0                                 |   5/11 T
+ret p             |z80  |IXIY |F0                                 |   5/11 T
+ret p             |z80n |-    |F0                                 |   5/11 T
+ret p             |z80n |IXIY |F0                                 |   5/11 T
+ret pe            |8080 |-    |E8                                 |   5/11 T
+ret pe            |8080 |IXIY |E8                                 |   5/11 T
+ret pe            |8085 |-    |E8                                 |   6/12 T
+ret pe            |8085 |IXIY |E8                                 |   6/12 T
+ret pe            |z80  |-    |E8                                 |   5/11 T
+ret pe            |z80  |IXIY |E8                                 |   5/11 T
+ret pe            |z80n |-    |E8                                 |   5/11 T
+ret pe            |z80n |IXIY |E8                                 |   5/11 T
+ret po            |8080 |-    |E0                                 |   5/11 T
+ret po            |8080 |IXIY |E0                                 |   5/11 T
+ret po            |8085 |-    |E0                                 |   6/12 T
+ret po            |8085 |IXIY |E0                                 |   6/12 T
+ret po            |z80  |-    |E0                                 |   5/11 T
+ret po            |z80  |IXIY |E0                                 |   5/11 T
+ret po            |z80n |-    |E0                                 |   5/11 T
+ret po            |z80n |IXIY |E0                                 |   5/11 T
+ret v             |8080 |-    |E8                                 |   5/11 T
+ret v             |8080 |IXIY |E8                                 |   5/11 T
+ret v             |8085 |-    |E8                                 |   6/12 T
+ret v             |8085 |IXIY |E8                                 |   6/12 T
+ret v             |z80  |-    |E8                                 |   5/11 T
+ret v             |z80  |IXIY |E8                                 |   5/11 T
+ret v             |z80n |-    |E8                                 |   5/11 T
+ret v             |z80n |IXIY |E8                                 |   5/11 T
+ret z             |8080 |-    |C8                                 |   5/11 T
+ret z             |8080 |IXIY |C8                                 |   5/11 T
+ret z             |8085 |-    |C8                                 |   6/12 T
+ret z             |8085 |IXIY |C8                                 |   6/12 T
+ret z             |gbz80|-    |C8                                 |      8 T
+ret z             |gbz80|IXIY |C8                                 |      8 T
+ret z             |z80  |-    |C8                                 |   5/11 T
+ret z             |z80  |IXIY |C8                                 |   5/11 T
+ret z             |z80n |-    |C8                                 |   5/11 T
+ret z             |z80n |IXIY |C8                                 |   5/11 T
+reti              |gbz80|-    |D9                                 |      8 T
+reti              |gbz80|IXIY |D9                                 |      8 T
+reti              |z80  |-    |ED 4D                              |     14 T
+reti              |z80  |IXIY |ED 4D                              |     14 T
+reti              |z80n |-    |ED 4D                              |     14 T
+reti              |z80n |IXIY |ED 4D                              |     14 T
+retn              |z80  |-    |ED 45                              |     14 T
+retn              |z80  |IXIY |ED 45                              |     14 T
+retn              |z80n |-    |ED 45                              |     14 T
+retn              |z80n |IXIY |ED 45                              |     14 T
 rl (hl)           |gbz80|-    |CB 16                              |     16 T
 rl (hl)           |gbz80|IXIY |CB 16                              |     16 T
 rl (hl)           |z80  |-    |CB 16                              |     15 T
@@ -6569,6 +7951,66 @@ rld               |z80  |-    |ED 6F                              |     18 T
 rld               |z80  |IXIY |ED 6F                              |     18 T
 rld               |z80n |-    |ED 6F                              |     18 T
 rld               |z80n |IXIY |ED 6F                              |     18 T
+rm                |8080 |-    |F8                                 |   5/11 T
+rm                |8080 |IXIY |F8                                 |   5/11 T
+rm                |8085 |-    |F8                                 |   6/12 T
+rm                |8085 |IXIY |F8                                 |   6/12 T
+rm                |z80  |-    |F8                                 |   5/11 T
+rm                |z80  |IXIY |F8                                 |   5/11 T
+rm                |z80n |-    |F8                                 |   5/11 T
+rm                |z80n |IXIY |F8                                 |   5/11 T
+rnc               |8080 |-    |D0                                 |   5/11 T
+rnc               |8080 |IXIY |D0                                 |   5/11 T
+rnc               |8085 |-    |D0                                 |   6/12 T
+rnc               |8085 |IXIY |D0                                 |   6/12 T
+rnc               |gbz80|-    |D0                                 |      8 T
+rnc               |gbz80|IXIY |D0                                 |      8 T
+rnc               |z80  |-    |D0                                 |   5/11 T
+rnc               |z80  |IXIY |D0                                 |   5/11 T
+rnc               |z80n |-    |D0                                 |   5/11 T
+rnc               |z80n |IXIY |D0                                 |   5/11 T
+rnv               |8080 |-    |E0                                 |   5/11 T
+rnv               |8080 |IXIY |E0                                 |   5/11 T
+rnv               |8085 |-    |E0                                 |   6/12 T
+rnv               |8085 |IXIY |E0                                 |   6/12 T
+rnv               |z80  |-    |E0                                 |   5/11 T
+rnv               |z80  |IXIY |E0                                 |   5/11 T
+rnv               |z80n |-    |E0                                 |   5/11 T
+rnv               |z80n |IXIY |E0                                 |   5/11 T
+rnz               |8080 |-    |C0                                 |   5/11 T
+rnz               |8080 |IXIY |C0                                 |   5/11 T
+rnz               |8085 |-    |C0                                 |   6/12 T
+rnz               |8085 |IXIY |C0                                 |   6/12 T
+rnz               |gbz80|-    |C0                                 |      8 T
+rnz               |gbz80|IXIY |C0                                 |      8 T
+rnz               |z80  |-    |C0                                 |   5/11 T
+rnz               |z80  |IXIY |C0                                 |   5/11 T
+rnz               |z80n |-    |C0                                 |   5/11 T
+rnz               |z80n |IXIY |C0                                 |   5/11 T
+rp                |8080 |-    |F0                                 |   5/11 T
+rp                |8080 |IXIY |F0                                 |   5/11 T
+rp                |8085 |-    |F0                                 |   6/12 T
+rp                |8085 |IXIY |F0                                 |   6/12 T
+rp                |z80  |-    |F0                                 |   5/11 T
+rp                |z80  |IXIY |F0                                 |   5/11 T
+rp                |z80n |-    |F0                                 |   5/11 T
+rp                |z80n |IXIY |F0                                 |   5/11 T
+rpe               |8080 |-    |E8                                 |   5/11 T
+rpe               |8080 |IXIY |E8                                 |   5/11 T
+rpe               |8085 |-    |E8                                 |   6/12 T
+rpe               |8085 |IXIY |E8                                 |   6/12 T
+rpe               |z80  |-    |E8                                 |   5/11 T
+rpe               |z80  |IXIY |E8                                 |   5/11 T
+rpe               |z80n |-    |E8                                 |   5/11 T
+rpe               |z80n |IXIY |E8                                 |   5/11 T
+rpo               |8080 |-    |E0                                 |   5/11 T
+rpo               |8080 |IXIY |E0                                 |   5/11 T
+rpo               |8085 |-    |E0                                 |   6/12 T
+rpo               |8085 |IXIY |E0                                 |   6/12 T
+rpo               |z80  |-    |E0                                 |   5/11 T
+rpo               |z80  |IXIY |E0                                 |   5/11 T
+rpo               |z80n |-    |E0                                 |   5/11 T
+rpo               |z80n |IXIY |E0                                 |   5/11 T
 rr (hl)           |gbz80|-    |CB 1E                              |     16 T
 rr (hl)           |gbz80|IXIY |CB 1E                              |     16 T
 rr (hl)           |z80  |-    |CB 1E                              |     15 T
@@ -6763,6 +8205,24 @@ rst %c            |z80  |-    |C7+%c                              |     11 T
 rst %c            |z80  |IXIY |C7+%c                              |     11 T
 rst %c            |z80n |-    |C7+%c                              |     11 T
 rst %c            |z80n |IXIY |C7+%c                              |     11 T
+rv                |8080 |-    |E8                                 |   5/11 T
+rv                |8080 |IXIY |E8                                 |   5/11 T
+rv                |8085 |-    |E8                                 |   6/12 T
+rv                |8085 |IXIY |E8                                 |   6/12 T
+rv                |z80  |-    |E8                                 |   5/11 T
+rv                |z80  |IXIY |E8                                 |   5/11 T
+rv                |z80n |-    |E8                                 |   5/11 T
+rv                |z80n |IXIY |E8                                 |   5/11 T
+rz                |8080 |-    |C8                                 |   5/11 T
+rz                |8080 |IXIY |C8                                 |   5/11 T
+rz                |8085 |-    |C8                                 |   6/12 T
+rz                |8085 |IXIY |C8                                 |   6/12 T
+rz                |gbz80|-    |C8                                 |      8 T
+rz                |gbz80|IXIY |C8                                 |      8 T
+rz                |z80  |-    |C8                                 |   5/11 T
+rz                |z80  |IXIY |C8                                 |   5/11 T
+rz                |z80n |-    |C8                                 |   5/11 T
+rz                |z80n |IXIY |C8                                 |   5/11 T
 sbb a             |8080 |-    |9F                                 |      4 T
 sbb a             |8080 |IXIY |9F                                 |      4 T
 sbb a             |8085 |-    |9F                                 |      4 T

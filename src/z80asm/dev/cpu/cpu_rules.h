@@ -26629,12 +26629,22 @@ if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0xDA);
 }
 
+| label? _TK_JP _TK_IND_BC _TK_RPAREN _TK_NEWLINE @{
+DO_stmt(0xC5);
+DO_stmt(0xC9);
+}
+
 | label? _TK_JP _TK_IND_C _TK_RPAREN _TK_NEWLINE @{
 switch (opts.cpu) {
 case CPU_Z80N: 
 DO_stmt(0xED98);
 break;
 default: error_illegal_ident(); }
+}
+
+| label? _TK_JP _TK_IND_DE _TK_RPAREN _TK_NEWLINE @{
+DO_stmt(0xD5);
+DO_stmt(0xC9);
 }
 
 | label? _TK_JP _TK_IND_HL _TK_RPAREN _TK_NEWLINE @{

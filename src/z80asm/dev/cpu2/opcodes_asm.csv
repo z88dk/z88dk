@@ -1538,6 +1538,114 @@ bit 7, l      |z180 |   **         |   **
 bit 7, l      |z80  |CB 7D         |      8 T
 bit 7, l      |z80n |CB 7D         |      8 T
               |     |              |         
+call %m       |8080 |CD %m %m      |     17 T
+call %m       |8085 |CD %m %m      |     18 T
+call %m       |gbz80|CD %m %m      |     12 T
+call %m       |r2k  |   **         |   **    
+call %m       |r3k  |   **         |   **    
+call %m       |z180 |   **         |   **    
+call %m       |z80  |CD %m %m      |     17 T
+call %m       |z80n |CD %m %m      |     17 T
+              |     |              |         
+call c, %m    |8080 |DC %m %m      |  11/17 T
+call c, %m    |8085 |DC %m %m      |   9/18 T
+call c, %m    |gbz80|DC %m %m      |     12 T
+call c, %m    |r2k  |   **         |   **    
+call c, %m    |r3k  |   **         |   **    
+call c, %m    |z180 |   **         |   **    
+call c, %m    |z80  |DC %m %m      |  10/17 T
+call c, %m    |z80n |DC %m %m      |  10/17 T
+              |     |              |         
+call m, %m    |8080 |FC %m %m      |  11/17 T
+call m, %m    |8085 |FC %m %m      |   9/18 T
+call m, %m    |gbz80|   **         |   **    
+call m, %m    |r2k  |   **         |   **    
+call m, %m    |r3k  |   **         |   **    
+call m, %m    |z180 |   **         |   **    
+call m, %m    |z80  |FC %m %m      |  10/17 T
+call m, %m    |z80n |FC %m %m      |  10/17 T
+              |     |              |         
+call nc, %m   |8080 |D4 %m %m      |  11/17 T
+call nc, %m   |8085 |D4 %m %m      |   9/18 T
+call nc, %m   |gbz80|D4 %m %m      |     12 T
+call nc, %m   |r2k  |   **         |   **    
+call nc, %m   |r3k  |   **         |   **    
+call nc, %m   |z180 |   **         |   **    
+call nc, %m   |z80  |D4 %m %m      |  10/17 T
+call nc, %m   |z80n |D4 %m %m      |  10/17 T
+              |     |              |         
+call nv, %m   |8080 |E4 %m %m      |  11/17 T
+call nv, %m   |8085 |E4 %m %m      |   9/18 T
+call nv, %m   |gbz80|   **         |   **    
+call nv, %m   |r2k  |   **         |   **    
+call nv, %m   |r3k  |   **         |   **    
+call nv, %m   |z180 |   **         |   **    
+call nv, %m   |z80  |E4 %m %m      |  10/17 T
+call nv, %m   |z80n |E4 %m %m      |  10/17 T
+              |     |              |         
+call nz, %m   |8080 |C4 %m %m      |  11/17 T
+call nz, %m   |8085 |C4 %m %m      |   9/18 T
+call nz, %m   |gbz80|C4 %m %m      |     12 T
+call nz, %m   |r2k  |   **         |   **    
+call nz, %m   |r3k  |   **         |   **    
+call nz, %m   |z180 |   **         |   **    
+call nz, %m   |z80  |C4 %m %m      |  10/17 T
+call nz, %m   |z80n |C4 %m %m      |  10/17 T
+              |     |              |         
+call p, %m    |8080 |F4 %m %m      |  11/17 T
+call p, %m    |8085 |F4 %m %m      |   9/18 T
+call p, %m    |gbz80|   **         |   **    
+call p, %m    |r2k  |   **         |   **    
+call p, %m    |r3k  |   **         |   **    
+call p, %m    |z180 |   **         |   **    
+call p, %m    |z80  |F4 %m %m      |  10/17 T
+call p, %m    |z80n |F4 %m %m      |  10/17 T
+              |     |              |         
+call pe, %m   |8080 |EC %m %m      |  11/17 T
+call pe, %m   |8085 |EC %m %m      |   9/18 T
+call pe, %m   |gbz80|   **         |   **    
+call pe, %m   |r2k  |   **         |   **    
+call pe, %m   |r3k  |   **         |   **    
+call pe, %m   |z180 |   **         |   **    
+call pe, %m   |z80  |EC %m %m      |  10/17 T
+call pe, %m   |z80n |EC %m %m      |  10/17 T
+              |     |              |         
+call po, %m   |8080 |E4 %m %m      |  11/17 T
+call po, %m   |8085 |E4 %m %m      |   9/18 T
+call po, %m   |gbz80|   **         |   **    
+call po, %m   |r2k  |   **         |   **    
+call po, %m   |r3k  |   **         |   **    
+call po, %m   |z180 |   **         |   **    
+call po, %m   |z80  |E4 %m %m      |  10/17 T
+call po, %m   |z80n |E4 %m %m      |  10/17 T
+              |     |              |         
+call v, %m    |8080 |EC %m %m      |  11/17 T
+call v, %m    |8085 |EC %m %m      |   9/18 T
+call v, %m    |gbz80|   **         |   **    
+call v, %m    |r2k  |   **         |   **    
+call v, %m    |r3k  |   **         |   **    
+call v, %m    |z180 |   **         |   **    
+call v, %m    |z80  |EC %m %m      |  10/17 T
+call v, %m    |z80n |EC %m %m      |  10/17 T
+              |     |              |         
+call z, %m    |8080 |CC %m %m      |  11/17 T
+call z, %m    |8085 |CC %m %m      |   9/18 T
+call z, %m    |gbz80|CC %m %m      |     12 T
+call z, %m    |r2k  |   **         |   **    
+call z, %m    |r3k  |   **         |   **    
+call z, %m    |z180 |   **         |   **    
+call z, %m    |z80  |CC %m %m      |  10/17 T
+call z, %m    |z80n |CC %m %m      |  10/17 T
+              |     |              |         
+cc %m         |8080 |DC %m %m      |  11/17 T
+cc %m         |8085 |DC %m %m      |   9/18 T
+cc %m         |gbz80|DC %m %m      |     12 T
+cc %m         |r2k  |   **         |   **    
+cc %m         |r3k  |   **         |   **    
+cc %m         |z180 |   **         |   **    
+cc %m         |z80  |DC %m %m      |  10/17 T
+cc %m         |z80n |DC %m %m      |  10/17 T
+              |     |              |         
 ccf           |8080 |3F            |      4 T
 ccf           |8085 |3F            |      4 T
 ccf           |gbz80|3F            |      4 T
@@ -1546,6 +1654,15 @@ ccf           |r3k  |   **         |   **
 ccf           |z180 |   **         |   **    
 ccf           |z80  |3F            |      4 T
 ccf           |z80n |3F            |      4 T
+              |     |              |         
+cm %m         |8080 |FC %m %m      |  11/17 T
+cm %m         |8085 |FC %m %m      |   9/18 T
+cm %m         |gbz80|   **         |   **    
+cm %m         |r2k  |   **         |   **    
+cm %m         |r3k  |   **         |   **    
+cm %m         |z180 |   **         |   **    
+cm %m         |z80  |FC %m %m      |  10/17 T
+cm %m         |z80n |FC %m %m      |  10/17 T
               |     |              |         
 cma           |8080 |2F            |      4 T
 cma           |8085 |2F            |      4 T
@@ -1808,6 +1925,33 @@ cmp m         |z180 |   **         |   **
 cmp m         |z80  |BE            |      7 T
 cmp m         |z80n |BE            |      7 T
               |     |              |         
+cnc %m        |8080 |D4 %m %m      |  11/17 T
+cnc %m        |8085 |D4 %m %m      |   9/18 T
+cnc %m        |gbz80|D4 %m %m      |     12 T
+cnc %m        |r2k  |   **         |   **    
+cnc %m        |r3k  |   **         |   **    
+cnc %m        |z180 |   **         |   **    
+cnc %m        |z80  |D4 %m %m      |  10/17 T
+cnc %m        |z80n |D4 %m %m      |  10/17 T
+              |     |              |         
+cnv %m        |8080 |E4 %m %m      |  11/17 T
+cnv %m        |8085 |E4 %m %m      |   9/18 T
+cnv %m        |gbz80|   **         |   **    
+cnv %m        |r2k  |   **         |   **    
+cnv %m        |r3k  |   **         |   **    
+cnv %m        |z180 |   **         |   **    
+cnv %m        |z80  |E4 %m %m      |  10/17 T
+cnv %m        |z80n |E4 %m %m      |  10/17 T
+              |     |              |         
+cnz %m        |8080 |C4 %m %m      |  11/17 T
+cnz %m        |8085 |C4 %m %m      |   9/18 T
+cnz %m        |gbz80|C4 %m %m      |     12 T
+cnz %m        |r2k  |   **         |   **    
+cnz %m        |r3k  |   **         |   **    
+cnz %m        |z180 |   **         |   **    
+cnz %m        |z80  |C4 %m %m      |  10/17 T
+cnz %m        |z80n |C4 %m %m      |  10/17 T
+              |     |              |         
 cp %n         |8080 |FE %n         |      7 T
 cp %n         |8085 |FE %n         |      7 T
 cp %n         |gbz80|FE %n         |      8 T
@@ -2060,6 +2204,15 @@ cpdr          |z180 |   **         |   **
 cpdr          |z80  |ED B9         |  16/37 T
 cpdr          |z80n |ED B9         |  16/37 T
               |     |              |         
+cpe %m        |8080 |EC %m %m      |  11/17 T
+cpe %m        |8085 |EC %m %m      |   9/18 T
+cpe %m        |gbz80|   **         |   **    
+cpe %m        |r2k  |   **         |   **    
+cpe %m        |r3k  |   **         |   **    
+cpe %m        |z180 |   **         |   **    
+cpe %m        |z80  |EC %m %m      |  10/17 T
+cpe %m        |z80n |EC %m %m      |  10/17 T
+              |     |              |         
 cpi           |8080 |CD @cpi       |164/191 T
 cpi           |8085 |CD @cpi       |156/181 T
 cpi           |gbz80|CD @cpi       |408/424 T
@@ -2104,6 +2257,33 @@ cpl a         |r3k  |   **         |   **
 cpl a         |z180 |   **         |   **    
 cpl a         |z80  |2F            |      4 T
 cpl a         |z80n |2F            |      4 T
+              |     |              |         
+cpo %m        |8080 |E4 %m %m      |  11/17 T
+cpo %m        |8085 |E4 %m %m      |   9/18 T
+cpo %m        |gbz80|   **         |   **    
+cpo %m        |r2k  |   **         |   **    
+cpo %m        |r3k  |   **         |   **    
+cpo %m        |z180 |   **         |   **    
+cpo %m        |z80  |E4 %m %m      |  10/17 T
+cpo %m        |z80n |E4 %m %m      |  10/17 T
+              |     |              |         
+cv %m         |8080 |EC %m %m      |  11/17 T
+cv %m         |8085 |EC %m %m      |   9/18 T
+cv %m         |gbz80|   **         |   **    
+cv %m         |r2k  |   **         |   **    
+cv %m         |r3k  |   **         |   **    
+cv %m         |z180 |   **         |   **    
+cv %m         |z80  |EC %m %m      |  10/17 T
+cv %m         |z80n |EC %m %m      |  10/17 T
+              |     |              |         
+cz %m         |8080 |CC %m %m      |  11/17 T
+cz %m         |8085 |CC %m %m      |   9/18 T
+cz %m         |gbz80|CC %m %m      |     12 T
+cz %m         |r2k  |   **         |   **    
+cz %m         |r3k  |   **         |   **    
+cz %m         |z180 |   **         |   **    
+cz %m         |z80  |CC %m %m      |  10/17 T
+cz %m         |z80n |CC %m %m      |  10/17 T
               |     |              |         
 daa           |8080 |27            |      4 T
 daa           |8085 |27            |      4 T
@@ -2419,6 +2599,42 @@ di            |r3k  |   **         |   **
 di            |z180 |   **         |   **    
 di            |z80  |F3            |      4 T
 di            |z80n |F3            |      4 T
+              |     |              |         
+djnz %j       |8080 |   **         |   **    
+djnz %j       |8085 |   **         |   **    
+djnz %j       |gbz80|05; 20 %j     |     12 T
+djnz %j       |r2k  |   **         |   **    
+djnz %j       |r3k  |   **         |   **    
+djnz %j       |z180 |   **         |   **    
+djnz %j       |z80  |   **         |   **    
+djnz %j       |z80n |   **         |   **    
+              |     |              |         
+djnz %m       |8080 |05; C2 %m %m  |     15 T
+djnz %m       |8085 |05; C2 %m %m  |  11/14 T
+djnz %m       |gbz80|   **         |   **    
+djnz %m       |r2k  |   **         |   **    
+djnz %m       |r3k  |   **         |   **    
+djnz %m       |z180 |   **         |   **    
+djnz %m       |z80  |   **         |   **    
+djnz %m       |z80n |   **         |   **    
+              |     |              |         
+djnz b, %j    |8080 |   **         |   **    
+djnz b, %j    |8085 |   **         |   **    
+djnz b, %j    |gbz80|05; 20 %j     |     12 T
+djnz b, %j    |r2k  |   **         |   **    
+djnz b, %j    |r3k  |   **         |   **    
+djnz b, %j    |z180 |   **         |   **    
+djnz b, %j    |z80  |   **         |   **    
+djnz b, %j    |z80n |   **         |   **    
+              |     |              |         
+djnz b, %m    |8080 |05; C2 %m %m  |     15 T
+djnz b, %m    |8085 |05; C2 %m %m  |  11/14 T
+djnz b, %m    |gbz80|   **         |   **    
+djnz b, %m    |r2k  |   **         |   **    
+djnz b, %m    |r3k  |   **         |   **    
+djnz b, %m    |z180 |   **         |   **    
+djnz b, %m    |z80  |   **         |   **    
+djnz b, %m    |z80n |   **         |   **    
               |     |              |         
 ei            |8080 |FB            |      4 T
 ei            |8085 |FB            |      4 T
@@ -2833,6 +3049,330 @@ inx sp        |r3k  |   **         |   **
 inx sp        |z180 |   **         |   **    
 inx sp        |z80  |33            |      6 T
 inx sp        |z80n |33            |      6 T
+              |     |              |         
+jc %m         |8080 |DA %m %m      |     10 T
+jc %m         |8085 |DA %m %m      |   7/10 T
+jc %m         |gbz80|DA %m %m      |     12 T
+jc %m         |r2k  |   **         |   **    
+jc %m         |r3k  |   **         |   **    
+jc %m         |z180 |   **         |   **    
+jc %m         |z80  |DA %m %m      |     10 T
+jc %m         |z80n |DA %m %m      |     10 T
+              |     |              |         
+jm %m         |8080 |FA %m %m      |     10 T
+jm %m         |8085 |FA %m %m      |   7/10 T
+jm %m         |gbz80|   **         |   **    
+jm %m         |r2k  |   **         |   **    
+jm %m         |r3k  |   **         |   **    
+jm %m         |z180 |   **         |   **    
+jm %m         |z80  |FA %m %m      |     10 T
+jm %m         |z80n |FA %m %m      |     10 T
+              |     |              |         
+jmp %m        |8080 |C3 %m %m      |     10 T
+jmp %m        |8085 |C3 %m %m      |     10 T
+jmp %m        |gbz80|C3 %m %m      |     12 T
+jmp %m        |r2k  |   **         |   **    
+jmp %m        |r3k  |   **         |   **    
+jmp %m        |z180 |   **         |   **    
+jmp %m        |z80  |C3 %m %m      |     10 T
+jmp %m        |z80n |C3 %m %m      |     10 T
+              |     |              |         
+jnc %m        |8080 |D2 %m %m      |     10 T
+jnc %m        |8085 |D2 %m %m      |   7/10 T
+jnc %m        |gbz80|D2 %m %m      |     12 T
+jnc %m        |r2k  |   **         |   **    
+jnc %m        |r3k  |   **         |   **    
+jnc %m        |z180 |   **         |   **    
+jnc %m        |z80  |D2 %m %m      |     10 T
+jnc %m        |z80n |D2 %m %m      |     10 T
+              |     |              |         
+jnv %m        |8080 |E2 %m %m      |     10 T
+jnv %m        |8085 |E2 %m %m      |   7/10 T
+jnv %m        |gbz80|   **         |   **    
+jnv %m        |r2k  |   **         |   **    
+jnv %m        |r3k  |   **         |   **    
+jnv %m        |z180 |   **         |   **    
+jnv %m        |z80  |E2 %m %m      |     10 T
+jnv %m        |z80n |E2 %m %m      |     10 T
+              |     |              |         
+jnz %m        |8080 |C2 %m %m      |     10 T
+jnz %m        |8085 |C2 %m %m      |   7/10 T
+jnz %m        |gbz80|C2 %m %m      |     12 T
+jnz %m        |r2k  |   **         |   **    
+jnz %m        |r3k  |   **         |   **    
+jnz %m        |z180 |   **         |   **    
+jnz %m        |z80  |C2 %m %m      |     10 T
+jnz %m        |z80n |C2 %m %m      |     10 T
+              |     |              |         
+jp %m         |8080 |C3 %m %m      |     10 T
+jp %m         |8085 |C3 %m %m      |     10 T
+jp %m         |gbz80|C3 %m %m      |     12 T
+jp %m         |r2k  |   **         |   **    
+jp %m         |r3k  |   **         |   **    
+jp %m         |z180 |   **         |   **    
+jp %m         |z80  |C3 %m %m      |     10 T
+jp %m         |z80n |C3 %m %m      |     10 T
+              |     |              |         
+jp (bc)       |8080 |C5; C9        |     21 T
+jp (bc)       |8085 |C5; C9        |     22 T
+jp (bc)       |gbz80|C5; C9        |     24 T
+jp (bc)       |r2k  |   **         |   **    
+jp (bc)       |r3k  |   **         |   **    
+jp (bc)       |z180 |   **         |   **    
+jp (bc)       |z80  |C5; C9        |     21 T
+jp (bc)       |z80n |C5; C9        |     21 T
+              |     |              |         
+jp (de)       |8080 |D5; C9        |     21 T
+jp (de)       |8085 |D5; C9        |     22 T
+jp (de)       |gbz80|D5; C9        |     24 T
+jp (de)       |r2k  |   **         |   **    
+jp (de)       |r3k  |   **         |   **    
+jp (de)       |z180 |   **         |   **    
+jp (de)       |z80  |D5; C9        |     21 T
+jp (de)       |z80n |D5; C9        |     21 T
+              |     |              |         
+jp (hl)       |8080 |E9            |      5 T
+jp (hl)       |8085 |E9            |      6 T
+jp (hl)       |gbz80|E9            |      4 T
+jp (hl)       |r2k  |   **         |   **    
+jp (hl)       |r3k  |   **         |   **    
+jp (hl)       |z180 |   **         |   **    
+jp (hl)       |z80  |E9            |      4 T
+jp (hl)       |z80n |E9            |      4 T
+              |     |              |         
+jp (ix)       |8080 |   **         |   **    
+jp (ix)       |8085 |   **         |   **    
+jp (ix)       |gbz80|   **         |   **    
+jp (ix)       |r2k  |   **         |   **    
+jp (ix)       |r3k  |   **         |   **    
+jp (ix)       |z180 |   **         |   **    
+jp (ix)       |z80  |DD E9         |      8 T
+jp (ix)       |z80n |DD E9         |      8 T
+              |     |              |         
+jp (iy)       |8080 |   **         |   **    
+jp (iy)       |8085 |   **         |   **    
+jp (iy)       |gbz80|   **         |   **    
+jp (iy)       |r2k  |   **         |   **    
+jp (iy)       |r3k  |   **         |   **    
+jp (iy)       |z180 |   **         |   **    
+jp (iy)       |z80  |FD E9         |      8 T
+jp (iy)       |z80n |FD E9         |      8 T
+              |     |              |         
+jp c, %m      |8080 |DA %m %m      |     10 T
+jp c, %m      |8085 |DA %m %m      |   7/10 T
+jp c, %m      |gbz80|DA %m %m      |     12 T
+jp c, %m      |r2k  |   **         |   **    
+jp c, %m      |r3k  |   **         |   **    
+jp c, %m      |z180 |   **         |   **    
+jp c, %m      |z80  |DA %m %m      |     10 T
+jp c, %m      |z80n |DA %m %m      |     10 T
+              |     |              |         
+jp m, %m      |8080 |FA %m %m      |     10 T
+jp m, %m      |8085 |FA %m %m      |   7/10 T
+jp m, %m      |gbz80|   **         |   **    
+jp m, %m      |r2k  |   **         |   **    
+jp m, %m      |r3k  |   **         |   **    
+jp m, %m      |z180 |   **         |   **    
+jp m, %m      |z80  |FA %m %m      |     10 T
+jp m, %m      |z80n |FA %m %m      |     10 T
+              |     |              |         
+jp nc, %m     |8080 |D2 %m %m      |     10 T
+jp nc, %m     |8085 |D2 %m %m      |   7/10 T
+jp nc, %m     |gbz80|D2 %m %m      |     12 T
+jp nc, %m     |r2k  |   **         |   **    
+jp nc, %m     |r3k  |   **         |   **    
+jp nc, %m     |z180 |   **         |   **    
+jp nc, %m     |z80  |D2 %m %m      |     10 T
+jp nc, %m     |z80n |D2 %m %m      |     10 T
+              |     |              |         
+jp nv, %m     |8080 |E2 %m %m      |     10 T
+jp nv, %m     |8085 |E2 %m %m      |   7/10 T
+jp nv, %m     |gbz80|   **         |   **    
+jp nv, %m     |r2k  |   **         |   **    
+jp nv, %m     |r3k  |   **         |   **    
+jp nv, %m     |z180 |   **         |   **    
+jp nv, %m     |z80  |E2 %m %m      |     10 T
+jp nv, %m     |z80n |E2 %m %m      |     10 T
+              |     |              |         
+jp nz, %m     |8080 |C2 %m %m      |     10 T
+jp nz, %m     |8085 |C2 %m %m      |   7/10 T
+jp nz, %m     |gbz80|C2 %m %m      |     12 T
+jp nz, %m     |r2k  |   **         |   **    
+jp nz, %m     |r3k  |   **         |   **    
+jp nz, %m     |z180 |   **         |   **    
+jp nz, %m     |z80  |C2 %m %m      |     10 T
+jp nz, %m     |z80n |C2 %m %m      |     10 T
+              |     |              |         
+jp p, %m      |8080 |F2 %m %m      |     10 T
+jp p, %m      |8085 |F2 %m %m      |   7/10 T
+jp p, %m      |gbz80|   **         |   **    
+jp p, %m      |r2k  |   **         |   **    
+jp p, %m      |r3k  |   **         |   **    
+jp p, %m      |z180 |   **         |   **    
+jp p, %m      |z80  |F2 %m %m      |     10 T
+jp p, %m      |z80n |F2 %m %m      |     10 T
+              |     |              |         
+jp pe, %m     |8080 |EA %m %m      |     10 T
+jp pe, %m     |8085 |EA %m %m      |   7/10 T
+jp pe, %m     |gbz80|   **         |   **    
+jp pe, %m     |r2k  |   **         |   **    
+jp pe, %m     |r3k  |   **         |   **    
+jp pe, %m     |z180 |   **         |   **    
+jp pe, %m     |z80  |EA %m %m      |     10 T
+jp pe, %m     |z80n |EA %m %m      |     10 T
+              |     |              |         
+jp po, %m     |8080 |E2 %m %m      |     10 T
+jp po, %m     |8085 |E2 %m %m      |   7/10 T
+jp po, %m     |gbz80|   **         |   **    
+jp po, %m     |r2k  |   **         |   **    
+jp po, %m     |r3k  |   **         |   **    
+jp po, %m     |z180 |   **         |   **    
+jp po, %m     |z80  |E2 %m %m      |     10 T
+jp po, %m     |z80n |E2 %m %m      |     10 T
+              |     |              |         
+jp v, %m      |8080 |EA %m %m      |     10 T
+jp v, %m      |8085 |EA %m %m      |   7/10 T
+jp v, %m      |gbz80|   **         |   **    
+jp v, %m      |r2k  |   **         |   **    
+jp v, %m      |r3k  |   **         |   **    
+jp v, %m      |z180 |   **         |   **    
+jp v, %m      |z80  |EA %m %m      |     10 T
+jp v, %m      |z80n |EA %m %m      |     10 T
+              |     |              |         
+jp z, %m      |8080 |CA %m %m      |     10 T
+jp z, %m      |8085 |CA %m %m      |   7/10 T
+jp z, %m      |gbz80|CA %m %m      |     12 T
+jp z, %m      |r2k  |   **         |   **    
+jp z, %m      |r3k  |   **         |   **    
+jp z, %m      |z180 |   **         |   **    
+jp z, %m      |z80  |CA %m %m      |     10 T
+jp z, %m      |z80n |CA %m %m      |     10 T
+              |     |              |         
+jpe %m        |8080 |EA %m %m      |     10 T
+jpe %m        |8085 |EA %m %m      |   7/10 T
+jpe %m        |gbz80|   **         |   **    
+jpe %m        |r2k  |   **         |   **    
+jpe %m        |r3k  |   **         |   **    
+jpe %m        |z180 |   **         |   **    
+jpe %m        |z80  |EA %m %m      |     10 T
+jpe %m        |z80n |EA %m %m      |     10 T
+              |     |              |         
+jpo %m        |8080 |E2 %m %m      |     10 T
+jpo %m        |8085 |E2 %m %m      |   7/10 T
+jpo %m        |gbz80|   **         |   **    
+jpo %m        |r2k  |   **         |   **    
+jpo %m        |r3k  |   **         |   **    
+jpo %m        |z180 |   **         |   **    
+jpo %m        |z80  |E2 %m %m      |     10 T
+jpo %m        |z80n |E2 %m %m      |     10 T
+              |     |              |         
+jr %j         |8080 |   **         |   **    
+jr %j         |8085 |   **         |   **    
+jr %j         |gbz80|18 %j         |      8 T
+jr %j         |r2k  |   **         |   **    
+jr %j         |r3k  |   **         |   **    
+jr %j         |z180 |   **         |   **    
+jr %j         |z80  |18 %j         |     12 T
+jr %j         |z80n |18 %j         |     12 T
+              |     |              |         
+jr %m         |8080 |C3 %m %m      |     10 T
+jr %m         |8085 |C3 %m %m      |     10 T
+jr %m         |gbz80|   **         |   **    
+jr %m         |r2k  |   **         |   **    
+jr %m         |r3k  |   **         |   **    
+jr %m         |z180 |   **         |   **    
+jr %m         |z80  |   **         |   **    
+jr %m         |z80n |   **         |   **    
+              |     |              |         
+jr c, %j      |8080 |   **         |   **    
+jr c, %j      |8085 |   **         |   **    
+jr c, %j      |gbz80|38 %j         |      8 T
+jr c, %j      |r2k  |   **         |   **    
+jr c, %j      |r3k  |   **         |   **    
+jr c, %j      |z180 |   **         |   **    
+jr c, %j      |z80  |38 %j         |   7/12 T
+jr c, %j      |z80n |38 %j         |   7/12 T
+              |     |              |         
+jr c, %m      |8080 |DA %m %m      |     10 T
+jr c, %m      |8085 |DA %m %m      |   7/10 T
+jr c, %m      |gbz80|   **         |   **    
+jr c, %m      |r2k  |   **         |   **    
+jr c, %m      |r3k  |   **         |   **    
+jr c, %m      |z180 |   **         |   **    
+jr c, %m      |z80  |   **         |   **    
+jr c, %m      |z80n |   **         |   **    
+              |     |              |         
+jr nc, %j     |8080 |   **         |   **    
+jr nc, %j     |8085 |   **         |   **    
+jr nc, %j     |gbz80|30 %j         |      8 T
+jr nc, %j     |r2k  |   **         |   **    
+jr nc, %j     |r3k  |   **         |   **    
+jr nc, %j     |z180 |   **         |   **    
+jr nc, %j     |z80  |30 %j         |   7/12 T
+jr nc, %j     |z80n |30 %j         |   7/12 T
+              |     |              |         
+jr nc, %m     |8080 |D2 %m %m      |     10 T
+jr nc, %m     |8085 |D2 %m %m      |   7/10 T
+jr nc, %m     |gbz80|   **         |   **    
+jr nc, %m     |r2k  |   **         |   **    
+jr nc, %m     |r3k  |   **         |   **    
+jr nc, %m     |z180 |   **         |   **    
+jr nc, %m     |z80  |   **         |   **    
+jr nc, %m     |z80n |   **         |   **    
+              |     |              |         
+jr nz, %j     |8080 |   **         |   **    
+jr nz, %j     |8085 |   **         |   **    
+jr nz, %j     |gbz80|20 %j         |      8 T
+jr nz, %j     |r2k  |   **         |   **    
+jr nz, %j     |r3k  |   **         |   **    
+jr nz, %j     |z180 |   **         |   **    
+jr nz, %j     |z80  |20 %j         |   7/12 T
+jr nz, %j     |z80n |20 %j         |   7/12 T
+              |     |              |         
+jr nz, %m     |8080 |C2 %m %m      |     10 T
+jr nz, %m     |8085 |C2 %m %m      |   7/10 T
+jr nz, %m     |gbz80|   **         |   **    
+jr nz, %m     |r2k  |   **         |   **    
+jr nz, %m     |r3k  |   **         |   **    
+jr nz, %m     |z180 |   **         |   **    
+jr nz, %m     |z80  |   **         |   **    
+jr nz, %m     |z80n |   **         |   **    
+              |     |              |         
+jr z, %j      |8080 |   **         |   **    
+jr z, %j      |8085 |   **         |   **    
+jr z, %j      |gbz80|28 %j         |      8 T
+jr z, %j      |r2k  |   **         |   **    
+jr z, %j      |r3k  |   **         |   **    
+jr z, %j      |z180 |   **         |   **    
+jr z, %j      |z80  |28 %j         |   7/12 T
+jr z, %j      |z80n |28 %j         |   7/12 T
+              |     |              |         
+jr z, %m      |8080 |CA %m %m      |     10 T
+jr z, %m      |8085 |CA %m %m      |   7/10 T
+jr z, %m      |gbz80|   **         |   **    
+jr z, %m      |r2k  |   **         |   **    
+jr z, %m      |r3k  |   **         |   **    
+jr z, %m      |z180 |   **         |   **    
+jr z, %m      |z80  |   **         |   **    
+jr z, %m      |z80n |   **         |   **    
+              |     |              |         
+jv %m         |8080 |EA %m %m      |     10 T
+jv %m         |8085 |EA %m %m      |   7/10 T
+jv %m         |gbz80|   **         |   **    
+jv %m         |r2k  |   **         |   **    
+jv %m         |r3k  |   **         |   **    
+jv %m         |z180 |   **         |   **    
+jv %m         |z80  |EA %m %m      |     10 T
+jv %m         |z80n |EA %m %m      |     10 T
+              |     |              |         
+jz %m         |8080 |CA %m %m      |     10 T
+jz %m         |8085 |CA %m %m      |   7/10 T
+jz %m         |gbz80|CA %m %m      |     12 T
+jz %m         |r2k  |   **         |   **    
+jz %m         |r3k  |   **         |   **    
+jz %m         |z180 |   **         |   **    
+jz %m         |z80  |CA %m %m      |     10 T
+jz %m         |z80n |CA %m %m      |     10 T
               |     |              |         
 ld (%m), a    |8080 |32 %m %m      |     13 T
 ld (%m), a    |8085 |32 %m %m      |     13 T
@@ -6038,6 +6578,15 @@ ori %n        |z180 |   **         |   **
 ori %n        |z80  |F6 %n         |      7 T
 ori %n        |z80n |F6 %n         |      7 T
               |     |              |         
+pchl          |8080 |E9            |      5 T
+pchl          |8085 |E9            |      6 T
+pchl          |gbz80|E9            |      4 T
+pchl          |r2k  |   **         |   **    
+pchl          |r3k  |   **         |   **    
+pchl          |z180 |   **         |   **    
+pchl          |z80  |E9            |      4 T
+pchl          |z80n |E9            |      4 T
+              |     |              |         
 pop af        |8080 |F1            |     10 T
 pop af        |8085 |F1            |     10 T
 pop af        |gbz80|F1            |     12 T
@@ -6235,6 +6784,15 @@ rar           |r3k  |   **         |   **
 rar           |z180 |   **         |   **    
 rar           |z80  |1F            |      4 T
 rar           |z80n |1F            |      4 T
+              |     |              |         
+rc            |8080 |D8            |   5/11 T
+rc            |8085 |D8            |   6/12 T
+rc            |gbz80|D8            |      8 T
+rc            |r2k  |   **         |   **    
+rc            |r3k  |   **         |   **    
+rc            |z180 |   **         |   **    
+rc            |z80  |D8            |   5/11 T
+rc            |z80n |D8            |   5/11 T
               |     |              |         
 res 0, (hl)   |8080 |   **         |   **    
 res 0, (hl)   |8085 |   **         |   **    
@@ -6812,6 +7370,123 @@ res 7, l      |z180 |   **         |   **
 res 7, l      |z80  |CB BD         |      8 T
 res 7, l      |z80n |CB BD         |      8 T
               |     |              |         
+ret           |8080 |C9            |     10 T
+ret           |8085 |C9            |     10 T
+ret           |gbz80|C9            |      8 T
+ret           |r2k  |   **         |   **    
+ret           |r3k  |   **         |   **    
+ret           |z180 |   **         |   **    
+ret           |z80  |C9            |     10 T
+ret           |z80n |C9            |     10 T
+              |     |              |         
+ret c         |8080 |D8            |   5/11 T
+ret c         |8085 |D8            |   6/12 T
+ret c         |gbz80|D8            |      8 T
+ret c         |r2k  |   **         |   **    
+ret c         |r3k  |   **         |   **    
+ret c         |z180 |   **         |   **    
+ret c         |z80  |D8            |   5/11 T
+ret c         |z80n |D8            |   5/11 T
+              |     |              |         
+ret m         |8080 |F8            |   5/11 T
+ret m         |8085 |F8            |   6/12 T
+ret m         |gbz80|   **         |   **    
+ret m         |r2k  |   **         |   **    
+ret m         |r3k  |   **         |   **    
+ret m         |z180 |   **         |   **    
+ret m         |z80  |F8            |   5/11 T
+ret m         |z80n |F8            |   5/11 T
+              |     |              |         
+ret nc        |8080 |D0            |   5/11 T
+ret nc        |8085 |D0            |   6/12 T
+ret nc        |gbz80|D0            |      8 T
+ret nc        |r2k  |   **         |   **    
+ret nc        |r3k  |   **         |   **    
+ret nc        |z180 |   **         |   **    
+ret nc        |z80  |D0            |   5/11 T
+ret nc        |z80n |D0            |   5/11 T
+              |     |              |         
+ret nv        |8080 |E0            |   5/11 T
+ret nv        |8085 |E0            |   6/12 T
+ret nv        |gbz80|   **         |   **    
+ret nv        |r2k  |   **         |   **    
+ret nv        |r3k  |   **         |   **    
+ret nv        |z180 |   **         |   **    
+ret nv        |z80  |E0            |   5/11 T
+ret nv        |z80n |E0            |   5/11 T
+              |     |              |         
+ret nz        |8080 |C0            |   5/11 T
+ret nz        |8085 |C0            |   6/12 T
+ret nz        |gbz80|C0            |      8 T
+ret nz        |r2k  |   **         |   **    
+ret nz        |r3k  |   **         |   **    
+ret nz        |z180 |   **         |   **    
+ret nz        |z80  |C0            |   5/11 T
+ret nz        |z80n |C0            |   5/11 T
+              |     |              |         
+ret p         |8080 |F0            |   5/11 T
+ret p         |8085 |F0            |   6/12 T
+ret p         |gbz80|   **         |   **    
+ret p         |r2k  |   **         |   **    
+ret p         |r3k  |   **         |   **    
+ret p         |z180 |   **         |   **    
+ret p         |z80  |F0            |   5/11 T
+ret p         |z80n |F0            |   5/11 T
+              |     |              |         
+ret pe        |8080 |E8            |   5/11 T
+ret pe        |8085 |E8            |   6/12 T
+ret pe        |gbz80|   **         |   **    
+ret pe        |r2k  |   **         |   **    
+ret pe        |r3k  |   **         |   **    
+ret pe        |z180 |   **         |   **    
+ret pe        |z80  |E8            |   5/11 T
+ret pe        |z80n |E8            |   5/11 T
+              |     |              |         
+ret po        |8080 |E0            |   5/11 T
+ret po        |8085 |E0            |   6/12 T
+ret po        |gbz80|   **         |   **    
+ret po        |r2k  |   **         |   **    
+ret po        |r3k  |   **         |   **    
+ret po        |z180 |   **         |   **    
+ret po        |z80  |E0            |   5/11 T
+ret po        |z80n |E0            |   5/11 T
+              |     |              |         
+ret v         |8080 |E8            |   5/11 T
+ret v         |8085 |E8            |   6/12 T
+ret v         |gbz80|   **         |   **    
+ret v         |r2k  |   **         |   **    
+ret v         |r3k  |   **         |   **    
+ret v         |z180 |   **         |   **    
+ret v         |z80  |E8            |   5/11 T
+ret v         |z80n |E8            |   5/11 T
+              |     |              |         
+ret z         |8080 |C8            |   5/11 T
+ret z         |8085 |C8            |   6/12 T
+ret z         |gbz80|C8            |      8 T
+ret z         |r2k  |   **         |   **    
+ret z         |r3k  |   **         |   **    
+ret z         |z180 |   **         |   **    
+ret z         |z80  |C8            |   5/11 T
+ret z         |z80n |C8            |   5/11 T
+              |     |              |         
+reti          |8080 |   **         |   **    
+reti          |8085 |   **         |   **    
+reti          |gbz80|D9            |      8 T
+reti          |r2k  |   **         |   **    
+reti          |r3k  |   **         |   **    
+reti          |z180 |   **         |   **    
+reti          |z80  |ED 4D         |     14 T
+reti          |z80n |ED 4D         |     14 T
+              |     |              |         
+retn          |8080 |   **         |   **    
+retn          |8085 |   **         |   **    
+retn          |gbz80|   **         |   **    
+retn          |r2k  |   **         |   **    
+retn          |r3k  |   **         |   **    
+retn          |z180 |   **         |   **    
+retn          |z80  |ED 45         |     14 T
+retn          |z80n |ED 45         |     14 T
+              |     |              |         
 rl (hl)       |8080 |   **         |   **    
 rl (hl)       |8085 |   **         |   **    
 rl (hl)       |gbz80|CB 16         |     16 T
@@ -7063,6 +7738,69 @@ rld           |r3k  |   **         |   **
 rld           |z180 |   **         |   **    
 rld           |z80  |ED 6F         |     18 T
 rld           |z80n |ED 6F         |     18 T
+              |     |              |         
+rm            |8080 |F8            |   5/11 T
+rm            |8085 |F8            |   6/12 T
+rm            |gbz80|   **         |   **    
+rm            |r2k  |   **         |   **    
+rm            |r3k  |   **         |   **    
+rm            |z180 |   **         |   **    
+rm            |z80  |F8            |   5/11 T
+rm            |z80n |F8            |   5/11 T
+              |     |              |         
+rnc           |8080 |D0            |   5/11 T
+rnc           |8085 |D0            |   6/12 T
+rnc           |gbz80|D0            |      8 T
+rnc           |r2k  |   **         |   **    
+rnc           |r3k  |   **         |   **    
+rnc           |z180 |   **         |   **    
+rnc           |z80  |D0            |   5/11 T
+rnc           |z80n |D0            |   5/11 T
+              |     |              |         
+rnv           |8080 |E0            |   5/11 T
+rnv           |8085 |E0            |   6/12 T
+rnv           |gbz80|   **         |   **    
+rnv           |r2k  |   **         |   **    
+rnv           |r3k  |   **         |   **    
+rnv           |z180 |   **         |   **    
+rnv           |z80  |E0            |   5/11 T
+rnv           |z80n |E0            |   5/11 T
+              |     |              |         
+rnz           |8080 |C0            |   5/11 T
+rnz           |8085 |C0            |   6/12 T
+rnz           |gbz80|C0            |      8 T
+rnz           |r2k  |   **         |   **    
+rnz           |r3k  |   **         |   **    
+rnz           |z180 |   **         |   **    
+rnz           |z80  |C0            |   5/11 T
+rnz           |z80n |C0            |   5/11 T
+              |     |              |         
+rp            |8080 |F0            |   5/11 T
+rp            |8085 |F0            |   6/12 T
+rp            |gbz80|   **         |   **    
+rp            |r2k  |   **         |   **    
+rp            |r3k  |   **         |   **    
+rp            |z180 |   **         |   **    
+rp            |z80  |F0            |   5/11 T
+rp            |z80n |F0            |   5/11 T
+              |     |              |         
+rpe           |8080 |E8            |   5/11 T
+rpe           |8085 |E8            |   6/12 T
+rpe           |gbz80|   **         |   **    
+rpe           |r2k  |   **         |   **    
+rpe           |r3k  |   **         |   **    
+rpe           |z180 |   **         |   **    
+rpe           |z80  |E8            |   5/11 T
+rpe           |z80n |E8            |   5/11 T
+              |     |              |         
+rpo           |8080 |E0            |   5/11 T
+rpo           |8085 |E0            |   6/12 T
+rpo           |gbz80|   **         |   **    
+rpo           |r2k  |   **         |   **    
+rpo           |r3k  |   **         |   **    
+rpo           |z180 |   **         |   **    
+rpo           |z80  |E0            |   5/11 T
+rpo           |z80n |E0            |   5/11 T
               |     |              |         
 rr (hl)       |8080 |   **         |   **    
 rr (hl)       |8085 |   **         |   **    
@@ -7440,6 +8178,24 @@ rst 8         |gbz80|CF            |     32 T
 rst 8         |z180 |   **         |   **    
 rst 8         |z80  |CF            |     11 T
 rst 8         |z80n |CF            |     11 T
+              |     |              |         
+rv            |8080 |E8            |   5/11 T
+rv            |8085 |E8            |   6/12 T
+rv            |gbz80|   **         |   **    
+rv            |r2k  |   **         |   **    
+rv            |r3k  |   **         |   **    
+rv            |z180 |   **         |   **    
+rv            |z80  |E8            |   5/11 T
+rv            |z80n |E8            |   5/11 T
+              |     |              |         
+rz            |8080 |C8            |   5/11 T
+rz            |8085 |C8            |   6/12 T
+rz            |gbz80|C8            |      8 T
+rz            |r2k  |   **         |   **    
+rz            |r3k  |   **         |   **    
+rz            |z180 |   **         |   **    
+rz            |z80  |C8            |   5/11 T
+rz            |z80n |C8            |   5/11 T
               |     |              |         
 sbb a         |8080 |9F            |      4 T
 sbb a         |8085 |9F            |      4 T

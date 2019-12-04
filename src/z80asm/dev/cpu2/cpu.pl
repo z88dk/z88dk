@@ -16,6 +16,12 @@ use Clone 'clone';
 use Data::Dump 'dump';
 use Config;
 use warnings FATAL => 'uninitialized'; 
+use Getopt::Std;
+
+#------------------------------------------------------------------------------
+our $opt_s;		# stop on first error
+getopts('s') or die "Usage: cpu.pl [-s] [test]\n";
+#------------------------------------------------------------------------------
 
 # make sure to use our z80asm
 $ENV{PATH} = join($Config{path_sep}, ".", "../ticks", $ENV{PATH});
@@ -352,7 +358,8 @@ sub T::to_string {
 my %R = (b => 0, c => 1, d => 2, e => 3, h => 4, l => 5, '(hl)' => 6, f => 6, m => 6, a => 7);
 sub R($)		{ return $R{$_[0]}; }
 
-my %F = (nz => 0, z => 1, nc => 2, c => 3, po => 4, pe => 5, p => 6, m => 7);
+my %F = (nz => 0, z => 1, nc => 2, c => 3, po => 4, pe => 5, 
+										   nv => 4, v  => 5, p => 6, m => 7);
 sub F($)		{ return $F{$_[0]}; }
 
 my %RP = (b => 0, bc => 0, d => 1, de => 1, h => 2, hl => 2, sp => 3, af => 3, psw => 3);
@@ -941,6 +948,152 @@ sub init_opcodes {
 		# Bit Set, Reset and Test Group
 		#----------------------------------------------------------------------
 		
+		# bit/res/set b, r
+		if (!isintel) {
+			for my $op (qw( bit res set )) {
+				for $r (qw( b c d e h l a )) {
+					$B = B(0xcb, (OP($op)*0x40+R($r))."+%c*8");
+					$T = T(8);
+					add("$op %c, $r",	$B, $T);
+				}
+			}
+		}
+
+		# bit/res/set b, (hl) / (ix+d) / (iy+d)
+		if (!isintel) {
+			for my $op (qw( bit res set )) {
+				$B = B(0xcb, (OP($op)*0x40+6)."+%c*8");
+				if ($op eq 'bit')	{ $T = isgbz80 ? T(16) : T(12); } 
+				else 				{ $T = isgbz80 ? T(16) : T(15); }
+				add("$op %c, (hl)",		$B, $T);
+			}
+		}
+		
+		#----------------------------------------------------------------------
+		# Call and Return Group
+		#----------------------------------------------------------------------
+
+		# call nn
+		$B = B(0xcd, '%m', '%m');
+		$T = is8080 ? T(17) : is8085 ? T(18) : isgbz80 ? T(12) : T(17);
+		add("call %m",		$B, $T);
+
+		# call f, nn
+		for my $f (qw( nz z nc c po pe nv v p m )) {
+			next if isgbz80 && F($f) >= 4;
+
+			$B = B(0xc4+F($f)*8, '%m', '%m');
+			$T = is8080 ? T(11,17) : is8085 ? T(9,18) : isgbz80 ? T(12) : T(10,17);
+			add("call $f, %m",	$B, $T);			
+			add("c$f %m",		$B, $T) if $f ne 'p';	# Intel's cp is ambiguous
+		}
+
+		# ret
+		$B = B(0xc9);
+		$T = isgbz80 ? T(8) : T(10);
+		add("ret",		$B, $T);
+		
+		# ret f
+		for my $f (qw( nz z nc c po pe nv v p m )) {
+			next if isgbz80 && F($f) >= 4;
+		
+			$B = B(0xc0+F($f)*8);
+			$T = is8080 ? T(5,11) : is8085 ? T(6,12) : isgbz80 ? T(8) : T(5,11);
+			add("ret $f",	$B, $T);
+			add("r$f",		$B, $T);
+		}
+
+		# reti
+		if (isgbz80) {
+			$B = B(0xd9);
+			$T = T(8);
+			add("reti",		$B, $T);
+		}
+		elsif (iszilog) {
+			$B = B(0xed, 0x4d);
+			$T = T(14);
+			add("reti",		$B, $T);
+		}
+		
+		# retn
+		if (iszilog) {
+			$B = B(0xed, 0x45);
+			$T = T(14);
+			add("retn",		$B, $T);
+		}
+		
+		# rst
+		$B = B(0xc7."+%c");
+		$T = is8085 ? T(12) : isgbz80 ? T(32) : T(11);
+		add("rst %c", 		$B, $T);
+
+		#----------------------------------------------------------------------
+		# Jump Group
+		#----------------------------------------------------------------------
+
+		# jp/jmp nn
+		$B = B(0xc3, '%m', '%m');
+		$T = isintel ? T(10) : isgbz80 ? T(12) : T(10);
+		add("jmp %m",		$B, $T);
+		add("jp  %m",		$B, $T); 	# do not define JP as Jump Positive in Intel
+
+		# jp f, nn
+		for my $f (qw( nz z nc c po pe nv v p m )) {
+			next if isgbz80 && F($f) >= 4;		# gbz80 only has carry and zero flags
+			$B = B(0xc2+F($f)*8, '%m', '%m');
+			$T = is8080 ? T(10) : is8085 ? T(7,10) : isgbz80 ? T(12) : T(10);
+			
+			add("jp $f, %m",	$B, $T);
+			add("j$f %m",		$B, $T) if $f ne 'p';	# Intel's jp is ambiguous
+		}
+		
+		# jr nn
+		if (isintel) {
+			add_compound("jr %m"			=> "jp %m");
+		}
+		else {
+			$B = B(0x18, '%j');
+			$T = isgbz80 ? T(8) : T(12);
+			add("jr %j",					$B, $T);
+		}
+		
+		# jr f, nn
+		for my $f (qw( nz z nc c )) {
+			if (isintel) {
+				add_compound("jr $f, %m"	=> "jp $f, %m");
+			}
+			else {
+				$B = B(0x20+F($f)*8, '%j');
+				$T = isgbz80 ? T(8) : T(7,12);
+				add("jr $f, %j",			$B, $T);
+			}
+		}
+		
+		# jp (hl) / jp (ix) / jp (iy)
+		$B = B(0xe9);
+		$T = is8080 ? T(5) : is8085 ? T(6) : T(4);
+		add(	"pchl",				$B, $T);
+		add(	"jp (hl)",			$B, $T);
+		add_ix(	"jp (hl)",			$B, $T+4);
+	
+		# jp (bc) / jp (de)
+		for $r (qw( bc de )) {
+			add_compound("jp ($r)"	=> "push $r", "ret");
+		}
+		
+		# djnz nn
+		if (isintel) {
+			add_compound("djnz %m"		=> "dec b", "jp nz, %m");
+			add_compound("djnz b, %m"	=> "dec b", "jp nz, %m");
+		}
+		elsif (isgbz80) {
+			add_compound("djnz %j"		=> "dec b", "jr nz, %j");
+			add_compound("djnz b, %j"	=> "dec b", "jr nz, %j");
+		}
+		else {
+			$B = B(0x10, '%j');
+			$T = T(8,13);
+		}
 
 
 
@@ -973,34 +1126,8 @@ sub init_opcodes {
 
 		
 		
-		# bit/res/set b, r
-		if (!isintel) {
-			for my $op (qw( bit res set )) {
-				for $r (qw( b c d e h l a )) {
-					$B = B(0xcb, (OP($op)*0x40+R($r))."+%c*8");
-					$T = T(8);
-					add("$op %c, $r",	$B, $T);
-				}
-			}
-		}
 
-		# bit/res/set b, (hl) / (ix+d) / (iy+d)
-		if (!isintel) {
-			for my $op (qw( bit res set )) {
-				$B = B(0xcb, (OP($op)*0x40+6)."+%c*8");
-				if ($op eq 'bit') {
-					$T = isgbz80 ? T(16) : T(12);
-				} 
-				else {
-					$T = isgbz80 ? T(16) : T(15);
-				}
-				add("$op %c, (hl)",		$B, $T);
-			}
-		}
 		
-		# restarts
-		add("rst %c", 			B(0xc7."+%c"),
-								is8085 ? T(12) : isgbz80 ? T(32) : T(11));
 		
 		next unless isintel || isgbz80;
 		next;
@@ -1024,39 +1151,8 @@ sub init_opcodes {
 		
 
 		
-		add("pchl",				0xe9, is8080 ? 5 : is8085 ? 6 : isgbz80 ? 4 : die);
-		add("jp (hl)",			0xe9, is8080 ? 5 : is8085 ? 6 : isgbz80 ? 4 : die);
 
-		add("jmp %m",			[0xc3, '%m', '%m'], isintel ? 10 : isgbz80 ? 12 : die);
-		add("jp  %m",			[0xc3, '%m', '%m'], isintel ? 10 : isgbz80 ? 12 : die) 
-			unless isintel; # JP in Intel is Jump if Positive
 
-		add("call %m",			[0xcd, '%m', '%m'], 
-								is8080 ? 17 : is8085 ? 18 : isgbz80 ? 12 : die);
-		add("ret",				0xc9, 
-								isintel ? 10 : isgbz80 ? 8 : die);
-
-		for my $f (qw( nz z nc c po pe p m )) {
-			next if isgbz80 && F($f) >= 4;
-			
-			add("j$f    %m",	[0xc2+F($f)*8, '%m', '%m'], 
-								is8080 ? 10 : is8085 ? [7,10] : isgbz80 ? 12 : die) 
-				unless $f eq 'p' && !isintel;
-			add("jp $f, %m",	[0xc2+F($f)*8, '%m', '%m'], 
-								is8080 ? 10 : is8085 ? [7,10] : isgbz80 ? 12 : die) 
-				unless isintel;		# JP in Intel is Jump if Positive
-
-			add("c$f      %m",	[0xc4+F($f)*8, '%m', '%m'], 
-								is8080 ? [11,17] : is8085 ? [9,18] : isgbz80 ? 12 : die) 
-				unless $f eq 'p' && !isintel;
-			add("call $f, %m",	[0xc4+F($f)*8, '%m', '%m'], 
-								is8080 ? [11,17] : is8085 ? [9,18] : isgbz80 ? 12 : die);
-
-			add("r$f",			0xc0+F($f)*8, 
-								is8080 ? [5,11] : is8085 ? [6,12] : isgbz80 ? 8 : die);
-			add("ret $f",		0xc0+F($f)*8, 
-								is8080 ? [5,11] : is8085 ? [6,12] : isgbz80 ? 8 : die);
-		}
 		
 		
 		if (isintel||iszilog) {
@@ -1148,19 +1244,8 @@ sub init_opcodes {
 		#----------------------------------------------------------------------
 		# Zilog opcodes
 		#----------------------------------------------------------------------
-			
-		if (!isintel) {
-			# relative jump
-			add("jr %j", 				[0x18, '%j'], 
-										isgbz80 ? 8 : die);
-			for my $f (qw( nz z nc c )) { 
-				add("jr $f, %j", 		[0x20+F($f)*8, '%j'], 
-										isgbz80 ? 8 : die);
-			}
-			
-			add("reti",					0xd9, 
-										isgbz80 ? 8 : die);
-		}
+		
+
 
 		#----------------------------------------------------------------------
 		# compound opcodes
@@ -1850,14 +1935,35 @@ sub run_tests {
 					if ($asm eq 'jp (bc)' || 
 						$asm eq 'jp (de)' || 
 						$asm eq 'jp (hl)' || 
+						$asm eq 'jp (ix)' || 
+						$asm eq 'jp (iy)' || 
 						$asm eq 'pchl' ||
 						$asm eq 'stop') {
 						ok run_test($ixiy, 0, [$test_asm, $prog_instance]);
 					}
 					elsif ($asm eq 'jmp %m' ||
 					       $asm eq 'call %m' ||
-					       ($asm eq 'jp %m' && !isintel)) {
+					       $asm eq 'jp %m' ||		# zilog
+						   $asm eq 'jr %m') {		# intel
 						ok run_test($ixiy, 0x1234, [$test_asm, $prog_instance]);
+					}
+					elsif ($asm eq 'djnz b, %j' ||
+						   $asm eq 'djnz %j') {
+						$prog_instance = $prog->clone(j => 0);		# jr 5 -> offset=0
+						$asm_instance = replace($asm, '%j', 5);
+						$test_asm = sprintf(" %-31s; %s", $asm_instance, $prog_instance->format_bytes);
+						ok run_test($ixiy, 5,
+								[" ld b, 1",	$Opcodes{"ld b, %n"}{$cpu}->clone(n => 1)],
+								[$test_asm, 	$prog_instance]);
+					}
+					elsif ($asm eq 'djnz b, %m' ||
+						   $asm eq 'djnz %m') {
+						$prog_instance = $prog->clone(m => 6);
+						$asm_instance = replace($asm, '%m', 6);
+						$test_asm = sprintf(" %-31s; %s", $asm_instance, $prog_instance->format_bytes);
+						ok run_test($ixiy, 6,
+								[" ld b, 1",	$Opcodes{"ld b, %n"}{$cpu}->clone(n => 1)],
+								[$test_asm, 	$prog_instance]);
 					}
 					elsif ($asm eq 'jr %j') {
 						$prog_instance = $prog->clone(j => 0);		# jr 2 -> offset=0
@@ -1865,7 +1971,7 @@ sub run_tests {
 						$test_asm = sprintf(" %-31s; %s", $asm_instance, $prog_instance->format_bytes);
 						ok run_test($ixiy, 2, [$test_asm, $prog_instance]);
 					}
-					elsif ($asm =~ /(jp|call) (nz|z), %m|(j|c)(nz|z) %m/) {
+					elsif ($asm =~ /(jp|call|jr) (nz|z), %m|(j|c)(nz|z) %m/) {
 						$prog_instance = $prog->clone(m => 5);
 						$asm_instance = replace($asm, '%m', 5);
 						$test_asm = sprintf(" %-31s; %s", $asm_instance, $prog_instance->format_bytes);
@@ -1916,7 +2022,7 @@ sub run_tests {
 								[" nop",		$Opcodes{"nop"}{$cpu}->clone()],
 								[$test_asm, 	$prog_instance]);
 					}
-					elsif ($asm =~ /(jp|call) (nc|c), %m|(j|c)(nc|c) %m/) {
+					elsif ($asm =~ /(jp|call|jr) (nc|c), %m|(j|c)(nc|c) %m/) {
 						$prog_instance = $prog->clone(m => 4);
 						$asm_instance = replace($asm, '%m', 4);
 						$test_asm = sprintf(" %-31s; %s", $asm_instance, $prog_instance->format_bytes);
@@ -1961,7 +2067,7 @@ sub run_tests {
 								[" scf",		$Opcodes{"scf"}{$cpu}->clone()],
 								[$test_asm, 	$prog_instance]);
 					}
-					elsif ($asm =~ /(jp|call) (po|pe), %m|(j|c)(po|pe) %m/) {
+					elsif ($asm =~ /(jp|call) (po|pe|nv|v), %m|(j|c)(po|pe|nv|v) %m/) {
 						$prog_instance = $prog->clone(m => 6);
 						$asm_instance = replace($asm, '%m', 6);
 						$test_asm = sprintf(" %-31s; %s", $asm_instance, $prog_instance->format_bytes);
@@ -1978,7 +2084,7 @@ sub run_tests {
 								[" and a",		$Opcodes{"and a"}{$cpu}->clone()],
 								[$test_asm, 	$prog_instance]);
 					}
-					elsif ($asm =~ /ret (po|pe)|r(po|pe)/) {
+					elsif ($asm =~ /ret (po|pe|nv|v)|r(po|pe|nv|v)/) {
 						# parity odd
 						ok run_test($ixiy, undef, 
 								[" ld hl, 8",	$Opcodes{"ld hl, %m"}{$cpu}->clone(m => 8)],
@@ -1995,7 +2101,7 @@ sub run_tests {
 								[" and a",		$Opcodes{"and a"}{$cpu}->clone()],
 								[$test_asm, 	$prog_instance]);
 					}
-					elsif ($asm =~ /(jp|call) (p|m), %m|(j|c)(p|m) %m/) {
+					elsif ($asm =~ /(jp|call) (p|m), %m|(j|c)m %m/) {
 						$prog_instance = $prog->clone(m => 6);
 						$asm_instance = replace($asm, '%m', 6);
 						$test_asm = sprintf(" %-31s; %s", $asm_instance, $prog_instance->format_bytes);
@@ -2143,8 +2249,10 @@ sub run_test {
 	ok $ok, $test;
 	return $ok if $ok;
 
+	
 	# drill down to find error
 	diag "Failed:\n".path('test.lis')->slurp;
+	die "Stopped.\n" if $opt_s;
 	
 	if (@test <= 1) {
 		diag "Error in:\n", path('test.lis')->slurp, "\n";
