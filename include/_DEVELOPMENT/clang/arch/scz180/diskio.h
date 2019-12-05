@@ -103,7 +103,7 @@ extern void sd_clock(uint8_t);
 extern void sd_cs_lower(uint8_t);
 
 
-extern void sd_cs_raise(uint8_t);
+extern void sd_cs_raise(void);
 
 
 extern void sd_write_byte(uint8_t);

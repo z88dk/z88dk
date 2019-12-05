@@ -117,8 +117,8 @@ extern void sd_cs_lower_fastcall(uint8_t) __preserves_regs(b,c,d,e,iyh,iyl) __z8
 #define sd_cs_lower(a) sd_cs_lower_fastcall(a)
 
 
-extern void sd_cs_raise(uint8_t) __preserves_regs(b,c,d,e,iyh,iyl);
-extern void sd_cs_raise_fastcall(uint8_t) __preserves_regs(b,c,d,e,iyh,iyl) __z88dk_fastcall;
+extern void sd_cs_raise(void) __preserves_regs(b,c,d,e,h,l,iyh,iyl);
+extern void sd_cs_raise_fastcall(void) __preserves_regs(b,c,d,e,h,l,iyh,iyl) __z88dk_fastcall;
 #define sd_cs_raise(a) sd_cs_raise_fastcall(a)
 
 

@@ -109,7 +109,7 @@ extern void __LIB__ sd_clock(uint8_t) __smallc __z88dk_fastcall;
 extern void __LIB__ sd_cs_lower(uint8_t) __smallc __z88dk_fastcall;
 
 
-extern void __LIB__ sd_cs_raise(uint8_t) __smallc __z88dk_fastcall;
+extern void __LIB__ sd_cs_raise(void) __smallc __z88dk_fastcall;
 
 
 extern void __LIB__ sd_write_byte(uint8_t) __smallc __z88dk_fastcall;
