@@ -25,11 +25,11 @@ char *tvc_fgets_cons(char* str, size_t max);
 /**
  * Starts the editor and gets a character on pressing enter (func $A1)
  */
-#define tvc_ed_chin    asm_tvc_ed_getch 
+#define tvc_ed_chin    asm_tvc_ed_getch
 extern char __LIB__ asm_tvc_ed_getch();
 
 /**
- * Before editor's CHIN this method fixes the character position 
+ * Before editor's CHIN this method fixes the character position
  * from where the ccharcters are returned. (func $A4)
  */
 #define tvc_ed_cfix     asm_tvc_ed_cfix
@@ -41,14 +41,14 @@ extern void __LIB__ asm_tvc_ed_cfix();
  * returns 0xF6 in case of invalid position provided (func $A3)
  */
 #define tvc_ed_cpos     asm_tvc_ed_cpos
-extern char __LIB__ asm_tvc_ed_cpos(char col, char row);
+extern void __LIB__ asm_tvc_ed_cpos(char col, char row);
 
 /**
  * Prints one character to the console from the actual
  * character position (func $A4)
  */
 #define tvc_ed_chout     fputc_cons_native
-extern char __LIB__ asm_tvc_ed_cpos(int character);
+extern char __LIB__ fputc_cons_native(int character);
 
 
 // TVC Keyboard functions
