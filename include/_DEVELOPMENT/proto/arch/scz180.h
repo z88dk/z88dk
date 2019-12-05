@@ -15,7 +15,7 @@ extern uint8_t io_system;
 extern uint8_t io_led_output;
 extern uint8_t io_led_status;
 
-extern uint8_t io_cf_port;
+extern uint8_t io_cf;
 
 extern uint8_t io_pio_port_a;
 extern uint8_t io_pio_port_b;
@@ -35,7 +35,7 @@ __sfr __at __IO_SYSTEM      io_system;
 __sfr __at __IO_LED_OUTPUT  io_led_output;
 __sfr __at __IO_LED_STATUS  io_led_status;
 
-__sfr __at __IO_CF_PORT     io_cf_port;
+__sfr __at __IO_CF_PORT     io_cf;
 
 __sfr __at __IO_PIO_PORT_A  io_pio_port_a;
 __sfr __at __IO_PIO_PORT_B  io_pio_port_b;
