@@ -9,7 +9,7 @@ include(__link__.m4)
 
 #ifdef __CLANG
 
-extern uint8_t io_dio_port;
+extern uint8_t io_dio;
 
 extern uint8_t io_system;
 extern uint8_t io_led_output;
@@ -29,7 +29,7 @@ extern uint8_t io_pio_ide_config;
 
 #else
 
-__sfr __at __IO_DIO_PORT    io_dio_port;
+__sfr __at __IO_DIO_PORT    io_dio;
 
 __sfr __at __IO_SYSTEM      io_system;
 __sfr __at __IO_LED_OUTPUT  io_led_output;
