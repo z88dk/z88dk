@@ -106,19 +106,19 @@ extern DRESULT __LIB__ disk_ioctl_callee(BYTE pdrv,BYTE cmd,void* buff) __smallc
 extern void __LIB__ sd_clock(uint8_t) __smallc __z88dk_fastcall;
 
 
-extern void __LIB__ sd_cs_lower(void) __smallc __z88dk_fastcall;
+extern void __LIB__ sd_cs_lower(uint8_t) __smallc __z88dk_fastcall;
 
 
-extern void __LIB__ sd_cs_raise(void) __smallc __z88dk_fastcall;
+extern void __LIB__ sd_cs_raise(uint8_t) __smallc __z88dk_fastcall;
 
 
 extern void __LIB__ sd_write_byte(uint8_t) __smallc __z88dk_fastcall;
 
 
-extern void __LIB__ sd_write_block(const uint8_t *from) __smallc __z88dk_fastcall;
-
-
 extern uint8_t __LIB__ sd_read_byte(void) __smallc __z88dk_fastcall;
+
+
+extern void __LIB__ sd_write_block(const uint8_t *from) __smallc __z88dk_fastcall;
 
 
 extern void __LIB__ sd_read_block(uint8_t *to) __smallc __z88dk_fastcall;

@@ -112,13 +112,13 @@ extern void sd_clock_fastcall(uint8_t) __preserves_regs(b,c,d,e,iyh,iyl) __z88dk
 #define sd_clock(a) sd_clock_fastcall(a)
 
 
-extern void sd_cs_lower(void) __preserves_regs(b,c,d,e,h,l,iyh,iyl);
-extern void sd_cs_lower_fastcall(void) __preserves_regs(b,c,d,e,h,l,iyh,iyl) __z88dk_fastcall;
+extern void sd_cs_lower(uint8_t) __preserves_regs(b,c,d,e,iyh,iyl);
+extern void sd_cs_lower_fastcall(uint8_t) __preserves_regs(b,c,d,e,iyh,iyl) __z88dk_fastcall;
 #define sd_cs_lower(a) sd_cs_lower_fastcall(a)
 
 
-extern void sd_cs_raise(void) __preserves_regs(b,c,d,e,h,l,iyh,iyl);
-extern void sd_cs_raise_fastcall(void) __preserves_regs(b,c,d,e,h,l,iyh,iyl) __z88dk_fastcall;
+extern void sd_cs_raise(uint8_t) __preserves_regs(b,c,d,e,iyh,iyl);
+extern void sd_cs_raise_fastcall(uint8_t) __preserves_regs(b,c,d,e,iyh,iyl) __z88dk_fastcall;
 #define sd_cs_raise(a) sd_cs_raise_fastcall(a)
 
 
@@ -127,14 +127,14 @@ extern void sd_write_byte_fastcall(uint8_t) __preserves_regs(b,c,d,e,iyh,iyl) __
 #define sd_write_byte(a) sd_write_byte_fastcall(a)
 
 
-extern void sd_write_block(const uint8_t *from) __preserves_regs(iyh,iyl);
-extern void sd_write_block_fastcall(const uint8_t *from) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define sd_write_block(a) sd_write_block_fastcall(a)
-
-
 extern uint8_t sd_read_byte(void) __preserves_regs(b,c,d,e,iyh,iyl);
 extern uint8_t sd_read_byte_fastcall(void) __preserves_regs(b,c,d,e,iyh,iyl) __z88dk_fastcall;
 #define sd_read_byte(a) sd_read_byte_fastcall(a)
+
+
+extern void sd_write_block(const uint8_t *from) __preserves_regs(iyh,iyl);
+extern void sd_write_block_fastcall(const uint8_t *from) __preserves_regs(iyh,iyl) __z88dk_fastcall;
+#define sd_write_block(a) sd_write_block_fastcall(a)
 
 
 extern void sd_read_block(uint8_t *to) __preserves_regs(iyh,iyl);
