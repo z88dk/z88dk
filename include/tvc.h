@@ -76,4 +76,13 @@ extern int __LIB__ getk();
 
 
 
+// screen, video functions
+
+/**
+ * Clears the screen and sets the cursors to their base position
+ * (editor cursor to the upper left, graphic cursor to the lower left)
+ */
+#define tvc_clrscr asm_tvc_cls
+extern void __LIB__ asm_tvc_cls(void);
+
 #endif

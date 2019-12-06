@@ -11,14 +11,16 @@ lstoff
 defc ED_CHOUT       = $21     ; Editor character out, char in C
 defc ED_CHIN        = $A1     ; Editor character in
 defc ED_CPOS        = $A3     ; Editor set character position
-defc ED_CFIX        = $A4     ; Editor set starting character position on input 
+defc ED_CFIX        = $A4     ; Editor set starting character position on input
 
 defc KBD_CHIN       = $91     ; Keyboard character in
 defc KBD_STATUS     = $93     ; Keyboard character in
 
+defc CLS            = $05     ; Clear screen
+
 ; Special addresses
 defc P_SAVE         = $0003   ; Save address of PORT 2, the memory mapping port
-defc PORT03         = $0B11   ; Save address of PORT 3, the keyboard row select and IO socket select port 
+defc PORT03         = $0B11   ; Save address of PORT 3, the keyboard row select and IO socket select port
 defc INTINC         = $0B1D   ; Address of the interrupt counter (happens once in each 20.096ms)
 
 ; Warnings
