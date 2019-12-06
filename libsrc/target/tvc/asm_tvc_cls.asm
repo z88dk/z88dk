@@ -1,4 +1,3 @@
-
 ;   Videoton TV Computer C stub
 ;   Sandor Vass - 2019
 ;

@@ -16,6 +16,8 @@
 #define TVC_CHAR_RETURN 0x0D
 #define TVC_CHAR_ESC    0x1B
 
+enum video_mode {VMODE_2C=0x00, VMODE_4C=0x01, VMODE_16C=0x02};
+
 // TVC Editor functions
 /**
  * Gets a string from the console using TVC's screen editor
@@ -75,7 +77,6 @@ extern int __LIB__ asm_tvc_kbd_status();
 extern int __LIB__ getk();
 
 
-
 // screen, video functions
 
 /**
@@ -84,5 +85,13 @@ extern int __LIB__ getk();
  */
 #define tvc_clrscr asm_tvc_cls
 extern void __LIB__ asm_tvc_cls(void);
+
+
+/**
+ * Sets the video mode of TVC (2 colours, 4 colours, 16 colours), clears screen
+ * and initialize cursor positions.
+ */
+#define tvc_vmode asm_tvc_vmode
+extern int __LIB__ asm_tvc_vmode(enum video_mode mode);
 
 #endif

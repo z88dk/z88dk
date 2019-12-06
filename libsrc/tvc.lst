@@ -10,5 +10,6 @@ target/tvc/asm_tvc_ed_cfix
 target/tvc/asm_tvc_ed_cpos
 target/tvc/asm_tvc_kbd_status
 target/tvc/asm_tvc_cls
+target/tvc/asm_tvc_vmode
 target/tvc/tvc_fgets_cons
 @z80.lst
