@@ -8,33 +8,33 @@
 ; z80    15    15
 ; z80n   15    15
 
-SECTION code_crt0_sccz80
-PUBLIC __z80asm__sbc_hl_sp
+      SECTION  code_crt0_sccz80
+      PUBLIC   __z80asm__sbc_hl_sp
 
-.__z80asm__sbc_hl_sp
-		push 	bc
-		ld		b, a
-		push 	de
-		ex		de, hl		; subtrahed to de
-		
+__z80asm__sbc_hl_sp:
+      push  bc
+      ld    b, a
+      push  de
+      ex    de, hl            ; subtrahed to de
+
 IF __CPU_GBZ80__
-		ld		hl, sp+6	; minuend to hl, compensate for return address, DE and BC in stack
-ELSE
-		push	af
-		ld		hl, 8		; minuend to hl, compensate for return address, DE, BC and AF in stack
-		add		hl, sp		
-		pop		af
-ENDIF
-		ld		a, e
-		sbc		a, l
-		ld 		e, a
-		
-		ld		a, d
-		sbc 	a, h
-		ld 		d, a
-		
-		ex		de, hl
-		pop		de
-		ld		a, b
-		pop		bc
-		ret
+      ld    hl, sp+6          ; minuend to hl, compensate for return address, DE and BC in stack
+ELSE  
+      push  af
+      ld    hl, 8             ; minuend to hl, compensate for return address, DE, BC and AF in stack
+      add   hl, sp
+      pop   af
+ENDIF 
+      ld    a, e
+      sbc   a, l
+      ld    e, a
+
+      ld    a, d
+      sbc   a, h
+      ld    d, a
+
+      ex    de, hl
+      pop   de
+      ld    a, b
+      pop   bc
+      ret   

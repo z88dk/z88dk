@@ -9,18 +9,18 @@
 ; z80   71    71
 ; z80n   8     8
 
-SECTION code_crt0_sccz80
-PUBLIC __z80asm__add_de_a
+      SECTION  code_crt0_sccz80
+      PUBLIC   __z80asm__add_de_a
 
-.__z80asm__add_de_a
-		push 	af
-		
-		add 	a, e
-		ld 		e, a
-		
-		ld 		a, d
-		adc 	a, 0
-		ld 		d, a
-		
-		pop 	af
-		ret
+__z80asm__add_de_a:
+      push  af
+
+      add   a, e
+      ld    e, a
+
+      ld    a, d
+      adc   a, 0
+      ld    d, a
+
+      pop   af
+      ret   
