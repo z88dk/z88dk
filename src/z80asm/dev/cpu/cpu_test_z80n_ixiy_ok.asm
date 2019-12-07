@@ -175,6 +175,7 @@
  ani -128                       ; E6 80
  ani 127                        ; E6 7F
  ani 255                        ; E6 FF
+ arhl                           ; CB 2C CB 1D
  bit 0, (hl)                    ; CB 46
  bit 0, (ix)                    ; FD CB 00 46
  bit 0, (ix+127)                ; FD CB 7F 46
@@ -611,6 +612,7 @@
  di                             ; F3
  djnz ASMPC                     ; 10 FE
  djnz b, ASMPC                  ; 10 FE
+ dsub                           ; CD @__z80asm__sub_hl_bc
  ei                             ; FB
  ex (sp), hl                    ; E3
  ex (sp), ix                    ; FD E3
@@ -1900,6 +1902,7 @@
  rrc l                          ; CB 0D
  rrca                           ; 0F
  rrd                            ; ED 67
+ rrhl                           ; CB 2C CB 1D
  rst 0                          ; C7
  rst 1                          ; CF
  rst 16                         ; D7
@@ -2423,10 +2426,13 @@
  sra (iy-128), l                ; DD CB 80 2D
  sra a                          ; CB 2F
  sra b                          ; CB 28
+ sra bc                         ; CB 28 CB 19
  sra c                          ; CB 29
  sra d                          ; CB 2A
+ sra de                         ; CB 2A CB 1B
  sra e                          ; CB 2B
  sra h                          ; CB 2C
+ sra hl                         ; CB 2C CB 1D
  sra l                          ; CB 2D
  srl (hl)                       ; CB 3E
  srl (ix)                       ; FD CB 00 3E
@@ -2529,6 +2535,10 @@
  sub d                          ; 92
  sub e                          ; 93
  sub h                          ; 94
+ sub hl, bc                     ; CD @__z80asm__sub_hl_bc
+ sub hl, de                     ; CD @__z80asm__sub_hl_de
+ sub hl, hl                     ; CD @__z80asm__sub_hl_hl
+ sub hl, sp                     ; CD @__z80asm__sub_hl_sp
  sub ixh                        ; FD 94
  sub ixl                        ; FD 95
  sub iyh                        ; DD 94

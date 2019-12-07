@@ -381,8 +381,6 @@ sub OP($)		{ return $OP{$_[0]}; }
 #------------------------------------------------------------------------------
 sub init_opcodes {
 	for $cpu (@CPUS) {
-		my($B, $T, $op, $r, $r1, $r2);
-		
 		next unless isintel || isgbz80 || isz80 || isz80n;
 		say "Build opcodes for $cpu";
 		
@@ -391,83 +389,64 @@ sub init_opcodes {
 		#----------------------------------------------------------------------
 		
 		# ld r, r
-		for $r1 (qw(     b c d e h l a )) {
-			for $r2 (qw( b c d e h l a )) {
+		for my $r1 (qw(     b c d e h l a )) {
+			for my $r2 (qw( b c d e h l a )) {
 				next if $cpu eq 'r3k' && "$r1,$r2" eq "e,e";
-				
-				$B = B(0x40+R($r1)*8+R($r2));
-				$T = T(is8080 ? 5 : israbbit ? 2 : 4);
-				add(		"ld  $r1, $r2", $B, $T);
-				add(		"mov $r1, $r2", $B, $T);
-				add_ixh(	"ld $r1, $r2",	$B, $T+4);
+				add(	"ld  $r1, $r2", B(0x40+R($r1)*8+R($r2)), T(is8080 ? 5 : israbbit ? 2 : 4));
+				add(	"mov $r1, $r2", B(0x40+R($r1)*8+R($r2)), T(is8080 ? 5 : israbbit ? 2 : 4));
+				add_ixh("ld  $r1, $r2",	B(0x40+R($r1)*8+R($r2)), T(is8080 ? 5 : israbbit ? 2 : 4)+4);
 			}
 		}
 
 		# ld r, n
-		for $r (qw( b c d e h l a )) {
-			$B = B(0x00+R($r)*8+6, '%n');
-			$T = T(isgbz80 ? 8 : 7);
-			add(		"ld  $r, %n",	$B, $T);
-			add(		"mvi $r, %n",	$B, $T);
-			add_ixh(	"ld  $r, %n",	$B, $T+4);
+		for my $r (qw( b c d e h l a )) {
+			add(	"ld  $r, %n", B(0x00+R($r)*8+6, '%n'), T(isgbz80 ? 8 : 7));
+			add(	"mvi $r, %n", B(0x00+R($r)*8+6, '%n'), T(isgbz80 ? 8 : 7));
+			add_ixh("ld  $r, %n", B(0x00+R($r)*8+6, '%n'), T(isgbz80 ? 8 : 7)+4);
 		}
 
 		# ld r, (hl) / (ix+d) / (iy+d)
-		for $r (qw( b c d e h l a )) {
-			$B = B(0x40+R($r)*8+6);
-			$T = T(isgbz80 ? 8 : 7);
-			add(		"ld  $r, (hl)",		$B, $T);
-			add(		"mov $r, m",		$B, $T);
-			add_ix_d(	"ld  $r, (hl)",		$B, $T+12);
+		for my $r (qw( b c d e h l a )) {
+			add(	 "ld  $r, (hl)", B(0x40+R($r)*8+6), T(isgbz80 ? 8 : 7));
+			add(	 "mov $r,  m",	 B(0x40+R($r)*8+6), T(isgbz80 ? 8 : 7));
+			add_ix_d("ld  $r, (hl)", B(0x40+R($r)*8+6), T(isgbz80 ? 8 : 7)+12);
 		}
 
 		# ld (hl) / (ix+d) / (iy+d), r
-		for $r (qw( b c d e h l a )) {
-			$B = B(0x40+6*8+R($r));
-			$T = T(isgbz80 ? 8 : 7);
-			add(		"ld  (hl),  $r",	$B, $T);
-			add(		"mov m,     $r",	$B, $T);
-			add_ix_d(	"ld  (hl), $r",		$B, $T+12);
+		for my $r (qw( b c d e h l a )) {
+			add(	 "ld  (hl), $r", B(0x40+6*8+R($r)), T(isgbz80 ? 8 : 7));
+			add(	 "mov  m,   $r", B(0x40+6*8+R($r)), T(isgbz80 ? 8 : 7));
+			add_ix_d("ld  (hl), $r", B(0x40+6*8+R($r)), T(isgbz80 ? 8 : 7)+12);
 		}
 
 		# ld (hl) / (ix+d) / (iy+d), n
-		$B = B(0x00+6*8+6, '%n');
-		$T = T(isgbz80 ? 12 : 10);
-		add(		"ld  (hl), %n",		$B, $T);
-		add(		"mvi m,    %n",		$B, $T);
-		add_ix_d(	"ld  (hl), %n",		$B, $T+9);
+		add(	 "ld  (hl), %n", B(0x00+6*8+6, '%n'), T(isgbz80 ? 12 : 10));
+		add(	 "mvi  m,   %n", B(0x00+6*8+6, '%n'), T(isgbz80 ? 12 : 10));
+		add_ix_d("ld  (hl), %n", B(0x00+6*8+6, '%n'), T(isgbz80 ? 12 : 10)+9);
 
 		# ld a, (bc) / (de)
-		for $r (qw( bc de )) {
-			$B = B(0x0a+RP($r)*16);
-			$T = T(isgbz80 ? 8 : 7);
-			$r1 = substr($r, 0, 1);
-			add("ld a, ($r)",	$B, $T);
-			add("ldax $r",		$B, $T);
-			add("ldax $r1",		$B, $T);
+		for my $r (qw( bc de )) {
+			my $r1 = substr($r, 0, 1);
+			add("ld a, ($r)", B(0x0a+RP($r)*16), T(isgbz80 ? 8 : 7));
+			add("ldax $r",	  B(0x0a+RP($r)*16), T(isgbz80 ? 8 : 7));
+			add("ldax $r1",	  B(0x0a+RP($r)*16), T(isgbz80 ? 8 : 7));
 		}
 		
 		# ld a, (nn)
-		$B = B(isgbz80 ? 0xfa : 0x3a, '%m', '%m');
-		$T = T(isgbz80 ? 16 : 13);
-		add("lda %m",		$B, $T);
-		add("ld a, (%m)",	$B, $T);
+		add("lda %m",	  B(isgbz80 ? 0xfa : 0x3a, '%m', '%m'), T(isgbz80 ? 16 : 13));
+		add("ld a, (%m)", B(isgbz80 ? 0xfa : 0x3a, '%m', '%m'), T(isgbz80 ? 16 : 13));
 
 		# ld (bc) / (de), a
-		for $r (qw( bc de )) {
-			$B = B(0x02+RP($r)*16);
-			$T = T(isgbz80 ? 8 : 7);
-			$r1 = substr($r, 0, 1);
-			add("ld ($r), a",	$B, $T);
-			add("stax $r",		$B, $T);
-			add("stax $r1",		$B, $T);
+		for my $r (qw( bc de )) {
+			my $r1 = substr($r, 0, 1);
+			add("ld ($r), a", B(0x02+RP($r)*16), T(isgbz80 ? 8 : 7));
+			add("stax $r",	  B(0x02+RP($r)*16), T(isgbz80 ? 8 : 7));
+			add("stax $r1",	  B(0x02+RP($r)*16), T(isgbz80 ? 8 : 7));
 		}
 		
 		# ld (nn), a
-		$B = B(isgbz80 ? 0xea : 0x32, '%m', '%m');
-		$T = T(isgbz80 ? 16 : 13);
-		add("ld (%m), a",	$B, $T);
-		add("sta %m",		$B, $T);
+		add("ld (%m), a", B(isgbz80 ? 0xea : 0x32, '%m', '%m'), T(isgbz80 ? 16 : 13));
+		add("sta %m",     B(isgbz80 ? 0xea : 0x32, '%m', '%m'), T(isgbz80 ? 16 : 13));
 		
 		# ld a, i / ld a, r / ld i,a / ld r, a
 		if (iszilog) {
@@ -500,77 +479,61 @@ sub init_opcodes {
 		#----------------------------------------------------------------------
 
 		# ld dd, nn
-		for $r (qw( bc de hl sp )) {
-			$B = B(0x01+RP($r)*16, '%m', '%m');
-			$T = T(isgbz80 ? 12 : 10);
-			$r1 = substr($r, 0, 1);
-			add(	"ld  $r, %m",	$B, $T);
-			add(	"lxi $r, %m",	$B, $T);
-			add(	"lxi $r1, %m",	$B, $T) unless $r eq 'sp';
-			add_ix(	"ld  $r, %m",	$B, $T+4);
+		for my $r (qw( bc de hl sp )) {
+			my $r1 = substr($r, 0, 1);
+			add(	"ld  $r,  %m", B(0x01+RP($r)*16, '%m', '%m'), T(isgbz80 ? 12 : 10));
+			add(	"lxi $r,  %m", B(0x01+RP($r)*16, '%m', '%m'), T(isgbz80 ? 12 : 10));
+			add(	"lxi $r1, %m", B(0x01+RP($r)*16, '%m', '%m'), T(isgbz80 ? 12 : 10)) unless $r eq 'sp';
+			add_ix(	"ld  $r,  %m", B(0x01+RP($r)*16, '%m', '%m'), T(isgbz80 ? 12 : 10)+4);
 		}
 
 		# ld hl, (nn)
 		if (!isgbz80) {
-			$B = B(0x2a, '%m', '%m');
-			$T = T(16);
-			add(	"ld hl, (%m)",	$B, $T);		
-			add(	"lhld   %m",	$B, $T);
-			add_ix(	"ld hl, (%m)",	$B, $T+4);
+			add(	"ld hl, (%m)",	B(0x2a, '%m', '%m'), T(16));		
+			add(	"lhld   %m",	B(0x2a, '%m', '%m'), T(16));
+			add_ix(	"ld hl, (%m)",	B(0x2a, '%m', '%m'), T(16)+4);
 		}
 		
 		# ld dd, (nn)
-		for $r (qw( bc de sp )) {
+		for my $r (qw( bc de sp )) {
 			if (!isintel && !isgbz80) {
-				$B = B(0xed, 0x4b+RP($r)*16, '%m', '%m');
-				$T = T(20);
-				add(	"ld $r, (%m)",	$B, $T);
+				add(	"ld $r, (%m)",	B(0xed, 0x4b+RP($r)*16, '%m', '%m'), T(20));
 			}
 		}
 			
 		# ld (nn), hl
 		if (!isgbz80) {
-			$B = B(0x22, '%m', '%m');
-			$T = T(16);
-			add(	"ld (%m), hl",	$B, $T);		
-			add(	"shld %m",		$B, $T);
-			add_ix(	"ld (%m), hl",	$B, $T+4);
+			add(	"ld (%m), hl",	B(0x22, '%m', '%m'), T(16));		
+			add(	"shld %m",		B(0x22, '%m', '%m'), T(16));
+			add_ix(	"ld (%m), hl",	B(0x22, '%m', '%m'), T(16)+4);
 		}
 		
 		# ld (nn), dd
 		if (!isintel && !isgbz80) {
-			for $r (qw( bc de sp )) {
-				$B = B(0xed, 0x43+RP($r)*16, '%m', '%m');
-				$T = T(20);
-				add(	"ld (%m), $r",	$B, $T);
+			for my $r (qw( bc de sp )) {
+				add(	"ld (%m), $r",	B(0xed, 0x43+RP($r)*16, '%m', '%m'), T(20));
 			}
 		}
 		
 		# ld sp, hl
-		$B = B(0xf9);
-		$T = T(is8080 ? 5 : isgbz80 ? 8 : 6);
-		add(	"ld sp, hl",	$B, $T);
-		add(	"sphl",			$B, $T);
-		add_ix(	"ld sp, hl",	$B, $T+4);
+		add(	"ld sp, hl",	B(0xf9), T(is8080 ? 5 : isgbz80 ? 8 : 6));
+		add(	"sphl",			B(0xf9), T(is8080 ? 5 : isgbz80 ? 8 : 6));
+		add_ix(	"ld sp, hl",	B(0xf9), T(is8080 ? 5 : isgbz80 ? 8 : 6)+4);
 		
 		# push qq
-		for $r (qw( bc de hl af )) {
-			$B = B(0xc5+RP($r)*16);
-			$T = T(is8085 ? 12 : isgbz80 ? 16 : 11);
-			$r1 = ($r eq 'af') ? 'psw' : substr($r, 0, 1);
-			add(	"push $r",	$B, $T);
-			add(	"push $r1",	$B, $T);
-			add_ix(	"push $r",	$B, $T+4);
+		for my $r (qw( bc de hl af )) {
+			my $r1 = ($r eq 'af') ? 'psw' : substr($r, 0, 1);
+			add(	"push $r",	B(0xc5+RP($r)*16), T(is8085 ? 12 : isgbz80 ? 16 : 11));
+			add(	"push $r1",	B(0xc5+RP($r)*16), T(is8085 ? 12 : isgbz80 ? 16 : 11));
+			add_ix(	"push $r",	B(0xc5+RP($r)*16), T(is8085 ? 12 : isgbz80 ? 16 : 11)+4);
 		}
 		
 		# pop qq
-		for $r (qw( bc de hl af )) {
-			$r1 = ($r eq 'af') ? 'psw' : substr($r, 0, 1);
-			$B = B(0xc1+RP($r)*16);
-			$T = T(isgbz80 ? 12 : 10);
-			add(	"pop $r",	$B, $T);
-			add(	"pop $r1",	$B, $T);
-			add_ix(	"pop $r",	$B, $T+4);
+		for my $r (qw( bc de hl af )) {
+			my $r1 = ($r eq 'af') ? 'psw' : substr($r, 0, 1);
+			add(	"pop $r",	B(0xc1+RP($r)*16), T(isgbz80 ? 12 : 10));
+			add(	"pop $r1",	B(0xc1+RP($r)*16), T(isgbz80 ? 12 : 10));
+			add_ix(	"pop $r",	B(0xc1+RP($r)*16), T(isgbz80 ? 12 : 10)+4);
 		}
 		
 		# ld (de), hl
@@ -620,11 +583,9 @@ sub init_opcodes {
 
 		# ex (sp), hl / ix / iy
 		if (isintel || iszilog) {
-			$B = B(0xe3);
-			$T = T(is8080 ? 18 : is8085 ? 16 : 19);
-			add(	"ex (sp), hl", 	$B, $T);
-			add(	"xthl",			$B, $T);
-			add_ix(	"ex (sp), hl", 	$B, $T+4);
+			add(	"ex (sp), hl", 	B(0xe3), T(is8080 ? 18 : is8085 ? 16 : 19));
+			add(	"xthl",			B(0xe3), T(is8080 ? 18 : is8085 ? 16 : 19));
+			add_ix(	"ex (sp), hl", 	B(0xe3), T(is8080 ? 18 : is8085 ? 16 : 19)+4);
 		}
 		elsif (israbbit) {
 			#add(	"ex (sp), hl", 			0xed, 0x54);
@@ -691,80 +652,60 @@ sub init_opcodes {
 		# add... a, r / add... r
 		for my $op (qw( add adc sub sbc and xor or  cp  
 		                                            cmp )) {
-			for $r (qw( b c d e h l a )) {
-				$B = B(0x80+OP($op)*8+R($r));
-				$T = T(4);
-				add("$op a, $r",	$B, $T);
-				add("$op    $r",	$B, $T);
+			for my $r (qw( b c d e h l a )) {
+				add("$op a, $r",	B(0x80+OP($op)*8+R($r)), T(4));
+				add("$op    $r",	B(0x80+OP($op)*8+R($r)), T(4));
 			}
 		}
 		for my $op (qw(             sbb ana xra ora     )) {	
-			for $r (qw( b c d e h l a )) {
-				$B = B(0x80+OP($op)*8+R($r));
-				$T = T(4);
-				add("$op $r", 		$B, $T);
+			for my $r (qw( b c d e h l a )) {
+				add("$op $r", 		B(0x80+OP($op)*8+R($r)), T(4));
 			}
 		}
 		
 		# add... a, (hl) / add... m
 		for my $op (qw( add adc sub sbc and xor or  cp  
 		                                            cmp )) {
-			$B = B(0x80+OP($op)*8+6);
-			$T = isgbz80 ? T(8) : T(7);
-			add(		"$op a, (hl)", 	$B, $T);
-			add(		"$op    (hl)", 	$B, $T);
-			add_ix_d(	"$op a, (hl)",	$B, $T+12);
-			add_ix_d(	"$op    (hl)",	$B, $T+12);
+			add(		"$op a, (hl)", 	B(0x80+OP($op)*8+6), isgbz80 ? T(8) : T(7));
+			add(		"$op    (hl)", 	B(0x80+OP($op)*8+6), isgbz80 ? T(8) : T(7));
+			add_ix_d(	"$op a, (hl)",	B(0x80+OP($op)*8+6), isgbz80 ? T(8) : T(7)+12);
+			add_ix_d(	"$op    (hl)",	B(0x80+OP($op)*8+6), isgbz80 ? T(8) : T(7)+12);
 		}
 		for my $op (qw( add adc sub sbb ana xra ora cmp )) {	
-			$B = B(0x80+OP($op)*8+6);
-			$T = isgbz80 ? T(8) : T(7);
-			add("$op m", 			$B, $T);
+			add("$op m", 			B(0x80+OP($op)*8+6), isgbz80 ? T(8) : T(7));
 		}
 		
 		# add... a, n / add... n
 		for my $op (qw( add adc sub sbc and xor or  cp  
 		                                            cmp )) {
-			$B = B(0xc6+OP($op)*8, '%n');
-			$T = isgbz80 ? T(8) : T(7);
-			add("$op a, %n", 		$B, $T);
-			add("$op    %n",		$B, $T);
+			add("$op a, %n", 		B(0xc6+OP($op)*8, '%n'), isgbz80 ? T(8) : T(7));
+			add("$op    %n",		B(0xc6+OP($op)*8, '%n'), isgbz80 ? T(8) : T(7));
 		}
 		for my $op (qw( adi aci sui sbi ani xri ori cpi )) {
-			$B = B(0xc6+OP($op)*8, '%n');
-			$T = isgbz80 ? T(8) : T(7);
-			add("$op %n", 			$B, $T);
+			add("$op %n", 			B(0xc6+OP($op)*8, '%n'), isgbz80 ? T(8) : T(7));
 		}
 		
 		# inc r
-		for $r (qw( b c d e h l a )) {
-			$B = B(0x04+R($r)*8);
-			$T = is8080 ? T(5) : T(4);
-			add("inr $r", 	$B, $T);
-			add("inc $r", 	$B, $T);
+		for my $r (qw( b c d e h l a )) {
+			add("inr $r", 	B(0x04+R($r)*8), is8080 ? T(5) : T(4));
+			add("inc $r", 	B(0x04+R($r)*8), is8080 ? T(5) : T(4));
 		}
 		
 		# dec r
-		for $r (qw( b c d e h l a )) {
-			$B = B(0x05+R($r)*8);
-			$T = is8080 ? T(5) : T(4);
-			add("dcr $r", 	$B, $T);
-			add("dec $r", 	$B, $T);
+		for my $r (qw( b c d e h l a )) {
+			add("dcr $r", 	B(0x05+R($r)*8), is8080 ? T(5) : T(4));
+			add("dec $r", 	B(0x05+R($r)*8), is8080 ? T(5) : T(4));
 		}
 		
 		# inc (hl) / (ix+d) / (iy+d)
-		$B = B(0x04+6*8);
-		$T = isintel ? T(10) : isgbz80 ? T(12) : T(11);
-		add(		"inr m", 		$B, $T);
-		add(		"inc (hl)", 	$B, $T);
-		add_ix_d(	"inc (hl)", 	$B, $T+12);
+		add(		"inr m", 		B(0x04+6*8), isintel ? T(10) : isgbz80 ? T(12) : T(11));
+		add(		"inc (hl)", 	B(0x04+6*8), isintel ? T(10) : isgbz80 ? T(12) : T(11));
+		add_ix_d(	"inc (hl)", 	B(0x04+6*8), isintel ? T(10) : isgbz80 ? T(12) : T(11)+12);
 		
 		# dec (hl) / (ix+d) / (iy+d)
-		$B = B(0x05+6*8);
-		$T = isintel ? T(10) : isgbz80 ? T(12) : T(11);
-		add(		"dcr m", 		$B, $T);
-		add(		"dec (hl)", 	$B, $T);
-		add_ix_d(	"dec (hl)", 	$B, $T+12);
+		add(		"dcr m", 		B(0x05+6*8), isintel ? T(10) : isgbz80 ? T(12) : T(11));
+		add(		"dec (hl)", 	B(0x05+6*8), isintel ? T(10) : isgbz80 ? T(12) : T(11));
+		add_ix_d(	"dec (hl)", 	B(0x05+6*8), isintel ? T(10) : isgbz80 ? T(12) : T(11)+12);
 		
 		#----------------------------------------------------------------------
 		# General Purpose Arithmetic
@@ -779,18 +720,14 @@ sub init_opcodes {
 		}
 		
 		# cpl
-		$B = B(0x2f);
-		$T = T(4);
-		add("cpl", 		$B, $T);
-		add("cma",		$B, $T);
-		add("cpl a", 	$B, $T);
+		add("cpl", 		B(0x2f), T(4));
+		add("cma",		B(0x2f), T(4));
+		add("cpl a", 	B(0x2f), T(4));
 		
 		# neg
-		$B = B(0xed, 0x44);
-		$T = T(8);
 		if (iszilog || israbbit) {
-			add("neg", 		$B, $T);
-			add("neg a", 	$B, $T);
+			add("neg", 		B(0xed, 0x44), T(8));
+			add("neg a", 	B(0xed, 0x44), T(8));
 		}
 		else {
 			add_compound("neg"		=> 	"cpl",
@@ -800,101 +737,91 @@ sub init_opcodes {
 		}
 
 		# ccf
-		$B = B(0x3f);
-		$T = T(4);
-		add("ccf",			$B, $T);
-		add("cmc",			$B, $T);
+		add("ccf",			B(0x3f), T(4));
+		add("cmc",			B(0x3f), T(4));
 		
 		# scf
-		$B = B(0x37);
-		$T = T(4);
-		add("scf",			$B, $T);
-		add("stc",			$B, $T);
+		add("scf",			B(0x37), T(4));
+		add("stc",			B(0x37), T(4));
 
 		#----------------------------------------------------------------------
 		# 16-bit arithmetic
 		#----------------------------------------------------------------------
 		
 		# add hl/ix/iy, ss
-		for $r (qw( bc de hl sp )) {
-			$B = B(0x09+RP($r)*16);
-			$T = isintel ? T(10) : isgbz80 ? T(8) : T(11);
-			add(	"add hl, $r",	$B, $T);
-			add_ix(	"add hl, $r",	$B, $T+4);
+		for my $r (qw( bc de hl sp )) {
+			my $r1 = substr($r, 0, 1);
+            add(    "dad $r",		B(0x09+RP($r)*16), isintel ? T(10) : isgbz80 ? T(8) : T(11));
+            add(    "dad $r1",		B(0x09+RP($r)*16), isintel ? T(10) : isgbz80 ? T(8) : T(11)) if $r ne 'sp';
+			add(	"add hl, $r",	B(0x09+RP($r)*16), isintel ? T(10) : isgbz80 ? T(8) : T(11));
+			add_ix(	"add hl, $r",	B(0x09+RP($r)*16), isintel ? T(10) : isgbz80 ? T(8) : T(11)+4);
 		}
 
 		# adc hl, ss
-		for $r (qw( bc de hl sp )) {
+		for my $r (qw( bc de hl sp )) {
 			if (isintel||isgbz80) {
-				$B = B(0xcd, '@__z80asm__adc_hl_'.$r);
-				if ($r eq 'bc' || $r eq 'de') { 
-					$T = is8080 ? T(47,52) : is8085 ? T(48,51) : T(36,44); 
-				} 
-				elsif ($r eq 'hl') { 
-					$T = is8080 ? T(110) : is8085 ? T(111) : T(84); 
-				}
-				elsif ($r eq 'sp') { 
-					$T = is8080 ? T(57,62) : is8085 ? T(60,63) : T(52,60); 
-				} 
-				else {
-					die;
-				}
-				add("adc hl, $r", 	$B, $T);
+				add("adc hl, $r", B(0xcd, '@__z80asm__adc_hl_'.$r),
+					($r eq 'bc' || $r eq 'de') ? (is8080 ? T(47,52) : is8085 ? T(48,51) : T(36,44)) :
+					($r eq 'hl') 			   ? (is8080 ? T(110)   : is8085 ? T(111)   : T(84))    :
+					 			   				 (is8080 ? T(57,62) : is8085 ? T(60,63) : T(52,60)));
+		
 			}
 			else {
-				$B = B(0xed, 0x4a+RP($r)*16);
-				$T = T(15);
-				add("adc hl, $r",	$B, $T);
+				add("adc hl, $r",	B(0xed, 0x4a+RP($r)*16), T(15));
 			}
 		}
 		
 		# sbc hl, ss
-		for $r (qw( bc de hl sp )) {
+		for my $r (qw( bc de hl sp )) {
 			if (isintel||isgbz80) {
-				$B = B(0xcd, '@__z80asm__sbc_hl_'.$r);
-				if ($r eq 'bc' || $r eq 'de') { 
-					$T = is8080 ? T(86) : is8085 ? T(82) : T(80); 
-				} 
-				elsif ($r eq 'hl') { 
-					$T = is8080 ? T(38,47) : is8085 ? T(40,50) : T(32,48); 
-				}
-				elsif ($r eq 'sp') { 
-					$T = is8080 ? T(156) : is8085 ? T(152) : T(232); 
-				} 
-				else {
-					die;
-				}
-				add("sbc hl, $r", 	$B, $T);
+				add("sbc hl, $r", B(0xcd, '@__z80asm__sbc_hl_'.$r),
+					($r eq 'bc') ? (is8080 ? T(86)    : is8085 ? T(82)    : T(80))    :
+					($r eq 'de') ? (is8080 ? T(86)    : is8085 ? T(82)    : T(80))    :
+					($r eq 'hl') ? (is8080 ? T(38,47) : is8085 ? T(40,50) : T(32,48)) :
+								   (is8080 ? T(156)   : is8085 ? T(152)   : T(232)));
 			}
 			else {
-				$B = B(0xed, 0x42+RP($r)*16);
-				$T = T(15);
-				add("sbc hl, $r",	$B, $T);
+				add("sbc hl, $r",	B(0xed, 0x42+RP($r)*16), T(15));
 			}
 		}
+        
+        # sub hl, ss
+        for my $r (qw( bc de hl sp )) {
+            if (is8085 && $r eq 'bc') {
+                # 8085 undocumented opcode: double subtract
+                add("dsub",			B(0x08), T(10));
+                add("sub hl, bc",	B(0x08), T(10));
+            }
+            else {
+				add("sub hl, $r", B(0xcd, '@__z80asm__sub_hl_'.$r),
+					($r eq 'bc') ? (is8080 ? T(86)  : is8085 ? T(10)  : isgbz80 ? T(80)  : T(80)) :
+					($r eq 'de') ? (is8080 ? T(86)  : is8085 ? T(82)  : isgbz80 ? T(80)  : T(80)) :
+					($r eq 'hl') ? (is8080 ? T(86)  : is8085 ? T(82)  : isgbz80 ? T(80)  : T(80)) :
+								   (is8080 ? T(156) : is8085 ? T(152) : isgbz80 ? T(232) : T(151)));
+            }
+        }
+        if (!is8085) {
+            add_compound("dsub" => "sub hl, bc");
+        }
 		
 		# inc ss
-		for $r (qw( bc de hl sp )) {
+		for my $r (qw( bc de hl sp )) {
 			my $r1 = substr($r, 0, 1);
-			$B = B(0x03+RP($r)*16);
-			$T = is8080 ? T(5) : is8085 ? T(6) : isgbz80 ? T(8) : T(6); 
-			add(	"inc $r", 	$B, $T);
-			add_ix(	"inc $r", 	$B, $T+4);
+			add(	"inc $r", 	B(0x03+RP($r)*16), is8080 ? T(5) : is8085 ? T(6) : isgbz80 ? T(8) : T(6));
+			add_ix(	"inc $r", 	B(0x03+RP($r)*16), is8080 ? T(5) : is8085 ? T(6) : isgbz80 ? T(8) : T(6)+4);
 			
-			add(	"inx $r", 	$B, $T);
-			add(	"inx $r1", 	$B, $T) if $r ne 'sp';
+			add(	"inx $r", 	B(0x03+RP($r)*16), is8080 ? T(5) : is8085 ? T(6) : isgbz80 ? T(8) : T(6));
+			add(	"inx $r1", 	B(0x03+RP($r)*16), is8080 ? T(5) : is8085 ? T(6) : isgbz80 ? T(8) : T(6)) if $r ne 'sp';
 		}
 		
 		# dec ss
-		for $r (qw( bc de hl sp )) {
+		for my $r (qw( bc de hl sp )) {
 			my $r1 = substr($r, 0, 1);
-			$B = B(0x0b+RP($r)*16);
-			$T = is8080 ? T(5) : is8085 ? T(6) : isgbz80 ? T(8) : T(6); 
-			add(	"dec $r", 	$B, $T);
-			add_ix(	"dec $r", 	$B, $T+4);
+			add(	"dec $r", 	B(0x0b+RP($r)*16), is8080 ? T(5) : is8085 ? T(6) : isgbz80 ? T(8) : T(6));
+			add_ix(	"dec $r", 	B(0x0b+RP($r)*16), is8080 ? T(5) : is8085 ? T(6) : isgbz80 ? T(8) : T(6)+4);
 
-			add(	"dcx $r", 	$B, $T);
-			add(	"dcx $r1", 	$B, $T) if $r ne 'sp';
+			add(	"dcx $r", 	B(0x0b+RP($r)*16), is8080 ? T(5) : is8085 ? T(6) : isgbz80 ? T(8) : T(6));
+			add(	"dcx $r1", 	B(0x0b+RP($r)*16), is8080 ? T(5) : is8085 ? T(6) : isgbz80 ? T(8) : T(6)) if $r ne 'sp';
 		}
 		
 		#----------------------------------------------------------------------
@@ -902,11 +829,9 @@ sub init_opcodes {
 		#----------------------------------------------------------------------
 		
 		# rlca/rrca/rla/rra
-		for $op (qw( rlca rrca rla rra 
+		for my $op (qw( rlca rrca rla rra 
 					 rlc  rrc  ral rar )) {
-			$B = B(0x07+OP($op)*8);
-			$T = T(4);
-			add($op,		$B, $T);
+			add($op,		B(0x07+OP($op)*8), T(4));
 		}		
 		
 		# rlc/rrc/rl/rr/sla/sra/sll/sli/srl
@@ -915,17 +840,13 @@ sub init_opcodes {
 			if    (iszilog) { @ops = qw( rlc rrc rl rr sla sra sll  sli srl ); }
 			elsif (isgbz80) { @ops = qw( rlc rrc rl rr sla sra swap     srl ); }
 			else  			{ @ops = qw( rlc rrc rl rr sla sra          srl ); }
-			for $op (@ops) {
-				for $r (qw( b c d e h l a )) {
-					$B = B(0xcb, OP($op)*8+R($r));
-					$T = T(8);
-					add("$op $r", 	$B, $T);
+			for my $op (@ops) {
+				for my $r (qw( b c d e h l a )) {
+					add("$op $r", 	B(0xcb, OP($op)*8+R($r)), T(8));
 				}
 
-				$B = B(0xcb, OP($op)*8+6);
-				$T = isgbz80 ? T(16) : T(15);
-				add(		"$op (hl)", 	$B, $T);
-				add_ix_d(	"$op (hl)", 	$B, $T+8);
+				add(		"$op (hl)", 	B(0xcb, OP($op)*8+6), isgbz80 ? T(16) : T(15));
+				add_ix_d(	"$op (hl)", 	B(0xcb, OP($op)*8+6), isgbz80 ? T(16) : T(15)+8);
 			}
 		}
 		
@@ -935,15 +856,43 @@ sub init_opcodes {
 			add("rld", B(0xed, 0x6f), T(18));
 		}
 		else {
-			$B = B(0xcd, '@__z80asm__rrd');
-			$T = is8080 ? T(229,260) : is8085 ? T(224,253) : isgbz80 ? T(136,160) : T(18); 
-			add("rrd",		$B, $T);
+			add("rrd",		B(0xcd, '@__z80asm__rrd'), is8080 ? T(229,260) : is8085 ? T(224,253) : isgbz80 ? T(136,160) : T(18));
 			
-			$B = B(0xcd, '@__z80asm__rld');
-			$T = is8080 ? T(201,232) : is8085 ? T(197,226) : isgbz80 ? T(164,188) : T(18); 
-			add("rld",		$B, $T);
+			add("rld",		B(0xcd, '@__z80asm__rld'), is8080 ? T(201,232) : is8085 ? T(197,226) : isgbz80 ? T(164,188) : T(18));
 		}
-	
+
+		#----------------------------------------------------------------------
+		# 16-bit Rotate and Shift Group
+		#----------------------------------------------------------------------
+		
+        # sra bc/de
+        if (isintel) {
+            add("sra bc", B(0xcd, '@__z80asm__sra_bc'), T(is8080?99:is8085?96:israbbit?8:isz180?14:16));
+            add("sra de", B(0xcd, '@__z80asm__sra_de'), T(is8080?99:is8085?96:israbbit?8:isz180?14:16));
+        } 
+        else {
+            add_compound("sra bc" => "sra b", "rr c");
+            add_compound("sra de" => "sra d", "rr e");
+        }
+
+        # sra hl (undocumented i8085)
+		if (is8085) {
+			add("arhl",		B(0x10), T(is8080?99:is8085?7:israbbit?8:isz180?14:16));
+			add("rrhl",		B(0x10), T(is8080?99:is8085?7:israbbit?8:isz180?14:16));
+			add("sra hl",	B(0x10), T(is8080?99:is8085?7:israbbit?8:isz180?14:16));
+		}
+        elsif (isintel) {
+            add("sra hl", B(0xcd, '@__z80asm__sra_hl'), T(is8080?99:is8085?96:israbbit?8:isz180?14:16));
+        }
+        else {
+            add_compound("sra hl" => "sra h", "rr l");
+        }
+
+        if (!is8085) {
+            add_compound("arhl"     => "sra hl");
+            add_compound("rrhl"     => "sra hl");
+        }
+
 		#----------------------------------------------------------------------
 		# Bit Set, Reset and Test Group
 		#----------------------------------------------------------------------
@@ -951,10 +900,8 @@ sub init_opcodes {
 		# bit/res/set b, r
 		if (!isintel) {
 			for my $op (qw( bit res set )) {
-				for $r (qw( b c d e h l a )) {
-					$B = B(0xcb, (OP($op)*0x40+R($r))."+%c*8");
-					$T = T(8);
-					add("$op %c, $r",	$B, $T);
+				for my $r (qw( b c d e h l a )) {
+					add("$op %c, $r",	B(0xcb, (OP($op)*0x40+R($r))."+%c*8"), T(8));
 				}
 			}
 		}
@@ -962,10 +909,9 @@ sub init_opcodes {
 		# bit/res/set b, (hl) / (ix+d) / (iy+d)
 		if (!isintel) {
 			for my $op (qw( bit res set )) {
-				$B = B(0xcb, (OP($op)*0x40+6)."+%c*8");
-				if ($op eq 'bit')	{ $T = isgbz80 ? T(16) : T(12); } 
-				else 				{ $T = isgbz80 ? T(16) : T(15); }
-				add("$op %c, (hl)",		$B, $T);
+				add("$op %c, (hl)",	B(0xcb, (OP($op)*0x40+6)."+%c*8"),
+					($op eq 'bit')	? T(isgbz80 ? 16 : 12) :
+									  T(isgbz80 ? 16 : 15));
 			}
 		}
 		
@@ -974,77 +920,57 @@ sub init_opcodes {
 		#----------------------------------------------------------------------
 
 		# call nn
-		$B = B(0xcd, '%m', '%m');
-		$T = is8080 ? T(17) : is8085 ? T(18) : isgbz80 ? T(12) : T(17);
-		add("call %m",		$B, $T);
+		add("call %m",		B(0xcd, '%m', '%m'), is8080 ? T(17) : is8085 ? T(18) : isgbz80 ? T(12) : T(17));
 
 		# call f, nn
 		for my $f (qw( nz z nc c po pe nv v p m )) {
 			next if isgbz80 && F($f) >= 4;
 
-			$B = B(0xc4+F($f)*8, '%m', '%m');
-			$T = is8080 ? T(11,17) : is8085 ? T(9,18) : isgbz80 ? T(12) : T(10,17);
-			add("call $f, %m",	$B, $T);			
-			add("c$f %m",		$B, $T) if $f ne 'p';	# Intel's cp is ambiguous
+			add("call $f, %m",	B(0xc4+F($f)*8, '%m', '%m'), is8080 ? T(11,17) : is8085 ? T(9,18) : isgbz80 ? T(12) : T(10,17));			
+			add("c$f %m",		B(0xc4+F($f)*8, '%m', '%m'), is8080 ? T(11,17) : is8085 ? T(9,18) : isgbz80 ? T(12) : T(10,17)) if $f ne 'p';	# Intel's cp is ambiguous
 		}
 
 		# ret
-		$B = B(0xc9);
-		$T = isgbz80 ? T(8) : T(10);
-		add("ret",		$B, $T);
+		add("ret",		B(0xc9), isgbz80 ? T(8) : T(10));
 		
 		# ret f
 		for my $f (qw( nz z nc c po pe nv v p m )) {
 			next if isgbz80 && F($f) >= 4;
 		
-			$B = B(0xc0+F($f)*8);
-			$T = is8080 ? T(5,11) : is8085 ? T(6,12) : isgbz80 ? T(8) : T(5,11);
-			add("ret $f",	$B, $T);
-			add("r$f",		$B, $T);
+			add("ret $f",	B(0xc0+F($f)*8), is8080 ? T(5,11) : is8085 ? T(6,12) : isgbz80 ? T(8) : T(5,11));
+			add("r$f",		B(0xc0+F($f)*8), is8080 ? T(5,11) : is8085 ? T(6,12) : isgbz80 ? T(8) : T(5,11));
 		}
 
 		# reti
 		if (isgbz80) {
-			$B = B(0xd9);
-			$T = T(8);
-			add("reti",		$B, $T);
+			add("reti",		B(0xd9), T(8));
 		}
 		elsif (iszilog) {
-			$B = B(0xed, 0x4d);
-			$T = T(14);
-			add("reti",		$B, $T);
+			add("reti",		B(0xed, 0x4d), T(14));
 		}
 		
 		# retn
 		if (iszilog) {
-			$B = B(0xed, 0x45);
-			$T = T(14);
-			add("retn",		$B, $T);
+			add("retn",		B(0xed, 0x45), T(14));
 		}
 		
 		# rst
-		$B = B(0xc7."+%c");
-		$T = is8085 ? T(12) : isgbz80 ? T(32) : T(11);
-		add("rst %c", 		$B, $T);
+		add("rst %c", 		B(0xc7."+%c"), is8085 ? T(12) : isgbz80 ? T(32) : T(11));
 
 		#----------------------------------------------------------------------
 		# Jump Group
 		#----------------------------------------------------------------------
 
 		# jp/jmp nn
-		$B = B(0xc3, '%m', '%m');
-		$T = isintel ? T(10) : isgbz80 ? T(12) : T(10);
-		add("jmp %m",		$B, $T);
-		add("jp  %m",		$B, $T); 	# do not define JP as Jump Positive in Intel
+		add("jmp %m",		B(0xc3, '%m', '%m'), isintel ? T(10) : isgbz80 ? T(12) : T(10));
+		add("jp  %m",		B(0xc3, '%m', '%m'), isintel ? T(10) : isgbz80 ? T(12) : T(10)); 	# do not define JP as Jump Positive in Intel
 
 		# jp f, nn
 		for my $f (qw( nz z nc c po pe nv v p m )) {
 			next if isgbz80 && F($f) >= 4;		# gbz80 only has carry and zero flags
-			$B = B(0xc2+F($f)*8, '%m', '%m');
-			$T = is8080 ? T(10) : is8085 ? T(7,10) : isgbz80 ? T(12) : T(10);
 			
-			add("jp $f, %m",	$B, $T);
-			add("j$f %m",		$B, $T) if $f ne 'p';	# Intel's jp is ambiguous
+			add("jp $f, %m",	B(0xc2+F($f)*8, '%m', '%m'), is8080 ? T(10) : is8085 ? T(7,10) : isgbz80 ? T(12) : T(10));
+			add("j$f %m",		B(0xc2+F($f)*8, '%m', '%m'), is8080 ? T(10) : is8085 ? T(7,10) : isgbz80 ? T(12) : T(10)) if $f ne 'p';	# Intel's jp is ambiguous
 		}
 		
 		# jr nn
@@ -1052,9 +978,7 @@ sub init_opcodes {
 			add_compound("jr %m"			=> "jp %m");
 		}
 		else {
-			$B = B(0x18, '%j');
-			$T = isgbz80 ? T(8) : T(12);
-			add("jr %j",					$B, $T);
+			add("jr %j",					B(0x18, '%j'), isgbz80 ? T(8) : T(12));
 		}
 		
 		# jr f, nn
@@ -1063,21 +987,17 @@ sub init_opcodes {
 				add_compound("jr $f, %m"	=> "jp $f, %m");
 			}
 			else {
-				$B = B(0x20+F($f)*8, '%j');
-				$T = isgbz80 ? T(8) : T(7,12);
-				add("jr $f, %j",			$B, $T);
+				add("jr $f, %j",			B(0x20+F($f)*8, '%j'), isgbz80 ? T(8) : T(7,12));
 			}
 		}
 		
 		# jp (hl) / jp (ix) / jp (iy)
-		$B = B(0xe9);
-		$T = is8080 ? T(5) : is8085 ? T(6) : T(4);
-		add(	"pchl",				$B, $T);
-		add(	"jp (hl)",			$B, $T);
-		add_ix(	"jp (hl)",			$B, $T+4);
+		add(	"pchl",				B(0xe9), is8080 ? T(5) : is8085 ? T(6) : T(4));
+		add(	"jp (hl)",			B(0xe9), is8080 ? T(5) : is8085 ? T(6) : T(4));
+		add_ix(	"jp (hl)",			B(0xe9), is8080 ? T(5) : is8085 ? T(6) : T(4)+4);
 	
 		# jp (bc) / jp (de)
-		for $r (qw( bc de )) {
+		for my $r (qw( bc de )) {
 			add_compound("jp ($r)"	=> "push $r", "ret");
 		}
 		
@@ -1091,12 +1011,61 @@ sub init_opcodes {
 			add_compound("djnz b, %j"	=> "dec b", "jr nz, %j");
 		}
 		else {
-			$B = B(0x10, '%j');
-			$T = T(8,13);
+			add("djnz %j",			B(0x10, '%j'), T(8,13));
+			add("djnz b, %j",		B(0x10, '%j'), T(8,13));
 		}
 
+		#----------------------------------------------------------------------
+		# Input and Output Group
+		#----------------------------------------------------------------------
 
-
+		# in a, (n)
+		if (isintel||iszilog) {
+			add("in %n",		B(0xdb, '%n'), isintel ? T(10) : T(11));
+			add("in a, (%n)",	B(0xdb, '%n'), isintel ? T(10) : T(11));
+		}
+		
+		# in (c)
+		if (iszilog) {
+			add("in (c)",		B(0xed, 0x40+R('f')*8), T(12));
+		}
+		
+		# in r, (c)
+		if (iszilog) {
+			for my $r (qw( b c d e h l f a )) {
+				add("in $r, (c)", 	B(0xed, 0x40+R($r)*8), T(12));
+			}
+		}
+		
+		# ini/inir/ind/indr
+		if (iszilog) {
+			add("ini", 			B(0xed, 0xa2), T(16));
+			add("inir",			B(0xed, 0xb2), T(16,44));	# b=1, b=2
+			add("ind", 			B(0xed, 0xaa), T(16));
+			add("indr", 		B(0xed, 0xba), T(16,44));	# b=1, b=2
+		}		
+		
+		# out (n), a
+		if (isintel||iszilog) {
+			add("out %n",		B(0xd3, '%n'), isintel ? T(10) : T(11));
+			add("out (%n), a",	B(0xd3, '%n'), isintel ? T(10) : T(11));
+		}
+		
+		# out (c), r
+		if (iszilog) {
+			for my $r (qw( b c d e h l a )) {
+				add("out (c), $r", 	B(0xed, 0x41+R($r)*8), T(12));
+			}
+			add("out (c), %c", 	B(0xed, 0x41+6*8), T(12));
+		}
+		
+		# outi/otir/outd/otdr
+		if (iszilog) {
+			add("outi", 		B(0xed, 0xa3), T(16));
+			add("otir",			B(0xed, 0xb3), T(16,44));	# b=1, b=2
+			add("outd", 		B(0xed, 0xab), T(16));
+			add("otdr", 		B(0xed, 0xbb), T(16,44));	# b=1, b=2
+		}		
 		
 		#----------------------------------------------------------------------
 		# General Purpose CPU Control
@@ -1107,10 +1076,8 @@ sub init_opcodes {
 		
 		# halt
 		if (!israbbit) {
-			$B = B(0x76);
-			$T = is8080 ? T(7) : is8085 ? T(5) : T(4);
-			add("hlt",		$B, $T);
-			add("halt",		$B, $T);
+			add("hlt",		B(0x76), is8080 ? T(7) : is8085 ? T(5) : T(4));
+			add("halt",		B(0x76), is8080 ? T(7) : is8085 ? T(5) : T(4));
 		}
 		
 		# ei / di
@@ -1124,65 +1091,21 @@ sub init_opcodes {
 			add("im %c", 	B(0xed, "%c==0?0x46:%c==1?0x56:0x5e"), T(8));
 		}
 
-		
-		
-
-		
-		
-		next unless isintel || isgbz80;
-		next;
-
-
-		
-		
-
-		
-		#----------------------------------------------------------------------
-		# 8080 opcodes
-		#----------------------------------------------------------------------
-
-		# data transfer group
-
-		for $r (qw( b bc d de h hl sp )) {
-			add("inx $r",		0x03+RP($r)*16, is8080 ? 5 : is8085 ? 6 : isgbz80 ? 8 : die);
-			add("dcx $r",		0x0b+RP($r)*16, is8080 ? 5 : is8085 ? 6 : isgbz80 ? 8 : die);
-			add("dad $r",		0x09+RP($r)*16, isintel ? 10 : isgbz80 ? 8 : die);
-		}
-		
-
-		
-
-
-		
-		
-		if (isintel||iszilog) {
-			add("in %n",		[0xdb, '%n'], isintel ? 10 : die);
-			add("in a, (%n)",	[0xdb, '%n'], isintel ? 10 : die);
-			
-			add("out %n",		[0xd3, '%n'], isintel ? 10 : die);
-			add("out (%n), a",	[0xd3, '%n'], isintel ? 10 : die);
-		}
-		
-
+        # interrupt mask
+		if (is8085) {
+			add("rim", 		B(0x20), T(4));
+			add("sim", 		B(0x30), T(4));
+        }
+        
+next unless isintel || isgbz80;
+next;
 
 		#----------------------------------------------------------------------
 		# 8085 opcodes
 		#----------------------------------------------------------------------
+        
+        # Rotate DE left (undocumented i8085)
 		if (is8085) {
-			# interrupt mask
-			add("rim", 			0x20, 4);
-			add("sim", 			0x30, 4);
-
-			# double subtract
-			add("dsub",			0x08, 10);
-			add("sub hl, bc",	0x08, 10);
-		
-			# Rotate HL right
-			add("arhl",			0x10, 7);
-			add("rrhl",			0x10, 7);
-			add("sra hl",		0x10, 7);
-			
-			# Rotate DE left
 			add("rdel",			0x18, 10);
 			add("rlde",			0x18, 10);
 			add("rl de",		0x18, 10);
@@ -1242,17 +1165,11 @@ sub init_opcodes {
 		}
 
 		#----------------------------------------------------------------------
-		# Zilog opcodes
-		#----------------------------------------------------------------------
-		
-
-
-		#----------------------------------------------------------------------
 		# compound opcodes
 		#----------------------------------------------------------------------
 		next;
 		
-		for $r (qw( bc de )) {
+		for my $r (qw( bc de )) {
 			my($rh, $rl) = split(//, $r);
 
 			add_compound("ld a, ($r+)"	=> "ld a, ($r)", "inc $r");
@@ -1278,16 +1195,16 @@ sub init_opcodes {
 			add_compound("jp ($r)"		=> "push $r", "ret");
 		}
 
-		for $r1 (qw( bc de hl )) {
+		for my $r1 (qw( bc de hl )) {
 			my($r1h, $r1l) = split(//, $r1);
-			for $r2 (qw( bc de hl )) {
+			for my $r2 (qw( bc de hl )) {
 				my($r2h, $r2l) = split(//, $r2);
 				
 				add_compound("ld $r1, $r2"	=> "ld $r1h, $r2h", "ld $r1l, $r2l");
 			}
 		}
 
-		for $r (qw( b c d e h l a )) {
+		for my $r (qw( b c d e h l a )) {
 			add_compound("ld $r, (hl+)"	=> "ld $r, (hl)", "inc hl");
 			add_compound("ldi $r, (hl)"	=> "ld $r, (hl)", "inc hl");
 			
@@ -1475,6 +1392,12 @@ sub write_opcodes_line {
 	}
 	elsif ($asm =~ /^im %c/) {
 		for my $c (0..2) {
+			write_opcodes_line($rows, replace($asm, '%c', $c), $cpu, 
+							   defined($prog) ? $prog->clone(c => $c) : undef);
+		}
+	}
+	elsif ($asm =~ /^out \(c\), %c/) {
+		for my $c (0) {
 			write_opcodes_line($rows, replace($asm, '%c', $c), $cpu, 
 							   defined($prog) ? $prog->clone(c => $c) : undef);
 		}
@@ -1932,36 +1855,30 @@ sub run_tests {
 						'%n', 0x12, '%s', 0x12, '%d' => 0x12, '%m', 0x1234);
 					my $test_asm = sprintf(" %-31s; %s", $asm_instance, $prog_instance->format_bytes);
 					
-					if ($asm eq 'jp (bc)' || 
-						$asm eq 'jp (de)' || 
-						$asm eq 'jp (hl)' || 
-						$asm eq 'jp (ix)' || 
-						$asm eq 'jp (iy)' || 
-						$asm eq 'pchl' ||
-						$asm eq 'stop') {
-						ok run_test($ixiy, 0, [$test_asm, $prog_instance]);
+					if ($asm =~ /^(jp \(bc\)|jp \(de\)|jp \(hl\)|jp \(ix\)|jp \(iy\)|pchl|stop)$/) {
+						run_test($ixiy, 0, [$test_asm, $prog_instance]);
 					}
 					elsif ($asm eq 'jmp %m' ||
 					       $asm eq 'call %m' ||
 					       $asm eq 'jp %m' ||		# zilog
 						   $asm eq 'jr %m') {		# intel
-						ok run_test($ixiy, 0x1234, [$test_asm, $prog_instance]);
+						run_test($ixiy, 0x1234, [$test_asm, $prog_instance]);
 					}
-					elsif ($asm eq 'djnz b, %j' ||
-						   $asm eq 'djnz %j') {
-						$prog_instance = $prog->clone(j => 0);		# jr 5 -> offset=0
-						$asm_instance = replace($asm, '%j', 5);
+					elsif ($asm =~ /^(djnz b, %j|djnz %j)$/) {
+						my $target = $prog->size + 2;				# ld b,1:djnz
+						$prog_instance = $prog->clone(j => 0);		# jr target -> offset=0
+						$asm_instance = replace($asm, '%j', $target);
 						$test_asm = sprintf(" %-31s; %s", $asm_instance, $prog_instance->format_bytes);
-						ok run_test($ixiy, 5,
+						run_test($ixiy, $target,
 								[" ld b, 1",	$Opcodes{"ld b, %n"}{$cpu}->clone(n => 1)],
 								[$test_asm, 	$prog_instance]);
 					}
-					elsif ($asm eq 'djnz b, %m' ||
-						   $asm eq 'djnz %m') {
-						$prog_instance = $prog->clone(m => 6);
-						$asm_instance = replace($asm, '%m', 6);
+					elsif ($asm =~ /^(djnz b, %m|djnz %m)$/) {
+						my $target = $prog->size + 2;				# ld b,1:djnz
+						$prog_instance = $prog->clone(m => $target);
+						$asm_instance = replace($asm, '%m', $target);
 						$test_asm = sprintf(" %-31s; %s", $asm_instance, $prog_instance->format_bytes);
-						ok run_test($ixiy, 6,
+						run_test($ixiy, $target,
 								[" ld b, 1",	$Opcodes{"ld b, %n"}{$cpu}->clone(n => 1)],
 								[$test_asm, 	$prog_instance]);
 					}
@@ -1969,7 +1886,7 @@ sub run_tests {
 						$prog_instance = $prog->clone(j => 0);		# jr 2 -> offset=0
 						$asm_instance = replace($asm, '%j', 2);
 						$test_asm = sprintf(" %-31s; %s", $asm_instance, $prog_instance->format_bytes);
-						ok run_test($ixiy, 2, [$test_asm, $prog_instance]);
+						run_test($ixiy, 2, [$test_asm, $prog_instance]);
 					}
 					elsif ($asm =~ /(jp|call|jr) (nz|z), %m|(j|c)(nz|z) %m/) {
 						$prog_instance = $prog->clone(m => 5);
@@ -1977,13 +1894,13 @@ sub run_tests {
 						$test_asm = sprintf(" %-31s; %s", $asm_instance, $prog_instance->format_bytes);
 						
 						# zero reset
-						ok run_test($ixiy, undef, 
+						run_test($ixiy, undef, 
 								[" xor a",		$Opcodes{"xor a"}{$cpu}->clone()],
 								[" inc a",		$Opcodes{"inc a"}{$cpu}->clone()],
 								[$test_asm, 	$prog_instance]);
 						
 						# zero set
-						ok run_test($ixiy, undef,
+						run_test($ixiy, undef,
 								[" xor a",		$Opcodes{"xor a"}{$cpu}->clone()],
 								[" nop",		$Opcodes{"nop"}{$cpu}->clone()],
 								[$test_asm, 	$prog_instance]);
@@ -1994,20 +1911,20 @@ sub run_tests {
 						$test_asm = sprintf(" %-31s; %s", $asm_instance, $prog_instance->format_bytes);
 						
 						# zero reset
-						ok run_test($ixiy, undef, 
+						run_test($ixiy, undef, 
 								[" xor a",		$Opcodes{"xor a"}{$cpu}->clone()],
 								[" inc a",		$Opcodes{"inc a"}{$cpu}->clone()],
 								[$test_asm, 	$prog_instance]);
 						
 						# zero set
-						ok run_test($ixiy, undef,
+						run_test($ixiy, undef,
 								[" xor a",		$Opcodes{"xor a"}{$cpu}->clone()],
 								[" nop",		$Opcodes{"nop"}{$cpu}->clone()],
 								[$test_asm, 	$prog_instance]);
 					}
 					elsif ($asm =~ /ret (nz|z)|r(nz|z)/) {
 						# zero reset
-						ok run_test($ixiy, undef, 
+						run_test($ixiy, undef, 
 								[" ld hl, 7",	$Opcodes{"ld hl, %m"}{$cpu}->clone(m => 7)],
 								[" push hl",	$Opcodes{"push hl"}{$cpu}->clone()],
 								[" xor a",		$Opcodes{"xor a"}{$cpu}->clone()],
@@ -2015,7 +1932,7 @@ sub run_tests {
 								[$test_asm, 	$prog_instance]);
 						
 						# zero set
-						ok run_test($ixiy, undef,
+						run_test($ixiy, undef,
 								[" ld hl, 7",	$Opcodes{"ld hl, %m"}{$cpu}->clone(m => 7)],
 								[" push hl",	$Opcodes{"push hl"}{$cpu}->clone()],
 								[" xor a",		$Opcodes{"xor a"}{$cpu}->clone()],
@@ -2028,12 +1945,12 @@ sub run_tests {
 						$test_asm = sprintf(" %-31s; %s", $asm_instance, $prog_instance->format_bytes);
 						
 						# carry reset
-						ok run_test($ixiy, undef, 
+						run_test($ixiy, undef, 
 								[" and a",		$Opcodes{"and a"}{$cpu}->clone()],
 								[$test_asm, 	$prog_instance]);
 						
 						# carry set
-						ok run_test($ixiy, undef,
+						run_test($ixiy, undef,
 								[" scf",		$Opcodes{"scf"}{$cpu}->clone()],
 								[$test_asm, 	$prog_instance]);
 					}
@@ -2043,25 +1960,25 @@ sub run_tests {
 						$test_asm = sprintf(" %-31s; %s", $asm_instance, $prog_instance->format_bytes);
 						
 						# carry reset
-						ok run_test($ixiy, undef, 
+						run_test($ixiy, undef, 
 								[" and a",		$Opcodes{"and a"}{$cpu}->clone()],
 								[$test_asm, 	$prog_instance]);
 						
 						# carry set
-						ok run_test($ixiy, undef,
+						run_test($ixiy, undef,
 								[" scf",		$Opcodes{"scf"}{$cpu}->clone()],
 								[$test_asm, 	$prog_instance]);
 					}
 					elsif ($asm =~ /ret (nc|c)|r(nc|c)/) {
 						# carry reset
-						ok run_test($ixiy, undef, 
+						run_test($ixiy, undef, 
 								[" ld hl, 6",	$Opcodes{"ld hl, %m"}{$cpu}->clone(m => 6)],
 								[" push hl",	$Opcodes{"push hl"}{$cpu}->clone()],
 								[" and a",		$Opcodes{"and a"}{$cpu}->clone()],
 								[$test_asm, 	$prog_instance]);
 						
 						# carry set
-						ok run_test($ixiy, undef,
+						run_test($ixiy, undef,
 								[" ld hl, 6",	$Opcodes{"ld hl, %m"}{$cpu}->clone(m => 6)],
 								[" push hl",	$Opcodes{"push hl"}{$cpu}->clone()],
 								[" scf",		$Opcodes{"scf"}{$cpu}->clone()],
@@ -2073,20 +1990,20 @@ sub run_tests {
 						$test_asm = sprintf(" %-31s; %s", $asm_instance, $prog_instance->format_bytes);
 						
 						# parity odd
-						ok run_test($ixiy, undef, 
+						run_test($ixiy, undef, 
 								[" ld a, 1",	$Opcodes{"ld a, %n"}{$cpu}->clone(n => 1)],
 								[" and a",		$Opcodes{"and a"}{$cpu}->clone()],
 								[$test_asm, 	$prog_instance]);
 						
 						# parity even
-						ok run_test($ixiy, undef,
+						run_test($ixiy, undef,
 								[" ld a, 0",	$Opcodes{"ld a, %n"}{$cpu}->clone(n => 0)],
 								[" and a",		$Opcodes{"and a"}{$cpu}->clone()],
 								[$test_asm, 	$prog_instance]);
 					}
 					elsif ($asm =~ /ret (po|pe|nv|v)|r(po|pe|nv|v)/) {
 						# parity odd
-						ok run_test($ixiy, undef, 
+						run_test($ixiy, undef, 
 								[" ld hl, 8",	$Opcodes{"ld hl, %m"}{$cpu}->clone(m => 8)],
 								[" push hl",	$Opcodes{"push hl"}{$cpu}->clone()],
 								[" ld a, 1",	$Opcodes{"ld a, %n"}{$cpu}->clone(n => 1)],
@@ -2094,7 +2011,7 @@ sub run_tests {
 								[$test_asm, 	$prog_instance]);
 						
 						# parity even
-						ok run_test($ixiy, undef,
+						run_test($ixiy, undef,
 								[" ld hl, 8",	$Opcodes{"ld hl, %m"}{$cpu}->clone(m => 8)],
 								[" push hl",	$Opcodes{"push hl"}{$cpu}->clone()],
 								[" ld a, 0",	$Opcodes{"ld a, %n"}{$cpu}->clone(n => 0)],
@@ -2107,20 +2024,20 @@ sub run_tests {
 						$test_asm = sprintf(" %-31s; %s", $asm_instance, $prog_instance->format_bytes);
 						
 						# positive
-						ok run_test($ixiy, undef, 
+						run_test($ixiy, undef, 
 								[" ld a, 1",	$Opcodes{"ld a, %n"}{$cpu}->clone(n => 1)],
 								[" and a",		$Opcodes{"and a"}{$cpu}->clone()],
 								[$test_asm, 	$prog_instance]);
 						
 						# negative
-						ok run_test($ixiy, undef,
+						run_test($ixiy, undef,
 								[" ld a, 255",	$Opcodes{"ld a, %n"}{$cpu}->clone(n => 255)],
 								[" and a",		$Opcodes{"and a"}{$cpu}->clone()],
 								[$test_asm, 	$prog_instance]);
 					}
 					elsif ($asm =~ /ret (p|m)|r(p|m)/) {
 						# positive
-						ok run_test($ixiy, undef, 
+						run_test($ixiy, undef, 
 								[" ld hl, 8",	$Opcodes{"ld hl, %m"}{$cpu}->clone(m => 8)],
 								[" push hl",	$Opcodes{"push hl"}{$cpu}->clone()],
 								[" ld a, 1",	$Opcodes{"ld a, %n"}{$cpu}->clone(n => 1)],
@@ -2128,7 +2045,7 @@ sub run_tests {
 								[$test_asm, 	$prog_instance]);
 						
 						# negative
-						ok run_test($ixiy, undef,
+						run_test($ixiy, undef,
 								[" ld hl, 8",	$Opcodes{"ld hl, %m"}{$cpu}->clone(m => 8)],
 								[" push hl",	$Opcodes{"push hl"}{$cpu}->clone()],
 								[" ld a, 255",	$Opcodes{"ld a, %n"}{$cpu}->clone(n => 255)],
@@ -2140,12 +2057,12 @@ sub run_tests {
 							$prog_instance = $prog->clone(c => $target);
 							$asm_instance = replace($asm, '%c', $target);
 							$test_asm = sprintf(" %-31s; %s", $asm_instance, $prog_instance->format_bytes);
-							ok run_test($ixiy, $target, 
+							run_test($ixiy, $target, 
 									[$test_asm, 	$prog_instance]);
 
 							$asm_instance = replace($asm, '%c', $target/8);
 							$test_asm = sprintf(" %-31s; %s", $asm_instance, $prog_instance->format_bytes);
-							ok run_test($ixiy, $target, 
+							run_test($ixiy, $target, 
 									[$test_asm, 	$prog_instance]);
 						}
 					}
@@ -2157,10 +2074,16 @@ sub run_tests {
 							push @test, [$test_asm, $prog_instance];	
 						}
 					}
-					elsif ($asm eq 'ret' ||
-					       $asm eq 'reti' ||
-						   $asm eq 'retn') {
-						ok run_test($ixiy, 0, 
+					elsif ($asm =~ /out \(c\), %c/) {
+						for my $c (0) {
+							$prog_instance = $prog->clone(c => $c);
+							$asm_instance = replace($asm, '%c', $c);
+							$test_asm = sprintf(" %-31s; %s", $asm_instance, $prog_instance->format_bytes);
+							push @test, [$test_asm, $prog_instance];	
+						}
+					}
+					elsif ($asm =~ /^(ret|reti|retn)$/) {
+						run_test($ixiy, 0, 
 								[" push hl",	$Opcodes{"push hl"}{$cpu}->clone()],
 								[$test_asm, 	$prog_instance]);
 					}
@@ -2172,31 +2095,35 @@ sub run_tests {
 							push @test, [$test_asm, $prog_instance];	
 						}
 					}
-					elsif ($asm eq 'halt' ||
-						   $asm eq 'hlt') {
-						ok run_test($ixiy, 0, 
+					elsif ($asm =~ /^(halt|hlt)$/) {
+						run_test($ixiy, 0, 
 								[$test_asm, 	$prog_instance]);
 					}
-					elsif ($asm eq 'ldi' ||
-						   $asm eq 'ldir' ||
-						   $asm eq 'ldd' ||
-						   $asm eq 'lddr') {
+					elsif ($asm =~ /^(ldi|ldir|ldd|lddr)$/) {
 						# BC = 1
-						ok run_test($ixiy, undef, 
+						run_test($ixiy, undef, 
 								[" ld bc, 1",	$Opcodes{"ld bc, %m"}{$cpu}->clone(m => 1)],
 								[$test_asm, 	$prog_instance]);
 								
 						# BC = 2
-						ok run_test($ixiy, undef, 
+						run_test($ixiy, undef, 
 								[" ld bc, 2",	$Opcodes{"ld bc, %m"}{$cpu}->clone(m => 2)],
 								[$test_asm, 	$prog_instance]);
 					}
-					elsif ($asm eq 'cpi' ||
-						   $asm eq 'cpir' ||
-						   $asm eq 'cpd' ||
-						   $asm eq 'cpdr') {
+					elsif ($asm =~ /^(ini|inir|ind|indr|outi|otir|outd|otdr)$/) {
+						# B = 1
+						run_test($ixiy, undef, 
+								[" ld b, 1",	$Opcodes{"ld b, %n"}{$cpu}->clone(n => 1)],
+								[$test_asm, 	$prog_instance]);
+								
+						# B = 2
+						run_test($ixiy, undef, 
+								[" ld b, 2",	$Opcodes{"ld b, %n"}{$cpu}->clone(n => 2)],
+								[$test_asm, 	$prog_instance]);
+					}
+					elsif ($asm =~ /^(pi|cpir|cpd|cpdr)$/) {
 						# BC = 1, carry cleared
-						ok run_test($ixiy, undef, 
+						run_test($ixiy, undef, 
 								[" ld bc, 1",	$Opcodes{"ld bc, %m"}{$cpu}->clone(m => 1)],
 								[" ld hl,1000h",$Opcodes{"ld hl, %m"}{$cpu}->clone(m => 0x1000)],
 								[" ld a, 0FFh",	$Opcodes{"ld a, %n"}{$cpu}->clone(n => 0xff)],
@@ -2204,7 +2131,7 @@ sub run_tests {
 								[$test_asm, 	$prog_instance]);
 								
 						# BC = 1, carry set
-						ok run_test($ixiy, undef, 
+						run_test($ixiy, undef, 
 								[" ld bc, 1",	$Opcodes{"ld bc, %m"}{$cpu}->clone(m => 1)],
 								[" ld hl,1000h",$Opcodes{"ld hl, %m"}{$cpu}->clone(m => 0x1000)],
 								[" ld a, 0FFh",	$Opcodes{"ld a, %n"}{$cpu}->clone(n => 0xff)],
@@ -2212,7 +2139,7 @@ sub run_tests {
 								[$test_asm, 	$prog_instance]);
 								
 						# BC = 2, carry cleared
-						ok run_test($ixiy, undef, 
+						run_test($ixiy, undef, 
 								[" ld bc, 2",	$Opcodes{"ld bc, %m"}{$cpu}->clone(m => 2)],
 								[" ld hl,1000h",$Opcodes{"ld hl, %m"}{$cpu}->clone(m => 0x1000)],
 								[" ld a, 0FFh",	$Opcodes{"ld a, %n"}{$cpu}->clone(n => 0xff)],
@@ -2220,7 +2147,7 @@ sub run_tests {
 								[$test_asm, 	$prog_instance]);
 								
 						# BC = 2, carry set
-						ok run_test($ixiy, undef, 
+						run_test($ixiy, undef, 
 								[" ld bc, 2",	$Opcodes{"ld bc, %m"}{$cpu}->clone(m => 2)],
 								[" ld hl,1000h",$Opcodes{"ld hl, %m"}{$cpu}->clone(m => 0x1000)],
 								[" ld a, 0FFh",	$Opcodes{"ld a, %n"}{$cpu}->clone(n => 0xff)],
@@ -2233,7 +2160,7 @@ sub run_tests {
 				}
 			}
 			
-			ok run_test($ixiy, undef, @test);
+			run_test($ixiy, undef, @test);
 		}
 	}
 }
@@ -2286,7 +2213,10 @@ sub assemble_and_run {
 	path('test.asm')->spew($asm);
 	$ok &&= run("z80asm -m$cpu $ixiy -l -b -m test.asm");
 	$ok or return;
-		
+	
+	# linked object size in hex
+	my $linked_size_hex = sprintf("%04X", -s "test.bin");
+	
 	# read map file
 	init_symtab();
 	for (path('test.map')->lines) {
@@ -2303,8 +2233,6 @@ sub assemble_and_run {
 	
 	my $size = $prog->size; 
 	$size == length($bytes) or die;
-	
-	my $size_hex = sprintf("%04X", $size);
 	
 	my @ticks = @{$prog->ticks};
 	
@@ -2323,8 +2251,8 @@ sub assemble_and_run {
 	
 	# run
 	my $ticks_cpu = ($cpu eq 'r3k') ? 'r2k' : $cpu;	# ticks does not support r3k
-	my $ticks_end = defined($end) ? sprintf("%04X", $end) : $size_hex;
-	$ok &&= run("z88dk-ticks test.bin -m$ticks_cpu -rom $size_hex -end $ticks_end >test.out");
+	my $ticks_end = sprintf("%04X", defined($end) ? $end : $size);
+	$ok &&= run("z88dk-ticks test.bin -m$ticks_cpu -rom $linked_size_hex -end $ticks_end >test.out");
 
 	$ok or return;
 
@@ -2458,7 +2386,6 @@ if (any_older(@all_files)) {
 }
 
 if (@ARGV && $ARGV[0] eq 'test') {
-	ok 1;
 	run_tests();
 	done_testing();
 }

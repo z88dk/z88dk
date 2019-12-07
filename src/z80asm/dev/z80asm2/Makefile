@@ -4,29 +4,29 @@
 # License: http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk
 #------------------------------------------------------------------------------
-PROJ			:= z80asm2
+PROJ	:= z80asm2
 
 # EXESUFFIX is passed when cross-compiling Win32 on Linux
 ifeq ($(OS),Windows_NT)
-  EXESUFFIX 	:= .exe
+  EXESUFFIX := .exe
 else
-  EXESUFFIX 	?=
+  EXESUFFIX ?=
 endif
 
-CC 				?= gcc
-INSTALL 		?= install
-CROSS			?= 0
+CC 	?= gcc
+INSTALL ?= install
+CROSS	?= 0
 
-SRCS			:= $(filter-out test.c,$(wildcard *.c))
-OBJS 			:= $(SRCS:.c=.o)
-DEPENDS			:= $(SRCS:.c=.d)
+SRCS	:= $(filter-out test.c,$(wildcard *.c))
+OBJS 	:= $(SRCS:.c=.o)
+DEPENDS	:= $(SRCS:.c=.d)
 
-TARGET 			= $(PROJ)$(EXESUFFIX)
+TARGET 	= $(PROJ)$(EXESUFFIX)
 
-OPT 			= -O3
+OPT 	= -O3
 
-STD 			= -std=gnu11
-LOCAL_CFLAGS 	+= -I../../../../ext/uthash/src -MMD -g -Wall $(STD) $(OPT)
+STD 	= -std=gnu11
+LOCAL_CFLAGS += -I../../../../ext/uthash/src -MMD -g -Wall $(STD) $(OPT)
 
 .PHONY: all
 

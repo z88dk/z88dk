@@ -1775,6 +1775,7 @@
  and iyl                        ; Error
  and.a ix, de                   ; Error
  and.a iy, de                   ; Error
+ arhl                           ; Error
  bit -1, (hl)                   ; Error
  bit -1, (hl)                   ; Error
  bit -1, (ix)                   ; Error
@@ -6305,6 +6306,7 @@
  rrc l                          ; Error
  rrc l'                         ; Error
  rrca'                          ; Error
+ rrhl                           ; Error
  rst -1                         ; Error
  rst -1                         ; Error
  rst 10                         ; Error

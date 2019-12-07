@@ -737,6 +737,16 @@ for my $cpu (@CPUS) {
 		else {
 			add_opc($cpu, "sbc hl, $r", 0xED, 0x42 + $V{$r}*16);
 		}
+        if ($i8085 && $r eq 'bc') {
+            # 8085 undocumented opcode: double subtract
+            add_opc($cpu, "dsub",			0x08);
+            add_opc($cpu, "sub hl, bc",		0x08);
+        }
+        else {
+			add_opc($cpu, "dsub",       call(), '@__z80asm__sub_hl_'.$r, '') if $r eq 'bc';
+			add_opc($cpu, "sub hl, $r", call(), '@__z80asm__sub_hl_'.$r, '');
+        }
+        
 		add_opc($cpu, "inc $r", 0x03 + $V{$r}*16);
 		add_opc($cpu, "dec $r", 0x0B + $V{$r}*16);
 	}
@@ -819,6 +829,34 @@ for my $cpu (@CPUS) {
 			}
 		}			
 	}
+
+    # 16-bit rotate group
+
+    # sra bc/de
+    if ($intel) {
+        add_opc($cpu, "sra bc",			0xcd, '@__z80asm__sra_bc', '');
+        add_opc($cpu, "sra de",			0xcd, '@__z80asm__sra_de', '');
+    } 
+    else {
+        add_opc($cpu, "sra bc",			0xcb, 0x28, 0xcb, 0x19);
+        add_opc($cpu, "sra de",			0xcb, 0x2a, 0xcb, 0x1b);
+    }
+    
+    # sra hl (undocumented 8085)
+    if ($i8085) {
+        add_opc($cpu, "sra hl",			0x10);
+    }
+    elsif ($intel) {
+        add_opc($cpu, "arhl",			0xcd, '@__z80asm__sra_hl', '');
+        add_opc($cpu, "rrhl",			0xcd, '@__z80asm__sra_hl', '');
+        add_opc($cpu, "sra hl",			0xcd, '@__z80asm__sra_hl', '');
+    } 
+    else {
+        add_opc($cpu, "arhl",			0xcb, 0x2c, 0xcb, 0x1d);
+        add_opc($cpu, "rrhl",			0xcb, 0x2c, 0xcb, 0x1d);
+        add_opc($cpu, "sra hl",			0xcb, 0x2c, 0xcb, 0x1d);
+    }
+
 	
 	# bit set, reset and test group
 	for my $r (qw( b c d e h l (hl) a )) {
@@ -1196,18 +1234,10 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "ldpirx",			0xED, 0xB7);
 		add_opc($cpu, "lddrx",			0xED, 0xBC);
 	}
-		
+    
+    
 	# undocumented 8085 instructions
 	if ($i8085) {
-		# double subtract
-		add_opc($cpu, "dsub",			0x08);
-		add_opc($cpu, "sub hl, bc",		0x08);
-		
-		# Rotate HL right
-		add_opc($cpu, "arhl",			0x10);
-		add_opc($cpu, "rrhl",			0x10);
-		add_opc($cpu, "sra hl",			0x10);
-		
 		# Rotate DE left
 		add_opc($cpu, "rdel",			0x18);
 		add_opc($cpu, "rlde",			0x18);
@@ -1501,8 +1531,10 @@ sub add_opc_3 {
 	}
 	
 	# expand altd
-	if ($asm =~ /^ (?| ( (?:ld|inc|dec|pop|bool|rlc|rrc|rl|rr|sla|sra|sll|sli|srl) \s+ 
+	if ($asm =~ /^ (?| ( (?:ld|inc|dec|pop|bool|rl|rr) \s+ 
 									(?:a|b|c|d|e|h|l|af|bc|de|hl)) ( $ | \b [^'] .*)
+                     | ( (?:rlc|rrc|sla|sra|sll|sli|srl) \s+ 
+									(?:a|b|c|d|e|h|l)) ( $ | \b [^'] .*)
 					 | ( (?:add|adc|sub|sbc|and|xor|or|neg) \s+ a )(,.*)
 					 | ( (?:ccf|scf) \s+ f)(,.*)
 					 | ( (?:rlca|rrca|rla|rra)) (.*)

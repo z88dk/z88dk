@@ -196,7 +196,6 @@
  and ixl                        ; Error
  and iyh                        ; Error
  and iyl                        ; Error
- arhl                           ; Error
  bit -1, (hl)                   ; Error
  bit -1, (hl)                   ; Error
  bit -1, (ix)                   ; Error
@@ -335,7 +334,6 @@
  dec iyh                        ; Error
  dec iyl                        ; Error
  di                             ; Error
- dsub                           ; Error
  ei                             ; Error
  halt                           ; Error
  hlt                            ; Error
@@ -1380,7 +1378,6 @@
  rrc (iy-128), e                ; Error
  rrc (iy-128), h                ; Error
  rrc (iy-128), l                ; Error
- rrhl                           ; Error
  rst -1                         ; Error
  rst -1                         ; Error
  rst 10                         ; Error
@@ -1833,7 +1830,6 @@
  sra (iy-128), e                ; Error
  sra (iy-128), h                ; Error
  sra (iy-128), l                ; Error
- sra hl                         ; Error
  srl (ix), a                    ; Error
  srl (ix), b                    ; Error
  srl (ix), c                    ; Error
@@ -1881,7 +1877,6 @@
  sub a, ixl                     ; Error
  sub a, iyh                     ; Error
  sub a, iyl                     ; Error
- sub hl, bc                     ; Error
  sub ixh                        ; Error
  sub ixl                        ; Error
  sub iyh                        ; Error

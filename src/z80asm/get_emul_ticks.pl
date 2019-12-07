@@ -8,11 +8,11 @@ use Path::Tiny;
 use Text::Table;
 use Config;
 
-# run z80asm from .
-$ENV{PATH} = ".".$Config{path_sep}.$ENV{PATH};
+# make sure to use our z80asm
+$ENV{PATH} = join($Config{path_sep}, ".", "../ticks", $ENV{PATH});
 
 my $asm = "@ARGV\n"; $asm =~ s/\s*:\s*/\n/g;
-my $tb = Text::Table->new("CPU", "Min T", "Max T");
+my $tb = Text::Table->new(";", "CPU", "Min T", "Max T");
 for my $cpu (qw( 8080 8085 gbz80 r2k z180 z80 z80n )) {
 	my @T;
 	for my $carry (0..1) {
@@ -34,7 +34,7 @@ for my $cpu (qw( 8080 8085 gbz80 r2k z180 z80 z80n )) {
 		push @T, 0+$1;
 	}
 	@T = sort {$a <=> $b} @T;
-	$tb->add($cpu, @T);
+	$tb->add(";", $cpu, @T);
 }
 say "\nResults\n", $tb;
 unlink "test.asm", "test.bin", "test.lis", "test.o", "test.out";

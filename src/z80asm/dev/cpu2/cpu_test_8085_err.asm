@@ -90,6 +90,15 @@
  ex af, af'                     ; Error
  exx                            ; Error
  im %c                          ; Error
+ in (c)                         ; Error
+ in a, (c)                      ; Error
+ in b, (c)                      ; Error
+ in c, (c)                      ; Error
+ in d, (c)                      ; Error
+ in e, (c)                      ; Error
+ in f, (c)                      ; Error
+ in h, (c)                      ; Error
+ in l, (c)                      ; Error
  inc (ix)                       ; Error
  inc (ix+-128)                  ; Error
  inc (ix+127)                   ; Error
@@ -98,6 +107,10 @@
  inc (iy+127)                   ; Error
  inc ix                         ; Error
  inc iy                         ; Error
+ ind                            ; Error
+ indr                           ; Error
+ ini                            ; Error
+ inir                           ; Error
  jp (ix)                        ; Error
  jp (iy)                        ; Error
  jr %j                          ; Error
@@ -333,6 +346,18 @@
  or a, (iy)                     ; Error
  or a, (iy+-128)                ; Error
  or a, (iy+127)                 ; Error
+ otdr                           ; Error
+ otir                           ; Error
+ out (c), %c                    ; Error
+ out (c), a                     ; Error
+ out (c), b                     ; Error
+ out (c), c                     ; Error
+ out (c), d                     ; Error
+ out (c), e                     ; Error
+ out (c), h                     ; Error
+ out (c), l                     ; Error
+ outd                           ; Error
+ outi                           ; Error
  pop ix                         ; Error
  pop iy                         ; Error
  push ix                        ; Error

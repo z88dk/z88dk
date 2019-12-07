@@ -119,6 +119,21 @@
  ex af, af'                     ; Error
  exx                            ; Error
  im %c                          ; Error
+ in (c)                         ; Error
+ in -128                        ; Error
+ in 127                         ; Error
+ in 255                         ; Error
+ in a, (-128)                   ; Error
+ in a, (127)                    ; Error
+ in a, (255)                    ; Error
+ in a, (c)                      ; Error
+ in b, (c)                      ; Error
+ in c, (c)                      ; Error
+ in d, (c)                      ; Error
+ in e, (c)                      ; Error
+ in f, (c)                      ; Error
+ in h, (c)                      ; Error
+ in l, (c)                      ; Error
  inc (ix)                       ; Error
  inc (ix+-128)                  ; Error
  inc (ix+127)                   ; Error
@@ -127,6 +142,10 @@
  inc (iy+127)                   ; Error
  inc ix                         ; Error
  inc iy                         ; Error
+ ind                            ; Error
+ indr                           ; Error
+ ini                            ; Error
+ inir                           ; Error
  jm -32768                      ; Error
  jm 32767                       ; Error
  jm 65535                       ; Error
@@ -403,6 +422,24 @@
  or a, (iy)                     ; Error
  or a, (iy+-128)                ; Error
  or a, (iy+127)                 ; Error
+ otdr                           ; Error
+ otir                           ; Error
+ out (-128), a                  ; Error
+ out (127), a                   ; Error
+ out (255), a                   ; Error
+ out (c), %c                    ; Error
+ out (c), a                     ; Error
+ out (c), b                     ; Error
+ out (c), c                     ; Error
+ out (c), d                     ; Error
+ out (c), e                     ; Error
+ out (c), h                     ; Error
+ out (c), l                     ; Error
+ out -128                       ; Error
+ out 127                        ; Error
+ out 255                        ; Error
+ outd                           ; Error
+ outi                           ; Error
  pop ix                         ; Error
  pop iy                         ; Error
  push ix                        ; Error
@@ -414,6 +451,7 @@
  ret po                         ; Error
  ret v                          ; Error
  retn                           ; Error
+ rim                            ; Error
  rl (ix)                        ; Error
  rl (ix+-128)                   ; Error
  rl (ix+127)                    ; Error
@@ -461,6 +499,7 @@
  shld 65535                     ; Error
  shlde                          ; Error
  shlx                           ; Error
+ sim                            ; Error
  sla (ix)                       ; Error
  sla (ix+-128)                  ; Error
  sla (ix+127)                   ; Error

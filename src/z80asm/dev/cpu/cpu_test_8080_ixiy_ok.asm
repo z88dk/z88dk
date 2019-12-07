@@ -107,6 +107,7 @@
  ani -128                       ; E6 80
  ani 127                        ; E6 7F
  ani 255                        ; E6 FF
+ arhl                           ; CD @__z80asm__sra_hl
  bit.a 0, (hl)                  ; 7E E6 01
  bit.a 0, a                     ; E6 01
  bit.a 0, b                     ; 78 E6 01
@@ -330,6 +331,7 @@
  djnz b, -32768                 ; 05 C2 00 80
  djnz b, 32767                  ; 05 C2 FF 7F
  djnz b, 65535                  ; 05 C2 FF FF
+ dsub                           ; CD @__z80asm__sub_hl_bc
  ei                             ; FB
  ex (sp), hl                    ; E3
  ex de, hl                      ; EB
@@ -873,6 +875,7 @@
  rrc                            ; 0F
  rrca                           ; 0F
  rrd                            ; CD @__z80asm__rrd
+ rrhl                           ; CD @__z80asm__sra_hl
  rst 0                          ; C7
  rst 1                          ; CF
  rst 16                         ; D7
@@ -996,6 +999,9 @@
  shld 32767                     ; 22 FF 7F
  shld 65535                     ; 22 FF FF
  sphl                           ; F9
+ sra bc                         ; CD @__z80asm__sra_bc
+ sra de                         ; CD @__z80asm__sra_de
+ sra hl                         ; CD @__z80asm__sra_hl
  sta -32768                     ; 32 00 80
  sta 32767                      ; 32 FF 7F
  sta 65535                      ; 32 FF FF
@@ -1025,6 +1031,10 @@
  sub d                          ; 92
  sub e                          ; 93
  sub h                          ; 94
+ sub hl, bc                     ; CD @__z80asm__sub_hl_bc
+ sub hl, de                     ; CD @__z80asm__sub_hl_de
+ sub hl, hl                     ; CD @__z80asm__sub_hl_hl
+ sub hl, sp                     ; CD @__z80asm__sub_hl_sp
  sub l                          ; 95
  sub m                          ; 96
  sui -128                       ; D6 80

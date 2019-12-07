@@ -72,9 +72,7 @@
 0F                           |rrc          |~           |~            |~                      |~        |~              |~             |~             
                              |rrca         |            |             |                       |         |               |              |              
                              |             |            |             |                       |         |               |              |              
-10                           |             |arhl        |             |                       |         |               |              |              
-                             |             |rrhl        |             |                       |         |               |              |              
-                             |             |sra hl      |             |                       |         |               |              |              
+10                           |             |sra hl      |             |                       |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 10 %j                        |             |            |             |djnz %j                |~        |~              |~             |~             
                              |             |            |             |djnz b, %j             |         |               |              |              
@@ -3741,13 +3739,21 @@ CB 27                        |             |            |sla a        |~        
                              |             |            |             |                       |         |               |              |              
 CB 28                        |             |            |sra b        |~                      |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
+CB 28 CB 19                  |             |            |sra bc       |~                      |~        |~              |~             |~             
+                             |             |            |             |                       |         |               |              |              
 CB 29                        |             |            |sra c        |~                      |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 CB 2A                        |             |            |sra d        |~                      |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
+CB 2A CB 1B                  |             |            |sra de       |~                      |~        |~              |~             |~             
+                             |             |            |             |                       |         |               |              |              
 CB 2B                        |             |            |sra e        |~                      |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 CB 2C                        |             |            |sra h        |~                      |~        |~              |~             |~             
+                             |             |            |             |                       |         |               |              |              
+CB 2C CB 1D                  |             |            |arhl         |~                      |~        |~              |~             |~             
+                             |             |            |rrhl         |                       |         |               |              |              
+                             |             |            |sra hl       |                       |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 CB 2D                        |             |            |sra l        |~                      |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
@@ -4429,6 +4435,23 @@ CD @sbc_hl_de                |sbc hl, de   |~           |~            |         
 CD @sbc_hl_hl                |sbc hl, hl   |~           |~            |                       |         |               |              |              
                              |             |            |             |                       |         |               |              |              
 CD @sbc_hl_sp                |sbc hl, sp   |~           |~            |                       |         |               |              |              
+                             |             |            |             |                       |         |               |              |              
+CD @sra_bc                   |sra bc       |~           |             |                       |         |               |              |              
+                             |             |            |             |                       |         |               |              |              
+CD @sra_de                   |sra de       |~           |             |                       |         |               |              |              
+                             |             |            |             |                       |         |               |              |              
+CD @sra_hl                   |arhl         |            |             |                       |         |               |              |              
+                             |rrhl         |            |             |                       |         |               |              |              
+                             |sra hl       |            |             |                       |         |               |              |              
+                             |             |            |             |                       |         |               |              |              
+CD @sub_hl_bc                |dsub         |            |dsub         |~                      |~        |~              |~             |~             
+                             |sub hl, bc   |            |sub hl, bc   |                       |         |               |              |              
+                             |             |            |             |                       |         |               |              |              
+CD @sub_hl_de                |sub hl, de   |~           |~            |~                      |~        |~              |~             |~             
+                             |             |            |             |                       |         |               |              |              
+CD @sub_hl_hl                |sub hl, hl   |~           |~            |~                      |~        |~              |~             |~             
+                             |             |            |             |                       |         |               |              |              
+CD @sub_hl_sp                |sub hl, sp   |~           |~            |~                      |~        |~              |~             |~             
                              |             |            |             |                       |         |               |              |              
 CE %n                        |aci %n       |~           |~            |~                      |~        |~              |~             |~             
                              |adc %n       |            |             |                       |         |               |              |              

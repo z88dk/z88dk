@@ -1779,7 +1779,6 @@
  and iyl                        ; Error
  and.a ix, de                   ; Error
  and.a iy, de                   ; Error
- arhl                           ; Error
  bit -1, (hl)                   ; Error
  bit -1, (hl)                   ; Error
  bit -1, (ix)                   ; Error
@@ -2107,7 +2106,6 @@
  dec iyl                        ; Error
  dec l'                         ; Error
  djnz b', ASMPC                 ; Error
- dsub                           ; Error
  ex (sp), hl'                   ; Error
  ex (sp), ix                    ; Error
  ex (sp), iy                    ; Error
@@ -6257,7 +6255,6 @@
  rrc h'                         ; Error
  rrc l'                         ; Error
  rrca'                          ; Error
- rrhl                           ; Error
  rst -1                         ; Error
  rst -1                         ; Error
  rst 10                         ; Error
@@ -6926,7 +6923,6 @@
  sra d'                         ; Error
  sra e'                         ; Error
  sra h'                         ; Error
- sra hl                         ; Error
  sra l'                         ; Error
  srl (ix)                       ; Error
  srl (ix), a                    ; Error
@@ -7016,7 +7012,6 @@
  sub a, ixl                     ; Error
  sub a, iyh                     ; Error
  sub a, iyl                     ; Error
- sub hl, bc                     ; Error
  sub ixh                        ; Error
  sub ixl                        ; Error
  sub iyh                        ; Error

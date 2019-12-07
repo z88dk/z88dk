@@ -533,11 +533,19 @@ static bool parse_reg16(int mask, int* out) {
 }
 
 static bool BCDE(int* out) {
-	token_t* yy0 = yy;
-	if (parse_reg16(IS_SP, out) && (*out == RR_BC || *out == RR_DE))
-		return true;
-	yy = yy0;
-	return false;
+    token_t* yy0 = yy;
+    if (parse_reg16(IS_SP, out) && (*out == RR_BC || *out == RR_DE))
+        return true;
+    yy = yy0;
+    return false;
+}
+
+static bool BCDEHL(int* out) {
+    token_t* yy0 = yy;
+    if (parse_reg16(IS_SP, out) && (*out == RR_BC || *out == RR_DE || *out == RR_HL))
+        return true;
+    yy = yy0;
+    return false;
 }
 
 static bool REG16_SPX(int* out) {
@@ -844,8 +852,8 @@ static bool parse_alu8(int op) {
 	return false;
 }
 
-static bool check_rot8(int op) {
-	int r, x, dis;
+static bool check_rot(int op) {
+	int r, rr, x, dis;
 	token_t* yy0 = yy;
 	if (REG8(&r) && EOS())									// rot B/C/D/E/H/L/A
 		return emit_rot_r(op, r);
@@ -856,11 +864,14 @@ static bool check_rot8(int op) {
 	if (IND_X(&x, &dis) && EOS())							// rot (HL)/(IX+d)/(IY+d)
 		return emit_rot_indx(op, x, dis);
 	yy = yy0;
-	return false;
+    if (op == OP_SRA && BCDEHL(&rr) && EOS())				// sra bc/de/hl
+        return emit_sra_rr(rr);
+    yy = yy0;
+    return false;
 }
 
-static bool parse_rot8(int op) {
-	if (check_rot8(op))
+static bool parse_rot(int op) {
+	if (check_rot(op))
 		return true;
 	syntax_error();
 	return false;
@@ -1186,7 +1197,7 @@ static bool parse_cmp(int dummy) {
 
 static bool parse_rlc_rrc(int is_left) {
 	token_t* yy0 = yy;
-	if (check_rot8(is_left ? OP_RLC : OP_RRC))		// Zilog RLC/RRC r
+	if (check_rot(is_left ? OP_RLC : OP_RRC))		// Zilog RLC/RRC r
 		return true;
 	yy = yy0;
 	if (EOS())										// Intel RLC/RRC
@@ -1392,7 +1403,7 @@ static bool parse_line(void) {
 		printf("Define label: %s\n", utstring_body(label));
 	}
 	while (yy->id != T_END) {
-		if (!parse_statement()) ok = false;
+        if (!parse_statement()) ok = false;
 	}
 	
 	utstring_free(label);
@@ -1581,19 +1592,21 @@ static keyword_t keywords_table[] = {
 {"RAL",		0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_rla },
 {"RLCA",	0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_rlca },
 {"RLC",		0,		IS_ANY,			NA,		NA,		NA,			parse_rlc_rrc,	1			},
-{"RL",		0,		IS_ANY,			NA,		NA,		NA,			parse_rot8,		OP_RL		},
-{"SLA",		0,		IS_ANY,			NA,		NA,		NA,			parse_rot8,		OP_SLA		},
-{"SLL",		0,		IS_ANY,			NA,		NA,		NA,			parse_rot8,		OP_SLL		},
-{"SLI",		0,		IS_ANY,			NA,		NA,		NA,			parse_rot8,		OP_SLI		},
+{"RL",		0,		IS_ANY,			NA,		NA,		NA,			parse_rot,		OP_RL		},
+{"SLA",		0,		IS_ANY,			NA,		NA,		NA,			parse_rot,		OP_SLA		},
+{"SLL",		0,		IS_ANY,			NA,		NA,		NA,			parse_rot,		OP_SLL		},
+{"SLI",		0,		IS_ANY,			NA,		NA,		NA,			parse_rot,		OP_SLI		},
 {"RLD",		0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_rld },
 {"RRA",		0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_rra },
 {"RAR",		0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_rra },
 {"RRCA",	0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_rrca },
 {"RRC",		0,		IS_ANY,			NA,		NA,		NA,			parse_rlc_rrc,	0			},
-{"RR",		0,		IS_ANY,			NA,		NA,		NA,			parse_rot8,		OP_RR		},
-{"SRA",		0,		IS_ANY,			NA,		NA,		NA,			parse_rot8,		OP_SRA		},
-{"SRL",		0,		IS_ANY,			NA,		NA,		NA,			parse_rot8,		OP_SRL		},
+{"RR",		0,		IS_ANY,			NA,		NA,		NA,			parse_rot,		OP_RR		},
+{"SRA",		0,		IS_ANY,			NA,		NA,		NA,			parse_rot,		OP_SRA		},
+{"SRL",		0,		IS_ANY,			NA,		NA,		NA,			parse_rot,		OP_SRL		},
 {"RRD",		0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_rrd },
+{"ARHL",	0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_sra_hl },
+{"RRHL",	0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_sra_hl },
 
 // bit manipulation
 {"BIT",		0,		IS_ANY,			NA,		NA,		NA,			parse_bit8,		OP_BIT		},

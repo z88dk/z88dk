@@ -11,8 +11,8 @@ use Test::More;
 use Path::Tiny;
 use Config;
 
-# run z80asm from .
-$ENV{PATH} = ".".$Config{path_sep}.$ENV{PATH};
+# run z80asm2 from . amd z80asm from ../..
+$ENV{PATH} = ".".$Config{path_sep}."../..".$Config{path_sep}.$ENV{PATH};
 
 my @code;
 sub add { 

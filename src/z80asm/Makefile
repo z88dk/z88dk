@@ -107,6 +107,7 @@ clean::
 #------------------------------------------------------------------------------
 .PHONY: dev
 dev:
+	perl asmstyle.pl dev/z80asm_lib/*.asm
 	$(MAKE) -C tt
 	$(MAKE) -C lib
 	$(MAKE) -f dev/Makefile
@@ -167,7 +168,7 @@ test: $(TARGET) z80asm_lib
 	$(MAKE) prove_perl
 	$(MAKE) -C dev/z80asm_lib test
 	$(MAKE) -C dev/z80asm2 test
-	perl dev/cpu2/cpu.pl test
+	perl dev/cpu2/cpu.pl -s test
 
 testlib:
 	$(MAKE) -C lib test

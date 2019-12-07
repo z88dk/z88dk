@@ -91,6 +91,7 @@
  ani -128                       ; E6 80
  ani 127                        ; E6 7F
  ani 255                        ; E6 FF
+ arhl                           ; CD @sra_hl
  call -32768                    ; CD 00 80
  call 32767                     ; CD FF 7F
  call 65535                     ; CD FF FF
@@ -209,6 +210,13 @@
  cz 32767                       ; CC FF 7F
  cz 65535                       ; CC FF FF
  daa                            ; 27
+ dad b                          ; 09
+ dad bc                         ; 09
+ dad d                          ; 19
+ dad de                         ; 19
+ dad h                          ; 29
+ dad hl                         ; 29
+ dad sp                         ; 39
  dcr a                          ; 3D
  dcr b                          ; 05
  dcr c                          ; 0D
@@ -243,11 +251,18 @@
  djnz b, -32768                 ; 05; C2 00 80
  djnz b, 32767                  ; 05; C2 FF 7F
  djnz b, 65535                  ; 05; C2 FF FF
+ dsub                           ; CD @sub_hl_bc
  ei                             ; FB
  ex (sp), hl                    ; E3
  ex de, hl                      ; EB
  halt                           ; 76
  hlt                            ; 76
+ in -128                        ; DB 80
+ in 127                         ; DB 7F
+ in 255                         ; DB FF
+ in a, (-128)                   ; DB 80
+ in a, (127)                    ; DB 7F
+ in a, (255)                    ; DB FF
  inc (hl)                       ; 34
  inc a                          ; 3C
  inc b                          ; 04
@@ -630,6 +645,12 @@
  ori -128                       ; F6 80
  ori 127                        ; F6 7F
  ori 255                        ; F6 FF
+ out (-128), a                  ; D3 80
+ out (127), a                   ; D3 7F
+ out (255), a                   ; D3 FF
+ out -128                       ; D3 80
+ out 127                        ; D3 7F
+ out 255                        ; D3 FF
  pchl                           ; E9
  pop af                         ; F1
  pop b                          ; C1
@@ -676,6 +697,7 @@
  rrc                            ; 0F
  rrca                           ; 0F
  rrd                            ; CD @rrd
+ rrhl                           ; CD @sra_hl
  rst %c                         ; C7+%c
  rv                             ; E8
  rz                             ; C8
@@ -721,6 +743,9 @@
  shld 32767                     ; 22 FF 7F
  shld 65535                     ; 22 FF FF
  sphl                           ; F9
+ sra bc                         ; CD @sra_bc
+ sra de                         ; CD @sra_de
+ sra hl                         ; CD @sra_hl
  sta -32768                     ; 32 00 80
  sta 32767                      ; 32 FF 7F
  sta 65535                      ; 32 FF FF
@@ -750,6 +775,10 @@
  sub d                          ; 92
  sub e                          ; 93
  sub h                          ; 94
+ sub hl, bc                     ; CD @sub_hl_bc
+ sub hl, de                     ; CD @sub_hl_de
+ sub hl, hl                     ; CD @sub_hl_hl
+ sub hl, sp                     ; CD @sub_hl_sp
  sub l                          ; 95
  sub m                          ; 96
  sui -128                       ; D6 80

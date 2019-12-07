@@ -105,10 +105,12 @@
 07            |z80  |rlca          |      4 T
 07            |z80n |rlca          |      4 T
               |     |              |         
+08            |8085 |dsub          |     10 T
 08            |z80  |ex af, af     |      4 T
 08            |z80n |ex af, af     |      4 T
 08            |z80  |ex af, af'    |      4 T
 08            |z80n |ex af, af'    |      4 T
+08            |8085 |sub hl, bc    |     10 T
               |     |              |         
 08 %m %m      |gbz80|ld (%m), sp   |     20 T
               |     |              |         
@@ -117,6 +119,16 @@
 09            |gbz80|add hl, bc    |      8 T
 09            |z80  |add hl, bc    |     11 T
 09            |z80n |add hl, bc    |     11 T
+09            |8080 |dad b         |     10 T
+09            |8085 |dad b         |     10 T
+09            |gbz80|dad b         |      8 T
+09            |z80  |dad b         |     11 T
+09            |z80n |dad b         |     11 T
+09            |8080 |dad bc        |     10 T
+09            |8085 |dad bc        |     10 T
+09            |gbz80|dad bc        |      8 T
+09            |z80  |dad bc        |     11 T
+09            |z80n |dad bc        |     11 T
               |     |              |         
 0A            |8080 |ld a, (bc)    |      7 T
 0A            |8085 |ld a, (bc)    |      7 T
@@ -193,6 +205,15 @@
 0F            |gbz80|rrca          |      4 T
 0F            |z80  |rrca          |      4 T
 0F            |z80n |rrca          |      4 T
+              |     |              |         
+10            |8085 |arhl          |      7 T
+10            |8085 |rrhl          |      7 T
+10            |8085 |sra hl        |      7 T
+              |     |              |         
+10 %j         |z80  |djnz %j       |   8/13 T
+10 %j         |z80n |djnz %j       |   8/13 T
+10 %j         |z80  |djnz b, %j    |   8/13 T
+10 %j         |z80n |djnz b, %j    |   8/13 T
               |     |              |         
 11 %m %m      |8080 |ld de, %m     |     10 T
 11 %m %m      |8085 |ld de, %m     |     10 T
@@ -295,6 +316,16 @@
 19            |gbz80|add hl, de    |      8 T
 19            |z80  |add hl, de    |     11 T
 19            |z80n |add hl, de    |     11 T
+19            |8080 |dad d         |     10 T
+19            |8085 |dad d         |     10 T
+19            |gbz80|dad d         |      8 T
+19            |z80  |dad d         |     11 T
+19            |z80n |dad d         |     11 T
+19            |8080 |dad de        |     10 T
+19            |8085 |dad de        |     10 T
+19            |gbz80|dad de        |      8 T
+19            |z80  |dad de        |     11 T
+19            |z80n |dad de        |     11 T
               |     |              |         
 1A            |8080 |ld a, (de)    |      7 T
 1A            |8085 |ld a, (de)    |      7 T
@@ -371,6 +402,8 @@
 1F            |gbz80|rra           |      4 T
 1F            |z80  |rra           |      4 T
 1F            |z80n |rra           |      4 T
+              |     |              |         
+20            |8085 |rim           |      4 T
               |     |              |         
 20 %j         |gbz80|jr nz, %j     |      8 T
 20 %j         |z80  |jr nz, %j     |   7/12 T
@@ -469,6 +502,16 @@
 29            |gbz80|add hl, hl    |      8 T
 29            |z80  |add hl, hl    |     11 T
 29            |z80n |add hl, hl    |     11 T
+29            |8080 |dad h         |     10 T
+29            |8085 |dad h         |     10 T
+29            |gbz80|dad h         |      8 T
+29            |z80  |dad h         |     11 T
+29            |z80n |dad h         |     11 T
+29            |8080 |dad hl        |     10 T
+29            |8085 |dad hl        |     10 T
+29            |gbz80|dad hl        |      8 T
+29            |z80  |dad hl        |     11 T
+29            |z80n |dad hl        |     11 T
               |     |              |         
 2A            |gbz80|ld a, (hl+)   |      8 T
 2A            |gbz80|ld a, (hli)   |      8 T
@@ -554,6 +597,8 @@
 2F; 3C        |8080 |neg a         |      9 T
 2F; 3C        |8085 |neg a         |      8 T
 2F; 3C        |gbz80|neg a         |      8 T
+              |     |              |         
+30            |8085 |sim           |      4 T
               |     |              |         
 30 %j         |gbz80|jr nc, %j     |      8 T
 30 %j         |z80  |jr nc, %j     |   7/12 T
@@ -647,6 +692,11 @@
 39            |gbz80|add hl, sp    |      8 T
 39            |z80  |add hl, sp    |     11 T
 39            |z80n |add hl, sp    |     11 T
+39            |8080 |dad sp        |     10 T
+39            |8085 |dad sp        |     10 T
+39            |gbz80|dad sp        |      8 T
+39            |z80  |dad sp        |     11 T
+39            |z80n |dad sp        |     11 T
               |     |              |         
 3A            |gbz80|ld a, (hl-)   |      8 T
 3A            |gbz80|ld a, (hld)   |      8 T
@@ -2676,6 +2726,10 @@ CB 28         |gbz80|sra b         |      8 T
 CB 28         |z80  |sra b         |      8 T
 CB 28         |z80n |sra b         |      8 T
               |     |              |         
+CB 28; CB 19  |gbz80|sra bc        |     16 T
+CB 28; CB 19  |z80  |sra bc        |     16 T
+CB 28; CB 19  |z80n |sra bc        |     16 T
+              |     |              |         
 CB 29         |gbz80|sra c         |      8 T
 CB 29         |z80  |sra c         |      8 T
 CB 29         |z80n |sra c         |      8 T
@@ -2684,6 +2738,10 @@ CB 2A         |gbz80|sra d         |      8 T
 CB 2A         |z80  |sra d         |      8 T
 CB 2A         |z80n |sra d         |      8 T
               |     |              |         
+CB 2A; CB 1B  |gbz80|sra de        |     16 T
+CB 2A; CB 1B  |z80  |sra de        |     16 T
+CB 2A; CB 1B  |z80n |sra de        |     16 T
+              |     |              |         
 CB 2B         |gbz80|sra e         |      8 T
 CB 2B         |z80  |sra e         |      8 T
 CB 2B         |z80n |sra e         |      8 T
@@ -2691,6 +2749,16 @@ CB 2B         |z80n |sra e         |      8 T
 CB 2C         |gbz80|sra h         |      8 T
 CB 2C         |z80  |sra h         |      8 T
 CB 2C         |z80n |sra h         |      8 T
+              |     |              |         
+CB 2C; CB 1D  |gbz80|arhl          |     16 T
+CB 2C; CB 1D  |z80  |arhl          |     16 T
+CB 2C; CB 1D  |z80n |arhl          |     16 T
+CB 2C; CB 1D  |gbz80|rrhl          |     16 T
+CB 2C; CB 1D  |z80  |rrhl          |     16 T
+CB 2C; CB 1D  |z80n |rrhl          |     16 T
+CB 2C; CB 1D  |gbz80|sra hl        |     16 T
+CB 2C; CB 1D  |z80  |sra hl        |     16 T
+CB 2C; CB 1D  |z80n |sra hl        |     16 T
               |     |              |         
 CB 2D         |gbz80|sra l         |      8 T
 CB 2D         |z80  |sra l         |      8 T
@@ -3643,6 +3711,43 @@ CD @sbc_hl_sp |8080 |sbc hl, sp    |    156 T
 CD @sbc_hl_sp |8085 |sbc hl, sp    |    152 T
 CD @sbc_hl_sp |gbz80|sbc hl, sp    |    232 T
               |     |              |         
+CD @sra_bc    |8080 |sra bc        |     99 T
+CD @sra_bc    |8085 |sra bc        |     96 T
+              |     |              |         
+CD @sra_de    |8080 |sra de        |     99 T
+CD @sra_de    |8085 |sra de        |     96 T
+              |     |              |         
+CD @sra_hl    |8080 |arhl          |     99 T
+CD @sra_hl    |8080 |rrhl          |     99 T
+CD @sra_hl    |8080 |sra hl        |     99 T
+              |     |              |         
+CD @sub_hl_bc |8080 |dsub          |     86 T
+CD @sub_hl_bc |gbz80|dsub          |     80 T
+CD @sub_hl_bc |z80  |dsub          |     80 T
+CD @sub_hl_bc |z80n |dsub          |     80 T
+CD @sub_hl_bc |8080 |sub hl, bc    |     86 T
+CD @sub_hl_bc |gbz80|sub hl, bc    |     80 T
+CD @sub_hl_bc |z80  |sub hl, bc    |     80 T
+CD @sub_hl_bc |z80n |sub hl, bc    |     80 T
+              |     |              |         
+CD @sub_hl_de |8080 |sub hl, de    |     86 T
+CD @sub_hl_de |8085 |sub hl, de    |     82 T
+CD @sub_hl_de |gbz80|sub hl, de    |     80 T
+CD @sub_hl_de |z80  |sub hl, de    |     80 T
+CD @sub_hl_de |z80n |sub hl, de    |     80 T
+              |     |              |         
+CD @sub_hl_hl |8080 |sub hl, hl    |     86 T
+CD @sub_hl_hl |8085 |sub hl, hl    |     82 T
+CD @sub_hl_hl |gbz80|sub hl, hl    |     80 T
+CD @sub_hl_hl |z80  |sub hl, hl    |     80 T
+CD @sub_hl_hl |z80n |sub hl, hl    |     80 T
+              |     |              |         
+CD @sub_hl_sp |8080 |sub hl, sp    |    156 T
+CD @sub_hl_sp |8085 |sub hl, sp    |    152 T
+CD @sub_hl_sp |gbz80|sub hl, sp    |    232 T
+CD @sub_hl_sp |z80  |sub hl, sp    |    151 T
+CD @sub_hl_sp |z80n |sub hl, sp    |    151 T
+              |     |              |         
 CE %n         |8080 |aci %n        |      7 T
 CE %n         |8085 |aci %n        |      7 T
 CE %n         |gbz80|aci %n        |      8 T
@@ -3704,6 +3809,15 @@ D2 %m %m      |z80  |jp nc, %m     |     10 T
 D2 %m %m      |z80n |jp nc, %m     |     10 T
 D2 %m %m      |8080 |jr nc, %m     |     10 T
 D2 %m %m      |8085 |jr nc, %m     |   7/10 T
+              |     |              |         
+D3 %n         |8080 |out %n        |     10 T
+D3 %n         |8085 |out %n        |     10 T
+D3 %n         |z80  |out %n        |     11 T
+D3 %n         |z80n |out %n        |     11 T
+D3 %n         |8080 |out (%n), a   |     10 T
+D3 %n         |8085 |out (%n), a   |     10 T
+D3 %n         |z80  |out (%n), a   |     11 T
+D3 %n         |z80n |out (%n), a   |     11 T
               |     |              |         
 D4 %m %m      |8080 |call nc, %m   |  11/17 T
 D4 %m %m      |8085 |call nc, %m   |   9/18 T
@@ -3790,6 +3904,15 @@ DA %m %m      |z80  |jp c, %m      |     10 T
 DA %m %m      |z80n |jp c, %m      |     10 T
 DA %m %m      |8080 |jr c, %m      |     10 T
 DA %m %m      |8085 |jr c, %m      |   7/10 T
+              |     |              |         
+DB %n         |8080 |in %n         |     10 T
+DB %n         |8085 |in %n         |     10 T
+DB %n         |z80  |in %n         |     11 T
+DB %n         |z80n |in %n         |     11 T
+DB %n         |8080 |in a, (%n)    |     10 T
+DB %n         |8085 |in a, (%n)    |     10 T
+DB %n         |z80  |in a, (%n)    |     11 T
+DB %n         |z80n |in a, (%n)    |     11 T
               |     |              |         
 DC %m %m      |8080 |call c, %m    |  11/17 T
 DC %m %m      |8085 |call c, %m    |   9/18 T
@@ -4380,6 +4503,12 @@ ED            |8085 |ld hl, (de)   |     10 T
 ED            |8085 |lhlde         |     10 T
 ED            |8085 |lhlx          |     10 T
               |     |              |         
+ED 40         |z80  |in b, (c)     |     12 T
+ED 40         |z80n |in b, (c)     |     12 T
+              |     |              |         
+ED 41         |z80  |out (c), b    |     12 T
+ED 41         |z80n |out (c), b    |     12 T
+              |     |              |         
 ED 42         |z80  |sbc hl, bc    |     15 T
 ED 42         |z80n |sbc hl, bc    |     15 T
               |     |              |         
@@ -4400,6 +4529,12 @@ ED 46         |z80n |im 0          |      8 T
 ED 47         |z80  |ld i, a       |      9 T
 ED 47         |z80n |ld i, a       |      9 T
               |     |              |         
+ED 48         |z80  |in c, (c)     |     12 T
+ED 48         |z80n |in c, (c)     |     12 T
+              |     |              |         
+ED 49         |z80  |out (c), c    |     12 T
+ED 49         |z80n |out (c), c    |     12 T
+              |     |              |         
 ED 4A         |z80  |adc hl, bc    |     15 T
 ED 4A         |z80n |adc hl, bc    |     15 T
               |     |              |         
@@ -4411,6 +4546,12 @@ ED 4D         |z80n |reti          |     14 T
               |     |              |         
 ED 4F         |z80  |ld r, a       |      9 T
 ED 4F         |z80n |ld r, a       |      9 T
+              |     |              |         
+ED 50         |z80  |in d, (c)     |     12 T
+ED 50         |z80n |in d, (c)     |     12 T
+              |     |              |         
+ED 51         |z80  |out (c), d    |     12 T
+ED 51         |z80n |out (c), d    |     12 T
               |     |              |         
 ED 52         |z80  |sbc hl, de    |     15 T
 ED 52         |z80n |sbc hl, de    |     15 T
@@ -4424,6 +4565,12 @@ ED 56         |z80n |im 1          |      8 T
 ED 57         |z80  |ld a, i       |      9 T
 ED 57         |z80n |ld a, i       |      9 T
               |     |              |         
+ED 58         |z80  |in e, (c)     |     12 T
+ED 58         |z80n |in e, (c)     |     12 T
+              |     |              |         
+ED 59         |z80  |out (c), e    |     12 T
+ED 59         |z80n |out (c), e    |     12 T
+              |     |              |         
 ED 5A         |z80  |adc hl, de    |     15 T
 ED 5A         |z80n |adc hl, de    |     15 T
               |     |              |         
@@ -4436,11 +4583,23 @@ ED 5E         |z80n |im 2          |      8 T
 ED 5F         |z80  |ld a, r       |      9 T
 ED 5F         |z80n |ld a, r       |      9 T
               |     |              |         
+ED 60         |z80  |in h, (c)     |     12 T
+ED 60         |z80n |in h, (c)     |     12 T
+              |     |              |         
+ED 61         |z80  |out (c), h    |     12 T
+ED 61         |z80n |out (c), h    |     12 T
+              |     |              |         
 ED 62         |z80  |sbc hl, hl    |     15 T
 ED 62         |z80n |sbc hl, hl    |     15 T
               |     |              |         
 ED 67         |z80  |rrd           |     18 T
 ED 67         |z80n |rrd           |     18 T
+              |     |              |         
+ED 68         |z80  |in l, (c)     |     12 T
+ED 68         |z80n |in l, (c)     |     12 T
+              |     |              |         
+ED 69         |z80  |out (c), l    |     12 T
+ED 69         |z80n |out (c), l    |     12 T
               |     |              |         
 ED 6A         |z80  |adc hl, hl    |     15 T
 ED 6A         |z80n |adc hl, hl    |     15 T
@@ -4448,11 +4607,25 @@ ED 6A         |z80n |adc hl, hl    |     15 T
 ED 6F         |z80  |rld           |     18 T
 ED 6F         |z80n |rld           |     18 T
               |     |              |         
+ED 70         |z80  |in (c)        |     12 T
+ED 70         |z80n |in (c)        |     12 T
+ED 70         |z80  |in f, (c)     |     12 T
+ED 70         |z80n |in f, (c)     |     12 T
+              |     |              |         
+ED 71         |z80  |out (c), 0    |     12 T
+ED 71         |z80n |out (c), 0    |     12 T
+              |     |              |         
 ED 72         |z80  |sbc hl, sp    |     15 T
 ED 72         |z80n |sbc hl, sp    |     15 T
               |     |              |         
 ED 73 %m %m   |z80  |ld (%m), sp   |     20 T
 ED 73 %m %m   |z80n |ld (%m), sp   |     20 T
+              |     |              |         
+ED 78         |z80  |in a, (c)     |     12 T
+ED 78         |z80n |in a, (c)     |     12 T
+              |     |              |         
+ED 79         |z80  |out (c), a    |     12 T
+ED 79         |z80n |out (c), a    |     12 T
               |     |              |         
 ED 7A         |z80  |adc hl, sp    |     15 T
 ED 7A         |z80n |adc hl, sp    |     15 T
@@ -4466,11 +4639,23 @@ ED A0         |z80n |ldi           |     16 T
 ED A1         |z80  |cpi           |     16 T
 ED A1         |z80n |cpi           |     16 T
               |     |              |         
+ED A2         |z80  |ini           |     16 T
+ED A2         |z80n |ini           |     16 T
+              |     |              |         
+ED A3         |z80  |outi          |     16 T
+ED A3         |z80n |outi          |     16 T
+              |     |              |         
 ED A8         |z80  |ldd           |     16 T
 ED A8         |z80n |ldd           |     16 T
               |     |              |         
 ED A9         |z80  |cpd           |     16 T
 ED A9         |z80n |cpd           |     16 T
+              |     |              |         
+ED AA         |z80  |ind           |     16 T
+ED AA         |z80n |ind           |     16 T
+              |     |              |         
+ED AB         |z80  |outd          |     16 T
+ED AB         |z80n |outd          |     16 T
               |     |              |         
 ED B0         |z80  |ldir          |  16/47 T
 ED B0         |z80n |ldir          |  16/47 T
@@ -4478,11 +4663,23 @@ ED B0         |z80n |ldir          |  16/47 T
 ED B1         |z80  |cpir          |  16/37 T
 ED B1         |z80n |cpir          |  16/37 T
               |     |              |         
+ED B2         |z80  |inir          |  16/44 T
+ED B2         |z80n |inir          |  16/44 T
+              |     |              |         
+ED B3         |z80  |otir          |  16/44 T
+ED B3         |z80n |otir          |  16/44 T
+              |     |              |         
 ED B8         |z80  |lddr          |  16/47 T
 ED B8         |z80n |lddr          |  16/47 T
               |     |              |         
 ED B9         |z80  |cpdr          |  16/37 T
 ED B9         |z80n |cpdr          |  16/37 T
+              |     |              |         
+ED BA         |z80  |indr          |  16/44 T
+ED BA         |z80n |indr          |  16/44 T
+              |     |              |         
+ED BB         |z80  |otdr          |  16/44 T
+ED BB         |z80n |otdr          |  16/44 T
               |     |              |         
 EE %n         |8080 |xor %n        |      7 T
 EE %n         |8085 |xor %n        |      7 T

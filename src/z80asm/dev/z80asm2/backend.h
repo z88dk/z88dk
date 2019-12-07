@@ -97,6 +97,10 @@ bool emit_rot_indx(int op, int x, int dis);
 bool emit_rot_indx_r(int op, int x, int dis, int r);
 bool emit_rrd(void);
 bool emit_rld(void);
+bool emit_sra_rr(int rr);
+bool emit_sra_bc(void);
+bool emit_sra_de(void);
+bool emit_sra_hl(void);
 
 // bit manipulation
 bool emit_bit_r(int op, int bit, int r);

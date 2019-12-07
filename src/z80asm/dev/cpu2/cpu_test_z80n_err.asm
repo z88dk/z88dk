@@ -1,8 +1,6 @@
- djnz %j                        ; Error
  djnz -32768                    ; Error
  djnz 32767                     ; Error
  djnz 65535                     ; Error
- djnz b, %j                     ; Error
  djnz b, -32768                 ; Error
  djnz b, 32767                  ; Error
  djnz b, 65535                  ; Error
@@ -37,8 +35,10 @@
  ldi a, (hl)                    ; Error
  lhlde                          ; Error
  lhlx                           ; Error
+ rim                            ; Error
  shlde                          ; Error
  shlx                           ; Error
+ sim                            ; Error
  swap (hl)                      ; Error
  swap a                         ; Error
  swap b                         ; Error
