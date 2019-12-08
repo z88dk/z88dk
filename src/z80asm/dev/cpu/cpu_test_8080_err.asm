@@ -5713,7 +5713,6 @@
  push ix                        ; Error
  push iy                        ; Error
  push su                        ; Error
- rdel                           ; Error
  rdmode                         ; Error
  res -1, (hl)                   ; Error
  res -1, (hl)                   ; Error
@@ -6133,7 +6132,6 @@
  rl c'                          ; Error
  rl d                           ; Error
  rl d'                          ; Error
- rl de                          ; Error
  rl de'                         ; Error
  rl e                           ; Error
  rl e'                          ; Error
@@ -6206,7 +6204,6 @@
  rlc l                          ; Error
  rlc l'                         ; Error
  rlca'                          ; Error
- rlde                           ; Error
  rlo                            ; Error
  rlz                            ; Error
  rr (hl)                        ; Error
@@ -6266,13 +6263,11 @@
  rr c'                          ; Error
  rr d                           ; Error
  rr d'                          ; Error
- rr de                          ; Error
  rr de'                         ; Error
  rr e                           ; Error
  rr e'                          ; Error
  rr h                           ; Error
  rr h'                          ; Error
- rr hl                          ; Error
  rr hl'                         ; Error
  rr ix                          ; Error
  rr iy                          ; Error

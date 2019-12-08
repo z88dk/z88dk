@@ -253,16 +253,16 @@
 			{rlc rrc rl rr sla sra .   srl} {. . . . . . (iy+D) .}		=> FD, CB, D, $1*8 + $2
 [zilog]		{.   .   .  .  .   .   sll .  } {. . . . . . (iy+D) .}		=> FD, CB, D, $1*8 + $2
 
-[rabbit]	rl de		=>     F3
-[rabbit]	rr de		=>     FB
-[rabbit]	rr hl		=>     FC
+;[rabbit]	rl de		=>     F3
+;[rabbit]	rr de		=>     FB
+;[rabbit]	rr hl		=>     FC
 
-[rabbit]	rl de'		=> 76, F3
-[rabbit]	rr de'		=> 76, FB
-[rabbit]	rr hl'		=> 76, FC
+;[rabbit]	rl de'		=> 76, F3
+;[rabbit]	rr de'		=> 76, FB
+;[rabbit]	rr hl'		=> 76, FC
 
-[rabbit]	rr ix		=> DD, FC
-[rabbit]	rr iy		=> FD, FC
+;[rabbit]	rr ix		=> DD, FC
+;[rabbit]	rr iy		=> FD, FC
 
 ;------------------------------------------------------------------------------
 ; Bit Set, Reset, and Test Group

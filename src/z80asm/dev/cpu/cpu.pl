@@ -844,6 +844,8 @@ for my $cpu (@CPUS) {
     
     # sra hl (undocumented 8085)
     if ($i8085) {
+        add_opc($cpu, "arhl",			0x10);
+        add_opc($cpu, "rrhl",			0x10);
         add_opc($cpu, "sra hl",			0x10);
     }
     elsif ($intel) {
@@ -857,7 +859,77 @@ for my $cpu (@CPUS) {
         add_opc($cpu, "sra hl",			0xcb, 0x2c, 0xcb, 0x1d);
     }
 
-	
+	# rl bc
+    if ($intel) {
+        add_opc($cpu, "rl bc",			0xcd, '@__z80asm__rl_bc', '');
+    }
+    else {
+        add_opc($cpu, "rl bc",			0xcb, 0x11, 0xcb, 0x10);
+    }
+        
+	# rl de
+    if ($i8085) {                       # undocumented 8085
+		add_opc($cpu, "rdel",			0x18);
+		add_opc($cpu, "rlde",			0x18);
+		add_opc($cpu, "rl de",			0x18);
+    }
+    elsif ($intel) {
+		add_opc($cpu, "rdel",			0xcd, '@__z80asm__rl_de', '');
+		add_opc($cpu, "rlde",			0xcd, '@__z80asm__rl_de', '');
+        add_opc($cpu, "rl de",			0xcd, '@__z80asm__rl_de', '');
+    }
+    elsif ($rabbit) {
+		add_opc($cpu, "rdel",			0xF3);
+		add_opc($cpu, "rlde",			0xF3);
+		add_opc($cpu, "rl de",          0xF3);
+    }
+    else {
+        add_opc($cpu, "rdel",			0xcb, 0x13, 0xcb, 0x12);
+        add_opc($cpu, "rlde",			0xcb, 0x13, 0xcb, 0x12);
+        add_opc($cpu, "rl de",			0xcb, 0x13, 0xcb, 0x12);
+    }
+    
+    # rl hl
+    if ($intel) {
+        add_opc($cpu, "rl hl",			0xcd, '@__z80asm__rl_hl', '');
+    }
+    else {
+        add_opc($cpu, "rl hl",			0xcb, 0x15, 0xcb, 0x14);
+    }
+        
+	# rr bc
+    if ($intel) {
+        add_opc($cpu, "rr bc",			0xcd, '@__z80asm__rr_bc', '');
+    }
+    else {
+        add_opc($cpu, "rr bc",			0xcb, 0x18, 0xcb, 0x19);
+    }
+        
+    # rr de
+    if ($rabbit) {
+		add_opc($cpu, "rr de",          0xFB);
+    }
+    elsif ($intel) {
+        add_opc($cpu, "rr de",			0xcd, '@__z80asm__rr_de', '');
+    }
+    else {
+        add_opc($cpu, "rr de",			0xcb, 0x1a, 0xcb, 0x1b);
+    }
+    
+    # rr hl
+	if ($rabbit) {
+		for ([hl => ()], [ix => 0xDD], [iy => 0xFD]) {
+			my($x, @pfx) = @$_;
+			add_opc($cpu, "rr $x", @pfx, 0xFC);
+		}
+	}
+    elsif ($intel) {
+        add_opc($cpu, "rr hl",			0xcd, '@__z80asm__rr_hl', '');
+    }
+    else {
+        add_opc($cpu, "rr hl",			0xcb, 0x1c, 0xcb, 0x1d);
+    }
+
 	# bit set, reset and test group
 	for my $r (qw( b c d e h l (hl) a )) {
 		if ($intel) {
@@ -886,16 +958,6 @@ for my $cpu (@CPUS) {
 				add_opc($cpu, "$op %c, $r", 	0xCB, ($V{$op}*0x40 + $V{$r})."+8*%c(0..7)");
 				add_opc($cpu, "$op.a %c, $r", 	0xCB, ($V{$op}*0x40 + $V{$r})."+8*%c(0..7)");
 			}
-		}
-	}
-	
-	# 16-bit rotate and shift group
-	if ($rabbit) {
-		add_opc($cpu, "rl de", 0xF3);
-		add_opc($cpu, "rr de", 0xFB);
-		for ([hl => ()], [ix => 0xDD], [iy => 0xFD]) {
-			my($x, @pfx) = @$_;
-			add_opc($cpu, "rr $x", @pfx, 0xFC);
 		}
 	}
 	
@@ -1238,11 +1300,6 @@ for my $cpu (@CPUS) {
     
 	# undocumented 8085 instructions
 	if ($i8085) {
-		# Rotate DE left
-		add_opc($cpu, "rdel",			0x18);
-		add_opc($cpu, "rlde",			0x18);
-		add_opc($cpu, "rl de",			0x18);
-
 		# Add 00bb immediate to SP, result to DE
 		add_opc($cpu, "ldsi %n",		0x38, '%n');
 		add_opc($cpu, "adi sp, %n",		0x38, '%n');
@@ -1531,10 +1588,12 @@ sub add_opc_3 {
 	}
 	
 	# expand altd
-	if ($asm =~ /^ (?| ( (?:ld|inc|dec|pop|bool|rl|rr) \s+ 
+	if ($asm =~ /^ (?| ( (?:ld|inc|dec|pop|bool) \s+ 
 									(?:a|b|c|d|e|h|l|af|bc|de|hl)) ( $ | \b [^'] .*)
-                     | ( (?:rlc|rrc|sla|sra|sll|sli|srl) \s+ 
+                     | ( (?:rl|rr|rlc|rrc|sla|sra|sll|sli|srl) \s+ 
 									(?:a|b|c|d|e|h|l)) ( $ | \b [^'] .*)
+                     | ( (?:rr) \s+ (?:de|hl)) ( $ | \b [^'] .*)
+                     | ( (?:rl) \s+ (?:de))    ( $ | \b [^'] .*)
 					 | ( (?:add|adc|sub|sbc|and|xor|or|neg) \s+ a )(,.*)
 					 | ( (?:ccf|scf) \s+ f)(,.*)
 					 | ( (?:rlca|rrca|rla|rra)) (.*)

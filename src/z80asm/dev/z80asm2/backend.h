@@ -101,6 +101,14 @@ bool emit_sra_rr(int rr);
 bool emit_sra_bc(void);
 bool emit_sra_de(void);
 bool emit_sra_hl(void);
+bool emit_rl_rr(int rr);
+bool emit_rl_bc(void);
+bool emit_rl_de(void);
+bool emit_rl_hl(void);
+bool emit_rr_rr(int rr);
+bool emit_rr_bc(void);
+bool emit_rr_de(void);
+bool emit_rr_hl(void);
 
 // bit manipulation
 bool emit_bit_r(int op, int bit, int r);

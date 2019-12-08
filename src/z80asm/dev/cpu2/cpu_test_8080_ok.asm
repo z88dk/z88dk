@@ -671,6 +671,7 @@
  ral                            ; 17
  rar                            ; 1F
  rc                             ; D8
+ rdel                           ; CD @rl_de
  ret                            ; C9
  ret c                          ; D8
  ret m                          ; F8
@@ -682,10 +683,14 @@
  ret po                         ; E0
  ret v                          ; E8
  ret z                          ; C8
+ rl bc                          ; CD @rl_bc
+ rl de                          ; CD @rl_de
+ rl hl                          ; CD @rl_hl
  rla                            ; 17
  rlc                            ; 07
  rlca                           ; 07
  rld                            ; CD @rld
+ rlde                           ; CD @rl_de
  rm                             ; F8
  rnc                            ; D0
  rnv                            ; E0
@@ -693,6 +698,9 @@
  rp                             ; F0
  rpe                            ; E8
  rpo                            ; E0
+ rr bc                          ; CD @rr_bc
+ rr de                          ; CD @rr_de
+ rr hl                          ; CD @rr_hl
  rra                            ; 1F
  rrc                            ; 0F
  rrca                           ; 0F

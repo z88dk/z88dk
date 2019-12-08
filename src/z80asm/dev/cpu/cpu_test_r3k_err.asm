@@ -1066,7 +1066,6 @@
  push -32768                    ; Error
  push 32767                     ; Error
  push 65535                     ; Error
- rdel                           ; Error
  res -1, (hl)                   ; Error
  res -1, (hl)                   ; Error
  res -1, (ix)                   ; Error
@@ -1293,7 +1292,6 @@
  rlc (iy-128), e                ; Error
  rlc (iy-128), h                ; Error
  rlc (iy-128), l                ; Error
- rlde                           ; Error
  rr (ix), a                     ; Error
  rr (ix), b                     ; Error
  rr (ix), c                     ; Error

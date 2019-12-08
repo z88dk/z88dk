@@ -867,6 +867,12 @@ static bool check_rot(int op) {
     if (op == OP_SRA && BCDEHL(&rr) && EOS())				// sra bc/de/hl
         return emit_sra_rr(rr);
     yy = yy0;
+    if (op == OP_RL && BCDEHL(&rr) && EOS())				// rl bc/de/hl
+        return emit_rl_rr(rr);
+    yy = yy0;
+    if (op == OP_RR && BCDEHL(&rr) && EOS())				// rr bc/de/hl
+        return emit_rr_rr(rr);
+    yy = yy0;
     return false;
 }
 
@@ -1607,6 +1613,8 @@ static keyword_t keywords_table[] = {
 {"RRD",		0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_rrd },
 {"ARHL",	0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_sra_hl },
 {"RRHL",	0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_sra_hl },
+{"RDEL",	0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_rl_de },
+{"RLDE",	0,		IS_ANY,			NA,		NA,		NA,			NULL, 0, parse_void, emit_rl_de },
 
 // bit manipulation
 {"BIT",		0,		IS_ANY,			NA,		NA,		NA,			parse_bit8,		OP_BIT		},

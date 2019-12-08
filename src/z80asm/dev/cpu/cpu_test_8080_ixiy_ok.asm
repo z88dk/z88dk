@@ -785,6 +785,7 @@
  ral                            ; 17
  rar                            ; 1F
  rc                             ; D8
+ rdel                           ; CD @__z80asm__rl_de
  res.a 0, (hl)                  ; 7E E6 FE 77
  res.a 0, a                     ; E6 FE
  res.a 0, b                     ; 78 E6 FE 47
@@ -860,10 +861,14 @@
  ret po                         ; E0
  ret v                          ; E8
  ret z                          ; C8
+ rl bc                          ; CD @__z80asm__rl_bc
+ rl de                          ; CD @__z80asm__rl_de
+ rl hl                          ; CD @__z80asm__rl_hl
  rla                            ; 17
  rlc                            ; 07
  rlca                           ; 07
  rld                            ; CD @__z80asm__rld
+ rlde                           ; CD @__z80asm__rl_de
  rm                             ; F8
  rnc                            ; D0
  rnv                            ; E0
@@ -871,6 +876,9 @@
  rp                             ; F0
  rpe                            ; E8
  rpo                            ; E0
+ rr bc                          ; CD @__z80asm__rr_bc
+ rr de                          ; CD @__z80asm__rr_de
+ rr hl                          ; CD @__z80asm__rr_hl
  rra                            ; 1F
  rrc                            ; 0F
  rrca                           ; 0F

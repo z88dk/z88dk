@@ -427,14 +427,6 @@
  ex de', hl             ;; 0704:  E3
  ex de, hl'             ;; 0704:  76 EB
  ex de', hl'            ;; 0704:  76 E3
- rl de                  ;; 0848:  F3
- rr de                  ;; 0848:  FB
- rr hl                  ;; 0848:  FC
- rl de'                 ;; 0848:  76 F3
- rr de'                 ;; 0848:  76 FB
- rr hl'                 ;; 0848:  76 FC
- rr ix                  ;; 0848:  DD FC
- rr iy                  ;; 0848:  FD FC
  res 0, b'              ;; 09C8:  76 CB 80
  res 0, c'              ;; 09C8:  76 CB 81
  res 0, d'              ;; 09C8:  76 CB 82

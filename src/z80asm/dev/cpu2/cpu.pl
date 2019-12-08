@@ -877,8 +877,6 @@ sub init_opcodes {
 
         # sra hl (undocumented i8085)
 		if (is8085) {
-			add("arhl",		B(0x10), T(is8080?99:is8085?7:israbbit?8:isz180?14:16));
-			add("rrhl",		B(0x10), T(is8080?99:is8085?7:israbbit?8:isz180?14:16));
 			add("sra hl",	B(0x10), T(is8080?99:is8085?7:israbbit?8:isz180?14:16));
 		}
         elsif (isintel) {
@@ -887,10 +885,60 @@ sub init_opcodes {
         else {
             add_compound("sra hl" => "sra h", "rr l");
         }
+        add_compound("arhl" => "sra hl");
+        add_compound("rrhl" => "sra hl");
+        
+        # rl bc
+        if (isintel) {
+            add("rl bc",    B(0xcd, '@__z80asm__rl_bc'), T(is8080?90:is8085?88:israbbit?8:isz180?14:16));
+        }
+        else {
+            add_compound("rl bc" => "rl c", "rl b");
+        }
+        
+        # rl de (undocumented i8085)
+		if (is8085) {
+			add("rl de",	B(0x18), T(10));
+        }
+        elsif (isintel) {
+            add("rl de",    B(0xcd, '@__z80asm__rl_de'), T(is8080?90:is8085?10:israbbit?2:isz180?14:16));
+        }
+        else {
+            add_compound("rl de" => "rl e", "rl d");
+        }
+        add_compound("rdel" => "rl de");
+        add_compound("rlde" => "rl de");
 
-        if (!is8085) {
-            add_compound("arhl"     => "sra hl");
-            add_compound("rrhl"     => "sra hl");
+        # rl hl
+        if (isintel) {
+            add("rl hl",    B(0xcd, '@__z80asm__rl_hl'), T(is8080?90:is8085?88:israbbit?8:isz180?14:16));
+        }
+        else {
+            add_compound("rl hl" => "rl l", "rl h");
+        }
+        
+        # rr bc
+        if (isintel) {
+            add("rr bc",    B(0xcd, '@__z80asm__rr_bc'), T(is8080?90:is8085?88:israbbit?8:isz180?14:16));
+        }
+        else {
+            add_compound("rr bc" => "rr b", "rr c");
+        }
+
+        # rr de
+        if (isintel) {
+            add("rr de",    B(0xcd, '@__z80asm__rr_de'), T(is8080?90:is8085?88:israbbit?8:isz180?14:16));
+        }
+        else {
+            add_compound("rr de" => "rr d", "rr e");
+        }
+
+        # rr hl
+        if (isintel) {
+            add("rr hl",    B(0xcd, '@__z80asm__rr_hl'), T(is8080?90:is8085?88:israbbit?8:isz180?14:16));
+        }
+        else {
+            add_compound("rr hl" => "rr h", "rr l");
         }
 
 		#----------------------------------------------------------------------
@@ -1104,12 +1152,7 @@ next;
 		# 8085 opcodes
 		#----------------------------------------------------------------------
         
-        # Rotate DE left (undocumented i8085)
 		if (is8085) {
-			add("rdel",			0x18, 10);
-			add("rlde",			0x18, 10);
-			add("rl de",		0x18, 10);
-			
 			# Add 00bb immediate to HL, result to DE (undocumented i8085)
 			add("ldhi %n",		[0x28, '%n'], 10);
 			add("adi hl, %n",	[0x28, '%n'], 10);

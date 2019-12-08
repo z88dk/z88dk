@@ -7136,6 +7136,15 @@ rc            |z180 |   **         |   **
 rc            |z80  |D8            |   5/11 T
 rc            |z80n |D8            |   5/11 T
               |     |              |         
+rdel          |8080 |CD @rl_de     |     90 T
+rdel          |8085 |18            |     10 T
+rdel          |gbz80|CB 13; CB 12  |     16 T
+rdel          |r2k  |   **         |   **    
+rdel          |r3k  |   **         |   **    
+rdel          |z180 |   **         |   **    
+rdel          |z80  |CB 13; CB 12  |     16 T
+rdel          |z80n |CB 13; CB 12  |     16 T
+              |     |              |         
 res 0, (hl)   |8080 |   **         |   **    
 res 0, (hl)   |8085 |   **         |   **    
 res 0, (hl)   |gbz80|CB 86         |     16 T
@@ -7901,6 +7910,15 @@ rl b          |z180 |   **         |   **
 rl b          |z80  |CB 10         |      8 T
 rl b          |z80n |CB 10         |      8 T
               |     |              |         
+rl bc         |8080 |CD @rl_bc     |     90 T
+rl bc         |8085 |CD @rl_bc     |     88 T
+rl bc         |gbz80|CB 11; CB 10  |     16 T
+rl bc         |r2k  |   **         |   **    
+rl bc         |r3k  |   **         |   **    
+rl bc         |z180 |   **         |   **    
+rl bc         |z80  |CB 11; CB 10  |     16 T
+rl bc         |z80n |CB 11; CB 10  |     16 T
+              |     |              |         
 rl c          |8080 |   **         |   **    
 rl c          |8085 |   **         |   **    
 rl c          |gbz80|CB 11         |      8 T
@@ -7919,6 +7937,15 @@ rl d          |z180 |   **         |   **
 rl d          |z80  |CB 12         |      8 T
 rl d          |z80n |CB 12         |      8 T
               |     |              |         
+rl de         |8080 |CD @rl_de     |     90 T
+rl de         |8085 |18            |     10 T
+rl de         |gbz80|CB 13; CB 12  |     16 T
+rl de         |r2k  |   **         |   **    
+rl de         |r3k  |   **         |   **    
+rl de         |z180 |   **         |   **    
+rl de         |z80  |CB 13; CB 12  |     16 T
+rl de         |z80n |CB 13; CB 12  |     16 T
+              |     |              |         
 rl e          |8080 |   **         |   **    
 rl e          |8085 |   **         |   **    
 rl e          |gbz80|CB 13         |      8 T
@@ -7936,6 +7963,15 @@ rl h          |r3k  |   **         |   **
 rl h          |z180 |   **         |   **    
 rl h          |z80  |CB 14         |      8 T
 rl h          |z80n |CB 14         |      8 T
+              |     |              |         
+rl hl         |8080 |CD @rl_hl     |     90 T
+rl hl         |8085 |CD @rl_hl     |     88 T
+rl hl         |gbz80|CB 15; CB 14  |     16 T
+rl hl         |r2k  |   **         |   **    
+rl hl         |r3k  |   **         |   **    
+rl hl         |z180 |   **         |   **    
+rl hl         |z80  |CB 15; CB 14  |     16 T
+rl hl         |z80n |CB 15; CB 14  |     16 T
               |     |              |         
 rl l          |8080 |   **         |   **    
 rl l          |8085 |   **         |   **    
@@ -8090,6 +8126,15 @@ rld           |z180 |   **         |   **
 rld           |z80  |ED 6F         |     18 T
 rld           |z80n |ED 6F         |     18 T
               |     |              |         
+rlde          |8080 |CD @rl_de     |     90 T
+rlde          |8085 |18            |     10 T
+rlde          |gbz80|CB 13; CB 12  |     16 T
+rlde          |r2k  |   **         |   **    
+rlde          |r3k  |   **         |   **    
+rlde          |z180 |   **         |   **    
+rlde          |z80  |CB 13; CB 12  |     16 T
+rlde          |z80n |CB 13; CB 12  |     16 T
+              |     |              |         
 rm            |8080 |F8            |   5/11 T
 rm            |8085 |F8            |   6/12 T
 rm            |gbz80|   **         |   **    
@@ -8216,6 +8261,15 @@ rr b          |z180 |   **         |   **
 rr b          |z80  |CB 18         |      8 T
 rr b          |z80n |CB 18         |      8 T
               |     |              |         
+rr bc         |8080 |CD @rr_bc     |     90 T
+rr bc         |8085 |CD @rr_bc     |     88 T
+rr bc         |gbz80|CB 18; CB 19  |     16 T
+rr bc         |r2k  |   **         |   **    
+rr bc         |r3k  |   **         |   **    
+rr bc         |z180 |   **         |   **    
+rr bc         |z80  |CB 18; CB 19  |     16 T
+rr bc         |z80n |CB 18; CB 19  |     16 T
+              |     |              |         
 rr c          |8080 |   **         |   **    
 rr c          |8085 |   **         |   **    
 rr c          |gbz80|CB 19         |      8 T
@@ -8234,6 +8288,15 @@ rr d          |z180 |   **         |   **
 rr d          |z80  |CB 1A         |      8 T
 rr d          |z80n |CB 1A         |      8 T
               |     |              |         
+rr de         |8080 |CD @rr_de     |     90 T
+rr de         |8085 |CD @rr_de     |     88 T
+rr de         |gbz80|CB 1A; CB 1B  |     16 T
+rr de         |r2k  |   **         |   **    
+rr de         |r3k  |   **         |   **    
+rr de         |z180 |   **         |   **    
+rr de         |z80  |CB 1A; CB 1B  |     16 T
+rr de         |z80n |CB 1A; CB 1B  |     16 T
+              |     |              |         
 rr e          |8080 |   **         |   **    
 rr e          |8085 |   **         |   **    
 rr e          |gbz80|CB 1B         |      8 T
@@ -8251,6 +8314,15 @@ rr h          |r3k  |   **         |   **
 rr h          |z180 |   **         |   **    
 rr h          |z80  |CB 1C         |      8 T
 rr h          |z80n |CB 1C         |      8 T
+              |     |              |         
+rr hl         |8080 |CD @rr_hl     |     90 T
+rr hl         |8085 |CD @rr_hl     |     88 T
+rr hl         |gbz80|CB 1C; CB 1D  |     16 T
+rr hl         |r2k  |   **         |   **    
+rr hl         |r3k  |   **         |   **    
+rr hl         |z180 |   **         |   **    
+rr hl         |z80  |CB 1C; CB 1D  |     16 T
+rr hl         |z80n |CB 1C; CB 1D  |     16 T
               |     |              |         
 rr l          |8080 |   **         |   **    
 rr l          |8085 |   **         |   **    

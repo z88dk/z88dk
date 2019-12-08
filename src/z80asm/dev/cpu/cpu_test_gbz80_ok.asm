@@ -774,6 +774,7 @@
  ral                            ; 17
  rar                            ; 1F
  rc                             ; D8
+ rdel                           ; CB 13 CB 12
  res 0, (hl)                    ; CB 86
  res 0, a                       ; CB 87
  res 0, b                       ; CB 80
@@ -911,10 +912,13 @@
  rl (hl)                        ; CB 16
  rl a                           ; CB 17
  rl b                           ; CB 10
+ rl bc                          ; CB 11 CB 10
  rl c                           ; CB 11
  rl d                           ; CB 12
+ rl de                          ; CB 13 CB 12
  rl e                           ; CB 13
  rl h                           ; CB 14
+ rl hl                          ; CB 15 CB 14
  rl l                           ; CB 15
  rla                            ; 17
  rlc                            ; 07
@@ -928,15 +932,19 @@
  rlc l                          ; CB 05
  rlca                           ; 07
  rld                            ; CD @__z80asm__rld
+ rlde                           ; CB 13 CB 12
  rnc                            ; D0
  rnz                            ; C0
  rr (hl)                        ; CB 1E
  rr a                           ; CB 1F
  rr b                           ; CB 18
+ rr bc                          ; CB 18 CB 19
  rr c                           ; CB 19
  rr d                           ; CB 1A
+ rr de                          ; CB 1A CB 1B
  rr e                           ; CB 1B
  rr h                           ; CB 1C
+ rr hl                          ; CB 1C CB 1D
  rr l                           ; CB 1D
  rra                            ; 1F
  rrc                            ; 0F

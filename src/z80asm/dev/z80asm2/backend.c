@@ -548,6 +548,40 @@ bool emit_sra_bc(void) { return emit_sra_rr(RR_BC); }
 bool emit_sra_de(void) { return emit_sra_rr(RR_DE); }
 bool emit_sra_hl(void) { return emit_sra_rr(RR_HL); }
 
+bool emit_rl_rr(int rr) {
+    if ((rr & IDX_MASK) != IDX_HL) {
+        illegal_opcode_error();
+        return false;
+    }
+    switch (rr & RR_MASK) {
+    case RR_BC: return emit_rot_r(OP_RL, R_C) && emit_rot_r(OP_RL, R_B);
+    case RR_DE: return emit_rot_r(OP_RL, R_E) && emit_rot_r(OP_RL, R_D);
+    case RR_HL: return emit_rot_r(OP_RL, R_L) && emit_rot_r(OP_RL, R_H);
+    default: illegal_opcode_error(); return false;
+    }
+}
+
+bool emit_rl_bc(void) { return emit_rl_rr(RR_BC); }
+bool emit_rl_de(void) { return emit_rl_rr(RR_DE); }
+bool emit_rl_hl(void) { return emit_rl_rr(RR_HL); }
+
+bool emit_rr_rr(int rr) {
+    if ((rr & IDX_MASK) != IDX_HL) {
+        illegal_opcode_error();
+        return false;
+    }
+    switch (rr & RR_MASK) {
+    case RR_BC: return emit_rot_r(OP_RR, R_B) && emit_rot_r(OP_RR, R_C);
+    case RR_DE: return emit_rot_r(OP_RR, R_D) && emit_rot_r(OP_RR, R_E);
+    case RR_HL: return emit_rot_r(OP_RR, R_H) && emit_rot_r(OP_RR, R_L);
+    default: illegal_opcode_error(); return false;
+    }
+}
+
+bool emit_rr_bc(void) { return emit_rr_rr(RR_BC); }
+bool emit_rr_de(void) { return emit_rr_rr(RR_DE); }
+bool emit_rr_hl(void) { return emit_rr_rr(RR_HL); }
+
 bool emit_bit_r(int op, int bit, int r) {
 	if (bit < 0 || bit > 7) {
 		range_error(bit);

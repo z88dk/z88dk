@@ -15,7 +15,13 @@ ldd.asm
 lddr.asm
 ldi.asm
 ldir.asm
+rl_bc.asm
+rl_de.asm
+rl_hl.asm
 rld.asm
+rr_bc.asm
+rr_de.asm
+rr_hl.asm
 rrd.asm
 sbc_hl_bc.asm
 sbc_hl_de.asm

@@ -113,6 +113,7 @@
  ani -128                       ; E6 80
  ani 127                        ; E6 7F
  ani 255                        ; E6 FF
+ arhl                           ; 10
  bit.a 0, (hl)                  ; 7E E6 01
  bit.a 0, a                     ; E6 01
  bit.a 0, b                     ; 78 E6 01
@@ -895,7 +896,9 @@
  ret v                          ; E8
  ret z                          ; C8
  rim                            ; 20
+ rl bc                          ; CD @__z80asm__rl_bc
  rl de                          ; 18
+ rl hl                          ; CD @__z80asm__rl_hl
  rla                            ; 17
  rlc                            ; 07
  rlca                           ; 07
@@ -908,10 +911,14 @@
  rp                             ; F0
  rpe                            ; E8
  rpo                            ; E0
+ rr bc                          ; CD @__z80asm__rr_bc
+ rr de                          ; CD @__z80asm__rr_de
+ rr hl                          ; CD @__z80asm__rr_hl
  rra                            ; 1F
  rrc                            ; 0F
  rrca                           ; 0F
  rrd                            ; CD @__z80asm__rrd
+ rrhl                           ; 10
  rst 0                          ; C7
  rst 1                          ; CF
  rst 16                         ; D7
