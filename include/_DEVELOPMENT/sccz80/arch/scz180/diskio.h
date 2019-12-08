@@ -77,10 +77,10 @@ typedef enum {
 // IDE DISK COMMANDS (FOUND IN @FEILIPU Z88DK-LIBS)
 //
 
-extern DSTATUS __LIB__ disk_initialize(BYTE pdrv) __smallc;
+extern DSTATUS __LIB__ disk_initialize(BYTE pdrv) __smallc __z88dk_fastcall;
 
 
-extern DSTATUS __LIB__ disk_status(BYTE pdrv) __smallc;
+extern DSTATUS __LIB__ disk_status(BYTE pdrv) __smallc __z88dk_fastcall;
 
 
 extern DRESULT __LIB__ disk_read(BYTE pdrv,BYTE* buff,DWORD sector,UINT count) __smallc;

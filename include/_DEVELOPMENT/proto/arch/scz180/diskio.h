@@ -75,8 +75,8 @@ typedef enum {
 // IDE DISK COMMANDS (FOUND IN @FEILIPU Z88DK-LIBS)
 //
 
-__OPROTO(`iyh,iyl',`iyh,iyl',DSTATUS,,disk_initialize,BYTE pdrv)
-__OPROTO(`iyh,iyl',`iyh,iyl',DSTATUS,,disk_status,BYTE pdrv)
+__DPROTO(`iyh,iyl',`iyh,iyl',DSTATUS,,disk_initialize,BYTE pdrv)
+__DPROTO(`iyh,iyl',`iyh,iyl',DSTATUS,,disk_status,BYTE pdrv)
 __OPROTO(`iyh,iyl',`iyh,iyl',DRESULT,,disk_read,BYTE pdrv, BYTE* buff, DWORD sector, UINT count)
 __OPROTO(`iyh,iyl',`iyh,iyl',DRESULT,,disk_write,BYTE pdrv, const BYTE* buff, DWORD sector, UINT count)
 __OPROTO(`iyh,iyl',`iyh,iyl',DRESULT,,disk_ioctl,BYTE pdrv, BYTE cmd, void* buff)

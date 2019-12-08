@@ -78,8 +78,14 @@ typedef enum {
 //
 
 extern DSTATUS disk_initialize(BYTE pdrv) __preserves_regs(iyh,iyl);
+extern DSTATUS disk_initialize_fastcall(BYTE pdrv) __preserves_regs(iyh,iyl) __z88dk_fastcall;
+#define disk_initialize(a) disk_initialize_fastcall(a)
+
 
 extern DSTATUS disk_status(BYTE pdrv) __preserves_regs(iyh,iyl);
+extern DSTATUS disk_status_fastcall(BYTE pdrv) __preserves_regs(iyh,iyl) __z88dk_fastcall;
+#define disk_status(a) disk_status_fastcall(a)
+
 
 extern DRESULT disk_read(BYTE pdrv,BYTE* buff,DWORD sector,UINT count) __preserves_regs(iyh,iyl);
 
