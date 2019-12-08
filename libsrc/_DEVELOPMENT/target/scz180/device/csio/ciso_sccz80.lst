@@ -8,4 +8,4 @@ target/scz180/device/csio/sccz80/csio_sd_write_block
 target/scz180/device/csio/sccz80/csio_sd_read_byte
 target/scz180/device/csio/sccz80/csio_sd_write_byte
 
-@target/scz180/device/csio/csio.lst
+@target/scz180/device/csio/csio_asm.lst

@@ -17,4 +17,4 @@ target/scz180/device/csio/sdcc/csio_sd_write_block_fastcall
 target/scz180/device/csio/sdcc/csio_sd_read_byte_fastcall
 target/scz180/device/csio/sdcc/csio_sd_write_byte_fastcall
 
-@target/scz180/device/csio/csio.lst
+@target/scz180/device/csio/csio_asm.lst

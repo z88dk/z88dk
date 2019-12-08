@@ -74,7 +74,7 @@ typedef enum {
 } DRESULT;
 
 //
-// IDE DISK COMMANDS
+// IDE DISK COMMANDS (FOUND IN @FEILIPU Z88DK-LIBS)
 //
 
 extern DSTATUS disk_initialize(BYTE pdrv);

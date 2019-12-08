@@ -13,3 +13,4 @@ target/scz180/device/asci/c/asci1_peekc
 target/scz180/device/asci/c/asci1_pollc
 target/scz180/device/asci/c/asci1_putc
 
+@target/scz180/device/asci/asci_asm.lst

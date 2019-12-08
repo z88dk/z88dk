@@ -43,13 +43,6 @@
 
 #define __CLOCKS_PER_SECOND 50
 
-#define __BIOS_SP   0xFFDE
-#define __BANK_SP   0xEFFE
-
-#define __COMMON_AREA_1_BASE  0xF000
-#define __COMMON_AREA_1_PHASE_DATA  0xf000
-#define __COMMON_AREA_1_PHASE_DRIVER  0xf580
-
 #define __ASCI0_RX_SIZE  0x100
 #define __ASCI0_TX_SIZE  0x080
 
@@ -65,8 +58,6 @@
 #define __IO_LED_STATUS  0x0E
 
 #define __IO_CF_PORT  0x10
-
-#define __IO_PIO_PORT_BASE  0x20
 
 
 
@@ -746,99 +737,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#define __IO_PIO_PORT_A  0x20
-#define __IO_PIO_PORT_B  0x21
-#define __IO_PIO_PORT_C  0x22
-#define __IO_PIO_CONTROL  0x23
-
-#define __IO_PIO_CNTL_00  0x80
-#define __IO_PIO_CNTL_01  0x81
-#define __IO_PIO_CNTL_02  0x82
-#define __IO_PIO_CNTL_03  0x83
-
-#define __IO_PIO_CNTL_04  0x88
-#define __IO_PIO_CNTL_05  0x89
-#define __IO_PIO_CNTL_06  0x8A
-#define __IO_PIO_CNTL_07  0x8B
-
-#define __IO_PIO_CNTL_08  0x90
-#define __IO_PIO_CNTL_09  0x91
-#define __IO_PIO_CNTL_10  0x92
-#define __IO_PIO_CNTL_11  0x83
-
-#define __IO_PIO_CNTL_12  0x98
-#define __IO_PIO_CNTL_13  0x99
-#define __IO_PIO_CNTL_14  0x9A
-#define __IO_PIO_CNTL_15  0x9B
-
-
-
-
-
-
-
-
-
-
-
-
-
-#define __IO_PIO_IDE_LSB  0x20
-#define __IO_PIO_IDE_MSB  0x21
-#define __IO_PIO_IDE_CTL  0x22
-#define __IO_PIO_IDE_CONFIG  0x23
-#define __IO_PIO_IDE_RD  0x92
-#define __IO_PIO_IDE_WR  0x80
-
-#define __IO_IDE_A0_LINE  0x01
-#define __IO_IDE_A1_LINE  0x02
-#define __IO_IDE_A2_LINE  0x04
-#define __IO_IDE_CS0_LINE  0x08
-#define __IO_IDE_CS1_LINE  0x10
-#define __IO_IDE_WR_LINE  0x20
-#define __IO_IDE_RD_LINE  0x40
-#define __IO_IDE_RST_LINE  0x80
-
-#define __IO_IDE_DATA  0x08
-#define __IO_IDE_ERROR  0x9
-#define __IO_IDE_SEC_CNT  0xa
-#define __IO_IDE_SECTOR  0xb
-#define __IO_IDE_CYL_LSB  0xc
-#define __IO_IDE_CYL_MSB  0xd
-#define __IO_IDE_HEAD  0xe
-#define __IO_IDE_COMMAND  0xf
-#define __IO_IDE_STATUS  0xf
-
-#define __IO_IDE_CONTROL  0x16
-#define __IO_IDE_ALT_STATUS  0x16
-
-#define __IO_IDE_LBA0  0xb
-#define __IO_IDE_LBA1  0xc
-#define __IO_IDE_LBA2  0xd
-#define __IO_IDE_LBA3  0xe
-
-#define __IDE_CMD_READ  0x20
-#define __IDE_CMD_WRITE  0x30
-
-#define __IDE_CMD_STANDBY  0xE0
-#define __IDE_CMD_IDLE  0xE1
-#define __IDE_CMD_SLEEP  0xE6
-#define __IDE_CMD_CACHE_FLUSH  0xE7
-#define __IDE_CMD_ID  0xEC
 
 
 
