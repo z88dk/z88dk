@@ -6,13 +6,13 @@
 ;
 
 	SECTION code_clib
-	PUBLIC  asm_tvc_cls
+	PUBLIC  tvc_cls
     INCLUDE "target/tvc/def/tvc.def"
 
 ; Entry:        no entry
 ;
-.asm_tvc_cls
-._asm_tvc_cls
+.tvc_cls
+._tvc_cls
     rst     $30
     defb    CLS ; editor - character in
 	ret

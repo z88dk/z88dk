@@ -6,14 +6,14 @@
 ;
 
 	SECTION code_clib
-	PUBLIC  asm_tvc_ed_cpos
+	PUBLIC  tvc_ed_cpos
     INCLUDE "target/tvc/def/tvc.def"
 
 ;
 ; Entry:        (column, row) / X,Y
 ;
-.asm_tvc_ed_cpos
-._asm_tvc_ed_cpos
+.tvc_ed_cpos
+._tvc_ed_cpos
 
     ld      hl,2
     add     hl,sp

@@ -6,14 +6,14 @@
 ;
 
 	SECTION code_clib
-	PUBLIC  asm_tvc_ed_cfix
+	PUBLIC  tvc_ed_cfix
     INCLUDE "target/tvc/def/tvc.def"
 
 ;
 ; Entry:        no entry
 ;
-.asm_tvc_ed_cfix
-._asm_tvc_ed_cfix
+.tvc_ed_cfix
+._tvc_ed_cfix
     rst     $30
     defb    ED_CFIX ; editor - character in
 	ret
