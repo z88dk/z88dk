@@ -25,6 +25,7 @@ defc PORT_BORDER    = $00     ; color of the border - output only
 ; Special addresses
 defc P_SAVE         = $0003   ; Save address of PORT 2, the memory mapping port
 defc PORT03         = $0B11   ; Save address of PORT 3, the keyboard row select and IO socket select port
+defc PORT06         = $0B13   ; Save address of PORT 6
 defc INTINC         = $0B1D   ; Address of the interrupt counter (happens once in each 20.096ms)
 defc BORDER         = $0B4f   ; Save address of the color of the border
 

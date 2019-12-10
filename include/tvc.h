@@ -11,7 +11,6 @@
 #define __TVC_H__
 
 #include <sys/types.h>
-#include <stdio.h>
 
 // constants
 #define TVC_CHAR_RETURN 0x0D
@@ -19,15 +18,20 @@
 
 enum video_mode {VMODE_2C=0x00, VMODE_4C=0x01, VMODE_16C=0x02};
 
-#define CGREEN   0x01
-#define CRED     0x04
-#define CBLUE    0x10
-#define CINTENSE 0x40
+#define CBLUE      0x01
+#define CRED       0x04
+#define CGREEN     0x10
+#define CINTENSITY 0x40
 
-enum colors {black  = 0x00, green   = 0x01, red     = 0x04, purple = 0x05,
-             blue   = 0x10, cyan    = 0x11, yellow  = 0x14, grey   = 0x15,
-             lgreen = 0x41, lred    = 0x44, lpurple = 0x45, lblue  = 0x50,
-             lcyan  = 0x51, lyellow = 0x54, white   = 0x55};
+enum colors {black  = 0x00, blue    = 0x01, red     = 0x04, purple = 0x05,
+             green  = 0x10, cyan    = 0x11, brown   = 0x14, grey   = 0x15,
+             lblue  = 0x41, lred    = 0x44, lpurple = 0x45, lgreen = 0x50,
+             lcyan  = 0x51, yellow  = 0x54, white   = 0x55};
+
+typedef union composite_color {
+    enum colors color;
+    int paletteIndex;
+} color_or_index;
 
 // TVC Editor functions
 /**
@@ -91,10 +95,13 @@ int __LIB__ tvc_kbd_status();
 void __LIB__ tvc_cls(void);
 
 /**
- * Sets the video mode of TVC (2 colours, 4 colours, 16 colours), clears screen
- * and initialize cursor positions.
+ * Sets the video mode of TVC (2 colors, 4 colors, 16 colors), clears screen
+ * and initialize cursor positions. Returns the error code.
  */
+#define tvc_set_vmode tvc_vmode
 int __LIB__ tvc_vmode(enum video_mode mode);
+
+enum video_mode __LIB__ tvc_get_vmode();
 
 /**
   * Returns the border color.
@@ -103,7 +110,23 @@ enum colors tvc_get_border();
 
 void tvc_set_border(enum colors c);
 
-#define tvc_set_paper(X) {tvc_set_palette(X, 0); char *p; p = (char *)0x0B4E; *p=X;}
 void __LIB__ tvc_set_palette(enum colors, int palette_index);
+
+/**
+ * Sets the current paper (character background color).
+ * In case of 2 or 4 color modes this method only sets the provided palette
+ * index, in case of 16 color mode this method sets the provided color.
+ * Before calling this method the caller shall know what is the current resolution.
+ */
+void tvc_set_paper(color_or_index c);
+
+/**
+ * Sets the current ink (character foreground color).
+ * In case of 2 or 4 color modes this method only sets the provided palette
+ * index, in case of 16 color mode this method sets the provided color.
+ * Before calling this method the caller shall know what is the current resolution.
+ */
+void tvc_set_ink(color_or_index c);
+
 
 #endif

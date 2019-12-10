@@ -14,7 +14,10 @@ target/tvc/tvc_kbd_status
 target/tvc/tvc_set_bordercolor
 target/tvc/tvc_set_palette
 target/tvc/tvc_vmode
+target/tvc/tvc_get_vmode
 target/tvc/tvc_fgets_cons
 target/tvc/tvc_get_border
 target/tvc/tvc_set_border
+target/tvc/tvc_set_paper
+target/tvc/tvc_set_ink
 @z80.lst

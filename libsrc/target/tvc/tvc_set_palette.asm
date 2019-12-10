@@ -19,7 +19,7 @@
     ld      a,(hl)
     or a
     jp m,quit
-    cp $03
+    cp $04      ; palette index can be 0-3
     jr nc,quit
     add a,$60
     ld c,a
