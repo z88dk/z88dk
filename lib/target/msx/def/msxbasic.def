@@ -111,11 +111,13 @@ defc RAWPRT = $F418	;1 Raw printer output is read by OUTDO
 defc VLZADR = $F419	;2 Address of data that is temporairly replaced by ‘O’ when Basic function VAL("") is running 
 defc VLZDAT = $F41B	;1 Original value that was in the address pointed to with VLZADR 
 defc CURLIN = $F41C	;2 Line number the Basic interpreter is working on, in direct mode it will be filled with #FFFF
-defc KBUF   = $F41F
 
+defc BUFFER = $F41E ; byte 0 in input buffer
+defc KBUF   = $F41F
 defc BUFMIN = $F55D  ; used in INPUT st.
 defc BUF    = $F55E  ; Buffer to store characters typed( in ASCII code)
 defc ENDBUF = $F660  ; Prevent overflow of BUF
+
 defc TTYPOS = $F661  ; Virtual cursor location internally retained by BASIC
 defc DIMFLG = $F662  ; ARRAY FLAG
 defc VALTYP = $F663  ; Type indicator
