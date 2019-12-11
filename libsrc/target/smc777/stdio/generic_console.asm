@@ -1,4 +1,4 @@
-;
+; Sony SMC-777 console
 ;
 
 
@@ -12,13 +12,13 @@
         PUBLIC  generic_console_set_paper
         PUBLIC  generic_console_set_inverse
 
-		EXTERN		generic_console_flags
-		EXTERN		__smc777_mode
-		EXTERN		__smc777_attr
-		EXTERN		__smc777_attr2
+	EXTERN	generic_console_flags
+	EXTERN	__smc777_mode
+	EXTERN	__smc777_attr
+	EXTERN	__smc777_attr2
 
-		EXTERN		CONSOLE_COLUMNS
-		EXTERN		CONSOLE_ROWS
+	EXTERN	CONSOLE_COLUMNS
+	EXTERN	CONSOLE_ROWS
 
 generic_console_set_inverse:
 	ld	a,(generic_console_flags)
@@ -63,8 +63,50 @@ loop:	dec	hl
 	ld	a,h
 	or	l
 	jr	nz,continue
-	;TODO: Clear graphics screen if necessary
+	ld	a,(__smc777_mode)
+	and	@00001100
+	ret	z
+	cp	@00001000
+	jr	z,get_bgattr_640
+	call	get_bgattr_320
+clg:
+	ld	bc,$0080
+clg_1:
+	out	(c),l
+	inc	b
+	jr	nz,clg_1
+	inc	c
+	jr	nz,clg_1
 	ret
+
+get_bgattr_320:
+	ld	a,(__smc777_attr2)
+	and	@00001111
+	ld	l,a
+	rlca
+	rlca
+	rlca
+	rlca
+	or	l
+	ld	l,a
+	ret
+
+get_bgattr_640:
+	ld	a,(__smc777_attr2)
+	and	@00000011
+	ld	l,a
+	rlca
+	rlca
+	or	l
+	rlca
+	rlca
+	or	l
+	rlca
+	rlca
+	or	l
+	ld	l,a
+	jr	clg
+
 
 ; c = x
 ; b = y
