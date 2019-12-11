@@ -892,6 +892,7 @@ smc777.lib:
 	@echo ''
 	@echo '--- Building Sony SMC-70/SMC-777 Library ---'
 	@echo ''
+	$(MAKE) gfxdeps
 	@$(RM) -f video/mc6845/*.o
 	$(MAKE) -C psg
 	$(MAKE) -C games TARGET=cpm SUBTYPE=smc777 TARGET_CFLAGS=-subtype=smc777

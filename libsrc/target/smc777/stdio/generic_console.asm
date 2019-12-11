@@ -2,18 +2,20 @@
 ;
 
 
-		SECTION		code_clib
+        SECTION code_clib
 
-		PUBLIC		generic_console_cls
-		PUBLIC		generic_console_vpeek
-		PUBLIC		generic_console_scrollup
-		PUBLIC		generic_console_printc
-                PUBLIC          generic_console_set_ink
-                PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_inverse
+        PUBLIC  generic_console_cls
+        PUBLIC  generic_console_vpeek
+        PUBLIC  generic_console_scrollup
+        PUBLIC  generic_console_printc
+        PUBLIC  generic_console_set_ink
+        PUBLIC  generic_console_set_paper
+        PUBLIC  generic_console_set_inverse
 
 		EXTERN		generic_console_flags
 		EXTERN		__smc777_mode
+		EXTERN		__smc777_attr
+		EXTERN		__smc777_attr2
 
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
@@ -40,6 +42,8 @@ generic_console_set_ink:
 
 	
 generic_console_set_paper:
+	and	7
+	ld	(__smc777_attr2),a
 	ret
 
 generic_console_cls:
@@ -59,6 +63,7 @@ loop:	dec	hl
 	ld	a,h
 	or	l
 	jr	nz,continue
+	;TODO: Clear graphics screen if necessary
 	ret
 
 ; c = x
@@ -97,7 +102,7 @@ generic_console_printc_3:
 	add	hl,bc			;hl now points to address in display
 	ex	af,af
 	ld	a,(__smc777_mode)
-	and	a
+	and	@00000011
 	jr	z,is_80_col
 	add	hl,bc
 is_80_col:
@@ -159,9 +164,6 @@ clear_continue:
 	ret
 
 
-	SECTION	data_clib
-
-__smc777_attr:	defb	7
 
 	SECTION	code_crt_init
 
