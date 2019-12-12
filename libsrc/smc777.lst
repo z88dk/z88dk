@@ -3,6 +3,7 @@ target/smc777/stdio/generic_console_ioctl
 target/smc777/stdio/conio_vars
 target/smc777/stdio/CRT_FONT
 target/smc777/stdio/copy_font
+target/smc777/stdio/conio_map_colour
 target/smc777/graphics/clg
 target/smc777/graphics/getmaxx
 target/smc777/graphics/getmaxy
