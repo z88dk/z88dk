@@ -47,21 +47,30 @@ check_mode:
 	jr	nz,failure
 	ld	a,c
 	ld	d,80
-	ld	h,@01111111	;Remove bit 7
 	ld	l,@00000000	;Bit 7=0=80 column mode
-	and	a
-	jr	z,set_mode
+	and	1
+	jr	z,check_graphics
 	ld	d,40
-	ld	h,@00111111	;Remove bit 7 + 6
 	ld	l,@10000000	;Bit 7=1=40 column
 	cp	1
 	jr	nz,failure
+check_graphics:
+	; Now, consider the graphics mode
+	ld	a,c
+	and	@00001100
+	jr	z,set_mode	;No graphics mode configured (so lores)
+	; 11 = 640x400x1
+	; 10 = 640x200x2
+	; 01 = 320x200x4
+	or	l
+	ld	l,a
 set_mode:
+	ld	a,c		;Full mode flag
 	ld	(__smc777_mode),a
 	ld	a,d
 	ld	(__console_w),a
 	in	a,($20)
-	and	h
+	and	@00110011
 	or	l
 	out	($20),a
 	call	generic_console_cls
