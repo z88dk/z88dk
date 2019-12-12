@@ -7,11 +7,13 @@ lstoff
 ;
 
 
-; System variables
-
 defc VDP_RP  = $0006	; address of vdp READ port
 defc VDP_WP  = $0007	; address of vdp WRITE port
 defc MSX_VER = $002D    ; MSX version (0 = MSX1, 1 = MSX2)
+
+; System variables
+
+defc MAXRAM = $F380	;Beginnning of system variables' space
 
 ; SUBROUTINES FOR READ/WRITE CALLS OF THE INTER-SLOT
 defc RDPRIM = $F380	;5 Routine that reads from a primary slot 
