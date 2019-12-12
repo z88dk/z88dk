@@ -14,9 +14,9 @@
 ;
 .tvc_get_bordercolor
 ._tvc_get_bordercolor
-
-    ld      a, (BORDER)
-    ld      l,a
+    
+    ld      hl,(BORDER);
     ld      h,0
+
 	ret
 

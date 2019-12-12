@@ -72,8 +72,6 @@ char __LIB__ fputc_cons_native(int character);
  * earlier this call will block (func $A1)
  */
 #define tvc_kbd_chin     fgetc_cons
-int __LIB__ fgetc_cons();
-
 
 /**
  * Checks if a key was pressed earlier or not
@@ -108,8 +106,15 @@ enum video_mode __LIB__ tvc_get_vmode();
  */
 enum colors tvc_get_border();
 
+/**
+ * Sets the border color
+ */
 void tvc_set_border(enum colors c);
 
+/**
+ * Sets the palette color for the specified index. The index must be 0-3, inclusive,
+ * otherwise nothing is set
+ */
 void __LIB__ tvc_set_palette(enum colors, int palette_index);
 
 /**
@@ -121,12 +126,24 @@ void __LIB__ tvc_set_palette(enum colors, int palette_index);
 void tvc_set_paper(color_or_index c);
 
 /**
+ * Fills the provided color_or_index union according to the previously set
+ * paper value, depending on the current resolution
+ */
+void tvc_get_paper(color_or_index *retVal);
+
+/**
  * Sets the current ink (character foreground color).
  * In case of 2 or 4 color modes this method only sets the provided palette
  * index, in case of 16 color mode this method sets the provided color.
  * Before calling this method the caller shall know what is the current resolution.
  */
 void tvc_set_ink(color_or_index c);
+
+/**
+ * Fills the provided color_or_index union according to the previously set
+ * ink value, depending on the current resolution
+ */
+void tvc_get_ink(color_or_index *retVal);
 
 
 #endif
