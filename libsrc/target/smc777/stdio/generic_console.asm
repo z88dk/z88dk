@@ -13,6 +13,7 @@
         PUBLIC  generic_console_set_inverse
 
 	EXTERN	generic_console_flags
+	EXTERN	conio_map_colour
 	EXTERN	__smc777_mode
 	EXTERN	__smc777_attr
 	EXTERN	__smc777_attr2
@@ -34,6 +35,7 @@ set_attr:
 	ret
 
 generic_console_set_ink:
+	call	conio_map_colour
 	and	7
 	ld	c,a
 	ld	a,(__smc777_attr)
@@ -42,6 +44,7 @@ generic_console_set_ink:
 
 	
 generic_console_set_paper:
+	call	conio_map_colour
 	and	7
 	ld	(__smc777_attr2),a
 	ret
