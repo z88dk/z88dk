@@ -16,9 +16,9 @@ ide_read_byte:
     out (c), a              ;drive address onto control lines
     or __IO_IDE_RD_LINE    
     out (c), a              ;and assert read pin
-    ld bc, __IO_PIO_IDE_LSB
+    ld c, __IO_PIO_IDE_LSB
     in e, (c)               ;read the lower byte
-    ld bc, __IO_PIO_IDE_CTL
+    ld c, __IO_PIO_IDE_CTL
     out (c), d              ;deassert read pin
     xor a
     out (c), a              ;deassert all control pins

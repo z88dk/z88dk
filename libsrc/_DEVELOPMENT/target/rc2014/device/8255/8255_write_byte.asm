@@ -15,18 +15,18 @@ ide_write_byte:
     ld bc, __IO_PIO_IDE_CONFIG
     ld a, __IO_PIO_IDE_WR
     out (c), a              ;config 8255 chip, write mode
-    ld bc, __IO_PIO_IDE_CTL
+    ld c, __IO_PIO_IDE_CTL
     ld a, d    
     out (c), a              ;drive address onto control lines
     or __IO_IDE_WR_LINE    
     out (c), a              ;and assert write pin
-    ld bc, __IO_PIO_IDE_LSB
+    ld c, __IO_PIO_IDE_LSB
     out (c), e              ;drive lower lines with lsb
-    ld bc, __IO_PIO_IDE_CTL
+    ld c, __IO_PIO_IDE_CTL
     out (c), d              ;deassert write pin
     xor a
     out (c), a              ;deassert all control pins
-    ld bc, __IO_PIO_IDE_CONFIG
+    ld c, __IO_PIO_IDE_CONFIG
     ld a, __IO_PIO_IDE_RD
     out (c), a              ;config 8255 chip, read mode
     pop de
