@@ -41,9 +41,9 @@ ide_rdblk2:
     djnz ide_rdblk2         ;keep iterative count in b
 
 ENDIF
-;   ld c, __IO_PIO_IDE_CTL  ;remembering what's in c
-    ld d, $0
-    out (c), d              ;deassert all control pins
+;   ld c, __IO_PIO_IDE_CTL  ;remembering what's in bc
+;   ld b, $0
+    out (c), b              ;deassert all control pins
     pop de
     pop bc
     ret
