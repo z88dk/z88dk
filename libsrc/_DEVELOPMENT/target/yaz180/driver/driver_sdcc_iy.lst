@@ -1,9 +1,0 @@
-@target/yaz180/driver/terminal/rc_01_input_asci0.lst
-@target/yaz180/driver/terminal/rc_01_input_asci1.lst
-@target/yaz180/driver/terminal/rc_01_output_asci0.lst
-@target/yaz180/driver/terminal/rc_01_output_asci1.lst
-@target/yaz180/driver/i2c/i2c_sdcc.lst
-@target/yaz180/driver/ide/ide.lst
-@target/yaz180/driver/diskio/diskio_sdcc.lst
-@target/yaz180/driver/apu/apu_sdcc.lst
-@target/yaz180/driver/time/time_sdcc.lst

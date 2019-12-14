@@ -25,8 +25,8 @@
 @stdlib/stdlib_sdcc_ix.lst
 @string/string_sdcc_ix.lst
 @target/yaz180/default/default.lst
-@target/yaz180/device/device.lst
-@target/yaz180/driver/driver_sdcc_ix.lst
+@target/yaz180/device/device_sdcc.lst
+@target/yaz180/driver/driver_sdcc.lst
 @target/cpm/driver/driver.lst
 @threads/threads_sdcc_ix.lst
 @time/time_sdcc.lst
