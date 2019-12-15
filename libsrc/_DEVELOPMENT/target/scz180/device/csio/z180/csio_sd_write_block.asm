@@ -3,7 +3,7 @@ INCLUDE "config_private.inc"
 
 SECTION code_driver
 
-EXTERN l_reverse
+EXTERN l_mirror
 
 PUBLIC asm_sd_write_block
 
@@ -25,7 +25,7 @@ PUBLIC asm_sd_write_block
 
 .sd_write_nextword
     ld a,(de)               ; upper byte
-    call l_reverse          ; reversed bits in A and L
+    call l_mirror           ; reversed bits in A and L
 .sd_write_wait_h
     tstio CNTR_TE           ; test bits in IO port (C)
     jr NZ,sd_write_wait_h   ; wait for transmit to complete
@@ -35,7 +35,7 @@ PUBLIC asm_sd_write_block
 
     inc de                  ; ptr++
     ld a,(de)               ; lower byte
-    call l_reverse          ; reversed bits in A and L
+    call l_mirror           ; reversed bits in A and L
 .sd_write_wait_l
     tstio CNTR_TE           ; test bits in IO port (C)
     jr NZ,sd_write_wait_l   ; wait for transmit to complete

@@ -3,7 +3,7 @@ INCLUDE "config_private.inc"
 
 SECTION code_driver
 
-EXTERN l_reverse
+EXTERN l_mirror 
 
 PUBLIC asm_sd_read_block
 
@@ -30,7 +30,7 @@ PUBLIC asm_sd_read_block
 .sd_read_again
     out0 (CNTR),h           ; start receiving next byte
 
-    call l_reverse          ; reversed bits in A and L
+    call l_mirror           ; reversed bits in A and L
     ld (de),a               ; upper byte
     inc de                  ; ptr++
 
@@ -40,7 +40,7 @@ PUBLIC asm_sd_read_block
 
     in0 a,(TRDR)            ; read byte
     out0 (CNTR),h           ; start reception next byte
-    call l_reverse          ; reversed bits in A and L
+    call l_mirror           ; reversed bits in A and L
     ld (de),a               ; lower byte
     inc de                  ; ptr++
 
@@ -51,6 +51,6 @@ PUBLIC asm_sd_read_block
     in0 a,(TRDR)            ; read byte
     djnz sd_read_again      ; length != 0, go again
 
-    call l_reverse          ; reversed bits in A and L
+    call l_mirror           ; reversed bits in A and L
     ld (de),a               ; upper byte
     ret

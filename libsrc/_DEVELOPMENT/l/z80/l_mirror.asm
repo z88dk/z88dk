@@ -2,10 +2,10 @@
 SECTION code_clib
 SECTION code_l
 
-PUBLIC l_reverse
+PUBLIC l_mirror
 
-.l_reverse
-    ; reverse the bits in a byte
+.l_mirror
+    ; reverse or mirror the bits in a byte
     ; 76543210 -> 01234567
     ;
     ; 18 bytes / 70 cycles
