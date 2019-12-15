@@ -419,6 +419,8 @@
  ld bc, -32768                  ; 01 00 80
  ld bc, 32767                   ; 01 FF 7F
  ld bc, 65535                   ; 01 FF FF
+ ld bc, de                      ; 42; 4B
+ ld bc, hl                      ; 44; 4D
  ld c, (hl)                     ; 4E
  ld c, -128                     ; 0E 80
  ld c, 127                      ; 0E 7F
@@ -444,6 +446,11 @@
  ld de, -32768                  ; 11 00 80
  ld de, 32767                   ; 11 FF 7F
  ld de, 65535                   ; 11 FF FF
+ ld de, bc                      ; 50; 59
+ ld de, hl                      ; 54; 5D
+ ld de, sp+-128                 ; EB; 21 80 00; 39; EB
+ ld de, sp+127                  ; EB; 21 7F 00; 39; EB
+ ld de, sp+255                  ; EB; 21 FF 00; 39; EB
  ld e, (hl)                     ; 5E
  ld e, -128                     ; 1E 80
  ld e, 127                      ; 1E 7F
@@ -472,6 +479,8 @@
  ld hl, -32768                  ; 21 00 80
  ld hl, 32767                   ; 21 FF 7F
  ld hl, 65535                   ; 21 FF FF
+ ld hl, bc                      ; 60; 69
+ ld hl, de                      ; 62; 6B
  ld l, (hl)                     ; 6E
  ld l, -128                     ; 2E 80
  ld l, 127                      ; 2E 7F

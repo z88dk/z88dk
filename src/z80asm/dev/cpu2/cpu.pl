@@ -250,7 +250,14 @@ sub T::to_string {
 		
 		return ::B(@bytes);
 	}
-	
+
+    sub word_to_byte_arg {
+		my($self) = @_;
+        $self->{_asm} =~ s/%m/%n/;
+        for (@{$self->_bytes}) { s/%m/%n/ and last; }
+        for (@{$self->_bytes}) { s/%m/0/ and last; }
+    }
+    
 	sub size {
 		my($self) = @_;
 		return scalar @{$self->_bytes};
@@ -325,11 +332,17 @@ sub T::to_string {
 		return \@bytes;
 	}
 
+    sub word_to_byte_arg {
+		my($self) = @_;
+		for my $instr (@{$self->prog}) {
+			$instr->word_to_byte_arg();
+		}
+    }
+    
 	sub size {
 		my($self) = @_;
 		return scalar @{$self->bytes};
 	}
-	
 	
 	sub ticks {
 		my($self) = @_;
@@ -555,8 +568,88 @@ sub init_opcodes {
 			add("ld (%m), sp", 	B(0x08, '%m', '%m'), T(20));
 		}
 
+        # ld ss,ss
+        add_compound("ld bc, de"        => "ld b, d", "ld c, e");
+        add_compound("ld bc, hl"        => "ld b, h", "ld c, l");
+        
+        if (isz80||isz80n) {
+            add_compound("ld bc, ix"    => "ld b, ixh", "ld c, ixl");
+            add_compound("ld bc, iy"    => "ld b, iyh", "ld c, iyl");
+        }
+        elsif (iszilog||israbbit) {
+            add_compound("ld bc, ix"    => "push ix", "pop bc");
+            add_compound("ld bc, iy"    => "push iy", "pop bc");
+        }
+        
+        add_compound("ld de, bc"        => "ld d, b", "ld e, c");
+        
+        if (is8085) {
+			# Add 00bb immediate to HL, result to DE (undocumented i8085)
+			add("ldhi %n",		B(0x28, '%n'), T(10));
+			add("adi hl, %n",	B(0x28, '%n'), T(10));
+			add("ld de, hl+%n",	B(0x28, '%n'), T(10));
+		}
+        else {
+            add_compound("ld de, hl"    => "ld d, h", "ld e, l");
+        }
+
+        if (isz80||isz80n) {
+            add_compound("ld de, ix"    => "ld d, ixh", "ld e, ixl");
+            add_compound("ld de, iy"    => "ld d, iyh", "ld e, iyl");
+        }
+        elsif (iszilog||israbbit) {
+            add_compound("ld de, ix"    => "push ix", "pop de");
+            add_compound("ld de, iy"    => "push iy", "pop de");
+        }
+
+        add_compound("ld hl, bc"        => "ld h, b", "ld l, c");
+        add_compound("ld hl, de"        => "ld h, d", "ld l, e");
+
+        if (iszilog||israbbit) {
+            add_compound("ld hl, ix"    => "push ix", "pop hl");
+            add_compound("ld hl, iy"    => "push iy", "pop hl");
+        }
+        
+        if (isz80||isz80n) {
+            add_compound("ld ix, bc"    => "ld ixh, b", "ld ixl, c");
+            add_compound("ld iy, bc"    => "ld iyh, b", "ld iyl, c");
+        }
+        elsif (iszilog||israbbit) {
+            add_compound("ld ix, bc"    => "push bc", "pop ix");
+            add_compound("ld iy, bc"    => "push bc", "pop iy");
+        }
+        
+        if (isz80||isz80n) {
+            add_compound("ld ix, de"    => "ld ixh, d", "ld ixl, e");
+            add_compound("ld iy, de"    => "ld iyh, d", "ld iyl, e");
+        }
+        elsif (iszilog||israbbit) {
+            add_compound("ld ix, de"    => "push de", "pop ix");
+            add_compound("ld iy, de"    => "push de", "pop iy");
+        }
+
+        if (iszilog||israbbit) {
+            add_compound("ld ix, hl"    => "push hl", "pop ix");
+            add_compound("ld iy, hl"    => "push hl", "pop iy");
+            add_compound("ld ix, iy"    => "push iy", "pop ix");
+            add_compound("ld iy, ix"    => "push ix", "pop iy");
+        }
+        
+        # Add 00bb immediate to SP, result to DE (undocumented i8085)
+		if (is8085) {
+			add("ldsi %n",		B(0x38, '%n'), T(10));
+			add("adi sp, %n",	B(0x38, '%n'), T(10));
+			add("ld de, sp+%n",	B(0x38, '%n'), T(10));
+        }
+        else {
+            add_compound("ld de, sp+%n" =>  "ex de, hl",
+                                            "ld hl, %n",
+                                            "add hl, sp",
+                                            "ex de, hl");
+        }
+
 		#----------------------------------------------------------------------
-		# Exchange
+		# Exchange group
 		#----------------------------------------------------------------------
 
 		# ex de, hl
@@ -1152,17 +1245,8 @@ next;
 		# 8085 opcodes
 		#----------------------------------------------------------------------
         
+        
 		if (is8085) {
-			# Add 00bb immediate to HL, result to DE (undocumented i8085)
-			add("ldhi %n",		[0x28, '%n'], 10);
-			add("adi hl, %n",	[0x28, '%n'], 10);
-			add("ld de, hl+%n",	[0x28, '%n'], 10);
-			
-			# Add 00bb immediate to SP, result to DE
-			add("ldsi %n",		[0x38, '%n'], 10);
-			add("adi sp, %n",	[0x38, '%n'], 10);
-			add("ld de, sp+%n",	[0x38, '%n'], 10);
-			
 			# Restart 8 (0040) if V flag is set
 			add("rstv",			0xcb, [6,12]);
 			add("ovrst8",		0xcb, [6,12]);
@@ -1276,6 +1360,8 @@ next;
 			add_compound("$op    (hl-)"	=> "$op a, (hl)", "dec hl");
 		}
 	}
+    
+    do_compound();
 }
 
 #------------------------------------------------------------------------------
@@ -1288,6 +1374,13 @@ sub _add_prog {
 	$Opcodes{$asm}{$cpu} = $prog;
 	
 	return $prog;
+}
+
+sub _remove_prog {
+	my($asm) = @_;
+	$asm =~ s/\s+/ /g;
+
+	delete $Opcodes{$asm}{$cpu};
 }
 
 #------------------------------------------------------------------------------
@@ -1347,11 +1440,60 @@ sub add_ix {
 #------------------------------------------------------------------------------
 sub add_compound {
 	my($asm, @prog) = @_;
-	my $prog = _add_prog($asm);
-	for my $asm1 (@prog) {
-		my $prog1 = $Opcodes{$asm1}{$cpu} or die;
-		$prog->add(clone($prog1));
-	}
+    our @compound_queue;
+
+    my $prog = try_add_compound($asm, @prog);
+    return $prog if $prog; # true
+
+    push @compound_queue, [$cpu, $ixiy, $asm, @prog];
+    return; # false
+}
+
+sub try_add_compound {
+    my($asm, @prog) = @_;
+    my $prog;
+    ### <where>: $asm
+    eval {
+        $prog = _add_prog($asm);
+        for my $asm1 (@prog) {
+            ### <where>: $asm1
+            if ($asm1 =~ /^ld (bc|de|hl), %n$/) {
+                $asm1 =~ s/%n/%m/;
+                my $prog1 = $Opcodes{$asm1}{$cpu} or die;
+                $prog1 = $prog1->clone;
+                $prog1->word_to_byte_arg();
+                $prog->add($prog1);
+            }
+            else {
+                my $prog1 = $Opcodes{$asm1}{$cpu} or die;
+                $prog->add($prog1->clone);
+            }
+        }
+    };
+    if ($@) {   # failed
+        _remove_prog($asm);
+        return; # false
+    }
+    else {
+        return $prog; # true
+    }
+}
+
+sub do_compound {
+    our @compound_queue;
+    my %tried;
+    while (@compound_queue) {
+        my($cpu_, $ixiy_, $asm, @prog) = @{shift @compound_queue};
+        ($cpu, $ixiy) = ($cpu_, $ixiy_);
+        #dump $cpu_, $ixiy_, $asm, \@prog;
+        
+        my $prog = try_add_compound($asm, @prog);
+        if (!$prog) {
+            $tried{$asm}++;
+            die "not found: $asm: ",join(" \\ ",@prog),"\n" if $tried{$asm} > 2;
+            push @compound_queue, [$cpu_, $ixiy_, $asm, @prog];
+        }
+    }
 }
 
 #------------------------------------------------------------------------------
@@ -1696,7 +1838,8 @@ sub parse_code {
 	
 	# check for argument type
 	my($stmt, $extra_arg) = ("", "");
-
+    
+    ### <where> bytes: $bytes
 	if ($bytes =~ s/ %d %n$//) {
 		$stmt = "DO_stmt_idx_n";
 	}
@@ -1712,12 +1855,16 @@ sub parse_code {
 	elsif ($bytes =~ s/ %m %m$//) {
 		$stmt = "DO_stmt_nn";
 	}
+	elsif ($bytes =~ s/ %n 0$//) {
+		$stmt = "DO_stmt_n_0";
+	}
 	elsif ($bytes =~ s/ %j$//) {
 		$stmt = "DO_stmt_jr";
 	}
 	else {
 		$stmt = "DO_stmt";
 	}
+    ### <where> bytes: $bytes
 
 	# build statement - need to leave expressions for C compiler
 	my @bytes = split(' ', $bytes);
@@ -1736,6 +1883,7 @@ sub parse_code {
 		}
 		else {
 			push @expr, undef;
+            ### <where> expr: $_
 			$_ = eval($_); die "$cpu, $asm, @bytes, $_" if $@;
 			$_ = format_hex($_);
 		}
@@ -2164,7 +2312,7 @@ sub run_tests {
 								[" ld b, 2",	$Opcodes{"ld b, %n"}{$cpu}->clone(n => 2)],
 								[$test_asm, 	$prog_instance]);
 					}
-					elsif ($asm =~ /^(pi|cpir|cpd|cpdr)$/) {
+					elsif ($asm =~ /^(cpi|cpir|cpd|cpdr)$/) {
 						# BC = 1, carry cleared
 						run_test($ixiy, undef, 
 								[" ld bc, 1",	$Opcodes{"ld bc, %m"}{$cpu}->clone(m => 1)],

@@ -58,6 +58,12 @@
  adi -128                       ; C6 80
  adi 127                        ; C6 7F
  adi 255                        ; C6 FF
+ adi hl, -128                   ; 28 80
+ adi hl, 127                    ; 28 7F
+ adi hl, 255                    ; 28 FF
+ adi sp, -128                   ; 38 80
+ adi sp, 127                    ; 38 7F
+ adi sp, 255                    ; 38 FF
  ana a                          ; A7
  ana b                          ; A0
  ana c                          ; A1
@@ -420,6 +426,8 @@
  ld bc, -32768                  ; 01 00 80
  ld bc, 32767                   ; 01 FF 7F
  ld bc, 65535                   ; 01 FF FF
+ ld bc, de                      ; 42; 4B
+ ld bc, hl                      ; 44; 4D
  ld c, (hl)                     ; 4E
  ld c, -128                     ; 0E 80
  ld c, 127                      ; 0E 7F
@@ -445,6 +453,13 @@
  ld de, -32768                  ; 11 00 80
  ld de, 32767                   ; 11 FF 7F
  ld de, 65535                   ; 11 FF FF
+ ld de, bc                      ; 50; 59
+ ld de, hl+-128                 ; 28 80
+ ld de, hl+127                  ; 28 7F
+ ld de, hl+255                  ; 28 FF
+ ld de, sp+-128                 ; 38 80
+ ld de, sp+127                  ; 38 7F
+ ld de, sp+255                  ; 38 FF
  ld e, (hl)                     ; 5E
  ld e, -128                     ; 1E 80
  ld e, 127                      ; 1E 7F
@@ -474,6 +489,8 @@
  ld hl, -32768                  ; 21 00 80
  ld hl, 32767                   ; 21 FF 7F
  ld hl, 65535                   ; 21 FF FF
+ ld hl, bc                      ; 60; 69
+ ld hl, de                      ; 62; 6B
  ld l, (hl)                     ; 6E
  ld l, -128                     ; 2E 80
  ld l, 127                      ; 2E 7F
@@ -498,8 +515,14 @@
  ldax de                        ; 1A
  ldd                            ; CD @ldd
  lddr                           ; CD @lddr
+ ldhi -128                      ; 28 80
+ ldhi 127                       ; 28 7F
+ ldhi 255                       ; 28 FF
  ldi                            ; CD @ldi
  ldir                           ; CD @ldir
+ ldsi -128                      ; 38 80
+ ldsi 127                       ; 38 7F
+ ldsi 255                       ; 38 FF
  lhld -32768                    ; 2A 00 80
  lhld 32767                     ; 2A FF 7F
  lhld 65535                     ; 2A FF FF

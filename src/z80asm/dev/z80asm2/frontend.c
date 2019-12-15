@@ -901,7 +901,7 @@ static bool parse_bit8(int op) {
 }
 
 static bool parse_ld(int dummy) {
-	int r, r1, r2, rr, x, n, nn, dis;
+	int r, r1, r2, rr, x, x1, x2, n, nn, dis;
 	token_t* yy0 = yy;
 	if (REG8_X(&r1) && TK(',') && REG8_X(&r2) && EOS())			// LD r, r
 		return emit_ld_r_r(r1, r2);
@@ -968,8 +968,22 @@ static bool parse_ld(int dummy) {
 		return (
 			emit_ld_r_r(R_D, R_B) &&
 			emit_ld_r_r(R_E, R_C));
-	yy = yy0;
-	if (DE() && TK(',') && X(&x) && EOS())						// LD DE, HL/IX/IY
+    yy = yy0;
+    if (DE() && TK(',') && SP() && EOS())						// LD DE, SP
+        return (
+            emit_ex_de_hl() &&
+            emit_ld_rr_nn(RR_HL, 0) &&
+            emit_add_x_rr(RR_HL, RR_SP) &&
+            emit_ex_de_hl());
+    yy = yy0;
+    if (DE() && TK(',') && SP() && TK('+') && EXPR(&nn) && EOS())	// LD DE, SP+nn
+        return (
+            emit_ex_de_hl() &&
+            emit_ld_rr_nn(RR_HL, nn) &&
+            emit_add_x_rr(RR_HL, RR_SP) &&
+            emit_ex_de_hl());
+    yy = yy0;
+    if (DE() && TK(',') && X(&x) && EOS())						// LD DE, HL/IX/IY
 		return (
 			emit_ld_r_r(R_D, R_H | (x & IDX_MASK)) &&
 			emit_ld_r_r(R_E, R_L | (x & IDX_MASK)));
@@ -983,7 +997,13 @@ static bool parse_ld(int dummy) {
 		return (
 			emit_ld_r_r(R_H | (x & IDX_MASK), R_D) &&
 			emit_ld_r_r(R_L | (x & IDX_MASK), R_E));
-	syntax_error();
+    yy = yy0;
+    if (X(&x1) && TK(',') && X(&x2) && EOS())						// LD HL/IX/IY, HL/IX/IY
+        return (
+            emit_push_rr(x2) &&
+            emit_pop_rr(x1));
+    yy = yy0;
+    syntax_error();
 	return false;
 }
 

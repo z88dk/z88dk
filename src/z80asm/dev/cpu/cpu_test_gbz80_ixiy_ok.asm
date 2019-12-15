@@ -526,6 +526,9 @@
  ld de, 65535                   ; 11 FF FF
  ld de, bc                      ; 50 59
  ld de, hl                      ; 54 5D
+ ld de, sp                      ; E5 D5 E1 D1 21 00 00 39 E5 D5 E1 D1
+ ld de, sp+0                    ; E5 D5 E1 D1 21 00 00 39 E5 D5 E1 D1
+ ld de, sp+255                  ; E5 D5 E1 D1 21 FF 00 39 E5 D5 E1 D1
  ld e, (hl)                     ; 5E
  ld e, -128                     ; 1E 80
  ld e, 127                      ; 1E 7F

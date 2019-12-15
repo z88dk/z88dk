@@ -843,9 +843,6 @@
  ld de, hl+255                  ; Error
  ld de, ix                      ; Error
  ld de, iy                      ; Error
- ld de, sp                      ; Error
- ld de, sp+0                    ; Error
- ld de, sp+255                  ; Error
  ld e, ixh                      ; Error
  ld e, ixl                      ; Error
  ld e, iyh                      ; Error
@@ -857,6 +854,7 @@
  ld i, a                        ; Error
  ld ix, bc                      ; Error
  ld ix, de                      ; Error
+ ld ix, iy                      ; Error
  ld ixh, -128                   ; Error
  ld ixh, 127                    ; Error
  ld ixh, 255                    ; Error
@@ -879,6 +877,7 @@
  ld ixl, ixl                    ; Error
  ld iy, bc                      ; Error
  ld iy, de                      ; Error
+ ld iy, ix                      ; Error
  ld iyh, -128                   ; Error
  ld iyh, 127                    ; Error
  ld iyh, 255                    ; Error

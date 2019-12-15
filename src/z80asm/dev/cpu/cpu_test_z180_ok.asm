@@ -931,6 +931,9 @@
  ld de, 65535                   ; 11 FF FF
  ld de, bc                      ; 50 59
  ld de, hl                      ; 54 5D
+ ld de, sp                      ; EB 21 00 00 39 EB
+ ld de, sp+0                    ; EB 21 00 00 39 EB
+ ld de, sp+255                  ; EB 21 FF 00 39 EB
  ld e, (hl)                     ; 5E
  ld e, (ix)                     ; DD 5E 00
  ld e, (ix+127)                 ; DD 5E 7F

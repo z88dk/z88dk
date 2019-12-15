@@ -1,3 +1,9 @@
+ adi hl, -128                   ; Error
+ adi hl, 127                    ; Error
+ adi hl, 255                    ; Error
+ adi sp, -128                   ; Error
+ adi sp, 127                    ; Error
+ adi sp, 255                    ; Error
  djnz -32768                    ; Error
  djnz 32767                     ; Error
  djnz 65535                     ; Error
@@ -28,11 +34,20 @@
  ld a, (hl-)                    ; Error
  ld a, (hld)                    ; Error
  ld a, (hli)                    ; Error
+ ld de, hl+-128                 ; Error
+ ld de, hl+127                  ; Error
+ ld de, hl+255                  ; Error
  ld hl, (de)                    ; Error
  ldd (hl), a                    ; Error
  ldd a, (hl)                    ; Error
+ ldhi -128                      ; Error
+ ldhi 127                       ; Error
+ ldhi 255                       ; Error
  ldi (hl), a                    ; Error
  ldi a, (hl)                    ; Error
+ ldsi -128                      ; Error
+ ldsi 127                       ; Error
+ ldsi 255                       ; Error
  lhlde                          ; Error
  lhlx                           ; Error
  rim                            ; Error

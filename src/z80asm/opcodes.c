@@ -91,6 +91,14 @@ void add_opcode_n(int opcode, Expr *expr)
 	Pass2infoExpr(RANGE_BYTE_UNSIGNED, expr);
 }
 
+/* add opcode followed by 8-bit unsigned expression and a zero byte */
+void add_opcode_n_0(int opcode, struct Expr* expr)
+{
+    add_opcode(opcode);
+    Pass2infoExpr(RANGE_BYTE_UNSIGNED, expr);
+    add_opcode(0);
+}
+
 /* add opcode followed by 8-bit signed expression */
 void add_opcode_d(int opcode, Expr *expr)
 {
