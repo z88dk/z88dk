@@ -18,6 +18,8 @@
         SECTION code_clib
         PUBLIC    joystick
         PUBLIC    _joystick
+        EXTERN    l_push_di
+        EXTERN    l_pop_ei
 
         INCLUDE "target/tvc/def/tvc.def"
 
@@ -28,7 +30,7 @@
     ; L is 1 or 2
     ; 
     
-    di            ; let's not allow interrupt, port is written, read..
+    call l_push_di  ; let's not allow interrupt, port is written, read..
     ld   a,(PORT03)
     and  $c0        ; keep the proper expansion socket (upper 2 bits)
     add  a,$07
@@ -38,7 +40,7 @@
     ld   d,a        ; store in C
     ld   a,(PORT03) ; setting back the keyboard row port
     out  ($03),a
-    ei              ; port is set back, interrupt is OK now.
+    call l_pop_ei   ; port is set back, interrupt is OK now.
     ld   a,d
     ld   c,0
 

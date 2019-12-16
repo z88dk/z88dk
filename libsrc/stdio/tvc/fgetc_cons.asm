@@ -5,23 +5,23 @@
 ;
 ;   Enterprise 64/128 C Library
 ;
-;   Fputc_cons
+;   Fgetc_cons
 ;
 ;   Stefano Bodrato - 2011
 ;
 
     SECTION code_clib
-    PUBLIC  fputc_cons_native
+    PUBLIC  fgetc_cons
     INCLUDE "target/tvc/def/tvc.def"
 
 ;
-; Entry:        stack contains a char
+; Entry:        none
 ;
-.fputc_cons_native
-    ld      hl,2
-    add     hl,sp
-    ld      c,(hl)
+.fgetc_cons
+._fgetc_cons
     rst     $30
-    defb    ED_CHOUT ; editor - character out
+    defb    KBD_CHIN ; keyboard - character in
+    ld l,c
+    ld h,0
     ret
 
