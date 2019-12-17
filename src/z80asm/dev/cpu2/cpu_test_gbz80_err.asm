@@ -152,12 +152,21 @@
  indr                           ; Error
  ini                            ; Error
  inir                           ; Error
+ jk -32768                      ; Error
+ jk 32767                       ; Error
+ jk 65535                       ; Error
  jm -32768                      ; Error
  jm 32767                       ; Error
  jm 65535                       ; Error
+ jnk -32768                     ; Error
+ jnk 32767                      ; Error
+ jnk 65535                      ; Error
  jnv -32768                     ; Error
  jnv 32767                      ; Error
  jnv 65535                      ; Error
+ jnx5 -32768                    ; Error
+ jnx5 32767                     ; Error
+ jnx5 65535                     ; Error
  jp (ix)                        ; Error
  jp (iy)                        ; Error
  jp m, -32768                   ; Error
@@ -202,6 +211,9 @@
  jv -32768                      ; Error
  jv 32767                       ; Error
  jv 65535                       ; Error
+ jx5 -32768                     ; Error
+ jx5 32767                      ; Error
+ jx5 65535                      ; Error
  ld (-32768), bc                ; Error
  ld (-32768), de                ; Error
  ld (-32768), hl                ; Error
@@ -469,6 +481,7 @@
  out 255                        ; Error
  outd                           ; Error
  outi                           ; Error
+ ovrst8                         ; Error
  pop ix                         ; Error
  pop iy                         ; Error
  push ix                        ; Error
@@ -510,6 +523,7 @@
  rrc (iy)                       ; Error
  rrc (iy+-128)                  ; Error
  rrc (iy+127)                   ; Error
+ rstv                           ; Error
  rv                             ; Error
  sbc (ix)                       ; Error
  sbc (ix+-128)                  ; Error

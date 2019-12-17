@@ -251,11 +251,32 @@ sub T::to_string {
 		return ::B(@bytes);
 	}
 
-    sub word_to_byte_arg {
+    sub word_to_unsigned_byte_arg {
 		my($self) = @_;
         $self->{_asm} =~ s/%m/%n/;
         for (@{$self->_bytes}) { s/%m/%n/ and last; }
         for (@{$self->_bytes}) { s/%m/0/ and last; }
+    }
+    
+    sub word_to_signed_byte_arg {
+		my($self) = @_;
+        $self->{_asm} =~ s/%m/%n/;
+        for (@{$self->_bytes}) { s/%m/%s/ and last; }
+        for (@{$self->_bytes}) { s/%m/0/ and last; }
+    }
+    
+    sub instanciate {
+        my($self, %args) = @_;
+
+		while (my($k, $v) = each %args) {
+			if ($k eq 'm') {
+				array_replace_first($self->_bytes, "%$k", $v & 0xff, "%$k", ($v>>8) & 0xff);
+			}
+			else {
+				array_replace_first($self->_bytes, "%$k", $v & 0xff);
+			}
+            $self->{_asm} =~ s/%$k/$v/;
+		}
     }
     
 	sub size {
@@ -332,10 +353,24 @@ sub T::to_string {
 		return \@bytes;
 	}
 
-    sub word_to_byte_arg {
+    sub word_to_unsigned_byte_arg {
 		my($self) = @_;
 		for my $instr (@{$self->prog}) {
-			$instr->word_to_byte_arg();
+			$instr->word_to_unsigned_byte_arg();
+		}
+    }
+    
+    sub word_to_signed_byte_arg {
+		my($self) = @_;
+		for my $instr (@{$self->prog}) {
+			$instr->word_to_signed_byte_arg();
+		}
+    }
+    
+    sub instanciate {
+        my($self, %args) = @_;
+		for my $instr (@{$self->prog}) {
+			$instr->instanciate(%args);
 		}
     }
     
@@ -635,17 +670,37 @@ sub init_opcodes {
             add_compound("ld iy, ix"    => "push ix", "pop iy");
         }
         
-        # Add 00bb immediate to SP, result to DE (undocumented i8085)
+        # Add unsigned immediate byte to SP, result to DE (undocumented i8085)
 		if (is8085) {
 			add("ldsi %n",		B(0x38, '%n'), T(10));
 			add("adi sp, %n",	B(0x38, '%n'), T(10));
+
 			add("ld de, sp+%n",	B(0x38, '%n'), T(10));
+			add("ld de, sp",	B(0x38, 0),    T(10));
         }
         else {
             add_compound("ld de, sp+%n" =>  "ex de, hl",
                                             "ld hl, %n",
                                             "add hl, sp",
                                             "ex de, hl");
+            add_compound("ld de, sp" =>     "ex de, hl",
+                                            "ld hl, 0",
+                                            "add hl, sp",
+                                            "ex de, hl");
+        }
+
+        # Add signed immediate byte to SP, result to HL (gbz80)
+		if (isgbz80) {
+			add("ldhl sp, %s", 	B(0xf8, '%s'), T(12));
+
+			add("ld hl, sp+%s", B(0xf8, '%s'), T(12));
+			add("ld hl, sp",    B(0xf8, 0),    T(12));
+		}
+        else {
+            add_compound("ld hl, sp+%s" =>  "ld hl, %s",
+                                            "add hl, sp");
+            add_compound("ld hl, sp" =>     "ld hl, 0",
+                                            "add hl, sp");
         }
 
 		#----------------------------------------------------------------------
@@ -1098,6 +1153,12 @@ sub init_opcodes {
 		# rst
 		add("rst %c", 		B(0xc7."+%c"), is8085 ? T(12) : isgbz80 ? T(32) : T(11));
 
+		if (is8085) {
+			# Restart 8 (0040) if V flag is set
+			add("rstv",		B(0xcb), T(6,12));
+			add("ovrst8",	B(0xcb), T(6,12));
+		}
+
 		#----------------------------------------------------------------------
 		# Jump Group
 		#----------------------------------------------------------------------
@@ -1155,6 +1216,16 @@ sub init_opcodes {
 			add("djnz %j",			B(0x10, '%j'), T(8,13));
 			add("djnz b, %j",		B(0x10, '%j'), T(8,13));
 		}
+        
+		if (is8085) {
+			# Jump on flag X5/K is reset
+			add("jnx5 %m",		    B(0xdd, '%m', '%m'), T(7,10));
+			add("jnk %m",		    B(0xdd, '%m', '%m'), T(7,10));
+
+			# Jump on flag X5/K is set
+			add("jx5 %m",		    B(0xfd, '%m', '%m'), T(7,10));
+			add("jk %m",		    B(0xfd, '%m', '%m'), T(7,10));
+		}
 
 		#----------------------------------------------------------------------
 		# Input and Output Group
@@ -1176,6 +1247,20 @@ sub init_opcodes {
 			for my $r (qw( b c d e h l f a )) {
 				add("in $r, (c)", 	B(0xed, 0x40+R($r)*8), T(12));
 			}
+		}
+
+        # gbz80 input/output
+		if (isgbz80) {
+			add("ldh (%n), a", 	B(0xe0, '%n'), T(12));
+			add("ldh a, (%n)", 	B(0xf0, '%n'), T(12));
+			
+			# TODO: accept ld ($FF00+n), a; ld a, ($FF00+n)
+			
+			add("ld  (c), a", 	B(0xe2), T(8));
+			add("ldh (c), a", 	B(0xe2), T(8));
+
+			add("ld  a, (c)", 	B(0xf2), T(8));
+			add("ldh a, (c)", 	B(0xf2), T(8));
 		}
 		
 		# ini/inir/ind/indr
@@ -1242,49 +1327,14 @@ next unless isintel || isgbz80;
 next;
 
 		#----------------------------------------------------------------------
-		# 8085 opcodes
-		#----------------------------------------------------------------------
-        
-        
-		if (is8085) {
-			# Restart 8 (0040) if V flag is set
-			add("rstv",			0xcb, [6,12]);
-			add("ovrst8",		0xcb, [6,12]);
-		}
-		
-		if (is8085) {
-			# Jump on flag X5/K is reset
-			add("jnx5 %m",		[0xdd, '%m', '%m'], [7,10]);
-			add("jnk %m",		[0xdd, '%m', '%m'], [7,10]);
-
-			# Jump on flag X5/K is set
-			add("jx5 %m",		[0xfd, '%m', '%m'], [7,10]);
-			add("jk %m",		[0xfd, '%m', '%m'], [7,10]);
-		}
-
-		#----------------------------------------------------------------------
 		# Game Boy opcodes
 		#----------------------------------------------------------------------
-		if (isgbz80) {
-			add("ldh (%n), a", 	[0xe0, '%n'], 12);
-			add("ldh a, (%n)", 	[0xf0, '%n'], 12);
-			
-			# TODO: accept ld ($FF00+n), a; ld a, ($FF00+n)
-			
-			add("ld  (c), a", 	0xe2, 8);
-			add("ldh (c), a", 	0xe2, 8);
-
-			add("ld  a, (c)", 	0xf2, 8);
-			add("ldh a, (c)", 	0xf2, 8);
-		}
 		
 		
 		if (isgbz80) {
 			add("add sp, %s", 	[0xe8, '%s'], 16);
-			
-			add("ld hl, sp+%s", [0xf8, '%s'], 12);
-			add("ldhl sp, %s", 	[0xf8, '%s'], 12);
-		}
+        }
+        
 		
 			
 		if (isgbz80) {
@@ -1461,7 +1511,22 @@ sub try_add_compound {
                 $asm1 =~ s/%n/%m/;
                 my $prog1 = $Opcodes{$asm1}{$cpu} or die;
                 $prog1 = $prog1->clone;
-                $prog1->word_to_byte_arg();
+                $prog1->word_to_unsigned_byte_arg();
+                $prog->add($prog1);
+            }
+            elsif ($asm1 =~ /^ld (bc|de|hl), %s$/) {
+                $asm1 =~ s/%s/%m/;
+                my $prog1 = $Opcodes{$asm1}{$cpu} or die;
+                $prog1 = $prog1->clone;
+                $prog1->word_to_signed_byte_arg();
+                $prog->add($prog1);
+            }
+            elsif ($asm1 =~ /^ld (bc|de|hl), (\d+)$/) {
+                my $m = $2;
+                $asm1 =~ s/$m/%m/; 
+                my $prog1 = $Opcodes{$asm1}{$cpu} or die;
+                $prog1 = $prog1->clone;
+                $prog1->instanciate(m => $m);
                 $prog->add($prog1);
             }
             else {
@@ -1857,6 +1922,9 @@ sub parse_code {
 	}
 	elsif ($bytes =~ s/ %n 0$//) {
 		$stmt = "DO_stmt_n_0";
+	}
+	elsif ($bytes =~ s/ %s 0$//) {
+		$stmt = "DO_stmt_s_0";
 	}
 	elsif ($bytes =~ s/ %j$//) {
 		$stmt = "DO_stmt_jr";

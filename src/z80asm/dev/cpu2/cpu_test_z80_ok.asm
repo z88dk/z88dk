@@ -674,6 +674,7 @@
  ld de, hl                      ; 54; 5D
  ld de, ix                      ; DD 54; DD 5D
  ld de, iy                      ; FD 54; FD 5D
+ ld de, sp                      ; EB; 21 00 00; 39; EB
  ld de, sp+-128                 ; EB; 21 80 00; 39; EB
  ld de, sp+127                  ; EB; 21 7F 00; 39; EB
  ld de, sp+255                  ; EB; 21 FF 00; 39; EB
@@ -725,6 +726,9 @@
  ld hl, de                      ; 62; 6B
  ld hl, ix                      ; DD E5; E1
  ld hl, iy                      ; FD E5; E1
+ ld hl, sp                      ; 21 00 00; 39
+ ld hl, sp+-128                 ; 21 80 00; 39
+ ld hl, sp+127                  ; 21 7F 00; 39
  ld i, a                        ; ED 47
  ld ix, (-32768)                ; DD 2A 00 80
  ld ix, (32767)                 ; DD 2A FF 7F

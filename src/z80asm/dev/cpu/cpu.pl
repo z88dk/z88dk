@@ -530,11 +530,20 @@ for my $cpu (@CPUS) {
 	}
 	
 	if ($gameboy) {
+		add_opc_final($cpu, "ldhl sp, %s",  0xF8, '%s');
+		add_opc_final($cpu, "ld hl, sp", 	0xF8, 0);
+		add_opc_final($cpu, "ld hl, sp+%s", 0xF8, '%s');
+    }
+    else {
+		add_opc_final($cpu, "ld hl, sp",	0x21, 0, 0,         # ld hl, %n
+                                            0x39);              # add hl, sp
+		add_opc_final($cpu, "ld hl, sp+%s",	0x21, '%s', 0,      # ld hl, %s
+                                            0x39);              # add hl, sp
+    }
+    
+	if ($gameboy) {
 		add_opc($cpu, "add sp, %s", 0xE8, '%s');
-		
-		add_opc($cpu, "ld hl, sp+%s", 	0xF8, '%s');
-		add_opc($cpu, "ldhl sp, %s", 	0xF8, '%s');
-		
+				
 		add_opc($cpu, "ld (%m), sp", 0x08, '%m', '%m');
 	}
 
@@ -1826,11 +1835,10 @@ sub parse_code {
 		$stmt = "DO_stmt_nn";
 	}
 	elsif ($bin =~ s/ %u 0$//) {
-		push @code, 
-			"DO_STMT_LABEL();",
-			"DO_stmt_n(0x".fmthex($bin[0])."); DO_stmt(0);";
-		my $code = join("\n", @code);
-		return $code;
+		$stmt = "DO_stmt_n_0";
+	}
+	elsif ($bin =~ s/ %s 0$//) {
+		$stmt = "DO_stmt_s_0";
 	}
 	elsif ($bin =~ s/ %M %M$//) {
 		$stmt = "DO_stmt_NN";
@@ -2010,7 +2018,17 @@ sub extract_common {
 sub add_tests {
 	my($cpu, $asm, $bin) = @_;
 
-	if ($asm =~ /%s/) {
+	if ($bin =~ /%s 0/) {
+        ### <where>: $cpu, $asm, $bin
+		add_tests($cpu, replace($asm, '%s',  127), replace($bin, '%s 0', "127 0"));
+		add_tests($cpu, replace($asm, '%s', -128), replace($bin, '%s 0', "128 255"));
+	}
+	elsif ($bin =~ /%u 0/) {
+        ### <where>: $cpu, $asm, $bin
+		add_tests($cpu, replace($asm, '%u',  255), replace($bin, '%u 0', "255 0"));
+		add_tests($cpu, replace($asm, '%u',  0),   replace($bin, '%u 0', "0 0"));
+	}
+	elsif ($asm =~ /%s/) {
 		add_tests($cpu, replace($asm, '%s', 127), replace($bin, '%s', 0x7F));
 		add_tests($cpu, replace($asm, '%s', -128), replace($bin, '%s', 0x80));
 	}

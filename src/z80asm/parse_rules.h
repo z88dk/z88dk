@@ -75378,8 +75378,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xE5); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD5); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE1); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD1); } while(0);
-asm_cond_LABEL(stmt_label);
-do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0x21), expr); } while(0); do { asm_cond_LABEL(stmt_label); add_opcode(0); } while(0);
+do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n_0((0x21), expr); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x39); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE5); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD5); } while(0);
@@ -75388,8 +75387,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xD1); } while(0);
 break;
 case CPU_8080: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xEB); } while(0);
-asm_cond_LABEL(stmt_label);
-do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0x21), expr); } while(0); do { asm_cond_LABEL(stmt_label); add_opcode(0); } while(0);
+do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n_0((0x21), expr); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x39); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xEB); } while(0);
 break;
@@ -76049,6 +76047,10 @@ default: error_illegal_ident(); }
 	case 2995:
 	{
 switch (opts.cpu) {
+case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+do { asm_cond_LABEL(stmt_label); add_opcode(0x210000); } while(0);
+do { asm_cond_LABEL(stmt_label); add_opcode(0x39); } while(0);
+break;
 case CPU_GBZ80:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xF800); } while(0);
 break;
@@ -76061,6 +76063,11 @@ switch (opts.cpu) {
 case CPU_GBZ80:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_d((0xF8), expr); } while(0);
+break;
+case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+if (expr_in_parens) warn_expr_in_parens();
+do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_s_0((0x21), expr); } while(0);
+do { asm_cond_LABEL(stmt_label); add_opcode(0x39); } while(0);
 break;
 default: error_illegal_ident(); }
 }

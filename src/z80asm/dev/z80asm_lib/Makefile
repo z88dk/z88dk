@@ -43,4 +43,4 @@ clean::
 	$(RM) $(SRC:.asm=.o) $(SRC:.asm=.lis) test.asm test.o test.bin
 
 test: all
-	prove t/*.t
+	perl -S prove t/*.t

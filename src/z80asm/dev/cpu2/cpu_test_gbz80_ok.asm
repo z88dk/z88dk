@@ -300,6 +300,7 @@
  ld (65535), a                  ; EA FF FF
  ld (65535), sp                 ; 08 FF FF
  ld (bc), a                     ; 02
+ ld (c), a                      ; E2
  ld (de), a                     ; 12
  ld (hl), -128                  ; 36 80
  ld (hl), 127                   ; 36 7F
@@ -319,6 +320,7 @@
  ld a, (32767)                  ; FA FF 7F
  ld a, (65535)                  ; FA FF FF
  ld a, (bc)                     ; 0A
+ ld a, (c)                      ; F2
  ld a, (de)                     ; 1A
  ld a, (hl)                     ; 7E
  ld a, (hl+)                    ; 2A
@@ -378,6 +380,7 @@
  ld de, 65535                   ; 11 FF FF
  ld de, bc                      ; 50; 59
  ld de, hl                      ; 54; 5D
+ ld de, sp                      ; E5; D5; E1; D1; 21 00 00; 39; E5; D5; E1; D1
  ld de, sp+-128                 ; E5; D5; E1; D1; 21 80 00; 39; E5; D5; E1; D1
  ld de, sp+127                  ; E5; D5; E1; D1; 21 7F 00; 39; E5; D5; E1; D1
  ld de, sp+255                  ; E5; D5; E1; D1; 21 FF 00; 39; E5; D5; E1; D1
@@ -408,6 +411,9 @@
  ld hl, 65535                   ; 21 FF FF
  ld hl, bc                      ; 60; 69
  ld hl, de                      ; 62; 6B
+ ld hl, sp                      ; F8 00
+ ld hl, sp+-128                 ; F8 80
+ ld hl, sp+127                  ; F8 7F
  ld l, (hl)                     ; 6E
  ld l, -128                     ; 2E 80
  ld l, 127                      ; 2E 7F
@@ -434,6 +440,16 @@
  ldd (hl), a                    ; 32
  ldd a, (hl)                    ; 3A
  lddr                           ; CD @lddr
+ ldh (-128), a                  ; E0 80
+ ldh (127), a                   ; E0 7F
+ ldh (255), a                   ; E0 FF
+ ldh (c), a                     ; E2
+ ldh a, (-128)                  ; F0 80
+ ldh a, (127)                   ; F0 7F
+ ldh a, (255)                   ; F0 FF
+ ldh a, (c)                     ; F2
+ ldhl sp, -128                  ; F8 80
+ ldhl sp, 127                   ; F8 7F
  ldi                            ; CD @ldi
  ldi (hl), a                    ; 22
  ldi a, (hl)                    ; 2A
