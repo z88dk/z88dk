@@ -16,7 +16,7 @@ EXTERN ide_write_byte
 ; Routines that talk with the IDE drive, these should be called by
 ; the main program.
 
-; tell the drive to imediately idle
+; tell the drive to immediately idle
 
 ide_idle:
     push af

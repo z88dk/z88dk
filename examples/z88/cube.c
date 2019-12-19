@@ -36,9 +36,9 @@ void main()
 /* Next line not needed */
 /*        mx=MAX_X2; my=MAX_Y2; */
 
-    win->graph=1;
-    win->width=255;
-    win->number='4';
+    win.graph=1;
+    win.width=255;
+    win.number='4';
 
         /* Open map with width 256 on window #4 */
     window(&win);

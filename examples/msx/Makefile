@@ -35,15 +35,17 @@ ifeq ($(COMPILER),sdcc)
    CFLAGS += -compiler=sdcc  -SO3 --max-allocs-per-node200000 --fsigned-char 
 all: ex1.cas ex1b.cas ex2.cas ex3.cas ex6.cas ex7.cas ex10.cas ex10b.cas vpoke.cas vtstone.cas
 else
-all: $(EXECFILES) EX8.COM ADVA.COM dstar.cas microman.cas othello.cas wall.cas globe.cas snakes.cas vtstone.cas
+all: $(EXECFILES) EX8.COM ADVA.COM dstar.cas microman.cas othello.cas wall.cas globe.cas snakes.cas vtstone.cas psgtest.cas
 endif
-
 
 EX8.COM: ex8.c
 	$(CC) +msx -vn -subtype=msxdos -create-app -oex8 ex8.c -lmsxbios
 
 ADVA.COM: ../console/adv_a.c
 	$(CC) +msx -vn -subtype=msxdos ../console/adv_a.c -I../console -DCOMPUTE_SCORE -DPICS -DDISK -create-app -clib=ansi -oadva.bin
+
+ex4.cas: ex4.c
+	$(CC) $(CFLAGS) -oex4.bin ex4.c -lmsxbios
 
 ex6.cas: ex6.c
 	$(CC) $(CFLAGS) -oex6.bin ex6.c -lmsxbios
@@ -82,6 +84,9 @@ snakes.cas: ../graphics/snakes.c
 	
 vtstone.cas: ../console/vtstone.c
 	$(CC) $(CFLAGS) ../console/vtstone.c -I../console -clib=ansi -pragma-define:ansicolumns=80 -create-app -ovtstone.bin
+
+psgtest.cas: ../sound/psgtest.c
+	$(CC) $(CFLAGS) ../sound/psgtest.c -DNODELAY -create-app -opsgtest.bin
 
 
 clean:

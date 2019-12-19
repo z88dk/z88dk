@@ -1,0 +1,5 @@
+target/scz180/driver/terminal/rc_01_input_asci1
+target/scz180/driver/terminal/rc_01_input_asci1/rc_01_input_asci1_iterm_msg_getc
+target/scz180/driver/terminal/rc_01_input_asci1/rc_01_input_asci1_iterm_msg_interrupt
+target/scz180/driver/terminal/rc_01_input_asci1/rc_01_input_asci1_iterm_msg_reject
+target/scz180/driver/terminal/rc_01_input_asci1/rc_01_input_asci1_stdio_msg_flsh

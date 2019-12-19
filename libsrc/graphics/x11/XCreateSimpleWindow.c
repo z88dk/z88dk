@@ -143,12 +143,12 @@ bksave(x,y,win->back);
 #else
 
 	if (border_width >= 1)
-	    mywin->full_width = width;
+	    mywin.full_width = width;
 
 	if (border_width > 3)
 	//if ((win->flags & WIN_SHADOW) > 0)
 	  {
-	    mywin->full_width = width + 4;
+	    mywin.full_width = width + 4;
 	    for (_X_int1=1; _X_int1<4; _X_int1++)
 	  	drawb (x+4,y+4,width-_X_int1,height-_X_int1);
 	  }
@@ -166,13 +166,13 @@ bksave(x,y,win->back);
 	//_X_int1=y + mywin->y_offset + 10;
 	draw(x, y+TITLE_AREA, x + width, y+TITLE_AREA);
 
-	mywin->x = x;
-	mywin->y = y;
-	mywin->width = width-4;
-	mywin->height = height-TITLE_AREA-4;
-	mywin->a_x = x+2;
-	mywin->a_y = y+TITLE_AREA+2;
-	mywin->full_height = height;
+	mywin.x = x;
+	mywin.y = y;
+	mywin.width = width-4;
+	mywin.height = height-TITLE_AREA-4;
+	mywin.a_x = x+2;
+	mywin.a_y = y+TITLE_AREA+2;
+	mywin.full_height = height;
 
 	
 	return mywin;

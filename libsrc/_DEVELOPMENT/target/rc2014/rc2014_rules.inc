@@ -29,7 +29,7 @@
    ENDIF
 
    IFNDEF TTY_ITERM_TERMINAL_FLAGS
-      defc TTY_ITERM_TERMINAL_FLAGS = 0x0130
+      defc TTY_ITERM_TERMINAL_FLAGS = 0x01b0
    ENDIF
 
    ; buffer size must be available to m4 (requires special case in zcc)

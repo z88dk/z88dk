@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.9.1 #11310 (Linux)
+; Version 3.9.5 #11479 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -292,7 +292,6 @@ _m32_sinf:
 	push	de
 	ld	hl,0x0000
 	push	hl
-	ld	hl,0x0000
 	push	hl
 	push	de
 	push	bc
@@ -306,11 +305,13 @@ _m32_sinf:
 	xor	a,0x80
 	ld	d, a
 	ld	(ix-6),0x02
-	ld	(ix-5),0x00
+	xor	a, a
+	ld	(ix-5),a
 	jr	l_m32_sinf_00103
 l_m32_sinf_00102:
-	ld	(ix-6),0x00
-	ld	(ix-5),0x00
+	xor	a, a
+	ld	(ix-6),a
+	ld	(ix-5),a
 l_m32_sinf_00103:
 	push	de
 	push	bc

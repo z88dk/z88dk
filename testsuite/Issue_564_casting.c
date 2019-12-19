@@ -14,7 +14,7 @@ void value(int v);
 
 long func3(Item *item)
 {
-   return (long)item->_character->_x;
+   return (long)item->_character._x;
 
 }
 void func2(int val)
@@ -37,5 +37,5 @@ void func4()
 
 long func5()
 {
-   return (long)item._character->_x;
+   return (long)item._character._x;
 }

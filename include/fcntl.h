@@ -83,11 +83,11 @@ extern unsigned int   RND_BLOCKSIZE;
 struct RND_FILE {
 	char    name_prefix;   /* block name, including prefix char */
 	char    name[15];         /* file name */
-	u16_t	blocksize;
+	i16_t	blocksize;
 	unsigned char *blockptr;
 	long    size;             /* file size */
 	long    position;         /* current position in file */
-	u16_t	pos_in_block;
+	i16_t	pos_in_block;
 	mode_t  mode;
 };
 

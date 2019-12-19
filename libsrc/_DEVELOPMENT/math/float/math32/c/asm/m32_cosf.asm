@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.9.1 #11310 (Linux)
+; Version 3.9.5 #11479 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -278,14 +278,12 @@ ENDIF
 ; Function m32_cosf
 ; ---------------------------------
 _m32_cosf:
-	ld	c, l
-	ld	b, h
-	ld	hl,0x3fc9
-	push	hl
-	ld	hl,0x0fdb
-	push	hl
-	push	de
+	ld	bc,0x3fc9
 	push	bc
+	ld	bc,0x0fdb
+	push	bc
+	push	de
+	push	hl
 	call	___fsadd_callee
 	jp  _m32_sinf
 	SECTION IGNORE

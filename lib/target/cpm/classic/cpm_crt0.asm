@@ -264,7 +264,7 @@ defltdsk:       defb    0	;Default disc
 
 IF !DEFINED_nofileio
 		PUBLIC	__fcb
-__fcb:		defs	420,0	;file control block (10 files) (MAXFILE)
+__fcb:		defs	430,0	;file control block (10 files) (MAXFILE)
 ENDIF
 
 

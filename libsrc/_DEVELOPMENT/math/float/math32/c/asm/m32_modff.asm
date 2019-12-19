@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.9.1 #11310 (Linux)
+; Version 3.9.5 #11479 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -281,11 +281,9 @@ _m32_modff:
 	push	ix
 	ld	ix,0
 	add	ix,sp
-	push	af
-	ld	a,(ix+8)
-	ld	(ix-2),a
-	ld	a,(ix+9)
-	ld	(ix-1),a
+	ld	l,(ix+8)
+	ld	h,(ix+9)
+	push	hl
 	ld	l,(ix+6)
 	ld	h,(ix+7)
 	push	hl

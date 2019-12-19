@@ -32,7 +32,7 @@ int open(char *name, int flags, mode_t mode)
     if ( ( fc = getfcb() ) == NULL ) {
         return -1;
     }
-
+	
     if ( setfcb(fc,name) == 0 ) {  /* We had a real file, not a device */
         if ( (flags & O_RDONLY) && bdos(CPM_VERS,0) >= 0x30 )
             fc->name[5] |= 0x80;    /* read only mode */
@@ -40,7 +40,7 @@ int open(char *name, int flags, mode_t mode)
         setuid(fc->uid);
         if ( (flags & O_TRUNC) == O_TRUNC)
             remove(name);
-
+		
         if ( bdos(CPM_OPN,fc) == -1 ) {
             clearfcb(fc);
             setuid(uid);
@@ -58,6 +58,11 @@ int open(char *name, int flags, mode_t mode)
         setuid(uid);
         fc->use = (flags + 1 ) & 0xff;
     }
+	
+	/* we keep an extra byte in the FCB struct to support random access,
+	   but at the moment we use only a "TEXT/BINARY" discrimintation flag */
+	fc->mode = mode & _IOTEXT;
+
     fd =  (fc - &_fcb[0]);
     if (flags & O_APPEND)
         lseek(fd,0L,SEEK_END);

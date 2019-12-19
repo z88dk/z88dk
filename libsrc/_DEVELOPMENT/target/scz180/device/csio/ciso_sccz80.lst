@@ -1,0 +1,11 @@
+
+target/scz180/device/csio/sccz80/csio_sd_clock
+target/scz180/device/csio/sccz80/csio_sd_cs_lower
+target/scz180/device/csio/sccz80/csio_sd_cs_raise
+
+target/scz180/device/csio/sccz80/csio_sd_read_block
+target/scz180/device/csio/sccz80/csio_sd_write_block
+target/scz180/device/csio/sccz80/csio_sd_read_byte
+target/scz180/device/csio/sccz80/csio_sd_write_byte
+
+@target/scz180/device/csio/csio_asm.lst

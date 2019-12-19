@@ -27,8 +27,12 @@
 
 	defc	CRT_ORG_CODE = 0xb000
 
-	defc	CONSOLE_ROWS = 25
+	defc	CONSOLE_ROWS = 24
 	defc	CONSOLE_COLUMNS = 40
+	PUBLIC	GRAPHICS_CHAR_SET
+	PUBLIC	GRAPHICS_CHAR_UNSET
+	defc	GRAPHICS_CHAR_SET = 0x87
+	defc	GRAPHICS_CHAR_UNSET = 0x32
 
 	defc	CRT_KEY_DEL = 8
 
@@ -37,6 +41,8 @@
         defc    TAR__register_sp = -1
 	defc	__CPU_CLOCK = 4000000 
         INCLUDE "crt/classic/crt_rules.inc"
+
+	INCLUDE "target/fp1100/def/fp1100.def"
 	
         org     CRT_ORG_CODE
 	jp	start
@@ -56,6 +62,8 @@ start:
 	IF DEFINED_USING_amalloc
 		INCLUDE "crt/classic/crt_init_amalloc.asm"
 	ENDIF
+	ld	a,SUB_BEEPOFF
+	call	TRNC1
 
 
         call    _main           ; Call user program

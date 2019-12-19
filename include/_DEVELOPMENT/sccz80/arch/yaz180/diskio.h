@@ -7,7 +7,6 @@
 
 #include <arch.h>
 #include <stdint.h>
-#include <stddef.h>
 
 /*
  * Disk Status Bits DSTATUS (uint8_t)
@@ -60,25 +59,7 @@
 #define CT_SDC				(CT_SD1|CT_SD2)	/* SD */
 #define CT_BLOCK			0x08		/* Block addressing */
 
-#ifndef FF_INTEGER // FF_INTEGER found in FatFS integer.h
 
-/* These types MUST be 16-bit or 32-bit */
-typedef int16_t         INT;
-typedef uint16_t    	UINT;
-
-/* This type MUST be 8-bit */
-typedef uint8_t     	BYTE;
-
-/* These types MUST be 16-bit */
-typedef int16_t			SHORT;
-typedef uint16_t    	WORD;
-typedef uint16_t    	WCHAR;
-
-/* These types MUST be 32-bit */
-typedef int32_t			LONG;
-typedef uint32_t    	DWORD;
-
-#endif
 
 /* Status of Disk Functions */
 typedef BYTE DSTATUS;
@@ -93,7 +74,7 @@ typedef enum {
 } DRESULT;
 
 //
-// DISK COMMANDS
+// IDE DISK COMMANDS
 //
 
 extern DSTATUS __LIB__ disk_initialize(BYTE pdrv) __smallc __z88dk_fastcall;

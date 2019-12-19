@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.9.1 #11310 (Linux)
+; Version 3.9.5 #11479 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -353,16 +353,13 @@ l_m32_roundf_00141:
 	jp	NC, l_m32_roundf_00112
 	bit	7,(ix-11)
 	jr	Z,l_m32_roundf_00106
-	ld	c,0x00
-	ld	b,0x00
+	ld	bc,0x0000
 	ld	e,0x00
 	ld	a,(ix-13)
 	and	a,0x80
 	ld	d, a
 	ld	a,(ix-12)
-	inc	a
-	jp	NZ,l_m32_roundf_00113
-	ld	a,(ix-11)
+	and	a,(ix-11)
 	inc	a
 	jp	NZ,l_m32_roundf_00113
 	set	7, e
@@ -371,11 +368,11 @@ l_m32_roundf_00141:
 	ld	d, a
 	jp	l_m32_roundf_00113
 l_m32_roundf_00106:
-	ld	a,(ix-12)
 	ld	(ix-4),0xff
 	ld	(ix-3),0xff
 	ld	(ix-2),0x7f
-	ld	(ix-1),0x00
+	xor	a, a
+	ld	(ix-1),a
 	inc	a
 	jr	l_m32_roundf_00146
 l_m32_roundf_00145:
@@ -394,8 +391,9 @@ l_m32_roundf_00146:
 	ld	(ix-8),a
 	ld	a,(ix-9)
 	ld	(ix-7),a
-	ld	(ix-6),0x00
-	ld	(ix-5),0x00
+	xor	a, a
+	ld	(ix-6),a
+	ld	(ix-5),a
 	ld	a,(ix-16)
 	and	a,(ix-8)
 	ld	(ix-4),a
@@ -418,10 +416,9 @@ l_m32_roundf_00146:
 l_m32_roundf_00104:
 	ld	b,(ix-12)
 	ld	c,0x00
-	ld	e,0x00
-	ld	l,0x40
-	ld	h,0x00
+	ld	e,c
 	inc	b
+	ld	hl,0x0040
 	jr	l_m32_roundf_00148
 l_m32_roundf_00147:
 	sra	h
@@ -442,18 +439,16 @@ l_m32_roundf_00148:
 	ld	a,(ix-13)
 	adc	a, h
 	ld	d, a
-	ld	(ix-4),c
-	ld	(ix-3),b
-	ld	(ix-2),e
-	ld	(ix-1),d
 	ld	a,(ix-10)
 	cpl
-	ld	c, a
+	ld	l, a
 	ld	a,(ix-9)
 	cpl
-	ld	b, a
-	ld	e,0x00
-	ld	d,0x00
+	ld	(ix-4),l
+	ld	(ix-3),a
+	xor	a, a
+	ld	(ix-2),a
+	ld	(ix-1),a
 	ld	a, c
 	and	a,(ix-4)
 	ld	c, a
