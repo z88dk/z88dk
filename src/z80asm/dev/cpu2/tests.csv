@@ -697,6 +697,10 @@ add m             |z80  |-    |86                                          |    
 add m             |z80  |IXIY |86                                          |      7 T
 add m             |z80n |-    |86                                          |      7 T
 add m             |z80n |IXIY |86                                          |      7 T
+add sp, -128      |gbz80|-    |E8 80                                       |     16 T
+add sp, -128      |gbz80|IXIY |E8 80                                       |     16 T
+add sp, 127       |gbz80|-    |E8 7F                                       |     16 T
+add sp, 127       |gbz80|IXIY |E8 7F                                       |     16 T
 adi -128          |8080 |-    |C6 80                                       |      7 T
 adi -128          |8080 |IXIY |C6 80                                       |      7 T
 adi -128          |8085 |-    |C6 80                                       |      7 T
@@ -4883,6 +4887,12 @@ ld bc, -32768     |8085 |-    |01 00 80                                    |    
 ld bc, -32768     |8085 |IXIY |01 00 80                                    |     10 T
 ld bc, -32768     |gbz80|-    |01 00 80                                    |     12 T
 ld bc, -32768     |gbz80|IXIY |01 00 80                                    |     12 T
+ld bc, -32768     |r2k  |-    |01 00 80                                    |      6 T
+ld bc, -32768     |r2k  |IXIY |01 00 80                                    |      6 T
+ld bc, -32768     |r3k  |-    |01 00 80                                    |      6 T
+ld bc, -32768     |r3k  |IXIY |01 00 80                                    |      6 T
+ld bc, -32768     |z180 |-    |01 00 80                                    |      9 T
+ld bc, -32768     |z180 |IXIY |01 00 80                                    |      9 T
 ld bc, -32768     |z80  |-    |01 00 80                                    |     10 T
 ld bc, -32768     |z80  |IXIY |01 00 80                                    |     10 T
 ld bc, -32768     |z80n |-    |01 00 80                                    |     10 T
@@ -4893,6 +4903,12 @@ ld bc, 32767      |8085 |-    |01 FF 7F                                    |    
 ld bc, 32767      |8085 |IXIY |01 FF 7F                                    |     10 T
 ld bc, 32767      |gbz80|-    |01 FF 7F                                    |     12 T
 ld bc, 32767      |gbz80|IXIY |01 FF 7F                                    |     12 T
+ld bc, 32767      |r2k  |-    |01 FF 7F                                    |      6 T
+ld bc, 32767      |r2k  |IXIY |01 FF 7F                                    |      6 T
+ld bc, 32767      |r3k  |-    |01 FF 7F                                    |      6 T
+ld bc, 32767      |r3k  |IXIY |01 FF 7F                                    |      6 T
+ld bc, 32767      |z180 |-    |01 FF 7F                                    |      9 T
+ld bc, 32767      |z180 |IXIY |01 FF 7F                                    |      9 T
 ld bc, 32767      |z80  |-    |01 FF 7F                                    |     10 T
 ld bc, 32767      |z80  |IXIY |01 FF 7F                                    |     10 T
 ld bc, 32767      |z80n |-    |01 FF 7F                                    |     10 T
@@ -4903,6 +4919,12 @@ ld bc, 65535      |8085 |-    |01 FF FF                                    |    
 ld bc, 65535      |8085 |IXIY |01 FF FF                                    |     10 T
 ld bc, 65535      |gbz80|-    |01 FF FF                                    |     12 T
 ld bc, 65535      |gbz80|IXIY |01 FF FF                                    |     12 T
+ld bc, 65535      |r2k  |-    |01 FF FF                                    |      6 T
+ld bc, 65535      |r2k  |IXIY |01 FF FF                                    |      6 T
+ld bc, 65535      |r3k  |-    |01 FF FF                                    |      6 T
+ld bc, 65535      |r3k  |IXIY |01 FF FF                                    |      6 T
+ld bc, 65535      |z180 |-    |01 FF FF                                    |      9 T
+ld bc, 65535      |z180 |IXIY |01 FF FF                                    |      9 T
 ld bc, 65535      |z80  |-    |01 FF FF                                    |     10 T
 ld bc, 65535      |z80  |IXIY |01 FF FF                                    |     10 T
 ld bc, 65535      |z80n |-    |01 FF FF                                    |     10 T
@@ -5253,6 +5275,12 @@ ld de, -32768     |8085 |-    |11 00 80                                    |    
 ld de, -32768     |8085 |IXIY |11 00 80                                    |     10 T
 ld de, -32768     |gbz80|-    |11 00 80                                    |     12 T
 ld de, -32768     |gbz80|IXIY |11 00 80                                    |     12 T
+ld de, -32768     |r2k  |-    |11 00 80                                    |      6 T
+ld de, -32768     |r2k  |IXIY |11 00 80                                    |      6 T
+ld de, -32768     |r3k  |-    |11 00 80                                    |      6 T
+ld de, -32768     |r3k  |IXIY |11 00 80                                    |      6 T
+ld de, -32768     |z180 |-    |11 00 80                                    |      9 T
+ld de, -32768     |z180 |IXIY |11 00 80                                    |      9 T
 ld de, -32768     |z80  |-    |11 00 80                                    |     10 T
 ld de, -32768     |z80  |IXIY |11 00 80                                    |     10 T
 ld de, -32768     |z80n |-    |11 00 80                                    |     10 T
@@ -5263,6 +5291,12 @@ ld de, 32767      |8085 |-    |11 FF 7F                                    |    
 ld de, 32767      |8085 |IXIY |11 FF 7F                                    |     10 T
 ld de, 32767      |gbz80|-    |11 FF 7F                                    |     12 T
 ld de, 32767      |gbz80|IXIY |11 FF 7F                                    |     12 T
+ld de, 32767      |r2k  |-    |11 FF 7F                                    |      6 T
+ld de, 32767      |r2k  |IXIY |11 FF 7F                                    |      6 T
+ld de, 32767      |r3k  |-    |11 FF 7F                                    |      6 T
+ld de, 32767      |r3k  |IXIY |11 FF 7F                                    |      6 T
+ld de, 32767      |z180 |-    |11 FF 7F                                    |      9 T
+ld de, 32767      |z180 |IXIY |11 FF 7F                                    |      9 T
 ld de, 32767      |z80  |-    |11 FF 7F                                    |     10 T
 ld de, 32767      |z80  |IXIY |11 FF 7F                                    |     10 T
 ld de, 32767      |z80n |-    |11 FF 7F                                    |     10 T
@@ -5273,6 +5307,12 @@ ld de, 65535      |8085 |-    |11 FF FF                                    |    
 ld de, 65535      |8085 |IXIY |11 FF FF                                    |     10 T
 ld de, 65535      |gbz80|-    |11 FF FF                                    |     12 T
 ld de, 65535      |gbz80|IXIY |11 FF FF                                    |     12 T
+ld de, 65535      |r2k  |-    |11 FF FF                                    |      6 T
+ld de, 65535      |r2k  |IXIY |11 FF FF                                    |      6 T
+ld de, 65535      |r3k  |-    |11 FF FF                                    |      6 T
+ld de, 65535      |r3k  |IXIY |11 FF FF                                    |      6 T
+ld de, 65535      |z180 |-    |11 FF FF                                    |      9 T
+ld de, 65535      |z180 |IXIY |11 FF FF                                    |      9 T
 ld de, 65535      |z80  |-    |11 FF FF                                    |     10 T
 ld de, 65535      |z80  |IXIY |11 FF FF                                    |     10 T
 ld de, 65535      |z80n |-    |11 FF FF                                    |     10 T
@@ -5665,6 +5705,12 @@ ld hl, -32768     |8085 |-    |21 00 80                                    |    
 ld hl, -32768     |8085 |IXIY |21 00 80                                    |     10 T
 ld hl, -32768     |gbz80|-    |21 00 80                                    |     12 T
 ld hl, -32768     |gbz80|IXIY |21 00 80                                    |     12 T
+ld hl, -32768     |r2k  |-    |21 00 80                                    |      6 T
+ld hl, -32768     |r2k  |IXIY |21 00 80                                    |      6 T
+ld hl, -32768     |r3k  |-    |21 00 80                                    |      6 T
+ld hl, -32768     |r3k  |IXIY |21 00 80                                    |      6 T
+ld hl, -32768     |z180 |-    |21 00 80                                    |      9 T
+ld hl, -32768     |z180 |IXIY |21 00 80                                    |      9 T
 ld hl, -32768     |z80  |-    |21 00 80                                    |     10 T
 ld hl, -32768     |z80  |IXIY |21 00 80                                    |     10 T
 ld hl, -32768     |z80n |-    |21 00 80                                    |     10 T
@@ -5675,6 +5721,12 @@ ld hl, 32767      |8085 |-    |21 FF 7F                                    |    
 ld hl, 32767      |8085 |IXIY |21 FF 7F                                    |     10 T
 ld hl, 32767      |gbz80|-    |21 FF 7F                                    |     12 T
 ld hl, 32767      |gbz80|IXIY |21 FF 7F                                    |     12 T
+ld hl, 32767      |r2k  |-    |21 FF 7F                                    |      6 T
+ld hl, 32767      |r2k  |IXIY |21 FF 7F                                    |      6 T
+ld hl, 32767      |r3k  |-    |21 FF 7F                                    |      6 T
+ld hl, 32767      |r3k  |IXIY |21 FF 7F                                    |      6 T
+ld hl, 32767      |z180 |-    |21 FF 7F                                    |      9 T
+ld hl, 32767      |z180 |IXIY |21 FF 7F                                    |      9 T
 ld hl, 32767      |z80  |-    |21 FF 7F                                    |     10 T
 ld hl, 32767      |z80  |IXIY |21 FF 7F                                    |     10 T
 ld hl, 32767      |z80n |-    |21 FF 7F                                    |     10 T
@@ -5685,6 +5737,12 @@ ld hl, 65535      |8085 |-    |21 FF FF                                    |    
 ld hl, 65535      |8085 |IXIY |21 FF FF                                    |     10 T
 ld hl, 65535      |gbz80|-    |21 FF FF                                    |     12 T
 ld hl, 65535      |gbz80|IXIY |21 FF FF                                    |     12 T
+ld hl, 65535      |r2k  |-    |21 FF FF                                    |      6 T
+ld hl, 65535      |r2k  |IXIY |21 FF FF                                    |      6 T
+ld hl, 65535      |r3k  |-    |21 FF FF                                    |      6 T
+ld hl, 65535      |r3k  |IXIY |21 FF FF                                    |      6 T
+ld hl, 65535      |z180 |-    |21 FF FF                                    |      9 T
+ld hl, 65535      |z180 |IXIY |21 FF FF                                    |      9 T
 ld hl, 65535      |z80  |-    |21 FF FF                                    |     10 T
 ld hl, 65535      |z80  |IXIY |21 FF FF                                    |     10 T
 ld hl, 65535      |z80n |-    |21 FF FF                                    |     10 T
@@ -6147,6 +6205,12 @@ ld sp, -32768     |8085 |-    |31 00 80                                    |    
 ld sp, -32768     |8085 |IXIY |31 00 80                                    |     10 T
 ld sp, -32768     |gbz80|-    |31 00 80                                    |     12 T
 ld sp, -32768     |gbz80|IXIY |31 00 80                                    |     12 T
+ld sp, -32768     |r2k  |-    |31 00 80                                    |      6 T
+ld sp, -32768     |r2k  |IXIY |31 00 80                                    |      6 T
+ld sp, -32768     |r3k  |-    |31 00 80                                    |      6 T
+ld sp, -32768     |r3k  |IXIY |31 00 80                                    |      6 T
+ld sp, -32768     |z180 |-    |31 00 80                                    |      9 T
+ld sp, -32768     |z180 |IXIY |31 00 80                                    |      9 T
 ld sp, -32768     |z80  |-    |31 00 80                                    |     10 T
 ld sp, -32768     |z80  |IXIY |31 00 80                                    |     10 T
 ld sp, -32768     |z80n |-    |31 00 80                                    |     10 T
@@ -6157,6 +6221,12 @@ ld sp, 32767      |8085 |-    |31 FF 7F                                    |    
 ld sp, 32767      |8085 |IXIY |31 FF 7F                                    |     10 T
 ld sp, 32767      |gbz80|-    |31 FF 7F                                    |     12 T
 ld sp, 32767      |gbz80|IXIY |31 FF 7F                                    |     12 T
+ld sp, 32767      |r2k  |-    |31 FF 7F                                    |      6 T
+ld sp, 32767      |r2k  |IXIY |31 FF 7F                                    |      6 T
+ld sp, 32767      |r3k  |-    |31 FF 7F                                    |      6 T
+ld sp, 32767      |r3k  |IXIY |31 FF 7F                                    |      6 T
+ld sp, 32767      |z180 |-    |31 FF 7F                                    |      9 T
+ld sp, 32767      |z180 |IXIY |31 FF 7F                                    |      9 T
 ld sp, 32767      |z80  |-    |31 FF 7F                                    |     10 T
 ld sp, 32767      |z80  |IXIY |31 FF 7F                                    |     10 T
 ld sp, 32767      |z80n |-    |31 FF 7F                                    |     10 T
@@ -6167,6 +6237,12 @@ ld sp, 65535      |8085 |-    |31 FF FF                                    |    
 ld sp, 65535      |8085 |IXIY |31 FF FF                                    |     10 T
 ld sp, 65535      |gbz80|-    |31 FF FF                                    |     12 T
 ld sp, 65535      |gbz80|IXIY |31 FF FF                                    |     12 T
+ld sp, 65535      |r2k  |-    |31 FF FF                                    |      6 T
+ld sp, 65535      |r2k  |IXIY |31 FF FF                                    |      6 T
+ld sp, 65535      |r3k  |-    |31 FF FF                                    |      6 T
+ld sp, 65535      |r3k  |IXIY |31 FF FF                                    |      6 T
+ld sp, 65535      |z180 |-    |31 FF FF                                    |      9 T
+ld sp, 65535      |z180 |IXIY |31 FF FF                                    |      9 T
 ld sp, 65535      |z80  |-    |31 FF FF                                    |     10 T
 ld sp, 65535      |z80  |IXIY |31 FF FF                                    |     10 T
 ld sp, 65535      |z80n |-    |31 FF FF                                    |     10 T
@@ -9829,6 +9905,8 @@ stc               |z80  |-    |37                                          |    
 stc               |z80  |IXIY |37                                          |      4 T
 stc               |z80n |-    |37                                          |      4 T
 stc               |z80n |IXIY |37                                          |      4 T
+stop              |gbz80|-    |10 00                                       |      4 T
+stop              |gbz80|IXIY |10 00                                       |      4 T
 sub (hl)          |8080 |-    |96                                          |      7 T
 sub (hl)          |8080 |IXIY |96                                          |      7 T
 sub (hl)          |8085 |-    |96                                          |      7 T

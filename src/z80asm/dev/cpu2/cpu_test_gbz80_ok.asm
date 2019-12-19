@@ -55,6 +55,8 @@
  add hl, sp                     ; 39
  add l                          ; 85
  add m                          ; 86
+ add sp, -128                   ; E8 80
+ add sp, 127                    ; E8 7F
  adi -128                       ; C6 80
  adi 127                        ; C6 7F
  adi 255                        ; C6 FF
@@ -767,6 +769,7 @@
  stax d                         ; 12
  stax de                        ; 12
  stc                            ; 37
+ stop                           ; 10 00
  sub (hl)                       ; 96
  sub -128                       ; D6 80
  sub 127                        ; D6 7F

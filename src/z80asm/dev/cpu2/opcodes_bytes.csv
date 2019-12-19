@@ -8,6 +8,9 @@
 01 %m %m                                    |8080 |ld bc, %m     |     10 T
 01 %m %m                                    |8085 |ld bc, %m     |     10 T
 01 %m %m                                    |gbz80|ld bc, %m     |     12 T
+01 %m %m                                    |r2k  |ld bc, %m     |      6 T
+01 %m %m                                    |r3k  |ld bc, %m     |      6 T
+01 %m %m                                    |z180 |ld bc, %m     |      9 T
 01 %m %m                                    |z80  |ld bc, %m     |     10 T
 01 %m %m                                    |z80n |ld bc, %m     |     10 T
 01 %m %m                                    |8080 |lxi b, %m     |     10 T
@@ -215,9 +218,14 @@
 10 %j                                       |z80  |djnz b, %j    |   8/13 T
 10 %j                                       |z80n |djnz b, %j    |   8/13 T
                                             |     |              |         
+10 00                                       |gbz80|stop          |      4 T
+                                            |     |              |         
 11 %m %m                                    |8080 |ld de, %m     |     10 T
 11 %m %m                                    |8085 |ld de, %m     |     10 T
 11 %m %m                                    |gbz80|ld de, %m     |     12 T
+11 %m %m                                    |r2k  |ld de, %m     |      6 T
+11 %m %m                                    |r3k  |ld de, %m     |      6 T
+11 %m %m                                    |z180 |ld de, %m     |      9 T
 11 %m %m                                    |z80  |ld de, %m     |     10 T
 11 %m %m                                    |z80n |ld de, %m     |     10 T
 11 %m %m                                    |8080 |lxi d, %m     |     10 T
@@ -416,6 +424,9 @@
 21 %m %m                                    |8080 |ld hl, %m     |     10 T
 21 %m %m                                    |8085 |ld hl, %m     |     10 T
 21 %m %m                                    |gbz80|ld hl, %m     |     12 T
+21 %m %m                                    |r2k  |ld hl, %m     |      6 T
+21 %m %m                                    |r3k  |ld hl, %m     |      6 T
+21 %m %m                                    |z180 |ld hl, %m     |      9 T
 21 %m %m                                    |z80  |ld hl, %m     |     10 T
 21 %m %m                                    |z80n |ld hl, %m     |     10 T
 21 %m %m                                    |8080 |lxi h, %m     |     10 T
@@ -625,6 +636,9 @@
 31 %m %m                                    |8080 |ld sp, %m     |     10 T
 31 %m %m                                    |8085 |ld sp, %m     |     10 T
 31 %m %m                                    |gbz80|ld sp, %m     |     12 T
+31 %m %m                                    |r2k  |ld sp, %m     |      6 T
+31 %m %m                                    |r3k  |ld sp, %m     |      6 T
+31 %m %m                                    |z180 |ld sp, %m     |      9 T
 31 %m %m                                    |z80  |ld sp, %m     |     10 T
 31 %m %m                                    |z80n |ld sp, %m     |     10 T
 31 %m %m                                    |8080 |lxi sp, %m    |     10 T
@@ -4589,6 +4603,8 @@ E8                                          |8080 |rv            |   5/11 T
 E8                                          |8085 |rv            |   6/12 T
 E8                                          |z80  |rv            |   5/11 T
 E8                                          |z80n |rv            |   5/11 T
+                                            |     |              |         
+E8 %s                                       |gbz80|add sp, %s    |     16 T
                                             |     |              |         
 E9                                          |8080 |jp (hl)       |      5 T
 E9                                          |8085 |jp (hl)       |      6 T

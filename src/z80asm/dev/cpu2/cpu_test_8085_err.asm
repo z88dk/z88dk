@@ -30,6 +30,8 @@
  add iy, de                     ; Error
  add iy, iy                     ; Error
  add iy, sp                     ; Error
+ add sp, -128                   ; Error
+ add sp, 127                    ; Error
  and (ix)                       ; Error
  and (ix+-128)                  ; Error
  and (ix+127)                   ; Error
@@ -545,6 +547,7 @@
  srl e                          ; Error
  srl h                          ; Error
  srl l                          ; Error
+ stop                           ; Error
  sub (ix)                       ; Error
  sub (ix+-128)                  ; Error
  sub (ix+127)                   ; Error

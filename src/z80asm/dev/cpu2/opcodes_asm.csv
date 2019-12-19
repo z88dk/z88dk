@@ -638,6 +638,15 @@ add m         |z180 |   **                                       |   **
 add m         |z80  |86                                          |      7 T
 add m         |z80n |86                                          |      7 T
               |     |                                            |         
+add sp, %s    |8080 |   **                                       |   **    
+add sp, %s    |8085 |   **                                       |   **    
+add sp, %s    |gbz80|E8 %s                                       |     16 T
+add sp, %s    |r2k  |   **                                       |   **    
+add sp, %s    |r3k  |   **                                       |   **    
+add sp, %s    |z180 |   **                                       |   **    
+add sp, %s    |z80  |   **                                       |   **    
+add sp, %s    |z80n |   **                                       |   **    
+              |     |                                            |         
 adi %n        |8080 |C6 %n                                       |      7 T
 adi %n        |8085 |C6 %n                                       |      7 T
 adi %n        |gbz80|C6 %n                                       |      8 T
@@ -4538,9 +4547,9 @@ ld b, l       |z80n |45                                          |      4 T
 ld bc, %m     |8080 |01 %m %m                                    |     10 T
 ld bc, %m     |8085 |01 %m %m                                    |     10 T
 ld bc, %m     |gbz80|01 %m %m                                    |     12 T
-ld bc, %m     |r2k  |   **                                       |   **    
-ld bc, %m     |r3k  |   **                                       |   **    
-ld bc, %m     |z180 |   **                                       |   **    
+ld bc, %m     |r2k  |01 %m %m                                    |      6 T
+ld bc, %m     |r3k  |01 %m %m                                    |      6 T
+ld bc, %m     |z180 |01 %m %m                                    |      9 T
 ld bc, %m     |z80  |01 %m %m                                    |     10 T
 ld bc, %m     |z80n |01 %m %m                                    |     10 T
               |     |                                            |         
@@ -4898,9 +4907,9 @@ ld d, l       |z80n |55                                          |      4 T
 ld de, %m     |8080 |11 %m %m                                    |     10 T
 ld de, %m     |8085 |11 %m %m                                    |     10 T
 ld de, %m     |gbz80|11 %m %m                                    |     12 T
-ld de, %m     |r2k  |   **                                       |   **    
-ld de, %m     |r3k  |   **                                       |   **    
-ld de, %m     |z180 |   **                                       |   **    
+ld de, %m     |r2k  |11 %m %m                                    |      6 T
+ld de, %m     |r3k  |11 %m %m                                    |      6 T
+ld de, %m     |z180 |11 %m %m                                    |      9 T
 ld de, %m     |z80  |11 %m %m                                    |     10 T
 ld de, %m     |z80n |11 %m %m                                    |     10 T
               |     |                                            |         
@@ -5249,9 +5258,9 @@ ld h, l       |z80n |65                                          |      4 T
 ld hl, %m     |8080 |21 %m %m                                    |     10 T
 ld hl, %m     |8085 |21 %m %m                                    |     10 T
 ld hl, %m     |gbz80|21 %m %m                                    |     12 T
-ld hl, %m     |r2k  |   **                                       |   **    
-ld hl, %m     |r3k  |   **                                       |   **    
-ld hl, %m     |z180 |   **                                       |   **    
+ld hl, %m     |r2k  |21 %m %m                                    |      6 T
+ld hl, %m     |r3k  |21 %m %m                                    |      6 T
+ld hl, %m     |z180 |21 %m %m                                    |      9 T
 ld hl, %m     |z80  |21 %m %m                                    |     10 T
 ld hl, %m     |z80n |21 %m %m                                    |     10 T
               |     |                                            |         
@@ -5861,9 +5870,9 @@ ld r, a       |z80n |ED 4F                                       |      9 T
 ld sp, %m     |8080 |31 %m %m                                    |     10 T
 ld sp, %m     |8085 |31 %m %m                                    |     10 T
 ld sp, %m     |gbz80|31 %m %m                                    |     12 T
-ld sp, %m     |r2k  |   **                                       |   **    
-ld sp, %m     |r3k  |   **                                       |   **    
-ld sp, %m     |z180 |   **                                       |   **    
+ld sp, %m     |r2k  |31 %m %m                                    |      6 T
+ld sp, %m     |r3k  |31 %m %m                                    |      6 T
+ld sp, %m     |z180 |31 %m %m                                    |      9 T
 ld sp, %m     |z80  |31 %m %m                                    |     10 T
 ld sp, %m     |z80n |31 %m %m                                    |     10 T
               |     |                                            |         
@@ -10608,6 +10617,15 @@ stc           |r3k  |   **                                       |   **
 stc           |z180 |   **                                       |   **    
 stc           |z80  |37                                          |      4 T
 stc           |z80n |37                                          |      4 T
+              |     |                                            |         
+stop          |8080 |   **                                       |   **    
+stop          |8085 |   **                                       |   **    
+stop          |gbz80|10 00                                       |      4 T
+stop          |r2k  |   **                                       |   **    
+stop          |r3k  |   **                                       |   **    
+stop          |z180 |   **                                       |   **    
+stop          |z80  |   **                                       |   **    
+stop          |z80n |   **                                       |   **    
               |     |                                            |         
 sub %n        |8080 |D6 %n                                       |      7 T
 sub %n        |8085 |D6 %n                                       |      7 T

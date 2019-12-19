@@ -1,3 +1,5 @@
+ add sp, -128                   ; Error
+ add sp, 127                    ; Error
  adi hl, -128                   ; Error
  adi hl, 127                    ; Error
  adi hl, 255                    ; Error
@@ -80,6 +82,7 @@
  shlde                          ; Error
  shlx                           ; Error
  sim                            ; Error
+ stop                           ; Error
  swap (hl)                      ; Error
  swap a                         ; Error
  swap b                         ; Error

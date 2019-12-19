@@ -429,6 +429,13 @@ sub OP($)		{ return $OP{$_[0]}; }
 #------------------------------------------------------------------------------
 sub init_opcodes {
 	for $cpu (@CPUS) {
+    
+        if (israbbit||isz180) {
+            for my $r (qw( bc de hl sp )) {
+                add(	"ld  $r,  %m", B(0x01+RP($r)*16, '%m', '%m'), T(israbbit ? 6 : 9));
+            }
+        }
+        
 		next unless isintel || isgbz80 || isz80 || isz80n;
 		say "Build opcodes for $cpu";
 		
@@ -951,7 +958,15 @@ sub init_opcodes {
         if (!is8085) {
             add_compound("dsub" => "sub hl, bc");
         }
-		
+
+        # add sp, %n
+		if (isgbz80) {
+			add("add sp, %s", 	B(0xe8, '%s'), T(16));
+        }
+        elsif (israbbit) {
+            add("add sp, %s", 	B(0x27, '%s'), T(16));
+        }
+
 		# inc ss
 		for my $r (qw( bc de hl sp )) {
 			my $r1 = substr($r, 0, 1);
@@ -1305,6 +1320,11 @@ sub init_opcodes {
 			add("hlt",		B(0x76), is8080 ? T(7) : is8085 ? T(5) : T(4));
 			add("halt",		B(0x76), is8080 ? T(7) : is8085 ? T(5) : T(4));
 		}
+
+        # stop
+		if (isgbz80) {
+			add("stop", 	B(0x10, 0x00), T(4));
+		}
 		
 		# ei / di
 		if (!israbbit) {
@@ -1325,21 +1345,6 @@ sub init_opcodes {
         
 next unless isintel || isgbz80;
 next;
-
-		#----------------------------------------------------------------------
-		# Game Boy opcodes
-		#----------------------------------------------------------------------
-		
-		
-		if (isgbz80) {
-			add("add sp, %s", 	[0xe8, '%s'], 16);
-        }
-        
-		
-			
-		if (isgbz80) {
-			add("stop", 		[0x10, 0x00], 4);
-		}
 
 		#----------------------------------------------------------------------
 		# compound opcodes
@@ -2103,7 +2108,8 @@ sub write_tests_files {
 sub run_tests {
 	for $cpu (@CPUS) {
 		for $ixiy ("", "--IXIY") {
-			my @test;
+			my @test = [" ld sp, 0c000h",  $Opcodes{"ld sp, %m"}{$cpu}->clone(m => 0xc000)];
+                
 			for my $asm (sort keys %Opcodes) {
 				my $asm_swap = ($ixiy) ? swap_ix_iy($asm) : $asm;
 				my $prog = $Opcodes{$asm_swap}{$cpu};
@@ -2413,6 +2419,9 @@ sub run_tests {
 								[" scf",		$Opcodes{"scf"}{$cpu}->clone()],
 								[$test_asm, 	$prog_instance]);
 					}
+					elsif ($asm =~ /^stop$/) {
+						run_test($ixiy, undef, [$test_asm, 	$prog_instance]);
+					}
 					else {
 						push @test, [$test_asm, $prog_instance];	
 					}
@@ -2434,7 +2443,6 @@ sub run_test {
 	my $ok = assemble_and_run($cpu, $ixiy, $end, @test);
 	ok $ok, $test;
 	return $ok if $ok;
-
 	
 	# drill down to find error
 	diag "Failed:\n".path('test.lis')->slurp;
