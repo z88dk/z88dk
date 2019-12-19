@@ -1031,7 +1031,7 @@ int main (int argc, char **argv){
             }
             break;
         }
-        st+= israbbit() ? 6 : isgbz80() ? 12 : 10;
+        st+= israbbit() ? 6 : isgbz80() ? 12 : isz180() ? 9 : 10;
         sp= get_memory(pc++);
         sp|= get_memory(pc++)<<8;
         ih=1;altd=0;ioi=0;ioe=0;break;
