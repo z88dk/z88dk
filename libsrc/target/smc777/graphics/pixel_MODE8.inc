@@ -4,8 +4,8 @@
 
         INCLUDE        "graphics/grafix.inc"
 
-        EXTERN        __smc777_attr
-        EXTERN        __smc777_attr2
+        EXTERN        __smc777_paper16
+        EXTERN        __smc777_ink16
         EXTERN        getmaxy
         EXTERN        getmaxx
         EXTERN        l_cmp
@@ -39,9 +39,9 @@
         ld      c,l
         ld      h,a
 IF NEEDunplot
-        ld      a,(__smc777_attr2)
+        ld      a,(__smc777_paper16)
 ELSE
-        ld      a,(__smc777_attr)
+        ld      a,(__smc777_ink16)
 ENDIF
         rlca
         rlca
