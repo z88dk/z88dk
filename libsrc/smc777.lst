@@ -1,3 +1,4 @@
+target/smc777/stdio/bordercolour
 target/smc777/stdio/generic_console
 target/smc777/stdio/generic_console_ioctl
 target/smc777/stdio/conio_vars
