@@ -16,7 +16,8 @@
 	EXTERN	conio_map_colour
 	EXTERN	__smc777_mode
 	EXTERN	__smc777_attr
-	EXTERN	__smc777_attr2
+	EXTERN	__smc777_ink16
+	EXTERN	__smc777_paper16
 
 	EXTERN	CONSOLE_COLUMNS
 	EXTERN	CONSOLE_ROWS
@@ -36,18 +37,33 @@ set_attr:
 
 generic_console_set_ink:
 	call	conio_map_colour
+	push	af
 	and	7
 	ld	c,a
 	ld	a,(__smc777_attr)
 	and	@11111000
-	jr	set_attr
+	call	set_attr
+	pop	af
+	call	nc,rotate	;attribute is in high nibble
+	and	15
+	ld	(__smc777_ink16),a
+	ret
 
 	
 generic_console_set_paper:
 	call	conio_map_colour
-	and	7
-	ld	(__smc777_attr2),a
+	call	nc,rotate	;colour from table, is in high nibble
+	and	15
+	ld	(__smc777_paper16),a
 	ret
+
+rotate:
+	rrca
+	rrca
+	rrca
+	rrca
+	ret
+
 
 generic_console_cls:
 	ld	hl, +(CONSOLE_ROWS * CONSOLE_COLUMNS)
@@ -83,7 +99,7 @@ clg_1:
 	ret
 
 get_bgattr_320:
-	ld	a,(__smc777_attr2)
+	ld	a,(__smc777_paper16)
 	and	@00001111
 	ld	l,a
 	rlca
@@ -95,7 +111,7 @@ get_bgattr_320:
 	ret
 
 get_bgattr_640:
-	ld	a,(__smc777_attr2)
+	ld	a,(__smc777_paper16)
 	and	@00000011
 	ld	l,a
 	rlca

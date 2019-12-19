@@ -288,12 +288,21 @@ int bastxt_skel2[]={11, SKIP_JP_RET, 0xC0, 0x2A, CATCH, CATCH, 0xAF, 0x77, 0x23,
 
 int microsoft_extended_skel[]={11, ADDR, 0xFE, '%', 0xC8, 0x14, 0xFE, '$', 0xC8, 0x14, 0xFE, '!'};
 
+/* Leveraging on a buggy ATN table to discriminate between N82(TRS80 M100/200, Olivetti M10) and N83(MSX, KC85) */
+int microsoft_n82n83[]={9, ADDR, 0xC0, 0x14, 0x28, 0x57, 0x08, 0x55, 0x48, 0x84};
+int microsoft_n82[]={9, ADDR, 0xC0, 0x14, 0x28, 0x56, 0x08, 0x55, 0x48, 0x84};
+
 int microsoft_defdbl_skel[]={7, ADDR, 'D', 'E', 'F', 'D', 'B', 'L'};
 int microsoft_defdbl_skel2[]={7, ADDR, 'D'+0x80, 'E', 'F', 'D', 'B', 'L'};
 int microsoft_defdbl_skel3[]={6, ADDR, 'E', 'F', 'D', 'B', 'L'+0x80};
 
 
 /* Microsoft BASIC code inspection */
+
+int ptrfil_skel[]={9, 0xE5, 0x2A, CATCH, CATCH, 0x7C, 0xB5, 0xE1, 0xC9, 0x3E};
+int ptrfil_skel2[]={9, 0xE5, 0x2A, CATCH, CATCH, 0x7D, 0xB4, 0xE1, 0xC9, 0x7C};
+int isflio_skel[]={10, ADDR, 0xE5, 0x2A, SKIP, SKIP, 0x7C, 0xB5, 0xE1, 0xC9, 0x3E};
+
 int ulerr_skel[]={9, SKIP_CALL, 0xE5, SKIP_CALL, 0x60, 0x69, 0xD1, 0xD2, CATCH, CATCH};
 int prognd_skel[]={8, 0xEB, 0x2A, CATCH, CATCH, 0x1A, 0x02, 0x03, 0x13};
 int prognd_skel2[]={13, SKIP_JP_RET, 0xC0, 0x2A, SKIP, SKIP, 0xAF, 0x77, 0x23, 0x77, 0x23, 0x22, CATCH, CATCH };
@@ -369,7 +378,7 @@ int depint_skel3[]={9,  SKIP_CALL,  SKIP_CALL, CATCH_CALL, 0xC2, SKIP, SKIP, 0x2
 int getk_skel[]={12, CATCH_CALL, 0x2A, SKIP, SKIP, 0xC5, SKIP_CALL, 0xC1, 0xC0, 0x2A, SKIP, SKIP, 0x85};
 int rinput_skel[]={9, 0x3E, '?', SKIP_CALL, 0x3E, ' ', SKIP_CALL, 0xC3, CATCH, CATCH};
 int rinput_skel2[]={7, 0x3E, '?', SKIP_CALL, 0x3E, ' ', SKIP_CALL, CATCH_CALL};
-int rinput_skel3[]={7, 0x3E, '?', SKIP, 0x3E, ' ', SKIP, CATCH_CALL};
+//int rinput_skel3[]={7, 0x3E, '?', SKIP, 0x3E, ' ', SKIP, CATCH_CALL};
 int rinput_skel4[]={14, 0x3E, '?', SKIP_CALL, 0x3E, ' ', SKIP_CALL, 0x18, SKIP, SKIP, SKIP, 0xC3, SKIP, SKIP, ADDR};
 
 /* High precision BASIC constants present only in the latest versions*/
@@ -1086,6 +1095,12 @@ int main(int argc, char *argv[])
 	if (res>0) {
 		printf("\n# Microsoft 8080/Z80 BASIC found\n");
 		
+		res=find_skel(microsoft_n82n83);
+		if (res>0) 	printf("#  Version: N82. Possible release year: 1983-1986\n");
+		
+		res=find_skel(microsoft_n82);
+		if (res>0) 	printf("#  Version: N82. Possible release year: 1982\n");
+		
 		brand=find_skel(tkmsbasic_ex_skel);
 		if (brand<0)
 		brand=find_skel(tkmsbasic_ex_skel2);
@@ -1105,6 +1120,12 @@ int main(int argc, char *argv[])
 			brand=find_skel(microsoft_defdbl_skel3);
 		if (brand>0)
 			printf("#  Double precision maths detected\n");
+
+		res=find_skel(ptrfil_skel);
+		if (res<0)
+			res=find_skel(ptrfil_skel2);
+		if (res>0)
+			printf("#  Support for devices/output redirection detected\n");
 
 		brand=find_skel(microsoft_skel);
 		if (brand>0)
@@ -1203,6 +1224,10 @@ int main(int argc, char *argv[])
 			res=find_skel(ms_lstrnd2);
 		if (res>0)
 			dlbl("LSTRND2", res+2, "Last RND number");
+
+		res=find_skel(isflio_skel);
+		if (res>0)
+			clbl("ISFLIO", res+pos, "Tests if an I/O redirection to device is in place");
 
 		res=find_skel(buffer_loc_skel);
 		if (res<0)
@@ -1560,6 +1585,12 @@ int main(int argc, char *argv[])
 		if (res>0)
 			clbl("OPRND", res, "Get next expression value");
 
+		res=find_skel(ptrfil_skel);
+		if (res<0)
+			res=find_skel(ptrfil_skel2);
+		if (res>0)
+			clbl("PTRFIL", res, "Pointer to the file description table for the current file");
+
 		res=find_skel(chksyn_skel);
 		if (res<0)
 			res=find_skel(chksyn_skel2);
@@ -1915,29 +1946,29 @@ int main(int argc, char *argv[])
 		
 		res=find_skel(dblsub_skel);
 		if (res>0)
-			clbl("DBL_SUB", res+pos+1, "Double precision SUB (formerly SUBCDE)");
+			clbl("DBL_SUB", res+pos+1, "aka DECSUB, Double precision SUB (formerly SUBCDE)");
 		
 		res=find_skel(dbladd_skel);
 		if (res>0)
-			clbl("DBL_ADD", res+pos+1, "Double precision ADD (formerly FPADD)");
+			clbl("DBL_ADD", res+pos+1, "aka DECADD, Double precision ADD (formerly FPADD)");
 		
 		res=find_skel(dblsub_skel2);
 		if (res>0) {
-			clbl("DBL_SUB", res+pos+1, "Double precision SUB (formerly SUBCDE)");
-			clbl("DBL_ADD", res+pos+7, "Double precision ADD (formerly FPADD)");
+			clbl("DBL_SUB", res+pos+1, "aka DECSUB, Double precision SUB (formerly SUBCDE)");
+			clbl("DBL_ADD", res+pos+7, "aka DECADD, Double precision ADD (formerly FPADD)");
 		}
 
 		res=find_skel(dblmul_skel);
 		if (res>0)
-			clbl("DBL_MUL", res+pos+1, "Double precision MULTIPLY");
+			clbl("DBL_MUL", res+pos+1, "aka DECMUL, Double precision MULTIPLY");
 		
 		res=find_skel(dbldiv_skel);
 		if (res>0)
-			clbl("DBL_DIV", res, "Double precision DIVIDE");
+			clbl("DBL_DIV", res, "aka DECDIV, Double precision DIVIDE");
 		else {
 			res=find_skel(dbldiv_skel2);
 			if (res>0)
-				clbl("DBL_DIV", res+pos+1, "Double precision DIVIDE");
+				clbl("DBL_DIV", res+pos+1, "aka DECDIV, Double precision DIVIDE");
 		}
 		
 		res=find_skel(fix_skel);
@@ -2278,8 +2309,8 @@ int main(int argc, char *argv[])
 		res=find_skel(rinput_skel);
 		if (res<0)
 			res=find_skel(rinput_skel2);
-		if (res<0)
-			res=find_skel(rinput_skel3);
+//		if (res<0)
+//			res=find_skel(rinput_skel3);
 		if (res>0)
 			clbl("RINPUT", res, "Line input");
 		else {
