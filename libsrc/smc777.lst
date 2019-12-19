@@ -23,6 +23,9 @@ target/smc777/graphics/w_respixl_MODE8
 target/smc777/graphics/w_xorpixl
 target/smc777/graphics/w_xorpixl_MODE4
 target/smc777/graphics/w_xorpixl_MODE8
+target/smc777/games/bit_open
+target/smc777/games/bit_close
+target/smc777/games/joystick
 @font/font_8x8/font_8x8.lst
 graphics/w_dcircle
 graphics/w_putsprite2
@@ -36,6 +39,5 @@ psg/sn76489/psg_init
 psg/sn76489/set_psg
 psg/sn76489/set_psg_callee
 @psg/psg.lst
-target/smc777/games/joystick
 @games/games.lst
 @video/mc6845/mc6845.lst
