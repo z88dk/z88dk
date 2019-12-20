@@ -18,10 +18,10 @@ The more detailed (yet incomplete) changelist is below:
 - [appmake] Autobooting +3 discs can now be created
 - [appmake] MSX-DOS format discs can now be created
 - [classic] Interrupt handlers can now be added on many targets
-- [classic] Sony SMC-70/SMC-777 support added via +cpm -subtype=smc777	
-- [classic] +pasopia7 Toshiba Pasopia 7 support added	
-- [classic] +sv8000 Bandai Supervision 8000 support added	
-- [classic] +msx: MSXDOS2 library available via -subtype=msxdos2	
+- [classic] Sony SMC-70/SMC-777 support added via +cpm -subtype=smc777
+- [classic] +pasopia7 Toshiba Pasopia 7 support added
+- [classic] +sv8000 Bandai Supervision 8000 support added
+- [classic] +msx: MSXDOS2 library available via -subtype=msxdos2
 - [classic] +msx: UNAPI support is now available
 - [classic] TMS9918 platforms now support Modes 0 and 1 for gencon
 - [classic] +aquarius: Microsoft 32 bit floating point support
@@ -57,17 +57,17 @@ The more detailed (yet incomplete) changelist is below:
 - [classic] all: IEEE 754 32 bit maths library
 - [classic] all: BBC BASIC 40 bit maths library
 - [sccz80] #1102: Trailing comma support in struct initialisation
-- [sccz80] Optimisation rule fixes and improvements	
-- [sccz80] Support added for 32 and 64 bit floating point numbers	
-- [sccz80] #1132: Struct assignment and parameter passing supported	
-- [sccz80] #1141: Support for named address spaces	
-- [sccz80] #1133: Support for bitfields	
-- [sccz80] 8080 and gbz80 support added	
-- [z80asm] Now supports assembling 8080/5 code using both Intel and Zilog syntax	
-- [z80asm] Now supports assembling gbz80 code	
+- [sccz80] Optimisation rule fixes and improvements
+- [sccz80] Support added for 32 and 64 bit floating point numbers
+- [sccz80] #1132: Struct assignment and parameter passing supported
+- [sccz80] #1141: Support for named address spaces
+- [sccz80] #1133: Support for bitfields
+- [sccz80] 8080 and gbz80 support added
+- [z80asm] Now supports assembling 8080/5 code using both Intel and Zilog syntax
+- [z80asm] Now supports assembling gbz80 code
 - [z80asm] Supports many emulations for cross-processor compatibility
 - [zsdcc] Upgraded to SDCC 3.9.5 r11502
-- [newlib] +scz180: Support for this platform
+- [newlib] +scz180: Support for this platform target
 
 - [newlib] +zxn: ZX Spectrum Next architecture renamed z80n
 
@@ -660,7 +660,7 @@ they can do (in order of complexity):
 vfprintf_mini  - supports %d,u,s,c,%,ld,lu fields
 vfprintf_comp  - supports width specifiers and %d,x,c,s,u,% fields
 vfprintf_float - As above but with floating point (%e etc), only generic,
-		 untested
+  untested
 
 Once a complexity escalation has been made within a project then it's not
 possible to undo - i.e. if you want to printf longs then don't specify a
