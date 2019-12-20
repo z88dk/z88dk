@@ -321,60 +321,44 @@ void getmem(SYMBOL* sym)
         }
 
 #endif
-    } else if (sym->ctype->kind == KIND_DOUBLE) {
-        if ( c_fp_size == 6 ) {
-            address(sym);
-            callrts("dload");
+    } else if (sym->ctype->kind == KIND_DOUBLE && c_fp_size > 4 ) {
+        address(sym);
+        callrts("dload");
+    } else if (sym->ctype->kind == KIND_LONG || sym->ctype->kind == KIND_DOUBLE || sym->ctype->kind == KIND_CPTR ) {  // 4 byte doubles only
+        if ( IS_GBZ80() ) {
+            ot("ld\thl,");
+            outname(sym->name, dopref(sym));  
+            outstr("\n");
+            callrts("l_glong");
         } else {
             ot("ld\thl,(");
-            outname(sym->name, dopref(sym));
+            outname(sym->name, dopref(sym));    
             outstr(")\n");
-            if ( !IS_8080() ) {
-                ot("ld\t(");
-                outname(sym->name, dopref(sym));
-                outstr("+2),de\n");
-            } else {
-                swap();
-                ot("ld\t(");
-                outname(sym->name, dopref(sym));
-                outstr("+2),hl\n");
-                swap();
-            }
-        }
-    } else if (sym->ctype->kind == KIND_LONG) {
-        ot("ld\thl,(");
-        outname(sym->name, dopref(sym));
-        outstr(")\n");
-        if ( !IS_8080() ) {
-            ot("ld\tde,(");
-            outname(sym->name, dopref(sym));
-            outstr("+2)\n");
-        } else {
-            swap();
-            ot("ld\thl,(");
-            outname(sym->name, dopref(sym));
-            outstr("+2)\n");
-            swap();
-        }
-    } else {
-        /* this is for KIND_INT and get pointer..will need to change! */
-        ot("ld\thl,(");
-        outname(sym->name, dopref(sym));
-        outstr(")\n");
-        /* For long pointers...load de with name+2, then d,0 */
-        if (sym->ctype->kind == KIND_CPTR) {
-            if ( !IS_8080() ) {
+            if ( !IS_8080() ) { 
                 ot("ld\tde,(");
                 outname(sym->name, dopref(sym));
                 outstr("+2)\n");
-            } else {
+            } else { 
                 swap();
                 ot("ld\thl,(");
                 outname(sym->name, dopref(sym));
                 outstr("+2)\n");
-                swap();
+                swap(); 
             }
+        }
+        if (sym->ctype->kind == KIND_CPTR) {
             ol("ld\td,0");
+        }
+    } else {   /* KIND_INT */
+        if ( IS_GBZ80() ) {
+            ot("ld\thl,");
+            outname(sym->name, dopref(sym));
+            outstr("\n");    
+            callrts("l_gint");
+        } else {
+            ot("ld\thl,(");
+            outname(sym->name, dopref(sym));
+            outstr(")\n");
         }
     }
 }
@@ -395,10 +379,20 @@ int getloc(SYMBOL* sym, int off)
 void putmem(SYMBOL* sym)
 {
     switch_namespace(sym->ctype->namespace);
-    if (sym->ctype->kind == KIND_DOUBLE) {
-        if ( c_fp_size > 4 ) {
-            address(sym);
-            callrts("dstore");
+    if (sym->ctype->kind == KIND_DOUBLE && c_fp_size > 4 ) {
+        address(sym);
+        callrts("dstore");
+    } else if (sym->ctype->kind == KIND_CHAR) {
+        LoadAccum();
+        ot("ld\t(");
+        outname(sym->name, dopref(sym));
+        outstr("),a\n");
+    } else if (sym->ctype->kind == KIND_LONG || sym->ctype->kind == KIND_DOUBLE ) { // 4 byte doubles
+        if ( IS_GBZ80() ) {
+            ot("ld\tbc,");
+            outname(sym->name, dopref(sym));
+            outstr("\n");
+            callrts("l_plong");
         } else {
             ot("ld\t(");
             outname(sym->name, dopref(sym));
@@ -415,28 +409,13 @@ void putmem(SYMBOL* sym)
                 swap();
             }
         }
-    } else {
-        if (sym->ctype->kind == KIND_CHAR) {
-            LoadAccum();
-            ot("ld\t(");
+    } else if (sym->ctype->kind == KIND_CPTR) {
+        if ( IS_GBZ80() ) {
+            ot("ld\tbc,");
             outname(sym->name, dopref(sym));
-            outstr("),a\n");
-        } else if (sym->ctype->kind == KIND_LONG) {
-            ot("ld\t(");
-            outname(sym->name, dopref(sym));
-            outstr("),hl\n");
-            if ( !IS_8080() ) {
-                ot("ld\t(");
-                outname(sym->name, dopref(sym));
-                outstr("+2),de\n");
-            } else {
-                swap();
-                ot("ld\t(");
-                outname(sym->name, dopref(sym));
-                outstr("+2),hl\n");
-                swap();
-            }
-        } else if (sym->ctype->kind == KIND_CPTR) {
+            outstr("\n");
+            callrts("l_putptr");
+        } else {
             ot("ld\t(");
             outname(sym->name, dopref(sym));
             outstr("),hl\n");
@@ -444,6 +423,13 @@ void putmem(SYMBOL* sym)
             ot("ld\t(");
             outname(sym->name, dopref(sym));
             outstr("+2),a\n");
+        }
+    } else {
+        if ( IS_GBZ80() ) {
+            ot("ld\tde,");
+            outname(sym->name, dopref(sym));
+            outstr("\n");
+            callrts("l_pint");
         } else {
             ot("ld\t(");
             outname(sym->name, dopref(sym));
@@ -869,7 +855,15 @@ void indirect(LVALUE* lval)
 /* Swap the primary and secondary registers */
 void swap(void)
 {
-    ol("ex\tde,hl");
+    if ( IS_GBZ80() ) {
+        // Crude emulation - we can probably do better on a case by case basis
+        ol("push\thl");
+        ol("ld\tl,e");
+        ol("ld\th,d");
+        ol("pop\tde");
+    } else {
+        ol("ex\tde,hl");
+    }
 }
 
 /* Print partial instruction to get an immediate value */
@@ -1016,7 +1010,14 @@ int push_function_argument_fnptr(Kind expr, Type *type, int push_sdccchar, int i
         return type->size;
     } 
     if ( !is_last_argument ) {
-        swapstk();
+        if ( IS_GBZ80() ) {
+            ol("ld\td,h");
+            ol("ld\te,l");
+            ol("pop\thl");
+            ol("push\tde");
+        } else {
+            swapstk();
+        }
     }
     return 2;
 }
@@ -1117,6 +1118,12 @@ void zshortcall(int rst, int value)
     outfmt("\t%s\t%d\n", value < 0x100 ? "defb" : "defw", value);
 }
 
+void zbankedcall(SYMBOL *sym)
+{
+    ol("call\tbanked_call");
+    ot("defq\t"); outname(sym->name, dopref(sym)); nl();
+}
+
 /* djm (move this!) Decide whether to print a prefix or not 
  * This uses new flags bit LIBRARY
  */
@@ -1194,7 +1201,14 @@ int callstk(Type *type, int n, int isfarptr, int last_argument_size)
     } else {
         if (last_argument_size == 2) {
             /* At this point, TOS = function, hl = argument */
-            swapstk();
+            if ( IS_GBZ80() ) {
+                ol("ld\td,h");
+                ol("ld\te,l");
+                ol("pop\thl");
+                ol("push\tde");
+            } else {
+                swapstk();
+            }
         } else if ( last_argument_size == 4) {
             /* At this point, TOS = function, dehl = argument */
             swap(); /* MSW -> hl */
@@ -1427,7 +1441,7 @@ int modstk(int newsp, Kind save, int saveaf, int usebc)
 
     if (k == 0)
         return newsp;
-    if ( (c_cpu & CPU_RABBIT) && abs(k) > 1 && abs(k) <= 127 ) {
+    if ( (c_cpu & (CPU_GBZ80|CPU_RABBIT)) && abs(k) > 1 && abs(k) <= 127 ) {
         outstr("\tadd\tsp,"); outdec(k); nl();
         return newsp;
     }
@@ -1653,9 +1667,18 @@ void quikmult(int type, int32_t size, char preserve)
                     ol("pop\tbc");
                     ol("add\thl,bc");
                     ol("pop\tbc");
-                    ol("ex\tde,hl");
-                    ol("adc\thl,bc");
-                    ol("ex\tde,hl");
+                    if ( IS_GBZ80() ) {
+                        ol("ld\ta,e");
+                        ol("adc\tc");
+                        ol("ld\te,a");
+                        ol("ld\ta,d");
+                        ol("adc\tb");
+                        ol("ld\td,a");
+                    } else {
+                        ol("ex\tde,hl");
+                        ol("adc\thl,bc");
+                        ol("ex\tde,hl");
+                    }
                     break;
                 }
                 // Fall through all the way to default for 8080
@@ -1669,9 +1692,18 @@ void quikmult(int type, int32_t size, char preserve)
                     ol("pop\tbc");
                     ol("add\thl,bc");
                     ol("pop\tbc");
-                    ol("ex\tde,hl");
-                    ol("adc\thl,bc");
-                    ol("ex\tde,hl");
+                    if ( IS_GBZ80() ) {
+                        ol("ld\ta,e");
+                        ol("adc\tc");
+                        ol("ld\te,a");
+                        ol("ld\ta,d");
+                        ol("adc\tb");
+                        ol("ld\td,a");
+                    } else {
+                        ol("ex\tde,hl");
+                        ol("adc\thl,bc");
+                        ol("ex\tde,hl");
+                    }
                     ol("add\thl,hl");
                     ol("rl\te");
                     ol("rl\td");  
@@ -1691,9 +1723,18 @@ void quikmult(int type, int32_t size, char preserve)
                     ol("pop\tbc"); 
                     ol("add\thl,bc");
                     ol("pop\tbc");
-                    ol("ex\tde,hl");
-                    ol("adc\thl,bc");
-                    ol("ex\tde,hl");
+                    if ( IS_GBZ80() ) {
+                        ol("ld\ta,e");
+                        ol("adc\tc");
+                        ol("ld\te,a");
+                        ol("ld\ta,d");
+                        ol("adc\tb");
+                        ol("ld\td,a");
+                    } else {
+                        ol("ex\tde,hl");
+                        ol("adc\thl,bc");
+                        ol("ex\tde,hl");
+                    }
                     break;
                 }
                 // Fall through all the way to default for 8080
@@ -1830,7 +1871,7 @@ void zadd(LVALUE* lval)
     switch (lval->val_type) {
     case KIND_LONG:
     case KIND_CPTR:
-        if ( c_speed_optimisation & OPT_ADD32 && !IS_8080() ) {
+        if ( c_speed_optimisation & OPT_ADD32 && !IS_8080() && !IS_GBZ80() ) {
             ol("pop\tbc");        /* 7 bytes, 54T */
             ol("add\thl,bc");
             ol("ex\tde,hl");
@@ -1997,7 +2038,7 @@ void zsub(LVALUE* lval)
     switch (lval->val_type) {
     case KIND_LONG:
     case KIND_CPTR:
-        if ( c_speed_optimisation & OPT_SUB32 && !IS_8080() ) {
+        if ( c_speed_optimisation & OPT_SUB32 && !IS_8080() && !IS_GBZ80() ) {
             ol("ld\tc,l");        /* 13 bytes: 4 + 4 + 10 + 4 + 15 + 4  + 4 + 4 + 10 + 15 + 4 = 78T */
             ol("ld\tb,h");
             ol("pop\thl");        
@@ -2019,7 +2060,7 @@ void zsub(LVALUE* lval)
         Zsp += c_fp_size;
         break;
     default:
-        if ( c_speed_optimisation & OPT_SUB16 && !IS_8080() ) {
+        if ( c_speed_optimisation & OPT_SUB16 && !IS_8080() && !IS_GBZ80()) {
             swap();
             ol("and\ta");
             ol("sbc\thl,de");
@@ -2259,11 +2300,19 @@ void zmod(LVALUE* lval)
         else
             callrts("l_long_mod");
     } else {
-        zdiv(lval);
-        if (lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR)
-            doexx();
-        else
-            swap();
+        if ( IS_GBZ80() ) {
+            // TODO: This or just load registers?
+            if (ulvalue(lval))
+                callrts("l_mod_u");
+            else
+                callrts("l_mod");
+        } else {
+            zdiv(lval);
+            if (lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR)
+                doexx();
+            else
+                swap();
+        }
     }
 }
 
@@ -2780,9 +2829,19 @@ void asr_const(LVALUE *lval, int32_t value)
             ot("ld\tc,"); outdec(value -8); nl();
             callrts("l_long_asr_uo");
         } else if ( value == 15 && ulvalue(lval) && !IS_8080() ) {
-            ol("ex\tde,hl"); /* 10 bytes, 45T */
-            ol("rl\td");                // Lowest bit
-            ol("adc\thl,hl");
+            if ( IS_GBZ80() ) {
+                ol("rl\th");
+                ol("ld\ta,e");
+                ol("adc\te");
+                ol("ld\tl,a");
+                ol("ld\ta,d");
+                ol("adc\td");
+                ol("ld\th,a");
+            } else {
+                ol("ex\tde,hl"); /* 10 bytes, 45T */
+                ol("rl\td");                // Lowest bit
+                ol("adc\thl,hl");
+            }
             ol("ld\tde,0");
             ol("rl\te");
         } else if ( value == 16 ) {
@@ -2809,18 +2868,34 @@ void asr_const(LVALUE *lval, int32_t value)
             } else {
                 ol("srl\td"); /* 8 bytes 30T */
                 ol("rr\te");
-                ol("ex\tde,hl");
+                if ( IS_GBZ80() ) {
+                    ol("ld\tl,e");
+                    ol("ld\th,d");
+                } else {
+                    ol("ex\tde,hl");
+                }
             }
             ol("ld\tde,0");
         } else if ( value == 18 && ulvalue(lval) && !IS_8080()) {
-            ol("ld\thl,0"); /* 12 bytes, 46T */
-            ol("ex\tde,hl");
+            if ( IS_GBZ80() ) {
+                ol("ld\tl,e");
+                ol("ld\th,d");
+                ol("ld\tde,0");
+            } else {
+                ol("ld\thl,0"); /* 12 bytes, 46T */
+                ol("ex\tde,hl");
+            }
             ol("srl\th");
             ol("rr\tl");
             ol("srl\th");
             ol("rr\tl");
         } else if ( value == 20 && ulvalue(lval) && (c_speed_optimisation & OPT_RSHIFT32) && !IS_8080() ) {
-            ol("ex\tde,hl"); /* 20 bytes, 78T */
+            if ( IS_GBZ80() ) {
+                ol("ld\tl,e");
+                ol("ld\th,d");
+            } else {
+                ol("ex\tde,hl"); /* 20 bytes, 78T */
+            }
             ol("ld\tde,0");
             ol("srl\th");
             ol("rr\tl");
@@ -3356,7 +3431,7 @@ void zeq_const(LVALUE *lval, int32_t value)
             }
             ol("scf");
             set_carry(lval);
-        } else if ( c_speed_optimisation & OPT_LONG_COMPARE && !IS_8080() ) {
+        } else if ( c_speed_optimisation & OPT_LONG_COMPARE && !IS_8080() && !IS_GBZ80() ) {
             constbc(value % 65536); // 18 bytes or 14 with zero top word
             ol("and\ta");
             ol("sbc\thl,bc");
@@ -3415,7 +3490,7 @@ void zeq_const(LVALUE *lval, int32_t value)
             }
             ol("scf");
             set_carry(lval);
-        } else if ( IS_8080() ) {
+        } else if ( IS_8080() || IS_GBZ80() ) {
             const2(value & 0xffff); 
             callrts("l_eq");
             set_int(lval);
@@ -3463,7 +3538,7 @@ void zeq(LVALUE* lval)
             break;
         }
     default:
-        if ( c_speed_optimisation & OPT_INT_COMPARE && !IS_8080() ) {
+        if ( c_speed_optimisation & OPT_INT_COMPARE && !IS_8080() && !IS_GBZ80() ) {
             ol("and\ta");
             ol("sbc\thl,de");
             ol("scf");
@@ -3497,7 +3572,7 @@ void zne_const(LVALUE *lval, int32_t value)
             ol("scf");
             set_carry(lval);
         } else {
-            if ( c_speed_optimisation & OPT_LONG_COMPARE && !IS_8080() ) {
+            if ( c_speed_optimisation & OPT_LONG_COMPARE && !IS_8080() && !IS_GBZ80() ) {
                 ol("and\ta");   // 18 bytes, 14 bytes if zero top word
                 constbc(value % 65536);
                 ol("sbc\thl,bc");
@@ -3556,7 +3631,7 @@ void zne_const(LVALUE *lval, int32_t value)
                 ol("jr\tz,ASMPC+3"); 
             }
             ol("scf");
-        } else if ( IS_8080() ) {
+        } else if ( IS_8080() || IS_GBZ80() ) {
             const2(value & 0xffff);
             callrts("l_ne");
             set_int(lval);
@@ -3604,7 +3679,7 @@ void zne(LVALUE* lval)
             break;
         }
     default:
-        if ( c_speed_optimisation & OPT_INT_COMPARE && !IS_8080() ) {
+        if ( c_speed_optimisation & OPT_INT_COMPARE && !IS_8080() && !IS_GBZ80() ) {
             ol("and\ta"); // 7 bytes
             ol("sbc\thl,de");
             ol("scf");
@@ -3684,7 +3759,7 @@ void zlt_const(LVALUE *lval, int32_t value)
             }
         } else {
             if ( ulvalue(lval)) {
-                if ( IS_8080() ) {
+                if ( IS_8080() || IS_GBZ80() ) {
                     ol("ld\ta,l");  // 6 bytes 
                     outfmt("\tsub\t%d\n", ((uint32_t)value % 256) & 0xff);
                     ol("ld\ta,h");
@@ -3753,7 +3828,7 @@ void zlt(LVALUE* lval)
         }
     default:
         if (ulvalue(lval)) {
-            if ( IS_8080() ) {
+            if ( IS_8080() || IS_GBZ80() ) {
                 ol("ld\ta,e");
                 ol("sub\tl");
                 ol("ld\ta,d");
@@ -3866,7 +3941,7 @@ void zle(LVALUE* lval)
         }
     default:
         if (ulvalue(lval)) {
-            if ( IS_8080() ) {
+            if ( IS_8080() || IS_GBZ80() ) {
                 ol("ld\ta,l");
                 ol("sub\te");
                 ol("ld\ta,h");
@@ -3968,7 +4043,7 @@ void zgt(LVALUE* lval)
         }
     default:
         if (ulvalue(lval)) {
-            if ( IS_8080() ) {
+            if ( IS_8080() || IS_GBZ80() ) {
                 outfmt("\tld\ta,e\n");
                 ol("ld\ta,l");
                 ol("sub\te");
@@ -4092,7 +4167,7 @@ void zge(LVALUE* lval)
         }
     default:
         if (ulvalue(lval)) {
-            if ( c_speed_optimisation & OPT_INT_COMPARE && !IS_8080() ) {
+            if ( c_speed_optimisation & OPT_INT_COMPARE && !IS_8080() && !IS_GBZ80() ) {
                 swap();
                 ol("and\ta");
                 ol("sbc\thl,de");
@@ -4434,7 +4509,7 @@ void FrameP(void)
 void pushframe(void)
 {
     if (c_framepointer_is_ix != -1 || (currfn->ctype->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
-        if ( !IS_8080() ) {
+        if ( !IS_8080() && !IS_GBZ80() ) {
             ot("push\t");
             FrameP();
             nl();
@@ -4447,7 +4522,7 @@ void pushframe(void)
 void popframe(void)
 {
     if (c_framepointer_is_ix != -1 || (currfn->ctype->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
-        if ( !IS_8080() ) {
+        if ( !IS_8080() && !IS_GBZ80() ) {
             ot("pop\t");
             FrameP();
             nl();
@@ -4457,20 +4532,32 @@ void popframe(void)
     }
 }
 
+
 void gen_builtin_strcpy()
 {
     int label;
     // hl holds src on entry, on stack= dest
     ol("pop\tde");
     ol("push\tde");
-    ol("xor\ta");
     label = getlabel();
-    postlabel(label);
-    ol("cp\t(hl)");
-    ol("ldi");
-    outstr("\tjr\tnz,");
-    printlabel(label);
-    nl();
+    if ( IS_GBZ80() ) {
+        postlabel(label);
+        ol("ld\ta,(hl+)");
+        ol("ld\t(de),a");
+        ol("inc\tde");
+        ol("and\ta");
+        outstr("\tjr\tnz,");
+        printlabel(label);
+        nl();
+    } else {
+        ol("xor\ta");
+        postlabel(label);
+        ol("cp\t(hl)");
+        ol("ldi");
+        outstr("\tjr\tnz,");
+        printlabel(label);
+        nl();
+    }
     ol("pop\thl");
 }
 
@@ -4480,7 +4567,12 @@ void gen_builtin_strchr(int32_t c)
     int startlabel, endlabel;
     if ( c == -1 ) {
         /* hl = c, stack = buffer */
-        ol("ex\tde,hl");
+        if ( IS_GBZ80() ) {
+            ol("ld\td,h");
+            ol("ld\te,l");
+        } else {
+            ol("ex\tde,hl");
+        }
         ol("pop\thl");
         Zsp += 2;
     } else {
@@ -4507,7 +4599,12 @@ void gen_builtin_memset(int32_t c, int32_t s)
 {
     if ( c == -1 ) {
         /* Entry hl = c, on stack = buffer */
-        ol("ex\tde,hl");  /* c */
+        if ( IS_GBZ80() ) {
+            ol("ld\td,h");
+            ol("ld\te,l");
+        } else {
+            ol("ex\tde,hl");  /* c */
+        }
         ol("pop\thl");  /* buffer */
         Zsp += 2;
     } else {
@@ -4548,7 +4645,7 @@ void gen_builtin_memset(int32_t c, int32_t s)
         ol("ld\te,l");
         ol("inc\tde");
         outstr("\tld\tbc,"); outdec((s % 65536) - 1); nl();
-        ol("ldir");
+	ol("ldir");
     }
     ol("pop\thl");
 }
@@ -4561,17 +4658,18 @@ void gen_builtin_memcpy(int32_t src, int32_t n)
         ol("push\tde");
         Zsp += 2;
         outstr("\tld\tbc,"); outdec(n % 65536); nl();
-        ol("ldir");
+	ol("ldir");
     } else {
         /* hl is dst */
         ol("push\thl");
         ol("ex\tde,hl");
         outstr("\tld\thl,"); outdec(src % 65536); nl();
         outstr("\tld\tbc,"); outdec(n % 65536); nl();
-        ol("ldir");
+	ol("ldir");
     }
     ol("pop\thl");
 }
+
 
 void copy_to_stack(char *label, int stack_offset,  int size)
 {
@@ -4609,6 +4707,11 @@ void intrinsic_in(SYMBOL *sym)
             ol("nop"); // Rabbit bug workaround
         }
         return;
+    } else if ( IS_GBZ80() ) {
+        outstr("\tldh\ta,("); outname(sym->name, 1); outstr(")"); nl();
+        ol("ld\tl,a");
+        ol("ld\th,0");
+        return;
     }
     if (sym->type == KIND_PORT8 ) {
         if ( c_cpu == CPU_Z180 ) {
@@ -4635,6 +4738,10 @@ void intrinsic_out(SYMBOL *sym)
         if ( c_cpu == CPU_R2K ) {
             ol("nop"); // Rabbit bug workaround
         }
+        return;
+    } else if ( IS_GBZ80() ) {
+        ol("ld\ta,l");
+        outstr("\tldh\t("); outname(sym->name, 1); outstr("),a"); nl();
         return;
     }
     if (sym->type == KIND_PORT8 ) {

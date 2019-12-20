@@ -4,6 +4,7 @@
 SECTION code_clib
 PUBLIC asm_atol
 EXTERN l_long_neg, asm_isspace
+EXTERN l_long_mult
 
 ; FASTCALL
 
@@ -53,73 +54,18 @@ EXTERN l_long_neg, asm_isspace
    cp 10
    ret nc
 
+   push bc
+   push af			;Save value
    ; dehl *= 10
-
-   add hl,hl
-   ex de,hl
-IF __CPU_INTEL__
-   push af
-   ld a,l
-   adc l
-   ld l,a
-   ld a,h
-   adc h
-   ld h,a
-   pop af
-ELSE
-   adc hl,hl
-ENDIF
-   ex de,hl
    push de
-   push hl                   ; save dehl*2
-   add hl,hl
-   ex de,hl
-IF __CPU_INTEL__
-   push af
-   ld a,l
-   adc l
-   ld l,a
-   ld a,h
-   adc h
-   ld h,a
-   pop af
-ELSE
-   adc hl,hl
-ENDIF
-   ex de,hl
-   add hl,hl
-   ex de,hl
-IF __CPU_INTEL__
-   push af
-   ld a,l
-   adc l
-   ld l,a
-   ld a,h
-   adc h
-   ld h,a
-   pop af
-ELSE
-   adc hl,hl                 ; long is hlde
-ENDIF
-   ex (sp),hl
-   add hl,de
-   pop de
-   ex (sp),hl
-IF __CPU_INTEL__
-   push af
-   ld a,l
-   adc e
-   ld l,a
-   ld a,h
-   adc d
-   ld h,a
-   pop af
-ELSE
-   adc hl,de
-ENDIF
-   ex de,hl
-   pop hl
+   push hl
+   ld   hl,10
+   ld   de,0
+   call l_long_mult
 
+   ; dehl + value
+   pop af		;Value
+   pop bc		;str pointer
    add a,l
    ld l,a
    jp nc, loop

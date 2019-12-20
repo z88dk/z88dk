@@ -4,7 +4,7 @@
  *      djm 4/5/99
  *
  * --------
- * $Id: fputc_callee.c,v 1.5 2016-03-06 21:36:52 dom Exp $
+ * $Id: fputc_callee.c $
  */
 
 
@@ -27,31 +27,38 @@ static void wrapper_fputc_callee() __naked
 fputc_callee:
 _fputc_callee:
 
-	pop	de
-	pop	hl	;fp
-	pop	bc	;c
-	push 	de
+    pop     de
+    pop     hl	;fp
+    pop     bc	;c
+    push 	de
 
-IF !__CPU_8080__
-        push	ix
-
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
+    push    ix
   IF __CPU_R2K__ | __CPU_R3K__
-	ld	ix,hl
+    ld      ix,hl
   ELSE
-	push	hl
-	pop	ix
+	push    hl
+	pop     ix
   ENDIF
 ENDIF
-	call	asm_fputc_callee
-
-IF !__CPU_8080__
-	pop	ix	
+    call    asm_fputc_callee
+IF __CPU_GBZ80__
+    ld      d,h
+    ld      e,l
+ELIF !__CPU_INTEL__ 
+    pop     ix
 ENDIF
-	ret
+    ret
+#endasm
+}
 
+
+static void wrapper_fputc_callee_z80() __naked
+{
+#asm
 	PUBLIC	asm_fputc_callee
 
-IF !__CPU_8080__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 ; Entry:	ix = fp
 ; 		bc = character to print
 ; Exit:		hl = byte written
@@ -60,8 +67,11 @@ asm_fputc_callee:
 	ld	a,(ix+fp_flags)
 	and	a	;no thing
 	ret	z
-	and	_IOREAD
-	ret	nz	;don`t want reading streams
+
+;	Check removed to allow READ+WRITE streams 
+;	and	_IOREAD
+;	ret	nz	;don`t want reading streams
+
 	ld	a,(ix+fp_flags)
 	and	_IOSTRING
 	jr	z,no_string
@@ -156,60 +166,60 @@ static void wrapper_fputc_callee_8080() __naked
 {
 //#ifdef Z80
 #asm
-IF __CPU_8080__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 ; Entry:	hl = fp
 ; 		bc = character to print
 ; Exit:		hl = byte written
 asm_fputc_callee:
-	ex	de,hl
-        ld      hl,-1   ;EOF
-        inc     de
-        inc     de      ;fp_flags
-        ld      a,(de)
-        and     a       ;no thing
-        ret     z
-        and     _IOREAD
-        ret     nz      ;don`t want reading streams
-        ld      a,(de)
-        and     _IOSTRING
-        jr      z,no_string
-        ex      de,hl
-        dec     hl      ;fp_desc+1
-        ld      d,(hl)
-        dec     hl      ;&fp_desc
-        ld      e,(hl)
-        ld      a,c     ;store character
-        ld      (de),a
-        inc     de      ;inc pointer and store
-        ld      (hl),e
-        inc     hl      ;fp_desc+1
-        ld      (hl),d
-        ld      l,c     ;load char to return
-        ld      h,0
-        ret
+    ex      de,hl
+    ld      hl,-1   ;EOF
+    inc     de
+    inc     de      ;fp_flags
+    ld      a,(de)
+    and     a       ;no thing
+    ret     z
+    and     _IOREAD
+    ret     nz      ;don`t want reading streams
+    ld      a,(de)
+    and     _IOSTRING
+    jr      z,no_string
+    ex      de,hl
+    dec     hl      ;fp_desc+1
+    ld      d,(hl)
+    dec     hl      ;&fp_desc
+    ld      e,(hl)
+    ld      a,c     ;store character
+    ld      (de),a
+    inc     de      ;inc pointer and store
+    ld      (hl),e
+    inc     hl      ;fp_desc+1
+    ld      (hl),d
+    ld      l,c     ;load char to return
+    ld      h,0
+    ret
 .no_string
-        dec     de
-        dec     de      ;fp_desc
-        push    de
-        call    fchkstd ;preserves bc
-        pop     de
-        jr      c,no_cons
+    dec     de
+    dec     de      ;fp_desc
+    push    de
+    call    fchkstd ;preserves bc
+    pop     de
+    jr      c,no_cons
 ; Output to console
-        push    bc
-        call    fputc_cons
-        pop     hl
-        ret
+    push    bc
+    call    fputc_cons
+    pop     hl
+    ret
 .no_cons
 ; Output to file
-        ex      de,hl
-        ld      e,(hl)  ;fp_desc
-        inc     hl
-        ld      d,(hl)
-        push    de      ;fd
-        push    bc      ;c
-        call    writebyte
-        pop     bc      ;discard values
-        pop     bc
+    ex      de,hl
+    ld      e,(hl)  ;fp_desc
+    inc     hl
+    ld      d,(hl)
+    push    de      ;fd
+    push    bc      ;c
+    call    writebyte
+    pop     bc      ;discard values
+    pop     bc
 	ret
 ENDIF
 #endasm

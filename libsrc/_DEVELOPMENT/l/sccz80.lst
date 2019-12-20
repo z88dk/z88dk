@@ -26,6 +26,7 @@ l/sccz80/crt0/l_ghtonsint
 l/sccz80/crt0/l_gint
 l/sccz80/crt0/l_gint_eq
 l/sccz80/crt0/l_gint7de
+l/sccz80/crt0/l_gintsp2de
 l/sccz80/crt0/l_gintsp
 l/sccz80/crt0/l_gintspchar
 l/sccz80/crt0/l_gintspsp
@@ -95,5 +96,4 @@ l/sccz80/crt0_long/l_long_ugt
 l/sccz80/crt0_long/l_long_ule
 l/sccz80/crt0_long/l_long_ult
 l/sccz80/crt0_long/l_long_xor
-l/sccz80/crt0_long/long2int_s
 l/sccz80/crt0_long/lpush2

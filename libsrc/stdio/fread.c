@@ -11,8 +11,10 @@ static int wrapper() __naked
 	GLOBAL _fread
 fread:
 _fread:
-IF __CPU_8080__
-	ld	hl,-1
+IF __CPU_INTEL__ | __CPU_GBZ80__
+	ld      hl,-1
+    ld      d,h
+    ld      e,l
 	ret
 ELSE
 	push	ix	;save callers

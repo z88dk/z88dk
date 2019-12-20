@@ -82,11 +82,26 @@ extern const unsigned char *joystick_type[];
 	#define GAME_DEVICES 3
 #endif
 
+#ifdef __TVC__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = { "Joystick 1/internal", "Joystick 2"};
+#endif
+	#define GAME_DEVICES 2
+#endif
+
+
 #ifdef __GAL__
 #ifdef DEFINE_JOYSTICK_TYPE
 	const unsigned char *joystick_type[] = {"Arrows and SPACE", "5678-0"};
 #endif
 	#define GAME_DEVICES 2
+#endif
+
+#ifdef __GAMEBOY__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = {"Joypad"};
+#endif
+	#define GAME_DEVICES 1
 #endif
 
 #ifdef __PC6001__
@@ -124,6 +139,13 @@ extern const unsigned char *joystick_type[];
 	#define GAME_DEVICES 3
 #endif
 
+#ifdef __PENCIL2__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = {"QAOP-MN", "8246-05", "hjkl-sd", "Cursor"};
+#endif
+	#define GAME_DEVICES 4
+#endif
+
 #ifdef __COLECO__
 #ifdef DEFINE_JOYSTICK_TYPE
 	const unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2", "Joystick 2 + Keypad 1", "Joystick 2 + Keypad 2"};
@@ -141,6 +163,13 @@ extern const unsigned char *joystick_type[];
 #ifdef __MC1000__
 #ifdef DEFINE_JOYSTICK_TYPE
 	const unsigned char *joystick_type[] = {"Joystick A", "Joystick B"};
+#endif
+	#define GAME_DEVICES 2
+#endif
+
+#ifdef __MYVISION__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = {"Cursor","1234-56"};
 #endif
 	#define GAME_DEVICES 2
 #endif
@@ -343,6 +372,8 @@ extern const unsigned char *joystick_type[];
 #endif
 	#define GAME_DEVICES 2
 #endif
+
+
 
 
 #endif

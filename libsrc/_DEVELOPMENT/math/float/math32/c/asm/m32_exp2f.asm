@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 3.9.1 #11310 (Linux)
+; Version 3.9.4 #11423 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -285,27 +285,49 @@ _m32_exp2f:
 	push	af
 	push	af
 	push	af
+	push	af
+	ld	(ix-8),l
+	ld	(ix-7),h
+	ld	(ix-6),e
+	ld	(ix-5),d
+	ld	a, d
+	and	a,0x7f
+	or	a,(ix-6)
+	or	a,(ix-7)
+	or	a,(ix-8)
+	jr	NZ,l_m32_exp2f_00102
+	ld	de,0x3f80
+	ld	hl,0x0000
+	jp	l_m32_exp2f_00103
+l_m32_exp2f_00102:
+	ld	hl,0x3f00
 	push	hl
-	ld	c,l
-	ld	b,h
-	push	de
-	ld	l, c
-	ld	h, b
+	ld	hl,0x0000
+	push	hl
+	ld	l,(ix-6)
+	ld	h,(ix-5)
+	push	hl
+	ld	l,(ix-8)
+	ld	h,(ix-7)
+	push	hl
+	call	___fsadd_callee
 	call	_m32_floorf
 	ld	(ix-4),l
 	ld	(ix-3),h
 	ld	(ix-2),e
+	ld	l, e
 	ld	(ix-1),d
-	pop	de
-	pop	bc
-	ld	l,(ix-2)
-	ld	h,(ix-1)
+	ld	h,d
 	push	hl
 	ld	l,(ix-4)
 	ld	h,(ix-3)
 	push	hl
-	push	de
-	push	bc
+	ld	l,(ix-6)
+	ld	h,(ix-5)
+	push	hl
+	ld	l,(ix-8)
+	ld	h,(ix-7)
+	push	hl
 	call	___fssub_callee
 	push	hl
 	push	de
@@ -320,67 +342,13 @@ _m32_exp2f:
 	ld	(ix-1),h
 	pop	de
 	pop	bc
-	push	bc
-	push	de
-	push	de
-	push	bc
-	ld	hl,0x3f00
-	push	hl
-	ld	hl,0x0000
-	push	hl
-	call	___fslt_callee
-	pop	de
-	pop	bc
-	ld	a,l
-	or	a, a
-	jr	Z,l_m32_exp2f_00102
-	inc	(ix-2)
-	jr	NZ,l_m32_exp2f_00110
-	inc	(ix-1)
-l_m32_exp2f_00110:
-	ld	hl,0x3f80
-	push	hl
-	ld	hl,0x0000
-	push	hl
-	push	de
-	push	bc
-	call	___fssub_callee
-	ld	c, l
-	ld	b, h
-l_m32_exp2f_00102:
-	push	bc
-	push	de
-	ld	hl,0x0005
+	ld	hl,0x0009
 	push	hl
 	ld	hl,_m32_coeff_exp2f
 	push	hl
 	push	de
 	push	bc
 	call	_m32_polyf
-	ld	(ix-6),l
-	ld	(ix-5),h
-	ld	(ix-4),e
-	ld	(ix-3),d
-	pop	de
-	pop	bc
-	push	de
-	push	bc
-	ld	l,(ix-4)
-	ld	h,(ix-3)
-	push	hl
-	ld	l,(ix-6)
-	ld	h,(ix-5)
-	push	hl
-	call	___fsmul_callee
-	ld	c, l
-	ld	b, h
-	ld	hl,0x3f80
-	push	hl
-	ld	hl,0x0000
-	push	hl
-	push	de
-	push	bc
-	call	___fsadd_callee
 	ld	c, l
 	ld	l,(ix-2)
 	ld	b,h
@@ -389,6 +357,7 @@ l_m32_exp2f_00102:
 	push	de
 	push	bc
 	call	_m32_ldexpf
+l_m32_exp2f_00103:
 	ld	sp, ix
 	pop	ix
 	ret

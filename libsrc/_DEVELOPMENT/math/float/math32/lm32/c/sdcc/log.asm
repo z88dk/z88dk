@@ -4,4 +4,3 @@
 	EXTERN	cm32_sdcc_log
 
 	defc	_log = cm32_sdcc_log
-

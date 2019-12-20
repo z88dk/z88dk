@@ -12,7 +12,7 @@ SECTION code_clib
 PUBLIC vz_soundcopy_callee
 PUBLIC _vz_soundcopy_callee
 PUBLIC ASMDISP_VZ_SOUNDCOPY_CALLEE
-EXTERN _std_seed
+EXTERN __stdlib_seed
 
 .vz_soundcopy_callee
 ._vz_soundcopy_callee
@@ -41,7 +41,7 @@ EXTERN _std_seed
 
    ld e,c
    ld d,b
-   ld hl,(_std_seed)
+   ld hl,(__stdlib_seed)
 
    ld a,b
    or c                      ; both off?

@@ -10,12 +10,18 @@ EXTERN asm_strcmp
 
 strcmp_callee:
 
-   pop af
+   pop bc
    pop hl
    pop de
-   push af
-   
+   push bc
+IF __CLASSIC && __CPU_GBZ80__
+   call asm_strcmp
+   ld d,h
+   ld e,l
+   ret
+ELSE   
    jp asm_strcmp
+ENDIF
 
 ; SDCC bridge for Classic
 IF __CLASSIC

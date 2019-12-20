@@ -50,9 +50,17 @@ loop:
    ld a,(hl)
    call asm_isspace
    jr c, not_ws
-   
+  
+IF __CPU_GBZ80__ || __CPU_INTEL__
+   dec hl
+   dec bc
+   ld a,b
+   or c
+   jr nz,loop
+ELSE 
    cpd                         ; hl--, bc--
    jp pe, loop
+ENDIF
    
 all_ws:
 exit:

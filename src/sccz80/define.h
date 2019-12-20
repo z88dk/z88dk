@@ -164,7 +164,8 @@ enum symbol_flags {
         NAKED = 0x800,      /* Function is naked - don't generate any code */
         CRITICAL = 0x1000,    /* Disable interrupts around the function */
         SDCCDECL = 0x2000,   /* Function uses sdcc convention for chars */
-        SHORTCALL = 0x4000   /* Function uses short call (via rst) */
+        SHORTCALL = 0x4000,   /* Function uses short call (via rst) */
+        BANKED = 0x8000      /* Call via the banked_call function */
 };
 
 
@@ -352,10 +353,12 @@ struct gototab_s {
 #define CPU_R3K      8
 #define CPU_Z80N     16
 #define CPU_8080     32
+#define CPU_GBZ80    64
 
 #define CPU_RABBIT (CPU_R2K|CPU_R3K)
 
 #define IS_8080() (c_cpu == CPU_8080)
+#define IS_GBZ80() (c_cpu == CPU_GBZ80)
 
 
 

@@ -1208,6 +1208,7 @@
 	exx
 
 %notcpu 8080
+%notcpu gbz80
 	call	l_sub
 =
 	ex	de,hl
@@ -1269,6 +1270,7 @@
 	call	ufloat
 	call	dpush
 
+%notcpu gbz80
 	ld	hl,%1	;const
 	add	hl,sp
 	call	l_gint	;
@@ -1278,6 +1280,22 @@
 	ld	hl,%1	;const
 	call	l_gintspsp	;
 	ld	hl,%2	;const
+
+REMOVE THIS LINE FOR IT TO FIRE
+	ld	hl,%1
+	push	hl
+	ld	hl,%2
+	add	hl,sp
+	call	l_gint	;
+	add	hl,hl
+	pop	de
+	add	hl,de
+	call	l_gint	;
+=
+	ld	hl,%1
+	push	hl
+	ld	hl,%2
+	call	l_gintsp2de	;
 
 	ld	hl,%1	;const
 	add	hl,sp
@@ -1289,6 +1307,7 @@
 	call	l_gcharspsp	;
 	ld	hl,%2	;const
 
+%notcpu gbz80
 	ld	hl,%1	;const
 	call	l_gintspsp	;
 	ld	hl,%1	;const
@@ -1297,6 +1316,7 @@
 	ld	hl,%1	;const
 	call	l_g2intspsp	;
 
+%notcpu gbz80
 	ld	hl,%1	;const
 	call	l_gcharspsp	;
 	ld	hl,%1	;const

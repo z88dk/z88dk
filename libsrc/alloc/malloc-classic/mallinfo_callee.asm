@@ -12,7 +12,12 @@ EXTERN _heap
 ._mallinfo_callee
 
    ld hl,_heap
+IF __CPU_GBZ80__
+   EXTERN __z80asm__exsphl
+   call __z80asm__exsphl
+ELSE
    ex (sp),hl
+ENDIF
    push hl
    jp HeapInfo_callee
 

@@ -9,7 +9,7 @@
 	EXTERN	__printf_set_upper
 
 __printf_handle_X:
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
 	ld	c,16
 	call	__printf_set_base
 	call	__printf_disable_plus_flag

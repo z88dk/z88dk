@@ -15,6 +15,7 @@ PUBLIC i2c_interrupt_attach_callee
 
 .i2c_interrupt_attach_callee
     pop bc                              ;ret
+    pop hl                              ;*isr
     dec sp
     pop af                              ;device address
     inc sp

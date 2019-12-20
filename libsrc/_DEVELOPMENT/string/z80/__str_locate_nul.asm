@@ -18,7 +18,19 @@ __str_locate_nul:
    xor a
    ld c,a
    ld b,a
+IF __CPU_GBZ80__
+loop:
+   dec bc
+   ld a,(hl)
+   and a
+   ret z
+   inc hl
+   ld a,b
+   or c
+   jr nz,loop
+   and a
+ELSE
    cpir
-   
+ENDIF
    dec hl
    ret

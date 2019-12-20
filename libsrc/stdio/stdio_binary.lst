@@ -12,6 +12,7 @@ stdio/obj/binary/fchkstd
 stdio/obj/binary/fclose
 stdio/obj/binary/fdopen
 stdio/obj/binary/feof
+stdio/obj/binary/ferror
 stdio/obj/binary/fflush
 stdio/obj/binary/fgetc
 stdio/obj/binary/fgetpos
@@ -32,6 +33,7 @@ stdio/obj/binary/fseek
 stdio/obj/binary/ftell
 stdio/obj/binary/fwrite
 stdio/obj/binary/gets
+stdio/obj/binary/perror
 stdio/obj/binary/printf
 stdio/obj/binary/printk
 stdio/obj/binary/printk_outc
@@ -101,4 +103,4 @@ stdio/obj/binary/__printf_handle_llx
 stdio/obj/binary/kbhit
 stdio/obj/binary/fputc_cons_generic
 stdio/obj/binary/fputc_cons_generic_ioctl
-@stdio/conio.lst
+stdio/obj/binary/conio/**

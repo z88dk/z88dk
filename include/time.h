@@ -86,7 +86,8 @@ struct tm {
 extern struct tm __LIB__ __SAVEFRAME__ *gmtime(time_t *t);
 extern struct tm __LIB__  __SAVEFRAME__*localtime(time_t *t);
 extern time_t __LIB__  __SAVEFRAME__ mktime(struct tm *tp);
-
+extern char __LIB__  __SAVEFRAME__ *asctime(struct tm *tp);
+extern char __LIB__  __SAVEFRAME__*ctime(time_t *t);
 
 
 /* This is a really simple fn which will barf over midnight,.. */

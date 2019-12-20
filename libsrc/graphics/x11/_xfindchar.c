@@ -31,9 +31,16 @@ next_char:
 no_end:
 	inc	hl
 	dec	a
+IF __CPU_INTEL__
+	rra
+	rra
+	rra
+	or	@11100000
+ELSE
 	srl	a
 	srl	a
 	srl	a
+ENDIF
 	ld	b,a
 	and	a	; set flag
 	ld	a,(hl)

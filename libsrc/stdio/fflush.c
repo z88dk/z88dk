@@ -25,7 +25,7 @@ ELSE
 	push	hl
 	push	bc
 ENDIF
-IF !__CPU_8080__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !_CPU_GBZ80__
 	ld	e,(hl)
 	inc	hl
 	ld	d,(hl)
@@ -54,11 +54,19 @@ IF __CPU_R2K__ | __CPU_R3K__
 	rr	hl
 ELSE
 	ld	hl,0
+  IF __CPU_GBZ80__
+        ld      d,h
+        ld      e,l
+  ENDIF
 ENDIF
 	ret
 ENDIF
 .fflush_error
 	ld	hl,-1	; EOF
+IF __CPU_GBZ80__
+        ld      d,h
+        ld      e,l
+ENDIF
 #endasm
 }
 

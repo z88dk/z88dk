@@ -14,7 +14,6 @@ strlcat_callee:
    pop bc
    pop de
    ex (sp),hl
-   
    jp asm_strlcat
 
 ; SDCC bridge for Classic

@@ -48,20 +48,10 @@ The more detailed (yet incomplete) changelist is below:
 - [classic] +ts2068: gencon supports hires and multicolour modes
 - [classic} +vz: Support for graphics 
 - [classic] +x1: Graphics and console improvements
-- [classic] all: IEEE 754 32 bit maths library
-- [classic] all: BBC BASIC 40 bit maths library
-- [sccz80] #1102: Trailing comma support in struct initialisation
-- [sccz80] Optimisation rule fixes and improvements
-- [sccz80] Support added for 32 and 64 bit floating point numbers
-- [sccz80] #1132: Struct assignment and parameter passing supported
-- [sccz80] #1141: Support for named address spaces
-- [sccz80] #1133: Support for bitfields
-- [sccz80] 8080 and gbz80 support added
-- [z80asm] Now supports assembling 8080/5 code using both Intel and Zilog syntax
-- [z80asm] Now supports assembling gbz80 code
-- [z80asm] Supports many emulations for cross-processor compatibility
+- [classic] +gb: Nintendo Gameboy support
 - [zsdcc] Upgraded to SDCC 3.9.5 r11502
 - [newlib] +scz180: Support for this platform
+
 - [newlib] +zxn: ZX Spectrum Next architecture renamed z80n
 
 z88dk v1.99C - 19.01.2019

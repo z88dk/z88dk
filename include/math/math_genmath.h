@@ -58,6 +58,7 @@
 
 /* Trigonmetric functions */
 extern double_t __LIB__ cos(double_t);   /* cosine */
+
 extern double_t __LIB__ tan(double_t);   /* tangent */
 extern double_t __LIB__ sin(double_t);   /* sine */
 extern double_t __LIB__ acos(double_t);  /* arc cosine */
@@ -78,6 +79,7 @@ extern double_t __LIB__ pow(double_t,double_t) __smallc;   /* pow(x,y) = x**y */
 extern double_t __LIB__ sqrt(double_t);  /* square root */
 #define cbrt(x) ((x)==0.?0.:(x)>0.?pow(x,.33333333):-pow(-x,.33333333))
 #define hypot(x,y) sqrt(x*x+y*y)
+#define ispow2(x) (((x) & ((x) - 1)) == 0)
 
 /* Exponential */
 extern double_t __LIB__ exp(double_t);   /* exponential */

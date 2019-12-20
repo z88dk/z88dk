@@ -1,6 +1,7 @@
 #include <graphics.h>
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 void main() {
   int x, y;

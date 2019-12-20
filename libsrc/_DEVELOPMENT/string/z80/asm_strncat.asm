@@ -45,12 +45,24 @@ asm0_strncat:
    ex de,hl
 
 loop:                          ; append src to dst
-
+IF __CPU_INTEL__ || __CPU_GBZ80__
+   ld a,(hl)
+   and a
+   jr z,done
+   ld (de),a
+   inc hl
+   inc de
+   dec bc
+   ld a,b
+   or c
+   jr nz,loop
+ELSE
    cp (hl)
    jr z, done
       
    ldi
    jp pe, loop
+ENDIF
 
    scf
 

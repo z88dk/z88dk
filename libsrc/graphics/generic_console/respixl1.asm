@@ -8,4 +8,4 @@
 
 .respixel			
 	defc	NEEDunplot = 1
-	INCLUDE	"pixel1.asm"
+	INCLUDE	"pixel1.inc"

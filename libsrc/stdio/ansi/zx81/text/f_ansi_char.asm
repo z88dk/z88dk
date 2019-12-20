@@ -18,10 +18,9 @@
 	
 	EXTERN	asctozx81
 	
+	EXTERN __console_x
+	EXTERN __console_y
 
-	EXTERN	ansi_ROW
-	EXTERN	ansi_COLUMN
-	
 	EXTERN	zx_inverse
 
 
@@ -43,7 +42,7 @@ ELSE
 	ld	hl,(16396)	; D_FILE
 	inc	hl
 ENDIF
-	ld	a,(ansi_ROW)
+	ld	a,(__console_y)
 	and	a
 	jr	z,r_zero
 	ld	b,a
@@ -52,7 +51,7 @@ ENDIF
 	add	hl,de
 	djnz	r_loop
 .r_zero
-	ld	a,(ansi_COLUMN)
+	ld	a,(__console_x)
 	ld	d,0
 	ld	e,a
 	add	hl,de

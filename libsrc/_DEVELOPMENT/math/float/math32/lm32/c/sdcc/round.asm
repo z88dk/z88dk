@@ -4,4 +4,3 @@
 	EXTERN	cm32_sdcc_round
 
 	defc	_round = cm32_sdcc_round
-

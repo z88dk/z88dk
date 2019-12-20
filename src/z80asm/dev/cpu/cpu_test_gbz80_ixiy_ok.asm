@@ -270,6 +270,7 @@
  djnz ASMPC                     ; 05 20 FE
  djnz b, ASMPC                  ; 05 20 FE
  ei                             ; FB
+ ex (sp), hl                    ; CD @__z80asm__exsphl
  ex de, hl                      ; E5 D5 E1 D1
  halt                           ; 76
  hlt                            ; 76
@@ -466,6 +467,7 @@
  ld hl, 65535                   ; 21 FF FF
  ld hl, bc                      ; 60 69
  ld hl, de                      ; 62 6B
+ ld hl, sp                      ; F8 00
  ld hl, sp+-128                 ; F8 80
  ld hl, sp+127                  ; F8 7F
  ld ix, -32768                  ; FD 21 00 80
@@ -496,12 +498,14 @@
  ldax bc                        ; 0A
  ldax d                         ; 1A
  ldax de                        ; 1A
+ ldd                            ; CD @__z80asm__ldd
  ldd (bc), a                    ; 02 0B
  ldd (de), a                    ; 12 1B
  ldd (hl), a                    ; 32
  ldd a, (bc)                    ; 0A 0B
  ldd a, (de)                    ; 1A 1B
  ldd a, (hl)                    ; 3A
+ lddr                           ; CD @__z80asm__lddr
  ldh (-128), a                  ; E0 80
  ldh (127), a                   ; E0 7F
  ldh (255), a                   ; E0 FF
@@ -512,12 +516,14 @@
  ldh a, (c)                     ; F2
  ldhl sp, -128                  ; F8 80
  ldhl sp, 127                   ; F8 7F
+ ldi                            ; CD @__z80asm__ldi
  ldi (bc), a                    ; 02 03
  ldi (de), a                    ; 12 13
  ldi (hl), a                    ; 22
  ldi a, (bc)                    ; 0A 03
  ldi a, (de)                    ; 1A 13
  ldi a, (hl)                    ; 2A
+ ldir                           ; CD @__z80asm__ldir
  lxi b, -32768                  ; 01 00 80
  lxi b, 32767                   ; 01 FF 7F
  lxi b, 65535                   ; 01 FF FF

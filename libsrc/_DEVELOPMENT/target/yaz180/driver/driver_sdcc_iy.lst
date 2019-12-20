@@ -6,4 +6,4 @@
 @target/yaz180/driver/ide/ide.lst
 @target/yaz180/driver/diskio/diskio_sdcc.lst
 @target/yaz180/driver/apu/apu_sdcc.lst
-@target/yaz180/driver/system_time/system_time_sdcc.lst
+@target/yaz180/driver/time/time_sdcc.lst

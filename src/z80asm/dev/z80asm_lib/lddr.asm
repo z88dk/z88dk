@@ -8,9 +8,13 @@ PUBLIC __z80asm__lddr
 .__z80asm__lddr
 	push	af
 loop:
+IF __CPU_GBZ80__
+	ld	a,(hl-)
+ELSE
 	ld	a,(hl)
-	ld	(de),a
 	dec	hl
+ENDIF
+	ld	(de),a
 	dec	de
 	dec	bc
 	ld	a,b

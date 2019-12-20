@@ -2,6 +2,7 @@
 	SECTION	rodata_clib
 	PUBLIC	mc6847_map_colour
 
+        EXTERN  __CLIB_CONIO_NATIVE_COLOUR
 
 ; Map conio colour to colours
 ; Entry:  a = colour
@@ -9,6 +10,10 @@
 ;         b = colour colour
 ; Uses:   dehl
 mc6847_map_colour:
+        ld      c,__CLIB_CONIO_NATIVE_COLOUR
+        rr      c
+        ret     c
+
 	and	15
 	ld	l,a
 	and	1

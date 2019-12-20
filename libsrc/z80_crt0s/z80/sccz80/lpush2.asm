@@ -18,7 +18,7 @@ PUBLIC    lpush2
 
 .lpush2
 
-IF __CPU_INTEL__
+IF __CPU_INTEL__ || __CPU_GBZ80__
    pop af
 ELSE
    pop ix
@@ -29,19 +29,10 @@ ENDIF
    push hl
    push bc
    
-IF __CPU_INTEL__
+IF __CPU_INTEL__ || __CPU_GBZ80__
    push af
    ret
 ELSE
    jp (ix)
 ENDIF
 
-;        exx
-;        pop     hl      ;save return address
-;        exx
-;        pop     bc      ;save next item on stack
-;        push    de      ;dump our long
-;        push    hl
-;        push    bc      ;store back "next item on stack"
-;        exx
-;        jp      (hl)

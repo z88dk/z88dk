@@ -29,6 +29,22 @@
    ; bc = char *
    ; stack = char **endp
 
+IF __CPU_GBZ80__
+   push hl		     ; Save lower word
+   ld   hl,sp+2
+   ld   a,(hl+)
+   ld   h,(hl)
+   ld   l,a
+   or   h
+   jr   z,no_write
+   ld   (hl),c
+   inc  hl
+   ld   (hl),b
+no_write:
+   pop hl                    ; Lower word
+   pop af                    ; Dump endp
+   ret
+ELSE
    ex (sp),hl                ; hl = char **endp
    ld a,h
    or l
@@ -39,6 +55,7 @@
 finally_exit:
    pop hl
    ret
+ENDIF
 
 .noendp
 

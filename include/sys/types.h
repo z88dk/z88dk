@@ -57,6 +57,11 @@ typedef unsigned char bool_t;
 typedef unsigned int ino_t;
 #endif
 
+#ifndef _NSECONDS_T
+#define _NSECONDS_T
+typedef unsigned long nseconds_t;
+#endif
+
 #ifndef _TIME_T
 #define _TIME_T
 typedef long time_t;

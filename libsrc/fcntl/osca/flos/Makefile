@@ -6,7 +6,7 @@
 
 include ../../../Make.config
 
-OBJECTS = open.o close.o read.o readbyte.o write.o writebyte.o remove.o rename.o mkdir.o lseek.o fdtell.o
+OBJECTS = open.o close.o read.o readbyte.o write.o writebyte.o remove.o rename.o mkdir.o lseek.o fdtell.o stat.o
 
 all: $(OUTPUT_DIRECTORY)/flosdos.lib
 

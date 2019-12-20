@@ -331,12 +331,27 @@
         ((member (car x) y) (union (cdr x) y))
         (t (cons (car x) (union (cdr x) y)))))
 
-; list intersection
+; list intersection, difference..
+; Example:
+; (setq lst1 '(A b C d))
+; (setq lst2 '(a B C d))
+; (ldifference lst1 lst2)
+
 (defun intersection (x y)
   (cond ((not (consp x)) nil)
         ((member (car x) y)
             (cons (car x) (intersection (cdr x) y)))
         (t (intersection (cdr x) y))))
+
+(defun ldifference (in out)
+    (cond ((null in) nil)
+          ((member (car in) out) (ldifference (cdr in) out))
+          (t (cons (car in) (ldifference (cdr in) out)))))
+
+(defun make-set (s)
+    (cond ((null s) nil)
+          ((member (car s) (cdr s)) (make-set (cdr s)))
+          (t (cons (car s) (make-set (cdr s))))))
 
 ; copy list
 (defun copy-list (l)
@@ -402,4 +417,34 @@
     (t 
         (assv obj (cdr alist))))) 
 
+
+; sort and splice make up a sorting utility.
+; ex: (sort '(3 6 7 1 9) '<) => (1 3 6 7 9).
+
+(defun sort (slist pred)
+    (cond ((null slist) nil)
+          (t (splice (car slist) (sort (cdr slist) pred) pred))))
+
+(defun splice (elem slist pred)
+    (cond ((null slist) (list elem))
+          ((eval (list pred elem (car slist))) (cons elem slist))
+          (t (cons (car slist) (splice elem (cdr slist) pred)))))
+
+
+
+
+; human friendly comparison
+(defun compare (x y)
+      (cond ((equal x y)     'numbers-are-the-same)
+            ((< x y) 'first-is-smaller)
+            ((> x y)  'first-is-bigger)))
+
+; human friendly algebric operations,
+;   e.g. (compute 'add 4 5)
+(defun compute (op x y)
+      (cond ((equal op 'add)      (+ x y))
+            ((equal op 'subtract) (- x y))
+            ((equal op 'multiply) (* x y))
+            ((equal op 'divide)   (/ x y))
+            (t '(I do not know how to do that))))
 

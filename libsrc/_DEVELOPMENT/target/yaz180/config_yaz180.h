@@ -41,7 +41,7 @@
 
 #define __CPU_CLOCK  36864000
 
-#define __IO_BASE_ADDRESS 0x0
+#define __CLOCKS_PER_SECOND 256
 
 #define __BIOS_SP   0xFFDE
 #define __BANK_SP   0x003B
@@ -55,6 +55,8 @@
 
 #define __ASCI1_RX_SIZE  0x100
 #define __ASCI1_TX_SIZE  0x080
+
+#define __IO_BASE_ADDRESS 0x0
 
 #define __IO_BREAK  0x2000
 
@@ -879,8 +881,8 @@
 
 
 
-#define __IO_I2C_RX_SIZE  256
-#define __IO_I2C_TX_SIZE  256
+#define __IO_I2C_RX_SIZE  68
+#define __IO_I2C_TX_SIZE  67
 
 #define __IO_I2C1_PORT_BASE  0xA000
 #define __IO_I2C2_PORT_BASE  0x8000

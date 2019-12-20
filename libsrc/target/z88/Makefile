@@ -1,40 +1,28 @@
-#
-# Wahey, a messed up makefile for building libraries!
-#
-# $Id: Makefile,v 1.18 2016-07-12 19:41:25 dom Exp $
-
 include ../../Make.config
 
-CFILES = \
-	DeRegisterInt.c \
-	exec_cli.c \
-	fnexpand.c \
-	getpid.c \
-	nameapp.c \
-	openpopup.c \
-	opentitled.c \
-	openwindow.c \
-	QueryPackage.c \
-	RegisterInt.c \
-	stripdev.c \
-	strippath.c \
-	wcclose.c \
-	wcnext.c \
-	wcopen.c \
+TARGET = z88
 
-AFILES  = $(CFILES:.c=.asm)
-OBJECTS = $(CFILES:.c=.o)
+SUBDIRS = z88 net time fcntl
+CLEANDIRS = $(SUBDIRS:%=clean-%)
 
-all: $(OBJECTS) net
+all: subdirs-all 
 
-.c.o:
-	$(ZCC) +z88 $(CFLAGS) $*.c
 
-net:
-	$(MAKE) -C net
+subdirs-all: $(SUBDIRS)
 
-clean:
-	$(RM) *.obj *.sym *.map *.o* *~ zcc_opt.def *.i $(AFILES)
-	$(MAKE) -C net clean
+subdirs-clean: $(SUBDIRS_CLEAN)
 
-.PHONY: net
+
+clean: subdirs-clean
+	$(RM) zcc_opt.def *.err *.o
+
+subdirs-clean: $(CLEANDIRS)
+
+.PHONY:	subdirs-all $(SUBDIRS) $(SUBDIRS_CLEAN)
+
+$(SUBDIRS):
+	$(MAKE) -C $@ all
+
+$(CLEANDIRS):
+	$(MAKE) -C $(@:clean-%=%) clean
+	$(RM) */*.o

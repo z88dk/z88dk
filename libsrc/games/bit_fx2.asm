@@ -4,6 +4,7 @@
 ; Alternate sound library by Stefano Bodrato
 ;
 
+IF !__CPU_GBZ80__
           SECTION    smc_clib
           PUBLIC     bit_fx2
           PUBLIC     _bit_fx2
@@ -576,3 +577,4 @@
           
           call	bit_close_ei
           ret
+ENDIF

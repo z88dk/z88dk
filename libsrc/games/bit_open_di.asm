@@ -8,6 +8,7 @@
 ; Stefano Bodrato - 2001..2013
 ;
 
+IF !__CPU_GBZ80__
     SECTION    code_clib
     PUBLIC     bit_open_di
     PUBLIC     _bit_open_di
@@ -29,3 +30,4 @@
         
         ld  a,(__snd_tick)
         ret
+ENDIF

@@ -2,13 +2,15 @@
 ;
 ; Supported VT52 codes:
 ;
+; * = With VT52x
+;
 ;  [ESC] A - Move the cursor to beginning of line above.
 ;  [ESC] B - Move the cursor to beginning of line below.
 ;  [ESC] C - Move the cursor right by one.
 ;  [ESC] D - Move the cursor left by one 
 ;  [ESC] E - Clear the screen and place the cursor in the upper left corner.
 ;  [ESC] H - Move the cursor to the upper left corner.
-;  ![ESC] I - Move the cursor to beginning of line above.
+;  // ![ESC] I - Move the cursor to beginning of line above.
 ;  *[ESC] J - Erase all lines after our current line
 ;  *[ESC] K - Clear the current line from the current cursor position.
 ;  [ESC] Y - row col 'Goto' Coordinate mode - first will change line number, then cursor position (both ASCII - 32)
@@ -16,6 +18,8 @@
 ;  [ESC] c - Byte after 'c' sets new background color (ASCII -32)
 ;  [ESC] p - start inverse video
 ;  [ESC] q - stop inverse video
+;  *[ESC] 0 - start underlined
+;  *[ESC] 1 - stop underlined
 ;  [ESC] s - Enable/disable vertical scrolling
 ;  [ESC] r [char] - Print character (raw)
 ;   8      - move cursor left
@@ -35,9 +39,9 @@
 ; 22,y+32,x+32 = Move to position
 
 
-IF !__CPU_INTEL__
+IF !__CPU_INTEL__ 
 		defc		SUPPORT_vt52=1
-		; Extra VT52 codes - clear to end of line + clear to end of screen
+		; Extra VT52 codes - clear to end of line + clear to end of screen + underlined
 		defc		SUPPORT_vt52x=0
 		defc		SUPPORT_zxcodes=1
 
@@ -55,6 +59,7 @@ IF !__CPU_INTEL__
 		EXTERN		generic_console_set_ink
 		EXTERN		generic_console_set_paper
 		EXTERN		generic_console_set_inverse
+		EXTERN		generic_console_set_underline
 		EXTERN		__console_x
 		EXTERN		__console_y
 		EXTERN		__console_w
@@ -72,6 +77,11 @@ IF __CPU_INTEL__
 	ld	hl,(__console_x)
 	ld	c,l
 	ld	b,h
+ELIF __CPU_GBZ80__
+	ld	hl,__console_x
+	ld	c,(hl)
+	inc	hl
+	ld	b,(hl)
 ELSE
 	ld	bc,(__console_x)		;coordinates
 ENDIF
@@ -84,7 +94,7 @@ ENDIF
 	ld	a,(generic_console_flags)
 	ld	e,1
 	rrca
-	jr	nz,handle_character
+;	jr	nz,handle_character
 	
 	dec	e				;-> e = 0 (look at zxcodes)
 	call	check_parameters		;Leaves e untouched
@@ -106,7 +116,13 @@ handle_character:
 	dec	a
 	ld	b,a
 	ld	c,0
+IF __CPU_GBZ80__
+	ld	(__console_x+1),a		;a holds vlaue of b
+	ld	a,c
+	ld	(__console_x),a
+ELSE
 	ld	(__console_x),bc
+ENDIF
 handle_character_no_scroll:
 	ld	a,d
 	push	bc		;save coordinates
@@ -142,7 +158,14 @@ handle_parameter:
 	ld	(hl),d
 	ret
 parameter_dispatch:
+IF __CPU_GBZ80__
+	ld	hl,parameter_processor
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+ELSE
 	ld	hl,(parameter_processor)
+ENDIF
 	ld	a,d		;Get parameter into a
 do_dispatch:
 	push	hl
@@ -176,7 +199,13 @@ ENDIF
 	inc	hl
 	ld	h,(hl)
 	ld	l,a
+IF __CPU_GBZ80__
+	ld	(parameter_processor),a
+	ld	a,h
+	ld	(parameter_processor+1),a
+ELSE
 	ld	(parameter_processor),hl
+ENDIF
 	ld	a,e
 	and	a		;Immediate action?
 	ld	a,d		;The character
@@ -196,7 +225,14 @@ try_again:
 ;  d = x
 ; (parameter) = y
 set_xypos:
+IF __CPU_GBZ80__
+	ld	hl,__console_w
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+ELSE
 	ld	hl,(__console_w)		;l = width, h = height
+ENDIF
 	ld	a,d
 	sub	32
 	ld	c,a
@@ -223,7 +259,14 @@ left:	ld	a,c
 	jr	up
 left_1: dec	c
 store_coords:
+IF __CPU_GBZ80__
+	ld	a,c
+	ld	(__console_x),a
+	ld	a,b
+	ld	(__console_x+1),a
+ELSE
 	ld	(__console_x),bc
+ENDIF
 	scf
 	ret
 
@@ -319,8 +362,9 @@ ENDIF
 
 handle_cr:
 	ld	a,(__console_h)
+	sub	b
+	jr	nc,handle_cr_no_need_to_scroll
 	dec	a
-	cp	b
 	jr	nz,handle_cr_no_need_to_scroll
 	; Check if scroll is enabled
 	bit	6,(hl)
@@ -332,10 +376,24 @@ handle_cr:
 handle_cr_no_need_to_scroll:
 	inc	b
 	ld	c,0
-	jr	store_coords
+	jp	store_coords
 
 
 
+IF SUPPORT_vt52x
+set_underlined_ansi:
+	;'0' = 48 = on, '1' = 49 = off
+	dec	a
+	and	@00001000
+	ld	c,a
+	ld	a,(hl)
+	and	@11110111
+	or	c
+	ld	(hl),a
+	call	generic_console_set_underline
+	ret
+ENDIF
+	
 
 
 
@@ -410,6 +468,12 @@ IF SUPPORT_vt52
 	defw	set_inverse_ansi
 ENDIF
 IF SUPPORT_vt52x
+	defb	255, '0'
+	defb	0
+	defw	set_underlined_ansi
+	defb	255, '1'
+	defb	0
+	defw	set_underlined_ansi
 	defb	255, 'K'
 	defb	0
 	defw	clear_eol
@@ -431,6 +495,7 @@ parameters:	defb	0		; We only have up-to two parameters
 parameter_processor:	defw	0	; Where we go to when we need to process
 
 generic_console_flags:		defb	0		; bit 0 = raw mode enabled
+							; bit 3 = underline
 							; bit 6 = vscroll disabled
 							; bit 7 = inverse on
 

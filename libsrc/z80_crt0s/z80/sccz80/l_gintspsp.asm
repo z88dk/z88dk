@@ -8,15 +8,23 @@ PUBLIC l_gintspsp
 	add	hl,sp
 	inc hl
 	inc hl
-   
-IF EZ80
-	defb	0xed, 0x27	;ld hl,(hl)
+IF __CPU_GBZ80__
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+	pop	af		;Return address
+	push	hl
+	push	af
+	ret
 ELSE
+  IF EZ80
+	defb	0xed, 0x27	;ld hl,(hl)
+  ELSE
    ld a,(hl)
    inc hl
    ld h,(hl)
    ld l,a
-ENDIF
-
+  ENDIF
 	ex	(sp),hl
 	jp (hl)
+ENDIF

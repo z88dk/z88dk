@@ -70,6 +70,9 @@ float m32_expf(float x) __z88dk_fastcall
         return(0.0);
     }
 #endif
+	if( x == 0.0 )
+		return 1.0;
+
     z = m32_floorf(x * LOG2EF + 0.5);
 
     x -= z * C1;

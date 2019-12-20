@@ -4,4 +4,3 @@
 	EXTERN	cm32_sdcc_atan
 
 	defc	_atan = cm32_sdcc_atan
-

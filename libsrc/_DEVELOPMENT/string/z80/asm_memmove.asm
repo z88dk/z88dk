@@ -66,7 +66,23 @@ use_lddr:
    push de
    
    inc bc
+IF __CPU_INTEL__ || __CPU_GBZ80__
+loop:
+ IF __CPU_GBZ80__
+   ld a,(hl-)
+ ELSE
+   ld a,(hl)
+   dec hl
+ ENDIF
+   ld (de),a
+   dec de
+   dec bc
+   ld a,b
+   or c
+   jr nz,loop
+ELSE
    lddr
+ENDIF
    
    pop de
    inc de

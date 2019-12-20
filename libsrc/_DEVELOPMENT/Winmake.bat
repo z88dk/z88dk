@@ -5,7 +5,7 @@ setlocal ENABLEDELAYEDEXPANSION
 
 @rem must have leading and trailing space
 
-set alltargets= z80 cpm m rc2014 sms vgl yaz180 z180 zx zxn 
+set alltargets= z80 cpm m rc2014 scz180 sms vgl yaz180 z180 zx zxn 
 
 if "%1" == "" (
    echo.
@@ -37,18 +37,20 @@ for %%t in (%targets%) do (
    if not "!temp!" == "%alltargets%" (
 
       set cpu=
+
+      if "%%t" == "scz180" (
+         set cpu="-mz180"
+      )
       if "%%t" == "yaz180" (
          set cpu="-mz180"
-      ) else (
-         if "%%t" == "z180" (
-            set cpu="-mz180"
-         ) else (
-            if "%%t" == "zxn" (
-               set cpu="-mz80n"
-            )
-         )
       )
-      
+      if "%%t" == "z180" (
+         set cpu="-mz180"
+      )
+      if "%%t" == "zxn" (
+         set cpu="-mz80n"
+      )
+
       echo.
       echo target = %%t !cpu!
 

@@ -20,6 +20,7 @@ CFILES = \
 	get_current_volume.c \
 	get_dir_name.c \
 	fdtell.c \
+	fdgetpos.c \
 	getfcb.c \
 	lseek.c \
 	open.c \
@@ -29,6 +30,7 @@ CFILES = \
 	remove.c \
 	rename.c \
 	setfcb.c \
+	stat.c \
 	write.c \
 	writebyte.c 
 

@@ -4,4 +4,3 @@
 	EXTERN	cm32_sdcc_exp10
 
 	defc	_exp10 = cm32_sdcc_exp10
-

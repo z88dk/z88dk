@@ -8,10 +8,16 @@ PUBLIC ASMDISP_BPOKE_CALLEE
 
 .bpoke_callee
 ._bpoke_callee
-
+IF __CPU_GBZ80__
+   pop af	;ret
+   pop de	;byte
+   pop hl	;addr
+   push af
+ELSE
    pop hl
    pop de
    ex (sp),hl
+ENDIF
    
 .asmentry
 

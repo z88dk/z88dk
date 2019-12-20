@@ -10,15 +10,21 @@ EXTERN asm_strpbrk
 
 strpbrk:
 
-   pop af
+   pop de
    pop de
    pop hl
    
    push hl
    push de
-   push af
-   
+   push de
+IF __CLASSIC && __CPU_GBZ80__
+   call asm_strpbrk
+   ld d,h
+   ld e,l
+   ret
+ELSE
    jp asm_strpbrk
+ENDIF
 
 ; SDCC bridge for Classic
 IF __CLASSIC

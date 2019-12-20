@@ -30,6 +30,7 @@ extern void swapstk(void);
 extern void sw(char type);
 extern void zcallop(void);
 extern void zshortcall(int rst, int value) ;
+extern void zbankedcall(SYMBOL *sym);
 extern void zclibcallop(void);
 extern char dopref(SYMBOL *sym);
 extern void callrts(char *sname);

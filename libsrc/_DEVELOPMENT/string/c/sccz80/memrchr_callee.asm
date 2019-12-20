@@ -9,7 +9,6 @@ PUBLIC memrchr_callee, l0_memrchr_callee
 EXTERN asm_memrchr
 
 memrchr_callee:
-
    pop hl
    pop bc
    pop de

@@ -7,21 +7,21 @@
 ;	Play a sound by PSG
 ;
 ;
-;	$Id: set_psg_callee.asm,v 1.5 2016-06-10 21:13:58 dom Exp $
+;	$Id: set_psg_callee.asm $
 ;
 
         SECTION code_clib
 	PUBLIC	set_psg_callee
 	PUBLIC	_set_psg_callee
-	EXTERN     msxbios
+;;	EXTERN     msxbios
 
 	PUBLIC ASMDISP_SET_PSG_CALLEE
 
 	
 IF FORmsx
-        INCLUDE "target/msx/def/msxbios.def"
+        INCLUDE "target/msx/def/msx.def"
 ELSE
-        INCLUDE "target/svi/def/svibios.def"
+        INCLUDE "target/svi/def/svi.def"
 ENDIF
 
 set_psg_callee:
@@ -34,10 +34,15 @@ _set_psg_callee:
 .asmentry
 
 	ld	a,l
-	push	ix	
-	ld	ix, WRTPSG
-	call	msxbios
-	pop	ix
+
+	di
+	out     (PSG_ADDR),a
+	push    af
+	ld      a,e
+	out     (PSG_DATA),a
+	ei
+	pop     af
+
 	ret
 
 DEFC ASMDISP_SET_PSG_CALLEE = asmentry - set_psg_callee

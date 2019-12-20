@@ -11,6 +11,7 @@
         PUBLIC  __tms9918_set_inverse
         EXTERN  __tms9918_attribute
         EXTERN  __tms9918_text_xypos
+	EXTERN	__tms9918_pattern_name
 
         EXTERN  generic_console_font32
         EXTERN  generic_console_udg32
@@ -18,7 +19,7 @@
         EXTERN  __console_w
         EXTERN  ansi_SCROLLUP
         EXTERN  ansi_cls
-        EXTERN  conio_map_colour
+        EXTERN  __tms9918_map_colour
         EXTERN  generic_console_flags
         EXTERN  __tms9918_screen_mode
         EXTERN  __tms9918_scroll_buffer
@@ -60,7 +61,7 @@ __tms9918_set_inverse:
         ret
 
 __tms9918_set_ink:
-        call    conio_map_colour
+        call    __tms9918_map_colour
         rla
         rla
         rla
@@ -77,7 +78,7 @@ set_attr:
         ret
 
 __tms9918_set_paper:
-        call    conio_map_colour
+        call    __tms9918_map_colour
         and     15
         ld      b,0xf0
         jr      set_attr
@@ -106,8 +107,9 @@ scroll_rejoin:
 ; Entry: bc = width
 scroll_text:
         push    ix
+	ld	de,(__tms9918_pattern_name)
+	add	hl,de
         push    hl      ;Save width for later
-        ld      de,0    ;destination
 scroll_text_1:
         push    bc
         push    hl      ;Source

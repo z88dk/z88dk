@@ -28,7 +28,7 @@ fpos_t ftell(FILE *fp)
 	pop	hl
 	push	hl
 	push	bc
-IF !__CPU_8080__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
         push    ix      ;save callers ix
 ENDIF
 	ld	e,(hl)	;gets the underlying fp
@@ -41,7 +41,7 @@ ENDIF
 	ld	a,(hl)
 	and	_IOSYSTEM
 	jr	nz,ftell_abort
-IF !__CPU_8080__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	ld	a,(hl)
 	and	_IOEXTRA
 	jr	nz,ftell_trampoline
@@ -49,7 +49,7 @@ ENDIF
 	push	de
 	call	fdtell
 	pop	bc
-IF !__CPU_8080__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
         pop     ix
 ENDIF
 	ret
@@ -57,7 +57,7 @@ ENDIF
 	ld	de,65535	;-1
 	ld	l,e
 	ld	h,d
-IF !__CPU_8080__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
         pop     ix
 	ret
 

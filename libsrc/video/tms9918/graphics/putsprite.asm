@@ -16,6 +16,7 @@
 	EXTERN	__tms9918_pixelbyte
 	EXTERN	l_tms9918_disable_interrupts
 	EXTERN	l_tms9918_enable_interrupts
+	EXTERN	__tms9918_attribute
 
 	EXTERN  swapgfxbk
         EXTERN	__graphics_end
@@ -180,6 +181,16 @@ IF VDP_CMD < 0
 	ld	(-VDP_CMD),a
 	ld	a,(__tms9918_pixelbyte)
 	ld	(-VDP_DATA),a
+	; And now the attribute
+        ld      a,l
+        ld      (-VDP_CMD),a
+        ld      a,h
+	add	$20
+        and     @00111111
+        or      @01000000
+        ld      (-VDP_CMD),a
+	ld	a,(__tms9918_attribute)
+	ld	(-VDP_DATA),a
 ELSE
         push    bc
         ld      bc,VDP_CMD
@@ -191,6 +202,18 @@ ELSE
         ld      a,(__tms9918_pixelbyte)
         ld      bc,VDP_DATA
         out     (c),a
+	; And now the attribute
+	ld	bc,VDP_CMD
+	ld	a,l
+	out	(c),a
+        ld      a,h
+	add	$20
+        and     @00111111
+        or      @01000000
+	out	(c),a
+	ld	a,(__tms9918_attribute)
+	ld	bc,VDP_DATA
+	out	(c),a
         pop     bc
 ENDIF
 	call	l_tms9918_enable_interrupts
@@ -241,6 +264,15 @@ IF VDP_CMD < 0
 	ld	(-VDP_CMD),a
 	ld	a,(__tms9918_pixelbyte)
 	ld	(-VDP_DATA),a
+	ld	a,l
+	ld	(-VDP_CMD),a
+	ld	a,h
+	add	$20
+        and     @00111111
+        or      @01000000
+        ld      (-VDP_CMD),a
+	ld	a,(__tms9918_attribute)
+	ld	(-VDP_DATA),a
 ELSE
         push    bc
         ld      bc,VDP_CMD
@@ -251,6 +283,16 @@ ELSE
         out     (c),a
         ld      bc,VDP_DATA
         ld      a,(__tms9918_pixelbyte)
+        out     (c),a
+	ld	bc,VDP_CMD
+	out	(c),l
+        ld      a,h		; MSB of video mem ptr
+	add	$20
+        and     @00111111	; masked with "write command" bits
+        or      @01000000
+        out     (c),a
+        ld      bc,VDP_DATA
+        ld      a,(__tms9918_attribute)
         out     (c),a
         pop     bc
 ENDIF

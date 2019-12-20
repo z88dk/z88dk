@@ -49,11 +49,11 @@ dnl#include(`driver/terminal/rc_01_output_basic.m4')
 dnl
 dnl## file dup
 dnl
-dnl#include(`../m4_file_dup.m4')dnl
+dnl#include(`../m4_file_dup.m4')
 dnl
 dnl## empty fd slot
 dnl
-dnl#include(`../../m4_file_absent.m4')dnl
+dnl#include(`../../m4_file_absent.m4')
 dnl
 dnl############################################################
 dnl## INSTANTIATE DRIVERS #####################################
@@ -70,8 +70,8 @@ ifelse(eval(M4__CRT_INCLUDE_DRIVER_INSTANTIATION == 0), 1,
    include(`driver/terminal/rc_01_output_basic.m4')
    m4_rc_01_output_basic(_stdout, CRT_OTERM_TERMINAL_FLAGS)
 
-   include(`../m4_file_dup.m4')dnl
-   m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)dnl
+   include(`../m4_file_dup.m4')
+   m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)
 ',
 `
    include(`crt_driver_instantiation.asm.m4')

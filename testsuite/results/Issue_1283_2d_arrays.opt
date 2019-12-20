@@ -1,0 +1,94 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	rodata_compiler
+._selected_data
+	defb	255
+	defb	255
+	defb	128
+	defb	255
+	defb	128
+	defb	255
+	defb	128
+	defb	255
+	defb	128
+	defb	255
+	defb	128
+	defb	255
+	defb	128
+	defb	255
+	defb	128
+	defb	254
+	defb	129
+	defb	253
+	defb	130
+	defb	250
+	defb	132
+	defb	245
+	defb	136
+	defb	235
+	defb	128
+	defb	231
+	defb	128
+	defb	216
+	defb	128
+	defb	255
+	defb	255
+	defb	128
+	defs	16
+	SECTION	code_compiler
+
+._test1
+	ld	hl,_selected_data
+	push	hl
+	call	_func
+	pop	bc
+	ld	hl,_selected_data+16
+	push	hl
+	call	_func
+	pop	bc
+	ld	hl,(_selected_data+1+1)
+	ld	h,0
+	push	hl
+	call	_ifunc
+	pop	bc
+	ret
+
+
+	SECTION	data_compiler
+._values
+	defw	1
+	defw	2
+	defw	3
+	SECTION	code_compiler
+
+._test2
+	ld	hl,(_values+4)
+	push	hl
+	call	_ifunc
+	pop	bc
+	ret
+
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_selected_data
+	GLOBAL	_func
+	GLOBAL	_ifunc
+	GLOBAL	_test1
+	GLOBAL	_values
+	GLOBAL	_test2
+
+
+
+

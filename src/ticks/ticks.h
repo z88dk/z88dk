@@ -70,6 +70,7 @@ extern long long st;
 extern int c_cpu;
 extern int trace;
 extern int debugger_active;
+extern int rom_size;		/* amount of memory in low addresses that is read-only */
 
 /* Break down flags */
 extern int f(void);

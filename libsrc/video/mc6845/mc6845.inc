@@ -73,3 +73,11 @@ IF FORexcali64
 	defc	register_r = 0x31
 	defc	register_w = 0x31
 ENDIF
+
+IF FORx1
+	defc	address_r = 0
+	defc	status_r =  0x1800
+	defc	address_w = 0x1800
+	defc	register_r = 0x1801
+	defc	register_w = 0x1801
+ENDIF

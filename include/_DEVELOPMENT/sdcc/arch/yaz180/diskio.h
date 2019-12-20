@@ -7,7 +7,6 @@
 
 #include <arch.h>
 #include <stdint.h>
-#include <stddef.h>
 
 /*
  * Disk Status Bits DSTATUS (uint8_t)
@@ -93,7 +92,7 @@ typedef enum {
 } DRESULT;
 
 //
-// DISK COMMANDS
+// IDE DISK COMMANDS
 //
 
 extern DSTATUS disk_initialize(BYTE pdrv) __preserves_regs(b,c,d,e,iyh,iyl);

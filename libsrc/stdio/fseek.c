@@ -25,7 +25,7 @@ static long fseek1(FILE *fp, fpos_t posn, int whence) __z88dk_callee;
 int fseek(FILE *fp, fpos_t posn, int whence) __z88dk_saveframe
 {
 	if ( fp->flags&_IOUSE && fchkstd(fp)== 0 ) {
-#ifdef CPU_8080
+#if CPU_8080 || CPU_GBZ80
 		if (lseek(fp->desc.fd,posn,whence) != -1L ) {
 #else
 		if (fseek1(fp,posn,whence) != -1L ) {
@@ -38,7 +38,7 @@ int fseek(FILE *fp, fpos_t posn, int whence) __z88dk_saveframe
 }
 
 #asm
-IF !__CPU_8080__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 _fseek1:
 	pop	af		;return address
 	pop	bc		;whence
