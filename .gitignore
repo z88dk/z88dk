@@ -3,6 +3,7 @@
 **/*.err
 **/*.exe
 **/*.lib
+**/*.lis
 **/*.o
 **/*.vcxproj.user
 **/lib*.a

@@ -5,7 +5,6 @@ include(__link__.m4)
 
 #include <arch.h>
 #include <stdint.h>
-#include <stddef.h>
 
 /*
  * Disk Status Bits DSTATUS (uint8_t)
@@ -58,25 +57,7 @@ include(__link__.m4)
 #define CT_SDC				(CT_SD1|CT_SD2)	/* SD */
 #define CT_BLOCK			0x08		/* Block addressing */
 
-#ifndef FF_INTEGER // FF_INTEGER found in FatFS integer.h
 
-/* These types MUST be 16-bit or 32-bit */
-typedef int16_t         INT;
-typedef uint16_t    	UINT;
-
-/* This type MUST be 8-bit */
-typedef uint8_t     	BYTE;
-
-/* These types MUST be 16-bit */
-typedef int16_t			SHORT;
-typedef uint16_t    	WORD;
-typedef uint16_t    	WCHAR;
-
-/* These types MUST be 32-bit */
-typedef int32_t			LONG;
-typedef uint32_t    	DWORD;
-
-#endif
 
 /* Status of Disk Functions */
 typedef BYTE DSTATUS;
@@ -91,13 +72,13 @@ typedef enum {
 } DRESULT;
 
 //
-// DISK COMMANDS
+// IDE DISK COMMANDS
 //
 
-__DPROTO(`b,c,d,e,iyh,iyl',`b,c,d,e,iyh,iyl',DSTATUS,,disk_initialize,BYTE pdrv)
-__DPROTO(`d,e,iyh,iyl',`d,e,iyh,iyl',DSTATUS,,disk_status,BYTE pdrv)
+__DPROTO(`iyh,iyl',`iyh,iyl',DSTATUS,,disk_initialize,BYTE pdrv)
+__DPROTO(`iyh,iyl',`iyh,iyl',DSTATUS,,disk_status,BYTE pdrv)
 __DPROTO(`iyh,iyl',`iyh,iyl',DRESULT,,disk_read,BYTE pdrv, BYTE* buff, DWORD sector, UINT count)
 __DPROTO(`iyh,iyl',`iyh,iyl',DRESULT,,disk_write,BYTE pdrv, const BYTE* buff, DWORD sector, UINT count)
-__DPROTO(`d,e,iyh,iyl',`d,e,iyh,iyl',DRESULT,,disk_ioctl,BYTE pdrv, BYTE cmd, void* buff)
+__DPROTO(`iyh,iyl',`iyh,iyl',DRESULT,,disk_ioctl,BYTE pdrv, BYTE cmd, void* buff)
 
 #endif

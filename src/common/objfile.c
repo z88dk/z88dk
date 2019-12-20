@@ -485,7 +485,9 @@ static void objfile_read_exprs(objfile_t *obj, FILE *fp, long fpos_start, long f
 				type == '=' ? ' ' :
 				type == 'L' ? 'l' :
 				type == 'C' ? 'w' :
-				type == 'B' ? 'W' : 'b');
+				type == 'B' ? 'W' :
+                type == 'u' ? 'w' :
+                type == 's' ? 'w' : 'b');
 
 		// create a new expression
 		expr_t *expr = expr_new();

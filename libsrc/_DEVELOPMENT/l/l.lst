@@ -25,6 +25,7 @@ l/z80/l_ldd
 l/z80/l_ldd_loop
 l/z80/l_ldi
 l/z80/l_ldi_loop
+l/z80/l_mirror
 l/z80/l_offset_ix_bc
 l/z80/l_offset_ix_de
 l/z80/l_outi
@@ -33,7 +34,6 @@ l/z80/l_readword_2_hl
 l/z80/l_readword_hl
 l/z80/l_ret
 l/z80/l_retn
-l/z80/l_reverse
 l/z80/l_setmem_de
 l/z80/l_setmem_hl
 l/z80/l_swap_ixiy

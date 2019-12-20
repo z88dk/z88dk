@@ -59,25 +59,7 @@
 #define CT_SDC				(CT_SD1|CT_SD2)	/* SD */
 #define CT_BLOCK			0x08		/* Block addressing */
 
-#ifndef FF_INTEGER // FF_INTEGER found in FatFS integer.h
 
-/* These types MUST be 16-bit or 32-bit */
-typedef int16_t         INT;
-typedef uint16_t    	UINT;
-
-/* This type MUST be 8-bit */
-typedef uint8_t     	BYTE;
-
-/* These types MUST be 16-bit */
-typedef int16_t			SHORT;
-typedef uint16_t    	WORD;
-typedef uint16_t    	WCHAR;
-
-/* These types MUST be 32-bit */
-typedef int32_t			LONG;
-typedef uint32_t    	DWORD;
-
-#endif
 
 /* Status of Disk Functions */
 typedef BYTE DSTATUS;
@@ -92,7 +74,7 @@ typedef enum {
 } DRESULT;
 
 //
-// IDE DISK COMMANDS
+// IDE DISK COMMANDS (FOUND IN @FEILIPU Z88DK-LIBS)
 //
 
 extern DSTATUS disk_initialize(BYTE pdrv) __preserves_regs(iyh,iyl);
@@ -106,19 +88,10 @@ extern DSTATUS disk_status_fastcall(BYTE pdrv) __preserves_regs(iyh,iyl) __z88dk
 
 
 extern DRESULT disk_read(BYTE pdrv,BYTE* buff,DWORD sector,UINT count) __preserves_regs(iyh,iyl);
-extern DRESULT disk_read_callee(BYTE pdrv,BYTE* buff,DWORD sector,UINT count) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define disk_read(a,b,c,d) disk_read_callee(a,b,c,d)
-
 
 extern DRESULT disk_write(BYTE pdrv,const BYTE* buff,DWORD sector,UINT count) __preserves_regs(iyh,iyl);
-extern DRESULT disk_write_callee(BYTE pdrv,const BYTE* buff,DWORD sector,UINT count) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define disk_write(a,b,c,d) disk_write_callee(a,b,c,d)
-
 
 extern DRESULT disk_ioctl(BYTE pdrv,BYTE cmd,void* buff) __preserves_regs(iyh,iyl);
-extern DRESULT disk_ioctl_callee(BYTE pdrv,BYTE cmd,void* buff) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define disk_ioctl(a,b,c) disk_ioctl_callee(a,b,c)
-
 
 
 //
@@ -130,8 +103,8 @@ extern void sd_clock_fastcall(uint8_t) __preserves_regs(b,c,d,e,iyh,iyl) __z88dk
 #define sd_clock(a) sd_clock_fastcall(a)
 
 
-extern void sd_cs_lower(void) __preserves_regs(b,c,d,e,h,l,iyh,iyl);
-extern void sd_cs_lower_fastcall(void) __preserves_regs(b,c,d,e,h,l,iyh,iyl) __z88dk_fastcall;
+extern void sd_cs_lower(uint8_t) __preserves_regs(b,c,d,e,iyh,iyl);
+extern void sd_cs_lower_fastcall(uint8_t) __preserves_regs(b,c,d,e,iyh,iyl) __z88dk_fastcall;
 #define sd_cs_lower(a) sd_cs_lower_fastcall(a)
 
 
@@ -145,14 +118,14 @@ extern void sd_write_byte_fastcall(uint8_t) __preserves_regs(b,c,d,e,iyh,iyl) __
 #define sd_write_byte(a) sd_write_byte_fastcall(a)
 
 
-extern void sd_write_block(const uint8_t *from) __preserves_regs(iyh,iyl);
-extern void sd_write_block_fastcall(const uint8_t *from) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define sd_write_block(a) sd_write_block_fastcall(a)
-
-
 extern uint8_t sd_read_byte(void) __preserves_regs(b,c,d,e,iyh,iyl);
 extern uint8_t sd_read_byte_fastcall(void) __preserves_regs(b,c,d,e,iyh,iyl) __z88dk_fastcall;
 #define sd_read_byte(a) sd_read_byte_fastcall(a)
+
+
+extern void sd_write_block(const uint8_t *from) __preserves_regs(iyh,iyl);
+extern void sd_write_block_fastcall(const uint8_t *from) __preserves_regs(iyh,iyl) __z88dk_fastcall;
+#define sd_write_block(a) sd_write_block_fastcall(a)
 
 
 extern void sd_read_block(uint8_t *to) __preserves_regs(iyh,iyl);

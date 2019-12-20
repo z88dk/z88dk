@@ -59,25 +59,7 @@
 #define CT_SDC				(CT_SD1|CT_SD2)	/* SD */
 #define CT_BLOCK			0x08		/* Block addressing */
 
-#ifndef FF_INTEGER // FF_INTEGER found in FatFS integer.h
 
-/* These types MUST be 16-bit or 32-bit */
-typedef int16_t         INT;
-typedef uint16_t    	UINT;
-
-/* This type MUST be 8-bit */
-typedef uint8_t     	BYTE;
-
-/* These types MUST be 16-bit */
-typedef int16_t			SHORT;
-typedef uint16_t    	WORD;
-typedef uint16_t    	WCHAR;
-
-/* These types MUST be 32-bit */
-typedef int32_t			LONG;
-typedef uint32_t    	DWORD;
-
-#endif
 
 /* Status of Disk Functions */
 typedef BYTE DSTATUS;
@@ -92,7 +74,7 @@ typedef enum {
 } DRESULT;
 
 //
-// IDE DISK COMMANDS
+// IDE DISK COMMANDS (FOUND IN @FEILIPU Z88DK-LIBS)
 //
 
 extern DSTATUS __LIB__ disk_initialize(BYTE pdrv) __smallc __z88dk_fastcall;
@@ -102,18 +84,12 @@ extern DSTATUS __LIB__ disk_status(BYTE pdrv) __smallc __z88dk_fastcall;
 
 
 extern DRESULT __LIB__ disk_read(BYTE pdrv,BYTE* buff,DWORD sector,UINT count) __smallc;
-extern DRESULT __LIB__ disk_read_callee(BYTE pdrv,BYTE* buff,DWORD sector,UINT count) __smallc __z88dk_callee;
-#define disk_read(a,b,c,d) disk_read_callee(a,b,c,d)
 
 
 extern DRESULT __LIB__ disk_write(BYTE pdrv,const BYTE* buff,DWORD sector,UINT count) __smallc;
-extern DRESULT __LIB__ disk_write_callee(BYTE pdrv,const BYTE* buff,DWORD sector,UINT count) __smallc __z88dk_callee;
-#define disk_write(a,b,c,d) disk_write_callee(a,b,c,d)
 
 
 extern DRESULT __LIB__ disk_ioctl(BYTE pdrv,BYTE cmd,void* buff) __smallc;
-extern DRESULT __LIB__ disk_ioctl_callee(BYTE pdrv,BYTE cmd,void* buff) __smallc __z88dk_callee;
-#define disk_ioctl(a,b,c) disk_ioctl_callee(a,b,c)
 
 
 
@@ -124,7 +100,7 @@ extern DRESULT __LIB__ disk_ioctl_callee(BYTE pdrv,BYTE cmd,void* buff) __smallc
 extern void __LIB__ sd_clock(uint8_t) __smallc __z88dk_fastcall;
 
 
-extern void __LIB__ sd_cs_lower(void) __smallc __z88dk_fastcall;
+extern void __LIB__ sd_cs_lower(uint8_t) __smallc __z88dk_fastcall;
 
 
 extern void __LIB__ sd_cs_raise(void) __smallc __z88dk_fastcall;
@@ -133,10 +109,10 @@ extern void __LIB__ sd_cs_raise(void) __smallc __z88dk_fastcall;
 extern void __LIB__ sd_write_byte(uint8_t) __smallc __z88dk_fastcall;
 
 
-extern void __LIB__ sd_write_block(const uint8_t *from) __smallc __z88dk_fastcall;
-
-
 extern uint8_t __LIB__ sd_read_byte(void) __smallc __z88dk_fastcall;
+
+
+extern void __LIB__ sd_write_block(const uint8_t *from) __smallc __z88dk_fastcall;
 
 
 extern void __LIB__ sd_read_block(uint8_t *to) __smallc __z88dk_fastcall;

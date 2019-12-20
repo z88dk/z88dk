@@ -128,12 +128,7 @@ ENDIF
    ld b,(hl)                 ; bc = & next block after merged blocks
    
    pop hl
-IF __CPU_GBZ80__
-   EXTERN __z80asm__exsphl
-   call __z80asm__exsphl
-ELSE
    ex (sp),hl                ; hl = & block to free, stack = & lagger->next + 1b
-ENDIF
    ld a,(hl)                 ; add next block's size to merged block
    add a,e
    ld (hl),a
@@ -142,11 +137,7 @@ ENDIF
    adc a,d
    ld (hl),a
    dec hl
-IF __CPU_GBZ80__
-   call __z80asm__exsphl
-ELSE
    ex (sp),hl
-ENDIF
    
 .checkformergebelow
 
@@ -165,11 +156,7 @@ ENDIF
 
    add hl,de                 ; hl = byte past end of lagger block
    ex de,hl
-IF __CPU_GBZ80__
-   call __z80asm__exsphl
-ELSE
    ex (sp),hl
-ENDIF
    ex de,hl
    
    ; bc = & next block after free

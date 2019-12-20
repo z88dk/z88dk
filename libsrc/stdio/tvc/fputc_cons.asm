@@ -3,15 +3,15 @@
 ;   Sandor Vass - 2019
 ;   Based on the source of
 ;
-;	Enterprise 64/128 C Library
+;   Enterprise 64/128 C Library
 ;
-;	Fputc_cons
+;   Fputc_cons
 ;
-;	Stefano Bodrato - 2011
+;   Stefano Bodrato - 2011
 ;
 
-	SECTION code_clib
-	PUBLIC  fputc_cons_native
+    SECTION code_clib
+    PUBLIC  fputc_cons_native
     INCLUDE "target/tvc/def/tvc.def"
 
 ;
@@ -23,5 +23,5 @@
     ld      c,(hl)
     rst     $30
     defb    ED_CHOUT ; editor - character out
-	ret
+    ret
 

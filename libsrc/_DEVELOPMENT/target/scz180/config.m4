@@ -43,10 +43,6 @@ include(`target/scz180/config/config_cpu.m4')
 include(`target/scz180/config/config_clib.m4')
 include(`target/scz180/config/config_clib_const.m4')
 
-include(`target/scz180/config/config_82c55.m4')
-
-include(`target/scz180/config/config_ide.m4')
-
 dnl############################################################
 dnl# END IF GUARDS
 dnl############################################################

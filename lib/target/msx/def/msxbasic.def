@@ -2,16 +2,18 @@ lstoff
 
 ; MSX BASIC and SYSTEM VARIABLES definitions
 ;
-; December 2007
-; $Id: msxbasic.def,v 1.8 2017-01-09 10:20:47 stefano Exp $
+; December 2019
+; $Id: msxbasic.def $
 ;
 
-
-; System variables
 
 defc VDP_RP  = $0006	; address of vdp READ port
 defc VDP_WP  = $0007	; address of vdp WRITE port
 defc MSX_VER = $002D    ; MSX version (0 = MSX1, 1 = MSX2)
+
+; System variables
+
+defc MAXRAM = $F380	;Beginnning of system variables' space
 
 ; SUBROUTINES FOR READ/WRITE CALLS OF THE INTER-SLOT
 defc RDPRIM = $F380	;5 Routine that reads from a primary slot 
@@ -111,11 +113,13 @@ defc RAWPRT = $F418	;1 Raw printer output is read by OUTDO
 defc VLZADR = $F419	;2 Address of data that is temporairly replaced by ‘O’ when Basic function VAL("") is running 
 defc VLZDAT = $F41B	;1 Original value that was in the address pointed to with VLZADR 
 defc CURLIN = $F41C	;2 Line number the Basic interpreter is working on, in direct mode it will be filled with #FFFF
-defc KBUF   = $F41F
 
+defc BUFFER = $F41E ; byte 0 in input buffer
+defc KBUF   = $F41F
 defc BUFMIN = $F55D  ; used in INPUT st.
 defc BUF    = $F55E  ; Buffer to store characters typed( in ASCII code)
 defc ENDBUF = $F660  ; Prevent overflow of BUF
+
 defc TTYPOS = $F661  ; Virtual cursor location internally retained by BASIC
 defc DIMFLG = $F662  ; ARRAY FLAG
 defc VALTYP = $F663  ; Type indicator
@@ -131,14 +135,16 @@ defc STKTOP = $F674  ; Top location to be used for the stack
 defc TXTTAB = $F676  ; Starting address of BASIC text area
 defc TEMPPT = $F678  ; Starting address of unused area of temporary descriptor
 defc TEMPST = $F67A  ; Temporary descriptors
-defc TMPSTR = $F697  ; Temporary string
+defc VARIABLES = $F689  ; Storage area for BASIC variables
+
 defc DSCTMP = $F698  ; String descriptor which is the result of string fun.
+defc TMPSTR = $F699  ; Temporary string
 defc FRETOP = $F69B  ; Starting address of unused area of string area
 defc TEMP3  = $F69D  ; Used for garbage collection or by USR function
 defc TEMP8  = $F69F  ; Used for garbage collection
 defc ENDFOR = $F6A1  ; Next address of FOR st.
 defc DATLIN = $F6A3  ; Line number of DATA st.read by READ st.
-defc SUBFLG = $F6A5  ; Flag for array for USR fun.
+defc SUBFLG = $F6A5  ; Flag for array for USR fn, 0 if no FOR/NEXT loop in progress, etc...
 defc USFLG  = $F6A6
 defc FLGINP = $F6A6  ; Flag for INPUT or READ
 defc TEMP   = $F6A7  ; Location for temporary reservation for st.code
@@ -146,7 +152,7 @@ defc PTRFLG = $F6A9  ; =0 if no line number converted to pointers
 defc AUTFLG = $F6AA  ; AUTO mode flag
 defc AUTLIN = $F6AB  ; Current line number for auto
 defc AUTINC = $F6AD  ; Increment for auto
-defc SAVTXT = $F6AF  ; Text pointer for resume
+defc SAVTXT = $F6AF  ; Pointer to most recent or currently running line (e.g. used by RESUME)
 defc SAVSTK = $F6B1  ; Save stack when error occurs
 defc ERRLIN = $F6B3  ; Line where last error
 defc DOT    = $F6B5  ; Current line for edit & list

@@ -3,7 +3,7 @@ INCLUDE "config_private.inc"
 
 SECTION code_driver
 
-EXTERN l_reverse
+EXTERN l_mirror 
 
 PUBLIC asm_sd_write_byte
 
@@ -13,7 +13,7 @@ PUBLIC asm_sd_write_byte
     
 .asm_sd_write_byte
     ld a,l
-    call l_reverse          ; reverse the bits before we busy wait
+    call l_mirror           ; reverse the bits before we busy wait
 .sd_write_wait
     in0 a,(CNTR)
     tst CNTR_TE|CNTR_RE     ; check the CSIO is not enabled

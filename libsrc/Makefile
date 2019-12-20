@@ -834,6 +834,7 @@ tvc_clib.lib:
 	$(MAKE) gfxdeps
 	$(call buildgeneric,tvc)
 	$(MAKE) -C games TARGET=tvc
+	$(MAKE) -C target/tvc
 	TARGET=tvc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORtvc -x$(OUTPUT_DIRECTORY)/tvc_clib @$(LISTFILE_DIRECTORY)/tvc.lst
 
 
@@ -892,6 +893,7 @@ smc777.lib:
 	@echo ''
 	@echo '--- Building Sony SMC-70/SMC-777 Library ---'
 	@echo ''
+	$(MAKE) gfxdeps
 	@$(RM) -f video/mc6845/*.o
 	$(MAKE) -C psg
 	$(MAKE) -C games TARGET=cpm SUBTYPE=smc777 TARGET_CFLAGS=-subtype=smc777
@@ -1563,6 +1565,7 @@ classic-clean:
 	$(MAKE) -C arch clean
 	$(MAKE) -C target clean
 	$(MAKE) -C video/tms9918 clean
+
 	$(RM) *.lib
 
 new-clean:

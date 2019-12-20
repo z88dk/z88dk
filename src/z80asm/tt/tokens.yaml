@@ -165,6 +165,12 @@ tokens:
     regexp  : '"(" hspace "IX"i index_reg_suffix'
     lexcode : 'p--; te--;'
 
+  - name    : IND_HLI
+    regexp  : '"(" hspace "HLI"i'
+    
+  - name    : IND_HLD
+    regexp  : '"(" hspace "HLD"i'
+    
   # Assembly keywords
   - name    : ASMPC
   

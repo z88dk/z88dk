@@ -1,0 +1,14 @@
+
+target/yaz180/device/asci/c/asci0_flush_Rx
+target/yaz180/device/asci/c/asci0_flush_Tx
+target/yaz180/device/asci/c/asci0_getc
+target/yaz180/device/asci/c/asci0_peekc
+target/yaz180/device/asci/c/asci0_pollc
+
+target/yaz180/device/asci/c/asci1_flush_Rx
+target/yaz180/device/asci/c/asci1_flush_Tx
+target/yaz180/device/asci/c/asci1_getc
+target/yaz180/device/asci/c/asci1_peekc
+target/yaz180/device/asci/c/asci1_pollc
+
+@target/yaz180/device/asci/asci_asm.lst

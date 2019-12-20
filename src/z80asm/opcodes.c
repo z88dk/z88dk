@@ -50,6 +50,13 @@ void add_opcode(int opcode)
 /* add opcode followed by jump relative offset expression */
 void add_opcode_jr(int opcode, Expr *expr)
 {
+	add_opcode_jr_n(opcode, expr, 0);
+}
+
+void add_opcode_jr_n(int opcode, struct Expr* expr, int asmpc_offset)
+{
+	expr->asmpc += asmpc_offset;		// expr is assumed to be at asmpc+1; add offset if this is not true
+
 	if (opts.opt_speed) {
 		switch (opcode) {
 		case Z80_JR:
@@ -82,6 +89,19 @@ void add_opcode_n(int opcode, Expr *expr)
 {
 	add_opcode(opcode);
 	Pass2infoExpr(RANGE_BYTE_UNSIGNED, expr);
+}
+
+/* add opcode followed by 8-bit unsigned expression and a zero byte */
+void add_opcode_n_0(int opcode, struct Expr* expr)
+{
+    add_opcode(opcode);
+    Pass2infoExpr(RANGE_BYTE_TO_WORD_UNSIGNED, expr);
+}
+
+void add_opcode_s_0(int opcode, struct Expr* expr)
+{
+    add_opcode(opcode);
+    Pass2infoExpr(RANGE_BYTE_TO_WORD_SIGNED, expr);
 }
 
 /* add opcode followed by 8-bit signed expression */

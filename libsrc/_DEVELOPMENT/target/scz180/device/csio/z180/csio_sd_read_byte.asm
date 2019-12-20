@@ -3,7 +3,7 @@ INCLUDE "config_private.inc"
 
 SECTION code_driver
 
-EXTERN l_reverse
+EXTERN l_mirror 
 
 PUBLIC asm_sd_read_byte
 
@@ -24,4 +24,4 @@ PUBLIC asm_sd_read_byte
     jr NZ,sd_read_wait
 
     in0 a,(TRDR)            ; read byte
-    jp l_reverse            ; reverse the byte, leave in L and A
+    jp l_mirror             ; reverse the byte, leave in L and A

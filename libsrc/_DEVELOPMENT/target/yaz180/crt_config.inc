@@ -56,7 +56,7 @@ IF __CRTCFG = 0
    defc TAR__clib_quickexit_stack_size = 0
 
    defc TAR__clib_malloc_heap_size     = -1
-   defc TAR__clib_stdio_heap_size      = 128
+   defc TAR__clib_stdio_heap_size      = 256
 
    defc TAR__clib_balloc_table_size    = 0
 
@@ -108,7 +108,7 @@ IF __CRTCFG = 1
    defc TAR__clib_quickexit_stack_size = 0
 
    defc TAR__clib_malloc_heap_size     = -1
-   defc TAR__clib_stdio_heap_size      = 128
+   defc TAR__clib_stdio_heap_size      = 256
 
    defc TAR__clib_balloc_table_size    = 0
 

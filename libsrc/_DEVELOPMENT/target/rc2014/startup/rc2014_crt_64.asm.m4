@@ -21,6 +21,7 @@ include "config_rc2014_public.inc"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../crt_defaults.inc"
+include "../../arch/hbios/crt_hbios_def.inc"
 include "crt_config.inc"
 include(`../crt_rules.inc')
 include(`rc2014_rules.inc')
@@ -42,13 +43,11 @@ dnl
 dnl## input terminals
 dnl
 dnl#include(`../cpm/driver/terminal/cpm_00_input_cons.m4')
-dnl#include(`../cpm/driver/terminal/cpm_01_input_kbd_dcio.m4')
 dnl#include(`../cpm/driver/character/cpm_00_input_reader.m4')
 dnl
 dnl## output terminals
 dnl
 dnl#include(`../cpm/driver/terminal/cpm_00_output_cons.m4')
-dnl#include(`../cpm/driver/terminal/cpm_01_output_dcio.m4')
 dnl#include(`../cpm/driver/character/cpm_00_output_list.m4')
 dnl#include(`../cpm/driver/character/cpm_00_output_punch.m4')
 dnl
@@ -142,21 +141,21 @@ __Start:
 
    include "../crt_start_di.inc"
    include "../crt_save_sp.inc"
-   
+
 __Restart:
 
    include "../crt_init_sp.inc"
 
    ; command line
-   
+
    IF __crt_enable_commandline = 1
-   
+
       include "../crt_cmdline_empty.inc"
-   
+
    ENDIF
-   
+
    IF __crt_enable_commandline >= 3
-      
+
       ; copy command line words from default dma buffer to stack
       ; must do this as the default dma buffer may be used by the cpm program
 
@@ -171,23 +170,23 @@ __Restart:
       ex de,hl
 
       call l_command_line_parse
-      
+
       ; cpm does not supply program name in command line
       ; so place empty string in argv[0] instead
-      
+
       ; bc = int argc
       ; hl = char *argv[]
       ; de = & empty string
       ; bc'= num chars in redirector
       ; hl'= char *redirector
-      
+
       push de                  ; empty string added to front of argv[]
-      
+
       dec hl
       dec hl                   ; char *argv[] adjusted to include empty string at index 0
-      
+
       inc c                    ; argc++
-      
+
    ENDIF
 
 __Restart_2:
@@ -198,7 +197,7 @@ __Restart_2:
       push bc                  ; argc
 
    ENDIF
-   
+
    ; initialize data section
 
    include "../clib_init_data.inc"
@@ -212,6 +211,11 @@ __Restart_2:
    include "../crt_set_interrupt_mode.inc"
 
 SECTION code_crt_init          ; user and library initialization
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; MAIN ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 SECTION code_crt_main
 
    include "../crt_start_ei.inc"
@@ -223,22 +227,22 @@ SECTION code_crt_main
    ; run exit stack
 
    IF __clib_exit_stack_size > 0
-   
+
       EXTERN asm_exit
       jp asm_exit              ; exit function jumps to __Exit
-   
+
    ENDIF
 
 __Exit:
 
    IF !((__crt_on_exit & 0x10000) && (__crt_on_exit & 0x8))
-   
+
       ; not restarting
       
       push hl                  ; save return status
-   
+
    ENDIF
-   
+
 SECTION code_crt_exit          ; user and library cleanup
 SECTION code_crt_return
 
@@ -247,7 +251,7 @@ SECTION code_crt_return
    include "../clib_close.inc"
 
    ; terminate
-   
+
    include "../crt_exit_eidi.inc"
    include "../crt_restore_sp.inc"
    include "../crt_program_exit.inc"
@@ -255,8 +259,6 @@ SECTION code_crt_return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-include "../crt_jump_vectors_z80.inc"
 
 IF (__crt_on_exit & 0x10000) && ((__crt_on_exit & 0x6) || ((__crt_on_exit & 0x8) && (__register_sp = -1)))
 

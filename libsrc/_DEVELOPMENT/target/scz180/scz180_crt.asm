@@ -14,40 +14,8 @@ ENDIF
 
 IF !DEFINED_startup
 	defc	DEFINED_startup = 1
-	defc startup = 16
+	defc startup = 8
 	IFNDEF startup
-	ENDIF
-ENDIF
-
-
-IF !DEFINED_CLIB_OPT_PRINTF
-	defc	DEFINED_CLIB_OPT_PRINTF = 1
-	defc CLIB_OPT_PRINTF = 0x200
-	IFNDEF CLIB_OPT_PRINTF
-	ENDIF
-ENDIF
-
-
-IF !DEFINED_CLIB_OPT_PRINTF_2
-	defc	DEFINED_CLIB_OPT_PRINTF_2 = 1
-	defc CLIB_OPT_PRINTF_2 = 0
-	IFNDEF CLIB_OPT_PRINTF_2
-	ENDIF
-ENDIF
-
-
-IF !DEFINED_CLIB_OPT_SCANF
-	defc	DEFINED_CLIB_OPT_SCANF = 1
-	defc CLIB_OPT_SCANF = 0x200000
-	IFNDEF CLIB_OPT_SCANF
-	ENDIF
-ENDIF
-
-
-IF !DEFINED_CLIB_OPT_SCANF_2
-	defc	DEFINED_CLIB_OPT_SCANF_2 = 1
-	defc CLIB_OPT_SCANF_2 = 0
-	IFNDEF CLIB_OPT_SCANF_2
 	ENDIF
 ENDIF
 
@@ -60,7 +28,7 @@ IFNDEF startup
 
    ; startup undefined so select a default
 
-   defc startup = 16
+   defc startup = 8
 
 ENDIF
 
@@ -72,18 +40,18 @@ ENDIF
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; scm drivers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; rom driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; app drivers;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; hbios driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-   ; scm hbios0 drivers installed on stdin, stdout, stderr
-   ; scm hbios1 drivers installed on ttyin, ttyout, ttyerr
+   ; romwbw hbios0 drivers installed on stdin, stdout, stderr
+   ; romwbw hbios1 drivers installed on ttyin, ttyout, ttyerr
 
    IFNDEF __CRTCFG
 
@@ -103,7 +71,7 @@ ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;            scz180 romwbw application target               ;;
-;; generated from target/scz180/startup/scz180_crt_16.asm.m4 ;;
+;; generated from target/scz180/startup/scz180_crt_8.asm.m4  ;;
 ;;                                                           ;;
 ;;                  flat 64k address space                   ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -119,7 +87,7 @@ include "config_scz180_public.inc"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../crt_defaults.inc"
-include "crt_romwbw_def.inc"
+include "../../arch/hbios/crt_hbios_def.inc"
 include "crt_config.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

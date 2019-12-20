@@ -27,7 +27,7 @@ ide_rdblk2:
     ld d, __IO_IDE_DATA
     out (c), d              ;deassert read pin
     dec e                   ;keep iterative count in e
-    jr nz, ide_rdblk2
+    jr NZ, ide_rdblk2
 
 ELSE
 ide_rdblk2:
@@ -41,12 +41,12 @@ ide_rdblk2:
     ld d, __IO_IDE_DATA
     out (c), d              ;deassert read pin
     dec e                   ;keep iterative count in e
-    jr nz, ide_rdblk2
+    jr NZ, ide_rdblk2
 
 ENDIF
 ;   ld bc, __IO_PIO_IDE_CTL ;remembering what's in bc
-    ld d, $0
-    out (c), d              ;deassert all control pins
+;   ld e, $0
+    out (c), e              ;deassert all control pins
     pop de
     pop bc
     ret

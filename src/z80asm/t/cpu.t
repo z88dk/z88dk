@@ -132,6 +132,9 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 	if (Test::More->builder->is_passing) {
 		unlink "test.err", $file_bin, $file_o, $file_err, $file_lis, $file_map;
 	}
+    else { 
+        die;
+    }
 }
 
 done_testing;

@@ -38,13 +38,6 @@ defc __CPU_CLOCK = 18432000
 
 defc __CLOCKS_PER_SECOND = 50
 
-defc __BIOS_SP = 0xFFDE
-defc __BANK_SP = 0xEFFE
-
-defc __COMMON_AREA_1_BASE = 0xF000
-defc __COMMON_AREA_1_PHASE_DATA = 0xf000
-defc __COMMON_AREA_1_PHASE_DRIVER = 0xf580
-
 defc __ASCI0_RX_SIZE = 0x100
 defc __ASCI0_TX_SIZE = 0x080
 
@@ -60,8 +53,6 @@ defc __IO_LED_OUTPUT = 0x0D
 defc __IO_LED_STATUS = 0x0E
 
 defc __IO_CF_PORT = 0x10
-
-defc __IO_PIO_PORT_BASE = 0x20
 
 
 
@@ -739,99 +730,6 @@ defc IOCTL_OCHAR_CRLF = 0xc014
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-defc __IO_PIO_PORT_A = 0x20
-defc __IO_PIO_PORT_B = 0x21
-defc __IO_PIO_PORT_C = 0x22
-defc __IO_PIO_CONTROL = 0x23
-
-defc __IO_PIO_CNTL_00 = 0x80
-defc __IO_PIO_CNTL_01 = 0x81
-defc __IO_PIO_CNTL_02 = 0x82
-defc __IO_PIO_CNTL_03 = 0x83
-
-defc __IO_PIO_CNTL_04 = 0x88
-defc __IO_PIO_CNTL_05 = 0x89
-defc __IO_PIO_CNTL_06 = 0x8A
-defc __IO_PIO_CNTL_07 = 0x8B
-
-defc __IO_PIO_CNTL_08 = 0x90
-defc __IO_PIO_CNTL_09 = 0x91
-defc __IO_PIO_CNTL_10 = 0x92
-defc __IO_PIO_CNTL_11 = 0x83
-
-defc __IO_PIO_CNTL_12 = 0x98
-defc __IO_PIO_CNTL_13 = 0x99
-defc __IO_PIO_CNTL_14 = 0x9A
-defc __IO_PIO_CNTL_15 = 0x9B
-
-
-
-
-
-
-
-
-
-
-
-
-
-defc __IO_PIO_IDE_LSB = 0x20
-defc __IO_PIO_IDE_MSB = 0x21
-defc __IO_PIO_IDE_CTL = 0x22
-defc __IO_PIO_IDE_CONFIG = 0x23
-defc __IO_PIO_IDE_RD = 0x92
-defc __IO_PIO_IDE_WR = 0x80
-
-defc __IO_IDE_A0_LINE = 0x01
-defc __IO_IDE_A1_LINE = 0x02
-defc __IO_IDE_A2_LINE = 0x04
-defc __IO_IDE_CS0_LINE = 0x08
-defc __IO_IDE_CS1_LINE = 0x10
-defc __IO_IDE_WR_LINE = 0x20
-defc __IO_IDE_RD_LINE = 0x40
-defc __IO_IDE_RST_LINE = 0x80
-
-defc __IO_IDE_DATA = 0x08
-defc __IO_IDE_ERROR = 0x9
-defc __IO_IDE_SEC_CNT = 0xa
-defc __IO_IDE_SECTOR = 0xb
-defc __IO_IDE_CYL_LSB = 0xc
-defc __IO_IDE_CYL_MSB = 0xd
-defc __IO_IDE_HEAD = 0xe
-defc __IO_IDE_COMMAND = 0xf
-defc __IO_IDE_STATUS = 0xf
-
-defc __IO_IDE_CONTROL = 0x16
-defc __IO_IDE_ALT_STATUS = 0x16
-
-defc __IO_IDE_LBA0 = 0xb
-defc __IO_IDE_LBA1 = 0xc
-defc __IO_IDE_LBA2 = 0xd
-defc __IO_IDE_LBA3 = 0xe
-
-defc __IDE_CMD_READ = 0x20
-defc __IDE_CMD_WRITE = 0x30
-
-defc __IDE_CMD_STANDBY = 0xE0
-defc __IDE_CMD_IDLE = 0xE1
-defc __IDE_CMD_SLEEP = 0xE6
-defc __IDE_CMD_CACHE_FLUSH = 0xE7
-defc __IDE_CMD_ID = 0xEC
 
 
 
