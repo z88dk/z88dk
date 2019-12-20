@@ -10,6 +10,8 @@
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_inverse
+                PUBLIC          generic_console_plotc
+                PUBLIC          generic_console_pointxy
                 EXTERN		generic_console_flags
 
 		EXTERN		CONSOLE_COLUMNS
@@ -37,6 +39,11 @@ generic_console_cls:
 ; b = y
 ; a = d = character to print
 ; e = raw
+generic_console_plotc:
+	call	xypos
+	ld	(hl),d
+	ret
+
 generic_console_printc:
 	call	xypos
 	ld	a,(generic_console_flags)
@@ -51,6 +58,12 @@ generic_console_printc:
 ;Exit:  nc = success
 ;        a = character,
 ;        c = failure
+generic_console_pointxy:
+        call    xypos
+	ld	a,(hl)
+	and	a
+	ret
+
 generic_console_vpeek:
         call    xypos
 	ld	a,(hl)

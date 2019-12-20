@@ -32,6 +32,10 @@
 	defc	__CPU_CLOCK = 2457600
         defc    CONSOLE_COLUMNS = 64
         defc    CONSOLE_ROWS = 24
+        defc    GRAPHICS_CHAR_SET = 128 + 32
+        defc    GRAPHICS_CHAR_UNSET = 32
+        PUBLIC  GRAPHICS_CHAR_SET
+        PUBLIC  GRAPHICS_CHAR_UNSET
         INCLUDE "crt/classic/crt_rules.inc"
 
         defc CRT_ORG_CODE = 0x0000
