@@ -14,7 +14,7 @@ subdirs-clean: $(SUBDIRS_CLEAN)
 
 
 clean: subdirs-clean
-	$(RM) */*.o */*/*.o 
+	$(RM) */*.o */*/*.o  */*/*/*.o
 
 subdirs-clean: $(CLEANDIRS)
 
