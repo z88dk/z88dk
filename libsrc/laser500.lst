@@ -31,10 +31,10 @@ target/laser500/graphics/xor_MODE2
 graphics/w_dcircle_square.asm
 graphics/text/swapgfxbk
 @gfxbasew.lst
-games/laser500/bit_open
-games/laser500/bit_close
-games/laser500/joystick
-games/laser500/keys_joystick
+target/laser500/games/bit_open
+target/laser500/games/bit_close
+target/laser500/games/joystick
+target/laser500/games/keys_joystick
 @games/games_mwr.lst
 games/obj/laser500/joystick_type
 @z80.lst
