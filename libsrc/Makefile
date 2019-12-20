@@ -907,6 +907,13 @@ bic.lib:
 	$(MAKE) -C video/upd7220 TARGET=bic
 	TARGET=bic TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORbic -x$(OUTPUT_DIRECTORY)/bic @$(LISTFILE_DIRECTORY)/bic.lst
 
+# QX10 library
+qx10.lib:
+	@echo ''
+	@echo '--- Building Epsom qx10 Library ---'
+	@echo ''
+	$(MAKE) -C video/upd7220 TARGET=qx10
+	TARGET=qx10 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORqx10 -x$(OUTPUT_DIRECTORY)/qx10 @$(LISTFILE_DIRECTORY)/bic.lst
 
 
 
@@ -1204,7 +1211,7 @@ cpc_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(call buildgeneric,cpc)
-	$(MAKE) -C fcntl/cpc
+	$(MAKE) -C target/cpc/fcntl
 	TARGET=cpc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcpc -x$(OUTPUT_DIRECTORY)/cpc_clib @$(LISTFILE_DIRECTORY)/cpc.lst
 	TARGET=cpc TYPE=z80 $(LIBLINKER) -DFORcpc -x$(OUTPUT_DIRECTORY)/cpccpm @$(LISTFILE_DIRECTORY)/cpccpm.lst
 
