@@ -68,7 +68,6 @@ The more detailed (yet incomplete) changelist is below:
 - [z80asm] Supports many emulations for cross-processor compatibility
 - [zsdcc] Upgraded to SDCC 3.9.5 r11502
 - [newlib] +scz180: Support for this platform target
-
 - [newlib] +zxn: ZX Spectrum Next architecture renamed z80n
 
 z88dk v1.99C - 19.01.2019
