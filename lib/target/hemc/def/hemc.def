@@ -1,0 +1,17 @@
+; Hübler/Evert-MC
+
+; Memory map:
+;
+; 0000-E7FF 58K RAM
+; E800-EFFF 2K VRAM
+; F000-FBFF 3K Monitorprogramm
+; FC00-FFFF 1K RAM CPU-Karte (For monitor)
+;
+; Stack is at $fefd
+
+
+
+	defc	RESTART = $f000
+	defc	CONSOLE_IN = $f003		;Waits: Exit a = key
+	defc	CONSOLE_OUT = $f009
+	defc	CONSOLE_STAT = $f012		;z = no key pressed
