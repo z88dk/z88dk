@@ -1002,6 +1002,7 @@ hemc_clib.lib:
 	@echo ''
 	@echo '--- Building Hübler/Evert-MC Library ---'
 	@echo ''
+	$(MAKE) gfxdeps
 	$(call buildgeneric,hemc)
 	TARGET=hemc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORhemc -x$(OUTPUT_DIRECTORY)/hemc_clib @$(LISTFILE_DIRECTORY)/hemc.lst
 
@@ -1010,6 +1011,7 @@ kramermc_clib.lib:
 	@echo ''
 	@echo '--- Building Kramer-MC Library ---'
 	@echo ''
+	$(MAKE) gfxdeps
 	$(call buildgeneric,kramermc)
 	TARGET=kramermc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORkramermc -x$(OUTPUT_DIRECTORY)/kramermc_clib @$(LISTFILE_DIRECTORY)/kramermc.lst
 
