@@ -1599,7 +1599,7 @@ classic-clean:
 	$(MAKE) -C font clean
 	$(MAKE) -C arch clean
 	$(MAKE) -C target clean
-	$(MAKE) -C video/tms9918 clean
+	$(MAKE) -C video clean
 
 	$(RM) *.lib
 

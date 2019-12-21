@@ -10,6 +10,15 @@ IF FORbic
     defc UPD7220_EXPORT_DIRECT = 1
 ENDIF
 
+IF FORqx10
+    defc UPD_7220_FIFO_READ = 0x39
+    defc UPD_7220_STATUS_READ = 0x38
+    defc UPD_7220_COMMAND_WRITE = 0x39
+    defc UPD_7220_PARAMETER_WRITE = 0x38
+    defc A5105_SCREEN_MODE = 0x3d
+    defc UPD7220_EXPORT_DIRECT = 1
+ENDIF
+
 ; Set cursor _CURS (3/4 parmaeters)
 
 
