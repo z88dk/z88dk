@@ -10,6 +10,14 @@ fputc_cons_native:
 _fputc_cons_native:
 	ld	hl,2
 	add	hl,sp
+	push	hl
 	ld	a,(hl)
+	cp	10
+	jr	nz,not_lf
+	ld	c,13
+	call	CONSOLE_OUT
+not_lf:
+	pop	hl
+	ld	c,(hl)
 	call	CONSOLE_OUT
 	ret
