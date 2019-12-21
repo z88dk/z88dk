@@ -29,7 +29,8 @@ all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	laser500_clib.lib super80_clib.lib super80_vduem_clib.lib \
 	adam.lib z80tvgame_clib.lib smc777.lib pasopia7_clib.lib sv8000_clib.lib \
 	excali64_clib.lib gb_clib.lib s1mp3_clib.lib bic.lib myvision_clib.lib pencil2_clib.lib \
-	preempt.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib tvc_clib.lib hemc_clib.lib
+	preempt.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib tvc_clib.lib hemc_clib.lib \
+	kramermc_clib.lib
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib mbf32.lib mbf64.lib math32.lib gendos.lib ndos.lib  \
 	 lib3d.lib x11.lib fastmath.lib
@@ -1003,6 +1004,15 @@ hemc_clib.lib:
 	@echo ''
 	$(call buildgeneric,hemc)
 	TARGET=hemc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORhemc -x$(OUTPUT_DIRECTORY)/hemc_clib @$(LISTFILE_DIRECTORY)/hemc.lst
+
+# Kramer-MC - dom
+kramermc_clib.lib:
+	@echo ''
+	@echo '--- Building Kramer-MC Library ---'
+	@echo ''
+	$(call buildgeneric,kramermc)
+	TARGET=kramermc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORkramermc -x$(OUTPUT_DIRECTORY)/kramermc_clib @$(LISTFILE_DIRECTORY)/kramermc.lst
+
 
 # Bandai RX78 - dom
 rx78_clib.lib:
