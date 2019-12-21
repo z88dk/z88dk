@@ -29,8 +29,10 @@
 			cp	maxx
 			ret	nc
 		ENDIF
+		IF maxy <> 256
 			ld	a,l
 			cp	maxy
 			ret	nc			; out of range...
+		ENDIF
 			ld	(__gfx_coords),hl
 			ret

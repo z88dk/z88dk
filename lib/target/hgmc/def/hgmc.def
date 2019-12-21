@@ -1,0 +1,16 @@
+; Hübler GrafikMC
+
+; Memory map:
+;
+; 4k VRAM (32x32 characters)
+;
+; E000-EFFF 4K VRAM
+; F000-FFFF 4k Monitor program + variables 
+;
+
+
+
+	defc	RESTART = $f000
+	defc	CONSOLE_IN = $f003		;Waits: Exit a = key
+	defc	CONSOLE_OUT = $f009
+	defc	CONSOLE_STAT = $f012		;z = no key pressed

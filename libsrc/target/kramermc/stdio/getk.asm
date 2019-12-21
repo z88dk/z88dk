@@ -3,6 +3,7 @@
 
 	PUBLIC	getk
 	PUBLIC	_getk
+	EXTERN	fgetc_cons
 
 	INCLUDE	"target/kramermc/def/kramermc.def"
 
@@ -12,7 +13,4 @@ _getk:
 	ld	hl,0
 	and	a
 	ret	z
-	call	CONSOLE_IN
-	ld	l,a
-	ld	h,0
-	ret
+	jp	fgetc_cons
