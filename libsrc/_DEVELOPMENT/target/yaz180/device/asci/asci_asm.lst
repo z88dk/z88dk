@@ -6,7 +6,9 @@ target/yaz180/device/asci/z180/__asci0_need
 target/yaz180/device/asci/z180/asm_asci0_init
 target/yaz180/device/asci/z180/asm_asci0_interrupt
 target/yaz180/device/asci/z180/asm_asci0_flush_Rx
+target/yaz180/device/asci/z180/asm_asci0_flush_Rx_di
 target/yaz180/device/asci/z180/asm_asci0_flush_Tx
+target/yaz180/device/asci/z180/asm_asci0_flush_Tx_di
 target/yaz180/device/asci/z180/asm_asci0_reset
 target/yaz180/device/asci/z180/asm_asci0_getc
 target/yaz180/device/asci/z180/asm_asci0_peekc
@@ -20,7 +22,9 @@ target/yaz180/device/asci/z180/__asci1_need
 target/yaz180/device/asci/z180/asm_asci1_init
 target/yaz180/device/asci/z180/asm_asci1_interrupt
 target/yaz180/device/asci/z180/asm_asci1_flush_Rx
+target/yaz180/device/asci/z180/asm_asci1_flush_Rx_di
 target/yaz180/device/asci/z180/asm_asci1_flush_Tx
+target/yaz180/device/asci/z180/asm_asci1_flush_Tx_di
 target/yaz180/device/asci/z180/asm_asci1_reset
 target/yaz180/device/asci/z180/asm_asci1_getc
 target/yaz180/device/asci/z180/asm_asci1_peekc
