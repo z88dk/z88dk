@@ -2499,7 +2499,7 @@ void LoadConfigFile(arg_t *argument, char *arg)
         /* Config file in config directory */
         snprintf(buf, sizeof(buf), "%s/%s", cfgfile, arg);
     } else {
-        snprintf(buf,sizeof(buf),"%s", arg);
+        snprintf(buf, sizeof(buf), "%s/lib/config/%s", c_install_dir, arg);
     }
     parse_configfile(buf);
 }
