@@ -58,6 +58,15 @@
      defc __CLIB_CONIO_NATIVE_COLOUR = 0
    ENDIF
 
+   ; When using the firmware printer we may need to disable the soft
+   ; cursor created by fgets_cons()
+   PUBLIC __CLIB_DISABLE_FGETS_CURSOR
+   IFDEF CLIB_DISABLE_FGETS_CURSOR
+     defc __CLIB_DISABLE_FGETS_CURSOR = CLIB_DISABLE_FGETS_CURSOR
+   ELSE
+     defc __CLIB_DISABLE_FGETS_CURSOR = 0
+   ENDIF
+
    ; Delay when entering fgetc_cons()
    ; 50ms stops rogue repeats nicely, but may need tuning
    PUBLIC __CLIB_FGETC_CONS_DELAY

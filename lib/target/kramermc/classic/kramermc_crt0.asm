@@ -27,7 +27,7 @@
 
         defc    TAR__clib_exit_stack_size = 4
         defc    TAR__register_sp = -1
-	defc	CRT_KEY_DEL = 127
+	defc	CRT_KEY_DEL = 8
 	defc	__CPU_CLOCK = 1500000
         defc    CONSOLE_COLUMNS = 64
         defc    CONSOLE_ROWS = 16
