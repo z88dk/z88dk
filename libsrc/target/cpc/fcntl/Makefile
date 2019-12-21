@@ -3,7 +3,7 @@
 #
 # $Id: Makefile,v 1.5 2016-07-02 15:41:38 dom Exp $
 
-include ../../Make.config
+include ../../../Make.config
 
 CFILES = \
 	close.c      \

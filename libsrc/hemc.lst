@@ -1,0 +1,16 @@
+target/hemc/stdio/generic_console
+target/hemc/stdio/fputc_cons_native
+target/hemc/stdio/getk
+target/hemc/stdio/fgetc_cons
+@stdio/stdio.lst
+graphics/generic_console/getmaxx1
+graphics/generic_console/getmaxy1
+graphics/generic_console/plotpixl1
+graphics/generic_console/respixl1
+graphics/generic_console/xorpixl1
+graphics/generic_console/pointxy1
+graphics/generic_console/swapgfxbk.asm
+graphics/dcircle2
+graphics/__gfx_coords
+@gfxbase.lst
+@z80.lst
