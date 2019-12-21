@@ -28,8 +28,11 @@ The more detailed (yet incomplete) changelist is below:
 - [classic] +cpm: Support for Sony SMC-70/SMC-777 (-subtype=smc777)
 - [classic] +cpm: Support for Sharp X1 (-subtype=x1)
 - [classic] +fp1100: Graphics support is now available
-- [classic] +gb: Nintendo Gameboy support
+- [classic] +gb: Nintendo Gameboy support added
 - [classic] +g800: ANSI terminal and graphics improvements
+- [classic] +hemc: Hübler/Evert-MC support added
+- [classic] +hgmc: Hübler Grafik-MC support added
+- [classic] +kramermc: Kramer MC support added
 - [classic] +laser500: Microsoft 32 and 64 bit floating point support
 - [classic] +mc1000: Microsoft 32 bit floating point support
 - [classic] +msx: MSXDOS2 library available via -subtype=msxdos2
