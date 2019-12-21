@@ -51,12 +51,14 @@
 				cp	maxx
 				jr	nc, exit_line		; x1	coordinate out	of range
 			ENDIF
+			IF maxy <> 256
 				ld	a,l
 				cp	maxy
 				jr	nc, exit_line		; y0	coordinate out	of range
 				ld	a,e
 				cp	maxy
 				jr	nc, exit_line		; y1	coordinate out	of range
+			ENDIF
 				ld	(__gfx_coords),hl		; the starting	point is now default
 				push	hl
 				push	de
