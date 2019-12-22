@@ -3,14 +3,14 @@
 
 	PUBLIC	getk
 	PUBLIC	_getk
-
 	EXTERN	fgetc_cons
 
-	INCLUDE	"target/hemc/def/hemc.def"
+	INCLUDE	"target/kramermc/def/kramermc.def"
 
 getk:
 _getk:
 	call	CONSOLE_STAT
 	ld	hl,0
+	and	a
 	ret	z
 	jp	fgetc_cons

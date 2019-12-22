@@ -1,14 +1,16 @@
 
 	SECTION	code_clib
 
-	PUBLIC	fgetc_cons
-	PUBLIC	_fgetc_cons
+	PUBLIC	getk
+	PUBLIC	_getk
 
-	INCLUDE	"target/hemc/def/hemc.def"
+	INCLUDE	"target/hgmc/def/hgmc.def"
 
-fgetc_cons:
-_fgetc_cons:
-	call	CONSOLE_IN
+getk:
+_getk:
+	call	CONSOLE_STAT
+	ld	hl,0
+	ret	z
 IF STANDARDESCAPECHARS
         cp      13
         jr      nz,not_return
@@ -16,5 +18,4 @@ IF STANDARDESCAPECHARS
 .not_return
 ENDIF
 	ld	l,a
-	ld	h,0
 	ret

@@ -4,7 +4,7 @@
 	PUBLIC	fgetc_cons
 	PUBLIC	_fgetc_cons
 
-	INCLUDE	"target/hemc/def/hemc.def"
+	INCLUDE	"target/hgmc/def/hgmc.def"
 
 fgetc_cons:
 _fgetc_cons:

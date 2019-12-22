@@ -4,7 +4,7 @@
 	PUBLIC	fputc_cons_native
 	PUBLIC	_fputc_cons_native
 
-	INCLUDE	"target/hemc/def/hemc.def"
+	INCLUDE	"target/hgmc/def/hgmc.def"
 
 fputc_cons_native:
 _fputc_cons_native:
@@ -12,10 +12,10 @@ _fputc_cons_native:
 	add	hl,sp
 	ld	a,(hl)
 	cp	10
-	jr	nz,continue
-	ld	c,13	
+	jr	nz,not_lf
+	ld	c,13
 	call	CONSOLE_OUT
-continue:
+not_lf:
 	ld	c,(hl)
 	call	CONSOLE_OUT
 	ret

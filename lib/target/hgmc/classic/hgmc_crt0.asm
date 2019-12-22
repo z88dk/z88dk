@@ -1,12 +1,12 @@
 ;
-;	Startup for Hübler/Evert-MC
+;	Startup for Hübler Grafik MC
 ;
-;	https://hc-ddr.hucki.net/wiki/doku.php/homecomputer/huebler#hueblerevert-mc
+;	https://hc-ddr.hucki.net/wiki/doku.php/homecomputer/hueblergrafik
 ;
 
-	module hemc_crt0
+	module hgmc_crt0
 
-	INCLUDE	"target/hemc/def/hemc.def"
+	INCLUDE	"target/hgmc/def/hgmc.def"
 
 ;--------
 ; Include zcc_opt.def to find out some info
@@ -27,11 +27,11 @@
 
 
         defc    TAR__clib_exit_stack_size = 4
-        defc    TAR__register_sp = $e800
+        defc    TAR__register_sp = -1		; $c000
 	defc	CRT_KEY_DEL = 8
-	defc	__CPU_CLOCK = 2457600
-        defc    CONSOLE_COLUMNS = 64
-        defc    CONSOLE_ROWS = 24
+	defc	__CPU_CLOCK = 1500000
+        defc    CONSOLE_COLUMNS = 32
+        defc    CONSOLE_ROWS = 32
         defc    GRAPHICS_CHAR_SET = 128 + 32
         defc    GRAPHICS_CHAR_UNSET = 32
         PUBLIC  GRAPHICS_CHAR_SET

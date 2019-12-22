@@ -38,7 +38,11 @@
 		ld	bc,__graphics_end
 		push bc
 
+	IF maxy <> 256
 		ld	c,maxy
+	ELSE
+		ld	c,0
+	ENDIF
 		push	bc
 .yloop		pop	bc
 		dec	c
@@ -54,8 +58,14 @@
 		add	hl,de
 		ld	a,(hl)		;X1
 		
+
+	IF maxy <> 256
 		ld	e,maxy
 		add	hl,de
+	ELSE
+		ld	e,0
+		inc	h
+	ENDIF
 		cp	(hl)		; if x1>x2, return
 		jr	nc,yloop
 		
