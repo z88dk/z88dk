@@ -1,6 +1,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; yabios provided labels found in common area 1 ;;;;;;;;;;;;;;
+;;;; yabios v1.5 provided labels found in common area 1 ;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 PUBLIC z180_int_int1
@@ -147,8 +147,14 @@ DEFC asm_asci0_init                  = $FABD
 PUBLIC asm_asci0_flush_Rx_di
 DEFC asm_asci0_flush_Rx_di           = $FAD7
 
+PUBLIC asm_asci0_flush_Rx
+DEFC asm_asci0_flush_Rx              = $FAE1
+
 PUBLIC asm_asci0_flush_Tx_di
 DEFC asm_asci0_flush_Tx_di           = $FAEF
+
+PUBLIC asm_asci0_flush_Tx
+DEFC asm_asci0_flush_Tx              = $FAF9
 
 PUBLIC asm_asci0_reset
 DEFC asm_asci0_reset                 = $FB07
@@ -171,8 +177,14 @@ DEFC asm_asci1_init                  = $FBDA
 PUBLIC asm_asci1_flush_Rx_di
 DEFC asm_asci1_flush_Rx_di           = $FBF4
 
+PUBLIC asm_asci1_flush_Rx
+DEFC asm_asci1_flush_Rx              = $FBFE
+
 PUBLIC asm_asci1_flush_Tx_di
 DEFC asm_asci1_flush_Tx_di           = $FC0C
+
+PUBLIC asm_asci1_flush_Tx
+DEFC asm_asci1_flush_Tx              = $FC16
 
 PUBLIC asm_asci1_reset
 DEFC asm_asci1_reset                 = $FC24
@@ -189,27 +201,48 @@ DEFC asm_asci1_pollc                 = $FC50
 PUBLIC asm_asci1_putc
 DEFC asm_asci1_putc                  = $FC58
 
+PUBLIC _asci0_flush_Rx
+DEFC _asci0_flush_Rx                 = $FAD7
+
+PUBLIC _asci0_getc
+DEFC _asci0_getc                     = $FB11
+
+PUBLIC _asci0_pollc
+DEFC _asci0_pollc                    = $FB33
+
+PUBLIC _asci1_flush_Rx
+DEFC _asci1_flush_Rx                 = $FBF4
+
+PUBLIC _asci1_getc
+DEFC _asci1_getc                     = $FC2E
+
+PUBLIC _asci1_pollc
+DEFC _asci1_pollc                    = $FC50
+
 PUBLIC ide_read_sector
-DEFC ide_read_sector                 = $FD9E
+DEFC ide_read_sector                 = $FD92
 
 PUBLIC ide_write_sector
-DEFC ide_write_sector                = $FDCE
+DEFC ide_write_sector                = $FDC2
 
 PUBLIC asm_phexwd
-DEFC asm_phexwd                      = $FE05
+DEFC asm_phexwd                      = $FDF9
 
 PUBLIC asm_phex
-DEFC asm_phex                        = $FE0F
+DEFC asm_phex                        = $FE03
 
 PUBLIC asm_pchar
-DEFC asm_pchar                       = $FE22
+DEFC asm_pchar                       = $FE16
 
 PUBLIC asm_pstring
-DEFC asm_pstring                     = $FDFB
+DEFC asm_pstring                     = $FDEF
 
 PUBLIC asm_rhex
-DEFC asm_rhex                        = $FE2C
+DEFC asm_rhex                        = $FE20
+
+PUBLIC asm_rchar
+DEFC asm_rchar                       = $FE3A
 
 PUBLIC _common1_phase_end
-DEFC _common1_phase_end              = $FE52
+DEFC _common1_phase_end              = $FE46
 
