@@ -5,7 +5,6 @@
 	EXTERN		generic_console_udg32
 	EXTERN		generic_console_font32
         EXTERN          generic_console_flags
-	EXTERN		__pc6001_attr
 
 
 	INCLUDE		"target/pc6001/def/pc6001.def"
@@ -37,21 +36,37 @@ not_udg:
         add     hl,bc
         inc     h
         inc     h               ;hl = screen address
-	ld	a,(__pc6001_attr)
+	ld	a,(generic_console_flags)
+	ld	b,a		;Save flags
 	rrca
         sbc     a,a
         ld      c,a             ;x = 0 / 255
-        ld      b,8
+	ex	de,hl		;hl = font, de screen
+        ld      a,8
 hires_printc_1:
-        ld      a,(de)
-        xor     c
-        ld      (hl),a
-        inc     de
-        ld      a,l
+	ex	af,af
+        ld      a,(hl)
+	bit	4,b
+	jr	z,no_bold
+	rrca
+	or	(hl)
+no_bold:
+        xor     c	;Inverse
+        ld      (de),a
+        inc     hl
+        ld      a,e
         add     32
-        ld      l,a
+        ld      e,a
         jr      nc,no_overflow
-        inc     h
+        inc     d
 no_overflow:
-        djnz    hires_printc_1
+	ex	af,af
+	dec	a
+	jr	nz,hires_printc_1
+	bit	3,b		;Check underline
+	ret	z
+	ex	de,hl		;hl is now screen
+	ld	bc,-32
+	add	hl,bc
+	ld	(hl),255
         ret
