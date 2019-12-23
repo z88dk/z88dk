@@ -18,6 +18,7 @@ lenterprisehr:
 clean:
 	$(RM) *.o
 	$(RM) */*.o
+	$(RM) */*/*.o
 	$(MAKE) -C c128 clean
 	$(MAKE) -C c128_64k clean
 	$(MAKE) -C enterprise clean

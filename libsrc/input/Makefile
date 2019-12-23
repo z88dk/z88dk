@@ -6,6 +6,5 @@
 include ../Make.config
 
 clean:
-	$(RM) spectrum/*.o*
-	$(RM) zx81/*.o*
-	$(RM) x1/*.o*
+	$(RM) */*.o*
+	$(RM) *.o
