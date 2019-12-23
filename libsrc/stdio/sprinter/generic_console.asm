@@ -9,7 +9,7 @@
 		PUBLIC		generic_console_ioctl
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_inverse
+                PUBLIC          generic_console_set_attribute
 
 		EXTERN		__console_w
 		EXTERN		CONSOLE_COLUMNS
@@ -18,7 +18,7 @@
 
 generic_console_ioctl:
 	scf
-generic_console_set_inverse:
+generic_console_set_attribute:
 	ret
 
 generic_console_set_ink:

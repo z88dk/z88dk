@@ -9,7 +9,7 @@
 		PUBLIC		generic_console_printc
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_inverse
+                PUBLIC          generic_console_set_attribute
 		PUBLIC		generic_console_vpeek
 		PUBLIC		generic_console_ioctl
 
@@ -21,7 +21,7 @@
 		EXTERN		__tms9918_console_ioctl
                 EXTERN          __tms9918_set_ink
                 EXTERN          __tms9918_set_paper
-                EXTERN          __tms9918_set_inverse
+                EXTERN          __tms9918_set_attribute
 		EXTERN		generic_console_flags
 
 
@@ -33,7 +33,7 @@
 		INCLUDe		"ioctl.def"
 
 
-		defc generic_console_set_inverse = __tms9918_set_inverse
+		defc generic_console_set_attribute = __tms9918_set_attribute
 		defc generic_console_set_paper   = __tms9918_set_paper
 		defc generic_console_set_ink     = __tms9918_set_ink
 

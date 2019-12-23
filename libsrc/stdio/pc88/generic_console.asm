@@ -8,7 +8,7 @@
 		PUBLIC		generic_console_scrollup
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_inverse
+                PUBLIC          generic_console_set_attribute
 		PUBLIC		generic_console_pointxy
 
 		EXTERN		CONSOLE_COLUMNS
@@ -33,7 +33,7 @@ generic_console_set_paper:
 generic_console_set_ink:
 	and	7
 	ld	(__pc88_ink),a
-generic_console_set_inverse:
+generic_console_set_attribute:
 	ret
 
 	

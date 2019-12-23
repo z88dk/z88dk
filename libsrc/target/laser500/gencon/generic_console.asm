@@ -7,7 +7,7 @@
 		PUBLIC		generic_console_scrollup
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_inverse
+                PUBLIC          generic_console_set_attribute
 		PUBLIC		__laser500_mode
 		PUBLIC		__laser500_attr
 
@@ -25,7 +25,7 @@
 		INCLUDE		"target/laser500/def/laser500.def"
 		defc		DISPLAY = 0xf800 - 0x8000
 
-generic_console_set_inverse:
+generic_console_set_attribute:
 	ret
 
 generic_console_set_paper:

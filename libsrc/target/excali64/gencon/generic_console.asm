@@ -9,7 +9,7 @@
 		PUBLIC		generic_console_printc
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_inverse
+                PUBLIC          generic_console_set_attribute
                 PUBLIC          generic_console_plotc
                 PUBLIC          generic_console_pointxy
 
@@ -29,7 +29,7 @@
 		defc		COLOUR_MAP = $2800
 		defc		HIRES_MAP = $3000
 
-generic_console_set_inverse:
+generic_console_set_attribute:
 	ld	a,(hl)
 	ld	(t_flags),a
 	ret

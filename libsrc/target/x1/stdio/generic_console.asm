@@ -3,7 +3,7 @@
 
         PUBLIC      generic_console_set_ink
         PUBLIC      generic_console_set_paper
-        PUBLIC      generic_console_set_inverse
+        PUBLIC      generic_console_set_attribute
         PUBLIC      generic_console_set_underline
 
         EXTERN      __x1_attr
@@ -11,7 +11,7 @@
 
 
 
-generic_console_set_inverse:
+generic_console_set_attribute:
 generic_console_set_underline:
     ld      a,(__x1_attr)
     and     @01110111

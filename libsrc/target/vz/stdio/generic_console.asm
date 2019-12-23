@@ -7,7 +7,7 @@
     PUBLIC      generic_console_scrollup
     PUBLIC      generic_console_set_ink
     PUBLIC      generic_console_set_paper
-    PUBLIC      generic_console_set_inverse
+    PUBLIC      generic_console_set_attribute
     PUBLIC      generic_console_pointxy
     PUBLIC      generic_console_plotc
 
@@ -29,7 +29,7 @@ generic_console_set_paper:
     rrca
     and	    @11000000
     ld      (__MODE1_attr+1),a
-generic_console_set_inverse:
+generic_console_set_attribute:
     ret
 
 generic_console_set_ink:

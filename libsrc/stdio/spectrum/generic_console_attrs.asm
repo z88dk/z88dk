@@ -4,7 +4,7 @@
 		SECTION	code_clib
 		PUBLIC	generic_console_set_ink
 		PUBLIC	generic_console_set_paper
-		PUBLIC	generic_console_set_inverse
+		PUBLIC	generic_console_set_attribute
 		EXTERN	conio_map_colour
 
 		EXTERN	__zx_console_attr
@@ -22,7 +22,7 @@ generic_console_set_paper:
         and     @11000111
         or      c
         ld      (hl),a
-generic_console_set_inverse:
+generic_console_set_attribute:
 	ret
 
 generic_console_set_ink:

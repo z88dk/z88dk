@@ -9,7 +9,7 @@
 		PUBLIC		generic_console_ioctl
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_inverse
+                PUBLIC          generic_console_set_attribute
 
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
@@ -22,7 +22,7 @@ generic_console_ioctl:
 	scf
 generic_console_set_ink:
 generic_console_set_paper:
-generic_console_set_inverse:
+generic_console_set_attribute:
 	ret
 
 generic_console_cls:

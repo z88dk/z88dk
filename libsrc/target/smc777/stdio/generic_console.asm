@@ -10,7 +10,7 @@
         PUBLIC  generic_console_printc
         PUBLIC  generic_console_set_ink
         PUBLIC  generic_console_set_paper
-        PUBLIC  generic_console_set_inverse
+        PUBLIC  generic_console_set_attribute
 
 	EXTERN	generic_console_flags
 	EXTERN	conio_map_colour
@@ -22,7 +22,7 @@
 	EXTERN	CONSOLE_COLUMNS
 	EXTERN	CONSOLE_ROWS
 
-generic_console_set_inverse:
+generic_console_set_attribute:
 	ld	a,(generic_console_flags)
 	rrca
 	rrca

@@ -8,7 +8,7 @@
         PUBLIC      __upd7220_printc
         PUBLIC      __upd7220_set_ink
         PUBLIC      __upd7220_set_paper
-        PUBLIC      __upd7220_set_inverse
+        PUBLIC      __upd7220_set_attribute
 
         EXTERN      CONSOLE_COLUMNS
         EXTERN      CONSOLE_ROWS
@@ -31,11 +31,11 @@ IF UPD7220_EXPORT_DIRECT = 1
         defc        generic_console_set_ink = __upd7220_set_ink
         PUBLIC      generic_console_set_paper
         defc        generic_console_set_paper = __upd7220_set_paper
-        PUBLIC      generic_console_set_inverse
-        defc        generic_console_set_inverse= __upd7220_set_inverse
+        PUBLIC      generic_console_set_attribute
+        defc        generic_console_set_attribute= __upd7220_set_attribute
 ENDIF
 
-__upd7220_set_inverse:
+__upd7220_set_attribute:
     ret
 
 __upd7220_set_paper:

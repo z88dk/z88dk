@@ -10,7 +10,7 @@
 		PUBLIC		generic_console_printc
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_inverse
+                PUBLIC          generic_console_set_attribute
 
 		EXTERN		conio_map_colour
 		EXTERN		CONSOLE_COLUMNS
@@ -22,7 +22,7 @@
 		defc		COLOUR_MAP = 0xf800
 
 
-generic_console_set_inverse:
+generic_console_set_attribute:
 	ld	a,(__alphatro_attr)
 	res	7,a
 	bit	7,(hl)	

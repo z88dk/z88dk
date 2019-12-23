@@ -7,7 +7,7 @@
 		PUBLIC		generic_console_scrollup
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_inverse
+                PUBLIC          generic_console_set_attribute
 		PUBLIC		generic_console_text_xypos
 
 
@@ -21,7 +21,7 @@
 		defc		DISPLAY = 0x2800
 
 generic_console_set_paper:
-generic_console_set_inverse:
+generic_console_set_attribute:
 generic_console_set_ink:
 	ret
 

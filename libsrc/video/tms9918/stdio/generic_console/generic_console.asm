@@ -8,7 +8,7 @@
         PUBLIC  __tms9918_printc
         PUBLIC  __tms9918_set_ink
         PUBLIC  __tms9918_set_paper
-        PUBLIC  __tms9918_set_inverse
+        PUBLIC  __tms9918_set_attribute
         EXTERN  __tms9918_attribute
         EXTERN  __tms9918_text_xypos
 	EXTERN	__tms9918_pattern_name
@@ -46,18 +46,18 @@ IF VDP_EXPORT_DIRECT = 1
         PUBLIC  generic_console_printc
         PUBLIC  generic_console_set_ink
         PUBLIC  generic_console_set_paper
-        PUBLIC  generic_console_set_inverse
+        PUBLIC  generic_console_set_attribute
 
         defc        generic_console_cls = __tms9918_cls
         defc        generic_console_scrollup = __tms9918_scrollup
         defc        generic_console_printc = __tms9918_printc
         defc        generic_console_set_ink = __tms9918_set_ink
         defc        generic_console_set_paper = __tms9918_set_paper
-        defc        generic_console_set_inverse = __tms9918_set_inverse
+        defc        generic_console_set_attribute = __tms9918_set_inverse
 ENDIF
 
 
-__tms9918_set_inverse:
+__tms9918_set_attribute:
         ret
 
 __tms9918_set_ink:

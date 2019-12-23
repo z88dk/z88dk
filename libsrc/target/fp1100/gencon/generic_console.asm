@@ -14,7 +14,7 @@
     PUBLIC  generic_console_plotc
     PUBLIC  generic_console_set_ink
     PUBLIC  generic_console_set_paper
-    PUBLIC  generic_console_set_inverse
+    PUBLIC  generic_console_set_attribute
 
     EXTERN  __console_w
     EXTERN  __fp1100_attr
@@ -30,7 +30,7 @@
     INCLUDE "target/fp1100/def/fp1100.def"
     INCLUDE "ioctl.def"
 
-generic_console_set_inverse:
+generic_console_set_attribute:
     ld      a,(__inverse)
     ld      b,a
     xor     a

@@ -9,7 +9,7 @@
 		PUBLIC		generic_console_printc
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_inverse
+                PUBLIC          generic_console_set_attribute
 		PUBLIC		generic_console_calc_xypos
 		PUBLIC		generic_console_plotc
 		PUBLIC		generic_console_pointxy
@@ -25,7 +25,7 @@
 		EXTERN		__tms9918_printc
                 EXTERN          __tms9918_set_ink
                 EXTERN          __tms9918_set_paper
-                EXTERN          __tms9918_set_inverse
+                EXTERN          __tms9918_set_attribute
 		EXTERN		generic_console_flags
 		EXTERN		mc6847_map_colour
 
@@ -38,7 +38,7 @@
 		defc		DISPLAY = 0x0000
 
 
-generic_console_set_inverse:
+generic_console_set_attribute:
 	ld	b,a
         ld      a,(hl)
         ld      c,0

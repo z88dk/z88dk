@@ -10,7 +10,7 @@
 		PUBLIC		generic_console_printc
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_inverse
+                PUBLIC          generic_console_set_attribute
 
 		EXTERN		generic_console_flags
 		EXTERN		CONSOLE_COLUMNS
@@ -20,7 +20,7 @@
 
 		INCLUDE		"target/pasopia7/def/pasopia7.def"
 
-generic_console_set_inverse:
+generic_console_set_attribute:
 	ld	a,(generic_console_flags)
 	rrca
 	rrca
