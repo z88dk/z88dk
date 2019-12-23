@@ -53,7 +53,7 @@ IF VDP_EXPORT_DIRECT = 1
         defc        generic_console_printc = __tms9918_printc
         defc        generic_console_set_ink = __tms9918_set_ink
         defc        generic_console_set_paper = __tms9918_set_paper
-        defc        generic_console_set_attribute = __tms9918_set_inverse
+        defc        generic_console_set_attribute = __tms9918_set_attribute
 ENDIF
 
 

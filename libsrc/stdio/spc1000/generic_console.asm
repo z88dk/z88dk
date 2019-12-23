@@ -51,7 +51,7 @@ generic_console_set_attribute:
 	ld	a,(__spc1000_mode)
 	cp	10
 	ld	a,b
-	jp	z,__tms9918_set_inverse
+	jp	z,__tms9918_set_attribute
 	ret
 
 generic_console_set_paper:
