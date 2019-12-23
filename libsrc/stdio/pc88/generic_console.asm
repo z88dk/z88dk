@@ -25,6 +25,8 @@
 
 		defc		DISPLAY = 0xf3c8
 
+
+
 generic_console_set_paper:
 	and	7
 	ld	(__pc88_paper),a

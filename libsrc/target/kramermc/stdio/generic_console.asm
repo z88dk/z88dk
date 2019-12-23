@@ -19,6 +19,10 @@
 		
 		defc		DISPLAY = $fc00
 
+		INCLUDE	"ioctl.def"
+	        PUBLIC  CLIB_GENCON_CAPS
+		defc	CLIB_GENCON_CAPS = CAP_GENCON_UNDERLINE
+
 generic_console_ioctl:
 	scf
 generic_console_set_ink:
@@ -47,7 +51,11 @@ generic_console_plotc:
 generic_console_printc:
 	call	xypos
 	ld	a,(generic_console_flags)
-	and	128
+	rrca
+	rrca
+	rrca
+	rrca
+	and	@10000000
 	or	d
 	ld	(hl),a
 	ret

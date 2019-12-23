@@ -26,6 +26,10 @@
 		defc		DISPLAY = 0x0800
                 defc            TOPROW = DISPLAY + (CONSOLE_ROWS - 1) * 64 + 10
 
+		PUBLIC          CLIB_GENCON_CAPS
+		defc            CLIB_GENCON_CAPS = 0
+
+
 generic_console_ioctl:
 	scf
 generic_console_set_ink:

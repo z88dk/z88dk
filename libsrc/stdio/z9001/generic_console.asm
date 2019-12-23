@@ -25,6 +25,11 @@
 		defc		generic_console_cls = ansi_cls
 		defc		generic_console_scrollup = ansi_SCROLLUP
 
+		INCLUDE		"ioctl.def"
+		PUBLIC          CLIB_GENCON_CAPS
+		defc            CLIB_GENCON_CAPS = CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR | CAP_GENCON_INVERSE
+
+
 generic_console_ioctl:
 	scf
 generic_console_set_attribute:

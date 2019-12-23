@@ -19,6 +19,11 @@
 		
 		defc		DISPLAY = $e800
 
+		INCLUDE	"ioctl.def"
+		PUBLIC  CLIB_GENCON_CAPS
+		defc    CLIB_GENCON_CAPS = CAP_GENCON_INVERSE
+
+
 generic_console_ioctl:
 	scf
 generic_console_set_ink:

@@ -16,6 +16,10 @@
 		EXTERN		CONSOLE_ROWS
 		EXTERN		__sprinter_attr
 
+		INCLUDE		"ioctl.def"
+		PUBLIC          CLIB_GENCON_CAPS
+		defc            CLIB_GENCON_CAPS = CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR
+
 generic_console_ioctl:
 	scf
 generic_console_set_attribute:

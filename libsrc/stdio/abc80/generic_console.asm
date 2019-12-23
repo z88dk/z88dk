@@ -16,6 +16,9 @@
 
 		defc		DISPLAY = 31744
 
+		PUBLIC          CLIB_GENCON_CAPS
+		defc            CLIB_GENCON_CAPS = 0
+
 generic_console_ioctl:
 	scf
 generic_console_set_ink:

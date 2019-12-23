@@ -37,6 +37,10 @@
 		defc		DISPLAY = 12328
 		defc		COLOUR_MAP = DISPLAY + 1024
 
+		INCLUDE		"ioctl.def"
+		PUBLIC          CLIB_GENCON_CAPS
+		defc            CLIB_GENCON_CAPS = CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR 
+
 generic_console_ioctl:
 	scf
 generic_console_set_attribute:

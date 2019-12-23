@@ -13,6 +13,9 @@
 
 	INCLUDE	"target/pasopia7/def/pasopia7.def"
 
+        PUBLIC          CLIB_GENCON_CAPS
+        defc            CLIB_GENCON_CAPS = CAP_GENCON_CUSTOM_FONT | CAP_GENCON_UDGS | CAP_GENCON_FG_COLOUR | CAP_GENCON_INVERSE
+
 
 ; a = ioctl
 ; de = arg

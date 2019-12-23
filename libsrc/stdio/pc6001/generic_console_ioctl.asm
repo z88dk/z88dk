@@ -14,6 +14,17 @@
 	INCLUDE	"target/pc6001/def/pc6001.def"
 	INCLUDE	"ioctl.def"
 
+        EXTERN          generic_console_caps
+        PUBLIC          CLIB_GENCON_CAPS
+        defc            CLIB_GENCON_CAPS = CAPS_MODE0
+
+        ; Text
+        defc    CAPS_MODE0 = CAP_GENCON_INVERSE | CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR
+        ; Hires
+        defc    CAPS_MODE1 = CAP_GENCON_INVERSE | CAP_GENCON_CUSTOM_FONT | CAP_GENCON_UDGS
+        ; Colour
+        defc    CAPS_MODE2 = CAP_GENCON_INVERSE | CAP_GENCON_CUSTOM_FONT | CAP_GENCON_UDGS | CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR
+
 
 ; a = ioctl
 ; de = arg
@@ -40,15 +51,18 @@ check_mode:
 	and	31
 	ld	e,32		;columns
 	ld	h,MODE_0
+	ld	d,CAPS_MODE0
 	ld	l,16
 	and	a
 	jr	z,set_mode
 	ld	h,MODE_1
+	ld	d,CAPS_MODE1
 	ld	l,24
 	cp	1		;HIRES
 	jr	z,set_mode
 	ld	e,16
 	ld	h,MODE_2
+	ld	d,CAPS_MODE1
 	cp	2		;Half hires
 	jr	nz,failure
 set_mode:
@@ -58,6 +72,8 @@ set_mode:
 not_css:
 	ld	a,e
 	ld	(__console_w),a
+	ld	a,d
+	ld	(generic_console_caps),a
 	ld	a,h
 	ld	(__pc6001_mode),a
 	ld	a,l

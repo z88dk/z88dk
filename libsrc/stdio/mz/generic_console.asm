@@ -30,6 +30,10 @@
 		defc		DISPLAY = 0xd000
 		defc		COLOUR_MAP = 0xd800
 
+		INCLUDE		"ioctl.def"
+		PUBLIC          CLIB_GENCON_CAPS
+		defc            CLIB_GENCON_CAPS = CAP_GENCON_INVERSE | CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR
+
 generic_console_ioctl:
 	scf
 	ret

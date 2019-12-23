@@ -16,6 +16,12 @@
 	; Set bit 1 for hires
 	defc	LATCH = $2038
 
+	EXTERN	generic_console_caps
+        PUBLIC  CLIB_GENCON_CAPS
+        defc    CLIB_GENCON_CAPS = CAPS_MODE0
+
+	defc	CAPS_MODE0 = 0
+	defc	CAPS_MODE1 = CAP_GENCON_INVERSE | CAP_GENCON_CUSTOM_FONT | CAP_GENCON_UDGS
 
 ; a = ioctl
 ; de = arg
@@ -45,6 +51,7 @@ check_mode:
 	ld	a,c
 	and	a
 	ld	c,$80
+	ld	d,CAPS_MODE0
 	jr	z,set_mode
 	cp	1
 	jr	nz,failure
@@ -59,6 +66,7 @@ check_mode:
 	ld	c,2
 	halt
 	im	2
+	ld	d,CAPS_MODE0
 set_mode:
 	ld	(__gal_mode),a
 	and	a
@@ -71,6 +79,8 @@ set_mode:
 	im	1
 not_mode0:
 	ld	(__console_w),hl
+	ld	a,d
+	ld	(generic_console_caps),a
 	;ld	a,c
 	;ld	(LATCH),a
 	call	generic_console_cls

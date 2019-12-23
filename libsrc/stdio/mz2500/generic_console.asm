@@ -21,6 +21,10 @@
 		INCLUDE		"target/mz2500/def/svc.inc"
 		INCLUDE		"ioctl.def"
 
+		PUBLIC          CLIB_GENCON_CAPS
+		defc            CLIB_GENCON_CAPS = CAP_GENCON_FG_COLOUR
+
+
 generic_console_ioctl:
         ex      de,hl
         ld      c,(hl)  ;bc = where we point to

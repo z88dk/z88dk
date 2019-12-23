@@ -20,7 +20,7 @@
 
 		defc		DISPLAY = 0xf000
 		defc		COLOUR_MAP = 0xf800
-
+	
 
 generic_console_set_attribute:
 	ld	a,(__alphatro_attr)

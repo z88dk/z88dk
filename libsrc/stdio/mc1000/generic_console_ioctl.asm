@@ -15,6 +15,18 @@
 	INCLUDE	"target/mc1000/def/mc1000.def"
 
 
+	EXTERN		generic_console_caps
+        PUBLIC          CLIB_GENCON_CAPS
+        defc            CLIB_GENCON_CAPS = CAPS_MODE0
+
+	; Text
+	defc	CAPS_MODE0 = 0
+	; Hires
+	defc	CAPS_MODE1 = CAP_GENCON_INVERSE | CAP_GENCON_CUSTOM_FONT | CAP_GENCON_UDGS
+	; Colour
+	defc	CAPS_MODE2 = CAP_GENCON_INVERSE | CAP_GENCON_CUSTOM_FONT | CAP_GENCON_UDGS | CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR
+
+
 ; a = ioctl
 ; de = arg
 generic_console_ioctl:
@@ -39,15 +51,18 @@ check_mode:
 	ld	a,c
 	and	31
 	ld	e,MODE_1
+	ld	d,CAPS_MODE1
 	ld	hl,$1820		;rows cols
 	cp	1
 	jr	z,set_mode
 	ld	hl,$1020
 	ld	e,MODE_0
+	ld	d,CAPS_MODE0
 	and	a
 	jr	z,set_mode
 	ld	hl,$1810
 	ld	e,MODE_2
+	ld	d,CAPS_MODE2
 	cp	2
 	jr	nz,failure
 set_mode:
@@ -57,6 +72,8 @@ set_mode:
 not_css:
 	ld	(__mc1000_mode),a
 	ld	(__console_w),hl
+	ld	a,d
+	ld	(generic_console_caps),a
 	ld	a,e
 	ld	(__mc1000_modeval),a
 	out	($80),a

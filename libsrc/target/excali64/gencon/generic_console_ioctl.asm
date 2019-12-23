@@ -13,6 +13,10 @@
 	EXTERN	__excali64_udg32
 	EXTERN	__excali64_mode
 
+        PUBLIC  CLIB_GENCON_CAPS
+        defc    CLIB_GENCON_CAPS = CAP_GENCON_CUSTOM_FONT | CAP_GENCON_UDGS | CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR
+
+
 
 ; a = ioctl
 ; de = arg

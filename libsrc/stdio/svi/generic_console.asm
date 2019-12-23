@@ -41,6 +41,10 @@
 
 		defc		DISPLAY = $f000
 
+                PUBLIC          CLIB_GENCON_CAPS
+                EXTERN          __tms9918_CLIB_GENCON_CAPS
+                defc            CLIB_GENCON_CAPS = __tms9918_CLIB_GENCON_CAPS
+		EXTERN		generic_console_caps
 
 		defc generic_console_set_attribute = __tms9918_set_attribute
 		defc generic_console_set_paper   = __tms9918_set_paper
@@ -64,6 +68,8 @@ generic_console_ioctl:
 set_mode:
 	ld	(__svi_mode),a
 	ld	(__console_w),hl
+	ld	a,CAP_GENCON_INVERSE
+	ld	(generic_console_caps),a
 	and	a
 	ret
 

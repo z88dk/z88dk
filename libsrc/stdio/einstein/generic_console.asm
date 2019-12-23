@@ -30,7 +30,13 @@
 		PUBLIC		__einstein_mode
 		EXTERN		__console_w
 
-		INCLUDe		"ioctl.def"
+		EXTERN		generic_console_caps
+
+		INCLUDE		"ioctl.def"
+
+		PUBLIC          CLIB_GENCON_CAPS
+		EXTERN		__tms9918_CLIB_GENCON_CAPS
+       		defc            CLIB_GENCON_CAPS = __tms9918_CLIB_GENCON_CAPS
 
 
 		defc generic_console_set_attribute = __tms9918_set_attribute
@@ -54,6 +60,8 @@ generic_console_ioctl:
 
 set_mode:
 	ld	(__einstein_mode),a
+	ld	a,CAP_GENCON_INVERSE
+	ld	(generic_console_caps),a
 	ld	(__console_w),bc
 	and	a
 	ret

@@ -27,6 +27,11 @@
     EXTERN   __tms9918_pattern_generator
     EXTERN   __console_w
 
+    EXTERN   generic_console_caps
+    EXTERN   __tms9918_CAPS_MODE0
+    EXTERN   __tms9918_CAPS_MODE1
+    EXTERN   __tms9918_CAPS_MODE2
+
 msx_set_mode:
 _msx_set_mode:
     ld    a,l
@@ -81,6 +86,9 @@ ENDIF
     and   15
     call  VDPreg_Write    ; reg7  -  INK & PAPER-/BACKDROPCOL.
    
+
+    ld    a,__tms9918_CAPS_MODE0
+    ld    (generic_console_caps),a
     ld    a,32
     ld    (__console_w),a 
     ld    hl,$1800
@@ -136,6 +144,8 @@ ENDIF
     call  VDPreg_Write    ; reg7  -  INK & PAPER-/BACKDROPCOL.
     
 
+    ld    a,__tms9918_CAPS_MODE1
+    ld    (generic_console_caps),a
     ld    a,40
     ld    (__console_w),a 
     ld    hl,$800
@@ -255,6 +265,8 @@ ENDIF
     dec   e
     jr    nz,pattern
 
+    ld    a,__tms9918_CAPS_MODE2
+    ld    (generic_console_caps),a
     ld    a,32
     ld    (__console_w),a 
 	

@@ -13,6 +13,16 @@
 
 	INCLUDE	"target/laser500/def/laser500.def"
 
+        EXTERN          generic_console_caps
+        PUBLIC          CLIB_GENCON_CAPS
+        defc            CLIB_GENCON_CAPS = CAPS_MODE0
+
+        ; 40 column 
+        defc    CAPS_MODE0 = CAP_GENCON_INVERSE | CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR
+        ; 80 column
+        defc    CAPS_MODE1 = 0
+        ; Hires
+        defc    CAPS_MODE2 = CAP_GENCON_INVERSE | CAP_GENCON_CUSTOM_FONT | CAP_GENCON_UDGS | CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR | CAP_GENCON_BOLD | CAP_GENCON_UNDERLINE
 
 ; a = ioctl
 ; de = arg
@@ -38,18 +48,23 @@ check_mode:
 	ld	a,c
 	ld	d,0
 	ld	e,80
+	ld	b,CAPS_MODE1
 	cp	1		;80 column mode
 	jr	z,set_mode
 	ld	e,40
+	ld	b,CAPS_MODE0
 	and	a		;40 column mode
 	jr	z,set_mode
 	cp	2
 	jr	nz,failure
 	ld	d,8
+	ld	b,CAPS_MODE2
 	; Value of 2 is GR4 - 320x192
 set_mode:
 	ld	(__laser500_mode),a
 	ld	c,a
+	ld	a,b
+	ld	(generic_console_caps),a
 	ld	a,(SYSVAR_port44)
 	and	@11111000
 	or	c

@@ -15,6 +15,17 @@
 
 	INCLUDE	"target/spc1000/def/spc1000.def"
 
+        EXTERN          generic_console_caps
+        PUBLIC          CLIB_GENCON_CAPS
+        defc            CLIB_GENCON_CAPS = CAPS_MODE0
+
+        ; Text
+        defc    CAPS_MODE0 = CAP_GENCON_INVERSE | CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR
+        ; Hires
+        defc    CAPS_MODE1 = CAP_GENCON_INVERSE | CAP_GENCON_CUSTOM_FONT | CAP_GENCON_UDGS
+        ; Colour
+        defc    CAPS_MODE2 = CAP_GENCON_INVERSE | CAP_GENCON_CUSTOM_FONT | CAP_GENCON_UDGS | CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR
+
 
 ; a = ioctl
 ; de = arg
@@ -41,16 +52,19 @@ check_mode:
 	ld	h,@00000000
 	ld	l,16
 	ld	c,32
+	ld	d,CAPS_MODE0
 	and	a
 	jr	z,set_mode
 	ld	h,MODE_1
 	ld	l,24
 	ld	c,32
+	ld	d,CAPS_MODE1
 	cp	1		;HIRES
 	jr	z,set_mode
 	ld	h,MODE_2
 	ld	l,24
 	ld	c,16
+	ld	d,CAPS_MODE2
 	cp	2		;COLOUR
 	jr	z,set_mode
 	cp	10		;Switch to VDP
@@ -60,6 +74,8 @@ check_mode:
 	ld	(__spc1000_mode),a
 	ld	a,24
 	ld	(__console_h),a
+	ld	a,d
+	ld	(generic_console_caps),a
         ld      a,c
         sub     10
         ld      l,a
