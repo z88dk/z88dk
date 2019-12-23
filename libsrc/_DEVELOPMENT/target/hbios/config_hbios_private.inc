@@ -32,7 +32,12 @@ defc __Z88DK = 1992
 
 
 
-defc __HBIOS = 020922
+defc __HBIOS = 1
+defc __HBIOS_VERS = 020922
+
+defc __CPU_CLOCK = 18432000
+
+defc __CLOCKS_PER_SECOND = 50
 
 
 
@@ -45,12 +50,10 @@ defc __HBIOS = 020922
 
 
 
-defc __Z80 = 0x01
+defc __Z80 = 0x02
 
 defc __Z80_NMOS = 0x01
 defc __Z80_CMOS = 0x02
-
-defc __CPU_CLOCK = 4000000
 
 defc __CPU_INFO = 0x00
 

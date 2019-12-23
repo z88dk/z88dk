@@ -37,7 +37,12 @@
 
 
 #undef  __HBIOS
-#define __HBIOS  020922
+#define __HBIOS  1
+#define __HBIOS_VERS  020922
+
+#define __CPU_CLOCK  18432000
+
+#define __CLOCKS_PER_SECOND 50
 
 
 
@@ -51,12 +56,10 @@
 
 
 #undef  __Z80
-#define __Z80  0x01
+#define __Z80  0x02
 
 #define __Z80_NMOS  0x01
 #define __Z80_CMOS  0x02
-
-#define __CPU_CLOCK  4000000
 
 #define __CPU_INFO  0x00
 

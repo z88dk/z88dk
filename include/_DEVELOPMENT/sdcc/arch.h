@@ -11,6 +11,10 @@
 #include <../../../libsrc/_DEVELOPMENT/target/cpm/config_cpm.h>
 #endif
 
+#ifdef __HBIOS
+#include <../../../libsrc/_DEVELOPMENT/target/hbios/config_hbios.h>
+#endif
+
 #ifdef __RC2014
 #include <../../../libsrc/_DEVELOPMENT/target/rc2014/config_rc2014.h>
 #endif
