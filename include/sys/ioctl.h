@@ -19,9 +19,9 @@ extern int __LIB__ console_ioctl(uint16_t cmd, void *arg) __smallc;
 #define CAP_GENCON_CUSTOM_FONT  1
 #define CAP_GENCON_UDGS		2
 #define CAP_GENCON_FG_COLOUR	4
-#define CAP_GENCON_BG_COLOUR	4
-#define CAP_GENCON_INVERSE	8
-#define CAP_GENCON_BOLD		16
-#define CAP_GENCON_UNDERLINE	32
+#define CAP_GENCON_BG_COLOUR	8
+#define CAP_GENCON_INVERSE	16
+#define CAP_GENCON_BOLD		32
+#define CAP_GENCON_UNDERLINE	64
 
 #endif

@@ -17,4 +17,4 @@
 	defc	RESTART =      $0000
 	defc	CONSOLE_IN =   $00e0 	;Waits: Exit a = key
 	defc	CONSOLE_OUT =  $00e6	;C = character to print
-	defc	CONSOLE_STAT = $00ec	;a=0 no key, $ff = key pressed
+	defc	CONSOLE_STAT = $00ef	;a=0 no key, $ff = key pressed
