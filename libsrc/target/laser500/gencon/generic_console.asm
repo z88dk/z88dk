@@ -168,7 +168,14 @@ not_udg:
 	ld	b,8
 printc_hires_loop:
 	push	bc
+	ld	a,(generic_console_flags)
+	bit	4,a
 	ld	a,(de)
+	ld	b,a
+	jr	z,not_bold
+	rrca
+	or	b
+not_bold:
 	xor	c
 	; Display is morrored, so mirror the byte
 	ld	c,a
@@ -194,6 +201,12 @@ printc_hires_loop:
 	add	hl,bc
 	pop	bc
 	djnz	printc_hires_loop
+	ld	a,(generic_console_flags)
+	bit	3,a
+	jr	z,printc_return
+	ld	bc,-$800
+	add	hl,bc
+	ld	(hl),255
 	jr	printc_return
 
 

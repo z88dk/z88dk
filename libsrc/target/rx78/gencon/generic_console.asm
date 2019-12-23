@@ -107,7 +107,14 @@ not_udg:
 	ld	a,8
 loop:	push	af
 	push	bc		;save inverse flag
+	ld	a,(generic_console_flags)
+	bit	4,a
 	ld	a,(de)
+	jr	z,not_bold
+	ld	b,a
+	rrca
+	or	b
+not_bold:
 	xor	c
 	ld	c,a		;c = byte to print
 	ld	a,d
