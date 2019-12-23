@@ -1,0 +1,28 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._constructItems
+	ret
+
+
+
+
+	SECTION	bss_compiler
+._array	defs	2
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_array
+	GLOBAL	_constructItems
+
+
+
+
