@@ -5,7 +5,6 @@ SECTION code_driver_terminal_input
 
 PUBLIC rc_01_input_hbios1_iterm_msg_getc
 
-EXTERN __BF_CIOIN
 EXTERN asm_hbios
 
 rc_01_input_hbios1_iterm_msg_getc:

@@ -30,8 +30,7 @@
     SECTION code_driver
     
     PUBLIC	asm_clock_gettime
-    
-    EXTERN  __BF_SYSGET, __BF_SYSGET_SECS
+
     EXTERN  asm_hbios
 
     ; HL contains address of struct timespec

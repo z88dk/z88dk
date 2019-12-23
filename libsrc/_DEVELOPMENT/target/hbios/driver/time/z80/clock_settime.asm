@@ -31,7 +31,6 @@
     
     PUBLIC    asm_clock_settime
 
-    EXTERN  __BF_SYSSET, __BF_SYSSET_SECS
     EXTERN  asm_hbios
     
     ; HL contains address of struct timespec

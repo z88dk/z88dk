@@ -7,7 +7,6 @@ PUBLIC rc_01_output_hbios1_oterm_msg_putc
 PUBLIC rc_01_output_hbios1_oterm_msg_putc_raw
 PUBLIC rc_01_output_hbios1_oterm_msg_putc_send
 
-EXTERN __BF_CIOOUT
 EXTERN asm_hbios
 EXTERN l_jpix
 
