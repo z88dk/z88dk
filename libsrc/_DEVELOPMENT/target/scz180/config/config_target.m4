@@ -2,7 +2,6 @@ divert(-1)
 
 ###############################################################
 # TARGET USER CONFIGURATION
-#
 # rebuild the library if changes are made
 #
 

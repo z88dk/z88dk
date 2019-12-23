@@ -2,7 +2,6 @@ divert(-1)
 
 ###############################################################
 # 82C55 IDE USER CONFIGURATION
-#
 # rebuild the library if changes are made
 #
 
