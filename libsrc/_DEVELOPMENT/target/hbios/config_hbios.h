@@ -443,7 +443,6 @@
 
 
 
-#define __CPM_RCON  __CPM_RCON
 #define __BF_CIO  0x00
 #define __BF_CIOIN  0x0
 #define __BF_CIOOUT  0x1
