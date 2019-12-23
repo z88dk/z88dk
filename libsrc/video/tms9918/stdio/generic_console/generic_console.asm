@@ -174,6 +174,38 @@ tms9918_printc_rejoin:
         add     hl,hl
         add     hl,hl
         add     hl,de
+	push	bc	;Save coordinates
+	ld	a,(generic_console_flags)
+	ld	b,a	;Save flags
+	rlca
+	sbc	a
+	ld	c,a	;So c = 255/0 depending on inverse
+        ld      de,__tms9918_scroll_buffer
+	push	de	;Save buffer
+	ld	a,8
+copy_glyph:
+	ex	af,af
+	ld	a,(hl)
+	bit	4,b
+	jr	z,not_bold
+	rrca
+	or	(hl)
+not_bold:
+	xor	c	;Invert if necessary
+	ld	(de),a
+	inc	de
+	inc	hl
+	ex	af,af
+	dec	a
+	jr	nz,copy_glyph
+	bit	3,b
+	jr	z,not_underline
+	dec	de
+	dec	a
+	ld	(de),a
+not_underline:
+	pop	hl	;Get buffer back
+	pop	bc
         ld      a,c
         add     a
         add     a
@@ -184,19 +216,10 @@ tms9918_printc_rejoin:
         ld      bc,8
         call    LDIRVM
         pop     hl
+	; Now set the attributes
         ld      de,8192
         add     hl,de        
-        push    hl
         ld      a,(__tms9918_attribute)
-        ld      hl,generic_console_flags
-        bit     7,(hl)
-        jr      z,not_inverse
-        rlca
-        rlca
-        rlca
-        rlca
-not_inverse:
-        pop     hl
         ld      bc,8
         call    FILVRM
         pop     ix
