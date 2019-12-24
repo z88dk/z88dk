@@ -42,16 +42,6 @@
 
 
 IF !__CPU_INTEL__ 
-		defc		SUPPORT_vt52=1
-		; Extra VT52 codes - clear to end of line + clear to end of screen + underlined
-		defc		SUPPORT_vt52x=1
-		defc		SUPPORT_zxcodes=1
-
-
-		SECTION		code_clib
-		PUBLIC		fputc_cons_generic
-		PUBLIC		_fputc_cons_generic
-
 		; Variables that can be adjusted by platform specific code
 		PUBLIC		generic_console_flags
 
@@ -70,8 +60,6 @@ IF !__CPU_INTEL__
 
 
 ; extern int __LIB__ fputc_cons(char c);
-fputc_cons_generic:
-_fputc_cons_generic:
 	ld	hl,2
 	add	hl,sp
 	ld	d,(hl)
