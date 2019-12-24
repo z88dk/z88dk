@@ -93,6 +93,8 @@ typedef enum {
 	RANGE_WORD,			// 16-bit value little-endian
 	RANGE_WORD_BE,		// 16-bit value big-endian
 	RANGE_DWORD,
+    RANGE_BYTE_TO_WORD_UNSIGNED,    // unsigned byte extended to 16 bits
+    RANGE_BYTE_TO_WORD_SIGNED,      // signed byte sign-extended to 16 bits
 } range_t;
 
 /* return size in bytes of value of given range */

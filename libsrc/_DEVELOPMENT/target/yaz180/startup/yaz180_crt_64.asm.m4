@@ -21,7 +21,6 @@ include "config_yaz180_public.inc"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../crt_defaults.inc"
-include "crt_yabios_def.inc"
 include "crt_config.inc"
 include(`../crt_rules.inc')
 include(`yaz180_rules.inc')
@@ -43,13 +42,11 @@ dnl
 dnl## input terminals
 dnl
 dnl#include(`../cpm/driver/terminal/cpm_00_input_cons.m4')
-dnl#include(`../cpm/driver/terminal/cpm_01_input_kbd_dcio.m4')
 dnl#include(`../cpm/driver/character/cpm_00_input_reader.m4')
 dnl
 dnl## output terminals
 dnl
 dnl#include(`../cpm/driver/terminal/cpm_00_output_cons.m4')
-dnl#include(`../cpm/driver/terminal/cpm_01_output_dcio.m4')
 dnl#include(`../cpm/driver/character/cpm_00_output_list.m4')
 dnl#include(`../cpm/driver/character/cpm_00_output_punch.m4')
 dnl
@@ -102,27 +99,7 @@ SECTION CODE
 
 PUBLIC __Start, __Exit
 
-EXTERN _main, asm_cpm_bdos
-
-Qualify:
-
-   ; disqualify 8080
-   
-   sub a
-   jp po, __Continue
-
-   ld c,__CPM_PRST
-   ld de,disqualify_s
-   
-   call asm_cpm_bdos
-   rst 0
-
-disqualify_s:
-
-   defm "z80 only"
-   defb 13,10,'$'
-
-__Continue:
+EXTERN _main
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; USER PREAMBLE ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -132,6 +109,16 @@ IF __crt_include_preamble
 
    include "crt_preamble.asm"
    SECTION CODE
+
+ENDIF
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; PAGE ZERO ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+IF (__crt_org_code = 0) && !(__page_zero_present)
+
+   include "../crt_page_zero_z180.inc"
 
 ENDIF
 
@@ -211,7 +198,7 @@ __Restart_2:
    include "../clib_init_bss.inc"
 
    ; interrupt mode
-   
+
    include "../crt_set_interrupt_mode.inc"
 
 SECTION code_crt_init          ; user and library initialization
@@ -225,7 +212,7 @@ SECTION code_crt_main
    include "../crt_start_ei.inc"
 
    ; call user program
-   
+
    call _main                  ; hl = return status
 
    ; run exit stack
@@ -242,7 +229,7 @@ __Exit:
    IF !((__crt_on_exit & 0x10000) && (__crt_on_exit & 0x8))
 
       ; not restarting
-      
+
       push hl                  ; save return status
 
    ENDIF
@@ -251,7 +238,7 @@ SECTION code_crt_exit          ; user and library cleanup
 SECTION code_crt_return
 
    ; close files
-   
+
    include "../clib_close.inc"
 
    ; terminate
@@ -263,6 +250,9 @@ SECTION code_crt_return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+include "../crt_jump_vectors_z180.inc"
+include "crt_interrupt_vectors_z180.inc"
 
 IF (__crt_on_exit & 0x10000) && ((__crt_on_exit & 0x6) || ((__crt_on_exit & 0x8) && (__register_sp = -1)))
 

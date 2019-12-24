@@ -65,7 +65,9 @@ static long write_expr( FILE *fp )
 			case RANGE_WORD_BE:			range = 'B'; break;
 			case RANGE_BYTE_UNSIGNED:	range = 'U'; break;
 			case RANGE_BYTE_SIGNED:		range = 'S'; break;
-			case RANGE_JR_OFFSET:		range = 'J'; break;
+            case RANGE_BYTE_TO_WORD_UNSIGNED:	range = 'u'; break;
+            case RANGE_BYTE_TO_WORD_SIGNED:		range = 's'; break;
+            case RANGE_JR_OFFSET:		range = 'J'; break;
 			default:					xassert(0);
 			}
 		}

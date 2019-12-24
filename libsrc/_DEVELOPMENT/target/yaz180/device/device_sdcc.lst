@@ -1,0 +1,4 @@
+@target/yaz180/device/asci/asci_sdcc.lst
+@target/yaz180/device/am9511a/am9511a_asm.lst
+@target/yaz180/device/8255/8255_asm.lst
+@target/yaz180/device/pca9665/pca9665_asm.lst

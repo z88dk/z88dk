@@ -53,7 +53,7 @@ dnl#include(`../m4_file_dup.m4')
 dnl
 dnl## empty fd slot
 dnl
-dnl#include(`../../m4_file_absent.m4')
+dnl#include(`../m4_file_absent.m4')
 dnl
 dnl############################################################
 dnl## INSTANTIATE DRIVERS #####################################
@@ -164,7 +164,7 @@ SECTION code_crt_main
 
    ; call user program
 
-      call _main                ; hl = return status
+   call _main                  ; hl = return status
 
    ; run exit stack
 

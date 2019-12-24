@@ -38,13 +38,6 @@ defc __CPU_CLOCK = 18432000
 
 defc __CLOCKS_PER_SECOND = 50
 
-defc __BIOS_SP = 0xFFDE
-defc __BANK_SP = 0xEFFE
-
-defc __COMMON_AREA_1_BASE = 0xF000
-defc __COMMON_AREA_1_PHASE_DATA = 0xf000
-defc __COMMON_AREA_1_PHASE_DRIVER = 0xf580
-
 defc __ASCI0_RX_SIZE = 0x100
 defc __ASCI0_TX_SIZE = 0x080
 
@@ -60,53 +53,6 @@ defc __IO_LED_OUTPUT = 0x0D
 defc __IO_LED_STATUS = 0x0E
 
 defc __IO_CF_PORT = 0x10
-
-defc __IO_PIO_PORT_BASE = 0x20
-
-
-
-
-
-
-
-
-
-
-
-
-defc __CPM      = 22
-
-defc __CPM_RCON = 1
-defc __CPM_WCON = 2
-defc __CPM_RRDR = 3
-defc __CPM_WPUN = 4
-defc __CPM_WLST = 5
-defc __CPM_DCIO = 6
-defc __CPM_GIOB = 7
-defc __CPM_SIOB = 8
-defc __CPM_PRST = 9
-defc __CPM_RCOB = 10
-defc __CPM_ICON = 11
-defc __CPM_VERS = 12
-defc __CPM_RDS  = 13
-defc __CPM_LGIN = 14
-defc __CPM_OPN  = 15
-defc __CPM_CLS  = 16
-defc __CPM_FFST = 17
-defc __CPM_FNXT = 18
-defc __CPM_DEL  = 19
-defc __CPM_READ = 20
-defc __CPM_WRIT = 21
-defc __CPM_MAKE = 22
-defc __CPM_REN  = 23
-defc __CPM_ILOG = 24
-defc __CPM_IDRV = 25
-defc __CPM_SDMA = 26
-defc __CPM_SUID = 32
-defc __CPM_RRAN = 33
-defc __CPM_WRAN = 34
-defc __CPM_CFS  = 35
-defc __CPM_DSEG = 51
 
 
 
@@ -753,30 +699,136 @@ defc IOCTL_OCHAR_CRLF = 0xc014
 
 
 
-defc __IO_PIO_PORT_A = 0x20
-defc __IO_PIO_PORT_B = 0x21
-defc __IO_PIO_PORT_C = 0x22
-defc __IO_PIO_CONTROL = 0x23
+defc __BF_CIO = 0x00
+defc __BF_CIOIN = 0x0
+defc __BF_CIOOUT = 0x1
+defc __BF_CIOIST = 0x2
+defc __BF_CIOOST = 0x3
+defc __BF_CIOINIT = 0x4
+defc __BF_CIOQUERY = 0x5
+defc __BF_CIODEVICE = 0x6
 
-defc __IO_PIO_CNTL_00 = 0x80
-defc __IO_PIO_CNTL_01 = 0x81
-defc __IO_PIO_CNTL_02 = 0x82
-defc __IO_PIO_CNTL_03 = 0x83
+defc __BF_DIO = 0x10
+defc __BF_DIOSTATUS = 0x10
+defc __BF_DIORESET = 0x11
+defc __BF_DIOSEEK = 0x12
+defc __BF_DIOREAD = 0x13
+defc __BF_DIOWRITE = 0x14
+defc __BF_DIOVERIFY = 0x15
+defc __BF_DIOFORMAT = 0x16
+defc __BF_DIODEVICE = 0x17
+defc __BF_DIOMEDIA = 0x18
+defc __BF_DIODEFMED = 0x19
+defc __BF_DIOCAP = 0x1a
+defc __BF_DIOGEOM = 0x1b
 
-defc __IO_PIO_CNTL_04 = 0x88
-defc __IO_PIO_CNTL_05 = 0x89
-defc __IO_PIO_CNTL_06 = 0x8A
-defc __IO_PIO_CNTL_07 = 0x8B
+defc __BF_RTC = 0x20
+defc __BF_RTCGETTIM = 0x20
+defc __BF_RTCSETTIM = 0x21
+defc __BF_RTCGETBYT = 0x22
+defc __BF_RTCSETBYT = 0x23
+defc __BF_RTCGETBLK = 0x24
+defc __BF_RTCSETBLK = 0x25
 
-defc __IO_PIO_CNTL_08 = 0x90
-defc __IO_PIO_CNTL_09 = 0x91
-defc __IO_PIO_CNTL_10 = 0x92
-defc __IO_PIO_CNTL_11 = 0x83
+defc __BF_EMU = 0x30
 
-defc __IO_PIO_CNTL_12 = 0x98
-defc __IO_PIO_CNTL_13 = 0x99
-defc __IO_PIO_CNTL_14 = 0x9A
-defc __IO_PIO_CNTL_15 = 0x9B
+defc __BF_VDA = 0x40
+defc __BF_VDAINI = 0x40
+defc __BF_VDAQRY = 0x41
+defc __BF_VDARES = 0x42
+defc __BF_VDADEV = 0x43
+defc __BF_VDASCS = 0x44
+defc __BF_VDASCP = 0x45
+defc __BF_VDASAT = 0x46
+defc __BF_VDASCO = 0x47
+defc __BF_VDAWRC = 0x48
+defc __BF_VDAFIL = 0x49
+defc __BF_VDACPY = 0x4a
+defc __BF_VDASCR = 0x4b
+defc __BF_VDAKST = 0x4c
+defc __BF_VDAKFL = 0x4d
+defc __BF_VDAKRD = 0x4e
+
+defc __BF_SYS = 0xF0
+defc __BF_SYSRESET = 0xf0
+defc __BF_SYSVER = 0xf1
+defc __BF_SYSSETBNK = 0xf2
+defc __BF_SYSGETBNK = 0xf3
+defc __BF_SYSSETCPY = 0xf4
+defc __BF_SYSBNKCPY = 0xf5
+defc __BF_SYSALLOC = 0xf6
+defc __BF_SYSFREE = 0xf7
+defc __BF_SYSGET = 0xf8
+defc __BF_SYSSET = 0xf9
+defc __BF_SYSPEEK = 0xfa
+defc __BF_SYSPOKE = 0xfb
+defc __BF_SYSINT = 0xfc
+
+defc __BF_SYSGET_CIOCNT = 0x00
+defc __BF_SYSGET_DIOCNT = 0x10
+defc __BF_SYSGET_VDACNT = 0x40
+defc __BF_SYSGET_TIMER = 0xD0
+defc __BF_SYSGET_SECS = 0xD1
+defc __BF_SYSGET_BOOTINFO = 0xE0
+defc __BF_SYSGET_CPUINFO = 0xF0
+defc __BF_SYSGET_MEMINFO = 0xF1
+defc __BF_SYSGET_BNKINFO = 0xF2
+
+defc __BF_SYSSET_TIMER = 0xD0
+defc __BF_SYSSET_SECS = 0xD1
+defc __BF_SYSSET_BOOTINFO = 0xE0
+
+defc __BF_SYSINT_INFO = 0x00
+defc __BF_SYSINT_GET = 0x10
+defc __BF_SYSINT_SET = 0x20
+
+defc __CIODEV_UART = 0x00
+defc __CIODEV_ASCI = 0x10
+defc __CIODEV_TERM = 0x20
+defc __CIODEV_PRPCON = 0x30
+defc __CIODEV_PPPCON = 0x40
+defc __CIODEV_SIO = 0x50
+defc __CIODEV_ACIA = 0x60
+defc __CIODEV_PIO = 0x70
+defc __CIODEV_UF = 0x80
+defc __CIODEV_CONSOLE = 0xD0
+
+defc __DIODEV_MD = 0x00
+defc __DIODEV_FD = 0x10
+defc __DIODEV_RF = 0x20
+defc __DIODEV_IDE = 0x30
+defc __DIODEV_ATAPI = 0x40
+defc __DIODEV_PPIDE = 0x50
+defc __DIODEV_SD = 0x60
+defc __DIODEV_PRPSD = 0x70
+defc __DIODEV_PPPSD = 0x80
+defc __DIODEV_HDSK = 0x90
+
+defc __VDADEV_VDU = 0x00
+defc __VDADEV_CVDU = 0x10
+defc __VDADEV_NEC = 0x20
+defc __VDADEV_TMS = 0x30
+defc __VDADEV_VGA = 0x40
+
+defc __EMUTYP_NONE = 0x00
+defc __EMUTYP_TTY = 0x01
+defc __EMUTYP_ANSI = 0x02
+
+defc __HBX_XFCDAT = 0xffe0
+defc __HB_CURBNK = 0xffe0
+defc __HB_INVBNK = 0xffe1
+defc __HB_SRCADR = 0xffe2
+defc __HB_SRCBNK = 0xffe4
+defc __HB_DSTADR = 0xffe5
+defc __HB_DSTBNK = 0xffe7
+defc __HB_CPYLEN = 0xffe8
+
+defc __HBX_XFCFNS = 0xfff0
+defc __HB_INVOKE = 0xfff0
+defc __HB_BNKSEL = 0xfff3
+defc __HB_BNKCPY = 0xfff6
+defc __HB_BNKCALL = 0xfff9
+defc __HB_IDENT = 0xfffe
 
 
 
@@ -789,50 +841,37 @@ defc __IO_PIO_CNTL_15 = 0x9B
 
 
 
-
-defc __IO_PIO_IDE_LSB = 0x20
-defc __IO_PIO_IDE_MSB = 0x21
-defc __IO_PIO_IDE_CTL = 0x22
-defc __IO_PIO_IDE_CONFIG = 0x23
-defc __IO_PIO_IDE_RD = 0x92
-defc __IO_PIO_IDE_WR = 0x80
-
-defc __IO_IDE_A0_LINE = 0x01
-defc __IO_IDE_A1_LINE = 0x02
-defc __IO_IDE_A2_LINE = 0x04
-defc __IO_IDE_CS0_LINE = 0x08
-defc __IO_IDE_CS1_LINE = 0x10
-defc __IO_IDE_WR_LINE = 0x20
-defc __IO_IDE_RD_LINE = 0x40
-defc __IO_IDE_RST_LINE = 0x80
-
-defc __IO_IDE_DATA = 0x08
-defc __IO_IDE_ERROR = 0x9
-defc __IO_IDE_SEC_CNT = 0xa
-defc __IO_IDE_SECTOR = 0xb
-defc __IO_IDE_CYL_LSB = 0xc
-defc __IO_IDE_CYL_MSB = 0xd
-defc __IO_IDE_HEAD = 0xe
-defc __IO_IDE_COMMAND = 0xf
-defc __IO_IDE_STATUS = 0xf
-
-defc __IO_IDE_CONTROL = 0x16
-defc __IO_IDE_ALT_STATUS = 0x16
-
-defc __IO_IDE_LBA0 = 0xb
-defc __IO_IDE_LBA1 = 0xc
-defc __IO_IDE_LBA2 = 0xd
-defc __IO_IDE_LBA3 = 0xe
-
-defc __IDE_CMD_READ = 0x20
-defc __IDE_CMD_WRITE = 0x30
-
-defc __IDE_CMD_STANDBY = 0xE0
-defc __IDE_CMD_IDLE = 0xE1
-defc __IDE_CMD_SLEEP = 0xE6
-defc __IDE_CMD_CACHE_FLUSH = 0xE7
-defc __IDE_CMD_ID = 0xEC
-
+defc __CPM_RCON = 1
+defc __CPM_WCON = 2
+defc __CPM_RRDR = 3
+defc __CPM_WPUN = 4
+defc __CPM_WLST = 5
+defc __CPM_DCIO = 6
+defc __CPM_GIOB = 7
+defc __CPM_SIOB = 8
+defc __CPM_PRST = 9
+defc __CPM_RCOB = 10
+defc __CPM_ICON = 11
+defc __CPM_VERS = 12
+defc __CPM_RDS  = 13
+defc __CPM_LGIN = 14
+defc __CPM_OPN  = 15
+defc __CPM_CLS  = 16
+defc __CPM_FFST = 17
+defc __CPM_FNXT = 18
+defc __CPM_DEL  = 19
+defc __CPM_READ = 20
+defc __CPM_WRIT = 21
+defc __CPM_MAKE = 22
+defc __CPM_REN  = 23
+defc __CPM_ILOG = 24
+defc __CPM_IDRV = 25
+defc __CPM_SDMA = 26
+defc __CPM_SUID = 32
+defc __CPM_RRAN = 33
+defc __CPM_WRAN = 34
+defc __CPM_CFS  = 35
+defc __CPM_DSEG = 51
 
 
 

@@ -2,84 +2,104 @@
 ; aralbrec 02.2008
 ; flag-perfect emulation of cpdr
 
-SECTION code_crt0_sccz80
-PUBLIC __z80asm__cpdr
+      SECTION  code_crt0_sccz80
+      PUBLIC   __z80asm__cpdr
 
-.__z80asm__cpdr
- 
-   jr nc, enterloop
- 
-   call enterloop
-   
+IF __CPU_GBZ80__
+      EXTERN   __z80asm__ex_sp_hl
+ENDIF 
+
+__z80asm__cpdr:
+
+      jr    nc, enterloop
+
+      call  enterloop
+
 ; scf clears N and H - must set carry the hard way
-   push af
-   ex (sp),hl
-IF __CPU_8080__ || __CPU_8085__
-   ld  a,l
-   or  @00000001
-   ld  l,a
-ELSE
-   set 0,l 			; set carry
-ENDIF
-   jr retflags
+      push  af
+IF __CPU_GBZ80__
+      call  __z80asm__ex_sp_hl
+ELSE  
+      ex    (sp), hl
+ENDIF 
+IF __CPU_INTEL__
+      ld    a, l
+      or    @00000001
+      ld    l, a
+ELSE  
+      set   0, l              ; set carry
+ENDIF 
+      jr    retflags
 
-.loop
+loop:
 
-   dec hl
+      dec   hl
 
-.enterloop
+enterloop:
 
-   dec bc
-   cp (hl)			; compare, set flags
-   jr z, match
-   
-   inc c
-   dec c
-   jr nz, loop
-  
-   inc b
-   djnz loop
-   
+      dec   bc
+      cp    (hl)              ; compare, set flags
+      jr    z, match
+
+      inc   c
+      dec   c
+      jr    nz, loop
+
+      inc   b
+      djnz  loop
+
 ; .nomatch
 
-   cp (hl)			; compare, set flags
-   dec hl
-   push af
- 
-.joinbc0
- 
-   ex (sp),hl
-IF __CPU_8080__ || __CPU_8085__
-   ld a,l
-   and @11111010
-   ld  l,a
-ELSE
-   res 0,l 			; clear carry
-   res 2,l			; clear P/V -> BC == 0
-ENDIF
-   jr retflags
+      cp    (hl)              ; compare, set flags
+      dec   hl
+      push  af
 
-.match
+joinbc0:
 
-   dec hl
-   push af
+IF __CPU_GBZ80__
+      call  __z80asm__ex_sp_hl
+ELSE  
+      ex    (sp), hl
+ENDIF 
+IF __CPU_INTEL__
+      ld    a, l
+      and   @11111010
+      ld    l, a
+ELSE  
+      res   0, l              ; clear carry
+      res   2, l              ; clear P/V -> BC == 0
+ENDIF 
+      jr    retflags
 
-   ld a,b
-   or c
-   jr z, joinbc0
-  
-   ex (sp),hl
-IF __CPU_8080__ || __CPU_8085__
-   ld a,l
-   and @11111110
-   or  @00000100
-   ld  l,a
-ELSE
-   res 0,l 			; clear carry
-   set 2,l			; set P/V -> BC != 0
-ENDIF
+match:
 
-.retflags
-   ex (sp),hl
-   pop af
-   ret
+      dec   hl
+      push  af
+
+      ld    a, b
+      or    c
+      jr    z, joinbc0
+
+IF __CPU_GBZ80__
+      call  __z80asm__ex_sp_hl
+ELSE  
+      ex    (sp), hl
+ENDIF 
+IF __CPU_INTEL__
+      ld    a, l
+      and   @11111110
+      or    @00000100
+      ld    l, a
+ELSE  
+      res   0, l              ; clear carry
+      set   2, l              ; set P/V -> BC != 0
+ENDIF 
+
+retflags:
+IF __CPU_GBZ80__
+      call  __z80asm__ex_sp_hl
+ELSE  
+      ex    (sp), hl
+ENDIF 
+      pop   af
+      ret   

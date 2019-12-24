@@ -59,25 +59,7 @@
 #define CT_SDC				(CT_SD1|CT_SD2)	/* SD */
 #define CT_BLOCK			0x08		/* Block addressing */
 
-#ifndef FF_INTEGER // FF_INTEGER found in FatFS integer.h
 
-/* These types MUST be 16-bit or 32-bit */
-typedef int16_t         INT;
-typedef uint16_t    	UINT;
-
-/* This type MUST be 8-bit */
-typedef uint8_t     	BYTE;
-
-/* These types MUST be 16-bit */
-typedef int16_t			SHORT;
-typedef uint16_t    	WORD;
-typedef uint16_t    	WCHAR;
-
-/* These types MUST be 32-bit */
-typedef int32_t			LONG;
-typedef uint32_t    	DWORD;
-
-#endif
 
 /* Status of Disk Functions */
 typedef BYTE DSTATUS;
@@ -92,7 +74,7 @@ typedef enum {
 } DRESULT;
 
 //
-// IDE DISK COMMANDS
+// IDE DISK COMMANDS (FOUND IN @FEILIPU Z88DK-LIBS)
 //
 
 extern DSTATUS disk_initialize(BYTE pdrv);
@@ -118,7 +100,7 @@ extern DRESULT disk_ioctl(BYTE pdrv,BYTE cmd,void* buff);
 extern void sd_clock(uint8_t);
 
 
-extern void sd_cs_lower(void);
+extern void sd_cs_lower(uint8_t);
 
 
 extern void sd_cs_raise(void);
@@ -127,10 +109,10 @@ extern void sd_cs_raise(void);
 extern void sd_write_byte(uint8_t);
 
 
-extern void sd_write_block(const uint8_t *from);
-
-
 extern uint8_t sd_read_byte(void);
+
+
+extern void sd_write_block(const uint8_t *from);
 
 
 extern void sd_read_block(uint8_t *to);

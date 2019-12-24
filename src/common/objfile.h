@@ -13,7 +13,7 @@
 #include <stdio.h>
 
 #define MIN_VERSION				1
-#define MAX_VERSION				12
+#define MAX_VERSION				13
 #define CUR_VERSION				MAX_VERSION
 #define SIGNATURE_SIZE			8
 #define SIGNATURE_OBJ			"Z80RMF"

@@ -42,6 +42,8 @@ include(`target/cpm/config/config_cpu.m4')
 include(`target/cpm/config/config_clib.m4')
 include(`target/cpm/config/config_clib_const.m4')
 
+include(`target/cpm/config/config_cpm.m4')
+
 dnl############################################################
 dnl# END IF GUARDS
 dnl############################################################

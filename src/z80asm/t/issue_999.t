@@ -32,7 +32,7 @@ my $cmd = "zcc +zx -c -clib=new testa.c testb.c -o testcons.o";
 ok 0==system($cmd), $cmd;
 
 z80nm("testcons.o", <<'END');
-Object  file testcons.o at $0000: Z80RMF12
+Object  file testcons.o at $0000: Z80RMF13
   Name: testcons
   Section code_compiler: 8 bytes
     C $0000: 21 64 00 C9 21 C8 00 C9

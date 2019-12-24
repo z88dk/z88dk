@@ -19,48 +19,55 @@ struct Expr;
 
 /* add 1 to 4 bytes opcode opcode to object code 
 *  bytes in big-endian format, e.g. 0xED46 */
-extern void add_opcode(int opcode);
+void add_opcode(int opcode);
 
 /* add opcode followed by jump relative offset expression */
-extern void add_opcode_jr(int opcode, struct Expr *expr);
+void add_opcode_jr(int opcode, struct Expr *expr);
+void add_opcode_jr_n(int opcode, struct Expr* expr, int asmpc_offset);
 
 /* add opcode followed by 8-bit unsigned expression */
-extern void add_opcode_n(int opcode, struct Expr *expr);
+void add_opcode_n(int opcode, struct Expr *expr);
+
+/* add opcode followed by 8-bit unsigned expression and a zero byte */
+void add_opcode_n_0(int opcode, struct Expr* expr);
+
+/* add opcode followed by 8-bit signed expression and a zero or 0xff byte depending on sign */
+void add_opcode_s_0(int opcode, struct Expr* expr);
 
 /* add opcode followed by 8-bit signed expression */
-extern void add_opcode_d(int opcode, struct Expr *expr);
+void add_opcode_d(int opcode, struct Expr *expr);
 
 /* add opcode followed by 16-bit expression */
-extern void add_opcode_nn(int opcode, struct Expr *expr);
+void add_opcode_nn(int opcode, struct Expr *expr);
 
 /* add opcode followed by big-endian 16-bit expression */
-extern void add_opcode_NN(int opcode, struct Expr *expr);
+void add_opcode_NN(int opcode, struct Expr *expr);
 
 /* add opcode followed by IX/IY offset expression */
-extern void add_opcode_idx(int opcode, struct Expr *expr);
+void add_opcode_idx(int opcode, struct Expr *expr);
 
 /* add opcode followed by IX/IY offset expression and 8 bit expression */
-extern void add_opcode_idx_n(int opcode, struct Expr *idx_expr,
+void add_opcode_idx_n(int opcode, struct Expr *idx_expr,
 										 struct Expr *n_expr );
 
 /* add opcode followed by two 8-bit expressions */
-extern void add_opcode_n_n(int opcode, struct Expr *n1_expr,
+void add_opcode_n_n(int opcode, struct Expr *n1_expr,
 									   struct Expr *n2_expr );
 
 /* call emulation function by name */
-extern void add_call_emul_func(char *emul_func);
+void add_call_emul_func(char *emul_func);
 
 /* add Z88's opcodes */
-extern void add_Z88_CALL_OZ(int argument);
-extern void add_Z88_CALL_PKG(int argument);
-extern void add_Z88_FPP(int argument);
-extern void add_Z88_INVOKE(int argument);
+void add_Z88_CALL_OZ(int argument);
+void add_Z88_CALL_PKG(int argument);
+void add_Z88_FPP(int argument);
+void add_Z88_INVOKE(int argument);
 
 /* add COPPER UNIT opcodes (ZX Next) */
-extern void add_copper_unit_wait(struct Expr *ver, struct Expr *hor);
-extern void add_copper_unit_move(struct Expr *reg, struct Expr *val);
-extern void add_copper_unit_stop();
-extern void add_copper_unit_nop();
+void add_copper_unit_wait(struct Expr *ver, struct Expr *hor);
+void add_copper_unit_move(struct Expr *reg, struct Expr *val);
+void add_copper_unit_stop();
+void add_copper_unit_nop();
 
 /* assert we are on a Z80 */
 #define _Z80_ONLY(x)		(!(opts.cpu & (CPU_Z80|CPU_Z80N)) ? \

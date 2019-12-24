@@ -1,0 +1,5 @@
+@target/hbios/driver/terminal/rc_01_input_hbios0.lst
+@target/hbios/driver/terminal/rc_01_input_hbios1.lst
+@target/hbios/driver/terminal/rc_01_output_hbios0.lst
+@target/hbios/driver/terminal/rc_01_output_hbios1.lst
+@target/hbios/driver/time/time_sccz80.lst

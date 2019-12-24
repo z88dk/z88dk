@@ -72,8 +72,7 @@ EXTERN ASMDISP_ZX_CYX2SADDR_CALLEE
    
 .nomatch
 
-   ld a,8
-   sub b
+   ld a,b			;Remaining rows in font left
    add a,e
    ld e,a
    jp nc, cont2

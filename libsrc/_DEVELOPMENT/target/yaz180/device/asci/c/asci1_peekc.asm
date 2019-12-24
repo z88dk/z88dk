@@ -5,6 +5,3 @@ PUBLIC _asci1_peekc
 EXTERN asm_asci1_peekc
 
 defc _asci1_peekc = asm_asci1_peekc
-
-EXTERN asm_asci1_need
-defc NEED = asm_asci1_need

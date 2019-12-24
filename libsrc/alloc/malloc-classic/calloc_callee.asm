@@ -14,12 +14,7 @@ EXTERN _heap, ASMDISP_HEAPCALLOC_CALLEE
 
    pop hl
    pop de
-IF __CPU_GBZ80__
-   EXTERN __z80asm__exsphl
-   call __z80asm__exsphl
-ELSE
    ex (sp),hl
-ENDIF
 
 .asmentry
 

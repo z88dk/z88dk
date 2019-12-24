@@ -14,7 +14,7 @@ use Test::More;
 require '../../t/testlib.pl';
 
 # CPUs not supported by ticks: z80n z180 r3k
-my @CPUS = (qw( z80 r2k ));
+my @CPUS = (qw( z80 8080 gbz80 r2k ));
 my $test_nr;
 
 # RLD / RRD
@@ -60,8 +60,9 @@ END
 					is $r->{F_C}, $carry,					  	"C";
 					is $r->{BC}, $bc,							"BC";
 					is $r->{DE}, $de,							"DE";
+					is $r->{HL}, 0x100,							"HL";
 						
-					# die if $test_nr == 73;
+					(Test::More->builder->is_passing) or die;
 				}
 			}
 		}

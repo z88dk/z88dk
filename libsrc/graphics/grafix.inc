@@ -369,6 +369,14 @@ IF FORc128
 	defc blankch	= 32
 ENDIF
 
+IF FORfp1100
+	DEFINE gotgfx
+	defc maxx	= 640
+	defc maxy	= 200
+	defc blankch	= 32
+	defc USEplotc   = 1
+ENDIF
+
 IF FORgal
 	DEFINE gotgfx
 	; This size reflects the Gal+ screen mode
@@ -466,6 +474,21 @@ IF FORalphatro
 	defc blankch	= 32
 ENDIF
 
+IF FORhemc
+	DEFINE gotgfx
+	defc maxx	= 64		;Text graphics settings
+	defc maxy	= 24 
+	defc blankch    = 32
+	defc USEplotc   = 1		; We call generic_console_plotc, not _printc for text mode
+ENDIF
+
+IF FORhgmc
+	DEFINE	gotgfx
+	defc	maxx = 256
+	defc	maxy = 256
+ENDIF
+
+
 IF FORspc1000
 	DEFINE gotgfx
 	;defc maxx	= 64		;Text graphics settings
@@ -474,6 +497,12 @@ IF FORspc1000
 	defc maxy	= 192
 	defc blankch    = 32
 	defc USEplotc   = 1		; We call generic_console_plotc, not _printc for text mode
+ENDIF
+
+IF FORsmc777
+	DEFINE gotgfx
+	defc maxx	= 640
+	defc maxy	= 200
 ENDIF
 
 IF FORmulti8
@@ -495,6 +524,12 @@ IF FORlynx
 	defc blankch    = 0
 	defc USEplotc   = 1		; We call generic_console_plotc, not _printc for text mode
 
+ENDIF
+
+IF FORx1
+	DEFINE gotgfx
+	defc maxx	= 640
+	defc maxy	= 200
 ENDIF
 
 IF FORlaser500

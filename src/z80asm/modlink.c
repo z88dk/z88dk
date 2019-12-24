@@ -208,7 +208,9 @@ static void read_cur_module_exprs_1(ExprList *exprs, FILE *file, char *filename,
             {
             case 'U': expr->range = RANGE_BYTE_UNSIGNED; break;
             case 'S': expr->range = RANGE_BYTE_SIGNED;  break;
-			case 'C': expr->range = RANGE_WORD;			break;
+            case 'u': expr->range = RANGE_BYTE_TO_WORD_UNSIGNED; break;
+            case 's': expr->range = RANGE_BYTE_TO_WORD_SIGNED; break;
+            case 'C': expr->range = RANGE_WORD;			break;
 			case 'B': expr->range = RANGE_WORD_BE;		break;
 			case 'L': expr->range = RANGE_DWORD;		break;
 			case 'J': expr->range = RANGE_JR_OFFSET;	break;
@@ -420,6 +422,22 @@ static void patch_exprs( ExprList *exprs )
                     warn_int_range( value );
 
 				patch_byte(expr->code_pos, (byte_t)value);
+                break;
+
+            case RANGE_BYTE_TO_WORD_UNSIGNED:
+                if (value < 0 || value > 255)
+                    warn_int_range(value);
+
+                patch_byte(expr->code_pos, (byte_t)value);
+                patch_byte(expr->code_pos+1, 0);
+                break;
+
+            case RANGE_BYTE_TO_WORD_SIGNED:
+                if (value < -128 || value > 127)
+                    warn_int_range(value);
+
+                patch_byte(expr->code_pos, (byte_t)value);
+                patch_byte(expr->code_pos + 1, value < 0 || value > 127 ? 0xff : 0);
                 break;
 
             case RANGE_WORD:

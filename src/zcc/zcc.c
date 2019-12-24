@@ -56,6 +56,7 @@ static void            add_file_to_process(char *filename);
 
 static void            SetNumber(arg_t *argument, char *arg);
 static void            SetStringConfig(arg_t *argument, char *arg);
+static void            LoadConfigFile(arg_t *argument, char *arg);
 static void            parse_cmdline_arg(char *arg);
 static void            SetBoolean(arg_t *arg, char *val);
 static void            AddPreProc(arg_t *arg, char *);
@@ -103,6 +104,7 @@ static void            BuildOptions(char **, char *);
 static void            BuildOptions_start(char **, char *);
 static void            BuildOptionsQuoted(char **, char *);
 static void            copy_output_files_to_destdir(char *suffix, int die_on_fail);
+static void            parse_configfile(const char *config_line);
 static void            parse_configfile_line(char *config_line);
 static void            KillEOL(char *line);
 static int             add_variant_args(char *wanted, int num_choices, char **choices);
@@ -393,6 +395,7 @@ static arg_t  config[] = {
     { "SUBTYPE",  0, AddArray, &c_subtype_array, &c_subtype_array_num, "Add a sub-type alias and config" },
     { "CLIB",  0, AddArray, &c_clib_array, &c_clib_array_num, "Add a clib variant config" },
     { "ALIAS",  0, AddArray, &c_aliases_array, &c_aliases_array_num, "Add an alias and options" },
+    { "INCLUDE", 0, LoadConfigFile, NULL, NULL, "Load a configuration file"},
     { "", 0, NULL, NULL }
 };
 
@@ -854,14 +857,6 @@ int main(int argc, char **argv)
     atexit(remove_temporary_files);
     add_option_to_compiler("");
 
-    // Add an alias for gencon
-    snprintf(buffer,sizeof(buffer),"ALIAS --generic-console -pragma-redirect:fputc_cons=fputc_cons_generic");
-    parse_configfile_line(buffer);
-    snprintf(buffer,sizeof(buffer),"ALIAS --hardware-keyboard -pragma-redirect:fgetc_cons=fgetc_cons_inkey");
-    parse_configfile_line(buffer);
-    snprintf(buffer,sizeof(buffer),"ALIAS --math32 -Cc-fp-mode=ieee -lmath32 -pragma-define:CLIB_32BIT_FLOATS=1");
-    parse_configfile_line(buffer);
-
     gc = 1;            /* Set for the first argument to scan for */
     if (argc == 1) {
         print_help_text(argv[0]);
@@ -881,17 +876,8 @@ int main(int argc, char **argv)
     setup_default_configuration();
 
     gc = find_zcc_config_fileFile(argv[0], argv[gc], gc, config_filename, sizeof(config_filename));
-    /* Okay, so now we read in the options file and get some info for us */
-    if ((fp = fopen(config_filename, "r")) == NULL) {
-        fprintf(stderr, "Can't open config file %s\n", config_filename);
-        exit(1);
-    }
-    while (fgets(buffer, LINEMAX, fp) != NULL) {
-        if (!isupper(buffer[0]))
-            continue;
-        parse_configfile_line(buffer);
-    }
-    fclose(fp);
+    parse_configfile(config_filename);
+
 
     /* Now, parse the default options list */
     if (c_options != NULL) {
@@ -2496,6 +2482,44 @@ void parse_cmdline_arg(char *arg)
         }
     }
     add_option_to_compiler(arg);
+}
+
+
+void LoadConfigFile(arg_t *argument, char *arg)
+{
+    char   buf[FILENAME_MAX+1];
+    char  *cfgfile;
+
+    cfgfile = getenv("ZCCCFG");
+    if (cfgfile != NULL) {
+        if (strlen(cfgfile) > FILENAME_MAX) {
+            fprintf(stderr, "Possibly corrupt env variable ZCCCFG\n");
+            exit(1);
+        }
+        /* Config file in config directory */
+        snprintf(buf, sizeof(buf), "%s/%s", cfgfile, arg);
+    } else {
+        snprintf(buf, sizeof(buf), "%s/lib/config/%s", c_install_dir, arg);
+    }
+    parse_configfile(buf);
+}
+
+void parse_configfile(const char *filename)
+{
+    FILE *fp;
+    char  buffer[LINEMAX+1];
+
+      /* Okay, so now we read in the options file and get some info for us */
+    if ((fp = fopen(filename, "r")) == NULL) {
+        fprintf(stderr, "Can't open config file %s\n", filename);
+        exit(1);
+    }
+    while (fgets(buffer, LINEMAX, fp) != NULL) {
+        if (!isupper(buffer[0]))
+            continue;
+        parse_configfile_line(buffer);
+    }
+    fclose(fp);
 }
 
 void parse_configfile_line(char *arg)

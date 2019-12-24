@@ -55,7 +55,7 @@ dnl#include(`../m4_file_dup.m4')
 dnl
 dnl## empty fd slot
 dnl
-dnl#include(`../../m4_file_absent.m4')
+dnl#include(`../m4_file_absent.m4')
 dnl
 dnl############################################################
 dnl## INSTANTIATE DRIVERS #####################################
@@ -156,7 +156,7 @@ SECTION code_crt_main
 
    ; call user program
 
-      call _main                ; hl = return status
+   call _main                  ; hl = return status
 
    ; run exit stack
 
@@ -188,7 +188,7 @@ SECTION code_crt_return
 
    include "../crt_exit_eidi.inc"
    include "../crt_restore_sp.inc"
-   include "../crt_program_exit.inc"      
+   include "../crt_program_exit.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

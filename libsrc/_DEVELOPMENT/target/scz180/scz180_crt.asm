@@ -4,17 +4,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-IF !DEFINED_CLIB_32BIT_FLOAT
-	defc	DEFINED_CLIB_32BIT_FLOAT = 1
-	defc CLIB_32BIT_FLOAT = 1
-	IFNDEF CLIB_32BIT_FLOAT
-	ENDIF
-ENDIF
-
-
 IF !DEFINED_startup
 	defc	DEFINED_startup = 1
-	defc startup = 16
+	defc startup = 8
 	IFNDEF startup
 	ENDIF
 ENDIF
@@ -60,7 +52,7 @@ IFNDEF startup
 
    ; startup undefined so select a default
 
-   defc startup = 16
+   defc startup = 8
 
 ENDIF
 
@@ -72,18 +64,18 @@ ENDIF
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; scm drivers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; rom driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; app drivers;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; hbios driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-   ; scm hbios0 drivers installed on stdin, stdout, stderr
-   ; scm hbios1 drivers installed on ttyin, ttyout, ttyerr
+   ; romwbw hbios0 drivers installed on stdin, stdout, stderr
+   ; romwbw hbios1 drivers installed on ttyin, ttyout, ttyerr
 
    IFNDEF __CRTCFG
 
@@ -103,7 +95,7 @@ ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;            scz180 romwbw application target               ;;
-;; generated from target/scz180/startup/scz180_crt_16.asm.m4 ;;
+;; generated from target/scz180/startup/scz180_crt_8.asm.m4  ;;
 ;;                                                           ;;
 ;;                  flat 64k address space                   ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -119,7 +111,6 @@ include "config_scz180_public.inc"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../crt_defaults.inc"
-include "crt_romwbw_def.inc"
 include "crt_config.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1787,6 +1778,16 @@ IF __crt_include_preamble
 ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; PAGE ZERO ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+IF (__crt_org_code = 0) && !(__page_zero_present)
+
+   include "../crt_page_zero_z180.inc"
+
+ENDIF
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CRT INIT ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -1827,7 +1828,7 @@ __Restart_2:
    include "../clib_init_bss.inc"
 
    ; interrupt mode
-   
+
    include "../crt_set_interrupt_mode.inc"
 
 SECTION code_crt_init          ; user and library initialization
@@ -1841,7 +1842,7 @@ SECTION code_crt_main
    include "../crt_start_ei.inc"
 
    ; call user program
-   
+
    call _main                  ; hl = return status
 
    ; run exit stack
@@ -1858,7 +1859,7 @@ __Exit:
    IF !((__crt_on_exit & 0x10000) && (__crt_on_exit & 0x8))
 
       ; not restarting
-      
+
       push hl                  ; save return status
 
    ENDIF
@@ -1867,7 +1868,7 @@ SECTION code_crt_exit          ; user and library cleanup
 SECTION code_crt_return
 
    ; close files
-   
+
    include "../clib_close.inc"
 
    ; terminate
@@ -1879,6 +1880,9 @@ SECTION code_crt_return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+include "../crt_jump_vectors_z180.inc"
+include "crt_interrupt_vectors_z180.inc"
 
 IF (__crt_on_exit & 0x10000) && ((__crt_on_exit & 0x6) || ((__crt_on_exit & 0x8) && (__register_sp = -1)))
 

@@ -112,7 +112,23 @@ Z80pass2( void )
 				patch_word(expr->code_pos, (int)value);
 				break;
 
-			case RANGE_WORD_BE:
+            case RANGE_BYTE_TO_WORD_UNSIGNED:
+                if (value < 0 || value > 255)
+                    warn_int_range(value);
+
+                patch_byte(expr->code_pos, (byte_t)value);
+                patch_byte(expr->code_pos + 1, 0);
+                break;
+
+            case RANGE_BYTE_TO_WORD_SIGNED:
+                if (value < -128 || value > 127)
+                    warn_int_range(value);
+
+                patch_byte(expr->code_pos, (byte_t)value);
+                patch_byte(expr->code_pos + 1, value < 0 || value > 127 ? 0xff : 0);
+                break;
+
+            case RANGE_WORD_BE:
 				patch_word_be(expr->code_pos, (int)value);
 				break;
 
