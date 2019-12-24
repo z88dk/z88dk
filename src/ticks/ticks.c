@@ -3808,13 +3808,24 @@ int main (int argc, char **argv){
               fa= 0; break;
             }
             break;
+          case 0x90:
+              if (c_cpu == CPU_Z80N) {  // OUTINB : out(BC,HL*); HL++
+                  out(c | b << 8, t = get_memory(l | h << 8));
+                  put_memory(e | d << 8, t = get_memory(l | h << 8));
+                  ++l || h++;
+                  st += 16;
+              }
+              else {
+                  st += 8; break;
+              }
+              break;
           case 0x91:
             if ( c_cpu == CPU_Z80N ) {
               uint8_t v = get_memory(pc++);
               uint8_t r = get_memory(pc++);
               out(0x243b, v);
               out(0x253b, r);
-              st += 16;
+              st += 20;
             } else {
               st+= 8; break;
             }
@@ -3824,11 +3835,34 @@ int main (int argc, char **argv){
               uint8_t v = get_memory(pc++);
               out(0x243b, v);
               out(0x253b, a);
-              st += 12;
+              st += 17;
             } else {
               st+= 8; break;
             }
             break;
+          case 0xa5:
+              if (c_cpu == CPU_Z80N) {  // LDWS : DE*:=HL*; INC L; INC D;
+                  put_memory(e | d << 8, t = get_memory(l | h << 8));
+                  l++; d++;
+                  st += 14;
+              }
+              else {
+                  st += 8; break;
+              }
+              break;
+          case 0xb7:
+              if (c_cpu == CPU_Z80N) {  // LDPIRX : do{t:=(HL&$FFF8+E&7)*; {if t!=A DE*:=t;} DE++; BC--}while(BC>0)
+                  t = get_memory(((l | h << 8) & 0xfff8) + (e & 0x07));
+                  if (t != a) put_memory(e | d << 8, t);
+                  ++e || d++;
+                  c-- || b--;
+                  st += 16;
+                  if ((b | c) != 0) { pc -= 2; st += 5; }
+              }
+              else {
+                  st += 8; break;
+              }
+              break;
           case 0x00: case 0x01:       // NOP
           case 0x05: case 0x06: 
           case 0x08: case 0x09: case 0x0a: case 0x0b:
@@ -3844,13 +3878,13 @@ int main (int argc, char **argv){
           case 0x84: case 0x85: case 0x86: case 0x87:
           case 0x88: case 0x89: 
           case 0x8c: case 0x8d: case 0x8e: case 0x8f:
-          case 0x90: case 0x93:
+          case 0x93:
           case 0x94: case 0x95: case 0x96: case 0x97:
           case 0x98: case 0x99: case 0x9a: case 0x9b:
           case 0x9c: case 0x9d: case 0x9e: case 0x9f:
-          case 0xa5: case 0xa6: case 0xa7:
+          case 0xa6: case 0xa7:
           case 0xad: case 0xae: case 0xaf:
-          case 0xb6: case 0xb7:
+          case 0xb6: 
           case 0xbd: case 0xbe: case 0xbf:
           case 0xc0: case 0xc1: case 0xc2: case 0xc3:
           case 0xc4: case 0xc5: case 0xc6: case 0xc7:
@@ -3980,8 +4014,9 @@ int main (int argc, char **argv){
             if ( c_cpu == CPU_Z80N ) {
               uint8_t lsb = get_memory(pc++);
               uint8_t msb = get_memory(pc++);
+              long long old_st = st;
               PUSH(msb,lsb);
-              st += 19  ;
+              st = old_st + 23;
             } else {
               st += 8;
             }
@@ -4020,7 +4055,7 @@ int main (int argc, char **argv){
                   | t     &   8
                   | t<<4  &  32;
             fa= 0;
-            b|c && (st += 5, fa= 128);
+            b|c && (fa= 128);
             fb= fa; break;
           case 0xac:                                       // (ZXN) lddx
             if ( c_cpu != CPU_Z80N ) { st+= 8; break; }
@@ -4038,7 +4073,7 @@ int main (int argc, char **argv){
                | t     &   8
                | t<<4  &  32;
             fa= 0;
-            b|c && (st += 5, fa= 128);
+            b|c && (fa= 128);
             fb= fa; break;
           case 0xb4:                                        // (ZXN) ldirx
             if ( c_cpu != CPU_Z80N ) { st+= 8; break; }
