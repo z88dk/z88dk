@@ -1590,7 +1590,6 @@ classic-clean:
 	$(RM) abc800/*.o
 	$(MAKE) -C enterprise clean
 	$(MAKE) -C psg clean
-	$(RM) cpc/*.o
 	$(MAKE) -C sos clean
 	$(MAKE) -C threading/preempt clean
 	$(MAKE) -C sprites/software/sp1 clean
@@ -1602,7 +1601,6 @@ classic-clean:
 	$(MAKE) -C arch clean
 	$(MAKE) -C target clean
 	$(MAKE) -C video clean
-
 	$(RM) *.lib
 
 new-clean:

@@ -8,6 +8,9 @@
         EXTERN  generic_console_font32
         EXTERN  generic_console_udg32
         EXTERN  generic_console_cls
+
+        PUBLIC  CLIB_GENCON_CAPS
+        defc    CLIB_GENCON_CAPS = CAP_GENCON_INVERSE | CAP_GENCON_CUSTOM_FONT | CAP_GENCON_UDGS | CAP_GENCON_UNDERLINE | CAP_GENCON_BOLD
  
 ; a = ioctl
 ; de = arg

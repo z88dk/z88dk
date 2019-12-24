@@ -8,6 +8,10 @@
 	SECTION	code_clib
 	INCLUDE	"ioctl.def"
 
+        PUBLIC          CLIB_GENCON_CAPS
+        defc            CLIB_GENCON_CAPS = CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR | CAP_GENCON_CUSTOM_FONT | CAP_GENCON_UDGS
+
+
 
 ; a = ioctl
 ; de = arg

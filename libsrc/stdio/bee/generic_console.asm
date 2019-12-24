@@ -10,7 +10,7 @@
 		PUBLIC		generic_console_printc
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_inverse
+                PUBLIC          generic_console_set_attribute
 		PUBLIC		generic_console_xypos
 
 		EXTERN		generic_console_generic_console_xypos
@@ -22,7 +22,7 @@
 
 		defc		DISPLAY = 0xf000
 
-generic_console_set_inverse:
+generic_console_set_attribute:
 	ret
 
 

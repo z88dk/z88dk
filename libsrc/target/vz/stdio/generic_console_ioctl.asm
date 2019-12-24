@@ -13,6 +13,13 @@
 
         INCLUDE        "ioctl.def"
 
+        EXTERN          generic_console_caps
+        PUBLIC          CLIB_GENCON_CAPS
+        defc            CLIB_GENCON_CAPS = CAPS_MODE0
+
+        defc    CAPS_MODE0 = CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR
+        defc    CAPS_MODE1 = CAP_GENCON_INVERSE | CAP_GENCON_CUSTOM_FONT | CAP_GENCON_UDGS | CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR 
+
 
 ; a = ioctl
 ; de = arg

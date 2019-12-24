@@ -136,7 +136,13 @@ handle_characters:
 	ld	c,a
 	ld	b,8
 print32_loop:
+	ld	a,(generic_console_flags)
+	bit	4,a
 	ld	a,(hl)
+	jr	z,no_32_bold
+	rrca
+	or	(hl)
+no_32_bold:
 	xor	c
 	ld	(de),a
 	inc	d
@@ -144,6 +150,12 @@ print32_loop:
 	djnz	print32_loop
 handle_attributes:
 	dec	d
+	ld	a,(generic_console_flags)
+	bit	3,a
+	jr	z,no_underline32
+	ld	a,255
+	ld	(de),a
+no_underline32:
 	call	get_attribute_address
 	ret	z		;No attributes
 	ld	a,(__zx_console_attr)

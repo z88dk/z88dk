@@ -79,7 +79,7 @@ ELSE
         PUBLIC          __tms9918_printc
         PUBLIC          __tms9918_set_ink
         PUBLIC          __tms9918_set_paper
-        PUBLIC          __tms9918_set_inverse
+        PUBLIC          __tms9918_set_attribute
         PUBLIC          __tms9918_plotpixel
         PUBLIC          __tms9918_respixel
         PUBLIC          __tms9918_xorpixel
@@ -94,7 +94,7 @@ ELSE
         defc            __tms9918_printc = stub
         defc            __tms9918_set_ink = stub
         defc            __tms9918_set_paper = stub
-        defc            __tms9918_set_inverse = stub
+        defc            __tms9918_set_attribute = stub
 	defc		__tms9918_plotpixel = stub
 	defc		__tms9918_xorpixel = stub
 	defc		__tms9918_respixel = stub

@@ -20,7 +20,7 @@
 		PUBLIC		generic_console_ioctl
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_inverse
+                PUBLIC          generic_console_set_attribute
 
 		EXTERN		sharpmz_from_ascii
 		EXTERN		sharpmz_to_ascii
@@ -30,12 +30,16 @@
 		defc		DISPLAY = 0xd000
 		defc		COLOUR_MAP = 0xd800
 
+		INCLUDE		"ioctl.def"
+		PUBLIC          CLIB_GENCON_CAPS
+		defc            CLIB_GENCON_CAPS = CAP_GENCON_INVERSE | CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR
+
 generic_console_ioctl:
 	scf
 	ret
 
 ; For the Sharp we use inverse to switch to the alternate character set
-generic_console_set_inverse:
+generic_console_set_attribute:
 	ld	b,(hl)		;flags 2 - we want bit 7
 	ld	a,(__sharpmz_attr)
 	rla			;dump existing extend flag

@@ -5,6 +5,7 @@
         INCLUDE "ioctl.def"
 
         PUBLIC  __tms9918_console_ioctl
+	EXTERN	__tms9918_CLIB_GENCON_CAPS
         EXTERN  generic_console_font32
         EXTERN  generic_console_udg32
         EXTERN  __tms9918_cls
@@ -17,10 +18,11 @@
 
 IF VDP_EXPORT_DIRECT = 1
         PUBLIC  generic_console_ioctl
+	PUBLIC	CLIB_GENCON_CAPS
 
         defc    generic_console_ioctl = __tms9918_console_ioctl
+	defc	CLIB_GENCON_CAPS = __tms9918_CLIB_GENCON_CAPS
 ENDIF
-
 
 ; a = ioctl
 ; de = arg

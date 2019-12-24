@@ -7,7 +7,7 @@
 		PUBLIC		generic_console_scrollup
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_inverse
+                PUBLIC          generic_console_set_attribute
 
 		EXTERN		__mc1000_modeval
 		EXTERN		__mc1000_mode
@@ -42,7 +42,7 @@ generic_console_set_paper:
         rrca
         and     @11000000
         ld      (__MODE2_attr+1),a
-generic_console_set_inverse:
+generic_console_set_attribute:
 	ret
 
 

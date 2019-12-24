@@ -12,7 +12,7 @@
 		PUBLIC		generic_console_printc
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_inverse
+                PUBLIC          generic_console_set_attribute
 		PUBLIC		generic_console_xypos
 		PUBLIC		kc_attr
 		PUBLIC		kc_type
@@ -42,7 +42,7 @@ set_attr:
 	and	b
 	or	c
 	ld	(hl),a
-generic_console_set_inverse:
+generic_console_set_attribute:
 	ret
 
 generic_console_set_paper:

@@ -44,6 +44,7 @@ $(OUTPUT_DIRECTORY)/z80s183_crt0.lib:
 
 clean:
 	@$(RM) z80/sccz80/*.o z80/sdcc/*.o
+	@$(RM) gbz80/sccz80/*.o gbz80/sdcc/*.o
 	@$(RM) z180/sccz80/*.o r2k/sccz80/*.o
 	@$(RM) 8080/sccz80/*.o 
 	@$(RM) ../_DEVELOPMENT/l/z80/*.o

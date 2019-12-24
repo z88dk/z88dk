@@ -16,7 +16,7 @@
 		PUBLIC		generic_console_scrollup
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_inverse
+                PUBLIC          generic_console_set_attribute
 
 		PUBLIC		generic_console_xypos_graphics
 
@@ -49,7 +49,7 @@ generic_console_set_paper:
 	ld	(__rx78_paper),a
 	ret
 
-generic_console_set_inverse:
+generic_console_set_attribute:
 	ret
 
 generic_console_cls:
@@ -107,7 +107,14 @@ not_udg:
 	ld	a,8
 loop:	push	af
 	push	bc		;save inverse flag
+	ld	a,(generic_console_flags)
+	bit	4,a
 	ld	a,(de)
+	jr	z,not_bold
+	ld	b,a
+	rrca
+	or	b
+not_bold:
 	xor	c
 	ld	c,a		;c = byte to print
 	ld	a,d

@@ -28,7 +28,7 @@
 		PUBLIC		generic_console_ioctl
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_inverse
+                PUBLIC          generic_console_set_attribute
 
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
@@ -37,9 +37,13 @@
 		defc		DISPLAY = 12328
 		defc		COLOUR_MAP = DISPLAY + 1024
 
+		INCLUDE		"ioctl.def"
+		PUBLIC          CLIB_GENCON_CAPS
+		defc            CLIB_GENCON_CAPS = CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR 
+
 generic_console_ioctl:
 	scf
-generic_console_set_inverse:
+generic_console_set_attribute:
 	ret
 
 generic_console_set_ink:

@@ -21,6 +21,10 @@
         EXTERN  __tms9918_set_font
         EXTERN  __console_w
         EXTERN  __tms9918_screen_mode
+        EXTERN   generic_console_caps
+        EXTERN   __tms9918_CAPS_MODE0
+        EXTERN   __tms9918_CAPS_MODE1
+        EXTERN   __tms9918_CAPS_MODE2
 
 IF FORmsx
 	INCLUDE	"target/msx/def/msxbios.def"
@@ -51,7 +55,9 @@ _msx_set_mode:
 	ex	de,hl	;hl = mode
 	ld	de,0 + 32		;width
 	ld	bc,0 + 4		;mode=4 (we don't handle that anywhere)
+        xor     a
 set_mode:
+        ld      (generic_console_caps),a
         ld      a,c
 	ld	(__tms9918_screen_mode),a
         ld      c,0
@@ -72,6 +78,7 @@ set_mode_2:
 	ld	hl,INIGRP
 	ld	de,$1800 + 32	;pattern name
 	ld	bc,$0000 + 2	;pattern generator
+        ld      a,__tms9918_CAPS_MODE2
 	jr	set_mode
 
 
@@ -80,6 +87,7 @@ set_mode_0:
 	ld	hl,INITXT
         ld      de,$0000 + 40   ; pattern name + width
         ld      bc,$0800 +1     ; pattern generator
+        ld      a,__tms9918_CAPS_MODE0
 	call    set_mode
 	call	__tms9918_set_font
 	ret
@@ -91,6 +99,7 @@ set_mode_1:
         ld      de,$1800 + 32   ; pattern name + width
         ld      bc,$0000 + 0  ; pattern generator + mode
 	ld	hl,INIT32
+        ld      a,__tms9918_CAPS_MODE1
 	call	set_mode
 	call	__tms9918_set_font
 	ret
@@ -106,6 +115,7 @@ set_mode_1:
         ld      (__tms9918_pattern_name),de
         ld      (__tms9918_pattern_generator),bc
 	ld    hl,INIGRP		; (Graphics 2)
+        ld      a,__tms9918_CAPS_MODE1
 	call  set_mode
 	xor   a			; change reg#0 on SVI
 	; Now bend the configuration to Graphics mode 1

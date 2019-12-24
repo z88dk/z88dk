@@ -8,7 +8,7 @@
 		PUBLIC		generic_console_scrollup
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_inverse
+                PUBLIC          generic_console_set_attribute
 
 		PUBLIC		generic_console_xypos_graphics
 
@@ -25,7 +25,7 @@
 
 generic_console_set_ink:
 generic_console_set_paper:
-generic_console_set_inverse:
+generic_console_set_attribute:
 	ret
 
 generic_console_cls:
@@ -67,7 +67,14 @@ not_udg:
 	ld	b,8
 loop:
 	push	bc
+	ld	a,(generic_console_flags)
+	bit	4,a
 	ld	a,(de)
+	jr	z,not_bold
+	ld	b,a
+	rrca
+	or	b
+not_bold: 
 	xor	c
         ld      c,a
         rlca
@@ -89,6 +96,12 @@ loop:
 	add	hl,bc
 	pop	bc	
 	djnz	loop
+	ld	a,(generic_console_flags)
+	bit	3,a
+	ret	z
+	ld	bc,-30
+	add	hl,bc
+	ld	(hl),255
 	ret
 
 

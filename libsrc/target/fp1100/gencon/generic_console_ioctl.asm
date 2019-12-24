@@ -11,6 +11,8 @@
     INCLUDE "target/fp1100/def/fp1100.def"
     INCLUDE "ioctl.def"
 
+    PUBLIC  CLIB_GENCON_CAPS
+    defc    CLIB_GENCON_CAPS = CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR | CAP_GENCON_INVERSE 
 
 generic_console_ioctl:
         ex      de,hl

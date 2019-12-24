@@ -6,7 +6,7 @@
 		PUBLIC		generic_console_printc
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_inverse
+                PUBLIC          generic_console_set_attribute
 		PUBLIC		generic_console_text_xypos
 		PUBLIC		generic_console_plotc
 		PUBLIC		generic_console_pointxy
@@ -31,7 +31,7 @@
 
 		INCLUDE		"target/pc6001/def/pc6001.def"
 
-generic_console_set_inverse:
+generic_console_set_attribute:
 	ld	a,(hl)
 	ld	c,0
 	rlca

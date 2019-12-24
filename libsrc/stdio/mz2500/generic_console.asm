@@ -10,7 +10,7 @@
 		PUBLIC		generic_console_ioctl
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_inverse
+                PUBLIC          generic_console_set_attribute
 
 		EXTERN		__console_w
 		EXTERN		CONSOLE_COLUMNS
@@ -20,6 +20,10 @@
 
 		INCLUDE		"target/mz2500/def/svc.inc"
 		INCLUDE		"ioctl.def"
+
+		PUBLIC          CLIB_GENCON_CAPS
+		defc            CLIB_GENCON_CAPS = CAP_GENCON_FG_COLOUR
+
 
 generic_console_ioctl:
         ex      de,hl
@@ -51,7 +55,7 @@ setmode:
 	and	a
 	ret
 
-generic_console_set_inverse:
+generic_console_set_attribute:
 	ret
 
 generic_console_set_ink:

@@ -9,6 +9,7 @@
 
 getk:
 _getk:
+	halt
 	call	CONSOLE_STAT
 	ld	hl,0
 	and	a

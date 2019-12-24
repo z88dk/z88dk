@@ -9,6 +9,9 @@
 	EXTERN	__console_h
 	EXTERN	__console_w
 
+        PUBLIC          CLIB_GENCON_CAPS
+        defc            CLIB_GENCON_CAPS = CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR | CAP_GENCON_INVERSE
+
 
 ; a = ioctl
 ; de = arg

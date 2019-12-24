@@ -8,7 +8,7 @@
 		PUBLIC		generic_console_printc
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_inverse
+                PUBLIC          generic_console_set_attribute
 		PUBLIC		__vg5k_custom_font
 
 		EXTERN		__vg5k_attr
@@ -18,7 +18,7 @@
 
 		defc		DISPLAY = 0x4000
 
-generic_console_set_inverse:
+generic_console_set_attribute:
 	ret
 
 generic_console_set_paper:

@@ -20,6 +20,8 @@
 ;  [ESC] q - stop inverse video
 ;  *[ESC] 0 - start underlined
 ;  *[ESC] 1 - stop underlined
+;  *[ESC] 2 - start bold
+;  *[ESC] 3 - stop bold
 ;  [ESC] s - Enable/disable vertical scrolling
 ;  [ESC] r [char] - Print character (raw)
 ;   8      - move cursor left
@@ -40,16 +42,6 @@
 
 
 IF !__CPU_INTEL__ 
-		defc		SUPPORT_vt52=1
-		; Extra VT52 codes - clear to end of line + clear to end of screen + underlined
-		defc		SUPPORT_vt52x=0
-		defc		SUPPORT_zxcodes=1
-
-
-		SECTION		code_clib
-		PUBLIC		fputc_cons_generic
-		PUBLIC		_fputc_cons_generic
-
 		; Variables that can be adjusted by platform specific code
 		PUBLIC		generic_console_flags
 
@@ -58,8 +50,8 @@ IF !__CPU_INTEL__
 		EXTERN		generic_console_cls
 		EXTERN		generic_console_set_ink
 		EXTERN		generic_console_set_paper
-		EXTERN		generic_console_set_inverse
-		EXTERN		generic_console_set_underline
+		EXTERN		generic_console_set_attribute
+		EXTERN		generic_console_set_attribute
 		EXTERN		__console_x
 		EXTERN		__console_y
 		EXTERN		__console_w
@@ -68,8 +60,6 @@ IF !__CPU_INTEL__
 
 
 ; extern int __LIB__ fputc_cons(char c);
-fputc_cons_generic:
-_fputc_cons_generic:
 	ld	hl,2
 	add	hl,sp
 	ld	d,(hl)
@@ -324,7 +314,7 @@ set_inverse:			;Entry hl = flags
 	rra
 	rr	(hl)		;get it back again
 set_inverse_call_generic:
-	call	generic_console_set_inverse
+	call	generic_console_set_attribute
 	scf
 	ret
 
@@ -390,8 +380,22 @@ set_underlined_ansi:
 	and	@11110111
 	or	c
 	ld	(hl),a
-	call	generic_console_set_underline
+call_set_attribute:
+	call	generic_console_set_attribute
+	scf
 	ret
+
+set_bold_ansi:
+	;'2' = 50 = on, '3' = 51 = off
+	sub	3	;So 47, 48
+	and	@00001000
+	rlca
+	ld	c,a
+	ld	a,(hl)
+	and	@11101111
+	or	c
+	ld	(hl),a
+	jr	call_set_attribute
 ENDIF
 	
 
@@ -400,7 +404,7 @@ ENDIF
 	SECTION	rodata_clib
 
 ; defb ZXCode, ANSICode
-; defb paramater_count
+; defb parameter_count
 ; defw process_routine
 ;
 ; If code is 255 then not valid for this mode, so skip
@@ -474,6 +478,12 @@ IF SUPPORT_vt52x
 	defb	255, '1'
 	defb	0
 	defw	set_underlined_ansi
+	defb	255, '2'
+	defb	0
+	defw	set_bold_ansi
+	defb	255, '3'
+	defb	0
+	defw	set_bold_ansi
 	defb	255, 'K'
 	defb	0
 	defw	clear_eol
@@ -496,6 +506,7 @@ parameter_processor:	defw	0	; Where we go to when we need to process
 
 generic_console_flags:		defb	0		; bit 0 = raw mode enabled
 							; bit 3 = underline
+							; bit 4 = bold
 							; bit 6 = vscroll disabled
 							; bit 7 = inverse on
 
