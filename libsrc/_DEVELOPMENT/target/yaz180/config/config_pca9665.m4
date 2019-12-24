@@ -2,6 +2,7 @@ divert(-1)
 
 ###############################################################
 # PCA9665 CONFIGURATION
+# rebuild the library if changes are made
 #
 
 # PCA9665 I2C I/O Buffer Definitions

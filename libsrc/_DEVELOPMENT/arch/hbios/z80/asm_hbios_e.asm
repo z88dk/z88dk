@@ -12,7 +12,7 @@ SECTION code_arch
 
 PUBLIC asm_hbios_e
 
-EXTERN HB_INVOKE
+EXTERN __HB_INVOKE
 
 .asm_hbios_e
 
@@ -23,7 +23,7 @@ EXTERN HB_INVOKE
     ; exit  : registers set by hbios
     ;       : hl = register E (returned by hbios)
 
-    call HB_INVOKE
+    call __HB_INVOKE
 
     ld h,0
     ld l,e

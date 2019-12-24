@@ -12,7 +12,7 @@ SECTION code_arch
 
 PUBLIC asm_hbios
 
-EXTERN HB_INVOKE
+EXTERN __HB_INVOKE
 
     ; enter : bc = hbios function << 8 || hbios device
     ;         de = argument
@@ -20,4 +20,4 @@ EXTERN HB_INVOKE
     ;
     ; exit  : registers set by hbios (DEHL)
 
-defc asm_hbios = HB_INVOKE
+defc asm_hbios = __HB_INVOKE

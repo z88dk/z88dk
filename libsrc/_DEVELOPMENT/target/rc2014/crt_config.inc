@@ -141,7 +141,7 @@ IF __CRTCFG = 2
    defc TAR__crt_enable_restart        = 0
    defc TAR__crt_enable_close          = 1
 
-   defc TAR__crt_enable_eidi           = 0x20
+   defc TAR__crt_enable_eidi           = 0
    defc TAR__crt_on_exit               = 0x0000
 
    defc TAR__crt_enable_rst            = 0
