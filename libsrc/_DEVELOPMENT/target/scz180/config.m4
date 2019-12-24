@@ -38,10 +38,12 @@ dnl############################################################
 
 include(`target/z88dk_version.m4')
 include(`target/scz180/config/config_target.m4')
-include(`target/scz180/config/config_cpm.m4')
 include(`target/scz180/config/config_cpu.m4')
 include(`target/scz180/config/config_clib.m4')
 include(`target/scz180/config/config_clib_const.m4')
+
+include(`target/hbios/config/config_hbios.m4')
+include(`target/cpm/config/config_cpm.m4')
 
 dnl############################################################
 dnl# END IF GUARDS

@@ -17,6 +17,7 @@ math/integer/fast/l_fast_divu_64_64x64
 math/integer/fast/l_fast_muls_8_8x8
 math/integer/fast/l_fast_muls_16_16x16
 math/integer/fast/l_fast_muls_32_32x32
+math/integer/fast/l_fast_mulu_de
 math/integer/fast/l_fast_mulu_8_8x8
 math/integer/fast/l_fast_mulu_16_8x8
 math/integer/fast/l_fast_mulu_16_16x16
@@ -36,6 +37,7 @@ math/integer/small/l_small_divu_16_16x16
 math/integer/small/l_small_divu_32_32x32
 math/integer/small/l_small_divu_64_64x8
 math/integer/small/l_small_divu_64_64x64
+math/integer/small/l_small_mulu_de
 math/integer/small/l_small_mul_16_16x16
 math/integer/small/l_small_mul_32_16x16
 math/integer/small/l_small_mul_32_32x32
@@ -53,6 +55,7 @@ math/integer/l_divu_32_32x16
 math/integer/l_divu_32_32x32
 math/integer/l_divu_64_64x8
 math/integer/l_divu_64_64x64
+math/integer/l_mulu_de
 math/integer/l_mulu_16_8x8
 math/integer/l_mulu_16_16x8
 math/integer/l_mulu_16_16x16

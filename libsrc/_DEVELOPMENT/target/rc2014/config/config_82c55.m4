@@ -2,6 +2,7 @@ divert(-1)
 
 ###############################################################
 # 82C55 CONFIGURATION
+# rebuild the library if changes are made
 #
 
 define(`__IO_PIO_PORT_A',   0x`'eval(__IO_PIO_PORT_BASE+0x00,16))  # Address for Port A

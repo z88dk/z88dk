@@ -140,7 +140,7 @@ __Start:
 
    include "../crt_start_di.inc"
    include "../crt_save_sp.inc"
-   
+
 __Restart:
 
    include "../crt_init_sp.inc"
@@ -196,7 +196,7 @@ __Restart_2:
       push bc                  ; argc
 
    ENDIF
-   
+
    ; initialize data section
 
    include "../clib_init_data.inc"
@@ -210,6 +210,11 @@ __Restart_2:
    include "../crt_set_interrupt_mode.inc"
 
 SECTION code_crt_init          ; user and library initialization
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; MAIN ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 SECTION code_crt_main
 
    include "../crt_start_ei.inc"
@@ -221,22 +226,22 @@ SECTION code_crt_main
    ; run exit stack
 
    IF __clib_exit_stack_size > 0
-   
+
       EXTERN asm_exit
       jp asm_exit              ; exit function jumps to __Exit
-   
+
    ENDIF
 
 __Exit:
 
    IF !((__crt_on_exit & 0x10000) && (__crt_on_exit & 0x8))
-   
+
       ; not restarting
       
       push hl                  ; save return status
-   
+
    ENDIF
-   
+
 SECTION code_crt_exit          ; user and library cleanup
 SECTION code_crt_return
 
@@ -245,7 +250,7 @@ SECTION code_crt_return
    include "../clib_close.inc"
 
    ; terminate
-   
+
    include "../crt_exit_eidi.inc"
    include "../crt_restore_sp.inc"
    include "../crt_program_exit.inc"

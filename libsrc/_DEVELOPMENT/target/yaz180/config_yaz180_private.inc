@@ -76,51 +76,6 @@ defc __IO_APU_PORT_BASE = 0xC000
 
 
 
-defc __CPM      = 22
-
-defc __CPM_RCON = 1
-defc __CPM_WCON = 2
-defc __CPM_RRDR = 3
-defc __CPM_WPUN = 4
-defc __CPM_WLST = 5
-defc __CPM_DCIO = 6
-defc __CPM_GIOB = 7
-defc __CPM_SIOB = 8
-defc __CPM_PRST = 9
-defc __CPM_RCOB = 10
-defc __CPM_ICON = 11
-defc __CPM_VERS = 12
-defc __CPM_RDS  = 13
-defc __CPM_LGIN = 14
-defc __CPM_OPN  = 15
-defc __CPM_CLS  = 16
-defc __CPM_FFST = 17
-defc __CPM_FNXT = 18
-defc __CPM_DEL  = 19
-defc __CPM_READ = 20
-defc __CPM_WRIT = 21
-defc __CPM_MAKE = 22
-defc __CPM_REN  = 23
-defc __CPM_ILOG = 24
-defc __CPM_IDRV = 25
-defc __CPM_SDMA = 26
-defc __CPM_SUID = 32
-defc __CPM_RRAN = 33
-defc __CPM_WRAN = 34
-defc __CPM_CFS  = 35
-defc __CPM_DSEG = 51
-
-
-
-
-
-
-
-
-
-
-
-
 defc __Z180 = 0x04
 
 defc __Z180_Z80180 = 0x01
@@ -960,7 +915,6 @@ defc __IO_I2C_IMODE_MASK = 0x03
 
 
 
-
 defc __IO_PIO_IDE_LSB = 0x4000
 defc __IO_PIO_IDE_MSB = 0x4001
 defc __IO_PIO_IDE_CTL = 0x4002
@@ -1004,6 +958,50 @@ defc __IDE_CMD_SLEEP = 0xE6
 defc __IDE_CMD_CACHE_FLUSH = 0xE7
 defc __IDE_CMD_ID = 0xEC
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+defc __CPM_RCON = 1
+defc __CPM_WCON = 2
+defc __CPM_RRDR = 3
+defc __CPM_WPUN = 4
+defc __CPM_WLST = 5
+defc __CPM_DCIO = 6
+defc __CPM_GIOB = 7
+defc __CPM_SIOB = 8
+defc __CPM_PRST = 9
+defc __CPM_RCOB = 10
+defc __CPM_ICON = 11
+defc __CPM_VERS = 12
+defc __CPM_RDS  = 13
+defc __CPM_LGIN = 14
+defc __CPM_OPN  = 15
+defc __CPM_CLS  = 16
+defc __CPM_FFST = 17
+defc __CPM_FNXT = 18
+defc __CPM_DEL  = 19
+defc __CPM_READ = 20
+defc __CPM_WRIT = 21
+defc __CPM_MAKE = 22
+defc __CPM_REN  = 23
+defc __CPM_ILOG = 24
+defc __CPM_IDRV = 25
+defc __CPM_SDMA = 26
+defc __CPM_SUID = 32
+defc __CPM_RRAN = 33
+defc __CPM_WRAN = 34
+defc __CPM_CFS  = 35
+defc __CPM_DSEG = 51
 
 
 

@@ -1,7 +1,0 @@
-target/rc2014/driver/terminal/rc_01_output_hbios0
-target/rc2014/driver/terminal/rc_01_output_hbios0/rc_01_output_hbios0_iterm_msg_bell
-target/rc2014/driver/terminal/rc_01_output_hbios0/rc_01_output_hbios0_iterm_msg_bs
-target/rc2014/driver/terminal/rc_01_output_hbios0/rc_01_output_hbios0_iterm_msg_putc
-target/rc2014/driver/terminal/rc_01_output_hbios0/rc_01_output_hbios0_oterm_msg_bell
-target/rc2014/driver/terminal/rc_01_output_hbios0/rc_01_output_hbios0_oterm_msg_putc
-target/rc2014/driver/terminal/rc_01_output_hbios0/rc_01_output_hbios0_stdio_msg_ictl

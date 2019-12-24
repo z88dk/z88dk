@@ -17,7 +17,7 @@ ALIAS   --math-bbc      -Cc-fp-mode=z88 -lbbc_math
 #
 # Math library aliases (classic + newlib)
 #
-ALIAS   --math32        -Cc-fp-mode=ieee -Cc-D__MATH_MATH32 -D__MATH_MATH32 -lmath32 -pragma-define:CLIB_32BIT_FLOAT=1
-ALIAS   --math32_fast   -Cc-fp-mode=ieee -Cc-D__MATH_MATH32 -D__MATH_MATH32 -lmath32_fast -pragma-define:CLIB_32BIT_FLOAT=1
-ALIAS   --math32_z180   -Cc-fp-mode=ieee -Cc-D__MATH_MATH32 -D__MATH_MATH32 -lmath32_z180 -pragma-define:CLIB_32BIT_FLOAT=1
-ALIAS   --math32_z80n   -Cc-fp-mode=ieee -Cc-D__MATH_MATH32 -D__MATH_MATH32 -lmath32_z80n -pragma-define:CLIB_32BIT_FLOAT=1
+ALIAS   --math32                -Cc-fp-mode=ieee -Cc-D__MATH_MATH32 -D__MATH_MATH32 -lmath32 -pragma-define:CLIB_32BIT_FLOAT=1
+ALIAS   --math32_fast           -Cc-fp-mode=ieee -Cc-D__MATH_MATH32 -D__MATH_MATH32 -lmath32_fast -pragma-define:CLIB_32BIT_FLOAT=1
+ALIAS   --math32_z180   -mz180  -Cc-fp-mode=ieee -Cc-D__MATH_MATH32 -D__MATH_MATH32 -lmath32_z180 -pragma-define:CLIB_32BIT_FLOAT=1
+ALIAS   --math32_z80n   -mz80n  -Cc-fp-mode=ieee -Cc-D__MATH_MATH32 -D__MATH_MATH32 -lmath32_z80n -pragma-define:CLIB_32BIT_FLOAT=1

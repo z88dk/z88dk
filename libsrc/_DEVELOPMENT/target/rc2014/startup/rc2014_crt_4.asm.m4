@@ -21,7 +21,6 @@ include "config_rc2014_public.inc"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../crt_defaults.inc"
-include "../../arch/hbios/crt_hbios_def.inc"
 include "crt_config.inc"
 include(`../crt_rules.inc')
 include(`rc2014_rules.inc')
@@ -56,7 +55,7 @@ dnl#include(`../m4_file_dup.m4')
 dnl
 dnl## empty fd slot
 dnl
-dnl#include(`../../m4_file_absent.m4')
+dnl#include(`../m4_file_absent.m4')
 dnl
 dnl############################################################
 dnl## INSTANTIATE DRIVERS #####################################
@@ -136,7 +135,7 @@ __Restart:
    include "../crt_init_sp.inc"
 
    ; command line
-   
+
    IF (__crt_enable_commandline = 1) || (__crt_enable_commandline >= 3)
 
       include "../crt_cmdline_empty.inc"
@@ -175,8 +174,8 @@ SECTION code_crt_main
    include "../crt_start_ei.inc"
 
    ; call user program
-   
-      call _main                ; hl = return status
+
+   call _main                  ; hl = return status
 
    ; run exit stack
 
@@ -208,7 +207,7 @@ SECTION code_crt_return
 
    include "../crt_exit_eidi.inc"
    include "../crt_restore_sp.inc"
-   include "../crt_program_exit.inc"      
+   include "../crt_program_exit.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

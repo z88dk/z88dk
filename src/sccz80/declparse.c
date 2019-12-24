@@ -857,9 +857,9 @@ Type *parse_decl(char name[], Type *base_type)
         }
     }
 
-    if ( match("const")) {
+    if ( ispointer(base_type) && match("const")) {
         base_type->isconst = 1;
-    } else {
+    } else if ( ispointer(base_type) ) {
         swallow("volatile");
     }
 

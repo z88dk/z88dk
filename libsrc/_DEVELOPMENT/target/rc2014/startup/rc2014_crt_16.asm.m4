@@ -21,7 +21,6 @@ include "config_rc2014_public.inc"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../crt_defaults.inc"
-include "../../arch/hbios/crt_hbios_def.inc"
 include "crt_config.inc"
 include(`../crt_rules.inc')
 include(`rc2014_rules.inc')
@@ -54,7 +53,7 @@ dnl#include(`../m4_file_dup.m4')
 dnl
 dnl## empty fd slot
 dnl
-dnl#include(`../../m4_file_absent.m4')
+dnl#include(`../m4_file_absent.m4')
 dnl
 dnl############################################################
 dnl## INSTANTIATE DRIVERS #####################################
@@ -165,7 +164,7 @@ SECTION code_crt_main
 
    ; call user program
 
-      call _main                ; hl = return status
+   call _main                  ; hl = return status
 
    ; run exit stack
 
