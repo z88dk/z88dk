@@ -3732,14 +3732,17 @@ int main (int argc, char **argv){
             if ( canz180() ) {
               TEST(l, isez80() ? 2 : 7);
             } else if ( c_cpu == CPU_Z80N ) {
+                long long old_st = st;
+                unsigned short old_ff = ff, old_fa = fa, old_fb = fb, old_fr = fr;
                 int count;
-                for ( count  = 0 ; count < (b & 0x07); count++ ) {
+                for ( count = 0 ; count < (b & 0x0f); count++ ) {
+                    ff &= ~256;
                     ff |= ( d & 128) ? 256 : 0;
                     RL(e);
                     RL(d);
                 }
-                st += 8;
-
+                st = old_st + 8;
+                ff = old_ff; fa = old_fa; fb = old_fb; fr = old_fr;
             } else {
               st += 8;
             }
