@@ -9,9 +9,7 @@
 
 getk:
 _getk:
-	halt
-	call	CONSOLE_STAT
+	call	$0169		;ZYKL
 	ld	hl,0
-	and	a
 	ret	z
 	jp	fgetc_cons
