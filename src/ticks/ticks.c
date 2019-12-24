@@ -3669,49 +3669,61 @@ int main (int argc, char **argv){
             break;
           case 0x28:    // (ZXN) bsla de,b
             if ( c_cpu == CPU_Z80N ) {
+                long long old_st = st;
+                unsigned short old_ff = ff, old_fa = fa, old_fb = fb, old_fr = fr;
                 int count;
-                for ( count  = 0 ; count < (b & 0x0f); count++ ) {
+                for ( count = 0 ; count < (b & 0x1f); count++ ) {
                     SLA(e);
                     RL(d);
                 }
-                st += 8;
+                st = old_st + 8;
+                ff = old_ff; fa = old_fa; fb = old_fb; fr = old_fr;
             } else {
               st += 8;
             }
             break;
           case 0x29:    // (ZXN) bsra de,b
             if ( c_cpu == CPU_Z80N ) {
+                long long old_st = st;
+                unsigned short old_ff = ff, old_fa = fa, old_fb = fb, old_fr = fr;
                 int count;
-                for ( count  = 0 ; count < (b & 0x0f); count++ ) {
+                for ( count = 0 ; count < (b & 0x1f); count++ ) {
                     SRA(d);
                     RR(e);
                 }
-                st += 8;
+                st = old_st + 8;
+                ff = old_ff; fa = old_fa; fb = old_fb; fr = old_fr;
             } else {
               st += 8;
             }
             break;
           case 0x2a:    // (ZXN) bsrl de,b
             if ( c_cpu == CPU_Z80N ) {
+                long long old_st = st;
+                unsigned short old_ff = ff, old_fa = fa, old_fb = fb, old_fr = fr;
                 int count;
-                for ( count  = 0 ; count < (b & 0x0f); count++ ) {
+                for ( count = 0 ; count < (b & 0x1f); count++ ) {
                     SRL(d);
                     RR(e);
                 }
-                st += 8;
+                st = old_st + 8;
+                ff = old_ff; fa = old_fa; fb = old_fb; fr = old_fr;
             } else {
               st += 8;
             }
             break;
           case 0x2b:    // (ZXN) bsrf de,b
             if ( c_cpu == CPU_Z80N ) {
+                long long old_st = st;
+                unsigned short old_ff = ff, old_fa = fa, old_fb = fb, old_fr = fr;
                 int count;
-                for ( count  = 0 ; count < (b & 0x0f); count++ ) {
+                for ( count = 0; count < (b & 0x1f); count++) {
                     RR(d);
                     d |= 128;
                     RR(e);
                 }
-                st += 8;
+                st = old_st + 8;
+                ff = old_ff; fa = old_fa; fb = old_fb; fr = old_fr;
             } else {
               st += 8;
             }
