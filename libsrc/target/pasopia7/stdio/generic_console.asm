@@ -15,6 +15,7 @@
 		EXTERN		generic_console_flags
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
+		EXTERN		conio_map_colour
 		EXTERN		__pasopia_page
 		EXTERN		__console_w
 
@@ -35,7 +36,8 @@ generic_console_set_attribute:
 	ret
 
 generic_console_set_ink:
-	and	15
+	call	conio_map_colour
+	and	7
 	ld	e,a
 	ld	a,(__pasopia7_attr)
 	and	@11111000

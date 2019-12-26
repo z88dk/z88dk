@@ -33,6 +33,7 @@
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
 		EXTERN		__aquarius_attr
+		EXTERN		conio_map_colour
 
 		defc		DISPLAY = 12328
 		defc		COLOUR_MAP = DISPLAY + 1024
@@ -47,6 +48,7 @@ generic_console_set_attribute:
 	ret
 
 generic_console_set_ink:
+	call	conio_map_colour
 	and	15
 	rla
 	rla
@@ -61,6 +63,7 @@ generic_console_set_ink:
 
 	
 generic_console_set_paper:
+	call	conio_map_colour
 	and	15
 	ld	e,a
 	ld	a,(__aquarius_attr)

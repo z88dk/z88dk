@@ -7,11 +7,11 @@
 		PUBLIC		_bordercolor
 
 		EXTERN		conio_map_colour
-		EXTERN		cpc_SetBorder
 
 bordercolor:
 _bordercolor:
 	ld	a,l
+	call	conio_map_colour
 	ld	hl,12288
 	ld	d,h
 	ld	e,l
