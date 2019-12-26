@@ -31,7 +31,7 @@ table:
 	defb	$3	;CYAN -> CYAN
 	defb	$4	;RED -> RED
 	defb	$5	;MAGENTA -> MAGENTA
-	defb	$e	;BROWN -> BRIGHT YELLOW
+	defb	$6	;BROWN -> YELLOW
 	defb	$7	;LIGHTGRAY -> BRIGHT GREY
 	defb	$8	;DARKGRAY -> DARK GREY
 	defb	$9	;LIGHTBLUE -> BRIGHT BLUE
@@ -39,6 +39,6 @@ table:
 	defb	$b	;LIGHTCYAN -> BRIGHT CYAN
 	defb	$c	;LIGHTRED -> BRIGHT RED
 	defb	$d	;LIGHTMAGENTA -> BRIGHT MAGENTA
-	defb	$6	;YELLOW -> YELLOW
+	defb	$e	;YELLOW -> BRIGHT YELLOW
 	defb	$f	;WHITE -> WHITE
 

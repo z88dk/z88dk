@@ -34,7 +34,7 @@ table:
 	defb	$1	;BROWN -> RED
 	defb	$7	;LIGHTGRAY -> WHITE
 	defb	$7	;DARKGRAY -> WHITE
-	defb	$1	;LIGHTBLUE -> BLUE
+	defb	$4	;LIGHTBLUE -> BLUE
 	defb	$2	;LIGHTGREEN -> GREEN
 	defb	$6	;LIGHTCYAN -> CYAN
 	defb	$1	;LIGHTRED -> RED
