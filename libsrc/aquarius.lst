@@ -1,9 +1,10 @@
-stdio/aquarius/fgetc_cons
-stdio/aquarius/getk
-stdio/aquarius/fputc_cons
-stdio/aquarius/generic_console
-stdio/aquarius/conio_vars
-stdio/aquarius/bordercolour
+target/aquarius/stdio/fgetc_cons
+target/aquarius/stdio/getk
+target/aquarius/stdio/fputc_cons
+target/aquarius/stdio/generic_console
+target/aquarius/stdio/conio_vars
+target/aquarius/stdio/bordercolour
+target/aquarius/stdio/conio_map_colour
 @stdio/ansicore.lst
 stdio/ansi/aquarius/f_ansi_attr
 stdio/ansi/aquarius/f_ansi_bel
