@@ -71,14 +71,17 @@ typedef enum {
     RES_PARERR = 4  /* 4: Invalid Parameter */
 } DRESULT;
 
+/* FatFS for non exFAT file systems */
+typedef DWORD LBA_t;
+
 //
 // IDE DISK COMMANDS
 //
 
 __DPROTO(`iyh,iyl',`iyh,iyl',DSTATUS,,disk_initialize,BYTE pdrv)
 __DPROTO(`iyh,iyl',`iyh,iyl',DSTATUS,,disk_status,BYTE pdrv)
-__DPROTO(`iyh,iyl',`iyh,iyl',DRESULT,,disk_read,BYTE pdrv, BYTE* buff, DWORD sector, UINT count)
-__DPROTO(`iyh,iyl',`iyh,iyl',DRESULT,,disk_write,BYTE pdrv, const BYTE* buff, DWORD sector, UINT count)
+__DPROTO(`iyh,iyl',`iyh,iyl',DRESULT,,disk_read,BYTE pdrv, BYTE* buff, LBA_t sector, UINT count)
+__DPROTO(`iyh,iyl',`iyh,iyl',DRESULT,,disk_write,BYTE pdrv, const BYTE* buff, LBA_t sector, UINT count)
 __DPROTO(`iyh,iyl',`iyh,iyl',DRESULT,,disk_ioctl,BYTE pdrv, BYTE cmd, void* buff)
 
 #endif

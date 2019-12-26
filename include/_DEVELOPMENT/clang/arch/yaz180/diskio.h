@@ -73,6 +73,8 @@ typedef enum {
     RES_PARERR = 4  /* 4: Invalid Parameter */
 } DRESULT;
 
+/* FatFS for non exFAT file systems */
+typedef DWORD LBA_t;
 //
 // IDE DISK COMMANDS
 //
@@ -83,10 +85,10 @@ extern DSTATUS disk_initialize(BYTE pdrv);
 extern DSTATUS disk_status(BYTE pdrv);
 
 
-extern DRESULT disk_read(BYTE pdrv,BYTE* buff,DWORD sector,UINT count);
+extern DRESULT disk_read(BYTE pdrv,BYTE* buff,LBA_t sector,UINT count);
 
 
-extern DRESULT disk_write(BYTE pdrv,const BYTE* buff,DWORD sector,UINT count);
+extern DRESULT disk_write(BYTE pdrv,const BYTE* buff,LBA_t sector,UINT count);
 
 
 extern DRESULT disk_ioctl(BYTE pdrv,BYTE cmd,void* buff);

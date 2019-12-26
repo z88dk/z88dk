@@ -10,7 +10,7 @@ EXTERN ide_read_sector
 ; DRESULT disk_read (
 ;   BYTE pdrv,                      /* Physical drive number to identify the drive */
 ;   BYTE *buff,                     /* Data buffer to store read data */
-;   DWORD sector,                   /* Start sector in LBA */
+;   LBA_t sector,                   /* Start sector in LBA */
 ;   UINT count ) __z88dk_callee;    /* Number of sectors to read (<256) */
 ;
 ; entry
