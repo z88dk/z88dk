@@ -27,6 +27,16 @@ __sfr __at __IO_LED_STATUS  io_led_status;
 
 __sfr __at __IO_CF_PORT     io_cf;
 
-#endif /* !__ARCH_SCZ180_H__ */
-
 #endif
+
+// CSIO SD COMMANDS
+
+__DPROTO(`b,c,d,e,iyh,iyl',`b,c,d,e,iyh,iyl',void,,sd_clock,uint8_t)
+__DPROTO(`b,c,d,e,iyh,iyl',`b,c,d,e,iyh,iyl',void,,sd_cs_lower,uint8_t)
+__DPROTO(`b,c,d,e,h,l,iyh,iyl',`b,c,d,e,h,l,iyh,iyl',void,,sd_cs_raise,void)
+__DPROTO(`b,c,d,e,iyh,iyl',`b,c,d,e,iyh,iyl',void,,sd_write_byte,uint8_t)
+__DPROTO(`b,c,d,e,iyh,iyl',`b,c,d,e,iyh,iyl',uint8_t,,sd_read_byte,void)
+__DPROTO(`iyh,iyl',`iyh,iyl',void,,sd_write_block,const uint8_t *from)
+__DPROTO(`iyh,iyl',`iyh,iyl',void,,sd_read_block,uint8_t *to)
+
+#endif /* !__ARCH_SCZ180_H__ */

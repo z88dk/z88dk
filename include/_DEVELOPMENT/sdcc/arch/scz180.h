@@ -29,6 +29,44 @@ __sfr __at __IO_LED_STATUS  io_led_status;
 
 __sfr __at __IO_CF_PORT     io_cf;
 
-#endif /* !__ARCH_SCZ180_H__ */
-
 #endif
+
+// CSIO SD COMMANDS
+
+extern void sd_clock(uint8_t) __preserves_regs(b,c,d,e,iyh,iyl);
+extern void sd_clock_fastcall(uint8_t) __preserves_regs(b,c,d,e,iyh,iyl) __z88dk_fastcall;
+#define sd_clock(a) sd_clock_fastcall(a)
+
+
+extern void sd_cs_lower(uint8_t) __preserves_regs(b,c,d,e,iyh,iyl);
+extern void sd_cs_lower_fastcall(uint8_t) __preserves_regs(b,c,d,e,iyh,iyl) __z88dk_fastcall;
+#define sd_cs_lower(a) sd_cs_lower_fastcall(a)
+
+
+extern void sd_cs_raise(void) __preserves_regs(b,c,d,e,h,l,iyh,iyl);
+extern void sd_cs_raise_fastcall(void) __preserves_regs(b,c,d,e,h,l,iyh,iyl) __z88dk_fastcall;
+#define sd_cs_raise(a) sd_cs_raise_fastcall(a)
+
+
+extern void sd_write_byte(uint8_t) __preserves_regs(b,c,d,e,iyh,iyl);
+extern void sd_write_byte_fastcall(uint8_t) __preserves_regs(b,c,d,e,iyh,iyl) __z88dk_fastcall;
+#define sd_write_byte(a) sd_write_byte_fastcall(a)
+
+
+extern uint8_t sd_read_byte(void) __preserves_regs(b,c,d,e,iyh,iyl);
+extern uint8_t sd_read_byte_fastcall(void) __preserves_regs(b,c,d,e,iyh,iyl) __z88dk_fastcall;
+#define sd_read_byte(a) sd_read_byte_fastcall(a)
+
+
+extern void sd_write_block(const uint8_t *from) __preserves_regs(iyh,iyl);
+extern void sd_write_block_fastcall(const uint8_t *from) __preserves_regs(iyh,iyl) __z88dk_fastcall;
+#define sd_write_block(a) sd_write_block_fastcall(a)
+
+
+extern void sd_read_block(uint8_t *to) __preserves_regs(iyh,iyl);
+extern void sd_read_block_fastcall(uint8_t *to) __preserves_regs(iyh,iyl) __z88dk_fastcall;
+#define sd_read_block(a) sd_read_block_fastcall(a)
+
+
+
+#endif /* !__ARCH_SCZ180_H__ */

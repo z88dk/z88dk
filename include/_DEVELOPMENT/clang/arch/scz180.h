@@ -29,6 +29,30 @@ __sfr __at __IO_LED_STATUS  io_led_status;
 
 __sfr __at __IO_CF_PORT     io_cf;
 
-#endif /* !__ARCH_SCZ180_H__ */
-
 #endif
+
+// CSIO SD COMMANDS
+
+extern void sd_clock(uint8_t);
+
+
+extern void sd_cs_lower(uint8_t);
+
+
+extern void sd_cs_raise(void);
+
+
+extern void sd_write_byte(uint8_t);
+
+
+extern uint8_t sd_read_byte(void);
+
+
+extern void sd_write_block(const uint8_t *from);
+
+
+extern void sd_read_block(uint8_t *to);
+
+
+
+#endif /* !__ARCH_SCZ180_H__ */

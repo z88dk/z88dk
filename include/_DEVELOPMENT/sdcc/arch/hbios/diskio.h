@@ -74,48 +74,32 @@ typedef enum {
 } DRESULT;
 
 //
-// IDE DISK COMMANDS (FOUND IN @FEILIPU Z88DK-LIBS)
+// IDE DISK COMMANDS
 //
 
-extern DSTATUS disk_initialize(BYTE pdrv);
+extern DSTATUS disk_initialize(BYTE pdrv) __preserves_regs(iyh,iyl);
+extern DSTATUS disk_initialize_fastcall(BYTE pdrv) __preserves_regs(iyh,iyl) __z88dk_fastcall;
+#define disk_initialize(a) disk_initialize_fastcall(a)
 
 
-extern DSTATUS disk_status(BYTE pdrv);
+extern DSTATUS disk_status(BYTE pdrv) __preserves_regs(iyh,iyl);
+extern DSTATUS disk_status_fastcall(BYTE pdrv) __preserves_regs(iyh,iyl) __z88dk_fastcall;
+#define disk_status(a) disk_status_fastcall(a)
 
 
-extern DRESULT disk_read(BYTE pdrv,BYTE* buff,DWORD sector,UINT count);
+extern DRESULT disk_read(BYTE pdrv,BYTE* buff,DWORD sector,UINT count) __preserves_regs(iyh,iyl);
+extern DRESULT disk_read_callee(BYTE pdrv,BYTE* buff,DWORD sector,UINT count) __preserves_regs(iyh,iyl) __z88dk_callee;
+#define disk_read(a,b,c,d) disk_read_callee(a,b,c,d)
 
 
-extern DRESULT disk_write(BYTE pdrv,const BYTE* buff,DWORD sector,UINT count);
+extern DRESULT disk_write(BYTE pdrv,const BYTE* buff,DWORD sector,UINT count) __preserves_regs(iyh,iyl);
+extern DRESULT disk_write_callee(BYTE pdrv,const BYTE* buff,DWORD sector,UINT count) __preserves_regs(iyh,iyl) __z88dk_callee;
+#define disk_write(a,b,c,d) disk_write_callee(a,b,c,d)
 
 
-extern DRESULT disk_ioctl(BYTE pdrv,BYTE cmd,void* buff);
-
-
-
-//
-// CSIO SD COMMANDS
-//
-
-extern void sd_clock(uint8_t);
-
-
-extern void sd_cs_lower(uint8_t);
-
-
-extern void sd_cs_raise(void);
-
-
-extern void sd_write_byte(uint8_t);
-
-
-extern uint8_t sd_read_byte(void);
-
-
-extern void sd_write_block(const uint8_t *from);
-
-
-extern void sd_read_block(uint8_t *to);
+extern DRESULT disk_ioctl(BYTE pdrv,BYTE cmd,void* buff) __preserves_regs(iyh,iyl);
+extern DRESULT disk_ioctl_callee(BYTE pdrv,BYTE cmd,void* buff) __preserves_regs(iyh,iyl) __z88dk_callee;
+#define disk_ioctl(a,b,c) disk_ioctl_callee(a,b,c)
 
 
 
