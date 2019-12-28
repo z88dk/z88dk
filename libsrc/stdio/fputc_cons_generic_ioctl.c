@@ -25,8 +25,12 @@ int console_ioctl(uint16_t cmd, void *arg) __naked
 	jr	z,set_raw
         cp      IOCTL_GENCON_CONSOLE_SIZE
         jr      z,get_console_size
+	push	de
+	push	af
 	call	generic_console_ioctl
-	jr	nc,success
+	jr	nc,success_pop
+	pop	af
+	pop	de
 	cp	IOCTL_GENCON_GET_CAPS
 	jr	nz,failure
 	ld	a,(generic_console_caps)
@@ -38,6 +42,9 @@ int console_ioctl(uint16_t cmd, void *arg) __naked
 failure:
 	ld	hl,-1
         ret
+success_pop:
+	pop	de
+	pop	af
 success:
 	ld	hl,0
 	ret
