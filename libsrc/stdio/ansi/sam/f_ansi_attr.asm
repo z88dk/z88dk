@@ -204,8 +204,8 @@
 .noback
         ret
 
-        SECTION bss_clib
+        SECTION data_clib
 .BACKGR
         defb 0
 .FOREGR
-        defb 0
+        defb 7
