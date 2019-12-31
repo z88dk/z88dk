@@ -1,6 +1,7 @@
 stdio/cpm/fgetc_cons
 stdio/cpm/getk
 stdio/cpm/fputc_cons
+stdio/cpm/generic_console
 @stdio/stdio_binary.lst
 @time/time.lst
 time/cpm/clock
