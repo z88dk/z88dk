@@ -4,6 +4,7 @@
         PUBLIC      generic_console_set_ink
         PUBLIC      generic_console_set_paper
         PUBLIC      generic_console_set_attribute
+        EXTERN      conio_map_colour
 
         EXTERN      __x1_attr
 
@@ -22,7 +23,7 @@ not_inverse:
     ret
 
 generic_console_set_ink:
-    ; TODO: Map colour
+    call    conio_map_colour
     and     7
     ld      e,a
     ld      a,(__x1_attr)
@@ -33,7 +34,7 @@ generic_console_set_ink:
 
 ; Paper is used for plotting hires
 generic_console_set_paper:
-    ; TODO: Map colour
+    call    conio_map_colour
     and     7
     ld      e,a
     ld      a,(__x1_attr+1)

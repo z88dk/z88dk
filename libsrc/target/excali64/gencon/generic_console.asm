@@ -68,6 +68,7 @@ generic_console_set_paper:
 set_paper:
 	call	conio_map_colour_bg
 	rlca
+	and	@00001110
 	ld	c,a
 	ld	a,(de)
 	and	@11110001

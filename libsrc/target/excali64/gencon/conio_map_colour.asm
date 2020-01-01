@@ -42,14 +42,14 @@ excalibur_colour_1:
 	defb	$6	;CYAN -> CYAN
 	defb	$1	;RED -> RED
 	defb	$3	;MAGENTA -> MAGENTA
-	defb	$b	;BROWN -> BROWN
-	defb	$f	;LIGHTGRAY -> LIGHT GREY
-	defb	$a	;DARKGRAY -> ORANGE
-	defb	$e	;LIGHTBLUE -> PURPLE
-	defb	$c	;LIGHTGREEN -> LIGHTGREEN
-	defb	$8	;LIGHTCYAN -> DARK RED
-	defb	$9	;LIGHTRED -> PINK
-	defb	$e	;LIGHTMAGENTA -> PURPLE
+        defb    $b      ;BROWN -> TAWNY (RED/ORANGE)        - ok
+        defb    $f      ;LIGHTGRAY -> 15 (a very dark green)
+        defb    $c      ;DARKGRAY -> 12 (a very, very dark purple)
+        defb    $2      ;LIGHTBLUE -> 2 (blue)
+        defb    $d      ;LIGHTGREEN -> PALE GREEN    - ok
+        defb    $6      ;LIGHTCYAN -> 6 (cyan)
+        defb    $9      ;LIGHTRED -> 9 (orange)
+        defb    $d      ;LIGHTMAGENTA -> 14 (pink/cerise)
 	defb	$6	;YELLOW -> YELLOW
 	defb	$7	;WHITE -> WHITE
 
