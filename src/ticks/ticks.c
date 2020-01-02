@@ -2866,13 +2866,23 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;
         break;
       case 0xeb: // EX DE,HL
-        st+= isez80() ? 1 : israbbit() ? 2 : 4;
-        t= d;
-        d= h;
-        h= t;
-        t= e;
-        e= l;
-        l= t;
+        st+= isez80() ? 1 : israbbit() ? 2 : isz180() ? 3 : 4;
+        if (altd) {
+            t = d;
+            d = h_;
+            h_ = t;
+            t = e;
+            e = l_;
+            l_ = t;
+        }
+        else {
+            t = d;
+            d = h;
+            h = t;
+            t = e;
+            e = l;
+            l = t;
+        }
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xd9: // EXX
         if ( is8085() ) {  // (8085) ld (de),hl (SHLX)
@@ -2912,13 +2922,23 @@ int main (int argc, char **argv){
         if ( isgbz80() ) {
           printf("%04x: ILLEGAL GBZ80 instruction EX (SP),HL\n",pc-1);         
         } else if ( israbbit() && ih ) {
-          t = h;
-          h = d_;
-          d_ = t;
-          t = l;
-          l = e_;
-          e_ = l;
-          st += 2;
+            if (altd) {
+                t = h_;
+                h_ = d_;
+                d_ = t;
+                t = l_;
+                l_ = e_;
+                e_ = t;
+            }
+            else {
+                t = h;
+                h = d_;
+                d_ = t;
+                t = l;
+                l = e_;
+                e_ = t;
+            }
+            st += 2;
         } else {
           if( ih )
             EXSPI(h, l);
