@@ -145,6 +145,9 @@ ENDIF
 	pop	bc
 	pop	bc
 cleanup:
+	push	hl
+	call	crt0_exit
+	pop	hl
 	ld	a,CMD_EXIT	;exit
 	; Fall into SYSCALL
 
