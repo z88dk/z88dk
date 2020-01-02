@@ -206,10 +206,8 @@ cleanup:
 ;
         push    hl		; keep return code
 
-IF CRT_ENABLE_STDIO = 1
-        EXTERN     closeall
-        call    closeall
-ENDIF
+        call    crt0_exit
+
 		; The BASIC USR call would restore IY on return, but it could not be enough
         call    restore81
 

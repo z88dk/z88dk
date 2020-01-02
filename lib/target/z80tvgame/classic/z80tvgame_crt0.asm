@@ -118,11 +118,8 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
         push    hl				; return code
+        call    crt0_exit
 
-IF CRT_ENABLE_STDIO = 1
-        EXTERN     closeall
-        call    closeall
-ENDIF
 
 
 cleanup_exit:

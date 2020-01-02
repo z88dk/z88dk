@@ -80,7 +80,12 @@ IF ( __crt_model & 2 )
 	call    asm_dzx7_standard
 ENDIF
 	
+		SECTION code_crt_init_exit
+			ret
 		SECTION code_crt_exit
+crt0_exit:
+			; Teardown code can go here
+		SECTION code_crt_exit_exit
 			ret
 
 		SECTION bss_crt

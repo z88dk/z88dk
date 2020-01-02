@@ -38,10 +38,8 @@ start:
 	ld	ix,$d2	; TOTEXT - force text mode on exit
 	call	msxbios
 cleanup:
-IF CRT_ENABLE_STDIO = 1
-	EXTERN	closeall
-	call	closeall
-ENDIF
+    call    crt0_exit
+
 
 start1:
         ld      sp,0

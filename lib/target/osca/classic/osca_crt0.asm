@@ -207,10 +207,8 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
         push	hl		;save exit value
-IF CRT_ENABLE_STDIO = 1
-	EXTERN	closeall
-	call	closeall
-ENDIF
+        call    crt0_exit
+
 	; kjt_flos_display restores the text mode but makes the screen flicker
 	; if it is in text mode already
 	;

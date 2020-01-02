@@ -96,10 +96,8 @@ ENDIF
     call    _main
 
 cleanup:
-IF CRT_ENABLE_STDIO = 1
-    EXTERN     closeall
-    call    closeall
-ENDIF
+    call    crt0_exit
+
 end:
     jr	end
     rst	0

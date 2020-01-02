@@ -65,3 +65,12 @@ FILE *_freopen1(const char* name, int fd, const char* mode, FILE* fp)
         return fp2;
     }
 }
+
+/* If fopen/freopen() is used, we need to close all files, so do it */
+static void freopen1_cleanup_exit() __naked {
+#asm
+	SECTION	code_crt_exit
+	EXTERN	closeall
+	call	closeall
+#endasm
+}

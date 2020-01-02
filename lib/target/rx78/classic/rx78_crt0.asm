@@ -69,10 +69,8 @@ cleanup:
 ;
         push    hl				; return code
 
-IF CRT_ENABLE_STDIO = 1
-        EXTERN     closeall
-        call    closeall
-ENDIF
+      call    crt0_exit
+
 
 
 cleanup_exit:
