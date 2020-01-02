@@ -109,10 +109,8 @@ start:
 
 cleanup:
 	push	hl
-IF CRT_ENABLE_STDIO = 1
-	EXTERN	closeall	;Close all opened files
-	call	closeall
-ENDIF
+    call    crt0_exit
+
 	pop	bc
 start1:
 	ld	sp,0

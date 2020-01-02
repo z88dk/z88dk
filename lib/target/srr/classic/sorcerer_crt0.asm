@@ -69,10 +69,8 @@ ENDIF
 
 cleanup:
 	push	hl		;Save return value
-IF CRT_ENABLE_STDIO = 1
-	EXTERN	closeall	;Close any opened files
-	call	closeall
-ENDIF
+    call    crt0_exit
+
 	pop	bc		;Get exit() value into bc
 start1:	ld      sp,0		;Pick up entry sp
         jp	$e003		; Monitor warm start
