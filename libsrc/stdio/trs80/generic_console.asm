@@ -186,3 +186,9 @@ __eg2000_custom_font:	defb	0
 	ld	bc,768
 	ldir
 no_set_font:
+
+	SECTION	code_crt_exit
+	EXTERN	__console_x
+	ld	bc,(__console_x)
+	call	xypos
+	ld	($4020),hl	
