@@ -667,6 +667,7 @@ int main (int argc, char **argv){
     printf("  -mz80          Emulate a z80\n"),
     printf("  -mz180         Emulate a z180\n"),
     printf("  -mr2k          Emulate a Rabbit 2000\n"),
+    printf("  -mr3k          Emulate a Rabbit 3000\n"),
     printf("  -mz80n         Emulate a Spectrum Next z80n\n"),
     printf("  -mez80         Emulate an ez80 (z80 mode)\n"),
     printf("  -x <file>      Symbol file to read\n"),
@@ -736,6 +737,8 @@ int main (int argc, char **argv){
             c_cpu = CPU_Z80N;
             memory_model = "zxn";
           } else if ( strcmp(&argv[0][1],"mr2k") == 0 ) {
+            c_cpu = CPU_R2K;
+          } else if ( strcmp(&argv[0][1],"mr3k") == 0 ) {
             c_cpu = CPU_R2K;
           } else if ( strcmp(&argv[0][1],"mez80") == 0 ) {
             c_cpu = CPU_EZ80;
