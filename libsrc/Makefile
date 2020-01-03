@@ -1554,7 +1554,6 @@ sp1-clean:
 clean: classic-clean new-clean
 
 classic-clean:
-	$(MAKE) -C ace clean
 	$(MAKE) -C assert clean
 	$(MAKE) -C cpm clean
 	$(MAKE) -C ctype clean
