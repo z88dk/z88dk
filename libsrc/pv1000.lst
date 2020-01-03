@@ -1,4 +1,4 @@
-target/pv1000/gencon/generic_console
+target/pv1000/stdio/generic_console
 target/pv1000/stdio/fgetc_cons
 target/pv1000/stdio/getk
 @stdio/stdio.lst

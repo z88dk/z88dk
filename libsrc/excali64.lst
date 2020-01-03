@@ -1,10 +1,10 @@
-target/excali64/gencon/generic_console
-target/excali64/gencon/generic_console_ioctl
-target/excali64/gencon/conio_vars
-target/excali64/gencon/conio_map_colour
-target/excali64/gencon/CRT_FONT
-target/excali64/gencon/copy_font
-target/excali64/gencon/loadudg6
+target/excali64/stdio/generic_console
+target/excali64/stdio/generic_console_ioctl
+target/excali64/stdio/conio_vars
+target/excali64/stdio/conio_map_colour
+target/excali64/stdio/CRT_FONT
+target/excali64/stdio/copy_font
+target/excali64/stdio/loadudg6
 @font/font_8x8/font_8x8.lst
 @input/input_keyboard.lst
 graphics/dcircle
