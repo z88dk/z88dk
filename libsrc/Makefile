@@ -978,11 +978,6 @@ z9001_clib.lib:
 	$(MAKE) -C games TARGET=z9001
 	TARGET=z9001 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz9001 -x$(OUTPUT_DIRECTORY)/z9001_clib @$(LISTFILE_DIRECTORY)/z9001.lst
 	@echo ''
-	@echo '--- Building Z9001 Standard Graphics Libraires ---'
-	@echo ''
-	$(MAKE) gfxdeps
-	TARGET=z9001 TYPE=z80 $(LIBLINKER) -DFORz9001 -x$(OUTPUT_DIRECTORY)/gfx9001 @$(LISTFILE_DIRECTORY)/gfx9001.lst
-	@echo ''
 	@echo '--- Building Z9001 KRT High Resolution libraires ---'
 	@echo ''
 	$(MAKE) gfxdeps

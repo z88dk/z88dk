@@ -6,7 +6,7 @@ graphics/fill
 graphics/dfill2
 graphics/getsprite
 graphics/liner
-games/coleco/joystick
+target/coleco/games/joystick
 games/obj/coleco/joystick_type
 psg/sn76489/bit_open
 psg/sn76489/psg_tone
