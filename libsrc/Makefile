@@ -875,6 +875,7 @@ einstein.lib:
 	@echo ''
 	$(MAKE) msxdeps
 	@$(RM) -f video/mc6845/*.o
+	$(MAKE) -C font
 	$(MAKE) -C games TARGET=cpm SUBTYPE=einstein
 	$(MAKE) -C video/tms9918 TARGET=cpm SUBTYPE=einstein
 	$(MAKE) -C psg
@@ -1203,7 +1204,7 @@ nc_clib.lib:
 	@echo '--- Building Amstrad NC100 Library ---'
 	@echo ''
 	$(call buildgeneric,nc)
-	$(MAKE) -C fcntl/nc100
+	$(MAKE) -C target/nc100
 	TARGET=nc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORnc -x$(OUTPUT_DIRECTORY)/nc_clib @$(LISTFILE_DIRECTORY)/nc100.lst
 	
 # NC-100 graphics lib - Stefano
@@ -1337,6 +1338,7 @@ gal_clib.lib:
 	$(MAKE) -C games TARGET=gal
 	TARGET=gal TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgal -x$(OUTPUT_DIRECTORY)/gal_clib @$(LISTFILE_DIRECTORY)/gal.lst
 	$(MAKE) gfxdeps
+	$(RM) target/gal/graphics/*.o
 	TARGET=gal SUBTARGET=galtext TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgal -Dtextgraphics -x$(OUTPUT_DIRECTORY)/gfxgaltext @target/gal/gfxgaltext.lst
 
 # Sharp PC-G8xx/E2xx - Stefano Bodrato
@@ -1347,8 +1349,10 @@ g800_clib.lib:
 	$(call buildgeneric,g800)
 	$(MAKE) -C games TARGET=g800
 	$(MAKE) gfxdeps
+	$(RM) target/g800/graphics/*.o
 	TARGET=g800 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORg800 -x$(OUTPUT_DIRECTORY)/g800_clib @$(LISTFILE_DIRECTORY)/g800.lst
 	$(MAKE) gfxdeps
+	$(RM) target/g800/graphics/*.o
 	TARGET=g800 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORg800 -x$(OUTPUT_DIRECTORY)/g850_clib @$(LISTFILE_DIRECTORY)/g850.lst
 	TARGET=g800 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORg800 -x$(OUTPUT_DIRECTORY)/g850b @$(LISTFILE_DIRECTORY)/g850b.lst
 
