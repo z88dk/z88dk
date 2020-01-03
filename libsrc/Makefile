@@ -22,7 +22,7 @@ all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	osca_clib.lib ozansi_clib.lib pacman_clib.lib p2000_clib.lib  \
 	pc6001_clib.lib pc88_clib.lib pps_clib.lib px4.lib px8.lib \
 	rex_clib.lib rx78_clib.lib sc3000_clib.lib sms_clib.lib lynx_clib.lib \
-	svi_clib.lib sam_clib.lib  sorcerer_clib.lib  sos_clib.lib tiki100.lib \
+	svi_clib.lib sam_clib.lib  srr_clib.lib  sos_clib.lib tiki100.lib \
 	trs80_clib.lib trsdos.lib vg5k_clib.lib vz_clib.lib  x07_clib.lib \
 	embedded_clib.lib test_clib.lib test8080_clib.lib testrcm_clib.lib testgbz80_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
 	pv1000_clib.lib pv2000_clib.lib coleco_clib.lib multi8_clib.lib alphatro_clib.lib  spc1000_clib.lib \
@@ -634,14 +634,14 @@ cpm_clib.lib:
 
 
 # Sorcerer Exidy lib - Stefano
-sorcerer_clib.lib:
+srr_clib.lib:
 	@echo ''
 	@echo '--- Building Sorcerer Exidy Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
 	$(call buildgeneric,srr)
 	$(MAKE) -C games TARGET=srr
-	TARGET=srr TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsorcerer -x$(OUTPUT_DIRECTORY)/sorcerer_clib @$(LISTFILE_DIRECTORY)/sorcerer.lst
+	TARGET=srr TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsorcerer -x$(OUTPUT_DIRECTORY)/srr_clib @$(LISTFILE_DIRECTORY)/srr.lst
 
 # Sharp MZ lib - Stefano
 mz_clib.lib:
@@ -688,7 +688,7 @@ ace_clib.lib:
 	@echo '--- Building Jupiter Ace Library ---'
 	@echo ''
 	$(call buildgeneric,ace)
-	$(MAKE) -C ace 
+	$(MAKE) -C target/ace 
 	$(MAKE) -C games TARGET=ace
 	TARGET=ace TYPE=z80 $(LIBLINKER) -DFORace -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/ace_clib.lib @$(LISTFILE_DIRECTORY)/ace.lst
 	@echo ''
@@ -1483,7 +1483,7 @@ sos_clib.lib:
 	@echo '--- Building S-OS (The Sentinel) Library ---'
 	@echo ''
 	$(call buildgeneric,sos)
-	$(MAKE) -C sos 
+	$(MAKE) -C target/sos 
 	TARGET=sos TYPE=z80 $(LIBLINKER) -DFORsos -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sos_clib.lib @$(LISTFILE_DIRECTORY)/sos.lst
 
 # OSCA / FLOS - Stefano
@@ -1585,7 +1585,6 @@ classic-clean:
 	$(RM) abc800/*.o
 	$(MAKE) -C enterprise clean
 	$(MAKE) -C psg clean
-	$(MAKE) -C sos clean
 	$(MAKE) -C threading/preempt clean
 	$(MAKE) -C sprites/software/sp1 clean
 	$(MAKE) -C sdcard clean

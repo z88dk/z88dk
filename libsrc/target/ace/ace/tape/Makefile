@@ -4,7 +4,7 @@
 # $Id: Makefile,v 1.1 2010-05-31 08:29:06 stefano Exp $
 #
 
-include ../../Make.config
+include ../../../../Make.config
 
 CIAFILES = \
 	tape_save.c

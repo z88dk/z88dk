@@ -4,7 +4,7 @@
 # $Id: Makefile,v 1.2 2014-01-14 07:48:41 stefano Exp $
 #
 
-include ../../Make.config
+include ../../../../Make.config
 
 CIAFILES = \
 	rnd_saveblock.c \
