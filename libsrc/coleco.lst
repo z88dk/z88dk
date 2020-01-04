@@ -1,7 +1,7 @@
 @stdio/ansicore.lst
-stdio/coleco/CRT_FONT
-stdio/coleco/fgetc_cons
-stdio/coleco/getk
+target/coleco/stdio/CRT_FONT
+target/coleco/stdio/fgetc_cons
+target/coleco/stdio/getk
 @stdio/stdio.lst
 @font/font_8x8/font_8x8.lst
 graphics/dcircle
@@ -11,7 +11,7 @@ graphics/getsprite
 @video/tms9918/video_tms9918_nmi.lst
 @gfxbase.lst
 psg/sn76489/bit_open
-games/coleco/joystick
+target/coleco/games/joystick
 games/obj/coleco/joystick_type
 @games/games.lst
 psg/sn76489/psg_tone

@@ -1,7 +1,7 @@
 graphics/dcircle
 graphics/clg
 graphics/text/clsgraph
-graphics/aquarius/textpixl
+target/aquarius/graphics/textpixl
 graphics/text/plotpixl
 graphics/text/respixl
 graphics/text/xorpixl

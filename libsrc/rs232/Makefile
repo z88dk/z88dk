@@ -1,7 +1,7 @@
 include ../Make.config
 
 
-SUBDIRS = osca  z88 cpc spectrum svi mtx
+SUBDIRS = osca  z88 cpc spectrum mtx
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
 all: subdirs-all

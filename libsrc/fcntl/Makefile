@@ -1,4 +1,4 @@
-SUBDIRS = cpm dummy gen_rnd msxdos2 nc100 newbrain osca spectrum sprinter trs80 zxvgs 
+SUBDIRS = cpm dummy gen_rnd msxdos2 newbrain osca spectrum zxvgs 
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
 include ../Make.config

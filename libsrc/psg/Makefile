@@ -16,27 +16,16 @@ AFILES = \
 	psg_tone_channels.c \
 	psg_volume.c \
 
-SIDFILES = \
-	c128/psg_init.c \
-	c128/psg_channels.c \
-	c128/psg_envelope.c \
-	c128/psg_noise.c \
-	c128/psg_tone.c \
-	c128/psg_volume.c
-
 AOBJECTS = $(AFILES:.c=.o)
-SIDOBJECTS = $(SIDFILES:.c=.o)
 
 .PHONY:	dirs
 
-all:    dirs $(addprefix obj/z80/, $(AOBJECTS)) $(addprefix obj/ixiy/, $(AOBJECTS)) $(addprefix obj/, $(SIDOBJECTS))
+all:    dirs $(addprefix obj/z80/, $(AOBJECTS)) $(addprefix obj/ixiy/, $(AOBJECTS)) 
 
 
-obj/c128/%.o: c128/%.c
-	$(ZCC) +c128 -mz80 $(CFLAGS) -o $@  $^
 
 dirs:
-	@mkdir -p obj/z80 obj/ixiy obj/c128
+	@mkdir -p obj/z80 obj/ixiy 
 
 clean:
 	$(RM) -fr obj

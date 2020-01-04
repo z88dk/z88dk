@@ -2,7 +2,7 @@ include ../../Make.config
 
 TARGET = svi
 
-SUBDIRS = svibios
+SUBDIRS = svibios rs232
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
 ASMFILES = $(wildcard *.asm)

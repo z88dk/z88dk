@@ -8,7 +8,7 @@ target/pasopia7/stdio/generic_console_ioctl
 @font/font_8x8/font_8x8.lst
 @stdio/stdio.lst
 @input/input_keyboard.lst
-games/pasopia7/joystick
+target/pasopia7/games/joystick
 @games/games.lst
 graphics/generic_console/getmaxx1
 graphics/generic_console/getmaxy1

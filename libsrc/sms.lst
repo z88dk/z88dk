@@ -1,4 +1,4 @@
-stdio/sms/fputc_cons
+target/sms/stdio/fputc_cons
 time/spectrum/clock
 target/sms/clear_vram
 target/sms/load_palette

@@ -1,5 +1,5 @@
 @stdio/ansicore.lst
-stdio/einstein/generic_console
+target/einstein/stdio/generic_console
 @font/font_8x8/font_8x8.lst
 graphics/dcircle
 graphics/lftscrol
@@ -9,9 +9,9 @@ graphics/getsprite
 graphics/liner
 @video/tms9918/video_tms9918.lst
 @gfxbase.lst
-psg/einstein/psg_init
-psg/einstein/get_psg
-psg/einstein/set_psg
-psg/einstein/set_psg_callee
+target/einstein/psg/psg_init
+target/einstein/psg/get_psg
+target/einstein/psg/set_psg
+target/einstein/psg/set_psg_callee
 @psg/psg.lst
 @video/mc6845/mc6845.lst

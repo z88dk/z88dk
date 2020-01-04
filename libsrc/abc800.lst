@@ -1,12 +1,12 @@
-stdio/abc800/fgetc_cons
-stdio/abc800/fputc_cons
-stdio/abc800/getk
+target/abc800/stdio/fgetc_cons
+target/abc800/stdio/fputc_cons
+target/abc800/stdio/getk
 @stdio/stdio.lst
 graphics/clg
-graphics/abc80/clsgraph
+target/abc80/graphics/clsgraph
 graphics/dcircle
-graphics/abc80/pixel
-graphics/abc80/pointxy
+target/abc80/graphics/pixel
+target/abc80/graphics/pointxy
 graphics/plotpixl_smc
 graphics/respixl_smc
 graphics/xorpixl_smc
@@ -18,6 +18,6 @@ graphics/stencil_render2
 graphics/swapgfxbk_foo
 @gfxbase.lst
 games/obj/${TARGET}/joystick
-abc800/abc_cursor
-abc800/abc_vdu
+target/abc800/abc800/abc_cursor
+target/abc800/abc800/abc_vdu
 @z80.lst

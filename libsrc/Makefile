@@ -22,7 +22,7 @@ all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	osca_clib.lib ozansi_clib.lib pacman_clib.lib p2000_clib.lib  \
 	pc6001_clib.lib pc88_clib.lib pps_clib.lib px4.lib px8.lib \
 	rex_clib.lib rx78_clib.lib sc3000_clib.lib sms_clib.lib lynx_clib.lib \
-	svi_clib.lib sam_clib.lib  sorcerer_clib.lib  sos_clib.lib tiki100.lib \
+	svi_clib.lib sam_clib.lib  srr_clib.lib  sos_clib.lib tiki100.lib \
 	trs80_clib.lib trsdos.lib vg5k_clib.lib vz_clib.lib  x07_clib.lib \
 	embedded_clib.lib test_clib.lib test8080_clib.lib testrcm_clib.lib testgbz80_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
 	pv1000_clib.lib pv2000_clib.lib coleco_clib.lib multi8_clib.lib alphatro_clib.lib  spc1000_clib.lib \
@@ -370,7 +370,7 @@ pps_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(call buildgeneric,pps)
-	$(MAKE) -C fcntl/sprinter
+	$(MAKE) -C target/pps
 	$(MAKE) -C target/zx
 	$(MAKE) -C games TARGET=pps
 	TARGET=pps TYPE=z80 $(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pps_clib @$(LISTFILE_DIRECTORY)/pps.lst
@@ -634,14 +634,14 @@ cpm_clib.lib:
 
 
 # Sorcerer Exidy lib - Stefano
-sorcerer_clib.lib:
+srr_clib.lib:
 	@echo ''
 	@echo '--- Building Sorcerer Exidy Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
 	$(call buildgeneric,srr)
 	$(MAKE) -C games TARGET=srr
-	TARGET=srr TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsorcerer -x$(OUTPUT_DIRECTORY)/sorcerer_clib @$(LISTFILE_DIRECTORY)/sorcerer.lst
+	TARGET=srr TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsorcerer -x$(OUTPUT_DIRECTORY)/srr_clib @$(LISTFILE_DIRECTORY)/srr.lst
 
 # Sharp MZ lib - Stefano
 mz_clib.lib:
@@ -688,7 +688,7 @@ ace_clib.lib:
 	@echo '--- Building Jupiter Ace Library ---'
 	@echo ''
 	$(call buildgeneric,ace)
-	$(MAKE) -C ace 
+	$(MAKE) -C target/ace 
 	$(MAKE) -C games TARGET=ace
 	TARGET=ace TYPE=z80 $(LIBLINKER) -DFORace -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/ace_clib.lib @$(LISTFILE_DIRECTORY)/ace.lst
 	@echo ''
@@ -793,7 +793,6 @@ svi_clib.lib:
 	$(MAKE) -C target/svi TARGET=svi
 	$(MAKE) -C video/tms9918 TARGET=svi
 	$(MAKE) -C psg
-	$(MAKE) -C rs232/svi
 	TARGET=svi TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsvi -x$(OUTPUT_DIRECTORY)/svi_clib @$(LISTFILE_DIRECTORY)/svi.lst
 	TARGET=svi TYPE=z80 $(LIBLINKER) -DFORsvi -x$(OUTPUT_DIRECTORY)/svibios @target/svi/arch_svibios.lst
 
@@ -875,6 +874,7 @@ einstein.lib:
 	@echo ''
 	$(MAKE) msxdeps
 	@$(RM) -f video/mc6845/*.o
+	$(MAKE) -C font
 	$(MAKE) -C games TARGET=cpm SUBTYPE=einstein
 	$(MAKE) -C video/tms9918 TARGET=cpm SUBTYPE=einstein
 	$(MAKE) -C psg
@@ -977,11 +977,6 @@ z9001_clib.lib:
 	$(call buildgeneric,z9001)
 	$(MAKE) -C games TARGET=z9001
 	TARGET=z9001 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz9001 -x$(OUTPUT_DIRECTORY)/z9001_clib @$(LISTFILE_DIRECTORY)/z9001.lst
-	@echo ''
-	@echo '--- Building Z9001 Standard Graphics Libraires ---'
-	@echo ''
-	$(MAKE) gfxdeps
-	TARGET=z9001 TYPE=z80 $(LIBLINKER) -DFORz9001 -x$(OUTPUT_DIRECTORY)/gfx9001 @$(LISTFILE_DIRECTORY)/gfx9001.lst
 	@echo ''
 	@echo '--- Building Z9001 KRT High Resolution libraires ---'
 	@echo ''
@@ -1208,7 +1203,7 @@ nc_clib.lib:
 	@echo '--- Building Amstrad NC100 Library ---'
 	@echo ''
 	$(call buildgeneric,nc)
-	$(MAKE) -C fcntl/nc100
+	$(MAKE) -C target/nc100
 	TARGET=nc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORnc -x$(OUTPUT_DIRECTORY)/nc_clib @$(LISTFILE_DIRECTORY)/nc100.lst
 	
 # NC-100 graphics lib - Stefano
@@ -1249,7 +1244,7 @@ cpcfs.lib:
 	@echo ''
 	@echo '--- Building Amstrad CPC fcntl Library ---'
 	@echo ''
-	$(MAKE) -C fcntl/cpc
+	$(MAKE) -C target/cpc/fcntl
 
 # Amstrad CPC maths libraries - Dom
 cpc_math.lib:
@@ -1342,6 +1337,7 @@ gal_clib.lib:
 	$(MAKE) -C games TARGET=gal
 	TARGET=gal TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgal -x$(OUTPUT_DIRECTORY)/gal_clib @$(LISTFILE_DIRECTORY)/gal.lst
 	$(MAKE) gfxdeps
+	$(RM) target/gal/graphics/*.o
 	TARGET=gal SUBTARGET=galtext TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgal -Dtextgraphics -x$(OUTPUT_DIRECTORY)/gfxgaltext @target/gal/gfxgaltext.lst
 
 # Sharp PC-G8xx/E2xx - Stefano Bodrato
@@ -1352,8 +1348,10 @@ g800_clib.lib:
 	$(call buildgeneric,g800)
 	$(MAKE) -C games TARGET=g800
 	$(MAKE) gfxdeps
+	$(RM) target/g800/graphics/*.o
 	TARGET=g800 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORg800 -x$(OUTPUT_DIRECTORY)/g800_clib @$(LISTFILE_DIRECTORY)/g800.lst
 	$(MAKE) gfxdeps
+	$(RM) target/g800/graphics/*.o
 	TARGET=g800 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORg800 -x$(OUTPUT_DIRECTORY)/g850_clib @$(LISTFILE_DIRECTORY)/g850.lst
 	TARGET=g800 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORg800 -x$(OUTPUT_DIRECTORY)/g850b @$(LISTFILE_DIRECTORY)/g850b.lst
 
@@ -1452,7 +1450,7 @@ trs80_clib.lib:
 	TARGET=eg2000 TYPE=z80 $(LIBLINKER) -DFOReg2000 -x$(OUTPUT_DIRECTORY)/gfxeg2000 @$(LISTFILE_DIRECTORY)/gfxeg2000.lst
 
 trsdos.lib:
-	$(MAKE) -C fcntl/trs80
+	$(MAKE) -C target/trs80/fcntl
 
 # Canon X-07 lib - Stefano
 x07_clib.lib:
@@ -1488,7 +1486,7 @@ sos_clib.lib:
 	@echo '--- Building S-OS (The Sentinel) Library ---'
 	@echo ''
 	$(call buildgeneric,sos)
-	$(MAKE) -C sos 
+	$(MAKE) -C target/sos 
 	TARGET=sos TYPE=z80 $(LIBLINKER) -DFORsos -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sos_clib.lib @$(LISTFILE_DIRECTORY)/sos.lst
 
 # OSCA / FLOS - Stefano
@@ -1559,7 +1557,6 @@ sp1-clean:
 clean: classic-clean new-clean
 
 classic-clean:
-	$(MAKE) -C ace clean
 	$(MAKE) -C assert clean
 	$(MAKE) -C cpm clean
 	$(MAKE) -C ctype clean
@@ -1590,7 +1587,6 @@ classic-clean:
 	$(RM) abc800/*.o
 	$(MAKE) -C enterprise clean
 	$(MAKE) -C psg clean
-	$(MAKE) -C sos clean
 	$(MAKE) -C threading/preempt clean
 	$(MAKE) -C sprites/software/sp1 clean
 	$(MAKE) -C sdcard clean

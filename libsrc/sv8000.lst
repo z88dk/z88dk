@@ -32,12 +32,12 @@ graphics/dfill
 graphics/getsprite
 graphics/stencil_render2
 @gfxbase.lst
-psg/sv8000/set_psg
-psg/sv8000/set_psg_callee
-psg/sv8000/get_psg
-psg/sv8000/psg_init
+target/sv8000/psg/set_psg
+target/sv8000/psg/set_psg_callee
+target/sv8000/psg/get_psg
+target/sv8000/psg/psg_init
 @psg/psg.lst
-games/sv8000/joystick
+target/sv8000/games/joystick
 games/obj/sv8000/joystick_type
 @games/games.lst
 @z80.lst
