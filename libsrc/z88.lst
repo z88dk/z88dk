@@ -1,11 +1,11 @@
 target/z88/stdio/fgets_cons
 @stdio/ansicore.lst
-stdio/ansi/z88/f_ansi_attr
-stdio/ansi/z88/f_ansi_bel
-stdio/ansi/z88/f_ansi_char
-stdio/ansi/z88/f_ansi_cls
-stdio/ansi/z88/f_ansi_dline
-stdio/ansi/z88/f_ansi_scrollup
+target/z88/stdio/ansi/f_ansi_attr
+target/z88/stdio/ansi/f_ansi_bel
+target/z88/stdio/ansi/f_ansi_char
+target/z88/stdio/ansi/f_ansi_cls
+target/z88/stdio/ansi/f_ansi_dline
+target/z88/stdio/ansi/f_ansi_scrollup
 target/z88/stdio/fgetc_cons
 target/z88/stdio/fputc_cons
 target/z88/stdio/getcmd

@@ -5,7 +5,7 @@ stdio/msx/fputc_cons
 @stdio/ansicore.lst
 @stdio/stdio_binary.lst
 time/msx/clock
-@fcntl/cpm/fcntl.lst
+@target/cpm/fcntl/fcntl.lst
 graphics/dcircle
 graphics/getsprite
 @video/tms9918/video_tms9918.lst

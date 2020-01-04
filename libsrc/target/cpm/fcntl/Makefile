@@ -1,9 +1,4 @@
-#
-# Wahey, a messed up makefile for building libraries!
-#
-# $Id: Makefile $
-
-include ../../Make.config
+include ../../../Make.config
 
 CFILES = \
 	_putoffset.c \

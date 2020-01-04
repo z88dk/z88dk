@@ -573,7 +573,7 @@ cpm_clib.lib:
 	@echo '--- Building CP/M Library ---'
 	@echo ''
 	$(call buildgeneric,cpm)
-	$(MAKE) -C fcntl/cpm
+	$(MAKE) -C target/cpm
 	TARGET=cpm TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm_clib @$(LISTFILE_DIRECTORY)/cpm.lst
 	@echo ''
 	@echo '--- Building CP/M Library (8080)---'
@@ -582,11 +582,11 @@ cpm_clib.lib:
 	@echo ''
 	@echo '--- Building CP/M Device fnctl Library ---'
 	@echo ''
-	TARGET=cpm TYPE=z80 DEVICE=device $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/cpmdevice @fcntl/cpm/fcntl.lst
+	TARGET=cpm TYPE=z80 DEVICE=device $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/cpmdevice @target/cpm/fcntl/fcntl.lst
 	@echo ''
 	@echo '--- Building CP/M Device fnctl Library (8080) ---'
 	@echo ''
-	TARGET=cpm TYPE=8080 DEVICE=device $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/cpmdevice @fcntl/cpm/fcntl.lst
+	TARGET=cpm TYPE=8080 DEVICE=device $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/cpmdevice @target/cpm/fcntl/fcntl.lst
 	@echo ''
 	@echo '--- Building Kaypro graphics Library ---'
 	@echo ''
@@ -792,7 +792,7 @@ msx_clib.lib:
 	@echo ''
 	$(MAKE) msxdeps
 	$(call buildgeneric,msx)
-	$(MAKE) -C fcntl/cpm
+	$(MAKE) -C target/cpm/fcntl
 	$(MAKE) -C fcntl/msxdos2
 	$(RM) games/msx/*.o
 	$(MAKE) -C games TARGET=msx
