@@ -27,7 +27,7 @@ all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	embedded_clib.lib test_clib.lib test8080_clib.lib testrcm_clib.lib testgbz80_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
 	pv1000_clib.lib pv2000_clib.lib coleco_clib.lib multi8_clib.lib alphatro_clib.lib  spc1000_clib.lib \
 	laser500_clib.lib super80_clib.lib super80_vduem_clib.lib \
-	adam.lib z80tvgame_clib.lib smc777.lib pasopia7_clib.lib sv8000_clib.lib \
+	adam.lib z80tvgame_clib.lib smc777_cpm.lib pasopia7_clib.lib sv8000_clib.lib \
 	excali64_clib.lib gb_clib.lib s1mp3_clib.lib bic.lib myvision_clib.lib pencil2_clib.lib \
 	preempt.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib tvc_clib.lib hemc_clib.lib \
 	kramermc_clib.lib hgmc_clib.lib
@@ -875,7 +875,7 @@ excali64_clib.lib:
 	TARGET=excali64 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORexcali64 -x$(OUTPUT_DIRECTORY)/excali64_cpm @$(LISTFILE_DIRECTORY)/target/excali64/excali64.lst
 
 # SMC-777 library 
-smc777.lib:
+smc777_cpm.lib:
 	@echo ''
 	@echo '--- Building Sony SMC-70/SMC-777 Library ---'
 	@echo ''
@@ -883,7 +883,7 @@ smc777.lib:
 	@$(RM) -f video/mc6845/*.o
 	$(MAKE) -C psg
 	$(MAKE) -C games TARGET=cpm SUBTYPE=smc777 TARGET_CFLAGS=-subtype=smc777
-	TARGET=smc777 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsmc777 -x$(OUTPUT_DIRECTORY)/smc777 @$(LISTFILE_DIRECTORY)/smc777.lst
+	TARGET=smc777 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsmc777 -x$(OUTPUT_DIRECTORY)/smc777_cpm @$(LISTFILE_DIRECTORY)/target/smc777/smc777_cpm.lst
 
 # A5105 library
 bic.lib:
@@ -1422,9 +1422,9 @@ trs80_clib.lib:
 	$(call buildgeneric,trs80)
 	$(MAKE) -C games TARGET=trs80
 	TARGET=trs80 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80_clib @$(LISTFILE_DIRECTORY)/trs80.lst
-	TARGET=trs80 TYPE=z80 $(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80cpm @$(LISTFILE_DIRECTORY)/target/trs80/trs80cpm.lst
+	TARGET=trs80 TYPE=z80 $(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80_cpm @$(LISTFILE_DIRECTORY)/target/trs80/trs80_cpm.lst
 	@echo ''
-	@echo '--- Building TRS 80 GFX libraires ---'
+	@echo '--- Building TRS 80 GFX Libraries ---'
 	@echo ''
 	$(MAKE) gfxdeps
 	TARGET=trs80 TYPE=z80 $(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/gfxtrs80 @$(LISTFILE_DIRECTORY)/target/trs80/gfxtrs80.lst
