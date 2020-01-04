@@ -10,3 +10,7 @@ target/attache/graphics/w_xorpixl
 target/attache/graphics/w_pointxy
 graphics/swapgfxbk_foo
 @gfxbasew.lst
+target/attache/psg/set_psg
+target/attache/psg/set_psg_callee
+target/attache/psg/psg_init
+@psg/psg.lst
