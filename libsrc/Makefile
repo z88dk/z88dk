@@ -277,9 +277,7 @@ zxvgs.lib:
 	@echo ''
 	@echo '--- Building ZXVGS Library ---'
 	@echo ''
-	$(MAKE) -C fcntl/zxvgs
-	$(MAKE) -C zxvgs
-	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/zxvgs @$(LISTFILE_DIRECTORY)/zxvgs.lst
+	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/zxvgs @$(LISTFILE_DIRECTORY)/target/zxvgs/zxvgs.lst
 
 # ZX Spectrum maths library - Stefano
 mzx.lib:
@@ -344,12 +342,12 @@ pc88_clib.lib:
 	@echo '--- Building PC8801 160x100 graphics Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	TARGET=pc88 TYPE=z80 $(LIBLINKER) -DFORpc88 -x$(OUTPUT_DIRECTORY)/gfxpc88 @$(LISTFILE_DIRECTORY)/gfxpc88.lst
+	TARGET=pc88 TYPE=z80 $(LIBLINKER) -DFORpc88 -x$(OUTPUT_DIRECTORY)/gfxpc88 @$(LISTFILE_DIRECTORY)/target/pc88/gfxpc88.lst
 	@echo ''
 	@echo '--- Building PC8801 640x200 Mono Graphics Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	TARGET=pc88 TYPE=z80 $(LIBLINKER) -DFORpc88hr200 -x$(OUTPUT_DIRECTORY)/gfxpc88hr200 @$(LISTFILE_DIRECTORY)/gfxpc88hr200.lst
+	TARGET=pc88 TYPE=z80 $(LIBLINKER) -DFORpc88hr200 -x$(OUTPUT_DIRECTORY)/gfxpc88hr200 @$(LISTFILE_DIRECTORY)/target/pc88/gfxpc88hr200.lst
 
 # Native for sprinter - dom
 pps_clib.lib:
@@ -369,7 +367,7 @@ px4.lib:
 	@echo '--- Building PX-4/HC-40 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	TARGET=px4 TYPE=z80 $(LIBLINKER) -DFORpx4 -x$(OUTPUT_DIRECTORY)/px4 @$(LISTFILE_DIRECTORY)/px4.lst
+	TARGET=px4 TYPE=z80 $(LIBLINKER) -DFORpx4 -x$(OUTPUT_DIRECTORY)/px4 @$(LISTFILE_DIRECTORY)/target/px4/px4.lst
 
 # Epson PX8 lib - Stefano	
 px8.lib:
@@ -377,7 +375,7 @@ px8.lib:
 	@echo '--- Building PX-8/Geneva Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	TARGET=px8 TYPE=z80 $(LIBLINKER) -DFORpx8 -x$(OUTPUT_DIRECTORY)/px8 @$(LISTFILE_DIRECTORY)/px8.lst
+	TARGET=px8 TYPE=z80 $(LIBLINKER) -DFORpx8 -x$(OUTPUT_DIRECTORY)/px8 @$(LISTFILE_DIRECTORY)/target/px8/px8.lst
 
 # VZ200/300 lib - Stefano
 vz_clib.lib:
@@ -700,7 +698,7 @@ aquarius_clib.lib:
 	@echo '--- Building Mattel Aquarius 80x48 Graphics lib ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	TARGET=aquarius TYPE=z80 $(LIBLINKER) -DFORaq48 -x$(OUTPUT_DIRECTORY)/gfxaq48 @$(LISTFILE_DIRECTORY)/gfxaq48.lst
+	TARGET=aquarius TYPE=z80 $(LIBLINKER) -DFORaq48 -x$(OUTPUT_DIRECTORY)/gfxaq48 @$(LISTFILE_DIRECTORY)/target/aquarius/gfxaq48.lst
 	
 # Aussie Byte library - Stefano
 aussie.lib:
@@ -709,7 +707,7 @@ aussie.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C games TARGET=cpm SUBTYPE=aussie
-	TARGET=aussie TYPE=z80 $(LIBLINKER) -DFORaussie -x$(OUTPUT_DIRECTORY)/aussie.lib @$(LISTFILE_DIRECTORY)/aussie.lst
+	TARGET=aussie TYPE=z80 $(LIBLINKER) -DFORaussie -x$(OUTPUT_DIRECTORY)/aussie.lib @$(LISTFILE_DIRECTORY)/target/aussie/aussie.lst
 
 # Applied Technology MicroBee library - Stefano
 bee_clib.lib:
@@ -727,7 +725,7 @@ microbee.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C games TARGET=bee
-	TARGET=bee TYPE=z80 $(LIBLINKER) -DFORbee -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/microbee.lib @$(LISTFILE_DIRECTORY)/beecpm.lst
+	TARGET=bee TYPE=z80 $(LIBLINKER) -DFORbee -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/microbee.lib @$(LISTFILE_DIRECTORY)/target/bee/beecpm.lst
 	TARGET=bee TYPE=z80 $(LIBLINKER) -DFORbee -x$(OUTPUT_DIRECTORY)/gfxbee.lib @$(LISTFILE_DIRECTORY)/target/bee/beegfx.lst
 	$(MAKE) gfxdeps
 	$(RM) target/bee/graphics/*.o
@@ -893,7 +891,7 @@ bic.lib:
 	@echo '--- Building A5105 Library ---'
 	@echo ''
 	$(MAKE) -C video/upd7220 TARGET=bic
-	TARGET=bic TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORbic -x$(OUTPUT_DIRECTORY)/bic @$(LISTFILE_DIRECTORY)/bic.lst
+	TARGET=bic TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORbic -x$(OUTPUT_DIRECTORY)/bic @$(LISTFILE_DIRECTORY)/target/bic/bic.lst
 
 # QX10 library
 qx10.lib:
@@ -968,7 +966,7 @@ z9001_clib.lib:
 	@echo '--- Building Z9001 KRT High Resolution libraires ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	TARGET=z9001 SUBTARGET=z9001krt TYPE=z80 $(LIBLINKER) -DFORz9001krt -x$(OUTPUT_DIRECTORY)/gfx9001krt @$(LISTFILE_DIRECTORY)/gfx9001krt.lst
+	TARGET=z9001 SUBTARGET=z9001krt TYPE=z80 $(LIBLINKER) -DFORz9001krt -x$(OUTPUT_DIRECTORY)/gfx9001krt @$(LISTFILE_DIRECTORY)/target/z9001/gfx9001krt.lst
 
 # Robotron HC900, KC85/2..KC85/5 library - Stefano
 kc_clib.lib:
@@ -1427,14 +1425,14 @@ trs80_clib.lib:
 	$(call buildgeneric,trs80)
 	$(MAKE) -C games TARGET=trs80
 	TARGET=trs80 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80_clib @$(LISTFILE_DIRECTORY)/trs80.lst
-	TARGET=trs80 TYPE=z80 $(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80cpm @$(LISTFILE_DIRECTORY)/trs80cpm.lst
+	TARGET=trs80 TYPE=z80 $(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80cpm @$(LISTFILE_DIRECTORY)/target/trs80/trs80cpm.lst
 	@echo ''
 	@echo '--- Building TRS 80 GFX libraires ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	TARGET=trs80 TYPE=z80 $(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/gfxtrs80 @$(LISTFILE_DIRECTORY)/gfxtrs80.lst
+	TARGET=trs80 TYPE=z80 $(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/gfxtrs80 @$(LISTFILE_DIRECTORY)/target/trs80/gfxtrs80.lst
 	$(MAKE) gfxdeps
-	TARGET=eg2000 TYPE=z80 $(LIBLINKER) -DFOReg2000 -x$(OUTPUT_DIRECTORY)/gfxeg2000 @$(LISTFILE_DIRECTORY)/gfxeg2000.lst
+	TARGET=eg2000 TYPE=z80 $(LIBLINKER) -DFOReg2000 -x$(OUTPUT_DIRECTORY)/gfxeg2000 @$(LISTFILE_DIRECTORY)/target/trs80/gfxeg2000.lst
 
 trsdos.lib:
 	$(MAKE) -C target/trs80/fcntl
