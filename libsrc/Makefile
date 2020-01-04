@@ -589,7 +589,7 @@ cpm_clib.lib:
 	@echo '--- Building Kaypro graphics Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	TARGET=kaypro TYPE=z80 $(LIBLINKER) -DFORkaypro -x$(OUTPUT_DIRECTORY)/gfxkp @$(LISTFILE_DIRECTORY)/gfxkp.lst
+	TARGET=kaypro TYPE=z80 $(LIBLINKER) -DFORkaypro -x$(OUTPUT_DIRECTORY)/gfxkp @$(LISTFILE_DIRECTORY)/target/kaypro84/gfxkp.lst
 	$(MAKE) gfxdeps
 	TARGET=kaypro SUBTARGET=kaypro83 TYPE=z80 $(LIBLINKER) -DFORkaypro83 -I$(Z88DK_LIB) -x$(OUTPUT_DIRECTORY)/gfxkp83 @$(LISTFILE_DIRECTORY)/target/kaypro83/gfxkp83.lst
 	@echo ''
@@ -872,7 +872,7 @@ excali64_clib.lib:
 	@$(RM) -f video/mc6845/*.o
 	$(call buildgeneric,excali64)
 	TARGET=excali64 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORexcali64 -x$(OUTPUT_DIRECTORY)/excali64_clib @$(LISTFILE_DIRECTORY)/excali64_clib.lst
-	TARGET=excali64 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORexcali64 -x$(OUTPUT_DIRECTORY)/excali64 @$(LISTFILE_DIRECTORY)/excali64.lst
+	TARGET=excali64 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORexcali64 -x$(OUTPUT_DIRECTORY)/excali64_cpm @$(LISTFILE_DIRECTORY)/target/excali64/excali64.lst
 
 # SMC-777 library 
 smc777.lib:
@@ -912,7 +912,7 @@ adam.lib:
 	$(MAKE) -C games TARGET=cpm SUBTYPE=coleco
 	$(MAKE) -C video/tms9918 TARGET=coleco
 	$(MAKE) -C psg
-	TARGET=coleco TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcoleco -DFORadam -x$(OUTPUT_DIRECTORY)/adam @$(LISTFILE_DIRECTORY)/adam.lst
+	TARGET=coleco TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcoleco -DFORadam -x$(OUTPUT_DIRECTORY)/adam @$(LISTFILE_DIRECTORY)/target/adam/adam.lst
 
 # SORD M5 library - Stefano
 m5_clib.lib:
@@ -1223,7 +1223,7 @@ cpc_clib.lib:
 	$(call buildgeneric,cpc)
 	$(MAKE) -C target/cpc
 	TARGET=cpc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcpc -x$(OUTPUT_DIRECTORY)/cpc_clib @$(LISTFILE_DIRECTORY)/cpc.lst
-	TARGET=cpc TYPE=z80 $(LIBLINKER) -DFORcpc -x$(OUTPUT_DIRECTORY)/cpccpm @$(LISTFILE_DIRECTORY)/cpccpm.lst
+	TARGET=cpc TYPE=z80 $(LIBLINKER) -DFORcpc -x$(OUTPUT_DIRECTORY)/cpccpm @$(LISTFILE_DIRECTORY)/target/cpc/cpc_cpm.lst
 
 cpcfs.lib:
 	@echo ''
@@ -1283,8 +1283,8 @@ newbrain_clib.lib:
 	$(MAKE) gfxdeps
 	$(call buildgeneric,newbrain)
 	$(MAKE) -C fcntl/newbrain
-	TARGET=newbrain TYPE=z80 $(LIBLINKER) -DFORnewbrain -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/newbrain_clib @$(LISTFILE_DIRECTORY)/newbrain.lst
-	TARGET=newbrain TYPE=z80 $(LIBLINKER) -DFORnewbrain -x$(OUTPUT_DIRECTORY)/nbcpm_clib @$(LISTFILE_DIRECTORY)/nbcpm.lst
+	TARGET=newbrain TYPE=z80 $(LIBLINKER) -DFORnewbrain -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/newbrain_clib @$(LISTFILE_DIRECTORY)/newbrain_clib.lst
+	TARGET=newbrain TYPE=z80 $(LIBLINKER) -DFORnewbrain -x$(OUTPUT_DIRECTORY)/newbrain_cpm @$(LISTFILE_DIRECTORY)/target/newbrain/newbrain_cpm.lst
 
 # TIKI-100 library - Stefano
 tiki100.lib:
@@ -1294,7 +1294,7 @@ tiki100.lib:
 	$(call buildgeneric,cpm)
 	$(MAKE) gfxdeps
 	$(MAKE) -C psg
-	TARGET=tiki100 TYPE=z80 $(LIBLINKER) -DFORtiki100 -x$(OUTPUT_DIRECTORY)/tiki100 @$(LISTFILE_DIRECTORY)/tiki100.lst
+	TARGET=tiki100 TYPE=z80 $(LIBLINKER) -DFORtiki100 -x$(OUTPUT_DIRECTORY)/tiki100 @$(LISTFILE_DIRECTORY)/target/tiki100/tiki100.lst
 	
 # RCM2/3000 lib
 rcmx000_clib.lib:
@@ -1321,9 +1321,6 @@ gal_clib.lib:
 	$(call buildgeneric,gal)
 	$(MAKE) -C games TARGET=gal
 	TARGET=gal TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgal -x$(OUTPUT_DIRECTORY)/gal_clib @$(LISTFILE_DIRECTORY)/gal.lst
-	$(MAKE) gfxdeps
-	$(RM) target/gal/graphics/*.o
-	TARGET=gal SUBTARGET=galtext TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgal -Dtextgraphics -x$(OUTPUT_DIRECTORY)/gfxgaltext @target/gal/gfxgaltext.lst
 
 # Sharp PC-G8xx/E2xx - Stefano Bodrato
 g800_clib.lib:
@@ -1556,7 +1553,6 @@ classic-clean:
 	$(MAKE) -C regex clean
 	$(MAKE) -C time clean
 	$(MAKE) -C z80_crt0s clean
-	$(MAKE) -C zxvgs clean
 	$(MAKE) -C adt clean
 	$(MAKE) -C adt-newlib clean
 	$(MAKE) -C alloc clean

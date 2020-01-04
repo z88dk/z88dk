@@ -13,4 +13,5 @@ target/newbrain/nb_putc
 target/newbrain/nb_puts
 target/newbrain/nb_putblock
 target/newbrain/nb_putval
-time/newbrain/clock
+target/newbrain/time/clock
+games/joystick
