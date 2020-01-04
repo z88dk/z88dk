@@ -1245,7 +1245,7 @@ cpcfs.lib:
 	@echo ''
 	@echo '--- Building Amstrad CPC fcntl Library ---'
 	@echo ''
-	$(MAKE) -C fcntl/cpc
+	$(MAKE) -C target/cpc/fcntl
 
 # Amstrad CPC maths libraries - Dom
 cpc_math.lib:
