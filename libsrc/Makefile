@@ -83,17 +83,6 @@ gfxdeps:
 	@$(RM) -f graphics/*.o
 	@$(RM) -f graphics/*/*.o
 
-#  short script to sort out ticalc dependencies
-tideps:
-	@$(RM) -f stdio/ticalc/*.o
-	@$(RM) -f stdio/ansi/ticalc/*.o
-	@$(RM) -f games/*.o
-	@$(RM) -f games/ticalc/*.o
-	@$(RM) -f graphics/*.o
-	@$(RM) -f graphics/*/*.o
-	@$(RM) -f graphics/ticalc/*.o
-	@$(RM) -f graphics/gray/*.o
-	@$(RM) -f graphics/gray/ticalc/*.o
 
 #  short script to sort out ticalc dependencies
 msxdeps:
@@ -210,7 +199,6 @@ z88_clib.lib:
 	$(MAKE) gfxdeps
 	$(call buildgeneric,z88)
 	$(MAKE) -C games TARGET=z88
-	$(MAKE) -C rs232/z88
 	$(MAKE) -C target/z88
 	TARGET=z88 TYPE=z80 $(LIBLINKER) -I$(Z88DK_LIB)/target/z88/def -DSTANDARDESCAPECHARS -DFORz88 -x$(OUTPUT_DIRECTORY)/z88_clib @$(LISTFILE_DIRECTORY)/z88.lst
 
@@ -517,12 +505,11 @@ mlambda_tiny.lib:
 
 # Texas Instrument's calculators: - stefano/henk
 # almost the same lib code with different -D flag set
-# that's why we force most of the lib code to be rebuilt (tideps.sh)
 ti82_clib.lib:
 	@echo ''
 	@echo '--- Building TI82 Library ---'
 	@echo ''
-	$(MAKE) tideps
+	$(MAKE) -C target/ticalc clean
 	$(call buildgeneric,ti82)
 	$(RM) games/ticalc/*.o
 	$(MAKE) -C games TARGET=ti82
@@ -532,7 +519,7 @@ ti83_clib.lib:
 	@echo ''
 	@echo '--- Building TI83 Library ---'
 	@echo ''
-	$(MAKE) tideps
+	$(MAKE) -C target/ticalc clean
 	$(call buildgeneric,ti83)
 	$(RM) -f games/ticalc/*.o
 	$(MAKE) -C games TARGET=ti83
@@ -542,7 +529,7 @@ ti83p_clib.lib:
 	@echo ''
 	@echo '--- Building TI83+ Library ---'
 	@echo ''
-	$(MAKE) tideps
+	$(MAKE) -C target/ticalc clean
 	$(call buildgeneric,ti8x)
 	$(RM) -f games/ticalc/*.o
 	$(MAKE) -C games TARGET=ti8x
@@ -552,7 +539,7 @@ ti85_clib.lib:
 	@echo ''
 	@echo '--- Building TI85 Library ---'
 	@echo ''
-	$(MAKE) tideps
+	$(MAKE) -C target/ticalc clean
 	$(call buildgeneric,ti85)
 	$(RM) -f games/ticalc/*.o
 	$(MAKE) -C games TARGET=ti85
@@ -562,7 +549,7 @@ ti86_clib.lib:
 	@echo ''
 	@echo '--- Building TI86 Library ---'
 	@echo ''
-	$(MAKE) tideps
+	$(MAKE) -C target/ticalc clean
 	$(call buildgeneric,ti86)
 	$(RM) -f games/ticalc/*.o
 	$(MAKE) -C games TARGET=ti86
@@ -574,10 +561,9 @@ ozansi_clib.lib:
 	@echo ''
 	@echo '--- Building Sharp OZ family ANSI Library ---'
 	@echo ''
-	$(RM) -f stdio/ansi/oz/f_ansi_char.o
 	$(MAKE) gfxdeps
 	$(call buildgeneric,oz)
-	$(MAKE) -C oz 
+	$(MAKE) -C target/oz 
 	$(MAKE) -C games TARGET=oz
 	TARGET=oz TYPE=z80 $(LIBLINKER) -DFORoz -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ozansi_clib @$(LISTFILE_DIRECTORY)/ozansi.lst
 
@@ -587,7 +573,7 @@ cpm_clib.lib:
 	@echo '--- Building CP/M Library ---'
 	@echo ''
 	$(call buildgeneric,cpm)
-	$(MAKE) -C fcntl/cpm
+	$(MAKE) -C target/cpm
 	TARGET=cpm TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm_clib @$(LISTFILE_DIRECTORY)/cpm.lst
 	@echo ''
 	@echo '--- Building CP/M Library (8080)---'
@@ -596,11 +582,11 @@ cpm_clib.lib:
 	@echo ''
 	@echo '--- Building CP/M Device fnctl Library ---'
 	@echo ''
-	TARGET=cpm TYPE=z80 DEVICE=device $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/cpmdevice @fcntl/cpm/fcntl.lst
+	TARGET=cpm TYPE=z80 DEVICE=device $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/cpmdevice @target/cpm/fcntl/fcntl.lst
 	@echo ''
 	@echo '--- Building CP/M Device fnctl Library (8080) ---'
 	@echo ''
-	TARGET=cpm TYPE=8080 DEVICE=device $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/cpmdevice @fcntl/cpm/fcntl.lst
+	TARGET=cpm TYPE=8080 DEVICE=device $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/cpmdevice @target/cpm/fcntl/fcntl.lst
 	@echo ''
 	@echo '--- Building Kaypro graphics Library ---'
 	@echo ''
@@ -743,13 +729,16 @@ microbee.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C games TARGET=bee
 	TARGET=bee TYPE=z80 $(LIBLINKER) -DFORbee -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/microbee.lib @$(LISTFILE_DIRECTORY)/beecpm.lst
-	TARGET=bee TYPE=z80 $(LIBLINKER) -DFORbee -x$(OUTPUT_DIRECTORY)/gfxbee.lib @$(LISTFILE_DIRECTORY)/beegfx.lst
+	TARGET=bee TYPE=z80 $(LIBLINKER) -DFORbee -x$(OUTPUT_DIRECTORY)/gfxbee.lib @$(LISTFILE_DIRECTORY)/target/bee/beegfx.lst
 	$(MAKE) gfxdeps
-	TARGET=bee SUBTARGET=hr TYPE=z80 $(LIBLINKER) -DFORbeehr -x$(OUTPUT_DIRECTORY)/gfxbee640.lib @$(LISTFILE_DIRECTORY)/beegfxhr.lst
+	$(RM) target/bee/graphics/*.o
+	TARGET=bee SUBTARGET=hr TYPE=z80 $(LIBLINKER) -DFORbeehr -x$(OUTPUT_DIRECTORY)/gfxbee640.lib @$(LISTFILE_DIRECTORY)/target/bee/beegfxhr.lst
 	$(MAKE) gfxdeps
-	TARGET=bee SUBTARGET=hr320 TYPE=z80 $(LIBLINKER) -DFORbeehr320 -x$(OUTPUT_DIRECTORY)/gfxbee320.lib @$(LISTFILE_DIRECTORY)/beegfxhr320.lst
+	$(RM) target/bee/graphics/*.o
+	TARGET=bee SUBTARGET=hr320 TYPE=z80 $(LIBLINKER) -DFORbeehr320 -x$(OUTPUT_DIRECTORY)/gfxbee320.lib @$(LISTFILE_DIRECTORY)/target/bee/beegfxhr320.lst
 	$(MAKE) gfxdeps
-	$(LIBLINKER) -DFORbeehr512 -x$(OUTPUT_DIRECTORY)/gfxbee512.lib @$(LISTFILE_DIRECTORY)/beegfxhr512.lst
+	$(RM) target/bee/graphics/*.o
+	$(LIBLINKER) -DFORbeehr512 -x$(OUTPUT_DIRECTORY)/gfxbee512.lib @$(LISTFILE_DIRECTORY)/target/bee/beegfxhr512.lst
 
 # Philips Videopac C7420 library - Stefano
 c7420_clib.lib:
@@ -803,7 +792,7 @@ msx_clib.lib:
 	@echo ''
 	$(MAKE) msxdeps
 	$(call buildgeneric,msx)
-	$(MAKE) -C fcntl/cpm
+	$(MAKE) -C target/cpm/fcntl
 	$(MAKE) -C fcntl/msxdos2
 	$(RM) games/msx/*.o
 	$(MAKE) -C games TARGET=msx
@@ -819,11 +808,10 @@ mtx_clib.lib:
 	@echo '--- Building Memotech MTX Library ---'
 	@echo ''
 	$(MAKE) msxdeps
-	$(MAKE) -C games TARGET=mtx
 	$(call buildgeneric,mtx)
 	$(MAKE) -C games TARGET=mtx
 	$(MAKE) -C video/tms9918 TARGET=mtx
-	$(MAKE) -C rs232/mtx
+	$(MAKE) -C target/mtx/rs232
 	TARGET=mtx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmtx -x$(OUTPUT_DIRECTORY)/mtx_clib @$(LISTFILE_DIRECTORY)/mtx.lst
 
 # Videoton TV Computer library - Sandor
@@ -846,7 +834,7 @@ enterprise_clib.lib:
 	$(MAKE) gfxdeps
 	$(call buildgeneric,enterprise)
 	$(MAKE) -C games TARGET=enterprise
-	$(MAKE) -C enterprise 
+	$(MAKE) -C target/enterprise
 	TARGET=enterprise TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORenterprise -x$(OUTPUT_DIRECTORY)/enterprise_clib @$(LISTFILE_DIRECTORY)/enterprise.lst
 
 # Enterprise graphics lib - Stefano
@@ -855,8 +843,8 @@ gfxep.lib:
 	@echo '--- Building Enterprise 64/128 Graphics Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C graphics lenterprise
-	TARGET=enterprise TYPE=z80 $(LIBLINKER) -DFORenterprise -x$(OUTPUT_DIRECTORY)/gfxep @$(LISTFILE_DIRECTORY)/gfxep.lst
+	$(MAKE) -C target/enterprise/graphics
+	TARGET=enterprise TYPE=z80 $(LIBLINKER) -DFORenterprise -x$(OUTPUT_DIRECTORY)/gfxep @$(LISTFILE_DIRECTORY)/target/enterprise/gfxep.lst
 
 # Enterprise HRG graphics lib - Stefano
 gfxephr.lib:
@@ -864,8 +852,8 @@ gfxephr.lib:
 	@echo '--- Building Enterprise 64/128 High Resolution Graphics Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C graphics lenterprisehr
-	TARGET=enterprise SUBTARGET=enterprisehr TYPE=z80 $(LIBLINKER) -DFORenterprisehr -x$(OUTPUT_DIRECTORY)/gfxephr @$(LISTFILE_DIRECTORY)/gfxephr.lst
+	$(MAKE) -C target/enterprise/graphics
+	TARGET=enterprise SUBTARGET=enterprisehr TYPE=z80 $(LIBLINKER) -DFORenterprisehr -x$(OUTPUT_DIRECTORY)/gfxephr @$(LISTFILE_DIRECTORY)/target/enterprise/gfxephr.lst
 
 # Einstein library - Stefano
 einstein.lib:
@@ -1236,7 +1224,7 @@ cpc_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(call buildgeneric,cpc)
-	$(MAKE) -C target/cpc/fcntl
+	$(MAKE) -C target/cpc
 	TARGET=cpc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcpc -x$(OUTPUT_DIRECTORY)/cpc_clib @$(LISTFILE_DIRECTORY)/cpc.lst
 	TARGET=cpc TYPE=z80 $(LIBLINKER) -DFORcpc -x$(OUTPUT_DIRECTORY)/cpccpm @$(LISTFILE_DIRECTORY)/cpccpm.lst
 
@@ -1558,7 +1546,6 @@ clean: classic-clean new-clean
 
 classic-clean:
 	$(MAKE) -C assert clean
-	$(MAKE) -C cpm clean
 	$(MAKE) -C ctype clean
 	$(MAKE) -C fcntl clean
 	$(MAKE) -C math clean
@@ -1580,12 +1567,10 @@ classic-clean:
 	$(MAKE) -C algorithm clean
 	$(MAKE) -C debug clean
 	$(MAKE) -C osca clean
-	$(MAKE) -C oz clean
 	$(MAKE) -C lib3d clean
 	$(MAKE) -C input clean	
 	$(RM) abc80/*.o
 	$(RM) abc800/*.o
-	$(MAKE) -C enterprise clean
 	$(MAKE) -C psg clean
 	$(MAKE) -C threading/preempt clean
 	$(MAKE) -C sprites/software/sp1 clean

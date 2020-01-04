@@ -2,7 +2,7 @@ include ../../Make.config
 
 TARGET = cpc
 
-SUBDIRS = fcntl
+SUBDIRS = fcntl rs232
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
 ASMFILES = $(wildcard *.asm)

@@ -4,7 +4,7 @@ target/super80/stdio/generic_console_vduem
 target/super80/stdio/generic_console_vduem_ioctl
 target/super80/stdio/conio_map_colour
 target/super80/stdio/CRT_FONT
-stdio/bee/copy_font
+target/shared/copy_font
 @font/font_8x8/font_8x8.lst
 graphics/generic_console/plotpixl
 graphics/generic_console/respixl

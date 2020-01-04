@@ -2,7 +2,7 @@ include ../../Make.config
 
 TARGET = z88
 
-SUBDIRS = z88 net time fcntl
+SUBDIRS = z88 net time fcntl rs232
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
 all: subdirs-all 
