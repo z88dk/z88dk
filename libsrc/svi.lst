@@ -1,7 +1,7 @@
 stdio/msx/fgetc_cons
 stdio/msx/getk
 stdio/msx/fputc_cons
-stdio/svi/generic_console
+target/svi/stdio/generic_console
 @font/font_8x8/font_8x8.lst
 @stdio/ansicore.lst
 @stdio/stdio.lst
@@ -11,8 +11,8 @@ graphics/dcircle
 graphics/getsprite
 @video/tms9918/video_tms9918.lst
 @gfxbase.lst
-games/svi/joystick
-games/svi/keys_joystick
+target/svi/games/joystick
+target/svi/games/keys_joystick
 games/msx/bit_open
 games/msx/bit_open_di
 games/msx/bit_close
@@ -24,10 +24,10 @@ psg/msx/set_psg
 psg/msx/set_psg_callee
 @psg/psg.lst
 @video/mc6845/mc6845.lst
-rs232/svi/rs232_close
-rs232/svi/rs232_get
-rs232/svi/rs232_init
-rs232/svi/rs232_params
-rs232/svi/rs232_put
+target/svi/rs232/rs232_close
+target/svi/rs232/rs232_get
+target/svi/rs232/rs232_init
+target/svi/rs232/rs232_params
+target/svi/rs232/rs232_put
 @target/svi/arch_svi.lst
 @z80.lst

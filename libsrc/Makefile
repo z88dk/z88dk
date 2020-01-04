@@ -793,7 +793,6 @@ svi_clib.lib:
 	$(MAKE) -C target/svi TARGET=svi
 	$(MAKE) -C video/tms9918 TARGET=svi
 	$(MAKE) -C psg
-	$(MAKE) -C rs232/svi
 	TARGET=svi TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsvi -x$(OUTPUT_DIRECTORY)/svi_clib @$(LISTFILE_DIRECTORY)/svi.lst
 	TARGET=svi TYPE=z80 $(LIBLINKER) -DFORsvi -x$(OUTPUT_DIRECTORY)/svibios @target/svi/arch_svibios.lst
 
