@@ -562,10 +562,9 @@ ozansi_clib.lib:
 	@echo ''
 	@echo '--- Building Sharp OZ family ANSI Library ---'
 	@echo ''
-	$(RM) -f stdio/ansi/oz/f_ansi_char.o
 	$(MAKE) gfxdeps
 	$(call buildgeneric,oz)
-	$(MAKE) -C oz 
+	$(MAKE) -C target/oz 
 	$(MAKE) -C games TARGET=oz
 	TARGET=oz TYPE=z80 $(LIBLINKER) -DFORoz -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ozansi_clib @$(LISTFILE_DIRECTORY)/ozansi.lst
 
@@ -1567,7 +1566,6 @@ classic-clean:
 	$(MAKE) -C algorithm clean
 	$(MAKE) -C debug clean
 	$(MAKE) -C osca clean
-	$(MAKE) -C oz clean
 	$(MAKE) -C lib3d clean
 	$(MAKE) -C input clean	
 	$(RM) abc80/*.o

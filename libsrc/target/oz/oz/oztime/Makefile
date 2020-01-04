@@ -3,7 +3,7 @@
 #
 # $Id: Makefile,v 1.5 2014-06-02 12:29:57 stefano Exp $
 
-include ../../Make.config
+include ../../../../Make.config
 
 CFILES = $(wildcard *.c)
 OFILES = $(CFILES:.c=.o)
