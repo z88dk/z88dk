@@ -1546,7 +1546,6 @@ clean: classic-clean new-clean
 
 classic-clean:
 	$(MAKE) -C assert clean
-	$(MAKE) -C cpm clean
 	$(MAKE) -C ctype clean
 	$(MAKE) -C fcntl clean
 	$(MAKE) -C math clean
