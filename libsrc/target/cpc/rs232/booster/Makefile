@@ -3,7 +3,7 @@
 #
 # $Id: Makefile,v 1.3 2016-07-02 15:42:55 dom Exp $
 
-include ../../../Make.config
+include ../../../../Make.config
 
 all: $(OUTPUT_DIRECTORY)/rs232cpc_booster.lib
 

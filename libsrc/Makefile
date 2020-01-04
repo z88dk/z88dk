@@ -199,7 +199,6 @@ z88_clib.lib:
 	$(MAKE) gfxdeps
 	$(call buildgeneric,z88)
 	$(MAKE) -C games TARGET=z88
-	$(MAKE) -C rs232/z88
 	$(MAKE) -C target/z88
 	TARGET=z88 TYPE=z80 $(LIBLINKER) -I$(Z88DK_LIB)/target/z88/def -DSTANDARDESCAPECHARS -DFORz88 -x$(OUTPUT_DIRECTORY)/z88_clib @$(LISTFILE_DIRECTORY)/z88.lst
 
@@ -1225,7 +1224,7 @@ cpc_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(call buildgeneric,cpc)
-	$(MAKE) -C target/cpc/fcntl
+	$(MAKE) -C target/cpc
 	TARGET=cpc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcpc -x$(OUTPUT_DIRECTORY)/cpc_clib @$(LISTFILE_DIRECTORY)/cpc.lst
 	TARGET=cpc TYPE=z80 $(LIBLINKER) -DFORcpc -x$(OUTPUT_DIRECTORY)/cpccpm @$(LISTFILE_DIRECTORY)/cpccpm.lst
 

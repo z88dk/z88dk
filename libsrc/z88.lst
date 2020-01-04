@@ -47,11 +47,11 @@ target/z88/games/bit_close
 target/z88/games/bit_close_ei
 target/z88/games/beeper
 @games/games.lst
-rs232/z88/rs232_close
-rs232/z88/rs232_get
-rs232/z88/rs232_init
-rs232/z88/rs232_params
-rs232/z88/rs232_put
+target/z88/rs232/rs232_close
+target/z88/rs232/rs232_get
+target/z88/rs232/rs232_init
+target/z88/rs232/rs232_params
+target/z88/rs232/rs232_put
 target/z88/z88/di
 target/z88/z88/ei
 target/z88/z88/freescr
