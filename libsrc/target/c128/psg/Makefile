@@ -1,8 +1,8 @@
-include ../../Make.config
+include ../../../Make.config
 
 TARGET = c128
 
-SUBDIRS = psg
+SUBDIRS = 
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
 CFILES = $(wildcard *.c)
