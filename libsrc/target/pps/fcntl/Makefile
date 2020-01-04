@@ -1,9 +1,4 @@
-#
-# Wahey, a messed up makefile for building libraries!
-#
-# $Id: Makefile,v 1.6 2016-06-14 07:07:53 dom Exp $
-
-include ../../Make.config
+include ../../../Make.config
 
 CFILES = \
 	close.c      \
@@ -19,7 +14,7 @@ CFILES = \
 AFILES  = $(CFILES:.c=.asm)
 OBJECTS = $(CFILES:.c=.o)
 
-z88_fcntl: $(OBJECTS)
+all: $(OBJECTS)
 
 .c.o:
 	$(ZCC) +pps $(CFLAGS) $*.c

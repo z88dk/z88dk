@@ -370,7 +370,7 @@ pps_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(call buildgeneric,pps)
-	$(MAKE) -C fcntl/sprinter
+	$(MAKE) -C target/pps
 	$(MAKE) -C target/zx
 	$(MAKE) -C games TARGET=pps
 	TARGET=pps TYPE=z80 $(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pps_clib @$(LISTFILE_DIRECTORY)/pps.lst
