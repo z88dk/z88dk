@@ -1,6 +1,6 @@
 # $Id: Makefile $
 
-include ../../Make.config
+include ../../../Make.config
 
 CFILES = \
 	syserrlist.c   \
