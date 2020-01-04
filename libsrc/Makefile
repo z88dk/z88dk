@@ -83,17 +83,6 @@ gfxdeps:
 	@$(RM) -f graphics/*.o
 	@$(RM) -f graphics/*/*.o
 
-#  short script to sort out ticalc dependencies
-tideps:
-	@$(RM) -f stdio/ticalc/*.o
-	@$(RM) -f stdio/ansi/ticalc/*.o
-	@$(RM) -f games/*.o
-	@$(RM) -f games/ticalc/*.o
-	@$(RM) -f graphics/*.o
-	@$(RM) -f graphics/*/*.o
-	@$(RM) -f graphics/ticalc/*.o
-	@$(RM) -f graphics/gray/*.o
-	@$(RM) -f graphics/gray/ticalc/*.o
 
 #  short script to sort out ticalc dependencies
 msxdeps:
@@ -517,12 +506,11 @@ mlambda_tiny.lib:
 
 # Texas Instrument's calculators: - stefano/henk
 # almost the same lib code with different -D flag set
-# that's why we force most of the lib code to be rebuilt (tideps.sh)
 ti82_clib.lib:
 	@echo ''
 	@echo '--- Building TI82 Library ---'
 	@echo ''
-	$(MAKE) tideps
+	$(MAKE) -C target/ticalc clean
 	$(call buildgeneric,ti82)
 	$(RM) games/ticalc/*.o
 	$(MAKE) -C games TARGET=ti82
@@ -532,7 +520,7 @@ ti83_clib.lib:
 	@echo ''
 	@echo '--- Building TI83 Library ---'
 	@echo ''
-	$(MAKE) tideps
+	$(MAKE) -C target/ticalc clean
 	$(call buildgeneric,ti83)
 	$(RM) -f games/ticalc/*.o
 	$(MAKE) -C games TARGET=ti83
@@ -542,7 +530,7 @@ ti83p_clib.lib:
 	@echo ''
 	@echo '--- Building TI83+ Library ---'
 	@echo ''
-	$(MAKE) tideps
+	$(MAKE) -C target/ticalc clean
 	$(call buildgeneric,ti8x)
 	$(RM) -f games/ticalc/*.o
 	$(MAKE) -C games TARGET=ti8x
@@ -552,7 +540,7 @@ ti85_clib.lib:
 	@echo ''
 	@echo '--- Building TI85 Library ---'
 	@echo ''
-	$(MAKE) tideps
+	$(MAKE) -C target/ticalc clean
 	$(call buildgeneric,ti85)
 	$(RM) -f games/ticalc/*.o
 	$(MAKE) -C games TARGET=ti85
@@ -562,7 +550,7 @@ ti86_clib.lib:
 	@echo ''
 	@echo '--- Building TI86 Library ---'
 	@echo ''
-	$(MAKE) tideps
+	$(MAKE) -C target/ticalc clean
 	$(call buildgeneric,ti86)
 	$(RM) -f games/ticalc/*.o
 	$(MAKE) -C games TARGET=ti86

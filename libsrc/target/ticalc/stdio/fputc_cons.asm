@@ -12,7 +12,7 @@
 	SECTION code_clib
 	PUBLIC	fputc_cons_native
 
-	INCLUDE	"stdio/ansi/ticalc/ticalc.inc"
+	INCLUDE	"target/ticalc/stdio/ansi/ticalc.inc"
 
 .fputc_cons_native
 	ld	hl,2

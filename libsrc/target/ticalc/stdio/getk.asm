@@ -16,7 +16,7 @@
 		EXTERN	tidi
 		EXTERN	tiei
 
-		INCLUDE	"stdio/ansi/ticalc/ticalc.inc"
+		INCLUDE	"target/ticalc/stdio/ansi/ticalc.inc"
 
 .getk
 ._getk

@@ -44,7 +44,7 @@
 ; 4 dots: MAX 32 columns
 ; 3 dots: MAX 42 columns
 
-	INCLUDE	"stdio/ansi/ticalc/ticalc.inc"
+	INCLUDE	"target/ticalc/stdio/ansi/ticalc.inc"
 	
 	PUBLIC	ansi_CHAR
 	

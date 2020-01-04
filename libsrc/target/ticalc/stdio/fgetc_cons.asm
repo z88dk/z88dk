@@ -16,7 +16,7 @@
 		EXTERN	tiei
 		EXTERN	tidi
 
-		INCLUDE	"stdio/ansi/ticalc/ticalc.inc"
+		INCLUDE	"target/ticalc/stdio/ansi/ticalc.inc"
 
 .fgetc_cons
 ._fgetc_cons

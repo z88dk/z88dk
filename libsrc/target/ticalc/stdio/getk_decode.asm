@@ -12,7 +12,7 @@
         	SECTION code_clib
 		PUBLIC	getk_decode
 
-		INCLUDE	"stdio/ansi/ticalc/ticalc.inc"
+		INCLUDE	"target/ticalc/stdio/ansi/ticalc.inc"
 
 .getk_decode
 
@@ -120,26 +120,26 @@ defb	0
 
 ; TI82 ROM key handler
 ;IF FORti82
-;	INCLUDE	"stdio/ticalc/ti82tab.inc"
+;	INCLUDE	"target/ticalc/stdio/ti82tab.inc"
 ;ENDIF
 
 ; CRASH re-written key handler
 IF FORti82
-	INCLUDE	"stdio/ticalc/ti82crtab.inc"
+	INCLUDE	"target/ticalc/stdio/ti82crtab.inc"
 ENDIF
 
 IF FORti83
-	INCLUDE	"stdio/ticalc/ti83tab.inc"
+	INCLUDE	"target/ticalc/stdio/ti83tab.inc"
 ENDIF
 
 IF FORti83p
-	INCLUDE	"stdio/ticalc/ti83tab.inc"
+	INCLUDE	"target/ticalc/stdio/ti83tab.inc"
 ENDIF
 
 IF FORti85
-	INCLUDE	"stdio/ticalc/ti85tab.inc"
+	INCLUDE	"target/ticalc/stdio/ti85tab.inc"
 ENDIF
 
 IF FORti86
-	INCLUDE	"stdio/ticalc/ti86tab.inc"
+	INCLUDE	"target/ticalc/stdio/ti86tab.inc"
 ENDIF
