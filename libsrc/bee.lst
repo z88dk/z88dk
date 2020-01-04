@@ -13,7 +13,7 @@ target/bee/stdio/generic_console_ioctl
 target/bee/stdio/conio_map_colour
 target/bee/stdio/conio_vars
 target/bee/stdio/CRT_FONT
-target/bee/stdio/copy_font
+target/shared/copy_font
 @font/font_8x8/font_8x8.lst
 @stdio/stdio.lst
 target/bee/games/joystick
