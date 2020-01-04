@@ -30,7 +30,7 @@ graphics/dcircle
 graphics/fill
 graphics/getsprite
 @gfxbase.lst
-games/rx78/joystick
-games/rx78/keys_joystick
+target/rx78/games/joystick
+target/rx78/games/keys_joystick
 @games/games.lst
 @z80.lst

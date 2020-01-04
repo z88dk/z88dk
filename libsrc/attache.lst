@@ -1,4 +1,4 @@
-psg/attache/set_psg
-psg/attache/set_psg_callee
-psg/attache/psg_init
+target/attache/psg/set_psg
+target/attache/psg/set_psg_callee
+target/attache/psg/psg_init
 @psg/psg.lst

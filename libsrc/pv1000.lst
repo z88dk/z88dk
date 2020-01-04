@@ -2,7 +2,7 @@ target/pv1000/stdio/generic_console
 target/pv1000/stdio/fgetc_cons
 target/pv1000/stdio/getk
 @stdio/stdio.lst
-games/pv1000/joystick
+target/pv1000/games/joystick
 games/obj/pv1000/joystick_type
 graphics/dcircle
 graphics/clg

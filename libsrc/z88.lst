@@ -41,11 +41,11 @@ target/z88/stdlib/sleep
 target/z88/time/clock
 target/z88/time/time
 games/joystick
-games/z88/bit_open
-games/z88/bit_open_di
-games/z88/bit_close
-games/z88/bit_close_ei
-games/z88/beeper
+target/z88/games/bit_open
+target/z88/games/bit_open_di
+target/z88/games/bit_close
+target/z88/games/bit_close_ei
+target/z88/games/beeper
 @games/games.lst
 rs232/z88/rs232_close
 rs232/z88/rs232_get
@@ -80,8 +80,8 @@ target/z88/z88/fnexpand
 graphics/dcircle
 graphics/clg
 graphics/clsgraph
-graphics/z88/closegfx
-graphics/z88/clrarea
+target/z88/graphics/closegfx
+target/z88/graphics/clrarea
 graphics/plotpixl
 graphics/respixl
 graphics/xorpixl
@@ -92,10 +92,10 @@ graphics/getsprite
 graphics/putsprite2
 graphics/bksave
 graphics/bkrestore
-graphics/z88/pixladdr
-graphics/z88/swapgfxbk
+target/z88/graphics/pixladdr
+target/z88/graphics/swapgfxbk
 graphics/stencil_render
-graphics/z88/window
+target/z88/graphics/window
 @gfxbase.lst
 @z80.lst
 

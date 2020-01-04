@@ -49,11 +49,11 @@ target/vz/graphics/pointxy_MODE1
 target/vz/graphics/swapgfxbk
 target/vz/graphics/textpixl
 @gfxbase.lst
-games/vz/bit_open
-games/vz/bit_open_di
-games/vz/bit_close
-games/vz/bit_close_ei
-games/vz/joystick
+target/vz/games/bit_open
+target/vz/games/bit_open_di
+target/vz/games/bit_close
+target/vz/games/bit_close_ei
+target/vz/games/joystick
 @games/games_mwr.lst
 @input/input_keyboard.lst
 target/vz/vz_bgrd
