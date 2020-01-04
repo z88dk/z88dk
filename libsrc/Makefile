@@ -1451,7 +1451,7 @@ trs80_clib.lib:
 	TARGET=eg2000 TYPE=z80 $(LIBLINKER) -DFOReg2000 -x$(OUTPUT_DIRECTORY)/gfxeg2000 @$(LISTFILE_DIRECTORY)/gfxeg2000.lst
 
 trsdos.lib:
-	$(MAKE) -C fcntl/trs80
+	$(MAKE) -C target/trs80/fcntl
 
 # Canon X-07 lib - Stefano
 x07_clib.lib:
