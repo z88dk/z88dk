@@ -4,7 +4,7 @@
 # $Id: Makefile,v 1.1 2011-04-01 06:50:45 stefano Exp $
 #
 
-include ../../Make.config
+include ../../../Make.config
 
 EPFILES = \
 	clg.c circle.c uncircle.c setxy.c fill.c \

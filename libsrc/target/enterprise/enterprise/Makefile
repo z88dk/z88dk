@@ -4,7 +4,7 @@
 # $Id: Makefile,v 1.2 2011-03-15 14:34:08 stefano Exp $
 #
 
-include ../Make.config
+include ../../../Make.config
 
 
 AFILES = \

@@ -832,7 +832,7 @@ enterprise_clib.lib:
 	$(MAKE) gfxdeps
 	$(call buildgeneric,enterprise)
 	$(MAKE) -C games TARGET=enterprise
-	$(MAKE) -C enterprise 
+	$(MAKE) -C target/enterprise
 	TARGET=enterprise TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORenterprise -x$(OUTPUT_DIRECTORY)/enterprise_clib @$(LISTFILE_DIRECTORY)/enterprise.lst
 
 # Enterprise graphics lib - Stefano
@@ -841,8 +841,8 @@ gfxep.lib:
 	@echo '--- Building Enterprise 64/128 Graphics Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C graphics lenterprise
-	TARGET=enterprise TYPE=z80 $(LIBLINKER) -DFORenterprise -x$(OUTPUT_DIRECTORY)/gfxep @$(LISTFILE_DIRECTORY)/gfxep.lst
+	$(MAKE) -C target/enterprise/graphics
+	TARGET=enterprise TYPE=z80 $(LIBLINKER) -DFORenterprise -x$(OUTPUT_DIRECTORY)/gfxep @$(LISTFILE_DIRECTORY)/target/enterprise/gfxep.lst
 
 # Enterprise HRG graphics lib - Stefano
 gfxephr.lib:
@@ -850,8 +850,8 @@ gfxephr.lib:
 	@echo '--- Building Enterprise 64/128 High Resolution Graphics Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C graphics lenterprisehr
-	TARGET=enterprise SUBTARGET=enterprisehr TYPE=z80 $(LIBLINKER) -DFORenterprisehr -x$(OUTPUT_DIRECTORY)/gfxephr @$(LISTFILE_DIRECTORY)/gfxephr.lst
+	$(MAKE) -C target/enterprise/graphics
+	TARGET=enterprise SUBTARGET=enterprisehr TYPE=z80 $(LIBLINKER) -DFORenterprisehr -x$(OUTPUT_DIRECTORY)/gfxephr @$(LISTFILE_DIRECTORY)/target/enterprise/gfxephr.lst
 
 # Einstein library - Stefano
 einstein.lib:
@@ -1570,7 +1570,6 @@ classic-clean:
 	$(MAKE) -C input clean	
 	$(RM) abc80/*.o
 	$(RM) abc800/*.o
-	$(MAKE) -C enterprise clean
 	$(MAKE) -C psg clean
 	$(MAKE) -C threading/preempt clean
 	$(MAKE) -C sprites/software/sp1 clean

@@ -9,12 +9,6 @@ lc128:
 	$(MAKE) -C c128
 	$(MAKE) -C c128_64k
 
-lenterprise:
-	$(MAKE) -C enterprise
-
-lenterprisehr:
-	$(MAKE) -C enterprise_hr
-
 clean:
 	$(RM) *.o
 	$(RM) */*.o
