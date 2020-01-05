@@ -3,7 +3,7 @@
 #
 # $Id: Makefile,v 1.9 2016-07-02 15:41:39 dom Exp $
 
-include ../../../Make.config
+include ../../../../Make.config
 
 OBJECTS = close.o fabandon.o findhand.o freehand.o open.o \
 	read.o readbyte.o write.o writebyte.o

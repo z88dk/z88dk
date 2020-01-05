@@ -5,4 +5,4 @@
 	PUBLIC		CRT_FONT_64
 
 CRT_FONT_64:
-        BINARY  "stdio/spectrum/font64.bin"
+        BINARY  "target/zx/stdio/font64.bin"

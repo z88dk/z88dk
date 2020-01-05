@@ -1,19 +1,40 @@
-#
-# Makefile for ZX Spectrum target specific lib
-#
-# $Id: Makefile,v 1.13 2016-10-26 13:03:31 stefano Exp $
-
 include ../../Make.config
 
+TARGET = zx
 
-all:
-	$(RM) -f basic/*.o*
-	$(MAKE) -C fzx
-	$(MAKE) -C tape clean
-	$(MAKE) -C tape 
+SUBDIRS = fzx tape fcntl
+CLEANDIRS = $(SUBDIRS:%=clean-%)
 
-clean:
-	$(MAKE) -C fzx clean
-	$(MAKE) -C tape clean
-	$(RM) *.o* zcc_opt.def
+ASMFILES = $(wildcard *.asm)
+OBJECTS = $(ASMFILES:.asm=.o)
+
+all: dirs subdirs-all $(addprefix obj/$(TARGET)/,$(OBJECTS))
+
+
+subdirs-all: $(SUBDIRS)
+
+subdirs-clean: $(SUBDIRS_CLEAN)
+
+
+clean: subdirs-clean
+	$(RM) -r obj
+	$(RM) zcc_opt.def *.err *.o
+	$(RM) */*.o */*/*.o
+
+subdirs-clean: $(CLEANDIRS)
+
+obj/$(TARGET)/%.o: %.asm
+	@$(ASSEMBLER) -DFOR$(TARGET) -I../..  $^
+	@mv $(^:.asm=.o) $@
+
+dirs:
+	@mkdir -p obj/$(TARGET)
+
+.PHONY:	subdirs-all $(SUBDIRS) $(SUBDIRS_CLEAN)
+
+$(SUBDIRS):
+	$(MAKE) -C $@ all
+
+$(CLEANDIRS):
+	$(MAKE) -C $(@:clean-%=%) clean
 	$(RM) */*.o

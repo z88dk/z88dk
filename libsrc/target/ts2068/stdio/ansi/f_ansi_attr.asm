@@ -15,13 +15,13 @@
         SECTION code_clib
 
 IF A64COL
-	INCLUDE "stdio/ansi/ts2068/f_ansi_attr64.asm"
+	INCLUDE "target/ts2068/stdio/ansi/f_ansi_attr64.asm"
 ELSE
 IF A80COL
-	INCLUDE "stdio/ansi/ts2068/f_ansi_attr85.asm"
+	INCLUDE "target/ts2068/stdio/ansi/f_ansi_attr85.asm"
 ELSE
 IF A85COL
-	INCLUDE "stdio/ansi/ts2068/f_ansi_attr85.asm"
+	INCLUDE "target/ts2068/stdio/ansi/f_ansi_attr85.asm"
 ELSE
 	PUBLIC	ansi_attr
 
