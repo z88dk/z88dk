@@ -18,10 +18,9 @@ target/zx/stdio/obj/${TARGET}/fgetc_cons_rom
 target/zx/stdio/obj/${TARGET}/console_vars
 target/zx/stdio/obj/${TARGET}/fputc_cons_rom_rst
 target/zx/stdio/obj/${TARGET}/generic_console_scrollup
-target/zx/stdio/obj/${TARGET}/ansi/f_ansi_attr.o
-target/zx/stdio/obj/${TARGET}/ansi/f_ansi_char_flexible.o
-target/zx/stdio/obj/${TARGET}/ansi/f_ansi_dline.o
-target/zx/stdio/obj/${TARGET}/ansi/f_ansi_cls.o
-target/zx/stdio/obj/${TARGET}/ansi/f_ansi_scrollup.o
-target/zx/stdio/obj/${TARGET}/ansi/f_ansi_char.o
-target/zx/stdio/obj/${TARGET}/ansi/f_ansi_bel.o
+target/zx/stdio/obj/${TARGET}/ansi/f_ansi_attr
+target/zx/stdio/obj/${TARGET}/ansi/f_ansi_char
+target/zx/stdio/obj/${TARGET}/ansi/f_ansi_dline
+target/zx/stdio/obj/${TARGET}/ansi/f_ansi_cls
+target/zx/stdio/obj/${TARGET}/ansi/f_ansi_scrollup
+target/zx/stdio/obj/${TARGET}/ansi/f_ansi_bel
