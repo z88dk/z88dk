@@ -6,11 +6,11 @@ target/zx81/stdio/fputc_cons
 target/zx81/stdio/generic_console
 @stdio/ansicore.lst
 target/zx81/stdio/ansi/f_ansi_bel
-target/zx81/stdio/ansi/text/f_ansi_attr
-target/zx81/stdio/ansi/text/f_ansi_char
-target/zx81/stdio/ansi/text/f_ansi_cls
-target/zx81/stdio/ansi/text/f_ansi_dline
-target/zx81/stdio/ansi/text/f_ansi_scrollup
+target/zx81/stdio/ansi_text/f_ansi_attr
+target/zx81/stdio/ansi_text/f_ansi_char
+target/zx81/stdio/ansi_text/f_ansi_cls
+target/zx81/stdio/ansi_text/f_ansi_dline
+target/zx81/stdio/ansi_text/f_ansi_scrollup
 @stdio/stdio.lst
 target/zx81/time/clock
 graphics/dcircle
