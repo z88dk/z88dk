@@ -98,23 +98,9 @@ msxdeps:
 	@$(RM) -f time/msx/*.o
 
 zx81deps:
-	@$(RM) -f stdio/zx81/*.o
-	@$(RM) -f stdio/ansi/zx81/*.o
-	@$(RM) -f stdio/ansi/zx81/text/*.o
-	@$(RM) -f input/spectrum/*.o
-	@$(RM) -f input/zx81/*.o
-	@$(RM) -f games/zx81/*.o
+	$(MAKE) -C target/zx81 clean
 	@$(RM) -f graphics/*.o
 	@$(RM) -f graphics/*/*.o
-	@$(RM) -f graphics/zx81/*.o
-	@$(RM) -f graphics/zx81/hr/*.o
-	@$(RM) -f graphics/zx81/udg/*.o
-	@$(RM) -f graphics/gray/*.o
-	@$(RM) -f target/zx81/*.o
-	@$(RM) -f target/zx81/tape/*.o
-	@$(RM) -f target/zx81/basic/*.o
-	@$(RM) -f target/zx81/chroma81/*.o
-	@$(RM) -f time/zx81/*.o
 
 
 # Generic maths build - dom, stefano

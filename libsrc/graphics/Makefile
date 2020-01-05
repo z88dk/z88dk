@@ -16,10 +16,6 @@ clean:
 	$(MAKE) -C c128 clean
 	$(MAKE) -C c128_64k clean
 	$(MAKE) -C x11 clean
-	$(RM) gray/ticalc/*.o
 	$(RM) gray/cpc/*.o
-	$(RM) gray/zx81/*.o
 	$(RM) msx/surface/*.o
 	$(RM) spectrum/cpm/*.o
-	$(RM) zx81/hr/*.o
-	$(RM) zx81/udg/*.o
