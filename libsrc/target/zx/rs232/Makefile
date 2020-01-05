@@ -1,4 +1,4 @@
-include ../../Make.config
+include ../../../Make.config
 
 
 SUBDIRS = if1 plus3

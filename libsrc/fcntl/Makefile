@@ -1,4 +1,4 @@
-SUBDIRS = dummy gen_rnd newbrain spectrum 
+SUBDIRS = dummy gen_rnd newbrain 
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
 include ../Make.config

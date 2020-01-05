@@ -2,7 +2,7 @@ include ../../Make.config
 
 TARGET = zx
 
-SUBDIRS = fzx tape fcntl
+SUBDIRS = fzx tape fcntl rs232
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
 ASMFILES = $(wildcard *.asm)

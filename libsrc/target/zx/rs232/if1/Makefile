@@ -3,7 +3,7 @@
 #
 # $Id: Makefile,v 1.9 2016-07-02 15:42:55 dom Exp $
 
-include ../../../Make.config
+include ../../../../Make.config
 
 CFILES = rs232_close.c rs232_get.c rs232_init.c rs232_params.c rs232_put.c 
 

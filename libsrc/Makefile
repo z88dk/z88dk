@@ -184,7 +184,7 @@ zxfcntl:
 	@echo ''
 	@echo '--- Building ZX Spectrum fcntl libraries ---'
 	@echo ''
-	$(MAKE) -C fcntl/spectrum
+	$(MAKE) -C target/zx/fcntl
 
 # 64/32 column library for ZX Spectrum - dom/stefano
 # ansi flags
@@ -194,20 +194,13 @@ zx_clib.lib:
 	@echo ''
 	@echo '--- Building ZX Spectrum Library ---'
 	@echo ''
-	$(RM) stdio/spectrum/*.o
 	$(MAKE) gfxdeps
+	$(RM) target/zx/stdio/*.o
 	$(call buildgeneric,zx)
 	$(MAKE) -C target/zx
 	$(MAKE) -C games TARGET=zx
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zx_clib @$(LISTFILE_DIRECTORY)/zx.lst
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zxcpm @$(LISTFILE_DIRECTORY)/target/zx/zx_cpm.lst
-
-# Various RS232 libraries
-rs232libs:
-	@echo ''
-	@echo '---> Building RS232 libraries <---'
-	@echo ''
-	$(MAKE) -C rs232
 
 # 64/32 column library for TS2068 - dom/stefano/alvin
 # use -DROMFONT for a tiny 36 columns mode
@@ -216,12 +209,12 @@ ts2068_clib.lib:
 	@echo ''
 	@echo '--- Building TS2068 (Spectrum clone) Library ---'
 	@echo ''
-	$(RM) stdio/spectrum/*.o
+	$(RM) target/zx/stdio/*.o
 	$(MAKE) gfxdeps
 	$(call buildgeneric,zx)
 	$(MAKE) -C target/zx
 	$(MAKE) -C games TARGET=zx
-	$(RM) -f stdio/zx/*.o
+	$(RM) target/zx/stdio/*.o
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORzx -DFORts2068 -DA80COL -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(LISTFILE_DIRECTORY)/ts2068.lst
 
 # TS2068 HRG graphics lib - Stefano
@@ -245,9 +238,9 @@ zxrom.lib:
 	@echo ''
 	@echo '--- Building ZXROM Library ---'
 	@echo ''
-	$(RM) stdio/spectrum/generic_console_scrollup.o
+	$(RM) target/zx/stdio/generic_console_scrollup.o
 	$(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS -DNOROMCALLS -x$(OUTPUT_DIRECTORY)/zxrom @$(LISTFILE_DIRECTORY)/zxrom.lst
-	$(RM) stdio/spectrum/generic_console_scrollup.o
+	$(RM) target/zx/stdio/generic_console_scrollup.o
 
 # ZXVGS - yarek
 zxvgs.lib:
@@ -1518,7 +1511,6 @@ classic-clean:
 	$(MAKE) -C math clean
 	$(MAKE) -C graphics clean
 	$(MAKE) -C interrupts clean
-	$(MAKE) -C rs232 clean
 	$(MAKE) -C setjmp clean
 	$(MAKE) -C stdio clean
 	$(MAKE) -C stdlib clean
