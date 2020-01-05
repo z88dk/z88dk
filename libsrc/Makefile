@@ -197,7 +197,8 @@ zx_clib.lib:
 	$(MAKE) gfxdeps
 	$(RM) target/zx/stdio/*.o
 	$(call buildgeneric,zx)
-	$(MAKE) -C target/zx
+	$(MAKE) -C target/zx clean
+	$(MAKE) -C target/zx 
 	$(MAKE) -C games TARGET=zx
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zx_clib @$(LISTFILE_DIRECTORY)/zx.lst
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zxcpm @$(LISTFILE_DIRECTORY)/target/zx/zx_cpm.lst
@@ -212,6 +213,7 @@ ts2068_clib.lib:
 	$(RM) target/zx/stdio/*.o
 	$(MAKE) gfxdeps
 	$(call buildgeneric,zx)
+	$(MAKE) -C target/zx clean
 	$(MAKE) -C target/zx
 	$(MAKE) -C games TARGET=zx
 	$(RM) target/zx/stdio/*.o
