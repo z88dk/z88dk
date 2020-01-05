@@ -6,8 +6,6 @@ target/zx/stdio/obj/${TARGET}/CRT_FONT_64
 target/zx/stdio/obj/${TARGET}/fputc_cons_fzx
 target/zx/stdio/obj/${TARGET}/generic_console_printc
 target/zx/stdio/obj/${TARGET}/generic_console_cls
-target/zx/stdio/obj/${TARGET}/generic_console_cursor
-target/zx/stdio/obj/${TARGET}/fputc_cons_scrollup
 target/zx/stdio/obj/${TARGET}/conio_vars
 target/zx/stdio/obj/${TARGET}/fgetc_cons
 target/zx/stdio/obj/${TARGET}/conio_map_colour
