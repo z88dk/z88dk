@@ -20,6 +20,12 @@ IF FORzx
         defc sndbit_mask   = 16         ; (2^sndbit_bit)
 ENDIF
 
+IF FORts2068
+        defc sndbit_port   = 254
+        defc sndbit_bit    = 4
+        defc sndbit_mask   = 16         ; (2^sndbit_bit)
+ENDIF
+
 IF FORmsx
         defc sndbit_port   = 170
         defc sndbit_bit    = 7
@@ -290,7 +296,7 @@ IF FORtvc
 ENDIF
 
 IF FORsmc777
-    defc sndbit_port	= $1d
+    defc sndbit_port	= $1c
     defc sndbit_bit    = 4
     defc sndbit_mask   = $15
 ENDIF

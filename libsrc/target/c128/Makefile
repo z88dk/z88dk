@@ -2,7 +2,7 @@ include ../../Make.config
 
 TARGET = c128
 
-SUBDIRS = psg
+SUBDIRS = psg c128 graphics graphics_64k
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
 CFILES = $(wildcard *.c)

@@ -20,7 +20,6 @@ graphics/getsprite
 target/oz/graphics/putsprite
 graphics/bksave
 graphics/bkrestore
-graphics/spectrum/rowtab
 target/oz/graphics/pixladdr
 target/oz/graphics/stencil_render
 target/oz/graphics/swapgfxbk

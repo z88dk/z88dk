@@ -8,5 +8,5 @@ target/c128/stdio/ansi/f_ansi_cls
 target/c128/stdio/ansi/f_ansi_dline
 target/c128/stdio/ansi/f_ansi_scrollup
 @stdio/stdio.lst
-@c128cpm.lst
+@target/c128/c128_cpm.lst
 @z80.lst

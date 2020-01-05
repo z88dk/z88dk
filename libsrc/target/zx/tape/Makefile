@@ -1,22 +1,45 @@
-#
-# Makefile for ZX Spectrum target specific lib - tape I/O
-#
-# $Id: Makefile,v 1.1 2008-07-18 15:38:51 stefano Exp $
-#
-
 include ../../../Make.config
 
-CIAFILES = \
-	tape_save.c
+TARGET ?= zx
 
-CIAOBJECTS = $(CIAFILES:.c=.o)
+SUBDIRS = 
 
-AFILES  = $(CIAFILES:.c=.asm)
+CLEANDIRS = $(SUBDIRS:%=clean-%)
 
-all:    $(CIAOBJECTS)
+ASMFILES = $(wildcard *.asm)
+CFILES = $(wildcard *.c)
+OBJECTS = $(ASMFILES:.asm=.o) $(CFILES:.c=.o)
 
-.c.o:
-	$(ZCC) +test $(CFLAGS) $*.c
+all: dirs subdirs-all $(addprefix obj/$(TARGET)/,$(OBJECTS))
 
-clean:
-	$(RM) *.o* *.sym *.map zcc_opt.def *.i $(AFILES)
+
+subdirs-all: $(SUBDIRS)
+
+subdirs-clean: $(SUBDIRS_CLEAN)
+
+
+clean: subdirs-clean
+	$(RM) -r obj
+	$(RM) zcc_opt.def *.err *.o
+	$(RM) */*.o */*/*.o
+
+subdirs-clean: $(CLEANDIRS)
+
+obj/$(TARGET)/%.o: %.asm
+	@$(ASSEMBLER) -DFOR$(TARGET) -I../..  $^
+	@mv $(^:.asm=.o) $@
+
+obj/$(TARGET)/%.o: %.c
+	$(ZCC) +$(TARGET) $(CFLAGS) -o $@ $^
+
+dirs:
+	@mkdir -p obj/$(TARGET)
+
+.PHONY:	subdirs-all $(SUBDIRS) $(SUBDIRS_CLEAN)
+
+$(SUBDIRS):
+	$(MAKE) -C $@ all TARGET=$(TARGET)
+
+$(CLEANDIRS):
+	$(MAKE) -C $(@:clean-%=%) clean
+	$(RM) */*.o
