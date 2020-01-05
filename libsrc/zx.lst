@@ -25,7 +25,7 @@ target/zx/stdio/ansi/f_ansi_cls
 target/zx/stdio/ansi/f_ansi_dline
 target/zx/stdio/ansi/f_ansi_scrollup
 @stdio/stdio.lst
-target/zx/time/clock
+target/shared/clock
 @target/zx/gfxspectrum.lst
 @font/fzx/fzx.lst
 @font/font_4x8/font_4x8.lst

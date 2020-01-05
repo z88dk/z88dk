@@ -231,7 +231,7 @@ gfxspectrum.lib:
 	@echo '--- Building ZX Spectrum Graphics Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/gfxspectrum @$(LISTFILE_DIRECTORY)/gfxspectrum.lst
+	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/gfxspectrum @$(LISTFILE_DIRECTORY)/target/zx/gfxspectrum.lst
 
 # ZXROM - stefano
 zxrom.lib:

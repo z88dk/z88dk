@@ -24,7 +24,7 @@ target/ts2068/stdio/ansi/f_ansi_cls
 target/ts2068/stdio/ansi/f_ansi_dline
 target/ts2068/stdio/ansi/f_ansi_scrollup
 @stdio/stdio.lst
-target/zx/time/clock
+target/shared/clock
 target/zx/games/joystick
 @games/games.lst
 @target/zx/spectrum.lst

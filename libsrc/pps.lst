@@ -31,9 +31,9 @@ target/pps/fcntl/mkdir
 target/pps/fcntl/getwd
 target/pps/fcntl/getcwd
 games/joystick
-psg/spectrum/set_psg
-psg/spectrum/set_psg_callee
-psg/spectrum/get_psg
-psg/spectrum/psg_init
+target/zx/psg/set_psg
+target/zx/psg/set_psg_callee
+target/zx/psg/get_psg
+target/zx/psg/psg_init
 @psg/psg.lst
 @z80.lst
