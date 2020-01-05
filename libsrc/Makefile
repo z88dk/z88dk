@@ -223,7 +223,7 @@ gfx2068hr.lib:
 	@echo '--- Building TS2068 High Resolution Graphics Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(LIBLINKER) -DFORgfx2068hr -x$(OUTPUT_DIRECTORY)/gfx2068hr @$(LISTFILE_DIRECTORY)/gfx2068hr.lst
+	$(LIBLINKER) -DFORgfx2068hr -x$(OUTPUT_DIRECTORY)/gfx2068hr @$(LISTFILE_DIRECTORY)/target/ts2068/gfx2068hr.lst
 
 # TS2068 HRG graphics lib - Stefano
 gfxspectrum.lib:
