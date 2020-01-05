@@ -6,7 +6,7 @@ SUBDIRS =
 
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
-ASMFILES = $(wildcard *.asm)
+ASMFILES = $(wildcard *.asm) $(wildcard ansi/*.asm)
 CFILES = $(wildcard *.c)
 OBJECTS = $(ASMFILES:.asm=.o) $(CFILES:.c=.o)
 
@@ -26,14 +26,14 @@ clean: subdirs-clean
 subdirs-clean: $(CLEANDIRS)
 
 obj/$(TARGET)/%.o: %.asm
-	@$(ASSEMBLER) -DFOR$(TARGET) -I../..  $^
+	@$(ASSEMBLER) -DFOR$(TARGET) -I$(OUTPUT_DIRECTORY) -I$(Z88DK_LIB)  $^
 	@mv $(^:.asm=.o) $@
 
 obj/$(TARGET)/%.o: %.c
 	$(ZCC) +$(TARGET) $(CFLAGS) -o $@ $^
 
 dirs:
-	@mkdir -p obj/$(TARGET)
+	@mkdir -p obj/$(TARGET)/ansi
 
 .PHONY:	subdirs-all $(SUBDIRS) $(SUBDIRS_CLEAN)
 

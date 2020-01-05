@@ -195,9 +195,7 @@ zx_clib.lib:
 	@echo '--- Building ZX Spectrum Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(RM) target/zx/stdio/*.o
 	$(call buildgeneric,zx)
-	$(MAKE) -C target/zx clean
 	$(MAKE) -C target/zx 
 	$(MAKE) -C games TARGET=zx
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zx_clib @$(LISTFILE_DIRECTORY)/zx.lst
@@ -210,14 +208,11 @@ ts2068_clib.lib:
 	@echo ''
 	@echo '--- Building TS2068 (Spectrum clone) Library ---'
 	@echo ''
-	$(RM) target/zx/stdio/*.o
 	$(MAKE) gfxdeps
-	$(call buildgeneric,zx)
-	$(MAKE) -C target/zx clean
-	$(MAKE) -C target/zx
-	$(MAKE) -C games TARGET=zx
-	$(RM) target/zx/stdio/*.o
-	TARGET=zx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORzx -DFORts2068 -DA80COL -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(LISTFILE_DIRECTORY)/ts2068.lst
+	$(call buildgeneric,ts2068)
+	$(MAKE) -C games TARGET=ts2068
+	$(MAKE) -C target/zx TARGET=ts2068
+	TARGET=ts2068 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORzx -DFORts2068 -DA80COL -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(LISTFILE_DIRECTORY)/ts2068.lst
 
 # TS2068 HRG graphics lib - Stefano
 gfx2068hr.lib:
@@ -329,7 +324,7 @@ pps_clib.lib:
 	$(MAKE) gfxdeps
 	$(call buildgeneric,pps)
 	$(MAKE) -C target/pps
-	$(MAKE) -C target/zx
+	$(MAKE) -C target/zx TARGET=pps
 	$(MAKE) -C games TARGET=pps
 	TARGET=pps TYPE=z80 $(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pps_clib @$(LISTFILE_DIRECTORY)/pps.lst
 
@@ -735,7 +730,7 @@ sam_clib.lib:
 	$(MAKE) gfxdeps
 	$(call buildgeneric,sam)
 	$(MAKE) -C games TARGET=sam
-	$(MAKE) -C target/zx
+	$(MAKE) -C target/zx TARGET=sam
 	TARGET=sam TYPE=z80 $(LIBLINKER) -DFORsam -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sam_clib @$(LISTFILE_DIRECTORY)/sam.lst
 
 # Spectravideo SVI library - Stefano

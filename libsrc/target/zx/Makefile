@@ -1,8 +1,13 @@
 include ../../Make.config
 
-TARGET = zx
+TARGET ?= zx
 
-SUBDIRS = fzx tape fcntl rs232
+SUBDIRS = tape games stdio
+
+ifeq ($(TARGET),zx)
+  SUBDIRS += fzx fcntl rs232
+endif
+
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
 ASMFILES = $(wildcard *.asm)
@@ -33,7 +38,7 @@ dirs:
 .PHONY:	subdirs-all $(SUBDIRS) $(SUBDIRS_CLEAN)
 
 $(SUBDIRS):
-	$(MAKE) -C $@ all
+	$(MAKE) -C $@ all TARGET=$(TARGET)
 
 $(CLEANDIRS):
 	$(MAKE) -C $(@:clean-%=%) clean

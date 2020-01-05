@@ -49,7 +49,7 @@
 
 	EXTERN	call_rom3
 	EXTERN	bit_open_di
-	EXTERN	bit_open_ei
+	EXTERN	bit_close_ei
 
 .beeper
 ._beeper
