@@ -1249,7 +1249,7 @@ newbrain_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(call buildgeneric,newbrain)
-	$(MAKE) -C fcntl/newbrain
+	$(MAKE) -C target/newbrain
 	TARGET=newbrain TYPE=z80 $(LIBLINKER) -DFORnewbrain -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/newbrain_clib @$(LISTFILE_DIRECTORY)/newbrain_clib.lst
 	TARGET=newbrain TYPE=z80 $(LIBLINKER) -DFORnewbrain -x$(OUTPUT_DIRECTORY)/newbrain_cpm @$(LISTFILE_DIRECTORY)/target/newbrain/newbrain_cpm.lst
 
