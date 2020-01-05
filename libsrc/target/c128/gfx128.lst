@@ -2,7 +2,7 @@ graphics/dcircle
 graphics/clg
 graphics/text/clsgraph
 graphics/lftscrol
-graphics/c128/textpixl
+target/c128/graphics/textpixl
 graphics/text/plotpixl
 graphics/text/respixl
 graphics/text/xorpixl

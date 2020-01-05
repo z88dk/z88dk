@@ -1213,7 +1213,7 @@ c128ansi_clib.lib:
 	$(call buildgeneric,c128)
 	$(MAKE) -C target/c128
 	$(MAKE) -C games TARGET=c128
-	TARGET=c128 TYPE=z80 $(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/c128cpm @$(LISTFILE_DIRECTORY)/c128cpm.lst
+	TARGET=c128 TYPE=z80 $(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/c128cpm @$(LISTFILE_DIRECTORY)/target/c128/c128_cpm.lst
 	TARGET=c128 TYPE=z80 $(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/c128ansi_clib @$(LISTFILE_DIRECTORY)/c128ansi.lst
 
 # C128 Base text mode graphics lib - Stefano
@@ -1222,7 +1222,8 @@ gfx128.lib:
 	@echo '--- Building Commodore 128 Base Graphics Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	TARGET=c128 TYPE=z80 $(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/gfx128 @$(LISTFILE_DIRECTORY)/gfx128.lst
+	$(MAKE) -C target/c128
+	TARGET=c128 TYPE=z80 $(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/gfx128 @$(LISTFILE_DIRECTORY)/target/c128/gfx128.lst
 
 # C128 HRG graphics lib - Stefano
 gfx128hr.lib:
@@ -1230,8 +1231,8 @@ gfx128hr.lib:
 	@echo '--- Building Commodore 128 High Resolution Graphics Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C graphics lc128
-	TARGET=c128 SUBTARGET=128hr TYPE=z80 $(LIBLINKER) -DFORc128hr -x$(OUTPUT_DIRECTORY)/gfx128hr @$(LISTFILE_DIRECTORY)/gfx128hr.lst
+	$(MAKE) -C target/c128
+	TARGET=c128 SUBTARGET=128hr TYPE=z80 $(LIBLINKER) -DFORc128hr -x$(OUTPUT_DIRECTORY)/gfx128hr @$(LISTFILE_DIRECTORY)/target/c128/gfx128hr.lst
 
 # C128 640x480 HRG graphics lib - Stefano
 gfx128hr480.lib:
@@ -1239,8 +1240,8 @@ gfx128hr480.lib:
 	@echo '--- Building Commodore 128 640x480 HRG Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C graphics lc128
-	TARGET=c128 SUBTARGET=128hr480 TYPE=z80 $(LIBLINKER) -DFORc128hr480 -x$(OUTPUT_DIRECTORY)/gfx128hr480 @$(LISTFILE_DIRECTORY)/gfx128hr480.lst
+	$(MAKE) -C target/c128
+	TARGET=c128 SUBTARGET=128hr480 TYPE=z80 $(LIBLINKER) -DFORc128hr480 -x$(OUTPUT_DIRECTORY)/gfx128hr480 @$(LISTFILE_DIRECTORY)/target/c128/gfx128hr480.lst
 
 # Grundy NewBrain library - Stefano
 newbrain_clib.lib:
