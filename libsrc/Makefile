@@ -12,7 +12,7 @@ include Make.config
 # LIBRARIES not built by the global list below:
 # - SP1 (build depends on customization and machine target, "make sp1" for options)
 
-all: genlibs rs232libs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
+all: genlibs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	abc80_clib.lib abc800_clib.lib ace_clib.lib aquarius_clib.lib \
 	aussie.lib bee_clib.lib microbee.lib c7420_clib.lib \
 	cpm_clib.lib einstein.lib fp1100_clib.lib gal_clib.lib \
@@ -773,9 +773,9 @@ mtx_clib.lib:
 	@echo ''
 	$(MAKE) msxdeps
 	$(call buildgeneric,mtx)
+	$(MAKE) -C target/mtx
 	$(MAKE) -C games TARGET=mtx
 	$(MAKE) -C video/tms9918 TARGET=mtx
-	$(MAKE) -C target/mtx/rs232
 	TARGET=mtx TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmtx -x$(OUTPUT_DIRECTORY)/mtx_clib @$(LISTFILE_DIRECTORY)/mtx.lst
 
 # Videoton TV Computer library - Sandor
