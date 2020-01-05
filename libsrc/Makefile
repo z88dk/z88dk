@@ -1478,8 +1478,7 @@ osca_clib.lib:
 	@echo ''
 	$(call buildgeneric,osca)
 	$(MAKE) -C games TARGET=osca
-	$(MAKE) -C sdcard clean
-	$(MAKE) -C fcntl/osca
+	$(MAKE) -C target/osca
 	TARGET=osca TYPE=z80 $(LIBLINKER) -DFORosca -DSTANDARDESCAPECHARS -DSDHC_SUPPORT -x$(OUTPUT_DIRECTORY)/osca_clib.lib @$(LISTFILE_DIRECTORY)/osca.lst
 
 # s1mp3

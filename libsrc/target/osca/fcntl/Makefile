@@ -1,11 +1,11 @@
 SUBDIRS = flos flosmulti
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
-include ../../Make.config
+include ../../../Make.config
      
 .PHONY: subdirs $(SUBDIRS) $(CLEANDIRS)
      
-subdirs: $(SUBDIRS)
+all: $(SUBDIRS)
      
 $(SUBDIRS):
 	$(MAKE) -C $@

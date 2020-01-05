@@ -1,7 +1,7 @@
 include ../Make.config
 
 
-SUBDIRS = osca  spectrum 
+SUBDIRS = spectrum 
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
 all: subdirs-all
