@@ -1558,7 +1558,6 @@ classic-clean:
 	$(MAKE) -C rect clean
 	$(MAKE) -C algorithm clean
 	$(MAKE) -C debug clean
-	$(MAKE) -C osca clean
 	$(MAKE) -C lib3d clean
 	$(MAKE) -C input clean	
 	$(RM) abc80/*.o
