@@ -86,16 +86,7 @@ gfxdeps:
 
 #  short script to sort out ticalc dependencies
 msxdeps:
-	@$(RM) -f stdio/msx/*.o
-	@$(RM) -f stdio/tms9918/*.o
-	@$(RM) -f stdio/ansi/msx/*.o
-	@$(RM) -f games/*.o
-	@$(RM) -f games/msx/*.o
-	@$(RM) -f graphics/*.o
-	@$(RM) -f graphics/*/*.o
-	@$(RM) -f psg/msx/*.o
-	@$(RM) -f psg/sn76489/*.o
-	@$(RM) -f time/msx/*.o
+	$(MAKE) -C target/msx clean
 
 zx81deps:
 	$(MAKE) -C target/zx81 clean
@@ -759,7 +750,6 @@ svi_clib.lib:
 	@echo ''
 	$(MAKE) msxdeps
 	$(call buildgeneric,svi)
-	$(RM) games/msx/*.o
 	$(MAKE) -C games TARGET=svi
 	$(MAKE) -C target/msx/msxbios
 	$(MAKE) -C target/svi TARGET=svi
@@ -776,8 +766,6 @@ msx_clib.lib:
 	$(MAKE) msxdeps
 	$(call buildgeneric,msx)
 	$(MAKE) -C target/cpm/fcntl
-	$(MAKE) -C fcntl/msxdos2
-	$(RM) games/msx/*.o
 	$(MAKE) -C games TARGET=msx
 	$(MAKE) -C target/msx 
 	$(MAKE) -C video/tms9918 TARGET=msx

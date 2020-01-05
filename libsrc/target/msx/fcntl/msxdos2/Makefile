@@ -1,5 +1,5 @@
 
-include ../../Make.config
+include ../../../../Make.config
 
 ASM = $(wildcard *.asm)
 
