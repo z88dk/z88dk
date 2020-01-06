@@ -46,7 +46,14 @@ not_udg:
 	ld	b,8
 hires_printc_1:
         push    bc
+        ld      a,(generic_console_flags)
+        bit     4,a
 	ld	a,(de)
+	ld	b,a
+	jr	z,no_32_bold
+	rrca
+	or	b
+no_32_bold:
         cpl			;Pixels are inverse by default
 	xor	c
         ; Display is mirrored, so mirror the byte
@@ -74,5 +81,11 @@ hires_printc_1:
 no_overflow:
         pop     bc
 	djnz	hires_printc_1
+	ld	a,(generic_console_flags)
+	bit	3,a
+	ret	z
+	ld	bc,-32
+	add	hl,bc
+	ld	(hl),255
 	ret
 
