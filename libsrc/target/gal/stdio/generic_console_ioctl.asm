@@ -66,7 +66,7 @@ check_mode:
 	ld	c,2
 	halt
 	im	2
-	ld	d,CAPS_MODE0
+	ld	d,CAPS_MODE1
 set_mode:
 	ld	(__gal_mode),a
 	and	a
