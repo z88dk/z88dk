@@ -1130,9 +1130,16 @@ coleco_clib.lib:
 	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=coleco
 	$(call buildgeneric,coleco)
-	$(MAKE) -C games TARGET=coleco
 	$(MAKE) -C video/tms9918 TARGET=coleco
 	TARGET=coleco TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcoleco -x$(OUTPUT_DIRECTORY)/coleco_clib @$(LISTFILE_DIRECTORY)/coleco.lst
+
+# Bit90 (colecovision clone + enhancements) - dom/stefano
+bit90.lib:
+	@echo ''
+	@echo '--- Building Bit-90 Library ---'
+	@echo ''
+	$(MAKE) -C games TARGET=coleco SUBTYPE=bit90 TARGET_CFLAGS=-subtype=bit90
+	TARGET=bit90 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcoleco -DFORbit90 -x$(OUTPUT_DIRECTORY)/bit90 @$(LISTFILE_DIRECTORY)/target/bit90/bit90.lst
 
 # Pencil II - dom/stefano
 pencil2_clib.lib:

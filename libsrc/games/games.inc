@@ -361,13 +361,19 @@ ENDIF
 
 
 IF FORcoleco
-    defc sndbit_port	= $E0		; also valid for Coleco Adam and Pencil II
+    defc sndbit_port	= $ff		; also valid for Coleco Adam and Pencil II
+    defc sndbit_bit    = 3
+    defc sndbit_mask   = $0F			; $0F for full volume output
+ENDIF
+
+IF FORbit90
+    defc sndbit_port	= $ff		; also valid for Coleco Adam and Pencil II
     defc sndbit_bit    = 3
     defc sndbit_mask   = $0F			; $0F for full volume output
 ENDIF
 
 IF FORpencil2
-    defc sndbit_port	= $E0		; also valid for Coleco Adam and Pencil II
+    defc sndbit_port	= $ff		; also valid for Coleco Adam and Pencil II
     defc sndbit_bit    = 3
     defc sndbit_mask   = $0F			; $0F for full volume output
 ENDIF

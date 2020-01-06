@@ -12,6 +12,7 @@ graphics/getsprite
 @gfxbase.lst
 psg/sn76489/bit_open
 target/coleco/games/joystick
+target/coleco/games/coleco_joypad
 games/obj/coleco/joystick_type
 @games/games.lst
 psg/sn76489/psg_tone

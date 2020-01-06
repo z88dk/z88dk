@@ -147,10 +147,19 @@ extern const unsigned char *joystick_type[];
 #endif
 
 #ifdef __COLECO__
+#ifndef __BIT90__
 #ifdef DEFINE_JOYSTICK_TYPE
 	const unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2", "Joystick 2 + Keypad 1", "Joystick 2 + Keypad 2"};
 #endif
 	#define GAME_DEVICES 4
+#endif
+#endif
+
+#ifdef __BIT90__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = { "QAOP-MN", "8246-05", "hjkl-sd", "Cursor", "Joystick 1", "Joystick 2", "Joystick 2 + Keypad 1", "Joystick 2 + Keypad 2"};
+#endif
+	#define GAME_DEVICES 8
 #endif
 
 #ifdef __LASER500__
