@@ -29,21 +29,20 @@ IF FORpv2000
 ENDIF
 
 IF FORrx78
-	defc psgport = 0xff
+	defc psgport = $ff
 ENDIF
 
 IF FORcoleco
-	defc psgport	= $E0		; also valid for Coleco Adam and Pencil II
+	defc psgport	= $ff		; also valid for Coleco Adam and Pencil II
 ENDIF
 
 IF FORpencil2
-	defc psgport	= $E0		; also valid for Coleco Adam and Pencil II
+	defc psgport	= $ff		; also valid for Coleco Adam and Pencil II
 ENDIF
 
-; ********************************************************
-;   This last part refers to NOT YET supported hardware
-; ********************************************************
-
+IF FORbit90
+	defc psgport	= $ff		; also valid for Coleco Adam and Pencil II
+ENDIF
 
 IF FORpasopia
 	defc psgport	= $3A		; Pasopia has also a second PSG on port $3B
