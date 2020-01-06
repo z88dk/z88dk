@@ -30,7 +30,7 @@ all: genlibs z88libs tilibs zxlibs eplibs c128libs nclibs cpclibs \
 	adam.lib z80tvgame_clib.lib smc777_cpm.lib pasopia7_clib.lib sv8000_clib.lib \
 	excali64_clib.lib gb_clib.lib s1mp3_clib.lib bic.lib myvision_clib.lib pencil2_clib.lib \
 	preempt.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib tvc_clib.lib hemc_clib.lib \
-	kramermc_clib.lib hgmc_clib.lib
+	kramermc_clib.lib hgmc_clib.lib pmd85_clib.lib
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib mbf32.lib mbf64.lib math32.lib gendos.lib ndos.lib  \
 	 lib3d.lib x11.lib fastmath.lib
@@ -1462,7 +1462,13 @@ s1mp3_clib.lib:
 	$(MAKE) -C target/s1mp3
 	TARGET=s1mp3 TYPE=z80 $(LIBLINKER) -DFORs1mp3 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/s1mp3_clib.lib @$(LISTFILE_DIRECTORY)/s1mp3.lst
 
-# Preempt multitasking library - dom
+pmd85_clib.lib:
+	@echo ''
+	@echo '--- Building pmd85 Library ---'
+	@echo ''
+	$(call buildgeneric,pmd85)
+	TARGET=pmd85 TYPE=8080 $(LIBLINKER) -DFORtest -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pmd85_clib @$(LISTFILE_DIRECTORY)/pmd85.lst
+
 
 # Preempt multitasking library - dom
 preempt.lib:
