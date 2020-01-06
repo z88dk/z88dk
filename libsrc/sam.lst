@@ -12,7 +12,7 @@ target/sam/stdio/ansi/f_ansi_restore
 target/sam/stdio/ansi/f_ansi_scrollup
 @stdio/stdio.lst
 target/shared/clock
-@input/spectrum.lst
+@target/zx/input_zx.lst
 graphics/dcircle
 target/zx/graphics/clg
 target/zx/graphics/clrarea2

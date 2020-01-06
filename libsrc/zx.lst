@@ -1,4 +1,4 @@
-@input/spectrum.lst
+@target/zx/input_zx.lst
 @target/zx/stdio/stdio.lst
 @stdio/ansicore.lst
 @stdio/stdio.lst

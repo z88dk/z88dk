@@ -1,4 +1,4 @@
-@input/zx81.lst
+@target/zx81/input_zx81.lst
 target/zx81/stdio/fgetc_cons
 target/zx81/stdio/getk
 target/zx81/stdio/fputc_cons
