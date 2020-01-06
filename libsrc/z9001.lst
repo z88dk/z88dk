@@ -1,6 +1,6 @@
-stdio/cpmbios/fgetc_cons
-stdio/cpmbios/getk
-stdio/cpmbios/fputc_cons
+target/z9001/stdio/fgetc_cons
+target/z9001/stdio/getk
+target/z9001/stdio/fputc_cons
 target/z9001/stdio/generic_console
 target/z9001/stdio/conio_vars
 target/z9001/stdio/conio_map_colour

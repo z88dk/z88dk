@@ -14,7 +14,7 @@ target/rcmx000/stdio/fputc_cons
 setjmp/obj/r2k/l_longjmp
 setjmp/obj/r2k/l_setjmp
 @assert/assert.lst
-time/rcmx000/clock
+target/rcmx000/time/clock
 @rect/rect.lst
 @regex/regex.lst
 @compress/zx7/zx7.lst

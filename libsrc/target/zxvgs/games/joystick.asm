@@ -5,7 +5,7 @@
 ;	$Id: joystick.asm,v 1.5 2016-06-16 20:23:52 dom Exp $
 ;
 
-	INCLUDE	"zxvgs.def"
+	INCLUDE	"target/zx/def/zxvgs.def"
 
         SECTION code_clib
         PUBLIC  joystick
