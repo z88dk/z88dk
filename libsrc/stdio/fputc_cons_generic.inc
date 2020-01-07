@@ -41,7 +41,6 @@
 ; 22,y+32,x+32 = Move to position
 
 
-IF !__CPU_INTEL__ 
 		; Variables that can be adjusted by platform specific code
 		PUBLIC		generic_console_flags
 
@@ -100,13 +99,20 @@ handle_character:
 	ld	a,(__console_h)
 	cp	b
 	jr	nz,handle_character_no_scroll
+IF __CPU_INTEL__
+	ld	a,(hl)
+	rlca
+	rlca
+	call	nc,generic_console_scrollup
+ELSE
 	bit	6,(hl)
 	call	z,generic_console_scrollup
+ENDIF
 	ld	a,(__console_h)
 	dec	a
 	ld	b,a
 	ld	c,0
-IF __CPU_GBZ80__
+IF __CPU_GBZ80__ | __CPU_INTEL__
 	ld	(__console_x+1),a		;a holds vlaue of b
 	ld	a,c
 	ld	(__console_x),a
@@ -168,10 +174,22 @@ parameter_loop:
 	ld	a,(hl)
 	inc	hl
 IF SUPPORT_vt52
+  IF __CPU_INTEL__
+        push   de
+        ld     d,a
+        ld     a,e
+        rrca
+        jp     nc,not_ansi
+        ld     d,(hl)
+not_ansi:
+        ld     a,d
+        pop    de
+  ELSE
 	bit	0,e
 	jr	z,not_ansi
 	ld	a,(hl)
 not_ansi:
+   ENDIF
 ENDIF
 	inc	hl		;points to parameter count now
 	and	a		;nc
@@ -249,7 +267,7 @@ left:	ld	a,c
 	jr	up
 left_1: dec	c
 store_coords:
-IF __CPU_GBZ80__
+IF __CPU_GBZ80__ | __CPU_INTEL__
 	ld	a,c
 	ld	(__console_x),a
 	ld	a,b
@@ -282,10 +300,25 @@ right:	ld	a,(__console_w)
 	jr	store_coords
 
 set_vscroll:
+IF __CPU_INTEL__
+	ld	e,a
+	ld	a,(hl)
+	and	@10111111
+	ld	(hl),a
+	ld	a,e
+	rrca
+	ret	c
+	ld	a,(hl)
+	or	@01000000
+	ld	(hl),a
+	scf
+	ret
+ELSE
 	res	6,(hl)
 	rrca
 	ret	c
 	set	6,(hl)
+ENDIF
 	scf
 	ret
 
@@ -310,9 +343,22 @@ set_inverse_ansi:
 	dec	a		;p = 70 = on, q = 71 = off
 ENDIF
 set_inverse:			;Entry hl = flags
+IF __CPU_INTEL__
+	ld	e,@01111111
+	ld	d,@10000000
+	rra
+	jr	c,set_inverse_doit
+	ld	d,@00000000
+set_inverse_doit:
+	ld	a,(hl)
+	and	e
+	or	d
+	ld	(hl),a
+ELSE
 	rl	(hl)		;drop bit 7
 	rra
 	rr	(hl)		;get it back again
+ENDIF
 set_inverse_call_generic:
 	call	generic_console_set_attribute
 	scf
@@ -357,8 +403,15 @@ handle_cr:
 	dec	a
 	jr	nz,handle_cr_no_need_to_scroll
 	; Check if scroll is enabled
-	bit	6,(hl)
+IF __CPU_INTEL__
+	ld	a,(hl)
+	rlca
+	rlca
 	call	nc,generic_console_scrollup
+ELSE
+	bit	6,(hl)
+	call	z,generic_console_scrollup
+ENDIF
 
 	ld	a,(__console_h)
 	sub	2
@@ -510,4 +563,3 @@ generic_console_flags:		defb	0		; bit 0 = raw mode enabled
 							; bit 6 = vscroll disabled
 							; bit 7 = inverse on
 
-ENDIF

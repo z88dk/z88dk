@@ -1,6 +1,5 @@
 
 
-IF !__CPU_INTEL__
 		MODULE		fputc_cons_generic_full
 
 
@@ -16,5 +15,3 @@ fputc_cons_generic:
 _fputc_cons_generic:
 
 		INCLUDE		"fputc_cons_generic.inc"
-ENDIF
-
