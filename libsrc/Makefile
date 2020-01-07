@@ -1123,7 +1123,7 @@ sv8000_clib.lib:
 	TARGET=sv8000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsv8000 -x$(OUTPUT_DIRECTORY)/sv8000_clib @$(LISTFILE_DIRECTORY)/sv8000.lst
 
 # Colecovision - dom/stefano
-coleco_clib.lib:
+coleco_clib.lib: bit90.lib
 	@echo ''
 	@echo '--- Building Colecovision Library ---'
 	@echo ''
