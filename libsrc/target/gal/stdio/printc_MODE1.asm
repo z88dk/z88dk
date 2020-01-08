@@ -73,11 +73,8 @@ no_32_bold:
         xor     c
 	ld	(hl),a
 	inc	de
-	ld	a,l
-	add	32
-	ld	l,a
-	jr	nc,no_overflow
-	inc	h
+	ld	bc,32
+	add	hl,bc
 no_overflow:
         pop     bc
 	djnz	hires_printc_1
@@ -86,6 +83,6 @@ no_overflow:
 	ret	z
 	ld	bc,-32
 	add	hl,bc
-	ld	(hl),255
+	ld	(hl),0	;Pixels are inverted
 	ret
 
