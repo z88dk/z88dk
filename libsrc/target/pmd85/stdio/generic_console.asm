@@ -28,22 +28,42 @@ generic_console_set_ink:
 generic_console_scrollup:
 	push	bc
 	push	de
+	ld	de,DISPLAY
+	ld	hl,DISPLAY+256
+	ld	c,256 - 8
+sloop1:
+	ld	b,48
+sloop2:
+	ld	a,(hl)
+	ld	(de),a
+	inc	hl
+	inc	de
+	djnz	sloop2
+	ld	de,16
+	add	hl,de
+	ld	d,h
+	ld	e,l	
+	dec	d
+	dec	c
+	jr	nz,sloop1
 	pop	de
 	pop	bc
 	ret
 
 generic_console_cls:
 	ld	hl,DISPLAY
-	ld	bc,16384
-cls_loop:
+	ld	c,0
+loop1:
+	ld	b,48
+loop2:
 	ld	(hl),0
 	inc	hl
-	dec	bc
-	ld	a,b
-	or	c
-	jr	nz,cls_loop
+	djnz	loop2
+	ld	de,16
+	add	hl,de
+	dec	c
+	jr	nz,loop1
 	ret
-
 
 generic_console_printc:
         ld      e,d
@@ -95,7 +115,7 @@ loop:
         xor     c
         and     0x66
         xor     c
-	rrca
+;	rrca
 	and	@00111111
 	ld	(hl),a
 	inc	de
@@ -103,6 +123,13 @@ loop:
 	add	hl,bc
 	pop	bc
 	djnz	loop
+	; And now underline
+	ld	a,(generic_console_flags)
+	and	@000001000
+	ret	z
+	ld	bc,-64
+	add	hl,bc
+	ld	(hl),@00111111
 	ret
 
 
