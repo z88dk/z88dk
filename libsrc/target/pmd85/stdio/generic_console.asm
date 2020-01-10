@@ -29,7 +29,7 @@ generic_console_scrollup:
 	push	bc
 	push	de
 	ld	de,DISPLAY
-	ld	hl,DISPLAY+256
+	ld	hl,DISPLAY+512
 	ld	c,256 - 8
 sloop1:
 	ld	b,48
@@ -44,8 +44,23 @@ sloop2:
 	ld	d,h
 	ld	e,l	
 	dec	d
+	dec	d
 	dec	c
 	jr	nz,sloop1
+	ld	c,8
+sloop3:
+	ld	b,48
+sloop4:
+	xor	a
+	ld	(de),a
+	inc	de
+	dec	b
+	jr	nz,sloop4
+	ld	hl,16
+	add	hl,de
+	ex	de,hl
+	dec	c
+	jr	nz,sloop3
 	pop	de
 	pop	bc
 	ret

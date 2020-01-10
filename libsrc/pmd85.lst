@@ -4,5 +4,6 @@ target/pmd85/stdio/CRT_FONT
 target/pmd85/stdio/generic_console
 target/pmd85/stdio/generic_console_vpeek
 target/pmd85/stdio/generic_console_ioctl
+@input/input_keyboard.lst
 @font/font_8x8/font_8x8.lst
 @8080.lst
