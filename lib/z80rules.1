@@ -2380,6 +2380,8 @@
 =
 	ld	sp,hl
 
+%notcpu 8080
+%notcpu gbz80
 	call	memset
 	pop	bc
 	pop	bc
@@ -2387,6 +2389,8 @@
 =
 	call	memset_callee
 
+%notcpu 8080
+%notcpu gbz80
 	call	memcpy
 	pop	bc
 	pop	bc

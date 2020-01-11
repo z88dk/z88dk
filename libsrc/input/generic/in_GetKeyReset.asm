@@ -11,5 +11,11 @@ EXTERN _in_KeyDebounce, _in_KbdState
    ld a,(_in_KeyDebounce)
    ld e,a
    ld d,0
+IF __CPU_INTEL__
+   ex de,hl
+   ld (_in_KbdState),hl
+   ex de,hl
+ELSE
    ld (_in_KbdState),de
+ENDIF
    ret

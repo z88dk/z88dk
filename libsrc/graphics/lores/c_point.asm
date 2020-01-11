@@ -25,17 +25,29 @@
 
 .c_point
 ._c_point
+IF __CPU_INTEL__
+                pop     bc
+                pop     hl
+                pop     de
+                push    de
+                push    hl
+                push    bc
+                ld      h,e
+ELSE
 		push	ix
                 ld      ix,2
                 add     ix,sp
                 ld      l,(ix+2)
                 ld      h,(ix+4)
+ENDIF
                 call    swapgfxbk
                 call    c_pointxy
                 push    af
                 call    swapgfxbk1
                 pop     af
+IF !__CPU_INTEL__
 		pop	ix
+ENDIF
                 ld      hl,1
                 ret     nz       ;pixel set
                 dec     hl

@@ -8,7 +8,7 @@
 ; DE=frequency
 ;
 
-IF !__CPU_GBZ80__
+IF !__CPU_GBZ80__ && !__CPU_INTEL__
     SECTION    code_clib
     PUBLIC     beeper
     PUBLIC     _beeper

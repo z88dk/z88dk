@@ -9,7 +9,7 @@ PUBLIC strlcpy
 EXTERN asm_strlcpy
 
 strlcpy:
-IF __CPU_GBZ80__
+IF __CPU_GBZ80__ | __CPU_INTEL__
    ld hl,sp+2
    ld c,(hl)
    inc hl
@@ -21,11 +21,8 @@ IF __CPU_GBZ80__
    inc hl
    ld a,(hl+)
    ld h,(hl)
-   ld l,e
-   ld e,l
-   ld a,h
-   ld h,d
-   ld d,a
+   ld l,a
+   ex de,hl
    call asm_strlcpy
    ld d,h
    ld e,l

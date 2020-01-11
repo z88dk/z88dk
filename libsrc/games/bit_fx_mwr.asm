@@ -7,7 +7,7 @@
 ; Adapted by Stefano Bodrato
 ;
 
-IF !__CPU_GBZ80__
+IF !__CPU_GBZ80__ && !__CPU_INTEL__
           SECTION    smc_clib
           PUBLIC     bit_fx
           PUBLIC     _bit_fx

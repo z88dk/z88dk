@@ -1,6 +1,5 @@
 
 
-IF !__CPU_INTEL__
 		MODULE		fputc_cons_generic_minimal
 
 
@@ -16,5 +15,4 @@ IF !__CPU_INTEL__
 fputc_cons_generic_minimal:
 _fputc_cons_generic_minimal:
 		INCLUDE		"fputc_cons_generic.inc"
-ENDIF
 

@@ -10,7 +10,7 @@ PUBLIC bcopy
 EXTERN asm_bcopy
 
 bcopy:
-IF __CPU_GBZ80__
+IF __CPU_GBZ80__ | __CPU_INTEL__
    ld hl,sp+2
    ld c,(hl)
    inc hl

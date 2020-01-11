@@ -30,20 +30,24 @@
 .point_callee
 ._point_callee
 
-   pop af
+   pop bc
    pop de	; y
    pop hl	; x
-   push af
+   push bc
 
 .asmentry
+IF !__CPU_INTEL__
 		push	ix
+ENDIF
                 call    swapgfxbk
                 call    w_pointxy
 				
                 push    af
                 call    swapgfxbk1
                 pop     af
+IF !__CPU_INTEL__
 		pop	ix
+ENDIF
                 ld      hl,1
                 ret     nz       ;pixel set
                 dec     hl

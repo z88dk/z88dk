@@ -49,7 +49,13 @@ EXTERN _in_KbdState
    ld a,(_in_KeyStartRepeat)
    ld e,a
    ld d,1
+IF __CPU_INTEL__
+   ex de,hl
+   ld (_in_KbdState),hl
+   ex de,hl
+ELSE
    ld (_in_KbdState),de
+ENDIF
    ret
 
 .startrepeat
@@ -57,7 +63,13 @@ EXTERN _in_KbdState
    ld a,(_in_KeyRepeatPeriod)
    ld e,a
    ld d,2
+IF __CPU_INTEL__
+   ex de,hl
+   ld (_in_KbdState),hl
+   ex de,hl
+ELSE
    ld (_in_KbdState),de
+ENDIF
    ret
 
 .nokey

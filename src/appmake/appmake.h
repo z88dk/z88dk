@@ -174,6 +174,9 @@ extern option_t  glue_options;
 extern int       residos_exec(char *target);
 extern option_t  residos_options;
 
+extern int       pmd85_exec(char *target);
+extern option_t  pmd85_options;
+
 extern int       sc3000_exec(char *target);
 extern option_t  sc3000_options;
 
@@ -363,14 +366,6 @@ struct {
       "PC-6001 (and others) CAS format conversion utility",
       NULL,
       nec_exec,    &nec_options },
-    { "bin2pas",   "pasopia7",  "(C) 2019 z88dk",
-      "Convert binary file to .wav",
-      NULL,
-      pasopia7_exec,    &pasopia7_options },
-    { "bin2t88",   "pc88",       "(C) 2018 Stefano Bodrato",
-      "PC-8801 T88 format conversion utility",
-      NULL,
-      pc88_exec,    &pc88_options },
     { "bin2nwbn",  "newbrain",       "(C) 2007 Stefano Bodrato",
       "BASIC loader + data block in Tape format or plain TXT (less efficient)",
       NULL,
@@ -383,6 +378,18 @@ struct {
       "Philips P2000 MicroCassette to CAS format conversion",
       NULL,
       p2000_exec,    &p2000_options },
+    { "bin2pas",   "pasopia7",  "(C) 2019 z88dk",
+      "Convert binary file to .wav",
+      NULL,
+      pasopia7_exec,    &pasopia7_options },
+    { "bin2t88",   "pc88",       "(C) 2018 Stefano Bodrato",
+      "PC-8801 T88 format conversion utility",
+      NULL,
+      pc88_exec,    &pc88_options },
+    { "bin2ptp",   "pmd85",       "(C) 2020 z88dk",
+      "Create a PMD85 ptp file",
+      NULL,
+      pmd85_exec,    &pmd85_options },
     { "px2rom",   "px",       "(C) 2015 Stefano Bodrato",
       "Create an epson PX(HC) family compatible EPROM image",
       NULL,

@@ -33,10 +33,10 @@ ELIF __CPU_GBZ80__
 	inc	hl
 	ld	d,(hl)
 ELSE
-	pop	af
+	pop	hl
 	pop	de
 	push	de
-	push	af
+	push	hl
 ENDIF
 	ld	hl,0
 	inc	de
