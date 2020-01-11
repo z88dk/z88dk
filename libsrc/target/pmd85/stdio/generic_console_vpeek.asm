@@ -21,6 +21,7 @@ generic_console_vpeek:
 	ld	a,8
 loop:	push	af
 	ld	a,(hl)
+	and	@00111111
 	; And mirror byte
 	ld	c,a
         rlca

@@ -17,12 +17,29 @@
                 EXTERN          generic_console_font32
                 EXTERN          generic_console_udg32
 		EXTERN		generic_console_flags
+		EXTERN		conio_map_colour
+		EXTERN		__pmd85_attribute
+		EXTERN		__pmd85_attribute2
 
                 defc            DISPLAY = 0xc000
 
 generic_console_set_paper:
 generic_console_set_attribute:
+	ret
+
+
 generic_console_set_ink:
+	call	conio_map_colour
+	rrca
+	rrca
+	ld	c,a
+	and	@11000000
+	ld	(__pmd85_attribute),a
+	ld	a,c
+	rrca
+	rrca
+	and	@11000000
+	ld	(__pmd85_attribute2),a
         ret
 
 
@@ -107,7 +124,7 @@ not_udg:
         rlca
         sbc     a,a
         ld      c,a             ;x = 0 / 255
-	ld	b,8
+	ld	b,4
 loop:
 	push	bc
 	ld	a,(generic_console_flags)
@@ -138,12 +155,54 @@ not_bold:
         xor     c
         and     0x66
         xor     c
-;	rrca
 	and	@00111111
+	ld	c,a
+	ld	a,(__pmd85_attribute)
+	or	c
 	ld	(hl),a
 	inc	de
 	ld	bc,64		;Move to next row
 	add	hl,bc
+	; 2nd row 
+	pop	bc
+	push	bc
+        ld      a,(generic_console_flags)
+        and     @000010000
+        ld      a,(de)
+        jr      z,not_bold2
+        ld      b,a
+        rrca
+        or      b
+not_bold2:
+        xor     c               ;Handle inverse
+        ld      c,a		;Mirror
+        rlca
+        rlca
+        xor     c
+        and     0xaa
+        xor     c
+        ld      c,a
+        rlca
+        rlca
+        rlca
+        ld      b,a
+        ld      a,c
+        rrca
+        ld      c,a
+        ld      a,b
+        xor     c
+        and     0x66
+        xor     c
+        and     @00111111	;Get required bits
+        ld      c,a
+        ld      a,(__pmd85_attribute2)	;second attribute
+        or      c
+        ld      (hl),a
+	inc	de
+	ld	bc,64		;Move to next row
+	add	hl,bc
+
+
 	pop	bc
 	djnz	loop
 	; And now underline
@@ -152,7 +211,9 @@ not_bold:
 	ret	z
 	ld	bc,-64
 	add	hl,bc
-	ld	(hl),@00111111
+	ld	a,(__pmd85_attribute2)
+	or	@00111111
+	ld	(hl),a
 	ret
 
 
