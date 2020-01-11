@@ -91,6 +91,7 @@ found_mask:
 	; b = mask
 	ld	a,l
 	or	c
+        ld      l,a
 	ld	h,b
 	and	a
 	ret
