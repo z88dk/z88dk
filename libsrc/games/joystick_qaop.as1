@@ -1,5 +1,6 @@
 ; Snippet for QAOP-MN joystick
 
+IF !__CPU_INTEL__
 	call	getk
 	ld	a,l
 	ld	hl,0
@@ -34,3 +35,4 @@
 	set	0,l
 	ret
 
+ENDIF

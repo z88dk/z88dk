@@ -1,5 +1,6 @@
 ; Snippet for 8246-05 joystick
 
+IF !__CPU_INTEL__
 	call	getk
 	ld	a,l
 	ld	hl,0
@@ -32,3 +33,4 @@
 	ret	nz
 	set	0,l
 	ret
+ENDIF

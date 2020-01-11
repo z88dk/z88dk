@@ -295,6 +295,12 @@ IF FORtvc
         defc sndbit_mask   = 0
 ENDIF
 
+IF FORpmd85
+        defc sndbit_port   = 0
+        defc sndbit_bit    = 0
+        defc sndbit_mask   = 0
+ENDIF
+
 IF FORsmc777
     defc sndbit_port	= $1c
     defc sndbit_bit    = 4
@@ -377,6 +383,7 @@ IF FORpencil2
     defc sndbit_bit    = 3
     defc sndbit_mask   = $0F			; $0F for full volume output
 ENDIF
+
 
 
 ; ********************************************************

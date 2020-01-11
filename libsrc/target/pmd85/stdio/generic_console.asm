@@ -87,9 +87,9 @@ generic_console_printc:
         ld      hl,(generic_console_font32)
         rlca
         jr      nc,not_udg
-        ccf
-        rrca
-        ld      e,d
+	ld	a,e
+	and	127
+	ld	e,a
         ld      hl,(generic_console_udg32)
         inc     h               ;We decrement later
 not_udg:
@@ -109,7 +109,14 @@ not_udg:
 	ld	b,8
 loop:
 	push	bc
+	ld	a,(generic_console_flags)
+	and	@000010000
 	ld	a,(de)
+	jr	z,not_bold
+        ld	b,a
+	rrca
+	or	b
+not_bold:
 	xor	c		;Handle inverse
 				;Now, mirror bits
 	ld      c,a
