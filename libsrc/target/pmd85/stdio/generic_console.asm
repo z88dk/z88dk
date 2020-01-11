@@ -8,6 +8,7 @@
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_attribute
+		PUBLIC		generic_console_xypos
 
 
                 EXTERN          CONSOLE_COLUMNS
@@ -100,7 +101,7 @@ not_udg:
         add     hl,de
         dec     h               ; -32 characters
         ex      de,hl           ; de = font
-	call	xypos
+	call	generic_console_xypos
 
         ld      a,(generic_console_flags)
         rlca
@@ -158,7 +159,7 @@ not_bold:
 ; Entry: b = row
 ;	 c = column
 ; Exit:	hl = address
-xypos:
+generic_console_xypos:
 	; 512 bytes per row
 	ld	h,b		;* 256
 	ld	l,0
