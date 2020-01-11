@@ -13,4 +13,13 @@ stdio/inkey/fgetc_cons
 target/pmd85/games/joystick
 target/pmd85/games/keys_joystick
 @games/games.lst
+target/pmd85/graphics/clg
+target/pmd85/graphics/w_pixladdr
+target/pmd85/graphics/w_plotpixl
+target/pmd85/graphics/w_respixl
+target/pmd85/graphics/w_xorpixl
+target/pmd85/graphics/w_pointxy
+target/pmd85/graphics/__set_graphics_colour
+graphics/swapgfxbk_foo
+@gfxbasew_8080.lst
 @8080.lst

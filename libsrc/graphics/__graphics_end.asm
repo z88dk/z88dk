@@ -8,5 +8,7 @@
 
 __graphics_end:
 		call	swapgfxbk1
+IF !__CPU_INTEL__
 		pop	ix
+ENDIF
 		ret

@@ -41,6 +41,12 @@
 		ret     c               ; Return if X overflows
 		
 		ld      (__gfx_coords),hl	; store X
+IF __CPU_INTEL__
+		ex	de,hl
+		ld	(__gfx_coords+2),hl
+		ex	de,hl
+ELSE
 		ld      (__gfx_coords+2),de   ; store Y: COORDS must be 2 bytes wider
+ENDIF
 
 		ret
