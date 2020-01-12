@@ -32,6 +32,10 @@ math/float/math32/lm32/c/sccz80/fabs
 math/float/math32/lm32/c/sccz80/fabs_fastcall
 math/float/math32/lm32/c/sccz80/floor
 math/float/math32/lm32/c/sccz80/floor_fastcall
+math/float/math32/lm32/c/sccz80/fmax
+math/float/math32/lm32/c/sccz80/fmax_callee
+math/float/math32/lm32/c/sccz80/fmin
+math/float/math32/lm32/c/sccz80/fmin_callee
 math/float/math32/lm32/c/sccz80/fmod
 math/float/math32/lm32/c/sccz80/fmod_callee
 math/float/math32/lm32/c/sccz80/fpclassify

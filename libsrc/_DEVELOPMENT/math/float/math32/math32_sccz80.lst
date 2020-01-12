@@ -14,6 +14,10 @@ math/float/math32/c/sccz80/cm32_sccz80_dloadb
 math/float/math32/c/sccz80/cm32_sccz80_exp
 math/float/math32/c/sccz80/cm32_sccz80_fabs
 math/float/math32/c/sccz80/cm32_sccz80_floor
+math/float/math32/c/sccz80/cm32_sccz80_fmax
+math/float/math32/c/sccz80/cm32_sccz80_fmax_callee
+math/float/math32/c/sccz80/cm32_sccz80_fmin
+math/float/math32/c/sccz80/cm32_sccz80_fmin_callee
 math/float/math32/c/sccz80/cm32_sccz80_fmod
 math/float/math32/c/sccz80/cm32_sccz80_fmod_callee
 math/float/math32/c/sccz80/cm32_sccz80_fpclassify

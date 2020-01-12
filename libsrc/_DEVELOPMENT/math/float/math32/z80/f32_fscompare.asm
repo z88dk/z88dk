@@ -1,7 +1,7 @@
 SECTION code_clib
 SECTION code_fp_math32
 
-PUBLIC  m32_compare_callee
+PUBLIC  m32_compare, m32_compare_callee
 
 ; Compare two IEEE floats.
 ;
@@ -13,6 +13,33 @@ PUBLIC  m32_compare_callee
 ;       - If the sign bit was set (negative), flip the other bits too.
 ;       http://stereopsis.com/radix.html, et al.
 ;
+;
+;       Entry: stack = right, left, ret, ret
+;
+;       Exit:      Z = number is zero
+;               (NZ) = number is non-zero
+;                  C = number is negative 
+;                 NC = number is positive
+;              stack = right, left, ret
+;
+;       Uses: af, bc, de, hl, bc', de', hl'
+.m32_compare
+    pop af              ;return address from this function
+    pop bc              ;return address to real program
+    pop hl              ;the left (primary) off the stack
+    pop de
+    exx                 ;right
+    pop hl              ;and the right (secondary) off the stack
+    pop de
+    push de
+    push hl
+    exx                 ;left
+    push de
+    push hl
+    push bc
+    push af
+    jr continue
+
 ;       Entry: dehl  = right
 ;              stack = left, ret, ret
 ;
@@ -22,16 +49,16 @@ PUBLIC  m32_compare_callee
 ;                 NC = number is positive
 ;
 ;       Uses: af, bc, de, hl, bc', de', hl'
-
 .m32_compare_callee
     exx                 ;left
     pop af              ;return address from this function
     pop bc              ;return address to real program
-    pop hl              ;and the left (primary) on the stack
+    pop hl              ;and the left (primary) off the stack
     pop de
     push bc
     push af
 
+.continue
     exx                 ;right
     sla e
     rl d
