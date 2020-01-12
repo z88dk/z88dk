@@ -2,7 +2,7 @@
 SECTION code_clib
 SECTION code_fp_math32
 
-PUBLIC asm_dmul10u
+PUBLIC asm_dmul10u, asm_dmul10a
 
 EXTERN m32_fsmul10u_fastcall
 
@@ -21,6 +21,9 @@ EXTERN m32_fsmul10u_fastcall
    ;            carry set, errno set
    ;
    ; uses  : af, bc', de', hl'
+
+
+defc asm_dmul10a = asm_dmul10u
 
 .asm_dmul10u
 
