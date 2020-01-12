@@ -49,7 +49,7 @@ EXTERN _in_KbdState
    ld a,(_in_KeyStartRepeat)
    ld e,a
    ld d,1
-IF __CPU_INTEL__
+IF __CPU_INTEL__ 
    ex de,hl
    ld (_in_KbdState),hl
    ex de,hl

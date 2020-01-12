@@ -66,6 +66,7 @@ define buildgeneric
 	$(MAKE) -C debug
 	$(MAKE) -C assert
 	$(MAKE) -C font
+	$(MAKE) -C input
 	$(MAKE) -C stdlib TARGET=$(1)
 	$(MAKE) -C compress/zx7
 	$(MAKE) -C psg
@@ -1467,7 +1468,6 @@ pmd85_clib.lib:
 	@echo '--- Building pmd85 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(MAKE) -C input clean
 	$(call buildgeneric,pmd85)
 	$(MAKE) -C games TARGET=pmd85
 	TARGET=pmd85 TYPE=8080 $(LIBLINKER) -m8080 -DFORpmd85 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pmd85_clib @$(LISTFILE_DIRECTORY)/pmd85.lst
