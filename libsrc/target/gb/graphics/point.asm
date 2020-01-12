@@ -13,9 +13,10 @@
 point:
 _point:
 	ld	hl,sp+2
-	ld	l,(hl)		;y
+	ld	e,(hl)		;y
 	ld	hl,sp+4
-	ld	h,(hl)		;x
+	ld	d,(hl)		;x
+	ex	de,hl
 	jr	asm_point
 
 point_callee:
