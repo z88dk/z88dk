@@ -4,8 +4,6 @@ math/float/math32/lm32/z80/asm_divf
 math/float/math32/lm32/z80/asm_div2f
 math/float/math32/lm32/z80/asm_fabsf
 math/float/math32/lm32/z80/asm_floorf
-math/float/math32/lm32/z80/asm_fmaxf
-math/float/math32/lm32/z80/asm_fminf
 math/float/math32/lm32/z80/asm_fpclassifyf
 math/float/math32/lm32/z80/asm_hypotf
 math/float/math32/lm32/z80/asm_invf
