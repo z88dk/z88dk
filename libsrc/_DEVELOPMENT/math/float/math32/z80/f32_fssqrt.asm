@@ -43,6 +43,12 @@ PUBLIC _m32_sqrtf, _m32_invsqrtf
 
 
 .m32_fssqrt
+    pop af                      ; ret
+    pop hl                      ; y off stack
+    pop de
+    push de
+    push hl
+    push af                     ; ret
     rl d
     jp C,m32_fsconst_nnan       ; negative number?
     rr d
@@ -55,11 +61,12 @@ PUBLIC _m32_sqrtf, _m32_invsqrtf
     rl d
     jp C,m32_fsconst_nnan       ; negative number?
     rr d
+    pop af                      ; ret
     push de                     ; y msw on stack
     push hl                     ; y lsw on stack
+    push af                     ; ret
     call m32_fsinvsqrt_fastcall
-    call m32_fsmul_callee
-    ret
+    jp m32_fsmul_callee
 
 
 ._m32_invsqrtf

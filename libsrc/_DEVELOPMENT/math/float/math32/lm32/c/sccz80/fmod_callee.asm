@@ -8,5 +8,6 @@
 IF __CLASSIC
     ; SDCC bridge for Classic
     PUBLIC  _fmod_callee
-    defc    _fmod_callee = fmod_callee
+    EXTERN  cm32_sdcc_fmod_callee
+    defc    _fmod_callee = cm32_sdcc_fmod_callee
 ENDIF

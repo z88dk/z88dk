@@ -8,6 +8,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _tan_fastcall
-defc _tan_fastcall = tan_fastcall
+defc _tan_fastcall = _m32_tanf
 ENDIF
 

@@ -1,14 +1,14 @@
 
 	SECTION	code_fp_math32
 	PUBLIC	sinh
-	EXTERN	cm32_sccz80_sinh
+	EXTERN	_m32_sinhf
 
-	defc	sinh = cm32_sccz80_sinh
-
+	defc	sinh = _m32_sinhf
 
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _sinh
-defc _sinh = sinh
+EXTERN cm32_sdcc_sinh
+defc _sinh = cm32_sdcc_sinh
 ENDIF
 

@@ -8,6 +8,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _acos_fastcall
-defc _acos_fastcall = acos_fastcall
+defc _acos_fastcall = _m32_acosf
 ENDIF
 

@@ -6,9 +6,7 @@ SECTION code_fp_math32
 
 PUBLIC cm32_sdcc_fssqrt
 
-EXTERN cm32_sdcc_fsread1, m32_fssqrt
-
-.cm32_sdcc_fssqrt
+EXTERN m32_fssqrt
 
     ; square root sdcc float
     ;
@@ -18,8 +16,4 @@ EXTERN cm32_sdcc_fsread1, m32_fssqrt
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-    call cm32_sdcc_fsread1
-
-    jp m32_fssqrt           ; enter stack = sdcc_float, ret
-                            ;
-                            ; return DEHL = sdcc_float
+defc cm32_sdcc_fssqrt = m32_fssqrt

@@ -1,14 +1,14 @@
 
 	SECTION	code_fp_math32
 	PUBLIC	tan
-	EXTERN	cm32_sccz80_tan
+	EXTERN	_m32_tanf
 
-	defc	tan = cm32_sccz80_tan
-
+	defc	tan = _m32_tanf
 
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _tan
-defc _tan = tan
+EXTERN cm32_sdcc_tan
+defc _tan = cm32_sdcc_tan
 ENDIF
 

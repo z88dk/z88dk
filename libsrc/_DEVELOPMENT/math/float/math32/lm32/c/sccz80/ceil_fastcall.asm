@@ -8,6 +8,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _ceil_fastcall
-defc _ceil_fastcall = ceil_fastcall
+defc _ceil_fastcall = m32_ceil_fastcall
 ENDIF
 

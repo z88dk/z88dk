@@ -1,13 +1,13 @@
 
 	SECTION	code_fp_math32
 	PUBLIC	mul2_fastcall
-	EXTERN	_m32_mul2f
+	EXTERN	m32_fsmul2_fastcall
 
-	defc	mul2_fastcall = _m32_mul2f
+	defc	mul2_fastcall = m32_fsmul2_fastcall
 
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _mul2_fastcall
-defc _mul2_fastcall = mul2_fastcall
+defc _mul2_fastcall = m32_fsmul2_fastcall
 ENDIF
 

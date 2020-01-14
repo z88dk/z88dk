@@ -8,6 +8,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _atanh_fastcall
-defc _atanh_fastcall = atanh_fastcall
+defc _atanh_fastcall = _m32_atanhf
 ENDIF
 

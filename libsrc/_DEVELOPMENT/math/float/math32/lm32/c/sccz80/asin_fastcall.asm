@@ -8,6 +8,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _asin_fastcall
-defc _asin_fastcall = asin_fastcall
+defc _asin_fastcall = _m32_asinf
 ENDIF
 

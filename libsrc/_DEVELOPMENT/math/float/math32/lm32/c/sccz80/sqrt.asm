@@ -1,15 +1,15 @@
 
+    SECTION code_fp_math32
 
-SECTION code_fp_math32
+    PUBLIC sqrt
+    EXTERN m32_fssqrt_fastcall
 
-PUBLIC sqrt
-EXTERN cm32_sccz80_fssqrt
-
-defc sqrt = cm32_sccz80_fssqrt
+    defc sqrt = m32_fssqrt_fastcall
 
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _sqrt
-defc _sqrt = sqrt
+EXTERN cm32_sdcc_fssqrt
+defc _sqrt = cm32_sdcc_fssqrt
 ENDIF
 

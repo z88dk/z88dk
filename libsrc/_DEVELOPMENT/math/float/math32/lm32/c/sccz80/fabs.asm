@@ -1,13 +1,14 @@
 
 	SECTION	code_fp_math32
 	PUBLIC	fabs
-	EXTERN	cm32_sccz80_fabs
+	EXTERN	m32_fabs_fastcall
 
-	defc	fabs = cm32_sccz80_fabs
+	defc	fabs = m32_fabs_fastcall
 
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _fabs
-defc _fabs = fabs
+EXTERN cm32_sdcc_fabs
+defc _fabs = cm32_sdcc_fabs
 ENDIF
 

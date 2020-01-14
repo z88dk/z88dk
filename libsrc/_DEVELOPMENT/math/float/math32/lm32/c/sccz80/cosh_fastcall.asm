@@ -8,6 +8,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _cosh_fastcall
-defc _cosh_fastcall = cosh_fastcall
+defc _cosh_fastcall = _m32_coshf
 ENDIF
 

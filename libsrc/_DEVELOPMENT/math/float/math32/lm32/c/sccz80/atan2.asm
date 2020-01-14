@@ -9,6 +9,7 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _atan2
-defc _atan2 = atan2
+EXTERN _m32_atan2f
+defc _atan2 = _m32_atan2f
 ENDIF
 

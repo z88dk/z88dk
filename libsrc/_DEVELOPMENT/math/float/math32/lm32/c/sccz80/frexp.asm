@@ -9,6 +9,7 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _frexp
-defc _frexp = frexp
+EXTERN cm32_sdcc_frexp
+defc _frexp = cm32_sdcc_frexp
 ENDIF
 
