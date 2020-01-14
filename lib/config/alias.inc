@@ -11,6 +11,7 @@ ALIAS   --hardware-keyboard -pragma-redirect:fgetc_cons=fgetc_cons_inkey  -pragm
 # Math library aliases (classic)
 #
 ALIAS   --math-mbf32    -Cc-fp-mode=mbf32 -lmbf32
+ALIAS   --math-mbf32_8080    -Cc-fp-mode=mbf32 -lmbf32_8080
 ALIAS   --math-mbf64    -Cc-fp-mode=mbf64 -lmbf64
 ALIAS   --math-bbc      -Cc-fp-mode=z88 -lbbc_math
 
