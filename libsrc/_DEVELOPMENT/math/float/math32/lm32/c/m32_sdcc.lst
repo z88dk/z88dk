@@ -81,6 +81,7 @@ math/float/math32/lm32/c/sdcc/mul2
 math/float/math32/lm32/c/sdcc/mul2_fastcall
 math/float/math32/lm32/c/sdcc/mul10u
 math/float/math32/lm32/c/sdcc/mul10u_fastcall
+math/float/math32/lm32/c/sdcc/mlib2d
 math/float/math32/lm32/c/sdcc/modf
 math/float/math32/lm32/c/sdcc/poly
 math/float/math32/lm32/c/sdcc/poly_callee
