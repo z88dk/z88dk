@@ -62,12 +62,13 @@ ssize_t read(int fd, void *buf, size_t len)
             _putoffset(fc->ranrec,fc->rwptr/SECSIZE);
             if ( size == SECSIZE ) {
                 bdos(CPM_SDMA,buf);
-                if ( bdos(CPM_RRAN,fc) )
-                    return -1;
+                if ( bdos(CPM_RRAN,fc) ) {
+                    return cnt-len;
+		}
             } else {
                 bdos(CPM_SDMA,buffer);
                 if ( bdos(CPM_RRAN,fc) ) {
-                    return -1;          
+                    return cnt-len;          
                 }
                 memcpy(buf,buffer+offset,size);
             }
