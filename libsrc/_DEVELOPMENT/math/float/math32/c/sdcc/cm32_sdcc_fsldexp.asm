@@ -1,13 +1,13 @@
 
 SECTION code_fp_math32
 
-PUBLIC cm32_sccz80_ldexp
+PUBLIC cm32_sdcc_ldexp
 
 EXTERN m32_fsldexp_callee
 
 ; float ldexpf(float x, int16_t pw2);
 
-.cm32_sccz80_ldexp
+.cm32_sdcc_ldexp
 
     ; Entry:
     ; Stack: int right, float left, ret
