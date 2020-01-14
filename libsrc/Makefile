@@ -88,6 +88,7 @@ gfxdeps:
 #  short script to sort out ticalc dependencies
 msxdeps:
 	$(MAKE) -C target/msx clean
+	$(MAKE) gfxdeps
 
 zx81deps:
 	$(MAKE) -C target/zx81 clean
