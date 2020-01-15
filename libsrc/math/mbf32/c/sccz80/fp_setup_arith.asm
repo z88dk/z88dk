@@ -28,7 +28,12 @@ IF __CPU_INTEL__
 ELSE
 	ld	(___mbf32_FPREG + 2),de
 ENDIF
+IF __CPU_INTEL__ | __CPU_GBZ80__
+	pop	hl		;return address
+	ld	(___mbf32_shuffle_temp),hl
+ELSE
 	pop	af		;Return address
+ENDIF
 	pop	hl		;Caller return address
 	pop	de		;Left LSW
 	pop	bc		;Left MSW
@@ -36,5 +41,17 @@ ENDIF
 IF !__CPU_INTEL__
 	push	ix
 ENDIF
+IF __CPU_INTEL__ | __CPU_GBZ80__
+	ld	hl,(___mbf32_shuffle_temp)
+	push	hl
+ELSE
 	push	af		;Our return address
+ENDIF
 	ret
+
+IF __CPU_INTEL__ | __CPU_GBZ80__
+	SECTION	bss_fp_mbf32
+	PUBLIC	___mbf32_shuffle_temp
+___mbf32_shuffle_temp:
+	defw	0
+ENDIF
