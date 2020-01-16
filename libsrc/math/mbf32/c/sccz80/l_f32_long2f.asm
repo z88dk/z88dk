@@ -19,8 +19,8 @@ l_f32_ulong2f:
 	jr	not_negative
 l_f32_slong2f:
 	ld	a,d
-	ld	a,128
 	rla
+	ld	a,128
 	jp	nc,not_negative
 	call	l_long_neg
 	xor	a
