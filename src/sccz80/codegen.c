@@ -2299,6 +2299,7 @@ void zmod(LVALUE* lval)
             callrts("l_long_mod_u");
         else
             callrts("l_long_mod");
+        Zsp += 4;
     } else {
         if ( IS_GBZ80() ) {
             // TODO: This or just load registers?
