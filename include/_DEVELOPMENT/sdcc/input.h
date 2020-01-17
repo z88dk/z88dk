@@ -68,6 +68,10 @@ typedef struct udk_s
 #include <input/input_cpm.h>
 #endif
 
+#ifdef __HBIOS
+#include <input/input_hbios.h>
+#endif
+
 #ifdef __SMS
 #include <input/input_sms.h>
 #endif

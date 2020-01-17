@@ -10,6 +10,7 @@
 @font/font_8x8/fonts.lst
 @font/fzx/zx/zx_sdcc_ix.lst
 @im2/im2_sdcc.lst
+@input/hbios/input_sdcc_ix.lst
 @inttypes/inttypes_sdcc_ix.lst
 @l/l.lst
 @l/sdcc.lst
