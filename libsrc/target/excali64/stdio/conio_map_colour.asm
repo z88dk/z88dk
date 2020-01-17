@@ -49,7 +49,7 @@ excalibur_colour_1:
         defb    $d      ;LIGHTGREEN -> PALE GREEN    - ok
         defb    $6      ;LIGHTCYAN -> 6 (cyan)
         defb    $9      ;LIGHTRED -> 9 (orange)
-        defb    $d      ;LIGHTMAGENTA -> 14 (pink/cerise)
+        defb    $e      ;LIGHTMAGENTA -> 14 (pink/cerise)
 	defb	$6	;YELLOW -> YELLOW
 	defb	$7	;WHITE -> WHITE
 
@@ -84,7 +84,7 @@ background_table:
 	defb	$2	;LIGHTBLUE -> BLUE
 	defb	$4	;LIGHTGREEN -> GREEN
 	defb	$6	;LIGHTCYAN -> CYAN
-	defb	$2	;LIGHTRED -> RED
+	defb	$1	;LIGHTRED -> RED
 	defb	$3	;LIGHTMAGENTA -> MAGENTA	
 	defb	$5	;YELLOW -> YELLOW
 	defb	$7	;WHITE -> WHITE
