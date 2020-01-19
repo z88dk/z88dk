@@ -16,13 +16,15 @@
 
 #include "appmake.h"
 
-
+static char              help         = 0;
 static char             *binname      = NULL;
 static char             *outfile      = NULL;
 static char             *crtfile      = NULL;
 static int               origin       = -1;
 static int               recsize      = 16;
-static char              help         = 0;
+static int               code_fence   = -1;
+static int               data_fence   = -1;
+static char              warn         = 0;
 
 
 /* Options that are available for this module */
@@ -32,10 +34,16 @@ option_t hex_options[] = {
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     { 'o', "output",   "Name of output file",        OPT_STR|OPT_OUTPUT,   &outfile },
     {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
+    { 'w', "warn",      "Warn of colliding sections",OPT_BOOL,  &warn },
+    {  0 , "code-fence", "CODE restricted below this address", OPT_INT,   &code_fence },
+    {  0 , "data-fence", "DATA restricted below this address", OPT_INT,   &data_fence },
     { 'r', "recsize",  "Record size (default: 16)",  OPT_INT,   &recsize },
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
 };
 
+/*
+ * Execution starts here
+ */
 
 int hex_exec(char *target)
 {
@@ -67,7 +75,66 @@ int hex_exec(char *target)
     if ( (output = fopen(filename,"w") ) == NULL ) {
         perror("Error opening output file");
         myexit(NULL,1);
-    } 
+    }
+
+    // check if section CODE extends past fence
+
+    if (code_fence > 0) {
+
+        long code_end_tail;
+
+        code_end_tail = parameter_search(crtfile, ".map", "__CODE_END_tail");
+
+        if (code_end_tail > code_fence) {
+
+            fprintf(stderr, "\nError: The CODE section has exceeded the fence by %u bytes\n(CODE_end 0x%04x, CODE fence 0x%04x)\n", (unsigned int)code_end_tail - code_fence, (unsigned int)code_end_tail - 1, code_fence);
+            fclose(input); 
+            fclose(output);
+            exit(1);
+        }
+
+    }
+
+    // check if section DATA extends past fence
+
+    if (data_fence > 0) {
+
+        long data_end_tail;
+
+        data_end_tail = parameter_search(crtfile, ".map", "__DATA_END_tail");
+
+        if (data_end_tail > data_fence) {
+
+            fprintf(stderr, "\nError: The DATA section has exceeded the fence by %u bytes\n(DATA_en 0x%04x, DATA fence 0x%04x)\n", (unsigned int)data_end_tail - data_fence, (unsigned int)data_end_tail - 1, data_fence);
+            fclose(input); 
+            fclose(output);
+            exit(1);
+        }
+    }
+
+    // check if sections overlap
+
+    if (warn) {
+
+        long code_end_tail, data_end_tail;
+        long data_head, bss_head;
+ 
+        code_end_tail = parameter_search(crtfile, ".map", "__CODE_END_tail");
+        data_head = parameter_search(crtfile, ".map", "__DATA_head");
+        
+        data_end_tail = parameter_search(crtfile, ".map", "__DATA_END_tail");
+        bss_head  = parameter_search(crtfile, ".map", "__BSS_head");
+
+        if (code_end_tail > data_head) {
+
+            fprintf(stderr, "\nWarning: CODE section overlaps DATA section by %u bytes\n(CODE_end 0x%04x, DATA_head 0x%04x)\n", (unsigned int)(code_end_tail - data_head), (unsigned int)(code_end_tail - 1), data_head);
+        }
+
+        if (data_end_tail > bss_head) {
+
+            fprintf(stderr, "\nWarning: DATA section overlaps BSS section by %u bytes\n(DATA_end 0x%04x, BSS_head 0x%04x)\n", (unsigned int)(data_end_tail - bss_head), (unsigned int)(data_end_tail - 1), bss_head);
+        }
+    }
 
     bin2hex(input, output, origin, -1, recsize, 1); 
 
