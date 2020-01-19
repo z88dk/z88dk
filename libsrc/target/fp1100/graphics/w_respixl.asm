@@ -17,7 +17,7 @@
     jr      z,hires
     ld      h,l
     ld      l,e
-    INCLUDE "graphics/generic_console/pixel.inc"
+    INCLUDE "gfx/gencon/pixel.inc"
 
 hires:	
 	INCLUDE "w_pixel.inc"

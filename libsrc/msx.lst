@@ -6,10 +6,8 @@ target/msx/stdio/fputc_cons
 @stdio/stdio_binary.lst
 target/msx/time/clock
 @target/cpm/fcntl/fcntl.lst
-graphics/dcircle
-graphics/getsprite
 @video/tms9918/video_tms9918.lst
-@gfxbase.lst
+@gfx/narrow/gfx_narrow.lst
 target/msx/games/joystick
 target/msx/games/bit_open
 target/msx/games/bit_open_di

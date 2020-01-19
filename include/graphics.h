@@ -64,48 +64,66 @@ extern int __LIB__ multipoint_callee(int hv, int length, int x, int y) __smallc 
 
 /* Draw a line */
 extern void __LIB__ draw(int x1, int y1, int x2, int y2) __smallc;
+#if !__GBZ80__ && !__8080__
 extern void __LIB__ draw_callee(int x1, int y1, int x2, int y2) __smallc __z88dk_callee;
 #define draw(a,b,c,d)           draw_callee(a,b,c,d)
+#endif
 
 /* Draw a line in 'XOR' mode */
 extern void __LIB__ xordraw(int x1, int y1, int x2, int y2) __smallc;
+#if !__GBZ80__ && !__8080__
 extern void __LIB__ xordraw_callee(int x1, int y1, int x2, int y2) __smallc __z88dk_callee;
 #define xordraw(a,b,c,d)           xordraw_callee(a,b,c,d)
+#endif
 
 /* Remove a line */
 extern void __LIB__ undraw(int x1, int y1, int x2, int y2) __smallc;
+#if !__GBZ80__ && !__8080__
 extern void __LIB__ undraw_callee(int x1, int y1, int x2, int y2) __smallc __z88dk_callee;
 #define undraw(a,b,c,d)           undraw_callee(a,b,c,d)
+#endif
 
 /* Relative draw */
 extern void __LIB__ drawr(int px, int py) __smallc;
+#if !__GBZ80__ && !__8080__
 extern void __LIB__ drawr_callee(int px, int py) __smallc __z88dk_callee;
 #define drawr(a,b)           drawr_callee(a,b)
+#endif
 
 /* Relative draw in XOR mode*/
 extern void __LIB__ xordrawr(int px, int py) __smallc;
+#if !__GBZ80__ && !__8080__
 extern void __LIB__ xordrawr_callee(int px, int py) __smallc __z88dk_callee;
 #define xordrawr(a,b)           xordrawr_callee(a,b)
+#endif
 
 /* Remove a relative draw */
 extern void __LIB__ undrawr(int px, int py) __smallc;
+#if !__GBZ80__ && !__8080__
 extern void __LIB__ undrawr_callee(int px, int py) __smallc __z88dk_callee;
 #define undrawr(a,b)           undrawr_callee(a,b)
+#endif
 
 /* Draw up to a specified point */
 extern void __LIB__ drawto(int x2, int y2) __smallc;
+#if !__GBZ80__ && !__8080__
 extern void __LIB__ drawto_callee(int x2, int y2) __smallc __z88dk_callee;
 #define drawto(a,b)           drawto_callee(a,b)
+#endif
 
 /* Draw up to a specified point in XOR mode*/
 extern void __LIB__ xordrawto(int x2, int y2) __smallc;
+#if !__GBZ80__ && !__8080__
 extern void __LIB__ xordrawto_callee(int x2, int y2) __smallc __z88dk_callee;
 #define xordrawto(a,b)           xordrawto_callee(a,b)
+#endif
 
 /* Undraw up to a specified point */
 extern void __LIB__ undrawto(int x2, int y2) __smallc;
+#if !__GBZ80__ && !__8080__
 extern void __LIB__ undrawto_callee(int x2, int y2) __smallc __z88dk_callee;
 #define undrawto(a,b)           undrawto_callee(a,b)
+#endif
 
 
 /* Pen up for 'move' */
@@ -149,18 +167,24 @@ extern void __LIB__ xorborder_callee(int tlx, int tly, int width, int height) __
 
 /* Draw a circle */
 extern void __LIB__ circle(int x, int y, int radius, int skip) __smallc;
+#if !__GBZ80__ && !__8080__
 extern void __LIB__ circle_callee(int x, int y, int radius, int skip) __smallc __z88dk_callee;
 #define circle(a,b,c,d)           circle_callee(a,b,c,d)
+#endif
 
 /* Undraw a circle */
 extern void __LIB__ uncircle(int x, int y, int radius, int skip) __smallc;
+#if !__GBZ80__ && !__8080__
 extern void __LIB__ uncircle_callee(int x, int y, int radius, int skip) __smallc __z88dk_callee;
 #define uncircle(a,b,c,d)           uncircle_callee(a,b,c,d)
+#endif
 
 /* Draw a circle in XOR mode */
 extern void __LIB__ xorcircle(int x, int y, int radius, int skip) __smallc;
+#if !__GBZ80__ && !__8080__
 extern void __LIB__ xorcircle_callee(int x, int y, int radius, int skip) __smallc __z88dk_callee;
 #define xorcircle(a,b,c,d)           xorcircle_callee(a,b,c,d)
+#endif
 
 /* Init GFX mode and clear map */
 extern void __LIB__ clg(void);

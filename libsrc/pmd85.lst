@@ -20,6 +20,6 @@ target/pmd85/graphics/w_respixl
 target/pmd85/graphics/w_xorpixl
 target/pmd85/graphics/w_pointxy
 target/pmd85/graphics/__set_graphics_colour
-graphics/swapgfxbk_foo
-@gfxbasew_8080.lst
+@gfx/portable/gfx_portable_w.lst
+@gfx/wide/gfx_wide.lst
 @8080.lst

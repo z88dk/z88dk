@@ -18,7 +18,7 @@
 			PUBLIC	xorpixel
 
 			EXTERN	textpixl
-			EXTERN	div3
+			EXTERN	div3_0
 			EXTERN	__gfx_coords
 			
 			EXTERN	char_address
@@ -40,7 +40,7 @@
 			
 			push	bc		; b=x, c=y
 			
-			ld	hl,div3
+			ld	hl,div3_0
 			ld	d,0
 			ld	e,b
 			add	hl,de

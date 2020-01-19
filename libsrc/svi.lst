@@ -7,10 +7,8 @@ target/svi/stdio/generic_console
 @stdio/stdio.lst
 @input/input_keyboard.lst
 target/msx/time/clock
-graphics/dcircle
-graphics/getsprite
 @video/tms9918/video_tms9918.lst
-@gfxbase.lst
+@gfx/narrow/gfx_narrow.lst
 target/svi/games/joystick
 target/svi/games/keys_joystick
 target/msx/games/bit_open

@@ -4,16 +4,6 @@ target/pv1000/stdio/getk
 @stdio/stdio.lst
 target/pv1000/games/joystick
 games/obj/pv1000/joystick_type
-graphics/dcircle
-graphics/clg
-graphics/generic_console/clsgraph
 target/pv1000/graphics/textpixl
-graphics/generic_console/plotpixl
-graphics/generic_console/respixl
-graphics/generic_console/xorpixl
-graphics/generic_console/pointxy
-graphics/putsprite2
-graphics/stencil_render2
-graphics/text/swapgfxbk
-@gfxbase.lst
+@gfx/gencon/gfx_gencon.lst
 @z80.lst

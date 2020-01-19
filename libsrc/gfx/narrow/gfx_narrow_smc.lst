@@ -1,0 +1,5 @@
+gfx/narrow/obj/${TARGET}/respixl_smc
+gfx/narrow/obj/${TARGET}/xorpixl_smc
+gfx/narrow/obj/${TARGET}/plotpixl_smc
+gfx/narrow/obj/${TARGET}/dcircle2
+@gfx/narrow/gfx_narrow.lst

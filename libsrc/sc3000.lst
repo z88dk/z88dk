@@ -5,10 +5,8 @@ target/sc3000/stdio/getk
 @stdio/stdio.lst
 target/sc3000/time/clock
 @input/input_keyboard.lst
-graphics/dcircle
-graphics/getsprite
 @video/tms9918/video_tms9918.lst
-@gfxbase.lst
+@gfx/narrow/gfx_narrow.lst
 psg/sn76489/bit_open
 target/sc3000/games/joystick
 target/sc3000/games/keys_joystick

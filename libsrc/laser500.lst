@@ -12,6 +12,7 @@ target/laser500/stdio/CRT_FONT
 @stdio/stdio.lst
 @font/font_8x8/font_8x8.lst
 @input/input_keyboard.lst
+target/laser500/graphics/clg
 target/laser500/graphics/getmaxx
 target/laser500/graphics/getmaxy
 target/laser500/graphics/plot_MODE0
@@ -28,9 +29,7 @@ target/laser500/graphics/w_respixl
 target/laser500/graphics/w_xorpixel
 target/laser500/graphics/xor_MODE0
 target/laser500/graphics/xor_MODE2
-graphics/w_dcircle_square.asm
-graphics/text/swapgfxbk
-@gfxbasew.lst
+@gfx/wide/gfx_wide.lst
 target/laser500/games/bit_open
 target/laser500/games/bit_close
 target/laser500/games/joystick

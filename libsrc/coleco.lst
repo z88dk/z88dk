@@ -4,12 +4,8 @@ target/coleco/stdio/fgetc_cons
 target/coleco/stdio/getk
 @stdio/stdio.lst
 @font/font_8x8/font_8x8.lst
-graphics/dcircle
-graphics/fill
-graphics/dfill2
-graphics/getsprite
 @video/tms9918/video_tms9918_nmi.lst
-@gfxbase.lst
+@gfx/narrow/gfx_narrow.lst
 psg/sn76489/bit_open
 target/coleco/games/joystick
 target/coleco/games/coleco_joypad
