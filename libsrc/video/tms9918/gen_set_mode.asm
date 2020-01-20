@@ -54,6 +54,7 @@ init_mode0:
 ; MTX:  $00,$D0,$07,$00,$03,$7E,$07
 
 
+    call clear_sprites
     ; reg0  - TEXT MODE
     ld    e,$00
 IF FORm5___2
@@ -108,10 +109,19 @@ ENDIF
     call  __tms9918_set_font
     ret
 
+clear_sprites:
+    ld    hl,$3800
+    ld    bc,2048
+    xor   a
+    call  FILVRM
+    ret
+
 ; Switch 2 VDP Mode 1
 ; 40x24
 init_mode1:
     ld   (hl),a
+    call  clear_sprites
+
     ; reg0  - TEXT MODE
     ld    e,$00
 IF FORm5___2
@@ -134,7 +144,7 @@ ENDIF
     ld    a,$01           ; $800  - Where the font will go
     call  VDPreg_Write    ; reg4  -  PT./TXT/MCOL-GEN.TAB.
     
-    ld    a,$76           ; Unused (sprites inactive)
+    ld    a,$36           ; Unused (sprites inactive)
     call  VDPreg_Write    ; reg5  -  SPRITE ATTR. TAB.
     
     ld    a,$07           ; Unused (sprites inactive)
@@ -166,6 +176,7 @@ ENDIF
 ;»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»
 init_mode2:
     ld   (hl),a
+    call clear_sprites
 ;»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»
 ; SVI:  $02,$E0,$06,$FF,$03,$36,$07,$07
 ; MSX:  $02,$E0,$06,$FF,$03,$36,$07,$04
@@ -191,7 +202,7 @@ init_mode2:
 ;1800 - 1b00 = PN Pattern Name
 ;2000 - 3800 = CT Colour
 ;3800        = Sprite 
-;3c00        = Sprite attribute
+;1b00        = Sprite attribute
 
     ; reg1  - GRAPH MODE, first reset bit #6 to blank the screen
     ld    e,$01
