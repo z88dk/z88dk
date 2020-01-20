@@ -87,7 +87,7 @@ int hex_exec(char *target)
 
         if (code_end_tail > code_fence) {
 
-            fprintf(stderr, "\nError: The CODE section has exceeded the fence by %u bytes\n(CODE_end 0x%04x, CODE fence 0x%04x)\n", (unsigned int)code_end_tail - code_fence, (unsigned int)code_end_tail - 1, code_fence);
+            fprintf(stderr, "\nError: The CODE section has exceeded the fence by %u bytes\n  (CODE_end 0x%04X, CODE fence 0x%04X)\n", (unsigned int)(code_end_tail - code_fence), (unsigned int)code_end_tail, (unsigned int)code_fence);
             fclose(input); 
             fclose(output);
             exit(1);
@@ -105,7 +105,7 @@ int hex_exec(char *target)
 
         if (data_end_tail > data_fence) {
 
-            fprintf(stderr, "\nError: The DATA section has exceeded the fence by %u bytes\n(DATA_en 0x%04x, DATA fence 0x%04x)\n", (unsigned int)data_end_tail - data_fence, (unsigned int)data_end_tail - 1, data_fence);
+            fprintf(stderr, "\nError: The DATA section has exceeded the fence by %u bytes\n  (DATA_en 0x%04X, DATA fence 0x%04X)\n", (unsigned int)(data_end_tail - data_fence), (unsigned int)data_end_tail, (unsigned int)data_fence);
             fclose(input); 
             fclose(output);
             exit(1);
@@ -116,23 +116,25 @@ int hex_exec(char *target)
 
     if (warn) {
 
-        long code_end_tail, data_end_tail;
-        long data_head, bss_head;
- 
+        long code_end_tail;
+        long data_head, data_end_tail;
+        long bss_head;
+
         code_end_tail = parameter_search(crtfile, ".map", "__CODE_END_tail");
+
         data_head = parameter_search(crtfile, ".map", "__DATA_head");
-        
         data_end_tail = parameter_search(crtfile, ".map", "__DATA_END_tail");
+
         bss_head  = parameter_search(crtfile, ".map", "__BSS_head");
 
         if (code_end_tail > data_head) {
 
-            fprintf(stderr, "\nWarning: CODE section overlaps DATA section by %u bytes\n(CODE_end 0x%04x, DATA_head 0x%04x)\n", (unsigned int)(code_end_tail - data_head), (unsigned int)(code_end_tail - 1), data_head);
+            fprintf(stderr, "\nWarning: CODE section overlaps DATA section by %u bytes\n  (CODE_end 0x%04X, DATA_head 0x%04X)\n", (unsigned int)(code_end_tail - data_head), (unsigned int)code_end_tail, (unsigned int)data_head);
         }
 
-        if (data_end_tail > bss_head) {
+        if (data_end_tail > bss_head ) {
 
-            fprintf(stderr, "\nWarning: DATA section overlaps BSS section by %u bytes\n(DATA_end 0x%04x, BSS_head 0x%04x)\n", (unsigned int)(data_end_tail - bss_head), (unsigned int)(data_end_tail - 1), bss_head);
+            fprintf(stderr, "\nWarning: DATA section overlaps BSS section by %u bytes\n  (DATA_end 0x%04X, BSS_head 0x%04X)\n", (unsigned int)(data_end_tail - bss_head), (unsigned int)data_end_tail, (unsigned int)bss_head);
         }
     }
 
