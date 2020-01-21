@@ -273,8 +273,7 @@ pacman_clib.lib:
 	@echo ''
 	@echo '--- Building PacMan HW Library ---'
 	@echo ''
-	$(MAKE) gfxdeps
-	$(call buildgeneric,pacman)
+	$(call buildgeneric,pacman,"text6 narrow")
 	TARGET=pacman TYPE=z80 $(LIBLINKER) -DFORpacman -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pacman_clib @$(LISTFILE_DIRECTORY)/pacman.lst
 
 # Philips P2000 lib - Stefano
@@ -283,7 +282,7 @@ p2000_clib.lib:
 	@echo '--- Building Philips P2000 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(call buildgeneric,p2000)
+	$(call buildgeneric,p2000,"text6 narrow")
 	$(MAKE) -C games TARGET=p2000
 	TARGET=p2000 TYPE=z80 $(LIBLINKER) -DFORp2000 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/p2000_clib @$(LISTFILE_DIRECTORY)/p2000.lst
 
@@ -924,23 +923,24 @@ z1013_clib.lib:
 	@echo '--- Building Robotron Z1013 Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
-	$(call buildgeneric,z1013)
+	$(call buildgeneric,z1013,"text narrow")
 	TARGET=z1013 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz1013 -x$(OUTPUT_DIRECTORY)/z1013_clib @$(LISTFILE_DIRECTORY)/z1013.lst
 
 # Robotron KC85/1, Z9001 library - Stefano
-z9001_clib.lib:
+z9001_clib.lib: gfx9001krt.lib
 	@echo ''
 	@echo '--- Building Robotron KC85/1, KC/87, Z9001 Library ---'
 	@echo ''
-	$(MAKE) gfxdeps
-	$(call buildgeneric,z9001)
+	$(call buildgeneric,z9001,"text narrow")
 	$(MAKE) -C games TARGET=z9001
 	TARGET=z9001 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz9001 -x$(OUTPUT_DIRECTORY)/z9001_clib @$(LISTFILE_DIRECTORY)/z9001.lst
+
+gfx9001krt.lib:
 	@echo ''
-	@echo '--- Building Z9001 KRT High Resolution libraires ---'
+	@echo '--- Building Z9001 KRT High Resolution Library ---'
 	@echo ''
-	$(MAKE) gfxdeps
-	TARGET=z9001 SUBTARGET=z9001krt TYPE=z80 $(LIBLINKER) -DFORz9001krt -x$(OUTPUT_DIRECTORY)/gfx9001krt @$(LISTFILE_DIRECTORY)/target/z9001/gfx9001krt.lst
+	$(MAKE) -C gfx TARGET=z9001 SUBTYPE=z9001krt FLAVOUR=wide
+	TARGET=z9001krt  TYPE=z80 $(LIBLINKER) -DFORz9001krt -x$(OUTPUT_DIRECTORY)/gfx9001krt @$(LISTFILE_DIRECTORY)/target/z9001/gfx9001krt.lst
 
 # Robotron HC900, KC85/2..KC85/5 library - Stefano
 kc_clib.lib:

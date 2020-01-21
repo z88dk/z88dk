@@ -8,9 +8,7 @@ target/pacman/graphics/plotpixl
 target/pacman/graphics/respixl
 target/pacman/graphics/xorpixl
 target/pacman/graphics/pointxy
-graphics/generic_console/div3
-graphics/putsprite2
-@gfxbasetxt6.lst
+@gfx/text6/gfx_text6.lst
 target/pacman/games/joystick
 @time/time.lst
 target/pacman/time/clock

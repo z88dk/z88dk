@@ -24,14 +24,7 @@ target/sv8000/graphics/plot_MODE1
 target/sv8000/graphics/res_MODE1
 target/sv8000/graphics/xor_MODE1
 target/sv8000/graphics/pointxy_MODE1
-graphics/swapgfxbk_foo
-graphics/dcircle
-graphics/clg
-graphics/fill
-graphics/dfill
-graphics/getsprite
-graphics/stencil_render2
-@gfxbase.lst
+@gfx/narrow/gfx_narrow.lst
 target/sv8000/psg/set_psg
 target/sv8000/psg/set_psg_callee
 target/sv8000/psg/get_psg

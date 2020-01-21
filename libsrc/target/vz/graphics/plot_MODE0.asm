@@ -12,4 +12,4 @@
 	ret	nc
 
         defc    NEEDplot = 1
-        INCLUDE "graphics/generic_console/pixel.inc"
+        INCLUDE "gfx/gencon/pixel.inc"

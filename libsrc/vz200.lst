@@ -17,14 +17,6 @@ target/vz/stdio/ansi/f_ansi_dline
 target/vz/stdio/ansi/f_ansi_scrollup
 @stdio/stdio.lst
 @font/font_8x8/font_8x8.lst
-graphics/dcircle
-graphics/clg
-graphics/cclg
-graphics/fill
-graphics/dfill
-graphics/getsprite
-graphics/stencil_render2
-graphics/putsprite2
 target/vz/graphics/clsgraph
 #target/vz/graphics/putsprite
 target/vz/graphics/bksave
@@ -48,7 +40,7 @@ target/vz/graphics/xor_MODE1
 target/vz/graphics/pointxy_MODE1
 target/vz/graphics/swapgfxbk
 target/vz/graphics/textpixl
-@gfxbase.lst
+@gfx/narrow/gfx_narrow.lst
 target/vz/games/bit_open
 target/vz/games/bit_open_di
 target/vz/games/bit_close

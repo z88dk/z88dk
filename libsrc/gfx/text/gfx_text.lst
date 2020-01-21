@@ -1,0 +1,5 @@
+gfx/text/obj/${TARGET}/pointxy
+gfx/text/obj/${TARGET}/plotpixl
+gfx/text/obj/${TARGET}/respixl
+gfx/text/obj/${TARGET}/xorpixl
+gfx/text/obj/${TARGET}/clsgraph
