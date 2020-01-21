@@ -1,15 +1,5 @@
-graphics/w_drawb
-graphics/w_undrawb
-graphics/w_xorborder
 target/nc100/graphics/clg
-graphics/w_stencil_render
 target/nc100/graphics/w_pixladdr
-graphics/w_plotpixl
-graphics/w_respixl
-graphics/w_xorpixl
 target/nc100/graphics/swapgfxbk
-graphics/w_putsprite
-graphics/draw_profile
-graphics/w_pointxy
 target/nc100/graphics/fill
-@gfxbasew.lst
+@gfx/wide/gfx_wide.lst
