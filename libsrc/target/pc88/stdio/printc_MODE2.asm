@@ -41,7 +41,24 @@ not_udg:
 	call	l_push_di
 	ld	b,8
 loop:	push	bc
+	ld	a,b
+	cp	1
+	jr	nz,not_last_row
+	; It's the last row, check for bold
+	ld	a,(generic_console_flags)
+	bit	3,a
+	jr	z,not_last_row
+	ld	a,255		;Underline
+	jr	no_bold
+not_last_row:
+	ld	a,(generic_console_flags)
+	bit	4,a
 	ld	a,(de)		;pick up font form main memory
+	jr	z,no_bold
+	ld	b,a
+	rrca
+	or	b
+no_bold:
 	xor	c
 	exx
 	ld	h,a		;save ink version
