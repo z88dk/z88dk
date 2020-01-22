@@ -303,7 +303,7 @@ pc88_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C psg
-	$(call buildgeneric,pc88)
+	$(call buildgeneric,pc88,"wide narrow")
 	$(MAKE) -C games TARGET=pc88
 	TARGET=pc88 TYPE=z80 $(LIBLINKER) -DFORpc88 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pc88_clib @$(LISTFILE_DIRECTORY)/pc88.lst
 	@echo ''
@@ -334,7 +334,7 @@ px4.lib:
 	@echo ''
 	@echo '--- Building PX-4/HC-40 Library ---'
 	@echo ''
-	$(MAKE) gfxdeps
+	$(MAKE) -C gfx TARGET=cpm SUBTYPE=px4 FLAVOUR="narrow"
 	TARGET=px4 TYPE=z80 $(LIBLINKER) -DFORpx4 -x$(OUTPUT_DIRECTORY)/px4 @$(LISTFILE_DIRECTORY)/target/px4/px4.lst
 
 # Epson PX8 lib - Stefano	
@@ -342,7 +342,7 @@ px8.lib:
 	@echo ''
 	@echo '--- Building PX-8/Geneva Library ---'
 	@echo ''
-	$(MAKE) gfxdeps
+	$(MAKE) -C gfx TARGET=cpm SUBTYPE=px8 FLAVOUR="wide"
 	TARGET=px8 TYPE=z80 $(LIBLINKER) -DFORpx8 -x$(OUTPUT_DIRECTORY)/px8 @$(LISTFILE_DIRECTORY)/target/px8/px8.lst
 
 # VZ200/300 lib - Stefano
@@ -413,8 +413,7 @@ gfx81udg.lib:
 	@echo '--- Building ZX81 UDG based Graphics Library ---'
 	@echo ''
 	$(MAKE) zx81deps
-	$(MAKE) -C gfx TARGET=zx81 FLAVOUR=narrow
-	$(MAKE) -C gfx TARGET=zx81 FLAVOUR="text6"
+	$(MAKE) -C gfx TARGET=zx81 FLAVOUR="narrow text6"
 	TYPE=zx81 SUBTARGET=zx81udg TYPE=ixiy $(LIBLINKER) --IXIY -DFORzx81udg -x$(OUTPUT_DIRECTORY)/gfx81udg @$(LISTFILE_DIRECTORY)/target/zx81/gfx81udg.lst
 	$(MAKE) zx81deps
 
@@ -1445,8 +1444,7 @@ x1_clib.lib:
 	@echo ''
 	@echo '--- Building Sharp X1 Library ---'
 	@echo ''
-	$(MAKE) gfxdeps
-	$(call buildgeneric,x1)
+	$(call buildgeneric,x1,wide)
 	$(MAKE) -C target/x1 
 	TARGET=x1 TYPE=z80 $(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1_clib @$(LISTFILE_DIRECTORY)/x1.lst
 
@@ -1578,6 +1576,7 @@ classic-clean:
 	$(MAKE) -C arch clean
 	$(MAKE) -C target clean
 	$(MAKE) -C video clean
+	$(MAKE) -C gfx clean
 	$(RM) *.lib
 
 new-clean:
