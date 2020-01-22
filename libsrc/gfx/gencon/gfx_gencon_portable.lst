@@ -1,9 +1,9 @@
-gfx/gencon/obj/${TYPE}/pointxy
-gfx/gencon/obj/${TYPE}/plotpixl
-gfx/gencon/obj/${TYPE}/getmaxy
-gfx/gencon/obj/${TYPE}/getmaxx
-gfx/gencon/obj/${TYPE}/respixl
-gfx/gencon/obj/${TYPE}/xorpixl
-gfx/gencon/obj/${TYPE}/clsgraph
+gfx/gencon/obj/${TARGET}/pointxy
+gfx/gencon/obj/${TARGET}/plotpixl
+gfx/gencon/obj/${TARGET}/getmaxy
+gfx/gencon/obj/${TARGET}/getmaxx
+gfx/gencon/obj/${TARGET}/respixl
+gfx/gencon/obj/${TARGET}/xorpixl
+gfx/gencon/obj/${TARGET}/clsgraph
 @gfx/common/gfx_common.lst
 @gfx/portable/gfx_portable.lst

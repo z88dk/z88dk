@@ -1,14 +1,7 @@
-graphics/dcircle
-graphics/clg
 target/osborne1/graphics/clsgraph
 target/osborne1/graphics/textpixl
 target/osborne1/graphics/plotpixl
 target/osborne1/graphics/respixl
 target/osborne1/graphics/xorpixl
 target/osborne1/graphics/pointxy
-graphics/fill
-graphics/dfill2
-graphics/putsprite3
-graphics/stencil_render2
-graphics/swapgfxbk_foo
-@gfxbase.lst
+@gfx/narrow/gfx_narrow.lst

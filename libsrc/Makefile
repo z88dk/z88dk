@@ -536,7 +536,47 @@ ozansi_clib.lib:
 	TARGET=oz TYPE=z80 $(LIBLINKER) -DFORoz -DPACKEDFONT -x$(OUTPUT_DIRECTORY)/ozansi_clib @$(LISTFILE_DIRECTORY)/ozansi.lst
 
 # CPM lib - Stefano/dom
-cpm_clib.lib:
+
+gfxkp.lib:
+	@echo ''
+	@echo '--- Building Kaypro graphics Library ---'
+	@echo ''
+	$(MAKE) -C gfx TARGET=cpm FLAVOUR=narrow SUBTYPE=kaypro
+	TARGET=kaypro TYPE=z80 $(LIBLINKER) -DFORkaypro -x$(OUTPUT_DIRECTORY)/gfxkp @$(LISTFILE_DIRECTORY)/target/kaypro84/gfxkp.lst
+	$(MAKE) -C gfx TARGET=cpm FLAVOUR=narrow SUBTYPE=kaypro83
+	TARGET=kaypro83 TYPE=z80 $(LIBLINKER) -DFORkaypro83 -I$(Z88DK_LIB) -x$(OUTPUT_DIRECTORY)/gfxkp83 @$(LISTFILE_DIRECTORY)/target/kaypro83/gfxkp83.lst
+
+attache.lib:
+	@echo ''
+	@echo '--- Building Otrona Attache Library ---'
+	@echo ''
+	$(MAKE) -C psg
+	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide SUBTYPE=attache
+	TARGET=attache TYPE=z80 $(LIBLINKER) -DFORattache -x$(OUTPUT_DIRECTORY)/attache @$(LISTFILE_DIRECTORY)/target/attache/attache.lst
+
+gfxosborne1.lib:
+	@echo ''
+	@echo '--- Building Osborne 1 graphics Library ---'
+	@echo ''
+	$(MAKE) -C gfx TARGET=cpm FLAVOUR=narrow SUBTYPE=osborne1
+	TARGET=osborne1 TYPE=z80 $(LIBLINKER) -DFORosborne1 -x$(OUTPUT_DIRECTORY)/gfxosborne1 @$(LISTFILE_DIRECTORY)/target/osborne1/gfxosborne1.lst
+
+rc700.lib:
+	@echo ''
+	@echo '--- Building RC-700 Library ---'
+	@echo ''
+	$(MAKE) -C gfx TARGET=cpm FLAVOUR="gencon narrow" SUBTYPE=rc700
+	TARGET=rc700 TYPE=z80 $(LIBLINKER) -DFORrc700 -x$(OUTPUT_DIRECTORY)/rc700 @$(LISTFILE_DIRECTORY)/target/rc700/rc700.lst
+
+x1_cpm.lib:
+	@echo ''
+	@echo '--- Building Sharp X1 Library ---'
+	@echo ''
+	$(MAKE) -C target/x1 
+	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide SUBTYPE=x1
+	TARGET=x1 TYPE=z80 $(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1_cpm @$(LISTFILE_DIRECTORY)/target/x1/x1.lst
+
+cpm_clib.lib: gfxkp.lib attache.lib gfxosborne1.lib rc700.lib x1_cpm.lib
 	@echo ''
 	@echo '--- Building CP/M Library ---'
 	@echo ''
@@ -555,35 +595,6 @@ cpm_clib.lib:
 	@echo '--- Building CP/M Device fnctl Library (8080) ---'
 	@echo ''
 	TARGET=cpm TYPE=8080 DEVICE=device $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/cpmdevice @target/cpm/fcntl/fcntl.lst
-	@echo ''
-	@echo '--- Building Kaypro graphics Library ---'
-	@echo ''
-	$(MAKE) gfxdeps
-	TARGET=kaypro TYPE=z80 $(LIBLINKER) -DFORkaypro -x$(OUTPUT_DIRECTORY)/gfxkp @$(LISTFILE_DIRECTORY)/target/kaypro84/gfxkp.lst
-	$(MAKE) gfxdeps
-	TARGET=kaypro SUBTARGET=kaypro83 TYPE=z80 $(LIBLINKER) -DFORkaypro83 -I$(Z88DK_LIB) -x$(OUTPUT_DIRECTORY)/gfxkp83 @$(LISTFILE_DIRECTORY)/target/kaypro83/gfxkp83.lst
-	@echo ''
-	@echo '--- Building Otrona Attache Library ---'
-	@echo ''
-	$(MAKE) gfxdeps
-	$(MAKE) -C psg
-	TARGET=attache TYPE=z80 $(LIBLINKER) -DFORattache -x$(OUTPUT_DIRECTORY)/attache @$(LISTFILE_DIRECTORY)/target/attache/attache.lst
-	@echo ''
-	@echo '--- Building Osborne 1 graphics Library ---'
-	@echo ''
-	$(MAKE) gfxdeps
-	TARGET=osborne1 TYPE=z80 $(LIBLINKER) -DFORosborne1 -x$(OUTPUT_DIRECTORY)/gfxosborne1 @$(LISTFILE_DIRECTORY)/target/osborne1/gfxosborne1.lst
-	@echo ''
-	@echo '--- Building RC-700 Library ---'
-	@echo ''
-	$(MAKE) gfxdeps
-	TARGET=rc700 TYPE=z80 $(LIBLINKER) -DFORrc700 -x$(OUTPUT_DIRECTORY)/rc700 @$(LISTFILE_DIRECTORY)/target/rc700/rc700.lst
-	@echo ''
-	@echo '--- Building Sharp X1 Library ---'
-	@echo ''
-	$(MAKE) gfxdeps
-	$(MAKE) -C target/x1 
-	TARGET=x1 TYPE=z80 $(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1_cpm @$(LISTFILE_DIRECTORY)/target/x1/x1.lst
 
 
 # Sorcerer Exidy lib - Stefano
@@ -810,7 +821,7 @@ gfxep.lib:
 	@echo ''
 	@echo '--- Building Enterprise 64/128 Graphics Library ---'
 	@echo ''
-	$(MAKE) -C target/enterprise/graphics
+	$(MAKE) -C target/enterprise
 	$(MAKE) -C gfx TARGET=enterprise FLAVOUR=wide
 	TARGET=enterprise TYPE=z80 $(LIBLINKER) -DFORenterprise -x$(OUTPUT_DIRECTORY)/gfxep @$(LISTFILE_DIRECTORY)/target/enterprise/gfxep.lst
 
@@ -819,8 +830,7 @@ gfxephr.lib:
 	@echo ''
 	@echo '--- Building Enterprise 64/128 High Resolution Graphics Library ---'
 	@echo ''
-	$(MAKE) gfxdeps
-	$(MAKE) -C target/enterprise/graphics
+	$(MAKE) -C target/enterprise
 	$(MAKE) -C gfx TARGET=enterprise FLAVOUR=wide SUBTYPE=enterprisehr
 	TARGET=enterprisehr TYPE=z80 $(LIBLINKER) -DFORenterprisehr -x$(OUTPUT_DIRECTORY)/gfxephr @$(LISTFILE_DIRECTORY)/target/enterprise/gfxephr.lst
 
@@ -834,15 +844,17 @@ einstein.lib:
 	$(MAKE) -C font
 	$(MAKE) -C games TARGET=cpm SUBTYPE=einstein
 	$(MAKE) -C video/tms9918 TARGET=cpm SUBTYPE=einstein
+	$(MAKE) -C gfx TARGET=cpm FLAVOUR=narrow SUBTYPE=einstein
 	$(MAKE) -C psg
 	TARGET=einstein TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFOReinstein -x$(OUTPUT_DIRECTORY)/einstein @$(LISTFILE_DIRECTORY)/target/einstein/einstein.lst
 
 excali64_clib.lib:
 	@echo ''
 	@echo '--- Building Excalibur 64 Library ---'
+	@echo ''
 	$(MAKE) gfxdeps
 	@$(RM) -f video/mc6845/*.o
-	$(call buildgeneric,excali64)
+	$(call buildgeneric,excali64,"gencon narrow")
 	TARGET=excali64 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORexcali64 -x$(OUTPUT_DIRECTORY)/excali64_clib @$(LISTFILE_DIRECTORY)/excali64_clib.lst
 	TARGET=excali64 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORexcali64 -x$(OUTPUT_DIRECTORY)/excali64_cpm @$(LISTFILE_DIRECTORY)/target/excali64/excali64.lst
 

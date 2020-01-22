@@ -1,18 +1,40 @@
+
 include ../../Make.config
 
 
+TARGET ?= test
 
+CFLAGS += $(TARGET_CFLAGS)
+
+ifeq ($(SUBTYPE),) 
+SUBTYPE=$(TARGET)
+OBJSUBDIR = $(TARGET)
+else
+OBJSUBDIR = $(SUBTYPE)
+endif
+
+GENOBJECTS = 
+
+ifeq ($(SUBSET),)
 ASMFILES = $(wildcard *.asm)
-CFILES = $(wildcard *.c)
-OBJECTS = $(ASMFILES:.asm=.o)  $(CFILES:.c=.o)
+else
+ASMFILES = $(SUBSET)
+endif
 
+OBJECTS = $(CUSTOBJECTS) $(ASMFILES:.asm=.o)
 
-all: dirs $(addprefix obj/gbz80/,$(OBJECTS))  $(addprefix obj/8080/,$(OBJECTS)) $(addprefix obj/z80/,$(OBJECTS)) $(addprefix obj/ixiy/,$(OBJECTS))
+all: dirs $(addprefix obj/$(OBJSUBDIR)/,$(OBJECTS)) 
 
+obj/$(OBJSUBDIR)/%.o: %.c
+	$(ZCC) +$(TARGET) $(CFLAGS) -o $@  $^
+
+obj/$(OBJSUBDIR)/%.o: %.asm
+	$(ZCC) +$(TARGET) $(CFLAGS) -o $@  $^ -Ca-I../.. -Ca-DFOR$(SUBTYPE)
 
 dirs:
-	@mkdir -p obj/gbz80 obj/8080 obj/z80 obj/ixiy
+	@mkdir -p obj/$(OBJSUBDIR)
 
-clean: 
-	$(RM) -r obj
-	$(RM) zcc_opt.def *.err *.o
+clean:
+	$(RM) -fr obj
+	$(RM) -f *.o
+	$(RM) -f */*.o
