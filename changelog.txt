@@ -66,6 +66,7 @@ The more detailed (yet incomplete) changelist is below:
 - [zsdcc] Upgraded to SDCC 3.9.1 r11311
 - [newlib] +scz180: Support for this board
 - [newlib] +zxn: ZX Spectrum Next architecture renamed z80n
+- [newlib] +hbios: Support for RomWBW HBIOS API - incl RetroBrew and rc2014
 
 z88dk v1.99C - 19.01.2019
 
