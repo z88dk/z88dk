@@ -25,10 +25,10 @@ RUN apk add --no-cache build-base libxml2 m4 \
 RUN cd ${Z88DK_PATH} \
     && chmod 777 build.sh \
     && ./build.sh \
-    && svn checkout -r 11502 https://svn.code.sf.net/p/sdcc/code/trunk/sdcc ${SDCC_PATH} \
+    && svn checkout -r 11525 https://svn.code.sf.net/p/sdcc/code/trunk/sdcc ${SDCC_PATH} \
     && cd ${SDCC_PATH} \
     && patch -p0 < ${Z88DK_PATH}/src/zsdcc/sdcc-z88dk.patch \
-    && ./configure \
+    && ./configure1 \
         --disable-ds390-port --disable-ds400-port \
         --disable-hc08-port --disable-s08-port --disable-mcs51-port \
         --disable-pic-port --disable-pic14-port --disable-pic16-port \

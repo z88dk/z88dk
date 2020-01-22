@@ -1,6 +1,6 @@
 Index: src/SDCCasm.c
 ===================================================================
---- src/SDCCasm.c	(revision 11502)
+--- src/SDCCasm.c	(revision 11525)
 +++ src/SDCCasm.c	(working copy)
 @@ -403,8 +403,8 @@
  static const ASM_MAPPING _asxxxx_mapping[] = {
@@ -23,7 +23,7 @@ Index: src/SDCCasm.c
     "; ---------------------------------\n"
 Index: src/SDCCglue.c
 ===================================================================
---- src/SDCCglue.c	(revision 11502)
+--- src/SDCCglue.c	(revision 11525)
 +++ src/SDCCglue.c	(working copy)
 @@ -189,7 +189,7 @@
             (sym->_isparm && !IS_REGPARM (sym->etype) && !IS_STATIC (sym->localof->etype))) &&
@@ -55,7 +55,7 @@ Index: src/SDCCglue.c
          }
  
        sym->ival = NULL;
-@@ -1887,9 +1891,12 @@
+@@ -1893,9 +1897,12 @@
    /* for all variables in this segment do */
    for (sym = setFirstItem (map->syms); sym; sym = setNextItem (map->syms))
      {
@@ -70,7 +70,7 @@ Index: src/SDCCglue.c
  
        /* eliminate redundant __str_%d (generated in stringToSymbol(), SDCCast.c) */
        if (!isinSet (tmpSet, sym))
-@@ -2067,7 +2074,11 @@
+@@ -2073,7 +2080,11 @@
  void
  flushStatics (void)
  {
@@ -84,7 +84,7 @@ Index: src/SDCCglue.c
  
 Index: src/SDCCmain.c
 ===================================================================
---- src/SDCCmain.c	(revision 11502)
+--- src/SDCCmain.c	(revision 11525)
 +++ src/SDCCmain.c	(working copy)
 @@ -499,16 +499,15 @@
  {
@@ -112,7 +112,7 @@ Index: src/SDCCmain.c
  static void
 Index: src/SDCCopt.c
 ===================================================================
---- src/SDCCopt.c	(revision 11502)
+--- src/SDCCopt.c	(revision 11525)
 +++ src/SDCCopt.c	(working copy)
 @@ -1010,7 +1010,7 @@
        /* TODO: Eliminate it, convert any SEND of volatile into DUMMY_READ_VOLATILE. */
@@ -176,7 +176,7 @@ Index: src/SDCCopt.c
                  continue;
 Index: src/z80/peep.c
 ===================================================================
---- src/z80/peep.c	(revision 11502)
+--- src/z80/peep.c	(revision 11525)
 +++ src/z80/peep.c	(working copy)
 @@ -228,6 +228,88 @@
    return(found && found < end);
