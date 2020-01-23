@@ -1,20 +1,6 @@
-graphics/dcircle2
 target/zx81/graphics_hr/clg
 target/zx81/graphics_hr/g007_clg_hr
 target/zx81/graphics_hr/g007_hardcopy
-graphics/clrarea2
-graphics/liner2
-graphics/plotpixl
-graphics/pointxy
-graphics/respixl
-graphics/fill
-graphics/dfill2
-graphics/getsprite
-graphics/putsprite
-graphics/stencil_render
-graphics/bksave
-graphics/bkrestore
-graphics/xorpixl
 target/zx81/stdio/ansi/f_ansi_char
 target/zx81/stdio/ansi/f_ansi_cls
 target/zx81/stdio/ansi/f_ansi_dline
@@ -23,4 +9,4 @@ target/zx81/graphics/swapgfxbk
 target/zx81/graphics_hr/g007_pixladdr
 target/zx81/graphics_hr/g007_hrg_on
 target/zx81/graphics_hr/g007_hrg_off
-@gfxbase.lst
+@gfx/narrow/gfx_narrow.lst
