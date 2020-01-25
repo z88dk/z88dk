@@ -20,6 +20,7 @@ gfx/narrow/obj/${TARGET}/drawr
 gfx/narrow/obj/${TARGET}/drawr_callee
 gfx/narrow/obj/${TARGET}/draw
 gfx/narrow/obj/${TARGET}/drawto_callee
+gfx/narrow/obj/${TARGET}/drawto
 gfx/narrow/obj/${TARGET}/fill
 gfx/narrow/obj/${TARGET}/fillarea
 gfx/narrow/obj/${TARGET}/fillb
@@ -63,6 +64,7 @@ gfx/narrow/obj/${TARGET}/undrawr
 gfx/narrow/obj/${TARGET}/undrawr_callee
 gfx/narrow/obj/${TARGET}/undraw
 gfx/narrow/obj/${TARGET}/undrawto_callee
+gfx/narrow/obj/${TARGET}/undrawto
 gfx/narrow/obj/${TARGET}/unplot
 gfx/narrow/obj/${TARGET}/unplot_callee
 gfx/narrow/obj/${TARGET}/xorborder

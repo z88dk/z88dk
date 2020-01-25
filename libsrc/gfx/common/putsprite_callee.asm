@@ -7,18 +7,19 @@
 ;	$Id: putsprite_callee.asm $
 ;
 
-SECTION smc_clib
-
+IF !__CPU_GBZ80__
+SECTION code_clib
 PUBLIC putsprite_callee
 PUBLIC _putsprite_callee
 
 	EXTERN     putsprite
+	EXTERN	   __graphics_retaddr
 
 .putsprite_callee
 ._putsprite_callee
 	ld	hl,retaddr
-	ex (sp),hl
-	ld	(retaddr0+1),hl
+	ex	(sp),hl
+	ld	(__graphics_retaddr),hl
 	ld	hl,putsprite
 	jp (hl)
 	
@@ -27,7 +28,8 @@ PUBLIC _putsprite_callee
 		pop bc
 		pop bc
 		pop bc	; ortype
-.retaddr0
-		ld	hl,0
+		ld	hl,(__graphics_retaddr)
 		jp (hl)
 
+
+ENDIF

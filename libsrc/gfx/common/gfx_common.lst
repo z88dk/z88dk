@@ -17,3 +17,5 @@ gfx/common/obj/${TARGET}/pen_up
 gfx/common/obj/${TARGET}/rbitmask
 gfx/common/obj/${TARGET}/rscroll
 gfx/common/obj/${TARGET}/swapgfxbk_noop
+gfx/common/obj/${TARGET}/__graphics_retaddr
+gfx/common/obj/${TARGET}/putsprite_callee
