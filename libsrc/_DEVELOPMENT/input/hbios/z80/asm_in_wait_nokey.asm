@@ -34,4 +34,4 @@ EXTERN asm_hbios
     pop bc
     djnz asm_in_wait_nokey_get
 
-    jr asm_in_wait_nokey        ; check again whether we no have no keys pressed
+    jr asm_in_wait_nokey        ; check again whether we have no keys pressed
