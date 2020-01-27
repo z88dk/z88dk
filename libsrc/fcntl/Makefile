@@ -13,6 +13,8 @@ $(SUBDIRS):
 
 clean: $(CLEANDIRS)
 	$(RM) */*.o
+	$(RM) */zcc_opt.def
+	$(RM) */*/zcc_opt.def
 
 $(CLEANDIRS): 
 	$(MAKE) -C $(@:clean-%=%) clean

@@ -39,3 +39,4 @@ clean:
 	$(RM) -fr obj
 	$(RM) -f *.o
 	$(RM) -f */*.o
+	$(RM) zcc_opt.def
