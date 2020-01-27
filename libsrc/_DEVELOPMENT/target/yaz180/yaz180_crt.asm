@@ -4,18 +4,34 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-IF !DEFINED_CLIB_32BIT_FLOATS
-	defc	DEFINED_CLIB_32BIT_FLOATS = 1
-	defc CLIB_32BIT_FLOATS = 1
-	IFNDEF CLIB_32BIT_FLOATS
+IF !DEFINED_CLIB_32BIT_FLOAT
+	defc	DEFINED_CLIB_32BIT_FLOAT = 1
+	defc CLIB_32BIT_FLOAT = 1
+	IFNDEF CLIB_32BIT_FLOAT
 	ENDIF
 ENDIF
 
 
 IF !DEFINED_startup
 	defc	DEFINED_startup = 1
-	defc startup = 0
+	defc startup = 16
 	IFNDEF startup
+	ENDIF
+ENDIF
+
+
+IF !DEFINED_CLIB_OPT_PRINTF
+	defc	DEFINED_CLIB_OPT_PRINTF = 1
+	defc CLIB_OPT_PRINTF = 0x15404642
+	IFNDEF CLIB_OPT_PRINTF
+	ENDIF
+ENDIF
+
+
+IF !DEFINED_CLIB_OPT_PRINTF_2
+	defc	DEFINED_CLIB_OPT_PRINTF_2 = 1
+	defc CLIB_OPT_PRINTF_2 = 0
+	IFNDEF CLIB_OPT_PRINTF_2
 	ENDIF
 ENDIF
 
@@ -28,7 +44,7 @@ IFNDEF startup
 
    ; startup undefined so select a default
 
-   defc startup = 0
+   defc startup = 16
 
 ENDIF
 
@@ -44,12 +60,18 @@ ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; app drivers;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
    ; yabios asci0 drivers installed on stdin, stdout, stderr
    ; yabios asci1 drivers installed on ttyin, ttyout, ttyerr
 
    IFNDEF __CRTCFG
 
-      defc __CRTCFG = 0
+      defc __CRTCFG = 1
 
    ENDIF
 
@@ -64,8 +86,8 @@ ENDIF
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                   yaz180 ROM target                       ;;
-;; generated from target/yaz180/startup/yaz180_crt_0.asm.m4  ;;
+;;                yaz180 application target                  ;;
+;; generated from target/yaz180/startup/yaz180_crt_16.asm.m4 ;;
 ;;                                                           ;;
 ;;                  flat 64k address space                   ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -75,6 +97,7 @@ ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "config_yaz180_public.inc"
+include "config_yabios_def.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CRT AND CLIB CONFIGURATION ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1748,16 +1771,6 @@ IF __crt_include_preamble
 ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; PAGE ZERO ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-IF (__crt_org_code = 0) && !(__page_zero_present)
-
-   include "../crt_page_zero_z180.inc"
-
-ENDIF
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CRT INIT ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -1789,12 +1802,6 @@ __Restart_2:
 
    ENDIF
 
-   IF __crt_include_preamble
-
-      include "crt_preamble.asm"
-
-   ENDIF
-
    ; initialize data section
 
    include "../clib_init_data.inc"
@@ -1804,7 +1811,7 @@ __Restart_2:
    include "../clib_init_bss.inc"
 
    ; interrupt mode
-   
+
    include "../crt_set_interrupt_mode.inc"
 
 SECTION code_crt_init          ; user and library initialization
@@ -1818,7 +1825,7 @@ SECTION code_crt_main
    include "../crt_start_ei.inc"
 
    ; call user program
-   
+
    call _main                  ; hl = return status
 
    ; run exit stack
@@ -1835,7 +1842,7 @@ __Exit:
    IF !((__crt_on_exit & 0x10000) && (__crt_on_exit & 0x8))
 
       ; not restarting
-      
+
       push hl                  ; save return status
 
    ENDIF
@@ -1844,7 +1851,7 @@ SECTION code_crt_exit          ; user and library cleanup
 SECTION code_crt_return
 
    ; close files
-   
+
    include "../clib_close.inc"
 
    ; terminate
@@ -1874,12 +1881,6 @@ include "../clib_variables.inc"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../clib_stubs.inc"
-
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; app drivers;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 
