@@ -9,4 +9,6 @@ clean:
 	$(RM) *.o
 	$(RM) */*.o
 	$(RM) */*/*.o
+	$(RM) zcc_opt.def
+	$(RM) */zcc_opt.def
 	$(MAKE) -C x11 clean

@@ -21,6 +21,7 @@
 @stdio/stdio_sdcc_iy.lst
 @stdlib/stdlib_sdcc_iy.lst
 @string/string_sdcc_iy.lst
+@target/z80/driver/driver.lst
 @threads/threads_sdcc_iy.lst
 @time/time_sdcc.lst
 @z80/z80_sdcc.lst

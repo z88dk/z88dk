@@ -29,7 +29,7 @@ This library is also designed to be as fast as possible on the z80 processor. Fo
 
   *  Made for the Spectrum Next. The z80n `mul de` and the z180 `mlt nn` multiply instructions are used to full advantage to accelerate all floating point calculations.
 
-  *  The z80 multiply (without a hardware instruction) is implemented with an unrolled equivalent to the z80n `mul de`, which is designed to have no side effect other than resetting the flag register. An alternate fast table look-up z80 multiply is also implemented, and used when the library is linked as `math32_fast`.
+  *  The z80 multiply (without a hardware instruction) is implemented with an unrolled equivalent to the z80n `mul de`, which is designed to have no side effect other than resetting the flag register. An alternate fast table look-up z80 multiply is also implemented, and used when the library is compiled with `__CLIB_OPT_FMATH` > 50.
 
   *  Mantissa calculations are done with 24-bits and 8-bits for rounding. Rounding is a simple method, but can be if required it can be expanded to the IEEE standard with a performance penalty.
 
@@ -179,9 +179,9 @@ Contains the zsdcc and the sccz80 C compiler interface and is implemented using 
 
 ### lm32
 
-Glue that connects the compilers and standard assembly interface to the `math32` library.  The purpose is to define aliases that connect the standard names to the math32 specific names.  These functions make up the complete z88dk `math32` maths library that is linked against on the compile line (as in `-lmath32` or `-lmath32_fast`) or for the z180 and z80n (`-lmath32_z180` or `-lmath32_z80n`).
+Glue that connects the compilers and standard assembly interface to the `math32` library.  The purpose is to define aliases that connect the standard names to the math32 specific names.  These functions make up the complete z88dk `math32` maths library that is linked against on the compile line as `-lmath32`.
 
-Aliases are provided to simplify usage of the library. `--math32`, `--math32_z180`, and `--math32_z80n` provide all the required linkages and definitions, as a simple alternative.
+An alias is provided to simplify usage of the library. `--math32` provides all the required linkages and definitions, as a simple alternative to `-Cc-fp-mode=ieee -Cc-D__MATH_MATH32 -D__MATH_MATH32 -lmath32 -pragma-define:CLIB_32BIT_FLOAT=1`.
 
 ## Function Discussion
 
@@ -206,7 +206,7 @@ For the z80 CPU, with no hardware multiply, a replica of the z80n instruction `m
 
 The `z80_mulu_de` has zero argument detection, leading zero detection, and is unrolled. With the exception of preserving `hl`, for equivalency with z80n `mul de`, it should be the fastest `16_8x8` linear multiply possible on a z80.
 
-In the search for performance, an alternate table driven `16_8x8` multiply function was created. This function uses a 512 Byte table containing the 16-bit square of 8-bit numbers, to substantially improve the multiply z80 performance. Alternate mantissa routines were written to suit this fast multiply function, and they are used where necessary.
+In the search for performance, an alternate table driven `16_8x8` multiply function was created. This function uses a 512 Byte table containing the 16-bit square of 8-bit numbers, to substantially improve the multiply z80 performance. Alternate mantissa routines were written to suit this fast multiply function, and they are used where necessary. The table driven multiply function is used when the library is compiled with `__CLIB_OPT_FMATH` > 50.
 
 To calculate the 24-bit mantissa a special `mulu_32h_24x24` function has been built using 8 multiplies, the minimum number of `16_8x8` multiply terms. It is much more natural for the z80 to work in `16_8x8` multiplies than the Rabbit's `32_16x16` multiply. It is not a "correct" multiply, in that all terms are calculated and carry forward is considered. The lowest term is not calculated, as it doesn't impact the 32-bit result. The lower 16-bits of the result are simply truncated, leaving a further 8-bits for mantissa rounding within the calling function. The resulting `mulu_32h_24x24` could be the fastest way to calculate an IEEE sized mantissa on a z80, z180, & z80n.
 

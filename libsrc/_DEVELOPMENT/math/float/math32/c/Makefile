@@ -8,3 +8,6 @@ all: $(addprefix asm/,$(AFILES))
 
 asm/%.asm: %.c
 	zcc +z80 -clib=sdcc_ix --reserve-regs-iy --allow-unsafe-read --max-allocs-per-node400000 -SO3 $(CFLAGS) -a $^ -o $@
+
+clean:
+	$(RM) asm/*.asm zcc_opt.def

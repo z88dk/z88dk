@@ -37,3 +37,4 @@ $(SUBDIRS):
 $(CLEANDIRS):
 	$(MAKE) -C $(@:clean-%=%) clean
 	$(RM) */*.o
+	$(RM) zcc_opt.def

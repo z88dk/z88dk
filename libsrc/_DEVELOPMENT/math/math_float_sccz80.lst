@@ -1,3 +1,4 @@
 @math/float/math48/math48_sccz80.lst
 @math/float/math32/math32_sccz80.lst
+@math/float/math32/math32_z80_common_asm.lst
 @math/float/math32/math32_z80_asm.lst
