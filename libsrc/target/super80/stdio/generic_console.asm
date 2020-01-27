@@ -36,6 +36,7 @@
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
 		EXTERN		__super80_attr
+		EXTERN		__super80_custom_font
 
 		defc		DISPLAY = $be00
 		defc		COLOUR_MAP = $fe00

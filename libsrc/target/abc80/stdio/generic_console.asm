@@ -27,23 +27,23 @@ generic_console_set_attribute:
 	ret
 
 generic_console_cls:
-	ld	b,24
-	ld	c,0
-generic_console_cls_1:
-	push	bc
-	ld	b,c
-	ld	c,0
-	call	xypos
-	ld	d,h
-	ld	e,l
+        ld      hl,884          ; ROW table in ROM
+	ld	c,CONSOLE_ROWS
+cls_1:
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	inc	hl
+	ld	b,CONSOLE_COLUMNS
+	ld	a,32
+cls_2:
+	ld	(de),a
 	inc	de
-	ld	bc,32
-	ld	(hl),32
-	ldir
-	pop	bc	
-	inc	c
-	djnz	generic_console_cls_1
+	djnz	cls_2
+	dec	c
+	jr	nz,cls_1
 	ret
+
 
 ; c = x
 ; b = y
@@ -137,7 +137,7 @@ generic_console_scrollup_1:
 	ld	d,h
 	ld	e,l
 	inc	de
-	ld	bc,39
+	ld	bc,CONSOLE_COLUMNS-1
 	ld	(hl),32
 	ldir
 

@@ -36,5 +36,3 @@ dirs:
 clean:
 	$(RM) *.o* zcc_opt.def $(OUTPUT_DIRECTORY)/esxdos.lib
 	$(RM) -fr obj
-	
-

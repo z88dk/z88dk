@@ -10,12 +10,15 @@
 	EXTERN	__pc88_mode
 	EXTERN	generic_console_font32
 	EXTERN	generic_console_udg32
+	EXTERN	generic_console_caps
 	EXTERN	pc88bios
 
 	INCLUDE	"ioctl.def"
 
 	PUBLIC  CLIB_GENCON_CAPS
-	defc    CLIB_GENCON_CAPS = CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR | CAP_GENCON_INVERSE | CAP_GENCON_CUSTOM_FONT | CAP_GENCON_UDGS
+	defc    CLIB_GENCON_CAPS = 0
+
+	defc    CLIB_GENCON_CAPS_MODE2 = CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR | CAP_GENCON_INVERSE | CAP_GENCON_CUSTOM_FONT | CAP_GENCON_UDGS | CAP_GENCON_BOLD | CAP_GENCON_UNDERLINE
 
 ; a = ioctl
 ; de = arg
@@ -40,10 +43,13 @@ check_mode:
 	jr	nz,failure
 	ld	a,c
 	ld	bc,$5019
+	ld	l,CLIB_GENCON_CAPS
 	and	a
 	jr	z,set_mode
+	ld	l,CLIB_GENCON_CAPS_MODE2
 	cp	2
 	jr	z,set_mode
+	ld	l,CLIB_GENCON_CAPS
 	cp	1
 	ld	bc,$2519
 	jr	nz,failure
@@ -53,6 +59,8 @@ set_mode:
 	ld	(__console_w),a
 	ld	a,c
 	ld	(__console_h),a
+	ld	a,l
+	ld	(generic_console_caps),a
         ld      ix,$6f6b                ; CRTSET
         call    pc88bios
 	call	generic_console_cls

@@ -35,6 +35,7 @@
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
 		EXTERN		__super80_attr
+		EXTERN		__super80_custom_font
 		EXTERN		PORT_F0_COPY
 
 		defc		DISPLAY = $f000

@@ -21,6 +21,7 @@
 @stdio/stdio_sccz80.lst
 @stdlib/stdlib_sccz80.lst
 @string/string_sccz80.lst
+@target/z80/driver/driver.lst
 @threads/threads_sccz80.lst
 @time/time_sccz80.lst
 @z80/z80_sccz80.lst

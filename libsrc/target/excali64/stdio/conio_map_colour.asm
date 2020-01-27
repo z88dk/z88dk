@@ -50,7 +50,7 @@ excalibur_colour_1:
         defb    $6      ;LIGHTCYAN -> 6 (cyan)
         defb    $9      ;LIGHTRED -> 9 (orange)
         defb    $e      ;LIGHTMAGENTA -> 14 (pink/cerise)
-	defb	$6	;YELLOW -> YELLOW
+	defb	$5	;YELLOW -> YELLOW
 	defb	$7	;WHITE -> WHITE
 
 excalibur_colour_2:

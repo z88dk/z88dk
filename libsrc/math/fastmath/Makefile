@@ -44,4 +44,5 @@ dirs:
 
 
 clean:
-	$(RM) -fr obj 
+	$(RM) -fr obj
+	$(RM) zcc_opt.def
