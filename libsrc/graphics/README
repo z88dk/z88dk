@@ -1,7 +1,0 @@
-Monochrome graphics library.
-
-(0:0) origin is on top-left.
-
-The Z88 uses the window and closegfx commands that aren't supported on the other ports.
-
-

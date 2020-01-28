@@ -16,9 +16,6 @@ target/fp1100/graphics/w_plotpixl
 target/fp1100/graphics/w_respixl
 target/fp1100/graphics/w_xorpixl
 target/fp1100/graphics/w_pointxy
-graphics/draw_profile
-graphics/swapgfxbk_foo
-graphics/w_putsprite2
-@gfxbasew.lst
+@gfx/wide/gfx_wide.lst
 @font/font_8x8/font_8x8.lst
 @z80.lst

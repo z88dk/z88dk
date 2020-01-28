@@ -16,15 +16,9 @@ target/vg5k/stdio/conio_vars
 @stdio/stdio_ixiy.lst
 @font/font_8x8/font_8x8.lst
 @input/input_keyboard.lst
-graphics/generic_console/plotpixl6
-graphics/generic_console/respixl6
-graphics/generic_console/xorpixl6
-graphics/generic_console/pointxy6
-graphics/generic_console/div3
-graphics/dcircle2
 target/vg5k/graphics/textpixl6
 target/vg5k/graphics/cleargraphics
-@gfxbasetxt6.lst
+@gfx/gencon/gfx_gencon6.lst
 target/vg5k/games/joystick
 target/vg5k/games/keys_joystick
 target/vg5k/games/bit_open

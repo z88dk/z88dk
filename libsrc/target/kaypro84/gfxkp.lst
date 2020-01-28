@@ -1,9 +1,5 @@
-graphics/dcircle
-graphics/clg
 target/kaypro84/graphics/clsgraph
 target/kaypro84/graphics/plotpixl
 target/kaypro84/graphics/respixl
-graphics/putsprite3
-graphics/stencil_render2
 target/kaypro84/graphics/swapgfxbk
-@gfxbase.lst
+@gfx/narrow/gfx_narrow.lst

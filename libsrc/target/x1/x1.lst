@@ -33,10 +33,7 @@ target/x1/graphics/w_plotpixl
 target/x1/graphics/w_respixl
 target/x1/graphics/w_xorpixl
 target/x1/graphics/w_pointxy
-graphics/draw_profile
-graphics/swapgfxbk_foo
-graphics/w_putsprite2
-@gfxbasew.lst
+@gfx/wide/gfx_wide.lst
 target/x1/x1/subcpu_command
 target/x1/x1/subcpu_get
 target/x1/x1/subcpu_set

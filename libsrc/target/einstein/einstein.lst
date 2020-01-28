@@ -1,14 +1,8 @@
 @stdio/ansicore.lst
 target/einstein/stdio/generic_console
 @font/font_8x8/font_8x8.lst
-graphics/dcircle
-graphics/lftscrol
-graphics/fill
-graphics/dfill2
-graphics/getsprite
-graphics/liner
 @video/tms9918/video_tms9918.lst
-@gfxbase.lst
+@gfx/narrow/gfx_narrow.lst
 target/einstein/psg/psg_init
 target/einstein/psg/get_psg
 target/einstein/psg/set_psg

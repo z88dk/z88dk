@@ -45,15 +45,7 @@ target/pc6001/graphics/xor_MODE2
 target/pc6001/graphics/pointxy_MODE2
 target/pc6001/graphics/swapgfxbk
 target/pc6001/graphics/textpixl6
-graphics/generic_console/div3
-graphics/dcircle
-graphics/clg
-graphics/fill
-graphics/dfill
-graphics/getsprite
-graphics/putsprite2
-graphics/stencil_render2
-@gfxbase.lst
+@gfx/narrow/gfx_narrow.lst
 target/pc6001/psg/set_psg
 target/pc6001/psg/set_psg_callee
 target/pc6001/psg/get_psg

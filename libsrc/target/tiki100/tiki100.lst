@@ -12,15 +12,11 @@ target/tiki100/graphics/w_xorpixl
 target/tiki100/graphics/w_pointxy
 target/tiki100/graphics/getmaxx
 target/tiki100/graphics/getmaxy
-graphics/w_plotpixl
-graphics/w_respixl
-graphics/w_xorpixl
-graphics/w_pointxy
 target/tiki100/graphics/fill
 target/tiki100/graphics/w_putsprite
 target/tiki100/graphics/w_stencil_render
 target/tiki100/graphics/l_graphics_cmp
-@gfxbasew.lst
+@gfx/wide/gfx_wide.lst
 target/tiki100/gr_setpalette
 target/tiki100/gr_defmod
 target/tiki100/gr_scroll

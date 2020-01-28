@@ -12,4 +12,4 @@
         ret     nc
 
         defc    NEEDpoint = 1
-        INCLUDE "graphics/generic_console/pixel6.inc"
+        INCLUDE "gfx/gencon/pixel6.inc"

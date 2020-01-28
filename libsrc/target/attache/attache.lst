@@ -1,15 +1,11 @@
-graphics/w_dcircle_square.asm
-graphics/clg
 target/attache/graphics/clsgraph
-graphics/w_putsprite2
-graphics/w_stencil_render2
+gfx/wide/obj/attache/w_dcircle_square
 target/attache/graphics/plot_setup
 target/attache/graphics/w_plotpixl
 target/attache/graphics/w_respixl
 target/attache/graphics/w_xorpixl
 target/attache/graphics/w_pointxy
-graphics/swapgfxbk_foo
-@gfxbasew.lst
+@gfx/wide/gfx_wide.lst
 target/attache/psg/set_psg
 target/attache/psg/set_psg_callee
 target/attache/psg/psg_init

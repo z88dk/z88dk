@@ -76,26 +76,11 @@ target/z88/z88/stripdev
 target/z88/z88/strippath
 target/z88/z88/opwin
 target/z88/z88/fnexpand
-@gfxbase.lst
-graphics/dcircle
-graphics/clg
-graphics/clsgraph
 target/z88/graphics/closegfx
 target/z88/graphics/clrarea
-graphics/plotpixl
-graphics/respixl
-graphics/xorpixl
-graphics/pointxy
-graphics/fill
-graphics/dfill
-graphics/getsprite
-graphics/putsprite2
-graphics/bksave
-graphics/bkrestore
 target/z88/graphics/pixladdr
 target/z88/graphics/swapgfxbk
-graphics/stencil_render
 target/z88/graphics/window
-@gfxbase.lst
+@gfx/narrow/gfx_narrow.lst
 @z80.lst
 

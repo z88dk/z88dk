@@ -1,14 +1,11 @@
-graphics/w_dcircle_square.asm
+gfx/wide/obj/aussie/w_dcircle_square
 target/aussie/graphics/clg
 target/aussie/graphics/w_pixladdr
 target/aussie/graphics/w_plotpixl
 target/aussie/graphics/w_respixl
 target/aussie/graphics/w_xorpixl
-graphics/lftscrol
-graphics/swapgfxbk_foo
-graphics/draw_profile
 target/aussie/graphics/w_pointxy
-@gfxbasew.lst
+@gfx/wide/gfx_wide.lst
 target/aussie/games/bit_open
 target/aussie/games/bit_open_di
 target/aussie/games/bit_close

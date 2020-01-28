@@ -25,11 +25,7 @@ target/rx78/graphics/respixl
 target/rx78/graphics/xorpixl
 target/rx78/graphics/pointxy
 target/rx78/graphics/swapgfxbk
-graphics/putsprite2
-graphics/dcircle
-graphics/fill
-graphics/getsprite
-@gfxbase.lst
+@gfx/narrow/gfx_narrow.lst
 target/rx78/games/joystick
 target/rx78/games/keys_joystick
 @games/games.lst

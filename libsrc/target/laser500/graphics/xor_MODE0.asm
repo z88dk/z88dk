@@ -5,4 +5,4 @@
 
 .xor_MODE0
         defc    NEEDxor = 1
-        INCLUDE "graphics/generic_console/pixel.inc"
+        INCLUDE "gfx/gencon/pixel.inc"

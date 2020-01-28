@@ -18,7 +18,7 @@
 		        SECTION code_clib
 			PUBLIC	respixel
 
-			EXTERN	div3
+			EXTERN	div3_0
 			EXTERN	__gfx_coords
 			EXTERN	base_graphics
 
@@ -41,7 +41,7 @@
 			
 			push	bc
 			
-			ld	hl,div3
+			ld	hl,div3_0
 			ld	d,0
 			ld	e,c
 			inc e
