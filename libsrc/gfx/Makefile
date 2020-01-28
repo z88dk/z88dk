@@ -2,7 +2,7 @@ include ../Make.config
 
 ALLSUBDIRS = common narrow wide portable x11 gencon
 
-SUBDIRS = common
+SUBDIRS = common x11
 # Directories that need a target passed down
 
 FLAVOUR ?= narrow

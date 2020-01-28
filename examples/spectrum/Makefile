@@ -132,7 +132,7 @@ smallgfx2.tap: ../graphics/smallgfx2.c
 	zcc +zx -vn ../graphics/smallgfx2.c -lndos -lm -create-app -osmallgfx2.bin
 
 wintest.tap: ../graphics/wintest.c
-	zcc +zx -vn ../graphics/wintest.c -lndos -lm -lx11  -create-app -owintest.bin
+	zcc +zx -vn ../graphics/wintest.c -lndos -lm -create-app -owintest.bin
 
 sinwave_fast.tap: ../graphics/sinwave.c
 	zcc +zx -vn ../graphics/sinwave.c -lndos -lm  -create-app -osinwave_fast.bin
@@ -153,7 +153,7 @@ smile.tap: ../ticalc/smile.c
 	zcc +zx -vn ../ticalc/smile.c -lndos -create-app -osmile.bin
 
 xample.tap: ../graphics/xample.c
-	zcc +zx -vn ../graphics/xample.c -lndos -create-app -lx11 -oxample.bin
+	zcc +zx -vn ../graphics/xample.c -lndos -create-app -oxample.bin
 
 clicktest.tap: ../sound/clicktest.c
 	zcc +zx -vn ../sound/clicktest.c -lndos -create-app -oclicktest.bin

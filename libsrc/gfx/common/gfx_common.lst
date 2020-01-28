@@ -19,3 +19,4 @@ gfx/common/obj/${TARGET}/rscroll
 gfx/common/obj/${TARGET}/swapgfxbk_noop
 gfx/common/obj/${TARGET}/__graphics_retaddr
 gfx/common/obj/${TARGET}/putsprite_callee
+@gfx/x11/x11.lst

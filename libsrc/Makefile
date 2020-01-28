@@ -32,7 +32,7 @@ all: genlibs z88libs tilibs zxlibs enterprise_clib.lib c128ansi_clib.lib nclibs 
 	kramermc_clib.lib hgmc_clib.lib pmd85_clib.lib
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib mbf32.lib mbf64.lib math32.lib gendos.lib ndos.lib  \
-	 lib3d.lib x11.lib fastmath.lib
+	 lib3d.lib fastmath.lib
 
 
 nclibs: nc_clib.lib gfxnc100.lib gfxzcn.lib gfxnc200.lib
@@ -140,13 +140,6 @@ lib3d.lib:
 	@echo '--- Building 3D Library ---'
 	@echo ''
 	$(MAKE) -C lib3d
-
-# Xlib / X11 and tiny GUI portable library - stefano
-x11.lib:
-	@echo ''
-	@echo '--- Building X11 emulation Library ---'
-	@echo ''
-	$(MAKE) -C gfx/x11
 
 ndos.lib:
 	$(MAKE) -C fcntl/dummy
