@@ -7,8 +7,7 @@ OBJECTS := $(SOURCES:.c=.o)
 CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED 
 
 
-all:	test_genmath.bin test_math48.bin test_math32.bin test_math32_fast.bin
-
+all:	test_genmath.bin test_math48.bin test_math32.bin
 
 
 test_genmath.bin: $(SOURCES)
@@ -21,11 +20,6 @@ test_math48.bin: $(SOURCES)
 
 test_math32.bin: $(SOURCES)
 	$(call compile, -m -DMATH32 -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math32\\\"\"", -lmath32)
-	$(runtest)
-
-
-test_math32_fast.bin: $(SOURCES)
-	$(call compile, -m -DMATH32 -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math32_Fast\\\"\"", -lmath32_fast)
 	$(runtest)
 
 clean:

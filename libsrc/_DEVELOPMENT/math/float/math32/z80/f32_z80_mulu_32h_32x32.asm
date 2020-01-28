@@ -9,8 +9,6 @@
 
 IF __CPU_Z80__
 
-INCLUDE "config_private.inc"
-
 SECTION code_clib
 SECTION code_fp_math32
 
@@ -88,8 +86,6 @@ PUBLIC m32_mulu_32h_32x32
     push bc                     ;'y3 y2
     exx                         ;
 ;   push de                     ; x1 x0
-
-IF __CLIB_OPT_FMATH <= 50
 
     ; start doing the p3 byte
 
@@ -194,127 +190,4 @@ IF __CLIB_OPT_FMATH <= 50
     ld l,c                      ; p4
     ret                         ; exit  : DEHL = 32-bit product
 
-ENDIF
-
-IF __CLIB_OPT_FMATH > 50
-
-    ; start doing the p3 byte
-
-    pop hl                      ; y3 y2
-    ld a,h
-    ld h,d
-    ld d,a
-    call m32_z80_mulu_de        ; y3*x0
-    ex de,hl
-    call m32_z80_mulu_de        ; x1*y2
-
-    xor a                       ; zero A
-    add hl,de                   ; p4 p3
-    adc a,a                     ; p5
-    ex af,af
-
-    pop bc                      ; x3 x2
-    pop de                      ; y1 y0
-    ld a,b
-    ld b,d
-    ld d,a
-    push bc                     ; y1 x2
-    call m32_z80_mulu_de        ; x3*y0
-
-    ex af,af
-    add hl,de                   ; p4 p3
-    adc a,0                     ; p5
-    ex af,af
-
-    pop de                      ; y1 x2
-    call m32_z80_mulu_de        ; y1*x2
-
-    ex af,af
-    add hl,de                   ; p4 p3
-    adc a,0                     ; p5
-
-    ld b,l                      ; preserve p3 byte for rounding
-    ld l,h                      ; prepare HL for next cycle
-    ld h,a                      ; promote HL p5 p4
-    ld a,b                      ; preserve p3 byte for rounding
-
-    ; start doing the p4 byte
-
-    pop bc                      ; x1 y1
-    pop de                      ; x3 y3
-    push af                     ; preserve p3 byte for rounding
-    ld a,b
-    ld b,d
-    ld d,a
-    push bc                     ; x3 y1
-    call m32_z80_mulu_de        ; x1*y3
-
-    xor a                       ; zero A
-    add hl,de                   ; p5 p4
-    adc a,a                     ; p6
-    ex af,af
-
-    pop de                      ; x3 y1
-    call m32_z80_mulu_de        ; x3*y1
-
-    ex af,af
-    add hl,de                   ; p5 p4
-    adc a,0                     ; p6
-    ex af,af
-
-    pop af                      ; preserve p3 byte for rounding
-    pop de                      ; x2 y2
-    push af                     ; preserve p3 byte for rounding
-    call m32_z80_mulu_de        ; x2*y2
-
-    ex af,af
-    add hl,de                   ; p5 p4
-    adc a,0                     ; p6
-
-    ld c,l                      ; final p4 byte in C
-    ld l,h                      ; prepare HL for next cycle
-    ld h,a                      ; promote HL p6 p5
-
-    pop af                      ; p3 byte for rounding
-    or a
-    jr Z,mul0                   ; use p3 to round p4
-    set 0,c
-
-.mul0
-    ; start doing the p5 byte
-
-    pop de                      ; y3 x2
-    push bc                     ; save p4 byte
-    call m32_z80_mulu_de        ; y3*x2
-
-    xor a                       ; zero A
-    add hl,de                   ; p6 p5
-    adc a,a                     ; p7
-    ex af,af
-
-    pop bc                      ; save p4 byte
-    pop de                      ; x3 y2
-    push bc                     ; save p4 byte
-    call m32_z80_mulu_de        ; x3*y2
-
-    ex af,af
-    add hl,de                   ; p6 p5
-    adc a,0                     ; p7
-
-    pop bc                      ; save p4 byte in C
-    ld b,l                      ; final p5 byte in B
-    ld l,h                      ; prepare HL for next cycle
-    ld h,a                      ; promote HL p7 p6
-
-    ; start doing the p6 p7 bytes
-    pop de                      ; y3 x3
-    push bc                     ; save p5 p4 byte in BC
-    call m32_z80_mulu_de        ; y3*x3
-
-    add hl,de                   ; p7 p6 in HL
-    pop de                      ; save p5 p4 byte in DE
-    ex de,hl                    ; p7 p6 p5 p4
-    ret                         ; exit  : DEHL = 32-bit product
-
-ENDIF
 ENDIF
