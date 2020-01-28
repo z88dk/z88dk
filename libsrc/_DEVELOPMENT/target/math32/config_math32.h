@@ -49,20 +49,6 @@
 
 
 
-
-
-
-
-
-
-
-#define __CLIB_OPT_FMATH  0
-
-
-
-
-
-
 #endif
 
 

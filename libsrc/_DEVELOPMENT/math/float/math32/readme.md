@@ -29,7 +29,7 @@ This library is also designed to be as fast as possible on the z80 processor. Fo
 
   *  Made for the Spectrum Next. The z80n `mul de` and the z180 `mlt nn` multiply instructions are used to full advantage to accelerate all floating point calculations.
 
-  *  The z80 multiply (without a hardware instruction) is implemented with an unrolled equivalent to the z80n `mul de`, which is designed to have no side effect other than resetting the flag register. An alternate fast table look-up z80 multiply is also implemented, and used when the library is compiled with `__CLIB_OPT_FMATH` > 50.
+  *  The z80 multiply (without a hardware instruction) is implemented with an unrolled equivalent to the z80n `mul de`, which is designed to have no side effect other than resetting the flag register.
 
   *  Mantissa calculations are done with 24-bits and 8-bits for rounding. Rounding is a simple method, but can be if required it can be expanded to the IEEE standard with a performance penalty.
 
@@ -206,7 +206,7 @@ For the z80 CPU, with no hardware multiply, a replica of the z80n instruction `m
 
 The `z80_mulu_de` has zero argument detection, leading zero detection, and is unrolled. With the exception of preserving `hl`, for equivalency with z80n `mul de`, it should be the fastest `16_8x8` linear multiply possible on a z80.
 
-In the search for performance, an alternate table driven `16_8x8` multiply function was created. This function uses a 512 Byte table containing the 16-bit square of 8-bit numbers, to substantially improve the multiply z80 performance. Alternate mantissa routines were written to suit this fast multiply function, and they are used where necessary. The table driven multiply function is used when the library is compiled with `__CLIB_OPT_FMATH` > 50.
+In the search for performance, an alternate table driven `16_8x8` multiply function was created. This function uses a 512 Byte table containing the 16-bit square of 8-bit numbers, to improve the multiply z80 performance. Alternate mantissa routines were written to suit this fast multiply function, and they are used where necessary. The table driven multiply function has been removed on January 28th 2020. Please look at commits on this date to rebuild this option if needed.
 
 To calculate the 24-bit mantissa a special `mulu_32h_24x24` function has been built using 8 multiplies, the minimum number of `16_8x8` multiply terms. It is much more natural for the z80 to work in `16_8x8` multiplies than the Rabbit's `32_16x16` multiply. It is not a "correct" multiply, in that all terms are calculated and carry forward is considered. The lowest term is not calculated, as it doesn't impact the 32-bit result. The lower 16-bits of the result are simply truncated, leaving a further 8-bits for mantissa rounding within the calling function. The resulting `mulu_32h_24x24` could be the fastest way to calculate an IEEE sized mantissa on a z80, z180, & z80n.
 
@@ -383,20 +383,20 @@ Careful use of the intrinsic functions can result in significant performance imp
 And we get about a __25%__ improvement for the n-body benchmark.
 Most of this gain is created by directly using the `invsqrt()` function. The optimisation effectively provides `y=invsqrt(x)`, instead of indirectly calculating `y=l_f32_inv(x*invsqrt(x))` in the normal situation.
 
-Library          | Compiler | Value 1       | Value 2       | Ticks
+Library                     | Compiler | Value 1       | Value 2       | Ticks
 -|-|-|-|-
-correct values   | -->      | -0.169075164  | -0.169087605
-math48           | sccz80   | -0.169075164  | -0.169087605  | 2_402_023_498
-mbf32            | sccz80   | -0.1699168    | -0.1699168    | 1_939_334_701
-bbcmath          | sccz80   | -0.16907516   | -0.16908760   | 1_655_789_776
-math32           | sccz80   | -0.1690752    | -0.1690867    | _1_398_993_950_
-math32      (opt)| sccz80   | -0.1690752    | -0.1690867    | __1_039_149_590__
-math32_fast      | sccz80   | -0.1690752    | -0.1690867    | _1_198_780_765_
-math32_fast (opt)| sccz80   | -0.1690752    | -0.1690867    | __0_890_625_068__
-math32_z80n      | sccz80   | -0.1690752    | -0.1690867    | _0_576_942_516_
-math32_z80n (opt)| sccz80   | -0.1690752    | -0.1690867    | __0_441_400_426__
-math32_z180      | sccz80   | -0.1690752    | -0.1690867    | _0_563_700_933_
-math32_z180 (opt)| sccz80   | -0.1690752    | -0.1690867    | __0_428_973_481__
+correct values              | -->      | -0.169075164  | -0.169087605
+math48                      | sccz80   | -0.169075164  | -0.169087605  | 2_402_023_498
+mbf32                       | sccz80   | -0.1699168    | -0.1699168    | 1_939_334_701
+bbcmath                     | sccz80   | -0.16907516   | -0.16908760   | 1_655_789_776
+math32                      | sccz80   | -0.1690752    | -0.1690867    | _1_398_993_950_
+math32                 (opt)| sccz80   | -0.1690752    | -0.1690867    | __1_039_149_590__
+math32_fast        (deleted)| sccz80   | -0.1690752    | -0.1690867    | _1_198_780_765_
+math32_fast   (opt, deleted)| sccz80   | -0.1690752    | -0.1690867    | __0_890_625_068__
+math32_z80n                 | sccz80   | -0.1690752    | -0.1690867    | _0_576_942_516_
+math32_z80n            (opt)| sccz80   | -0.1690752    | -0.1690867    | __0_441_400_426__
+math32_z180                 | sccz80   | -0.1690752    | -0.1690867    | _0_563_700_933_
+math32_z180            (opt)| sccz80   | -0.1690752    | -0.1690867    | __0_428_973_481__
 
 
 #### mandelbrot
@@ -422,19 +422,19 @@ math32_z180 (opt)| sccz80   | -0.1690752    | -0.1690867    | __0_428_973_481__
 ```
 And we get nearly a __10%__ improvement for the mandelbrot benchmark. This gain is achieved because the `sqr()` function optimises the mantissa calculation to 5 `16_8x8` multiplies, rather than 8 `16_8x8` multiplies required for full multiply.
 
-Library          | Compiler | Ticks
+Library                     | Compiler | Ticks
 -|-|-
-genmath          | sccz80   | 3_589_992_847
-math48           | sccz80   | 3_323_285_174
-math48           | zsdcc    | 3_205_062_412
-math32           | zsdcc    | 1_670_409_507
-math32           | sccz80   | _1_653_612_845_
-math32      (opt)| sccz80   | __1_433_305_904__
-math32_fast      | sccz80   | _1_495_633_606_
-math32_fast (opt)| sccz80   | __1_306_278_647__
-math32_z80n      | sccz80   | _0_922_658_537_
-math32_z80n (opt)| sccz80   | __0_861_039_210__
-math32_z180      | sccz80   | _0_892_842_610_
-math32_z180 (opt)| sccz80   | __0_825_674_427__
+genmath                     | sccz80   | 3_589_992_847
+math48                      | sccz80   | 3_323_285_174
+math48                      | zsdcc    | 3_205_062_412
+math32                      | zsdcc    | 1_670_409_507
+math32                      | sccz80   | _1_653_612_845_
+math32                 (opt)| sccz80   | __1_433_305_904__
+math32_fast        (deleted)| sccz80   | _1_495_633_606_
+math32_fast   (opt, deleted)| sccz80   | __1_306_278_647__
+math32_z80n                 | sccz80   | _0_922_658_537_
+math32_z80n            (opt)| sccz80   | __0_861_039_210__
+math32_z180                 | sccz80   | _0_892_842_610_
+math32_z180            (opt)| sccz80   | __0_825_674_427__
 
 ---

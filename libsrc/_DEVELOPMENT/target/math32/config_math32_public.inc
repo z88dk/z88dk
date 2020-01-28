@@ -58,23 +58,6 @@ defc __CPU_INFO_ENABLE_SLL = 0x01
 
 
 
-PUBLIC __CLIB_OPT_FMATH
-
-
-
-
-
-defc __CLIB_OPT_FMATH = 0
-
-
-
-
-
-
-
-
-
-
 
 ENDIF
 

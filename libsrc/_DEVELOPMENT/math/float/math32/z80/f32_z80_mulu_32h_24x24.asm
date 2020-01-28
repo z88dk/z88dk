@@ -9,8 +9,6 @@
 
 IF __CPU_Z80__
 
-INCLUDE "config_private.inc"
-
 SECTION code_clib
 SECTION code_fp_math32
 
@@ -70,8 +68,6 @@ PUBLIC m32_mulu_32h_24x24
     push de                     ; dc on stack
     push bc                     ; ab on stack (again)
     push hl                     ; ef on stack
-
-IF __CLIB_OPT_FMATH <= 50
 
     ld d,l
     ld a,h
@@ -146,92 +142,4 @@ IF __CLIB_OPT_FMATH <= 50
     ld e,c                      ; exit  : HLDE  = 32-bit product
     ret
 
-ENDIF
-
-IF __CLIB_OPT_FMATH > 50
-
-    ld d,l
-    ld a,h
-    ld h,e
-    ld e,a
-    call m32_z80_mulu_de        ; b*e 2^8
-    ex de,hl
-    call m32_z80_mulu_de        ; c*f 2^8
-
-    xor a
-    add hl,de
-    adc a,a
-
-    ld l,h                      ; put 2^8 in hl
-    ld h,a
-
-    pop de                      ; ef
-    pop bc                      ; ab
-    ld a,d
-    ld d,b
-    ld b,a
-    push bc                     ; eb
-    call m32_z80_mulu_de        ; a*f 2^16
-
-    xor a
-    add hl,de
-    adc a,a
-    ex af,af
-
-    pop de                      ; eb
-    call m32_z80_mulu_de        ; e*b 2^16
-
-    ex af,af
-    add hl,de
-    adc a,0
-    ex af,af
-
-    pop de                      ; dc
-    call m32_z80_mulu_de        ; d*c 2^16
-
-    ex af,af
-    add hl,de
-    adc a,0
-
-    ld b,l                      ; put 2^16 in hla
-    ld l,h
-    ld h,a
-    ld a,b
-
-    pop de                      ; ab
-    pop bc                      ; de
-    push af                     ; l on stack
-    ld a,d
-    ld d,b
-    ld b,a
-    push bc                     ; ae
-    call m32_z80_mulu_de        ; d*b 2^24
-
-    xor a
-    add hl,de
-    adc a,a
-    ex af,af
-
-    pop de                      ; ae
-    call m32_z80_mulu_de        ; a*e 2^24
-
-    ex af,af
-    add hl,de
-    adc a,0
-
-    pop bc                     ; l in b
-    ld c,b
-    ld b,l
-    ld l,h
-    ld h,a
-
-    pop de                      ; ad
-    push bc
-    call m32_z80_mulu_de        ; a*d 2^32
-
-    add hl,de
-    pop de                      ; exit  : HLDE  = 32-bit product
-    ret
-
-ENDIF
 ENDIF
