@@ -85,21 +85,17 @@ PUBLIC m32_mulu_32h_32x32
 
     ; start doing the p3 byte
 
-    pop bc                      ; y3 y2
-    ld a,b
-    ld b,d
+    pop hl                      ; y3 y2
+    ld a,h
+    ld h,d
     ld d,a
-    mlt bc                      ; x1*y2
+    mlt hl                      ; x1*y2
     mlt de                      ; y3*x0
 
     xor a                       ; zero A,HL
-    ld h,a                      ; zero HL
-    ld l,a
 
     add hl,de                   ; p4 p3
     adc a,a                     ; p5
-    add hl,bc                   ; p4 p3
-    adc a,0
     ex af,af
 
     pop bc                      ; x3 x2

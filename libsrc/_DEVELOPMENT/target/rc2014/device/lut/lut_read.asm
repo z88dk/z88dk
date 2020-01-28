@@ -29,14 +29,15 @@ PUBLIC lut_read
 ;
 
 .lut_read
-
-    push bc                                 ; 11 preserve BC
-    ld c,__IO_LUT_RESULT_MSB                ; 7 result MSB address
-    in h,(c)                                ; 12 result MSB to H
-    dec c                                   ; 4 result LSB address
-    in l,(c)                                ; 12 result LSB to L
-    pop bc                                  ; 10 restore BC
-    ret                                     ; 10
+    push bc                     ; 11 preserve BC
+    ld b,h                      ; 4  operand Y in B
+    ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
+    out (c),l                   ; 12 operand X from L
+    dec c                       ; 4  result MSB address
+    in h,(c)                    ; 12 result Z MSB to H
+    dec c                       ; 4  result LSB address
+    in l,(c)                    ; 12 result Z LSB to L
+    pop bc                      ; 10 restore BC
 
 ENDIF
 ENDIF

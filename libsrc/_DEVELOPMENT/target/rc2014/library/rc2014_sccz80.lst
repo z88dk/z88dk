@@ -18,7 +18,9 @@
 @libgen/libgen_sccz80.lst
 @locale/locale.lst
 @math/math_integer.lst
-@math/math_float_sccz80.lst
+@math/float/math48/math48_sccz80.lst
+@math/float/math32/math32_sccz80.lst
+@math/float/math32/math32_z80_common_asm.lst
 @network/network_sccz80.lst
 @setjmp/setjmp_sccz80.lst
 @stdio/stdio_sccz80.lst
