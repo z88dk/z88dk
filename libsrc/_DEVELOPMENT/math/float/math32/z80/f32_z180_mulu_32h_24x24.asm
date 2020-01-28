@@ -45,7 +45,7 @@ PUBLIC m32_mulu_32h_24x24
 
     ld h,l                      ; ab:bc
     ld l,d
-    ld a,h                      ; a in a             
+    ld a,h                      ; a in a
     
     exx
     ld h,a

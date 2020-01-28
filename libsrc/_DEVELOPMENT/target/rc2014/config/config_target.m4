@@ -15,28 +15,32 @@ define(`__CPU_CLOCK', 7372800)
 
 # Digital I/O Module Port Definition
 
-define(`__IO_DIO_PORT', 0x00)    # Port Address for DIO
+define(`__IO_DIO_PORT', 0x00)    # Port Address for DIO Module
 
 # Compact Flash Module Port Definition
 
-define(`__IO_CF_PORT', 0x10)    # Port Address for CF
+define(`__IO_CF_PORT', 0x10)    # Port Address for CF Module
 
-# 82C55 PIO Port Definitions
+# 82C55 PIO Port Definition
 
-define(`__IO_PIO_PORT_BASE', 0x20)    # Port Address for 82C55
+define(`__IO_PIO_PORT_BASE', 0x20)  # Port Address for 82C55 Module
 
 # Pageable ROM Port Definitions
 
-define(`__IO_PROM_RESET', 0x30)   # Port Address for PROM Reset
-define(`__IO_PROM_TOGGLE', 0x38)   # Port Address for PROM Toggle
+define(`__IO_PROM_RESET', 0x30)     # Port Address for PROM Reset
+define(`__IO_PROM_TOGGLE', 0x38)    # Port Address for PROM Toggle
 
-# MC68C60 ACIA Port Definitions
+# LUT Module Port Definition
 
-define(`__IO_ACIA_PORT_BASE', 0x80)   # Port Address for 68C50
+define(`__IO_LUT_PORT_BASE', 0x40)  # Port Address for LUT Module
+
+# MC68C60 ACIA Port Definition
+
+define(`__IO_ACIA_PORT_BASE', 0x80) # Port Address for 68C50 Module
 
 # Zilog SIO Port Definitions
 
-define(`__IO_SIO_PORT_BASE', 0x80)   # Port Address for SIO/0-2
+define(`__IO_SIO_PORT_BASE', 0x80)  # Port Address for SIO/0-2 Module
 
 # Spencer's build
 define(`__IO_SIO_PORT_OFFSET_A', 0x00)   # Port Offset for A Channel (A1)
@@ -71,6 +75,7 @@ PUBLIC `__IO_CF_PORT'
 PUBLIC `__IO_PIO_PORT_BASE'
 PUBLIC `__IO_PROM_RESET'
 PUBLIC `__IO_PROM_TOGGLE'
+PUBLIC `__IO_LUT_PORT_BASE'
 PUBLIC `__IO_ACIA_PORT_BASE'
 PUBLIC `__IO_SIO_PORT_BASE'
 PUBLIC `__IO_SIO_PORT_OFFSET_A'
@@ -94,6 +99,7 @@ defc `__IO_CF_PORT' = __IO_CF_PORT
 defc `__IO_PIO_PORT_BASE' = __IO_PIO_PORT_BASE
 defc `__IO_PROM_RESET' = __IO_PROM_RESET
 defc `__IO_PROM_TOGGLE' = __IO_PROM_TOGGLE
+defc `__IO_LUT_PORT_BASE' = __IO_LUT_PORT_BASE
 defc `__IO_ACIA_PORT_BASE' = __IO_ACIA_PORT_BASE
 defc `__IO_SIO_PORT_BASE' = __IO_SIO_PORT_BASE
 defc `__IO_SIO_PORT_OFFSET_A' = __IO_SIO_PORT_OFFSET_A

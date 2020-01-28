@@ -1,0 +1,7 @@
+target/rc2014/device/lut/lut_read
+target/rc2014/device/lut/f32_lut_mulu_de
+target/rc2014/device/lut/l_mulu_de
+
+target/rc2014/device/lut/f32_z80_mulu_32h_24x24
+target/rc2014/device/lut/f32_z80_mulu_32h_32x32
+target/rc2014/device/lut/f32_z80_sqr_32h_24x24
