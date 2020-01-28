@@ -17,7 +17,10 @@
     EXTERN  asm_load_z88dk_udg
     EXTERN  l_jphl
 
-	INCLUDE	"ioctl.def"
+    INCLUDE	"ioctl.def"
+
+    PUBLIC  CLIB_GENCON_CAPS
+    defc    CLIB_GENCON_CAPS = CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR | CAP_GENCON_CUSTOM_FONT | CAP_GENCON_UDGS
 
 ; Entry:
 ; a = ioctl

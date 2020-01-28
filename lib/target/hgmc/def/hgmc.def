@@ -1,0 +1,20 @@
+; Hübler GrafikMC
+
+; Memory map:
+;
+; 8k VRAM (32x32 characters)
+;
+; C000-EFFF 4K VRAM
+; F000-FFFF 4k Monitor program + variables 
+;
+
+
+
+	defc	RESTART = $f000
+	defc	CONSOLE_IN = $f003		;Waits: Exit a = key
+	defc	CONSOLE_OUT = $f009
+	defc	CONSOLE_STAT = $f012		;z = no key pressed
+
+	defc	PORT_KBD_DATA = $08		;Keyboard data
+	defc	PORT_KBD_STATUS = $09		;Status: 0xff = pressed, 0x00 = not pressed
+	defc	PORT_VIDEO = $10		;Video port, where VRAM is located

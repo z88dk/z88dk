@@ -31,13 +31,13 @@ EXTERN _m32_exp10f
 .asm_dmulpow10
     ld l,a
     call m32_float8             ; convert l to float in dehl
-    call _m32_exp10f            ; make 10^A
-    push de
-    push hl
-
     exx
-    call m32_fsmul_callee       ; DEHL = x * 10^(A)
     
+    push de                     ; preserve x, and put it on stack for fsmul
+    push hl
+    exx
+    
+    call _m32_exp10f            ; make 10^A
+    call m32_fsmul_callee       ; DEHL = x * 10^(A)
     exx
     ret
-

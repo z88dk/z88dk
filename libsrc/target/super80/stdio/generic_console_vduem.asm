@@ -26,24 +26,22 @@
 		PUBLIC		generic_console_vpeek
 		PUBLIC		generic_console_scrollup
 		PUBLIC		generic_console_printc
-		PUBLIC		generic_console_ioctl
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_inverse
+                PUBLIC          generic_console_set_attribute
 
 		EXTERN		generic_console_flags
 		EXTERN		conio_map_colour
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
 		EXTERN		__super80_attr
+		EXTERN		__super80_custom_font
 		EXTERN		PORT_F0_COPY
 
 		defc		DISPLAY = $f000
 		defc		COLOUR_MAP = $f000
 
-generic_console_ioctl:
-	scf
-generic_console_set_inverse:
+generic_console_set_attribute:
 	ret
 
 generic_console_set_paper:

@@ -1,6 +1,6 @@
-stdio/x07/fgetc_cons
-stdio/x07/fputc_cons
-stdio/x07/getk
+target/x07/stdio/fgetc_cons
+target/x07/stdio/fputc_cons
+target/x07/stdio/getk
 @stdio/stdio.lst
 games/joystick
 @z80.lst

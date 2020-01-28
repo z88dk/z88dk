@@ -19,7 +19,9 @@
 		SECTION CODE
 
 		SECTION code_crt_init
+		SECTION code_crt_init_exit
 		SECTION code_crt_exit
+		SECTION code_crt_exit_exit
 		SECTION code_driver
 		SECTION rodata_driver		;Keep it in low memoey
 		SECTION code_compiler
@@ -73,6 +75,9 @@ ENDIF
 		SECTION rodata_fp_mbf64
 		SECTION rodata_compiler
 		SECTION rodata_clib
+IF !__crt_org_graphics
+		SECTION rodata_graphics
+ENDIF
 		SECTION rodata_user
 		SECTION rodata_font
 		SECTION rodata_font_fzx
@@ -85,6 +90,9 @@ IF !__crt_model
 		SECTION smc_user
 		SECTION data_clib
 		SECTION data_stdlib
+IF !__crt_org_graphics
+		SECTION data_graphics
+ENDIF
 		SECTION data_crt
 		SECTION data_compiler
 		SECTION data_user
@@ -129,6 +137,9 @@ IF __crt_model > 0
 		SECTION data_clib
 		SECTION data_crt
 		SECTION data_stdlib
+IF !__crt_org_graphics
+		SECTION data_graphics
+ENDIF
 		SECTION data_compiler
 		SECTION data_user
 		SECTION data_alloc_balloc
@@ -141,6 +152,8 @@ IF __crt_org_graphics
 		org	__crt_org_graphics
 		SECTION code_graphics
 		SECTION code_himem
+		SECTION rodata_graphics
+		SECTION rodata_himem
 		SECTION data_himem
 		SECTION data_graphics
 		SECTION bss_graphics

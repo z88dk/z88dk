@@ -73,6 +73,8 @@ typedef enum {
     RES_PARERR = 4  /* 4: Invalid Parameter */
 } DRESULT;
 
+/* FatFS for non exFAT file systems */
+typedef DWORD LBA_t;
 //
 // IDE DISK COMMANDS
 //
@@ -87,13 +89,13 @@ extern DSTATUS disk_status_fastcall(BYTE pdrv) __preserves_regs(iyh,iyl) __z88dk
 #define disk_status(a) disk_status_fastcall(a)
 
 
-extern DRESULT disk_read(BYTE pdrv,BYTE* buff,DWORD sector,UINT count) __preserves_regs(iyh,iyl);
-extern DRESULT disk_read_callee(BYTE pdrv,BYTE* buff,DWORD sector,UINT count) __preserves_regs(iyh,iyl) __z88dk_callee;
+extern DRESULT disk_read(BYTE pdrv,BYTE* buff,LBA_t sector,UINT count) __preserves_regs(iyh,iyl);
+extern DRESULT disk_read_callee(BYTE pdrv,BYTE* buff,LBA_t sector,UINT count) __preserves_regs(iyh,iyl) __z88dk_callee;
 #define disk_read(a,b,c,d) disk_read_callee(a,b,c,d)
 
 
-extern DRESULT disk_write(BYTE pdrv,const BYTE* buff,DWORD sector,UINT count) __preserves_regs(iyh,iyl);
-extern DRESULT disk_write_callee(BYTE pdrv,const BYTE* buff,DWORD sector,UINT count) __preserves_regs(iyh,iyl) __z88dk_callee;
+extern DRESULT disk_write(BYTE pdrv,const BYTE* buff,LBA_t sector,UINT count) __preserves_regs(iyh,iyl);
+extern DRESULT disk_write_callee(BYTE pdrv,const BYTE* buff,LBA_t sector,UINT count) __preserves_regs(iyh,iyl) __z88dk_callee;
 #define disk_write(a,b,c,d) disk_write_callee(a,b,c,d)
 
 

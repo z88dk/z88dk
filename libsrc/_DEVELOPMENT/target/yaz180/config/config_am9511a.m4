@@ -2,6 +2,7 @@ divert(-1)
 
 ###############################################################
 # AM9511A CONFIGURATION
+# rebuild the library if changes are made
 #
 
 define(`__IO_APU_DATA',    0x`'eval(__IO_APU_PORT_BASE+0x00,16))  # APU Data Port

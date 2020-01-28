@@ -100,10 +100,8 @@ cleanup:
 ;
         push    hl		; keep return code
 
-IF CRT_ENABLE_STDIO = 1
-        EXTERN     closeall
-        call    closeall
-ENDIF
+        call    crt0_exit
+
     ;    ld      iy,16384	; no ix/iy swap here
 	;LD      (IY+$12),2    ; set DF-SZ to 24 lines.
 	;call	1863

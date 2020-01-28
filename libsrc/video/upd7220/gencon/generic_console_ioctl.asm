@@ -9,6 +9,7 @@
         EXTERN  __upd7220_cls
         EXTERN  __upd7220_set_pitch
         EXTERN  __upd7220_command
+        PUBLIC  __upd7220_CLIB_GENCON_CAPS
         EXTERN  __console_w
  
         INCLUDE "video/upd7220/upd7220.inc"
@@ -18,8 +19,12 @@ IF UPD7220_EXPORT_DIRECT = 1
         PUBLIC  generic_console_ioctl
 
         defc    generic_console_ioctl = __upd7220_console_ioctl
+
+        PUBLIC  CLIB_GENCON_CAPS
+        defc    CLIB_GENCON_CAPS = __upd7220_CLIB_GENCON_CAPS
 ENDIF
 
+        defc    __upd7220_CLIB_GENCON_CAPS = CAP_GENCON_CUSTOM_FONT | CAP_GENCON_UDGS | CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR
 
 ; a = ioctl
 ; de = arg

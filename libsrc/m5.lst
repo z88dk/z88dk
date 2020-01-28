@@ -1,8 +1,8 @@
 stdio/inkey/fgetc_cons
 stdio/inkey/getk
-stdio/m5/fgetc_cons_rom
-stdio/m5/getk_rom
-stdio/m5/fputc_cons_rom
+target/m5/stdio/fgetc_cons_rom
+target/m5/stdio/getk_rom
+target/m5/stdio/fputc_cons_rom
 @stdio/ansicore.lst
 @stdio/stdio.lst
 @font/font_8x8/font_8x8.lst
@@ -11,8 +11,8 @@ graphics/dcircle
 graphics/getsprite
 @video/tms9918/video_tms9918.lst
 @gfxbase.lst
-games/m5/joystick
-games/m5/keys_joystick
+target/m5/games/joystick
+target/m5/games/keys_joystick
 psg/sn76489/bit_open
 @games/games.lst
 psg/sn76489/psg_tone

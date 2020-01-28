@@ -1,0 +1,20 @@
+; Kramer-MC
+; Memory map:
+;
+;0000-03FF	Monitor	S. 44ff
+;0400-07ff	Debugger	S. 66
+;0800-0BFF	Reassembler	
+;0C00-0FFF	System-RAM	
+;1000-FBFF	freier RAM	
+;4000-7FFF	Textspeicher f. Editor	
+;8000-AFFF	BASIC	S. 41ff
+;C000-C3FF	Editor	S. 72
+;C400-DFFF	Assembler	S. 74
+;FC00-FFFF	Bildwiederholspeicher
+
+
+
+	defc	RESTART =      $0000
+	defc	CONSOLE_IN =   $00e0 	;Waits: Exit a = key
+	defc	CONSOLE_OUT =  $00e6	;C = character to print
+	defc	CONSOLE_STAT = $00ef	;a=0 no key, $ff = key pressed

@@ -1,0 +1,8 @@
+target/c128/c128/obj/c128/*
+target/c128/psg/obj/c128/*
+target/c128/games/joystick
+target/c128/games/bit_open
+target/c128/games/bit_open_di
+target/c128/games/bit_close
+target/c128/games/bit_close_ei
+@games/games.lst

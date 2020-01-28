@@ -1,10 +1,10 @@
 stdio/inkey/fgetc_cons
 stdio/inkey/getk
-target/rx78/gencon/generic_console
-target/rx78/gencon/generic_console_ioctl
-target/rx78/gencon/generic_console_vpeek
-target/rx78/gencon/conio_map_colour
-target/rx78/gencon/CRT_FONT
+target/rx78/stdio/generic_console
+target/rx78/stdio/generic_console_ioctl
+target/rx78/stdio/generic_console_vpeek
+target/rx78/stdio/conio_map_colour
+target/rx78/stdio/CRT_FONT
 target/rx78/stdio/fputc_cons_native
 @stdio/stdio.lst
 @font/font_8x8/font_8x8.lst
@@ -30,7 +30,7 @@ graphics/dcircle
 graphics/fill
 graphics/getsprite
 @gfxbase.lst
-games/rx78/joystick
-games/rx78/keys_joystick
+target/rx78/games/joystick
+target/rx78/games/keys_joystick
 @games/games.lst
 @z80.lst

@@ -14,6 +14,13 @@
 	INCLUDE	"target/sv8000/def/sv8000.def"
 	INCLUDE	"ioctl.def"
 
+	EXTERN	generic_console_caps
+        PUBLIC  CLIB_GENCON_CAPS
+	defc	CLIB_GENCON_CAPS = CAPS_MODE0
+	
+	defc	CAPS_MODE0 = 0
+	defc	CAPS_MODE1 = CAP_GENCON_CUSTOM_FONT | CAP_GENCON_UDGS | CAP_GENCON_INVERSE
+
 
 ; a = ioctl
 ; de = arg
@@ -40,9 +47,11 @@ check_mode:
 	and	31
 	ld	de,$1020	; rows, cols
 	ld	h,MODE_0
+	ld	b,CAPS_MODE0
 	and	a
 	jr	z,set_mode
 	ld	h,MODE_1
+	ld	b,CAPS_MODE1
 	ld	de,$0c20	; rows, cols
 	cp	1		;HIRES
 	jr	nz,failure
@@ -55,6 +64,8 @@ not_css:
 	ld	(__console_w),a
 	ld	a,d
 	ld	(__console_h),a
+	ld	a,b
+	ld	(generic_console_caps),a
 	ld	a,14
 	out	($c1),a
 	ld	a,h

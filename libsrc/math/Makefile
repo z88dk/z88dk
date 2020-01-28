@@ -11,6 +11,7 @@ $(SUBDIRS):
 	$(MAKE) -C $@
 
 clean: $(CLEANDIRS)
+	$(RM) */*.o
 
 $(CLEANDIRS): 
 	$(MAKE) -C $(@:clean-%=%) clean

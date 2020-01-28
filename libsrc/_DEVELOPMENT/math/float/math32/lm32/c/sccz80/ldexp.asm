@@ -5,10 +5,10 @@
 
 	defc	ldexp = cm32_sccz80_ldexp
 
-
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _ldexp
-defc _ldexp = ldexp
+EXTERN cm32_sdcc_ldexp
+defc _ldexp = cm32_sdcc_ldexp
 ENDIF
 

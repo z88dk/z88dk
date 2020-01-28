@@ -20,9 +20,6 @@ OBJECTS = $(CFILES:.c=.o)
 all: $(OUTPUT_DIRECTORY)/cpcfs.lib
 
 $(OUTPUT_DIRECTORY)/cpcfs.lib: $(OBJECTS) $(wildcard *.asm) cpcfs.lst
-	@echo ''
-	@echo '--- Building Amstrad CPC fcntl Library ---'
-	@echo ''
 	$(LIBLINKER) -DFORcpc -x$(OUTPUT_DIRECTORY)/cpcfs @cpcfs.lst
 
 

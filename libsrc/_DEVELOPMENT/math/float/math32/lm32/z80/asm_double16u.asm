@@ -16,12 +16,7 @@ EXTERN m32_float16u
    ; uses  : af, hl, bc', de', hl'
 
 .asm_double16u
-    push hl
-
-    exx
-    pop hl
-    call m32_float16u           ; convert hl to float in dehl
-
-    exx
+    call m32_float16u           ; convert HL to float in DEHL
+    exx                         ; bring DEHL' to DEHL
     ret
 

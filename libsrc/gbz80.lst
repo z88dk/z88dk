@@ -1,8 +1,7 @@
 @assert/assert.lst
 @alloc/alloc_gbz80.lst
 @ctype/ctype.lst
-setjmp/obj/gbz80/l_longjmp
-setjmp/obj/gbz80/l_setjmp
+@setjmp/setjmp.lst
 @stdlib/stdlib.lst
 @strings/string.lst
 @regex/regex.lst

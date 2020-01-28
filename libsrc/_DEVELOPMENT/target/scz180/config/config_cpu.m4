@@ -2,6 +2,7 @@ divert(-1)
 
 ###############################################################
 # Z180 CPU CONFIGURATION
+# rebuild the library if changes are made
 #
 
 # Class of Z180 being targeted

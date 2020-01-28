@@ -1,0 +1,16 @@
+graphics/dcircle
+graphics/clg
+graphics/text/clsgraph
+target/ace/graphics/textpixl
+graphics/text/plotpixl
+graphics/text/respixl
+graphics/text/xorpixl
+graphics/text/pointxy
+graphics/fill
+graphics/dfill2
+graphics/putsprite2
+graphics/draw_profile
+graphics/stencil_render2
+graphics/text/swapgfxbk
+target/ace/graphics/zx_hardcopy
+@gfxbase.lst

@@ -2,7 +2,7 @@ include ../../Make.config
 
 TARGET = msx
 
-SUBDIRS = asmlib msxbios
+SUBDIRS = asmlib msxbios fcntl
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
 ASMFILES = $(wildcard *.asm)
@@ -19,6 +19,7 @@ subdirs-clean: $(SUBDIRS_CLEAN)
 clean: subdirs-clean
 	$(RM) -r obj
 	$(RM) zcc_opt.def *.err *.o
+	$(RM) */*.o */*/*.o
 
 subdirs-clean: $(CLEANDIRS)
 

@@ -38,7 +38,6 @@ dnl############################################################
 
 include(`target/z88dk_version.m4')
 include(`target/math32/config_cpu.m4')
-include(`target/math32/config_m32.m4')
 
 dnl############################################################
 dnl# END IF GUARDS

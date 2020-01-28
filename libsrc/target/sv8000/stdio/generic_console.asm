@@ -9,7 +9,7 @@
 		PUBLIC		generic_console_printc
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_inverse
+                PUBLIC          generic_console_set_attribute
 
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
@@ -20,7 +20,7 @@
 		INCLUDE         "target/sv8000/def/sv8000.def"
 
 generic_console_set_ink:
-generic_console_set_inverse:
+generic_console_set_attribute:
 generic_console_set_paper:
 	ret
 

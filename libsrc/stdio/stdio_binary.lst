@@ -101,6 +101,7 @@ stdio/obj/binary/__printf_handle_llo
 stdio/obj/binary/__printf_handle_llu
 stdio/obj/binary/__printf_handle_llx
 stdio/obj/binary/kbhit
-stdio/obj/binary/fputc_cons_generic
+stdio/obj/binary/fputc_cons_generic_full
+stdio/obj/binary/fputc_cons_generic_minimal
 stdio/obj/binary/fputc_cons_generic_ioctl
 stdio/obj/binary/conio/**

@@ -9,6 +9,7 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _modf
-defc _modf = modf
+EXTERN	_m32_modff
+defc _modf = _m32_modff
 ENDIF
 

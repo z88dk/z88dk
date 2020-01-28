@@ -28,13 +28,15 @@
 .plot_callee
 ._plot_callee
 
-   pop af
+   pop bc
    pop de	; y
    pop hl	; x
-   push af
+   push bc
 
 .asmentry
+IF !__CPU_INTEL__
 		push	ix
+ENDIF
                 call    swapgfxbk
                 call    w_plotpixel
                 jp      __graphics_end

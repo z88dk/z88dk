@@ -53,6 +53,26 @@
 	call	__divslong_callee
 
 	call	__divslong
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+=
+	call	__divslong_callee
+
+	call	__divslong
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+=
+	call	__divslong_callee
+
+	call	__divslong
 	pop	af
 	pop	af
 	pop	af
@@ -62,9 +82,55 @@
 	push	hl
 
 	call	__divslong
+	pop	bc
+	pop	bc
+	pop	bc
+	ex	(sp),hl
+=
+	call	__divslong_callee
+	push	hl
+
+	call	__divslong
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	ex	(sp),hl
+=
+	call	__divslong_callee
+	push	hl
+
+	call	__divslong
 	pop	af
 	pop	af
 	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	__divslong_callee
+	ld	hl,%1
+	push	hl
+
+	call	__divslong
+	pop	bc
+	pop	bc
+	pop	bc
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	__divslong_callee
+	ld	hl,%1
+	push	hl
+
+	call	__divslong
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
 	ld	hl,%1
 	ex	(sp),hl
 =
@@ -148,6 +214,26 @@
 	call	__divulong_callee
 
 	call	__divulong
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+=
+	call	__divulong_callee
+
+	call	__divulong
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+=
+	call	__divulong_callee
+
+	call	__divulong
 	pop	af
 	pop	af
 	pop	af
@@ -157,9 +243,55 @@
 	push	hl
 
 	call	__divulong
+	pop	bc
+	pop	bc
+	pop	bc
+	ex	(sp),hl
+=
+	call	__divulong_callee
+	push	hl
+
+	call	__divulong
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	ex	(sp),hl
+=
+	call	__divulong_callee
+	push	hl
+
+	call	__divulong
 	pop	af
 	pop	af
 	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	__divulong_callee
+	ld	hl,%1
+	push	hl
+
+	call	__divulong
+	pop	bc
+	pop	bc
+	pop	bc
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	__divulong_callee
+	ld	hl,%1
+	push	hl
+
+	call	__divulong
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
 	ld	hl,%1
 	ex	(sp),hl
 =
@@ -338,6 +470,26 @@
 	call	__modulong_callee
 
 	call	__modulong
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+=
+	call	__modulong_callee
+
+	call	__modulong
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+=
+	call	__modulong_callee
+
+	call	__modulong
 	pop	af
 	pop	af
 	pop	af
@@ -347,9 +499,55 @@
 	push	hl
 
 	call	__modulong
+	pop	bc
+	pop	bc
+	pop	bc
+	ex	(sp),hl
+=
+	call	__modulong_callee
+	push	hl
+
+	call	__modulong
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	ex	(sp),hl
+=
+	call	__modulong_callee
+	push	hl
+
+	call	__modulong
 	pop	af
 	pop	af
 	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	__modulong_callee
+	ld	hl,%1
+	push	hl
+
+	call	__modulong
+	pop	bc
+	pop	bc
+	pop	bc
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	__modulong_callee
+	ld	hl,%1
+	push	hl
+
+	call	__modulong
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
 	ld	hl,%1
 	ex	(sp),hl
 =
@@ -414,6 +612,26 @@
 	call	__mullong_callee
 
 	call	__mullong
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+=
+	call	__mullong_callee
+
+	call	__mullong
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+=
+	call	__mullong_callee
+
+	call	__mullong
 	pop	af
 	pop	af
 	pop	af
@@ -423,9 +641,55 @@
 	push	hl
 
 	call	__mullong
+	pop	bc
+	pop	bc
+	pop	bc
+	ex	(sp),hl
+=
+	call	__mullong_callee
+	push	hl
+
+	call	__mullong
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	ex	(sp),hl
+=
+	call	__mullong_callee
+	push	hl
+
+	call	__mullong
 	pop	af
 	pop	af
 	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	__mullong_callee
+	ld	hl,%1
+	push	hl
+
+	call	__mullong
+	pop	bc
+	pop	bc
+	pop	bc
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	__mullong_callee
+	ld	hl,%1
+	push	hl
+
+	call	__mullong
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
 	ld	hl,%1
 	ex	(sp),hl
 =
@@ -720,9 +984,50 @@
 	call	___fsadd_callee
 
 	call	___fsadd
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+=
+	call	___fsadd_callee
+
+	call	___fsadd
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+=
+	call	___fsadd_callee
+
+	call	___fsadd
 	pop	af
 	pop	af
 	pop	af
+	ex	(sp),hl
+=
+	call	___fsadd_callee
+	push	hl
+
+	call	___fsadd
+	pop	bc
+	pop	bc
+	pop	bc
+	ex	(sp),hl
+=
+	call	___fsadd_callee
+	push	hl
+
+	call	___fsadd
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
 	ex	(sp),hl
 =
 	call	___fsadd_callee
@@ -739,6 +1044,31 @@
 	ld	hl,%1
 	push	hl
 
+	call	___fsadd
+	pop	bc
+	pop	bc
+	pop	bc
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fsadd_callee
+	ld	hl,%1
+	push	hl
+
+	call	___fsadd
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fsadd_callee
+	ld	hl,%1
+	push	hl
+
 	call	___fsdiv
 	pop	af
 	pop	af
@@ -748,9 +1078,50 @@
 	call	___fsdiv_callee
 
 	call	___fsdiv
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+=
+	call	___fsdiv_callee
+
+	call	___fsdiv
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+=
+	call	___fsdiv_callee
+
+	call	___fsdiv
 	pop	af
 	pop	af
 	pop	af
+	ex	(sp),hl
+=
+	call	___fsdiv_callee
+	push	hl
+
+	call	___fsdiv
+	pop	bc
+	pop	bc
+	pop	bc
+	ex	(sp),hl
+=
+	call	___fsdiv_callee
+	push	hl
+
+	call	___fsdiv
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
 	ex	(sp),hl
 =
 	call	___fsdiv_callee
@@ -767,11 +1138,55 @@
 	ld	hl,%1
 	push	hl
 
+	call	___fsdiv
+	pop	bc
+	pop	bc
+	pop	bc
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fsdiv_callee
+	ld	hl,%1
+	push	hl
+
+	call	___fsdiv
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fsdiv_callee
+	ld	hl,%1
+	push	hl
 	call	___fseq
 	pop	af
 	pop	af
 	pop	af
 	pop	af
+=
+	call	___fseq_callee
+
+	call	___fseq
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+=
+	call	___fseq_callee
+
+	call	___fseq
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
 =
 	call	___fseq_callee
 
@@ -785,9 +1200,55 @@
 	push	hl
 
 	call	___fseq
+	pop	bc
+	pop	bc
+	pop	bc
+	ex	(sp),hl
+=
+	call	___fseq_callee
+	push	hl
+
+	call	___fseq
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	ex	(sp),hl
+=
+	call	___fseq_callee
+	push	hl
+
+	call	___fseq
 	pop	af
 	pop	af
 	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fseq_callee
+	ld	hl,%1
+	push	hl
+
+	call	___fseq
+	pop	bc
+	pop	bc
+	pop	bc
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fseq_callee
+	ld	hl,%1
+	push	hl
+
+	call	___fseq
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
 	ld	hl,%1
 	ex	(sp),hl
 =
@@ -804,6 +1265,26 @@
 	call	___fsgt_callee
 
 	call	___fsgt
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+=
+	call	___fsgt_callee
+
+	call	___fsgt
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+=
+	call	___fsgt_callee
+
+	call	___fsgt
 	pop	af
 	pop	af
 	pop	af
@@ -813,9 +1294,55 @@
 	push	hl
 
 	call	___fsgt
+	pop	bc
+	pop	bc
+	pop	bc
+	ex	(sp),hl
+=
+	call	___fsgt_callee
+	push	hl
+
+	call	___fsgt
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	ex	(sp),hl
+=
+	call	___fsgt_callee
+	push	hl
+
+	call	___fsgt
 	pop	af
 	pop	af
 	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fsgt_callee
+	ld	hl,%1
+	push	hl
+
+	call	___fsgt
+	pop	bc
+	pop	bc
+	pop	bc
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fsgt_callee
+	ld	hl,%1
+	push	hl
+
+	call	___fsgt
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
 	ld	hl,%1
 	ex	(sp),hl
 =
@@ -832,6 +1359,26 @@
 	call	___fslt_callee
 
 	call	___fslt
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+=
+	call	___fslt_callee
+
+	call	___fslt
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+=
+	call	___fslt_callee
+
+	call	___fslt
 	pop	af
 	pop	af
 	pop	af
@@ -841,9 +1388,55 @@
 	push	hl
 
 	call	___fslt
+	pop	bc
+	pop	bc
+	pop	bc
+	ex	(sp),hl
+=
+	call	___fslt_callee
+	push	hl
+
+	call	___fslt
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	ex	(sp),hl
+=
+	call	___fslt_callee
+	push	hl
+
+	call	___fslt
 	pop	af
 	pop	af
 	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fslt_callee
+	ld	hl,%1
+	push	hl
+
+	call	___fslt
+	pop	bc
+	pop	bc
+	pop	bc
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fslt_callee
+	ld	hl,%1
+	push	hl
+
+	call	___fslt
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
 	ld	hl,%1
 	ex	(sp),hl
 =
@@ -860,6 +1453,26 @@
 	call	___fsmul_callee
 
 	call	___fsmul
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+=
+	call	___fsmul_callee
+
+	call	___fsmul
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+=
+	call	___fsmul_callee
+
+	call	___fsmul
 	pop	af
 	pop	af
 	pop	af
@@ -869,9 +1482,55 @@
 	push	hl
 
 	call	___fsmul
+	pop	bc
+	pop	bc
+	pop	bc
+	ex	(sp),hl
+=
+	call	___fsmul_callee
+	push	hl
+
+	call	___fsmul
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	ex	(sp),hl
+=
+	call	___fsmul_callee
+	push	hl
+
+	call	___fsmul
 	pop	af
 	pop	af
 	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fsmul_callee
+	ld	hl,%1
+	push	hl
+
+	call	___fsmul
+	pop	bc
+	pop	bc
+	pop	bc
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fsmul_callee
+	ld	hl,%1
+	push	hl
+
+	call	___fsmul
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
 	ld	hl,%1
 	ex	(sp),hl
 =
@@ -888,6 +1547,26 @@
 	call	___fsneq_callee
 
 	call	___fsneq
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+=
+	call	___fsneq_callee
+
+	call	___fsneq
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+=
+	call	___fsneq_callee
+
+	call	___fsneq
 	pop	af
 	pop	af
 	pop	af
@@ -897,9 +1576,55 @@
 	push	hl
 
 	call	___fsneq
+	pop	bc
+	pop	bc
+	pop	bc
+	ex	(sp),hl
+=
+	call	___fsneq_callee
+	push	hl
+
+	call	___fsneq
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	ex	(sp),hl
+=
+	call	___fsneq_callee
+	push	hl
+
+	call	___fsneq
 	pop	af
 	pop	af
 	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fsneq_callee
+	ld	hl,%1
+	push	hl
+
+	call	___fsneq
+	pop	bc
+	pop	bc
+	pop	bc
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fsneq_callee
+	ld	hl,%1
+	push	hl
+
+	call	___fsneq
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
 	ld	hl,%1
 	ex	(sp),hl
 =
@@ -916,6 +1641,26 @@
 	call	___fssub_callee
 
 	call	___fssub
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+=
+	call	___fssub_callee
+
+	call	___fssub
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+=
+	call	___fssub_callee
+
+	call	___fssub
 	pop	af
 	pop	af
 	pop	af
@@ -925,9 +1670,55 @@
 	push	hl
 
 	call	___fssub
+	pop	bc
+	pop	bc
+	pop	bc
+	ex	(sp),hl
+=
+	call	___fssub_callee
+	push	hl
+
+	call	___fssub
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	ex	(sp),hl
+=
+	call	___fssub_callee
+	push	hl
+
+	call	___fssub
 	pop	af
 	pop	af
 	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fssub_callee
+	ld	hl,%1
+	push	hl
+
+	call	___fssub
+	pop	bc
+	pop	bc
+	pop	bc
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fssub_callee
+	ld	hl,%1
+	push	hl
+
+	call	___fssub
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
 	ld	hl,%1
 	ex	(sp),hl
 =
@@ -990,6 +1781,26 @@
 	call	___slonglong2fs_callee
 
 	call	___slonglong2fs
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+=
+	call	___slonglong2fs_callee
+
+	call	___slonglong2fs
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+=
+	call	___slonglong2fs_callee
+
+	call	___slonglong2fs
 	pop	af
 	pop	af
 	pop	af
@@ -999,9 +1810,55 @@
 	push	hl
 
 	call	___slonglong2fs
+	pop	bc
+	pop	bc
+	pop	bc
+	ex	(sp),hl
+=
+	call	___slonglong2fs_callee
+	push	hl
+
+	call	___slonglong2fs
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	ex	(sp),hl
+=
+	call	___slonglong2fs_callee
+	push	hl
+
+	call	___slonglong2fs
 	pop	af
 	pop	af
 	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___slonglong2fs_callee
+	ld	hl,%1
+	push	hl
+
+	call	___slonglong2fs
+	pop	bc
+	pop	bc
+	pop	bc
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___slonglong2fs_callee
+	ld	hl,%1
+	push	hl
+
+	call	___slonglong2fs
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
 	ld	hl,%1
 	ex	(sp),hl
 =
@@ -1064,6 +1921,26 @@
 	call	___ulonglong2fs_callee
 
 	call	___ulonglong2fs
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+=
+	call	___ulonglong2fs_callee
+
+	call	___ulonglong2fs
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+=
+	call	___ulonglong2fs_callee
+
+	call	___ulonglong2fs
 	pop	af
 	pop	af
 	pop	af
@@ -1073,9 +1950,55 @@
 	push	hl
 
 	call	___ulonglong2fs
+	pop	bc
+	pop	bc
+	pop	bc
+	ex	(sp),hl
+=
+	call	___ulonglong2fs_callee
+	push	hl
+
+	call	___ulonglong2fs
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	ex	(sp),hl
+=
+	call	___ulonglong2fs_callee
+	push	hl
+
+	call	___ulonglong2fs
 	pop	af
 	pop	af
 	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___ulonglong2fs_callee
+	ld	hl,%1
+	push	hl
+
+	call	___ulonglong2fs
+	pop	bc
+	pop	bc
+	pop	bc
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___ulonglong2fs_callee
+	ld	hl,%1
+	push	hl
+
+	call	___ulonglong2fs
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
 	ld	hl,%1
 	ex	(sp),hl
 =

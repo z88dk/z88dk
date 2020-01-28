@@ -482,6 +482,12 @@ IF FORhemc
 	defc USEplotc   = 1		; We call generic_console_plotc, not _printc for text mode
 ENDIF
 
+IF FORhgmc
+	DEFINE	gotgfx
+	defc	maxx = 256
+	defc	maxy = 256
+ENDIF
+
 
 IF FORspc1000
 	DEFINE gotgfx
@@ -555,6 +561,14 @@ IF FORsv8000
 	defc maxy = 96
 	defc blankch = 32
 ENDIF
+
+IF FORpmd85
+	DEFINE gotgfx
+	defc maxx = 288
+	defc maxy = 256
+	defc blankch = 32
+ENDIF
+
 
 IF FORgb
 	defc USEplotc   = 1		; We call generic_console_plotc, not _printc for text mode

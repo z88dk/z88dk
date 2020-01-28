@@ -1,0 +1,14 @@
+target/pc88/graphics/w_clg
+target/pc88/graphics/w_pixladdr
+target/pc88/graphics/w_putsprite
+target/pc88/graphics/w_stencil_render
+graphics/w_plotpixl
+graphics/w_respixl
+graphics/w_xorpixl
+graphics/w_drawb
+graphics/w_undrawb
+graphics/w_xorborder
+target/pc88/graphics/swapgfxbk_hr
+graphics/draw_profile
+graphics/w_pointxy
+@gfxbasew.lst

@@ -29,6 +29,10 @@ math/float/math32/lm32/c/sdcc/fabs
 math/float/math32/lm32/c/sdcc/fabs_fastcall
 math/float/math32/lm32/c/sdcc/floor
 math/float/math32/lm32/c/sdcc/floor_fastcall
+math/float/math32/lm32/c/sdcc/fmax
+math/float/math32/lm32/c/sdcc/fmax_callee
+math/float/math32/lm32/c/sdcc/fmin
+math/float/math32/lm32/c/sdcc/fmin_callee
 math/float/math32/lm32/c/sdcc/fmod
 math/float/math32/lm32/c/sdcc/fpclassify
 math/float/math32/lm32/c/sdcc/frexp
@@ -77,6 +81,7 @@ math/float/math32/lm32/c/sdcc/mul2
 math/float/math32/lm32/c/sdcc/mul2_fastcall
 math/float/math32/lm32/c/sdcc/mul10u
 math/float/math32/lm32/c/sdcc/mul10u_fastcall
+math/float/math32/lm32/c/sdcc/mlib2d
 math/float/math32/lm32/c/sdcc/modf
 math/float/math32/lm32/c/sdcc/poly
 math/float/math32/lm32/c/sdcc/poly_callee

@@ -288,7 +288,7 @@ int bastxt_skel2[]={11, SKIP_JP_RET, 0xC0, 0x2A, CATCH, CATCH, 0xAF, 0x77, 0x23,
 
 int microsoft_extended_skel[]={11, ADDR, 0xFE, '%', 0xC8, 0x14, 0xFE, '$', 0xC8, 0x14, 0xFE, '!'};
 
-/* Leveraging on a buggy ATN table to discriminate between N82(TRS80 M100/200, Olivetti M10) and N83(MSX, KC85) */
+/* Looking for a buggy ATN table to discriminate between N82(TRS80 M100/200, Olivetti M10) and N83(MSX, KC85) */
 int microsoft_n82n83[]={9, ADDR, 0xC0, 0x14, 0x28, 0x57, 0x08, 0x55, 0x48, 0x84};
 int microsoft_n82[]={9, ADDR, 0xC0, 0x14, 0x28, 0x56, 0x08, 0x55, 0x48, 0x84};
 
@@ -790,11 +790,18 @@ int tkmsbasic_ex_skel[]={11, 33, CATCH, CATCH, 0x47, 0x0e, 0x40, 0x0C, 0x23, 0x5
 int tkmsbasic_ex_skel2[]={14, 33, CATCH, CATCH, 0xCD, SKIP, SKIP, 0x47, 0x0e, 0x40, 0x0C, 0x23, 0x54, 0x5D, 0x7E};
 int tkmsbasic_ex_skel3[]={9, 33, CATCH, CATCH, 0x47, 0x0e, 0x40, 0x0C, 0x79, 0xFE};
 
-int tkrange_ex_skel[]={14, 0xD6, 129, 0xDA, SKIP, SKIP, 0xFE, CATCH, 0xD2, SKIP, SKIP, 7, 0x4F, 6, 0};
+int tkrange_ex_skel[]={14, 0xD6, 0x81, 0xDA, SKIP, SKIP, 0xFE, CATCH, 0xD2, SKIP, SKIP, 7, 0x4F, 6, 0};
+
 int tok_ex_skel[]={12, 0x3C, 0xCA, SKIP, SKIP, 0x3D, 0xFE, ADDR, 0x28, SKIP, 0xFE, SKIP, 0xCA};
 int lnum_tokens_skel[]={11, 17, CATCH, CATCH, 0x4F, 0x1A, 0xB7, 0x28, SKIP, 0x13, 0xB9, 0x20};
+int lnum_tokens_skel2[]={11, 17, CATCH, CATCH, 0x4F, 0x1A, 0xB7, 0xCA, SKIP, SKIP, 0x13, 0xB9};
+
+int tty_ctlcodes_skel[]={10, 33, CATCH, CATCH, 0x0E, 0x0C, 0x23, 0x23, 0xA7, 0x0D, 0xF8};
+int tty_jp_skel[]={10, ADDR, 0x0E, 0x0C, 0x23, 0x23, 0xA7, 0x0D, 0xF8, 0xBE, 0x23};
+
 int equal_tk_skel[]={8, 0xF1, 0xC6, 3, 0x18, SKIP, SKIP_CALL, SKIP_CALL, CATCH};
 int using_tokens_skel[]={18, 0xFE, ADDR, 0xCA, SKIP, SKIP, 0xFE, SKIP, 0xCA, SKIP, SKIP, 0xFE, SKIP, 0xCA, SKIP, SKIP, 0xE5, 0xFE, ','};
+
 int lnum_range_skel[]={9, 0x73, 0x23, 0x72, 0x18, ADDR, 17, 0, 0, 0xD5};
 
 int ex_warm_skel[]={17, ADDR, 0xF9, 33, SKIP, SKIP, 0x22, SKIP, SKIP, SKIP_CALL, SKIP_CALL, 0xAF, 0x67, 0x6F, 0x22, SKIP, SKIP, 0x32};
@@ -1357,13 +1364,13 @@ int main(int argc, char *argv[])
 		
 		res=find_skel(eval3_ex_skel);
 		if (res>0) {
-			dlbl("TEMP2", img[res+2] + 256*img[res+3], "(word) temp. storage used by EVAL");
+			dlbl("TEMP2", img[res+2] + 256*img[res+3], "(word) temp. storage used by EVAL, also used in place of NXTOPR");
 			dlbl("TEMP3", img[res+7] + 256*img[res+8], "(word) used for garbage collection or by USR function");
 		}
 
 		res=find_skel(ex_end1_skel);
 		if (res>0) {
-			dlbl("SAVTXT", img[res+2] + 256*img[res+3], "(word), prg pointer for resume");
+			//dlbl("SAVTXT", img[res+2] + 256*img[res+3], "(word), prg pointer for resume");
 			//dlbl("TEMPST", img[res+5] + 256*img[res+6], "(word), temporary descriptors");
 			//dlbl("TEMPPT", img[res+8] + 256*img[res+9], "(word), start of free area of temporary descriptor");
 			//
@@ -2217,29 +2224,6 @@ int main(int argc, char *argv[])
 		if (res>0)
 			clbl("OPNPAR", res+pos+1, "Chk Syntax, make sure '(' follows");
 
-		res=find_skel(eval_skel);
-		if (res>0) {
-			clbl("EVAL", res+pos+1, "a.k.a. GETNUM, evaluate expression");
-			clbl("EVAL1", res+pos+1+3, "Save precedence and eval until precedence break");
-			clbl("EVAL2", res+pos+1+12, "Evaluate expression until precedence break");
-			clbl("EVAL3", res+pos+1+15, "Evaluate expression until precedence break");
-		}
-
-		res=find_skel(eval_skel2);
-		if (res>0) {
-			clbl("EVAL", res+pos+1, "a.k.a. GETNUM, evaluate expression");
-			clbl("EVAL1", res+pos+1+3, "Save precedence and eval until precedence break");
-			clbl("EVAL2", res+pos+1+15, "Evaluate expression until precedence break");
-			clbl("EVAL3", res+pos+1+18, "Evaluate expression until precedence break");
-		}
-
-		res=find_skel(eval_skel3);
-		if (res>0) {
-			clbl("EVAL", res+pos+1, "a.k.a. GETNUM, evaluate expression");
-			clbl("EVAL1", res+pos+1+3, "Save precedence and eval until precedence break");
-			clbl("EVAL2", res+pos+1+19, "Evaluate expression until precedence break");
-			clbl("EVAL3", res+pos+1+22, "Evaluate expression until precedence break");
-		}
 		
 		res=find_skel(getnum_skel);
 		if (res<0)
@@ -2250,6 +2234,30 @@ int main(int argc, char *argv[])
 			//clbl("GETNUM", res, "BASIC interpreter entry to get a number (EVAL on recent versions)");
 			clbl("EVAL", res+pos+1, "(a.k.a. GETNUM, evaluate expression (GETNUM)");
 			clbl("EVAL1", res+pos+1+3, "Save precedence and eval until precedence break");
+		} else {
+			res=find_skel(eval_skel);
+			if (res>0) {
+				clbl("EVAL", res+pos+1, "a.k.a. GETNUM, evaluate expression");
+				clbl("EVAL1", res+pos+1+3, "Save precedence and eval until precedence break");
+				clbl("EVAL2", res+pos+1+12, "Evaluate expression until precedence break");
+				clbl("EVAL3", res+pos+1+15, "Evaluate expression until precedence break");
+			}
+
+			res=find_skel(eval_skel2);
+			if (res>0) {
+				clbl("EVAL", res+pos+1, "a.k.a. GETNUM, evaluate expression");
+				clbl("EVAL1", res+pos+1+3, "Save precedence and eval until precedence break");
+				clbl("EVAL2", res+pos+1+15, "Evaluate expression until precedence break");
+				clbl("EVAL3", res+pos+1+18, "Evaluate expression until precedence break");
+			}
+
+			res=find_skel(eval_skel3);
+			if (res>0) {
+				clbl("EVAL", res+pos+1, "a.k.a. GETNUM, evaluate expression");
+				clbl("EVAL1", res+pos+1+3, "Save precedence and eval until precedence break");
+				clbl("EVAL2", res+pos+1+19, "Evaluate expression until precedence break");
+				clbl("EVAL3", res+pos+1+22, "Evaluate expression until precedence break");
+			}
 		}
 		
 		res=find_skel(eval3_ex_skel);
@@ -2377,6 +2385,24 @@ int main(int argc, char *argv[])
 		if (res>0)
 			clbl("ULERR", res, "entry for '?UL ERROR'");
 
+		res=find_skel(tty_ctlcodes_skel);
+		if (res>0) {
+			if (SKOOLMODE) {
+				printf("@ $%04x label=%s\n", res+2, "TTY_CTLCODES");
+				printf("B $%04x %s\n", res+2, "Control code + JP location list for TTY controls");
+				printf("W $%04x %s\n", res+3, "Control code + JP location list for TTY controls");
+				printf("L $%04x,3,12\n", res+2);
+				
+			}
+		}
+		
+		res=find_skel(tty_jp_skel);
+		if (res>0) {
+			dlbl("TTY_JP_0", res+pos-4, "Search for TTY controls in jumptable");
+			dlbl("TTY_JP", res+pos+1, "Loop search for TTY controls in jumptable");
+		}
+
+
 		printf("\n\n");
 
 		/* MS BASIC commands */
@@ -2454,7 +2480,10 @@ int main(int argc, char *argv[])
 			printf("\n# -- STATEMENTS --\n");
 			
 			res2=find_skel(lnum_tokens_skel);
+			if (res2<0)
+				res2=find_skel(lnum_tokens_skel2);
 			if ((res2>0) && (img[res2+14]==0)) {
+					dlbl("LNUM_TOKENS", res, "Token table for operations on BASIC line numbers");
 					printf("\n#\tRESTORE\t\t[%d]\t",img[res2++]);
 					printf("\n#\tAUTO\t\t[%d]\t",img[res2++]);
 					printf("\n#\tRENUM\t\t[%d]\t",img[res2++]);
@@ -2468,9 +2497,27 @@ int main(int argc, char *argv[])
 					printf("\n#\tGOTO\t\t[%d]\t",img[res2++]);
 					printf("\n#\tRETURN\t\t[%d]\t",img[res2++]);
 					printf("\n#\tTHEN\t\t[%d]\t",img[res2++]);
-					printf("\n#\tGOSUB\t\t[%d]\t",img[res2++]);
+					printf("\n#\tGOSUB\t\t[%d]\t\n\n",img[res2++]);
+					clbl("DETOKEN_MORE", ++res2+pos+1, "Continue decoding tokens");
 			}
-			
+			else if ((res2>0) && (img[res2+13]==0)) {
+					dlbl("LNUM_TOKENS", res, "Token table for operations on BASIC line numbers");
+					printf("\n#\tRESTORE\t\t[%d]\t",img[res2++]);
+					printf("\n#\tRENUM\t\t[%d]\t",img[res2++]);
+					printf("\n#\tDELETE\t\t[%d]\t",img[res2++]);
+					printf("\n#\tRESUME\t\t[%d]\t",img[res2++]);
+					printf("\n#\tERL\t\t[%d]\t",img[res2++]);
+					printf("\n#\tELSE\t\t[%d]\t",img[res2++]);
+					printf("\n#\tRUN\t\t[%d]\t",img[res2++]);
+					printf("\n#\tLIST\t\t[%d]\t",img[res2++]);
+					printf("\n#\tLLIST\t\t[%d]\t",img[res2++]);
+					printf("\n#\tGOTO\t\t[%d]\t",img[res2++]);
+					printf("\n#\tRETURN\t\t[%d]\t",img[res2++]);
+					printf("\n#\tTHEN\t\t[%d]\t",img[res2++]);
+					printf("\n#\tGOSUB\t\t[%d]\t\n\n",img[res2++]);
+					clbl("DETOKEN_MORE", ++res2+pos+1, "Continue decoding tokens");
+			}
+
 			res2=find_skel(using_tokens_skel);
 			if (res2>0) {
 				if (SKOOLMODE) {

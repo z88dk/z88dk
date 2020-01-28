@@ -27,6 +27,11 @@
     EXTERN   __tms9918_pattern_generator
     EXTERN   __console_w
 
+    EXTERN   generic_console_caps
+    EXTERN   __tms9918_CAPS_MODE0
+    EXTERN   __tms9918_CAPS_MODE1
+    EXTERN   __tms9918_CAPS_MODE2
+
 msx_set_mode:
 _msx_set_mode:
     ld    a,l
@@ -49,6 +54,7 @@ init_mode0:
 ; MTX:  $00,$D0,$07,$00,$03,$7E,$07
 
 
+    call clear_sprites
     ; reg0  - TEXT MODE
     ld    e,$00
 IF FORm5___2
@@ -81,6 +87,9 @@ ENDIF
     and   15
     call  VDPreg_Write    ; reg7  -  INK & PAPER-/BACKDROPCOL.
    
+
+    ld    a,__tms9918_CAPS_MODE0
+    ld    (generic_console_caps),a
     ld    a,32
     ld    (__console_w),a 
     ld    hl,$1800
@@ -100,10 +109,19 @@ ENDIF
     call  __tms9918_set_font
     ret
 
+clear_sprites:
+    ld    hl,$3800
+    ld    bc,2048
+    xor   a
+    call  FILVRM
+    ret
+
 ; Switch 2 VDP Mode 1
 ; 40x24
 init_mode1:
     ld   (hl),a
+    call  clear_sprites
+
     ; reg0  - TEXT MODE
     ld    e,$00
 IF FORm5___2
@@ -126,7 +144,7 @@ ENDIF
     ld    a,$01           ; $800  - Where the font will go
     call  VDPreg_Write    ; reg4  -  PT./TXT/MCOL-GEN.TAB.
     
-    ld    a,$76           ; Unused (sprites inactive)
+    ld    a,$36           ; Unused (sprites inactive)
     call  VDPreg_Write    ; reg5  -  SPRITE ATTR. TAB.
     
     ld    a,$07           ; Unused (sprites inactive)
@@ -136,6 +154,8 @@ ENDIF
     call  VDPreg_Write    ; reg7  -  INK & PAPER-/BACKDROPCOL.
     
 
+    ld    a,__tms9918_CAPS_MODE1
+    ld    (generic_console_caps),a
     ld    a,40
     ld    (__console_w),a 
     ld    hl,$800
@@ -156,6 +176,7 @@ ENDIF
 ;»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»
 init_mode2:
     ld   (hl),a
+    call clear_sprites
 ;»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»
 ; SVI:  $02,$E0,$06,$FF,$03,$36,$07,$07
 ; MSX:  $02,$E0,$06,$FF,$03,$36,$07,$04
@@ -181,7 +202,7 @@ init_mode2:
 ;1800 - 1b00 = PN Pattern Name
 ;2000 - 3800 = CT Colour
 ;3800        = Sprite 
-;3c00        = Sprite attribute
+;1b00        = Sprite attribute
 
     ; reg1  - GRAPH MODE, first reset bit #6 to blank the screen
     ld    e,$01
@@ -255,6 +276,8 @@ ENDIF
     dec   e
     jr    nz,pattern
 
+    ld    a,__tms9918_CAPS_MODE2
+    ld    (generic_console_caps),a
     ld    a,32
     ld    (__console_w),a 
 	

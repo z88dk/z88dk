@@ -1,5 +1,5 @@
-stdio/sms/fputc_cons
-time/spectrum/clock
+target/sms/stdio/fputc_cons
+target/shared/clock
 target/sms/clear_vram
 target/sms/load_palette
 target/sms/VRAMToHL

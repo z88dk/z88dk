@@ -168,8 +168,7 @@ ENDIF
 cleanup:			;Jump back to here from exit()
 IF CRT_ENABLE_STDIO = 1
 	push	af		;Save exit value
-	EXTERN	closeall
-	call	closeall	;Close all files
+    call    crt0_exit
  IF DEFINED_farheapsz
 	EXTERN	freeall_far
  	call	freeall_far	;Deallocate far memory

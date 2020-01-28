@@ -38,8 +38,10 @@ math/float/math32/c/sdcc/cm32_sdcc_fsload
 math/float/math32/c/sdcc/cm32_sdcc_fsldexp
 math/float/math32/c/sdcc/cm32_sdcc_fsldexp_callee
 math/float/math32/c/sdcc/cm32_sdcc___fslt_callee
-math/float/math32/c/sdcc/cm32_sdcc_fsmax
-math/float/math32/c/sdcc/cm32_sdcc_fsmin
+math/float/math32/c/sdcc/cm32_sdcc_fmin
+math/float/math32/c/sdcc/cm32_sdcc_fmin_callee
+math/float/math32/c/sdcc/cm32_sdcc_fmax
+math/float/math32/c/sdcc/cm32_sdcc_fmax_callee
 math/float/math32/c/sdcc/cm32_sdcc_fsmul
 math/float/math32/c/sdcc/cm32_sdcc_fsmul_callee
 math/float/math32/c/sdcc/cm32_sdcc_fsmul2

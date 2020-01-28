@@ -11,8 +11,8 @@ graphics/getsprite
 @video/tms9918/video_tms9918_nmi.lst
 @gfxbase.lst
 psg/sn76489/bit_open
-games/pencil2/joystick
-games/pencil2/keys_joystick
+target/pencil2/games/joystick
+target/pencil2/games/keys_joystick
 games/obj/pencil2/joystick_type
 @games/games.lst
 @input/input_keyboard.lst

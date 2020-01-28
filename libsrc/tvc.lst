@@ -1,10 +1,10 @@
-stdio/tvc/fputc_cons
-stdio/tvc/fgetc_cons
-stdio/tvc/getk
+target/tvc/stdio/fputc_cons
+target/tvc/stdio/fgetc_cons
+target/tvc/stdio/getk
 @stdio/stdio.lst
-games/tvc/joystick
+target/tvc/games/joystick
 @games/games.lst
-time/tvc/clock
+target/tvc/time/clock
 target/tvc/tvc_cls
 target/tvc/tvc_ed_cfix
 target/tvc/tvc_ed_cpos

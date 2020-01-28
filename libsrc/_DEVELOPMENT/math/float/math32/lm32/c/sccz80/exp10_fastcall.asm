@@ -8,6 +8,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _exp10_fastcall
-defc _exp10_fastcall = exp10_fastcall
+defc _exp10_fastcall = _m32_exp10f
 ENDIF
 

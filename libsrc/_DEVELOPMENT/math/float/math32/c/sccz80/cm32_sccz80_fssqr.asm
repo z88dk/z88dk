@@ -6,7 +6,7 @@ SECTION code_fp_math32
 
 PUBLIC cm32_sccz80_fssqr
 
-EXTERN cm32_sccz80_fsread1, m32_fssqr_fastcall
+EXTERN m32_fssqr
 
     ; square (^2) sccz80 floats
     ;
@@ -16,6 +16,4 @@ EXTERN cm32_sccz80_fsread1, m32_fssqr_fastcall
     ;
     ; uses  : af, bc, de, hl, af'
 
-cm32_sccz80_fssqr:
-    call cm32_sccz80_fsread1
-    jp m32_fssqr_fastcall
+defc cm32_sccz80_fssqr = m32_fssqr

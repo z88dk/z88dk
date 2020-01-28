@@ -8,6 +8,8 @@
         EXTERN  __kayproii_gfxmode
 
 
+        PUBLIC  CLIB_GENCON_CAPS
+        defc    CLIB_GENCON_CAPS = 0
 
 ; a = ioctl
 ; de = arg

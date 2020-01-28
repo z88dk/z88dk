@@ -6,7 +6,7 @@ SECTION code_fp_math32
 
 PUBLIC cm32_sccz80_fssqrt
 
-EXTERN cm32_sccz80_fsread1, m32_fssqrt_fastcall
+EXTERN m32_fssqrt
 
     ; square root sccz80 float
     ;
@@ -16,6 +16,4 @@ EXTERN cm32_sccz80_fsread1, m32_fssqrt_fastcall
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-cm32_sccz80_fssqrt:
-    call cm32_sccz80_fsread1
-    jp m32_fssqrt_fastcall
+defc cm32_sccz80_fssqrt = m32_fssqrt

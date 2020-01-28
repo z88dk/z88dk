@@ -6,9 +6,7 @@ SECTION code_fp_math32
 
 PUBLIC cm32_sdcc_fssqr
 
-EXTERN cm32_sdcc_fsread1, m32_fssqr_fastcall
-
-.cm32_sdcc_fssqr
+EXTERN m32_fssqr
 
     ; square (^2) sdcc floats
     ;
@@ -18,8 +16,4 @@ EXTERN cm32_sdcc_fsread1, m32_fssqr_fastcall
     ;
     ; uses  : af, bc, de, hl, af'
 
-    call cm32_sdcc_fsread1
-
-    jp m32_fssqr_fastcall   ; enter  DEHL = sdcc_float
-                            ;
-                            ; return DEHL = sdcc_float
+defc cm32_sdcc_fssqr = m32_fssqr

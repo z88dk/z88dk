@@ -1,14 +1,15 @@
 
 	SECTION	code_fp_math32
 	PUBLIC	atanh
-	EXTERN	cm32_sccz80_atanh
+	EXTERN	_m32_atanhf
 
-	defc	atanh = cm32_sccz80_atanh
+	defc	atanh = _m32_atanhf
 
 
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _atanh
-defc _atanh = atanh
+EXTERN cm32_sdcc_atanh
+defc _atanh = cm32_sdcc_atanh
 ENDIF
 

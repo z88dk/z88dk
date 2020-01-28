@@ -8,7 +8,7 @@
 		PUBLIC		generic_console_printc
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_inverse
+                PUBLIC          generic_console_set_attribute
 		EXTERN		generic_console_xypos
 		EXTERN		swapgfxbk
 		EXTERN		swapgfxbk1
@@ -22,7 +22,7 @@
 		defc		DISPLAY = 0x3000
 
 
-generic_console_set_inverse:
+generic_console_set_attribute:
 generic_console_set_ink:
 generic_console_set_paper:
 	ret

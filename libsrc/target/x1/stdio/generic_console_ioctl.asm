@@ -16,6 +16,9 @@
     EXTERN  set_crtc_10
     INCLUDE "target/mc1000/def/mc1000.def"
 
+    PUBLIC  CLIB_GENCON_CAPS
+    defc    CLIB_GENCON_CAPS = CAP_GENCON_FG_COLOUR | CAP_GENCON_CUSTOM_FONT | CAP_GENCON_UDGS
+
 
 ; a = ioctl
 ; de = arg

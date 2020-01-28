@@ -1,6 +1,6 @@
 
     SECTION code_fp_math32
     PUBLIC _sqr
-    EXTERN cm32_sccz80_fssqr
+    EXTERN cm32_sdcc_fssqr
 
-    defc _sqr = cm32_sccz80_fssqr
+    defc _sqr = cm32_sdcc_fssqr

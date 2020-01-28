@@ -9,7 +9,7 @@
         PUBLIC  generic_console_scrollup
         PUBLIC  generic_console_set_ink
         PUBLIC  generic_console_set_paper
-        PUBLIC  generic_console_set_inverse
+        PUBLIC  generic_console_set_attribute
 	PUBLIC	generic_console_calc_screen_address
 
 	PUBLIC	__cpc_mode
@@ -22,7 +22,7 @@
 
 	defc	SCREEN = 0xc000
 
-generic_console_set_inverse:
+generic_console_set_attribute:
 	ret
 
 generic_console_set_ink:

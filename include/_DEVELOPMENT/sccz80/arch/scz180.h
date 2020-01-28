@@ -29,6 +29,30 @@ __sfr __at __IO_LED_STATUS  io_led_status;
 
 __sfr __at __IO_CF_PORT     io_cf;
 
-#endif /* !__ARCH_SCZ180_H__ */
-
 #endif
+
+// CSIO SD COMMANDS
+
+extern void __LIB__ sd_clock(uint8_t) __smallc __z88dk_fastcall;
+
+
+extern void __LIB__ sd_cs_lower(uint8_t) __smallc __z88dk_fastcall;
+
+
+extern void __LIB__ sd_cs_raise(void) __smallc __z88dk_fastcall;
+
+
+extern void __LIB__ sd_write_byte(uint8_t) __smallc __z88dk_fastcall;
+
+
+extern uint8_t __LIB__ sd_read_byte(void) __smallc __z88dk_fastcall;
+
+
+extern void __LIB__ sd_write_block(const uint8_t *from) __smallc __z88dk_fastcall;
+
+
+extern void __LIB__ sd_read_block(uint8_t *to) __smallc __z88dk_fastcall;
+
+
+
+#endif /* !__ARCH_SCZ180_H__ */

@@ -1,7 +1,7 @@
-graphics/spectrum/rom_putsprite
+target/zx/graphics/rom_putsprite
 games/beeper
-stdio/spectrum/generic_console_scrollup
-stdio/spectrum/fgetc_cons_rom
-stdio/spectrum/getk_rom
+target/zx/stdio/generic_console_scrollup
+target/zx/stdio/fgetc_cons_rom
+target/zx/stdio/getk_rom
 target/zx/tape/tape_load_block_callee_rom
 target/zx/tape/tape_save_block_callee_rom

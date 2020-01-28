@@ -1,8 +1,8 @@
-target/fp1100/gencon/generic_console
-target/fp1100/gencon/generic_console_ioctl
-target/fp1100/gencon/conio_vars
-target/fp1100/gencon/CRT_FONT
-target/fp1100/gencon/conio_map_colour
+target/fp1100/stdio/generic_console
+target/fp1100/stdio/generic_console_ioctl
+target/fp1100/stdio/conio_vars
+target/fp1100/stdio/CRT_FONT
+target/fp1100/stdio/conio_map_colour
 target/fp1100/stdio/fputc_cons_native
 target/fp1100/stdio/fgetc_cons
 target/fp1100/stdio/getk

@@ -9,6 +9,7 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _pow
-defc _pow = pow
+EXTERN	_m32_powf
+defc _pow = _m32_powf
 ENDIF
 

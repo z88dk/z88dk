@@ -1,14 +1,14 @@
 
 	SECTION	code_fp_math32
 	PUBLIC	exp
-	EXTERN	cm32_sccz80_exp
+	EXTERN	_m32_expf
 
-	defc	exp = cm32_sccz80_exp
-
+	defc	exp = _m32_expf
 
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _exp
-defc _exp = exp
+EXTERN cm32_sdcc_exp
+defc _exp = cm32_sdcc_exp
 ENDIF
 

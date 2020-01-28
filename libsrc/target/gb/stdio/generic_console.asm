@@ -10,7 +10,7 @@
         PUBLIC          generic_console_plotc
         PUBLIC          generic_console_set_ink
         PUBLIC          generic_console_set_paper
-        PUBLIC          generic_console_set_inverse
+        PUBLIC          generic_console_set_attribute
 
         GLOBAL          asm_setchar
         GLOBAL          asm_wrtchr
@@ -31,7 +31,7 @@
         EXTERN          generic_console_font32
         EXTERN          generic_console_udg32
 
-generic_console_set_inverse:
+generic_console_set_attribute:
         ret
 generic_console_set_ink:
         and     3

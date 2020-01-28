@@ -75,10 +75,8 @@ ENDIF
 
         call    _main		;Run the program
 cleanup:			;Jump back here from exit() if needed
-IF CRT_ENABLE_STDIO = 1
-	EXTERN	closeall
-	call	closeall	;Close any open files (fopen)
-ENDIF
+        call    crt0_exit
+
         call_oz(gn_nln)		;Print a new line
         call    resterrhan	;Restore the original error handler
 start1:	ld	sp,0		;Restore stack to entry value

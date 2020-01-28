@@ -45,8 +45,16 @@ SECTION code_fp_math32
 EXTERN m32_fsconst_pzero, m32_fsconst_pinf, m32_fsconst_pnan
 EXTERN m32_sqr_32h_24x24
 
-PUBLIC m32_fssqr_fastcall
+PUBLIC m32_fssqr, m32_fssqr_fastcall
 PUBLIC _m32_sqrf
+
+.m32_fssqr
+    pop af                      ; ret
+    pop hl                      ; y off stack
+    pop de
+    push de
+    push hl
+    push af                     ; ret
 
 ._m32_sqrf
 .m32_fssqr_fastcall

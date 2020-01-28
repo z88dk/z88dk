@@ -1,5 +1,0 @@
-target/rc2014/driver/terminal/rc_01_input_hbios1
-target/rc2014/driver/terminal/rc_01_input_hbios1/rc_01_input_hbios1_iterm_msg_getc
-target/rc2014/driver/terminal/rc_01_input_hbios1/rc_01_input_hbios1_iterm_msg_interrupt
-target/rc2014/driver/terminal/rc_01_input_hbios1/rc_01_input_hbios1_iterm_msg_reject
-target/rc2014/driver/terminal/rc_01_input_hbios1/rc_01_input_hbios1_stdio_msg_flsh

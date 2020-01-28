@@ -1,4 +1,0 @@
-SECTION code_fp_mbf32
-PUBLIC ___mbf32_POWER
-EXTERN POWER
-defc ___mbf32_POWER = POWER
