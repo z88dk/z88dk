@@ -13,7 +13,7 @@ Where not written by me, the functions were sourced from:
 
 This library is designed for z180, and z80n processors. Specifically, it is optimised for the z180 and [ZX Spectrum Next](https://www.specnext.com/) z80n as these processors have a hardware `16_8x8` multiply instruction that can substantially accelerate the floating point mantissa calculation.
 
-This library is also designed to be as fast as possible on the z80 processor. For the z80 it is built on the same core `16_8x8` multiply model, using either an optimal unrolled shift+add algorithm or a faster 512 Byte table lookup algorithm.
+This library is also designed to be as fast as possible on the z80 processor. For the z80 it is built on the same core `16_8x8` multiply model, using an optimal unrolled shift+add algorithm.
 
 *@feilipu, May 2019*
 
@@ -206,7 +206,7 @@ For the z80 CPU, with no hardware multiply, a replica of the z80n instruction `m
 
 The `z80_mulu_de` has zero argument detection, leading zero detection, and is unrolled. With the exception of preserving `hl`, for equivalency with z80n `mul de`, it should be the fastest `16_8x8` linear multiply possible on a z80.
 
-In the search for performance, an alternate table driven `16_8x8` multiply function was created. This function uses a 512 Byte table containing the 16-bit square of 8-bit numbers, to improve the multiply z80 performance. Alternate mantissa routines were written to suit this fast multiply function, and they are used where necessary. The table driven multiply function has been removed on January 28th 2020. Please look at commits on this date to rebuild this option if needed.
+In the search for performance, an alternate table driven `16_8x8` multiply function was created. This function uses a 512 Byte table containing the 16-bit square of 8-bit numbers, to improve the multiply z80 performance. Alternate mantissa routines were written to suit this fast multiply function, and they are used where necessary. The table driven multiply function has been removed on January 28th 2020. Please [look at the commit](https://github.com/z88dk/z88dk/commit/efdd07c2e2229cac7cfef97ec01f478004846e39) to rebuild this option if needed.
 
 To calculate the 24-bit mantissa a special `mulu_32h_24x24` function has been built using 8 multiplies, the minimum number of `16_8x8` multiply terms. It is much more natural for the z80 to work in `16_8x8` multiplies than the Rabbit's `32_16x16` multiply. It is not a "correct" multiply, in that all terms are calculated and carry forward is considered. The lowest term is not calculated, as it doesn't impact the 32-bit result. The lower 16-bits of the result are simply truncated, leaving a further 8-bits for mantissa rounding within the calling function. The resulting `mulu_32h_24x24` could be the fastest way to calculate an IEEE sized mantissa on a z80, z180, & z80n.
 
@@ -391,8 +391,8 @@ mbf32                       | sccz80   | -0.1699168    | -0.1699168    | 1_939_3
 bbcmath                     | sccz80   | -0.16907516   | -0.16908760   | 1_655_789_776
 math32                      | sccz80   | -0.1690752    | -0.1690867    | _1_398_993_950_
 math32                 (opt)| sccz80   | -0.1690752    | -0.1690867    | __1_039_149_590__
-math32_fast        (deleted)| sccz80   | -0.1690752    | -0.1690867    | _1_198_780_765_
-math32_fast   (opt, deleted)| sccz80   | -0.1690752    | -0.1690867    | __0_890_625_068__
+~~math32_fast~~    (deleted)| sccz80   | -0.1690752    | -0.1690867    | _1_198_780_765_ [*](https://github.com/z88dk/z88dk/commit/efdd07c2e2229cac7cfef97ec01f478004846e39)
+~~math32_fast~~ (opt, deleted)| sccz80   | -0.1690752    | -0.1690867    | __0_890_625_068__ [*](https://github.com/z88dk/z88dk/commit/efdd07c2e2229cac7cfef97ec01f478004846e39)
 math32_z80n                 | sccz80   | -0.1690752    | -0.1690867    | _0_576_942_516_
 math32_z80n            (opt)| sccz80   | -0.1690752    | -0.1690867    | __0_441_400_426__
 math32_z180                 | sccz80   | -0.1690752    | -0.1690867    | _0_563_700_933_
@@ -430,8 +430,8 @@ math48                      | zsdcc    | 3_205_062_412
 math32                      | zsdcc    | 1_670_409_507
 math32                      | sccz80   | _1_653_612_845_
 math32                 (opt)| sccz80   | __1_433_305_904__
-math32_fast        (deleted)| sccz80   | _1_495_633_606_
-math32_fast   (opt, deleted)| sccz80   | __1_306_278_647__
+~~math32_fast~~    (deleted)| sccz80   | _1_495_633_606_ [*](https://github.com/z88dk/z88dk/commit/efdd07c2e2229cac7cfef97ec01f478004846e39)
+~~math32_fast~~ (opt, deleted)| sccz80   | __1_306_278_647__ [*](https://github.com/z88dk/z88dk/commit/efdd07c2e2229cac7cfef97ec01f478004846e39)
 math32_z80n                 | sccz80   | _0_922_658_537_
 math32_z80n            (opt)| sccz80   | __0_861_039_210__
 math32_z180                 | sccz80   | _0_892_842_610_
