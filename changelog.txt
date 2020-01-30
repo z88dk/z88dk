@@ -64,8 +64,8 @@ The more detailed (yet incomplete) changelist is below:
 - [z80asm] Now supports assembling 8080/5 code using both Intel and Zilog syntax
 - [z80asm] Now supports assembling gbz80 code
 - [z80asm] Supports many emulations for cross-processor compatibility
-- [zsdcc] Upgraded to SDCC 3.9.1 r11311
-- [newlib] +scz180: Support for this board
+- [zsdcc] Upgraded to SDCC 4.0.0 r11535
+- [newlib] +scz180: Support for this target
 - [newlib] +zxn: ZX Spectrum Next architecture renamed z80n
 - [newlib] +hbios: Support for RomWBW HBIOS API - incl RetroBrew and rc2014
 
@@ -658,7 +658,7 @@ they can do (in order of complexity):
 vfprintf_mini  - supports %d,u,s,c,%,ld,lu fields
 vfprintf_comp  - supports width specifiers and %d,x,c,s,u,% fields
 vfprintf_float - As above but with floating point (%e etc), only generic,
-		 untested
+  untested
 
 Once a complexity escalation has been made within a project then it's not
 possible to undo - i.e. if you want to printf longs then don't specify a
