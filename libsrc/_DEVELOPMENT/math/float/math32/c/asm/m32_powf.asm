@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.0 #11525 (Linux)
+; Version 4.0.0 #11528 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -318,7 +318,11 @@ l_m32_powf_00104:
 	ld	l,(ix+8)
 	ld	h,(ix+9)
 	push	hl
-	call	___fseq_callee
+	call	___fseq
+	pop	af
+	pop	af
+	pop	af
+	pop	af
 	ld	a, l
 	or	a, a
 	jr	Z,l_m32_powf_00106
