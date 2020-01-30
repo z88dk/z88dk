@@ -41,13 +41,8 @@ target/spc1000/graphics/xor_MODE2
 target/spc1000/graphics/pointxy_MODE2
 target/spc1000/graphics/swapgfxbk
 target/spc1000/graphics/textpixl6
-graphics/generic_console/div3
-graphics/putsprite3
-graphics/dcircle2
-graphics/fill
-graphics/getsprite
+@gfx/narrow/gfx_narrow.lst
 @video/tms9918/video_tms9918.lst
-@gfxbase.lst
 target/spc1000/psg/set_psg
 target/spc1000/psg/set_psg_callee
 target/spc1000/psg/get_psg

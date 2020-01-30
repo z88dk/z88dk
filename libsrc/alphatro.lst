@@ -7,16 +7,9 @@ target/alphatro/stdio/conio_vars
 target/alphatro/stdio/conio_map_colour
 @stdio/stdio.lst
 @input/input_keyboard.lst
-@gfxbasetxt6.lst
-graphics/generic_console/plotpixl6
-graphics/generic_console/respixl6
-graphics/generic_console/xorpixl6
-graphics/generic_console/pointxy6
-graphics/generic_console/div3
-graphics/dcircle2
-graphics/__gfx_coords
 target/alphatro/graphics/textpixl6
 target/alphatro/graphics/cleargraphics
+@gfx/gencon/gfx_gencon6.lst
 @video/mc6845/mc6845.lst
 target/alphatro/games/keys_joystick
 @games/games.lst

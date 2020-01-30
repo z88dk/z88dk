@@ -14,8 +14,8 @@ target/aquarius/stdio/ansi/f_ansi_dline
 target/aquarius/stdio/ansi/f_ansi_scrollup
 @stdio/stdio.lst
 @input/input_keyboard.lst
-@gfxbasetxt6.lst
 target/aquarius/graphics/textpixl6
+@gfx/text6/gfx_text6.lst
 target/aquarius/games/bit_open
 target/aquarius/games/bit_open_di
 target/aquarius/games/bit_close

@@ -42,13 +42,7 @@ target/gal/graphics/xor_MODE1
 target/gal/graphics/pointxy_MODE1
 target/gal/graphics/swapgfxbk
 target/gal/graphics/textpixl6
-graphics/generic_console/div3
-graphics/putsprite3
-graphics/dcircle2
-graphics/clrarea
-graphics/fill
-graphics/getsprite
-@gfxbase.lst
+@gfx/narrow/gfx_narrow.lst
 target/gal/games/bit_open
 target/gal/games/bit_open_di
 target/gal/games/bit_close

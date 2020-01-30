@@ -12,7 +12,4 @@ target/kaypro83/swapgfxbk
 target/kaypro83/xorpixl
 target/kaypro83/getmaxx
 target/kaypro83/getmaxy
-graphics/dcircle
-graphics/clg
-graphics/stencil_render2
-@gfxbase.lst
+@gfx/narrow/gfx_narrow.lst

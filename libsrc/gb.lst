@@ -1,12 +1,5 @@
-target/gb/graphics/obj/gbz80/*
 target/gb/**/*.asm
-graphics/__gfx_coords
-graphics/generic_console/plotpixl
-graphics/generic_console/respixl
-graphics/generic_console/xorpixl
-graphics/generic_console/pointxy
-graphics/generic_console/getmaxy
-graphics/generic_console/getmaxx
+@gfx/gencon/gfx_gencon_portable.lst
 @stdio/stdio_gbz80.lst
 @time/time.lst
 @games/games.lst

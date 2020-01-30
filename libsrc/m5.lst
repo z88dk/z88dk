@@ -7,10 +7,8 @@ target/m5/stdio/fputc_cons_rom
 @stdio/stdio.lst
 @font/font_8x8/font_8x8.lst
 @input/input_keyboard.lst
-graphics/dcircle
-graphics/getsprite
 @video/tms9918/video_tms9918.lst
-@gfxbase.lst
+@gfx/narrow/gfx_narrow.lst
 target/m5/games/joystick
 target/m5/games/keys_joystick
 psg/sn76489/bit_open

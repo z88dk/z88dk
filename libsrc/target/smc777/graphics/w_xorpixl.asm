@@ -17,7 +17,7 @@
     jr      nz,hires
     ld      h,l
     ld      l,e
-    INCLUDE	"graphics/generic_console/pixel.inc"
+    INCLUDE	"gfx/gencon/pixel.inc"
 
 hires:
     cp      @00000100

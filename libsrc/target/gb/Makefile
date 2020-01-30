@@ -2,7 +2,7 @@ include ../../Make.config
 
 TARGET = gb
 
-SUBDIRS = graphics
+SUBDIRS = 
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
 ASMFILES = $(wildcard *.asm)

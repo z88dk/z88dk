@@ -13,8 +13,6 @@ target/zx81/stdio/ansi_text/f_ansi_dline
 target/zx81/stdio/ansi_text/f_ansi_scrollup
 @stdio/stdio.lst
 target/zx81/time/clock
-graphics/dcircle
-graphics/clg
 target/zx81/graphics/clsgraph
 target/zx80/graphics/zx_hardcopy
 target/zx80/graphics/textpixl
@@ -22,10 +20,7 @@ target/zx80/graphics/plotpixl
 target/zx80/graphics/respixl
 target/zx80/graphics/xorpixl
 target/zx80/graphics/pointxy
-graphics/putsprite3
-graphics/stencil_render2
-graphics/text/swapgfxbk
-@gfxbase.lst
+@gfx/narrow/gfx_narrow.lst
 target/zx81/games/bit_open
 target/zx81/games/bit_open_di
 target/zx81/games/bit_close
