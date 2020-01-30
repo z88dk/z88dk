@@ -4,12 +4,16 @@
 
 include ../Make.config
 
-all: $(OUTPUT_DIRECTORY)/z80_crt0.lib $(OUTPUT_DIRECTORY)/rcmx000_crt0.lib $(OUTPUT_DIRECTORY)/z80iy_crt0.lib $(OUTPUT_DIRECTORY)/z80s183_crt0.lib $(OUTPUT_DIRECTORY)/z180_crt0.lib $(OUTPUT_DIRECTORY)/ez80_crt0.lib $(OUTPUT_DIRECTORY)/8080_crt0.lib $(OUTPUT_DIRECTORY)/gbz80_crt0.lib
+all: $(OUTPUT_DIRECTORY)/z80_crt0.lib $(OUTPUT_DIRECTORY)/rcmx000_crt0.lib $(OUTPUT_DIRECTORY)/z80iy_crt0.lib $(OUTPUT_DIRECTORY)/z80s183_crt0.lib $(OUTPUT_DIRECTORY)/z180_crt0.lib $(OUTPUT_DIRECTORY)/ez80_crt0.lib $(OUTPUT_DIRECTORY)/8080_crt0.lib $(OUTPUT_DIRECTORY)/gbz80_crt0.lib $(OUTPUT_DIRECTORY)/z80n_crt0.lib
 
 
 $(OUTPUT_DIRECTORY)/z80_crt0.lib:
 	@$(MAKE) clean
 	$(LIBLINKER) -I.. -x$@ @crt0.lst
+
+$(OUTPUT_DIRECTORY)/z80n_crt0.lib:
+	@$(MAKE) clean
+	$(LIBLINKER) -I.. -mz80n -x$@ @crt0.lst
 
 $(OUTPUT_DIRECTORY)/8080_crt0.lib:
 	@$(MAKE) clean
@@ -58,3 +62,4 @@ clean:
 	@$(RM) ../_DEVELOPMENT/math/integer/*.o
 	@$(RM) ../_DEVELOPMENT/math/integer/fast/*.o
 	@$(RM) ../_DEVELOPMENT/math/integer/small/*.o
+	@$(RM) ../_DEVELOPMENT/math/float/math32/z80/*.o

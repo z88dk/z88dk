@@ -15,9 +15,6 @@ ALIAS   --math-mbf32_8080    -Cc-fp-mode=mbf32 -lmbf32_8080
 ALIAS   --math-mbf64    -Cc-fp-mode=mbf64 -lmbf64
 ALIAS   --math-bbc      -Cc-fp-mode=z88 -lbbc_math
 
-ALIAS   --math32_z180   -mz180  -Cc-fp-mode=ieee -Cc-D__MATH_MATH32 -D__MATH_MATH32 -lmath32_z180 -pragma-define:CLIB_32BIT_FLOAT=1
-ALIAS   --math32_z80n   -mz80n  -Cc-fp-mode=ieee -Cc-D__MATH_MATH32 -D__MATH_MATH32 -lmath32_z80n -pragma-define:CLIB_32BIT_FLOAT=1
-
 #
 # Math library aliases (classic + newlib)
 #

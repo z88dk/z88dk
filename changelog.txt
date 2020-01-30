@@ -8,8 +8,8 @@ release of z88dk contains some major new features which are noteworthy:
 
 * A (mostly) IEEE754 compliant maths library is available for both classic
   and newlib.
-* The sccz80 compiler and classic +cpm target now supports generating binaries
-  that run on 8080 hardware
+* The sccz80 compiler and classic +cpm and +pmd85 targets now support 
+  generating binaries that run on 8080 hardware
 * The sccz80 compiler and classic +gb target can now generate ROMs for the
   Nintendo Gameboy
 
@@ -41,6 +41,7 @@ The more detailed (yet incomplete) changelist is below:
 - [classic] +myvision: Support for the Nichibutsu My Vision 
 - [classic] +pasopia7 Toshiba Pasopia 7 support added
 - [classic] +pencil2: Support for the Hanimex Pencil II
+- [classic] +pmd85: Support for the Tesla PMD85 family
 - [classic] +s1mp3: Preliminary support for the s1mp3 player devices
 - [classic] +sms: Support for Gamegear with -lgamegear
 - [classic] +spc1000: Graphics are now supported on the TMS9928
