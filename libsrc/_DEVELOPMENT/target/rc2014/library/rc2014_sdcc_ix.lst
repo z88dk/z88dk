@@ -27,7 +27,7 @@
 @stdlib/stdlib_sdcc_ix.lst
 @string/string_sdcc_ix.lst
 @target/rc2014/default/default.lst
-@target/rc2014/device/device.lst
+@target/rc2014/device/device_sdcc_ix.lst
 @target/rc2014/driver/driver_sdcc_ix.lst
 @target/cpm/driver/driver.lst
 @threads/threads_sdcc_ix.lst

@@ -1,4 +1,0 @@
-@target/rc2014/device/acia/acia.lst
-@target/rc2014/device/sio/sio.lst
-@target/rc2014/device/8255/8255.lst
-@target/rc2014/device/lut/lut.lst

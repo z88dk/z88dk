@@ -1,0 +1,5 @@
+target/rc2014/device/lut/z80/lut_read
+
+target/rc2014/device/lut/z80/f32_z80_mulu_32h_24x24
+target/rc2014/device/lut/z80/f32_z80_mulu_32h_32x32
+target/rc2014/device/lut/z80/f32_z80_sqr_32h_24x24

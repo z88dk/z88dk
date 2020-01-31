@@ -1,0 +1,6 @@
+@target/rc2014/device/acia/acia_asm.lst
+@target/rc2014/device/sio/sio_asm.lst
+@target/rc2014/device/8255/8255_asm.lst
+@target/rc2014/device/lut/lut_asm.lst
+
+@target/rc2014/device/lut/lut_sdcc.lst

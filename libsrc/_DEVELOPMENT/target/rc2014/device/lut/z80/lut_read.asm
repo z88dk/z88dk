@@ -11,25 +11,24 @@
 ;
 ;------------------------------------------------------------------------------
 
-IF __CPU_Z80__
-
 INCLUDE "config_private.inc"
-
-IF __IO_LUT_MODULE_AVAILABLE > 0
 
 SECTION code_driver
 
-PUBLIC lut_read
+PUBLIC asm_lut_read
 
 ;------------------------------------------------------------------------------
 ;
 ; Read RC2014 LUT Module
 ;
+; entry : hl = 16-bit linear address or 8-bit x 8-bit table address
+;
 ; exit  : hl = 16-bit result
 ;
+; uses  : bc
 
-.lut_read
-    push bc                     ; 11 preserve BC
+.asm_lut_read
+
     ld b,h                      ; 4  operand Y in B
     ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
     out (c),l                   ; 12 operand X from L
@@ -37,7 +36,5 @@ PUBLIC lut_read
     in h,(c)                    ; 12 result Z MSB to H
     dec c                       ; 4  result LSB address
     in l,(c)                    ; 12 result Z LSB to L
-    pop bc                      ; 10 restore BC
+    ret                         ; 10
 
-ENDIF
-ENDIF

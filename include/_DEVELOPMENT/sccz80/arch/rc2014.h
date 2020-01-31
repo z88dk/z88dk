@@ -64,10 +64,29 @@ __sfr __at __IO_PIO_IDE_CONFIG  io_pio_ide_config;
 __sfr __at __IO_PROM_RESET      io_prom_reset;
 __sfr __at __IO_PROM_TOGGLE     io_prom_toggle;
 
-#endif
+__sfr __at __IO_LUT_OPERAND_LATCH   io_lut_operand_latch;
+__sfr __at __IO_LUT_RESULT_MSB      io_lut_result_msb;
+__sfr __at __IO_LUT_RESULT_LSB      io_lut_result_lsb;
 
 #endif
 
 // SYSTEM FUNCTIONS
 
+// provide lut functions
 
+extern uint16_t __LIB__ lut_read(uint16_t location) __smallc __z88dk_fastcall;
+
+
+
+#ifdef __SCCZ80
+
+#define lut_mulu(a,b) lut_read((uint8_t)(a)<<8|(uint8_t)(b))
+
+#endif
+
+#ifdef __SDCC
+
+#define lut_mulu(a,b) lut_read_fastcall((uint8_t)(a)<<8|(uint8_t)(b))
+
+#endif
+#endif
