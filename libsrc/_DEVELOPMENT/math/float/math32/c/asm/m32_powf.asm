@@ -318,11 +318,7 @@ l_m32_powf_00104:
 	ld	l,(ix+8)
 	ld	h,(ix+9)
 	push	hl
-	call	___fseq
-	pop	af
-	pop	af
-	pop	af
-	pop	af
+	call	___fseq_callee
 	ld	a, l
 	or	a, a
 	jr	Z,l_m32_powf_00106

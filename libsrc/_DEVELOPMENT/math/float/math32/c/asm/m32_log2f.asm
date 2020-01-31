@@ -287,20 +287,16 @@ _m32_log2f:
 	ld	hl, -14
 	add	hl, sp
 	ld	sp, hl
-	ld	(ix-6),c
-	ld	(ix-5),b
-	ld	(ix-4),e
-	ld	l, e
-	ld	(ix-3),d
-	ld	h,d
-	push	hl
-	ld	l,(ix-6)
-	ld	h,(ix-5)
-	push	hl
+	push	bc
+	push	de
+	push	de
+	push	bc
 	ld	hl,0x0000
 	push	hl
 	push	hl
 	call	___fslt_callee
+	pop	de
+	pop	bc
 	bit	0,l
 	jr	NZ,l_m32_log2f_00102
 	ld	de,0xff00
@@ -309,13 +305,11 @@ _m32_log2f:
 l_m32_log2f_00102:
 	ld	hl,12
 	add	hl, sp
+	ld	(ix-4),l
+	ld	(ix-3),h
 	push	hl
-	ld	l,(ix-4)
-	ld	h,(ix-3)
-	push	hl
-	ld	l,(ix-6)
-	ld	h,(ix-5)
-	push	hl
+	push	de
+	push	bc
 	call	_m32_frexpf
 	push	hl
 	ld	c,l
