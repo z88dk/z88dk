@@ -9,7 +9,7 @@ define(`__IO_LUT_OPERAND_LATCH', 0x`'eval(__IO_LUT_PORT_BASE+0x02,16))  # Addres
 define(`__IO_LUT_RESULT_MSB', 0x`'eval(__IO_LUT_PORT_BASE+0x01,16))     # Address of Result MSB
 define(`__IO_LUT_RESULT_LSB', 0x`'eval(__IO_LUT_PORT_BASE+0x00,16))     # Address of Result LSB
 
-define(`__IO_LUT_MODULE_AVAILABLE', 0x00)   # The LUT Module is available and should be used.
+define(`__IO_LUT_MODULE_AVAILABLE', 0x00)   # 0x01 = The LUT Module is available and should be used.
 
 #
 # END OF USER CONFIGURATION
