@@ -38,7 +38,7 @@ PUBLIC m32_mulu_32h_24x24
 ;   (b*f + c*e)*2^8
 ;
 ;   NOT CALCULATED
-;   (c*c)*2^0
+;   (c*f)*2^0
 ;
 ; 8 8*8 multiplies in total
 ;
@@ -77,9 +77,9 @@ IF __IO_LUT_MODULE_AVAILABLE == 0
     ld a,h
     ld h,e
     ld e,a
-    call m32_z80_mulu_de        ; b*e 2^8
+    call m32_z80_mulu_de        ; b*f 2^8
     ex de,hl
-    call m32_z80_mulu_de        ; c*f 2^8
+    call m32_z80_mulu_de        ; c*e 2^8
 
     xor a
     add hl,de

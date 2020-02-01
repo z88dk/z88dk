@@ -25,7 +25,7 @@
 ;   (b*f + c*e)*2^8
 ;
 ;   NOT CALCULATED
-;   (c*c)*2^0
+;   (c*f)*2^0
 ;
 ; 8 8*8 multiplies in total
 ;
@@ -69,9 +69,9 @@ PUBLIC m32_mulu_32h_24x24
     ld a,h
     ld h,e
     ld e,a
-    mul de                      ; b*e 2^8
+    mul de                      ; b*f 2^8
     ex de,hl
-    mul de                      ; c*f 2^8
+    mul de                      ; c*e 2^8
 
     xor a
     add hl,de
