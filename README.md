@@ -105,5 +105,6 @@ Examples in [z88dk/libsrc/_DEVELOPMENT/EXAMPLES](https://github.com/z88dk/z88dk/
 [Compiling for Generic z80 Systems Using the New C Library](https://www.z88dk.org/wiki/doku.php?id=libnew:target_embedded)
 For any z80 computer, embedded or not.
 
-Using [z88dk with the rc2014](https://github.com/RC2014Z80/RC2014/wiki/Using-Z88DK), covers cpm, hbios, and rc2014 subtypes.
+Using [z88dk with the rc2014 target](https://github.com/RC2014Z80/RC2014/wiki/Using-Z88DK), covers cpm, hbios, and rc2014 subtypes.
 
+Using [z88dk with zx](https://github.com/z88dk/z88dk/blob/master/doc/overview.md), covers the zx target, and by extension the zxn target.
