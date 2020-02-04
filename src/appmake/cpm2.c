@@ -379,6 +379,22 @@ static disc_spec fp1100_spec = {
 };
 
 
+static disc_spec vector06_spec = {
+    .name = "Vector06",
+    .sectors_per_track = 10,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 8,
+    .directory_entries = 128,
+    .alternate_sides = 1,
+    .extent_size = 2048,
+    .byte_size_extents = 0,
+    .first_sector_offset = 1,
+};
+
 
 
 
@@ -412,6 +428,7 @@ static struct formats {
     { "smc777",    "Sony SMC-70/SMC-777",&smc777_spec, 0, NULL, 1 },
     { "svi-40ss",   "SVI 40ss (174k)",   &svi40ss_spec, 0, NULL, 1 },
     { "tiki100-40t","Tiki 100 (200k)",   &tiki100_spec, 0, NULL, 1 },
+    { "vector06",   "Vector 06",         &vector06_spec, 0, NULL, 1 },
     { NULL, NULL }
 };
 
@@ -524,7 +541,7 @@ int cpm_write_file_to_image(const char *disc_format, const char *container, cons
     h = cpm_create(spec);
     if (boot_filename != NULL) {
         size_t bootlen;
-        size_t max_bootsize = spec->boottracks * spec->sectors_per_track * spec->sector_size;
+        size_t max_bootsize = spec->boottracks * spec->sectors_per_track * spec->sector_size * (spec->alternate_sides + 1);
         if ((binary_fp = fopen(boot_filename, "rb")) != NULL) {
             void* bootbuf;
             if (fseek(binary_fp, 0, SEEK_END)) {

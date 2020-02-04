@@ -1,6 +1,7 @@
-target/cpm/stdio/fgetc_cons
-target/cpm/stdio/getk
-target/cpm/stdio/fputc_cons
+target/cpm/stdio/obj/${TYPE}/fgetc_cons
+target/cpm/stdio/obj/${TYPE}/getk
+target/cpm/stdio/obj/${TYPE}/fputc_cons
+target/cpm/stdio/obj/${TYPE}/generic_console
 target/cpm/cpm/cpm_platform_init
 @stdio/stdio_8080.lst
 @time/time.lst

@@ -27,6 +27,7 @@
  ;
  ;
 
+IF !__CPU_INTEL__
 	SECTION		code_clib
 PUBLIC clock
 PUBLIC _clock
@@ -141,3 +142,4 @@ unbcd:
 	ld  l,a
 	ld  h,0
 	ret
+ENDIF
