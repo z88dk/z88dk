@@ -69,7 +69,7 @@ define buildgeneric
 	$(MAKE) -C stdlib TARGET=$(1)
 	$(MAKE) -C gfx TARGET=$(1) FLAVOUR=$(if $(2),$(2),narrow)
 	$(MAKE) -C compress/zx7
-	$(MAKE) -C psg
+	$(MAKE) -C psg TARGET=$(1)
 	$(MAKE) -C alloc
 	$(MAKE) -C debug
 	$(MAKE) -C adt
@@ -280,7 +280,7 @@ pc88_clib.lib:
 	@echo ''
 	@echo '--- Building PC8801 Library ---'
 	@echo ''
-	$(MAKE) -C psg
+	$(MAKE) -C psg TARGET=pc88
 	$(call buildgeneric,pc88,"wide narrow")
 	$(MAKE) -C games TARGET=pc88
 	TARGET=pc88 TYPE=z80 $(LIBLINKER) -DFORpc88 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pc88_clib @$(LISTFILE_DIRECTORY)/pc88.lst
@@ -533,7 +533,7 @@ attache.lib:
 	@echo ''
 	@echo '--- Building Otrona Attache Library ---'
 	@echo ''
-	$(MAKE) -C psg
+	$(MAKE) -C psg TARGET=cpm SUBTYPE=attache
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide SUBTYPE=attache
 	TARGET=attache TYPE=z80 $(LIBLINKER) -DFORattache -x$(OUTPUT_DIRECTORY)/attache @$(LISTFILE_DIRECTORY)/target/attache/attache.lst
 
@@ -738,7 +738,7 @@ svi_clib.lib:
 	$(MAKE) -C target/msx/msxbios
 	$(MAKE) -C target/svi TARGET=svi
 	$(MAKE) -C video/tms9918 TARGET=svi
-	$(MAKE) -C psg
+	$(MAKE) -C psg TARGET=svi
 	TARGET=svi TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsvi -x$(OUTPUT_DIRECTORY)/svi_clib @$(LISTFILE_DIRECTORY)/svi.lst
 	TARGET=svi TYPE=z80 $(LIBLINKER) -DFORsvi -x$(OUTPUT_DIRECTORY)/svibios @target/svi/arch_svibios.lst
 
@@ -753,7 +753,7 @@ msx_clib.lib:
 	$(MAKE) -C games TARGET=msx
 	$(MAKE) -C target/msx 
 	$(MAKE) -C video/tms9918 TARGET=msx
-	$(MAKE) -C psg
+	$(MAKE) -C psg TARGET=msx
 	TARGET=msx TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/msx_clib @$(LISTFILE_DIRECTORY)/msx.lst
 	TARGET=msx TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/msxbios @target/msx/arch_msxbios.lst
 
@@ -819,7 +819,7 @@ einstein.lib:
 	$(MAKE) -C games TARGET=cpm SUBTYPE=einstein
 	$(MAKE) -C video/tms9918 TARGET=cpm SUBTYPE=einstein
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR=narrow SUBTYPE=einstein
-	$(MAKE) -C psg
+	$(MAKE) -C psg TARGET=cpm SUBTYPE=einstein
 	TARGET=einstein TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFOReinstein -x$(OUTPUT_DIRECTORY)/einstein @$(LISTFILE_DIRECTORY)/target/einstein/einstein.lst
 
 excali64_clib.lib:
@@ -838,7 +838,7 @@ smc777_cpm.lib:
 	@echo ''
 	@$(RM) -f video/mc6845/*.o
 	$(MAKE) -C gfx TARGET=cpm SUBTYPE=smc777 FLAVOUR=wide
-	$(MAKE) -C psg
+	$(MAKE) -C psg TARGET=cpm SUBTYPE=smc777
 	$(MAKE) -C games TARGET=cpm SUBTYPE=smc777 TARGET_CFLAGS=-subtype=smc777
 	TARGET=smc777 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsmc777 -x$(OUTPUT_DIRECTORY)/smc777_cpm @$(LISTFILE_DIRECTORY)/target/smc777/smc777_cpm.lst
 
@@ -869,7 +869,7 @@ adam.lib:
 	$(MAKE) -C games TARGET=cpm SUBTYPE=coleco
 	$(MAKE) -C video/tms9918 TARGET=coleco
 	$(MAKE) -C gfx TARGET=coleco FLAVOUR=narrow
-	$(MAKE) -C psg
+	$(MAKE) -C psg TARGET=coleco
 	TARGET=coleco TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcoleco -DFORadam -x$(OUTPUT_DIRECTORY)/adam @$(LISTFILE_DIRECTORY)/target/adam/adam.lst
 
 # SORD M5 library - Stefano
@@ -1242,7 +1242,7 @@ tiki100.lib:
 	@echo ''
 	$(call buildgeneric,cpm)
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR="wide" SUBTYPE=tiki100
-	$(MAKE) -C psg
+	$(MAKE) -C psg TARGET=cpm SUBTYPE=tiki100
 	TARGET=tiki100 TYPE=z80 $(LIBLINKER) -DFORtiki100 -x$(OUTPUT_DIRECTORY)/tiki100 @$(LISTFILE_DIRECTORY)/target/tiki100/tiki100.lst
 	
 # RCM2/3000 lib
