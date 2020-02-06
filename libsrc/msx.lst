@@ -18,6 +18,8 @@ target/msx/psg/psg_init
 target/msx/psg/get_psg
 target/msx/psg/set_psg
 target/msx/psg/set_psg_callee
+target/msx/psg/asm_wyz_hardware_out
 @psg/psg.lst
+@psg/wyz/psg_wyz.lst
 @target/msx/arch_msx.lst
 @z80.lst

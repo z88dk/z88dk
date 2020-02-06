@@ -19,5 +19,7 @@ target/zx/psg/set_psg
 target/zx/psg/set_psg_callee
 target/zx/psg/get_psg
 target/zx/psg/psg_init
+target/zx/psg/asm_wyz_hardware_out
 @psg/psg.lst
+@psg/wyz/psg_wyz.lst
 @z80.lst

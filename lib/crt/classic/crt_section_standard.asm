@@ -64,6 +64,7 @@
 		SECTION	code_arch
 		SECTION	code_font
 		SECTION	code_font_fzx
+		SECTION	code_psg
 		SECTION	code_z80
 IF !__crt_org_graphics
 		SECTION code_graphics
@@ -126,6 +127,7 @@ ENDIF
 IF !__crt_org_graphics
 		SECTION bss_graphics
 ENDIF
+		SECTION bss_psg
 		SECTION bss_user
 IF __crt_model > 0
         	SECTION DATA

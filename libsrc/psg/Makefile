@@ -6,8 +6,11 @@
 
 include ../Make.config
 
+SUBDIRS = wyz
 
-AFILES = \
+CLEANDIRS = $(SUBDIRS:%=clean-%)
+
+CFILES = \
 	psg_channels.c \
 	psg_envelope.c \
 	psg_noise.c \
@@ -16,18 +19,29 @@ AFILES = \
 	psg_tone_channels.c \
 	psg_volume.c \
 
-AOBJECTS = $(AFILES:.c=.o)
+OBJECTS = $(CFILES:.c=.o)
 
-.PHONY:	dirs
 
-all:    dirs $(addprefix obj/z80/, $(AOBJECTS)) $(addprefix obj/ixiy/, $(AOBJECTS)) 
+all:    dirs $(SUBDIRS) $(addprefix obj/z80/, $(OBJECTS)) $(addprefix obj/ixiy/, $(OBJECTS)) 
 
 
 
 dirs:
 	@mkdir -p obj/z80 obj/ixiy 
 
-clean:
+clean: subdirs-clean
 	$(RM) -fr obj
 	$(RM) -f */*.o
 	$(RM) zcc_opt.def
+
+.PHONY: dirs subdirs-all $(SUBDIRS) $(SUBDIRS_CLEAN)
+
+subdirs-all: $(SUBDIRS) 
+
+subdirs-clean: $(CLEANDIRS)
+
+$(SUBDIRS):
+	$(MAKE) -C $@ all
+
+$(CLEANDIRS):
+	$(MAKE) -C $(@:clean-%=%) clean
