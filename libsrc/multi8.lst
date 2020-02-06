@@ -23,5 +23,7 @@ target/multi8/psg/set_psg
 target/multi8/psg/set_psg_callee
 target/multi8/psg/get_psg
 target/multi8/psg/psg_init
+target/multi8/psg/asm_wyz_hardware_out
 @psg/psg.lst
+@psg/wyz/psg_wyz.lst
 @z80.lst
