@@ -1,4 +1,4 @@
-
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 
 	SECTION	code_psg
 
@@ -38,3 +38,4 @@ _ay_wyz_init:
 	ret
 
 
+ENDIF

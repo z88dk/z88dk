@@ -1,6 +1,6 @@
 ; ZX PSG proPLAYER V 0.3 - WYZ 19.03.2016
 
-
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 
 
 ; THE DATA TO BE CHANGED :
@@ -1055,3 +1055,4 @@ asm_wyz_TABLA_SONIDOS:	defw	0
 asm_wyz_DATOS_NOTAS:	defw	0
 asm_wyz_TABLA_SONG:	defw	0
 
+ENDIF
