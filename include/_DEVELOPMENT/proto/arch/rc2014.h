@@ -72,7 +72,7 @@ __sfr __at __IO_LUT_RESULT_LSB      io_lut_result_lsb;
 
 // provide lut functions
 
-__DPROTO(`d,e,iyh,iyl',`d,e,yh,iyl',uint16_t,,lut_read,uint16_t location)
+__DPROTO(`d,e,iyh,iyl',`d,e,iyh,iyl',uint16_t,,lut_read,uint16_t location)
 
 #ifdef __SCCZ80
 

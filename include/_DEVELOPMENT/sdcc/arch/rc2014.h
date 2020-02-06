@@ -74,7 +74,7 @@ __sfr __at __IO_LUT_RESULT_LSB      io_lut_result_lsb;
 
 // provide lut functions
 
-extern uint16_t lut_read(uint16_t location) __preserves_regs(d,e,yh,iyl);
+extern uint16_t lut_read(uint16_t location) __preserves_regs(d,e,iyh,iyl);
 extern uint16_t lut_read_fastcall(uint16_t location) __preserves_regs(d,e,iyh,iyl) __z88dk_fastcall;
 #define lut_read(a) lut_read_fastcall(a)
 

@@ -8,8 +8,11 @@
  *        then at the '*?' prompt enter the program name (or its first letter) and press PLAY
  *        When the program is in memory, type '/'.
  *
+ *        CO format ( Stefano Bodrato, Feb 2020 )
+ *        Support for Olivetti M10, Kyotronic KC85, TRS80 M100, etc..
  *
- *        $Id: trs80.c,v 1.13 2016-06-26 00:46:55 aralbrec Exp $
+ *
+ *        $Id: trs80.c $
  */
 
 #include "appmake.h"
@@ -19,6 +22,7 @@ static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
 static int               origin       = -1;
 static char              cmd          = 0;
+static char              co           = 0;
 static int               blocksz      = 256;
 static char              audio        = 0;
 static char              fast         = 0;
@@ -40,6 +44,7 @@ option_t trs80_options[] = {
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
     {  0 , "cmd",      ".CMD file format",           OPT_BOOL,  &cmd },
+    {  0 , "co",       "M100 .CO format",            OPT_BOOL,  &co },
     {  0 , "blocksz",  "Block size (10..256)",       OPT_INT,   &blocksz },
     {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
     {  0,  "fast",     "Tweak the audio tones to run a bit faster",  OPT_BOOL,  &fast },
@@ -143,9 +148,12 @@ int trs80_exec(char* target)
         }
     }
 
+	if (co)
+		cmd = co;
+	
     if (audio)
-        cmd = 0;
-
+        co = cmd = 0;
+ 	
     if ((blocksz < 10) || (blocksz > 256)) {
         myexit("Invalid block size: %d\n", blocksz);
     }
@@ -159,7 +167,10 @@ int trs80_exec(char* target)
         if (outfile == NULL) {
             strcpy(filename, binname);
             if (cmd)
-                suffix_change(filename, ".cmd");
+				if (co)
+					suffix_change(filename, ".co");
+				else
+					suffix_change(filename, ".cmd");
             else
                 suffix_change(filename, ".cas");
         } else {
@@ -219,54 +230,66 @@ int trs80_exec(char* target)
 		 *   Main loop
 		 */
 
-        for (i = 0; i < len; i++) {
+		if (!co) {
+			for (i = 0; i < len; i++) {
 
-            if ((i % blocksz) == 0) {
-                if (cmd)
-                    writebyte(1, fpout); /* Block signature byte in CMD mode */
-                else
-                    writebyte(0x3c, fpout); /* Escape char for data block signature in CAS mode */
+				if ((i % blocksz) == 0) {
+					if (cmd)
+						writebyte(1, fpout); /* Block signature byte in CMD mode */
+					else
+						writebyte(0x3c, fpout); /* Escape char for data block signature in CAS mode */
 
-                if ((i + blocksz) > len)
-                    if (cmd)
-                        writebyte(len - i + 2, fpout); /* last block length (remainder) */
-                    else
-                        writebyte(len - i, fpout); /* last block length (remainder) */
-                else if (cmd)
-                    if (blocksz == 254)
-                        writebyte(0, fpout); /* block length (256 bytes) */
-                    else
-                        writebyte(blocksz + 2, fpout); /* block length */
-                else if (blocksz == 256)
-                    writebyte(0, fpout); /* block length (256 bytes) */
-                else
-                    writebyte(blocksz, fpout); /* block length (CAS mode)*/
+					if ((i + blocksz) > len)
+						if (cmd)
+							writebyte(len - i + 2, fpout); /* last block length (remainder) */
+						else
+							writebyte(len - i, fpout); /* last block length (remainder) */
+					else if (cmd)
+						if (blocksz == 254)
+							writebyte(0, fpout); /* block length (256 bytes) */
+						else
+							writebyte(blocksz + 2, fpout); /* block length */
+					else if (blocksz == 256)
+						writebyte(0, fpout); /* block length (256 bytes) */
+					else
+						writebyte(blocksz, fpout); /* block length (CAS mode)*/
 
-                writeword(pos + i, fpout); /* block memory location */
-                cksum = (pos + i) % 256 + (pos + i) / 256; /* Checksum (for CAS mode) */
-            }
+					writeword(pos + i, fpout); /* block memory location */
+					cksum = (pos + i) % 256 + (pos + i) / 256; /* Checksum (for CAS mode) */
+				}
 
-            c = getc(fpin);
-            cksum += c; /* Checksum (for CAS mode) */
-            fputc(c, fpout);
-            ckflag = 1;
+				c = getc(fpin);
+				cksum += c; /* Checksum (for CAS mode) */
+				fputc(c, fpout);
+				ckflag = 1;
 
-            if (!cmd && ((i + 1) % blocksz == 0)) {
-                writebyte(cksum, fpout); /* Checksum (for CAS mode) */
-                ckflag = 0;
-            }
-        }
+				if (!cmd && ((i + 1) % blocksz == 0)) {
+					writebyte(cksum, fpout); /* Checksum (for CAS mode) */
+					ckflag = 0;
+				}
+			}
+			
+			if (cmd) {
+				writebyte(2, fpout); /* Two bytes end marker in CMD mode*/
+				writebyte(2, fpout);
+			} else {
+				if (ckflag)
+					writebyte(cksum, fpout); /* Checksum */
+				writebyte(0x78, fpout); /* Escape char for EOF in CAS mode */
+			}
+		}
 
-        if (cmd) {
-            writebyte(2, fpout); /* Two bytes end marker in CMD mode*/
-            writebyte(2, fpout);
-        } else {
-            if (ckflag)
-                writebyte(cksum, fpout); /* Checksum */
-            writebyte(0x78, fpout); /* Escape char for EOF in CAS mode */
-        }
 
         writeword(pos, fpout); /* Start address */
+		
+		if (co) {
+			writeword(len, fpout); /* Program length */
+			writeword(pos, fpout); /* Program entry */
+			for (i = 0; i < len; i++) {
+				c = getc(fpin);
+				fputc(c, fpout);
+			}
+		}
 
         fclose(fpin);
         fclose(fpout);
@@ -313,7 +336,7 @@ int trs80_exec(char* target)
         }
 
         if (c != 0xA5) {
-            fprintf(stderr, "Header marker not found:0xA5\n");
+            fprintf(stderr, "Header marker not found: 0xA5\n");
             myexit(NULL, 1);
         }
 
