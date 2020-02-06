@@ -26,7 +26,7 @@ clean: subdirs-clean
 subdirs-clean: $(CLEANDIRS)
 
 obj/$(TARGET)/%.o: %.asm
-	@$(ASSEMBLER) -DFOR$(TARGET) -I$(OUTPUT_DIRECTORY) -I$(Z88DK_LIB)  $^
+	@$(ASSEMBLER) -DFOR$(TARGET) -I$(OUTPUT_DIRECTORY) -I$(Z88DK_LIB) -DSTANDARDESCAPECHARS  $^
 	@mv $(^:.asm=.o) $@
 
 obj/$(TARGET)/%.o: %.c

@@ -569,6 +569,7 @@ cpm_clib.lib: gfxkp.lib attache.lib gfxosborne1.lib rc700.lib x1_cpm.lib
 	@echo ''
 	@echo '--- Building CP/M Library (8080)---'
 	@echo ''
+	$(RM) target/cpm/stdio/*.o target/cpm/cpm/*.o
 	TARGET=cpm TYPE=8080 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm8080_clib @$(LISTFILE_DIRECTORY)/cpm_8080.lst
 	@echo ''
 	@echo '--- Building CP/M Device fnctl Library ---'

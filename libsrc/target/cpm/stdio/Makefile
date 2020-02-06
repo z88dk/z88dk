@@ -6,6 +6,8 @@ TARGET = cpm
 ASMFILES = $(wildcard *.asm)
 OBJECTS = $(ASMFILES:.asm=.o)
 
+AFLAGS += -DSTANDARDESCAPECHARS
+
 all: dirs $(addprefix obj/8080/,$(OBJECTS)) $(addprefix obj/z80/,$(OBJECTS))
 
 
