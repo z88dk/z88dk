@@ -533,7 +533,7 @@ attache.lib:
 	@echo ''
 	@echo '--- Building Otrona Attache Library ---'
 	@echo ''
-	$(MAKE) -C psg TARGET=attache
+	$(MAKE) -C psg TARGET=cpm SUBTYPE=attache
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide SUBTYPE=attache
 	TARGET=attache TYPE=z80 $(LIBLINKER) -DFORattache -x$(OUTPUT_DIRECTORY)/attache @$(LISTFILE_DIRECTORY)/target/attache/attache.lst
 
@@ -819,7 +819,7 @@ einstein.lib:
 	$(MAKE) -C games TARGET=cpm SUBTYPE=einstein
 	$(MAKE) -C video/tms9918 TARGET=cpm SUBTYPE=einstein
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR=narrow SUBTYPE=einstein
-	$(MAKE) -C psg TARGET=einstein
+	$(MAKE) -C psg TARGET=cpm SUBTYPE=einstein
 	TARGET=einstein TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFOReinstein -x$(OUTPUT_DIRECTORY)/einstein @$(LISTFILE_DIRECTORY)/target/einstein/einstein.lst
 
 excali64_clib.lib:
@@ -838,7 +838,7 @@ smc777_cpm.lib:
 	@echo ''
 	@$(RM) -f video/mc6845/*.o
 	$(MAKE) -C gfx TARGET=cpm SUBTYPE=smc777 FLAVOUR=wide
-	$(MAKE) -C psg TARGET=smc777
+	$(MAKE) -C psg TARGET=cpm SUBTYPE=smc777
 	$(MAKE) -C games TARGET=cpm SUBTYPE=smc777 TARGET_CFLAGS=-subtype=smc777
 	TARGET=smc777 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsmc777 -x$(OUTPUT_DIRECTORY)/smc777_cpm @$(LISTFILE_DIRECTORY)/target/smc777/smc777_cpm.lst
 
@@ -869,7 +869,7 @@ adam.lib:
 	$(MAKE) -C games TARGET=cpm SUBTYPE=coleco
 	$(MAKE) -C video/tms9918 TARGET=coleco
 	$(MAKE) -C gfx TARGET=coleco FLAVOUR=narrow
-	$(MAKE) -C psg TARGET=adam
+	$(MAKE) -C psg TARGET=coleco
 	TARGET=coleco TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcoleco -DFORadam -x$(OUTPUT_DIRECTORY)/adam @$(LISTFILE_DIRECTORY)/target/adam/adam.lst
 
 # SORD M5 library - Stefano
@@ -1242,7 +1242,7 @@ tiki100.lib:
 	@echo ''
 	$(call buildgeneric,cpm)
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR="wide" SUBTYPE=tiki100
-	$(MAKE) -C psg TARGET=tiki100
+	$(MAKE) -C psg TARGET=cpm SUBTYPE=tiki100
 	TARGET=tiki100 TYPE=z80 $(LIBLINKER) -DFORtiki100 -x$(OUTPUT_DIRECTORY)/tiki100 @$(LISTFILE_DIRECTORY)/target/tiki100/tiki100.lst
 	
 # RCM2/3000 lib
