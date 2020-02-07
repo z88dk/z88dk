@@ -1022,11 +1022,11 @@ do_game:
             unplot(x+MPSIZE-MPMARGIN, y+(SIZE/2));
 #endif
           }
+          x++;
           if (b == PILL) {
             eatpill();
-            putsprite (spr_xor, (x+SIZE2)/SIZE2*SIZE2, (y+SIZE2)/SIZE2*SIZE2, pill);
+            putsprite (spr_and, (x+SIZE2)/SIZE2*SIZE2, (y+SIZE2)/SIZE2*SIZE2, pill);
           }
-          x++;
           a++;
         }
         break;
@@ -1045,9 +1045,9 @@ do_game:
           if (b == PILL) {
             eatpill();
 #if SIZE==6
-            putsprite (spr_xor, (x-1)/SIZE2*SIZE2, (y+SIZE2)/SIZE2*SIZE2, pill);
+            putsprite (spr_and, (x-1)/SIZE2*SIZE2, (y+SIZE2)/SIZE2*SIZE2, pill);
 #else
-            putsprite (spr_xor, x/SIZE2*SIZE2, (y+SIZE2)/SIZE2*SIZE2, pill);
+            putsprite (spr_and, x/SIZE2*SIZE2, (y+SIZE2)/SIZE2*SIZE2, pill);
 #endif
           }
           x--;
@@ -1067,15 +1067,15 @@ do_game:
 #endif
 
           }
+          y++;
           if (b == PILL) {
             eatpill();
 #if SIZE==6
-            putsprite (spr_xor, (x+SIZE2-1)/SIZE2*SIZE2, (y+SIZE2+1)/SIZE2*SIZE2, pill);
+            putsprite (spr_and, (x+SIZE2-1)/SIZE2*SIZE2, (y+SIZE2+1)/SIZE2*SIZE2, pill);
 #else
-            putsprite (spr_xor, (x+SIZE2)/SIZE2*SIZE2, (y+SIZE2)/SIZE2*SIZE2, pill);
+            putsprite (spr_and, (x+SIZE2)/SIZE2*SIZE2, (y+SIZE2)/SIZE2*SIZE2, pill);
 #endif
           }
-          y++;
           a++;
         }
         break;
@@ -1094,9 +1094,9 @@ do_game:
           if (b == PILL) {
             eatpill();
 #if SIZE==6
-            putsprite (spr_xor, (x+SIZE2-1)/SIZE2*SIZE2, y/SIZE2*SIZE2, pill);
+            putsprite (spr_and, (x+SIZE2-1)/SIZE2*SIZE2, y/SIZE2*SIZE2, pill);
 #else
-            putsprite (spr_xor, (x+SIZE2)/SIZE2*SIZE2, y/SIZE2*SIZE2, pill);
+            putsprite (spr_and, (x+SIZE2)/SIZE2*SIZE2, y/SIZE2*SIZE2, pill);
 #endif
           }
           y--;
