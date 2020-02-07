@@ -25,11 +25,14 @@ target/sv8000/graphics/res_MODE1
 target/sv8000/graphics/xor_MODE1
 target/sv8000/graphics/pointxy_MODE1
 @gfx/narrow/gfx_narrow.lst
+target/sv8000/interrupts/add_raster_int
 target/sv8000/psg/set_psg
 target/sv8000/psg/set_psg_callee
 target/sv8000/psg/get_psg
 target/sv8000/psg/psg_init
+target/sv8000/psg/asm_wyz_hardware_out
 @psg/psg.lst
+@psg/wyz/psg_wyz.lst
 target/sv8000/games/joystick
 games/obj/sv8000/joystick_type
 @games/games.lst
