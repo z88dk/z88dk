@@ -428,6 +428,17 @@ extern uchar __LIB__    *zx_pxy2aaddr_callee(uchar xcoord, uchar ycoord) __small
 #define zx_pxy2aaddr(a,b)          zx_pxy2aaddr_callee(a,b)
 
 
+/* Interrupt handling */
+
+#include <interrupt.h>
+
+// Setup an im2 jump table at given address
+extern void __LIB__    zx_im2_init(void *address, uint8_t byte) __smallc;
+
+// Add a raster interrupt handler
+extern void __LIB__ add_raster_int(isr_t handler);
+
+
 /* This routine strips the drive specifier from the filename header.
    It updates the 'D' BASIC variable with the drive number 
    and N$ with the file name  */

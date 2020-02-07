@@ -8,6 +8,8 @@ target/zx/obj/${TARGET}/zx_screenstr
 target/zx/obj/${TARGET}/zx_screenstr_callee
 target/zx/obj/${TARGET}/zx_lprintc
 target/zx/obj/${TARGET}/zx_print_buf
+target/zx/obj/${TARGET}/zx_im2_init
+target/zx/obj/${TARGET}/add_raster_int
 target/zx/basic/zx_basemem
 target/zx/basic/zx_basic_length
 target/zx/basic/zx_extsys
