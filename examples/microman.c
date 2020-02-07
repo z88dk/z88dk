@@ -381,7 +381,7 @@ char bgh[] = {
 
 #define DOTROW   64
 #define BLANKROW 0
-#define PILL  14
+#define PILL  448
 
 
 char man_right[] = { 
