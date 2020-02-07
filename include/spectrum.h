@@ -433,7 +433,7 @@ extern uchar __LIB__    *zx_pxy2aaddr_callee(uchar xcoord, uchar ycoord) __small
 #include <interrupt.h>
 
 // Setup an im2 jump table at given address
-extern void __LIB__    zx_im2_init(void *address, uint8_t byte) __smallc;
+extern void __LIB__  zx_im2_init(void *address, uchar byte) __smallc;
 
 // Add a raster interrupt handler
 extern void __LIB__ add_raster_int(isr_t handler);
