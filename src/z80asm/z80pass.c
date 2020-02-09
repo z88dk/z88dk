@@ -16,33 +16,33 @@ Repository: https://github.com/z88dk/z88dk
 /* external functions */
 
 /* local functions */
-void Z80pass2( void );
+void Z80pass2(void);
 
 void
-Z80pass2( void )
+Z80pass2(void)
 {
-	ExprListElem *iter;
-    Expr *expr, *expr2;
-    long value;
+	ExprListElem* iter;
+	Expr* expr, * expr2;
+	long value;
 	bool do_patch, do_store;
 	long asmpc;		// should be an int!
 
 	/* compute all dependent expressions */
-	compute_equ_exprs( CURRENTMODULE->exprs, false, true );
+	compute_equ_exprs(CURRENTMODULE->exprs, false, true);
 
-	iter = ExprList_first( CURRENTMODULE->exprs );
-	while ( iter != NULL )
+	iter = ExprList_first(CURRENTMODULE->exprs);
+	while (iter != NULL)
 	{
 		expr = iter->obj;
 
-        /* set error location */
+		/* set error location */
 		set_error_null();
-        set_error_file( expr->filename );
-        set_error_line( expr->line_nr );
+		set_error_file(expr->filename);
+		set_error_line(expr->line_nr);
 
 		/* Define code location; BUG_0048 */
-		set_cur_section( expr->section );
-		set_PC( expr->asmpc );		
+		set_cur_section(expr->section);
+		set_PC(expr->asmpc);
 
 		/* try to evaluate expression to detect missing symbols */
 		value = Expr_eval(expr, true);
@@ -51,95 +51,101 @@ Z80pass2( void )
 		do_patch = true;
 		do_store = false;
 
-		if ( expr->result.undefined_symbol ||
- 			 expr->result.not_evaluable ||
+		if (expr->result.undefined_symbol ||
+			expr->result.not_evaluable ||
 			!expr->is_computed)
 		{
 			do_patch = false;
 			do_store = true;
 		}
-		else if ( expr->range == RANGE_JR_OFFSET )
+		else if (expr->range == RANGE_JR_OFFSET)
 		{
-			if (expr->result.extern_symbol || expr->result.cross_section_addr )
+			if (expr->result.extern_symbol || expr->result.cross_section_addr)
 			{
 				error_jr_not_local();	/* JR must be local */
 				do_patch = false;
 			}
 		}
-		else if ( expr->type >= TYPE_ADDRESS || 
-				  expr->result.extern_symbol ||
-			      expr->target_name )
+		else if (expr->type >= TYPE_ADDRESS ||
+			expr->result.extern_symbol ||
+			expr->target_name)
 		{
 			do_patch = false;
 			do_store = true;            /* store expression in relocatable file */
 		}
 
 
-        if ( do_patch )
-        {
-            switch ( expr->range )
-            {
-            case RANGE_JR_OFFSET:
+		if (do_patch)
+		{
+			switch (expr->range)
+			{
+			case RANGE_JR_OFFSET:
 				asmpc = get_phased_PC() >= 0 ? get_phased_PC() : get_PC();
-                value -= asmpc + 2;		/* get module PC at JR instruction */
+				value -= asmpc + 2;		/* get module PC at JR instruction */
 
-                if ( value >= -128 && value <= 127 )
-                {
+				if (value >= -128 && value <= 127)
+				{
 					patch_byte(expr->code_pos, (byte_t)value);
-                    /* opcode is stored, now store relative jump */
-                }
-                else
-                {
-                    error_int_range( value );
-                }
-                break;
+					/* opcode is stored, now store relative jump */
+				}
+				else
+				{
+					error_int_range(value);
+				}
+				break;
 
 			case RANGE_BYTE_UNSIGNED:
-                if ( value < -128 || value > 255 )
-                    warn_int_range( value );
+				if (value < -128 || value > 255)
+					warn_int_range(value);
 
 				patch_byte(expr->code_pos, (byte_t)value);
-                break;
+				break;
 
-            case RANGE_BYTE_SIGNED:
-                if ( value < -128 || value > 127 )
-                    warn_int_range( value );
+			case RANGE_BYTE_SIGNED:
+				if (value < -128 || value > 127)
+					warn_int_range(value);
 
 				patch_byte(expr->code_pos, (byte_t)value);
-                break;
+				break;
 
 			case RANGE_WORD:
 				patch_word(expr->code_pos, (int)value);
 				break;
 
-            case RANGE_BYTE_TO_WORD_UNSIGNED:
-                if (value < 0 || value > 255)
-                    warn_int_range(value);
+			case RANGE_BYTE_TO_WORD_UNSIGNED:
+				if (value < 0 || value > 255)
+					warn_int_range(value);
 
-                patch_byte(expr->code_pos, (byte_t)value);
-                patch_byte(expr->code_pos + 1, 0);
-                break;
+				patch_byte(expr->code_pos, (byte_t)value);
+				patch_byte(expr->code_pos + 1, 0);
+				break;
 
-            case RANGE_BYTE_TO_WORD_SIGNED:
-                if (value < -128 || value > 127)
-                    warn_int_range(value);
+			case RANGE_BYTE_TO_WORD_SIGNED:
+				if (value < -128 || value > 127)
+					warn_int_range(value);
 
-                patch_byte(expr->code_pos, (byte_t)value);
-                patch_byte(expr->code_pos + 1, value < 0 || value > 127 ? 0xff : 0);
-                break;
+				patch_byte(expr->code_pos, (byte_t)value);
+				patch_byte(expr->code_pos + 1, value < 0 || value > 127 ? 0xff : 0);
+				break;
 
-            case RANGE_WORD_BE:
+			case RANGE_PTR24:
+				patch_byte(expr->code_pos + 0, (byte_t)((value >> 0) & 0xff));
+				patch_byte(expr->code_pos + 1, (byte_t)((value >> 8) & 0xff));
+				patch_byte(expr->code_pos + 2, (byte_t)((value >> 16) & 0xff));
+				break;
+
+			case RANGE_WORD_BE:
 				patch_word_be(expr->code_pos, (int)value);
 				break;
 
 			case RANGE_DWORD:
 				patch_long(expr->code_pos, value);
-                break;
+				break;
 
 			default:
 				xassert(0);
-            }
-        }
+			}
+		}
 
 		if (opts.list) {
 			if (expr->range == RANGE_WORD_BE) {
@@ -150,38 +156,38 @@ Z80pass2( void )
 				list_patch_data(expr->listpos, value, range_size(expr->range));
 			}
 		}
-			
+
 		/* continue loop - delete expression unless needs to be stored in object file */
-		if ( do_store )
-			iter = ExprList_next( iter );
+		if (do_store)
+			iter = ExprList_next(iter);
 		else
 		{
 			/* remove current expression, advance iterator */
-			expr2 = ExprList_remove( CURRENTMODULE->exprs, &iter );
-			xassert( expr == expr2 );
+			expr2 = ExprList_remove(CURRENTMODULE->exprs, &iter);
+			xassert(expr == expr2);
 
-			OBJ_DELETE( expr );	
+			OBJ_DELETE(expr);
 		}
-    }
+	}
 
 	// check for undefined symbols
 	check_undefined_symbols(CURRENTMODULE->local_symtab);
 	check_undefined_symbols(global_symtab);
 
 	/* clean error location */
-    set_error_null();
-    //set_error_module( CURRENTMODULE->modname );
+	set_error_null();
+	//set_error_module( CURRENTMODULE->modname );
 
 	/* create object file */
-	if ( ! get_num_errors() )
-		write_obj_file( CURRENTMODULE->filename );
+	if (!get_num_errors())
+		write_obj_file(CURRENTMODULE->filename);
 
-    if ( ! get_num_errors() && opts.symtable )
+	if (!get_num_errors() && opts.symtable)
 		write_sym_file(CURRENTMODULE);
 }
 
 
-bool Pass2infoExpr(range_t range, Expr *expr)
+bool Pass2infoExpr(range_t range, Expr* expr)
 {
 	int list_offset;
 
@@ -207,8 +213,8 @@ bool Pass2infoExpr(range_t range, Expr *expr)
 
 bool Pass2info(range_t range)
 {
-	Expr *expr;
-	
+	Expr* expr;
+
 	/* Offset of (ix+d) should be optional; '+' or '-' are necessary */
 	if (range == RANGE_BYTE_SIGNED)
 	{

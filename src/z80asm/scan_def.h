@@ -9,9 +9,9 @@ Define lexer tokens
 */
 
 /*-----------------------------------------------------------------------------
-*	Token IDs
-*	Lexical tokens are returned by the lexer
-*	Semantical tokens are used internally and have semantical value 
+*   Token IDs
+*   Lexical tokens are returned by the lexer
+*   Semantical tokens are used internally and have semantical value
 *----------------------------------------------------------------------------*/
 #ifndef TOKEN_RE
 #define TOKEN_RE(name, string, regexp, set_value)
@@ -26,7 +26,7 @@ Define lexer tokens
 #define TOKEN2(name, string, set_value)
 #endif
 
-#define TOKEN_KW(name, set_value)	TOKEN(TK_##name, #name, set_value)
+#define TOKEN_KW(name, set_value)   TOKEN(TK_##name, #name, set_value)
 
 #ifndef TOKEN_OPCODE
 #define TOKEN_OPCODE(opcode)
@@ -36,18 +36,18 @@ Define lexer tokens
 #define TOKEN_OPCODE1(opcode, string)
 #endif
 
-TOKEN(	TK_END,			"",)	/* = 0; end of file reached */
-TOKEN(	TK_NIL,			"", )	/* returned for rubish */
-TOKEN(	TK_NAME,		"", )
-TOKEN(	TK_LABEL,		"", )
-TOKEN(	TK_NUMBER,		"", )
-TOKEN(	TK_STRING,		"", )
-TOKEN(	TK_TERN_COND,	"", )	/* cond ? true : false */
-TOKEN(	TK_ASMPC,		"ASMPC", )
-TOKEN2(	TK_ASMPC,		"$", )
+TOKEN(  TK_END,         "",)    /* = 0; end of file reached */
+TOKEN(  TK_NIL,         "", )   /* returned for rubish */
+TOKEN(  TK_NAME,        "", )
+TOKEN(  TK_LABEL,       "", )
+TOKEN(  TK_NUMBER,      "", )
+TOKEN(  TK_STRING,      "", )
+TOKEN(  TK_TERN_COND,   "", )   /* cond ? true : false */
+TOKEN(  TK_ASMPC,       "ASMPC", )
+TOKEN2( TK_ASMPC,       "$", )
 
 /*-----------------------------------------------------------------------------
-*	lexical tokens in ASCII order
+*   lexical tokens in ASCII order
 *----------------------------------------------------------------------------*/
 
 TOKEN(TK_NEWLINE, "\n", )
@@ -119,7 +119,7 @@ TOKEN(TK_RCURLY, "}", )
 TOKEN(TK_BIN_NOT, "~", )
 
 /*-----------------------------------------------------------------------------
-*	Assembly keywords
+*   Assembly keywords
 *----------------------------------------------------------------------------*/
 
 /* flags */
@@ -131,8 +131,8 @@ TOKEN_KW(PO, )
 TOKEN_KW(PE, )
 TOKEN_KW(P,  )
 TOKEN_KW(M,  )
-TOKEN_RABBIT(LZ)		// issue #577
-TOKEN_RABBIT(LO)		// issue #577
+TOKEN_RABBIT(LZ)        // issue #577
+TOKEN_RABBIT(LO)        // issue #577
 TOKEN_KW(NV, )
 TOKEN_KW(V, )
 
@@ -192,7 +192,7 @@ TOKEN(TK_HL1, "HL'", )
 TOKEN(TK_AF1, "AF'", )
 
 /* indirect 8- and 16-bit registers */
-/* TK_IND_IX|IY|HL is followed by ')', '+' or '-', but follow char is not matched - 
+/* TK_IND_IX|IY|HL is followed by ')', '+' or '-', but follow char is not matched -
 *  can collect expression, will be positive or negative depending on symbol */
 TOKEN_RE(TK_IND_BC, "(BC", "(" hspace "BC"i index_reg_suffix, p--; te--)
 TOKEN_RE(TK_IND_DE, "(DE", "(" hspace "DE"i index_reg_suffix, p--; te--)
@@ -206,44 +206,57 @@ TOKEN_RE(TK_IND_HLI, "(HLI", "(" hspace "HLI"i index_reg_suffix, p--; te--)
 TOKEN_RE(TK_IND_HLD, "(HLD", "(" hspace "HLD"i index_reg_suffix, p--; te--)
 
 /* assembly directives */
-TOKEN_OPCODE(ALIGN		)
-TOKEN_OPCODE(BINARY		)
-TOKEN_OPCODE(C_LINE		)
-TOKEN_OPCODE(DEFB		)
-TOKEN_OPCODE(DEFC		)
-TOKEN_OPCODE(DEFDB		)
-TOKEN_OPCODE(DEFGROUP	)
-TOKEN_OPCODE(DEFINE		)
-TOKEN_OPCODE(DEFM		)
-TOKEN_OPCODE(DEFQ		)
-TOKEN_OPCODE(DEFS		)
-TOKEN_OPCODE(DEFVARS	)
-TOKEN_OPCODE(DEFW		)
-TOKEN_OPCODE(DEPHASE	)
-TOKEN_OPCODE(ELSE		)
-TOKEN_OPCODE(ELIF		)
-TOKEN_OPCODE(ELIFDEF	)
-TOKEN_OPCODE(ELIFNDEF	)
-TOKEN_OPCODE(ENDIF		)
-TOKEN_OPCODE(EXTERN		)
+TOKEN_OPCODE(ALIGN      )
+TOKEN_OPCODE(BINARY     )
+TOKEN_OPCODE(BYTE       )
+TOKEN_OPCODE(C_LINE     )
+TOKEN_OPCODE(DB         )
+TOKEN_OPCODE(DC         )
+TOKEN_OPCODE(DDB        )
+TOKEN_OPCODE(DEFB       )
+TOKEN_OPCODE(DEFC       )
+TOKEN_OPCODE(DEFDB      )
+TOKEN_OPCODE(DEFGROUP   )
+TOKEN_OPCODE(DEFINE     )
+TOKEN_OPCODE(DEFM       )
+TOKEN_OPCODE(DEFP       )
+TOKEN_OPCODE(DEFQ       )
+TOKEN_OPCODE(DEFS       )
+TOKEN_OPCODE(DEFVARS    )
+TOKEN_OPCODE(DEFW       )
+TOKEN_OPCODE(DEPHASE    )
+TOKEN_OPCODE(DM         )
+TOKEN_OPCODE(DP         )
+TOKEN_OPCODE(DQ         )
+TOKEN_OPCODE(DS         )
+TOKEN_OPCODE(DW         )
+TOKEN_OPCODE(DWORD      )
+TOKEN_OPCODE(ELIF       )
+TOKEN_OPCODE(ELIFDEF    )
+TOKEN_OPCODE(ELIFNDEF   )
+TOKEN_OPCODE(ELSE       )
+TOKEN_OPCODE(ENDIF      )
+TOKEN_OPCODE(EXTERN     )
 TOKEN_OPCODE(GLOBAL     )
 TOKEN_OPCODE(IF         )
-TOKEN_OPCODE(IFDEF		)
-TOKEN_OPCODE(IFNDEF		)
-TOKEN_OPCODE(INCLUDE	)
-TOKEN_OPCODE(LIB		)
-TOKEN_OPCODE(LINE		)
-TOKEN_OPCODE(LSTOFF		)
-TOKEN_OPCODE(LSTON		)
-TOKEN_OPCODE(MODULE		)
-TOKEN_OPCODE(ORG		)
-TOKEN_OPCODE(PHASE		)
-TOKEN_OPCODE(PUBLIC		)
-TOKEN_OPCODE(SECTION	)
-TOKEN_OPCODE(UNDEFINE	)
-TOKEN_OPCODE(XDEF		)
-TOKEN_OPCODE(XLIB		)
-TOKEN_OPCODE(XREF		)
+TOKEN_OPCODE(IFDEF      )
+TOKEN_OPCODE(IFNDEF     )
+TOKEN_OPCODE(INCLUDE    )
+TOKEN_OPCODE(LIB        )
+TOKEN_OPCODE(LINE       )
+TOKEN_OPCODE(LSTOFF     )
+TOKEN_OPCODE(LSTON      )
+TOKEN_OPCODE(MODULE     )
+TOKEN_OPCODE(ORG        )
+TOKEN_OPCODE(PHASE      )
+TOKEN_OPCODE(PTR        )
+TOKEN_OPCODE(PUBLIC     )
+TOKEN_OPCODE(SECTION    )
+TOKEN_OPCODE(UNDEFINE   )
+TOKEN_OPCODE(WORD       )
+TOKEN_OPCODE(XDEF       )
+TOKEN_OPCODE(XLIB       )
+TOKEN_OPCODE(XREF       )
 
 /* DEFGROUP storage specifiers */
 TOKEN(TK_DS_B, "DS.B", )
@@ -418,8 +431,8 @@ TOKEN_OPCODE(UMS)
 /* Z88DK specific opcodes */
 TOKEN_OPCODE(CALL_OZ)
 TOKEN_OPCODE(CALL_PKG)
-TOKEN_OPCODE(FPP	)
-TOKEN_OPCODE(INVOKE	)
+TOKEN_OPCODE(FPP    )
+TOKEN_OPCODE(INVOKE )
 
 /* Intel 8080/8085 opcodes */
 TOKEN_OPCODE(MOV)

@@ -165,7 +165,7 @@ test: $(TARGET) z80asm_lib
 	$(MAKE) z80asm_lib
 	$(MAKE) prove_c
 	$(MAKE) prove_perl
-	
+
 testdev:
 	$(MAKE) -C dev/z80asm_lib test
 	$(MAKE) -C dev/z80asm2 test
@@ -177,6 +177,7 @@ testlib:
 prove_c: t/libtestlib.a $(TEST_SRC_MAIN:.c=.o) $(TEST_SRC_MAIN:.c=.out)
 
 prove_perl: $(TARGET)
+	perl -S prove -It2 --state=slow,save -j9 t2/*.t
 	perl -S prove t/*.t
 
 clean::

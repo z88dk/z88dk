@@ -29,7 +29,7 @@ END
 
 run("z80asm -otestx.o test1.asm test2.asm");
 z80nm("testx.o", <<'END');
-Object  file testx.o at $0000: Z80RMF13
+Object  file testx.o at $0000: Z80RMF14
   Name: testx
   Section "": 1 bytes
     C $0000: C9

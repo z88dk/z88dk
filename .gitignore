@@ -9,6 +9,8 @@
 **/lib*.a
 **/zcc_opt.def
 **/zcc_proj.lst
+**/_prove
+**/.prove
 bin/
 libsrc/_DEVELOPMENT/arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm
 libsrc/_DEVELOPMENT/arch/zx/bifrost2/z80/BIFROST2_INSTALL.asm
