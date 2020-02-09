@@ -15,6 +15,11 @@
 ; Registers: a = amount to adjust exponent
 l_f48_ldexp:
 	exx             ;switch to AC
+	ex	af,af
+	ld	a,l
+	and	a
+	ret	z
+	ex	af,af
 	add	l
 	ld	l,a
 	exx
