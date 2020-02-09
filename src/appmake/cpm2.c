@@ -379,8 +379,8 @@ static disc_spec fp1100_spec = {
 };
 
 
-static disc_spec vector06_spec = {
-    .name = "Vector06",
+static disc_spec vector06c_spec = {
+    .name = "Vector06c",
     .sectors_per_track = 10,
     .tracks = 80,
     .sides = 2,
@@ -428,7 +428,7 @@ static struct formats {
     { "smc777",    "Sony SMC-70/SMC-777",&smc777_spec, 0, NULL, 1 },
     { "svi-40ss",   "SVI 40ss (174k)",   &svi40ss_spec, 0, NULL, 1 },
     { "tiki100-40t","Tiki 100 (200k)",   &tiki100_spec, 0, NULL, 1 },
-    { "vector06",   "Vector 06",         &vector06_spec, 0, NULL, 1 },
+    { "vector06c",  "Vector 06c",        &vector06c_spec, 0, NULL, 1 },
     { NULL, NULL }
 };
 
