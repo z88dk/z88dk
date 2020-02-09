@@ -1,0 +1,14 @@
+interrupts/common/obj/${TYPE}/asm_interrupt_add_handler
+interrupts/common/obj/${TYPE}/tick_count_isr
+interrupts/common/obj/${TYPE}/asm_interrupt_handler
+interrupts/common/obj/${TYPE}/asm_interrupt_remove_handler
+interrupts/im1/obj/${TYPE}/im1_vectors
+interrupts/im1/obj/${TYPE}/im1_install_isr
+interrupts/im1/obj/${TYPE}/im1_uninstall_isr
+interrupts/im1/obj/${TYPE}/im1_init
+interrupts/im1/obj/${TYPE}/im1_handler
+interrupts/nmi/obj/${TYPE}/nmi_vectors
+interrupts/nmi/obj/${TYPE}/nmi_install_isr
+interrupts/nmi/obj/${TYPE}/nmi_uninstall_isr
+interrupts/nmi/obj/${TYPE}/nmi_init
+interrupts/nmi/obj/${TYPE}/nmi_handler

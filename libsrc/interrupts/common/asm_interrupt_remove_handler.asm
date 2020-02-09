@@ -23,7 +23,13 @@ loop:
 	ex	de,hl
 	dec	de	;Slot we're trying to erase
 	inc	hl	;Next slot
+IF __CPU_INTEL__
+	ld	a,b
+	add	b
+	ld	b,a
+ELSE
 	sla	b	;b * 2
+ENDIF
 move_chain:
 	ld	a,(hl)
 	ld	(de),a

@@ -64,6 +64,7 @@ define buildgeneric
 	$(MAKE) -C time
 	$(MAKE) -C debug
 	$(MAKE) -C assert
+	$(MAKE) -C interrupts
 	$(MAKE) -C font
 	$(MAKE) -C input
 	$(MAKE) -C stdlib TARGET=$(1)

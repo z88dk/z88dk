@@ -12,6 +12,11 @@ asm_im1_handler:
 	call	asm_interrupt_handler
 	pop	hl
 	pop	af
+IF __CPU_INTEL__
+	ei
+	ret
+ELSE
 	ei
 	reti
+ENDIF
 

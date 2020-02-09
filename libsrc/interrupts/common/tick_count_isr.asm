@@ -11,15 +11,17 @@
 ; Uses: hl, a
 tick_count_isr:
 _tick_count_isr:
-	ld	hl, (tick_count)
-	inc	hl
-	ld	(tick_count),hl
-	ld	a,h
-	or	l
+	ld	hl,tick_count
+	inc	(hl)
 	ret	nz
-	ld	hl,(tick_count + 2)
 	inc	hl
-	ld	(tick_count+2),hl
+	inc	(hl)
+	ret	nz
+	inc	hl
+	inc	(hl)
+	ret	nz
+	inc	hl
+	inc	(hl)
 	ret
 
 		SECTION		bss_clib

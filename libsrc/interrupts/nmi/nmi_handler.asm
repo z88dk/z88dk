@@ -12,5 +12,9 @@ asm_nmi_handler:
 	call	asm_interrupt_handler
 	pop	hl
 	pop	af
+IF __CPU_INTEL__  | __CPU_GBZ80__
+	ret
+ELSE
 	retn
+ENDIF
 
