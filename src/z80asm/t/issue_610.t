@@ -28,7 +28,7 @@ spew("test.def",	"test");
 run("z80asm test");
 
 z80nm("test.o", <<'END');
-Object  file test.o at $0000: Z80RMF13
+Object  file test.o at $0000: Z80RMF14
   Name: test
   Section "": 1 bytes
     C $0000: 00

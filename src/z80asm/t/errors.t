@@ -358,7 +358,7 @@ my $obj = objfile(NAME => "test", CODE => [["", -1, 1, "\x00"]] );
 substr($obj,6,2)="99";		# change version
 write_file(o_file(), $obj);
 t_z80asm_capture("-b  ".o_file(), "", <<"END", 1);
-Error: object file 'test.o' version 99, expected version 13
+Error: object file 'test.o' version 99, expected version 14
 END
 
 #------------------------------------------------------------------------------
@@ -408,7 +408,7 @@ substr($lib,6,2)="99";		# change version
 write_file(asm_file(), "nop");
 write_file(lib_file(), $lib);
 t_z80asm_capture("-b -i".lib_file()." ".asm_file(), "", <<"END", 1);
-Error: library file 'test.lib' version 99, expected version 13
+Error: library file 'test.lib' version 99, expected version 14
 END
 
 #------------------------------------------------------------------------------

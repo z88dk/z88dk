@@ -139,7 +139,7 @@ tokens:
     regexp  : '"(" hspace "C"i index_reg_suffix'
 
   # Indirect 16-bit register
-  # TK_IND_IX|IY is followed by ')', '+' or '-', but follow char is not matched - 
+  # TK_IND_IX|IY is followed by ')', '+' or '-', but follow char is not matched -
   # can collect expression, will be positive or negative depending on symbol
   - name    : IND_BC
     regexp  : '"(" hspace "BC"i index_reg_suffix'
@@ -167,13 +167,13 @@ tokens:
 
   - name    : IND_HLI
     regexp  : '"(" hspace "HLI"i'
-    
+
   - name    : IND_HLD
     regexp  : '"(" hspace "HLD"i'
-    
+
   # Assembly keywords
   - name    : ASMPC
-  
+
   # Flags, C register
   - name    : NZ
   - name    : Z
@@ -206,7 +206,7 @@ tokens:
   - name    : IXL
   - name    : IYL
   - name    : X
-  
+
   # 16-bit registers
   - name    : BC
   - name    : DE
@@ -216,58 +216,69 @@ tokens:
   - name    : AF
   - name    : SP
   - name    : PSW
-  
+
   - name    : B1
     regexp  : "\"B'\"i"
-  
+
   - name    : C1
     regexp  : "\"C'\"i"
-  
+
   - name    : D1
     regexp  : "\"D'\"i"
-  
+
   - name    : E1
     regexp  : "\"E'\"i"
-  
+
   - name    : H1
     regexp  : "\"H'\"i"
-  
+
   - name    : L1
     regexp  : "\"L'\"i"
-  
+
   - name    : A1
     regexp  : "\"A'\"i"
-  
+
   - name    : F1
     regexp  : "\"F'\"i"
-  
+
   - name    : BC1
     regexp  : "\"BC'\"i"
-  
+
   - name    : DE1
     regexp  : "\"DE'\"i"
-  
+
   - name    : HL1
     regexp  : "\"HL'\"i"
-  
+
   - name    : AF1
     regexp  : "\"AF'\"i"
-  
+
   # Assembly directives
   - name    : ALIGN
   - name    : BINARY
+  - name    : BYTE
   - name    : C_LINE
+  - name    : DB
+  - name    : DC
+  - name    : DDB
   - name    : DEFB
   - name    : DEFC
   - name    : DEFDB
   - name    : DEFGROUP
   - name    : DEFINE
   - name    : DEFM
+  - name    : DEFP
   - name    : DEFQ
   - name    : DEFS
   - name    : DEFVARS
   - name    : DEFW
   - name    : DEPHASE
+  - name    : DM
+  - name    : DP
+  - name    : DQ
+  - name    : DS
+  - name    : DW
+  - name    : DWORD
   - name    : ELIF
   - name    : ELIFDEF
   - name    : ELIFNDEF
@@ -286,26 +297,28 @@ tokens:
   - name    : MODULE
   - name    : ORG
   - name    : PHASE
+  - name    : PTR
   - name    : PUBLIC
   - name    : SECTION
   - name    : UNDEFINE
+  - name    : WORD
   - name    : XDEF
   - name    : XLIB
   - name    : XREF
-  
+
   # DEFGROUP storage specifiers
   - name    : DS_B
     regexp  : "\"DS.B\"i"
-    
+
   - name    : DS_W
     regexp  : "\"DS.W\"i"
-    
+
   - name    : DS_P
     regexp  : "\"DS.P\"i"
-    
+
   - name    : DS_Q
     regexp  : "\"DS.Q\"i"
-    
+
   # Z80 opcode specifiers
   - name    : ADC
   - name    : ADD
@@ -384,7 +397,7 @@ tokens:
   - name    : SRL
   - name    : STOP
   - name    : SUB
-  - name    : XOR 
+  - name    : XOR
 
   # Z80-ZXN specific opcodes
   - name    : SWAPNIB
@@ -433,8 +446,8 @@ tokens:
   - name 	: BRLC
 
   # Z180 specific opcodes
-  - name    : SLP 
-  - name    : MLT 
+  - name    : SLP
+  - name    : MLT
   - name    : IN0
   - name    : OUT0
   - name    : OTIM
@@ -468,13 +481,13 @@ tokens:
   - name    : SYSCALL
   - name    : UMA
   - name    : UMS
-  
+
   # Z88DK specific opcodes
   - name    : CALL_OZ
   - name    : CALL_PKG
   - name    : FPP
   - name    : INVOKE
-  
+
   # Intel 8080/8085 specific opcodes
   - name    : MOV
   - name    : MVI
