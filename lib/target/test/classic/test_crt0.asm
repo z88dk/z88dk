@@ -86,7 +86,7 @@ endif
 if (ASMPC<>$0038)
         defs    CODE_ALIGNMENT_ERROR
 endif
-IF !__CPU_8080__ && !__CPU_GBZ80__
+IF !__CPU_RABBIT__ && !__CPU_GBZ80__
 	jp	asm_im1_handler
 ELSE
 	ret

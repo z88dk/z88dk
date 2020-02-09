@@ -3,7 +3,7 @@ target/test/stdio/fputc_cons
 @stdio/stdio_r2k.lst
 target/test/time/time
 @time/time.lst
-@z80.lst
+@rabbit.lst
 target/test/fcntl/close
 target/test/fcntl/creat
 target/test/fcntl/fdgetpos
