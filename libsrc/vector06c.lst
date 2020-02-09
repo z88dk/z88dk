@@ -1,0 +1,12 @@
+target/vector06c/stdio/CRT_FONT
+target/vector06c/stdio/conio_vars
+target/vector06c/stdio/generic_console
+@stdio/stdio_8080.lst
+stdio/inkey/getk
+stdio/inkey/fgetc_cons
+@time/time.lst
+@font/font_8x8/font_8x8.lst
+@games/games.lst
+@gfx/portable/gfx_portable_w.lst
+@gfx/wide/gfx_wide.lst
+@8080.lst
