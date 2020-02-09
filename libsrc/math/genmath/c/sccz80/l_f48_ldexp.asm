@@ -15,6 +15,10 @@
 ; Registers: a = amount to adjust exponent
 l_f48_ldexp:
 	ld	hl,fa+5
-	add	(hl)
+	ld	c,a
+	ld	a,(hl)
+	and	a
+	ret	z
+	add	c
 	ld	(hl),a
 	ret
