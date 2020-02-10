@@ -1,0 +1,6 @@
+@stdio/stdio_8080.lst
+@time/time.lst
+@font/font_8x8/font_8x8.lst
+@games/games.lst
+@gfx/portable/gfx_portable.lst
+@8080.lst

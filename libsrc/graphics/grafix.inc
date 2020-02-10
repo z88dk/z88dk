@@ -570,6 +570,13 @@ IF FORpmd85
 	defc blankch = 32
 ENDIF
 
+IF FORm100
+	DEFINE gotgfx
+	defc maxx = 256
+	defc maxy = 256
+	defc blankch = 32
+ENDIF
+
 
 IF FORgb
 	defc USEplotc   = 1		; We call generic_console_plotc, not _printc for text mode
