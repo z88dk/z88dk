@@ -23,11 +23,14 @@
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
+        IF !CLIB_FGETC_CONS_DELAY
+                defc CLIB_FGETC_CONS_DELAY = 150
+        ENDIF
 
 	defc    TAR__fputc_cons_generic = 1
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = 32768
-	defc	CRT_KEY_DEL = 127
+	defc	CRT_KEY_DEL = 12
 	defc	__CPU_CLOCK = 3000000
 	defc	CONSOLE_ROWS = 32
 	defc	CONSOLE_COLUMNS = 32

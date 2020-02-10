@@ -1,9 +1,11 @@
 target/vector06c/stdio/CRT_FONT
 target/vector06c/stdio/conio_vars
 target/vector06c/stdio/generic_console
+target/vector06c/input/vector06c_key_interrupt
 @stdio/stdio_8080.lst
 stdio/inkey/getk
 stdio/inkey/fgetc_cons
+@input/input_keyboard.lst
 @time/time.lst
 @font/font_8x8/font_8x8.lst
 @games/games.lst

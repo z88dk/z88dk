@@ -22,6 +22,7 @@
 		EXTERN		conio_map_colour
 		EXTERN		__vector06c_ink
 		EXTERN		__vector06c_paper
+		EXTERN		__vector06c_scroll
 
                 defc            DISPLAY = 0xe000
                 PUBLIC          CLIB_GENCON_CAPS
@@ -50,6 +51,21 @@ generic_console_set_ink:
 generic_console_scrollup:
 	push	bc
 	push	de
+	ld	a,(__vector06c_scroll)
+	sub	8
+	ld	(__vector06c_scroll),a
+	out	(3),a
+	ld	b,CONSOLE_ROWS-1
+	ld	c,0
+scrollup_1:
+	push	bc
+	ld	d,' '
+	call	generic_console_printc
+	pop	bc
+	inc	c
+	ld	a,c
+	cp	32
+	jr	nz,scrollup_1
 	pop	de
 	pop	bc
 	ret
@@ -240,6 +256,9 @@ generic_console_xypos:
 	add	a
 	add	a
 	cpl
+	ld	l,a
+	ld	a,(__vector06c_scroll)
+	add	l
 	ld	l,a
 	ret
 
