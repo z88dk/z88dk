@@ -10,7 +10,6 @@
                 PUBLIC          generic_console_set_attribute
 		PUBLIC		generic_console_xypos
 		PUBLIC		generic_console_vpeek
-		PUBLIC		generic_console_ioctl
 
 
                 EXTERN          CONSOLE_COLUMNS
@@ -24,12 +23,8 @@
 		EXTERN		__vector06c_paper
 		EXTERN		__vector06c_scroll
 
-                defc            DISPLAY = 0xe000
-                PUBLIC          CLIB_GENCON_CAPS
-                defc            CLIB_GENCON_CAPS = 255
 
 generic_console_vpeek:
-generic_console_ioctl:
 	scf
 	ret
 
