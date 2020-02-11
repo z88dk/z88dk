@@ -56,16 +56,14 @@ generic_console_ioctl:
 	; Set the mode here
 	ex	de,hl
 	ld	a,(hl)
-	ld	hl,$1950
 	cp	10
 	jr	z,set_mode
-	ld	hl,$1820
-	and	a
-	jr	z,set_mode
-	scf
-	ret
+	ex	de,hl
+	ld	a,IOCTL_GENCON_SET_MODE
+	jp	__tms9918_console_ioctl
 
 set_mode:
+	ld	hl,$1950
 	ld	(__svi_mode),a
 	ld	(__console_w),hl
 	ld	a,CAP_GENCON_INVERSE
