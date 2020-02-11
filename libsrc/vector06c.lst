@@ -1,4 +1,5 @@
 target/vector06c/stdio/CRT_FONT
+target/vector06c/stdio/bordercolour
 target/vector06c/stdio/conio_vars
 target/vector06c/stdio/generic_console
 target/vector06c/stdio/generic_console_ioctl

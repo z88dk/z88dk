@@ -9,7 +9,6 @@
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_attribute
 		PUBLIC		generic_console_xypos
-		PUBLIC		generic_console_vpeek
 
 
                 EXTERN          CONSOLE_COLUMNS
@@ -24,9 +23,6 @@
 		EXTERN		__vector06c_scroll
 
 
-generic_console_vpeek:
-	scf
-	ret
 
 generic_console_set_paper:
 	and	15
