@@ -22,8 +22,8 @@ extern void __LIB__ ay_wyz_stop(void);  // Stop playing
 // Sound effect functionality
 typedef int wyz_effects;
 
-extern void __LIB__ ay_wyz_effect_init(wyz_effects *effects);
-extern void __LIB__ ay_wyz_start_effect(int channel, int effect_number); // Play an effect on specified channel
+extern void __LIB__ ay_wyz_effect_init(wyz_effects *effects) __z88dk_fastcall;
+extern void __LIB__ ay_wyz_start_effect(int channel, int effect_number) __smallc; // Play an effect on specified channel
 extern void __LIB__ ay_wyz_stop_effect(void);  // Stop playing effect
 
 

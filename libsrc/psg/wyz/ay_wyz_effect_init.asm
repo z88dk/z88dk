@@ -7,13 +7,9 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 	EXTERN	asm_wyz_TABLA_EFECTOS
 
 
-;void ay_wyz_effect_init(wyz_effects *effects)
+;void ay_wyz_effect_init(wyz_effects *effects) __z88dk_fastcall
 ay_wyz_effect_init:
 _ay_wyz_effect_init:
-	pop	bc	;return address
-	pop	hl	;table
-	push	hl
-	push	bc
 	ld	(asm_wyz_TABLA_EFECTOS),hl
 	ret
 ENDIF
