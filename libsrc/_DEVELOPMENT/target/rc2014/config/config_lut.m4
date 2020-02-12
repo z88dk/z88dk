@@ -5,7 +5,7 @@ divert(-1)
 # rebuild the library if changes are made
 #
 
-define(`__IO_LUT_OPERAND_LATCH', 0x`'eval(__IO_LUT_PORT_BASE+0x02,16))  # Address of Operand Latch
+define(`__IO_LUT_OPERAND_LATCH', 0x`'eval(__IO_LUT_PORT_BASE+0x00,16))  # Address of Operand Latch
 define(`__IO_LUT_RESULT_MSB', 0x`'eval(__IO_LUT_PORT_BASE+0x01,16))     # Address of Result MSB
 define(`__IO_LUT_RESULT_LSB', 0x`'eval(__IO_LUT_PORT_BASE+0x00,16))     # Address of Result LSB
 
