@@ -19,5 +19,9 @@ extern void __LIB__ ay_wyz_play(void);  // Called on interrupt, trashes main reg
 extern void __LIB__ ay_wyz_start(int song) __z88dk_fastcall; // Setup to play song N
 extern void __LIB__ ay_wyz_stop(void);  // Stop playing
 
+// Sound effect functionality
+extern void __LIB__ ay_wyz_play_effect(int channel, void *effect); // Play an effect
+extern void __LIB__ ay_wyz_stop_effect(void);  // Stop playing effect
+
 
 #endif
