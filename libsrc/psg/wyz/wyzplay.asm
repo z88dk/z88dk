@@ -23,6 +23,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	PUBLIC	asm_wyz_TABLA_SONIDOS
 	PUBLIC	asm_wyz_TABLA_SONG
 	PUBLIC	asm_wyz_DATOS_NOTAS
+	PUBLIC	asm_wyz_TABLA_EFECTOS
 
 	; Read by the hardware routines
 	PUBLIC	asm_wyz_PSG_REG
@@ -930,11 +931,12 @@ EXT_WORD:
 
 ; Initialise playing an effect
 ; Entry: a = channel
-;       hl = effect to play
+;        b = effect to play
 asm_wyz_start_effect:
 INICIA_EFECTO:
     ld      (CANAL_EFECTOS),a
-    ;LD      HL,(asm_wyz_TABLA_EFECTOS)
+    ld      a,b
+    LD      HL,(asm_wyz_TABLA_EFECTOS)
     CALL    EXT_WORD
     LD      (PUNTERO_EFECTO),HL
     LD      HL,INTERR
@@ -1128,5 +1130,6 @@ asm_wyz_TABLA_PAUTAS:	defw	0
 asm_wyz_TABLA_SONIDOS:	defw	0
 asm_wyz_DATOS_NOTAS:	defw	0
 asm_wyz_TABLA_SONG:	defw	0
+asm_wyz_TABLA_EFECTOS:	defw	0
 
 ENDIF

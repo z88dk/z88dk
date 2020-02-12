@@ -7,16 +7,17 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 	EXTERN	asm_wyz_start_effect
 
 
-;void ay_wyz_start_effect(int channel, void *effect_table);
+;void ay_wyz_start_effect(int channel, int effect_number)
 ay_wyz_start_effect:
 _ay_wyz_start_effect:
 	pop	bc	;return address
-	pop	hl	;table
+	pop	hl	;number
 	pop	de	;channel
 	push	de
 	push	hl
 	push	bc
-	ld	a,c
+	ld	a,e	;channel
+	ld	b,l	;effect number
 	call	asm_wyz_start_effect
 	ret
 ENDIF
