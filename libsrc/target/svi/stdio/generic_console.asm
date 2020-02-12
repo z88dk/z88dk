@@ -56,6 +56,7 @@ generic_console_ioctl:
 	; Set the mode here
 	ex	de,hl
 	ld	a,(hl)
+	ld	(__svi_mode),a
 	cp	10
 	jr	z,set_mode
 	ex	de,hl
@@ -64,7 +65,6 @@ generic_console_ioctl:
 
 set_mode:
 	ld	hl,$1950
-	ld	(__svi_mode),a
 	ld	(__console_w),hl
 	ld	a,CAP_GENCON_INVERSE
 	ld	(generic_console_caps),a
