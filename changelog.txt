@@ -3,6 +3,18 @@ Concise Record of Changes to Z88DK Releases
 
 z88dk vx.x.x - xx.xx.xxxx
 
+Detailed but incomplete changelist:
+
+- [classic] WYZTracker is now available for AY music and SFX
+- [classic] Interrupt code is now 8080 clean
+- [classic] +cpm: Vector06c disc creation
+- [classic] +svi: Generic console now works again
+- [classic] +zx: The enter key now works with ROM input
+- [sccz80] genmath/math48: Fixes to builtin ldexp implementation
+- [z80asm] db/dw/ds etc synonyms are now accepted
+
+z88dk v2.0 - 03.02.2020
+
 In addition to the usual collection of bugfixes and enhancements, this
 release of z88dk contains some major new features which are noteworthy:
 
