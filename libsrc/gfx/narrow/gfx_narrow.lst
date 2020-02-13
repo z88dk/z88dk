@@ -85,11 +85,7 @@ gfx/narrow/obj/${TARGET}/xordrawto_callee
 gfx/narrow/obj/${TARGET}/xorpixl
 gfx/narrow/obj/${TARGET}/xorplot
 gfx/narrow/obj/${TARGET}/xorplot_callee
-gfx/narrow/obj/${TARGET}/c_xorplot
-gfx/narrow/obj/${TARGET}/c_plot
 gfx/narrow/obj/${TARGET}/c_plotpixel
-gfx/narrow/obj/${TARGET}/c_point
 gfx/narrow/obj/${TARGET}/c_respixel
-gfx/narrow/obj/${TARGET}/c_unplot
 gfx/narrow/obj/${TARGET}/c_pointxy
 gfx/narrow/obj/${TARGET}/c_xorpixel

@@ -1,8 +1,4 @@
-gfx/narrow/obj/${TARGET}/c_plot
 gfx/narrow/obj/${TARGET}/c_plotpixel
-gfx/narrow/obj/${TARGET}/c_point
 gfx/narrow/obj/${TARGET}/c_pointxy
 gfx/narrow/obj/${TARGET}/c_respixel
-gfx/narrow/obj/${TARGET}/c_unplot
 gfx/narrow/obj/${TARGET}/c_xorpixel
-gfx/narrow/obj/${TARGET}/c_xorplot
