@@ -22,6 +22,7 @@
 	ld	h,a
 	ld	a,e
 	cpl
+	inc	a
 	ld	l,a
 	ld	a,(__vector06c_scroll)
 	add	l

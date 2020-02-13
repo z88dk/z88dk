@@ -62,7 +62,6 @@ scrollup_1:
 	ret
 
 generic_console_cls:
-	
 	ld	hl,65535
 	ld	b,4
 	ld	a,(__vector06c_paper)
@@ -271,6 +270,7 @@ generic_console_xypos:
 	add	a
 	add	a
 	cpl
+	inc	a
 	ld	l,a
 	ld	a,(__vector06c_scroll)
 	add	l
@@ -278,8 +278,4 @@ generic_console_xypos:
 	ret
 
 
-	SECTION	code_crt_init
-
-	ld	a,(__vector06c_scroll)
-	out	(3),a
 
