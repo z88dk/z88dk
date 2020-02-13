@@ -572,7 +572,7 @@ ENDIF
 
 IF FORvector06c
 	DEFINE gotgfx
-	defc maxx = 512
+	defc maxx = 256
 	defc maxy = 256
 	defc blankch = 32
 ENDIF

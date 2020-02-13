@@ -62,6 +62,31 @@ scrollup_1:
 	ret
 
 generic_console_cls:
+	
+	ld	hl,65535
+	ld	b,4
+	ld	a,(__vector06c_paper)
+	ld	d,a
+loop1:
+	ld	a,d
+	rrca
+	ld	d,a
+	sbc	a
+	ld	e,a
+	push	bc
+	push	de
+	ld	bc,8192
+loop2:
+	ld	(hl),e
+	dec	hl
+	dec	bc
+	ld	a,b
+	or	c
+	jp	nz,loop2
+	pop	de
+	pop	bc
+	dec	b
+	jp	nz,loop1
 	ret
 
 generic_console_printc:
@@ -238,7 +263,6 @@ not_bold:
 ; Exit:	hl = address (in plane 0)
 generic_console_xypos:
 	; Each column is 256 bytes, rows count from bottom
-	ld	l,0
 	ld	a,$E0
 	add	c
 	ld	h,a
@@ -253,4 +277,9 @@ generic_console_xypos:
 	ld	l,a
 	ret
 
+
+	SECTION	code_crt_init
+
+	ld	a,(__vector06c_scroll)
+	out	(3),a
 

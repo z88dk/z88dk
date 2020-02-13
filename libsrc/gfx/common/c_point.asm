@@ -25,7 +25,7 @@
 
 .c_point
 ._c_point
-IF __CPU_INTEL__
+IF __CPU_INTEL__ | __CPU_GBZ80__
                 pop     bc
                 pop     hl
                 pop     de
@@ -45,7 +45,7 @@ ENDIF
                 push    af
                 call    swapgfxbk1
                 pop     af
-IF !__CPU_INTEL__
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 		pop	ix
 ENDIF
                 ld      hl,1

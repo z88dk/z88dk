@@ -19,4 +19,8 @@ gfx/common/obj/${TARGET}/rscroll
 gfx/common/obj/${TARGET}/swapgfxbk_noop
 gfx/common/obj/${TARGET}/__graphics_retaddr
 gfx/common/obj/${TARGET}/putsprite_callee
+gfx/common/obj/${TARGET}/c_plot
+gfx/common/obj/${TARGET}/c_unplot
+gfx/common/obj/${TARGET}/c_xorplot
+gfx/common/obj/${TARGET}/c_point
 @gfx/x11/x11.lst

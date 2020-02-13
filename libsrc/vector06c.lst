@@ -12,6 +12,12 @@ stdio/inkey/fgetc_cons
 @time/time.lst
 @font/font_8x8/font_8x8.lst
 @games/games.lst
+target/vector06c/graphics/clg
+target/vector06c/graphics/w_pixladdr
+target/vector06c/graphics/w_plotpixl
+target/vector06c/graphics/w_respixl
+target/vector06c/graphics/w_xorpixl
+target/vector06c/graphics/w_pointxy
 @gfx/portable/gfx_portable_w.lst
 @gfx/wide/gfx_wide.lst
 @8080.lst
