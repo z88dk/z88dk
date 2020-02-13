@@ -6,23 +6,36 @@
 		EXTERN		l_pop_ei
                 EXTERN          im1_vectors
 		EXTERN          asm_interrupt_handler
+		EXTERN		asm_im1_install_isr
 
 
 im1_init:
 _im1_init:
 	call	l_push_di
+	ld	hl,$fd9f
+	ld	de,existing_int
+	ld	bc,5
+	ldir
 	ld	hl,asm_im1_handler
-	ld	($fd9b),hl
+	ld	($fd9f+1),hl
 	ld	a,195
-	ld	($fd9a),a
+	ld	($fd9f),a
+	; Add the code that was originally there as the first interrupt
+	ld	de,existing_int
+	call	asm_im1_install_isr
 	call	l_pop_ei
 	ret
 
-; On the MSX all registers are preserved for us by the firmware, so no need to 
-; do it here. We also shouldn't return with a reti since the interrupt
-; routine carries on
+; On the MSX hooking into fd9f we just need to save af
 asm_im1_handler:
+	push	af
         ld      hl,im1_vectors
 	call    asm_interrupt_handler
+	pop	af
 	ret
 	
+
+	SECTION	bss_driver
+
+existing_int:	
+	defs	5
