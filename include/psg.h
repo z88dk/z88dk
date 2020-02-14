@@ -160,6 +160,10 @@
 #endif
 #endif
 
+#ifdef __VECTOR06C__
+#define psgT(hz)		((int)(110837.5 / (hz)))
+#endif
+
 #ifdef __ZX80__
 // ZON-X81 clock: 1625000  divided internally by 16
 #define psgT(hz)		((int)(101562.0 / (hz)))

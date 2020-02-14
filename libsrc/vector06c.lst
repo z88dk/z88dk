@@ -5,6 +5,10 @@ target/vector06c/stdio/generic_console
 target/vector06c/stdio/generic_console_ioctl
 target/vector06c/stdio/generic_console_vpeek
 target/vector06c/input/vector06c_key_interrupt
+target/vector06c/games/joystick
+target/vector06c/games/keys_joystick
+target/vector06c/load_palette
+target/vector06c/asm_load_palette
 @stdio/stdio_8080.lst
 stdio/inkey/getk
 stdio/inkey/fgetc_cons
@@ -20,4 +24,9 @@ target/vector06c/graphics/w_xorpixl
 target/vector06c/graphics/w_pointxy
 @gfx/portable/gfx_portable_w.lst
 @gfx/wide/gfx_wide.lst
+target/vector06c/psg/set_psg
+target/vector06c/psg/set_psg_callee
+target/vector06c/psg/get_psg
+target/vector06c/psg/psg_init
+@psg/psg.lst
 @8080.lst
