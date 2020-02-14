@@ -11,13 +11,9 @@ __divuint:
         dec     hl
         ld      e,(hl)
         dec     hl
-        ld      a,(hl)
+        ld      b,(hl)
         dec     hl
-        ld      l,(hl)
-        ld      h,a
-
-        ld      b,h
-        ld      c,l
+        ld      c,(hl)
         call    l_divu16
 
         ld      e,c

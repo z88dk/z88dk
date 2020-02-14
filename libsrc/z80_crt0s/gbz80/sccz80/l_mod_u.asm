@@ -10,8 +10,9 @@ l_mod_u:
 	; Delegate to the sdcc routine 
 	; Entry BC=dividend, DE=divisor
 	; Exit: BC=quotient, DE=remainder
-	ld	c,l
-	ld	b,h
+	ld	c,e
+	ld	b,d
+	ex	de,hl
 	call	___divu16_bcde
 	ld	l,e
 	ld	h,d

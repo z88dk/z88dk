@@ -12,13 +12,9 @@ __divsint:
         dec     hl
         ld      e,(hl)
         dec     hl
-        ld      a,(hl)
-        dec     hl
-        ld      l,(hl)
-        ld      h,a
-
-        ld      b,h
-        ld      c,l
+        ld      b,(hl)
+	dec	hl
+        ld      c,(hl)
 
         call    l_div16
 
