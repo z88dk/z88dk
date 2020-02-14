@@ -22,12 +22,12 @@ CFILES = \
 OBJECTS = $(CFILES:.c=.o)
 
 
-all:    dirs $(SUBDIRS) $(addprefix obj/z80/, $(OBJECTS)) $(addprefix obj/ixiy/, $(OBJECTS)) 
+all:    dirs $(SUBDIRS) $(addprefix obj/z80/, $(OBJECTS)) $(addprefix obj/ixiy/, $(OBJECTS))  $(addprefix obj/8080/, $(OBJECTS))
 
 
 
 dirs:
-	@mkdir -p obj/z80 obj/ixiy 
+	@mkdir -p obj/z80 obj/ixiy obj/8080
 
 clean: subdirs-clean
 	$(RM) -fr obj
