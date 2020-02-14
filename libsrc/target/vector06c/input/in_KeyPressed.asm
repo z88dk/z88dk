@@ -23,10 +23,12 @@ EXTERN __vector06c_key_rows
 ._in_KeyPressed
 	ex	de,hl	;de = input values
 	ld	hl,__vector06c_key_rows
-	ld	c,e
+	ld	a,e
+	and	15
+	ld	c,a
 	ld	b,0
 	add	hl,bc
-	ld	c,(hl)			;Save it for a minute
+	ld	a,(hl)			;Save it for a minute
 	and	d
 	jr	z,fail
 	ld	hl,__vector06c_key_rows+8	;Move to control row
@@ -45,7 +47,6 @@ no_shift:
 no_control:
 	ld	a,(hl)			;What we read
 	and	@01100000		;Isolate keys
-	and	b			;Mask out what we want
 	cp	b			;Is it what we want?
 	jr	nz,fail
 	ld	hl,1
