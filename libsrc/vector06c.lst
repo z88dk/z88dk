@@ -7,6 +7,8 @@ target/vector06c/stdio/generic_console_vpeek
 target/vector06c/input/vector06c_key_interrupt
 target/vector06c/games/joystick
 target/vector06c/games/keys_joystick
+target/vector06c/load_palette
+target/vector06c/asm_load_palette
 @stdio/stdio_8080.lst
 stdio/inkey/getk
 stdio/inkey/fgetc_cons

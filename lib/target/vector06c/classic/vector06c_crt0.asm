@@ -19,6 +19,7 @@
 
         EXTERN    _main           ;main() is always external to crt0 code
         EXTERN    asm_im1_handler
+	EXTERN    asm_load_palette
 
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
@@ -57,26 +58,9 @@ program:
 
         ld a,$88
         out ($00),a
-	ei
-	halt
+	ld	hl,palette
+	call	asm_load_palette
 
-        ld hl,palette+15
-        ld de,$100f
-INIT1:  ld a,e
-        out ($02),a
-        ld A,(hl)
-        out ($0C),a
-        out ($0C),a
-        out ($0C),a
-        out ($0C),a
-        out ($0C),a
-        dec hl
-        out ($0C),a
-        dec e
-        out ($0C),a
-        dec d
-        out ($0C),a
-        jp nz,INIT1
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of
 ; the compiled program and the stack pointer
