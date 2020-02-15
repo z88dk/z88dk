@@ -18,7 +18,8 @@
 
 		
 generic_console_scrollup:
-        push    hl
+        push    de
+	push	bc
 		
 IF NOROMCALLS
 	; Code to be used when the original ROM is missing or not available
@@ -75,7 +76,8 @@ IF NOROMCALLS
 	ldir
 		
         pop     ix
-        pop     hl
+	pop	bc
+	pop	de
         ret
 ELSE
   IF FORts2068
@@ -94,13 +96,15 @@ ELSE
         call    call_rom3
         defw    3582    ;scrollup
 		
-        pop     hl
+	pop	bc
+	pop	de
         ret
 		
 .ts2068_rom
         call    call_rom3
         defw    $939    ; TS2068 scrollup
-        pop     hl
+	pop	bc
+	pop	de
         ret
 		
 ENDIF
@@ -190,6 +194,7 @@ clear_hires2:
 	pop	bc
 	djnz	clear_loop
         pop     ix
-        pop     hl
+	pop	bc
+	pop	de
         ret
 ENDIF
