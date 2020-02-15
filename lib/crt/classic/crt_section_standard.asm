@@ -76,6 +76,7 @@ ENDIF
 		SECTION rodata_fp_mbf64
 		SECTION rodata_compiler
 		SECTION rodata_clib
+		SECTION rodata_psg
 IF !__crt_org_graphics
 		SECTION rodata_graphics
 ENDIF
@@ -91,6 +92,7 @@ IF !__crt_model
 		SECTION smc_user
 		SECTION data_clib
 		SECTION data_stdlib
+		SECTION data_psg
 IF !__crt_org_graphics
 		SECTION data_graphics
 ENDIF
@@ -139,6 +141,7 @@ IF __crt_model > 0
 		SECTION data_clib
 		SECTION data_crt
 		SECTION data_stdlib
+		SECTION data_psg
 IF !__crt_org_graphics
 		SECTION data_graphics
 ENDIF
