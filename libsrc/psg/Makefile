@@ -6,7 +6,7 @@
 
 include ../Make.config
 
-SUBDIRS = wyz
+SUBDIRS = wyz vt2
 
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
