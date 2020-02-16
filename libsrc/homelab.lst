@@ -1,4 +1,5 @@
 target/homelab/stdio/generic_console
+target/homelab/stdio/fgetc_cons
 @stdio/stdio.lst
 target/homelab/graphics/textpixl
 @gfx/gencon/gfx_gencon.lst

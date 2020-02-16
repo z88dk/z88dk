@@ -23,14 +23,11 @@
         PUBLIC    l_dcal          ;jp(hl)
 
 
+        defc    TAR__fputc_cons_generic = 1
         defc    TAR__clib_exit_stack_size = 4
-        defc    TAR__register_sp = $7ff0
+        defc    TAR__register_sp = -1
 	defc	CRT_KEY_DEL = 8
 	defc	__CPU_CLOCK = 3000000
-        defc    GRAPHICS_CHAR_SET = 96
-        defc    GRAPHICS_CHAR_UNSET = 32
-        PUBLIC  GRAPHICS_CHAR_SET
-        PUBLIC  GRAPHICS_CHAR_UNSET
         INCLUDE "crt/classic/crt_rules.inc"
 
         defc CRT_ORG_CODE = 0x4300
@@ -44,6 +41,7 @@ program:
 	ld	hl,0
 	add	hl,sp
 	ld	(exitsp),hl
+	out	($ff),a
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of
 ; the compiled program and the stack pointer
