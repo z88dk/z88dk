@@ -1,0 +1,5 @@
+target/homelab/stdio/generic_console
+@stdio/stdio.lst
+target/homelab/graphics/textpixl
+@gfx/gencon/gfx_gencon.lst
+@z80.lst
