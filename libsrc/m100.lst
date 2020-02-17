@@ -1,3 +1,6 @@
+target/m100/stdio/fgetc_cons
+target/m100/stdio/fputc_cons
+target/m100/stdio/getk
 @stdio/stdio_8080.lst
 @time/time.lst
 @font/font_8x8/font_8x8.lst
