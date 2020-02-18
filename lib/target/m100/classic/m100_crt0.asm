@@ -37,8 +37,10 @@
         defc    TAR__register_sp = -1 
 	defc	CRT_KEY_DEL = 12
 	defc	__CPU_CLOCK = 2048000
-	defc	CONSOLE_COLUMNS = 48
-	defc	CONSOLE_ROWS = 32
+
+	defc	CONSOLE_COLUMNS = 80
+	defc	CONSOLE_ROWS = 8
+
         INCLUDE "crt/classic/crt_rules.inc"
 
         IF      !DEFINED_CRT_ORG_CODE
