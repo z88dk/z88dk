@@ -1,14 +1,14 @@
 
 		SECTION		code_clib
-		PUBLIC		nmi_install_isr
-		PUBLIC		_nmi_install_isr
+		PUBLIC		nmi_uninstall_isr
+		PUBLIC		_nmi_uninstall_isr
 
 		EXTERN		nmi_vectors
 		EXTERN		CLIB_NMI_VECTOR_COUNT
 		EXTERN		asm_interrupt_remove_handler
 
-nmi_install_isr:
-_nmi_install_isr:
+nmi_uninstall_isr:
+_nmi_uninstall_isr:
 	pop	bc
 	pop	de
 	push	de

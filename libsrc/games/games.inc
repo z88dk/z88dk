@@ -301,6 +301,12 @@ IF FORpmd85
         defc sndbit_mask   = 0
 ENDIF
 
+IF FORvector06c
+        defc sndbit_port   = 0
+        defc sndbit_bit    = 0
+        defc sndbit_mask   = 0
+ENDIF
+  
 IF FORm100
         defc sndbit_port   = 0
         defc sndbit_bit    = 0

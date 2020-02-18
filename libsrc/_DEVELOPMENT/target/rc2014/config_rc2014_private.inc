@@ -713,7 +713,7 @@ defc __IDE_CMD_ID = 0xEC
 
 
 
-defc __IO_LUT_OPERAND_LATCH  = 0x42
+defc __IO_LUT_OPERAND_LATCH  = 0x40
 defc __IO_LUT_RESULT_MSB  = 0x41
 defc __IO_LUT_RESULT_LSB  = 0x40
 

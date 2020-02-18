@@ -712,7 +712,7 @@
 
 
 
-#define __IO_LUT_OPERAND_LATCH  0x42
+#define __IO_LUT_OPERAND_LATCH  0x40
 #define __IO_LUT_RESULT_MSB  0x41
 #define __IO_LUT_RESULT_LSB  0x40
 

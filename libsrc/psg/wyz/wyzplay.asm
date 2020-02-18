@@ -15,12 +15,15 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	PUBLIC	asm_wyz_start
 	PUBLIC	asm_wyz_stop
 	PUBLIC	asm_wyz_player_init
+	PUBLIC	asm_wyz_start_effect
+	PUBLIC	asm_wyz_stop_effect
 
 	; Initialised outside to setup song
 	PUBLIC	asm_wyz_TABLA_PAUTAS
 	PUBLIC	asm_wyz_TABLA_SONIDOS
 	PUBLIC	asm_wyz_TABLA_SONG
 	PUBLIC	asm_wyz_DATOS_NOTAS
+	PUBLIC	asm_wyz_TABLA_EFECTOS
 
 	; Read by the hardware routines
 	PUBLIC	asm_wyz_PSG_REG
@@ -38,13 +41,13 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__
 asm_wyz_play:
 INICIO:    
     CALL    asm_wyz_hardware_out
-    LD	HL,asm_wyz_PSG_REG
-    LD	DE,asm_wyz_PSG_REG_SEC
-    LD	BC,14
+    LD      HL,asm_wyz_PSG_REG
+    LD      DE,asm_wyz_PSG_REG_SEC
+    LD      BC,14
     LDIR	
     CALL    REPRODUCE_SONIDO
     CALL    PLAY
-;    CALL    REPRODUCE_EFECTO
+    CALL    REPRODUCE_EFECTO
     RET    
     
       	
@@ -906,7 +909,7 @@ CRTBC0:    ;AND	A    	;1/4 - 1/8 - 1/16
     AND     00000110B    ;$08,$0A,$0C,$0E
     ADD     8    
     LD      (asm_wyz_PSG_REG+13),A
-   	LD      (asm_wyz_ENVOLVENTE_BACK),A
+    LD      (asm_wyz_ENVOLVENTE_BACK),A
     RET
 
 
@@ -924,6 +927,77 @@ EXT_WORD:
     INC     HL
     LD      D,(HL)
     EX      DE,HL
+    RET
+
+; Initialise playing an effect
+; Entry: a = channel
+;        b = effect to play
+asm_wyz_start_effect:
+INICIA_EFECTO:
+    ld      (CANAL_EFECTOS),a
+    ld      a,b
+    LD      HL,(asm_wyz_TABLA_EFECTOS)
+    CALL    EXT_WORD
+    LD      (PUNTERO_EFECTO),HL
+    LD      HL,INTERR
+    SET     3,(HL)
+    RET
+
+REPRODUCE_EFECTO:
+    LD      HL,INTERR
+    BIT     3,(HL)                  ;ESTA ACTIVADO EL EFECTO?
+    RET     Z
+    LD      HL,(PUNTERO_EFECTO)
+    LD      A,(HL)
+    CP      $FF
+    JP      Z,FIN_EFECTO
+    LD      B,A                     ;FRECUENCIA FINO
+    INC     HL
+    LD      A,(HL)
+    RRCA
+    RRCA
+    RRCA
+    RRCA
+    AND     00001111B
+    LD      C,A                     ;       FRECUENCIA GRAVE
+    ;LD      A,10111000B            ;       ELIMINA RUIDO
+    ;LD      (asm_wyz_PSG_REG_SEC+7),A
+    LD      A,(HL)
+    DEC     A                       ;DEC A PARA BAJR VOLUMEN!! O PONER VARIABLE
+    ;DEC    A
+    AND     00001111B
+
+    LD      D,A                     ;VOLUMEN
+    INC     HL                      ;INCREMENTA Y GUARDA EL PUNTERO
+    LD      (PUNTERO_EFECTO),HL
+    LD      IX,asm_wyz_PSG_REG_SEC
+    LD      A,(CANAL_EFECTOS)       ;SELECCION DE CANAL *********
+    CP      1
+    JR      Z,RS_CANALA
+    CP      2
+    JR      Z,RS_CANALB
+RS_CANALC:    
+    LD      (IX+4),B
+    LD      (IX+5),C
+    LD      (IX+10),D
+    RET
+
+RS_CANALA:
+    LD      (IX+0),B
+    LD      (IX+1),C
+    LD      (IX+8),D
+    RET
+
+RS_CANALB:
+    LD      (IX+2),B
+    LD      (IX+3),C
+    LD      (IX+9),D
+    RET
+
+asm_wyz_stop_effect:
+FIN_EFECTO:
+    LD      HL,INTERR
+    RES     3,(HL)                  ;DESACTIVA EFECTO
     RET
     
 ;TABLA DE DATOS DEL SELECTOR DEL CANAL DE EFECTOS DE RITMO
@@ -975,10 +1049,12 @@ TTEMPO:         defb     0	       ;DB CONTADOR TEMPO
 PUNTERO_A:      defw     0	       ;DW PUNTERO DEL CANAL A
 PUNTERO_B:      defw     0	       ;DW PUNTERO DEL CANAL B
 PUNTERO_C:      defw     0	       ;DW PUNTERO DEL CANAL C
+PUNTERO_EFECTO: defw     0	       ;DW PUNTERO DEL SONIDO QUE SE REPRODUCE;REPRODUCE EFECTOS
 
 CANAL_A:        defw     0    ;DW DIRECION DE INICIO DE LA MUSICA A
 CANAL_B:        defw     0          ;DW DIRECION DE INICIO DE LA MUSICA B
 CANAL_C:        defw     0          ;DW DIRECION DE INICIO DE LA MUSICA C
+CANAL_EFECTOS:	defb	 3	    ;DB : 1:CANAL A - 2:CANAL B - OTRO:CANAL C
 
 PUNTERO_P_A:    defw     0          ;DW PUNTERO PAUTA CANAL A
 PUNTERO_P_B:    defw     0	        ;DW PUNTERO PAUTA CANAL B
@@ -1054,5 +1130,6 @@ asm_wyz_TABLA_PAUTAS:	defw	0
 asm_wyz_TABLA_SONIDOS:	defw	0
 asm_wyz_DATOS_NOTAS:	defw	0
 asm_wyz_TABLA_SONG:	defw	0
+asm_wyz_TABLA_EFECTOS:	defw	0
 
 ENDIF

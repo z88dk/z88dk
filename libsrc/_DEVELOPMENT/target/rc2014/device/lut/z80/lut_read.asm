@@ -32,9 +32,8 @@ PUBLIC asm_lut_read
     ld b,h                      ; 4  operand Y in B
     ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
     out (c),l                   ; 12 operand X from L
-    dec c                       ; 4  result MSB address
-    in h,(c)                    ; 12 result Z MSB to H
-    dec c                       ; 4  result LSB address
     in l,(c)                    ; 12 result Z LSB to L
+    inc c                       ; 4  result MSB address
+    in h,(c)                    ; 12 result Z MSB to H
     ret                         ; 10
 

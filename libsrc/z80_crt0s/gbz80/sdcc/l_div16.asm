@@ -73,9 +73,6 @@ dodiv:
         ;; Negate quotient if it is negative
         pop     af              ; recover sign of quotient
         and     0x80
-        ;; Negate quotient if it is negative
-        pop     af              ; recover sign of quotient
-        and     0x80
         jr      Z,dorem        ; Jump if quotient is positive
         sub     a               ; Substract quotient from 0
         sub     c

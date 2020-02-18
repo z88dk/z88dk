@@ -206,18 +206,16 @@ ELSE
     ld b,h                      ; 4  operand Y in B
     ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
     out (c),l                   ; 12 operand X from L
-    dec c                       ; 4  result MSB address
-    in h,(c)                    ; 12 result Z MSB to H
-    dec c                       ; 4  result LSB address
     in l,(c)                    ; 12 result Z LSB to L
+    inc c                       ; 4  result MSB address
+    in h,(c)                    ; 12 result Z MSB to H
 ;;; MLT DE (BC) ;;;;;;;;;;;;;;;;; y3*x0
     ld b,d                      ; 4  operand Y in B
-    ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
+    dec c                       ; 4  operand latch address
     out (c),e                   ; 12 operand X from E
-    dec c                       ; 4  result MSB address
-    in d,(c)                    ; 12 result Z MSB to D
-    dec c                       ; 4  result LSB address
     in e,(c)                    ; 12 result Z LSB to E
+    inc c                       ; 4  result MSB address
+    in d,(c)                    ; 12 result Z MSB to D
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     xor a                       ; zero A
@@ -235,10 +233,9 @@ ELSE
     ld b,d                      ; 4  operand Y in B
     ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
     out (c),e                   ; 12 operand X from E
-    dec c                       ; 4  result MSB address
-    in d,(c)                    ; 12 result Z MSB to D
-    dec c                       ; 4  result LSB address
     in e,(c)                    ; 12 result Z LSB to E
+    inc c                       ; 4  result MSB address
+    in d,(c)                    ; 12 result Z MSB to D
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     ex af,af
@@ -247,12 +244,11 @@ ELSE
     pop de                      ; y1 x2
 ;;; MLT DE (BC) ;;;;;;;;;;;;;;;;; y1*x2
     ld b,d                      ; 4  operand Y in B
-    ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
+    dec c                       ; 4  operand latch address
     out (c),e                   ; 12 operand X from E
-    dec c                       ; 4  result MSB address
-    in d,(c)                    ; 12 result Z MSB to D
-    dec c                       ; 4  result LSB address
     in e,(c)                    ; 12 result Z LSB to E
+    inc c                       ; 4  result MSB address
+    in d,(c)                    ; 12 result Z MSB to D
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
      
     add hl,de                   ; p4 p3
@@ -277,10 +273,9 @@ ELSE
     ld b,d                      ; 4  operand Y in B
     ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
     out (c),e                   ; 12 operand X from E
-    dec c                       ; 4  result MSB address
-    in d,(c)                    ; 12 result Z MSB to D
-    dec c                       ; 4  result LSB address
     in e,(c)                    ; 12 result Z LSB to E
+    inc c                       ; 4  result MSB address
+    in d,(c)                    ; 12 result Z MSB to D
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     xor a                       ; zero A
@@ -289,12 +284,11 @@ ELSE
     pop de                      ; x3 y1
 ;;; MLT DE (BC) ;;;;;;;;;;;;;;;;; x3*y1
     ld b,d                      ; 4  operand Y in B
-    ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
+    dec c                       ; 4  operand latch address
     out (c),e                   ; 12 operand X from E
-    dec c                       ; 4  result MSB address
-    in d,(c)                    ; 12 result Z MSB to D
-    dec c                       ; 4  result LSB address
     in e,(c)                    ; 12 result Z LSB to E
+    inc c                       ; 4  result MSB address
+    in d,(c)                    ; 12 result Z MSB to D
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     add hl,de                   ; p5 p4
@@ -303,12 +297,11 @@ ELSE
     pop de                      ; x2 y2
 ;;; MLT DE (BC) ;;;;;;;;;;;;;;;;; x2*y2
     ld b,d                      ; 4  operand Y in B
-    ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
+    dec c                       ; 4  operand latch address
     out (c),e                   ; 12 operand X from E
-    dec c                       ; 4  result MSB address
-    in d,(c)                    ; 12 result Z MSB to D
-    dec c                       ; 4  result LSB address
     in e,(c)                    ; 12 result Z LSB to E
+    inc c                       ; 4  result MSB address
+    in d,(c)                    ; 12 result Z MSB to D
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     add hl,de                   ; p5 p4
@@ -333,10 +326,9 @@ ELSE
     ld b,d                      ; 4  operand Y in B
     ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
     out (c),e                   ; 12 operand X from E
-    dec c                       ; 4  result MSB address
-    in d,(c)                    ; 12 result Z MSB to D
-    dec c                       ; 4  result LSB address
     in e,(c)                    ; 12 result Z LSB to E
+    inc c                       ; 4  result MSB address
+    in d,(c)                    ; 12 result Z MSB to D
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     xor a                       ; zero A
@@ -351,10 +343,9 @@ ELSE
     ld b,d                      ; 4  operand Y in B
     ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
     out (c),e                   ; 12 operand X from E
-    dec c                       ; 4  result MSB address
-    in d,(c)                    ; 12 result Z MSB to D
-    dec c                       ; 4  result LSB address
     in e,(c)                    ; 12 result Z LSB to E
+    inc c                       ; 4  result MSB address
+    in d,(c)                    ; 12 result Z MSB to D
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     add hl,de                   ; p6 p5
@@ -374,10 +365,9 @@ ELSE
     ld b,d                      ; 4  operand Y in B
     ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
     out (c),e                   ; 12 operand X from E
-    dec c                       ; 4  result MSB address
-    in d,(c)                    ; 12 result Z MSB to D
-    dec c                       ; 4  result LSB address
     in e,(c)                    ; 12 result Z LSB to E
+    inc c                       ; 4  result MSB address
+    in d,(c)                    ; 12 result Z MSB to D
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     add hl,de                   ; p7 p6 in HL
