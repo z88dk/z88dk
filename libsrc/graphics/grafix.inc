@@ -584,6 +584,12 @@ IF FORvector06c
 	defc blankch = 32
 ENDIF
 
+IF FORhomelab
+	DEFINE gotgfx
+	defc maxx = 128
+	defc maxy = 64
+ENDIF
+
 IF FORgb
 	defc USEplotc   = 1		; We call generic_console_plotc, not _printc for text mode
 ENDIF

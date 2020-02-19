@@ -1,0 +1,13 @@
+target/homelab/stdio/generic_console
+target/homelab/stdio/fgetc_cons
+target/homelab/stdio/getk
+@stdio/stdio.lst
+stdio/inkey/getk
+stdio/inkey/fgetc_cons
+@input/input_keyboard.lst
+target/homelab/games/joystick.asm
+target/homelab/games/keys_joystick.asm
+@games/games.lst
+target/homelab/graphics/textpixl
+@gfx/gencon/gfx_gencon.lst
+@z80.lst

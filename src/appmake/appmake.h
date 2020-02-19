@@ -97,6 +97,9 @@ extern option_t  gb_options;
 extern int       hex_exec(char *target);
 extern option_t  hex_options;
 
+extern int       homelab_exec(char *target);
+extern option_t  homelab_options;
+
 extern int       inject_exec(char *target);
 extern option_t  inject_options;
 extern char      inject_longhelp[];
@@ -313,6 +316,10 @@ struct {
       "Creates an intel hex record suitable for embedded devices",
       NULL,
       hex_exec,     &hex_options },
+    { "bin2htp",  "homelab",  "(C) 2020 z88dk",
+      "Creates a .htp file for Homelab emulators",
+      NULL,
+      homelab_exec,    &homelab_options },
     { "inject",  "inject",      "(C) 2014 Dominic Morris",
       "Injects files within other files",
       inject_longhelp,
