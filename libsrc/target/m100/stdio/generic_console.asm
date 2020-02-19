@@ -29,9 +29,17 @@ generic_console_set_ink:
 	ret
 
 generic_console_scrollup:
-	call $45ED	; SCROLL_ALTLCD
-	ld	l,1
-	jp	$44C7	; ESC_M_0
+	push bc
+	push de
+	ld	bc,$0808
+	call generic_console_xypos
+	ld	a,13
+	rst $20
+	ld	a,10
+	rst $20
+	pop de
+	pop bc
+	ret
   
 generic_console_cls:
 	ld	a,12
@@ -55,8 +63,10 @@ generic_console_printc:
 ; Exit:	hl = address
 generic_console_xypos:
 	ld	a,c
+	inc a
 	ld	($f63a),a	; CSRY
 	ld	a,b
+	inc a
 	ld	($f639),a	; CSRX
 	ret
 
