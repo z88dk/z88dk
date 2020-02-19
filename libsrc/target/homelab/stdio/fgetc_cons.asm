@@ -9,7 +9,7 @@ fgetc_cons:
 _fgetc_cons:
 	call	$85
 	and	a
-	jr	z,fgetc_cons
+	jr	z,fgetc_cons_native
 	ld	l,a
 	ld	h,0
 	ret

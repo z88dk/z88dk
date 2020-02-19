@@ -319,6 +319,12 @@ IF FORmyvision
     defc sndbit_mask   = 0
 ENDIF
 
+IF FORhomelab
+    defc sndbit_port	= 0
+    defc sndbit_bit    = 0
+    defc sndbit_mask   = 0
+ENDIF
+
 
 ; ********************************************************
 ;  SN76489 PSG chip definitions

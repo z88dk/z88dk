@@ -1464,6 +1464,7 @@ homelab_clib.lib:
 	@echo '--- Building Homelab Library ---'
 	@echo ''
 	$(call buildgeneric,homelab,"gencon narrow")
+	$(MAKE) -C games TARGET=homelab
 	TARGET=homelab TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORhomelab -x$(OUTPUT_DIRECTORY)/homelab_clib @$(LISTFILE_DIRECTORY)/homelab.lst
 
 
