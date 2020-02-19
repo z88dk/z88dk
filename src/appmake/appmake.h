@@ -198,6 +198,9 @@ extern option_t  tixx_options;
 extern int       trs80_exec(char *target);
 extern option_t  trs80_options;
 
+extern int       vector06c_exec(char *target);
+extern option_t  vector06c_options;
+
 extern int       vg5k_exec(char *target);
 extern option_t  vg5k_options;
 
@@ -465,6 +468,10 @@ struct {
       "Creates a CMD file for the TRS 80",
       NULL,
       trs80_exec,   &trs80_options },
+    { "bin2fdd",  "vector06c", "(C) 2020 z88dk",
+      "Create a bootable vector06c disk",
+      NULL,
+      vector06c_exec,    &vector06c_options },
     { "vg5k2k7",    "vg5k",     "(C) 2014 Stefano Bodrato",
       "Convert to Philips VG-5000 .k7 format, optionally to WAV",
       NULL,

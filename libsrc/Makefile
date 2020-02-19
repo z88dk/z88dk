@@ -29,7 +29,7 @@ all: genlibs z88libs tilibs zxlibs enterprise_clib.lib c128ansi_clib.lib nclibs 
 	adam.lib z80tvgame_clib.lib smc777_cpm.lib pasopia7_clib.lib sv8000_clib.lib \
 	excali64_clib.lib gb_clib.lib s1mp3_clib.lib bic.lib myvision_clib.lib pencil2_clib.lib \
 	preempt.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib tvc_clib.lib hemc_clib.lib \
-	kramermc_clib.lib hgmc_clib.lib pmd85_clib.lib vector06c_clib.lib homelab_clib.lib
+	kramermc_clib.lib hgmc_clib.lib pmd85_clib.lib vector06c_clib.lib homelab_clib.lib m100_clib.lib
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib mbf32.lib mbf64.lib math32.lib gendos.lib ndos.lib  \
 	 lib3d.lib fastmath.lib
@@ -1449,6 +1449,15 @@ pmd85_clib.lib:
 	$(MAKE) -C games TARGET=pmd85
 	TARGET=pmd85 TYPE=8080 $(LIBLINKER) -m8080 -DFORpmd85 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pmd85_clib @$(LISTFILE_DIRECTORY)/pmd85.lst
 
+
+m100_clib.lib:
+	@echo ''
+	@echo '--- Building m100 Library ---'
+	@echo ''
+	$(call buildgeneric,m100,portable)
+	$(MAKE) -C games TARGET=m100
+	TARGET=m100 TYPE=8080 $(LIBLINKER) -m8080 -DFORm100 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/m100_clib @$(LISTFILE_DIRECTORY)/m100.lst
+
 vector06c_clib.lib:
 	@echo ''
 	@echo '--- Building Vector06c Library ---'
@@ -1466,7 +1475,6 @@ homelab_clib.lib:
 	$(call buildgeneric,homelab,"gencon narrow")
 	$(MAKE) -C games TARGET=homelab
 	TARGET=homelab TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORhomelab -x$(OUTPUT_DIRECTORY)/homelab_clib @$(LISTFILE_DIRECTORY)/homelab.lst
-
 
 
 # Preempt multitasking library - dom

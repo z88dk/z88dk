@@ -570,6 +570,13 @@ IF FORpmd85
 	defc blankch = 32
 ENDIF
 
+IF FORm100
+	DEFINE gotgfx
+	defc maxx = 480
+	defc maxy = 64
+	defc blankch = 32
+ENDIF
+
 IF FORvector06c
 	DEFINE gotgfx
 	defc maxx = 256
