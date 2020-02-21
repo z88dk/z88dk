@@ -1,3 +1,4 @@
+@target/zx81/gfx81_specific.lst
 target/zx81/graphics_hr/clg
 target/zx81/graphics_hr/_clg_hr
 target/zx81/graphics_hr/clrarea_arx
