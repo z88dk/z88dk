@@ -1,3 +1,4 @@
+@target/zx81/gfx81_specific.lst
 target/zx81/graphics_udg/clg
 target/zx81/graphics/clsgraph
 target/zx81/graphics_udg/zx_hardcopy
