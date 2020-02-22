@@ -56,7 +56,7 @@ static void add_bitfield(Type *bitfield, int *value)
     Kind valtype;
     double cvalue;
 
-    if (constexpr(&cvalue, &valtype, 1)) {
+    if (constexpr(&cvalue, &valtype, 0)) {
         int ival = ((int)cvalue & (( 1 << bitfield->bit_size) - 1)) << bitfield->bit_offset;
         check_assign_range(bitfield, cvalue);
         *value |= ival;
@@ -285,7 +285,11 @@ static int init(Type *type, int dump)
                                 break;                                
                             }
                         }
-                    }
+                    } else if ( rcmatch('+') || rcmatch('-') ) {
+                        if ( constexpr(&value, &valtype, 1) ) {
+                            offset = value;
+                        }
+                    } 
                     defword();
                     outname(ptr->name, dopref(ptr));
                     outfmt(" + %d",offset);

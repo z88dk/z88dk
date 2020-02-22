@@ -628,7 +628,7 @@ static void parse_trailing_modifiers(Type *type)
             double   val;
             Kind     valtype;
 
-            if (constexpr(&val,&valtype, 1) == 0 ) {
+            if (constexpr(&val,&valtype, 0) == 0 ) {
                 errorfmt("Expecting a constant expression for __z88dk_params_offset", 1);
                 val = 0;
             }
@@ -639,14 +639,14 @@ static void parse_trailing_modifiers(Type *type)
             Kind  valtype;
 
             needchar('(');
-            if (constexpr(&rstnumber,&valtype, 1) == 0 ) {
+            if (constexpr(&rstnumber,&valtype, 0) == 0 ) {
                 errorfmt("Expecting a restart number",1);
             } else {
                 if ( rstnumber < 0 || rstnumber > 0x38 || ((int)rstnumber % 8 ) ) {
                     errorfmt("Invalid rst number: %d",1, (int)rstnumber);
                 } 
                 needchar(',');
-                if (  constexpr(&val,&valtype, 1) == 0 ) {
+                if (  constexpr(&val,&valtype,0) == 0 ) {
                     errorfmt("Expecting a constant call number",1);
                 } else {
                     if ( val < 0 || val > 65535 ) {
