@@ -791,22 +791,11 @@ int constexpr(double *val, Kind *type, int flag)
     int con;
     int savesp = Zsp;
     int valtype;
-    int sign = 1;
-    int needbrack = 0;
     Type   *type_ptr;
     
-    if ( cmatch('-')) {
-        sign = -1;
-    } else if ( cmatch('+')) {
-        sign = 1;
-    }
-    if ( cmatch('(')) {
-        needbrack = 1;
-    }
-
     setstage(&before, &start);
     valtype = expression(&con, &valtemp, &type_ptr);
-    *val = valtemp * sign;
+    *val = valtemp;
     clearstage(before, 0); /* scratch generated code */
     if ( valtype == KIND_DOUBLE && con ) {
         decrement_double_ref_direct(valtemp);
@@ -815,9 +804,6 @@ int constexpr(double *val, Kind *type, int flag)
     Zsp = savesp;
     if (flag && con == 0)
         errorfmt("Expecting constant expression", 0 );
-    if ( needbrack ) {
-        needchar(')');
-    }
     return con;
 }
 

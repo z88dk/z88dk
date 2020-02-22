@@ -285,9 +285,13 @@ static int init(Type *type, int dump)
                                 break;                                
                             }
                         }
-                    } else if ( rcmatch('+') || rcmatch('-') ) {
+                    } else if ( cmatch('+') ) {                      
                         if ( constexpr(&value, &valtype, 1) ) {
                             offset = value;
+                        }
+                    } else if ( cmatch('-') ) {                      
+                        if ( constexpr(&value, &valtype, 1) ) {
+                            offset = value * -1;
                         }
                     } 
                     defword();

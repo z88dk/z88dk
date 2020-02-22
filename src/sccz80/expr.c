@@ -680,7 +680,7 @@ int heirb(LVALUE* lval)
                     //    if (lval->flags&FARPTR) zpop();
                 }
                 ptr = deref(lval, YES);
-		k = lval->ltype->kind == KIND_ARRAY ? 0 : 1;
+                k = lval->ltype->kind == KIND_ARRAY ? 0 : 1;
             } else if (cmatch('(')) {
                 Type *return_type = type_void;
                 int   flags = 0;
