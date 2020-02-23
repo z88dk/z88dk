@@ -73,8 +73,8 @@ typedef unsigned char UBaseType_t;
     do{                             \
         __asm                       \
             ld a,i                  \
-            push af                 \
             di                      \
+            push af                 \
         __endasm;                   \
     }while(0)
 
