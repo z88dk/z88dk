@@ -62,7 +62,7 @@
 					drawto ( cx+(int) (x(t)*scale), cy-(y(t)*scale));
 		}
 		
-		while (getk() != 13) {};
+		while (getk() != '\n') {};
 
 	}
   

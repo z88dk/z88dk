@@ -149,6 +149,6 @@ void main()
     }
 
     win_close(&win);
-    while (getk() != 13)
+    while (getk() != '\n')
         ;
 }

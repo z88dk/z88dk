@@ -61,7 +61,7 @@
 			for (y=0; y<a[x]; y++)
 				putsprite (spr_or,x*10-20,getmaxy()-(y*3)-12,dot);
 			
-		while (getk() != 13) {};
+	        while (getk() != '\n') {};
 		}
 	}
 

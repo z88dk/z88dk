@@ -32,5 +32,5 @@ void main()
     }    
   }  
 	
-	while (getk() != 13) {};
+  while (getk() != '\n') {};
 }
