@@ -150,9 +150,6 @@ typedef TickType_t EventBits_t;
 #if( configSUPPORT_DYNAMIC_ALLOCATION == 1 )
 //  EventGroupHandle_t xEventGroupCreate( void ) PRIVILEGED_FUNCTION;
     extern EventGroupHandle_t xEventGroupCreate(void) __preserves_regs(iyh,iyl);
-extern EventGroupHandle_t xEventGroupCreate_fastcall(void) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define xEventGroupCreate(a) xEventGroupCreate_fastcall(a)
-
 
 #endif
 
@@ -208,9 +205,6 @@ extern EventGroupHandle_t xEventGroupCreate_fastcall(void) __preserves_regs(iyh,
 #if( configSUPPORT_STATIC_ALLOCATION == 1 )
 //  EventGroupHandle_t xEventGroupCreateStatic( StaticEventGroup_t *pxEventGroupBuffer ) PRIVILEGED_FUNCTION;
     extern EventGroupHandle_t xEventGroupCreateStatic(StaticEventGroup_t *pxEventGroupBuffer) __preserves_regs(iyh,iyl);
-extern EventGroupHandle_t xEventGroupCreateStatic_fastcall(StaticEventGroup_t *pxEventGroupBuffer) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define xEventGroupCreateStatic(a) xEventGroupCreateStatic_fastcall(a)
-
 
 #endif
 
@@ -308,9 +302,6 @@ extern EventGroupHandle_t xEventGroupCreateStatic_fastcall(StaticEventGroup_t *p
  */
 //  EventBits_t xEventGroupWaitBits( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToWaitFor, const BaseType_t xClearOnExit, const BaseType_t xWaitForAllBits, TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
 extern EventBits_t xEventGroupWaitBits(EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToWaitFor,const BaseType_t xClearOnExit,const BaseType_t xWaitForAllBits,TickType_t xTicksToWait) __preserves_regs(iyh,iyl);
-extern EventBits_t xEventGroupWaitBits_callee(EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToWaitFor,const BaseType_t xClearOnExit,const BaseType_t xWaitForAllBits,TickType_t xTicksToWait) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define xEventGroupWaitBits(a,b,c,d,e) xEventGroupWaitBits_callee(a,b,c,d,e)
-
 
 
 /**
@@ -370,9 +361,6 @@ extern EventBits_t xEventGroupWaitBits_callee(EventGroupHandle_t xEventGroup,con
  */
 //  EventBits_t xEventGroupClearBits( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToClear ) PRIVILEGED_FUNCTION;
 extern EventBits_t xEventGroupClearBits(EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToClear) __preserves_regs(iyh,iyl);
-extern EventBits_t xEventGroupClearBits_callee(EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToClear) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define xEventGroupClearBits(a,b) xEventGroupClearBits_callee(a,b)
-
 
 
 /**
@@ -431,9 +419,6 @@ extern EventBits_t xEventGroupClearBits_callee(EventGroupHandle_t xEventGroup,co
 #if( configUSE_TRACE_FACILITY == 1 )
 //  BaseType_t xEventGroupClearBitsFromISR( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToClear ) PRIVILEGED_FUNCTION;
     extern BaseType_t xEventGroupClearBitsFromISR(EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToClear) __preserves_regs(iyh,iyl);
-extern BaseType_t xEventGroupClearBitsFromISR_callee(EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToClear) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define xEventGroupClearBitsFromISR(a,b) xEventGroupClearBitsFromISR_callee(a,b)
-
 
 #else
     #define xEventGroupClearBitsFromISR( xEventGroup, uxBitsToClear ) xTimerPendFunctionCallFromISR( vEventGroupClearBitsCallback, ( void * ) xEventGroup, ( uint32_t ) uxBitsToClear, NULL )
@@ -513,9 +498,6 @@ extern BaseType_t xEventGroupClearBitsFromISR_callee(EventGroupHandle_t xEventGr
  */
 //  EventBits_t xEventGroupSetBits( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToSet ) PRIVILEGED_FUNCTION;
 extern EventBits_t xEventGroupSetBits(EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToSet) __preserves_regs(iyh,iyl);
-extern EventBits_t xEventGroupSetBits_callee(EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToSet) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define xEventGroupSetBits(a,b) xEventGroupSetBits_callee(a,b)
-
 
 
 /**
@@ -593,9 +575,6 @@ extern EventBits_t xEventGroupSetBits_callee(EventGroupHandle_t xEventGroup,cons
 #if( configUSE_TRACE_FACILITY == 1 )
 //  BaseType_t xEventGroupSetBitsFromISR( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToSet, BaseType_t *pxHigherPriorityTaskWoken ) PRIVILEGED_FUNCTION;
     extern BaseType_t xEventGroupSetBitsFromISR(EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToSet,BaseType_t *pxHigherPriorityTaskWoken) __preserves_regs(iyh,iyl);
-extern BaseType_t xEventGroupSetBitsFromISR_callee(EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToSet,BaseType_t *pxHigherPriorityTaskWoken) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define xEventGroupSetBitsFromISR(a,b,c) xEventGroupSetBitsFromISR_callee(a,b,c)
-
 
 #else
     #define xEventGroupSetBitsFromISR( xEventGroup, uxBitsToSet, pxHigherPriorityTaskWoken ) xTimerPendFunctionCallFromISR( vEventGroupSetBitsCallback, ( void * ) xEventGroup, ( uint32_t ) uxBitsToSet, pxHigherPriorityTaskWoken )
@@ -727,9 +706,6 @@ extern BaseType_t xEventGroupSetBitsFromISR_callee(EventGroupHandle_t xEventGrou
  */
 //  EventBits_t xEventGroupSync( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToSet, const EventBits_t uxBitsToWaitFor, TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
 extern EventBits_t xEventGroupSync(EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToSet,const EventBits_t uxBitsToWaitFor,TickType_t xTicksToWait) __preserves_regs(iyh,iyl);
-extern EventBits_t xEventGroupSync_callee(EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToSet,const EventBits_t uxBitsToWaitFor,TickType_t xTicksToWait) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define xEventGroupSync(a,b,c,d) xEventGroupSync_callee(a,b,c,d)
-
 
 
 
@@ -768,9 +744,6 @@ extern EventBits_t xEventGroupSync_callee(EventGroupHandle_t xEventGroup,const E
  */
 //  EventBits_t xEventGroupGetBitsFromISR( EventGroupHandle_t xEventGroup ) PRIVILEGED_FUNCTION;
 extern EventBits_t xEventGroupGetBitsFromISR(EventGroupHandle_t xEventGroup) __preserves_regs(iyh,iyl);
-extern EventBits_t xEventGroupGetBitsFromISR_fastcall(EventGroupHandle_t xEventGroup) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define xEventGroupGetBitsFromISR(a) xEventGroupGetBitsFromISR_fastcall(a)
-
 
 
 /**
@@ -787,37 +760,22 @@ extern EventBits_t xEventGroupGetBitsFromISR_fastcall(EventGroupHandle_t xEventG
  */
 //  void vEventGroupDelete( EventGroupHandle_t xEventGroup ) PRIVILEGED_FUNCTION;
 extern void vEventGroupDelete(EventGroupHandle_t xEventGroup) __preserves_regs(iyh,iyl);
-extern void vEventGroupDelete_fastcall(EventGroupHandle_t xEventGroup) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define vEventGroupDelete(a) vEventGroupDelete_fastcall(a)
-
 
 
 /* For internal use only. */
 //  void vEventGroupSetBitsCallback( void *pvEventGroup, const uint32_t ulBitsToSet ) PRIVILEGED_FUNCTION;
 extern void vEventGroupSetBitsCallback(void *pvEventGroup,const uint32_t ulBitsToSet) __preserves_regs(iyh,iyl);
-extern void vEventGroupSetBitsCallback_callee(void *pvEventGroup,const uint32_t ulBitsToSet) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define vEventGroupSetBitsCallback(a,b) vEventGroupSetBitsCallback_callee(a,b)
-
 
 //  void vEventGroupClearBitsCallback( void *pvEventGroup, const uint32_t ulBitsToClear ) PRIVILEGED_FUNCTION;
 extern void vEventGroupClearBitsCallback(void *pvEventGroup,const uint32_t ulBitsToClear) __preserves_regs(iyh,iyl);
-extern void vEventGroupClearBitsCallback_callee(void *pvEventGroup,const uint32_t ulBitsToClear) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define vEventGroupClearBitsCallback(a,b) vEventGroupClearBitsCallback_callee(a,b)
-
 
 
 #if (configUSE_TRACE_FACILITY == 1)
 //  UBaseType_t uxEventGroupGetNumber( void* xEventGroup ) PRIVILEGED_FUNCTION;
     extern UBaseType_t uxEventGroupGetNumber(void* xEventGroup) __preserves_regs(iyh,iyl);
-extern UBaseType_t uxEventGroupGetNumber_fastcall(void* xEventGroup) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define uxEventGroupGetNumber(a) uxEventGroupGetNumber_fastcall(a)
-
 
 //  void vEventGroupSetNumber( void* xEventGroup, UBaseType_t uxEventGroupNumber ) PRIVILEGED_FUNCTION;
     extern void vEventGroupSetNumber(void* xEventGroup,UBaseType_t uxEventGroupNumber) __preserves_regs(iyh,iyl);
-extern void vEventGroupSetNumber_callee(void* xEventGroup,UBaseType_t uxEventGroupNumber) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define vEventGroupSetNumber(a,b) vEventGroupSetNumber_callee(a,b)
-
 
 #endif
 

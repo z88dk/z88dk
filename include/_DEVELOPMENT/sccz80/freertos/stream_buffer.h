@@ -319,8 +319,6 @@ const TickType_t x100ms = pdMS_TO_TICKS( 100 );
                               TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
 */
 extern size_t __LIB__ xStreamBufferSend(StreamBufferHandle_t xStreamBuffer,const void *pvTxData,size_t xDataLengthBytes,TickType_t xTicksToWait) __smallc;
-extern size_t __LIB__ xStreamBufferSend_callee(StreamBufferHandle_t xStreamBuffer,const void *pvTxData,size_t xDataLengthBytes,TickType_t xTicksToWait) __smallc __z88dk_callee;
-#define xStreamBufferSend(a,b,c,d) xStreamBufferSend_callee(a,b,c,d)
 
 
 
@@ -426,8 +424,6 @@ BaseType_t xHigherPriorityTaskWoken = pdFALSE; // Initialised to pdFALSE.
                                      BaseType_t * const pxHigherPriorityTaskWoken ) PRIVILEGED_FUNCTION;
 */
 extern size_t __LIB__ xStreamBufferSendFromISR(StreamBufferHandle_t xStreamBuffer,const void *pvTxData,size_t xDataLengthBytes,BaseType_t * const pxHigherPriorityTaskWoken) __smallc;
-extern size_t __LIB__ xStreamBufferSendFromISR_callee(StreamBufferHandle_t xStreamBuffer,const void *pvTxData,size_t xDataLengthBytes,BaseType_t * const pxHigherPriorityTaskWoken) __smallc __z88dk_callee;
-#define xStreamBufferSendFromISR(a,b,c,d) xStreamBufferSendFromISR_callee(a,b,c,d)
 
 
 
@@ -521,8 +517,6 @@ const TickType_t xBlockTime = pdMS_TO_TICKS( 20 );
                                  TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
 */
 extern size_t __LIB__ xStreamBufferReceive(StreamBufferHandle_t xStreamBuffer,void *pvRxData,size_t xBufferLengthBytes,TickType_t xTicksToWait) __smallc;
-extern size_t __LIB__ xStreamBufferReceive_callee(StreamBufferHandle_t xStreamBuffer,void *pvRxData,size_t xBufferLengthBytes,TickType_t xTicksToWait) __smallc __z88dk_callee;
-#define xStreamBufferReceive(a,b,c,d) xStreamBufferReceive_callee(a,b,c,d)
 
 
 
@@ -613,8 +607,6 @@ BaseType_t xHigherPriorityTaskWoken = pdFALSE;  // Initialised to pdFALSE.
                                         BaseType_t * const pxHigherPriorityTaskWoken ) PRIVILEGED_FUNCTION;
 */
 extern size_t __LIB__ xStreamBufferReceiveFromISR(StreamBufferHandle_t xStreamBuffer,void *pvRxData,size_t xBufferLengthBytes,BaseType_t * const pxHigherPriorityTaskWoken) __smallc;
-extern size_t __LIB__ xStreamBufferReceiveFromISR_callee(StreamBufferHandle_t xStreamBuffer,void *pvRxData,size_t xBufferLengthBytes,BaseType_t * const pxHigherPriorityTaskWoken) __smallc __z88dk_callee;
-#define xStreamBufferReceiveFromISR(a,b,c,d) xStreamBufferReceiveFromISR_callee(a,b,c,d)
 
 
 
@@ -639,7 +631,7 @@ void vStreamBufferDelete( StreamBufferHandle_t xStreamBuffer );
  * \ingroup StreamBufferManagement
  */
 //  void vStreamBufferDelete( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
-extern void __LIB__ vStreamBufferDelete(StreamBufferHandle_t xStreamBuffer) __smallc __z88dk_fastcall;
+extern void __LIB__ vStreamBufferDelete(StreamBufferHandle_t xStreamBuffer) __smallc;
 
 
 
@@ -662,7 +654,7 @@ BaseType_t xStreamBufferIsFull( StreamBufferHandle_t xStreamBuffer );
  * \ingroup StreamBufferManagement
  */
 //  BaseType_t xStreamBufferIsFull( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
-extern BaseType_t __LIB__ xStreamBufferIsFull(StreamBufferHandle_t xStreamBuffer) __smallc __z88dk_fastcall;
+extern BaseType_t __LIB__ xStreamBufferIsFull(StreamBufferHandle_t xStreamBuffer) __smallc;
 
 
 
@@ -685,7 +677,7 @@ BaseType_t xStreamBufferIsEmpty( StreamBufferHandle_t xStreamBuffer );
  * \ingroup StreamBufferManagement
  */
 //  BaseType_t xStreamBufferIsEmpty( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
-extern BaseType_t __LIB__ xStreamBufferIsEmpty(StreamBufferHandle_t xStreamBuffer) __smallc __z88dk_fastcall;
+extern BaseType_t __LIB__ xStreamBufferIsEmpty(StreamBufferHandle_t xStreamBuffer) __smallc;
 
 
 
@@ -711,7 +703,7 @@ BaseType_t xStreamBufferReset( StreamBufferHandle_t xStreamBuffer );
  * \ingroup StreamBufferManagement
  */
 //  BaseType_t xStreamBufferReset( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
-extern BaseType_t __LIB__ xStreamBufferReset(StreamBufferHandle_t xStreamBuffer) __smallc __z88dk_fastcall;
+extern BaseType_t __LIB__ xStreamBufferReset(StreamBufferHandle_t xStreamBuffer) __smallc;
 
 
 
@@ -735,7 +727,7 @@ size_t xStreamBufferSpacesAvailable( StreamBufferHandle_t xStreamBuffer );
  * \ingroup StreamBufferManagement
  */
 //  size_t xStreamBufferSpacesAvailable( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
-extern size_t __LIB__ xStreamBufferSpacesAvailable(StreamBufferHandle_t xStreamBuffer) __smallc __z88dk_fastcall;
+extern size_t __LIB__ xStreamBufferSpacesAvailable(StreamBufferHandle_t xStreamBuffer) __smallc;
 
 
 
@@ -759,7 +751,7 @@ size_t xStreamBufferBytesAvailable( StreamBufferHandle_t xStreamBuffer );
  * \ingroup StreamBufferManagement
  */
 //  size_t xStreamBufferBytesAvailable( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
-extern size_t __LIB__ xStreamBufferBytesAvailable(StreamBufferHandle_t xStreamBuffer) __smallc __z88dk_fastcall;
+extern size_t __LIB__ xStreamBufferBytesAvailable(StreamBufferHandle_t xStreamBuffer) __smallc;
 
 
 
@@ -800,8 +792,6 @@ BaseType_t xStreamBufferSetTriggerLevel( StreamBufferHandle_t xStreamBuffer, siz
  */
 //  BaseType_t xStreamBufferSetTriggerLevel( StreamBufferHandle_t xStreamBuffer, size_t xTriggerLevel ) PRIVILEGED_FUNCTION;
 extern BaseType_t __LIB__ xStreamBufferSetTriggerLevel(StreamBufferHandle_t xStreamBuffer,size_t xTriggerLevel) __smallc;
-extern BaseType_t __LIB__ xStreamBufferSetTriggerLevel_callee(StreamBufferHandle_t xStreamBuffer,size_t xTriggerLevel) __smallc __z88dk_callee;
-#define xStreamBufferSetTriggerLevel(a,b) xStreamBufferSetTriggerLevel_callee(a,b)
 
 
 
@@ -844,8 +834,6 @@ BaseType_t xStreamBufferSendCompletedFromISR( StreamBufferHandle_t xStreamBuffer
  */
 //  BaseType_t xStreamBufferSendCompletedFromISR( StreamBufferHandle_t xStreamBuffer, BaseType_t *pxHigherPriorityTaskWoken ) PRIVILEGED_FUNCTION;
 extern BaseType_t __LIB__ xStreamBufferSendCompletedFromISR(StreamBufferHandle_t xStreamBuffer,BaseType_t *pxHigherPriorityTaskWoken) __smallc;
-extern BaseType_t __LIB__ xStreamBufferSendCompletedFromISR_callee(StreamBufferHandle_t xStreamBuffer,BaseType_t *pxHigherPriorityTaskWoken) __smallc __z88dk_callee;
-#define xStreamBufferSendCompletedFromISR(a,b) xStreamBufferSendCompletedFromISR_callee(a,b)
 
 
 
@@ -889,8 +877,6 @@ BaseType_t xStreamBufferReceiveCompletedFromISR( StreamBufferHandle_t xStreamBuf
  */
 //  BaseType_t xStreamBufferReceiveCompletedFromISR( StreamBufferHandle_t xStreamBuffer, BaseType_t *pxHigherPriorityTaskWoken ) PRIVILEGED_FUNCTION;
 extern BaseType_t __LIB__ xStreamBufferReceiveCompletedFromISR(StreamBufferHandle_t xStreamBuffer,BaseType_t *pxHigherPriorityTaskWoken) __smallc;
-extern BaseType_t __LIB__ xStreamBufferReceiveCompletedFromISR_callee(StreamBufferHandle_t xStreamBuffer,BaseType_t *pxHigherPriorityTaskWoken) __smallc __z88dk_callee;
-#define xStreamBufferReceiveCompletedFromISR(a,b) xStreamBufferReceiveCompletedFromISR_callee(a,b)
 
 
 
@@ -900,8 +886,6 @@ extern BaseType_t __LIB__ xStreamBufferReceiveCompletedFromISR_callee(StreamBuff
                                                      BaseType_t xIsMessageBuffer ) PRIVILEGED_FUNCTION;
 */
 extern StreamBufferHandle_t __LIB__ xStreamBufferGenericCreate(size_t xBufferSizeBytes,size_t xTriggerLevelBytes,BaseType_t xIsMessageBuffer) __smallc;
-extern StreamBufferHandle_t __LIB__ xStreamBufferGenericCreate_callee(size_t xBufferSizeBytes,size_t xTriggerLevelBytes,BaseType_t xIsMessageBuffer) __smallc __z88dk_callee;
-#define xStreamBufferGenericCreate(a,b,c) xStreamBufferGenericCreate_callee(a,b,c)
 
 
 
@@ -912,29 +896,25 @@ extern StreamBufferHandle_t __LIB__ xStreamBufferGenericCreate_callee(size_t xBu
                                                            StaticStreamBuffer_t * const pxStaticStreamBuffer ) PRIVILEGED_FUNCTION;
 */
 extern StreamBufferHandle_t __LIB__ xStreamBufferGenericCreateStatic(size_t xBufferSizeBytes,size_t xTriggerLevelBytes,BaseType_t xIsMessageBuffer,uint8_t * const pucStreamBufferStorageArea,StaticStreamBuffer_t * const pxStaticStreamBuffer) __smallc;
-extern StreamBufferHandle_t __LIB__ xStreamBufferGenericCreateStatic_callee(size_t xBufferSizeBytes,size_t xTriggerLevelBytes,BaseType_t xIsMessageBuffer,uint8_t * const pucStreamBufferStorageArea,StaticStreamBuffer_t * const pxStaticStreamBuffer) __smallc __z88dk_callee;
-#define xStreamBufferGenericCreateStatic(a,b,c,d,e) xStreamBufferGenericCreateStatic_callee(a,b,c,d,e)
 
 
 
 size_t xStreamBufferNextMessageLengthBytes( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
-extern size_t __LIB__ xStreamBufferNextMessageLengthBytes(StreamBufferHandle_t xStreamBuffer) __smallc __z88dk_fastcall;
+extern size_t __LIB__ xStreamBufferNextMessageLengthBytes(StreamBufferHandle_t xStreamBuffer) __smallc;
 
 
 
 #if( configUSE_TRACE_FACILITY == 1 )
 //  void vStreamBufferSetStreamBufferNumber( StreamBufferHandle_t xStreamBuffer, UBaseType_t uxStreamBufferNumber ) PRIVILEGED_FUNCTION;
     extern void __LIB__ vStreamBufferSetStreamBufferNumber(StreamBufferHandle_t xStreamBuffer,UBaseType_t uxStreamBufferNumber) __smallc;
-extern void __LIB__ vStreamBufferSetStreamBufferNumber_callee(StreamBufferHandle_t xStreamBuffer,UBaseType_t uxStreamBufferNumber) __smallc __z88dk_callee;
-#define vStreamBufferSetStreamBufferNumber(a,b) vStreamBufferSetStreamBufferNumber_callee(a,b)
 
 
 //  UBaseType_t uxStreamBufferGetStreamBufferNumber( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
-    extern UBaseType_t __LIB__ uxStreamBufferGetStreamBufferNumber(StreamBufferHandle_t xStreamBuffer) __smallc __z88dk_fastcall;
+    extern UBaseType_t __LIB__ uxStreamBufferGetStreamBufferNumber(StreamBufferHandle_t xStreamBuffer) __smallc;
 
 
 //  uint8_t ucStreamBufferGetStreamBufferType( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
-    extern uint8_t __LIB__ ucStreamBufferGetStreamBufferType(StreamBufferHandle_t xStreamBuffer) __smallc __z88dk_fastcall;
+    extern uint8_t __LIB__ ucStreamBufferGetStreamBufferType(StreamBufferHandle_t xStreamBuffer) __smallc;
 
 
 #endif

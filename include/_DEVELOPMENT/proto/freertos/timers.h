@@ -232,7 +232,7 @@ typedef void (*PendedFunction_t)( void *, uint32_t );
                                 void * const pvTimerID,
                                 TimerCallbackFunction_t pxCallbackFunction ) PRIVILEGED_FUNCTION;
 */
-__DPROTO(`iyh,iyl',`iyh,iyl',TimerHandle_t,,xTimerCreate,const char * const pcTimerName,const TickType_t xTimerPeriodInTicks,const UBaseType_t uxAutoReload,void * const pvTimerID,TimerCallbackFunction_t pxCallbackFunction)
+__OPROTO(`iyh,iyl',`iyh,iyl',TimerHandle_t,,xTimerCreate,const char * const pcTimerName,const TickType_t xTimerPeriodInTicks,const UBaseType_t uxAutoReload,void * const pvTimerID,TimerCallbackFunction_t pxCallbackFunction)
 #endif
 
 /**
@@ -365,7 +365,7 @@ __DPROTO(`iyh,iyl',`iyh,iyl',TimerHandle_t,,xTimerCreate,const char * const pcTi
                                         TimerCallbackFunction_t pxCallbackFunction,
                                         StaticTimer_t *pxTimerBuffer ) PRIVILEGED_FUNCTION;
 */
-__DPROTO(`iyh,iyl',`iyh,iyl',TimerHandle_t,,xTimerCreate,const char * const pcTimerName,const TickType_t xTimerPeriodInTicks,const UBaseType_t uxAutoReload,void * const pvTimerID,TimerCallbackFunction_t pxCallbackFunction,StaticTimer_t *pxTimerBuffer)
+__OPROTO(`iyh,iyl',`iyh,iyl',TimerHandle_t,,xTimerCreate,const char * const pcTimerName,const TickType_t xTimerPeriodInTicks,const UBaseType_t uxAutoReload,void * const pvTimerID,TimerCallbackFunction_t pxCallbackFunction,StaticTimer_t *pxTimerBuffer)
 #endif /* configSUPPORT_STATIC_ALLOCATION */
 
 /**
@@ -389,7 +389,7 @@ __DPROTO(`iyh,iyl',`iyh,iyl',TimerHandle_t,,xTimerCreate,const char * const pcTi
  * See the xTimerCreate() API function example usage scenario.
  */
 //  void *pvTimerGetTimerID( const TimerHandle_t xTimer ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',void,*,pvTimerGetTimerID,const TimerHandle_t xTimer)
+__OPROTO(`iyh,iyl',`iyh,iyl',void,*,pvTimerGetTimerID,const TimerHandle_t xTimer)
 
 /**
  * void vTimerSetTimerID( TimerHandle_t xTimer, void *pvNewID );
@@ -411,7 +411,7 @@ __DPROTO(`iyh,iyl',`iyh,iyl',void,*,pvTimerGetTimerID,const TimerHandle_t xTimer
  * See the xTimerCreate() API function example usage scenario.
  */
 //  void vTimerSetTimerID( TimerHandle_t xTimer, void *pvNewID ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',void,,vTimerSetTimerID,TimerHandle_t xTimer, void *pvNewID)
+__OPROTO(`iyh,iyl',`iyh,iyl',void,,vTimerSetTimerID,TimerHandle_t xTimer, void *pvNewID)
 
 /**
  * BaseType_t xTimerIsTimerActive( TimerHandle_t xTimer );
@@ -449,7 +449,7 @@ __DPROTO(`iyh,iyl',`iyh,iyl',void,,vTimerSetTimerID,TimerHandle_t xTimer, void *
  * @endverbatim
  */
 //  BaseType_t xTimerIsTimerActive( TimerHandle_t xTimer ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTimerIsTimerActive,TimerHandle_t xTimer)
+__OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTimerIsTimerActive,TimerHandle_t xTimer)
 
 /**
  * TaskHandle_t xTimerGetTimerDaemonTaskHandle( void );
@@ -458,7 +458,7 @@ __DPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTimerIsTimerActive,TimerHandle_t xTime
  * to call xTimerGetTimerDaemonTaskHandle() before the scheduler has been started.
  */
 //  TaskHandle_t xTimerGetTimerDaemonTaskHandle( void ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',TaskHandle_t,,xTimerGetTimerDaemonTaskHandle,void)
+__OPROTO(`iyh,iyl',`iyh,iyl',TaskHandle_t,,xTimerGetTimerDaemonTaskHandle,void)
 
 /**
  * BaseType_t xTimerStart( TimerHandle_t xTimer, TickType_t xTicksToWait );
@@ -1194,7 +1194,7 @@ __DPROTO(`iyh,iyl',`iyh,iyl',TaskHandle_t,,xTimerGetTimerDaemonTaskHandle,void)
  * @endverbatim
  */
 //BaseType_t xTimerPendFunctionCallFromISR( PendedFunction_t xFunctionToPend, void *pvParameter1, uint32_t ulParameter2, BaseType_t *pxHigherPriorityTaskWoken ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTimerPendFunctionCallFromISR,PendedFunction_t xFunctionToPend,void *pvParameter1,uint32_t ulParameter2,BaseType_t *pxHigherPriorityTaskWoken)
+__OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTimerPendFunctionCallFromISR,PendedFunction_t xFunctionToPend,void *pvParameter1,uint32_t ulParameter2,BaseType_t *pxHigherPriorityTaskWoken)
 
  /**
   * BaseType_t xTimerPendFunctionCall( PendedFunction_t xFunctionToPend,
@@ -1229,7 +1229,7 @@ __DPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTimerPendFunctionCallFromISR,PendedFun
   *
   */
 //  BaseType_t xTimerPendFunctionCall( PendedFunction_t xFunctionToPend, void *pvParameter1, uint32_t ulParameter2, TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTimerPendFunctionCall,PendedFunction_t xFunctionToPend, void *pvParameter1, uint32_t ulParameter2, TickType_t xTicksToWait)
+__OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTimerPendFunctionCall,PendedFunction_t xFunctionToPend, void *pvParameter1, uint32_t ulParameter2, TickType_t xTicksToWait)
 
 /**
  * const char * const pcTimerGetName( TimerHandle_t xTimer );
@@ -1241,7 +1241,7 @@ __DPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTimerPendFunctionCall,PendedFunction_t
  * @return The name assigned to the timer specified by the xTimer parameter.
  */
 //  const char * pcTimerGetName( TimerHandle_t xTimer ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
-__DPROTO(`iyh,iyl',`iyh,iyl',const char,*,pcTimerGetName,TimerHandle_t xTimer)
+__OPROTO(`iyh,iyl',`iyh,iyl',const char,*,pcTimerGetName,TimerHandle_t xTimer)
 
 /**
  * void vTimerSetReloadMode( TimerHandle_t xTimer, const UBaseType_t uxAutoReload );
@@ -1259,7 +1259,7 @@ __DPROTO(`iyh,iyl',`iyh,iyl',const char,*,pcTimerGetName,TimerHandle_t xTimer)
  * enter the dormant state after it expires.
  */
 //  void vTimerSetReloadMode( TimerHandle_t xTimer, const UBaseType_t uxAutoReload ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',void,,vTimerSetReloadMode,TimerHandle_t xTimer,const UBaseType_t uxAutoReload)
+__OPROTO(`iyh,iyl',`iyh,iyl',void,,vTimerSetReloadMode,TimerHandle_t xTimer,const UBaseType_t uxAutoReload)
 
 /**
 * UBaseType_t uxTimerGetReloadMode( TimerHandle_t xTimer );
@@ -1274,7 +1274,7 @@ __DPROTO(`iyh,iyl',`iyh,iyl',void,,vTimerSetReloadMode,TimerHandle_t xTimer,cons
 * pdFALSE is returned.
 */
 //  UBaseType_t uxTimerGetReloadMode( TimerHandle_t xTimer ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',UBaseType_t,,uxTimerGetReloadMode,TimerHandle_t xTimer)
+__OPROTO(`iyh,iyl',`iyh,iyl',UBaseType_t,,uxTimerGetReloadMode,TimerHandle_t xTimer)
 
 /**
  * TickType_t xTimerGetPeriod( TimerHandle_t xTimer );
@@ -1286,7 +1286,7 @@ __DPROTO(`iyh,iyl',`iyh,iyl',UBaseType_t,,uxTimerGetReloadMode,TimerHandle_t xTi
  * @return The period of the timer in ticks.
  */
 //  TickType_t xTimerGetPeriod( TimerHandle_t xTimer ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',TickType_t,,xTimerGetPeriod,TimerHandle_t xTimer)
+__OPROTO(`iyh,iyl',`iyh,iyl',TickType_t,,xTimerGetPeriod,TimerHandle_t xTimer)
 
 /**
 * TickType_t xTimerGetExpiryTime( TimerHandle_t xTimer );
@@ -1302,23 +1302,23 @@ __DPROTO(`iyh,iyl',`iyh,iyl',TickType_t,,xTimerGetPeriod,TimerHandle_t xTimer)
 * value is undefined.
 */
 //  TickType_t xTimerGetExpiryTime( TimerHandle_t xTimer ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',TickType_t,,xTimerGetExpiryTime,TimerHandle_t xTimer)
+__OPROTO(`iyh,iyl',`iyh,iyl',TickType_t,,xTimerGetExpiryTime,TimerHandle_t xTimer)
 
 /*
  * Functions beyond this part are not part of the public API and are intended
  * for use by the kernel only.
  */
 //  BaseType_t xTimerCreateTimerTask( void ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTimerCreateTimerTask,void)
+__OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTimerCreateTimerTask,void)
 
 //  BaseType_t xTimerGenericCommand( TimerHandle_t xTimer, const BaseType_t xCommandID, const TickType_t xOptionalValue, BaseType_t * const pxHigherPriorityTaskWoken, const TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTimerGenericCommand,TimerHandle_t xTimer,const BaseType_t xCommandID,const TickType_t xOptionalValue,BaseType_t * const pxHigherPriorityTaskWoken,const TickType_t xTicksToWait)
+__OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTimerGenericCommand,TimerHandle_t xTimer,const BaseType_t xCommandID,const TickType_t xOptionalValue,BaseType_t * const pxHigherPriorityTaskWoken,const TickType_t xTicksToWait)
 
 #if( configUSE_TRACE_FACILITY == 1 )
 //  void vTimerSetTimerNumber( TimerHandle_t xTimer, UBaseType_t uxTimerNumber ) PRIVILEGED_FUNCTION;
-    __DPROTO(`iyh,iyl',`iyh,iyl',void,,vTimerSetTimerNumber,TimerHandle_t xTimer,UBaseType_t uxTimerNumber)
+    __OPROTO(`iyh,iyl',`iyh,iyl',void,,vTimerSetTimerNumber,TimerHandle_t xTimer,UBaseType_t uxTimerNumber)
 //  UBaseType_t uxTimerGetTimerNumber( TimerHandle_t xTimer ) PRIVILEGED_FUNCTION;
-    __DPROTO(`iyh,iyl',`iyh,iyl',UBaseType_t,,uxTimerGetTimerNumber,TimerHandle_t xTimer)
+    __OPROTO(`iyh,iyl',`iyh,iyl',UBaseType_t,,uxTimerGetTimerNumber,TimerHandle_t xTimer)
 #endif
 
 #ifdef __cplusplus

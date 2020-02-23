@@ -347,7 +347,7 @@ List_t * const pxConstList = ( pxList );                                        
  * \ingroup LinkedList
  */
 //  void vListInitialise( List_t * const pxList ) PRIVILEGED_FUNCTION;
-extern void __LIB__ vListInitialise(List_t * const pxList) __smallc __z88dk_fastcall;
+extern void __LIB__ vListInitialise(List_t * const pxList) __smallc;
 
 
 
@@ -361,7 +361,7 @@ extern void __LIB__ vListInitialise(List_t * const pxList) __smallc __z88dk_fast
  * \ingroup LinkedList
  */
 // void vListInitialiseItem( ListItem_t * const pxItem ) PRIVILEGED_FUNCTION;
-extern void __LIB__ vListInitialiseItem(ListItem_t * const pxItem) __smallc __z88dk_fastcall;
+extern void __LIB__ vListInitialiseItem(ListItem_t * const pxItem) __smallc;
 
 
 
@@ -378,8 +378,6 @@ extern void __LIB__ vListInitialiseItem(ListItem_t * const pxItem) __smallc __z8
  */
 //  void vListInsert( List_t * const pxList, ListItem_t * const pxNewListItem ) PRIVILEGED_FUNCTION;
 extern void __LIB__ vListInsert(List_t * const pxList,ListItem_t * const pxNewListItem) __smallc;
-extern void __LIB__ vListInsert_callee(List_t * const pxList,ListItem_t * const pxNewListItem) __smallc __z88dk_callee;
-#define vListInsert(a,b) vListInsert_callee(a,b)
 
 
 
@@ -404,8 +402,6 @@ extern void __LIB__ vListInsert_callee(List_t * const pxList,ListItem_t * const 
  */
 //  void vListInsertEnd( List_t * const pxList, ListItem_t * const pxNewListItem ) PRIVILEGED_FUNCTION;
 extern void __LIB__ vListInsertEnd(List_t * const pxList,ListItem_t * const pxNewListItem) __smallc;
-extern void __LIB__ vListInsertEnd_callee(List_t * const pxList,ListItem_t * const pxNewListItem) __smallc __z88dk_callee;
-#define vListInsertEnd(a,b) vListInsertEnd_callee(a,b)
 
 
 
@@ -423,7 +419,7 @@ extern void __LIB__ vListInsertEnd_callee(List_t * const pxList,ListItem_t * con
  * \ingroup LinkedList
  */
 //  UBaseType_t uxListRemove( ListItem_t * const pxItemToRemove ) PRIVILEGED_FUNCTION;
-extern UBaseType_t __LIB__ uxListRemove(ListItem_t * const pxItemToRemove) __smallc __z88dk_fastcall;
+extern UBaseType_t __LIB__ uxListRemove(ListItem_t * const pxItemToRemove) __smallc;
 
 
 

@@ -134,8 +134,6 @@ typedef struct corCoRoutineControlBlock
  */
 //  BaseType_t xCoRoutineCreate( crCOROUTINE_CODE pxCoRoutineCode, UBaseType_t uxPriority, UBaseType_t uxIndex );
 extern BaseType_t __LIB__ xCoRoutineCreate(crCOROUTINE_CODE pxCoRoutineCode,UBaseType_t uxPriority,UBaseType_t uxIndex) __smallc;
-extern BaseType_t __LIB__ xCoRoutineCreate_callee(crCOROUTINE_CODE pxCoRoutineCode,UBaseType_t uxPriority,UBaseType_t uxIndex) __smallc __z88dk_callee;
-#define xCoRoutineCreate(a,b,c) xCoRoutineCreate_callee(a,b,c)
 
 
 
@@ -179,7 +177,7 @@ extern BaseType_t __LIB__ xCoRoutineCreate_callee(crCOROUTINE_CODE pxCoRoutineCo
  * \ingroup Tasks
  */
 //  void vCoRoutineSchedule( void );
-extern void __LIB__ vCoRoutineSchedule(void) __smallc __z88dk_fastcall;
+extern void __LIB__ vCoRoutineSchedule(void) __smallc;
 
 
 
@@ -715,8 +713,6 @@ extern void __LIB__ vCoRoutineSchedule(void) __smallc __z88dk_fastcall;
  */
 //  void vCoRoutineAddToDelayedList( TickType_t xTicksToDelay, List_t *pxEventList );
 extern void __LIB__ vCoRoutineAddToDelayedList(TickType_t xTicksToDelay,List_t *pxEventList) __smallc;
-extern void __LIB__ vCoRoutineAddToDelayedList_callee(TickType_t xTicksToDelay,List_t *pxEventList) __smallc __z88dk_callee;
-#define vCoRoutineAddToDelayedList(a,b) vCoRoutineAddToDelayedList_callee(a,b)
 
 
 
@@ -728,7 +724,7 @@ extern void __LIB__ vCoRoutineAddToDelayedList_callee(TickType_t xTicksToDelay,L
  * the pending ready list.
  */
 //  BaseType_t xCoRoutineRemoveFromEventList( const List_t *pxEventList );
-extern BaseType_t __LIB__ xCoRoutineRemoveFromEventList(const List_t *pxEventList) __smallc __z88dk_fastcall;
+extern BaseType_t __LIB__ xCoRoutineRemoveFromEventList(const List_t *pxEventList) __smallc;
 
 
 

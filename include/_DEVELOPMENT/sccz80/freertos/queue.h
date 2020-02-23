@@ -652,8 +652,6 @@ typedef struct QueueDef_t * QueueSetMemberHandle_t;
  */
 //  BaseType_t xQueueGenericSend( QueueHandle_t xQueue, const void * const pvItemToQueue, TickType_t xTicksToWait, const BaseType_t xCopyPosition ) PRIVILEGED_FUNCTION;
 extern BaseType_t __LIB__ xQueueGenericSend(QueueHandle_t xQueue,const void * const pvItemToQueue,TickType_t xTicksToWait,const BaseType_t xCopyPosition) __smallc;
-extern BaseType_t __LIB__ xQueueGenericSend_callee(QueueHandle_t xQueue,const void * const pvItemToQueue,TickType_t xTicksToWait,const BaseType_t xCopyPosition) __smallc __z88dk_callee;
-#define xQueueGenericSend(a,b,c,d) xQueueGenericSend_callee(a,b,c,d)
 
 
 
@@ -751,8 +749,6 @@ extern BaseType_t __LIB__ xQueueGenericSend_callee(QueueHandle_t xQueue,const vo
  */
 //  BaseType_t xQueuePeek( QueueHandle_t xQueue, void * const pvBuffer, TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
 extern BaseType_t __LIB__ xQueuePeek(QueueHandle_t xQueue,void * const pvBuffer,TickType_t xTicksToWait) __smallc;
-extern BaseType_t __LIB__ xQueuePeek_callee(QueueHandle_t xQueue,void * const pvBuffer,TickType_t xTicksToWait) __smallc __z88dk_callee;
-#define xQueuePeek(a,b,c) xQueuePeek_callee(a,b,c)
 
 
 
@@ -789,8 +785,6 @@ extern BaseType_t __LIB__ xQueuePeek_callee(QueueHandle_t xQueue,void * const pv
  */
 //  BaseType_t xQueuePeekFromISR( QueueHandle_t xQueue, void * const pvBuffer ) PRIVILEGED_FUNCTION;
 extern BaseType_t __LIB__ xQueuePeekFromISR(QueueHandle_t xQueue,void * const pvBuffer) __smallc;
-extern BaseType_t __LIB__ xQueuePeekFromISR_callee(QueueHandle_t xQueue,void * const pvBuffer) __smallc __z88dk_callee;
-#define xQueuePeekFromISR(a,b) xQueuePeekFromISR_callee(a,b)
 
 
 
@@ -885,8 +879,6 @@ extern BaseType_t __LIB__ xQueuePeekFromISR_callee(QueueHandle_t xQueue,void * c
  */
 //  BaseType_t xQueueReceive( QueueHandle_t xQueue, void * const pvBuffer, TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
 extern BaseType_t __LIB__ xQueueReceive(QueueHandle_t xQueue,void * const pvBuffer,TickType_t xTicksToWait) __smallc;
-extern BaseType_t __LIB__ xQueueReceive_callee(QueueHandle_t xQueue,void * const pvBuffer,TickType_t xTicksToWait) __smallc __z88dk_callee;
-#define xQueueReceive(a,b,c) xQueueReceive_callee(a,b,c)
 
 
 
@@ -904,7 +896,7 @@ extern BaseType_t __LIB__ xQueueReceive_callee(QueueHandle_t xQueue,void * const
  * \ingroup QueueManagement
  */
 //  UBaseType_t uxQueueMessagesWaiting( const QueueHandle_t xQueue ) PRIVILEGED_FUNCTION;
-extern UBaseType_t __LIB__ uxQueueMessagesWaiting(const QueueHandle_t xQueue) __smallc __z88dk_fastcall;
+extern UBaseType_t __LIB__ uxQueueMessagesWaiting(const QueueHandle_t xQueue) __smallc;
 
 
 
@@ -924,7 +916,7 @@ extern UBaseType_t __LIB__ uxQueueMessagesWaiting(const QueueHandle_t xQueue) __
  * \ingroup QueueManagement
  */
 //  UBaseType_t uxQueueSpacesAvailable( const QueueHandle_t xQueue ) PRIVILEGED_FUNCTION;
-extern UBaseType_t __LIB__ uxQueueSpacesAvailable(const QueueHandle_t xQueue) __smallc __z88dk_fastcall;
+extern UBaseType_t __LIB__ uxQueueSpacesAvailable(const QueueHandle_t xQueue) __smallc;
 
 
 
@@ -941,7 +933,7 @@ extern UBaseType_t __LIB__ uxQueueSpacesAvailable(const QueueHandle_t xQueue) __
  * \ingroup QueueManagement
  */
 void vQueueDelete( QueueHandle_t xQueue ) PRIVILEGED_FUNCTION;
-extern void __LIB__ vQueueDelete(QueueHandle_t xQueue) __smallc __z88dk_fastcall;
+extern void __LIB__ vQueueDelete(QueueHandle_t xQueue) __smallc;
 
 
 
@@ -1326,14 +1318,10 @@ uint32_t ulVarToSend, ulValReceived;
  */
 //  BaseType_t xQueueGenericSendFromISR( QueueHandle_t xQueue, const void * const pvItemToQueue, BaseType_t * const pxHigherPriorityTaskWoken, const BaseType_t xCopyPosition ) PRIVILEGED_FUNCTION;
 extern BaseType_t __LIB__ xQueueGenericSendFromISR(QueueHandle_t xQueue,const void * const pvItemToQueue,BaseType_t * const pxHigherPriorityTaskWoken,const BaseType_t xCopyPosition) __smallc;
-extern BaseType_t __LIB__ xQueueGenericSendFromISR_callee(QueueHandle_t xQueue,const void * const pvItemToQueue,BaseType_t * const pxHigherPriorityTaskWoken,const BaseType_t xCopyPosition) __smallc __z88dk_callee;
-#define xQueueGenericSendFromISR(a,b,c,d) xQueueGenericSendFromISR_callee(a,b,c,d)
 
 
 //  BaseType_t xQueueGiveFromISR( QueueHandle_t xQueue, BaseType_t * const pxHigherPriorityTaskWoken ) PRIVILEGED_FUNCTION;
 extern BaseType_t __LIB__ xQueueGiveFromISR(QueueHandle_t xQueue,BaseType_t * const pxHigherPriorityTaskWoken) __smallc;
-extern BaseType_t __LIB__ xQueueGiveFromISR_callee(QueueHandle_t xQueue,BaseType_t * const pxHigherPriorityTaskWoken) __smallc __z88dk_callee;
-#define xQueueGiveFromISR(a,b) xQueueGiveFromISR_callee(a,b)
 
 
 
@@ -1426,8 +1414,6 @@ extern BaseType_t __LIB__ xQueueGiveFromISR_callee(QueueHandle_t xQueue,BaseType
  */
 //  BaseType_t xQueueReceiveFromISR( QueueHandle_t xQueue, void * const pvBuffer, BaseType_t * const pxHigherPriorityTaskWoken ) PRIVILEGED_FUNCTION;
 extern BaseType_t __LIB__ xQueueReceiveFromISR(QueueHandle_t xQueue,void * const pvBuffer,BaseType_t * const pxHigherPriorityTaskWoken) __smallc;
-extern BaseType_t __LIB__ xQueueReceiveFromISR_callee(QueueHandle_t xQueue,void * const pvBuffer,BaseType_t * const pxHigherPriorityTaskWoken) __smallc __z88dk_callee;
-#define xQueueReceiveFromISR(a,b,c) xQueueReceiveFromISR_callee(a,b,c)
 
 
 
@@ -1436,15 +1422,15 @@ extern BaseType_t __LIB__ xQueueReceiveFromISR_callee(QueueHandle_t xQueue,void 
  * should be used only from witin an ISR, or within a critical section.
  */
 //  BaseType_t xQueueIsQueueEmptyFromISR( const QueueHandle_t xQueue ) PRIVILEGED_FUNCTION;
-extern BaseType_t __LIB__ xQueueIsQueueEmptyFromISR(const QueueHandle_t xQueue) __smallc __z88dk_fastcall;
+extern BaseType_t __LIB__ xQueueIsQueueEmptyFromISR(const QueueHandle_t xQueue) __smallc;
 
 
 //  BaseType_t xQueueIsQueueFullFromISR( const QueueHandle_t xQueue ) PRIVILEGED_FUNCTION;
-extern BaseType_t __LIB__ xQueueIsQueueFullFromISR(const QueueHandle_t xQueue) __smallc __z88dk_fastcall;
+extern BaseType_t __LIB__ xQueueIsQueueFullFromISR(const QueueHandle_t xQueue) __smallc;
 
 
 //  UBaseType_t uxQueueMessagesWaitingFromISR( const QueueHandle_t xQueue ) PRIVILEGED_FUNCTION;
-extern UBaseType_t __LIB__ uxQueueMessagesWaitingFromISR(const QueueHandle_t xQueue) __smallc __z88dk_fastcall;
+extern UBaseType_t __LIB__ uxQueueMessagesWaitingFromISR(const QueueHandle_t xQueue) __smallc;
 
 
 
@@ -1459,26 +1445,18 @@ extern UBaseType_t __LIB__ uxQueueMessagesWaitingFromISR(const QueueHandle_t xQu
  */
 //  BaseType_t xQueueCRSendFromISR( QueueHandle_t xQueue, const void *pvItemToQueue, BaseType_t xCoRoutinePreviouslyWoken );
 extern BaseType_t __LIB__ xQueueCRSendFromISR(QueueHandle_t xQueue,const void *pvItemToQueue,BaseType_t xCoRoutinePreviouslyWoken) __smallc;
-extern BaseType_t __LIB__ xQueueCRSendFromISR_callee(QueueHandle_t xQueue,const void *pvItemToQueue,BaseType_t xCoRoutinePreviouslyWoken) __smallc __z88dk_callee;
-#define xQueueCRSendFromISR(a,b,c) xQueueCRSendFromISR_callee(a,b,c)
 
 
 //  BaseType_t xQueueCRReceiveFromISR( QueueHandle_t xQueue, void *pvBuffer, BaseType_t *pxTaskWoken );
 extern BaseType_t __LIB__ xQueueCRReceiveFromISR(QueueHandle_t xQueue,void *pvBuffer,BaseType_t *pxTaskWoken) __smallc;
-extern BaseType_t __LIB__ xQueueCRReceiveFromISR_callee(QueueHandle_t xQueue,void *pvBuffer,BaseType_t *pxTaskWoken) __smallc __z88dk_callee;
-#define xQueueCRReceiveFromISR(a,b,c) xQueueCRReceiveFromISR_callee(a,b,c)
 
 
 //  BaseType_t xQueueCRSend( QueueHandle_t xQueue, const void *pvItemToQueue, TickType_t xTicksToWait );
 extern BaseType_t __LIB__ xQueueCRSend(QueueHandle_t xQueue,const void *pvItemToQueue,TickType_t xTicksToWait) __smallc;
-extern BaseType_t __LIB__ xQueueCRSend_callee(QueueHandle_t xQueue,const void *pvItemToQueue,TickType_t xTicksToWait) __smallc __z88dk_callee;
-#define xQueueCRSend(a,b,c) xQueueCRSend_callee(a,b,c)
 
 
 //  BaseType_t xQueueCRReceive( QueueHandle_t xQueue, void *pvBuffer, TickType_t xTicksToWait );
 extern BaseType_t __LIB__ xQueueCRReceive(QueueHandle_t xQueue,void *pvBuffer,TickType_t xTicksToWait) __smallc;
-extern BaseType_t __LIB__ xQueueCRReceive_callee(QueueHandle_t xQueue,void *pvBuffer,TickType_t xTicksToWait) __smallc __z88dk_callee;
-#define xQueueCRReceive(a,b,c) xQueueCRReceive_callee(a,b,c)
 
 
 
@@ -1488,39 +1466,31 @@ extern BaseType_t __LIB__ xQueueCRReceive_callee(QueueHandle_t xQueue,void *pvBu
  * these functions directly.
  */
 //  QueueHandle_t xQueueCreateMutex( const uint8_t ucQueueType ) PRIVILEGED_FUNCTION;
-extern QueueHandle_t __LIB__ xQueueCreateMutex(const uint8_t ucQueueType) __smallc __z88dk_fastcall;
+extern QueueHandle_t __LIB__ xQueueCreateMutex(const uint8_t ucQueueType) __smallc;
 
 
 //  QueueHandle_t xQueueCreateMutexStatic( const uint8_t ucQueueType, StaticQueue_t *pxStaticQueue ) PRIVILEGED_FUNCTION;
 extern QueueHandle_t __LIB__ xQueueCreateMutexStatic(const uint8_t ucQueueType,StaticQueue_t *pxStaticQueue) __smallc;
-extern QueueHandle_t __LIB__ xQueueCreateMutexStatic_callee(const uint8_t ucQueueType,StaticQueue_t *pxStaticQueue) __smallc __z88dk_callee;
-#define xQueueCreateMutexStatic(a,b) xQueueCreateMutexStatic_callee(a,b)
 
 
 //  QueueHandle_t xQueueCreateCountingSemaphore( const UBaseType_t uxMaxCount, const UBaseType_t uxInitialCount ) PRIVILEGED_FUNCTION;
 extern QueueHandle_t __LIB__ xQueueCreateCountingSemaphore(const UBaseType_t uxMaxCount,const UBaseType_t uxInitialCount) __smallc;
-extern QueueHandle_t __LIB__ xQueueCreateCountingSemaphore_callee(const UBaseType_t uxMaxCount,const UBaseType_t uxInitialCount) __smallc __z88dk_callee;
-#define xQueueCreateCountingSemaphore(a,b) xQueueCreateCountingSemaphore_callee(a,b)
 
 
 //  QueueHandle_t xQueueCreateCountingSemaphoreStatic( const UBaseType_t uxMaxCount, const UBaseType_t uxInitialCount, StaticQueue_t *pxStaticQueue ) PRIVILEGED_FUNCTION;
 extern QueueHandle_t __LIB__ xQueueCreateCountingSemaphoreStatic(const UBaseType_t uxMaxCount,const UBaseType_t uxInitialCount,StaticQueue_t *pxStaticQueue) __smallc;
-extern QueueHandle_t __LIB__ xQueueCreateCountingSemaphoreStatic_callee(const UBaseType_t uxMaxCount,const UBaseType_t uxInitialCount,StaticQueue_t *pxStaticQueue) __smallc __z88dk_callee;
-#define xQueueCreateCountingSemaphoreStatic(a,b,c) xQueueCreateCountingSemaphoreStatic_callee(a,b,c)
 
 
 //  BaseType_t xQueueSemaphoreTake( QueueHandle_t xQueue, TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
 extern BaseType_t __LIB__ xQueueSemaphoreTake(QueueHandle_t xQueue,TickType_t xTicksToWait) __smallc;
-extern BaseType_t __LIB__ xQueueSemaphoreTake_callee(QueueHandle_t xQueue,TickType_t xTicksToWait) __smallc __z88dk_callee;
-#define xQueueSemaphoreTake(a,b) xQueueSemaphoreTake_callee(a,b)
 
 
 //  TaskHandle_t xQueueGetMutexHolder( QueueHandle_t xSemaphore ) PRIVILEGED_FUNCTION;
-extern TaskHandle_t __LIB__ xQueueGetMutexHolder(QueueHandle_t xSemaphore) __smallc __z88dk_fastcall;
+extern TaskHandle_t __LIB__ xQueueGetMutexHolder(QueueHandle_t xSemaphore) __smallc;
 
 
 //  TaskHandle_t xQueueGetMutexHolderFromISR( QueueHandle_t xSemaphore ) PRIVILEGED_FUNCTION;
-extern TaskHandle_t __LIB__ xQueueGetMutexHolderFromISR(QueueHandle_t xSemaphore) __smallc __z88dk_fastcall;
+extern TaskHandle_t __LIB__ xQueueGetMutexHolderFromISR(QueueHandle_t xSemaphore) __smallc;
 
 
 
@@ -1530,12 +1500,10 @@ extern TaskHandle_t __LIB__ xQueueGetMutexHolderFromISR(QueueHandle_t xSemaphore
  */
 //  BaseType_t xQueueTakeMutexRecursive( QueueHandle_t xMutex, TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
 extern BaseType_t __LIB__ xQueueTakeMutexRecursive(QueueHandle_t xMutex,TickType_t xTicksToWait) __smallc;
-extern BaseType_t __LIB__ xQueueTakeMutexRecursive_callee(QueueHandle_t xMutex,TickType_t xTicksToWait) __smallc __z88dk_callee;
-#define xQueueTakeMutexRecursive(a,b) xQueueTakeMutexRecursive_callee(a,b)
 
 
 //  BaseType_t xQueueGiveMutexRecursive( QueueHandle_t xMutex ) PRIVILEGED_FUNCTION;
-extern BaseType_t __LIB__ xQueueGiveMutexRecursive(QueueHandle_t xMutex) __smallc __z88dk_fastcall;
+extern BaseType_t __LIB__ xQueueGiveMutexRecursive(QueueHandle_t xMutex) __smallc;
 
 
 
@@ -1570,8 +1538,6 @@ extern BaseType_t __LIB__ xQueueGiveMutexRecursive(QueueHandle_t xMutex) __small
 #if( configQUEUE_REGISTRY_SIZE > 0 )
 //  void vQueueAddToRegistry( QueueHandle_t xQueue, const char *pcQueueName ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
     extern void __LIB__ vQueueAddToRegistry(QueueHandle_t xQueue,const char *pcQueueName) __smallc;
-extern void __LIB__ vQueueAddToRegistry_callee(QueueHandle_t xQueue,const char *pcQueueName) __smallc __z88dk_callee;
-#define vQueueAddToRegistry(a,b) vQueueAddToRegistry_callee(a,b)
 
 
 #endif
@@ -1588,7 +1554,7 @@ extern void __LIB__ vQueueAddToRegistry_callee(QueueHandle_t xQueue,const char *
  */
 #if( configQUEUE_REGISTRY_SIZE > 0 )
 //  void vQueueUnregisterQueue( QueueHandle_t xQueue ) PRIVILEGED_FUNCTION;
-    extern void __LIB__ vQueueUnregisterQueue(QueueHandle_t xQueue) __smallc __z88dk_fastcall;
+    extern void __LIB__ vQueueUnregisterQueue(QueueHandle_t xQueue) __smallc;
 
 
 #endif
@@ -1606,7 +1572,7 @@ extern void __LIB__ vQueueAddToRegistry_callee(QueueHandle_t xQueue,const char *
  */
 #if( configQUEUE_REGISTRY_SIZE > 0 )
 //  const char *pcQueueGetName( QueueHandle_t xQueue ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
-    extern const char __LIB__ *pcQueueGetName(QueueHandle_t xQueue) __smallc __z88dk_fastcall;
+    extern const char __LIB__ *pcQueueGetName(QueueHandle_t xQueue) __smallc;
 
 
 #endif
@@ -1619,8 +1585,6 @@ extern void __LIB__ vQueueAddToRegistry_callee(QueueHandle_t xQueue,const char *
 #if( configSUPPORT_DYNAMIC_ALLOCATION == 1 )
 //  QueueHandle_t xQueueGenericCreate( const UBaseType_t uxQueueLength, const UBaseType_t uxItemSize, const uint8_t ucQueueType ) PRIVILEGED_FUNCTION;
     extern QueueHandle_t __LIB__ xQueueGenericCreate(const UBaseType_t uxQueueLength,const UBaseType_t uxItemSize,const uint8_t ucQueueType) __smallc;
-extern QueueHandle_t __LIB__ xQueueGenericCreate_callee(const UBaseType_t uxQueueLength,const UBaseType_t uxItemSize,const uint8_t ucQueueType) __smallc __z88dk_callee;
-#define xQueueGenericCreate(a,b,c) xQueueGenericCreate_callee(a,b,c)
 
 
 #endif
@@ -1633,8 +1597,6 @@ extern QueueHandle_t __LIB__ xQueueGenericCreate_callee(const UBaseType_t uxQueu
 #if( configSUPPORT_STATIC_ALLOCATION == 1 )
 //  QueueHandle_t xQueueGenericCreateStatic( const UBaseType_t uxQueueLength, const UBaseType_t uxItemSize, uint8_t *pucQueueStorage, StaticQueue_t *pxStaticQueue, const uint8_t ucQueueType ) PRIVILEGED_FUNCTION;
     extern QueueHandle_t __LIB__ xQueueGenericCreateStatic(const UBaseType_t uxQueueLength,const UBaseType_t uxItemSize,uint8_t *pucQueueStorage,StaticQueue_t *pxStaticQueue,const uint8_t ucQueueType) __smallc;
-extern QueueHandle_t __LIB__ xQueueGenericCreateStatic_callee(const UBaseType_t uxQueueLength,const UBaseType_t uxItemSize,uint8_t *pucQueueStorage,StaticQueue_t *pxStaticQueue,const uint8_t ucQueueType) __smallc __z88dk_callee;
-#define xQueueGenericCreateStatic(a,b,c,d,e) xQueueGenericCreateStatic_callee(a,b,c,d,e)
 
 
 #endif
@@ -1688,7 +1650,7 @@ extern QueueHandle_t __LIB__ xQueueGenericCreateStatic_callee(const UBaseType_t 
  * queue set is returned.  Otherwise NULL is returned.
  */
 //  QueueSetHandle_t xQueueCreateSet( const UBaseType_t uxEventQueueLength ) PRIVILEGED_FUNCTION;
-extern QueueSetHandle_t __LIB__ xQueueCreateSet(const UBaseType_t uxEventQueueLength) __smallc __z88dk_fastcall;
+extern QueueSetHandle_t __LIB__ xQueueCreateSet(const UBaseType_t uxEventQueueLength) __smallc;
 
 
 
@@ -1716,8 +1678,6 @@ extern QueueSetHandle_t __LIB__ xQueueCreateSet(const UBaseType_t uxEventQueueLe
  */
 //  BaseType_t xQueueAddToSet( QueueSetMemberHandle_t xQueueOrSemaphore, QueueSetHandle_t xQueueSet ) PRIVILEGED_FUNCTION;
 extern QueueSetHandle_t __LIB__ xQueueAddToSet(QueueSetMemberHandle_t xQueueOrSemaphore,QueueSetHandle_t xQueueSet) __smallc;
-extern QueueSetHandle_t __LIB__ xQueueAddToSet_callee(QueueSetMemberHandle_t xQueueOrSemaphore,QueueSetHandle_t xQueueSet) __smallc __z88dk_callee;
-#define xQueueAddToSet(a,b) xQueueAddToSet_callee(a,b)
 
 
 
@@ -1740,8 +1700,6 @@ extern QueueSetHandle_t __LIB__ xQueueAddToSet_callee(QueueSetMemberHandle_t xQu
  */
 //  BaseType_t xQueueRemoveFromSet( QueueSetMemberHandle_t xQueueOrSemaphore, QueueSetHandle_t xQueueSet ) PRIVILEGED_FUNCTION;
 extern QueueSetHandle_t __LIB__ xQueueRemoveFromSet(QueueSetMemberHandle_t xQueueOrSemaphore,QueueSetHandle_t xQueueSet) __smallc;
-extern QueueSetHandle_t __LIB__ xQueueRemoveFromSet_callee(QueueSetMemberHandle_t xQueueOrSemaphore,QueueSetHandle_t xQueueSet) __smallc __z88dk_callee;
-#define xQueueRemoveFromSet(a,b) xQueueRemoveFromSet_callee(a,b)
 
 
 
@@ -1781,8 +1739,6 @@ extern QueueSetHandle_t __LIB__ xQueueRemoveFromSet_callee(QueueSetMemberHandle_
  */
 //  QueueSetMemberHandle_t xQueueSelectFromSet( QueueSetHandle_t xQueueSet, const TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
 extern QueueSetMemberHandle_t __LIB__ xQueueSelectFromSet(QueueSetHandle_t xQueueSet,const TickType_t xTicksToWait) __smallc;
-extern QueueSetMemberHandle_t __LIB__ xQueueSelectFromSet_callee(QueueSetHandle_t xQueueSet,const TickType_t xTicksToWait) __smallc __z88dk_callee;
-#define xQueueSelectFromSet(a,b) xQueueSelectFromSet_callee(a,b)
 
 
 
@@ -1790,35 +1746,29 @@ extern QueueSetMemberHandle_t __LIB__ xQueueSelectFromSet_callee(QueueSetHandle_
  * A version of xQueueSelectFromSet() that can be used from an ISR.
  */
 //  QueueSetMemberHandle_t xQueueSelectFromSetFromISR( QueueSetHandle_t xQueueSet ) PRIVILEGED_FUNCTION;
-extern QueueSetMemberHandle_t __LIB__ xQueueSelectFromSetFromISR(QueueSetHandle_t xQueueSet) __smallc __z88dk_fastcall;
+extern QueueSetMemberHandle_t __LIB__ xQueueSelectFromSetFromISR(QueueSetHandle_t xQueueSet) __smallc;
 
 
 
 /* Not public API functions. */
 //  void vQueueWaitForMessageRestricted( QueueHandle_t xQueue, TickType_t xTicksToWait, const BaseType_t xWaitIndefinitely ) PRIVILEGED_FUNCTION;
 extern void __LIB__ vQueueWaitForMessageRestricted(QueueHandle_t xQueue,TickType_t xTicksToWait,const BaseType_t xWaitIndefinitely) __smallc;
-extern void __LIB__ vQueueWaitForMessageRestricted_callee(QueueHandle_t xQueue,TickType_t xTicksToWait,const BaseType_t xWaitIndefinitely) __smallc __z88dk_callee;
-#define vQueueWaitForMessageRestricted(a,b,c) vQueueWaitForMessageRestricted_callee(a,b,c)
 
 
 //  BaseType_t xQueueGenericReset( QueueHandle_t xQueue, BaseType_t xNewQueue ) PRIVILEGED_FUNCTION;
 extern BaseType_t __LIB__ xQueueGenericReset(QueueHandle_t xQueue,BaseType_t xNewQueue) __smallc;
-extern BaseType_t __LIB__ xQueueGenericReset_callee(QueueHandle_t xQueue,BaseType_t xNewQueue) __smallc __z88dk_callee;
-#define xQueueGenericReset(a,b) xQueueGenericReset_callee(a,b)
 
 
 //  void vQueueSetQueueNumber( QueueHandle_t xQueue, UBaseType_t uxQueueNumber ) PRIVILEGED_FUNCTION;
 extern void __LIB__ vQueueSetQueueNumber(QueueHandle_t xQueue,UBaseType_t uxQueueNumber) __smallc;
-extern void __LIB__ vQueueSetQueueNumber_callee(QueueHandle_t xQueue,UBaseType_t uxQueueNumber) __smallc __z88dk_callee;
-#define vQueueSetQueueNumber(a,b) vQueueSetQueueNumber_callee(a,b)
 
 
 //  UBaseType_t uxQueueGetQueueNumber( QueueHandle_t xQueue ) PRIVILEGED_FUNCTION;
-extern UBaseType_t __LIB__ uxQueueGetQueueNumber(QueueHandle_t xQueue) __smallc __z88dk_fastcall;
+extern UBaseType_t __LIB__ uxQueueGetQueueNumber(QueueHandle_t xQueue) __smallc;
 
 
 //  uint8_t ucQueueGetQueueType( QueueHandle_t xQueue ) PRIVILEGED_FUNCTION;
-extern uint8_t __LIB__ ucQueueGetQueueType(QueueHandle_t xQueue) __smallc __z88dk_fastcall;
+extern uint8_t __LIB__ ucQueueGetQueueType(QueueHandle_t xQueue) __smallc;
 
 
 

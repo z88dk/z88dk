@@ -338,9 +338,6 @@ is used in assert() statements. */
                             TaskHandle_t * const pxCreatedTask ) PRIVILEGED_FUNCTION;
 */
     extern BaseType_t xTaskCreate(TaskFunction_t pxTaskCode,const char * const pcName,const configSTACK_DEPTH_TYPE usStackDepth,void * const pvParameters,UBaseType_t uxPriority,TaskHandle_t * const pxCreatedTask) __preserves_regs(iyh,iyl);
-extern BaseType_t xTaskCreate_callee(TaskFunction_t pxTaskCode,const char * const pcName,const configSTACK_DEPTH_TYPE usStackDepth,void * const pvParameters,UBaseType_t uxPriority,TaskHandle_t * const pxCreatedTask) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define xTaskCreate(a,b,c,d,e,f) xTaskCreate_callee(a,b,c,d,e,f)
-
 
 #endif
 
@@ -461,9 +458,6 @@ extern BaseType_t xTaskCreate_callee(TaskFunction_t pxTaskCode,const char * cons
                                     StaticTask_t * const pxTaskBuffer ) PRIVILEGED_FUNCTION;
 */
     extern BaseType_t xTaskCreateStatic(TaskFunction_t pxTaskCode,const char * const pcName,const configSTACK_DEPTH_TYPE ulStackDepth,void * const pvParameters,UBaseType_t uxPriority,StackType_t * const puxStackBuffer,StaticTask_t * const pxTaskBuffer) __preserves_regs(iyh,iyl);
-extern BaseType_t xTaskCreateStatic_callee(TaskFunction_t pxTaskCode,const char * const pcName,const configSTACK_DEPTH_TYPE ulStackDepth,void * const pvParameters,UBaseType_t uxPriority,StackType_t * const puxStackBuffer,StaticTask_t * const pxTaskBuffer) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define xTaskCreateStatic(a,b,c,d,e,f,g) xTaskCreateStatic_callee(a,b,c,d,e,f,g)
-
 
 #endif /* configSUPPORT_STATIC_ALLOCATION */
 
@@ -542,9 +536,6 @@ TaskHandle_t xHandle;
 #if( portUSING_MPU_WRAPPERS == 1 )
 //  BaseType_t xTaskCreateRestricted( const TaskParameters_t * const pxTaskDefinition, TaskHandle_t *pxCreatedTask ) PRIVILEGED_FUNCTION;
     extern BaseType_t xTaskCreateRestricted(const TaskParameters_t * const pxTaskDefinition,TaskHandle_t *pxCreatedTask) __preserves_regs(iyh,iyl);
-extern BaseType_t xTaskCreateRestricted_callee(const TaskParameters_t * const pxTaskDefinition,TaskHandle_t *pxCreatedTask) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define xTaskCreateRestricted(a,b) xTaskCreateRestricted_callee(a,b)
-
 
 #endif
 
@@ -635,9 +626,6 @@ TaskHandle_t xHandle;
 #if( ( portUSING_MPU_WRAPPERS == 1 ) && ( configSUPPORT_STATIC_ALLOCATION == 1 ) )
 //  BaseType_t xTaskCreateRestrictedStatic( const TaskParameters_t * const pxTaskDefinition, TaskHandle_t *pxCreatedTask ) PRIVILEGED_FUNCTION;
     extern BaseType_t xTaskCreateRestrictedStatic(const TaskParameters_t * const pxTaskDefinition,TaskHandle_t *pxCreatedTask) __preserves_regs(iyh,iyl);
-extern BaseType_t xTaskCreateRestrictedStatic_callee(const TaskParameters_t * const pxTaskDefinition,TaskHandle_t *pxCreatedTask) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define xTaskCreateRestrictedStatic(a,b) xTaskCreateRestrictedStatic_callee(a,b)
-
 
 #endif
 
@@ -689,9 +677,6 @@ void vATask( void *pvParameters )
  */
 //  void vTaskAllocateMPURegions( TaskHandle_t xTask, const MemoryRegion_t * const pxRegions ) PRIVILEGED_FUNCTION;
 extern void vTaskAllocateMPURegions(TaskHandle_t xTask,const MemoryRegion_t * const pxRegions) __preserves_regs(iyh,iyl);
-extern void vTaskAllocateMPURegions_callee(TaskHandle_t xTask,const MemoryRegion_t * const pxRegions) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define vTaskAllocateMPURegions(a,b) vTaskAllocateMPURegions_callee(a,b)
-
 
 
 /**
@@ -735,9 +720,6 @@ extern void vTaskAllocateMPURegions_callee(TaskHandle_t xTask,const MemoryRegion
  */
 //  void vTaskDelete( TaskHandle_t xTaskToDelete ) PRIVILEGED_FUNCTION;
 extern void vTaskDelete(TaskHandle_t xTaskToDelete) __preserves_regs(iyh,iyl);
-extern void vTaskDelete_fastcall(TaskHandle_t xTaskToDelete) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define vTaskDelete(a) vTaskDelete_fastcall(a)
-
 
 
 /*-----------------------------------------------------------
@@ -792,9 +774,6 @@ extern void vTaskDelete_fastcall(TaskHandle_t xTaskToDelete) __preserves_regs(iy
  */
 //  void vTaskDelay( const TickType_t xTicksToDelay ) PRIVILEGED_FUNCTION;
 extern void vTaskDelay(const TickType_t xTicksToDelay) __preserves_regs(iyh,iyl);
-extern void vTaskDelay_fastcall(const TickType_t xTicksToDelay) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define vTaskDelay(a) vTaskDelay_fastcall(a)
-
 
 
 /**
@@ -856,9 +835,6 @@ extern void vTaskDelay_fastcall(const TickType_t xTicksToDelay) __preserves_regs
  */
 //  void vTaskDelayUntil( TickType_t * const pxPreviousWakeTime, const TickType_t xTimeIncrement ) PRIVILEGED_FUNCTION;
 extern void vTaskDelayUntil(TickType_t * const pxPreviousWakeTime,const TickType_t xTimeIncrement) __preserves_regs(iyh,iyl);
-extern void vTaskDelayUntil_callee(TickType_t * const pxPreviousWakeTime,const TickType_t xTimeIncrement) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define vTaskDelayUntil(a,b) vTaskDelayUntil_callee(a,b)
-
 
 
 /**
@@ -891,9 +867,6 @@ extern void vTaskDelayUntil_callee(TickType_t * const pxPreviousWakeTime,const T
  */
 //  BaseType_t xTaskAbortDelay( TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
 extern BaseType_t xTaskAbortDelay(TaskHandle_t xTask) __preserves_regs(iyh,iyl);
-extern BaseType_t xTaskAbortDelay_fastcall(TaskHandle_t xTask) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define xTaskAbortDelay(a) xTaskAbortDelay_fastcall(a)
-
 
 
 /**
@@ -943,9 +916,6 @@ extern BaseType_t xTaskAbortDelay_fastcall(TaskHandle_t xTask) __preserves_regs(
  */
 //  UBaseType_t uxTaskPriorityGet( const TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
 extern UBaseType_t uxTaskPriorityGet(const TaskHandle_t xTask) __preserves_regs(iyh,iyl);
-extern UBaseType_t uxTaskPriorityGet_fastcall(const TaskHandle_t xTask) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define uxTaskPriorityGet(a) uxTaskPriorityGet_fastcall(a)
-
 
 
 /**
@@ -956,9 +926,6 @@ extern UBaseType_t uxTaskPriorityGet_fastcall(const TaskHandle_t xTask) __preser
  */
 //  UBaseType_t uxTaskPriorityGetFromISR( const TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
 extern UBaseType_t uxTaskPriorityGetFromISR(const TaskHandle_t xTask) __preserves_regs(iyh,iyl);
-extern UBaseType_t uxTaskPriorityGetFromISR_fastcall(const TaskHandle_t xTask) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define uxTaskPriorityGetFromISR(a) uxTaskPriorityGetFromISR_fastcall(a)
-
 
 
 /**
@@ -979,9 +946,6 @@ extern UBaseType_t uxTaskPriorityGetFromISR_fastcall(const TaskHandle_t xTask) _
  */
 //  eTaskState eTaskGetState( TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
 extern eTaskState eTaskGetState(TaskHandle_t xTask) __preserves_regs(iyh,iyl);
-extern eTaskState eTaskGetState_fastcall(TaskHandle_t xTask) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define eTaskGetState(a) eTaskGetState_fastcall(a)
-
 
 
 /**
@@ -1040,9 +1004,6 @@ extern eTaskState eTaskGetState_fastcall(TaskHandle_t xTask) __preserves_regs(iy
  */
 //  void vTaskGetInfo( TaskHandle_t xTask, TaskStatus_t *pxTaskStatus, BaseType_t xGetFreeStackSpace, eTaskState eState ) PRIVILEGED_FUNCTION;
 extern void vTaskGetInfo(TaskHandle_t xTask,TaskStatus_t *pxTaskStatus,BaseType_t xGetFreeStackSpace,eTaskState eState) __preserves_regs(iyh,iyl);
-extern void vTaskGetInfo_callee(TaskHandle_t xTask,TaskStatus_t *pxTaskStatus,BaseType_t xGetFreeStackSpace,eTaskState eState) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define vTaskGetInfo(a,b,c,d) vTaskGetInfo_callee(a,b,c,d)
-
 
 
 /**
@@ -1087,9 +1048,6 @@ extern void vTaskGetInfo_callee(TaskHandle_t xTask,TaskStatus_t *pxTaskStatus,Ba
  */
 //  void vTaskPrioritySet( TaskHandle_t xTask, UBaseType_t uxNewPriority ) PRIVILEGED_FUNCTION;
 extern void vTaskPrioritySet(TaskHandle_t xTask,UBaseType_t uxNewPriority) __preserves_regs(iyh,iyl);
-extern void vTaskPrioritySet_callee(TaskHandle_t xTask,UBaseType_t uxNewPriority) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define vTaskPrioritySet(a,b) vTaskPrioritySet_callee(a,b)
-
 
 
 /**
@@ -1143,9 +1101,6 @@ extern void vTaskPrioritySet_callee(TaskHandle_t xTask,UBaseType_t uxNewPriority
  */
 //  void vTaskSuspend( TaskHandle_t xTaskToSuspend ) PRIVILEGED_FUNCTION;
 extern void vTaskSuspend(TaskHandle_t xTaskToSuspend) __preserves_regs(iyh,iyl);
-extern void vTaskSuspend_fastcall(TaskHandle_t xTaskToSuspend) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define vTaskSuspend(a) vTaskSuspend_fastcall(a)
-
 
 
 /**
@@ -1197,9 +1152,6 @@ extern void vTaskSuspend_fastcall(TaskHandle_t xTaskToSuspend) __preserves_regs(
  */
 //  void vTaskResume( TaskHandle_t xTaskToResume ) PRIVILEGED_FUNCTION;
 extern void vTaskResume(TaskHandle_t xTaskToResume) __preserves_regs(iyh,iyl);
-extern void vTaskResume_fastcall(TaskHandle_t xTaskToResume) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define vTaskResume(a) vTaskResume_fastcall(a)
-
 
 
 /**
@@ -1231,9 +1183,6 @@ extern void vTaskResume_fastcall(TaskHandle_t xTaskToResume) __preserves_regs(iy
  */
 //  BaseType_t xTaskResumeFromISR( TaskHandle_t xTaskToResume ) PRIVILEGED_FUNCTION;
 extern BaseType_t xTaskResumeFromISR(TaskHandle_t xTaskToResume) __preserves_regs(iyh,iyl);
-extern BaseType_t xTaskResumeFromISR_fastcall(TaskHandle_t xTaskToResume) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define xTaskResumeFromISR(a) xTaskResumeFromISR_fastcall(a)
-
 
 
 /*-----------------------------------------------------------
@@ -1269,9 +1218,6 @@ extern BaseType_t xTaskResumeFromISR_fastcall(TaskHandle_t xTaskToResume) __pres
  */
 //  void vTaskStartScheduler( void ) PRIVILEGED_FUNCTION;
 extern void vTaskStartScheduler(void) __preserves_regs(iyh,iyl);
-extern void vTaskStartScheduler_fastcall(void) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define vTaskStartScheduler(a) vTaskStartScheduler_fastcall(a)
-
 
 
 /**
@@ -1330,9 +1276,6 @@ extern void vTaskStartScheduler_fastcall(void) __preserves_regs(iyh,iyl) __z88dk
  */
 //  void vTaskEndScheduler( void ) PRIVILEGED_FUNCTION;
 extern void vTaskEndScheduler(void) __preserves_regs(iyh,iyl);
-extern void vTaskEndScheduler_fastcall(void) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define vTaskEndScheduler(a) vTaskEndScheduler_fastcall(a)
-
 
 
 /**
@@ -1386,9 +1329,6 @@ extern void vTaskEndScheduler_fastcall(void) __preserves_regs(iyh,iyl) __z88dk_f
  */
 //  void vTaskSuspendAll( void ) PRIVILEGED_FUNCTION;
 extern void vTaskSuspendAll(void) __preserves_regs(iyh,iyl);
-extern void vTaskSuspendAll_fastcall(void) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define vTaskSuspendAll(a) vTaskSuspendAll_fastcall(a)
-
 
 
 /**
@@ -1445,9 +1385,6 @@ extern void vTaskSuspendAll_fastcall(void) __preserves_regs(iyh,iyl) __z88dk_fas
  */
 //  BaseType_t xTaskResumeAll( void ) PRIVILEGED_FUNCTION;
 extern BaseType_t xTaskResumeAll(void) __preserves_regs(iyh,iyl);
-extern BaseType_t xTaskResumeAll_fastcall(void) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define xTaskResumeAll(a) xTaskResumeAll_fastcall(a)
-
 
 
 /*-----------------------------------------------------------
@@ -1465,9 +1402,6 @@ extern BaseType_t xTaskResumeAll_fastcall(void) __preserves_regs(iyh,iyl) __z88d
  */
 //  TickType_t xTaskGetTickCount( void ) PRIVILEGED_FUNCTION;
 extern TickType_t xTaskGetTickCount(void) __preserves_regs(iyh,iyl);
-extern TickType_t xTaskGetTickCount_fastcall(void) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define xTaskGetTickCount(a) xTaskGetTickCount_fastcall(a)
-
 
 
 /**
@@ -1486,9 +1420,6 @@ extern TickType_t xTaskGetTickCount_fastcall(void) __preserves_regs(iyh,iyl) __z
  */
 //  TickType_t xTaskGetTickCountFromISR( void ) PRIVILEGED_FUNCTION;
 extern TickType_t xTaskGetTickCountFromISR(void) __preserves_regs(iyh,iyl);
-extern TickType_t xTaskGetTickCountFromISR_fastcall(void) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define xTaskGetTickCountFromISR(a) xTaskGetTickCountFromISR_fastcall(a)
-
 
 
 /**
@@ -1505,9 +1436,6 @@ extern TickType_t xTaskGetTickCountFromISR_fastcall(void) __preserves_regs(iyh,i
  */
 //  UBaseType_t uxTaskGetNumberOfTasks( void ) PRIVILEGED_FUNCTION;
 extern UBaseType_t uxTaskGetNumberOfTasks(void) __preserves_regs(iyh,iyl);
-extern UBaseType_t uxTaskGetNumberOfTasks_fastcall(void) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define uxTaskGetNumberOfTasks(a) uxTaskGetNumberOfTasks_fastcall(a)
-
 
 
 /**
@@ -1523,9 +1451,6 @@ extern UBaseType_t uxTaskGetNumberOfTasks_fastcall(void) __preserves_regs(iyh,iy
  */
 //  char *pcTaskGetName( TaskHandle_t xTaskToQuery ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
 extern char *pcTaskGetName(TaskHandle_t xTaskToQuery) __preserves_regs(iyh,iyl);
-extern char *pcTaskGetName_fastcall(TaskHandle_t xTaskToQuery) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define pcTaskGetName(a) pcTaskGetName_fastcall(a)
-
 
 
 /**
@@ -1544,9 +1469,6 @@ extern char *pcTaskGetName_fastcall(TaskHandle_t xTaskToQuery) __preserves_regs(
  */
 //  TaskHandle_t xTaskGetHandle( const char *pcNameToQuery ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
 extern TaskHandle_t xTaskGetHandle(const char *pcNameToQuery) __preserves_regs(iyh,iyl);
-extern TaskHandle_t xTaskGetHandle_fastcall(const char *pcNameToQuery) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define xTaskGetHandle(a) xTaskGetHandle_fastcall(a)
-
 
 
 /**
@@ -1577,16 +1499,10 @@ extern TaskHandle_t xTaskGetHandle_fastcall(const char *pcNameToQuery) __preserv
 #if configENABLE_BACKWARD_COMPATIBILITY == 1
 //  UBaseType_t uxTaskGetStackHighWaterMark( TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
 extern UBaseType_t uxTaskGetStackHighWaterMark(TaskHandle_t xTask) __preserves_regs(iyh,iyl);
-extern UBaseType_t uxTaskGetStackHighWaterMark_fastcall(TaskHandle_t xTask) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define uxTaskGetStackHighWaterMark(a) uxTaskGetStackHighWaterMark_fastcall(a)
-
 
 #else
 //  configSTACK_DEPTH_TYPE uxTaskGetStackHighWaterMark( TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
 extern configSTACK_DEPTH_TYPE uxTaskGetStackHighWaterMark(TaskHandle_t xTask) __preserves_regs(iyh,iyl);
-extern configSTACK_DEPTH_TYPE uxTaskGetStackHighWaterMark_fastcall(TaskHandle_t xTask) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define uxTaskGetStackHighWaterMark(a) uxTaskGetStackHighWaterMark_fastcall(a)
-
 
 #endif /* configENABLE_BACKWARD_COMPATIBILITY */
 
@@ -1608,9 +1524,6 @@ constant. */
          */
         //  void vTaskSetApplicationTaskTag( TaskHandle_t xTask, TaskHookFunction_t pxHookFunction ) PRIVILEGED_FUNCTION;
         extern void vTaskSetApplicationTaskTag(TaskHandle_t xTask,TaskHookFunction_t pxHookFunction) __preserves_regs(iyh,iyl);
-extern void vTaskSetApplicationTaskTag_callee(TaskHandle_t xTask,TaskHookFunction_t pxHookFunction) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define vTaskSetApplicationTaskTag(a,b) vTaskSetApplicationTaskTag_callee(a,b)
-
 
 
         /**
@@ -1623,9 +1536,6 @@ extern void vTaskSetApplicationTaskTag_callee(TaskHandle_t xTask,TaskHookFunctio
          */
         //  TaskHookFunction_t xTaskGetApplicationTaskTag( TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
         extern TaskHookFunction_t xTaskGetApplicationTaskTag(TaskHandle_t xTask) __preserves_regs(iyh,iyl);
-extern TaskHookFunction_t xTaskGetApplicationTaskTag_fastcall(TaskHandle_t xTask) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define xTaskGetApplicationTaskTag(a) xTaskGetApplicationTaskTag_fastcall(a)
-
 
 
         /**
@@ -1637,9 +1547,6 @@ extern TaskHookFunction_t xTaskGetApplicationTaskTag_fastcall(TaskHandle_t xTask
          */
         //  TaskHookFunction_t xTaskGetApplicationTaskTagFromISR( TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
         extern TaskHookFunction_t xTaskGetApplicationTaskTagFromISR(TaskHandle_t xTask) __preserves_regs(iyh,iyl);
-extern TaskHookFunction_t xTaskGetApplicationTaskTagFromISR_fastcall(TaskHandle_t xTask) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define xTaskGetApplicationTaskTagFromISR(a) xTaskGetApplicationTaskTagFromISR_fastcall(a)
-
 
     #endif /* configUSE_APPLICATION_TASK_TAG ==1 */
 #endif /* ifdef configUSE_APPLICATION_TASK_TAG */
@@ -1653,15 +1560,9 @@ extern TaskHookFunction_t xTaskGetApplicationTaskTagFromISR_fastcall(TaskHandle_
     used to set and query a pointer respectively. */
     //  void vTaskSetThreadLocalStoragePointer( TaskHandle_t xTaskToSet, BaseType_t xIndex, void *pvValue ) PRIVILEGED_FUNCTION;
     extern void vTaskSetThreadLocalStoragePointer(TaskHandle_t xTaskToSet,BaseType_t xIndex,void *pvValue) __preserves_regs(iyh,iyl);
-extern void vTaskSetThreadLocalStoragePointer_callee(TaskHandle_t xTaskToSet,BaseType_t xIndex,void *pvValue) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define vTaskSetThreadLocalStoragePointer(a,b,c) vTaskSetThreadLocalStoragePointer_callee(a,b,c)
-
 
     //  void *pvTaskGetThreadLocalStoragePointer( TaskHandle_t xTaskToQuery, BaseType_t xIndex ) PRIVILEGED_FUNCTION;
     extern void *pvTaskGetThreadLocalStoragePointer(TaskHandle_t xTaskToQuery,BaseType_t xIndex) __preserves_regs(iyh,iyl);
-extern void *pvTaskGetThreadLocalStoragePointer_callee(TaskHandle_t xTaskToQuery,BaseType_t xIndex) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define pvTaskGetThreadLocalStoragePointer(a,b) pvTaskGetThreadLocalStoragePointer_callee(a,b)
-
 
 
 #endif
@@ -1679,9 +1580,6 @@ extern void *pvTaskGetThreadLocalStoragePointer_callee(TaskHandle_t xTaskToQuery
  */
 //  BaseType_t xTaskCallApplicationTaskHook( TaskHandle_t xTask, void *pvParameter ) PRIVILEGED_FUNCTION;
 extern BaseType_t xTaskCallApplicationTaskHook(TaskHandle_t xTask,void *pvParameter) __preserves_regs(iyh,iyl);
-extern BaseType_t xTaskCallApplicationTaskHook_callee(TaskHandle_t xTask,void *pvParameter) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define xTaskCallApplicationTaskHook(a,b) xTaskCallApplicationTaskHook_callee(a,b)
-
 
 
 /**
@@ -1693,9 +1591,6 @@ extern BaseType_t xTaskCallApplicationTaskHook_callee(TaskHandle_t xTask,void *p
  */
 //  TaskHandle_t xTaskGetIdleTaskHandle( void ) PRIVILEGED_FUNCTION;
 extern TaskHandle_t xTaskGetIdleTaskHandle(void) __preserves_regs(iyh,iyl);
-extern TaskHandle_t xTaskGetIdleTaskHandle_fastcall(void) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define xTaskGetIdleTaskHandle(a) xTaskGetIdleTaskHandle_fastcall(a)
-
 
 
 /**
@@ -1797,9 +1692,6 @@ extern TaskHandle_t xTaskGetIdleTaskHandle_fastcall(void) __preserves_regs(iyh,i
  */
 //  UBaseType_t uxTaskGetSystemState( TaskStatus_t * const pxTaskStatusArray, const UBaseType_t uxArraySize, uint32_t * const pulTotalRunTime ) PRIVILEGED_FUNCTION;
 extern UBaseType_t uxTaskGetSystemState(TaskStatus_t * const pxTaskStatusArray,const UBaseType_t uxArraySize,uint32_t * const pulTotalRunTime) __preserves_regs(iyh,iyl);
-extern UBaseType_t uxTaskGetSystemState_callee(TaskStatus_t * const pxTaskStatusArray,const UBaseType_t uxArraySize,uint32_t * const pulTotalRunTime) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define uxTaskGetSystemState(a,b,c) uxTaskGetSystemState_callee(a,b,c)
-
 
 
 /**
@@ -1849,9 +1741,6 @@ extern UBaseType_t uxTaskGetSystemState_callee(TaskStatus_t * const pxTaskStatus
  */
 //  void vTaskList( char * pcWriteBuffer ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
 extern void vTaskList(char * pcWriteBuffer) __preserves_regs(iyh,iyl);
-extern void vTaskList_fastcall(char * pcWriteBuffer) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define vTaskList(a) vTaskList_fastcall(a)
-
 
 
 /**
@@ -1908,9 +1797,6 @@ extern void vTaskList_fastcall(char * pcWriteBuffer) __preserves_regs(iyh,iyl) _
  */
 //  void vTaskGetRunTimeStats( char *pcWriteBuffer ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
 extern void vTaskGetRunTimeStats(char *pcWriteBuffer) __preserves_regs(iyh,iyl);
-extern void vTaskGetRunTimeStats_fastcall(char *pcWriteBuffer) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define vTaskGetRunTimeStats(a) vTaskGetRunTimeStats_fastcall(a)
-
 
 
 /**
@@ -1943,9 +1829,6 @@ extern void vTaskGetRunTimeStats_fastcall(char *pcWriteBuffer) __preserves_regs(
 */
 //  TickType_t ulTaskGetIdleRunTimeCounter( void ) PRIVILEGED_FUNCTION;
 extern TickType_t ulTaskGetIdleRunTimeCounter(void) __preserves_regs(iyh,iyl);
-extern TickType_t ulTaskGetIdleRunTimeCounter_fastcall(void) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define ulTaskGetIdleRunTimeCounter(a) ulTaskGetIdleRunTimeCounter_fastcall(a)
-
 
 
 /**
@@ -2029,9 +1912,6 @@ extern TickType_t ulTaskGetIdleRunTimeCounter_fastcall(void) __preserves_regs(iy
  */
 //  BaseType_t xTaskGenericNotify( TaskHandle_t xTaskToNotify, uint32_t ulValue, eNotifyAction eAction, uint32_t *pulPreviousNotificationValue ) PRIVILEGED_FUNCTION;
 extern BaseType_t xTaskGenericNotify(TaskHandle_t xTaskToNotify,uint32_t ulValue,eNotifyAction eAction,uint32_t *pulPreviousNotificationValue) __preserves_regs(iyh,iyl);
-extern BaseType_t xTaskGenericNotify_callee(TaskHandle_t xTaskToNotify,uint32_t ulValue,eNotifyAction eAction,uint32_t *pulPreviousNotificationValue) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define xTaskGenericNotify(a,b,c,d) xTaskGenericNotify_callee(a,b,c,d)
-
 
 #define xTaskNotify( xTaskToNotify, ulValue, eAction ) xTaskGenericNotify( ( xTaskToNotify ), ( ulValue ), ( eAction ), NULL )
 #define xTaskNotifyAndQuery( xTaskToNotify, ulValue, eAction, pulPreviousNotifyValue ) xTaskGenericNotify( ( xTaskToNotify ), ( ulValue ), ( eAction ), ( pulPreviousNotifyValue ) )
@@ -2125,9 +2005,6 @@ extern BaseType_t xTaskGenericNotify_callee(TaskHandle_t xTaskToNotify,uint32_t 
  */
 //  BaseType_t xTaskGenericNotifyFromISR( TaskHandle_t xTaskToNotify, uint32_t ulValue, eNotifyAction eAction, uint32_t *pulPreviousNotificationValue, BaseType_t *pxHigherPriorityTaskWoken ) PRIVILEGED_FUNCTION;
 extern BaseType_t xTaskGenericNotifyFromISR(TaskHandle_t xTaskToNotify,uint32_t ulValue,eNotifyAction eAction,uint32_t *pulPreviousNotificationValue,BaseType_t *pxHigherPriorityTaskWoken) __preserves_regs(iyh,iyl);
-extern BaseType_t xTaskGenericNotifyFromISR_callee(TaskHandle_t xTaskToNotify,uint32_t ulValue,eNotifyAction eAction,uint32_t *pulPreviousNotificationValue,BaseType_t *pxHigherPriorityTaskWoken) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define xTaskGenericNotifyFromISR(a,b,c,d,e) xTaskGenericNotifyFromISR_callee(a,b,c,d,e)
-
 
 #define xTaskNotifyFromISR( xTaskToNotify, ulValue, eAction, pxHigherPriorityTaskWoken ) xTaskGenericNotifyFromISR( ( xTaskToNotify ), ( ulValue ), ( eAction ), NULL, ( pxHigherPriorityTaskWoken ) )
 #define xTaskNotifyAndQueryFromISR( xTaskToNotify, ulValue, eAction, pulPreviousNotificationValue, pxHigherPriorityTaskWoken ) xTaskGenericNotifyFromISR( ( xTaskToNotify ), ( ulValue ), ( eAction ), ( pulPreviousNotificationValue ), ( pxHigherPriorityTaskWoken ) )
@@ -2207,9 +2084,6 @@ extern BaseType_t xTaskGenericNotifyFromISR_callee(TaskHandle_t xTaskToNotify,ui
  */
 // BaseType_t xTaskNotifyWait( uint32_t ulBitsToClearOnEntry, uint32_t ulBitsToClearOnExit, uint32_t *pulNotificationValue, TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
 extern BaseType_t xTaskNotifyWait(uint32_t ulBitsToClearOnEntry,uint32_t ulBitsToClearOnExit,uint32_t *pulNotificationValue,TickType_t xTicksToWait) __preserves_regs(iyh,iyl);
-extern BaseType_t xTaskNotifyWait_callee(uint32_t ulBitsToClearOnEntry,uint32_t ulBitsToClearOnExit,uint32_t *pulNotificationValue,TickType_t xTicksToWait) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define xTaskNotifyWait(a,b,c,d) xTaskNotifyWait_callee(a,b,c,d)
-
 
 
 /**
@@ -2313,9 +2187,6 @@ extern BaseType_t xTaskNotifyWait_callee(uint32_t ulBitsToClearOnEntry,uint32_t 
  */
 //  void vTaskNotifyGiveFromISR( TaskHandle_t xTaskToNotify, BaseType_t *pxHigherPriorityTaskWoken ) PRIVILEGED_FUNCTION;
 extern void vTaskNotifyGiveFromISR(TaskHandle_t xTaskToNotify,BaseType_t *pxHigherPriorityTaskWoken) __preserves_regs(iyh,iyl);
-extern void vTaskNotifyGiveFromISR_callee(TaskHandle_t xTaskToNotify,BaseType_t *pxHigherPriorityTaskWoken) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define vTaskNotifyGiveFromISR(a,b) vTaskNotifyGiveFromISR_callee(a,b)
-
 
 
 /**
@@ -2387,9 +2258,6 @@ extern void vTaskNotifyGiveFromISR_callee(TaskHandle_t xTaskToNotify,BaseType_t 
  */
 //  uint32_t ulTaskNotifyTake( BaseType_t xClearCountOnExit, TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
 extern uint32_t ulTaskNotifyTake(BaseType_t xClearCountOnExit,TickType_t xTicksToWait) __preserves_regs(iyh,iyl);
-extern uint32_t ulTaskNotifyTake_callee(BaseType_t xClearCountOnExit,TickType_t xTicksToWait) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define ulTaskNotifyTake(a,b) ulTaskNotifyTake_callee(a,b)
-
 
 
 /**
@@ -2408,9 +2276,6 @@ extern uint32_t ulTaskNotifyTake_callee(BaseType_t xClearCountOnExit,TickType_t 
  */
 //  BaseType_t xTaskNotifyStateClear( TaskHandle_t xTask );
 extern BaseType_t xTaskNotifyStateClear(TaskHandle_t xTask) __preserves_regs(iyh,iyl);
-extern BaseType_t xTaskNotifyStateClear_fastcall(TaskHandle_t xTask) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define xTaskNotifyStateClear(a) xTaskNotifyStateClear_fastcall(a)
-
 
 
 /**
@@ -2431,9 +2296,6 @@ extern BaseType_t xTaskNotifyStateClear_fastcall(TaskHandle_t xTask) __preserves
 */
 //  uint32_t ulTaskNotifyValueClear( TaskHandle_t xTask, uint32_t ulBitsToClear ) PRIVILEGED_FUNCTION;
 extern uint32_t ulTaskNotifyValueClear(TaskHandle_t xTask,uint32_t ulBitsToClear) __preserves_regs(iyh,iyl);
-extern uint32_t ulTaskNotifyValueClear_callee(TaskHandle_t xTask,uint32_t ulBitsToClear) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define ulTaskNotifyValueClear(a,b) ulTaskNotifyValueClear_callee(a,b)
-
 
 
 /**
@@ -2450,9 +2312,6 @@ extern uint32_t ulTaskNotifyValueClear_callee(TaskHandle_t xTask,uint32_t ulBits
  */
 //  void vTaskSetTimeOutState( TimeOut_t * const pxTimeOut ) PRIVILEGED_FUNCTION;
 extern void vTaskSetTimeOutState(TimeOut_t * const pxTimeOut) __preserves_regs(iyh,iyl);
-extern void vTaskSetTimeOutState_fastcall(TimeOut_t * const pxTimeOut) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define vTaskSetTimeOutState(a) vTaskSetTimeOutState_fastcall(a)
-
 
 
 /**
@@ -2538,9 +2397,6 @@ extern void vTaskSetTimeOutState_fastcall(TimeOut_t * const pxTimeOut) __preserv
  */
 //  BaseType_t xTaskCheckForTimeOut( TimeOut_t * const pxTimeOut, TickType_t * const pxTicksToWait ) PRIVILEGED_FUNCTION;
 extern BaseType_t xTaskCheckForTimeOut(TimeOut_t * const pxTimeOut,TickType_t * const pxTicksToWait) __preserves_regs(iyh,iyl);
-extern BaseType_t xTaskCheckForTimeOut_callee(TimeOut_t * const pxTimeOut,TickType_t * const pxTicksToWait) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define xTaskCheckForTimeOut(a,b) xTaskCheckForTimeOut_callee(a,b)
-
 
 
 /*-----------------------------------------------------------
@@ -2564,9 +2420,6 @@ extern BaseType_t xTaskCheckForTimeOut_callee(TimeOut_t * const pxTimeOut,TickTy
  */
 //  BaseType_t xTaskIncrementTick( void ) PRIVILEGED_FUNCTION;
 extern BaseType_t xTaskIncrementTick(void) __preserves_regs(iyh,iyl);
-extern BaseType_t xTaskIncrementTick_fastcall(void) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define xTaskIncrementTick(a) xTaskIncrementTick_fastcall(a)
-
 
 
 /*
@@ -2602,15 +2455,9 @@ extern BaseType_t xTaskIncrementTick_fastcall(void) __preserves_regs(iyh,iyl) __
  */
 //  void vTaskPlaceOnEventList( List_t * const pxEventList, const TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
 extern void vTaskPlaceOnEventList(List_t * const pxEventList,const TickType_t xTicksToWait) __preserves_regs(iyh,iyl);
-extern void vTaskPlaceOnEventList_callee(List_t * const pxEventList,const TickType_t xTicksToWait) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define vTaskPlaceOnEventList(a,b) vTaskPlaceOnEventList_callee(a,b)
-
 
 //  void vTaskPlaceOnUnorderedEventList( List_t * pxEventList, const TickType_t xItemValue, const TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
 extern void vTaskPlaceOnUnorderedEventList(List_t * pxEventList,const TickType_t xItemValue,const TickType_t xTicksToWait) __preserves_regs(iyh,iyl);
-extern void vTaskPlaceOnUnorderedEventList_callee(List_t * pxEventList,const TickType_t xItemValue,const TickType_t xTicksToWait) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define vTaskPlaceOnUnorderedEventList(a,b,c) vTaskPlaceOnUnorderedEventList_callee(a,b,c)
-
 
 
 /*
@@ -2626,9 +2473,6 @@ extern void vTaskPlaceOnUnorderedEventList_callee(List_t * pxEventList,const Tic
  */
 //  void vTaskPlaceOnEventListRestricted( List_t * const pxEventList, TickType_t xTicksToWait, const BaseType_t xWaitIndefinitely ) PRIVILEGED_FUNCTION;
 extern void vTaskPlaceOnEventListRestricted(List_t * const pxEventList,TickType_t xTicksToWait,const BaseType_t xWaitIndefinitely) __preserves_regs(iyh,iyl);
-extern void vTaskPlaceOnEventListRestricted_callee(List_t * const pxEventList,TickType_t xTicksToWait,const BaseType_t xWaitIndefinitely) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define vTaskPlaceOnEventListRestricted(a,b,c) vTaskPlaceOnEventListRestricted_callee(a,b,c)
-
 
 
 /*
@@ -2657,15 +2501,9 @@ extern void vTaskPlaceOnEventListRestricted_callee(List_t * const pxEventList,Ti
  */
 //  BaseType_t xTaskRemoveFromEventList( const List_t * const pxEventList ) PRIVILEGED_FUNCTION;
 extern BaseType_t xTaskRemoveFromEventList(const List_t * const pxEventList) __preserves_regs(iyh,iyl);
-extern BaseType_t xTaskRemoveFromEventList_fastcall(const List_t * const pxEventList) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define xTaskRemoveFromEventList(a) xTaskRemoveFromEventList_fastcall(a)
-
 
 //  void vTaskRemoveFromUnorderedEventList( ListItem_t * pxEventListItem, const TickType_t xItemValue ) PRIVILEGED_FUNCTION;
 extern void vTaskRemoveFromUnorderedEventList(ListItem_t * pxEventListItem,const TickType_t xItemValue) __preserves_regs(iyh,iyl);
-extern void vTaskRemoveFromUnorderedEventList_callee(ListItem_t * pxEventListItem,const TickType_t xItemValue) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define vTaskRemoveFromUnorderedEventList(a,b) vTaskRemoveFromUnorderedEventList_callee(a,b)
-
 
 
 /*
@@ -2678,9 +2516,6 @@ extern void vTaskRemoveFromUnorderedEventList_callee(ListItem_t * pxEventListIte
  */
 //  portDONT_DISCARD void vTaskSwitchContext( void ) PRIVILEGED_FUNCTION;
 extern void vTaskSwitchContext(void) __preserves_regs(iyh,iyl);
-extern void vTaskSwitchContext_fastcall(void) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define vTaskSwitchContext(a) vTaskSwitchContext_fastcall(a)
-
 
 
 /*
@@ -2689,9 +2524,6 @@ extern void vTaskSwitchContext_fastcall(void) __preserves_regs(iyh,iyl) __z88dk_
  */
 //  TickType_t uxTaskResetEventItemValue( void ) PRIVILEGED_FUNCTION;
 extern TickType_t uxTaskResetEventItemValue(void) __preserves_regs(iyh,iyl);
-extern TickType_t uxTaskResetEventItemValue_fastcall(void) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define uxTaskResetEventItemValue(a) uxTaskResetEventItemValue_fastcall(a)
-
 
 
 /*
@@ -2699,9 +2531,6 @@ extern TickType_t uxTaskResetEventItemValue_fastcall(void) __preserves_regs(iyh,
  */
 //  TaskHandle_t xTaskGetCurrentTaskHandle( void ) PRIVILEGED_FUNCTION;
 extern TaskHandle_t xTaskGetCurrentTaskHandle(void) __preserves_regs(iyh,iyl);
-extern TaskHandle_t xTaskGetCurrentTaskHandle_fastcall(void) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define xTaskGetCurrentTaskHandle(a) xTaskGetCurrentTaskHandle_fastcall(a)
-
 
 
 /*
@@ -2710,9 +2539,6 @@ extern TaskHandle_t xTaskGetCurrentTaskHandle_fastcall(void) __preserves_regs(iy
  */
 //  void vTaskMissedYield( void ) PRIVILEGED_FUNCTION;
 extern void vTaskMissedYield(void) __preserves_regs(iyh,iyl);
-extern void vTaskMissedYield_fastcall(void) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define vTaskMissedYield(a) vTaskMissedYield_fastcall(a)
-
 
 
 /*
@@ -2721,9 +2547,6 @@ extern void vTaskMissedYield_fastcall(void) __preserves_regs(iyh,iyl) __z88dk_fa
  */
 //  BaseType_t xTaskGetSchedulerState( void ) PRIVILEGED_FUNCTION;
 extern BaseType_t xTaskGetSchedulerState(void) __preserves_regs(iyh,iyl);
-extern BaseType_t xTaskGetSchedulerState_fastcall(void) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define xTaskGetSchedulerState(a) xTaskGetSchedulerState_fastcall(a)
-
 
 
 /*
@@ -2732,9 +2555,6 @@ extern BaseType_t xTaskGetSchedulerState_fastcall(void) __preserves_regs(iyh,iyl
  */
 //  BaseType_t xTaskPriorityInherit( TaskHandle_t const pxMutexHolder ) PRIVILEGED_FUNCTION;
 extern BaseType_t xTaskPriorityInherit(TaskHandle_t const pxMutexHolder) __preserves_regs(iyh,iyl);
-extern BaseType_t xTaskPriorityInherit_fastcall(TaskHandle_t const pxMutexHolder) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define xTaskPriorityInherit(a) xTaskPriorityInherit_fastcall(a)
-
 
 
 /*
@@ -2743,9 +2563,6 @@ extern BaseType_t xTaskPriorityInherit_fastcall(TaskHandle_t const pxMutexHolder
  */
 //  BaseType_t xTaskPriorityDisinherit( TaskHandle_t const pxMutexHolder ) PRIVILEGED_FUNCTION;
 extern BaseType_t xTaskPriorityDisinherit(TaskHandle_t const pxMutexHolder) __preserves_regs(iyh,iyl);
-extern BaseType_t xTaskPriorityDisinherit_fastcall(TaskHandle_t const pxMutexHolder) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define xTaskPriorityDisinherit(a) xTaskPriorityDisinherit_fastcall(a)
-
 
 
 /*
@@ -2758,9 +2575,6 @@ extern BaseType_t xTaskPriorityDisinherit_fastcall(TaskHandle_t const pxMutexHol
  */
 //void vTaskPriorityDisinheritAfterTimeout( TaskHandle_t const pxMutexHolder, UBaseType_t uxHighestPriorityWaitingTask ) PRIVILEGED_FUNCTION;
 extern void vTaskPriorityDisinheritAfterTimeout(TaskHandle_t const pxMutexHolder,UBaseType_t uxHighestPriorityWaitingTask) __preserves_regs(iyh,iyl);
-extern void vTaskPriorityDisinheritAfterTimeout_callee(TaskHandle_t const pxMutexHolder,UBaseType_t uxHighestPriorityWaitingTask) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define vTaskPriorityDisinheritAfterTimeout(a,b) vTaskPriorityDisinheritAfterTimeout_callee(a,b)
-
 
 
 /*
@@ -2768,9 +2582,6 @@ extern void vTaskPriorityDisinheritAfterTimeout_callee(TaskHandle_t const pxMute
  */
 //  UBaseType_t uxTaskGetTaskNumber( TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
 extern UBaseType_t uxTaskGetTaskNumber(TaskHandle_t xTask) __preserves_regs(iyh,iyl);
-extern UBaseType_t uxTaskGetTaskNumber_fastcall(TaskHandle_t xTask) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define uxTaskGetTaskNumber(a) uxTaskGetTaskNumber_fastcall(a)
-
 
 
 /*
@@ -2779,9 +2590,6 @@ extern UBaseType_t uxTaskGetTaskNumber_fastcall(TaskHandle_t xTask) __preserves_
  */
 //  void vTaskSetTaskNumber( TaskHandle_t xTask, const UBaseType_t uxHandle ) PRIVILEGED_FUNCTION;
 extern void vTaskSetTaskNumber(TaskHandle_t xTask,const UBaseType_t uxHandle) __preserves_regs(iyh,iyl);
-extern void vTaskSetTaskNumber_callee(TaskHandle_t xTask,const UBaseType_t uxHandle) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define vTaskSetTaskNumber(a,b) vTaskSetTaskNumber_callee(a,b)
-
 
 
 /*
@@ -2794,9 +2602,6 @@ extern void vTaskSetTaskNumber_callee(TaskHandle_t xTask,const UBaseType_t uxHan
  */
 //  void vTaskStepTick( const TickType_t xTicksToJump ) PRIVILEGED_FUNCTION;
 extern void vTaskStepTick(const TickType_t xTicksToJump) __preserves_regs(iyh,iyl);
-extern void vTaskStepTick_fastcall(const TickType_t xTicksToJump) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define vTaskStepTick(a) vTaskStepTick_fastcall(a)
-
 
 
 /* Correct the tick count value after the application code has held
@@ -2812,9 +2617,6 @@ tasks may have to be removed from the blocked state as the tick count is
 moved. */
 //  BaseType_t xTaskCatchUpTicks( TickType_t xTicksToCatchUp ) PRIVILEGED_FUNCTION;
 extern BaseType_t xTaskCatchUpTicks(TickType_t xTicksToCatchUp) __preserves_regs(iyh,iyl);
-extern BaseType_t xTaskCatchUpTicks_fastcall(TickType_t xTicksToCatchUp) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define xTaskCatchUpTicks(a) xTaskCatchUpTicks_fastcall(a)
-
 
 
 /*
@@ -2833,9 +2635,6 @@ extern BaseType_t xTaskCatchUpTicks_fastcall(TickType_t xTicksToCatchUp) __prese
  */
 //  eSleepModeStatus eTaskConfirmSleepModeStatus( void ) PRIVILEGED_FUNCTION;
 extern eSleepModeStatus eTaskConfirmSleepModeStatus(void) __preserves_regs(iyh,iyl);
-extern eSleepModeStatus eTaskConfirmSleepModeStatus_fastcall(void) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define eTaskConfirmSleepModeStatus(a) eTaskConfirmSleepModeStatus_fastcall(a)
-
 
 
 /*
@@ -2844,9 +2643,6 @@ extern eSleepModeStatus eTaskConfirmSleepModeStatus_fastcall(void) __preserves_r
  */
 //  TaskHandle_t pvTaskIncrementMutexHeldCount( void ) PRIVILEGED_FUNCTION;
 extern TaskHandle_t pvTaskIncrementMutexHeldCount(void) __preserves_regs(iyh,iyl);
-extern TaskHandle_t pvTaskIncrementMutexHeldCount_fastcall(void) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define pvTaskIncrementMutexHeldCount(a) pvTaskIncrementMutexHeldCount_fastcall(a)
-
 
 
 /*
@@ -2855,9 +2651,6 @@ extern TaskHandle_t pvTaskIncrementMutexHeldCount_fastcall(void) __preserves_reg
  */
 //  void vTaskInternalSetTimeOutState( TimeOut_t * const pxTimeOut ) PRIVILEGED_FUNCTION;
 extern void vTaskInternalSetTimeOutState(TimeOut_t * const pxTimeOut) __preserves_regs(iyh,iyl);
-extern void vTaskInternalSetTimeOutState_fastcall(TimeOut_t * const pxTimeOut) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define vTaskInternalSetTimeOutState(a) vTaskInternalSetTimeOutState_fastcall(a)
-
 
 
 #ifdef __cplusplus

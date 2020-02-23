@@ -345,7 +345,7 @@ List_t * const pxConstList = ( pxList );                                        
  * \ingroup LinkedList
  */
 //  void vListInitialise( List_t * const pxList ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',void,,vListInitialise,List_t * const pxList)
+__OPROTO(`iyh,iyl',`iyh,iyl',void,,vListInitialise,List_t * const pxList)
 
 /*
  * Must be called before a list item is used.  This sets the list container to
@@ -357,7 +357,7 @@ __DPROTO(`iyh,iyl',`iyh,iyl',void,,vListInitialise,List_t * const pxList)
  * \ingroup LinkedList
  */
 // void vListInitialiseItem( ListItem_t * const pxItem ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',void,,vListInitialiseItem,ListItem_t * const pxItem)
+__OPROTO(`iyh,iyl',`iyh,iyl',void,,vListInitialiseItem,ListItem_t * const pxItem)
 
 /*
  * Insert a list item into a list.  The item will be inserted into the list in
@@ -371,7 +371,7 @@ __DPROTO(`iyh,iyl',`iyh,iyl',void,,vListInitialiseItem,ListItem_t * const pxItem
  * \ingroup LinkedList
  */
 //  void vListInsert( List_t * const pxList, ListItem_t * const pxNewListItem ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',void,,vListInsert,List_t * const pxList,ListItem_t * const pxNewListItem)
+__OPROTO(`iyh,iyl',`iyh,iyl',void,,vListInsert,List_t * const pxList,ListItem_t * const pxNewListItem)
 
 /*
  * Insert a list item into a list.  The item will be inserted in a position
@@ -393,7 +393,7 @@ __DPROTO(`iyh,iyl',`iyh,iyl',void,,vListInsert,List_t * const pxList,ListItem_t 
  * \ingroup LinkedList
  */
 //  void vListInsertEnd( List_t * const pxList, ListItem_t * const pxNewListItem ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',void,,vListInsertEnd,List_t * const pxList,ListItem_t * const pxNewListItem)
+__OPROTO(`iyh,iyl',`iyh,iyl',void,,vListInsertEnd,List_t * const pxList,ListItem_t * const pxNewListItem)
 
 /*
  * Remove an item from a list.  The list item has a pointer to the list that
@@ -409,7 +409,7 @@ __DPROTO(`iyh,iyl',`iyh,iyl',void,,vListInsertEnd,List_t * const pxList,ListItem
  * \ingroup LinkedList
  */
 //  UBaseType_t uxListRemove( ListItem_t * const pxItemToRemove ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',UBaseType_t,,uxListRemove,ListItem_t * const pxItemToRemove)
+__OPROTO(`iyh,iyl',`iyh,iyl',UBaseType_t,,uxListRemove,ListItem_t * const pxItemToRemove)
 
 #ifdef __cplusplus
 }

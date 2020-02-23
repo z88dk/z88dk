@@ -235,8 +235,6 @@ typedef void (*PendedFunction_t)( void *, uint32_t );
                                 TimerCallbackFunction_t pxCallbackFunction ) PRIVILEGED_FUNCTION;
 */
 extern TimerHandle_t __LIB__ xTimerCreate(const char * const pcTimerName,const TickType_t xTimerPeriodInTicks,const UBaseType_t uxAutoReload,void * const pvTimerID,TimerCallbackFunction_t pxCallbackFunction) __smallc;
-extern TimerHandle_t __LIB__ xTimerCreate_callee(const char * const pcTimerName,const TickType_t xTimerPeriodInTicks,const UBaseType_t uxAutoReload,void * const pvTimerID,TimerCallbackFunction_t pxCallbackFunction) __smallc __z88dk_callee;
-#define xTimerCreate(a,b,c,d,e) xTimerCreate_callee(a,b,c,d,e)
 
 
 #endif
@@ -372,8 +370,6 @@ extern TimerHandle_t __LIB__ xTimerCreate_callee(const char * const pcTimerName,
                                         StaticTimer_t *pxTimerBuffer ) PRIVILEGED_FUNCTION;
 */
 extern TimerHandle_t __LIB__ xTimerCreate(const char * const pcTimerName,const TickType_t xTimerPeriodInTicks,const UBaseType_t uxAutoReload,void * const pvTimerID,TimerCallbackFunction_t pxCallbackFunction,StaticTimer_t *pxTimerBuffer) __smallc;
-extern TimerHandle_t __LIB__ xTimerCreate_callee(const char * const pcTimerName,const TickType_t xTimerPeriodInTicks,const UBaseType_t uxAutoReload,void * const pvTimerID,TimerCallbackFunction_t pxCallbackFunction,StaticTimer_t *pxTimerBuffer) __smallc __z88dk_callee;
-#define xTimerCreate(a,b,c,d,e,f) xTimerCreate_callee(a,b,c,d,e,f)
 
 
 #endif /* configSUPPORT_STATIC_ALLOCATION */
@@ -399,7 +395,7 @@ extern TimerHandle_t __LIB__ xTimerCreate_callee(const char * const pcTimerName,
  * See the xTimerCreate() API function example usage scenario.
  */
 //  void *pvTimerGetTimerID( const TimerHandle_t xTimer ) PRIVILEGED_FUNCTION;
-extern void __LIB__ *pvTimerGetTimerID(const TimerHandle_t xTimer) __smallc __z88dk_fastcall;
+extern void __LIB__ *pvTimerGetTimerID(const TimerHandle_t xTimer) __smallc;
 
 
 
@@ -424,8 +420,6 @@ extern void __LIB__ *pvTimerGetTimerID(const TimerHandle_t xTimer) __smallc __z8
  */
 //  void vTimerSetTimerID( TimerHandle_t xTimer, void *pvNewID ) PRIVILEGED_FUNCTION;
 extern void __LIB__ vTimerSetTimerID(TimerHandle_t xTimer,void *pvNewID) __smallc;
-extern void __LIB__ vTimerSetTimerID_callee(TimerHandle_t xTimer,void *pvNewID) __smallc __z88dk_callee;
-#define vTimerSetTimerID(a,b) vTimerSetTimerID_callee(a,b)
 
 
 
@@ -465,7 +459,7 @@ extern void __LIB__ vTimerSetTimerID_callee(TimerHandle_t xTimer,void *pvNewID) 
  * @endverbatim
  */
 //  BaseType_t xTimerIsTimerActive( TimerHandle_t xTimer ) PRIVILEGED_FUNCTION;
-extern BaseType_t __LIB__ xTimerIsTimerActive(TimerHandle_t xTimer) __smallc __z88dk_fastcall;
+extern BaseType_t __LIB__ xTimerIsTimerActive(TimerHandle_t xTimer) __smallc;
 
 
 
@@ -476,7 +470,7 @@ extern BaseType_t __LIB__ xTimerIsTimerActive(TimerHandle_t xTimer) __smallc __z
  * to call xTimerGetTimerDaemonTaskHandle() before the scheduler has been started.
  */
 //  TaskHandle_t xTimerGetTimerDaemonTaskHandle( void ) PRIVILEGED_FUNCTION;
-extern TaskHandle_t __LIB__ xTimerGetTimerDaemonTaskHandle(void) __smallc __z88dk_fastcall;
+extern TaskHandle_t __LIB__ xTimerGetTimerDaemonTaskHandle(void) __smallc;
 
 
 
@@ -1215,8 +1209,6 @@ extern TaskHandle_t __LIB__ xTimerGetTimerDaemonTaskHandle(void) __smallc __z88d
  */
 //BaseType_t xTimerPendFunctionCallFromISR( PendedFunction_t xFunctionToPend, void *pvParameter1, uint32_t ulParameter2, BaseType_t *pxHigherPriorityTaskWoken ) PRIVILEGED_FUNCTION;
 extern BaseType_t __LIB__ xTimerPendFunctionCallFromISR(PendedFunction_t xFunctionToPend,void *pvParameter1,uint32_t ulParameter2,BaseType_t *pxHigherPriorityTaskWoken) __smallc;
-extern BaseType_t __LIB__ xTimerPendFunctionCallFromISR_callee(PendedFunction_t xFunctionToPend,void *pvParameter1,uint32_t ulParameter2,BaseType_t *pxHigherPriorityTaskWoken) __smallc __z88dk_callee;
-#define xTimerPendFunctionCallFromISR(a,b,c,d) xTimerPendFunctionCallFromISR_callee(a,b,c,d)
 
 
 
@@ -1254,8 +1246,6 @@ extern BaseType_t __LIB__ xTimerPendFunctionCallFromISR_callee(PendedFunction_t 
   */
 //  BaseType_t xTimerPendFunctionCall( PendedFunction_t xFunctionToPend, void *pvParameter1, uint32_t ulParameter2, TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
 extern BaseType_t __LIB__ xTimerPendFunctionCall(PendedFunction_t xFunctionToPend,void *pvParameter1,uint32_t ulParameter2,TickType_t xTicksToWait) __smallc;
-extern BaseType_t __LIB__ xTimerPendFunctionCall_callee(PendedFunction_t xFunctionToPend,void *pvParameter1,uint32_t ulParameter2,TickType_t xTicksToWait) __smallc __z88dk_callee;
-#define xTimerPendFunctionCall(a,b,c,d) xTimerPendFunctionCall_callee(a,b,c,d)
 
 
 
@@ -1269,7 +1259,7 @@ extern BaseType_t __LIB__ xTimerPendFunctionCall_callee(PendedFunction_t xFuncti
  * @return The name assigned to the timer specified by the xTimer parameter.
  */
 //  const char * pcTimerGetName( TimerHandle_t xTimer ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
-extern const char __LIB__ *pcTimerGetName(TimerHandle_t xTimer) __smallc __z88dk_fastcall;
+extern const char __LIB__ *pcTimerGetName(TimerHandle_t xTimer) __smallc;
 
 
 
@@ -1290,8 +1280,6 @@ extern const char __LIB__ *pcTimerGetName(TimerHandle_t xTimer) __smallc __z88dk
  */
 //  void vTimerSetReloadMode( TimerHandle_t xTimer, const UBaseType_t uxAutoReload ) PRIVILEGED_FUNCTION;
 extern void __LIB__ vTimerSetReloadMode(TimerHandle_t xTimer,const UBaseType_t uxAutoReload) __smallc;
-extern void __LIB__ vTimerSetReloadMode_callee(TimerHandle_t xTimer,const UBaseType_t uxAutoReload) __smallc __z88dk_callee;
-#define vTimerSetReloadMode(a,b) vTimerSetReloadMode_callee(a,b)
 
 
 
@@ -1308,7 +1296,7 @@ extern void __LIB__ vTimerSetReloadMode_callee(TimerHandle_t xTimer,const UBaseT
 * pdFALSE is returned.
 */
 //  UBaseType_t uxTimerGetReloadMode( TimerHandle_t xTimer ) PRIVILEGED_FUNCTION;
-extern UBaseType_t __LIB__ uxTimerGetReloadMode(TimerHandle_t xTimer) __smallc __z88dk_fastcall;
+extern UBaseType_t __LIB__ uxTimerGetReloadMode(TimerHandle_t xTimer) __smallc;
 
 
 
@@ -1322,7 +1310,7 @@ extern UBaseType_t __LIB__ uxTimerGetReloadMode(TimerHandle_t xTimer) __smallc _
  * @return The period of the timer in ticks.
  */
 //  TickType_t xTimerGetPeriod( TimerHandle_t xTimer ) PRIVILEGED_FUNCTION;
-extern TickType_t __LIB__ xTimerGetPeriod(TimerHandle_t xTimer) __smallc __z88dk_fastcall;
+extern TickType_t __LIB__ xTimerGetPeriod(TimerHandle_t xTimer) __smallc;
 
 
 
@@ -1340,7 +1328,7 @@ extern TickType_t __LIB__ xTimerGetPeriod(TimerHandle_t xTimer) __smallc __z88dk
 * value is undefined.
 */
 //  TickType_t xTimerGetExpiryTime( TimerHandle_t xTimer ) PRIVILEGED_FUNCTION;
-extern TickType_t __LIB__ xTimerGetExpiryTime(TimerHandle_t xTimer) __smallc __z88dk_fastcall;
+extern TickType_t __LIB__ xTimerGetExpiryTime(TimerHandle_t xTimer) __smallc;
 
 
 
@@ -1349,26 +1337,22 @@ extern TickType_t __LIB__ xTimerGetExpiryTime(TimerHandle_t xTimer) __smallc __z
  * for use by the kernel only.
  */
 //  BaseType_t xTimerCreateTimerTask( void ) PRIVILEGED_FUNCTION;
-extern BaseType_t __LIB__ xTimerCreateTimerTask(void) __smallc __z88dk_fastcall;
+extern BaseType_t __LIB__ xTimerCreateTimerTask(void) __smallc;
 
 
 
 //  BaseType_t xTimerGenericCommand( TimerHandle_t xTimer, const BaseType_t xCommandID, const TickType_t xOptionalValue, BaseType_t * const pxHigherPriorityTaskWoken, const TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
 extern BaseType_t __LIB__ xTimerGenericCommand(TimerHandle_t xTimer,const BaseType_t xCommandID,const TickType_t xOptionalValue,BaseType_t * const pxHigherPriorityTaskWoken,const TickType_t xTicksToWait) __smallc;
-extern BaseType_t __LIB__ xTimerGenericCommand_callee(TimerHandle_t xTimer,const BaseType_t xCommandID,const TickType_t xOptionalValue,BaseType_t * const pxHigherPriorityTaskWoken,const TickType_t xTicksToWait) __smallc __z88dk_callee;
-#define xTimerGenericCommand(a,b,c,d,e) xTimerGenericCommand_callee(a,b,c,d,e)
 
 
 
 #if( configUSE_TRACE_FACILITY == 1 )
 //  void vTimerSetTimerNumber( TimerHandle_t xTimer, UBaseType_t uxTimerNumber ) PRIVILEGED_FUNCTION;
     extern void __LIB__ vTimerSetTimerNumber(TimerHandle_t xTimer,UBaseType_t uxTimerNumber) __smallc;
-extern void __LIB__ vTimerSetTimerNumber_callee(TimerHandle_t xTimer,UBaseType_t uxTimerNumber) __smallc __z88dk_callee;
-#define vTimerSetTimerNumber(a,b) vTimerSetTimerNumber_callee(a,b)
 
 
 //  UBaseType_t uxTimerGetTimerNumber( TimerHandle_t xTimer ) PRIVILEGED_FUNCTION;
-    extern UBaseType_t __LIB__ uxTimerGetTimerNumber(TimerHandle_t xTimer) __smallc __z88dk_fastcall;
+    extern UBaseType_t __LIB__ uxTimerGetTimerNumber(TimerHandle_t xTimer) __smallc;
 
 
 #endif

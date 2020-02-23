@@ -129,15 +129,11 @@ extern "C" {
 #if( portHAS_STACK_OVERFLOW_CHECKING == 1 )
 //  StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, StackType_t *pxEndOfStack, TaskFunction_t pxCode, void *pvParameters ) PRIVILEGED_FUNCTION;
     extern StackType_t __LIB__ *pxPortInitialiseStack(StackType_t *pxTopOfStack,StackType_t *pxEndOfStack,TaskFunction_t pxCode,void *pvParameters) __smallc;
-extern StackType_t __LIB__ *pxPortInitialiseStack_callee(StackType_t *pxTopOfStack,StackType_t *pxEndOfStack,TaskFunction_t pxCode,void *pvParameters) __smallc __z88dk_callee;
-#define pxPortInitialiseStack(a,b,c,d) pxPortInitialiseStack_callee(a,b,c,d)
 
 
 #else
 //  StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t pxCode, void *pvParameters ) PRIVILEGED_FUNCTION;
     extern StackType_t __LIB__ *pxPortInitialiseStack(StackType_t *pxTopOfStack,TaskFunction_t pxCode,void *pvParameters) __smallc;
-extern StackType_t __LIB__ *pxPortInitialiseStack_callee(StackType_t *pxTopOfStack,TaskFunction_t pxCode,void *pvParameters) __smallc __z88dk_callee;
-#define pxPortInitialiseStack(a,b,c) pxPortInitialiseStack_callee(a,b,c)
 
 
 #endif
@@ -175,7 +171,7 @@ typedef struct xHeapStats
  * with the lowest start address must appear first in the array.
  */
 //  void vPortDefineHeapRegions( const HeapRegion_t * const pxHeapRegions ) PRIVILEGED_FUNCTION;
-extern void __LIB__ vPortDefineHeapRegions(const HeapRegion_t * const pxHeapRegions) __smallc __z88dk_fastcall;
+extern void __LIB__ vPortDefineHeapRegions(const HeapRegion_t * const pxHeapRegions) __smallc;
 
 
 
@@ -184,7 +180,7 @@ extern void __LIB__ vPortDefineHeapRegions(const HeapRegion_t * const pxHeapRegi
  * heap state.
  */
 //  void vPortGetHeapStats( HeapStats_t *pxHeapStats );
-extern void __LIB__ vPortGetHeapStats(HeapStats_t *pxHeapStats) __smallc __z88dk_fastcall;
+extern void __LIB__ vPortGetHeapStats(HeapStats_t *pxHeapStats) __smallc;
 
 
 
@@ -192,27 +188,27 @@ extern void __LIB__ vPortGetHeapStats(HeapStats_t *pxHeapStats) __smallc __z88dk
  * Map to the memory management routines required for the port.
  */
 //  void *pvPortMalloc( size_t xSize ) PRIVILEGED_FUNCTION;
-extern void __LIB__ *pvPortMalloc(size_t xSize) __smallc __z88dk_fastcall;
+extern void __LIB__ *pvPortMalloc(size_t xSize) __smallc;
 
 
 
 //  void vPortFree( void *pv ) PRIVILEGED_FUNCTION;
-extern void __LIB__ vPortFree(void *pv) __smallc __z88dk_fastcall;
+extern void __LIB__ vPortFree(void *pv) __smallc;
 
 
 
 //  void vPortInitialiseBlocks( void ) PRIVILEGED_FUNCTION;
-extern void __LIB__ vPortInitialiseBlocks(void) __smallc __z88dk_fastcall;
+extern void __LIB__ vPortInitialiseBlocks(void) __smallc;
 
 
 
 //  size_t xPortGetFreeHeapSize( void ) PRIVILEGED_FUNCTION;
-extern size_t __LIB__ xPortGetFreeHeapSize(void) __smallc __z88dk_fastcall;
+extern size_t __LIB__ xPortGetFreeHeapSize(void) __smallc;
 
 
 
 //  size_t xPortGetMinimumEverFreeHeapSize( void ) PRIVILEGED_FUNCTION;
-extern size_t __LIB__ xPortGetMinimumEverFreeHeapSize(void) __smallc __z88dk_fastcall;
+extern size_t __LIB__ xPortGetMinimumEverFreeHeapSize(void) __smallc;
 
 
 
@@ -221,7 +217,7 @@ extern size_t __LIB__ xPortGetMinimumEverFreeHeapSize(void) __smallc __z88dk_fas
  * sets up a tick interrupt and sets timers for the correct tick frequency.
  */
 //  BaseType_t xPortStartScheduler( void ) PRIVILEGED_FUNCTION;
-extern BaseType_t __LIB__ xPortStartScheduler(void) __smallc __z88dk_fastcall;
+extern BaseType_t __LIB__ xPortStartScheduler(void) __smallc;
 
 
 
@@ -231,7 +227,7 @@ extern BaseType_t __LIB__ xPortStartScheduler(void) __smallc __z88dk_fastcall;
  * executing.
  */
 //  void vPortEndScheduler( void ) PRIVILEGED_FUNCTION;
-extern void __LIB__ vPortEndScheduler(void) __smallc __z88dk_fastcall;
+extern void __LIB__ vPortEndScheduler(void) __smallc;
 
 
 

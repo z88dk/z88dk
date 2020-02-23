@@ -147,7 +147,7 @@ typedef TickType_t EventBits_t;
  */
 #if( configSUPPORT_DYNAMIC_ALLOCATION == 1 )
 //  EventGroupHandle_t xEventGroupCreate( void ) PRIVILEGED_FUNCTION;
-    __DPROTO(`iyh,iyl',`iyh,iyl',EventGroupHandle_t,,xEventGroupCreate,void)
+    __OPROTO(`iyh,iyl',`iyh,iyl',EventGroupHandle_t,,xEventGroupCreate,void)
 #endif
 
 /**
@@ -201,7 +201,7 @@ typedef TickType_t EventBits_t;
  */
 #if( configSUPPORT_STATIC_ALLOCATION == 1 )
 //  EventGroupHandle_t xEventGroupCreateStatic( StaticEventGroup_t *pxEventGroupBuffer ) PRIVILEGED_FUNCTION;
-    __DPROTO(`iyh,iyl',`iyh,iyl',EventGroupHandle_t,,xEventGroupCreateStatic,StaticEventGroup_t *pxEventGroupBuffer)
+    __OPROTO(`iyh,iyl',`iyh,iyl',EventGroupHandle_t,,xEventGroupCreateStatic,StaticEventGroup_t *pxEventGroupBuffer)
 #endif
 
 /**
@@ -297,7 +297,7 @@ typedef TickType_t EventBits_t;
  * \ingroup EventGroup
  */
 //  EventBits_t xEventGroupWaitBits( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToWaitFor, const BaseType_t xClearOnExit, const BaseType_t xWaitForAllBits, TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',EventBits_t,,xEventGroupWaitBits,EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToWaitFor,const BaseType_t xClearOnExit,const BaseType_t xWaitForAllBits,TickType_t xTicksToWait)
+__OPROTO(`iyh,iyl',`iyh,iyl',EventBits_t,,xEventGroupWaitBits,EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToWaitFor,const BaseType_t xClearOnExit,const BaseType_t xWaitForAllBits,TickType_t xTicksToWait)
 
 /**
  * event_groups.h
@@ -355,7 +355,7 @@ __DPROTO(`iyh,iyl',`iyh,iyl',EventBits_t,,xEventGroupWaitBits,EventGroupHandle_t
  * \ingroup EventGroup
  */
 //  EventBits_t xEventGroupClearBits( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToClear ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',EventBits_t,,xEventGroupClearBits,EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToClear)
+__OPROTO(`iyh,iyl',`iyh,iyl',EventBits_t,,xEventGroupClearBits,EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToClear)
 
 /**
  * event_groups.h
@@ -412,7 +412,7 @@ __DPROTO(`iyh,iyl',`iyh,iyl',EventBits_t,,xEventGroupClearBits,EventGroupHandle_
  */
 #if( configUSE_TRACE_FACILITY == 1 )
 //  BaseType_t xEventGroupClearBitsFromISR( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToClear ) PRIVILEGED_FUNCTION;
-    __DPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xEventGroupClearBitsFromISR,EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToClear)
+    __OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xEventGroupClearBitsFromISR,EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToClear)
 #else
     #define xEventGroupClearBitsFromISR( xEventGroup, uxBitsToClear ) xTimerPendFunctionCallFromISR( vEventGroupClearBitsCallback, ( void * ) xEventGroup, ( uint32_t ) uxBitsToClear, NULL )
 #endif
@@ -490,7 +490,7 @@ __DPROTO(`iyh,iyl',`iyh,iyl',EventBits_t,,xEventGroupClearBits,EventGroupHandle_
  * \ingroup EventGroup
  */
 //  EventBits_t xEventGroupSetBits( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToSet ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',EventBits_t,,xEventGroupSetBits,EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToSet)
+__OPROTO(`iyh,iyl',`iyh,iyl',EventBits_t,,xEventGroupSetBits,EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToSet)
 
 /**
  * event_groups.h
@@ -566,7 +566,7 @@ __DPROTO(`iyh,iyl',`iyh,iyl',EventBits_t,,xEventGroupSetBits,EventGroupHandle_t 
  */
 #if( configUSE_TRACE_FACILITY == 1 )
 //  BaseType_t xEventGroupSetBitsFromISR( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToSet, BaseType_t *pxHigherPriorityTaskWoken ) PRIVILEGED_FUNCTION;
-    __DPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xEventGroupSetBitsFromISR,EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToSet,BaseType_t *pxHigherPriorityTaskWoken)
+    __OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xEventGroupSetBitsFromISR,EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToSet,BaseType_t *pxHigherPriorityTaskWoken)
 #else
     #define xEventGroupSetBitsFromISR( xEventGroup, uxBitsToSet, pxHigherPriorityTaskWoken ) xTimerPendFunctionCallFromISR( vEventGroupSetBitsCallback, ( void * ) xEventGroup, ( uint32_t ) uxBitsToSet, pxHigherPriorityTaskWoken )
 #endif
@@ -696,7 +696,7 @@ __DPROTO(`iyh,iyl',`iyh,iyl',EventBits_t,,xEventGroupSetBits,EventGroupHandle_t 
  * \ingroup EventGroup
  */
 //  EventBits_t xEventGroupSync( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToSet, const EventBits_t uxBitsToWaitFor, TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',EventBits_t,,xEventGroupSync,EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToSet,const EventBits_t uxBitsToWaitFor,TickType_t xTicksToWait)
+__OPROTO(`iyh,iyl',`iyh,iyl',EventBits_t,,xEventGroupSync,EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToSet,const EventBits_t uxBitsToWaitFor,TickType_t xTicksToWait)
 
 
 /**
@@ -733,7 +733,7 @@ __DPROTO(`iyh,iyl',`iyh,iyl',EventBits_t,,xEventGroupSync,EventGroupHandle_t xEv
  * \ingroup EventGroup
  */
 //  EventBits_t xEventGroupGetBitsFromISR( EventGroupHandle_t xEventGroup ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',EventBits_t,,xEventGroupGetBitsFromISR,EventGroupHandle_t xEventGroup)
+__OPROTO(`iyh,iyl',`iyh,iyl',EventBits_t,,xEventGroupGetBitsFromISR,EventGroupHandle_t xEventGroup)
 
 /**
  * event_groups.h
@@ -748,19 +748,19 @@ __DPROTO(`iyh,iyl',`iyh,iyl',EventBits_t,,xEventGroupGetBitsFromISR,EventGroupHa
  * @param xEventGroup The event group being deleted.
  */
 //  void vEventGroupDelete( EventGroupHandle_t xEventGroup ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',void,,vEventGroupDelete,EventGroupHandle_t xEventGroup)
+__OPROTO(`iyh,iyl',`iyh,iyl',void,,vEventGroupDelete,EventGroupHandle_t xEventGroup)
 
 /* For internal use only. */
 //  void vEventGroupSetBitsCallback( void *pvEventGroup, const uint32_t ulBitsToSet ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',void,,vEventGroupSetBitsCallback,void *pvEventGroup,const uint32_t ulBitsToSet)
+__OPROTO(`iyh,iyl',`iyh,iyl',void,,vEventGroupSetBitsCallback,void *pvEventGroup,const uint32_t ulBitsToSet)
 //  void vEventGroupClearBitsCallback( void *pvEventGroup, const uint32_t ulBitsToClear ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',void,,vEventGroupClearBitsCallback,void *pvEventGroup,const uint32_t ulBitsToClear)
+__OPROTO(`iyh,iyl',`iyh,iyl',void,,vEventGroupClearBitsCallback,void *pvEventGroup,const uint32_t ulBitsToClear)
 
 #if (configUSE_TRACE_FACILITY == 1)
 //  UBaseType_t uxEventGroupGetNumber( void* xEventGroup ) PRIVILEGED_FUNCTION;
-    __DPROTO(`iyh,iyl',`iyh,iyl',UBaseType_t,,uxEventGroupGetNumber,void* xEventGroup)
+    __OPROTO(`iyh,iyl',`iyh,iyl',UBaseType_t,,uxEventGroupGetNumber,void* xEventGroup)
 //  void vEventGroupSetNumber( void* xEventGroup, UBaseType_t uxEventGroupNumber ) PRIVILEGED_FUNCTION;
-    __DPROTO(`iyh,iyl',`iyh,iyl',void,,vEventGroupSetNumber,void* xEventGroup,UBaseType_t uxEventGroupNumber)
+    __OPROTO(`iyh,iyl',`iyh,iyl',void,,vEventGroupSetNumber,void* xEventGroup,UBaseType_t uxEventGroupNumber)
 #endif
 
 #ifdef __cplusplus

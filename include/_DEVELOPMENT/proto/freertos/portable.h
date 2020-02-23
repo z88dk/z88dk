@@ -126,10 +126,10 @@ extern "C" {
  */
 #if( portHAS_STACK_OVERFLOW_CHECKING == 1 )
 //  StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, StackType_t *pxEndOfStack, TaskFunction_t pxCode, void *pvParameters ) PRIVILEGED_FUNCTION;
-    __DPROTO(`iyh,iyl',`iyh,iyl',StackType_t,*,pxPortInitialiseStack,StackType_t *pxTopOfStack,StackType_t *pxEndOfStack,TaskFunction_t pxCode,void *pvParameters)
+    __OPROTO(`iyh,iyl',`iyh,iyl',StackType_t,*,pxPortInitialiseStack,StackType_t *pxTopOfStack,StackType_t *pxEndOfStack,TaskFunction_t pxCode,void *pvParameters)
 #else
 //  StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t pxCode, void *pvParameters ) PRIVILEGED_FUNCTION;
-    __DPROTO(`iyh,iyl',`iyh,iyl',StackType_t,*,pxPortInitialiseStack,StackType_t *pxTopOfStack,TaskFunction_t pxCode,void *pvParameters)
+    __OPROTO(`iyh,iyl',`iyh,iyl',StackType_t,*,pxPortInitialiseStack,StackType_t *pxTopOfStack,TaskFunction_t pxCode,void *pvParameters)
 #endif
 
 
@@ -165,39 +165,39 @@ typedef struct xHeapStats
  * with the lowest start address must appear first in the array.
  */
 //  void vPortDefineHeapRegions( const HeapRegion_t * const pxHeapRegions ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',void,,vPortDefineHeapRegions,const HeapRegion_t * const pxHeapRegions)
+__OPROTO(`iyh,iyl',`iyh,iyl',void,,vPortDefineHeapRegions,const HeapRegion_t * const pxHeapRegions)
 
 /*
  * Returns a HeapStats_t structure filled with information about the current
  * heap state.
  */
 //  void vPortGetHeapStats( HeapStats_t *pxHeapStats );
-__DPROTO(`iyh,iyl',`iyh,iyl',void,,vPortGetHeapStats,HeapStats_t *pxHeapStats)
+__OPROTO(`iyh,iyl',`iyh,iyl',void,,vPortGetHeapStats,HeapStats_t *pxHeapStats)
 
 /*
  * Map to the memory management routines required for the port.
  */
 //  void *pvPortMalloc( size_t xSize ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',void,*,pvPortMalloc,size_t xSize)
+__OPROTO(`iyh,iyl',`iyh,iyl',void,*,pvPortMalloc,size_t xSize)
 
 //  void vPortFree( void *pv ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',void,,vPortFree,void *pv)
+__OPROTO(`iyh,iyl',`iyh,iyl',void,,vPortFree,void *pv)
 
 //  void vPortInitialiseBlocks( void ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',void,,vPortInitialiseBlocks,void)
+__OPROTO(`iyh,iyl',`iyh,iyl',void,,vPortInitialiseBlocks,void)
 
 //  size_t xPortGetFreeHeapSize( void ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',size_t,,xPortGetFreeHeapSize,void)
+__OPROTO(`iyh,iyl',`iyh,iyl',size_t,,xPortGetFreeHeapSize,void)
 
 //  size_t xPortGetMinimumEverFreeHeapSize( void ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',size_t,,xPortGetMinimumEverFreeHeapSize,void)
+__OPROTO(`iyh,iyl',`iyh,iyl',size_t,,xPortGetMinimumEverFreeHeapSize,void)
 
 /*
  * Setup the hardware ready for the scheduler to take control.  This generally
  * sets up a tick interrupt and sets timers for the correct tick frequency.
  */
 //  BaseType_t xPortStartScheduler( void ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xPortStartScheduler,void)
+__OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xPortStartScheduler,void)
 
 /*
  * Undo any hardware/ISR setup that was performed by xPortStartScheduler() so
@@ -205,7 +205,7 @@ __DPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xPortStartScheduler,void)
  * executing.
  */
 //  void vPortEndScheduler( void ) PRIVILEGED_FUNCTION;
-__DPROTO(`iyh,iyl',`iyh,iyl',void,,vPortEndScheduler,void)
+__OPROTO(`iyh,iyl',`iyh,iyl',void,,vPortEndScheduler,void)
 
 #ifdef __cplusplus
 }

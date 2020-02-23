@@ -348,9 +348,6 @@ List_t * const pxConstList = ( pxList );                                        
  */
 //  void vListInitialise( List_t * const pxList ) PRIVILEGED_FUNCTION;
 extern void vListInitialise(List_t * const pxList) __preserves_regs(iyh,iyl);
-extern void vListInitialise_fastcall(List_t * const pxList) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define vListInitialise(a) vListInitialise_fastcall(a)
-
 
 
 /*
@@ -364,9 +361,6 @@ extern void vListInitialise_fastcall(List_t * const pxList) __preserves_regs(iyh
  */
 // void vListInitialiseItem( ListItem_t * const pxItem ) PRIVILEGED_FUNCTION;
 extern void vListInitialiseItem(ListItem_t * const pxItem) __preserves_regs(iyh,iyl);
-extern void vListInitialiseItem_fastcall(ListItem_t * const pxItem) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define vListInitialiseItem(a) vListInitialiseItem_fastcall(a)
-
 
 
 /*
@@ -382,9 +376,6 @@ extern void vListInitialiseItem_fastcall(ListItem_t * const pxItem) __preserves_
  */
 //  void vListInsert( List_t * const pxList, ListItem_t * const pxNewListItem ) PRIVILEGED_FUNCTION;
 extern void vListInsert(List_t * const pxList,ListItem_t * const pxNewListItem) __preserves_regs(iyh,iyl);
-extern void vListInsert_callee(List_t * const pxList,ListItem_t * const pxNewListItem) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define vListInsert(a,b) vListInsert_callee(a,b)
-
 
 
 /*
@@ -408,9 +399,6 @@ extern void vListInsert_callee(List_t * const pxList,ListItem_t * const pxNewLis
  */
 //  void vListInsertEnd( List_t * const pxList, ListItem_t * const pxNewListItem ) PRIVILEGED_FUNCTION;
 extern void vListInsertEnd(List_t * const pxList,ListItem_t * const pxNewListItem) __preserves_regs(iyh,iyl);
-extern void vListInsertEnd_callee(List_t * const pxList,ListItem_t * const pxNewListItem) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define vListInsertEnd(a,b) vListInsertEnd_callee(a,b)
-
 
 
 /*
@@ -428,9 +416,6 @@ extern void vListInsertEnd_callee(List_t * const pxList,ListItem_t * const pxNew
  */
 //  UBaseType_t uxListRemove( ListItem_t * const pxItemToRemove ) PRIVILEGED_FUNCTION;
 extern UBaseType_t uxListRemove(ListItem_t * const pxItemToRemove) __preserves_regs(iyh,iyl);
-extern UBaseType_t uxListRemove_fastcall(ListItem_t * const pxItemToRemove) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define uxListRemove(a) uxListRemove_fastcall(a)
-
 
 
 #ifdef __cplusplus

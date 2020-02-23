@@ -129,16 +129,10 @@ extern "C" {
 #if( portHAS_STACK_OVERFLOW_CHECKING == 1 )
 //  StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, StackType_t *pxEndOfStack, TaskFunction_t pxCode, void *pvParameters ) PRIVILEGED_FUNCTION;
     extern StackType_t *pxPortInitialiseStack(StackType_t *pxTopOfStack,StackType_t *pxEndOfStack,TaskFunction_t pxCode,void *pvParameters) __preserves_regs(iyh,iyl);
-extern StackType_t *pxPortInitialiseStack_callee(StackType_t *pxTopOfStack,StackType_t *pxEndOfStack,TaskFunction_t pxCode,void *pvParameters) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define pxPortInitialiseStack(a,b,c,d) pxPortInitialiseStack_callee(a,b,c,d)
-
 
 #else
 //  StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t pxCode, void *pvParameters ) PRIVILEGED_FUNCTION;
     extern StackType_t *pxPortInitialiseStack(StackType_t *pxTopOfStack,TaskFunction_t pxCode,void *pvParameters) __preserves_regs(iyh,iyl);
-extern StackType_t *pxPortInitialiseStack_callee(StackType_t *pxTopOfStack,TaskFunction_t pxCode,void *pvParameters) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define pxPortInitialiseStack(a,b,c) pxPortInitialiseStack_callee(a,b,c)
-
 
 #endif
 
@@ -176,9 +170,6 @@ typedef struct xHeapStats
  */
 //  void vPortDefineHeapRegions( const HeapRegion_t * const pxHeapRegions ) PRIVILEGED_FUNCTION;
 extern void vPortDefineHeapRegions(const HeapRegion_t * const pxHeapRegions) __preserves_regs(iyh,iyl);
-extern void vPortDefineHeapRegions_fastcall(const HeapRegion_t * const pxHeapRegions) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define vPortDefineHeapRegions(a) vPortDefineHeapRegions_fastcall(a)
-
 
 
 /*
@@ -187,9 +178,6 @@ extern void vPortDefineHeapRegions_fastcall(const HeapRegion_t * const pxHeapReg
  */
 //  void vPortGetHeapStats( HeapStats_t *pxHeapStats );
 extern void vPortGetHeapStats(HeapStats_t *pxHeapStats) __preserves_regs(iyh,iyl);
-extern void vPortGetHeapStats_fastcall(HeapStats_t *pxHeapStats) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define vPortGetHeapStats(a) vPortGetHeapStats_fastcall(a)
-
 
 
 /*
@@ -197,37 +185,22 @@ extern void vPortGetHeapStats_fastcall(HeapStats_t *pxHeapStats) __preserves_reg
  */
 //  void *pvPortMalloc( size_t xSize ) PRIVILEGED_FUNCTION;
 extern void *pvPortMalloc(size_t xSize) __preserves_regs(iyh,iyl);
-extern void *pvPortMalloc_fastcall(size_t xSize) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define pvPortMalloc(a) pvPortMalloc_fastcall(a)
-
 
 
 //  void vPortFree( void *pv ) PRIVILEGED_FUNCTION;
 extern void vPortFree(void *pv) __preserves_regs(iyh,iyl);
-extern void vPortFree_fastcall(void *pv) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define vPortFree(a) vPortFree_fastcall(a)
-
 
 
 //  void vPortInitialiseBlocks( void ) PRIVILEGED_FUNCTION;
 extern void vPortInitialiseBlocks(void) __preserves_regs(iyh,iyl);
-extern void vPortInitialiseBlocks_fastcall(void) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define vPortInitialiseBlocks(a) vPortInitialiseBlocks_fastcall(a)
-
 
 
 //  size_t xPortGetFreeHeapSize( void ) PRIVILEGED_FUNCTION;
 extern size_t xPortGetFreeHeapSize(void) __preserves_regs(iyh,iyl);
-extern size_t xPortGetFreeHeapSize_fastcall(void) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define xPortGetFreeHeapSize(a) xPortGetFreeHeapSize_fastcall(a)
-
 
 
 //  size_t xPortGetMinimumEverFreeHeapSize( void ) PRIVILEGED_FUNCTION;
 extern size_t xPortGetMinimumEverFreeHeapSize(void) __preserves_regs(iyh,iyl);
-extern size_t xPortGetMinimumEverFreeHeapSize_fastcall(void) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define xPortGetMinimumEverFreeHeapSize(a) xPortGetMinimumEverFreeHeapSize_fastcall(a)
-
 
 
 /*
@@ -236,9 +209,6 @@ extern size_t xPortGetMinimumEverFreeHeapSize_fastcall(void) __preserves_regs(iy
  */
 //  BaseType_t xPortStartScheduler( void ) PRIVILEGED_FUNCTION;
 extern BaseType_t xPortStartScheduler(void) __preserves_regs(iyh,iyl);
-extern BaseType_t xPortStartScheduler_fastcall(void) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define xPortStartScheduler(a) xPortStartScheduler_fastcall(a)
-
 
 
 /*
@@ -248,9 +218,6 @@ extern BaseType_t xPortStartScheduler_fastcall(void) __preserves_regs(iyh,iyl) _
  */
 //  void vPortEndScheduler( void ) PRIVILEGED_FUNCTION;
 extern void vPortEndScheduler(void) __preserves_regs(iyh,iyl);
-extern void vPortEndScheduler_fastcall(void) __preserves_regs(iyh,iyl) __z88dk_fastcall;
-#define vPortEndScheduler(a) vPortEndScheduler_fastcall(a)
-
 
 
 #ifdef __cplusplus
