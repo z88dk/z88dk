@@ -8,4 +8,3 @@ target/zx81/graphics_udg/xorpixl
 target/zx81/graphics_udg/pointxy
 target/zx81/graphics/swapgfxbk
 @gfx/text6/gfx_text6.lst
-@gfx/narrow/gfx_narrow.lst
