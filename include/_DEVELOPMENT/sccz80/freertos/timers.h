@@ -1207,7 +1207,7 @@ extern TaskHandle_t __LIB__ xTimerGetTimerDaemonTaskHandle(void) __smallc;
  *    }
  * @endverbatim
  */
-//BaseType_t xTimerPendFunctionCallFromISR( PendedFunction_t xFunctionToPend, void *pvParameter1, uint32_t ulParameter2, BaseType_t *pxHigherPriorityTaskWoken ) PRIVILEGED_FUNCTION;
+//  BaseType_t xTimerPendFunctionCallFromISR( PendedFunction_t xFunctionToPend, void *pvParameter1, uint32_t ulParameter2, BaseType_t *pxHigherPriorityTaskWoken ) PRIVILEGED_FUNCTION;
 extern BaseType_t __LIB__ xTimerPendFunctionCallFromISR(PendedFunction_t xFunctionToPend,void *pvParameter1,uint32_t ulParameter2,BaseType_t *pxHigherPriorityTaskWoken) __smallc;
 
 

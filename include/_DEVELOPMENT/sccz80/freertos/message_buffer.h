@@ -69,7 +69,7 @@
 	#error "include FreeRTOS.h must appear in source files before include message_buffer.h"
 #endif
 
-/* Message buffers are built onto of stream buffers. */
+/* Message buffers are built on top of stream buffers. */
 #include <freertos/stream_buffer.h>
 
 #if defined( __cplusplus )
@@ -799,7 +799,7 @@ BaseType_t xMessageBufferReceiveCompletedFromISR( MessageBufferHandle_t xStreamB
 #define xMessageBufferReceiveCompletedFromISR( xMessageBuffer, pxHigherPriorityTaskWoken ) xStreamBufferReceiveCompletedFromISR( ( StreamBufferHandle_t ) xMessageBuffer, pxHigherPriorityTaskWoken )
 
 #if defined( __cplusplus )
-} /* extern "C" */
+}
 #endif
 
 #endif	/* !defined( FREERTOS_MESSAGE_BUFFER_H ) */
