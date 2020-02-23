@@ -57,57 +57,193 @@ typedef portSTACK_TYPE StackType_t;
 typedef signed char BaseType_t;
 typedef unsigned char UBaseType_t;
 
-#if( configUSE_16_BIT_TICKS == 1 )
+#if configUSE_16_BIT_TICKS == 1
     typedef uint16_t TickType_t;
     #define portMAX_DELAY ( TickType_t ) 0xffff
 #else
     typedef uint32_t TickType_t;
     #define portMAX_DELAY ( TickType_t ) 0xffffffffUL
 #endif
+
 /*-----------------------------------------------------------*/
 
 /* Critical section management. */
 
-#define portENTER_CRITICAL()    __asm__ __volatile__ (                              \
-                                        "in __tmp_reg__, __SREG__"        "\n\t"    \
-                                        "cli"                             "\n\t"    \
-                                        "push __tmp_reg__"                "\n\t"    \
-                                        ::: "memory"                                \
-                                        )
+#define portENTER_CRITICAL()        \
+    do{                             \
+        __asm                       \
+            ld a,i                  \
+            push af                 \
+            di                      \
+        __endasm;                   \
+    }while(0)
 
 
-#define portEXIT_CRITICAL()     __asm__ __volatile__ (                              \
-                                        "pop __tmp_reg__"                 "\n\t"    \
-                                        "out __SREG__, __tmp_reg__"       "\n\t"    \
-                                        ::: "memory"                                \
-                                        )
+#define portEXIT_CRITICAL()         \
+    do{                             \
+        __asm                       \
+            pop af                  \
+            di                      \
+            jp PO,ASMPC+4           \
+            ei                      \
+        __endasm;                   \
+    }while(0)
 
+#define portDISABLE_INTERRUPTS()    \
+    do{                             \
+        __asm                       \
+            di                      \
+        __endasm;                   \
+    }while(0)
 
-#define portDISABLE_INTERRUPTS()        __asm__ __volatile__ ( "cli" ::: "memory")
-#define portENABLE_INTERRUPTS()         __asm__ __volatile__ ( "sei" ::: "memory")
+#define portENABLE_INTERRUPTS()     \
+    do{                             \
+        __asm                       \
+            ei                      \
+        __endasm;                   \
+    }while(0)
 
 /*-----------------------------------------------------------*/
 
 /* Architecture specifics. */
+
 #define portSTACK_GROWTH                ( -1 )
-#define portBYTE_ALIGNMENT              1
-#define portNOP()                       __asm__ __volatile__ ( "nop" );
-
-#define sleep_reset()                   do { _SLEEP_CONTROL_REG = 0; } while(0)     // reset all sleep_mode() configurations.
-
 #define portTICK_PERIOD_MS          ( ( TickType_t ) 1000 / configTICK_RATE_HZ )
+#define portBYTE_ALIGNMENT              1
 
+#define portNOP()                   \
+    do{                             \
+        __asm                       \
+            nop                     \
+        __endasm;                   \
+    }while(0)
+
+/*
+ * Macros to save all the registers, and the save the stack pointer into the TCB.
+ *
+ */
+
+#define portSAVE_CONTEXT()          \
+    do{                             \
+        __asm                       \
+            EXTERN _pxCurrentTCB    \
+            push af                 \
+            ld a,i                  \
+            di                      \
+            push af                 \
+            push bc                 \
+            push de                 \
+            push hl                 \
+            exx                     \
+            ex af,af                \
+            push af                 \
+            push bc                 \
+            push de                 \
+            push hl                 \
+            push ix                 \
+            push iy                 \
+            ld ix,(_pxCurrentTCB)   \
+            ld hl,0                 \
+            add hl,sp               \
+            ld (ix),l               \
+            inc ix                  \
+            ld (ix),h               \
+        __endasm;                   \
+    }while(0)
+
+#define portRESTORE_CONTEXT()       \
+    do{                             \
+        __asm                       \
+            EXTERN _pxCurrentTCB    \
+            ld ix,(_pxCurrentTCB)   \
+            ld l,(ix)               \
+            inc ix                  \
+            ld h,(ix)               \
+            ld sp,hl                \
+            pop iy                  \
+            pop ix                  \
+            pop hl                  \
+            pop de                  \
+            pop bc                  \
+            pop af                  \
+            ex af,af                \
+            exx                     \
+            pop hl                  \
+            pop de                  \
+            pop bc                  \
+            pop af                  \
+            jp PO,ASMPC+4           \
+            ei                      \
+            pop af                  \
+            ret                     \
+        __endasm;                   \
+    }while(0)
+
+#define portSAVE_CONTEXT_IN_ISR()   \
+    do{                             \
+        __asm                       \
+            EXTERN _pxCurrentTCB    \
+            push af                 \
+            ld a,0x7F               \
+            inc a       ; set P/V   \
+            push af                 \
+            push bc                 \
+            push de                 \
+            push hl                 \
+            exx                     \
+            ex af,af                \
+            push af                 \
+            push bc                 \
+            push de                 \
+            push hl                 \
+            push ix                 \
+            push iy                 \
+            ld ix,(_pxCurrentTCB)   \
+            ld hl,0                 \
+            add hl,sp               \
+            ld (ix),l               \
+            inc ix                  \
+            ld (ix),h               \
+        __endasm;                   \
+    }while(0)
+
+#define portRESTORE_CONTEXT_IN_ISR()\
+    do{                             \
+        __asm                       \
+            EXTERN _pxCurrentTCB    \
+            ld ix,(_pxCurrentTCB)   \
+            ld l,(ix)               \
+            inc ix                  \
+            ld h,(ix)               \
+            ld sp,hl                \
+            pop iy                  \
+            pop ix                  \
+            pop hl                  \
+            pop de                  \
+            pop bc                  \
+            pop af                  \
+            ex af,af                \
+            exx                     \
+            pop hl                  \
+            pop de                  \
+            pop bc                  \
+            pop af                  \
+            jp PO,ASMPC+4           \
+            ei                      \
+            pop af                  \
+            reti                    \
+        __endasm;                   \
+    }while(0)
 /*-----------------------------------------------------------*/
 
 /* Kernel utilities. */
-extern void vPortYield( void )          __attribute__ ( ( naked ) );
+extern void vPortYield( void );
 #define portYIELD()                     vPortYield()
 
 /*-----------------------------------------------------------*/
 
 /* Task function macros as described on the FreeRTOS.org WEB site. */
 #define portTASK_FUNCTION_PROTO( vFunction, pvParameters ) void vFunction( void *pvParameters )
-
 #define portTASK_FUNCTION( vFunction, pvParameters ) void vFunction( void *pvParameters )
 
 #ifdef __cplusplus
