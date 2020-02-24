@@ -130,7 +130,7 @@ typedef unsigned char UBaseType_t;
             push af                 \
             ld a,i                  \
             di                      \
-            push af                 \
+            push af     ; if        \
             push bc                 \
             push de                 \
             push hl                 \
@@ -142,12 +142,13 @@ typedef unsigned char UBaseType_t;
             push hl                 \
             push ix                 \
             push iy                 \
-            ld ix,(_pxCurrentTCB)   \
             ld hl,0                 \
             add hl,sp               \
-            ld (ix),l               \
-            inc ix                  \
-            ld (ix),h               \
+            ld de,(_pxCurrentTCB)   \
+            ex de,hl                \
+            ld (hl),e               \
+            inc hl                  \
+            ld (hl),d               \
         __endasm;                   \
     }while(0)
 
@@ -155,10 +156,11 @@ typedef unsigned char UBaseType_t;
     do{                             \
         __asm                       \
             EXTERN _pxCurrentTCB    \
-            ld ix,(_pxCurrentTCB)   \
-            ld l,(ix)               \
-            inc ix                  \
-            ld h,(ix)               \
+            ld hl,(_pxCurrentTCB)   \
+            ld e,(hl)               \
+            inc hl                  \
+            ld d,(hl)               \
+            ex de,hl                \
             ld sp,hl                \
             pop iy                  \
             pop ix                  \
@@ -171,7 +173,7 @@ typedef unsigned char UBaseType_t;
             pop hl                  \
             pop de                  \
             pop bc                  \
-            pop af                  \
+            pop af      ; if        \
             jp PO,ASMPC+4           \
             ei                      \
             pop af                  \
@@ -186,7 +188,7 @@ typedef unsigned char UBaseType_t;
             push af                 \
             ld a,0x7F               \
             inc a       ; set P/V   \
-            push af                 \
+            push af     ; if        \
             push bc                 \
             push de                 \
             push hl                 \
@@ -198,12 +200,13 @@ typedef unsigned char UBaseType_t;
             push hl                 \
             push ix                 \
             push iy                 \
-            ld ix,(_pxCurrentTCB)   \
             ld hl,0                 \
             add hl,sp               \
-            ld (ix),l               \
-            inc ix                  \
-            ld (ix),h               \
+            ld de,(_pxCurrentTCB)   \
+            ex de,hl                \
+            ld (hl),e               \
+            inc hl                  \
+            ld (hl),d               \
         __endasm;                   \
     }while(0)
 
@@ -211,10 +214,11 @@ typedef unsigned char UBaseType_t;
     do{                             \
         __asm                       \
             EXTERN _pxCurrentTCB    \
-            ld ix,(_pxCurrentTCB)   \
-            ld l,(ix)               \
-            inc ix                  \
-            ld h,(ix)               \
+            ld hl,(_pxCurrentTCB)   \
+            ld e,(hl)               \
+            inc hl                  \
+            ld d,(hl)               \
+            ex de,hl                \
             ld sp,hl                \
             pop iy                  \
             pop ix                  \
@@ -227,7 +231,7 @@ typedef unsigned char UBaseType_t;
             pop hl                  \
             pop de                  \
             pop bc                  \
-            pop af                  \
+            pop af      ; if        \
             jp PO,ASMPC+4           \
             ei                      \
             pop af                  \
