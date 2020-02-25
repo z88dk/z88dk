@@ -318,7 +318,7 @@ const TickType_t x100ms = pdMS_TO_TICKS( 100 );
                               size_t xDataLengthBytes,
                               TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
 */
-extern size_t xStreamBufferSend(StreamBufferHandle_t xStreamBuffer,const void *pvTxData,size_t xDataLengthBytes,TickType_t xTicksToWait) __preserves_regs(iyh,iyl);
+extern size_t xStreamBufferSend(StreamBufferHandle_t xStreamBuffer,const void *pvTxData,size_t xDataLengthBytes,TickType_t xTicksToWait);
 
 
 /**
@@ -422,7 +422,7 @@ BaseType_t xHigherPriorityTaskWoken = pdFALSE; // Initialised to pdFALSE.
                                      size_t xDataLengthBytes,
                                      BaseType_t * const pxHigherPriorityTaskWoken ) PRIVILEGED_FUNCTION;
 */
-extern size_t xStreamBufferSendFromISR(StreamBufferHandle_t xStreamBuffer,const void *pvTxData,size_t xDataLengthBytes,BaseType_t * const pxHigherPriorityTaskWoken) __preserves_regs(iyh,iyl);
+extern size_t xStreamBufferSendFromISR(StreamBufferHandle_t xStreamBuffer,const void *pvTxData,size_t xDataLengthBytes,BaseType_t * const pxHigherPriorityTaskWoken);
 
 
 /**
@@ -514,7 +514,7 @@ const TickType_t xBlockTime = pdMS_TO_TICKS( 20 );
                                  size_t xBufferLengthBytes,
                                  TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
 */
-extern size_t xStreamBufferReceive(StreamBufferHandle_t xStreamBuffer,void *pvRxData,size_t xBufferLengthBytes,TickType_t xTicksToWait) __preserves_regs(iyh,iyl);
+extern size_t xStreamBufferReceive(StreamBufferHandle_t xStreamBuffer,void *pvRxData,size_t xBufferLengthBytes,TickType_t xTicksToWait);
 
 
 /**
@@ -603,7 +603,7 @@ BaseType_t xHigherPriorityTaskWoken = pdFALSE;  // Initialised to pdFALSE.
                                         size_t xBufferLengthBytes,
                                         BaseType_t * const pxHigherPriorityTaskWoken ) PRIVILEGED_FUNCTION;
 */
-extern size_t xStreamBufferReceiveFromISR(StreamBufferHandle_t xStreamBuffer,void *pvRxData,size_t xBufferLengthBytes,BaseType_t * const pxHigherPriorityTaskWoken) __preserves_regs(iyh,iyl);
+extern size_t xStreamBufferReceiveFromISR(StreamBufferHandle_t xStreamBuffer,void *pvRxData,size_t xBufferLengthBytes,BaseType_t * const pxHigherPriorityTaskWoken);
 
 
 /**
@@ -627,7 +627,7 @@ void vStreamBufferDelete( StreamBufferHandle_t xStreamBuffer );
  * \ingroup StreamBufferManagement
  */
 //  void vStreamBufferDelete( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
-extern void vStreamBufferDelete(StreamBufferHandle_t xStreamBuffer) __preserves_regs(iyh,iyl);
+extern void vStreamBufferDelete(StreamBufferHandle_t xStreamBuffer);
 
 
 /**
@@ -649,7 +649,7 @@ BaseType_t xStreamBufferIsFull( StreamBufferHandle_t xStreamBuffer );
  * \ingroup StreamBufferManagement
  */
 //  BaseType_t xStreamBufferIsFull( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
-extern BaseType_t xStreamBufferIsFull(StreamBufferHandle_t xStreamBuffer) __preserves_regs(iyh,iyl);
+extern BaseType_t xStreamBufferIsFull(StreamBufferHandle_t xStreamBuffer);
 
 
 /**
@@ -671,7 +671,7 @@ BaseType_t xStreamBufferIsEmpty( StreamBufferHandle_t xStreamBuffer );
  * \ingroup StreamBufferManagement
  */
 //  BaseType_t xStreamBufferIsEmpty( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
-extern BaseType_t xStreamBufferIsEmpty(StreamBufferHandle_t xStreamBuffer) __preserves_regs(iyh,iyl);
+extern BaseType_t xStreamBufferIsEmpty(StreamBufferHandle_t xStreamBuffer);
 
 
 /**
@@ -696,7 +696,7 @@ BaseType_t xStreamBufferReset( StreamBufferHandle_t xStreamBuffer );
  * \ingroup StreamBufferManagement
  */
 //  BaseType_t xStreamBufferReset( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
-extern BaseType_t xStreamBufferReset(StreamBufferHandle_t xStreamBuffer) __preserves_regs(iyh,iyl);
+extern BaseType_t xStreamBufferReset(StreamBufferHandle_t xStreamBuffer);
 
 
 /**
@@ -719,7 +719,7 @@ size_t xStreamBufferSpacesAvailable( StreamBufferHandle_t xStreamBuffer );
  * \ingroup StreamBufferManagement
  */
 //  size_t xStreamBufferSpacesAvailable( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
-extern size_t xStreamBufferSpacesAvailable(StreamBufferHandle_t xStreamBuffer) __preserves_regs(iyh,iyl);
+extern size_t xStreamBufferSpacesAvailable(StreamBufferHandle_t xStreamBuffer);
 
 
 /**
@@ -742,7 +742,7 @@ size_t xStreamBufferBytesAvailable( StreamBufferHandle_t xStreamBuffer );
  * \ingroup StreamBufferManagement
  */
 //  size_t xStreamBufferBytesAvailable( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
-extern size_t xStreamBufferBytesAvailable(StreamBufferHandle_t xStreamBuffer) __preserves_regs(iyh,iyl);
+extern size_t xStreamBufferBytesAvailable(StreamBufferHandle_t xStreamBuffer);
 
 
 /**
@@ -781,7 +781,7 @@ BaseType_t xStreamBufferSetTriggerLevel( StreamBufferHandle_t xStreamBuffer, siz
  * \ingroup StreamBufferManagement
  */
 //  BaseType_t xStreamBufferSetTriggerLevel( StreamBufferHandle_t xStreamBuffer, size_t xTriggerLevel ) PRIVILEGED_FUNCTION;
-extern BaseType_t xStreamBufferSetTriggerLevel(StreamBufferHandle_t xStreamBuffer,size_t xTriggerLevel) __preserves_regs(iyh,iyl);
+extern BaseType_t xStreamBufferSetTriggerLevel(StreamBufferHandle_t xStreamBuffer,size_t xTriggerLevel);
 
 
 /**
@@ -822,7 +822,7 @@ BaseType_t xStreamBufferSendCompletedFromISR( StreamBufferHandle_t xStreamBuffer
  * \ingroup StreamBufferManagement
  */
 //  BaseType_t xStreamBufferSendCompletedFromISR( StreamBufferHandle_t xStreamBuffer, BaseType_t *pxHigherPriorityTaskWoken ) PRIVILEGED_FUNCTION;
-extern BaseType_t xStreamBufferSendCompletedFromISR(StreamBufferHandle_t xStreamBuffer,BaseType_t *pxHigherPriorityTaskWoken) __preserves_regs(iyh,iyl);
+extern BaseType_t xStreamBufferSendCompletedFromISR(StreamBufferHandle_t xStreamBuffer,BaseType_t *pxHigherPriorityTaskWoken);
 
 
 /**
@@ -864,7 +864,7 @@ BaseType_t xStreamBufferReceiveCompletedFromISR( StreamBufferHandle_t xStreamBuf
  * \ingroup StreamBufferManagement
  */
 //  BaseType_t xStreamBufferReceiveCompletedFromISR( StreamBufferHandle_t xStreamBuffer, BaseType_t *pxHigherPriorityTaskWoken ) PRIVILEGED_FUNCTION;
-extern BaseType_t xStreamBufferReceiveCompletedFromISR(StreamBufferHandle_t xStreamBuffer,BaseType_t *pxHigherPriorityTaskWoken) __preserves_regs(iyh,iyl);
+extern BaseType_t xStreamBufferReceiveCompletedFromISR(StreamBufferHandle_t xStreamBuffer,BaseType_t *pxHigherPriorityTaskWoken);
 
 
 /* Functions below here are not part of the public API. */
@@ -872,7 +872,7 @@ extern BaseType_t xStreamBufferReceiveCompletedFromISR(StreamBufferHandle_t xStr
                                                      size_t xTriggerLevelBytes,
                                                      BaseType_t xIsMessageBuffer ) PRIVILEGED_FUNCTION;
 */
-extern StreamBufferHandle_t xStreamBufferGenericCreate(size_t xBufferSizeBytes,size_t xTriggerLevelBytes,BaseType_t xIsMessageBuffer) __preserves_regs(iyh,iyl);
+extern StreamBufferHandle_t xStreamBufferGenericCreate(size_t xBufferSizeBytes,size_t xTriggerLevelBytes,BaseType_t xIsMessageBuffer);
 
 
 /*  StreamBufferHandle_t xStreamBufferGenericCreateStatic( size_t xBufferSizeBytes,
@@ -881,22 +881,22 @@ extern StreamBufferHandle_t xStreamBufferGenericCreate(size_t xBufferSizeBytes,s
                                                            uint8_t * const pucStreamBufferStorageArea,
                                                            StaticStreamBuffer_t * const pxStaticStreamBuffer ) PRIVILEGED_FUNCTION;
 */
-extern StreamBufferHandle_t xStreamBufferGenericCreateStatic(size_t xBufferSizeBytes,size_t xTriggerLevelBytes,BaseType_t xIsMessageBuffer,uint8_t * const pucStreamBufferStorageArea,StaticStreamBuffer_t * const pxStaticStreamBuffer) __preserves_regs(iyh,iyl);
+extern StreamBufferHandle_t xStreamBufferGenericCreateStatic(size_t xBufferSizeBytes,size_t xTriggerLevelBytes,BaseType_t xIsMessageBuffer,uint8_t * const pucStreamBufferStorageArea,StaticStreamBuffer_t * const pxStaticStreamBuffer);
 
 
 size_t xStreamBufferNextMessageLengthBytes( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
-extern size_t xStreamBufferNextMessageLengthBytes(StreamBufferHandle_t xStreamBuffer) __preserves_regs(iyh,iyl);
+extern size_t xStreamBufferNextMessageLengthBytes(StreamBufferHandle_t xStreamBuffer);
 
 
 #if( configUSE_TRACE_FACILITY == 1 )
 //  void vStreamBufferSetStreamBufferNumber( StreamBufferHandle_t xStreamBuffer, UBaseType_t uxStreamBufferNumber ) PRIVILEGED_FUNCTION;
-    extern void vStreamBufferSetStreamBufferNumber(StreamBufferHandle_t xStreamBuffer,UBaseType_t uxStreamBufferNumber) __preserves_regs(iyh,iyl);
+    extern void vStreamBufferSetStreamBufferNumber(StreamBufferHandle_t xStreamBuffer,UBaseType_t uxStreamBufferNumber);
 
 //  UBaseType_t uxStreamBufferGetStreamBufferNumber( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
-    extern UBaseType_t uxStreamBufferGetStreamBufferNumber(StreamBufferHandle_t xStreamBuffer) __preserves_regs(iyh,iyl);
+    extern UBaseType_t uxStreamBufferGetStreamBufferNumber(StreamBufferHandle_t xStreamBuffer);
 
 //  uint8_t ucStreamBufferGetStreamBufferType( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
-    extern uint8_t ucStreamBufferGetStreamBufferType(StreamBufferHandle_t xStreamBuffer) __preserves_regs(iyh,iyl);
+    extern uint8_t ucStreamBufferGetStreamBufferType(StreamBufferHandle_t xStreamBuffer);
 
 #endif
 

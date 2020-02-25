@@ -28,13 +28,12 @@ include(__link__.m4)
 
 /* freeRTOSBoardDefs.h
  *
- * Board (hardware) specific definitions for the AVR boards that I use regularly.
+ * Board (hardware) specific definitions for the Z80 boards that I use regularly.
  * This includes
- * Arduino UNO with ATmega328p
- * Goldilocks with ATmega1284p
- * Arduino MEGA with ATmega2560
- *
- * And also Pololu SVP with ATmega1284p
+ * YAZ180 with Z8S180
+ * SCZ180 with Z8S180
+ * RC2014 with Z80
+ * Spectrum Next with Z80N
  *
  * This file is NOT part of the FreeRTOS distribution.
  *

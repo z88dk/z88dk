@@ -133,7 +133,7 @@ typedef struct corCoRoutineControlBlock
  * \ingroup Tasks
  */
 //  BaseType_t xCoRoutineCreate( crCOROUTINE_CODE pxCoRoutineCode, UBaseType_t uxPriority, UBaseType_t uxIndex );
-extern BaseType_t xCoRoutineCreate(crCOROUTINE_CODE pxCoRoutineCode,UBaseType_t uxPriority,UBaseType_t uxIndex) __preserves_regs(iyh,iyl);
+extern BaseType_t xCoRoutineCreate(crCOROUTINE_CODE pxCoRoutineCode,UBaseType_t uxPriority,UBaseType_t uxIndex);
 
 
 /**
@@ -176,7 +176,7 @@ extern BaseType_t xCoRoutineCreate(crCOROUTINE_CODE pxCoRoutineCode,UBaseType_t 
  * \ingroup Tasks
  */
 //  void vCoRoutineSchedule( void );
-extern void vCoRoutineSchedule(void) __preserves_regs(iyh,iyl);
+extern void vCoRoutineSchedule(void);
 
 
 /**
@@ -710,7 +710,7 @@ extern void vCoRoutineSchedule(void) __preserves_regs(iyh,iyl);
  * appropriate delayed list.
  */
 //  void vCoRoutineAddToDelayedList( TickType_t xTicksToDelay, List_t *pxEventList );
-extern void vCoRoutineAddToDelayedList(TickType_t xTicksToDelay,List_t *pxEventList) __preserves_regs(iyh,iyl);
+extern void vCoRoutineAddToDelayedList(TickType_t xTicksToDelay,List_t *pxEventList);
 
 
 /*
@@ -721,7 +721,7 @@ extern void vCoRoutineAddToDelayedList(TickType_t xTicksToDelay,List_t *pxEventL
  * the pending ready list.
  */
 //  BaseType_t xCoRoutineRemoveFromEventList( const List_t *pxEventList );
-extern BaseType_t xCoRoutineRemoveFromEventList(const List_t *pxEventList) __preserves_regs(iyh,iyl);
+extern BaseType_t xCoRoutineRemoveFromEventList(const List_t *pxEventList);
 
 
 #ifdef __cplusplus

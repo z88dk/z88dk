@@ -149,7 +149,7 @@ typedef TickType_t EventBits_t;
  */
 #if( configSUPPORT_DYNAMIC_ALLOCATION == 1 )
 //  EventGroupHandle_t xEventGroupCreate( void ) PRIVILEGED_FUNCTION;
-    extern EventGroupHandle_t xEventGroupCreate(void) __preserves_regs(iyh,iyl);
+    extern EventGroupHandle_t xEventGroupCreate(void);
 
 #endif
 
@@ -204,7 +204,7 @@ typedef TickType_t EventBits_t;
  */
 #if( configSUPPORT_STATIC_ALLOCATION == 1 )
 //  EventGroupHandle_t xEventGroupCreateStatic( StaticEventGroup_t *pxEventGroupBuffer ) PRIVILEGED_FUNCTION;
-    extern EventGroupHandle_t xEventGroupCreateStatic(StaticEventGroup_t *pxEventGroupBuffer) __preserves_regs(iyh,iyl);
+    extern EventGroupHandle_t xEventGroupCreateStatic(StaticEventGroup_t *pxEventGroupBuffer);
 
 #endif
 
@@ -301,7 +301,7 @@ typedef TickType_t EventBits_t;
  * \ingroup EventGroup
  */
 //  EventBits_t xEventGroupWaitBits( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToWaitFor, const BaseType_t xClearOnExit, const BaseType_t xWaitForAllBits, TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
-extern EventBits_t xEventGroupWaitBits(EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToWaitFor,const BaseType_t xClearOnExit,const BaseType_t xWaitForAllBits,TickType_t xTicksToWait) __preserves_regs(iyh,iyl);
+extern EventBits_t xEventGroupWaitBits(EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToWaitFor,const BaseType_t xClearOnExit,const BaseType_t xWaitForAllBits,TickType_t xTicksToWait);
 
 
 /**
@@ -360,7 +360,7 @@ extern EventBits_t xEventGroupWaitBits(EventGroupHandle_t xEventGroup,const Even
  * \ingroup EventGroup
  */
 //  EventBits_t xEventGroupClearBits( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToClear ) PRIVILEGED_FUNCTION;
-extern EventBits_t xEventGroupClearBits(EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToClear) __preserves_regs(iyh,iyl);
+extern EventBits_t xEventGroupClearBits(EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToClear);
 
 
 /**
@@ -418,7 +418,7 @@ extern EventBits_t xEventGroupClearBits(EventGroupHandle_t xEventGroup,const Eve
  */
 #if( configUSE_TRACE_FACILITY == 1 )
 //  BaseType_t xEventGroupClearBitsFromISR( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToClear ) PRIVILEGED_FUNCTION;
-    extern BaseType_t xEventGroupClearBitsFromISR(EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToClear) __preserves_regs(iyh,iyl);
+    extern BaseType_t xEventGroupClearBitsFromISR(EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToClear);
 
 #else
     #define xEventGroupClearBitsFromISR( xEventGroup, uxBitsToClear ) xTimerPendFunctionCallFromISR( vEventGroupClearBitsCallback, ( void * ) xEventGroup, ( uint32_t ) uxBitsToClear, NULL )
@@ -497,7 +497,7 @@ extern EventBits_t xEventGroupClearBits(EventGroupHandle_t xEventGroup,const Eve
  * \ingroup EventGroup
  */
 //  EventBits_t xEventGroupSetBits( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToSet ) PRIVILEGED_FUNCTION;
-extern EventBits_t xEventGroupSetBits(EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToSet) __preserves_regs(iyh,iyl);
+extern EventBits_t xEventGroupSetBits(EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToSet);
 
 
 /**
@@ -574,7 +574,7 @@ extern EventBits_t xEventGroupSetBits(EventGroupHandle_t xEventGroup,const Event
  */
 #if( configUSE_TRACE_FACILITY == 1 )
 //  BaseType_t xEventGroupSetBitsFromISR( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToSet, BaseType_t *pxHigherPriorityTaskWoken ) PRIVILEGED_FUNCTION;
-    extern BaseType_t xEventGroupSetBitsFromISR(EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToSet,BaseType_t *pxHigherPriorityTaskWoken) __preserves_regs(iyh,iyl);
+    extern BaseType_t xEventGroupSetBitsFromISR(EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToSet,BaseType_t *pxHigherPriorityTaskWoken);
 
 #else
     #define xEventGroupSetBitsFromISR( xEventGroup, uxBitsToSet, pxHigherPriorityTaskWoken ) xTimerPendFunctionCallFromISR( vEventGroupSetBitsCallback, ( void * ) xEventGroup, ( uint32_t ) uxBitsToSet, pxHigherPriorityTaskWoken )
@@ -705,7 +705,7 @@ extern EventBits_t xEventGroupSetBits(EventGroupHandle_t xEventGroup,const Event
  * \ingroup EventGroup
  */
 //  EventBits_t xEventGroupSync( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToSet, const EventBits_t uxBitsToWaitFor, TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
-extern EventBits_t xEventGroupSync(EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToSet,const EventBits_t uxBitsToWaitFor,TickType_t xTicksToWait) __preserves_regs(iyh,iyl);
+extern EventBits_t xEventGroupSync(EventGroupHandle_t xEventGroup,const EventBits_t uxBitsToSet,const EventBits_t uxBitsToWaitFor,TickType_t xTicksToWait);
 
 
 
@@ -743,7 +743,7 @@ extern EventBits_t xEventGroupSync(EventGroupHandle_t xEventGroup,const EventBit
  * \ingroup EventGroup
  */
 //  EventBits_t xEventGroupGetBitsFromISR( EventGroupHandle_t xEventGroup ) PRIVILEGED_FUNCTION;
-extern EventBits_t xEventGroupGetBitsFromISR(EventGroupHandle_t xEventGroup) __preserves_regs(iyh,iyl);
+extern EventBits_t xEventGroupGetBitsFromISR(EventGroupHandle_t xEventGroup);
 
 
 /**
@@ -759,23 +759,23 @@ extern EventBits_t xEventGroupGetBitsFromISR(EventGroupHandle_t xEventGroup) __p
  * @param xEventGroup The event group being deleted.
  */
 //  void vEventGroupDelete( EventGroupHandle_t xEventGroup ) PRIVILEGED_FUNCTION;
-extern void vEventGroupDelete(EventGroupHandle_t xEventGroup) __preserves_regs(iyh,iyl);
+extern void vEventGroupDelete(EventGroupHandle_t xEventGroup);
 
 
 /* For internal use only. */
 //  void vEventGroupSetBitsCallback( void *pvEventGroup, const uint32_t ulBitsToSet ) PRIVILEGED_FUNCTION;
-extern void vEventGroupSetBitsCallback(void *pvEventGroup,const uint32_t ulBitsToSet) __preserves_regs(iyh,iyl);
+extern void vEventGroupSetBitsCallback(void *pvEventGroup,const uint32_t ulBitsToSet);
 
 //  void vEventGroupClearBitsCallback( void *pvEventGroup, const uint32_t ulBitsToClear ) PRIVILEGED_FUNCTION;
-extern void vEventGroupClearBitsCallback(void *pvEventGroup,const uint32_t ulBitsToClear) __preserves_regs(iyh,iyl);
+extern void vEventGroupClearBitsCallback(void *pvEventGroup,const uint32_t ulBitsToClear);
 
 
 #if (configUSE_TRACE_FACILITY == 1)
 //  UBaseType_t uxEventGroupGetNumber( void* xEventGroup ) PRIVILEGED_FUNCTION;
-    extern UBaseType_t uxEventGroupGetNumber(void* xEventGroup) __preserves_regs(iyh,iyl);
+    extern UBaseType_t uxEventGroupGetNumber(void* xEventGroup);
 
 //  void vEventGroupSetNumber( void* xEventGroup, UBaseType_t uxEventGroupNumber ) PRIVILEGED_FUNCTION;
-    extern void vEventGroupSetNumber(void* xEventGroup,UBaseType_t uxEventGroupNumber) __preserves_regs(iyh,iyl);
+    extern void vEventGroupSetNumber(void* xEventGroup,UBaseType_t uxEventGroupNumber);
 
 #endif
 

@@ -131,7 +131,7 @@ typedef struct corCoRoutineControlBlock
  * \ingroup Tasks
  */
 //  BaseType_t xCoRoutineCreate( crCOROUTINE_CODE pxCoRoutineCode, UBaseType_t uxPriority, UBaseType_t uxIndex );
-__OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xCoRoutineCreate,crCOROUTINE_CODE pxCoRoutineCode,UBaseType_t uxPriority,UBaseType_t uxIndex)
+__OPROTO(,,BaseType_t,,xCoRoutineCreate,crCOROUTINE_CODE pxCoRoutineCode,UBaseType_t uxPriority,UBaseType_t uxIndex)
 
 /**
  * croutine. h
@@ -173,7 +173,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xCoRoutineCreate,crCOROUTINE_CODE pxCoR
  * \ingroup Tasks
  */
 //  void vCoRoutineSchedule( void );
-__OPROTO(`iyh,iyl',`iyh,iyl',void,,vCoRoutineSchedule,void)
+__OPROTO(,,void,,vCoRoutineSchedule,void)
 
 /**
  * croutine. h
@@ -706,7 +706,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',void,,vCoRoutineSchedule,void)
  * appropriate delayed list.
  */
 //  void vCoRoutineAddToDelayedList( TickType_t xTicksToDelay, List_t *pxEventList );
-__OPROTO(`iyh,iyl',`iyh,iyl',void,,vCoRoutineAddToDelayedList,TickType_t xTicksToDelay,List_t *pxEventList)
+__OPROTO(,,void,,vCoRoutineAddToDelayedList,TickType_t xTicksToDelay,List_t *pxEventList)
 
 /*
  * This function is intended for internal use by the queue implementation only.
@@ -716,7 +716,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',void,,vCoRoutineAddToDelayedList,TickType_t xTicksT
  * the pending ready list.
  */
 //  BaseType_t xCoRoutineRemoveFromEventList( const List_t *pxEventList );
-__OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xCoRoutineRemoveFromEventList,const List_t *pxEventList)
+__OPROTO(,,BaseType_t,,xCoRoutineRemoveFromEventList,const List_t *pxEventList)
 
 #ifdef __cplusplus
 }

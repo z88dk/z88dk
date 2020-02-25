@@ -333,9 +333,9 @@ is used in assert() statements. */
                             const configSTACK_DEPTH_TYPE usStackDepth,
                             void * const pvParameters,
                             UBaseType_t uxPriority,
-                            TaskHandle_t * const pxCreatedTask ) PRIVILEGED_FUNCTION;
+                            TaskHandle_t * pxCreatedTask ) PRIVILEGED_FUNCTION;
 */
-    __OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTaskCreate,TaskFunction_t pxTaskCode,const char * const pcName,const configSTACK_DEPTH_TYPE usStackDepth,void * const pvParameters,UBaseType_t uxPriority,TaskHandle_t * const pxCreatedTask)
+    __OPROTO(,,BaseType_t,,xTaskCreate,TaskFunction_t pxTaskCode,const char * const pcName,const configSTACK_DEPTH_TYPE usStackDepth,void * const pvParameters,UBaseType_t uxPriority,TaskHandle_t * pxCreatedTask)
 #endif
 
 /**
@@ -454,7 +454,7 @@ is used in assert() statements. */
                                     StackType_t * const puxStackBuffer,
                                     StaticTask_t * const pxTaskBuffer ) PRIVILEGED_FUNCTION;
 */
-    __OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTaskCreateStatic,TaskFunction_t pxTaskCode,const char * const pcName,const configSTACK_DEPTH_TYPE ulStackDepth,void * const pvParameters,UBaseType_t uxPriority,StackType_t * const puxStackBuffer,StaticTask_t * const pxTaskBuffer)
+    __OPROTO(,,BaseType_t,,xTaskCreateStatic,TaskFunction_t pxTaskCode,const char * const pcName,const configSTACK_DEPTH_TYPE ulStackDepth,void * const pvParameters,UBaseType_t uxPriority,StackType_t * const puxStackBuffer,StaticTask_t * const pxTaskBuffer)
 #endif /* configSUPPORT_STATIC_ALLOCATION */
 
 /**
@@ -531,7 +531,7 @@ TaskHandle_t xHandle;
  */
 #if( portUSING_MPU_WRAPPERS == 1 )
 //  BaseType_t xTaskCreateRestricted( const TaskParameters_t * const pxTaskDefinition, TaskHandle_t *pxCreatedTask ) PRIVILEGED_FUNCTION;
-    __OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTaskCreateRestricted,const TaskParameters_t * const pxTaskDefinition,TaskHandle_t *pxCreatedTask)
+    __OPROTO(,,BaseType_t,,xTaskCreateRestricted,const TaskParameters_t * const pxTaskDefinition,TaskHandle_t *pxCreatedTask)
 #endif
 
 /**
@@ -620,7 +620,7 @@ TaskHandle_t xHandle;
  */
 #if( ( portUSING_MPU_WRAPPERS == 1 ) && ( configSUPPORT_STATIC_ALLOCATION == 1 ) )
 //  BaseType_t xTaskCreateRestrictedStatic( const TaskParameters_t * const pxTaskDefinition, TaskHandle_t *pxCreatedTask ) PRIVILEGED_FUNCTION;
-    __OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTaskCreateRestrictedStatic,const TaskParameters_t * const pxTaskDefinition,TaskHandle_t *pxCreatedTask)
+    __OPROTO(,,BaseType_t,,xTaskCreateRestrictedStatic,const TaskParameters_t * const pxTaskDefinition,TaskHandle_t *pxCreatedTask)
 #endif
 
 /**
@@ -670,7 +670,7 @@ void vATask( void *pvParameters )
  * \ingroup Tasks
  */
 //  void vTaskAllocateMPURegions( TaskHandle_t xTask, const MemoryRegion_t * const pxRegions ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskAllocateMPURegions,TaskHandle_t xTask,const MemoryRegion_t * const pxRegions)
+__OPROTO(,,void,,vTaskAllocateMPURegions,TaskHandle_t xTask,const MemoryRegion_t * const pxRegions)
 
 /**
  * task. h
@@ -712,7 +712,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskAllocateMPURegions,TaskHandle_t xTask,co
  * \ingroup Tasks
  */
 //  void vTaskDelete( TaskHandle_t xTaskToDelete ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskDelete,TaskHandle_t xTaskToDelete)
+__OPROTO(,,void,,vTaskDelete,TaskHandle_t xTaskToDelete)
 
 /*-----------------------------------------------------------
  * TASK CONTROL API
@@ -765,7 +765,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskDelete,TaskHandle_t xTaskToDelete)
  * \ingroup TaskCtrl
  */
 //  void vTaskDelay( const TickType_t xTicksToDelay ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskDelay,const TickType_t xTicksToDelay)
+__OPROTO(,,void,,vTaskDelay,const TickType_t xTicksToDelay)
 
 /**
  * task. h
@@ -825,7 +825,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskDelay,const TickType_t xTicksToDelay)
  * \ingroup TaskCtrl
  */
 //  void vTaskDelayUntil( TickType_t * const pxPreviousWakeTime, const TickType_t xTimeIncrement ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskDelayUntil,TickType_t * const pxPreviousWakeTime,const TickType_t xTimeIncrement)
+__OPROTO(,,void,,vTaskDelayUntil,TickType_t * const pxPreviousWakeTime,const TickType_t xTimeIncrement)
 
 /**
  * task. h
@@ -856,7 +856,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskDelayUntil,TickType_t * const pxPrevious
  * \ingroup TaskCtrl
  */
 //  BaseType_t xTaskAbortDelay( TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTaskAbortDelay,TaskHandle_t xTask)
+__OPROTO(,,BaseType_t,,xTaskAbortDelay,TaskHandle_t xTask)
 
 /**
  * task. h
@@ -904,7 +904,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTaskAbortDelay,TaskHandle_t xTask)
  * \ingroup TaskCtrl
  */
 //  UBaseType_t uxTaskPriorityGet( const TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',UBaseType_t,,uxTaskPriorityGet,const TaskHandle_t xTask)
+__OPROTO(,,UBaseType_t,,uxTaskPriorityGet,const TaskHandle_t xTask)
 
 /**
  * task. h
@@ -913,7 +913,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',UBaseType_t,,uxTaskPriorityGet,const TaskHandle_t x
  * A version of uxTaskPriorityGet() that can be used from an ISR.
  */
 //  UBaseType_t uxTaskPriorityGetFromISR( const TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',UBaseType_t,,uxTaskPriorityGetFromISR,const TaskHandle_t xTask)
+__OPROTO(,,UBaseType_t,,uxTaskPriorityGetFromISR,const TaskHandle_t xTask)
 
 /**
  * task. h
@@ -932,7 +932,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',UBaseType_t,,uxTaskPriorityGetFromISR,const TaskHan
  * functions return value being tested by the calling task.
  */
 //  eTaskState eTaskGetState( TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',eTaskState,,eTaskGetState,TaskHandle_t xTask)
+__OPROTO(,,eTaskState,,eTaskGetState,TaskHandle_t xTask)
 
 /**
  * task. h
@@ -989,7 +989,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',eTaskState,,eTaskGetState,TaskHandle_t xTask)
  * \ingroup TaskCtrl
  */
 //  void vTaskGetInfo( TaskHandle_t xTask, TaskStatus_t *pxTaskStatus, BaseType_t xGetFreeStackSpace, eTaskState eState ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskGetInfo,TaskHandle_t xTask,TaskStatus_t *pxTaskStatus,BaseType_t xGetFreeStackSpace,eTaskState eState)
+__OPROTO(,,void,,vTaskGetInfo,TaskHandle_t xTask,TaskStatus_t *pxTaskStatus,BaseType_t xGetFreeStackSpace,eTaskState eState)
 
 /**
  * task. h
@@ -1032,7 +1032,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskGetInfo,TaskHandle_t xTask,TaskStatus_t 
  * \ingroup TaskCtrl
  */
 //  void vTaskPrioritySet( TaskHandle_t xTask, UBaseType_t uxNewPriority ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskPrioritySet,TaskHandle_t xTask,UBaseType_t uxNewPriority)
+__OPROTO(,,void,,vTaskPrioritySet,TaskHandle_t xTask,UBaseType_t uxNewPriority)
 
 /**
  * task. h
@@ -1084,7 +1084,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskPrioritySet,TaskHandle_t xTask,UBaseType
  * \ingroup TaskCtrl
  */
 //  void vTaskSuspend( TaskHandle_t xTaskToSuspend ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskSuspend,TaskHandle_t xTaskToSuspend)
+__OPROTO(,,void,,vTaskSuspend,TaskHandle_t xTaskToSuspend)
 
 /**
  * task. h
@@ -1134,7 +1134,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskSuspend,TaskHandle_t xTaskToSuspend)
  * \ingroup TaskCtrl
  */
 //  void vTaskResume( TaskHandle_t xTaskToResume ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskResume,TaskHandle_t xTaskToResume)
+__OPROTO(,,void,,vTaskResume,TaskHandle_t xTaskToResume)
 
 /**
  * task. h
@@ -1164,7 +1164,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskResume,TaskHandle_t xTaskToResume)
  * \ingroup TaskCtrl
  */
 //  BaseType_t xTaskResumeFromISR( TaskHandle_t xTaskToResume ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTaskResumeFromISR,TaskHandle_t xTaskToResume)
+__OPROTO(,,BaseType_t,,xTaskResumeFromISR,TaskHandle_t xTaskToResume)
 
 /*-----------------------------------------------------------
  * SCHEDULER CONTROL
@@ -1198,7 +1198,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTaskResumeFromISR,TaskHandle_t xTaskTo
  * \ingroup SchedulerControl
  */
 //  void vTaskStartScheduler( void ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskStartScheduler,void)
+__OPROTO(,,void,,vTaskStartScheduler,void)
 
 /**
  * task. h
@@ -1255,7 +1255,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskStartScheduler,void)
  * \ingroup SchedulerControl
  */
 //  void vTaskEndScheduler( void ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskEndScheduler,void)
+__OPROTO(,,void,,vTaskEndScheduler,void)
 
 /**
  * task. h
@@ -1307,7 +1307,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskEndScheduler,void)
  * \ingroup SchedulerControl
  */
 //  void vTaskSuspendAll( void ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskSuspendAll,void)
+__OPROTO(,,void,,vTaskSuspendAll,void)
 
 /**
  * task. h
@@ -1362,7 +1362,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskSuspendAll,void)
  * \ingroup SchedulerControl
  */
 //  BaseType_t xTaskResumeAll( void ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTaskResumeAll,void)
+__OPROTO(,,BaseType_t,,xTaskResumeAll,void)
 
 /*-----------------------------------------------------------
  * TASK UTILITIES
@@ -1378,7 +1378,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTaskResumeAll,void)
  * \ingroup TaskUtils
  */
 //  TickType_t xTaskGetTickCount( void ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',TickType_t,,xTaskGetTickCount,void)
+__OPROTO(,,TickType_t,,xTaskGetTickCount,void)
 
 /**
  * task. h
@@ -1395,7 +1395,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',TickType_t,,xTaskGetTickCount,void)
  * \ingroup TaskUtils
  */
 //  TickType_t xTaskGetTickCountFromISR( void ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',TickType_t,,xTaskGetTickCountFromISR,void)
+__OPROTO(,,TickType_t,,xTaskGetTickCountFromISR,void)
 
 /**
  * task. h
@@ -1410,7 +1410,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',TickType_t,,xTaskGetTickCountFromISR,void)
  * \ingroup TaskUtils
  */
 //  UBaseType_t uxTaskGetNumberOfTasks( void ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',UBaseType_t,,uxTaskGetNumberOfTasks,void)
+__OPROTO(,,UBaseType_t,,uxTaskGetNumberOfTasks,void)
 
 /**
  * task. h
@@ -1424,7 +1424,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',UBaseType_t,,uxTaskGetNumberOfTasks,void)
  * \ingroup TaskUtils
  */
 //  char *pcTaskGetName( TaskHandle_t xTaskToQuery ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
-__OPROTO(`iyh,iyl',`iyh,iyl',char,*,pcTaskGetName,TaskHandle_t xTaskToQuery)
+__OPROTO(,,char,*,pcTaskGetName,TaskHandle_t xTaskToQuery)
 
 /**
  * task. h
@@ -1441,7 +1441,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',char,*,pcTaskGetName,TaskHandle_t xTaskToQuery)
  * \ingroup TaskUtils
  */
 //  TaskHandle_t xTaskGetHandle( const char *pcNameToQuery ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
-__OPROTO(`iyh,iyl',`iyh,iyl',TaskHandle_t,,xTaskGetHandle,const char *pcNameToQuery)
+__OPROTO(,,TaskHandle_t,,xTaskGetHandle,const char *pcNameToQuery)
 
 /**
  * task.h
@@ -1470,10 +1470,10 @@ __OPROTO(`iyh,iyl',`iyh,iyl',TaskHandle_t,,xTaskGetHandle,const char *pcNameToQu
  */
 #if configENABLE_BACKWARD_COMPATIBILITY == 1
 //  UBaseType_t uxTaskGetStackHighWaterMark( TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',UBaseType_t,,uxTaskGetStackHighWaterMark,TaskHandle_t xTask)
+__OPROTO(,,UBaseType_t,,uxTaskGetStackHighWaterMark,TaskHandle_t xTask)
 #else
 //  configSTACK_DEPTH_TYPE uxTaskGetStackHighWaterMark( TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',configSTACK_DEPTH_TYPE,,uxTaskGetStackHighWaterMark,TaskHandle_t xTask)
+__OPROTO(,,configSTACK_DEPTH_TYPE,,uxTaskGetStackHighWaterMark,TaskHandle_t xTask)
 #endif /* configENABLE_BACKWARD_COMPATIBILITY */
 
 /* When using trace macros it is sometimes necessary to include task.h before
@@ -1493,7 +1493,7 @@ constant. */
          * function.
          */
         //  void vTaskSetApplicationTaskTag( TaskHandle_t xTask, TaskHookFunction_t pxHookFunction ) PRIVILEGED_FUNCTION;
-        __OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskSetApplicationTaskTag,TaskHandle_t xTask,TaskHookFunction_t pxHookFunction)
+        __OPROTO(,,void,,vTaskSetApplicationTaskTag,TaskHandle_t xTask,TaskHookFunction_t pxHookFunction)
 
         /**
          * task.h
@@ -1504,7 +1504,7 @@ constant. */
          * xTaskGetApplicationTaskTagFromISR() instead.
          */
         //  TaskHookFunction_t xTaskGetApplicationTaskTag( TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
-        __OPROTO(`iyh,iyl',`iyh,iyl',TaskHookFunction_t,,xTaskGetApplicationTaskTag,TaskHandle_t xTask)
+        __OPROTO(,,TaskHookFunction_t,,xTaskGetApplicationTaskTag,TaskHandle_t xTask)
 
         /**
          * task.h
@@ -1514,7 +1514,7 @@ constant. */
          * be called from an interrupt service routine.
          */
         //  TaskHookFunction_t xTaskGetApplicationTaskTagFromISR( TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
-        __OPROTO(`iyh,iyl',`iyh,iyl',TaskHookFunction_t,,xTaskGetApplicationTaskTagFromISR,TaskHandle_t xTask)
+        __OPROTO(,,TaskHookFunction_t,,xTaskGetApplicationTaskTagFromISR,TaskHandle_t xTask)
     #endif /* configUSE_APPLICATION_TASK_TAG ==1 */
 #endif /* ifdef configUSE_APPLICATION_TASK_TAG */
 
@@ -1526,9 +1526,9 @@ constant. */
     the pointers for any purpose they wish.  The following two functions are
     used to set and query a pointer respectively. */
     //  void vTaskSetThreadLocalStoragePointer( TaskHandle_t xTaskToSet, BaseType_t xIndex, void *pvValue ) PRIVILEGED_FUNCTION;
-    __OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskSetThreadLocalStoragePointer,TaskHandle_t xTaskToSet,BaseType_t xIndex,void *pvValue)
+    __OPROTO(,,void,,vTaskSetThreadLocalStoragePointer,TaskHandle_t xTaskToSet,BaseType_t xIndex,void *pvValue)
     //  void *pvTaskGetThreadLocalStoragePointer( TaskHandle_t xTaskToQuery, BaseType_t xIndex ) PRIVILEGED_FUNCTION;
-    __OPROTO(`iyh,iyl',`iyh,iyl',void,*,pvTaskGetThreadLocalStoragePointer,TaskHandle_t xTaskToQuery,BaseType_t xIndex)
+    __OPROTO(,,void,*,pvTaskGetThreadLocalStoragePointer,TaskHandle_t xTaskToQuery,BaseType_t xIndex)
 
 #endif
 
@@ -1544,7 +1544,7 @@ constant. */
  * registered by the user.
  */
 //  BaseType_t xTaskCallApplicationTaskHook( TaskHandle_t xTask, void *pvParameter ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTaskCallApplicationTaskHook,TaskHandle_t xTask,void *pvParameter)
+__OPROTO(,,BaseType_t,,xTaskCallApplicationTaskHook,TaskHandle_t xTask,void *pvParameter)
 
 /**
  * xTaskGetIdleTaskHandle() is only available if
@@ -1554,7 +1554,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTaskCallApplicationTaskHook,TaskHandle
  * xTaskGetIdleTaskHandle() before the scheduler has been started.
  */
 //  TaskHandle_t xTaskGetIdleTaskHandle( void ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',TaskHandle_t,,xTaskGetIdleTaskHandle,void)
+__OPROTO(,,TaskHandle_t,,xTaskGetIdleTaskHandle,void)
 
 /**
  * configUSE_TRACE_FACILITY must be defined as 1 in FreeRTOSConfig.h for
@@ -1654,7 +1654,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',TaskHandle_t,,xTaskGetIdleTaskHandle,void)
     </pre>
  */
 //  UBaseType_t uxTaskGetSystemState( TaskStatus_t * const pxTaskStatusArray, const UBaseType_t uxArraySize, uint32_t * const pulTotalRunTime ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',UBaseType_t,,uxTaskGetSystemState,TaskStatus_t * const pxTaskStatusArray,const UBaseType_t uxArraySize,uint32_t * const pulTotalRunTime)
+__OPROTO(,,UBaseType_t,,uxTaskGetSystemState,TaskStatus_t * const pxTaskStatusArray,const UBaseType_t uxArraySize,uint32_t * const pulTotalRunTime)
 
 /**
  * task. h
@@ -1702,7 +1702,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',UBaseType_t,,uxTaskGetSystemState,TaskStatus_t * co
  * \ingroup TaskUtils
  */
 //  void vTaskList( char * pcWriteBuffer ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
-__OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskList,char * pcWriteBuffer)
+__OPROTO(,,void,,vTaskList,char * pcWriteBuffer)
 
 /**
  * task. h
@@ -1757,7 +1757,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskList,char * pcWriteBuffer)
  * \ingroup TaskUtils
  */
 //  void vTaskGetRunTimeStats( char *pcWriteBuffer ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
-__OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskGetRunTimeStats,char *pcWriteBuffer)
+__OPROTO(,,void,,vTaskGetRunTimeStats,char *pcWriteBuffer)
 
 /**
  * task. h
@@ -1788,7 +1788,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskGetRunTimeStats,char *pcWriteBuffer)
 * \ingroup TaskUtils
 */
 //  TickType_t ulTaskGetIdleRunTimeCounter( void ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',TickType_t,,ulTaskGetIdleRunTimeCounter,void)
+__OPROTO(,,TickType_t,,ulTaskGetIdleRunTimeCounter,void)
 
 /**
  * task. h
@@ -1870,7 +1870,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',TickType_t,,ulTaskGetIdleRunTimeCounter,void)
  * \ingroup TaskNotifications
  */
 //  BaseType_t xTaskGenericNotify( TaskHandle_t xTaskToNotify, uint32_t ulValue, eNotifyAction eAction, uint32_t *pulPreviousNotificationValue ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTaskGenericNotify,TaskHandle_t xTaskToNotify,uint32_t ulValue,eNotifyAction eAction,uint32_t *pulPreviousNotificationValue)
+__OPROTO(,,BaseType_t,,xTaskGenericNotify,TaskHandle_t xTaskToNotify,uint32_t ulValue,eNotifyAction eAction,uint32_t *pulPreviousNotificationValue)
 #define xTaskNotify( xTaskToNotify, ulValue, eAction ) xTaskGenericNotify( ( xTaskToNotify ), ( ulValue ), ( eAction ), NULL )
 #define xTaskNotifyAndQuery( xTaskToNotify, ulValue, eAction, pulPreviousNotifyValue ) xTaskGenericNotify( ( xTaskToNotify ), ( ulValue ), ( eAction ), ( pulPreviousNotifyValue ) )
 
@@ -1962,7 +1962,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTaskGenericNotify,TaskHandle_t xTaskTo
  * \ingroup TaskNotifications
  */
 //  BaseType_t xTaskGenericNotifyFromISR( TaskHandle_t xTaskToNotify, uint32_t ulValue, eNotifyAction eAction, uint32_t *pulPreviousNotificationValue, BaseType_t *pxHigherPriorityTaskWoken ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTaskGenericNotifyFromISR,TaskHandle_t xTaskToNotify,uint32_t ulValue,eNotifyAction eAction,uint32_t *pulPreviousNotificationValue,BaseType_t *pxHigherPriorityTaskWoken)
+__OPROTO(,,BaseType_t,,xTaskGenericNotifyFromISR,TaskHandle_t xTaskToNotify,uint32_t ulValue,eNotifyAction eAction,uint32_t *pulPreviousNotificationValue,BaseType_t *pxHigherPriorityTaskWoken)
 #define xTaskNotifyFromISR( xTaskToNotify, ulValue, eAction, pxHigherPriorityTaskWoken ) xTaskGenericNotifyFromISR( ( xTaskToNotify ), ( ulValue ), ( eAction ), NULL, ( pxHigherPriorityTaskWoken ) )
 #define xTaskNotifyAndQueryFromISR( xTaskToNotify, ulValue, eAction, pulPreviousNotificationValue, pxHigherPriorityTaskWoken ) xTaskGenericNotifyFromISR( ( xTaskToNotify ), ( ulValue ), ( eAction ), ( pulPreviousNotificationValue ), ( pxHigherPriorityTaskWoken ) )
 
@@ -2040,7 +2040,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTaskGenericNotifyFromISR,TaskHandle_t 
  * \ingroup TaskNotifications
  */
 // BaseType_t xTaskNotifyWait( uint32_t ulBitsToClearOnEntry, uint32_t ulBitsToClearOnExit, uint32_t *pulNotificationValue, TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTaskNotifyWait,uint32_t ulBitsToClearOnEntry,uint32_t ulBitsToClearOnExit,uint32_t *pulNotificationValue,TickType_t xTicksToWait)
+__OPROTO(,,BaseType_t,,xTaskNotifyWait,uint32_t ulBitsToClearOnEntry,uint32_t ulBitsToClearOnExit,uint32_t *pulNotificationValue,TickType_t xTicksToWait)
 
 /**
  * task. h
@@ -2142,7 +2142,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTaskNotifyWait,uint32_t ulBitsToClearO
  * \ingroup TaskNotifications
  */
 //  void vTaskNotifyGiveFromISR( TaskHandle_t xTaskToNotify, BaseType_t *pxHigherPriorityTaskWoken ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskNotifyGiveFromISR,TaskHandle_t xTaskToNotify,BaseType_t *pxHigherPriorityTaskWoken)
+__OPROTO(,,void,,vTaskNotifyGiveFromISR,TaskHandle_t xTaskToNotify,BaseType_t *pxHigherPriorityTaskWoken)
 
 /**
  * task. h
@@ -2212,7 +2212,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskNotifyGiveFromISR,TaskHandle_t xTaskToNo
  * \ingroup TaskNotifications
  */
 //  uint32_t ulTaskNotifyTake( BaseType_t xClearCountOnExit, TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',uint32_t,,ulTaskNotifyTake,BaseType_t xClearCountOnExit,TickType_t xTicksToWait)
+__OPROTO(,,uint32_t,,ulTaskNotifyTake,BaseType_t xClearCountOnExit,TickType_t xTicksToWait)
 
 /**
  * task. h
@@ -2229,7 +2229,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',uint32_t,,ulTaskNotifyTake,BaseType_t xClearCountOn
  * \ingroup TaskNotifications
  */
 //  BaseType_t xTaskNotifyStateClear( TaskHandle_t xTask );
-__OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTaskNotifyStateClear,TaskHandle_t xTask)
+__OPROTO(,,BaseType_t,,xTaskNotifyStateClear,TaskHandle_t xTask)
 
 /**
 * task. h
@@ -2248,7 +2248,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTaskNotifyStateClear,TaskHandle_t xTas
 * \ingroup TaskNotifications
 */
 //  uint32_t ulTaskNotifyValueClear( TaskHandle_t xTask, uint32_t ulBitsToClear ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',uint32_t,,ulTaskNotifyValueClear,TaskHandle_t xTask,uint32_t ulBitsToClear)
+__OPROTO(,,uint32_t,,ulTaskNotifyValueClear,TaskHandle_t xTask,uint32_t ulBitsToClear)
 
 /**
  * task.h
@@ -2263,7 +2263,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',uint32_t,,ulTaskNotifyValueClear,TaskHandle_t xTask
  * \ingroup TaskCtrl
  */
 //  void vTaskSetTimeOutState( TimeOut_t * const pxTimeOut ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskSetTimeOutState,TimeOut_t * const pxTimeOut)
+__OPROTO(,,void,,vTaskSetTimeOutState,TimeOut_t * const pxTimeOut)
 
 /**
  * task.h
@@ -2347,7 +2347,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskSetTimeOutState,TimeOut_t * const pxTime
  * \ingroup TaskCtrl
  */
 //  BaseType_t xTaskCheckForTimeOut( TimeOut_t * const pxTimeOut, TickType_t * const pxTicksToWait ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTaskCheckForTimeOut,TimeOut_t * const pxTimeOut,TickType_t * const pxTicksToWait)
+__OPROTO(,,BaseType_t,,xTaskCheckForTimeOut,TimeOut_t * const pxTimeOut,TickType_t * const pxTicksToWait)
 
 /*-----------------------------------------------------------
  * SCHEDULER INTERNALS AVAILABLE FOR PORTING PURPOSES
@@ -2369,7 +2369,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTaskCheckForTimeOut,TimeOut_t * const 
  *     currently running task.
  */
 //  BaseType_t xTaskIncrementTick( void ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTaskIncrementTick,void)
+__OPROTO(,,BaseType_t,,xTaskIncrementTick,void)
 
 /*
  * THIS FUNCTION MUST NOT BE USED FROM APPLICATION CODE.  IT IS AN
@@ -2403,9 +2403,9 @@ __OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTaskIncrementTick,void)
  * period.
  */
 //  void vTaskPlaceOnEventList( List_t * const pxEventList, const TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskPlaceOnEventList,List_t * const pxEventList,const TickType_t xTicksToWait)
+__OPROTO(,,void,,vTaskPlaceOnEventList,List_t * const pxEventList,const TickType_t xTicksToWait)
 //  void vTaskPlaceOnUnorderedEventList( List_t * pxEventList, const TickType_t xItemValue, const TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskPlaceOnUnorderedEventList,List_t * pxEventList,const TickType_t xItemValue,const TickType_t xTicksToWait)
+__OPROTO(,,void,,vTaskPlaceOnUnorderedEventList,List_t * pxEventList,const TickType_t xItemValue,const TickType_t xTicksToWait)
 
 /*
  * THIS FUNCTION MUST NOT BE USED FROM APPLICATION CODE.  IT IS AN
@@ -2419,7 +2419,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskPlaceOnUnorderedEventList,List_t * pxEve
  *
  */
 //  void vTaskPlaceOnEventListRestricted( List_t * const pxEventList, TickType_t xTicksToWait, const BaseType_t xWaitIndefinitely ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskPlaceOnEventListRestricted,List_t * const pxEventList,TickType_t xTicksToWait,const BaseType_t xWaitIndefinitely)
+__OPROTO(,,void,,vTaskPlaceOnEventListRestricted,List_t * const pxEventList,TickType_t xTicksToWait,const BaseType_t xWaitIndefinitely)
 
 /*
  * THIS FUNCTION MUST NOT BE USED FROM APPLICATION CODE.  IT IS AN
@@ -2446,9 +2446,9 @@ __OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskPlaceOnEventListRestricted,List_t * cons
  * making the call, otherwise pdFALSE.
  */
 //  BaseType_t xTaskRemoveFromEventList( const List_t * const pxEventList ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTaskRemoveFromEventList,const List_t * const pxEventList)
+__OPROTO(,,BaseType_t,,xTaskRemoveFromEventList,const List_t * const pxEventList)
 //  void vTaskRemoveFromUnorderedEventList( ListItem_t * pxEventListItem, const TickType_t xItemValue ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskRemoveFromUnorderedEventList,ListItem_t * pxEventListItem,const TickType_t xItemValue)
+__OPROTO(,,void,,vTaskRemoveFromUnorderedEventList,ListItem_t * pxEventListItem,const TickType_t xItemValue)
 
 /*
  * THIS FUNCTION MUST NOT BE USED FROM APPLICATION CODE.  IT IS ONLY
@@ -2459,48 +2459,48 @@ __OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskRemoveFromUnorderedEventList,ListItem_t 
  * that is ready to run.
  */
 //  portDONT_DISCARD void vTaskSwitchContext( void ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskSwitchContext,void)
+__OPROTO(,,void,,vTaskSwitchContext,void)
 
 /*
  * THESE FUNCTIONS MUST NOT BE USED FROM APPLICATION CODE.  THEY ARE USED BY
  * THE EVENT BITS MODULE.
  */
 //  TickType_t uxTaskResetEventItemValue( void ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',TickType_t,,uxTaskResetEventItemValue,void)
+__OPROTO(,,TickType_t,,uxTaskResetEventItemValue,void)
 
 /*
  * Return the handle of the calling task.
  */
 //  TaskHandle_t xTaskGetCurrentTaskHandle( void ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',TaskHandle_t,,xTaskGetCurrentTaskHandle,void)
+__OPROTO(,,TaskHandle_t,,xTaskGetCurrentTaskHandle,void)
 
 /*
  * Shortcut used by the queue implementation to prevent unnecessary call to
  * taskYIELD();
  */
 //  void vTaskMissedYield( void ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskMissedYield,void)
+__OPROTO(,,void,,vTaskMissedYield,void)
 
 /*
  * Returns the scheduler state as taskSCHEDULER_RUNNING,
  * taskSCHEDULER_NOT_STARTED or taskSCHEDULER_SUSPENDED.
  */
 //  BaseType_t xTaskGetSchedulerState( void ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTaskGetSchedulerState,void)
+__OPROTO(,,BaseType_t,,xTaskGetSchedulerState,void)
 
 /*
  * Raises the priority of the mutex holder to that of the calling task should
  * the mutex holder have a priority less than the calling task.
  */
 //  BaseType_t xTaskPriorityInherit( TaskHandle_t const pxMutexHolder ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTaskPriorityInherit,TaskHandle_t const pxMutexHolder)
+__OPROTO(,,BaseType_t,,xTaskPriorityInherit,TaskHandle_t const pxMutexHolder)
 
 /*
  * Set the priority of a task back to its proper priority in the case that it
  * inherited a higher priority while it was holding a semaphore.
  */
 //  BaseType_t xTaskPriorityDisinherit( TaskHandle_t const pxMutexHolder ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTaskPriorityDisinherit,TaskHandle_t const pxMutexHolder)
+__OPROTO(,,BaseType_t,,xTaskPriorityDisinherit,TaskHandle_t const pxMutexHolder)
 
 /*
  * If a higher priority task attempting to obtain a mutex caused a lower
@@ -2511,20 +2511,20 @@ __OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTaskPriorityDisinherit,TaskHandle_t co
  * more than one task waiting for the mutex).
  */
 //void vTaskPriorityDisinheritAfterTimeout( TaskHandle_t const pxMutexHolder, UBaseType_t uxHighestPriorityWaitingTask ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskPriorityDisinheritAfterTimeout,TaskHandle_t const pxMutexHolder,UBaseType_t uxHighestPriorityWaitingTask)
+__OPROTO(,,void,,vTaskPriorityDisinheritAfterTimeout,TaskHandle_t const pxMutexHolder,UBaseType_t uxHighestPriorityWaitingTask)
 
 /*
  * Get the uxTCBNumber assigned to the task referenced by the xTask parameter.
  */
 //  UBaseType_t uxTaskGetTaskNumber( TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',UBaseType_t,,uxTaskGetTaskNumber,TaskHandle_t xTask)
+__OPROTO(,,UBaseType_t,,uxTaskGetTaskNumber,TaskHandle_t xTask)
 
 /*
  * Set the uxTaskNumber of the task referenced by the xTask parameter to
  * uxHandle.
  */
 //  void vTaskSetTaskNumber( TaskHandle_t xTask, const UBaseType_t uxHandle ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskSetTaskNumber,TaskHandle_t xTask,const UBaseType_t uxHandle)
+__OPROTO(,,void,,vTaskSetTaskNumber,TaskHandle_t xTask,const UBaseType_t uxHandle)
 
 /*
  * Only available when configUSE_TICKLESS_IDLE is set to 1.
@@ -2535,7 +2535,7 @@ __OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskSetTaskNumber,TaskHandle_t xTask,const U
  * equal to the idle period.
  */
 //  void vTaskStepTick( const TickType_t xTicksToJump ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskStepTick,const TickType_t xTicksToJump)
+__OPROTO(,,void,,vTaskStepTick,const TickType_t xTicksToJump)
 
 /* Correct the tick count value after the application code has held
 interrupts disabled for an extended period.  xTicksToCatchUp is the number
@@ -2549,7 +2549,7 @@ time at which a task should be removed from the blocked state.  That means
 tasks may have to be removed from the blocked state as the tick count is
 moved. */
 //  BaseType_t xTaskCatchUpTicks( TickType_t xTicksToCatchUp ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTaskCatchUpTicks,TickType_t xTicksToCatchUp)
+__OPROTO(,,BaseType_t,,xTaskCatchUpTicks,TickType_t xTicksToCatchUp)
 
 /*
  * Only available when configUSE_TICKLESS_IDLE is set to 1.
@@ -2566,21 +2566,21 @@ __OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xTaskCatchUpTicks,TickType_t xTicksToCa
  * entered to ensure it is ok to proceed into the sleep mode.
  */
 //  eSleepModeStatus eTaskConfirmSleepModeStatus( void ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',eSleepModeStatus,,eTaskConfirmSleepModeStatus,void)
+__OPROTO(,,eSleepModeStatus,,eTaskConfirmSleepModeStatus,void)
 
 /*
  * For internal use only.  Increment the mutex held count when a mutex is
  * taken and return the handle of the task that has taken the mutex.
  */
 //  TaskHandle_t pvTaskIncrementMutexHeldCount( void ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',TaskHandle_t,,pvTaskIncrementMutexHeldCount,void)
+__OPROTO(,,TaskHandle_t,,pvTaskIncrementMutexHeldCount,void)
 
 /*
  * For internal use only.  Same as vTaskSetTimeOutState(), but without a critial
  * section.
  */
 //  void vTaskInternalSetTimeOutState( TimeOut_t * const pxTimeOut ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',void,,vTaskInternalSetTimeOutState,TimeOut_t * const pxTimeOut)
+__OPROTO(,,void,,vTaskInternalSetTimeOutState,TimeOut_t * const pxTimeOut)
 
 #ifdef __cplusplus
 }

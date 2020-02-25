@@ -316,7 +316,7 @@ const TickType_t x100ms = pdMS_TO_TICKS( 100 );
                               size_t xDataLengthBytes,
                               TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
 */
-__OPROTO(`iyh,iyl',`iyh,iyl',size_t,,xStreamBufferSend,StreamBufferHandle_t xStreamBuffer,const void *pvTxData,size_t xDataLengthBytes,TickType_t xTicksToWait)
+__OPROTO(,,size_t,,xStreamBufferSend,StreamBufferHandle_t xStreamBuffer,const void *pvTxData,size_t xDataLengthBytes,TickType_t xTicksToWait)
 
 /**
  * stream_buffer.h
@@ -419,7 +419,7 @@ BaseType_t xHigherPriorityTaskWoken = pdFALSE; // Initialised to pdFALSE.
                                      size_t xDataLengthBytes,
                                      BaseType_t * const pxHigherPriorityTaskWoken ) PRIVILEGED_FUNCTION;
 */
-__OPROTO(`iyh,iyl',`iyh,iyl',size_t,,xStreamBufferSendFromISR,StreamBufferHandle_t xStreamBuffer,const void *pvTxData,size_t xDataLengthBytes,BaseType_t * const pxHigherPriorityTaskWoken)
+__OPROTO(,,size_t,,xStreamBufferSendFromISR,StreamBufferHandle_t xStreamBuffer,const void *pvTxData,size_t xDataLengthBytes,BaseType_t * const pxHigherPriorityTaskWoken)
 
 /**
  * stream_buffer.h
@@ -510,7 +510,7 @@ const TickType_t xBlockTime = pdMS_TO_TICKS( 20 );
                                  size_t xBufferLengthBytes,
                                  TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
 */
-__OPROTO(`iyh,iyl',`iyh,iyl',size_t,,xStreamBufferReceive,StreamBufferHandle_t xStreamBuffer,void *pvRxData,size_t xBufferLengthBytes,TickType_t xTicksToWait)
+__OPROTO(,,size_t,,xStreamBufferReceive,StreamBufferHandle_t xStreamBuffer,void *pvRxData,size_t xBufferLengthBytes,TickType_t xTicksToWait)
 
 /**
  * stream_buffer.h
@@ -598,7 +598,7 @@ BaseType_t xHigherPriorityTaskWoken = pdFALSE;  // Initialised to pdFALSE.
                                         size_t xBufferLengthBytes,
                                         BaseType_t * const pxHigherPriorityTaskWoken ) PRIVILEGED_FUNCTION;
 */
-__OPROTO(`iyh,iyl',`iyh,iyl',size_t,,xStreamBufferReceiveFromISR,StreamBufferHandle_t xStreamBuffer,void *pvRxData,size_t xBufferLengthBytes,BaseType_t * const pxHigherPriorityTaskWoken)
+__OPROTO(,,size_t,,xStreamBufferReceiveFromISR,StreamBufferHandle_t xStreamBuffer,void *pvRxData,size_t xBufferLengthBytes,BaseType_t * const pxHigherPriorityTaskWoken)
 
 /**
  * stream_buffer.h
@@ -621,7 +621,7 @@ void vStreamBufferDelete( StreamBufferHandle_t xStreamBuffer );
  * \ingroup StreamBufferManagement
  */
 //  void vStreamBufferDelete( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',void,,vStreamBufferDelete,StreamBufferHandle_t xStreamBuffer)
+__OPROTO(,,void,,vStreamBufferDelete,StreamBufferHandle_t xStreamBuffer)
 
 /**
  * stream_buffer.h
@@ -642,7 +642,7 @@ BaseType_t xStreamBufferIsFull( StreamBufferHandle_t xStreamBuffer );
  * \ingroup StreamBufferManagement
  */
 //  BaseType_t xStreamBufferIsFull( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xStreamBufferIsFull,StreamBufferHandle_t xStreamBuffer)
+__OPROTO(,,BaseType_t,,xStreamBufferIsFull,StreamBufferHandle_t xStreamBuffer)
 
 /**
  * stream_buffer.h
@@ -663,7 +663,7 @@ BaseType_t xStreamBufferIsEmpty( StreamBufferHandle_t xStreamBuffer );
  * \ingroup StreamBufferManagement
  */
 //  BaseType_t xStreamBufferIsEmpty( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xStreamBufferIsEmpty,StreamBufferHandle_t xStreamBuffer)
+__OPROTO(,,BaseType_t,,xStreamBufferIsEmpty,StreamBufferHandle_t xStreamBuffer)
 
 /**
  * stream_buffer.h
@@ -687,7 +687,7 @@ BaseType_t xStreamBufferReset( StreamBufferHandle_t xStreamBuffer );
  * \ingroup StreamBufferManagement
  */
 //  BaseType_t xStreamBufferReset( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xStreamBufferReset,StreamBufferHandle_t xStreamBuffer)
+__OPROTO(,,BaseType_t,,xStreamBufferReset,StreamBufferHandle_t xStreamBuffer)
 
 /**
  * stream_buffer.h
@@ -709,7 +709,7 @@ size_t xStreamBufferSpacesAvailable( StreamBufferHandle_t xStreamBuffer );
  * \ingroup StreamBufferManagement
  */
 //  size_t xStreamBufferSpacesAvailable( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',size_t,,xStreamBufferSpacesAvailable,StreamBufferHandle_t xStreamBuffer)
+__OPROTO(,,size_t,,xStreamBufferSpacesAvailable,StreamBufferHandle_t xStreamBuffer)
 
 /**
  * stream_buffer.h
@@ -731,7 +731,7 @@ size_t xStreamBufferBytesAvailable( StreamBufferHandle_t xStreamBuffer );
  * \ingroup StreamBufferManagement
  */
 //  size_t xStreamBufferBytesAvailable( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',size_t,,xStreamBufferBytesAvailable,StreamBufferHandle_t xStreamBuffer)
+__OPROTO(,,size_t,,xStreamBufferBytesAvailable,StreamBufferHandle_t xStreamBuffer)
 
 /**
  * stream_buffer.h
@@ -769,7 +769,7 @@ BaseType_t xStreamBufferSetTriggerLevel( StreamBufferHandle_t xStreamBuffer, siz
  * \ingroup StreamBufferManagement
  */
 //  BaseType_t xStreamBufferSetTriggerLevel( StreamBufferHandle_t xStreamBuffer, size_t xTriggerLevel ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xStreamBufferSetTriggerLevel,StreamBufferHandle_t xStreamBuffer,size_t xTriggerLevel)
+__OPROTO(,,BaseType_t,,xStreamBufferSetTriggerLevel,StreamBufferHandle_t xStreamBuffer,size_t xTriggerLevel)
 
 /**
  * stream_buffer.h
@@ -809,7 +809,7 @@ BaseType_t xStreamBufferSendCompletedFromISR( StreamBufferHandle_t xStreamBuffer
  * \ingroup StreamBufferManagement
  */
 //  BaseType_t xStreamBufferSendCompletedFromISR( StreamBufferHandle_t xStreamBuffer, BaseType_t *pxHigherPriorityTaskWoken ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xStreamBufferSendCompletedFromISR,StreamBufferHandle_t xStreamBuffer,BaseType_t *pxHigherPriorityTaskWoken)
+__OPROTO(,,BaseType_t,,xStreamBufferSendCompletedFromISR,StreamBufferHandle_t xStreamBuffer,BaseType_t *pxHigherPriorityTaskWoken)
 
 /**
  * stream_buffer.h
@@ -850,14 +850,14 @@ BaseType_t xStreamBufferReceiveCompletedFromISR( StreamBufferHandle_t xStreamBuf
  * \ingroup StreamBufferManagement
  */
 //  BaseType_t xStreamBufferReceiveCompletedFromISR( StreamBufferHandle_t xStreamBuffer, BaseType_t *pxHigherPriorityTaskWoken ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',BaseType_t,,xStreamBufferReceiveCompletedFromISR,StreamBufferHandle_t xStreamBuffer,BaseType_t *pxHigherPriorityTaskWoken)
+__OPROTO(,,BaseType_t,,xStreamBufferReceiveCompletedFromISR,StreamBufferHandle_t xStreamBuffer,BaseType_t *pxHigherPriorityTaskWoken)
 
 /* Functions below here are not part of the public API. */
 /*  StreamBufferHandle_t xStreamBufferGenericCreate( size_t xBufferSizeBytes,
                                                      size_t xTriggerLevelBytes,
                                                      BaseType_t xIsMessageBuffer ) PRIVILEGED_FUNCTION;
 */
-__OPROTO(`iyh,iyl',`iyh,iyl',StreamBufferHandle_t,,xStreamBufferGenericCreate,size_t xBufferSizeBytes,size_t xTriggerLevelBytes,BaseType_t xIsMessageBuffer)
+__OPROTO(,,StreamBufferHandle_t,,xStreamBufferGenericCreate,size_t xBufferSizeBytes,size_t xTriggerLevelBytes,BaseType_t xIsMessageBuffer)
 
 /*  StreamBufferHandle_t xStreamBufferGenericCreateStatic( size_t xBufferSizeBytes,
                                                            size_t xTriggerLevelBytes,
@@ -865,18 +865,18 @@ __OPROTO(`iyh,iyl',`iyh,iyl',StreamBufferHandle_t,,xStreamBufferGenericCreate,si
                                                            uint8_t * const pucStreamBufferStorageArea,
                                                            StaticStreamBuffer_t * const pxStaticStreamBuffer ) PRIVILEGED_FUNCTION;
 */
-__OPROTO(`iyh,iyl',`iyh,iyl',StreamBufferHandle_t,,xStreamBufferGenericCreateStatic,size_t xBufferSizeBytes,size_t xTriggerLevelBytes,BaseType_t xIsMessageBuffer,uint8_t * const pucStreamBufferStorageArea,StaticStreamBuffer_t * const pxStaticStreamBuffer)
+__OPROTO(,,StreamBufferHandle_t,,xStreamBufferGenericCreateStatic,size_t xBufferSizeBytes,size_t xTriggerLevelBytes,BaseType_t xIsMessageBuffer,uint8_t * const pucStreamBufferStorageArea,StaticStreamBuffer_t * const pxStaticStreamBuffer)
 
 size_t xStreamBufferNextMessageLengthBytes( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
-__OPROTO(`iyh,iyl',`iyh,iyl',size_t,,xStreamBufferNextMessageLengthBytes,StreamBufferHandle_t xStreamBuffer)
+__OPROTO(,,size_t,,xStreamBufferNextMessageLengthBytes,StreamBufferHandle_t xStreamBuffer)
 
 #if( configUSE_TRACE_FACILITY == 1 )
 //  void vStreamBufferSetStreamBufferNumber( StreamBufferHandle_t xStreamBuffer, UBaseType_t uxStreamBufferNumber ) PRIVILEGED_FUNCTION;
-    __OPROTO(`iyh,iyl',`iyh,iyl',void,,vStreamBufferSetStreamBufferNumber,StreamBufferHandle_t xStreamBuffer,UBaseType_t uxStreamBufferNumber)
+    __OPROTO(,,void,,vStreamBufferSetStreamBufferNumber,StreamBufferHandle_t xStreamBuffer,UBaseType_t uxStreamBufferNumber)
 //  UBaseType_t uxStreamBufferGetStreamBufferNumber( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
-    __OPROTO(`iyh,iyl',`iyh,iyl',UBaseType_t,,uxStreamBufferGetStreamBufferNumber,StreamBufferHandle_t xStreamBuffer)
+    __OPROTO(,,UBaseType_t,,uxStreamBufferGetStreamBufferNumber,StreamBufferHandle_t xStreamBuffer)
 //  uint8_t ucStreamBufferGetStreamBufferType( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
-    __OPROTO(`iyh,iyl',`iyh,iyl',uint8_t,,ucStreamBufferGetStreamBufferType,StreamBufferHandle_t xStreamBuffer)
+    __OPROTO(,,uint8_t,,ucStreamBufferGetStreamBufferType,StreamBufferHandle_t xStreamBuffer)
 #endif
 
 #if defined( __cplusplus )
