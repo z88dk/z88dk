@@ -48,6 +48,7 @@
 extern "C" {
 #endif
 
+#define configTICK_RATE_HZ			( ( TickType_t ) 256 )
 
 #ifdef __cplusplus
 }

@@ -116,7 +116,7 @@ typedef uint8_t UBaseType_t;
     }while(0)
 
 /*
- * Macros to save all the registers, and the save the stack pointer into the TCB.
+ * Macros to save all the registers, and save the stack pointer into the TCB.
  */
  
 #define portSAVE_CONTEXT()          \
@@ -285,7 +285,7 @@ typedef uint8_t UBaseType_t;
     }while(0)
 
 /*
- * Macros to save all the registers, and the save the stack pointer into the TCB.
+ * Macros to save all the registers, and save the stack pointer into the TCB.
  */
 
 #define portSAVE_CONTEXT()          \

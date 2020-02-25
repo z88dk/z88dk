@@ -57,13 +57,13 @@ extern "C" {
 #endif
 
 /* Application specific configuration options. */
-#include <freertos/FreeRTOSConfig.h>
+#include "freertos/FreeRTOSConfig.h"
 
 /* Basic FreeRTOS definitions. */
-#include <freertos/projdefs.h>
+#include "freertos/projdefs.h"
 
 /* Definitions specific to the port being used. */
-#include <freertos/portable.h>
+#include "freertos/portable.h"
 
 /* Must be defaulted before configUSE_NEWLIB_REENTRANT is used below. */
 #ifndef configUSE_NEWLIB_REENTRANT
