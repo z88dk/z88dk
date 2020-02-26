@@ -48,6 +48,32 @@ extern "C" {
 
 #define configTICK_RATE_HZ			( ( TickType_t ) 256 )
 
+#ifdef __SCCZ80
+
+#define portRESET_TIMER_INTERRUPT() \
+    do{                             \
+        asm(                        \
+            "EXTERN TCR, TMDR1L                                                 \n" \
+            "in0 a, (TCR)           ; to clear the PRT0 interrupt, read the TCR \n" \
+            "in0 a, (TMDR1L)        ; followed by the TMDR1                     \n" \
+            );                      \
+    }while(0)
+
+#endif
+
+#ifdef __SDCC
+
+#define portRESET_TIMER_INTERRUPT() \
+    do{                             \
+        __asm                       \
+            EXTERN TCR, TMDR1L                                                      \
+            in0 a, (TCR)           ; to clear the PRT0 interrupt, read the TCR      \
+            in0 a, (TMDR1L)        ; followed by the TMDR1                          \
+        __endasm;                   \
+    }while(0)
+
+#endif
+
 #ifdef __cplusplus
 }
 #endif

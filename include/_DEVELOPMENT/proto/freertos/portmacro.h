@@ -140,7 +140,7 @@ typedef uint8_t UBaseType_t;
             "push iy            \n" \
             "ld hl,0            \n" \
             "add hl,sp          \n" \
-            "ld de,(_pxCurrentTCB)\n"\
+            "ld de,(_pxCurrentTCB)  \n"\
             "ex de,hl           \n" \
             "ld (hl),e          \n" \
             "inc hl             \n" \
