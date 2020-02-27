@@ -1,9 +1,9 @@
 ;
 ;	Startup for m100
-;   Stefano, 2020
+;	Stefano, February 2020
 ;
-;   "appmake +trs80 --co" will prepare a valid binary file, to be invoked from within BASIC:
-;        CLEAR 0,39999: RUNM"A.CO"
+;	"appmake +trs80 --co" will prepare a valid binary file, to be invoked from within BASIC:
+;	CLEAR 0,49999: RUNM "A.CO"
 ;
 
 
@@ -44,7 +44,7 @@
         INCLUDE "crt/classic/crt_rules.inc"
 
         IF      !DEFINED_CRT_ORG_CODE
-                    defc  CRT_ORG_CODE  = 40000
+                    defc  CRT_ORG_CODE  = 50000
         ENDIF
 
 	org	  CRT_ORG_CODE
