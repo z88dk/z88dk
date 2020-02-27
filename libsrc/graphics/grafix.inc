@@ -573,7 +573,7 @@ ENDIF
 IF FORm100
 	DEFINE gotgfx
 	defc maxx = 256
-	defc maxy = 64
+	defc maxy = 48
 ENDIF
 
 IF FORvector06c
