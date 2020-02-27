@@ -46,32 +46,173 @@ include(__link__.m4)
 extern "C" {
 #endif
 
-#define configTICK_RATE_HZ			( ( TickType_t ) 256 )
+#ifdef __YAZ180 
+
+#define configTICK_RATE_HZ              ( ( TickType_t ) 256 )
+#define configSWITCH_CONTEXT()          vTaskSwitchContext()
 
 #ifdef __SCCZ80
 
-#define portRESET_TIMER_INTERRUPT() \
-    do{                             \
-        asm(                        \
-            "EXTERN TCR, TMDR1L                                                 \n" \
-            "in0 a, (TCR)           ; to clear the PRT0 interrupt, read the TCR \n" \
-            "in0 a, (TMDR1L)        ; followed by the TMDR1                     \n" \
-            );                      \
+#define configSETUP_TIMER_INTERRUPT()                                       \
+    do{                                                                     \
+        asm(                                                                \
+            "EXTERN __CPU_CLOCK                                         \n" \
+            "EXTERN RLDR1L, RLDR1H                                      \n" \
+            "EXTERN TCR, TCR_TIE1, TCR_TDE1                             \n" \
+            "ld de,_timer_isr                                           \n" \
+            "ld hl,0xFFE6            ; YAZ180 PRT1 address              \n" \
+            "ld (hl),e                                                  \n" \
+            "inc hl                                                     \n" \
+            "ld (hl),d                                                  \n" \
+            "ld hl,__CPU_CLOCK/256/20-1                                 \n" \
+            "out0(RLDR1L),l                                             \n" \
+            "out0(RLDR1H),h                                             \n" \
+            "in0 a,(TCR)                                                \n" \
+            "or TCR_TIE1|TCR_TDE1                                       \n" \
+            "out0 (TCR),a                                               \n" \
+            );                                                              \
+    }while(0)
+
+#define configRESET_TIMER_INTERRUPT()                                       \
+    do{                                                                     \
+        asm(                                                                \
+            "EXTERN TCR, TMDR1L                                         \n" \
+            "in0 a,(TCR)                                                \n" \
+            "in0 a,(TMDR1L)                                             \n" \
+            );                                                              \
     }while(0)
 
 #endif
 
 #ifdef __SDCC
 
-#define portRESET_TIMER_INTERRUPT() \
-    do{                             \
-        __asm                       \
-            EXTERN TCR, TMDR1L                                                      \
-            in0 a, (TCR)           ; to clear the PRT0 interrupt, read the TCR      \
-            in0 a, (TMDR1L)        ; followed by the TMDR1                          \
-        __endasm;                   \
+#define configSETUP_TIMER_INTERRUPT()                                       \
+    do{                                                                     \
+        __asm                                                               \
+            EXTERN __CPU_CLOCK                                              \
+            EXTERN RLDR1L, RLDR1H                                           \
+            EXTERN TCR, TCR_TIE1, TCR_TDE1                                  \
+            ; address of ISR                                                \
+            ld de,_timer_isr                                                \
+            ; address of PRT1 Jump Address                                  \
+            ld hl,0xFFE6            ; YAZ180 PRT1 address                   \
+            ld (hl),e                                                       \
+            inc hl                                                          \
+            ld (hl),d                                                       \
+            ; we do 256 ticks per second                                    \
+            ld hl,__CPU_CLOCK/256/20-1                                      \
+            out0(RLDR1L),l                                                  \
+            out0(RLDR1H),h                                                  \
+            ; enable down counting and interrupts for PRT1                  \
+            in0 a,(TCR)                                                     \
+            or TCR_TIE1|TCR_TDE1                                            \
+            out0 (TCR),a                                                    \
+        __endasm;                                                           \
+    }while(0)  
+
+#define configRESET_TIMER_INTERRUPT()                                       \
+    do{                                                                     \
+        __asm                                                               \
+            EXTERN TCR, TMDR1L                                              \
+            in0 a,(TCR)                                                     \
+            in0 a,(TMDR1L)                                                  \
+        __endasm;                                                           \
     }while(0)
 
+#endif
+#endif
+
+#ifdef __SCZ180
+
+#define configTICK_RATE_HZ              ( ( TickType_t ) 256 )
+
+#ifdef __SCCZ80
+#define configSWITCH_CONTEXT()                                              \
+    do{                                                                     \
+        asm(                                                                \
+            "EXTERN BBR                                                 \n" \
+            "in0 a,(BBR)                                                \n" \
+            "and 0x1F                                                   \n" \
+            "call NZ,vTaskSwitchContext                                 \n" \
+            );                                                              \
+    }while(0)
+
+#define configSETUP_TIMER_INTERRUPT()                                       \
+    do{                                                                     \
+        asm(                                                                \
+            "EXTERN __CPU_CLOCK                                         \n" \
+            "EXTERN RLDR1L, RLDR1H                                      \n" \
+            "EXTERN TCR, TCR_TIE1, TCR_TDE1                             \n" \
+            "ld de,_timer_isr                                           \n" \
+            "ld hl,0xFF06           ; SCZ180 PRT1 address               \n" \
+            "ld (hl),e                                                  \n" \
+            "inc hl                                                     \n" \
+            "ld (hl),d                                                  \n" \
+            "ld hl,__CPU_CLOCK/256/20-1                                 \n" \
+            "out0(RLDR1L),l                                             \n" \
+            "out0(RLDR1H),h                                             \n" \
+            "in0 a,(TCR)                                                \n" \
+            "or TCR_TIE1|TCR_TDE1                                       \n" \
+            "out0 (TCR),a                                               \n" \
+            );                                                              \
+    }while(0)
+
+#define configRESET_TIMER_INTERRUPT()                                       \
+    do{                                                                     \
+        asm(                                                                \
+            "EXTERN TCR, TMDR1L                                         \n" \
+            "in0 a,(TCR)                                                \n" \
+            "in0 a,(TMDR1L)                                             \n" \
+            );                                                              \
+    }while(0)
+#endif
+
+#ifdef __SDCC
+
+#define configSWITCH_CONTEXT()                                              \
+    do{                                                                     \
+        __asm                                                               \
+            EXTERN BBR                                                      \
+            in0 a,(BBR)                                                     \
+            and 0x1F                                                        \
+            call NZ,_vTaskSwitchContext                                     \
+        __endasm;                                                           \
+    }while(0)
+
+#define configSETUP_TIMER_INTERRUPT()                                       \
+    do{                                                                     \
+        __asm                                                               \
+            EXTERN __CPU_CLOCK                                              \
+            EXTERN RLDR1L, RLDR1H                                           \
+            EXTERN TCR, TCR_TIE1, TCR_TDE1                                  \
+            ; address of ISR                                                \
+            ld de,_timer_isr                                                \
+            ; address of PRT1 Jump Address                                  \
+            ld hl,0xFF06            ; SCZ180 PRT1 address                   \
+            ld (hl),e                                                       \
+            inc hl                                                          \
+            ld (hl),d                                                       \
+            ; we do 256 ticks per second                                    \
+            ld hl,__CPU_CLOCK/256/20-1                                      \
+            out0(RLDR1L),l                                                  \
+            out0(RLDR1H),h                                                  \
+            ; enable down counting and interrupts for PRT1                  \
+            in0 a,(TCR)                                                     \
+            or TCR_TIE1|TCR_TDE1                                            \
+            out0 (TCR),a                                                    \
+        __endasm;                                                           \
+    }while(0)  
+
+#define configRESET_TIMER_INTERRUPT()                                       \
+    do{                                                                     \
+        __asm                                                               \
+            EXTERN TCR, TMDR1L                                              \
+            in0 a,(TCR)                                                     \
+            in0 a,(TMDR1L)                                                  \
+        __endasm;                                                           \
+    }while(0)
+
+#endif
 #endif
 
 #ifdef __cplusplus
