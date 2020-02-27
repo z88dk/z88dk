@@ -572,7 +572,7 @@ ENDIF
 
 IF FORm100
 	DEFINE gotgfx
-	defc maxx = 256
+	defc maxx = 240
 	defc maxy = 64
 ENDIF
 
