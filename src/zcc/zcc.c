@@ -209,6 +209,7 @@ static int             c_startupoffset = -1;
 static int             c_nostdlib = 0;
 static int             mgbz80 = 0;
 static int             m8080 = 0;
+static int             m8085 = 0;
 static int             mz180 = 0;
 static int             mr2k = 0;
 static int             mr3k = 0;
@@ -413,6 +414,7 @@ static arg_t     myargs[] = {
     { "specs", AF_BOOL_TRUE, SetBoolean, &c_print_specs, NULL, "Print out compiler specs" },
     { "compiler", AF_MORE, SetString, &c_compiler_type, NULL, "Set the compiler type from the command line (sccz80, sdcc)" },
     { "m8080", AF_BOOL_TRUE, SetBoolean, &m8080, NULL, "Target the 8080 cpu" },
+    { "m8085", AF_BOOL_TRUE, SetBoolean, &m8085, NULL, "Target the 8085 cpu" },
     { "mz80n", AF_BOOL_TRUE, SetBoolean, &mz80n, NULL, "Target the ZX Next z80n cpu" },
     { "mz180", AF_BOOL_TRUE, SetBoolean, &mz180, NULL, "Target the z180 cpu" },
     { "mgbz80", AF_BOOL_TRUE, SetBoolean, &mgbz80, NULL, "Target the gbz80 cpu" },
@@ -507,6 +509,7 @@ enum {
     CPU_TYPE_R2K,
     CPU_TYPE_R3K,
     CPU_TYPE_8080,
+    CPU_TYPE_8085,
     CPU_TYPE_GBZ80,
     CPU_TYPE_SIZE
 };
@@ -517,8 +520,9 @@ cpu_map_t cpu_map[CPU_TYPE_SIZE] = {
     { "-mz180",    "-mz180", "-mz180 -portmode=z180", "" },     // CPU_TYPE_Z180    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
     { "-mr2k",     "-mr2k",  "-mr2k", "" },                     // CPU_TYPE_R2K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
     { "-mr3k",     "-mr3k",  "-mr3ka", "" },                    // CPU_TYPE_R3K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
-    { "-m8080",    "-m8080" , "-mz80", "-m8080" },                    // CPU_TYPE_8080     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
-    { "-mgbz80",   "-mgbz80" , "-mgbz80", "-mgbz80" },                    // CPU_TYPE_8080     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
+    { "-m8080",    "-m8080" , "-mz80", "-m8080" },              // CPU_TYPE_8080    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
+    { "-m8085",    "-m8085" , "-mz80", "-m8080" },              // CPU_TYPE_8085    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
+    { "-mgbz80",   "-mgbz80" , "-mgbz80", "-mgbz80" },          // CPU_TYPE_GBZ80   : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
 };
 
 char *select_cpu(int n)
@@ -537,6 +541,9 @@ char *select_cpu(int n)
 
     if (m8080)
         return cpu_map[CPU_TYPE_8080].tool[n];
+
+    if (m8085)
+        return cpu_map[CPU_TYPE_8085].tool[n];
 
     if (mgbz80)
         return cpu_map[CPU_TYPE_GBZ80].tool[n];

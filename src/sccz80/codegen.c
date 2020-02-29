@@ -334,7 +334,7 @@ void getmem(SYMBOL* sym)
             ot("ld\thl,(");
             outname(sym->name, dopref(sym));    
             outstr(")\n");
-            if ( !IS_8080() ) { 
+            if ( !IS_808x() ) { 
                 ot("ld\tde,(");
                 outname(sym->name, dopref(sym));
                 outstr("+2)\n");
@@ -397,7 +397,7 @@ void putmem(SYMBOL* sym)
             ot("ld\t(");
             outname(sym->name, dopref(sym));
             outstr("),hl\n");
-            if ( !IS_8080() ) {
+            if ( !IS_808x() ) {
                 ot("ld\t(");
                 outname(sym->name, dopref(sym));
                 outstr("+2),de\n");
@@ -778,7 +778,7 @@ void indirect(LVALUE* lval)
                 // We need to do some bit extension here
                 if ( lval->ltype->bit_size % 8 ) {
                     outfmt("\tbit\t%d,a\n",lval->ltype->bit_size - 1);
-                    if ( IS_8080() ) {
+                    if ( IS_808x() ) {
                         ol("jp\tz,ASMPC+5");
                     } else {
                         ol("jr\tz,ASMPC+4");
@@ -802,7 +802,7 @@ void indirect(LVALUE* lval)
                 outfmt("\tand\t%d\n",(1 << (lval->ltype->bit_size - 8)) - 1);
                 if ( lval->ltype->isunsigned == 0 ) {
                     outfmt("\tbit\t%d,a\n",(lval->ltype->bit_size - 8) - 1);
-                    if ( IS_8080() ) {
+                    if ( IS_808x() ) {
                         ol("jp\tz,ASMPC+5");
                     } else {
                         ol("jr\tz,ASMPC+4");
@@ -1614,7 +1614,9 @@ void quikmult(int type, int32_t size, char preserve)
                 break;      
             case 8: /* 15 bytes */
                 ol("add\thl,hl");
-                if ( IS_8080() ) {
+                if ( IS_8085() ) {
+                    ol("rl\tde");
+                } else if ( IS_8080() ) {
                     ol("ld\ta,e");
                     ol("rla");
                     ol("ld\te,a");
@@ -1628,7 +1630,9 @@ void quikmult(int type, int32_t size, char preserve)
                 /* Fall through */              
             case 4: /* 10 bytes */
                 ol("add\thl,hl");
-                if ( IS_8080() ) {
+                if ( IS_8085() ) {
+                    ol("rl\tde");
+                } else if ( IS_8080() ) {
                     ol("ld\ta,e");
                     ol("rla");
                     ol("ld\te,a");
@@ -1642,7 +1646,9 @@ void quikmult(int type, int32_t size, char preserve)
                 /* Fall through */            
             case 2: /* 5 bytes */
                 ol("add\thl,hl");
-                if ( IS_8080() ) {
+                if ( IS_8085() ) {
+                    ol("rl\tde");
+                } else if ( IS_8080() ) {
                     ol("ld\ta,e");
                     ol("rla");
                     ol("ld\te,a");
@@ -1658,7 +1664,7 @@ void quikmult(int type, int32_t size, char preserve)
                 asl_const(&lval, 13);
                 break;
             case 3: /* 13 bytes */
-                if ( !IS_8080() ) {
+                if ( !IS_808x() ) {
                     ol("push\tde");
                     ol("push\thl");
                     ol("add\thl,hl");
@@ -1683,7 +1689,7 @@ void quikmult(int type, int32_t size, char preserve)
                 }
                 // Fall through all the way to default for 8080
             case 6:  /* 19 bytes */
-                if ( !IS_8080() ) {
+                if ( !IS_808x() ) {
                     ol("push\tde");
                     ol("push\thl");
                     ol("add\thl,hl");
@@ -1711,7 +1717,7 @@ void quikmult(int type, int32_t size, char preserve)
                 }
                 // Fall through all the way to default for 8080
             case 5: /* 19 bytes */
-                if ( !IS_8080() ) {
+                if ( !IS_808x() ) {
                     ol("push\tde");
                     ol("push\thl");
                     ol("add\thl,hl");;
@@ -1871,7 +1877,7 @@ void zadd(LVALUE* lval)
     switch (lval->val_type) {
     case KIND_LONG:
     case KIND_CPTR:
-        if ( c_speed_optimisation & OPT_ADD32 && !IS_8080() && !IS_GBZ80() ) {
+        if ( c_speed_optimisation & OPT_ADD32 && !IS_808x() && !IS_GBZ80() ) {
             ol("pop\tbc");        /* 7 bytes, 54T */
             ol("add\thl,bc");
             ol("ex\tde,hl");
@@ -1940,7 +1946,7 @@ void zadd_const(LVALUE *lval, int32_t value)
                 ol("ld\ta,h");    // 1, 4
                 ol("or\tl");      // 1, 4
                 ol("dec\thl");    // 1, 6    
-                if ( IS_8080() ) {
+                if ( IS_808x() ) {
                     ol("jp\tnz,ASMPC+4");
                 } else {
                     ol("jr\tnz,ASMPC+3"); // 2, 12/7
@@ -1968,7 +1974,7 @@ void zadd_const(LVALUE *lval, int32_t value)
                 ol("inc\thl");    // 1, 6    
                 ol("ld\ta,h");    // 1, 4
                 ol("or\tl");      // 1, 4
-                if ( IS_8080() ) {
+                if ( IS_808x() ) {
                     ol("jp\tnz,ASMPC+4");
                 } else {
                     ol("jr\tnz,ASMPC+3"); // 2, 12/7
@@ -1996,31 +2002,31 @@ void zadd_const(LVALUE *lval, int32_t value)
         constbc(((uint32_t)value) % 65536);   // 3, 10
         ol("add\thl,bc");                     // 1, 11
         if ( value >= 0 && value < 65536 ) {
-            if ( IS_8080() ) {
+            if ( IS_808x() ) {
                 ol("jp\tnc,ASMPC+4");
             } else {
                 ol("jr\tnc,ASMPC+3"); // 2, 12/7
             }
             ol("inc\tde");                    // 1, 6
         } else if ( highword <= 4 ) {
-            if ( IS_8080() ) {
+            if ( IS_808x() ) {
                 ol("jp\tnc,ASMPC+4");
             } else {
                 ol("jr\tnc,ASMPC+3"); // 2, 12/7
             }
             ol("inc\tde");                    // 1, 6
-	        add_to_high_word(value);          // it will be < 7 bytes, 33T
+            add_to_high_word(value);          // it will be < 7 bytes, 33T
         } else if ( highword >= 65532 && highword <= 65535  ) {
             // Jump into the block of dec de that we produce
-            if ( IS_8080() ) {
+            if ( IS_808x() ) {
                 ol("jp\tc,ASMPC+4");
             } else {
                 ol("jr\tc,ASMPC+3"); // 2, 12/7
             }
-	    add_to_high_word(value);          // it will be < 7 bytes, 33T
+            add_to_high_word(value);          // it will be < 7 bytes, 33T
         } else {
             ol("ex\tde,hl");                      // 1, 4
-		// TODO: 8080
+            // TODO: 8080
             constbc(((uint32_t)value) / 65536);   // 3, 10
             ol("adc\thl,bc");                     // 2, 15
             ol("ex\tde,hl");                      // 1, 4
@@ -2043,12 +2049,12 @@ void zsub(LVALUE* lval)
             ol("ld\tb,h");
             ol("pop\thl");        
             ol("and\ta");
-            ol("sbc\thl,bc");
+            if ( IS_8085() ) ol("sub\thl,bc"); else ol("sbc\thl,bc");
             ol("ex\tde,hl");
             ol("ld\tc,l");
             ol("ld\tb,h");
             ol("pop\thl");
-            ol("sbc\thl,bc");
+            if ( IS_8085() ) ol("sub\thl,bc"); else ol("sbc\thl,bc");
             ol("ex\tde,hl");
         } else {
             callrts("l_long_sub"); /* 3 bytes: 100 + 17T = 117t */
@@ -2060,7 +2066,7 @@ void zsub(LVALUE* lval)
         Zsp += c_fp_size;
         break;
     default:
-        if ( c_speed_optimisation & OPT_SUB16 && !IS_8080() && !IS_GBZ80()) {
+        if ( c_speed_optimisation & OPT_SUB16 && !IS_808x() && !IS_GBZ80()) {
             swap();
             ol("and\ta");
             ol("sbc\thl,de");
@@ -2172,7 +2178,7 @@ static void add_if_negative(LVALUE *lval, int32_t toadd)
         return;
     label = getlabel();
     if ( lval->val_type == KIND_LONG ) {
-        if ( IS_8080() ) {
+        if ( IS_808x() ) {
             ol("ld\ta,d");
             ol("rla");
             ot("jp\tnc,");
@@ -2183,7 +2189,7 @@ static void add_if_negative(LVALUE *lval, int32_t toadd)
         printlabel(label);
         nl();     
     } else {
-        if ( IS_8080() ) {
+        if ( IS_808x() ) {
             ol("ld\ta,h");
             ol("rla");
             ot("jp\tnc,");
@@ -2216,7 +2222,7 @@ void zdiv_const(LVALUE *lval, int32_t value)
             return;
         }
     } else if ( lval->val_type == KIND_INT && ulvalue(lval) ) {
-        if ( value == 512 && !IS_8080()) {
+        if ( value == 512 && !IS_808x()) {
             ol("ld\tl,h");
             ol("ld\th,0");
             ol("srl\tl");
@@ -2326,7 +2332,7 @@ void negate_if_negative(LVALUE *lval, int32_t value)
         return;
     label = getlabel();
     if ( lval->val_type == KIND_LONG ) {
-        if ( IS_8080() ) {
+        if ( IS_808x() ) {
             ol("ld\ta,d");
             ol("rla");
             ot("jp\tnc,");
@@ -2337,7 +2343,7 @@ void negate_if_negative(LVALUE *lval, int32_t value)
         printlabel(label);
         nl();     
     } else {
-        if ( IS_8080() ) {
+        if ( IS_808x() ) {
             ol("ld\ta,h");
             ol("rla");
             ot("jp\tnc,");
@@ -2472,7 +2478,7 @@ int zor_handle_pow2(int32_t value)
             c++;
         case 0x01:
             c++;
-            if ( IS_8080() ) return 0;
+            if ( IS_808x() ) return 0;
             outfmt("\tset\t%d,l\n",c-1);
             break;
         case 0x8000:
@@ -2491,7 +2497,7 @@ int zor_handle_pow2(int32_t value)
             c++;
         case 0x100:
             c++;
-            if ( IS_8080() ) return 0;
+            if ( IS_808x() ) return 0;
             outfmt("\tset\t%d,h\n",c-1);
             break;
         case 0x800000:
@@ -2510,7 +2516,7 @@ int zor_handle_pow2(int32_t value)
             c++;
         case 0x10000:
             c++;
-            if ( IS_8080() ) return 0;
+            if ( IS_808x() ) return 0;
             outfmt("\tset\t%d,e\n",c-1);
             break;
         case 0x80000000:
@@ -2529,7 +2535,7 @@ int zor_handle_pow2(int32_t value)
             c++;
         case 0x1000000:
             c++;
-            if ( IS_8080() ) return 0;
+            if ( IS_808x() ) return 0;
             outfmt("\tset\t%d,d\n",c-1);
             break;           
     }
@@ -2728,7 +2734,7 @@ void zand_const(LVALUE *lval, int32_t value)
         } else if ( value == (uint16_t)0xffff ) {
             // Do nothing
         } else if ( val == 0xfffe ) {
-            if ( IS_8080() ) {
+            if ( IS_808x() ) {
                 ol("ld\ta,l");
                 ol("and\t254");
                 ol("ld\tl,a");
@@ -2766,7 +2772,7 @@ void asr(LVALUE* lval)
 void asr_const(LVALUE *lval, int32_t value)
 {
     if  (lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) {
-        if ( value == 1 && !IS_8080() ) {
+        if ( value == 1 && !IS_808x() ) {
             if ( ulvalue(lval) ) { /* 8 bytes, 8 + 8 + 8 + 8 + 8 = 40T */
                 ol("srl\td");
             } else {
@@ -2795,7 +2801,7 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("ld\th,e");
             ol("ld\te,d");
             ol("ld\td,0");
-            if ( IS_8080() ) {
+            if ( IS_808x() ) {
                 ol("and\ta");   // 16 bytes + 40T = 59T
                 ol("ld\ta,e");
                 ol("rra");
@@ -2811,7 +2817,7 @@ void asr_const(LVALUE *lval, int32_t value)
                 ol("rr\th");
                 ol("rr\tl");
             }
-        } else if ( value == 10 && ulvalue(lval) && (c_speed_optimisation & OPT_RSHIFT32) && !IS_8080()  )  {
+        } else if ( value == 10 && ulvalue(lval) && (c_speed_optimisation & OPT_RSHIFT32) && !IS_808x()  )  {
             ol("ld\tl,h"); /* 17 bytes, 19 + 48 = 67T */
             ol("ld\th,e");
             ol("ld\te,d");
@@ -2829,7 +2835,7 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("ld\td,0");
             ot("ld\tc,"); outdec(value -8); nl();
             callrts("l_long_asr_uo");
-        } else if ( value == 15 && ulvalue(lval) && !IS_8080() ) {
+        } else if ( value == 15 && ulvalue(lval) && !IS_808x() ) {
             if ( IS_GBZ80() ) {
                 ol("rl\th");
                 ol("ld\ta,e");
@@ -2858,7 +2864,7 @@ void asr_const(LVALUE *lval, int32_t value)
                 ol("ld\te,a");  
             }
         } else if ( value == 17 && ulvalue(lval)) {
-            if ( IS_8080()) {
+            if ( IS_808x()) {
                 ol("and\ta");  // 10 bytes, 38T
                 ol("ld\ta,d");
                 ol("rra");
@@ -2877,7 +2883,7 @@ void asr_const(LVALUE *lval, int32_t value)
                 }
             }
             ol("ld\tde,0");
-        } else if ( value == 18 && ulvalue(lval) && !IS_8080()) {
+        } else if ( value == 18 && ulvalue(lval) && !IS_808x()) {
             if ( IS_GBZ80() ) {
                 ol("ld\tl,e");
                 ol("ld\th,d");
@@ -2890,7 +2896,7 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("rr\tl");
             ol("srl\th");
             ol("rr\tl");
-        } else if ( value == 20 && ulvalue(lval) && (c_speed_optimisation & OPT_RSHIFT32) && !IS_8080() ) {
+        } else if ( value == 20 && ulvalue(lval) && (c_speed_optimisation & OPT_RSHIFT32) && !IS_808x() ) {
             if ( IS_GBZ80() ) {
                 ol("ld\tl,e");
                 ol("ld\th,d");
@@ -2906,7 +2912,7 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("rr\tl");
             ol("srl\th");
             ol("rr\tl");
-        } else if ( value == 23 && ulvalue(lval) && !IS_8080()) {
+        } else if ( value == 23 && ulvalue(lval) && !IS_808x()) {
             ol("ld\tl,d"); /* 12 bytes, 37T */
             ol("rl\te");
             ol("rl\tl");
@@ -2929,17 +2935,17 @@ void asr_const(LVALUE *lval, int32_t value)
             }
         } else if ( value == 25 && ulvalue(lval) && !IS_8080() ) {
             ol("ld\tl,d"); /* 8 bytes, 29T */
-            ol("srl\tl");
             ol("ld\th,0");
+            if ( IS_8085() ) ol("sra\thl"); else ol("srl\tl");
             ol("ld\tde,0");
         } else if ( value == 27 && ulvalue(lval)  && !IS_8080()) {
             ol("ld\tl,d"); /* 12 bytes, 47T */
-            ol("srl\tl");
-            ol("srl\tl");
-            ol("srl\tl");
             ol("ld\th,0");
+            if ( IS_8085() ) ol("sra\thl"); else ol("srl\tl");
+            if ( IS_8085() ) ol("sra\thl"); else ol("srl\tl");
+            if ( IS_8085() ) ol("sra\thl"); else ol("srl\tl");
             ol("ld\tde,0");
-        } else if ( value == 30 && ulvalue(lval) && (c_speed_optimisation & OPT_RSHIFT32)  && !IS_8080() ) {
+        } else if ( value == 30 && ulvalue(lval) && (c_speed_optimisation & OPT_RSHIFT32)  && !IS_808x() ) {
             ol("ld\tl,0"); /* 15 bytes, 51T */
             ol("rl\td");
             ol("rl\tl");
@@ -2947,7 +2953,7 @@ void asr_const(LVALUE *lval, int32_t value)
             ol("rl\tl");
             ol("ld\th,0");
             ol("ld\tde,0");
-        } else if  ( value == 31 && ulvalue(lval)  && !IS_8080() ) {
+        } else if  ( value == 31 && ulvalue(lval)  && !IS_808x() ) {
             ol("ld\tl,0"); /* 12 bytes, 40T */
             ol("rl\td");
             ol("rl\tl");
@@ -2966,7 +2972,9 @@ void asr_const(LVALUE *lval, int32_t value)
             }
         }
     } else {
-        if ( value == 1  && !IS_8080() ) { /* 4 bytes, 16T */
+        if ( value == 1 && IS_8085() && !ulvalue(lval) ) {
+            ol("sra\thl");
+        } else if ( value == 1  && !IS_8080() ) { /* 4 bytes, 16T */
             if ( ulvalue(lval) ) {
                 ol("srl\th");
             } else {
@@ -2984,7 +2992,7 @@ void asr_const(LVALUE *lval, int32_t value)
                 ol("sbc\ta");
                 ol("ld\th,a");
             }
-        } else if ( value == 15 && ulvalue(lval) && (c_cpu != CPU_Z80N && !IS_8080()) ) {
+        } else if ( value == 15 && ulvalue(lval) && (c_cpu != CPU_Z80N && !IS_808x()) ) {
             ol("rl\th");   /* 7 bytes, 26T */
             vconst(0);
             ol("rl\tl");
@@ -3039,7 +3047,7 @@ void asl_16bit_const(LVALUE *lval, int value)
                 ol("ld\tb,10");    // 2, 7T
                 ol("bsla\tde,b");  // 2, 8T
                 ol("ex\tde,hl");   // 1, 4T
-            } else if ( !IS_8080()) {
+            } else if ( !IS_808x()) {
                 ol("sla\tl");
                 ol("sla\tl");
                 ol("ld\th,l");
@@ -3054,7 +3062,7 @@ void asl_16bit_const(LVALUE *lval, int value)
             }
             break;
         case 9: // 6 bytes, 8 + 4 + 7 = 19T
-            if ( IS_8080()) {
+            if ( IS_808x()) {
                 ol("ld\ta,l");
                 ol("and\ta");
                 ol("rla");
@@ -3077,7 +3085,7 @@ void asl_16bit_const(LVALUE *lval, int value)
                 ol("bsla\tde,b");  // 2, 8T
                 ol("ex\tde,hl");   // 1, 4T
                 break;
-            } else if ( c_speed_optimisation & OPT_LSHIFT32  && !IS_8080() ) {
+            } else if ( c_speed_optimisation & OPT_LSHIFT32  && !IS_808x() ) {
                 ol("rr\th");  // 9 bytes, 8 + 4  + 8 + 7 + 8 = 35T
                 ol("ld\th,l");
                 ol("rr\th");
@@ -3167,7 +3175,9 @@ void asl_const(LVALUE *lval, int32_t value)
             break;         
         case 1: /* 5 bytes, 11 + 8 + 8 = 27T */
             ol("add\thl,hl");
-            if ( IS_8080() ) {
+            if ( IS_8085() ) {
+                ol("rl\tde");
+            } else if ( IS_8080() ) {
                 ol("ld\ta,e");
                 ol("rla");
                 ol("ld\te,a");
@@ -3425,7 +3435,7 @@ void zeq_const(LVALUE *lval, int32_t value)
             }
             ol("or\th");
             ol("or\tl");
-            if ( IS_8080() ) {
+            if ( IS_808x() ) {
                 ol("jp\tnz,ASMPC+4");
             } else {
                 ol("jr\tnz,ASMPC+3"); // 2, 12/7
@@ -3435,7 +3445,7 @@ void zeq_const(LVALUE *lval, int32_t value)
         } else if ( c_speed_optimisation & OPT_LONG_COMPARE && !IS_8080() && !IS_GBZ80() ) {
             constbc(value % 65536); // 18 bytes or 14 with zero top word
             ol("and\ta");
-            ol("sbc\thl,bc");
+            if ( IS_8085() ) ol("sub\thl,bc"); else ol("sbc\thl,bc");
             if ( value / 65536 == 0 ) {
                 ol("jr\tnz,ASMPC+7"); 
                 ol("ld\ta,d");
@@ -3447,7 +3457,7 @@ void zeq_const(LVALUE *lval, int32_t value)
                 ol("jr\tnz,ASMPC+11"); 
                 ol("ex\tde,hl");
                 constbc(value / 65536);
-                ol("sbc\thl,bc");
+                if ( IS_8085() ) ol("sub\thl,bc"); else ol("sbc\thl,bc");
                 ol("scf");
                 ol("jr\tz,ASMPC+3"); 
                 ol("and\ta");
@@ -3462,7 +3472,7 @@ void zeq_const(LVALUE *lval, int32_t value)
         if ( value == 0 ) {
             ol("ld\ta,l");  // 5 bytes
             ol("and\ta");
-            if ( IS_8080() ) {
+            if ( IS_808x() ) {
                 ol("jp\tnz,ASMPC+4");
             } else {
                 ol("jr\tnz,ASMPC+3"); 
@@ -3472,7 +3482,7 @@ void zeq_const(LVALUE *lval, int32_t value)
             ol("ld\ta,l");  // 7 bytes
             outfmt("\tcp\t%d\n", (value % 256));
             ol("scf");
-            if ( IS_8080() ) {
+            if ( IS_808x() ) {
                 ol("jp\tz,ASMPC+4");
             } else {
                 ol("jr\tz,ASMPC+3"); 
@@ -3484,14 +3494,14 @@ void zeq_const(LVALUE *lval, int32_t value)
         if ( value == 0 ) {
             ol("ld\ta,h");
             ol("or\tl");
-            if ( IS_8080() ) {
+            if ( IS_808x() ) {
                 ol("jp\tnz,ASMPC+4");
             } else {
                 ol("jr\tnz,ASMPC+3"); 
             }
             ol("scf");
             set_carry(lval);
-        } else if ( IS_8080() || IS_GBZ80() ) {
+        } else if ( IS_808x() || IS_GBZ80() ) {
             const2(value & 0xffff); 
             callrts("l_eq");
             set_int(lval);
@@ -3530,7 +3540,7 @@ void zeq(LVALUE* lval)
             ol("ld\ta,l");
             ol("sub\te");
             ol("and\ta");
-            if ( IS_8080() ) {
+            if ( IS_808x() ) {
                 ol("jp\tnz,ASMPC+4");
             } else {
                 ol("jr\tnz,ASMPC+3"); 
@@ -3539,7 +3549,7 @@ void zeq(LVALUE* lval)
             break;
         }
     default:
-        if ( c_speed_optimisation & OPT_INT_COMPARE && !IS_8080() && !IS_GBZ80() ) {
+        if ( c_speed_optimisation & OPT_INT_COMPARE && !IS_808x() && !IS_GBZ80() ) {
             ol("and\ta");
             ol("sbc\thl,de");
             ol("scf");
@@ -3565,7 +3575,7 @@ void zne_const(LVALUE *lval, int32_t value)
             }
             ol("or\th");
             ol("or\tl");
-            if ( IS_8080() ) {
+            if ( IS_808x() ) {
                 ol("jp\tz,ASMPC+4");
             } else {
                 ol("jr\tz,ASMPC+3"); 
@@ -3576,7 +3586,7 @@ void zne_const(LVALUE *lval, int32_t value)
             if ( c_speed_optimisation & OPT_LONG_COMPARE && !IS_8080() && !IS_GBZ80() ) {
                 ol("and\ta");   // 18 bytes, 14 bytes if zero top word
                 constbc(value % 65536);
-                ol("sbc\thl,bc");
+                if ( IS_8085() ) ol("sub\thl,bc"); else ol("sbc\thl,bc");
                 if ( value / 65536 == 0 ) {
                     ol("jr\tnz,ASMPC+4");  // into scf
                     ol("ld\ta,d");
@@ -3589,7 +3599,7 @@ void zne_const(LVALUE *lval, int32_t value)
                     // Carry should still be reset if zero
                     swap();
                     constbc(value / 65536);
-                    ol("sbc\thl,bc");
+                    if ( IS_8085() ) ol("sub\thl,bc"); else ol("sbc\thl,bc");
                     ol("scf");
                     ol("jr\tnz,ASMPC+3");  // into scf§
                     ol("and\ta");   // Reset carry
@@ -3605,7 +3615,7 @@ void zne_const(LVALUE *lval, int32_t value)
          if ( value == 0 ) {
             ol("ld\ta,l");  // 5 bytes
             ol("and\ta");
-            if ( IS_8080() ) {
+            if ( IS_808x() ) {
                 ol("jp\tz,ASMPC+4");
             } else {
                 ol("jr\tz,ASMPC+3"); 
@@ -3614,7 +3624,7 @@ void zne_const(LVALUE *lval, int32_t value)
         } else {
             ol("ld\ta,l");  // 6 bytes
             outfmt("\tcp\t%d\n", (value % 256));  /* z = 1, c = 0 */
-            if ( IS_8080() ) {
+            if ( IS_808x() ) {
                 ol("jp\tz,ASMPC+4");
             } else {
                 ol("jr\tz,ASMPC+3"); 
@@ -3626,13 +3636,13 @@ void zne_const(LVALUE *lval, int32_t value)
         if ( value == 0 ) {
             ol("ld\ta,h");
             ol("or\tl");
-            if ( IS_8080() ) {
+            if ( IS_808x() ) {
                 ol("jp\tz,ASMPC+4");
             } else {
                 ol("jr\tz,ASMPC+3"); 
             }
             ol("scf");
-        } else if ( IS_8080() || IS_GBZ80() ) {
+        } else if ( IS_808x() || IS_GBZ80() ) {
             const2(value & 0xffff);
             callrts("l_ne");
             set_int(lval);
@@ -3671,7 +3681,7 @@ void zne(LVALUE* lval)
             ol("ld\ta,l");
             ol("sub\te");
             ol("and\ta");
-            if ( IS_8080() ) {
+            if ( IS_808x() ) {
                 ol("jp\tz,ASMPC+4");
             } else {
                 ol("jr\tz,ASMPC+3"); 
@@ -3680,7 +3690,7 @@ void zne(LVALUE* lval)
             break;
         }
     default:
-        if ( c_speed_optimisation & OPT_INT_COMPARE && !IS_8080() && !IS_GBZ80() ) {
+        if ( c_speed_optimisation & OPT_INT_COMPARE && !IS_808x() && !IS_GBZ80() ) {
             ol("and\ta"); // 7 bytes
             ol("sbc\thl,de");
             ol("scf");
@@ -3706,7 +3716,7 @@ void zlt_const(LVALUE *lval, int32_t value)
                 ol("rla");
             }
             set_carry(lval);
-        } else if ( !IS_8080() ) {
+        } else if ( !IS_808x() ) {
             ol("ld\ta,l");  // 12 bytes (unsigned), 15 bytes (signed) vs 11 bytes + call
             outfmt("\tsub\t%d\n", (value % 65536) % 256);
             ol("ld\ta,h");
@@ -3760,7 +3770,7 @@ void zlt_const(LVALUE *lval, int32_t value)
             }
         } else {
             if ( ulvalue(lval)) {
-                if ( IS_8080() || IS_GBZ80() ) {
+                if ( IS_808x() || IS_GBZ80() ) {
                     ol("ld\ta,l");  // 6 bytes 
                     outfmt("\tsub\t%d\n", ((uint32_t)value % 256) & 0xff);
                     ol("ld\ta,h");
@@ -3829,7 +3839,7 @@ void zlt(LVALUE* lval)
         }
     default:
         if (ulvalue(lval)) {
-            if ( IS_8080() || IS_GBZ80() ) {
+            if ( IS_808x() || IS_GBZ80() ) {
                 ol("ld\ta,e");
                 ol("sub\tl");
                 ol("ld\ta,d");
@@ -3855,7 +3865,7 @@ void zlt(LVALUE* lval)
 void zle_const(LVALUE *lval, int32_t value)
 {
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
-       if ( value ==  0 && !IS_8080() ) {
+       if ( value ==  0 && !IS_808x() ) {
             if ( lval->val_type == KIND_CPTR) {
                 ol("ld\ta,e");
             } else {
@@ -3882,7 +3892,7 @@ void zle_const(LVALUE *lval, int32_t value)
         ol("ccf");
         set_carry(lval);
     } else {
-        if ( value ==  0 && !IS_8080() ) {
+        if ( value ==  0 && !IS_808x() ) {
             ol("ld\ta,h"); // 8 bytes
             ol("rla");
             ol("jr\tc,ASMPC+6");
@@ -3919,7 +3929,7 @@ void zle(LVALUE* lval)
         Zsp += c_fp_size;
         break;
     case KIND_CHAR:
-        if (c_speed_optimisation & OPT_INT_COMPARE && !IS_8080() ) {
+        if (c_speed_optimisation & OPT_INT_COMPARE && !IS_808x() ) {
             if (ulvalue(lval)) { /* unsigned */
                 ol("ld\ta,e");
                 ol("sub\tl"); /* If l < e then carry set */
@@ -3942,7 +3952,7 @@ void zle(LVALUE* lval)
         }
     default:
         if (ulvalue(lval)) {
-            if ( IS_8080() || IS_GBZ80() ) {
+            if ( IS_808x() || IS_GBZ80() ) {
                 ol("ld\ta,l");
                 ol("sub\te");
                 ol("ld\ta,h");
@@ -3967,7 +3977,7 @@ void zle(LVALUE* lval)
 void zgt_const(LVALUE *lval, int32_t value)
 {
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
-        if ( value == 0 && ulvalue(lval) && !IS_8080() ) {
+        if ( value == 0 && ulvalue(lval) && !IS_808x() ) {
             if ( lval->val_type == KIND_CPTR ) {
                 ol("ld\ta,e");
             } else {
@@ -3991,7 +4001,7 @@ void zgt_const(LVALUE *lval, int32_t value)
     } else if ( value == 0 && lval->val_type == KIND_INT && ulvalue(lval)) {
         ol("ld\ta,h");
         ol("or\tl");
-        if ( IS_8080() ) {
+        if ( IS_808x() ) {
             ol("jp\tz,ASMPC+4");
         } else {
             ol("jr\tz,ASMPC+3");
@@ -4044,7 +4054,7 @@ void zgt(LVALUE* lval)
         }
     default:
         if (ulvalue(lval)) {
-            if ( IS_8080() || IS_GBZ80() ) {
+            if ( IS_808x() || IS_GBZ80() ) {
                 outfmt("\tld\ta,e\n");
                 ol("ld\ta,l");
                 ol("sub\te");
@@ -4144,7 +4154,7 @@ void zge(LVALUE* lval)
         Zsp += c_fp_size;
         break;
     case KIND_CHAR:
-        if (c_speed_optimisation & OPT_INT_COMPARE && !IS_8080()  ) {
+        if (c_speed_optimisation & OPT_INT_COMPARE && !IS_808x()  ) {
             if (ulvalue(lval)) {
                 ol("ld\ta,l");
                 ol("sub\te"); /* If l > e, carry set */
@@ -4168,7 +4178,7 @@ void zge(LVALUE* lval)
         }
     default:
         if (ulvalue(lval)) {
-            if ( c_speed_optimisation & OPT_INT_COMPARE && !IS_8080() && !IS_GBZ80() ) {
+            if ( c_speed_optimisation & OPT_INT_COMPARE && !IS_808x() && !IS_GBZ80() ) {
                 swap();
                 ol("and\ta");
                 ol("sbc\thl,de");
@@ -4188,7 +4198,7 @@ void zge(LVALUE* lval)
 void zcarryconv(void)
 {
     vconst(0);
-    if ( !IS_8080() ) {
+    if ( !IS_808x() ) {
         ol("rl\tl");
     } else {
         ol("ld\ta,0");
@@ -4510,7 +4520,7 @@ void FrameP(void)
 void pushframe(void)
 {
     if (c_framepointer_is_ix != -1 || (currfn->ctype->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
-        if ( !IS_8080() && !IS_GBZ80() ) {
+        if ( !IS_808x() && !IS_GBZ80() ) {
             ot("push\t");
             FrameP();
             nl();
@@ -4523,7 +4533,7 @@ void pushframe(void)
 void popframe(void)
 {
     if (c_framepointer_is_ix != -1 || (currfn->ctype->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
-        if ( !IS_8080() && !IS_GBZ80() ) {
+        if ( !IS_808x() && !IS_GBZ80() ) {
             ot("pop\t");
             FrameP();
             nl();
