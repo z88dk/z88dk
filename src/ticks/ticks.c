@@ -3549,19 +3549,15 @@ int main (int argc, char **argv){
         ih=1;altd=0;ioi=0;ioe=0;break;
       case 0xed: // OP ED
         if ( is8085() ) { // (8085) LD HL,(DE) (LHLDE)
-           l = get_memory( (e|d<<8));
-           h = get_memory( (e|d<<8) + 1);
-           st+=10;
-		   break;
+           if ( get_memory(pc) != 0xfe) {
+               l = get_memory( (e|d<<8));
+               h = get_memory( (e|d<<8) + 1);
+               st+=10;
+	       break;
+           }
         } else if ( is8080() ) {
           if ( get_memory(pc) != 0xfe) {
             printf("%04x: ILLEGAL 8080 prefix 0xED\n",pc-1);
-            st+= isez80() ? 5 : israbbit() ? 12 : isz180() ? 16 : 17;
-            t= pc+2;
-            mp= pc= get_memory(pc) | get_memory(pc+1)<<8;
-            put_memory(--sp,t>>8);
-            put_memory(--sp,t);
-            ih=1;altd=0;ioi=0;ioe=0;
             break;
           }
         } else if ( isgbz80() ) {
