@@ -4,7 +4,7 @@
 
 include ../Make.config
 
-all: $(OUTPUT_DIRECTORY)/z80_crt0.lib $(OUTPUT_DIRECTORY)/rcmx000_crt0.lib $(OUTPUT_DIRECTORY)/z80iy_crt0.lib $(OUTPUT_DIRECTORY)/z80s183_crt0.lib $(OUTPUT_DIRECTORY)/z180_crt0.lib $(OUTPUT_DIRECTORY)/ez80_crt0.lib $(OUTPUT_DIRECTORY)/8080_crt0.lib $(OUTPUT_DIRECTORY)/gbz80_crt0.lib $(OUTPUT_DIRECTORY)/z80n_crt0.lib
+all: $(OUTPUT_DIRECTORY)/z80_crt0.lib $(OUTPUT_DIRECTORY)/rcmx000_crt0.lib $(OUTPUT_DIRECTORY)/z80iy_crt0.lib $(OUTPUT_DIRECTORY)/z80s183_crt0.lib $(OUTPUT_DIRECTORY)/z180_crt0.lib $(OUTPUT_DIRECTORY)/ez80_crt0.lib $(OUTPUT_DIRECTORY)/8080_crt0.lib $(OUTPUT_DIRECTORY)/gbz80_crt0.lib $(OUTPUT_DIRECTORY)/z80n_crt0.lib $(OUTPUT_DIRECTORY)/8085_crt0.lib
 
 
 $(OUTPUT_DIRECTORY)/z80_crt0.lib:
@@ -18,6 +18,10 @@ $(OUTPUT_DIRECTORY)/z80n_crt0.lib:
 $(OUTPUT_DIRECTORY)/8080_crt0.lib:
 	@$(MAKE) clean
 	$(LIBLINKER) -I.. -x$@ -DCPU_8080 -m8080 @crt0_8080.lst
+
+$(OUTPUT_DIRECTORY)/8085_crt0.lib:
+	@$(MAKE) clean
+	$(LIBLINKER) -I.. -x$@ -DCPU_8085 -m8085 @crt0_8080.lst
 
 $(OUTPUT_DIRECTORY)/gbz80_crt0.lib:
 	@$(MAKE) clean

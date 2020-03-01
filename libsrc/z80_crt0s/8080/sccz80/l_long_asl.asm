@@ -42,6 +42,8 @@ ENDIF
 IF __CPU_GBZ80__
    rla
    rl d
+ELIF __CPU_8085__
+   rl de
 ELSE
    ld  a,e
    rla

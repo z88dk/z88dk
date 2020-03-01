@@ -13,6 +13,8 @@ IF EZ80
 	ex	de,hl
 	defb	0xed, 0x1f	;ld (hl),de
 	ex	de,hl
+ELIF __CPU_8085__
+        ld	(de),hl
 ELSE
         ld a,l
         ld (de),a

@@ -22,12 +22,17 @@ ccmul2: XOR     a
         OR     b
         RET     Z
         XOR     a
+IF __CPU_8085__
+        rl      de
+        ld      a,d
+ELSE
         LD      a,e
         RLA
         LD      e,a
         LD      a,d
         RLA
         LD      d,a
+ENDIF
         OR     e
         RET     Z
         JP     ccmul1

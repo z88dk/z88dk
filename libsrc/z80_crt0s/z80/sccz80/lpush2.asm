@@ -19,20 +19,34 @@ PUBLIC    lpush2
 .lpush2
 
 IF __CPU_INTEL__ || __CPU_GBZ80__
-   pop af
+	EXTERN	__retloc
+	pop	bc
+	ld	a,c
+	ld	(__retloc),a
+	ld	a,b
+	ld	(__retloc+1),a
+	pop	bc	;stack 1
+	push	de
+	push	hl
+	push	bc
+IF __CPU_GBZ80__
+	ld	hl,__retloc
+	ld	a,(hl+)
+	ld	h,(hl)
+	ld	l,a
+ELSE
+	ld	hl,(__retloc)
+ENDIF
+	push	hl
+	ret
 ELSE
    pop ix
-ENDIF
-   
    pop bc
    push de
    push hl
    push bc
    
-IF __CPU_INTEL__ || __CPU_GBZ80__
-   push af
-   ret
-ELSE
    jp (ix)
 ENDIF
+
 

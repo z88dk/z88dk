@@ -10,6 +10,9 @@
 .l_asr1
         dec     e
         ret     m
+IF __CPU_8085__
+	sra	hl
+ELSE
 	ld	a,h
 	rla
 	ld	a,h
@@ -18,5 +21,6 @@
 	ld	a,l
 	rra
 	ld	l,a
+ENDIF
         jp      l_asr1
 

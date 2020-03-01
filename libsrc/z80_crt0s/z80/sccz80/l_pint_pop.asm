@@ -13,4 +13,9 @@
 	pop	bc	;return address
 	pop	de	;where to put it
 	push	bc
+IF __CPU_8085__
+	ld	(de),hl
+	ret
+ELSE
 	jp	l_pint
+ENDIF

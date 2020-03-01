@@ -11,10 +11,16 @@
 
 ; store int from HL into (DE)
 .l_pint_eq   
+IF __CPU_8085__
+	ld	(de),hl
+	ld	a,h
+	or	l
+ELSE
         ld a,l
         ld (de),a
         inc   de
         ld a,h
         ld (de),a
 	or	l
+ENDIF
         ret

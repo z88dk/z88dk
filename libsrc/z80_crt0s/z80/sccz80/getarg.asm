@@ -10,8 +10,7 @@
                 PUBLIC    getarg
                 EXTERN     l_sxt
 
-.getarg
-        jp      l_sxt
+		defc	getarg = l_sxt
 
 
 
