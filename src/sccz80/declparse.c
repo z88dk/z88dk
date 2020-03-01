@@ -799,9 +799,18 @@ Type *parse_decl_array(Type *base_type)
     } else {
         len = needsub(); // Swallows the ]
     } 
-    
+
+   
     t = parse_decl_tail(base_type);
-    
+    if ( t->kind == KIND_ARRAY && t->len == -1 && len == -1 ) {
+        UT_string *str;
+                
+        utstring_new(str);
+        utstring_printf(str,"Must specify array dimension of type: ");
+        type_describe(t,str);
+        errorfmt("%s", 1, utstring_body(str));
+        utstring_free(str);
+    }
     return make_array(t,len);
 }
 
