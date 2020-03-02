@@ -20,6 +20,7 @@ IF __CPU_GBZ80__
 	ld	(hl),c
 	inc	hl
 	ld	(hl),b
+	pop	bc
 ELSE
 	ex	(sp),hl
 	ld	(__retloc),hl

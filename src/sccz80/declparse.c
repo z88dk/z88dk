@@ -341,9 +341,8 @@ int align_struct(Type *str)
             }
         } else {
             // It's a bitfield...
-            int rem = (elem->size * 8) - bitoffs;
-
-            if ( elem->bit_size > rem ) {
+            if ( elem->bit_size + bitoffs > 8 &&
+                (elem->bit_size + bitoffs) / 8 != (bitoffs / 8) && bitoffs ) {
                 offset += ((bitoffs-1) / 8) + 1;
                 bitoffs = 0;
             }

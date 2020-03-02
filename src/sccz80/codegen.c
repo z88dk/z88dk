@@ -531,8 +531,6 @@ void putstk(LVALUE *lval)
     Type *ctype;
     Kind typeobj = lval->indirect_kind;
 
-
-
     //outfmt("; %s type=%d val_type=%d indirect=%d\n", lval->ltype->name, lval->type, lval->val_type, lval->indirect_kind);
     /* Store via long pointer... */
     ctype = retrstk(&flags);
@@ -584,10 +582,9 @@ void putstk(LVALUE *lval)
             }
 
             ol("ld\ta,l");
-            // TODO: Shift left as necessary
             if ( bit_offset >= 4) {
                 for ( i = 0; i < (8 - bit_offset); i++ ) {
-                    ol("rlca");
+                    ol("rrca");
                 }
             } else {
                 for ( i = 0; i < bit_offset; i++ ) {
@@ -711,6 +708,78 @@ static void loada(int n)
         ol("xor\ta");
 }
 
+// Read a bitfield from (hl)
+void get_bitfield(LVALUE *lval) 
+{
+    int bit_offset = lval->ltype->bit_offset;
+
+    if ( bit_offset >= 8 ) {
+        bit_offset -= 8;
+        ol("inc\thl");
+    }
+
+    if ( lval->ltype->bit_size + bit_offset <= 8 ) {
+        int i;
+        ol("ld\ta,(hl)");
+        // TODO: Shift left as necessary
+        if ( bit_offset >= 4) {
+            for ( i = 0; i < (8 - bit_offset); i++ ) {
+                ol("rlca");
+            }
+        } else {
+            for ( i = 0; i < bit_offset; i++ ) {
+                ol("rrca");
+            }
+        }
+        if ( lval->ltype->bit_size % 8 ) { 
+            outfmt("\tand\t%d\n",(1 << lval->ltype->bit_size) - 1);
+        }
+        if ( lval->ltype->isunsigned == 0 ) {
+            // We need to do some bit extension here
+            if ( lval->ltype->bit_size % 8 ) {
+                if ( IS_808x() ) {
+                    ol("ld\tl,a");
+                    outfmt("\tand\t%d\n",(1 << (lval->ltype->bit_size - 1)));
+                    ol("ld\ta,l");
+                    ol("jp\tz,ASMPC+5");
+                } else {
+                    outfmt("\tbit\t%d,a\n",lval->ltype->bit_size - 1);
+                    ol("jr\tz,ASMPC+4");
+                }
+                outfmt("\tor\t%d\n",0xff - ((1 << lval->ltype->bit_size) - 1));
+            }
+            ol("ld\tl,a");
+            ol("rlca");
+            ol("sbc\ta,a");
+            ol("ld\th,a");
+        } else {
+            ol("ld\tl,a");
+            ol("ld\th,0");
+        }
+    } else {
+        // This is a value that starts and bit 0 and then carries on into the next byte
+        ol("ld\te,(hl)");
+        ol("inc\thl");
+        ol("ld\ta,(hl)");
+        outfmt("\tand\t%d\n",(1 << (lval->ltype->bit_size - 8)) - 1);
+        if ( lval->ltype->isunsigned == 0 ) {
+            if ( IS_808x() ) {
+                ol("ld\th,a");
+                outfmt("\tand\t%d\n",(1 << (lval->ltype->bit_size - 8 - 1)));
+                ol("ld\ta,h");
+                ol("jp\tz,ASMPC+5");
+            } else {
+                outfmt("\tbit\t%d,a\n",lval->ltype->bit_size - 8 - 1);
+                ol("jr\tz,ASMPC+4");
+            }
+            outfmt("\tor\t%d\n",0xff - ((1 << (lval->ltype->bit_size - 8)) - 1));
+        }
+        ol("ld\th,a");
+        ol("ld\tl,e");
+    }
+}
+
+
 /* Fetch the specified object type indirect through the */
 /*      primary register into the primary register */
 void indirect(LVALUE* lval)
@@ -751,68 +820,7 @@ void indirect(LVALUE* lval)
     }
 
     if ( lval->ltype->bit_size ) {
-        int bit_offset = lval->ltype->bit_offset;
-
-        if ( bit_offset >= 8 ) {
-            bit_offset -= 8;
-            ol("inc\thl");
-        }
-
-        if ( lval->ltype->bit_size + bit_offset <= 8 ) {
-            int i;
-            ol("ld\ta,(hl)");
-            // TODO: Shift left as necessary
-            if ( bit_offset >= 4) {
-                for ( i = 0; i < (8 - bit_offset); i++ ) {
-                    ol("rlca");
-                }
-            } else {
-                for ( i = 0; i < bit_offset; i++ ) {
-                    ol("rrca");
-                }
-            }
-            if ( lval->ltype->bit_size % 8 ) { 
-                outfmt("\tand\t%d\n",(1 << lval->ltype->bit_size) - 1);
-            }
-            if ( lval->ltype->isunsigned == 0 ) {
-                // We need to do some bit extension here
-                if ( lval->ltype->bit_size % 8 ) {
-                    outfmt("\tbit\t%d,a\n",lval->ltype->bit_size - 1);
-                    if ( IS_808x() ) {
-                        ol("jp\tz,ASMPC+5");
-                    } else {
-                        ol("jr\tz,ASMPC+4");
-                    }
-                    outfmt("\tor\t%d\n",0xff - ((1 << lval->ltype->bit_size) - 1));
-                }
-                ol("ld\tl,a");
-                ol("rlca");
-                ol("sbc\ta,a");
-                ol("ld\th,a");
-            } else {
-                ol("ld\tl,a");
-                ol("ld\th,0");
-            }
-        } else {
-            // It's an int > 8 bits
-            ol("ld\te,(hl)");
-            ol("inc\thl");
-            ol("ld\ta,(hl)");
-            if ( lval->ltype->bit_size % 8 ) { 
-                outfmt("\tand\t%d\n",(1 << (lval->ltype->bit_size - 8)) - 1);
-                if ( lval->ltype->isunsigned == 0 ) {
-                    outfmt("\tbit\t%d,a\n",(lval->ltype->bit_size - 8) - 1);
-                    if ( IS_808x() ) {
-                        ol("jp\tz,ASMPC+5");
-                    } else {
-                        ol("jr\tz,ASMPC+4");
-                    }
-                    outfmt("\tor\t%d\n",0xff - ((1 << (lval->ltype->bit_size - 8)) - 1));
-                }
-            }
-            ol("ld\th,a");
-            ol("ld\tl,e");
-        }
+        get_bitfield(lval);
         return;
     }
 
