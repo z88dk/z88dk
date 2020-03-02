@@ -8,6 +8,8 @@
 #define MAX_TESTS 50
 #endif
 
+
+#define ASSERT(c) Assert_real((c), __FILE__, __LINE__, #c)
 #define Assert(r,m) Assert_real((r), __FILE__, __LINE__, (m))
 #define assertEqual(a,b) Assert_real((a) == (b),  __FILE__, __LINE__, #a  "== "  #b)
 #define assertNotEqual(a,b) Assert_real((a) != (b),  __FILE__, __LINE__, #a  "!= "  #b)

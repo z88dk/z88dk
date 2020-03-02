@@ -9,7 +9,7 @@
 	SECTION	data_compiler
 ._x
 	defw	0x7ff
-	defb	0x7b
+	defb	0xf60
 	defw	i_1+0
 	SECTION	code_compiler
 
@@ -23,16 +23,24 @@
 	or	7
 	ld	(hl),a
 	ld	hl,_x+1+1
+	ld	de,2	;const
+	ex	de,hl
+	ld	a,l
+	rrca
+	rrca
+	rrca
+	and	224
+	ld	l,a
+	ld	a,(de)
+	and	31
+	or	l
+	ld	(de),a
+	ld	hl,_x+1+1 + 1
 	ld	a,(hl)
-	and	248
-	or	2
+	and	224
+	or	3
 	ld	(hl),a
-	ld	hl,_x+1+1
-	ld	a,(hl)
-	and	7
-	or	24
-	ld	(hl),a
-	ld	hl,5	;const
+	ld	hl,6	;const
 	pop	bc
 	push	hl
 	ld	hl,_x
@@ -68,6 +76,9 @@
 ._func1b
 	ld	hl,_x+1+1
 	ld	a,(hl)
+	rlca
+	rlca
+	rlca
 	and	7
 	ld	l,a
 	ld	h,0
@@ -76,11 +87,8 @@
 
 
 ._func1c
-	ld	hl,_x+1+1
+	ld	hl,_x+1+1+1
 	ld	a,(hl)
-	rrca
-	rrca
-	rrca
 	and	31
 	ld	l,a
 	ld	h,0
@@ -140,10 +148,13 @@
 
 ._func3b
 	ld	hl,_z+1+1
-	ld	a,(hl)
+	ld	e,(hl)
 	inc	hl
-	ld	h,(hl)
-	ld	l,a
+	ld	a,(hl)
+	bit	7,a
+	jr	z,ASMPC+4
+	ld	h,a
+	ld	l,e
 	ret
 
 
