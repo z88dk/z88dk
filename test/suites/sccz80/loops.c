@@ -5,14 +5,12 @@
 
 unsigned char array[300];
 
-#if !__GBZ80__
 // No 32 bit multiplication for gbz80
 void loop8(unsigned char *a, unsigned long n)
 {
         for(unsigned long i = 0; i < n; i++)
                 a[i * n] = 8;
 }
-#endif
 
 /* A loop where the counter should be narrowed to a 16-bit unsigned type, but not further. */
 void loop16(unsigned char *a)
@@ -82,12 +80,10 @@ void jump(unsigned char *a)
 
 void test_loop(void)
 {
-#if !__GBZ80__
         loop8 (array, 3);
         assertEqual(array[0],8);
         assertEqual(array[3],8);
         assertEqual(array[6],8);
-#endif
 
         loop16 (array);
         assertEqual (array[0],16);
