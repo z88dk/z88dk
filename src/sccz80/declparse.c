@@ -1178,6 +1178,7 @@ Type *dodeclare2(Type **base_type, decl_mode mode)
         if ( base_type )
             *base_type = type;
             
+        swallow("const");
         // Parse for z88dk flags
         while (blanks(), rcmatch('_')) {
             if ( amatch("__LIB__") ) {

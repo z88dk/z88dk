@@ -6,7 +6,7 @@
 
 static void output_double_string_load(double value);
 static int init(Type *type, int dump);
-static int agg_init(Type *type);
+static int agg_init(Type *type, int isflexible);
 
 
 /*
@@ -39,7 +39,7 @@ int initials(const char *dropname, Type *type)
             desize = str_init(type->kind == KIND_STRUCT ? type->tag : type->ptr);
         } else {
             // Aggregate initialiser
-            desize = agg_init(type);
+            desize = agg_init(type, 0);
         }
         needchar('}');
     } else {
@@ -111,19 +111,19 @@ int str_init(Type *tag)
 
         last_offset = ptr->offset;
 
-        sz += ptr->size;
+        sz += ptr->size == -1 ? 0 : ptr->size;
         if ( ptr->kind == KIND_STRUCT ) {
             needchar('{');
             str_init(ptr->tag);
             needchar('}');
         } else if ( ( ptr->kind == KIND_ARRAY && ptr->ptr->kind != KIND_CHAR ) ) {
             needchar('{');
-            agg_init(ptr);
+            agg_init(ptr, ptr->size == -1 && i == num_fields - 1);
             needchar('}');
         } else if ( ptr->kind == KIND_ARRAY && ptr->ptr->kind == KIND_CHAR ) {
             if ( rcmatch('{')) {
                 needchar('{');
-                agg_init(ptr);
+                agg_init(ptr,0);
                 needchar('}');
             } else {
                 init(ptr,1);
@@ -154,7 +154,7 @@ int str_init(Type *tag)
 /*
  * initialise aggregate
  */
-int agg_init(Type *type)
+int agg_init(Type *type, int isflexible)
 {
     int done = 0;
     int dim = type->len;
@@ -174,7 +174,7 @@ int agg_init(Type *type)
         } else if ( type->ptr && type->ptr->kind == KIND_ARRAY) {
             if ( type->ptr->ptr->kind != KIND_CHAR ) {
                 needchar('{');
-                size += agg_init(type->ptr);
+                size += agg_init(type->ptr, isflexible);
                 needchar('}');
             } else {
                char needbrace = 0;
@@ -183,7 +183,7 @@ int agg_init(Type *type)
                if ( rcmatch('"') )
                    size += init(type->ptr,1);
                else 
-                   size += agg_init(type->ptr);
+                   size += agg_init(type->ptr, isflexible);
                if ( needbrace ) needchar('}');
             }
         } else {
@@ -200,7 +200,7 @@ int agg_init(Type *type)
     }
     if ( type->len != -1 ) {
         size += dumpzero(1, type->size - size);
-    } else {
+    } else if ( !isflexible ) {
         type->size = size;
         type->len = size / type->ptr->size;
     }
