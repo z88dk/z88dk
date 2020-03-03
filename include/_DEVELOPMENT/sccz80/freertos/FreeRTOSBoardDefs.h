@@ -50,7 +50,11 @@ extern "C" {
 
 #ifdef __YAZ180 
 
-#define configTICK_RATE_HZ              ( ( TickType_t ) 256 )
+#define configTICK_RATE_HZ              (256)
+#define configISR_ORG                   ASMPC
+#define configISR_IVT                   0xFFE6
+
+#define configINCREMENT_TICK()          xTaskIncrementTick()
 #define configSWITCH_CONTEXT()          vTaskSwitchContext()
 
 #ifdef __SCCZ80
@@ -62,11 +66,12 @@ extern "C" {
             "EXTERN RLDR1L, RLDR1H                          \n" \
             "EXTERN TCR, TCR_TIE1, TCR_TDE1                 \n" \
             "ld de,_timer_isr                               \n" \
-            "ld hl,0xFFE6       ; YAZ180 PRT1 address       \n" \
+            "ld hl,"string(configISR_IVT)" ; YAZ180 PRT1 address\n" \
             "ld (hl),e                                      \n" \
             "inc hl                                         \n" \
             "ld (hl),d                                      \n" \
-            "ld hl,__CPU_CLOCK/256/20-1                     \n" \
+            "; we do configTICK_RATE_HZ ticks per second    \n" \
+            "ld hl,__CPU_CLOCK/"string(configTICK_RATE_HZ)"/20-1 \n" \
             "out0(RLDR1L),l                                 \n" \
             "out0(RLDR1H),h                                 \n" \
             "in0 a,(TCR)                                    \n" \
@@ -107,12 +112,12 @@ extern "C" {
             EXTERN TCR, TCR_TIE1, TCR_TDE1                      \
             ; address of ISR                                    \
             ld de,_timer_isr                                    \
-            ld hl,0xFFE6        ; YAZ180 PRT1 address           \
+            ld hl,configISR_IVT ; YAZ180 PRT1 address           \
             ld (hl),e                                           \
             inc hl                                              \
             ld (hl),d                                           \
-            ; we do 256 ticks per second                        \
-            ld hl,__CPU_CLOCK/256/20-1                          \
+            ; we do configTICK_RATE_HZ ticks per second         \
+            ld hl,__CPU_CLOCK/configTICK_RATE_HZ/20-1           \
             out0(RLDR1L),l                                      \
             out0(RLDR1H),h                                      \
             ; enable down counting and interrupts for PRT1      \
@@ -148,43 +153,60 @@ extern "C" {
 
 #ifdef __SCZ180
 
-#define configTICK_RATE_HZ              ( ( TickType_t ) 256 )
+#define configTICK_RATE_HZ              (256)
+#define configISR_ORG                   0xFB00
+#define configISR_IVT                   0xFF06
 
 #ifdef __SCCZ80
+
+#define configINCREMENT_TICK()                                  \
+    do{                                                         \
+        asm(                                                    \
+            "EXTERN BBR                                     \n" \
+            "in0 a,(BBR)                                    \n" \
+            "xor 0xF0           ; BBR for user TPA          \n" \
+            "call Z,xTaskIncrementTick                      \n" \
+            );                                                  \
+    }while(0)
+
 
 #define configSWITCH_CONTEXT()                                  \
     do{                                                         \
         asm(                                                    \
             "EXTERN BBR                                     \n" \
             "in0 a,(BBR)                                    \n" \
-            "xor 0xF0           ; BBR for TPA               \n" \
-            "call Z,vTaskSwitchContext                      \n" \
+            "xor 0xF0           ; BBR for user TPA          \n" \
+            "jr NZ,ASMPC+9                                  \n" \
+            "ld hl,0x0100                                   \n" \
+            "add hl,sp          ; Check SP < 0xFFnn         \n" \
+            "call NC,vTaskSwitchContext                     \n" \
             );                                                  \
     }while(0)
 
-#define configSETUP_TIMER_INTERRUPT()                       \
-    do{                                                         \
-        asm(                                                    \
-            "EXTERN __CPU_CLOCK                             \n" \
-            "EXTERN RLDR1L, RLDR1H                          \n" \
-            "EXTERN TCR, TCR_TIE1, TCR_TDE1                 \n" \
-            "ld hl,_timer_isr   ; move timer_isr() to a     \n" \
-            "ld de,0xFB00       ; destination above 0x8000  \n" \
+#define configSETUP_TIMER_INTERRUPT()               \
+    do{                                             \
+        asm(                                        \
+            "EXTERN __CPU_CLOCK                 \n" \
+            "EXTERN RLDR1L, RLDR1H              \n" \
+            "EXTERN TCR, TCR_TIE1, TCR_TDE1     \n" \
+            "ld hl,_timer_isr       ; move timer_isr() to a     \n" \
+            "ld de,_timer_isr_start ; destination above 0x8000  \n" \
             "push de                                        \n" \
-            "ld bc,0x0050       ; copy 0x50 Bytes           \n" \
-            "ldir               ; copy timer_isr()          \n" \
-            "pop de             ; destination to DE         \n" \
-            "ld hl,0xFF06       ; SCZ180 PRT1 address       \n" \
+            "ld bc,_timer_isr_end-_timer_isr_start          \n" \
+            "ldir                   ; copy timer_isr()      \n" \
+            "pop de                 ; destination to DE     \n" \
+            "ld hl,"string(configISR_IVT)" ; SCZ180 PRT1 address\n" \
             "ld (hl),e                                      \n" \
             "inc hl                                         \n" \
             "ld (hl),d                                      \n" \
-            "ld hl,__CPU_CLOCK/256/20-1                     \n" \
-            "out0(RLDR1L),l                                 \n" \
-            "out0(RLDR1H),h                                 \n" \
-            "in0 a,(TCR)                                    \n" \
-            "or TCR_TIE1|TCR_TDE1                           \n" \
-            "out0 (TCR),a                                   \n" \
-            );                                                  \
+            "; we do configTICK_RATE_HZ ticks per second    \n" \
+            "ld hl,__CPU_CLOCK/"string(configTICK_RATE_HZ)"/20-1\n" \
+            "out0 (RLDR1L),l                    \n" \
+            "out0 (RLDR1H),h                    \n" \
+            "in0 a,(TCR)                        \n" \
+            "or TCR_TIE1|TCR_TDE1               \n" \
+            "out0 (TCR),a                       \n" \
+            );                                      \
     }while(0)
 
 #define configRESET_TIMER_INTERRUPT()                           \
@@ -210,13 +232,27 @@ extern "C" {
 
 #ifdef __SDCC
 
+#define configINCREMENT_TICK()                                  \
+    do{                                                         \
+        __asm                                                   \
+            EXTERN BBR                                          \
+            in0 a,(BBR)                                         \
+            xor 0xF0            ; BBR for user TPA              \
+            call Z,_xTaskIncrementTick                          \
+        __endasm;                                               \
+    }while(0)
+
+
 #define configSWITCH_CONTEXT()                                  \
     do{                                                         \
         __asm                                                   \
             EXTERN BBR                                          \
             in0 a,(BBR)                                         \
-            xor 0xF0            ; BBR for TPA                   \
-            call Z,_vTaskSwitchContext                          \
+            xor 0xF0            ; BBR for user TPA              \
+            jr NZ,ASMPC+9                                       \
+            ld hl,0x0100                                        \
+            add hl,sp           ; Check SP < 0xFFnn             \
+            call NC,_vTaskSwitchContext                         \
         __endasm;                                               \
     }while(0)
 
@@ -227,18 +263,18 @@ extern "C" {
             EXTERN RLDR1L, RLDR1H                               \
             EXTERN TCR, TCR_TIE1, TCR_TDE1                      \
             ; address of ISR                                    \
-            ld hl,_timer_isr    ; move timer_isr() to a         \
-            ld de,0xFB00        ; destination above 0x8000      \
+            ld hl,_timer_isr        ; move timer_isr() to a     \
+            ld de,_timer_isr_start  ; destination above 0x8000  \
             push de                                             \
-            ld bc,0x0050        ; copy 0x50 Bytes               \
-            ldir                ; copy timer_isr()              \
-            pop de              ; destination to DE             \
-            ld hl,0xFF06        ; SCZ180 PRT1 address           \
+            ld bc,_timer_isr_end-_timer_isr_start               \
+            ldir                    ; copy timer_isr()          \
+            pop de                  ; destination to DE         \
+            ld hl,configISR_IVT     ; SCZ180 PRT1 address       \
             ld (hl),e                                           \
             inc hl                                              \
             ld (hl),d                                           \
-            ; we do 256 ticks per second                        \
-            ld hl,__CPU_CLOCK/256/20-1                          \
+            ; we do configTICK_RATE_HZ ticks per second         \
+            ld hl,__CPU_CLOCK/configTICK_RATE_HZ/20-1           \
             out0(RLDR1L),l                                      \
             out0(RLDR1H),h                                      \
             ; enable down counting and interrupts for PRT1      \

@@ -39,7 +39,7 @@ extern "C" {
  * Port specific definitions.
  *
  * The settings in this file configure FreeRTOS correctly for the
- * given hardware and compiler.
+ * given Z80 (Z180, Z80N) hardware and SCCZ80 or SDCC compiler.
  *
  * These settings should not be altered.
  *-----------------------------------------------------------
@@ -59,7 +59,12 @@ typedef uint8_t UBaseType_t;
     #define portMAX_DELAY ( TickType_t ) 0xffffffffUL
 #endif
 
+/*-----------------------------------------------------------*/
 
+/* General purpose stringify macros. */
+
+#define string(a) __string(a)
+#define __string(a) #a
 
 /*-----------------------------------------------------------*/
 
@@ -181,7 +186,9 @@ typedef uint8_t UBaseType_t;
 #define portSAVE_CONTEXT_IN_ISR()   \
     do{                             \
         asm(                        \
+            "PHASE "string(configISR_ORG)"  \n" \
             "EXTERN _pxCurrentTCB   \n" \
+            "_timer_isr_start:  \n" \
             "push af            \n" \
             "ld a,0x7F          \n" \
             "inc a  ; set P/V   \n" \
@@ -233,6 +240,8 @@ typedef uint8_t UBaseType_t;
             "ei                 \n" \
             "pop af             \n" \
             "reti               \n" \
+            "_timer_isr_end:    \n" \
+            "DEPHASE            \n" \
             );                      \
     }while(0)
 
@@ -350,7 +359,9 @@ typedef uint8_t UBaseType_t;
 #define portSAVE_CONTEXT_IN_ISR()   \
     do{                             \
         __asm                       \
+            PHASE configISR_ORG     \
             EXTERN _pxCurrentTCB    \
+            _timer_isr_start:       \
             push af                 \
             ld a,0x7F               \
             inc a       ; set P/V   \
@@ -402,6 +413,8 @@ typedef uint8_t UBaseType_t;
             ei                      \
             pop af                  \
             reti                    \
+            _timer_isr_end:         \
+            DEPHASE                 \
         __endasm;                   \
     }while(0)
 
