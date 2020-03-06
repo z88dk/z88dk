@@ -157,26 +157,61 @@ extern "C" {
 
 #ifdef __SCCZ80
 
+#if configUSE_16_BIT_TICKS == 1
+
 #define configINCREMENT_TICK()                                  \
     do{                                                         \
         asm(                                                    \
             "EXTERN BBR                                     \n" \
             "in0 a,(BBR)                                    \n" \
-            "xor 0xF0           ; BBR for user TPA          \n" \
-            "call Z,xTaskIncrementTick                      \n" \
+            "xor 0xF0                ; BBR for TPA          \n" \
+            "jr NZ,ASMPC+9                                  \n" \
+            "ld hl,ASMPC+14                                 \n" \
+            "push hl                                        \n" \
+            "jp xTaskIncrementTick   ; ret to end           \n" \
+            "ld hl,(_xPendedTicks)                          \n" \
+            "inc hl                                         \n" \
+            "ld (_xPendedTicks),hl                          \n" \
             );                                                  \
     }while(0)
 
+#else
+
+#define configINCREMENT_TICK()                                  \
+    do{                                                         \
+        asm(                                                    \
+            "EXTERN BBR                                     \n" \
+            "in0 a,(BBR)                                    \n" \
+            "xor 0xF0                ; BBR for TPA          \n" \
+            "jr NZ,ASMPC+9                                  \n" \
+            "ld hl,ASMPC+23                                 \n" \
+            "push hl                                        \n" \
+            "jp xTaskIncrementTick   ; ret to end           \n" \
+            "ld hl,_xPendedTicks                            \n" \
+            "inc (hl)                                       \n" \
+            "jr NZ,ASMPC+12                                 \n" \
+            "inc hl                                         \n" \
+            "inc (hl)                                       \n" \
+            "jr NZ,ASMPC+8                                  \n" \
+            "inc hl                                         \n" \
+            "inc (hl)                                       \n" \
+            "jr NZ,ASMPC+4                                  \n" \
+            "inc hl                                         \n" \
+            "inc (hl)                                       \n" \
+            );                                                  \
+    }while(0)
+
+#endif
 
 #define configSWITCH_CONTEXT()                                  \
     do{                                                         \
         asm(                                                    \
             "EXTERN BBR                                     \n" \
             "in0 a,(BBR)                                    \n" \
-            "xor 0xF0           ; BBR for user TPA          \n" \
+            "xor 0xF0                ; BBR for user TPA     \n" \
             "jr NZ,ASMPC+9                                  \n" \
             "ld hl,0x0100                                   \n" \
-            "add hl,sp          ; Check SP < 0xFFnn         \n" \
+            "add hl,sp               ; Check SP < 0xFFnn    \n" \
             "call NC,vTaskSwitchContext                     \n" \
             );                                                  \
     }while(0)
@@ -230,26 +265,61 @@ extern "C" {
 
 #ifdef __SDCC
 
+#if configUSE_16_BIT_TICKS == 1
+
 #define configINCREMENT_TICK()                                  \
     do{                                                         \
         __asm                                                   \
             EXTERN BBR                                          \
             in0 a,(BBR)                                         \
-            xor 0xF0            ; BBR for user TPA              \
-            call Z,_xTaskIncrementTick                          \
+            xor 0xF0                ; BBR for TPA               \
+            jr NZ,ASMPC+9                                       \
+            ld hl,ASMPC+14                                      \
+            push hl                                             \
+            jp _xTaskIncrementTick  ; ret to _endasm            \
+            ld hl,(_xPendedTicks)                               \
+            inc hl                                              \
+            ld (_xPendedTicks),hl                               \
         __endasm;                                               \
     }while(0)
 
+#else
+
+#define configINCREMENT_TICK()                                  \
+    do{                                                         \
+        __asm                                                   \
+            EXTERN BBR                                          \
+            in0 a,(BBR)                                         \
+            xor 0xF0                ; BBR for TPA               \
+            jr NZ,ASMPC+9                                       \
+            ld hl,ASMPC+23                                      \
+            push hl                                             \
+            jp _xTaskIncrementTick  ; ret to _endasm            \
+            ld hl,_xPendedTicks                                 \
+            inc (hl)                                            \
+            jr NZ,ASMPC+12                                      \
+            inc hl                                              \
+            inc (hl)                                            \
+            jr NZ,ASMPC+8                                       \
+            inc hl                                              \
+            inc (hl)                                            \
+            jr NZ,ASMPC+4                                       \
+            inc hl                                              \
+            inc (hl)                                            \
+        __endasm;                                               \
+    }while(0)
+
+#endif
 
 #define configSWITCH_CONTEXT()                                  \
     do{                                                         \
         __asm                                                   \
             EXTERN BBR                                          \
             in0 a,(BBR)                                         \
-            xor 0xF0            ; BBR for user TPA              \
+            xor 0xF0                ; BBR for user TPA          \
             jr NZ,ASMPC+9                                       \
             ld hl,0x0100                                        \
-            add hl,sp           ; Check SP < 0xFFnn             \
+            add hl,sp               ; Check SP < 0xFFnn         \
             call NC,_vTaskSwitchContext                         \
         __endasm;                                               \
     }while(0)
