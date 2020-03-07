@@ -60,7 +60,7 @@ include(__link__.m4)
 #define configUSE_QUEUE_SETS                0
 #define configQUEUE_REGISTRY_SIZE           0
 #define configUSE_TIME_SLICING              1
-#define configCHECK_FOR_STACK_OVERFLOW      1
+#define configCHECK_FOR_STACK_OVERFLOW      0
 #define configUSE_MALLOC_FAILED_HOOK        0
 
 #define configSUPPORT_DYNAMIC_ALLOCATION    1

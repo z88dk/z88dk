@@ -57,13 +57,13 @@ extern "C" {
 #endif
 
 /* Application specific configuration options. */
-#include "freertos/FreeRTOSConfig.h"
+#include <freertos/FreeRTOSConfig.h>
 
 /* Basic FreeRTOS definitions. */
-#include "freertos/projdefs.h"
+#include <freertos/projdefs.h>
 
 /* Definitions specific to the port being used. */
-#include "freertos/portable.h"
+#include <freertos/portable.h>
 
 /* Must be defaulted before configUSE_NEWLIB_REENTRANT is used below. */
 #ifndef configUSE_NEWLIB_REENTRANT
@@ -72,7 +72,7 @@ extern "C" {
 
 /* Required if struct _reent is used. */
 #if ( configUSE_NEWLIB_REENTRANT == 1 )
-    #include <reent.h>
+    #warning Invalid configuration configUSE_NEWLIB_REENTRANT reent.h is not available.
 #endif
 /*
  * Check all the required application specific macros have been defined.
@@ -1291,7 +1291,7 @@ typedef StaticStreamBuffer_t StaticMessageBuffer_t;
 }
 #endif
 
-/* Board (AVR) specific configuration options. */
+/* Board specific configuration options. */
 #include <freertos/FreeRTOSBoardDefs.h>
 
 #endif /* INC_FREERTOS_H */
