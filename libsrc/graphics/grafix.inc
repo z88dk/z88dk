@@ -589,6 +589,12 @@ IF FORhomelab
 	defc maxy = 64
 ENDIF
 
+IF FORhomelab2
+	DEFINE gotgfx
+	defc maxx = 80
+	defc maxy = 50
+ENDIF
+
 IF FORgb
 	defc USEplotc   = 1		; We call generic_console_plotc, not _printc for text mode
 ENDIF
