@@ -1,1 +1,1 @@
-ctype/obj/${TYPE}/**/*.o
+compress/aplib/obj/${TYPE}/**/*.o
