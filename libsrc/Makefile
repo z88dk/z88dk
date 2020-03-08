@@ -70,7 +70,7 @@ define buildgeneric
 	$(MAKE) -C input
 	$(MAKE) -C stdlib TARGET=$(1)
 	$(MAKE) -C gfx TARGET=$(1) FLAVOUR=$(if $(2),$(2),narrow)
-	$(MAKE) -C compress/zx7
+	$(MAKE) -C compress
 	$(MAKE) -C psg TARGET=$(1)
 	$(MAKE) -C alloc
 	$(MAKE) -C debug
@@ -1561,7 +1561,7 @@ classic-clean:
 	$(MAKE) -C sdcard clean
 	$(MAKE) -C games clean
 	$(MAKE) -C math clean
-	$(MAKE) -C compress/zx7 clean
+	$(MAKE) -C compress clean
 	$(MAKE) -C font clean
 	$(MAKE) -C arch clean
 	$(MAKE) -C target clean
