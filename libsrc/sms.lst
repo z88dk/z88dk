@@ -14,7 +14,6 @@ target/sms/set_sprite
 target/sms/read_joypad1
 target/sms/read_joypad2
 target/sms/gotoxy
-target/sms/aplib_depack
 target/sms/add_raster_int
 target/sms/add_pause_int
 @games/games.lst

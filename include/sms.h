@@ -9,6 +9,8 @@
 
 #include <sys/compiler.h>
 
+#include <compress/aplib.h>
+
 #define VDP_REG_FLAGS0 0x80
 // Screen sync off
 #define VDP_REG_FLAGS0_SYNC 0x01
@@ -112,7 +114,6 @@ extern int __LIB__ read_joypad1();
 extern int __LIB__ read_joypad2();
 extern void __LIB__ set_vdp_reg(int reg, int value) __smallc;
 extern void __LIB__ gotoxy(int x, int y) __smallc;
-extern void __LIB__ aplib_depack(unsigned char *src, unsigned char *dest) __smallc;
 extern void __LIB__ add_raster_int(void *ptr);
 extern void __LIB__ add_pause_int(void *ptr);
 extern void __LIB__ set_sound_freq(int channel, int freq) __smallc;
