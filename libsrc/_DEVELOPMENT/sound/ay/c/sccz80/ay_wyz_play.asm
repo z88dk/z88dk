@@ -5,7 +5,13 @@
 
 	EXTERN	asm_wyz_play
 
-	defc ay_wyz_play = asm_wyz_play
+ay_wyz_play:
+	push	ix
+	push	iy
+	call	ay_wyz_play
+	pop	iy
+	pop	ix
+	ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

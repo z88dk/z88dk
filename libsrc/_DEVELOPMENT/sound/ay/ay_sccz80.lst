@@ -1,0 +1,8 @@
+sound/ay/c/sccz80/ay_wyz_stop_effect
+sound/ay/c/sccz80/ay_wyz_init
+sound/ay/c/sccz80/ay_wyz_stop
+sound/ay/c/sccz80/ay_wyz_effect_init
+sound/ay/c/sccz80/ay_wyz_start_effect
+sound/ay/c/sccz80/ay_wyz_start
+sound/ay/c/sccz80/ay_wyz_play
+@sound/ay/ay_asm.lst
