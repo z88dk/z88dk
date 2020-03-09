@@ -72,10 +72,6 @@ include(__link__.m4)
 #define configTIMER_QUEUE_LENGTH            ( ( UBaseType_t ) 10 )
 #define configTIMER_TASK_STACK_DEPTH        ( 85 )
 
-/* Co-routine definitions. */
-#define configUSE_CO_ROUTINES               0
-#define configMAX_CO_ROUTINE_PRIORITIES     ( (UBaseType_t ) 2 )
-
 /* Set the stack depth type to be uint16_t. */
 #define configSTACK_DEPTH_TYPE              uint16_t
 
