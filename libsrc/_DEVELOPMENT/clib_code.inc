@@ -58,6 +58,7 @@ section code_PSGlib
 section code_setjmp
 section code_SMSlib
 section code_sound_bit
+section code_sound_ay
 section code_stdio
 section code_stdlib
 section code_string

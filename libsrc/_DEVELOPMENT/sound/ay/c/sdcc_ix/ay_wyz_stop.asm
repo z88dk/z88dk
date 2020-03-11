@@ -1,5 +1,5 @@
 
-	SECTION	code_psg
+	SECTION	code_sound_ay
 
 	PUBLIC	_ay_wyz_stop
 

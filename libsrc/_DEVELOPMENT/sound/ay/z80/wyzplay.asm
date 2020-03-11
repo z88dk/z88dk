@@ -9,7 +9,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__
 ; * SONG TABLE
 
 
-	SECTION	code_psg
+	SECTION	code_sound_ay
 
 	PUBLIC	asm_wyz_play
 	PUBLIC	asm_wyz_start
@@ -1026,7 +1026,7 @@ SELECT_CANAL_C:
 
 ;____________________________________
 
-	SECTION	bss_psg
+	SECTION	bss_sound_ay
 
 INTERR:         defb     0	        ;INTERRUPTORES 1=ON 0=OFF
                 ;BIT 0=CARGA CANCION ON/OFF

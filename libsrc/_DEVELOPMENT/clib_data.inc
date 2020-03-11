@@ -12,6 +12,7 @@ section data_fcntl_fdtable_body
 section data_PSGlib
 section data_SMSlib
 section data_sound_bit
+section data_sound_ay
 section data_stdio
 section data_stdlib
 section data_threads
