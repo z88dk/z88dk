@@ -13,6 +13,7 @@ section bss_input
 section bss_PSGlib
 section bss_SMSlib
 section bss_sound_bit
+section bss_sound_ay
 section bss_stdio
 section bss_stdlib
 section bss_string

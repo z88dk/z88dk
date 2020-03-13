@@ -22,6 +22,7 @@
 @network/network_sccz80.lst
 @setjmp/setjmp_sccz80.lst
 @sound/sound_sccz80.lst
+@sound/ay/ay_sccz80.lst
 @stdio/stdio_sccz80.lst
 @stdlib/stdlib_sccz80.lst
 @string/string_sccz80.lst

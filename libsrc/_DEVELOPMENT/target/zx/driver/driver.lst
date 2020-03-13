@@ -10,3 +10,4 @@ target/zx/driver/terminal/_font_8x8_rom
 @target/zx/driver/terminal/zx_01_output_fzx_tty_z88dk.lst
 @target/zx/driver/terminal/zx_tty.lst
 @target/zx/driver/math/math32.lst
+target/zx/driver/sound/asm_wyz_hardware_out
