@@ -45,7 +45,7 @@ ALL = setup bin/appmake$(EXESUFFIX) bin/z88dk-copt$(EXESUFFIX) bin/z88dk-zcpp$(E
 	bin/z80nm$(EXESUFFIX) bin/zobjcopy$(EXESUFFIX)  \
 	bin/z88dk-ticks$(EXESUFFIX) bin/z88dk-z80svg$(EXESUFFIX) \
 	bin/z88dk-font2pv1000$(EXESUFFIX) bin/z88dk-basck$(EXESUFFIX) \
-	testsuite bin/z88dk-lib$(EXESUFFIX) 
+	testsuite bin/z88dk-lib$(EXESUFFIX)
 ALL_EXT = bin/zsdcc$(EXESUFFIX)
 
 .PHONY: $(ALL)
@@ -68,7 +68,7 @@ setup:
 
 
 bin/zsdcc$(EXESUFFIX):
-	svn checkout -r 11535 https://svn.code.sf.net/p/sdcc/code/trunk/sdcc -q $(SDCC_PATH)
+	svn checkout -r 11556 https://svn.code.sf.net/p/sdcc/code/trunk/sdcc -q $(SDCC_PATH)
 	cd $(SDCC_PATH) && patch -p0 < $(Z88DK_PATH)/src/zsdcc/sdcc-z88dk.patch
 	cd $(SDCC_PATH) && CC=$(OCC) ./configure \
 		--disable-ds390-port --disable-ds400-port \

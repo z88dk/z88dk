@@ -12,6 +12,7 @@ Detailed but incomplete changelist:
 - [classic] +zx: The enter key now works with ROM input
 - [sccz80] genmath/math48: Fixes to builtin ldexp implementation
 - [z80asm] db/dw/ds etc synonyms are now accepted
+- [zsdcc] Upgraded to SDCC 4.0.0 r11556 (bugfixes)
 
 z88dk v2.0 - 03.02.2020
 
@@ -20,7 +21,7 @@ release of z88dk contains some major new features which are noteworthy:
 
 * A (mostly) IEEE754 compliant maths library is available for both classic
   and newlib.
-* The sccz80 compiler and classic +cpm and +pmd85 targets now support 
+* The sccz80 compiler and classic +cpm and +pmd85 targets now support
   generating binaries that run on 8080 hardware
 * The sccz80 compiler and classic +gb target can now generate ROMs for the
   Nintendo Gameboy
@@ -50,19 +51,19 @@ The more detailed (yet incomplete) changelist is below:
 - [classic] +msx: MSXDOS2 library available via -subtype=msxdos2
 - [classic] +msx: UNAPI support is now available
 - [classic] +mtx: Serial port support
-- [classic] +myvision: Support for the Nichibutsu My Vision 
+- [classic] +myvision: Support for the Nichibutsu My Vision
 - [classic] +pasopia7 Toshiba Pasopia 7 support added
 - [classic] +pencil2: Support for the Hanimex Pencil II
 - [classic] +pmd85: Support for the Tesla PMD85 family
 - [classic] +s1mp3: Preliminary support for the s1mp3 player devices
 - [classic] +sms: Support for Gamegear with -lgamegear
 - [classic] +spc1000: Graphics are now supported on the TMS9928
-- [classic] +sv8000: Support for the Bandai Supervision 8000 
+- [classic] +sv8000: Support for the Bandai Supervision 8000
 - [classic] +trs80: Microsoft 32 and 64 bit floating point support
 - [classic] +trs80: TRSDOS support
 - [classic] +tvc: Preliminary support for Videoton TVC
 - [classic] +ts2068: gencon supports hires and multicolour modes
-- [classic} +vz: Support for graphics 
+- [classic} +vz: Support for graphics
 - [classic] +x1: Graphics and console improvements
 - [classic] all: IEEE 754 32 bit maths library
 - [classic] all: BBC BASIC 40 bit maths library
@@ -85,7 +86,7 @@ z88dk v1.99C - 19.01.2019
 
 This release of z88dk contains many significant changes over the 1.99B,
 significantly increasing the number of supported systems, improving source
-code compatibility between the two compilers and natively supporting 
+code compatibility between the two compilers and natively supporting
 more z80 derivative CPUs. The major changes are detailed below:
 
 * sccz80 has seen many changes, included frontend parsing enhancements and
@@ -110,7 +111,7 @@ A more detailed (incomplete) changelist follows:
 - [classiclib] Bug fixes for memrchr() and gets()
 - [classiclib] Compiler intrinsics are now available
 - [classiclib] fmemopen() and funopen() are now available
-- [classiclib] +pc6001 ROM cartridge support 
+- [classiclib] +pc6001 ROM cartridge support
 - [classiclib] +test target now supports amalloc and command line arguments
 - [classiclib] printf format %s now supports a precision field
 - [classiclib] printf format %x, %p, %X, %B now disable the + flag
@@ -135,7 +136,7 @@ A more detailed (incomplete) changelist follows:
 - [classiclib] Marked adt and balloc classic apis as deprecated
 - [classiclib] +cpc cpcrslib has been imported
 - [classiclib] CPC, MSX, SVI, ZX81, Galaksija, Sam, X1, Z1013 port improvements
-- [classiclib] New ports for Casio PV-1000, PV-2000, FP-1100, Colecovision, Coleco Adam, 
+- [classiclib] New ports for Casio PV-1000, PV-2000, FP-1100, Colecovision, Coleco Adam,
   Mitsubishi Multi8, Alphatronic PC, NEC PC-8800, Dick Smith Super80, Z80 TV Game Console,
   Bandai RX78, Sharp MZ2500, Samsung SPC-1000, VTech Laser 350/500/700
 - [classiclib] +m5 ROM cartridge support
@@ -143,7 +144,7 @@ A more detailed (incomplete) changelist follows:
 - [classiclib] +aquarius 8k ROM cartridges can now be created
 - [classiclib] inkey() implementations for Jupiter Ace, Sord M5, PV-2000, SC-3000,
   VZ-200, TRS80, Exidy Sorcerer, Alphatronic PC, Camputers Lynx, VG5K, Super-80, SVI
-  TRS80, 
+  TRS80,
 - [classiclib] SMS stability improvements
 - [classiclib] [all] New kbhit() implementation
 - [classiclib] Now shares ctype, string and most of stdlib with newlib
@@ -211,8 +212,8 @@ A more detailed (incomplete) changelist follows:
 - [z80asm] #159: Environment variables ${VAR} in filenames and .lst files
 - [z80asm] #222: +zx and +zx81 options to z80asm to generate .tap and .P files
 - [z80asm] #248: Filler byte for DEFS and ALIGN can be given in command line
-- [z80asm] #341: Produce debugger-friendly map files with symbols of C and ASM lines 
-- [z80asm] #429: Add PHASE and DEPHASE directives 
+- [z80asm] #341: Produce debugger-friendly map files with symbols of C and ASM lines
+- [z80asm] #429: Add PHASE and DEPHASE directives
 - [z80asm] #436: Add ALIGN directive
 - [z80asm] #524: Allow the target directory for object files to be given in the command line
 - [z88dk-dis] A new standalone diassembler is available
@@ -447,7 +448,7 @@ list of symbols only once.
 - [classiclib] GFX Library: improved the vector rendering functions, now bigger pictures
 can be drawn and higher resolutions are supported.  Various fixes.
 - [classiclib] Custom text configuration (font, resolution) can be done at compile time
-for targets with ansi VT support on graphics display. 
+for targets with ansi VT support on graphics display.
 - [newclib] 64-bit integers are now fully supported in the library.
 - [newclib] The fprintf/fscanf cores can now have conversion specifiers individually
 enabled or disabled at compile time.
@@ -474,41 +475,41 @@ comments in translated asm may cause the tools to crash.
 
 z88dk v1.99A - 24.12.2015
 
-- [z80asm] Sections have been introduced for generating memory maps and compiling to 
+- [z80asm] Sections have been introduced for generating memory maps and compiling to
 bankswitched memory.
 - [z80asm] Modern logical operators have been adopted.
 - [z80asm] New scoping keywords PUBLIC, EXTERN and GLOBAL introduced.
-- [z80asm] Relocate files are generated for output binaries for patching assembled code to 
+- [z80asm] Relocate files are generated for output binaries for patching assembled code to
 a new address at load time.
 - [sccz80] Numerous bugfixes.
 - [sdcc] SDCC is now fully supported as alternate C compiler for the new C library.
-- [sdcc] SDCC's generated code is improved by a large set of aggressive peephole rules  
+- [sdcc] SDCC's generated code is improved by a large set of aggressive peephole rules
 (use -SO3 to enable).
 - [sdcc] SDCC's calls to its primitive functions are modified to use callee linkage.
-- [new c lib] New C library written in assembly language from scratch aiming for a subset 
+- [new c lib] New C library written in assembly language from scratch aiming for a subset
 of C11 compliance.  Contains more than 700 functions currently.
-- [new c lib] Stdio made object-oriented so that drivers can inherit library code to 
+- [new c lib] Stdio made object-oriented so that drivers can inherit library code to
 implement features with a minimal amount of additional code.
-- [new c lib] Stdio base classes currently include serial character i/o and terminal i/o 
+- [new c lib] Stdio base classes currently include serial character i/o and terminal i/o
 implementing windows and proportional fonts.  Disk i/o is missing in this release.
-- [new c lib] Unique stdio implementation allows removal of high level buffers without 
+- [new c lib] Unique stdio implementation allows removal of high level buffers without
 affecting performance.
 - [new c lib] Many functions from GNU and POSIX are present beyond the C11 standard.
-- [new c lib] Many unique libraries including some C++ STL containers, data compression, 
-obstacks, game libraries, sound, fzx proportional fonts, etc.  The new C lib contains 
-libraries not present in the classic C lib and vice versa.  Over time the two libraries 
+- [new c lib] Many unique libraries including some C++ STL containers, data compression,
+obstacks, game libraries, sound, fzx proportional fonts, etc.  The new C lib contains
+libraries not present in the classic C lib and vice versa.  Over time the two libraries
 will homogenize.
-- [new c lib] CRTs are supplied for three initial targets:  embedded (generic z80), cpm, 
+- [new c lib] CRTs are supplied for three initial targets:  embedded (generic z80), cpm,
 zx (zx spectrum).  Specialized crts allow immediate compilation without customization by t
 he user.
-- [new c lib] The library and crts are highly configurable at library build time and at 
+- [new c lib] The library and crts are highly configurable at library build time and at
 compile time.  Options allow easy generation of binaries for ROM or RAM targets.
-- [tools] New tool ticks is a command line z80 emulator able to exactly measure execution 
+- [tools] New tool ticks is a command line z80 emulator able to exactly measure execution
 time of a code block.
 - [tools] New tool dzx7 is a decompressor counterpart to zx7.
-- [tools] New tool zx7 is an optimal lz77/lzss data compressor with companion 
+- [tools] New tool zx7 is an optimal lz77/lzss data compressor with companion
 decompression subroutines in the z80 library.
-- [appmake] +rom added to manipulate raw binaries; options include code injection, 
+- [appmake] +rom added to manipulate raw binaries; options include code injection,
 extraction and conversion to intel hex format.
 
 
@@ -518,7 +519,7 @@ z88dkv1.9 12.7.2009
 - [z80asm] the # include identify is no longer required
 - [z80asm] Bug fixes for rabbit support
 - [sccz80] Support for alternate assemblers
-- [zcc] Support for alternate assembler/linkers 
+- [zcc] Support for alternate assembler/linkers
 - [z80nm] Improvements and bug fixes
 - [lib] MSX: Many improvements
 - [lib] TRS80: Graphics support
@@ -556,15 +557,15 @@ z88dkv1.7 15.7.2007
 - [zcpp] End of file fix for win32
 - [zcc] -Cz flag to pass through to appmake
 - [appmake] Support for most z88dk targets
-- [lib/crt0] Support for Newbrain, Rabbit, Sega Master System SMS, TS2068 
+- [lib/crt0] Support for Newbrain, Rabbit, Sega Master System SMS, TS2068
 - [lib] Much of the library rewritten to use FASTCALL and CALLEE linkage
   for faster and small library function calls
-- [lib] malloc library can now allocate from a scattered map of available 
+- [lib] malloc library can now allocate from a scattered map of available
   RAM and supports multiple heaps
 - [lib] balloc library introduced as a block memory allocator
 - [lib] interrupt mode 2 library added
 - [lib] stdlib and strings now completely implemented in assembler and expanded
-- [lib] abstract data types library introduced initially containing linked list, 
+- [lib] abstract data types library introduced initially containing linked list,
   heap, stack and queue algorithms library begun initially containing an implementation
   of the A* search algorithm
 - [lib] ZX Spectrum : SZX basic fcntl driver
@@ -581,7 +582,7 @@ z88dkv1.5 16.12.2002
 - [libs]    Many new machines added
 - [libs]    3 ports now support command line arguments
 
-Basically about 18 months of changes! 
+Basically about 18 months of changes!
 
 
 z88dkv1.33 (sccz80v1.10b72) 11.5.2001
@@ -603,7 +604,7 @@ z88dkv1.33 (sccz80v1.10b72) 11.5.2001
 z88dkv1.32 (sccz80v1.10b71pre4) 6.2.2001
 
 - [sccz80] Fixed long pointer arithmetic
-- [sccz80] Added int blah @ nnnn type as alternative (and better implemented) 
+- [sccz80] Added int blah @ nnnn type as alternative (and better implemented)
   version of int blah (nnnn)
 - [sccz80] Added ability for FP constants to be evaluated at run time
 - [sccz80] Got rid of *annoying* int<->ptr warning when calling func with
@@ -687,7 +688,7 @@ z88dkv1.2p5 (sccz80v1.10b69) xx.3.2000
 - Miniprintf now understands %u, %ld, %lu types
 - ZSock API & doc distributed
 - Package support (both utilisation and creation)
-- More library routines are in C (more efficient than mildly 
+- More library routines are in C (more efficient than mildly
   optimised!)
 - Arrays of pointers to functions now supported
 - ANSI compliance! Well, in literal escapes at least!
@@ -764,7 +765,7 @@ Changes (in no particular order):
   a function differ only a sign - a warning is now emitted
 - New appmake by Dennis Groning that doesn't allocate entire 64k but
   only allocates what is needed (ideal for MSDOS)
-- zcc now uses local files instead of temporary files if issued the 
+- zcc now uses local files instead of temporary files if issued the
   -notemp flag (ideal for MSDOS)
 - Always been there but..feature: Use -cc to get the C code interspersed
   with the assembler, warning: this will clobber some of the opt rules
@@ -777,13 +778,13 @@ Changes (in no particular order):
   (for large switch statements cast to int and old method used (less space
   but slower))
 
-  
+
 z88dkv1.2
 
 Improvements & fixes:
 
 - Fixed strcmp() - it was the worlds most useless one before
-- Added goto functionality to the compiler, but just cos its there don't   
+- Added goto functionality to the compiler, but just cos its there don't
   mean you have to use it!!!
 - Fixed many incorrect warnings that the compiler was giving out
 - Unfixed the "if symbol not found declare as local routine", it reverts to

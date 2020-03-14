@@ -14,7 +14,7 @@ LABEL Version="0.8" \
 ENV Z88DK_PATH="/opt/z88dk" \
     SDCC_PATH="/tmp/sdcc"
 
-RUN apk add --no-cache build-base libxml2 m4 \ 
+RUN apk add --no-cache build-base libxml2 m4 \
     && apk add --no-cache -t .build_deps bison flex libxml2-dev git subversion boost-dev texinfo \
     && git clone --depth 1 --recursive https://github.com/z88dk/z88dk.git ${Z88DK_PATH}
 
@@ -25,7 +25,7 @@ RUN apk add --no-cache build-base libxml2 m4 \
 RUN cd ${Z88DK_PATH} \
     && chmod 777 build.sh \
     && ./build.sh \
-    && svn checkout -r 11535 https://svn.code.sf.net/p/sdcc/code/trunk/sdcc ${SDCC_PATH} \
+    && svn checkout -r 11556 https://svn.code.sf.net/p/sdcc/code/trunk/sdcc ${SDCC_PATH} \
     && cd ${SDCC_PATH} \
     && patch -p0 < ${Z88DK_PATH}/src/zsdcc/sdcc-z88dk.patch \
     && ./configure \
