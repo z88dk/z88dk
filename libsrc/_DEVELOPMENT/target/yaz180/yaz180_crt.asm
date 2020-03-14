@@ -14,24 +14,40 @@ ENDIF
 
 IF !DEFINED_startup
 	defc	DEFINED_startup = 1
-	defc startup = 16
+	defc startup = 0
 	IFNDEF startup
 	ENDIF
 ENDIF
 
 
-IF !DEFINED_CLIB_OPT_PRINTF
-	defc	DEFINED_CLIB_OPT_PRINTF = 1
-	defc CLIB_OPT_PRINTF = 0x15404642
-	IFNDEF CLIB_OPT_PRINTF
+IF !DEFINED_REGISTER_SP 
+	defc	DEFINED_REGISTER_SP  = 1
+	defc REGISTER_SP  = 0xffde
+	IFNDEF REGISTER_SP 
 	ENDIF
 ENDIF
 
 
-IF !DEFINED_CLIB_OPT_PRINTF_2
-	defc	DEFINED_CLIB_OPT_PRINTF_2 = 1
-	defc CLIB_OPT_PRINTF_2 = 0
-	IFNDEF CLIB_OPT_PRINTF_2
+IF !DEFINED_CRT_ENABLE_RST 
+	defc	DEFINED_CRT_ENABLE_RST  = 1
+	defc CRT_ENABLE_RST  = 0xfe
+	IFNDEF CRT_ENABLE_RST 
+	ENDIF
+ENDIF
+
+
+IF !DEFINED_CRT_ENABLE_TRAP 
+	defc	DEFINED_CRT_ENABLE_TRAP  = 1
+	defc CRT_ENABLE_TRAP  = 0x1
+	IFNDEF CRT_ENABLE_TRAP 
+	ENDIF
+ENDIF
+
+
+IF !DEFINED_CLIB_MALLOC_HEAP_SIZE 
+	defc	DEFINED_CLIB_MALLOC_HEAP_SIZE  = 1
+	defc CLIB_MALLOC_HEAP_SIZE  = 0x2700
+	IFNDEF CLIB_MALLOC_HEAP_SIZE 
 	ENDIF
 ENDIF
 
@@ -44,7 +60,7 @@ IFNDEF startup
 
    ; startup undefined so select a default
 
-   defc startup = 16
+   defc startup = 0
 
 ENDIF
 
@@ -60,18 +76,12 @@ ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; app drivers;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
    ; yabios asci0 drivers installed on stdin, stdout, stderr
    ; yabios asci1 drivers installed on ttyin, ttyout, ttyerr
 
    IFNDEF __CRTCFG
 
-      defc __CRTCFG = 1
+      defc __CRTCFG = 0
 
    ENDIF
 
@@ -86,8 +96,8 @@ ENDIF
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                yaz180 application target                  ;;
-;; generated from target/yaz180/startup/yaz180_crt_16.asm.m4 ;;
+;;                   yaz180 ROM target                       ;;
+;; generated from target/yaz180/startup/yaz180_crt_0.asm.m4  ;;
 ;;                                                           ;;
 ;;                  flat 64k address space                   ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -97,7 +107,6 @@ ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "config_yaz180_public.inc"
-include "config_yabios_def.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CRT AND CLIB CONFIGURATION ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1766,7 +1775,16 @@ EXTERN _main
 IF __crt_include_preamble
 
    include "crt_preamble.asm"
-   SECTION CODE
+
+ENDIF
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; PAGE ZERO ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+IF (__crt_org_code = 0) && !(__page_zero_present)
+
+   include "../crt_page_zero_z180.inc"
 
 ENDIF
 
@@ -1799,6 +1817,12 @@ __Restart_2:
 
       push hl                  ; argv
       push bc                  ; argc
+
+   ENDIF
+
+   IF __crt_include_preamble
+
+      include "crt_preamble.asm"
 
    ENDIF
 
@@ -1881,6 +1905,12 @@ include "../clib_variables.inc"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../clib_stubs.inc"
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; app drivers;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 
