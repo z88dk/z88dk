@@ -10,7 +10,13 @@ Detailed but incomplete changelist:
 - [classic] +cpm: Vector06c disc creation
 - [classic] +svi: Generic console now works again
 - [classic] +zx: The enter key now works with ROM input
+- [classic] +vector06c: New target
+- [classic] +homelab2: New target for the Homelab 2 machine
+- [classic] +homelab: New target for the Homelab 3/4 machine
+- [newlib] +zx WYZTRacker is now available
 - [sccz80] genmath/math48: Fixes to builtin ldexp implementation
+- [sccz80] Bitfields now work and on the 8080
+- [sccz80] Code generator fixes for gbz80
 - [z80asm] db/dw/ds etc synonyms are now accepted
 - [zsdcc] Upgraded to SDCC 4.0.0 r11556 (bugfixes)
 
