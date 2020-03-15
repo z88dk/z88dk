@@ -127,7 +127,7 @@ __Continue:
 
 IF __crt_include_preamble
 
-   include "crt_preamble.asm"
+   include "crt_preamble.asm"  ; user provided preamble
    SECTION CODE
 
 ENDIF
@@ -146,56 +146,56 @@ __Restart:
    include "../crt_init_sp.inc"
 
    ; command line
-   
-   IF __crt_enable_commandline = 1
-   
-      include "../crt_cmdline_empty.inc"
-   
-   ENDIF
-   
-   IF __crt_enable_commandline >= 3
-      
-      ; copy command line words from default dma buffer to stack
-      ; must do this as the default dma buffer may be used by the cpm program
 
-      EXTERN l_command_line_parse
+IF __crt_enable_commandline = 1
 
-      ld hl,0x0080             ; default dma buffer
+   include "../crt_cmdline_empty.inc"
 
-      ld c,(hl)
-      ld b,h                   ; bc = length of command line
+ENDIF
 
-      inc l
-      ex de,hl
+IF __crt_enable_commandline >= 3
 
-      call l_command_line_parse
-      
-      ; cpm does not supply program name in command line
-      ; so place empty string in argv[0] instead
-      
-      ; bc = int argc
-      ; hl = char *argv[]
-      ; de = & empty string
-      ; bc'= num chars in redirector
-      ; hl'= char *redirector
-      
-      push de                  ; empty string added to front of argv[]
-      
-      dec hl
-      dec hl                   ; char *argv[] adjusted to include empty string at index 0
-      
-      inc c                    ; argc++
-      
-   ENDIF
+   ; copy command line words from default dma buffer to stack
+   ; must do this as the default dma buffer may be used by the cpm program
+
+   EXTERN l_command_line_parse
+
+   ld hl,0x0080                ; default dma buffer
+
+   ld c,(hl)
+   ld b,h                      ; bc = length of command line
+
+   inc l
+   ex de,hl
+
+   call l_command_line_parse
+
+   ; cpm does not supply program name in command line
+   ; so place empty string in argv[0] instead
+
+   ; bc = int argc
+   ; hl = char *argv[]
+   ; de = & empty string
+   ; bc'= num chars in redirector
+   ; hl'= char *redirector
+
+   push de                     ; empty string added to front of argv[]
+
+   dec hl
+   dec hl                      ; char *argv[] adjusted to include empty string at index 0
+
+   inc c                       ; argc++
+
+ENDIF
 
 __Restart_2:
 
-   IF __crt_enable_commandline >= 1
+IF __crt_enable_commandline >= 1
 
-      push hl                  ; argv
-      push bc                  ; argc
+   push hl                     ; argv
+   push bc                     ; argc
 
-   ENDIF
+ENDIF
 
    ; initialize data section
 
@@ -206,7 +206,7 @@ __Restart_2:
    include "../clib_init_bss.inc"
 
    ; interrupt mode
-   
+
    include "../crt_set_interrupt_mode.inc"
 
 SECTION code_crt_init          ; user and library initialization
@@ -220,33 +220,33 @@ SECTION code_crt_main
    include "../crt_start_ei.inc"
 
    ; call user program
-   
+
    call _main                  ; hl = return status
 
    ; run exit stack
 
-   IF __clib_exit_stack_size > 0
+IF __clib_exit_stack_size > 0
 
-      EXTERN asm_exit
-      jp asm_exit              ; exit function jumps to __Exit
+   EXTERN asm_exit
+   jp asm_exit                 ; exit function jumps to __Exit
 
-   ENDIF
+ENDIF
 
 __Exit:
 
-   IF !((__crt_on_exit & 0x10000) && (__crt_on_exit & 0x8))
+IF !((__crt_on_exit & 0x10000) && (__crt_on_exit & 0x8))
 
-      ; not restarting
-      
-      push hl                  ; save return status
+   ; not restarting
 
-   ENDIF
+   push hl                     ; save return status
+
+ENDIF
 
 SECTION code_crt_exit          ; user and library cleanup
 SECTION code_crt_return
 
    ; close files
-   
+
    include "../clib_close.inc"
 
    ; terminate
