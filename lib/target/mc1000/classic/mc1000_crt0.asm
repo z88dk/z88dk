@@ -33,6 +33,11 @@
         PUBLIC    l_dcal          ;jp(hl)
 
 
+	; Force the interrupt handler to be registered
+	EXTERN	asm_im1_handler
+	defc	IMPORT_asm_im1_handler = asm_im1_handler
+
+
         defc    CONSOLE_COLUMNS = 32
 IF NEED_ansiterminal
 	defc	CONSOLE_ROWS = 24
@@ -247,11 +252,6 @@ ENDIF
 
 
 start:
-
-	ld	hl,($39)
-	ld	(irq_hndl+1),hl
-	ld	hl,mc_irq
-	ld	($39),hl
 	
 	;CALL $CEBA
 	;LD ($0128),A
@@ -311,36 +311,11 @@ IF (startup=2)
         ;jp      $C000  ; BASIC entry (COLD RESET)
         jp      $C003  ; BASIC entry (WARM RESET)
 ELSE
-		ld	hl,(irq_hndl+1)
-		ld	($39),hl
-		ret
+	ret
 ENDIF
 
 l_dcal:
         jp      (hl)
-
-
-; IRQ stub to get a time counter
-mc_irq:
-		di
-		push hl
-		push af
-		ld	hl,(FRAMES)
-		inc	hl
-		ld	(FRAMES),hl
-		ld	a,h
-		or	l
-		jr	nz,irq_hndl
-		ld	hl,(FRAMES+2)
-		inc	hl
-		ld	(FRAMES+2),hl
-irq_hndl:
-		ld	hl,0
-		;jp	$7f
-		pop af
-		ex	(sp),hl
-		ret
-
 
 		
 ; If we were given an address for the BSS then use it
@@ -351,14 +326,4 @@ ENDIF
 
 	INCLUDE "crt/classic/crt_runtime_selection.asm"
 	INCLUDE	"crt/classic/crt_section.asm"
-
-	
-	SECTION	bss_crt
-	
-        PUBLIC	FRAMES
-
-		
-FRAMES:
-		defw	0
-		defw	0
 
