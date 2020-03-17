@@ -10,8 +10,6 @@
 ; Using RC2014 LUT Module
 ;
 ;------------------------------------------------------------------------------
-;
-; 2020 feilipu
 
 INCLUDE "config_private.inc"
 
@@ -35,8 +33,8 @@ l_lut_mulu_16_16x8:
     ; uses  : af, bc, de, hl
 
     ld b,l
+    
     ld c,__IO_LUT_OPERAND_LATCH ; operand latch address
-
     out (c),e                   ; multiply lsb
     in l,(c)                    ; lsb
     inc c
