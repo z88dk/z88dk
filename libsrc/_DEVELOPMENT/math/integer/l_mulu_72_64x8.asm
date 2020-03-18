@@ -30,7 +30,7 @@ IF __CPU_Z80N__ && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
 
 ELSE
 
-IF __CPU_Z80__ && __IO_LUT_MODULE_AVAILABLE
+IF __IO_LUT_MODULE_AVAILABLE
 
    EXTERN l_lut_mulu_72_64x8
    defc l_mulu_72_64x8 = l_lut_mulu_72_64x8

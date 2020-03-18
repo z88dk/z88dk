@@ -22,20 +22,20 @@ l_lut_mulu_16_16x16:
 
     ; multiplication of two 16-bit numbers into a 16-bit product
     ;
-    ; enter : hl = 16-bit multiplier
-    ;         de = 16-bit multiplicand
+    ; enter : hl = 16-bit multiplier   = y
+    ;         de = 16-bit multiplicand = x
     ;
     ; exit  : hl = 16-bit product
     ;         carry reset
     ;
     ; uses  : af, bc, de, hl
 
-    ld c,e                      ; c = xl
-    ld b,l                      ; b = yl
-    push bc                     ; preserve yl*xl
+    ld c,e                      ; 4  c = xl
+    ld b,l                      ; 4  b = yl
+    push bc                     ; 11 preserve yl*xl
 
-    ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address   
-                                
+    ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
+
                                 ; yh*xl
     ld b,h                      ; 4  operand Y in B
     out (c),e                   ; 12 operand X from E
@@ -46,8 +46,8 @@ l_lut_mulu_16_16x16:
     out (c),l                   ; 12 operand X from L
     in a,(c)                    ; 12 result Z LSB to A
 
-    add a,e                     ; add cross products LSB
-    pop hl                      ; restore yl*xl
+    add a,e                     ; 4  add cross products LSB
+    pop hl                      ; 10 restore yl*xl
 
                                 ; yl*xl
     ld b,h                      ; 4  operand Y in B
@@ -57,8 +57,8 @@ l_lut_mulu_16_16x16:
     inc c                       ; 4  result MSB address
     in h,(c)                    ; 12 result Z MSB to H
 
-    add a,h                     ; add to msb final
-    ld h,a                      ; hl = final
+    add a,h                     ; 4  add to msb final
+    ld h,a                      ; 4  hl = final
 
-    xor a
+    xor a                       ; 4  reset carry
     ret

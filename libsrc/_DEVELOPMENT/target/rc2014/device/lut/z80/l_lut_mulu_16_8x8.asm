@@ -30,9 +30,9 @@ l_lut_mulu_16_8x8:
     ;
     ; uses  : af, bc, de, hl
 
-    ld b,e                      ; 4  operand Y to B
-    
     ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
+
+    ld b,e                      ; 4  operand Y to B
     out (c),l                   ; 12 operand X from L
     in l,(c)                    ; 12 result Z LSB to L
     inc c                       ; 4  result MSB address

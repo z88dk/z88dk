@@ -30,10 +30,10 @@ l_lut_mulu_72_64x8:
    ;
    ; uses  : af, bc, de, hl, bc', de', hl'
 
+    ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
 
     ld b,a                      ; 4  operand X in B
 
-    ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
     out (c),l                   ; 12 operand Y0 from L
     in l,(c)                    ; 12 result LSB to A
     inc c                       ; 4  result MSB address
@@ -42,64 +42,64 @@ l_lut_mulu_72_64x8:
     dec c                       ; 4  operand latch address
     out (c),h                   ; 12 operand Y1 from H
     in h,(c)                    ; 12 result LSB to H
-    add a,h
-    ld h,a
+    add a,h                     ; 4
+    ld h,a                      ; 4
     inc c                       ; 4  result MSB address
     in a,(c)                    ; 12 result MSB to A
 
     dec c                       ; 4  operand latch address
     out (c),e                   ; 12 operand Y2 from E
     in e,(c)                    ; 12 result LSB to E
-    adc a,e
-    ld e,a
+    adc a,e                     ; 4
+    ld e,a                      ; 4
     inc c                       ; 4  result MSB address
     in a,(c)                    ; 12 result MSB to A
 
     dec c                       ; 4  operand latch address
     out (c),d                   ; 12 operand Y3 from D
     in d,(c)                    ; 12 result LSB to D
-    adc a,d
-    ld d,a
+    adc a,d                     ; 4
+    ld d,a                      ; 4
     inc c                       ; 4  result MSB address
     in a,(c)                    ; 12 result MSB to A
 
-    push bc
+    push bc                     ; 11
 
-    exx
-    pop bc
+    exx                         ; 4
+    pop bc                      ; 10
 
     dec c                       ; 4  operand latch address
     out (c),l                   ; 12 operand Y4 from L'
     in l,(c)                    ; 12 result LSB to L'
-    adc a,l
-    ld l,a
+    adc a,l                     ; 4
+    ld l,a                      ; 4
     inc c                       ; 4  result MSB address
     in a,(c)                    ; 12 result MSB to A
 
     dec c                       ; 4  operand latch address
     out (c),h                   ; 12 operand Y5 from H
     in h,(c)                    ; 12 result LSB to H
-    adc a,h
-    ld h,a
+    adc a,h                     ; 4
+    ld h,a                      ; 4
     inc c                       ; 4  result MSB address
     in a,(c)                    ; 12 result MSB to A
 
     dec c                       ; 4  operand latch address
     out (c),e                   ; 12 operand Y6 from E
     in e,(c)                    ; 12 result LSB to E
-    adc a,e
-    ld e,a
+    adc a,e                     ; 4
+    ld e,a                      ; 4
     inc c                       ; 4  result MSB address
     in a,(c)                    ; 12 result MSB to A
 
     dec c                       ; 4  operand latch address
     out (c),d                   ; 12 operand Y7 from D
     in d,(c)                    ; 12 result LSB to D
-    adc a,d
-    ld d,a
+    adc a,d                     ; 4
+    ld d,a                      ; 4
     inc c                       ; 4  result MSB address
     in a,(c)                    ; 12 result MSB to A
-    adc a,0                     ;    final carry
+    adc a,0                     ; 7  final carry
 
-    exx
+    exx                         ; 4
     ret

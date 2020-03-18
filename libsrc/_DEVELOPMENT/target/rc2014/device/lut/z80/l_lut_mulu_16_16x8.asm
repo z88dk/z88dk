@@ -18,7 +18,7 @@ SECTION code_math
 
 PUBLIC l_lut_mulu_16_16x8
 
-   ex de,hl
+    ex de,hl
 
 l_lut_mulu_16_16x8:
 
@@ -32,9 +32,9 @@ l_lut_mulu_16_16x8:
     ;
     ; uses  : af, bc, de, hl
 
-    ld b,l
-    
     ld c,__IO_LUT_OPERAND_LATCH ; operand latch address
+
+    ld b,l
     out (c),e                   ; multiply lsb
     in l,(c)                    ; lsb
     inc c

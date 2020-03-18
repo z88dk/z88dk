@@ -30,7 +30,7 @@ l_mulu_16_8x8:
 
 ELSE
 
-IF __CPU_Z80__ && __IO_LUT_MODULE_AVAILABLE
+IF __IO_LUT_MODULE_AVAILABLE
 
    EXTERN l_lut_mulu_16_8x8
    defc l_mulu_16_8x8 = l_lut_mulu_16_8x8

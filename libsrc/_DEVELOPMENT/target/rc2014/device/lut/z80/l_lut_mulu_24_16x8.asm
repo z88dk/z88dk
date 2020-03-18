@@ -30,16 +30,17 @@ l_lut_mulu_24_16x8:
     ;
     ; uses  : af, bc, de, hl
 
-    ld b,e
-    
     ld c,__IO_LUT_OPERAND_LATCH ; operand latch address
-    out (c),l                   ; multiply lsb
+
+    ld b,e                      ; multiplicand to B
+
+    out (c),l                   ; multiplier lsb
     in l,(c)                    ; lsb
     inc c
     in a,(c)                    ; msb
 
     dec c                       ; operand latch address
-    out (c),h
+    out (c),h                   ; multiplier msb
     in h,(c)                    ; lsb
 
     add a,h                     ; add to msb final
