@@ -116,8 +116,8 @@ IF __IO_LUT_MODULE_AVAILABLE == 0
 ELSE
 
 ;;; MLT HL (BC) ;;;;;;;;;;;;;;;;; b*c 2^8
-    ld b,h                      ; 4  operand Y in B
     ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
+    ld b,h                      ; 4  operand Y in B
     out (c),l                   ; 12 operand X from L
     in l,(c)                    ; 12 result Z LSB to L
     inc c                       ; 4  result MSB address
@@ -136,15 +136,15 @@ ELSE
 
     push bc
 ;;; MLT HL (BC) ;;;;;;;;;;;;;;;;; a*c 2^16
-    ld b,h                      ; 4  operand Y in B
     ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
+    ld b,h                      ; 4  operand Y in B
     out (c),l                   ; 12 operand X from L
     in l,(c)                    ; 12 result Z LSB to L
     inc c                       ; 4  result MSB address
     in h,(c)                    ; 12 result Z MSB to H
 ;;; MLT DE (BC) ;;;;;;;;;;;;;;;;; b*b 2^16
-    ld b,d                      ; 4  operand Y in B
     dec c                       ; 4  operand latch address
+    ld b,d                      ; 4  operand Y in B
     out (c),e                   ; 12 operand X from E
     in e,(c)                    ; 12 result Z LSB to E
     inc c                       ; 4  result MSB address
@@ -167,8 +167,8 @@ ELSE
     
     push bc
 ;;; MLT DE (BC) ;;;;;;;;;;;;;;;;; a*b 2^24
-    ld b,d                      ; 4  operand Y in B
     ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
+    ld b,d                      ; 4  operand Y in B
     out (c),e                   ; 12 operand X from E
     in e,(c)                    ; 12 result Z LSB to E
     inc c                       ; 4  result MSB address
@@ -192,8 +192,8 @@ ELSE
     pop de                      ; aa
     push bc
 ;;; MLT DE (BC) ;;;;;;;;;;;;;;;;; a*a 2^32
-    ld b,d                      ; 4  operand Y in B
     ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
+    ld b,d                      ; 4  operand Y in B
     out (c),e                   ; 12 operand X from E
     in e,(c)                    ; 12 result Z LSB to E
     inc c                       ; 4  result MSB address

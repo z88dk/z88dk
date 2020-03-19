@@ -73,13 +73,12 @@ l_lut_mulu_32_16x16:
     ld a,d                      ; 4
     add a,l                     ; 4
     ld d,a                      ; 4  de = final LSW
-    
+
     ld l,h                      ; 4  LSB of MSW from cross products
     ld h,b                      ; 4  carry from cross products
 
     pop bc                      ; 10 restore yh*xh
 
-    
 ;;; MLT BC (xAF) ;;;;;;;;;;;;;;;; xh*yh
     ld a,c                      ; 4  operand Y in A
     ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address

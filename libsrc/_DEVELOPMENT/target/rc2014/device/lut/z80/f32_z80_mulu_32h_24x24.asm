@@ -152,16 +152,16 @@ ELSE
     ld a,h
     ld h,e
     ld e,a
-;;; MLT HL (BC) ;;;;;;;;;;;;;;;;; b*e 2^8
-    ld b,h                      ; 4  operand Y in B
+;;; MLT HL (BC) ;;;;;;;;;;;;;;;;; b*f 2^8
     ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
+    ld b,h                      ; 4  operand Y in B
     out (c),l                   ; 12 operand X from L
     in l,(c)                    ; 12 result Z LSB to L
     inc c                       ; 4  result MSB address
     in h,(c)                    ; 12 result Z MSB to H
-;;; MLT DE (BC) ;;;;;;;;;;;;;;;;; c*f 2^8
-    ld b,d                      ; 4  operand Y in B
+;;; MLT DE (BC) ;;;;;;;;;;;;;;;;; c*e 2^8
     dec c                       ; 4  operand latch address
+    ld b,d                      ; 4  operand Y in B
     out (c),e                   ; 12 operand X from E
     in e,(c)                    ; 12 result Z LSB to E
     inc c                       ; 4  result MSB address
@@ -177,25 +177,22 @@ ELSE
 
     pop de                      ; ef
     pop hl                      ; ab
-    ld a,d
-    ld d,h
-    ld h,a
 
     push bc
-;;; MLT HL (BC) ;;;;;;;;;;;;;;;;; a*f 2^16
-    ld b,h                      ; 4  operand Y in B
+;;; MLT DL (BC) ;;;;;;;;;;;;;;;;; a*f 2^16
     ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
+    ld b,d                      ; 4  operand Y in B
     out (c),l                   ; 12 operand X from L
     in l,(c)                    ; 12 result Z LSB to L
     inc c                       ; 4  result MSB address
-    in h,(c)                    ; 12 result Z MSB to H
-;;; MLT DE (BC) ;;;;;;;;;;;;;;;;; e*b 2^16
-    ld b,d                      ; 4  operand Y in B
+    in d,(c)                    ; 12 result Z MSB to D
+;;; MLT HE (BC) ;;;;;;;;;;;;;;;;; e*b 2^16
     dec c                       ; 4  operand latch address
+    ld b,h                      ; 4  operand Y in B
     out (c),e                   ; 12 operand X from E
     in e,(c)                    ; 12 result Z LSB to E
     inc c                       ; 4  result MSB address
-    in d,(c)                    ; 12 result Z MSB to D
+    in h,(c)                    ; 12 result Z MSB to H
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
     pop bc
 
@@ -207,8 +204,8 @@ ELSE
 
     pop de                      ; dc
 ;;; MLT DE (BC) ;;;;;;;;;;;;;;;;; d*c 2^16
-    ld b,d                      ; 4  operand Y in B
     ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
+    ld b,d                      ; 4  operand Y in B
     out (c),e                   ; 12 operand X from E
     in e,(c)                    ; 12 result Z LSB to E
     inc c                       ; 4  result MSB address
@@ -225,25 +222,22 @@ ELSE
     pop de                      ; ab
     pop hl                      ; de
     push af                     ; l on stack
-    ld a,d
-    ld d,h
-    ld h,a
 
     push bc
-;;; MLT HL (BC) ;;;;;;;;;;;;;;;;; d*b 2^24
-    ld b,h                      ; 4  operand Y in B
+;;; MLT DL (BC) ;;;;;;;;;;;;;;;;; d*b 2^24
     ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
+    ld b,d                      ; 4  operand Y in B
     out (c),l                   ; 12 operand X from L
     in l,(c)                    ; 12 result Z LSB to L
     inc c                       ; 4  result MSB address
-    in h,(c)                    ; 12 result Z MSB to H
-;;; MLT DE (BC) ;;;;;;;;;;;;;;;;; a*e 2^24
-    ld b,d                      ; 4  operand Y in B
+    in d,(c)                    ; 12 result Z MSB to D
+;;; MLT HE (BC) ;;;;;;;;;;;;;;;;; a*e 2^24
     dec c                       ; 4  operand latch address
+    ld b,h                      ; 4  operand Y in B
     out (c),e                   ; 12 operand X from E
     in e,(c)                    ; 12 result Z LSB to E
     inc c                       ; 4  result MSB address
-    in d,(c)                    ; 12 result Z MSB to D
+    in h,(c)                    ; 12 result Z MSB to H
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     pop bc
 
@@ -262,8 +256,8 @@ ELSE
     pop de                      ; ad
     push bc
 ;;; MLT DE (BC) ;;;;;;;;;;;;;;;;; a*d 2^32
-    ld b,d                      ; 4  operand Y in B
     ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
+    ld b,d                      ; 4  operand Y in B
     out (c),e                   ; 12 operand X from E
     in e,(c)                    ; 12 result Z LSB to E
     inc c                       ; 4  result MSB address
