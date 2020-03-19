@@ -194,7 +194,7 @@ IF __IO_LUT_MODULE_AVAILABLE == 0
     ld l,c                      ; p4
     ret                         ; exit  : DEHL = 32-bit product
 
-ELSE
+ELSE ;  feilipu, 2020 February
 
     ; start doing the p3 byte
 

@@ -113,7 +113,7 @@ IF __IO_LUT_MODULE_AVAILABLE == 0
     ld e,c                      ; exit  : HLDE  = 32-bit product
     ret
 
-ELSE
+ELSE ;  feilipu, 2020 February
 
 ;;; MLT HL (BC) ;;;;;;;;;;;;;;;;; b*c 2^8
     ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
