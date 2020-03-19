@@ -5,6 +5,7 @@ target/rc2014/device/lut/z80/l_lut_mulu_16_16x8
 target/rc2014/device/lut/z80/l_lut_mulu_16_16x16
 target/rc2014/device/lut/z80/l_lut_mulu_24_16x8
 target/rc2014/device/lut/z80/l_lut_mulu_32_16x16
+target/rc2014/device/lut/z80/l_lut_mulu_32_32x32
 target/rc2014/device/lut/z80/l_lut_mulu_40_32x8
 target/rc2014/device/lut/z80/l_lut_mulu_72_64x8
 

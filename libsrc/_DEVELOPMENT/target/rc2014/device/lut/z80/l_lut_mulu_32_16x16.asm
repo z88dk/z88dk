@@ -77,16 +77,17 @@ l_lut_mulu_32_16x16:
     ld l,h                      ; 4  LSB of MSW from cross products
     ld h,b                      ; 4  carry from cross products
 
-    pop bc                      ; 10 restore yh*xh
+    ex (sp),hl                  ; 19 restore y1*x1, stack interim p3 p2
 
-;;; MLT BC (xAF) ;;;;;;;;;;;;;;;; xh*yh
-    ld a,c                      ; 4  operand Y in A
-    ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
-    out (c),a                   ; 12 operand Y from A
-    in a,(c)                    ; 12 result Z LSB to A
+;;; MLT HL (xBC) ;;;;;;;;;;;;;;;; x1*y1
+    dec c                       ; 4  operand latch address
+    ld b,h                      ; 4  operand Y in B
+    out (c),l                   ; 12 operand X from L
+    in l,(c)                    ; 12 result Z LSB to L
     inc c                       ; 4  result MSB address
-    in b,(c)                    ; 12 result Z MSB to B
-    ld c,a                      ; 4  result Z LSB to C
+    in h,(c)                    ; 12 result Z MSB to H
+    
+    pop bc                      ; 10 destack interim p3 p2
 
     adc hl,bc                   ; 15 hl = final MSW
     ex de,hl                    ; 4  dehl = final product
