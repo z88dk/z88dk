@@ -15,14 +15,17 @@ IF __IO_LUT_MODULE_AVAILABLE
 l_mulu_de:
 
     push bc                     ; 11 preserve BC
-    ld b,d                      ; 4  operand Y in B
+
     ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
+    
+    ld b,d                      ; 4  operand Y from D
     out (c),e                   ; 12 operand X from E
     in e,(c)                    ; 12 result Z LSB to E
     inc c                       ; 4  result MSB address
     in d,(c)                    ; 12 result Z MSB to D
+
     pop bc                      ; 10 restore BC
-    ret
+    ret                         ; 10
 
 ELSE
 

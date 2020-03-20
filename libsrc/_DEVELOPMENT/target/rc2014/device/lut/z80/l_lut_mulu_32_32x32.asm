@@ -16,7 +16,26 @@ INCLUDE "config_private.inc"
 SECTION code_clib
 SECTION code_math
 
+EXTERN l_lut_mulu_32_16x16
+
 PUBLIC l_lut_mulu_32_32x32, l0_lut_mulu_32_32x32
+
+l0_lut_mulu_32_16x16:
+
+    ; multiplication of two 16-bit numbers into a 32-bit product
+    ;
+    ; enter : hl'= 16-bit multiplier   = y
+    ;         hl = 16-bit multiplicand = x
+    ;
+    ; exit  : dehl = 32-bit product
+    ;         carry reset
+    ;
+    ; uses  : af, hl, bc', de', hl'
+
+    push hl
+    exx
+    pop de
+    jp l_lut_mulu_32_16x16
 
 l_lut_mulu_32_32x32:
 
@@ -29,6 +48,15 @@ l_lut_mulu_32_32x32:
     ;         carry reset
     ;
     ; uses  : af, bc, de, hl, bc', de', hl'
+
+    xor a
+    or e
+    or d
+
+    exx
+    or e
+    or d
+    jr Z,l0_lut_mulu_32_16x16   ;   demote if both are uint16_t
 
     push hl
     exx
@@ -138,19 +166,18 @@ l0_lut_mulu_32_32x32:
     pop bc                      ; 10 destack interim p3 p2
 
     adc hl,bc                   ; HL = interim MSW p3 p2
-                                ; 32_16x16 = HLDE
-
-    push hl                     ; stack interim p3 p2
     ex de,hl                    ; DEHL = end of 32_16x16
+
+    push de                     ; stack interim p3 p2
 
     ; continue doing the p2 byte
 
     exx                         ; now we're working in the high order bytes
                                 ; DEHL' = end of 32_16x16
 
-    pop hl                      ; destack interim p3 p2
-    pop de                      ; x0 y0
-    ex (sp),hl                  ; x2 y2, stack interim p3 p2
+    pop hl                      ; 10 destack interim p3 p2
+    pop de                      ; 10 x0 y0
+    ex (sp),hl                  ; 19 x2 y2, stack interim p3 p2
 
 ;;; MLT HE (xBC) ;;;;;;;;;;;;;;;; x2*y0
     ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
@@ -168,14 +195,14 @@ l0_lut_mulu_32_32x32:
     inc c                       ; 4  result MSB address
     in d,(c)                    ; 12 result Z MSB to D
 
-    add hl,de
-    pop de                      ; destack interim p3 p2
-    add hl,de
+    add hl,de                   ; 11
+    pop de                      ; 10 destack interim p3 p2
+    add hl,de                   ; 11
 
     ; start doing the p3 byte
 
-    pop de                      ; y3 y2
-    ex (sp),hl                  ; x1 x0, stack interim p3 p2
+    pop de                      ; 10 y3 y2
+    ex (sp),hl                  ; 19 x1 x0, stack interim p3 p2
 
 ;;; MLT HE (xBC) ;;;;;;;;;;;;;;;; x1*y2
     dec c                       ; 4  operand latch address
@@ -188,15 +215,15 @@ l0_lut_mulu_32_32x32:
     out (c),l                   ; 12 operand X from L
     in l,(c)                    ; 12 result Z LSB to L
 
-    ld a,l                      ; add low bytes of products
-    add a,e
+    ld a,l                      ; 4  add low bytes of products
+    add a,e                     ; 4
  
-    pop hl                      ; destack interim p3 p2
-    add a,h
-    ld h,a                      ; return new p3, and p2
+    pop hl                      ; 10 destack interim p3 p2
+    add a,h                     ; 4
+    ld h,a                      ; 4  return new p3, and p2
 
-    pop de                      ; y1 y0
-    ex (sp),hl                  ; x3 x2, stack interim p3 p2
+    pop de                      ; 10 y1 y0
+    ex (sp),hl                  ; 19 x3 x2, stack interim p3 p2
 
 ;;; MLT HE (xBC) ;;;;;;;;;;;;;;;; x3*y0
     ld b,h                      ; 4  operand Y in B
@@ -208,17 +235,17 @@ l0_lut_mulu_32_32x32:
     out (c),l                   ; 12 operand X from L
     in l,(c)                    ; 12 result Z LSB to L
 
-    ld a,l                      ; add low bytes of products
-    add a,e
+    ld a,l                      ; 4  add low bytes of products
+    add a,e                     ; 4
  
-    pop hl                      ; destack interim p3 p2
-    add a,h
-    ld h,a                      ; put final p3 back in H
+    pop hl                      ; 10 destack interim p3 p2
+    add a,h                     ; 4
+    ld h,a                      ; 4 put final p3 back in H
 
-    push hl
+    push hl                     ; 11
 
-    exx                         ; now we're working in the low order bytes, again
-    pop de
-    xor a                       ; carry reset
-    ret                         ; exit  : DEHL = 32-bit product
+    exx                         ; 4  now we're working in the low order bytes, again
+    pop de                      ; 10
+    xor a                       ; 4  carry reset
+    ret                         ;    exit  : DEHL = 32-bit product
 

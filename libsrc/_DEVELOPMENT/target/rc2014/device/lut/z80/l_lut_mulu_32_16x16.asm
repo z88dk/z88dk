@@ -30,15 +30,15 @@ l_lut_mulu_32_16x16:
     ;
     ; uses  : af, bc, de, hl
 
-    ld c,d                      ; 4  c = xh
-    ld b,h                      ; 4  b = yh
-    push bc                     ; 11 preserve yh*xh
+    ld c,d                      ; 4  c = x1
+    ld b,h                      ; 4  b = y1
+    push bc                     ; 11 preserve y1*x1
 
-    ld c,e                      ; 4  c = xl
-    ld b,l                      ; 4  b = yl
-    push bc                     ; 11 preserve yl*xl
+    ld c,e                      ; 4  c = x0
+    ld b,l                      ; 4  b = y0
+    push bc                     ; 11 preserve y0*x0
 
-;;; MLT HE (xBC) ;;;;;;;;;;;;;;;; yh*xl
+;;; MLT HE (xBC) ;;;;;;;;;;;;;;;; y1*x0
     ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
     ld b,h                      ; 4  operand Y in B
     out (c),e                   ; 12 operand X from E
@@ -46,7 +46,7 @@ l_lut_mulu_32_16x16:
     inc c                       ; 4  result MSB address
     in h,(c)                    ; 12 result Z MSB to H
 
-;;; MLT DL (xBC) ;;;;;;;;;;;;;;;; xh*yl
+;;; MLT DL (xBC) ;;;;;;;;;;;;;;;; x1*y0
     dec c                       ; 4  operand latch address
     ld b,d                      ; 4  operand Y in B
     out (c),l                   ; 12 operand X from L
@@ -58,9 +58,9 @@ l_lut_mulu_32_16x16:
     add hl,de                   ; 11 add cross products
     adc a,a                     ; 4  capture carry
 
-    pop de                      ; 10 restore yl*xl
+    pop de                      ; 10 restore y0*x0
 
-;;; MLT DE (xBC) ;;;;;;;;;;;;;;;; yl*xl
+;;; MLT DE (xBC) ;;;;;;;;;;;;;;;; y0*x0
     dec c                       ; 4  operand latch address
     ld b,d                      ; 4  operand Y in B
     out (c),e                   ; 12 operand X from A
@@ -72,7 +72,7 @@ l_lut_mulu_32_16x16:
 
     ld a,d                      ; 4
     add a,l                     ; 4
-    ld d,a                      ; 4  de = final LSW
+    ld d,a                      ; 4  DE = final LSW
 
     ld l,h                      ; 4  LSB of MSW from cross products
     ld h,b                      ; 4  carry from cross products
@@ -90,5 +90,5 @@ l_lut_mulu_32_16x16:
     pop bc                      ; 10 destack interim p3 p2
 
     adc hl,bc                   ; 15 hl = final MSW
-    ex de,hl                    ; 4  dehl = final product
+    ex de,hl                    ; 4  DEHL = final product
     ret
