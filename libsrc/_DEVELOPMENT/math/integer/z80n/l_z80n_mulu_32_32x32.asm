@@ -3,7 +3,26 @@
 SECTION code_clib
 SECTION code_math
 
+EXTERN l_z80n_mulu_32_16x16
+
 PUBLIC l_z80n_mulu_32_32x32, l0_z80n_mulu_32_32x32
+
+l0_z80n_mulu_32_16x16:
+
+    ; multiplication of two 16-bit numbers into a 32-bit product
+    ;
+    ; enter : hl'= 16-bit multiplier   = y
+    ;         hl = 16-bit multiplicand = x
+    ;
+    ; exit  : dehl = 32-bit product
+    ;         carry reset
+    ;
+    ; uses  : af, hl, bc', de', hl'
+
+    push hl
+    exx
+    pop de
+    jp l_z80n_mulu_32_16x16
 
 l_z80n_mulu_32_32x32:
 
@@ -16,6 +35,15 @@ l_z80n_mulu_32_32x32:
     ;         carry reset
     ;
     ; uses  : af, bc, de, hl, bc', de', hl'
+
+    xor a
+    or e
+    or d
+
+    exx
+    or e
+    or d
+    jr Z,l0_z80n_mulu_32_16x16   ;   demote if both are uint16_t
 
     push hl
     exx
@@ -101,10 +129,9 @@ l0_z80n_mulu_32_32x32:
 
     ex de,hl
     adc hl,bc                   ; HL = interim MSW p3 p2
-                                ; 32_16x16 = HLDE
+    ex de,hl                    ; DEHL = end of 32_16x16
 
-    push hl                     ; stack interim p3 p2
-    ex de,hl                    ; p1 p0 in HL
+    push de                     ; stack interim p3 p2
 
     ; continue doing the p2 byte
 

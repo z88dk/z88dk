@@ -194,28 +194,26 @@ IF __IO_LUT_MODULE_AVAILABLE == 0
     ld l,c                      ; p4
     ret                         ; exit  : DEHL = 32-bit product
 
-ELSE
+ELSE ;  feilipu, 2020 February
 
     ; start doing the p3 byte
 
     pop hl                      ; y3 y2
-    ld a,h
-    ld h,d
-    ld d,a
-;;; MLT HL (BC) ;;;;;;;;;;;;;;;;; x1*y2
-    ld b,h                      ; 4  operand Y in B
+
+;;; MLT DL (BC) ;;;;;;;;;;;;;;;;; x1*y2
     ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
+    ld b,d                      ; 4  operand Y in B
     out (c),l                   ; 12 operand X from L
     in l,(c)                    ; 12 result Z LSB to L
     inc c                       ; 4  result MSB address
-    in h,(c)                    ; 12 result Z MSB to H
-;;; MLT DE (BC) ;;;;;;;;;;;;;;;;; y3*x0
-    ld b,d                      ; 4  operand Y in B
+    in d,(c)                    ; 12 result Z MSB to D
+;;; MLT HE (BC) ;;;;;;;;;;;;;;;;; y3*x0
     dec c                       ; 4  operand latch address
+    ld b,h                      ; 4  operand Y in B
     out (c),e                   ; 12 operand X from E
     in e,(c)                    ; 12 result Z LSB to E
     inc c                       ; 4  result MSB address
-    in d,(c)                    ; 12 result Z MSB to D
+    in h,(c)                    ; 12 result Z MSB to H
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     xor a                       ; zero A
@@ -230,8 +228,8 @@ ELSE
     ld d,a
     push bc                     ; y1 x2
 ;;; MLT DE (BC) ;;;;;;;;;;;;;;;;; x3*y0
-    ld b,d                      ; 4  operand Y in B
     ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
+    ld b,d                      ; 4  operand Y in B
     out (c),e                   ; 12 operand X from E
     in e,(c)                    ; 12 result Z LSB to E
     inc c                       ; 4  result MSB address
@@ -243,8 +241,8 @@ ELSE
     adc a,0                     ; p5
     pop de                      ; y1 x2
 ;;; MLT DE (BC) ;;;;;;;;;;;;;;;;; y1*x2
-    ld b,d                      ; 4  operand Y in B
     dec c                       ; 4  operand latch address
+    ld b,d                      ; 4  operand Y in B
     out (c),e                   ; 12 operand X from E
     in e,(c)                    ; 12 result Z LSB to E
     inc c                       ; 4  result MSB address
@@ -270,8 +268,8 @@ ELSE
     ld d,a
     push bc                     ; x3 y1
 ;;; MLT DE (BC) ;;;;;;;;;;;;;;;;; x1*y3
-    ld b,d                      ; 4  operand Y in B
     ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
+    ld b,d                      ; 4  operand Y in B
     out (c),e                   ; 12 operand X from E
     in e,(c)                    ; 12 result Z LSB to E
     inc c                       ; 4  result MSB address
@@ -283,8 +281,8 @@ ELSE
     adc a,a                     ; p6
     pop de                      ; x3 y1
 ;;; MLT DE (BC) ;;;;;;;;;;;;;;;;; x3*y1
-    ld b,d                      ; 4  operand Y in B
     dec c                       ; 4  operand latch address
+    ld b,d                      ; 4  operand Y in B
     out (c),e                   ; 12 operand X from E
     in e,(c)                    ; 12 result Z LSB to E
     inc c                       ; 4  result MSB address
@@ -296,8 +294,8 @@ ELSE
 
     pop de                      ; x2 y2
 ;;; MLT DE (BC) ;;;;;;;;;;;;;;;;; x2*y2
-    ld b,d                      ; 4  operand Y in B
     dec c                       ; 4  operand latch address
+    ld b,d                      ; 4  operand Y in B
     out (c),e                   ; 12 operand X from E
     in e,(c)                    ; 12 result Z LSB to E
     inc c                       ; 4  result MSB address
@@ -323,8 +321,8 @@ ELSE
     push bc                     ; save p4 byte
 
 ;;; MLT DE (BC) ;;;;;;;;;;;;;;;;; y3*x2
-    ld b,d                      ; 4  operand Y in B
     ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
+    ld b,d                      ; 4  operand Y in B
     out (c),e                   ; 12 operand X from E
     in e,(c)                    ; 12 result Z LSB to E
     inc c                       ; 4  result MSB address
@@ -340,8 +338,8 @@ ELSE
     push bc                     ; save p4 byte
 
 ;;; MLT DE (BC) ;;;;;;;;;;;;;;;;; x3*y2
-    ld b,d                      ; 4  operand Y in B
     ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
+    ld b,d                      ; 4  operand Y in B
     out (c),e                   ; 12 operand X from E
     in e,(c)                    ; 12 result Z LSB to E
     inc c                       ; 4  result MSB address
@@ -362,8 +360,8 @@ ELSE
     push bc                     ; save p5 p4 byte in BC
 
 ;;; MLT DE (BC) ;;;;;;;;;;;;;;;;; y3*x3
-    ld b,d                      ; 4  operand Y in B
     ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
+    ld b,d                      ; 4  operand Y in B
     out (c),e                   ; 12 operand X from E
     in e,(c)                    ; 12 result Z LSB to E
     inc c                       ; 4  result MSB address

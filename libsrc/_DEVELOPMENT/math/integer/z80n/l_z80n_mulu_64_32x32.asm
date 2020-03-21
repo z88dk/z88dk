@@ -125,10 +125,9 @@ l0_z80n_mulu_64_32x32:
 
     ex de,hl
     adc hl,bc                   ; HL = interim MSW p3 p2
-                                ; 32_16x16 = HLDE
+    ex de,hl                    ; DEHL = 32_16x16
 
-    push hl                     ; stack interim p3 p2
-    ex de,hl                    ; p1 p0 in HL
+    push de                     ; stack interim p3 p2
 
     ; continue doing the p2 byte
 
@@ -258,6 +257,4 @@ l0_z80n_mulu_64_32x32:
     ld h,b                      ;'p5
     ld l,c                      ;'p4
 
-    xor a                       ;'carry reset
     ret                         ;'exit  : DEHL DEHL' = 64-bit product
-

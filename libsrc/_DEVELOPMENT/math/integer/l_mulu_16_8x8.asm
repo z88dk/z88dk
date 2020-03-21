@@ -30,6 +30,13 @@ l_mulu_16_8x8:
 
 ELSE
 
+IF __IO_LUT_MODULE_AVAILABLE
+
+   EXTERN l_lut_mulu_16_8x8
+   defc l_mulu_16_8x8 = l_lut_mulu_16_8x8
+
+ELSE
+
 IF __CLIB_OPT_IMATH <= 50
 
    EXTERN l_small_mul_16_16x8
@@ -45,6 +52,8 @@ IF __CLIB_OPT_IMATH > 50
 
    EXTERN l_fast_mulu_16_8x8
    defc l_mulu_16_8x8 = l_fast_mulu_16_8x8
+
+ENDIF
 
 ENDIF
 
