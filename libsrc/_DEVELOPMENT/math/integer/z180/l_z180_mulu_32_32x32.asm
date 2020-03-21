@@ -131,7 +131,7 @@ l0_z180_mulu_32_32x32:
 
     exx                         ; now we're working in the high order bytes
                                 ; DEHL' = end of 32_16x16
-    pop hl                      ; stack interim p3 p2
+    pop hl                      ; destack interim p3 p2
 
     pop bc                      ; x0 y0
     pop de                      ; x2 y2

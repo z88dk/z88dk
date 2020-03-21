@@ -118,15 +118,15 @@ l0_z180_mulu_64_32x32:
     mlt hl                      ; x1*y1
 
     adc hl,bc                   ; HL = interim MSW p3 p2
-                                ; 32_16x16 = HLDE
+    ex de,hl                    ; DEHL = 32_16x16
 
-    push hl                     ; stack interim p3 p2
-    ex de,hl                    ; p1 p0 in HL
+    push de                     ; stack interim p3 p2
 
     ; continue doing the p2 byte
 
-    exx                         ;'
-    pop hl                      ;'recover interim p3 p2
+    exx                         ; 'now we're working in the high order bytes
+                                ; DEHL' = end of 32_16x16
+    pop hl                      ; 10'destack interim p3 p2
 
     pop bc                      ;'x0 y0
     pop de                      ;'x2 y2
@@ -242,6 +242,4 @@ l0_z180_mulu_64_32x32:
     add hl,bc                   ;'p7 p6
     ex de,hl                    ;'p7 p6 <-> p5 p4
 
-    xor a                       ;'carry reset
     ret                         ;'exit  : DEHL DEHL' = 64-bit product
-
