@@ -17,3 +17,10 @@ glob_dos:
    push af
    
    jp l0_glob_dos_callee
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _glob_dos
+defc _glob_dos = glob_dos
+ENDIF
+

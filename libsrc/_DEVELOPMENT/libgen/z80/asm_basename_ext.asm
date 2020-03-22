@@ -42,9 +42,20 @@ loop:
    
    cp '/'
    jr z, no_extension
+
+IF __CPU_GBZ80__ | __CPU_INTEL__
+   dec hl
+   ld a,b
+   or c
+   jr z,no_extension
+   dec bc
+   jr  loop
+ELSE
+
    
    cpd                         ; hl--, bc--
    jp pe, loop
+ENDIF
 
 no_extension:
 

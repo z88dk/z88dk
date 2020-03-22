@@ -48,10 +48,22 @@ find_start:
    cp '/'
    ret z
    
+IF __CPU_GBZ80__ | __CPU_INTEL__
+   dec hl
+   ld a,b
+   or c
+   scf
+   ret z
+   dec bc
+   ld a,(hl)   
+   jr find_start
+ELSE
+
    cpd                         ; hl--, bc--
    ld a,(hl)   
 
    jp pe, find_start
+ENDIF
    
    scf
    ret

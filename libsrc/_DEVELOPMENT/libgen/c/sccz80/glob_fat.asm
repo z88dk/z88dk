@@ -17,3 +17,10 @@ glob_fat:
    push af
    
    jp l0_glob_fat_callee
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _glob_fat
+defc _glob_fat = glob_fat
+ENDIF
+

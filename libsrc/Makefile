@@ -57,6 +57,7 @@ zx81libs: zx81_clib.lib gfx81.lib gfxlambda.lib gfx81udg.lib gfx81hr64.lib gfx81
 # Arg2: Graphics flavour
 define buildgeneric
 	$(MAKE) -C ctype
+	$(MAKE) -C libgen
 	$(MAKE) -C strings
 	$(MAKE) -C interrupts
 	$(MAKE) -C regex
@@ -1538,6 +1539,7 @@ classic-clean:
 	$(MAKE) -C fcntl clean
 	$(MAKE) -C math clean
 	$(MAKE) -C interrupts clean
+	$(MAKE) -C libgen clean
 	$(MAKE) -C setjmp clean
 	$(MAKE) -C stdio clean
 	$(MAKE) -C stdlib clean

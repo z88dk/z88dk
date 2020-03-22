@@ -43,8 +43,13 @@ match:
    
    call asm_toupper
    
+IF __CPU_INTEL__
+   call asm_tolower
+ELSE
    bit 5,(hl)
    call nz, asm_tolower
+ENDIF
+	
 
    cp (hl)                     ; match a literal with caseless compare
 

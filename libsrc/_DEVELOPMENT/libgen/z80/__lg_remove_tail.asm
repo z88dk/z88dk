@@ -74,19 +74,37 @@ skip_trailing_ws:
    
    call asm_isspace
    ret c                       ; if char is not whitespace
-   
+  
+IF __CPU_GBZ80__ | __CPU_INTEL__
+   dec hl
+   ld a,b
+   or c
+   ret z
+   dec bc
+   jr  skip_trailing_ws
+ELSE 
    cpd                         ; hl--, bc--
    jp pe, skip_trailing_ws
    
    ret
+ENDIF
 
 skip_trailing_slash:
 
    ; skip trailing slashes
    ; carry reset
 
+IF __CPU_GBZ80__ | __CPU_INTEL__
+   dec hl
+   ld a,b
+   or c
+   ret z
+   dec bc
+ELSE
+
    cpd                         ; hl--, bc--
    ret po
+ENDIF
    
    ld a,(hl)
    

@@ -22,3 +22,10 @@ l0_glob_dos_callee:
    
    dec l                       ; return 0 for no match
    ret
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _glob_dos_callee
+defc _glob_dos_callee = glob_dos_callee
+ENDIF
+

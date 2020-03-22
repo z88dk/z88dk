@@ -1,6 +1,7 @@
 @assert/assert.lst
 @alloc/alloc_8080.lst
 @ctype/ctype.lst
+@libgen/libgen.lst
 @setjmp/setjmp.lst
 @stdlib/stdlib.lst
 @strings/string.lst

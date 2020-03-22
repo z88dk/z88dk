@@ -22,3 +22,10 @@ l0_glob_callee:
    
    dec l                       ; return 0 for no match
    ret
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _glob_callee
+defc _glob_callee = glob_callee
+ENDIF
+

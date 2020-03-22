@@ -7,3 +7,10 @@ PUBLIC pathnice
 EXTERN asm_pathnice
 
 defc pathnice = asm_pathnice
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _pathnice
+defc _pathnice = pathnice
+ENDIF
+
