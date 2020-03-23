@@ -1,4 +1,4 @@
-// zcc +zxn -vn -startup=31 -SO3 -clib=sdcc_iy --max-allocs-per-node200000 @zproject.lst -o terms -pragma-include:zpragma.inc -subtype=sna -create-app
+// zcc +zxn -vn -startup=31 -SO3 -clib=sdcc_iy --max-allocs-per-node200000 @zproject.lst -o terms -pragma-include:zpragma.inc -subtype=nex -Cz"--clean" -create-app
 
 #include <stdio.h>
 #include <stropts.h>

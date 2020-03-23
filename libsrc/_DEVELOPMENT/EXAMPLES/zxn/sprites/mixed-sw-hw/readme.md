@@ -1,7 +1,7 @@
 ## Compile
 
 ```
-zcc +zxn -v -startup=1 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 main.c graphics.asm.m4 interrupt.asm -o main -pragma-include:zpragma.inc -subtype=sna -Cz"--clean" -create-app
+zcc +zxn -v -startup=1 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 main.c graphics.asm.m4 interrupt.asm -o main -pragma-include:zpragma.inc -subtype=nex -Cz"--clean" -create-app
 ```
 
 ## Run
