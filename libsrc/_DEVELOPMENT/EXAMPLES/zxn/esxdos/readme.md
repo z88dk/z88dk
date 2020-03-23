@@ -23,10 +23,10 @@ functions should be used instead of `esx_*` to indicate this.
 
 zsdcc compile:
 ```
-zcc +zxn -v -clib=sdcc_iy -SO3 --max-allocs-per-node200000 dir.c -o dir -subtype=sna -Cz"--clean" -create-app
+zcc +zxn -v -clib=sdcc_iy -SO3 --max-allocs-per-node200000 dir.c -o dir -subtype=nex -Cz"--clean" -create-app
 ```
 
 sccz80 compile:
 ```
-zcc +zxn -v -clib=new dir.c -o dir -subtype=sna -Cz"--clean" -create-app
+zcc +zxn -v -clib=new dir.c -o dir -subtype=nex -Cz"--clean" -create-app
 ```
