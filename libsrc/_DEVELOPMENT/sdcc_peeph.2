@@ -2859,6 +2859,13 @@ replace restart {
 	jp	%3
 }
 
+replace restart {
+	ld	hl,%1
+	ld	sp,hl
+} by {
+	ld	sp,%1
+	; peephole 146 removed redundant load of hl.
+} if notUsed('hl')
 
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
