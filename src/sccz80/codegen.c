@@ -2982,7 +2982,7 @@ void asr_const(LVALUE *lval, int32_t value)
     } else {
         if ( value == 1 && IS_8085() && !ulvalue(lval) ) {
             ol("sra\thl");
-        } else if ( value == 1  && !IS_8080() ) { /* 4 bytes, 16T */
+        } else if ( value == 1  && !IS_808x() ) { /* 4 bytes, 16T */
             if ( ulvalue(lval) ) {
                 ol("srl\th");
             } else {
