@@ -2860,10 +2860,9 @@ replace restart {
 }
 
 replace restart {
-	ld	hl,%1
-	ld	sp,hl
+	ld	hl, 0000
+	add	sp,hl
 } by {
-	ld	sp,%1
 	; peephole 146 removed redundant load of hl.
 } if notUsed('hl')
 
