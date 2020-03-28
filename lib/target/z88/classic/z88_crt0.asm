@@ -36,14 +36,6 @@
 ;-------
 
 	EXTERN    _main		;main() is always external to crt0 code
-	PUBLIC    cleanup		;jp'd to by exit()
-	PUBLIC    l_dcal		;jp(hl)
-
-
-	PUBLIC    processcmd	;Processing <> commands
-
-
-	PUBLIC	_cpfar2near	;Conversion of far to near data
 
 
         defc    CONSOLE_COLUMNS = 80

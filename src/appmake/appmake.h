@@ -20,7 +20,6 @@
 #include <unistd.h>
 #endif
 
-#include "d88.h"
 #include "cpmdisk.h"
 
 extern char c_install_dir[];
@@ -30,7 +29,13 @@ extern char c_install_dir[];
 #define OPT_BASE_MASK 127
 typedef enum { OPT_NONE, OPT_BOOL, OPT_INT, OPT_STR, OPT_INPUT=128, OPT_OUTPUT=256 } type_t;
 
+#ifndef WIN32
 enum { FALSE = 0, TRUE };
+#endif
+
+#if defined(__GNUC__) || defined(__clang__)
+#define __NORETURN __attribute((noreturn))
+#endif
 
 typedef struct {
     char     sopt;
@@ -43,6 +48,9 @@ typedef struct {
 #ifdef _WIN32
 #ifndef strncasecmp
 #define strncasecmp(a,b,c) strnicmp(a,b,c)
+#endif
+#ifndef strcasecmp
+#define strcasecmp(a,b) stricmp(a,b)
 #endif
 #endif
 
@@ -66,15 +74,15 @@ extern option_t  c7420_options;
 extern int       cpc_exec(char *target);
 extern option_t  cpc_options;
 
-extern int       cpm_exec(char *target);
-extern option_t  cpm_options;
-extern char      cpm_longhelp[];
+extern int       cpm2_exec(char *target);
+extern option_t  cpm2_options;
 
-extern int       einstein_exec(char *target);
-extern option_t  einstein_options;
 
 extern int       enterprise_exec(char *target);
 extern option_t  enterprise_options;
+
+extern int       fat_exec(char *target);
+extern option_t  fat_options;
 
 extern int       fp1100_exec(char *target);
 extern option_t  fp1100_options;
@@ -82,8 +90,15 @@ extern option_t  fp1100_options;
 extern int       gal_exec(char *target);
 extern option_t  gal_options;
 
+extern int       gb_exec(char *target);
+extern option_t  gb_options;
+
+
 extern int       hex_exec(char *target);
 extern option_t  hex_options;
+
+extern int       homelab_exec(char *target);
+extern option_t  homelab_options;
 
 extern int       inject_exec(char *target);
 extern option_t  inject_options;
@@ -98,6 +113,9 @@ extern option_t  lynx_options;
 
 extern int       m5_exec(char *target);
 extern option_t  m5_options;
+
+extern int       mameql_exec(char *target);
+extern option_t  mameql_options;
 
 extern int       mc_exec(char *target);
 extern option_t  mc_options;
@@ -116,11 +134,18 @@ extern option_t  mz_options;
 
 extern int       mz2500_exec(char *target);
 extern option_t  mz2500_options;
+
 extern int       nascom_exec(char *target);
 extern option_t  nascom_options;
 
 extern int       nec_exec(char *target);
 extern option_t  nec_options;
+
+extern int       pasopia7_exec(char *target);
+extern option_t  pasopia7_options;
+
+extern int       pc88_exec(char *target);
+extern option_t  pc88_options;
 
 extern int       p2000_exec(char *target);
 extern option_t  p2000_options;
@@ -152,6 +177,9 @@ extern option_t  glue_options;
 extern int       residos_exec(char *target);
 extern option_t  residos_options;
 
+extern int       pmd85_exec(char *target);
+extern option_t  pmd85_options;
+
 extern int       sc3000_exec(char *target);
 extern option_t  sc3000_options;
 
@@ -170,11 +198,16 @@ extern option_t  tixx_options;
 extern int       trs80_exec(char *target);
 extern option_t  trs80_options;
 
+extern int       vector06c_exec(char *target);
+extern option_t  vector06c_options;
+
 extern int       vg5k_exec(char *target);
 extern option_t  vg5k_options;
 
 extern int       vz_exec(char *target);
 extern option_t  vz_options;
+extern int       laser500_exec(char *target);
+extern option_t  laser500_options;
 
 extern int       x07_exec(char *target);
 extern option_t  x07_options;
@@ -209,6 +242,9 @@ extern option_t  zxvgs_options;
 extern int       zx81_exec(char *target);
 extern option_t  zx81_options;
 
+extern int       tvc_exec(char *target);
+extern option_t  tvc_options;
+
 
 
 struct {
@@ -236,22 +272,30 @@ struct {
       "Adds a c128 style disk file header",
       NULL,
       c128_exec,   &c128_options },
+    { "bin7420",   "c7420",    "(C) 2015 Stefano Bodrato",
+      "Philips Videopac C7420 cassette format conversion",
+      NULL,
+      c7420_exec,    &c7420_options },
     { "bin2cpc",  "cpc",      "(C) 2003 Dominic Morris, (C) 1997 Pierre Thevenet",
       "Creates an AMSDOS file suitable for writing to a .DSK image, opt. WAV",
       NULL,
       cpc_exec,   &cpc_options },
-    { "com2dsk",   "einstein",      "(C) 2018 Dominic Morris",
-      "Create an Einstein disc image",
+    { "cpmdisk",  "cpmdisk",   "(C) 2018 dom",
+      "CPM disk image creation",
       NULL,
-      einstein_exec,   &einstein_options },
+      cpm2_exec,     &cpm2_options },
     { "bin2ep",   "enterprise",      "(C) 2011 Stefano Bodrato",
       "Adds a type 5 header to make a .app file",
       NULL,
       enterprise_exec,   &enterprise_options },
-    { "cpm",  "cpm",      "(C) 2018 Stefano Bodrato",
-      "CPM disk image creation",
-      cpm_longhelp,
-      cpm_exec,     &cpm_options },
+    { "extract", "extract",      "(C) 2015 Alvin Albrecht",
+      "Extracts bytes from input file",
+      extract_longhelp,
+      extract_exec,    &extract_options },
+    { "bin2fat",  "fat",      "(C) 2019 dom + ChaN",
+      "Creates a FAT disc for many platforms",
+      NULL,
+      fat_exec,   &fat_options },
     { "fp1kd88",  "fp1100",      "(C) 2018 Dominic Morris",
       "Creates a .d88 for the Casio FP-1100",
       NULL,
@@ -260,26 +304,34 @@ struct {
       "Creates a tape file image for the Galaksija micro",
       NULL,
       gal_exec,   &gal_options },
+    { "makebin",  "gb",      "(C) 2000 - 2019 gbdk + z88dk",
+      "Creates a ROM image for the Gameboy",
+      NULL,
+      gb_exec,   &gb_options },
+    { "gluebin", "glue", "(C) 2017 Alvin Albrecht",
+      "Glue several output binaries into a single binary representing memory",
+       NULL,
+       glue_exec, &glue_options },
     { "bin2hex",  "hex",      "(C) 2001 Dominic Morris & Jeff Brown",
       "Creates an intel hex record suitable for embedded devices",
       NULL,
       hex_exec,     &hex_options },
-    { "newext",  "newext",      "(C) 2014 Stefano Bodrato",
-      "Changes the binary file extension for CP/M and others",
+    { "bin2htp",  "homelab",  "(C) 2020 z88dk",
+      "Creates a .htp file for Homelab emulators",
       NULL,
-      newext_exec,   &newext_options },
+      homelab_exec,    &homelab_options },
     { "inject",  "inject",      "(C) 2014 Dominic Morris",
       "Injects files within other files",
       inject_longhelp,
       inject_exec,     &inject_options },
-    { "extract", "extract",      "(C) 2015 Alvin Albrecht",
-      "Extracts bytes from input file",
-      extract_longhelp,
-      extract_exec,    &extract_options },
     { "kcc",      "kc",          "(C) 2016 Stefano Bodrato",
       "Prapares a .KCC file for the Robotron KC85/2..KC85/4",
       NULL,
       kc_exec,       &kc_options },
+    { "laser2cas", "laser500",     "(C) 2010-2018 Stefano Bodrato",
+      "Convert the Laser 350/500/700 .vz file to .cas, optionally to WAV",
+      NULL,
+      laser500_exec,    &laser500_options },
     { "lynxtap",  "lynx",      "(C) 2014 Stefano Bodrato",
       "Generates a tape file for the Camputers Lynx, opt. WAV",
       NULL,
@@ -288,6 +340,10 @@ struct {
       "Generates a tape file for the Sord M5, optional WAV file",
       NULL,
       m5_exec,   &m5_options },
+    { "bin2mql",   "mameql",  "(C) 2018 dom",
+      "Create a Mame quickload file (z80bin)",
+      NULL,
+      mameql_exec,   &mameql_options },
     { "mc1000",   "mc",      "(C) 2013 Stefano Bodrato",
       "Generates a CAS file for the CCE MC-1000, optional WAV file",
       NULL,
@@ -320,30 +376,50 @@ struct {
       "PC-6001 (and others) CAS format conversion utility",
       NULL,
       nec_exec,    &nec_options },
-    { "px2rom",   "px",       "(C) 2015 Stefano Bodrato",
-      "Create an epson PX(HC) family compatible EPROM image",
+    { "bin2nwbn",  "newbrain",       "(C) 2007 Stefano Bodrato",
+      "BASIC loader + data block in Tape format or plain TXT (less efficient)",
       NULL,
-      px_exec,   &px_options },
+      newbrain_exec,    &newbrain_options },
+    { "newext",  "newext",      "(C) 2014 Stefano Bodrato",
+      "Changes the binary file extension for CP/M and others",
+      NULL,
+      newext_exec,   &newext_options },
     { "mc2cas",   "p2000",      "(C) 2014 Stefano Bodrato",
       "Philips P2000 MicroCassette to CAS format conversion",
       NULL,
       p2000_exec,    &p2000_options },
-    { "bin7420",   "c7420",    "(C) 2015 Stefano Bodrato",
-      "Philips Videopac C7420 cassette format conversion",
+    { "bin2pas",   "pasopia7",  "(C) 2019 z88dk",
+      "Convert binary file to .wav",
       NULL,
-      c7420_exec,    &c7420_options },
+      pasopia7_exec,    &pasopia7_options },
+    { "bin2t88",   "pc88",       "(C) 2018 Stefano Bodrato",
+      "PC-8801 T88 format conversion utility",
+      NULL,
+      pc88_exec,    &pc88_options },
+    { "bin2ptp",   "pmd85",       "(C) 2020 z88dk",
+      "Create a PMD85 ptp file",
+      NULL,
+      pmd85_exec,    &pmd85_options },
+    { "px2rom",   "px",       "(C) 2015 Stefano Bodrato",
+      "Create an epson PX(HC) family compatible EPROM image",
+      NULL,
+      px_exec,   &px_options },
     { "bin2pkg",    "residos",       "(C) 2014 Dominic Morris",
       "Create the header for a Residos package",
       NULL,
       residos_exec,    &residos_options },
+    { "mkaddin",   "rex",       "(C) 2001 Dominic Morris",
+      "Creates a .rex application using data from a .res file and a .bin file",
+      NULL,
+      rex_exec,     &rex_options },
     { "rompad",    "rom",       "(C) 2014,2017 Stefano Bodrato & Alvin Albrecht",
       "Embed a binary inside a rom, padding if necessary",
       NULL,
       rom_exec,    &rom_options },
-    { "gluebin", "glue", "(C) 2017 Alvin Albrecht",
-      "Glue several output binaries into a single binary representing memory",
-       NULL,
-       glue_exec, &glue_options },
+    { "sentinel",  "sos",       "(C) 2013 Stefano Bodrato",
+      "Add a header for S-OS (The Sentinel)",
+      NULL,
+      sos_exec,    &sos_options },
     { "bin2spc",   "spc1000",   "(C) 2018 Dominic Morris",
       "Create a .SPC file suitable for emulators",
       NULL,
@@ -352,18 +428,6 @@ struct {
       "DGOS, KCS variant for Sorcerer Exidy and Microbee, also WAV format",
       NULL,
       sorcerer_exec,    &sorcerer_options },
-    { "sentinel",  "sos",       "(C) 2013 Stefano Bodrato",
-      "Add a header for S-OS (The Sentinel)",
-      NULL,
-      sos_exec,    &sos_options },
-    { "bin2nwbn",  "newbrain",       "(C) 2007 Stefano Bodrato",
-      "BASIC loader + data block in Tape format or plain TXT (less efficient)",
-      NULL,
-      newbrain_exec,    &newbrain_options },
-    { "mkaddin",   "rex",       "(C) 2001 Dominic Morris",
-      "Creates a .rex application using data from a .res file and a .bin file",
-      NULL,
-      rex_exec,     &rex_options },
     { "bin2var",   "ti82",       "(C) 2000,2003 David Phillips et al",
       "Creates a .82p file",
       NULL,
@@ -388,34 +452,34 @@ struct {
       "Creates a .86s file",
       NULL,
       tixx_exec,      &tixx_options },
-    { "bin2svi",  "svi",       "(C) 2001 Stefano Bodrato",
-      "Creates a .cas file loadable with the SVI emulator",
-      NULL,
-      svi_exec,      &svi_options },
     { "bin2sms",  "sms",       "(C) 2007 Dominic Morris",
       "Creates an sms file composed of a 32k main binary and 16k expansion banks",
       NULL,
       sms_exec,      &sms_options },
-    { "bin2cmd",  "trs80",    "(C) 2008 Stefano Bodrato",
-      "Creates a CMD file for the TRS 80",
-      NULL,
-      trs80_exec,   &trs80_options },
     { "bin2sc",   "sc3000",      "(C) 2010 Stefano Bodrato",
       "Packager for the SEGA SC-3000 / SF-7000, Kansas City Standard variant",
       NULL,
       sc3000_exec,   &sc3000_options },
-    { "vz2cas",    "vz",     "(C) 2010 Stefano Bodrato",
-      "Convert the Laser 200 .vz file to .cas, optionally to WAV",
+    { "bin2svi",  "svi",       "(C) 2001 Stefano Bodrato",
+      "Creates a .cas file loadable with the SVI emulator",
       NULL,
-      vz_exec,    &vz_options },
+      svi_exec,      &svi_options },
+    { "bin2cmd",  "trs80",    "(C) 2008 Stefano Bodrato",
+      "Creates a CMD file for the TRS 80",
+      NULL,
+      trs80_exec,   &trs80_options },
+    { "bin2fdd",  "vector06c", "(C) 2020 z88dk",
+      "Create a bootable vector06c disk",
+      NULL,
+      vector06c_exec,    &vector06c_options },
     { "vg5k2k7",    "vg5k",     "(C) 2014 Stefano Bodrato",
       "Convert to Philips VG-5000 .k7 format, optionally to WAV",
       NULL,
       vg5k_exec,    &vg5k_options },
-    { "appz88",     "z88",      "(C) 2000,2003 Dominic Morris & Dennis Groning",
-      "Generates .63 and .62 files suitable for burning to EPROM",
+    { "vz2cas",    "vz",     "(C) 2010 Stefano Bodrato",
+      "Convert the Laser 200 .vz file to .cas, optionally to WAV",
       NULL,
-      z88_exec,     &z88_options },
+      vz_exec,    &vz_options },
     { "x07cas",     "x07",     "(C) 2011 Stefano Bodrato",
       "Prapares a .cas file for the Canon X-07, optional WAV format",
       NULL,
@@ -428,24 +492,28 @@ struct {
       "Prapares a .z80 file for the Robotron Z1013, optional WAV format",
       NULL,
       z1013_exec,    &z1013_options },
-    { "kctape",     "z9001",      "(C) 2016 Stefano Bodrato",
-      "Prapares a .TAP file for the Robotron Z9001, KC85/1, KC87",
+    { "appz88",     "z88",      "(C) 2000,2003 Dominic Morris & Dennis Groning",
+      "Generates .63 and .62 files suitable for burning to EPROM",
       NULL,
-      z9001_exec,     &z9001_options },
+      z88_exec,     &z88_options },
     { "shellmak",   "z88shell", "(C) 2002,2003 Dominic Morris",   
       "Patches the header to ensure that the program is recognised by the shell",
       NULL,
       z88shell_exec,&z88shell_options },
-    { "appzxvgs",   "zxvgs",    "(C) 2003 Yarek",
-      "Creates a zxvgs application file",
+    { "kctape",     "z9001",      "(C) 2016 Stefano Bodrato",
+      "Prapares a .TAP file for the Robotron Z9001, KC85/1, KC87",
       NULL,
-      zxvgs_exec,   &zxvgs_options},
+      z9001_exec,     &z9001_options },
     { "bin2tap",  "zx",  "(C) 2000,2003,2017 Morris, Bodrato, Albrecht", 
       "Generates a .TAP file complete with BASIC header, optional WAV file\n"
       "Generates 48k/128k SNA Snapshots from binary files\n"
       "Generates ESXDOS dot commands",
       NULL,
       zx_exec,      &zx_options },
+    { "bin2p",    "zx81",     "(C) 2000 Stefano Bodrato",                         
+      "Generates a .P file suitable for use by emulators, optional WAV file",
+      NULL,
+      zx81_exec,    &zx81_options },
     { "zxnext",  "zxn",  "(C) 2000,2003,2017 Morris, Bodrato, Albrecht",
       "Generates a .TAP file complete with BASIC header, optional WAV file\n"
       "Generates 48k/128k SNA Snapshots from binary files\n"
@@ -454,10 +522,14 @@ struct {
       "Generates ZXN monolithic programs",
       NULL,
       zxn_exec,     &zxn_options },
-    { "bin2p",    "zx81",     "(C) 2000 Stefano Bodrato",                         
-      "Generates a .P file suitable for use by emulators, optional WAV file",
+    { "appzxvgs",   "zxvgs",    "(C) 2003 Yarek",
+      "Creates a zxvgs application file",
       NULL,
-      zx81_exec,    &zx81_options },
+      zxvgs_exec,   &zxvgs_options},
+    { "bin2cas",   "tvc",      "(C) 2019 Sandor Vass",
+      "Generate TVC .cas file from the linked binary",
+      NULL,
+      tvc_exec,   &tvc_options },
     { NULL, NULL, NULL, NULL, NULL, NULL }
 };
 #endif
@@ -469,12 +541,12 @@ struct {
 
 
 #define myexit(buf, code) exit_log(code, buf)
-extern void         exit_log(int code, char *fmt, ...);
-extern long         parameter_search(char *filen, char *ext,char *target);
-extern FILE        *fopen_bin(char *fname, char *crtfile);
+extern void         exit_log(int code, char *fmt, ...) __NORETURN;
+extern long         parameter_search(const char *filen,const  char *ext,const char *target);
+extern FILE        *fopen_bin(const char *fname,const  char *crtfile);
 extern long         get_org_addr(char *crtfile);
-extern void         suffix_change(char *name, char *suffix);
-extern void         any_suffix_change(char *name, char *suffix, char schar);
+extern void         suffix_change(char *name, const char *suffix);
+extern void         any_suffix_change(char *name, const char *suffix, char schar);
 
 extern void        *must_malloc(size_t sz);
 extern void        *must_realloc(void *p, size_t sz);
@@ -496,6 +568,12 @@ extern void         writestring_pk(char *mystring, FILE *fp,unsigned char *p);
 extern void         writebyte_cksum(unsigned char c, FILE *fp, unsigned long *cksum);
 extern void         writeword_cksum(unsigned int i, FILE *fp, unsigned long *cksum);
 extern void         writestring_cksum(char *mystring, FILE *fp, unsigned long *cksum);
+
+
+extern void         writebyte_b(unsigned char c, uint8_t **pptr);
+extern void         writeword_b(unsigned int i, uint8_t **pptr);
+extern void         writelong_b(unsigned long i, uint8_t **pptr);
+extern void         writestring_b(char *mystring, uint8_t **pptr);
 
 extern void         raw2wav(char *rawfilename);
 

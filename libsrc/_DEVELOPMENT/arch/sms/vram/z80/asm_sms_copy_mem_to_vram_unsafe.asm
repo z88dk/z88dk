@@ -30,7 +30,9 @@ asm_sms_copy_mem_to_vram_unsafe:
    dec bc
    inc b
    inc c
-   ld a,c
+
+   ld a,b
+   ld b,c
    
 no_adjust:
    

@@ -10,6 +10,10 @@
 OPTIONS:
 --------
 
+	-DFILES          For targets with file support, get an optional lisp source file as program parameter
+	                 and evaluates it before leaving control to the user.
+	                 A specific LISP command is also available , e.g.:  (load 'eliza.l)
+	
 	-DSHORT          Reduce the 'lisp atom' size to 16 bit to save memory.
 	                 Be aware that the valid numeric range will be only between -2047 and 2048 !
 	                 (untested: the structure tags may interfere with values, use it only as a last resort)
@@ -31,6 +35,8 @@ OPTIONS:
 	-DNOTIMER        To be used when the target platform misses the clock() function to 'randomize'
 	
 	-DZEDIT          (ZX81 ONLY), initial LISP code MUST be present @32768, 16K for text available, 48K RAM NEEDED
+	                 At startup a source file is searched in memory and eventually evaluated before getting to the
+					 user prompt.
 
 
 z88dk build hints:
@@ -51,6 +57,12 @@ zx81 48K, minimalistic version, graphics support, initial code must be provided 
 
 MicroBee  
   zcc +bee -O3 -create-app -DLARGEMEM=1200 -DGRAPHICS -DNOTIMER -lgfxbee512 -llib3d clisp.c
+  
+Plain CP/M with file support to load programs
+  zcc +cpm -O3 -create-app -DLARGEMEM=2000 -DFILES clisp.c
+  
+For super size optimization, add:
+	 --opt-code-size -pragma-define:CRT_INITIALIZE_BSS=0 -custom-copt-rules clisp.opt -DOPTIMIZE
 
 */
 
@@ -70,6 +82,10 @@ MicroBee
 #ifdef GRAPHICS
 #include <graphics.h>
 #include <lib3d.h>
+#endif
+
+#ifdef OPTIMIZE
+#include <clisp_opt.c>
 #endif
 
 #ifdef ZEDIT
@@ -175,7 +191,12 @@ int t_symb_ftype[] @41780+shift;    /* 360 bytes */
 
 #ifdef ZEDIT
 char* text;
-int c;
+int c = 0;
+#endif
+
+#ifdef FILES
+FILE *fpin;
+int c = 0;
 #endif
 
 /* Printable name */
@@ -252,6 +273,9 @@ enum keywords {
 #ifdef GRAPHICS
    ,KW_CLS,      KW_PENU,     KW_PEND,
     KW_LEFT,   KW_RIGHT,     KW_FWD
+#endif
+#ifdef FILES
+   ,KW_LOAD
 #endif
 };
 struct s_keywords {
@@ -377,6 +401,10 @@ struct s_keywords funcs[] = {
   { "fwd",      FTYPE(FTYPE_SYS,     1),               KW_FWD      },
 #endif
 
+#ifdef FILES
+  { "load",     FTYPE(FTYPE_SYS,     1),               KW_LOAD     },
+#endif
+
   { NULL,       -1,                                    -1          }
 };
 #endif
@@ -392,38 +420,50 @@ char *errmsg_eof        = "END OF FILE";
 char *errmsg_stack_of   = "STACK OVERFLOW";
 char *errmsg_zero_div   = "DIVISION BY ZERO: ";
 char *errmsg_no_memory  = "\nno memory. abort.\n";
+
+#ifdef Z80
+#define FASTCALL_MODE __z88dk_fastcall;
+#else
+#define FASTCALL_MODE ;
+#endif
+
 /* Function types */
 void  init(void);
 #ifndef INITONLY
 void toplevel(void);
 long  l_read(void);
-long l_eval(long s);
-long l_print(long s);
+long l_eval(long s) FASTCALL_MODE
+long l_print(long s) FASTCALL_MODE
 char  skip_space(void);
-long  int_make_l(long v);
-long  int_get_c(long s);
+long  int_make_l(long v) FASTCALL_MODE
+long  int_get_c(long s) FASTCALL_MODE
 long  eval_args(long func, long a, long av[2], int n);
 long  special(long f, long a);
 long  fcall(long f, long av[2]);  /*, int n*/
 long  apply(long f, long args, int n);
 char  err_msg(char *msg, char f, long s);
 long  l_cons(long car, long cdr);
-long  l_car(long s);
-long  l_cdr(long s);
-int  list_len(long s);
+long  l_car(long s) FASTCALL_MODE
+long  l_cdr(long s) FASTCALL_MODE
+int  list_len(long s) FASTCALL_MODE
 void  rplacd(long s, long cdr);
 void  gcollect(void);
-void  gc_mark(long s);
-char  gc_protect(long s);
-void  gc_unprotect(long s);
+void  gc_mark(long s) FASTCALL_MODE
+char  gc_protect(long s) FASTCALL_MODE
+void  gc_unprotect(long s) FASTCALL_MODE
+#ifdef FILES
+long  l_load(long s) FASTCALL_MODE
+#endif
 #endif
 long  symb_make(char *p);
 void  quit(void);
 
+long D_GET_TAG(long s) FASTCALL_MODE
 long D_GET_TAG(long s) {
         return (s & ~(D_GC_MARK | D_MASK_DATA));
 }
 
+long D_GET_DATA(long s) FASTCALL_MODE
 long D_GET_DATA(long s) {
         return (s & D_MASK_DATA);
 }
@@ -440,7 +480,14 @@ int cpt;
 char ug=13;
 
 char gchar() {
-	
+
+#ifdef FILES
+	if (c!=0 && c!=EOF)
+		c=fgetc(fpin);
+		if (c!=0 && c!=EOF)
+			return (c);
+#endif
+
 #ifdef ZEDIT
 	if (c!=0 && c!=26)
 		c=text[cpt++];
@@ -448,7 +495,6 @@ char gchar() {
 			return (c);
 #endif
 
-	
 #ifdef ZX81_32K
 	zx_slow();
 #endif
@@ -465,22 +511,41 @@ char gchar() {
 }
 
 void ugchar(char ch) {
+#ifdef FILES
+if (c!=0 && c!=EOF)
+		ungetc(ch,fpin);
+else
     cpt--;
+#else
+    cpt--;
+#endif
 }
+
 #else
 
 char gchar() {
+	
+#ifdef FILES
+	if (c!=0 && c!=EOF)
+		c=fgetc(fpin);
+		if (c!=0 && c!=EOF)
+			return (c);
+#endif
+
     return (fgetc (stdin));
 }
 
 void ugchar(char ch) {
+if (c!=0 && c!=EOF)
+    ungetc(ch,fpin);
+else
     ungetc(ch,stdin);
 }
 
 #endif
 
 void
-main(void)
+main(int argc, char *argv[])
 {
   init();
 #ifdef SCHEME
@@ -491,6 +556,39 @@ main(void)
 #else
   printf("%cCAMPUS LIsP\nLemon version,\nz88dk variant\n",12);
 #endif
+#endif
+
+#if defined(SHORT)||defined(MINIMALISTIC)||defined(TINYMEM)||defined(LARGEMEM)||defined(GRAPHICS)||defined(FILES)
+printf("Build opt: [ ");
+#ifdef SHORT
+printf("SHORT ");
+#endif
+#ifdef MINIMALISTIC
+printf("MINIMALISTIC ");
+#endif
+#ifdef TINYMEM
+printf("TINYMEM ");
+#endif
+#ifdef LARGEMEM
+printf("LARGEMEM ");
+#endif
+#ifdef GRAPHICS
+printf("GRAPHICS ");
+#endif
+#ifdef FILES
+printf("FILES ");
+#endif
+printf("]\n");
+#endif
+
+#ifdef FILES
+if (argc == 2) {
+	fpin = fopen(argv[1],"r");
+	if (fpin == NULL)
+		printf ("File open error: %s\n",argv[1]);
+	else
+		c = 1;
+}
 #endif
 
 #ifdef INITONLY
@@ -545,7 +643,7 @@ init(void)
     t_symb_ftype[i] = funcs[i].ftype;
 #ifndef Z80
     if (i != funcs[i].i){
-      printf("function install error: %s\n", funcs[i].key);
+      printf("Function install error: %s\n", funcs[i].key);
       quit();
     }
 #endif
@@ -599,8 +697,8 @@ l_read(void)
     return TAG_EOF; 
 
   } else if (ch == ';'){         /* comment */
-    while (gchar() != '\n')
-      ;
+    while (( ch != '\n' ) && ( ch != '\r') )
+      ch = gchar();
     return -1;
   }
 #ifdef ZX81
@@ -1291,13 +1389,19 @@ fcall(long f, long av[2])  /*, int n*/
 	pen_down();
     break;
   case KW_RIGHT:
-	turn_right(int_get_c(av[0]));
+	turn_right((int)int_get_c(av[0]));
     break;
   case KW_LEFT:
-	turn_left(int_get_c(av[0]));
+	turn_left((int)int_get_c(av[0]));
     break;
   case KW_FWD:
-	fwd(int_get_c(av[0]));
+	fwd((int)int_get_c(av[0]));
+    break;
+#endif
+
+#ifdef FILES
+  case KW_LOAD:
+    v = l_load(av[0]);
     break;
 #endif
 
@@ -1581,6 +1685,26 @@ symb_make(char *p)
 
   return (TAG_SYMB | s);
 }
+
+
+
+/* Load a LISP source file */ 
+
+#ifdef FILES
+long
+l_load(long s)
+{
+  if (D_GET_TAG(s)!=TAG_SYMB)
+    return err_msg(errmsg_ill_type, 1, s);
+
+  if ((fpin = fopen(t_symb_pname[s & D_MASK_DATA],"r"))==NULL)
+    return TAG_NIL;
+
+  c = 1;
+  return TAG_T;
+}
+#endif
+
 
 /* Quit micro lisp */
 void

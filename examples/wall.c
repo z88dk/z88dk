@@ -81,8 +81,9 @@
  *     TAPE
  *
  *  MSX, Spectravideo SVI
- *     zcc +[msx/svi] -create-app -DJOYSTICK -Dspritesize=8 -DSOUND -DBANNERS  -lndos wall.c
- *     BLOAD “CAS:”,R
+ *     zcc +msx -create-app -DJOYSTICK -Dspritesize=8 -DSOUND -DBANNERS -lndos -lmsxbios wall.c
+ *     zcc +svi -create-app -DJOYSTICK -Dspritesize=8 -DSOUND -DBANNERS -lndos -lsvibios wall.c
+ *     BLOAD "CAS:",R
  *
  *  SEGA SC-3000
  *     zcc +sc3000 -create-app -Dspritesize=8 -DBANNERS wall.c
@@ -209,7 +210,7 @@ zx_border (INK_CYAN);
 
 #if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX)
 #if (spritesize == 8)
-msx_color(INK_WHITE, INK_BLACK, INK_CYAN);
+msx_set_border(INK_CYAN);
 #endif
 #endif
 
@@ -509,7 +510,7 @@ restart:
 	hit_border();
 #ifndef LOMEM
 #if defined(MSX) || defined(SVI)
-	msx_text();
+	msx_set_mode(0);
 #endif
 
 #ifdef SPECTRUM
@@ -568,6 +569,8 @@ start_level:
 #endif
 
 	tt++; t=0; p=1;
+
+
 	clg();
 	hit_border();
 

@@ -34,13 +34,12 @@
 IF startup = 2
         INCLUDE "target/multi8/classic/64k.asm"
 ELSE
+	INCLUDE	"target/multi8/def/maths_mbf.def"
         INCLUDE "target/multi8/classic/16k.asm"
 ENDIF
 l_dcal:	jp	(hl)		;Used for function pointer calls
 
 
-         defm  "Small C+ Multi8"	;Unnecessary file signature
-         defb	0
 
         INCLUDE "crt/classic/crt_runtime_selection.asm"
 	INCLUDE "crt/classic/crt_section.asm"

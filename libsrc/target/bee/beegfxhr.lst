@@ -1,0 +1,9 @@
+target/bee/graphics/w_clg
+target/bee/graphics/w_clsgraph
+target/bee/graphics/w_pixladdr
+target/bee/graphics/w_stencil_render
+target/bee/graphics/fill
+target/bee/graphics/swapgfxbk
+target/bee/graphics/div5
+target/bee/graphics/div11
+@gfx/wide/gfx_wide.lst

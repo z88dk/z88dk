@@ -1,7 +1,7 @@
 /*
 Z88DK Z80 Module Assembler
 
-Copyright (C) Paulo Custodio, 2011-2017
+Copyright (C) Paulo Custodio, 2011-2019
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -59,7 +59,7 @@ ragel, to expand token definition from token_def.h.
 #define TOKEN_ZXN1(opcode, string)	 \
 	string <CAT> i										<NL> \
 	{													<NL> \
-		<TAB>		if (opts.cpu & CPU_Z80_ZXN) {		<NL> \
+		<TAB>		if (opts.cpu & CPU_Z80N) {			<NL> \
 		<TAB><TAB>		sym.tok        = TK_##opcode;	<NL> \
 		<TAB>		}									<NL> \
 		<TAB>		else {								<NL> \

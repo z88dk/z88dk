@@ -1,0 +1,2 @@
+./obj/${TYPE}/**/*noaf*.o
+obj/${TYPE}/**/*.o

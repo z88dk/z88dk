@@ -89,6 +89,7 @@ static int cmd_registers(int argc, char **argv);
 static int cmd_break(int argc, char **argv);
 static int cmd_examine(int argc, char **argv);
 static int cmd_set(int argc, char **argv);
+static int cmd_out(int argc, char **argv);
 static int cmd_trace(int argc, char **argv);
 static int cmd_hotspot(int argc, char **argv);
 static int cmd_help(int argc, char **argv);
@@ -106,6 +107,7 @@ static command commands[] = {
     { "break",  cmd_break,         "<address/label>",  "Handle breakpoints" },
     { "x",      cmd_examine,       "<address>",   "Examine memory" },
     { "set",    cmd_set,           "<hl/h/l/...> <value>",  "Set registers" },
+    { "out",    cmd_out,           "<address> <value>", "Send to IO bus"},
     { "trace",  cmd_trace,         "<on/off>", "Disassemble every instruction"},
     { "hotspot",cmd_hotspot,       "<on/off>", "Track address counts and write to hotspots file"},
     { "help",   cmd_help,          "",   "Display this help text" },
@@ -121,7 +123,10 @@ static int next_address = -1;
        int trace = 0;
 static int hotspot = 0;
 static int max_hotspot_addr = 0;
+static int last_hotspot_addr;
+static int last_hotspot_st;
 static int hotspots[65536];
+static int hotspots_t[65536];
 
 
 void debugger_init()
@@ -161,7 +166,12 @@ void debugger()
         if ( pc > max_hotspot_addr) {
             max_hotspot_addr = pc;
         }
+        if ( last_hotspot_addr != -1 ) {
+            hotspots_t[last_hotspot_addr] += st - last_hotspot_st;
+        }
         hotspots[pc]++;
+        last_hotspot_addr = pc;
+        last_hotspot_st = st;
     }
 
     if ( debugger_active == 0 ) {
@@ -252,7 +262,6 @@ static int cmd_next(int argc, char **argv)
     len = disassemble2(pc, buf, sizeof(buf));
 
     // Set a breakpoint after the call
-    printf("%02x %02x %02x\n",opcode,opcode & 0xc0, opcode & 0x07);
     switch ( opcode ) {
     case 0xc4:
     case 0xcc:
@@ -284,6 +293,18 @@ static int cmd_continue(int argc, char **argv)
     return 1;
 }
 
+static int parse_number(char *str, char **end)
+{
+    int   base = 0;
+    int   ret;
+
+    if ( *str == '$' ) {
+        base = 16;
+        str++;
+    } 
+    return strtol(str, end, base);
+}
+
 static int cmd_disassemble(int argc, char **argv)
 {
     char  buf[256];
@@ -292,7 +313,13 @@ static int cmd_disassemble(int argc, char **argv)
 
     if ( argc == 2 ) {
         char *end;
-        where = strtol(argv[1], &end, 0);
+        where = parse_number(argv[1], &end);
+        if ( end == argv[1] ) {
+            where = symbol_resolve(argv[1]);
+            if ( where == -1 ) {
+                where = pc;
+            }
+        }
     }
 
     while ( i < 10 ) {
@@ -338,7 +365,7 @@ static int cmd_break(int argc, char **argv)
         char *end;
         const char *sym;
         breakpoint *elem;
-        int value = strtol(argv[1], &end,0);
+        int value = parse_number(argv[1], &end);
 
         if ( end != argv[1] ) {
             elem = malloc(sizeof(*elem));
@@ -399,7 +426,7 @@ static int cmd_break(int argc, char **argv)
     } else if ( argc == 5 && strcmp(argv[1], "memory8") == 0 ) {
         // break memory8 <addr> = <value>
         char  *end;
-        int value = strtol(argv[2], &end,0);
+        int value = parse_number(argv[2], &end);
         
         if ( end == argv[2] ) {
             value =  symbol_resolve(argv[2]);
@@ -409,7 +436,7 @@ static int cmd_break(int argc, char **argv)
             breakpoint *elem = malloc(sizeof(*elem));
             elem->type = BREAK_CHECK8;
             elem->lcheck_ptr = get_memory_addr(value);
-            elem->lvalue = atoi(argv[4]);
+            elem->lvalue = parse_number(argv[4], &end);
             elem->enabled = 1;
             elem->text = strdup(argv[2]);
             LL_APPEND(breakpoints, elem);
@@ -417,14 +444,14 @@ static int cmd_break(int argc, char **argv)
         }   
     } else if ( argc == 5 && strcmp(argv[1], "memory16") == 0 ) {
         char  *end;
-        int addr = strtol(argv[2], &end,0);
+        int addr = parse_number(argv[2], &end);
         
         if ( end == argv[2] ) {
             addr =  symbol_resolve(argv[2]);
         }
        
         if ( addr != -1 ) {
-            int value = atoi(argv[4]);
+            int value = parse_number(argv[4],&end);
             breakpoint *elem = malloc(sizeof(*elem));
             elem->type = BREAK_CHECK16;
             elem->lcheck_ptr = get_memory_addr(addr);
@@ -485,9 +512,11 @@ static int cmd_examine(int argc, char **argv)
 {
     if ( argc == 2 ) {
         char *end;
-        int addr = strtol(argv[1], &end, 0);
-
-        if ( end != argv[1] ) {
+        int addr = parse_number(argv[1], &end);
+        if ( end == argv[1] ) {
+            addr =  symbol_resolve(argv[1]);
+        }
+        if ( addr != -1  ) {
             char  buf[100];
             char  abuf[17];
             size_t offs;
@@ -518,7 +547,7 @@ static int cmd_set(int argc, char **argv)
 
     if ( argc == 3 ) {
         char *end;
-        int val = strtol(argv[2], &end, 0);
+        int val = parse_number(argv[2], &end);
 
         if ( end != NULL ) {
             while ( search->name != NULL ) {
@@ -542,6 +571,20 @@ static int cmd_set(int argc, char **argv)
     return 0;
 }
 
+
+
+static int cmd_out(int argc, char **argv)
+{
+    if ( argc == 3 ) {
+        char *end;
+        int port = parse_number(argv[1], &end);
+        int value = parse_number(argv[2], &end);
+        
+        printf("Writing IO: out(%d),%d\n",port,value);
+        out(port,value);
+    }
+    return 0;
+}
 
 static int cmd_trace(int argc, char **argv)
 {
@@ -599,7 +642,7 @@ static void print_hotspots()
         for ( i = 0; i < max_hotspot_addr; i++) {
             if ( hotspots[i] != 0 ) {
                 disassemble2(i, buf, sizeof(buf));
-                fprintf(fp, "%d\t\t%s\n",hotspots[i],buf);
+                fprintf(fp, "%d\t%d\t\t%s\n",hotspots[i],hotspots_t[i],buf);
             }
         }
         fclose(fp);

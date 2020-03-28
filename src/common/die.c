@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // die - check results and die on error
-// Copyright (C) Paulo Custodio, 2011-2018
+// Copyright (C) Paulo Custodio, 2011-2019
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 #include "die.h"
@@ -41,7 +41,7 @@ int check_retval(int retval, const char *file, const char *source_file, int line
 }
 
 int xglob(const char * pattern, int flags, 
-	const int(*errfunc)(const char *epath, int eerrno), glob_t * pglob)
+	int(*errfunc)(const char *epath, int eerrno), glob_t * pglob)
 {
 	int ret = glob(pattern, flags, errfunc, pglob);
 	if (ret != GLOB_NOMATCH && ret != 0)

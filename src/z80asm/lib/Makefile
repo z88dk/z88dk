@@ -3,18 +3,30 @@
 #
 # Collection of C library functions to be used in my C projects.
 #
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-# Repository: https://github.com/pauloscustodio/z88dk-z80asm
+# Repository: https://github.com/z88dk/z88dk
 #------------------------------------------------------------------------------
 
 TARGET		= libclibrary.a
 
-include ../../Make.common
+# EXESUFFIX is passed when cross-compiling Win32 on Linux
+ifeq ($(OS),Windows_NT)
+  EXESUFFIX 		:= .exe
+else
+  EXESUFFIX 		?=
+endif
+
+# UNIXem is needed in both Windows_NT and in a MinGW build in Unix
+ifeq ($(EXESUFFIX),.exe)
+  UNIXem_CFLAGS	:= -I../../../ext/UNIXem/include
+  UNIXem_OBJS	:=   ../../../ext/UNIXem/src/glob.o \
+				     ../../../ext/UNIXem/src/dirent.o
+endif
 
 CC		= gcc
 CFLAGS		+= -g -Wall -Wextra -MMD -I. -I../../common -I../../../ext/uthash/src \
-		   $(UNIXem_CFLAGS)\
+		   $(UNIXem_CFLAGS) \
 		   $(OPTFLAGS)
 LDLIBS		+= $(OPTLIBS) $(TARGET)
 PREFIX  	?= /usr/local

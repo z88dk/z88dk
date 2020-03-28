@@ -1,4 +1,4 @@
-# Black Star by Juan J. Ramirez (@reidrac)
+# Black Star by Juan J. Martinez (@reidrac)
 [Original Website](https://www.usebox.net/jjm/blackstar/)
 
 This is a game I made in (less than) 48 hours for [BitBitJam 2015](http://bitbitjam.com/), a retro compo to make a game for an old 8-bit or 16-bit platform (in this edition the time limit was 48 hours).

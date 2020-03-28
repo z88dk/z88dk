@@ -1,46 +1,31 @@
 #
-# Wahey, a messed up makefile for building libraries!
-# $Id: Makefile,v 1.4 2016-07-14 13:30:11 pauloscustodio Exp $
-#
 
 include ../../Make.config
 
-AFILES  = $(CFILES:.c=.asm)
-OBJECTS = $(CFILES:.c=.o)
+vpath %.c ../cimpl/
 
-all: zx81math genmath
+AFILES  = $(wildcard c/sccz80/*.asm)
+CFILES  = acos.c asin.c	atan2.c	atof.c cosh.c ftoa.c ftoe.c pow.c sinh.c tanh.c acosh.c asinh.c atanh.c
+OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
 
-genmath: $(OBJECTS)
-	$(ZCC) +test $(CFLAGS) acos.c
-	$(ZCC) +test $(CFLAGS) asin.c
-	$(ZCC) +test $(CFLAGS) atan2.c
-	$(ZCC) +test $(CFLAGS) atof.c
-	$(ZCC) +test $(CFLAGS) cosh.c
-	$(ZCC) +test $(CFLAGS) ftoa.c
-	$(ZCC) +test $(CFLAGS) ftoe.c
-	$(ZCC) +test $(CFLAGS) pow.c
-	$(ZCC) +test $(CFLAGS) sinh.c
-	$(ZCC) +test $(CFLAGS) tanh.c
-	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/gen_math @genlist
+CFLAGS += -fp-mode=z80
 
-zx81math:
-	$(RM) -f *.o
-	$(ZCC) +test $(CFLAGS) -Ca--IXIY acos.c
-	$(ZCC) +test $(CFLAGS) -Ca--IXIY asin.c
-	$(ZCC) +test $(CFLAGS) -Ca--IXIY atan2.c
-	$(ZCC) +test $(CFLAGS) -Ca--IXIY atof.c
-	$(ZCC) +test $(CFLAGS) -Ca--IXIY cosh.c
-	$(ZCC) +test $(CFLAGS) -Ca--IXIY ftoa.c
-	$(ZCC) +test $(CFLAGS) -Ca--IXIY ftoe.c
-	$(ZCC) +test $(CFLAGS) -Ca--IXIY pow.c
-	$(ZCC) +test $(CFLAGS) -Ca--IXIY sinh.c
-	$(ZCC) +test $(CFLAGS) -Ca--IXIY tanh.c
-	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/zx81_math --IXIY @zx81list
-	$(RM) -f *.o
+all: dirs $(OUTPUT_DIRECTORY)/genmath.lib $(OUTPUT_DIRECTORY)/genmath_iy.lib $(OUTPUT_DIRECTORY)/genmath_zx81.lib
 
-.c.o:
-	$(ZCC) +test $(CFLAGS) $*.c
+
+$(OUTPUT_DIRECTORY)/genmath.lib: $(addprefix obj/z80/, $(OBJECTS))
+	TYPE=z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/genmath @genmath.lst
+
+$(OUTPUT_DIRECTORY)/genmath_iy.lib: $(addprefix obj/ixiy/, $(OBJECTS))
+	TYPE=ixiy $(LIBLINKER) --IXIY -x$(OUTPUT_DIRECTORY)/genmath_iy @genmath.lst
+
+$(OUTPUT_DIRECTORY)/genmath_zx81.lib: $(addprefix obj/ixiy/, $(OBJECTS))
+	TYPE=ixiy $(LIBLINKER) --IXIY -x$(OUTPUT_DIRECTORY)/genmath_zx81 @genmathzx81.lst
+
+dirs:
+	@mkdir -p obj/z80/c/sccz80 obj/ixiy/c/sccz80
 
 clean:
-	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i $(AFILES)
+	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i *.opt
+	$(RM) -fr obj
 

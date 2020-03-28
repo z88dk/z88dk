@@ -25,6 +25,7 @@ l/z80/l_ldd
 l/z80/l_ldd_loop
 l/z80/l_ldi
 l/z80/l_ldi_loop
+l/z80/l_mirror
 l/z80/l_offset_ix_bc
 l/z80/l_offset_ix_de
 l/z80/l_outi

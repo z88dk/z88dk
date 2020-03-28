@@ -1,0 +1,11 @@
+target/trs80/graphics_eg2000/clg
+target/trs80/graphics_eg2000/clsgraph
+target/trs80/graphics_eg2000/cplot
+target/trs80/graphics_eg2000/cplot_callee
+target/trs80/graphics_eg2000/cpoint
+target/trs80/graphics_eg2000/cpoint_callee
+target/trs80/graphics_eg2000/pixladdr
+target/trs80/graphics_eg2000/putsprite
+target/trs80/graphics_eg2000/bksave
+target/trs80/graphics_eg2000/bkrestore
+@gfx/narrow/gfx_narrow.lst

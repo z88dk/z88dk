@@ -2,15 +2,13 @@
 
 # Z88DK Z80 Module Assembler
 #
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk/
 #
 # Test source lists (@files)
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 use File::Path 'make_path';
 require './t/testlib.pl';
@@ -55,7 +53,6 @@ spew("test2.lst",
 	"test1.lst");
 run('z80asm -b test1.asm "@test1.lst"', 1, "", <<'ERR');
 Error at file 'test2.lst' line 7: cannot include file 'test1.lst' recursively
-1 errors occurred during assembly
 ERR
 
 # expand environment variables in source and list files
@@ -129,7 +126,6 @@ spew("test1.lst", <<'END');
 END
 run('z80asm -b "@test1.lst"', 1, "", <<'ERR');
 Error at file 'test1.lst' line 1: pattern 'test_dir/*.asm' returned no files
-1 errors occurred during assembly
 ERR
 
 # use globs in recursive list file name

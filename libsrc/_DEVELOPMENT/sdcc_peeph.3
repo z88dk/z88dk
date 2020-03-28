@@ -954,7 +954,7 @@ replace restart {
 	ld	%5, %2
 	; peephole 10 loaded %5 from %2 directly instead of going through %1.
 	ld	%3, %4
-} if canAssign(%5 %2), notVolatile(%1), operandsNotRelated(%1 %4), operandsNotRelated(%1 %3), operandsNotRelated(%4 %5), notUsed(%1), notSame(%3 %4 '(hl)' '(de)' '(bc)'), notVolatile(%5)
+} if notUsed(%1), canAssign(%5 %2), notVolatile(%1), notVolatile(%5), operandsNotRelated(%1 %3), operandsNotRelated(%1 %4), operandsNotRelated(%2 %3), operandsNotRelated(%3 %5), operandsNotRelated(%4 %5), notSame(%3 %4 '(hl)' '(de)' '(bc)')
 // Rule OK unless both %5 and %4 are volatile, but we can't express that directly.
 
 replace restart {
@@ -5822,7 +5822,7 @@ replace restart {
 	dec	hl
 	ld	%1,(hl)
 	; peephole z88dk-171
-} if notUsed('hl')
+} if notUsed('hl'), operandsNotRelated(%1 'hl'), operandsNotRelated(%2 'hl')
 
 replace restart {
 	sla	e
@@ -6910,7 +6910,7 @@ replace restart {
 	ld	%2,h
 	pop	de
 	; peephole z88dk-199
-} if operandsNotRelated(%1 'de'), operandsNotRelated(%2 'de')
+} if operandsNotRelated(%1 'de'), operandsNotRelated(%2 'de'), operandsNotRelated(%1 'hl'), operandsNotRelated(%2 'hl')
 // if notVolatile()
 
 replace restart {
@@ -9698,7 +9698,7 @@ replace restart {
 	ld	%2,%3
 	ld	hl,#%1
 	; peephole z88dk-293
-} if notSame(%2 'h' 'l' 'hl' '(hl)'), notSame(%3 'h' 'l' 'hl' '(hl)')
+} if operandsNotRelated(%2 'hl'), operandsNotRelated(%3 'hl')
 
 replace restart {
 	ld	a,d
@@ -11514,7 +11514,7 @@ replace restart {
 	ld	%3 (%5),%6
 	ld	%4 (%5),%7
 	; peephole z88dk-348a
-} if canAssign(%3 %5 %6), canAssign(%4 %5 %7)
+} if canAssign(%3 %5 %6), canAssign(%4 %5 %7), operandsNotRelated(%2 %6), operandsNotRelated(%2 %1)
 
 replace restart {
 	ld	%1,%3 (%5)
@@ -18590,8 +18590,7 @@ replace restart {
 	ld	a,(hl)
 } by {
 	ld	hl,(#%1)
-	ld	a,l
-	ld	%3 (%4),a
+	ld	%3 (%4),l
 	ld	a,h
 	; peephole z88dk-427a
 } if notUsed('hl')
@@ -20931,7 +20930,7 @@ replace restart {
 } by {
 	ld	%1,#%2 + %3+1
 	; peephole z88dk-463b
-} if notSame(%1 '(hl)')
+} if same(%1 'bc' 'de' 'hl')
 
 replace restart {
 	ld	%1,#%2
@@ -21299,7 +21298,7 @@ replace restart {
 	ld	%3,%4
 	ld	%5,%1
 	; peephole z88dk-471b
-} if notSame(%1 %3)
+} if operandsNotRelated(%1 %3)
 
 replace restart {
 	ld	%1 (%2),l
@@ -22204,8 +22203,9 @@ replace restart {
 	inc	bc
 	ld	a,h
 	ld	(bc),a
+	ex	de,hl
 	; peephole z88dk-478d
-} if notUsed('de'), notUsed('hl')
+}
 
 replace restart {
 	ld	a,(#%1)
@@ -24878,6 +24878,41 @@ replace restart {
 	; peephole z88dk-494a2
 }
 
+replace restart {
+	ld	bc,(#%1)
+	ld	d,b
+	ld	hl,#%1
+	ld	e,(hl)
+} by {
+	ld	bc,(#%1)
+	ld	e,c
+	ld	d,b
+	ld	hl,#%1
+	; peephole z88dk-494a3
+}
+
+replace restart {
+	ld	l,c
+	ld	h,b
+	ld	a,d
+	ld	d,l
+	ld	l,a
+	ld	a,e
+	ld	e,h
+	ld	h,a
+} by {
+	ld	a,d
+	ld	d,c
+	ld	l,a
+	ld	a,e
+	ld	e,b
+	ld	h,a
+	; peephole z88dk-494a4
+}
+
+
+
+
 
 
 
@@ -26167,7 +26202,7 @@ replace restart {
 	or	a,%2
 	ld	%1,%2
 	; peephole z88dk-606e
-} if canAssign(%2 '(hl)'), notSame(%1 'a'), notSame(%1 %3)
+} if canAssign(%2 '(hl)'), notSame(%1 'a'), operandsNotRelated(%1 %3)
 
 replace restart {
 	ld	e,a

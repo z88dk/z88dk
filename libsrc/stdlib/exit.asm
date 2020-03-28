@@ -40,7 +40,14 @@ PUBLIC ASMDISP_EXIT
    add a,a
    ld e,a
    ld d,0
+IF __CPU_GBZ80__
+   ld hl,exitsp
+   ld a,(hl+)
+   ld h,(hl)
+   ld l,a
+ELSE
    ld hl,(exitsp)            ; hl = & atexit stack
+ENDIF
    add hl,de                 ; hl = & last function in exit stack + 2b
 
 .loop                        ; now traverse atexit stack in reverse order

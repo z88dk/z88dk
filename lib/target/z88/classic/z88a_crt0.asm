@@ -21,6 +21,14 @@
 ;
 ;	$Id: app_crt0.asm,v 1.30 2016-07-15 19:32:43 dom Exp $
 
+        PUBLIC    cleanup               ;jp'd to by exit()
+        PUBLIC    l_dcal                ;jp(hl)
+
+
+        PUBLIC    processcmd    ;Processing <> commands
+
+
+        PUBLIC  _cpfar2near     ;Conversion of far to near data
 
 ;--------
 ; Call up some header files (probably too many but...)
@@ -47,6 +55,12 @@
         IF      !DEFINED_CRT_ORG_CODE
                 defc    CRT_ORG_CODE  = 49152
         ENDIF
+
+        IF !DEFINED_CLIB_FOPEN_MAX
+		defc	DEFINED_CLIB_FOPEN_MAX = 1
+                DEFC    CLIB_FOPEN_MAX = 5
+        ENDIF
+
 
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = -1
@@ -154,8 +168,7 @@ ENDIF
 cleanup:			;Jump back to here from exit()
 IF CRT_ENABLE_STDIO = 1
 	push	af		;Save exit value
-	EXTERN	closeall
-	call	closeall	;Close all files
+    call    crt0_exit
  IF DEFINED_farheapsz
 	EXTERN	freeall_far
  	call	freeall_far	;Deallocate far memory

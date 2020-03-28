@@ -75,6 +75,10 @@ dnl#__DPROTO(,,uint16_t,,in_stick_keyboard,udk_t *u)
 #include <input/input_cpm.h>
 #endif
 
+#ifdef __HBIOS
+#include <input/input_hbios.h>
+#endif
+
 #ifdef __SMS
 #include <input/input_sms.h>
 #endif

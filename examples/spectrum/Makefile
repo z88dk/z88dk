@@ -1,6 +1,6 @@
 
-
-all: clisp.tap adv_a.tap ansitest.tap enigma.tap fib.tap mm.tap rpn.tap tic.tap \
+all: rndsphere.tap clisp_speclisp.tap clisp.tap hawk.tap \
+	adv_a.tap ansitest.tap enigma.tap fib.tap mm.tap rpn.tap tic.tap \
 	sorter.tap snakes.tap dstar.tap dstar_native.tap microman.tap \
 	othello.tap othello_udg.tap wall.tap gfx.tap save.tap ex10b.tap \
 	ccoswave.tap c3d.tap cmandel.tap csprite.tap zxbasic.tap zxcurrah.tap \
@@ -16,6 +16,9 @@ fontexample.tap: fontexample.c
 
 clisp.tap: ../clisp/clisp.c
 	zcc +zx -vn -lndos ../clisp/clisp.c -create-app -O3 -DLARGEMEM=1200 -oclisp.bin
+
+clisp_speclisp.tap: ../clisp/clisp.c
+	zcc +zx -vn -lndos ../clisp/clisp.c -create-app -O3 -DLARGEMEM=3000 -DGRAPHICS -llib3d -DSHORT -DSPECLISP -oclisp_speclisp.bin
 
 adv_a.tap: ../console/adv_a.c
 	zcc +zx -vn -lndos ../console/adv_a.c -I../console -create-app -DTAPE -DPICS -DCOMPUTE_SCORE -O3 -zorg=27000 -oadv_a.bin
@@ -90,7 +93,7 @@ zxcurrah.tap: zxcurrah.c
 	zcc +zx -vn zxcurrah.c -lndos -create-app -ozxcurrah.bin -lm
 
 threading.tap: preempt.c
-	zcc +zx -vn preempt.c -lim2 -lndos -create-app -othreading.bin -lpreempt
+	zcc +zx -vn preempt.c -lndos -create-app -othreading.bin -lpreempt
 
 opusdump.tap: opusdump.c
 	zcc +zx -vn opusdump.c -lndos -create-app -lrs232plus -oopusdump.bin
@@ -101,6 +104,9 @@ globe.tap: ../graphics/globe.c
 chessboard.tap: ../graphics/chessboard.c
 	zcc +zx -vn -I../graphics ../graphics/chessboard.c -lndos -lm -create-app -ochessboard.bin
 
+hawk.tap: ../graphics/hawk.c
+	zcc +zx -vn ../graphics/hawk.c -lndos -lm -create-app -DSOUND -ohawk.bin
+	
 mandel.tap: ../graphics/mandel.c
 	zcc +zx -vn ../graphics/mandel.c -lndos -lm -create-app -omandel.bin
 
@@ -109,6 +115,9 @@ julia.tap: ../graphics/julia.c
 
 smallgfx.tap: ../graphics/smallgfx.c
 	zcc +zx -vn ../graphics/smallgfx.c -lndos -lm -create-app -osmallgfx.bin
+
+rndsphere.tap: ../graphics/rndsphere.c
+	zcc +zx -vn ../graphics/rndsphere.c -lndos -lm -create-app -orndsphere.bin
 
 stencil.tap: ../graphics/stencil.c
 	zcc +zx -vn ../graphics/stencil.c -lndos -lm -llib3d -create-app -ostencil.bin
@@ -123,7 +132,7 @@ smallgfx2.tap: ../graphics/smallgfx2.c
 	zcc +zx -vn ../graphics/smallgfx2.c -lndos -lm -create-app -osmallgfx2.bin
 
 wintest.tap: ../graphics/wintest.c
-	zcc +zx -vn ../graphics/wintest.c -lndos -lm -lx11  -create-app -owintest.bin
+	zcc +zx -vn ../graphics/wintest.c -lndos -lm -create-app -owintest.bin
 
 sinwave_fast.tap: ../graphics/sinwave.c
 	zcc +zx -vn ../graphics/sinwave.c -lndos -lm  -create-app -osinwave_fast.bin
@@ -144,7 +153,7 @@ smile.tap: ../ticalc/smile.c
 	zcc +zx -vn ../ticalc/smile.c -lndos -create-app -osmile.bin
 
 xample.tap: ../graphics/xample.c
-	zcc +zx -vn ../graphics/xample.c -lndos -create-app -lx11 -oxample.bin
+	zcc +zx -vn ../graphics/xample.c -lndos -create-app -oxample.bin
 
 clicktest.tap: ../sound/clicktest.c
 	zcc +zx -vn ../sound/clicktest.c -lndos -create-app -oclicktest.bin

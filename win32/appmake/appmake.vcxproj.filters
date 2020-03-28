@@ -46,18 +46,20 @@
     <ClCompile Include="..\..\src\appmake\zx81.c" />
     <ClCompile Include="..\..\src\appmake\zxvgs.c" />
     <ClCompile Include="..\..\src\appmake\kc.c" />
+    <ClCompile Include="..\..\src\appmake\gb.c" />
     <ClCompile Include="..\..\src\appmake\glue.c" />
     <ClCompile Include="..\..\src\appmake\zxn.c" />
     <ClCompile Include="..\..\src\appmake\zx-util.c" />
     <ClCompile Include="..\..\src\appmake\x1.c" />
-    <ClCompile Include="..\..\src\appmake\cpm.c" />
     <ClCompile Include="..\..\src\appmake\spc1000.c" />
     <ClCompile Include="..\..\src\appmake\multi8.c" />
     <ClCompile Include="..\..\src\appmake\fp1100.c" />
     <ClCompile Include="..\..\src\appmake\d88.c" />
     <ClCompile Include="..\..\src\appmake\cpmdisk.c" />
-    <ClCompile Include="..\..\src\appmake\einstein.c" />
     <ClCompile Include="..\..\src\appmake\mz2500.c" />
+    <ClCompile Include="..\..\src\appmake\cpm2.c" />
+    <ClCompile Include="..\..\src\appmake\mameql.c" />
+    <ClCompile Include="..\..\src\appmake\pc88.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\appmake\appmake.h" />

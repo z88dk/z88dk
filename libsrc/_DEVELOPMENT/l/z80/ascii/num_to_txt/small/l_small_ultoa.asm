@@ -28,7 +28,12 @@ l_small_ultoa:
    ld bc,-10+256
    push bc
    push hl
-   
+
+;  ld bc,-100+256
+   ld c,0xff & (-100+256)
+   push bc
+   push hl
+
    ld bc,-1000+256
    push bc
    push hl

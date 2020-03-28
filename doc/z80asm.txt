@@ -568,13 +568,13 @@ file.
 2.6. Scope of symbols in source modules
 ---------------------------------------
 
-All source modules may refer to each others symbols by using XREF directives.
+All source modules may refer to each others symbols by using EXTERN directives.
 This means that you refer to external information outside the current source
 module. The opposite of an external module reference is to declare symbols
-globally available using a XDEF directive, i.e. making symbols available to other
-source modules. Finally it is possible to have local symbols that is not known to
+globally available using a PUBLIC directive, i.e. making symbols available to other
+source modules. Finally it is possible to have local symbols that are not known to
 other source modules than the current. A label or constant that has not been
-declared with XREF, XDEF or XLIB is local to the module.
+declared with EXTERN, PUBLIC or GLOBAL is local to the module.
 
 
 2.7. Using arithmetic and relational expressions
@@ -1176,7 +1176,7 @@ following is a label definition:
     ; routine definition
     .mainmenu call xxx ; a label is preceded with '.'
 
-    endmain:  ret                ; or followed by '.'
+    endmain:  ret                ; or followed by ':'
 
 It is not allowed to position two labels on the same line. However, you may place
 as many label after each other - even though no code is between them. They just
@@ -1186,15 +1186,15 @@ It is not allowed to specify two identical address labels in the same source
 file.
 
 If you want to declare an address globally accessible to other modules, then use
-XDEF for the address label definition, otherwise the label definition will be
+PUBLIC for the address label definition, otherwise the label definition will be
 interpreted as a local address label.
 
-    XDEF mainmenu
+    PUBLIC mainmenu
     ...
-    .mainmenu ; label accessible from other modules with XREF
+    .mainmenu ; label accessible from other modules through PUBLIC directive
 
-You may use before or after the label - z80asm automatically handles the scope
-resolution as long as you use XDEF to define it as globally accessible.
+You may use it before or after the label - z80asm automatically handles the scope
+resolution as long as you use PUBLIC to define it as globally accessible.
 
 
 5.9. Writing Z80 mnemonic instructions
@@ -1443,7 +1443,6 @@ implemented: binary AND, OR and XOR.
     | : binary OR, e.g. 128 | 64 (192)
     ^ : binary XOR, e.g. 128 ^ 128 (0)
     ~ : binary NOT, e.g. (~0xAA) & 0xFF (0x55)
-    # : truncate expression as constant (remove relocatable address flag)
 
 Arithmetic operators use the standard operator precedence, shown from highest to
 lowest:
@@ -1452,35 +1451,6 @@ lowest:
     () ** */% +-&|^~
 
 If you want to override the default operator precedence rules, use brackets ().
-
-
-6.3. The # operator
--------------------
-
-This is not a real operator, though. It is only used as the first symbol in an
-expression to identify that this expression evaluates to a constant, i.e.
-containing no relocatable information. This feature may be necessary when you
-have to calculate a distance between two address labels without letting the
-assembler think it is a relocatable address. The assembler thinks that
-expressions containing address labels are relocatable items. In 99% of any
-expression used this is perfectly adequate.
-
-During the linking phase such an expression may have undesirable side effect when
-you want to produce relocatable machine code using the -R option. The relocator
-identifies the expression as an relocatable item and will add a constant to the
-evaluated value of the expression. This is a perfectly correct handling in normal
-address references for relocatable code. However, since the assembler cannot see
-this as a constant expression, you have to force it as one.
-
-    LD BC, end_relocator-relocator  ; the relocator will add an ORG constant
-    LD BC, #end_relocator-relocator ; the relocator sees a constant expression
-
-Normal executable code, compiled for an absolute address, won't conflict with the
-above problem, since no constants are added to expressions. All address
-information is calculated during loading of the address labels in pass 1 of the
-linking process. Pass 2 of the linking process just evaluates expressions
-(thereby using the proper values of labels and other constants) and patches them
-into the corresponding locations of the code.
 
 
 6.4. Relational operators
@@ -1744,7 +1714,15 @@ Some of the symbols will look like this:
     JJJ = $40D4
 
 
-7.12. FPP <8-bit expression>
+7.12. EXTERN name {, name}
+--------------------------
+
+This declares symbols as external to the current module. Such a symbol must have
+been defined as PUBLIC in another module for the current module to be able to
+use the symbol (it will be linked during the linking phase).
+
+
+7.13. FPP <8-bit expression>
 ----------------------------
 
 Interface call to the Z88 operating systems' floating point library. This is
@@ -1758,7 +1736,14 @@ the specified parameter. All Z88 floating point call mnemonics are defined in th
 "fpp.def" file.
 
 
-7.13. IF <logical expression> ... [ELSE] ... ENDIF
+7.14. GLOBAL name {, name}
+--------------------------
+
+The GLOBAL directive defines a symbol PUBLIC if it has been defined locally or
+EXTERN otherwise.
+
+
+7.15. IF <logical expression> ... [ELSE] ... ENDIF
 --------------------------------------------------
 
 This structure evaluates the logical expression as a constant, and compiles the
@@ -1767,7 +1752,7 @@ lines from ELSE to ENDIF if is is false (i.e. zero). The ELSE clause is optional
 This structure may be nested.
 
 
-7.14. IFDEF <name> ... [ELSE] ... ENDIF
+7.16. IFDEF <name> ... [ELSE] ... ENDIF
 ---------------------------------------
 
 This structure checks if the give symbol name is defined, and compiles the lines
@@ -1776,7 +1761,7 @@ false (i.e. not defined). The ELSE clause is optional. This structure may be
 nested.
 
 
-7.15. IFNDEF <name> ... [ELSE] ... ENDIF
+7.17. IFNDEF <name> ... [ELSE] ... ENDIF
 ----------------------------------------
 
 This structure checks if the give symbol name is not defined, and compiles the
@@ -1785,7 +1770,7 @@ ENDIF if false (i.e. defined). The ELSE clause is optional. This structure may b
 nested.
 
 
-7.16. INCLUDE "filename"
+7.18. INCLUDE "filename"
 ------------------------
 
 Another component that is frequently used is to 'link' an additional source file
@@ -1809,7 +1794,7 @@ after the INCLUDE directive when the included file has been parsed to the end of
 file.
 
 
-7.17. INVOKE <16-bit expression>
+7.19. INVOKE <16-bit expression>
 --------------------------------
 
 Special CALL instruction for the Ti83 calculator; it is coded as a RST 28H
@@ -1818,17 +1803,14 @@ line (for the Ti83Plus), or as a normal CALL instruction if the option is not
 passed.
 
 
-7.18. LIB name {,name}
+7.20. LIB name {,name}
 ----------------------
 
-LIB declares symbol as external to the current module. The symbol name will be
-defined as the name of a library routine which will be automatically linked into
-the application code from a library during the linking/relocation phase of the
-compilation process (if a library has been specified at the command line with the
--i option).
+This directive is obsolete. It has been replaced by the EXTERN directive (See
+changelog.txt at the root of the z88dk project).
 
 
-7.19. LINE <32-bit expr>
+7.21. LINE <32-bit expr>
 ------------------------
 
 Used when the assembler is used as the back-end of a compiler to synchronize the
@@ -1836,13 +1818,13 @@ line numbers in error messages to the lines from the compiled source. Needs the
 -C option to enable.
 
 
-7.20. LSTOFF
+7.22. LSTOFF
 ------------
 
 Switches listing output to file off temporarily. The listing file is not closed.
 
 
-7.21. LSTON
+7.23. LSTON
 -----------
 
 Enables listing output (usually from a previous LSTOFF). Both directives may be
@@ -1850,7 +1832,7 @@ useful when information from INCLUDE files is redundant in the listing file, e.g
 operating system definitions.
 
 
-7.22. MODULE name
+7.24. MODULE name
 -----------------
 
 This defines the name of the current module. This may be defined only once for a
@@ -1863,7 +1845,7 @@ sense to put it at the top. The syntax is simple - specify a legal identifier
 name after the MODULE directive, e.g. MODULE main_module
 
 
-7.23. ORG <16-bit expression>
+7.25. ORG <16-bit expression>
 -----------------------------
 
 Define address origin of compiled machine code - the position in memory where the
@@ -1882,29 +1864,32 @@ A section may contain ORG -1 to tell the linker to split the binary file of this
 section, but continue the addresses sequence from the previous section.
 
 
-7.24. XDEF name {, name}
+7.26. PUBLIC name {, name}
+--------------------------
+
+This directive declares symbols publicly available for other modules during the
+linking phase of the compilation process.
+
+
+7.27. XDEF name {, name}
 ------------------------
 
-This declares symbol globally available to other specified source file modules
-during the linking phase of the compilation process.
+This directive is obsolete. It has been replaced by the PUBLIC directive (See
+changelog.txt at the root of the z88dk project).
 
 
-7.25. XLIB name
+7.28. XLIB name
 ---------------
 
-When you need to create a library routine, it is necessary to declare the routine
-with XLIB. In functionality it declares the name globally available to all other
-modules in project, but also serves as a searchable item in libraries. A library
-routine does not contain a MODULE directive, since the XLIB name is also
-identified as the module name (you only specify one library routine per module).
+This directive is obsolete. It has been replaced by the PUBLIC directive (See
+changelog.txt at the root of the z88dk project).
 
 
-7.26. XREF name {, name}
+7.29. XREF name {, name}
 ------------------------
 
-This declares symbol as external to the current module. The name must have been
-defined as XDEF in another module to let this module reach the value of the
-symbol during the linking phase.
+This directive is obsolete. It has been replaced by the EXTERN directive (See
+changelog.txt at the root of the z88dk project).
 
 
 
@@ -2342,8 +2327,6 @@ Index
 
     6.2. Arithmetic operators
 
-    6.3. The # operator
-
     6.4. Relational operators
 
     6.5. The ASMPC standard function
@@ -2375,35 +2358,41 @@ Index
     7.11. DEFVARS <16-bit expression> '{' [<name>] [<storage_size>
     <size_multiplier>] '}'
 
-    7.12. FPP <8-bit expression>
+    7.12. EXTERN name {, name}
 
-    7.13. IF <logical expression> ... [ELSE] ... ENDIF
+    7.13. FPP <8-bit expression>
 
-    7.14. IFDEF <name> ... [ELSE] ... ENDIF
+    7.14. GLOBAL name {, name}
 
-    7.15. IFNDEF <name> ... [ELSE] ... ENDIF
+    7.15. IF <logical expression> ... [ELSE] ... ENDIF
 
-    7.16. INCLUDE "filename"
+    7.16. IFDEF <name> ... [ELSE] ... ENDIF
 
-    7.17. INVOKE <16-bit expression>
+    7.17. IFNDEF <name> ... [ELSE] ... ENDIF
 
-    7.18. LIB name {,name}
+    7.18. INCLUDE "filename"
 
-    7.19. LINE <32-bit expr>
+    7.19. INVOKE <16-bit expression>
 
-    7.20. LSTOFF
+    7.20. LIB name {,name}
 
-    7.21. LSTON
+    7.21. LINE <32-bit expr>
 
-    7.22. MODULE name
+    7.22. LSTOFF
 
-    7.23. ORG <16-bit expression>
+    7.23. LSTON
 
-    7.24. XDEF name {, name}
+    7.24. MODULE name
 
-    7.25. XLIB name
+    7.25. ORG <16-bit expression>
 
-    7.26. XREF name {, name}
+    7.26. PUBLIC name {, name}
+
+    7.27. XDEF name {, name}
+
+    7.28. XLIB name
+
+    7.29. XREF name {, name}
 
   8. Run time error messages
 

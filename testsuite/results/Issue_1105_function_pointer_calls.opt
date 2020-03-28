@@ -1,0 +1,491 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._placeholder
+	ld	hl,i_1+0
+	push	hl
+	ld	hl,6	;const
+	call	l_gintspsp	;
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_gint	;
+	push	hl
+	ld	a,3
+	call	printf
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._s_fastcall
+	ld	de,65535	;const
+	ex	de,hl
+	push	de
+	push	hl
+	ex	de,hl
+	push	hl
+	call	_placeholder
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._test2
+	ld	hl,_s_fastcall
+	push	hl
+	ld	hl,i_1+7
+	call	_s_fastcall
+	pop	hl
+	push	hl
+	push	hl
+	ld	hl,i_1+20
+	pop	af
+	ld	bc,i_2
+	push	bc
+	push	af
+	ret
+.i_2
+	pop	bc
+	ret
+
+
+
+._s_regular
+	ld	hl,65535	;const
+	push	hl
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	push	hl
+	call	_placeholder
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._test3
+	ld	hl,_s_regular
+	push	hl
+	ld	hl,i_1+26
+	push	hl
+	call	_s_regular
+	pop	bc
+	pop	hl
+	push	hl
+	push	hl
+	ld	hl,i_1+39
+	ex	(sp),hl
+	call	l_jphl
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._is_regular
+	ld	hl,4	;const
+	call	l_gintspsp	;
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	push	hl
+	call	_placeholder
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._test4
+	ld	hl,_is_regular
+	push	hl
+	ld	hl,10	;const
+	push	hl
+	ld	hl,i_1+45
+	push	hl
+	call	_is_regular
+	pop	bc
+	pop	bc
+	ld	hl,0	;const
+	call	l_gintspsp	;
+	ld	hl,4	;const
+	ex	(sp),hl
+	push	hl
+	ld	hl,i_1+58
+	ex	(sp),hl
+	call	l_jphl
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._l_regular
+	ld	hl,i_1+64
+	push	hl
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_glong
+	push	de
+	push	hl
+	ld	a,3
+	call	printf
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._test5
+	ld	hl,_l_regular
+	push	hl
+	ld	hl,101	;const
+	call	l_int2long_s
+	push	de
+	push	hl
+	call	_l_regular
+	pop	bc
+	pop	bc
+	ld	hl,0	;const
+	call	l_gintspsp	;
+	ld	hl,65535	;const
+	ld	de,65535
+	ex	de,hl
+	ex	(sp),hl
+	push	de
+	call	l_jphl
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._d_fastcall
+	call	dpush
+	ld	hl,i_1+78
+	push	hl
+	ld	hl,2	;const
+	add	hl,sp
+	call	dldpsh
+	ld	a,4
+	call	printf
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._test6
+	ld	hl,_d_fastcall
+	push	hl
+	ld	hl,i_3+0
+	call	dload
+	call	_d_fastcall
+	pop	hl
+	push	hl
+	push	hl
+	ld	hl,i_4+0
+	call	dload
+	call	dpush2
+	pop	hl
+	call	l_jphl
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._ll_fastcall
+	push	de
+	push	hl
+	ld	hl,i_1+94
+	push	hl
+	ld	hl,8	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	push	de
+	push	hl
+	ld	a,5
+	call	printf
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._test7
+	ld	hl,_ll_fastcall
+	push	hl
+	ld	hl,100	;const
+	call	l_int2long_s
+	push	de
+	push	hl
+	ld	hl,65526	;const
+	call	l_int2long_s
+	call	_ll_fastcall
+	pop	bc
+	pop	bc
+	ld	hl,0	;const
+	call	l_gintspsp	;
+	ld	hl,10	;const
+	call	l_int2long_s
+	ex	de,hl
+	ex	(sp),hl
+	push	de
+	push	hl
+	ld	hl,65535	;const
+	call	l_int2long_s
+	pop	af
+	ld	bc,i_5
+	push	bc
+	push	af
+	ret
+.i_5
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._is_fastcall
+	push	hl
+	ld	hl,4	;const
+	call	l_gintspsp	;
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	push	hl
+	call	_placeholder
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._test1
+	ld	hl,_is_fastcall
+	push	hl
+	ld	hl,10	;const
+	push	hl
+	ld	hl,i_1+111
+	call	_is_fastcall
+	pop	bc
+	ld	hl,0	;const
+	call	l_gintspsp	;
+	ld	hl,1	;const
+	ex	(sp),hl
+	push	hl
+	ld	hl,i_1+124
+	pop	af
+	ld	bc,i_6
+	push	bc
+	push	af
+	ret
+.i_6
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._main
+	call	_test1
+	call	_test2
+	call	_test3
+	call	_test4
+	call	_test5
+	call	_test6
+	call	_test7
+	ld	hl,0	;const
+	ret
+
+
+	SECTION	rodata_compiler
+.i_1
+	defm	"%d %s"
+	defb	10
+
+	defm	""
+	defb	0
+
+	defm	"test2-direct"
+	defb	0
+
+	defm	"test2"
+	defb	0
+
+	defm	"test3-direct"
+	defb	0
+
+	defm	"test3"
+	defb	0
+
+	defm	"test4-direct"
+	defb	0
+
+	defm	"test4"
+	defb	0
+
+	defm	"Long val %ld"
+	defb	10
+
+	defm	""
+	defb	0
+
+	defm	"Double val %lf"
+	defb	10
+
+	defm	""
+	defb	0
+
+	defm	"A = %ld b = %ld"
+	defb	10
+
+	defm	""
+	defb	0
+
+	defm	"test1-direct"
+	defb	0
+
+	defm	"test1"
+	defb	0
+
+.i_3
+	;20.000000
+	defb	0x00,0x00,0x00,0x00,0x20,0x85
+.i_4
+	;1.000000
+	defb	0x00,0x00,0x00,0x00,0x00,0x81
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	open
+	GLOBAL	creat
+	GLOBAL	close
+	GLOBAL	read
+	GLOBAL	write
+	GLOBAL	lseek
+	GLOBAL	readbyte
+	GLOBAL	writebyte
+	GLOBAL	getcwd
+	GLOBAL	chdir
+	GLOBAL	getwd
+	GLOBAL	rmdir
+	GLOBAL	_RND_BLOCKSIZE
+	GLOBAL	rnd_loadblock
+	GLOBAL	rnd_saveblock
+	GLOBAL	rnd_erase
+	GLOBAL	__FOPEN_MAX
+	GLOBAL	__sgoioblk
+	GLOBAL	__sgoioblk_end
+	GLOBAL	fopen_zsock
+	GLOBAL	fopen
+	GLOBAL	freopen
+	GLOBAL	fdopen
+	GLOBAL	_freopen1
+	GLOBAL	fmemopen
+	GLOBAL	funopen
+	GLOBAL	fclose
+	GLOBAL	fflush
+	GLOBAL	closeall
+	GLOBAL	fgets
+	GLOBAL	fputs
+	GLOBAL	fputc
+	GLOBAL	fputs_callee
+	GLOBAL	fputc_callee
+	GLOBAL	fgetc
+	GLOBAL	ungetc
+	GLOBAL	feof
+	GLOBAL	ferror
+	GLOBAL	puts
+	GLOBAL	ftell
+	GLOBAL	fgetpos
+	GLOBAL	fseek
+	GLOBAL	fread
+	GLOBAL	fwrite
+	GLOBAL	gets
+	GLOBAL	printf
+	GLOBAL	fprintf
+	GLOBAL	sprintf
+	GLOBAL	snprintf
+	GLOBAL	vfprintf
+	GLOBAL	vsnprintf
+	GLOBAL	printn
+	GLOBAL	scanf
+	GLOBAL	fscanf
+	GLOBAL	sscanf
+	GLOBAL	vfscanf
+	GLOBAL	vsscanf
+	GLOBAL	getarg
+	GLOBAL	fchkstd
+	GLOBAL	fgetc_cons
+	GLOBAL	fgetc_cons_inkey
+	GLOBAL	fputc_cons
+	GLOBAL	fgets_cons
+	GLOBAL	puts_cons
+	GLOBAL	fabandon
+	GLOBAL	fdtell
+	GLOBAL	fdgetpos
+	GLOBAL	rename
+	GLOBAL	remove
+	GLOBAL	getk
+	GLOBAL	getk_inkey
+	GLOBAL	printk
+	GLOBAL	perror
+	GLOBAL	_placeholder
+	GLOBAL	_s_fastcall
+	GLOBAL	_test2
+	GLOBAL	_s_regular
+	GLOBAL	_test3
+	GLOBAL	_is_regular
+	GLOBAL	_test4
+	GLOBAL	_l_regular
+	GLOBAL	_test5
+	GLOBAL	_d_fastcall
+	GLOBAL	_test6
+	GLOBAL	_ll_fastcall
+	GLOBAL	_test7
+	GLOBAL	_is_fastcall
+	GLOBAL	_test1
+	GLOBAL	_main
+
+
+
+

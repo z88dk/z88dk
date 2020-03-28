@@ -1,0 +1,5 @@
+target/kaypro84/graphics/clsgraph
+target/kaypro84/graphics/plotpixl
+target/kaypro84/graphics/respixl
+target/kaypro84/graphics/swapgfxbk
+@gfx/narrow/gfx_narrow.lst

@@ -2,9 +2,9 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2017
+Copyright (C) Paulo Custodio, 2011-2019
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-Repository: https://github.com/pauloscustodio/z88dk-z80asm
+Repository: https://github.com/z88dk/z88dk
 
 Handle library file contruction, reading and writing
 */
@@ -45,8 +45,8 @@ void make_library(const char *lib_filename, argv_t *src_files)
 	if ( lib_filename == NULL )
 		return;					/* ERROR */
 
-    if ( opts.verbose )
-        printf("Creating library '%s'\n", lib_filename );
+	if (opts.verbose)
+		printf("Creating library '%s'\n", path_canon(lib_filename));
 
 	/* write library header */
 	lib_file = xfopen( lib_filename, "wb" );	

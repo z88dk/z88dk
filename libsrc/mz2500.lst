@@ -1,5 +1,7 @@
-stdio/mz2500/fgetc_cons
-stdio/mz2500/fputc_cons_native
-stdio/mz2500/getk
+target/mz2500/stdio/fgetc_cons
+target/mz2500/stdio/fputc_cons_native
+target/mz2500/stdio/getk
+target/mz2500/stdio/conio_map_colour
+target/mz2500/stdio/generic_console
 @stdio/stdio.lst
 @z80.lst

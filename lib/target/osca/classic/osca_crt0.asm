@@ -125,17 +125,19 @@ ENDIF
 	
 start:
         di
-	ld	b,h
-	ld	c,l
+		
+	ld	(cmdline+1),hl
+;	ld	b,h
+;	ld	c,l
 
         ld      (start1+1),sp
         INCLUDE "crt/classic/crt_init_sp.asm"
         INCLUDE "crt/classic/crt_init_atexit.asm"
-	push	bc		
+;	push	bc		
 	call	crt0_init_bss
-	pop	bc
+;	pop	bc
         ld      (exitsp),sp
-        push	bc  ; keep ptr to arg list
+;       push	bc  ; keep ptr to arg list
 
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
@@ -173,7 +175,10 @@ ENDIF
         
 	; Push pointers to argv[n] onto the stack now
 	; We must start from the end 
-	pop	hl	; command line back again
+	;pop	hl	; command line back again
+cmdline:
+	ld		hl,0	; SMC
+	
 	ld	bc,0
 	ld	a,(hl)
 	and	a
@@ -202,10 +207,8 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
         push	hl		;save exit value
-IF CRT_ENABLE_STDIO = 1
-	EXTERN	closeall
-	call	closeall
-ENDIF
+        call    crt0_exit
+
 	; kjt_flos_display restores the text mode but makes the screen flicker
 	; if it is in text mode already
 	;
@@ -295,7 +298,6 @@ FRAMES:
 
 
 
-         defm  "Small C+ OSCA"
 end:
          defb  0
 

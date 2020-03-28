@@ -95,10 +95,8 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
 	push	hl	;save return code
-IF CRT_ENABLE_STDIO = 1
-	EXTERN	closeall
-	call	closeall
-ENDIF
+    call    crt0_exit
+
 	pop	bc
 start1:	ld	sp,0		;Restore stack to entry value
 	ld	bc,$41		;exit with - error code
@@ -110,7 +108,6 @@ l_dcal:	jp	(hl)		;Used for function pointer calls
 
 
 
-	defm	"Small C+ PPS"	;Unnecessary file signature
 end:	defb	0
 
         INCLUDE "crt/classic/crt_runtime_selection.asm"

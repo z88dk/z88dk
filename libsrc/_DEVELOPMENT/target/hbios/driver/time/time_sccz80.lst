@@ -1,0 +1,7 @@
+target/hbios/driver/time/c/sccz80/clock_getres
+target/hbios/driver/time/c/sccz80/clock_getres_callee
+target/hbios/driver/time/c/sccz80/clock_gettime
+target/hbios/driver/time/c/sccz80/clock_gettime_callee
+target/hbios/driver/time/c/sccz80/clock_settime
+target/hbios/driver/time/c/sccz80/clock_settime_callee
+@target/hbios/driver/time/time_asm.lst

@@ -4,10 +4,23 @@
  *   This tool looks for known 'fingerprints' in the code and tries to identify
  *   function entry points and to provide a cross-reference for further ROM analysis.
  *
- *   It works with Sinclair, Microsoft or Hu-BASIC ROMs or raw datafiles (tape images, etc..), giving hints to 
+ *   It works with Sinclair, Microsoft or Hu-BASIC ROMs on raw datafiles (tape images, etc..), giving hints to 
  *   set-up a brand new target port or to just extend it with an alternative shortcuts (i.e. in the FP package).
  *
- *   $Id: basck.c - updated in 2018 $
+ *   $Id: basck.c $
+ *
+ *
+ *   Simpler way to adapt a Microsoft BASIC subroutine to z88dk:
+ *    > basck -map romfile.rom |grep PRS
+ *              PRS     = $AAAA   ; Create string entry and print it
+ *
+ *   extern void rom_prs(char * str) __z88dk_fastcall @0xAAAA;
+ *
+ *   main() {
+ *   rom_prs ("Hello WORLD !");
+ *   while (1){};
+ *   }
+ *
  */
 
 unsigned char  *img;
@@ -17,7 +30,8 @@ int  l;
 char token[1000];
 int address;
 
-/* For the SKOOL mode, refer to:  http://pythonhosted.org/skoolkit */
+/* For the SKOOL mode (disassembler), refer to:  http://skoolkit.ca/ */
+
 /* usage example in skool mode:
 		basck -ctl p2000.bin > p2000.ctl
 		---> we look into the created file and see:  "(Detected position for ORG:  4096)"
@@ -49,7 +63,6 @@ int SKOOLMODE = -1;
 #include <string.h>
 /* stdlib.h MUST be included to really open files as binary */
 #include <stdlib.h>
-#include <malloc.h>
 
 #define SKIP -1
 #define CATCH -2
@@ -256,9 +269,17 @@ int zxshadow_end[]={26, ADDR, 33, 0x38, 0x00, 0x22, 0x8D, 0x5C, 0x22, 0x8F, 0x5C
 
 
 
-/*****************************/
-/* Microsoft BASIC detection */
-/*****************************/
+/***********************************/
+/* Microsoft BASIC detection, 6502 */
+/***********************************/
+int msbas_6502_gosub[]={22, ADDR, 0xA9, 0x03, 0x20, SKIP, SKIP, 0xA5, SKIP, 0x48, 0xA5, SKIP, 0x48, 0xA5, SKIP, 0x48, 0xA5, SKIP, 0x48, 0xA9, SKIP, 0x48, 0x20};
+int msbas_6502_goto[]={21, ADDR, 0xA5, SKIP, 0xE5, SKIP, 0xA5, SKIP, 0xE5, SKIP,  0xB0, SKIP,      0x98, 0x38, 0x65, SKIP, 0xA6, SKIP, 0x90, SKIP, 0xE8, 0xB0};
+
+ 
+
+/********************************************/
+/* Microsoft BASIC detection, Intel & Zilog */
+/********************************************/
 
 int restore_bastxt_skel[]={14, 0xEB, 0x2A, CATCH, CATCH, 0x28, 0x0E, 0xEB, SKIP_CALL, 0xE5, SKIP_CALL, 0x60, 0x69, 0xD1, 0xD2};
 int microsoft_skel[]={9, CATCH, 'i', 'c', 'r', 'o', 's', 'o', 'f', 't'};
@@ -267,12 +288,22 @@ int bastxt_skel2[]={11, SKIP_JP_RET, 0xC0, 0x2A, CATCH, CATCH, 0xAF, 0x77, 0x23,
 
 int microsoft_extended_skel[]={11, ADDR, 0xFE, '%', 0xC8, 0x14, 0xFE, '$', 0xC8, 0x14, 0xFE, '!'};
 
+/* Looking for a buggy ATN table to discriminate between N82(TRS80 M100/200, Olivetti M10) and N83(MSX, KC85) */
+int microsoft_n82n83[]={9, ADDR, 0xC0, 0x14, 0x28, 0x57, 0x08, 0x55, 0x48, 0x84};
+int microsoft_n82[]={9, ADDR, 0xC0, 0x14, 0x28, 0x56, 0x08, 0x55, 0x48, 0x84};
+
 int microsoft_defdbl_skel[]={7, ADDR, 'D', 'E', 'F', 'D', 'B', 'L'};
 int microsoft_defdbl_skel2[]={7, ADDR, 'D'+0x80, 'E', 'F', 'D', 'B', 'L'};
 int microsoft_defdbl_skel3[]={6, ADDR, 'E', 'F', 'D', 'B', 'L'+0x80};
 
 
 /* Microsoft BASIC code inspection */
+
+int ptrfil_skel[]={9, 0xE5, 0x2A, CATCH, CATCH, 0x7C, 0xB5, 0xE1, 0xC9, 0x3E};
+int ptrfil_skel2[]={9, 0xE5, 0x2A, CATCH, CATCH, 0x7D, 0xB4, 0xE1, 0xC9, 0x7C};
+int isflio_skel[]={10, ADDR, 0xE5, 0x2A, SKIP, SKIP, 0x7C, 0xB5, 0xE1, 0xC9, 0x3E};
+int isflio_skel2[]={11, ADDR, SKIP_CALL, 0xE5, 0x2A, SKIP, SKIP, 0x7D, 0xB4, 0xE1, 0xC9, 0x7C};
+
 int ulerr_skel[]={9, SKIP_CALL, 0xE5, SKIP_CALL, 0x60, 0x69, 0xD1, 0xD2, CATCH, CATCH};
 int prognd_skel[]={8, 0xEB, 0x2A, CATCH, CATCH, 0x1A, 0x02, 0x03, 0x13};
 int prognd_skel2[]={13, SKIP_JP_RET, 0xC0, 0x2A, SKIP, SKIP, 0xAF, 0x77, 0x23, 0x77, 0x23, 0x22, CATCH, CATCH };
@@ -757,11 +788,20 @@ int tkmsbasic_old_skel[]={8, ADDR, 'E', 'N', 0xC4, 'F', 'O', 0xd2, 'N'};
 /* Odd extended BASIC (i.e. MSX) tokens*/
 int tkmsbasic_ex_skel[]={11, 33, CATCH, CATCH, 0x47, 0x0e, 0x40, 0x0C, 0x23, 0x54, 0x5D, 0x7E};
 int tkmsbasic_ex_skel2[]={14, 33, CATCH, CATCH, 0xCD, SKIP, SKIP, 0x47, 0x0e, 0x40, 0x0C, 0x23, 0x54, 0x5D, 0x7E};
-int tkrange_ex_skel[]={14, 0xD6, 129, 0xDA, SKIP, SKIP, 0xFE, CATCH, 0xD2, SKIP, SKIP, 7, 0x4F, 6, 0};
+int tkmsbasic_ex_skel3[]={9, 33, CATCH, CATCH, 0x47, 0x0e, 0x40, 0x0C, 0x79, 0xFE};
+
+int tkrange_ex_skel[]={14, 0xD6, 0x81, 0xDA, SKIP, SKIP, 0xFE, CATCH, 0xD2, SKIP, SKIP, 7, 0x4F, 6, 0};
+
 int tok_ex_skel[]={12, 0x3C, 0xCA, SKIP, SKIP, 0x3D, 0xFE, ADDR, 0x28, SKIP, 0xFE, SKIP, 0xCA};
 int lnum_tokens_skel[]={11, 17, CATCH, CATCH, 0x4F, 0x1A, 0xB7, 0x28, SKIP, 0x13, 0xB9, 0x20};
+int lnum_tokens_skel2[]={11, 17, CATCH, CATCH, 0x4F, 0x1A, 0xB7, 0xCA, SKIP, SKIP, 0x13, 0xB9};
+
+int tty_ctlcodes_skel[]={10, 33, CATCH, CATCH, 0x0E, 0x0C, 0x23, 0x23, 0xA7, 0x0D, 0xF8};
+int tty_jp_skel[]={10, ADDR, 0x0E, 0x0C, 0x23, 0x23, 0xA7, 0x0D, 0xF8, 0xBE, 0x23};
+
 int equal_tk_skel[]={8, 0xF1, 0xC6, 3, 0x18, SKIP, SKIP_CALL, SKIP_CALL, CATCH};
 int using_tokens_skel[]={18, 0xFE, ADDR, 0xCA, SKIP, SKIP, 0xFE, SKIP, 0xCA, SKIP, SKIP, 0xFE, SKIP, 0xCA, SKIP, SKIP, 0xE5, 0xFE, ','};
+
 int lnum_range_skel[]={9, 0x73, 0x23, 0x72, 0x18, ADDR, 17, 0, 0, 0xD5};
 
 int ex_warm_skel[]={17, ADDR, 0xF9, 33, SKIP, SKIP, 0x22, SKIP, SKIP, SKIP_CALL, SKIP_CALL, 0xAF, 0x67, 0x6F, 0x22, SKIP, SKIP, 0x32};
@@ -775,6 +815,9 @@ int jptabptr_msbasic_skel[]={10, 0x07, 0x4F, 6, 0, 0xEB, 0x2A, CATCH, CATCH, 9, 
 
 int relocsrc_msbasic_skel[]={15, 0x11, SKIP, SKIP, 0x21, CATCH, CATCH, 0x01, SKIP, 0x01, 0xED, 0xB0, 0x21, SKIP, SKIP, 0x22};
 int relocdst_msbasic_skel[]={15, 0x11, CATCH, CATCH, 0x21, SKIP, SKIP, 0x01, SKIP, 0x01, 0xED, 0xB0, 0x21, SKIP, SKIP, 0x22};
+
+int relocsrc_msbasic_skel2[]={16, 0x11, SKIP, SKIP, 0x21, CATCH, CATCH, SKIP_CALL, SKIP_CALL, 0x3E, SKIP, 0x32, SKIP, SKIP, 0x3E, SKIP, 0x32};
+int relocdst_msbasic_skel2[]={16, 0x11, CATCH, CATCH, 0x21, SKIP, SKIP, SKIP_CALL, SKIP_CALL, 0x3E, SKIP, 0x32, SKIP, SKIP, 0x3E, SKIP, 0x32};
 
 
 									   
@@ -1037,6 +1080,21 @@ int main(int argc, char *argv[])
 	/***********************************/
 	/* Microsoft BASIC related section */
 	/***********************************/
+	
+	res=find_skel(msbas_6502_gosub);
+	if (res<0)
+		res=find_skel(msbas_6502_goto);
+	if (res>0) {
+		printf("\n# Microsoft AppleSoft/PET (6502) BASIC found\n");
+		brand=find_skel(microsoft_skel);
+		if (brand>0)
+			printf("#  Microsoft signature found\n");
+			else printf("#  Microsoft signature not found\n");
+		brand=find_skel(msbas_6502_goto);
+		if (brand>0)
+			printf("#  Extended BASIC detected\n");
+	}
+		
 	res=find_skel(restore_bastxt_skel);
 	if (res<0)
 		res=find_skel(bastxt_skel);
@@ -1050,9 +1108,17 @@ int main(int argc, char *argv[])
 	if (res>0) {
 		printf("\n# Microsoft 8080/Z80 BASIC found\n");
 		
+		res=find_skel(microsoft_n82n83);
+		if (res>0) 	printf("#  Version: N82. Possible release year: 1983-1986\n");
+		
+		res=find_skel(microsoft_n82);
+		if (res>0) 	printf("#  Version: N82. Possible release year: 1982\n");
+		
 		brand=find_skel(tkmsbasic_ex_skel);
 		if (brand<0)
 		brand=find_skel(tkmsbasic_ex_skel2);
+		if (brand<0)
+		brand=find_skel(tkmsbasic_ex_skel3);
 		if (brand>0)
 			printf("#  Extended BASIC detected\n");
 		else {
@@ -1069,6 +1135,12 @@ int main(int argc, char *argv[])
 			brand=find_skel(microsoft_defdbl_skel3);
 		if (brand>0)
 			printf("#  Double precision maths detected\n");
+
+		res=find_skel(ptrfil_skel);
+		if (res<0)
+			res=find_skel(ptrfil_skel2);
+		if (res>0)
+			printf("#  Support for devices/output redirection detected\n");
 
 		brand=find_skel(microsoft_skel);
 		if (brand>0)
@@ -1168,6 +1240,12 @@ int main(int argc, char *argv[])
 		if (res>0)
 			dlbl("LSTRND2", res+2, "Last RND number");
 
+		res=find_skel(isflio_skel);
+		if (res<0)
+		res=find_skel(isflio_skel2);
+		if (res>0)
+			clbl("ISFLIO", res+pos+1, "Tests if an I/O redirection to device is in place");
+
 		res=find_skel(buffer_loc_skel);
 		if (res<0)
 			res=find_skel(buffer_loc_skel2);
@@ -1218,13 +1296,13 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(prognd_skel2);
 		if (res>0)
-			dlbl("PROGND", res, "BASIC program end ptr (aka VARTAB)");
+			dlbl("PROGND", res, "; BASIC program end ptr (a.k.a. VARTAB, Simple Variables)");
 
 		res=find_skel(varend_skel);
 		if (res<0)
 			res=find_skel(varend_skel2);
 		if (res>0)
-			dlbl("VAREND", res, "End of variables");
+			dlbl("VAREND", res, "End of variables, begin of array aariables");
 
 		res=find_skel(arrend_skel);
 		if (res<0)
@@ -1238,19 +1316,6 @@ int main(int argc, char *argv[])
 		if (res>0)
 			dlbl("SGNRES", res, "Sign of result");
 
-		res=find_skel(ex_warm_skel);
-		if (res>0) {
-			dlbl("TEMPST", img[res+3] + 256*img[res+4], "(word), temporary descriptors");
-			dlbl("TEMPPT", img[res+6] + 256*img[res+7], "(word), start of free area of temporary descriptor");
-			//
-			dlbl("PRMLEN", img[res+18] + 256*img[res+19], "(word), number of bytes of obj table");
-			dlbl("NOFUNS", img[res+21] + 256*img[res+22], "(byte), 0 if no function active");
-			dlbl("PRMLN2", img[res+24] + 256*img[res+25], "(word), size of parameter block");
-			dlbl("FUNACT", img[res+27] + 256*img[res+28], "(word), active functions counter");
-			dlbl("PRMSTK", img[res+30] + 256*img[res+31], "(word), previous block definition on stack");
-			dlbl("SUBFLG", img[res+33] + 256*img[res+34], "(byte), flag for USR fn. array");
-			dlbl("TEMP", img[res+38] + 256*img[res+39], "(word) temp. reservation for st.code");
-		}
 		
 		res=find_skel(ex_warm_skel2);
 		if (res>0) {
@@ -1264,6 +1329,26 @@ int main(int argc, char *argv[])
 			dlbl("PRMSTK", img[res+33] + 256*img[res+34], "(word), previous block definition on stack");
 			dlbl("SUBFLG", img[res+36] + 256*img[res+37], "(byte), flag for USR fn. array");
 			dlbl("TEMP", img[res+41] + 256*img[res+42], "(word) temp. reservation for st.code");
+		} else {
+			res=find_skel(ex_warm_skel);
+			if (res>0) {
+				dlbl("TEMPST", img[res+3] + 256*img[res+4], "(word), temporary descriptors");
+				dlbl("TEMPPT", img[res+6] + 256*img[res+7], "(word), start of free area of temporary descriptor");
+				//
+				dlbl("PRMLEN", img[res+18] + 256*img[res+19], "(word), number of bytes of obj table");
+				dlbl("NOFUNS", img[res+21] + 256*img[res+22], "(byte), 0 if no function active");
+				dlbl("PRMLN2", img[res+24] + 256*img[res+25], "(word), size of parameter block");
+				dlbl("FUNACT", img[res+27] + 256*img[res+28], "(word), active functions counter");
+				dlbl("PRMSTK", img[res+30] + 256*img[res+31], "(word), previous block definition on stack");
+				dlbl("SUBFLG", img[res+33] + 256*img[res+34], "(byte), flag for USR fn. array");
+				dlbl("TEMP", img[res+38] + 256*img[res+39], "(word) temp. reservation for st.code");
+			} else {
+				res=find_skel(ex_end1_skel);
+				if (res>0) {
+					dlbl("TEMPST", img[res+5] + 256*img[res+6], "(word), temporary descriptors");
+					dlbl("TEMPPT", img[res+8] + 256*img[res+9], "(word), start of free area of temporary descriptor");
+				}
+			}
 		}
 
 		res=find_skel(sbscpt_skel);
@@ -1279,15 +1364,15 @@ int main(int argc, char *argv[])
 		
 		res=find_skel(eval3_ex_skel);
 		if (res>0) {
-			dlbl("TEMP2", img[res+2] + 256*img[res+3], "(word) temp. storage used by EVAL");
+			dlbl("TEMP2", img[res+2] + 256*img[res+3], "(word) temp. storage used by EVAL, also used in place of NXTOPR");
 			dlbl("TEMP3", img[res+7] + 256*img[res+8], "(word) used for garbage collection or by USR function");
 		}
 
 		res=find_skel(ex_end1_skel);
 		if (res>0) {
-			dlbl("SAVTXT", img[res+2] + 256*img[res+3], "(word), prg pointer for resume");
-			dlbl("TEMPST", img[res+5] + 256*img[res+6], "(word), temporary descriptors");
-			dlbl("TEMPPT", img[res+8] + 256*img[res+9], "(word), start of free area of temporary descriptor");
+			//dlbl("SAVTXT", img[res+2] + 256*img[res+3], "(word), prg pointer for resume");
+			//dlbl("TEMPST", img[res+5] + 256*img[res+6], "(word), temporary descriptors");
+			//dlbl("TEMPPT", img[res+8] + 256*img[res+9], "(word), start of free area of temporary descriptor");
 			//
 			dlbl("CURLIN", img[res+15] + 256*img[res+16], "(word), line number being interpreted");
 			//
@@ -1524,6 +1609,27 @@ int main(int argc, char *argv[])
 		if (res>0)
 			clbl("OPRND", res, "Get next expression value");
 
+		res=find_skel(ptrfil_skel);
+		if (res<0)
+			res=find_skel(ptrfil_skel2);
+		if (res>0)
+			clbl("PTRFIL", res, "Pointer to the file description table for the current file");
+		else {
+			// Rinput detection is prone to false positives when file redirection is available
+			res=find_skel(rinput_skel);
+			if (res<0)
+				res=find_skel(rinput_skel2);
+			if (res<0)
+				res=find_skel(rinput_skel3);
+			if (res>0)
+				clbl("RINPUT", res, "Line input");
+			else {
+				res=find_skel(rinput_skel4);
+				if (res>0)
+					clbl("RINPUT", res+pos, "Line input");
+			}
+		}
+
 		res=find_skel(chksyn_skel);
 		if (res<0)
 			res=find_skel(chksyn_skel2);
@@ -1684,7 +1790,7 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(abs_skel3);
 		if (res>0)
-			clbl("ABS", res+pos+1, "ATN");
+			clbl("ABS", res+pos+1, "ABS");
 		
 		res=find_skel(dblabs_skel);
 		if (res>0)
@@ -1879,29 +1985,29 @@ int main(int argc, char *argv[])
 		
 		res=find_skel(dblsub_skel);
 		if (res>0)
-			clbl("DBL_SUB", res+pos+1, "Double precision SUB (formerly SUBCDE)");
+			clbl("DBL_SUB", res+pos+1, "aka DECSUB, Double precision SUB (formerly SUBCDE)");
 		
 		res=find_skel(dbladd_skel);
 		if (res>0)
-			clbl("DBL_ADD", res+pos+1, "Double precision ADD (formerly FPADD)");
+			clbl("DBL_ADD", res+pos+1, "aka DECADD, Double precision ADD (formerly FPADD)");
 		
 		res=find_skel(dblsub_skel2);
 		if (res>0) {
-			clbl("DBL_SUB", res+pos+1, "Double precision SUB (formerly SUBCDE)");
-			clbl("DBL_ADD", res+pos+7, "Double precision ADD (formerly FPADD)");
+			clbl("DBL_SUB", res+pos+1, "aka DECSUB, Double precision SUB (formerly SUBCDE)");
+			clbl("DBL_ADD", res+pos+7, "aka DECADD, Double precision ADD (formerly FPADD)");
 		}
 
 		res=find_skel(dblmul_skel);
 		if (res>0)
-			clbl("DBL_MUL", res+pos+1, "Double precision MULTIPLY");
+			clbl("DBL_MUL", res+pos+1, "aka DECMUL, Double precision MULTIPLY");
 		
 		res=find_skel(dbldiv_skel);
 		if (res>0)
-			clbl("DBL_DIV", res, "Double precision DIVIDE");
+			clbl("DBL_DIV", res, "aka DECDIV, Double precision DIVIDE");
 		else {
 			res=find_skel(dbldiv_skel2);
 			if (res>0)
-				clbl("DBL_DIV", res+pos+1, "Double precision DIVIDE");
+				clbl("DBL_DIV", res+pos+1, "aka DECDIV, Double precision DIVIDE");
 		}
 		
 		res=find_skel(fix_skel);
@@ -2118,29 +2224,6 @@ int main(int argc, char *argv[])
 		if (res>0)
 			clbl("OPNPAR", res+pos+1, "Chk Syntax, make sure '(' follows");
 
-		res=find_skel(eval_skel);
-		if (res>0) {
-			clbl("EVAL", res+pos+1, "a.k.a. GETNUM, evaluate expression");
-			clbl("EVAL1", res+pos+1+3, "Save precedence and eval until precedence break");
-			clbl("EVAL2", res+pos+1+12, "Evaluate expression until precedence break");
-			clbl("EVAL3", res+pos+1+15, "Evaluate expression until precedence break");
-		}
-
-		res=find_skel(eval_skel2);
-		if (res>0) {
-			clbl("EVAL", res+pos+1, "a.k.a. GETNUM, evaluate expression");
-			clbl("EVAL1", res+pos+1+3, "Save precedence and eval until precedence break");
-			clbl("EVAL2", res+pos+1+15, "Evaluate expression until precedence break");
-			clbl("EVAL3", res+pos+1+18, "Evaluate expression until precedence break");
-		}
-
-		res=find_skel(eval_skel3);
-		if (res>0) {
-			clbl("EVAL", res+pos+1, "a.k.a. GETNUM, evaluate expression");
-			clbl("EVAL1", res+pos+1+3, "Save precedence and eval until precedence break");
-			clbl("EVAL2", res+pos+1+19, "Evaluate expression until precedence break");
-			clbl("EVAL3", res+pos+1+22, "Evaluate expression until precedence break");
-		}
 		
 		res=find_skel(getnum_skel);
 		if (res<0)
@@ -2151,6 +2234,30 @@ int main(int argc, char *argv[])
 			//clbl("GETNUM", res, "BASIC interpreter entry to get a number (EVAL on recent versions)");
 			clbl("EVAL", res+pos+1, "(a.k.a. GETNUM, evaluate expression (GETNUM)");
 			clbl("EVAL1", res+pos+1+3, "Save precedence and eval until precedence break");
+		} else {
+			res=find_skel(eval_skel);
+			if (res>0) {
+				clbl("EVAL", res+pos+1, "a.k.a. GETNUM, evaluate expression");
+				clbl("EVAL1", res+pos+1+3, "Save precedence and eval until precedence break");
+				clbl("EVAL2", res+pos+1+12, "Evaluate expression until precedence break");
+				clbl("EVAL3", res+pos+1+15, "Evaluate expression until precedence break");
+			}
+
+			res=find_skel(eval_skel2);
+			if (res>0) {
+				clbl("EVAL", res+pos+1, "a.k.a. GETNUM, evaluate expression");
+				clbl("EVAL1", res+pos+1+3, "Save precedence and eval until precedence break");
+				clbl("EVAL2", res+pos+1+15, "Evaluate expression until precedence break");
+				clbl("EVAL3", res+pos+1+18, "Evaluate expression until precedence break");
+			}
+
+			res=find_skel(eval_skel3);
+			if (res>0) {
+				clbl("EVAL", res+pos+1, "a.k.a. GETNUM, evaluate expression");
+				clbl("EVAL1", res+pos+1+3, "Save precedence and eval until precedence break");
+				clbl("EVAL2", res+pos+1+19, "Evaluate expression until precedence break");
+				clbl("EVAL3", res+pos+1+22, "Evaluate expression until precedence break");
+			}
 		}
 		
 		res=find_skel(eval3_ex_skel);
@@ -2239,18 +2346,6 @@ int main(int argc, char *argv[])
 		if (res>0)
 			clbl("GETK", res, "Get key in 'A'");
 		
-		res=find_skel(rinput_skel);
-		if (res<0)
-			res=find_skel(rinput_skel2);
-		if (res<0)
-			res=find_skel(rinput_skel3);
-		if (res>0)
-			clbl("RINPUT", res, "Line input");
-		else {
-			res=find_skel(rinput_skel4);
-			if (res>0)
-				clbl("RINPUT", res+pos, "Line input");
-		}
 
 		res=find_skel(outc_skel);
 		if (res<0)
@@ -2290,6 +2385,24 @@ int main(int argc, char *argv[])
 		if (res>0)
 			clbl("ULERR", res, "entry for '?UL ERROR'");
 
+		res=find_skel(tty_ctlcodes_skel);
+		if (res>0) {
+			if (SKOOLMODE) {
+				printf("@ $%04x label=%s\n", res+2, "TTY_CTLCODES");
+				printf("B $%04x %s\n", res+2, "Control code + JP location list for TTY controls");
+				printf("W $%04x %s\n", res+3, "Control code + JP location list for TTY controls");
+				printf("L $%04x,3,12\n", res+2);
+				
+			}
+		}
+		
+		res=find_skel(tty_jp_skel);
+		if (res>0) {
+			dlbl("TTY_JP_0", res+pos-4, "Search for TTY controls in jumptable");
+			dlbl("TTY_JP", res+pos+1, "Loop search for TTY controls in jumptable");
+		}
+
+
 		printf("\n\n");
 
 		/* MS BASIC commands */
@@ -2297,10 +2410,14 @@ int main(int argc, char *argv[])
 		if (jptab>0)  {
 			printf("\n# JP table relocated in ram, ptr in $%04X\n",jptab);
 			res=find_skel(relocdst_msbasic_skel);
+			if (res<0)
+				res=find_skel(relocdst_msbasic_skel2);
 			if (res>0) {
 				printf("\n# First byte of moved block: $%04X\n",res);
 				res=jptab-res;
 				jptab=find_skel(relocsrc_msbasic_skel);
+				if (jptab<0)
+					jptab=find_skel(relocsrc_msbasic_skel2);
 				if (jptab>0) {
 					  res+=jptab;
 					  jptab = img[res+pos]+256*img[res+pos+1];
@@ -2309,7 +2426,7 @@ int main(int argc, char *argv[])
 			} else jptab=0;
 				
 		}
-			
+		
 		if (jptab <=0)
 		jptab=find_skel(jptab_msbasic_skel);
 		if (jptab<0)
@@ -2338,6 +2455,8 @@ int main(int argc, char *argv[])
 		res=find_skel(tkmsbasic_ex_skel);
 		if (res<0)
 		res=find_skel(tkmsbasic_ex_skel2);
+		if (res<0)
+		res=find_skel(tkmsbasic_ex_skel3);
 		if (res>0) {
 		
 		/*********************************/
@@ -2361,7 +2480,10 @@ int main(int argc, char *argv[])
 			printf("\n# -- STATEMENTS --\n");
 			
 			res2=find_skel(lnum_tokens_skel);
+			if (res2<0)
+				res2=find_skel(lnum_tokens_skel2);
 			if ((res2>0) && (img[res2+14]==0)) {
+					dlbl("LNUM_TOKENS", res, "Token table for operations on BASIC line numbers");
 					printf("\n#\tRESTORE\t\t[%d]\t",img[res2++]);
 					printf("\n#\tAUTO\t\t[%d]\t",img[res2++]);
 					printf("\n#\tRENUM\t\t[%d]\t",img[res2++]);
@@ -2375,9 +2497,27 @@ int main(int argc, char *argv[])
 					printf("\n#\tGOTO\t\t[%d]\t",img[res2++]);
 					printf("\n#\tRETURN\t\t[%d]\t",img[res2++]);
 					printf("\n#\tTHEN\t\t[%d]\t",img[res2++]);
-					printf("\n#\tGOSUB\t\t[%d]\t",img[res2++]);
+					printf("\n#\tGOSUB\t\t[%d]\t\n\n",img[res2++]);
+					clbl("DETOKEN_MORE", ++res2+pos+1, "Continue decoding tokens");
 			}
-			
+			else if ((res2>0) && (img[res2+13]==0)) {
+					dlbl("LNUM_TOKENS", res, "Token table for operations on BASIC line numbers");
+					printf("\n#\tRESTORE\t\t[%d]\t",img[res2++]);
+					printf("\n#\tRENUM\t\t[%d]\t",img[res2++]);
+					printf("\n#\tDELETE\t\t[%d]\t",img[res2++]);
+					printf("\n#\tRESUME\t\t[%d]\t",img[res2++]);
+					printf("\n#\tERL\t\t[%d]\t",img[res2++]);
+					printf("\n#\tELSE\t\t[%d]\t",img[res2++]);
+					printf("\n#\tRUN\t\t[%d]\t",img[res2++]);
+					printf("\n#\tLIST\t\t[%d]\t",img[res2++]);
+					printf("\n#\tLLIST\t\t[%d]\t",img[res2++]);
+					printf("\n#\tGOTO\t\t[%d]\t",img[res2++]);
+					printf("\n#\tRETURN\t\t[%d]\t",img[res2++]);
+					printf("\n#\tTHEN\t\t[%d]\t",img[res2++]);
+					printf("\n#\tGOSUB\t\t[%d]\t\n\n",img[res2++]);
+					clbl("DETOKEN_MORE", ++res2+pos+1, "Continue decoding tokens");
+			}
+
 			res2=find_skel(using_tokens_skel);
 			if (res2>0) {
 				if (SKOOLMODE) {

@@ -10,6 +10,9 @@
 	defc	VRAM_OUT = 0x2f
 	INCLUDE	"crt/classic/crt_rules.inc"
 
+	EXTERN	asm_im1_handler
+	EXTERN	asm_nmi_handler
+
         org     CRT_ORG_CODE
 
 if (ASMPC<>$0000)
@@ -57,16 +60,13 @@ endif
 if (ASMPC<>$0038)
         defs    CODE_ALIGNMENT_ERROR
 endif
-	; TODO: Some interrupt routine
-	ei	
-	reti
+	jp	asm_im1_handler
 
         defs    $0066 - ASMPC
 if (ASMPC<>$0066)
         defs    CODE_ALIGNMENT_ERROR
 endif
-nmi:
-	retn
+	jp	asm_nmi_handler
 
 restart10:
 restart08:
@@ -106,10 +106,8 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
 	push	hl
-IF CRT_ENABLE_STDIO = 1
-	EXTERN 	closeall
-	call	closeall
-ENDIF
+    call    crt0_exit
+
 
 endloop:
 	jr	endloop

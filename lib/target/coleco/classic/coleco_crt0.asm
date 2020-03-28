@@ -23,6 +23,11 @@
         PUBLIC    l_dcal          ;jp(hl)
 	PUBLIC	  msxbios
 	EXTERN	  msx_set_mode
+	EXTERN    asm_im1_handler
+	EXTERN    nmi_vectors
+        EXTERN    asm_interrupt_handler
+	EXTERN    __vdp_enable_status
+	EXTERN    VDP_STATUS
 
 	defc	CONSOLE_COLUMNS = 32
 	defc	CONSOLE_ROWS = 24
@@ -52,7 +57,7 @@
 	jp	restart20
 	jp	restart28
 	jp	restart30
-	jp	mask_int	;Maskable interrupt
+	jp	asm_im1_handler	;Maskable interrupt
 	jp	nmi_int		;NMI
 	defm	" / / "		;TODO: Make it customisable
 	
@@ -90,17 +95,17 @@ cleanup:
 nmi_int:
 	push	af
 	push	hl
-	ld	hl,pause_procs
-	call	int_handler
+	ld	a,(__vdp_enable_status)
+	rlca
+	jr	c,no_vbl
+	in	a,(VDP_STATUS)
+no_vbl:
+	ld	hl,nmi_vectors
+	call	asm_interrupt_handler
 	pop	hl
 	pop	af
 	retn
 
-mask_int:
-	push	af
-	push	hl
-	; Flow into int_VBL
-        INCLUDE "crt/classic/tms9118/interrupt_handler.asm"
 
 ; Safe BIOS call
 msxbios:
@@ -120,34 +125,3 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
         ENDIF
 	INCLUDE	"crt/classic/crt_section.asm"
 
-        SECTION bss_crt
-
-
-        PUBLIC  raster_procs    ;Raster interrupt handlers
-        PUBLIC  pause_procs     ;Pause interrupt handlers
-
-        PUBLIC  timer           ;This is incremented every time a VBL/HBL interrupt happens
-        PUBLIC  _pause_flag     ;This alternates between 0 and 1 every time pause is pressed
-
-        PUBLIC  RG0SAV          ;keeping track of VDP register values
-        PUBLIC  RG1SAV
-        PUBLIC  RG2SAV
-        PUBLIC  RG3SAV
-        PUBLIC  RG4SAV
-        PUBLIC  RG5SAV
-        PUBLIC  RG6SAV
-        PUBLIC  RG7SAV
-
-raster_procs:           defw    0       ;Raster interrupt handlers
-pause_procs:            defs    8       ;Pause interrupt handlers
-timer:                          defw    0       ;This is incremented every time a VBL/HBL interrupt happens
-_pause_flag:            defb    0       ;This alternates between 0 and 1 every time pause is pressed
-
-RG0SAV:         defb    0       ;keeping track of VDP register values
-RG1SAV:         defb    0
-RG2SAV:         defb    0
-RG3SAV:         defb    0
-RG4SAV:         defb    0
-RG5SAV:         defb    0
-RG6SAV:         defb    0
-RG7SAV:         defb    0

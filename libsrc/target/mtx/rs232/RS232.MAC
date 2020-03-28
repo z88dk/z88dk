@@ -1,0 +1,189 @@
+;
+; RS232.MAC  Low level RS232 driver
+;
+	CSEG
+
+	.Z80
+
+TRUE	EQU	0FFFFH
+FALSE	EQU	NOT TRUE
+
+NEWRS	EQU	TRUE
+;
+; NEWRS => use revised register
+;
+; Modified to allow checking to see if a particular buffer is empty of not.
+;
+CTLRSA	EQU	0EH
+CTLRSB	EQU	0FH
+DATRSA	EQU	0CH
+DATRSB	EQU	0DH
+CTCVA	EQU	09H
+CTCVB	EQU	0AH
+RSRDYR	EQU	00000001B		; RS232 ready to read
+RSRDYW	EQU	00000100B		; RS232 ready to write
+TXBUFE	EQU	00000100B		; Xmit buffer empty
+;
+; BAUDA ----- SET UP BAUD RATE CHANNEL A
+;
+; IF DE is a valid baud rate THEN set baud rate to DE
+;			     ELSE return Z
+;
+BAUDA::	LD	BC,CTLRSA*100H+CTCVA
+	JR	BAUDAB
+;
+; BAUDB ----- SET UP BAUD RATE CHANNEL B
+;
+BAUDB::	LD	BC,CTLRSB*100H+CTCVB
+; Fall
+;
+; BAUDAB ----- SET BAUD RATE
+;
+BAUDAB:	LD	IX,BAUDTB
+BAUDA2:	LD	L,(IX+0)
+	LD	H,(IX+1)
+	LD	A,H
+	OR	L
+	RET	Z
+	AND	A
+	SBC	HL,DE
+	JR	Z,BAUDA4
+	INC	IX
+	INC	IX
+	INC	IX
+	JR	BAUDA2
+; Got a valid baud rate
+BAUDA4:	LD	A,3			; Reset CTC channel
+	OUT	(C),A
+	LD	A,045H
+	OUT	(C),A
+	LD	A,(IX+2)
+	OUT	(C),A			; Set up CTC channel 1 or 2
+;
+	LD	C,B
+	LD	HL,BAUDRG
+	LD	B,9
+	OTIR				; Set up DART for correct channel
+	OR	0FFH			; Signal done ok
+	RET
+;
+; BAUDTB ----- CONTAINS BAUD-RATE, TIME CONSTANT
+;
+BAUDTB:	DB	00H,4BH,1		; 19200
+	DB	80H,25H,2		; 9600
+	DB	0C0H,12H,4		; 4800
+	DB	60H,09H,8		; 2400
+	DB	0B0H,04H,10H		; 1200
+	DB	58H,02H,20H		; 600
+	DB	2CH,01H,40H		; 300
+	DB	96H,00H,80H		; 150
+	DB	6EH,00H,0AFH		; 110
+	DB	4BH,00H,0		; 75
+	DB	0,0
+;
+BAUDRG::
+	DB	18H			; Error reset
+	DB	1			; Reg 1
+	DB	0			; Null code to reg 0
+	DB	3			; Reg 3
+DARTR3::
+	DB	0E1H			; 8 bits/char received
+	DB	4			; Reg 4
+DARTR4::
+	DB	4CH			; x16 clock 2 stop bits no parity
+					; Receiver enable, auto-enable
+	DB	5			; Reg 5
+DARTR5::
+	IF	NEWRS			; New value suggested by geoff
+	DB	0EAH			; 8 bits/char out, transmitter enable, DTR=RTS=1
+	ELSE				; Old value as manual
+	DB	068H			; 8 bits/char out, transmitter enable, DTR=RTS=0
+	ENDIF
+;
+; RSINA ----- RS232 IN CHANNEL A
+;
+; IF nodata ready THEN return Z
+;		  ELSE A=character
+;
+RSINA::	IN	A,(CTLRSA)
+	AND	RSRDYR
+	RET	Z
+	IN	A,(DATRSA)
+	RET
+;
+; RSOUTA ----- RS232 OUT CHANNEL A
+;
+; IF unable to send THEN return Z
+;		    ELSE send C
+;
+SENT2A:	DB	0			; NZ => something has been sent
+;
+RSOUTA::
+	IN	A,(CTLRSA)
+	AND	RSRDYW
+	RET	Z
+	LD	A,C
+	OUT	(DATRSA),A
+	OR	0FFH
+	LD	(SENT2A),A
+	RET
+;
+; RSWBCA ----- RS232 WAIT FOR BUFFER TO CLEAR ON CHANNEL A
+;
+RSWBCA::
+	LD	A,(SENT2A)
+	AND	A
+	RET	Z			; Don't bother, nothing has been sent
+RSWBA2:	IN	A,(CTLRSA)
+	AND	TXBUFE
+	JR	Z,RSWBA2
+	XOR	A
+	LD	(SENT2A),A		; Nothing sent as of now
+; Fall
+;
+;RSSHFD ----- RS232 data "shift out" delay (to avoid partial loss of chars)
+;
+RSSHFD::
+	PUSH	BC
+	LD	B,0
+RSSHF2:	DJNZ	RSSHF2
+RSSHF4:	DJNZ	RSSHF4
+	POP	BC
+	RET
+;
+;RSINB ----- RS232 IN CHANNEL B
+;
+RSINB::	IN	A,(CTLRSB)
+	AND	RSRDYR
+	RET	Z
+	IN	A,(DATRSB)
+	RET
+;
+;RSOUTB ----- RS232 OUT CHANNEL B
+;
+SENT2B:	DB	0
+;
+RSOUTB::
+	IN	A,(CTLRSB)
+	AND	RSRDYW
+	RET	Z
+	LD	A,C
+	OUT	(DATRSB),A
+	OR	0FFH
+	LD	(SENT2B),A
+	RET
+;
+;RSWBCB ----- RS232 WAIT FOR BUFFER TO CLEAR ON CHANNEL B
+;
+RSWBCB::
+	LD	A,(SENT2B)
+	AND	A
+	RET	Z			; Don't bother, nothing has been sent
+RSWBB2:	IN	A,(CTLRSB)
+	AND	TXBUFE
+	JR	Z,RSWBB2
+	XOR	A
+	LD	(SENT2B),A		; Nothing sent as of now
+	JP	RSSHFD
+;
+	END

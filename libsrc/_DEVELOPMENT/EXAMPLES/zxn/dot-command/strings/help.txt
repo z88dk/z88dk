@@ -13,4 +13,4 @@
 
 no -o,-a prints to screen
 
-strings v1.0 spectrum z88dk.org
+strings v1.2 zx-next z88dk.org

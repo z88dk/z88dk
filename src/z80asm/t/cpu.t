@@ -3,11 +3,13 @@
 #------------------------------------------------------------------------------
 # Test cpu opcode files created by ../dev/cpu/cpu.pl
 #------------------------------------------------------------------------------
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 use File::Basename;
+use Config;
+
+# make sure to use our z80asm
+$ENV{PATH} = ".".$Config{path_sep}.$ENV{PATH};
 
 for my $file (<dev/cpu/cpu_test*.asm>) {
 	# build cpu, ixiy, ok options from file name
@@ -17,7 +19,7 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 	my($cpu) = $base =~ /cpu_test(?:old)?_(\w+)$/; $cpu =~ tr/_/-/;
 	
 	# build command line
-	my $cmd = "z80asm --cpu=$cpu ".
+	my $cmd = "z80asm -m$cpu ".
 			($ixiy ? "--IXIY " : "").
 			" -m -l -b $file 2> test.err";
 	
@@ -113,16 +115,26 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 		ok -f $file_err, "$file_err exists";
 		local(@ARGV) = $file_err;
 		while (<>) {
-			/^Error .*? line (\d+)/ and $err_lines[$1]++;
+			if (/^Error .*? line (\d+)/ ||
+				/^Warning .* line (\d+): interpreting indirect value as immediate/) {
+				$err_lines[$1]++;
+			}			
 		}
+		
+		my @failed;
 		for (1..$num_lines) {
-			ok $err_lines[$_], "$file: expected error at line $_";
+			if (!$err_lines[$_]) { push @failed, $_; }
 		}
+		ok @failed==0, "all lines output errors";
+		if (@failed) { diag "Failed tests: @failed"; }
 	}
 	
 	if (Test::More->builder->is_passing) {
 		unlink "test.err", $file_bin, $file_o, $file_err, $file_lis, $file_map;
 	}
+    else { 
+        die;
+    }
 }
 
 done_testing;

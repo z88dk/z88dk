@@ -1,0 +1,9 @@
+@target/scz180/driver/terminal/rc_01_input_asci0.lst
+@target/scz180/driver/terminal/rc_01_input_asci1.lst
+@target/hbios/driver/terminal/rc_01_input_hbios0.lst
+@target/hbios/driver/terminal/rc_01_input_hbios1.lst
+@target/scz180/driver/terminal/rc_01_output_asci0.lst
+@target/scz180/driver/terminal/rc_01_output_asci1.lst
+@target/hbios/driver/terminal/rc_01_output_hbios0.lst
+@target/hbios/driver/terminal/rc_01_output_hbios1.lst
+@target/scz180/driver/time/time_sdcc.lst

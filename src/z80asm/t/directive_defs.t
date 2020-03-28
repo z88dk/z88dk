@@ -2,15 +2,13 @@
 
 # Z88DK Z80 Module Assembler
 #
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk/
 #
 # Test DEFS
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 require './t/testlib.pl';
 
@@ -66,7 +64,6 @@ Error at file 'test.asm' line 6: integer '-1' out of range
 Error at file 'test.asm' line 7: integer '65537' out of range
 Error at file 'test.asm' line 8: integer '-129' out of range
 Error at file 'test.asm' line 9: integer '256' out of range
-10 errors occurred during assembly
 ERR
 
 unlink_testfiles();

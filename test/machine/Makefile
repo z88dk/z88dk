@@ -1,4 +1,10 @@
 
+# EXESUFFIX is passed when cross-compiling Win32 on Linux
+ifeq ($(OS),Windows_NT)
+  EXESUFFIX 		:= .exe
+else
+  EXESUFFIX 		?=
+endif
 
 SOURCES_COMMON = main.c Z80/Debug.c hook_io.c hook_console.c hook_misc.c
 SOURCES_Z80 = Z80/Z80.c

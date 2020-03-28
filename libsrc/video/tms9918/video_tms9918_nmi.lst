@@ -1,0 +1,3 @@
+video/tms9918/obj/${TARGET}/l_tms9918_disable_interrupts_nmi
+video/tms9918/obj/${TARGET}/add_raster_nmi
+@video/tms9918/video_tms9918.lst

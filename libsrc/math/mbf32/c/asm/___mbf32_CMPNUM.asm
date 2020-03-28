@@ -1,0 +1,4 @@
+SECTION code_fp_mbf32
+PUBLIC ___mbf32_CMPNUM
+EXTERN CMPNUM
+defc ___mbf32_CMPNUM = CMPNUM

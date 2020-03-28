@@ -1,0 +1,21 @@
+include ../../../Make.config
+
+TARGET = cpm
+
+
+ASMFILES = $(wildcard *.asm)
+OBJECTS = $(ASMFILES:.asm=.o)
+
+AFLAGS += -DSTANDARDESCAPECHARS
+
+all: dirs $(addprefix obj/8080/,$(OBJECTS)) $(addprefix obj/z80/,$(OBJECTS))
+
+
+
+clean: 
+	$(RM) -r obj
+	$(RM) zcc_opt.def *.err *.o
+
+dirs:
+	@mkdir -p obj/8080 obj/z80
+

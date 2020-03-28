@@ -1,0 +1,5 @@
+target/mtx/rs232/rs232_close
+target/mtx/rs232/rs232_get
+target/mtx/rs232/rs232_init
+target/mtx/rs232/rs232_params
+target/mtx/rs232/rs232_put

@@ -1,9 +1,0 @@
-$Id: README,v 1.2 2001-04-18 13:21:37 stefano Exp $
-
-Changed the (0:0) origin to top-left (hardware) to port easily the stuff.
-The Z88 uses the window and closegfx commands that aren't supported 
-with the other ports.
-
-Spectrum, ZX81, VZ200/300, Jupiter ACE and TI calculators are supported
-with all the others gfx commands.
-

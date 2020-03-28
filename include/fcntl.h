@@ -41,7 +41,7 @@ extern ssize_t __LIB__ read(int fd, void *ptr, size_t len) __smallc;
 extern ssize_t __LIB__ write(int fd, const void *ptr, size_t len) __smallc;
 extern long __LIB__ __SAVEFRAME__ lseek(int fd,long posn, int whence) __smallc;
 
-extern int __LIB__  readbyte(int fd) __smallc __z88dk_fastcall;
+extern int __LIB__ readbyte(int fd) __z88dk_fastcall;
 extern int __LIB__ writebyte(int fd, int c) __smallc;
 
 
@@ -83,11 +83,11 @@ extern unsigned int   RND_BLOCKSIZE;
 struct RND_FILE {
 	char    name_prefix;   /* block name, including prefix char */
 	char    name[15];         /* file name */
-	u16_t	blocksize;
+	i16_t	blocksize;
 	unsigned char *blockptr;
 	long    size;             /* file size */
 	long    position;         /* current position in file */
-	u16_t	pos_in_block;
+	i16_t	pos_in_block;
 	mode_t  mode;
 };
 
@@ -95,7 +95,7 @@ struct RND_FILE {
 /* The following three functions are target specific */
 extern int  __LIB__ rnd_loadblock(char *name, void *loadstart, size_t len) __smallc;
 extern int  __LIB__ rnd_saveblock(char *name, void *loadstart, size_t len) __smallc;
-extern int  __LIB__  rnd_erase(char *name) __smallc __z88dk_fastcall;
+extern int  __LIB__  rnd_erase(char *name) __z88dk_fastcall;
 
 /* ********************************************************* */
 

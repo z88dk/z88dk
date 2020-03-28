@@ -1,0 +1,14 @@
+target/srr/stdio/fgetc_cons
+target/srr/stdio/fputc_cons
+target/srr/stdio/getk
+target/srr/stdio/CRT_FONT
+target/srr/stdio/generic_console
+target/srr/stdio/generic_console_ioctl
+@stdio/stdio.lst
+@font/font_8x8/font_8x8.lst
+@input/input_keyboard.lst
+target/srr/graphics/textpixl
+@gfx/gencon/gfx_gencon.lst
+target/srr/games/keys_joystick
+@games/games.lst
+@z80.lst

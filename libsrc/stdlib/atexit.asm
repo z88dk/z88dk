@@ -35,7 +35,14 @@ EXTERN exitsp, exitcount
    add a,a                   ; compute index in exit stack
    ld c,a
    ld b,0
+IF __CPU_GBZ80__
+   ld hl,exitsp
+   ld a,(hl+)
+   ld h,(hl)
+   ld l,a
+ELSE
    ld hl,(exitsp)
+ENDIF
    add hl,bc
    ld (hl),e                 ; write atexit function
    inc hl

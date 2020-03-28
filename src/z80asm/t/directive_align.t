@@ -2,15 +2,13 @@
 
 # Z88DK Z80 Module Assembler
 #
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk/
 #
 # Test ALIGN
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 require './t/testlib.pl';
 
@@ -18,44 +16,37 @@ require './t/testlib.pl';
 unlink_testfiles();
 z80asm("align 0", "", 1, "", <<'END');
 Error at file 'test.asm' line 1: integer '0' out of range
-1 errors occurred during assembly
 END
 
 unlink_testfiles();
 z80asm("align 0x10000", "", 1, "", <<'END');
 Error at file 'test.asm' line 1: integer '65536' out of range
-1 errors occurred during assembly
 END
 
 # align redefined
 unlink_testfiles();
 z80asm("align 1 \n align 2", "", 1, "", <<'END');
 Error at file 'test.asm' line 2: ALIGN redefined
-1 errors occurred during assembly
 END
 
 # ORG and ALIGN not compatible
 unlink_testfiles();
 z80asm("org 1 \n align 16", "", 1, "", <<'END');
 Error at file 'test.asm' line 2: ORG '0x0001' not ALIGNed '16'
-1 errors occurred during assembly
 END
 
 unlink_testfiles();
 z80asm("align 16 \n org 1", "", 1, "", <<'END');
 Error at file 'test.asm' line 2: ORG '0x0001' not ALIGNed '16'
-1 errors occurred during assembly
 END
 
 # constant expression
 z80asm("extern SIXTEEN \n align SIXTEEN", "", 1, "", <<'END');
 Error at file 'test.asm' line 2: expected constant expression
-1 errors occurred during assembly
 END
 
 z80asm("extern SIXTEEN, FILL \n align SIXTEEN, FILL", "", 1, "", <<'END');
 Error at file 'test.asm' line 2: expected constant expression
-1 errors occurred during assembly
 END
 
 # align inside a section, check when address is already aligned
@@ -116,7 +107,7 @@ END
 check_bin_file("test.bin", pack("C*", 0, (0) x 15, 1,2,3,4));
 
 z80nm("test.o", <<'END');
-Object  file test.o at $0000: Z80RMF12
+Object  file test.o at $0000: Z80RMF14
   Name: test
   Section code: 1 bytes
     C $0000: 00

@@ -67,10 +67,8 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
 	push	hl
-IF CRT_ENABLE_STDIO = 1
-	EXTERN	closeall
-	call	closeall
-ENDIF
+    call    crt0_exit
+
 
 	pop	bc
 start1:	ld	sp,0		;Restore stack to entry value
@@ -78,9 +76,6 @@ start1:	ld	sp,0		;Restore stack to entry value
 
 l_dcal:	jp	(hl)		;Used for function pointer calls
 
-
-	 defm  "Small C+ Z1013"	;Unnecessary file signature
-	 defb	0
 
 	INCLUDE "crt/classic/crt_runtime_selection.asm"
 	INCLUDE "crt/classic/crt_section.asm"

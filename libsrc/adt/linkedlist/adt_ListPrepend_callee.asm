@@ -96,5 +96,5 @@ EXTERN _u_malloc
    scf
    ret
 
-DEFC ASMDISP_ADT_LISTPREPEND_CALLEE = # asmentry - adt_ListPrepend_callee
-DEFC ASMDISP_ADT_LISTPREPEND2 = # ADTListPrepend2 - adt_ListPrepend_callee
+DEFC ASMDISP_ADT_LISTPREPEND_CALLEE = asmentry - adt_ListPrepend_callee
+DEFC ASMDISP_ADT_LISTPREPEND2 = ADTListPrepend2 - adt_ListPrepend_callee

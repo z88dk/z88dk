@@ -73,6 +73,174 @@ int  *n1, *n2;
      return(OK);
 }
 
+/*  dokey -- process and store  a sort key */
+dokey(inkey,nkey)
+char  inkey[];
+int   nkey;
+{
+     int  k1,k2;
+
+     if(argrange(inkey,&k1,&k2)==ERROR)  return(-4);
+
+     keys[nkey] = --k1;
+     keys[MAXKEYS*nkey]= --k2;
+
+     if((k1<0)||(k2<0)||(k1>MAXLINE-1)||(k2>MAXLINE-1))  return(-5);
+     else
+          return(0);
+}
+
+
+
+/*  filein -- read input, store lines, store pointers to lines */
+filein()
+{
+     int  len, nlines;
+     char *p;
+     char line[MAXLINE];
+
+     nlines=0;
+
+     while(fgets(line,STDIN))
+          {if(nlines>LINES)  return(-1);
+
+          line[strlen(line)-1]='\0';    /* zap '\n' */
+          len=strlen(line) + 1;   /* account for null byte  */
+          if((p=sbrk(len))==ERROR)  return(-2);
+
+          strcpy(p,line);
+          lineptr[nlines++]=p;
+          }
+
+     return(nlines);
+}
+
+
+
+
+
+
+
+
+
+
+/*  swap -- exchange pointers.  K&R p. 117  */
+swap(px,py)
+char  *px[], *py[];
+{
+     char  *temp;
+
+     temp=*px;
+     *px=*py;
+     *py=temp;
+}
+
+
+
+/*  xstrcmp -- return <0 if s<t, 0 if s==t, >0 if s>t.
+          If fold, fold lower into upper case before compare.
+*/
+xstrcmp(s,t,fold)
+char *s, *t;
+int  fold;
+{
+     char s1, t1;
+
+     for(; *s != '\0'; s++, t++)
+          {s1= (fold) ? toupper(*s) : *s;
+           t1= (fold) ? toupper(*t) : *t;
+
+          if(s1 != t1)  return(s1-t1);
+          }
+
+     if(*t=='\0')
+          return(0);
+     else
+          return(-1);
+}
+
+
+
+/*  strcmpaf -- compare using fields.  Return <0 for
+          s<t, 0 for s==t, >0 for s>t.  If fold, fold
+          lower into upper case before comparison.
+*/
+strcmpaf(s,t,fold)
+char *s, *t;
+int  fold;
+{
+     int  i,j;
+     char s1, t1;
+
+     for(i=0; keys[i]>=0; i++)
+          for(j=keys[i]; j<=keys[MAXKEYS+i]; j++)
+               {s1 = (fold) ? toupper(s[j]) : s[j];
+               t1  = (fold) ? toupper(t[j]) : t[j];
+               if(s1 != t1)  return (s1-t1);
+               }
+
+     return(0);
+}
+
+/*  scmp -- string compare. Return <0 if s<t, 0 if s=t, >0 if s>t
+     (lie if reverse)
+*/
+scmp(s,t,fold,keys,reverse,numeric)
+char *s, *t;
+int  fold, keys, reverse, numeric;
+{
+     int  result;
+
+     if(numeric)         /* leading integers */
+          result=atoi(s) -atoi(t);
+     else if(keys)       /* fields */
+          result=strcmpaf(s,t,fold);
+     else                /* whole line */
+          result=xstrcmp(s,t,fold);
+
+     if(reverse)         /* lie for descending sort */
+          result *= -1;
+
+     return(result);
+}
+
+
+/*  output -- write output. Delete non-unique lines (current sort def
+     of equality) if requested
+*/
+output(nlines,unique,fold,keys,reverse,numeric)
+int  nlines, unique, fold, keys, reverse, numeric;
+{
+     int  i;
+
+     if(unique)          /* delete non-unique lines */
+          {fprintf(STDOUT,"%s\n",lineptr[0]);
+          for(i=1; i < nlines; i++)
+               if(scmp(lineptr[i],lineptr[i-1],fold,keys,reverse,numeric) != 0)
+                    fprintf(STDOUT,"%s\n",lineptr[i]);
+          }
+     else                /* output all lines */
+          for(i=0; i < nlines; i++)
+               fprintf(STDOUT,"%s\n",lineptr[i]);
+}
+
+
+/* xsort -- shell sort pointers to text lines  */
+xsort(v,n,fold,keys,reverse,numeric)
+char  *v[];
+int   n, fold, keys, reverse, numeric;
+{
+     int  gap, i, j;
+
+     for(gap=n/2;gap>0;gap/=2)
+          for(i=gap;i<n;i++)
+               for(j=i-gap;j>=0;j-=gap)
+                    {if(scmp(v[j],v[j+gap],fold,keys,reverse,numeric) <= 0)
+                         break;
+                    swap(&v[j],&v[j+gap]);
+                    }
+}
+
 
 main(argc,argv)
 int  argc;
@@ -181,173 +349,6 @@ char *argv[];
      output(nlines,uniqflag,foldflag,keyflag,revflag,numflag);
 
      //dioflush();
-}
-
-
-/*  dokey -- process and store  a sort key */
-dokey(inkey,nkey)
-char  inkey[];
-int   nkey;
-{
-     int  k1,k2;
-
-     if(argrange(inkey,&k1,&k2)==ERROR)  return(-4);
-
-     keys[nkey] = --k1;
-     keys[MAXKEYS*nkey]= --k2;
-
-     if((k1<0)||(k2<0)||(k1>MAXLINE-1)||(k2>MAXLINE-1))  return(-5);
-     else
-          return(0);
-}
-
-
-
-/*  filein -- read input, store lines, store pointers to lines */
-filein()
-{
-     int  len, nlines;
-     char *p;
-     char line[MAXLINE];
-
-     nlines=0;
-
-     while(fgets(line,STDIN))
-          {if(nlines>LINES)  return(-1);
-
-          line[strlen(line)-1]='\0';    /* zap '\n' */
-          len=strlen(line) + 1;   /* account for null byte  */
-          if((p=sbrk(len))==ERROR)  return(-2);
-
-          strcpy(p,line);
-          lineptr[nlines++]=p;
-          }
-
-     return(nlines);
-}
-
-
-
-/* xsort -- shell sort pointers to text lines  */
-xsort(v,n,fold,keys,reverse,numeric)
-char  *v[];
-int   n, fold, keys, reverse, numeric;
-{
-     int  gap, i, j;
-
-     for(gap=n/2;gap>0;gap/=2)
-          for(i=gap;i<n;i++)
-               for(j=i-gap;j>=0;j-=gap)
-                    {if(scmp(v[j],v[j+gap],fold,keys,reverse,numeric) <= 0)
-                         break;
-                    swap(&v[j],&v[j+gap]);
-                    }
-}
-
-
-
-
-/*  scmp -- string compare. Return <0 if s<t, 0 if s=t, >0 if s>t
-     (lie if reverse)
-*/
-scmp(s,t,fold,keys,reverse,numeric)
-char *s, *t;
-int  fold, keys, reverse, numeric;
-{
-     int  result;
-
-     if(numeric)         /* leading integers */
-          result=atoi(s) -atoi(t);
-     else if(keys)       /* fields */
-          result=strcmpaf(s,t,fold);
-     else                /* whole line */
-          result=xstrcmp(s,t,fold);
-
-     if(reverse)         /* lie for descending sort */
-          result *= -1;
-
-     return(result);
-}
-
-
-
-/*  swap -- exchange pointers.  K&R p. 117  */
-swap(px,py)
-char  *px[], *py[];
-{
-     char  *temp;
-
-     temp=*px;
-     *px=*py;
-     *py=temp;
-}
-
-
-
-/*  xstrcmp -- return <0 if s<t, 0 if s==t, >0 if s>t.
-          If fold, fold lower into upper case before compare.
-*/
-xstrcmp(s,t,fold)
-char *s, *t;
-int  fold;
-{
-     char s1, t1;
-
-     for(; *s != '\0'; s++, t++)
-          {s1= (fold) ? toupper(*s) : *s;
-           t1= (fold) ? toupper(*t) : *t;
-
-          if(s1 != t1)  return(s1-t1);
-          }
-
-     if(*t=='\0')
-          return(0);
-     else
-          return(-1);
-}
-
-
-
-/*  strcmpaf -- compare using fields.  Return <0 for
-          s<t, 0 for s==t, >0 for s>t.  If fold, fold
-          lower into upper case before comparison.
-*/
-strcmpaf(s,t,fold)
-char *s, *t;
-int  fold;
-{
-     int  i,j;
-     char s1, t1;
-
-     for(i=0; keys[i]>=0; i++)
-          for(j=keys[i]; j<=keys[MAXKEYS+i]; j++)
-               {s1 = (fold) ? toupper(s[j]) : s[j];
-               t1  = (fold) ? toupper(t[j]) : t[j];
-               if(s1 != t1)  return (s1-t1);
-               }
-
-     return(0);
-}
-
-
-
-/*  output -- write output. Delete non-unique lines (current sort def
-     of equality) if requested
-*/
-output(nlines,unique,fold,keys,reverse,numeric)
-int  nlines, unique, fold, keys, reverse, numeric;
-{
-     int  i;
-
-     if(unique)          /* delete non-unique lines */
-          {fprintf(STDOUT,"%s\n",lineptr[0]);
-          for(i=1; i < nlines; i++)
-               if(scmp(lineptr[i],lineptr[i-1],fold,keys,reverse,numeric) != 0)
-                    fprintf(STDOUT,"%s\n",lineptr[i]);
-          }
-     else                /* output all lines */
-          for(i=0; i < nlines; i++)
-               fprintf(STDOUT,"%s\n",lineptr[i]);
 }
 
 

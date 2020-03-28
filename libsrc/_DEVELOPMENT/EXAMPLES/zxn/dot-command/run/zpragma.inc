@@ -1,11 +1,11 @@
-// limit size of printf
+// Limit size of printf
 
-#pragma printf = "s u c"
+#pragma printf = "%s %c %u"
 
-// space for one function to be registered with atexit()
+// Room for one atexit function
 
 #pragma output CLIB_EXIT_STACK_SIZE = 1
 
-// use unprocessed command line
+// Indicate this is for NextZXOS 48k+
 
-#pragma output CRT_ENABLE_COMMANDLINE = 2
+#pragma output NEXTOS_VERSION = -1

@@ -2,9 +2,9 @@
 Z88-DK Z80ASM - Z80 Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2017
+Copyright (C) Paulo Custodio, 2011-2019
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-Repository: https://github.com/pauloscustodio/z88dk-z80asm
+Repository: https://github.com/z88dk/z88dk
 
 Define ragel-based parser. 
 */
@@ -108,11 +108,10 @@ static void push_expr(ParseCtx *ctx)
 	STR_DEFINE(expr_text, STR_SIZE);
 	Expr *expr;
 	Sym  *expr_p;
-	bool  last_was_prefix;
 
 	/* build expression text - split constant prefixes from numbers and names */
 	Str_clear(expr_text);
-	last_was_prefix = false;
+	bool last_was_prefix = false;
 	for (expr_p = ctx->expr_start; expr_p < ctx->p; expr_p++)
 	{
 		if (last_was_prefix && expr_p->tlen > 0 &&
@@ -486,13 +485,13 @@ bool parse_file(const char *filename)
 	int num_errors = get_num_errors();
 
 	ctx = ParseCtx_new();
-	if (opts.verbose)
-		printf("Reading '%s'\n", filename);	/* display name of file */
-
 	src_push();
 	{
 		if (src_open(filename, opts.inc_path))
 		{
+			if (opts.verbose)
+				printf("Reading '%s' = '%s'\n", path_canon(filename), path_canon(src_filename()));	/* display name of file */
+
 			sym.tok = TK_NIL;
 			while (sym.tok != TK_END)
 				parseline(ctx);				/* before parsing it */

@@ -1,25 +1,12 @@
 /*
- *      Routines to initialise variables
- *      Split from decl.c 11/3/98 djm
- *
- *      14/3/99 djm Solved many problems with string initialisation
- *      char arrays in structs now initialised correctly, strings
- *      truncated if too long, all seems to be fine - hurrah!
- *
- *        2/2/02 djm - This file needs to rewritten to be more flexible
- * 
- *      3/2/02 djm - Unspecified structure members are now padded out
- *
- *      $Id: declinit.c,v 1.18 2016-07-15 12:45:18 pauloscustodio Exp $
+ * Handle initialisation
  */
 
 #include "ccdefs.h"
 
 static void output_double_string_load(double value);
 static int init(Type *type, int dump);
-static int agg_init(Type *type);
-
-
+static int agg_init(Type *type, int isflexible);
 
 
 /*
@@ -33,10 +20,11 @@ int initials(const char *dropname, Type *type)
 
     // We can only use rodata_compile (i.e. ROM if double string isn't enabled)
     if ( (type->isconst && !c_double_strings) ||
-        ( (ispointer(type) || type->kind == KIND_ARRAY) && type->ptr->isconst ) )  {
-        output_section(c_rodata_section);
+        ( (ispointer(type) || type->kind == KIND_ARRAY) && 
+		(type->ptr->isconst || ((ispointer(type->ptr) || type->ptr->kind == KIND_ARRAY) && type->ptr->ptr->isconst) ) ) ) {
+        output_section(get_section_name(type->namespace,c_rodata_section));
     } else {
-        output_section(c_data_section);
+        output_section(get_section_name(type->namespace,c_data_section));
     }
     prefix();
     outname(dropname, YES);
@@ -51,7 +39,7 @@ int initials(const char *dropname, Type *type)
             desize = str_init(type->kind == KIND_STRUCT ? type->tag : type->ptr);
         } else {
             // Aggregate initialiser
-            desize = agg_init(type);
+            desize = agg_init(type, 0);
         }
         needchar('}');
     } else {
@@ -61,6 +49,20 @@ int initials(const char *dropname, Type *type)
 
     output_section(c_code_section); 
     return (desize);
+}
+
+static void add_bitfield(Type *bitfield, int *value)
+{
+    Kind valtype;
+    double cvalue;
+
+    if (constexpr(&cvalue, &valtype, 0)) {
+        int ival = ((int)cvalue & (( 1 << bitfield->bit_size) - 1)) << bitfield->bit_offset;
+        check_assign_range(bitfield, cvalue);
+        *value |= ival;
+    } else {
+        errorfmt("Expected a constant value for bitfield assignment", 1);
+    }
 }
 
 /*
@@ -73,27 +75,55 @@ int str_init(Type *tag)
     int sz = 0;
     Type   *ptr;
     int     i;
+    int     last_offset = -1;
     int     num_fields = tag->isstruct ? array_len(tag->fields) : 1;
+    int     bitfield_value = 0;
+    int     had_bitfield = 0;
 
     for ( i = 0; i < num_fields; i++ ) {
+        ptr = array_get_byindex(tag->fields,i);
+
         if ( rcmatch('}')) {
             break;
         }
         if ( i != 0 ) needchar(',');
-        ptr = array_get_byindex(tag->fields,i);
-        sz += ptr->size;
+
+
+        if ( ptr->offset == last_offset ) {
+            add_bitfield(ptr, &bitfield_value);
+            had_bitfield += ptr->bit_size;
+            continue;
+        } else if ( had_bitfield ) {
+            sz = ptr->offset;
+            // We've finished a byte/word of bitfield, we should dump it
+            outfmt("\t%s\t0x%x\n", had_bitfield <= 8 ? "defb" : "defw", bitfield_value);
+            had_bitfield = 0;
+            bitfield_value = 0;
+        }
+
+        if ( ptr->bit_size ) {
+            sz = ptr->offset;
+            last_offset = ptr->offset;
+            had_bitfield = ptr->bit_size;
+            add_bitfield(ptr, &bitfield_value);
+            continue;
+        }
+
+        last_offset = ptr->offset;
+
+        sz += ptr->size == -1 ? 0 : ptr->size;
         if ( ptr->kind == KIND_STRUCT ) {
             needchar('{');
             str_init(ptr->tag);
             needchar('}');
         } else if ( ( ptr->kind == KIND_ARRAY && ptr->ptr->kind != KIND_CHAR ) ) {
             needchar('{');
-            agg_init(ptr);
+            agg_init(ptr, ptr->size == -1 && i == num_fields - 1);
             needchar('}');
         } else if ( ptr->kind == KIND_ARRAY && ptr->ptr->kind == KIND_CHAR ) {
             if ( rcmatch('{')) {
                 needchar('{');
-                agg_init(ptr);
+                agg_init(ptr,0);
                 needchar('}');
             } else {
                 init(ptr,1);
@@ -102,6 +132,15 @@ int str_init(Type *tag)
             init(ptr,1);
         }
     }
+    swallow(",");
+
+    // And output 
+    if ( had_bitfield ) {
+        // We've finished a struct initialisation with a bitfield
+        outfmt("\t%s\t0x%x\n", had_bitfield <= 8 ? "defb" : "defw", bitfield_value);
+        sz += ((had_bitfield-1) / 8) + 1;
+    }
+
     // Pad out the union
     if ( sz < tag->size) {
         defstorage();
@@ -115,7 +154,7 @@ int str_init(Type *tag)
 /*
  * initialise aggregate
  */
-int agg_init(Type *type)
+int agg_init(Type *type, int isflexible)
 {
     int done = 0;
     int dim = type->len;
@@ -132,12 +171,27 @@ int agg_init(Type *type)
             size += str_init(type->ptr->tag);
             dim--;
             needchar('}');
-        } else if ( type->ptr->kind == KIND_ARRAY ) {
-            needchar('{');
-            size += agg_init(type->ptr);
-            needchar('}');
+        } else if ( type->ptr && type->ptr->kind == KIND_ARRAY) {
+            if ( type->ptr->ptr->kind != KIND_CHAR ) {
+                needchar('{');
+                size += agg_init(type->ptr, isflexible);
+                needchar('}');
+            } else {
+               char needbrace = 0;
+               if ( cmatch('{') ) 
+                   needbrace = 1;
+               if ( rcmatch('"') )
+                   size += init(type->ptr,1);
+               else 
+                   size += agg_init(type->ptr, isflexible);
+               if ( needbrace ) needchar('}');
+            }
         } else {
+            char needbrace = 0;
+            if ( cmatch('{') ) 
+               needbrace = 1;
             size += init(type->ptr,1);
+            if ( needbrace ) needchar('}');
         }
         done++;
         if (cmatch(',') == 0)
@@ -146,7 +200,7 @@ int agg_init(Type *type)
     }
     if ( type->len != -1 ) {
         size += dumpzero(1, type->size - size);
-    } else {
+    } else if ( !isflexible ) {
         type->size = size;
         type->len = size / type->ptr->size;
     }
@@ -231,7 +285,15 @@ static int init(Type *type, int dump)
                                 break;                                
                             }
                         }
-                    }
+                    } else if ( cmatch('+') ) {                      
+                        if ( constexpr(&value, &valtype, 1) ) {
+                            offset = value;
+                        }
+                    } else if ( cmatch('-') ) {                      
+                        if ( constexpr(&value, &valtype, 1) ) {
+                            offset = value * -1;
+                        }
+                    } 
                     defword();
                     outname(ptr->name, dopref(ptr));
                     outfmt(" + %d",offset);
@@ -257,10 +319,11 @@ static int init(Type *type, int dump)
             return 0;
         } else if (constexpr(&value, &valtype, 1)) {
 constdecl:
+            check_assign_range(type, value);
             if (dump) {
                 /* struct member or array of pointer to char */
                 if ( type->kind == KIND_DOUBLE ) {
-                    unsigned char  fa[6];
+                    unsigned char  fa[MAX_MANTISSA_SIZE+1];
                     int      i;
                     /* It was a float, lets parse the float and then dump it */
                     if ( c_double_strings ) { 
@@ -268,7 +331,7 @@ constdecl:
                     } else {
                         dofloat(value, fa);
                         defbyte();
-                        for ( i = 0; i < 6; i++ ) {
+                        for ( i = 0; i < c_fp_size; i++ ) {
                             if ( i ) outbyte(',');
                             outdec(fa[i]);
                         }
@@ -314,7 +377,7 @@ constdecl:
                         output_double_string_load(value);
                     } else {
                         dofloat(value, fa);
-                        for ( i = 0; i < 6; i++ ) {
+                        for ( i = 0; i < c_fp_size; i++ ) {
                             stowlit(fa[i], 1);
                         }
                     }
@@ -341,7 +404,7 @@ static void output_double_string_load(double value)
     output_section(c_init_section);
     lval.const_val = value;
     load_double_into_fa(&lval);
-    immedlit(dumplocation); outdec(0); nl();
+    immedlit(dumplocation,0); nl();
     callrts("dstore");
     output_section(c_data_section);
 }

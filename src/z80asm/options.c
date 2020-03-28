@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------
 // Z88DK Z80 Module Assembler
 // Parse command line options
-// Copyright (C) Paulo Custodio, 2011-2018
+// Copyright (C) Paulo Custodio, 2011-2019
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -59,10 +59,15 @@ static void option_define(const char *symbol );
 static void option_make_lib(const char *library );
 static void option_use_lib(const char *library );
 static void option_cpu_z80(void);
-static void option_cpu_z80_zxn(void);
+static void option_cpu_z80n(void);
 static void option_cpu_z180(void);
+static void option_cpu_gbz80(void);
+static void option_cpu_8080(void);
+static void option_cpu_8085(void);
 static void option_cpu_r2k(void);
 static void option_cpu_r3k(void);
+static void option_cpu_ti83(void);
+static void option_cpu_ti83plus(void);
 static void option_appmake_zx(void);
 static void option_appmake_zx81(void);
 static void option_filler(const char *filler_arg );
@@ -130,6 +135,32 @@ DEFINE_dtor_module()
 *   Parse command line, set options, including opts.files with list of
 *	input files, including parsing of '@' lists
 *----------------------------------------------------------------------------*/
+static void process_env_options()
+{
+	const char *opts = getenv("Z80ASM");
+	if (!opts)
+		return;
+
+	// add dummy program name option
+	argv_t* args = argv_new();
+	argv_push(args, "z80asm");
+
+	char *opts_copy = xstrdup(opts);		// strtok needs writeable string
+	char *tok = strtok(opts_copy, " ");
+	while (tok) {
+		argv_push(args, tok);
+		tok = strtok(NULL, " ");
+	}
+
+	// parse args
+	int argc = argv_len(args);
+	int arg;
+	process_options(&arg, argc, argv_front(args));
+
+	xfree(opts_copy);
+	argv_free(args);
+}
+
 void parse_argv( int argc, char *argv[] )
 {
     int arg;
@@ -139,10 +170,14 @@ void parse_argv( int argc, char *argv[] )
     if ( argc == 1 )
         exit_copyright();					/* exit if no arguments */
 
-    process_options( &arg, argc, argv );	/* process all options, set arg to next */
+	if (!get_num_errors())
+		process_env_options();				/* process options from Z80ASM environment variable */
 
-    if ( arg >= argc )
-        error_no_src_file();				/* no source file */
+	if (!get_num_errors())
+		process_options( &arg, argc, argv );/* process all options, set arg to next */
+
+	if (!get_num_errors() && arg >= argc)
+		error_no_src_file();				/* no source file */
 
 	if ( ! get_num_errors() )
         process_files( arg, argc, argv );	/* process each source file */
@@ -179,73 +214,117 @@ static void process_opt( int *parg, int argc, char *argv[] )
     int		 j;
 	const char *opt_arg_ptr;
 
-    /* search opts_lu[] */
-    for ( j = 0; j < NUM_ELEMS( opts_lu ); j++ )
-    {
-        if ( ( opt_arg_ptr = check_option( argv[II], opts_lu[j].long_opt ) ) != NULL ||
-                ( opt_arg_ptr = check_option( argv[II], opts_lu[j].short_opt ) ) != NULL )
-        {
-            /* found option, opt_arg_ptr points to after option */
-            switch ( opts_lu[j].type )
-            {
-            case OptSet:
-                if ( *opt_arg_ptr )
-                    error_illegal_option( argv[II] );
-                else
-                    *( ( bool * )( opts_lu[j].arg ) ) = true;
-
-                break;
-
-            case OptCall:
-                if ( *opt_arg_ptr )
-                    error_illegal_option( argv[II] );
-                else
-                    ( ( void ( * )( void ) )( opts_lu[j].arg ) )();
-
-                break;
-
-            case OptCallArg:
-				if (*opt_arg_ptr) {
-					opt_arg_ptr = expand_environment_variables(opt_arg_ptr);
-					((void(*)(const char *))(opts_lu[j].arg))(opt_arg_ptr);
-				}
-                else
-                    error_illegal_option( argv[II] );
-
-                break;
-
-            case OptString:
-				if (*opt_arg_ptr) {
-					opt_arg_ptr = expand_environment_variables(opt_arg_ptr);
-                    *( ( const char ** )( opts_lu[j].arg ) ) = opt_arg_ptr;
-				}
-                else
-                    error_illegal_option( argv[II] );
-
-                break;
-
-            case OptStringList:
-				if (*opt_arg_ptr)
+	/* search options that are exceptions to the look-up table */
+	if (strcmp(argv[II], "-mz80n") == 0 || strcmp(argv[II], "-m=z80n") == 0) {
+		option_cpu_z80n();
+		return;
+	}
+	else if (strcmp(argv[II], "-mz80") == 0 || strcmp(argv[II], "-m=z80") == 0) {
+		option_cpu_z80();
+		return;
+	}
+	else if (strcmp(argv[II], "-mgbz80") == 0 || strcmp(argv[II], "-m=gbz80") == 0) {
+		option_cpu_gbz80();
+		return;
+	}
+	else if (strcmp(argv[II], "-m8080") == 0 || strcmp(argv[II], "-m=8080") == 0) {
+		option_cpu_8080();
+		return;
+	}
+	else if (strcmp(argv[II], "-m8085") == 0 || strcmp(argv[II], "-m=8085") == 0) {
+		option_cpu_8085();
+		return;
+	}
+	else if (strcmp(argv[II], "-mz180") == 0 || strcmp(argv[II], "-m=z180") == 0) {
+		option_cpu_z180();
+		return;
+	}
+	else if(strcmp(argv[II], "-mr2k") == 0 || strcmp(argv[II], "-m=r2k") == 0) {
+		option_cpu_r2k();
+		return;
+	}
+	else if(strcmp(argv[II], "-mr3k") == 0 || strcmp(argv[II], "-m=r3k") == 0) {
+		option_cpu_r3k();
+		return;
+	}
+	else if (strcmp(argv[II], "-mti83") == 0 || strcmp(argv[II], "-m=ti83") == 0) {
+		option_cpu_ti83();
+		return;
+	}
+	else if (strcmp(argv[II], "-mti83plus") == 0 || strcmp(argv[II], "-m=ti83plus") == 0) {
+		option_cpu_ti83plus();
+		return;
+	}
+	else {
+		/* search opts_lu[] */
+		for (j = 0; j < NUM_ELEMS(opts_lu); j++)
+		{
+			if ((opt_arg_ptr = check_option(argv[II], opts_lu[j].long_opt)) != NULL ||
+				(opt_arg_ptr = check_option(argv[II], opts_lu[j].short_opt)) != NULL)
+			{
+				/* found option, opt_arg_ptr points to after option */
+				switch (opts_lu[j].type)
 				{
-					UT_array **p_path = (UT_array **)opts_lu[j].arg;
-					opt_arg_ptr = expand_environment_variables(opt_arg_ptr);
-					argv_push(*p_path, opt_arg_ptr);
+				case OptSet:
+					if (*opt_arg_ptr)
+						error_illegal_option(argv[II]);
+					else
+						*((bool *)(opts_lu[j].arg)) = true;
+
+					break;
+
+				case OptCall:
+					if (*opt_arg_ptr)
+						error_illegal_option(argv[II]);
+					else
+						((void(*)(void))(opts_lu[j].arg))();
+
+					break;
+
+				case OptCallArg:
+					if (*opt_arg_ptr) {
+						opt_arg_ptr = expand_environment_variables(opt_arg_ptr);
+						((void(*)(const char *))(opts_lu[j].arg))(opt_arg_ptr);
+					}
+					else
+						error_illegal_option(argv[II]);
+
+					break;
+
+				case OptString:
+					if (*opt_arg_ptr) {
+						opt_arg_ptr = expand_environment_variables(opt_arg_ptr);
+						*((const char **)(opts_lu[j].arg)) = opt_arg_ptr;
+					}
+					else
+						error_illegal_option(argv[II]);
+
+					break;
+
+				case OptStringList:
+					if (*opt_arg_ptr)
+					{
+						UT_array **p_path = (UT_array **)opts_lu[j].arg;
+						opt_arg_ptr = expand_environment_variables(opt_arg_ptr);
+						argv_push(*p_path, opt_arg_ptr);
+					}
+					else
+						error_illegal_option(argv[II]);
+
+					break;
+
+				default:
+					xassert(0);
 				}
-                else
-                    error_illegal_option( argv[II] );
 
-                break;
+				return;
+			}
+		}
 
-            default:
-                xassert(0);
-            }
+		/* not found */
+		error_illegal_option(argv[II]);
 
-            return;
-        }
-    }
-
-    /* not found */
-    error_illegal_option( argv[II] );
+	}
 
 #undef II
 }
@@ -253,10 +332,16 @@ static void process_opt( int *parg, int argc, char *argv[] )
 static void process_options( int *parg, int argc, char *argv[] )
 {
 #define II (*parg)
-
-    for ( II = 1; II < argc && (argv[II][0] == '-' || argv[II][0] == '+'); II++ )
-        process_opt( &II, argc, argv );
-
+	for (II = 1; II < argc && (argv[II][0] == '-' || argv[II][0] == '+'); II++) {
+		if (strcmp(argv[II], "--") == 0) {
+			// end of options
+			II++;
+			break;
+		}
+		else {
+			process_opt(&II, argc, argv);
+		}
+	}
 #undef II
 }
 
@@ -303,11 +388,6 @@ static void process_file(char *filename )
 	cstr_strip(filename);
 	switch (filename[0])
 	{
-	case '-':		/* Illegal source file name */
-	case '+':
-		error_illegal_src_filename(filename);
-		break;
-
 	case '\0':		/* no file */
 		break;
 
@@ -349,6 +429,10 @@ void expand_list_glob(const char *filename)
 {
 	if (strpbrk(filename, "*?") != NULL) {		// is a pattern
 		argv_t *files = path_find_glob(filename);
+
+		if (argv_len(files) == 0)
+			error_glob_no_files(filename);		// error if pattern matched no file
+
 		for (char **p = argv_front(files); *p; p++) {
 			char *filename = *p;
 			src_push();
@@ -665,10 +749,28 @@ static void option_cpu_z80(void)
 	opts.cpu_name = CPU_Z80_NAME;
 }
 
-static void option_cpu_z80_zxn(void)
+static void option_cpu_z80n(void)
 {
-	opts.cpu = CPU_Z80_ZXN;
-	opts.cpu_name = CPU_Z80_ZXN_NAME;
+	opts.cpu = CPU_Z80N;
+	opts.cpu_name = CPU_Z80N_NAME;
+}
+
+static void option_cpu_gbz80(void)
+{
+	opts.cpu = CPU_GBZ80;
+	opts.cpu_name = CPU_GBZ80_NAME;
+}
+
+static void option_cpu_8080(void)
+{
+	opts.cpu = CPU_8080;
+	opts.cpu_name = CPU_8080_NAME;
+}
+
+static void option_cpu_8085(void)
+{
+	opts.cpu = CPU_8085;
+	opts.cpu_name = CPU_8085_NAME;
 }
 
 static void option_cpu_z180(void)
@@ -689,23 +791,51 @@ static void option_cpu_r3k(void)
 	opts.cpu_name = CPU_R3K_NAME;
 }
 
+static void option_cpu_ti83(void)
+{
+	option_cpu_z80();
+	opts.ti83plus = false;
+}
+
+static void option_cpu_ti83plus(void)
+{
+	option_cpu_z80();
+	opts.ti83plus = true;
+}
+
 static void define_assembly_defines()
 {
 	switch (opts.cpu) {
 	case CPU_Z80:
 	    define_static_def_sym("__CPU_Z80__", 1);
+	    define_static_def_sym("__CPU_ZILOG__", 1);
 		break;
-	case CPU_Z80_ZXN:
-	    define_static_def_sym("__CPU_Z80_ZXN__", 1);
+	case CPU_Z80N:
+	    define_static_def_sym("__CPU_Z80N__", 1);
+	    define_static_def_sym("__CPU_ZILOG__", 1);
 		break;
 	case CPU_Z180:
 	    define_static_def_sym("__CPU_Z180__", 1);
+	    define_static_def_sym("__CPU_ZILOG__", 1);
 		break;
 	case CPU_R2K:
 	    define_static_def_sym("__CPU_R2K__", 1);
+	    define_static_def_sym("__CPU_RABBIT__", 1);
 		break;
 	case CPU_R3K:
 	    define_static_def_sym("__CPU_R3K__", 1);
+	    define_static_def_sym("__CPU_RABBIT__", 1);
+		break;
+	case CPU_8080:
+	    define_static_def_sym("__CPU_8080__", 1);
+	    define_static_def_sym("__CPU_INTEL__", 1);
+		break;
+	case CPU_8085:
+	    define_static_def_sym("__CPU_8085__", 1);
+	    define_static_def_sym("__CPU_INTEL__", 1);
+		break;
+	case CPU_GBZ80:
+		define_static_def_sym("__CPU_GBZ80__", 1);
 		break;
 	default:
 		xassert(0);
@@ -873,7 +1003,7 @@ static const char *check_library(const char *lib_name)
 		return lib_name;
 	
 	if (opts.verbose)
-		printf("Library '%s' not found\n", lib_name);
+		printf("Library '%s' not found\n", path_canon(lib_name));
 
 	return NULL;
 }

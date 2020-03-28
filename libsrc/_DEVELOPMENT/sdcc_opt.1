@@ -444,6 +444,14 @@ ENDIF
 =
 %1(#((%0) / 256))
 
+%1#<%0
+=
+%1#((%0) & 0xFF)
+
+%1#>%0
+=
+%1#((%0) / 256)
+
 ;;
 ;; zilog syntax for index registers
 ;;
@@ -541,3 +549,9 @@ __xinit_%0
 	ld	ix, %1 (%2)
 =
 	ld	ix,(%2 + %1)
+
+;;
+;; GBZ80 instructions
+	ldhl	sp, %2
+=
+	ld	hl,sp + %2

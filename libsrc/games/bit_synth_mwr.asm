@@ -1,4 +1,4 @@
-; $Id: bit_synth_mwr.asm,v 1.3 2016-04-23 21:06:32 dom Exp $
+; $Id: bit_synth_mwr.asm $
 ;
 ; void bit_synth(int duration, int frequency1, int frequency2, int frequency3, int frequency4);
 ;
@@ -14,7 +14,8 @@
 ; This routine shouldn't stay in contended memory locations !!
 ;
 
-          SECTION    code_clib
+IF !__CPU_GBZ80__ && !__CPU_INTEL__
+          SECTION    smc_clib
           PUBLIC     bit_synth
           PUBLIC     _bit_synth
           INCLUDE  "games/games.inc"
@@ -105,3 +106,4 @@
           call	bit_close_ei
 
           ret
+ENDIF

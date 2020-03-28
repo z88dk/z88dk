@@ -152,10 +152,7 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
 	push	hl
-IF CRT_ENABLE_STDIO = 1
-	EXTERN	closeall
-	call	closeall
-ENDIF
+    call    crt0_exit
 	pop	bc
 start1:
         ld      sp,0
@@ -170,8 +167,6 @@ l_dcal:
         jp      (hl)
 
 
-	defm  "Small C+ J.ACE"
-	defb  0
         INCLUDE "crt/classic/crt_runtime_selection.asm"
 
 ;---------------------------------------------------------------------------

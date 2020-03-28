@@ -3,13 +3,14 @@
 # Z88DK Z80 Macro Assembler
 #
 # Copyright (C) Gunther Strube, InterLogic 1993-99
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-# Repository: https://github.com/pauloscustodio/z88dk-z80asm
+# Repository: https://github.com/z88dk/z88dk
 #
 # Build opcodes.t test code, using Udo Munk's z80pack assembler as a reference implementation
 
 use Modern::Perl;
+use Config;
 use File::Basename;
 use File::Slurp;
 use Iterator::Array::Jagged;
@@ -20,7 +21,7 @@ use Data::Dump 'dump';
 our $KEEP_FILES;
 $KEEP_FILES	 = grep {/-keep/} @ARGV; 
 
-my $UDOMUNK_ASM = "dev/z80pack-1.21/z80asm/z80asm.exe";
+my $UDOMUNK_ASM = "dev/z80pack-1.21/z80asm/z80asm".$Config{_exe};
 my $Z80EMU_SRCDIR = '../../libsrc/z80_crt0s/z80_emu';
 my @Z80EMU = qw(
 		rcmx_cpd
@@ -54,7 +55,7 @@ my $INPUT = read_file(dirname($0).'/'.basename($0, '.pl').'.asm');
 #------------------------------------------------------------------------------
 # Main
 #------------------------------------------------------------------------------
-for my $cpu ('z80', 'r2k') { #, 'z80-zxn', 'z180', 'r3k') {
+for my $cpu ('z80', 'r2k') { #, 'z80n', 'z180', 'r3k') {
 	my $rabbit = ($cpu =~ /r[23]k/);
 	for my $error (0, 1) {
 		my $iter = 	format_iter(
@@ -71,7 +72,7 @@ for my $cpu ('z80', 'r2k') { #, 'z80-zxn', 'z180', 'r3k') {
 		# write test code
 		if (@asm) {
 			push @OUTPUT, "z80asm(\n";
-			push @OUTPUT, "    options => \"-l -b --cpu=$cpu".
+			push @OUTPUT, "    options => \"-l -b -m$cpu".
 						  ($rabbit ? " -DRABBIT" : "")."\",\n";
 			unless ($error) {
 				push @OUTPUT, "    asm1 => <<'END_ASM',\n";

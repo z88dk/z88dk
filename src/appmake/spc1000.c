@@ -23,96 +23,91 @@ option_t spc1000_options[] = {
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
-
-int spc1000_exec(char *target)
+int spc1000_exec(char* target)
 {
-    char    filename[FILENAME_MAX+1];
-    char    name[11];
-    FILE    *fpin, *fpout;
-    long    pos;
-    int     c;
-    int     i;
-    int     len, blocklen;
-    int     cksum;
+    char filename[FILENAME_MAX + 1];
+    FILE *fpin, *fpout;
+    long pos;
+    int c;
+    int i;
+    int len;
 
-    if ( help )
+    if (help)
         return -1;
 
-    if ( binname == NULL || ( crtfile == NULL && origin == -1 ) ) {
+    if (binname == NULL || (crtfile == NULL && origin == -1)) {
         return -1;
     }
 
-    if ( outfile == NULL ) {
-        strcpy(filename,binname);
-        suffix_change(filename,".spc");
+    if (outfile == NULL) {
+        strcpy(filename, binname);
+        suffix_change(filename, ".spc");
     } else {
-        strcpy(filename,outfile);
+        strcpy(filename, outfile);
     }
 
-    if ( origin != -1 ) {
+    if (origin != -1) {
         pos = origin;
     } else {
-        if ( (pos = get_org_addr(crtfile)) == -1 ) {
-            myexit("Could not find parameter ZORG (not z88dk compiled?)\n",1);
+        if ((pos = get_org_addr(crtfile)) == -1) {
+            myexit("Could not find parameter ZORG (not z88dk compiled?)\n", 1);
         }
     }
 
-
-   if ( (fpin=fopen_bin(binname, crtfile) ) == NULL ) {
-        fprintf(stderr,"Can't open input file %s\n",binname);
-        myexit(NULL,1);
+    if ((fpin = fopen_bin(binname, crtfile)) == NULL) {
+        fprintf(stderr, "Can't open input file %s\n", binname);
+        myexit(NULL, 1);
     }
 
     /* Determine size of input file */
-    if ( fseek(fpin,0,SEEK_END) ) {
-        fprintf(stderr,"Couldn't determine size of file\n");
+    if (fseek(fpin, 0, SEEK_END)) {
+        fprintf(stderr, "Couldn't determine size of file\n");
         fclose(fpin);
-        myexit(NULL,1);
+        myexit(NULL, 1);
     }
 
-    len=ftell(fpin);
+    len = ftell(fpin);
 
-    fseek(fpin,0L,SEEK_SET);
+    fseek(fpin, 0L, SEEK_SET);
 
-    if ( (fpout=fopen(filename,"wb") ) == NULL ) {
+    if ((fpout = fopen(filename, "wb")) == NULL) {
         fclose(fpin);
-        myexit("Can't open output file\n",1);
+        myexit("Can't open output file\n", 1);
     }
 
-
-	/* Offset 0x12 = size */
-	/* OFfset 0x14 = address */
+    /* Offset 0x12 = size */
+    /* OFfset 0x14 = address */
 
     writebyte(0x02, fpout);
-    for ( i = 0; i < 15; i++ ) {
-        writebyte( i < strlen(binname) ? binname[i] : 0, fpout);
+    for (i = 0; i < 15; i++) {
+        writebyte(i < strlen(binname) ? binname[i] : 0, fpout);
     }
     /* Offset 0x10 */
     writebyte(0x00, fpout);
     writebyte(0x00, fpout);
     /* Length of the file + headers */
-    writebyte( (len + 13) % 256, fpout);
-    writebyte( (len + 13) / 256, fpout);
+    writebyte((len + 13) % 256, fpout);
+    writebyte((len + 13) / 256, fpout);
     /* Loading address */
-    writebyte( pos % 256, fpout);
-    writebyte( pos / 256, fpout);
+    writebyte(pos % 256, fpout);
+    writebyte(pos / 256, fpout);
     writebyte(0x00, fpout);
     writebyte(0x00, fpout);
     writebyte(0x3a, fpout); // ??
 
-    for ( i = 25; i < 0x80; i++ ) {
+    for (i = 25; i < 0x80; i++) {
         writebyte(0x00, fpout);
     }
 
     // Now write the payload file
-    writebyte( 0x09, fpout);
-    writebyte( 0x00, fpout);
-    writebyte( 0x0a, fpout);
-    writebyte( 0x00, fpout);
-    writebyte( 0xb9, fpout);
-    writebyte( 0x11, fpout);
-    writebyte( pos % 256, fpout);
-    writebyte( pos / 256, fpout);
+    writebyte(0x09, fpout);
+    writebyte(0x00, fpout);
+    writebyte(0x0a, fpout);
+    writebyte(0x00, fpout);
+    writebyte(0xb9, fpout);
+    writebyte(0x11, fpout);
+    writebyte(pos % 256, fpout);
+    writebyte(pos / 256, fpout);
 #if 0
     writebyte( 0x00, fpout);
     writebyte( 0x00, fpout);
@@ -120,13 +115,13 @@ int spc1000_exec(char *target)
     writebyte( 0x00, fpout);
     writebyte( 0x00, fpout);
 #else
-    for ( i = 0x88; i < 0xc0; i++ ) {
-        writebyte( 0x00, fpout);
+    for (i = 0x88; i < 0xc0; i++) {
+        writebyte(0x00, fpout);
     }
 #endif
-    for (i=0; i<len; i++ ) {
-      c=getc(fpin);
-      writebyte(c,fpout);
+    for (i = 0; i < len; i++) {
+        c = getc(fpin);
+        writebyte(c, fpout);
     }
 
     fclose(fpin);
@@ -134,4 +129,3 @@ int spc1000_exec(char *target)
 
     return 0;
 }
-

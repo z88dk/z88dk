@@ -28,69 +28,66 @@ option_t sos_options[] = {
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
 };
 
-
-
-
 /*
  * Execution starts here
  */
 
-int sos_exec(char *target)
+int sos_exec(char* target)
 {
-    char    filename[FILENAME_MAX+1];
-    FILE   *fpin;
-    FILE   *fpout;
-    int     len;
-    long    pos;
-    int     c,i;
+    char filename[FILENAME_MAX + 1];
+    FILE* fpin;
+    FILE* fpout;
+    int len;
+    long pos;
+    int c, i;
 
-    if ( help )
+    if (help)
         return -1;
 
-    if ( binname == NULL || ( crtfile == NULL && origin == -1 ) ) {
+    if (binname == NULL || (crtfile == NULL && origin == -1)) {
         return -1;
     }
 
-	if ( origin != -1 ) {
-		pos = origin;
-	} else {
-		if ( (pos = get_org_addr(crtfile)) == -1 ) {
-			myexit("Could not find parameter ZORG (not z88dk compiled?)\n",1);
-		}
-	}
-
-    if ( outfile == NULL ) {
-        strcpy(filename,binname);
-        suffix_change(filename,".obj");
+    if (origin != -1) {
+        pos = origin;
     } else {
-        strcpy(filename,outfile);
+        if ((pos = get_org_addr(crtfile)) == -1) {
+            myexit("Could not find parameter ZORG (not z88dk compiled?)\n", 1);
+        }
     }
 
-	if ( (fpin=fopen_bin(binname, crtfile) ) == NULL ) {
-        fprintf(stderr,"Can't open input file %s\n",binname);
-        myexit(NULL,1);
-    } 
+    if (outfile == NULL) {
+        strcpy(filename, binname);
+        suffix_change(filename, ".obj");
+    } else {
+        strcpy(filename, outfile);
+    }
 
-    if (fseek(fpin,0,SEEK_END)) {
-        fprintf(stderr,"Couldn't determine size of file\n");
+    if ((fpin = fopen_bin(binname, crtfile)) == NULL) {
+        fprintf(stderr, "Can't open input file %s\n", binname);
+        myexit(NULL, 1);
+    }
+
+    if (fseek(fpin, 0, SEEK_END)) {
+        fprintf(stderr, "Couldn't determine size of file\n");
         fclose(fpin);
-        myexit(NULL,1);
+        myexit(NULL, 1);
     }
 
-    len=ftell(fpin);
+    len = ftell(fpin);
 
-    fseek(fpin,0L,SEEK_SET);
+    fseek(fpin, 0L, SEEK_SET);
 
-    if ( (fpout=fopen(filename,"wb") ) == NULL ) {
+    if ((fpout = fopen(filename, "wb")) == NULL) {
         fclose(fpin);
-        myexit("Can't open output file\n",1);
+        myexit("Can't open output file\n", 1);
     }
 
-	fprintf(fpout,"_SOS 01 %4X %4X%c",(int)pos,(int)pos,10);
+    fprintf(fpout, "_SOS 01 %4X %4X%c", (int)pos, (int)pos, 10);
 
-    for ( i = 0; i < len; i++) {
+    for (i = 0; i < len; i++) {
         c = getc(fpin);
-        writebyte(c,fpout);
+        writebyte(c, fpout);
     }
 
     fclose(fpin);
@@ -98,6 +95,3 @@ int sos_exec(char *target)
 
     return 0;
 }
-
-
-

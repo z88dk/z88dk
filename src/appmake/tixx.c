@@ -47,12 +47,14 @@ static char             *conf_comment = NULL;
 static char             *binname      = NULL;
 static char             *outfile      = NULL;
 static char              help         = 0;
+static char              altfmt       = 0;
 
 /* Options that are available for this module */
 option_t tixx_options[] = {
 { 'h', "help",     "Display this help",          OPT_BOOL,  &help},
 { 'b', "binfile",  "Linked binary file",         OPT_STR,   &binname },
 { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
+{  0 , "altfmt",   "Format variant for 8xp",     OPT_BOOL,  &altfmt },
 {  0,  "comment",  "File comment (42 chars)",    OPT_STR,   &conf_comment },
 {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
 };
@@ -145,7 +147,7 @@ int tixx_exec(char *target)
     FILE *fp;
     char *buf, str[256];
     char *suffix;
-    int i, n, ext, n2;
+    int i, n, ext = E_83P, n2;
     unsigned short chk;
 
     if ( help || binname == NULL ) {
@@ -171,6 +173,8 @@ int tixx_exec(char *target)
     } else if (!stricmp(target, "ti86s")) {
         ext = E_86S;
         suffix = ".86s";
+    } else {
+        exit_log(1,"Unknown target <%s>\n",target);
     }
 
     if ( outfile == NULL ) {
@@ -232,7 +236,6 @@ int tixx_exec(char *target)
     writeword(i, fp);
     /* printf("Data Length: %04X\n", i); */
 
-
     /****************/
     /* DATA SECTION */
     /****************/
@@ -260,6 +263,12 @@ int tixx_exec(char *target)
         cfwrite("\x12", 1, fp, &chk);
     else if ((ext == E_85S) || (ext == E_86S))
         cfwrite("\x0c", 1, fp, &chk);
+
+    /* TI83 Plus workaround */
+    if ( altfmt != 0 ) {
+        cfwritebyte(0xBB, fp, &chk);
+		cfwritebyte(0x6D, fp, &chk);
+    }
 
     /* VARIABLE NAME */
     i = strlen(str);

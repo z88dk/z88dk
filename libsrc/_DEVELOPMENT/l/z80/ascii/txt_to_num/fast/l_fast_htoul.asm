@@ -89,19 +89,70 @@ done_shift:
    rl d
    
    adc a,a
+IF __CPU_INTEL__
+   push af
+   ld a,l
+   adc l
+   ld l,a
+   ld a,h
+   adc h
+   ld h,a
+   ld a,e
+   rla
+   ld e,a
+   ld a,d
+   rla
+   ld d,a
+   pop af
+ELSE
    adc hl,hl
    rl e
    rl d
+ENDIF
    
    adc a,a
+IF __CPU_INTEL__
+   push af
+   ld a,l
+   adc l
+   ld l,a
+   ld a,h
+   adc h
+   ld h,a
+   ld a,e
+   rla
+   ld e,a
+   ld a,d
+   rla
+   ld d,a
+   pop af
+ELSE
    adc hl,hl
    rl e
    rl d
+ENDIF
    
    adc a,a
+IF __CPU_INTEL__
+   push af
+   ld a,l
+   adc l
+   ld l,a
+   ld a,h
+   adc h
+   ld h,a
+   ld a,e
+   rla
+   ld e,a
+   ld a,d
+   rla
+   ld d,a
+   pop af
+ELSE
    adc hl,hl
    rl e
    rl d
+ENDIF
    
    adc a,a
    ret z

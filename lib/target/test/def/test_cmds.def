@@ -5,24 +5,33 @@ lstoff
         defc    argv_start = 65281
 
 	defc	CMD_EXIT = 0
-	defc	CMD_PRINTCHAR = 1
-	defc	CMD_READKEY = 2
+	defc	CMD_PRINTCHAR = 1	; hl=characeter to print
+	defc	CMD_READKEY = 2		; hl=pressed key
 
-        defc    CMD_OPENF = 3
-        defc    CMD_CLOSEF = 4
-        defc    CMD_WRITEBYTE = 5
-        defc    CMD_READBYTE = 6
-        defc    CMD_WRITEBLOCK = 7
-        defc    CMD_READBLOCK = 8
-        defc    CMD_SEEK = 9
-        defc    CMD_STAT = 10
+        defc    CMD_OPENF = 3		; hl=filename, de=mode, ret: hl=handle
+        defc    CMD_CLOSEF = 4		; b=handle
+        defc    CMD_WRITEBYTE = 5	; b=handle, l = byte
+        defc    CMD_READBYTE = 6	; b=handle, hl=read byte
+        defc    CMD_WRITEBLOCK = 7	; b=handle, de=address, hl=length, 
+        defc    CMD_READBLOCK = 8	; b=handle, de=address, hl=length, 
+        defc    CMD_SEEK = 9		; dehl=offset, b =handle, c=whence
+        defc    CMD_STAT = 10		; hl=filename, de=struct stat
 
 
-        defc    CMD_REMOVE = 20
-        defc    CMD_RENAME = 21
+        defc    CMD_REMOVE = 20		; hl=filename
+        defc    CMD_RENAME = 21		; hl=source, de=dest
 
-        defc    CMD_GETTIME = 30
+        defc    CMD_MKDIR = 25		;unimp
+        defc    CMD_RMDIR = 26		;unimp
 
-        defc    CMD_MKDIR = 40
-        defc    CMD_RMDIR = 41
+        defc    CMD_GETTIME = 30	;dehl=32 bit time
+
+	defc	CMD_IDE_SELECT = 40	; l = 0/1 = unit
+	defc	CMD_IDE_ID = 41
+	defc	CMD_IDE_READ = 42	; bchl=lba to de=address
+	defc	CMD_IDE_WRITE = 43	; bchl=lba from de=address
+
+
+
+	EXTERN  SYSCALL
 lston

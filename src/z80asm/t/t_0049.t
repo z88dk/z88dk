@@ -3,7 +3,7 @@
 #-----------------------------------------------------------------------------
 # Z88DK Z80 Macro Assembler
 #
-# Copyright (C) Paulo Custodio, 2011-2018
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: http://www.perlfoundation.org/artistic_license_2_0
 #
 # BUG_0049: Making a library with -d and 512 (win32) object files fails
@@ -15,9 +15,7 @@
 # 1021 files - when compiled with gcc on Ubuntu
 #-----------------------------------------------------------------------------
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 require './t/testlib.pl';
 

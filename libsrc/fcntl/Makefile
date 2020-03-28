@@ -1,4 +1,4 @@
-SUBDIRS = cpc cpm dummy gen_rnd nc100 newbrain osca spectrum sprinter z88 zxvgs
+SUBDIRS = dummy gen_rnd 
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
 include ../Make.config
@@ -12,6 +12,9 @@ $(SUBDIRS):
 	$(MAKE) -C $@
 
 clean: $(CLEANDIRS)
+	$(RM) */*.o
+	$(RM) */zcc_opt.def
+	$(RM) */*/zcc_opt.def
 
 $(CLEANDIRS): 
 	$(MAKE) -C $(@:clean-%=%) clean

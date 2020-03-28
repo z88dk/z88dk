@@ -1,0 +1,8 @@
+target/bee/graphics/clg
+target/bee/graphics/clsgraph
+target/bee/graphics/loadudg6.asm
+target/bee/graphics/plotpixl
+target/bee/graphics/respixl
+target/bee/graphics/xorpixl
+target/bee/graphics/pointxy
+@gfx/narrow/gfx_narrow.lst

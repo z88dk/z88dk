@@ -25,8 +25,9 @@ cprintf:
 	ld	h,0
         add     hl,hl
 	add	hl,sp		;&fmt
-
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	push	ix
+ENDIF
 	push	bc		;fp (we don't care about the fp)
 	ld	bc,printk_outc
 	push	bc
@@ -46,6 +47,8 @@ cprintf:
 	pop	bc	
 	pop	bc
 	pop	bc
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	pop	ix
+ENDIF
 	ret
 

@@ -1,0 +1,9 @@
+target/c128/graphics/clg
+target/c128/graphics/w_pixladdr
+target/c128/graphics/w_plotpixl
+target/c128/graphics/w_respixl
+target/c128/graphics/w_xorpixl
+target/c128/graphics/w_putsprite
+target/c128/graphics/w_pointxy
+target/c128/graphics/w_stencil_render
+@gfx/wide/gfx_wide.lst

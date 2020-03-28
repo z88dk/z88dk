@@ -3,16 +3,14 @@
 # Z88DK Z80 Macro Assembler
 #
 # Copyright (C) Gunther Strube, InterLogic 1993-99
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-# Repository: https://github.com/pauloscustodio/z88dk-z80asm
+# Repository: https://github.com/z88dk/z88dk
 #
 # Test https://github.com/z88dk/z88dk/issues/222
 # z80asm: Can I use the assembler to make a .tap image, like pasmo does?
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 require './t/testlib.pl';
 
@@ -106,11 +104,14 @@ unlink_testfiles();
 z80asm($asm, "+zx -v", 0, <<'END');
 	Reading library 'z80asm-z80-.lib'
 	Predefined constant: __CPU_Z80__ = $0001
+	Predefined constant: __CPU_ZILOG__ = $0001
 	Assembling 'test.asm' to 'test.o'
-	Reading 'test.asm'
+	Reading 'test.asm' = 'test.asm'
+	Writing object file 'test.o'
 	Module 'test' size: 4 bytes
 
 	Code size: 4 bytes ($5CD0 to $5CD3)
+	Creating binary 'test.bin'
 	appmake +zx -b "test.bin" -o "test.tap" --org 23760
 END
 check_bin_file("test.bin", $bin);
@@ -127,8 +128,7 @@ check_bin_file("test.tap", $rem_tap);
 # error for -r below 23760
 unlink_testfiles();
 z80asm($asm, "+zx -r23759", 1, "", <<'END');
-	Error: invalid ORG value '23759'
-	1 errors occurred during assembly
+	Error: invalid origin: 23759
 END
 check_bin_file("test.bin", $bin);
 ok ! -f "test.tap", "no test.tap";
@@ -243,11 +243,14 @@ unlink_testfiles();
 z80asm($asm, "+zx81 -v", 0, <<'END', "");
 	Reading library 'z80asm-z80-.lib'
 	Predefined constant: __CPU_Z80__ = $0001
+	Predefined constant: __CPU_ZILOG__ = $0001
 	Assembling 'test.asm' to 'test.o'
-	Reading 'test.asm'
+	Reading 'test.asm' = 'test.asm'
+	Writing object file 'test.o'
 	Module 'test' size: 4 bytes
 
 	Code size: 4 bytes ($4082 to $4085)
+	Creating binary 'test.bin'
 	appmake +zx81 -b "test.bin" -o "test.P" --org 16514
 END
 check_bin_file("test.bin", $bin);

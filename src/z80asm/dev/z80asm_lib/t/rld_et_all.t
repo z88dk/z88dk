@@ -3,7 +3,7 @@
 #
 # Test z80asm-*.lib
 #
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk
 #------------------------------------------------------------------------------
@@ -13,8 +13,8 @@ use v5.10;
 use Test::More;
 require '../../t/testlib.pl';
 
-# CPUs not supported by ticks: z80-zxn z180 r3k
-my @CPUS = (qw( z80 r2k ));
+# CPUs not supported by ticks: z80n z180 r3k
+my @CPUS = (qw( z80 8080 gbz80 r2k ));
 my $test_nr;
 
 # RLD / RRD
@@ -28,7 +28,7 @@ for my $cpu (@CPUS) {
 					$test_nr++;
 					note "Test $test_nr: cpu:$cpu, carry:$carry, a:$a, data:$data, op:$op";
 					my $carry_set = $carry ? "scf" : "and a";
-					my $r = ticks(<<END, "--cpu=$cpu");
+					my $r = ticks(<<END, "-m$cpu");
 						defc data = 0x100
 								$carry_set
 								ld bc, $bc
@@ -60,8 +60,9 @@ END
 					is $r->{F_C}, $carry,					  	"C";
 					is $r->{BC}, $bc,							"BC";
 					is $r->{DE}, $de,							"DE";
+					is $r->{HL}, 0x100,							"HL";
 						
-					# die if $test_nr == 73;
+					(Test::More->builder->is_passing) or die;
 				}
 			}
 		}

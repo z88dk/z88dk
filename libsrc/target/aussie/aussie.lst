@@ -1,0 +1,13 @@
+gfx/wide/obj/aussie/w_dcircle_square
+target/aussie/graphics/clg
+target/aussie/graphics/w_pixladdr
+target/aussie/graphics/w_plotpixl
+target/aussie/graphics/w_respixl
+target/aussie/graphics/w_xorpixl
+target/aussie/graphics/w_pointxy
+@gfx/wide/gfx_wide.lst
+target/aussie/games/bit_open
+target/aussie/games/bit_open_di
+target/aussie/games/bit_close
+target/aussie/games/bit_close_ei
+@games/games.lst

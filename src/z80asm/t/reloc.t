@@ -3,9 +3,9 @@
 # Z88DK Z80 Macro Assembler
 #
 # Copyright (C) Gunther Strube, InterLogic 1993-99
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-# Repository: https://github.com/pauloscustodio/z88dk-z80asm
+# Repository: https://github.com/z88dk/z88dk
 #
 # Test options
 
@@ -91,7 +91,7 @@ t_binary(read_binfile("test_data.bin"),
 		CPU::Z80::Assembler::z80asm(data_asm("").data_asm("1").data_asm("2")));
 ok ! -f "test.reloc";
 
-eq_or_diff scalar(read_file("test.map")), <<'...', "mapfile contents";
+is_text( scalar(read_file("test.map")), <<'...', "mapfile contents" );
 start                           = $1020 ; addr, local, , test, code, test.asm:3
 string                          = $3040 ; addr, local, , test, data, test.asm:12
 string1                         = $304A ; addr, local, , test, data, test.asm:23
@@ -134,7 +134,7 @@ ok ! -f "test_code.reloc";
 ok ! -f "test_data.bin";
 ok ! -f "test_data.reloc";
 
-eq_or_diff scalar(read_file("test.map")), <<'...', "mapfile contents";
+is_text( scalar(read_file("test.map")), <<'...', "mapfile contents" );
 start                           = $005F ; addr, local, , test, code, test.asm:3
 string                          = $0095 ; addr, local, , test, data, test.asm:12
 string1                         = $009F ; addr, local, , test, data, test.asm:23
@@ -192,7 +192,7 @@ t_binary(read_binfile("test_data.bin"),
 		CPU::Z80::Assembler::z80asm(data_asm("").data_asm("1").data_asm("2")));
 t_binary(read_binfile("test_data.reloc"), "");
 
-eq_or_diff scalar(read_file("test.map")), <<'...', "mapfile contents";
+is_text( scalar(read_file("test.map")), <<'...', "mapfile contents" );
 start                           = $1020 ; addr, public, , test, code, test.asm:5
 string                          = $3040 ; addr, public, , test, data, test.asm:14
 start1                          = $1032 ; addr, public, , test1, code, test1.asm:4
@@ -256,7 +256,7 @@ ok ! -f "test_code.reloc";
 ok ! -f "test_data.bin";
 ok ! -f "test_data.reloc";
 
-eq_or_diff scalar(read_file("test.map")), <<'...', "mapfile contents";
+is_text( scalar(read_file("test.map")), <<'...', "mapfile contents" );
 start                           = $005F ; addr, public, , test, code, test.asm:5
 string                          = $0095 ; addr, public, , test, data, test.asm:14
 start1                          = $0071 ; addr, public, , test1, code, test1.asm:4
@@ -324,7 +324,7 @@ ok ! -f "test_data1.reloc";
 ok ! -f "test_data2.bin";
 ok ! -f "test_data2.reloc";
 
-eq_or_diff scalar(read_file("test.map")), <<'...', "mapfile contents";
+is_text( scalar(read_file("test.map")), <<'...', "mapfile contents" );
 start                           = $1020 ; addr, local, , test, code, test.asm:12
 string                          = $3040 ; addr, local, , test, data, test.asm:36
 string1                         = $304A ; addr, local, , test, data1, test.asm:39

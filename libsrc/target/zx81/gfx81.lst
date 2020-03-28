@@ -1,0 +1,15 @@
+@target/zx81/gfx81_specific.lst
+target/zx81/graphics/clg
+target/zx81/graphics/clsgraph
+target/zx81/graphics/zx_hardcopy
+target/zx81/graphics/plotpixl
+target/zx81/graphics/respixl
+target/zx81/graphics/xorpixl
+target/zx81/graphics/pointxy
+target/zx81/graphics/swapgfxbk
+@gfx/narrow/gfx_narrow.lst
+target/zx81/stdio/ansi_text/f_ansi_attr
+target/zx81/stdio/ansi_text/f_ansi_char
+target/zx81/stdio/ansi_text/f_ansi_cls
+target/zx81/stdio/ansi_text/f_ansi_dline
+target/zx81/stdio/ansi_text/f_ansi_scrollup

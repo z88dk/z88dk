@@ -17,6 +17,15 @@
 %check 0 <= %1 <= 254
 	ld	hl,%1	;const
 	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+=
+	ld	hl,(sp+%1)
+	ld	h,0
+
+%check 0 <= %1 <= 254
+	ld	hl,%1	;const
+	add	hl,sp
 	ld	e,(hl)
 	inc	hl
 	ld	d,(hl)
@@ -32,6 +41,37 @@
 	call	l_gint	;
 =
 	ld	hl,(sp + %1)
+
+%check 0 <= %1 <= 254
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+=
+	ld	hl,(sp + %1)
+
+%check 0 <= %1 <= 254
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	c,(hl)
+	inc	hl
+	ld	b,(hl)
+	ld	hl,%2
+=
+	ld	hl,(sp + %1)
+	ld	c,l
+	ld	b,h
+	ld	hl,%2
+
+	ld	c,l
+	ld	b,h
+	ld	hl,%2	;const
+	add	hl,bc
+=
+	ld	bc,%2
+	add	hl,bc
 
 %check 0 <= %1 <= 254
 	ld	hl,%1	;const
@@ -112,7 +152,7 @@
 	ld	sp,hl
 	ld	hl,%2
 =
-	add	sp,#(%1 - 65536)
+	add	sp,+(%1 - 65536)
 	ld	hl,%2
 
 	call	l_or

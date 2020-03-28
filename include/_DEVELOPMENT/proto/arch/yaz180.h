@@ -53,21 +53,21 @@ extern uint16_t *bank_cpm_bdos_addr;    // CPM/ BDOS entry address
 
 #ifdef __CLANG
 
-extern unsigned char io_break;
+extern uint16_t io_break;
 
-extern unsigned char io_pio_port_a;
-extern unsigned char io_pio_port_b;
-extern unsigned char io_pio_port_b;
-extern unsigned char io_pio_control;
+extern uint16_t io_pio_port_a;
+extern uint16_t io_pio_port_b;
+extern uint16_t io_pio_port_b;
+extern uint16_t io_pio_control;
 
-extern unsigned char io_pio_ide_lsb;
-extern unsigned char io_pio_ide_msb;
-extern unsigned char io_pio_ide_ctl;
-extern unsigned char io_pio_ide_config;
+extern uint16_t io_pio_ide_lsb;
+extern uint16_t io_pio_ide_msb;
+extern uint16_t io_pio_ide_ctl;
+extern uint16_t io_pio_ide_config;
 
-extern unsigned char io_apu_port_data;
-extern unsigned char io_apu_port_control;
-extern unsigned char io_apu_port_status;
+extern uint16_t io_apu_port_data;
+extern uint16_t io_apu_port_control;
+extern uint16_t io_apu_port_status;
 
 #else
 
@@ -118,37 +118,79 @@ __OPROTO(`b,c,iyh,iyl',`b,c,iyh,iyl',void,,jp_far,void *str, int8_t bank)
 
 // provide call_error, call_far, call_sys, & call_apu function macros
 
-#define call_error(code)                      \
-    do{                                       \
-        __asm                                 \
-        rst 8h        ; call_error(code)      \
-        defb code                             \
-        __endasm;                             \
+
+#ifdef __SCCZ80
+
+#define call_error(code)                        \
+    do{                                         \
+        asm(                                    \
+        "rst 8h     ; call_error(code)      \n" \
+        "defb " #code "                     \n" \
+            );                                  \
     }while(0)
 
-#define call_far(addr, bank)                  \
-    do{                                       \
-        __asm                                 \
-        rst 10h        ; call_far(addr, bank) \
-        defw addr                             \
-        defb bank                             \
-        __endasm;                             \
+#define call_far(addr, bank)                    \
+    do{                                         \
+        asm(                                    \
+        "rst 10h    ; call_far(addr, bank)  \n" \
+        "defw " #addr "                     \n" \
+        "defb " #bank "                     \n" \
+            );                                  \
     }while(0)
 
-#define call_sys(addr)                        \
-    do{                                       \
-        __asm                                 \
-        rst 20h        ; call_sys(addr)       \
-        defw addr                             \
-        __endasm;                             \
+#define call_sys(addr)                          \
+    do{                                         \
+        asm(                                    \
+        "rst 20h    ; call_sys(addr)        \n" \
+        "defw " #addr "                     \n" \
+            );                                  \
     }while(0)
 
-#define call_apu(cmd)                         \
-    do{                                       \
-        __asm                                 \
-        rst 28h        ; call_apu(cmd)        \
-        defb cmd                              \
-        __endasm;                             \
+#define call_apu(cmd)                           \
+    do{                                         \
+        asm(                                    \
+        "rst 28h    ; call_apu(cmd)         \n" \
+        "defb " #cmd  "                     \n" \
+            );                                  \
     }while(0)
+
+#endif
+
+#ifdef __SDCC
+
+#define call_error(code)                        \
+    do{                                         \
+        __asm                                   \
+        rst 8h        ; call_error(code)        \
+        defb code                               \
+        __endasm;                               \
+    }while(0)
+
+#define call_far(addr, bank)                    \
+    do{                                         \
+        __asm                                   \
+        rst 10h        ; call_far(addr, bank)   \
+        defw addr                               \
+        defb bank                               \
+        __endasm;                               \
+    }while(0)
+
+#define call_sys(addr)                          \
+    do{                                         \
+        __asm                                   \
+        rst 20h        ; call_sys(addr)         \
+        defw addr                               \
+        __endasm;                               \
+    }while(0)
+
+#define call_apu(cmd)                           \
+    do{                                         \
+        __asm                                   \
+        rst 28h        ; call_apu(cmd)          \
+        defb cmd                                \
+        __endasm;                               \
+    }while(0)
+
+#endif
 
 #endif

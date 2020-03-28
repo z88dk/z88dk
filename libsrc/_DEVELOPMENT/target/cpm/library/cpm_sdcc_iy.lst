@@ -8,7 +8,7 @@
 @fcntl/fcntl_sdcc_iy.lst
 @font/font_4x8/fonts.lst
 @font/font_8x8/fonts.lst
-@font/fzx/fzx_sdcc_iy.lst
+@font/fzx/zx/zx_sdcc_iy.lst
 @im2/im2_sdcc.lst
 @input/cpm/input_sdcc_iy.lst
 @inttypes/inttypes_sdcc_iy.lst

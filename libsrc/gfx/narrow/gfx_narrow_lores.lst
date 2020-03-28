@@ -1,0 +1,4 @@
+gfx/narrow/obj/${TARGET}/c_plotpixel
+gfx/narrow/obj/${TARGET}/c_pointxy
+gfx/narrow/obj/${TARGET}/c_respixel
+gfx/narrow/obj/${TARGET}/c_xorpixel

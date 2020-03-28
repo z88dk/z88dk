@@ -4,7 +4,7 @@
  * Most of the functions are based on GFX,
  * a small graphics library by Rafael de Oliveira Jannone - (C) 2004
  *
- * $Id: msx.h,v 1.24 2016-06-16 20:54:11 dom Exp $
+ * $Id: msx.h $
  */
 
 #ifndef __MSX_H__
@@ -162,6 +162,7 @@ extern void __LIB__ msx_noblank();
 
 // Change the MSX color attributes
 extern int __LIB__ msx_color(int foreground, int background, int border) __smallc;
+extern int __LIB__ msx_set_border(int border) __z88dk_fastcall;
 
 #define INK_TRANSPARENT    0x00
 #undef INK_BLACK
@@ -296,10 +297,10 @@ typedef struct {
 // Joystick related stuff
 
 // Get state of joystick number \a id
-extern int  __LIB__ msx_get_stick(unsigned int id);
+extern int  __LIB__ msx_get_stick(unsigned int id) __z88dk_fastcall;
 
 // Get state of joystick button (trigger) number \a id, true = pressed
-extern int  __LIB__ msx_get_trigger(unsigned int id);
+extern bool_t  __LIB__ msx_get_trigger(unsigned int id) __z88dk_fastcall;
 
 extern unsigned int st_dir[];
 
@@ -323,15 +324,22 @@ enum stick_direction {
 // 5: SVI-328 MKII
 extern int __LIB__ msx_type();
 
+// MSX2 version number
+// 0 = MSX 1
+// 1 = MSX 2
+// 2 = MSX 2+
+// 3 = MSX turbo R
+extern unsigned char MSX2_SUBTYPE @0x002d;
+
 // Detect the VRAM size (in KB)
 extern int __LIB__ msx_vram();
 
 // Check if the line printer is ready (1=ready, 0 if not)
-extern int __LIB__ msx_lpt();
+extern bool_t __LIB__ msx_lpt();
 #define lpt_ready() msx_lpt()
 
 // Check if Ctrl-STOP is being pressed (1=if pressed, 0 if not)
-extern int __LIB__ msx_break();
+extern bool_t __LIB__ msx_break();
 
 // Clear the keyboard buffer
 extern void __LIB__ msx_clearkey();
@@ -398,6 +406,7 @@ extern void __LIB__ object_render_flatshading(surface_t* s, object_t* obj, vecto
 /// render object obj with wireframes
 extern void __LIB__ object_render_wireframe(surface_t* s, object_t* obj, vector_t* pbuffer) __smallc;
 
-
+// Add a raster interrupt handler
+extern void __LIB__ add_raster_int(void *);
 
 #endif

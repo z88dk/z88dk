@@ -94,7 +94,16 @@ end_s2:
    ld (de),a                   ; terminate dst
    
    pop de                      ; de = src
+IF __CPU_INTEL__ | __CPU_GBZ80__
+   ld  a,l
+   sub e
+   ld  l,a
+   ld  a,h
+   sbc d
+   ld  h,a
+ELSE
    sbc hl,de                   ; hl = num chars written to s1
+ENDIF
    
    or a
    ret

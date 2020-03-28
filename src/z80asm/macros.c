@@ -1,9 +1,9 @@
 /*
 Z88DK Z80 Macro Assembler
 
-Copyright (C) Paulo Custodio, 2011-2017
+Copyright (C) Paulo Custodio, 2011-2019
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-Repository: https://github.com/pauloscustodio/z88dk-z80asm
+Repository: https://github.com/z88dk/z88dk/
 
 Assembly macros.
 */
@@ -281,6 +281,19 @@ static bool collect_equ(char **in, UT_string *name)
 				p++;
 			}
 			return false;
+		}
+		
+		if (utstring_body(name)[0] == '.') {			// old-style label
+			// remove starting dot from name
+			UT_string *temp;
+			utstring_new(temp);
+			utstring_printf(temp, "%s", &utstring_body(name)[1]);
+			utstring_clear(name);
+			utstring_concat(name, temp);
+			utstring_free(temp);
+		}
+		else if (*p == ':') {							// colon after name
+			p++;
 		}
 
 		while (isspace(*p)) p++;

@@ -187,6 +187,7 @@ extern int  __LIB__  ulaplus_get(unsigned char attribute) __z88dk_fastcall;
 // INTERFACE FOR CALLING BASIC
 ///////////////////////////////
 
+// Check syntax of an immediate BASIC command (e.g. {TK_CLS, '#', 13} would probe the Interface 1), max 20 bytes.
 extern int  __LIB__  zx_syntax(char *statement) __z88dk_fastcall;
 
 // enter BASIC at a given program line, execution will stop gettin back to the
@@ -201,8 +202,8 @@ extern int  __LIB__              zx_getstr(char variable, char *value) __smallc;
 extern void __LIB__              zx_setstr(char variable, char *value) __smallc;
 
 // set/get positive integer values in numeric variables
-extern int  __LIB__  zx_getint(char *variable) __z88dk_fastcall;
-extern void __LIB__              zx_setint(char *variable, int value) __smallc;
+extern unsigned int  __LIB__  zx_getint(char *variable) __z88dk_fastcall;
+extern void __LIB__              zx_setint(char *variable, unsigned int value) __smallc;
 
 // set/get FP values in numeric variables, e.g.  double a = zx_getfloat("number");
 extern double_t __LIB__  zx_getfloat(char *variable) __z88dk_fastcall;
@@ -210,7 +211,7 @@ extern void __LIB__              zx_setfloat(char *variable, double_t value) __s
 
 extern int  __LIB__    zx_getstr_callee(char variable, char *value) __smallc __z88dk_callee;
 extern void __LIB__    zx_setstr_callee(char variable, char *value) __smallc __z88dk_callee;
-extern void __LIB__    zx_setint_callee(char *variable, int value) __smallc __z88dk_callee;
+extern void __LIB__    zx_setint_callee(char *variable, unsigned int value) __smallc __z88dk_callee;
 extern void __LIB__    zx_setfloat_callee(char *variable, double_t value) __smallc __z88dk_callee;
 
 #define zx_getstr(a,b)           zx_getstr_callee(a,b)
@@ -425,6 +426,17 @@ extern uchar __LIB__    *zx_pxy2aaddr_callee(uchar xcoord, uchar ycoord) __small
 
 #define zx_cyx2aaddr(a,b)          zx_cyx2aaddr_callee(a,b)
 #define zx_pxy2aaddr(a,b)          zx_pxy2aaddr_callee(a,b)
+
+
+/* Interrupt handling */
+
+#include <interrupt.h>
+
+// Setup an im2 jump table at given address
+extern void __LIB__  zx_im2_init(void *address, uchar byte) __smallc;
+
+// Add a raster interrupt handler
+extern void __LIB__ add_raster_int(isr_t handler);
 
 
 /* This routine strips the drive specifier from the filename header.

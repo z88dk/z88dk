@@ -3,16 +3,14 @@
 # Z88DK Z80 Macro Assembler
 #
 # Copyright (C) Gunther Strube, InterLogic 1993-99
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk/
 #
 # Test https://github.com/z88dk/z88dk/issues/441
 # z80asm: add command line option for specifying the output directory
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 use File::Find 'finddepth';
 require './t/testlib.pl';
@@ -32,14 +30,16 @@ check_bin_file("test.bin", pack("C*", 0xC9));
 ok ! -d "test_dir", "! test_dir";
 
 # second run with -O
-for my $dir ('test_dir', 'test_dir////sub//dir//') {	# use pairs of /, as they will be converted to \ in run()
-	unlink_output();
-	run("z80asm -s -l -m -g -b -O=$dir test.asm");
-	ok -d $dir, $dir;
-	for (@output) {
-		ok -f "$dir/$_", "$dir/$_";
+for my $opt('-O', '--out-dir') {
+	for my $dir ('test_dir', 'test_dir////sub//dir//') {	# use pairs of /, as they will be converted to \ in run()
+		unlink_output();
+		run("z80asm -s -l -m -g -b $opt=$dir test.asm");
+		ok -d $dir, $dir;
+		for (@output) {
+			ok -f "$dir/$_", "$dir/$_";
+		}
+		check_bin_file("$dir/test.bin", pack("C*", 0xC9));
 	}
-	check_bin_file("$dir/test.bin", pack("C*", 0xC9));
 }
 
 # make trees

@@ -50,7 +50,7 @@ Note: an Internet connection is required because several packages and source cod
 Simply execute this line in the directory you want z88dk executables to be run:
 
 ```bash
-docker run -v ${PWD}:/src/ -it z88dk <command>
+docker run -v ${PWD}:/src/ --rm -it z88dk <command>
 ```
 
 where \<command\> is the command line to be executed in the Docker container.
@@ -64,31 +64,31 @@ Note: \<command\> is not tied to run z88dk executables only: it can run scripts 
 Compiling all the programs located in the z88dk GIT's examples folder:
 ```bash
 cd ${z88dk}/examples
-docker run -v ${PWD}:/src/ -it z88dk make
+docker run -v ${PWD}:/src/ --rm -it z88dk make
 ```
 
 Compiling BlackStar SP1 example with `sccz80`:
 ```bash
 cd ${z88dk}/libsrc/_DEVELOPMENT/EXAMPLES/zx/demo_sp1/BlackStar/
-docker run -v ${PWD}:/src/ -it z88dk zcc +zx -v -startup=31 -DWFRAMES=3 -clib=new -O3 @zproject.lst -o blackstar -pragma-include:zpragma.inc
-docker run -v ${PWD}:/src/ -it z88dk appmake +zx -b loading.scr -o screen.tap --blockname screen --org 16384 --noloader
-docker run -v ${PWD}:/src/ -it z88dk appmake +zx -b blackstar_CODE.bin -o game.tap --blockname game --org 25124 --noloader
-docker run -v ${PWD}:/src/ -it z88dk cat loader.tap screen.tap game.tap > blackstar.tap
+docker run -v ${PWD}:/src/ --rm -it z88dk zcc +zx -v -startup=31 -DWFRAMES=3 -clib=new -O3 @zproject.lst -o blackstar -pragma-include:zpragma.inc
+docker run -v ${PWD}:/src/ --rm -it z88dk appmake +zx -b loading.scr -o screen.tap --blockname screen --org 16384 --noloader
+docker run -v ${PWD}:/src/ --rm -it z88dk appmake +zx -b blackstar_CODE.bin -o game.tap --blockname game --org 25124 --noloader
+docker run -v ${PWD}:/src/ --rm -it z88dk cat loader.tap screen.tap game.tap > blackstar.tap
 ```
 
 Compiling BlackStar SP1 example with `zsdcc`:
 ```bash
 cd ${z88dk}/libsrc/_DEVELOPMENT/EXAMPLES/zx/demo_sp1/BlackStar/
-docker run -v ${PWD}:/src/ -it z88dk zcc +zx -v -startup=31 -DWFRAMES=3 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 --fsigned-char @zproject.lst -o blackstar -pragma-include:zpragma.inc
-docker run -v ${PWD}:/src/ -it z88dk appmake +zx -b loading.scr -o screen.tap --blockname screen --org 16384 --noloader
-docker run -v ${PWD}:/src/ -it z88dk appmake +zx -b blackstar_CODE.bin -o game.tap --blockname game --org 25124 --noloader
-docker run -v ${PWD}:/src/ -it z88dk cat loader.tap screen.tap game.tap > blackstar.tap
+docker run -v ${PWD}:/src/ --rm -it z88dk zcc +zx -v -startup=31 -DWFRAMES=3 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 --fsigned-char @zproject.lst -o blackstar -pragma-include:zpragma.inc
+docker run -v ${PWD}:/src/ --rm -it z88dk appmake +zx -b loading.scr -o screen.tap --blockname screen --org 16384 --noloader
+docker run -v ${PWD}:/src/ --rm -it z88dk appmake +zx -b blackstar_CODE.bin -o game.tap --blockname game --org 25124 --noloader
+docker run -v ${PWD}:/src/ --rm -it z88dk cat loader.tap screen.tap game.tap > blackstar.tap
 ```
 
 Compiling Tritone example with provided `build.sh`:
 ```bash
 cd ${z88dk}/libsrc/_DEVELOPMENT/EXAMPLES/zx/demo_tritone/
-docker run -v ${PWD}:/src/ -it z88dk ./build.sh
+docker run -v ${PWD}:/src/ --rm -it z88dk ./build.sh
 ```
 
 ### Troubleshooting
@@ -109,3 +109,13 @@ To solve this, a workaround is to go up a directory and let `make` compile insid
 cd ${z88dk}/examples/
 docker run -v ${PWD}:/src/ -it z88dk make -C spectrum
 ```
+* When trying compiling examples of BlackStar SP1 with `sccz80` or `zsdcc` inside ${z88dk}/libsrc/_DEVELOPMENT/EXAMPLES/zx/demo_sp1/BlackStar/ you can delete blackstar.tap but remeber to leave loader.tap. It is necessary in 4th command line of both examples (given commands do not generate loader.tap).
+* One can replace last line of both examples (make it simpler):
+    * For Windows: `copy /b loader.tap + screen.tap + game.tap blackstar.tap`
+    * For Linux: `cat loader.tap screen.tap game.tap > blackstar.tap`
+* Compiling Tritone example on Linux can give error simmilar to
+```bash
+docker run -v ${PWD}:/src/ --rm -it z88dk ./build.sh
+docker: Error response from daemon: OCI runtime create failed: container_linux.go:348: starting container process caused "exec: \"./build.sh\": permission denied": unknown.
+```
+One can fix it by giving build.sh exec permissions `(chmod a+x)`

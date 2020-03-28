@@ -13,7 +13,7 @@
  */
 
 struct stat {
-	int	st_mode;	/* Mode */
+	unsigned int	st_mode;	/* Mode */
 	time_t	st_atime;	/* Last access */
 	time_t	st_mtime;	/* Last modification */
 	time_t	st_ctime;	/* Last change?!?! */
@@ -30,7 +30,7 @@ struct stat {
 	int	st_rdev;	/* ? */
 };
 
-extern int __LIB__ __SAVEFRAME__ stat(char *filename, struct stat *buf);
+extern int __LIB__ __SAVEFRAME__ stat(char *filename, struct stat *buf) __smallc;
 
 extern int __LIB__  mkdir(char *dirname);
 #define mkdir(a,b) mkdir(a)

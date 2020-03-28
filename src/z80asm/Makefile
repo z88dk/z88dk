@@ -1,44 +1,55 @@
 #------------------------------------------------------------------------------
 # Z88DK Z80 Module Assembler
 #
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk
 #------------------------------------------------------------------------------
-PROJ		:= z80asm
+PROJ			:= z80asm
 
-include ../Make.common
+# EXESUFFIX is passed when cross-compiling Win32 on Linux
+ifeq ($(OS),Windows_NT)
+  EXESUFFIX 	:= .exe
+else
+  EXESUFFIX 	?=
+endif
 
-CC 		?= gcc
-INSTALL 	?= install
-CROSS		?= 0
+# UNIXem is needed in both Windows_NT and in a MinGW build in Unix
+ifeq ($(EXESUFFIX),.exe)
+  UNIXem_CFLAGS	:= -I../../ext/UNIXem/include
+  UNIXem_OBJS	:= ../../ext/UNIXem/src/glob.o \
+				   ../../ext/UNIXem/src/dirent.o
+endif
+
+CC 				?= gcc
+INSTALL 		?= install
+CROSS			?= 0
 
 #------------------------------------------------------------------------------
 # Object files
 #------------------------------------------------------------------------------
-SRCS		:= $(filter-out test.c,$(wildcard *.c lib/*.c ../common/*.c ../../ext/regex/reg*.c))
-OBJS 		:= $(SRCS:.c=.o) \
-		   $(UNIXem_OBJS)
-DEPENDS		:= $(SRCS:.c=.d)
+SRCS			:= $(filter-out test.c,$(wildcard *.c lib/*.c ../common/*.c ../../ext/regex/reg*.c))
+OBJS 			:= $(SRCS:.c=.o) \
+				   $(UNIXem_OBJS)
+DEPENDS			:= $(SRCS:.c=.d)
 TEST_SRC_MAIN	:= $(wildcard t/test_*.c)
 TEST_SRC_LIB	:= t/testlib.c
 
 #------------------------------------------------------------------------------
 # variables
 #------------------------------------------------------------------------------
-TARGET 		= $(PROJ)$(EXE)
-MSVC_TARGET 	= ../../win32/Debug/$(TARGET)
+TARGET 			= $(PROJ)$(EXESUFFIX)
 
-OPT 		= -O3
+OPT 			= -O3
 
-STD 		= -std=gnu11
-LOCAL_LIB 	:= lib
-LOCAL_CFLAGS 	+= -MMD -I. -I$(LOCAL_LIB) -It -g -Wall -ftabstop=4 $(STD) $(OPT) \
-		   -I../common \
-		   -I../../ext/optparse \
-		   -I../../ext/regex \
-		   -I../../ext/uthash/src \
-		   $(UNIXem_CFLAGS)
+STD 			= -std=gnu11
+LOCAL_LIB 		:= lib
+LOCAL_CFLAGS 	+= -MMD -I. -I$(LOCAL_LIB) -It -g -Wall $(STD) $(OPT) \
+				   -I../common \
+				   -I../../ext/optparse \
+				   -I../../ext/regex \
+				   -I../../ext/uthash/src \
+				   $(UNIXem_CFLAGS)
 
 #------------------------------------------------------------------------------
 # main
@@ -64,6 +75,17 @@ parse.o: parse.c
 	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -O0 -c -o $@ $<
 
 #------------------------------------------------------------------------------
+# z80asm2
+#------------------------------------------------------------------------------
+all: z80asm2$(EXESUFFIX)
+
+z80asm2$(EXESUFFIX): dev/z80asm2/z80asm2$(EXESUFFIX)
+	cp dev/z80asm2/z80asm2$(EXESUFFIX) z80asm2$(EXESUFFIX)
+
+dev/z80asm2/z80asm2$(EXESUFFIX): $(wildcard dev/z80asm2/*.c dev/z80asm2/*.h)
+	$(MAKE) -C dev/z80asm2
+
+#------------------------------------------------------------------------------
 # libraries
 #------------------------------------------------------------------------------
 .PHONY: z80asm_lib
@@ -71,12 +93,12 @@ all: z80asm_lib
 
 z80asm_lib:
 ifeq ($(CROSS),0)
-	make -C dev/z80asm_lib
+	$(MAKE) -C dev/z80asm_lib
 	cp dev/z80asm_lib/$(PROJ)-*.lib .
 endif
 
 clean::
-	make -C dev/z80asm_lib clean
+	$(MAKE) -C dev/z80asm_lib clean
 	$(RM) $(PROJ)-*.lib
 
 #------------------------------------------------------------------------------
@@ -84,6 +106,7 @@ clean::
 #------------------------------------------------------------------------------
 .PHONY: dev
 dev:
+	perl asmstyle.pl dev/z80asm_lib/*.asm
 	$(MAKE) -C tt
 	$(MAKE) -C lib
 	$(MAKE) -f dev/Makefile
@@ -93,12 +116,12 @@ clean::
 	$(MAKE) -C lib clean
 
 #------------------------------------------------------------------------------
-# intall
+# install
 #------------------------------------------------------------------------------
-install:
+install: $(TARGET) z80asm_lib
 	$(INSTALL) $(TARGET)     $(PREFIX)/bin/$(EXEC_PREFIX)$(TARGET)
 	$(INSTALL) asmpp.pl      $(PREFIX)/bin/asmpp.pl
-	make -C dev/z80asm_lib install PREFIX=$(PREFIX_SHARE)
+	$(MAKE) -C dev/z80asm_lib install PREFIX=$(PREFIX_SHARE)
 
 #------------------------------------------------------------------------------
 # clean
@@ -126,20 +149,27 @@ t/libtestlib.a : $(OBJS) $(TEST_SRC_LIB:.c=.o)
 $(TEST_SRC_MAIN:.c=.o) : t/libtestlib.a
 
 .o.out :
-	$(CC) $(CFLAGS) $< -o $(<:.o=$(EXE)) $(LDFLAGS) -Lt -ltestlib
-	$(<:.o=$(EXE)) 2> $@~
+	$(CC) $(CFLAGS) $< -o $(<:.o=$(EXESUFFIX)) $(LDFLAGS) -Lt -ltestlib
+	$(<:.o=$(EXESUFFIX)) 2> $@~
 	diff -w $(<:.o=.bmk) $@~
 	mv -f $@~ $@
 
 clean::
-	$(RM) t/libtestlib.a t/*.o t/*.out lib/t/*.o lib/t/*.out $(TEST_SRC_MAIN:.c=$(EXE))
+	$(RM) t/libtestlib.a t/*.o t/*.out lib/t/*.o lib/t/*.out $(TEST_SRC_MAIN:.c=$(EXESUFFIX))
+
+all:
+	perl dev/cpu2/cpu.pl
 
 test: $(TARGET) z80asm_lib
 	$(MAKE) dev
 	$(MAKE) z80asm_lib
-	#$(MAKE) -C dev\z80asm_lib test
 	$(MAKE) prove_c
 	$(MAKE) prove_perl
+
+testdev:
+	$(MAKE) -C dev/z80asm_lib test
+	$(MAKE) -C dev/z80asm2 test
+	perl dev/cpu2/cpu.pl -s test
 
 testlib:
 	$(MAKE) -C lib test
@@ -147,10 +177,8 @@ testlib:
 prove_c: t/libtestlib.a $(TEST_SRC_MAIN:.c=.o) $(TEST_SRC_MAIN:.c=.out)
 
 prove_perl: $(TARGET)
+	perl -S prove -It2 --state=slow,save -j9 t2/*.t
 	perl -S prove t/*.t
-
-testmsvc : $(MSVC_TARGET)
-	make Z80ASM=$(MSVC_TARGET) prove
 
 clean::
 	$(RM) zcc_opt.def zcc_proj.lst
@@ -168,14 +196,6 @@ clean::
 clean::
 	$(RM) $(TARGET) $(LOCAL_LIB)/$(TARGET) test* $(LOCAL_LIB)/test*
 	$(RM) t/*.tmp $(LOCAL_LIB)/t/*.tmp t/dev/*.tmp
-
-#------------------------------------------------------------------------------
-# build with msvc - need to build manualy, devenv not available in Express
-#------------------------------------------------------------------------------
-$(MSVC_TARGET) : $(wildcard *.c) $(wildcard *.h)
-	@echo Build $(PROJ) inside Microsoft Visual C++ 2010 Express
-	@exit 1
-
 
 #------------------------------------------------------------------------------
 # Dependencies

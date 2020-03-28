@@ -53,9 +53,9 @@
 IF (startup=2)
 	DEFINE MirageOS			;Used by greyscale interrupt etc.
 	DEFINE NOT_DEFAULT_SHELL	;Else we would use Ion
-	;org	$9D93			;Origin
-	;defb	$BB,$6D			;Compiled AsmPrgm token
-	org	$9D95	;We use Bin2var
+	org	$9D95
+	;org	$9D93
+	;defb         $BB,$6D
 	ret				;So TIOS wont run the program
 	defb	1			;Identifier as MirageOS program
 	DEFINE NEED_mirage_icon
@@ -125,8 +125,9 @@ ENDIF
 IF (startup=10)
 	DEFINE ASM
 	DEFINE NOT_DEFAULT_SHELL
-	org	$9D93
-	defb	$BB,$6D
+	org	$9D95
+	;org	$9D93
+	;defb         $BB,$6D
 ENDIF
 
 ;-----------------

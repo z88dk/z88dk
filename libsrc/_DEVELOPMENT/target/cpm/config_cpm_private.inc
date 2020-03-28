@@ -421,6 +421,22 @@ defc IOCTL_OCHAR_CRLF = 0xc014
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 defc __CPM_RCON = 1
 defc __CPM_WCON = 2
 defc __CPM_RRDR = 3
@@ -452,9 +468,6 @@ defc __CPM_RRAN = 33
 defc __CPM_WRAN = 34
 defc __CPM_CFS  = 35
 defc __CPM_DSEG = 51
-
-
-
 
 
 

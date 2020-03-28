@@ -22,7 +22,7 @@
 #include <stdlib.h>
 
 
-char baswindres[]= {
+const char baswindres[]= {
                1,'7','#','3',32,32,32+94,32+8,128,1,'2','C','3',
                1,'2','+','S',1,'2','+','C',0
                };

@@ -22,14 +22,17 @@
 
         ZX81 (high resolution mode)
         --------------------------------
-        WRX, SMOOTH, FAST and very compact (16K):
-        zcc +zx81 -subtype=wrx64 -clib=wrx64 -DSIZE=6 -DCOMPACT=3 -create-app -omicroman -DZX81LOMEM microman.c
+        WRX, SMOOTH, FAST and very compact, Kempston Joystick by default (16K):
+        zcc +zx81 -subtype=wrx64 -clib=wrx64 -DSIZE=6 -DCOMPACT=3 -create-app -omicroman -DZX81LOMEM -O3 microman.c
         WRX, FAST and compact mode (16K):
-        zcc +zx81 -subtype=wrx64 -clib=wrx64 -DSIZE=6 -DCOMPACT=2 -create-app -omicroman -DZX81LOMEM -O3 microman.c
+		zcc +zx81 -subtype=wrx64 -clib=wrx64 -DSIZE=6 -DCOMPACT=2 -create-app -omicroman -DZX81LOMEM -O3 -DJOYSTICK_DIALOG -pragma-redirect=fputc_cons=putc4x6 microman.c
 		As above, ARX mode
-        zcc +zx81 -subtype=arx64 -clib=arx64 -DSIZE=6 -DCOMPACT=2 -create-app -omicroman -DZX81LOMEM -O3 microman.c
+        zcc +zx81 -subtype=arx64 -clib=arx64 -DSIZE=6 -DCOMPACT=2 -create-app -omicroman -DZX81LOMEM -O3 -DJOYSTICK_DIALOG -pragma-redirect=fputc_cons=putc4x6 microman.c
 		As above, Memotech HRG (you may like to uncomment also "mt_hrg_off")
-		zcc +zx81 -clib=mt64 -DSIZE=6 -DCOMPACT=2 -create-app  -DZX81LOMEM microman.c
+		zcc +zx81 -clib=mt64 -DSIZE=6 -DCOMPACT=2 -create-app -DZX81LOMEM -O3 microman.c
+		G007, very simple because it is not possible to limit to a single screen slice, add "CLS 4" in the BASIC program before the USR call
+		zcc +zx81 -clib=g007 -DSIZE=6 -DCOMPACT=3 -create-app -DZX81LOMEM -O3 -Cz--disable-autorun microman.c
+
         Full board mode (SLOW):
         zcc +zx81 -subtype=wrx192 -clib=wrx192 -startup=3 -DSIZE=8 -create-app -omicroman microman.c
 
@@ -39,7 +42,7 @@
         zcc +aquarius -lndos -create-app -DSOUND -DSIZE=6 -DCOMPACT=3 -DJOYSTICK_DIALOG -omicroman microman.c
 
 
-        $Id: microman.c,v 1.6 2015-01-22 11:13:35 stefano Exp $
+        $Id: microman.c $
 
 */
 
@@ -378,7 +381,7 @@ char bgh[] = {
 
 #define DOTROW   64
 #define BLANKROW 0
-#define PILL  14
+#define PILL  448
 
 
 char man_right[] = { 
@@ -762,8 +765,8 @@ void move_ghost()
   g[a].direction = 1<< b ;
 
 // exit if ghost can go in that direction
-  if (collision(g[a].x, g[a].y, g[a].direction));
-    return;
+/*  if (collision(g[a].x, g[a].y, g[a].direction))
+    return; */
  }
 }
 
@@ -776,7 +779,7 @@ void move_ghost()
   *************************
   *************************/
 
-void main ()
+int main ()
 {
 
  /****  JOYSTICK CHOICE  ****/
@@ -820,7 +823,7 @@ draw_board:
         b=0;
         if (--a > 6) b=SIZE*2*(a&1)-SIZE;
         
-        c=&bar[SIZE*a];
+        c=(unsigned int)bar+(SIZE*a);
         putsprite (spr_or, i*SIZE2, j*SIZE2, c);
         putsprite (spr_or, (18-i)*SIZE2, j*SIZE2, c+b);
       }
@@ -1019,11 +1022,11 @@ do_game:
             unplot(x+MPSIZE-MPMARGIN, y+(SIZE/2));
 #endif
           }
+          x++;
           if (b == PILL) {
             eatpill();
-            putsprite (spr_xor, (x+SIZE2)/SIZE2*SIZE2, (y+SIZE2)/SIZE2*SIZE2, pill);
+            putsprite (spr_and, (x+SIZE2)/SIZE2*SIZE2, (y+SIZE2)/SIZE2*SIZE2, pill);
           }
-          x++;
           a++;
         }
         break;
@@ -1042,9 +1045,9 @@ do_game:
           if (b == PILL) {
             eatpill();
 #if SIZE==6
-            putsprite (spr_xor, (x-1)/SIZE2*SIZE2, (y+SIZE2)/SIZE2*SIZE2, pill);
+            putsprite (spr_and, (x-1)/SIZE2*SIZE2, (y+SIZE2)/SIZE2*SIZE2, pill);
 #else
-            putsprite (spr_xor, x/SIZE2*SIZE2, (y+SIZE2)/SIZE2*SIZE2, pill);
+            putsprite (spr_and, x/SIZE2*SIZE2, (y+SIZE2)/SIZE2*SIZE2, pill);
 #endif
           }
           x--;
@@ -1064,15 +1067,15 @@ do_game:
 #endif
 
           }
+          y++;
           if (b == PILL) {
             eatpill();
 #if SIZE==6
-            putsprite (spr_xor, (x+SIZE2-1)/SIZE2*SIZE2, (y+SIZE2+1)/SIZE2*SIZE2, pill);
+            putsprite (spr_and, (x+SIZE2-1)/SIZE2*SIZE2, (y+SIZE2+1)/SIZE2*SIZE2, pill);
 #else
-            putsprite (spr_xor, (x+SIZE2)/SIZE2*SIZE2, (y+SIZE2)/SIZE2*SIZE2, pill);
+            putsprite (spr_and, (x+SIZE2)/SIZE2*SIZE2, (y+SIZE2)/SIZE2*SIZE2, pill);
 #endif
           }
-          y++;
           a++;
         }
         break;
@@ -1091,9 +1094,9 @@ do_game:
           if (b == PILL) {
             eatpill();
 #if SIZE==6
-            putsprite (spr_xor, (x+SIZE2-1)/SIZE2*SIZE2, y/SIZE2*SIZE2, pill);
+            putsprite (spr_and, (x+SIZE2-1)/SIZE2*SIZE2, y/SIZE2*SIZE2, pill);
 #else
-            putsprite (spr_xor, (x+SIZE2)/SIZE2*SIZE2, y/SIZE2*SIZE2, pill);
+            putsprite (spr_and, (x+SIZE2)/SIZE2*SIZE2, y/SIZE2*SIZE2, pill);
 #endif
           }
           y--;
@@ -1177,7 +1180,7 @@ do_game:
         else 
           move_ghost();
         break;
-      cycle3++;
+      //cycle3++;
       }
       
       // Ghosts position handling for tunnel

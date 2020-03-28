@@ -173,6 +173,7 @@ struct textsettingstype {
 #define	rectangle(a,b,c,d)	drawb((a)*GFXSCALEX,(b)*GFXSCALEY,((c)-(a))*GFXSCALEX,((d)-(b))*GFXSCALEY)
 #define	bar(a,b,c,d)	drawb((a)*GFXSCALEX,(b)*GFXSCALEY,((c)-(a))*GFXSCALEX,((d)-(b))*GFXSCALEY);fill((a)*GFXSCALEX+1,(b)*GFXSCALEY+1);xorborder((a)*GFXSCALEX+1,(b)*GFXSCALEY+1,((c)-(a)+1)*GFXSCALEX+2,((d)-(b)+1)*GFXSCALEY+2)
 #define	bar3d(a,b,c,d,e,f) bar(a,b,c,d)
+#undef circle
 #define	circle(a,b,c)	circle((a)*GFXSCALEX,(b)*GFXSCALEY,(c)*GFXSCALEX,1)
 //#define	circle(a,b,c)	ellipse(a,b,0,360,c,c)
 //#define	circle(a,b,c) polygon((a)*GFXSCALEX,(b)*GFXSCALEY,180,(c)*GFXSCALEY,0);
@@ -181,6 +182,7 @@ struct textsettingstype {
 #define	fillellipse(a,b,c,d)	ellipse(a,b,0,360,c,d);fill((a)*GFXSCALEX,(b)*GFXSCALEY)
 #define	line(a,b,c,d)	draw((a)*GFXSCALEX,(b)*GFXSCALEY,(c)*GFXSCALEX,(d)*GFXSCALEY)
 //#define	line(a,b,c,d)	plot((a)*GFXSCALEX,(b)*GFXSCALEY);drawto((c)*GFXSCALEX,(d)*GFXSCALEY)
+#undef arc
 #define	arc(a,b,c,d,e)	ellipse(a,b,360-(d),360-(c),e,e)
 #define	pieslice(a,b,c,d,e)	ellipse(a,b,360-(d),360-(c),e,e);drawto((a)*GFXSCALEX,(b)*GFXSCALEY);drawto((a+icos(360-(d))*e/256)*GFXSCALEX,(b+isin(360-(d))*e/256)*GFXSCALEY)
 #define	drawpoly(a,b)	for(bgi_x=0;bgi_x<((a)-1);bgi_x++){draw(b[bgi_x*2]*GFXSCALEX,b[1+bgi_x*2]*GFXSCALEY,b[2+bgi_x*2]*GFXSCALEX,b[3+bgi_x*2]*GFXSCALEY);}
@@ -202,11 +204,13 @@ struct textsettingstype {
 #define	rectangle(a,b,c,d)	drawb(a,b,(c)-(a),(d)-(b))
 #define	bar(a,b,c,d)	drawb(a,b,(c)-(a),(d)-(b));fill(a+1,b+1);xorborder(a+1,b+1,(c)-(a)+2,(d)-(b)+2)
 #define	bar3d(a,b,c,d,e,f) bar(a,b,c,d)
+#undef circle
 //#define	circle(a,b,c)	circle(a,b,c,1)
 #define	circle(a,b,c)	ellipse(a,b,0,360,c,c)
 #define	sector(a,b,c,d,e,f)	ellipse(a,b,360-(d),360-(c),e,f);drawto(a,b);drawto(((a)+icos(360-(d))*(e)/256),((b)+isin(360-(d))*(f)/256));fill(((a)+icos(358-(c))*((e)-2)/256),((b)+isin(358-(c))*((f)-2)/256))
 #define	fillellipse(a,b,c,d)	ellipse(a,b,0,360,c,d);fill(a,b)
 #define	line(a,b,c,d)	draw(a,b,c,d)
+#undef arc
 #define	arc(a,b,c,d,e)	ellipse(a,b,360-(d),360-(c),e,e)
 #define	pieslice(a,b,c,d,e)	ellipse(a,b,360-(d),360-(c),e,e);drawto(a,b);drawto(((a)+icos(360-(d))*(e)/256),((b)+isin(360-(d))*(e)/256))
 #define	drawpoly(a,b)	for(bgi_x=0;bgi_x<(a-1);bgi_x++){draw(b[bgi_x*2],b[1+bgi_x*2],b[2+bgi_x*2],b[3+bgi_x*2]);}

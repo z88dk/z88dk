@@ -40,12 +40,33 @@ asm_strnchr:
    or c
    jp z, error_zc
 
+
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
    ld a,e
+ENDIF
 
 loop:
 
-   ld e,(hl)                   ; current char in s
+IF __CPU_INTEL__ || __CPU_GBZ80__
+ IF __CPU_GBZ80__
+   ld a,(hl+)
+ ELSE
+   ld a,(hl)
+   inc hl
+ ENDIF
+   ld e,a
+   dec bc
+   cp d 
+   jr z,match
+   and a		;Isn't current char NUL?
+   jp z,error_zc
+   ld a,b
+   or c
+   jr nz,loop
+   jp error_zc
+ELSE
    
+   ld e,(hl)                   ; current char in s
    cpi
    jr z, match                 ; found char
    jp po, error_zc             ; n exceeded
@@ -55,7 +76,7 @@ loop:
    jr nz, loop
 
    jp error_zc
-
+ENDIF
 match:
 
    dec hl

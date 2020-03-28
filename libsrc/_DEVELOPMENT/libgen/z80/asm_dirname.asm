@@ -26,21 +26,42 @@ loop_find:
 
    cp '/'
    jr z, loop_remove
+
+IF __CPU_GBZ80__ | __CPU_INTEL__
+   dec hl
+   ld a,b
+   or c
+   jp __lg_return_dot
+   dec bc
+   ld a,(hl)
+   jr loop_find
+ELSE
    
    cpd                         ; hl--, bc--
    ld a,(hl)
    
    jp pe, loop_find
    jp __lg_return_dot          ; if no slash found
+ENDIF
 
 loop_remove:
 
    ; remove multiple slashes
+
+IF __CPU_GBZ80__ | __CPU_INTEL__
+   dec hl
+   ld a,b
+   or c
+   jp z,__lg_return_slash
+   dec bc
+   ld a,(hl)
+ELSE
    
    cpd                         ; hl--, bc--
    jp po, __lg_return_slash    ; if only slashes
    
    ld a,(hl)
+ENDIF
    
    cp '/'
    jr z, loop_remove

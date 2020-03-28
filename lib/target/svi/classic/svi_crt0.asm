@@ -16,21 +16,26 @@
 	defc    crt0 = 1
 	INCLUDE "zcc_opt.def"
 
+	INCLUDE	"target/svi/def/svibios.def"
+
 ;--------
 ; Some scope definitions
 ;--------
 
 	EXTERN    _main
+        EXTERN    msxbios
 
 	PUBLIC    cleanup
 	PUBLIC    l_dcal
 
-	PUBLIC    msxbios
 
 
 
 ; Now, getting to the real stuff now!
 
+IF startup = 2
+	defc	CRT_ORG_CODE = $8000
+ENDIF
 
 IFNDEF CRT_ORG_CODE
 		defc CRT_ORG_CODE  = 34816
@@ -58,45 +63,42 @@ IF DEFINED_USING_amalloc
 	INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
 
+IF startup != 2
 	call	$53		; Hide function key menu
+ELSE
+	im	1
+	ei
+ENDIF
         call    _main
 	
 cleanup:
 ;
 ;       Deallocate memory which has been allocated here!
 ;
+    call    crt0_exit
 
-IF CRT_ENABLE_STDIO = 1
-	EXTERN	closeall
-	call	closeall
-ENDIF
 
 start1:
+IF startup = 2
+	jr	start1
+ELSE
         ld      sp,0
+
+	ld	ix,KILBUF	;Clear keyboard buffer
+	call	msxbios
 
 	ld	ix,$3768	; TOTEXT - force text mode on exit
 	call	msxbios
         ret
+ENDIF
 
 l_dcal:
         jp      (hl)
-
-; ---------------
-; MSX specific stuff
-; ---------------
-
-; Safe BIOS call
-msxbios:
-	push	ix
-	ret
-
-; Signature in resulting binary
-
-	defm	"Small C+ SVI"
-	defb	0
 
 
         INCLUDE "crt/classic/crt_runtime_selection.asm"
 	INCLUDE	"crt/classic/crt_section.asm"
 
-
+IF startup = 2
+        INCLUDE "target/svi/classic/bootstrap.asm"
+ENDIF

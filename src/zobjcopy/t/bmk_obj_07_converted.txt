@@ -1,4 +1,4 @@
-Object  file test2.o at $0000: Z80RMF11
+Object  file test2.o at $0000: Z80RMF12
   Name: file1
   Section "": 0 bytes
   Section text_1: 63 bytes

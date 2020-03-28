@@ -2,15 +2,13 @@
 
 # Z88DK Z80 Macro Assembler
 #
-# Copyright (C) Paulo Custodio, 2011-2018
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk/
 #
 # Test defvars
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 require './t/testlib.pl';
 
@@ -164,7 +162,6 @@ spew("test.asm", "
 ");
 run("z80asm -b test.asm", 1, "", <<END);
 Error at file 'test.asm' line 5: integer '65572' out of range
-1 errors occurred during assembly
 END
 
 
@@ -177,7 +174,6 @@ spew("test.asm", "
 ");
 run("z80asm -b test.asm", 1, "", <<END);
 Error at file 'test.asm' line 4: integer '65536' out of range
-1 errors occurred during assembly
 END
 
 
@@ -187,7 +183,6 @@ spew("test.asm", "
 ");
 run("z80asm -b test.asm", 1, "", <<END);
 Error at file 'test.asm' line 2: syntax error
-1 errors occurred during assembly
 END
 
 
@@ -197,7 +192,6 @@ spew("test.asm", "
 ");
 run("z80asm -b test.asm", 1, "", <<END);
 Error at file 'test.asm' line 3: missing {} block
-1 errors occurred during assembly
 END
 
 
@@ -207,7 +201,6 @@ spew("test.asm", "
 ");
 run("z80asm -b test.asm", 1, "", <<END);
 Error at file 'test.asm' line 3: {} block not closed
-1 errors occurred during assembly
 END
 
 
@@ -285,7 +278,6 @@ z80asm(<<'END', "", 1, "", <<'ERR');
 	}
 END
 Error at file 'test.asm' line 2: expected constant expression
-1 errors occurred during assembly
 ERR
 
 
@@ -299,7 +291,6 @@ z80asm(<<'END', "", 1, "", <<'ERR');
 	}
 END
 Error at file 'test.asm' line 2: expected constant expression
-1 errors occurred during assembly
 ERR
 
 
@@ -312,7 +303,6 @@ z80asm(<<'END', "", 1, "", <<'ERR');
 END
 Error at file 'test.asm' line 1: symbol 'undefined' not defined
 Error at file 'test.asm' line 1: expected constant expression
-2 errors occurred during assembly
 ERR
 
 
@@ -327,7 +317,6 @@ END
 Error at file 'test.asm' line 3: expected constant expression
 Error at file 'test.asm' line 4: symbol 'undefined' not defined
 Error at file 'test.asm' line 4: expected constant expression
-3 errors occurred during assembly
 ERR
 
 

@@ -1,0 +1,7 @@
+target/newbrain/stdio/fgetc_cons
+target/newbrain/stdio/getk
+target/newbrain/stdio/fputc_cons
+@stdio/stdio.lst
+target/newbrain/zcall
+@target/newbrain/newbrain.lst
+@z80.lst

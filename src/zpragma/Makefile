@@ -1,22 +1,64 @@
+#-----------------------------------------------------------------------------
+# zpragma - Parse files and create zcc_opt.def
+#-----------------------------------------------------------------------------
+PROJ		:= z88dk-zpragma
 
-INSTALL ?= install
+# EXESUFFIX is passed when cross-compiling Win32 on Linux
+ifeq ($(OS),Windows_NT)
+  EXESUFFIX 		:= .exe
+else
+  EXESUFFIX 		?=
+endif
 
-OBJS = zpragma.o
+CC			?= gcc
+CFLAGS		+= -Wall -std=gnu11 -MMD -pedantic \
+-I../../ext/optparse \
+-I../../ext/regex
 
+INSTALL 	?= install
 
-all: zpragma$(EXESUFFIX)
+SRCS 		:= $(wildcard *.c) 
 
-zpragma$(EXESUFFIX):	$(OBJS)
-	$(CC) -o zpragma$(EXESUFFIX) $(LDFLAGS) $(OBJS)
+OBJS_ALL	:= $(SRCS:.c=.o)
+OBJS		:= $(OBJS_ALL:$(PROJ).o=)
 
-install:
-	$(INSTALL) zpragma$(EXESUFFIX) $(PREFIX)/bin/$(EXEC_PREFIX)zpragma$(EXESUFFIX)
+DEPENDS		:= $(SRCS:.c=.d) $(T_SRCS:.c=.d)
 
-clean:
-	$(RM) zpragma$(EXESUFFIX) zpragma.o core$(EXESUFFIX)
-	$(RM) -rf Debug Release
+#------------------------------------------------------------------------------
+.PHONY: all clean test install
 
+#------------------------------------------------------------------------------
+define MAKE_EXE
+all: $(1)$(EXESUFFIX)
 
-#Dependencies
+$(1)$(EXESUFFIX): $(2)
+	$(CC) $(CFLAGS) -o $(1)$(EXESUFFIX) $(2) $(LDFLAGS)
+	
+clean::
+	$(RM) $(1)$(EXESUFFIX) $(2)
 
-zpragma.o: zpragma.c 
+test:: $(1)$(EXESUFFIX)
+ifeq ($(3),1)
+	./$(1)$(EXESUFFIX)
+endif
+
+valgrind:: $(1)$(EXESUFFIX)
+	$(VALGRIND) $(1)$(EXESUFFIX)
+endef
+
+#------------------------------------------------------------------------------
+$(eval $(call MAKE_EXE,$(PROJ),$(OBJS_ALL),0))
+
+#------------------------------------------------------------------------------
+test:: $(PROJ)$(EXESUFFIX)
+	perl -S prove t/*.t
+
+#------------------------------------------------------------------------------
+clean::
+	$(RM) $(OBJS) $(DEPENDS) *.bak t/*.bak
+
+#------------------------------------------------------------------------------
+install: $(PROJ)$(EXESUFFIX)
+	$(INSTALL) $(PROJ)$(EXESUFFIX) $(PREFIX)/bin/$(PROJ)$(EXESUFFIX)
+
+-include $(DEPENDS)

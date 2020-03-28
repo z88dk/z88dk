@@ -2,15 +2,13 @@
 
 # Z88DK Z80 Module Assembler
 #
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk/
 #
 # Test INCLUDE
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 require './t/testlib.pl';
 
@@ -37,7 +35,6 @@ check_bin_file("test.bin", pack("C*", 0x3E, 10));
 # no -I, only file name : error
 z80asm('include "test.inc"', "", 1, "", <<END);
 Error at file 'test.asm' line 1: cannot read file 'test.inc'
-1 errors occurred during assembly
 END
 	
 # -I : OK
@@ -64,7 +61,6 @@ check_bin_file("test_dir/test.bin", pack("C*", 0x3E, 10));
 unlink_testfiles();
 z80asm('include "test.inc"', "-xtest.lib", 1, "", <<END);
 Error at file 'test.asm' line 1: cannot read file 'test.inc'
-1 errors occurred during assembly
 END
 ok ! -f "test.lib", "test.lib does not exist";
 
@@ -73,14 +69,12 @@ unlink_testfiles();
 spew("test.inc", 'include "test.asm"');
 z80asm('include "test.inc"', "", 1, "", <<END);
 Error at file 'test.inc' line 1: cannot include file 'test.asm' recursively
-1 errors occurred during assembly
 END
 
 # syntax
 unlink_testfiles();
 z80asm('include', "", 1, "", <<END);
 Error at file 'test.asm' line 1: syntax error
-1 errors occurred during assembly
 END
 
 # test -I using environment variables
@@ -92,7 +86,6 @@ spew("test_dir/test.inc", 'ld a,10');
 unlink "test.bin";
 z80asm('include "test.inc"', "", 1, "", <<END);
 Error at file 'test.asm' line 1: cannot read file 'test.inc'
-1 errors occurred during assembly
 END
 
 unlink "test.bin";

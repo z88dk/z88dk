@@ -1,7 +1,7 @@
 @assert/assert.lst
 @ctype/ctype.lst
-setjmp/l_longjmp
-setjmp/l_setjmp
+@libgen/libgen.lst
+@setjmp/setjmp.lst
 @stdlib/stdlib.lst
 @strings/string.lst
 @regex/regex.lst
@@ -12,6 +12,7 @@ stdio/ansi/ansifont_f5
 stdio/ansi/ansifont_f6
 stdio/ansi/ansifont_f8
 @compress/zx7/zx7.lst
+@compress/aplib/compress_aplib.lst
 _DEVELOPMENT/stdlib/z80/asm_lltoa
 _DEVELOPMENT/stdlib/z80/asm_ulltoa
 _DEVELOPMENT/stdlib/z80/asm_strtoll
@@ -34,3 +35,5 @@ _DEVELOPMENT/l/z80/ascii/l_num2char
 @debug/debug.lst
 @rect/rect.lst
 @algorithm/alg.lst
+arch/z80/AsmCall
+@interrupts/interrupts.lst

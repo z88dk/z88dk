@@ -41,7 +41,29 @@ asm_strncpy:
    xor a
 
 loop:
-
+IF __CPU_GBZ80__ || __CPU_INTEL__
+   ld a,(hl)
+   ld (de),a
+   inc hl
+   inc de
+   dec bc
+   and a
+   jr z,copied
+   ld a,c
+   or c
+   jr z,done	;max characters
+   jr loop
+copied:
+   ; Now pad it out with zero
+zeroloop:
+   xor a
+   ld (de),a
+   inc de
+   dec bc
+   ld a,b
+   or c
+   jr nz,zeroloop
+ELSE
    cp (hl)
    ldi
    jp po, done                 ; reached max number of chars
@@ -53,6 +75,7 @@ loop:
    ld h,d
    dec hl
    ldir
+ENDIF
 
 done:
 

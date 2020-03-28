@@ -241,10 +241,9 @@
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
-	call	dldpsh
-	ld	hl,i_3+0
 	call	dload
-	call	dmul
+	ld	a,1
+	call	l_f48_ldexp
 	pop	hl
 	call	dstore
 	ld	hl,0	;const
@@ -263,11 +262,9 @@
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
-	call	dldpsh
-	ld	hl,2	;const
-	ld	de,0
-	call	float
-	call	dmul
+	call	dload
+	ld	a,1
+	call	l_f48_ldexp
 	pop	hl
 	call	dstore
 	ld	hl,0	;const
@@ -286,10 +283,9 @@
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
-	call	dldpsh
-	ld	hl,i_3+0
 	call	dload
-	call	ddiv
+	ld	a,-1
+	call	l_f48_ldexp
 	pop	hl
 	call	dstore
 	ld	hl,0	;const
@@ -308,10 +304,9 @@
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
-	call	dldpsh
-	ld	hl,i_3+0
 	call	dload
-	call	ddiv
+	ld	a,-1
+	call	l_f48_ldexp
 	pop	hl
 	call	dstore
 	ld	hl,0	;const
@@ -330,10 +325,9 @@
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
-	call	dldpsh
-	ld	hl,i_3+0
 	call	dload
-	call	ddiv
+	ld	a,-1
+	call	l_f48_ldexp
 	pop	hl
 	call	dstore
 	ld	hl,0	;const
@@ -634,10 +628,10 @@
 
 .i_2
 	;1.000000
-	defb	0,0,0,0,0,129
+	defb	0x00,0x00,0x00,0x00,0x00,0x81
 .i_3
 	;2.000000
-	defb	0,0,0,0,0,130
+	defb	0x00,0x00,0x00,0x00,0x00,0x82
 
 
 	SECTION	bss_compiler
@@ -682,6 +676,7 @@
 	GLOBAL	fgetc
 	GLOBAL	ungetc
 	GLOBAL	feof
+	GLOBAL	ferror
 	GLOBAL	puts
 	GLOBAL	ftell
 	GLOBAL	fgetpos
@@ -707,6 +702,7 @@
 	GLOBAL	fgetc_cons_inkey
 	GLOBAL	fputc_cons
 	GLOBAL	fgets_cons
+	GLOBAL	puts_cons
 	GLOBAL	fabandon
 	GLOBAL	fdtell
 	GLOBAL	fdgetpos
@@ -715,6 +711,7 @@
 	GLOBAL	getk
 	GLOBAL	getk_inkey
 	GLOBAL	printk
+	GLOBAL	perror
 	GLOBAL	_add_int
 	GLOBAL	_add_int_longform
 	GLOBAL	_add_int_longform2

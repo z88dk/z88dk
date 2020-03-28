@@ -112,10 +112,8 @@ find_end:
 
 cleanup:
 	push	hl		;Save return value
-IF CRT_ENABLE_STDIO = 1
-	EXTERN	closeall	;Close any opened files
-	call	closeall
-ENDIF
+    call    crt0_exit
+
 	pop	bc		;Get exit() value into bc
 start1:	ld      sp,0		;Pick up entry sp
         jp	$1FFA	; HOT boot
@@ -123,7 +121,6 @@ start1:	ld      sp,0		;Pick up entry sp
 l_dcal:	jp	(hl)		;Used for call by function ptr
 
 
-        defm    "Small C+ SOS"
 end:    defb    0               ; null file name
 
         INCLUDE "crt/classic/crt_runtime_selection.asm"

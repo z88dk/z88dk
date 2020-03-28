@@ -3,16 +3,14 @@
 # Z88DK Z80 Macro Assembler
 #
 # Copyright (C) Gunther Strube, InterLogic 1993-99
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-# Repository: https://github.com/pauloscustodio/z88dk-z80asm
+# Repository: https://github.com/z88dk/z88dk
 #
 # Test https://github.com/z88dk/z88dk/issues/53
 # z80asm: public constants not being listed in global .def file
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 require './t/testlib.pl';
 
@@ -60,7 +58,7 @@ DEFC asm_BIFROST2_stop               = $C9B2
 END
 
 z80nm("test.o", <<'END');
-Object  file test.o at $0000: Z80RMF12
+Object  file test.o at $0000: Z80RMF14
   Name: test
   Section "": 1 bytes, ORG $FDE8
     C $0000: C9

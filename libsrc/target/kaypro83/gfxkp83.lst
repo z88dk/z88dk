@@ -1,0 +1,15 @@
+target/kaypro83/cleargraphics
+target/kaypro83/generic_console
+target/kaypro83/generic_console_scrollup
+target/kaypro83/generic_console_xypos
+target/kaypro83/generic_console_ioctl
+target/kaypro83/kaypro_variables
+target/kaypro83/plothelper
+target/kaypro83/plotpixl
+target/kaypro83/pointxy
+target/kaypro83/respixl
+target/kaypro83/swapgfxbk
+target/kaypro83/xorpixl
+target/kaypro83/getmaxx
+target/kaypro83/getmaxy
+@gfx/narrow/gfx_narrow.lst

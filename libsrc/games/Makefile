@@ -4,6 +4,8 @@ include ../Make.config
 
 TARGET ?= test
 
+CFLAGS += $(TARGET_CFLAGS)
+
 ifeq ($(SUBTYPE),) 
 SUBTYPE=$(TARGET)
 OBJSUBDIR = $(TARGET)
@@ -28,8 +30,7 @@ obj/$(OBJSUBDIR)/%.o: %.c
 	$(ZCC) +$(TARGET) $(CFLAGS) -o $@  $^
 
 obj/$(OBJSUBDIR)/%.o: %.asm
-	@$(ASSEMBLER) -DFOR$(SUBTYPE) -I.. $^
-	@mv $(^:.asm=.o) $@
+	$(ZCC) +$(TARGET) $(CFLAGS) -o $@  $^ -Ca-I../ -Ca-DFOR$(SUBTYPE)
 
 dirs:
 	@mkdir -p obj/$(OBJSUBDIR)
@@ -38,3 +39,4 @@ clean:
 	$(RM) -fr obj
 	$(RM) -f *.o
 	$(RM) -f */*.o
+	$(RM) zcc_opt.def

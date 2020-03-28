@@ -1,0 +1,886 @@
+
+
+
+
+IFNDEF __CONFIG_Z88DK_INC_
+defc   __CONFIG_Z88DK_INC_ = 1
+
+; Automatically Generated at Library Build Time
+
+
+
+
+
+
+
+
+
+
+
+
+
+defc __Z88DK = 1992
+
+
+
+
+
+
+
+
+
+
+
+
+defc __SCZ180 = 1
+
+defc __CPU_CLOCK = 18432000
+
+defc __CLOCKS_PER_SECOND = 50
+
+defc __ASCI0_RX_SIZE = 0x100
+defc __ASCI0_TX_SIZE = 0x080
+
+defc __ASCI1_RX_SIZE = 0x100
+defc __ASCI1_TX_SIZE = 0x080
+
+defc __IO_BASE_ADDRESS = 0xc0
+
+defc __IO_DIO_PORT = 0x00
+
+defc __IO_SYSTEM = 0x0C
+defc __IO_LED_OUTPUT = 0x0D
+defc __IO_LED_STATUS = 0x0E
+
+defc __IO_CF_PORT = 0x10
+
+
+
+
+
+
+
+
+
+
+
+
+defc __Z180 = 0x04
+
+defc __Z180_Z80180 = 0x01
+defc __Z180_Z8L180 = 0x02
+defc __Z180_Z8S180 = 0x04
+
+defc __CPU_INFO = 0x00
+
+defc __CPU_INFO_ENABLE_SLL = 0x01
+
+defc __CPU_TIMER_SCALE = 20
+
+
+   ; Z8S180 / Z8L180 CLASS
+
+   defc CNTLA0 = 0xc0
+   defc CNTLA1 = 0xc1
+   defc CNTLB0 = 0xc2
+   defc CNTLB1 = 0xc3
+   defc STAT0 = 0xc4
+   defc STAT1 = 0xc5
+   defc TDR0 = 0xc6
+   defc TDR1 = 0xc7
+   defc RDR0 = 0xc8
+   defc RDR1 = 0xc9
+   defc ASEXT0 = 0xd2
+   defc ASEXT1 = 0xd3
+   defc ASTC0L = 0xda
+   defc ASTC0H = 0xdb
+   defc ASTC1L = 0xdc
+   defc ASTC1H = 0xdd
+
+   defc CNTR = 0xca
+   defc TRDR = 0xcb
+
+   defc TMDR0L = 0xcc
+   defc TMDR0H = 0xcd
+   defc RLDR0L = 0xce
+   defc RLDR0H = 0xcf
+   defc TCR = 0xd0
+   defc TMDR1L = 0xd4
+   defc TMDR1H = 0xd5
+   defc RLDR1L = 0xd6
+   defc RLDR1H = 0xd7
+
+   defc FRC = 0xd8
+   defc CMR = 0xde
+   defc CCR = 0xdf
+
+   defc SAR0L = 0xe0
+   defc SAR0H = 0xe1
+   defc SAR0B = 0xe2
+   defc DAR0L = 0xe3
+   defc DAR0H = 0xe4
+   defc DAR0B = 0xe5
+   defc BCR0L = 0xe6
+   defc BCR0H = 0xe7
+   defc MAR1L = 0xe8
+   defc MAR1H = 0xe9
+   defc MAR1B = 0xea
+   defc IAR1L = 0xeb
+   defc IAR1H = 0xec
+   defc IAR1B = 0xed
+   defc BCR1L = 0xee
+   defc BCR1H = 0xef
+   defc DSTAT = 0xf0
+   defc DMODE = 0xf1
+   defc DCNTL = 0xf2
+
+   defc IL = 0xf3
+   defc ITC = 0xf4
+
+   defc RCR = 0xf6
+
+   defc CBR = 0xf8
+   defc BBR = 0xf9
+   defc CBAR = 0xfa
+
+   defc OMCR = 0xfe
+   defc ICR = 0x3f
+
+   ; I/O REGISTER BIT FIELDS
+
+   defc CNTLA0_MPE = 0x80
+   defc CNTLA0_RE = 0x40
+   defc CNTLA0_TE = 0x20
+   defc CNTLA0_RTS0 = 0x10
+   defc CNTLA0_MPBR = 0x08
+   defc CNTLA0_EFR = 0x08
+   defc CNTLA0_MODE_MASK = 0x07
+   defc CNTLA0_MODE_8P2 = 0x07
+   defc CNTLA0_MODE_8P1 = 0x06
+   defc CNTLA0_MODE_8N2 = 0x05
+   defc CNTLA0_MODE_8N1 = 0x04
+   defc CNTLA0_MODE_7P2 = 0x03
+   defc CNTLA0_MODE_7P1 = 0x02
+   defc CNTLA0_MODE_7N2 = 0x01
+   defc CNTLA0_MODE_7N1 = 0x00
+
+   defc CNTLA1_MPE = 0x80
+   defc CNTLA1_RE = 0x40
+   defc CNTLA1_TE = 0x20
+   defc CNTLA1_CKA1D = 0x10
+   defc CNTLA1_MPBR = 0x08
+   defc CNTLA1_EFR = 0x08
+   defc CNTLA1_MODE_MASK = 0x07
+   defc CNTLA1_MODE_8P2 = 0x07
+   defc CNTLA1_MODE_8P1 = 0x06
+   defc CNTLA1_MODE_8N2 = 0x05
+   defc CNTLA1_MODE_8N1 = 0x04
+   defc CNTLA1_MODE_7P2 = 0x03
+   defc CNTLA1_MODE_7P1 = 0x02
+   defc CNTLA1_MODE_7N2 = 0x01
+   defc CNTLA1_MODE_7N1 = 0x00
+
+   defc CNTLB0_MPBT = 0x80
+   defc CNTLB0_MP = 0x40
+   defc CNTLB0_CTS = 0x20
+   defc CNTLB0_PS = 0x20
+   defc CNTLB0_PEO = 0x10
+   defc CNTLB0_DR = 0x08
+   defc CNTLB0_SS_MASK = 0x07
+   defc CNTLB0_SS_EXT = 0x07
+   defc CNTLB0_SS_DIV_64 = 0x06
+   defc CNTLB0_SS_DIV_32 = 0x05
+   defc CNTLB0_SS_DIV_16 = 0x04
+   defc CNTLB0_SS_DIV_8 = 0x03
+   defc CNTLB0_SS_DIV_4 = 0x02
+   defc CNTLB0_SS_DIV_2 = 0x01
+   defc CNTLB0_SS_DIV_1 = 0x00
+
+   defc CNTLB1_MPBT = 0x80
+   defc CNTLB1_MP = 0x40
+   defc CNTLB1_CTS = 0x20
+   defc CNTLB1_PS = 0x20
+   defc CNTLB1_PEO = 0x10
+   defc CNTLB1_DR = 0x08
+   defc CNTLB1_SS_MASK = 0x07
+   defc CNTLB1_SS_EXT = 0x07
+   defc CNTLB1_SS_DIV_64 = 0x06
+   defc CNTLB1_SS_DIV_32 = 0x05
+   defc CNTLB1_SS_DIV_16 = 0x04
+   defc CNTLB1_SS_DIV_8 = 0x03
+   defc CNTLB1_SS_DIV_4 = 0x02
+   defc CNTLB1_SS_DIV_2 = 0x01
+   defc CNTLB1_SS_DIV_1 = 0x00
+
+   defc STAT0_RDRF = 0x80
+   defc STAT0_OVRN = 0x40
+   defc STAT0_PE = 0x20
+   defc STAT0_FE = 0x10
+   defc STAT0_RIE = 0x08
+   defc STAT0_DCD0 = 0x04
+   defc STAT0_TDRE = 0x02
+   defc STAT0_TIE = 0x01
+
+   defc STAT1_RDRF = 0x80
+   defc STAT1_OVRN = 0x40
+   defc STAT1_PE = 0x20
+   defc STAT1_FE = 0x10
+   defc STAT1_RIE = 0x08
+   defc STAT1_CTS1E = 0x04
+   defc STAT1_TDRE = 0x02
+   defc STAT1_TIE = 0x01
+
+   defc CNTR_EF = 0x80
+   defc CNTR_EIE = 0x40
+   defc CNTR_RE = 0x20
+   defc CNTR_TE = 0x10
+   defc CNTR_SS_MASK = 0x07
+   defc CNTR_SS_EXT = 0x07
+   defc CNTR_SS_DIV_1280 = 0x06
+   defc CNTR_SS_DIV_640 = 0x05
+   defc CNTR_SS_DIV_320 = 0x04
+   defc CNTR_SS_DIV_160 = 0x03
+   defc CNTR_SS_DIV_80 = 0x02
+   defc CNTR_SS_DIV_40 = 0x01
+   defc CNTR_SS_DIV_20 = 0x00
+
+   ; PRT REGISTER BIT FIELDS
+
+   defc TCR_TIF1 = 0x80
+   defc TCR_TIF0 = 0x40
+   defc TCR_TIE1 = 0x20
+   defc TCR_TIE0 = 0x10
+   defc TCR_TOC1 = 0x08
+   defc TCR_TOC0 = 0x04
+   defc TCR_TDE1 = 0x02
+   defc TCR_TDE0 = 0x01
+
+   ; DMA REGISTER BIT FIELDS
+
+   defc DSTAT_DE1 = 0x80
+   defc DSTAT_DE0 = 0x40
+   defc DSTAT_DWE1 = 0x20
+   defc DSTAT_DWE0 = 0x10
+   defc DSTAT_DIE1 = 0x08
+   defc DSTAT_DIE0 = 0x04
+   defc DSTAT_DME = 0x01
+
+   defc DMODE_DM1 = 0x20
+   defc DMODE_DM0 = 0x10
+   defc DMODE_SM1 = 0x08
+   defc DMODE_SM0 = 0x04
+   defc DMODE_MMOD = 0x02
+
+   defc DCNTL_MWI1 = 0x80
+   defc DCNTL_MWI0 = 0x40
+   defc DCNTL_IWI1 = 0x20
+   defc DCNTL_IWI0 = 0x10
+   defc DCNTL_DMS1 = 0x08
+   defc DCNTL_DMS0 = 0x04
+   defc DCNTL_DIM1 = 0x02
+   defc DCNTL_DIM0 = 0x01
+
+   ; INT/TRAP CONTROL REGISTER (ITC) BIT FIELDS
+
+   defc ITC_TRAP = 0x80
+   defc ITC_UFO = 0x40
+   defc ITC_ITE2 = 0x04
+   defc ITC_ITE1 = 0x02
+   defc ITC_ITE0 = 0x01
+
+   ; Refresh CONTROL REGISTER (RCR) BIT FIELDS
+
+   defc RCR_REFE = 0x80
+   defc RCR_REFW = 0x40
+   defc RCR_CYC1 = 0x02
+   defc RCR_CYC0 = 0x01
+
+   ; Operation Mode CONTROL REGISTER (OMCR) BIT FIELDS
+
+   defc OMCR_M1E = 0x80
+   defc OMCR_M1TE = 0x40
+   defc OMCR_IOC = 0x20
+
+   ; CPU CLOCK MULTIPLIER REGISTER (CMR) BIT FIELDS (Z8S180 & higher Only)
+
+   defc CMR_X2 = 0x80
+   defc CMR_LN_XTAL = 0x40
+
+   ; CPU CONTROL REGISTER (CCR) BIT FIELDS (Z8S180 & higher Only)
+
+   defc CCR_XTAL_X2 = 0x80
+   defc CCR_STANDBY = 0x40
+   defc CCR_BREXT = 0x20
+   defc CCR_LNPHI = 0x10
+   defc CCR_IDLE = 0x08
+   defc CCR_LNIO = 0x04
+   defc CCR_LNCPUCTL = 0x02
+   defc CCR_LNAD = 0x01
+
+
+
+
+
+
+
+
+
+
+
+
+
+defc __CLIB_OPT_MULTITHREAD = 0x00
+
+defc __CLIB_OPT_MULTITHREAD_LOCK_HEAPS = 0x01
+defc __CLIB_OPT_MULTITHREAD_LOCK_FILES = 0x02
+defc __CLIB_OPT_MULTITHREAD_LOCK_FLIST = 0x04
+defc __CLIB_OPT_MULTITHREAD_LOCK_FDTBL = 0x08
+defc __CLIB_OPT_MULTITHREAD_LOCK_FDSTR = 0x10
+
+defc __CLIB_OPT_IMATH = 0
+
+defc __CLIB_OPT_IMATH_FAST = 0x0f
+
+defc __CLIB_OPT_IMATH_FAST_DIV_UNROLL = 0x01
+defc __CLIB_OPT_IMATH_FAST_DIV_LZEROS = 0x02
+defc __CLIB_OPT_IMATH_FAST_MUL_UNROLL = 0x04
+defc __CLIB_OPT_IMATH_FAST_MUL_LZEROS = 0x08
+defc __CLIB_OPT_IMATH_FAST_LIA = 0x80
+
+defc __CLIB_OPT_IMATH_SELECT = 0x00
+
+defc __CLIB_OPT_IMATH_SELECT_FAST_ASR = 0x01
+defc __CLIB_OPT_IMATH_SELECT_FAST_LSR = 0x02
+defc __CLIB_OPT_IMATH_SELECT_FAST_LSL = 0x04
+
+defc __CLIB_OPT_TXT2NUM = 0x04
+
+defc __CLIB_OPT_TXT2NUM_INT_BIN = 0x01
+defc __CLIB_OPT_TXT2NUM_INT_OCT = 0x02
+defc __CLIB_OPT_TXT2NUM_INT_DEC = 0x04
+defc __CLIB_OPT_TXT2NUM_INT_HEX = 0x08
+
+defc __CLIB_OPT_TXT2NUM_LONG_BIN = 0x10
+defc __CLIB_OPT_TXT2NUM_LONG_OCT = 0x20
+defc __CLIB_OPT_TXT2NUM_LONG_DEC = 0x40
+defc __CLIB_OPT_TXT2NUM_LONG_HEX = 0x80
+
+defc __CLIB_OPT_TXT2NUM_SELECT = 0x00
+
+defc __CLIB_OPT_TXT2NUM_SELECT_FAST_BIN = 0x01
+defc __CLIB_OPT_TXT2NUM_SELECT_FAST_OCT = 0x02
+defc __CLIB_OPT_TXT2NUM_SELECT_FAST_DEC = 0x04
+defc __CLIB_OPT_TXT2NUM_SELECT_FAST_HEX = 0x08
+
+defc __CLIB_OPT_NUM2TXT = 0x00
+
+defc __CLIB_OPT_NUM2TXT_INT_BIN = 0x01
+defc __CLIB_OPT_NUM2TXT_INT_OCT = 0x02
+defc __CLIB_OPT_NUM2TXT_INT_DEC = 0x04
+defc __CLIB_OPT_NUM2TXT_INT_HEX = 0x08
+
+defc __CLIB_OPT_NUM2TXT_LONG_BIN = 0x10
+defc __CLIB_OPT_NUM2TXT_LONG_OCT = 0x20
+defc __CLIB_OPT_NUM2TXT_LONG_DEC = 0x40
+defc __CLIB_OPT_NUM2TXT_LONG_HEX = 0x80
+
+defc __CLIB_OPT_NUM2TXT_SELECT = 0x00
+
+defc __CLIB_OPT_NUM2TXT_SELECT_FAST_BIN = 0x01
+defc __CLIB_OPT_NUM2TXT_SELECT_FAST_OCT = 0x02
+defc __CLIB_OPT_NUM2TXT_SELECT_FAST_DEC = 0x04
+defc __CLIB_OPT_NUM2TXT_SELECT_FAST_HEX = 0x08
+
+defc __CLIB_OPT_STDIO = 0x00
+
+defc __CLIB_OPT_STDIO_VALID = 0x01
+
+defc CHAR_CR = 13
+defc CHAR_LF = 10
+defc CHAR_BS = 8
+defc CHAR_ESC = 27
+defc CHAR_CAPS = 6
+defc CHAR_BELL = 7
+defc CHAR_CTRL_C = 3
+defc CHAR_CTRL_D = 4
+defc CHAR_CTRL_Z = 26
+defc CHAR_CURSOR_UC = 45
+defc CHAR_CURSOR_LC = 95
+defc CHAR_PASSWORD = 42
+
+defc __CLIB_OPT_PRINTF = 0x002ff6ff
+
+defc __CLIB_OPT_PRINTF_d = 0x00000001
+defc __CLIB_OPT_PRINTF_u = 0x00000002
+defc __CLIB_OPT_PRINTF_x = 0x00000004
+defc __CLIB_OPT_PRINTF_X = 0x00000008
+defc __CLIB_OPT_PRINTF_o = 0x00000010
+defc __CLIB_OPT_PRINTF_n = 0x00000020
+defc __CLIB_OPT_PRINTF_i = 0x00000040
+defc __CLIB_OPT_PRINTF_p = 0x00000080
+defc __CLIB_OPT_PRINTF_B = 0x00000100
+defc __CLIB_OPT_PRINTF_s = 0x00000200
+defc __CLIB_OPT_PRINTF_c = 0x00000400
+defc __CLIB_OPT_PRINTF_I = 0x00000800
+defc __CLIB_OPT_PRINTF_ld = 0x00001000
+defc __CLIB_OPT_PRINTF_lu = 0x00002000
+defc __CLIB_OPT_PRINTF_lx = 0x00004000
+defc __CLIB_OPT_PRINTF_lX = 0x00008000
+defc __CLIB_OPT_PRINTF_lo = 0x00010000
+defc __CLIB_OPT_PRINTF_ln = 0x00020000
+defc __CLIB_OPT_PRINTF_li = 0x00040000
+defc __CLIB_OPT_PRINTF_lp = 0x00080000
+defc __CLIB_OPT_PRINTF_lB = 0x00100000
+defc __CLIB_OPT_PRINTF_a = 0x00400000
+defc __CLIB_OPT_PRINTF_A = 0x00800000
+defc __CLIB_OPT_PRINTF_e = 0x01000000
+defc __CLIB_OPT_PRINTF_E = 0x02000000
+defc __CLIB_OPT_PRINTF_f = 0x04000000
+defc __CLIB_OPT_PRINTF_F = 0x08000000
+defc __CLIB_OPT_PRINTF_g = 0x10000000
+defc __CLIB_OPT_PRINTF_G = 0x20000000
+
+defc __CLIB_OPT_PRINTF_2 = 0x00
+
+defc __CLIB_OPT_PRINTF_2_lld = 0x01
+defc __CLIB_OPT_PRINTF_2_llu = 0x02
+defc __CLIB_OPT_PRINTF_2_llx = 0x04
+defc __CLIB_OPT_PRINTF_2_llX = 0x08
+defc __CLIB_OPT_PRINTF_2_llo = 0x10
+defc __CLIB_OPT_PRINTF_2_lli = 0x40
+
+defc __CLIB_OPT_SCANF = 0x002ff6ff
+
+defc __CLIB_OPT_SCANF_d = 0x00000001
+defc __CLIB_OPT_SCANF_u = 0x00000002
+defc __CLIB_OPT_SCANF_x = 0x00000004
+defc __CLIB_OPT_SCANF_X = 0x00000008
+defc __CLIB_OPT_SCANF_o = 0x00000010
+defc __CLIB_OPT_SCANF_n = 0x00000020
+defc __CLIB_OPT_SCANF_i = 0x00000040
+defc __CLIB_OPT_SCANF_p = 0x00000080
+defc __CLIB_OPT_SCANF_B = 0x00000100
+defc __CLIB_OPT_SCANF_s = 0x00000200
+defc __CLIB_OPT_SCANF_c = 0x00000400
+defc __CLIB_OPT_SCANF_I = 0x00000800
+defc __CLIB_OPT_SCANF_ld = 0x00001000
+defc __CLIB_OPT_SCANF_lu = 0x00002000
+defc __CLIB_OPT_SCANF_lx = 0x00004000
+defc __CLIB_OPT_SCANF_lX = 0x00008000
+defc __CLIB_OPT_SCANF_lo = 0x00010000
+defc __CLIB_OPT_SCANF_ln = 0x00020000
+defc __CLIB_OPT_SCANF_li = 0x00040000
+defc __CLIB_OPT_SCANF_lp = 0x00080000
+defc __CLIB_OPT_SCANF_lB = 0x00100000
+defc __CLIB_OPT_SCANF_BRACKET = 0x00200000
+defc __CLIB_OPT_SCANF_a = 0x00400000
+defc __CLIB_OPT_SCANF_A = 0x00800000
+defc __CLIB_OPT_SCANF_e = 0x01000000
+defc __CLIB_OPT_SCANF_E = 0x02000000
+defc __CLIB_OPT_SCANF_f = 0x04000000
+defc __CLIB_OPT_SCANF_F = 0x08000000
+defc __CLIB_OPT_SCANF_g = 0x10000000
+defc __CLIB_OPT_SCANF_G = 0x20000000
+
+defc __CLIB_OPT_SCANF_2 = 0x00
+
+defc __CLIB_OPT_SCANF_2_lld = 0x01
+defc __CLIB_OPT_SCANF_2_llu = 0x02
+defc __CLIB_OPT_SCANF_2_llx = 0x04
+defc __CLIB_OPT_SCANF_2_llX = 0x08
+defc __CLIB_OPT_SCANF_2_llo = 0x10
+defc __CLIB_OPT_SCANF_2_lli = 0x40
+
+defc __CLIB_OPT_UNROLL = 0x00
+
+defc __CLIB_OPT_UNROLL_MEMCPY = 0x01
+defc __CLIB_OPT_UNROLL_MEMSET = 0x02
+defc __CLIB_OPT_UNROLL_OTIR = 0x10
+defc __CLIB_OPT_UNROLL_LDIR = 0x20
+defc __CLIB_OPT_UNROLL_USER_SMC = 0x40
+defc __CLIB_OPT_UNROLL_LIB_SMC = 0x80
+
+defc __CLIB_OPT_STRTOD = 0x00
+
+defc __CLIB_OPT_STRTOD_NAN = 0x01
+defc __CLIB_OPT_STRTOD_INF = 0x01
+defc __CLIB_OPT_STRTOD_HEX = 0x02
+
+defc __CLIB_OPT_SORT = 1
+
+defc __CLIB_OPT_SORT_INSERTION = 0
+defc __CLIB_OPT_SORT_SHELL = 1
+defc __CLIB_OPT_SORT_QUICK = 2
+
+defc __CLIB_OPT_SORT_QSORT = 0x0c
+
+defc __CLIB_OPT_SORT_QSORT_PIVOT = 0x3
+defc __CLIB_OPT_SORT_QSORT_PIVOT_MID = 0x0
+defc __CLIB_OPT_SORT_QSORT_PIVOT_RAN = 0x1
+defc __CLIB_OPT_SORT_QSORT_ENABLE_INSERTION = 0x04
+defc __CLIB_OPT_SORT_QSORT_ENABLE_EQUAL = 0x08
+
+defc __CLIB_OPT_ERROR = 0x00
+
+defc __CLIB_OPT_ERROR_ENABLED = 0x01
+defc __CLIB_OPT_ERROR_VERBOSE = 0x02
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+defc __EOK = 0
+defc __EACCES = 1
+defc __EBADF = 2
+defc __EBDFD = 3
+defc __EDOM = 4
+defc __EFBIG = 5
+defc __EINVAL = 6
+defc __EIO = 7
+defc __EMFILE = 8
+defc __ENFILE = 9
+defc __ENOLCK = 10
+defc __ENOMEM = 11
+defc __ENOTSUP = 12
+defc __EOVERFLOW = 13
+defc __ERANGE = 14
+defc __ESTAT = 15
+defc __EAGAIN = 16
+defc __EWOULDBLOCK = 16
+
+defc __ERROR_NEXT = 50
+
+defc STDIO_SEEK_SET = 0
+defc STDIO_SEEK_CUR = 1
+defc STDIO_SEEK_END = 2
+
+defc STDIO_MSG_PUTC = 1
+defc STDIO_MSG_WRIT = 2
+defc STDIO_MSG_GETC = 3
+defc STDIO_MSG_EATC = 4
+defc STDIO_MSG_READ = 5
+defc STDIO_MSG_SEEK = 6
+defc STDIO_MSG_ICTL = 7
+defc STDIO_MSG_FLSH = 8
+defc STDIO_MSG_CLOS = 9
+
+defc ITERM_MSG_GETC = 15
+defc ITERM_MSG_REJECT = 16
+defc ITERM_MSG_INTERRUPT = 17
+defc ITERM_MSG_PUTC = 18
+defc ITERM_MSG_PRINT_CURSOR = 19
+defc ITERM_MSG_ERASE_CURSOR = 20
+defc ITERM_MSG_ERASE_CURSOR_PWD = 21
+defc ITERM_MSG_BS = 22
+defc ITERM_MSG_BS_PWD = 23
+defc ITERM_MSG_READLINE_BEGIN = 24
+defc ITERM_MSG_READLINE_END = 25
+defc ITERM_MSG_READLINE_SCROLL_LIMIT = 26
+defc ITERM_MSG_BELL = 27
+      
+defc __MESSAGE_ITERM_NEXT__ = 28
+
+defc OTERM_MSG_PUTC = 30
+defc OTERM_MSG_TTY = 31
+defc OTERM_MSG_FZX_PUTC = 32
+defc OTERM_MSG_PRINTC = 33
+defc OTERM_MSG_SCROLL = 34
+defc OTERM_MSG_SCROLL_LIMIT = 35
+defc OTERM_MSG_CLS = 36
+defc OTERM_MSG_PAUSE = 37
+defc OTERM_MSG_BELL = 38
+defc OTERM_MSG_PSCROLL = 39
+defc OTERM_MSG_FZX_GET_XOR_DRAW = 40
+      
+defc __MESSAGE_OTERM_NEXT__ = 41
+
+defc ICHAR_MSG_GETC = 15
+defc OCHAR_MSG_PUTC_BIN = 30
+defc OCHAR_MSG_PUTC = 33
+  
+defc __MESSAGE_NEXT__ = 45
+
+defc mtx_plain = 0x01
+defc mtx_recursive = 0x02
+defc mtx_timed = 0x04
+
+defc thrd_success = 0x00
+defc thrd_error = 0x01
+defc thrd_nomem = 0x02
+defc thrd_busy = 0x04
+defc thrd_timedout = 0x08
+
+defc IOCTL_RESET = 0x0000
+
+defc IOCTL_ITERM_ECHO = 0xc081
+defc IOCTL_ITERM_PASS = 0xc041
+defc IOCTL_ITERM_LINE = 0xc021
+defc IOCTL_ITERM_COOK = 0xc011
+defc IOCTL_ITERM_CAPS = 0xc009
+defc IOCTL_ITERM_CRLF = 0xc101
+defc IOCTL_ITERM_CURS = 0xc201
+   
+defc IOCTL_ITERM_TIE = 0x0201
+defc IOCTL_ITERM_GET_EDITBUF = 0x0381
+defc IOCTL_ITERM_SET_EDITBUF = 0x0301
+
+defc IOCTL_OTERM_PAGE = 0xc082
+defc IOCTL_OTERM_PAUSE = 0xc042
+defc IOCTL_OTERM_COOK = 0xc022
+defc IOCTL_OTERM_CRLF = 0xc012
+defc IOCTL_OTERM_CLEAR = 0xe002
+defc IOCTL_OTERM_SIGNAL = 0xc202
+defc IOCTL_OTERM_BELL = 0xc102
+
+defc IOCTL_OTERM_CLS = 0x0102
+defc IOCTL_OTERM_RESET_SCROLL = 0x0202
+defc IOCTL_OTERM_GET_WINDOW_COORD = 0x0382
+defc IOCTL_OTERM_SET_WINDOW_COORD = 0x0302
+defc IOCTL_OTERM_GET_WINDOW_RECT = 0x0482
+defc IOCTL_OTERM_SET_WINDOW_RECT = 0x0402
+defc IOCTL_OTERM_GET_CURSOR_COORD = 0x0582
+defc IOCTL_OTERM_SET_CURSOR_COORD = 0x0502
+defc IOCTL_OTERM_GET_OTERM = 0x0602
+defc IOCTL_OTERM_SCROLL = 0x0702
+defc IOCTL_OTERM_FONT = 0x0802
+defc IOCTL_OTERM_SCROLL_LIMIT = 0x0902
+
+defc IOCTL_OTERM_FZX_GET_PAPER_COORD = 0x0a82
+defc IOCTL_OTERM_FZX_SET_PAPER_COORD = 0x0a02
+defc IOCTL_OTERM_FZX_GET_PAPER_RECT = 0x0b82
+defc IOCTL_OTERM_FZX_SET_PAPER_RECT = 0x0b02
+defc IOCTL_OTERM_FZX_LEFT_MARGIN = 0x0c02
+defc IOCTL_OTERM_FZX_LINE_SPACING = 0x0d02
+defc IOCTL_OTERM_FZX_SPACE_EXPAND = 0x0e02
+defc IOCTL_OTERM_FZX_GET_FZX_STATE = 0x0f82
+defc IOCTL_OTERM_FZX_SET_FZX_STATE = 0x0f02
+
+defc IOCTL_ICHAR_CRLF = 0xc103
+   
+defc IOCTL_OCHAR_CRLF = 0xc014
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+defc __BF_CIO = 0x00
+defc __BF_CIOIN = 0x0
+defc __BF_CIOOUT = 0x1
+defc __BF_CIOIST = 0x2
+defc __BF_CIOOST = 0x3
+defc __BF_CIOINIT = 0x4
+defc __BF_CIOQUERY = 0x5
+defc __BF_CIODEVICE = 0x6
+
+defc __BF_DIO = 0x10
+defc __BF_DIOSTATUS = 0x10
+defc __BF_DIORESET = 0x11
+defc __BF_DIOSEEK = 0x12
+defc __BF_DIOREAD = 0x13
+defc __BF_DIOWRITE = 0x14
+defc __BF_DIOVERIFY = 0x15
+defc __BF_DIOFORMAT = 0x16
+defc __BF_DIODEVICE = 0x17
+defc __BF_DIOMEDIA = 0x18
+defc __BF_DIODEFMED = 0x19
+defc __BF_DIOCAP = 0x1a
+defc __BF_DIOGEOM = 0x1b
+
+defc __BF_RTC = 0x20
+defc __BF_RTCGETTIM = 0x20
+defc __BF_RTCSETTIM = 0x21
+defc __BF_RTCGETBYT = 0x22
+defc __BF_RTCSETBYT = 0x23
+defc __BF_RTCGETBLK = 0x24
+defc __BF_RTCSETBLK = 0x25
+
+defc __BF_EMU = 0x30
+
+defc __BF_VDA = 0x40
+defc __BF_VDAINI = 0x40
+defc __BF_VDAQRY = 0x41
+defc __BF_VDARES = 0x42
+defc __BF_VDADEV = 0x43
+defc __BF_VDASCS = 0x44
+defc __BF_VDASCP = 0x45
+defc __BF_VDASAT = 0x46
+defc __BF_VDASCO = 0x47
+defc __BF_VDAWRC = 0x48
+defc __BF_VDAFIL = 0x49
+defc __BF_VDACPY = 0x4a
+defc __BF_VDASCR = 0x4b
+defc __BF_VDAKST = 0x4c
+defc __BF_VDAKFL = 0x4d
+defc __BF_VDAKRD = 0x4e
+
+defc __BF_SYS = 0xF0
+defc __BF_SYSRESET = 0xf0
+defc __BF_SYSVER = 0xf1
+defc __BF_SYSSETBNK = 0xf2
+defc __BF_SYSGETBNK = 0xf3
+defc __BF_SYSSETCPY = 0xf4
+defc __BF_SYSBNKCPY = 0xf5
+defc __BF_SYSALLOC = 0xf6
+defc __BF_SYSFREE = 0xf7
+defc __BF_SYSGET = 0xf8
+defc __BF_SYSSET = 0xf9
+defc __BF_SYSPEEK = 0xfa
+defc __BF_SYSPOKE = 0xfb
+defc __BF_SYSINT = 0xfc
+
+defc __BF_SYSGET_CIOCNT = 0x00
+defc __BF_SYSGET_DIOCNT = 0x10
+defc __BF_SYSGET_VDACNT = 0x40
+defc __BF_SYSGET_TIMER = 0xD0
+defc __BF_SYSGET_SECS = 0xD1
+defc __BF_SYSGET_BOOTINFO = 0xE0
+defc __BF_SYSGET_CPUINFO = 0xF0
+defc __BF_SYSGET_MEMINFO = 0xF1
+defc __BF_SYSGET_BNKINFO = 0xF2
+
+defc __BF_SYSSET_TIMER = 0xD0
+defc __BF_SYSSET_SECS = 0xD1
+defc __BF_SYSSET_BOOTINFO = 0xE0
+
+defc __BF_SYSINT_INFO = 0x00
+defc __BF_SYSINT_GET = 0x10
+defc __BF_SYSINT_SET = 0x20
+
+defc __CIODEV_UART = 0x00
+defc __CIODEV_ASCI = 0x10
+defc __CIODEV_TERM = 0x20
+defc __CIODEV_PRPCON = 0x30
+defc __CIODEV_PPPCON = 0x40
+defc __CIODEV_SIO = 0x50
+defc __CIODEV_ACIA = 0x60
+defc __CIODEV_PIO = 0x70
+defc __CIODEV_UF = 0x80
+defc __CIODEV_CONSOLE = 0xD0
+
+defc __DIODEV_MD = 0x00
+defc __DIODEV_FD = 0x10
+defc __DIODEV_RF = 0x20
+defc __DIODEV_IDE = 0x30
+defc __DIODEV_ATAPI = 0x40
+defc __DIODEV_PPIDE = 0x50
+defc __DIODEV_SD = 0x60
+defc __DIODEV_PRPSD = 0x70
+defc __DIODEV_PPPSD = 0x80
+defc __DIODEV_HDSK = 0x90
+
+defc __VDADEV_VDU = 0x00
+defc __VDADEV_CVDU = 0x10
+defc __VDADEV_NEC = 0x20
+defc __VDADEV_TMS = 0x30
+defc __VDADEV_VGA = 0x40
+
+defc __EMUTYP_NONE = 0x00
+defc __EMUTYP_TTY = 0x01
+defc __EMUTYP_ANSI = 0x02
+
+defc __HBX_XFCDAT = 0xffe0
+defc __HB_CURBNK = 0xffe0
+defc __HB_INVBNK = 0xffe1
+defc __HB_SRCADR = 0xffe2
+defc __HB_SRCBNK = 0xffe4
+defc __HB_DSTADR = 0xffe5
+defc __HB_DSTBNK = 0xffe7
+defc __HB_CPYLEN = 0xffe8
+
+defc __HBX_XFCFNS = 0xfff0
+defc __HB_INVOKE = 0xfff0
+defc __HB_BNKSEL = 0xfff3
+defc __HB_BNKCPY = 0xfff6
+defc __HB_BNKCALL = 0xfff9
+defc __HB_IDENT = 0xfffe
+
+
+
+
+
+
+
+
+
+
+
+
+defc __CPM_RCON = 1
+defc __CPM_WCON = 2
+defc __CPM_RRDR = 3
+defc __CPM_WPUN = 4
+defc __CPM_WLST = 5
+defc __CPM_DCIO = 6
+defc __CPM_GIOB = 7
+defc __CPM_SIOB = 8
+defc __CPM_PRST = 9
+defc __CPM_RCOB = 10
+defc __CPM_ICON = 11
+defc __CPM_VERS = 12
+defc __CPM_RDS  = 13
+defc __CPM_LGIN = 14
+defc __CPM_OPN  = 15
+defc __CPM_CLS  = 16
+defc __CPM_FFST = 17
+defc __CPM_FNXT = 18
+defc __CPM_DEL  = 19
+defc __CPM_READ = 20
+defc __CPM_WRIT = 21
+defc __CPM_MAKE = 22
+defc __CPM_REN  = 23
+defc __CPM_ILOG = 24
+defc __CPM_IDRV = 25
+defc __CPM_SDMA = 26
+defc __CPM_SUID = 32
+defc __CPM_RRAN = 33
+defc __CPM_WRAN = 34
+defc __CPM_CFS  = 35
+defc __CPM_DSEG = 51
+
+
+
+
+
+
+
+
+
+
+ENDIF
+

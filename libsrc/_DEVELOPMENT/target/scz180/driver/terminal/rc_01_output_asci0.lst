@@ -1,0 +1,7 @@
+target/scz180/driver/terminal/rc_01_output_asci0
+target/scz180/driver/terminal/rc_01_output_asci0/rc_01_output_asci0_iterm_msg_bell
+target/scz180/driver/terminal/rc_01_output_asci0/rc_01_output_asci0_iterm_msg_bs
+target/scz180/driver/terminal/rc_01_output_asci0/rc_01_output_asci0_iterm_msg_putc
+target/scz180/driver/terminal/rc_01_output_asci0/rc_01_output_asci0_oterm_msg_bell
+target/scz180/driver/terminal/rc_01_output_asci0/rc_01_output_asci0_oterm_msg_putc
+target/scz180/driver/terminal/rc_01_output_asci0/rc_01_output_asci0_stdio_msg_ictl

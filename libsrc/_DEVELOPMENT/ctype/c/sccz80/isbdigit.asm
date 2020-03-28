@@ -8,6 +8,15 @@ PUBLIC isbdigit
 
 EXTERN asm_isbdigit, error_znc
 
+IF __CLASSIC && __CPU_GBZ80__
+PUBLIC _isbdigit
+_isbdigit:
+  ld  hl,sp+2
+  ld  a,(hl+)
+  ld  h,(hl)
+  ld  l,a
+ENDIF
+
 isbdigit:
 
    inc h
@@ -18,13 +27,20 @@ isbdigit:
    call asm_isbdigit
    
    ld l,h
+IF __CPU_GBZ80__
+   ld d,h
+   ld e,l
+ENDIF
    ret nz
    
    inc l
+IF __CPU_GBZ80__
+   inc e
+ENDIF
    ret
 
 ; SDCC bridge for Classic
-IF __CLASSIC
+IF __CLASSIC && !__CPU_GBZ80__
 PUBLIC _isbdigit
 defc _isbdigit = isbdigit
 ENDIF

@@ -41,7 +41,7 @@
 
 #define __CPU_CLOCK  36864000
 
-#define __IO_BASE_ADDRESS 0x0
+#define __CLOCKS_PER_SECOND 256
 
 #define __BIOS_SP   0xFFDE
 #define __BANK_SP   0x003B
@@ -55,6 +55,8 @@
 
 #define __ASCI1_RX_SIZE  0x100
 #define __ASCI1_TX_SIZE  0x080
+
+#define __IO_BASE_ADDRESS 0x0
 
 #define __IO_BREAK  0x2000
 
@@ -834,10 +836,10 @@
 
 
 #define __IO_I2C_RX_SIZE  68
-#define __IO_I2C_TX_SIZE  68
+#define __IO_I2C_TX_SIZE  67
 
-#define __IO_PCA9665_1_PORT_BASE  0xA000
-#define __IO_PCA9665_2_PORT_BASE  0x8000
+#define __IO_I2C1_PORT_BASE  0xA000
+#define __IO_I2C2_PORT_BASE  0x8000
 
 #define __IO_I2C1_PORT_MSB  0xa0
 #define __IO_I2C2_PORT_MSB  0x80
@@ -919,7 +921,6 @@
 
 
 
-
 #define __IO_PIO_IDE_LSB  0x4000
 #define __IO_PIO_IDE_MSB  0x4001
 #define __IO_PIO_IDE_CTL  0x4002
@@ -963,6 +964,50 @@
 #define __IDE_CMD_CACHE_FLUSH  0xE7
 #define __IDE_CMD_ID  0xEC
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+#define __CPM_RCON  1
+#define __CPM_WCON  2
+#define __CPM_RRDR  3
+#define __CPM_WPUN  4
+#define __CPM_WLST  5
+#define __CPM_DCIO  6
+#define __CPM_GIOB  7
+#define __CPM_SIOB  8
+#define __CPM_PRST  9
+#define __CPM_RCOB  10
+#define __CPM_ICON  11
+#define __CPM_VERS  12
+#define __CPM_RDS   13
+#define __CPM_LGIN  14
+#define __CPM_OPN   15
+#define __CPM_CLS   16
+#define __CPM_FFST  17
+#define __CPM_FNXT  18
+#define __CPM_DEL   19
+#define __CPM_READ  20
+#define __CPM_WRIT  21
+#define __CPM_MAKE  22
+#define __CPM_REN   23
+#define __CPM_ILOG  24
+#define __CPM_IDRV  25
+#define __CPM_SDMA  26
+#define __CPM_SUID  32
+#define __CPM_RRAN  33
+#define __CPM_WRAN  34
+#define __CPM_CFS   35
+#define __CPM_DSEG  51
 
 
 

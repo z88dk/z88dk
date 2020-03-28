@@ -22,16 +22,28 @@ option_t fp1100_options[] = {
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
+static disc_spec fp1100_spec = {
+    .name = "FP-1100",
+    .sectors_per_track = 16,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .first_sector_offset = 1,
+    .alternate_sides = 0
+};
 
 int fp1100_exec(char *target)
 {
-    static d88_hdr_t hdr = {0};
-    static d88_sct_t sector = {0};
-    static uint8_t buf[256];
-    char    disc_name[FILENAME_MAX+1];
+    char    *buf;
+    char    bootbuf[512];
+    char    filename[FILENAME_MAX+1];
     char    bootname[FILENAME_MAX+1];
-    FILE   *bootstrap_fp, *binary_fp, *d88_fp;
-    int     total_sectors, len, binlen;
+    FILE    *fpin, *bootstrap_fp;
+    disc_handle *h;
+    long    pos, bootlen;
+    int     t,s,w,head = 0;
 
     if ( help )
         return -1;
@@ -40,30 +52,8 @@ int fp1100_exec(char *target)
         return -1;
     }
 
-    if ( outfile == NULL ) {
-        strcpy(disc_name,binname);
-        suffix_change(disc_name,".d88");
-    } else {
-        strcpy(disc_name,outfile);
-    }
-
-    strcpy(hdr.title, "Z88DK");
-
     strcpy(bootname, binname);
     suffix_change(bootname, "_BOOTSTRAP.bin");
-
-    // Open the binary file
-    if ( (binary_fp=fopen_bin(binname, crtfile) ) == NULL ) {
-        exit_log(1,"Can't open input file %s\n",bootname);
-    }
-    if ( fseek(binary_fp,0,SEEK_END) ) {
-        fclose(binary_fp);
-        exit_log(1,"Couldn't determine size of file\n");
-    }
-    binlen = ftell(binary_fp);
-    fseek(binary_fp,0L,SEEK_SET);
-
-    // Load bootstrap
     if ( (bootstrap_fp=fopen_bin(bootname, crtfile) ) == NULL ) {
         exit_log(1,"Can't open input file %s\n",bootname);
     }
@@ -71,52 +61,59 @@ int fp1100_exec(char *target)
         fclose(bootstrap_fp);
         fprintf(stderr,"Couldn't determine size of file\n");
     }
-    len = ftell(bootstrap_fp);
+    bootlen = ftell(bootstrap_fp);
     fseek(bootstrap_fp,0L,SEEK_SET);
 
-    if ( len > 256 ) {
-        exit_log(1, "Bootstrap has length %d > 256", len);
+    if ( bootlen > 256 ) {
+        exit_log(1, "Bootstrap has length %d > 256", bootlen);
     }
-    memset(buf, 0, sizeof(buf));
-    if ( fread(buf, 1, len, bootstrap_fp) != len ) {
+    memset(bootbuf, 0, sizeof(bootbuf));
+    if ( fread(bootbuf, 1, bootlen, bootstrap_fp) != bootlen ) {
         exit_log(1, "Cannot read whole bootstrap file");
     }
+    fclose(bootstrap_fp);
 
-    // Write the header and first sector
-    d88_fp = d88_create_disk(disc_name, &hdr, 40, 16, 256);
 
-    // And now the first sector
-    sector.c = 0;
-    sector.h = 0;
-    sector.r = 1;
-    sector.n = 1;
-    sector.nsec = 0x10;
-    d88_write_sector(d88_fp, &sector, buf, 256);
-
-    total_sectors = (80 * 16) - 1;
-
-    while ( total_sectors ) {
-        sector.r++;
-        if ( sector.r == 0x11 ) {
-            sector.r = 1;
-            if ( sector.h == 1 ) {
-                sector.c++;
-            }
-            sector.h ^= 1;
-        }
-        if ( sector.h == 0 && !feof(binary_fp) ) {
-            fread(buf, 1, 256, binary_fp);
-        } else {
-            memset(buf, 0xe5, sizeof(buf));
-        }
-        d88_write_sector(d88_fp, &sector, buf, 256);
-        total_sectors--;
+    strcpy(filename, binname);
+    if ( ( fpin = fopen_bin(binname, crtfile) ) == NULL ) {
+        exit_log(1,"Cannot open binary file <%s>\n",binname);
     }
 
-    fclose(d88_fp);
+    if (fseek(fpin, 0, SEEK_END)) {
+        fclose(fpin);
+        exit_log(1,"Couldn't determine size of file\n");
+    }
 
-    fclose(bootstrap_fp);
-    fclose(binary_fp);
+    pos = ftell(fpin);
+    fseek(fpin, 0L, SEEK_SET);
+    buf = must_malloc(pos);
+    fread(buf, 1, pos, fpin);
+    fclose(fpin);
+
+
+    h = disc_create(&fp1100_spec);
+
+    // Write the bootstrap to track 0
+    disc_write_sector(h, 0, 0, 0, bootbuf);
+
+    // Write input file
+    t = 0;
+    s = 1;
+    w = 0;
+    head = 0;
+    while ( w < pos ) {
+        disc_write_sector(h, t, s, head, buf + w);
+        s++;
+        if ( s == 16 ) {
+           t++;
+           s = 0;
+        }
+        w += 256;
+    }
+
+    suffix_change(filename, ".d88");
+    disc_write_d88(h, filename);
+    free(buf);
 
     return 0;
 }

@@ -110,12 +110,22 @@ extern int __LIB__ getch(void);
 // Get the character that is on screen at the specified location
 extern int __LIB__ cvpeek(int x, int y) __smallc;
 
+
+// Get the character that is on screen at the specified location (no charset
+// translations will be made)
+extern int __LIB__ cvpeekr(int x, int y) __smallc;
+
 // Set the border colour, may not be implemented on all ports
 extern int __LIB__ bordercolor(int c) __z88dk_fastcall;
 
 // Missing functions, not implemented
 //extern int  __LIB__ movetext (int _left, int _top, int _right, int _bottom, int _destleft, int _desttop);
 //extern int  __LIB__ gettext (int left, int top, int right, int bottom, void *destin);
+
+
+// CC65 compatibility
+#define cgetc() getch()
+#define cputc(a) fputc_cons(a)
 
 
 #endif /* _CONIO_H */

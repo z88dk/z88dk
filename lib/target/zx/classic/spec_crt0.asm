@@ -33,8 +33,7 @@
 
         PUBLIC    call_rom3       ; Interposer
        
-        PUBLIC    _FRAMES
-        defc      _FRAMES = 23672 ; Timer
+        
 
 	PUBLIC	  __SYSVAR_BORDCR
 	defc	  __SYSVAR_BORDCR = 23624
@@ -49,19 +48,31 @@
 	    defc TAR__register_sp = 0xff57	; below UDG, keep eye when using banks
         ENDIF
 
+        PUBLIC    _FRAMES
+        IF startup != 2
+                defc  _FRAMES = 23672 ; Timer	
+        ENDIF
         
         IF      !DEFINED_CRT_ORG_CODE
             IF (startup=2)                 ; ROM ?
-                defc    CRT_ORG_CODE  = 0
-		defc	TAR__register_sp = 32767	
+                defc  CRT_ORG_CODE  = 0
+		defc	TAR__register_sp = 32767
             ELSE
-                defc    CRT_ORG_CODE  = 32768
+                IF DEFINED_CRT_TS2068_HRG
+                    defc  CRT_ORG_CODE  = 40000
+                ELSE
+                    defc  CRT_ORG_CODE  = 32768
+                ENDIF
             ENDIF
         ENDIF
 
 	; We default to the 64 column terminal driver
         defc    CONSOLE_COLUMNS = 64
         defc    CONSOLE_ROWS = 24
+
+	IF !CLIB_FGETC_CONS_DELAY
+		defc CLIB_FGETC_CONS_DELAY = 100
+	ENDIF
 
 	; We use the generic driver by default
         defc    TAR__fputc_cons_generic = 1
@@ -81,6 +92,10 @@ start:
 
 IF (startup=2)
 
+	IF !CLIB_FGETC_CONS_DELAY
+		defc CLIB_FGETC_CONS_DELAY = 100
+	ENDIF
+
         di          ; put hardware in a stable state
         ld      a,$3F
         ld      i,a
@@ -98,14 +113,19 @@ endif
         ; --- nothing more ?
 
 init:
-        im      1
-	INCLUDE	"crt/classic/crt_init_sp.asm"
-	INCLUDE	"crt/classic/crt_init_atexit.asm"
+
+		INCLUDE	"crt/classic/crt_init_sp.asm"
+		
         ld      a,@111000       ; White PAPER, black INK
         call    zx_internal_cls
         ld      (hl),0
         ld      bc,42239
         ldir
+
+		INCLUDE	"crt/classic/crt_init_atexit.asm"
+		call	crt0_init_bss
+
+		im      1
         ei
 ELSE
 
@@ -149,10 +169,8 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
         push    hl
-IF CRT_ENABLE_STDIO = 1
-        EXTERN     closeall
-        call    closeall
-ENDIF
+      call    crt0_exit
+
 
 
 IF (startup=2)      ; ROM ?
@@ -313,9 +331,6 @@ ENDIF
         ret
         
 
-        defm    "Small C+ ZX"   ;Unnecessary file signature
-        defb    0
-
 
 IF (startup=2) 			;ROM
 
@@ -348,6 +363,7 @@ ENDIF
 	SECTION bss_crt
 IF startup=2
 	PUBLIC  romsvc
+_FRAMES:        defs    3
 romsvc:         defs    10  ; Pointer to the end of the sysdefvars
                             ; used by the ROM version of some library
 ENDIF

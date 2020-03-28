@@ -40,7 +40,6 @@
 
 
 ; Enterprise 64/128 specific stuff
-		PUBLIC    warmreset
 		PUBLIC    set_exos_multi_variables
 		PUBLIC    _DEV_VIDEO
 		PUBLIC    _DEV_KEYBOARD
@@ -175,13 +174,12 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
 
-IF CRT_ENABLE_STDIO = 1
-	EXTERN	closeall
-	call	closeall
-ENDIF
+    call    crt0_exit
+
 
 IF (!DEFINED_startup | (startup=1))
 warmreset:
+		PUBLIC    warmreset
         ld      sp, 0100h
         ld      a, 0ffh
         out     (0b2h), a
@@ -319,7 +317,6 @@ __VideoVariables:
         defb  25, 25                    ; Y_SIZ_VID
         defb  0
 
-         defm  "Small C+ Enterprise"
 end:	 defb	0
 
 

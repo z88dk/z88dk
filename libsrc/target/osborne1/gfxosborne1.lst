@@ -1,0 +1,7 @@
+target/osborne1/graphics/clsgraph
+target/osborne1/graphics/textpixl
+target/osborne1/graphics/plotpixl
+target/osborne1/graphics/respixl
+target/osborne1/graphics/xorpixl
+target/osborne1/graphics/pointxy
+@gfx/narrow/gfx_narrow.lst

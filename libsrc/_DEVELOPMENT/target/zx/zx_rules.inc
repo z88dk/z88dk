@@ -10,15 +10,15 @@
 Z88DK_FOR(`LOOP', `0', `7',
 `
    IFNDEF CRT_ORG_BANK_`'LOOP
-	   defc CRT_ORG_BANK_`'LOOP = 0xc000
-	ENDIF
+      defc CRT_ORG_BANK_`'LOOP = 0xc000
+   ENDIF
 ')
 
 Z88DK_FOR(`LOOP', `0', `63',
 `
    IFNDEF CRT_ORG_DIV_`'LOOP
-	   defc CRT_ORG_DIV_`'LOOP = 0x2000
-	ENDIF
+      defc CRT_ORG_DIV_`'LOOP = 0x2000
+   ENDIF
 ')
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -28,6 +28,8 @@ Z88DK_FOR(`LOOP', `0', `63',
    IFNDEF CRT_ORG_MAIN
       defc CRT_ORG_MAIN = 0x8000
    ENDIF
+
+   ; DOTX_RAMTOP can be set to alter ramtop check
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; Input Terminal Settings

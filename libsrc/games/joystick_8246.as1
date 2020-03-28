@@ -1,0 +1,36 @@
+; Snippet for 8246-05 joystick
+
+IF !__CPU_INTEL__
+	call	getk
+	ld	a,l
+	ld	hl,0
+	cp	'0'
+	jr	nz,no_fire1_a
+	set	4,l
+	ret
+.no_fire1_a
+	cp	'5'
+	jr	nz,no_fire2_a
+	set	5,l
+	ret
+.no_fire2_a
+	cp	'8'
+	jr	nz,no_up_a
+	set	3,l
+	ret
+.no_up_a
+	cp	'2'
+	jr	nz,no_down_a
+	set	2,l
+	ret
+.no_down_a
+	cp	'4'
+	jr	nz,no_left_a
+	set	1,l
+	ret
+.no_left_a
+	cp	'6'
+	ret	nz
+	set	0,l
+	ret
+ENDIF

@@ -7,6 +7,8 @@
 ; Stefano Bodrato - 2/10/2001
 ;
 
+IF !__CPU_GBZ80__
+
     SECTION    code_clib
     PUBLIC     bit_click
     PUBLIC     _bit_click
@@ -30,3 +32,4 @@
           ld   (__snd_tick),a
           ret
 
+ENDIF

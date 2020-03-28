@@ -1,8 +1,16 @@
 #-----------------------------------------------------------------------------
 # Test common utils
-# Copyright (C) Paulo Custodio, 2011-2018
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: http://www.perlfoundation.org/artistic_license_2_0
 #-----------------------------------------------------------------------------
+
+# EXESUFFIX is passed when cross-compiling Win32 on Linux
+ifeq ($(OS),Windows_NT)
+  EXESUFFIX 		:= .exe
+else
+  EXESUFFIX 		?=
+endif
+
 include ../Make.common
 
 CC			?= gcc
@@ -26,10 +34,10 @@ CFLAGS		+= -DUNITY_EXCLUDE_SETJMP_H -I. -I../../ext/Unity/src \
 
 DEPENDS		:= $(SRCS:.c=.d)
 
-all: t/test$(EXE)
+all: t/test$(EXESUFFIX)
 
-t/test$(EXE): $(OBJS)
-	$(CC) $(CFLAGS) -o t/test$(EXE) $(OBJS) $(LDFLAGS)
+t/test$(EXESUFFIX): $(OBJS)
+	$(CC) $(CFLAGS) -o t/test$(EXESUFFIX) $(OBJS) $(LDFLAGS)
 
 t/test.o: t/test.c t/test1.hh t/test2.hh
 
@@ -41,11 +49,11 @@ t/test2.hh: $(wildcard t/*.c) Makefile
 	@grep -h -i '^void t_[a-z0-9_]*(void)' t/*.c | sed -e 's/void \(t_[a-z0-9_]*\).*/extern void \1(void); RUN_TEST(\1);/' > t/test2.hh
 	@echo Built t/test2.hh
 
-test: t/test$(EXE)
-	t/test$(EXE)
+test: t/test$(EXESUFFIX)
+	t/test$(EXESUFFIX)
 	t/run_tests.sh
 
 clean:
-	$(RM) t/test$(EXE) $(OBJS) $(DEPENDS)
+	$(RM) t/test$(EXESUFFIX) $(OBJS) $(DEPENDS)
 
 -include $(DEPENDS)

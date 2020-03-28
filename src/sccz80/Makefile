@@ -4,6 +4,13 @@
 # $Id: Makefile,v 1.17 2016-07-10 16:09:00 dom Exp $
 #
 
+# EXESUFFIX is passed when cross-compiling Win32 on Linux
+ifeq ($(OS),Windows_NT)
+  EXESUFFIX 		:= .exe
+else
+  EXESUFFIX 		?=
+endif
+
 INSTALL ?= install
 
 OBJS =	callfunc.o     	\
@@ -30,12 +37,12 @@ DEPENDS := $(OBJS:.o=.d)
 
 all: sccz80$(EXESUFFIX)
 
-CFLAGS += -MMD -Wall -I../../ext/uthash/src/ -g -pedantic
+CFLAGS += -MMD -Wall -I../../ext/uthash/src/ -g -pedantic -std=gnu99
 
 sccz80$(EXESUFFIX): $(OBJS)
 	$(CC) $(LDFLAGS) -o sccz80$(EXESUFFIX) $(OBJS) -lm
 
-install:
+install: sccz80$(EXESUFFIX)
 	$(INSTALL) -m 755 sccz80$(EXESUFFIX) $(PREFIX)/bin/$(EXEC_PREFIX)sccz80$(EXESUFFIX)
 
 clean :

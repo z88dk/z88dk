@@ -12,6 +12,7 @@ stdio/obj/ixiy/fchkstd
 stdio/obj/ixiy/fclose
 stdio/obj/ixiy/fdopen
 stdio/obj/ixiy/feof
+stdio/obj/ixiy/ferror
 stdio/obj/ixiy/fflush
 stdio/obj/ixiy/fgetc
 stdio/obj/ixiy/fgetpos
@@ -32,6 +33,7 @@ stdio/obj/ixiy/fseek
 stdio/obj/ixiy/ftell
 stdio/obj/ixiy/fwrite
 stdio/obj/ixiy/gets
+stdio/obj/ixiy/perror
 stdio/obj/ixiy/printf
 stdio/obj/ixiy/printk
 stdio/obj/ixiy/printk_outc
@@ -100,6 +102,7 @@ stdio/obj/ixiy/__printf_handle_llo
 stdio/obj/ixiy/__printf_handle_llu
 stdio/obj/ixiy/__printf_handle_llx
 stdio/obj/ixiy/kbhit
-stdio/obj/ixiy/fputc_cons_generic
+stdio/obj/ixiy/fputc_cons_generic_full
+stdio/obj/ixiy/fputc_cons_generic_minimal
 stdio/obj/ixiy/fputc_cons_generic_ioctl
-@stdio/conio.lst
+stdio/obj/ixiy/conio/**

@@ -753,7 +753,7 @@ void player_human(void)
       print_grain_report();
       puts("");
       
-      do { INPUT("1) Buy grain  2) Sell grain  3) Sell land ? ", "%d", &H); } while ((H < 0) || (H > 3));
+      do { INPUT("0) Skip 1) Buy grain  2) Sell grain  3) Sell land ? ", "%d", &H); } while ((H < 0) || (H > 3));
       puts("");
       
       action_grain_report();
@@ -910,7 +910,7 @@ void player_human(void)
       print_revenue_report();
       puts("");
       
-      do { INPUT("1) Customs duty  2) Sales tax  3) Income tax ? ", "%d", &E); } while ((E > 3) || (E < 0));
+      do { INPUT("0) Skip 1) Customs duty  2) Sales tax  3) Income tax ? ", "%d", &E); } while ((E > 3) || (E < 0));
       puts("");
 
       if (E == 0) break;

@@ -16,7 +16,9 @@
 _sprintf:
 	ld	hl,2
 	add	hl,sp	;points to buf
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	push	ix	;save callers
+ENDIF
 
 	ld	bc,65535
 	push	bc
@@ -46,6 +48,8 @@ _sprintf:
 	add	hl,sp
 	ld	sp,hl
 	ex	de,hl
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	pop	ix	;restore ix
+ENDIF
 	ret
 

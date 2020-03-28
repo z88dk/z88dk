@@ -2,7 +2,7 @@
    Chessboard lib demo/test program
    By Stefano Bodrato - 13/08/2001
    
-   $Id: chessboard.c,v 1.4 2015-09-17 20:36:52 aralbrec Exp $
+   $Id: chessboard.c $
    
 */
 
@@ -15,10 +15,14 @@
    #ifdef FANCY
       #include "fancychess.h"
    #else
-      #if defined __TI85__ || defined __TI86__ || defined __Z88__ || defined __VZ200__
+      #if defined __G800__ || defined __TI85__ || defined __TI86__ || defined __Z88__ || defined __VZ200__
          #include "ti_chessboard.h"
       #else
-         #include "chessboard.h"
+         #if defined __RX78__
+           #include "chessb16.h"
+         #else
+           #include "chessboard.h"
+         #endif
       #endif
    #endif
 #endif

@@ -206,10 +206,8 @@ cleanup:
 ;
         push    hl		; keep return code
 
-IF CRT_ENABLE_STDIO = 1
-        EXTERN     closeall
-        call    closeall
-ENDIF
+        call    crt0_exit
+
 		; The BASIC USR call would restore IY on return, but it could not be enough
         call    restore81
 
@@ -360,8 +358,6 @@ _hr_rows:
 ENDIF
 
 
-;                defm  "Small C+ ZX81"   ;Unnecessary file signature
-;                defb    0
         INCLUDE "crt/classic/crt_runtime_selection.asm"
 	INCLUDE "crt/classic/crt_section.asm"
 

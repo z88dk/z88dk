@@ -10,15 +10,20 @@ EXTERN asm_strspn
 
 strspn:
 
-   pop af
+   pop bc
    pop de
    pop hl
    
    push hl
    push de
-   push af
-   
+   push bc
+IF __CLASSIC && __CPU_GBZ80__
+   call asm_strspn
+   ld d,h
+   ld e,l
+ELSE
    jp asm_strspn
+ENDIF
 
 ; SDCC bridge for Classic
 IF __CLASSIC

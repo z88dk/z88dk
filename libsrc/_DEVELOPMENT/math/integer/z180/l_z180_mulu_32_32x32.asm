@@ -1,11 +1,28 @@
 ; 2018 June feilipu
 
-INCLUDE "config_private.inc"
-
 SECTION code_clib
 SECTION code_math
 
+EXTERN l_z180_mulu_32_16x16
+
 PUBLIC l_z180_mulu_32_32x32, l0_z180_mulu_32_32x32
+
+l0_z180_mulu_32_16x16:
+
+    ; multiplication of two 16-bit numbers into a 32-bit product
+    ;
+    ; enter : hl'= 16-bit multiplier   = y
+    ;         hl = 16-bit multiplicand = x
+    ;
+    ; exit  : dehl = 32-bit product
+    ;         carry reset
+    ;
+    ; uses  : af, hl, bc', de', hl'
+
+    push hl
+    exx
+    pop de
+    jp l_z180_mulu_32_16x16
 
 l_z180_mulu_32_32x32:
 
@@ -18,6 +35,15 @@ l_z180_mulu_32_32x32:
     ;         carry reset
     ;
     ; uses  : af, bc, de, hl, bc', de', hl'
+
+    xor a
+    or e
+    or d
+
+    exx
+    or e
+    or d
+    jr Z,l0_z180_mulu_32_16x16   ;   demote if both are uint16_t
 
     push hl
     exx
@@ -97,16 +123,15 @@ l0_z180_mulu_32_32x32:
     mlt hl                      ; x1*y1
 
     adc hl,bc                   ; HL = interim MSW p3 p2
-                                ; 32_16x16 = HLDE
-
-    push hl                     ; stack interim p3 p2
     ex de,hl                    ; DEHL = end of 32_16x16
+
+    push de                     ; stack interim p3 p2
 
     ; continue doing the p2 byte
 
     exx                         ; now we're working in the high order bytes
                                 ; DEHL' = end of 32_16x16
-    pop hl                      ; stack interim p3 p2
+    pop hl                      ; destack interim p3 p2
 
     pop bc                      ; x0 y0
     pop de                      ; x2 y2

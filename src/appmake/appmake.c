@@ -48,7 +48,9 @@ static void         cleanup_temporary_files(void);
 
 static int          num_temp_files = 0;
 static char       **temp_files = NULL;
+#ifdef WIN32
 static char         tmpnambuf[] = "apmXXXX";
+#endif
 
 
 int main(int argc, char *argv[])
@@ -178,7 +180,7 @@ void exit_log(int code, char *fmt, ...)
 
 
 /* Search through debris from z80asm for some important parameters */
-long parameter_search(char *filen, char *ext,char *target)
+long parameter_search(const char *filen,const  char *ext,const char *target)
 {
     char    name[FILENAME_MAX+1];
     char    buffer[LINEMAX+1];
@@ -199,7 +201,7 @@ long parameter_search(char *filen, char *ext,char *target)
 
      /* Successfully opened the file so search through it.. */
     while ( fgets(buffer,LINEMAX,fp) != NULL ) {
-        if (strncmp(buffer,target,strlen(target)) == 0 ) {
+        if (strncmp(buffer,target,strlen(target)) == 0 && isspace(buffer[strlen(target)])) {
             sscanf(buffer,"%*s%*s%*[ $]%lx",&val);
             break;
         }
@@ -226,9 +228,9 @@ long get_org_addr(char *crtfile)
    Otherwise, try to open the "normal" file.
 */
 
-FILE *fopen_bin(char *fname, char *crtfile)
+FILE *fopen_bin(const char *fname,const  char *crtfile)
 {
-    FILE   *fcode = NULL, *fdata = NULL, *fin = NULL;
+    FILE   *fcode = NULL, *fdata = NULL, *fin = NULL, *fhimem = NULL;
     char    name[FILENAME_MAX+1];
     char    tname[FILENAME_MAX+1];
     char    cmdline[FILENAME_MAX*2 + 128];
@@ -290,8 +292,13 @@ FILE *fopen_bin(char *fname, char *crtfile)
         strcpy(name, fname);
         suffix_change(name, "_DATA.bin");
         if ( stat(name, &st_file2) < 0 ) {
-             /* Nope, everything was all in one file */
-             return fcode;
+             /* What about having a _HIMEM.bin file? */
+             strcpy(name, fname);
+             suffix_change(name, "_HIMEM.bin");
+             if ( stat(name, &st_file2) < 0 ) {
+                 /* Nope, everything was all in one file */
+                 return fcode;
+             }
         }
     } else {
         // new c lib compile
@@ -311,7 +318,7 @@ FILE *fopen_bin(char *fname, char *crtfile)
 
     // 0: ram model, complete binary is "*_CODE.bin"
 
-    if (crt_model == 0) return fcode;
+    //if (crt_model == 0) return fcode;
 
     // form complete binary
 
@@ -338,12 +345,12 @@ FILE *fopen_bin(char *fname, char *crtfile)
         if ((fdata = fopen(name, "rb")) == NULL)
             exit_log(1, "ERROR: File %s not found for a rom model compile\n", name);
 
-    } else {
+    } else if ( crt_model == 2 ) {
 
         // 2: compressed rom model, complete binary is "*_CODE.bin" + zx7("*_DATA.bin")
 
         get_temporary_filename(tname);
-        snprintf(cmdline, FILENAME_MAX*2 + 127, "%szx7 -f %s %s", EXEC_PREFIX,name, tname);
+        snprintf(cmdline, FILENAME_MAX*2 + 127, "z88dk-zx7 -f %s %s", name, tname);
 
         if (system(cmdline) != 0)
             exit_log(1, "ERROR: Unable to compress %s\n", name);
@@ -353,9 +360,21 @@ FILE *fopen_bin(char *fname, char *crtfile)
 
     }
 
-    while ((c = fgetc(fdata)) != EOF)
-        fputc(c, fin);
-    fclose(fdata);
+    if ( fdata != NULL ) {
+        while ((c = fgetc(fdata)) != EOF)
+            fputc(c, fin);
+        fclose(fdata);
+    }
+
+    // If we have a HIMEM then append it as well
+    strcpy(name, fname);
+    suffix_change(name, "_HIMEM.bin");
+    if ( ( fhimem = fopen(name, "rb")) != NULL ) {
+        while ((c = fgetc(fhimem)) != EOF)
+            fputc(c, fin);
+        fclose(fhimem);
+    }
+
 
     // return complete binary file
 
@@ -363,31 +382,45 @@ FILE *fopen_bin(char *fname, char *crtfile)
     return fin;
 }
 
+int zcc_strrcspn(char *s, char *reject)
+{
+    int index, i;
+
+    index = 0;
+
+    for (i = 1; *s; ++i)
+    {
+        if (strchr(reject, *s++))
+            index = i;
+    }
+
+    return index;
+}
 
 /* Generic change suffix routine - make sure name is long enough to hold the suffix */
-void suffix_change(char *name, char *suffix)
+void suffix_change(char *name, const char *suffix)
 {
-    int j = strlen(name)-1;
+    int index;
 
-    while ( j && name[j-1] != '.' ) 
-        j--;
+    if ((index = zcc_strrcspn(name, "./\\")) && (name[index - 1] == '.'))
+        name[index - 1] = 0;
 
-    if ( j)
-        name[j-1]='\0';
-    strcat(name,suffix);
+    strcat(name, suffix);
 }
 
 /* Variant for the generic change suffix routine */
-void any_suffix_change(char *name, char *suffix, char suffix_delimiter)
+void any_suffix_change(char *name, const char *suffix, char suffix_delimiter)
 {
-    int j = strlen(name)-1;
+    int index;
 
-    while ( j && name[j-1] != suffix_delimiter ) 
-        j--;
+    static char delim[] = "./\\";
 
-    if ( j)
-        name[j-1]='\0';
-    strcat(name,suffix);
+    delim[0] = suffix_delimiter;
+
+    if ((index = zcc_strrcspn(name, delim)) && (name[index - 1] == delim[0]))
+        name[index - 1] = 0;
+
+    strcat(name, suffix);
 }
 
 void *must_malloc(size_t sz)
@@ -609,14 +642,11 @@ void writebyte(unsigned char c, FILE *fp)
         fputc(c,fp);
 }
 
-
-
 void writeword(unsigned int i, FILE *fp)
 {
     fputc(i%256,fp);
     fputc(i/256,fp);
 }
-
 
 void writestring(char *mystring, FILE *fp)
 {
@@ -627,13 +657,41 @@ void writestring(char *mystring, FILE *fp)
     }
 }
 
-
 void writelong(unsigned long i, FILE *fp)
 {
     writeword(i%65536,fp);
     writeword(i/65536,fp);
 }
 
+void writebyte_b(unsigned char c, uint8_t **pptr)
+{
+   uint8_t *ptr = *pptr;
+   *ptr++ = c;
+   *pptr = ptr; 
+}
+
+void writeword_b(unsigned int i, uint8_t **pptr)
+{
+   uint8_t *ptr = *pptr;
+   *ptr++ = i % 256;
+   *ptr++ = i / 256;
+   *pptr = ptr; 
+}
+
+void writestring_b(char *mystring, uint8_t **pptr)
+{
+    size_t c;
+
+    for (c=0; c < strlen(mystring); c++) {
+        writebyte_b(mystring[c],pptr);
+    }
+}
+
+void writelong_b(unsigned long i, uint8_t **pptr)
+{
+    writeword_b(i%65536,pptr);
+    writeword_b(i/65536,pptr);
+}
 
 
 void writeword_p(unsigned int i, FILE *fp,unsigned char *p)
@@ -722,8 +780,8 @@ void raw2wav(char *wavfile)
 {
     char    rawfilename[FILENAME_MAX+1];
     FILE    *fpin, *fpout;
-    int		c;
-    long	i, len;
+    int      c;
+    long     i, len;
 
     strcpy(rawfilename,wavfile);
 
@@ -1407,8 +1465,10 @@ int mb_user_remove_bank(struct banked_memory *memory, char *bankname)
     return 0;
 }
 
-int mb_compare_aligned(const struct section_aligned *a, const struct section_aligned *b)
+int mb_compare_aligned(const void *va, const void *vb)
 {
+    const struct section_aligned *a = va;
+    const struct section_aligned *b = vb;
     return strcmp(a->section_name, b->section_name);
 }
 
@@ -1431,8 +1491,10 @@ int mb_check_alignment(struct aligned_data *aligned)
     return errors;
 }
 
-int mb_compare_banks(const struct section_bin *a, const struct section_bin *b)
+int mb_compare_banks(const void *va, const void *vb)
 {
+    const struct section_bin *a = va;
+    const struct section_bin *b = vb;
     return a->org - b->org;
 }
 
@@ -1497,7 +1559,6 @@ int mb_sort_banks(struct banked_memory *memory)
 
         for (j = 0; j < MAXBANKS; ++j)
         {
-            struct memory_bank *mb = &bs->membank[j];
             errors += mb_sort_banks_check(&bs->membank[j], bs->org, bs->size);
         }
     }

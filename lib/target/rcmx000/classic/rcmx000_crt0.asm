@@ -66,10 +66,8 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
 	push	hl
-IF CRT_ENABLE_STDIO = 1
-	EXTERN	closeall
-	call	closeall
-ENDIF
+    call    crt0_exit
+
 
 	pop	bc
 start1:	ld	sp,0		;Restore stack to some sane value
@@ -82,7 +80,6 @@ l_dcal:	jp	(hl)		;Used for function pointer calls
 
 	; Here is a great place to store temp variables and stuff!!
 acme:	defw 4711 			; useless arbitrarily choosen number
-	defm  "Small C+ RCM2/3000",0	;Unnecessary file signature
 
 
         INCLUDE "crt/classic/crt_runtime_selection.asm"

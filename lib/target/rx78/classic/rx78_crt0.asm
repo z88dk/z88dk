@@ -69,10 +69,8 @@ cleanup:
 ;
         push    hl				; return code
 
-IF CRT_ENABLE_STDIO = 1
-        EXTERN     closeall
-        call    closeall
-ENDIF
+      call    crt0_exit
+
 
 
 cleanup_exit:
@@ -88,8 +86,6 @@ interrupt:
 l_dcal: jp      (hl)            ;Used for function pointer calls
 
 
-        defm    "Small C+ RX78"   ;Unnecessary file signature
-        defb    0
         INCLUDE "crt/classic/crt_runtime_selection.asm"
 
         defc    __crt_org_bss = CRT_ORG_BSS

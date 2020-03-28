@@ -12,6 +12,7 @@ stdio/obj/r2k/fchkstd
 stdio/obj/r2k/fclose
 stdio/obj/r2k/fdopen
 stdio/obj/r2k/feof
+stdio/obj/r2k/ferror
 stdio/obj/r2k/fflush
 stdio/obj/r2k/fgetc
 stdio/obj/r2k/fgetpos
@@ -32,6 +33,7 @@ stdio/obj/r2k/fseek
 stdio/obj/r2k/ftell
 stdio/obj/r2k/fwrite
 stdio/obj/r2k/gets
+stdio/obj/r2k/perror
 stdio/obj/r2k/printf
 stdio/obj/r2k/printk
 stdio/obj/r2k/printk_outc
@@ -99,6 +101,7 @@ stdio/obj/r2k/__printf_handle_llo
 stdio/obj/r2k/__printf_handle_llu
 stdio/obj/r2k/__printf_handle_llx
 stdio/obj/r2k/kbhit
-stdio/obj/r2k/fputc_cons_generic
+stdio/obj/r2k/fputc_cons_generic_full
+stdio/obj/r2k/fputc_cons_generic_minimal
 stdio/obj/r2k/fputc_cons_generic_ioctl
-@stdio/conio.lst
+stdio/obj/r2k/conio/**

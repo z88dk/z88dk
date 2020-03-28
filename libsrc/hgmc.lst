@@ -1,0 +1,13 @@
+target/hgmc/stdio/generic_console
+target/hgmc/stdio/generic_console_ioctl
+target/hgmc/stdio/generic_console_vpeek
+target/hgmc/stdio/CRT_FONT
+target/hgmc/stdio/fputc_cons_native
+target/hgmc/stdio/getk
+target/hgmc/stdio/fgetc_cons
+@stdio/stdio.lst
+@font/font_8x8/font_8x8.lst
+target/hgmc/graphics/pixladdr
+target/hgmc/graphics/clg
+@gfx/narrow/gfx_narrow.lst
+@z80.lst

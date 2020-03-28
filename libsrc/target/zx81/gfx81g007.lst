@@ -1,0 +1,13 @@
+@target/zx81/gfx81_specific.lst
+target/zx81/graphics_hr/clg
+target/zx81/graphics_hr/g007_clg_hr
+target/zx81/graphics_hr/g007_hardcopy
+target/zx81/stdio/ansi/f_ansi_char
+target/zx81/stdio/ansi/f_ansi_cls
+target/zx81/stdio/ansi/f_ansi_dline
+target/zx81/stdio/ansi/f_ansi_scrollup
+target/zx81/graphics/swapgfxbk
+target/zx81/graphics_hr/g007_pixladdr
+target/zx81/graphics_hr/g007_hrg_on
+target/zx81/graphics_hr/g007_hrg_off
+@gfx/narrow/gfx_narrow.lst

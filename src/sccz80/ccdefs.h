@@ -13,6 +13,7 @@
 
 #include <sys/types.h>
 #include <stdint.h>
+#include <string.h>
 #include <stdio.h>
 #include <ctype.h>
 
@@ -69,6 +70,7 @@ extern void       write_double_queue(void);
 extern void       decrement_double_ref(LVALUE *lval);
 extern void       increment_double_ref(LVALUE *lval);
 extern void       decrement_double_ref_direct(double value);
+extern void       indicate_double_written(int litlab);
 
 extern void       dofloat(double raw, unsigned char fa[]);
 #include "data.h"
@@ -94,6 +96,10 @@ extern void       declare_func_kr();
 extern int        ispointer(Type *type);
 extern void       type_describe(Type *type, UT_string *output);
 extern int        type_matches(Type *t1, Type *t2);
+extern void       parse_addressmod(void);
+extern namespace *get_namespace(const char *name);
+extern void       check_pointer_namespace(Type *lhs, Type *rhs);
+extern int        isutype(Type *type);
 
 /* error.c */
 extern int        endst(void);
@@ -160,7 +166,7 @@ extern int      c_fp_exponent_bias;
 extern int      skim(char *opstr, void (*testfuncz)(LVALUE* lval, int label), void (*testfuncq)(int label), int dropval, int endval, int (*heir)(LVALUE* lval), LVALUE *lval);
 extern void     dropout(int k, void (*testfuncz)(LVALUE* lval, int label), void (*testfuncq)(int label), int exit1, LVALUE *lval);
 extern int      plnge1(int (*heir)(LVALUE* lval), LVALUE *lval);
-extern void     plnge2a(int (*heir)(LVALUE* lval), LVALUE *lval, LVALUE *lval2, void (*oper)(LVALUE *lval), void (*doper)(LVALUE *lval), void (*constoper)(LVALUE *lval, int32_t constval));
+extern void     plnge2a(int (*heir)(LVALUE* lval), LVALUE *lval, LVALUE *lval2, void (*oper)(LVALUE *lval), void (*doper)(LVALUE *lval), void (*constoper)(LVALUE *lval, int32_t constval), int (*dconstoper)(LVALUE *lval, double const_val, int isrhs));
 extern void     plnge2b(int (*heir)(LVALUE* lval), LVALUE *lval, LVALUE *lval2, void (*oper)(LVALUE *lval));
 extern void     load_constant(LVALUE *lval);
 
@@ -203,13 +209,14 @@ extern int      constexpr(double *val, Kind *valtype, int flag);
 extern void     cscale(Type *type, int *val);
 extern int      docast(LVALUE *lval,LVALUE *dest_lval);
 extern void     convert_int_to_double(char type, char zunsign);
-extern int      utype(LVALUE *lval);
+extern int      ulvalue(LVALUE *lval);
 extern int      check_lastop_was_testjump(LVALUE *lval);
 extern int      check_range(LVALUE *lval, int32_t min_value, int32_t max_value) ;
+extern void     check_assign_range(Type *type, double const_value);
 
 /* stmt.c */
 extern int      statement(void);
-extern void     leave(int save,char type, int incritical);
+extern void     leave(Kind save,char type, int incritical);
 extern void     doasm(void);
 extern void     dopragma(void);
 extern void     doasmfunc(char wantbr);

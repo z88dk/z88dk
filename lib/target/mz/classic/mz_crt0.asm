@@ -2,6 +2,8 @@
 ;
 ;       Stefano Bodrato - 5/5/2000
 ;
+; 	UncleBod	-  2018-09-25
+;	Changed default org to 1200
 ;       $Id: mz_crt0.asm,v 1.24 2016-07-15 21:03:25 dom Exp $
 ;
 
@@ -28,7 +30,7 @@
 ; Now, getting to the real stuff now!
 
         IF      !DEFINED_CRT_ORG_CODE
-                defc    CRT_ORG_CODE  = $1300
+                defc    CRT_ORG_CODE  = $1200
         ENDIF
 
         defc    CONSOLE_COLUMNS = 40
@@ -60,10 +62,8 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
 
-IF CRT_ENABLE_STDIO = 1
-	EXTERN	closeall
-	call	closeall
-ENDIF
+    call    crt0_exit
+
 
 start1:
         ld      sp,0
@@ -75,8 +75,6 @@ l_dcal:	jp	(hl)		;Used for function pointer calls
 
 
 
-	defm  "Small C+ SHARP MZ"
-	defb	0
 
         INCLUDE "crt/classic/crt_runtime_selection.asm"
 

@@ -76,10 +76,8 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
 	push	hl
-IF CRT_ENABLE_STDIO = 1
-	EXTERN	closeall
-	call	closeall
-ENDIF
+    call    crt0_exit
+
 
 	pop	bc
 start1:	ld	sp,0		;Restore stack to entry value
@@ -99,8 +97,6 @@ montest: ld	a,(1)	; "T" monitor or NAS-SYS?
          ret
 
 
-         defm  "Small C+ NASCOM"	;Unnecessary file signature
-         defb	0
 
         INCLUDE "crt/classic/crt_runtime_selection.asm"
 	INCLUDE "crt/classic/crt_section.asm"

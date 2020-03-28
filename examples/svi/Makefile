@@ -9,7 +9,7 @@
 CC = zcc
 
 COMPILER ?= sccz80
-CFLAGS = +svi -vn -llib3d  -lm -lndos -create-app
+CFLAGS = +svi -vn -llib3d  -lm -lndos -create-app -DAMALLOC
 
 
 CFILES = \
@@ -35,9 +35,12 @@ ifeq ($(COMPILER),sdcc)
    CFLAGS += -compiler=sdcc  -SO3 --max-allocs-per-node200000 --fsigned-char 
 all: ex1.cas ex1b.cas ex2.cas ex3.cas ex6.cas ex7.cas ex10.cas ex10b.cas vpoke.cas vtstone.cas
 else
-all: $(EXECFILES) dstar.cas microman.cas othello.cas wall.cas globe.cas snakes.cas vtstone.cas
+   CFLAGS += -lsvibios
+all: $(EXECFILES) dstar.cas microman.cas othello.cas wall.cas globe.cas snakes.cas vtstone.cas psgtest.cas
 endif
 
+showlib3d.cas: ../msx/showlib3d.c
+	$(CC) $(CFLAGS) -oshowlib3d.bin ../msx/showlib3d.c
 
 #ex8.com: ex8.c
 #	$(CC) +cpm -create-app -lsvicpm -oex8 ex8.c
@@ -55,7 +58,7 @@ microman.cas: ../microman.c
 	$(CC) $(CFLAGS) ../microman.c -I.. -DSOUND -DJOYSTICK_DIALOG -create-app -omicroman.bin
 
 wall.cas: ../wall.c
-	$(CC) $(CFLAGS) ../wall.c -I.. -DJOYSTICK -DBANNERS -Dspritesize=8 -DSOUND -DCLOCK -create-app -owall.bin
+	$(CC) $(CFLAGS) ../wall.c -I.. -DJOYSTICK -DBANNERS -Dspritesize=8 -DSOUND -DCLOCK -create-app -owall.bin -lsvibios
 
 globe.cas: ../graphics/globe.c
 	$(CC) $(CFLAGS) ../graphics/globe.c -I../graphics -create-app -pragma-redirect=fputc_cons=putc4x6 -oglobe.bin
@@ -65,6 +68,9 @@ snakes.cas: ../graphics/snakes.c
 	
 vtstone.cas: ../console/vtstone.c
 	$(CC) $(CFLAGS) ../console/vtstone.c -I../console -clib=ansi -pragma-define:ansicolumns=80 -create-app -ovtstone.bin
+
+psgtest.cas: ../sound/psgtest.c
+	$(CC) $(CFLAGS) ../sound/psgtest.c -DNODELAY -create-app -opsgtest.bin
 
 clean:
 	$(RM) *.obj *.sym *.map *.o* *.bin zcc_opt.def *.reloc *.cas

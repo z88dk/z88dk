@@ -45,6 +45,6 @@ int z,buf;
 		}
 	}
 	
-	while (getk() != 13) {};
+	while (getk() != '\n') {};
 }
 

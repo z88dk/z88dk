@@ -8,7 +8,7 @@
 	ld	hl,%3
 =
 	ld	a,(hl)
-	cp	#(%1 % 256)
+	cp	+(%1 % 256)
 	jp	nz,%2
 	ld	hl,%3
 
@@ -38,7 +38,7 @@
 	ld	hl,%3
 =
 	ld	a,(hl)
-	cp	#(%1 % 256)
+	cp	+(%1 % 256)
 	jp	z,%2
 	ld	hl,%3
 
@@ -52,7 +52,7 @@
 	ld	hl,%3
 =
 	ld	a,(hl)
-	cp	#(%1 % 256)
+	cp	+(%1 % 256)
 	jp	z,%2
 	ld	hl,%3
 
@@ -66,7 +66,7 @@
 	ld	hl,%3
 =
 	ld	a,(hl)
-	cp	#(%1 % 256)
+	cp	+(%1 % 256)
 	jp	nz,%2
 	ld	hl,%3
 
@@ -82,7 +82,7 @@
 	ld	hl,%3
 =
 	ld	a,(hl)
-	and	#(%1 % 256)
+	and	+(%1 % 256)
 	jp	nz,%2
 	ld	hl,%3
 
@@ -98,7 +98,7 @@
 	ld	hl,%3
 =
 	ld	a,(hl)
-	and	#(%1 % 256)
+	and	+(%1 % 256)
 	jp	z,%2
 	ld	hl,%3
 
@@ -114,7 +114,7 @@
 	ld	(de),a
 =
 	ld	a,(hl)
-	or	#(%1 % 256)
+	or	+(%1 % 256)
 	ld	(hl),a
 	ld	l,a
 	ld	h,0
@@ -128,7 +128,7 @@
 	ld	(de),a
 =
 	ld	a,(hl)
-	or	#( ( 2 ** %1 ))
+	or	%eval(1 %1 <)
 	ld	(hl),a
 	ld	l,a
 	ld	h,0
@@ -189,7 +189,7 @@
 	ld	(de),a
 =
 	ld	a,(hl)
-	or	#(%1 % 256)
+	or	+(%1 % 256)
 	pop	de
 	ld	(de),a
 	ld	l,a
@@ -208,7 +208,7 @@
 .%2
 =
 	ld	a,(hl)
-	and	#(%1 % 256)
+	and	+(%1 % 256)
 	ld	(hl),a
 .%2
 
@@ -224,7 +224,7 @@
 .%2
 =
 	ld	a,(hl)
-	and	#(%1 % 256)
+	and	+(%1 % 256)
 	pop	de
 	ld	(de),a
 .%2
@@ -240,7 +240,7 @@
 	ld	(de),a
 =
 	ld	a,(hl)
-	and	#(%1 % 256)
+	and	+(%1 % 256)
 	pop	de
 	ld	(de),a
 	ld	l,a
@@ -257,7 +257,7 @@
 	ld	(de),a
 =
 	ld	a,(hl)
-	xor	#(%1 % 256)
+	xor	+(%1 % 256)
 	pop	de
 	ld	(de),a
 	ld	l,a
@@ -274,7 +274,7 @@
 	jp	z,%2
 =
 	ld	a,(hl)
-	and	#(%1 % 256)
+	and	+(%1 % 256)
 	jp	z,%2
 	ld	l,a
 	ld	h,0
@@ -288,7 +288,7 @@
 	add	hl,hl
 =
 	ld	a,(hl)
-	and	#(%1 % 256)
+	and	+(%1 % 256)
 	ld	l,a
 	ld	h,0
 	add	hl,hl
@@ -306,8 +306,8 @@
 	jp	c,%3
 =
 	ld	a,(hl)
-	and	#(%1 % 256)
-	cp	#(%2 % 256)
+	and	+(%1 % 256)
+	cp	+(%2 % 256)
 	ld	hl,1
 	jp	nz,%3
 	dec	hl
@@ -325,8 +325,8 @@
 	jp	nc,%3
 =
 	ld	a,(hl)
-	and	#(%1 % 256)
-	cp	#(%2 % 256)
+	and	+(%1 % 256)
+	cp	+(%2 % 256)
 	ld	hl,0
 	jp	z,%3
 	inc	hl
@@ -344,8 +344,8 @@
 	jp	nc,%3
 =
 	ld	a,(hl)
-	or	#(%1 % 256)
-	cp	#(%2 % 256)
+	or	+(%1 % 256)
+	cp	+(%2 % 256)
 	ld	hl,0
 	jp	z,%3
 	inc	hl
@@ -363,8 +363,8 @@
 	jp	nc,%3
 =
 	ld	a,(hl)
-	xor	#(%1 % 256)
-	cp	#(%2 % 256)
+	xor	+(%1 % 256)
+	cp	+(%2 % 256)
 	ld	hl,0
 	jp	z,%3
 	inc	hl
@@ -382,8 +382,8 @@
 	jp	nc,%3
 =
 	ld	a,(hl)
-	and	#(%1 % 256)
-	cp	#(%2 % 256)
+	and	+(%1 % 256)
+	cp	+(%2 % 256)
 	ld	hl,0
 	jp	nz,%3
 	inc	hl
@@ -401,8 +401,8 @@
 	jp	nc,%3
 =
 	ld	a,(hl)
-	or	#(%1 % 256)
-	cp	#(%2 % 256)
+	or	+(%1 % 256)
+	cp	+(%2 % 256)
 	ld	hl,0
 	jp	nz,%3
 	inc	hl
@@ -420,8 +420,8 @@
 	jp	nc,%3
 =
 	ld	a,(hl)
-	xor	#(%1 % 256)
-	cp	#(%2 % 256)
+	xor	+(%1 % 256)
+	cp	+(%2 % 256)
 	ld	hl,1
 	jp	nz,%3
 	dec	hl
@@ -721,7 +721,7 @@
 	ld	bc,%2
 	add	hl,bc
 =
-	ld	bc,%1+(%2)
+	ld	bc,%eval(%1 %2 +)
 	add	hl,bc
 
 	ld	l,(hl)
@@ -742,9 +742,9 @@
 	call	l_pint
 	ld	hl,%2
 =
-	ld	(hl),#(%1 % 256)
+	ld	(hl),+(%1 % 256)
 	inc	hl
-	ld	(hl),#(%1 / 256)
+	ld	(hl),+(%1 / 256)
 	ld	hl,%2
 
 	ld	hl,2	;const
@@ -773,7 +773,7 @@
 	ld	(de),a
 =
 	ld	a,(hl)
-	add	a,#(%1 % 256)
+	add	a,+(%1 % 256)
 	ld	(hl),a
 	ld	l,a
 	ld	h,0
@@ -819,7 +819,7 @@
 	ld	hl,%3
 =
 	ld	a,(hl)
-	cp	#(%1 % 256)
+	cp	+(%1 % 256)
 	jp	nc,%2
 	ld	hl,%3
 
@@ -833,7 +833,7 @@
 	ld	hl,%3
 =
 	ld	a,(hl)
-	cp	#(%1 % 256)
+	cp	+(%1 % 256)
 	jr	z,%2_ule
 	jp	nc,%2
 .%2_ule
@@ -850,7 +850,7 @@
 	ld	hl,%3
 =
 	ld	a,(hl)
-	cp	#(%1 % 256)
+	cp	+(%1 % 256)
 	jp	z,%2
 	jp	c,%2
 	ld	hl,%3
@@ -865,7 +865,7 @@
 	ld	hl,%3
 =
 	ld	a,(hl)
-	cp	#(%1 % 256)
+	cp	+(%1 % 256)
 	jp	c,%2
 	ld	hl,%3
 
@@ -874,6 +874,7 @@
 =
 	ld	(%1),hl
 
+#notcpu 8080
 	ld	(%1),hl
 	ld	(%1+2),de
 	ld	hl,(%1)
@@ -991,25 +992,25 @@
 	ld	d,h
 	ld	e,l
 
-	and	#(1 % 256)
+	and	+(1 % 256)
 	jp	z,%1
 =
 	rrca
 	jp	nc,%1
 
-	and	#(1 % 256)
+	and	+(1 % 256)
 	jp	nz,%1
 =
 	rrca
 	jp	c,%1
 
-	and	#(128 % 256)
+	and	+(128 % 256)
 	jp	z,%1
 =
 	rlca
 	jp	nc,%1
 
-	and	#(128 % 256)
+	and	+(128 % 256)
 	jp	nz,%1
 =
 	rlca
@@ -1045,7 +1046,7 @@
 	add	hl,bc
 	inc	hl
 =
-	ld	bc,%1+1
+	ld	bc,%eval(%1 1 +)
 	add	hl,bc
 
 	ld	hl,-%1	;const
@@ -1206,6 +1207,8 @@
 	ld	sp,hl
 	exx
 
+%notcpu 8080
+%notcpu gbz80
 	call	l_sub
 =
 	ex	de,hl
@@ -1267,6 +1270,7 @@
 	call	ufloat
 	call	dpush
 
+%notcpu gbz80
 	ld	hl,%1	;const
 	add	hl,sp
 	call	l_gint	;
@@ -1276,6 +1280,22 @@
 	ld	hl,%1	;const
 	call	l_gintspsp	;
 	ld	hl,%2	;const
+
+REMOVE THIS LINE FOR IT TO FIRE
+	ld	hl,%1
+	push	hl
+	ld	hl,%2
+	add	hl,sp
+	call	l_gint	;
+	add	hl,hl
+	pop	de
+	add	hl,de
+	call	l_gint	;
+=
+	ld	hl,%1
+	push	hl
+	ld	hl,%2
+	call	l_gintsp2de	;
 
 	ld	hl,%1	;const
 	add	hl,sp
@@ -1287,6 +1307,7 @@
 	call	l_gcharspsp	;
 	ld	hl,%2	;const
 
+%notcpu gbz80
 	ld	hl,%1	;const
 	call	l_gintspsp	;
 	ld	hl,%1	;const
@@ -1295,6 +1316,7 @@
 	ld	hl,%1	;const
 	call	l_g2intspsp	;
 
+%notcpu gbz80
 	ld	hl,%1	;const
 	call	l_gcharspsp	;
 	ld	hl,%1	;const
@@ -1339,7 +1361,7 @@
 	ld	(%2),a
 	ld	h%3
 =
-	ld	a,#(%1 % 256)
+	ld	a,+(%1 % 256)
 	ld	(%2),a
 	ld	h%3
 
@@ -1352,7 +1374,7 @@
 	ld	h%3
 =
 	pop	de
-	ld	a,#(%1 % 256)
+	ld	a,+(%1 % 256)
 	ld	(de),a
 	ld	h%3
 
@@ -1397,3 +1419,21 @@
 	ld	hl,0	;const
 	ld	d,h
 	ld	e,l
+
+	ld	hl,0	;const
+	rl	l
+	ld	h,0
+=
+	ld	hl,0	;const
+	rl	l
+
+	ld	l,(hl)
+	ld	h,0
+	ld	a,l
+	call	l_sxt
+=
+	ld	l,(hl)
+	ld	a,l
+	rla
+	sbc	a
+	ld	h,a

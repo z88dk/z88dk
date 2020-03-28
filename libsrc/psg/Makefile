@@ -6,8 +6,11 @@
 
 include ../Make.config
 
+SUBDIRS = wyz vt2
 
-AFILES = \
+CLEANDIRS = $(SUBDIRS:%=clean-%)
+
+CFILES = \
 	psg_channels.c \
 	psg_envelope.c \
 	psg_noise.c \
@@ -16,28 +19,29 @@ AFILES = \
 	psg_tone_channels.c \
 	psg_volume.c \
 
-SIDFILES = \
-	c128/psg_init.c \
-	c128/psg_channels.c \
-	c128/psg_envelope.c \
-	c128/psg_noise.c \
-	c128/psg_tone.c \
-	c128/psg_volume.c
-
-AOBJECTS = $(AFILES:.c=.o)
-SIDOBJECTS = $(SIDFILES:.c=.o)
-
-.PHONY:	dirs
-
-all:    dirs $(addprefix obj/z80/, $(AOBJECTS)) $(addprefix obj/ixiy/, $(AOBJECTS)) $(addprefix obj/, $(SIDOBJECTS))
+OBJECTS = $(CFILES:.c=.o)
 
 
-obj/c128/%.o: c128/%.c
-	$(ZCC) +c128 -mz80 $(CFLAGS) -o $@  $^
+all:    dirs $(SUBDIRS) $(addprefix obj/z80/, $(OBJECTS)) $(addprefix obj/ixiy/, $(OBJECTS))  $(addprefix obj/8080/, $(OBJECTS))
+
+
 
 dirs:
-	@mkdir -p obj/z80 obj/ixiy obj/c128
+	@mkdir -p obj/z80 obj/ixiy obj/8080
 
-clean:
+clean: subdirs-clean
 	$(RM) -fr obj
 	$(RM) -f */*.o
+	$(RM) zcc_opt.def
+
+.PHONY: dirs subdirs-all $(SUBDIRS) $(SUBDIRS_CLEAN)
+
+subdirs-all: $(SUBDIRS) 
+
+subdirs-clean: $(CLEANDIRS)
+
+$(SUBDIRS):
+	$(MAKE) -C $@ all
+
+$(CLEANDIRS):
+	$(MAKE) -C $(@:clean-%=%) clean

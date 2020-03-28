@@ -61,4 +61,4 @@ EXTERN SP1V_TEMP_IY
 
    jp sp1_MoveSprAbs_callee + ASMDISP_SP1_MOVESPRABS_CALLEE
 
-DEFC ASMDISP_SP1_MOVESPRPIX_CALLEE = # asmentry - sp1_MoveSprPix_callee
+DEFC ASMDISP_SP1_MOVESPRPIX_CALLEE = asmentry - sp1_MoveSprPix_callee

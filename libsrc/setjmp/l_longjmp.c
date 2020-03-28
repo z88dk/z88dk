@@ -20,7 +20,8 @@ void l_longjmp(jmp_buf *env, int val)
 	inc	bc	;cant return 0
 .longjmp1
 	pop	hl	;&env
-	ld	e,(hl)	;ix
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
+	ld	e,(hl)	;iy
 	inc	hl
 	ld	d,(hl)
 	inc	hl
@@ -29,9 +30,14 @@ void l_longjmp(jmp_buf *env, int val)
 	ld	e,(hl)	;ix
 	inc	hl
 	ld	d,(hl)
-	inc	hl
 	push	de
 	pop	ix
+ELSE
+	inc	hl
+	inc	hl
+	inc	hl
+ENDIF
+	inc	hl
 	ld	e,(hl)	;sp
 	inc	hl
 	ld	d,(hl)	
@@ -46,6 +52,10 @@ void l_longjmp(jmp_buf *env, int val)
 	push	de	;ret address
 	ld	l,c	;ret value
 	ld	h,b
+IF __CPU_GBZ80__
+    ld  d,h
+    ld  e,l
+ENDIF
 #pragma endasm
 }
 

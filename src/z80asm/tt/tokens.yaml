@@ -1,6 +1,6 @@
 # Z88DK Z80 Module Assembler
 #
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk
 #
@@ -139,7 +139,7 @@ tokens:
     regexp  : '"(" hspace "C"i index_reg_suffix'
 
   # Indirect 16-bit register
-  # TK_IND_IX|IY is followed by ')', '+' or '-', but follow char is not matched - 
+  # TK_IND_IX|IY is followed by ')', '+' or '-', but follow char is not matched -
   # can collect expression, will be positive or negative depending on symbol
   - name    : IND_BC
     regexp  : '"(" hspace "BC"i index_reg_suffix'
@@ -165,9 +165,15 @@ tokens:
     regexp  : '"(" hspace "IX"i index_reg_suffix'
     lexcode : 'p--; te--;'
 
+  - name    : IND_HLI
+    regexp  : '"(" hspace "HLI"i'
+
+  - name    : IND_HLD
+    regexp  : '"(" hspace "HLD"i'
+
   # Assembly keywords
   - name    : ASMPC
-  
+
   # Flags, C register
   - name    : NZ
   - name    : Z
@@ -200,7 +206,7 @@ tokens:
   - name    : IXL
   - name    : IYL
   - name    : X
-  
+
   # 16-bit registers
   - name    : BC
   - name    : DE
@@ -209,62 +215,70 @@ tokens:
   - name    : IY
   - name    : AF
   - name    : SP
-  
+  - name    : PSW
+
   - name    : B1
     regexp  : "\"B'\"i"
-  
+
   - name    : C1
     regexp  : "\"C'\"i"
-  
+
   - name    : D1
     regexp  : "\"D'\"i"
-  
+
   - name    : E1
     regexp  : "\"E'\"i"
-  
+
   - name    : H1
     regexp  : "\"H'\"i"
-  
+
   - name    : L1
     regexp  : "\"L'\"i"
-  
+
   - name    : A1
     regexp  : "\"A'\"i"
-  
+
   - name    : F1
     regexp  : "\"F'\"i"
-  
+
   - name    : BC1
     regexp  : "\"BC'\"i"
-  
+
   - name    : DE1
     regexp  : "\"DE'\"i"
-  
+
   - name    : HL1
     regexp  : "\"HL'\"i"
-  
+
   - name    : AF1
     regexp  : "\"AF'\"i"
-  
-  # 32-bit registers
-  - name    : A32
-  - name    : DEHL
-  
+
   # Assembly directives
   - name    : ALIGN
   - name    : BINARY
+  - name    : BYTE
   - name    : C_LINE
+  - name    : DB
+  - name    : DC
+  - name    : DDB
   - name    : DEFB
   - name    : DEFC
   - name    : DEFDB
   - name    : DEFGROUP
   - name    : DEFINE
   - name    : DEFM
+  - name    : DEFP
   - name    : DEFQ
   - name    : DEFS
   - name    : DEFVARS
   - name    : DEFW
   - name    : DEPHASE
+  - name    : DM
+  - name    : DP
+  - name    : DQ
+  - name    : DS
+  - name    : DW
+  - name    : DWORD
   - name    : ELIF
   - name    : ELIFDEF
   - name    : ELIFNDEF
@@ -283,26 +297,28 @@ tokens:
   - name    : MODULE
   - name    : ORG
   - name    : PHASE
+  - name    : PTR
   - name    : PUBLIC
   - name    : SECTION
   - name    : UNDEFINE
+  - name    : WORD
   - name    : XDEF
   - name    : XLIB
   - name    : XREF
-  
+
   # DEFGROUP storage specifiers
   - name    : DS_B
     regexp  : "\"DS.B\"i"
-    
+
   - name    : DS_W
     regexp  : "\"DS.W\"i"
-    
+
   - name    : DS_P
     regexp  : "\"DS.P\"i"
-    
+
   - name    : DS_Q
     regexp  : "\"DS.Q\"i"
-    
+
   # Z80 opcode specifiers
   - name    : ADC
   - name    : ADD
@@ -335,6 +351,8 @@ tokens:
   - name    : JP
   - name    : JR
   - name    : LD
+  - name    : LDH
+  - name    : LDHL
   - name    : LDD
   - name    : LDDR
   - name    : LDI
@@ -377,8 +395,9 @@ tokens:
   - name    : SLI
   - name    : SRA
   - name    : SRL
+  - name    : STOP
   - name    : SUB
-  - name    : XOR 
+  - name    : XOR
 
   # Z80-ZXN specific opcodes
   - name    : SWAPNIB
@@ -420,10 +439,15 @@ tokens:
   - name    : DMA_WR5
   - name    : DMA_WR6
   - name    : DMA_CMD
-  
+  - name 	: BSLA
+  - name 	: BSRA
+  - name 	: BSRL
+  - name 	: BSRF
+  - name 	: BRLC
+
   # Z180 specific opcodes
-  - name    : SLP 
-  - name    : MLT 
+  - name    : SLP
+  - name    : MLT
   - name    : IN0
   - name    : OUT0
   - name    : OTIM
@@ -457,10 +481,141 @@ tokens:
   - name    : SYSCALL
   - name    : UMA
   - name    : UMS
-  
+
   # Z88DK specific opcodes
   - name    : CALL_OZ
   - name    : CALL_PKG
   - name    : FPP
   - name    : INVOKE
-  
+
+  # Intel 8080/8085 specific opcodes
+  - name    : MOV
+  - name    : MVI
+  - name    : LXI
+  - name    : LDA
+  - name    : STA
+  - name    : LHLD
+  - name    : SHLD
+  - name    : LDAX
+  - name    : STAX
+  - name    : XCHG
+  - name    : ADI
+  - name    : ACI
+  - name    : SUI
+  - name    : SBB
+  - name    : SBI
+  - name    : INR
+  - name    : DCR
+  - name    : INX
+  - name    : DCX
+  - name    : DAD
+  - name    : ANA
+  - name    : ANI
+  - name    : ORA
+  - name    : ORI
+  - name    : XRA
+  - name    : XRI
+  - name    : CMP
+  - name    : RAL
+  - name    : RAR
+  - name    : CMA
+  - name    : CMC
+  - name    : STC
+  - name    : JMP
+  - name    : JNC
+  - name    : JC
+  - name    : JNZ
+  - name    : JZ
+  - name    : JPO
+  - name    : JPE
+  - name    : JNV
+  - name    : JV
+  - name    : JLO
+  - name    : JLZ
+  - name    : JM
+  - name    : JK
+  - name    : JX5
+  - name    : JNK
+  - name    : JNX5
+  - name    : J_NC
+  - name    : J_C
+  - name    : J_NZ
+  - name    : J_Z
+  - name    : J_PO
+  - name    : J_PE
+  - name    : J_NV
+  - name    : J_V
+  - name    : J_LO
+  - name    : J_LZ
+  - name    : J_P
+  - name    : J_M
+  - name    : J_K
+  - name    : J_X5
+  - name    : J_NK
+  - name    : J_NX5
+  - name    : CNC
+  - name    : CC
+  - name    : CNZ
+  - name    : CZ
+  - name    : CPO
+  - name    : CPE
+  - name    : CNV
+  - name    : CV
+  - name    : CLO
+  - name    : CLZ
+  - name    : CM
+  - name    : C_NC
+  - name    : C_C
+  - name    : C_NZ
+  - name    : C_Z
+  - name    : C_PO
+  - name    : C_PE
+  - name    : C_NV
+  - name    : C_V
+  - name    : C_LO
+  - name    : C_LZ
+  - name    : C_P
+  - name    : C_M
+  - name    : RNC
+  - name    : RC
+  - name    : RNZ
+  - name    : RZ
+  - name    : RPO
+  - name    : RPE
+  - name    : RNV
+  - name    : RV
+  - name    : RLO
+  - name    : RLZ
+  - name    : RP
+  - name    : RM
+  - name    : R_NC
+  - name    : R_C
+  - name    : R_NZ
+  - name    : R_Z
+  - name    : R_PO
+  - name    : R_PE
+  - name    : R_NV
+  - name    : R_V
+  - name    : R_LO
+  - name    : R_LZ
+  - name    : R_P
+  - name    : R_M
+  - name    : PCHL
+  - name    : XTHL
+  - name    : SPHL
+  - name    : HLT
+  - name    : RIM
+  - name    : SIM
+  - name    : DSUB
+  - name    : ARHL
+  - name    : RRHL
+  - name    : RDEL
+  - name    : RLDE
+  - name    : LDHI
+  - name    : LDSI
+  - name    : RSTV
+  - name    : OVRST8
+  - name    : SHLX
+  - name    : SHLDE
+  - name    : LHLX
+  - name    : LHLDE

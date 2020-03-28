@@ -2,15 +2,13 @@
 
 # Z88DK Z80 Module Assembler
 #
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk/
 #
 # Test BINARY
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 require './t/testlib.pl';
 
@@ -38,7 +36,6 @@ z80asm(<<END, "-b", 1, "", <<END);
 		binary "test1.dat"
 END
 Error at file 'test.asm' line 2: max. code size of 65536 bytes reached
-1 errors occurred during assembly
 END
 
 unlink_testfiles();
@@ -47,7 +44,6 @@ z80asm(<<END, "-b", 1, "", <<END);
 		binary "test1.dat"
 END
 Error at file 'test.asm' line 1: max. code size of 65536 bytes reached
-1 errors occurred during assembly
 END
 
 # -I; more complete tests in INCLUDE
@@ -60,7 +56,6 @@ z80asm(<<END, "-b", 1, "", <<END);
 		binary "test1.dat"
 END
 Error at file 'test.asm' line 1: cannot read file 'test1.dat'
-1 errors occurred during assembly
 END
 
 z80asm(<<END, "-b -Itest_dir");

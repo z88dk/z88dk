@@ -63,11 +63,17 @@ static struct zx_bin zxb = {
 
 static struct zxn_nex zxnex = {
     0,          // screen
+    0,          // nopalette
+    0,          // screen_ula
+    0,          // screen_lores
+    0,          // screen_hires
+    0,          // screen_hicol
     7,          // border
    -1,          // loadbar
     0,          // loaddelay
     0,          // startdelay
-    0           // norun
+    0,          // norun
+    0           // noreset
 };
 
 static char tap = 0;            // .tap tape
@@ -114,14 +120,20 @@ option_t zxn_options[] = {
 
     {  0,  "nex",          "Make .nex instead of .tap", OPT_BOOL,   &nex },
     {  0,  "nex-norun",    "Return to basic after loading", OPT_BOOL, &zxnex.norun },
-    {  0,  "nex-screen",   "File containing loading screen", OPT_STR, &zxnex.screen },
+    {  0,  "nex-screen",   "File containing loading screen (layer 2)", OPT_STR, &zxnex.screen },
+    {  0,  "nex-screen-no-palette", "No palette prepends loading screen", OPT_BOOL, &zxnex.nopalette },
+    {  0,  "nex-screen-is-ula", "Loading screen is ula (6912 bytes)", OPT_BOOL, &zxnex.screen_ula },
+    {  0,  "nex-screen-is-lores", "Loading screen is lores (12288 bytes)", OPT_BOOL, &zxnex.screen_lores },
+    {  0,  "nex-screen-is-hires", "Loading screen is hires (12288 bytes)", OPT_BOOL, &zxnex.screen_hires },
+    {  0,  "nex-screen-is-hicol", "Loading screen is hi-colour (12288 bytes)", OPT_BOOL, &zxnex.screen_hicol },
     {  0,  "nex-border",   "Initial border colour", OPT_INT, &zxnex.border },
     {  0,  "nex-loadbar",  "Load bar colour", OPT_INT, &zxnex.loadbar },
     {  0,  "nex-loaddel",  "Delay after loading a bank", OPT_INT, &zxnex.loaddelay },
-    {  0,  "nex-startdel", "Delay before starting\n", OPT_INT, &zxnex.startdelay },
+    {  0,  "nex-startdel", "Delay before starting", OPT_INT, &zxnex.startdelay },
+    {  0,  "nex-noreset",  "Do not reset nextreg state\n", OPT_BOOL, &zxnex.noreset },
 
     {  0,  "dot",      "Make esxdos dot command instead of .tap", OPT_BOOL, &dot },
-    {  0,  "dotn",     "Make nextos dot command instead of .tap", OPT_BOOL, &dotn },
+    {  0,  "dotn",     "Make nextos dot command instead of .tap\n", OPT_BOOL, &dotn },
 
     {  0,  "audio",     "Create also a WAV file",    OPT_BOOL,  &zxt.audio },
     {  0,  "ts2068",    "TS2068 BASIC relocation (if possible)",  OPT_BOOL,  &zxt.ts2068 },

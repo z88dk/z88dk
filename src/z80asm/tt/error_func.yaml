@@ -1,7 +1,7 @@
 # Z88DK Z80 Macro Assembler
 #
 # Copyright (C) Gunther Strube, InterLogic 1993-99
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #
@@ -9,12 +9,6 @@
 
 ---
 errors:
-  # Information
-  - type	: ErrInfo
-    func	: info_total_errors
-    args	: void
-    message	: '"%d errors occurred during assembly", get_num_errors()'
-	
   # File errors
   - type	: ErrError
     func	: error_read_file
@@ -35,17 +29,12 @@ errors:
   - type	: ErrError
     func	: error_no_src_file
     args	: void
-    message	: '"source filename missing"'
+    message	: '"source file missing"'
 	
   - type	: ErrError
     func	: error_illegal_option
     args	: const char *option
-    message	: "\"illegal option '%s'\", option"
-	
-  - type	: ErrError
-    func	: error_illegal_src_filename
-    args	: const char *filename
-    message	: "\"illegal source filename '%s'\", filename"
+    message	: "\"illegal option: %s\", option"
 	
   - type	: ErrError
     func	: error_glob
@@ -200,12 +189,12 @@ errors:
   - type	: ErrError
     func	: error_invalid_org
     args	: int origin
-    message	: "\"invalid ORG value '%d'\", origin"
+    message	: "\"invalid origin: %d\", origin"
 	
   - type	: ErrError
     func	: error_invalid_filler_option
     args	: const char *filler_hex
-    message	: "\"invalid --filler option '%s'\", filler_hex"
+    message	: "\"invalid filler value: %s\", filler_hex"
 	
   - type	: ErrWarn
     func	: warn_org_ignored

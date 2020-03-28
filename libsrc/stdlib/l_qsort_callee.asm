@@ -32,4 +32,4 @@ EXTERN Lqsort, l_jpiy
    pop hl
    ret
 
-DEFC ASMDISP_L_QSORT_CALLEE = # centry - l_qsort_callee
+DEFC ASMDISP_L_QSORT_CALLEE = centry - l_qsort_callee

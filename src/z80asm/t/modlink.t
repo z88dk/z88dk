@@ -3,15 +3,15 @@
 # Z88DK Z80 Macro Assembler
 #
 # Copyright (C) Gunther Strube, InterLogic 1993-99
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-# Repository: https://github.com/pauloscustodio/z88dk-z80asm
+# Repository: https://github.com/z88dk/z88dk
 #
 # Test linking of modules
 
 use Modern::Perl;
-BEGIN { 
-	use lib '.'; 
+BEGIN {
+	use lib '.';
 	use t::TestZ80asm;
 };
 use Capture::Tiny::Extended 'capture';
@@ -21,10 +21,10 @@ use Capture::Tiny::Extended 'capture';
 z80asm(
 	asm =>	<<'ASM',
 			org $1234
-			
+
 			public a1
 			extern a2, __head, __tail, __size
-			
+
 			ld	a, ASMPC -$1200	;$1234 ;; 3E 34
 			jp	ASMPC			;$1236 ;; C3 36 12
 			ld	b, a1 -$1200	;$1239 ;; 06 47
@@ -41,7 +41,7 @@ ASM
 	asm1 => <<'ASM1',
 			public a2
 			extern a1, __head, __tail, __size
-			
+
 			ld	a, ASMPC -$1200	;$1250 ;; 3E 50
 			jp	ASMPC			;$1252 ;; C3 52 12
 			ld	b, a2 -$1200	;$1255 ;; 06 63
@@ -66,7 +66,7 @@ z80asm(
 );
 
 z80nm("test.o test1.o", <<'END');
-Object  file test.o at $0000: Z80RMF12
+Object  file test.o at $0000: Z80RMF14
   Name: test
   Section "": 28 bytes, ORG $1234
     C $0000: 3E 00 C3 00 00 06 00 C3 00 00 21 00 00 01 00 00
@@ -89,7 +89,7 @@ Object  file test.o at $0000: Z80RMF12
     E Cw $0013 $0014: __head (section "") (file test.asm:14)
     E Cw $0016 $0017: __tail (section "") (file test.asm:15)
     E Cw $0019 $001A: __size (section "") (file test.asm:16)
-Object  file test1.o at $0000: Z80RMF12
+Object  file test1.o at $0000: Z80RMF14
   Name: test1
   Section "": 28 bytes, ORG $1234
     C $0000: 3E 00 C3 00 00 06 00 C3 00 00 21 00 00 01 00 00
@@ -114,7 +114,7 @@ Object  file test1.o at $0000: Z80RMF12
     E Cw $0019 $001A: __size (section "") (file test1.asm:14)
 END
 
-eq_or_diff scalar(read_file("test.map")), <<'END';
+is_text( scalar(read_file("test.map")), <<'END' );
 a1                              = $1247 ; addr, public, , test, , test.asm:13
 a2                              = $1263 ; addr, public, , test1, , test1.asm:11
 __head                          = $1234 ; const, public, def, , ,
@@ -124,39 +124,39 @@ END
 
 #------------------------------------------------------------------------------
 # Test sections
-my $expected_bin = pack("C*", 
-					0x21, 0x59, 0x12, 
-					0x01, 0x05, 0x00, 
-					0xCD, 0x50, 0x12, 
-					0x21, 0x5E, 0x12, 
-					0x01, 0x06, 0x00, 
-					0xCD, 0x50, 0x12, 
-					0x21, 0x64, 0x12, 
-					0x01, 0x01, 0x00, 
-					0xCD, 0x50, 0x12, 
-					0xC9, 
-					0x78, 
-					0xB1, 
-					0xC8, 
+my $expected_bin = pack("C*",
+					0x21, 0x59, 0x12,
+					0x01, 0x05, 0x00,
+					0xCD, 0x50, 0x12,
+					0x21, 0x5E, 0x12,
+					0x01, 0x06, 0x00,
+					0xCD, 0x50, 0x12,
+					0x21, 0x64, 0x12,
+					0x01, 0x01, 0x00,
+					0xCD, 0x50, 0x12,
+					0xC9,
+					0x78,
+					0xB1,
+					0xC8,
 					0x7E,
-					0x23, 
-					0xD7, 
-					0x0B, 
+					0x23,
+					0xD7,
+					0x0B,
 					0x18, 0xF7).
 				"hello".
 				" world".
 				".";
-					
+
 z80asm(
 	asm =>	<<'ASM',
 			org $1234
 
 			extern prmes, mes0, mes0end
-			
+
 			section code
 start:		ld hl,mes1
 			ld bc,mes1end - mes1
-			
+
 			section data
 mes1:		defm "hello"
 mes1end:
@@ -166,46 +166,46 @@ mes1end:
 			section code
 			ld hl,mes2
 			ld bc,mes2end - mes2
-			
+
 			section data
 mes2:		defm " world"
 mes2end:
 			section code
 			call prmes
-			
+
 			ld hl,mes0
 			ld bc,mes0end - mes0
 			call prmes
-			
+
 			section code
 			ret
 ASM
 	asm1 => <<'ASM1',
-	
-			section data			
+
+			section data
 mes0:		defm "."
 mes0end:
-			
+
 			section code
 prmes:		ld 	a, b
 			or 	c
 			ret z
-			
+
 			ld 	a, (hl)
 			inc	hl
-			
+
 			rst $10
-			
+
 			dec	bc
 			jr 	prmes
-			
+
 			; declare public in a different section
-			section data 
+			section data
 			public prmes
-			
+
 			section code
 			public mes0, mes0end
-			
+
 ASM1
 	options => "-b -l",
 	bin		=> $expected_bin,
@@ -218,7 +218,7 @@ z80asm(
 );
 
 z80nm("test.o test1.o", <<'END');
-Object  file test.o at $0000: Z80RMF12
+Object  file test.o at $0000: Z80RMF14
   Name: test
   Section "": 0 bytes, ORG $1234
   Section code: 28 bytes
@@ -246,7 +246,7 @@ Object  file test.o at $0000: Z80RMF12
     E Cw $0012 $0013: mes0 (section code) (file test.asm:25)
     E Cw $0015 $0016: mes0end-mes0 (section code) (file test.asm:26)
     E Cw $0018 $0019: prmes (section code) (file test.asm:27)
-Object  file test1.o at $0000: Z80RMF12
+Object  file test1.o at $0000: Z80RMF14
   Name: test1
   Section "": 0 bytes, ORG $1234
   Section code: 9 bytes
@@ -259,7 +259,7 @@ Object  file test1.o at $0000: Z80RMF12
     G A $0001 mes0end (section data) (file test1.asm:4)
 END
 
-eq_or_diff scalar(read_file("test.map")), <<'END';
+is_text( scalar(read_file("test.map")), <<'END' );
 mes1                            = $1259 ; addr, local, , test, data, test.asm:10
 start                           = $1234 ; addr, local, , test, code, test.asm:6
 mes1end                         = $125E ; addr, local, , test, data, test.asm:11
@@ -286,7 +286,7 @@ z80asm(
 		section code
 		section data
 		section bss
-		
+
 		section bss
 		defb 3
 ASM
@@ -294,7 +294,7 @@ ASM
 		section code
 		section data
 		section bss
-		
+
 		section data
 		defb 2
 ASM1
@@ -302,26 +302,26 @@ ASM1
 		section code
 		section data
 		section bss
-		
+
 		section code
 		defb 1
 ASM2
 	bin		=> "\1\2\3",
 );
 z80nm("test.o test1.o test2.o", <<'END');
-Object  file test.o at $0000: Z80RMF12
+Object  file test.o at $0000: Z80RMF14
   Name: test
   Section code: 0 bytes
   Section data: 0 bytes
   Section bss: 1 bytes
     C $0000: 03
-Object  file test1.o at $0000: Z80RMF12
+Object  file test1.o at $0000: Z80RMF14
   Name: test1
   Section code: 0 bytes
   Section data: 1 bytes
     C $0000: 02
   Section bss: 0 bytes
-Object  file test2.o at $0000: Z80RMF12
+Object  file test2.o at $0000: Z80RMF14
   Name: test2
   Section code: 1 bytes
     C $0000: 01
@@ -335,19 +335,19 @@ z80asm(
 	bin		=> "\1\2\3",
 );
 z80nm("test.o test1.o test2.o", <<'END');
-Object  file test.o at $0000: Z80RMF12
+Object  file test.o at $0000: Z80RMF14
   Name: test
   Section code: 0 bytes
   Section data: 0 bytes
   Section bss: 1 bytes
     C $0000: 03
-Object  file test1.o at $0000: Z80RMF12
+Object  file test1.o at $0000: Z80RMF14
   Name: test1
   Section code: 0 bytes
   Section data: 1 bytes
     C $0000: 02
   Section bss: 0 bytes
-Object  file test2.o at $0000: Z80RMF12
+Object  file test2.o at $0000: Z80RMF14
   Name: test2
   Section code: 1 bytes
     C $0000: 01
@@ -378,7 +378,7 @@ z80asm(
 );
 
 z80nm("test.o", <<'...');
-Object  file test.o at $0000: Z80RMF12
+Object  file test.o at $0000: Z80RMF14
   Name: test
   Section "": 8 bytes, ORG $0100
     C $0000: 00 00 00 00 00 00 00 00
@@ -423,7 +423,7 @@ ASM
 		section lib
 
 		public func1, func2
-		
+
 		section lib
 func1:	ret
 
@@ -437,10 +437,10 @@ ASM1
 
 		extern func1, func2
 		public func1_alias, func2_alias, computed_end
-		
+
 		defc func1_alias = func1		; link lib to lib
 		defc func2_alias = func2		; link lib to code
-		
+
 		defc computed_end = chain1 + 1
 		defc chain1 = chain2 - 1
 		defc chain2 = ASMPC
@@ -456,7 +456,7 @@ z80asm(
 );
 
 z80nm("test.o test1.o test2.o", <<'END');
-Object  file test.o at $0000: Z80RMF12
+Object  file test.o at $0000: Z80RMF14
   Name: test
   Section "": 0 bytes, ORG $1000
   Section code: 9 bytes
@@ -470,7 +470,7 @@ Object  file test.o at $0000: Z80RMF12
     E Cw $0000 $0001: func1_alias (section code) (file test.asm:7)
     E Cw $0003 $0004: func2_alias (section code) (file test.asm:8)
     E Cw $0006 $0007: computed_end (section code) (file test.asm:9)
-Object  file test1.o at $0000: Z80RMF12
+Object  file test1.o at $0000: Z80RMF14
   Name: test1
   Section "": 0 bytes, ORG $1000
   Section code: 1 bytes
@@ -480,7 +480,7 @@ Object  file test1.o at $0000: Z80RMF12
   Symbols:
     G A $0000 func1 (section lib) (file test1.asm:7)
     G A $0000 func2 (section code) (file test1.asm:10)
-Object  file test2.o at $0000: Z80RMF12
+Object  file test2.o at $0000: Z80RMF14
   Name: test2
   Section "": 0 bytes, ORG $1000
   Section code: 0 bytes
@@ -553,7 +553,7 @@ z80asm(
 );
 
 z80nm("test.o test1.o", <<'END');
-Object  file test.o at $0000: Z80RMF12
+Object  file test.o at $0000: Z80RMF14
   Name: test
   Section "": 4 bytes, ORG $1000
     C $0000: CD 00 00 C9
@@ -563,7 +563,7 @@ Object  file test.o at $0000: Z80RMF12
     U         func2
   Expressions:
     E Cw $0000 $0001: func2 (section "") (file test.asm:1)
-Object  file test1.o at $0000: Z80RMF12
+Object  file test1.o at $0000: Z80RMF14
   Name: test1
   Section "": 4 bytes, ORG $1000
     C $0000: CD 00 00 C9
@@ -585,11 +585,10 @@ write_file("test.asm", <<'END');
 				jp sd_write_block_2gb + ASMDISP_SD_WRITE_BLOCK_2GB_CALLEE ;; error: symbol 'sd_write_block_2gb' not defined
 END
 my($stdout, $stderr, $return, @dummy) = capture { system "z80asm test.asm"; };
-is $stdout, "";
-is $stderr, <<'END';
+is_text( $stdout, "" );
+is_text( $stderr, <<'END' );
 Error at file 'test.asm' line 5: symbol 'sd_write_block_2gb' not defined
 Error at file 'test.asm' line 1: symbol 'sd_write_block_2gb' not defined
-2 errors occurred during assembly
 END
 is !!$return, !!1;
 
@@ -604,7 +603,7 @@ z80asm(
 ...
 	asm1	=> <<'...',
 				PUBLIC asm_b_array_at
-				
+
 			asm_b_array_at:				; 1000
 				ret						; 1000 ;; C9
 										; 1001
@@ -612,7 +611,7 @@ z80asm(
 	asm2	=> <<'...',
 				EXTERN asm_b_vector_at
 				EXTERN asm_b_array_at
-				
+
 			start:						; 1001
 				call asm_b_vector_at	; 1001 ;; CD 00 10
 				call asm_b_array_at		; 1004 ;; CD 00 10
@@ -629,7 +628,7 @@ z80asm(
 );
 
 z80nm("test.o test1.o test2.o", <<'...');
-Object  file test.o at $0000: Z80RMF12
+Object  file test.o at $0000: Z80RMF14
   Name: test
   Section "": 0 bytes, ORG $1000
   Symbols:
@@ -638,13 +637,13 @@ Object  file test.o at $0000: Z80RMF12
     U         asm_b_array_at
   Expressions:
     E =  $0000 $0000: asm_b_vector_at := asm_b_array_at (section "") (file test.asm:4)
-Object  file test1.o at $0000: Z80RMF12
+Object  file test1.o at $0000: Z80RMF14
   Name: test1
   Section "": 1 bytes, ORG $1000
     C $0000: C9
   Symbols:
     G A $0000 asm_b_array_at (section "") (file test1.asm:3)
-Object  file test2.o at $0000: Z80RMF12
+Object  file test2.o at $0000: Z80RMF14
   Name: test2
   Section "": 7 bytes, ORG $1000
     C $0000: CD 00 00 CD 00 00 C9
@@ -665,36 +664,36 @@ write_file("test.asm", <<'...');
 		section bank0
 		org 0
 		public  start0, bank_switch_0, func0
-		
+
 	start0:
 		ret
-		
+
 		defs 8 - ASMPC
-		
+
 	bank_switch_0:
 		ret
-	
-	func0: 
+
+	func0:
 		ret
 ...
 write_file("test1.asm", <<'...');
-	
+
 		section bank1
 		org 0
 		public  start1, bank_switch_1, func1
 		extern  start0, func0
-		
+
 	start1:
 		call bank_switch_1
 		defw start0
-		
+
 		defs 8 - ASMPC
-		
+
 	bank_switch_1:
 		ret
-	
+
 		nop
-		
+
 	func1:
 		ret
 ...
@@ -703,7 +702,7 @@ write_file("test2.asm", <<'...');
 		section main
 		org $4000
 		extern  bank_switch_0, func0, bank_switch_1, func1
-		
+
 	main:
 		call bank_switch_0
 		defw func0
@@ -714,8 +713,8 @@ write_file("test2.asm", <<'...');
 my $cmd = "./z80asm -b test.asm test1.asm test2.asm";
 ok 1, $cmd;
 ($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
-eq_or_diff_text $stdout, "", "stdout";
-eq_or_diff_text $stderr, "", "stderr";
+is_text( $stdout, "", "stdout" );
+is_text( $stderr, "", "stderr" );
 ok !!$return == !!0, "retval";
 ok ! -f "test.bin", "test.bin";
 is read_binfile("test_bank0.bin"), "\xC9\0\0\0\0\0\0\0\xC9\xC9", "test_bank0.bin";
@@ -726,7 +725,7 @@ is read_binfile("test_main.bin"), "\xCD\x08\x00\x09\x00\xCD\x08\x00\x0A\x00\xC9"
 # Test consolidated object file
 write_file("test1.asm", <<'...');
 		global main, main1, print, lib_start, lib_end
-		
+
 		section code
 	main:
 		call lib_start
@@ -734,10 +733,10 @@ write_file("test1.asm", <<'...');
 		call print
 		call lib_end
 		ret
-		
+
 		section data
-	mess: defb "hello "	
-	
+	mess: defb "hello "
+
 		defc main1 = main
 ...
 
@@ -746,7 +745,7 @@ write_file("test2.asm", <<'...');
 
 		defc print = print1
 		defc printa1 = printa
-		
+
 		section code
 	printa:
 		ld a,(hl)
@@ -756,28 +755,28 @@ write_file("test2.asm", <<'...');
 		inc hl
 		call _delay
 		jp printa1
-		
+
 	_delay:
 		ld b,0
 	_delay_1:
 		dec b
 		jp nz, _delay_1
 		ret
-		
+
 		section data
 	mess: defb "world"
 ...
 
 write_file("test3.asm", <<'...');
 		global print1, printa
-		
+
 		section code
 	print1:
 		push hl
 		call printa
 		pop hl
 		ret
-		
+
 		section data
 	mess: defb "!", 0
 	dollar:	defw ASMPC
@@ -785,14 +784,14 @@ write_file("test3.asm", <<'...');
 
 write_file("test4.asm", <<'...');
 		global code_end
-		
+
 		section code
 	code_end:
 ...
 
 write_file("test_lib.asm", <<'...');
 		global lib_start, lib_end
-		
+
 		defc lib_start = 0
 		defc lib_end   = 0
 ...
@@ -809,11 +808,11 @@ my $bincode = sub {
 	my $l_dollar = 0;
 	my $l_delay = 0;
 	my $l_delay1 = 0;
-	
+
 	for my $pass (1..2) {
 		$code = "";
 		$data = "";
-		
+
 		# test1.asm
 		$l_main = $addr + length($code);
 		$code .= pack("Cv", 0xCD, 0).
@@ -821,9 +820,9 @@ my $bincode = sub {
 				 pack("Cv", 0xCD, $l_print).
 				 pack("Cv", 0xCD, 0).
 				 pack("C",  0xC9);
-				 
+
 		$data .= "hello ";
-		
+
 		# test2.asm
 		$l_printa = $addr + length($code);
 		$code .= pack("C*",	0x7E,
@@ -833,34 +832,34 @@ my $bincode = sub {
 							0x23).
 				 pack("Cv",	0xCD, $l_delay).
 				 pack("Cv",	0xC3, $l_printa);
-				 
+
 		$l_delay = $addr + length($code);
 		$code .= pack("C*",	0x06, 0x00);
-		
+
 		$l_delay1 = $addr + length($code);
 		$code .= pack("C*",	0x05).
 				 pack("Cv",	0xC2, $l_delay1).
 				 pack("C*",	0xC9);
-		
+
 		$data .= "world";
-				
+
 		# test3.asm
 		$l_print1 = $addr + length($code);
 		$code .= pack("C*",	0xE5).
 				 pack("Cv",	0xCD, $l_printa).
 				 pack("C*",	0xE1,
 							0xC9);
-							
+
 		$data .= "!\0";
 		$data .= pack("v", $l_dollar);
-		
+
 		if ($pass == 1) {
 			$l_mess = $addr + length($code);
 			$l_dollar = $addr + length($code) + length($data) - 2;
 			$l_print = $l_print1;
 		}
 	}
-	
+
 	my $bin = $code.$data;
 	return $bin;
 };
@@ -868,12 +867,12 @@ my $bincode = sub {
 $cmd = "./z80asm -s -otest.o test1.asm test2.asm test3.asm test4.asm";
 ok 1, $cmd;
 ($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
-eq_or_diff_text $stdout, "", "stdout";
-eq_or_diff_text $stderr, "", "stderr";
+is_text( $stdout, "", "stdout" );
+is_text( $stderr, "", "stderr" );
 ok !!$return == !!0, "retval";
 
 z80nm("test.o", <<'END');
-Object  file test.o at $0000: Z80RMF12
+Object  file test.o at $0000: Z80RMF14
   Name: test
   Section code: 37 bytes
     C $0000: CD 00 00 21 00 00 CD 00 00 CD 00 00 C9 7E A7 C8
@@ -913,7 +912,7 @@ Object  file test.o at $0000: Z80RMF12
     E Cw $0020 $0021: printa (section code) (file test3.asm:6)
 END
 
-eq_or_diff_text scalar(read_file("test.sym")), <<'END';
+is_text( scalar(read_file("test.sym")), <<'END' );
 test1_mess                      = $0000 ; addr, local, , , data, test1.asm:12
 test2_printa1                   = $0000 ; comput, local, , , , test2.asm:4
 test2__delay                    = $0018 ; addr, local, , , code, test2.asm:16
@@ -935,12 +934,12 @@ unlink "test.asm", "test.bin";
 $cmd = "./z80asm -b -m test.o test_lib.asm";
 ok 1, $cmd;
 ($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
-eq_or_diff_text $stdout, "", "stdout";
-eq_or_diff_text $stderr, "", "stderr";
+is_text( $stdout, "", "stdout" );
+is_text( $stderr, "", "stderr" );
 ok !!$return == !!0, "retval";
 test_binfile("test.bin", $bincode->(0));
 
-eq_or_diff_text scalar(read_file("test.map")), <<'END';
+is_text( scalar(read_file("test.map")), <<'END' );
 test1_mess                      = $0025 ; addr, local, , test, data, test1.asm:12
 test2_printa1                   = $000D ; addr, local, , test, , test2.asm:4
 test2__delay                    = $0018 ; addr, local, , test, code, test2.asm:16
@@ -973,12 +972,12 @@ unlink "test.asm", "test.bin";
 $cmd = "./z80asm -b -m -r0x1234 test.o test_lib.asm";
 ok 1, $cmd;
 ($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
-eq_or_diff_text $stdout, "", "stdout";
-eq_or_diff_text $stderr, "", "stderr";
+is_text( $stdout, "", "stdout" );
+is_text( $stderr, "", "stderr" );
 ok !!$return == !!0, "retval";
 test_binfile("test.bin", $bincode->(0x1234));
 
-eq_or_diff_text scalar(read_file("test.map")), <<'END';
+is_text( scalar(read_file("test.map")), <<'END' );
 test1_mess                      = $1259 ; addr, local, , test, data, test1.asm:12
 test2_printa1                   = $1241 ; addr, local, , test, , test2.asm:4
 test2__delay                    = $124C ; addr, local, , test, code, test2.asm:16
@@ -1023,8 +1022,8 @@ write_file("test_plat1.asm", <<'...');
 $cmd = "./z80asm -xtest_plat1.lib test_plat1 test_gen";
 ok 1, $cmd;
 ($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
-eq_or_diff_text $stdout, "", "stdout";
-eq_or_diff_text $stderr, "", "stderr";
+is_text( $stdout, "", "stdout" );
+is_text( $stderr, "", "stderr" );
 ok !!$return == !!0, "retval";
 
 
@@ -1040,8 +1039,8 @@ write_file("test_plat2.asm", <<'...');
 $cmd = "./z80asm -xtest_plat2.lib test_plat2 test_gen";
 ok 1, $cmd;
 ($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
-eq_or_diff_text $stdout, "", "stdout";
-eq_or_diff_text $stderr, "", "stderr";
+is_text( $stdout, "", "stdout" );
+is_text( $stderr, "", "stderr" );
 ok !!$return == !!0, "retval";
 
 
@@ -1056,8 +1055,8 @@ write_file("test.asm", <<'...');
 $cmd = "./z80asm -itest_plat1.lib -b test";
 ok 1, $cmd;
 ($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
-eq_or_diff_text $stdout, "", "stdout";
-eq_or_diff_text $stderr, "", "stderr";
+is_text( $stdout, "", "stdout" );
+is_text( $stderr, "", "stderr" );
 ok !!$return == !!0, "retval";
 test_binfile("test.bin", pack("C*", 0xC3, 3, 0, 0x3E, 1, 0xC9));
 
@@ -1066,17 +1065,17 @@ test_binfile("test.bin", pack("C*", 0xC3, 3, 0, 0x3E, 1, 0xC9));
 $cmd = "./z80asm -itest_plat2.lib -b test";
 ok 1, $cmd;
 ($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
-eq_or_diff_text $stdout, "", "stdout";
-eq_or_diff_text $stderr, "", "stderr";
+is_text( $stdout, "", "stdout" );
+is_text( $stderr, "", "stderr" );
 ok !!$return == !!0, "retval";
 test_binfile("test.bin", pack("C*", 0xC3, 3, 0, 0x3E, 2, 0xC9));
 
 z80nm("test_plat1.lib", <<'END');
-Library file test_plat1.lib at $0000: Z80LMF12
-Object  file test_plat1.lib at $0010: Z80RMF12
+Library file test_plat1.lib at $0000: Z80LMF14
+Object  file test_plat1.lib at $0010: Z80RMF14
   Name: test_plat1
 
-Object  file test_plat1.lib at $003F: Z80RMF12
+Object  file test_plat1.lib at $003F: Z80RMF14
   Name: test_gen
   Section "": 3 bytes
     C $0000: 3E 01 C9
@@ -1087,15 +1086,15 @@ END
 
 
 z80nm("test_plat2.lib", <<'END');
-Library file test_plat2.lib at $0000: Z80LMF12
-Object  file test_plat2.lib at $0010: Z80RMF12
+Library file test_plat2.lib at $0000: Z80LMF14
+Object  file test_plat2.lib at $0010: Z80RMF14
   Name: test_plat2
   Section "": 3 bytes
     C $0000: 3E 02 C9
   Symbols:
     G A $0000 putpixel (section "") (file test_plat2.asm:3)
 
-Object  file test_plat2.lib at $0077: Z80RMF12
+Object  file test_plat2.lib at $0077: Z80RMF14
   Name: test_gen
   Section "": 3 bytes
     C $0000: 3E 01 C9
@@ -1105,10 +1104,10 @@ Object  file test_plat2.lib at $0077: Z80RMF12
 END
 
 #------------------------------------------------------------------------------
-# Bug report: alvin (alvin_albrecht@hotmail.com) <lists@suborbital.org.uk> via lists.sourceforge.net 
+# Bug report: alvin (alvin_albrecht@hotmail.com) <lists@suborbital.org.uk> via lists.sourceforge.net
 # date:	Mon, Oct 17, 2016 at 8:11 AM
-# For some reason, in pietro_loader.asm, the symbols "__LOADER_head" and "__LOADER_CODE_tail" are 
-# being made public when a consolidated object is built.  It is only those two symbols despite 
+# For some reason, in pietro_loader.asm, the symbols "__LOADER_head" and "__LOADER_CODE_tail" are
+# being made public when a consolidated object is built.  It is only those two symbols despite
 # other section symbols being used in the same file.
 write_file("test1.asm", <<'...');
 	SECTION LOADER
@@ -1119,37 +1118,37 @@ write_file("test1.asm", <<'...');
 $cmd = "./z80asm test1.asm";
 ok 1, $cmd;
 ($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
-eq_or_diff_text $stdout, "", "stdout";
-eq_or_diff_text $stderr, "", "stderr";
+is_text( $stdout, "", "stdout" );
+is_text( $stderr, "", "stderr" );
 ok !!$return == !!0, "retval";
 
 $cmd = "../../src/z80nm/z80nm test1.o";
 ok 1, $cmd;
 ($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
 $stdout = join("\n", grep {/__/} split(/\n/, $stdout))."\n";
-eq_or_diff_text $stdout, <<'END', "stdout";
+is_text( $stdout, <<'END', "stdout" );
     U         __LOADER_head
     U         __LOADER_tail
 END
-eq_or_diff_text $stderr, "", "stderr";
+is_text( $stderr, "", "stderr" );
 ok !!$return == !!0, "retval";
 
 
 $cmd = "./z80asm --output=test1.o test1.asm";
 ok 1, $cmd;
 ($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
-eq_or_diff_text $stdout, "", "stdout";
-eq_or_diff_text $stderr, "", "stderr";
+is_text( $stdout, "", "stdout" );
+is_text( $stderr, "", "stderr" );
 ok !!$return == !!0, "retval";
 
 $cmd = "../../src/z80nm/z80nm test1.o";
 ok 1, $cmd;
 ($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
 $stdout = join("\n", grep {/__/} split(/\n/, $stdout))."\n";
-eq_or_diff_text $stdout, <<'END', "stdout";
+is_text( $stdout, <<'END', "stdout" );
     U         __LOADER_head
     U         __LOADER_tail
 END
-eq_or_diff_text $stderr, "", "stderr";
+is_text( $stderr, "", "stderr" );
 ok !!$return == !!0, "retval";
 

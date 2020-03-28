@@ -1,8 +1,9 @@
-globals.c
+error.asm
 load.asm
 load.c
 option.c
 path.c
-run.asm
 run.c
-usage.asm
+run-help.asm
+sort.c
+user_interaction.c

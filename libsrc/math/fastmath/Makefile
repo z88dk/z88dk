@@ -7,78 +7,42 @@ include ../../Make.config
 
 TARGET ?= test
 
-NEWLIB_LSTFILE = $(NEWLIB_DIRECTORY)/math/math_integer.lst
+NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/math/integer/fast/*.asm" "$(NEWLIB_DIRECTORY)/math/integer/small/*.asm" "$(NEWLIB_DIRECTORY)/math/integer/*.asm"
+NEWLIBZXNGLOBS := "$(NEWLIB_DIRECTORY)/math/integer/z80n/*.asm" 
+NEWLIB_TARGETS := obj/newlib-z80 obj/newlib-z80n obj/newlib-r2k obj/newlib-ixiy
 
-CLASSIC_ASM = $(wildcard _*.asm)
-CLASSIC_OBJ = $(CLASSIC_ASM:.asm=.o)
-CLASSIC_OBJECTS = $(addprefix obj/z80/, $(CLASSIC_OBJ)) $(addprefix obj/z80-zxn/, $(CLASSIC_OBJ)) $(addprefix obj/r2k/, $(CLASSIC_OBJ)) $(addprefix obj/ixiy/, $(CLASSIC_OBJ))
+space :=
+space +=
 
-NEWLIBASM := $(shell z88dk-lstmanip -r / -i $(NEWLIB_LSTFILE) -p $(NEWLIB_DIRECTORY) -t)
-NEWLIBOBJ := $(NEWLIBASM:.asm=.o)
-NEWLIB_OBJECTS := $(subst $(NEWLIB_DIRECTORY),obj/z80/,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/z80-zxn/,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/r2k/,$(NEWLIBOBJ)) $(subst $(NEWLIB_DIRECTORY),obj/ixiy/,$(NEWLIBOBJ))
+OBJECTS = $(CLASSIC_OBJECTS) 
 
-OBJECTS = $(CLASSIC_OBJECTS) $(NEWLIB_OBJECTS)
+.PHONY: dirs  $(NEWLIB_TARGETS)
 
-.PHONY: dirs
+all: dirs $(OBJECTS) $(NEWLIB_TARGETS) $(OUTPUT_DIRECTORY)/fastmath.lib $(OUTPUT_DIRECTORY)/fastmath_ixiy.lib
 
-all: dirs $(OBJECTS) fastmath.lst $(OUTPUT_DIRECTORY)/fastmath.lib $(OUTPUT_DIRECTORY)/fastmath_ixiy.lib
+obj/newlib-z80:  
+	@$(ASSEMBLER) -d -O=obj/z80/x -I.. -mz80 -D__CLASSIC $(NEWLIBGLOBS)
 
-obj/z80/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@$(ASSEMBLER) -I../ --cpu=z80 -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
+obj/newlib-r2k:  
+	@$(ASSEMBLER) -d -O=obj/r2k/x -I.. -mr2k -D__CLASSIC $(NEWLIBGLOBS)
 
-obj/ixiy/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@$(ASSEMBLER) -I../ --IXIY --cpu=z80 -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
+obj/newlib-z80n:  
+	@$(ASSEMBLER) -d -O=obj/z80n/x -I.. -mz80n -D__CLASSIC $(NEWLIBGLOBS)
+	@$(ASSEMBLER) -d -O=obj/z80n/x -I.. -mz80n -D__CLASSIC $(NEWLIBZXNGLOBS)
 
-obj/r2k/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@$(ASSEMBLER) -I../ --cpu=r2k -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
-
-obj/z80-zxn/%.o: $(NEWLIB_DIRECTORY)/%.asm
-	@$(ASSEMBLER) -I../ --cpu=z80-zxn -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
-
-obj/z80/%.o: %.asm
-	@$(ASSEMBLER) -I../ --cpu=z80 -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
-
-obj/ixiy/%.o: %.asm
-	@$(ASSEMBLER) -I../ --IXIY --cpu=z80 -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
-
-obj/r2k/%.o: %.asm
-	@$(ASSEMBLER) -I../ --cpu=r2k -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
-
-obj/z80-zxn/%.o: %.asm
-	@$(ASSEMBLER) -I../ --cpu=z80-zxn -D__CLASSIC $^
-	@mv $(^:.asm=.o) $@
-
-obj/z80/%.o: %.c
-	$(ZCC) +$(TARGET) $(CFLAGS) -o   $^
-
-obj/z80-zxn/%.o: %.c
-	$(ZCC) +$(TARGET) -mz80-zxn -custom-copt-rules=$(Z88DK_LIB)/zxn_rules.1 $(CFLAGS) -o   $^
-
-obj/ixiy/%.o: %.c
-	$(ZCC) +$(TARGET) -Ca--IXIY $(CFLAGS) -o $  $^
-
-obj/r2k/%.o: %.c
-	$(ZCC) +rcmx000 $(CFLAGS) -o $  $^
-
-fastmath.lst: $(OBJECTS)
-	@z88dk-lstmanip -r / -i $(NEWLIB_LSTFILE)  -p $(NEWLIB_DIRECTORY) -x 'obj/$${TYPE}' -c -o fastmath.lst
+obj/newlib-ixiy:  
+	@$(ASSEMBLER) -d -O=obj/ixiy/x -I.. -mz80 --IXIY -D__CLASSIC $(NEWLIBGLOBS)
 
 $(OUTPUT_DIRECTORY)/fastmath.lib: fastmath.lst
 	TYPE=z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/fastmath.lib @fastmath.lst
 
 $(OUTPUT_DIRECTORY)/fastmath_ixiy.lib: fastmath.lst
-	TYPE=z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/fastmath_ixiy.lib @fastmath.lst
+	TYPE=ixiy $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/fastmath_ixiy.lib @fastmath.lst
 
 dirs:
-	@mkdir -p $(dir $(OBJECTS))
+	@mkdir -p obj/z80 obj/z80n obj/ixiy obj/r2k
 
 
 clean:
-	$(RM) -fr obj fastmath.lst
+	$(RM) -fr obj
+	$(RM) zcc_opt.def

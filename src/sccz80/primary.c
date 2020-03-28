@@ -19,6 +19,7 @@ int primary(LVALUE* lval)
     char sname[NAMESIZE];
     SYMBOL* ptr;
     int k;
+
     if (cmatch('(')) {
         do {
             k = heir1(lval);
@@ -48,8 +49,7 @@ int primary(LVALUE* lval)
             lval->ptr_type = KIND_CHAR; /* djm 9/3/99 */
             lval->val_type = KIND_INT;
             lval->flags = FLAGS_NONE;
-            immedlit(litlab);
-            outdec(lval->const_val);
+            immedlit(litlab,lval->const_val);
             nl();
             return 0;
         } else if ((ptr = findloc(sname))) {
@@ -192,7 +192,7 @@ double calc(
             right = 0;
         }
         if ( is16bit ) return ((int16_t)left >> (int16_t)right);
-        else return ((int)left >> (int)right);
+        else return ((int32_t)left >> (int)right);
     } else
         return (CalcStand(left_kind, left, oper, right));
 }
@@ -221,7 +221,7 @@ double calcun(
             warningfmt("limited-range", "Right shifting by more than size of object, changed to zero");
             right = 0;
         }
-        return ((unsigned int)left >> (unsigned int)right);
+        return ((uint32_t)left >> (int)right);
     } else
         return (CalcStand(left_kind, left, oper, right));
 }
@@ -243,7 +243,7 @@ double CalcStand(
     else if (oper == zand)
         return ((unsigned int)left & (unsigned int)right);
     else if (oper == mult)
-        return ((unsigned int)left * (unsigned int)right);
+        return (left * right);
     else if (oper == asl) {
         if ( ((left_kind == KIND_INT || left_kind == KIND_CHAR) && right >= 16) ||
              (left_kind == KIND_LONG && right >= 32) ) {
@@ -278,11 +278,11 @@ void force(Kind t1, Kind t2, char isunsigned1, char isunsigned2, int isconst)
 
     if (t1 == KIND_DOUBLE) {
         if (t2 != KIND_DOUBLE) {
-            convert_int_to_double(t2, isunsigned2);
+            zconvert_to_double(t2, isunsigned2);
         }
     } else {
         if (t2 == KIND_DOUBLE) {
-            convdoub2int();
+            zconvert_from_double(t1, isunsigned1);
             return;
         }
     }
@@ -333,7 +333,7 @@ int widen(LVALUE* lval, LVALUE* lval2)
             mainpop();
             if (lval->val_type == KIND_LONG)
                 zpop();
-            convert_int_to_double(lval->val_type, lval->ltype->isunsigned);
+            zconvert_to_double(lval->val_type, lval->ltype->isunsigned);
             DoubSwap();
             lval->val_type = KIND_DOUBLE; /* type of result */
             lval->ltype = type_double;
@@ -341,7 +341,7 @@ int widen(LVALUE* lval, LVALUE* lval2)
         return (1);
     } else {
         if (lval->val_type == KIND_DOUBLE) {
-            convert_int_to_double(lval2->val_type, lval2->ltype->isunsigned);
+            zconvert_to_double(lval2->val_type, lval2->ltype->isunsigned);
             lval2->val_type = KIND_DOUBLE;
             lval2->ltype = type_double;
             return (1);
@@ -482,7 +482,7 @@ void prestep(
         //intcheck(lval, lval);
         switch (lval->ptr_type) {
         case KIND_DOUBLE:
-            zadd_const(lval, (n * 6));
+            zadd_const(lval, n * c_fp_size);
             break;
         case KIND_STRUCT:
             zadd_const(lval, n * lval->ltype->ptr->tag->size);
@@ -525,7 +525,7 @@ void poststep(
         rvalue(lval);
         switch (lval->ptr_type) {
         case KIND_DOUBLE:
-            nstep(lval, n * 6, unstep);
+            nstep(lval, n * c_fp_size, unstep);
             break;
         case KIND_STRUCT:
             nstep(lval, n * lval->ltype->ptr->tag->size, unstep);
@@ -710,6 +710,27 @@ int check_range(LVALUE *lval, int32_t min_value, int32_t max_value)
     return always;
 }
 
+#define CHECK(v, min, max) do { \
+        if ( v < min || v > max ) warningfmt("limited-range","Value is out of range for assignment"); \
+    } while (0)
+
+void check_assign_range(Type *type, double const_value)
+{
+    Kind lhs_val_type = type->kind;
+    int  factor = type->bit_size ? ((1 << type->bit_size) - 1) : 0xffff;
+
+    if ( lhs_val_type == KIND_INT && !isutype(type) ) {
+        CHECK(const_value, -(32767 & factor), (65535 & factor));
+    } else if ( lhs_val_type == KIND_INT && isutype(type) ) {
+        CHECK(const_value, 0, (65535 & factor));
+    } else if ( lhs_val_type == KIND_CHAR && !isutype(type) ) {
+        CHECK(const_value, -(127 & factor), (255 & factor));
+    } else if ( lhs_val_type == KIND_CHAR && isutype(type) ) {
+        CHECK(const_value, 0, (255 & factor));
+    }
+}
+#undef CHECK
+
 /** 
  * \retval 1 - If constant true
  * \retval 0 - If constant false
@@ -838,12 +859,11 @@ int docast(LVALUE* lval, LVALUE *dest_lval)
  * Check whether a type is unsigned..
  */
 
-int utype(LVALUE* lval)
+int ulvalue(LVALUE* lval)
 {
-    if (lval->ltype->isunsigned || ispointer(lval->ltype)) 
-        return (1);
-    return (0);
+    return isutype(lval->ltype);
 }
+
 
 /*
  * Check to see whether an operation should be testjumped or not
@@ -881,17 +901,3 @@ int check_lastop_was_comparison(LVALUE* lval)
     return (1);
 }
 
-/* Generate Code to Turn integer type of signed to double, Generic now does longs */
-void convert_int_to_double(char type, char zunsign)
-{
-    if (type == KIND_INT || type == KIND_CHAR) {
-        if (zunsign)
-            convUint2long();
-        else
-            convSint2long();
-    }
-    if (zunsign)
-        convUlong2doub();
-    else
-        convSlong2doub();
-}

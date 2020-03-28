@@ -36,122 +36,120 @@ option_t kc_options[] = {
  * Execution starts here
  */
 
-int kc_exec(char *target)
+int kc_exec(char* target)
 {
-    char    filename[FILENAME_MAX+1];
-    FILE   *fpin;
-    FILE   *fpout;
-    long    pos;
-	char	name[17];
-    int     len,namelen;
-    int     c,i;
-	int		nflag;
-    char   *p;
+    char filename[FILENAME_MAX + 1];
+    FILE* fpin;
+    FILE* fpout;
+    long pos;
+    int len;
+    int c, i;
+    int nflag;
+    char* p;
 
-    if ( help )
+    if (help)
         return -1;
 
-    if ( binname == NULL ) {
+    if (binname == NULL) {
         return -1;
     }
 
-    if ( outfile == NULL ) {
-        strcpy(filename,binname);
+    if (outfile == NULL) {
+        strcpy(filename, binname);
     } else {
-        strcpy(filename,outfile);
+        strcpy(filename, outfile);
     }
-	
+
     // strupr(filename);
     // not available on all platforms
-    
-    for (p = filename; *p !='\0'; ++p)
-       *p = toupper(*p);
+
+    for (p = filename; *p != '\0'; ++p)
+        *p = toupper(*p);
 
     //
 
-    suffix_change(filename,".KCC");
+    suffix_change(filename, ".KCC");
 
-    namelen=strlen(filename)-1;
-
-    if ( strcmp(binname,filename) == 0 ) {
-        fprintf(stderr,"Input and output file names must be different\n");
-        myexit(NULL,1);
+    if (strcmp(binname, filename) == 0) {
+        fprintf(stderr, "Input and output file names must be different\n");
+        myexit(NULL, 1);
     }
 
-	if ( blockname == NULL )
-		blockname = binname;
+    if (blockname == NULL)
+        blockname = binname;
 
-    if ( origin != -1 ) {
+    if (origin != -1) {
         pos = origin;
     } else {
-		if ( (pos = get_org_addr(crtfile)) == -1 ) {
-            myexit("Could not find parameter ZORG (not z88dk compiled?)\n",1);
+        if ((pos = get_org_addr(crtfile)) == -1) {
+            myexit("Could not find parameter ZORG (not z88dk compiled?)\n", 1);
         }
     }
 
-	if ( (fpin=fopen_bin(binname, crtfile) ) == NULL ) {
-        fprintf(stderr,"Can't open input file %s\n",binname);
-        myexit(NULL,1);
+    if ((fpin = fopen_bin(binname, crtfile)) == NULL) {
+        fprintf(stderr, "Can't open input file %s\n", binname);
+        myexit(NULL, 1);
     }
 
-    if (fseek(fpin,0,SEEK_END)) {
-        fprintf(stderr,"Couldn't determine size of file\n");
+    if (fseek(fpin, 0, SEEK_END)) {
+        fprintf(stderr, "Couldn't determine size of file\n");
         fclose(fpin);
-        myexit(NULL,1);
+        myexit(NULL, 1);
     }
 
-    len=ftell(fpin);
+    len = ftell(fpin);
 
-    fseek(fpin,0L,SEEK_SET);
+    fseek(fpin, 0L, SEEK_SET);
 
-    if ( (fpout=fopen(filename,"wb") ) == NULL ) {
+    if ((fpout = fopen(filename, "wb")) == NULL) {
         fclose(fpin);
-        myexit("Can't open output file\n",1);
+        myexit("Can't open output file\n", 1);
     }
-	
-	
-	/* deal with the filename */
-	nflag=0;
-	for (i=0; i<8; i++) {
-		if (nflag)
-			writebyte(0,fpout);
-		else {
-			if (!isalnum(blockname[i])) {
-				writebyte(0,fpout);
-				nflag++;
-			} else {
-				writebyte(toupper(blockname[i]),fpout);
-			}
-		}
-	}
 
-	writebyte('K',fpout);
-	writebyte('C',fpout);
-	writebyte('C',fpout);
+    /* deal with the filename */
+    nflag = 0;
+    for (i = 0; i < 8; i++) {
+        if (nflag)
+            writebyte(0, fpout);
+        else {
+            if (!isalnum(blockname[i])) {
+                writebyte(0, fpout);
+                nflag++;
+            } else {
+                writebyte(toupper(blockname[i]), fpout);
+            }
+        }
+    }
 
-    for (i=0; i<5; i++)
-		writebyte(0,fpout);
+    writebyte('K', fpout);
+    writebyte('C', fpout);
+    writebyte('C', fpout);
 
-	writebyte(3,fpout);		/* 0x02 = load, 0x03 = autostart */
+    for (i = 0; i < 5; i++)
+        writebyte(0, fpout);
 
-    writeword(pos,fpout);
-    writeword(pos+len,fpout);
-    writeword(pos,fpout);	/* start address */
+    writebyte(3, fpout); /* 0x02 = load, 0x03 = autostart */
 
-	for	(i=0;i<105;i++)
-		writebyte(0,fpout);
+    writeword(pos, fpout);
+    writeword(pos + len, fpout);
+    writeword(pos, fpout); /* start address */
 
-    for ( i = 0; i < len; i++) {
+    for (i = 0; i < 105; i++)
+        writebyte(0, fpout);
+
+    for (i = 0; i < len; i++) {
         c = getc(fpin);
-        writebyte(c,fpout);
+        writebyte(c, fpout);
     }
-	
+
+    // Pad the block out to 128 bytes
+    while( (i % 128) > 0) {
+        writebyte(0, fpout);
+        i++;
+    }
+
     fclose(fpin);
     fclose(fpout);
-    
 
     return 0;
 }
-
-
-

@@ -25,7 +25,9 @@ static char   *c_default_categories[] = {
     "incorrect-function-declspec",
     "invalid-value",
     "invalid-function-definition",
-    "limited-range"
+    "limited-range",
+    "implicit-function-definition",
+    "unsupported-feature"
 };
 static int     c_default_categories_num = sizeof(c_default_categories) / sizeof(c_default_categories[0]);
 
@@ -104,6 +106,8 @@ void warningfmt(const char *category, const char *fmt, ...)
 {
     int pass = 0;
 
+    if ( buffer_fps_num ) return;
+
     if ( c_warning_all ) {
         pass = 1;
     } else {
@@ -135,6 +139,7 @@ void warningfmt(const char *category, const char *fmt, ...)
 
 void errorva(int fatal, const char *fmt, va_list ap)
 {
+    if ( buffer_fps_num ) return;
     fprintf(stderr, "sccz80:%s L:%d Error:", Filename, lineno);
     vfprintf(stderr, fmt, ap);
     fprintf(stderr, "\n");

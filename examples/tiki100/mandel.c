@@ -12,6 +12,7 @@
 #include <math.h>
 #include <tiki100.h>
 #include <graphics.h>
+#include <conio.h>
 
 
 float a,b,c,d,e,g,h,i,j;
@@ -42,10 +43,10 @@ void main()
 	g=(b-a)/(float)xmax;
 	h=(d-c)/(float)ymax;
 	
-	for(y=ymax; y>0; y--)
+	for(y=ymax; y>=0; y--)
 	{
 	  j=(float)y*h+c;
-	  for(x=xmax; x>0; x--)
+	  for(x=xmax; x>=0; x--)
 	  {
 	     i=(float)x*g+a;
 	     k=0;
@@ -61,15 +62,8 @@ l110:	     k++;
 			if ((n+o)<e) goto l110;
 
 				/* Trick to plot in color with the BW function */
-				if (k&1)
-					plot(x*4,y);
-				if (k&2)
-					plot(x*4+1,y);
-				if (k&4)
-					plot(x*4+2,y);
-				if (k&8)
-					plot(x*4+3,y);
-
+				textcolor(k&15);
+				plot(x,y);
 	     }
 	  }
 	}

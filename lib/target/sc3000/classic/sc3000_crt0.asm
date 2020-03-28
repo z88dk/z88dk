@@ -48,31 +48,3 @@ msxbios:
 
 _sc_cursor_pos: defw    0x9489
 
-        SECTION         bss_crt
-
-        PUBLIC  raster_procs    ;Raster interrupt handlers
-        PUBLIC  pause_procs     ;Pause interrupt handlers
-
-        PUBLIC  timer           ;This is incremented every time a VBL/HBL interrupt happens
-        PUBLIC  _pause_flag     ;This alternates between 0 and 1 every time pause is pressed
-
-        PUBLIC  RG0SAV          ;keeping track of VDP register values
-        PUBLIC  RG1SAV
-        PUBLIC  RG2SAV
-        PUBLIC  RG5SAV
-        PUBLIC  RG6SAV
-        PUBLIC  RG7SAV
-
-raster_procs:           defw    0       ;Raster interrupt handlers
-pause_procs:            defs    8       ;Pause interrupt handlers
-timer:                  defw    0       ;This is incremented every time a VBL/HBL interrupt happens
-_pause_flag:            defb    0       ;This alternates between 0 and 1 every time pause is pressed
-RG0SAV:			defb    0       ;keeping track of VDP register values
-RG1SAV:			defb    0
-RG2SAV:			defb    0
-RG3SAV:			defb    0
-RG4SAV:			defb    0
-RG5SAV:			defb    0
-RG6SAV:			defb    0
-RG7SAV:			defb    0
-

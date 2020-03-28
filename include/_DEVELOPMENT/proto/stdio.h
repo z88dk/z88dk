@@ -49,27 +49,33 @@ extern FILE *stdout;
 extern FILE *stderr;
 
 #ifdef __CPM
-
 extern FILE *stdrdr;
 extern FILE *stdpun;
 extern FILE *stdlst;
+#endif
 
+#ifdef __HBIOS
+extern FILE *ttyin;
+extern FILE *ttyout;
+extern FILE *ttyerr;
 #endif
 
 #ifdef __RC2014
-
 extern FILE *ttyin;
 extern FILE *ttyout;
 extern FILE *ttyerr;
+#endif
 
+#ifdef __SCZ180
+extern FILE *ttyin;
+extern FILE *ttyout;
+extern FILE *ttyerr;
 #endif
 
 #ifdef __YAZ180
-
 extern FILE *ttyin;
 extern FILE *ttyout;
 extern FILE *ttyerr;
-
 #endif
 
 // FUNCTIONS

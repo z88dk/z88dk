@@ -1,5 +1,6 @@
 @adt/adt_sdcc_ix.lst
 @alloc/alloc_sdcc_ix.lst
+@arch/cpm/cpm_sdcc_ix.lst
 @compress/compress_sdcc_ix.lst
 @ctype/ctype_sdcc_ix.lst
 @drivers/drivers.lst
@@ -9,6 +10,7 @@
 @font/font_8x8/fonts.lst
 @font/fzx/fzx_sdcc_ix.lst
 @im2/im2_sdcc.lst
+@input/cpm/input_sdcc_ix.lst
 @inttypes/inttypes_sdcc_ix.lst
 @l/l.lst
 @l/sdcc.lst
@@ -16,15 +18,16 @@
 @locale/locale.lst
 @math/math_integer.lst
 @math/math_integer_z180.lst
-@math/math_float_sdcc_ix.lst
+@math/math_float_sdcc_ix_z180.lst
 @network/network_sdcc_ix.lst
 @setjmp/setjmp_sdcc_ix.lst
 @stdio/stdio_sdcc_ix.lst
 @stdlib/stdlib_sdcc_ix.lst
 @string/string_sdcc_ix.lst
 @target/yaz180/default/default.lst
-@target/yaz180/device/device.lst
-@target/yaz180/driver/driver_sdcc_ix.lst
+@target/yaz180/device/device_sdcc.lst
+@target/yaz180/driver/driver_sdcc.lst
+@target/cpm/driver/driver.lst
 @threads/threads_sdcc_ix.lst
 @time/time_sdcc.lst
 @z180/z180_sdcc.lst

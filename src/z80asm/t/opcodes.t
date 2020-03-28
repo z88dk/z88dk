@@ -9,7 +9,7 @@ BEGIN {
 };
 
 z80asm(
-    options => "-l -b --cpu=z80",
+    options => "-l -b -mz80",
     asm1 => <<'END_ASM',
         public ZERO
         defc ZERO    = 0
@@ -21,9 +21,9 @@ END_ASM
 ; Input data for tests, to be parsed by build_opcodes.pl
 ;
 ; Copyright (C) Gunther Strube, InterLogic 1993-99
-; Copyright (C) Paulo Custodio, 2011-2017
+; Copyright (C) Paulo Custodio, 2011-2019
 ; License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-; Repository: https://github.com/pauloscustodio/z88dk-z80asm
+; Repository: https://github.com/z88dk/z88dk
 ;------------------------------------------------------------------------------
 
         org  0100h
@@ -77,10 +77,8 @@ END_ASM
         ld   bc,1                       ;; 01 01 00
         ld   bc,32767                   ;; 01 FF 7F
         ld   bc,65535                   ;; 01 FF FF
-        ld   bc,-32769                  ;; warn 2: integer '-32769' out of range
-                                        ;; 01 FF 7F
-        ld   bc,65536                   ;; warn 2: integer '65536' out of range
-                                        ;; 01 00 00
+        ld   bc,-32769                  ;; 01 FF 7F
+        ld   bc,65536                   ;; 01 00 00
 
 ; 32-bit arithmetic, long range is not tested on a 32bit long
         defq 0xFFFFFFFF                 ;; FF FF FF FF
@@ -92,10 +90,8 @@ END_ASM
         call 0                          ;; CD 00 00
         call 1                          ;; CD 01 00
         call 65535                      ;; CD FF FF
-        call -32769                     ;; warn 2: integer '-32769' out of range
-                                        ;; CD FF 7F
-        call 65536                      ;; warn 2: integer '65536' out of range
-                                        ;; CD 00 00
+        call -32769                     ;; CD FF 7F
+        call 65536                      ;; CD 00 00
 
 ;------------------------------------------------------------------------------
 ; Expressions
@@ -108,8 +104,8 @@ label_2: ld   a,3                       ;; 3E 03
 
         defw label_1, label_2           ;; 6D 01 6F 01
         defw ZERO+label_1               ;; 6D 01
-        defb #label_2-label_1           ;; 02
-        defb #ZERO+label_2-label_1      ;; 02
+        defb +label_2-label_1           ;; 02
+        defb +ZERO+label_2-label_1      ;; 02
 
         defb 255,128,0,-128             ;; FF 80 00 80
         defb ZERO+255,ZERO-128          ;; FF 80
@@ -2232,7 +2228,7 @@ ENDIF
 END_ASM
 );
 z80asm(
-    options => "-l -b --cpu=z80",
+    options => "-l -b -mz80",
     asm  => <<'END_ASM',
         ldx                             ;; error: syntax error
         ld                              ;; error: syntax error
@@ -2320,20 +2316,17 @@ IF      !RABBIT
         out  N,a                        ;; error: syntax error
 ENDIF   
         call_oz 0                       ;; error: integer '0' out of range
-        call_oz 65536                   ;; error: integer '65536' out of range
 IF      !RABBIT
         call_pkg -1                     ;; error: integer '-1' out of range
-        call_pkg 65536                  ;; error: integer '65536' out of range
 ENDIF   
         fpp  0                          ;; error: integer '0' out of range
         fpp  255                        ;; error: integer '255' out of range
         fpp  256                        ;; error: integer '256' out of range
         invoke -1                       ;; error: integer '-1' out of range
-        invoke 65536                    ;; error: integer '65536' out of range
 END_ASM
 );
 z80asm(
-    options => "-l -b --cpu=r2k -DRABBIT",
+    options => "-l -b -mr2k -DRABBIT",
     asm1 => <<'END_ASM',
         public ZERO
         defc ZERO    = 0
@@ -2345,9 +2338,9 @@ END_ASM
 ; Input data for tests, to be parsed by build_opcodes.pl
 ;
 ; Copyright (C) Gunther Strube, InterLogic 1993-99
-; Copyright (C) Paulo Custodio, 2011-2017
+; Copyright (C) Paulo Custodio, 2011-2019
 ; License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-; Repository: https://github.com/pauloscustodio/z88dk-z80asm
+; Repository: https://github.com/z88dk/z88dk
 ;------------------------------------------------------------------------------
 
         org  0100h
@@ -2401,10 +2394,8 @@ END_ASM
         ld   bc,1                       ;; 01 01 00
         ld   bc,32767                   ;; 01 FF 7F
         ld   bc,65535                   ;; 01 FF FF
-        ld   bc,-32769                  ;; warn 2: integer '-32769' out of range
-                                        ;; 01 FF 7F
-        ld   bc,65536                   ;; warn 2: integer '65536' out of range
-                                        ;; 01 00 00
+        ld   bc,-32769                  ;; 01 FF 7F
+        ld   bc,65536                   ;; 01 00 00
 
 ; 32-bit arithmetic, long range is not tested on a 32bit long
         defq 0xFFFFFFFF                 ;; FF FF FF FF
@@ -2416,10 +2407,8 @@ END_ASM
         call 0                          ;; CD 00 00
         call 1                          ;; CD 01 00
         call 65535                      ;; CD FF FF
-        call -32769                     ;; warn 2: integer '-32769' out of range
-                                        ;; CD FF 7F
-        call 65536                      ;; warn 2: integer '65536' out of range
-                                        ;; CD 00 00
+        call -32769                     ;; CD FF 7F
+        call 65536                      ;; CD 00 00
 
 ;------------------------------------------------------------------------------
 ; Expressions
@@ -2432,8 +2421,8 @@ label_2: ld   a,3                       ;; 3E 03
 
         defw label_1, label_2           ;; 6D 01 6F 01
         defw ZERO+label_1               ;; 6D 01
-        defb #label_2-label_1           ;; 02
-        defb #ZERO+label_2-label_1      ;; 02
+        defb +label_2-label_1           ;; 02
+        defb +ZERO+label_2-label_1      ;; 02
 
         defb 255,128,0,-128             ;; FF 80 00 80
         defb ZERO+255,ZERO-128          ;; FF 80
@@ -4398,7 +4387,7 @@ ENDIF
 END_ASM
 );
 z80asm(
-    options => "-l -b --cpu=r2k -DRABBIT",
+    options => "-l -b -mr2k -DRABBIT",
     asm  => <<'END_ASM',
         ldx                             ;; error: syntax error
         ld                              ;; error: syntax error
@@ -4646,13 +4635,11 @@ ENDIF
 IF      !RABBIT
 ENDIF   
         call_oz 0                       ;; error: integer '0' out of range
-        call_oz 65536                   ;; error: integer '65536' out of range
 IF      !RABBIT
 ENDIF   
         fpp  0                          ;; error: integer '0' out of range
         fpp  255                        ;; error: integer '255' out of range
         fpp  256                        ;; error: integer '256' out of range
         invoke -1                       ;; error: integer '-1' out of range
-        invoke 65536                    ;; error: integer '65536' out of range
 END_ASM
 );

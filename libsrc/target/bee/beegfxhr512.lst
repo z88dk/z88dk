@@ -1,0 +1,10 @@
+target/bee/graphics/w_clg_512
+target/bee/graphics/w_clsgraph_320
+target/bee/graphics/w_pixladdr_512
+target/bee/graphics/w_putsprite_512
+target/bee/graphics/w_stencil_render_512
+target/bee/graphics/fill_512
+target/bee/graphics/swapgfxbk
+target/bee/graphics/div5
+target/bee/graphics/div11
+@gfx/wide/gfx_wide.lst

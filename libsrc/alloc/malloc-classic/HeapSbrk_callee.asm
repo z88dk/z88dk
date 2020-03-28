@@ -50,4 +50,4 @@ EXTERN ASMDISP_HEAPFREE_CALLEE
    inc hl
    jp HeapFree_callee + ASMDISP_HEAPFREE_CALLEE
 
-DEFC ASMDISP_HEAPSBRK_CALLEE = # asmentry - HeapSbrk_callee
+DEFC ASMDISP_HEAPSBRK_CALLEE = asmentry - HeapSbrk_callee

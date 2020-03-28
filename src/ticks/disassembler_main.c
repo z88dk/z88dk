@@ -11,6 +11,7 @@ static void disassemble_loop(int start, int end);
 
 unsigned char *mem;
 int  c_cpu = CPU_Z80;
+int  inverted = 0;
 
 
 static void usage(char *program)
@@ -23,12 +24,13 @@ static void usage(char *program)
     printf("  -mz80          Disassemble z80 code\n");
     printf("  -mz180         Disassemble z180 code\n");
     printf("  -mez80         Disassemble ez80 code (short mode)\n");
-    printf("  -mz80-zxn      Disassemble z80 ZXN code\n");
+    printf("  -mz80n         Disassemble z80n code\n");
     printf("  -mr2k          Disassemble Rabbit 2000 code\n");
     printf("  -mr3k          Disassemble Rabbit 3000 code\n");
     printf("  -mr800         Disassemble R800 code\n");
     printf("  -mgbz80        Disassemble Gameboy z80 code\n");
     printf("  -m8080         Disassemble 8080 code (with z80 mnenomics)\n");
+    printf("  -m8085         Disassemble 8085 code (with z80 mnenomics)\n");
     printf("  -x <file>      Symbol file to read\n");
 
     exit(1);
@@ -68,6 +70,9 @@ int main(int argc, char **argv)
                 end = strtol(argv[1], &endp, 0);
                 argc--; argv++;
                 break;
+            case 'i':
+                inverted = 255;
+                break;
             case 'x':
                 read_symbol_file(argv[1]);
                 argc--; argv++;
@@ -75,8 +80,8 @@ int main(int argc, char **argv)
             case 'm':
                 if ( strcmp(&argv[0][1],"mz80") == 0 ) {
                     c_cpu = CPU_Z80;
-                } else if ( strcmp(&argv[0][1],"mz80-zxn") == 0 ) {
-                    c_cpu = CPU_Z80_ZXN;
+                } else if ( strcmp(&argv[0][1],"mz80n") == 0 ) {
+                    c_cpu = CPU_Z80N;
                 } else if ( strcmp(&argv[0][1],"mz180") == 0 ) {
                     c_cpu = CPU_Z180;
                 } else if ( strcmp(&argv[0][1],"mr2k") == 0 ) {
@@ -89,6 +94,8 @@ int main(int argc, char **argv)
                     c_cpu = CPU_GBZ80;
                 } else if ( strcmp(&argv[0][1],"m8080") == 0 ) {
                     c_cpu = CPU_8080;
+                } else if ( strcmp(&argv[0][1],"m8085") == 0 ) {
+                    c_cpu = CPU_8085;
                 } else if ( strcmp(&argv[0][1],"mez80") == 0 ) {
                     c_cpu = CPU_EZ80;
                 } else {
@@ -136,5 +143,5 @@ static void disassemble_loop(int start, int end)
 
 uint8_t get_memory(int pc)
 {
-    return mem[pc % 65536];
+    return mem[pc % 65536] ^ inverted;
 }

@@ -14,34 +14,59 @@
 argv_loop_1:
 	ld	a,(hl)
 	cp	' '
+IF __CPU_8080__
+	jp	nz,argv_loop_2
+ELSE
 	jr	nz,argv_loop_2
+ENDIF
 	ld	(hl),0
 	dec	hl
 	dec	c
+IF __CPU_8080__
+	jp	nz,argv_loop_1
+ELSE
 	jr	nz,argv_loop_1
+ENDIF
 ; We've located the end of the last argument, try to find the start
 argv_loop_2:
 	ld	a,(hl)
 	cp	' '
+IF __CPU_8080__
+	jp	nz,argv_loop_3
+ELSE
 	jr	nz,argv_loop_3
+ENDIF
 	;ld	(hl),0
 	inc	hl
 
+IF CRT_ENABLE_STDIO
 IF !DEFINED_noredir
 IF !DEFINED_nostreams
 	EXTERN freopen
 	xor	a
 	add	b
+IF __CPU_8080__
+	jp	nz,no_redir_stdout
+ELSE
 	jr	nz,no_redir_stdout
+ENDIF
 	ld	a,(hl)
 	cp	'>'
+IF __CPU_8080__
+	jp	nz,no_redir_stdout
+ELSE
 	jr	nz,no_redir_stdout
+ENDIF
 	push	hl
 	inc	hl
 	cp	(hl)
 	dec	hl
 	ld	de,redir_fopen_flag	; "a" or "w"
+IF __CPU_8080__
+	jp	nz,noappendb
+ELSE
 	jr	nz,noappendb
+ENDIF
 	ld	a,'a'
 	ld	(de),a
 	inc	hl
@@ -51,7 +76,7 @@ noappendb:
 	push	bc
 	push	hl					; file name ptr
 	push	de
-	ld	de,__sgoioblk+6		; file struct for stdout
+	ld	de,__sgoioblk+10		; file struct for stdout
 	push	de
 	call	freopen
 	pop	de
@@ -62,12 +87,20 @@ noappendb:
 	pop	hl
 		
 	dec	hl
+IF __CPU_8080__
+	jp	argv_zloop
+ELSE
 	jr	argv_zloop
+ENDIF
 no_redir_stdout:
 
 	ld	a,(hl)
 	cp	'<'
+IF __CPU_8080__
+	jp	nz,no_redir_stdin
+ELSE
 	jr	nz,no_redir_stdin
+ENDIF
 	push	hl
 	inc	hl
 	ld	de,redir_fopen_flagr
@@ -86,8 +119,13 @@ no_redir_stdout:
 	pop	hl
 		
 	dec	hl
+IF __CPU_8080__
+	jp	argv_zloop
+ELSE
 	jr	argv_zloop
+ENDIF
 no_redir_stdin:
+ENDIF
 ENDIF
 ENDIF
 
@@ -99,18 +137,30 @@ ENDIF
 argv_zloop:
 	ld	(hl),0
 	dec	c
+IF __CPU_8080__
+	jp	z,argv_done
+ELSE
 	jr	z,argv_done
+ENDIF
 	dec	hl
 	ld	a,(hl)
 	cp	' '
+IF __CPU_8080__
+	jp	z,argv_zloop
+ELSE
 	jr	z,argv_zloop
+ENDIF
 	inc c
 	inc hl
 
 argv_loop_3:
 	dec	hl
 	dec	c
+IF __CPU_8080__
+	jp	nz,argv_loop_2
+ELSE
 	jr	nz,argv_loop_2
+ENDIF
 
 argv_done:
 	ld	hl,end	;name of program (NULL)

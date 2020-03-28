@@ -14,8 +14,9 @@
  *	 - casts removed in structures
  *	 - Few defines to make life easier
  *   - tape or disk save     (-DTAPE, -DDISK)
+ *   - disk save in data block mode (-DDISKBLOCK)
  *   - lowercase text taken from the oz700 port in the 'ozdev' web site
- *   - opt graphics scenes   (-DPIC)
+ *   - opt graphics scenes   (-DPICS)
  *   - score made optional   (-DCOMPUTE_SCORE)
  *
  *	Found at: http://www.penelope.demon.co.uk/pod/
@@ -26,6 +27,17 @@
  *	Paul Taylor 18-Aug-1998 With Special thanks to Tim Olmstead
  */
 
+ 
+ /*
+  *	Using -DDISKBLOCKS on a ZX Spectrum, will require the inclusion of 'zxbasdos.lib' and few extra BASIC lines.
+  * ZX Microdrive syntax example is given:
+  *
+  * 5000 STOP
+  * 7600 LOAD *"m";d;n$ CODE a,l : STOP
+  * 7650 SAVE *"m";d;n$ CODE a,l : STOP
+  * 7900 ERASE "m";d;n$ : STOP
+  *
+  */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -50,6 +62,10 @@
 
 #ifdef DISK
 FILE *fpsave;
+#endif
+
+#ifdef DISKBLOCK
+#define TAPE
 #endif
 
 void GetLine();
@@ -2577,22 +2593,51 @@ void SH_OK()
 
 void SH_QUIT()
 {
+
+/* TAPE and DISKBLOCK mode save */
 #ifdef TAPE
 	PrintStr("Do you want to save the game?\n");
 
 	if (i_GetCh() == 'Y')
 	{
 		/* save */
-		PrintStr("Start tape, then press a key\n");
+#ifdef DISKBLOCK
+		PrintStr("\nPrepare disc or cartrige, then press a key\n");
+#else
+		PrintStr("\nStart tape, then press a key\n");
+#endif
 		i_GetCh();
+		
+#ifdef DISKBLOCK
+		rnd_erase("GVARS.SAV");
+		rnd_saveblock("GVARS.SAV", GVARS, sizeof(GVARS));
+#else
 		tape_save_block(GVARS, sizeof(GVARS), 1);
+#endif
+
 #ifdef COMPUTE_SCORE
+#ifdef DISKBLOCK
+		rnd_erase("SCORE.SAV");
+		rnd_saveblock("SCORE.SAV", &nScore, sizeof(nScore));
+#else
 		tape_save_block(&nScore, sizeof(nScore), 2);
 #endif
+#endif
+
+#ifdef DISKBLOCK
+		rnd_erase("ITEMS.SAV");
+		rnd_erase("ROOM.SAV");
+		rnd_saveblock("ITEMS.SAV", &naItemLoc, sizeof(naItemLoc));
+		rnd_saveblock("ROOM.SAV", &CUR_RM, sizeof(CUR_RM));
+#else
 		tape_save_block(naItemLoc, sizeof(naItemLoc), 3);
 		tape_save_block(&CUR_RM, sizeof(CUR_RM), 4);
 #endif
 
+#endif
+
+
+/*  Save game to DISK with standard C functions */
 #ifdef DISK
 	PrintStr("Do you want to save the game?\n");
 
@@ -2955,12 +3000,25 @@ int main()
 		if (i_GetCh() == 'Y')
 		{
 			/* restore */
+#ifdef DISKBLOCK
+			rnd_loadblock("GVARS.SAV", GVARS, sizeof(GVARS));
+#else
 			tape_load_block(GVARS, sizeof(GVARS), 1);
+#endif
 #ifdef COMPUTE_SCORE
+#ifdef DISKBLOCK
+			rnd_loadblock("SCORE.SAV", &nScore, sizeof(nScore));
+#else
 			tape_load_block(&nScore, sizeof(nScore), 2);
 #endif
+#endif
+#ifdef DISKBLOCK
+			rnd_loadblock("ITEMS.SAV", &naItemLoc, sizeof(naItemLoc));
+			rnd_loadblock("ROOM.SAV", &CUR_RM, sizeof(CUR_RM));
+#else
 			tape_load_block(naItemLoc, sizeof(naItemLoc), 3);
 			tape_load_block(&CUR_RM, sizeof(CUR_RM), 4);
+#endif
 		}
 #endif
 

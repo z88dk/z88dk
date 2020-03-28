@@ -3,7 +3,7 @@
 #-----------------------------------------------------------------------------
 # Z88DK Z80 Macro Assembler
 #
-# Copyright (C) Paulo Custodio, 2011-2018
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: http://www.perlfoundation.org/artistic_license_2_0
 #
 # Test bugfixes
@@ -70,8 +70,7 @@ note "BUG_0003";
 z80asm(
 	options => "-h=x",
 	error 	=> <<'ERR',
-Error: illegal option '-h=x'
-Error: source filename missing
+Error: illegal option: -h=x
 ERR
 );
 
@@ -269,7 +268,7 @@ z80asm(
 							;; 78 B1 20 02 CB 95 ED 54 F1 C9 BE 23 
 							;; 0B F5 ED 54 CB C5 18 EA
 ASM
-	options	=> "$list -b --cpu=r2k",
+	options	=> "$list -b -mr2k",
 );
 }
 
@@ -323,7 +322,7 @@ note "BUG_0023";
 z80asm(
 	asm		=> "ld a,-129 ;; 3E 7F ;; warn: integer '-129' out of range",
 );
-eq_or_diff(scalar(read_file("test.err")), <<'ERROR');
+is_text(scalar(read_file("test.err")), <<'ERROR');
 Warning at file 'test.asm' line 1: integer '-129' out of range
 ERROR
 
@@ -338,7 +337,7 @@ ASM
 			defc value = -129
 ASM1
 );
-eq_or_diff(scalar(read_file("test.err")), <<'ERROR');
+is_text(scalar(read_file("test.err")), <<'ERROR');
 Warning at file 'test.asm' line 3: integer '256' out of range
 Warning at file 'test.asm' line 2: integer '-129' out of range
 ERROR
@@ -477,7 +476,7 @@ z80asm(
 	entry:
 		ret							; 000D ;; C9
 		
-		DEFC L_DIVENTRY = # entry - l_div_u
+		DEFC L_DIVENTRY = entry - l_div_u
 ...
 );
 
@@ -497,10 +496,9 @@ for my $op ("jr", "djnz", "jr nc,") {
 	my $cmd = "z80asm -b test.asm";
 	ok 1, $cmd;
 	my($stdout, $stderr, $return) = capture { system $cmd; };
-	eq_or_diff_text $stdout, "", "stdout";
-	eq_or_diff_text $stderr, <<'...', "stderr";
+	is_text( $stdout, "", "stdout" );
+	is_text( $stderr, <<'...', "stderr" );
 Error at file 'test.asm' line 2: relative jump address must be local
-1 errors occurred during assembly
 ...
 	ok !!$return == !!1, "retval";
 }

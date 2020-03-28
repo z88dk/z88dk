@@ -38,14 +38,13 @@
 	PUBLIC	timer		;This is incremented every time a VBL/HBL interrupt happens
 	PUBLIC	_pause_flag	;This alternates between 0 and 1 every time pause is pressed
 	
-	PUBLIC	RG0SAV		;keeping track of VDP register values
-	PUBLIC	RG1SAV
-	PUBLIC	RG2SAV
-	PUBLIC	RG3SAV
-	PUBLIC	RG4SAV
-	PUBLIC	RG5SAV
-	PUBLIC	RG6SAV
-	PUBLIC	RG7SAV
+
+	PUBLIC __IO_VDP_DATA
+ 	PUBLIC __IO_VDP_COMMAND
+	PUBLIC __IO_VDP_STATUS
+	defc __IO_VDP_DATA              = 0xbe
+	defc __IO_VDP_COMMAND           = 0xbf
+	defc __IO_VDP_STATUS            = 0xbf
 
 
         defc    TAR__register_sp = Stack_Top
@@ -169,10 +168,8 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
 	push	hl
-IF CRT_ENABLE_STDIO = 1
-	EXTERN 	closeall
-	call	closeall
-ENDIF
+    call    crt0_exit
+
 
 endloop:
 	jr	endloop
@@ -252,14 +249,6 @@ raster_procs:		defs	16	;Raster interrupt handlers
 pause_procs:		defs	16	;Pause interrupt handlers
 timer:			defw	0	;This is incremented every time a VBL/HBL interrupt happens
 _pause_flag:		defb	0	;This alternates between 0 and 1 every time pause is pressed
-RG0SAV:			defb	0	;keeping track of VDP register values
-RG1SAV:			defb	0
-RG2SAV:			defb	0
-RG3SAV:			defb	0
-RG4SAV:			defb	0
-RG5SAV:			defb	0
-RG6SAV:			defb	0
-RG7SAV:			defb	0
 
 
 ; DEFINE SECTIONS FOR BANKSWITCHING

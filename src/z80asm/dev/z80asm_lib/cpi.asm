@@ -1,43 +1,83 @@
 ; Substitute for z80 cpi instruction
 ; aralbrec 06.2007
 
-SECTION code_crt0_sccz80
-PUBLIC __z80asm__cpi
+      SECTION  code_crt0_sccz80
+      PUBLIC   __z80asm__cpi
 
-.__z80asm__cpi
+IF __CPU_GBZ80__
+      EXTERN   __z80asm__ex_sp_hl
+ENDIF 
 
-   jr c, cpiwcarry
-   
-   cp (hl)
-   inc hl
-   dec bc
-   
-   push af
-   ex (sp),hl
-   res 0,l 			; clear carry
+__z80asm__cpi:
 
-.rejoin
+      jr    c, cpiwcarry
 
-   set 2,l			; set P/V -> BC != 0
+      cp    (hl)
+      inc   hl
+      dec   bc
 
-   ld a,b
-   or c
-   jr nz, exitcpi
-   res 2,l			; clear P/V -> BC == 0
+      push  af
+IF __CPU_GBZ80__
+      call  __z80asm__ex_sp_hl
+ELSE  
+      ex    (sp), hl
+ENDIF 
+IF __CPU_INTEL__
+      ld    a, l
+      and   @11111110
+      ld    l, a
+ELSE  
+      res   0, l              ; clear carry
+ENDIF 
 
-.exitcpi
+rejoin:
 
-   ex (sp),hl
-   pop af
-   ret
+IF __CPU_INTEL__
+      ld    a, l
+      or    @00000100
+      ld    l, a
+ELSE  
+      set   2, l              ; set P/V -> BC != 0
+ENDIF 
 
-.cpiwcarry
+      ld    a, b
+      or    c
+      jr    nz, exitcpi
+IF __CPU_INTEL__
+      ld    a, l
+      and   @11111011
+      ld    l, a
+ELSE  
+      res   2, l              ; clear P/V -> BC == 0
+ENDIF 
 
-   cp (hl)
-   inc hl
-   dec bc
-   
-   push af
-   ex (sp),hl
-   set 0,l 			; set carry
-   jr rejoin
+exitcpi:
+
+IF __CPU_GBZ80__
+      call  __z80asm__ex_sp_hl
+ELSE  
+      ex    (sp), hl
+ENDIF 
+      pop   af
+      ret   
+
+cpiwcarry:
+
+      cp    (hl)
+      inc   hl
+      dec   bc
+
+      push  af
+IF __CPU_GBZ80__
+      call  __z80asm__ex_sp_hl
+ELSE  
+      ex    (sp), hl
+ENDIF 
+IF __CPU_INTEL__
+      ld    a, l
+      or    @00000001
+      ld    l, a
+ELSE  
+      set   0, l              ; set carry
+ENDIF 
+      jr    rejoin

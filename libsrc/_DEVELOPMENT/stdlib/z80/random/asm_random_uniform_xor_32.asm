@@ -61,7 +61,12 @@ asm_random_uniform_xor_32:
    ld h,a
 
    ld a,d
+IF __CPU_INTEL__
+   and a
+   rra
+ELSE
    srl a
+ENDIF
    xor e
    ld e,a
 

@@ -8,7 +8,7 @@ include ../Make.config
 TARGET ?= test
 
 NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/adt/**/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/adt/**/z80/*.asm"
-NEWLIB_TARGETS := obj/newlib-z80 obj/newlib-z80-zxn obj/newlib-r2k obj/newlib-ixiy
+NEWLIB_TARGETS := obj/newlib-z80 obj/newlib-z80n obj/newlib-r2k obj/newlib-ixiy
 
 space :=
 space +=
@@ -20,19 +20,19 @@ OBJECTS = $(CLASSIC_OBJECTS)
 all: dirs $(OBJECTS) $(NEWLIB_TARGETS)
 
 obj/newlib-z80:  
-	@$(ASSEMBLER) -d -O=obj/z80/x -I.. --cpu=z80 -D__CLASSIC $(NEWLIBGLOBS)
+	@$(ASSEMBLER) -d -O=obj/z80/x -I.. -mz80 -D__CLASSIC $(NEWLIBGLOBS)
 
 obj/newlib-r2k:  
-	@$(ASSEMBLER) -d -O=obj/r2k/x -I.. --cpu=r2k -D__CLASSIC $(NEWLIBGLOBS)
+	@$(ASSEMBLER) -d -O=obj/r2k/x -I.. -mr2k -D__CLASSIC $(NEWLIBGLOBS)
 
-obj/newlib-z80-zxn:  
-	@$(ASSEMBLER) -d -O=obj/z80-zxn/x -I.. --cpu=z80-zxn -D__CLASSIC $(NEWLIBGLOBS)
+obj/newlib-z80n:  
+	@$(ASSEMBLER) -d -O=obj/z80n/x -I.. -mz80n -D__CLASSIC $(NEWLIBGLOBS)
 
 obj/newlib-ixiy:  
-	@$(ASSEMBLER) -d -O=obj/ixiy/x -I.. --cpu=z80 --IXIY -D__CLASSIC $(NEWLIBGLOBS)
+	@$(ASSEMBLER) -d -O=obj/ixiy/x -I.. -mz80 --IXIY -D__CLASSIC $(NEWLIBGLOBS)
 
 dirs:
-	@mkdir -p obj/z80 obj/z80-zxn obj/ixiy obj/r2k
+	@mkdir -p obj/z80 obj/z80n obj/ixiy obj/r2k
 
 
 clean:

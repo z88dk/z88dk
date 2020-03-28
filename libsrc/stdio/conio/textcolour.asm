@@ -9,6 +9,8 @@
 	PUBLIC	textcolor
 	PUBLIC	_textcolor
 
+	SECTION	code_clib
+
 	EXTERN	generic_console_set_ink
 
 

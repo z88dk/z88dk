@@ -97,4 +97,4 @@ EXTERN SP1V_DISPWIDTH, SP1V_UPDATELISTT
    ld (ix+5),0
    ret
 
-DEFC ASMDISP_SP1_CLEARRECTINV_CALLEE = # asmentry - sp1_ClearRectInv_callee
+DEFC ASMDISP_SP1_CLEARRECTINV_CALLEE = asmentry - sp1_ClearRectInv_callee

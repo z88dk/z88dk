@@ -10,15 +10,21 @@ EXTERN asm_strcat
 
 strcat:
 
-   pop af
+   pop bc
    pop hl
    pop de
    
    push de
    push hl
-   push af
-   
+   push bc
+IF __CLASSIC && __CPU_GBZ80__
+   call asm_strcat
+   ld d,h
+   ld e,l
+   ret
+ELSE
    jp asm_strcat
+ENDIF
 
 ; SDCC bridge for Classic
 IF __CLASSIC

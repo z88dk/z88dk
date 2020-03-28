@@ -56,6 +56,7 @@
 
         defc    TAR__clib_exit_stack_size = 0
         defc    TAR__register_sp = -1
+        defc    CRT_KEY_DEL = 12
 	defc	__CPU_CLOCK = 3250000
         INCLUDE "crt/classic/crt_rules.inc"
         org     CRT_ORG_CODE
@@ -99,10 +100,8 @@ cleanup:
 ;
         push    hl		; keep return code
 
-IF CRT_ENABLE_STDIO = 1
-        EXTERN     closeall
-        call    closeall
-ENDIF
+        call    crt0_exit
+
     ;    ld      iy,16384	; no ix/iy swap here
 	;LD      (IY+$12),2    ; set DF-SZ to 24 lines.
 	;call	1863
@@ -130,8 +129,6 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 
 
 
-;                defm  "Small C+ ZX80"   ;Unnecessary file signature
-;                defb    0
 
 ;zx80_cls:
 ;	LD      HL,($400A)      ; fetch E-LINE

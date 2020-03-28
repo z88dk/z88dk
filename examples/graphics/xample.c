@@ -19,7 +19,7 @@ int screen;
 void draw_graphics(Window win, GC* gc, unsigned int window_width, unsigned int window_height);
 void draw_text(Window win, GC* gc, XFontStruct* font_info, unsigned int win_width, unsigned int win_height);
 void TooSmall(Window win, GC *gc, XFontStruct *font_info);
-void get_GC(Window win, GC *gc, XFontStruct *font_info);
+void get_GC(Window win, GC **gc, XFontStruct *font_info);
 void load_font(XFontStruct **font_info);
 
 void main(int argc, char **argv)
@@ -33,7 +33,7 @@ void main(int argc, char **argv)
     Pixmap icon_pixmap;
     XSizeHints size_hints;
     XEvent report;
-    GC gc;
+    GC *gc;
     XFontStruct* font_info;
     char* display_name = NULL;
     int window_size = 0;
@@ -81,7 +81,7 @@ void main(int argc, char **argv)
     XMapWindow(display, win);
 
     while (1) {
-        XNextEvent(display, &report);
+        XNextEvent(display, &report.type);
         switch (report.type) {
         case Expose:
 
@@ -121,7 +121,7 @@ void main(int argc, char **argv)
     }
 }
 
-void get_GC(Window win, GC *gc, XFontStruct *font_info)
+void get_GC(Window win, GC **gcp, XFontStruct *font_info)
 {
     unsigned int valuemask = 0;
     XGCValues values;
@@ -132,16 +132,18 @@ void get_GC(Window win, GC *gc, XFontStruct *font_info)
     int dash_offset = 0;
     static char dash_list[] = { 20, 40 };
     int list_length = sizeof(dash_list);
+    GC *gc;
 
-    *gc = XCreateGC(display, win, valuemask, &values);
+    gc = XCreateGC(display, win, valuemask, &values);
+    *gcp = gc;
 
-    XSetFont(display, *gc, font_info->fid);
+    XSetFont(display, gc, font_info->fid);
 
-    XSetForeground(display, *gc, BlackPixel(display, screen));
+    XSetForeground(display, gc, BlackPixel(display, screen));
 
-    XSetLineAttributes(display, *gc, line_width, line_style, cap_style, join_style);
+    XSetLineAttributes(display, gc, line_width, line_style, cap_style, join_style);
 
-    XSetDashes(display, *gc, dash_offset, dash_list, list_length);
+    XSetDashes(display, gc, dash_offset, dash_list, list_length);
 }
 
 void load_font(XFontStruct **font_info)
@@ -179,6 +181,7 @@ void draw_text(Window win, GC* gc, XFontStruct* font_info, unsigned int win_widt
     XDrawString(display, win, gc, (win_width - width2) / 2, (int)(win_height - 35), string2, len2);
     XDrawString(display, win, gc, (win_width - width3) / 2, (int)(win_height - 15), string3, len3);
 
+
     sprintf(cd_height, "Height - %d pixels", DisplayHeight(display, screen));
     sprintf(cd_width, "Width - %d pixels", DisplayWidth(display, screen));
     sprintf(cd_depth, "Depth - %d plane(s)", DefaultDepth(display, screen));
@@ -190,7 +193,6 @@ void draw_text(Window win, GC* gc, XFontStruct* font_info, unsigned int win_widt
 
     font_height = font_info->max_bounds.ascent + font_info->max_bounds.descent;
 
-    //printf("Font height: %u - Win height: %u\n",font_height, win_height);
 
     y_offset = win_height / 2 - font_height - font_info->max_bounds.descent;
     x_offset = (int)win_width / 4;

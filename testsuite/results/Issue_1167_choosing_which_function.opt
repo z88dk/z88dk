@@ -1,0 +1,47 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._callit
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	a,h
+	or	l
+	jp	z,i_2
+	ld	hl,_func1
+	jp	i_3
+.i_2
+	ld	hl,_func2
+.i_3
+	push	hl
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	ex	(sp),hl
+	call	l_jphl
+	pop	bc
+	ret
+
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_func1
+	GLOBAL	_func2
+	GLOBAL	_callit
+
+
+
+

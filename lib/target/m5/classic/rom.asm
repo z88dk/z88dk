@@ -14,6 +14,8 @@
 
 
 	EXTERN	msx_set_mode
+	EXTERN	im1_vectors
+	EXTERN	asm_interrupt_handler
 
         org     CRT_ORG_CODE
 
@@ -57,10 +59,8 @@ cleanup:
 ;
         push    hl				; return code
 
-IF CRT_ENABLE_STDIO = 1
-        EXTERN     closeall
-        call    closeall
-ENDIF
+        call    crt0_exit
+
 
 
 cleanup_exit:
@@ -69,8 +69,19 @@ cleanup_exit:
         ret
 
 
+
 	INCLUDE	"crt/classic/tms9118/interrupt.asm"
-	INCLUDE	"crt/classic/tms9118/interrupt_handler.asm"
+	ei
+	reti
+
+int_VBL:
+	ld	hl,im1_vectors
+	call	asm_interrupt_handler
+	pop	hl
+	pop	af
+	ei
+	reti
+
 
         defc    __crt_org_bss = CRT_ORG_BSS
         ; If we were given a model then use it

@@ -1,10 +1,11 @@
-; $Id: bit_fx2.asm,v 1.5 2016-04-23 21:06:32 dom Exp $
+; $Id: bit_fx2.asm $
 ;
 ; Generic platform sound effects module.
 ; Alternate sound library by Stefano Bodrato
 ;
 
-          SECTION    code_clib
+IF !__CPU_GBZ80__ && !__CPU_INTEL__
+          SECTION    smc_clib
           PUBLIC     bit_fx2
           PUBLIC     _bit_fx2
           INCLUDE  "games/games.inc"
@@ -576,3 +577,4 @@
           
           call	bit_close_ei
           ret
+ENDIF

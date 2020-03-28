@@ -2,13 +2,11 @@
 
 #pragma once
 
-extern void info_total_errors(void);
 extern void error_read_file(const char *filename);
 extern void error_write_file(const char *filename);
 extern void error_include_recursion(const char *filename);
 extern void error_no_src_file(void);
 extern void error_illegal_option(const char *option);
-extern void error_illegal_src_filename(const char *filename);
 extern void error_glob(const char *filename, const char *error);
 extern void error_glob_no_files(const char *filename);
 extern void error_not_regular_file(const char *filename);

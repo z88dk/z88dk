@@ -2,9 +2,9 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2017
+Copyright (C) Paulo Custodio, 2011-2019
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-Repository: https://github.com/pauloscustodio/z88dk-z80asm
+Repository: https://github.com/z88dk/z88dk
 */
 
 #include "directives.h"
@@ -59,15 +59,18 @@ static void do_assemble(const char *src_filename );
 *	- if all above fail, try to replace/append the .asm extension and assemble
 *	- if all above fail, try to replace/append the .o extension and link
 *----------------------------------------------------------------------------*/
-void assemble_file( char *filename )
+void assemble_file( const char *filename )
 {
+	// must canonize input file name so that comparison to .o below works
+	filename = path_canon(filename);
+
 	const char *src_filename;
 	const char *obj_filename;
 	bool load_obj_only;
 	Module *module;
 
 	/* create output directory*/
-	obj_filename = get_obj_filename(filename);
+	obj_filename = path_canon(get_obj_filename(filename));
 	path_mkdir(path_dir(obj_filename));
 
 	/* try to load object file */
@@ -191,7 +194,7 @@ static void do_assemble(const char *src_filename )
 	set_PC(0);
 
 	if (opts.verbose)
-		printf("Assembling '%s' to '%s'\n", src_filename, obj_filename);
+		printf("Assembling '%s' to '%s'\n", path_canon(src_filename), path_canon(obj_filename));
 
 	parse_file(src_filename);
 
@@ -256,7 +259,7 @@ const char *GetLibfile( const char *filename )
 	opts.library = true;
 
 	if (opts.verbose)
-		printf("Reading library '%s'\n", found_libfilename);
+		printf("Reading library '%s'\n", path_canon(found_libfilename));
 
 	return found_libfilename;
 }
@@ -390,7 +393,6 @@ int z80asm_main( int argc, char *argv[] )
 
     if ( get_num_errors() )
     {
-        info_total_errors();
         return 1;	/* signal error */
     }
     else

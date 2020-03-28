@@ -38,11 +38,8 @@ cleanup:
 ;
 ;       Deallocate memory which has been allocated here!
 ;
+    call    crt0_exit
 
-IF CRT_ENABLE_STDIO = 1
-	EXTERN	closeall
-	call	closeall
-ENDIF
 
 start1:	ld	sp,0		;Restore stack to entry value
         ret

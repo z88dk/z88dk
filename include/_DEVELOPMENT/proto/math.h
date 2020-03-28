@@ -99,6 +99,20 @@ include(__link__.m4)
 
 #endif
 
+#ifdef __MATH_MATH32
+
+#define HUGE_POSF              (float)+3.4028234664E+38
+#define TINY_POSF              (float)+1.1754943508E−38
+#define HUGE_NEGF              (float)-1.7014118346E+38
+#define TINY_NEGF              (float)-1.1754943508E-38
+
+#define MAXL2F                 ((float)+127.999999914)
+#define MINL2F                 ((float)-126.0)
+#define MAXL10F                ((float)+38.230809449)
+#define MINL10F                ((float)−37.929779454)
+
+#endif
+
 __DPROTO(,,double_t,,acos,double_t x)
 __DPROTO(,,double_t,,asin,double_t x)
 __DPROTO(,,double_t,,atan,double_t x)
@@ -178,6 +192,19 @@ __DPROTO(,,int,,islessequal,double_t x,double_t y)
 __DPROTO(,,int,,islessgreater,double_t x,double_t y)
 __DPROTO(,,int,,isunordered,double_t x,double_t y)
 
+#ifdef __MATH_MATH32
+
+__DPROTO(,,double_t,,sqr,double_t x)
+__DPROTO(,,double_t,,inv,double_t x)
+__DPROTO(,,double_t,,invsqrt,double_t x)
+__DPROTO(,,double_t,,div2,double_t x)
+__DPROTO(,,double_t,,mul2,double_t x)
+__DPROTO(,,double_t,,mul10u,double_t x)
+__DPROTO(,,double_t,,exp10,double_t x)
+__DPROTO(,,double_t,,poly, const float x, const float d[], unsigned int n)
+
+#endif
+
 // NO DISTINCTION BETWEEN FLOAT AND DOUBLE
 
 #define acosf        acos
@@ -253,5 +280,18 @@ __DPROTO(,,int,,isunordered,double_t x,double_t y)
 #define fminf        fmin
 
 #define fmaf         fma
+
+#ifdef __MATH_MATH32
+
+#define sqrf         sqr
+#define invf         inv
+#define invsqrtf     insqrt
+#define div2f        div2
+#define mul2f        mul2
+#define mul10uf      mul10u
+#define exp10f       exp10
+#define polyf        poly
+
+#endif
 
 #endif

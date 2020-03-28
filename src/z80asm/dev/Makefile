@@ -1,11 +1,18 @@
 # Z88DK Z80 Macro Assembler
 #
 # Copyright (C) Gunther Strube, InterLogic 1993-99
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-# Repository: https://github.com/pauloscustodio/z88dk-z80asm
+# Repository: https://github.com/z88dk/z88dk
 #
 # Makefile to generate C files, to be called from the .. directory
+
+# EXESUFFIX is passed when cross-compiling Win32 on Linux
+ifeq ($(OS),Windows_NT)
+  EXESUFFIX 		:= .exe
+else
+  EXESUFFIX 		?=
+endif
 
 ASTYLE = astyle \
 	--mode=c \
@@ -49,6 +56,7 @@ parse_rules.h : parse_rules.rl tokens.h scan_def.h \
 all:: t/opcodes.t
 
 t/opcodes.t: dev/build_opcodes.pl dev/build_opcodes.asm dev/Makefile
+	$(MAKE) -C dev/z80pack-1.21/z80asm
 	perl dev/build_opcodes.pl
 
 #------------------------------------------------------------------------------

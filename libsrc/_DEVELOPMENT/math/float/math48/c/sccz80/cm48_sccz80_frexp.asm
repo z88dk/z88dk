@@ -19,6 +19,7 @@ cm48_sccz80_frexp:
    exx
    
    ld hl,4
+   add hl,sp
    call cm48_sccz80p_dload
    
    jp am48_frexp

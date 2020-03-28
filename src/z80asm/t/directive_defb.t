@@ -2,15 +2,13 @@
 
 # Z88DK Z80 Module Assembler
 #
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk/
 #
 # Test DEFB, DEFM - more complete tests in build_opcodes.asm
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 require './t/testlib.pl';
 
@@ -19,7 +17,6 @@ for my $DEFB (qw(DEFB DEFM)) {
 
 	z80asm("xx: $DEFB", "", 1, "", <<END);
 Error at file 'test.asm' line 1: syntax error
-1 errors occurred during assembly
 END
 
 	unlink_testfiles();
@@ -28,7 +25,6 @@ END
 
 	z80asm("xx: $DEFB xx,", "", 1, "", <<END);
 Error at file 'test.asm' line 1: syntax error
-1 errors occurred during assembly
 END
 
 	unlink_testfiles();
@@ -37,12 +33,10 @@ END
 
 	z80asm("xx: $DEFB \"", "", 1, "", <<END);
 Error at file 'test.asm' line 1: unclosed quoted string
-1 errors occurred during assembly
 END
 
 	z80asm("xx: $DEFB \"hello", "", 1, "", <<END);
 Error at file 'test.asm' line 1: unclosed quoted string
-1 errors occurred during assembly
 END
 
 	# escape chars

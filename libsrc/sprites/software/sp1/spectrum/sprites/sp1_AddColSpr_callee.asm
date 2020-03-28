@@ -203,4 +203,4 @@ EXTERN _u_malloc, _u_free
    pop hl
    jp faillp
 
-DEFC ASMDISP_SP1_ADDCOLSPR_CALLEE = # asmentry - sp1_AddColSpr_callee
+DEFC ASMDISP_SP1_ADDCOLSPR_CALLEE = asmentry - sp1_AddColSpr_callee

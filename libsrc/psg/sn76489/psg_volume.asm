@@ -40,6 +40,11 @@
 	
 	or	a, $90
 	or	a, b		; Prepares the first byte of the command
+IF HAVE16bitbus
+        ld      bc,psgport
+        out     (c),a
+ELSE
 	out	(psgport), a	; Sends it
+ENDIF
 
 	ret

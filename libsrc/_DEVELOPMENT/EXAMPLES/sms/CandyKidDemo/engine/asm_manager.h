@@ -7,13 +7,13 @@ __sfr __at 0xBE VDPDataPort;
 void engine_asm_manager_clear_VRAM()
 {
 	__asm
-		ld a,#0x00
+		ld a,+0x00
 		out (_VDPControlPort),a
-		ld a,#0x40
+		ld a,+0x40
 		out (_VDPControlPort),a
-		ld bc, #0x4000
+		ld bc, +0x4000
 ClearVRAMLoop:
-	ld a,#0x00
+	ld a,+0x00
 		out (_VDPDataPort),a
 		dec bc
 		ld a,b

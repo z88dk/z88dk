@@ -2,15 +2,13 @@
 
 # Z88DK Z80 Macro Assembler
 #
-# Copyright (C) Paulo Custodio, 2011-2018
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk/
 #
 # Test macros
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 require './t/testlib.pl';
 
@@ -42,7 +40,6 @@ z80asm(<<'END', "", 1, "", <<'ERR');
 	nil
 END
 Error at file 'test.asm' line 2: macro 'nil' redefined
-1 errors occurred during assembly
 ERR
 
 z80asm(<<'END', "", 1, "", <<'ERR');
@@ -51,7 +48,6 @@ z80asm(<<'END', "", 1, "", <<'ERR');
 END
 Error at file 'test.asm' line 1: syntax error
 Error at file 'test.asm' line 2: syntax error
-2 errors occurred during assembly
 ERR
 
 z80asm(<<'END');
@@ -74,9 +70,12 @@ three  equ  3
 four   Equ  4
 five   EQU  5
 six    set  6
-defb one,two,three,four,five,six
+.seven set  7
+eight: set  8
+defb one,two,three,four,five,six,seven,eight
 END
-check_bin_file("test.bin", pack("C*", 1..6));
+check_bin_file("test.bin", pack("C*", 1..8));
+
 
 unlink_testfiles();
 done_testing();

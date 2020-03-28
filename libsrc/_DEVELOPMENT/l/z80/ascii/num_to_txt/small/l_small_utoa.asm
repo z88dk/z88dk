@@ -24,7 +24,8 @@ l_small_utoa:
    ld bc,-10+256
    push bc
    
-   ld bc,-100+256
+;  ld bc,-100+256
+   ld c,0xff & (-100+256)
    push bc
    
    ld bc,-1000+256
@@ -84,6 +85,14 @@ divloop:
    inc a
    add hl,bc
    jr c, divloop
-   
+IF __CPU_INTEL__ | __CPU_GBZ80__
+   ld a,l
+   sub c
+   ld l,a
+   ld a,h
+   sbc b
+   ld h,a
+ELSE
    sbc hl,bc
+ENDIF
    ret

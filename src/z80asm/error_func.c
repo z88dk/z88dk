@@ -6,15 +6,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void info_total_errors(void)
-{
-	STR_DEFINE(msg, STR_SIZE);
-
-	Str_append_sprintf( msg, "%d errors occurred during assembly", get_num_errors() );
-	do_error( ErrInfo, Str_data(msg) );
-	
-	STR_DELETE(msg);
-}
 void error_read_file(const char *filename)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -46,7 +37,7 @@ void error_no_src_file(void)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
-	Str_append_sprintf( msg, "source filename missing" );
+	Str_append_sprintf( msg, "source file missing" );
 	do_error( ErrError, Str_data(msg) );
 	
 	STR_DELETE(msg);
@@ -55,16 +46,7 @@ void error_illegal_option(const char *option)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
-	Str_append_sprintf( msg, "illegal option '%s'", option );
-	do_error( ErrError, Str_data(msg) );
-	
-	STR_DELETE(msg);
-}
-void error_illegal_src_filename(const char *filename)
-{
-	STR_DEFINE(msg, STR_SIZE);
-
-	Str_append_sprintf( msg, "illegal source filename '%s'", filename );
+	Str_append_sprintf( msg, "illegal option: %s", option );
 	do_error( ErrError, Str_data(msg) );
 	
 	STR_DELETE(msg);
@@ -334,7 +316,7 @@ void error_invalid_org(int origin)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
-	Str_append_sprintf( msg, "invalid ORG value '%d'", origin );
+	Str_append_sprintf( msg, "invalid origin: %d", origin );
 	do_error( ErrError, Str_data(msg) );
 	
 	STR_DELETE(msg);
@@ -343,7 +325,7 @@ void error_invalid_filler_option(const char *filler_hex)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
-	Str_append_sprintf( msg, "invalid --filler option '%s'", filler_hex );
+	Str_append_sprintf( msg, "invalid filler value: %s", filler_hex );
 	do_error( ErrError, Str_data(msg) );
 	
 	STR_DELETE(msg);

@@ -22,6 +22,8 @@ void main()
 	screensize(&xs,&ys);
 	x=--xs; y=--ys;
 	
+	putch (12);
+	
 	p=0; q=0;
 
 	

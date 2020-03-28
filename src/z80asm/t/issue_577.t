@@ -3,19 +3,15 @@
 # Z88DK Z80 Macro Assembler
 #
 # Copyright (C) Gunther Strube, InterLogic 1993-99
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk/
 #
 # Test https://github.com/z88dk/z88dk/issues/577
 # z80asm: Ti83 and Ti83 apps can't be compiled
 
-use strict;
-use warnings;
-use v5.10;
-
+use Modern::Perl;
 use Test::More;
-
 require './t/testlib.pl';
 
 z80asm(<<END, "-b", "", "");
@@ -27,7 +23,7 @@ END
 check_bin_file("test.bin", pack("C*", 1, 2));
 
 for my $cpu (qw( r2k r3k )) {
-	z80asm(<<END, "-b --cpu=$cpu", "", "");
+	z80asm(<<END, "-b -m$cpu", "", "");
 		jp Lz, 0
 		jp Lo, 0
 END

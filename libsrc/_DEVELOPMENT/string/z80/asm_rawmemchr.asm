@@ -14,9 +14,24 @@ asm_rawmemchr:
    ;
    ; exit  : hl = pointer to char c
    ;
-   ; uses  : af, bc, hl
+   ; uses  : af, bc, hl + de (gbz80/8080)
    
    ld bc,0
+IF __CPU_GBZ80__
+   push de
+   ld e,a
+loop:
+   cp (hl)
+   jr z,matched
+   inc hl
+   dec bc
+   ld a,b
+   or c
+   jr nz,loop
+matched:
+   pop de
+ELSE
    cpir
    dec hl
+ENDIF
    ret

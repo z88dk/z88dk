@@ -15,7 +15,6 @@ static char             *binname      = NULL;
 static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
 static char             *blockname    = NULL;
-static int               origin       = -1;
 static char              help         = 0;
 
 
@@ -23,34 +22,35 @@ static char              help         = 0;
 option_t mz2500_options[] = {
     { 'h', "help",     "Display this help",          OPT_BOOL,  &help},
     { 'b', "binfile",  "Linked binary file",         OPT_STR,   &binname },
-    {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
-    { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
     {  0 , "blockname", "Name for the code block",   OPT_STR,   &blockname},
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
 };
 
+static disc_spec spec = {
+    .name = "MZ2500",
+    .sectors_per_track = 16,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .first_sector_offset = 1,
+    .alternate_sides = 1
+};
+
+static uint8_t    sectorbuf[256];
 
 
-/* Writing routines */
-void writebyte_xor(unsigned char c, FILE *fp)
+void write_sector(disc_handle *h, int track, int sector, int head) 
 {
-	writebyte(c^0xff,fp);
-}
+    int  i;
 
-void writestring_xor(char *mystring, FILE *fp)
-{
-    size_t c;
-
-    for (c=0; c < strlen(mystring); c++) {
-        writebyte_xor(mystring[c],fp);
+    for ( i = 0; i < sizeof(sectorbuf);i++ ) {
+        sectorbuf[i] ^= 0xff;
     }
-}
+    disc_write_sector(h, track, sector, head, sectorbuf);
 
-void writeword_xor(unsigned int i, FILE *fp)
-{
-    writebyte_xor(i%256,fp);
-    writebyte_xor(i/256,fp);
 }
 
 
@@ -58,157 +58,110 @@ void writeword_xor(unsigned int i, FILE *fp)
  * Execution starts here
  */
 
-int mz2500_exec(char *target)
+int mz2500_exec(char* target)
 {
-    char    filename[FILENAME_MAX+1];
-    char    name[14];
-    FILE   *fpin;
-    FILE   *fpout;
-    int     len,namelen;
-    int     i,j,c;
-    int     pos;
+    char filename[FILENAME_MAX + 1];
+    FILE* fpin;
+    int len;
+    int i;
+    int track, sector, head, written;
+    disc_handle *h;
 
-    if ( help )
+    if (help)
         return -1;
-	
-    if ( binname == NULL || ( crtfile == NULL && origin == -1 )) {
+
+    if (binname == NULL ) {
         return -1;
     }
-	
-	if ( origin != -1 ) {
-		pos = origin;
-	} else {
-		if ( (pos = get_org_addr(crtfile)) == -1 ) {
-			myexit("Could not find parameter ZORG (not z88dk compiled?)\n",1);
-		}
-	}
 
-    if ( outfile == NULL ) {
-        strcpy(filename,binname);
+    if (outfile == NULL) {
+        strcpy(filename, binname);
     } else {
-        strcpy(filename,outfile);
-    }
-	
-    //for (p = filename; *p !='\0'; ++p)
-    //   *p = toupper(*p);
-
-    suffix_change(filename,".2D");
-
-    namelen=strlen(filename)-1;
-
-    if ( strcmp(binname,filename) == 0 ) {
-        fprintf(stderr,"Input and output file names must be different\n");
-        myexit(NULL,1);
+        strcpy(filename, outfile);
     }
 
-	if ( blockname == NULL )
-		blockname = binname;
-	
-	if ( (fpin=fopen_bin(binname, crtfile) ) == NULL ) {
-        fprintf(stderr,"Can't open input file %s\n",binname);
-        myexit(NULL,1);
-    }
-	
-	suffix_change(blockname,"");
 
-    if (fseek(fpin,0,SEEK_END)) {
-        fprintf(stderr,"Couldn't determine size of file\n");
+    suffix_change(filename, ".dsk");
+
+
+    if (strcmp(binname, filename) == 0) {
+        fprintf(stderr, "Input and output file names must be different\n");
+        myexit(NULL, 1);
+    }
+
+    if (blockname == NULL)
+        blockname = binname;
+
+    if ((fpin = fopen_bin(binname, crtfile)) == NULL) {
+        fprintf(stderr, "Can't open input file %s\n", binname);
+        myexit(NULL, 1);
+    }
+
+    suffix_change(blockname, "");
+
+    if (fseek(fpin, 0, SEEK_END)) {
+        fprintf(stderr, "Couldn't determine size of file\n");
         fclose(fpin);
-        myexit(NULL,1);
+        myexit(NULL, 1);
     }
 
-    len=ftell(fpin);
-	
-	fseek(fpin,0L,SEEK_SET);
-	
-    if ( (fpout=fopen(filename,"wb") ) == NULL ) {
-        fclose(fpin);
-        myexit("Can't open output file\n",1);
+    len = ftell(fpin);
+    fseek(fpin, 0L, SEEK_SET);
+
+    h = disc_create(&spec);
+
+    /* Disk block #2 (directory) */
+    memset(sectorbuf, 0, sizeof(sectorbuf));
+    sectorbuf[0] = 1;    /* OBJ (machine language program) */
+    memcpy(sectorbuf + 1,"IPLPRO", 6);
+
+    /* Now the filename from offset 8 */
+    for ( i = 7 ; i < 20; i++ ) {
+        int slen = i - 7;
+        sectorbuf[i] = strlen(blockname) > slen ? blockname[slen] : ' ';
     }
+    sectorbuf[20] = 0x0d;    // Terminate name
+    // sectorbuf[22] = 0;	 	// 
+    // sectorbuf[23] = 0x80;
+    sectorbuf[24] = 0;		// Load address
+    sectorbuf[25] = 0x80;
+    sectorbuf[30] = 0x30;		// Start sector
+    sectorbuf[31] = 0x00;
 
+    sectorbuf[32] = 12;		// Memory bank for $2000...$e000
+    sectorbuf[33] = 13;		// Next bank
+    sectorbuf[34] = 14;		// Next bank
+    sectorbuf[35] = 0xff;		// Terminate
+ 
+    // Banking at start of execution
+    sectorbuf[48] = 8;		// for $000
+    sectorbuf[49] = 9;
+    sectorbuf[50] = 10;
+    sectorbuf[51] = 11;
+    sectorbuf[52] = 12;
+    sectorbuf[53] = 13;
+    sectorbuf[54] = 14;
+    sectorbuf[55] = 15;
+    write_sector(h, 0, 0, 1);
 
-	/* Disk block #0 */
-	for	(i=1;i<=0x800;i++)
-		writebyte_xor(0,fpout);
-
-	/* Disk block #1 (side 1?) */
-	for	(i=1;i<=0x800;i++)
-		writebyte_xor(0xbf,fpout);
-
-	/* Disk block #2 (directory) */
-
-	writebyte_xor(1,fpout);						/* OBJ (machine language program), 
-													or boot sector for disk model '1': MZ-80B/2000/2200/2500  */
-	writestring_xor("IPLPRO",fpout);			/* Boot file marker */
-
-	if (strlen(blockname) >= 10 )			/* startup label (JIS X 0201 encoding) */
-	{
-		strncpy(name,blockname,10);
-	} else {
-		strcpy(name,blockname);
-		strncat(name,"          ",10-strlen(blockname));
-	}
-	writestring_xor(name,fpout);
-	writebyte_xor(0x0d,fpout);						/* File name termination */
-
-	writebyte_xor(0,fpout);						/* "normal file" attribute (no protection) */
-	writebyte_xor(0,fpout);						/* unused */
-	
-	writeword_xor(len,fpout);					/* file size? ..no effect if changed !! */	
-	writeword_xor(pos,fpout);					/* load address? ..no effect if changed !! */
-	
-	writeword_xor(pos,fpout);					/* exec address */
-	
-	
-	writebyte_xor(0,fpout);						/* year */
-	writebyte_xor(0,fpout);						/* month/day */
-	writebyte_xor(0,fpout);						/* day/time */
-	writebyte_xor(0,fpout);						/* time/minute */
-	
-	writeword_xor(0x30,fpout);					/* "start sector"?, seems rather to be a relative offset to the "memory bank organization" below */
-	
-	writebyte_xor(12,fpout);					/* Memory bank: 9..15 for $2000..$E000 */
-	//writebyte_xor(13,fpout);					/* next Memory bank ? */
-	
-	
-	writebyte_xor(0xff,fpout);					/* load sequence termination ? */
-	
-	for	(i=1;i<=14;i++)
-		writebyte_xor(0,fpout);
-
-	/* memory bank organization at boot (Mapping at start of execution ) */
-	writebyte_xor(8,fpout);		/* bank for $0000 */
-	writebyte_xor(9,fpout);		/* bank for $2000 */
-	writebyte_xor(10,fpout);	/* bank for $4000 */
-	writebyte_xor(11,fpout);	/* bank for $6000 */
-	writebyte_xor(12,fpout);	/* bank for $8000 */
-	writebyte_xor(13,fpout);	/* bank for $A000 */
-	writebyte_xor(14,fpout);	/* bank for $C000 */
-	writebyte_xor(15,fpout);	/* bank for $E000 */
-	
-	
-	for	(i=1;i<=200;i++)
-		writebyte_xor(0,fpout);
-
-	/* filler */
-	for	(i=1;i<=0x700+0x800;i++)
-		writebyte_xor(0xbf,fpout);
-
-	
-	/* Program block */
-	for (i=0; i<len;i++) {
-		c=getc(fpin);
-		writebyte_xor(c,fpout);
-	}
-
-	/* filler */
-	for	(i=1;i<=(0x50000-len-0x2000);i++)
-		writebyte_xor(0,fpout);
-
+    // Now, locate to track 2, first sector (block 0x30)
+    track = 1; sector = 0; head = 0;
+    written = 0;
+    while ( written < len ) {
+       memset(sectorbuf, 0, sizeof(sector));
+       fread(sectorbuf, 256, sizeof(uint8_t), fpin);
+       written += 256;
+       write_sector(h, track, sector, head);
+       sector++;
+       if ( sector == 16 ) {
+          sector = 0; head ^= 1;
+          if ( head == 1 ) track++;
+       }
+    }
 
     fclose(fpin);
-    fclose(fpout);
-    
+    disc_write_edsk(h, filename);
+    disc_free(h);
+
     return 0;
 }
-

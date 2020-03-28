@@ -3,23 +3,21 @@
 #
 # Plain Perl (no CPAN libraries) test library
 #
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk
 #------------------------------------------------------------------------------
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
+use Config;
 use Test::More;
 use Cwd qw( cwd abs_path );
 use File::Basename;
 use File::Path 'remove_tree';
 
-my $IS_WIN32 = $^O eq 'MSWin32';
 my @TEST_EXT = qw( asm bin c d dat def err inc lis lst map o P out sym tap );
 
 # run z80asm from .
-$ENV{PATH} = ".".($IS_WIN32 ? ";" : ":").$ENV{PATH};
+$ENV{PATH} = ".".$Config{path_sep}.$ENV{PATH};
 
 # add path to z80asm top directory
 _prepend_path(_root());
@@ -37,7 +35,7 @@ sub _root {
 
 sub _prepend_path {
 	my($dir) = @_;
-	$ENV{PATH} = $dir . ($IS_WIN32 ? ';' : ':') . $ENV{PATH};
+	$ENV{PATH} = $dir . $Config{path_sep} . $ENV{PATH};
 }
 
 #------------------------------------------------------------------------------
@@ -82,7 +80,6 @@ sub run {
 	$err //= '';
 	
 	$cmd .= " >test.stdout 2>test.stderr";
-#	$cmd =~ s!/!\\!g if $IS_WIN32;
 	
 	ok 1, $cmd;
 	ok !!$return == !!system($cmd), "exit value";
@@ -130,8 +127,8 @@ sub ticks {
 	build_ticks();
 	z80asm($source, $options." -b");
 	
-	my $cpu = ($options =~ /--cpu=(\S+)/) ? $1 : "z80";
-	run("ticks test.bin -m$cpu -output test.out", 
+	my $cpu = ($options =~ /(?:--cpu=?|-m=?)(\S+)/) ? $1 : "z80";
+	run("z88dk-ticks test.bin -m$cpu -output test.out", 
 		0, "IGNORE");
 
 	my $bin = slurp("test.out");

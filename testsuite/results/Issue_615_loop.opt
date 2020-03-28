@@ -59,8 +59,7 @@
 	ld	hl,(_var)
 	ld	a,h
 	or	l
-	jp	nz,i_14
-	jr	i_15
+	jr	z,i_15
 .i_14
 	ld	hl,1	;const
 .i_15
@@ -128,7 +127,6 @@
 	pop	hl
 	inc	hl
 	push	hl
-	dec	hl
 .i_27
 	ld	hl,(_var)
 	inc	hl
@@ -150,7 +148,6 @@
 	pop	hl
 	inc	hl
 	push	hl
-	dec	hl
 .i_30
 	ld	hl,(_var)
 	inc	hl

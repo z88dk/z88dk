@@ -3,19 +3,15 @@
 # Z88DK Z80 Macro Assembler
 #
 # Copyright (C) Gunther Strube, InterLogic 1993-99
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk/
 #
 # Test https://github.com/z88dk/z88dk/issues/343
 # z80asm: Rabbit emulation of cpi and cpir is broken
 
-use strict;
-use warnings;
-use v5.10;
-
+use Modern::Perl;
 use Test::More;
-
 require './t/testlib.pl';
 
 spew("test.asm",<<END);
@@ -23,11 +19,11 @@ spew("test.asm",<<END);
 		call   __z80asm__cpir
 END
 
-run("z80asm --cpu=z80 -b test.asm");
+run("z80asm -mz80 -b test.asm");
 my $bin1 = hexdump(slurp("test.bin"));
 note $bin1;
 
-run("z80asm --cpu=r2k -b test.asm");
+run("z80asm -mr2k -b test.asm");
 my $bin2 = hexdump(slurp("test.bin"));
 note $bin2;
 

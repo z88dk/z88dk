@@ -16,6 +16,7 @@
 ;	#pragma output nostreams - No stdio disc files
 ;	#pragma output nofileio  - No fileio at all, use in conjunction to "-lndos"
 ;	#pragma output noprotectmsdos - strip the MS-DOS protection header
+;	#pragma output protect8080 - add a check to block the program when on an 8080 CPU (not compatible)
 ;	#pragma output noredir   - do not insert the file redirection option while parsing the
 ;	                           command line arguments (useless if "nostreams" is set)
 ;	#pragma output nogfxglobals - No global variables for graphics (required for GFX on TIKI-100, Einstein, and Spectrum +3)
@@ -35,6 +36,7 @@
 ; Some scope definitions
 ;-----------------------
 
+	EXTERN	cpm_platform_init
 	EXTERN    _main		;main() is always external to crt0
 
 	PUBLIC    cleanup		;jp'd to by exit()
@@ -72,6 +74,23 @@ dosmessage:
 begin:
 ENDIF
 
+IF DEFINED_protect8080
+
+	ld	a,$7F			; 01111111 into accumulator
+	inc	a			; make it overflow ie. 10000000
+	jp	pe,isz80	; only 8080 resets for odd parity here
+
+	ld	c,9		; print string
+	ld	de,err8080
+	call	5	; BDOS
+	jp	0
+	
+err8080:
+	defm	"This program requires a Z80 CPU."
+	defb	13,10,'$'
+isz80:
+ENDIF
+
 IF (startup=2)
 	;EXTERN ASMTAIL
 		ld	hl,$100
@@ -88,17 +107,22 @@ ENDIF
 	nop	 ;   Those extra bytes fix the Amstrad NC's ZCN support !!?!
 	nop
 
-	ld      (start1+1),sp	;Save entry stack
+        ld	hl,0
+	add	hl,sp
+	ld      (start1+1),hl	;Save entry stack
 IF (startup=3)
 	; Increase to cover +3 MEM banking
-	defc	__clib_exit_stack_size_t  = __clib_exit_stack_size + 18
+	defc	__clib_exit_stack_size_t  = __clib_exit_stack_size + 18 + 18
 	UNDEFINE __clib_exit_stack_size
 	defc	__clib_exit_stack_size = __clib_exit_stack_size_t
 ENDIF
         INCLUDE "crt/classic/crt_init_sp.asm"
         INCLUDE "crt/classic/crt_init_atexit.asm"
-        call    crt0_init_bss   ;Initialise any data setup by sdcc
-	ld      (exitsp),sp
+        call    crt0_init_bss   
+	call	cpm_platform_init	;Any platform specific init
+	ld	hl,0
+	add	hl,sp
+	ld      (exitsp),hl
 
 ; Memory banking for Spectrum +3
 IF (startup=3)
@@ -152,10 +176,8 @@ ENDIF
 
 cleanup:
 	push	hl		;Save return value
-IF CRT_ENABLE_STDIO = 1
-	EXTERN	closeall	;Close any opened files
-	call	closeall
-ENDIF
+    call    crt0_exit
+
 	pop	bc		;Get exit() value into bc
 start1:	ld      sp,0		;Pick up entry sp
         jp	0
@@ -218,7 +240,6 @@ peekbyte_code:
 		nop
 ENDIF
 
-        defm  	"Small C+ CP/M"
 
         INCLUDE "crt/classic/crt_runtime_selection.asm"
 
@@ -241,7 +262,7 @@ defltdsk:       defb    0	;Default disc
 
 IF !DEFINED_nofileio
 		PUBLIC	__fcb
-__fcb:		defs	420,0	;file control block (10 files) (MAXFILE)
+__fcb:		defs	430,0	;file control block (10 files) (MAXFILE)
 ENDIF
 
 
@@ -251,12 +272,6 @@ ENDIF
 		PUBLIC	_vdcDispMem
 _vdcDispMem:				; Label used by "c128cpm.lib" only
 end:		defb	0		; null file name
-IF !DEFINED_nogfxglobals
-		PUBLIC	RG0SAV
-RG0SAV:		defb	1*8		; VDP graphics driver (Einstein)
-							; Also used to remember the border color for the ZX Spectrum +3 
-							; in CP/M mode (Blue is default)
-ENDIF
 
 
 	SECTION  rodata_clib

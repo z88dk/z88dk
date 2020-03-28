@@ -1,0 +1,29 @@
+; Toshiba Posopia 7
+
+
+	; Port definitions
+	; ppi0 = 0x08, 0x09, 0x0a + 0x0b	- (8255) screen mode + config
+	; ppi1 = 0x0c, 0x0d, 0x0e + 0x0f	- (8255) video
+	; pac2 = 0x18, 0x19, 0x1a, 0x1b
+	; ppi2 = 0x20, 0x21, 0x22 + 0x23	- (8255) nmi
+	; 6845 = 0x28, 0x29, 0x2a, 0x2b
+	; pio  = 0x30, 0x31, 0x32 +  0x33A	- (z80), keyboard
+	; PSG1 = 0x3a
+	; PSG2 = 0x3b
+	; flopy  0xe0, 0xe1, 0xe2, 0xe3, 0xe4, 0xe5, 0xe6
+
+	defc	MEM_MODE	= $3c
+	defc	MEM_CTRL	= $22
+	defc	VRAM_PLANE	= $0c	;V-RAM Plane selection
+	defc	DISP_CTRL	= $0d	;Display control 1
+					;xPPPxxxx PPP = text page
+	defc	CTL_PORT	= $0f	;8255 Control port
+	defc	KEY_SCAN	= $30	;Keyboard row scan
+	defc	KEY_DATA	= $31	;And read keyboard data from here
+	defc	SCR_MODE	= $08	;ppi0 port A, screen mode
+					;G.W.Cccc
+					;G = graphics mode
+					;W = 80/40 column mode
+					;C = take colour from ccc instead of attr
+	defc	CRTC_CTRL	= $0b	;ppi0 port B, vsync, raster/lcd, disp bit
+	defc	VIDEO_MISC	= $0e	;ppi1, port C, blinking attribute wrap, palette

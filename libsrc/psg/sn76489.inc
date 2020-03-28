@@ -29,17 +29,20 @@ IF FORpv2000
 ENDIF
 
 IF FORrx78
-	defc psgport = 0xff
+	defc psgport = $ff
 ENDIF
 
 IF FORcoleco
-	defc psgport	= $E0		; also valid for Coleco Adam and Pencil II
+	defc psgport	= $ff		; also valid for Coleco Adam and Pencil II
 ENDIF
 
-; ********************************************************
-;   This last part refers to NOT YET supported hardware
-; ********************************************************
+IF FORpencil2
+	defc psgport	= $ff		; also valid for Coleco Adam and Pencil II
+ENDIF
 
+IF FORbit90
+	defc psgport	= $ff		; also valid for Coleco Adam and Pencil II
+ENDIF
 
 IF FORpasopia
 	defc psgport	= $3A		; Pasopia has also a second PSG on port $3B
@@ -48,6 +51,11 @@ ENDIF
 
 IF FORsmc777
 	defc psgport	= $53		; possibly valid also for Sony SMC 70
+	defc HAVE16bitbus = 1
+ENDIF
+
+IF FORpasopia7
+	defc psgport 	= $3a		; There's a second one on 3b
 ENDIF
 
 

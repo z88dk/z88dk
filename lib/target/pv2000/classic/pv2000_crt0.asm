@@ -27,6 +27,12 @@
 
 	EXTERN	msx_set_mode
 
+	EXTERN	nmi_vectors
+	EXTERN	im1_vectors
+	EXTERN	asm_interrupt_handler
+	EXTERN	asm_im1_handler
+	EXTERN	__vdp_enable_status
+	EXTERN	VDP_STATUS
 
 ;--------
 ; Set an origin for the application (-zorg=) default to 32768
@@ -53,7 +59,7 @@ start:
 	; Hook the interrupt
 	ld	a,0xc3
 	ld	($7498),a	;jp
-	ld	hl,nmi_int
+	ld	hl,nmi_handler
 	ld	($7499),hl
 	ld	a,0xc3
 	ld	($749b),a	;jp
@@ -85,10 +91,8 @@ cleanup:
 ;
         push    hl				; return code
 
-IF CRT_ENABLE_STDIO = 1
-        EXTERN     closeall
-        call    closeall
-ENDIF
+        call    crt0_exit
+
 
 
 cleanup_exit:
@@ -101,18 +105,33 @@ start1: ld      sp,0            ;Restore stack to entry value
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
 
-nmi_int:
-        push    af
-        push    hl
-        ; Flow into int_VBL
-        INCLUDE "crt/classic/tms9118/interrupt_handler.asm"
-
-; Not sure when this is called, but don't do anything
 mask_int:
-	ex	(sp),hl
-	pop	hl
+	ex      (sp),hl		;Discard return address
+	push	af
+	ld	hl,im1_vectors
+	call	asm_interrupt_handler
+	pop	af
+	pop	hl	
 	ei
 	reti
+
+
+; On the PV-2000, the NMI receives the VDP interrupt
+nmi_handler:
+	push	af
+	push	hl
+	ld	a,(__vdp_enable_status)
+	rlca
+	jr	c,skip_vbl
+; Polling the VDP from the NMI causes graphical glitches
+	ld	a,(-VDP_STATUS)	;VDP status register
+skip_vbl:
+	ld	hl,nmi_vectors
+	call	asm_interrupt_handler
+not_VBL:
+	pop	hl
+	pop	af
+	retn
 
 ; ---------------
 ; MSX specific stuff
@@ -125,8 +144,6 @@ msxbios:
 	ret
 
 
-	defm    "Small C+ PV2000"   ;Unnecessary file signature
-	defb    0
         INCLUDE "crt/classic/crt_runtime_selection.asm"
 
         defc    __crt_org_bss = CRT_ORG_BSS
@@ -136,40 +153,4 @@ msxbios:
             defc __crt_model = 1
         ENDIF
         INCLUDE "crt/classic/crt_section.asm"
-
-	SECTION	bss_crt
-
-			
-
-	PUBLIC	raster_procs	;Raster interrupt handlers
-	PUBLIC	pause_procs	;Pause interrupt handlers
-
-	PUBLIC	timer		;This is incremented every time a VBL/HBL interrupt happens
-	PUBLIC	_pause_flag	;This alternates between 0 and 1 every time pause is pressed
-
-	PUBLIC	RG0SAV		;keeping track of VDP register values
-	PUBLIC	RG1SAV
-	PUBLIC	RG2SAV
-	PUBLIC	RG3SAV
-	PUBLIC	RG4SAV
-	PUBLIC	RG5SAV
-	PUBLIC	RG6SAV
-	PUBLIC	RG7SAV       
-
-raster_procs:		defw	0	;Raster interrupt handlers
-pause_procs:		defs	8	;Pause interrupt handlers
-timer:				defw	0	;This is incremented every time a VBL/HBL interrupt happens
-_pause_flag:		defb	0	;This alternates between 0 and 1 every time pause is pressed
-
-RG0SAV:		defb	0	;keeping track of VDP register values
-RG1SAV:		defb	0
-RG2SAV:		defb	0
-RG3SAV:		defb	0
-RG4SAV:		defb	0
-RG5SAV:		defb	0
-RG6SAV:		defb	0
-RG7SAV:		defb	0
-
-
-
 

@@ -85,6 +85,10 @@ extern void __LIB__ bit_play(unsigned char melody[]);
   #define BEEP_TSTATES 312500.0 /* 2.5 Mhz */
 #endif
 
+#ifdef PC88
+  #define BEEP_TSTATES 500000.0  /* 4 Mhz */
+#endif
+
 #ifdef SPECTRUM
   #define BEEP_TSTATES 437500.0  /* 3.5 Mhz; float value = CPU_CLOCK*125 */
 #endif

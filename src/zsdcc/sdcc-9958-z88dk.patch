@@ -1,0 +1,1339 @@
+Index: src/SDCC.lex
+===================================================================
+--- src/SDCC.lex	(revision 9958)
++++ src/SDCC.lex	(working copy)
+@@ -171,6 +171,8 @@
+ "__preserves_regs"      { count (); return PRESERVES_REGS; }
+ "__z88dk_fastcall"      { count (); TKEYWORD (Z88DK_FASTCALL); }
+ "__z88dk_callee"        { count (); TKEYWORD (Z88DK_CALLEE); }
++"__z88dk_shortcall"     { count (); return Z88DK_SHORTCALL; }
++"__z88dk_params_offset" { count (); return Z88DK_PARAMS_OFFSET; }
+ "__addressmod"          { count (); return ADDRESSMOD; }
+ "_Static_assert"        { count (); return STATIC_ASSERT; }
+ "_Alignas"              { count (); return ALIGNAS; }
+Index: src/SDCCpeeph.c
+===================================================================
+--- src/SDCCpeeph.c	(revision 9958)
++++ src/SDCCpeeph.c	(working copy)
+@@ -77,8 +77,10 @@
+   (*cmdLine)++;
+   if (!ISCHARDIGIT (**cmdLine))
+     goto error;
++
+   varNumber = strtol (*cmdLine, &digitend, 10);
+   *cmdLine = digitend;
++
+   return hTabItemWithKey (vars, varNumber);
+ 
+ error:
+@@ -106,6 +108,7 @@
+           !pl->isLabel &&
+           !pl->isDebug)
+         {
++
+           if (port->peep.getSize)
+             {
+               dist += port->peep.getSize(pl);
+@@ -212,7 +215,6 @@
+       lbl = getPatternVar (vars, &cmdLine);
+     }
+   while (lbl);
+-
+   return TRUE;
+ }
+ 
+@@ -1220,6 +1222,40 @@
+ }
+ 
+ /*-----------------------------------------------------------------*/
++/* same - Check if first operand matches any of the remaining      */
++/*-----------------------------------------------------------------*/
++FBYNAME(same)
++{
++    set *operands;
++    const char *match, *op;
++
++    operands = setFromConditionArgs(cmdLine, vars);
++
++    if (!operands)
++    {
++        fprintf(stderr,
++            "*** internal error: same peephole restriction"
++            " malformed: %s\n", cmdLine);
++        return FALSE;
++    }
++
++    operands = reverseSet(operands);
++
++    match = setFirstItem(operands);
++    for (op = setNextItem(operands); op; op = setNextItem(operands))
++    {
++        if (strcmp(match, op) == 0)
++        {
++            deleteSet(&operands);
++            return TRUE;
++        }
++    }
++
++    deleteSet(&operands);
++    return FALSE;
++}
++
++/*-----------------------------------------------------------------*/
+ /* operandsLiteral - returns true if the condition's operands are  */
+ /* literals.                                                       */
+ /*-----------------------------------------------------------------*/
+@@ -1406,6 +1442,48 @@
+     }
+ }
+ 
++/*-----------------------------------------------------------------*/
++/* inSequence - Check that numerical constants are in sequence     */
++/*-----------------------------------------------------------------*/
++FBYNAME (inSequence)
++{
++  set *operands;
++  const char *op;
++  long seq, val, stride;
++
++  if ((operands = setFromConditionArgs(cmdLine, vars)) == NULL)
++    {
++      fprintf (stderr,
++               "*** internal error: inSequence peephole restriction"
++               " malformed: %s\n", cmdLine);
++      return FALSE;
++    }
++
++  operands = reverseSet(operands);
++
++  op = setFirstItem(operands);
++  if ((immdGet(op, &stride) == NULL) || ((op = setNextItem(operands)) == NULL))
++    {
++      fprintf (stderr,
++               "*** internal error: inSequence peephole restriction"
++               " malformed: %s\n", cmdLine);
++      return FALSE;
++    }
++
++  for (seq = LONG_MIN; op; op = setNextItem(operands))
++    {
++      if ((immdGet(op, &val) == NULL) || ((seq != LONG_MIN) && (val != seq+stride)))
++        {
++          deleteSet(&operands);
++          return FALSE;
++        }
++      seq = val;
++    }
++
++  deleteSet(&operands);
++  return TRUE;
++}
++
+ static const struct ftab
+ {
+   char *fname;
+@@ -1435,6 +1513,9 @@
+     "operandsNotRelated", operandsNotRelated        // 28
+   },
+   {
++    "same", same                                    // z88dk z80
++  },
++  {
+     "labelJTInRange", labelJTInRange                // 13
+   },
+   {
+@@ -1444,6 +1525,9 @@
+     "canAssign", canAssign                          // 8
+   },
+   {
++    "inSequence", inSequence                        // z88dk z80
++  },
++  {
+     "optimizeReturn", optimizeReturn                // ? just a guess
+   },
+   {
+@@ -1502,8 +1586,8 @@
+   /* Isolate the function name part (we are passed the full condition
+    * string including arguments)
+    */
++
+   cmdTerm = cmdCopy = Safe_strdup(fname);
+-
+   do
+     {
+       funcArgs = funcName = cmdTerm;
+@@ -1538,12 +1622,15 @@
+                 num_parenthesis--;
+               cmdTerm++;
+             }
++
+           *cmdTerm = '\0';  /* terminate the arguments */
+           if (c == ')')
+             {
+               cmdTerm++;
++
+               while ((c = *cmdTerm) && (c == ' ' || c == '\t' || c == ','))
+                 cmdTerm++;
++
+               if (!*cmdTerm)
+                 cmdTerm = NULL;
+             }
+@@ -1565,7 +1652,6 @@
+               break;
+             }
+         }
+-
+       if (rc == -1)
+         {
+           fprintf (stderr,
+@@ -1578,6 +1664,7 @@
+           break;
+         }
+     }
++
+   while (rc && cmdTerm);
+ 
+   Safe_free(cmdCopy);
+@@ -1666,7 +1753,7 @@
+ 
+       /* read till end of line */
+       lp = lines;
+-      while ((*bp != '\n' && *bp != '}') && *bp)
++      while (*bp && (*bp != '\n' && *bp != '}'))
+         *lp++ = *bp++;
+       *lp = '\0';
+ 
+@@ -1772,8 +1859,11 @@
+   getPeepLine (&replace, &bp);
+ 
+   /* look for a 'if' */
+-  while ((ISCHARSPACE (*bp) || *bp == '\n') && *bp)
+-    bp++;
++  while (*bp && (ISCHARSPACE (*bp) || *bp == '\n' || (*bp == '/' && *(bp+1) == '/')))
++  {
++    ++bp;
++	if (*bp == '/') while (*bp && *bp != '\n') ++bp;
++  }
+ 
+   if (strncmp (bp, "if", 2) == 0)
+     {
+@@ -1907,14 +1997,14 @@
+   if (!s || !(*s))
+     return FALSE;
+ 
+-  /* skip leading white spaces */
+-  while (ISCHARSPACE (*s))
+-    s++;
+-  while (ISCHARSPACE (*d))
+-    d++;
+-
+   while (*s && *d)
+     {
++      /* skip white space in both */
++      while (ISCHARSPACE(*s))
++          s++;
++      while (ISCHARSPACE(*d))
++          d++;
++
+       /* if the destination is a var */
+       if (*d == '%' && ISCHARDIGIT (*(d + 1)) && vars)
+         {
+@@ -1954,7 +2044,7 @@
+       else if (*s && *d) /* they should be an exact match otherwise */
+         {
+           if (*s++ != *d++)
+-            return FALSE;
++              return FALSE;
+         }
+     }
+ 
+@@ -1995,7 +2085,6 @@
+   spl = pl;
+   while (spl && rpl)
+     {
+-
+       /* if the source line starts with a ';' then
+          comment line don't process or the source line
+          contains == . debugger information skip it */
+@@ -2562,6 +2651,7 @@
+       restart = FALSE;
+ 
+       /* for all rules */
++
+       for (pr = rootRules; pr; pr = pr->next)
+         {
+           if (restart && pr->barrier)
+@@ -2597,7 +2687,9 @@
+                       spl = *pls;
+                     }
+                   else
++				  {
+                     replaceRule (&spl, mtail, pr);
++				  }
+ 
+                   /* if restart rule type then
+                      start at the top again */
+Index: src/SDCCerr.c
+===================================================================
+--- src/SDCCerr.c	(revision 9958)
++++ src/SDCCerr.c	(working copy)
+@@ -535,6 +535,8 @@
+     "inline function '%s' might lose function attributes", 0},
+   { E_FOR_INITAL_DECLARATION_C99, ERROR_LEVEL_ERROR,
+     "initial declaration in for loop requires ISO C99 or later", 0},
++  { E_SHORTCALL_INVALID_VALUE, ERROR_LEVEL_ERROR,
++    "invalid value for __z88dk_shortcall %s parameter: %x", 0},
+ };
+ 
+ /* -------------------------------------------------------------------------------
+Index: src/SDCCerr.h
+===================================================================
+--- src/SDCCerr.h	(revision 9958)
++++ src/SDCCerr.h	(working copy)
+@@ -266,6 +266,7 @@
+   E_ANONYMOUS_STRUCT_TAG        = 237, /* anonymous struct/union should not have a tag */
+   W_INLINE_FUNCATTR             = 238, /* inline functions should not be z88dk_fastcall or z88dk_callee */
+   E_FOR_INITAL_DECLARATION_C99  = 239, /* initial declaration in for loop requires ISO C99 or later */
++  E_SHORTCALL_INVALID_VALUE     = 240, /* Invalid value for a __z88dk_shortcall specifier */
+ 
+   /* don't touch this! */
+   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */
+Index: src/SDCCasm.c
+===================================================================
+--- src/SDCCasm.c	(revision 9958)
++++ src/SDCCasm.c	(working copy)
+@@ -401,8 +401,8 @@
+ static const ASM_MAPPING _asxxxx_mapping[] = {
+   {"labeldef", "%s::"},
+   {"slabeldef", "%s:"},
+-  {"tlabeldef", "%05d$:"},
+-  {"tlabel", "%05d$"},
++  {"tlabeldef", "l%N_%05d$:"},
++  {"tlabel", "l%N_%05d$"},
+   {"immed", "#"},
+   {"zero", "#0x00"},
+   {"one", "#0x01"},
+@@ -425,6 +425,7 @@
+   {"msbimmeds", "#>(%s)"},
+   {"module", ".module %s"},
+   {"global", ".globl %s"},
++  {"extern", ".globl %s"},
+   {"fileprelude", ""},
+   {"functionheader",
+    "; ---------------------------------\n"
+Index: src/SDCCsymt.h
+===================================================================
+--- src/SDCCsymt.h	(revision 9958)
++++ src/SDCCsymt.h	(working copy)
+@@ -273,6 +273,8 @@
+     unsigned smallc:1;              /* Parameters on stack are passed in reverse order */
+     unsigned z88dk_fastcall:1;      /* For the z80-related ports: Function has a single paramter of at most 32 bits that is passed in dehl */
+     unsigned z88dk_callee:1;        /* Stack pointer adjustment for parameters passed on the stack is done by the callee */
++    unsigned z88dk_shortcall:1;     /* Short call available via rst (see values later) (Z80 only) */
++    unsigned z88dk_has_params_offset:1;     /* Has a parameter offset (Z80 only) */
+     unsigned intno;                 /* 1=Interrupt service routine          */
+     short regbank;                  /* register bank 2b used                */
+     unsigned builtin;               /* is a builtin function                */
+@@ -280,6 +282,9 @@
+     unsigned overlay;               /* force parameters & locals into overlay segment */
+     unsigned hasStackParms;         /* function has parameters on stack     */
+     bool preserved_regs[9];         /* Registers preserved by the function - may be an underestimate */
++    unsigned char z88dk_shortcall_rst;  /* Rst for a short call */
++    unsigned short z88dk_shortcall_val; /* Value for a short call */
++    unsigned short z88dk_params_offset;  /* Additional offset from for arguments */
+   } funcAttrs;
+ 
+   struct sym_link *next;            /* next element on the chain  */
+@@ -454,6 +459,8 @@
+ #define IFFUNC_ISZ88DK_FASTCALL(x) (IS_FUNC(x) && FUNC_ISZ88DK_FASTCALL(x))
+ #define FUNC_ISZ88DK_CALLEE(x) (x->funcAttrs.z88dk_callee)
+ #define IFFUNC_ISZ88DK_CALLEE(x) (IS_FUNC(x) && FUNC_ISZ88DK_CALLEE(x))
++#define FUNC_ISZ88DK_SHORTCALL(x) (x->funcAttrs.z88dk_shortcall)
++#define IFFUNC_ISZ88DK_SHORTCALL(x) (IS_FUNC(x) && FUNC_ISZ88DK_SHORTCALL(x))
+ 
+ #define BANKED_FUNCTIONS        ( options.model == MODEL_HUGE || \
+                                   ( (options.model == MODEL_LARGE || options.model == MODEL_MEDIUM) && \
+Index: src/SDCC.y
+===================================================================
+--- src/SDCC.y	(revision 9958)
++++ src/SDCC.y	(working copy)
+@@ -104,7 +104,7 @@
+ %token BITWISEAND UNARYMINUS IPUSH IPOP PCALL  ENDFUNCTION JUMPTABLE
+ %token RRC RLC
+ %token CAST CALL PARAM NULLOP BLOCK LABEL RECEIVE SEND ARRAYINIT
+-%token DUMMY_READ_VOLATILE ENDCRITICAL SWAP INLINE NORETURN RESTRICT SMALLC PRESERVES_REGS Z88DK_FASTCALL Z88DK_CALLEE ALIGNAS
++%token DUMMY_READ_VOLATILE ENDCRITICAL SWAP INLINE NORETURN RESTRICT SMALLC PRESERVES_REGS Z88DK_FASTCALL Z88DK_CALLEE ALIGNAS Z88DK_SHORTCALL Z88DK_PARAMS_OFFSET
+ %token GENERIC GENERIC_ASSOC_LIST GENERIC_ASSOCIATION
+ %token ASM
+ 
+@@ -182,7 +182,7 @@
+           allocVariables ($1);
+           cleanUpLevel (SymbolTab, 1);
+         }
+-   | addressmod
++   | addressmod {}
+    ;
+ 
+ function_definition
+@@ -289,6 +289,39 @@
+    |  Z88DK_CALLEE   {  $$ = newLink (SPECIFIER);
+                         FUNC_ISZ88DK_CALLEE($$) = 1;
+                      }
++   |  Z88DK_PARAMS_OFFSET '(' constant_expr ')' 
++                     {
++                        value *offset_v = constExprValue ($3, TRUE);
++                        int    offset = 0;
++                        $$ = newLink(SPECIFIER);
++                        if  ( offset_v ) 
++                          offset = ulFromVal(offset_v);
++                        $$->funcAttrs.z88dk_params_offset = offset;
++                     } 
++   |  Z88DK_SHORTCALL '(' constant_expr ',' constant_expr ')'
++                     {
++                        value *rst_v = constExprValue ($3, TRUE);
++                        value *value_v = constExprValue ($5, TRUE);
++                        int rst = -1, value = -1;
++                        $$ = newLink(SPECIFIER);
++
++                        if  ( rst_v ) 
++                          rst = ulFromVal(rst_v);
++                        if  ( value_v ) 
++                          value = ulFromVal(value_v);
++          
++                        if ( rst < 0 || rst > 56 || ( rst % 8 ) )
++                          {
++                            werror(E_SHORTCALL_INVALID_VALUE, "rst", rst);
++                          }
++                        if ( value < 0 || value > 0xfff )
++                          {
++                            werror(E_SHORTCALL_INVALID_VALUE, "value", value);
++                          }
++                        $$->funcAttrs.z88dk_shortcall_rst = rst;
++                        $$->funcAttrs.z88dk_shortcall_val = value;
++                        FUNC_ISZ88DK_SHORTCALL($$) = 1;
++                     }
+    |  PRESERVES_REGS '(' identifier_list ')'
+                      {
+                         const struct symbol *regsym;
+@@ -1793,7 +1826,7 @@
+        werror(W_LABEL_WITHOUT_STATEMENT);
+        $$ = $1;
+        yychar = '}';
+-     };
++     }
+     ;
+ 
+ label
+Index: src/SDCCmain.c
+===================================================================
+--- src/SDCCmain.c	(revision 9958)
++++ src/SDCCmain.c	(working copy)
+@@ -480,20 +480,19 @@
+ /* printVersionInfo - prints the version info        */
+ /*-----------------------------------------------------------------*/
+ void
+-printVersionInfo (FILE * stream)
++printVersionInfo(FILE * stream)
+ {
+-  int i;
++    int i;
+ 
+-  fprintf (stream, "SDCC : ");
+-  for (i = 0; i < NUM_PORTS; i++)
+-    fprintf (stream, "%s%s", i == 0 ? "" : "/", _ports[i]->target);
+-
+-  fprintf (stream, " " SDCC_VERSION_STR
++    fprintf(stream, "\nZSDCC IS A MODIFICATION OF SDCC FOR Z88DK\n");
++    fprintf(stream, "Build: " SDCC_VERSION_STR
+ #ifdef SDCC_SUB_VERSION_STR
+-           "/" SDCC_SUB_VERSION_STR
++        "/" SDCC_SUB_VERSION_STR
+ #endif
+-           " #%s (%s)\n", getBuildNumber (), getBuildEnvironment ());
+-  fprintf (stream, "published under GNU General Public License (GPL)\n");
++        " #%s (%s) " __DATE__ "\n\n", getBuildNumber(), getBuildEnvironment());
++    fprintf(stream, "sdcc website:\nhttps://sourceforge.net/projects/sdcc/\n\n");
++    fprintf(stream, "patch details:\nhttps://github.com/z88dk/z88dk/blob/master/libsrc/_DEVELOPMENT/sdcc_z88dk_patch.zip\n\n");
++    fprintf(stream, "published under GNU General Public License (GPL)\n");
+ }
+ 
+ static void
+Index: src/SDCCglue.c
+===================================================================
+--- src/SDCCglue.c	(revision 9958)
++++ src/SDCCglue.c	(working copy)
+@@ -185,7 +185,7 @@
+            (sym->_isparm && !IS_REGPARM (sym->etype) && !IS_STATIC (sym->localof->etype))) &&
+           addPublics &&
+           !IS_STATIC (sym->etype) &&
+-          (IS_FUNC (sym->type) ? (sym->used || IFFUNC_HASBODY (sym->type)) : (!IS_EXTERN (sym->etype) || sym->ival)) &&
++          (IS_FUNC (sym->type) ? (IFFUNC_HASBODY (sym->type)) : (!IS_EXTERN (sym->etype) || sym->ival)) &&
+           !(IFFUNC_ISINLINE (sym->type) && !IS_STATIC (sym->etype) && !IS_EXTERN (sym->etype)))
+         {
+           addSetHead (&publics, sym);
+@@ -361,11 +361,15 @@
+               emitDebugSym (&map->oBuf, sym);
+               dbuf_printf (&map->oBuf, "==.\n");
+             }
+-          if (IS_STATIC (sym->etype) || sym->level)
+-            dbuf_tprintf (&map->oBuf, "!slabeldef\n", sym->rname);
+-          else
+-            dbuf_tprintf (&map->oBuf, "!labeldef\n", sym->rname);
+-          dbuf_tprintf (&map->oBuf, "\t!ds\n", (unsigned int) size & 0xffff);
++          if (!IS_EXTERN (sym->etype))
++            {
++              if (IS_STATIC (sym->etype) || sym->level)
++                dbuf_tprintf (&map->oBuf, "!slabeldef\n", sym->rname);
++              else
++                dbuf_tprintf (&map->oBuf, "!labeldef\n", sym->rname);
++
++              dbuf_tprintf (&map->oBuf, "\t!ds\n", (unsigned int) size & 0xffff);
++            }
+         }
+ 
+       sym->ival = NULL;
+@@ -1808,9 +1812,12 @@
+   /* for all variables in this segment do */
+   for (sym = setFirstItem (map->syms); sym; sym = setNextItem (map->syms))
+     {
+-      /* if it is "extern" then do nothing */
++      /* if it is "extern" then add to the extern table */
+       if (IS_EXTERN (sym->etype) && !sym->ival)
+-        continue;
++        {
++          addSetHead (&externs, sym);
++          continue;
++        }
+ 
+       /* eliminate redundant __str_%d (generated in stringToSymbol(), SDCCast.c) */
+       if (!isinSet (tmpSet, sym))
+@@ -1882,13 +1889,15 @@
+                   emitDebugSym (oBuf, sym);
+                   dbuf_printf (oBuf, " == .\n");
+                 }
+-              dbuf_printf (oBuf, "%s:\n", sym->rname);
+               /* special case for character strings */
+               if (IS_ARRAY (sym->type) &&
+                 (IS_CHAR (sym->type->next) && SPEC_CVAL (sym->etype).v_char ||
+                  IS_INT (sym->type->next) && !IS_LONG (sym->type->next) && SPEC_CVAL (sym->etype).v_char16 ||
+                  IS_INT (sym->type->next) && IS_LONG (sym->type->next) && SPEC_CVAL (sym->etype).v_char32))
+                 {
++                  if (options.const_seg)
++                     dbuf_tprintf(&code->oBuf, "\t!area\n", options.const_seg);
++                  dbuf_printf (oBuf, "%s:\n", sym->rname);
+                   if (IS_CHAR (sym->type->next))
+                     printChar (oBuf, SPEC_CVAL (sym->etype).v_char, size);
+                   else if (IS_INT (sym->type->next) && !IS_LONG (sym->type->next))
+@@ -1897,9 +1906,12 @@
+                     printChar32 (oBuf, SPEC_CVAL (sym->etype).v_char32, size / 4);
+                   else
+                     wassert (0);
++                  if (options.const_seg)
++                     dbuf_tprintf(oBuf, "\t!areacode\n", options.code_seg);
+                 }
+               else
+                 {
++                  dbuf_printf (oBuf, "%s:\n", sym->rname);
+                   dbuf_tprintf (oBuf, "\t!ds\n", (unsigned int) size & 0xffff);
+                 }
+             }
+@@ -1984,7 +1996,11 @@
+ void
+ flushStatics (void)
+ {
++  if (options.const_seg)
++      dbuf_tprintf (&code->oBuf, "\t!area\n", options.const_seg);
+   emitStaticSeg (statsg, codeOutBuf);
++  if (options.const_seg)
++      dbuf_tprintf(&code->oBuf, "\t!areacode\n", options.code_seg);
+   statsg->syms = NULL;
+ }
+ 
+Index: src/SDCCopt.c
+===================================================================
+--- src/SDCCopt.c	(revision 9958)
++++ src/SDCCopt.c	(working copy)
+@@ -2036,10 +2036,11 @@
+   int i;
+   int change = 0;
+   iCode *ic, *newic;
+-  iCode *uic;
++  iCode *uic, *lic, *ric;
+   sym_link *nextresulttype;
+   symbol *sym;
+   int resultsize, nextresultsize;
++  unsigned long litval;
+ 
+   // Wide loop counter
+   for (i = 0; i < count; i++)
+@@ -2207,15 +2208,15 @@
+             IS_ITEMP (right) && bitVectnBitsOn (OP_DEFS (right)) != 1)
+             continue;
+ 
+-          iCode *lic = IS_ITEMP (left) ? hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_DEFS (left))) : 0;
+-          iCode *ric = IS_ITEMP (right) ? hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_DEFS (right))) : 0;
++          lic = IS_ITEMP (left) ? hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_DEFS (left))) : 0;
++          ric = IS_ITEMP (right) ? hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_DEFS (right))) : 0;
+ 
+           if (lic)
+             {
+               if (lic->op != BITWISEAND || !IS_OP_LITERAL (IC_LEFT (lic)) && !IS_OP_LITERAL (IC_RIGHT (lic)))
+                 continue;
+ 
+-              unsigned long litval = operandLitValue (IS_OP_LITERAL (IC_LEFT (lic)) ? IC_LEFT (lic) : IC_RIGHT (lic));
++              litval = operandLitValue (IS_OP_LITERAL (IC_LEFT (lic)) ? IC_LEFT (lic) : IC_RIGHT (lic));
+ 
+               if (litval > 0x7f)
+                 continue;
+@@ -2228,7 +2229,7 @@
+               if (ric->op != BITWISEAND || !IS_OP_LITERAL (IC_LEFT (ric)) && !IS_OP_LITERAL (IC_RIGHT (ric)))
+                 continue;
+ 
+-              unsigned long litval = operandLitValue (IS_OP_LITERAL (IC_LEFT (ric)) ? IC_LEFT (ric) : IC_RIGHT (ric));
++              litval = operandLitValue (IS_OP_LITERAL (IC_LEFT (ric)) ? IC_LEFT (ric) : IC_RIGHT (ric));
+ 
+               if (litval > 0x7f)
+                 continue;
+Index: src/z80/gen.c
+===================================================================
+--- src/z80/gen.c	(revision 9958)
++++ src/z80/gen.c	(working copy)
+@@ -4254,6 +4254,10 @@
+         {
+           werror (W_INDIR_BANKED);
+         }
++      else if ( IFFUNC_ISZ88DK_SHORTCALL(ftype) ) 
++       {
++          wassertl(0, "__z88dk_short_call via function pointer not implemented");
++       }
+       aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
+ 
+       if (isLitWord (AOP (IC_LEFT (ic))))
+@@ -4295,6 +4299,17 @@
+               emit2 ("call 0x%04X", ulFromVal (OP_VALUE (IC_LEFT (ic))));
+               regalloc_dry_run_cost += 3;
+             }
++          else if ( IFFUNC_ISZ88DK_SHORTCALL(ftype) ) 
++            {
++              int rst = ftype->funcAttrs.z88dk_shortcall_rst;
++              int value = ftype->funcAttrs.z88dk_shortcall_val;
++              emit2 ("rst 0x%02x", rst);
++              if ( value < 256 ) 
++                emit2 ("defb 0x%02x\n",value);
++              else
++                emit2 ("defw 0x%04x\n",value);
++              regalloc_dry_run_cost += 3;
++            }
+           else
+             {
+               bool jump = (!ic->parmBytes && IFFUNC_ISNORETURN (ftype));
+@@ -4409,7 +4424,7 @@
+      doesn't seem to get reset anywhere else.
+    */
+   _G.receiveOffset = 0;
+-  _G.stack.param_offset = 0;
++  _G.stack.param_offset = sym->type->funcAttrs.z88dk_params_offset;
+ 
+   /* Record the last function name for debugging. */
+   _G.lastFunctionName = sym->rname;
+Index: src/z80/main.c
+===================================================================
+--- src/z80/main.c	(revision 9958)
++++ src/z80/main.c	(working copy)
+@@ -120,6 +120,8 @@
+   "z88dk_fastcall",
+   "z88dk_callee",
+   "smallc",
++  "z88dk_shortcall",
++  "z88dk_params_offset",
+   NULL
+ };
+ 
+Index: src/z80/peep.c
+===================================================================
+--- src/z80/peep.c	(revision 9958)
++++ src/z80/peep.c	(working copy)
+@@ -201,6 +201,109 @@
+   return NULL;
+ }
+ 
++/* returns 0 = not found, 1 = found as (rp), 2 = found as register */
++static int argContPrec_helper(const char *arg, const char *what)
++{
++  const char *p;
++  int q;
++
++  // immediate operator anywhere indicates constant
++
++  if (strchr(arg, '#')) return 0;
++
++  // round brackets indicate (rp) or (NN)
++
++  if (p = strchr(arg, '('))
++  {
++    switch(*what)
++    {
++      case 'a':
++        return 0;
++      case 'b':
++      case 'c':
++        return (!strncmp("bc)", p+1, 3)) ? 1 : 0;
++      case 'd':
++	  case 'e':
++        return (!strncmp("de)", p+1, 3)) ? 1 : 0;
++      case 'h':
++      case 'l':
++        return (!strncmp("hl)", p+1, 3)) ? 1 : 0;
++      case 'i':
++        // ix and iy
++        return (!strncmp(what, p+1, 2) && (p[3] == ')')) ? 1 : 0;
++      default:
++        // unrecognized so return true
++        return 1;
++    }
++  }
++
++  // register, NN, label without '#'
++
++  for (p = arg; isspace(*p); ++p) ;
++  for (q = strlen(p); q && isspace(p[q-1]); --q) ;
++
++  // 'p' points to arg 'q' chars in length
++
++  if ((q == 0) || (q > 3)) return 0;
++
++  switch(*what)
++  {
++    case 'a':
++      return ((p[0] == 'a') && ((q == 1) || (q == 2) && (p[1] == 'f'))) ? 2 : 0;
++    case 'b':
++      return ((p[0] == 'b') && ((q == 1) || (q == 2) && (p[1] == 'c'))) ? 2 : 0;
++    case 'c':
++      return ((q == 1) && (p[0] == 'c') || (q == 2) && (p[0] == 'b') && (p[1] == 'c')) ? 2 : 0;
++    case 'd':
++      return ((p[0] == 'd') && ((q == 1) || (q == 2) && (p[1] == 'e'))) ? 2 : 0;
++    case 'e':
++      return ((q == 1) && (p[0] == 'e') || (q == 2) && (p[0] == 'd') && (p[1] == 'e')) ? 2 : 0;
++    case 'h':
++      return ((p[0] == 'h') && ((q == 1) || (q == 2) && (p[1] == 'l'))) ? 2 : 0;
++    case 'l':
++      return ((q == 1) && (p[0] == 'l') || (q == 2) && (p[0] == 'h') && (p[1] == 'l')) ? 2 : 0;
++    case 'i':
++      // ix and iy
++      return ((p[0] == what[0]) && (p[1] == what[1]) && ((q == 2) || (q == 3) && ((p[2] == 'l') || (p[2] == 'h')))) ? 2 : 0;
++    default:
++      // unrecognized so return true
++      return 2;
++  }
++}
++
++/* Check precisely if reading arg implies reading what. */
++/* returns 0 = not found, 1 = found as (rp), 2 = found as register */
++/* sides & 0x01 indicates check left side, sides & 0x02 indicates check right side */
++static int argContPrec(const char *arg, const char *what, unsigned int sides)
++{
++  const char *p;
++  char buffer[128];
++  int ret;
++
++  // locate comma
++
++  p = strchr(arg, ',');
++
++  // check second parameter
++
++  if ((sides & 0x02) && p && (ret = argContPrec_helper(p+1, what)))
++    return ret;
++
++  // check first parameter
++
++  if (!(sides & 0x01)) return 0;
++
++  // if no second parameter
++
++  if (!p) return argContPrec_helper(arg, what);
++
++  // must separate first parameter from second
++
++  buffer[0] = '\0';
++  strncat(buffer, arg, ((p-arg) > 127) ? 127 : p-arg);
++  return argContPrec_helper(buffer, what);
++}
++
+ /* Check if reading arg implies reading what. */
+ static bool argCont(const char *arg, const char *what)
+ {
+@@ -216,211 +319,352 @@
+   return(arg[0] == '#') ? FALSE : StrStr(arg, what) != NULL;
+ }
+ 
++// z88dk special functions with register parameters listed
++static char *special_funcs[][3] = {
++    // [0] = call function name, [1] = input registers, [2] = preserved registers
++    {"call\t____sdcc_ll_copy_src_hlsp_dst_de", "dehl", "ay"},
++    {"call\t____sdcc_ll_copy_src_de_dst_hlsp", "dehl", "ay"},
++    {"call\t____sdcc_ll_add_deix_hlix", "dehl", "bcy"},
++    {"call\t____sdcc_ll_sub_deix_hlix", "dehl", "bcy"},
++    {"call\t____sdcc_ll_push_hlix", "hl", "bcy"},
++    {"call\t____sdcc_ll_copy_src_hlsp_dst_deixm", "dehl", "ay"},
++    {"call\t____sdcc_ll_copy_src_deixm_dst_hlsp", "dehl", "ay"},
++    {"call\t____sdcc_ll_asr_hlix_a", "ahl", "y"},
++    {"call\t____sdcc_ll_lsr_hlix_a", "ahl", "y"},
++    {"call\t____sdcc_ll_lsl_hlix_a", "ahl", "y"},
++    {"call\t____sdcc_ll_push_mhl", "hl", "bcy"},
++    {"call\t____sdcc_ll_copy_src_deix_dst_hl", "dehl", "ay"},
++    {"call\t____sdcc_ll_add_deix_bc_hl", "bcdehl", "y"},
++    {"call\t____sdcc_ll_sub_deix_bc_hl", "bcdehl", "y"},
++    {"call\t____sdcc_ll_copy_src_desp_dst_hlsp", "dehl", "ay"},
++    {"call\t____sdcc_ll_copy_src_de_dst_hlix", "dehl", "ay"},
++    {"call\t____sdcc_ll_add_de_bc_hl", "bcdehl", "y"},
++    {"call\t____sdcc_ll_sub_de_bc_hl", "bcdehl", "y"},
++    {"call\t____sdcc_ll_copy_src_hl_dst_de", "dehl", "ay"},
++    {"call\t____sdcc_ll_asr_mbc_a", "abc", "y"},
++    {"call\t____sdcc_ll_lsl_mbc_a", "abc", "y"},
++    {"call\t____sdcc_ll_lsr_mbc_a", "abc", "y"},
++    {"call\t____sdcc_ll_add_hlix_deix_bcix", "bcdehl", "y"},
++    {"call\t____sdcc_ll_sub_hlix_deix_bcix", "bcdehl", "y"},
++    {"call\t____sdcc_ll_copy_src_deix_dst_hlix", "dehl", "ay"},
++    {"call\t____sdcc_ll_add_hlix_bc_deix", "bcdehl", "y"},
++    {"call\t____sdcc_ll_sub_hlix_bc_deix", "bcdehl", "y"},
++    {"call\t____sdcc_ll_add_hlix_deix_bc", "bcdehl", "y"},
++    {"call\t____sdcc_ll_sub_hlix_deix_bc", "bcdehl", "y"},
++    {"call\t____sdcc_ll_add_de_hlix_bcix", "bcdehl", "y"},
++    {"call\t____sdcc_ll_sub_de_hlix_bcix", "bcdehl", "y"},
++    {"call\t____sdcc_ll_add_de_bc_hlix", "bcdehl", "y"},
++    {"call\t____sdcc_ll_sub_de_bc_hlix", "bcdehl", "y"},
++    {"call\t____sdcc_ll_add_de_hlix_bc", "bcdehl", "y"},
++    {"call\t____sdcc_ll_sub_de_hlix_bc", "bcdehl", "y"},
++    {"call\t____sdcc_cpu_push_di", "", "bcdehly"},
++    {"call\t____sdcc_cpu_pop_ei", "", "bcdehly"},
++    {"call\t____sdcc_lib_setmem_hl", "ahl", "abcdey"},
++    {"call\t____sdcc_load_debc_deix", "de", "ahly"},
++    {"call\t____sdcc_load_dehl_deix", "de", "bcy"},
++    {"call\t____sdcc_load_debc_mhl", "hl", "ay"},
++    {"call\t____sdcc_load_hlde_mhl", "hl", "bcy"},
++    {"call\t____sdcc_4_copy_src_mhl_dst_deix", "dehl", "bcy"},
++    {"call\t____sdcc_4_copy_src_mhl_dst_bcix", "bchl", "bcdey"},
++    {"call\t____sdcc_4_copy_src_mhl_dst_mbc", "bchl", "dey"},
++    {"call\t____sdcc_4_push_hlix", "hl", "bcdey"},
++    {"call\t____sdcc_4_push_mhl", "hl", "bcdey"},
++    {"call\t____sdcc_store_debc_hlix", "bcdehl", "abcdey"},
++    {"call\t____sdcc_store_debc_mhl", "bcdehl", "abcdey"},
++    {"call\t____sdcc_store_dehl_bcix", "bcdehl", "adehly"},
++    {"call\t____sdcc_2_copy_src_mhl_dst_deix", "dehl", "bcy"},
++    {"call\t____sdcc_2_copy_src_mhl_dst_bcix", "bchl", "debcy"},
++    {"call\t____sdcc_4_ldi_nosave_bc", "dehl", "y"},
++    {"call\t____sdcc_4_ldi_save_bc", "dehl", "bcy"},
++    {"call\t____sdcc_outi_128", "bchl", "acdey"},
++    {"call\t____sdcc_outi_256", "bchl", "acdey"},
++    {"call\t____sdcc_outi", "bchl", "acdey"},
++    {"call\t____sdcc_ldi_128", "bcdehl", "ay"},
++    {"call\t____sdcc_ldi_256", "bcdehl", "ay"},
++    {"call\t____sdcc_ldi", "bcdehl", "ay"},
++    {"call\t____sdcc_4_copy_srcd_hlix_dst_deix","dehl","y" },
++    {"call\t____sdcc_4_and_src_mbc_mhl_dst_deix","bcdehl","y" },
++    {"call\t____sdcc_4_or_src_mbc_mhl_dst_deix","bcdehl","y" },
++    {"call\t____sdcc_4_xor_src_mbc_mhl_dst_deix","bcdehl","y" },
++    {"call\t____sdcc_4_or_src_dehl_dst_bcix","bcdehl","dehly" },
++    {"call\t____sdcc_4_xor_src_dehl_dst_bcix","bcdehl","dehly" },
++    {"call\t____sdcc_4_and_src_dehl_dst_bcix","bcdehl","dehly" },
++    {"call\t____sdcc_4_xor_src_mbc_mhl_dst_debc","bcdehl","y" },
++    {"call\t____sdcc_4_or_src_mbc_mhl_dst_debc","bcdehl","y" },
++    {"call\t____sdcc_4_and_src_mbc_mhl_dst_debc","bcdehl","y" },
++    {"call\t____sdcc_4_cpl_src_mhl_dst_debc","hl","y" },
++    {"call\t____sdcc_4_xor_src_debc_mhl_dst_debc","bcdehl","y" },
++    {"call\t____sdcc_4_or_src_debc_mhl_dst_debc","bcdehl","y" },
++    {"call\t____sdcc_4_and_src_debc_mhl_dst_debc","bcdehl","y" },
++    {"call\t____sdcc_4_and_src_debc_hlix_dst_debc","bcdehl","y" },
++    {"call\t____sdcc_4_or_src_debc_hlix_dst_debc","bcdehl","y" },
++    {"call\t____sdcc_4_xor_src_debc_hlix_dst_debc","bcdehl","y" }
++};
++
+ static bool
+ z80MightRead(const lineNode *pl, const char *what)
+ {
+-  if(strcmp(what, "iyl") == 0 || strcmp(what, "iyh") == 0)
+-    what = "iy";
+-  if(strcmp(what, "ixl") == 0 || strcmp(what, "ixh") == 0)
+-    what = "ix";
++    int i;
+ 
+-  if(strcmp(pl->line, "call\t__initrleblock") == 0)
+-    return TRUE;
++    if (strcmp(what, "iyl") == 0 || strcmp(what, "iyh") == 0)
++        what = "iy";
++    if (strcmp(what, "ixl") == 0 || strcmp(what, "ixh") == 0)
++        what = "ix";
+ 
+-  if(strcmp(pl->line, "call\t___sdcc_call_hl") == 0 && (strchr(what, 'h') != 0 || strchr(what, 'l') != 0))
+-    return TRUE;
++    // look for z88dk special functions
++    if (strstr(pl->line, "call\t____sdcc") != 0)
++    {
++        for (i = 0; i < sizeof(special_funcs) / (3 * sizeof(char *)); ++i)
++        {
++            if (strstr(pl->line, special_funcs[i][0]) != 0)
++                return (strchr(special_funcs[i][1], (what[1] == '\0') ? what[0] : what[1]) != 0);
++        }
++    }
+ 
+-  if(strcmp(pl->line, "call\t___sdcc_call_iy") == 0 && strstr(what, "iy") != 0)
+-    return TRUE;
++    if (strcmp(pl->line, "call\t__initrleblock") == 0)
++        return TRUE;
+ 
+-  if(strncmp(pl->line, "call\t", 5) == 0 && strchr(pl->line, ',') == 0)
++    if (strcmp(pl->line, "call\t___sdcc_call_hl") == 0 && strchr("hl", *what))
++        return TRUE;
++
++    if (strcmp(pl->line, "call\t___sdcc_call_iy") == 0 && strstr(what, "iy") != 0)
++        return TRUE;
++
++    if (strncmp(pl->line, "call\t", 5) == 0 && strchr(pl->line, ',') == 0)
+     {
+-      const symbol *f = findSym (SymbolTab, 0, pl->line + 6);
+-      if (f)
+-      {
+-        const value *args = FUNC_ARGS (f->type);
++        const symbol *f = findSym(SymbolTab, 0, pl->line + 6);
++        if (f)
++        {
++            const value *args = FUNC_ARGS(f->type);
+ 
+-        if (IFFUNC_ISZ88DK_FASTCALL (f->type) && args) // Has one register argument of size up to 32 bit.
+-          {
+-            const unsigned int size = getSize (args->type);
+-            wassert (!args->next); // Only one argment allowed in __z88dk_fastcall functions.
+-            if (strchr(what, 'l') && size >= 1)
+-              return TRUE;
+-            if (strchr(what, 'h') && size >= 2)
+-              return TRUE;
+-            if (strchr(what, 'e') && size >= 3)
+-              return TRUE;
+-            if (strchr(what, 'd') && size >= 4)
+-              return TRUE;
+-          }
+-        return FALSE;
+-      }
+-      else // Fallback needed for calls through function pointers and for calls to literal addresses.
+-      {
+-        if (strchr(what, 'l') && z80_regs_used_as_parms_in_calls_from_current_function[L_IDX])
+-          return TRUE;
+-        if (strchr(what, 'h') && z80_regs_used_as_parms_in_calls_from_current_function[H_IDX])
+-          return TRUE;
+-        if (strchr(what, 'e') && z80_regs_used_as_parms_in_calls_from_current_function[E_IDX])
+-          return TRUE;
+-        if (strchr(what, 'd') && z80_regs_used_as_parms_in_calls_from_current_function[D_IDX])
+-          return TRUE;
+-        if (strchr(what, 'c') && z80_regs_used_as_parms_in_calls_from_current_function[C_IDX])
+-          return TRUE;
+-        if (strchr(what, 'b') && z80_regs_used_as_parms_in_calls_from_current_function[B_IDX])
+-          return TRUE;
+-        if (strstr(what, "iy") && (z80_regs_used_as_parms_in_calls_from_current_function[IYL_IDX] || z80_regs_used_as_parms_in_calls_from_current_function[IYH_IDX]))
+-          return TRUE;
+-        return FALSE;
+-      }
++            if (IFFUNC_ISZ88DK_FASTCALL(f->type) && args) // Has one register argument of size up to 32 bit.
++            {
++                const unsigned int size = getSize(args->type);
++                wassert(!args->next); // Only one argment allowed in __z88dk_fastcall functions.
++                if (strchr(what, 'l') && size >= 1)
++                    return TRUE;
++                if (strchr(what, 'h') && size >= 2)
++                    return TRUE;
++                if (strchr(what, 'e') && size >= 3)
++                    return TRUE;
++                if (strchr(what, 'd') && size >= 4)
++                    return TRUE;
++            }
++            return FALSE;
++        }
++        else // Fallback needed for calls through function pointers and for calls to literal addresses.
++        {
++            if (strchr(what, 'l') && z80_regs_used_as_parms_in_calls_from_current_function[L_IDX])
++                return TRUE;
++            if (strchr(what, 'h') && z80_regs_used_as_parms_in_calls_from_current_function[H_IDX])
++                return TRUE;
++            if (strchr(what, 'e') && z80_regs_used_as_parms_in_calls_from_current_function[E_IDX])
++                return TRUE;
++            if (strchr(what, 'd') && z80_regs_used_as_parms_in_calls_from_current_function[D_IDX])
++                return TRUE;
++            if (strchr(what, 'c') && z80_regs_used_as_parms_in_calls_from_current_function[C_IDX])
++                return TRUE;
++            if (strchr(what, 'b') && z80_regs_used_as_parms_in_calls_from_current_function[B_IDX])
++                return TRUE;
++            if (strstr(what, "iy") && (z80_regs_used_as_parms_in_calls_from_current_function[IYL_IDX] || z80_regs_used_as_parms_in_calls_from_current_function[IYH_IDX]))
++                return TRUE;
++            return FALSE;
++        }
+     }
+ 
+-  if(ISINST(pl->line, "ret"))
+-    return(isReturned(what));
++    if (ISINST(pl->line, "ret") ||
++        ISINST(pl->line, "reti") ||
++        ISINST(pl->line, "retn"))
++        return(isReturned(what));
+ 
+-  if(!strcmp(pl->line, "ex\t(sp), hl") || !strcmp(pl->line, "ex\t(sp),hl"))
+-    return(!strcmp(what, "h") || !strcmp(what, "l"));
+-  if(!strcmp(pl->line, "ex\t(sp), ix") || !strcmp(pl->line, "ex\t(sp),ix"))
+-    return(!!strstr(what, "ix"));
+-  if(!strcmp(pl->line, "ex\t(sp), iy") || !strcmp(pl->line, "ex\t(sp),iy"))
+-    return(!!strstr(what, "iy"));
+-  if(!strcmp(pl->line, "ex\tde, hl") || !strcmp(pl->line, "ex\tde,hl"))
+-    return(!strcmp(what, "h") || !strcmp(what, "l") || !strcmp(what, "d") || !strcmp(what, "e"));
+-  if(ISINST(pl->line, "ld\t"))
++    if (!strcmp(pl->line, "ex\t(sp), hl") || !strcmp(pl->line, "ex\t(sp),hl"))
++        return(strchr("hl", *what) != 0);
++
++    if (!strcmp(pl->line, "ex\t(sp), ix") || !strcmp(pl->line, "ex\t(sp),ix"))
++        return(strstr(what, "ix") != 0);
++
++    if (!strcmp(pl->line, "ex\t(sp), iy") || !strcmp(pl->line, "ex\t(sp),iy"))
++        return(strstr(what, "iy") != 0);
++
++    if (!strcmp(pl->line, "ex\tde, hl") || !strcmp(pl->line, "ex\tde,hl"))
++        return(strchr("dehl", *what) != 0);
++
++    if (!IS_GB && ISINST(pl->line, "exx"))
++        return(strchr("bcdehl", *what) != 0);
++
++    if (ISINST(pl->line, "ld\t"))
+     {
+-      if(argCont(strchr(pl->line, ','), what))
+-        return TRUE;
+-      if(*(strchr(pl->line, ',') - 1) == ')' && strstr(pl->line + 3, what) && (strchr(pl->line, '#') == 0 || strchr(pl->line, '#') > strchr(pl->line, ',')))
+-        return TRUE;
+-      return FALSE;
++        // anything found to right of comma is a read
++        if (argContPrec(pl->line + 3, what, 2))
++            return TRUE;
++
++        // only (ix), (iy), (bc), (de), (hl) to left of comma is a read
++        return (argContPrec(pl->line + 3, what, 1) == 1);
+     }
+ 
+-  if(!strcmp(pl->line, "xor\ta, a") || !strcmp(pl->line, "xor\ta,a"))
+-    return FALSE;
++    if (!strcmp(pl->line, "xor\ta, a") || !strcmp(pl->line, "xor\ta,a"))
++        return FALSE;
+ 
+-  if(ISINST(pl->line, "adc\t") ||
+-     ISINST(pl->line, "add\t") ||
+-     ISINST(pl->line, "and\t") ||
+-     ISINST(pl->line, "sbc\t") ||
+-     ISINST(pl->line, "sub\t") ||
+-     ISINST(pl->line, "xor\t"))
++    if (ISINST(pl->line, "adc\t") ||
++        ISINST(pl->line, "add\t") ||
++        ISINST(pl->line, "and\t") ||
++        ISINST(pl->line, "sbc\t") ||
++        ISINST(pl->line, "sub\t") ||
++        ISINST(pl->line, "xor\t"))
+     {
+-      const char *arg = pl->line + 4;
+-      while(isspace(*arg))
+-        arg++;
+-      if(*arg == 'a' && *(arg + 1) == ',')
+-        {
+-          if(!strcmp(what, "a"))
+-            return TRUE;
+-          arg += 2;
+-        }
+-      return(argCont(arg, what));
++        return(argContPrec(pl->line + 4, what, 3));
+     }
+ 
+-  if(ISINST(pl->line, "or\t") || ISINST(pl->line, "cp\t") )
++    if (ISINST(pl->line, "or\t") ||
++        ISINST(pl->line, "cp\t"))
+     {
+-      if(argCont(pl->line + 3, what))
+-        return TRUE;
+-      if(strcmp("a", what) == 0)
+-        return TRUE;
+-      return FALSE;
++        if (*what == 'a')
++            return TRUE;
++        if (argContPrec(pl->line + 3, what, 3))
++            return TRUE;
++        return FALSE;
+     }
+ 
+-  if(ISINST(pl->line, "neg"))
+-    return(strcmp(what, "a") == 0);
++    if (ISINST(pl->line, "neg"))
++        return(*what == 'a');
+ 
+-  if(ISINST(pl->line, "pop\t"))
+-    return FALSE;
++    if (ISINST(pl->line, "pop\t"))
++        return FALSE;
+ 
+-  if(ISINST(pl->line, "push\t"))
+-    return(strstr(pl->line + 5, what) != 0);
++    if (ISINST(pl->line, "push\t"))
++        return(strstr(pl->line + 5, what) != 0);
+ 
+-  if(ISINST(pl->line, "dec\t") ||
+-     ISINST(pl->line, "inc\t"))
++    if (ISINST(pl->line, "dec\t") ||
++        ISINST(pl->line, "inc\t"))
+     {
+-      return(argCont(pl->line + 4, what));
++        return(argContPrec(pl->line + 4, what, 3));
+     }
+ 
+-  if(ISINST(pl->line, "cpl"))
+-    return(!strcmp(what, "a"));
++    if (ISINST(pl->line, "cpl"))
++        return(*what == 'a');
+ 
+-  if(ISINST(pl->line, "di") || ISINST(pl->line, "ei"))
+-    return(FALSE);
++    if (ISINST(pl->line, "di") ||
++        ISINST(pl->line, "ei") ||
++        ISINST(pl->line, "halt") ||
++        ISINST(pl->line, "im"))
++        return(FALSE);
+ 
+-  // Rotate and shift group
+-  if(ISINST(pl->line, "rlca") ||
+-     ISINST(pl->line, "rla")  ||
+-     ISINST(pl->line, "rrca") ||
+-     ISINST(pl->line, "rra"))
++    // Rotate and shift group
++    if (ISINST(pl->line, "rlca") ||
++        ISINST(pl->line, "rla") ||
++        ISINST(pl->line, "rrca") ||
++        ISINST(pl->line, "rra"))
+     {
+-      return(strcmp(what, "a") == 0);
++        return(*what == 'a');
+     }
+-  if(ISINST(pl->line, "rl\t") ||
+-     ISINST(pl->line, "rr\t"))
++    if (ISINST(pl->line, "rl\t") ||
++        ISINST(pl->line, "rr\t"))
+     {
+-      return(argCont(pl->line + 3, what));
++        return(argContPrec(pl->line + 3, what, 3));
+     }
+-  if(ISINST(pl->line, "rlc\t") ||
+-     ISINST(pl->line, "sla\t") ||
+-     ISINST(pl->line, "sra\t") ||
+-     ISINST(pl->line, "srl\t"))
++    if (ISINST(pl->line, "rlc\t") ||
++        ISINST(pl->line, "sla\t") ||
++        ISINST(pl->line, "sra\t") ||
++        ISINST(pl->line, "srl\t"))
+     {
+-      return(argCont(pl->line + 4, what));
++        return(argContPrec(pl->line + 4, what, 3));
+     }
+-  if(!IS_GB && !IS_RAB &&
+-    (ISINST(pl->line, "rld") ||
+-     ISINST(pl->line, "rrd")))
+-    return(!!strstr("ahl", what));
+ 
+-  // Bit set, reset and test group
+-  if(ISINST(pl->line, "bit\t") ||
+-     ISINST(pl->line, "set\t") ||
+-     ISINST(pl->line, "res\t"))
++    if (!IS_GB && !IS_RAB &&
++        (ISINST(pl->line, "rld") ||
++            ISINST(pl->line, "rrd")))
+     {
+-      return(argCont(pl->line + 4, what));
++        return(strchr("ahl", *what) != 0);
+     }
+ 
+- if(ISINST(pl->line, "ccf") ||
+-    ISINST(pl->line, "nop"))
+-    return FALSE;
++    // Bit set, reset and test group
++    if (ISINST(pl->line, "bit\t") ||
++        ISINST(pl->line, "set\t") ||
++        ISINST(pl->line, "res\t"))
++    {
++        return(argContPrec(pl->line + 4, what, 3));
++    }
+ 
+-  if(strncmp(pl->line, "jp\t", 3) == 0 ||
+-     strncmp(pl->line, "jr\t", 3) == 0)
+-    return FALSE;
++    if (ISINST(pl->line, "ccf") ||
++        ISINST(pl->line, "nop"))
++        return FALSE;
+ 
+-  if(ISINST(pl->line, "djnz\t"))
+-    return(strchr(what, 'b') != 0);
++    if (strncmp(pl->line, "jp\t", 3) == 0 ||
++        strncmp(pl->line, "jr\t", 3) == 0)
++        return FALSE;
+ 
+-  if(!IS_GB && ISINST(pl->line, "ldir"))
+-    return(!strcmp(what, "b") || !strcmp(what, "c") || !strcmp(what, "d") || !strcmp(what, "e") || !strcmp(what, "h") || !strcmp(what, "l"));
++    if (ISINST(pl->line, "djnz\t"))
++        return(*what == 'b');
+ 
+-  if(!IS_GB && !IS_RAB && ISINST(pl->line, "out\t"))
+-    return(strstr(strchr(pl->line + 4, ','), what) != 0 || strstr(pl->line + 4, "(c)") && (!strcmp(what, "b") || !strcmp(what, "c")));
+-  if(!IS_GB && !IS_RAB && ISINST(pl->line, "in\t"))
+-    return(!strstr(strchr(pl->line + 4, ','), "(c)") && !strcmp(what, "a") || strstr(strchr(pl->line + 4, ','), "(c)") && (!strcmp(what, "b") || !strcmp(what, "c")));
++    if (!IS_GB &&
++        (ISINST(pl->line, "ldir") ||
++            ISINST(pl->line, "ldi") ||
++            ISINST(pl->line, "ldd") ||
++            ISINST(pl->line, "lddr")))
++        return(strchr("bcdehl", *what) != 0);
+ 
+-  if(!IS_GB && !IS_RAB &&
+-    (ISINST(pl->line, "ini\t") || ISINST(pl->line, "ind\t") || ISINST(pl->line, "inir\t") || ISINST(pl->line, "indr\t") ||
+-    ISINST(pl->line, "outi\t") || ISINST(pl->line, "outd\t") || ISINST(pl->line, "otir\t") || ISINST(pl->line, "otdr\t")))
+-    return(!strcmp(what, "b") || !strcmp(what, "c") || !strcmp(what, "h") || !strcmp(what, "l"));
++    if (!IS_GB && !IS_RAB &&
++        (ISINST(pl->line, "cpir") ||
++            ISINST(pl->line, "cpi") ||
++            ISINST(pl->line, "cpd") ||
++            ISINST(pl->line, "cpdr")))
++        return(strchr("abchl", *what) != 0);
+ 
+-  if(IS_Z180 && ISINST(pl->line, "mlt\t"))
+-    return(argCont(pl->line + 4, what));
++    if (!IS_GB && !IS_RAB && ISINST(pl->line, "out\t"))
++        return(strstr(strchr(pl->line + 4, ','), what) != 0 || strstr(pl->line + 4, "(c)") && ((*what == 'b') || (*what == 'c')));
+ 
+-  if(IS_Z180 && ISINST(pl->line, "tst\t"))
+-    return(argCont(pl->line + 4, what));
++    if (!IS_GB && !IS_RAB && ISINST(pl->line, "in\t"))
++        return(!strstr(strchr(pl->line + 3, ','), "(c)") && (*what == 'a') || strstr(strchr(pl->line + 3, ','), "(c)") && ((*what == 'b') || (*what == 'c')));
+ 
+-  if(IS_RAB && ISINST(pl->line, "mul"))
+-    return(!strcmp(what, "b") || !strcmp(what, "c") || !strcmp(what, "d") || !strcmp(what, "e"));
++    if (!IS_GB && !IS_RAB &&
++        (ISINST(pl->line, "ini") ||
++            ISINST(pl->line, "ind") ||
++            ISINST(pl->line, "inir") ||
++            ISINST(pl->line, "indr") ||
++            ISINST(pl->line, "outi") ||
++            ISINST(pl->line, "outd") ||
++            ISINST(pl->line, "otir") ||
++            ISINST(pl->line, "otdr")))
++        return(strchr("bchl", *what) != 0);
+ 
+-  if(IS_RAB && ISINST(pl->line, "bool\t"))
+-    return(argCont(pl->line + 5, what));
++    if (IS_Z180)
++    {
++      if (ISINST(pl->line, "mlt\t"))
++        return(strchr(pl->line + 4, *what) != 0);
+ 
+-  /* TODO: Can we know anything about rst? */
+-  if(ISINST(pl->line, "rst"))
+-    return(TRUE);
++      if (ISINST(pl->line, "tst\t"))
++        return(argContPrec(pl->line + 4, what, 3));
+ 
+-  return TRUE;
++      if (ISINST(pl->line, "tstio\t"))
++        return(*what == 'c');
++
++      if (ISINST(pl->line, "slp"))
++        return FALSE;
++
++      if (ISINST(pl->line, "otim") ||
++          ISINST(pl->line, "otimr") ||
++          ISINST(pl->line, "otdm") ||
++          ISINST(pl->line, "otdmr"))
++        return(strchr("bchl", *what) != 0);
++
++      if (ISINST(pl->line, "in0"))
++        return FALSE;
++
++      if (ISINST(pl->line, "out0"))
++          return(argContPrec(pl->line + 5, what, 2));
++    }
++
++    if(IS_RAB && ISINST(pl->line, "mul"))
++      return(strchr("bcde", *what) != 0);
++
++    if(IS_RAB && ISINST(pl->line, "bool\t"))
++      return(argCont(pl->line + 5, what));
++
++    /* TODO: Can we know anything about rst? */
++    if(ISINST(pl->line, "rst"))
++      return(TRUE);
++
++    return TRUE;
+ }
+ 
+ static bool
+@@ -465,12 +709,23 @@
+     return TRUE;
+   if(ISINST(pl->line, "call\t") && strchr(pl->line, ',') == 0)
+     {
++      int i;
+       const symbol *f = findSym (SymbolTab, 0, pl->line + 6);
+       const bool *preserved_regs;
+ 
+       if(!strcmp(what, "ix"))
+         return FALSE;
+ 
++      // z88dk special functions
++      if(!f && (strstr(pl->line, "call\t____sdcc") != 0))
++        {
++           for (i = 0; i < sizeof(special_funcs) / (3*sizeof(char *)); ++i)
++             {
++                if (strstr(pl->line, special_funcs[i][0]) != 0)
++                  return (strchr(special_funcs[i][2], (what[1] == '\0') ? what[0] : what[1]) == 0);
++             }
++        }
++
+       if(f)
+           preserved_regs = f->type->funcAttrs.preserved_regs;
+       else // Err on the safe side.
+@@ -491,25 +746,26 @@
+       if(!strcmp(what, "iy"))
+         return !preserved_regs[IYL_IDX] && !preserved_regs[IYH_IDX];
+     }
++
+   if(strcmp(pl->line, "ret") == 0)
+     return TRUE;
+   if(ISINST(pl->line, "ld\tiy") && strncmp(what, "iy", 2) == 0)
+     return TRUE;
+ 
+   if (IS_Z180)
+-    {
++  {
+       if (ISINST(pl->line, "mlt\t"))
+         return(strchr(pl->line + 4, *what) != 0);
+ 
+       if (ISINST(pl->line, "otim") ||
+-        ISINST(pl->line, "otimr") ||
+-        ISINST(pl->line, "otdm") ||
+-        ISINST(pl->line, "otdmr"))
+-        return(strchr("bchl", *what) != NULL);
++          ISINST(pl->line, "otimr") ||
++          ISINST(pl->line, "otdm") ||
++          ISINST(pl->line, "otdmr"))
++        return(strchr("bchl", *what) != 0);
+ 
+       if (ISINST(pl->line, "in0"))
+-        return(!strncmp(pl->line + 4, what, strlen(what)));
+-    }
++        return(argContPrec(pl->line + 4, what, 1));
++  }
+ 
+   return FALSE;
+ }
+@@ -1076,7 +1332,7 @@
+   /* If the instruction is unrecognized, we shouldn't try to optimize.  */
+   /* For all we know it might be some .ds or similar possibly long line */
+   /* Return a large value to discourage optimization.                   */
+-  werrorfl(pl->ic->filename, pl->ic->lineno, W_UNRECOGNIZED_ASM, __FUNCTION__, 999, pl->line);
++  //werrorfl(pl->ic->filename, pl->ic->lineno, W_UNRECOGNIZED_ASM, __FUNCTION__, 999, pl->line);
+   return(999);
+ }
+ 

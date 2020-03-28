@@ -20,6 +20,9 @@
 	INCLUDE	"crt/classic/crt_rules.inc"
 
 	EXTERN	msx_set_mode
+	EXTERN	im1_vectors
+	EXTERN	nmi_vectors
+	EXTERN	asm_interrupt_handler
 
         org     CRT_ORG_CODE
 
@@ -69,28 +72,31 @@ if (ASMPC<>$0038)
         defs    CODE_ALIGNMENT_ERROR
 endif
 	INCLUDE	"crt/classic/tms9118/interrupt.asm"
+	ei
+	reti
 
         defs    $0066 - ASMPC
 if (ASMPC<>$0066)
         defs    CODE_ALIGNMENT_ERROR
 endif
 nmi:
-int_PAUSE:
 	push	af
 	push	hl
-	
-	ld	hl, _pause_flag
-	ld	a, (hl)
-	xor	a, 1
-	ld	(hl), a
-	
-	ld	hl, pause_procs
-	call	int_handler
+	ld	hl, nmi_vectors
+	call	asm_interrupt_handler
 	pop	hl
 	pop	af
 	retn
 
-	INCLUDE	"crt/classic/tms9118/interrupt_handler.asm"
+int_VBL:
+	ld	hl,im1_vectors
+	call	asm_interrupt_handler
+	pop	hl
+	pop	af
+	ei
+	reti
+
+
 
 restart10:
 restart08:
@@ -131,10 +137,8 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
 	push	hl
-IF CRT_ENABLE_STDIO = 1
-	EXTERN 	closeall
-	call	closeall
-ENDIF
+    call    crt0_exit
+
 
 endloop:
 	jr	endloop

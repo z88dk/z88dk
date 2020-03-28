@@ -42,6 +42,7 @@ section code_fcntl
 section code_font_fzx
 section code_fp_genmath
 section code_fp_math48
+section code_fp_math32
 section code_im2
 section code_input
 section code_inttypes
@@ -57,6 +58,7 @@ section code_PSGlib
 section code_setjmp
 section code_SMSlib
 section code_sound_bit
+section code_sound_ay
 section code_stdio
 section code_stdlib
 section code_string

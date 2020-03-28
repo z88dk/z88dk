@@ -398,7 +398,7 @@ restart:
 	}
 		
 	printf ("Done.  Press ENTER");
-	while (getk() != 13) {};
+	while (getk() != '\n') {};
 	goto restart;
 }
 

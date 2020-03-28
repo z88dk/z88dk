@@ -27,8 +27,12 @@
 
 	defc	CRT_ORG_CODE = 0xb000
 
-	defc	CONSOLE_ROWS = 25
+	defc	CONSOLE_ROWS = 24
 	defc	CONSOLE_COLUMNS = 40
+	PUBLIC	GRAPHICS_CHAR_SET
+	PUBLIC	GRAPHICS_CHAR_UNSET
+	defc	GRAPHICS_CHAR_SET = 0x87
+	defc	GRAPHICS_CHAR_UNSET = 0x32
 
 	defc	CRT_KEY_DEL = 8
 
@@ -37,6 +41,8 @@
         defc    TAR__register_sp = -1
 	defc	__CPU_CLOCK = 4000000 
         INCLUDE "crt/classic/crt_rules.inc"
+
+	INCLUDE "target/fp1100/def/fp1100.def"
 	
         org     CRT_ORG_CODE
 	jp	start
@@ -56,6 +62,8 @@ start:
 	IF DEFINED_USING_amalloc
 		INCLUDE "crt/classic/crt_init_amalloc.asm"
 	ENDIF
+	ld	a,SUB_BEEPOFF
+	call	TRNC1
 
 
         call    _main           ; Call user program
@@ -65,10 +73,8 @@ cleanup:
 ;
         push    hl				; return code
 
-IF CRT_ENABLE_STDIO = 1
-        EXTERN     closeall
-        call    closeall
-ENDIF
+        call    crt0_exit
+
 
 cleanup_exit:
 
@@ -82,8 +88,6 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 
 
 
-	defm    "Small C+ FP-1100"   ;Unnecessary file signature
-	defb    0
         INCLUDE "crt/classic/crt_runtime_selection.asm"
 
         INCLUDE "crt/classic/crt_section.asm"

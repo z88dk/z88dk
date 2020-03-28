@@ -2,15 +2,13 @@
 
 # Z88DK Z80 Macro Assembler
 #
-# Copyright (C) Paulo Custodio, 2011-2018
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk/
 #
 # Test defgroup
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 require './t/testlib.pl';
 
@@ -96,7 +94,6 @@ END
 Error at file 'test.asm' line 3: expected constant expression
 Error at file 'test.asm' line 4: symbol 'undefined' not defined
 Error at file 'test.asm' line 4: expected constant expression
-3 errors occurred during assembly
 ERR
 
 # range errors
@@ -111,7 +108,6 @@ z80asm(<<'END', "", 1, "", <<'ERR');
 END
 Error at file 'test.asm' line 3: integer '65536' out of range
 Error at file 'test.asm' line 5: integer '-32769' out of range
-2 errors occurred during assembly
 ERR
 
 # {} block
@@ -120,7 +116,6 @@ z80asm(<<'END', "", 1, "", <<'ERR');
 	defgroup 
 END
 Error at file 'test.asm' line 2: missing {} block
-1 errors occurred during assembly
 ERR
 
 unlink_testfiles();
@@ -128,7 +123,6 @@ z80asm(<<'END', "", 1, "", <<'ERR');
 	defgroup  {
 END
 Error at file 'test.asm' line 2: {} block not closed
-1 errors occurred during assembly
 ERR
 
 # BUG_0032 : DEFGROUP ignores name after assignment

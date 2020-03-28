@@ -2,16 +2,14 @@
 
 # Z88DK Z80 Module Assembler
 #
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk/
 #
 # Test https://github.com/z88dk/z88dk/issues/17
 # z80asm: bug with filenames interpreting escape sequences
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 require './t/testlib.pl';
 
@@ -41,7 +39,6 @@ END
 END
 	run("z80asm test.asm", 1, "", <<END);
 Error at file 'test_dir${slash}test.inc' line 1: syntax error
-1 errors occurred during assembly
 END
 
 	spew("test.asm", <<END);
@@ -50,7 +47,6 @@ END
 END
 	run("z80asm test.asm", 1, "", <<END);
 Error at file 'test_dir${slash}test.c' line 1: syntax error
-1 errors occurred during assembly
 END
 
 }

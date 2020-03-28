@@ -2,9 +2,9 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2017
+Copyright (C) Paulo Custodio, 2011-2019
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-Repository: https://github.com/pauloscustodio/z88dk-z80asm
+Repository: https://github.com/z88dk/z88dk
 */
 
 #include "alloc.h"
@@ -28,87 +28,87 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include <ctype.h>
 
 /* external functions */
-struct libfile *NewLibrary( void );
+struct libfile* NewLibrary(void);
 
 /* local functions */
-int LinkModule(const char *filename, long fptr_base, StrHash *extern_syms);
-int LinkTracedModule(const char *filename, long baseptr );
-int LinkLibModule(struct libfile *library, long curmodule, const char *modname, StrHash *extern_syms);
+int LinkModule(const char* filename, long fptr_base, StrHash* extern_syms);
+int LinkTracedModule(const char* filename, long baseptr);
+int LinkLibModule(struct libfile* library, long curmodule, const char* modname, StrHash* extern_syms);
 void CreateBinFile(void);
-void ReadNames(const char *filename, FILE *file);
-void ReleaseLinkInfo( void );
-static void merge_modules(StrHash *extern_syms);
+void ReadNames(const char* filename, FILE* file);
+void ReleaseLinkInfo(void);
+static void merge_modules(StrHash* extern_syms);
 
 /* global variables */
 extern char Z80objhdr[];
 extern byte_t reloc_routine[];
-extern struct liblist *libraryhdr;
-extern char *reloctable, *relocptr;
+extern struct liblist* libraryhdr;
+extern char* reloctable, * relocptr;
 
-struct linklist *linkhdr;
+struct linklist* linkhdr;
 int totaladdr, curroffset;
 
-static void ReadNames_1(const char *filename, FILE *file,
-						str_t *section_name, str_t *name, str_t *def_filename)
+static void ReadNames_1(const char* filename, FILE* file,
+	str_t* section_name, str_t* name, str_t* def_filename)
 {
-    int scope, symbol_char;
+	int scope, symbol_char;
 	sym_type_t type = TYPE_UNKNOWN;
-    long value;
+	long value;
 	long line_nr;
-	Symbol *sym = NULL;
+	Symbol* sym = NULL;
 
-    while (true)
-    {
-        scope = xfread_byte(file);
-		if ( scope == 0 )
+	while (true)
+	{
+		scope = xfread_byte(file);
+		if (scope == 0)
 			break;								/* terminator */
 
-        symbol_char	= xfread_byte(file);		/* type of name   */
+		symbol_char = xfread_byte(file);		/* type of name   */
 
 		xfread_bcount_str(section_name, file);	/* read section name */
 
-		value		= xfread_dword(file);		/* read symbol (long) integer */
+		value = xfread_dword(file);		/* read symbol (long) integer */
 		xfread_bcount_str(name, file);			/* read symbol name */
 
 		// read symbol definition location
 		xfread_bcount_str(def_filename, file);
 		line_nr = xfread_dword(file);
 
-		new_section( str_data(section_name) );		/* define CURRENTSECTION */
+		new_section(str_data(section_name));		/* define CURRENTSECTION */
 
-        switch ( symbol_char )
-        {
-        case 'A': type = TYPE_ADDRESS;  break;
-        case 'C': type = TYPE_CONSTANT; break;
-        case '=': type = TYPE_COMPUTED; break;
-        default:
-            error_not_obj_file( filename );
-        }
+		switch (symbol_char)
+		{
+		case 'A': type = TYPE_ADDRESS;  break;
+		case 'C': type = TYPE_CONSTANT; break;
+		case '=': type = TYPE_COMPUTED; break;
+		default:
+			error_not_obj_file(filename);
+		}
 
-        switch ( scope )
-        {
+		switch (scope)
+		{
 		case 'L': sym = define_local_sym(str_data(name), value, type); break;
 		case 'G': sym = define_global_sym(str_data(name), value, type); break;
-        default:
-            error_not_obj_file( filename );
-        }
+		default:
+			error_not_obj_file(filename);
+		}
 
 		// set symbol definition
 		if (sym) {
 			sym->filename = spool_add(str_data(def_filename));
 			sym->line_nr = line_nr;
 		}
-    }
+	}
 }
 
-void ReadNames(const char *filename, FILE *file)
+void ReadNames(const char* filename, FILE* file)
 {
-	str_t *section_name = str_new();
-	str_t *name = str_new();
-	str_t *def_filename = str_new();
+	str_t* section_name = str_new();
+	str_t* name = str_new();
+	str_t* def_filename = str_new();
 
-	ReadNames_1(filename, file, 
-				section_name, name, def_filename);
+	ReadNames_1(filename, file,
+		section_name, name, def_filename);
 
 	str_free(section_name);
 	str_free(name);
@@ -117,131 +117,134 @@ void ReadNames(const char *filename, FILE *file)
 
 
 /* set environment to compute expression */
-static void set_asmpc_env(Module *module, const char *section_name,
-	const char *filename, int line_nr,
+static void set_asmpc_env(Module* module, const char* section_name,
+	const char* filename, int line_nr,
 	int asmpc,
 	bool module_relative_addr)
 {
 	int base_addr, offset;
 
 	/* point to current module */
-	set_cur_module( module );
+	set_cur_module(module);
 
 	/* source file and line number */
-	set_error_file( filename );
-	set_error_line( line_nr );
+	set_error_file(filename);
+	set_error_line(line_nr);
 
 	/* assembler PC as absolute address */
-	new_section( section_name );
+	new_section(section_name);
 
-	if ( module_relative_addr ) {
-		set_PC( asmpc );
+	if (module_relative_addr) {
+		set_PC(asmpc);
 	}
 	else {
 		base_addr = CURRENTSECTION->addr;
-		offset    = get_cur_module_start(); 
-		set_PC( asmpc + base_addr + offset );
+		offset = get_cur_module_start();
+		set_PC(asmpc + base_addr + offset);
 	}
 }
 
 /* set environment to compute expression */
-static void set_expr_env( Expr *expr, bool module_relative_addr )
+static void set_expr_env(Expr* expr, bool module_relative_addr)
 {
-	set_asmpc_env( expr->module, expr->section->name, 
-				   expr->filename, expr->line_nr, 
-				   expr->asmpc,
-				   module_relative_addr );
+	set_asmpc_env(expr->module, expr->section->name,
+		expr->filename, expr->line_nr,
+		expr->asmpc,
+		module_relative_addr);
 }
 
 /* read the current modules' expressions to the given list */
-static void read_cur_module_exprs_1(ExprList *exprs, FILE *file, char *filename,
-	str_t *expr_text, str_t *last_filename, str_t *source_filename, 
-	str_t *section_name, str_t *target_name)
+static void read_cur_module_exprs_1(ExprList* exprs, FILE* file, char* filename,
+	str_t* expr_text, str_t* last_filename, str_t* source_filename,
+	str_t* section_name, str_t* target_name)
 {
 	int line_nr;
 	int type;
-    Expr *expr;
-    int asmpc, code_pos;
+	Expr* expr;
+	int asmpc, code_pos;
 
-	while (1) 
+	while (1)
 	{
-        type = xfread_byte(file);
-		if ( type == 0 )
+		type = xfread_byte(file);
+		if (type == 0)
 			break;			/* end marker */
 
 		/* source file and line number */
 		xfread_wcount_str(source_filename, file);
-		if ( str_len(source_filename) == 0 )
-			str_set( source_filename, str_data(last_filename) );
+		if (str_len(source_filename) == 0)
+			str_set(source_filename, str_data(last_filename));
 		else
-			str_set( last_filename, str_data(source_filename) );
+			str_set(last_filename, str_data(source_filename));
 
 		line_nr = xfread_dword(file);
 
 		/* patch location */
 		xfread_bcount_str(section_name, file);
 
-		asmpc		= xfread_word(file);
-        code_pos	= xfread_word(file);
+		asmpc = xfread_word(file);
+		code_pos = xfread_word(file);
 
 		xfread_bcount_str(target_name, file);	/* get expression EQU target, if not empty */
 		xfread_wcount_str(expr_text, file);		/* get expression */
 
 		/* read expression followed by newline */
 		str_append(expr_text, "\n");
-		SetTemporaryLine( str_data(expr_text) );			/* read expression */
+		SetTemporaryLine(str_data(expr_text));			/* read expression */
 
-        EOL = false;                /* reset end of line parsing flag - a line is to be parsed... */
+		EOL = false;                /* reset end of line parsing flag - a line is to be parsed... */
 
 		scan_expect_operands();
-        GetSym();
+		GetSym();
 
 		/* parse and store expression in the list */
-		set_asmpc_env( CURRENTMODULE, str_data(section_name), 
-					   str_data(source_filename), line_nr, 
-					   asmpc,
-					   false );
-        if ( ( expr = expr_parse() ) != NULL )
-        {
+		set_asmpc_env(CURRENTMODULE, str_data(section_name),
+			str_data(source_filename), line_nr,
+			asmpc,
+			false);
+		if ((expr = expr_parse()) != NULL)
+		{
 			expr->range = 0;
-            switch ( type )
-            {
-            case 'U': expr->range = RANGE_BYTE_UNSIGNED; break;
-            case 'S': expr->range = RANGE_BYTE_SIGNED;  break;
+			switch (type)
+			{
+			case 'U': expr->range = RANGE_BYTE_UNSIGNED; break;
+			case 'S': expr->range = RANGE_BYTE_SIGNED;  break;
+			case 'u': expr->range = RANGE_BYTE_TO_WORD_UNSIGNED; break;
+			case 's': expr->range = RANGE_BYTE_TO_WORD_SIGNED; break;
 			case 'C': expr->range = RANGE_WORD;			break;
 			case 'B': expr->range = RANGE_WORD_BE;		break;
 			case 'L': expr->range = RANGE_DWORD;		break;
 			case 'J': expr->range = RANGE_JR_OFFSET;	break;
+			case 'P': expr->range = RANGE_PTR24;		break;
 			case '=': expr->range = RANGE_WORD;
-					  xassert( str_len(target_name) > 0 );
-					  expr->target_name = spool_add( str_data(target_name) );	/* define expression as EQU */
-					  break;
+				xassert(str_len(target_name) > 0);
+				expr->target_name = spool_add(str_data(target_name));	/* define expression as EQU */
+				break;
 			default:
-				error_not_obj_file( filename );
-            }
+				error_not_obj_file(filename);
+			}
 
-			expr->module	= CURRENTMODULE;
-			expr->section	= CURRENTSECTION;
-			expr->asmpc		= asmpc;
-			expr->code_pos	= code_pos;
-			expr->filename	= spool_add( str_data(source_filename) );
-			expr->line_nr	= line_nr;
-			expr->listpos	= -1;
+			expr->module = CURRENTMODULE;
+			expr->section = CURRENTSECTION;
+			expr->asmpc = asmpc;
+			expr->code_pos = code_pos;
+			expr->filename = spool_add(str_data(source_filename));
+			expr->line_nr = line_nr;
+			expr->listpos = -1;
 
-			ExprList_push( & exprs, expr );
+			ExprList_push(&exprs, expr);
 		}
-    }
+	}
 }
 
-static void read_cur_module_exprs(ExprList *exprs, FILE *file, char *filename)
+static void read_cur_module_exprs(ExprList* exprs, FILE* file, char* filename)
 {
-	str_t *expr_text = str_new();
-	str_t *last_filename = str_new();
-	str_t *source_filename = str_new();
-	str_t *section_name = str_new();
-	str_t *target_name = str_new();
+	str_t* expr_text = str_new();
+	str_t* last_filename = str_new();
+	str_t* source_filename = str_new();
+	str_t* section_name = str_new();
+	str_t* target_name = str_new();
 
-	read_cur_module_exprs_1(exprs, file, filename, 
+	read_cur_module_exprs_1(exprs, file, filename,
 		expr_text, last_filename, source_filename, section_name, target_name);
 
 	str_free(expr_text);
@@ -253,25 +256,25 @@ static void read_cur_module_exprs(ExprList *exprs, FILE *file, char *filename)
 }
 
 /* read all the modules' expressions to the given list, or to the module's if NULL */
-static void read_module_exprs( ExprList *exprs )
+static void read_module_exprs(ExprList* exprs)
 {
-    long fptr_exprdecl;
-    long fptr_base;
-    struct linkedmod *curlink;
-	FILE *file;
+	long fptr_exprdecl;
+	long fptr_base;
+	struct linkedmod* curlink;
+	FILE* file;
 
-    curlink = linkhdr->firstlink;
+	curlink = linkhdr->firstlink;
 
-    do
-    {
-		set_cur_module( curlink->moduleinfo );
+	do
+	{
+		set_cur_module(curlink->moduleinfo);
 
-        fptr_base = curlink->modulestart;
+		fptr_base = curlink->modulestart;
 
-        set_error_null();
+		set_error_null();
 
-        /* open relocatable file for reading */
-        file = fopen( curlink->objfilename, "rb" );	
+		/* open relocatable file for reading */
+		file = fopen(curlink->objfilename, "rb");
 		if (!file) {
 			error_read_file(curlink->objfilename);
 		}
@@ -294,43 +297,42 @@ static void read_module_exprs( ExprList *exprs )
 			xfclose(file);
 		}
 
-        curlink = curlink->nextlink;
-    }
-    while ( curlink != NULL );
+		curlink = curlink->nextlink;
+	} while (curlink != NULL);
 
-    set_error_null();
+	set_error_null();
 }
 
-/* compute equ expressions and remove them from the list 
+/* compute equ expressions and remove them from the list
    return >0: number of computed expressions
    return 0 : nothing done, all EQU expression computed and removed from list
    return <0: -(number of expressions with unresolved symbols)
 */
-static int compute_equ_exprs_once( ExprList *exprs, bool show_error, bool module_relative_addr )
+static int compute_equ_exprs_once(ExprList* exprs, bool show_error, bool module_relative_addr)
 {
-	ExprListElem *iter;
-    Expr *expr, *expr2;
+	ExprListElem* iter;
+	Expr* expr, * expr2;
 	long value;
-	int  num_computed   = 0;
+	int  num_computed = 0;
 	int  num_unresolved = 0;
 	bool computed;
 
-	iter = ExprList_first( exprs );
-	while ( iter != NULL )
+	iter = ExprList_first(exprs);
+	while (iter != NULL)
 	{
 		expr = iter->obj;
 		computed = false;
 
-		if ( expr->target_name )
+		if (expr->target_name)
 		{
 			/* touch symbol so that it ends in object file */
-			Symbol *sym = get_used_symbol(expr->target_name);
+			Symbol* sym = get_used_symbol(expr->target_name);
 			sym->is_touched = true;
 
 			/* expressions with symbols from other sections need to be passed to the link phase */
 			if (!module_relative_addr || /* link phase */
 				(Expr_is_local_in_section(expr, CURRENTMODULE, CURRENTSECTION) &&	/* or symbols from other sections */
-				 Expr_without_addresses(expr))		/* expression addressees - needs to be computed at link time */
+					Expr_without_addresses(expr))		/* expression addressees - needs to be computed at link time */
 				)
 			{
 				set_expr_env(expr, module_relative_addr);
@@ -353,87 +355,106 @@ static int compute_equ_exprs_once( ExprList *exprs, bool show_error, bool module
 		}
 
 		/* continue loop - delete expression if computed */
-		if ( computed )
+		if (computed)
 		{
 			/* remove current expression, advance iterator */
-			expr2 = ExprList_remove( exprs, &iter );
-			xassert( expr == expr2 );
+			expr2 = ExprList_remove(exprs, &iter);
+			xassert(expr == expr2);
 
-			OBJ_DELETE( expr );	
+			OBJ_DELETE(expr);
 		}
 		else
-			iter = ExprList_next( iter );
+			iter = ExprList_next(iter);
 	}
 
-	if ( num_computed > 0 )
+	if (num_computed > 0)
 		return num_computed;
-	else if ( num_unresolved > 0 )
-		return - num_unresolved;
-	else 
+	else if (num_unresolved > 0)
+		return -num_unresolved;
+	else
 		return 0;
 }
 
 /* compute all equ expressions, removing them from the list */
-void compute_equ_exprs( ExprList *exprs, bool show_error, bool module_relative_addr )
+void compute_equ_exprs(ExprList* exprs, bool show_error, bool module_relative_addr)
 {
 	int  compute_result;
 
 	/* loop to solve dependencies while some are solved */
 	do {
-		compute_result = compute_equ_exprs_once( exprs, false, module_relative_addr );
-	} while ( compute_result > 0 );
+		compute_result = compute_equ_exprs_once(exprs, false, module_relative_addr);
+	} while (compute_result > 0);
 
 	/* if some unresolved, give up and show error */
-	if ( show_error && compute_result < 0 )
-		compute_equ_exprs_once( exprs, true, module_relative_addr );
+	if (show_error && compute_result < 0)
+		compute_equ_exprs_once(exprs, true, module_relative_addr);
 }
 
 /* compute and patch expressions */
-static void patch_exprs( ExprList *exprs )
+static void patch_exprs(ExprList* exprs)
 {
-	ExprListElem *iter;
-    Expr *expr, *expr2;
+	ExprListElem* iter;
+	Expr* expr, * expr2;
 	long value, asmpc;
 
-	iter = ExprList_first( exprs );
-	while ( iter != NULL )
+	iter = ExprList_first(exprs);
+	while (iter != NULL)
 	{
 		expr = iter->obj;
-		xassert( expr->target_name == NULL );		/* EQU expressions are already computed */
+		xassert(expr->target_name == NULL);		/* EQU expressions are already computed */
 
-		set_expr_env( expr, false );
+		set_expr_env(expr, false);
 		value = Expr_eval(expr, true);
 
 		if (!expr->result.not_evaluable)			/* not unresolved */
 		{
-            switch ( expr->range )
-            {
-            case RANGE_BYTE_UNSIGNED:
-                if ( value < -128 || value > 255 )
-                    warn_int_range( value );
+			switch (expr->range)
+			{
+			case RANGE_BYTE_UNSIGNED:
+				if (value < -128 || value > 255)
+					warn_int_range(value);
 
 				patch_byte(expr->code_pos, (byte_t)value);
-                break;
+				break;
 
-            case RANGE_BYTE_SIGNED:
-                if ( value < -128 || value > 127 )
-                    warn_int_range( value );
+			case RANGE_BYTE_SIGNED:
+				if (value < -128 || value > 127)
+					warn_int_range(value);
 
 				patch_byte(expr->code_pos, (byte_t)value);
-                break;
+				break;
 
-            case RANGE_WORD:
-                if ( value < -32768 || value > 65535 )
-                    warn_int_range( value );
+			case RANGE_BYTE_TO_WORD_UNSIGNED:
+				if (value < 0 || value > 255)
+					warn_int_range(value);
 
-				patch_word(expr->code_pos, value); 
+				patch_byte(expr->code_pos, (byte_t)value);
+				patch_byte(expr->code_pos + 1, 0);
+				break;
+
+			case RANGE_BYTE_TO_WORD_SIGNED:
+				if (value < -128 || value > 127)
+					warn_int_range(value);
+
+				patch_byte(expr->code_pos, (byte_t)value);
+				patch_byte(expr->code_pos + 1, value < 0 || value > 127 ? 0xff : 0);
+				break;
+
+			case RANGE_PTR24:
+				patch_byte(expr->code_pos + 0, (byte_t)((value >> 0) & 0xff));
+				patch_byte(expr->code_pos + 1, (byte_t)((value >> 8) & 0xff));
+				patch_byte(expr->code_pos + 2, (byte_t)((value >> 16) & 0xff));
+				break;
+
+			case RANGE_WORD:
+				patch_word(expr->code_pos, value);
 
 				/* Expression contains relocatable address */
 				if (expr->type == TYPE_ADDRESS) {
 
 					/* save section reloc data */
 					*(intArray_push(expr->section->reloc)) = expr->code_pos + get_cur_module_start();
-				
+
 					/* relocate code */
 					if (opts.relocatable)
 					{
@@ -456,22 +477,16 @@ static void patch_exprs( ExprList *exprs )
 						totaladdr++;
 						curroffset = expr->code_pos + offset;
 					}
-				}                
-                break;
+				}
+				break;
 
 			case RANGE_WORD_BE:
-				if (value < -32768 || value > 65535)
-					warn_int_range(value);
-
 				patch_word_be(expr->code_pos, value);
 				break;
 
 			case RANGE_DWORD:
-                if ( value < LONG_MIN || value > LONG_MAX )
-                    warn_int_range( value );
-
 				patch_long(expr->code_pos, value);
-                break;
+				break;
 
 			case RANGE_JR_OFFSET:
 				asmpc = get_phased_PC() >= 0 ? get_phased_PC() : get_PC();
@@ -484,97 +499,97 @@ static void patch_exprs( ExprList *exprs )
 				break;
 
 			default: xassert(0);
-            }
+			}
 
 		}
 
 		/* remove current expression, advance iterator */
-		expr2 = ExprList_remove( exprs, &iter );
-		xassert( expr == expr2 );
+		expr2 = ExprList_remove(exprs, &iter);
+		xassert(expr == expr2);
 
-		OBJ_DELETE( expr );	
+		OBJ_DELETE(expr);
 	}
 }
 
 /*-----------------------------------------------------------------------------
 *   relocate all SYM_ADDR symbols based on address from start of sections
 *----------------------------------------------------------------------------*/
-static void relocate_symbols_symtab( SymbolHash *symtab )
+static void relocate_symbols_symtab(SymbolHash* symtab)
 {
-    SymbolHashElem *iter;
-    Symbol         *sym;
+	SymbolHashElem* iter;
+	Symbol* sym;
 	int			base_addr;
 	int			offset;
 
-    for ( iter = SymbolHash_first( symtab ); iter; iter = SymbolHash_next( iter ) )
-    {
-        sym = (Symbol *) iter->value;
-		if ( sym->type == TYPE_ADDRESS ) 
+	for (iter = SymbolHash_first(symtab); iter; iter = SymbolHash_next(iter))
+	{
+		sym = (Symbol*)iter->value;
+		if (sym->type == TYPE_ADDRESS)
 		{
-			xassert( sym->module );				/* owner should exist except for -D defines */
-			
+			xassert(sym->module);				/* owner should exist except for -D defines */
+
 			/* set base address for symbol */
-			set_cur_module(  sym->module );
-			set_cur_section( sym->section );
+			set_cur_module(sym->module);
+			set_cur_section(sym->section);
 
- 			base_addr = sym->section->addr;
-			offset    = get_cur_module_start();
+			base_addr = sym->section->addr;
+			offset = get_cur_module_start();
 
-            sym->value += base_addr + offset;	/* Absolute address */
+			sym->value += base_addr + offset;	/* Absolute address */
 			sym->is_computed = true;
 		}
 	}
 }
 
-static void relocate_symbols( void )
+static void relocate_symbols(void)
 {
-    Module		   *module;
-	ModuleListElem *iter;
+	Module* module;
+	ModuleListElem* iter;
 
-	for ( module = get_first_module( &iter ) ; module != NULL  ;
-		  module = get_next_module( &iter ) )  
-    {
-		relocate_symbols_symtab( module->local_symtab );
+	for (module = get_first_module(&iter); module != NULL;
+		module = get_next_module(&iter))
+	{
+		relocate_symbols_symtab(module->local_symtab);
 	}
-	relocate_symbols_symtab( global_symtab );
+	relocate_symbols_symtab(global_symtab);
 }
 
 /*-----------------------------------------------------------------------------
 *   Define symbols with sections and code start, end and size
 *----------------------------------------------------------------------------*/
-static void define_location_symbols( void )
+static void define_location_symbols(void)
 {
-	Section *section;
-	SectionHashElem *iter;
-	STR_DEFINE( name, STR_SIZE );
+	Section* section;
+	SectionHashElem* iter;
+	STR_DEFINE(name, STR_SIZE);
 	int start_addr, end_addr;
 
 	/* global code size */
 	start_addr = get_first_section(NULL)->addr;
-	section    = get_last_section();
-	end_addr   = section->addr + get_section_size( section );
-	
+	section = get_last_section();
+	end_addr = section->addr + get_section_size(section);
+
 	if (opts.verbose)
 		printf("Code size: %d bytes ($%04X to $%04X)\n",
-			(int)(get_sections_size()), (int)start_addr, (int)end_addr - 1);
+		(int)(get_sections_size()), (int)start_addr, (int)end_addr - 1);
 
-	Str_sprintf( name, ASMHEAD_KW, "", "" ); 
-	define_global_def_sym( Str_data(name), start_addr );
-	
-	Str_sprintf( name, ASMTAIL_KW, "", "" ); 
-	define_global_def_sym( Str_data(name), end_addr );
-	
-	Str_sprintf( name, ASMSIZE_KW, "", "" ); 
-	define_global_def_sym( Str_data(name), end_addr - start_addr );
+	Str_sprintf(name, ASMHEAD_KW, "", "");
+	define_global_def_sym(Str_data(name), start_addr);
+
+	Str_sprintf(name, ASMTAIL_KW, "", "");
+	define_global_def_sym(Str_data(name), end_addr);
+
+	Str_sprintf(name, ASMSIZE_KW, "", "");
+	define_global_def_sym(Str_data(name), end_addr - start_addr);
 
 	/* size of each named section - skip "" section */
-	for ( section = get_first_section( &iter ) ; section != NULL ; 
-		  section = get_next_section( &iter ) )
+	for (section = get_first_section(&iter); section != NULL;
+		section = get_next_section(&iter))
 	{
-		if ( *(section->name) != '\0' )
+		if (*(section->name) != '\0')
 		{
 			start_addr = section->addr;
-			end_addr   = start_addr + get_section_size( section );
+			end_addr = start_addr + get_section_size(section);
 
 			if (opts.verbose)
 				printf("Section '%s' size: %d bytes ($%04X to $%04X)\n",
@@ -600,9 +615,9 @@ static void define_location_symbols( void )
 *----------------------------------------------------------------------------*/
 
 /* check if there are symbols not yet linked */
-static bool pending_syms(StrHash *extern_syms)
+static bool pending_syms(StrHash* extern_syms)
 {
-	StrHashElem *elem, *next;
+	StrHashElem* elem, * next;
 
 	/* delete defined symbols */
 	for (elem = StrHash_first(extern_syms); elem != NULL; elem = next) {
@@ -620,16 +635,16 @@ static bool pending_syms(StrHash *extern_syms)
 
 /* search one module for unresolved symbols and link if needed */
 /* ignore module name - check only symbols */
-static bool linked_module(struct libfile *lib, FILE *file, long obj_fpos, StrHash *extern_syms)
+static bool linked_module(struct libfile* lib, FILE* file, long obj_fpos, StrHash* extern_syms)
 {
 	long names_fpos, modname_fpos;
 	bool linked = false;
 	bool found_symbol;
-	
-	str_t *module_name = str_new();
-	str_t *def_filename = str_new();
-	str_t *symbol_name = str_new();
-	str_t *section_name = str_new();
+
+	str_t* module_name = str_new();
+	str_t* def_filename = str_new();
+	str_t* symbol_name = str_new();
+	str_t* section_name = str_new();
 
 	/* read module name */
 	fseek(file, obj_fpos + 8, SEEK_SET);
@@ -679,16 +694,16 @@ static bool linked_module(struct libfile *lib, FILE *file, long obj_fpos, StrHas
 }
 
 /* search chain of libraries for modules that resolve any of the pending syms, break search after first found module */
-static bool linked_libraries(StrHash *extern_syms)
+static bool linked_libraries(StrHash* extern_syms)
 {
 	bool linked = false;
-	struct libfile *lib;
-	FILE *file;
+	struct libfile* lib;
+	FILE* file;
 	long obj_fpos, obj_next_fpos, module_size;
 
 	/* search library chain */
 	for (lib = libraryhdr->firstlib; !linked && lib != NULL; lib = lib->nextlib) {
-		
+
 		file = fopen(lib->libfilename, "rb");
 		if (!file) {
 			error_read_file(lib->libfilename);
@@ -697,7 +712,7 @@ static bool linked_libraries(StrHash *extern_syms)
 			/* search object module chain */
 			for (obj_fpos = 8; !linked && obj_fpos != -1; obj_fpos = obj_next_fpos) {
 				fseek(file, obj_fpos, SEEK_SET);			/* point at beginning of a module */
-				
+
 				// check if library file ended prematurely
 				int c = fgetc(file);
 				if (c == EOF)
@@ -723,7 +738,7 @@ static bool linked_libraries(StrHash *extern_syms)
 }
 
 /* link libraries in the order given in the command line */
-static void link_libraries(StrHash *extern_syms)
+static void link_libraries(StrHash* extern_syms)
 {
 	/* while symbols to resolve and new module pulled in */
 	while (pending_syms(extern_syms) && linked_libraries(extern_syms)) {
@@ -734,29 +749,29 @@ static void link_libraries(StrHash *extern_syms)
 /*-----------------------------------------------------------------------------
 *   link
 *----------------------------------------------------------------------------*/
-void link_modules( void )
+void link_modules(void)
 {
-    Module *module, *first_obj_module;
-	ModuleListElem *iter;
-	ExprList *exprs = NULL;
-	StrHash *extern_syms = OBJ_NEW(StrHash);
+	Module* module, * first_obj_module;
+	ModuleListElem* iter;
+	ExprList* exprs = NULL;
+	StrHash* extern_syms = OBJ_NEW(StrHash);
 
-    opts.cur_list = false;
-    linkhdr = NULL;
+	opts.cur_list = false;
+	linkhdr = NULL;
 
-    if ( opts.relocatable )
-    {
-        reloctable = m_new_n( char, 32768U );
-        relocptr = reloctable;
-        relocptr += 4;  /* point at first offset to store */
-        totaladdr = 0;
-        sizeof_reloctable = 0;  /* relocation table, still 0 elements .. */
-        curroffset = 0;
-    }
-    else
-    {
-        reloctable = NULL;
-    }
+	if (opts.relocatable)
+	{
+		reloctable = m_new_n(char, 32768U);
+		relocptr = reloctable;
+		relocptr += 4;  /* point at first offset to store */
+		totaladdr = 0;
+		sizeof_reloctable = 0;  /* relocation table, still 0 elements .. */
+		curroffset = 0;
+	}
+	else
+	{
+		reloctable = NULL;
+	}
 
 	/* remember current first modules */
 	first_obj_module = get_first_module(&iter);
@@ -774,14 +789,14 @@ void link_modules( void )
 		set_error_module(CURRENTMODULE->modname);
 
 		/* overwrite '.asm' extension with * '.o' */
-		const char *obj_filename = get_obj_filename(CURRENTMODULE->filename);
+		const char* obj_filename = get_obj_filename(CURRENTMODULE->filename);
 
 		/* open relocatable file for reading */
 		if (!check_object_file(obj_filename))
 			break;
 
 		/* link code & read name definitions */
-		LinkModule(obj_filename, 0, extern_syms);       
+		LinkModule(obj_filename, 0, extern_syms);
 	}
 
 	/* link libraries */
@@ -793,7 +808,7 @@ void link_modules( void )
 
 	/* allocate segment addresses and compute absolute addresses of symbols */
 	/* in consol_obj_file sections are zero-based */
-	if (!get_num_errors() && !opts.consol_obj_file)	
+	if (!get_num_errors() && !opts.consol_obj_file)
 		sections_alloc_addr();
 
 	/* relocate address symbols */
@@ -845,15 +860,15 @@ void link_modules( void )
 
 
 
-static int LinkModule_1(const char *filename, long fptr_base, str_t *section_name, StrHash *extern_syms)
+static int LinkModule_1(const char* filename, long fptr_base, str_t* section_name, StrHash* extern_syms)
 {
-    long fptr_namedecl, fptr_modname, fptr_modcode, fptr_libnmdecl;
-    int code_size;
-	FILE *file;
-	Section *section;
+	long fptr_namedecl, fptr_modname, fptr_modcode, fptr_libnmdecl;
+	int code_size;
+	FILE* file;
+	Section* section;
 
-    /* open object file for reading */
-    file = fopen( filename, "rb" );           
+	/* open object file for reading */
+	file = fopen(filename, "rb");
 	if (!file) {
 		error_read_file(filename);
 	}
@@ -904,8 +919,8 @@ static int LinkModule_1(const char *filename, long fptr_base, str_t *section_nam
 		// collect list of external symbols
 		if (fptr_libnmdecl != -1)
 		{
-			str_t *name = str_new();
-			const char *name_p;
+			str_t* name = str_new();
+			const char* name_p;
 			long p;
 
 			for (p = fptr_libnmdecl; p < fptr_modname;) {
@@ -921,12 +936,12 @@ static int LinkModule_1(const char *filename, long fptr_base, str_t *section_nam
 		xfclose(file);
 	}
 
-    return LinkTracedModule( filename, fptr_base );       /* Remember module for pass2 */
+	return LinkTracedModule(filename, fptr_base);       /* Remember module for pass2 */
 }
 
-int LinkModule(const char *filename, long fptr_base, StrHash *extern_syms)
+int LinkModule(const char* filename, long fptr_base, StrHash* extern_syms)
 {
-	str_t *section_name = str_new();
+	str_t* section_name = str_new();
 	int ret = LinkModule_1(filename, fptr_base, section_name, extern_syms);
 	str_free(section_name);
 	return ret;
@@ -934,42 +949,45 @@ int LinkModule(const char *filename, long fptr_base, StrHash *extern_syms)
 
 
 int
-LinkLibModule(struct libfile *library, long curmodule, const char *modname, StrHash *extern_syms)
+LinkLibModule(struct libfile* library, long curmodule, const char* modname, StrHash* extern_syms)
 {
-    Module *tmpmodule, *lib_module;
-    int flag;
+	Module* tmpmodule, * lib_module;
+	int flag;
 
-    tmpmodule = get_cur_module();					/* remember current module */
+	tmpmodule = get_cur_module();					/* remember current module */
 
 	/* create new module to link library */
-	lib_module = set_cur_module( new_module() );
-	lib_module->modname = spool_add( modname );
+	lib_module = set_cur_module(new_module());
+	lib_module->modname = spool_add(modname);
 
-    if ( opts.verbose )
-        printf( "Linking library module '%s'\n", modname );
+	if (opts.verbose)
+		printf("Linking library module '%s'\n", modname);
 
 	flag = LinkModule(library->libfilename, curmodule, extern_syms);       /* link module & read names */
 
-    set_cur_module( tmpmodule );		/* restore previous current module */
-    return flag;
+	set_cur_module(tmpmodule);		/* restore previous current module */
+	return flag;
 }
 
 
 void
-CreateBinFile( void )
+CreateBinFile(void)
 {
-	FILE *binaryfile, *inital_binaryfile;
-	FILE *relocfile, *initial_relocfile;
-	const char *filename;
-	bool is_relocatable = ( opts.relocatable && totaladdr != 0 );
+	FILE* binaryfile, * inital_binaryfile;
+	FILE* relocfile, * initial_relocfile;
+	const char* filename;
+	bool is_relocatable = (opts.relocatable && totaladdr != 0);
 
-    if ( opts.bin_file )        /* use predined output filename from command line */
-        filename = opts.bin_file;
-    else						/* create output filename, based on project filename */
-        filename = get_bin_filename( get_first_module(NULL)->filename );		/* add '.bin' extension */
+	if (opts.bin_file)        /* use predined output filename from command line */
+		filename = opts.bin_file;
+	else						/* create output filename, based on project filename */
+		filename = get_bin_filename(get_first_module(NULL)->filename);		/* add '.bin' extension */
 
-    /* binary output to filename.bin */
-    binaryfile = xfopen( filename, "wb" );
+	/* binary output to filename.bin */
+	if (opts.verbose)
+		printf("Creating binary '%s'\n", path_canon(filename));
+
+	binaryfile = xfopen(filename, "wb");
 	inital_binaryfile = binaryfile;
 
 	relocfile = opts.relocatable ? NULL : opts.reloc_info ? xfopen(get_reloc_filename(filename), "wb") : NULL;
@@ -980,7 +998,7 @@ CreateBinFile( void )
 		if (is_relocatable)
 		{
 			/* relocate routine */
-			xfwrite_bytes((char *)reloc_routine, sizeof_relocroutine, binaryfile);
+			xfwrite_bytes((char*)reloc_routine, sizeof_relocroutine, binaryfile);
 
 			*(reloctable + 0) = (byte_t)totaladdr % 256U;
 			*(reloctable + 1) = (byte_t)totaladdr / 256U;  /* total of relocation elements */
@@ -1012,80 +1030,80 @@ CreateBinFile( void )
 
 
 int
-LinkTracedModule(const char *filename, long baseptr )
+LinkTracedModule(const char* filename, long baseptr)
 {
-    struct linkedmod *newm;
-    char *fname;
+	struct linkedmod* newm;
+	char* fname;
 
-    if ( linkhdr == NULL )
-    {
-        linkhdr = m_new( struct linklist );
-        linkhdr->firstlink = NULL;
-        linkhdr->lastlink = NULL;       /* Library header initialised */
-    }
+	if (linkhdr == NULL)
+	{
+		linkhdr = m_new(struct linklist);
+		linkhdr->firstlink = NULL;
+		linkhdr->lastlink = NULL;       /* Library header initialised */
+	}
 
-    fname = m_strdup( filename );        /* get a copy module file name */
+	fname = m_strdup(filename);        /* get a copy module file name */
 
-    newm = m_new( struct linkedmod );
-    newm->nextlink = NULL;
-    newm->objfilename = fname;
-    newm->modulestart = baseptr;
-    newm->moduleinfo = CURRENTMODULE;   /* pointer to current (active) module structure   */
+	newm = m_new(struct linkedmod);
+	newm->nextlink = NULL;
+	newm->objfilename = fname;
+	newm->modulestart = baseptr;
+	newm->moduleinfo = CURRENTMODULE;   /* pointer to current (active) module structure   */
 
-    if ( linkhdr->firstlink == NULL )
-    {
-        linkhdr->firstlink = newm;
-        linkhdr->lastlink = newm;       /* First module trace information */
-    }
-    else
-    {
-        linkhdr->lastlink->nextlink = newm;     /* current/last linked module points now at new current */
-        linkhdr->lastlink = newm;               /* pointer to current linked module updated */
-    }
+	if (linkhdr->firstlink == NULL)
+	{
+		linkhdr->firstlink = newm;
+		linkhdr->lastlink = newm;       /* First module trace information */
+	}
+	else
+	{
+		linkhdr->lastlink->nextlink = newm;     /* current/last linked module points now at new current */
+		linkhdr->lastlink = newm;               /* pointer to current linked module updated */
+	}
 
-    return 1;
+	return 1;
 }
 
 
 void
-ReleaseLinkInfo( void )
+ReleaseLinkInfo(void)
 {
-    struct linkedmod *m, *n;
+	struct linkedmod* m, * n;
 
-    if ( linkhdr == NULL )
-    {
-        return;
-    }
+	if (linkhdr == NULL)
+	{
+		return;
+	}
 
-    m = linkhdr->firstlink;
+	m = linkhdr->firstlink;
 
-    while ( m != NULL )               /* move test to start in case list is empty */
-    {
-        if ( m->objfilename != NULL )
-        {
-            m_free( m->objfilename );
-        }
+	while (m != NULL)               /* move test to start in case list is empty */
+	{
+		if (m->objfilename != NULL)
+		{
+			m_free(m->objfilename);
+		}
 
-        n = m->nextlink;
-        m_free( m );
-        m = n;
-    }
+		n = m->nextlink;
+		m_free(m);
+		m = n;
+	}
 
-    m_free( linkhdr );
+	m_free(linkhdr);
 
-    linkhdr = NULL;
+	linkhdr = NULL;
 }
 
 /* Consolidate object file */
 static int sym_first(int c) { return c == '_' || isalpha(c); }
-static int sym_next(int c)  { return c == '_' || isalnum(c); }
+static int sym_next(int c) { return c == '_' || isalnum(c); }
 
-static void replace_names(Str *result, const char *input, StrHash *map)
+static void replace_names(Str* result, const char* input, StrHash* map)
 {
 	STR_DEFINE(key, STR_SIZE);
-	const char *elem;
-	const char *p0;
-	const char *p1;
+	const char* elem;
+	const char* p0;
+	const char* p1;
 	Str_clear(result);
 
 	p0 = input;
@@ -1097,7 +1115,7 @@ static void replace_names(Str *result, const char *input, StrHash *map)
 			Str_set_n(key, p0, p1 - p0);
 			elem = (const char*)StrHash_get(map, Str_data(key));
 			if (elem)
-				Str_append(result, (char *)elem);
+				Str_append(result, (char*)elem);
 			else
 				Str_append(result, Str_data(key));
 			p0 = p1;
@@ -1112,22 +1130,22 @@ static void replace_names(Str *result, const char *input, StrHash *map)
 	}
 }
 
-static void rename_module_local_symbols(Module *module)
+static void rename_module_local_symbols(Module* module)
 {
-	Symbol *sym;
-	SymbolHashElem *sym_it;
-	StrHash *old_syms = OBJ_NEW(StrHash);
-	StrHashElem *name_it;
-	Expr *expr;
-	ExprListElem *expr_it;
-	const char *old_name;
-	const char *value;
+	Symbol* sym;
+	SymbolHashElem* sym_it;
+	StrHash* old_syms = OBJ_NEW(StrHash);
+	StrHashElem* name_it;
+	Expr* expr;
+	ExprListElem* expr_it;
+	const char* old_name;
+	const char* value;
 	STR_DEFINE(new_name, STR_SIZE);
 	STR_DEFINE(new_text, STR_SIZE);
 
 	/* collect list of symbol names to change - cannot iterate through symbols hash while changing it */
 	for (sym_it = SymbolHash_first(module->local_symtab); sym_it != NULL; sym_it = SymbolHash_next(sym_it)) {
-		sym = (Symbol *)sym_it->value;
+		sym = (Symbol*)sym_it->value;
 
 		old_name = spool_add(sym->name);
 		Str_sprintf(new_name, "%s_%s", module->modname, old_name);
@@ -1160,15 +1178,15 @@ static void rename_module_local_symbols(Module *module)
 	OBJ_DELETE(old_syms);
 }
 
-static void merge_local_symbols(StrHash *extern_syms)
+static void merge_local_symbols(StrHash* extern_syms)
 {
-	Module *module;
-	Module *first_module;
-	ModuleListElem *it;
-	Symbol *sym;
-	SymbolHashElem *sym_it, *next_sym;
-	Expr *expr;
-	StrHashElem *elem, *next;
+	Module* module;
+	Module* first_module;
+	ModuleListElem* it;
+	Symbol* sym;
+	SymbolHashElem* sym_it, * next_sym;
+	Expr* expr;
+	StrHashElem* elem, * next;
 	int start;
 
 	first_module = get_first_module(NULL); xassert(first_module != NULL);
@@ -1177,7 +1195,7 @@ static void merge_local_symbols(StrHash *extern_syms)
 		/* remove local symbols that are not defined */
 		for (sym_it = SymbolHash_first(module->local_symtab); sym_it != NULL; sym_it = next_sym) {
 			next_sym = SymbolHash_next(sym_it);
-			sym = (Symbol *)sym_it->value;
+			sym = (Symbol*)sym_it->value;
 			if (!sym->is_defined)
 				SymbolHash_remove_elem(module->local_symtab, sym_it);
 		}
@@ -1187,7 +1205,7 @@ static void merge_local_symbols(StrHash *extern_syms)
 			next = StrHash_next(elem);
 
 			sym = find_local_symbol(elem->key);
-			if (sym == NULL) 
+			if (sym == NULL)
 				sym = find_global_symbol(elem->key);
 			if (sym != NULL && sym->is_defined) {		/* symbol defined */
 				StrHash_remove_elem(extern_syms, elem);
@@ -1207,7 +1225,7 @@ static void merge_local_symbols(StrHash *extern_syms)
 			/* move local expressions */
 			while ((expr = ExprList_pop(module->exprs)) != NULL) {
 				ExprList_push(&first_module->exprs, expr);
-				
+
 				/* relocate expression address */
 				set_cur_module(expr->module);
 				set_cur_section(expr->section);
@@ -1223,30 +1241,30 @@ static void merge_local_symbols(StrHash *extern_syms)
 
 static void merge_codearea()
 {
-	Section *section;
-	SectionHashElem *iter;
+	Section* section;
+	SectionHashElem* iter;
 
 	for (section = get_first_section(&iter); section != NULL; section = get_next_section(&iter)) {
 		intArray_set_size(section->module_start, 1);		/* delete all module boundaries */
 	}
 }
 
-static void touch_symtab_symbols(SymbolHash *symtab)
+static void touch_symtab_symbols(SymbolHash* symtab)
 {
-	SymbolHashElem *iter;
-	Symbol         *sym;
+	SymbolHashElem* iter;
+	Symbol* sym;
 
 	for (iter = SymbolHash_first(symtab); iter; iter = SymbolHash_next(iter)) {
-		sym = (Symbol *)iter->value;
+		sym = (Symbol*)iter->value;
 		//Bug 563 -- if (sym->type == TYPE_ADDRESS || sym->scope == SCOPE_EXTERN)
-			sym->is_touched = true;
+		sym->is_touched = true;
 	}
 }
 
 static void touch_symbols()
 {
-	Module *module;
-	ModuleListElem *it;
+	Module* module;
+	ModuleListElem* it;
 
 	for (module = get_first_module(&it); module != NULL; module = get_next_module(&it)) {
 		touch_symtab_symbols(module->local_symtab);
@@ -1254,20 +1272,20 @@ static void touch_symbols()
 	touch_symtab_symbols(global_symtab);
 }
 
-static void create_extern_symbols(StrHash *extern_syms)
+static void create_extern_symbols(StrHash* extern_syms)
 {
-	StrHashElem *elem;
+	StrHashElem* elem;
 
 	for (elem = StrHash_first(extern_syms); elem != NULL; elem = StrHash_next(elem)) {
-		const char *name = elem->key;
+		const char* name = elem->key;
 		if (!find_local_symbol(name) && !find_global_symbol(name))
 			declare_extern_symbol(name);
 	}
 }
 
-static void merge_modules(StrHash *extern_syms)
+static void merge_modules(StrHash* extern_syms)
 {
-	Module *first_module;
+	Module* first_module;
 	first_module = get_first_module(NULL); xassert(first_module != NULL);
 
 	/* read each module's expression list */

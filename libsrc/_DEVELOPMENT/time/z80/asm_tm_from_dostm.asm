@@ -60,7 +60,12 @@ asm_tm_from_dostm:
    rla
    rla
    and $0f                     ; a = dos.month
-   
+
+   jr z, no_adjust_month
+   dec a
+
+no_adjust_month:
+
    ld (de),a                   ; tm_mon
    inc de
    

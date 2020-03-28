@@ -2,9 +2,9 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2017
+Copyright (C) Paulo Custodio, 2011-2019
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-Repository: https://github.com/pauloscustodio/z88dk-z80asm
+Repository: https://github.com/z88dk/z88dk
 
 Handle object file contruction, reading and writing
 */
@@ -24,7 +24,7 @@ Handle object file contruction, reading and writing
 /*-----------------------------------------------------------------------------
 *   Object header
 *----------------------------------------------------------------------------*/
-char Z80objhdr[] 	= "Z80RMF" OBJ_VERSION;
+char Z80objhdr[] = "Z80RMF" OBJ_VERSION;
 
 #define Z80objhdr_size (sizeof(Z80objhdr)-1)
 #define Z80objhdr_version_pos 6
@@ -32,25 +32,25 @@ char Z80objhdr[] 	= "Z80RMF" OBJ_VERSION;
 /*-----------------------------------------------------------------------------
 *   Write module to object file
 *----------------------------------------------------------------------------*/
-static long write_expr( FILE *fp )
+static long write_expr(FILE* fp)
 {
 	STR_DEFINE(last_sourcefile, STR_SIZE);		/* keep last source file referred to in object */
-	ExprListElem *iter;
-    Expr *expr;
+	ExprListElem* iter;
+	Expr* expr;
 	char range;
-	const char *target_name;
+	const char* target_name;
 	long expr_ptr;
 
-	if ( ExprList_empty( CURRENTMODULE->exprs ) )	/* no expressions */
+	if (ExprList_empty(CURRENTMODULE->exprs))	/* no expressions */
 		return -1;
 
-	expr_ptr = ftell( fp );
-	for ( iter = ExprList_first( CURRENTMODULE->exprs ); iter != NULL; iter = ExprList_next( iter ) )
+	expr_ptr = ftell(fp);
+	for (iter = ExprList_first(CURRENTMODULE->exprs); iter != NULL; iter = ExprList_next(iter))
 	{
 		expr = iter->obj;
 
 		/* store range */
-		if ( expr->target_name )
+		if (expr->target_name)
 		{
 			target_name = expr->target_name;		/* EQU expression */
 			range = '=';
@@ -58,13 +58,16 @@ static long write_expr( FILE *fp )
 		else
 		{
 			target_name = "";						/* patch expression */
-			switch ( expr->range )
+			switch (expr->range)
 			{
 			case RANGE_DWORD:			range = 'L'; break;
 			case RANGE_WORD:			range = 'C'; break;
 			case RANGE_WORD_BE:			range = 'B'; break;
 			case RANGE_BYTE_UNSIGNED:	range = 'U'; break;
 			case RANGE_BYTE_SIGNED:		range = 'S'; break;
+			case RANGE_BYTE_TO_WORD_UNSIGNED:	range = 'u'; break;
+			case RANGE_BYTE_TO_WORD_SIGNED:		range = 's'; break;
+			case RANGE_PTR24:			range = 'P'; break;
 			case RANGE_JR_OFFSET:		range = 'J'; break;
 			default:					xassert(0);
 			}
@@ -72,11 +75,11 @@ static long write_expr( FILE *fp )
 		xfwrite_byte(range, fp);				/* range of expression */
 
 		/* store file name if different from last, folowed by source line number */
-		if ( expr->filename != NULL &&
-			 strcmp( Str_data(last_sourcefile), expr->filename ) != 0 )
+		if (expr->filename != NULL &&
+			strcmp(Str_data(last_sourcefile), expr->filename) != 0)
 		{
 			xfwrite_wcount_cstr(expr->filename, fp);
-			Str_set( last_sourcefile, expr->filename );
+			Str_set(last_sourcefile, expr->filename);
 		}
 		else
 			xfwrite_wcount_cstr("", fp);
@@ -98,16 +101,16 @@ static long write_expr( FILE *fp )
 	return expr_ptr;
 }
 
-static int write_symbols_symtab( FILE *fp, SymbolHash *symtab )
+static int write_symbols_symtab(FILE* fp, SymbolHash* symtab)
 {
-    SymbolHashElem *iter;
-    Symbol         *sym;
+	SymbolHashElem* iter;
+	Symbol* sym;
 	int written = 0;
 	char scope, type;
 
-    for ( iter = SymbolHash_first( symtab ); iter; iter = SymbolHash_next( iter ) )
-    {
-        sym = ( Symbol * )iter->value;
+	for (iter = SymbolHash_first(symtab); iter; iter = SymbolHash_next(iter))
+	{
+		sym = (Symbol*)iter->value;
 
 		/* scope */
 		scope =
@@ -138,21 +141,21 @@ static int write_symbols_symtab( FILE *fp, SymbolHash *symtab )
 
 			written++;
 		}
-    }
+	}
 	return written;
 }
 
-static long write_symbols( FILE *fp )
+static long write_symbols(FILE* fp)
 {
 	long symbols_ptr;
 	int written = 0;
 
-	symbols_ptr = ftell( fp );
+	symbols_ptr = ftell(fp);
 
-	written += write_symbols_symtab( fp, CURRENTMODULE->local_symtab );
-	written += write_symbols_symtab( fp, global_symtab );
+	written += write_symbols_symtab(fp, CURRENTMODULE->local_symtab);
+	written += write_symbols_symtab(fp, global_symtab);
 
-	if ( written )
+	if (written)
 	{
 		xfwrite_byte(0, fp);								/* terminator */
 		return symbols_ptr;
@@ -161,18 +164,18 @@ static long write_symbols( FILE *fp )
 		return -1;
 }
 
-static long write_externsym( FILE *fp )
+static long write_externsym(FILE* fp)
 {
-    SymbolHashElem *iter;
-    Symbol         *sym;
+	SymbolHashElem* iter;
+	Symbol* sym;
 	long externsym_ptr;
 	int written = 0;
 
-	externsym_ptr = ftell( fp );
+	externsym_ptr = ftell(fp);
 
-    for ( iter = SymbolHash_first( global_symtab ); iter; iter = SymbolHash_next( iter ) )
-    {
-        sym = ( Symbol * )iter->value;
+	for (iter = SymbolHash_first(global_symtab); iter; iter = SymbolHash_next(iter))
+	{
+		sym = (Symbol*)iter->value;
 
 		if (sym->is_touched &&
 			(sym->scope == SCOPE_EXTERN || (!sym->is_defined && sym->scope == SCOPE_GLOBAL)))
@@ -180,28 +183,28 @@ static long write_externsym( FILE *fp )
 			xfwrite_bcount_cstr(sym->name, fp);
 			written++;
 		}
-    }
+	}
 
-	if ( written )
+	if (written)
 		return externsym_ptr;
 	else
 		return -1;
 }
 
-static long write_modname( FILE *fp )
+static long write_modname(FILE* fp)
 {
-	long modname_ptr = ftell( fp );
+	long modname_ptr = ftell(fp);
 	xfwrite_bcount_cstr(CURRENTMODULE->modname, fp);		/* write module name */
 	return modname_ptr;
 }
 
-static long write_code( FILE *fp )
+static long write_code(FILE* fp)
 {
 	long code_ptr;
 	int code_size = 0;
 	bool wrote_data = false;
-	
-	code_ptr  = ftell( fp );
+
+	code_ptr = ftell(fp);
 	wrote_data = fwrite_module_code(fp, &code_size);
 
 	if (opts.verbose)
@@ -213,42 +216,46 @@ static long write_code( FILE *fp )
 		return -1;
 }
 
-void write_obj_file(const char *source_filename )
+void write_obj_file(const char* source_filename)
 {
-	const char *obj_filename;
-	FILE *fp;
+	const char* obj_filename;
+	FILE* fp;
 	long header_ptr, modname_ptr, expr_ptr, symbols_ptr, externsym_ptr, code_ptr;
 	int i;
 
 	/* open file */
-	obj_filename = get_obj_filename( source_filename );
-	fp = xfopen( obj_filename, "wb" );
+	obj_filename = get_obj_filename(source_filename);
+
+	if (opts.verbose)
+		printf("Writing object file '%s'\n", path_canon(obj_filename));
+
+	fp = xfopen(obj_filename, "wb");
 
 	/* write header */
 	xfwrite_cstr(Z80objhdr, fp);
 
 	/* write placeholders for 5 pointers */
-	header_ptr = ftell( fp );
-	for ( i = 0; i < 5; i++ )
-	    xfwrite_dword(-1, fp);
+	header_ptr = ftell(fp);
+	for (i = 0; i < 5; i++)
+		xfwrite_dword(-1, fp);
 
 	/* write sections, return pointers */
-	expr_ptr		= write_expr( fp );
-	symbols_ptr		= write_symbols( fp );
-	externsym_ptr	= write_externsym( fp );
-	modname_ptr		= write_modname( fp );
-	code_ptr		= write_code( fp );
+	expr_ptr = write_expr(fp);
+	symbols_ptr = write_symbols(fp);
+	externsym_ptr = write_externsym(fp);
+	modname_ptr = write_modname(fp);
+	code_ptr = write_code(fp);
 
 	/* write pointers to areas */
-	fseek( fp, header_ptr, SEEK_SET );
-    xfwrite_dword(modname_ptr, fp);
-    xfwrite_dword(expr_ptr, fp);
-    xfwrite_dword(symbols_ptr, fp);
-    xfwrite_dword(externsym_ptr, fp);
-    xfwrite_dword(code_ptr, fp);
+	fseek(fp, header_ptr, SEEK_SET);
+	xfwrite_dword(modname_ptr, fp);
+	xfwrite_dword(expr_ptr, fp);
+	xfwrite_dword(symbols_ptr, fp);
+	xfwrite_dword(externsym_ptr, fp);
+	xfwrite_dword(code_ptr, fp);
 
 	/* close temp file and rename to object file */
-	xfclose( fp );
+	xfclose(fp);
 }
 
 
@@ -256,49 +263,49 @@ void write_obj_file(const char *source_filename )
 /*-----------------------------------------------------------------------------
 *   Check the object file header
 *----------------------------------------------------------------------------*/
-static bool test_header( FILE *file )
+static bool test_header(FILE* file)
 {
-    char buffer[Z80objhdr_size];
+	char buffer[Z80objhdr_size];
 
-    if ( fread(  buffer, sizeof(char), Z80objhdr_size, file ) == Z80objhdr_size &&
-         memcmp( buffer, Z80objhdr,    Z80objhdr_size ) == 0
-       )
-        return true;
-    else
-        return false;
+	if (fread(buffer, sizeof(char), Z80objhdr_size, file) == Z80objhdr_size &&
+		memcmp(buffer, Z80objhdr, Z80objhdr_size) == 0
+		)
+		return true;
+	else
+		return false;
 }
 
 /*-----------------------------------------------------------------------------
 *   Object file class
 *----------------------------------------------------------------------------*/
-DEF_CLASS( OFile );
+DEF_CLASS(OFile);
 
-void OFile_init( OFile *self )
+void OFile_init(OFile* self)
 {
-	self->modname_ptr = 
-	self->expr_ptr = 
-	self->symbols_ptr =
-	self->externsym_ptr = 
-	self->code_ptr = -1;
+	self->modname_ptr =
+		self->expr_ptr =
+		self->symbols_ptr =
+		self->externsym_ptr =
+		self->code_ptr = -1;
 }
 
-void OFile_copy( OFile *self, OFile *other ) { xassert(0); }
+void OFile_copy(OFile* self, OFile* other) { xassert(0); }
 
-void OFile_fini( OFile *self )
+void OFile_fini(OFile* self)
 {
 	/* if not from library, close file */
-    if ( self->file		 != NULL && 
-		 self->start_ptr == 0
-	   )
-        xfclose( self->file );
+	if (self->file != NULL &&
+		self->start_ptr == 0
+		)
+		xfclose(self->file);
 
 	/* if writing but not closed, delete partialy created file */
-    if ( self->writing && 
-		 self->start_ptr == 0 &&
-         self->file      != NULL && 
-		 self->filename  != NULL
-	   )
-        remove( self->filename );
+	if (self->writing &&
+		self->start_ptr == 0 &&
+		self->file != NULL &&
+		self->filename != NULL
+		)
+		remove(self->filename);
 }
 
 /*-----------------------------------------------------------------------------
@@ -307,33 +314,33 @@ void OFile_fini( OFile *self )
 *   Object needs to be deleted by caller by OBJ_DELETE()
 *   Keeps the library file open
 *----------------------------------------------------------------------------*/
-OFile *OFile_read_header( FILE *file, size_t start_ptr )
+OFile* OFile_read_header(FILE* file, size_t start_ptr)
 {
-	str_t *modname = str_new();
-	OFile *self;
+	str_t* modname = str_new();
+	OFile* self;
 
 	/* check file version */
-    fseek( file, start_ptr, SEEK_SET );
-	if ( ! test_header( file ) )
+	fseek(file, start_ptr, SEEK_SET);
+	if (!test_header(file))
 		return NULL;
 
 	/* create OFile object */
-	self = OBJ_NEW( OFile );
+	self = OBJ_NEW(OFile);
 
-	self->file			= file;
-	self->start_ptr		= start_ptr;
-	self->writing		= false;
+	self->file = file;
+	self->start_ptr = start_ptr;
+	self->writing = false;
 
-    self->modname_ptr	= xfread_dword(file);
-    self->expr_ptr		= xfread_dword(file);
-    self->symbols_ptr	= xfread_dword(file);
-    self->externsym_ptr	= xfread_dword(file);
-    self->code_ptr		= xfread_dword(file);
+	self->modname_ptr = xfread_dword(file);
+	self->expr_ptr = xfread_dword(file);
+	self->symbols_ptr = xfread_dword(file);
+	self->externsym_ptr = xfread_dword(file);
+	self->code_ptr = xfread_dword(file);
 
-    /* read module name */
-    fseek( file, start_ptr + self->modname_ptr, SEEK_SET );
-    xfread_bcount_str(modname, file);
-    self->modname		= spool_add(str_data(modname));
+	/* read module name */
+	fseek(file, start_ptr + self->modname_ptr, SEEK_SET);
+	xfread_bcount_str(modname, file);
+	self->modname = spool_add(str_data(modname));
 
 	str_free(modname);
 
@@ -346,10 +353,10 @@ OFile *OFile_read_header( FILE *file, size_t start_ptr )
 *   Object needs to be deleted by caller by OBJ_DELETE()
 *   Keeps the object file open
 *----------------------------------------------------------------------------*/
-static OFile *_OFile_open_read(const char *filename, bool test_mode )
+static OFile* _OFile_open_read(const char* filename, bool test_mode)
 {
-	OFile *self;
-	FILE *file;
+	OFile* self;
+	FILE* file;
 
 	/* file exists? */
 	file = fopen(filename, "rb");
@@ -360,47 +367,47 @@ static OFile *_OFile_open_read(const char *filename, bool test_mode )
 	}
 
 	/* read header */
-	self = OFile_read_header( file, 0 );
-	if ( self == NULL )
+	self = OFile_read_header(file, 0);
+	if (self == NULL)
 	{
-		xfclose( file );
-		
-		if ( ! test_mode )
-			error_not_obj_file( filename );
+		xfclose(file);
+
+		if (!test_mode)
+			error_not_obj_file(filename);
 
 		return NULL;
 	}
-	self->filename = spool_add( filename );
+	self->filename = spool_add(filename);
 
 	/* return object */
 	return self;
 }
 
-OFile *OFile_open_read(const char *filename )
+OFile* OFile_open_read(const char* filename)
 {
-	return _OFile_open_read( filename, false );
+	return _OFile_open_read(filename, false);
 }
 
 /*-----------------------------------------------------------------------------
 *	close object file
 *----------------------------------------------------------------------------*/
-void OFile_close( OFile *self )
+void OFile_close(OFile* self)
 {
-	if ( self != NULL && self->file != NULL )
+	if (self != NULL && self->file != NULL)
 	{
-		xfclose( self->file );
+		xfclose(self->file);
 		self->file = NULL;
 	}
 }
 
 /*-----------------------------------------------------------------------------
 *	test if a object file exists and is the correct version, return object if yes
-*   return NULL if not. 
+*   return NULL if not.
 *   Object needs to be deleted by caller by OBJ_DELETE()
 *----------------------------------------------------------------------------*/
-OFile *OFile_test_file(const char *filename )
+OFile* OFile_test_file(const char* filename)
 {
-	return _OFile_open_read( filename, true );
+	return _OFile_open_read(filename, true);
 }
 
 /*-----------------------------------------------------------------------------
@@ -408,29 +415,29 @@ OFile *OFile_test_file(const char *filename )
 *	return NULL if input file is not an object, or does not exist
 *	NOTE: not reentrant, reuses array on each call
 *----------------------------------------------------------------------------*/
-ByteArray *read_obj_file_data(const char *filename )
+ByteArray* read_obj_file_data(const char* filename)
 {
-	static ByteArray *buffer = NULL;
+	static ByteArray* buffer = NULL;
 	size_t	 size;
-	OFile	*ofile;
+	OFile* ofile;
 
 	/* static object to read each file, not reentrant */
-	INIT_OBJ( ByteArray, &buffer );
+	INIT_OBJ(ByteArray, &buffer);
 
 	/* open object file, check header */
-	ofile = OFile_open_read( filename );
-	if ( ofile == NULL )
+	ofile = OFile_open_read(filename);
+	if (ofile == NULL)
 		return NULL;					/* error */
 
-    fseek( ofile->file, 0, SEEK_END );	/* file pointer to end of file */
-    size = ftell( ofile->file );
-    fseek( ofile->file, 0, SEEK_SET );	/* file pointer to start of file */
+	fseek(ofile->file, 0, SEEK_END);	/* file pointer to end of file */
+	size = ftell(ofile->file);
+	fseek(ofile->file, 0, SEEK_SET);	/* file pointer to start of file */
 
 	/* set array size, read file */
-	ByteArray_set_size( buffer, size );
+	ByteArray_set_size(buffer, size);
 	xfread_bytes(ByteArray_item(buffer, 0), size, ofile->file);
-    
-	OBJ_DELETE( ofile );
+
+	OBJ_DELETE(ofile);
 
 	return buffer;
 }
@@ -439,26 +446,26 @@ ByteArray *read_obj_file_data(const char *filename )
 *	Updates current module name and size, if given object file is valid
 *	Load module name and size, when assembling with -d and up-to-date
 *----------------------------------------------------------------------------*/
-static bool objmodule_loaded_1(const char *obj_filename, str_t *section_name )
+static bool objmodule_loaded_1(const char* obj_filename, str_t* section_name)
 {
 	int code_size;
-	OFile *ofile;
-	Section *section;
+	OFile* ofile;
+	Section* section;
 
 	ofile = OFile_test_file(obj_filename);
-    if ( ofile != NULL )
-    {
-        CURRENTMODULE->modname = ofile->modname;        
+	if (ofile != NULL)
+	{
+		CURRENTMODULE->modname = ofile->modname;
 
 		/* reserve space in each section; BUG_0015 */
-		if ( ofile->code_ptr >= 0 )
+		if (ofile->code_ptr >= 0)
 		{
-			fseek( ofile->file, ofile->start_ptr + ofile->code_ptr, SEEK_SET );
+			fseek(ofile->file, ofile->start_ptr + ofile->code_ptr, SEEK_SET);
 
 			while (true)	/* read sections until end marker */
 			{
 				code_size = xfread_dword(ofile->file);
-				if ( code_size < 0 )
+				if (code_size < 0)
 					break;
 
 				/* reserve space in section */
@@ -467,44 +474,44 @@ static bool objmodule_loaded_1(const char *obj_filename, str_t *section_name )
 				read_origin(ofile->file, section);
 				section->align = xfread_dword(ofile->file);
 
-				append_reserve( code_size );
+				append_reserve(code_size);
 
 				/* advance past code block */
-				fseek( ofile->file, code_size, SEEK_CUR );
+				fseek(ofile->file, code_size, SEEK_CUR);
 			}
 		}
 
-		OBJ_DELETE( ofile );					/* BUG_0049 */
+		OBJ_DELETE(ofile);					/* BUG_0049 */
 
-        return true;
-    }
-    else
-        return false;
+		return true;
+	}
+	else
+		return false;
 }
 
-bool objmodule_loaded(const char *obj_filename)
+bool objmodule_loaded(const char* obj_filename)
 {
-	str_t *section_name = str_new();
+	str_t* section_name = str_new();
 	bool ret = objmodule_loaded_1(obj_filename, section_name);
 	str_free(section_name);
 	return ret;
 }
 
-bool check_object_file(const char *obj_filename)
+bool check_object_file(const char* obj_filename)
 {
 	return check_obj_lib_file(
-		obj_filename, 
+		obj_filename,
 		Z80objhdr,
 		error_not_obj_file,
 		error_obj_file_version);
 }
 
-bool check_obj_lib_file(const char *filename,
-	char *signature,
+bool check_obj_lib_file(const char* filename,
+	char* signature,
 	void(*error_file)(const char*),
 	void(*error_version)(const char*, int, int))
 {
-	FILE *fp = NULL;
+	FILE* fp = NULL;
 
 	// can read file?
 	fp = fopen(filename, "rb");

@@ -1,0 +1,11 @@
+catalog.c
+date.c
+errors.asm
+list.c
+ls.c
+ls-help.asm
+memory.asm
+memory.c
+options.c
+sort.c
+user_interaction.c

@@ -6,6 +6,15 @@
 ;	$Id: z88s_crt0.asm,v 1.21 2016-07-15 21:38:08 dom Exp $
 
 
+        PUBLIC    cleanup               ;jp'd to by exit()
+        PUBLIC    l_dcal                ;jp(hl)
+
+
+        PUBLIC    processcmd    ;Processing <> commands
+
+
+        PUBLIC  _cpfar2near     ;Conversion of far to near data
+
 
 	INCLUDE	"stdio.def"
 	INCLUDE "error.def"
@@ -122,10 +131,8 @@ ENDIF
 	pop	bc		; kill argc
 	
 cleanup:			;Jump back here from exit() if needed
-IF CRT_ENABLE_STDIO = 1
-	EXTERN	closeall
-	call	closeall	;Close any open files (fopen)
-ENDIF
+    call    crt0_exit
+
         call    resterrhan	;Restore the original error handler
 	
 start1:	ld	sp,0		;Restore stack to entry value

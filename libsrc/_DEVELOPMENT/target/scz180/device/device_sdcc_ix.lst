@@ -1,0 +1,2 @@
+@target/scz180/device/asci/asci_asm.lst
+@target/scz180/device/csio/csio_sdcc.lst

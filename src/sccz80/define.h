@@ -24,7 +24,7 @@
 #define YES             1
 
 /* Maximum size of the mantissa, write_double_queue() doesn't respect this yet */
-#define MAX_MANTISSA_SIZE  5    
+#define MAX_MANTISSA_SIZE  7 
 
 /*      System wide name size (for symbols)     */
 
@@ -66,7 +66,7 @@ typedef enum {
     KIND_ARRAY,
     KIND_PTR,
     KIND_CPTR,
-    KIND_STRUCT, // 11
+    KIND_STRUCT, /* 11 */
     KIND_FUNC,
     KIND_ELLIPSES,
     KIND_PORT8,
@@ -75,6 +75,7 @@ typedef enum {
     KIND_CARRY
 } Kind;
 
+#define kind_is_integer(k) ( k == KIND_CHAR || k == KIND_INT || k == KIND_SHORT || k == KIND_LONG )
 
 typedef struct {
     size_t    size;
@@ -90,14 +91,20 @@ struct type_s {
     Kind      kind;
     int       size;
     char      isunsigned;
+    char      explicitly_signed;  // Set if "signed" in type definition
     char      isconst;
     char      isfar;  // Valid for pointers/array
     char      name[NAMESIZE]; 
+    char     *namespace; // Which namespace is this object in
     
     Type     *ptr;   // For array, or pointer
     int       len;   // Length of the array
     
     int32_t   value; // For enum, goto position, short call value
+
+    // bitfields
+    int       bit_offset;
+    int       bit_size;
     
     // Structures
     Type   *tag;     // Reference to the structure type
@@ -128,7 +135,7 @@ enum ident_type {
         ID_VARIABLE = 1,
         ID_MACRO,
         ID_GOTOLABEL,
-        ID_ENUM,
+        ID_ENUM
     };
 
 
@@ -138,7 +145,7 @@ enum storage_type {
     EXTERNAL,      /* External to this file */
     EXTERNP,       /* Extern @ */
     LSTATIC,       /* Static to this file */
-    TYPDEF,
+    TYPDEF
 };
 
 
@@ -157,7 +164,8 @@ enum symbol_flags {
         NAKED = 0x800,      /* Function is naked - don't generate any code */
         CRITICAL = 0x1000,    /* Disable interrupts around the function */
         SDCCDECL = 0x2000,   /* Function uses sdcc convention for chars */
-        SHORTCALL = 0x4000   /* Function uses short call (via rst) */
+        SHORTCALL = 0x4000,   /* Function uses short call (via rst) */
+        BANKED = 0x8000      /* Call via the banked_call function */
 };
 
 
@@ -197,6 +205,15 @@ struct symbol_s {
         int level;           /* Compound level that this variable is declared at */
         UT_hash_handle  hh;
 
+};
+
+
+typedef struct namespace_s namespace;
+
+struct namespace_s {
+    char        *name;
+    SYMBOL      *bank_function;
+    namespace   *next;       
 };
 
 
@@ -316,7 +333,7 @@ struct gototab_s {
 #define DBG_GOTO  14
 
 #define DBG_FAR1  21
-#define DBG_ALL  99
+#define DBG_ALL   99
 
 #define Z80ASM_PREFIX "_"
 
@@ -334,9 +351,17 @@ struct gototab_s {
 #define CPU_Z180     2
 #define CPU_R2K      4
 #define CPU_R3K      8
-#define CPU_Z80ZXN   16
+#define CPU_Z80N     16
+#define CPU_8080     32
+#define CPU_8085     34
+#define CPU_GBZ80    128
 
 #define CPU_RABBIT (CPU_R2K|CPU_R3K)
+
+#define IS_8080() (c_cpu == CPU_8080 )
+#define IS_8085() (c_cpu == CPU_8085 )
+#define IS_808x() (c_cpu == CPU_8080 || c_cpu == CPU_8085)
+#define IS_GBZ80() (c_cpu == CPU_GBZ80)
 
 
 
@@ -384,8 +409,19 @@ enum optimisation {
         OPT_SUB16          = (1 << 3),
         OPT_SUB32          = (1 << 4),
         OPT_INT_COMPARE    = (1 << 5),
-        OPT_LONG_COMPARE   = (1 << 6)
+        OPT_LONG_COMPARE   = (1 << 6),
+        OPT_UCHAR_MULT     = (1 << 7)
 };
+
+enum maths_mode {
+    MATHS_Z80,  // Classic z80 mode
+    MATHS_IEEE, // 32 bit ieee
+    MATHS_MBFS,  // 32 bit Microsoft single precision
+    MATHS_MBF40, // 40 bit Microsoft 
+    MATHS_MBF64, // 64 bit Microsoft double precision
+    MATHS_Z88    // Special handling for z88 (subtype of MATHS_Z80)
+};
+
 
 
 #define dump_type(type) do { \

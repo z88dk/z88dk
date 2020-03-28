@@ -1,0 +1,2 @@
+@target/scz180/device/asci/asci_sccz80.lst
+@target/scz180/device/csio/csio_sccz80.lst

@@ -2,15 +2,13 @@
 
 # Z88DK Z80 Macro Assembler
 #
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk/
 #
 # Test org
 
-use strict;
-use warnings;
-use v5.10;
+use Modern::Perl;
 use Test::More;
 require './t/testlib.pl';
 
@@ -37,14 +35,12 @@ check_bin_file("test.bin", pack("C*", 0xC3, 0x34, 0x12));
 unlink_testfiles();
 z80asm("org", "", 1, "", <<'ERR');
 Error at file 'test.asm' line 1: syntax error
-1 errors occurred during assembly
 ERR
 
 # ORG redefined
 unlink_testfiles();
 z80asm("org 0x1234 \n org 0x5678", "", 1, "", <<'ERR');
 Error at file 'test.asm' line 2: ORG redefined
-1 errors occurred during assembly
 ERR
 
 # ORG OK
@@ -64,20 +60,12 @@ check_bin_file("test.bin", pack("C*", 0xFF));
 unlink_testfiles();
 z80asm("org -2", "", 1, "", <<'ERR');
 Error at file 'test.asm' line 1: integer '-2' out of range
-1 errors occurred during assembly
-ERR
-
-unlink_testfiles();
-z80asm("org 65536", "", 1, "", <<'ERR');
-Error at file 'test.asm' line 1: integer '65536' out of range
-1 errors occurred during assembly
 ERR
 
 # ORG not constant
 unlink_testfiles();
 z80asm("extern start \n org start", "", 1, "", <<'ERR');
 Error at file 'test.asm' line 2: expected constant expression
-1 errors occurred during assembly
 ERR
 
 # -r, --origin -- tested in options.t
@@ -86,13 +74,11 @@ ERR
 unlink_testfiles();
 z80asm("jr ASMPC+2-129", "", 1, "", <<'ERR');
 Error at file 'test.asm' line 1: integer '-129' out of range
-1 errors occurred during assembly
 ERR
 
 unlink_testfiles();
 z80asm("jr ASMPC+2+128", "", 1, "", <<'ERR');
 Error at file 'test.asm' line 1: integer '128' out of range
-1 errors occurred during assembly
 ERR
 
 # --split-bin, ORG -1

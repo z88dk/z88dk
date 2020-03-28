@@ -1,9 +1,0 @@
-@stdio/ansicore.lst
-stdio/ansi/bee/f_ansi_attr
-stdio/ansi/bee/f_ansi_bel
-stdio/ansi/bee/f_ansi_char
-stdio/ansi/bee/f_ansi_cls
-stdio/ansi/bee/f_ansi_dline
-stdio/ansi/bee/f_ansi_scrollup
-games/bee/joystick
-@games/games.lst

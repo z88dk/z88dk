@@ -417,7 +417,7 @@ int main(int argc, char **argv)
             fputs("__asm\n",stdout);
         } else if ( sccz80_mode == 0 && strncmp(ptr, "#endasm", 7) == 0 ) {
             fputs("__endasm;\n",stdout);
-        } else if ( sccz80_mode == 1 && strncmp(ptr, "__asm", 5) == 0 ) {
+        } else if ( sccz80_mode == 1 && strncmp(ptr, "__asm", 5) == 0 && strncmp(ptr,"__asm__", 7) ) {
             fputs("#asm\n",stdout);
         } else if ( sccz80_mode == 1 && strncmp(ptr, "__endasm", 8) == 0 ) {
             fputs("#endasm;\n",stdout);

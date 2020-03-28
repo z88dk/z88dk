@@ -1,0 +1,10 @@
+@target/zx81/gfx81_specific.lst
+target/zx81/graphics_udg/clg
+target/zx81/graphics/clsgraph
+target/zx81/graphics_udg/zx_hardcopy
+target/zx81/graphics_udg/plotpixl
+target/zx81/graphics_udg/respixl
+target/zx81/graphics_udg/xorpixl
+target/zx81/graphics_udg/pointxy
+target/zx81/graphics/swapgfxbk
+@gfx/text6/gfx_text6.lst

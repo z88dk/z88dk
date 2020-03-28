@@ -1,5 +1,5 @@
-Library file test2.lib at $0000: Z80LMF11
-Object  file test2.lib at $0010: Z80RMF11
+Library file test2.lib at $0000: Z80LMF12
+Object  file test2.lib at $0010: Z80RMF12
   Name: file1
   Section "": 0 bytes
   Section text_1: 63 bytes, ORG $0000
@@ -39,7 +39,7 @@ Object  file test2.lib at $0010: Z80RMF11
     E Ll $0000 $0001: msg2 (section data_2) (file file1.asm:321)
     E Ll $0000 $0001: ext2 (section data_2) (file file1.asm:321)
 
-Object  file test2.lib at $0341: Z80RMF11
+Object  file test2.lib at $0341: Z80RMF12
   Name: file1
   Section "": 0 bytes
   Section text_1: 63 bytes, ORG $0000

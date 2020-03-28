@@ -8,6 +8,7 @@
 ; DE=frequency
 ;
 
+IF !__CPU_GBZ80__ && !__CPU_INTEL__
     SECTION    code_clib
     PUBLIC     beeper
     PUBLIC     _beeper
@@ -62,3 +63,4 @@
           call   bit_close_ei
 	pop	ix
           ret
+ENDIF

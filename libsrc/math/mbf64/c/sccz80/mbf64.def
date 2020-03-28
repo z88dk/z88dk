@@ -1,0 +1,23 @@
+;
+; External routines/address that these bindings rely on
+
+
+	EXTERN		___mbf64_FPREG	; Primary FP register
+	EXTERN		___mbf64_FPARG	; Secondary FP register
+	EXTERN		___mbf64_VALTYP	; Value type
+
+
+	; Arithmetic operations (used by sccz80 bindings)
+	EXTERN		___mbf64_FPADD			;DBL_ADD
+	EXTERN		___mbf64_FPSUB			;DBL_SUB
+	EXTERN		___mbf64_FPMUL			;DBL_MUL
+	EXTERN		___mbf64_FPDIV			;DBL_DIV
+	EXTERN		___mbf64_FPCOMPARE		;DECCOMP
+
+	; Internal routines
+	EXTERN		___mbf64_setup_single
+	EXTERN		___mbf64_setup_arith
+	EXTERN		___mbf64_setup_comparison
+	EXTERN		___mbf64_return
+	EXTERN		___mbf64_return_single
+	EXTERN		msbios

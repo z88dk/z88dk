@@ -32,18 +32,57 @@ asm_rand:
    ; uses : af, bc, de, hl
 
    ; get current seed
-   
+
+IF __CPU_GBZ80__
+   ld hl,__stdlib_seed + 3
+   ld a,(hl-)
+   ld d,a
+   ld a,(hl-)
+   ld e,a
+   ld a,(hl-)
+   ld l,(hl)
+   ld h,a
+ELSE
    ld hl,(__stdlib_seed)
+  IF __CPU_INTEL__
+   ex de,hl
+   ld hl,(__stdlib_seed + 2)
+   ex de,hl
+  ELSE
    ld de,(__stdlib_seed + 2)
+  ENDIF
+ENDIF
 
    ; generate next prng in sequence
    
    call asm_random_uniform_xor_32  ; marsaglia xor generator
 
    ; store new seed
-
+IF __CPU_GBZ80__
+   ld c,l
+   ld b,h
+   ld hl,__stdlib_seed
+   ld a,c
+   ld (hl+),a
+   ld a,b
+   ld (hl+),a
+   ld a,e
+   ld (hl+),a
+   ld a,d
+   ld (hl+),a
+   ld l,c
+   ld h,b
+ELSE
    ld (__stdlib_seed),hl
+  IF __CPU_INTEL__
+   ex de,hl
+   ld (__stdlib_seed + 2),hl
+   ex de,hl
+
+  ELSE
    ld (__stdlib_seed + 2),de
+  ENDIF
+ENDIF
    
    ; create a 15-bit result that includes 0
    

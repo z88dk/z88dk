@@ -1,14 +1,12 @@
 # .STRINGS dot command
 
-To use, copy "STRINGS" to the sd card's BIN directory.
+To use, copy "STRINGS" to the sd card's DOT directory.
 
 ## Compiling
 
-`zsdcc` compile (optimization is high so compile time will be long).
-~~~
-zcc +zxn -vn -startup=30 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 --opt-code-size strings.c help.asm -o strings -subtype=dot -create-app
-~~~
-An `sccz80` compile produces code that is too large for esxdos.  Compile line can be found in `strings.c`.
+```
+zcc +zxn -v -startup=30 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 --opt-code-size @zproject.lst -o strings -pragma-include:zpragma.inc -subtype=dot-n -Cz"--clean" -create-app
+```
 
 ## Usage
 
@@ -34,15 +32,19 @@ The help text is reproduced here:
 
 no -o,-a prints to screen
 
-strings v1.0 spectrum z88dk.org
+strings v1.2 zx-next z88dk.org
 ~~~
 
 ## Examples
 
 1. Look for strings at least 6 chars long.  If found print the file offset in hex along with the string.  Output to screen.
 
-`.strings knight.sna -n 6 -t X `
+```
+.strings knight.sna -n 6 -t X
+```
 
 2.  Look for strings and save findings to an output file.  Print file offset in decimal and print a separator between findings.
 
-`.strings knight.sna -t d -s ------- -o string.txt`
+```
+.strings knight.sna -t d -s ------- -o string.txt
+```

@@ -1,0 +1,38 @@
+; Snippet for QAOP-MN joystick
+
+IF !__CPU_INTEL__
+	call	getk
+	ld	a,l
+	ld	hl,0
+	or	@00100000	; TO_LOWER
+	cp	'm'
+	jr	nz,no_fire1
+	set	4,l
+	ret
+.no_fire1
+	cp	'n'
+	jr	nz,no_fire2
+	set	5,l
+	ret
+.no_fire2
+	cp	'q'
+	jr	nz,no_up
+	set	3,l
+	ret
+.no_up
+	cp	'a'
+	jr	nz,no_down
+	set	2,l
+	ret
+.no_down
+	cp	'o'
+	jr	nz,no_left
+	set	1,l
+	ret
+.no_left
+	cp	'p'
+	ret	nz
+	set	0,l
+	ret
+
+ENDIF

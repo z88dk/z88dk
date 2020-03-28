@@ -1,5 +1,5 @@
-// zcc +zxn -v -clib=sdcc_iy -SO3 --max-allocs-per-node200000 dir.c -o dir -subtype=sna -Cz"--clean" -create-app
-// zcc +zxn -v -clib=new dir.c -o dir -subtype=sna -Cz"--clean" -create-app
+// zcc +zxn -v -clib=sdcc_iy -SO3 --max-allocs-per-node200000 dir.c -o dir -subtype=nex -Cz"--clean" -create-app
+// zcc +zxn -v -clib=new dir.c -o dir -subtype=nex -Cz"--clean" -create-app
 
 #include <stdio.h>
 #include <arch/zxn/esxdos.h>

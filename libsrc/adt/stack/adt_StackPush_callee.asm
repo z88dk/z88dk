@@ -63,4 +63,4 @@ EXTERN _u_malloc
    scf
    ret
 
-DEFC ASMDISP_ADT_STACKPUSH_CALLEE = # asmentry - adt_StackPush_callee
+DEFC ASMDISP_ADT_STACKPUSH_CALLEE = asmentry - adt_StackPush_callee

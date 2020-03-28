@@ -218,10 +218,8 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
 
-IF CRT_ENABLE_STDIO = 1
-		EXTERN	closeall
-		call	closeall
-ENDIF
+        call    crt0_exit
+
 
 start1:	ld	sp,0		;Restore stack to entry value
 		;ret
@@ -453,9 +451,6 @@ l_dcal:
 		jp	(hl)
 
 
-		defm  "Small C+ OZ"	;Unnecessary file signature
-		defb	0
-		
 		defc ansipixels = 236
 		IF !DEFINED_ansicolumns
 			 defc DEFINED_ansicolumns = 1

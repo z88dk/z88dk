@@ -1,0 +1,21 @@
+
+
+	defc	SYSVAR_KEYASCII = $8030	;ASCII code of last key pressed
+
+	defc	IM1_VECTOR = $8012	; 3 bytes available to call user code
+
+	defc	SYSVAR_bank0 = $8665
+	defc	SYSVAR_bank1 = $8666
+	defc	SYSVAR_bank2 = $8667
+	defc	SYSVAR_bank3 = $8668
+	defc	SYSVAR_port44 = $8669
+
+	defc	SYSVAR_mem6800 = $85f9	; Copy of mem io $6800
+
+
+	defc	GETKEY = $0b4f		; reads the keyboard and updates LAST_KEY_PRESSED (0x85F0) and KEYASCII (0x8030)
+	defc	CHROUT = $57d9		; prints character in a
+	defc	GETC = $58f0		; read char feorm keyboard, return in a
+	defc	PRINTSTR = $62d3	; prints 0 terminated string in hl
+
+

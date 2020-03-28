@@ -48,7 +48,7 @@ void zxn_construct_page_contents(unsigned char *mem, struct memory_bank *mb, int
 {
     FILE *fin;
     int   j;
-    int   first, last, gap;
+    int   first = 0 , last = 0, gap;
 
     if ((mbsz != 0x2000) && (mbsz != 0x4000))
         exit_log(1, "Error: Page construction for a size that is not 8k or 16k: %u\n", mbsz);
@@ -205,8 +205,8 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt)
     char    name[11];
     char    mybuf[20];
     FILE    *fpin, *fpout, *fpmerge;
-    long    pos;
-    int     c, d;
+    long    pos = 0;
+    int     c = 0, d;
     int     warping;
     int     i, j, blocklen;
     int     len, mlen;
@@ -513,10 +513,10 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt)
                             writebyte_p(':', fpout, &zxt->parity);
                             writebyte_p(0xf4, fpout, &zxt->parity);   /* POKE */
                             writebyte_p(0xb0, fpout, &zxt->parity);       /* VAL */
-                            sprintf(mybuf, "\"23739\",", (int)pos);        
+                            sprintf(mybuf, "\"23739\",");
                             writestring_p(mybuf, fpout, &zxt->parity);
                             writebyte_p(0xb0, fpout, &zxt->parity);       /* VAL */
-                            sprintf(mybuf, "\"111\":", (int)pos);        
+                            sprintf(mybuf, "\"111\":");
                             writestring_p(mybuf, fpout, &zxt->parity);
                         }
                         writebyte_p(0xef, fpout, &zxt->parity);       /* LOAD */
@@ -743,7 +743,7 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt)
                 for (i = 0; (i < blocklen); i++)		/* Skip the block we're excluding */
                     c = getc(fpin);
 
-            if ((zxt->turbo && (blockcount == 4) || (blockcount == 6)) || (zxt->turbo && zxt->dumb)) {
+            if ((zxt->turbo && (blockcount == 4 || blockcount == 6)) || (zxt->turbo && zxt->dumb)) {
                 //zx_rawout(fpout,1,fast);
                 zx_rawbit(fpout, tperiod0);
                 zx_rawbit(fpout, 75);
@@ -925,11 +925,11 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
     int user_handle;
     int z_alt_filename;
 
-    int dotn_last_page, actual_last_page;
-    int dotn_last_div, actual_last_div;
+    int dotn_last_page = 0, actual_last_page;
+    int dotn_last_div = 0, actual_last_div;
     int dotn_num_extra;
-    int dotn_main_overlay_mask;
-    int dotn_main_absolute_mask;
+    int dotn_main_overlay_mask = 0;
+    int dotn_main_absolute_mask = 0;
 
     unsigned char mem[64 * 1024];
 
@@ -1002,13 +1002,13 @@ int zxn_dotn_command(struct zx_common *zxc, struct banked_memory *memory, int fi
         if (sb->org < 0x2000)
             exit_log(1, "Error: Section %s has org too low 0x%04x\n", sb->section_name, sb->org);
 
-        if ((sb->org < 0x4000) && (sb->org + sb->size >= 0x4000))
+        if ((sb->org < 0x4000) && (sb->org + sb->size > 0x4000))
             exit_log(1, "Error: Section %s extends past end of dot [0x%04x,0x%04x)\n", sb->section_name, sb->org, sb->org + sb->size);
 
-        if ((sb->org < 0x4000) && (sb->org + sb->size >= (0x4000 - 300)))
+        if ((sb->org < 0x4000) && (sb->org + sb->size > (0x4000 - 256)))
             printf("Warning: Section %s may overlap stack area in divmmc memory [0x%04x,0x%04x)\n", sb->section_name, sb->org, sb->org + sb->size);
 
-        if ((sb->org >= 0x4000) && (sb->org + sb->size >= 0x10000))
+        if ((sb->org >= 0x4000) && (sb->org + sb->size > 0x10000))
             exit_log(1, "Error: Section %s extends past end of main bank [0x%04x,0x%04x)\n", sb->section_name, sb->org, sb->org + sb->size);
 
         if (sb->org < 0x4000)
@@ -1745,7 +1745,7 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
     z_sna_filename = parameter_search(zxc->crtfile, ".map", "__z_sna_filename");
 
     if (z_sna_filename >= 0x4000)
-        sprintf(&mem128[z_sna_filename - 0x4000], "%.12s", filename);
+        sprintf((char *)&mem128[z_sna_filename - 0x4000], "%.12s", filename);
 
     // create sna file
 
@@ -1778,15 +1778,15 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
 
 /*
    ZX NEXT NEX FORMAT
-   June 2018 aralbrec
+   June, Sept 2018 aralbrec
 
    .NEX file format (V1.0)
    =======================
    unsigned char Next[4];			//"Next"
-   unsigned char VersionNumber[4];	//"V1.0"
+   unsigned char VersionNumber[4];	//"V1.1"
    unsigned char RAM_Required;		//0=768K, 1=1792K
    unsigned char NumBanksToLoad;	//0-112 x 16K banks
-   unsigned char LoadingScreen;	//1=YES load palette also and layer2 at 16K page 9.
+   unsigned char LoadingScreen;	    //see implementation
    unsigned char BorderColour;		//0-7 ld a,BorderColour:out(254),a
    unsigned short SP;				//Stack Pointer
    unsigned short PC;				//Code Entry Point : $0000 = Don't run just load.
@@ -1795,11 +1795,17 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
    unsigned char LoadBar;           //Enable the layer 2 load bar
    unsigned char LoadColour;        //Colour of the load bar
    unsigned char LoadDelay;         //Delay in interrupts after each 16k loaded
-   unsinged char StartDelay;        //Delay in interrupts before starting the program
+   unsigned char StartDelay;        //Delay in interrupts before starting the program
+   unsigned char DontSetNextRegs;   //Do not reset nextreg to known state
+   unsigned char CoreMajor;         //Minimum core version
+   unsigned char CoreMinor;
+   unsigned char CoreSubMinor;
+   unsigned char HiResCol;          //Timex hi-res loading screen colour (paper bits)
+
    unsigned char RestOf512Bytes[512-(4+4 +1+1+1+1 +2+2+2 +64+48 +1+1+1+1)];
    if LoadingScreen!=0 {
-     uint16_t palette[256];  // 8 bits of palette entry followed by 9th bit of palette entry in two bytes
-     uint8_t  Layer2LoadingScreen[49152];
+     uint16_t palette[256];  // 8 bits of palette entry followed by 9th bit of palette entry in two bytes (optional)
+     uint8_t  Layer2LoadingScreen[49152];  // can also be other ula mode screens see implementation
    }
    Banks 5,2,0 in order if present
    Banks 1,3,4,6,7,... in order if present (ie not 5,2,0)
@@ -1821,7 +1827,12 @@ struct nex_hdr
     uint8_t LoadColour;
     uint8_t LoadDelay;
     uint8_t StartDelay;
-    uint8_t Padding[512 - (4 + 4 + 1 + 1 + 1 + 1 + 2 + 2 + 2 + 64 + 48 + 4)];
+    uint8_t DontSetNextRegs;
+    uint8_t CoreMajor;
+    uint8_t CoreMinor;
+    uint8_t CoreSubMinor;
+    uint8_t HiResCol;
+    uint8_t Padding[512 - (4 + 4 + 1 + 1 + 1 + 1 + 2 + 2 + 2 + 64 + 48 + 4 + 5)];
 };
 
 struct nex_hdr nh;
@@ -1836,6 +1847,7 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
 
     int register_sp;
     int crt_org_code;
+    int core_version;
 
     int mainbank_occupied;
 
@@ -1872,6 +1884,8 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
             exit_log(1, "Error: Unable to find org address\n");
     }
 
+    core_version = parameter_search(zxc->crtfile, ".map", "__CRT_CORE_VERSION");
+
     // open output file
 
     if ((fout = fopen(outname, "wb")) == NULL)
@@ -1894,12 +1908,48 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
             fprintf(stderr, "Warning: NEX loading screen not added; can't open %s\n", zxnex->screen);
         else
         {
-            nh.LoadingScreen = 1;
-            
-            fread(scr, NEX_SCREEN_SIZE, 1, fin);
-            fclose(fin);
+            int size;
 
-            fwrite(scr, sizeof(scr), 1, fout);
+            if (zxnex->screen_ula)
+            {
+                size = 6912;
+                nh.LoadingScreen = 0x02;
+            }
+            else if (zxnex->screen_lores)
+            {
+                size = 12288;
+                nh.LoadingScreen = 0x04;
+            }
+            else if (zxnex->screen_hires)
+            {
+                size = 12288;
+                nh.LoadingScreen = 0x08;
+            }
+            else if (zxnex->screen_hicol)
+            {
+                size = 12288;
+                nh.LoadingScreen = 0x10;
+            }
+            else
+            {
+                size = 48 * 1024;
+                nh.LoadingScreen = 0x01;
+            }
+
+            if (zxnex->nopalette)
+                nh.LoadingScreen += 0x80;
+            else
+                size += 512;
+            
+            if (fread(scr, size, 1, fin) == 1)
+                fwrite(scr, size, 1, fout);
+            else
+            {
+                nh.LoadingScreen = 0;
+                fprintf(stderr, "Warning: Loading screen not used (wrong size, palette %sexpected)\n", zxnex->nopalette ? "not " : "");
+            }
+
+            fclose(fin);
         }
     }
 
@@ -1940,26 +1990,13 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
             }
         }
 
-        // NOT NEEDED FOR NEX FORMAT BECAUSE NEX DOES NOT COOPERATE WITH NEXTZXOS
-        //
-        // mark all pages occupied above the lowest page
-        // temporary to accommodate z88dk normally placing stack and heap at top of memory
-        //
-        // for (i = 0; i < 8; ++i)
-        // {
-        //     if (mainbank_occupied & (1 << i))
-        //     {
-        //         mainbank_occupied = 0xff - (1 << i) + 1;
-        //         break;
-        //     }
-        // }
-
         // bank 5
 
         if (mainbank_occupied & 0x0c)
         {
             nh.Banks[5] = 1;
             fwrite(mem, 16384, 1, fout);
+            nh.NumBanksToLoad++;
         }
 
         // bank 2
@@ -1968,6 +2005,7 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
         {
             nh.Banks[2] = 1;
             fwrite(&mem[16384], 16384, 1, fout);
+            nh.NumBanksToLoad++;
         }
 
         // bank 0
@@ -1976,6 +2014,7 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
         {
             nh.Banks[0] = 1;
             fwrite(&mem[32768], 16384, 1, fout);
+            nh.NumBanksToLoad++;
         }
     }
 
@@ -2018,7 +2057,7 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
     // complete the header
 
     memcpy(&nh.Next, "Next", 4);
-    memcpy(&nh.VersionNumber, "V1.0", 4);
+    memcpy(&nh.VersionNumber, "V1.1", 4);
 
     nh.BorderColour = zxnex->border & 0x7;
 
@@ -2037,6 +2076,15 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
     nh.PC[0] = crt_org_code & 0xff;
     nh.PC[1] = (crt_org_code >> 8) & 0xff;
 
+    if (core_version > 0)
+    {
+        nh.CoreMajor = core_version / 100000;
+        nh.CoreMinor = (core_version / 1000) % 100;
+        nh.CoreSubMinor = core_version % 1000;
+    }
+
+    nh.DontSetNextRegs = (zxnex->noreset != 0);
+
     // write the completed header to output
 
     rewind(fout);
@@ -2044,5 +2092,205 @@ int zxn_nex(struct zx_common *zxc, struct zxn_nex *zxnex, struct banked_memory *
 
     fclose(fout);
 
+    return 0;
+}
+
+// Layout a +3 file
+// \param inbuf The input buffer containing the file
+// \param filelen Number of bytes to read
+// \param file_type Spectrum file type
+// \param total_len How long the returned block is
+// \return Allocated buffer containing the whole file (should be freed)
+uint8_t *zx3_layout_file(uint8_t *inbuf, size_t filelen, int start_address, int file_type, size_t *total_len_ptr)
+{
+     uint8_t *buf = must_malloc(filelen + 128);
+     int      cksum, i;
+     size_t   total_len = 0;
+
+     memcpy(buf,"PLUS3DOS", 8);
+     buf[8] = 0x1a;
+     buf[9] = 0x01;	// Issue number
+     buf[10] = 0x00;    // Version number
+     // 11 - 14 = filelength
+     // 15 - 22 = header data
+     // +---------------+-------+-------+-------+-------+-------+-------+-------+
+     // | BYTE		|   0	|   1	|   2	|   3	|   4	|   5	|   6	|
+     // +---------------+-------+-------+-------+-------+-------+-------+-------+
+     // | Program	    0	file length	8000h or LINE	offset to prog	|
+     // | Numeric array	    1	file length	xxx	name	xxx	xxx	|
+     // | Character array   2	file length	xxx	name	xxx	xxx	|
+     // | CODE or SCREEN$   3	file length	load address	xxx	xxx	|
+     // +-----------------------------------------------------------------------+
+     // 127 = checksum (sum of 0..126 mod 256)
+     while ( total_len < filelen ) {
+         buf[128 + total_len] = inbuf[total_len];
+         total_len++;
+     }
+
+     // Now populate the +3 dos header
+     buf[15] = file_type;
+     buf[16] = total_len % 256;
+     buf[17] = total_len / 256;
+     buf[18] = start_address % 256;
+     buf[19] = start_address / 256;
+     buf[20] = file_type == 0 ? total_len % 256 : 0;
+     buf[21] = file_type == 0 ? total_len / 256 : 0;
+
+     // And then the overall file header
+     total_len += 128;
+     buf[11] = total_len % 256;
+     buf[12] = (total_len / 256) % 256;
+     buf[13] = (total_len / 65536) % 256;
+     buf[14] = (total_len / 65536) / 256;
+
+     // And now do the checksum
+     for ( i = 0, cksum = 0; i < 127; i++ ) {
+         cksum += buf[i];
+     }
+     buf[127] = cksum % 256;
+     *total_len_ptr = total_len;
+     return buf;
+}
+
+int zx_plus3(struct zx_common *zxc, struct zx_tape *zxt)
+{
+    uint8_t  buffer[1024];  // Temporary buffer
+    uint8_t *ptr;
+    char    disc_image_name[FILENAME_MAX+1];
+    char    cpm_filename[20];
+    char    basic_filename[20];
+    char    tbuf[50];
+    size_t  origin;
+    size_t  binary_length;
+    int     len;
+    disc_handle *h;
+    FILE   *fpin;
+    void   *file_buf;
+    size_t  file_len;
+
+    if (zxc->outfile == NULL) {
+        strcpy(disc_image_name, zxc->binname);
+        suffix_change(disc_image_name, ".dsk");
+    } else {
+        strcpy(disc_image_name, zxc->outfile);
+    }
+
+
+    if (zxt->blockname == NULL)
+        zxt->blockname = zxc->binname;
+
+
+    if (strcmp(zxc->binname, disc_image_name) == 0) {
+        fprintf(stderr, "Input and output file names must be different\n");
+        myexit(NULL, 1);
+    }
+
+
+    if (zxc->origin != -1) {
+        origin = zxc->origin;
+    } else {
+        if ((origin = get_org_addr(zxc->crtfile)) == -1) {
+            myexit("Could not find parameter ZORG (not z88dk compiled?)\n", 1);
+        }
+    }
+
+    if ((fpin = fopen_bin(zxc->binname, zxc->crtfile)) == NULL) {
+        exit_log(1,"Can't open input file %s\n", zxc->binname);
+    }
+
+    if (fseek(fpin, 0, SEEK_END)) {
+        fclose(fpin);
+        exit_log(1,"Couldn't determine size of file\n");
+    }
+
+    binary_length = ftell(fpin);
+    fseek(fpin, 0L, SEEK_SET);
+
+    if ( (h = cpm_create_with_format("plus3")) == NULL ) {
+        fclose(fpin);
+        exit_log(1,"Cannot find disc specification\n");
+    }
+
+    // Lets do some filename mangling
+    cpm_create_filename(zxc->binname, basic_filename, 0, 1);
+
+    // Create the basic file
+
+    // Write the basic file
+    ptr = buffer; 
+    writebyte_b(0, &ptr);		// MSB of basic line
+    writebyte_b(10, &ptr);		// MSB
+    writeword_b(0, &ptr);		// Line length, we'll fix up later
+    writebyte_b(0xfd, &ptr);		// CLEAR
+    writebyte_b(0xb0, &ptr);		// VAL
+    if ( zxt->clear_address == -1 ) {
+        zxt->clear_address = origin - 1;
+    }
+    snprintf(tbuf,sizeof(tbuf),"\"%i\":", zxt->clear_address);
+    writestring_b(tbuf, &ptr);
+    if ( zxt->screen ) {
+        suffix_change(basic_filename, ".SCR");
+        writebyte_b(0xef, &ptr);	/* LOAD */
+        writebyte_b('"', &ptr);
+        writestring_b(basic_filename, &ptr);
+        writebyte_b('"', &ptr);
+        writebyte_b(0xaa, &ptr);	/* SCREEN$ */
+        writebyte_b(':', &ptr);
+    }
+    suffix_change(basic_filename, ".BIN");
+    writebyte_b(0xef, &ptr);	/* LOAD */
+    writebyte_b('"', &ptr);
+    writestring_b(basic_filename, &ptr);
+    writebyte_b('"', &ptr);
+    writebyte_b(0xaf, &ptr);	/* CODE */
+    writebyte_b(':', &ptr);
+    writebyte_b(0xf9, &ptr);	/* RANDOMIZE */
+    writebyte_b(0xc0, &ptr);	/* USR */
+    writebyte_b(0xb0, &ptr);	/* VAL */
+    snprintf(tbuf,sizeof(tbuf), "\"%i\"", (int)origin);           /* Location for USR */
+    writestring_b(tbuf, &ptr);
+    writebyte_b(0x0d, &ptr);	/* ENTER (end of BASIC line) */
+    len = ptr - buffer;
+    buffer[2] = (len-4) % 256; 
+    buffer[3] = (len-4) / 256; 
+
+    // And now we can write the file
+    file_buf = zx3_layout_file(buffer, len, 10, 0, &file_len);
+    disc_write_file(h, "DISK       ", file_buf, file_len);
+    free(file_buf);
+
+    // Read the screen$
+    if ( zxt->screen ) {
+        uint8_t scrbuf[6912] = {0};
+        FILE    *fpscr = fopen(zxt->screen, "rb");
+
+        if ( fpscr == NULL ) {
+            fclose(fpin);
+            exit_log(1,"Cannot open SCREEN$ file %s\n", zxt->screen);
+        }
+        suffix_change(basic_filename, ".SCR");
+        fread(scrbuf, 1, 6912, fpscr);
+        fclose(fpscr);
+        file_buf = zx3_layout_file(scrbuf, 6912, 16384, 3, &file_len);
+        cpm_create_filename(basic_filename, cpm_filename, 0, 0);
+        disc_write_file(h, cpm_filename, file_buf, file_len);
+        free(file_buf);
+    }
+    // Read the binary
+    ptr = must_malloc(binary_length);
+    fread(ptr, 1, binary_length, fpin);
+    fclose(fpin);
+
+    // And write it
+    suffix_change(basic_filename, ".BIN");
+    cpm_create_filename(basic_filename, cpm_filename, 0, 0);
+    file_buf = zx3_layout_file(ptr, binary_length, origin, 3, &file_len);
+    disc_write_file(h, cpm_filename, file_buf, file_len);
+    free(file_buf);
+    free(ptr);
+    // Finalise the image
+    if ( disc_write_edsk(h, disc_image_name) < 0 ) {
+        exit_log(1,"Can't write disc image");
+    }
     return 0;
 }

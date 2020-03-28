@@ -65,17 +65,45 @@ cleanup:
 ;
         push    hl				; return code
 
-IF CRT_ENABLE_STDIO = 1
-        EXTERN     closeall
-        call    closeall
-ENDIF
+        call    crt0_exit
+
 
 IF CRT_ENABLE_VDP
-	EXTERN	tms9918_spc1000_impl
-	defc	__unused_vdp_import = tms9918_spc1000_impl
 ELSE
-	EXTERN	tms9918_spc1000_stub
-	defc	__unused_vdp_import = tms9918_spc1000_stub
+        PUBLIC          __tms9918_cls
+        PUBLIC          __tms9918_console_vpeek
+        PUBLIC          __tms9918_console_ioctl
+        PUBLIC          __tms9918_scrollup
+        PUBLIC          __tms9918_printc
+        PUBLIC          __tms9918_set_ink
+        PUBLIC          __tms9918_set_paper
+        PUBLIC          __tms9918_set_attribute
+        PUBLIC          __tms9918_plotpixel
+        PUBLIC          __tms9918_respixel
+        PUBLIC          __tms9918_xorpixel
+        PUBLIC          __tms9918_pointxy
+        PUBLIC          __tms9918_getmaxx
+        PUBLIC          __tms9918_getmaxy
+
+        defc            __tms9918_cls = stub
+        defc            __tms9918_console_vpeek = stub_scf
+        defc            __tms9918_console_ioctl = stub_scf
+        defc            __tms9918_scrollup = stub
+        defc            __tms9918_printc = stub
+        defc            __tms9918_set_ink = stub
+        defc            __tms9918_set_paper = stub
+        defc            __tms9918_set_attribute = stub
+	defc		__tms9918_plotpixel = stub
+	defc		__tms9918_xorpixel = stub
+	defc		__tms9918_respixel = stub
+	defc		__tms9918_pointxy = stub
+        defc            __tms9918_getmaxx = stub
+        defc            __tms9918_getmaxy = stub
+
+stub_scf:
+        scf
+stub:
+        ret
 ENDIF
 
 
@@ -92,8 +120,6 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 
 
 
-	defm    "Small C+ SPC-1000"   ;Unnecessary file signature
-	defb    0
         INCLUDE "crt/classic/crt_runtime_selection.asm"
 
         INCLUDE "crt/classic/crt_section.asm"

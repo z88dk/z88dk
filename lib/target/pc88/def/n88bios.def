@@ -1,0 +1,48 @@
+lstoff
+
+; PC-8801 BIOS functions definition
+;
+; $Id: n88bios.def $
+;
+
+
+defc SYNCHR = $0008 ; Checks if then current character pointed by
+                    ; HL is one desired.If not,generates
+                    ; 'Syntax error',otherwise falls into CHRGTB.
+defc CHRGTB = $0010 ; Gets next character (or token) from BASIC text.
+defc OUTDO  = $0018 ; ($3E0D?) Output to the current device.
+defc DCOMPR = $0020 ; (??) Compare HL with DE.
+defc GETYPR = $0030 ; Return the type FAC.
+defc KEYINT = $0038 ; Performs hardware interrupt procedures.
+
+
+; Console (i.e. the keyboard and the CRT)
+defc CHSNS  = $35CE ; Get key from keyboard buffer, don't wait for keypress (on MSX, only check the status of keyboard buffer)
+defc CHGET  = $5A41 ; Waits for character being input and returns the character codes.
+;defc CHPUT  = $7A9F? ; $7AA5? Outputs a character to the console.
+defc LPTOUT = $3ED4 ; Output a character to the line printer.
+;defc LPTSTT = $ ; Check the line priter status.
+;defc SNVCHR = $ ; Check graphic header byte and converts codes.
+defc PINLIN = $5F92 ; Accepts a line from console until a CR or STOP
+                    ; is typed,and stores the line in a buffer.
+defc INLIN  = $5FC8 ; Same as PINLIN,exept if AUTFLO if set.
+defc QINLIN = $5FC2 ; Output a '?' mark and a space then falls into the INLIN routine.
+defc BREAKX = $35C2 ; Check the status of the Control-STOP key.
+defc ISCNTC = $368C ; Check the status of the SHIFT-STOP key.
+defc CKCNTC = $368C ; Same as ISCNTC,used by BASIC
+defc BEEP   = $3E9B ; Sounds the buffer
+;defc CLS    = $ ; Clear the screen.
+;defc POSIT  = $ ; Locate cursor at the specified position.
+;defc FNKSB  = $ ; Check if function key display is active. If
+;                    ; it is,it display it,otherwise does nothing.
+;defc ERAFNK = $ ; Hide the function key diplay.
+;defc DSPFNK = $ ; Show the function key display.
+;defc TOTEXT = $ ; Forcidly places the screen in text mode.
+
+; Misc routines
+defc ISFLIO = $5372 ; Tests if I/O to device is taking place
+;; defc CALBAS = $ ; Executes inter-slot call to the routine in BASIC interpreter
+
+
+
+lston

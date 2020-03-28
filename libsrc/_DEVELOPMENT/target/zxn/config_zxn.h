@@ -72,13 +72,13 @@
 
 #define __USE_SYSVAR  0
 
-#define __USE_ZXN_OPCODES  0xff
+#define __USE_Z80N_OPCODES  0xff
 
-#define __USE_ZXN_OPCODES_NEXTREG  1
-#define __USE_ZXN_OPCODES_MLT  2
-#define __USE_ZXN_OPCODES_LDIR  4
-#define __USE_ZXN_OPCODES_DISPLAY  8
-#define __USE_ZXN_OPCODES_OTHER  16
+#define __USE_Z80N_OPCODES_NEXTREG  1
+#define __USE_Z80N_OPCODES_MLT  2
+#define __USE_Z80N_OPCODES_LDIR  4
+#define __USE_Z80N_OPCODES_DISPLAY  8
+#define __USE_Z80N_OPCODES_OTHER  16
 
 
 

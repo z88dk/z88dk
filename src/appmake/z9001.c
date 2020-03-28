@@ -42,10 +42,9 @@ int z9001_exec(char *target)
     FILE   *fpin;
     FILE   *fpout;
     long    pos;
-	char	name[17];
-    int     len,namelen;
+    int     len;
     int     c,i;
-	int		blocknr,nflag,a;
+    int	    blocknr,nflag,a;
     char   *p;
 
     if ( help )
@@ -71,7 +70,6 @@ int z9001_exec(char *target)
 
     suffix_change(filename,".TAP");
 
-    namelen=strlen(filename)-1;
 
     if ( strcmp(binname,filename) == 0 ) {
         fprintf(stderr,"Input and output file names must be different\n");

@@ -1,44 +1,55 @@
-#include <stdio.h>
 #include <string.h>
 #include <libgen.h>
 #include <arch/zxn/esxdos.h>
 
-#include "globals.h"
 #include "path.h"
+#include "run.h"
+#include "user_interaction.h"
 
-struct esx_dirent_lfn dirent;
+unsigned char fdir = 0xff;
+struct esx_dirent dirent;
 
-char *path_parent;
-unsigned char constructed_path[ESX_PATHNAME_MAX];
-
-char *path_walk(char *p)
+unsigned char *path_walk(unsigned char *p)
 {
-   if (p)
+   static unsigned int len;
+   
+   p = strstrip(p);
+   
+   if (p && *p)
    {
-      unsigned int len;
+      unsigned char *q;
       
       path_close();
-      len = strlen(p = pathnice(p));
-      
-      if ((len >= 2) && (stricmp(&p[len - 2], "/*") == 0))
-      {
-         p[len - 1] = 0;
-         path_parent = p;
 
-         fdir = esx_f_opendir_ex(p, ESX_DIR_USE_LFN);
+      strcpy(buffer, current_drive);
+
+      q = advance_past_drive(p);
+      if (p != q) *buffer = *p;
+      
+      q = pathnice(q);
+      if (*q == '/') ++q;
+      
+      len = strlen(strupr(strcat(buffer, q)));
+
+      if (strcmp(&buffer[len - 2], "/*") == 0)
+      {
+         buffer[len - 1] = 0;
+         fdir = esx_f_opendir(buffer);
       }
       else
-         return p;
+         return buffer;
    }
 
    if (fdir != 0xff)
    {
       while (esx_f_readdir(fdir, &dirent) == 1)
       {
-         if ((dirent.attr & ESX_DIR_A_DIR) && (stricmp(dirent.name, ".") != 0) && (stricmp(dirent.name, "..") != 0))
+         user_interaction();
+         
+         if ((dirent.attr & ESX_DIR_A_DIR) && (strcmp(dirent.name, ".") != 0) && (strcmp(dirent.name, "..") != 0))
          {
-            snprintf(constructed_path, sizeof(constructed_path), "%s%s", path_parent, pathnice(dirent.name));
-            return constructed_path;
+            strcpy(buffer + len - 1, strupr(dirent.name));
+            return buffer;
          }
       }
    
@@ -48,25 +59,26 @@ char *path_walk(char *p)
    return 0;
 }
 
+static unsigned char *tokenize;
+
 char *path_open(void)
 {
-   unsigned char *p;
-   
-   if (p = strtok(PATH, ":;"))
-      return (p = path_walk(p)) ? p : path_next();
-
-   return 0;
+   tokenize = PATH;
+   return cwd;
 }
 
 char *path_next(void)
 {
    unsigned char *p;
-   
+
    if (p = path_walk(0))
       return p;
-   
-   while (p = strtok(0, ":;"))
+
+   while (p = strtok(tokenize, ";"))
+   {
+      tokenize = 0;
       if (p = path_walk(p)) return p;
+   }
    
    return 0;
 }

@@ -3,7 +3,7 @@
 # Z88DK Z80 Macro Assembler
 #
 # Copyright (C) Gunther Strube, InterLogic 1993-99
-# Copyright (C) Paulo Custodio, 2011-2017
+# Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk/
 #
@@ -59,7 +59,6 @@ ok unlink "$dir/f1.o",   "$dir/f1.o";
 unlink_testfiles();
 run("./z80asm -b -d -o=test.bin \"\@$dir/lib.lst\"", 1, "", <<END);
 Error at file 'test/my/deep/lib/lib.lst' line 1: cannot read file 'test/my/deep/lib/f1.asm'
-1 errors occurred during assembly
 END
 
 path('test')->remove_tree;
@@ -70,8 +69,8 @@ sub run {
 	my($cmd, $ret, $out, $err) = @_;
 	ok 1, $cmd;
 	my($stdout, $stderr, $return) = capture { system $cmd; };
-	is $stdout, ($out // ""), "stdout";
-	is $stderr, ($err // ""), "stderr";
+	is_text( $stdout, ($out // ""), "stdout" );
+	is_text( $stderr, ($err // ""), "stderr" );
 	ok !!$return == !!($ret // 0), "exit value";
 }
 

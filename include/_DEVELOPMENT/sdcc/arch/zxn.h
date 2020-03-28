@@ -861,18 +861,18 @@ extern void ZXN_WRITE_MMU7_fastcall(unsigned char page) __preserves_regs(b,c,d,e
 
 // memory - paging and banking state
 
-extern unsigned int zxn_addr_from_mmu(unsigned char mmu) __preserves_regs(b,c,d,e,iyl,iyh);
-extern unsigned int zxn_addr_from_mmu_fastcall(unsigned char mmu) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+extern void *zxn_addr_from_mmu(unsigned char mmu) __preserves_regs(b,c,d,e,iyl,iyh);
+extern void *zxn_addr_from_mmu_fastcall(unsigned char mmu) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
 #define zxn_addr_from_mmu(a) zxn_addr_from_mmu_fastcall(a)
 
 
-extern unsigned char zxn_mmu_from_addr(unsigned int addr) __preserves_regs(b,c,d,e,iyl,iyh);
-extern unsigned char zxn_mmu_from_addr_fastcall(unsigned int addr) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
+extern unsigned char zxn_mmu_from_addr(void *addr) __preserves_regs(b,c,d,e,iyl,iyh);
+extern unsigned char zxn_mmu_from_addr_fastcall(void *addr) __preserves_regs(b,c,d,e,iyl,iyh) __z88dk_fastcall;
 #define zxn_mmu_from_addr(a) zxn_mmu_from_addr_fastcall(a)
 
 
-extern unsigned int zxn_addr_in_mmu(unsigned char mmu,unsigned int addr) __preserves_regs(b,c,d,iyl,iyh);
-extern unsigned int zxn_addr_in_mmu_callee(unsigned char mmu,unsigned int addr) __preserves_regs(b,c,d,iyl,iyh) __z88dk_callee;
+extern void *zxn_addr_in_mmu(unsigned char mmu,void *addr) __preserves_regs(b,c,d,iyl,iyh);
+extern void *zxn_addr_in_mmu_callee(unsigned char mmu,void *addr) __preserves_regs(b,c,d,iyl,iyh) __z88dk_callee;
 #define zxn_addr_in_mmu(a,b) zxn_addr_in_mmu_callee(a,b)
 
 

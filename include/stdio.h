@@ -4,7 +4,7 @@
 #include <sys/compiler.h>
 #include <stdint.h>
 
-/* $Id: stdio.h,v 1.41 2016-11-11 07:55:37 stefano Exp $ */
+/* $Id: stdio.h */
 
 #undef __STDIO_BINARY      /* By default don't consider binary/text file differences */
 #undef __STDIO_CRLF        /* By default don't insert automatic linefeed in text mode */
@@ -199,6 +199,7 @@ extern int __LIB__ fgetc(FILE *fp);
 #define getc(f) fgetc(f)
 extern int __LIB__ ungetc(int c, FILE *) __smallc;
 extern int __LIB__ feof(FILE *fp) __z88dk_fastcall;
+extern int __LIB__ ferror(FILE *fp) __z88dk_fastcall;
 extern int __LIB__ puts(char *s);
 
 /* Some standard macros */
@@ -225,6 +226,7 @@ extern int __LIB__ fgetc(FILE *fp);
 #define getc(f) fgetc(f)
 extern int __LIB__ ungetc(int c, FILE *) __smallc;
 extern int __LIB__ feof(FILE *fp) __z88dk_fastcall;
+extern int __LIB__ ferror(FILE *fp) __z88dk_fastcall;
 extern int __LIB__ puts(const char *);
 
 #define fputs(a,b)   fputs_callee(a,b)
@@ -240,23 +242,23 @@ extern int __LIB__ puts(const char *);
 #endif
 
 /* Routines for file positioning */
-extern fpos_t __LIB__ __SAVEFRAME__ ftell(FILE *fp);
-extern int __LIB__ __SAVEFRAME__ fgetpos(FILE *fp, fpos_t *pos) __smallc;
+extern fpos_t __LIB__ ftell(FILE *fp);
+extern int __LIB__ fgetpos(FILE *fp, fpos_t *pos) __smallc;
 #define fsetpos(fp,pos) fseek(fp,pos,SEEK_SET)
 #define rewind(fp) fseek(fp,0L,SEEK_SET)
 extern int __LIB__ __SAVEFRAME__ fseek(FILE *fp, fpos_t offset, int whence) __smallc;
 
 /* Block read/writing */
-extern int __LIB__ __SAVEFRAME__ fread(void *ptr, size_t size, size_t num, FILE *) __smallc;
-extern int __LIB__ __SAVEFRAME__ fwrite(const void *ptr, size_t size, size_t num, FILE *) __smallc;
+extern int __LIB__  fread(void *ptr, size_t size, size_t num, FILE *) __smallc;
+extern int __LIB__  fwrite(const void *ptr, size_t size, size_t num, FILE *) __smallc;
 
 
 /* You shouldn't use gets. z88 gets() is limited to 255 characters */
-#ifdef __STDIO_CRLF
-#define gets(x) fgets_cons(x,255)
-#else
+//#ifdef __STDIO_CRLF
+//#define gets(x) fgets_cons(x,255)
+//#else
 extern char __LIB__ *gets(char *s);
-#endif
+//#endif
 
 extern int __LIB__ printf(const char *fmt,...) __vasmallc;
 extern int __LIB__ fprintf(FILE *f,const char *fmt,...) __vasmallc;
@@ -311,6 +313,8 @@ extern int __LIB__ fputc_cons(char c);
 /* Read a string using the default keyboard driver */
 extern char __LIB__ *fgets_cons(char *s, size_t n) __smallc;
 
+extern int __LIB__ puts_cons(char *s);
+
 /* Abandon file - can be the generic version */
 extern void __LIB__ fabandon(FILE *);
 /* Get file position for file handle fd */
@@ -330,6 +334,9 @@ extern int __LIB__ getk_inkey();
 
 /* Print a formatted string directly to the console using the default driver */
 extern int __LIB__ printk(const char *fmt,...) __vasmallc;
+
+/* Error handler (mostly an empty fn) */
+extern void __LIB__ perror(char *msg) __z88dk_fastcall;
 
 
 /*

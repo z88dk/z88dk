@@ -81,13 +81,10 @@ cleanup:
 ;
 ;       Deallocate memory which has been allocated here!
 ;
+    call    crt0_exit
 
-IF CRT_ENABLE_STDIO = 1
-        EXTERN     closeall
-        call    closeall
-ENDIF
 
-        di
+    di
 	call    cpc_enable_fw_exx_set
 start1: ld      sp,0
         ei
@@ -166,9 +163,6 @@ ENDIF
 
 
 
-
-                defm    "Small C+ CPC"
-                defb    0
 
 		INCLUDE "crt/classic/crt_runtime_selection.asm"
 

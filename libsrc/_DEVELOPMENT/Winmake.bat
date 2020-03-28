@@ -5,7 +5,7 @@ setlocal ENABLEDELAYEDEXPANSION
 
 @rem must have leading and trailing space
 
-set alltargets= z80 cpm m rc2014 sms vgl yaz180 z180 zx zxn 
+set alltargets= z80 cpm m rc2014 scz180 sms vgl yaz180 z180 zx zxn 
 
 if "%1" == "" (
    echo.
@@ -37,18 +37,20 @@ for %%t in (%targets%) do (
    if not "!temp!" == "%alltargets%" (
 
       set cpu=
-      if "%%t" == "yaz180" (
-         set cpu="--cpu=z180"
-      ) else (
-         if "%%t" == "z180" (
-            set cpu="--cpu=z180"
-         ) else (
-            if "%%t" == "zxn" (
-               set cpu="--cpu=z80-zxn"
-            )
-         )
+
+      if "%%t" == "scz180" (
+         set cpu="-mz180"
       )
-      
+      if "%%t" == "yaz180" (
+         set cpu="-mz180"
+      )
+      if "%%t" == "z180" (
+         set cpu="-mz180"
+      )
+      if "%%t" == "zxn" (
+         set cpu="-mz80n"
+      )
+
       echo.
       echo target = %%t !cpu!
 
@@ -61,15 +63,15 @@ for %%t in (%targets%) do (
       if "%%t" == "zx" (
          zcc +z80 -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_48.bin
          zcc +z80 -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_p3.bin
-         zx7 -f arch/zx/bifrost2/z80/bifrost2_engine_48.bin
-         zx7 -f arch/zx/bifrost2/z80/bifrost2_engine_p3.bin
+         z88dk-zx7 -f arch/zx/bifrost2/z80/bifrost2_engine_48.bin
+         z88dk-zx7 -f arch/zx/bifrost2/z80/bifrost2_engine_p3.bin
       )
 
       if "%%t" == "zxn" (
          zcc +z80 -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_48.bin
          zcc +z80 -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_p3.bin
-         zx7 -f arch/zx/bifrost2/z80/bifrost2_engine_48.bin
-         zx7 -f arch/zx/bifrost2/z80/bifrost2_engine_p3.bin
+         z88dk-zx7 -f arch/zx/bifrost2/z80/bifrost2_engine_48.bin
+         z88dk-zx7 -f arch/zx/bifrost2/z80/bifrost2_engine_p3.bin
       )
 
       if exist target\%%t\library\%%t_macro.lst (

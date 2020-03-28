@@ -319,8 +319,8 @@ extern char pieces[];
 
 void PutPiece (int x, int y, int piece,int b_w)
 {
-  putsprite(spr_and,6+10*x+5*y,5+5*y,pieces+264*b_w+piece*44 + 22);
-  putsprite(spr_or,6+10*x+5*y,5+5*y,pieces+264*b_w+piece*44);
+  putsprite(spr_and,6+10*x+5*y,5*y,pieces+264*b_w+piece*44 + 22);
+  putsprite(spr_or,6+10*x+5*y,5*y,pieces+264*b_w+piece*44);
 }
 
 
@@ -333,7 +333,7 @@ void DrawBoard()
 
   for (x=1 ; x!=43; x++)
   {
-    draw(x,x+9,81+x,x+9);
+    draw(x,x+4,81+x,x+4);
   }
 
   for (x=0 ; x!=8; x++)
@@ -345,7 +345,7 @@ void DrawBoard()
 	  for (z=0 ; z!=5; z++)
 	  {
 	    a=3+10*x+5*y+z;
-	    b=11+5*y+z;
+	    b=6+5*y+z;
 	    undraw(a,b,a+9,b);
 	  }
       }
