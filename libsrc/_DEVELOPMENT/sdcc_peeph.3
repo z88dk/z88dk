@@ -19670,7 +19670,7 @@ replace restart {
 }
 
 replace restart {
-	ld	hl,
+	pop	%1
 	ld	sp,%2
 } by {
 	ld	sp,%2
