@@ -139,3 +139,4 @@ extern void zconvert_from_double(Kind type, unsigned char isunsigned);
 extern int push_function_argument(Kind expr, Type *type, int push_sdccchar);
 extern int push_function_argument_fnptr(Kind expr, Type *type, int push_sdccchar, int is_last_argument);
 extern void reset_namespace();
+extern void zwiden_stack_to_long(LVALUE *lval);

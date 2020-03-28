@@ -1,11 +1,17 @@
 
 
 
-SOURCES = $(wildcard *.c) $(wildcard z80n/*.c) $(wildcard rabbit/*.c) $(wildcard z180/*.c)
+SOURCES = $(wildcard *.c) $(wildcard z80n/*.c) $(wildcard rabbit/*.c) $(wildcard z180/*.c) $(wildcard 8080/*.c)
 OUTPUT = $(SOURCES:.c=.opt)
 
 
 all: $(OUTPUT)
+
+8080/%.opt: 8080/%.c
+	zcc +test -m8080 -vn -a $^ -o tmp1.opt
+	@cat tmp1.opt | grep -v '^;' | grep -v MODULE > tmp2.opt
+	diff -w tmp2.opt results/$@
+	@mv -f tmp1.opt $@
 
 z180/%.opt: z180/%.c
 	zcc +test -mz180 -vn -a $^ -o tmp1.opt
