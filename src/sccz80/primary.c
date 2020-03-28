@@ -361,11 +361,7 @@ void widenlong(LVALUE* lval, LVALUE* lval2)
     if (lval2->val_type == KIND_LONG) {
         /* Second operator is long */
         if (lval->val_type != KIND_LONG) {
-            doexx(); /* Preserve other operator */
-            mainpop();
-            force(KIND_LONG, lval->val_type, lval->ltype->isunsigned, lval->ltype->isunsigned, 0);
-            lpush(); /* Put the new expansion on stk*/
-            doexx(); /* Get it back again */
+            zwiden_stack_to_long(lval);
             if ( lval->ltype->isunsigned ) {
                 lval->ltype = type_ulong;
             } else {

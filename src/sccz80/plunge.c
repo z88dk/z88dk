@@ -404,11 +404,13 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             }
             lval->stage_add = NULL;
 
+#if 0
            if ( lhs_val_type != KIND_CHAR && rhs_val_type == KIND_CHAR ) {
                 rhs_val_type = lhs_val_type;
             } else if ( lhs_val_type == KIND_CHAR && rhs_val_type != KIND_CHAR ) {
                 lhs_val_type = rhs_val_type;
             }
+#endif
 
             if ( lval2->is_const && (lval->val_type == KIND_INT || lval->val_type == KIND_CHAR || lval->val_type == KIND_LONG) ) {
                 doconstoper = 1;

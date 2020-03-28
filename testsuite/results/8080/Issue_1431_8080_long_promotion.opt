@@ -1,0 +1,60 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	EXTERN	saved_hl
+	EXTERN	saved_de
+	SECTION	code_compiler
+
+._func
+	ld	hl,(_points)
+	push	hl
+	ld	hl,(_level)
+	ld	h,0
+	ld	de,0
+	push	de
+	push	hl
+	ld	hl,5	;const
+	ld	de,0
+	call	l_long_mult
+	ld	bc,100
+	add	hl,bc
+	jp	nc,ASMPC+4
+	inc	de
+	ld	c,l
+	ld	b,h
+	ld	hl,0
+	ex	(sp),hl
+	ld	a,h
+	rlca
+	jr	nc,i_3
+	ex	(sp),hl
+	dec	hl
+	ex	(sp),hl
+.i_3
+	push	hl
+	ld	l,c
+	ld	h,b
+	call	l_long_add
+	ld	(_points),hl
+	ret
+
+
+
+
+	SECTION	bss_compiler
+._points	defs	2
+._level	defs	1
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_func
+
+
+
+

@@ -2982,7 +2982,7 @@ void asr_const(LVALUE *lval, int32_t value)
     } else {
         if ( value == 1 && IS_8085() && !ulvalue(lval) ) {
             ol("sra\thl");
-        } else if ( value == 1  && !IS_8080() ) { /* 4 bytes, 16T */
+        } else if ( value == 1  && !IS_808x() ) { /* 4 bytes, 16T */
             if ( ulvalue(lval) ) {
                 ol("srl\th");
             } else {
@@ -4841,6 +4841,34 @@ void zconvert_to_double(Kind type, unsigned char isunsigned)
    }
    if ( isunsigned ) callrts("uint2f");
    else callrts("sint2f");
+}
+
+void zwiden_stack_to_long(LVALUE *lval)
+{
+    if ( IS_808x() || IS_GBZ80() ) {
+        int label = getlabel();
+        // We have a value in dehl that we must preserve
+        ol("ld\tc,l");
+        ol("ld\tb,h");
+        ol("ld\thl,0");
+        ol("ex\t(sp),hl"); // Emulated on GBZ80 unfortunately
+        ol("ld\ta,h");
+        ol("rlca");
+        opjumpr("nc,",label);
+        ol("ex\t(sp),hl"); // Emulated on GBZ80 unfortunately
+        ol("dec\thl");
+        ol("ex\t(sp),hl"); // Emulated on GBZ80 unfortunately
+        postlabel(label);
+        zpush();
+        ol("ld\tl,c");
+        ol("ld\th,b");
+    } else {
+        doexx(); /* Preserve other operator */
+        mainpop();
+        force(KIND_LONG, lval->val_type, lval->ltype->isunsigned, lval->ltype->isunsigned, 0);
+        lpush(); /* Put the new expansion on stk*/
+        doexx(); /* Get it back again */
+    }
 }
 
 /*
