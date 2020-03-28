@@ -960,9 +960,7 @@ REPRODUCE_EFECTO:
     RRCA
     RRCA
     AND     00001111B
-    LD      C,A                     ;       FRECUENCIA GRAVE
-    ;LD      A,10111000B            ;       ELIMINA RUIDO
-    ;LD      (asm_wyz_PSG_REG_SEC+7),A
+    LD      C,A                 ;FRECUENCIA GRAVE
     LD      A,(HL)
 ; -- start of PoPe section with noise treatment
 ; If volume is 0, it might pass to F, max volume!
