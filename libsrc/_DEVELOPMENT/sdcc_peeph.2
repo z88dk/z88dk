@@ -2863,7 +2863,7 @@ replace restart {
 	ld	hl, 0000
 	add	sp,hl
 } by {
-	; peephole 146 removed redundant load of hl.
+	; peephole 146 removed redundant load of sp, hl.
 } if notUsed('hl')
 
 ///////////////////////////////////////////////////////////////
