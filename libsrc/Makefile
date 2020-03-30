@@ -376,6 +376,12 @@ gfx81.lib:
 	$(MAKE) zx81deps
 	$(MAKE) -C gfx TARGET=zx81 FLAVOUR="narrow"
 	TARGET=zx81 TYPE=ixiy $(LIBLINKER) --IXIY -DFORzx81 -x$(OUTPUT_DIRECTORY)/gfx81 @$(LISTFILE_DIRECTORY)/target/zx81/gfx81.lst
+	@echo ''
+	@echo '--- Building ZX81 Pseudo-HR Graphics Library ---'
+	@echo ''
+	$(MAKE) zx81deps
+	$(MAKE) -C gfx TARGET=zx81 FLAVOUR="narrow" SUBTYPE=zx81phrg
+	TARGET=zx81phrg TYPE=ixiy $(LIBLINKER) --IXIY -DFORzx81phrg -x$(OUTPUT_DIRECTORY)/gfx81phrg @$(LISTFILE_DIRECTORY)/target/zx81/gfx81phrg.lst
 	$(MAKE) zx81deps
 
 # Lambda 8300 graphics lib - Stefano
