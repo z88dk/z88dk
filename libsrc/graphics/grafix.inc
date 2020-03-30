@@ -145,6 +145,12 @@ IF FORzx81udg
 	defc blankch	= 0
 ENDIF
 
+IF FORzx81phrg
+	DEFINE gotgfx
+	defc maxx	= 128
+	defc maxy	= 96	; This one can be changed !  1..200 are theorical valid values !
+ENDIF
+
 IF FORzx81hr64
 	DEFINE gotgfx
 	defc maxx	= 256
