@@ -42,7 +42,7 @@ __RST18_SMS_crt0_RST18:
    out (__IO_VDP_DATA),a
    ret
 
-   defm "1.99C"
+   defm "2.00"
 
 ; address = 0x0028
 

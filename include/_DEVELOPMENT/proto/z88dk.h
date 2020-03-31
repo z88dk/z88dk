@@ -10,6 +10,7 @@ include(__link__.m4)
 // 1990 = 1.99A
 // 1991 = 1.99B
 // 1992 = 1.99C
+// 2000 = 2.00
 
 #define Z88DK_VERSION  __Z88DK
 
