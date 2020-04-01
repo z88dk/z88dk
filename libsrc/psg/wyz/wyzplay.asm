@@ -1,4 +1,5 @@
 ; ZX PSG proPLAYER V 0.3 - WYZ 19.03.2016
+; added thEpOpE noise channel for effects
 
 IF !__CPU_INTEL__ && !__CPU_GBZ80__
 
@@ -959,16 +960,33 @@ REPRODUCE_EFECTO:
     RRCA
     RRCA
     AND     00001111B
-    LD      C,A                     ;       FRECUENCIA GRAVE
-    ;LD      A,10111000B            ;       ELIMINA RUIDO
-    ;LD      (asm_wyz_PSG_REG_SEC+7),A
+    LD      C,A                 ;FRECUENCIA GRAVE
     LD      A,(HL)
-    DEC     A                       ;DEC A PARA BAJR VOLUMEN!! O PONER VARIABLE
-    ;DEC    A
-    AND     00001111B
+; -- start of PoPe section with noise treatment
+; If volume is 0, it might pass to F, max volume!
+;
+;            DEC     A                   ;DEC A PARA BAJR VOLUMEN!!
+;
 
-    LD      D,A                     ;VOLUMEN
-    INC     HL                      ;INCREMENTA Y GUARDA EL PUNTERO
+	AND     00001111B
+
+    LD   D,A                    ;VOLUMEN
+    INC     HL                  ;INCREMENTA Y GUARDA EL PUNTERO
+
+;
+; noise channel management
+;
+	ld a,(hl)
+	inc hl
+	ld e,$ff	;la máscara que usaremos con el mixer en principio no toca nada en el mixer (dejaría los canales tal cual)
+	and a
+	jr z,nonoise	;si el valor es 0 no hay ruido (no toco nada de los canales)
+
+	and %00011111	;si hay ruido le pasamos la máscara para dejarlo en 5 bits
+	ld (asm_wyz_PSG_REG_SEC+6),a	;lo metemos en el buffer para el registro correspondiente del ay
+	ld e,%11011111	;marcamos el canal C para el ruido como canal por defecto
+nonoise:
+
     LD      (PUNTERO_EFECTO),HL
     LD      IX,asm_wyz_PSG_REG_SEC
     LD      A,(CANAL_EFECTOS)       ;SELECCION DE CANAL *********
@@ -980,19 +998,26 @@ RS_CANALC:
     LD      (IX+4),B
     LD      (IX+5),C
     LD      (IX+10),D
+poneruidomixer:		;este punto es comun a los 3 canales
+    ld a,e	;cargamos la máscara para el mixer
+    and (ix+7)	;lo aplicamos desde el buffer de registros del ay
+    ld (ix+7),a	;dejamos el resultado en el buffer de registros del ay
     RET
 
 RS_CANALA:
     LD      (IX+0),B
     LD      (IX+1),C
     LD      (IX+8),D
-    RET
+    rrc e	;para situar bien la máscara para el canal A en el mixer, desplazamos el bit del ruido dos posiciones a la derecha
+    rrc e
+    jr poneruidomixer
 
 RS_CANALB:
     LD      (IX+2),B
     LD      (IX+3),C
     LD      (IX+9),D
-    RET
+    rrc e	;para situar bien la máscara para el canal B en el mixer, desplazamos el bit  del ruido una posición a la derecha
+    jr poneruidomixer
 
 asm_wyz_stop_effect:
 FIN_EFECTO:
