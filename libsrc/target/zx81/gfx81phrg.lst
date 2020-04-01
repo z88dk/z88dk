@@ -10,5 +10,5 @@ target/zx81/graphics_phrg/xorpixl
 target/zx81/graphics_phrg/hrg_on
 target/zx81/graphics_phrg/hrg_off
 target/zx81/graphics_phrg/invhrg
-target/zx81/graphics_phr/putsprite
+target/zx81/graphics_phrg/putsprite
 @gfx/narrow/gfx_narrow.lst
