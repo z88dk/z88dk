@@ -15,7 +15,7 @@
 	PUBLIC	pixeladdress
 	PUBLIC	__pixeladdress_hl
 	PUBLIC	pix_return
-	PUBLIC	pix_return_2
+	PUBLIC	pix_return_pixelbyte
 
 	EXTERN	base_graphics
 
@@ -34,8 +34,6 @@
 
 
 .pixeladdress
-	push	af			; keep C flag
-
 	ld	a,h		; X
 	ld	c,a
 	
@@ -56,76 +54,10 @@
 
 .__pixeladdress_hl
 	ld	(__dfile_addr),hl		; D-FILE address
-
-	pop		af			; check C flag
-	push	af
-	ld		e,0				; needed if 'singlebyte'
-	jr		c,singlebyte
-	
-	push hl
-	call map_pixtab
-	rla
-	rla
-	rla
-	rla
-	and @11110000
-	ld	e,a
-
-	pop	hl
-	inc hl
-
-.singlebyte
-	call map_pixtab
-	or	e
-	
-	ld	hl,__pixelbyte
-	ld	(hl),a
-
-	pop af			; check C flag
-	jr	c,singlebyte_exit
-	ld	a,c
-	and	@00000111
-	xor	@00000111
-	ret
-	
-.singlebyte_exit
-	ld	a,c
-	and	@00000011
-	xor	@00000011
-	ret
-
-
-
-.pix_return_2
-;	ld	(hl),a	; hl points to "pixelbyte"
-;ld	a,2
-	push af
-	rra
-	rra
-	rra
-	rra
-	call pix_return
-	ld	hl,__dfile_addr
-	inc (hl)
-	pop af
-
-
-.pix_return
-	and @00001111
-	ld	hl,_gfxhr_pixtab
-	ld	d,0
-	ld	e,a
-	add hl,de
 	ld	a,(hl)
-	ld	hl,(__dfile_addr)
-	;ex	de,hl
-	ld	(hl),a
-	ret
 	
-
-
-.map_pixtab
-	ld	a,(hl)	
+	;ex	de,hl
+	
 	ld	hl,_gfxhr_pixtab
 	ld	b,15
 .tabloop
@@ -139,7 +71,37 @@
 	ld	a,15
 	sub b
 .zbyte
+	
+	ld	hl,__pixelbyte
+	ld	d,h
+	ld	e,l
+	ld	(hl),a
+
+	ld	a,c
+	and	@00000011
+	xor	@00000011
 	ret
+
+
+.pix_return_pixelbyte
+	ld	a,(__pixelbyte)
+
+.pix_return
+
+	and @00001111
+
+;	ld	(hl),a	; hl points to "pixelbyte"
+;ld	a,2
+	ld	hl,_gfxhr_pixtab
+	ld	d,0
+	ld	e,a
+	add hl,de
+	ld	a,(hl)
+	ld	hl,(__dfile_addr)
+	;ex	de,hl
+	ld	(hl),a
+	ret
+	
 
 
 	SECTION bss_clib
