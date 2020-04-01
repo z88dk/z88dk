@@ -8,7 +8,7 @@
 ay_wyz_play:
 	push	ix
 	push	iy
-	call	ay_wyz_play
+	call	asm_wyz_play
 	pop	iy
 	pop	ix
 	ret

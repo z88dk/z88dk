@@ -1,40 +1,45 @@
+#
+# Wahey, a messed up makefile for building libraries!
+#
+# $Id: Makefile,v 1.24 2016-07-02 14:44:33 dom Exp $
 
 include ../../Make.config
 
-
 TARGET ?= test
 
-CFLAGS += $(TARGET_CFLAGS)
+NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/sound/ay/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/sound/ay/z80/*.asm"
+NEWLIB_TARGETS := obj/newlib-z80 obj/newlib-z80n obj/newlib-r2k obj/newlib-ixiy 
 
-ifeq ($(SUBTYPE),) 
-SUBTYPE=$(TARGET)
-OBJSUBDIR = $(TARGET)
-else
-OBJSUBDIR = $(SUBTYPE)
-endif
+space :=
+space +=
 
-GENOBJECTS = 
+OBJECTS = $(CLASSIC_OBJECTS) 
 
-ifeq ($(SUBSET),)
-ASMFILES = $(wildcard *.asm)
-else
-ASMFILES = $(SUBSET)
-endif
+.PHONY: dirs  $(NEWLIB_TARGETS)
 
-OBJECTS = $(CUSTOBJECTS) $(ASMFILES:.asm=.o)
+all: dirs $(OBJECTS) $(NEWLIB_TARGETS)
 
-all: dirs $(addprefix obj/$(OBJSUBDIR)/,$(OBJECTS)) 
+obj/newlib-z80:  
+	$(Q)$(ASSEMBLER) -d -O=obj/z80/x -I.. -mz80 -D__CLASSIC $(NEWLIBGLOBS)
 
-obj/$(OBJSUBDIR)/%.o: %.c
-	$(ZCC) +$(TARGET) $(CFLAGS) -o $@  $^
+obj/newlib-r2k:  
+	$(Q)$(ASSEMBLER) -d -O=obj/r2k/x -I.. -mr2k -D__CLASSIC $(NEWLIBGLOBS)
 
-obj/$(OBJSUBDIR)/%.o: %.asm
-	$(ZCC) +$(TARGET) $(CFLAGS) -o $@  $^ -Ca-I../.. -Ca-DFOR$(SUBTYPE)
+obj/newlib-z80n:  
+	$(Q)$(ASSEMBLER) -d -O=obj/z80n/x -I.. -mz80n -D__CLASSIC $(NEWLIBGLOBS)
+
+obj/newlib-ixiy:  
+	$(Q)$(ASSEMBLER) -d -O=obj/ixiy/x -I.. -mz80 --IXIY -D__CLASSIC $(NEWLIBGLOBS)
+
+obj/newlib-8080:  
+	$(Q)$(ASSEMBLER) -d -O=obj/8080/x -I.. -m8080 -D__CLASSIC $(NEWLIBGLOBS)
+
+obj/newlib-gbz80:  
+	$(Q)$(ASSEMBLER) -d -O=obj/gbz80/x -I.. -mgbz80 -D__CLASSIC $(NEWLIBGLOBS)
 
 dirs:
-	@mkdir -p obj/$(OBJSUBDIR)
+	@mkdir -p obj/z80 obj/z80n obj/ixiy obj/r2k obj/8080 obj/gbz80
+
 
 clean:
-	$(RM) -fr obj zcc_opt.def
-	$(RM) -f *.o
-	$(RM) -f */*.o
+	$(RM) -fr obj 
