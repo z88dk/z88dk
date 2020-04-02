@@ -43,7 +43,7 @@ l_z180_mulu_32_32x32:
     exx
     or e
     or d
-    jr Z,l0_z180_mulu_32_16x16   ;   demote if both are uint16_t
+    jr Z,l0_z180_mulu_32_16x16  ; demote if both are uint16_t
 
     push hl
     exx
