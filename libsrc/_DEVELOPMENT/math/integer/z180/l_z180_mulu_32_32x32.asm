@@ -17,7 +17,7 @@ l0_z180_mulu_32_16x16:
     ; exit  : dehl = 32-bit product
     ;         carry reset
     ;
-    ; uses  : af, hl, bc', de', hl'
+    ; uses  : af, bc, de, hl, bc', de', hl'
 
     push hl
     exx
@@ -175,4 +175,3 @@ l0_z180_mulu_32_32x32:
     pop de
     xor a                       ; carry reset
     ret                         ; exit  : DEHL = 32-bit product
-

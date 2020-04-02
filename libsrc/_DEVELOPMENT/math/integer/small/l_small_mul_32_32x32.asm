@@ -1,4 +1,3 @@
-
 ; 2000 djm
 ; 2007 aralbrec - use bcbc' rather than bytes indexed by ix per djm suggestion
 ; 2020 feilipu - demote uint16_t
@@ -20,7 +19,7 @@ l0_small_mul_32_16x16:
     ; exit  : dehl = 32-bit product
     ;         carry reset
     ;
-    ; uses  : af, hl, bc', de', hl'
+    ; uses  : af, bc, de, hl, bc', de', hl'
 
     push hl
     exx
@@ -29,15 +28,15 @@ l0_small_mul_32_16x16:
 
 l_small_mul_32_32x32:
 
-   ; multiplication of two 32-bit numbers into a 32-bit product
-   ;
-   ; enter : dehl = 32-bit multiplicand (more leading zeroes = better performance)
-   ;         dehl'= 32-bit multiplicand
-   ;
-   ; exit  : dehl = 32-bit product
-   ;         carry reset
-   ;
-   ; uses  : af, bc, de, hl, bc', de', hl'
+    ; multiplication of two 32-bit numbers into a 32-bit product
+    ;
+    ; enter : dehl = 32-bit multiplicand (more leading zeroes = better performance)
+    ;         dehl'= 32-bit multiplicand
+    ;
+    ; exit  : dehl = 32-bit product
+    ;         carry reset
+    ;
+    ; uses  : af, bc, de, hl, bc', de', hl'
 
 
     xor a
