@@ -25,6 +25,9 @@ l_small_mul_32_16x16:
     ld hl,0
 
 loop_0:
+IF __CPU_INTEL__
+    push af
+ENDIF
 
     ; bc = 16-bit multiplicand
     ; de = 16-bit multiplicand
@@ -32,14 +35,12 @@ loop_0:
 
     add hl,hl
 IF __CPU_INTEL__
-    push af
     ld a,e
     rla
     ld e,a
     ld a,d
     rla
     ld d,a
-    pop af
 ELSE
     rl e
     rl d
@@ -51,6 +52,9 @@ ENDIF
     inc de
 
 loop_1:
+IF __CPU_INTEL__
+    pop af
+ENDIF
     dec a
     jr NZ,loop_0
 
