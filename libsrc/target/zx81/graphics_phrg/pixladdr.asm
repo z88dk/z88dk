@@ -59,7 +59,7 @@
 	;ex	de,hl
 	
 	ld	hl,_gfxhr_pixtab
-	ld	b,15
+	ld	b,16
 .tabloop
 	cp (hl)
 	jr	z,cfound
@@ -68,7 +68,7 @@
 	xor a
 	jr	zbyte
 .cfound
-	ld	a,15
+	ld	a,16
 	sub b
 .zbyte
 	
