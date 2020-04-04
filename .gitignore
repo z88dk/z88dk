@@ -27,11 +27,16 @@ libsrc/_DEVELOPMENT/arch/zx/nirvanam/z80/asm_NIRVANAM.asm
 libsrc/_DEVELOPMENT/arch/zx/nirvanap/z80/NIRVANAP_ENGINE.asm
 libsrc/_DEVELOPMENT/arch/zx/nirvanap/z80/asm_NIRVANAP.asm
 libsrc/_DEVELOPMENT/target/cpm/cpm_crt.asm
+libsrc/_DEVELOPMENT/target/hbios/hbios_crt.asm
 libsrc/_DEVELOPMENT/target/rc2014/rc2014_crt.asm
+libsrc/_DEVELOPMENT/target/scz180/scz180_crt.asm
 libsrc/_DEVELOPMENT/target/sms/sms_crt.asm
+libsrc/_DEVELOPMENT/target/vgl/vgl_crt.asm
+libsrc/_DEVELOPMENT/target/yaz180/yaz180_crt.asm
 libsrc/_DEVELOPMENT/target/z180/z180_crt.asm
 libsrc/_DEVELOPMENT/target/z80/z80_crt.asm
 libsrc/_DEVELOPMENT/target/zx/zx_crt.asm
+libsrc/_DEVELOPMENT/target/zxn/zxn_crt.asm
 src/appmake/appmake
 src/config.h
 src/copt/z88dk-copt
