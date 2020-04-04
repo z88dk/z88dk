@@ -111,48 +111,60 @@ RESULT
 Z88DK March 2, 2017
 ZSDCC #9833
 
+Z88DK April 4, 2020
+ZSDCC #11556
+PR #1436 demotion of small uint32*uint32 where multipliers are uint16*uint16
+
 
 PI.C
 
 new/sccz80/small (6269 bytes less page zero)
 
-cycle count  = 5246791210
-time @ 4MHz  = 5246791210 / 4*10^6 = 21 min 52 sec
+cycle count  = 5246791210 (March 2, 2017)
+cycle count  = 4012440735 (April 4, 2020)
+time @ 4MHz  = 4012440735 / 4*10^6 = 17 min 43 sec
 
 new/zsdcc/small (6246 bytes less page zero)
 
-cycle count  = 5278798872
-time @ 4MHz  = 5278798872 / 4*10^6 = 22 min 00 sec
+cycle count  = 5278798872 (March 2, 2017, ZSDCC #9833)
+cycle count  = 4067517071 (April 4, 2020,  ZSDCC #11556)
+time @ 4MHz  = 4067517071 / 4*10^6 = 16 min 57 sec
 
-new/sccz80/fast (9018 bytes less page zero)
+new/sccz80/fast (8999 bytes less page zero)
 
-cycle count  = 1708903088
-time @ 4MHz  = 1708903088 / 4*10^6 = 7 min 07 sec
+cycle count  = 1708903088 (March 2, 2017)
+cycle count  = 1696878309 (April 4, 2020)
+time @ 4MHz  = 1696878309 / 4*10^6 = 7 min 04 sec
 
 new/zsdcc/fast (8997 bytes less page zero)
 
-cycle count  = 1739403552
-time @ 4MHz  = 1739403552 / 4*10^6 = 7 min 15 sec
+cycle count  = 1739403552 (March 2, 2017, ZSDCC #9833)
+cycle count  = 1756864232 (April 4, 2020, ZSDCC #11556)
+time @ 4MHz  = 1756864232 / 4*10^6 = 7 min 19 sec
 
 
 PI_LDIV.C
 
 new/sccz80/small (6382 bytes less page zero)
 
-cycle count  = 3810732458
-time @ 4MHz  = 3810732458 / 4*10^6 = 15 min 53 sec
+cycle count  = 3810732458 (March 2, 2017)
+cycle count  = 2576381983 (April 4, 2020)
+time @ 4MHz  = 2576381983 / 4*10^6 = 10 min 44 sec
 
 new/zsdcc/small (6348 bytes less page zero)
 
-cycle count  = 3827247920
-time @ 4MHz  = 3827247920 / 4*10^6 = 15 min 57 sec
+cycle count  = 3827247920 (March 2, 2017, ZSDCC #9833) 
+cycle count  = 2609489119 (April 4, 2020, ZSDCC #11556)
+time @ 4MHz  = 2609489119 / 4*10^6 = 10 min 52 sec
 
 new/sccz80/fast (9131 bytes less page zero)
 
-cycle count  = 1313857712
-time @ 4MHz  = 1313857712 / 4*10^6 = 5 min 28 sec
+cycle count  = 1313857712 (March 2, 2017)
+cycle count  = 1301832933 (April 4, 2020)
+time @ 4MHz  = 1301832933 / 4*10^6 = 5 min 25 sec
 
 new/zsdcc/fast (9097 bytes less page zero)
 
-cycle count  = 1328865976
-time @ 4MHz  = 1328865976 / 4*10^6 = 5 min 32 sec
+cycle count  = 1328865976 (March 2, 2017, ZSDCC #9833)
+cycle count  = 1339849656 (April 4, 2020, ZSDCC #11556)
+time @ 4MHz  = 1339849656 / 4*10^6 = 5 min 35 sec
