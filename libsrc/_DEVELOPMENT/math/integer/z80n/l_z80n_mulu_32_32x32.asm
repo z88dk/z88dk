@@ -17,7 +17,7 @@ l0_z80n_mulu_32_16x16:
     ; exit  : dehl = 32-bit product
     ;         carry reset
     ;
-    ; uses  : af, hl, bc', de', hl'
+    ; uses  : af, bc, de, hl, bc', de', hl'
 
     push hl
     exx
@@ -43,7 +43,7 @@ l_z80n_mulu_32_32x32:
     exx
     or e
     or d
-    jr Z,l0_z80n_mulu_32_16x16   ;   demote if both are uint16_t
+    jr Z,l0_z80n_mulu_32_16x16  ; demote if both are uint16_t
 
     push hl
     exx
@@ -188,4 +188,3 @@ l0_z80n_mulu_32_32x32:
     pop de
     xor a                       ; carry reset
     ret                         ; exit  : DEHL = 32-bit product
-
