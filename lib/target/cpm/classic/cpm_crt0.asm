@@ -47,11 +47,18 @@
 	defc	__CPU_CLOCK = 4000000
         INCLUDE "crt/classic/crt_rules.inc"
 
-IF (startup=2)
-        org     32768
-ELSE
-        org     $100
-ENDIF
+	IF (startup=2)
+		IF !DEFINED_CRT_ORG_CODE
+            defc    CRT_ORG_CODE  = 32768
+		ENDIF
+	ELSE
+		IF !DEFINED_CRT_ORG_CODE
+            defc    CRT_ORG_CODE  = $100
+		ENDIF
+	ENDIF
+
+	org     CRT_ORG_CODE
+
 
 ;----------------------
 ; Execution starts here
@@ -94,13 +101,13 @@ ENDIF
 IF (startup=2)
 	;EXTERN ASMTAIL
 		ld	hl,$100
-		ld  de,32768
+		ld  de,CRT_ORG_CODE
 		ld  bc,$4000-$100	; max. code size is about 16K
 		ldir
 IF !DEFINED_noprotectmsdos
-		jp  32768+14
+		jp  CRT_ORG_CODE+14
 ELSE
-		jp  32768+14-start+begin
+		jp  CRT_ORG_CODE+14-start+begin
 ENDIF
 ENDIF
 
