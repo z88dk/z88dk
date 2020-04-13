@@ -192,12 +192,11 @@ zxn_clib.lib:
 	@echo ''
 	@echo '--- Building ZX Spectrum Next Library ---'
 	@echo ''
-	$(call buildgeneric,zxn)
-	$(MAKE) -C gfx TARGET=zx FLAVOUR=narrow
+	$(call buildgeneric,zxn,wide)
 	$(MAKE) -C target/zx TARGET=zxn
 	$(MAKE) -C games TARGET=zxn
 	$(MAKE) -C target/zxn TARGET=zxn
-	TARGET=zxn TYPE=z80n $(LIBLINKER) -mz80n -DFORzx -DFORzxn -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zxn_clib @$(LISTFILE_DIRECTORY)/zxn.lst
+	TARGET=zxn TYPE=z80n $(LIBLINKER) -mz80n -DFORzxn -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zxn_clib @$(LISTFILE_DIRECTORY)/zxn.lst
 
 # 64/32 column library for TS2068 - dom/stefano/alvin
 # use -DROMFONT for a tiny 36 columns mode
