@@ -57,7 +57,7 @@
 	; We use the generic driver by default
         defc    TAR__fputc_cons_generic = 1
 
-	defc	DEF__register_sp = 
+	defc	DEF__register_sp = 65535
         defc    TAR__clib_exit_stack_size = 32
 	defc	CRT_KEY_DEL = 12
 	defc __CPU_CLOCK = 3500000
