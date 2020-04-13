@@ -12,6 +12,10 @@ extern struct _font font_8x8_c64_system;
 extern struct _font font_8x8_clairsys;
 extern struct _font font_8x8_clairsys_bold;
 extern struct _font font_8x8_cpc_system;
+extern struct _font font_8x8_einstein_system;
+extern struct _font font_8x8_msx_system;
+extern struct _font font_8x8_pmd85_system;
+extern struct _font font_8x8_sam_system;
 extern struct _font font_8x8_vga_rom;
 extern struct _font font_8x8_zx_system;
 
