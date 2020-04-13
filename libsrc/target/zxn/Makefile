@@ -2,7 +2,7 @@ include ../../Make.config
 
 TARGET ?= zxn
 
-SUBDIRS = newlib
+SUBDIRS = newlib graphics
 
 ifeq ($(TARGET),zx)
   SUBDIRS += fzx fcntl rs232

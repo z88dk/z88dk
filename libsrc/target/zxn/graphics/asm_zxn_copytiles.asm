@@ -1,5 +1,4 @@
-
-
+IF FORzxn
 
 	MODULE		asm_zxn_copytiles
 
@@ -95,9 +94,4 @@ notset_0:
 	pop	bc
 	djnz	loop_char
 	ret
-
-
-
-	
-
-
+ENDIF

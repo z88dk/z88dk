@@ -45,7 +45,7 @@ z88libs: z88_math.lib  z88_clib.lib
 
 tilibs: ti82_clib.lib ti83_clib.lib ti83p_clib.lib ti85_clib.lib ti86_clib.lib
 
-zxlibs: ts2068_clib.lib gfx2068hr.lib gfxspectrum.lib zx_clib.lib zxvgs.lib mzx.lib mzx_tiny.lib m2068.lib zxrom.lib zxfcntl zxn_clib.lib
+zxlibs: ts2068_clib.lib zx_clib.lib zxvgs.lib mzx.lib mzx_tiny.lib m2068.lib zxrom.lib zxfcntl zxn_clib.lib
 
 zx81libs: zx81_clib.lib gfx81.lib gfxlambda.lib gfx81udg.lib gfx81hr64.lib gfx81hr192.lib m81.lib m81_tiny.lib mlambda.lib mlambda_tiny.lib lambda_clib.lib
 
@@ -205,27 +205,12 @@ ts2068_clib.lib:
 	@echo ''
 	@echo '--- Building TS2068 (Spectrum clone) Library ---'
 	@echo ''
-	$(call buildgeneric,ts2068)
+	$(call buildgeneric,ts2068,wide)
 	$(MAKE) -C games TARGET=ts2068
 	$(MAKE) -C target/zx TARGET=ts2068
 	$(MAKE) -C target/ts2068 TARGET=ts2068
+	$(MAKE) -C target/zxn/graphics TARGET=ts2068
 	TARGET=ts2068 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORzx -DFORts2068 -DA80COL -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(LISTFILE_DIRECTORY)/ts2068.lst
-
-# TS2068 HRG graphics lib - Stefano
-gfx2068hr.lib:
-	@echo ''
-	@echo '--- Building TS2068 High Resolution Graphics Library ---'
-	@echo ''
-	$(MAKE) -C gfx TARGET=ts2068 FLAVOUR=wide
-	TARGET=ts2068 TYPE=z80 $(LIBLINKER) -DFORgfx2068hr -x$(OUTPUT_DIRECTORY)/gfx2068hr @$(LISTFILE_DIRECTORY)/target/ts2068/gfx2068hr.lst
-
-# TS2068 HRG graphics lib - Stefano
-gfxspectrum.lib:
-	@echo ''
-	@echo '--- Building ZX Spectrum Graphics Library ---'
-	@echo ''
-	$(MAKE) -C gfx TARGET=zx FLAVOUR=narrow
-	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/gfxspectrum @$(LISTFILE_DIRECTORY)/target/zx/gfxspectrum.lst
 
 # ZXROM - stefano
 zxrom.lib:
