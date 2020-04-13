@@ -21,6 +21,10 @@ target/ts2068/psg/set_psg
 target/ts2068/psg/set_psg_callee
 target/ts2068/psg/get_psg
 target/ts2068/psg/psg_init
+target/ts2068/psg/asm_wyz_hardware_out
+target/ts2068/psg/asm_vt2_hardware_out
+@psg/wyz/psg_wyz.lst
+@psg/vt2/psg_vt2.lst
 @target/ts2068/newlib/newlib.lst
 @psg/psg.lst
 @z80.lst
