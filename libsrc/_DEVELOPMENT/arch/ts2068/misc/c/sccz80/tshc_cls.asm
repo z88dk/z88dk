@@ -8,3 +8,10 @@ PUBLIC tshc_cls
 EXTERN asm_tshc_cls
 
 defc tshc_cls = asm_tshc_cls
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _tshc_cls
+defc _tshc_cls = tshc_cls
+ENDIF
+

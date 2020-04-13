@@ -12,16 +12,22 @@
 	EXTERN	__zx_32col_udgs
 	EXTERN	__zx_32col_font
 	EXTERN	__zx_64col_font
-	EXTERN	__ts2068_hrgmode
+	EXTERN	__zx_screenmode
 
+	EXTERN	generic_console_zxn_tile_vpeek
 
 
 generic_console_vpeek:
+IF FORzxn
+	ld	a,(__zx_screenmode)
+	bit	6,a
+	jp	nz,generic_console_zxn_tile_vpeek
+ENDIF
 	ld	hl,-8
 	add	hl,sp		;de = screen, hl = buffer, bc = coords
 	ld	sp,hl
-IF FORts2068
-	ld	a,(__ts2068_hrgmode)
+IF FORts2068 | FORzxn
+	ld	a,(__zx_screenmode)
 	cp	6
 	jr	nz,standard_screen
 	ld	a,(__console_w)

@@ -32,6 +32,9 @@ obj/$(OBJSUBDIR)/%.o: %.c
 obj/$(OBJSUBDIR)/%.o: %.asm
 	$(ZCC) +$(TARGET) $(CFLAGS) -o $@  $^ -Ca-I../ -Ca-DFOR$(SUBTYPE)
 
+obj/zxn/%.o: %.c
+	$(ZCC) +$(TARGET) -clib=classic $(CFLAGS) -o $@  $^
+
 dirs:
 	@mkdir -p obj/$(OBJSUBDIR)
 

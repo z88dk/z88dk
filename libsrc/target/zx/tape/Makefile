@@ -2,6 +2,10 @@ include ../../../Make.config
 
 TARGET ?= zx
 
+ifeq ($(TARGET),zxn)
+   CFLAGS += -clib=classic
+endif
+
 SUBDIRS = 
 
 CLEANDIRS = $(SUBDIRS:%=clean-%)

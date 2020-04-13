@@ -20,3 +20,10 @@ zx_cxy2aaddr:
    
    ld h,e
    jp asm_zx_cxy2aaddr
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _zx_cxy2aaddr
+defc _zx_cxy2aaddr = zx_cxy2aaddr
+ENDIF
+

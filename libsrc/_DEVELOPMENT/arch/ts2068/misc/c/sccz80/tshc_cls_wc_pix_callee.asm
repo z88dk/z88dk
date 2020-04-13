@@ -15,3 +15,10 @@ tshc_cls_wc_pix_callee:
 	push af
 
    jp asm_tshc_cls_wc_pix
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _tshc_cls_wc_pix_callee
+defc _tshc_cls_wc_pix_callee = tshc_cls_wc_pix_callee
+ENDIF
+

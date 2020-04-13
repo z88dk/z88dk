@@ -18,3 +18,10 @@ tshr_pxy2saddr:
    push af
 
    jp asm_tshr_pxy2saddr
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _tshr_pxy2saddr
+defc _tshr_pxy2saddr = tshr_pxy2saddr
+ENDIF
+

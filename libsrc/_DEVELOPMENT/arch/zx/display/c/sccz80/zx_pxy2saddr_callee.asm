@@ -16,3 +16,10 @@ zx_pxy2saddr_callee:
 
    ld h,e
    jp asm_zx_pxy2saddr
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _zx_pxy2saddr_callee
+defc _zx_pxy2saddr_callee = zx_pxy2saddr_callee
+ENDIF
+

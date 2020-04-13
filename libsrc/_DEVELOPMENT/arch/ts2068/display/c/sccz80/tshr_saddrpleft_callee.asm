@@ -17,3 +17,10 @@ tshr_saddrpleft_callee:
 
    ld e,d
    jp asm_tshr_saddrpleft
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _tshr_saddrpleft_callee
+defc _tshr_saddrpleft_callee = tshr_saddrpleft_callee
+ENDIF
+

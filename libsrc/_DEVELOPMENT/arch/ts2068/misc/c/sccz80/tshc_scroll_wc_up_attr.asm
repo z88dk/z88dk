@@ -20,3 +20,10 @@ tshc_scroll_wc_up_attr:
    push af
 
    jp asm0_tshc_scroll_wc_up_attr
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _tshc_scroll_wc_up_attr
+defc _tshc_scroll_wc_up_attr = tshc_scroll_wc_up_attr
+ENDIF
+

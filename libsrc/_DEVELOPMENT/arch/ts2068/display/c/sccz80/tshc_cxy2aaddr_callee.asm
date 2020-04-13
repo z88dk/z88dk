@@ -13,3 +13,10 @@ tshc_cxy2aaddr_callee:
    ex (sp),hl
 
    jp asm_tshc_cxy2aaddr
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _tshc_cxy2aaddr_callee
+defc _tshc_cxy2aaddr_callee = tshc_cxy2aaddr_callee
+ENDIF
+

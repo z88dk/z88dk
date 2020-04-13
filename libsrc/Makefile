@@ -45,7 +45,7 @@ z88libs: z88_math.lib  z88_clib.lib
 
 tilibs: ti82_clib.lib ti83_clib.lib ti83p_clib.lib ti85_clib.lib ti86_clib.lib
 
-zxlibs: ts2068_clib.lib gfx2068hr.lib gfxspectrum.lib zx_clib.lib zxvgs.lib mzx.lib mzx_tiny.lib m2068.lib zxrom.lib zxfcntl
+zxlibs: ts2068_clib.lib gfx2068hr.lib gfxspectrum.lib zx_clib.lib zxvgs.lib mzx.lib mzx_tiny.lib m2068.lib zxrom.lib zxfcntl zxn_clib.lib
 
 zx81libs: zx81_clib.lib gfx81.lib gfxlambda.lib gfx81udg.lib gfx81hr64.lib gfx81hr192.lib m81.lib m81_tiny.lib mlambda.lib mlambda_tiny.lib lambda_clib.lib
 
@@ -188,6 +188,17 @@ zx_clib.lib:
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zx_clib @$(LISTFILE_DIRECTORY)/zx.lst
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zxcpm @$(LISTFILE_DIRECTORY)/target/zx/zx_cpm.lst
 
+zxn_clib.lib:
+	@echo ''
+	@echo '--- Building ZX Spectrum Next Library ---'
+	@echo ''
+	$(call buildgeneric,zxn)
+	$(MAKE) -C gfx TARGET=zx FLAVOUR=narrow
+	$(MAKE) -C target/zx TARGET=zxn
+	$(MAKE) -C games TARGET=zxn
+	$(MAKE) -C target/zxn TARGET=zxn
+	TARGET=zxn TYPE=z80n $(LIBLINKER) -mz80n -DFORzx -DFORzxn -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zxn_clib @$(LISTFILE_DIRECTORY)/zxn.lst
+
 # 64/32 column library for TS2068 - dom/stefano/alvin
 # use -DROMFONT for a tiny 36 columns mode
 # or -DPACKEDFONT for tiny 64->85 column modes
@@ -198,6 +209,7 @@ ts2068_clib.lib:
 	$(call buildgeneric,ts2068)
 	$(MAKE) -C games TARGET=ts2068
 	$(MAKE) -C target/zx TARGET=ts2068
+	$(MAKE) -C target/ts2068 TARGET=ts2068
 	TARGET=ts2068 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORzx -DFORts2068 -DA80COL -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(LISTFILE_DIRECTORY)/ts2068.lst
 
 # TS2068 HRG graphics lib - Stefano

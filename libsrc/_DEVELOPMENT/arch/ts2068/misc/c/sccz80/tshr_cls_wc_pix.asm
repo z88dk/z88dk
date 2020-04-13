@@ -18,3 +18,10 @@ tshr_cls_wc_pix:
    push af
 
    jp asm_tshr_cls_wc_pix
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _tshr_cls_wc_pix
+defc _tshr_cls_wc_pix = tshr_cls_wc_pix
+ENDIF
+

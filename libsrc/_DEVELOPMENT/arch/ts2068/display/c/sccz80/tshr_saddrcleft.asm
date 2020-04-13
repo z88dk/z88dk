@@ -8,3 +8,10 @@ PUBLIC tshr_saddrcleft
 EXTERN asm_tshr_saddrcleft
 
 defc tshr_saddrcleft = asm_tshr_saddrcleft
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _tshr_saddrcleft
+defc _tshr_saddrcleft = tshr_saddrcleft
+ENDIF
+

@@ -18,3 +18,10 @@ tshc_visit_wc_attr:
    push af
    
    jp asm_tshc_visit_wc_attr
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _tshc_visit_wc_attr
+defc _tshc_visit_wc_attr = tshc_visit_wc_attr
+ENDIF
+

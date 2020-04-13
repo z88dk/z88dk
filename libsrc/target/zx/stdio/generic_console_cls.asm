@@ -6,8 +6,10 @@
 		SECTION	code_clib
 		PUBLIC	generic_console_cls
 
+		EXTERN	generic_console_zxn_tile_cls
+
 		EXTERN	__zx_console_attr
-		EXTERN	__ts2068_hrgmode
+		EXTERN	__zx_screenmode
 
 
 generic_console_cls:
@@ -15,8 +17,12 @@ generic_console_cls:
 	push	bc
 	ld      hl,16384
         ld      de,16385
-IF FORts2068
-        ld      a,(__ts2068_hrgmode)
+IF FORts2068 | FORzxn
+        ld      a,(__zx_screenmode)
+IF FORzxn
+	bit	6,a
+	jp	nz,generic_console_zxn_tile_cls
+ENDIF
 	cp	1
 	jr	nz,clear_main_screen
 	ld	hl,$6000
@@ -26,9 +32,9 @@ ENDIF
         ld      bc,6144
         ld      (hl),l
         ldir
-IF FORts2068
-        ld      a,(__ts2068_hrgmode)
-	cp	0
+IF FORts2068 | FORzxn
+        ld      a,(__zx_screenmode)
+	and	a
 	jr	z,clear_attributes
 	cp	1
 	jr	z,clear_attributes
