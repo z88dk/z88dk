@@ -10,15 +10,18 @@
 
 
 IF !__CPU_INTEL__
-		SECTION         code_graphics
+	MODULE	w_fill
+	SECTION         code_graphics
         
-		PUBLIC	fill
-		PUBLIC	_fill
+	PUBLIC	fill
+	PUBLIC	_fill
         
-		EXTERN	l_graphics_cmp
+	EXTERN	l_graphics_cmp
 	
-		EXTERN   point
+	EXTERN   point
         EXTERN   plot
+	EXTERN	getmaxx
+	EXTERN	getmaxy
 
 
 ;ix points to the table on stack (above)
@@ -47,16 +50,18 @@ IF !__CPU_INTEL__
 		push bc
 		
 		push    hl
-		ld      hl,maxy
+		call	getmaxy
 		call    l_graphics_cmp
 		pop     hl
 		ret     nc               ; Return if Y overflows
 
 		push    de
-		ld      de,maxx
+		ex	de,hl
+		call	getmaxx
 		call    l_graphics_cmp
+		ex	de,hl
 		pop     de
-		ret     c               ; Return if X overflows
+		ret     nc               ; Return if X overflows
 		
 		push	hl
 		push	de

@@ -18,8 +18,10 @@
 	ld	a,(__zx_screenmode)
 	cp	3
 	jp	c,plot_MODE0
+IF FORzxn
 	bit	6,a
 	jp	nz,plot_MODE64
+ENDIF
 	jp	plot_MODE6
 
 

@@ -17,8 +17,10 @@
 	ld	a,(__zx_screenmode)
 	cp	3
 	jp	c,res_MODE0
+IF FORzxn
 	bit	6,a
 	jp	nz,res_MODE64
+ENDIF
 	jp	res_MODE6
 
 

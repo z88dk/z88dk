@@ -8,8 +8,4 @@
 
 xor_MODE64:
 	defc    NEEDxor = 1
-; We enter here with: hl = x, de = y
-; We fold them down into the standard narrow parameters
-        ld      h,l
-        ld      l,e
-	INCLUDE	"gfx/gencon/pixel.inc"
+        INCLUDE "target/zxn/graphics/pixel_MODE64.inc"
