@@ -13,7 +13,7 @@ $(OUTPUT_DIRECTORY)/z80_crt0.lib:
 
 $(OUTPUT_DIRECTORY)/z80n_crt0.lib:
 	@$(MAKE) clean
-	$(LIBLINKER) -I.. -mz80n -x$@ @crt0.lst
+	$(LIBLINKER) -I.. -mz80n -x$@ @crt0_z80n.lst
 
 $(OUTPUT_DIRECTORY)/8080_crt0.lib:
 	@$(MAKE) clean

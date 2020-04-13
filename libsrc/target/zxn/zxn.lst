@@ -1,6 +1,7 @@
 target/zxn/graphics/__set_zx_pixel_colour
 target/zxn/graphics/asm_zxn_copytiles
 target/zxn/graphics/asm_zxn_tilemap_palette
+target/zxn/graphics/cleargraphics
 target/zxn/graphics/getmaxx
 target/zxn/graphics/getmaxy
 target/zxn/graphics/pixladdr_MODE0
