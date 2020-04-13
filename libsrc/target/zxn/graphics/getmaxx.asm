@@ -17,6 +17,7 @@
 	ret	z
 	; So we must be left with a ZXN screenmode
 	ld	hl,(__console_w)
+	ld	h,0
 	add	hl,hl
 	dec	hl
 	ret

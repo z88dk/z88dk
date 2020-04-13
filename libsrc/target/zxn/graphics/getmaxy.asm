@@ -17,6 +17,7 @@
 	ret	z
 	; And so we're left with ZXN
 	ld	hl,(__console_h)
+	ld	h,0
 	add	hl,hl
 	dec	hl
 	ret	

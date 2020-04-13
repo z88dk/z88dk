@@ -33,21 +33,17 @@
         ld      (__gfx_coords),hl
         ld      (__gfx_coords+2),de
 
+	ld	h,l
+	ld	l,e
 	push	bc		;save entry bc	
-	ld	c,l
-	ld	b,e
+	ld	c,h
+	ld	b,l
 	srl	b
 	srl	c
 	push	bc		;save reduced cooardinates
 	push	hl		;save original coordinates
-IF USEplotc
-	call	generic_console_pointxy
-ELSE
 	ld	e,1		;raw mode
 	call	generic_console_vpeek
-ENDIF
-	ld	e,a
-
 	ld	hl,textpixl
 	ld	e,0
 	ld	b,16
@@ -57,16 +53,14 @@ ENDIF
 	inc	e
 	djnz	ckmap
 	ld	e,0
-.chfound	ld	b,e
-
+.chfound	
+	ld	b,e		;Offset in table
 	pop	hl		;original coordinates
 
 	ld	a,1		; the bit we want to draw
-		
 	bit	0,h
 	jr	z,iseven
 	add	a,a		; move right the bit
-
 .iseven
 	bit	0,l
 	jr	z,evenrow
@@ -93,15 +87,9 @@ ELSE
 	add	hl,de
 	ld	a,(hl)
 	pop	bc		;reduced coordinates
-IF USEplotc
-	ld	d,a
-        ld      e,0             ;pixel4 mode
-        call    generic_console_plotc
-ELSE
 	ld	d,a
 	ld	e,1		;raw mode
 	call	generic_console_printc
-ENDIF
 ENDIF
 	pop	bc
 	ret

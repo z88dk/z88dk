@@ -95,7 +95,7 @@ set_font_lo:
 ; a = d character to print
 ; e = raw
 generic_console_printc:
-	rl	e
+	rr	e
 	jr	c,skip_control_codes
 	ld	hl,expect_flags
 	bit	0,(hl)
