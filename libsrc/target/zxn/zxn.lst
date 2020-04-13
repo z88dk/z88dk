@@ -1,4 +1,4 @@
-target/zxn/graphics/asm_zxn_copytiles
-target/zxn/graphics/asm_zxn_tilemap_palette
+@target/zxn/timex_zxn_graphics.lst
 target/zxn/stdio/generic_console_zxn
 @target/zxn/newlib/newlib.lst
+@gfx/wide/gfx_wide.lst

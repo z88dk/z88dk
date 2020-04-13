@@ -28,55 +28,33 @@ PUBLIC ASMDISP_DRAW_CALLEE
 .draw_callee
 ._draw_callee
 		pop af
-		;pop bc	; color
-		pop de			;dest
-		pop	hl
+		pop	de	;y2
+		pop	hl	;x2
 		exx			; w_plotpixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
-		pop hl		;start
-		pop de
-		
+		pop de		;y1
+		pop hl		;x1
 		push af		; ret addr
 		
-;		exx
-		
+; de = x1, hl = y1, hl'=x2, de'=y2
 .asmentry
 		
-;		ld	l,(ix+6)
-;		ld	h,(ix+7)
-;		ld	e,(ix+4)
-;		ld	d,(ix+5)
-;		ld	c,(ix+8)
-		
-		
-		;ld	a,c
-		;ld	(__gfx_color),a
-
 		push ix
-		
-		push hl
-		push de
-		
+		push hl		;x1
+		push de		;y1
 		call    swapgfxbk
 		call	w_plotpixel
-		;call    swapgfxbk1
-		;pop ix
 
 		exx
-		;ld	l,(ix+0)
-		;ld	h,(ix+1)
-		pop bc
-		or a
-		sbc hl,bc
-		ex de,hl
+		ex	de,hl
+		pop	bc	;y1
+		or	a
+		sbc	hl,bc
+		ex	de,hl
 		
-		;ld	l,(ix+2)
-		;ld	h,(ix+3)
-		pop bc
-		or a
-		sbc hl,bc
+		pop	bc		;x1
+		or	a
+		sbc	hl,bc
 
-		;call    swapgfxbk
-		;push	ix
 		ld      ix,w_plotpixel
 		call    w_line_r
 		jp      __graphics_end

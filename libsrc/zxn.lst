@@ -3,7 +3,7 @@
 @stdio/ansicore.lst
 @stdio/stdio.lst
 target/shared/clock
-@target/zx/gfxspectrum.lst
+@target/zxn/zxn.lst
 @font/fzx/fzx.lst
 @font/font_4x8/font_4x8.lst
 @font/font_8x8/font_8x8.lst
@@ -21,7 +21,6 @@ target/zx/psg/get_psg
 target/zx/psg/psg_init
 target/zx/psg/asm_wyz_hardware_out
 target/zx/psg/asm_vt2_hardware_out
-@target/zxn/zxn.lst
 @psg/psg.lst
 @psg/wyz/psg_wyz.lst
 @psg/vt2/psg_vt2.lst

@@ -1,17 +1,19 @@
-include ../../Make.config
+include ../../../Make.config
 
 TARGET ?= zxn
 
-SUBDIRS = newlib graphics
-
-ifeq ($(TARGET),zx)
-  SUBDIRS += fzx fcntl rs232
-endif
+SUBDIRS = 
 
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
-ASMFILES = $(wildcard *.asm)
-OBJECTS = $(ASMFILES:.asm=.o)
+ASMFILES = $(wildcard *.asm) $(wildcard ansi/*.asm)
+CFILES = $(wildcard *.c)
+OBJECTS = $(ASMFILES:.asm=.o) $(CFILES:.c=.o)
+AFLAGS = 
+
+ifeq ($(TARGET),zxn)
+AFLAGS=-mz80n
+endif
 
 all: dirs subdirs-all $(addprefix obj/$(TARGET)/,$(OBJECTS))
 
@@ -29,8 +31,11 @@ clean: subdirs-clean
 subdirs-clean: $(CLEANDIRS)
 
 obj/$(TARGET)/%.o: %.asm
-	@$(ASSEMBLER) -DFOR$(TARGET) -I../..  $^
+	$(Q)$(ASSEMBLER) -DFOR$(TARGET) $(AFLAGS) -I$(OUTPUT_DIRECTORY) -I$(Z88DK_LIB) -DSTANDARDESCAPECHARS  $^
 	@mv $(^:.asm=.o) $@
+
+obj/$(TARGET)/%.o: %.c
+	$(ZCC) +$(TARGET) $(CFLAGS) -o $@ $^
 
 dirs:
 	@mkdir -p obj/$(TARGET)

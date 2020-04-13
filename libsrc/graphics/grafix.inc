@@ -298,6 +298,12 @@ IF FORgfx2068hr
 	defc maxy       = 192
 ENDIF
 
+IF FORzxn
+	DEFINE gotgfx
+	defc maxx       = 512
+	defc maxy       = 192
+ENDIF
+
 IF FORtiki100
 	DEFINE gotgfx
 	defc maxx       = 1024

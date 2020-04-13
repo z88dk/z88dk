@@ -6,8 +6,6 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.53 2016-07-16 07:06:27 dom Exp $
-;
 
 
         MODULE  zxn_crt0
@@ -43,16 +41,7 @@
         ENDIF
         
         IF      !DEFINED_CRT_ORG_CODE
-            IF (startup=2)                 ; ROM ?
-                defc  CRT_ORG_CODE  = 0
-		defc	TAR__register_sp = 32767
-            ELSE
-                IF DEFINED_CRT_TS2068_HRG
-                    defc  CRT_ORG_CODE  = 40000
-                ELSE
-                    defc  CRT_ORG_CODE  = 32768
-                ENDIF
-            ENDIF
+                defc  CRT_ORG_CODE  = 32768
         ENDIF
         defc __crt_org_code = CRT_ORG_CODE
 	PUBLIC __crt_org_code
@@ -68,7 +57,7 @@
 	; We use the generic driver by default
         defc    TAR__fputc_cons_generic = 1
 
-	defc	DEF__register_sp = -1
+	defc	DEF__register_sp = 65535
         defc    TAR__clib_exit_stack_size = 32
 	defc	CRT_KEY_DEL = 12
 	defc __CPU_CLOCK = 3500000
