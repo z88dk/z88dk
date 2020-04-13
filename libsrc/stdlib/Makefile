@@ -3,9 +3,10 @@
 #
 # $Id: Makefile,v 1.24 2016-07-02 14:44:33 dom Exp $
 
-include ../Make.config
 
 TARGET ?= test
+
+include ../Make.config
 
 GENOBJECTS = unbcd.o wcmatch.o getopt.o
 CUSTOBJECTS = sleep.o 
@@ -70,6 +71,9 @@ obj/$(TARGET)/%.o: %.c
 
 obj/$(TARGET)/%.o: %.asm
 	$(ZCC) +$(TARGET) $(CFLAGS) -o $@  $^
+
+obj/zxn/%.o: %.c
+	$(ZCC) +zxn -clib=classic $(CFLAGS) -o $@ $^
 
 
 dirs:

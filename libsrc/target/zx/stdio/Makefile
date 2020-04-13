@@ -9,6 +9,11 @@ CLEANDIRS = $(SUBDIRS:%=clean-%)
 ASMFILES = $(wildcard *.asm) $(wildcard ansi/*.asm)
 CFILES = $(wildcard *.c)
 OBJECTS = $(ASMFILES:.asm=.o) $(CFILES:.c=.o)
+AFLAGS = 
+
+ifeq ($(TARGET),zxn)
+AFLAGS=-mz80n
+endif
 
 all: dirs subdirs-all $(addprefix obj/$(TARGET)/,$(OBJECTS))
 
@@ -26,7 +31,7 @@ clean: subdirs-clean
 subdirs-clean: $(CLEANDIRS)
 
 obj/$(TARGET)/%.o: %.asm
-	@$(ASSEMBLER) -DFOR$(TARGET) -I$(OUTPUT_DIRECTORY) -I$(Z88DK_LIB) -DSTANDARDESCAPECHARS  $^
+	$(Q)$(ASSEMBLER) -DFOR$(TARGET) $(AFLAGS) -I$(OUTPUT_DIRECTORY) -I$(Z88DK_LIB) -DSTANDARDESCAPECHARS  $^
 	@mv $(^:.asm=.o) $@
 
 obj/$(TARGET)/%.o: %.c

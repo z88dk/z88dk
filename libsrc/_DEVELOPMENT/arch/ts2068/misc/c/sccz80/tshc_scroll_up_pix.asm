@@ -18,3 +18,10 @@ tshc_scroll_up_pix:
    push af
 
    jp asm0_tshc_scroll_up_pix
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _tshc_scroll_up_pix
+defc _tshc_scroll_up_pix = tshc_scroll_up_pix
+ENDIF
+

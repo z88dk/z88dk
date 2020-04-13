@@ -19,3 +19,10 @@ zx_saddrpleft:
    push af
    
    jp asm_zx_saddrpleft
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _zx_saddrpleft
+defc _zx_saddrpleft = zx_saddrpleft
+ENDIF
+

@@ -2,7 +2,7 @@
 ;
 ; Relies on ROM routines to perform the scroll
 ;
-; Toggle on __ts2068_hrgmode to determine whether to scroll
+; Toggle on __zx_screenmode to determine whether to scroll
 ; the second display
 ;
 
@@ -11,13 +11,21 @@
 	SECTION	code_clib
 	PUBLIC	generic_console_scrollup
 	EXTERN	call_rom3
-	EXTERN	__ts2068_hrgmode
+	EXTERN	__zx_screenmode
 
 	EXTERN	__zx_console_attr
         EXTERN  zx_rowtab
 
+	EXTERN	generic_console_zxn_tile_scrollup
+
+
 		
 generic_console_scrollup:
+IF FORzxn
+	ld	a,(__zx_screenmode)
+	bit	6,a
+	jp	nz,generic_console_zxn_tile_scrollup
+ENDIF
         push    de
 	push	bc
 		
@@ -80,8 +88,8 @@ IF NOROMCALLS
 	pop	de
         ret
 ELSE
-  IF FORts2068
-        ld      a,(__ts2068_hrgmode)
+  IF FORts2068 | FORzxn
+        ld      a,(__zx_screenmode)
 	cp	6	;Hires
 	jr	z,hrgscroll
 	cp	2	;High colour
@@ -111,17 +119,17 @@ ENDIF
 
 		
 
-IF FORts2068
+IF FORts2068 | FORzxn
 .hrgscroll
         push    ix
         ld      ix,zx_rowtab
         ld      a,8
-.outer_loop
+.outer_loophr
         push    af
         push    ix
-	ld	a,(__ts2068_hrgmode)
+	ld	a,(__zx_screenmode)
         ld      b,23
-.inner_loop
+.inner_loophr
 	push	bc
         ld      e,(ix+16)
         ld      d,(ix+17)
@@ -144,19 +152,19 @@ just_screen_1:
         ld      bc,16
         add     ix,bc
 	pop	bc
-	djnz	inner_loop
+	djnz	inner_loophr
 
         pop     ix
         pop     af
         inc     ix
         inc     ix
         dec     a
-        jr      nz,outer_loop
+        jr      nz,outer_loophr
 ; clear
         ld      ix,zx_rowtab + (192 - 8) * 2
-	ld	a,(__ts2068_hrgmode)
+	ld	a,(__zx_screenmode)
         ld      b,8
-.clear_loop
+.clear_loophr
 	push	bc
         push    ix
         ld      e,(ix+0)
@@ -192,7 +200,7 @@ clear_hires2:
         inc     ix
         inc     ix
 	pop	bc
-	djnz	clear_loop
+	djnz	clear_loophr
         pop     ix
 	pop	bc
 	pop	de

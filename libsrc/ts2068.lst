@@ -14,10 +14,10 @@ target/zx/games/obj/${TARGET}/joystick
 @target/zx/spectrum.lst
 @font/font_4x8/font_4x8.lst
 @font/font_8x8/font_8x8.lst
-target/ts2068/ts_vmod
 target/ts2068/psg/set_psg
 target/ts2068/psg/set_psg_callee
 target/ts2068/psg/get_psg
 target/ts2068/psg/psg_init
+@target/ts2068/newlib/newlib.lst
 @psg/psg.lst
 @z80.lst

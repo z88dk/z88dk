@@ -8,3 +8,10 @@ PUBLIC tshc_aaddrpleft
 EXTERN zx_saddrpleft
 
 defc tshc_aaddrpleft = zx_saddrpleft
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _tshc_aaddrpleft
+defc _tshc_aaddrpleft = tshc_aaddrpleft
+ENDIF
+

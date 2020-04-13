@@ -15,3 +15,10 @@ tshr_scroll_up_callee:
    push af
 
    jp asm_tshr_scroll_up
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _tshr_scroll_up_callee
+defc _tshr_scroll_up_callee = tshr_scroll_up_callee
+ENDIF
+

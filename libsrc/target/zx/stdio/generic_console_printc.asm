@@ -14,7 +14,9 @@
 	EXTERN	__zx_64col_font
 	EXTERN	__console_w
 	EXTERN	generic_console_flags
-	EXTERN	__ts2068_hrgmode
+	EXTERN	__zx_screenmode
+
+	EXTERN	generic_console_zxn_tile_printc
 
 ; Entry:
 ;  a = charcter
@@ -67,8 +69,8 @@ set_switch:
 	ld	de,$8040
 set_switch1:
 	ld	(print_routine),hl
-IF FORts2068
-	ld	a,(__ts2068_hrgmode)
+IF FORts2068|FORzxn
+	ld	a,(__zx_screenmode)
 	cp	6
 	ld	a,d
 	jr	z,set_width
@@ -109,6 +111,12 @@ generic_console_printc:
 	cp	32
 	jr	c,handle_controls
 skip_control_codes:
+IF FORzxn
+	ld	a,(__zx_screenmode)
+	bit	6,a
+	ld	a,d
+	jp	nz,generic_console_zxn_tile_printc
+ENDIF
 	ld	hl,(print_routine)
 	jp	(hl)
 
@@ -164,11 +172,11 @@ no_underline32:
 
 
 get_attribute_address:
-IF FORts2068
+IF FORts2068|FORzxn
 	ld	a,d
 	and	@0100000
 	ld	l,a
-	ld	a,(__ts2068_hrgmode)
+	ld	a,(__zx_screenmode)
 	cp	6
 	ret	z
 	cp	2
@@ -189,7 +197,7 @@ ENDIF
 	rrca
 	and	3
 	or	88
-IF FORts2068
+IF FORts2068|zxn
 	or	l		;Add in screen 1 bit
 ENDIF
 	ld	d,a
@@ -246,10 +254,10 @@ print64_noinverse:
 ;        b = y
 ; Exit: hl = screen address
 generic_console_calc_screen_addr:
-IF FORts2068
+IF FORts2068|FORzxn
 	bit	0,c
         push    af
-	ld	a,(__ts2068_hrgmode)
+	ld	a,(__zx_screenmode)
 	cp	6
 	jr	nz,not_hrgmode
 	srl	c
@@ -266,8 +274,8 @@ ENDIF
 	and	0x18
 	or	0x40
 	ld	h,a
-IF FORts2068
-        ld      a,(__ts2068_hrgmode)
+IF FORts2068|FORzxn
+        ld      a,(__zx_screenmode)
 	and	a
 	jr	z,dont_use_screen_1
 	cp	1		;screen 1

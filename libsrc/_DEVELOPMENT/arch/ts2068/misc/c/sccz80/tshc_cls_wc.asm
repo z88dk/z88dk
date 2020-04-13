@@ -18,3 +18,10 @@ tshc_cls_wc:
    push af
    
    jp asm_tshc_cls_wc
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _tshc_cls_wc
+defc _tshc_cls_wc = tshc_cls_wc
+ENDIF
+

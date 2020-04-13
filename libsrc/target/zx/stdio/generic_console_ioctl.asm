@@ -9,12 +9,17 @@
 	EXTERN	__zx_32col_font
 	EXTERN	__zx_64col_font
 	EXTERN	__zx_32col_udgs
-	EXTERN	__ts2068_hrgmode
+	EXTERN	__zx_screenmode
 	EXTERN	__console_w
+
+	EXTERN	asm_zxn_copytiles
+	EXTERN	generic_console_caps
 
 
         PUBLIC          CLIB_GENCON_CAPS
         defc            CLIB_GENCON_CAPS = CAP_GENCON_INVERSE | CAP_GENCON_BOLD | CAP_GENCON_UNDERLINE | CAP_GENCON_CUSTOM_FONT | CAP_GENCON_UDGS | CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR
+	defc		CLIB_GENCON_CAPS_TIMEX_HIRES = CAP_GENCON_INVERSE | CAP_GENCON_BOLD | CAP_GENCON_UNDERLINE | CAP_GENCON_CUSTOM_FONT | CAP_GENCON_UDGS
+	defc		CLIB_GENCON_CAPS_TILEMAP =  CAP_GENCON_CUSTOM_FONT | CAP_GENCON_UDGS | CAP_GENCON_FG_COLOUR
 
 ; a = ioctl
 ; de = arg
@@ -26,6 +31,21 @@ generic_console_ioctl:
 	cp	IOCTL_GENCON_SET_FONT32
 	jr	nz,check_set_font64
 	ld	(__zx_32col_font),bc
+IF FORzxn
+	ld	de,$6020
+ENDIF
+font_success:
+IF FORzxn
+	ld	a,(__zx_screenmode)
+	bit	6,a
+	jr	z,success
+	; Register shuffle
+	ld	l,c
+	ld	h,b
+	ld	c,e
+	ld	b,d
+	call	asm_zxn_copytiles
+ENDIF
 success:
 	and	a
 	ret
@@ -38,31 +58,66 @@ check_set_udg:
 	cp	IOCTL_GENCON_SET_UDGS
 	jr	nz,check_mode
 	ld	(__zx_32col_udgs),bc
-	jr	success
+	ld	de,$8080
+	jr	font_success
 check_mode:
-IF FORts2068
+IF FORts2068 | FORzxn
 	cp	IOCTL_GENCON_SET_MODE
 	jr	nz,failure
 	ld	a,c
-	and	7
 	; 0 = screen 0
 	; 1 = screen 1
 	; 2 = high colour
 	; 6 = hires
 	ld	l,64
+	ld	h,CLIB_GENCON_CAPS
 	cp	0
 	jr	z,set_mode
 	cp	1
 	jr	z,set_mode
 	cp	2
 	jr	z,set_mode
+	and	7
 	cp	6
-	jr	nz,failure
 	ld	l,128
+	ld	h,CLIB_GENCON_CAPS_TIMEX_HIRES
+IF !FORzxn
+	jr	nz,failure
+ELSE
+	jr	z,set_mode
+;zxn modes
+	ld	a,c
+	ld	(__zx_screenmode),a
+	; Mode 64 = 40 column
+	;      65 = 40 column with single byte tiles
+	;      66 = 80 column
+	;      67 = 80 column with single byte tiles
+	rrca
+	rrca
+	rrca
+	and	@01100000
+	or	@10000001
+	nextreg	$6b,a
+	nextreg	$6c,@10000000
+	nextreg	$6e,$6c ;tile map
+	nextreg	$6f,$4c	;tile definition
+	ld	hl,$2028
+	bit	6,a
+	jr	z,set_tilemap_size
+	ld	l,80
+set_tilemap_size:
+	ld	(__console_w),hl
+	ld	a,CLIB_GENCON_CAPS_TILEMAP
+	ld	(generic_console_caps),a
+	call	generic_console_cls
+	jr	success
+ENDIF
 set_mode:
-	ld	(__ts2068_hrgmode),a
-	ld	a,l
-	ld	(__console_w),a
+	ld	(__zx_screenmode),a
+	ld	a,h
+	ld	(generic_console_caps),a
+	ld	h,$18
+	ld	(__console_w),hl
 	in	a,($ff)
 	and	@1100000
 	ld	b,a
@@ -71,7 +126,7 @@ set_mode:
 	or	b
 	out	($ff),a
 	call	generic_console_cls
-	jr	success
+	jp	success
 ENDIF
 failure:
 	scf

@@ -27,7 +27,7 @@
 	EXTERN	__zx_32col_font
 	EXTERN	__zx_64col_font
 	EXTERN	__zx_32col_udgs
-	EXTERN	__ts2068_hrgmode
+	EXTERN	__zx_screenmode
 	EXTERN	generic_console_scrollup
 
 ;
@@ -37,7 +37,7 @@
 .fputc_cons_native
 IF FORts2068
 	in	a,(255)
-	ld	hl,__ts2068_hrgmode
+	ld	hl,__zx_screenmode
 	and	7
 	ld	(hl),a
 .normal
@@ -148,7 +148,7 @@ ENDIF
 	dec	h
 IF FORts2068
 	; No __zx_console_attribute setting for hires mode
-	ld	a,(__ts2068_hrgmode)
+	ld	a,(__zx_screenmode)
 	cp	6
 	jr	z,cbak
 ENDIF
@@ -168,7 +168,7 @@ ENDIF
 	bit	6,l  
 	jr	z,char4
 IF FORts2068
-	ld	a,(__ts2068_hrgmode)
+	ld	a,(__zx_screenmode)
 	cp	6
 	jr	nz,cbak1
 	bit	7,l
@@ -216,7 +216,7 @@ ENDIF
 	dec	d
 	ld	hl,(chrloc)
 IF FORts2068
-	ld	a,(__ts2068_hrgmode)
+	ld	a,(__zx_screenmode)
 	cp	6
 	jr	z,increment
 ENDIF
@@ -261,7 +261,7 @@ ENDIF
 just_calculate:
 IF FORts2068
 	; In highres mode, we've got to divide again
-	ld	a,(__ts2068_hrgmode)
+	ld	a,(__zx_screenmode)
 	cp	6
 	jr	nz,not_hrg_calc
 	srl	l
@@ -281,7 +281,7 @@ ENDIF
 IF FORts2068
 	pop	af
 	ret	z
-	ld	a,(__ts2068_hrgmode)
+	ld	a,(__zx_screenmode)
 	cp	6
 	ret	z
 	ld	a,$20
@@ -410,7 +410,7 @@ ENDIF
 	ld      (hl),l
 	ldir
 IF FORts2068
-	ld	a,(__ts2068_hrgmode)
+	ld	a,(__zx_screenmode)
 	cp	6
 	jr	z,cls_hrg
 ENDIF

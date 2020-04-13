@@ -15,3 +15,10 @@ zx_saddrpright_callee:
    ex (sp),hl
    
    jp asm_zx_saddrpright
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _zx_saddrpright_callee
+defc _zx_saddrpright_callee = zx_saddrpright_callee
+ENDIF
+

@@ -18,3 +18,10 @@ tshr_saddrpleft:
    push af
 
    jp asm_tshr_saddrpleft
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _tshr_saddrpleft
+defc _tshr_saddrpleft = tshr_saddrpleft
+ENDIF
+

@@ -20,3 +20,10 @@ tshr_scroll_wc_up_pix:
    push af
 
    jp asm0_tshr_scroll_wc_up_pix
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _tshr_scroll_wc_up_pix
+defc _tshr_scroll_wc_up_pix = tshr_scroll_wc_up_pix
+ENDIF
+

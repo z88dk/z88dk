@@ -20,6 +20,12 @@ IF FORzx
         defc sndbit_mask   = 16         ; (2^sndbit_bit)
 ENDIF
 
+IF FORzxn
+        defc sndbit_port   = 254
+        defc sndbit_bit    = 4
+        defc sndbit_mask   = 16         ; (2^sndbit_bit)
+ENDIF
+
 IF FORts2068
         defc sndbit_port   = 254
         defc sndbit_bit    = 4
