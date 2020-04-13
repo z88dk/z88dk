@@ -364,7 +364,7 @@ extern uint  __LIB__    zx_screenstr_callee(uchar row, uchar col) __smallc __z88
 
 // DISPLAY PIXEL ADDRESS MANIPULATORS
 
-extern uchar __LIB__              *zx_cyx2saddr(uchar row, uchar col) __smallc;
+extern uchar __LIB__              *zx_cxy2saddr(uchar row, uchar col) __smallc;
 extern uchar __LIB__  *zx_cy2saddr(uchar row) __z88dk_fastcall;           // cx assumed 0
 
 extern uchar __LIB__              *zx_pxy2saddr(uchar xcoord, uchar ycoord, uchar *mask) __smallc;
@@ -388,13 +388,15 @@ extern uchar __LIB__              *zx_saddrpleft(void *pixeladdr, uchar *mask) _
 extern uchar __LIB__              *zx_saddrpright(void *pixeladdr, uchar *mask) __smallc;
 extern uchar __LIB__  *zx_saddrpup(void *pixeladdr) __z88dk_fastcall;
 
-extern uchar __LIB__    *zx_cyx2saddr_callee(uchar row, uchar col) __smallc __z88dk_callee;
+extern uchar __LIB__    *zx_cxy2saddr_callee(uchar row, uchar col) __smallc __z88dk_callee;
 extern uchar __LIB__    *zx_pxy2saddr_callee(uchar xcoord, uchar ycoord, uchar *mask) __smallc __z88dk_callee;
 extern uint  __LIB__     zx_saddr2px_callee(void *pixeladdr, uchar mask) __smallc __z88dk_callee;
 extern uchar __LIB__    *zx_saddrpleft_callee(void *pixeladdr, uchar *mask) __smallc __z88dk_callee;
 extern uchar __LIB__    *zx_saddrpright_callee(void *pixeladdr, uchar *mask) __smallc __z88dk_callee;
 
-#define zx_cyx2saddr(a,b)          zx_cyx2saddr_callee(a,b)
+#define zx_cyx2saddr(a,b)          zx_cxy2saddr_callee(a,b)
+#define zx_cxy2saddr(a,b)          zx_cxy2saddr_callee(a,b)
+
 #define zx_pxy2saddr(a,b,c)        zx_pxy2saddr_callee(a,b,c)
 #define zx_saddr2px(a,b)           zx_saddr2px_callee(a,b)
 #define zx_saddrpleft(a,b)         zx_saddrpleft_callee(a,b)
@@ -402,7 +404,7 @@ extern uchar __LIB__    *zx_saddrpright_callee(void *pixeladdr, uchar *mask) __s
 
 // DISPLAY ATTRIBUTE ADDRESS MANIPULATORS
 
-extern uchar __LIB__              *zx_cyx2aaddr(uchar row, uchar col) __smallc;
+extern uchar __LIB__              *zx_cxy2aaddr(uchar row, uchar col) __smallc;
 extern uchar __LIB__  *zx_cy2aaddr(uchar row) __z88dk_fastcall;           // cx assumed 0
 
 extern uchar __LIB__              *zx_pxy2aaddr(uchar xcoord, uchar ycoord) __smallc;
@@ -421,10 +423,11 @@ extern uchar __LIB__  *zx_aaddrcleft(void *attraddr) __z88dk_fastcall;
 extern uchar __LIB__  *zx_aaddrcright(void *attraddr) __z88dk_fastcall;
 extern uchar __LIB__  *zx_aaddrcup(void *attraddr) __z88dk_fastcall;
 
-extern uchar __LIB__    *zx_cyx2aaddr_callee(uchar row, uchar col) __smallc __z88dk_callee;
+extern uchar __LIB__    *zx_cxy2aaddr_callee(uchar row, uchar col) __smallc __z88dk_callee;
 extern uchar __LIB__    *zx_pxy2aaddr_callee(uchar xcoord, uchar ycoord) __smallc __z88dk_callee;
 
-#define zx_cyx2aaddr(a,b)          zx_cyx2aaddr_callee(a,b)
+#define zx_cyx2aaddr(a,b)          zx_cxy2aaddr_callee(b,a)
+#define zx_cxy2aaddr(a,b)          zx_cxy2aaddr_callee(a,b)
 #define zx_pxy2aaddr(a,b)          zx_pxy2aaddr_callee(a,b)
 
 
