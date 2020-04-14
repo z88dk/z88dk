@@ -1,6 +1,6 @@
 IF FORzxn
 
-	SECTION	code_arch
+	SECTION	code_graphics
 
 	PUBLIC	asm_zxn_tilemap_palette
 

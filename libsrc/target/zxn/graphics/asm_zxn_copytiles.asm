@@ -2,6 +2,8 @@ IF FORzxn
 
 	MODULE		asm_zxn_copytiles
 
+	SECTION		code_graphics
+
 	PUBLIC		asm_zxn_copytiles
 
 	; Used to determine which palette index is set
