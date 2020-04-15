@@ -44,10 +44,12 @@ pixeladdress_MODE0:
         rlca
         rlca
         ld      e,a
+IF FORzxn | FORts2068
 	ld	a,(__zx_screenmode)
 	cp	1
 	jr	nz,not_screen1
 	set	5,d
+ENDIF
 not_screen1:
         ld	a,h
         and     @00000111

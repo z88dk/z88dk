@@ -9,5 +9,5 @@ IF FORzxn
 
 pointxy_MODE64:
 	defc    NEEDpoint = 1
-        INCLUDE "target/zxn/graphics/pixel_MODE64.inc"
+        INCLUDE "pixel_MODE64.inc"
 ENDIF

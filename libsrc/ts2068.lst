@@ -9,7 +9,7 @@ target/ts2068/stdio/ansi/f_ansi_scrollup
 @stdio/ansicore.lst
 @stdio/stdio.lst
 target/ts2068/graphics_hr/zx_hardcopy
-@target/zxn/timex_zxn_graphics.lst
+@target/zx-common/timex_zxn_graphics.lst
 @gfx/wide/gfx_wide.lst
 target/shared/clock
 target/zx/games/obj/${TARGET}/joystick

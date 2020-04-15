@@ -7,6 +7,7 @@
 	EXTERN	__set_zx_pixel_colour
 
 ; We enter here with: hl = x, de = y
+IF FORzxn | FORts2068
 	ld	a,h
 	and	a
 	ret	nz
@@ -22,6 +23,12 @@
 	; Now get them into 8 bit parameters
 	ld	h,l
 	ld	l,e
+ELSE
+	ld	a,l
+	cp	192
+	ret	nc
+	ld	(__gfx_coords),hl
+ENDIF
 	push	bc		;Save callers
 	call	pixeladdress_MODE0
         ld      b,a

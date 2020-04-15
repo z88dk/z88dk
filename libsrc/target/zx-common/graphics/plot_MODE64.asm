@@ -10,5 +10,5 @@ IF FORzxn
 
 plot_MODE64:
 	defc    NEEDplot = 1
-	INCLUDE	"target/zxn/graphics/pixel_MODE64.inc"
+	INCLUDE	"pixel_MODE64.inc"
 ENDIF

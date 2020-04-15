@@ -9,5 +9,5 @@ IF FORzxn
 
 res_MODE64:
 	defc    NEEDunplot = 1
-        INCLUDE "target/zxn/graphics/pixel_MODE64.inc"
+        INCLUDE "pixel_MODE64.inc"
 ENDIF
