@@ -317,6 +317,18 @@ extern void __LIB__   in_MouseKempSetPos_callee(uint xcoord, uint ycoord) __smal
 // DISPLAY FILE FUNCTIONS
 //////////////////////////
 
+// Clear the screen
+#define zx_cls()                  fputc_cons(12)
+
+// Set or unset the flash attribute for now on
+#define zx_setattrflash(b)        fputc_cons(18); fputc_cons((b)? 49: 48)
+
+// Set or unset the bright attribute for now on
+#define zx_setattrbright(b)       fputc_cons(19); fputc_cons((b)? 49: 48)
+
+// Set or unset the inverse attribute for now on
+#define zx_setattrinverse(b)      fputc_cons(20); fputc_cons((b)? 49: 48)
+
 // Set the border color
 extern void  __LIB__  zx_border(uchar colour) __z88dk_fastcall;
 // Quickly set the whole screen color attributes
