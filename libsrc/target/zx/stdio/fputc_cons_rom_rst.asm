@@ -1,4 +1,5 @@
 
+		SECTION	code_clib
 		PUBLIC	fputc_cons_rom_rst
 
 		EXTERN	call_rom3
