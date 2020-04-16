@@ -331,7 +331,13 @@ extern uint  __LIB__    zx_screenstr_callee(uchar row, uchar col) __smallc __z88
 #define zx_attr(a,b)              zx_attr_callee(a,b)
 #define zx_screenstr(a,b)         zx_screenstr_callee(a,b)
 
-#define zx_setcursorpos(a,b)      fputc_cons(22); fputc_cons(a); fputc_cons(b);
+// Sets the cursor position on screen
+// Remember to add 32 to both the desired row & col.
+#define zx_setcursorpos(row,col)      fputc_cons(22); fputc_cons(row); fputc_cons(col);
+
+// Sets the cursor position on screen
+#define zx_movecursorto(row,col)      fputc_cons(22); fputc_cons(row + 32); fputc_cons(col + 32)
+
 #define zx_topleft()              fputc_cons(22); fputc_cons(0); fputc_cons(0);
 
 // In the following, screen address refers to a pixel address within the display file while
