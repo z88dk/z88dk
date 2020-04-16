@@ -19,7 +19,7 @@ all: dirs $(OUTPUT_DIRECTORY)/esxdos.lib
 .PHONY: dirs $(NEWLIB_TARGETS)
 
 $(OUTPUT_DIRECTORY)/esxdos.lib: $(CLASSIC_OBJECTS) $(NEWLIB_TARGETS) esxdos.lst
-	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/esxdos @esxdos.lst
+	$(LIBLINKER) -I$(Z88DK_LIB) -x$(OUTPUT_DIRECTORY)/esxdos @esxdos.lst
 
 obj/%.o: %.c
 	$(ZCC) +zx $(CFLAGS) -DESXDOS -o $@ $^
@@ -28,7 +28,7 @@ obj/%.o: %.asm
 	$(ZCC) +zx $(CFLAGS) -DESXDOS -o $@ $^
 
 obj/newlib-z80:
-	@$(ASSEMBLER) -d -O=obj/z80/x -I$(NEWLIB_DIRECTORY) -I../.. -mz80 -D__CLASSIC $(NEWLIBGLOBS)
+	$(Q)$(ASSEMBLER) -I$(Z88DK_LIB) -d -O=obj/z80/x -I$(NEWLIB_DIRECTORY) -I../.. -mz80 -D__CLASSIC $(NEWLIBGLOBS)
 
 dirs:
 	@mkdir -p obj/z80 obj/z80n obj/ixiy obj/r2k

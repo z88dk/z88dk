@@ -6,7 +6,7 @@
 ; Some scope definitions
 ;--------
 
-	defc	__ESX_RST_SYS = 8
+	INCLUDE	"target/zx/def/esxdos.def"
 
         defc    TAR__clib_exit_stack_size = 4
         defc    TAR__register_sp = -1
@@ -29,13 +29,13 @@ program:
 
 	; Check for ESXDOS/NextOS
 	rst 	__ESX_RST_SYS
-      	defb 0x88	;__ESX_M_DOSVERSION
+      	defb 	__ESX_M_DOSVERSION
 IF __ESXDOS_VERSION
 	ld hl,error_msg_esxdos
 	jp nc, error_crt         ; if esxdos not present
 ELSE
 	ld	hl,error_msg_nextos
-	jp	c,error_crt
+        jp      c,error_crt
     IF __NEXTOS_VERSION > 0
          ld hl,+(((__NEXTOS_VERSION / 1000) % 10) << 12) + (((__NEXTOS_VERSION / 100) % 10) << 8) + (((__NEXTOS_VERSION / 10) % 10
 ) << 4) + (__NEXTOS_VERSION % 10)
