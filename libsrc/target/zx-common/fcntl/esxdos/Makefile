@@ -34,5 +34,4 @@ dirs:
 	@mkdir -p obj/z80 obj/z80n obj/ixiy obj/r2k
 
 clean:
-	$(RM) *.o* zcc_opt.def $(OUTPUT_DIRECTORY)/esxdos.lib
 	$(RM) -fr obj

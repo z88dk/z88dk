@@ -36,3 +36,4 @@ dirs:
 
 clean:
 	$(RM) *.sym *.map zcc_opt.def *.o* obj/*.o* $(OUTPUT_DIRECTORY)/trsdos.lib
+	$(RM) -r obj

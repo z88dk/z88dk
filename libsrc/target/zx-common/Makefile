@@ -1,8 +1,8 @@
 include ../../Make.config
 
-TARGET ?= zx fcntl
+TARGET ?= zx 
 
-SUBDIRS = graphics
+SUBDIRS = graphics fcntl
 
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
