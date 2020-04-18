@@ -114,6 +114,9 @@ extern option_t  lynx_options;
 extern int       m5_exec(char *target);
 extern option_t  m5_options;
 
+extern int       mamepp_exec(char *target);
+extern option_t  mamepp_options;
+
 extern int       mameql_exec(char *target);
 extern option_t  mameql_options;
 
@@ -340,6 +343,10 @@ struct {
       "Generates a tape file for the Sord M5, optional WAV file",
       NULL,
       m5_exec,   &m5_options },
+    { "bin2pp",   "mamepp",  "(C) 2020 z88dk",
+      "Create a Mame quickload file (pp)",
+      NULL,
+      mamepp_exec,   &mamepp_options },
     { "bin2mql",   "mameql",  "(C) 2018 dom",
       "Create a Mame quickload file (z80bin)",
       NULL,

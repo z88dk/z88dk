@@ -30,7 +30,7 @@ all: genlibs z88libs tilibs zxlibs enterprise_clib.lib c128ansi_clib.lib nclibs 
 	excali64_clib.lib gb_clib.lib s1mp3_clib.lib bic.lib myvision_clib.lib pencil2_clib.lib \
 	preempt.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib tvc_clib.lib hemc_clib.lib \
 	kramermc_clib.lib hgmc_clib.lib pmd85_clib.lib vector06c_clib.lib homelab_clib.lib m100_clib.lib \
-	homelab2_clib.lib
+	homelab2_clib.lib primo_clib.lib
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib mbf32.lib mbf64.lib math32.lib gendos.lib ndos.lib  \
 	 lib3d.lib fastmath.lib
@@ -962,6 +962,14 @@ hgmc_clib.lib:
 	@echo ''
 	$(call buildgeneric,hgmc)
 	TARGET=hgmc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORhgmc -x$(OUTPUT_DIRECTORY)/hgmc_clib @$(LISTFILE_DIRECTORY)/hgmc.lst
+
+# Primo A-32/64 - dom
+primo_clib.lib:
+	@echo ''
+	@echo '--- Building Primo A-32/64 Library ---'
+	@echo ''
+	$(call buildgeneric,primo)
+	TARGET=primo TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORprimo -x$(OUTPUT_DIRECTORY)/primo_clib @$(LISTFILE_DIRECTORY)/primo.lst
 
 
 
