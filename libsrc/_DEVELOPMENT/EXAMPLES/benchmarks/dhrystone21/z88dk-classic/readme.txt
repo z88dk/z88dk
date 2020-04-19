@@ -26,7 +26,7 @@ a binary ORGed at address 0 was produced.
 This simplifies the use of TICKS for timing.
 
 new/zsdcc
-zcc +test -vn -compiler=sdcc -SO3 --max-allocs-per-node200000 -DTIMER -D__Z88DK dhry_1.c dhry_2.c -o dhry.bin -lndos -m
+zcc +test -vn -compiler=sdcc -SO3 --max-allocs-per-node200000 -DTIMER -D__Z88DK dhry_1.c dhry_2.c -o dhry.bin -m -lndos
 
 The map file was used to look up symbols "TIMER_START" and "TIMER_STOP".
 These address bounds were given to TICKS to measure execution time.

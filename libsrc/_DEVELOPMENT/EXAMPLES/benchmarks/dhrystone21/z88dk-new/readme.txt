@@ -52,4 +52,4 @@ classic/zsdcc #11566
 cycle count  = 257100263
 time @ 4MHz  = 257100263 / 4x10^6 = 62.2751 seconds
 dhrystones/s = 20000 / 62.2107 = 311.1626
-DMIPS        = 321.4879 / 1757 = 0.1771
+DMIPS        = 311.1626 / 1757 = 0.1771

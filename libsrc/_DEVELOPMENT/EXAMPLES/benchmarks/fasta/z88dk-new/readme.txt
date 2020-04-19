@@ -10,13 +10,13 @@ To verify the correct result compile for the zx spectrum target
 and run in an emulator.
 
 new/sccz80
-zcc +cpm -vn -DSTATIC -DPRINTF -O2 -clib=new fasta.c -o fasta -lm -create-app
+zcc +zx -vn -DSTATIC -DPRINTF -startup=4 -O2 -clib=new fasta.c -o fasta -lm -create-app
 
 new/sccz80/math32
-zcc +cpm -vn -DSTATIC -DPRINTF -O2 -clib=new fasta.c -o fasta --math32 -create-app
+zcc +zx -vn -DSTATIC -DPRINTF -startup=4 -O2 -clib=new fasta.c -o fasta --math32 -create-app
 
 new/zsdcc
-zcc +cpm -vn -DSTATIC -DPRINTF -SO3 -clib=sdcc_iy --max-allocs-per-node200000 --fsigned-char fasta.c -o fasta -lm -create-app
+zcc +zx -vn -DSTATIC -DPRINTF -startup=4 -SO3 -clib=sdcc_iy --max-allocs-per-node200000 --fsigned-char fasta.c -o fasta -lm -create-app
 
 TIMING
 ======
