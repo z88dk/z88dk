@@ -35,7 +35,7 @@ execution time.
 
 A typical invocation of TICKS looked like this:
 
-ticks pi.bin -start 00bb -end 01e9 -counter 9999999999
+z88dk-ticks pi.bin -start 00bb -end 01e9 -counter 9999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex

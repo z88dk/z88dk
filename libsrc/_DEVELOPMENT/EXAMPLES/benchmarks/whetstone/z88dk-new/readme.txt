@@ -44,7 +44,7 @@ These address bounds were given to TICKS to measure execution time.
 
 A typical invocation of TICKS looked like this:
 
-ticks whetstone.bin -start 08bc -end 13be -counter 9999999999
+z88dk-ticks whetstone.bin -start 08bc -end 13be -counter 9999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex

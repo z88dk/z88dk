@@ -42,7 +42,7 @@ These address bounds were given to TICKS to measure execution time.
 
 A typical invocation of TICKS looked like this:
 
-ticks n-body.bin -start 0dc6 -end 0e25 -counter 999999999999
+z88dk-ticks n-body.bin -start 0dc6 -end 0e25 -counter 999999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex

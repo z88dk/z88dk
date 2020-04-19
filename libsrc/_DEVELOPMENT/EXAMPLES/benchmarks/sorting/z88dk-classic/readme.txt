@@ -64,7 +64,7 @@ measure execution time.
 
 A typical invocation of TICKS looked like this:
 
-ticks sort-ran-20.bin -start 0161 -end 0174 -counter 999999999999
+z88dk-ticks sort-ran-20.bin -start 0161 -end 0174 -counter 999999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex

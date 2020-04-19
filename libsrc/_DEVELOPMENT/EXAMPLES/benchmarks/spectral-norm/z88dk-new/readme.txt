@@ -36,7 +36,7 @@ These address bounds were given to TICKS to measure execution time.
 
 A typical invocation of TICKS looked like this:
 
-ticks spectral-norm.bin -start 06d9 -end 0800 -counter 99999999999999
+z88dk-ticks spectral-norm.bin -start 06d9 -end 0800 -counter 99999999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex

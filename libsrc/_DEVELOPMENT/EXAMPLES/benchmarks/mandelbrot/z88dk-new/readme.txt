@@ -33,7 +33,7 @@ measure execution time.
 
 A typical invocation of TICKS looked like this:
 
-ticks mandelbrot.bin -start 0495 -end 075d -counter 999999999999 -output verify.bin
+z88dk-ticks mandelbrot.bin -start 0495 -end 075d -counter 999999999999 -output verify.bin
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
