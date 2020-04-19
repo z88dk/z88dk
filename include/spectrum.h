@@ -335,8 +335,7 @@ extern uint  __LIB__    zx_screenstr_callee(uchar row, uchar col) __smallc __z88
 #define zx_topleft()              fputc_cons(22); fputc_cons(0); fputc_cons(0);
 
 // Print a string on the screen
-extern int printk(char *fmt, ...);
-#define zx_print(s) printk(s)
+extern int zx_printf(char *fmt, ...);
 
 // In the following, screen address refers to a pixel address within the display file while
 // attribute address refers to the attributes area.
