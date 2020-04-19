@@ -328,11 +328,6 @@ extern void  __LIB__  zx_border(uchar colour) __z88dk_fastcall;
 // i can be any of: INK_BLACK, INK_BLUE,... to INK_WHITE
 // p can be any of: PAPER_BLACK, PAPER_BLUE,... to PAPER_WHITE
 extern void  __LIB__  zx_colour(uchar colour) __z88dk_fastcall;
-// Change the paper & ink attrs from now on
-// Param colour must be in the form i | p, where
-// i can be any of: INK_BLACK, INK_BLUE,... to INK_WHITE
-// p can be any of: PAPER_BLACK, PAPER_BLUE,... to PAPER_WHITE
-#define zx_setattr(colour) fputc_cons(16); fputc_cons(48 + (colour & 0x0f)); fputc_cons(17); fputc_cons(48 + (colour >> 3))
 // Change the paper attr from now on
 // i can be any of: INK_BLACK, INK_BLUE,... to INK_WHITE
 #define zx_setink(i) fputc_cons(16); fputc_cons(48 + i)
