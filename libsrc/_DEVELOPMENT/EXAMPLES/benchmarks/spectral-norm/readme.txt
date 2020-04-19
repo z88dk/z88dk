@@ -57,26 +57,26 @@ time @ 4MHz  = 6798318787 / 4*10^6 = 28 min 20 sec
 Very fast float library but only accurate for */+-
 
 2.
-Z88DK March 18, 2017
-zsdcc #9852 / new c library
-3398 bytes less page zero
+Z88DK April 20, 2020
+zsdcc #11566 / new c library
+3358 bytes less page zero
 
 error: 2 * 10^(-9)
 
-cycle count  = 8617066395
-time @ 4MHz  = 8617066395 / 4*10^6 = 35 min 54 sec
+cycle count  = 8628617805
+time @ 4MHz  = 8628617805 / 4*10^6 = 35 min 57 sec
 
 Internal 48-bit float implementation causes relative slowdown.
 
 3.
-Z88DK March 18, 2017
-zsdcc #9852 / classic c library
-3397 bytes less page zero
+Z88DK April 20, 2020
+zsdcc #11566 / classic c library
+3437 bytes less page zero
 
 error: 2 * 10^(-9)
 
-cycle count  = 8628742350
-time @ 4MHz  = 8628742350 / 4*10^6 = 35 min 57 sec
+cycle count  = 8624312042
+time @ 4MHz  = 8624312042 / 4*10^6 = 35 min 56 sec
 
 Internal 48-bit float implementation causes relative slowdown.
 
@@ -90,26 +90,26 @@ cycle count  = 8632065790
 time @ 4MHz  = 8632065790 / 4*10^6 = 35 min 58 sec
 
 5.
-Z88DK March 18, 2017
+Z88DK April 20, 2020
 sccz80 / new c library
-4026 bytes less page zero
+3895 bytes less page zero
 
 error: 2 * 10^(-9)
 
-cycle count  = 9271618782
-time @ 4MHz  = 9271618782 / 4*10^6 = 38 min 38 sec
+cycle count  = 8906227168
+time @ 4MHz  = 8906227168 / 4*10^6 = 37 min 07 sec
 
 48-bit float implementation causes relative slowdown.
 
 6.
-Z88DK March 18, 2017
+Z88DK April 20, 2020
 sccz80 / classic c library
-4106 bytes less page zero
+4137 bytes less page zero
 
 error: 2 * 10^(-9)
 
-cycle count  = 15385384430
-time @ 4MHz  = 15385384430 / 4*10^6 = 64 min 06 sec
+cycle count  = 14688455657
+time @ 4MHz  = 14688455657 / 4*10^6 = 61 min 12 sec
 
 48-bit float implementation causes relative slowdown.
 [Issue #124](https://github.com/z88dk/z88dk/issues/124) Normalization is slow.

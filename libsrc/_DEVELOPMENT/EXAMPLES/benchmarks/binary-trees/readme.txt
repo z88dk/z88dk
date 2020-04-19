@@ -75,20 +75,20 @@ RESULTS
 
 
 1.
-Z88DK March 18, 2017
-zsdcc #9852 / classic c library
-2910 bytes less page zero
+Z88DK April 20, 2020
+zsdcc #11566 / classic c library
+2978 bytes less page zero
 
-cycle count  = 151251680
-time @ 4MHz  = 151251680 / 4*10^6 = 37.81 sec
+cycle count  = 150508687
+time @ 4MHz  = 150508687 / 4*10^6 = 37.63 sec
 
 2.
-Z88DK March 18, 2017
+Z88DK April 20, 2020
 sccz80 / classic c library
-2852 bytes less page zero
+2924 bytes less page zero
 
-cycle count  = 159135288
-time @ 4MHz  = 159135288 / 4*10^6 = 39.78 sec
+cycle count  = 153408086
+time @ 4MHz  = 153408086 / 4*10^6 = 38.52 sec
 
 3.
 SDCC 3.6.5 #9852 (MINGW64)
@@ -107,24 +107,24 @@ cycle count  = 243708728
 time @ 4MHz  = 243708728 / 4x10^6 = 60.93 seconds
 
 5.
-Z88DK March 18, 2017
-zsdcc #9852 / new c library
-2683 bytes less page zero
+Z88DK April 20, 2020
+zsdcc #11566 / new c library
+2689 bytes less page zero
 
-cycle count  = 6574398908
-time @ 4MHz  = 6574398908 / 4*10^6 = 27 min 24 sec
+cycle count  = 6576349618
+time @ 4MHz  = 6576349618 / 4*10^6 = 27 min 24 sec
 
 Issue #113: https://github.com/z88dk/z88dk/issues/113
 Library optimization for fast realloc causes slow free block search
 when a thousand blocks are allocated in this benchmark.
 
 6.
-Z88DK March 18, 2017
+Z88DK April 20, 2020
 sccz80 / new c library
-2733 bytes less page zero
+2711 bytes less page zero
 
-cycle count  = 6588490067
-time @ 4MHz  = 6588490067 / 4*10^6 = 27 min 27 sec
+cycle count  = 6582763903
+time @ 4MHz  = 6582763903 / 4*10^6 = 27 min 25 sec
 
 Issue #113: https://github.com/z88dk/z88dk/issues/113
 Library optimization for fast realloc causes slow free block search

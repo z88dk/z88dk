@@ -50,17 +50,17 @@ RESULT
 PI.C
 
 
-Z88DK March 18, 2017
+Z88DK April 20, 2020
 sccz80 / classic c library
-6387 bytes less page zero
+6508 bytes less page zero
 
-cycle count  = 5391508326
-time @ 4MHz  = 5391508326 / 4*10^6 = 22 min 29 sec
+cycle count  = 4012440830
+time @ 4MHz  = 4012440830 / 4*10^6 = 16 min 43 sec
 
 
-Z88DK March 18, 2017
-zsdcc #9852 / classic c library
-6484 bytes less page zero
+Z88DK April 20, 2020
+zsdcc #11566 / classic c library
+6600 bytes less page zero
 
-cycle count  = 5377063339
-time @ 4MHz  = 5377063339 / 4*10^6 = 22 min 24 sec
+cycle count  = 4169137078
+time @ 4MHz  = 4169137078 / 4*10^6 = 17 min 22 sec

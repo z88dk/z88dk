@@ -9,7 +9,7 @@ VERIFY CORRECT RESULT
 To verify the correct result compile for the zx spectrum target
 and run in an emulator.
 
-new/sccz80/FAILS UNABLE TO COMPILE
+new/sccz80
 zcc +zx -vn -DSTATIC -DPRINTF -O2 -clib=new n-body.c -o n-body -lm -create-app
 
 new/zsdcc
@@ -25,7 +25,7 @@ a binary ORGed at address 0 was produced.
 
 This simplifies the use of TICKS for timing.
 
-new/sccz80/FAILS UNABLE TO COMPILE
+new/sccz80
 zcc +z80 -vn -DSTATIC -DTIMER -startup=0 -O2 -clib=new n-body.c -o n-body -lm -m -pragma-include:zpragma.inc -create-app
 
 new/zsdcc
@@ -48,12 +48,23 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-Z88DK March 18, 2017
-zsdcc #9852 / new
-4191 bytes less page zero
+Z88DK April 20, 2020
+zsdcc #11566 / new
+4356 bytes less page zero
 
 first number error : 5 * 10^(-8)
 second number error: 1 * 10^(-4)
 
-cycle count  = 2244963926
-time @ 4MHz  = 2244963926 / 4*10^6 = 9 min 21 sec
+cycle count  = 2247600377
+time @ 4MHz  = 2247600377 / 4*10^6 = 9 min 22 sec
+
+
+Z88DK April 20, 2020
+sccz80 / new
+3244 bytes less page zero
+
+first number error : 5 * 10^(-8)
+second number error: 1 * 10^(-8)
+
+cycle count  = 2374676379
+time @ 4MHz  = 2374676379 / 4*10^6 = 9 min 54 sec

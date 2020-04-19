@@ -50,17 +50,17 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-Z88DK March 2, 2017
-ZSDCC #9833
+Z88DK April 20, 2020
+sccz80 / new c library
+8362 bytes less page zero
 
-new/sccz80
-8414 bytes less page zero
+cycle count  = 4957733
+time @ 4MHz  = 4957733 / 4*10^6 = 1.2394 sec
 
-cycle count  = 5894225
-time @ 4MHz  = 5894225 / 4*10^6 = 1.4736 sec
 
-new/zsdcc
-8312 bytes less page zero
+Z88DK April 20, 2020
+zsdcc #11566 / new c library
+8315 bytes less page zero
 
-cycle count  = 3663646
-time @ 4MHZ  = 3663646 / 4*10^6 = 0.9159 sec
+cycle count  = 3665494
+time @ 4MHZ  = 3665494 / 4*10^6 = 0.9163 sec

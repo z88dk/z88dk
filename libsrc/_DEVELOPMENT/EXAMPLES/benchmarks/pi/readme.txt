@@ -62,50 +62,50 @@ RESULTS - PI.C (NO LDIV)
 1.
 Z88DK March 2, 2017
 sccz80 / new c library / fast int math
-9018 bytes less page zero
+8999 bytes less page zero
 
-cycle count  = 1708903088
-time @ 4MHz  = 1708903088 / 4*10^6 = 7 min 07 sec
+cycle count  = 1696878309
+time @ 4MHz  = 1696878309 / 4*10^6 =  7 min 04 sec
 
 2.
-Z88DK March 2, 2017
-zsdcc #9833 / new c library / fast int math
+Z88DK April 20, 2020
+zsdcc #11566 / new c library / fast int math
 8997 bytes less page zero
 
-cycle count  = 1739403552
-time @ 4MHz  = 1739403552 / 4*10^6 = 7 min 15 sec
+cycle count  = 1756864232
+time @ 4MHz  = 1756864232 / 4*10^6 =  7 min 19 sec
 
 3.
-Z88DK March 2, 2017
+Z88DK April 20, 2020
 sccz80 / new c library / small int math
 6269 bytes less page zero
 
-cycle count  = 5246791210
-time @ 4MHz  = 5246791210 / 4*10^6 = 21 min 52 sec
+cycle count  = 4012440735
+time @ 4MHz  = 4012440735 / 4*10^6 = 17 min 43 sec
 
 4.
-Z88DK March 2, 2017
-zsdcc #9833 / new c library / small int math
+Z88DK April 20, 2020
+zsdcc #11566 / new c library / small int math
 6246 bytes less page zero
 
-cycle count  = 5278798872
-time @ 4MHz  = 5278798872 / 4*10^6 = 22 min 00 sec
+cycle count  = 4067517071
+time @ 4MHz  = 4067517071 / 4*10^6 = 16 min 57 sec
 
 5.
-Z88DK March 18, 2017
-zsdcc #9852 / classic c library
-6484 bytes less page zero
+Z88DK April 20, 2020
+zsdcc #11566 / classic c library
+6600 bytes less page zero
 
-cycle count  = 5377063339
-time @ 4MHz  = 5377063339 / 4*10^6 = 22 min 24 sec
+cycle count  = 4169137078
+time @ 4MHz  = 4169137078 / 4*10^6 = 17 min 22 sec
 
 6.
-Z88DK March 18, 2017
+Z88DK April 20, 2020
 sccz80 / classic c library
-6387 bytes less page zero
+6508 bytes less page zero
 
-cycle count  = 5391508326
-time @ 4MHz  = 5391508326 / 4*10^6 = 22 min 29 sec
+cycle count  = 4012440830
+time @ 4MHz  = 4012440830 / 4*10^6 = 16 min 43 sec
 
 7.
 HITECH C MSDOS V750
@@ -144,36 +144,36 @@ RESULTS - PI_LDIV.C (LDIV USED)
 ===============================
 
 1.
-Z88DK March 2, 2017
+Z88DK April 4, 2020
 sccz80 / new c library / fast int math
 9131 bytes less page zero
 
-cycle count  = 1313857712
-time @ 4MHz  = 1313857712 / 4*10^6 = 5 min 28 sec
+cycle count  = 1301832933
+time @ 4MHz  = 1301832933 / 4*10^6 =  5 min 25 sec
 
 2.
-Z88DK March 2, 2017
-zsdcc #9833 / new c library / fast int math
+Z88DK April 4, 2020
+zsdcc #11566 / new c library / fast int math
 9097 bytes less page zero
 
-cycle count  = 1328865976
-time @ 4MHz  = 1328865976 / 4*10^6 = 5 min 32 sec
+cycle count  = 1339849656
+time @ 4MHz  = 1339849656 / 4*10^6 =  5 min 35 sec
 
 3.
-Z88DK March 2, 2017
+Z88DK April 20, 2020
 sccz80 / new c library / small int math
-6382 bytes less page zero
+6400 bytes less page zero
 
-cycle count  = 3810732458
-time @ 4MHz  = 3810732458 / 4*10^6 = 15 min 53 sec
+cycle count  = 2576381983
+time @ 4MHz  = 2576381983 / 4*10^6 = 10 min 44 sec
 
 4.
-Z88DK March 2, 2017
-zsdcc #9833 / new c library / small int math
-6348 bytes less page zero
+Z88DK April 20, 2020
+zsdcc #11566 / new c library / small int math
+6388 bytes less page zero
 
-cycle count  = 3827247920
-time @ 4MHz  = 3827247920 / 4*10^6 = 15 min 57 sec
+cycle count  = 2609489119
+time @ 4MHz  = 2609489119 / 4*10^6 = 10 min 52 sec
 
 5.
 HITECH C MSDOS V750

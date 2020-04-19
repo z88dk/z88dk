@@ -15,6 +15,9 @@ zcc +zx -vn -startup=4 -clib=new -O2 -DSTATIC -DTIMER -DPRINTOUT whetstone.c -o 
 new/zsdcc/math48 : 40 bit mantissa internal, 24 bit mantissa presented by compiler
 zcc +zx -vn -startup=4 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 -DSTATIC -DTIMER -DPRINTOUT whetstone.c -o whetstone -lm -m -create-app
 
+new/zsdcc/math32: 24 bit mantissa
+zcc +cpm -vn -clib=sdcc_iy -SO3 --max-allocs-per-node200000 -DSTATIC -DTIMER -DPRINTOUT whetstone.c -o whetstone --math32 -m -create-app
+
 (These compile settings were found to give the best results).
 
 Compiles matched expected results exactly.
@@ -33,6 +36,9 @@ zcc +z80 -vn -startup=0 -clib=new -O2 -DSTATIC -DTIMER whetstone.c -o whetstone 
 new/zsdcc/math48 : 40 bit mantissa internal, 24 bit mantissa presented by compiler
 zcc +z80 -vn -startup=0 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 -DSTATIC -DTIMER whetstone.c -o whetstone -lm -m -pragma-include:zpragma.inc -create-app
 
+new/zsdcc/math32 : 24 bit mantissa
+zcc +z80 -vn -startup=0 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 -DSTATIC -DTIMER whetstone.c -o whetstone --math32 -m -pragma-include:zpragma.inc -create-app
+
 The map file was used to look up symbols "TIMER_START" and "TIMER_STOP".
 These address bounds were given to TICKS to measure execution time.
 
@@ -50,23 +56,34 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-Z88DK March 2, 2017
-ZSDCC #9833
-
-new/sccz80/math48
-5483 bytes less page zero
+Z88DK April 20, 2020
+sccz80 / new c library / math48
 40 bit mantissa + 8 bit exponent
+5388 bytes less page zero
 
-cycle count  = 970198993
-time @ 4MHz  = 970198993 / 4x10^6 = 242.5497  seconds
-KWIPS        = 100*10*1 / 242.5497 = 4.1229
-MWIPS        = 4.1229 / 1000 = 0.0041229
+cycle count  = 973210939
+time @ 4MHz  = 973210939 / 4x10^6 = 243.3027 seconds
+KWIPS        = 100*10*1 / 243.3027 = 4.1101
+MWIPS        = 4.1101 / 1000 = 0.0041101
 
-new/zsdcc/math48
-6153 bytes less page zero
+
+Z88DK April 20, 2020
+zsdcc #11566 / new c library / math48
 40 bit mantissa + 8 bit exponent internal, 24 bit mantissa + 8 bit exponent exposed by compiler
+6234 bytes less page zero
 
-cycle count  = 916537242
-time @ 4MHz  = 916537242 / 4x10^6 = 229.1343 seconds
-KWIPS        = 100*10*1 / 229.1343 = 4.3643
-MWIPS        = 4.3643 / 1000 = 0.0043643
+cycle count  = 916707945
+time @ 4MHz  = 916707945 / 4x10^6 = 229.1770 seconds
+KWIPS        = 100*10*1 / 229.1770 = 4.3634
+MWIPS        = 4.3634 / 1000 = 0.0043634
+
+
+Z88DK April 20, 2020
+zsdcc #11566 / new c library / math32
+24 bit mantissa + 8 bit exponent
+9578 bytes less page zero
+
+cycle count  = 844247586
+time @ 4MHz  = 844247586 / 4x10^6 = 211.0619 seconds
+KWIPS        = 100*10*1 / 211.0619 = 4.7379
+MWIPS        = 4.7379 / 1000 = 0.0047379

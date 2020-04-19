@@ -62,12 +62,12 @@ cycle count  = 223805149
 time @ 4MHz  = 223805149 / 4x10^6 = 55.95 sec
 
 3.
-Z88DK March 18, 2017
-zsdcc #9852 / new c library
-3144 bytes less page zero
+Z88DK April 20, 2020
+zsdcc #11566 / new c library
+3171 bytes less page zero
 
-cycle count  = 251825519
-time @ 4MHz  = 251825519 / 4*10^6 = 62.96 sec
+cycle count  = 245055005
+time @ 4MHz  = 245055005 / 4*10^6 = 61.26 sec
 
 Internal 48-bit float implementation causes relative slowdown.
 
@@ -90,6 +90,44 @@ time @ 4MHz  = 488970702 / 4*10^6 = 122.24 sec
 
 Large size & slow speed largely due to float implementation in C.
 Bugged -DSTATIC prevents potentially faster version from compiling.
+
+6.
+Z88DK April 20, 2020
+sccz80 / classic c library
+3291 bytes less page zero
+
+cycle count  = 243021012
+time @ 4MHz  = 243021012 / 4*10^6 = 60.76 sec
+
+Internal 48-bit float implementation causes relative slowdown.
+
+7.
+Z88DK April 20, 2020
+sccz80 / classic c library / math32
+3978 bytes less page zero
+
+cycle count  = 136057474
+time @ 4MHz  = 136057474 / 4*10^6 = 34.01 sec
+
+IEEE 32-bit float implementation.
+
+8.
+Z88DK April 20, 2020
+sccz80 / new c library
+2998 bytes less page zero
+
+cycle count  = 204281085
+time @ 4MHz  = 204281085 / 4*10^6 = 51.07 sec
+
+9.
+Z88DK April 20, 2020
+sccz80 / new c library / math32
+3729 bytes less page zero
+
+cycle count  = 136057141
+time @ 4MHz  = 136057141 / 4*10^6 = 34.01 sec
+
+IEEE 32-bit float implementation.
 
 DQ.
 HITECH C MSDOS V750

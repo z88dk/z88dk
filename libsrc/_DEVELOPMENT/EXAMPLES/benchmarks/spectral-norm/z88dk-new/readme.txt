@@ -48,21 +48,21 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-Z88DK March 18, 2017
-zsdcc #9852 / new c library
-3398 bytes less page zero
+Z88DK April 20, 2020
+zsdcc #11566 / new c library
+3358 bytes less page zero
 
 error: 2 * 10^(-9)
 
-cycle count  = 8617066395
-time @ 4MHz  = 8617066395 / 4*10^6 = 35 min 54 sec
+cycle count  = 8628617805
+time @ 4MHz  = 8628617805 / 4*10^6 = 35 min 57 sec
 
 
-Z88DK March 18, 2017
+Z88DK April 20, 2020
 sccz80 / new c library
-4026 bytes less page zero
+3895 bytes less page zero
 
 error: 2 * 10^(-9)
 
-cycle count  = 9271618782
-time @ 4MHz  = 9271618782 / 4*10^6 = 38 min 38 sec
+cycle count  = 8906227168
+time @ 4MHz  = 8906227168 / 4*10^6 = 37 min 07 sec
