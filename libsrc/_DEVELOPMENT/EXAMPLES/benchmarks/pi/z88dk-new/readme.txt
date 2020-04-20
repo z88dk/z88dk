@@ -96,7 +96,7 @@ execution time.
 
 A typical invocation of TICKS looked like this:
 
-ticks pi.bin -start 01a8 -end 0318 -counter 9999999999
+z88dk-ticks pi.bin -start 01a8 -end 0318 -counter 9999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
@@ -134,24 +134,24 @@ new/sccz80/fast (8999 bytes less page zero)
 
 cycle count  = 1708903088 (March 2, 2017)
 cycle count  = 1696878309 (April 4, 2020)
-time @ 4MHz  = 1696878309 / 4*10^6 = 7 min 04 sec
+time @ 4MHz  = 1696878309 / 4*10^6 =  7 min 04 sec
 
 new/zsdcc/fast (8997 bytes less page zero)
 
 cycle count  = 1739403552 (March 2, 2017, ZSDCC #9833)
 cycle count  = 1756864232 (April 4, 2020, ZSDCC #11556)
-time @ 4MHz  = 1756864232 / 4*10^6 = 7 min 19 sec
+time @ 4MHz  = 1756864232 / 4*10^6 =  7 min 19 sec
 
 
 PI_LDIV.C
 
-new/sccz80/small (6382 bytes less page zero)
+new/sccz80/small (6400 bytes less page zero)
 
 cycle count  = 3810732458 (March 2, 2017)
 cycle count  = 2576381983 (April 4, 2020)
 time @ 4MHz  = 2576381983 / 4*10^6 = 10 min 44 sec
 
-new/zsdcc/small (6348 bytes less page zero)
+new/zsdcc/small (6388 bytes less page zero)
 
 cycle count  = 3827247920 (March 2, 2017, ZSDCC #9833) 
 cycle count  = 2609489119 (April 4, 2020, ZSDCC #11556)
@@ -161,10 +161,10 @@ new/sccz80/fast (9131 bytes less page zero)
 
 cycle count  = 1313857712 (March 2, 2017)
 cycle count  = 1301832933 (April 4, 2020)
-time @ 4MHz  = 1301832933 / 4*10^6 = 5 min 25 sec
+time @ 4MHz  = 1301832933 / 4*10^6 =  5 min 25 sec
 
 new/zsdcc/fast (9097 bytes less page zero)
 
 cycle count  = 1328865976 (March 2, 2017, ZSDCC #9833)
 cycle count  = 1339849656 (April 4, 2020, ZSDCC #11556)
-time @ 4MHz  = 1339849656 / 4*10^6 = 5 min 35 sec
+time @ 4MHz  = 1339849656 / 4*10^6 =  5 min 35 sec

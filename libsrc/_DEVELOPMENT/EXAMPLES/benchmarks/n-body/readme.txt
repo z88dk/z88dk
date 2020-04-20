@@ -52,15 +52,15 @@ RESULTS
 =======
 
 1.
-Z88DK March 18, 2017
-zsdcc #9852 / new c library
-4191 bytes less page zero
+Z88DK April 20, 2020
+zsdcc #11566 / new c library
+4356 bytes less page zero
 
 first number error : 5 * 10^(-8)
 second number error: 1 * 10^(-4)
 
-cycle count  = 2244963926
-time @ 4MHz  = 2244963926 / 4*10^6 = 9 min 21 sec
+cycle count  = 2247600377
+time @ 4MHz  = 2247600377 / 4*10^6 = 9 min 22 sec
 
 Internal 48-bit float implementation causes relative slowdown.
 
@@ -98,6 +98,45 @@ cycle count  = 5306393684
 time @ 4MHz  = 5306393684 / 4*10^6 = 22 min 07 sec
 
 Slow speed & large size due to float implementation in C.
+
+5.
+Z88DK April 20, 2020
+sccz80 / classic c library
+3814 bytes less page zero
+
+first number error : 5 * 10^(-8)
+second number error: 1 * 10^(-8)
+
+cycle count  = 3624577433
+time @ 4MHz  = 3624577433 / 4*10^6 = 15 min 06 sec
+
+Internal 48-bit float implementation causes relative slowdown.
+
+6.
+Z88DK April 20, 2020
+sccz80 / new c library
+3244 bytes less page zero
+
+first number error : 5 * 10^(-8)
+second number error: 1 * 10^(-8)
+
+cycle count  = 2374676379
+time @ 4MHz  = 2374676379 / 4*10^6 = 9 min 54 sec
+
+Internal 48-bit float implementation causes relative slowdown.
+
+7.
+Z88DK April 20, 2020
+sccz80 / classic c library / math32
+5333 bytes less page zero
+
+first number error : 1 * 10^(-7)
+second number error: 1 * 10^(-6)
+
+cycle count  = 1358606369
+time @ 4MHz  = 1358606369 / 4*10^6 =  5 min 40 sec
+
+IEEE 32-bit float implementation, accurate to 7 significant digits.
 
 DQ.
 HITECH C CPM V309

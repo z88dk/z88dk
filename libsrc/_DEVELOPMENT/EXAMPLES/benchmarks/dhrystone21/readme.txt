@@ -90,24 +90,24 @@ RESULTS
 =======
 
 1.
-Z88DK March 18, 2017
-zsdcc #9852 / classic c library
-7265 bytes less page zero
+Z88DK April 20, 2020
+zsdcc #11566 / classic c library
+7344 bytes less page zero
 
-cycle count  = 247720320
-time @ 4MHz  = 247720320 / 4x10^6 = 61.9301  seconds
-dhrystones/s = 20000 / 61.9301 = 322.9448
-DMIPS        = 322.9448 / 1757 = 0.18380
+cycle count  = 248080263
+time @ 4MHz  = 248080263 / 4x10^6 = 62.0201 seconds
+dhrystones/s = 20000 / 62.0201 = 322.4763
+DMIPS        = 322.4763 / 1757 = 0.18354
 
 2.
-Z88DK March 18, 2017
-zsdcc #9852 / new c library
-7124 bytes less page zero
+Z88DK April 20, 2020
+zsdcc #11566 / new c library
+7163 bytes less page zero
 
-cycle count  = 248842927
-time @ 4MHz  = 248842927 / 4x10^6 = 62.2107  seconds
-dhrystones/s = 20000 / 62.2107 = 321.4879
-DMIPS        = 321.4879 / 1757 = 0.18298
+cycle count  = 257100263
+time @ 4MHz  = 257100263 / 4x10^6 = 62.2751  seconds
+dhrystones/s = 20000 / 62.2107 = 311.1626
+DMIPS        = 311.1626 / 1757 = 0.1771
 
 3.
 HITECH C MSDOS V750

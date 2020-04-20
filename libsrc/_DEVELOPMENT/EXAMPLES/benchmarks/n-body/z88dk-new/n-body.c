@@ -114,7 +114,7 @@ void offset_momentum(int nbodies, struct planet * bodies)
 {
   STATIC double px, py, pz;
   STATIC int i;
-  
+
   px = py = pz = 0.0;
   for (i = 0; i < nbodies; i++) {
     px += bodies[i].vx * bodies[i].mass;
@@ -193,7 +193,7 @@ int main(int argc, char ** argv)
 {
   int i;
   int n = 1000;
-  
+
 #ifdef COMMAND
   n = atoi(argv[1]);
 #endif

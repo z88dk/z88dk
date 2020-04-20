@@ -11,6 +11,9 @@ Compilation:
 new/sccz80
 zcc +z80 -vn -DSTATIC -DTIMER -startup=0 -O2 -clib=new mandelbrot.c -o mandelbrot -lm -m -pragma-include:zpragma.inc -create-app
 
+new/sccz80
+zcc +z80 -vn -DSTATIC -DTIMER -startup=0 -O2 -clib=new mandelbrot.c -o mandelbrot --math32 -m -pragma-include:zpragma.inc -create-app
+
 new/zsdcc
 zcc +z80 -vn -DSTATIC -DTIMER -startup=0 -SO3 -clib=sdcc_iy --max-allocs-per-node200000 mandelbrot.c -o mandelbrot -lm -m -pragma-include:zpragma.inc -create-app
 
@@ -30,7 +33,7 @@ measure execution time.
 
 A typical invocation of TICKS looked like this:
 
-ticks mandelbrot.bin -start 0495 -end 075d -counter 999999999999 -output verify.bin
+z88dk-ticks mandelbrot.bin -start 0495 -end 075d -counter 999999999999 -output verify.bin
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
@@ -52,17 +55,25 @@ the images to address 16384 to see a visual representation.
 RESULT
 ======
 
-Z88DK March 18, 2017
-zsdcc #9852 / new
-1953 bytes less page zero
+Z88DK April 20, 2020
+zsdcc #11566 / new
+1939 bytes less page zero
 
-cycle count  = 3734872448
-time @ 4MHz  = 3734872448 / 4*10^6 = 15 min 34 sec
+cycle count  = 3736280696
+time @ 4MHz  = 3736280696 / 4*10^6 = 15 min 34 sec
 
 
-Z88DK March 18, 2017
+Z88DK April 20, 2020
 sccz80 / new
-2013 bytes less page zero
+1826 bytes less page zero
 
-cycle count  = 3853108866
-time @ 4MHz  = 3853108866 / 4*10^6 = 16 min 03 sec
+cycle count  = 3265477446
+time @ 4MHz  = 3265477446 / 4*10^6 = 13 min 36 sec
+
+
+Z88DK April 20, 2020
+sccz80 / new / math32
+3651 bytes less page zero
+
+cycle count  = 1519179681
+time @ 4MHz  = 1519179681 / 4*10^6 =  6 min 20 sec

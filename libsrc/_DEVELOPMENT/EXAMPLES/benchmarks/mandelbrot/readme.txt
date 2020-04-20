@@ -82,42 +82,42 @@ cycle count  = 3256695469
 time @ 4MHz  = 3256695469 / 4x10^6 = 13 min 34 sec
 
 3.
-Z88DK March 18, 2017
-zsdcc #9852 / new c library
-1953 bytes less page zero
+Z88DK April 20, 2020
+zsdcc #11566 / new c library
+1939 bytes less page zero
 
-cycle count  = 3734872448
-time @ 4MHz  = 3734872448 / 4*10^6 = 15 min 34 sec
+cycle count  = 3736280696
+time @ 4MHz  = 3736280696 / 4*10^6 = 15 min 34 sec
 
 Internal 48-bit float implementation causes relative slowdown.
 
 4.
-Z88DK March 18, 2017
-zsdcc #9852 / classic c library
-2303 bytes less page zero
+Z88DK April 20, 2020
+zsdcc #11566 / classic c library
+2356 bytes less page zero
 
-cycle count  = 3781297645
-time @ 4MHz  = 3781297645 / 4*10^6 = 15 min 45 sec
+cycle count  = 3783223422
+time @ 4MHz  = 3783223422 / 4*10^6 = 15 min 45 sec
 
 Internal 48-bit float implementation causes relative slowdown.
 
 5.
-Z88DK March 18, 2017
+Z88DK April 20, 2020
 sccz80 / new c library
-2013 bytes less page zero
+1826 bytes less page zero
 
-cycle count  = 3853108866
-time @ 4MHz  = 3853108866 / 4*10^6 = 16 min 03 sec
+cycle count  = 3265477446
+time @ 4MHz  = 3265477446 / 4*10^6 = 13 min 36 sec
 
 48-bit float implementation causes relative slowdown.
 
 6.
-Z88DK March 18, 2017
+Z88DK April 20, 2020
 sccz80 / classic c library
-2148 bytes less page zero
+2108 bytes less page zero
 
-cycle count  = 4409687319
-time @ 4MHz  = 4409687319 / 4*10^6 = 18 min 22 sec
+cycle count  = 3591216622
+time @ 4MHz  = 3591216622 / 4*10^6 = 14 min 57 sec
 
 48-bit float implementation causes relative slowdown.
 
@@ -129,6 +129,26 @@ cycle count  = 10863431873
 time @ 4MHz  = 10863431873 / 4*10^6 = 45 min 16 sec
 
 Large size & slow speed largely due to float implementation in C.
+
+8.
+Z88DK April 20, 2020
+sccz80 / classic c library / math32
+3859 bytes less page zero
+
+cycle count  = 1519179081
+time @ 4MHz  = 1519179081 / 4*10^6 =  6 min 20 sec
+
+IEEE 32-bit float implementation.
+
+9.
+Z88DK April 20, 2020
+sccz80 / new c library / math32
+3651 bytes less page zero
+
+cycle count  = 1519179681
+time @ 4MHz  = 1519179681 / 4*10^6 =  6 min 20 sec
+
+IEEE 32-bit float implementation.
 
 DQ.
 HITECH C MSDOS V750

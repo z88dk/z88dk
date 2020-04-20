@@ -50,23 +50,23 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-Z88DK March 18, 2017
+Z88DK April 20, 2020
 classic/sccz80/genmath
-5715 bytes less page zero
 40 bit mantissa + 8 bit exponent
 
-cycle count  = 1288407230
-time @ 4MHz  = 1288407230 / 4x10^6 = 322.1018  seconds
-KWIPS        = 100*10*1 / 322.1018 = 3.1046
-MWIPS        = 3.1046 / 1000 = 0.0031046
+5744 bytes less page zero
+cycle count  = 1280818856
+time @ 4MHz  = 1280818856 / 4x10^6 = 320.2047 seconds
+KWIPS        = 100*10*1 / 322.1018 = 3.1230
+MWIPS        = 3.1230 / 1000 = 0.0031230
 
 
-Z88DK March 18, 2017
-classic/zsdcc #9852/math48
-7049 bytes less page zero
+Z88DK April 20, 2020
+classic/zsdcc #11566/math48
 40 bit mantissa + 8 bit exponent internal, 24 bit mantissa + 8 bit exponent exposed by compiler
+7045 bytes less page zero
 
-cycle count  = 920888959
-time @ 4MHz  = 920888959 / 4x10^6 = 230.2222 seconds
-KWIPS        = 100*10*1 / 230.2222 = 4.3436
-MWIPS        = 4.3436 / 1000 = 0.0043436
+cycle count  = 921228352
+time @ 4MHz  = 921228352 / 4x10^6 = 230.3071 seconds
+KWIPS        = 100*10*1 / 230.3071 = 4.3420
+MWIPS        = 4.3420 / 1000 = 0.0043420
