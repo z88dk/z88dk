@@ -317,6 +317,8 @@ extern void __LIB__   in_MouseKempSetPos_callee(uint xcoord, uint ycoord) __smal
 // DISPLAY FILE FUNCTIONS
 //////////////////////////
 
+// NOTE: remember to compile with -pragma-define:CLIB_CONIO_NATIVE_COLOUR=1
+// in order to use INK_BLACK to INK_WHITE and PAPER_BLACK to PAPER_WHITE.
 // Clear the screen
 #define zx_cls()                  fputc_cons(12)
 
@@ -330,9 +332,19 @@ extern void __LIB__   in_MouseKempSetPos_callee(uint xcoord, uint ycoord) __smal
 #define zx_setattrinverse(b)      fputc_cons(20); fputc_cons((b)? 49: 48)
 
 // Set the border color
+// Param colour can be any of: INK_BLACK, INK_BLUE,... to INK_WHITE
 extern void  __LIB__  zx_border(uchar colour) __z88dk_fastcall;
 // Quickly set the whole screen color attributes
+// Param colour must be in the form i | p, where
+// i can be any of: INK_BLACK, INK_BLUE,... to INK_WHITE
+// p can be any of: PAPER_BLACK, PAPER_BLUE,... to PAPER_WHITE
 extern void  __LIB__  zx_colour(uchar colour) __z88dk_fastcall;
+// Change the paper attr from now on
+// i can be any of: INK_BLACK, INK_BLUE,... to INK_WHITE
+#define zx_setink(i) fputc_cons(16); fputc_cons(48 + i)
+// Change the paper attr from now on
+// p can be any of: INK_BLACK, INK_BLUE,... to INK_WHITE
+#define zx_setpaper(p) fputc_cons(17); fputc_cons(48 + i)
 // Get color attribute at given position
 extern uint  __LIB__              zx_attr(uchar row, uchar col) __smallc;
 extern uint  __LIB__              zx_screenstr(uchar row, uchar col) __smallc;
