@@ -2,6 +2,7 @@
 
 	MODULE generic_console_zxn
 
+	SECTION	code_clib
 	PUBLIC generic_console_zxn_tile_printc
 	PUBLIC generic_console_zxn_tile_cls
 	PUBLIC generic_console_zxn_tile_vpeek

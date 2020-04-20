@@ -319,6 +319,17 @@ extern void __LIB__   in_MouseKempSetPos_callee(uint xcoord, uint ycoord) __smal
 
 // NOTE: remember to compile with -pragma-define:CLIB_CONIO_NATIVE_COLOUR=1
 // in order to use INK_BLACK to INK_WHITE and PAPER_BLACK to PAPER_WHITE.
+// Clear the screen
+#define zx_cls()                  fputc_cons(12)
+
+// Set or unset the flash attribute for now on
+#define zx_setattrflash(b)        fputc_cons(18); fputc_cons((b)? 49: 48)
+
+// Set or unset the bright attribute for now on
+#define zx_setattrbright(b)       fputc_cons(19); fputc_cons((b)? 49: 48)
+
+// Set or unset the inverse attribute for now on
+#define zx_setattrinverse(b)      fputc_cons(20); fputc_cons((b)? 49: 48)
 
 // Set the border color
 // Param colour can be any of: INK_BLACK, INK_BLUE,... to INK_WHITE
@@ -344,7 +355,13 @@ extern uint  __LIB__    zx_screenstr_callee(uchar row, uchar col) __smallc __z88
 #define zx_attr(a,b)              zx_attr_callee(a,b)
 #define zx_screenstr(a,b)         zx_screenstr_callee(a,b)
 
-#define zx_setcursorpos(a,b)      fputc_cons(22); fputc_cons(a); fputc_cons(b);
+// Sets the cursor position on screen
+// Remember to add 32 to both the desired row & col.
+#define zx_setcursorpos(row,col)      fputc_cons(22); fputc_cons(row); fputc_cons(col);
+
+// Sets the cursor position on screen
+#define zx_movecursorto(row,col)      fputc_cons(22); fputc_cons(row + 32); fputc_cons(col + 32)
+
 #define zx_topleft()              fputc_cons(22); fputc_cons(0); fputc_cons(0);
 
 // In the following, screen address refers to a pixel address within the display file while

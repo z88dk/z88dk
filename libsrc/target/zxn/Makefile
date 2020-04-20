@@ -2,11 +2,7 @@ include ../../Make.config
 
 TARGET ?= zxn
 
-SUBDIRS = newlib graphics
-
-ifeq ($(TARGET),zx)
-  SUBDIRS += fzx fcntl rs232
-endif
+SUBDIRS = newlib 
 
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 

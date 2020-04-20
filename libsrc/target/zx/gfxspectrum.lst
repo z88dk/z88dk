@@ -1,3 +1,13 @@
+target/zx-common/graphics/obj/zx/plotpixl
+target/zx-common/graphics/obj/zx/plot_MODE0
+target/zx-common/graphics/obj/zx/respixl
+target/zx-common/graphics/obj/zx/res_MODE0
+target/zx-common/graphics/obj/zx/xorpixl
+target/zx-common/graphics/obj/zx/xor_MODE0
+target/zx-common/graphics/obj/zx/pointxy
+target/zx-common/graphics/obj/zx/pointxy_MODE0
+target/zx-common/graphics/obj/zx/__set_zx_pixel_colour
+target/zx-common/graphics/obj/zx/pixladdr_MODE0
 target/zx/graphics/clg
 target/zx/graphics/clrarea2
 target/zx/graphics/putsprite

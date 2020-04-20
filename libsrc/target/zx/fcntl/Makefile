@@ -1,4 +1,4 @@
-SUBDIRS = microdrive plus3 zxbasdrv esxdos
+SUBDIRS = microdrive plus3 zxbasdrv 
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
 include ../../../Make.config

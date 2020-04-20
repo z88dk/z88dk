@@ -184,6 +184,7 @@ zx_clib.lib:
 	@echo ''
 	$(call buildgeneric,zx)
 	$(MAKE) -C target/zx 
+	$(MAKE) -C target/zx-common TARGET=zx
 	$(MAKE) -C games TARGET=zx
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zx_clib @$(LISTFILE_DIRECTORY)/zx.lst
 	TARGET=zx TYPE=z80 $(LIBLINKER) -DFORzx $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zxcpm @$(LISTFILE_DIRECTORY)/target/zx/zx_cpm.lst
@@ -194,6 +195,7 @@ zxn_clib.lib:
 	@echo ''
 	$(call buildgeneric,zxn,wide)
 	$(MAKE) -C target/zx TARGET=zxn
+	$(MAKE) -C target/zx-common TARGET=zxn
 	$(MAKE) -C games TARGET=zxn
 	$(MAKE) -C target/zxn TARGET=zxn
 	TARGET=zxn TYPE=z80n $(LIBLINKER) -mz80n -DFORzxn -DSTANDARDESCAPECHARS $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zxn_clib @$(LISTFILE_DIRECTORY)/zxn.lst
@@ -209,7 +211,7 @@ ts2068_clib.lib:
 	$(MAKE) -C games TARGET=ts2068
 	$(MAKE) -C target/zx TARGET=ts2068
 	$(MAKE) -C target/ts2068 TARGET=ts2068
-	$(MAKE) -C target/zxn/graphics TARGET=ts2068
+	$(MAKE) -C target/zx-common TARGET=ts2068
 	TARGET=ts2068 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORzx -DFORts2068 -DA80COL -x$(OUTPUT_DIRECTORY)/ts2068_clib @$(LISTFILE_DIRECTORY)/ts2068.lst
 
 # ZXROM - stefano

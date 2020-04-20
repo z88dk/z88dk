@@ -1,6 +1,6 @@
 include ../../Make.config
 
-TARGET ?= ts2069
+TARGET ?= ts2068
 
 SUBDIRS = newlib
 

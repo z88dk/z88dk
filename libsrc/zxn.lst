@@ -12,6 +12,7 @@ target/zx/games/obj/${TARGET}/bit_open
 target/zx/games/obj/${TARGET}/bit_open_di
 target/zx/games/obj/${TARGET}/bit_close
 target/zx/games/obj/${TARGET}/bit_close_ei
+@target/zx-common/timex_zxn_graphics.lst
 @games/games.lst
 @target/zx/spectrum.lst
 @target/zx/fzx/fzx.lst

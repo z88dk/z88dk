@@ -18,4 +18,5 @@ dirs:
 	@mkdir -p obj/z80 
 
 clean:
-	$(RM) *.err *.sym *.map zcc_opt.def *.i $(OBJECTS)
+	$(RM) *.err *.sym *.map zcc_opt.def *.i $(OBJECTS) 
+	$(RM) -r obj
