@@ -127,6 +127,17 @@ Internal 48-bit float implementation causes relative slowdown.
 
 7.
 Z88DK April 20, 2020
+zsdcc #11566 / classic
+4770 bytes less page zero
+
+first number error : 5 * 10^(-8)
+second number error: 1 * 10^(-8)
+
+cycle count  = 2253531346
+time @ 4MHz  = 2253531346 / 4*10^6 = 9 min 23 sec
+
+8.
+Z88DK April 20, 2020
 sccz80 / classic c library / math32
 5333 bytes less page zero
 

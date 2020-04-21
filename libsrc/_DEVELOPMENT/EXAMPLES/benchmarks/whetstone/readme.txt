@@ -141,7 +141,7 @@ HITECH C CPM V309
 7605 bytes less cpm overhead
 
 cycle count  = 639413871
-time @ 4MHz  = 639413871 / 4*10^6 = 159.8535 sec
+time @ 4MHz  = 639413871 / 4*10^6 = 159.8535 seconds
 KWIPS        = 100*10*1 / 159.8535 = 6.2557
 MWIPS        = 6.2557 / 1000 = 0.0062557
 
@@ -205,7 +205,7 @@ SDCC 3.6.5 #9842 (MINGW64)
 14379 bytes less page zero
 
 cycle count  = 2184812093
-time @ 4MHz  = 2184812093 / 4x10^6 = 546.2030  seconds
+time @ 4MHz  = 2184812093 / 4x10^6 = 546.2030 seconds
 KWIPS        = 100*10*1 / 546.2030 = 1.8308
 MWIPS        = 1.8308 / 1000 = 0.0018308
 

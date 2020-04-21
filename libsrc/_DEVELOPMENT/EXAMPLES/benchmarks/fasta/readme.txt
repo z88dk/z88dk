@@ -72,12 +72,12 @@ time @ 4MHz  = 245055005 / 4*10^6 = 61.26 sec
 Internal 48-bit float implementation causes relative slowdown.
 
 4.
-Z88DK March 18, 2017
-zsdcc #9852 / classic c library
-3519 bytes less page zero
+Z88DK April 20, 2020
+zsdcc #11566 / classic c library
+3583 bytes less page zero
 
-cycle count  = 256212331
-time @ 4MHz  = 256212331 / 4*10^6 = 64.05 sec
+cycle count  = 248331410
+time @ 4MHz  = 248331410 / 4*10^6 = 62.08 sec
 
 Internal 48-bit float implementation causes relative slowdown.
 
