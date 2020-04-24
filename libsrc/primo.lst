@@ -4,6 +4,9 @@ target/primo/stdio/generic_console_vpeek
 target/primo/stdio/CRT_FONT
 target/primo/stdio/conio_vars
 @stdio/stdio.lst
+stdio/inkey/getk
+stdio/inkey/fgetc_cons
+@input/input_keyboard.lst
 @font/font_8x8/font_8x8.lst
 target/primo/graphics/pixladdr
 target/primo/graphics/clg

@@ -39,4 +39,5 @@
 	add	hl,de
 	ex	de,hl
 	and	7
+	xor	7
 	ret
