@@ -11,4 +11,9 @@ stdio/inkey/fgetc_cons
 target/primo/graphics/pixladdr
 target/primo/graphics/clg
 @gfx/narrow/gfx_narrow.lst
+target/primo/games/bit_open
+target/primo/games/bit_open_di
+target/primo/games/bit_close
+target/primo/games/bit_close_ei
+@games/games.lst
 @z80.lst
