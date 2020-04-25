@@ -1,0 +1,3 @@
+
+
+	defc	CONSOLE_OUT = $032A		;Out char in 'a' to the console

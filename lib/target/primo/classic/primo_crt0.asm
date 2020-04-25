@@ -1,5 +1,5 @@
 ;
-;	Startup for Primo A-XX models
+;	Startup for Primo A-XX/B-XX models
 ;
 ;
 
@@ -26,7 +26,7 @@
 
         defc    TAR__clib_exit_stack_size = 4
         defc    TAR__register_sp = -1		; $c000
-	defc	CRT_KEY_DEL = 8
+	defc	CRT_KEY_DEL = 12
 	defc	__CPU_CLOCK = 2500000
         defc    CONSOLE_COLUMNS = 32
         defc    CONSOLE_ROWS = 24
@@ -64,6 +64,7 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 __sp:	defw	0
 
 
+        INCLUDE "target/primo/def/maths_mbf.def"
 
 	INCLUDE "crt/classic/crt_runtime_selection.asm" 
 	
