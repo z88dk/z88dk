@@ -19,6 +19,7 @@
 
         EXTERN    _main           ;main() is always external to crt0 code
         EXTERN    asm_im1_handler
+	EXTERN	  __primo_screen_base
 
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
@@ -44,13 +45,25 @@ program:
 	ld	hl,0
 	add	hl,sp
 	ld	(exitsp),hl
-    	ei
+	; Entry stack is is ~ $e800 for 64k
+	;		      $a800 for 48k?
+	;		      $6800 for 32k
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of
 ; the compiled program and the stack pointer
 IF DEFINED_USING_amalloc
     INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
+	ld	hl,$6800
+	ld	a,(__sp+1)
+	cp	$80
+	jr	c,set_screen
+	ld	hl,$a800
+	cp	$c0
+	jr	c,set_screen
+	ld	hl,$e800
+set_screen:
+	ld	(__primo_screen_base),hl
 	ld	hl,0
 	push	hl	;argv
 	push	hl	;argc
