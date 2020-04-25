@@ -648,6 +648,13 @@ void writeword(unsigned int i, FILE *fp)
     fputc(i/256,fp);
 }
 
+void writeword_be(unsigned int i, FILE *fp)
+{
+    fputc(i/256,fp);
+    fputc(i%256,fp);
+}
+
+
 void writestring(char *mystring, FILE *fp)
 {
     size_t c;

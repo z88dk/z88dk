@@ -1,0 +1,7 @@
+target/mikro80/stdio/generic_console
+@stdio/stdio_8080.lst
+stdio/inkey/getk
+stdio/inkey/fgetc_cons
+@time/time.lst
+;@input/input_keyboard.lst
+@8080.lst
