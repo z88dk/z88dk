@@ -536,7 +536,6 @@ IF FORlynx
 	defc maxy	= 64
 	defc blankch    = 0
 	defc USEplotc   = 1		; We call generic_console_plotc, not _printc for text mode
-
 ENDIF
 
 IF FORx1
@@ -609,6 +608,10 @@ ENDIF
 
 IF FORgb
 	defc USEplotc   = 1		; We call generic_console_plotc, not _printc for text mode
+ENDIF
+
+IF FORmikro80
+	defc USEplotc = 1
 ENDIF
 
 

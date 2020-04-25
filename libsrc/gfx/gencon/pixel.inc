@@ -10,7 +10,6 @@
 	EXTERN	__console_h
 	EXTERN	__gfx_coords
 
-IF !__CPU_INTEL__
 
 		ld	a,(__console_w)
 		add	a
@@ -70,16 +69,29 @@ ENDIF
 .chfound	ld	b,e
 
 		pop	hl		;original coordinates
-
+IF __CPU_INTEL__
+		ld	a,h
+		rrca
 		ld	a,1		; the bit we want to draw
-			
+		jr	nc,iseven
+ELSE
+		ld	a,1
 		bit	0,h
 		jr	z,iseven
+ENDIF
 		add	a,a		; move right the bit
 
 .iseven
+IF __CPU_INTEL__
+		ld	c,a
+		ld	a,l
+		rrca
+		ld	a,c
+		jr	nc,evenrow
+ELSE
 		bit	0,l
 		jr	z,evenrow
+ENDIF
 		add	a,a
 		add	a,a		; move down the bit
 .evenrow
@@ -115,4 +127,3 @@ ENDIF
 ENDIF
 		pop	bc
 		ret
-ENDIF
