@@ -2075,7 +2075,7 @@ P_DIR:
 	nNextParseAction = NA_BEGIN;
 }
 
-extern void *SYS_V[];
+extern const void *SYS_V[];
 
 void PARSE_LP()
 {

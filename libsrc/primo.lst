@@ -4,7 +4,7 @@ target/primo/stdio/generic_console_vpeek
 target/primo/stdio/CRT_FONT
 target/primo/stdio/conio_vars
 target/primo/stdio/fputc_cons_native
-@stdio/stdio.lst
+@stdio/stdio_ixiy.lst
 stdio/inkey/getk
 stdio/inkey/fgetc_cons
 @input/input_keyboard.lst

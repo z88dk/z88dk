@@ -966,11 +966,11 @@ hgmc_clib.lib:
 # Primo A-32/64 - dom
 primo_clib.lib:
 	@echo ''
-	@echo '--- Building Primo A-32/64 Library ---'
+	@echo '--- Building Primo A-32/48/64 Library ---'
 	@echo ''
 	$(call buildgeneric,primo)
 	$(MAKE) -C games TARGET=primo
-	TARGET=primo TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORprimo -x$(OUTPUT_DIRECTORY)/primo_clib @$(LISTFILE_DIRECTORY)/primo.lst
+	TARGET=primo TYPE=ixiy $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORprimo -x$(OUTPUT_DIRECTORY)/primo_clib @$(LISTFILE_DIRECTORY)/primo.lst
 
 
 

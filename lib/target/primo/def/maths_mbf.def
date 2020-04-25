@@ -50,9 +50,9 @@
 	defc	___mbf32_FPSIGN	= $4125
 	defc	___mbf32_VALTYP 	= $0000 ; Not used
 
-	EXTERN	l_jpix
+	EXTERN	l_jpiy
 	PUBLIC	msbios
-	defc	msbios = l_jpix
+	defc	msbios = l_jpiy
 
 
 
