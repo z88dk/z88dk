@@ -32,9 +32,7 @@ EXTERN in_keytranstbl
 	jr	c,not_function_table
 	sub	64 * 2
 	ld	c,a
-	ld	a,h
-	or	@01000000
-	ld	h,a
+	set	6,h
 	jr	continue
 
 notfound:
@@ -48,9 +46,7 @@ not_function_table:
 	jr	c,continue
 	sub	64
 	ld	c,a
-	ld	a,h
-	or	@10000000
-	ld	h,a
+	set	7,h
 
 continue:
 	; h = flags

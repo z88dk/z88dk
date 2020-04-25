@@ -8,29 +8,29 @@ EXTERN CLIB_KEYBOARD_ADDRESS
 ; Determines if a key is pressed using the scan code
 ; returned by in_LookupKey.
 
-; enter : l = flags
-;         h = port
+; enter : h = flags
+;         l = port
 ; exit  : carry = key is pressed & HL = 1
 ;         no carry = key not pressed & HL = 0
 ; used  : AF,BC,HL
 
 .in_KeyPressed
 ._in_KeyPressed
-	ld	c,h
+	ld	c,l
 	ld	b,0
 	in	a,(c)
 	rrca
 	jr	nc,fail
 
 	; Now we should check shift/control keys
-	in	a,(3)	;Shift
-	rrca
-	rr	b
 	in	a,(7)	;Control
 	rrca
 	rr	b
+	in	a,(3)	;Shift
+	rrca
+	rr	b
 	ld	a,b
-	cp	l
+	cp	h
 	jr	nz,fail
 	ld	hl,1
 	scf
