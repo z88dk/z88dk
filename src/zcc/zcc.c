@@ -698,6 +698,7 @@ process(char *suffix, char *nextsuffix, char *processor, char *extraargs, enum i
 
     if (verbose) {
         printf("%s\n", buffer);
+        fflush(stdout);
     }
 
     status = system(buffer);
@@ -825,8 +826,10 @@ int linkthem(char *linker)
 
     if (prj) fclose(prj);
 
-    if (verbose)
+    if (verbose) {
         printf("%s\n", cmdline);
+        fflush(stdout);
+    }
     status = system(cmdline);
 
     if (cleanup && strlen(tname))
@@ -1004,7 +1007,7 @@ int main(int argc, char **argv)
 #else
         snprintf(cmdline, FILENAME_MAX + 127, "%s < \"%s\" > /dev/null",c_zpragma_exe, pragincname);
 #endif
-        if (verbose) printf("%s\n", cmdline);
+        if (verbose) { printf("%s\n", cmdline); fflush(stdout); }
         system(cmdline);
     }
 
@@ -1537,8 +1540,10 @@ int main(int argc, char **argv)
         if (createapp) {
             /* Building an application - run the appmake command on it */
             snprintf(buffer, sizeof(buffer), "%s %s -b \"%s\" -c \"%s\"", c_appmake_exe, appmakeargs ? appmakeargs : "", outputfile, c_crt0);
-            if (verbose)
+            if (verbose) {
                 printf("%s\n", buffer);
+                fflush(stdout);
+            }
             if (system(buffer)) {
                 fprintf(stderr, "Building application code failed\n");
                 status = 1;
@@ -1872,8 +1877,10 @@ int copyprepend_file(char *name1, char *ext1, char *name2, char *ext2, char *pre
 #else
     cmd = muststrdup(buffer);
 #endif
-    if (verbose)
+    if (verbose) {
         printf("%s\n", buffer);
+        fflush(stdout);
+    }
     ret = (system(cmd));
     free(cmd);
     return ret;
