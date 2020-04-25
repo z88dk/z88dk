@@ -343,6 +343,11 @@ IF FORhomelab2
     defc sndbit_mask   = 0
 ENDIF
 
+IF FORprimo
+    defc sndbit_port	= $00 ;
+    defc sndbit_bit    = 4
+    defc sndbit_mask   = $10		;
+ENDIF
 
 ; ********************************************************
 ;  SN76489 PSG chip definitions
@@ -413,6 +418,7 @@ IF FORpencil2
     defc sndbit_bit    = 3
     defc sndbit_mask   = $0F			; $0F for full volume output
 ENDIF
+
 
 
 
