@@ -25,6 +25,9 @@
         PUBLIC    l_dcal          ;jp(hl)
 
 
+        ; We use the generic driver by default
+        defc    TAR__fputc_cons_generic = 1
+
         defc    TAR__clib_exit_stack_size = 4
         defc    TAR__register_sp = -1		; $c000
 	defc	CRT_KEY_DEL = 12
