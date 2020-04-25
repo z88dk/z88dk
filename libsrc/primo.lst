@@ -15,5 +15,7 @@ target/primo/games/bit_open
 target/primo/games/bit_open_di
 target/primo/games/bit_close
 target/primo/games/bit_close_ei
+target/primo/games/keys_joystick
+target/primo/games/joystick
 @games/games.lst
 @z80.lst
