@@ -5,7 +5,7 @@ target/mikro80/stdio/fgetc_cons
 stdio/inkey/getk
 stdio/inkey/fgetc_cons
 @time/time.lst
-;@input/input_keyboard.lst
+@input/input_keyboard.lst
 target/mikro80/graphics/textpixl
 @gfx/gencon/gfx_gencon_portable.lst
 @8080.lst
