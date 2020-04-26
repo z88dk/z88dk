@@ -10,6 +10,7 @@
 ;	$Id: xordrawr_callee.asm $
 ;
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 	SECTION   code_graphics
 
 	PUBLIC    xordrawr_callee
@@ -40,3 +41,4 @@
 
 
 DEFC ASMDISP_XORDRAWR_CALLEE = asmentry - xordrawr_callee
+ENDIF

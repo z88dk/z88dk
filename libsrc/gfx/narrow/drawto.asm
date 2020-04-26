@@ -9,6 +9,7 @@
 ;	$Id: drawto.asm $
 ;
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 ; CALLER LINKAGE FOR FUNCTION POINTERS
 ; ----- void  drawto(int x2, int y2)
 
@@ -33,3 +34,4 @@
 	push	af	; ret addr
 		
    jp drawto_callee + ASMDISP_DRAWTO_CALLEE
+ENDIF

@@ -70,7 +70,9 @@
 		
 		ld	(chr),a
 		
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 		push	ix
+ENDIF
 		call swapgfxbk
 
 		ld	a,(chr)
@@ -106,7 +108,13 @@
 		ld	d,0
 		ld	e,a
 .colloop
+IF __CPU_INTEL__
+		ld	a,c
+		rla
+		ld	c,a
+ELSE
 		rl c		; cy = pixel status
+ENDIF
 		push bc
 		push de
 		ld	a,(y_4x6)

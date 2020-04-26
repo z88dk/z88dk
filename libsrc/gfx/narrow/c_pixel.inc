@@ -16,11 +16,22 @@
 	ld	a,l
 	cp	maxy / 4
 	ret	nc
-
+IF __CPU_INTEL__
+	rrca
+	rrca
+	and	@00111111
+	ld	l,a
+	ld	a,h
+	rrca
+	rrca
+	and	@00111111
+	ld	h,a
+ELSE
 	sla	h
 	sla	h
 	sla	l
 	sla	l	
+ENDIF
 	ld	c,4
 row_loop:
 	push	hl

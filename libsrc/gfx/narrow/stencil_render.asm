@@ -13,6 +13,7 @@
 
 	INCLUDE	"graphics/grafix.inc"
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
         SECTION smc_clib
 	PUBLIC	stencil_render
 	PUBLIC	_stencil_render
@@ -156,3 +157,4 @@
 .pattern1	and	0		; prepare fill pattern portion
 		or	e		; mix with masked data
 		ret
+ENDIF

@@ -14,6 +14,7 @@
 ; ----- void  unplot(int x, int y)
 
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
         SECTION code_graphics
 		
                 PUBLIC    unplot_callee
@@ -40,3 +41,4 @@
                 jp      __graphics_end
 
 DEFC ASMDISP_UNPLOT_CALLEE = asmentry - unplot_callee
+ENDIF

@@ -6,6 +6,7 @@
 ;	$Id: bkrestore3.asm $
 ;
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 	SECTION   code_clib
 	
 	PUBLIC    bkrestore
@@ -111,3 +112,4 @@
 	ret
 
 
+ENDIF

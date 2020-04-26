@@ -12,6 +12,7 @@
 ;
 
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
                 SECTION   smc_clib
 	PUBLIC    getsprite
 	PUBLIC    _getsprite
@@ -116,3 +117,4 @@
                 SECTION         bss_graphics
 .actcoord
 	 defw	0
+ENDIF

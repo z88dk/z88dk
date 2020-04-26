@@ -9,6 +9,7 @@
 ; $Id: putsprite.asm,v 1.9 2016-07-02 09:01:35 dom Exp $
 ;
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
         SECTION   smc_clib
 	PUBLIC    putsprite
 	PUBLIC    _putsprite
@@ -184,3 +185,4 @@
 
 .offsets_table
          defb	1,2,4,8,16,32,64,128
+ENDIF

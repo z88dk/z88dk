@@ -9,6 +9,7 @@
 ;	$Id: plot.asm $
 ;
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 ; CALLER LINKAGE FOR FUNCTION POINTERS
 ; ----- void  plot(int x, int y)
 
@@ -33,3 +34,4 @@
 	push	af	; ret addr
 		
    jp plot_callee + ASMDISP_PLOT_CALLEE
+ENDIF

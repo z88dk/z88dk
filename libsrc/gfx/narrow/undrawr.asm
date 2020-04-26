@@ -13,6 +13,7 @@
 ; ----- void  undrawr(int x2, int y2)
 
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 		SECTION   code_graphics
 		
 		PUBLIC    undrawr
@@ -32,3 +33,4 @@
 	push	af	; ret addr
 		
    jp undrawr_callee + ASMDISP_UNDRAWR_CALLEE
+ENDIF

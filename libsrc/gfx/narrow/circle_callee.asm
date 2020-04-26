@@ -13,6 +13,7 @@
 ; Usage: circle(int x, int y, int radius, int skip);
 
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 		SECTION         code_graphics
 		
 		PUBLIC    circle_callee
@@ -50,3 +51,4 @@
                 jp      __graphics_end
 
 DEFC ASMDISP_CIRCLE_CALLEE = asmentry - circle_callee
+ENDIF

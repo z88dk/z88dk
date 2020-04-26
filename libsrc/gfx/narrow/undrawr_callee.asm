@@ -10,6 +10,7 @@
 ;	$Id: undrawr_callee.asm $
 ;
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 	SECTION   code_graphics
 
 	PUBLIC    undrawr_callee
@@ -40,3 +41,4 @@
 
 
 DEFC ASMDISP_UNDRAWR_CALLEE = asmentry - undrawr_callee
+ENDIF

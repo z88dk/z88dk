@@ -1,0 +1,6 @@
+
+
+
+	defc	CONSOLE_IN  = $f803	;Exit: a = key
+	defc	CONSOLE_OUT = $f809 ;Entry: c = char
+

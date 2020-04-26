@@ -6,6 +6,7 @@
 ;	$Id: bksave2.asm $
 ;
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 	SECTION   code_clib
 	
 	PUBLIC    bksave
@@ -48,3 +49,4 @@
 
 	
 	jp getsprite_sub
+ENDIF

@@ -14,6 +14,7 @@
 ; $Id: putsprite3.asm $
 ;
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 	SECTION	 smc_clib
 
 	PUBLIC    putsprite
@@ -141,3 +142,4 @@
 	djnz	oloopx
 	jp       __graphics_end
 
+ENDIF

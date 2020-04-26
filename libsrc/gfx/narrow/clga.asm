@@ -10,6 +10,7 @@
 ;Usage: clga(struct *pixels)
 
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 		SECTION         code_graphics
 		
 		PUBLIC    clga
@@ -30,3 +31,4 @@
 		pop	ix
 		
    jp clga_callee + ASMDISP_CLGA_CALLEE
+ENDIF

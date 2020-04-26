@@ -13,6 +13,7 @@
 ; ----- void  draw(int x, int y, int x2, int y2)
 
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 		SECTION   code_graphics
 		
 		PUBLIC    draw
@@ -35,3 +36,4 @@
 		
    jp draw_callee + ASMDISP_DRAW_CALLEE
   
+ENDIF

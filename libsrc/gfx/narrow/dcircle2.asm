@@ -10,6 +10,7 @@
 ;	$Id: dcircle2.asm,v 1.6 2017-01-02 21:51:24 aralbrec Exp $
 ;
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 			SECTION   smc_clib
 			
                 PUBLIC    draw_circle
@@ -191,3 +192,4 @@ DEFVARS 0
         ret     c
 .plt    jp      0
 
+ENDIF

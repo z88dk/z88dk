@@ -349,6 +349,13 @@ IF FORprimo
     defc sndbit_mask   = $10		;
 ENDIF
 
+IF FORmikro80
+    defc sndbit_port	= $4 ;
+    defc sndbit_bit    = 1
+    defc sndbit_mask   = $2	;
+
+ENDIF
+
 ; ********************************************************
 ;  SN76489 PSG chip definitions
 ; ********************************************************
