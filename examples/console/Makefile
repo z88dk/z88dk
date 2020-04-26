@@ -1,5 +1,5 @@
 
-TARGETS = abc80 abc800 ace alphatro aquarius bee c128 c7420 coleco cpc cpm enterprise fp1100 g800 gal hemc hgmc homelab kc kramermc lambda laser500 lynx m5 mc1000 msx mtx multi8 mz nascom nc newbrain osca oz p2000 pacman pasopia7 pc6001 pps primo pv1000 pv2000 rcmx000 rx78 sam sc3000 sos spc1000 srr svi test ti82 ti83 ti85 ti86 ti8x trs80 ts2068 vector06c vg5k vz x07 x1 z1013 z9001 z88 zx zx80 zx81 
+TARGETS = abc80 abc800 ace alphatro aquarius bee c128 c7420 coleco cpc cpm enterprise fp1100 g800 gal hemc hgmc homelab kc kramermc lambda laser500 lynx m5 mc1000 mikro80 msx mtx multi8 mz nascom nc newbrain osca oz p2000 pacman pasopia7 pc6001 pps primo pv1000 pv2000 rcmx000 rx78 sam sc3000 sos spc1000 srr svi test ti82 ti83 ti85 ti86 ti8x trs80 ts2068 vector06c vg5k vz x07 x1 z1013 z9001 z88 zx zx80 zx81 
 
 TARGETCLASSIC = zxn
 
