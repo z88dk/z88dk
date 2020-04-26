@@ -9,6 +9,7 @@
 
 ;Usage: fillb(struct *pixels)
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 
 		SECTION         code_graphics
 		
@@ -43,3 +44,4 @@
 
 
 DEFC ASMDISP_FILLB_CALLEE = asmentry - fillb_callee
+ENDIF

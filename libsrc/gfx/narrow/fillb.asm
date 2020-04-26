@@ -10,6 +10,7 @@
 ;Usage: fillb(struct *pixels)
 
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 		SECTION         code_graphics
 		
 		PUBLIC    fillb
@@ -30,3 +31,4 @@
 		pop	ix
 		
    jp fillb_callee + ASMDISP_FILLB_CALLEE
+ENDIF

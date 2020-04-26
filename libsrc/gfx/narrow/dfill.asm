@@ -14,6 +14,7 @@
 
 	INCLUDE	"graphics/grafix.inc"
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
                 SECTION         code_graphics
         PUBLIC    do_fill
         EXTERN	pixeladdress
@@ -160,3 +161,4 @@
 
 	SECTION	bss_graphics
 .spsave	defw 0
+ENDIF

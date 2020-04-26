@@ -10,6 +10,7 @@
 ;
 
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 		SECTION         code_graphics
 		
 		PUBLIC    xordrawb
@@ -31,3 +32,4 @@
 		pop	ix
 		
    jp xordrawb_callee + ASMDISP_XORDRAWB_CALLEE
+ENDIF

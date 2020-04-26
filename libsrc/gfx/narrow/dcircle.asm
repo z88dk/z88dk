@@ -6,6 +6,7 @@
 ;	$Id: dcircle.asm,v 1.4 2016-04-23 21:05:46 dom Exp $
 ;
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 		SECTION   code_graphics
                 PUBLIC    draw_circle
 
@@ -139,3 +140,4 @@ DEFVARS 0
         ret     c
         jp      (ix)
 
+ENDIF

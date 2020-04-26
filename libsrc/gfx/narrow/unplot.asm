@@ -13,6 +13,7 @@
 ; ----- void  unplot(int x, int y)
 
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 		SECTION   code_graphics
 		
 		PUBLIC    unplot
@@ -33,3 +34,4 @@
 	push	af	; ret addr
 		
    jp unplot_callee + ASMDISP_UNPLOT_CALLEE
+ENDIF

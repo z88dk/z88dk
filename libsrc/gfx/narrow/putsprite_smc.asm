@@ -13,6 +13,7 @@
 ;	$Id: putsprite_smc.asm,v 1.3 2016-07-02 09:01:35 dom Exp $
 ;
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 	SECTION	 smc_clib
 
 	PUBLIC    putsprite
@@ -120,3 +121,4 @@
 	pop	bc		;Restore data
 	djnz	oloop
 	ret
+ENDIF

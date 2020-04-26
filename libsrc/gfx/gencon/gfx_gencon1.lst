@@ -5,6 +5,5 @@ gfx/gencon/obj/${TARGET}/getmaxx1
 gfx/gencon/obj/${TARGET}/respixl1
 gfx/gencon/obj/${TARGET}/xorpixl1
 gfx/gencon/obj/${TARGET}/clsgraph
-gfx/gencon/obj/${TARGET}/__gfx_coords
 @gfx/common/gfx_common.lst
 @gfx/narrow/gfx_narrow.lst

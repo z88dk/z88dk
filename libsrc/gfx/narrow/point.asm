@@ -25,13 +25,14 @@
 .point
 ._point
 
-	pop	af	; ret addr
+	pop	bc	; ret addr
 	pop hl	; y
 	pop de
 	push de
 	push hl
 	ld	h,e	; x
-	push	af	; ret addr
+	push	bc	; ret addr
 
    jp point_callee + ASMDISP_POINT_CALLEE
    
+

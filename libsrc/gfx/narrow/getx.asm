@@ -20,7 +20,7 @@
 .getx
 ._getx
 
-	ld	de,(__gfx_coords)
+	ld	hl,(__gfx_coords)
+	ld	l,h
 	ld	h,0
-	ld	l,d
 	ret

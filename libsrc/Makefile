@@ -1459,8 +1459,7 @@ pmd85_clib.lib:
 	@echo ''
 	@echo '--- Building pmd85 Library ---'
 	@echo ''
-	$(call buildgeneric,pmd85,portable)
-	$(MAKE) -C gfx TARGET=pmd85 FLAVOUR=wide
+	$(call buildgeneric,pmd85,"portable wide")
 	$(MAKE) -C games TARGET=pmd85
 	TARGET=pmd85 TYPE=8080 $(LIBLINKER) -m8080 -DFORpmd85 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pmd85_clib @$(LISTFILE_DIRECTORY)/pmd85.lst
 
@@ -1468,8 +1467,8 @@ mikro80_clib.lib:
 	@echo ''
 	@echo '--- Building Mikro80 Library ---'
 	@echo ''
-	$(call buildgeneric,mikro80,"gencon portable")
-	$(MAKE) -C gfx TARGET=mikro80 FLAVOUR=wide
+	$(call buildgeneric,mikro80,"gencon portable narrow")
+	$(MAKE) -C games TARGET=mikro80
 	TARGET=mikro80 TYPE=8080 $(LIBLINKER) -m8080 -DFORmikro80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/mikro80_clib @$(LISTFILE_DIRECTORY)/mikro80.lst
 
 
@@ -1479,7 +1478,7 @@ m100_clib.lib:
 	@echo ''
 	@echo '--- Building m100 Library ---'
 	@echo ''
-	$(call buildgeneric,m100,portable)
+	$(call buildgeneric,m100,"portable narrow")
 	$(MAKE) -C games TARGET=m100
 	TARGET=m100 TYPE=8080 $(LIBLINKER) -m8080 -DFORm100 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/m100_clib @$(LISTFILE_DIRECTORY)/m100.lst
 

@@ -1,4 +1,5 @@
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 	SECTION code_graphics
 	
 	PUBLIC	xorborder_callee
@@ -101,3 +102,4 @@
 		jp	swapgfxbk1
 
 DEFC ASMDISP_XORBORDER_CALLEE = asmentry - xorborder_callee
+ENDIF

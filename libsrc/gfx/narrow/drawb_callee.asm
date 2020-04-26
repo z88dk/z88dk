@@ -10,6 +10,7 @@
 ;
 
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 		SECTION         code_graphics
 		
 		PUBLIC    drawb_callee
@@ -42,3 +43,4 @@
                 jp      __graphics_end
 
 DEFC ASMDISP_DRAWB_CALLEE = asmentry - drawb_callee
+ENDIF

@@ -11,6 +11,7 @@
 ;Usage: fill(struct *pixel)
 
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
                 SECTION         code_graphics
                 PUBLIC    fill
                 PUBLIC    _fill
@@ -30,3 +31,4 @@
                 call    do_fill
                 jp      __graphics_end
 
+ENDIF

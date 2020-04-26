@@ -10,6 +10,7 @@
 ;
 
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 ; CALLER LINKAGE FOR FUNCTION POINTERS
 ; ----- void  point(int x, int y)
 ;Result is true/false
@@ -51,3 +52,4 @@
                 ret
 
 DEFC ASMDISP_POINT_CALLEE = asmentry - point_callee
+ENDIF

@@ -1,4 +1,5 @@
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 	SECTION code_graphics
 	
 	PUBLIC	xorborder
@@ -37,3 +38,4 @@
 		pop ix
 
    jp xorborder_callee + ASMDISP_XORBORDER_CALLEE
+ENDIF

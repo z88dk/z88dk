@@ -7,6 +7,7 @@
 ;       $Id: multipoint.asm $
 ;
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 ;
 ; Pick a vertical or horizontal bit bar, up to 16 bits long
 ;
@@ -43,3 +44,4 @@
 	
 	
    jp multipoint_callee + ASMDISP_MULTIPOINT_CALLEE
+ENDIF

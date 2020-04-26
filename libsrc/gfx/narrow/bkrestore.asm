@@ -6,12 +6,12 @@
 ;	$Id: bkrestore.asm $
 ;
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 	SECTION smc_clib
 	
 	PUBLIC    bkrestore
 	PUBLIC    _bkrestore
 	EXTERN	pixeladdress
-
 
 .bkrestore
 ._bkrestore
@@ -59,3 +59,4 @@
 	djnz	bkrestores
 	pop	ix
 	ret
+ENDIF

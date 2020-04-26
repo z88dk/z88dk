@@ -11,6 +11,7 @@
 ;
 
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 	SECTION   smc_clib
 	
 	PUBLIC    getsprite
@@ -128,3 +129,4 @@
 	
 	jp	__graphics_end
 
+ENDIF

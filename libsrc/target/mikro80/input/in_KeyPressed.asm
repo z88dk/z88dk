@@ -40,16 +40,11 @@ rotate_done:
 	jr	z,fail
 	ld	b,0
 	ld	a,l			;7 = shift, 6 = control
+	rlca				;Rotate to match the hardware
 	rlca
-	jr	nc,no_shift
-	ld	b,@00100000
-no_shift:
 	rlca
-	jr	nc,no_control
-	ld	a,b
-	or	@01000000
+	and	@00000110
 	ld	b,a
-no_control:
 	; Now we need to read the shift row
 	in	a,($05)
 	cpl

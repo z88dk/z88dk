@@ -10,6 +10,7 @@
 ;Usage: xorclga(struct *pixels)
 
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 		SECTION         code_graphics
 		
 		PUBLIC    xorclga_callee
@@ -43,3 +44,4 @@
 
 
 DEFC ASMDISP_XORCLGA_CALLEE = asmentry - xorclga_callee
+ENDIF

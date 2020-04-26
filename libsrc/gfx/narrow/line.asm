@@ -1,5 +1,6 @@
 	INCLUDE	"graphics/grafix.inc"
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 	SECTION	code_graphics	
 	PUBLIC	Line
 
@@ -94,3 +95,4 @@
 				ret	nc
 				ld	h,-1
 				ret
+ENDIF

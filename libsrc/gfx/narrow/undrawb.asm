@@ -10,6 +10,7 @@
 ;
 
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 		SECTION         code_graphics
 		
 		PUBLIC    undrawb
@@ -31,3 +32,4 @@
 		pop	ix
 		
    jp undrawb_callee + ASMDISP_UNDRAWB_CALLEE
+ENDIF

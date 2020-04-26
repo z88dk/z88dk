@@ -10,6 +10,7 @@
 ;
 
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 ; CALLER LINKAGE FOR FUNCTION POINTERS
 ; ----- void  plot(int x, int y)
 
@@ -40,3 +41,4 @@
                 jp      __graphics_end
 
 DEFC ASMDISP_PLOT_CALLEE = asmentry - plot_callee
+ENDIF

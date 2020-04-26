@@ -5,6 +5,7 @@
 ;       $Id: move.asm $
 ;
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 		SECTION         code_graphics
 			PUBLIC    move
 			PUBLIC    _move
@@ -39,3 +40,4 @@
 		call    Line_r
 		jp      __graphics_end
 
+ENDIF

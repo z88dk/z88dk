@@ -13,6 +13,7 @@
 ; ----- void  drawr(int x, int y)
 
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 		SECTION   code_graphics
 		
 		PUBLIC    drawr
@@ -32,3 +33,4 @@
 	push	af	; ret addr
 		
    jp drawr_callee + ASMDISP_DRAWR_CALLEE
+ENDIF

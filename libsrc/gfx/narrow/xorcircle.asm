@@ -13,6 +13,7 @@
 ; Usage: xorcircle(int x, int y, int radius, int skip);
 
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 		SECTION     code_graphics
 		
 		PUBLIC      xorcircle
@@ -33,3 +34,4 @@
 		ld	b,(ix+8)	;x
 		
 		jp xorcircle_callee + ASMDISP_XORCIRCLE_CALLEE
+ENDIF

@@ -10,6 +10,7 @@
 ;	$Id: draw_callee.asm $
 ;
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 	SECTION   code_graphics
 
 	PUBLIC    draw_callee
@@ -49,3 +50,4 @@
 
 
 DEFC ASMDISP_DRAW_CALLEE = asmentry - draw_callee
+ENDIF

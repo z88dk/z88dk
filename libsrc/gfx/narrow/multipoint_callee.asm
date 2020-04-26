@@ -8,6 +8,7 @@
 ;
 
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 ; CALLER LINKAGE FOR FUNCTION POINTERS
 ; ----- bool  multipoint(int hv, int length, int x, int y)
 
@@ -74,3 +75,4 @@
 
 
 DEFC ASMDISP_MULTIPOINT_CALLEE = asmentry - multipoint_callee
+ENDIF

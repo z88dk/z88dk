@@ -14,6 +14,7 @@
 ;; void stencil_add_lineto(int x, int y, unsigned char *stencil)
 
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 		SECTION   code_graphics
                 PUBLIC    stencil_add_lineto
                 PUBLIC    _stencil_add_lineto
@@ -50,3 +51,4 @@
                 
                 jp      __graphics_end
 
+ENDIF

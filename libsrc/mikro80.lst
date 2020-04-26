@@ -7,5 +7,10 @@ stdio/inkey/fgetc_cons
 @time/time.lst
 @input/input_keyboard.lst
 target/mikro80/graphics/textpixl
-@gfx/gencon/gfx_gencon_portable.lst
+@gfx/gencon/gfx_gencon.lst
+@gfx/portable/gfx_portable.lst
+@gfx/narrow/gfx_narrow.lst
+target/mikro80/games/joystick
+target/mikro80/games/keys_joystick
+@games/games.lst
 @8080.lst
