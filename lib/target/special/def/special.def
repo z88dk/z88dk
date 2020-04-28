@@ -1,0 +1,18 @@
+; Specialist
+
+; Memory map:
+;
+; 0000-8FFF - RAM
+; 9000-BFFF - Video RAM
+; C000-C7FF - Bootloader ROM
+; C800 -... - Monitor ROM
+; F000-F7FF - 580VB55 - 1
+; F800-FFFF - 580VB55 - 2 (Keyboard)
+
+
+
+	defc	RESTART = $c000
+	defc	CONSOLE_CLS = $c010
+	defc	CONSOLE_OUT = $c037		;c = character
+	defc	CONSOLE_IN = $c337		;Exit: a = key
+	defc	CONSOLE_PTRSTR = $c438		;Entry: hl = string (0 terminated)

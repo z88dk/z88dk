@@ -30,7 +30,7 @@ all: genlibs z88libs tilibs zxlibs enterprise_clib.lib c128ansi_clib.lib nclibs 
 	excali64_clib.lib gb_clib.lib s1mp3_clib.lib bic.lib myvision_clib.lib pencil2_clib.lib \
 	preempt.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib tvc_clib.lib hemc_clib.lib \
 	kramermc_clib.lib hgmc_clib.lib pmd85_clib.lib vector06c_clib.lib homelab_clib.lib m100_clib.lib \
-	homelab2_clib.lib primo_clib.lib mikro80_clib.lib
+	homelab2_clib.lib primo_clib.lib mikro80_clib.lib special_clib.lib
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib mbf32.lib mbf64.lib math32.lib gendos.lib ndos.lib  \
 	 lib3d.lib fastmath.lib
@@ -1471,6 +1471,13 @@ mikro80_clib.lib:
 	$(MAKE) -C games TARGET=mikro80
 	TARGET=mikro80 TYPE=8080 $(LIBLINKER) -m8080 -DFORmikro80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/mikro80_clib @$(LISTFILE_DIRECTORY)/mikro80.lst
 
+
+special_clib.lib:
+	@echo ''
+	@echo '--- Building Specialist Library ---'
+	@echo ''
+	$(call buildgeneric,special,"wide")
+	TARGET=special TYPE=8080 $(LIBLINKER) -m8080 -DFORspecial -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/special_clib.lib @$(LISTFILE_DIRECTORY)/special.lst
 
 
 

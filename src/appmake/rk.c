@@ -1,5 +1,5 @@
 /*
- * RK8 generator 
+ * RK* generator 
  */
 
 
@@ -12,11 +12,14 @@ static char             *crtfile      = NULL;
 static int               origin       = -1;
 static int               exec         = -1;
 static char              help         = 0;
+static char              rks          = 0;
+static char              rk8          = 0;
 
 
+static int rk_create(char *extension, int be);
 
 /* Options that are available for this module */
-option_t rk8_options[] = {
+option_t rk_options[] = {
     { 'h', "help",       "Display this help",                OPT_BOOL,  &help },
     { 'b', "binfile",    "Binary file to embed",             OPT_STR,   &binname },
     {  0 , "description","Description of the file",          OPT_STR,   &description},
@@ -24,23 +27,30 @@ option_t rk8_options[] = {
     {  0 , "exec",       "Starting execution address",       OPT_INT,   &exec },
     { 'c', "crt0file",   "crt0 used to link binary",         OPT_STR,   &crtfile },
     { 'o', "output",     "Name of output file",              OPT_STR,   &outfile },
+    {  0,  "rks",        "Create an .rks file",              OPT_BOOL,  &rks },
+    {  0,  "rk8",        "Create an .rk8 file",              OPT_BOOL,  &rk8 },
     {  0,   NULL,        NULL,                               OPT_NONE,  NULL }
 };
 
+int rk_exec(char *target)
+{
+   if ( rks ) 
+      return rk_create(".rks", 0);
+   else if ( rk8 ) 
+      return rk_create(".rk8", 1);
+   return -1;
+}
 
 
 
-/*
- * Execution starts here
- */
-
-int rk8_exec(char *target)
+static int rk_create(char *extension, int be)
 {
     char    filename[FILENAME_MAX+1];
     struct  stat binname_sb;
     FILE   *fpin;
     FILE   *fpout;
     int     i,c;
+    int     size;
     
     if ( help )
         return -1;
@@ -51,7 +61,7 @@ int rk8_exec(char *target)
 
     if ( outfile == NULL ) {
         strcpy(filename,binname);
-        suffix_change(filename,".rk8");
+        suffix_change(filename,extension);
     } else {
         strcpy(filename,outfile);
     }
@@ -82,25 +92,34 @@ int rk8_exec(char *target)
 
     /* Header */
     // Load address
-    writeword_be(origin, fpout);
+    if ( be ) writeword_be(origin, fpout); else writeword(origin, fpout);
     // End address
-    i = binname_sb.st_size;
-    if ( i % 2 ) i++;
-    writeword_be(origin + i, fpout);
+    size = binname_sb.st_size;
+    if ( size % 2 ) size++;
+    if ( be ) writeword_be(origin + size - 1, fpout); else writeword(origin + size - 1, fpout);
 
 
     uint8_t chkh = 0, chkl = 0;
+    uint16_t chksum = 0;
+
     i = 0;
-    while ( i < binname_sb.st_size ) {
-        c = getc(fpin);
+    while ( i < size ) {
+        if ( i < binname_sb.st_size ) c = getc(fpin); else c = 0;
         writebyte_p(c, fpout, &chkh);
-        c = getc(fpin);
-        if ( feof(fpin) ) c = 0;
-        writebyte_p(c, fpout, &chkl);
-        i += 2;
+        chksum += c;
+        chksum += (c * 256);
+        i++;
+        if ( rk8 ) {
+            if ( i < binname_sb.st_size ) c = getc(fpin); else c = 0;
+            writebyte_p(c, fpout, &chkl);
+            i++;
+        }
     }
-    writebyte(chkh,fpout);
-    writebyte(chkl,fpout);
+    if ( rks ) writeword(chksum, fpout);
+    else {
+        writebyte(chkh,fpout);
+        writebyte(chkl,fpout);
+    }
     
     fclose(fpin);
     fclose(fpout);

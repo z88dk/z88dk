@@ -156,8 +156,8 @@ extern option_t  p2000_options;
 extern int       px_exec(char *target);
 extern option_t  px_options;
 
-extern int       rk8_exec(char *target);
-extern option_t  rk8_options;
+extern int       rk_exec(char *target);
+extern option_t  rk_options;
 
 extern int       sorcerer_exec(char *target);
 extern option_t  sorcerer_options;
@@ -422,10 +422,10 @@ struct {
       "Creates a .rex application using data from a .res file and a .bin file",
       NULL,
       rex_exec,     &rex_options },
-    { "bin2rk8",  "rk8",  "(C) 2020 z88dk",
-      "Create a rk8 file for Mikro-80",
+    { "bin2rk",    "rkx",  "(C) 2020 z88dk",
+      "Create a rk? file for USSR RKs",
       NULL,
-      rk8_exec,        &rk8_options },
+      rk_exec,        &rk_options },
     { "rompad",    "rom",       "(C) 2014,2017 Stefano Bodrato & Alvin Albrecht",
       "Embed a binary inside a rom, padding if necessary",
       NULL,
