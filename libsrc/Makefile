@@ -1476,7 +1476,7 @@ special_clib.lib:
 	@echo ''
 	@echo '--- Building Specialist Library ---'
 	@echo ''
-	$(call buildgeneric,special,"wide")
+	$(call buildgeneric,special,"wide portable")
 	TARGET=special TYPE=8080 $(LIBLINKER) -m8080 -DFORspecial -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/special_clib.lib @$(LISTFILE_DIRECTORY)/special.lst
 
 

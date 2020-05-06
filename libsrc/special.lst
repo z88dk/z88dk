@@ -2,6 +2,8 @@ target/special/stdio/generic_console
 target/special/stdio/generic_console_ioctl
 target/special/stdio/generic_console_vpeek
 target/special/stdio/CRT_FONT
+target/special/stdio/conio_vars
+target/special/stdio/conio_map_colour
 target/special/stdio/fputc_cons_native
 target/special/stdio/fputc_cons_native
 target/special/stdio/fgetc_cons
@@ -10,10 +12,15 @@ stdio/inkey/getk
 stdio/inkey/fgetc_cons
 @time/time.lst
 @font/font_8x8/font_8x8.lst
+target/special/graphics/clg
+target/special/graphics/w_pixladdr
+target/special/graphics/w_plotpixl
+target/special/graphics/w_respixl
+target/special/graphics/w_xorpixl
+target/special/graphics/w_pointxy
+@gfx/portable/gfx_portable_w.lst
+@gfx/wide/gfx_wide.lst
 ;@input/input_keyboard.lst
-;@gfx/gencon/gfx_gencon.lst
-;@gfx/portable/gfx_portable.lst
-;@gfx/narrow/gfx_narrow.lst
 ;target/special/games/joystick
 ;target/special/games/keys_joystick
 ;@games/games.lst

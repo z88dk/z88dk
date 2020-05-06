@@ -16,23 +16,60 @@
 
         EXTERN  generic_console_flags
 
+	EXTERN	__special_attr
+	EXTERN	__specialmx_attr
+	EXTERN	conio_map_colour
+	EXTERN	conio_map_colour_mx
 	EXTERN	CONSOLE_COLUMNS
 	EXTERN	CONSOLE_ROWS
 
 	defc	DISPLAY = $9000
 
 
+; Write to $fff8 with the colour (SpecialMX)
+; Write to $ff02 with the colour (Special with board)
+
 generic_console_set_attribute:
-generic_console_set_ink:
-generic_console_set_paper:
         ret
+
+generic_console_set_ink:
+	ld	d,a	;Save it, we'll need it
+	call	set_ink_mx
+	ld	a,d
+	call	conio_map_colour
+	ld	(__special_attr),a
+	ret
+
+
+generic_console_set_paper:
+	call	conio_map_colour_mx
+	and	15
+	ld	b,a
+	ld	c,$f0
+set_attr:
+	ld	hl,__specialmx_attr
+	ld	a,(hl)
+	and	c
+	or	b
+	ld	(hl),a
+	ret
+
+set_ink_mx:
+	call	conio_map_colour_mx
+	rlca
+	rlca
+	rlca
+	rlca
+	and	$f0
+	ld	b,a
+	ld	c,$0f
+	jp	set_attr
 
 generic_console_scrollup:
 	push	de
 	push	bc
 	ld	de,DISPLAY
 	ld	hl,DISPLAY + 8
-
 	ld	c,248
 scrollup_1:
 	push	hl
@@ -72,11 +109,19 @@ clear_loop:
 
 
 generic_console_cls:
+	call	setup_attr
 	ld	hl,DISPLAY
 	ld	de,DISPLAY+1
 	ld	bc,+(((CONSOLE_COLUMNS * CONSOLE_ROWS) * 8)-1)
 	ld	(hl),0
 	ldir
+	ret
+
+setup_attr:
+	ld	a,(__special_attr)
+	ld	($ff02),a
+;	ld	a,(__specialmx_attr)
+;	ld	($fff8),a
 	ret
 
 ; c = x
@@ -106,6 +151,7 @@ not_udg:
 	call	generic_console_xypos	;-> hl = screen
 	ex	de,hl
 
+	call	setup_attr
         ld      a,(generic_console_flags)
         rlca
         sbc     a
