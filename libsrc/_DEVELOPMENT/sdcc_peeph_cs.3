@@ -30252,7 +30252,7 @@ replace restart {
 	ld	h,%2
 	ld	d,%1
 	; peephole z88dk-606ah
-} if notSame(%1 'h')
+} if notSame(%1 'h'), notSame(%1 '(hl)')
 
 replace restart {
 	ld	e,l
