@@ -9,7 +9,7 @@
  *
  *   Stefano Bodrato - December 2001: first release
  *
- *   $Id: aquarius.c,v 1.4 2016-06-26 00:46:54 aralbrec Exp $
+ *   $Id: aquarius.c $
  */
 
 #include "appmake.h"
@@ -179,24 +179,25 @@ int aquarius_exec(char *target)
 		exit(1);
 	}
 
+// "ffffffffffffffffffffffff 
 
 /* Write out the header  */
 	for	(i=1;i<=12;i++)
 		writebyte(255,fpout);
 
+//00
 	writebyte(0,fpout);
-
 
 /* Write out the "file name" */
 	for	(i=1;i<=6;i++)
 		writebyte('#',fpout);
 
-/*	for	(i=1;i<=6;i++)
-		writebyte(0,fpout);*/
+	for	(i=1;i<=6;i++)
+		writebyte(0,fpout);
 
 
 /* Mattel games loader relocator */
-/*
+
 	writebyte(0x2A,fpout);	// ld	hl,(14552)
 	writeword(14552,fpout);
 	writebyte(0x23,fpout);	// inc	hl	
@@ -213,9 +214,9 @@ int aquarius_exec(char *target)
 	writebyte(0xb7,fpout);	// or	a	
 	writebyte(0xed,fpout);	// sbc	hl,de	
 	writebyte(0x52,fpout);
-	writebyte(0xe5,fpout);	// push hl	
-	writebyte(0xc1,fpout);	// pop	bc	
-	writebyte(0xe1,fpout);	// pop	hl	
+	writebyte(0xe5,fpout);	// push hl
+	writebyte(0xc1,fpout);	// pop	bc
+	writebyte(0xe1,fpout);	// pop	hl
 	writebyte(0x23,fpout);	// inc hl	
 	writebyte(0x7e,fpout);	// ld	a,(hl)	
 	writebyte(0xb7,fpout);	// or	a	
@@ -228,7 +229,7 @@ int aquarius_exec(char *target)
 
 	for	(i=1;i<=41;i++)
 		writebyte(0,fpout);
-*/
+
 
 
 /* We append the binary file */
