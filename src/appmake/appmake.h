@@ -20,6 +20,10 @@
 #include <unistd.h>
 #endif
 
+#ifdef WIN32
+#define __NORETURN 
+#endif
+
 #include "cpmdisk.h"
 
 extern char c_install_dir[];

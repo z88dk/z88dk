@@ -21,8 +21,9 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{748E94AB-5E0D-4B30-A8C5-E7E4582DEB10}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>zpragma</RootNamespace>
+    <RootNamespace>z88dk-zpragma</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <ProjectName>z88dk-zpragma</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
