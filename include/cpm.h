@@ -28,7 +28,7 @@
 /* Size of CPM Sector */
 #define SECSIZE  128
 
-/* Falgs for fcp->use */
+/* Flags for fcp->use */
 #define U_READ  1               /* file open for reading */
 #define U_WRITE 2               /* file open for writing */
 #define U_RDWR  3               /* open for read and write */
@@ -51,8 +51,9 @@ struct fcb {
     char    discmap[16];    /* CP/M disc map */
     char    next_record;    /* next record to read or write */
     u8_t    ranrec[3];      /* random record number (24 bit no. ) */
+
     /* Below here is used by the library */
-    unsigned long    rwptr;          /* read/write pointer in bytes */
+    unsigned long rwptr;    /* read/write pointer in bytes */
     u8_t    use;            /* use flag */
     u8_t    uid;            /* user id belonging to this file */
     u8_t    mode;           /* TEXT/BINARY discrimination */

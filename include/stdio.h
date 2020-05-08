@@ -89,7 +89,7 @@ struct filestr {
                 int         fd;
                 uint8_t    *ptr;
         } desc;
-        uint8_t  flags;
+        uint8_t   flags;
         uint8_t   ungetc;
         intptr_t  extra;
         uint8_t   flags2;
@@ -103,32 +103,32 @@ struct filestr {
  */
 
 /* Exit: hl = byte read, c = error, nc = success */
-#define __STDIO_MSG_GETC		1
+#define __STDIO_MSG_GETC        1
 /* Entry: bc = byte to write, Exit: hl = byte written (or EOF) */
-#define __STDIO_MSG_PUTC		2
+#define __STDIO_MSG_PUTC        2
 /* Entry: de = buf, bc = len, Exit: hl = bytes read */
-#define __STDIO_MSG_READ		3
+#define __STDIO_MSG_READ        3
 /* Entry: de = buf, bc = len, Exit: hl = bytes written */
-#define __STDIO_MSG_WRITE		4
+#define __STDIO_MSG_WRITE       4
 /* Entry: debc = offset, a' = whence */
-#define __STDIO_MSG_SEEK		5
-#define __STDIO_MSG_FLUSH		6
-#define __STDIO_MSG_CLOSE		7
-#define __STDIO_MSG_IOCTL		8
+#define __STDIO_MSG_SEEK        5
+#define __STDIO_MSG_FLUSH       6
+#define __STDIO_MSG_CLOSE       7
+#define __STDIO_MSG_IOCTL       8
 
 
 /* For asm routines kinda handy to have a nice DEFVARS of the structure*/
 #ifdef STDIO_ASM
 #asm
 DEFVARS 0 {
-	fp_desc		ds.w	1
-	fp_flags	ds.b	1
-	fp_ungetc	ds.b	1
-	fp_extra        ds.w	1
-        fp_flags2       ds.b    1
-        reserved        ds.b    1
-        reserved2       ds.b    1
-        reserved3       ds.b    1
+    fp_desc         ds.w    1
+    fp_flags        ds.b    1
+    fp_ungetc       ds.b    1
+    fp_extra        ds.w    1
+    fp_flags2       ds.b    1
+    reserved        ds.b    1
+    reserved2       ds.b    1
+    reserved3       ds.b    1
 }
 #endasm
 #endif
@@ -177,11 +177,11 @@ extern FILE __LIB__ *fdopen(const int fildes, const char *mode) __smallc;
 extern FILE __LIB__ *_freopen1(const char *name, int fd, const char *mode, FILE *fp) __smallc;
 extern FILE __LIB__ *fmemopen(void *buf, size_t size, const char *mode) __smallc;
 extern FILE __LIB__ *funopen(const void     *cookie, int (*readfn)(void *, char *, int),
-			int (*writefn)(void *, const char *, int),
-			fpos_t (*seekfn)(void *, fpos_t, int), int (*closefn)(void *)) __smallc;
+                    int (*writefn)(void *, const char *, int),
+                    fpos_t (*seekfn)(void *, fpos_t, int), int (*closefn)(void *)) __smallc;
 
-extern int __LIB__ fclose(FILE *fp);
-extern int __LIB__ fflush(FILE *);
+extern int __LIB__  fclose(FILE *fp);
+extern int __LIB__  fflush(FILE *);
 
 extern void __LIB__ closeall();
 

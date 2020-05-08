@@ -3,6 +3,7 @@
  * 
  *  27/1/2002 - djm
  *
+ *  May, 2020 - feilipu - added sequential read
  *
  *  $Id: read.c,v 1.3 2013-06-06 08:58:32 stefano Exp $
  */
@@ -53,24 +54,31 @@ ssize_t read(int fd, void *buf, size_t len)
     case U_RDWR:
         uid = getuid();
         cnt = len;
+        offset = fc->rwptr%SECSIZE;
         while ( len ) {
             setuid(fc->uid);
-            offset = fc->rwptr%SECSIZE;
-
-            if ( ( size = SECSIZE - offset ) > len )
-                size = len;
-            _putoffset(fc->ranrec,fc->rwptr/SECSIZE);
-            if ( size == SECSIZE ) {
+            if ( offset == 0 && len >= SECSIZE ) {
+                size = SECSIZE;
                 bdos(CPM_SDMA,buf);
-                if ( bdos(CPM_RRAN,fc) ) {
+                if ( bdos(CPM_READ,fc) ) {
                     return cnt-len;
-		}
-            } else {
-                bdos(CPM_SDMA,buffer);
-                if ( bdos(CPM_RRAN,fc) ) {
-                    return cnt-len;          
                 }
-                memcpy(buf,buffer+offset,size);
+            } else {
+                if ( ( size = SECSIZE - offset ) > len )
+                    size = len;
+                _putoffset(fc->ranrec,fc->rwptr/SECSIZE);
+                if ( size == SECSIZE ) {
+                    bdos(CPM_SDMA,buf);
+                    if ( bdos(CPM_RRAN,fc) ) {
+                        return cnt-len;
+		            }
+                } else {
+                    bdos(CPM_SDMA,buffer);
+                    if ( bdos(CPM_RRAN,fc) ) {
+                        return cnt-len;          
+                    }
+                    memcpy(buf,buffer+offset,size);
+                }
             }
             buf += size;
             fc->rwptr += size;
@@ -85,9 +93,4 @@ ssize_t read(int fd, void *buf, size_t len)
         break;
     }
 }
-            
-
-        
-
-
 

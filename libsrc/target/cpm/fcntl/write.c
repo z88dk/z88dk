@@ -3,6 +3,7 @@
  * 
  *  27/1/2002 - djm
  *
+ *  May, 2020 - feilipu - added sequential write
  *
  *  $Id: write.c,v 1.5 2013-06-06 08:58:32 stefano Exp $
  */
@@ -20,7 +21,7 @@ ssize_t write(int fd, void *buf, size_t len)
     unsigned char uid;
     struct fcb *fc;
     int    cnt,size,offset;
-    
+
     if ( fd >= MAXFILE )
 	return -1;
 
@@ -48,25 +49,33 @@ ssize_t write(int fd, void *buf, size_t len)
     case U_WRITE:
     case U_RDWR:
 		uid = getuid();
+		offset = fc->rwptr%SECSIZE;
 		while ( len ) {
 			setuid(fc->uid);
-			offset = fc->rwptr%SECSIZE;
-			if ( (size = SECSIZE-offset) > len )
-			size = len;
-			_putoffset(fc->ranrec,fc->rwptr/SECSIZE);
-			if ( size == SECSIZE ) {
-			bdos(CPM_SDMA,buf);
-			} else {  /* Not the required size, read in the extent */
-			bdos(CPM_SDMA,buffer);
-			/* Blank out the buffer to indicate EOF */
-			buffer[0] = 26;         /* ^Z */
-			memcpy(buffer+1,buffer,SECSIZE-1);
-			bdos(CPM_RRAN,fc);
-			memcpy(buffer+offset,buf,size);
-			}
-			if ( bdos(CPM_WRAN,fc) ) {
-			setuid(uid);
-			return -1;   /* Not sure about this.. */
+			if ( offset == 0 && len >= SECSIZE ) {
+                size = SECSIZE;
+                bdos(CPM_SDMA,buf);
+                if ( bdos(CPM_WRIT,fc) ) {
+                    return cnt-len;
+                }
+			} else {
+			    if ( ( size = SECSIZE - offset ) > len )
+			        size = len;
+				_putoffset(fc->ranrec,fc->rwptr/SECSIZE);
+			    if ( size == SECSIZE ) {
+			        bdos(CPM_SDMA,buf);
+			    } else {  /* Not the required size, read in the extent */
+			        bdos(CPM_SDMA,buffer);
+			        /* Blank out the buffer to indicate EOF */
+			        buffer[0] = 26;         /* ^Z */
+			        memcpy(buffer+1,buffer,SECSIZE-1);
+			        bdos(CPM_RRAN,fc);
+			        memcpy(buffer+offset,buf,size);
+			    }
+			    if ( bdos(CPM_WRAN,fc) ) {
+			        setuid(uid);
+			        return -1;   /* Not sure about this.. */
+			    }
 			}
 			buf += size;
 			fc->rwptr += size;
@@ -81,9 +90,4 @@ ssize_t write(int fd, void *buf, size_t len)
 		break;
     }
 }
-		    
-
-	    
-
-
 
