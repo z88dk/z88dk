@@ -50,9 +50,8 @@ ssize_t write(int fd, void *buf, size_t len)
     case U_RDWR:
         uid = getuid();
         while ( len ) {
-			setuid(fc->uid);
+            setuid(fc->uid);
             offset = fc->rwptr%SECSIZE;
-
             if ( (size = SECSIZE-offset) > len )
                 size = len;
             _putoffset(fc->ranrec,fc->rwptr/SECSIZE);

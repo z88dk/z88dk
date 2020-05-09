@@ -57,7 +57,6 @@ ssize_t read(int fd, void *buf, size_t len)
         while ( len ) {
             setuid(fc->uid);
             offset = fc->rwptr%SECSIZE;
-
             if ( ( size = SECSIZE - offset ) > len )
                 size = len;
             _putoffset(fc->ranrec,fc->rwptr/SECSIZE);
