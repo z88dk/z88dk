@@ -54,31 +54,24 @@ ssize_t read(int fd, void *buf, size_t len)
     case U_RDWR:
         uid = getuid();
         cnt = len;
-        offset = fc->rwptr%SECSIZE;
         while ( len ) {
             setuid(fc->uid);
-            if ( offset == 0 && len >= SECSIZE ) {
-                size = SECSIZE;
+            offset = fc->rwptr%SECSIZE;
+
+            if ( ( size = SECSIZE - offset ) > len )
+                size = len;
+            _putoffset(fc->ranrec,fc->rwptr/SECSIZE);
+            if ( size == SECSIZE ) {
                 bdos(CPM_SDMA,buf);
                 if ( bdos(CPM_READ,fc) ) {
                     return cnt-len;
                 }
             } else {
-                if ( ( size = SECSIZE - offset ) > len )
-                    size = len;
-                _putoffset(fc->ranrec,fc->rwptr/SECSIZE);
-                if ( size == SECSIZE ) {
-                    bdos(CPM_SDMA,buf);
-                    if ( bdos(CPM_RRAN,fc) ) {
-                        return cnt-len;
-		            }
-                } else {
-                    bdos(CPM_SDMA,buffer);
-                    if ( bdos(CPM_RRAN,fc) ) {
-                        return cnt-len;          
-                    }
-                    memcpy(buf,buffer+offset,size);
+                bdos(CPM_SDMA,buffer);
+                if ( bdos(CPM_RRAN,fc) ) {
+                    return cnt-len;          
                 }
+                memcpy(buf,buffer+offset,size);
             }
             buf += size;
             fc->rwptr += size;

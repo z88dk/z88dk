@@ -49,29 +49,26 @@ ssize_t write(int fd, void *buf, size_t len)
     case U_WRITE:
     case U_RDWR:
         uid = getuid();
-        offset = fc->rwptr%SECSIZE;
         while ( len ) {
-            setuid(fc->uid);
-            if ( offset == 0 && len >= SECSIZE ) {
-                size = SECSIZE;
+			setuid(fc->uid);
+            offset = fc->rwptr%SECSIZE;
+
+            if ( (size = SECSIZE-offset) > len )
+                size = len;
+            _putoffset(fc->ranrec,fc->rwptr/SECSIZE);
+            if ( size == SECSIZE ) {
                 bdos(CPM_SDMA,buf);
                 if ( bdos(CPM_WRIT,fc) ) {
-                    return cnt-len;
+                    setuid(uid);
+                    return -1;   /* Not sure about this.. */
                 }
-            } else {
-                if ( ( size = SECSIZE - offset ) > len )
-                    size = len;
-                _putoffset(fc->ranrec,fc->rwptr/SECSIZE);
-                if ( size == SECSIZE ) {
-                    bdos(CPM_SDMA,buf);
-                } else {  /* Not the required size, read in the extent */
-                    bdos(CPM_SDMA,buffer);
-                    /* Blank out the buffer to indicate EOF */
-                    buffer[0] = 26;         /* ^Z */
-                    memcpy(buffer+1,buffer,SECSIZE-1);
-                    bdos(CPM_RRAN,fc);
-                    memcpy(buffer+offset,buf,size);
-                }
+            } else {  /* Not the required size, read in the extent */
+                bdos(CPM_SDMA,buffer);
+                /* Blank out the buffer to indicate EOF */
+                buffer[0] = 26;         /* ^Z */
+                memcpy(buffer+1,buffer,SECSIZE-1);
+                bdos(CPM_RRAN,fc);
+                memcpy(buffer+offset,buf,size);
                 if ( bdos(CPM_WRAN,fc) ) {
                     setuid(uid);
                     return -1;   /* Not sure about this.. */
