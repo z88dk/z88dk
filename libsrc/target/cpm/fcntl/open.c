@@ -60,7 +60,7 @@ int open(char *name, int flags, mode_t mode)
     }
 	
 	/* we keep an extra byte in the FCB struct to support random access,
-	   but at the moment we use only a "TEXT/BINARY" discrimintation flag */
+	   but at the moment we use only a "TEXT/BINARY" discrimination flag */
 	fc->mode = mode & _IOTEXT;
 
     fd =  (fc - &_fcb[0]);

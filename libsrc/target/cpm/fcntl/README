@@ -5,3 +5,6 @@ These routines are a port of the Hitech C routines.
 They've been modified to work within the z88dk stdio framework and
 seem to quite well within the tests that I've made. There is no distinction
 between binary and text files.
+
+May 2020 - feilipu. Added sequential read and write to try to improve performance for large buffer moves. Issue uncovered through performance comparision with CP/M PIP tool.
+
