@@ -49,7 +49,7 @@ void t_die_xmalloc(void)
 
 void t_die_xcalloc(void)
 {
-	char *p = xcalloc(sizeof(char), 5);
+	char *p = xcalloc(1, 5);
 	TEST_ASSERT_NOT_NULL(p);
 	TEST_ASSERT_EQUAL(0, memcmp(p, "\0\0\0\0\0", 5));
 	xfree(p);

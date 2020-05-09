@@ -9,6 +9,7 @@ Repository: https://github.com/z88dk/z88dk
 Define CPU opcodes
 */
 
+#include "../portability.h"
 #include "directives.h"
 #include "expr.h"
 #include "codearea.h"
@@ -16,12 +17,7 @@ Define CPU opcodes
 #include "opcodes.h"
 #include "parse.h"
 #include "z80asm.h"
-
 #include <assert.h>
-
-#ifdef _MSC_VER
-#define snprintf _snprintf
-#endif
 
 /* add 1 to 4 bytes opcode opcode to object code 
 *  bytes in big-endian format, e.g. 0xCB00 */

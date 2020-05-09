@@ -3,13 +3,16 @@
 // Copyright (C) Paulo Custodio, 2011-2019
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
-#include "fileutil.h"
-#include "die.h"
-#include "strutil.h"
 
+#include "die.h"
+#include "fileutil.h"
+#include "strutil.h"
+#include "utstring.h"
+#include "zutils.h"
 #include <ctype.h>
-#include <string.h>
 #include <dirent.h>
+#include <string.h>
+
 #ifndef WIN32
 #include <unistd.h>
 #endif
@@ -19,11 +22,11 @@
 //-----------------------------------------------------------------------------
 #define isslash(x)	((x) == '/' || (x) == '\\')
 
-static void str_path_canon(str_t *path)
+static void str_path_canon(UT_string *path)
 {
 	// remove double slashes and normalize forward slashes
-	char *s = str_data(path);
-	char *d = str_data(path);
+	char *s = utstr_body(path);
+	char *d = utstr_body(path);
 	while (*s) {
 		if (isslash(*s)) {
 			*d++ = '/';
@@ -38,7 +41,7 @@ static void str_path_canon(str_t *path)
 	*d = '\0';
 
 	// skip initial volume, root dir, or parent dir
-	char *p = str_data(path);
+	char *p = utstr_body(path);
 	if (isalpha(p[0]) && p[1] == ':') p += 2;			// win32 volume
 	if (*p == '/')
 		p++;											// root dir
@@ -81,25 +84,25 @@ static void str_path_canon(str_t *path)
 		p--; 
 		*p = '\0';
 	}
-	str_len(path) = p - str_data(path);
+	utstr_len(path) = p - utstr_body(path);
 
-	if (str_len(path) == 0)			// dir is now empty
-		str_set(path, ".");
+	if (utstr_len(path) == 0)			// dir is now empty
+		utstr_set(path, ".");
 }
 
 static const char *path_canon_sep(const char *path, char win32_sep)
 {
-	str_t *canon = str_new_copy(path);
+	UT_string *canon = utstr_new_init(path);	
 	str_path_canon(canon);
 
 #ifdef _WIN32
-	char *p = str_data(canon);
+	char *p = utstr_body(canon);
 	while ((p = strchr(p, '/')) != NULL)
 		*p++ = win32_sep;
 #endif
 
-	const char *ret = spool_add(str_data(canon));
-	str_free(canon);
+	const char *ret = spool_add(utstr_body(canon));
+	utstr_free(canon);
 	return ret;
 }
 
@@ -115,23 +118,22 @@ const char *path_os(const char *path)
 
 const char *path_combine(const char *path1, const char *path2)
 {
-	str_t *path = str_new_copy(path1);
-
-	str_append(path, "/");
+	UT_string *path = utstr_new_init(path1);
+	utstr_append(path, "/");
 
 	if (isalpha(path2[0]) && path2[1] == ':') {	// remove ':'
-		str_append_n(path, path2, 1);			// drive letter
-		str_append(path, "/");					// slash
-		str_append(path, path2 + 2);				// rest of path
+		utstr_append_n(path, path2, 1);			// drive letter
+		utstr_append(path, "/");				// slash
+		utstr_append(path, path2 + 2);			// rest of path
 	}
 	else {
-		str_append(path, path2);
+		utstr_append(path, path2);
 	}
 
 	str_path_canon(path);
 
-	const char *ret = spool_add(str_data(path));
-	str_free(path);
+	const char *ret = spool_add(utstr_body(path));
+	utstr_free(path);
 	return ret;
 }
 
@@ -142,36 +144,36 @@ const char *path_remove_ext(const char *path1)
 
 const char *path_replace_ext(const char *path1, const char *new_ext)
 {
-	str_t *path = str_new_copy(path1);
+	UT_string *path = utstr_new_init(path1);	
 	str_path_canon(path);
 
 	// remove extension
 	const char *old_ext = path_ext(path1);
-	str_len(path) -= strlen(old_ext);
-	str_data(path)[str_len(path)] = '\0';
+	utstr_len(path) -= strlen(old_ext);
+	utstr_body(path)[utstr_len(path)] = '\0';
 
 	// append new extension
 	if (*new_ext && *new_ext != '.')
-		str_append(path, ".");
-	str_append(path, new_ext);
+		utstr_append(path, ".");
+	utstr_append(path, new_ext);
 
-	const char *ret = spool_add(str_data(path));
-	str_free(path);
+	const char *ret = spool_add(utstr_body(path));
+	utstr_free(path);
 	return ret;
 }
 
-static char *path_dir_slash(str_t *path)
+static char *path_dir_slash(UT_string *path)
 {
 	str_path_canon(path);
 
-	char *p = str_data(path);
+	char *p = utstr_body(path);
 	if (isalpha(p[0]) && p[1] == ':')
 		p += 2;											// win32 volume
 	if (*p == '/')
 		p++;											// root dir
 	char *root = p;
 
-	p = str_data(path) + str_len(path) - 1;
+	p = utstr_body(path) + utstr_len(path) - 1;
 	while (p > root && *p != '/')
 		p--;
 
@@ -180,29 +182,29 @@ static char *path_dir_slash(str_t *path)
 
 const char *path_dir(const char *path1)
 {
-	str_t *path = str_new_copy(path1);
+	UT_string *path = utstr_new_init(path1);
 	char *p = path_dir_slash(path);
 
 	*p = '\0';
-	str_len(path) = p - str_data(path);
+	utstr_len(path) = p - utstr_body(path);
 
-	if (str_len(path) == 0)			// dir is now empty
-		str_set(path, ".");
+	if (utstr_len(path) == 0) 			// dir is now empty
+		utstr_set(path, ".");
 	
-	const char *ret = spool_add(str_data(path));
-	str_free(path);
+	const char *ret = spool_add(utstr_body(path));
+	utstr_free(path);
 	return ret;
 }
 
 const char *path_file(const char *path1)
 {
-	str_t *path = str_new_copy(path1);
+	UT_string *path = utstr_new_init(path1);	
 	char *p = path_dir_slash(path);
 	if (*p == '/')
 		p++;
 
 	const char *ret = spool_add(p);
-	str_free(path);
+	utstr_free(path);
 	return ret;
 }
 
@@ -309,9 +311,9 @@ void xfwrite_cstr(const char *str, FILE *stream)
 	xfwrite_bytes(str, strlen(str), stream);
 }
 
-void xfwrite_str(str_t *str, FILE *stream)
+void xfwrite_str(UT_string *str, FILE *stream)
 {
-	xfwrite_bytes(str_data(str), str_len(str), stream);
+	xfwrite_bytes(utstr_body(str), utstr_len(str), stream);
 }
 
 void xfwrite_bytes(const void *ptr, size_t count, FILE *stream)
@@ -332,9 +334,9 @@ void xfwrite_bcount_cstr(const char *str, FILE *stream)
 	xfwrite_bcount_bytes(str, strlen(str), stream);
 }
 
-void xfwrite_bcount_str(str_t *str, FILE *stream)
+void xfwrite_bcount_str(UT_string *str, FILE *stream)
 {
-	xfwrite_bcount_bytes(str_data(str), str_len(str), stream);
+	xfwrite_bcount_bytes(utstr_body(str), utstr_len(str), stream);
 }
 
 void xfwrite_wcount_bytes(const void *str, size_t count, FILE * stream)
@@ -350,9 +352,9 @@ void xfwrite_wcount_cstr(const char *str, FILE *stream)
 	xfwrite_wcount_bytes(str, strlen(str), stream);
 }
 
-void xfwrite_wcount_str(str_t *str, FILE *stream)
+void xfwrite_wcount_str(UT_string *str, FILE *stream)
 {
-	xfwrite_wcount_bytes(str_data(str), str_len(str), stream);
+	xfwrite_wcount_bytes(utstr_body(str), utstr_len(str), stream);
 }
 
 void xfwrite_byte(byte_t value, FILE *stream)
@@ -385,12 +387,13 @@ void xfread(void *ptr, size_t size, size_t count, FILE *stream)
 		die("failed to read %u bytes from file '%s'\n", size*count, get_filename(stream));
 }
 
-void xfread_str(size_t size, str_t *str, FILE *stream)
+void xfread_str(size_t size, UT_string *str, FILE *stream)
 {
-	str_reserve(str, size);
-	xfread(str_data(str), sizeof(char), size, stream);
-	str_len(str) = size;
-	str_data(str)[str_len(str)] = '\0';
+	utstr_clear(str);
+	utstr_reserve(str, size);
+	xfread(utstr_body(str), sizeof(char), size, stream);
+	utstr_len(str) = size;
+	utstr_body(str)[utstr_len(str)] = '\0';
 }
 
 void xfread_bytes(void *ptr, size_t count, FILE *stream)
@@ -398,13 +401,13 @@ void xfread_bytes(void *ptr, size_t count, FILE *stream)
 	xfread(ptr, sizeof(byte_t), count, stream);
 }
 
-void xfread_bcount_str(str_t *str, FILE *stream)
+void xfread_bcount_str(UT_string *str, FILE *stream)
 {
 	size_t len = xfread_byte(stream);
 	xfread_str(len, str, stream);
 }
 
-void xfread_wcount_str(str_t * str, FILE * stream)
+void xfread_wcount_str(UT_string * str, FILE * stream)
 {
 	size_t len = xfread_word(stream);
 	xfread_str(len, str, stream);
@@ -462,16 +465,16 @@ void file_spew(const char *filename, const char *text)
 void file_spew_n(const char *filename, const char *text, size_t size)
 {
 	FILE *fp = xfopen(filename, "wb");
-	xfwrite(text, sizeof(char), size, fp);
+	xfwrite(text, 1, size, fp);
 	xfclose(fp);
 }
 
-void file_spew_str(const char *filename, str_t *str)
+void file_spew_str(const char *filename, UT_string *str)
 {
-	file_spew_n(filename, str_data(str), str_len(str));
+	file_spew_n(filename, utstr_body(str), utstr_len(str));
 }
 
-str_t *file_slurp(const char *filename)
+UT_string *file_slurp(const char *filename)
 {
 	FILE *fp = xfopen(filename, "rb");
 
@@ -480,7 +483,7 @@ str_t *file_slurp(const char *filename)
 	xassert(size >= 0);
 	xfseek(fp, 0, SEEK_SET);
 
-	str_t *text = str_new();
+	UT_string* text = utstr_new();
 	xfread_str((size_t)size, text, fp);
 
 	xfclose(fp);
@@ -538,7 +541,7 @@ argv_t *path_find_files(const char *dirname, bool recursive)
 
 static void path_find_glob_1(argv_t *files, const char *pattern)
 {
-	str_t *pad = str_new();
+	UT_string* pad = utstr_new();
 
 	pattern = path_canon(pattern);
 	const char *wc = strpbrk(pattern, "*?");
@@ -550,19 +553,19 @@ static void path_find_glob_1(argv_t *files, const char *pattern)
 		char *child = strchr(wc, '/');		// point to slash after star-star
 
 		if (child) {
-			str_set_n(pad, pattern, wc - pattern);		// try without star-star
-			str_append(pad, child);
-			path_find_glob_1(files, str_data(pad));		// recurse
+			utstr_set_n(pad, pattern, wc - pattern);		// try without star-star
+			utstr_append(pad, child);
+			path_find_glob_1(files, utstr_body(pad));		// recurse
 		}
 
-		str_set_n(pad, pattern, wc - pattern + 1);			// copy up to first star
+		utstr_set_n(pad, pattern, wc - pattern + 1);		// copy up to first star
 		if (child)
-			str_append_n(pad, wc + 2, child - (wc + 2));	// and up to child
+			utstr_append_n(pad, wc + 2, child - (wc + 2));	// and up to child
 		else
-			str_append(pad, wc + 2);
+			utstr_append(pad, wc + 2);
 		
 		glob_t glob_files;
-		int ret = xglob(str_data(pad), GLOB_NOESCAPE, NULL, &glob_files);
+		int ret = xglob(utstr_body(pad), GLOB_NOESCAPE, NULL, &glob_files);
 		if (ret == GLOB_NOMATCH) {				// no match - ignore
 			;
 		}
@@ -570,16 +573,16 @@ static void path_find_glob_1(argv_t *files, const char *pattern)
 			for (int i = 0; i < glob_files.gl_pathc; i++) {
 				char *found = glob_files.gl_pathv[i];
 				if (dir_exists(found)) {
-					str_set_f(pad, "%s/**", found);
+					utstr_set_fmt(pad, "%s/**", found);
 					if (child)
-						str_append(pad, child);
-					path_find_glob_1(files, str_data(pad));		// recurse
+						utstr_append(pad, child);
+					path_find_glob_1(files, utstr_body(pad));		// recurse
 				}
 				else {
-					str_set(pad, found);
+					utstr_set(pad, found);
 					if (child)
-						str_append(pad, child);
-					path_find_glob_1(files, str_data(pad));		// recurse
+						utstr_append(pad, child);
+					path_find_glob_1(files, utstr_body(pad));		// recurse
 				}
 			}
 		}
@@ -591,22 +594,23 @@ static void path_find_glob_1(argv_t *files, const char *pattern)
 	else {									// find one level of subdirs
 		char *child = strchr(wc, '/');		// point to slash wild card
 		if (child)
-			str_set_n(pad, pattern, child - pattern);
-		else
-			str_set(pad, pattern);
+			utstr_set_n(pad, pattern, child - pattern);
+		else {
+			utstr_set(pad, pattern);
+		}
 
 		glob_t glob_files;
-		int ret = xglob(str_data(pad), GLOB_NOESCAPE, NULL, &glob_files);
+		int ret = xglob(utstr_body(pad), GLOB_NOESCAPE, NULL, &glob_files);
 		if (ret == GLOB_NOMATCH) {				// no match - ignore
 			;
 		}
 		else if (ret == 0) {
 			for (int i = 0; i < glob_files.gl_pathc; i++) {
 				char *found = glob_files.gl_pathv[i];
-				str_set(pad, found);
+				utstr_set(pad, found);
 				if (child)
-					str_append(pad, child);
-				path_find_glob_1(files, str_data(pad));		// recurse
+					utstr_append(pad, child);
+				path_find_glob_1(files, utstr_body(pad));		// recurse
 			}
 		}
 		else {
@@ -615,7 +619,7 @@ static void path_find_glob_1(argv_t *files, const char *pattern)
 		globfree(&glob_files);
 	}
 
-	str_free(pad);
+	utstr_free(pad);
 }
 
 argv_t *path_find_glob(const char *pattern)

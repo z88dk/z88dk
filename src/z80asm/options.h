@@ -6,9 +6,10 @@
 //-----------------------------------------------------------------------------
 #pragma once
 
+#include "strutil.h"
 #include "types.h"
 #include "utarray.h"
-#include "strutil.h"
+#include "utstring.h"
 
 /*-----------------------------------------------------------------------------
 *   CPU type

@@ -20,12 +20,15 @@ Repository: https://github.com/z88dk/z88dk
 #include "strutil.h"
 #include "sym.h"
 #include "symbol.h"
+#include "utstring.h"
 #include "z80asm.h"
+#include "zutils.h"
+
+#include <ctype.h>
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 
 /* external functions */
 struct libfile* NewLibrary(void);
@@ -49,7 +52,7 @@ struct linklist* linkhdr;
 int totaladdr, curroffset;
 
 static void ReadNames_1(const char* filename, FILE* file,
-	str_t* section_name, str_t* name, str_t* def_filename)
+	UT_string* section_name, UT_string* name, UT_string* def_filename)
 {
 	int scope, symbol_char;
 	sym_type_t type = TYPE_UNKNOWN;
@@ -74,7 +77,7 @@ static void ReadNames_1(const char* filename, FILE* file,
 		xfread_bcount_str(def_filename, file);
 		line_nr = xfread_dword(file);
 
-		new_section(str_data(section_name));		/* define CURRENTSECTION */
+		new_section(utstr_body(section_name));		/* define CURRENTSECTION */
 
 		switch (symbol_char)
 		{
@@ -87,15 +90,15 @@ static void ReadNames_1(const char* filename, FILE* file,
 
 		switch (scope)
 		{
-		case 'L': sym = define_local_sym(str_data(name), value, type); break;
-		case 'G': sym = define_global_sym(str_data(name), value, type); break;
+		case 'L': sym = define_local_sym(utstr_body(name), value, type); break;
+		case 'G': sym = define_global_sym(utstr_body(name), value, type); break;
 		default:
 			error_not_obj_file(filename);
 		}
 
 		// set symbol definition
 		if (sym) {
-			sym->filename = spool_add(str_data(def_filename));
+			sym->filename = spool_add(utstr_body(def_filename));
 			sym->line_nr = line_nr;
 		}
 	}
@@ -103,16 +106,16 @@ static void ReadNames_1(const char* filename, FILE* file,
 
 void ReadNames(const char* filename, FILE* file)
 {
-	str_t* section_name = str_new();
-	str_t* name = str_new();
-	str_t* def_filename = str_new();
+	UT_string* section_name = utstr_new();
+	UT_string* name = utstr_new();
+	UT_string* def_filename = utstr_new();
 
 	ReadNames_1(filename, file,
 		section_name, name, def_filename);
 
-	str_free(section_name);
-	str_free(name);
-	str_free(def_filename);
+	utstr_free(section_name);
+	utstr_free(name);
+	utstr_free(def_filename);
 }
 
 
@@ -155,8 +158,8 @@ static void set_expr_env(Expr* expr, bool module_relative_addr)
 
 /* read the current modules' expressions to the given list */
 static void read_cur_module_exprs_1(ExprList* exprs, FILE* file, char* filename,
-	str_t* expr_text, str_t* last_filename, str_t* source_filename,
-	str_t* section_name, str_t* target_name)
+	UT_string* expr_text, UT_string* last_filename, UT_string* source_filename,
+	UT_string* section_name, UT_string* target_name)
 {
 	int line_nr;
 	int type;
@@ -171,10 +174,10 @@ static void read_cur_module_exprs_1(ExprList* exprs, FILE* file, char* filename,
 
 		/* source file and line number */
 		xfread_wcount_str(source_filename, file);
-		if (str_len(source_filename) == 0)
-			str_set(source_filename, str_data(last_filename));
+		if (utstr_len(source_filename) == 0)
+			utstr_set(source_filename, utstr_body(last_filename));
 		else
-			str_set(last_filename, str_data(source_filename));
+			utstr_set(last_filename, utstr_body(source_filename));
 
 		line_nr = xfread_dword(file);
 
@@ -188,8 +191,8 @@ static void read_cur_module_exprs_1(ExprList* exprs, FILE* file, char* filename,
 		xfread_wcount_str(expr_text, file);		/* get expression */
 
 		/* read expression followed by newline */
-		str_append(expr_text, "\n");
-		SetTemporaryLine(str_data(expr_text));			/* read expression */
+		utstr_append(expr_text, "\n");
+		SetTemporaryLine(utstr_body(expr_text));			/* read expression */
 
 		EOL = false;                /* reset end of line parsing flag - a line is to be parsed... */
 
@@ -197,8 +200,8 @@ static void read_cur_module_exprs_1(ExprList* exprs, FILE* file, char* filename,
 		GetSym();
 
 		/* parse and store expression in the list */
-		set_asmpc_env(CURRENTMODULE, str_data(section_name),
-			str_data(source_filename), line_nr,
+		set_asmpc_env(CURRENTMODULE, utstr_body(section_name),
+			utstr_body(source_filename), line_nr,
 			asmpc,
 			false);
 		if ((expr = expr_parse()) != NULL)
@@ -216,8 +219,8 @@ static void read_cur_module_exprs_1(ExprList* exprs, FILE* file, char* filename,
 			case 'J': expr->range = RANGE_JR_OFFSET;	break;
 			case 'P': expr->range = RANGE_PTR24;		break;
 			case '=': expr->range = RANGE_WORD;
-				xassert(str_len(target_name) > 0);
-				expr->target_name = spool_add(str_data(target_name));	/* define expression as EQU */
+				xassert(utstr_len(target_name) > 0);
+				expr->target_name = spool_add(utstr_body(target_name));	/* define expression as EQU */
 				break;
 			default:
 				error_not_obj_file(filename);
@@ -227,7 +230,7 @@ static void read_cur_module_exprs_1(ExprList* exprs, FILE* file, char* filename,
 			expr->section = CURRENTSECTION;
 			expr->asmpc = asmpc;
 			expr->code_pos = code_pos;
-			expr->filename = spool_add(str_data(source_filename));
+			expr->filename = spool_add(utstr_body(source_filename));
 			expr->line_nr = line_nr;
 			expr->listpos = -1;
 
@@ -238,20 +241,20 @@ static void read_cur_module_exprs_1(ExprList* exprs, FILE* file, char* filename,
 
 static void read_cur_module_exprs(ExprList* exprs, FILE* file, char* filename)
 {
-	str_t* expr_text = str_new();
-	str_t* last_filename = str_new();
-	str_t* source_filename = str_new();
-	str_t* section_name = str_new();
-	str_t* target_name = str_new();
+	UT_string* expr_text = utstr_new();
+	UT_string* last_filename = utstr_new();
+	UT_string* source_filename = utstr_new();
+	UT_string* section_name = utstr_new();
+	UT_string* target_name = utstr_new();
 
 	read_cur_module_exprs_1(exprs, file, filename,
 		expr_text, last_filename, source_filename, section_name, target_name);
 
-	str_free(expr_text);
-	str_free(last_filename);
-	str_free(source_filename);
-	str_free(section_name);
-	str_free(target_name);
+	utstr_free(expr_text);
+	utstr_free(last_filename);
+	utstr_free(source_filename);
+	utstr_free(section_name);
+	utstr_free(target_name);
 
 }
 
@@ -641,10 +644,10 @@ static bool linked_module(struct libfile* lib, FILE* file, long obj_fpos, StrHas
 	bool linked = false;
 	bool found_symbol;
 
-	str_t* module_name = str_new();
-	str_t* def_filename = str_new();
-	str_t* symbol_name = str_new();
-	str_t* section_name = str_new();
+	UT_string* module_name = utstr_new();
+	UT_string* def_filename = utstr_new();
+	UT_string* symbol_name = utstr_new();
+	UT_string* section_name = utstr_new();
 
 	/* read module name */
 	fseek(file, obj_fpos + 8, SEEK_SET);
@@ -674,21 +677,21 @@ static bool linked_module(struct libfile* lib, FILE* file, long obj_fpos, StrHas
 			xfread_bcount_str(def_filename, file);
 			xfread_dword(file);			/* line_nr */
 
-			if (scope == 'G' && StrHash_exists(extern_syms, str_data(symbol_name)))
+			if (scope == 'G' && StrHash_exists(extern_syms, utstr_body(symbol_name)))
 				found_symbol = true;
 		}
 
 		/* link module if found one needed symbol */
 		if (found_symbol) {
-			LinkLibModule(lib, obj_fpos, str_data(module_name), extern_syms);
+			LinkLibModule(lib, obj_fpos, utstr_body(module_name), extern_syms);
 			linked = true;
 		}
 	}
 
-	str_free(module_name);
-	str_free(def_filename);
-	str_free(symbol_name);
-	str_free(section_name);
+	utstr_free(module_name);
+	utstr_free(def_filename);
+	utstr_free(symbol_name);
+	utstr_free(section_name);
 
 	return linked;
 }
@@ -860,7 +863,7 @@ void link_modules(void)
 
 
 
-static int LinkModule_1(const char* filename, long fptr_base, str_t* section_name, StrHash* extern_syms)
+static int LinkModule_1(const char* filename, long fptr_base, UT_string* section_name, StrHash* extern_syms)
 {
 	long fptr_namedecl, fptr_modname, fptr_modcode, fptr_libnmdecl;
 	int code_size;
@@ -894,13 +897,13 @@ static int LinkModule_1(const char* filename, long fptr_base, str_t* section_nam
 				/* load bytes to section */
 				/* BUG_0015: was reading at current position in code area, swaping order of modules */
 				xfread_bcount_str(section_name, file);
-				section = new_section(str_data(section_name));
+				section = new_section(utstr_body(section_name));
 				read_origin(file, section);
 				section->align = xfread_dword(file);
 
 				/* if creating relocatable code, ignore origin */
 				if (opts.relocatable && section->origin >= 0) {
-					warn_org_ignored(filename, str_data(section_name));
+					warn_org_ignored(filename, utstr_body(section_name));
 					section->origin = -1;
 					section->section_split = false;
 				}
@@ -919,18 +922,18 @@ static int LinkModule_1(const char* filename, long fptr_base, str_t* section_nam
 		// collect list of external symbols
 		if (fptr_libnmdecl != -1)
 		{
-			str_t* name = str_new();
+			UT_string* name = utstr_new();
 			const char* name_p;
 			long p;
 
 			for (p = fptr_libnmdecl; p < fptr_modname;) {
 				fseek(file, fptr_base + p, SEEK_SET);			/* set file pointer to point at external name declaration */
 				xfread_bcount_str(name, file);					/* read library reference name */
-				p += 1 + str_len(name);							/* point to next name */
-				name_p = spool_add(str_data(name));
+				p += 1 + utstr_len(name);					/* point to next name */
+				name_p = spool_add(utstr_body(name));
 				StrHash_set(&extern_syms, name_p, (void*)name_p);		/* remember all extern references */
 			}
-			str_free(name);
+			utstr_free(name);
 		}
 
 		xfclose(file);
@@ -941,9 +944,9 @@ static int LinkModule_1(const char* filename, long fptr_base, str_t* section_nam
 
 int LinkModule(const char* filename, long fptr_base, StrHash* extern_syms)
 {
-	str_t* section_name = str_new();
+	UT_string* section_name = utstr_new();
 	int ret = LinkModule_1(filename, fptr_base, section_name, extern_syms);
-	str_free(section_name);
+	utstr_free(section_name);
 	return ret;
 }
 

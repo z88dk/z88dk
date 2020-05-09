@@ -13,9 +13,11 @@ Repository: https://github.com/z88dk/z88dk
 */
 
 #include "alloc.h"
-#include "strhash.h"
 #include "str.h"
+#include "strhash.h"
 #include "strutil.h"
+#include "utstring.h"
+#include "zutils.h"
 
 /*-----------------------------------------------------------------------------
 *   Define the class
@@ -76,7 +78,7 @@ static const char *StrHash_norm_key( StrHash *self, const char *key )
 	if ( self->ignore_case )
 	{
 		Str_set(KEY, key);
-		cstr_toupper(Str_data(KEY));
+		strtoupper(Str_data(KEY));
 		return Str_data(KEY);
 	}
 	else

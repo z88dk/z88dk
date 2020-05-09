@@ -137,6 +137,7 @@ clean::
 	$(RM) *.log  $(LOCAL_LIB)/*.log  $(LOCAL_LIB)/t/*.log  $(LOCAL_LIB)/t/uthash/*.log
 	$(RM) *~     $(LOCAL_LIB)/*~     $(LOCAL_LIB)/t/*~     $(LOCAL_LIB)/t/uthash/*~
 	$(RM) -rf Debug Release x1 x2 x3
+	$(RM) $(OBJS) $(TEST_SRC_LIB:.c=.o)
 
 #------------------------------------------------------------------------------
 # test
@@ -144,12 +145,12 @@ clean::
 all: t/libtestlib.a
 
 t/libtestlib.a : $(OBJS) $(TEST_SRC_LIB:.c=.o)
-	ar rcs t/libtestlib.a $(OBJS:$(PROJ).o=) $(TEST_SRC_LIB:.c=.o)
+	ar rcs t/libtestlib.a $(OBJS:main.o=) $(TEST_SRC_LIB:.c=.o)
 
 $(TEST_SRC_MAIN:.c=.o) : t/libtestlib.a
 
 .o.out :
-	$(CC) $(CFLAGS) $< -o $(<:.o=$(EXESUFFIX)) $(LDFLAGS) -Lt -ltestlib
+	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) $< -o $(<:.o=$(EXESUFFIX)) $(LDFLAGS) -Lt -ltestlib
 	$(<:.o=$(EXESUFFIX)) 2> $@~
 	diff -w $(<:.o=.bmk) $@~
 	mv -f $@~ $@
@@ -201,6 +202,6 @@ clean::
 # Dependencies
 #------------------------------------------------------------------------------
 clean::
-	rm -f $(DEPENDS)
+	$(RM) $(DEPENDS)
 
 -include $(DEPENDS)

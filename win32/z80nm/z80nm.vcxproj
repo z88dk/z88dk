@@ -170,6 +170,7 @@
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\z80asm\zutils.c" />
     <ClCompile Include="..\..\src\z80nm\ar.c" />
   </ItemGroup>
   <ItemGroup>
@@ -182,6 +183,9 @@
     <ProjectReference Include="..\z80asm-common\z80asm-common.vcxproj">
       <Project>{00bce225-fe40-4c33-b15e-c8fb6ada74eb}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\z80asm\zutils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

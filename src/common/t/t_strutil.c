@@ -3,54 +3,57 @@
 // Copyright (C) Paulo Custodio, 2011-2019
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
+
 #include "strutil.h"
 #include "unity.h"
+#include "utstring.h"
+#include "zutils.h"
 
 void t_strutil_cstr_toupper(void)
 {
 	char buff[10];
-	strcpy(buff, "abc1"); TEST_ASSERT_EQUAL_STRING("ABC1", cstr_toupper(buff));
-	strcpy(buff, "Abc1"); TEST_ASSERT_EQUAL_STRING("ABC1", cstr_toupper(buff));
-	strcpy(buff, "ABC1"); TEST_ASSERT_EQUAL_STRING("ABC1", cstr_toupper(buff));
+	strcpy(buff, "abc1"); TEST_ASSERT_EQUAL_STRING("ABC1", strtoupper(buff));
+	strcpy(buff, "Abc1"); TEST_ASSERT_EQUAL_STRING("ABC1", strtoupper(buff));
+	strcpy(buff, "ABC1"); TEST_ASSERT_EQUAL_STRING("ABC1", strtoupper(buff));
 }
 
 void t_strutil_cstr_tolower(void)
 {
 	char buff[10];
-	strcpy(buff, "abc1"); TEST_ASSERT_EQUAL_STRING("abc1", cstr_tolower(buff));
-	strcpy(buff, "Abc1"); TEST_ASSERT_EQUAL_STRING("abc1", cstr_tolower(buff));
-	strcpy(buff, "ABC1"); TEST_ASSERT_EQUAL_STRING("abc1", cstr_tolower(buff));
+	strcpy(buff, "abc1"); TEST_ASSERT_EQUAL_STRING("abc1", strtolower(buff));
+	strcpy(buff, "Abc1"); TEST_ASSERT_EQUAL_STRING("abc1", strtolower(buff));
+	strcpy(buff, "ABC1"); TEST_ASSERT_EQUAL_STRING("abc1", strtolower(buff));
 }
 
 void t_strutil_cstr_chomp(void)
 {
 	char buff[100];
-	strcpy(buff, ""); TEST_ASSERT_EQUAL_STRING("", cstr_chomp(buff));
-	strcpy(buff, "\r\n \t\f \r\n \t\f\v"); TEST_ASSERT_EQUAL_STRING("", cstr_chomp(buff));
-	strcpy(buff, "\r\n \t\fx\r\n \t\f\v"); TEST_ASSERT_EQUAL_STRING("\r\n \t\fx", cstr_chomp(buff));
+	strcpy(buff, ""); TEST_ASSERT_EQUAL_STRING("", strchomp(buff));
+	strcpy(buff, "\r\n \t\f \r\n \t\f\v"); TEST_ASSERT_EQUAL_STRING("", strchomp(buff));
+	strcpy(buff, "\r\n \t\fx\r\n \t\f\v"); TEST_ASSERT_EQUAL_STRING("\r\n \t\fx", strchomp(buff));
 }
 
 void t_strutil_cstr_strip(void)
 {
 	char buff[100];
-	strcpy(buff, ""); TEST_ASSERT_EQUAL_STRING("", cstr_strip(buff));
-	strcpy(buff, "\r\n \t\f \r\n \t\f\v"); TEST_ASSERT_EQUAL_STRING("", cstr_strip(buff));
-	strcpy(buff, "\r\n \t\fx\r\n \t\f\v"); TEST_ASSERT_EQUAL_STRING("x", cstr_strip(buff));
+	strcpy(buff, ""); TEST_ASSERT_EQUAL_STRING("", strstrip(buff));
+	strcpy(buff, "\r\n \t\f \r\n \t\f\v"); TEST_ASSERT_EQUAL_STRING("", strstrip(buff));
+	strcpy(buff, "\r\n \t\fx\r\n \t\f\v"); TEST_ASSERT_EQUAL_STRING("x", strstrip(buff));
 }
 
 void t_strutil_cstr_strip_compress_escapes(void)
 {
-	str_t *s = str_new();
+	UT_string *s = utstr_new();
 	char cs[100];
 
 #define T(in, out_len, out_str) \
 			strcpy(cs, in); \
-			TEST_ASSERT_EQUAL(out_len, cstr_compress_escapes(cs)); \
+			TEST_ASSERT_EQUAL(out_len, str_compress_escapes(cs)); \
 			TEST_ASSERT_EQUAL(0, memcmp(cs, out_str, out_len)); \
-			str_set(s, in); \
-			str_compress_escapes(s); \
-			TEST_ASSERT_EQUAL(out_len, str_len(s)); \
-			TEST_ASSERT_EQUAL(0, memcmp(str_data(s), out_str, out_len))
+			utstr_set(s, in); \
+			utstr_compress_escapes(s); \
+			TEST_ASSERT_EQUAL(out_len, utstr_len(s)); \
+			TEST_ASSERT_EQUAL(0, memcmp(utstr_body(s), out_str, out_len))
 
 	// trailing backslash ignored 
 	T("\\", 0, "");
@@ -84,7 +87,7 @@ void t_strutil_cstr_strip_compress_escapes(void)
 	for (int i = 0; i < 256; i++)
 	{
 		sprintf(cs, "\\%o \\x%x", i, i);
-		int len = cstr_compress_escapes(cs);
+		int len = str_compress_escapes(cs);
 		TEST_ASSERT_EQUAL(3, len);
 		TEST_ASSERT_EQUAL((char)i, cs[0]);
 		TEST_ASSERT_EQUAL(' ', cs[1]);
@@ -97,269 +100,71 @@ void t_strutil_cstr_strip_compress_escapes(void)
 		4,
 		"\xFF" "0" "\xFF" "0");
 
-	str_free(s);
+	utstr_free(s);
 #undef T
 }
 
 void t_strutil_cstr_case_cmp(void)
 {
-	TEST_ASSERT(cstr_case_cmp("", "") == 0);
-	TEST_ASSERT(cstr_case_cmp("a", "") > 0);
-	TEST_ASSERT(cstr_case_cmp("", "a") < 0);
-	TEST_ASSERT(cstr_case_cmp("a", "a") == 0);
-	TEST_ASSERT(cstr_case_cmp("a", "A") == 0);
-	TEST_ASSERT(cstr_case_cmp("A", "a") == 0);
-	TEST_ASSERT(cstr_case_cmp("ab", "a") > 0);
-	TEST_ASSERT(cstr_case_cmp("a", "ab") < 0);
-	TEST_ASSERT(cstr_case_cmp("ab", "ab") == 0);
+	TEST_ASSERT(strcasecmp("", "") == 0);
+	TEST_ASSERT(strcasecmp("a", "") > 0);
+	TEST_ASSERT(strcasecmp("", "a") < 0);
+	TEST_ASSERT(strcasecmp("a", "a") == 0);
+	TEST_ASSERT(strcasecmp("a", "A") == 0);
+	TEST_ASSERT(strcasecmp("A", "a") == 0);
+	TEST_ASSERT(strcasecmp("ab", "a") > 0);
+	TEST_ASSERT(strcasecmp("a", "ab") < 0);
+	TEST_ASSERT(strcasecmp("ab", "ab") == 0);
 }
 
 void t_strutil_cstr_case_ncmp(void)
 {
-	TEST_ASSERT(cstr_case_ncmp("", "", 0) == 0);
-	TEST_ASSERT(cstr_case_ncmp("x", "y", 0) == 0);
-	TEST_ASSERT(cstr_case_ncmp("a", "", 1) > 0);
-	TEST_ASSERT(cstr_case_ncmp("", "a", 1) < 0);
-	TEST_ASSERT(cstr_case_ncmp("ax", "ay", 1) == 0);
-	TEST_ASSERT(cstr_case_ncmp("ax", "Ay", 1) == 0);
-	TEST_ASSERT(cstr_case_ncmp("Ax", "ay", 1) == 0);
-	TEST_ASSERT(cstr_case_ncmp("abx", "a", 2) > 0);
-	TEST_ASSERT(cstr_case_ncmp("a", "aby", 2) < 0);
-	TEST_ASSERT(cstr_case_ncmp("abx", "aby", 2) == 0);
-}
-
-void t_strutil_str_new(void)
-{
-	str_t *s = str_new();
-	
-	TEST_ASSERT_NOT_NULL(s);
-	TEST_ASSERT_NOT_NULL(str_data(s));
-	TEST_ASSERT_EQUAL('\0', *str_data(s));
-	TEST_ASSERT_EQUAL(0, str_len(s));
-	TEST_ASSERT_EQUAL_STRING("", str_data(s));
-	
-	str_free(s);
-}
-
-void t_strutil_str_new_copy(void)
-{
-	str_t *s = str_new_copy("hello");
-	
-	TEST_ASSERT_NOT_NULL(s);
-	TEST_ASSERT_NOT_NULL(str_data(s));
-	TEST_ASSERT_EQUAL(5, str_len(s));
-	TEST_ASSERT_EQUAL_STRING("hello", str_data(s));
-	
-	str_data(s)[3] = '\0';
-	str_sync_len(s);
-
-	TEST_ASSERT_EQUAL(3, str_len(s));
-	TEST_ASSERT_EQUAL_STRING("hel", str_data(s));
-
-	str_free(s);
-}
-
-void t_strutil_str_clear(void)
-{
-	str_t *s = str_new_copy("hello");
-	
-	TEST_ASSERT_EQUAL_STRING("hello", str_data(s));
-	
-	str_clear(s);
-	TEST_ASSERT_EQUAL_STRING("", str_data(s));
-	
-	str_free(s);
-}
-
-void t_strutil_str_reserve(void)
-{
-	str_t *s = str_new();
-	TEST_ASSERT_EQUAL(0, s->i);
-	TEST_ASSERT_EQUAL(100, s->n);
-	TEST_ASSERT_EQUAL(0, s->d[0]);
-
-	str_reserve(s, 99);
-	TEST_ASSERT_EQUAL(0, s->i);
-	TEST_ASSERT_EQUAL(100, s->n);
-	TEST_ASSERT_EQUAL(0, s->d[99]);
-
-	str_reserve(s, 100);
-	TEST_ASSERT_EQUAL(0, s->i);
-	TEST_ASSERT_EQUAL(101, s->n);
-	TEST_ASSERT_EQUAL(0, s->d[100]);
-	str_free(s);
-
-	s = str_new_copy("1234567890");
-	str_reserve(s, 89);
-	TEST_ASSERT_EQUAL(10, s->i);
-	TEST_ASSERT_EQUAL(100, s->n);
-	TEST_ASSERT_EQUAL(0, s->d[99]);
-
-	str_reserve(s, 90);
-	TEST_ASSERT_EQUAL(10, s->i);
-	TEST_ASSERT_EQUAL(101, s->n);
-	TEST_ASSERT_EQUAL(0, s->d[100]);
-	str_free(s);
-}
-
-void t_strutil_str_set(void)
-{
-	str_t *s = str_new();
-	TEST_ASSERT_EQUAL_STRING("", str_data(s));
-
-	str_set(s, "hello");
-	TEST_ASSERT_EQUAL_STRING("hello", str_data(s));
-
-	str_set(s, "world");
-	TEST_ASSERT_EQUAL_STRING("world", str_data(s));
-
-	str_free(s);
-}
-
-void t_strutil_str_set_f(void)
-{
-	str_t *s = str_new();
-	TEST_ASSERT_EQUAL_STRING("", str_data(s));
-
-	str_set_f(s, "%s %d", "hello", 21);
-	TEST_ASSERT_EQUAL_STRING("hello 21", str_data(s));
-
-	str_set_f(s, "%s %d", "world", 42);
-	TEST_ASSERT_EQUAL_STRING("world 42", str_data(s));
-
-	str_free(s);
-}
-
-void t_strutil_str_set_n(void)
-{
-	str_t *s = str_new();
-	TEST_ASSERT_EQUAL_STRING("", str_data(s));
-
-	str_set_n(s, "\0\1\2\3", 4);
-	TEST_ASSERT_EQUAL(4, str_len(s));
-	TEST_ASSERT_EQUAL(0, memcmp(str_data(s), "\0\1\2\3\0", 5));
-
-	str_set_n(s, "\3\2\1\0", 4);
-	TEST_ASSERT_EQUAL(4, str_len(s));
-	TEST_ASSERT_EQUAL(0, memcmp(str_data(s), "\3\2\1\0\0", 5));
-
-	str_free(s);
-}
-
-void t_strutil_str_set_str(void)
-{
-	str_t *s = str_new();
-	TEST_ASSERT_EQUAL_STRING("", str_data(s));
-
-	str_t *s1 = str_new_copy("hello");
-	str_set_str(s, s1);
-	TEST_ASSERT_EQUAL_STRING("hello", str_data(s));
-
-	str_t *s2 = str_new_copy("world");
-	str_set_str(s, s2);
-	TEST_ASSERT_EQUAL_STRING("world", str_data(s));
-
-	str_free(s);
-	str_free(s1);
-	str_free(s2);
-}
-
-void t_strutil_str_append(void)
-{
-	str_t *s = str_new();
-	TEST_ASSERT_EQUAL_STRING("", str_data(s));
-
-	str_append(s, "hello");
-	TEST_ASSERT_EQUAL_STRING("hello", str_data(s));
-
-	str_append(s, "world");
-	TEST_ASSERT_EQUAL_STRING("helloworld", str_data(s));
-
-	str_free(s);
-}
-
-void t_strutil_str_append_f(void)
-{
-	str_t *s = str_new();
-	TEST_ASSERT_EQUAL_STRING("", str_data(s));
-
-	str_append_f(s, "%s %d", "hello", 21);
-	TEST_ASSERT_EQUAL_STRING("hello 21", str_data(s));
-
-	str_append_f(s, "%s %d", "world", 42);
-	TEST_ASSERT_EQUAL_STRING("hello 21world 42", str_data(s));
-
-	str_free(s);
-}
-
-void t_strutil_str_append_n(void)
-{
-	str_t *s = str_new();
-	TEST_ASSERT_EQUAL_STRING("", str_data(s));
-
-	str_append_n(s, "\0\1\2\3", 4);
-	TEST_ASSERT_EQUAL(4, str_len(s));
-	TEST_ASSERT_EQUAL(0, memcmp(str_data(s), "\0\1\2\3\0", 5));
-
-	str_append_n(s, "\3\2\1\0", 4);
-	TEST_ASSERT_EQUAL(8, str_len(s));
-	TEST_ASSERT_EQUAL(0, memcmp(str_data(s), "\0\1\2\3\3\2\1\0\0", 9));
-
-	str_free(s);
-}
-
-void t_strutil_str_append_str(void)
-{
-	str_t *s = str_new();
-	TEST_ASSERT_EQUAL_STRING("", str_data(s));
-
-	str_t *s1 = str_new_copy("hello");
-	str_append_str(s, s1);
-	TEST_ASSERT_EQUAL_STRING("hello", str_data(s));
-
-	str_t *s2 = str_new_copy("world");
-	str_append_str(s, s2);
-	TEST_ASSERT_EQUAL_STRING("helloworld", str_data(s));
-
-	str_free(s);
-	str_free(s1);
-	str_free(s2);
+	TEST_ASSERT(strncasecmp("", "", 0) == 0);
+	TEST_ASSERT(strncasecmp("x", "y", 0) == 0);
+	TEST_ASSERT(strncasecmp("a", "", 1) > 0);
+	TEST_ASSERT(strncasecmp("", "a", 1) < 0);
+	TEST_ASSERT(strncasecmp("ax", "ay", 1) == 0);
+	TEST_ASSERT(strncasecmp("ax", "Ay", 1) == 0);
+	TEST_ASSERT(strncasecmp("Ax", "ay", 1) == 0);
+	TEST_ASSERT(strncasecmp("abx", "a", 2) > 0);
+	TEST_ASSERT(strncasecmp("a", "aby", 2) < 0);
+	TEST_ASSERT(strncasecmp("abx", "aby", 2) == 0);
 }
 
 void t_strutil_str_toupper(void)
 {
-	str_t *s = str_new();
-	str_set(s, "abc1"); str_toupper(s); TEST_ASSERT_EQUAL_STRING("ABC1", str_data(s));
-	str_set(s, "Abc1"); str_toupper(s); TEST_ASSERT_EQUAL_STRING("ABC1", str_data(s));
-	str_set(s, "ABC1"); str_toupper(s); TEST_ASSERT_EQUAL_STRING("ABC1", str_data(s));
-	str_free(s);
+	UT_string *s = utstr_new();
+	utstr_set(s, "abc1"); utstr_toupper(s); TEST_ASSERT_EQUAL_STRING("ABC1", utstr_body(s));
+	utstr_set(s, "Abc1"); utstr_toupper(s); TEST_ASSERT_EQUAL_STRING("ABC1", utstr_body(s));
+	utstr_set(s, "ABC1"); utstr_toupper(s); TEST_ASSERT_EQUAL_STRING("ABC1", utstr_body(s));
+	utstr_free(s);
 }
 
 void t_strutil_str_tolower(void)
 {
-	str_t *s = str_new();
-	str_set(s, "abc1"); str_tolower(s); TEST_ASSERT_EQUAL_STRING("abc1", str_data(s));
-	str_set(s, "Abc1"); str_tolower(s); TEST_ASSERT_EQUAL_STRING("abc1", str_data(s));
-	str_set(s, "ABC1"); str_tolower(s); TEST_ASSERT_EQUAL_STRING("abc1", str_data(s));
-	str_free(s);
+	UT_string *s = utstr_new();
+	utstr_set(s, "abc1"); utstr_tolower(s); TEST_ASSERT_EQUAL_STRING("abc1", utstr_body(s));
+	utstr_set(s, "Abc1"); utstr_tolower(s); TEST_ASSERT_EQUAL_STRING("abc1", utstr_body(s));
+	utstr_set(s, "ABC1"); utstr_tolower(s); TEST_ASSERT_EQUAL_STRING("abc1", utstr_body(s));
+	utstr_free(s);
 }
 
 void t_strutil_str_chomp(void)
 {
-	str_t *s = str_new();
-	str_set(s, ""); str_chomp(s); TEST_ASSERT_EQUAL_STRING("", str_data(s));
-	str_set(s, "\r\n \t\f \r\n \t\f\v"); str_chomp(s); TEST_ASSERT_EQUAL_STRING("", str_data(s));
-	str_set(s, "\r\n \t\fx\r\n \t\f\v"); str_chomp(s); TEST_ASSERT_EQUAL_STRING("\r\n \t\fx", str_data(s));
-	str_free(s);
+	UT_string *s = utstr_new();
+	utstr_set(s, ""); utstr_chomp(s); TEST_ASSERT_EQUAL_STRING("", utstr_body(s));
+	utstr_set(s, "\r\n \t\f \r\n \t\f\v"); utstr_chomp(s); TEST_ASSERT_EQUAL_STRING("", utstr_body(s));
+	utstr_set(s, "\r\n \t\fx\r\n \t\f\v"); utstr_chomp(s); TEST_ASSERT_EQUAL_STRING("\r\n \t\fx", utstr_body(s));
+	utstr_free(s);
 }
 
 void t_strutil_str_strip(void)
 {
-	str_t *s = str_new();
-	str_set(s, ""); str_strip(s); TEST_ASSERT_EQUAL_STRING("", str_data(s));
-	str_set(s, "\r\n \t\f \r\n \t\f\v"); str_strip(s); TEST_ASSERT_EQUAL_STRING("", str_data(s));
-	str_set(s, "\r\n \t\fx\r\n \t\f\v"); str_strip(s); TEST_ASSERT_EQUAL_STRING("x", str_data(s));
-	str_free(s);
+	UT_string *s = utstr_new();
+	utstr_set(s, ""); utstr_strip(s); TEST_ASSERT_EQUAL_STRING("", utstr_body(s));
+	utstr_set(s, "\r\n \t\f \r\n \t\f\v"); utstr_strip(s); TEST_ASSERT_EQUAL_STRING("", utstr_body(s));
+	utstr_set(s, "\r\n \t\fx\r\n \t\f\v"); utstr_strip(s); TEST_ASSERT_EQUAL_STRING("x", utstr_body(s));
+	utstr_free(s);
 }
 
 void t_strutil_argv_new(void)

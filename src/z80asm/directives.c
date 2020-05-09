@@ -10,6 +10,7 @@ Assembly directives.
 */
 
 #include "codearea.h"
+#include "die.h"
 #include "directives.h"
 #include "errors.h"
 #include "fileutil.h"
@@ -17,10 +18,10 @@ Assembly directives.
 #include "module.h"
 #include "parse.h"
 #include "strutil.h"
-#include "types.h"
 #include "symtab.h"
+#include "types.h"
+#include "utstring.h"
 #include "z80asm.h"
-#include "die.h"
 
 static void check_org_align();
 

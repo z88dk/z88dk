@@ -6,9 +6,10 @@
 #pragma once
 
 #include "die.h"
+#include "strutil.h"
 #include "types.h"
 #include "utarray.h"
-#include "strutil.h"
+#include "utstring.h"
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -43,14 +44,14 @@ typedef enum file_type
 //-----------------------------------------------------------------------------
 typedef struct symbol_s
 {
-	str_t* name;
+	UT_string* name;
 	char	 scope;
 	char	 type;
 	int		 value;
 
 	struct section_s* section;		// weak
 
-	str_t* filename;
+	UT_string* filename;
 	int		 line_nr;
 
 	struct symbol_s* next, * prev;
@@ -64,16 +65,16 @@ extern void symbol_free(symbol_t* self);
 //-----------------------------------------------------------------------------
 typedef struct expr_s
 {
-	str_t* text;
+	UT_string* text;
 	char	 type;
 	int		 asmpc;
 	int		 patch_ptr;
 
 	struct section_s* section;		// weak
 
-	str_t* target_name;
+	UT_string* target_name;
 
-	str_t* filename;
+	UT_string* filename;
 	int		 line_nr;
 
 	struct expr_s* next, * prev;
@@ -87,7 +88,7 @@ extern void expr_free(expr_t* self);
 //-----------------------------------------------------------------------------
 typedef struct section_s
 {
-	str_t* name;
+	UT_string* name;
 	UT_array* data;
 	int			 org;
 	int			 align;
@@ -107,9 +108,9 @@ extern void section_free(section_t* self);
 //-----------------------------------------------------------------------------
 typedef struct objfile_s
 {
-	str_t* filename;
-	str_t* signature;
-	str_t* modname;
+	UT_string* filename;
+	UT_string* signature;
+	UT_string* modname;
 	int			 version;
 	int			 global_org;
 	argv_t* externs;
@@ -128,8 +129,8 @@ extern void objfile_write(objfile_t* obj, FILE* fp);
 //-----------------------------------------------------------------------------
 typedef struct file_s
 {
-	str_t* filename;
-	str_t* signature;
+	UT_string* filename;
+	UT_string* signature;
 	file_type_e  type;
 	int			 version;
 

@@ -11,6 +11,7 @@ Define ragel-based parser.
 
 #include "class.h"
 #include "codearea.h"
+#include "die.h"
 #include "directives.h"
 #include "expr.h"
 #include "listfile.h"
@@ -23,7 +24,9 @@ Define ragel-based parser.
 #include "sym.h"
 #include "symtab.h"
 #include "utarray.h"
-#include "die.h"
+#include "utstring.h"
+#include "zutils.h"
+
 #include <ctype.h>
 
 /*-----------------------------------------------------------------------------
@@ -487,8 +490,7 @@ bool parse_file(const char *filename)
 	ctx = ParseCtx_new();
 	src_push();
 	{
-		if (src_open(filename, opts.inc_path))
-		{
+		if (src_open(filename, opts.inc_path)) {
 			if (opts.verbose)
 				printf("Reading '%s' = '%s'\n", path_canon(filename), path_canon(src_filename()));	/* display name of file */
 

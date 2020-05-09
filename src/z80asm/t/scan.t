@@ -19,16 +19,17 @@ my $objs = "scan.o errors.o error_func.o model.o module.o codearea.o listfile.o 
 		   "options.o hist.o sym.o symtab.o expr.o ".
 		   "lib/str.o lib/strhash.o  ../common/fileutil.o ../common/strutil.o ../common/die.o ../common/objfile.o ../../ext/regex/regcomp.o ../../ext/regex/regerror.o ../../ext/regex/regexec.o ../../ext/regex/regfree.o ".
 		   "lib/srcfile.o macros.o lib/class.o ".
-		   "lib/list.o lib/array.o lib/dbg.o ";
+		   "lib/list.o lib/array.o lib/dbg.o zutils.o ";
 if ($^O eq 'MSWin32' || $^O eq 'msys') {
 	  $objs .= "../../ext/UNIXem/src/glob.o ../../ext/UNIXem/src/dirent.o ";
 }
 
 my $init = <<'END';
-#include "scan.h"
-#include "symbol.h"
 #include "macros.h"
+#include "scan.h"
 #include "strutil.h"
+#include "symbol.h"
+#include "utstring.h"
 #include <assert.h>
 
 char *GetLibfile( char *filename ) {return NULL;}
@@ -147,11 +148,11 @@ char *GetLibfile( char *filename ) {return NULL;}
 
 #define T_OPCODE(opcode, _cpu)	\
 		strcpy(opcode_lcase, #opcode); \
-		cstr_tolower(opcode_lcase); \
+		strtolower(opcode_lcase); \
 		strcpy(string, #opcode " " #opcode); \
-		cstr_tolower(string); \
+		strtolower(string); \
 		T_OPCODE2(opcode, opcode_lcase, _cpu); \
-		cstr_toupper(string); \
+		strtoupper(string); \
 		T_OPCODE2(opcode, #opcode, _cpu);
 
 END

@@ -11,13 +11,14 @@ Error handling.
 
 #include "errors.h"
 #include "fileutil.h"
+#include "init.h"
 #include "options.h"
 #include "srcfile.h"
 #include "str.h"
-#include "strutil.h"
 #include "strhash.h"
+#include "strutil.h"
 #include "types.h"
-#include "init.h"
+#include "utstring.h"
 #include <stdio.h>
 
 /*-----------------------------------------------------------------------------

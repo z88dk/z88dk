@@ -12,12 +12,13 @@ License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_licens
 Repository: https://github.com/z88dk/z88dk
 */
 
-#include "alloc.h"
 #include "../errors.h"
+#include "alloc.h"
+#include "die.h"
+#include "fileutil.h"
 #include "srcfile.h"
 #include "strutil.h"
-#include "fileutil.h"
-#include "die.h"
+#include "utstring.h"
 
 /*-----------------------------------------------------------------------------
 *   Type stored in file_stack

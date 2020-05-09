@@ -12,10 +12,11 @@ endif
 include ../Make.common
 
 SRCS 		:= $(wildcard *.c) \
-../common/die.c \
-../common/objfile.c \
-../common/fileutil.c \
-../common/strutil.c \
+			../z80asm/zutils.c \
+			../common/die.c \
+			../common/objfile.c \
+			../common/fileutil.c \
+			../common/strutil.c \
 $(wildcard ../../ext/regex/reg*.c)
 
 OBJS	:= $(SRCS:.c=.o) \
@@ -23,7 +24,10 @@ OBJS	:= $(SRCS:.c=.o) \
 
 DEPENDS	:= $(SRCS:.c=.d)
 
-CFLAGS += -Wall -std=gnu11 -MMD -std=gnu11 -I../common -I../../ext/uthash/src -I../../ext/regex \
+OPT 	:= -O3
+#OPT 	:= -O3 -pg
+
+CFLAGS += $(OPT) -Wall -std=gnu11 -MMD -std=gnu11 -I../common -I../../ext/uthash/src -I../../ext/regex -I../z80asm \
 			$(UNIXem_CFLAGS)
 
 INSTALL ?= install

@@ -7,7 +7,7 @@
 
 #include "../config.h"
 #include "../portability.h"
-
+#include "die.h"
 #include "errors.h"
 #include "fileutil.h"
 #include "hist.h"
@@ -19,17 +19,14 @@
 #include "strutil.h"
 #include "symtab.h"
 #include "utarray.h"
+#include "utstring.h"
 #include "z80asm.h"
-#include "die.h"
+#include "zutils.h"
 
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
 #include <string.h>
-
-#ifdef _MSC_VER
-#define snprintf _snprintf
-#endif
 
 /* default file name extensions */
 #define FILEEXT_ASM     ".asm"    
@@ -385,7 +382,7 @@ static const char *search_source(const char *filename)
 
 static void process_file(char *filename )
 {
-	cstr_strip(filename);
+	strstrip(filename);
 	switch (filename[0])
 	{
 	case '\0':		/* no file */
@@ -393,7 +390,7 @@ static void process_file(char *filename )
 
 	case '@':		/* file list */
 		filename++;						/* point to after '@' */
-		cstr_strip(filename);
+		strstrip(filename);
 		filename = (char *)expand_environment_variables(filename);
 		expand_list_glob(filename);
 		break;

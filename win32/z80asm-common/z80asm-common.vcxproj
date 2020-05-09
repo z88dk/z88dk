@@ -100,7 +100,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\..\ext\uthash\src;..\..\ext\UNIXem\include;..\..\ext\regex;..\..\ext\optparse</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\src\z80asm;$(ProjectDir)\..\..\ext\uthash\src;$(ProjectDir)\..\..\ext\UNIXem\include;$(ProjectDir)\..\..\ext\regex;$(ProjectDir)\..\..\ext\optparse</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -129,7 +129,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\..\ext\uthash\src;..\..\ext\UNIXem\include;..\..\ext\regex;..\..\ext\optparse</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\src\z80asm;$(ProjectDir)\..\..\ext\uthash\src;$(ProjectDir)\..\..\ext\UNIXem\include;$(ProjectDir)\..\..\ext\regex;$(ProjectDir)\..\..\ext\optparse</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

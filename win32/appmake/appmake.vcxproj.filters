@@ -53,18 +53,28 @@
     <ClCompile Include="..\..\src\appmake\x1.c" />
     <ClCompile Include="..\..\src\appmake\spc1000.c" />
     <ClCompile Include="..\..\src\appmake\multi8.c" />
-    <ClCompile Include="..\..\src\appmake\fp1100.c" />
-    <ClCompile Include="..\..\src\appmake\d88.c" />
     <ClCompile Include="..\..\src\appmake\cpmdisk.c" />
     <ClCompile Include="..\..\src\appmake\mz2500.c" />
     <ClCompile Include="..\..\src\appmake\cpm2.c" />
     <ClCompile Include="..\..\src\appmake\mameql.c" />
     <ClCompile Include="..\..\src\appmake\pc88.c" />
+    <ClCompile Include="..\..\src\appmake\fat.c" />
+    <ClCompile Include="..\..\src\appmake\ff.c" />
+    <ClCompile Include="..\..\src\appmake\fp1100.c" />
+    <ClCompile Include="..\..\src\appmake\homelab.c" />
+    <ClCompile Include="..\..\src\appmake\mamepp.c" />
+    <ClCompile Include="..\..\src\appmake\pasopia7.c" />
+    <ClCompile Include="..\..\src\appmake\pmd85.c" />
+    <ClCompile Include="..\..\src\appmake\rk8.c" />
+    <ClCompile Include="..\..\src\appmake\tvc.c" />
+    <ClCompile Include="..\..\src\appmake\vector06c.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\appmake\appmake.h" />
     <ClInclude Include="..\..\src\appmake\zx-util.h" />
-    <ClInclude Include="..\..\src\appmake\d88.h" />
     <ClInclude Include="..\..\src\appmake\cpmdisk.h" />
+    <ClInclude Include="..\..\src\appmake\diskio.h" />
+    <ClInclude Include="..\..\src\appmake\ff.h" />
+    <ClInclude Include="..\..\src\appmake\ffconf.h" />
   </ItemGroup>
 </Project>

@@ -9,14 +9,15 @@ Manage the code area in memory
 */
 
 #include "codearea.h"
-#include "fileutil.h"
+#include "die.h"
 #include "errors.h"
+#include "fileutil.h"
 #include "init.h"
 #include "listfile.h"
 #include "options.h"
 #include "strutil.h"
+#include "utstring.h"
 #include "z80asm.h"
-#include "die.h"
 #include <memory.h>
 
 /*-----------------------------------------------------------------------------

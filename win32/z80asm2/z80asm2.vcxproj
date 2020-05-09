@@ -22,12 +22,17 @@
     <ClInclude Include="..\..\src\z80asm\dev\z80asm2\backend.h" />
     <ClInclude Include="..\..\src\z80asm\dev\z80asm2\frontend.h" />
     <ClInclude Include="..\..\src\z80asm\dev\z80asm2\utils.h" />
+    <ClInclude Include="..\..\src\z80asm\zutils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\ext\UNIXem\src\dirent.c" />
+    <ClCompile Include="..\..\ext\UNIXem\src\glob.c" />
+    <ClCompile Include="..\..\src\common\die.c" />
     <ClCompile Include="..\..\src\z80asm\dev\z80asm2\backend.c" />
     <ClCompile Include="..\..\src\z80asm\dev\z80asm2\frontend.c" />
     <ClCompile Include="..\..\src\z80asm\dev\z80asm2\utils.c" />
     <ClCompile Include="..\..\src\z80asm\dev\z80asm2\z80asm2.c" />
+    <ClCompile Include="..\..\src\z80asm\zutils.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -102,7 +107,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\ext\uthash\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\src\z80asm;$(ProjectDir)\..\..\src\common;$(ProjectDir)\..\..\ext\uthash\src;$(ProjectDir)\..\..\ext\UNIXem\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -135,7 +140,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\ext\uthash\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\src\z80asm;$(ProjectDir)\..\..\src\common;$(ProjectDir)\..\..\ext\uthash\src;$(ProjectDir)\..\..\ext\UNIXem\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

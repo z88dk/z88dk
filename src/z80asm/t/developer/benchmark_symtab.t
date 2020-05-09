@@ -14,7 +14,7 @@ use Test::More;
 use List::AllUtils 'uniq';
 require './t/test_utils.pl';
 
-my $objs = "avltree.o lib/alloc.o lib/str.o lib/list.o errors.o error_func.o ../common/strutil.o lib/strhash.o lib/class.o";
+my $objs = "avltree.o lib/alloc.o lib/str.o lib/list.o errors.o error_func.o ../common/strutil.o lib/strhash.o lib/class.o zutils.o ";
 my $src = "t/data/zx48.asm";
 my @words;
 

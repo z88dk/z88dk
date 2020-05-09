@@ -7,6 +7,7 @@ License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_licens
 Repository: https://github.com/z88dk/z88dk
 */
 
+#include "die.h"
 #include "directives.h"
 #include "fileutil.h"
 #include "libfile.h"
@@ -14,13 +15,12 @@ Repository: https://github.com/z88dk/z88dk
 #include "macros.h"
 #include "modlink.h"
 #include "module.h"
-#include "zobjfile.h"
 #include "parse.h"
-#include "types.h"
 #include "strutil.h"
 #include "symbol.h"
-#include "die.h"
-
+#include "types.h"
+#include "utstring.h"
+#include "zobjfile.h"
 #include <sys/stat.h>
 
 /* external functions */

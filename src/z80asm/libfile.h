@@ -12,6 +12,7 @@ Handle library file contruction, reading and writing
 #pragma once
 
 #include "strutil.h"
+#include "utstring.h"
 
 extern char Z80libhdr[];
 

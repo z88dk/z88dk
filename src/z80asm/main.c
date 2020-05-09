@@ -9,7 +9,6 @@ Main function
 */
 #include "z80asm.h"
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 	return z80asm_main(argc, argv);
 }

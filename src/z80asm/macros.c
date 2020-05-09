@@ -8,14 +8,17 @@ Repository: https://github.com/z88dk/z88dk/
 Assembly macros.
 */
 
-#include "macros.h"
 #include "alloc.h"
+#include "die.h"
 #include "errors.h"
+#include "macros.h"
 #include "str.h"
 #include "strutil.h"
-#include "uthash.h"
 #include "types.h"
-#include "die.h"
+#include "uthash.h"
+#include "utstring.h"
+#include "zutils.h"
+
 #include <ctype.h>
 
 #define Is_ident_prefix(x)	((x)=='.' || (x)=='#' || (x)=='$' || (x)=='%' || (x)=='@')
@@ -29,14 +32,14 @@ typedef struct DefMacro
 {
 	const char	*name;					// string kept in strpool.h
 	argv_t		*params;				// list of formal parameters
-	str_t		*text;					// replacement text
+	UT_string	*text;					// replacement text
 	UT_hash_handle hh;      			// hash table
 } DefMacro;
 
 static DefMacro *def_macros = NULL;		// global list of #define macros
 static argv_t *in_lines = NULL;			// line stream from input
 static argv_t *out_lines = NULL;		// line stream to ouput
-static str_t *current_line = NULL;		// current returned line
+static UT_string *current_line = NULL;	// current returned line
 static bool in_defgroup;				// no EQU transformation in defgroup
 
 static DefMacro *DefMacro_add(char *name)
@@ -49,7 +52,7 @@ static DefMacro *DefMacro_add(char *name)
 	elem = m_new(DefMacro);
 	elem->name = spool_add(name);
 	elem->params = argv_new();
-	elem->text = str_new();
+	elem->text = utstr_new();
 	HASH_ADD_KEYPTR(hh, def_macros, elem->name, strlen(name), elem);
 
 	return elem;
@@ -59,7 +62,7 @@ static void DefMacro_delete_elem(DefMacro *elem)
 {
 	if (elem) {
 		argv_free(elem->params);
-		str_free(elem->text);
+		utstr_free(elem->text);
 		HASH_DEL(def_macros, elem);
 		m_free(elem);
 	}
@@ -85,7 +88,7 @@ void init_macros()
 	in_defgroup = false;
 	in_lines = argv_new();
 	out_lines = argv_new();
-	current_line = str_new();
+	current_line = utstr_new();
 }
 
 void clear_macros()
@@ -99,7 +102,7 @@ void clear_macros()
 
 	argv_clear(in_lines);
 	argv_clear(out_lines);
-	str_clear(current_line);
+	utstr_clear(current_line);
 }
 
 void free_macros()
@@ -108,7 +111,7 @@ void free_macros()
 
 	argv_free(in_lines);
 	argv_free(out_lines);
-	str_free(current_line);
+	utstr_free(current_line);
 }
 
 // fill input stream
@@ -124,11 +127,11 @@ static void fill_input(getline_t getline_func)
 // extract first line from input_stream to current_line
 static bool shift_lines(argv_t *lines)
 {
-	str_clear(current_line);
+	utstr_clear(current_line);
 	if (argv_len(lines) > 0) {
 		// copy first from stream
 		char *line = *argv_front(lines);
-		str_set(current_line, line);
+		utstr_set(current_line, line);
 		argv_shift(lines);
 		return true;
 	}
@@ -141,17 +144,17 @@ static bool collect_name(char **in, UT_string *out)
 {
 	char *p = *in;
 
-	str_clear(out);
+	utstr_clear(out);
 	while (isspace(*p)) p++;
 
 	if (Is_ident_prefix(p[0]) && Is_ident_start(p[1])) {
-		str_append_n(out, p, 2); p += 2;
-		while (Is_ident_cont(*p)) { str_append_n(out, p, 1); p++; }
+		utstr_append_n(out, p, 2); p += 2;
+		while (Is_ident_cont(*p)) { utstr_append_n(out, p, 1); p++; }
 		*in = p;
 		return true;
 	}
 	else if (Is_ident_start(p[0])) {
-		while (Is_ident_cont(*p)) { str_append_n(out, p, 1); p++; }
+		while (Is_ident_cont(*p)) { utstr_append_n(out, p, 1); p++; }
 		*in = p;
 		return true;
 	}
@@ -171,7 +174,7 @@ static bool collect_params(char **p, DefMacro *macro, UT_string *param)
 
 	for (;;) {
 		if (!collect_name(p, param)) return false;
-		argv_push(macro->params, str_data(param));
+		argv_push(macro->params, utstr_body(param));
 
 		while (isspace(*P)) P++;
 		if (*P == ')') { P++; return true; }
@@ -183,44 +186,44 @@ static bool collect_params(char **p, DefMacro *macro, UT_string *param)
 }
 
 // collect macro text
-static bool collect_text(char **p, DefMacro *macro, str_t *text)
+static bool collect_text(char **p, DefMacro *macro, UT_string *text)
 {
 #define P (*p)
 
-	str_clear(text);
+	utstr_clear(text);
 
 	while (isspace(*P)) P++;
 	while (*P) {
 		if (*P == ';' || *P == '\n') 
 			break;
 		else if (*P == '\'' || *P == '"') {
-			char q = *P; str_append_n(text, P, 1); P++;
+			char q = *P; utstr_append_n(text, P, 1); P++;
 			while (*P != q && *P != '\0') {
 				if (*P == '\\') {
-					str_append_n(text, P, 1); P++;
+					utstr_append_n(text, P, 1); P++;
 					if (*P != '\0') {
-						str_append_n(text, P, 1); P++;
+						utstr_append_n(text, P, 1); P++;
 					}
 				}
 				else {
-					str_append_n(text, P, 1); P++;
+					utstr_append_n(text, P, 1); P++;
 				}
 			}
 			if (*P != '\0') {
-				str_append_n(text, P, 1); P++;
+				utstr_append_n(text, P, 1); P++;
 			}
 		}
 		else {
-			str_append_n(text, P, 1); P++;
+			utstr_append_n(text, P, 1); P++;
 		}
 	}
 
-	while (str_len(text) > 0 && isspace(str_data(text)[str_len(text) - 1])) {
-		str_len(text)--;
-		str_data(text)[str_len(text)] = '\0';
+	while (utstr_len(text) > 0 && isspace(utstr_body(text)[utstr_len(text) - 1])) {
+		utstr_len(text)--;
+		utstr_body(text)[utstr_len(text)] = '\0';
 	}
 
-	str_set_str(macro->text, text);
+	utstr_set_str(macro->text, text);
 
 	return true;
 
@@ -247,7 +250,7 @@ static bool collect_ident(char **in, char *ident)
 	char *p = *in;
 
 	size_t idlen = strlen(ident);
-	if (cstr_case_ncmp(p, ident, idlen) == 0 && !Is_ident_cont(p[idlen])) {
+	if (strncasecmp(p, ident, idlen) == 0 && !Is_ident_cont(p[idlen])) {
 		*in = p + idlen;
 		return true;
 	}
@@ -271,7 +274,7 @@ static bool collect_equ(char **in, UT_string *name)
 		}
 	}
 	else if (collect_name(&p, name)) {
-		if (cstr_case_cmp(str_data(name), "defgroup") == 0) {
+		if (strcasecmp(utstr_body(name), "defgroup") == 0) {
 			in_defgroup = true;
 			while (*p != '\0' && *p != ';') {
 				if (*p == '}') {
@@ -283,14 +286,11 @@ static bool collect_equ(char **in, UT_string *name)
 			return false;
 		}
 		
-		if (utstring_body(name)[0] == '.') {			// old-style label
+		if (utstr_body(name)[0] == '.') {			// old-style label
 			// remove starting dot from name
-			UT_string *temp;
-			utstring_new(temp);
-			utstring_printf(temp, "%s", &utstring_body(name)[1]);
-			utstring_clear(name);
-			utstring_concat(name, temp);
-			utstring_free(temp);
+			UT_string *temp = utstr_new_init(&utstr_body(name)[1]);
+			utstr_set_str(name, temp);
+			utstr_free(temp);
 		}
 		else if (*p == ':') {							// colon after name
 			p++;
@@ -311,29 +311,29 @@ static bool collect_equ(char **in, UT_string *name)
 }
 
 // collect arguments and expand macro
-static void macro_expand(DefMacro *macro, char **p, str_t *out)
+static void macro_expand(DefMacro *macro, char **p, UT_string *out)
 {
 	if (utarray_len(macro->params) > 0) {
 		// collect arguments
 		xassert(0);
 	}
 
-	str_append(out, str_data(macro->text));
+	utstr_append(out, utstr_body(macro->text));
 }
 
 // parse #define, #undef and expand macros
-static void parse1(str_t *in, str_t *out, str_t *name, str_t *text)
+static void parse1(UT_string *in, UT_string *out, UT_string *name, UT_string *text)
 {
 	// default output = input
-	str_set_str(out, in);
+	utstr_set_str(out, in);
 
-	char *p = str_data(in);
+	char *p = utstr_body(in);
 
 	if (*p == '#') {
 		p++;
 
 		if (collect_ident(&p, "define")) {
-			str_clear(out);
+			utstr_clear(out);
 
 			// get macro name
 			if (!collect_name(&p, name)) {
@@ -342,9 +342,9 @@ static void parse1(str_t *in, str_t *out, str_t *name, str_t *text)
 			}
 
 			// create macro, error if duplicate
-			DefMacro *macro = DefMacro_add(str_data(name));
+			DefMacro *macro = DefMacro_add(utstr_body(name));
 			if (!macro) {
-				error_redefined_macro(str_data(name));
+				error_redefined_macro(utstr_body(name));
 				return;
 			}
 
@@ -363,7 +363,7 @@ static void parse1(str_t *in, str_t *out, str_t *name, str_t *text)
 			}
 		}
 		else if (collect_ident(&p, "undef")) {
-			str_clear(out);
+			utstr_clear(out);
 
 			// get macro name
 			if (!collect_name(&p, name)) {
@@ -377,87 +377,87 @@ static void parse1(str_t *in, str_t *out, str_t *name, str_t *text)
 				return;
 			}
 
-			DefMacro_delete(str_data(name));
+			DefMacro_delete(utstr_body(name));
 		}
 		else {
 		}
 	}
 	else {	// expand macros
-		str_clear(out);
+		utstr_clear(out);
 		while (*p != '\0') {
 			if ((Is_ident_prefix(p[0]) && Is_ident_start(p[1])) ||
 				Is_ident_start(p[0])) {
 				// maybe at start of macro call
 				collect_name(&p, name);
-				DefMacro *macro = DefMacro_lookup(str_data(name));
+				DefMacro *macro = DefMacro_lookup(utstr_body(name));
 				if (macro)
 					macro_expand(macro, &p, out);
 				else {
 					// try after prefix
-					if (Is_ident_prefix(str_data(name)[0])) {
-						str_append_n(out, str_data(name), 1);
-						macro = DefMacro_lookup(str_data(name) + 1);
+					if (Is_ident_prefix(utstr_body(name)[0])) {
+						utstr_append_n(out, utstr_body(name), 1);
+						macro = DefMacro_lookup(utstr_body(name) + 1);
 						if (macro)
 							macro_expand(macro, &p, out);
 						else
-							str_append_n(out, str_data(name) + 1, str_len(name) - 1);
+							utstr_append_n(out, utstr_body(name) + 1, utstr_len(name) - 1);
 					}
 					else {
-						str_append_n(out, str_data(name), str_len(name));
+						utstr_append_n(out, utstr_body(name), utstr_len(name));
 					}
 				}
 			}
 			else if (*p == '\'' || *p == '"') {
 				char q = *p;
-				str_append_n(out, p, 1); p++;
+				utstr_append_n(out, p, 1); p++;
 				while (*p != q && *p != '\0') {
 					if (*p == '\\') {
-						str_append_n(out, p, 1); p++;
+						utstr_append_n(out, p, 1); p++;
 						if (*p != '\0') {
-							str_append_n(out, p, 1); p++;
+							utstr_append_n(out, p, 1); p++;
 						}
 					}
 					else {
-						str_append_n(out, p, 1); p++;
+						utstr_append_n(out, p, 1); p++;
 					}
 				}
 				if (*p != '\0') {
-					str_append_n(out, p, 1); p++;
+					utstr_append_n(out, p, 1); p++;
 				}
 			}
 			else if (*p == ';') {
-				str_append_n(out, "\n", 1); p += strlen(p);		// skip comments
+				utstr_append_n(out, "\n", 1); p += strlen(p);		// skip comments
 			}
 			else {
-				str_append_n(out, p, 1); p++;
+				utstr_append_n(out, p, 1); p++;
 			}
 		}
 
 		// check other commands after macro expansion
-		str_set_str(in, out);	// in = out
+		utstr_set_str(in, out);	// in = out
 
-		p = str_data(in);
+		p = utstr_body(in);
 		if (collect_equ(&p, name)) {
-			str_set_f(out, "defc %s = %s", str_data(name), p);
+			utstr_set_fmt(out, "defc %s = %s", utstr_body(name), p);
 		}
 	}
 }
 
 static void parse()
 {
-	str_t *out, *name, *text;
-	out = str_new();
-	name = str_new();
-	text = str_new();
+	UT_string *out, *name, *text;
+	out = utstr_new();
+	name = utstr_new();
+	text = utstr_new();
 
 	parse1(current_line, out, name, text);
-	if (str_len(out) > 0) {
-		argv_push(out_lines, str_data(out));
+	if (utstr_len(out) > 0) {
+		argv_push(out_lines, utstr_body(out));
 	}
 
-	str_free(out);
-	str_free(name);
-	str_free(text);
+	utstr_free(out);
+	utstr_free(name);
+	utstr_free(text);
 }
 
 // get line and call parser
@@ -465,7 +465,7 @@ char *macros_getline(getline_t getline_func)
 {
 	do {
 		if (shift_lines(out_lines))
-			return str_data(current_line);
+			return utstr_body(current_line);
 
 		fill_input(getline_func);
 
@@ -475,7 +475,7 @@ char *macros_getline(getline_t getline_func)
 		parse();					// parse current_line, leave output in out_lines
 	} while (!shift_lines(out_lines));
 
-	return str_data(current_line);
+	return utstr_body(current_line);
 }
 
 

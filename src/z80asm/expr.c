@@ -12,15 +12,16 @@ see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
 #include "array.h"
 #include "codearea.h"
-#include "expr.h"
+#include "die.h"
 #include "errors.h"
+#include "expr.h"
 #include "init.h"
 #include "model.h"
 #include "strhash.h"
 #include "strutil.h"
 #include "sym.h"
 #include "symtab.h"
-#include "die.h"
+#include "utstring.h"
 
 /*-----------------------------------------------------------------------------
 *	UT_array of Expr*

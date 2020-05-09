@@ -11,15 +11,17 @@ Handle object file contruction, reading and writing
 
 #include "class.h"
 #include "codearea.h"
-#include "fileutil.h"
+#include "die.h"
 #include "errors.h"
+#include "fileutil.h"
 #include "libfile.h"
-#include "options.h"
 #include "model.h"
-#include "zobjfile.h"
+#include "options.h"
 #include "str.h"
 #include "strutil.h"
-#include "die.h"
+#include "utstring.h"
+#include "zobjfile.h"
+#include "zutils.h"
 
 /*-----------------------------------------------------------------------------
 *   Object header
@@ -267,7 +269,7 @@ static bool test_header(FILE* file)
 {
 	char buffer[Z80objhdr_size];
 
-	if (fread(buffer, sizeof(char), Z80objhdr_size, file) == Z80objhdr_size &&
+	if (fread(buffer, 1, Z80objhdr_size, file) == Z80objhdr_size &&
 		memcmp(buffer, Z80objhdr, Z80objhdr_size) == 0
 		)
 		return true;
@@ -316,7 +318,7 @@ void OFile_fini(OFile* self)
 *----------------------------------------------------------------------------*/
 OFile* OFile_read_header(FILE* file, size_t start_ptr)
 {
-	str_t* modname = str_new();
+	UT_string* modname = utstr_new();
 	OFile* self;
 
 	/* check file version */
@@ -340,9 +342,9 @@ OFile* OFile_read_header(FILE* file, size_t start_ptr)
 	/* read module name */
 	fseek(file, start_ptr + self->modname_ptr, SEEK_SET);
 	xfread_bcount_str(modname, file);
-	self->modname = spool_add(str_data(modname));
+	self->modname = spool_add(utstr_body(modname));
 
-	str_free(modname);
+	utstr_free(modname);
 
 	return self;
 }
@@ -446,7 +448,7 @@ ByteArray* read_obj_file_data(const char* filename)
 *	Updates current module name and size, if given object file is valid
 *	Load module name and size, when assembling with -d and up-to-date
 *----------------------------------------------------------------------------*/
-static bool objmodule_loaded_1(const char* obj_filename, str_t* section_name)
+static bool objmodule_loaded_1(const char* obj_filename, UT_string* section_name)
 {
 	int code_size;
 	OFile* ofile;
@@ -470,7 +472,7 @@ static bool objmodule_loaded_1(const char* obj_filename, str_t* section_name)
 
 				/* reserve space in section */
 				xfread_bcount_str(section_name, ofile->file);
-				section = new_section(str_data(section_name));
+				section = new_section(utstr_body(section_name));
 				read_origin(ofile->file, section);
 				section->align = xfread_dword(ofile->file);
 
@@ -491,9 +493,9 @@ static bool objmodule_loaded_1(const char* obj_filename, str_t* section_name)
 
 bool objmodule_loaded(const char* obj_filename)
 {
-	str_t* section_name = str_new();
+	UT_string* section_name = utstr_new();
 	bool ret = objmodule_loaded_1(obj_filename, section_name);
-	str_free(section_name);
+	utstr_free(section_name);
 	return ret;
 }
 

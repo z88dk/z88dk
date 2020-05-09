@@ -16,6 +16,7 @@ One symbol from the assembly code - label or constant.
 #include "strutil.h"
 #include "sym.h"
 #include "symbol.h"
+#include "utstring.h"
 
 /*-----------------------------------------------------------------------------
 *   Constant tables
