@@ -21,7 +21,7 @@ static char              fast         = 0;
 static char              survivors    = 0;
 static char              sf7000       = 0;
 
-unsigned long            checksum;
+static unsigned long     checksum;
 
 
 /* Options that are available for this module */
