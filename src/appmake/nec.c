@@ -21,6 +21,7 @@ static char help = 0;
 static char audio = 0;
 
 char nec_fast = 0;
+char nec_22 = 0;
 //static char              dumb         = 0;
 
 /* Options that are available for this module */
@@ -31,6 +32,7 @@ option_t nec_options[] = {
     { 'o', "output", "Name of output file", OPT_STR, &outfile },
     { 0, "audio", "Create also a WAV file", OPT_BOOL, &audio },
     { 0, "fast", "Create a fast loading WAV", OPT_BOOL, &nec_fast },
+    { 0, "22", "22050hz bitrate option", OPT_BOOL, &nec_22 },
     //    {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
     { 0, "org", "Origin of the binary", OPT_INT, &origin },
     { 0, "mode", "0..5: 16k,32k,mk2,n,ROM,n88", OPT_INT, &mode },
@@ -373,7 +375,7 @@ int nec_exec(char* target)
     /* ***************************************** */
     /*  Now, if requested, create the audio file */
     /* ***************************************** */
-    if ((audio) || (nec_fast)) {
+    if ((audio) || (nec_fast) || (nec_22)) {
         if ((fpin = fopen(filename, "rb")) == NULL) {
             fprintf(stderr, "Can't open file %s for wave conversion\n", filename);
             myexit(NULL, 1);
@@ -468,7 +470,10 @@ int nec_exec(char* target)
         fclose(fpout);
 
         /* Now complete with the WAV header */
-        raw2wav(wavfile);
+		if (nec_22)
+			raw2wav_22k(wavfile,2);
+		else
+			raw2wav(wavfile);
     }
 
     exit(0);
