@@ -654,7 +654,6 @@ void writeword_be(unsigned int i, FILE *fp)
     fputc(i%256,fp);
 }
 
-
 void writestring(char *mystring, FILE *fp)
 {
     size_t c;
@@ -838,6 +837,85 @@ void raw2wav(char *wavfile)
 
     for (i=0; i<len;i++) {
       c=getc(fpin);
+      fputc(c,fpout);
+    }
+
+    fclose(fpin);
+    fclose(fpout);
+    remove (rawfilename);
+}
+
+
+/* Convert a 44100 Khz RAW sound file to a 22050 Khz WAV file */
+void raw2wav_22k(char *wavfile, int mode)
+{
+    char    rawfilename[FILENAME_MAX+1];
+    FILE    *fpin, *fpout;
+    int      c;
+    long     i, len;
+
+    strcpy(rawfilename,wavfile);
+
+    if ( (fpin=fopen(wavfile,"rb") ) == NULL ) {
+        fprintf(stderr,"Can't open file %s for wave conversion\n",wavfile);
+        myexit(NULL,1);
+    }
+
+    if (fseek(fpin,0,SEEK_END)) {
+       fclose(fpin);
+       myexit("Couldn't determine size of file\n",1);
+    }
+
+    len=ftell(fpin)/2;
+    fseek(fpin,0L,SEEK_SET);
+    suffix_change(wavfile,".wav");
+
+    if ( (fpout=fopen(wavfile,"wb") ) == NULL ) {
+        fprintf(stderr,"Can't open output raw audio file %s\n",wavfile);
+        myexit(NULL,1);
+    }
+
+    /* Now let's think at the WAV file */
+    writestring("RIFF",fpout);
+    writelong(len+63,fpout);
+    writestring("WAVEfmt ",fpout);
+    writelong(0x10,fpout);
+    writeword(1,fpout);
+    writeword(1,fpout);
+    writelong(22050,fpout);
+    writelong(22050,fpout);
+    writeword(1,fpout);
+    writeword(8,fpout);
+    writestring("data",fpout);
+    writelong(len,fpout);
+
+    for (i=0; i<63;i++) {
+      fputc(0x20,fpout);
+    }
+
+    /*
+    //writestring(wav_table,fpout);
+    for (i=0; i<28;i++) {
+      fputc(0x20,fpout);
+    }
+    */
+
+    for (i=0; i<len;i++) {
+
+    switch (mode)
+    {
+        case 1:
+			c=getc(fpin);
+			getc(fpin);
+            break;
+        case 2:
+			getc(fpin);
+			c=getc(fpin);
+            break;
+		default:
+			c=getc(fpin);
+			c=(c+getc(fpin))/2;
+	}
       fputc(c,fpout);
     }
 
