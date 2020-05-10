@@ -20,10 +20,6 @@
 #include <unistd.h>
 #endif
 
-#ifdef WIN32
-#define __NORETURN 
-#endif
-
 #include "cpmdisk.h"
 
 extern char c_install_dir[];
@@ -101,9 +97,6 @@ extern option_t  gb_options;
 extern int       hex_exec(char *target);
 extern option_t  hex_options;
 
-extern int       homelab_exec(char *target);
-extern option_t  homelab_options;
-
 extern int       inject_exec(char *target);
 extern option_t  inject_options;
 extern char      inject_longhelp[];
@@ -117,9 +110,6 @@ extern option_t  lynx_options;
 
 extern int       m5_exec(char *target);
 extern option_t  m5_options;
-
-extern int       mamepp_exec(char *target);
-extern option_t  mamepp_options;
 
 extern int       mameql_exec(char *target);
 extern option_t  mameql_options;
@@ -159,9 +149,6 @@ extern option_t  p2000_options;
 
 extern int       px_exec(char *target);
 extern option_t  px_options;
-
-extern int       rk8_exec(char *target);
-extern option_t  rk8_options;
 
 extern int       sorcerer_exec(char *target);
 extern option_t  sorcerer_options;
@@ -207,9 +194,6 @@ extern option_t  tixx_options;
 
 extern int       trs80_exec(char *target);
 extern option_t  trs80_options;
-
-extern int       vector06c_exec(char *target);
-extern option_t  vector06c_options;
 
 extern int       vg5k_exec(char *target);
 extern option_t  vg5k_options;
@@ -326,10 +310,6 @@ struct {
       "Creates an intel hex record suitable for embedded devices",
       NULL,
       hex_exec,     &hex_options },
-    { "bin2htp",  "homelab",  "(C) 2020 z88dk",
-      "Creates a .htp file for Homelab emulators",
-      NULL,
-      homelab_exec,    &homelab_options },
     { "inject",  "inject",      "(C) 2014 Dominic Morris",
       "Injects files within other files",
       inject_longhelp,
@@ -350,10 +330,6 @@ struct {
       "Generates a tape file for the Sord M5, optional WAV file",
       NULL,
       m5_exec,   &m5_options },
-    { "bin2pp",   "mamepp",  "(C) 2020 z88dk",
-      "Create a Mame quickload file (pp)",
-      NULL,
-      mamepp_exec,   &mamepp_options },
     { "bin2mql",   "mameql",  "(C) 2018 dom",
       "Create a Mame quickload file (z80bin)",
       NULL,
@@ -426,10 +402,6 @@ struct {
       "Creates a .rex application using data from a .res file and a .bin file",
       NULL,
       rex_exec,     &rex_options },
-    { "bin2rk8",  "rk8",  "(C) 2020 z88dk",
-      "Create a rk8 file for Mikro-80",
-      NULL,
-      rk8_exec,        &rk8_options },
     { "rompad",    "rom",       "(C) 2014,2017 Stefano Bodrato & Alvin Albrecht",
       "Embed a binary inside a rom, padding if necessary",
       NULL,
@@ -486,10 +458,6 @@ struct {
       "Creates a CMD file for the TRS 80",
       NULL,
       trs80_exec,   &trs80_options },
-    { "bin2fdd",  "vector06c", "(C) 2020 z88dk",
-      "Create a bootable vector06c disk",
-      NULL,
-      vector06c_exec,    &vector06c_options },
     { "vg5k2k7",    "vg5k",     "(C) 2014 Stefano Bodrato",
       "Convert to Philips VG-5000 .k7 format, optionally to WAV",
       NULL,
@@ -575,8 +543,6 @@ extern void         writeword(unsigned int i, FILE *fp);
 extern void         writelong(unsigned long i, FILE *fp);
 extern void         writestring(char *mystring, FILE *fp);
 
-extern void         writeword_be(unsigned int i, FILE *fp);
-
 extern void         writeword_p(unsigned int i, FILE *fp,unsigned char *p);
 extern void         writebyte_p(unsigned char c, FILE *fp,unsigned char *p);
 extern void         writestring_p(char *mystring, FILE *fp,unsigned char *p);
@@ -596,6 +562,7 @@ extern void         writelong_b(unsigned long i, uint8_t **pptr);
 extern void         writestring_b(char *mystring, uint8_t **pptr);
 
 extern void         raw2wav(char *rawfilename);
+extern void         raw2wav_22k(char *rawfilename, int mode);
 
 extern void         zx_pilot(int pilot_len, FILE *fpout);
 extern void         zx_rawbit(FILE *fpout, int period);
