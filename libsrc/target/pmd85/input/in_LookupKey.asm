@@ -52,9 +52,9 @@ notfound:
 	
 
 not_function_table:
-	cp	64
+	cp	75
 	jr	c,continue
-	sub	64
+	sub	75
 	ld	c,a
 	ld	a,l
 	or	@10000000
