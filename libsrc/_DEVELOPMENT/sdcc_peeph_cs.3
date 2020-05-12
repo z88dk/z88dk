@@ -3651,6 +3651,57 @@ barrier
 ///////////////////////////////////////////////////////////////
 
 replace restart {
+	call	_SECTION_SIZE_CODE
+} by {
+	nop	; EXTERN __CODE_END_tail
+	nop	; EXTERN __CODE_head
+	ld	hl,#(__CODE_END_tail - __CODE_head)
+	; peephole z88dk-intrinsic-section-size
+}
+
+replace restart {
+	call	_SECTION_SIZE_DATA
+} by {
+	nop	; EXTERN __DATA_END_tail
+	nop	; EXTERN __DATA_head
+	ld	hl,#(__DATA_END_tail - __DATA_head)
+	; peephole z88dk-intrinsic-section-size
+}
+
+replace restart {
+	call	_SECTION_SIZE_BSS
+} by {
+	nop	; EXTERN __BSS_UNINITIALIZED_head
+	nop	; EXTERN __BSS_head
+	ld	hl,#(__BSS_UNINITIALIZED_head - __BSS_head)
+	; peephole z88dk-intrinsic-section-size
+}
+
+replace restart {
+	call	_SECTION_ORG_%1
+} by {
+	nop	; EXTERN __%1_head
+	ld	hl,#__%1_head
+	; peephole z88dk-intrinsic-section-org
+}
+
+replace restart {
+	call	_SECTION_END_%1
+} by {
+	nop	; EXTERN __%1_tail
+	ld	hl,#__%1_tail
+	; peephole z88dk-intrinsic-section-end
+}
+
+replace restart {
+	call	_SECTION_SIZE_%1
+} by {
+	nop	; EXTERN __%1_size
+	ld	hl,#__%1_size
+	; peephole z88dk-intrinsic-section-size
+}
+
+replace restart {
 	call	_intrinsic_outi_num_256
 } by {
 	call	____sdcc_outi_256
@@ -3852,8 +3903,23 @@ replace restart {
 }
 
 replace restart {
+	jp	_intrinsic_slp
+} by {
+	slp
+	ret
+	; peephole z88dk-intrinsic-slp
+}
+
+replace restart {
 	call	_intrinsic_stub
 } by {
+	; peephole z88dk-intrinsic-stub
+}
+
+replace restart {
+	jp	_intrinsic_stub
+} by {
+	ret
 	; peephole z88dk-intrinsic-stub
 }
 
@@ -3865,9 +3931,25 @@ replace restart {
 }
 
 replace restart {
+	jp	_intrinsic_di
+} by {
+	di
+	ret
+	; peephole z88dk-intrinsic-di
+}
+
+replace restart {
 	call	_intrinsic_ei
 } by {
 	ei
+	; peephole z88dk-intrinsic-ei
+}
+
+replace restart {
+	jp	_intrinsic_ei
+} by {
+	ei
+	ret
 	; peephole z88dk-intrinsic-ei
 }
 
@@ -3879,6 +3961,14 @@ replace restart {
 }
 
 replace restart {
+	jp	_intrinsic_halt
+} by {
+	halt
+	ret
+	; peephole z88dk-intrinsic-halt
+}
+
+replace restart {
 	call	_intrinsic_label_%1
 } by {
 %1::
@@ -3886,9 +3976,25 @@ replace restart {
 }
 
 replace restart {
+	jp	_intrinsic_label_%1
+} by {
+%1::
+	ret
+	; peephole z88dk-intrinsic-label %1
+}
+
+replace restart {
 	call	_intrinsic_load16_%1
 } by {
 	ld	hl,(#%1)
+	; peephole z88dk-intrinsic-load (%1)
+}
+
+replace restart {
+	jp	_intrinsic_load16_%1
+} by {
+	ld	hl,(#%1)
+	ret
 	; peephole z88dk-intrinsic-load (%1)
 }
 
@@ -3909,7 +4015,21 @@ replace restart {
 }
 
 replace restart {
+	jp	_intrinsic_reti
+} by {
+	reti
+	; peephole z88dk-intrinsic-reti
+}
+
+replace restart {
 	call	_intrinsic_retn
+} by {
+	retn
+	; peephole z88dk-intrinsic-retn
+}
+
+replace restart {
+	jp	_intrinsic_retn
 } by {
 	retn
 	; peephole z88dk-intrinsic-retn
@@ -3923,9 +4043,25 @@ replace restart {
 }
 
 replace restart {
+	jp	_intrinsic_im_0
+} by {
+	im	0
+	ret
+	; peephole z88dk-intrinsic-im-0
+}
+
+replace restart {
 	call	_intrinsic_im_1
 } by {
 	im	1
+	; peephole z88dk-intrinsic-im-1
+}
+
+replace restart {
+	jp	_intrinsic_im_1
+} by {
+	im	1
+	ret
 	; peephole z88dk-intrinsic-im-1
 }
 
@@ -3937,9 +4073,25 @@ replace restart {
 }
 
 replace restart {
+	jp	_intrinsic_im_2
+} by {
+	im	2
+	ret
+	; peephole z88dk-intrinsic-im-2
+}
+
+replace restart {
 	call	_intrinsic_nop
 } by {
 	nop
+	; peephole z88dk-intrinsic-nop
+}
+
+replace restart {
+	jp	_intrinsic_nop
+} by {
+	nop
+	ret
 	; peephole z88dk-intrinsic-nop
 }
 
@@ -3951,9 +4103,25 @@ replace restart {
 }
 
 replace restart {
+	jp	_intrinsic_exx
+} by {
+	exx
+	ret
+	; peephole z88dk-intrinsic-exx
+}
+
+replace restart {
 	call	_intrinsic_ex_de_hl
 } by {
 	ex	de,hl
+	; peephole z88dk-intrinsic-ex-de-hl
+}
+
+replace restart {
+	jp	_intrinsic_ex_de_hl
+} by {
+	ex	de,hl
+	ret
 	; peephole z88dk-intrinsic-ex-de-hl
 }
 
@@ -3966,10 +4134,28 @@ replace restart {
 }
 
 replace restart {
+	jp	_intrinsic_return_bc
+} by {
+	ld	l,c
+	ld	h,b
+	ret
+	; peephole z88dk-intrinsic-return-bc
+}
+
+replace restart {
 	call	_intrinsic_return_de
 } by {
 	ld	l,e
 	ld	h,d
+	; peephole z88dk-intrinsic-return-de
+}
+
+replace restart {
+	jp	_intrinsic_return_de
+} by {
+	ld	l,e
+	ld	h,d
+	ret
 	; peephole z88dk-intrinsic-return-de
 }
 
@@ -3979,6 +4165,16 @@ replace restart {
 	ld	a,l
 	ld	l,h
 	ld	h,a
+	; peephole z88dk-intrinsic-swap-endian-16
+}
+
+replace restart {
+	jp	_intrinsic_swap_endian_16_fastcall
+} by {
+	ld	a,l
+	ld	l,h
+	ld	h,a
+	ret
 	; peephole z88dk-intrinsic-swap-endian-16
 }
 
@@ -3995,10 +4191,39 @@ replace restart {
 }
 
 replace restart {
+	jp	_intrinsic_swap_endian_32_fastcall
+} by {
+	ld	a,d
+	ld	d,l
+	ld	l,a
+	ld	a,e
+	ld	e,h
+	ld	h,a
+	ret
+	; peephole z88dk-intrinsic-swap-endian-32
+}
+
+replace restart {
 	call	_intrinsic_swap_word_32_fastcall
 } by {
 	ex	de,hl
 	; peephole z88dk-intrinsic-swap-word-32
+}
+
+replace restart {
+	jp	_intrinsic_swap_word_32_fastcall
+} by {
+	ex	de,hl
+	ret
+	; peephole z88dk-intrinsic-swap-word-32
+}
+
+replace restart {
+	ret
+	ret
+} by {
+	ret
+	; peephole z88dk-intrinsic-retret
 }
 
 
