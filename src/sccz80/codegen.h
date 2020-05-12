@@ -134,6 +134,7 @@ extern void intrinsic_out(SYMBOL *sym);
 extern void zentercritical(void);
 extern void zleavecritical(void);
 extern int zcriticaloffset(void);
+extern void zconvert_constant_to_double(double value, unsigned char isunsigned);
 extern void zconvert_to_double(Kind type, unsigned char isunsigned);
 extern void zconvert_from_double(Kind type, unsigned char isunsigned);
 extern int push_function_argument(Kind expr, Type *type, int push_sdccchar);

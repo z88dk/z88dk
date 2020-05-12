@@ -188,6 +188,30 @@
 	EXTERN  __atof2		;string->fa conversion
         EXTERN  l_f48_ldexp     ;FA * pow2(N)
 
+	; 16 bit float ABI
+	EXTERN	l_f16_add
+	EXTERN	l_f16_sub
+	EXTERN	l_f16_mul
+	EXTERN	l_f16_div
+	EXTERN	l_f16_le
+	EXTERN	l_f16_lt
+	EXTERN	l_f16_ge
+	EXTERN	l_f16_gt
+	EXTERN	l_f16_eq
+	EXTERN	l_f16_ne
+	EXTERN	l_f16_swap
+	EXTERN	l_f16_schar2f
+	EXTERN	l_f16_uchar2f
+	EXTERN	l_f16_sint2f
+	EXTERN	l_f16_uint2f
+	EXTERN	l_f16_slong2f
+	EXTERN	l_f16_ulong2f
+	EXTERN	l_f16_f2sint
+	EXTERN	l_f16_f2uint
+	EXTERN	l_f16_f2slong
+	EXTERN	l_f16_f2ulong
+        EXTERN  l_f16_ldexp
+        EXTERN  l_f16_invf	;Only for ieee16
 
 	; 32 bit float ABI
 	EXTERN	l_f32_add
