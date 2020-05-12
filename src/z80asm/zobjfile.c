@@ -2,7 +2,7 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2019
+Copyright (C) Paulo Custodio, 2011-2020
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -52,6 +52,7 @@ static long write_expr(FILE* fp)
 		expr = iter->obj;
 
 		/* store range */
+		range = 0;
 		if (expr->target_name)
 		{
 			target_name = expr->target_name;		/* EQU expression */
@@ -122,6 +123,7 @@ static int write_symbols_symtab(FILE* fp, SymbolHash* symtab)
 		if (scope != 0 && sym->is_touched && sym->type != TYPE_UNKNOWN)
 		{
 			/* type */
+			type = 0;
 			switch (sym->type)
 			{
 			case TYPE_CONSTANT:	type = 'C'; break;

@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // String Utilities - based on UT_string
-// Copyright (C) Paulo Custodio, 2011-2019
+// Copyright (C) Paulo Custodio, 2011-2020
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -178,3 +178,11 @@ const char *spool_add(const char *str)
 	return found->str;
 }
 
+const char *spool_add_n(const char *str, size_t n) {
+	char* copy = xmalloc(n + 1);
+	strncpy(copy, str, n);
+	copy[n] = '\0';
+	const char* ret = spool_add(copy);
+	xfree(copy);
+	return ret;
+}

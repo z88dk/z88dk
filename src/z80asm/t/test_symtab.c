@@ -20,8 +20,8 @@ Repository: https://github.com/z88dk/z88dk
 #include <stdarg.h>
 #include <stdio.h>
 
-int sizeof_relocroutine = 0;
-int sizeof_reloctable = 0;
+//int sizeof_relocroutine = 0;
+//int sizeof_reloctable = 0;
 
 char *GetLibfile( char *filename ) { return ""; }
 extern Symbol *_define_sym( char *name, long value, sym_type_t sym_type, byte_t type_mask,

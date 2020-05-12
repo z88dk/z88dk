@@ -2,7 +2,7 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2019
+Copyright (C) Paulo Custodio, 2011-2020
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 */
@@ -27,11 +27,6 @@ Repository: https://github.com/z88dk/z88dk
 void Z80pass2( void );
 void CreateBinFile( void );
 
-
-/* local functions */
-void ReleaseLibraries( void );
-struct libfile *NewLibrary( void );
-
 extern char Z80objhdr[];
 
 byte_t reloc_routine[] =
@@ -45,8 +40,6 @@ size_t sizeof_relocroutine = 73;
 size_t sizeof_reloctable   = 0;
 
 char *reloctable = NULL, *relocptr = NULL;
-
-struct liblist *libraryhdr;
 
 /* local functions */
 static void query_assemble(const char *src_filename );
@@ -124,12 +117,8 @@ void assemble_file( const char *filename )
 	remove(get_err_filename(src_filename));
 	open_error_file(src_filename);
 
-	if (load_obj_only) {
-		if (check_object_file(obj_filename)) {
-			if (!objmodule_loaded(obj_filename))
-				error_not_obj_file(src_filename);	/* invalid object file */
-		}
-	}
+	if (load_obj_only)
+		object_file_append(obj_filename, CURRENTMODULE);
 	else
 		query_assemble(src_filename);			/* try to assemble, check -d */
 
@@ -161,7 +150,7 @@ static void query_assemble(const char *src_filename )
               : true										/* ... else source does not exist, but object exists
 															   --> consider up-to-date (e.g. test.c -> test.o) */
             ) &&
-            objmodule_loaded(obj_filename)					/* object file valid and size loaded */
+			object_file_append(obj_filename, CURRENTMODULE)	/* object file valid and size loaded */
        )
     {
         /* OK - object file is up-to-date */
@@ -231,104 +220,12 @@ static void do_assemble(const char *src_filename )
 		putchar('\n');    /* separate module texts */
 }
 
-
-/* search library file name, return found name in strpool */
-const char *GetLibfile( const char *filename )
-{
-    struct libfile *newlib;
-	const char     *found_libfilename;
-    int len;
-
-    newlib = NewLibrary();
-
-    len = strlen( filename );
-
-    if ( len == 0 )
-	{
-		error_not_lib_file(filename);
-		return NULL;
-	}
-	
-	found_libfilename = path_search( get_lib_filename( filename ), opts.lib_path );
-
-    newlib->libfilename = m_strdup( found_libfilename );		/* freed when newlib is freed */
-
-	if (!check_library_file(found_libfilename))					/* not a library or wrong version */
-		return NULL;
-
-	opts.library = true;
-
-	if (opts.verbose)
-		printf("Reading library '%s'\n", path_canon(found_libfilename));
-
-	return found_libfilename;
-}
-
-
-/* CH_0004 : always returns non-NULL, ERR_NO_MEMORY is signalled by exception */
-struct libfile *
-NewLibrary( void )
-{
-    struct libfile *newl;
-
-    if ( libraryhdr == NULL )
-    {
-        libraryhdr = m_new( struct liblist );
-        libraryhdr->firstlib = NULL;
-        libraryhdr->currlib = NULL;     /* Library header initialised */
-    }
-
-    newl = m_new( struct libfile );
-    newl->nextlib = NULL;
-    newl->libfilename = NULL;
-    newl->nextobjfile = -1;
-
-    if ( libraryhdr->firstlib == NULL )
-    {
-        libraryhdr->firstlib = newl;
-        libraryhdr->currlib = newl;     /* First library in list */
-    }
-    else
-    {
-        libraryhdr->currlib->nextlib = newl;    /* current/last library points now at new current */
-        libraryhdr->currlib = newl;     /* pointer to current module updated */
-    }
-
-    return newl;
-}
-
-
-
-void
-ReleaseLibraries( void )
-{
-    struct libfile *curptr, *tmpptr;
-
-    curptr = libraryhdr->firstlib;
-
-    while ( curptr != NULL )    /* while there are libraries */
-    {
-        if ( curptr->libfilename != NULL )
-        {
-            m_free( curptr->libfilename );
-        }
-
-        tmpptr = curptr;
-        curptr = curptr->nextlib;
-        m_free( tmpptr );       /* release library */
-    }
-
-    m_free( libraryhdr );       /* Release library header */
-}
-
-
 /***************************************************************************************************
  * Main entry of Z80asm
  ***************************************************************************************************/
 int z80asm_main( int argc, char *argv[] )
 {
 	model_init();						/* init global data */
-	libraryhdr = NULL;					/* initialise to no library files */
 	init_macros();
 
 	/* parse command line and call-back via assemble_file() */
@@ -379,9 +276,6 @@ int z80asm_main( int argc, char *argv[] )
 	close_error_file();
 
 	delete_modules();		/* Release module information (symbols, etc.) */
-
-	if (libraryhdr != NULL)
-		ReleaseLibraries();    /* Release library information */
 
 	if (opts.relocatable)
 	{

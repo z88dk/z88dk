@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------
 // Z88DK Z80 Module Assembler
 // Parse command line options
-// Copyright (C) Paulo Custodio, 2011-2019
+// Copyright (C) Paulo Custodio, 2011-2020
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -735,9 +735,8 @@ static void option_make_lib(const char *library )
     opts.lib_file = library;		/* may be empty string */
 }
 
-static void option_use_lib(const char *library )
-{
-    GetLibfile( library );
+static void option_use_lib(const char *library) {
+	library_file_append(library);
 }
 
 static void option_cpu_z80(void)

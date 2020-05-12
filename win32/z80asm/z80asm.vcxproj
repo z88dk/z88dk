@@ -186,6 +186,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\z80asm\codearea.c" />
+    <ClCompile Include="..\..\src\z80asm\common.c" />
     <ClCompile Include="..\..\src\z80asm\directives.c" />
     <ClCompile Include="..\..\src\z80asm\errors.c" />
     <ClCompile Include="..\..\src\z80asm\error_func.c" />
@@ -222,6 +223,7 @@
     <ClInclude Include="..\..\src\config.h" />
     <ClInclude Include="..\..\src\portability.h" />
     <ClInclude Include="..\..\src\z80asm\codearea.h" />
+    <ClInclude Include="..\..\src\z80asm\common.h" />
     <ClInclude Include="..\..\src\z80asm\directives.h" />
     <ClInclude Include="..\..\src\z80asm\errors.h" />
     <ClInclude Include="..\..\src\z80asm\error_func.h" />

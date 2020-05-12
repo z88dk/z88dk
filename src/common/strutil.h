@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // String Utilities - based on UT_string
-// Copyright (C) Paulo Custodio, 2011-2019
+// Copyright (C) Paulo Custodio, 2011-2020
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 #pragma once
@@ -44,3 +44,4 @@ extern void argv_set(argv_t *argv, size_t idx, const char *str);
 // string pool
 //-----------------------------------------------------------------------------
 extern const char *spool_add(const char *str);
+extern const char *spool_add_n(const char *str, size_t n);

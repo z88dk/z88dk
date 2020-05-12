@@ -15,8 +15,8 @@ Repository: https://github.com/z88dk/z88dk
 #include <stdio.h>
 #include <stdarg.h>
 
-int sizeof_relocroutine = 0;
-int sizeof_reloctable = 0;
+//int sizeof_relocroutine = 0;
+//int sizeof_reloctable = 0;
 
 char *GetLibfile( char *filename ) { return ""; }
 

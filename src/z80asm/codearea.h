@@ -1,7 +1,7 @@
 /*
 Z88DK Z80 Module Assembler
 
-Copyright (C) Paulo Custodio, 2011-2019
+Copyright (C) Paulo Custodio, 2011-2020
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -152,6 +152,8 @@ extern byte_t *append_reserve( int num_bytes );
 extern void  patch_file_contents( FILE *file, int addr, long num_bytes );	
 extern void append_file_contents( FILE *file,            long num_bytes );	
 
+extern void patch_from_memory(byte_t* data, int addr, long num_bytes);
+
 /*-----------------------------------------------------------------------------
 *   read/write current module to an open file
 *----------------------------------------------------------------------------*/
@@ -180,6 +182,7 @@ extern void set_origin_option(int origin);
    origin = -1 - origin not defined 
    origin = -1 and section_split - origin not defined, but section split */
 extern void read_origin(FILE* file, Section *section);
+extern void set_origin(int origin, Section *section);
 extern void write_origin(FILE* file, Section *section);
 
 // set/clear the new asmpc_phase
