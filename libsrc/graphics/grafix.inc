@@ -594,6 +594,13 @@ IF FORvector06c
 	defc blankch = 32
 ENDIF
 
+IF FORspecial
+	DEFINE gotgfx
+	defc maxx = 384
+	defc maxy = 256
+	defc blankch = 32
+ENDIF
+
 IF FORhomelab
 	DEFINE gotgfx
 	defc maxx = 128

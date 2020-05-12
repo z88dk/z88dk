@@ -28,17 +28,17 @@ EXTERN in_keytranstbl
 ._in_LookupKey
 	ld	a,l
 	ld	hl,in_keytranstbl
-	ld	bc,75 * 3
+	ld	bc,72 * 3
 	cpir
 	jr	nz,notfound
 
-	ld	a,+(75 * 3) - 1
+	ld	a,+(72 * 3) - 1
 	sub	c		;A = position in table
 	ld	c,a
 	ld	hl,0
-	cp	75 * 2
+	cp	72 * 2
 	jr	c,not_function_table
-	sub	75 * 2
+	sub	72 * 2
 	ld	c,a
 	ld	a,l
 	or	@01000000
@@ -52,9 +52,9 @@ notfound:
 	
 
 not_function_table:
-	cp	75
+	cp	72
 	jr	c,continue
-	sub	75
+	sub	72
 	ld	c,a
 	ld	a,l
 	or	@10000000
@@ -68,12 +68,12 @@ continue:
 	ld	c,255
 find_row:
 	inc	c
-	sub	5
+	sub	6
 	jr	nc,find_row
-	add	5
+	add	6
 	; c = row number, a = character in row
 	; find the mask
-	ld	b,@00000001
+	ld	b,@00000100
 	ld	e,a
 find_mask:
 	ld	a,e
