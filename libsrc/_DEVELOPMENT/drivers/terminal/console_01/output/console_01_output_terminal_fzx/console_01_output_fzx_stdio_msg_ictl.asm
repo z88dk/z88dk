@@ -68,6 +68,8 @@ console_01_output_fzx_stdio_msg_ictl:
 
 console_01_output_fzx_stdio_msg_ictl_0:
 
+   xor a                       ; clear error status
+
    ld a,d
    
    dec a

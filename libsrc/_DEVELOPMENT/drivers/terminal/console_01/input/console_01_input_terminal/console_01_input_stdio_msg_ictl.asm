@@ -70,6 +70,8 @@ _ictl_messages:
 
 console_01_input_stdio_msg_ictl_0:
 
+   xor a                       ; clear error status
+
    ; interpret ioctl message
    
    ld a,d
