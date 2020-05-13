@@ -77,14 +77,14 @@ parse.o: parse.c
 #------------------------------------------------------------------------------
 # z80asm2
 #------------------------------------------------------------------------------
-all: z80asm2$(EXESUFFIX)
-
-z80asm2$(EXESUFFIX): dev/z80asm2/z80asm2$(EXESUFFIX)
-	cp dev/z80asm2/z80asm2$(EXESUFFIX) z80asm2$(EXESUFFIX)
-
-dev/z80asm2/z80asm2$(EXESUFFIX): $(wildcard dev/z80asm2/*.c dev/z80asm2/*.h)
-	$(MAKE) -C dev/z80asm2
-
+#all: z80asm2$(EXESUFFIX)
+#
+#z80asm2$(EXESUFFIX): dev/z80asm2/z80asm2$(EXESUFFIX)
+#	cp dev/z80asm2/z80asm2$(EXESUFFIX) z80asm2$(EXESUFFIX)
+#
+#dev/z80asm2/z80asm2$(EXESUFFIX): $(wildcard dev/z80asm2/*.c dev/z80asm2/*.h)
+#	$(MAKE) -C dev/z80asm2
+#
 #------------------------------------------------------------------------------
 # libraries
 #------------------------------------------------------------------------------
