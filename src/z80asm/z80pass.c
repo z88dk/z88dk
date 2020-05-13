@@ -183,7 +183,8 @@ Z80pass2(void)
 		write_obj_file(CURRENTMODULE->filename);
 
 	// add to the list of objects to link
-	object_file_append(get_obj_filename(CURRENTMODULE->filename), CURRENTMODULE);
+	if (!get_num_errors())
+		object_file_append(get_obj_filename(CURRENTMODULE->filename), CURRENTMODULE, false, false);
 
 	if (!get_num_errors() && opts.symtable)
 		write_sym_file(CURRENTMODULE);

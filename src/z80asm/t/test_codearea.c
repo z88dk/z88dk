@@ -4,7 +4,7 @@ Z88DK Z80 Macro Assembler
 Unit test for codearea.c
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2019
+Copyright (C) Paulo Custodio, 2011-2020
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 */
@@ -14,9 +14,6 @@ Repository: https://github.com/z88dk/z88dk
 #include <assert.h>
 #include <stdio.h>
 #include <stdarg.h>
-
-//int sizeof_relocroutine = 0;
-//int sizeof_reloctable = 0;
 
 char *GetLibfile( char *filename ) { return ""; }
 

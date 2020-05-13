@@ -31,9 +31,22 @@ Repository: https://github.com/z88dk/z88dk
 #include <stdlib.h>
 #include <string.h>
 
+// list of objects/libraries to search during linking
+typedef struct obj_file_t {
+	struct obj_file_t* next, *prev;		// doubly linked list
+	const char*		filename;			// library file name (strpool)
+	int				size;				// size of library file
+	byte_t*			data;				// contents of library file, loaded before linking
+	int				i;					// point to next position to parse
+	Module*			module;				// weak pointer to main module information, if object file
+} obj_file_t;
+
+
 /* local functions */
 static void link_lib_module(const char* modname, obj_file_t* obj, StrHash* extern_syms);
 static void merge_modules(StrHash* extern_syms);
+static void object_module_append(obj_file_t* obj, Module* module);
+static void obj_files_free(obj_file_t** plist);
 void CreateBinFile(void);
 
 /* global variables */
@@ -43,8 +56,8 @@ extern char* reloctable, * relocptr;
 
 int totaladdr, curroffset;
 
-obj_file_t*	g_objects;				// list of objects to link
-obj_file_t*	g_libraries;			// list of libraries to link
+static obj_file_t*	g_objects;				// list of objects to link
+static obj_file_t*	g_libraries;			// list of libraries to link
 
 static void dtor(void) {
 	obj_files_free(&g_objects);
@@ -132,7 +145,7 @@ static bool goto_code(obj_file_t* obj) {
 	return obj->i >= 0;
 }
 
-void obj_files_append(obj_file_t** plist, const char* filename, Module* module) {
+static void obj_files_append(obj_file_t** plist, const char* filename, Module* module) {
 	init();
 
 	// create a obj and append to list - file will be loaded when linking
@@ -142,7 +155,7 @@ void obj_files_append(obj_file_t** plist, const char* filename, Module* module) 
 	obj->module = module;
 }
 
-bool obj_files_read_data(obj_file_t** plist) {
+static bool obj_files_read_data(obj_file_t** plist) {
 	init();
 
 	for (obj_file_t* obj = *plist; obj; obj = obj->next) {
@@ -165,7 +178,7 @@ bool obj_files_read_data(obj_file_t** plist) {
 	return true;
 }
 
-void obj_files_free(obj_file_t** plist) {
+static void obj_files_free(obj_file_t** plist) {
 	while (*plist) {
 		obj_file_t* elem = *plist;
 		DL_DELETE(*plist, elem);
@@ -199,7 +212,7 @@ bool library_file_append(const char * filename) {
 	return true;
 }
 
-bool object_file_append(const char* filename, Module* module) {
+bool object_file_append(const char* filename, Module* module, bool reserve_space, bool no_errors) {
 	init();
 
 	// check for empty file name
@@ -209,13 +222,21 @@ bool object_file_append(const char* filename, Module* module) {
 	}
 
 	// check if file exists and version is correct
-	if (!check_object_file(filename) && !check_library_file(filename))
-		return false;
+	if (no_errors) {
+		if (!check_object_file_no_errors(filename))
+			return false;
+	}
+	else {
+		if (!check_object_file(filename))
+			return false;
+	}
 
 	// reserve space for the module's sections
-	if (!objmodule_loaded(filename)) {
-		error_not_obj_file(filename);
-		return false;
+	if (reserve_space) {
+		if (!objmodule_loaded(filename)) {
+			error_not_obj_file(filename);
+			return false;
+		}
 	}
 
 	// append to the list of objects to be linked
@@ -297,89 +318,6 @@ static void set_expr_env(Expr* expr, bool module_relative_addr)
 		expr->filename, expr->line_nr,
 		expr->asmpc,
 		module_relative_addr);
-}
-
-/* read the current modules' expressions to the given list */
-static void read_cur_module_exprs_1(ExprList* exprs, FILE* file, char* filename,
-	UT_string* expr_text, UT_string* last_filename, UT_string* source_filename,
-	UT_string* section_name, UT_string* target_name)
-{
-	int line_nr;
-	int type;
-	Expr* expr;
-	int asmpc, code_pos;
-
-	while (1)
-	{
-		type = xfread_byte(file);
-		if (type == 0)
-			break;			/* end marker */
-
-		/* source file and line number */
-		xfread_wcount_str(source_filename, file);
-		if (utstr_len(source_filename) == 0)
-			utstr_set(source_filename, utstr_body(last_filename));
-		else
-			utstr_set(last_filename, utstr_body(source_filename));
-
-		line_nr = xfread_dword(file);
-
-		/* patch location */
-		xfread_bcount_str(section_name, file);
-
-		asmpc = xfread_word(file);
-		code_pos = xfread_word(file);
-
-		xfread_bcount_str(target_name, file);	/* get expression EQU target, if not empty */
-		xfread_wcount_str(expr_text, file);		/* get expression */
-
-		/* read expression followed by newline */
-		utstr_append(expr_text, "\n");
-		SetTemporaryLine(utstr_body(expr_text));			/* read expression */
-
-		EOL = false;                /* reset end of line parsing flag - a line is to be parsed... */
-
-		scan_expect_operands();
-		GetSym();
-
-		/* parse and store expression in the list */
-		set_asmpc_env(CURRENTMODULE, utstr_body(section_name),
-			utstr_body(source_filename), line_nr,
-			asmpc,
-			false);
-		if ((expr = expr_parse()) != NULL)
-		{
-			expr->range = 0;
-			switch (type)
-			{
-			case 'U': expr->range = RANGE_BYTE_UNSIGNED; break;
-			case 'S': expr->range = RANGE_BYTE_SIGNED;  break;
-			case 'u': expr->range = RANGE_BYTE_TO_WORD_UNSIGNED; break;
-			case 's': expr->range = RANGE_BYTE_TO_WORD_SIGNED; break;
-			case 'C': expr->range = RANGE_WORD;			break;
-			case 'B': expr->range = RANGE_WORD_BE;		break;
-			case 'L': expr->range = RANGE_DWORD;		break;
-			case 'J': expr->range = RANGE_JR_OFFSET;	break;
-			case 'P': expr->range = RANGE_PTR24;		break;
-			case '=': expr->range = RANGE_WORD;
-				xassert(utstr_len(target_name) > 0);
-				expr->target_name = spool_add(utstr_body(target_name));	/* define expression as EQU */
-				break;
-			default:
-				error_not_obj_file(filename);
-			}
-
-			expr->module = CURRENTMODULE;
-			expr->section = CURRENTSECTION;
-			expr->asmpc = asmpc;
-			expr->code_pos = code_pos;
-			expr->filename = spool_add(utstr_body(source_filename));
-			expr->line_nr = line_nr;
-			expr->listpos = -1;
-
-			ExprList_push(&exprs, expr);
-		}
-	}
 }
 
 static void read_cur_module_exprs(ExprList* exprs, obj_file_t* obj) {
@@ -815,10 +753,10 @@ static bool linked_module(obj_file_t* obj, StrHash* extern_syms) {
 			if (scope == 0)	
 				break;					// end of list
 			obj->i++;					// skip type
-			const char* section_name = parse_bcount_str(obj);
+			parse_bcount_str(obj);		// skip section name
 			obj->i += 4;				// skip value
 			const char* symbol_name = parse_bcount_str(obj);
-			const char* def_filename = parse_bcount_str(obj);
+			parse_bcount_str(obj);		// skip defined file name
 			obj->i += 4;				// skip line number
 
 			// link module if one defined symbol matches pending externals
@@ -1008,7 +946,6 @@ void link_modules(void)
 	while (mod) {
 		xassert(obj);
 		xassert(mod == obj->module);
-		xassert(strcmp(mod->filename, obj->filename) == 0);		// assert sequence is the same
 
 		mod = get_next_module(&iter);
 		obj = obj->next;
@@ -1017,7 +954,7 @@ void link_modules(void)
 	// </TODO>
 
 	// link all .o modules
-	for (obj_file_t* obj = g_objects; obj; obj = obj->next) {
+	for (obj_file_t* obj = g_objects; !get_num_errors() && obj != NULL; obj = obj->next) {
 		set_cur_module(obj->module);
 
 		// open error file on first module

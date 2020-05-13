@@ -3,7 +3,7 @@
 # Z88DK Z80 Macro Assembler
 #
 # Copyright (C) Gunther Strube, InterLogic 1993-99
-# Copyright (C) Paulo Custodio, 2011-2019
+# Copyright (C) Paulo Custodio, 2011-2020
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk
 #
@@ -17,9 +17,9 @@ require './t/test_utils.pl';
 
 my $objs = "scan.o errors.o error_func.o model.o module.o codearea.o listfile.o ".
 		   "options.o hist.o sym.o symtab.o expr.o ".
-		   "lib/str.o lib/strhash.o  ../common/fileutil.o ../common/strutil.o ../common/die.o ../common/objfile.o ../../ext/regex/regcomp.o ../../ext/regex/regerror.o ../../ext/regex/regexec.o ../../ext/regex/regfree.o ".
+		   "lib/str.o lib/strhash.o  ../common/fileutil.o ../common/strutil.o ../common/die.o ../common/objfile.o ../../ext/regex/regcomp.o ../../ext/regex/regerror.o ../../ext/regex/regexec.o ../../ext/regex/regfree.o modlink.o zobjfile.o libfile.o ".
 		   "lib/srcfile.o macros.o lib/class.o ".
-		   "lib/list.o lib/array.o lib/dbg.o zutils.o ";
+		   "lib/list.o lib/array.o lib/dbg.o zutils.o z80asm.o z80pass.o directives.o parse.o opcodes.o ";
 if ($^O eq 'MSWin32' || $^O eq 'msys') {
 	  $objs .= "../../ext/UNIXem/src/glob.o ../../ext/UNIXem/src/dirent.o ";
 }

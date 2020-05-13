@@ -510,6 +510,17 @@ bool check_object_file(const char* obj_filename)
 		error_obj_file_version);
 }
 
+static void no_error_file(const char* filename) {}
+static void no_error_version(const char* filename, int version, int expected) {}
+
+bool check_object_file_no_errors(const char* obj_filename) {
+	return check_obj_lib_file(
+		obj_filename,
+		Z80objhdr,
+		no_error_file,
+		no_error_version);
+}
+
 bool check_obj_lib_file(const char* filename,
 	char* signature,
 	void(*error_file)(const char*),

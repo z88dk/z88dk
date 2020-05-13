@@ -84,6 +84,7 @@ extern bool objmodule_loaded(const char* obj_filename);
 
 // check if the given filename exists and is an object file of the correct version
 extern bool check_object_file(const char* obj_filename);
+extern bool check_object_file_no_errors(const char* obj_filename);
 
 // worker
 extern bool check_obj_lib_file(const char* filename,

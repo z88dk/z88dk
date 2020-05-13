@@ -118,7 +118,7 @@ void assemble_file( const char *filename )
 	open_error_file(src_filename);
 
 	if (load_obj_only)
-		object_file_append(obj_filename, CURRENTMODULE);
+		object_file_append(obj_filename, CURRENTMODULE, true, false);
 	else
 		query_assemble(src_filename);			/* try to assemble, check -d */
 
@@ -150,7 +150,7 @@ static void query_assemble(const char *src_filename )
               : true										/* ... else source does not exist, but object exists
 															   --> consider up-to-date (e.g. test.c -> test.o) */
             ) &&
-			object_file_append(obj_filename, CURRENTMODULE)	/* object file valid and size loaded */
+			object_file_append(obj_filename, CURRENTMODULE, true, true)	/* object file valid and size loaded */
        )
     {
         /* OK - object file is up-to-date */
