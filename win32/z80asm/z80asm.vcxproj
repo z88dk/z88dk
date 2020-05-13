@@ -185,6 +185,7 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\common\zutils.c" />
     <ClCompile Include="..\..\src\z80asm\codearea.c" />
     <ClCompile Include="..\..\src\z80asm\common.c" />
     <ClCompile Include="..\..\src\z80asm\directives.c" />
@@ -208,7 +209,6 @@
     <ClCompile Include="..\..\src\z80asm\model.c" />
     <ClCompile Include="..\..\src\z80asm\modlink.c" />
     <ClCompile Include="..\..\src\z80asm\module.c" />
-    <ClCompile Include="..\..\src\z80asm\zutils.c" />
     <ClCompile Include="..\..\src\z80asm\zobjfile.c" />
     <ClCompile Include="..\..\src\z80asm\opcodes.c" />
     <ClCompile Include="..\..\src\z80asm\options.c" />
@@ -220,6 +220,7 @@
     <ClCompile Include="..\..\src\z80asm\z80pass.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\common\zutils.h" />
     <ClInclude Include="..\..\src\config.h" />
     <ClInclude Include="..\..\src\portability.h" />
     <ClInclude Include="..\..\src\z80asm\codearea.h" />
@@ -249,7 +250,6 @@
     <ClInclude Include="..\..\src\z80asm\model.h" />
     <ClInclude Include="..\..\src\z80asm\modlink.h" />
     <ClInclude Include="..\..\src\z80asm\module.h" />
-    <ClInclude Include="..\..\src\z80asm\zutils.h" />
     <ClInclude Include="..\..\src\z80asm\zobjfile.h" />
     <ClInclude Include="..\..\src\z80asm\opcodes.h" />
     <ClInclude Include="..\..\src\z80asm\options.h" />

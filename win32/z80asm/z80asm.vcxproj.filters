@@ -108,10 +108,10 @@
     <ClCompile Include="..\..\src\z80asm\zobjfile.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\zutils.c">
+    <ClCompile Include="..\..\src\z80asm\common.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\common.c">
+    <ClCompile Include="..\..\src\common\zutils.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -242,10 +242,10 @@
     <ClInclude Include="..\..\src\z80asm\zobjfile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\zutils.h">
+    <ClInclude Include="..\..\src\z80asm\common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\common.h">
+    <ClInclude Include="..\..\src\common\zutils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

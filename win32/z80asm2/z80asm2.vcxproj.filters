@@ -24,7 +24,7 @@
     <ClInclude Include="..\..\src\z80asm\dev\z80asm2\utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\zutils.h">
+    <ClInclude Include="..\..\src\common\zutils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -41,9 +41,6 @@
     <ClCompile Include="..\..\src\z80asm\dev\z80asm2\z80asm2.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\zutils.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\common\die.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -51,6 +48,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\ext\UNIXem\src\glob.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\zutils.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

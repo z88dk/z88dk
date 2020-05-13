@@ -18,7 +18,7 @@
     <ClCompile Include="..\..\src\zobjcopy\zobjcopy.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\zutils.c">
+    <ClCompile Include="..\..\src\common\zutils.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -26,7 +26,7 @@
     <ClInclude Include="..\..\src\zobjcopy\zobjcopy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\zutils.h">
+    <ClInclude Include="..\..\src\common\zutils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

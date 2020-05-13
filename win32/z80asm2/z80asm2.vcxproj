@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -19,20 +19,20 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\common\zutils.h" />
     <ClInclude Include="..\..\src\z80asm\dev\z80asm2\backend.h" />
     <ClInclude Include="..\..\src\z80asm\dev\z80asm2\frontend.h" />
     <ClInclude Include="..\..\src\z80asm\dev\z80asm2\utils.h" />
-    <ClInclude Include="..\..\src\z80asm\zutils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\ext\UNIXem\src\dirent.c" />
     <ClCompile Include="..\..\ext\UNIXem\src\glob.c" />
     <ClCompile Include="..\..\src\common\die.c" />
+    <ClCompile Include="..\..\src\common\zutils.c" />
     <ClCompile Include="..\..\src\z80asm\dev\z80asm2\backend.c" />
     <ClCompile Include="..\..\src\z80asm\dev\z80asm2\frontend.c" />
     <ClCompile Include="..\..\src\z80asm\dev\z80asm2\utils.c" />
     <ClCompile Include="..\..\src\z80asm\dev\z80asm2\z80asm2.c" />
-    <ClCompile Include="..\..\src\z80asm\zutils.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{2D3EF459-1199-423F-A1D2-7EDFFB563075}</ProjectGuid>

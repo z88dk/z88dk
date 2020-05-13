@@ -9,7 +9,7 @@
 #include "strutil.h"
 #include "utlist.h"
 #include "utstring.h"
-#include "../z80asm/zutils.h"
+#include "zutils.h"
 #include <ctype.h>
 
 #include <sys/types.h>	// needed before regex.h

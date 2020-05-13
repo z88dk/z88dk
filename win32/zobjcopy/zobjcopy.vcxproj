@@ -141,11 +141,11 @@
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\z80asm\zutils.c" />
+    <ClCompile Include="..\..\src\common\zutils.c" />
     <ClCompile Include="..\..\src\zobjcopy\zobjcopy.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\z80asm\zutils.h" />
+    <ClInclude Include="..\..\src\common\zutils.h" />
     <ClInclude Include="..\..\src\zobjcopy\zobjcopy.h" />
   </ItemGroup>
   <ItemGroup>

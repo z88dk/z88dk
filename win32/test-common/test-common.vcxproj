@@ -161,7 +161,7 @@
     <ClCompile Include="..\..\src\common\t\t_fileutil.c" />
     <ClCompile Include="..\..\src\common\t\t_strutil.c" />
     <ClCompile Include="..\..\src\common\t\t_types.c" />
-    <ClCompile Include="..\..\src\z80asm\zutils.c" />
+    <ClCompile Include="..\..\src\common\zutils.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ext\optparse\optparse.h" />
@@ -175,7 +175,7 @@
     <ClInclude Include="..\..\src\common\types.h" />
     <ClInclude Include="..\..\src\common\t\test1.hh" />
     <ClInclude Include="..\..\src\common\t\test2.hh" />
-    <ClInclude Include="..\..\src\z80asm\zutils.h" />
+    <ClInclude Include="..\..\src\common\zutils.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\UNIXem\UNIXem.vcxproj">

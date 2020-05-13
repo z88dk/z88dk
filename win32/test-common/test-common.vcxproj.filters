@@ -66,7 +66,7 @@
     <ClCompile Include="..\..\src\common\t\t_die.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\zutils.c">
+    <ClCompile Include="..\..\src\common\zutils.c">
       <Filter>Source Files\ext</Filter>
     </ClCompile>
   </ItemGroup>
@@ -104,7 +104,7 @@
     <ClInclude Include="..\..\src\common\t\test2.hh">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\zutils.h">
+    <ClInclude Include="..\..\src\common\zutils.h">
       <Filter>Header Files\ext</Filter>
     </ClInclude>
   </ItemGroup>
