@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // zobjfile - manipulate z80asm object files
-// Copyright (C) Paulo Custodio, 2011-2019
+// Copyright (C) Paulo Custodio, 2011-2020
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -9,7 +9,7 @@
 #include "strutil.h"
 #include "utlist.h"
 #include "utstring.h"
-#include "zutils.h"
+#include "../z80asm/zutils.h"
 #include <ctype.h>
 
 #include <sys/types.h>	// needed before regex.h
