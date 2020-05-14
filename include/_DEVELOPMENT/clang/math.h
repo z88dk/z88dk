@@ -126,10 +126,13 @@ typedef short half_t;           /* IEEE16 half float type */
 
 #ifdef __MATH_MATH16
 
-#define HUGE_POS_HF            (short)0x7BFF        /*  +6.550E+4 */
-#define TINY_POS_HF            (short)0x0400        /*  +6.104E-5 */
-#define HUGE_NEG_HF            (short)0xFBFF        /*  -6.550E+4 */
-#define TINY_NEG_HF            (short)0x8400        /*  -6.104E-5 */
+#define HUGE_POS_HF            (short)0x7BFF        /*  +6.5504E+4 */
+#define TINY_POS_HF            (short)0x0400        /*  +6.1035E-5 */
+#define HUGE_NEG_HF            (short)0xFBFF        /*  -6.5504E+4 */
+#define TINY_NEG_HF            (short)0x8400        /*  -6.1035E-5 */
+
+#define INF_POS_HF             (short)0x7C00
+#define INF_NEG_HF             (short)0xFC00
 
 #define MAXL2_HF               (short)0x4BFF        /*  +15.99    */
 #define MINL2_HF               (short)0xCB00        /*  -14.00    */
