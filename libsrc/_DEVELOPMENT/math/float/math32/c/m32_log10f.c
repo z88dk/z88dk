@@ -26,13 +26,13 @@
  *
  * In the tests over the interval [0, MAXNUM], the logarithms
  * of the random arguments were uniformly distributed over
- * [-MAXL10, MAXL10].
+ * [-MAXL10_F, MAXL10_F].
  *
  * ERROR MESSAGES:
  *
  * log10f singularity:  x = 0; returns -MAXL10
  * log10f domain:       x < 0; returns -MAXL10
- * MAXL10 = 38.230809449325611792
+ * MAXL10_F = 38.230809449325611792
  */
 
 /*
@@ -60,7 +60,7 @@ float m32_log10f (float x) __z88dk_fastcall
     /* Test for domain */
     if( x <= 0.0 )
     {
-        return( HUGE_NEGF );
+        return( HUGE_NEG_F );
     }
 
     /* separate mantissa from exponent */

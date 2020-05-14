@@ -50,10 +50,10 @@
  * ERROR MESSAGES:
  *
  *   message         condition      value returned
- * exp underflow    x < -MAXL2        0.0
- * exp overflow     x > MAXL2         MAXNUMF
+ * exp underflow    x < -MAXL_2          0.0
+ * exp overflow     x > MAXL_2        HUGE_POS_F
  *
- * For IEEE arithmetic, MAXL2 = 127.
+ * For IEEE arithmetic, MAXL_2 = 127.
  */
 
 
@@ -71,12 +71,12 @@ float m32_exp2f (float x) __z88dk_fastcall
 {
     float z;
 #if 0
-    if( x > MAXL2F )
+    if( x > MAXL2_F )
     {
-	    return( HUGE_POSF );
+	    return( HUGE_POS_F );
     }
 
-    if( x < MINL2F )
+    if( x < MINL2_F )
     {
 	    return(0.0);
     }

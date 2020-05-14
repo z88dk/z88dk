@@ -51,6 +51,13 @@ include(__link__.m4)
    
 #endif
 
+#ifndef _HALF_FLOAT_T
+#define _HALF_FLOAT_T
+
+typedef short half_t;           /* IEEE16 half float type */
+
+#endif
+
 // XSI EXTENSION
 // temporary : math lib should supply these via func call
 
@@ -101,15 +108,33 @@ include(__link__.m4)
 
 #ifdef __MATH_MATH32
 
-#define HUGE_POSF              (float)+3.4028234664E+38
-#define TINY_POSF              (float)+1.1754943508E−38
-#define HUGE_NEGF              (float)-1.7014118346E+38
-#define TINY_NEGF              (float)-1.1754943508E-38
+#define HUGE_POS_F             (float)+3.4028234664E+38
+#define TINY_POS_F             (float)+1.1754943508E−38
+#define HUGE_NEG_F             (float)-1.7014118346E+38
+#define TINY_NEG_F             (float)-1.1754943508E-38
 
-#define MAXL2F                 ((float)+127.999999914)
-#define MINL2F                 ((float)-126.0)
-#define MAXL10F                ((float)+38.230809449)
-#define MINL10F                ((float)−37.929779454)
+#define MAXL2_F                ((float)+127.999999914)
+#define MINL2_F                ((float)-126.0)
+#define MAXLOG_F               ((float)+88.722839052)
+#define MINLOG_F               ((float)−87.336544751)
+#define MAXL10_F               ((float)+38.230809449)
+#define MINL10_F               ((float)−37.929779454)
+
+#endif
+
+#ifdef __MATH_MATH16
+
+#define HUGE_POS_HF            (short)0x7BFF        /*  +6.550E+4 */
+#define TINY_POS_HF            (short)0x0400        /*  +6.104E-5 */
+#define HUGE_NEG_HF            (short)0xFBFF        /*  -6.550E+4 */
+#define TINY_NEG_HF            (short)0x8400        /*  -6.104E-5 */
+
+#define MAXL2_HF               (short)0x4BFF        /*  +15.99    */
+#define MINL2_HF               (short)0xCB00        /*  -14.00    */
+#define MAXLOG_HF              (short)0x498B        /*  +11.086   */
+#define MINLOG_HF              (short)0xC8DA        /*  -9.700    */       
+#define MAXL10_HF              (short)0x44D1        /*  +4.816    */
+#define MINL10_HF              (short)0xC437        /*  -4.215    */
 
 #endif
 
@@ -202,6 +227,98 @@ __DPROTO(,,double_t,,mul2,double_t x)
 __DPROTO(,,double_t,,mul10u,double_t x)
 __DPROTO(,,double_t,,exp10,double_t x)
 __DPROTO(,,double_t,,poly, const float x, const float d[], unsigned int n)
+
+#endif
+
+#ifdef __MATH_MATH16
+
+__DPROTO(,,half_t,,f16_acos,half_t x)
+__DPROTO(,,half_t,,f16_asin,half_t x)
+__DPROTO(,,half_t,,f16_atan,half_t x)
+__DPROTO(,,half_t,,f16_atan2,half_t y,half_t x)
+
+__DPROTO(,,half_t,,f16_cos,half_t x)
+__DPROTO(,,half_t,,f16_sin,half_t x)
+__DPROTO(,,half_t,,f16_tan,half_t x)
+
+__DPROTO(,,half_t,,f16_acosh,half_t x)
+__DPROTO(,,half_t,,f16_asinh,half_t x)
+__DPROTO(,,half_t,,f16_atanh,half_t x)
+
+__DPROTO(,,half_t,,f16_cosh,half_t x)
+__DPROTO(,,half_t,,f16_sinh,half_t x)
+__DPROTO(,,half_t,,f16_tanh,half_t x)
+
+__DPROTO(,,half_t,,f16_exp,half_t x)
+__DPROTO(,,half_t,,f16_exp2,half_t x)
+__DPROTO(,,half_t,,f16_expm1,half_t x)
+__DPROTO(,,half_t,,f16_frexp,half_t value,int *exp)
+__DPROTO(,,int,,f16_ilogb,half_t x)
+__DPROTO(,,half_t,,f16_ldexp,half_t x,int exp)
+
+__DPROTO(,,half_t,,f16_log,half_t x)
+__DPROTO(,,half_t,,f16_log10,half_t x)
+__DPROTO(,,half_t,,f16_log1p,half_t x)
+__DPROTO(,,half_t,,f16_log2,half_t x)
+__DPROTO(,,half_t,,f16_logb,half_t x)
+
+__DPROTO(,,half_t,,f16_scalbn,half_t x,int n)
+__DPROTO(,,half_t,,f16_scalbln,half_t x,int n)
+
+__DPROTO(,,half_t,,f16_fabs,half_t x)
+__DPROTO(,,half_t,,f16_hypot,half_t x,half_t y)
+
+__DPROTO(,,half_t,,f16_pow,half_t x,half_t y)
+__DPROTO(,,half_t,,f16_sqrt,half_t x)
+__DPROTO(,,half_t,,f16_cbrt,half_t x)
+
+__DPROTO(,,half_t,,f16_erf,half_t x)
+__DPROTO(,,half_t,,f16_erfc,half_t x)
+__DPROTO(,,half_t,,f16_lgamma,half_t x)
+__DPROTO(,,half_t,,f16_tgamma,half_t x)
+
+__DPROTO(,,half_t,,f16_ceil,half_t x)
+__DPROTO(,,half_t,,f16_floor,half_t x)
+__DPROTO(,,half_t,,f16_nearbyint,half_t x)
+__DPROTO(,,half_t,,f16_rint,half_t x)
+__DPROTO(,,int,,f16_lrint,half_t x)
+__DPROTO(,,double_t,,f16_round,half_t x)
+__DPROTO(,,long,,f16_lround,half_t x)
+__DPROTO(,,half_t,,f16_trunc,half_t x)
+
+__DPROTO(,,half_t,,f16_modf,half_t value,half_t *iptr)
+__DPROTO(,,half_t,,f16_fmod,half_t x,half_t y)
+__DPROTO(,,half_t,,f16_remainder,half_t x,half_t y)
+__DPROTO(,,half_t,,f16_remquo,half_t x,half_t y,int *quo)
+
+__DPROTO(,,half_t,,f16_copysign,half_t x,half_t y)
+__DPROTO(,,half_t,,f16_nan,const char *tagp)
+
+__DPROTO(,,half_t,,f16_nextafter,half_t x,half_t y)
+__DPROTO(,,half_t,,f16_nexttoward,half_t x,half_t y)
+
+__DPROTO(,,half_t,,f16_fdim,half_t x,half_t y)
+
+__DPROTO(,,half_t,,f16_fmax,half_t x,half_t y)
+__DPROTO(,,half_t,,f16_fmin,half_t x,half_t y)
+
+__DPROTO(,,half_t,,f16_fma,half_t x,half_t y,half_t z)
+
+__DPROTO(,,int,,f16_isgreater,half_t x,half_t y)
+__DPROTO(,,int,,f16_isgreaterequal,half_t x,half_t y)
+__DPROTO(,,int,,f16_isless,half_t x,half_t y)
+__DPROTO(,,int,,f16_islessequal,half_t x,half_t y)
+__DPROTO(,,int,,f16_islessgreater,half_t x,half_t y)
+__DPROTO(,,int,,f16_isunordered,half_t x,half_t y)
+
+__DPROTO(,,half_t,,f16_sqr,half_t x)
+__DPROTO(,,half_t,,f16_inv,half_t x)
+__DPROTO(,,half_t,,f16_invsqrt,half_t x)
+__DPROTO(,,half_t,,f16_div2,half_t x)
+__DPROTO(,,half_t,,f16_mul2,half_t x)
+__DPROTO(,,half_t,,f16_mul10u,half_t x)
+__DPROTO(,,half_t,,f16_exp10,half_t x)
+__DPROTO(,,double_t,,f16_poly, const half_t x, const half_t d[], unsigned int n)
 
 #endif
 

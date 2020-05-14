@@ -34,10 +34,10 @@
 #include <stdint.h>
 #include <limits.h>
 
-#define HUGE_POSF   (float)+3.4028234664E+38
-#define TINY_POSF   (float)+1.1754943508E−38
-#define HUGE_NEGF   (float)-1.7014118346E+38
-#define TINY_NEGF   (float)-1.1754943508E-38
+#define HUGE_POS_F  (float)+3.4028234664E+38
+#define TINY_POS_F  (float)+1.1754943508E−38
+#define HUGE_NEG_F  (float)-1.7014118346E+38
+#define TINY_NEG_F  (float)-1.1754943508E-38
 #define INFINITY_POSF   ((unsigned long)0x7F800000)
 #define INFINITY_NEGF   ((unsigned long)0xFF800000)
 
@@ -61,12 +61,12 @@
 #define POW10INF        (float)38.0
 #define SQR10           (float)3.162277660168
 
-#define MAXL2F          ((float)+127.999999914)
-#define MINL2F          ((float)-126.0)
-#define MAXLOGF         ((float)+88.722839052)
-#define MINLOGF         ((float)−87.336544751)
-#define MAXL10F         ((float)+38.230809449)
-#define MINL10F         ((float)−37.929779454)
+#define MAXL2_F         ((float)+127.999999914)
+#define MINL2_F         ((float)-126.0)
+#define MAXLOG_F        ((float)+88.722839052)
+#define MINLOG_F        ((float)−87.336544751)
+#define MAXL10_F        ((float)+38.230809449)
+#define MINL10_F        ((float)−37.929779454)
 
 union float_long
 {
