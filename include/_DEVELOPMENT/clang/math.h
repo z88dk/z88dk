@@ -375,6 +375,19 @@ extern double_t poly(const float x,const float d[],unsigned int n);
 
 #ifdef __MATH_MATH16
 
+extern half_t f16_add(half_t y,half_t x);
+
+
+extern half_t f16_sub(half_t y,half_t x);
+
+
+extern half_t f16_mul(half_t y,half_t x);
+
+
+extern half_t f16_div(half_t y,half_t x);
+
+
+
 extern half_t f16_acos(half_t x);
 
 
@@ -574,6 +587,9 @@ extern int f16_islessgreater(half_t x,half_t y);
 
 extern int f16_isunordered(half_t x,half_t y);
 
+
+
+extern half_t f16_neg(half_t x);
 
 
 extern half_t f16_sqr(half_t x);

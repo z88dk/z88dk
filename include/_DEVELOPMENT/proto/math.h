@@ -235,6 +235,11 @@ __DPROTO(,,double_t,,poly, const float x, const float d[], unsigned int n)
 
 #ifdef __MATH_MATH16
 
+__DPROTO(,,half_t,,f16_add,half_t y,half_t x)
+__DPROTO(,,half_t,,f16_sub,half_t y,half_t x)
+__DPROTO(,,half_t,,f16_mul,half_t y,half_t x)
+__DPROTO(,,half_t,,f16_div,half_t y,half_t x)
+
 __DPROTO(,,half_t,,f16_acos,half_t x)
 __DPROTO(,,half_t,,f16_asin,half_t x)
 __DPROTO(,,half_t,,f16_atan,half_t x)
@@ -314,6 +319,7 @@ __DPROTO(,,int,,f16_islessequal,half_t x,half_t y)
 __DPROTO(,,int,,f16_islessgreater,half_t x,half_t y)
 __DPROTO(,,int,,f16_isunordered,half_t x,half_t y)
 
+__DPROTO(,,half_t,,f16_neg,half_t x)
 __DPROTO(,,half_t,,f16_sqr,half_t x)
 __DPROTO(,,half_t,,f16_inv,half_t x)
 __DPROTO(,,half_t,,f16_invsqrt,half_t x)

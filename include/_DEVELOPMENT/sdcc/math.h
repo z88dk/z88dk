@@ -513,6 +513,27 @@ extern double_t poly_callee(const float x,const float d[],unsigned int n) __z88d
 
 #ifdef __MATH_MATH16
 
+extern half_t f16_add(half_t y,half_t x);
+extern half_t f16_add_callee(half_t y,half_t x) __z88dk_callee;
+#define f16_add(a,b) f16_add_callee(a,b)
+
+
+extern half_t f16_sub(half_t y,half_t x);
+extern half_t f16_sub_callee(half_t y,half_t x) __z88dk_callee;
+#define f16_sub(a,b) f16_sub_callee(a,b)
+
+
+extern half_t f16_mul(half_t y,half_t x);
+extern half_t f16_mul_callee(half_t y,half_t x) __z88dk_callee;
+#define f16_mul(a,b) f16_mul_callee(a,b)
+
+
+extern half_t f16_div(half_t y,half_t x);
+extern half_t f16_div_callee(half_t y,half_t x) __z88dk_callee;
+#define f16_div(a,b) f16_div_callee(a,b)
+
+
+
 extern half_t f16_acos(half_t x);
 extern half_t f16_acos_fastcall(half_t x) __z88dk_fastcall;
 #define f16_acos(a) f16_acos_fastcall(a)
@@ -834,6 +855,11 @@ extern int f16_isunordered(half_t x,half_t y);
 extern int f16_isunordered_callee(half_t x,half_t y) __z88dk_callee;
 #define f16_isunordered(a,b) f16_isunordered_callee(a,b)
 
+
+
+extern half_t f16_neg(half_t x);
+extern half_t f16_neg_fastcall(half_t x) __z88dk_fastcall;
+#define f16_neg(a) f16_neg_fastcall(a)
 
 
 extern half_t f16_sqr(half_t x);
