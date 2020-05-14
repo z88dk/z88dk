@@ -31,8 +31,7 @@ These tools are not normally directly invoked by the user:
 
 ## BENCHMARKS
 
-The assembly language libraries supplied by z88dk give it performance advantages over other z80 compilers.
-(COMING)
+The assembly language libraries supplied by z88dk give it performance advantages over other z80 compilers. For details please look at the [Benchmarks](https://github.com/z88dk/z88dk/wiki/Benchmarks) section in the Wiki.
 
 * **Dhrystone 2.1**  Dhrystone was a common synthetic benchmark for measuring the integer performance of compilers in the 1980s until more modern benchmarks replaced it.  It attempts to simulate typical programs by executing a set of statements statistically determined from common programs.
 * **Pi**  Mainly measures 32-bit integer performance.
