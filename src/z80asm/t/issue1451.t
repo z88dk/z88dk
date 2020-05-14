@@ -11,8 +11,8 @@ use warnings;
 use Test::More;
 
 my $dir = "t/1451";
-my $cmd = "zcc +zxn -startup=4 -clib=sdcc_iy $dir/hexdump.c -o $dir/hexdump -subtype=dotn -create-app";
+my $cmd = "zcc +zxn -startup=4 -clib=sdcc_iy $dir/hexdump.c -subtype=dotn -create-app";
 ok 0==system($cmd), $cmd;
 
-unlink "$dir/H", "$dir/hexdump_CODE.bin", "$dir/hexdump_MAIN.bin", "$dir/hexdump_UNASSIGNED.bin";
+unlink "A", "a_CODE.bin", "a_MAIN.bin", "a_UNASSIGNED.bin", "zcc_opt.def";
 done_testing();
