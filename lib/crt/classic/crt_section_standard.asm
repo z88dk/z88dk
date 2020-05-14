@@ -36,6 +36,7 @@
 		SECTION code_fp
 		SECTION code_fp_math48
 		SECTION code_fp_math32
+		SECTION code_fp_math16
 		SECTION code_fp_mbf32
 		SECTION code_fp_mbf64
 		SECTION code_math
