@@ -6934,7 +6934,7 @@ _eof_trans:
   {
    STR_DEFINE(string, STR_SIZE);
    Str_set_bytes(string, ts, te-ts);
-   Str_len(string) = cstr_compress_escapes(Str_data(string));
+   Str_len(string) = str_compress_escapes(Str_data(string));
    if (Str_len(string) == 1)
     sym.number = Str_data(string)[0];
    else

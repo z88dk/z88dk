@@ -521,9 +521,6 @@ sub t_compile_module {
 #include <stdlib.h>
 #include <stdio.h>
 
-int sizeof_relocroutine = 0;
-int sizeof_reloctable = 0;
-
 ".join("\n", map {"#include \"$_\""} grep {-f $_} map {"$_.h"} sort keys %modules)."\n".'
 #undef main
 

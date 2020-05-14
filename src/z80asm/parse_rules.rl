@@ -1,7 +1,7 @@
 /*
 Z88DK Z80 Module Assembler
 
-Copyright (C) Paulo Custodio, 2011-2019
+Copyright (C) Paulo Custodio, 2011-2020
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -307,7 +307,7 @@ Define rules for a ragel-based parser.
 			(
 				string (_TK_COMMA | _TK_NEWLINE)
 				@{	DO_STMT_LABEL();
-					Str_len(name) = cstr_compress_escapes(Str_data(name));
+					Str_len(name) = str_compress_escapes(Str_data(name));
 					asm_DEFB_str(Str_data(name), Str_len(name));
 					if ( ctx->p->tok == TK_COMMA )
 						fgoto asm_DEFB_next;

@@ -1,11 +1,13 @@
 //-----------------------------------------------------------------------------
 // file utilities
-// Copyright (C) Paulo Custodio, 2011-2019
+// Copyright (C) Paulo Custodio, 2011-2020
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 #include "unity.h"
 #include "die.h"
 #include "fileutil.h"
+#include "zutils.h"
+
 #include <limits.h>
 #include <stdio.h>
 
@@ -169,13 +171,13 @@ void t_fileutil_xfopen(void)
 	FILE *fp = xfopen("test.out", "wb");
 	TEST_ASSERT_NOT_NULL(fp);
 
-	xfwrite("hello", sizeof(char), 5, fp);
+	xfwrite("hello", 1, 5, fp);
 	xfclose(fp);
 
 	fp = xfopen("test.out", "rb");
 	TEST_ASSERT_NOT_NULL(fp);
 
-	xfread(buffer, sizeof(char), 5, fp);
+	xfread(buffer, 1, 5, fp);
 	buffer[5] = '\0';
 	TEST_ASSERT_EQUAL_STRING("hello", buffer);
 
@@ -196,7 +198,7 @@ void t_fileutil_xfclose_remove_empty(void)
 	FILE *fp = xfopen("test.out", "wb");
 	TEST_ASSERT_NOT_NULL(fp);
 
-	xfwrite("hello", sizeof(char), 5, fp);
+	xfwrite("hello", 1, 5, fp);
 	xfclose_remove_empty(fp);
 
 	fp = xfopen("test.out", "rb");
@@ -244,19 +246,19 @@ void t_fileutil_xfwrite_cstr(void)
 	fp = xfopen("test.out", "rb");
 	TEST_ASSERT_NOT_NULL(fp);
 
-	str_t *s = str_new();
+	UT_string *s = utstr_new();
 	xfread_str(5, s, fp);
-	TEST_ASSERT_EQUAL_STRING("hello", str_data(s));
+	TEST_ASSERT_EQUAL_STRING("hello", utstr_body(s));
 
 	xfclose(fp);
 	remove("test.out");
-	str_free(s);
+	utstr_free(s);
 }
 
 void t_fileutil_xfwrite_str(void)
 {
-	str_t *s = str_new();
-	str_set(s, "hello");
+	UT_string *s = utstr_new();
+	utstr_set(s, "hello");
 
 	FILE *fp = xfopen("test.out", "wb");
 	TEST_ASSERT_NOT_NULL(fp);
@@ -267,21 +269,21 @@ void t_fileutil_xfwrite_str(void)
 	fp = xfopen("test.out", "rb");
 	TEST_ASSERT_NOT_NULL(fp);
 
-	str_clear(s);
-	TEST_ASSERT_EQUAL_STRING("", str_data(s));
+	utstr_clear(s);
+	TEST_ASSERT_EQUAL_STRING("", utstr_body(s));
 
 	xfread_str(5, s, fp);
-	TEST_ASSERT_EQUAL_STRING("hello", str_data(s));
+	TEST_ASSERT_EQUAL_STRING("hello", utstr_body(s));
 
 	xfclose(fp);
 	remove("test.out");
-	str_free(s);
+	utstr_free(s);
 }
 
 void run_fileutil_xfwrite_str(void)
 {
-	str_t *s = str_new();
-	str_set(s, "hello");
+	UT_string *s = utstr_new();
+	utstr_set(s, "hello");
 
 	FILE *fp = xfopen("test.out", "wb");
 	xfwrite_str(s, fp);
@@ -296,17 +298,17 @@ void run_fileutil_xfwrite_str(void)
 
 void t_fileutil_xfwrite_bcount_str_1(void)
 {
-	str_t *s = str_new();
+	UT_string *s = utstr_new();
 	FILE *fp = xfopen("test.out", "wb");
 	TEST_ASSERT_NOT_NULL(fp);
 
 	fputc(0xFF, fp);
 
-	str_clear(s);
+	utstr_clear(s);
 	xfwrite_bcount_str(s, fp);
 	fputc(0xFF, fp);
 
-	str_set(s, "h");
+	utstr_set(s, "h");
 	xfwrite_bcount_str(s, fp);
 	fputc(0xFF, fp);
 
@@ -341,18 +343,18 @@ void t_fileutil_xfwrite_bcount_str_1(void)
 
 	xfclose(fp);
 	remove("test.out");
-	str_free(s);
+	utstr_free(s);
 }
 
 void t_fileutil_xfwrite_bcount_str_2(void)
 {
-	str_t *s = str_new();
-	str_set(s, 
+	UT_string *s = utstr_new();
+	utstr_set(s,  
 		"0123456789abcdef" "0123456789abcdef" "0123456789abcdef" "0123456789abcdef"
 		"0123456789abcdef" "0123456789abcdef" "0123456789abcdef" "0123456789abcdef"
 		"0123456789abcdef" "0123456789abcdef" "0123456789abcdef" "0123456789abcdef"
 		"0123456789abcdef" "0123456789abcdef" "0123456789abcdef" "0123456789abcde");
-	TEST_ASSERT_EQUAL(255, str_len(s));
+	TEST_ASSERT_EQUAL(255, utstr_len(s));
 
 	FILE *fp = xfopen("test.out", "wb");
 	TEST_ASSERT_NOT_NULL(fp);
@@ -360,30 +362,30 @@ void t_fileutil_xfwrite_bcount_str_2(void)
 	xfwrite_bcount_str(s, fp);
 	xfclose(fp);
 
-	str_t *r = str_new();
+	UT_string *r = utstr_new();
 
 	fp = xfopen("test.out", "rb");
 	TEST_ASSERT_NOT_NULL(fp);
 
 	xfread_bcount_str(r, fp);
-	TEST_ASSERT_EQUAL(255, str_len(s));
-	TEST_ASSERT_EQUAL_STRING(str_data(s), str_data(r));
+	TEST_ASSERT_EQUAL(255, utstr_len(s));
+	TEST_ASSERT_EQUAL_STRING(utstr_body(s), utstr_body(r));
 
 	xfclose(fp);
 	remove("test.out");
-	str_free(s);
-	str_free(r);
+	utstr_free(s);
+	utstr_free(r);
 }
 
 void run_fileutil_xfwrite_bcount_str(void)
 {
-	str_t *s = str_new();
-	str_set(s,
+	UT_string *s = utstr_new();
+	utstr_set(s, 
 		"0123456789abcdef" "0123456789abcdef" "0123456789abcdef" "0123456789abcdef"
 		"0123456789abcdef" "0123456789abcdef" "0123456789abcdef" "0123456789abcdef"
 		"0123456789abcdef" "0123456789abcdef" "0123456789abcdef" "0123456789abcdef"
 		"0123456789abcdef" "0123456789abcdef" "0123456789abcdef" "0123456789abcdef");
-	TEST_ASSERT_EQUAL(256, str_len(s));
+	TEST_ASSERT_EQUAL(256, utstr_len(s));
 
 	FILE *fp = xfopen("test.out", "wb");
 	TEST_ASSERT_NOT_NULL(fp);
@@ -395,10 +397,10 @@ void run_fileutil_xfwrite_bcount_str(void)
 void t_fileutil_xfwrite_wcount_str_1(void)
 {
 	size_t sz = 0xFFFF;
-	str_t *s = str_new();
-	str_reserve(s, sz);
-	memset(str_data(s), 'x', sz);
-	str_data(s)[str_len(s) = sz] = '\0';
+	UT_string *s = utstr_new();
+	utstr_reserve(s, sz);
+	memset(utstr_body(s), 'x', sz);
+	utstr_body(s)[utstr_len(s) = sz] = '\0';
 
 	FILE *fp = xfopen("test.out", "wb");
 	TEST_ASSERT_NOT_NULL(fp);
@@ -406,8 +408,8 @@ void t_fileutil_xfwrite_wcount_str_1(void)
 	xfwrite_wcount_str(s, fp);
 	xfclose(fp);
 
-	str_clear(s);
-	TEST_ASSERT_EQUAL_STRING("", str_data(s));
+	utstr_clear(s);
+	TEST_ASSERT_EQUAL_STRING("", utstr_body(s));
 
 	fp = xfopen("test.out", "rb");
 	TEST_ASSERT_NOT_NULL(fp);
@@ -416,36 +418,36 @@ void t_fileutil_xfwrite_wcount_str_1(void)
 
 	TEST_ASSERT_EQUAL(EOF, fgetc(fp));
 
-	TEST_ASSERT_EQUAL(sz, str_len(s));
+	TEST_ASSERT_EQUAL(sz, utstr_len(s));
 	for (size_t i = 0; i < sz; i++)
-		TEST_ASSERT_EQUAL('x', str_data(s)[i]);
+		TEST_ASSERT_EQUAL('x', utstr_body(s)[i]);
 
 	xfclose(fp);
 	remove("test.out");
-	str_free(s);
+	utstr_free(s);
 }
 
 void t_fileutil_xfwrite_wcount_str_2(void)
 {
-	str_t *s = str_new();
+	UT_string *s = utstr_new();
 	FILE *fp = xfopen("test.out", "wb");
 	TEST_ASSERT_NOT_NULL(fp);
 
 	fputc(0xFF, fp);
 
-	str_clear(s);
+	utstr_clear(s);
 	xfwrite_wcount_str(s, fp);
 
 	fputc(0xFF, fp);
 
-	str_set(s, "h");
+	utstr_set(s, "h");
 	xfwrite_wcount_str(s, fp);
 
 	fputc(0xFF, fp);
 
-	str_reserve(s, 256);
-	memset(str_data(s), ' ', 256);
-	str_data(s)[str_len(s) = 256] = '\0';
+	utstr_reserve(s, 256);
+	memset(utstr_body(s), ' ', 256);
+	utstr_body(s)[utstr_len(s) = 256] = '\0';
 
 	xfwrite_wcount_str(s, fp);
 	fputc(0xFF, fp);
@@ -490,16 +492,16 @@ void t_fileutil_xfwrite_wcount_str_2(void)
 
 	xfclose(fp);
 	remove("test.out");
-	str_free(s);
+	utstr_free(s);
 }
 
 void run_fileutil_xfwrite_wcount_str(void)
 {
 	size_t sz = 0x10000;
-	str_t *s = str_new();
-	str_reserve(s, sz);
-	memset(str_data(s), 'x', sz);
-	str_data(s)[str_len(s) = sz] = '\0';
+	UT_string *s = utstr_new();
+	utstr_reserve(s, sz);
+	memset(utstr_body(s), 'x', sz);
+	utstr_body(s)[utstr_len(s) = sz] = '\0';
 
 	FILE *fp = xfopen("test.out", "wb");
 	TEST_ASSERT_NOT_NULL(fp);
@@ -710,7 +712,7 @@ void run_fileutil_xfread_str(void)
 	fp = xfopen("test.out", "rb");
 	TEST_ASSERT_NOT_NULL(fp);
 
-	str_t *s = str_new();
+	UT_string *s = utstr_new();
 	xfread_str(2, s, fp);	// dies
 	xassert(0);
 }
@@ -726,7 +728,7 @@ void run_fileutil_xfread_bcount_str(void)
 	fp = xfopen("test.out", "rb");
 	TEST_ASSERT_NOT_NULL(fp);
 
-	str_t *s = str_new();
+	UT_string *s = utstr_new();
 	xfread_bcount_str(s, fp);	// dies
 	xassert(0);
 }
@@ -743,7 +745,7 @@ void run_fileutil_xfread_wcount_str(void)
 	fp = xfopen("test.out", "rb");
 	TEST_ASSERT_NOT_NULL(fp);
 
-	str_t *s = str_new();
+	UT_string *s = utstr_new();
 	xfread_wcount_str(s, fp);	// dies
 	xassert(0);
 }
@@ -868,7 +870,7 @@ void t_fileutil_file_spew_slurp(void)
 		"And the evening and the morning were the sixth day. \n";
 
 	size_t len = strlen(text);
-	str_t *s;
+	UT_string *s;
 
 	// file_spew
 	file_spew("test.txt", text);
@@ -876,9 +878,9 @@ void t_fileutil_file_spew_slurp(void)
 	TEST_ASSERT_EQUAL(len, file_size("test.txt"));
 
 	s = file_slurp("test.txt");
-	TEST_ASSERT_EQUAL(len, str_len(s));
-	TEST_ASSERT_EQUAL_STRING(text, str_data(s));
-	str_free(s);
+	TEST_ASSERT_EQUAL(len, utstr_len(s));
+	TEST_ASSERT_EQUAL_STRING(text, utstr_body(s));
+	utstr_free(s);
 
 	// file_spew_n
 	file_spew_n("test.txt", text, strlen(text));
@@ -886,21 +888,21 @@ void t_fileutil_file_spew_slurp(void)
 	TEST_ASSERT_EQUAL(len, file_size("test.txt"));
 
 	s = file_slurp("test.txt");
-	TEST_ASSERT_EQUAL(len, str_len(s));
-	TEST_ASSERT_EQUAL_STRING(text, str_data(s));
-	str_free(s);
+	TEST_ASSERT_EQUAL(len, utstr_len(s));
+	TEST_ASSERT_EQUAL_STRING(text, utstr_body(s));
+	utstr_free(s);
 
 	// file_spew_str
-	s = str_new_copy(text);
+	s = utstr_new_init(text);
 	file_spew_str("test.txt", s);
-	str_free(s);
+	utstr_free(s);
 	TEST_ASSERT(file_exists("test.txt"));
 	TEST_ASSERT_EQUAL(len, file_size("test.txt"));
 
 	s = file_slurp("test.txt");
-	TEST_ASSERT_EQUAL(len, str_len(s));
-	TEST_ASSERT_EQUAL_STRING(text, str_data(s));
-	str_free(s);
+	TEST_ASSERT_EQUAL(len, utstr_len(s));
+	TEST_ASSERT_EQUAL_STRING(text, utstr_body(s));
+	utstr_free(s);
 
 	unlink("test.txt");
 	TEST_ASSERT(!file_exists("test.txt"));
@@ -1060,18 +1062,18 @@ void t_fileutil_path_find_glob(void)
 	TEST_ASSERT(!dir_exists("test_dir"));
 
 	int file = 0;
-	str_t *pad = str_new();
+	UT_string *pad = utstr_new();
 	for (int d1 = 'a'; d1 <= 'b'; d1++) {
 		for (int d2 = '1'; d2 <= '2'; d2++) {
-			str_set_f(pad, "test_dir/%c/%c", d1, d2); path_mkdir(str_data(pad));
-			str_set_f(pad, "test_dir/%c/%c/d", d1, d2); path_mkdir(str_data(pad));
+			utstr_set_fmt(pad, "test_dir/%c/%c", d1, d2); path_mkdir(utstr_body(pad));
+			utstr_set_fmt(pad, "test_dir/%c/%c/d", d1, d2); path_mkdir(utstr_body(pad));
 
-			str_set_f(pad, "test_dir/%c/%c/f%d.c", d1, d2, ++file); file_spew(str_data(pad), "");
-			str_set_f(pad, "test_dir/%c/%c/f%d.c", d1, d2, ++file); file_spew(str_data(pad), "");
-			str_set_f(pad, "test_dir/%c/%c/f%d.c", d1, d2, ++file); file_spew(str_data(pad), "");
+			utstr_set_fmt(pad, "test_dir/%c/%c/f%d.c", d1, d2, ++file); file_spew(utstr_body(pad), "");
+			utstr_set_fmt(pad, "test_dir/%c/%c/f%d.c", d1, d2, ++file); file_spew(utstr_body(pad), "");
+			utstr_set_fmt(pad, "test_dir/%c/%c/f%d.c", d1, d2, ++file); file_spew(utstr_body(pad), "");
 		}
 	}
-	str_free(pad);
+	utstr_free(pad);
 
 	// no wild card - file exists
 	argv_t *f = path_find_glob("test_dir/a/1/f1.c");

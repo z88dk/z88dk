@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // die - check results and die on error
-// Copyright (C) Paulo Custodio, 2011-2019
+// Copyright (C) Paulo Custodio, 2011-2020
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 #include "unity.h"
@@ -49,7 +49,7 @@ void t_die_xmalloc(void)
 
 void t_die_xcalloc(void)
 {
-	char *p = xcalloc(sizeof(char), 5);
+	char *p = xcalloc(1, 5);
 	TEST_ASSERT_NOT_NULL(p);
 	TEST_ASSERT_EQUAL(0, memcmp(p, "\0\0\0\0\0", 5));
 	xfree(p);

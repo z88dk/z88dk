@@ -1,14 +1,15 @@
 //-----------------------------------------------------------------------------
 // Z88DK Z80 Module Assembler
 // Parse command line options
-// Copyright (C) Paulo Custodio, 2011-2019
+// Copyright (C) Paulo Custodio, 2011-2020
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 #pragma once
 
+#include "strutil.h"
 #include "types.h"
 #include "utarray.h"
-#include "strutil.h"
+#include "utstring.h"
 
 /*-----------------------------------------------------------------------------
 *   CPU type

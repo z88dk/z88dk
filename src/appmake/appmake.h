@@ -19,6 +19,9 @@
 #ifndef WIN32
 #include <unistd.h>
 #endif
+#ifdef _MSC_VER
+#define __NORETURN 
+#endif
 
 #ifdef WIN32
 #define __NORETURN 

@@ -2,7 +2,7 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2019
+Copyright (C) Paulo Custodio, 2011-2020
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -12,15 +12,16 @@ see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
 #include "array.h"
 #include "codearea.h"
-#include "expr.h"
+#include "die.h"
 #include "errors.h"
+#include "expr.h"
 #include "init.h"
 #include "model.h"
 #include "strhash.h"
 #include "strutil.h"
 #include "sym.h"
 #include "symtab.h"
-#include "die.h"
+#include "utstring.h"
 
 /*-----------------------------------------------------------------------------
 *	UT_array of Expr*

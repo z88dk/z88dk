@@ -62,7 +62,7 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 		
 		# run assembler
 		ok system($cmd)==0, $cmd;
-		ok -s "test.err" == 0, "no errors in stderr";
+		diag slurp("test.err") if !-s "test.err";
 		ok !-f $file_err, "no $file_err";
 		if (-f $file_err) {
 			diag slurp($file_err);
@@ -111,7 +111,7 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 		
 		# run assembler
 		ok system($cmd)!=0, $cmd;
-		ok -s "test.err", "errors in stderr";
+		diag slurp("test.err") if !-s "test.err";
 		ok -f $file_err, "$file_err exists";
 		local(@ARGV) = $file_err;
 		while (<>) {

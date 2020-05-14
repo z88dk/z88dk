@@ -2,7 +2,7 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2019
+Copyright (C) Paulo Custodio, 2011-2020
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -84,6 +84,7 @@ extern bool objmodule_loaded(const char* obj_filename);
 
 // check if the given filename exists and is an object file of the correct version
 extern bool check_object_file(const char* obj_filename);
+extern bool check_object_file_no_errors(const char* obj_filename);
 
 // worker
 extern bool check_obj_lib_file(const char* filename,

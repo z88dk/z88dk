@@ -2,7 +2,7 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2019
+Copyright (C) Paulo Custodio, 2011-2020
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -10,6 +10,7 @@ Assembly directives.
 */
 
 #include "codearea.h"
+#include "die.h"
 #include "directives.h"
 #include "errors.h"
 #include "fileutil.h"
@@ -17,10 +18,10 @@ Assembly directives.
 #include "module.h"
 #include "parse.h"
 #include "strutil.h"
-#include "types.h"
 #include "symtab.h"
+#include "types.h"
+#include "utstring.h"
 #include "z80asm.h"
-#include "die.h"
 
 static void check_org_align();
 

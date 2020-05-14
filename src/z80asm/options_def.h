@@ -2,7 +2,7 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2019
+Copyright (C) Paulo Custodio, 2011-2020
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -30,7 +30,6 @@ OPT_VAR( bool,		split_bin,	false   )	/* true to split binary file per section */
 OPT_VAR( bool,		date_stamp,	false	)
 OPT_VAR( bool,		relocatable, false	)
 OPT_VAR( bool,      reloc_info, false   )	/* generate .reloc file */
-OPT_VAR( bool,		library,	false	)	/* true if linking with libs */
 OPT_VAR( bool,		opt_speed,	false   )
 
 OPT_VAR(appmake_t, appmake, APPMAKE_NONE)
