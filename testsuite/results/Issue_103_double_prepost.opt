@@ -22,8 +22,7 @@
 	call	dstore
 	call	dpush
 	ld	hl,65535	;const
-	ld	de,65535
-	call	float
+	call	l_int2long_s_float
 	call	dadd
 	ld	hl,0	;const
 	add	hl,sp
@@ -55,8 +54,7 @@
 	call	dstore
 	call	dpush
 	ld	hl,65535	;const
-	ld	de,65535
-	call	float
+	call	l_int2long_s_float
 	call	dadd
 	pop	hl
 	call	dstore
@@ -130,8 +128,7 @@
 	push	hl
 	call	dldpsh
 	ld	hl,65535	;const
-	ld	de,65535
-	call	float
+	call	l_int2long_s_float
 	call	dadd
 	pop	hl
 	call	dstore
@@ -163,8 +160,7 @@
 	push	hl
 	call	dldpsh
 	ld	hl,65535	;const
-	ld	de,65535
-	call	float
+	call	l_int2long_s_float
 	call	dadd
 	pop	hl
 	call	dstore
@@ -192,8 +188,7 @@
 	push	hl
 	call	dldpsh
 	ld	hl,65535	;const
-	ld	de,65535
-	call	float
+	call	l_int2long_s_float
 	call	dadd
 	pop	hl
 	call	dstore
@@ -221,8 +216,7 @@
 	push	hl
 	call	dldpsh
 	ld	hl,65535	;const
-	ld	de,65535
-	call	float
+	call	l_int2long_s_float
 	call	dadd
 	pop	hl
 	call	dstore

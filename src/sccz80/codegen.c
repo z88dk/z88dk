@@ -82,11 +82,11 @@ struct _mapping {
         { "f2uint",  "ifix",  "l_f16_f2uint",  "l_f32_f2uint",  "l_f64_f2uint" },
         { "f2slong", "ifix",  "l_f16_f2slong", "l_f32_f2slong", "l_f64_f2slong" },
         { "f2ulong", "ifix",  "l_f16_f2ulong", "l_f32_f2ulong", "l_f64_f2ulong" },
-        { "fpush",   "dpush", NULL, NULL, "l_f64_dpush" },
+        { "fpush",   "dpush",  NULL,            NULL, "l_f64_dpush" },
         { "dpush_under_long", "dpush3", NULL, NULL, "l_f64_dpush3" }, // Inlined
         { "dpush_under_int", "dpush2", NULL, NULL, "l_f64_dpush2" }, // Inlined
-        { "fswap", "dswap", "l_f16_swap", "l_f32_swap", "l_f64_swap" },
-        { "fnegate", "minusfa", "l_f16_negate", NULL, "l_f64_negate" },
+        { "fswap", "dswap",   NULL, "l_f32_swap", "l_f64_swap" },
+        { "fnegate", "minusfa", NULL, NULL, "l_f64_negate" },
         { "ldexp", "l_f48_ldexp", "l_f16_ldexp", "l_f32_ldexp", "l_f64_ldexp" },
         { "inversef", NULL, "l_f16_invf", "l_f32_invf", NULL }, // Called only for IEEE mode
         { NULL }
@@ -3365,8 +3365,7 @@ void inc(LVALUE* lval)
             vlongconst(0x81000000); // +1.0
             break;
         default:
-            vconst(1);
-            zconvert_to_double(KIND_INT, 1);
+            zconvert_constant_to_double(1, 1);
         }
         callrts("fadd");
         Zsp += c_fp_size;
@@ -3401,8 +3400,7 @@ void dec(LVALUE* lval)
             vlongconst(0x81800000); // -1.0
             break;
         default:
-            vlongconst(-1);
-            zconvert_to_double(KIND_LONG, 0);
+            zconvert_constant_to_double(-1,0);
         }
         callrts("fadd");
         Zsp += c_fp_size;
@@ -4279,7 +4277,11 @@ void convSint2long(void)
 /* Swap double positions on stack */
 void DoubSwap(void)
 {
-    callrts("fswap");
+    if ( c_fp_size == 2 ) {
+        swapstk(); 
+    } else {
+        callrts("fswap");
+    }
 }
 
 void vlongconst(double val)
@@ -4853,12 +4855,23 @@ void zconvert_from_double(Kind type, unsigned char isunsigned)
 
 void zconvert_constant_to_double(double val, unsigned char isunsigned)
 {
+    unsigned char  fa[8] = {0};
+
     if ( c_fp_size == 2 ) {
-        vconst(val);
-        zconvert_to_double(KIND_INT, isunsigned);
+        dofloat(val, fa);
+        vconst((fa[1] << 8) | fa[0]);
+    } else if ( c_fp_size == 4 ) {
+        dofloat(val, fa);
+        vconst((fa[1] << 8) | fa[0]);
+        const2((fa[3] << 8) | fa[2]);
     } else {
-        vlongconst(val);
-        zconvert_to_double(KIND_LONG, isunsigned);
+        if ( fabs(val) < 65536 ) {
+            vconst(val);
+            zconvert_to_double(KIND_INT, isunsigned);
+        } else {
+            vlongconst(val);
+            zconvert_to_double(KIND_LONG, isunsigned);
+        }
     }
 
 }
